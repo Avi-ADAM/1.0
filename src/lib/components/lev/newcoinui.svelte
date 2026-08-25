@@ -35,8 +35,8 @@
   import { flip } from 'svelte/animate';
   import { onDestroy, onMount, untrack } from 'svelte';
   import { t } from '$lib/translations';
-  import { coinSize, coinSkin } from '$lib/stores/levStores';
-  import { RIM_GILT } from './coins/coinSkin.js';
+  import { coinSize, coinSkin, chooseCoinSkin } from '$lib/stores/levStores';
+  import { RIM_GILT, RIM_WELL } from './coins/coinSkin.js';
   import { confettiStore } from '$lib/stores/confettiStore';
   import { deckPosition, rememberCard } from './cards/deckPosition.svelte.js';
   import { isMobileOrTablet } from '$lib/utilities/device';
@@ -600,7 +600,7 @@
       aria-pressed={$coinSkin === 'classic'}
       aria-label={$t('lev.coins.skin.label')}
       title={$t(`lev.coins.skin.${$coinSkin === 'classic' ? 'plate' : 'classic'}`)}
-      onclick={() => coinSkin.set($coinSkin === 'classic' ? 'plate' : 'classic')}
+      onclick={() => chooseCoinSkin($coinSkin === 'classic' ? 'plate' : 'classic')}
     >
       <span class="skin-dot" aria-hidden="true"></span>
     </button>
@@ -620,16 +620,28 @@
          docs/PLAN_LEV_COINS.md puts the zoom controls in its place. -->
   </div>
 
-  <!-- One gilt gradient for the whole field. The original coins defined one
+  <!-- Two gradients for the whole field. The original coins defined one
        *per coin* — part of why 137 of them cost 31,540 DOM nodes — and an SVG
        paint server resolves document-wide, so a single hidden <defs> serves
        every coin's rim lettering. -->
   <svg class="coin-defs" aria-hidden="true" focusable="false">
     <defs>
+      <!-- The gilt, down the glyph. -->
       <linearGradient id="lev-coin-gilt" x1="0" y1="0" x2="0" y2="1">
         {#each RIM_GILT as stop, i}
           <stop offset={i / (RIM_GILT.length - 1)} stop-color={stop} />
         {/each}
+      </linearGradient>
+
+      <!-- The ground the gilt is read against, across the rim arc. Opaque
+           where the label sits and transparent at both arc ends, so the band
+           is a well under the words rather than a bezel bolted round the
+           coin — the artwork keeps its shoulders. -->
+      <linearGradient id="lev-coin-rim-well" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stop-color={RIM_WELL} stop-opacity="0" />
+        <stop offset="0.2" stop-color={RIM_WELL} stop-opacity="1" />
+        <stop offset="0.8" stop-color={RIM_WELL} stop-opacity="1" />
+        <stop offset="1" stop-color={RIM_WELL} stop-opacity="0" />
       </linearGradient>
     </defs>
   </svg>

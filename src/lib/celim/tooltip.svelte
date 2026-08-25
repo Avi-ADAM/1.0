@@ -20,24 +20,29 @@
 		children
 	} = $props();
 
+	/* `clientX/clientY`, not `pageX/pageY`. The bubble is `position: fixed`, so
+	   its coordinates are viewport ones; the page pair adds the document scroll
+	   and pushed the bubble that far off the cursor on any scrolled page. It
+	   went unnoticed on the lev page only because `#screen` is itself fixed and
+	   scrolls internally, so the document never scrolls there. */
+	function place(event) {
+		x = event.clientX + 5;
+		y = event.clientY + 5;
+		ix = event.clientX + 5;
+		iy = event.clientY + 5;
+	}
 	function mouseOver(event) {
 		isHovered = true;
-		x = event.pageX + 5;
-		y = event.pageY + 5;
-		ix = event.pageX + 5;
-		iy = event.pageY + 5;
+		place(event);
 	}
 	function mouseMove(event) {
-		x = event.pageX + 5;
-		y = event.pageY + 5;
-		ix = event.pageX + 5;
-		iy = event.pageY + 5;
+		place(event);
 	}
 	function mouseLeave() {
 		isHovered = false;
 		ispic = false
 	}
- 
+
 </script>
 
 <span
@@ -57,16 +62,35 @@
 	{/if}
 
 <style>
+	/* This bubble carries the only running commentary the heart has — what each
+	   diamond filters, where the centre leads — and it was unreadable: hot pink
+	   (#ef1758) on a four-stop gold ramp that ends at #AA771C, which is 1.3:1
+	   at the dark end, and with no width limit a whole sentence stretched across
+	   whatever it was explaining. Same gold identity, but only the pale end of
+	   the ramp, violet ink to match the heart, and a width that makes it wrap. */
 	.tooltip {
-        z-index: 999;
-		border: 1px solid rgb(239, 45, 178);
-		box-shadow: 1px 1px 1px rgb(224, 165, 211);
-		background: linear-gradient(to bottom right, #BF953F, #FCF6BA, #FBF5B7, #AA771C);
-        color: rgb(239, 23, 88);
+		z-index: 999;
+		max-width: min(22rem, 70vw);
+		border: 1px solid #8b2fd6;
+		box-shadow: 0 2px 8px rgb(2 6 23 / 0.35);
+		background: linear-gradient(to bottom right, #fcf6ba, #f0de72);
+		color: #3b0047; /* 13.6:1 on #f0de72 */
 		border-radius: 4px;
-		padding: 4px;
+		padding: 4px 8px;
 		position: fixed;
 		text-align: center;
+		/* The cursor is at the bubble's top-left corner; without this it would be
+		   the first thing the bubble covers on its way to a stud. */
+		pointer-events: none;
 	}
-    
+
+	/* The professional identity has no gold parchment. Same bubble, the
+	   appearance layer's own surface and ink — readable in light and dark
+	   without a second rule, because both tokens flip together. */
+	:global(html.business) .tooltip {
+		background: var(--s1, #fff);
+		color: var(--text, #0f172a);
+		border-color: var(--border, rgb(15 23 42 / 0.12));
+	}
+
 </style>

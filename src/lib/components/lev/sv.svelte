@@ -142,17 +142,25 @@ console.log(sml)
       </style>
  <svg class:fv={sml === true} class:midCom={sml === false} class:sh={low === true}  version="1.1" viewBox="-148.21 -131.51 641.46 671.02" xmlns="http://www.w3.org/2000/svg" xmlns:bx="https://boxy-svg.com" xmlns:xlink="http://www.w3.org/1999/xlink">
 <defs>
+    <!-- The palette, in one place because it is spread over ~1500 gradient
+         stops below. It is one violet family with gold as the only warm
+         accent: the heart mass runs gold -> #8b2fd6 (#levleva), the facet
+         strokes shared by all twelve diamonds run #2c1145 -> #c084fc, and
+         each diamond keeps a violet of its own so it stays tellable apart —
+         e #e879f9, d #a78bfa, q #4c1d95, b #3b0047, j #7c3aed, x #8b5cf6,
+         f #6d28d9, a #7c3aed, g #c77dff. c and y stay gold (#levlevr) on
+         purpose: the pair is violet AND gold, not violet alone. -->
     <linearGradient id="levlevah" bx:pinned="true">
-    <stop stop-color="#46281e" offset="0"/>
+    <stop stop-color="#2c1145" offset="0"/>
     <stop stop-color="#fecf00" offset=".337"/>
     <stop stop-color="#fd5" offset=".521"/>
-    <stop stop-color="#ff2253" offset=".693"/>
+    <stop stop-color="#a855f7" offset=".693"/>
     <stop stop-color="#ffc400" offset=".878"/>
     <stop stop-color="#a67e22" offset="1"/>
     </linearGradient>
     <linearGradient id="levleva" bx:pinned="true">
     <stop stop-color="#ffd828" offset=".214"/>
-    <stop stop-color="#f06" offset=".888"/>
+    <stop stop-color="#8b2fd6" offset=".888"/>
     </linearGradient>
 
     <style bx:fonts="Shizuru" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Shizuru%3Aital%2Cwght%400%2C400&display=swap);</style>
@@ -1070,112 +1078,112 @@ console.log(sml)
     <linearGradient id="levlevii" x1="51.389" x2="51.389" y1="471.21" y2="508.08" gradientUnits="userSpaceOnUse" xlink:href="#levleva"/>
     <linearGradient id="levlevih" x1="57.371" x2="57.371" y1="578.6" y2="587.38" gradientUnits="userSpaceOnUse" xlink:href="#levleva"/>
     <linearGradient id="levlevaf" x1="259.5" x2="259.5" y1="613.23" y2="622" gradientUnits="userSpaceOnUse">
-    <stop stop-color="#363128" offset="0"/>
-    <stop stop-color="#e96fbc" offset="1"/>
+    <stop stop-color="#2c1145" offset="0"/>
+    <stop stop-color="#c084fc" offset="1"/>
     </linearGradient>
     <linearGradient id="levlevae" x1="258.66" x2="258.66" y1="614.76" y2="622" gradientUnits="userSpaceOnUse">
-    <stop stop-color="#363128" offset="0"/>
-    <stop stop-color="#e96fbc" offset="1"/>
+    <stop stop-color="#2c1145" offset="0"/>
+    <stop stop-color="#c084fc" offset="1"/>
     </linearGradient>
     <linearGradient id="levlevad" x1="252.17" x2="252.17" y1="614.39" y2="621.91" gradientUnits="userSpaceOnUse">
-    <stop stop-color="#363128" offset="0"/>
-    <stop stop-color="#e96fbc" offset="1"/>
+    <stop stop-color="#2c1145" offset="0"/>
+    <stop stop-color="#c084fc" offset="1"/>
     </linearGradient>
     <linearGradient id="levlevac" x1="249.29" x2="249.29" y1="607.47" y2="614.35" gradientUnits="userSpaceOnUse">
-    <stop stop-color="#363128" offset="0"/>
-    <stop stop-color="#e96fbc" offset="1"/>
+    <stop stop-color="#2c1145" offset="0"/>
+    <stop stop-color="#c084fc" offset="1"/>
     </linearGradient>
     <linearGradient id="levlevab" x1="250.92" x2="250.92" y1="608.01" y2="614.28" gradientUnits="userSpaceOnUse">
-    <stop stop-color="#363128" offset="0"/>
-    <stop stop-color="#e96fbc" offset="1"/>
+    <stop stop-color="#2c1145" offset="0"/>
+    <stop stop-color="#c084fc" offset="1"/>
     </linearGradient>
     <linearGradient id="levlevaa" x1="252.11" x2="252.11" y1="610.14" y2="616.31" gradientUnits="userSpaceOnUse">
-    <stop stop-color="#363128" offset="0"/>
-    <stop stop-color="#e96fbc" offset="1"/>
+    <stop stop-color="#2c1145" offset="0"/>
+    <stop stop-color="#c084fc" offset="1"/>
     </linearGradient>
     <linearGradient id="levlevz" x1="261.74" x2="261.74" y1="607.53" y2="610.78" gradientUnits="userSpaceOnUse">
-    <stop stop-color="#363128" offset="0"/>
-    <stop stop-color="#e96fbc" offset="1"/>
+    <stop stop-color="#2c1145" offset="0"/>
+    <stop stop-color="#c084fc" offset="1"/>
     </linearGradient>
     <linearGradient id="levlevy" x1="262.11" x2="262.11" y1="608.89" y2="614.81" gradientUnits="userSpaceOnUse">
-    <stop stop-color="#363128" offset="0"/>
-    <stop stop-color="#e96fbc" offset="1"/>
+    <stop stop-color="#2c1145" offset="0"/>
+    <stop stop-color="#c084fc" offset="1"/>
     </linearGradient>
     <linearGradient id="levlevx" x1="259.73" x2="259.73" y1="608.4" y2="614.7" gradientUnits="userSpaceOnUse">
-    <stop stop-color="#363128" offset="0"/>
-    <stop stop-color="#e96fbc" offset="1"/>
+    <stop stop-color="#2c1145" offset="0"/>
+    <stop stop-color="#c084fc" offset="1"/>
     </linearGradient>
     <linearGradient id="levlevw" x1="258.52" x2="258.52" y1="610.19" y2="616.28" gradientUnits="userSpaceOnUse">
-    <stop stop-color="#363128" offset="0"/>
-    <stop stop-color="#e96fbc" offset="1"/>
+    <stop stop-color="#2c1145" offset="0"/>
+    <stop stop-color="#c084fc" offset="1"/>
     </linearGradient>
     <linearGradient id="levlevv" x1="253.88" x2="253.88" y1="615.96" y2="621.82" gradientUnits="userSpaceOnUse">
-    <stop stop-color="#363128" offset="0"/>
-    <stop stop-color="#e96fbc" offset="1"/>
+    <stop stop-color="#2c1145" offset="0"/>
+    <stop stop-color="#c084fc" offset="1"/>
     </linearGradient>
     <linearGradient id="levlevu" x1="257.11" x2="257.11" y1="615.85" y2="621.62" gradientUnits="userSpaceOnUse">
-    <stop stop-color="#363128" offset="0"/>
-    <stop stop-color="#e96fbc" offset="1"/>
+    <stop stop-color="#2c1145" offset="0"/>
+    <stop stop-color="#c084fc" offset="1"/>
     </linearGradient>
     <linearGradient id="levlevt" x1="255.52" x2="255.52" y1="610.06" y2="616.05" gradientUnits="userSpaceOnUse">
-    <stop stop-color="#363128" offset="0"/>
-    <stop stop-color="#e96fbc" offset="1"/>
+    <stop stop-color="#2c1145" offset="0"/>
+    <stop stop-color="#c084fc" offset="1"/>
     </linearGradient>
     <linearGradient id="levlevs" x1="103.04" x2="103.04" y1="491.21" y2="534.17" gradientUnits="userSpaceOnUse">
-    <stop stop-color="#363128" offset="0"/>
-    <stop stop-color="#e96fbc" offset="1"/>
+    <stop stop-color="#2c1145" offset="0"/>
+    <stop stop-color="#c084fc" offset="1"/>
     </linearGradient>
     <linearGradient id="levlevdw" x1="258.52" x2="258.52" y1="610.19" y2="616.28" gradientUnits="userSpaceOnUse">
     <stop stop-color="#fff" offset="0"/>
-    <stop stop-color="rgba(51, 0, 255, 1)" offset="1"/>
+    <stop stop-color="rgba(124, 58, 237, 1)" offset="1"/>
     </linearGradient>
     <linearGradient id="levlevbv" x1="259.5" x2="259.5" y1="613.23" y2="622" gradientUnits="userSpaceOnUse">
     <stop stop-color="#fff" offset="0"/>
-    <stop stop-color="rgba(51, 0, 255, 1)" offset="1"/>
+    <stop stop-color="rgba(124, 58, 237, 1)" offset="1"/>
     </linearGradient>
     <linearGradient id="levlevbt" x1="258.66" x2="258.66" y1="614.76" y2="622" gradientUnits="userSpaceOnUse">
     <stop stop-color="#fff" offset="0"/>
-    <stop stop-color="rgba(51, 0, 255, 1)" offset="1"/>
+    <stop stop-color="rgba(124, 58, 237, 1)" offset="1"/>
     </linearGradient>
     <linearGradient id="levlevbp" x1="252.17" x2="252.17" y1="614.39" y2="621.91" gradientUnits="userSpaceOnUse">
     <stop stop-color="#fff" offset="0"/>
-    <stop stop-color="rgba(51, 0, 255, 1)" offset="1"/>
+    <stop stop-color="rgba(124, 58, 237, 1)" offset="1"/>
     </linearGradient>
     <linearGradient id="levlevbk" x1="249.29" x2="249.29" y1="607.47" y2="614.35" gradientUnits="userSpaceOnUse">
     <stop stop-color="#fff" offset="0"/>
-    <stop stop-color="rgba(51, 0, 255, 1)" offset="1"/>
+    <stop stop-color="rgba(124, 58, 237, 1)" offset="1"/>
     </linearGradient>
     <linearGradient id="levlevbj" x1="250.92" x2="250.92" y1="608.01" y2="614.28" gradientUnits="userSpaceOnUse">
     <stop stop-color="#fff" offset="0"/>
-    <stop stop-color="rgba(51, 0, 255, 1)" offset="1"/>
+    <stop stop-color="rgba(124, 58, 237, 1)" offset="1"/>
     </linearGradient>
     <linearGradient id="levlevbi" x1="252.11" x2="252.11" y1="610.14" y2="616.31" gradientUnits="userSpaceOnUse">
     <stop stop-color="#fff" offset="0"/>
-    <stop stop-color="rgba(51, 0, 255, 1)" offset="1"/>
+    <stop stop-color="rgba(124, 58, 237, 1)" offset="1"/>
     </linearGradient>
     <linearGradient id="levlevbg" x1="261.74" x2="261.74" y1="607.53" y2="610.78" gradientUnits="userSpaceOnUse">
     <stop stop-color="#fff" offset="0"/>
-    <stop stop-color="rgba(51, 0, 255, 1)" offset="1"/>
+    <stop stop-color="rgba(124, 58, 237, 1)" offset="1"/>
     </linearGradient>
     <linearGradient id="levlevfl" x1="262.11" x2="262.11" y1="608.89" y2="614.81" gradientUnits="userSpaceOnUse">
     <stop stop-color="#fff" offset="0"/>
-    <stop stop-color="rgba(51, 0, 255, 1)" offset="1"/>
+    <stop stop-color="rgba(124, 58, 237, 1)" offset="1"/>
     </linearGradient>
     <linearGradient id="levlevff" x1="259.73" x2="259.73" y1="608.4" y2="614.7" gradientUnits="userSpaceOnUse">
     <stop stop-color="#fff" offset="0"/>
-    <stop stop-color="rgba(51, 0, 255, 1)" offset="1"/>
+    <stop stop-color="rgba(124, 58, 237, 1)" offset="1"/>
     </linearGradient>
     <linearGradient id="levlevfa" x1="253.88" x2="253.88" y1="615.96" y2="621.82" gradientUnits="userSpaceOnUse">
     <stop stop-color="#fff" offset="0"/>
-    <stop stop-color="rgba(51, 0, 255, 1)" offset="1"/>
+    <stop stop-color="rgba(124, 58, 237, 1)" offset="1"/>
     </linearGradient>
     <linearGradient id="levlevez" x1="257.11" x2="257.11" y1="615.85" y2="621.62" gradientUnits="userSpaceOnUse">
     <stop stop-color="#fff" offset="0"/>
-    <stop stop-color="rgba(51, 0, 255, 1)" offset="1"/>
+    <stop stop-color="rgba(124, 58, 237, 1)" offset="1"/>
     </linearGradient>
     <linearGradient id="levlevey" x1="255.52" x2="255.52" y1="610.06" y2="616.05" gradientUnits="userSpaceOnUse">
     <stop stop-color="#fff" offset="0"/>
-    <stop stop-color="rgba(51, 0, 255, 1)" offset="1"/>
+    <stop stop-color="rgba(124, 58, 237, 1)" offset="1"/>
     </linearGradient>
     <linearGradient id="levlevag" x1="122.49" x2="122.49" y1="460.34" y2="482.05" gradientUnits="userSpaceOnUse">
     <stop stop-color="rgba(12, 1, 127, 1)" offset="0"/>
@@ -1183,171 +1191,171 @@ console.log(sml)
     </linearGradient>
     <linearGradient id="levlevei" x1="259.5" x2="259.5" y1="613.23" y2="622" gradientUnits="userSpaceOnUse">
     <stop stop-color="#fff" offset="0"/>
-    <stop stop-color="#ff52a8" offset="1"/>
+    <stop stop-color="#e879f9" offset="1"/>
     </linearGradient>
     <linearGradient id="levleveh" x1="258.66" x2="258.66" y1="614.76" y2="622" gradientUnits="userSpaceOnUse">
     <stop stop-color="#fff" offset="0"/>
-    <stop stop-color="#ff52a8" offset="1"/>
+    <stop stop-color="#e879f9" offset="1"/>
     </linearGradient>
     <linearGradient id="levleveg" x1="252.17" x2="252.17" y1="614.39" y2="621.91" gradientUnits="userSpaceOnUse">
     <stop stop-color="#fff" offset="0"/>
-    <stop stop-color="#ff52a8" offset="1"/>
+    <stop stop-color="#e879f9" offset="1"/>
     </linearGradient>
     <linearGradient id="levlevef" x1="249.29" x2="249.29" y1="607.47" y2="614.35" gradientUnits="userSpaceOnUse">
     <stop stop-color="#fff" offset="0"/>
-    <stop stop-color="#ff52a8" offset="1"/>
+    <stop stop-color="#e879f9" offset="1"/>
     </linearGradient>
     <linearGradient id="levlevee" x1="250.92" x2="250.92" y1="608.01" y2="614.28" gradientUnits="userSpaceOnUse">
     <stop stop-color="#fff" offset="0"/>
-    <stop stop-color="#ff52a8" offset="1"/>
+    <stop stop-color="#e879f9" offset="1"/>
     </linearGradient>
     <linearGradient id="levleved" x1="252.11" x2="252.11" y1="610.14" y2="616.31" gradientUnits="userSpaceOnUse">
     <stop stop-color="#fff" offset="0"/>
-    <stop stop-color="#ff52a8" offset="1"/>
+    <stop stop-color="#e879f9" offset="1"/>
     </linearGradient>
     <linearGradient id="levlevec" x1="261.74" x2="261.74" y1="607.53" y2="610.78" gradientUnits="userSpaceOnUse">
     <stop stop-color="#fff" offset="0"/>
-    <stop stop-color="#ff52a8" offset="1"/>
+    <stop stop-color="#e879f9" offset="1"/>
     </linearGradient>
     <linearGradient id="levleveb" x1="262.11" x2="262.11" y1="608.89" y2="614.81" gradientUnits="userSpaceOnUse">
     <stop stop-color="#fff" offset="0"/>
-    <stop stop-color="#ff52a8" offset="1"/>
+    <stop stop-color="#e879f9" offset="1"/>
     </linearGradient>
     <linearGradient id="levlevea" x1="259.73" x2="259.73" y1="608.4" y2="614.7" gradientUnits="userSpaceOnUse">
     <stop stop-color="#fff" offset="0"/>
-    <stop stop-color="#ff52a8" offset="1"/>
+    <stop stop-color="#e879f9" offset="1"/>
     </linearGradient>
     <linearGradient id="levlevdz" x1="258.52" x2="258.52" y1="610.19" y2="616.28" gradientUnits="userSpaceOnUse">
     <stop stop-color="#fff" offset="0"/>
-    <stop stop-color="#ff52a8" offset="1"/>
+    <stop stop-color="#e879f9" offset="1"/>
     </linearGradient>
     <linearGradient id="levlevdy" x1="253.88" x2="253.88" y1="615.96" y2="621.82" gradientUnits="userSpaceOnUse">
     <stop stop-color="#fff" offset="0"/>
-    <stop stop-color="#ff52a8" offset="1"/>
+    <stop stop-color="#e879f9" offset="1"/>
     </linearGradient>
     <linearGradient id="levlevdx" x1="257.11" x2="257.11" y1="615.85" y2="621.62" gradientUnits="userSpaceOnUse">
     <stop stop-color="#fff" offset="0"/>
-    <stop stop-color="#ff52a8" offset="1"/>
+    <stop stop-color="#e879f9" offset="1"/>
     </linearGradient>
     <linearGradient id="levlevdu" x1="255.52" x2="255.52" y1="610.06" y2="616.05" gradientUnits="userSpaceOnUse">
     <stop stop-color="#fff" offset="0"/>
-    <stop stop-color="#ff52a8" offset="1"/>
+    <stop stop-color="#e879f9" offset="1"/>
     </linearGradient>
     <linearGradient id="levlevdt" x1="103.04" x2="103.04" y1="491.21" y2="534.17" gradientUnits="userSpaceOnUse">
     <stop stop-color="#fff" offset="0"/>
-    <stop stop-color="#ff52a8" offset="1"/>
+    <stop stop-color="#e879f9" offset="1"/>
     </linearGradient>
     <linearGradient id="levlevex" x1="259.5" x2="259.5" y1="613.23" y2="622" gradientUnits="userSpaceOnUse">
     <stop stop-color="#fff" offset="0"/>
-    <stop stop-color="#47fff9" offset="1"/>
+    <stop stop-color="#a78bfa" offset="1"/>
     </linearGradient>
     <linearGradient id="levlevew" x1="258.66" x2="258.66" y1="614.76" y2="622" gradientUnits="userSpaceOnUse">
     <stop stop-color="#fff" offset="0"/>
-    <stop stop-color="#47fff9" offset="1"/>
+    <stop stop-color="#a78bfa" offset="1"/>
     </linearGradient>
     <linearGradient id="levlevev" x1="252.17" x2="252.17" y1="614.39" y2="621.91" gradientUnits="userSpaceOnUse">
     <stop stop-color="#fff" offset="0"/>
-    <stop stop-color="#47fff9" offset="1"/>
+    <stop stop-color="#a78bfa" offset="1"/>
     </linearGradient>
     <linearGradient id="levleveu" x1="249.29" x2="249.29" y1="607.47" y2="614.35" gradientUnits="userSpaceOnUse">
     <stop stop-color="#fff" offset="0"/>
-    <stop stop-color="#47fff9" offset="1"/>
+    <stop stop-color="#a78bfa" offset="1"/>
     </linearGradient>
     <linearGradient id="levlevet" x1="250.92" x2="250.92" y1="608.01" y2="614.28" gradientUnits="userSpaceOnUse">
     <stop stop-color="#fff" offset="0"/>
-    <stop stop-color="#47fff9" offset="1"/>
+    <stop stop-color="#a78bfa" offset="1"/>
     </linearGradient>
     <linearGradient id="levleves" x1="252.11" x2="252.11" y1="610.14" y2="616.31" gradientUnits="userSpaceOnUse">
     <stop stop-color="#fff" offset="0"/>
-    <stop stop-color="#47fff9" offset="1"/>
+    <stop stop-color="#a78bfa" offset="1"/>
     </linearGradient>
     <linearGradient id="levlever" x1="261.74" x2="261.74" y1="607.53" y2="610.78" gradientUnits="userSpaceOnUse">
     <stop stop-color="#fff" offset="0"/>
-    <stop stop-color="#47fff9" offset="1"/>
+    <stop stop-color="#a78bfa" offset="1"/>
     </linearGradient>
     <linearGradient id="levlevep" x1="262.11" x2="262.11" y1="608.89" y2="614.81" gradientUnits="userSpaceOnUse">
     <stop stop-color="#fff" offset="0"/>
-    <stop stop-color="#47fff9" offset="1"/>
+    <stop stop-color="#a78bfa" offset="1"/>
     </linearGradient>
     <linearGradient id="levleveo" x1="259.73" x2="259.73" y1="608.4" y2="614.7" gradientUnits="userSpaceOnUse">
     <stop stop-color="#fff" offset="0"/>
-    <stop stop-color="#47fff9" offset="1"/>
+    <stop stop-color="#a78bfa" offset="1"/>
     </linearGradient>
     <linearGradient id="levleven" x1="258.52" x2="258.52" y1="610.19" y2="616.28" gradientUnits="userSpaceOnUse">
     <stop stop-color="#fff" offset="0"/>
-    <stop stop-color="#47fff9" offset="1"/>
+    <stop stop-color="#a78bfa" offset="1"/>
     </linearGradient>
     <linearGradient id="levlevem" x1="253.88" x2="253.88" y1="615.96" y2="621.82" gradientUnits="userSpaceOnUse">
     <stop stop-color="#fff" offset="0"/>
-    <stop stop-color="#47fff9" offset="1"/>
+    <stop stop-color="#a78bfa" offset="1"/>
     </linearGradient>
     <linearGradient id="levlevel" x1="257.11" x2="257.11" y1="615.85" y2="621.62" gradientUnits="userSpaceOnUse">
     <stop stop-color="#fff" offset="0"/>
-    <stop stop-color="#47fff9" offset="1"/>
+    <stop stop-color="#a78bfa" offset="1"/>
     </linearGradient>
     <linearGradient id="levlevek" x1="255.52" x2="255.52" y1="610.06" y2="616.05" gradientUnits="userSpaceOnUse">
     <stop stop-color="#fff" offset="0"/>
-    <stop stop-color="#47fff9" offset="1"/>
+    <stop stop-color="#a78bfa" offset="1"/>
     </linearGradient>
     <linearGradient id="levlevej" x1="103.04" x2="103.04" y1="491.21" y2="534.17" gradientUnits="userSpaceOnUse">
     <stop stop-color="#fff" offset="0"/>
-    <stop stop-color="#47fff9" offset="1"/>
+    <stop stop-color="#a78bfa" offset="1"/>
     </linearGradient>
     <linearGradient id="levleveq" x1="259.5" x2="259.5" y1="613.23" y2="622" gradientUnits="userSpaceOnUse">
     <stop stop-color="#fff" offset="0"/>
-    <stop stop-color="#005716" offset="1"/>
+    <stop stop-color="#4c1d95" offset="1"/>
     </linearGradient>
     <linearGradient id="levlevdv" x1="258.66" x2="258.66" y1="614.76" y2="622" gradientUnits="userSpaceOnUse">
     <stop stop-color="#fff" offset="0"/>
-    <stop stop-color="#005716" offset="1"/>
+    <stop stop-color="#4c1d95" offset="1"/>
     </linearGradient>
     <linearGradient id="levlevde" x1="252.17" x2="252.17" y1="614.39" y2="621.91" gradientUnits="userSpaceOnUse">
     <stop stop-color="#fff" offset="0"/>
-    <stop stop-color="#005716" offset="1"/>
+    <stop stop-color="#4c1d95" offset="1"/>
     </linearGradient>
     <linearGradient id="levlevco" x1="249.29" x2="249.29" y1="607.47" y2="614.35" gradientUnits="userSpaceOnUse">
     <stop stop-color="#fff" offset="0"/>
-    <stop stop-color="#005716" offset="1"/>
+    <stop stop-color="#4c1d95" offset="1"/>
     </linearGradient>
     <linearGradient id="levlevby" x1="250.92" x2="250.92" y1="608.01" y2="614.28" gradientUnits="userSpaceOnUse">
     <stop stop-color="#fff" offset="0"/>
-    <stop stop-color="#005716" offset="1"/>
+    <stop stop-color="#4c1d95" offset="1"/>
     </linearGradient>
     <linearGradient id="levlevbx" x1="252.11" x2="252.11" y1="610.14" y2="616.31" gradientUnits="userSpaceOnUse">
     <stop stop-color="#fff" offset="0"/>
-    <stop stop-color="#005716" offset="1"/>
+    <stop stop-color="#4c1d95" offset="1"/>
     </linearGradient>
     <linearGradient id="levlevbu" x1="261.74" x2="261.74" y1="607.53" y2="610.78" gradientUnits="userSpaceOnUse">
     <stop stop-color="#fff" offset="0"/>
-    <stop stop-color="#005716" offset="1"/>
+    <stop stop-color="#4c1d95" offset="1"/>
     </linearGradient>
     <linearGradient id="levlevbs" x1="262.11" x2="262.11" y1="608.89" y2="614.81" gradientUnits="userSpaceOnUse">
     <stop stop-color="#fff" offset="0"/>
-    <stop stop-color="#005716" offset="1"/>
+    <stop stop-color="#4c1d95" offset="1"/>
     </linearGradient>
     <linearGradient id="levlevbr" x1="259.73" x2="259.73" y1="608.4" y2="614.7" gradientUnits="userSpaceOnUse">
     <stop stop-color="#fff" offset="0"/>
-    <stop stop-color="#005716" offset="1"/>
+    <stop stop-color="#4c1d95" offset="1"/>
     </linearGradient>
     <linearGradient id="levlevbq" x1="258.52" x2="258.52" y1="610.19" y2="616.28" gradientUnits="userSpaceOnUse">
     <stop stop-color="#fff" offset="0"/>
-    <stop stop-color="#005716" offset="1"/>
+    <stop stop-color="#4c1d95" offset="1"/>
     </linearGradient>
     <linearGradient id="levlevbo" x1="253.88" x2="253.88" y1="615.96" y2="621.82" gradientUnits="userSpaceOnUse">
     <stop stop-color="#fff" offset="0"/>
-    <stop stop-color="#005716" offset="1"/>
+    <stop stop-color="#4c1d95" offset="1"/>
     </linearGradient>
     <linearGradient id="levlevbn" x1="257.11" x2="257.11" y1="615.85" y2="621.62" gradientUnits="userSpaceOnUse">
     <stop stop-color="#fff" offset="0"/>
-    <stop stop-color="#005716" offset="1"/>
+    <stop stop-color="#4c1d95" offset="1"/>
     </linearGradient>
     <linearGradient id="levlevbm" x1="255.52" x2="255.52" y1="610.06" y2="616.05" gradientUnits="userSpaceOnUse">
     <stop stop-color="#fff" offset="0"/>
-    <stop stop-color="#005716" offset="1"/>
+    <stop stop-color="#4c1d95" offset="1"/>
     </linearGradient>
     <linearGradient id="levlevbl" x1="103.04" x2="103.04" y1="491.21" y2="534.17" gradientUnits="userSpaceOnUse">
     <stop stop-color="#fff" offset="0"/>
-    <stop stop-color="#005716" offset="1"/>
+    <stop stop-color="#4c1d95" offset="1"/>
     </linearGradient>
     <linearGradient id="levlevbh" x1="259.5" x2="259.5" y1="613.23" y2="622" gradientUnits="userSpaceOnUse">
     <stop stop-color="#fff" offset="0"/>
@@ -1412,15 +1420,15 @@ console.log(sml)
     <stop stop-color="#bd8524" offset="1"/>
     </linearGradient>
     <linearGradient id="levlevl" bx:pinned="true">
-    <stop stop-color="#00ff62" offset="0"/>
+    <stop stop-color="#d8b4fe" offset="0"/>
     <stop stop-color="#f9fe92" offset=".789"/>
     <stop stop-color="#ffeffc" offset="1"/>
     <stop stop-color="#bd8524" offset="1"/>
     </linearGradient>
     <linearGradient id="levlevn" bx:pinned="true">
     <stop stop-color="#fff5fe" offset=".036"/>
-    <stop stop-color="#08f" offset=".88"/>
-    <stop stop-color="#08f" offset="1"/>
+    <stop stop-color="#8b5cf6" offset=".88"/>
+    <stop stop-color="#8b5cf6" offset="1"/>
     </linearGradient>
     <linearGradient id="levlevm" bx:pinned="true">
     <stop stop-color="#fff" offset=".235"/>
@@ -1512,9 +1520,9 @@ console.log(sml)
     <style bx:fonts="Londrina Sketch" bx:pinned="true">/*$$__STYLE_CONTENT__$$*/</style>
     <linearGradient id="levlevaw" x1="-/*$$__STYLE_CONTENT__$$*/.googleapis.com/css2?family=Londrina+Sketch%3Aital%2Cwght%400%2C400&display=swap);33.774" y2="45.358" gradientUnits="userSpaceOnUse" xlink:href="#levlevah"/>
     <radialGradient id="levlevfb" cx="-14.698" cy="39.566" r="10" gradientUnits="userSpaceOnUse">
-    <stop stop-color="#ffad55" offset="0"/>
-    <stop stop-color="#321814" offset=".462"/>
-    <stop stop-color="#fb0032" offset="1"/>
+    <stop stop-color="#e9d5ff" offset="0"/>
+    <stop stop-color="#241040" offset=".462"/>
+    <stop stop-color="#7c3aed" offset="1"/>
     </radialGradient>
     <linearGradient id="levlevav" x1="103.04" x2="103.04" y1="491.21" y2="534.17" gradientUnits="userSpaceOnUse" xlink:href="#levlevl"/>
     <linearGradient id="levlevau" x1="255.52" x2="255.52" y1="610.06" y2="616.05" gradientUnits="userSpaceOnUse" xlink:href="#levlevl"/>
@@ -1545,16 +1553,16 @@ console.log(sml)
     <linearGradient id="levlevcy" x1="258.66" x2="258.66" y1="614.76" y2="622" gradientUnits="userSpaceOnUse" xlink:href="#levlevn"/>
     <linearGradient id="levlevcx" x1="259.5" x2="259.5" y1="613.23" y2="622" gradientUnits="userSpaceOnUse" xlink:href="#levlevn"/>
     <linearGradient id="levlevbw" x1="122.64" x2="122.64" y1="460.05" y2="481.79" gradientUnits="userSpaceOnUse">
-    <stop stop-color="rgba(86, 251, 185, 0.25)" offset="0"/>
-    <stop stop-color="#90b7ec" offset=".205"/>
-    <stop stop-color="#42577d" offset=".367"/>
+    <stop stop-color="rgba(167, 139, 250, 0.25)" offset="0"/>
+    <stop stop-color="#b3a4f0" offset=".205"/>
+    <stop stop-color="#3b2f6b" offset=".367"/>
     <stop stop-color="#e40ce5" offset=".567"/>
     <stop stop-color="rgba(255, 0, 247, 0.4)" offset=".929"/>
     </linearGradient>
     <linearGradient id="levlevq" bx:pinned="true">
-    <stop stop-color="#40e0d0" offset="0"/>
-    <stop stop-color="#ff8c00" offset=".775"/>
-    <stop stop-color="#ff0080" offset="1"/>
+    <stop stop-color="#c4b5fd" offset="0"/>
+    <stop stop-color="#a855f7" offset=".775"/>
+    <stop stop-color="#6d28d9" offset="1"/>
     </linearGradient>
     <linearGradient id="levlevaqf" x1="103.04" x2="103.04" y1="491.21" y2="534.17" gradientUnits="userSpaceOnUse" xlink:href="#levlevq"/>
     <linearGradient id="levlevaqe" x1="255.52" x2="255.52" y1="610.06" y2="616.05" gradientUnits="userSpaceOnUse" xlink:href="#levlevq"/>
@@ -1572,8 +1580,8 @@ console.log(sml)
     <linearGradient id="levlevaqa" x1="259.5" x2="259.5" y1="613.23" y2="622" gradientUnits="userSpaceOnUse" xlink:href="#levlevq"/>
     <linearGradient id="levlevp" bx:pinned="true">
     <stop stop-color="#fff" offset="0"/>
-    <stop stop-color="#79cbca" offset=".5"/>
-    <stop stop-color="#e684ae" offset="1"/>
+    <stop stop-color="#b39ddb" offset=".5"/>
+    <stop stop-color="#c77dff" offset="1"/>
     </linearGradient>
     <linearGradient id="levlevapr" x1="103.04" x2="103.04" y1="491.21" y2="534.17" gradientUnits="userSpaceOnUse" xlink:href="#levlevp"/>
     <linearGradient id="levlevapq" x1="255.52" x2="255.52" y1="610.06" y2="616.05" gradientUnits="userSpaceOnUse" xlink:href="#levlevp"/>
@@ -1591,8 +1599,8 @@ console.log(sml)
     <linearGradient id="levlevapm" x1="259.5" x2="259.5" y1="613.23" y2="622" gradientUnits="userSpaceOnUse" xlink:href="#levlevp"/>
     <linearGradient id="levlevo" bx:pinned="true">
     <stop stop-color="#fff" offset="0"/>
-    <stop stop-color="#0076ec" offset=".569"/>
-    <stop stop-color="#76ff45" offset=".84"/>
+    <stop stop-color="#7c3aed" offset=".569"/>
+    <stop stop-color="#d8b4fe" offset=".84"/>
     </linearGradient>
     <linearGradient id="levlevapd" x1="103.04" x2="103.04" y1="491.21" y2="534.17" gradientUnits="userSpaceOnUse" xlink:href="#levlevo"/>
     <linearGradient id="levlevapc" x1="255.52" x2="255.52" y1="610.06" y2="616.05" gradientUnits="userSpaceOnUse" xlink:href="#levlevo"/>
@@ -2608,7 +2616,7 @@ console.log(sml)
 <path d="m261.59 614.76-5.8538 7.2384 3.0363-6.0785c1.0074-0.39432 1.9148-0.79157 2.8174-1.1598z" fill="url(#levlevaoz)" fill-rule="evenodd" opacity=".76724" stroke="url(#levlevae)" stroke-width=".16015px"/>
 <path d="m261.59 614.76-5.8538 7.2384 7.5363-8.766z" fill="url(#levlevaoy)" fill-rule="evenodd" opacity=".76724" stroke="url(#levlevaf)" stroke-width=".16015px"/>
 </g>
-<text transform="matrix(1.4297 -.001037 -.12436 .70816 51.887 117.55)" x="122.391" y="477.71" fill="rgb(37, 30, 30)" class="tt" font-weight="700" stroke="rgb(243, 71, 46)" stroke-miterlimit="1" stroke-width="0px" text-anchor="middle" word-spacing="59.7px" style="white-space:pre" bx:origin="0.47 0.2">{sug}</text>
+<text transform="matrix(1.4297 -.001037 -.12436 .70816 51.887 117.55)" x="122.391" y="477.71" fill="#4b086f" class="tt" font-weight="700" stroke="rgb(243, 71, 46)" stroke-miterlimit="1" stroke-width="0px" text-anchor="middle" word-spacing="59.7px" style="white-space:pre" bx:origin="0.47 0.2">{sug}</text>
 </g>
 {/if}
 {#if pen > 0}
@@ -2629,7 +2637,7 @@ console.log(sml)
 <path d="m261.59 614.76-5.8538 7.2384 3.0363-6.0785c1.0074-0.39432 1.9148-0.79157 2.8174-1.1598z" fill="url(#levlevbf)" fill-rule="evenodd" opacity=".76724" stroke="url(#levlevcj)" stroke-width=".16015px"/>
 <path d="m261.59 614.76-5.8538 7.2384 7.5363-8.766z" fill="url(#levlevbh)" fill-rule="evenodd" opacity=".76724" stroke="url(#levlevci)" stroke-width=".16015px"/>
 </g>
-<text transform="matrix(1.4297 -.001037 -.12436 .70816 48.562 116.2)" x="122.391" y="477.71" fill="rgb(247, 40, 130)" class="tt" font-weight="700" stroke="url(#levlevch)" stroke-miterlimit="1" stroke-width="0px" text-anchor="middle" word-spacing="59.7px" style="white-space:pre" bx:origin="0.47 0.2">{pen}</text>
+<text transform="matrix(1.4297 -.001037 -.12436 .70816 48.562 116.2)" x="122.391" y="477.71" fill="#4b086f" class="tt" font-weight="700" stroke="url(#levlevch)" stroke-miterlimit="1" stroke-width="0px" text-anchor="middle" word-spacing="59.7px" style="white-space:pre" bx:origin="0.47 0.2">{pen}</text>
 </g>
 {/if}
 {#if ask > 0}
@@ -2650,7 +2658,7 @@ console.log(sml)
 <path d="m261.59 614.76-5.8538 7.2384 3.0363-6.0785c1.0074-0.39432 1.9148-0.79157 2.8174-1.1598z" fill="url(#levlevdr)" fill-rule="evenodd" opacity=".76724" stroke="url(#levlevae)" stroke-width=".16015px"/>
 <path d="m261.59 614.76-5.8538 7.2384 7.5363-8.766z" fill="url(#levlevds)" fill-rule="evenodd" opacity=".76724" stroke="url(#levlevaf)" stroke-width=".16015px"/>
 </g>
-<text transform="matrix(1.4297 -.001037 -.12436 .70816 51.887 117.55)" x="122.391" y="477.71" fill="rgb(5, 5, 5)" class="tt" font-weight="700" stroke="rgb(243, 71, 46)" stroke-miterlimit="1" stroke-width="0px" text-anchor="middle" word-spacing="59.7px" style="white-space:pre" bx:origin="0.47 0.2">{ask}</text>
+<text transform="matrix(1.4297 -.001037 -.12436 .70816 51.887 117.55)" x="122.391" y="477.71" fill="#4b086f" class="tt" font-weight="700" stroke="rgb(243, 71, 46)" stroke-miterlimit="1" stroke-width="0px" text-anchor="middle" word-spacing="59.7px" style="white-space:pre" bx:origin="0.47 0.2">{ask}</text>
 </g>
 {/if}
 
@@ -3230,7 +3238,7 @@ License: https://creativecommons.org/licenses/by-sa/4.0</desc>
   <a  data-sveltekit-prefetch 
     href="/me" >
 <path d="m-24.698 44.139h20v1.219h-20v-1.219zm0-8.536 5 1.828 5-3.657 5 3.657 5-1.828v7.316h-20v-7.316z" fill="url(#levlevaw)" stroke="url(#levlevfb)" stroke-miterlimit="5" stroke-width=".57906px"/>
-<text transform="matrix(.075915 0 0 .081691 -14.883 40.747)" fill="rgb(0, 81, 88)" font-family="Arial, sans-serif" font-size="28px" font-weight="700" letter-spacing="1.6px" text-anchor="middle" style="white-space:pre">{name}</text>
+<text transform="matrix(.075915 0 0 .081691 -14.883 40.747)" fill="#f5d0fe" font-family="Arial, sans-serif" font-size="28px" font-weight="700" letter-spacing="1.6px" text-anchor="middle" style="white-space:pre">{name}</text>
     </a>
 </g>
 {#if pmash > 0}
@@ -3252,7 +3260,7 @@ License: https://creativecommons.org/licenses/by-sa/4.0</desc>
 <path d="m261.59 614.76-5.8538 7.2384 3.0363-6.0785c1.0074-0.39432 1.9148-0.79157 2.8174-1.1598z" fill="url(#levlevar)" fill-rule="evenodd" opacity=".76724" stroke="url(#levlevae)" stroke-width=".16015px"/>
 <path d="m261.59 614.76-5.8538 7.2384 7.5363-8.766z" fill="url(#levlevaq)" fill-rule="evenodd" opacity=".76724" stroke="url(#levlevaf)" stroke-width=".16015px"/>
 </g>
-<text transform="matrix(1.4297 -.001037 -.12436 .70816 51.887 117.55)" x="122.391" y="477.71" fill="rgb(54, 59, 56)" class="tt" font-weight="700" stroke="rgb(243, 71, 46)" stroke-miterlimit="1" stroke-width="0px" text-anchor="middle" word-spacing="59.7px" style="white-space:pre" bx:origin="0.47 0.2">{pmash}</text>
+<text transform="matrix(1.4297 -.001037 -.12436 .70816 51.887 117.55)" x="122.391" y="477.71" fill="#4b086f" class="tt" font-weight="700" stroke="rgb(243, 71, 46)" stroke-miterlimit="1" stroke-width="0px" text-anchor="middle" word-spacing="59.7px" style="white-space:pre" bx:origin="0.47 0.2">{pmash}</text>
 </g>
 {/if}
 {#if askma > 0}
@@ -3296,7 +3304,7 @@ License: https://creativecommons.org/licenses/by-sa/4.0</desc>
 <path d="m261.59 614.76-5.8538 7.2384 3.0363-6.0785c1.0074-0.39432 1.9148-0.79157 2.8174-1.1598z" fill="url(#levlevaqb)" fill-rule="evenodd" opacity=".76724" stroke="url(#levlevae)" stroke-width=".16015px"/>
 <path d="m261.59 614.76-5.8538 7.2384 7.5363-8.766z" fill="url(#levlevaqa)" fill-rule="evenodd" opacity=".76724" stroke="url(#levlevaf)" stroke-width=".16015px"/>
 </g>
-<text transform="matrix(1.4297 -.001037 -.12436 .70816 51.887 117.55)" x="122.391" y="477.71" fill="rgb(62, 78, 77)" class="tt" font-weight="700" stroke="rgb(243, 71, 46)" stroke-miterlimit="1" stroke-width="0px" text-anchor="middle" word-spacing="59.7px" style="white-space:pre" bx:origin="0.47 0.2">{wel}</text>
+<text transform="matrix(1.4297 -.001037 -.12436 .70816 51.887 117.55)" x="122.391" y="477.71" fill="#4b086f" class="tt" font-weight="700" stroke="rgb(243, 71, 46)" stroke-miterlimit="1" stroke-width="0px" text-anchor="middle" word-spacing="59.7px" style="white-space:pre" bx:origin="0.47 0.2">{wel}</text>
 </g>
 {/if}
 {#if fia > 0}
@@ -3318,7 +3326,7 @@ License: https://creativecommons.org/licenses/by-sa/4.0</desc>
 <path d="m261.59 614.76-5.8538 7.2384 3.0363-6.0785c1.0074-0.39432 1.9148-0.79157 2.8174-1.1598z" fill="url(#levlevapn)" fill-rule="evenodd" opacity=".76724" stroke="url(#levlevae)" stroke-width=".16015px"/>
 <path d="m261.59 614.76-5.8538 7.2384 7.5363-8.766z" fill="url(#levlevapm)" fill-rule="evenodd" opacity=".76724" stroke="url(#levlevaf)" stroke-width=".16015px"/>
 </g>
-<text transform="matrix(1.4297 -.001037 -.12436 .70816 51.887 117.55)" x="122.391" y="477.71" fill="rgb(31, 25, 25)" class="tt" font-weight="700" stroke="rgb(243, 71, 46)" stroke-miterlimit="1" stroke-width="0px" text-anchor="middle" word-spacing="59.7px" style="white-space:pre" bx:origin="0.47 0.2">{fia}</text>
+<text transform="matrix(1.4297 -.001037 -.12436 .70816 51.887 117.55)" x="122.391" y="477.71" fill="#4b086f" class="tt" font-weight="700" stroke="rgb(243, 71, 46)" stroke-miterlimit="1" stroke-width="0px" text-anchor="middle" word-spacing="59.7px" style="white-space:pre" bx:origin="0.47 0.2">{fia}</text>
 
 </g>
 {/if}

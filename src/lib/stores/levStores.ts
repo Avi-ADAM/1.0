@@ -1,5 +1,6 @@
 // src/lib/stores/levStores.ts
-import { writable, type Writable } from 'svelte/store';
+import { writable, get, type Writable } from 'svelte/store';
+import { theme, THEMES } from './theme.js';
 
 // ========== Type Definitions ==========
 
@@ -700,33 +701,80 @@ coinSize.subscribe((v) => {
  * coverage of every kind — so choosing the one you like cannot cost you sight
  * of a consent item, which is exactly what choosing the old coin view did.
  *
- * Remembered per browser, like `coinSize`.
+ * The face is remembered per browser, but only once it is *chosen*. Until
+ * then it belongs to the theme: the personal identity is the painted heart,
+ * so it opens on `classic`; the professional identity is the quiet one, so it
+ * opens on `plate`. Flipping the theme therefore flips the coins with it —
+ * right up until the member touches the skin button, after which their pick
+ * wins in both identities and the theme stops having an opinion.
  */
 export type CoinSkin = 'plate' | 'classic';
 
-const COIN_SKIN_KEY = 'lev:coinSkin';
+/* A NEW key, deliberately. The previous one was written on every load —
+   `subscribe` fires with the store's current value the moment it is
+   registered — so the old key holds the last face the member *saw*, which
+   cannot be told apart from a face they picked. Reading it here would leave
+   every existing member pinned to the plate and make the theme default dead
+   code. This key is written only from a real change, so its presence is the
+   choice. The cost is one-off: someone who had picked `classic` before goes
+   back to their theme's default until they pick again — and in the personal
+   identity that default now *is* `classic`. */
+const COIN_SKIN_KEY = 'lev:coinSkin:chosen';
 
-function initialCoinSkin(): CoinSkin {
-  if (typeof window === 'undefined') return 'plate';
+/** The face an untouched browser opens on, per identity. */
+function themeDefaultSkin(): CoinSkin {
+  return get(theme) === THEMES.business ? 'plate' : 'classic';
+}
+
+/** The member's own pick, or `null` if they have never made one. */
+function chosenCoinSkin(): CoinSkin | null {
+  if (typeof window === 'undefined') return null;
   try {
     const saved = window.localStorage.getItem(COIN_SKIN_KEY);
     if (saved === 'plate' || saved === 'classic') return saved;
   } catch {
     /* private mode / disabled storage */
   }
-  return 'plate';
+  return null;
 }
 
-export const coinSkin: Writable<CoinSkin> = writable(initialCoinSkin());
+export const coinSkin: Writable<CoinSkin> = writable(chosenCoinSkin() ?? themeDefaultSkin());
 
-coinSkin.subscribe((v) => {
-  if (typeof window === 'undefined') return;
-  try {
-    window.localStorage.setItem(COIN_SKIN_KEY, v);
-  } catch {
-    /* ignore */
+let skinChosen = chosenCoinSkin() !== null;
+
+/**
+ * The member picking a face — and the only thing that counts as picking one.
+ *
+ * The obvious shape for this was a `coinSkin.subscribe` that persisted every
+ * value and a flag saying "ignore the one I am about to write myself". It does
+ * not work: `set` called from inside another store’s subscriber does not notify
+ * synchronously — Svelte queues it — so the flag is already back to false by the
+ * time the subscriber runs, and the first theme flip recorded itself as a
+ * choice. Saying which operation this is, instead of guessing afterwards, has
+ * no such window. The skin control calls this; nothing else should `set` the
+ * store directly, or the pick will not survive a reload.
+ */
+export function chooseCoinSkin(next: CoinSkin): void {
+  skinChosen = true;
+  if (typeof window !== 'undefined') {
+    try {
+      window.localStorage.setItem(COIN_SKIN_KEY, next);
+    } catch {
+      /* private mode / disabled storage */
+    }
   }
-});
+  coinSkin.set(next);
+}
+
+/* Browser only. On the server this module is shared between requests, and a
+   subscription that writes to a module-level store would let one request
+   decide what the next one renders. */
+if (typeof window !== 'undefined') {
+  theme.subscribe(() => {
+    if (skinChosen) return;
+    coinSkin.set(themeDefaultSkin());
+  });
+}
 
 /** Filter configuration for what to display */
 export const milon: Writable<MilonConfig> = writable({

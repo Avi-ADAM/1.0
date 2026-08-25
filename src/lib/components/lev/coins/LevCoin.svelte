@@ -44,7 +44,15 @@
     rowIsActionable
   } from '../cards/cardKinds.js';
   import { coinArc } from './coinArc.js';
-  import { coinFace, RIM_GILT, RIM_STROKE } from './coinSkin.js';
+  import {
+    coinFace,
+    RIM_GILT,
+    RIM_STROKE,
+    RIM_WELL,
+    RIM_WELL_ALPHA,
+    RIM_WELL_LIFT,
+    RIM_WELL_WIDTH
+  } from './coinSkin.js';
   import { coinSkin } from '$lib/stores/levStores';
 
   /**
@@ -67,16 +75,33 @@
 
   /**
    * The rim label's size, in viewBox units — i.e. as a percentage of the coin's
-   * diameter — floored so that it never renders below **10px**, whatever the
-   * member's size step. That is the same floor the plate keeps for its kind cap
-   * and meta line, and it is not a style choice: 8–10px inside a small circle
-   * is the complaint this whole view was shelved over, and a curved line is
-   * already harder to read than a straight one. At the S step (96px, or 81px on
-   * a phone) 8.5 units would be 8.2px, so this lifts it; at M and L the natural
-   * size already clears the floor.
+   * diameter — floored so that it never renders below **11px**, whatever the
+   * member's size step. It is not a style choice: 8–10px inside a small circle
+   * is the complaint this whole view was shelved over. The floor is one pixel
+   * above the 10px the plate gives its kind cap and meta line, and the extra
+   * pixel is the curve's — a line bent around a circle is measurably harder to
+   * read than the same line set straight, so it does not get to sit at the
+   * straight text's floor. At the S step (96px, or 81px on a phone) 9 units
+   * would be 8.6px, so this lifts it; at M and L the natural size clears it.
    */
-  const RIM_UNITS = 8.5;
-  let rimFont = $derived(Math.max(RIM_UNITS, (10 / Math.max(size, 1)) * 100));
+  const RIM_UNITS = 9;
+  let rimFont = $derived(Math.max(RIM_UNITS, (11 / Math.max(size, 1)) * 100));
+
+  /**
+   * The rim well's arc, in the same viewBox units.
+   *
+   * The label hangs *below* the text path, so a band centred on that path would
+   * spend half its width outside the coin. This is the same semicircle pulled
+   * inward by `RIM_WELL_LIFT` em and stroked `RIM_WELL_WIDTH` em wide, which
+   * puts the band over the glyphs rather than over the edge. Both are in em of
+   * the rim font, so the well tracks the label through every size step instead
+   * of being tuned for one.
+   */
+  let wellR = $derived(44 - rimFont * RIM_WELL_LIFT);
+  let wellPath = $derived(
+    `M ${(50 - wellR).toFixed(2)},50 A ${wellR.toFixed(2)},${wellR.toFixed(2)} 0 0 1 ${(50 + wellR).toFixed(2)},50`
+  );
+  let wellWidth = $derived(rimFont * RIM_WELL_WIDTH);
   /** The artwork this kind's original coin was painted with. */
   let face = $derived(coinFace(item.ani));
 
@@ -213,6 +238,18 @@
          still letters correctly if the field's <defs> is not in the document
          (a lone coin in a test, a screenshot of one). -->
     <svg class="rim" viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+      <!-- The ground first: gilt on a photograph is not a contrast the stroke
+           can guarantee (see RIM_WELL). The shared gradient fades the band out
+           at both arc ends so the artwork still owns the coin's shoulders; the
+           solid fallback keeps a lone coin readable with no <defs> in the
+           document, exactly as the gilt's does. -->
+      <path
+        d={wellPath}
+        fill="none"
+        stroke="url(#lev-coin-rim-well) {RIM_WELL}"
+        stroke-opacity={RIM_WELL_ALPHA}
+        stroke-width={wellWidth}
+      />
       <path id={rimId} d="M 6,50 A 44,44 0 0 1 94,50" fill="none" />
       <text
         text-anchor="middle"
@@ -439,11 +476,11 @@
 
      The one thing it does drop is the ring: see the `{#if !classic}` above.
 
-     Cost, for the record: no extra elements on the plate skin, and three net on
-     the classic one (an <svg>, a <path>, a <text>, a <textPath>, less the ring
-     span). At 137 coins that is ~410 nodes on top of 4,297 — about +10%,
-     against the 31,540 the original coins cost. No Swiper, no per-coin timer,
-     no per-coin gradient definition. */
+     Cost, for the record: no extra elements on the plate skin, and four net on
+     the classic one (an <svg>, the well <path>, the rim <path>, a <text>, a
+     <textPath>, less the ring span). At 137 coins that is ~550 nodes on top of
+     4,297 — about +13%, against the 31,540 the original coins cost. No Swiper,
+     no per-coin timer, and two gradient definitions for the whole field. */
   .coin.classic {
     /* The face is a photograph or a painted sphere, so nothing may rely on the
        surface being light: the ink is set here, not inherited. */
@@ -479,9 +516,12 @@
     font-weight: 800;
     letter-spacing: 0.02em;
     /* The originals stroked their lettering and painted the stroke *under* the
-       fill, which is what lets gilt sit on any face without a halo. */
+       fill, which is what lets gilt sit on any face without a halo. It is
+       thinner than the original 1.6px now that the well carries the separation:
+       at a 10px glyph a 1.6px stroke eats most of the letter's own width from
+       the outside in, so the label read as blurred gold rather than as gold. */
     paint-order: stroke;
-    stroke-width: 1.6px;
+    stroke-width: 1px;
     stroke-linejoin: round;
   }
 

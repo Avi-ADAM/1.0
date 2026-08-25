@@ -1943,7 +1943,13 @@ html.business {
   --neww: #0e7490;
   --wow: #047857;
   --wow2: #15803d;
-  --wowt: #064e3b;
+  /* --wowt is not a free colour: its only call site is the Tile
+     component's `wow` chip, which sets `bg-neww text-wowt`. It was
+     #064e3b — a dark green ON the dark teal above it, 2.1:1 — because the
+     two were picked independently. The pair has to oppose, so this is the
+     light side of the same cyan family: 5.2:1 on --neww, 5.4:1 on the
+     --wow it swaps to on hover. */
+  --wowt: #ecfeff;
   --blueg: #2563eb;
   --oranges: #b45309;
 
@@ -2035,7 +2041,9 @@ html.business.dark {
   --neww: #67e8f9;
   --wow: #34d399;
   --wow2: #a3e635;
-  --wowt: #d1fae5;
+  /* …and in dark mode --neww is the PALE one, so the ink flips with it.
+     #d1fae5 on #67e8f9 was 1.19:1 — the chip read as an empty capsule. */
+  --wowt: #083344; /* 9.2:1 on --neww, 7.7:1 on --wow */
   --blueg: #93c5fd;
   --oranges: #fbbf24;
 

@@ -635,9 +635,11 @@ backgrounds and colours rather than to reproduce the original coins.
       load-bearing of the three labels; the title and the clock stay flat and
       horizontal in the middle, because a curved line is harder to read and
       "older members cannot read it" is what shelved this view.
-      - Floored at **10px rendered**, at every size step — the same floor the
-        plate keeps for its cap and meta line. At the S step the natural 8.5
-        units would be 8.2px, so it is lifted; verified at 96px.
+      - Floored at **11px rendered**, at every size step — one pixel above the
+        floor the plate keeps for its cap and meta line, and the extra pixel is
+        the curve's: a line bent around a circle is harder to read than the same
+        line set straight, so it does not get to sit at straight text's floor.
+        At the S step the natural 9 units would be 8.6px, so it is lifted.
       - **`letters()` is not needed, and that is a finding.** The original coins
         pre-reversed Hebrew word by word because "SVG `<text>` has no bidi
         engine". Modern browsers apply the bidi algorithm to `<textPath>` too:
@@ -659,6 +661,38 @@ backgrounds and colours rather than to reproduce the original coins.
       Nothing is lost: `meta` spells the clock out in words whenever there is an
       arc to draw — `countdown` is set exactly when `deadline` is — the kind is
       lettered around the rim, and the accessible name still carries both.
+- [x] **The rim well, and a gilt ramp that clears AA.** The first cut lettered
+      the rim in the original six-stop gilt with a 1.6px dark stroke, on the
+      theory that the stroke lets gilt sit on any face. It does not, and the
+      arithmetic says why: a face is a *photograph*, and on `diamond`
+      (near-white) the original ramp's own stops ran as low as **1.10:1** — the
+      label was not dim, it was invisible, and a 1.6px stroke on a 10px glyph
+      cannot rescue that. Three changes, in order of how much each buys:
+      - **A ground.** One arc, stroked `RIM_WELL_WIDTH` em wide at 85% of
+        `#0a0803`, on the same semicircle pulled `RIM_WELL_LIFT` em inward
+        (the label *hangs below* its path, so a band centred on the path would
+        spend half its width outside the coin). Both are in em of the rim font,
+        so the well tracks the label through every size step. It fades to
+        transparent at both arc ends through a second shared `<linearGradient>`,
+        so it reads as a well under the words and not as a bezel bolted round
+        the coin — the artwork keeps its shoulders. This is what makes contrast
+        *deterministic*: the ground is now the same on all eleven faces.
+      - **The gilt's two bronze extremes lifted**, deepest stop `#e0b356`. The
+        original ramp was drawn for lettering the size of a whole coin's rim;
+        at 11px its dark stops stop reading as shine and start reading as blur,
+        because the top and bottom fifth of every glyph fell to a mid bronze.
+        The ramp still alternates — that is what makes it read as metal rather
+        than as flat yellow — and `coinSkin.test.ts` now asserts both
+        properties: every stop ≥ 4.5:1 against the well composited over a white
+        face, and at least two luminance swings along the ramp.
+      - **The stroke thinned, 1.6px → 1px.** With the well carrying the
+        separation, a stroke that wide only ate the letter's own width from the
+        outside in.
+
+      Measured, worst stop against the worst face: **1.10:1 → 7.04:1** (12.6:1
+      at the ramp's brightest). The old ramp would fail the new test at 4.22:1,
+      which is the point of asserting it rather than eyeballing a screenshot of
+      the pale faces.
 - [x] The middle of a textured coin is not a legible background, so the words
       get a soft well that fades out before the rim — the artwork still reads as
       the face, and the title never lands on whatever the photograph is doing
@@ -675,8 +709,8 @@ backgrounds and colours rather than to reproduce the original coins.
 |---|---:|---:|
 | DOM nodes on the page | 4,403 | **4,942** (+539, ≈ +12%) |
 | extra elements per coin | 0 | 4 (`svg`, `path`, `text`, `textPath`) |
-| … since the ring was dropped | 0 | **3** net (−137 nodes on this field) |
-| gradient definitions | 0 | **1**, shared by all 137 |
+| … less the ring, plus the well | 0 | **4** net (−137 ring, +137 well) |
+| gradient definitions | 0 | **2**, shared by all 137 |
 | Swiper instances | 0 | **0** |
 | per-coin timers | 0 | **0** |
 | layout work per clock tick | none | none |

@@ -1,5 +1,12 @@
 <script> 
     import Sv from "./sv.svelte";
+    // The professional identity gets a parallel element rather than a
+    // restyled heart — see MidiPro.svelte. This is the first `$isBusiness`
+    // branch in the app: every other surface switches identity in CSS,
+    // which cannot swap one element for another. The lev page renders
+    // nothing until onMount, so there is no server/client mismatch here.
+    import MidiPro from "./MidiPro.svelte";
+    import { isBusiness } from '$lib/stores/theme.js';
     import { t } from '$lib/translations';
     let fir = 'lev.page.diamondsHint';
     let u = 'lev.page.diamondsHint';
@@ -213,6 +220,29 @@ u = 'lev.page.diamondsHint'
 }
 </style>
 
+{#if $isBusiness}
+<MidiPro
+{picLink}
+{pic}
+{name}
+{low}
+{sug}
+{pen}
+{ask}
+{wel}
+{beta}
+{des}
+{fia}
+{pmash}
+{mashs}
+{maap}
+{askma}
+{onView}
+{soleKey}
+onPick={(key) => disp({ id: toggle(key) })}
+{onHover}
+/>
+{:else}
 <div 
 role="contentinfo"
 style="position: relative;" 
@@ -271,3 +301,4 @@ pmaap={toggle('pmaap')}
 onHover={hover}
  onDisp={disp}/>
  </div>
+{/if}

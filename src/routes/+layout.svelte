@@ -271,8 +271,12 @@ onMessage(messaging, (payload) => {
     z-index: 10000;
     padding: 0.6rem 1rem;
     border-radius: 0 0 0.5rem 0.5rem;
-    background: #ff0092;
-    color: #ffffff;
+    /* app.postcss retired #ff0092 for exactly this reason: white on it is
+       3.71:1, under the 4.5:1 that file commits to. --barbi-pink/--gold is
+       the pair it guarantees, and it follows the theme — the skip link was
+       still hot pink in the professional identity. */
+    background: var(--barbi-pink, #b80069);
+    color: var(--gold, #ffffff);
     font-weight: 700;
     text-decoration: none;
     transition: top 0.15s ease-in-out;
