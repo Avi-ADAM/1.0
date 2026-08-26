@@ -2,7 +2,6 @@
   import { liUN } from '$lib/stores/liUN.js';
   import { Canvas } from '@threlte/core';
   import Scene from './globu.svelte';
-  import { doesLang, langUs, lang } from '$lib/stores/lang.js';
   import { locale, t, isRtl} from '$lib/translations';
   import { goto } from '$app/navigation';
   import Maze from './maze.svelte';
@@ -455,7 +454,6 @@
   let g = $state(false);
   import Close from '$lib/celim/close.svelte';
   import { animateScroll } from 'svelte-scrollto-element';
-  import Text1lev1 from '$lib/celim/ui/text1lev1.svelte';
   import { sendError } from '$lib/func/send/senError.svelte';
   let meData = [];
 
@@ -623,11 +621,6 @@
     }
   }
 
-  let trans = $state(false);
-  function tran() {
-    trans = !trans;
-  }
-
   let isOpen = $state(false);
   let isMazeOpen = $state(false);
   let a = $state(0);
@@ -656,38 +649,6 @@
   }
   function erorer() {
     a = 5;
-  }
-
-  function change(la) {
-    if (la == 'en') {
-      lang.set('en');
-      locale.set('en');
-      langUs.set('en');
-      doesLang.set(true);
-      document.cookie =
-        `lang=en; expires=` + new Date(2027, 0, 1).toUTCString();
-    } else if (la == 'ar') {
-      lang.set('ar');
-      locale.set('ar');
-      langUs.set('ar');
-      doesLang.set(true);
-      document.cookie =
-        `lang=ar; expires=` + new Date(2027, 0, 1).toUTCString();
-    } else if (la == 'he') {
-      lang.set('he');
-      locale.set('he');
-      langUs.set('he');
-      doesLang.set(true);
-      document.cookie =
-        `lang=he; expires=` + new Date(2027, 0, 1).toUTCString();
-    } else if (la == 'ru') {
-      lang.set('ru');
-      locale.set('ru');
-      langUs.set('ru');
-      doesLang.set(true);
-      document.cookie =
-        `lang=ru; expires=` + new Date(2027, 0, 1).toUTCString();
-    }
   }
 
   $effect(() => {
@@ -789,59 +750,6 @@
     <div class="orb orb-1"></div>
     <div class="orb orb-2"></div>
     <div class="orb orb-3"></div>
-  </div>
-
-  <!-- Top Navigation -->
-  <div class="top-nav">
-    <a href="/login" class="login-link">
-      <img
-        src="https://res.cloudinary.com/love1/image/upload/v1640020897/cropped-PicsArt_01-28-07.49.25-1_wvt4qz.png"
-        alt="התחברות"
-        class="login-icon"
-      />
-      <span>{$t('home.amana.nav.login')}</span>
-    </a>
-
-    <div class="menu-buttons">
-      {#if trans === false}
-        <button onclick={tran} class="menu-btn icon-btn">
-          <img
-            src="https://res.cloudinary.com/love1/image/upload/v1639345051/icons8-translate-app_gwpwcn.svg"
-            alt="תרגום"
-          />
-        </button>
-      {:else}
-        <button onclick={tran} class="menu-btn">✕</button>
-        {#if $locale !== 'en'}
-          <button onclick={() => change('en')} class="menu-btn">English</button>
-        {/if}
-        {#if $locale !== 'ar'}
-          <button onclick={() => change('ar')} class="menu-btn">العربية</button>
-        {/if}
-        {#if $locale !== 'he'}
-          <button onclick={() => change('he')} class="menu-btn">עברית</button>
-        {/if}
-        {#if $locale !== 'ru'}
-          <button onclick={() => change('ru')} class="menu-btn">Русский</button>
-        {/if}
-        <a href="/about" class="menu-btn">{$t('home.nav.about')}</a>
-        <button onclick={info} class="menu-btn"
-          >{$t('home.amana.nav.explanation')}</button
-        >
-        <button onclick={() => goto('/he')} class="menu-btn"
-          ><Text1lev1 /></button
-        >
-        <button onclick={sell} class="menu-btn"
-          >{$t('home.amana.nav.changeRequest')}</button
-        >
-        <button onclick={tr} class="menu-btn"
-          >{$t('home.amana.nav.translation')}</button
-        >
-        <a href="/love" class="menu-btn">{$t('home.nav.agreementMap')}</a>
-      {/if}
-    </div>
-
-    <button onclick={() => info()} class="help-btn">?</button>
   </div>
 
   <!-- Main Content -->
@@ -1040,6 +948,25 @@
             </div>
           {/if}
         </form>
+
+<!-- The fixed top bar these lived in stacked into three rows under
+             480px and covered the top of this card. Login, the language switch
+             and the way home are all in the site footer already; what is left
+             is page-specific, and sits here instead — quiet, and below the
+             thing people came to read. -->
+        <nav class="card-links">
+          <button type="button" onclick={info} class="card-link">
+            {$t('home.amana.nav.explanation')}
+          </button>
+          <a href="/about" class="card-link">{$t('home.nav.about')}</a>
+          <a href="/love" class="card-link">{$t('home.nav.agreementMap')}</a>
+          <button type="button" onclick={sell} class="card-link">
+            {$t('home.amana.nav.changeRequest')}
+          </button>
+          <button type="button" onclick={tr} class="card-link">
+            {$t('home.amana.nav.translation')}
+          </button>
+        </nav>
       </div>
     {/if}
   </div>
@@ -1381,104 +1308,36 @@
     }
   }
 
-  /* Top Navigation */
-  .top-nav {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    padding: 1.5rem 2rem;
+  /* Secondary links, at the foot of the card. Deliberately quiet: these are
+     the entries the site footer does not already carry. */
+  .card-links {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    z-index: 100;
-    background: linear-gradient(
-      180deg,
-      rgba(26, 10, 46, 0.8) 0%,
-      transparent 100%
-    );
-    backdrop-filter: blur(10px);
-  }
-
-  .login-link {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: white;
-    text-decoration: none;
-    font-weight: 500;
-    transition: all 0.3s ease;
-    padding: 0.5rem 1rem;
-    border-radius: 12px;
-    background: rgba(255, 255, 255, 0.05);
-  }
-
-  .login-link:hover {
-    background: rgba(255, 255, 255, 0.1);
-    transform: translateY(-2px);
-  }
-
-  .login-icon {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-  }
-
-  .menu-buttons {
-    display: flex;
-    gap: 0.5rem;
     flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.4rem 1rem;
+    margin-top: 1.75rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
   }
 
-  .menu-btn {
-    padding: 0.5rem 1rem;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: white;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-size: 0.9rem;
-    font-family: 'Rubik', sans-serif;
-  }
-
-  .menu-btn:hover {
-    background: rgba(255, 255, 255, 0.15);
-    transform: translateY(-2px);
-  }
-
-  .icon-btn {
-    padding: 0.5rem;
-    width: 40px;
-    height: 40px;
-  }
-
-  .icon-btn img {
-    width: 100%;
-    height: 100%;
-  }
-
-  .help-btn {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #ff00ae, #ffb800);
+  .card-link {
+    padding: 0.35rem 0.25rem;
+    background: none;
     border: none;
-    color: white;
-    font-size: 1.2rem;
-    font-weight: bold;
+    /* 0.75 alpha on the card's violet ground clears 4.5:1; the 0.6 used for
+       .subtitle does not, and these are interactive. */
+    color: rgba(255, 255, 255, 0.75);
+    font-family: 'Rubik', sans-serif;
+    font-size: 0.85rem;
+    text-decoration: none;
     cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow:
-      0 4px 15px rgba(255, 0, 174, 0.3),
-      0 0 20px rgba(255, 184, 0, 0.2);
+    transition: color 0.2s ease;
   }
 
-  .help-btn:hover {
-    transform: scale(1.1);
-    box-shadow:
-      0 6px 20px rgba(255, 0, 174, 0.5),
-      0 0 30px rgba(255, 184, 0, 0.3);
+  .card-link:hover,
+  .card-link:focus-visible {
+    color: #ffd700;
+    text-decoration: underline;
   }
 
   /* Content Wrapper */
@@ -1490,7 +1349,7 @@
     align-items: center;
     justify-content: center;
     padding: 2rem;
-    padding-top: 6rem;
+    padding-bottom: calc(2rem + var(--foot-h, 0px));
   }
 
   /* Glass Card */
@@ -2105,22 +1964,13 @@
       font-size: 2.5rem;
     }
 
-    .menu-buttons {
-      gap: 0.3rem;
-    }
-
-    .menu-btn {
-      padding: 0.4rem 0.8rem;
-      font-size: 0.85rem;
-    }
-
     .agreement-section {
       padding: 1.5rem;
     }
 
     .content-wrapper {
       padding: 1rem;
-      padding-top: 5rem;
+      padding-bottom: calc(1rem + var(--foot-h, 0px));
     }
 
     .globe-wrapper {
@@ -2130,12 +1980,6 @@
   }
 
   @media (max-width: 480px) {
-    .top-nav {
-      flex-direction: column;
-      gap: 1rem;
-      padding: 1rem;
-    }
-
     .glass-card {
       padding: 1.5rem 1rem;
     }
