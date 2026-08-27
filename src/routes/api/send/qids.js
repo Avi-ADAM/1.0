@@ -176,6 +176,36 @@ const qids_base = {
         }
         
     }`,
+  /**
+   * The guest twin of 1chatsend.
+   *
+   * A meeting guest has no Strapi account, so there is no
+   * users_permissions_user to attach; the message carries their display name
+   * instead (message.guestName, added 2026-08). A message with guestName set
+   * and no user is exactly how a guest message is recognised when the forum
+   * is read back.
+   *
+   * Server-only: reached through /api/guest/message, which verifies the
+   * guest's signed invitation and that the forum really belongs to the
+   * meeting that invitation names. Never expose it on /api/send.
+   */
+  '1chatsendGuest': `mutation CreateGuestMessage($fid: ID, $fidn: Int, $da: DateTime, $mes: String, $guestName: String)
+    {createMessage(
+       data: {
+        forum: $fid,
+        fid: $fidn,
+        when: $da,
+        publishedAt: $da,
+        content: $mes,
+        guestName: $guestName
+        }
+        ){data{id attributes{
+          forum{data{id}}
+        }
+            }
+        }
+    }`,
+
   '2forumCr': `mutation  CreateForum($pid : ID, $mbId: [ID] , $da: DateTime)
    { createForum(
        data: {
@@ -3461,6 +3491,7 @@ ${STIPEND_DECISION_FIELDS}
                     attributes {
                       content
                       createdAt
+                      guestName
                       users_permissions_user {
                         data {
                           id

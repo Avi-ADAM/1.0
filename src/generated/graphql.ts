@@ -4074,6 +4074,7 @@ export type Finiapruval = {
   month?: Maybe<Scalars['Date']['output']>;
   noofhours?: Maybe<Scalars['Float']['output']>;
   partofs?: Maybe<PartofRelationResponseCollection>;
+  perhour?: Maybe<Scalars['Float']['output']>;
   project?: Maybe<ProjectEntityResponse>;
   publishedAt?: Maybe<Scalars['DateTime']['output']>;
   timegrama?: Maybe<TimegramaEntityResponse>;
@@ -4139,6 +4140,7 @@ export type FiniapruvalFiltersInput = {
   not?: InputMaybe<FiniapruvalFiltersInput>;
   or?: InputMaybe<Array<InputMaybe<FiniapruvalFiltersInput>>>;
   partofs?: InputMaybe<PartofFiltersInput>;
+  perhour?: InputMaybe<FloatFilterInput>;
   project?: InputMaybe<ProjectFiltersInput>;
   publishedAt?: InputMaybe<DateTimeFilterInput>;
   timegrama?: InputMaybe<TimegramaFiltersInput>;
@@ -4160,6 +4162,7 @@ export type FiniapruvalInput = {
   month?: InputMaybe<Scalars['Date']['input']>;
   noofhours?: InputMaybe<Scalars['Float']['input']>;
   partofs?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  perhour?: InputMaybe<Scalars['Float']['input']>;
   project?: InputMaybe<Scalars['ID']['input']>;
   publishedAt?: InputMaybe<Scalars['DateTime']['input']>;
   timegrama?: InputMaybe<Scalars['ID']['input']>;
@@ -7281,6 +7284,7 @@ export type Message = {
   editHistory?: Maybe<Array<Maybe<ComponentNewEdits>>>;
   fid?: Maybe<Scalars['Int']['output']>;
   forum?: Maybe<ForumEntityResponse>;
+  guestName?: Maybe<Scalars['String']['output']>;
   publishedAt?: Maybe<Scalars['DateTime']['output']>;
   raplyTo?: Maybe<MessageEntityResponse>;
   replys?: Maybe<MessageRelationResponseCollection>;
@@ -7337,6 +7341,7 @@ export type MessageFiltersInput = {
   editHistory?: InputMaybe<ComponentNewEditsFiltersInput>;
   fid?: InputMaybe<IntFilterInput>;
   forum?: InputMaybe<ForumFiltersInput>;
+  guestName?: InputMaybe<StringFilterInput>;
   id?: InputMaybe<IdFilterInput>;
   not?: InputMaybe<MessageFiltersInput>;
   or?: InputMaybe<Array<InputMaybe<MessageFiltersInput>>>;
@@ -7355,6 +7360,7 @@ export type MessageInput = {
   editHistory?: InputMaybe<Array<InputMaybe<ComponentNewEditsInput>>>;
   fid?: InputMaybe<Scalars['Int']['input']>;
   forum?: InputMaybe<Scalars['ID']['input']>;
+  guestName?: InputMaybe<Scalars['String']['input']>;
   publishedAt?: InputMaybe<Scalars['DateTime']['input']>;
   raplyTo?: InputMaybe<Scalars['ID']['input']>;
   replys?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;

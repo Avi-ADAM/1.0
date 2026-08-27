@@ -6,13 +6,14 @@
  * on a different server.
  */
 
-import { Server } from 'socket.io';
+import { Server, type Socket } from 'socket.io';
 import { createServer as createHttpServer } from 'http';
 import { createServer as createHttpsServer } from 'https';
 import { readFileSync } from 'fs';
 import { config } from 'dotenv';
 import { verifyToken, extractToken } from './auth.js';
 import { SessionManager } from './session-manager.js';
+import { verifyInviteToken, meetingRoom } from './guest-invite.js';
 import type { AuthData, NotificationPayload, BroadcastRequest, SocketData } from './types.js';
 
 // Load environment variables
@@ -76,11 +77,128 @@ function parseCookies(cookieHeader: string | undefined): Record<string, string> 
 }
 
 /**
+ * Handlers every authenticated socket gets, guest or registered.
+ *
+ * Extracted so the guest branch cannot quietly drift from the registered one:
+ * before this existed, returning early for guests would have left them without
+ * a disconnect or error handler at all.
+ */
+function registerCommonHandlers(socket: Socket): void {
+  /**
+   * Space sync wake-up subscriptions (HANDOFF_DISTRIBUTED_DB T1).
+   * A replica subscribes to its spaceId; the relay pokes /space-changed after
+   * accepting new envelopes and everyone in the room gets a metadata-only
+   * 'space:changed' — no content ever flows through here.
+   */
+  socket.on('space:subscribe', (data: { spaceId?: unknown }) => {
+    const spaceId = typeof data?.spaceId === 'string' ? data.spaceId : null;
+    if (!spaceId || spaceId.length > 200) return;
+    socket.join(`space:${spaceId}`);
+  });
+
+  socket.on('space:unsubscribe', (data: { spaceId?: unknown }) => {
+    const spaceId = typeof data?.spaceId === 'string' ? data.spaceId : null;
+    if (!spaceId || spaceId.length > 200) return;
+    socket.leave(`space:${spaceId}`);
+  });
+
+  /**
+   * Disconnect handler
+   */
+  socket.on('disconnect', (reason: string) => {
+    const userId = socket.data.userId;
+    const guest = socket.data.guest;
+
+    if (userId) {
+      sessionManager.removeSession(socket.id);
+      console.log(`[Socket.IO] User ${userId} disconnected: ${reason}`);
+    } else if (guest) {
+      // Nothing to clean up: the room membership goes with the socket, and
+      // guests were never in the SessionManager.
+      console.log(
+        `[Socket.IO] Guest "${guest.displayName}" left meeting ${guest.meetingId}: ${reason}`
+      );
+    } else {
+      console.log(`[Socket.IO] Unauthenticated socket ${socket.id} disconnected: ${reason}`);
+    }
+  });
+  
+  /**
+   * Error handler
+   */
+  socket.on('error', (error: unknown) => {
+    console.error(`[Socket.IO] Socket error for ${socket.id}:`, error);
+  });
+  
+  /**
+   * Ping/pong for connection health
+   */
+  socket.on('ping', () => {
+    socket.emit('pong');
+  });
+}
+
+/**
  * Socket.IO connection handler with automatic cookie-based authentication
  */
 io.on('connection', (socket) => {
   console.log(`[Socket.IO] New connection attempt: ${socket.id}`);
-  
+
+  // ── Guest handshake ──────────────────────────────────────────────────
+  // A meeting guest has no account, so there is no jwt cookie to check.
+  // Their credential is the signed invitation link that let them in, which
+  // names exactly one meeting. Verified here, it buys exactly one thing:
+  // membership of that meeting's room. Guests are never registered
+  // with the SessionManager - nothing addresses them by user id, because
+  // they have none.
+  const handshakeAuth = (socket.handshake.auth || {}) as Record<string, unknown>;
+
+  if (handshakeAuth.userType === 'guest') {
+    const result = verifyInviteToken(handshakeAuth.inviteToken);
+
+    if (!result.valid) {
+      console.error(
+        `[Socket.IO] Guest invitation rejected for ${socket.id}: ${result.error}`
+      );
+      socket.emit('auth_error', {
+        message:
+          result.error === 'expired'
+            ? 'Your guest invitation has expired'
+            : 'Invalid guest invitation'
+      });
+      socket.disconnect();
+      return;
+    }
+
+    const rawName = handshakeAuth.displayName;
+    const displayName =
+      typeof rawName === 'string' && rawName.trim() !== ''
+        ? rawName.trim().slice(0, 50)
+        : 'Guest';
+    const sessionId =
+      typeof handshakeAuth.guestSessionId === 'string'
+        ? handshakeAuth.guestSessionId.slice(0, 200)
+        : null;
+
+    const { meetingId } = result.invite;
+    socket.data.guest = { meetingId, displayName, sessionId };
+    socket.join(meetingRoom(meetingId));
+
+    socket.emit('auth_success', {
+      userId: sessionId ?? socket.id,
+      userType: 'guest',
+      guestSessionId: sessionId,
+      meetingId
+    });
+
+    console.log(
+      `[Socket.IO] Guest "${displayName}" joined meeting ${meetingId} (${socket.id})`
+    );
+
+    registerCommonHandlers(socket);
+    return;
+  }
+
   try {
     // Extract cookies from handshake
     const cookieHeader = socket.handshake.headers.cookie;
@@ -141,52 +259,9 @@ io.on('connection', (socket) => {
     return;
   }
   
-  /**
-   * Space sync wake-up subscriptions (HANDOFF_DISTRIBUTED_DB T1).
-   * A replica subscribes to its spaceId; the relay pokes /space-changed after
-   * accepting new envelopes and everyone in the room gets a metadata-only
-   * 'space:changed' — no content ever flows through here.
-   */
-  socket.on('space:subscribe', (data: { spaceId?: unknown }) => {
-    const spaceId = typeof data?.spaceId === 'string' ? data.spaceId : null;
-    if (!spaceId || spaceId.length > 200) return;
-    socket.join(`space:${spaceId}`);
-  });
-
-  socket.on('space:unsubscribe', (data: { spaceId?: unknown }) => {
-    const spaceId = typeof data?.spaceId === 'string' ? data.spaceId : null;
-    if (!spaceId || spaceId.length > 200) return;
-    socket.leave(`space:${spaceId}`);
-  });
-
-  /**
-   * Disconnect handler
-   */
-  socket.on('disconnect', (reason) => {
-    const userId = socket.data.userId;
-    
-    if (userId) {
-      sessionManager.removeSession(socket.id);
-      console.log(`[Socket.IO] User ${userId} disconnected: ${reason}`);
-    } else {
-      console.log(`[Socket.IO] Unauthenticated socket ${socket.id} disconnected: ${reason}`);
-    }
-  });
-  
-  /**
-   * Error handler
-   */
-  socket.on('error', (error) => {
-    console.error(`[Socket.IO] Socket error for ${socket.id}:`, error);
-  });
-  
-  /**
-   * Ping/pong for connection health
-   */
-  socket.on('ping', () => {
-    socket.emit('pong');
-  });
+  registerCommonHandlers(socket);
 });
+
 
 /**
  * HTTP endpoint for broadcasting notifications
@@ -237,7 +312,7 @@ httpServer.on('request', async (req, res) => {
     req.on('end', () => {
       try {
         const data: BroadcastRequest = JSON.parse(body);
-        const { userIds, notification } = data;
+        const { userIds, notification, meetingIds } = data;
         
         if (!userIds || !Array.isArray(userIds)) {
           res.writeHead(400, { 'Content-Type': 'application/json' });
@@ -274,12 +349,28 @@ httpServer.on('request', async (req, res) => {
           }
         }
         
+        // Guest rooms. A guest has no user id, so the loop above cannot
+        // reach them; they are addressed by the meeting their signed
+        // invitation names. Only guests join these rooms, so a registered
+        // participant never receives the same notification twice.
+        let guestRooms = 0;
+        if (Array.isArray(meetingIds)) {
+          for (const meetingId of meetingIds) {
+            if (meetingId == null) continue;
+            const room = meetingRoom(String(meetingId));
+            io.to(room).emit('notification', notification);
+            guestRooms++;
+            console.log(`[Broadcast] Sent notification to guest room ${room}`);
+          }
+        }
+
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({
           success: true,
           deliveredTo,
           totalSockets,
-          requestedUsers: userIds.length
+          requestedUsers: userIds.length,
+          guestRooms
         }));
         
         console.log(`[Broadcast] Notification sent to ${deliveredTo}/${userIds.length} users (${totalSockets} sockets)`);

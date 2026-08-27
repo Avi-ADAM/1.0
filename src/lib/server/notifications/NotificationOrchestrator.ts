@@ -91,7 +91,14 @@ export class NotificationOrchestrator {
 
       console.log(`[NotificationOrchestrator] Recipients for ${config.templates.title.he}: ${filteredRecipients.length}`);
 
-      if (filteredRecipients.length === 0) {
+      // A meeting notification has a second audience that never appears in
+      // filteredRecipients: the guests watching that meeting, who have no
+      // Strapi user to resolve to. Returning here on an empty list would drop
+      // them silently - which is exactly what happens in a meeting whose only
+      // other attendee is a guest.
+      const meetingIds = this.meetingIdsFor(config.metadata, actionParams);
+
+      if (filteredRecipients.length === 0 && meetingIds.length === 0) {
         console.log('No recipients to notify');
         return;
       }
@@ -136,12 +143,14 @@ export class NotificationOrchestrator {
       // 4. Send via all configured channels (in parallel)
       const promises: Promise<void>[] = [];
 
+
       if (config.channels.includes('socket')) {
         promises.push(
           this.socketIOServer.broadcastToUsers(
             filteredRecipients,
             notificationData,
-            context
+            context,
+            meetingIds
           ).then(() => {
             // Convert to void for consistency with other channels
           })
@@ -298,6 +307,24 @@ export class NotificationOrchestrator {
         console.warn(`Unknown recipient rule type: ${rule.type}`);
         return [];
     }
+  }
+
+  /**
+   * Which meeting, if any, is this notification about?
+   *
+   * Read from the notification metadata first - every meeting event sets
+   * `metadata.type` and `metadata.meetingId` - and fall back to the action
+   * params. Returns an empty list for everything that is not a meeting, so
+   * no guest room is ever addressed by accident.
+   */
+  private meetingIdsFor(
+    metadata: Record<string, any> | undefined,
+    actionParams: Record<string, any> | undefined
+  ): string[] {
+    const raw = metadata?.meetingId ?? actionParams?.meetingId;
+    if (raw == null) return [];
+    const id = String(raw).trim();
+    return id === '' ? [] : [id];
   }
 
   /**

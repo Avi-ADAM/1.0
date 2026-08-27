@@ -11,6 +11,8 @@ import type { ActionContext } from '../actions/types';
 export interface BroadcastRequest {
   userIds: string[];
   notification: NotificationData;
+  /** Meetings whose guest rooms should also receive this - see below. */
+  meetingIds?: string[];
 }
 
 export interface BroadcastResponse {
@@ -40,10 +42,11 @@ export class SocketIOServer {
   async broadcast(
     userIds: string[],
     notification: NotificationData,
-    context: ActionContext
+    context: ActionContext,
+    meetingIds: string[] = []
   ): Promise<BroadcastResponse> {
     try {
-      if (!userIds || userIds.length === 0) {
+      if ((!userIds || userIds.length === 0) && meetingIds.length === 0) {
         console.log('[SocketIOServer] No users to broadcast to');
         return {
           success: true,
@@ -55,10 +58,14 @@ export class SocketIOServer {
 
       const request: BroadcastRequest = {
         userIds,
-        notification
+        notification,
+        ...(meetingIds.length > 0 && { meetingIds })
       };
 
-      console.log(`[SocketIOServer] Broadcasting to ${userIds.length} users`);
+      console.log(
+        `[SocketIOServer] Broadcasting to ${userIds.length} users` +
+          (meetingIds.length > 0 ? ` and ${meetingIds.length} guest room(s)` : '')
+      );
 
       const response = await context.fetch(`${this.serverUrl}/broadcast`, {
         method: 'POST',
@@ -103,10 +110,11 @@ export class SocketIOServer {
   async broadcastToUsers(
     users: UserProfile[],
     notification: NotificationData,
-    context: ActionContext
+    context: ActionContext,
+    meetingIds: string[] = []
   ): Promise<BroadcastResponse> {
     const userIds = users.map(u => u.id);
-    return this.broadcast(userIds, notification, context);
+    return this.broadcast(userIds, notification, context, meetingIds);
   }
 
   /**
