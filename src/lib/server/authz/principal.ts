@@ -13,6 +13,7 @@
 
 import { env } from '$env/dynamic/private';
 import { isInternalRequest } from '$lib/server/internalSecret.js';
+import { isMeetingsRequest } from '$lib/server/meetingsProxy.js';
 import type { Principal } from './types.js';
 
 export const CONSENSUS_SECRET_HEADER = 'x-consensus-secret';
@@ -73,6 +74,12 @@ export function resolvePrincipal(opts: {
   const { request, cookies, isSerFlag } = opts;
   if (isSerFlag === true && isInternalRequest(request)) {
     return resolveServicePrincipal(request);
+  }
+  // The meetings app proving itself. Checked before the cookie so a guest —
+  // who has no cookie to fall back to — resolves to something other than
+  // anonymous, and after isSer so it can never widen a genuine service call.
+  if (isMeetingsRequest(request)) {
+    return { kind: 'serviceMeetings' };
   }
   return resolveCookiePrincipal(cookies);
 }

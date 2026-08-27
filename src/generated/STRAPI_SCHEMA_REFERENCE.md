@@ -1,6 +1,6 @@
 # Strapi GraphQL Schema Reference
 > Auto-generated from `src/generated/graphql.ts`
-> Last updated: 2026-08-20
+> Last updated: 2026-08-26
 > Source: `codegen.ts` → `http://localhost:1337/graphql`
 
 This file provides a compact reference of all types available from the Strapi backend.
@@ -421,6 +421,7 @@ These are the main content types in the Strapi backend.
 | `month` | `Maybe<Scalars['Date']['output']>` |
 | `noofhours` | `Maybe<Scalars['Float']['output']>` |
 | `partofs` | `Maybe<PartofRelationResponseCollection>` |
+| `perhour` | `Maybe<Scalars['Float']['output']>` |
 | `project` | `Maybe<ProjectEntityResponse>` |
 | `publishedAt` | `Maybe<Scalars['DateTime']['output']>` |
 | `timegrama` | `Maybe<TimegramaEntityResponse>` |
@@ -1000,6 +1001,7 @@ These are the main content types in the Strapi backend.
 | `editHistory` | `Maybe<Array<Maybe<ComponentNewEdits>>>` |
 | `fid` | `Maybe<Scalars['Int']['output']>` |
 | `forum` | `Maybe<ForumEntityResponse>` |
+| `guestName` | `Maybe<Scalars['String']['output']>` |
 | `publishedAt` | `Maybe<Scalars['DateTime']['output']>` |
 | `raplyTo` | `Maybe<MessageEntityResponse>` |
 | `replys` | `Maybe<MessageRelationResponseCollection>` |
@@ -4835,6 +4837,7 @@ Used for creating/updating content.
 | `month` | `InputMaybe<Scalars['Date']['input']>` |
 | `noofhours` | `InputMaybe<Scalars['Float']['input']>` |
 | `partofs` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
+| `perhour` | `InputMaybe<Scalars['Float']['input']>` |
 | `project` | `InputMaybe<Scalars['ID']['input']>` |
 | `publishedAt` | `InputMaybe<Scalars['DateTime']['input']>` |
 | `timegrama` | `InputMaybe<Scalars['ID']['input']>` |
@@ -5476,6 +5479,7 @@ Used for creating/updating content.
 | `editHistory` | `InputMaybe<Array<InputMaybe<ComponentNewEditsInput>>>` |
 | `fid` | `InputMaybe<Scalars['Int']['input']>` |
 | `forum` | `InputMaybe<Scalars['ID']['input']>` |
+| `guestName` | `InputMaybe<Scalars['String']['input']>` |
 | `publishedAt` | `InputMaybe<Scalars['DateTime']['input']>` |
 | `raplyTo` | `InputMaybe<Scalars['ID']['input']>` |
 | `replys` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
@@ -7084,7 +7088,7 @@ Fields: `and`, `callActId`, `coordActId`, `createdAt`, `email`, `goal`, `id`, `l
 Fields: `and`, `createdAt`, `id`, `locale`, `localizations`, `name`, `not`, `or`, `publishedAt`, `updatedAt`, `users_permissions_users`
 
 #### FiniapruvalFiltersInput
-Fields: `and`, `archived`, `createdAt`, `finnished_mission`, `forum`, `id`, `isTimerSave`, `iskvua`, `mesimabetahalich`, `missname`, `month`, `noofhours`, `not`, `or`, `partofs`, `project`, `publishedAt`, `timegrama`, `timer`, `updatedAt`, `users_permissions_user`, `vots`, `why`
+Fields: `and`, `archived`, `createdAt`, `finnished_mission`, `forum`, `id`, `isTimerSave`, `iskvua`, `mesimabetahalich`, `missname`, `month`, `noofhours`, `not`, `or`, `partofs`, `perhour`, `project`, `publishedAt`, `timegrama`, `timer`, `updatedAt`, `users_permissions_user`, `vots`, `why`
 
 #### FinnishedMissionFiltersInput
 Fields: `and`, `createdAt`, `descrip`, `finiapruvals`, `finish`, `hearotMeyuchadot`, `id`, `idYesod`, `isFinished`, `isMust`, `isNotFinished`, `isglobal`, `iskvua`, `locale`, `localizations`, `mesimabetahalich`, `mission`, `missionName`, `month`, `noofhours`, `not`, `or`, `perhour`, `project`, `publishedAt`, `start`, `tafkidims`, `total`, `updatedAt`, `users_permissions_user`, `why`
@@ -7159,7 +7163,7 @@ Fields: `and`, `createdAt`, `id`, `kind`, `matchedOn`, `not`, `notifiedAt`, `ope
 Fields: `activeTimer`, `acts`, `admaticedai`, `and`, `archiveEffectiveFrom`, `archive_decisions`, `createdAt`, `dates`, `decisions`, `descrip`, `dormancyDays`, `finiapruvals`, `finnished`, `finnished_missions`, `forappruval`, `forums`, `hearotMeyuchadot`, `hoursassinged`, `howmanyhoursalready`, `id`, `isMust`, `isYesod`, `isglobal`, `iskvua`, `lifecycle`, `matanot_recipe_missions`, `mission`, `monter`, `monters`, `name`, `not`, `open_missions`, `or`, `partofs`, `perhour`, `privatlinks`, `project`, `publicklinks`, `publishedAt`, `seeders`, `sheirut_fulfillments`, `start`, `status`, `stipendCostShare`, `stipendFunder`, `stipendMode`, `stipendRate`, `stipend_pledges`, `stname`, `tafkidims`, `timegramas`, `timer`, `timers`, `totalHoursSaved`, `updatedAt`, `users_permissions_user`, `zohars`
 
 #### MessageFiltersInput
-Fields: `and`, `archived`, `content`, `createdAt`, `editHistory`, `fid`, `forum`, `id`, `not`, `or`, `publishedAt`, `raplyTo`, `replys`, `seen`, `updatedAt`, `users_permissions_user`, `when`
+Fields: `and`, `archived`, `content`, `createdAt`, `editHistory`, `fid`, `forum`, `guestName`, `id`, `not`, `or`, `publishedAt`, `raplyTo`, `replys`, `seen`, `updatedAt`, `users_permissions_user`, `when`
 
 #### MissionFiltersInput
 Fields: `and`, `createdAt`, `descrip`, `embedding_id`, `finnished_missions`, `id`, `kindOf`, `locale`, `localizations`, `matanots`, `mesimabetahaliches`, `missionName`, `mission_offers`, `negos`, `not`, `open_missions`, `or`, `pendms`, `projects`, `publishedAt`, `ratsons`, `skills`, `synonyms`, `tafkidims`, `updatedAt`, `usage_count`, `users_can_do`, `work_ways`
@@ -7947,7 +7951,7 @@ Wrapper types for GraphQL responses.
 ```
 src/
 ├── generated/
-│   ├── graphql.ts              # Auto-generated types (codegen) - 20840 lines
+│   ├── graphql.ts              # Auto-generated types (codegen) - 20846 lines
 │   ├── index.ts                # Re-export hub
 │   └── STRAPI_SCHEMA_REFERENCE.md  # This file (AI agent reference)
 ├── lib/

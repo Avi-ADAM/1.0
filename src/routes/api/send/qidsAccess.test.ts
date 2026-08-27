@@ -9,7 +9,7 @@ import { describe, it, expect } from 'vitest';
 import { qids } from './qids.js';
 import { qidsAccess } from './qidsAccess.js';
 
-const VALID_KINDS = ['user', 'serviceAdmin', 'serviceConsensus', 'apiKey', 'anonymous'];
+const VALID_KINDS = ['user', 'serviceAdmin', 'serviceConsensus', 'serviceMeetings', 'apiKey', 'anonymous'];
 
 describe('qidsAccess manifest', () => {
   it('classifies every qid defined in qids.js', () => {
@@ -53,5 +53,16 @@ describe('qidsAccess manifest', () => {
       expect(entry.allow, `${qid} must allow serviceConsensus`).toContain('serviceConsensus');
       expect(entry.allow, `${qid} must not allow serviceAdmin`).not.toContain('serviceAdmin');
     }
+  });
+
+  it('grants serviceMeetings only the reads the meetings app needs', () => {
+    // The meetings app authenticates with x-meetings-secret and acts for a
+    // guest, who has no JWT. Keep that grant to reads, and to the smallest
+    // set that renders a guest's meeting page — this test is the tripwire.
+    const expected = ['59GetMeetingDetails'];
+    const granted = Object.entries(qidsAccess)
+      .filter(([, entry]) => (entry as { allow: string[] }).allow.includes('serviceMeetings'))
+      .map(([qid]) => qid);
+    expect(granted.sort()).toEqual(expected.sort());
   });
 });

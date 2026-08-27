@@ -6,7 +6,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { createHash } from 'node:crypto';
 
 vi.mock('$env/dynamic/private', () => ({
-  env: { CONSENSUS_PROXY_SECRET: 'consensus-secret-value' }
+  env: { CONSENSUS_PROXY_SECRET: 'consensus-secret-value', MEETINGS_PROXY_SECRET: 'meetings-secret-value' }
 }));
 vi.mock('$env/static/private', () => ({ ADMINMONTHER: 'test-admin-token' }));
 
@@ -82,5 +82,43 @@ describe('resolvePrincipal', () => {
       isSerFlag: false
     });
     expect(p).toMatchObject({ kind: 'user', userId: '12' });
+  });
+
+  it('resolves the meetings shared secret as serviceMeetings', () => {
+    const p = resolvePrincipal({
+      request: requestWith({ 'x-meetings-secret': 'meetings-secret-value' }),
+      cookies: cookiesOf({}),
+      isSerFlag: false
+    });
+    expect(p.kind).toBe('serviceMeetings');
+  });
+
+  it('ignores a wrong meetings secret', () => {
+    const p = resolvePrincipal({
+      request: requestWith({ 'x-meetings-secret': 'nope' }),
+      cookies: cookiesOf({}),
+      isSerFlag: false
+    });
+    expect(p.kind).toBe('anonymous');
+  });
+
+  it('lets a genuine isSer call stay serviceAdmin even with the meetings header', () => {
+    const p = resolvePrincipal({
+      request: requestWith({ 'x-internal-secret': INTERNAL_SECRET, 'x-meetings-secret': 'meetings-secret-value' }),
+      cookies: cookiesOf({}),
+      isSerFlag: true
+    });
+    expect(p.kind).toBe('serviceAdmin');
+  });
+
+  it('prefers the meetings principal over a cookie that happens to be present', () => {
+    // The meetings server never forwards visitor cookies on this path, but if
+    // one ever leaked in it must not silently become that user's session.
+    const p = resolvePrincipal({
+      request: requestWith({ 'x-meetings-secret': 'meetings-secret-value' }),
+      cookies: cookiesOf({ jwt: 'x', id: '12' }),
+      isSerFlag: false
+    });
+    expect(p.kind).toBe('serviceMeetings');
   });
 });

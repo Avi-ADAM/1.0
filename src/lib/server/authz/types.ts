@@ -15,6 +15,11 @@ export type PrincipalKind =
   | 'serviceAdmin'
   /** Server-originated consensus call: isSer + x-consensus-secret → CONSENSUS_PUBLIC_TOKEN */
   | 'serviceConsensus'
+  /** The meetings app's server (meetings.1lev1.com) proving itself with
+   *  x-meetings-secret. It carries no user: this is how a meeting *guest*,
+   *  who has no JWT, is read on behalf of. Narrow by design — see
+   *  src/lib/server/meetingsProxy.ts and its entries in qidsAccess.js. */
+  | 'serviceMeetings'
   /** External caller authenticated by a 1lev1_… API key (Strapi does not know
    *  this token — WE enforce permissions here, and execution ultimately uses
    *  the Strapi admin token behind the scenes) */
