@@ -1,7 +1,6 @@
 import { redirect, fail } from '@sveltejs/kit';
 import { importInvitedMeeting } from '$lib/server/importInvitedMeeting.js';
 
-import { STRAPI_URL as baseUrl } from '$lib/server/strapiUrl.js';
 import { signupCookieOptions } from '$lib/server/signupCookies.js';
 
 export async function load({ cookies, url }) {
@@ -76,7 +75,10 @@ export const actions = {
       if (fpval) registerBody.chezin = fpval;
       if (countries.length > 0) registerBody.cuntries = countries;
 
-      const res = await fetch(`${baseUrl}/api/auth/local/register`, {
+      // Through our own auth proxy — never straight at Strapi. As an internal
+      // caller this action gets the jwt back in the body and sets the session
+      // cookie itself, below.
+      const res = await fetch('/api/auth/local/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(registerBody)

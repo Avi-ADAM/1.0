@@ -24,12 +24,7 @@ const SRC = join(ROOT, 'src');
 
 // Files known to still call Strapi /graphql directly from the client.
 // Shrink this list as components are migrated; never add to it.
-const BASELINE = new Set([
-	// Dead code — zero importers anywhere in src/. Kept for reference, not
-	// migrating; listed here (rather than deleted) so the guardrail doesn't
-	// need updating again if they're ever fully removed.
-	'src/lib/legacy/moach/OLD_monolith.svelte'
-]);
+const BASELINE = new Set([]);
 
 /** Recursively collect .svelte files under a dir. */
 function walk(dir, out = []) {

@@ -1,5 +1,4 @@
 import { redirect, fail } from '@sveltejs/kit';
-import { STRAPI_URL } from '$lib/server/strapiUrl.js';
 import { signupCookieOptions } from '$lib/server/signupCookies.js';
 import type { Actions, PageServerLoad } from './$types';
 
@@ -19,11 +18,11 @@ import type { Actions, PageServerLoad } from './$types';
  * So the confirmation link should point here instead (Strapi admin →
  * Settings → Users & Permissions → Email templates → Email address
  * confirmation, `<%= URL %>` → `https://www.1lev1.com/confirm-email`). We
- * forward to Strapi server-side and turn its two outcomes into pages a person
- * can act on.
+ * forward through our own auth proxy — never straight at Strapi — and turn its
+ * two outcomes into pages a person can act on.
  */
 
-const CONFIRM_ENDPOINT = `${STRAPI_URL}/api/auth/email-confirmation`;
+const CONFIRM_ENDPOINT = '/api/auth/email-confirmation';
 
 /**
  * The address this link was sent to, so the login page it hands off to can be
@@ -50,14 +49,17 @@ export const load: PageServerLoad = async ({ url, cookies, fetch }) => {
 
   let status: number;
   try {
-    const res = await fetch(
-      `${CONFIRM_ENDPOINT}?confirmation=${encodeURIComponent(token)}`,
-      // A good token answers with a 302 to Strapi's configured redirection URL.
-      // Don't follow it — that target is not ours to render, and a 404 there
-      // would look like a failed confirmation.
-      { redirect: 'manual' }
-    );
-    status = res.status;
+    // The proxy is the one that talks to Strapi, and it does not follow the
+    // 302 a good token produces — that target is not ours to render, and a 404
+    // there would look like a failed confirmation. It reports Strapi's status
+    // back in the body; its own status is only about the hop.
+    const res = await fetch(`${CONFIRM_ENDPOINT}?confirmation=${encodeURIComponent(token)}`);
+    if (!res.ok) {
+      status = res.status;
+    } else {
+      const body = (await res.json().catch(() => ({}))) as { status?: number };
+      status = typeof body.status === 'number' ? body.status : 200;
+    }
   } catch (e) {
     console.error('[confirm-email] Strapi confirmation request failed:', e);
     return { state: 'error' as const, email };
@@ -95,7 +97,7 @@ export const actions: Actions = {
     }
 
     try {
-      const res = await fetch(`${STRAPI_URL}/api/auth/send-email-confirmation`, {
+      const res = await fetch('/api/auth/send-email-confirmation', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email })

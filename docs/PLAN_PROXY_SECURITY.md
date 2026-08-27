@@ -463,3 +463,110 @@ forum `[forumId]` שלח `/api/action` ל-VITE_URL (באג — תוקן ליחס
 **נשאר פתוח גם אחרי הסגירה:** מי שיש לו את הסוד עובר; `/uploads` ציבורי;
 כשצריך אדמין — open, לעבוד, close. עדיין כדאי בהמשך firewall אמיתי (למנוע
 עקיפת nginx על פורט 1337 אם הוא חשוף) — לבדוק `sudo ss -tlnp | grep 1337`.
+
+## 11. SSR עובר לפרוקסי — הצעד שמאפשר לנעול את Strapi (2026-08-27)
+
+**הבעיה שנשארה אחרי §9-§10:** גם כשהדפדפן מנותב ל-api.1lev1.com
+(`VITE_API_BASE`), ה-**SSR** עדיין רץ על Vercel — ו-`+page.server` פנה משם
+ל-Strapi ישירות. כל עוד זה המצב, Strapi חייב להיות נגיש מהאינטרנט הציבורי ולא
+יכול להיסגר ל-loopback; `x-strapi-gate` הוא תחליף (סוד ב-header), לא נעילת רשת.
+
+**המנגנון:** `SSR_API_BASE` (runtime, `$env/dynamic/private`).
+`src/lib/server/ssrApiBase.js` מחליט, ו-`handleFetch` ב-`hooks.server.js` מבצע:
+כל `fetch('/api/…')` **יחסי** מתוך לואד/form-action מנותב ל-
+`SSR_API_BASE + path`, עם `x-internal-secret` (נגזר מ-`ADMINMONTHER`, זהה בשני
+הצדדים) ועם ה-`Cookie` של הגולש מועבר הלאה — כי ברגע שהקריאה חוצה origin
+SvelteKit מפסיק לצרף אותו לבד. על ה-VPS המשתנה ריק, ולכן `/api/*` שלו ממשיך
+לרוץ in-process — אין לולאה ואין קפיצה מיותרת.
+
+- ריק = כיבוי מלא (התנהגות ישנה). **rollback = להסיר את המשתנה מ-Vercel.**
+- `rewriteToApiBase` מסרב לנתב URL מוחלט, נתיב שאינו `/api/`, וכשה-base הוא
+  ה-origin של עצמנו — נבדק ב-`src/lib/server/ssrApiBase.test.ts`.
+
+**שני clients חדשים לצד השרת** (`src/lib/server/`):
+`sendViaProxy.js` → `/api/send` עם qid, `actionViaProxy.js` → `/api/action`
+(מחזיר את אותו `{ success, data, error }` ש-`executeAction` מחזיר, כדי שאתר
+קריאה רק יחליף import). שניהם ב-`sendViaProxy.test.ts`.
+
+**מה הוגר (2026-08-27):**
+
+| קובץ | היה | עכשיו |
+|---|---|---|
+| `(reg)/me` | POST ל-`STRAPI_GRAPHQL` עם `qids['meProfile']` | `sendViaProxy('meProfile')` |
+| `(reg)/moach/[projectId]/chains` | query inline | qid חדש `306moachChainsExtra` |
+| `(regandnon)/gift/[id]` | `fetchPendingForMatanot` ישיר | `sendViaProxy('125userPendingForMatanot')` |
+| `love` | query inline אנונימי | qid חדש `305loveCountryAgreement`, `isSer:true` |
+| `deals`, `deals/[id]`, `deals/request/[id]`, `deals/sales-center` | `gql()` ישיר + `Bearer tok` | `sendViaProxy`; `dealsQueries.ts` לא מקבל יותר `jwt` בכלל |
+| `(reg)/forum/+layout`, `(reg)/forum/[forumId]`, `(reg)/concierge/[id]` | `actionService.executeAction` in-process | `actionViaProxy` |
+| `login`, `signup` | `${STRAPI_URL}/api/auth/local[/register]` | `/api/auth/local[/register]` |
+| `confirm-email` | `${STRAPI_URL}/api/auth/email-confirmation` | `/api/auth/email-confirmation` (GET חדש בפרוקסי) |
+| `$lib/server/importInvitedMeeting.ts` | mutation עם admin token ישירות | `sendViaProxy('19CreatePendMeeting', …, { isSer:true })` |
+
+**שינויים ב-`/api/auth/[...path]`:**
+1. **קורא פנימי מקבל את ה-`jwt` בגוף.** בדרך כלל הפרוקסי שומר את הטוקן כ-cookie
+   ומנקה אותו מהתשובה — אבל כשהקורא הוא SSR, ה-cookie היה נוחת על הקפיצה
+   *בין שני השרתים* ונעלם. לכן `isInternalRequest` ⇒ התשובה עוברת כמו שהיא,
+   ו-`login`/`signup` ממשיכים להגדיר את ה-cookie בעצמם — כולל לוגיקת מחיקת
+   ה-zombie cookies שלא נגענו בה (יש לה היסטוריית באג בפרודקשן; ראה ההערה שם).
+2. **`GET email-confirmation`** — הקישור מהמייל הוא GET, והפרוקסי לא עוקב אחרי
+   ה-302 של Strapi אלא מחזיר `{ status }`.
+
+**מה נשאר לעשות ביד (לא בקוד):**
+
+1. - [ ] `SSR_API_BASE=https://api.1lev1.com` ב-env של **Vercel** (יחד עם
+       `VITE_API_BASE` — שניהם צריכים להיות דלוקים) ואז redeploy.
+       ⚠️ **לא** להגדיר אותו ב-`.env` של הקונטיינר על ה-VPS.
+2. - [ ] לוודא ש-`ADMINMONTHER` **זהה** ב-Vercel וב-VPS — ממנו נגזר
+       `x-internal-secret`, ובלי התאמה כל קריאת SSR תיפול ל-401.
+3. - [ ] **Strapi → Settings → Users & Permissions → Email templates:** לוודא
+       ש-`<%= URL %>` באישור המייל מצביע ל-`https://www.1lev1.com/confirm-email`
+       ולא ל-Strapi עצמו. הקישור מהמייל חייב להגיע לאפליקציה — אחרת כשננעל
+       tovmeod הוא ישבר. (זו ההגדרה שנוגעת גם ל-reset-password.)
+4. - [ ] אחרי אימות: `sudo strapi-gate close`, ואז אפשר להתקדם ל-loopback אמיתי.
+
+**מה זה עדיין לא סוגר:** `/api/*` שרץ על Vercel כשה-דפדפן פונה יחסית — זה מה
+ש-`VITE_API_BASE` פותר (§9), וצריך להיות דלוק יחד עם זה. אחרי שניהם, אף קוד
+שרץ על Vercel לא נוגע ב-Strapi: `grep -rln "server/strapiUrl" src` מחזיר רק
+`src/routes/api/`, `src/lib/server/` ו-`hooks.server.js` (ושם רק לחישוב
+ה-origin של שער ה-gate, לא לקריאה).
+
+### 11.1 אימות בפועל (2026-08-27)
+
+**מבחן א' — מול ה-VPS האמיתי** (`SSR_API_BASE=https://api.1lev1.com`, dev מקומי):
+`GET /love` החזיר 200, וב-לוג: `/api/send 305loveCountryAgreement failed: 400
+Unknown queId`. זו תשובה שרק הצד המרוחק יכול לתת (ה-qid קיים מקומית) — כלומר
+הניתוב, ה-`x-internal-secret` והעברת השגיאה עובדים מקצה לקצה. בנוסף, probe ישיר
+ל-`api.1lev1.com/api/send` עם הסוד הנגזר הריץ `meProfile` עד Strapi (נפל רק על
+משתנה חסר, לא על 401) — כלומר **`ADMINMONTHER` תואם בין המקומי ל-VPS**.
+
+⚠️ **המסקנה המבצעית:** ה-image הפרוס לא מכיר את `305`/`306`, את ה-GET החדש
+ב-`/api/auth`, ולא את החזרת ה-jwt לקורא פנימי. **חובה לפרוס `.\deploy-api.ps1`
+לפני שמדליקים `SSR_API_BASE` ב-Vercel** — אחרת love/chains/login יישברו.
+
+**מבחן ב' — הקוד החדש בשני הצדדים** (גלישה ל-`dev.1lev1.com:5173`,
+`SSR_API_BASE=http://localhost:5173` — שני origin שונים, אז ה-rewrite נורה):
+
+| דף | הקפיצה הפנימית (`ua=node`) | זהות |
+|---|---|---|
+| `POST /login` | `POST /api/auth/local` → jwt בגוף, ה-action קבע jwt/id/un/email | — |
+| `GET /me` | `POST /api/send` | **`uid=256`** |
+| `GET /deals` | 4× `POST /api/send` | **`uid=256`** |
+| `GET /love` | `POST /api/send` | `uid=None` (isSer) |
+
+כולם 200. ה-`uid` על הקריאות הפנימיות מוכיח שהפרוקסי זיהה את המשתמש **מה-cookie
+שהועבר בקפיצה**, וכניסת ה-login מוכיחה את מסלול ה-jwt לקורא פנימי.
+
+### 11.2 מלכודת: Strapi בודק את ה-`Origin` (קיים מלפני השינוי)
+
+Strapi מחזיר **500 `"<origin> is not a valid origin"`** לכל בקשה שנושאת `Origin`
+שאינו ב-allowlist שלו — ו-`event.fetch` של SvelteKit מטביע `Origin` בקפיצה
+חוצת-origin. נבדק מול `tovmeod` (2026-08-27):
+
+| Origin | תוצאה |
+|---|---|
+| `https://www.1lev1.com`, `https://1lev1.com`, `https://api.1lev1.com`, `http://localhost:5173` | ✅ עובר |
+| `http://127.0.0.1:5173`, `http://dev.1lev1.com:5173` | ❌ 500 |
+
+**בפרודקשן זה תקין** — האינסטנס על ה-VPS שולח `Origin: https://api.1lev1.com`,
+שנמצא ברשימה. אבל אם מוסיפים origin חדש (סביבת staging, preview של Vercel שפונה
+ישירות) — צריך להוסיף אותו ל-CORS של Strapi, אחרת הכל נופל ב-500 מבלבל.

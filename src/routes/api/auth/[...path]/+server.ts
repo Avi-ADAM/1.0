@@ -15,6 +15,7 @@ import type { RequestHandler } from '@sveltejs/kit';
  */
 
 import { STRAPI_URL as BASE_URL } from '$lib/server/strapiUrl.js';
+import { isInternalRequest } from '$lib/server/internalSecret.js';
 
 type AuthAction = {
   /** Requires an authenticated user; token is taken from the httpOnly cookie. */
@@ -31,6 +32,15 @@ const ALLOWED: Record<string, AuthAction> = {
   'forgot-password': { requiresAuth: false, setsSession: false },
   'reset-password': { requiresAuth: false, setsSession: true },
   'send-email-confirmation': { requiresAuth: false, setsSession: false }
+};
+
+/**
+ * Auth actions reachable with GET, for links that arrive from an email rather
+ * than from the app. Strapi answers these with a redirect, so the caller wants
+ * the status, not a body.
+ */
+const ALLOWED_GET: Record<string, true> = {
+  'email-confirmation': true
 };
 
 function buildCookieOptions(hostname: string) {
@@ -100,6 +110,16 @@ export const POST: RequestHandler = async ({ params, request, cookies, fetch, ur
       return json(data, { status: res.status });
     }
 
+    // A server-side caller (an SSR load reaching this instance through
+    // SSR_API_BASE) is finishing the request itself: it owns the browser
+    // response, so it is the one that must set the session cookie. Hand it the
+    // payload untouched — it proved it is server-originated with the internal
+    // secret, which no browser can produce. Cookies set here would land on the
+    // hop between the two servers and be lost.
+    if (isInternalRequest(request)) {
+      return json(data);
+    }
+
     // Persist a returned JWT server-side and strip it from the client payload.
     if (action.setsSession && data?.jwt) {
       const opts = buildCookieOptions(url.hostname);
@@ -138,5 +158,46 @@ export const POST: RequestHandler = async ({ params, request, cookies, fetch, ur
 
     console.error('Auth proxy error:', e);
     throw error(500, e instanceof Error ? e.message : 'Auth request failed');
+  }
+};
+
+/**
+ * Confirm an email address. Strapi's endpoint is a GET with a `confirmation`
+ * query param that answers with a 302 on success and a 400 on a spent token;
+ * the redirect target is Strapi's, not ours, so it is never followed. The
+ * caller only needs to know which of the two happened.
+ *
+ * GET /api/auth/email-confirmation?confirmation=<token>
+ */
+export const GET: RequestHandler = async ({ params, url, fetch }) => {
+  const path = (params.path ?? '').replace(/^\/+|\/+$/g, '');
+  if (!ALLOWED_GET[path]) {
+    throw error(404, 'Unknown auth action');
+  }
+
+  const token = url.searchParams.get('confirmation');
+  if (!token) {
+    throw error(400, 'Missing confirmation token');
+  }
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 30000);
+
+  try {
+    const res = await fetch(
+      `${BASE_URL}/api/auth/${path}?confirmation=${encodeURIComponent(token)}`,
+      { redirect: 'manual', signal: controller.signal }
+    );
+    clearTimeout(timeoutId);
+    // `redirect: 'manual'` yields either the 3xx itself or an opaque redirect
+    // (status 0) depending on the fetch implementation. Both mean success.
+    return json({ status: res.status });
+  } catch (e) {
+    clearTimeout(timeoutId);
+    if (e instanceof Error && e.name === 'AbortError') {
+      throw error(504, 'Gateway Timeout: the auth provider did not respond in time.');
+    }
+    console.error('Auth proxy error (GET):', e);
+    throw error(502, 'Confirmation request failed');
   }
 };

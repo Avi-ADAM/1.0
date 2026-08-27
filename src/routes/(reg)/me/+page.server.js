@@ -1,6 +1,5 @@
 import { redirect } from '@sveltejs/kit';
-import { qids } from '../../api/send/qids.js';
-import { STRAPI_GRAPHQL } from '$lib/server/strapiUrl.js';
+import { sendViaProxy } from '$lib/server/sendViaProxy.js';
 
 const DEFAULT_PIC =
   'https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png';
@@ -50,20 +49,9 @@ export async function load({ locals, fetch, depends }) {
   }
 
   try {
-    const res = await fetch(STRAPI_GRAPHQL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${tok}`
-      },
-      body: JSON.stringify({
-        query: qids['meProfile'],
-        variables: { uid: String(uid) }
-      })
-    });
-    const json = await res.json();
+    const data = await sendViaProxy(fetch, 'meProfile', { uid: String(uid) });
 
-    const userData = json?.data?.usersPermissionsUser?.data;
+    const userData = data?.usersPermissionsUser?.data;
     if (!userData || !userData.attributes) {
       // Token rejected / user gone → login
       throw redirect(303, '/login');

@@ -1,8 +1,7 @@
 import type { SaleData } from '$lib/stores/levStores';
 import { mapSaleData } from '$lib/utils/levDataExtractors';
 import { stripHtml } from '$lib/utils/stripHtml';
-import { qids } from '../../../routes/api/send/qids.js';
-import { STRAPI_GRAPHQL } from '$lib/server/strapiUrl.js';
+import { sendViaProxy } from '$lib/server/sendViaProxy.js';
 
 export interface PendingRequestData {
   id: string;
@@ -130,26 +129,17 @@ function mapSheirutpend(node: any, projectId?: string, projectName?: string): Pe
   };
 }
 
+/**
+ * Every read here goes through the vetted /api/send proxy — the session comes
+ * from the cookie the proxy already holds, so these functions never handle a
+ * JWT and never address Strapi. See docs/PLAN_PROXY_SECURITY.md §11.
+ */
 async function gql<T = any>(
   fetchFn: typeof fetch,
-  jwt: string,
-  query: string,
+  queId: string,
   variables: Record<string, unknown>
 ): Promise<T> {
-  const endpoint = STRAPI_GRAPHQL;
-  const res = await fetchFn(endpoint, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${jwt}`
-    },
-    body: JSON.stringify({ query, variables })
-  });
-  const json = await res.json();
-  if (json.errors) {
-    throw new Error(json.errors[0]?.message || 'GraphQL error');
-  }
-  return json.data as T;
+  return (await sendViaProxy(fetchFn as any, queId, variables)) as T;
 }
 
 function isActiveSheirut(attrs: any): boolean {
@@ -172,13 +162,10 @@ export interface UserWeave {
 
 export async function fetchUserWeaves(
   fetchFn: typeof fetch,
-  jwt: string,
   userId: string
 ): Promise<UserWeave[]> {
-  const query = (qids as Record<string, string>)['141listMyWeavesDetailed'];
-  if (!query) return [];
   try {
-    const data = await gql(fetchFn, jwt, query, { uid: userId });
+    const data = await gql(fetchFn, '141listMyWeavesDetailed', { uid: userId });
     const nodes = data?.usersPermissionsUser?.data?.attributes?.projects_1s?.data ?? [];
     return nodes.map((p: any) => {
       const a = p.attributes ?? {};
@@ -217,14 +204,10 @@ export interface DealsForUserResult {
  */
 export async function fetchWishInvitationsForUser(
   fetchFn: typeof fetch,
-  jwt: string,
   userId: string
 ): Promise<IncomingWishInvitation[]> {
-  const query = (qids as Record<string, string>)['111listMyWishInvitations'];
-  if (!query) return [];
-
   try {
-    const data = await gql(fetchFn, jwt, query, { uid: userId, limit: 60 });
+    const data = await gql(fetchFn, '111listMyWishInvitations', { uid: userId, limit: 60 });
     const nodes = data?.ratsonProposals?.data ?? [];
     return nodes
       .map(mapWishInvitation)
@@ -237,18 +220,14 @@ export async function fetchWishInvitationsForUser(
 
 export async function fetchDealsForUser(
   fetchFn: typeof fetch,
-  jwt: string,
   userId: string
 ): Promise<DealsForUserResult> {
-  const query = (qids as Record<string, string>)['123dealsForUser'];
-  if (!query) throw new Error('qid 123dealsForUser missing');
-
   // Fetch the user's deal data, their personal wish invitations, and their
   // weaves (host options for contributing) together.
   const [data, incomingWishes, weaves] = await Promise.all([
-    gql(fetchFn, jwt, query, { idL: userId }),
-    fetchWishInvitationsForUser(fetchFn, jwt, userId),
-    fetchUserWeaves(fetchFn, jwt, userId)
+    gql(fetchFn, '123dealsForUser', { idL: userId }),
+    fetchWishInvitationsForUser(fetchFn, userId),
+    fetchUserWeaves(fetchFn, userId)
   ]);
   const userData = data?.usersPermissionsUser?.data;
   if (!userData) {
@@ -308,15 +287,11 @@ export interface SingleDealResult {
 
 export async function fetchSingleDeal(
   fetchFn: typeof fetch,
-  jwt: string,
   userId: string,
   sheirutId: string,
   username?: string
 ): Promise<SingleDealResult> {
-  const query = (qids as Record<string, string>)['124sheirutForDeal'];
-  if (!query) throw new Error('qid 124sheirutForDeal missing');
-
-  const data = await gql(fetchFn, jwt, query, { id: sheirutId });
+  const data = await gql(fetchFn, '124sheirutForDeal', { id: sheirutId });
   const sheirut = data?.sheirut?.data;
   if (!sheirut) return { sale: null, kind: null };
 

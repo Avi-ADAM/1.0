@@ -1,4 +1,3 @@
-import { STRAPI_URL as baseUrl } from '$lib/server/strapiUrl.js';
 import { safeRedirectTarget } from '$lib/auth/redirectTarget.js';
 
 /**
@@ -11,7 +10,7 @@ export async function load({ cookies }) {
 }
 
 export const actions = {
-    login: async ({ request, cookies, url }) => {
+    login: async ({ request, cookies, fetch, url }) => {
         const data = await request.formData();
         const email = data.get('email');
         const password = data.get('password');
@@ -24,7 +23,10 @@ export const actions = {
         }
 
         try {
-            const response = await fetch(`${baseUrl}/api/auth/local`, {
+            // Through our own auth proxy — never straight at Strapi. As an
+            // internal caller this action gets the jwt back in the body and
+            // sets the session cookie itself, below.
+            const response = await fetch('/api/auth/local', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ identifier: email, password })

@@ -3,6 +3,7 @@
 //import * as Sentry from '@sentry/sveltekit';
 import { env } from '$env/dynamic/private';
 import { getInternalSecret, INTERNAL_HEADER } from '$lib/server/internalSecret.js';
+import { ssrApiBase, rewriteToApiBase } from '$lib/server/ssrApiBase.js';
 import { STRAPI_URL } from '$lib/server/strapiUrl.js';
 import { isExpiredJwt, clearStaleAuthCookies } from '$lib/server/session.js';
 import { log, requestId } from '$lib/server/log.js';
@@ -98,20 +99,37 @@ function applyCorsHeaders(headers, origin, request) {
 }
 
 /**
- * Inject the internal proxy secret on same-origin /api/* requests made with the
- * server-side fetch. Browser fetches never reach this hook, so the header
- * cannot be forged by a client. This is what lets /api/send and /api/action
- * trust a request's `isSer` flag.
+ * Route the server's own `/api/*` calls and prove they are server-originated.
+ *
+ * Two things happen here, both only for same-origin `/api/*`:
+ *
+ * 1. **Re-point at the API instance.** When `SSR_API_BASE` is set (Vercel), a
+ *    load's relative `/api/send` is sent to `https://api.1lev1.com/api/send`
+ *    instead of being served in-process. That is what keeps Strapi out of
+ *    reach of everything except the VPS — see $lib/server/ssrApiBase.js.
+ *    Going cross-origin means SvelteKit stops forwarding the session cookie,
+ *    so it is copied over explicitly; the proxy resolves the caller from it
+ *    exactly as it does for a browser request.
+ * 2. **Stamp the internal secret.** Browser fetches never reach this hook, so
+ *    the header cannot be forged by a client. This is what lets /api/send and
+ *    /api/action trust a request's `isSer` flag.
+ *
  * @type {import('@sveltejs/kit').HandleFetch}
  */
 export async function handleFetch({ event, request, fetch }) {
 	try {
 		const url = new URL(request.url);
 		if (url.origin === event.url.origin && url.pathname.startsWith('/api/')) {
+			const rewritten = rewriteToApiBase(url, event.url, ssrApiBase());
+			if (rewritten) {
+				request = new Request(rewritten, request);
+				const cookie = event.request.headers.get('cookie');
+				if (cookie) request.headers.set('cookie', cookie);
+			}
 			request.headers.set(INTERNAL_HEADER, getInternalSecret());
 		}
 	} catch (e) {
-		log.error('handleFetch: failed to attach internal secret', { err: e });
+		log.error('handleFetch: failed to route the internal API call', { err: e });
 	}
 	return fetch(request);
 }

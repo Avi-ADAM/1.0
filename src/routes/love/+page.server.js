@@ -1,49 +1,26 @@
 import datai from '$lib/components/main/data.json';
-// Server load (not universal): the public countries query must run on the
-// server so it works when Strapi is gated (x-strapi-gate via hooks fetch patch).
-import { STRAPI_URL as baseUrl } from '$lib/server/strapiUrl.js';
+// Server load (not universal): the page is anonymous, so the countries query
+// runs as the service through /api/send — never against Strapi directly.
+import { sendViaProxy } from '$lib/server/sendViaProxy.js';
 
 export const load = async ({fetch}) => {
-    let error, country,data
+    let country, data
 
-    const res =  fetch(baseUrl+'/graphql', {
-      //api/cuntries?pagination[page]=1&pagination[pageSize]=280
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        query: `query {
-  cuntries {
-    data{
-      id
-      attributes {name free_people{data{id
-    }
-    }
-    } 
-    }
-}
-}   `
-      })
-    })
-      .then((data) => {
-        return data.json();
-      })
-      .catch(() => {
-        console.log(error);
-        return error;
+    const res = sendViaProxy(fetch, '305loveCountryAgreement', {}, { isSer: true })
+      .catch((e) => {
+        console.error('[love] country agreement query failed:', e);
+        return null;
       });
-   
-  
- 
+
+
+
  return {
    streamed: {
      data: new Promise((resolve) => {
        res
          .then((data) => {
-          console.log("43",data)
-          console.log("API Response:", data); // Added console.log to inspect the response
-            country = data.data.cuntries.data;
+            if (!data?.cuntries?.data) return resolve({ list: datai, total: 0 });
+            country = data.cuntries.data;
             let total =0
             data = datai;
             for (let j = 0; j < country.length; j++) {

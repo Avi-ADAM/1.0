@@ -1,24 +1,6 @@
 import { redirect, error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
-import { qids } from '../../../../routes/api/send/qids.js';
-import { STRAPI_GRAPHQL } from '$lib/server/strapiUrl.js';
-
-async function gql<T = any>(
-  fetchFn: typeof fetch,
-  jwt: string,
-  query: string,
-  variables: Record<string, unknown>
-): Promise<T> {
-  const endpoint = STRAPI_GRAPHQL;
-  const res = await fetchFn(endpoint, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${jwt}` },
-    body: JSON.stringify({ query, variables })
-  });
-  const json = await res.json();
-  if (json.errors) throw new Error(json.errors[0]?.message || 'GraphQL error');
-  return json.data as T;
-}
+import { sendViaProxy } from '$lib/server/sendViaProxy.js';
 
 export const load: PageServerLoad = async ({ locals, params, fetch }) => {
   const tok = (locals as any).tok as string | undefined;
@@ -26,11 +8,8 @@ export const load: PageServerLoad = async ({ locals, params, fetch }) => {
 
   if (!tok || !uid) throw redirect(302, '/login?from=deals');
 
-  const query = (qids as Record<string, string>)['72getSheirutpendById'];
-  if (!query) throw error(500, 'Missing query');
-
   try {
-    const data = await gql(fetch, tok, query, { id: params.id });
+    const data: any = await sendViaProxy(fetch, '72getSheirutpendById', { id: params.id });
     const node = data?.sheirutpend?.data;
     if (!node) throw error(404, 'Request not found');
 

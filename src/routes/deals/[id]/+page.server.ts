@@ -12,7 +12,7 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
   }
 
   try {
-    const result = await fetchSingleDeal(fetch, tok, String(uid), params.id, un);
+    const result = await fetchSingleDeal(fetch, String(uid), params.id, un);
     return {
       sale: result.sale,
       kind: result.kind

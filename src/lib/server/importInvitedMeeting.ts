@@ -10,16 +10,8 @@
  * Best-effort: never throws. Registration must succeed even if import fails.
  */
 
-import { env } from '$env/dynamic/private';
-import { qids } from '../../routes/api/send/qids.js';
 import { verifyInviteToken } from './guestInvite.js';
-import { STRAPI_GRAPHQL } from '$lib/server/strapiUrl.js';
-
-function adminToken(): string {
-  let t = String(env.ADMINMONTHER ?? '').replace(/\s+/g, '');
-  if (t.startsWith('ADMINMONTHER=')) t = t.slice('ADMINMONTHER='.length);
-  return t;
-}
+import { sendViaProxy } from '$lib/server/sendViaProxy.js';
 
 export interface ImportResult {
   imported: boolean;
@@ -58,25 +50,18 @@ export async function importInvitedMeeting(
   const meetingId = res.payload.meetingId;
 
   try {
-    const endpoint = STRAPI_GRAPHQL;
-    const response = await fetchFn(endpoint, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${adminToken()}`
-      },
-      body: JSON.stringify({
-        query: qids['19CreatePendMeeting'],
-        variables: { id: String(userId), pgishaId: String(meetingId) }
-      })
-    });
+    // Through /api/send as the service: the invite was verified above, and the
+    // account this runs for has only just been created — there is no session
+    // to act under yet. The proxy is still the only route to Strapi.
+    const data: any = await sendViaProxy(
+      fetchFn as any,
+      '19CreatePendMeeting',
+      { id: String(userId), pgishaId: String(meetingId) },
+      { isSer: true }
+    );
 
-    const data = await response.json();
-    if (data?.errors || !data?.data?.createPgishauserpend?.data?.id) {
-      console.error(
-        '[importInvitedMeeting] Strapi error:',
-        JSON.stringify(data?.errors)
-      );
+    if (!data?.createPgishauserpend?.data?.id) {
+      console.error('[importInvitedMeeting] no participant created for', meetingId);
       return { imported: false, reason: 'error', meetingId };
     }
 

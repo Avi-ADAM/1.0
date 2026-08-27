@@ -1,5 +1,5 @@
 import { redirect } from '@sveltejs/kit';
-import { actionService } from '$lib/server/actions/index.js';
+import { actionViaProxy } from '$lib/server/actionViaProxy.js';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ params, locals, fetch, depends }) => {
@@ -9,16 +9,11 @@ export const load: PageServerLoad = async ({ params, locals, fetch, depends }) =
     throw redirect(302, `/login?from=${encodeURIComponent(`/forum/${params.forumId}`)}`);
   }
 
-  const result = await actionService.executeAction(
-    'getForumThread',
-    { forumId: String(params.forumId) },
-    {
-      userId: String(locals.uid),
-      jwt: String(locals.tok),
-      lang: String(locals.lang || 'he'),
-      fetch
-    }
-  );
+  // Through /api/action: the identity comes from the cookie the proxy reads,
+  // so this load never handles the JWT or addresses Strapi.
+  const result = await actionViaProxy(fetch, 'getForumThread', {
+    forumId: String(params.forumId)
+  });
 
   if (!result.success || !result.data?.forum) {
     throw redirect(302, '/forum?forum=blocked');

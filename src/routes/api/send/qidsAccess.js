@@ -563,4 +563,9 @@ export const qidsAccess = {
   '302createWant': { allow: ['serviceAdmin'] },
   '303findWantForUser': { allow: ['serviceAdmin'] },
   '304getProjectMembersAndRestime': { allow: ['serviceAdmin'] },
+
+  // SSR loads that used to reach Strapi directly (PLAN_PROXY_SECURITY §11).
+  // /love is anonymous — no cookie, so it can only run as the service.
+  '305loveCountryAgreement': { allow: ['serviceAdmin'] },
+  '306moachChainsExtra': { allow: ['user', 'serviceAdmin'] },
 };

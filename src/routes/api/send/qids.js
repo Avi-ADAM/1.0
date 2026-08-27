@@ -14926,6 +14926,60 @@ ${STIPEND_DECISION_FIELDS}
     }
   }`,
 
+  /**
+   * The /love map: how many people signed per country. Public data, but it is
+   * read with the service token because the page is anonymous — no cookie, so
+   * no user principal to run it as. `ListPlaces` is not a substitute; this one
+   * needs the signer count.
+   */
+  '305loveCountryAgreement': `query LoveCountryAgreement {
+    cuntries {
+      data {
+        id
+        attributes { name free_people { data { id } } }
+      }
+    }
+  }`,
+
+  /**
+   * The extra slices the chains board renders on top of its client data:
+   * open resources, finished missions (the archive), and archived pendms.
+   */
+  '306moachChainsExtra': `query MoachChainsExtra($id: ID!) {
+    project(id: $id) {
+      data {
+        attributes {
+          open_mashaabims(filters: { archived: { ne: true } }) {
+            data { id attributes { name descrip spnot createdAt price easy hm kindOf partofs { data { id } } } }
+          }
+          extraArchiveBmi: mesimabetahaliches(filters: { finnished: { eq: true } }) {
+            data {
+              id
+              attributes {
+                name status iskvua finnished howmanyhoursalready perhour hoursassinged createdAt start dates
+                hearotMeyuchadot descrip admaticedai privatlinks publicklinks
+                monter { monthStart hours isDone hoursDone }
+                forums { data { id } }
+                open_missions { data { id } }
+                finiapruvals { data { id attributes { missname archived } } }
+                tafkidims { data { id attributes { roleDescription localizations { data { attributes { roleDescription } } } } } }
+                acts { data { id attributes { shem dateS hashivut naasa des dateF myIshur valiIshur status
+                  my { data { id attributes { username profilePic { data { attributes { url } } } } } }
+                  vali { data { id } }
+                  mesimabetahaliches { data { id } }
+                } } }
+                users_permissions_user { data { id attributes { username profilePic { data { attributes { url } } } } } }
+              }
+            }
+          }
+          extraArchivePm: pendms(filters: { archived: { eq: true } }) {
+            data { id attributes { name descrip noofhours perhour createdAt } }
+          }
+        }
+      }
+    }
+  }`,
+
   ...qids_base,
   ...moachQids
 };

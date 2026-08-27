@@ -1,6 +1,6 @@
 import { sendToSer } from '$lib/send/sendToSer.js';
 import { redirect } from '@sveltejs/kit';
-import { actionService } from '$lib/server/actions/index.js';
+import { actionViaProxy } from '$lib/server/actionViaProxy.js';
 import { enrichWish, EMPTY_ENRICHMENT, type WishEnrichment } from '$lib/server/ai/enrichWish';
 import { extractWish, type WishExtraction } from '$lib/server/ai/extractWish';
 import { GEMINI_API_KEY } from '$env/static/private';
@@ -215,26 +215,17 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
           // Persist so the next load is instant and the breakdown is editable.
           if (uid && tok) {
             try {
-              await actionService.executeAction(
-                'updateRatsonExtraction',
-                {
-                  ratsonId: String(wish.id),
-                  extracted_missions: wish.extractedMissions.map((m: any) => ({
-                    name: m.name,
-                    importance: m.importance
-                  })),
-                  extracted_resources: wish.extractedResources.map((r: any) => ({
-                    name: r.name,
-                    importance: r.importance
-                  }))
-                },
-                {
-                  userId: String(uid),
-                  jwt: String(tok),
-                  lang: String((locals as any)?.lang || 'he'),
-                  fetch
-                }
-              );
+              await actionViaProxy(fetch, 'updateRatsonExtraction', {
+                ratsonId: String(wish.id),
+                extracted_missions: wish.extractedMissions.map((m: any) => ({
+                  name: m.name,
+                  importance: m.importance
+                })),
+                extracted_resources: wish.extractedResources.map((r: any) => ({
+                  name: r.name,
+                  importance: r.importance
+                }))
+              });
             } catch (e) {
               console.warn('[concierge/:id] auto-extract persist failed (non-fatal):', e);
             }
@@ -264,11 +255,9 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
   let forumMessages: WishForumMessage[] = [];
   if (wish?.chatForumId && uid && tok) {
     try {
-      const res = await actionService.executeAction(
-        'getForumThread',
-        { forumId: String(wish.chatForumId) },
-        { userId: String(uid), jwt: String(tok), lang: String((locals as any)?.lang || 'he'), fetch }
-      );
+      const res = await actionViaProxy(fetch, 'getForumThread', {
+        forumId: String(wish.chatForumId)
+      });
       const msgs = res?.success ? res.data?.forum?.messages ?? [] : [];
       forumMessages = msgs.map((m: any) => ({
         id: String(m.id),

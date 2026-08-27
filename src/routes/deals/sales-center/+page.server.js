@@ -1,9 +1,7 @@
-import { qids } from '../../api/send/qids.js';
-import { STRAPI_GRAPHQL } from '$lib/server/strapiUrl.js';
+import { sendViaProxy } from '$lib/server/sendViaProxy.js';
 
 export async function load({ locals, fetch }) {
   const uid = locals.uid;
-  const tok = locals.tok;
   const lang = locals.lang;
 
   let products = [];
@@ -14,21 +12,9 @@ export async function load({ locals, fetch }) {
   let profilePic = '';
 
   try {
-    const endpoint = STRAPI_GRAPHQL;
-    const res = await fetch(endpoint, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${tok}`
-      },
-      body: JSON.stringify({
-        query: qids['saleCenterUserProducts'],
-        variables: { uid: String(uid) }
-      })
-    });
-    const json = await res.json();
+    const data = await sendViaProxy(fetch, 'saleCenterUserProducts', { uid: String(uid) });
 
-    const userAttrs = json?.data?.usersPermissionsUser?.data?.attributes ?? {};
+    const userAttrs = data?.usersPermissionsUser?.data?.attributes ?? {};
     username = userAttrs.username || '';
     profilePic = userAttrs.profilePic?.data?.attributes?.url || '';
 
@@ -99,19 +85,8 @@ export async function load({ locals, fetch }) {
   // amount that came in this month.
   let pendingCycles = [];
   try {
-    const res = await fetch(STRAPI_GRAPHQL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${tok}`
-      },
-      body: JSON.stringify({
-        query: qids['saleCenterPendingCycles'],
-        variables: { uid: String(uid) }
-      })
-    });
-    const json = await res.json();
-    pendingCycles = (json?.data?.sales?.data ?? []).map((s) => {
+    const data = await sendViaProxy(fetch, 'saleCenterPendingCycles', { uid: String(uid) });
+    pendingCycles = (data?.sales?.data ?? []).map((s) => {
       const at = s.attributes ?? {};
       return {
         id: s.id,

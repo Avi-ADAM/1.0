@@ -1,19 +1,10 @@
 import { sendToSer } from '$lib/send/sendToSer.js';
-import { qids } from '../../../api/send/qids.js';
-import { STRAPI_GRAPHQL } from '$lib/server/strapiUrl.js';
+import { sendViaProxy } from '$lib/server/sendViaProxy.js';
 
-async function fetchPendingForMatanot(fetchFn, tok, uid, matId) {
+async function fetchPendingForMatanot(fetchFn, uid, matId) {
   try {
-    const query = qids['125userPendingForMatanot'];
-    if (!query) return [];
-    const endpoint = STRAPI_GRAPHQL;
-    const res = await fetchFn(endpoint, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${tok}` },
-      body: JSON.stringify({ query, variables: { uid, matId } })
-    });
-    const json = await res.json();
-    return json?.data?.sheirutpends?.data ?? [];
+    const data = await sendViaProxy(fetchFn, '125userPendingForMatanot', { uid, matId });
+    return data?.sheirutpends?.data ?? [];
   } catch {
     return [];
   }
@@ -75,7 +66,7 @@ export async function load({ locals, params, fetch }) {
   }
 
   if (tok && tok !== false && uid) {
-    existingRequests = await fetchPendingForMatanot(fetch, tok, String(uid), mId);
+    existingRequests = await fetchPendingForMatanot(fetch, String(uid), mId);
     console.log('existingRequests', existingRequests);
   }
 

@@ -1,7 +1,6 @@
 import { redirect, error } from '@sveltejs/kit';
 import { fetchDealsForUser } from '$lib/server/deals/dealsQueries';
-import { qids } from '../api/send/qids.js';
-import { STRAPI_GRAPHQL } from '$lib/server/strapiUrl.js';
+import { sendViaProxy } from '$lib/server/sendViaProxy.js';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals, fetch }) => {
@@ -16,19 +15,8 @@ export const load: PageServerLoad = async ({ locals, fetch }) => {
   // standing order — each asks "how much did you transfer this month?".
   let customerCycles: any[] = [];
   try {
-    const res = await fetch(STRAPI_GRAPHQL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${tok}`
-      },
-      body: JSON.stringify({
-        query: qids['dealsCustomerPendingCycles'],
-        variables: { uid: String(uid) }
-      })
-    });
-    const json = await res.json();
-    customerCycles = (json?.data?.sales?.data ?? []).map((s: any) => {
+    const data = await sendViaProxy(fetch, 'dealsCustomerPendingCycles', { uid: String(uid) });
+    customerCycles = (data?.sales?.data ?? []).map((s: any) => {
       const at = s.attributes ?? {};
       return {
         id: s.id,
@@ -48,7 +36,7 @@ export const load: PageServerLoad = async ({ locals, fetch }) => {
   }
 
   try {
-    const result = await fetchDealsForUser(fetch, tok, String(uid));
+    const result = await fetchDealsForUser(fetch, String(uid));
     return {
       purchases: result.purchases,
       sales: result.sales,
