@@ -63,17 +63,28 @@
     });
   });
 
+  // The dialogs sit next to a card whose timer may not be in the store yet
+  // (`fetchTimers` is async, and a failed refresh empties the store). Reading
+  // `timer.mId` straight from a missing entry threw inside the click handler
+  // and left the dialog stuck, so every lock/unlock goes through these.
+  function lockThis() {
+    if (timer?.mId != null) lockTimerForEdit(timer.mId);
+  }
+  function unlockThis() {
+    if (timer?.mId != null) unlockTimerForEdit(timer.mId, { refresh: true });
+  }
+
   // פונקציות
   function closeDialog() {
     showSaveDialog = false;
     dialogEdit = true;
-    unlockTimerForEdit(timer.mId, { refresh: true });
+    unlockThis();
   }
 
   function handleClearTimer() {
     showSaveDialog = false;
     showClearDialog = true;
-    lockTimerForEdit(timer.mId);
+    lockThis();
   }
 
   async function localClearAllTimers() {
@@ -114,7 +125,7 @@
         });
 
         showClearDialog = false;
-        unlockTimerForEdit(timer.mId, { refresh: true });
+        unlockThis();
         toast.success($t('timers.clearSuccess'));
       } else {
         toast.error($t('timers.clearError'));
@@ -149,7 +160,7 @@
             (task) => task.id
           ) ?? [];
         taskSearchTerm = '';
-        unlockTimerForEdit(timer.mId, { refresh: true });
+        unlockThis();
         toast.success($t('timers.timerUpdated'));
       }
     });
@@ -160,7 +171,7 @@
     showClearDialog = false;
     dialogEdit = true;
     showSaveFinal = true;
-    lockTimerForEdit(timer.mId);
+    lockThis();
   }
 
   async function handleSaveTimerFinal() {
@@ -200,7 +211,7 @@
       dialogEdit = false;
       saveText = '';
       saveTextTouched = false;
-      unlockTimerForEdit(timer.mId, { refresh: true });
+      unlockThis();
 
       toast.success($t('timers.saveSuccess'));
     } else {
@@ -272,20 +283,31 @@
   );
 </script>
 
+<!--
+  Layering. svelte-accessible-dialog portals its overlay to <body>, so these
+  three dialogs compete with every other top-level layer in the app rather than
+  with whatever card opened them. They used to declare z-index 700, which put
+  them *under* the lev sheet — the fixed, opaque z-900 panel that both the coin
+  view and the list view mount a card into (LevSheet.svelte). Opening the timer
+  menu from a coin therefore did nothing visible: the dialog was there, behind
+  the sheet, with the page scroll locked behind it. 1300 clears the sheet (900)
+  and the card deck's own chrome (1000), and stays under the app's 9000+ layers.
+-->
+
 <!-- דיאלוג ניקוי -->
 <DialogOverlay
-  style="z-index: 700;"
+  style="z-index: 1300;"
   isOpen={showClearDialog}
-  onDismiss={() => { showClearDialog = false; unlockTimerForEdit(timer.mId, { refresh: true }); }}
+  onDismiss={() => { showClearDialog = false; unlockThis(); }}
 >
   <div
-    style="z-index: 700;"
+    style="z-index: 1300;"
     transition:fly|local={{ y: 450, opacity: 0.5, duration: 1000 }}
   >
     <DialogContent aria-label="clear-timer-options" class="timer-dialog">
       <button
         class="close-button"
-        onclick={() => { showClearDialog = false; unlockTimerForEdit(timer.mId, { refresh: true }); }}
+        onclick={() => { showClearDialog = false; unlockThis(); }}
         aria-label="Close dialog"
       >
         <svg
@@ -335,12 +357,12 @@
 
 <!-- דיאלוג שמירה -->
 <DialogOverlay
-  style="z-index: 700;"
+  style="z-index: 1300;"
   isOpen={showSaveDialog}
   onDismiss={() => closeDialog()}
 >
   <div
-    style="z-index: 700;"
+    style="z-index: 1300;"
     transition:fly|local={{ y: 450, opacity: 0.5, duration: 1000 }}
   >
     <DialogContent aria-label="timer-options" class="timer-dialog">
@@ -389,15 +411,15 @@
 
 <!-- דיאלוג שמירה סופי -->
 <DialogOverlay
-  style="z-index: 700;"
+  style="z-index: 1300;"
   isOpen={showSaveFinal}
-  onDismiss={() => { showSaveFinal = false; unlockTimerForEdit(timer.mId, { refresh: true }); }}
+  onDismiss={() => { showSaveFinal = false; unlockThis(); }}
 >
-  <div style="z-index: 700;" transition:fly={{ y: -100, duration: 500 }}>
+  <div style="z-index: 1300;" transition:fly={{ y: -100, duration: 500 }}>
     <DialogContent aria-label="timer-options" class="timer-dialog">
       <button
         class="close-button"
-        onclick={() => { showSaveFinal = false; unlockTimerForEdit(timer.mId, { refresh: true }); }}
+        onclick={() => { showSaveFinal = false; unlockThis(); }}
         aria-label="Close dialog"
       >
         <svg
@@ -486,18 +508,12 @@
 </DialogOverlay>
 
 <style>
-  :global(.svelte-dialog-overlay) {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 700;
-  }
+  /* There used to be a `:global(.svelte-dialog-overlay)` block here carrying
+     `z-index: 700`. svelte-accessible-dialog marks its overlay with the
+     *attribute* `data-svelte-dialog-overlay`, never that class, so the rule
+     matched nothing and the 700 it declared was never the layer these dialogs
+     actually got. The layer is the inline z-index on each <DialogOverlay>
+     above — see the note there. */
 
   :global([data-svelte-dialog-content].timer-dialog) {
     background: linear-gradient(147deg, #000000 0%, #04619f 74%);
@@ -509,7 +525,7 @@
     position: relative;
     margin: 2rem auto;
     min-width: 320px;
-    z-index: 701;
+    z-index: 1301;
   }
 
   .close-button {

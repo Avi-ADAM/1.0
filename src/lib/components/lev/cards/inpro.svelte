@@ -45,7 +45,6 @@
    * @property {number} [lapse]
    * @property {boolean} [low]
    * @property {boolean} [iskvua]
-   * @property {boolean} [showSaveDialog]
    * @property {any} storeTimer
    * @property {boolean} [isVisible]
    * @property {any} [startDate]
@@ -55,6 +54,8 @@
    * @property {() => void} [onSave] - Callback for save event
    * @property {() => void} [onAzor] - Callback for azor event
    * @property {() => void} [onClear] - Callback for clear event
+   * @property {() => void} [onEditTimer] - Open the timer menu (the parent owns
+   *   the edit lock and picks save-vs-times, exactly as MissionControls does)
    * @property {(payload: { x: any }) => void} [onHover] - Callback for hover event
    * @property {() => void} [onStatusi] - Callback for statusi event
    * @property {() => void} [onTask] - Callback for task event
@@ -88,7 +89,6 @@
     low = false,
     iskvua = false,
     forumId,
-    showSaveDialog = $bindable(false),
     storeTimer,
     isVisible = false,
     startDate = null,
@@ -98,6 +98,7 @@
     onSave,
     onAzor,
     onClear,
+    onEditTimer,
     onHover,
     onStatusi,
     onTask
@@ -120,6 +121,9 @@
   }
   function clear() {
     onClear?.();
+  }
+  function editTimer() {
+    onEditTimer?.();
   }
   function hover(x) {
     onHover?.({ x: x });
@@ -163,6 +167,22 @@
   }
   // import { textfit } from 'svelte-textfit';
   // let parent;
+  // The timer menu used to be gated on `activeTimer.data.attributes`, i.e. on
+  // there being an *unsaved* timer row. That is only true between a start and
+  // a save, so the button vanished for the rest of the mission's life and a
+  // member who wanted to correct an interval they had already saved had no way
+  // in from the card. The gate is now the same one MissionControls uses: the
+  // mission has an entry in the timers store at all. What changes with the
+  // unsaved state is the label, not the button's existence.
+  let activeTimerData = $derived(
+    storeTimer?.attributes?.activeTimer?.data?.attributes
+  );
+  let hasUnsavedTime = $derived(
+    !activeTimerData?.saved &&
+      ((activeTimerData?.timers?.length ?? 0) > 0 ||
+        (activeTimerData?.totalHours ?? 0) > 0)
+  );
+
   let std = $derived(startDate != null ? new Date(startDate) : null);
   let eve = $derived(
     dueDateOrCountToDedline != 'undefined' &&
@@ -376,17 +396,22 @@
   >
     {#if low == false}
       <!-- Edit Timer Button -->
-      {#if storeTimer?.attributes?.activeTimer?.data?.attributes}
+      {#if storeTimer}
         <button
+          type="button"
           onmouseenter={() => hover('לחיצה לעריכת הטיימר')}
           onmouseleave={() => hover('0')}
-          class="flex-1 py-1.5 px-3 bg-white dark:bg-gray-800 border-2 border-yellow-500 dark:border-yellow-400 text-yellow-600 dark:text-yellow-400 hover:bg-yellow-50 dark:hover:bg-yellow-900/20 font-bold rounded-xl transition-all flex items-center justify-center gap-1.5"
-          tabindex="0"
-          role="button"
-          onkeypress={() => (showSaveDialog = true)}
-          onclick={() => (showSaveDialog = true)}
+          class="flex-1 py-1.5 px-3 bg-white dark:bg-gray-800 border-2 font-bold rounded-xl transition-all flex items-center justify-center gap-1.5 {hasUnsavedTime
+            ? 'border-yellow-500 dark:border-yellow-400 text-yellow-600 dark:text-yellow-400 hover:bg-yellow-50 dark:hover:bg-yellow-900/20'
+            : 'border-gray-400 dark:border-gray-500 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700/40'}"
+          onclick={editTimer}
         >
-          ✏ {$t('lev.cards.inpro.editTimer')}
+          <span aria-hidden="true">✏</span>
+          <span
+            >{hasUnsavedTime
+              ? $t('moach.progress.saveTimer')
+              : $t('lev.cards.inpro.editTimer')}</span
+          >
         </button>
       {/if}
 

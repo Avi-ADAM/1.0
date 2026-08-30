@@ -265,6 +265,12 @@
   let orbitalRotation = $derived((localZman / 60000) * 360); // Complete rotation every minute
 </script>
 
+<!--
+  `onUpdateTimer`, not `onUpdate-timer` — the latter is a Svelte 4
+  `on:update-timer` left over from the runes migration and matches no prop
+  TimerDialogs declares, so this handler never ran. The payload is the plain
+  object TimerDialogs passes, not a `{ detail }` wrapper.
+-->
 <TimerDialogs
   {timer}
   bind:showSaveDialog
@@ -274,7 +280,7 @@
   bind:elapsedTime
   bind:selectedTasks
   bind:taskSearchTerm
-  onUpdate-timer={({ detail }) => {
+  onUpdateTimer={(detail) => {
     if (detail.timer) {
       // Ensure store is updated based on the event result
       updateStore(detail.running, detail.timer);

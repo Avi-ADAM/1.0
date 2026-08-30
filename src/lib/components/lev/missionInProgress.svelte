@@ -336,6 +336,26 @@
     lockTimerForEdit(mId);
   }
 
+  // The card's ✏ button. Same routing as MissionControls.openTimerEditor: with
+  // unsaved time on the clock the member wants the save menu, otherwise they
+  // want the interval list — the button's own label says which. Taking the edit
+  // lock here is what stops a socket refresh from swapping the timer out from
+  // under the open dialog; the card used to just flip `showSaveDialog` and skip
+  // it entirely.
+  let hasUnsavedTime = $derived(
+    !activeTimerData?.saved && (storeTimers.length > 0 || storeTotalHours > 0)
+  );
+
+  function openTimerEditor() {
+    if (hasUnsavedTime) {
+      showSaveDialog = true;
+      dialogEdit = false;
+    } else {
+      showClearDialog = true;
+    }
+    lockTimerForEdit(mId);
+  }
+
 
 
   // this is a very imperfect way to have the dials rotate smoothly back to 0
@@ -654,42 +674,57 @@
   });
 </script>
 
-<TimerDialogs
-  timer={storeTimer}
-  bind:showSaveDialog
-  bind:showClearDialog
-  bind:showSaveFinal
-  bind:dialogEdit
-  bind:elapsedTime
-  bind:selectedTasks
-  bind:taskSearchTerm
-  onUpdate-timer={({ detail }) => {
-    if (detail.timer) {
-      // Write the result back to the global store (single source of truth);
-      // storeTimer/isRunning/zman re-derive automatically.
-      updateStore(detail.running, detail.timer);
+<!--
+  Only mount the dialogs once the mission actually has a timers-store entry:
+  every handler inside them reads `timer.mId`, and with no entry the first
+  click threw. The ✏ button is gated on the same `storeTimer`, so this never
+  hides a reachable dialog.
 
-      if (detail.hoursdon !== undefined) {
-        updateTimers(
-          $timers.map((t) =>
-            t.mId === mId
-              ? {
-                  ...t,
-                  attributes: {
-                    ...t.attributes,
-                    howmanyhoursalready: detail.hoursdon
+  The callback is `onUpdateTimer`. It was written `onUpdate-timer` — a Svelte 4
+  `on:update-timer` left over from the runes migration — which is not the prop
+  TimerDialogs declares, so it was never called: a save or a clear reached the
+  card only through the delayed refetch that `unlockTimerForEdit({refresh:true})`
+  schedules. The payload is the plain object TimerDialogs passes, not a
+  `{ detail }` wrapper.
+-->
+{#if storeTimer}
+  <TimerDialogs
+    timer={storeTimer}
+    bind:showSaveDialog
+    bind:showClearDialog
+    bind:showSaveFinal
+    bind:dialogEdit
+    bind:elapsedTime
+    bind:selectedTasks
+    bind:taskSearchTerm
+    onUpdateTimer={(detail) => {
+      if (detail.timer) {
+        // Write the result back to the global store (single source of truth);
+        // storeTimer/isRunning/zman re-derive automatically.
+        updateStore(detail.running, detail.timer);
+
+        if (detail.hoursdon !== undefined) {
+          updateTimers(
+            $timers.map((t) =>
+              t.mId === mId
+                ? {
+                    ...t,
+                    attributes: {
+                      ...t.attributes,
+                      howmanyhoursalready: detail.hoursdon
+                    }
                   }
-                }
-              : t
-          )
-        );
+                : t
+            )
+          );
+        }
+      } else {
+        console.warn('update-timer event received without timer data:', detail);
+        updateStore(false);
       }
-    } else {
-      console.warn('update-timer event received without timer data:', detail);
-      updateStore(false);
-    }
-  }}
-/>
+    }}
+  />
+{/if}
 
 <!--<svelte:window on:beforeunload={beforeUnload}/>-->
 
@@ -2034,16 +2069,17 @@
                   ></button
                 >
               {/if}
-              {#if storeTimer?.attributes?.activeTimer?.data?.attributes}
+              {#if storeTimer}
                 <!--edit timer button-->
                 <button
+                  type="button"
                   onmouseenter={() => hover('לחיצה לעריכת הטיימר')}
                   onmouseleave={() => hover('0')}
                   class="btn c"
-                  tabindex="0"
-                  role="button"
-                  onkeypress={() => (showSaveDialog = true)}
-                  onclick={() => (showSaveDialog = true)}>✏</button
+                  aria-label={hasUnsavedTime
+                    ? $t('moach.progress.saveTimer')
+                    : $t('lev.cards.inpro.editTimer')}
+                  onclick={openTimerEditor}>✏</button
                 >
               {/if}
               {#if show === true}
@@ -2102,7 +2138,7 @@
                     a = 2;
                     isOpen = true;
                   }}
-                  bind:showSaveDialog
+                  onEditTimer={openTimerEditor}
                   {low}
                   {storeTimer}
                   tasks={localTasks}
@@ -2150,7 +2186,7 @@
       isOpen = true;
     }}
     {isVisible}
-    bind:showSaveDialog
+    onEditTimer={openTimerEditor}
     {low}
     tasks={localTasks}
     {storeTimer}

@@ -148,11 +148,17 @@
   <span>{label || $t('archive.propose.button')}</span>
 </button>
 
+<!--
+  z-1300/1301: these drawers are portalled to <body>, so they compete with the
+  lev sheet — the fixed, opaque z-900 panel a card is mounted into in the coin
+  and list views (LevSheet.svelte). At the old z-60/61 the proposal opened
+  behind it and the button looked dead. Same layer as the timer dialogs.
+-->
 <Drawer.Root bind:open>
   <Drawer.Portal>
-    <Drawer.Overlay class="fixed inset-0 bg-black/50 z-[60]" />
+    <Drawer.Overlay class="fixed inset-0 bg-black/50 z-[1300]" />
     <Drawer.Content
-      class="bg-white dark:bg-gray-800 flex flex-col rounded-t-2xl fixed bottom-0 left-0 right-0 max-h-[92vh] z-[61]"
+      class="bg-white dark:bg-gray-800 flex flex-col rounded-t-2xl fixed bottom-0 left-0 right-0 max-h-[92vh] z-[1301]"
     >
       <div
         class="mx-auto w-12 h-1.5 flex-shrink-0 rounded-full bg-gray-300 dark:bg-gray-600 my-3"

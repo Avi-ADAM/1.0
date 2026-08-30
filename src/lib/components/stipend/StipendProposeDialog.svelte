@@ -394,9 +394,15 @@
   );
 </script>
 
+<!--
+  z-1300, the same layer as the timer dialogs and the archive/edit proposals:
+  a card opened from a coin or from the list lives inside the lev sheet, a
+  fixed opaque z-900 panel (LevSheet.svelte), and at z-50 this dialog opened
+  behind it.
+-->
 {#if open}
   <div
-    class="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 p-0 sm:p-4"
+    class="fixed inset-0 z-[1300] flex items-end sm:items-center justify-center bg-black/50 p-0 sm:p-4"
     dir={$isRtl ? 'rtl' : 'ltr'}
   >
     <div
