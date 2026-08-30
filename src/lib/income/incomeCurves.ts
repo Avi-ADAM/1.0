@@ -132,13 +132,21 @@ export function freelancerAt(year: number, stopYear: number): number {
 }
 
 /**
- * Partner income at `year`: the sum of every partnership already opened.
+ * How far a partner's income settles after they stop contributing, as a
+ * fraction of what it was on the day they stopped.
  *
- * After `stopYear` no new partnership opens — that is what stopping costs — but
- * the ones already running go on maturing, so the curve flattens toward their
- * accrued yield instead of falling to zero.
+ * This is not a hand-wave: it is the platform's own split formula run forward.
+ * A member's share of a split is the value they gave over the value everyone
+ * gave. Stop contributing and your numerator freezes while the denominator
+ * keeps growing, so your percentage thins — but it never reaches zero, because
+ * what you already gave stays in the numerator forever. The floor is where the
+ * thinning settles; the tau is how fast it gets there.
  */
-export function partnerAt(year: number, stopYear: number): number {
+export const POST_STOP_FLOOR = 0.45;
+const POST_STOP_TAU = 2.5;
+
+/** Everything the already-open partnerships have accrued by `year`. */
+function accruedAt(year: number, stopYear: number): number {
   let total = 0;
   for (const { startYear, cap } of PARTNERSHIPS) {
     if (startYear > year) continue;
@@ -146,6 +154,33 @@ export function partnerAt(year: number, stopYear: number): number {
     total += cap * ramp(year - startYear, PARTNERSHIP_RAMP);
   }
   return total;
+}
+
+/**
+ * What is left of a stopped partner's share `years` after they stopped.
+ * Starts at 1 on the day itself and eases down to `POST_STOP_FLOOR`.
+ */
+export function residualShare(yearsSinceStop: number): number {
+  if (yearsSinceStop <= 0) return 1;
+  return (
+    POST_STOP_FLOOR + (1 - POST_STOP_FLOOR) * Math.exp(-yearsSinceStop / POST_STOP_TAU)
+  );
+}
+
+/**
+ * Partner income at `year`: the sum of every partnership already opened.
+ *
+ * After `stopYear` two things happen at once, and both matter. No new
+ * partnership opens — that is what stopping costs. And what was accrued stops
+ * growing and starts thinning, because everyone still contributing dilutes the
+ * share of everyone who is not. So the curve does *not* keep climbing past the
+ * level it stopped at; it declines toward a floor. It is the only one of the
+ * three that declines to a floor rather than to nothing, which is the whole
+ * claim — and it is a smaller claim than "it keeps growing", deliberately.
+ */
+export function partnerAt(year: number, stopYear: number): number {
+  if (year <= stopYear) return accruedAt(year, stopYear);
+  return accruedAt(stopYear, stopYear) * residualShare(year - stopYear);
 }
 
 const TRACK_FNS: Record<Track, (year: number, stopYear: number) => number> = {
