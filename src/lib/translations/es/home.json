@@ -594,5 +594,30 @@
     "entryCustomer": "el cliente entra en Petición",
     "core": "lo que cada uno dio decide lo que se lleva",
     "note": "Las dos entradas llevan al mismo círculo y al mismo cálculo exacto."
+  },
+  "curves": {
+    "title": "Tres formas de ganarse la vida — y qué pasa el día en que paras",
+    "lead": "Una misma década, tres trayectorias. Mueve el año en que dejas de trabajar y mira qué queda.",
+    "baseline": "salario inicial",
+    "axisYears": "años",
+    "stopMark": "dejas de trabajar",
+    "stopLabel": "Dejas de trabajar en el año {{year}}",
+    "afterLabel": "{{years}} años después",
+    "beforeLabel": "antes de parar: {{value}}%",
+    "partnershipDot": "aquí se abrió otra sociedad",
+    "note": "Las cifras son relativas a un salario inicial (100%), no importes. Quien es empleado cobra paro tres meses y después nada; quien trabaja por su cuenta se detiene ese mismo día; quien es socio no abre nuevas rikmas tras parar, pero las que ya abrió siguen dando fruto.",
+    "employee": {
+      "name": "Empleado/a",
+      "d": "El sueldo apenas se mueve en una década: algo de antigüedad, algo de revisión. Lo que de verdad le pasa es el día en que el trabajo termina: tres meses de paro y luego cero."
+    },
+    "freelancer": {
+      "name": "Autónomo/a",
+      "d": "Una subida escalonada: reputación, cartera de clientes, clientes que vuelven. Y sin red — el día que dejas de trabajar, el ingreso se para contigo."
+    },
+    "partner": {
+      "name": "Socio/a en una rikma",
+      "d": "El arranque más lento de los tres: una primera rikma casi nunca paga el primer mes. Pero puedes ser socio de varias a la vez, y se suman. Y cuando paras, lo ya construido sigue pagando."
+    },
+    "decade": "En toda la década: quien trabaja por su cuenta se lleva {{freelancer}}× lo del empleado, y quien es socio {{partner}}×."
   }
 }

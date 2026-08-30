@@ -44,6 +44,18 @@ const PRE_GUARDS = {
     }
   },
 
+  // A member's income history is their whole financial life on the site — every
+  // payout, from which rikma, when. The qid takes `uid` from the client, so
+  // without this an unpinned uid would hand any logged-in user someone else's
+  // earnings. Same shape as the co-members guard above, same reason.
+  '307myIncomeHistory': ({ isSer, callerId, variablesObject }) => {
+    if (isSer) return;
+    if (!callerId) throw error(401, 'Unauthorized: No caller id');
+    if (String(variablesObject.uid) !== String(callerId)) {
+      throw error(403, 'Forbidden: Can only read your own income history');
+    }
+  },
+
   // Editing a position (UpdatePosition without support:true) is registered-user
   // only. Votes (support:true) are handled earlier by the idempotent-vote path
   // and never reach here, so any service call at this point is a direct edit.

@@ -14980,6 +14980,50 @@ ${STIPEND_DECISION_FIELDS}
     }
   }`,
 
+  // ── The member's own income history (the /me/income page) ────────────────
+  // Every haluka they received, with the rikma that sent it and the currency,
+  // plus their finished missions — which are only here to date the *last work*
+  // per rikma, so the page can separate "paid for what I just did" from money
+  // that kept arriving long after. Confirmed/unconfirmed is returned as-is and
+  // split client-side by `$lib/income/buildIncomeSeries` (an unconfirmed
+  // transfer is reported as pending, never counted).
+  //
+  // `uid` is pinned to the caller on the JWT path by a guard in guards.js — the
+  // rows are one person's whole financial history and nobody else's business.
+  '307myIncomeHistory': `query MyIncomeHistory($uid: ID!) {
+    usersPermissionsUser(id: $uid) {
+      data {
+        id
+        attributes {
+          halukasres(pagination: { limit: 500 }, sort: ["createdAt:asc"]) {
+            data {
+              id
+              attributes {
+                amount
+                confirmed
+                createdAt
+                isSiteShare
+                matbea { data { id attributes { name simbol } } }
+                project { data { id attributes { projectName } } }
+              }
+            }
+          }
+          finnished_missions(pagination: { limit: 500 }, sort: ["finish:desc"]) {
+            data {
+              id
+              attributes {
+                finish
+                createdAt
+                noofhours
+                project { data { id attributes { projectName } } }
+              }
+            }
+          }
+        }
+      }
+    }
+  }`,
+
   ...qids_base,
   ...moachQids
 };

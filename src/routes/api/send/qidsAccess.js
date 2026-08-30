@@ -568,4 +568,8 @@ export const qidsAccess = {
   // /love is anonymous — no cookie, so it can only run as the service.
   '305loveCountryAgreement': { allow: ['serviceAdmin'] },
   '306moachChainsExtra': { allow: ['user', 'serviceAdmin'] },
+
+  // The member's own income history. JWT only in practice — the guard in
+  // guards.js pins `uid` to the caller, so 'user' here means "yourself".
+  '307myIncomeHistory': { allow: ['user', 'serviceAdmin'] },
 };

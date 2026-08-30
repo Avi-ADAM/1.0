@@ -25,6 +25,48 @@ function statusOf(fn: () => Promise<unknown>) {
   );
 }
 
+describe('runSendGuards — 307myIncomeHistory', () => {
+  const q = { ...base, queId: '307myIncomeHistory' };
+
+  it('allows reading your own income history', async () => {
+    await expect(
+      runSendGuards({ ...q, callerId: '7', variablesObject: { uid: '7' } })
+    ).resolves.toBeUndefined();
+  });
+
+  it('tolerates a numeric uid against a string cookie', async () => {
+    await expect(
+      runSendGuards({ ...q, callerId: '7', variablesObject: { uid: 7 } })
+    ).resolves.toBeUndefined();
+  });
+
+  it("blocks reading another user's income history", async () => {
+    const r = await statusOf(() =>
+      runSendGuards({ ...q, callerId: '7', variablesObject: { uid: '8' } })
+    );
+    expect(r.threw).toBe(true);
+    expect((r as any).status).toBe(403);
+  });
+
+  it('blocks an omitted uid', async () => {
+    const r = await statusOf(() => runSendGuards({ ...q, callerId: '7', variablesObject: {} }));
+    expect(r.threw).toBe(true);
+    expect((r as any).status).toBe(403);
+  });
+
+  it('401s when there is no caller id', async () => {
+    const r = await statusOf(() => runSendGuards({ ...q, variablesObject: { uid: '7' } }));
+    expect(r.threw).toBe(true);
+    expect((r as any).status).toBe(401);
+  });
+
+  it('does not pin the service path', async () => {
+    await expect(
+      runSendGuards({ ...q, isSer: true, variablesObject: { uid: '8' } })
+    ).resolves.toBeUndefined();
+  });
+});
+
 describe('runSendGuards — 170getMyCoMembers', () => {
   const q = { ...base, queId: '170getMyCoMembers' };
 

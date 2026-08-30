@@ -10,6 +10,7 @@
   import Scene from '$lib/components/main/1lev1.svelte';
   import ProductPeek from '$lib/components/main/ProductPeek.svelte';
   import SplitCalculator from '$lib/components/main/SplitCalculator.svelte';
+  import IncomeCurves from '$lib/components/main/IncomeCurves.svelte';
   import VideoModal from '$lib/components/main/VideoModal.svelte';
   import DemoRequest from '$lib/components/main/DemoRequest.svelte';
   import ResizeHandler from '$lib/components/ResizeHandler.svelte';
@@ -958,6 +959,17 @@
             </button>
           </div>
         {/if}
+      </section>
+
+      <!-- ===== הגרף: איך נראית פרנסה לאורך עשור בכל אחד מהשלושה =====
+           ממוקם מיד אחרי טבלת ההשוואה כי הוא בדיוק אותה טענה בציר זמן: שם
+           רואים *מה* שונה, וכאן רואים *מתי* זה מתחיל להיות שונה - ומה קורה
+           ביום שמפסיקים לעבוד, שזה ההבדל היחיד שאי אפשר להתווכח עליו. -->
+      <section
+        class="w-full max-w-xl mt-8 animate-fade-in-up"
+        style="font-family:'Sababa',sans-serif;"
+      >
+        <IncomeCurves />
       </section>
 
       {@render flowLine($t('home.flow.toDemo'))}

@@ -593,5 +593,30 @@
     "entryCustomer": "the customer enters at Request",
     "core": "what each person gave decides what they take",
     "note": "Both entrances lead into the same circle, and into exactly the same calculation."
+  },
+  "curves": {
+    "title": "Three ways to make a living — and what happens the day you stop",
+    "lead": "One decade, three tracks. Move the year you stop working and see what is left.",
+    "baseline": "starting salary",
+    "axisYears": "years",
+    "stopMark": "you stop working",
+    "stopLabel": "You stop working in year {{year}}",
+    "afterLabel": "{{years}} years later",
+    "beforeLabel": "before you stopped: {{value}}%",
+    "partnershipDot": "another partnership opened here",
+    "note": "The numbers are relative to a starting salary (100%), not amounts. An employee draws unemployment pay for three months and then nothing; a freelancer stops the same day; a partner opens no new rikmas after stopping — but the ones already open keep bearing fruit.",
+    "employee": {
+      "name": "Employee",
+      "d": "The salary barely moves across a decade — a little seniority, a little adjustment. What actually happens to it is the day the job ends: three months of unemployment pay, then zero."
+    },
+    "freelancer": {
+      "name": "Freelancer",
+      "d": "A graded climb: reputation, a client base, returning customers. And no safety net — the day you stop working, the income stops with you."
+    },
+    "partner": {
+      "name": "Partner in a rikma",
+      "d": "The slowest start of the three — a first rikma almost never pays in month one. But you can be a partner in several at once, and they add up. And when you stop, what you already built keeps paying."
+    },
+    "decade": "Across the whole decade: a freelancer takes home {{freelancer}}× what the employee did, and a partner {{partner}}×."
   }
 }

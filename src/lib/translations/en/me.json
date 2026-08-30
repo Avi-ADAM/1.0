@@ -19,5 +19,31 @@
     "retry": "Retry",
     "backToMe": "Back to profile",
     "nothing": "- no data -"
+  },
+  "income": {
+    "title": "What I have earned here",
+    "sub": "Everything that reached you through your rikmas — month by month.",
+    "backToMe": "back to my profile",
+    "loadFailed": "We could not load your income data right now. Try refreshing in a moment.",
+    "emptyTitle": "No money has arrived yet — and that is fine.",
+    "emptyBody": "A first rikma almost never pays in its first month, and that is exactly what separates this track from a salary. The moment a split is confirmed, it shows up here.",
+    "emptyCtaLev": "to my heart",
+    "emptyCtaMissions": "open missions",
+    "noCurrency": "no currency",
+    "chartTitle": "Your income, month by month",
+    "chartSub": "From {{from}} to {{to}}. Each colour is a different rikma.",
+    "chartAria": "Chart of your monthly income by rikma. Total:",
+    "concurrent": "There was a month when {{count}} rikmas paid you at the same time.",
+    "afterWork": "{{percent}}% of your income arrived more than a month after the last time you worked in that rikma.",
+    "afterWorkNote": "This is the part that keeps arriving when you are not working — the fruit of what you already built.",
+    "pending": "{{amount}} across {{count}} transfers reported but not yet confirmed. They are not counted in the figures above.",
+    "hours": "Alongside this you logged {{hours}} hours of work here.",
+    "method": "Only confirmed splits are counted. The platform’s share of a split is not, and different currencies are never converted or added together.",
+    "tile": {
+      "total": "received in total",
+      "rikmas": "rikmas that paid",
+      "span": "months since the first payout",
+      "best": "best month"
+    }
   }
 }

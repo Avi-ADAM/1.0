@@ -20,5 +20,31 @@
     "retry": "Reintentar",
     "backToMe": "Volver al perfil",
     "nothing": "- sin datos -"
+  },
+  "income": {
+    "title": "Cuánto he ganado aquí",
+    "sub": "Todo lo que te ha llegado a través de tus rikmas, mes a mes.",
+    "backToMe": "volver a mi perfil",
+    "loadFailed": "No hemos podido cargar tus datos de ingresos ahora mismo. Prueba a recargar en un momento.",
+    "emptyTitle": "Todavía no ha entrado dinero, y no pasa nada.",
+    "emptyBody": "Una primera rikma casi nunca paga en su primer mes, y eso es justo lo que distingue este camino de un sueldo. En cuanto se confirme un primer reparto, aparecerá aquí.",
+    "emptyCtaLev": "a mi corazón",
+    "emptyCtaMissions": "misiones abiertas",
+    "noCurrency": "sin moneda",
+    "chartTitle": "Tus ingresos, mes a mes",
+    "chartSub": "De {{from}} a {{to}}. Cada color es una rikma distinta.",
+    "chartAria": "Gráfico de tus ingresos mensuales por rikma. Total:",
+    "concurrent": "Hubo un mes en que {{count}} rikmas te pagaron a la vez.",
+    "afterWork": "El {{percent}}% de tus ingresos llegó más de un mes después de la última vez que trabajaste en esa rikma.",
+    "afterWorkNote": "Es la parte que sigue llegando cuando ya no trabajas: el fruto de lo que ya construiste.",
+    "pending": "{{amount}} en {{count}} transferencias comunicadas pero aún sin confirmar. No cuentan en las cifras de arriba.",
+    "hours": "Junto a esto has registrado aquí {{hours}} horas de trabajo.",
+    "method": "Solo se cuentan los repartos confirmados. La parte de la plataforma no cuenta, y las monedas distintas nunca se convierten ni se suman entre sí.",
+    "tile": {
+      "total": "recibido en total",
+      "rikmas": "rikmas que pagaron",
+      "span": "meses desde el primer pago",
+      "best": "mejor mes"
+    }
   }
 }
