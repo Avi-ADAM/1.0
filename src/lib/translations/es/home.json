@@ -603,9 +603,9 @@
     "stopMark": "dejas de trabajar",
     "stopLabel": "Dejas de trabajar en el año {{year}}",
     "afterLabel": "{{years}} años después",
-    "beforeLabel": "antes de parar: {{value}}%",
+    "beforeLabel": "antes de parar",
     "partnershipDot": "aquí se abrió otra sociedad",
-    "note": "Las cifras son relativas a un salario inicial (100%), no importes. Quien es empleado cobra paro tres meses y después nada; quien trabaja por su cuenta se detiene ese mismo día; quien es socio no abre nuevas rikmas tras parar, pero las que ya abrió siguen dando fruto.",
+    "note": "Las cifras son relativas a un salario inicial (100%), no importes. Quien es empleado cobra paro tres meses y después nada; quien trabaja por su cuenta se detiene ese mismo día; quien es socio no abre nuevas rikmas tras parar, y su parte en las que ya tiene también se diluye, porque quien sigue aportando agranda el denominador. Su ingreso baja, pero se asienta en un suelo y no en cero: lo que ya diste se queda en el numerador para siempre.",
     "employee": {
       "name": "Empleado/a",
       "d": "El sueldo apenas se mueve en una década: algo de antigüedad, algo de revisión. Lo que de verdad le pasa es el día en que el trabajo termina: tres meses de paro y luego cero."

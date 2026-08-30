@@ -3,6 +3,7 @@ import {
   CLIFF_EPSILON,
   EMPLOYEE_BASE,
   PARTNERSHIPS,
+  POST_STOP_FLOOR,
   UNEMPLOYMENT_RATE,
   UNEMPLOYMENT_YEARS,
   buildAllCurves,
@@ -12,7 +13,8 @@ import {
   employeeSalary,
   freelancerAt,
   lifetimeTotal,
-  partnerAt
+  partnerAt,
+  residualShare
 } from './incomeCurves.js';
 
 const at = (points: { year: number; value: number }[], year: number) =>
@@ -74,9 +76,26 @@ describe('partner', () => {
     const stop = 7;
     const atStop = partnerAt(stop, stop);
     expect(atStop).toBeGreaterThan(0);
-    expect(partnerAt(10, stop)).toBeGreaterThanOrEqual(atStop);
+    expect(partnerAt(10, stop)).toBeGreaterThan(0);
     expect(partnerAt(10, stop)).toBeGreaterThan(employeeAt(10, stop));
     expect(partnerAt(10, stop)).toBeGreaterThan(freelancerAt(10, stop));
+  });
+
+  it('never earns more after stopping than it did while working', () => {
+    // The claim is "it does not go to zero", not "it grows while you rest".
+    for (let stop = 2; stop <= 10; stop++) {
+      const atStop = partnerAt(stop, stop);
+      for (let y = stop; y <= 40; y += 0.25) {
+        expect(partnerAt(y, stop)).toBeLessThanOrEqual(atStop + 1e-9);
+      }
+    }
+  });
+
+  it('declines monotonically once stopped', () => {
+    const stop = 5;
+    for (let y = stop; y < 20; y += 0.25) {
+      expect(partnerAt(y + 0.25, stop)).toBeLessThan(partnerAt(y, stop) + 1e-9);
+    }
   });
 
   it('never opens a partnership that starts after the stop', () => {
@@ -86,10 +105,20 @@ describe('partner', () => {
     expect(withoutLate).toBeLessThan(withLate);
   });
 
-  it('flattens toward the accrued caps, never above them', () => {
+  it('settles on a floor of what it was, never on nothing', () => {
     const stop = 7;
-    const accrued = PARTNERSHIPS.filter((p) => p.startYear < stop).reduce((s, p) => s + p.cap, 0);
-    expect(partnerAt(30, stop)).toBeLessThanOrEqual(accrued);
+    const atStop = partnerAt(stop, stop);
+    // Dilution thins the share; what was already given keeps it off the floor of zero.
+    expect(partnerAt(40, stop)).toBeCloseTo(atStop * POST_STOP_FLOOR, 3);
+    expect(partnerAt(40, stop)).toBeGreaterThan(0);
+  });
+
+  it('residualShare runs from the whole share down to the floor', () => {
+    expect(residualShare(0)).toBe(1);
+    expect(residualShare(-1)).toBe(1);
+    expect(residualShare(3)).toBeLessThan(1);
+    expect(residualShare(3)).toBeGreaterThan(POST_STOP_FLOOR);
+    expect(residualShare(100)).toBeCloseTo(POST_STOP_FLOOR, 10);
   });
 });
 
