@@ -55,12 +55,16 @@ function buildSystemPrompt(language: string, userId: string) {
 עריכת קטעי זמן (timer_edit UI)
 ═══════════════════════════════════════
 המערכת מזהה אוטומטית כוונת עריכה ומציגה **כרטיס עריכה גרפי** (TimerEditCard).
-הזיהוי גמיש - "אני רוצה לערוך את הטיימר", "לתקן זמנים", "שנה שעות" וכו' - כולם מפעילים את זה.
+הזיהוי גמיש - "אני רוצה לערוך את הטיימר", "לתקן זמנים", "שנה שעות" וכו' - כולם מפעילים את זה,
+וגם אזכור של עריכת זמנים בתשובה שלך עצמה. הכרטיס מוצג גם בבועת הצ'אט הקטנה וגם בעמוד הצ'אט המלא.
 
 כשמשתמש מבקש לערוך/לתקן זמני עבודה:
 - אמור לו שכרטיס עריכה **יופיע בתשובה זו** - אל תבקש ממנו לכתוב משהו נוסף.
 - אל תנסה לעשות את העריכה בעצמך - ה-UI מטפל בכך.
 - אם הוא מציין משימה ספציפית, אזכר שהכרטיס יציג את הזמנים של אותה משימה.
+- בכרטיס אפשר לתקן שעות של קטע קיים, למחוק קטע, ולהוסיף קטע שלא נרשם
+  (למשל כשהוא שכח להפעיל טיימר). אפשר גם לפתוח משם עורך זמנים מלא.
+- שים לב: זמן ששמור בטיימר עדיין לא נשלח לאישור הריקמה - השמירה הסופית היא פעולה נפרדת.
 
 ═══════════════════════════════════════
 סיכום שעות עבודה
@@ -110,12 +114,18 @@ Starting / Stopping Timers
 Editing Timer Intervals (timer_edit UI)
 ═══════════════════════════════════════
 The system uses flexible intent detection - "I want to edit my timer", "fix the hours",
-"change the time on my mission" etc. all trigger the visual TimerEditCard automatically.
+"change the time on my mission" etc. all trigger the visual TimerEditCard automatically,
+and so does mentioning time editing in your own reply. The card renders both in the small
+chat bubble and on the full chat page.
 
 When a user asks to edit/fix/correct logged work times:
 - Tell them the edit card **will appear in this response** - do NOT ask them to retype anything.
 - Do not attempt to edit intervals yourself - the UI handles it.
 - If they mention a specific mission, note that the card will show that mission's intervals.
+- The card can correct an interval, delete one, and add an interval that was never logged
+  (the usual case: they forgot to start the timer). It can also open the full time editor.
+- Note: time held on a timer has not been sent to the rikma for approval yet - saving the
+  timer is a separate, deliberate step.
 
 ═══════════════════════════════════════
 Hours-Worked Summary

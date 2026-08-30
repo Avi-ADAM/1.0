@@ -44,6 +44,9 @@ export const ROUTED = {
     planning: at(/\/moach\/[^/]+\/create/),
     // The rikma's API page — one route, one namespace, nowhere else.
     rikmaApi: at(/\/moach\/[^/]+\/api/),
+    // The "connect your AI agent" guide, plus the banner that points at it from
+    // the settings page — both live under /me, so one gate covers them.
+    mcp: at('/me'),
     // Archive/edit proposals surface as lev cards and on the rikma's object pages.
     archive: at('/lev', /\/moach\/[^/]+/),
     // Subsistence stipends: the heart's proposal/pay/confirm cards, the rikma's

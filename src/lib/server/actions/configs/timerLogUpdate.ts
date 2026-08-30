@@ -86,7 +86,10 @@ export const timerLogUpdateConfig: ActionConfig = {
             body: {
                 he: 'עריכת זמנים עודכנה בהצלחה',
                 en: 'Timer intervals or tasks have been updated',
-                ar: 'تم تحديث فترات المؤقت או המשימות בהצלחה'
+                // Was half-Hebrew ("فترات المؤقت או המשימות בהצלחה") — an
+                // Arabic-speaking member read the second half as garbage, and
+                // the mixed run reordered the line.
+                ar: 'تم تحديث فترات المؤقت أو المهام بنجاح'
             }
         },
         channels: ['socket'],

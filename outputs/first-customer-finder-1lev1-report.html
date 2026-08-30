@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>1lev1 First Customer Finder</title>
+  <style>
+    :root{--bg:#090b0f;--panel:#12161d;--panel2:#191f28;--ink:#f5f2ea;--muted:#9ca6b5;--line:#2b3340;--acid:#d9ff63;--blue:#69b7ff;--orange:#ff8f5a;--cyan:#5ee8d0;--radius:18px;--shadow:0 24px 80px rgba(0,0,0,.38)}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.55}body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.3;background:repeating-linear-gradient(135deg,rgba(255,255,255,.018) 0 1px,transparent 1px 12px);mask-image:linear-gradient(#000,transparent 82%)}a{color:inherit}.skip{position:absolute;left:-9999px}.skip:focus{left:16px;top:16px;z-index:9;background:var(--acid);color:#111;padding:10px}
+    .shell{width:min(1180px,calc(100% - 40px));margin:auto;position:relative}.top{display:flex;justify-content:space-between;align-items:center;padding:22px 0;border-bottom:1px solid var(--line)}.brand{font-weight:850;display:flex;align-items:center;gap:10px}.brand i{width:12px;height:12px;border-radius:50%;background:var(--acid);box-shadow:0 0 22px var(--acid)}.meta{display:flex;gap:8px;align-items:center}.chip,.stage{border:1px solid var(--line);border-radius:999px;padding:7px 10px;color:var(--muted);font:750 11px ui-monospace,monospace;text-transform:uppercase;letter-spacing:.07em}button{background:var(--ink);color:#111;border:0;border-radius:999px;padding:9px 14px;font:800 13px inherit;cursor:pointer}button:focus-visible,summary:focus-visible,a:focus-visible{outline:3px solid var(--blue);outline-offset:3px}
+    .hero{display:grid;grid-template-columns:1.45fr .55fr;gap:36px;align-items:end;padding:72px 0 42px}.eyebrow{color:var(--acid);font:750 11px ui-monospace,monospace;text-transform:uppercase;letter-spacing:.11em}h1{font-size:clamp(48px,7vw,92px);line-height:.92;letter-spacing:-.065em;margin:13px 0 24px}.verdict{font-size:clamp(18px,2.1vw,25px);color:#dce1e9;max-width:820px;margin:0}.hero-card{background:var(--acid);color:#10120d;padding:26px;border-radius:var(--radius);box-shadow:var(--shadow);transform:rotate(1deg)}.hero-card span{font:800 11px ui-monospace,monospace;text-transform:uppercase;letter-spacing:.08em}.hero-card strong{display:block;font-size:64px;line-height:1;letter-spacing:-.08em;margin:15px 0 6px}.hero-card p{margin:0;font-weight:700;font-size:13px}
+    .stats{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;margin-bottom:28px}.stats>div{padding:18px;background:var(--panel)}.stats>div+div{border-left:1px solid var(--line)}.stats span,.prospect-grid span,.signal span,.evidence span,blockquote span{display:block;color:var(--muted);font:700 10px ui-monospace,monospace;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}.stats strong{font-size:17px}
+    .best{display:grid;grid-template-columns:180px 1fr auto;gap:24px;align-items:center;padding:25px;background:var(--orange);color:#1b0f09;border-radius:var(--radius);box-shadow:var(--shadow);margin:0 0 72px}.best-label{font:800 11px ui-monospace,monospace;text-transform:uppercase;letter-spacing:.1em}.best h2{font-size:clamp(28px,4vw,46px);letter-spacing:-.045em;line-height:1;margin:0 0 8px}.best p{margin:0}.best strong{font-size:44px}
+    .section-head{display:flex;justify-content:space-between;align-items:end;gap:24px;padding-bottom:18px;border-bottom:1px solid var(--line);margin-bottom:18px}.section-head h2{font-size:clamp(34px,5vw,62px);line-height:.98;letter-spacing:-.055em;margin:0}.section-head p{color:var(--muted);max-width:470px;margin:0}
+    .prospects{display:grid;gap:16px;margin-bottom:76px}.prospect{background:linear-gradient(135deg,var(--panel),#0f1319);border:1px solid var(--line);border-radius:var(--radius);padding:25px;box-shadow:0 12px 38px rgba(0,0,0,.18)}.prospect-head{display:grid;grid-template-columns:54px 1fr 92px;gap:17px;align-items:start}.rank{font:850 24px ui-monospace,monospace;color:var(--acid);padding-top:8px}.identity h3{font-size:29px;letter-spacing:-.04em;margin:6px 0 10px}.stage{display:inline-block}.stage.hot{color:var(--orange);border-color:rgba(255,143,90,.5)}.stage.warm{color:var(--cyan);border-color:rgba(94,232,208,.45)}.score{--score:0;width:88px;height:88px;border-radius:50%;display:grid;place-content:center;text-align:center;background:radial-gradient(circle,var(--panel) 58%,transparent 60%),conic-gradient(var(--acid) calc(var(--score)*1%),var(--line) 0)}.score strong{font-size:26px;line-height:1}.score small{color:var(--muted)}
+    .signal{margin:21px 0 12px;padding:16px;background:var(--panel2);border-left:4px solid var(--acid)}.signal p{font-size:17px;margin:0}.prospect-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}.prospect-grid>div,.evidence>div{border:1px solid var(--line);border-radius:12px;padding:15px;background:rgba(255,255,255,.018)}.prospect-grid p,.evidence p{margin:0}blockquote{margin:12px 0 0;padding:16px;border:1px dashed rgba(217,255,99,.55);border-radius:12px;color:#eaf6c6}details{margin-top:10px}summary{cursor:pointer;color:var(--acid);font-weight:800;padding:10px 0}.evidence{display:grid;grid-template-columns:1fr 1fr;gap:9px}.evidence a{display:inline-block;color:var(--blue);margin-top:8px;word-break:break-word}.metrics{display:grid;gap:8px;margin-top:14px}.metric{display:grid;grid-template-columns:145px 1fr 40px;gap:12px;align-items:center;font-size:13px}.track{height:8px;background:var(--line);border-radius:8px;overflow:hidden}.track i{display:block;height:100%;background:linear-gradient(90deg,var(--blue),var(--acid))}
+    .patterns{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:76px}.pattern{display:grid;grid-template-columns:42px 1fr auto;gap:15px;align-items:start;padding:20px;border:1px solid var(--line);border-radius:14px;background:var(--panel)}.pattern-num{color:var(--acid);font:800 13px ui-monospace,monospace}.pattern h3{margin:0 0 5px}.pattern p{margin:0;color:var(--muted)}.pattern>strong{font-size:30px;color:var(--acid)}
+    .plan{display:grid;grid-template-columns:.8fr 1.2fr;gap:28px;background:var(--acid);color:#111;padding:29px;border-radius:var(--radius);margin-bottom:30px}.plan h2{font-size:38px;line-height:1;letter-spacing:-.045em;margin:10px 0}.plan-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}.plan-grid>div{border:1px solid rgba(0,0,0,.24);border-radius:11px;padding:13px}.plan-grid span{display:block;font:750 10px ui-monospace,monospace;text-transform:uppercase;letter-spacing:.07em;margin-bottom:5px}.plan-grid p{margin:0}.limits{border:1px solid var(--line);border-radius:var(--radius);padding:24px;color:var(--muted);margin-bottom:60px}.limits h2{color:var(--ink);margin-top:0}footer{display:flex;justify-content:space-between;gap:20px;border-top:1px solid var(--line);padding:22px 0 40px;color:var(--muted);font-size:12px}.reveal{animation:rise .4s ease both}@keyframes rise{from{opacity:0;transform:translateY(12px)}}
+    @media(max-width:820px){.shell{width:min(100% - 24px,1180px)}.hero,.plan{grid-template-columns:1fr}.hero{padding-top:44px}.hero-card{transform:none}.stats{grid-template-columns:1fr 1fr}.stats>div+div{border-left:0;border-top:1px solid var(--line)}.best{grid-template-columns:1fr}.prospect-head{grid-template-columns:38px 1fr}.score{grid-column:1/-1}.prospect-grid,.evidence,.patterns,.plan-grid{grid-template-columns:1fr}.meta .chip{display:none}}
+    @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}@media print{body{background:#fff;color:#111}body:before,.top button{display:none}.shell{width:100%}.prospect,.pattern,.limits{background:#fff;color:#111;break-inside:avoid}.prospect-grid span,.signal span,.evidence span,blockquote span{color:#444}}
+  </style>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to report</a>
+  <div class="shell">
+    <header class="top"><div class="brand"><i></i> First Customer Finder</div><div class="meta"><span class="chip">Public signals only</span><button type="button" onclick="window.print()">Print / Save PDF</button></div></header>
+    <main id="main">
+      <section class="hero"><div><span class="eyebrow">Early-customer report · 2026-08-28</span><h1>1lev1 First Customer Finder</h1><p class="verdict">1lev1 has reachable early-customer signals, especially among small cooperative founders who are stitching together decision-making, project management, files, member contributions, and profit-sharing by hand. The strongest outreach angle is not a generic co-op pitch; it is a lightweight design-partner offer for groups already asking how to coordinate shared work, votes, money, and membership without losing autonomy.</p></div><aside class="hero-card"><span>Qualified prospects</span><strong>10</strong><p>Potential customers based on public signals.</p></aside></section>
+      <section class="stats"><div><span>Product</span><strong><a href="https://www.1lev1.com/" target="_blank" rel="noreferrer">1lev1</a></strong></div><div><span>Target customer</span><strong>Founders and small groups forming cooperative, worker-owned, commons, or values-based ventures that need shared governance, tasks, budgets, profit sharing, and transparent collaboration.</strong></div><div><span>High intent</span><strong>4</strong></div><div><span>Average fit score</span><strong>78/100</strong></div></section>
+      <section class="best"><div class="best-label">Highest-confidence prospect</div><div><h2>coopevolution / Anthony</h2><p>The thread was active from 2025-08-15 to 2025-08-26, and Anthony continued engaging after receiving modular-tool recommendations.</p></div><strong>88</strong></section>
+      <section><header class="section-head"><h2>People with a reason<br>to care now.</h2><p>Every primary prospect is tied to a public pain, demand, or timing signal. Open the evidence before considering outreach.</p></header><div class="prospects">
+    <article class="prospect reveal">
+      <header class="prospect-head">
+        <div class="rank">01</div>
+        <div class="identity">
+          <span class="eyebrow">Public professional profile</span>
+          <h3>coopevolution / Anthony</h3>
+          <span class="stage hot">High intent</span>
+        </div>
+        <div class="score" style="--score:88" aria-label="Fit score 88 out of 100"><strong>88</strong><small>/100</small></div>
+      </header>
+      <div class="signal"><span>Public signal</span><p>Anthony explicitly asked for an all-in-one governance and operations tool for platform co-ops, combining voting, project management, and secure document storage.</p></div>
+      <div class="prospect-grid">
+        <div><span>Why it fits</span><p>1lev1&#x27;s rikma model, consensus layer, tasks, budgets, graphs, AI assistant, shared assets, and transparent ledger map closely to the combined governance-plus-operations request.</p></div>
+        <div><span>Why now</span><p>The thread was active from 2025-08-15 to 2025-08-26, and Anthony continued engaging after receiving modular-tool recommendations.</p></div>
+        <div><span>Suggested channel</span><p>Reply in the CoTech discussion or send a forum message if profile settings allow it.</p></div>
+        <div><span>Caution</span><p>Confirm whether Anthony is evaluating tools for a specific co-op, a client, or broader research before pitching.</p></div>
+      </div>
+      <blockquote><span>Suggested opener</span>Saw your CoTech thread about wanting voting, project management, and storage to feel more unified for platform co-ops. I am testing 1lev1, a Hebrew/English collaboration platform for values-based groups that combines consensus, tasks, budgets, contribution tracking, and transparent shared ledgers. Would a rough design-partner walkthrough be useful, even just to compare against your modular-tool research?</blockquote>
+      <details>
+        <summary>Evidence and score breakdown</summary>
+        <div class="evidence"><div><span>Evidence</span><p>In a CoTech forum thread, Anthony described a need for tools that support both co-op governance and daily operations, then clarified interest in a more unified experience because multiple stitched-together tools create admin burden.</p></div><div><span>Source</span><p>Public forum · 2025-08-15 to 2025-08-26</p><a href="https://community.coops.tech/t/looking-for-all-in-one-governance-operations-tools-for-platform-co-ops/4505" target="_blank" rel="noreferrer">Looking for All-in-one governance + operations tools for platform co-ops ↗</a></div></div>
+        <div class="metrics"><div class="metric"><span>Pain strength</span><div class="track"><i style="width:100%"></i></div><b>5/5</b></div><div class="metric"><span>Product fit</span><div class="track"><i style="width:100%"></i></div><b>5/5</b></div><div class="metric"><span>Timing</span><div class="track"><i style="width:100%"></i></div><b>5/5</b></div><div class="metric"><span>Reachability</span><div class="track"><i style="width:80%"></i></div><b>4/5</b></div><div class="metric"><span>Evidence quality</span><div class="track"><i style="width:80%"></i></div><b>4/5</b></div></div>
+      </details>
+    </article>
+    <article class="prospect reveal">
+      <header class="prospect-head">
+        <div class="rank">02</div>
+        <div class="identity">
+          <span class="eyebrow">Company / community business</span>
+          <h3>Beanchain Coffee</h3>
+          <span class="stage warm">Problem aware</span>
+        </div>
+        <div class="score" style="--score:83" aria-label="Fit score 83 out of 100"><strong>83</strong><small>/100</small></div>
+      </header>
+      <div class="signal"><span>Public signal</span><p>Beanchain publicly describes casual votes, open forums, paid work teams, member profit sharing, founder veto, and the fact that profit sharing is still mostly a design rather than fully tested practice.</p></div>
+      <div class="prospect-grid">
+        <div><span>Why it fits</span><p>1lev1 could be piloted as the operating layer for a worker-directed shop moving toward worker ownership: decisions, member roles, contribution-based allocation, shared tasks, and transparent budgets.</p></div>
+        <div><span>Why now</span><p>The page was crawled on 2026-08-28 and Beanchain is actively publishing its transition model and current shortfalls.</p></div>
+        <div><span>Suggested channel</span><p>Use Beanchain&#x27;s public website contact or social links, referencing the worker-direction page.</p></div>
+        <div><span>Caution</span><p>Beanchain has its own philosophy and documentation; position this as a test layer, not a replacement for their model.</p></div>
+      </div>
+      <blockquote><span>Suggested opener</span>I read your worker-direction page and noticed the mix of casual voting, forums, bounties, and profit-sharing design that still has to survive real operations. 1lev1 is a collaboration platform for groups sharing decisions, work, budgets, and returns by agreement. Would you be open to a 20-minute design-partner conversation around the first Beanchain member workflow?</blockquote>
+      <details>
+        <summary>Evidence and score breakdown</summary>
+        <div class="evidence"><div><span>Evidence</span><p>The worker-direction page says workers already use votes and forums, members will hold equal votes, bounties and paid work teams tie money to contribution, and there are no members yet so the profit-sharing model remains untested.</p></div><div><span>Source</span><p>Company page · 2026-08-28 crawl; site notes recent cooperative transition status</p><a href="https://bchain.coffee/worker-direction/" target="_blank" rel="noreferrer">Worker Direction | Beanchain Coffee ↗</a></div></div>
+        <div class="metrics"><div class="metric"><span>Pain strength</span><div class="track"><i style="width:80%"></i></div><b>4/5</b></div><div class="metric"><span>Product fit</span><div class="track"><i style="width:100%"></i></div><b>5/5</b></div><div class="metric"><span>Timing</span><div class="track"><i style="width:100%"></i></div><b>5/5</b></div><div class="metric"><span>Reachability</span><div class="track"><i style="width:80%"></i></div><b>4/5</b></div><div class="metric"><span>Evidence quality</span><div class="track"><i style="width:100%"></i></div><b>5/5</b></div></div>
+      </details>
+    </article>
+    <article class="prospect reveal">
+      <header class="prospect-head">
+        <div class="rank">03</div>
+        <div class="identity">
+          <span class="eyebrow">Public professional profile</span>
+          <h3>Navarro</h3>
+          <span class="stage hot">High intent</span>
+        </div>
+        <div class="score" style="--score:82" aria-label="Fit score 82 out of 100"><strong>82</strong><small>/100</small></div>
+      </header>
+      <div class="signal"><span>Public signal</span><p>Navarro said a group of young engineers is discussing a tech worker co-op, has business experience, but zero co-op experience and needs advice on starting.</p></div>
+      <div class="prospect-grid">
+        <div><span>Why it fits</span><p>1lev1 can act as a formation workspace: define members, skills, resources, agreements, decisions, and early contribution/revenue sharing before the group formalizes.</p></div>
+        <div><span>Why now</span><p>The post was published on 2025-11-05, with a reply offering a call the next day, indicating live formation intent.</p></div>
+        <div><span>Suggested channel</span><p>Reply publicly in the CoTech introduction thread with a concise offer to compare formation workflows.</p></div>
+        <div><span>Caution</span><p>Do not imply legal advice; keep the conversation about workflow and collaboration until they have co-op legal support.</p></div>
+      </div>
+      <blockquote><span>Suggested opener</span>Saw your CoTech intro about a group of engineers considering a tech worker co-op while still learning the co-op side. 1lev1 is built for small groups to map skills, responsibilities, decisions, and value-sharing before the structure hardens. Would it help to test a simple formation board for your smartphone-plus-digital-ecosystem idea?</blockquote>
+      <details>
+        <summary>Evidence and score breakdown</summary>
+        <div class="evidence"><div><span>Evidence</span><p>The CoTech introduction asks for advice on starting a worker co-op and whether a smartphone-selling business with a digital ecosystem could fit CoTech.</p></div><div><span>Source</span><p>Public forum · 2025-11-05</p><a href="https://community.coops.tech/t/introduce-yourself/23?page=9" target="_blank" rel="noreferrer">Introduce yourself! - Navarro post ↗</a></div></div>
+        <div class="metrics"><div class="metric"><span>Pain strength</span><div class="track"><i style="width:80%"></i></div><b>4/5</b></div><div class="metric"><span>Product fit</span><div class="track"><i style="width:100%"></i></div><b>5/5</b></div><div class="metric"><span>Timing</span><div class="track"><i style="width:100%"></i></div><b>5/5</b></div><div class="metric"><span>Reachability</span><div class="track"><i style="width:80%"></i></div><b>4/5</b></div><div class="metric"><span>Evidence quality</span><div class="track"><i style="width:80%"></i></div><b>4/5</b></div></div>
+      </details>
+    </article>
+    <article class="prospect reveal">
+      <header class="prospect-head">
+        <div class="rank">04</div>
+        <div class="identity">
+          <span class="eyebrow">Public professional profile</span>
+          <h3>Alex Loveday</h3>
+          <span class="stage hot">High intent</span>
+        </div>
+        <div class="score" style="--score:80" aria-label="Fit score 80 out of 100"><strong>80</strong><small>/100</small></div>
+      </header>
+      <div class="signal"><span>Public signal</span><p>Alex is trying to start a worker-owned co-op for tech-driven wellness tools and is seeking co-directors with AI/ML, software engineering, or hardware prototyping skills who also care about co-operative governance.</p></div>
+      <div class="prospect-grid">
+        <div><span>Why it fits</span><p>1lev1&#x27;s skills/resources matching, consensus decisions, and shared project management fit an early founding team that must coordinate contributors before formal operations.</p></div>
+        <div><span>Why now</span><p>The post is recent, dated 2025-10-05, and contains an explicit collaborator-seeking signal.</p></div>
+        <div><span>Suggested channel</span><p>Reply in the CoTech introduction thread or use the forum profile&#x27;s public contact options.</p></div>
+        <div><span>Caution</span><p>Avoid framing around personal health data or sensitive health claims; focus on organizational setup.</p></div>
+      </div>
+      <blockquote><span>Suggested opener</span>Saw your CoTech intro about forming a worker-owned health-tech co-op and finding co-directors who care about governance. 1lev1 is a lightweight space for prospective members to map skills, decisions, tasks, and contribution-based sharing before the co-op is fully formed. Would a tiny founding-team workspace be useful to test with your first collaborators?</blockquote>
+      <details>
+        <summary>Evidence and score breakdown</summary>
+        <div class="evidence"><div><span>Evidence</span><p>In a 2025 CoTech introduction, Alex describes a planned worker-owned co-op and asks to connect with people relevant to co-op governance and technical collaboration.</p></div><div><span>Source</span><p>Public forum · 2025-10-05</p><a href="https://community.coops.tech/t/introduce-yourself/23?page=9" target="_blank" rel="noreferrer">Introduce yourself! - Alex Loveday post ↗</a></div></div>
+        <div class="metrics"><div class="metric"><span>Pain strength</span><div class="track"><i style="width:80%"></i></div><b>4/5</b></div><div class="metric"><span>Product fit</span><div class="track"><i style="width:100%"></i></div><b>5/5</b></div><div class="metric"><span>Timing</span><div class="track"><i style="width:100%"></i></div><b>5/5</b></div><div class="metric"><span>Reachability</span><div class="track"><i style="width:80%"></i></div><b>4/5</b></div><div class="metric"><span>Evidence quality</span><div class="track"><i style="width:80%"></i></div><b>4/5</b></div></div>
+      </details>
+    </article>
+    <article class="prospect reveal">
+      <header class="prospect-head">
+        <div class="rank">05</div>
+        <div class="identity">
+          <span class="eyebrow">Public founder profile</span>
+          <h3>Matturdayyyy</h3>
+          <span class="stage hot">High intent</span>
+        </div>
+        <div class="score" style="--score:79" aria-label="Fit score 79 out of 100"><strong>79</strong><small>/100</small></div>
+      </header>
+      <div class="signal"><span>Public signal</span><p>The founder said they had built an MVP for a worker/patron/supplier-owned ethical alternative to Amazon and were looking for people willing to exchange time and skills for shares.</p></div>
+      <div class="prospect-grid">
+        <div><span>Why it fits</span><p>1lev1 directly supports the pre-co-op problem of coordinating people, skills, contributions, decisions, and agreed share/reward logic.</p></div>
+        <div><span>Why now</span><p>The signal is older and should be revalidated, but it is explicit and unusually close to 1lev1&#x27;s cooperative formation use case.</p></div>
+        <div><span>Suggested channel</span><p>Reply to the Reddit thread or send a Reddit message if the account is active.</p></div>
+        <div><span>Caution</span><p>Treat as stale until the founder confirms the MVP and conversion are still active.</p></div>
+      </div>
+      <blockquote><span>Suggested opener</span>Saw your post about turning an ethical Amazon alternative from a solo LLC into a multi-stakeholder co-op, with contributors exchanging time and skills for shares. 1lev1 is a workspace for groups to agree on roles, contributions, votes, and value-sharing transparently. Is that still an active conversion problem, or has the structure moved on?</blockquote>
+      <details>
+        <summary>Evidence and score breakdown</summary>
+        <div class="evidence"><div><span>Evidence</span><p>The Reddit post describes a solo LLC founder hoping to convert to a Limited Cooperative Association and looking for anyone who could add value.</p></div><div><span>Source</span><p>Public Reddit post · 2024-11 approximate; page showed relative age</p><a href="https://www.reddit.com/r/cooperatives/comments/1gw4vc7/looking_for_potential_cofounders/" target="_blank" rel="noreferrer">Looking for potential co-founders ↗</a></div></div>
+        <div class="metrics"><div class="metric"><span>Pain strength</span><div class="track"><i style="width:100%"></i></div><b>5/5</b></div><div class="metric"><span>Product fit</span><div class="track"><i style="width:100%"></i></div><b>5/5</b></div><div class="metric"><span>Timing</span><div class="track"><i style="width:40%"></i></div><b>2/5</b></div><div class="metric"><span>Reachability</span><div class="track"><i style="width:80%"></i></div><b>4/5</b></div><div class="metric"><span>Evidence quality</span><div class="track"><i style="width:100%"></i></div><b>5/5</b></div></div>
+      </details>
+    </article>
+    <article class="prospect reveal">
+      <header class="prospect-head">
+        <div class="rank">06</div>
+        <div class="identity">
+          <span class="eyebrow">Public founder / builder profile</span>
+          <h3>Max</h3>
+          <span class="stage warm">Problem aware</span>
+        </div>
+        <div class="score" style="--score:78" aria-label="Fit score 78 out of 100"><strong>78</strong><small>/100</small></div>
+      </header>
+      <div class="signal"><span>Public signal</span><p>Max is working on a cooperative formation, management, and marketplace platform and identified needs such as consensus gathering, votes, share management, financial operations, and federation.</p></div>
+      <div class="prospect-grid">
+        <div><span>Why it fits</span><p>Max may be more collaborator or competitor than buyer, but the post validates the same problem 1lev1 addresses: co-op formation and ongoing governance require integrated workflows.</p></div>
+        <div><span>Why now</span><p>The post is from 2024 and asks what is missing as the concept is being fleshed out; validate whether the project advanced before outreach.</p></div>
+        <div><span>Suggested channel</span><p>Reply to the Reddit thread with a peer-builder framing.</p></div>
+        <div><span>Caution</span><p>Frame as ecosystem learning; this prospect may be a peer builder rather than a paying user.</p></div>
+      </div>
+      <blockquote><span>Suggested opener</span>Saw your cooperative formation and management platform write-up, especially the parts about consensus gathering, votes, shares, and federation. I am testing 1lev1 around similar group-formation and shared-governance workflows. Would you be open to comparing notes on what early co-op founders need before they are ready for heavier ERP or banking layers?</blockquote>
+      <details>
+        <summary>Evidence and score breakdown</summary>
+        <div class="evidence"><div><span>Evidence</span><p>The Reddit post lays out modules for cooperative formation, cooperative management, and a marketplace, including votes, shares, compliance reminders, and meta-cooperation among cooperatives.</p></div><div><span>Source</span><p>Public Reddit post · 2024-03 approximate; page showed relative age</p><a href="https://www.reddit.com/r/cooperatives/comments/1birzcu/working_on_a_cooperative_formation_management_and/" target="_blank" rel="noreferrer">Working on a Cooperative Formation, Management and Marketplace Platform ↗</a></div></div>
+        <div class="metrics"><div class="metric"><span>Pain strength</span><div class="track"><i style="width:80%"></i></div><b>4/5</b></div><div class="metric"><span>Product fit</span><div class="track"><i style="width:100%"></i></div><b>5/5</b></div><div class="metric"><span>Timing</span><div class="track"><i style="width:60%"></i></div><b>3/5</b></div><div class="metric"><span>Reachability</span><div class="track"><i style="width:80%"></i></div><b>4/5</b></div><div class="metric"><span>Evidence quality</span><div class="track"><i style="width:100%"></i></div><b>5/5</b></div></div>
+      </details>
+    </article>
+    <article class="prospect reveal">
+      <header class="prospect-head">
+        <div class="rank">07</div>
+        <div class="identity">
+          <span class="eyebrow">Public founder profile</span>
+          <h3>Riviera / ivykim</h3>
+          <span class="stage warm">Problem aware</span>
+        </div>
+        <div class="score" style="--score:77" aria-label="Fit score 77 out of 100"><strong>77</strong><small>/100</small></div>
+      </header>
+      <div class="signal"><span>Public signal</span><p>Riviera is aiming to start a Linux-focused co-op with people in Devon, connect mutual aid and non-extractive software practice, and is looking for advice about getting started.</p></div>
+      <div class="prospect-grid">
+        <div><span>Why it fits</span><p>1lev1 could help a small place-based founding group coordinate shared skills, resources, community commitments, crowdfunding tasks, and governance agreements.</p></div>
+        <div><span>Why now</span><p>The post is recent, dated 2025-10-11, and is explicitly about starting and finding support.</p></div>
+        <div><span>Suggested channel</span><p>Reply in the CoTech introduction thread with a low-pressure founder-workspace offer.</p></div>
+        <div><span>Caution</span><p>Only reference the public co-op-building context; avoid using personal details beyond what is relevant to the project.</p></div>
+      </div>
+      <blockquote><span>Suggested opener</span>Saw your CoTech intro about starting a Linux-focused co-op in Devon and figuring out the first steps with a small group. 1lev1 is meant for groups to coordinate skills, resources, tasks, decisions, and contribution-sharing around a shared purpose. Would it be useful to sketch a starter workspace for the radio/crowdfunding path?</blockquote>
+      <details>
+        <summary>Evidence and score breakdown</summary>
+        <div class="evidence"><div><span>Evidence</span><p>The CoTech introduction describes an early group, a planned co-op, crowdfunding through community radio, and a desire to connect with people locally and around getting started.</p></div><div><span>Source</span><p>Public forum · 2025-10-11</p><a href="https://community.coops.tech/t/introduce-yourself/23?page=9" target="_blank" rel="noreferrer">Introduce yourself! - Riviera post ↗</a></div></div>
+        <div class="metrics"><div class="metric"><span>Pain strength</span><div class="track"><i style="width:80%"></i></div><b>4/5</b></div><div class="metric"><span>Product fit</span><div class="track"><i style="width:80%"></i></div><b>4/5</b></div><div class="metric"><span>Timing</span><div class="track"><i style="width:100%"></i></div><b>5/5</b></div><div class="metric"><span>Reachability</span><div class="track"><i style="width:80%"></i></div><b>4/5</b></div><div class="metric"><span>Evidence quality</span><div class="track"><i style="width:80%"></i></div><b>4/5</b></div></div>
+      </details>
+    </article>
+    <article class="prospect reveal">
+      <header class="prospect-head">
+        <div class="rank">08</div>
+        <div class="identity">
+          <span class="eyebrow">Public co-op founder profile</span>
+          <h3>Alexander</h3>
+          <span class="stage warm">Trigger present</span>
+        </div>
+        <div class="score" style="--score:75" aria-label="Fit score 75 out of 100"><strong>75</strong><small>/100</small></div>
+      </header>
+      <div class="signal"><span>Public signal</span><p>Alexander said a tech co-op has fallen on hard times, is down to a two-person core team with former members ready to return, and is looking for meaningful paid projects.</p></div>
+      <div class="prospect-grid">
+        <div><span>Why it fits</span><p>1lev1&#x27;s group/project matching, skills/resources view, tasks, budget transparency, and revenue-sharing model could help the co-op package capabilities into rikmot and coordinate returning contributors.</p></div>
+        <div><span>Why now</span><p>The post is recent, dated 2025-08-26, and includes an active survival and reactivation trigger.</p></div>
+        <div><span>Suggested channel</span><p>Reply in the CoTech thread with a design-partner offer tied to project intake and contribution sharing.</p></div>
+        <div><span>Caution</span><p>Their immediate need may be paid client work rather than software; validate whether tooling would help before pitching.</p></div>
+      </div>
+      <blockquote><span>Suggested opener</span>Saw your CoTech note about rebuilding a very multidisciplinary tech co-op around meaningful paid projects, with former members ready to return if the work can support them. 1lev1 helps groups map skills, tasks, budgets, and agreed value-sharing around each project. Would a project-intake and contributor-allocation pilot be worth testing?</blockquote>
+      <details>
+        <summary>Evidence and score breakdown</summary>
+        <div class="evidence"><div><span>Evidence</span><p>The CoTech post describes a multidisciplinary tech co-op with former members who could rejoin if enough paid work exists.</p></div><div><span>Source</span><p>Public forum · 2025-08-26</p><a href="https://community.coops.tech/t/introduce-yourself/23?page=9" target="_blank" rel="noreferrer">Introduce yourself! - Alexander post ↗</a></div></div>
+        <div class="metrics"><div class="metric"><span>Pain strength</span><div class="track"><i style="width:100%"></i></div><b>5/5</b></div><div class="metric"><span>Product fit</span><div class="track"><i style="width:60%"></i></div><b>3/5</b></div><div class="metric"><span>Timing</span><div class="track"><i style="width:100%"></i></div><b>5/5</b></div><div class="metric"><span>Reachability</span><div class="track"><i style="width:80%"></i></div><b>4/5</b></div><div class="metric"><span>Evidence quality</span><div class="track"><i style="width:80%"></i></div><b>4/5</b></div></div>
+      </details>
+    </article>
+    <article class="prospect reveal">
+      <header class="prospect-head">
+        <div class="rank">09</div>
+        <div class="identity">
+          <span class="eyebrow">Public project lead profile</span>
+          <h3>Mike Hales / digital infrastructure federation initiative</h3>
+          <span class="stage warm">Trigger present</span>
+        </div>
+        <div class="score" style="--score:73" aria-label="Fit score 73 out of 100"><strong>73</strong><small>/100</small></div>
+      </header>
+      <div class="signal"><span>Public signal</span><p>Mike described entering a new digital infrastructure federation initiative responding to Big Tech, with links to knowledge commons, Free Knowledge Institute, and cooperative infrastructure networks.</p></div>
+      <div class="prospect-grid">
+        <div><span>Why it fits</span><p>1lev1&#x27;s values-based group formation, decentralized ledger concept, shared decisions, and commons orientation could fit a pre-launch federation that needs aligned contributors and transparent coordination.</p></div>
+        <div><span>Why now</span><p>The post is recent, dated 2025-10-02, and explicitly says the initiative is not launched yet.</p></div>
+        <div><span>Suggested channel</span><p>Reply on CoTech or follow the public Mastodon/context link from the thread.</p></div>
+        <div><span>Caution</span><p>This may be strategic commons work rather than a software procurement process; ask before demoing.</p></div>
+      </div>
+      <blockquote><span>Suggested opener</span>Saw your CoTech post about a not-yet-launched digital infrastructure federation and the need to go beyond simply de-Googling or using co-op hosting. 1lev1 is a values-based collaboration space for groups to form around shared commitments, decisions, work, and transparent resources. Would it be useful to test it against one early federation coordination workflow?</blockquote>
+      <details>
+        <summary>Evidence and score breakdown</summary>
+        <div class="evidence"><div><span>Evidence</span><p>The CoTech post says the initiative is not launched yet, but the stakes are higher than simply getting people off Big Tech or into co-op hosting.</p></div><div><span>Source</span><p>Public forum · 2025-10-02</p><a href="https://community.coops.tech/t/introduce-yourself/23?page=9" target="_blank" rel="noreferrer">Introduce yourself! - Mike Hales post ↗</a></div></div>
+        <div class="metrics"><div class="metric"><span>Pain strength</span><div class="track"><i style="width:80%"></i></div><b>4/5</b></div><div class="metric"><span>Product fit</span><div class="track"><i style="width:80%"></i></div><b>4/5</b></div><div class="metric"><span>Timing</span><div class="track"><i style="width:100%"></i></div><b>5/5</b></div><div class="metric"><span>Reachability</span><div class="track"><i style="width:80%"></i></div><b>4/5</b></div><div class="metric"><span>Evidence quality</span><div class="track"><i style="width:60%"></i></div><b>3/5</b></div></div>
+      </details>
+    </article>
+    <article class="prospect reveal">
+      <header class="prospect-head">
+        <div class="rank">10</div>
+        <div class="identity">
+          <span class="eyebrow">Cooperative / Israel public job signal</span>
+          <h3>Laamel Women&#x27;s Cooperative</h3>
+          <span class="stage warm">Trigger present</span>
+        </div>
+        <div class="score" style="--score:70" aria-label="Fit score 70 out of 100"><strong>70</strong><small>/100</small></div>
+      </header>
+      <div class="signal"><span>Public signal</span><p>A public Israel-focused job board listed Laamel Women&#x27;s Cooperative as seeking a partner-manager in the Negev with responsibility for client recruitment and management.</p></div>
+      <div class="prospect-grid">
+        <div><span>Why it fits</span><p>For a Hebrew-first platform, Laamel is a culturally and geographically closer candidate for testing shared management, client pipeline, partner roles, and cooperative coordination.</p></div>
+        <div><span>Why now</span><p>The signal is older and tied to a 2024 hiring deadline, but it indicates cooperative operating complexity and a named partner-management function.</p></div>
+        <div><span>Suggested channel</span><p>Use only the cooperative&#x27;s public website/contact path; do not rely on archived personal phone or email details.</p></div>
+        <div><span>Caution</span><p>This is a stale hiring signal; verify current relevance through the cooperative&#x27;s public channels before any deeper outreach.</p></div>
+      </div>
+      <blockquote><span>Suggested opener</span>I saw the public OnePlace listing for a partner-manager role at Laamel, with client recruitment and management responsibilities. 1lev1 is a Hebrew-first platform for cooperative groups to coordinate roles, tasks, decisions, budgets, and shared resources transparently. Is cooperative operations tooling something your team is currently exploring, or was that hiring need already resolved?</blockquote>
+      <details>
+        <summary>Evidence and score breakdown</summary>
+        <div class="evidence"><div><span>Evidence</span><p>OnePlace listed the cooperative&#x27;s partner-manager role, immediate start, client-management responsibility, and application deadline in August 2024.</p></div><div><span>Source</span><p>Public job board · 2024-08-21 to 2024-08-31</p><a href="https://in-oneplace.net/job-opportunities/" target="_blank" rel="noreferrer">Job opportunities - OnePlace, Arabs in Israel ↗</a></div></div>
+        <div class="metrics"><div class="metric"><span>Pain strength</span><div class="track"><i style="width:60%"></i></div><b>3/5</b></div><div class="metric"><span>Product fit</span><div class="track"><i style="width:80%"></i></div><b>4/5</b></div><div class="metric"><span>Timing</span><div class="track"><i style="width:40%"></i></div><b>2/5</b></div><div class="metric"><span>Reachability</span><div class="track"><i style="width:80%"></i></div><b>4/5</b></div><div class="metric"><span>Evidence quality</span><div class="track"><i style="width:100%"></i></div><b>5/5</b></div></div>
+      </details>
+    </article></div></section>
+      <section><header class="section-head"><h2>Signals that repeat.</h2><p>Patterns across prospects reveal the strongest positioning, workflow, and outreach angles.</p></header><div class="patterns">
+    <article class="pattern reveal"><span class="pattern-num">01</span><div><h3>Unified governance plus operations</h3><p>The strongest prospects are not asking only for voting. They want decisions connected to project work, documents, roles, and daily coordination.</p></div><strong>4×</strong></article>
+    <article class="pattern reveal"><span class="pattern-num">02</span><div><h3>Formation before formalization</h3><p>Several groups are still forming, seeking co-founders, or learning how co-op governance works. A lightweight pre-incorporation workspace may be easier to sell than a full operating system.</p></div><strong>5×</strong></article>
+    <article class="pattern reveal"><span class="pattern-num">03</span><div><h3>Contribution-based value sharing</h3><p>Prospects repeatedly mention shares, sweat equity, paid work teams, bounties, profit sharing, or member economic participation.</p></div><strong>4×</strong></article>
+    <article class="pattern reveal"><span class="pattern-num">04</span><div><h3>Stitched-together tools fatigue</h3><p>Co-op technologists know Loomio, Nextcloud, Odoo, Discord, and project management tools, but current stacks often feel fragmented or not co-op-native.</p></div><strong>3×</strong></article>
+    <article class="pattern reveal"><span class="pattern-num">05</span><div><h3>Manual, public, respectful outreach</h3><p>The best channels are public forum replies, public website contact paths, or community introductions, not enriched personal emails or cold mass campaigns.</p></div><strong>10×</strong></article></div></section>
+      <section class="plan"><div><span class="eyebrow" style="color:#111">Seven-day manual plan</span><h2>Offer a tiny design-partner workspace around one live cooperative workflow, not a broad movement manifesto.</h2></div><div class="plan-grid"><div><span>First step</span><p>Day 1: contact the top three prospects manually, each with one source-based question and a request to validate the workflow before showing the product.</p></div><div><span>Follow-up</span><p>Days 3-5: if they respond, map their current tools and one painful decision-to-task-to-money workflow; only then share a two-minute 1lev1 walkthrough configured to their use case.</p></div><div><span>Success signal</span><p>Within seven days, secure three conversations, one concrete workflow map, and one small group willing to run a pilot rikma with real tasks and decisions.</p></div><div><span>Research scope</span><p>Public web sources checked on 2026-08-28, focused on English-language co-op technology communities plus Hebrew/Israel public sources where available.</p></div></div></section>
+      <section class="limits"><h2>Use this shortlist responsibly</h2><ul><li>These are potential customers based on public signals, not confirmed buyers, leads who consented to outreach, or evidence of purchase intent.</li><li>Several strong Reddit signals are older; verify current project status before outreach.</li><li>1lev1&#x27;s Hebrew-first positioning is a strength for Israeli cooperative prospects, but most explicit public demand found quickly was in English-language co-op technology communities.</li><li>Do not use private emails, phone numbers, data brokers, scraped contact data, or sensitive personal details. Keep validation manual and low volume.</li><li>Legal structure, tax treatment, equity, securities, employment, and cooperative incorporation questions must be handled by qualified local professionals; 1lev1 should be positioned as workflow support.</li></ul></section>
+    </main>
+    <footer><span>Generated by $first-customer-finder</span><span>Outreach is never sent automatically.</span></footer>
+  </div>
+</body>
+</html>

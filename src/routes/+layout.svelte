@@ -34,6 +34,9 @@ onMessage(messaging, (payload) => {
   import '$lib/stores/a11y.js';
   import { showFoot } from '$lib/stores/showFoot.js';
   import { Bot } from '$lib/components/bot';
+  // One editor for logged work hours, mounted once so `openTimeEditor` reaches
+  // it from any page — a lev card, the moach, the bot, a notification link.
+  import TimeEditorDialog from '$lib/components/timers/TimeEditorDialog.svelte';
   import { socketClient } from '$lib/stores/socketClient';
   import { patchUser } from '$lib/stores/userStore.js';
   import { toast } from 'svelte-sonner';
@@ -256,6 +259,9 @@ onMessage(messaging, (payload) => {
     <MobileFooter isAuthed={!!data?.loggedIn} />
   {/if}
   <Bot {data} />
+  {#if data?.loggedIn}
+    <TimeEditorDialog />
+  {/if}
 </main>
 
 <AccessibilityPanel />

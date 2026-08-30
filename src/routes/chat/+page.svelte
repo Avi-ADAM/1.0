@@ -61,7 +61,11 @@
         id: crypto.randomUUID(),
         role: m.user ? 'user' : 'assistant',
         content: m.text,
-        time: ''
+        time: '',
+        // The cards belong to the message. Dropping them here is what made a
+        // promised edit card vanish the moment the popup handed over to this
+        // page (or the page was reloaded).
+        components: m.components ?? []
       }));
     }
 
@@ -102,8 +106,12 @@
     // Sync expanded page messages back to shared store
     chatMessages.set(
       messages
-        .filter((m) => m.content)
-        .map((m) => ({ text: m.content, user: m.role === 'user' }))
+        .filter((m) => m.content || m.components?.length)
+        .map((m) => ({
+          text: m.content,
+          user: m.role === 'user',
+          ...(m.components?.length ? { components: m.components } : {})
+        }))
     );
   }
 

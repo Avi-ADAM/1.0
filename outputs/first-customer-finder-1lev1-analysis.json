@@ -1,0 +1,291 @@
+{
+  "title": "1lev1 First Customer Finder",
+  "product": "1lev1",
+  "product_url": "https://www.1lev1.com/",
+  "target_customer": "Founders and small groups forming cooperative, worker-owned, commons, or values-based ventures that need shared governance, tasks, budgets, profit sharing, and transparent collaboration.",
+  "search_scope": "Public web sources checked on 2026-08-28, focused on English-language co-op technology communities plus Hebrew/Israel public sources where available.",
+  "generated_at": "2026-08-28",
+  "verdict": "1lev1 has reachable early-customer signals, especially among small cooperative founders who are stitching together decision-making, project management, files, member contributions, and profit-sharing by hand. The strongest outreach angle is not a generic co-op pitch; it is a lightweight design-partner offer for groups already asking how to coordinate shared work, votes, money, and membership without losing autonomy.",
+  "prospects": [
+    {
+      "name": "coopevolution / Anthony",
+      "type": "Public professional profile",
+      "stage": "High intent",
+      "score": 88,
+      "pain_signal": "Anthony explicitly asked for an all-in-one governance and operations tool for platform co-ops, combining voting, project management, and secure document storage.",
+      "evidence": "In a CoTech forum thread, Anthony described a need for tools that support both co-op governance and daily operations, then clarified interest in a more unified experience because multiple stitched-together tools create admin burden.",
+      "why_fit": "1lev1's rikma model, consensus layer, tasks, budgets, graphs, AI assistant, shared assets, and transparent ledger map closely to the combined governance-plus-operations request.",
+      "why_now": "The thread was active from 2025-08-15 to 2025-08-26, and Anthony continued engaging after receiving modular-tool recommendations.",
+      "source_title": "Looking for All-in-one governance + operations tools for platform co-ops",
+      "source_url": "https://community.coops.tech/t/looking-for-all-in-one-governance-operations-tools-for-platform-co-ops/4505",
+      "source_type": "Public forum",
+      "signal_date": "2025-08-15 to 2025-08-26",
+      "suggested_channel": "Reply in the CoTech discussion or send a forum message if profile settings allow it.",
+      "opener": "Saw your CoTech thread about wanting voting, project management, and storage to feel more unified for platform co-ops. I am testing 1lev1, a Hebrew/English collaboration platform for values-based groups that combines consensus, tasks, budgets, contribution tracking, and transparent shared ledgers. Would a rough design-partner walkthrough be useful, even just to compare against your modular-tool research?",
+      "caution": "Confirm whether Anthony is evaluating tools for a specific co-op, a client, or broader research before pitching.",
+      "dimensions": {
+        "pain_strength": 5,
+        "product_fit": 5,
+        "timing": 5,
+        "reachability": 4,
+        "evidence_quality": 4
+      }
+    },
+    {
+      "name": "Beanchain Coffee",
+      "type": "Company / community business",
+      "stage": "Problem aware",
+      "score": 83,
+      "pain_signal": "Beanchain publicly describes casual votes, open forums, paid work teams, member profit sharing, founder veto, and the fact that profit sharing is still mostly a design rather than fully tested practice.",
+      "evidence": "The worker-direction page says workers already use votes and forums, members will hold equal votes, bounties and paid work teams tie money to contribution, and there are no members yet so the profit-sharing model remains untested.",
+      "why_fit": "1lev1 could be piloted as the operating layer for a worker-directed shop moving toward worker ownership: decisions, member roles, contribution-based allocation, shared tasks, and transparent budgets.",
+      "why_now": "The page was crawled on 2026-08-28 and Beanchain is actively publishing its transition model and current shortfalls.",
+      "source_title": "Worker Direction | Beanchain Coffee",
+      "source_url": "https://bchain.coffee/worker-direction/",
+      "source_type": "Company page",
+      "signal_date": "2026-08-28 crawl; site notes recent cooperative transition status",
+      "suggested_channel": "Use Beanchain's public website contact or social links, referencing the worker-direction page.",
+      "opener": "I read your worker-direction page and noticed the mix of casual voting, forums, bounties, and profit-sharing design that still has to survive real operations. 1lev1 is a collaboration platform for groups sharing decisions, work, budgets, and returns by agreement. Would you be open to a 20-minute design-partner conversation around the first Beanchain member workflow?",
+      "caution": "Beanchain has its own philosophy and documentation; position this as a test layer, not a replacement for their model.",
+      "dimensions": {
+        "pain_strength": 4,
+        "product_fit": 5,
+        "timing": 5,
+        "reachability": 4,
+        "evidence_quality": 5
+      }
+    },
+    {
+      "name": "Navarro",
+      "type": "Public professional profile",
+      "stage": "High intent",
+      "score": 82,
+      "pain_signal": "Navarro said a group of young engineers is discussing a tech worker co-op, has business experience, but zero co-op experience and needs advice on starting.",
+      "evidence": "The CoTech introduction asks for advice on starting a worker co-op and whether a smartphone-selling business with a digital ecosystem could fit CoTech.",
+      "why_fit": "1lev1 can act as a formation workspace: define members, skills, resources, agreements, decisions, and early contribution/revenue sharing before the group formalizes.",
+      "why_now": "The post was published on 2025-11-05, with a reply offering a call the next day, indicating live formation intent.",
+      "source_title": "Introduce yourself! - Navarro post",
+      "source_url": "https://community.coops.tech/t/introduce-yourself/23?page=9",
+      "source_type": "Public forum",
+      "signal_date": "2025-11-05",
+      "suggested_channel": "Reply publicly in the CoTech introduction thread with a concise offer to compare formation workflows.",
+      "opener": "Saw your CoTech intro about a group of engineers considering a tech worker co-op while still learning the co-op side. 1lev1 is built for small groups to map skills, responsibilities, decisions, and value-sharing before the structure hardens. Would it help to test a simple formation board for your smartphone-plus-digital-ecosystem idea?",
+      "caution": "Do not imply legal advice; keep the conversation about workflow and collaboration until they have co-op legal support.",
+      "dimensions": {
+        "pain_strength": 4,
+        "product_fit": 5,
+        "timing": 5,
+        "reachability": 4,
+        "evidence_quality": 4
+      }
+    },
+    {
+      "name": "Alex Loveday",
+      "type": "Public professional profile",
+      "stage": "High intent",
+      "score": 80,
+      "pain_signal": "Alex is trying to start a worker-owned co-op for tech-driven wellness tools and is seeking co-directors with AI/ML, software engineering, or hardware prototyping skills who also care about co-operative governance.",
+      "evidence": "In a 2025 CoTech introduction, Alex describes a planned worker-owned co-op and asks to connect with people relevant to co-op governance and technical collaboration.",
+      "why_fit": "1lev1's skills/resources matching, consensus decisions, and shared project management fit an early founding team that must coordinate contributors before formal operations.",
+      "why_now": "The post is recent, dated 2025-10-05, and contains an explicit collaborator-seeking signal.",
+      "source_title": "Introduce yourself! - Alex Loveday post",
+      "source_url": "https://community.coops.tech/t/introduce-yourself/23?page=9",
+      "source_type": "Public forum",
+      "signal_date": "2025-10-05",
+      "suggested_channel": "Reply in the CoTech introduction thread or use the forum profile's public contact options.",
+      "opener": "Saw your CoTech intro about forming a worker-owned health-tech co-op and finding co-directors who care about governance. 1lev1 is a lightweight space for prospective members to map skills, decisions, tasks, and contribution-based sharing before the co-op is fully formed. Would a tiny founding-team workspace be useful to test with your first collaborators?",
+      "caution": "Avoid framing around personal health data or sensitive health claims; focus on organizational setup.",
+      "dimensions": {
+        "pain_strength": 4,
+        "product_fit": 5,
+        "timing": 5,
+        "reachability": 4,
+        "evidence_quality": 4
+      }
+    },
+    {
+      "name": "Matturdayyyy",
+      "type": "Public founder profile",
+      "stage": "High intent",
+      "score": 79,
+      "pain_signal": "The founder said they had built an MVP for a worker/patron/supplier-owned ethical alternative to Amazon and were looking for people willing to exchange time and skills for shares.",
+      "evidence": "The Reddit post describes a solo LLC founder hoping to convert to a Limited Cooperative Association and looking for anyone who could add value.",
+      "why_fit": "1lev1 directly supports the pre-co-op problem of coordinating people, skills, contributions, decisions, and agreed share/reward logic.",
+      "why_now": "The signal is older and should be revalidated, but it is explicit and unusually close to 1lev1's cooperative formation use case.",
+      "source_title": "Looking for potential co-founders",
+      "source_url": "https://www.reddit.com/r/cooperatives/comments/1gw4vc7/looking_for_potential_cofounders/",
+      "source_type": "Public Reddit post",
+      "signal_date": "2024-11 approximate; page showed relative age",
+      "suggested_channel": "Reply to the Reddit thread or send a Reddit message if the account is active.",
+      "opener": "Saw your post about turning an ethical Amazon alternative from a solo LLC into a multi-stakeholder co-op, with contributors exchanging time and skills for shares. 1lev1 is a workspace for groups to agree on roles, contributions, votes, and value-sharing transparently. Is that still an active conversion problem, or has the structure moved on?",
+      "caution": "Treat as stale until the founder confirms the MVP and conversion are still active.",
+      "dimensions": {
+        "pain_strength": 5,
+        "product_fit": 5,
+        "timing": 2,
+        "reachability": 4,
+        "evidence_quality": 5
+      }
+    },
+    {
+      "name": "Max",
+      "type": "Public founder / builder profile",
+      "stage": "Problem aware",
+      "score": 78,
+      "pain_signal": "Max is working on a cooperative formation, management, and marketplace platform and identified needs such as consensus gathering, votes, share management, financial operations, and federation.",
+      "evidence": "The Reddit post lays out modules for cooperative formation, cooperative management, and a marketplace, including votes, shares, compliance reminders, and meta-cooperation among cooperatives.",
+      "why_fit": "Max may be more collaborator or competitor than buyer, but the post validates the same problem 1lev1 addresses: co-op formation and ongoing governance require integrated workflows.",
+      "why_now": "The post is from 2024 and asks what is missing as the concept is being fleshed out; validate whether the project advanced before outreach.",
+      "source_title": "Working on a Cooperative Formation, Management and Marketplace Platform",
+      "source_url": "https://www.reddit.com/r/cooperatives/comments/1birzcu/working_on_a_cooperative_formation_management_and/",
+      "source_type": "Public Reddit post",
+      "signal_date": "2024-03 approximate; page showed relative age",
+      "suggested_channel": "Reply to the Reddit thread with a peer-builder framing.",
+      "opener": "Saw your cooperative formation and management platform write-up, especially the parts about consensus gathering, votes, shares, and federation. I am testing 1lev1 around similar group-formation and shared-governance workflows. Would you be open to comparing notes on what early co-op founders need before they are ready for heavier ERP or banking layers?",
+      "caution": "Frame as ecosystem learning; this prospect may be a peer builder rather than a paying user.",
+      "dimensions": {
+        "pain_strength": 4,
+        "product_fit": 5,
+        "timing": 3,
+        "reachability": 4,
+        "evidence_quality": 5
+      }
+    },
+    {
+      "name": "Riviera / ivykim",
+      "type": "Public founder profile",
+      "stage": "Problem aware",
+      "score": 77,
+      "pain_signal": "Riviera is aiming to start a Linux-focused co-op with people in Devon, connect mutual aid and non-extractive software practice, and is looking for advice about getting started.",
+      "evidence": "The CoTech introduction describes an early group, a planned co-op, crowdfunding through community radio, and a desire to connect with people locally and around getting started.",
+      "why_fit": "1lev1 could help a small place-based founding group coordinate shared skills, resources, community commitments, crowdfunding tasks, and governance agreements.",
+      "why_now": "The post is recent, dated 2025-10-11, and is explicitly about starting and finding support.",
+      "source_title": "Introduce yourself! - Riviera post",
+      "source_url": "https://community.coops.tech/t/introduce-yourself/23?page=9",
+      "source_type": "Public forum",
+      "signal_date": "2025-10-11",
+      "suggested_channel": "Reply in the CoTech introduction thread with a low-pressure founder-workspace offer.",
+      "opener": "Saw your CoTech intro about starting a Linux-focused co-op in Devon and figuring out the first steps with a small group. 1lev1 is meant for groups to coordinate skills, resources, tasks, decisions, and contribution-sharing around a shared purpose. Would it be useful to sketch a starter workspace for the radio/crowdfunding path?",
+      "caution": "Only reference the public co-op-building context; avoid using personal details beyond what is relevant to the project.",
+      "dimensions": {
+        "pain_strength": 4,
+        "product_fit": 4,
+        "timing": 5,
+        "reachability": 4,
+        "evidence_quality": 4
+      }
+    },
+    {
+      "name": "Alexander",
+      "type": "Public co-op founder profile",
+      "stage": "Trigger present",
+      "score": 75,
+      "pain_signal": "Alexander said a tech co-op has fallen on hard times, is down to a two-person core team with former members ready to return, and is looking for meaningful paid projects.",
+      "evidence": "The CoTech post describes a multidisciplinary tech co-op with former members who could rejoin if enough paid work exists.",
+      "why_fit": "1lev1's group/project matching, skills/resources view, tasks, budget transparency, and revenue-sharing model could help the co-op package capabilities into rikmot and coordinate returning contributors.",
+      "why_now": "The post is recent, dated 2025-08-26, and includes an active survival and reactivation trigger.",
+      "source_title": "Introduce yourself! - Alexander post",
+      "source_url": "https://community.coops.tech/t/introduce-yourself/23?page=9",
+      "source_type": "Public forum",
+      "signal_date": "2025-08-26",
+      "suggested_channel": "Reply in the CoTech thread with a design-partner offer tied to project intake and contribution sharing.",
+      "opener": "Saw your CoTech note about rebuilding a very multidisciplinary tech co-op around meaningful paid projects, with former members ready to return if the work can support them. 1lev1 helps groups map skills, tasks, budgets, and agreed value-sharing around each project. Would a project-intake and contributor-allocation pilot be worth testing?",
+      "caution": "Their immediate need may be paid client work rather than software; validate whether tooling would help before pitching.",
+      "dimensions": {
+        "pain_strength": 5,
+        "product_fit": 3,
+        "timing": 5,
+        "reachability": 4,
+        "evidence_quality": 4
+      }
+    },
+    {
+      "name": "Mike Hales / digital infrastructure federation initiative",
+      "type": "Public project lead profile",
+      "stage": "Trigger present",
+      "score": 73,
+      "pain_signal": "Mike described entering a new digital infrastructure federation initiative responding to Big Tech, with links to knowledge commons, Free Knowledge Institute, and cooperative infrastructure networks.",
+      "evidence": "The CoTech post says the initiative is not launched yet, but the stakes are higher than simply getting people off Big Tech or into co-op hosting.",
+      "why_fit": "1lev1's values-based group formation, decentralized ledger concept, shared decisions, and commons orientation could fit a pre-launch federation that needs aligned contributors and transparent coordination.",
+      "why_now": "The post is recent, dated 2025-10-02, and explicitly says the initiative is not launched yet.",
+      "source_title": "Introduce yourself! - Mike Hales post",
+      "source_url": "https://community.coops.tech/t/introduce-yourself/23?page=9",
+      "source_type": "Public forum",
+      "signal_date": "2025-10-02",
+      "suggested_channel": "Reply on CoTech or follow the public Mastodon/context link from the thread.",
+      "opener": "Saw your CoTech post about a not-yet-launched digital infrastructure federation and the need to go beyond simply de-Googling or using co-op hosting. 1lev1 is a values-based collaboration space for groups to form around shared commitments, decisions, work, and transparent resources. Would it be useful to test it against one early federation coordination workflow?",
+      "caution": "This may be strategic commons work rather than a software procurement process; ask before demoing.",
+      "dimensions": {
+        "pain_strength": 4,
+        "product_fit": 4,
+        "timing": 5,
+        "reachability": 4,
+        "evidence_quality": 3
+      }
+    },
+    {
+      "name": "Laamel Women's Cooperative",
+      "type": "Cooperative / Israel public job signal",
+      "stage": "Trigger present",
+      "score": 70,
+      "pain_signal": "A public Israel-focused job board listed Laamel Women's Cooperative as seeking a partner-manager in the Negev with responsibility for client recruitment and management.",
+      "evidence": "OnePlace listed the cooperative's partner-manager role, immediate start, client-management responsibility, and application deadline in August 2024.",
+      "why_fit": "For a Hebrew-first platform, Laamel is a culturally and geographically closer candidate for testing shared management, client pipeline, partner roles, and cooperative coordination.",
+      "why_now": "The signal is older and tied to a 2024 hiring deadline, but it indicates cooperative operating complexity and a named partner-management function.",
+      "source_title": "Job opportunities - OnePlace, Arabs in Israel",
+      "source_url": "https://in-oneplace.net/job-opportunities/",
+      "source_type": "Public job board",
+      "signal_date": "2024-08-21 to 2024-08-31",
+      "suggested_channel": "Use only the cooperative's public website/contact path; do not rely on archived personal phone or email details.",
+      "opener": "I saw the public OnePlace listing for a partner-manager role at Laamel, with client recruitment and management responsibilities. 1lev1 is a Hebrew-first platform for cooperative groups to coordinate roles, tasks, decisions, budgets, and shared resources transparently. Is cooperative operations tooling something your team is currently exploring, or was that hiring need already resolved?",
+      "caution": "This is a stale hiring signal; verify current relevance through the cooperative's public channels before any deeper outreach.",
+      "dimensions": {
+        "pain_strength": 3,
+        "product_fit": 4,
+        "timing": 2,
+        "reachability": 4,
+        "evidence_quality": 5
+      }
+    }
+  ],
+  "patterns": [
+    {
+      "title": "Unified governance plus operations",
+      "count": 4,
+      "insight": "The strongest prospects are not asking only for voting. They want decisions connected to project work, documents, roles, and daily coordination."
+    },
+    {
+      "title": "Formation before formalization",
+      "count": 5,
+      "insight": "Several groups are still forming, seeking co-founders, or learning how co-op governance works. A lightweight pre-incorporation workspace may be easier to sell than a full operating system."
+    },
+    {
+      "title": "Contribution-based value sharing",
+      "count": 4,
+      "insight": "Prospects repeatedly mention shares, sweat equity, paid work teams, bounties, profit sharing, or member economic participation."
+    },
+    {
+      "title": "Stitched-together tools fatigue",
+      "count": 3,
+      "insight": "Co-op technologists know Loomio, Nextcloud, Odoo, Discord, and project management tools, but current stacks often feel fragmented or not co-op-native."
+    },
+    {
+      "title": "Manual, public, respectful outreach",
+      "count": 10,
+      "insight": "The best channels are public forum replies, public website contact paths, or community introductions, not enriched personal emails or cold mass campaigns."
+    }
+  ],
+  "outreach_plan": {
+    "angle": "Offer a tiny design-partner workspace around one live cooperative workflow, not a broad movement manifesto.",
+    "first_step": "Day 1: contact the top three prospects manually, each with one source-based question and a request to validate the workflow before showing the product.",
+    "follow_up": "Days 3-5: if they respond, map their current tools and one painful decision-to-task-to-money workflow; only then share a two-minute 1lev1 walkthrough configured to their use case.",
+    "success": "Within seven days, secure three conversations, one concrete workflow map, and one small group willing to run a pilot rikma with real tasks and decisions."
+  },
+  "limits": [
+    "These are potential customers based on public signals, not confirmed buyers, leads who consented to outreach, or evidence of purchase intent.",
+    "Several strong Reddit signals are older; verify current project status before outreach.",
+    "1lev1's Hebrew-first positioning is a strength for Israeli cooperative prospects, but most explicit public demand found quickly was in English-language co-op technology communities.",
+    "Do not use private emails, phone numbers, data brokers, scraped contact data, or sensitive personal details. Keep validation manual and low volume.",
+    "Legal structure, tax treatment, equity, securities, employment, and cooperative incorporation questions must be handled by qualified local professionals; 1lev1 should be positioned as workflow support."
+  ]
+}

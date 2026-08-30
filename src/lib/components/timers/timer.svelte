@@ -22,6 +22,39 @@
     tx // Add tx to props
   } = $props();
 
+  // Rendered width of one dial, and the factor that turns a length expressed in
+  // the SVG's 0 0 600 600 user space into the CSS pixels the HTML readout needs.
+  let dialSize = $derived(orders?.big ? bigsize : size);
+  let dialScale = $derived(dialSize / 600);
+
+  // The ENTIRE face - not just the tick marks its class name suggests - is drawn
+  // inside <g class="tics" transform="matrix(0.5, -0.866, 0.866, 0.5, -109.8, 409.8)">,
+  // which is rotate(-60, 300, 300). That group was left open in the original
+  // artwork and swallowed every element after it, so the whole dial is already
+  // turned -60deg; the wrapper's +tiltAngle (59deg) all but cancels it, and that
+  // is the only reason the dial reads upright on screen.
+  // The readout is now a sibling of the <svg>, so it receives tiltAngle WITHOUT
+  // that -60 - it has to reproduce both the angle and the place the rotation
+  // moved it to, or it hangs in the coin at the full tilt.
+  const FACE_ROTATION = -60;
+  const FACE_CENTER = 300;
+  // Where the readout sat in the group's own coordinates: the old
+  // <g transform="translate(300,380)"> + <foreignObject y="-20" height="120">.
+  const READOUT_LOCAL = { x: 300, y: 420 };
+  const faceRad = (FACE_ROTATION * Math.PI) / 180;
+  const readoutLeftPct =
+    ((FACE_CENTER +
+      (READOUT_LOCAL.x - FACE_CENTER) * Math.cos(faceRad) -
+      (READOUT_LOCAL.y - FACE_CENTER) * Math.sin(faceRad)) /
+      600) *
+    100;
+  const readoutTopPct =
+    ((FACE_CENTER +
+      (READOUT_LOCAL.x - FACE_CENTER) * Math.sin(faceRad) +
+      (READOUT_LOCAL.y - FACE_CENTER) * Math.cos(faceRad)) /
+      600) *
+    100;
+
   let showSaveDialog = $state(false);
   let showClearDialog = $state(false);
   let showSaveFinal = $state(false);
@@ -272,12 +305,24 @@
     }
   }}
 />
-<svg
+<!--
+  The face is an <svg>, but the digital readout is *not* inside it. It used to
+  live in a <foreignObject>, and WebKit (iOS Safari) does not apply the SVG's
+  viewBox scale or the host element's CSS transform to foreignObject children:
+  the HTML escaped to unscaled size and to an arbitrary spot on the page, where
+  its 300x120 box sat on top of the play/edit buttons and swallowed the taps.
+  So the wrapper below owns the placement/tilt, the <svg> only draws the clock,
+  and the readout is a plain absolutely-positioned div scaled by hand.
+-->
+<div
   class="timer"
-  style="width:{orders?.big ? bigsize : size}px;
+  style="width:{dialSize}px;
        left:{orders?.x}px;
        top:{orders?.y}px;
        transform: rotate({tiltAngle}deg) translate(-50%, -50%);"
+>
+<svg
+  class="timer-face"
   viewBox="0 0 600 600"
   xmlns="http://www.w3.org/2000/svg"
   xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -659,53 +704,7 @@
         />
       </g>
     </g>
-    <!-- Timer Display -->
-    <g transform="translate(300,380)">
-      <foreignObject x="-150" y="-20" width="300" height="120">
-        <div
-          style="width: 100%; height: 100%; display: flex; justify-content: center; align-items: center;"
-        >
-          <NumberFlowGroup>
-            <div
-              style="
-                  font-variant-numeric: tabular-nums;
-                  --number-flow-char-height: 1em;
-                  font-size: 48px;
-                  font-family: 'DS-Digital', 'Seven Segment', monospace;
-                  color: #33ff33;
-                  text-shadow: 0 0 10px rgba(51, 255, 51, 0.7);
-                  font-weight: normal;
-                  letter-spacing: 4px;
-                  background: rgba(0, 0, 0, 0.3);
-                  padding: 8px 15px;
-                  border-radius: 8px;
-                  border: 1px solid rgba(51, 255, 51, 0.3);"
-              class="flex items-baseline"
-            >
-              <NumberFlow
-                trend={-1}
-                value={getTimeComponents(localZman).hours}
-                format={{ minimumIntegerDigits: 2 }}
-              />
-              <NumberFlow
-                prefix=":"
-                trend={-1}
-                value={getTimeComponents(localZman).minutes}
-                digits={{ 1: { max: 5 } }}
-                format={{ minimumIntegerDigits: 2 }}
-              />
-              <NumberFlow
-                prefix=":"
-                trend={-1}
-                value={getTimeComponents(localZman).seconds}
-                digits={{ 1: { max: 2 } }}
-                format={{ minimumIntegerDigits: 2 }}
-              />
-            </div>
-          </NumberFlowGroup>
-        </div>
-      </foreignObject>
-    </g>
+    <!-- Timer display: rendered as HTML below the </svg>, not here. -->
     <g
       transform="matrix(0.542341, 0, 0, 0.542341, 267.0672, 302.203613)"
       style=""
@@ -910,10 +909,17 @@
       </g>
     </g>
     <!-- Mission Name (curved text) -->
+    <!--
+      fill/stroke "none", NOT "transparent". This path is only a rail for the
+      <textPath> below, but it is declared after the control buttons and its
+      filled arc covers both of them - and a transparent fill is still a
+      painted fill, so it was eating every tap on play/edit. "none" takes it
+      out of hit-testing.
+    -->
     <path
       transform="matrix(1.4, 0, 0, 1.4 , 20, 280)"
-      fill="transparent"
-      stroke="transparent"
+      fill="none"
+      stroke="none"
       id="curveooo8"
       d=" M 0 0 A 200 200 0 0 0 400 0"
     />
@@ -959,6 +965,51 @@
     </text>
   </g></svg
 >
+
+  <!--
+    Was <foreignObject x="-150" y="-20" width="300" height="120"> inside
+    <g transform="translate(300,380)">, i.e. centred on user-space (300,420) of
+    a 0 0 600 600 viewBox. That point lives inside the face's -60deg group, so
+    left/top below are that point AFTER the group's rotation, and the -60deg in
+    the transform puts the digits back at the angle the rest of the dial is
+    drawn at. Every length the foreignObject used to get for free from the
+    viewBox is multiplied by `dialScale` here instead.
+  -->
+  <div
+    class="timer-readout"
+    style="left: {readoutLeftPct}%; top: {readoutTopPct}%;
+           transform: translate(-50%, -50%) rotate({FACE_ROTATION}deg);
+           font-size: {48 * dialScale}px;
+           letter-spacing: {4 * dialScale}px;
+           padding: {8 * dialScale}px {15 * dialScale}px;
+           border-radius: {8 * dialScale}px;
+           text-shadow: 0 0 {10 * dialScale}px rgba(51, 255, 51, 0.7);"
+  >
+    <NumberFlowGroup>
+      <div class="flex items-baseline" style="--number-flow-char-height: 1em;">
+        <NumberFlow
+          trend={-1}
+          value={getTimeComponents(localZman).hours}
+          format={{ minimumIntegerDigits: 2 }}
+        />
+        <NumberFlow
+          prefix=":"
+          trend={-1}
+          value={getTimeComponents(localZman).minutes}
+          digits={{ 1: { max: 5 } }}
+          format={{ minimumIntegerDigits: 2 }}
+        />
+        <NumberFlow
+          prefix=":"
+          trend={-1}
+          value={getTimeComponents(localZman).seconds}
+          digits={{ 1: { max: 2 } }}
+          format={{ minimumIntegerDigits: 2 }}
+        />
+      </div>
+    </NumberFlowGroup>
+  </div>
+</div>
 
 <style>
   .edit-fields {
@@ -1177,6 +1228,38 @@
     position: absolute; /* Position each timer absolutely within the container */
     /* Add any other styling you need for the timer SVG itself */
     transition: all 0.5s ease-in-out;
+  }
+
+  .timer-face {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  /* Every label on the face is decoration, and several of them are drawn after
+     the control buttons, so they would otherwise sit on top of the tap target. */
+  .timer-face text {
+    pointer-events: none;
+  }
+
+  /* The digital readout. Sits over the face rather than inside it, because
+     foreignObject is not reliably scaled/positioned by WebKit. Never takes a
+     pointer event - the play/edit buttons underneath must stay tappable. */
+  .timer-readout {
+    position: absolute;
+    /* left / top / transform are inline - they depend on the face's -60deg
+       group rotation, see FACE_ROTATION in the script block. */
+    pointer-events: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+    font-family: 'DS-Digital', 'Seven Segment', monospace;
+    color: #33ff33;
+    font-weight: normal;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(51, 255, 51, 0.3);
   }
   /* Global styles for the SVG elements */
   #hours {

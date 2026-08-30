@@ -224,8 +224,16 @@
   }
 
   function openTimerEditor() {
-    showSaveDialog = true;
-    dialogEdit = false;
+    // The button reads "save timer" while there is unsaved time and "edit
+    // timer" otherwise — so send it where its own label points. It used to open
+    // the same menu either way, and the times themselves were another click in
+    // behind a button that said "clear the timer".
+    if (hasUnsavedTime) {
+      showSaveDialog = true;
+      dialogEdit = false;
+    } else {
+      showClearDialog = true;
+    }
     lockTimerForEdit(missionId);
   }
 

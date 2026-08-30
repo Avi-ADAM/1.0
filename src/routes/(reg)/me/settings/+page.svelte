@@ -140,6 +140,24 @@
     </a>
   </div>
 
+  <div
+    class="mb-6 flex items-center justify-between gap-3 flex-wrap rounded-xl border border-zinc-200 dark:border-zinc-700 p-4 bg-white/60 dark:bg-zinc-900/40"
+  >
+    <div class="min-w-0">
+      <p class="font-medium text-goldink">🤖 {$t('mcp.banner.title')}</p>
+      <p class="text-sm text-zinc-500">{$t('mcp.banner.desc')}</p>
+    </div>
+    <!-- `goldink`, not `gold`: the card sits on a white surface, where --gold
+         renders at ~1.2:1 and is effectively invisible (see tailwind.config). -->
+    <a
+      href="/me/settings/mcp"
+      data-sveltekit-prefetch
+      class="shrink-0 px-4 py-2 rounded-full border border-goldink text-goldink font-bold hover:bg-goldink/10"
+    >
+      {$t('mcp.banner.cta')}
+    </a>
+  </div>
+
   {#if meData}
     <EditB
       machshirs={meData?.machshirs.data}

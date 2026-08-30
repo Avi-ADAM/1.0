@@ -51,17 +51,23 @@ describe('isCardVisible', () => {
 });
 
 describe('rowTitle', () => {
-  // The regression this guards: four processors build `name` through
-  // `letters()`, which pre-reverses Hebrew/Arabic for SVG <text>. A row is
-  // ordinary HTML, so it must use the untouched `nameRaw`.
-  it('prefers nameRaw over the SVG-reversed name', () => {
+  // The regression this guards: five processors build `name` through
+  // `letters()`. It used to pre-reverse Hebrew/Arabic for SVG <text>, which
+  // reads backwards once the same string is shown as HTML. A row is ordinary
+  // HTML, so it takes the untouched `nameRaw` whatever `name` holds.
+  it('prefers nameRaw over a mangled name', () => {
     const original = 'מכונת תפירה';
-    const reversed = letters(original)[0];
-
-    // Guard the premise: letters() really does mangle it.
-    expect(reversed).not.toBe(original);
+    const reversed = original.split('').reverse().join('');
 
     expect(rowTitle({ name: reversed, nameRaw: original })).toBe(original);
+  });
+
+  // ...and the reversal itself is gone: SVG <text>/<tspan>/<textPath> all run
+  // the bidi algorithm, so letters() must hand back the name untouched.
+  it('letters() no longer reverses Hebrew', () => {
+    expect(letters('מכונת תפירה')[0]).toBe('מכונת תפירה');
+    expect(letters('آلة الخياطة')[0]).toBe('آلة الخياطة');
+    expect(letters('sewing machine')[0]).toBe('sewing machine');
   });
 
   it('does not mangle Hebrew that never went through letters()', () => {

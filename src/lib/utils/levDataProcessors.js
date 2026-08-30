@@ -4,22 +4,24 @@ import { getOccurrence } from '$lib/func/getOccurrence.svelte';
 import { montsi } from '$lib/func/montsi.svelte';
 import { kindOfTranslation } from '$lib/func/kindOfTranslate.svelte';
 
+/**
+ * Sizing helper for a lev item's name: returns `[name, fontSize, startOffset]`.
+ *
+ * It used to also hand back the name with every Hebrew/Arabic word reversed and
+ * the word order flipped, on the belief that SVG `<text>` has no bidi engine.
+ * It does - `<text>`, `<tspan>` and `<textPath>` all run the bidi algorithm in
+ * every engine we ship to - so the reversal was double-reversing correct text
+ * and the names read backwards. That was invisible while the faces were the
+ * only consumer (nobody proofreads a curved label), and glaring once the cards
+ * became ordinary HTML that shows the same string as a heading.
+ *
+ * So: no reversal, and `name === nameRaw`. `nameRaw` is kept because callers
+ * still read it, and because it documents which surfaces are HTML.
+ */
 export function letters(data) {
-  let namer = [];
   let st = 175;
   let stylef = '24px';
-  if (/[\u0590-\u05FF]/.test(data) | /[\u0600-\u06FF]/.test(data)) {
-    let sep = '';
-    sep = data.split(' ').filter((w) => w !== '');
-    for (let i = 0; i < sep.length; i++) {
-      if (/[\u0590-\u05FF]/.test(sep[i]) | /[\u0600-\u06FF]/.test(sep[i])) {
-        namer[i] = sep[i].split('').reverse().join('');
-      } else {
-        namer[i] = sep[i];
-      }
-    }
-    const x = namer.reverse().join(' ');
-    data = x;
+  if (/[\u0590-\u05FF]/.test(data) || /[\u0600-\u06FF]/.test(data)) {
     st = 275;
   }
 

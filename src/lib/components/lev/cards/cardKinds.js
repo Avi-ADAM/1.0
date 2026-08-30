@@ -140,11 +140,10 @@ export function kindAccent(ani) {
  * different field names depending on which processor built them, so try them in
  * the order the cards themselves do before falling back to the project.
  *
- * `nameRaw` comes first and matters: four processors build `name` through
- * `letters()`, which reverses every Hebrew/Arabic word and then the word order
- * so the string can be dropped into an SVG `<text>` (the coin view), where no
- * bidi engine runs. Rendered as ordinary HTML — which is what a row is — that
- * pre-reversed string reads backwards. `nameRaw` is the untouched original.
+ * `nameRaw` comes first and stays first: it is the untouched original, so it is
+ * right whatever `letters()` decides to do to `name`. (`letters()` used to
+ * pre-reverse Hebrew/Arabic for SVG `<text>`, which reads backwards as HTML;
+ * it no longer does, because SVG text runs bidi like everything else.)
  */
 export function rowTitle(item) {
   return (

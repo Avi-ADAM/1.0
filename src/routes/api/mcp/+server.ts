@@ -1,5 +1,4 @@
 import { MCPServer } from '@mastra/mcp';
-import { mastra } from '../../../mastra'; // Our global instance
 import { verifyApiKey } from '$lib/server/apiKeys';
 import { setMcpContext } from '$lib/server/mcpContext';
 import { toReqRes, toFetchResponse } from 'fetch-to-node';
@@ -46,16 +45,44 @@ const howToConnect = createTool({
     execute: async () => {
         return {
             steps: [
-                "1. Visit https://1lev1.com and register a new account.",
-                "2. Login to your account.",
-                "3. Go to your Profile -> API Keys to generate a new key.",
-                "4. Alternatively, run 'npx 1lev1-mcp' in your terminal to quickly authenticate and get your key.",
-                "5. Add the key to your MCP client headers: { 'Authorization': 'Bearer YOUR_KEY' }"
+                "1. Run 'npx 1lev1-mcp' in your terminal. It opens 1lev1.com, you approve the connection, and it writes the key into your agent's config for you.",
+                "2. Restart your agent so it picks up the new configuration.",
+                "3. Manual alternative: register at https://1lev1.com, then Settings -> API keys -> create a key named 'MCP'.",
+                "4. Add it to your MCP client headers: { 'Authorization': 'Bearer YOUR_KEY' }",
+                "5. The endpoint is https://api.1lev1.com/api/mcp"
             ],
             is_unauthenticated: true
         };
     }
 });
+
+// --- Tool exposure, classified by blast radius ---------------------------
+//
+// A key minted by the `npx 1lev1-mcp` flow carries no scopes, so the default
+// set has to be the one that is safe to hand an autonomous agent. The line we
+// draw is the platform's own: anything that only touches the key's owner is on
+// by default; anything that lands work or obligations on ANOTHER member needs
+// an explicit grant, because that is exactly the kind of act 1lev1 requires
+// human consent for.
+//
+//   read         — queries. Always available.
+//   prepare      — returns a prefilled URL, writes nothing. Always available.
+//   selfWrite    — changes only the caller's own records (their timers/hours).
+//   sharedWrite  — creates obligations for other people. Requires 'mcp:write'.
+//
+// Scopes live on the api-key record; `ops` is the list we honour here.
+const MCP_WRITE_SCOPE = 'mcp:write';
+
+/** Reads the `ops` list off a verified key's scopes, if it has any. */
+function keyOps(user: any): string[] {
+    const raw = user?.scopes;
+    if (!raw) return [];
+    if (Array.isArray(raw)) return raw.map(String);
+    if (typeof raw === 'object' && Array.isArray((raw as any).ops)) {
+        return (raw as any).ops.map(String);
+    }
+    return [];
+}
 
 // Process incoming MCP requests, mapping SvelteKit structures to fetch-to-node for Mastra Serverless HTTP
 async function handleMcpRequest(request: Request, url: URL, svelteFetch: typeof fetch): Promise<Response> {
@@ -97,45 +124,65 @@ async function handleMcpRequest(request: Request, url: URL, svelteFetch: typeof 
             fetchInstance: svelteFetch
         });
 
-        // Extract valid agents handling missing description fields properly
-        for (const [key, agent] of Object.entries((mastra as any).agents || {})) {
-            const agt = agent as any;
-            if (!agt.description) agt.description = `Agent for ${key}`;
-            if (agt.config && !agt.config.description) agt.config.description = `Agent for ${key}`;
-            agentsToExpose[key] = agt;
-        }
+        // Agents and workflows are deliberately NOT exposed. MCPServer turns
+        // every registered agent into `ask_<key>` and every workflow into
+        // `run_<key>`, which handed an external client tools like
+        // `ask_enhancedBotAgent` and `run_chatWorkflow` — the site's own in-app
+        // assistant. That puts a second, less-informed agent inside the calling
+        // agent's loop, and it is never what a caller wants: it already IS the
+        // agent. Concrete tools only.
+        agentsToExpose = {};
+        workflowsToExpose = {};
 
-        // Set missing descriptions in workflows too
-        for (const [key, workflow] of Object.entries((mastra as any).workflows || {})) {
-            const wf = workflow as any;
-            if (!wf.description) wf.description = `Workflow for ${key}`;
-            if (wf.config && !wf.config.description) wf.config.description = `Workflow for ${key}`;
-            if (wf.options && !wf.options.description) wf.options.description = `Workflow for ${key}`;
-            workflowsToExpose[key] = wf;
-        }
-
-        toolsToExpose = {
-            timerActionTool,
+        const readTools = {
             listUserMissionsTool,
             getActiveTimersTool,
             getMissionDetailsTool,
             getTimerHistoryTool,
             getMissionStatsTool,
             getSitePagesTool,
-            navigateToPageTool,
+            getPageContextTool,
             findMissionTool,
             findUserProjectsTool,
-            getPageContextTool,
-            createProjectTool,
-            createTaskTool,
             getProjectMembersTool,
-            getMemberMissionsTool,
-            prepareMissionTool,
-            createMissionTool,
+            getMemberMissionsTool
+        };
+
+        const prepareTools = {
+            navigateToPageTool,
+            createProjectTool,     // returns a prefilled URL; the human creates it
+            prepareMissionTool,    // ditto
             planProjectWorkTool,
-            scanProjectDirectionsTool,
+            scanProjectDirectionsTool
+        };
+
+        // Only ever touches the caller's own timers/hours.
+        const selfWriteTools = {
+            timerActionTool
+        };
+
+        // Creates work and obligations for other members; `createTaskTool` also
+        // executes with the admin token rather than the caller's session.
+        const sharedWriteTools = {
+            createTaskTool,
+            createMissionTool
+        };
+
+        const ops = keyOps(user);
+        const mayWriteShared = ops.includes(MCP_WRITE_SCOPE);
+
+        toolsToExpose = {
+            ...readTools,
+            ...prepareTools,
+            ...selfWriteTools,
+            ...(mayWriteShared ? sharedWriteTools : {}),
             howToConnect // Included even in auth mode for convenience
         };
+
+        console.log(
+            `[MCP] user ${user.id}: exposing ${Object.keys(toolsToExpose).length} tools ` +
+            `(shared-write ${mayWriteShared ? 'granted' : 'withheld — needs the ' + MCP_WRITE_SCOPE + ' scope'})`
+        );
     } else {
         // --- UNAUTHENTICATED MODE ---
         toolsToExpose = {

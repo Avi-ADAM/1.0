@@ -489,8 +489,8 @@ export function processFiapp(
     const myid = approval.myid;
 
     // Logic from ishursium
-    // `letters()` returns the name pre-reversed for SVG <text>, which has no
-    // bidi engine. Keep the original for anything rendered as real HTML.
+    // `letters()` only sizes the name now; it used to also reverse it for
+    // SVG <text>, which turned out to run bidi like every other surface.
     const rawName = approval.missname || '';
     const rt = letters(rawName);
 
@@ -579,8 +579,8 @@ export function processFiapp(
 
       // Mapped fields
       name: rt[0],
-      // Un-reversed name for HTML surfaces (the list rows); `name` stays
-      // pre-reversed because the coin view feeds it to SVG <text>.
+      // The untouched original. `name` is the same string now that
+      // `letters()` no longer reverses, but HTML surfaces still read this.
       nameRaw: rawName,
       stylef: rt[1],
       st: rt[2],
@@ -894,8 +894,8 @@ export function processAsked(
     return {
       // Common display fields
       name: rt[0],
-      // Un-reversed name for HTML surfaces (the list rows); `name` stays
-      // pre-reversed because the coin view feeds it to SVG <text>.
+      // The untouched original. `name` is the same string now that
+      // `letters()` no longer reverses, but HTML surfaces still read this.
       nameRaw: rawName,
       stylef: rt[1],
       st: rt[2],
@@ -1059,8 +1059,8 @@ export function processAskedResources(
 
       // Helper fields
       name: rt[0],
-      // Un-reversed name for HTML surfaces (the list rows); `name` stays
-      // pre-reversed because the coin view feeds it to SVG <text>.
+      // The untouched original. `name` is the same string now that
+      // `letters()` no longer reverses, but HTML surfaces still read this.
       nameRaw: rawName,
       stylef: rt[1],
       st: rt[2],
@@ -1714,8 +1714,8 @@ export function processWegets(
       spnot: weget.spnot,
       kindOf: weget.kindOf,
       name: rt[0],
-      // Un-reversed name for HTML surfaces (the list rows); `name` stays
-      // pre-reversed because the coin view feeds it to SVG <text>.
+      // The untouched original. `name` is the same string now that
+      // `letters()` no longer reverses, but HTML surfaces still read this.
       nameRaw: rawName,
       stylef: rt[1],
       st: rt[2],

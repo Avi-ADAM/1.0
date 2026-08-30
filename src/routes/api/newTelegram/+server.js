@@ -834,7 +834,7 @@ bot.action(/^stopTimer-(\d+)-(\d+)$/, async (ctx) => {
             ctx.reply(
                 getText('timerStopped', lang),
                 Markup.inlineKeyboard([
-                    [Markup.button.url(getText('editTimerBtn', lang), 'https://1lev1.com/timers')],
+                    [Markup.button.url(getText('editTimerBtn', lang), `https://1lev1.com/timers?editTime=${missionId}`)],
                     [Markup.button.callback(getText('editIntervalsBtn', lang), `editTimerIntervals-${missionId}-${userId}-${activeTimerData.id}`)],
                     [Markup.button.callback(getText('updateTasksBtn', lang), `updateTasks-${missionId}-${userId}-${activeTimerData.id}`)],
                     [Markup.button.callback(getText('saveTimerBtn', lang), `saveTimer-${missionId}-${userId}-${activeTimerData.id}`)]
@@ -1949,7 +1949,7 @@ bot.on('text', async (ctx) => {
 
                         if (timerAttributes && !timerAttributes.isActive) {
                             ctx.reply(getText('timerStopped', lang), Markup.inlineKeyboard([
-                                [Markup.button.url(getText('editTimerBtn', lang), 'https://1lev1.com/timers')],
+                                [Markup.button.url(getText('editTimerBtn', lang), `https://1lev1.com/timers?editTime=${missionId}`)],
                                 [Markup.button.callback(getText('editIntervalsBtn', lang), `editTimerIntervals-${missionId}-${userInfo.uid}-${activeTimerData.id}`)],
                                 [Markup.button.callback(getText('updateTasksBtn', lang), `updateTasks-${missionId}-${userInfo.uid}-${activeTimerData.id}`)],
                                 [Markup.button.callback(getText('saveTimerBtn', lang), `saveTimer-${missionId}-${userInfo.uid}-${activeTimerData.id}`)]

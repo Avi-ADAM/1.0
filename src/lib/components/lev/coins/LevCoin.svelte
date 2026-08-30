@@ -19,11 +19,10 @@
    *   site-share, stipends, wish offers — had *no coin at all*, so a member who
    *   preferred coins never saw a consent item that a member on cards did. That
    *   is fixed by construction rather than by writing eight more branches.
-   * - **No SVG `<text>`, so no `letters()`.** The old coins drew Hebrew into a
-   *   raw `<text>` element, which has no bidi engine, so four processors
-   *   pre-reverse the string word by word. Ordinary HTML in a `<div>` reverses
-   *   nothing, so this reads `nameRaw` (through `rowContent`) and the browser
-   *   does the shaping.
+   * - **No SVG `<text>`, so no `letters()`.** This reads `nameRaw` (through
+   *   `rowContent`) and lets the browser shape it. `name` would do as well now
+   *   that `letters()` has stopped pre-reversing Hebrew, but `nameRaw` is the
+   *   field that says out loud "this surface is HTML".
    * - **Every string goes through `$t()`.** The old coin branches were never
    *   migrated and still carry hard-coded Hebrew, so an English or Russian
    *   member got Hebrew coins.

@@ -28,7 +28,7 @@
         {:else}
           <strong>שים לב:</strong> ייווצר מפתח API חדש. תוכל לבטל גישה זו בכל עת
           מ-
-          <a href="/settings/api-keys" class="underline">הגדרות → מפתחות API</a>.
+          <a href="/me/settings/mcp" class="underline">הגדרות → חיבור סוכן AI</a>.
         {/if}
       </div>
 

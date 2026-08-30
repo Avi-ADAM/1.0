@@ -8,6 +8,7 @@
   import { page } from '$app/stores';
   import { chatMessages } from '$lib/stores/chatStore';
   import DemoRequest from '$lib/components/main/DemoRequest.svelte';
+  import ChatComponents from '$lib/chat/ChatComponents.svelte';
   import { ambientAnimates } from '$lib/stores/motion.js';
 
   let { data } = $props();
@@ -69,10 +70,14 @@
     }
   });
 
-  async function handleSend() {
-    if (!userInput.trim()) return;
+  function handleSend() {
+    return sendText(userInput);
+  }
 
-    const currentInput = userInput;
+  async function sendText(text) {
+    if (!text || !text.trim()) return;
+
+    const currentInput = text;
     const messageHistory = [...messages];
     showQuickActions = false;
 
@@ -113,8 +118,17 @@
       const responseData = await response.json();
       const replyText = responseData.content || responseData.reply;
 
-      if (replyText) {
-        chatMessages.addMessage({ text: replyText, user: false });
+      // The reply's cards ride along with it, so they survive a reload and a
+      // hand-off to the full /chat page just like the text does.
+      const components = Array.isArray(responseData.components)
+        ? responseData.components
+        : [];
+      if (replyText || components.length) {
+        chatMessages.addMessage({
+          text: replyText ?? '',
+          user: false,
+          ...(components.length ? { components } : {})
+        });
       }
       if (responseData.navigation?.url) {
         goto(responseData.navigation.url);
@@ -287,6 +301,14 @@
                 {message.text}
               </div>
             </div>
+            <!-- The cards the answer came with. The popup used to drop them,
+                 so the timer agent's "an edit card will appear in this
+                 response" was false on every page but /chat. -->
+            {#if !message.user && message.components?.length}
+              <div class="px-1">
+                <ChatComponents components={message.components} onAction={(text) => sendText(text)} />
+              </div>
+            {/if}
           {/each}
           {#if loading}
             <div class="chat chat-start">

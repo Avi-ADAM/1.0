@@ -279,27 +279,39 @@ export async function updateTimer(timer, whatToUpdate, params = {}, fetch, proje
   if (!timer) return null;
   
   switch (whatToUpdate) {
-    case 'timers': {
-      const { oldLap, newLap, index } = params;
-      const timers = (timer.attributes.timers || []).map((t, i) => {
-        if (i === index) return { start: newLap.start, stop: newLap.stop };
-        return { start: t.start, stop: t.stop };
-      });
-
-      const totalTime = (timer.attributes.totalHours || 0) -
-        ((new Date(oldLap.stop).getTime() - new Date(oldLap.start).getTime()) / 1000 / 60 / 60) +
-        ((new Date(newLap.stop).getTime() - new Date(newLap.start).getTime()) / 1000 / 60 / 60);
+    // Replace the whole interval list in one write — the path every edit,
+    // delete and manual addition in the time editor takes.
+    case 'intervals': {
+      const timers = (params.intervals || []).map(t => ({
+        start: t.start,
+        stop: t.stop ?? null
+      }));
 
       const updateParams = {
         timerId: timer.id.toString(),
         projectId: projectId.toString(),
         userId: userId.toString(),
-        totalHours: totalTime,
+        // Recomputed from the list rather than nudged by a delta. The old delta
+        // arithmetic read `oldLap.stop`/`newLap.stop`, and a running interval
+        // has none — `null` there made the subtraction NaN and wrote NaN over
+        // the member's accumulated hours. calculateTotalHours simply skips a
+        // segment that has no stop.
+        totalHours: calculateTotalHours(timers),
         timers: timers,
         isSer: params.isSer
       };
-      
+
       return unwrapTimerResult(await executeTimerAction('timerLogUpdate', updateParams, fetch));
+    }
+
+    case 'timers': {
+      const { newLap, index } = params;
+      const timers = (timer.attributes.timers || []).map((t, i) => {
+        if (i === index) return { start: newLap.start, stop: newLap.stop ?? null };
+        return { start: t.start, stop: t.stop ?? null };
+      });
+
+      return updateTimer(timer, 'intervals', { ...params, intervals: timers }, fetch, projectId, userId);
     }
 
     case 'tasks': {
@@ -328,24 +340,21 @@ export async function updateTimer(timer, whatToUpdate, params = {}, fetch, proje
  */
 export async function handleClearSingle(index, timer, fetch, isSer = false, projectId = '', userId = '') {
   let timers = [...(timer.attributes.activeTimer.data.attributes.timers || [])];
-  
-  const total = timer.attributes.activeTimer.data.attributes.totalHours || 0;
-  const start = new Date(timers[index].start).getTime();
-  const stop = new Date(timers[index].stop).getTime();
-  const duration = (stop - start) / 1000 / 60 / 60;
-  
-  let newTotal = total - duration;
   timers.splice(index, 1);
-  
+
   const timerData = timer.attributes?.activeTimer?.data || timer;
+  const kept = timers.map(t => ({ start: t.start, stop: t.stop ?? null }));
 
   return unwrapTimerResult(await executeTimerAction('timerLogUpdate', {
     timerId: timerData.id.toString(),
     projectId: projectId.toString(),
     userId: userId.toString(),
     isActive: false,
-    totalHours: newTotal,
-    timers: timers.map(t => ({ start: t.start, stop: t.stop })),
+    // Same reason as `updateTimer('intervals')`: subtracting the deleted
+    // segment's duration turns into NaN the moment that segment is a running
+    // one, and the running segment is exactly the one a member deletes.
+    totalHours: calculateTotalHours(kept),
+    timers: kept,
     isSer: isSer
   }, fetch));
 }

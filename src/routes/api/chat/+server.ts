@@ -203,8 +203,13 @@ export const POST: RequestHandler = async ({ request, fetch, cookies }) => {
     // Detect rich UI components (supplemental)
     const detectedComponents = detectRenderComponents(lastUserMessage.content);
     const missionNameHint: string | null = outputData.intent?.details?.target ?? null;
+    // The agent's own answer counts as a request for the card. It is told to
+    // say "an edit card will appear in this response", and it says so in
+    // wordings the user-text pattern never sees — including as a reply to a
+    // bare "yes". Reading the reply too is what makes the promise true.
+    const timerEditProbe = `${lastUserMessage.content}\n${String(response.content ?? '')}`;
     const timerEditComponents = userId
-      ? await detectTimerEditComponents(lastUserMessage.content, userId.toString(), fetch, missionNameHint)
+      ? await detectTimerEditComponents(timerEditProbe, userId.toString(), fetch, missionNameHint)
       : [];
     const allExtra = [...detectedComponents, ...timerEditComponents];
     if (allExtra.length > 0) {
@@ -258,11 +263,11 @@ async function detectTimerEditComponents(
     const res = await sendToSer({ id: userId }, '8getMissionsOnProgress', 0, 0, false, fetchInstance);
     const missions = (res as any)?.data?.usersPermissionsUser?.data?.attributes?.mesimabetahaliches?.data ?? [];
 
-    // Only include missions that have at least one completed interval
-    let withTimers = missions.filter((m: any) => {
-      const intervals = m.attributes.activeTimer?.data?.attributes?.timers;
-      return Array.isArray(intervals) && intervals.some((iv: any) => iv.start && iv.stop);
-    });
+    // Any mission with a timer qualifies. Requiring a *completed* interval used
+    // to be the rule, and it silently returned nothing for the most common
+    // reason to open the editor at all: the member forgot to start the timer
+    // and wants to add the hour by hand.
+    let withTimers = missions.filter((m: any) => m.attributes.activeTimer?.data?.id);
     if (withTimers.length === 0) return [];
 
     // If we know which mission the user asked about, narrow down to just that one.
@@ -289,16 +294,32 @@ async function detectTimerEditComponents(
       // If bestScore === 0 nothing matched the hint — fall through and show all
     }
 
-    return withTimers.map((mission: any) => ({
-      type: 'timer_edit',
-      props: {
-        missionId: mission.id,
-        missionName: mission.attributes.name,
-        timerId: mission.attributes.activeTimer.data.id,
-        projectId: mission.attributes.project?.data?.id || '',
-        intervals: mission.attributes.activeTimer.data.attributes.timers || []
-      }
-    }));
+    // With no hint the member can be on a dozen missions at once, and a dozen
+    // editors is not an answer. Show the ones with logged time first, newest
+    // work first, and stop at three.
+    const MAX_CARDS = 3;
+    const lastActivity = (m: any) => {
+      const ivs = m.attributes.activeTimer?.data?.attributes?.timers ?? [];
+      return ivs.reduce((newest: number, iv: any) => {
+        const when = new Date(iv.stop || iv.start).getTime();
+        return Number.isNaN(when) ? newest : Math.max(newest, when);
+      }, 0);
+    };
+
+    return withTimers
+      .slice()
+      .sort((a: any, b: any) => lastActivity(b) - lastActivity(a))
+      .slice(0, MAX_CARDS)
+      .map((mission: any) => ({
+        type: 'timer_edit',
+        props: {
+          missionId: mission.id,
+          missionName: mission.attributes.name,
+          timerId: mission.attributes.activeTimer.data.id,
+          projectId: mission.attributes.project?.data?.id || '',
+          intervals: mission.attributes.activeTimer.data.attributes.timers || []
+        }
+      }));
   } catch (err) {
     console.error('detectTimerEditComponents error:', err);
     return [];

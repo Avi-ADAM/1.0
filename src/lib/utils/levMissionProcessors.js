@@ -42,8 +42,8 @@ export function ishursium(dati, fiapp, fia, lang, idL) {
   
   for (let i = 0; i < start.length; i++) {
     for (let j = 0; j < start[i].attributes.finiapruvals.data.length; j++) {
-      // `letters()` returns the name pre-reversed for SVG <text>, which has no
-      // bidi engine. Keep the original for anything rendered as real HTML.
+      // `letters()` only sizes the name now; it used to also reverse it for
+      // SVG <text>, which turned out to run bidi like every other surface.
       const rawName =
         start[i].attributes.finiapruvals.data[j].attributes.missname;
       const rt = letters(rawName);
@@ -90,8 +90,8 @@ export function ishursium(dati, fiapp, fia, lang, idL) {
           start[i].attributes.finiapruvals.data[j].attributes.what?.data?.id,
         users: start[i].attributes.finiapruvals.data[j].attributes.vots,
         name: rt[0],
-        // Un-reversed name for HTML surfaces (the list rows); `name` stays
-        // pre-reversed because the coin view feeds it to SVG <text>.
+        // The untouched original. `name` is the same string now that
+        // `letters()` no longer reverses, but HTML surfaces still read this.
         nameRaw: rawName,
         stylef: rt[1],
         st: rt[2],

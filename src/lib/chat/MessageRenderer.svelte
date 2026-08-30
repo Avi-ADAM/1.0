@@ -1,21 +1,12 @@
 <script lang="ts">
   import type { ChatMessage } from '$lib/types/chat';
-  import VotingCard from './components/VotingCard.svelte';
-  import PartnershipGrid from './components/PartnershipGrid.svelte';
-  import MissionList from './components/MissionList.svelte';
-  import TimerEditCard from './components/TimerEditCard.svelte';
-  import ProductList from './components/ProductList.svelte';
+  import ChatComponents from './ChatComponents.svelte';
 
   let {
     message,
     onAction
   }: { message: ChatMessage; onAction: (text: string) => void } = $props();
-  console.log(message);
   const isUser = $derived(message.role === 'user');
-
-  function handleVote(option: string, proposal: string) {
-    onAction(`הצבעתי "${option}" על: ${proposal}`);
-  }
 </script>
 
 <div class="message-row {isUser ? 'user' : ''}">
@@ -67,19 +58,7 @@
 
     <!-- Rich components -->
     {#if message.components}
-      {#each message.components as comp}
-        {#if comp.type === 'voting'}
-          <VotingCard {...comp.props} onVote={handleVote} />
-        {:else if comp.type === 'summary'}
-          <PartnershipGrid {...comp.props} />
-        {:else if comp.type === 'mission_list'}
-          <MissionList {...comp.props} {onAction} />
-        {:else if comp.type === 'timer_edit'}
-          <TimerEditCard {...comp.props} />
-        {:else if comp.type === 'product_list'}
-          <ProductList {...comp.props} />
-        {/if}
-      {/each}
+      <ChatComponents components={message.components} {onAction} />
     {/if}
 
     <time class="timestamp">{message.time}</time>

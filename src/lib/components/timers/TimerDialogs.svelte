@@ -1,15 +1,13 @@
 ﻿<script lang="ts">
   import { untrack } from 'svelte';
   import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
-  import { fly, slide } from 'svelte/transition';
-  import { quintOut } from 'svelte/easing';
+  import { fly } from 'svelte/transition';
   import { lang } from '$lib/stores/lang';
   import { t, isRtl} from '$lib/translations';
   import { toast } from 'svelte-sonner';
   import { formatTime } from '$lib/func/uti/formatTime';
   import {
     handleClearAll,
-    handleClearSingle,
     updateTimer,
     saveTimer,
     recalculateMissionHours,
@@ -17,6 +15,8 @@
   } from '$lib/func/timers.js';
   import { timers, updateTimers, lockTimerForEdit, unlockTimerForEdit } from '$lib/stores/timers';
   import { page } from '$app/state';
+  // The interval list itself — shared with the global editor and the chat card.
+  import TimeEditor from './TimeEditor.svelte';
 
   /**
    * @typedef {Object} Props
@@ -124,30 +124,6 @@
       toast.error($t('timers.clearError'));
     }
   }
-  async function localHandleClearSingle(i, timer) {
-    const originalTimer = JSON.parse(JSON.stringify(timer));
-    const originalTimers = [
-      ...timer.attributes.activeTimer.data.attributes.timers
-    ];
-
-    timer.attributes.activeTimer.data.attributes.timers =
-      timer.attributes.activeTimer.data.attributes.timers.filter(
-        (_, index) => index !== i
-      );
-
-    try {
-      const x = await handleClearSingle(i, originalTimer, fetch, false, timer.projectId, page.data.uid);
-      if (x) {
-        onUpdateTimer?.({
-          timer: x,
-          running: false
-        });
-      }
-    } catch (error) {
-      console.error('Failed to delete timer:', error);
-      timer.attributes.activeTimer.data.attributes.timers = originalTimers;
-    }
-  }
 
   async function handleUpdateTimer() {
     const selectedTaskIds = selectedTasks.map((taskId) => parseInt(taskId, 10));
@@ -232,119 +208,9 @@
     }
   }
 
-  // Add to your script section:
-  let editingTimer = null;
-
-  function handleStartEdit(index, timerEntry) {
-    lockTimerForEdit(timer.mId);
-    const updatedTimer = structuredClone($state.snapshot(timer));
-    updatedTimer.attributes.activeTimer.data.attributes.timers =
-      updatedTimer.attributes.activeTimer.data.attributes.timers.map((t, i) => {
-        if (i === index) {
-          return {
-            ...t,
-            isEditing: true,
-            editStart: toLocalDatetimeString(t.start),
-            editStop: t.stop ? toLocalDatetimeString(t.stop) : null
-          };
-        }
-        return t;
-      });
-    timer = updatedTimer;
-  }
-
-  async function handleSaveEdit(index, timerEntry) {
-    const originalTimer = JSON.parse(JSON.stringify(timer));
-
-    try {
-      // Get the old lap (before edit)
-      const oldLap = {
-        start: timer.attributes.activeTimer.data.attributes.timers[index].start,
-        stop: timer.attributes.activeTimer.data.attributes.timers[index].stop
-      };
-
-      // Update the timer entry with new values
-      const newLap = {
-        start: new Date(timerEntry.editStart).toISOString(),
-        stop: timerEntry.editStop
-          ? new Date(timerEntry.editStop).toISOString()
-          : null
-      };
-
-      if (newLap.stop && new Date(newLap.stop) <= new Date(newLap.start)) {
-        toast.error($lang === 'he' ? 'שעת הסוף חייבת להיות אחרי שעת ההתחלה' : 'End time must be after start time');
-        return;
-      }
-
-      timer.attributes.activeTimer.data.attributes.timers[index] = {
-        ...timerEntry,
-        ...newLap,
-        isEditing: false
-      };
-
-      // API call to update the timer with project and user context
-      await updateTimer(
-        timer.attributes.activeTimer.data, // Timer object
-        'timers', // Specify what to update
-        { oldLap, newLap, index }, // Pass oldLap, newLap, and index
-        fetch, // Fetch function
-        timer.projectId,
-        page.data.uid
-      );
-
-      // Update the store with the modified timer
-      updateTimers($timers.map((t) => (t.mId === timer.mId ? timer : t)));
-      unlockTimerForEdit(timer.mId, { refresh: true });
-    } catch (error) {
-      console.error('Failed to update timer:', error);
-      // Rollback changes
-      timer = originalTimer;
-      unlockTimerForEdit(timer.mId, { refresh: true });
-    }
-  }
-
-  function handleCancelEdit(index) {
-    const updatedTimer = structuredClone($state.snapshot(timer));
-    updatedTimer.attributes.activeTimer.data.attributes.timers[index].isEditing = false;
-    timer = updatedTimer;
-    
-    // Check if any other timer entries are still editing
-    const anyStillEditing = timer.attributes.activeTimer.data.attributes.timers.some(
-      (t, i) => i !== index && t.isEditing
-    );
-    if (!anyStillEditing) {
-      unlockTimerForEdit(timer.mId, { refresh: true });
-    }
-  }
-
-  async function handleAddInterval() {
-    const now = new Date();
-    const newInterval = {
-      start: now.toISOString(),
-      stop: now.toISOString(),
-      isEditing: true,
-      editStart: toLocalDatetimeString(now.toISOString()),
-      editStop: toLocalDatetimeString(now.toISOString())
-    };
-
-    const updatedTimer = structuredClone($state.snapshot(timer));
-    updatedTimer.attributes.activeTimer.data.attributes.timers.push(newInterval);
-    timer = updatedTimer;
-
-    // Update the store
-    updateTimers($timers.map((t) => (t.mId === timer.mId ? timer : t)));
-  }
-  function toLocalDatetimeString(date) {
-    const local = new Date(date);
-    local.setMinutes(local.getMinutes() - local.getTimezoneOffset());
-    return local.toISOString().slice(0, 16);
-  }
-
   async function handleRecalculate() {
     if (!timer?.mId) {
-      toast.error(
-        $lang === 'he' ? 'שגיאה: חסר מזהה משימה' : 'Error: Missing Mission ID'
-      );
+      toast.error($t('timers.missingMissionId'));
       return;
     }
 
@@ -367,7 +233,7 @@
         { duration: 5000 }
       );
     } else {
-      toast.error($lang === 'he' ? 'חישוב נכשל' : 'Recalculation failed');
+      toast.error($t('timers.recalcFailed'));
     }
   }
   // Computed properties
@@ -432,147 +298,33 @@
         </svg>
       </button>
       <div class="dialog-content mt-4" dir={$isRtl ? 'rtl' : 'ltr'}>
-        <h2 class="dialog-title">{$t('timers.manageTime')}</h2>
+        {#if timer?.attributes?.activeTimer?.data}
+          <!-- One editor, shared with the global dialog and the chat card.
+               The interval list used to be re-implemented here, and its copy
+               in the chat disagreed with it about what a valid interval is. -->
+          <TimeEditor
+            missionId={timer.mId}
+            missionName={timer.missionName ?? timer?.attributes?.name ?? ''}
+            timerId={timer.attributes.activeTimer.data.id}
+            projectId={timer.projectId}
+            intervals={timer.attributes.activeTimer.data.attributes.timers ?? []}
+          />
 
-        {#if timer?.attributes?.activeTimer?.data?.attributes?.timers?.length}
-          <div class="timer-list d">
-            {#each timer.attributes.activeTimer.data.attributes.timers as timerEntry, i (timerEntry.start)}
-              <div
-                class="timer-entry"
-                transition:slide={{
-                  delay: 150,
-                  duration: 1000,
-                  easing: quintOut
-                }}
-              >
-                <div class="timer-info">
-                  {#if timerEntry.isEditing}
-                    <div class="edit-fields">
-                      <input
-                        type="datetime-local"
-                        bind:value={timerEntry.editStart}
-                        class="datetime-input"
-                      />
-                      <!--TODO: add js code to prevent selecting before start -->
-                      <input
-                        type="datetime-local"
-                        bind:value={timerEntry.editStop}
-                        class="datetime-input"
-                        min={timerEntry.editStart}
-                        disabled={!timerEntry.stop}
-                      />
-                      <div class="edit-actions">
-                        <button
-                          class="save-edit-btn"
-                          onclick={() => handleSaveEdit(i, timerEntry)}
-                        >
-                          <svg viewBox="0 0 24 24" width="20" height="20">
-                            <path
-                              fill="currentColor"
-                              d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"
-                            />
-                          </svg>
-                        </button>
-                        <button
-                          class="cancel-edit-btn"
-                          onclick={() => handleCancelEdit(i)}
-                        >
-                          <svg viewBox="0 0 24 24" width="20" height="20">
-                            <path
-                              fill="currentColor"
-                              d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
-                            />
-                          </svg>
-                        </button>
-                      </div>
-                    </div>
-                  {:else}
-                    <span class="timer-time">
-                      {new Date(timerEntry.start).toLocaleString($lang)} -
-                      {timerEntry.stop
-                        ? new Date(timerEntry.stop).toLocaleString()
-                        : 'Running'}
-                    </span>
-                    <span class="timer-duration">
-                      {formatTime(
-                        timerEntry.stop
-                          ? new Date(timerEntry.stop).getTime() -
-                              new Date(timerEntry.start).getTime()
-                          : Date.now() - new Date(timerEntry.start).getTime(),
-                        { lang: $lang as 'he' | 'en' }
-                      )}
-                    </span>
-                  {/if}
-                </div>
-                <div class="timer-actions">
-                  {#if !timerEntry.isEditing}
-                    <button
-                      class="edit-btn"
-                      onclick={() => handleStartEdit(i, timerEntry)}
-                    >
-                      <svg viewBox="0 0 24 24" width="20" height="20">
-                        <path
-                          fill="currentColor"
-                          d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"
-                        />
-                      </svg>
-                    </button>
-                    <button
-                      class="clear-single-btn"
-                      onclick={() => localHandleClearSingle(i, timer)}
-                    >
-                      <svg viewBox="0 0 24 24" width="20" height="20">
-                        <path
-                          fill="currentColor"
-                          d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z"
-                        />
-                      </svg>
-                    </button>
-                  {/if}
-                </div>
-              </div>
-            {/each}
-
-            {#if timer?.attributes?.activeTimer?.data?.attributes?.timers}
-              <button class="add-interval-btn" onclick={handleAddInterval}>
-                <svg viewBox="0 0 24 24" width="24" height="24">
-                  <path
-                    fill="currentColor"
-                    d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"
-                  />
-                </svg>
-                {$lang === 'he' ? 'הוספת מרווח זמן' : 'Add Time Interval'}
-              </button>
-            {/if}
-          </div>
-
-          <div
-            class="additional-actions"
-            style="margin-top: 1rem; display: flex; gap: 0.5rem; justify-content: center;"
-          >
-            <button
-              class="save-btn"
-              style="background: linear-gradient(to right, #4ade80, #3b82f6); color: black;"
-              onclick={handleSaveTimer}
-            >
+          <div class="manage-actions">
+            <button class="save-btn" onclick={handleSaveTimer}>
               {$t('timers.saveTimerBtn')}
             </button>
+            <button class="recalc-btn" onclick={handleRecalculate}>
+              {$t('timers.recalculate')}
+            </button>
             <button
-              class="recalc-btn"
-              style="padding: 0.5rem 1rem; border-radius: 6px; font-weight: bold; background: linear-gradient(to right, #f59e0b, #ef4444); color: white; border: none; cursor: pointer;"
-              onclick={handleRecalculate}
+              class="clear-all-btn"
+              onclick={() => localClearAllTimers()}
+              aria-label={$t('timers.clearAll')}
             >
-              {$lang === 'he' ? 'חישוב מחדש' : 'Recalculate'}
+              {$t('timers.clearAll')}
             </button>
           </div>
-
-          <button
-            class="clear-all-btn"
-            onclick={() => localClearAllTimers()}
-            aria-label="Clear all timers"
-          >
-            {$t('timers.clearAll')}
-          </button>
         {:else}
           <p class="no-timers">{$t('timers.noTimes')}</p>
         {/if}
@@ -621,13 +373,13 @@
           <button class="save-btn" onclick={handleSaveTimer}>
             {$t('timers.saveTimerBtn')}
           </button>
-          {#if dialogEdit == true}
-            <button class="save-btn tasks-btn" onclick={handleSaveTimer}>
-              {$t('timers.updateTasks')}
-            </button>
-          {/if}
+          <!-- Correcting the logged times is its own labelled action now. It
+               used to share a button with "clear timer" — the same control
+               said "edit times" or "clear the timer" depending on how the
+               dialog had been opened, which is why members could not find the
+               editor and feared the button that led to it. -->
           <button class="clear-btn" onclick={handleClearTimer}>
-            {dialogEdit == true ? $t('timers.editTimes') : $t('timers.clearTimer')}
+            {$t('timers.editTimes')}
           </button>
         </div>
       </div>
@@ -665,9 +417,7 @@
             <input
               type="text"
               bind:value={taskSearchTerm}
-              placeholder={$lang === 'he'
-                ? 'חיפוש משימות...'
-                : 'Search tasks...'}
+              placeholder={$t('timers.searchTasks')}
               class="task-search"
             />
 
@@ -762,90 +512,6 @@
     z-index: 701;
   }
 
-  .edit-fields {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  .datetime-input {
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 4px;
-    color: #fff;
-    padding: 0.25rem;
-    font-size: 0.9rem;
-  }
-
-  .edit-actions {
-    display: flex;
-    gap: 0.5rem;
-  }
-
-  .save-edit-btn,
-  .cancel-edit-btn {
-    background: transparent;
-    border: none;
-    color: inherit;
-    padding: 0.25rem;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-
-  .save-edit-btn {
-    color: #00ff88;
-  }
-
-  .cancel-edit-btn {
-    color: #ff3366;
-  }
-
-  .save-edit-btn:hover,
-  .cancel-edit-btn:hover {
-    background: rgba(255, 255, 255, 0.1);
-  }
-
-  .timer-actions {
-    display: flex;
-    gap: 0.5rem;
-  }
-
-  .edit-btn {
-    background: transparent;
-    border: none;
-    color: #00ffff;
-    padding: 0.5rem;
-    border-radius: 50%;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-
-  .edit-btn:hover {
-    background: rgba(0, 255, 255, 0.1);
-    transform: scale(1.1);
-  }
-
-  .add-interval-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    width: 100%;
-    padding: 0.75rem;
-    background: linear-gradient(45deg, #00ff88, #00bbff);
-    border: none;
-    border-radius: 6px;
-    color: #000;
-    font-weight: bold;
-    cursor: pointer;
-    transition: transform 0.2s;
-    margin-top: 1rem;
-  }
-
-  .add-interval-btn:hover {
-    transform: translateY(-2px);
-  }
   .close-button {
     position: absolute;
     top: 1rem;
@@ -907,13 +573,10 @@
     transition: transform 0.2s;
   }
 
-  /* Three buttons do not fit a phone. "Update tasks" opens the same dialog as
-     "save timer", so dropping it there costs the member nothing. */
+  /* The menu is two buttons now — save, and edit the times — so both fit a
+     phone. "Update tasks" was a third button that opened the very same dialog
+     as "save timer"; it lives inside that dialog instead. */
   @media (max-width: 480px) {
-    .tasks-btn {
-      display: none;
-    }
-
     .save-btn,
     .clear-btn {
       padding: 0.75rem 1rem;
@@ -973,60 +636,33 @@
     transform: translateY(-2px);
   }
 
-  .timer-list {
+  /* The three whole-timer actions that sit under the interval list: send the
+     hours for approval, recompute the mission's total, wipe the timer. */
+  .manage-actions {
     display: flex;
-    flex-direction: column;
-    gap: 1rem;
-  }
-
-  .timer-entry {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
-  }
-
-  .timer-info {
-    display: flex;
-    flex-direction: column;
+    flex-wrap: wrap;
     gap: 0.5rem;
+    justify-content: center;
+    margin-top: 1rem;
   }
 
-  .timer-time {
-    font-size: 0.9rem;
-    color: #ccc;
-  }
-
-  .timer-duration {
+  .recalc-btn {
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
     font-weight: bold;
-    color: #00ffff;
-  }
-
-  .timer-actions {
-    display: flex;
-    gap: 0.5rem;
-  }
-
-  .clear-single-btn {
-    background: transparent;
+    background: linear-gradient(to right, #f59e0b, #ef4444);
+    color: #fff;
     border: none;
-    color: #ff3366;
-    padding: 0.5rem;
-    border-radius: 50%;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: transform 0.2s;
   }
 
-  .clear-single-btn:hover {
-    background: rgba(255, 51, 102, 0.1);
-    transform: scale(1.1);
+  .recalc-btn:hover {
+    transform: translateY(-2px);
   }
 
   .clear-all-btn {
-    width: 100%;
-    padding: 0.75rem;
+    padding: 0.5rem 1rem;
     background: linear-gradient(45deg, #ff3366, #ff0066);
     border: none;
     border-radius: 6px;
@@ -1034,7 +670,6 @@
     font-weight: bold;
     cursor: pointer;
     transition: transform 0.2s;
-    margin-top: 1rem;
   }
 
   .clear-all-btn:hover {

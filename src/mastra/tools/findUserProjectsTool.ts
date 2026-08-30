@@ -29,7 +29,11 @@ export const findUserProjectsTool = createTool({
   id: 'findUserProjects',
   description: 'Find all projects associated with the current user. Use this when user mentions a project by name or wants to navigate to a specific project.',
   inputSchema: z.object({
-    userId: z.string().describe('userId to get its project list'),
+    // Optional on purpose: an external MCP client has no way to know its own
+    // Strapi user id, and this is the first call of almost every flow
+    // ("which rikmot do I have?"). When omitted we use the identity the API
+    // key was verified as — which is also the only identity it may ever read.
+    userId: z.string().optional().describe('User id to list projects for. Omit to use the authenticated caller.'),
     query: z.string().optional().describe('Optional search query to filter projects by name'),
   }),
   outputSchema: z.object({
@@ -47,10 +51,27 @@ export const findUserProjectsTool = createTool({
       const globalContext = getMcpContext() || ({} as any);
       const fetchInstance = globalContext.fetchInstance;
       const isServerRequest = !globalContext.isInternalBot;
-      
-      console.log('🔍 findUserProjectsTool - userId:', userId, 'query:', query);
-      
-      if (!userId || !fetchInstance) {
+      const ctxUserId = globalContext.userId;
+
+      // External (API-key) requests run against the service token, so an
+      // arbitrary `userId` here would happily list somebody else's rikmot.
+      // Such a caller is only ever allowed to read the identity its key was
+      // verified as; the internal bot, already JWT-authenticated, may pass one.
+      if (!globalContext.isInternalBot && userId && String(userId) !== String(ctxUserId)) {
+        return {
+          projects: [],
+          success: false,
+          message: 'You can only list the projects of the authenticated user.'
+        };
+      }
+
+      // Omitting userId is the normal case for an external client: it has no
+      // way to know its own Strapi id.
+      const effectiveUserId = globalContext.isInternalBot ? (userId ?? ctxUserId) : ctxUserId;
+
+      console.log('🔍 findUserProjectsTool - userId:', effectiveUserId, 'query:', query);
+
+      if (!effectiveUserId || !fetchInstance) {
         return {
           projects: [],
           success: false,
@@ -58,8 +79,8 @@ export const findUserProjectsTool = createTool({
         };
       }
 
-      const projects = await findUserProjects(parseInt(userId), fetchInstance, isServerRequest);
-      console.log(`📋 Found ${projects.length} projects for user ${userId}`);
+      const projects = await findUserProjects(parseInt(String(effectiveUserId)), fetchInstance, isServerRequest);
+      console.log(`📋 Found ${projects.length} projects for user ${effectiveUserId}`);
       
       // Filter projects if query provided
       let filteredProjects = projects;

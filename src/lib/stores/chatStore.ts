@@ -1,9 +1,17 @@
 import { writable } from 'svelte/store';
 import { browser } from '$app/environment';
+import type { ChatComponent } from '$lib/types/chat';
 
 export interface BotMessage {
   text: string;
   user: boolean;
+  /**
+   * Rich cards the answer came with (a timer edit card, a mission list, …).
+   * They live on the message rather than beside it so both chat surfaces — the
+   * popup and /chat — show the same answer, and so a card the assistant said
+   * would appear is still there after a reload.
+   */
+  components?: ChatComponent[];
 }
 
 const STORAGE_KEY = 'bot_message_history';

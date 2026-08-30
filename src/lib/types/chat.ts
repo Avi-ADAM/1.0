@@ -23,9 +23,24 @@ export interface MissionInfo {
   action: 'start_timer' | 'stop_timer';
 }
 
+export interface TimerEditProps {
+  missionId: string;
+  missionName: string;
+  timerId: string;
+  projectId: string;
+  intervals: { start: string; stop?: string | null }[];
+}
+
 export interface ChatComponent {
-  type: 'voting' | 'summary' | 'proposal' | 'mission_list';
-  props: VotingProps | { partnerships: PartnershipData[] } | { missions: MissionInfo[] } | Record<string, unknown>;
+  // `timer_edit` and `product_list` were rendered by MessageRenderer but were
+  // missing from this union, so the type said the timer card could not exist.
+  type: 'voting' | 'summary' | 'proposal' | 'mission_list' | 'timer_edit' | 'product_list';
+  props:
+    | VotingProps
+    | { partnerships: PartnershipData[] }
+    | { missions: MissionInfo[] }
+    | TimerEditProps
+    | Record<string, unknown>;
 }
 
 export interface ChatMessage {
