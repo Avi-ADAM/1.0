@@ -24,6 +24,7 @@ import { execFromContext } from '$lib/server/archive/exec.js';
 import { dateField, enumField, fields, gqlStr, numField, run, strField } from '$lib/server/archive/gql.js';
 import { fetchProgram, fetchProjectContext } from '$lib/server/stipend/read.js';
 import { matchOpenMashaabimToUsers } from '$lib/server/matching/engine.js';
+import { resolveFundingRequestTerms } from '$lib/stipend/fundingRequestTerms.js';
 
 const KIND_OFS = ['total', 'perUnit', 'rent', 'monthly', 'yearly'] as const;
 
@@ -52,14 +53,22 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
     );
   }
 
-  const months = params.months != null ? Math.max(1, Math.round(Number(params.months))) : 12;
-  const budget = Number(program.totalCap ?? 0);
-  const monthly =
-    params.monthlyAmount != null
-      ? Number(params.monthlyAmount)
-      : budget > 0
-        ? Math.round((budget / months) * 100) / 100
-        : Number(program.monthlyCap ?? 0);
+  // An open-mashaabim states its money per *cycle* and its length in *dates*.
+  // Writing the month count into `hm` (a unit count) and the whole budget into
+  // `easy` (a per-cycle rate) multiplied the duration in twice over, which is
+  // how a ₪2,400-a-month program came out as ₪3,110,400 a month on
+  // /availiableResorce. The single source of those fields is now the pure,
+  // tested $lib/stipend/fundingRequestTerms.
+  const terms = resolveFundingRequestTerms({
+    totalCap: program.totalCap,
+    monthlyCap: program.monthlyCap,
+    months: params.months,
+    monthlyAmount: params.monthlyAmount,
+    startDate: params.startDate,
+    endDate: params.endDate
+  });
+  const { months, monthly, total } = terms;
+  const nis = (n: number) => `₪${n.toLocaleString('en-US')}`;
 
   const name = params.name
     ? String(params.name)
@@ -68,7 +77,8 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
     ? String(params.descrip)
     : [
         `הריקמה מחפשת שותף שיממן מלגות קיום לחברים שעובדים בה.`,
-        `תעריף המלגה: ₪${program.stipendRate} לשעה שאושרה. תקציב התוכנית: ₪${budget}.`,
+        `תעריף המלגה: ${nis(Number(program.stipendRate) || 0)} לשעה שאושרה.`,
+        `הבקשה: ${nis(monthly)} לחודש למשך ${months} חודשים — סה"כ ${nis(total)}.`,
         program.mode === 'equity'
           ? `הכסף נספר כתרומה לריקמה ומזכה בחלק בה (מקדם ${program.equityMultiplier}).`
           : `הכסף נרשם כתרומה — בלי חלק בריקמה.`,
@@ -85,17 +95,20 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
       strField('project', program.projectId),
       strField('stipend_program', programId),
       enumField('kindOf', String(params.kindOf ?? 'monthly'), KIND_OFS),
-      numField('hm', months),
+      // Units per cycle — one funding stream. The month count lives in the dates.
+      numField('hm', terms.hm),
       numField('price', monthly),
-      numField('easy', budget > 0 ? budget : monthly * months),
+      numField('easy', monthly),
       numField('howMeny', 1),
       'source: stipend',
       'recurring: true',
       'lifecycle: active',
       numField('cycleSize', 1),
       params.mashaabimId ? strField('mashaabim', String(params.mashaabimId)) : null,
-      dateField('sqadualed', params.startDate ?? nowISO),
-      dateField('sqadualedf', params.endDate ?? null),
+      // The window is what montsi() counts cycles from, so it always closes:
+      // an unbounded request prices a bounded budget as a perpetual monthly one.
+      dateField('sqadualed', terms.startISO),
+      dateField('sqadualedf', terms.endISO),
       dateField('publishedAt', nowISO)
     )} }) { data { id } } }`,
     'publishStipendFundingRequest'
@@ -129,7 +142,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
   }
 
   return {
-    data: { openMashaabimId, programId, monthly, months, suggested },
+    data: { openMashaabimId, programId, monthly, months, total, suggested },
     updateStrategy: { type: 'fullRefresh' as const }
   };
 };
@@ -142,15 +155,15 @@ export const publishStipendFundingRequestConfig: ActionConfig = {
 
   paramSchema: {
     programId: { type: 'string', required: true, description: 'The approved stipend program to fund' },
-    months: { type: 'number', required: false, description: 'How many months of funding are being asked for (default 12)' },
-    monthlyAmount: { type: 'number', required: false, description: '₪ per month (defaults to budget ÷ months)' },
+    months: { type: 'number', required: false, description: "How many months of funding are being asked for. Defaults to the program's budget ÷ monthly ceiling, then 12. An explicit endDate overrides it." },
+    monthlyAmount: { type: 'number', required: false, description: "₪ per month — one cycle. Defaults to the program's monthlyCap, then budget ÷ months." },
     mashaabimId: { type: 'string', required: false, description: 'Resource template to file it under — enables match suggestions' },
     name: { type: 'string', required: false, description: 'Title of the request' },
     descrip: { type: 'string', required: false, description: 'Body of the request' },
     spnot: { type: 'string', required: false, description: 'Extra notes' },
     kindOf: { type: 'string', required: false, description: 'monthly (default) | total | yearly | perUnit | rent' },
     startDate: { type: 'string', required: false, description: 'ISO start date' },
-    endDate: { type: 'string', required: false, description: 'ISO end date' }
+    endDate: { type: 'string', required: false, description: 'ISO end date. Defines the run length; derived from months when omitted — it is never left open.' }
   },
 
   authRules: [{ type: 'jwt', errorMessage: 'Must be logged in to publish a funding request' }],

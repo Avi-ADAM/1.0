@@ -300,17 +300,18 @@
     let perCycleValue = $derived(
         Number(data.alld?.easy) > 0 ? Number(data.alld.easy) : Number(data.alld?.price) || 0
     );
-    let equityValue = $derived(
-        perCycleValue *
-            Math.max(1, Number(data.alld?.hm) || 1) *
-            (isOpenEnded
-                ? 1
-                : Number(montsi(data.alld?.kindOf, data.alld?.sqadualed, data.alld?.sqadualedf, true)) || 1)
+    // hm הוא מונה *יחידות למחזור* — לא משך. המשך מגיע תמיד מהתאריכים דרך montsi,
+    // ולכן שורת הכסף למטה משתמשת באותו `units` ולא ב-hm הגולמי: רשומה ישנה עם
+    // hm ריק הציגה "סה"כ 0", ורשומה שכתבה לתוכו חודשים הכפילה את המשך פעמיים.
+    let units = $derived(Math.max(1, Number(data.alld?.hm) || 1));
+    let cycles = $derived(
+        Number(montsi(data.alld?.kindOf, data.alld?.sqadualed, data.alld?.sqadualedf, true)) || 1
     );
+    let equityValue = $derived(perCycleValue * units * (isOpenEnded ? 1 : cycles));
     // ₪ לחודש — רק למשאב מתחדש בלי תאריך סיום, שממשיך לחייב ללא הגבלה.
     let equityMonthlyValue = $derived(
         isOpenEnded && perCycleValue > 0
-            ? (perCycleValue * Math.max(1, Number(data.alld?.hm) || 1)) /
+            ? (perCycleValue * units) /
                   (Math.max(1, Number(data.alld?.cycleSize) || 1) *
                       (data.alld?.kindOf === 'yearly' ? 12 : 1))
             : null
@@ -448,11 +449,11 @@
                                                 <span class="text-gold"> ₪ {data.alld.kindOf == "yearly" ? $t('pages.availResource.perY') : $t('pages.availResource.perM')}</span>
                                             {/if}
                                         </span>
-                                        {#if data.alld.kindOf != "total" && data.alld.hm > 1}
-                                            <span> ✖️ {data.alld.hm} {$t('pages.availResource.units')}</span>
+                                        {#if data.alld.kindOf != "total" && units > 1}
+                                            <span> ✖️ {units} {$t('pages.availResource.units')}</span>
                                         {/if}
                                         {#if (data.alld.kindOf == "monthly" || data.alld.kindOf == "years" || data.alld.kindOf == "yearly" || data.alld.kindOf == "rent") && !(data.alld.recurring && !data.alld.sqadualedf)}
-                                            <span> ✖️ {montsi(data.alld.kindOf,data.alld.sqadualed,data.alld.sqadualedf,true)}
+                                            <span> ✖️ {cycles}
                                                 {#if data.alld.kindOf == "monthly" || data.alld.kindOf == "rent"}
                                                     <span>{$t('pages.availResource.monts')}</span>
                                                 {:else if data.alld.kindOf == "years" || data.alld.kindOf == "yearly"}
@@ -461,9 +462,9 @@
                                             </span>
                                         {/if}
                                         {#if data.alld.kindOf != "total" && !(data.alld.recurring && !data.alld.sqadualedf)}
-                                            <span>  =  {data.alld.price * data.alld.hm * montsi(data.alld.kindOf, data.alld.sqadualed, data.alld.sqadualedf,true)}
+                                            <span>  =  {((Number(data.alld.price) || 0) * units * cycles).toLocaleString('en-US')}
                                                 {#if data.alld.price != data.alld.easy}
-                                                    <span> ↔️ {data.alld.easy * data.alld.hm * montsi(data.alld.kindOf, data.alld.sqadualed, data.alld.sqadualedf,true)}</span>
+                                                    <span> ↔️ {((Number(data.alld.easy) || 0) * units * cycles).toLocaleString('en-US')}</span>
                                                 {/if}
                                                 {$t('pages.availResource.total')}
                                             </span>
