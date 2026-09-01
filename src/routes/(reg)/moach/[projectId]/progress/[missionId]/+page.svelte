@@ -20,6 +20,7 @@
   import { segmentsFromTimers } from '$lib/recurring/missionMonths.js';
   import RichText from '$lib/celim/ui/richText.svelte';
   import MonthlyHours from '$lib/components/mission/MonthlyHours.svelte';
+  import TimerSessions from '$lib/components/mission/TimerSessions.svelte';
   import MissionControls from '$lib/components/mission/MissionControls.svelte';
   import EquityPreview from '$lib/components/equity/EquityPreview.svelte';
   import MissionStipendOffer from '$lib/components/stipend/MissionStipendOffer.svelte';
@@ -73,32 +74,34 @@
     return (Number(value) || 0).toLocaleString('en-US', { maximumFractionDigits: 2 });
   }
 
-  // The monthly ledger needs the mission's timer segments; the rikma-wide qid
-  // is the one that carries them, so take it and keep only this mission's.
-  /** @type {{start?: string|null, stop?: string|null}[]} */
-  let segments = $state([]);
+  // The mission's Timer entities come down with the page. They feed both the
+  // monthly ledger (through their segments) and the session log below it, so
+  // the two can never disagree about what was clocked.
+  //
+  // `refreshed` is what a save re-read, tagged with the mission it belongs to
+  // so navigating to another mission falls straight back to that page's own
+  // server data instead of showing the previous mission's timers for a frame.
+  let refreshed = $state(/** @type {{ mid: string, timers: any[] } | null} */ (null));
+  let timersError = $state('');
+  let timerEntities = $derived(
+    refreshed && refreshed.mid === String(missionId) ? refreshed.timers : (data.timers ?? [])
+  );
+  let segments = $derived(segmentsFromTimers(timerEntities));
 
-  async function loadSegments() {
-    if (!projectId) return;
+  /** Re-read the timers after the member saved or edited logged time. */
+  async function loadSessions() {
+    if (!missionId) return;
     try {
-      const res = await sendToSer(
-        { pid: projectId },
-        'projectMissionTimerSegments',
-        null,
-        null,
-        false,
-        fetch
-      );
-      segments = (res?.data?.timers?.data ?? [])
-        .filter((x) => String(x.attributes?.mesimabetahalich?.data?.id) === String(missionId))
-        .flatMap((x) => segmentsFromTimers([x]));
+      const res = await sendToSer({ mid: missionId }, 'missionTimerSessions', null, null, false, fetch);
+      refreshed = { mid: String(missionId), timers: res?.data?.timers?.data ?? [] };
+      timersError = '';
     } catch (e) {
-      console.error('[progress/mission] timer segments failed', e);
+      console.error('[progress/mission] timer sessions failed', e);
+      timersError = $t('timers.sessionsError');
     }
   }
 
   onMount(() => {
-    loadSegments();
     const id = page.data?.uid;
     if (!id) return;
     fetchTimers(id, fetch).catch((e) =>
@@ -288,7 +291,7 @@
         perhour={attrs.perhour}
         onStatus={(value) => (statusOverride = value)}
         onCompleted={() => (submitted = true)}
-        onTimerSaved={loadSegments}
+        onTimerSaved={loadSessions}
       />
     </section>
 
@@ -351,6 +354,14 @@
             counter={attrs.howmanyhoursalready}
             showTitle={false}
           />
+        </section>
+
+        <!-- The ledger above answers "how many hours"; this answers "when".
+             Same timers, one level of detail further down: every start and
+             stop the platform actually recorded. -->
+        <section class="mp-card">
+          <h2 class="mp-card-title">{$t('timers.sessionsTitle')}</h2>
+          <TimerSessions timers={timerEntities} error={timersError} showTitle={false} />
         </section>
 
         <section class="mp-card">

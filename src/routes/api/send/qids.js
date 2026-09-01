@@ -9219,6 +9219,37 @@ export const moachQids = {
       }
     }
   }`,
+  // Every timer of ONE mission, with the segments unrolled — the session log
+  // (`$lib/timers/timerSessions.js`) behind "when was this work actually done?".
+  // `projectMissionTimerSegments` above is the rikma-wide, numbers-only version:
+  // it carries no user, no state and no note, and it skips finished missions,
+  // so a closed mission's history would be unreadable through it.
+  'missionTimerSessions': `query MissionTimerSessions($mid: ID!) {
+    timers(
+      filters: { mesimabetahalich: { id: { eq: $mid } } }
+      pagination: { limit: -1 }
+      sort: ["start:desc"]
+    ) {
+      data {
+        id
+        attributes {
+          start
+          finnish
+          isActive
+          saved
+          appruved
+          forApruve
+          totalHours
+          saveText
+          saveLinks
+          createdAt
+          timers { start stop }
+          users_permissions_user { data { id attributes { username profilePic { data { attributes { url } } } } } }
+          acts { data { id attributes { shem } } }
+        }
+      }
+    }
+  }`,
   'getProjectMissions': `query GetProjectMissions($pid: ID!) {
     project(id: $pid) {
       data {

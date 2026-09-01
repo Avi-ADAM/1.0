@@ -4,12 +4,15 @@
    *  · the monthly hours ledger (MonthlyHours — plan vs. actual per month, with
    *    the current month counting up live from the running timer), and
    *  · the actual timer entities grouped by month, each with its user, date,
-   *    hours, save/approve state and what was worked on.
+   *    hours, save/approve state and what was worked on, and
+   *  · the session log — every start/stop the timers actually recorded, which
+   *    is the only level at which "when was this done?" has an answer.
    */
   import { t } from '$lib/translations';
   import { lang as langStore } from '$lib/stores/lang.js';
   import { groupTimersByMonth, mediaUrl } from '$lib/utils/processLifecycle';
   import MonthlyHours from '$lib/components/mission/MonthlyHours.svelte';
+  import TimerSessions from '$lib/components/mission/TimerSessions.svelte';
 
   let { monter = [], timers = [], hoursassinged = 0, counter = 0 } = $props();
 
@@ -120,6 +123,13 @@
       {/each}
     {/if}
   </div>
+
+  <!-- ── Every recorded sitting: start, stop, length ────────────────────── -->
+  {#if timers?.length}
+    <div class="tp-block">
+      <TimerSessions {timers} />
+    </div>
+  {/if}
 </div>
 
 <style>
