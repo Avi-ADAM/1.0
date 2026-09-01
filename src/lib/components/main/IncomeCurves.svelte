@@ -87,8 +87,12 @@
       path: linePath(curves[key]),
       /** What they were earning the day before they stopped. */
       before: Math.round(fn(stopYear - CLIFF_EPSILON, stopYear)),
-      /** And three years later. */
-      after: Math.round(fn(Math.min(stopYear + LOOK_AHEAD, YEARS), stopYear)),
+      /**
+       * And three years later. Deliberately not clamped to the plotted decade:
+       * the model is defined past the axis, and clamping made "three years
+       * later" mean "the day you stopped" once the slider reached year 10.
+       */
+      after: Math.round(fn(stopYear + LOOK_AHEAD, stopYear)),
       /** Everything earned across the whole decade — the area under the line. */
       decade: lifetimeTotal(curves[key])
     }))
@@ -289,18 +293,33 @@
           ? 'border-barbi bg-barbi/5'
           : 'border-slate-200 bg-slate-50'}"
       >
-        <p class="text-xs font-bold mb-1" style="color:{row.color}">
+        <p class="text-xs font-bold mb-2" style="color:{row.color}">
           {$t(`home.curves.${row.key}.name`)}
         </p>
-        <p class="text-2xl sm:text-xl font-bold text-slate-800 leading-none">
-          {row.after}<span class="text-sm font-normal text-slate-500">%</span>
-        </p>
-        <p class="text-[11px] text-slate-500 mt-1 leading-tight">
-          {$t('home.curves.afterLabel', { years: LOOK_AHEAD })}
-        </p>
-        <p class="text-[11px] text-slate-400 mt-1 leading-tight">
-          {$t('home.curves.beforeLabel', { value: row.before })}
-        </p>
+        <!-- Before and after carry the same weight on purpose. Only the
+             partner's "after" moves with the slider — the other two are zero
+             from three months past the stop onwards — so making the "after"
+             the headline would print a static 0 next to a big number and read
+             as a rigged comparison. The pair is the honest unit: the drop is
+             visible on every card, and every number moves as the slider does. -->
+        <dl class="text-[11px] leading-tight space-y-1">
+          <div>
+            <dt class="text-slate-400">
+              {$t('home.curves.beforeLabel')}
+            </dt>
+            <dd class="text-lg font-bold text-slate-500 leading-none">
+              {row.before}<span class="text-xs font-normal">%</span>
+            </dd>
+          </div>
+          <div>
+            <dt class="text-slate-500">
+              {$t('home.curves.afterLabel', { years: LOOK_AHEAD })}
+            </dt>
+            <dd class="text-lg font-bold leading-none" style="color:{row.color}">
+              {row.after}<span class="text-xs font-normal">%</span>
+            </dd>
+          </div>
+        </dl>
       </div>
     {/each}
   </div>

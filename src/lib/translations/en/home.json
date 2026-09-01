@@ -602,9 +602,9 @@
     "stopMark": "you stop working",
     "stopLabel": "You stop working in year {{year}}",
     "afterLabel": "{{years}} years later",
-    "beforeLabel": "before you stopped: {{value}}%",
+    "beforeLabel": "before stopping",
     "partnershipDot": "another partnership opened here",
-    "note": "The numbers are relative to a starting salary (100%), not amounts. An employee draws unemployment pay for three months and then nothing; a freelancer stops the same day; a partner opens no new rikmas after stopping — but the ones already open keep bearing fruit.",
+    "note": "The numbers are relative to a starting salary (100%), not amounts. An employee draws unemployment pay for three months and then nothing; a freelancer stops the same day; a partner opens no new rikmas after stopping, and their share of the existing ones thins too — whoever keeps contributing grows the denominator. So their income falls, but it settles on a floor rather than on zero: what you already gave stays in the numerator for good.",
     "employee": {
       "name": "Employee",
       "d": "The salary barely moves across a decade — a little seniority, a little adjustment. What actually happens to it is the day the job ends: three months of unemployment pay, then zero."
