@@ -203,12 +203,25 @@ export async function verifyApiKeyDetailed(rawKey: string): Promise<VerifiedApiK
 
   const { data: gqlData, errors } = await res.json();
 
+  const keys = gqlData?.apiKeys?.data || [];
+
+  // Strapi answers 200 with *partial* data plus a non-fatal `errors` array when
+  // the service token may not read one of the requested relations. `project` and
+  // `scopes` decide how far the key reaches, so a key whose scoping we could not
+  // read must fail closed: treating an unreadable `project` as "unscoped" would
+  // widen the key instead of narrowing it. Say why, though — a bare "Forbidden
+  // access" here reads as one broken key, when what it actually means is that
+  // every API key on the deployment is being refused.
   if (errors) {
-    console.error(`[API Keys] GraphQL Errors: ${JSON.stringify(errors)}`);
+    console.error(
+      `[API Keys] GraphQL errors while verifying (matched ${keys.length} key(s)). ` +
+        `The service token (STRAPI_API_NEW) is most likely missing find/findOne on a ` +
+        `related content-type - "project" is the one this query pulls. Refusing the ` +
+        `key rather than guessing its scope. ${JSON.stringify(errors)}`
+    );
     return null;
   }
 
-  const keys = gqlData?.apiKeys?.data || [];
   console.log(`[API Keys] GraphQL returned ${keys.length} matching keys`);
 
   if (keys.length === 0) return null;

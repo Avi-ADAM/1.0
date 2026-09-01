@@ -2,6 +2,7 @@
 node_modules
 /.svelte-kit
 /package
+.mcp.json
 .vercel_build_output
 .vercel
 .env.development
@@ -26,3 +27,6 @@ dev_output.log
 *.log
 test-results/
 vite.config.js.timestamp-*.mjs
+
+# scheduler state — per-box runtime record, never shared between servers
+scripts/scheduler/scheduler-state.json

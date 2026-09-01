@@ -1,5 +1,6 @@
 import { MCPServer } from '@mastra/mcp';
 import { verifyApiKey } from '$lib/server/apiKeys';
+import { oauthChallenge } from '$lib/server/oauth/challenge.js';
 import { setMcpContext } from '$lib/server/mcpContext';
 import { toReqRes, toFetchResponse } from 'fetch-to-node';
 import { error } from '@sveltejs/kit';
@@ -184,7 +185,16 @@ async function handleMcpRequest(request: Request, url: URL, svelteFetch: typeof 
             `(shared-write ${mayWriteShared ? 'granted' : 'withheld — needs the ' + MCP_WRITE_SCOPE + ' scope'})`
         );
     } else {
-        // --- UNAUTHENTICATED MODE ---
+        // A spec client (claude.ai, or anything else that speaks the MCP
+        // authorization flow) will not start an OAuth handshake until it is told
+        // to. Answering 200 with two public tools reads to it as success, and the
+        // connector stays silently anonymous — which is exactly how this went
+        // unnoticed. `oauthChallenge` returns null while public mode is on, so
+        // today's behaviour is unchanged until MCP_OAUTH_ENABLED is set.
+        const challenge = oauthChallenge(url);
+        if (challenge) return challenge;
+
+        // --- UNAUTHENTICATED MODE (public probe) ---
         toolsToExpose = {
             getPlatformInfo,
             howToConnect

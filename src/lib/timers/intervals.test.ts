@@ -1,8 +1,10 @@
 import { describe, it, expect } from 'vitest';
 import {
+	closeOpenIntervals,
 	formatDuration,
 	intervalMs,
 	isRunning,
+	openIntervals,
 	sortIntervals,
 	suggestNewInterval,
 	toPersistable,
@@ -144,5 +146,56 @@ describe('helpers', () => {
 	it('formats durations', () => {
 		expect(formatDuration(45 * 60_000)).toBe('45m');
 		expect(formatDuration(2 * 3_600_000 + 5 * 60_000)).toBe('2h 5m');
+	});
+});
+
+describe('closeOpenIntervals', () => {
+	const AT = iso(20);
+
+	it('closes every open interval, not just the last one', () => {
+		// The shape that produced a 390-hour month: two intervals were opened and
+		// only the newest was ever stopped, so the older one kept counting to now.
+		const { intervals, closed } = closeOpenIntervals(
+			[{ start: iso(9) }, { start: iso(12), stop: iso(13) }, { start: iso(18) }],
+			AT
+		);
+		expect(closed).toBe(2);
+		expect(intervals.every((iv) => Boolean(iv.stop))).toBe(true);
+		expect(intervals[0].stop).toBe(AT);
+		expect(intervals[1].stop).toBe(iso(13));
+		expect(intervals[2].stop).toBe(AT);
+	});
+
+	it('is a no-op when nothing is open, so repeating a stop is safe', () => {
+		const rows = [{ start: iso(9), stop: iso(10) }];
+		const { intervals, closed } = closeOpenIntervals(rows, AT);
+		expect(closed).toBe(0);
+		expect(intervals).toEqual(rows);
+	});
+
+	it('never produces a negative interval when the clock disagrees', () => {
+		// A start in the future of `at` would otherwise subtract from the total.
+		const { intervals } = closeOpenIntervals([{ start: iso(22) }], AT);
+		expect(intervals[0].stop).toBe(iso(22));
+		expect(totalHours(intervals)).toBe(0);
+	});
+
+	it('makes the closed hours claimable — an open interval counts as zero', () => {
+		const rows = [{ start: iso(9) }];
+		expect(totalHours(rows)).toBe(0);
+		expect(totalHours(closeOpenIntervals(rows, iso(11)).intervals)).toBeCloseTo(2);
+	});
+
+	it('tolerates junk and empties', () => {
+		expect(closeOpenIntervals(null, AT)).toEqual({ intervals: [], closed: 0 });
+		expect(closeOpenIntervals([], AT)).toEqual({ intervals: [], closed: 0 });
+	});
+});
+
+describe('openIntervals', () => {
+	it('names the intervals that were started and never stopped', () => {
+		expect(
+			openIntervals([{ start: iso(9), stop: iso(10) }, { start: iso(12) }]).map((iv) => iv.start)
+		).toEqual([iso(12)]);
 	});
 });

@@ -8,7 +8,7 @@ import { sendToSer } from '$lib/send/sendToSer.js';
 // Server-only secret — never exposed to the client bundle (no VITE_ prefix).
 import { ADMINMONTHER } from '$env/static/private';
 import { cycleWindow } from '$lib/recurring/recurringPlan.js';
-import { hoursInMonth, monthKeyOf, normalizeRows } from '$lib/recurring/missionMonths.js';
+import { monthKeyOf, normalizeRows, reconcileMonter } from '$lib/recurring/missionMonths.js';
 
 function formatDate(date = new Date()) {
   const year = date.toLocaleString('default', { year: 'numeric' });
@@ -43,9 +43,41 @@ function hasOpenCycleFor(maaps, cycleStart) {
   });
 }
 
+/**
+ * Every mutation monthi makes goes through here, so `?dry=1` can describe a run
+ * instead of performing it.
+ *
+ * The month-close touches every kvua mission on the platform, opens resource
+ * and standing-order cycles and mails real members — there was no way to see
+ * what a run would do before it did it. /api/fixer has had that from the start;
+ * this is the same idea. The stub answer carries the id shapes the callers read
+ * back (`createMaap`, `createTimegrama`, …) so the rest of the run still walks
+ * its own path and logs the follow-up writes it would make.
+ */
+async function writeAdmin(mutation, label, dry) {
+  if (dry) {
+    console.log(`[monthi:dry] would ${label}:`, mutation.replace(/\s+/g, ' ').trim());
+    return {
+      data: {
+        __dry: true,
+        updateMesimabetahalich: { data: { id: 'dry' } },
+        updateMashabetahalich: { data: { id: 'dry' } },
+        createMaap: { data: { id: 'dry-maap' } },
+        createTimegrama: { data: { id: 'dry-timegrama' } },
+        updateMaap: { data: { id: 'dry' } }
+      }
+    };
+  }
+  return SendToAdmin(mutation, ADMINMONTHER);
+}
+
 // Render the activation email and post it to the existing sendMail endpoint.
-async function sendActivationEmail(fetchFn, user, payload) {
+async function sendActivationEmail(fetchFn, user, payload, dry) {
   if (!user?.email || user?.noMail === true) return;
+  if (dry) {
+    console.log('[monthi:dry] would email resource cycle to', user.email, payload);
+    return;
+  }
   try {
     const { render } = await import('svelty-email');
     const mod = await import('$lib/components/mail/monthlyResourceActive.svelte');
@@ -83,14 +115,41 @@ async function sendActivationEmail(fetchFn, user, payload) {
   }
 }
 
-// hoursInMonth / monthKeyOf / normalizeRows (imported): the month arithmetic is
-// shared with /api/fixer, which rebuilds a whole ledger from the same segments.
+// reconcileMonter / monthKeyOf / normalizeRows (imported): the month arithmetic
+// is shared with /api/fixer, which rebuilds a whole ledger from the same rules.
+
+/** Length-independent comparison, so the key cannot be probed byte by byte. */
+function secretMatches(given, expected) {
+  if (typeof given !== 'string' || typeof expected !== 'string' || !expected) return false;
+  if (given.length !== expected.length) return false;
+  let diff = 0;
+  for (let i = 0; i < given.length; i++) diff |= given.charCodeAt(i) ^ expected.charCodeAt(i);
+  return diff === 0;
+}
 
 let suc = [];
 
-export async function GET({ fetch }) {
-  console.log('monthi api called');
+export async function GET({ fetch, url, request }) {
+  // The month close files hours for every kvua mission on the platform, opens
+  // resource and standing-order cycles and mails members — and it answered to
+  // anyone who knew the path. /api/fixer, which repairs the same ledger, has
+  // always asked for this key; monthi never did. Send it as `x-monthi-key`
+  // where possible; `?key=` is the fallback for a plain scheduler.
+  const key = request?.headers?.get('x-monthi-key') ?? url?.searchParams?.get('key') ?? '';
+  if (!secretMatches(key, ADMINMONTHER)) {
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+      status: 401,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+
+  // `?dry=1` walks the whole run and logs every write it would make, touching
+  // nothing and mailing nobody.
+  const dry = ['1', 'true', 'yes'].includes((url?.searchParams?.get('dry') ?? '').toLowerCase());
+  console.log(dry ? 'monthi api called (DRY RUN — nothing will be written)' : 'monthi api called');
   suc = [];
+  /** Missions deliberately left alone this run, with the reason. */
+  const skipped = [];
 
   const que = `{
     mesimabetahaliches(filters: { and: [
@@ -119,7 +178,7 @@ export async function GET({ fetch }) {
           monter { monthStart hours isDone hoursDone }
         }}}
         timers(filters: { mesimabetahalich: { id: { eq: "${id}" } } }, pagination: { limit: -1 }) {
-          data { attributes { timers { start stop } } }
+          data { id attributes { isActive timers { start stop } } }
         }
       }`;
 
@@ -129,19 +188,6 @@ export async function GET({ fetch }) {
 
         const at = resi.data.mesimabetahalich.data.attributes;
         const now = new Date();
-
-        let targetMonth = now.getMonth();
-        let targetYear = now.getFullYear();
-
-        if (now.getDate() < 28) {
-          targetMonth -= 1;
-          if (targetMonth < 0) {
-            targetMonth = 11;
-            targetYear -= 1;
-          }
-        }
-        
-        let targetDate = new Date(targetYear, targetMonth, 1);
 
         if (at.dates && new Date(at.dates) > now) {
           console.log('mission not started yet, skipping', id);
@@ -153,47 +199,79 @@ export async function GET({ fetch }) {
         const segments = timerRows.flatMap((t) => t.attributes?.timers ?? []);
         const hasTimers = segments.length > 0;
 
-        // Hours actually worked in the month being closed, and in the month we
-        // are standing in. Running monthi on the 2nd of August must file July's
-        // real hours under July and leave August's own hours on the counter —
-        // the old code filed the raw counter (August's hours, once July's had
-        // been consumed by an earlier run) under July and then zeroed it,
-        // losing both months.
-        const targetHours = hasTimers
-          ? hoursInMonth(segments, targetYear, targetMonth)
-          : (at.howmanyhoursalready ?? 0);
-        const currentHours = hasTimers
-          ? hoursInMonth(segments, now.getFullYear(), now.getMonth())
-          : 0;
+        // An open interval is measured up to *now*, so it grows by 24 hours a
+        // day. A timer running right now is the normal case and harmless: its
+        // hours land in the open month, and the open month is never filed. The
+        // danger is an interval left open in a month that has already **ended** —
+        // it pours a runaway number into a month monthi is about to write, and a
+        // filed month goes on into the approval chain. Reading that on a screen
+        // is recoverable; filing it is not. A timer of 49 real hours read 390
+        // exactly this way, so that mission is left alone and named instead.
+        const openKey = monthKeyOf(now);
+        const staleOpen = segments.filter(
+          (s) => s?.start && !s.stop && (monthKeyOf(s.start) ?? openKey) < openKey
+        );
+        if (staleOpen.length) {
+          console.error(
+            '[monthi] mission ' + id + ' "' + at.name + '" SKIPPED — ' + staleOpen.length +
+              ' interval(s) left open in a month that has already ended (' +
+              staleOpen.map((s) => s.start).join(', ') + '). Close them, then re-run.'
+          );
+          skipped.push({ id, name: at.name, reason: 'openIntervalInClosedMonth', open: staleOpen.length });
+          continue;
+        }
 
+        // An interval open on a timer that is *not* running is the same orphan,
+        // caught early — it does no harm this month, but it will the moment the
+        // month turns. Say so; do not block the run over it.
+        const orphaned = timerRows.filter(
+          (t) => t.attributes?.isActive !== true && (t.attributes?.timers ?? []).some((s) => s?.start && !s.stop)
+        );
+        if (orphaned.length) {
+          console.warn(
+            '[monthi] mission ' + id + ' "' + at.name + '" has an interval open on a stopped timer (' +
+              orphaned.map((t) => t.id).join(', ') + ') — it will corrupt this month once the month turns.'
+          );
+        }
+
+        // Every past month the timers can account for, not only the last one.
+        // monthi used to look at a single target month, so a month that went by
+        // without a run was never filed at all — and there is no scheduler,
+        // monthi runs when somebody remembers. reconcileMonter is the rule
+        // /api/fixer repairs with: approved rows are never touched, the open
+        // month stays on the counter, duplicate rows for one month collapse,
+        // and a month with no timer evidence keeps whatever was filed for it.
         const rows = normalizeRows(at.monter);
-        const targetKey = monthKeyOf(targetDate);
-        const isTargetRow = (r) => monthKeyOf(r.monthStart) === targetKey;
-        const targetRows = rows.filter(isTargetRow);
-        const targetApproved = targetRows.some((r) => r.isDone === true);
+        const reconciled = reconcileMonter({
+          rows,
+          segments,
+          hoursassinged: at.hoursassinged,
+          now
+        });
 
-        let nextRows = rows;
+        let nextRows = reconciled.rows;
+        let currentHours = reconciled.counter;
+        const changes = [...reconciled.changes];
+
         if (!hasTimers) {
-          // No timers = no evidence of when the work happened. Append the
-          // counter once and never rewrite it; a rewrite here would file 0.
-          if (targetHours > 0 && targetRows.length === 0) {
+          // No timers = no evidence of *when* the work happened, so the
+          // month-less counter is the only record there is. File it once under
+          // the month that just ended and never rewrite it, and never reset it
+          // on its own — that would throw the record away.
+          const previous = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+          const previousKey = monthKeyOf(previous);
+          const counterHours = at.howmanyhoursalready ?? 0;
+          const hasPreviousRow = rows.some((r) => monthKeyOf(r.monthStart) === previousKey);
+          if (counterHours > 0 && !hasPreviousRow) {
             nextRows = [
               ...rows,
-              { monthStart: formatDate(targetDate), hours: at.hoursassinged ?? 0, isDone: false, hoursDone: targetHours }
+              { monthStart: formatDate(previous), hours: at.hoursassinged ?? 0, isDone: false, hoursDone: counterHours }
             ];
-          }
-        } else if (!targetApproved) {
-          // The timers are authoritative, so an unapproved row for this month is
-          // rewritten rather than duplicated — that also repairs rows a previous
-          // run filled with the wrong month's hours.
-          nextRows = rows.filter((r) => !isTargetRow(r));
-          if (targetHours > 0) {
-            nextRows.push({
-              monthStart: formatDate(targetDate),
-              hours: targetRows[0]?.hours ?? at.hoursassinged ?? 0,
-              isDone: false,
-              hoursDone: targetHours
-            });
+            currentHours = 0;
+            changes.push({ month: previousKey, kind: 'added', to: counterHours });
+          } else {
+            nextRows = rows;
+            currentHours = counterHours;
           }
         }
 
@@ -202,16 +280,34 @@ export async function GET({ fetch }) {
         nextRows = [...nextRows].sort((a, b) => String(a.monthStart).localeCompare(String(b.monthStart)));
 
         const monterChanged = JSON.stringify(nextRows) !== JSON.stringify(rows);
-        // Without timers there is no evidence of *when* the counter's hours were
-        // worked, so only reset it as part of filing them — never on its own.
-        const scalarIsStale =
-          (hasTimers || monterChanged) &&
-          Math.abs((at.howmanyhoursalready ?? 0) - currentHours) > 1e-6;
+        const scalarIsStale = Math.abs((at.howmanyhoursalready ?? 0) - currentHours) > 1e-6;
 
         if (!monterChanged && !scalarIsStale) {
-          console.log('nothing to do for', id, targetRows.length ? '(month already filed)' : '(no hours)');
+          console.log('nothing to do for', id, rows.length ? '(the ledger already agrees with the timers)' : '(no hours)');
           continue;
         }
+
+        // What the counter claimed, against what the timers can actually show.
+        // The two disagreeing is the signature of a drifted
+        // `howmanyhoursalready`, and the difference used to vanish in silence.
+        const counterGap = (at.howmanyhoursalready ?? 0) - currentHours;
+        const gapNote =
+          hasTimers && Math.abs(counterGap) > 0.01
+            ? ' (the counter was ' + (counterGap > 0 ? 'ahead of' : 'behind') + ' the timers by ' +
+              Math.abs(counterGap).toFixed(3) + 'h — the timers decide)'
+            : '';
+        const changeNote = changes.length
+          ? changes
+              .map((c) =>
+                c.month + ': ' + c.kind +
+                (c.from !== undefined ? ' ' + c.from + '→' + c.to : c.to !== undefined ? ' ' + c.to : '')
+              )
+              .join(', ')
+          : 'no month changed';
+        console.log(
+          '[monthi] mission ' + id + ' "' + at.name + '" — counter ' + (at.howmanyhoursalready ?? 0) +
+            ' → ' + currentHours.toFixed(3) + gapNote + '\n         ' + changeNote
+        );
 
         const mutation = `mutation {
           updateMesimabetahalich(id: "${id}", data: {
@@ -220,7 +316,7 @@ export async function GET({ fetch }) {
           }) { data { id } }
         }`;
 
-        const resis = await SendToAdmin(mutation, ADMINMONTHER);
+        const resis = await writeAdmin(mutation, `reconcile the ledger of mission ${id}`, dry);
         if (resis?.data) {
           console.log('monthly reset done for', id);
           suc.push(id);
@@ -236,18 +332,23 @@ export async function GET({ fetch }) {
   }
 
   // ── Recurring resources (mashabetahalich): open this month's cycle ─────────
-  const sucRes = await runRecurringResources(fetch);
+  const sucRes = await runRecurringResources(fetch, dry);
 
   // ── Recurring sales (standing orders): open this month's report cycle ──────
-  const sucSales = await runRecurringSaleCycles(fetch);
+  const sucSales = await runRecurringSaleCycles(fetch, dry);
 
-  return new Response(JSON.stringify({ missions: suc, resources: sucRes, sales: sucSales }));
+  if (skipped.length) {
+    console.error('[monthi] finished with', skipped.length, 'mission(s) skipped:', skipped);
+  }
+  return new Response(
+    JSON.stringify({ dry, missions: suc, skipped, resources: sucRes, sales: sucSales })
+  );
 }
 
 // For every active recurring resource, open a Maap cycle for the current month
 // (unless one already exists or the resource ended), and email the responsible
 // user to confirm the amount spent. Past-end resources are closed.
-async function runRecurringResources(fetchFn) {
+async function runRecurringResources(fetchFn, dry) {
   const opened = [];
 
   const listQue = `query MrGetRecurringForMonthi {
@@ -295,7 +396,7 @@ async function runRecurringResources(fetchFn) {
       if ((end && now > end) || (effectiveFrom && now >= effectiveFrom)) {
         // Past the end date — close the engine so no further cycles open.
         const closeMut = `mutation { updateMashabetahalich(id: "${id}", data: { status_mashab: "closed", finnished: true }) { data { id } } }`;
-        await SendToAdmin(closeMut, ADMINMONTHER);
+        await writeAdmin(closeMut, `close ended resource ${id}`, dry);
         continue;
       }
 
@@ -327,7 +428,7 @@ async function runRecurringResources(fetchFn) {
           publishedAt: "${now.toISOString()}"
         }) { data { id } }
       }`;
-      const created = await SendToAdmin(createMut, ADMINMONTHER);
+      const created = await writeAdmin(createMut, `open cycle ${nextIndex} for resource ${id}`, dry);
       const newMaapId = created?.data?.createMaap?.data?.id;
       if (!newMaapId) {
         console.error('monthi: failed to open cycle for resource', id, created);
@@ -341,12 +442,13 @@ async function runRecurringResources(fetchFn) {
         const tgMut = `mutation {
           createTimegrama(data: { date: "${deadline.toISOString()}", done: false, whatami: "maap", maap: "${newMaapId}" }) { data { id } }
         }`;
-        const tg = await SendToAdmin(tgMut, ADMINMONTHER);
+        const tg = await writeAdmin(tgMut, `attach timegrama to maap ${newMaapId}`, dry);
         const tgId = tg?.data?.createTimegrama?.data?.id;
         if (tgId) {
-          await SendToAdmin(
+          await writeAdmin(
             `mutation { updateMaap(id: "${newMaapId}", data: { timegrama: "${tgId}" }) { data { id } } }`,
-            ADMINMONTHER
+            `link timegrama ${tgId} to maap ${newMaapId}`,
+            dry
           );
         }
       } catch (e) {
@@ -361,7 +463,7 @@ async function runRecurringResources(fetchFn) {
         projectName: a.project?.data?.attributes?.projectName ?? '',
         plannedAmount: planned,
         monthLabel
-      });
+      }, dry);
 
       console.log('monthi: opened cycle', nextIndex, 'for resource', id);
       opened.push(id);
@@ -375,8 +477,12 @@ async function runRecurringResources(fetchFn) {
 
 // Render the monthly recurring-sale email (holder or customer flavor) and post
 // it to the existing sendMail endpoint.
-async function sendRecurringSaleEmail(fetchFn, user, role, payload) {
+async function sendRecurringSaleEmail(fetchFn, user, role, payload, dry) {
   if (!user?.email || user?.noMail === true) return;
+  if (dry) {
+    console.log('[monthi:dry] would email recurring sale to', user.email, role, payload);
+    return;
+  }
   try {
     const { render } = await import('svelty-email');
     const mod = await import('$lib/components/mail/monthlyRecurringSale.svelte');
@@ -422,7 +528,7 @@ async function sendRecurringSaleEmail(fetchFn, user, role, payload) {
 // (pending:true, holderStatus:'open') the money-holder settles by reporting
 // how much actually came in. Past-end engines are closed. The holder — and
 // the paying customer, when one is named — get a reminder email.
-async function runRecurringSaleCycles(fetchFn) {
+async function runRecurringSaleCycles(fetchFn, dry) {
   const opened = [];
 
   let list;
@@ -446,7 +552,8 @@ async function runRecurringSaleCycles(fetchFn) {
 
       if (end && now > end) {
         // Past the end date — stop opening cycles for this standing order.
-        await sendToSer({ id }, 'mrsCloseRecurringSale', 0, 0, true, fetchFn);
+        if (dry) console.log('[monthi:dry] would close ended sale engine', id);
+        else await sendToSer({ id }, 'mrsCloseRecurringSale', 0, 0, true, fetchFn);
         continue;
       }
 
@@ -484,7 +591,10 @@ async function runRecurringSaleCycles(fetchFn) {
         note: a.note ?? null,
         publishedAt: now.toISOString()
       };
-      const created = await sendToSer(vars, 'mrsCreateCycleSale', 0, 0, true, fetchFn);
+      const created = dry
+        ? (console.log('[monthi:dry] would open sale cycle for engine', id, vars),
+          { data: { createSale: { data: { id: 'dry-sale' } } } })
+        : await sendToSer(vars, 'mrsCreateCycleSale', 0, 0, true, fetchFn);
       const cycleId = created?.data?.createSale?.data?.id;
       if (!cycleId) {
         console.error('monthi: failed to open sale cycle for engine', id, created);
@@ -498,9 +608,9 @@ async function runRecurringSaleCycles(fetchFn) {
         expectedAmount: a.in ?? 0,
         monthLabel
       };
-      await sendRecurringSaleEmail(fetchFn, holder.attributes, 'holder', payload);
+      await sendRecurringSaleEmail(fetchFn, holder.attributes, 'holder', payload, dry);
       if (customer?.attributes) {
-        await sendRecurringSaleEmail(fetchFn, customer.attributes, 'customer', payload);
+        await sendRecurringSaleEmail(fetchFn, customer.attributes, 'customer', payload, dry);
       }
 
       console.log('monthi: opened sale cycle', cycleId, 'for engine', id);

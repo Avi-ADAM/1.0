@@ -4,6 +4,8 @@ import { touchDormancy } from '$lib/server/archive/dormancyClock.js';
 import { execFromContext } from '$lib/server/archive/exec.js';
 import { run } from '$lib/server/archive/gql.js';
 import { pickRateRow, resolveRate, rowRate, type RateRow } from '$lib/timers/rate.js';
+import { closeOpenIntervals, totalHours as hoursOfIntervals } from '$lib/timers/intervals.js';
+import { workMonthOf } from '$lib/recurring/missionMonths.js';
 
 /**
  * The timer as the server sees it, read before anything is written to it.
@@ -18,16 +20,26 @@ import { pickRateRow, resolveRate, rowRate, type RateRow } from '$lib/timers/rat
 async function readTimer(
     context: any,
     timerId: string,
-): Promise<{ rate: number | null; saved: boolean } | null> {
+): Promise<{
+    rate: number | null;
+    saved: boolean;
+    intervals: { start: string; stop: string | null }[];
+    totalHours: number;
+} | null> {
     try {
         const data = await run(
             execFromContext(context),
-            `{ timer(id: "${timerId}") { data { attributes { rate saved } } } }`,
+            `{ timer(id: "${timerId}") { data { attributes { rate saved totalHours timers { start stop } } } } }`,
             'timerSave:timer',
         );
         const a = data?.timer?.data?.attributes;
         if (!a) return null;
-        return { rate: a.rate == null ? null : Number(a.rate), saved: a.saved === true };
+        return {
+            rate: a.rate == null ? null : Number(a.rate),
+            saved: a.saved === true,
+            intervals: (a.timers ?? []).map((s: any) => ({ start: s?.start, stop: s?.stop ?? null })),
+            totalHours: Number(a.totalHours ?? 0) || 0,
+        };
     } catch (e) {
         // Unreadable is not "already saved" — fall through to the legacy
         // behaviour rather than dropping the member's hours on the floor.
@@ -62,6 +74,19 @@ function todayDateString(): string {
   return `${y}-${m}-${day}`;
 }
 
+/**
+ * The month the approval is filed under.
+ *
+ * It used to be today's date, so a member who worked all through August and
+ * saved on the 1st of September had every one of those hours booked to
+ * September. The hours carry their own dates — `workMonthOf` reads the month
+ * that holds most of them — and only a timer with no usable interval falls back
+ * to today.
+ */
+function approvalMonth(intervals: { start?: string | null; stop?: string | null }[]): string {
+  return workMonthOf(intervals) ?? todayDateString();
+}
+
 export const timerSaveConfig: ActionConfig = {
     key: 'timerSave',
     description: 'Save a timer and commit hours to mission, routing through approval or direct save',
@@ -88,13 +113,31 @@ export const timerSaveConfig: ActionConfig = {
             return { success: true, missionId: mId, alreadySaved: true };
         }
 
-        // Step 1: Mark timer as saved
+        // The timer's own account of the work, closed. Saving used to write
+        // `isActive: false, saved: true` without touching the intervals, so a
+        // timer saved while it was still running kept an interval that nothing
+        // would ever close — invisible to `totalHours`, but measured up to *now*
+        // by every month-aware view, growing 24 hours a day. Closing it here is
+        // also what makes these hours claimable: an open interval is worth zero
+        // to the total the rikma is asked to sign.
+        const closedIntervals = closeOpenIntervals(timerBefore?.intervals ?? []);
+        const intervals = closedIntervals.intervals;
+        if (closedIntervals.closed) {
+            console.warn(
+                `[timerSave] closed ${closedIntervals.closed} open interval(s) on timer ${params.timerId} before saving`
+            );
+        }
+
+        // Step 1: Mark timer as saved, with its books closed.
         if (hasTimer) {
             await strapi.execute('34UpdateTimer', {
                 timerId: params.timerId,
                 isActive: false,
                 saved: true,
                 tasks: params.tasks || [],
+                ...(intervals.length
+                    ? { timers: intervals, totalHours: hoursOfIntervals(intervals) }
+                    : {}),
                 ...(saveText ? { saveText } : {})
             }, context.jwt, context.fetch);
         }
@@ -109,7 +152,24 @@ export const timerSaveConfig: ActionConfig = {
 
         const at = missionData.attributes;
         const userCount = at.project?.data?.attributes?.user_1s?.data?.length ?? 1;
-        const sessionHoursTotal: number = params.sessionHoursTotal ?? params.totalHours ?? 0;
+
+        // What the rikma is asked to sign comes from the intervals on the
+        // server's own copy of the timer, not from a number the client sent:
+        // a counter that has drifted upward (a lap booked twice by a repeated
+        // stop) must not be able to buy equity the intervals cannot account for.
+        // A legacy timer with no interval components has nothing to derive from,
+        // so it keeps the client's figure.
+        const claimedHours: number = params.sessionHoursTotal ?? params.totalHours ?? 0;
+        const derivedHours = intervals.length ? hoursOfIntervals(intervals) : null;
+        if (derivedHours !== null && Math.abs(derivedHours - claimedHours) > 0.01) {
+            console.warn('[timerSave] the claim disagrees with the intervals — filing the intervals', {
+                timerId: params.timerId,
+                claimed: claimedHours,
+                derived: derivedHours,
+                storedTotalHours: timerBefore?.totalHours
+            });
+        }
+        const sessionHoursTotal: number = derivedHours ?? claimedHours;
         const newHowManyHours: number = params.howmanyhoursalready ?? (at.howmanyhoursalready ?? 0);
 
         // What these hours are worth: the value stamped on the timer when the
@@ -186,7 +246,7 @@ export const timerSaveConfig: ActionConfig = {
                 users_permissions_user: at.users_permissions_user?.data?.id,
                 vots,
                 timer: hasTimer ? params.timerId : undefined,
-                month: todayDateString(),
+                month: approvalMonth(intervals),
                 // Carried onto the approval so a vote that lands after the
                 // mission's value changed still prices these hours correctly.
                 perhour: rate,

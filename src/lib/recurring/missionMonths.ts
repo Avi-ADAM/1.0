@@ -77,6 +77,32 @@ export function hoursByMonth(
   return out;
 }
 
+/**
+ * The month a stretch of work belongs to: the one holding most of its hours.
+ *
+ * An approval is stamped with a month, and stamping it with *today* files
+ * August's work under September the moment a member saves on the 1st — which is
+ * exactly when they do. The hours themselves know when they happened, so ask
+ * them. Returns a `YYYY-MM-01` string, or null when there is nothing to go on.
+ */
+export function workMonthOf(
+  segments: TimerSegment[] | null | undefined,
+  nowMs: number = Date.now()
+): string | null {
+  const byMonth = hoursByMonth(segments, nowMs);
+  let best: string | null = null;
+  let most = 0;
+  for (const [key, hours] of byMonth) {
+    // Ties go to the later month — work that straddles midnight on the 1st
+    // reads as belonging to the month it carried on into.
+    if (hours > most || (hours === most && best !== null && key > best)) {
+      most = hours;
+      best = key;
+    }
+  }
+  return best ? monthStartString(best) : null;
+}
+
 /** Hours inside one calendar month (0-indexed `month`, as `Date` uses). */
 export function hoursInMonth(
   segments: TimerSegment[] | null | undefined,
@@ -339,15 +365,21 @@ export function reconcileMonter(input: ReconcileInput): ReconcileResult {
     const previous = group[0];
 
     if (computed > 0) {
+      // A row that already agrees to the precision it is stored and shown at is
+      // left exactly as it is. Strapi rounds `hoursDone` to two decimals, so a
+      // full-precision rewrite differs from the stored value on every single
+      // run — which made this "repair" rewrite the whole ledger every time it
+      // was called, replacing every component row for no visible change.
+      const agrees = previous && Math.abs(previous.hoursDone - computed) <= DISPLAY_EPSILON;
       out.push({
         monthStart: previous?.monthStart || monthStartString(key),
         hours: previous?.hours ?? (Number(input.hoursassinged ?? 0) || 0),
         isDone: false,
-        hoursDone: computed
+        hoursDone: agrees ? previous.hoursDone : computed
       });
       if (!previous) {
         changes.push({ month: key, kind: 'added', to: computed });
-      } else if (Math.abs(previous.hoursDone - computed) > 1e-6) {
+      } else if (!agrees) {
         changes.push({ month: key, kind: 'corrected', from: previous.hoursDone, to: computed });
       }
       if (group.length > 1) changes.push({ month: key, kind: 'collapsed' });

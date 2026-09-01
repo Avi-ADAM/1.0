@@ -1,4 +1,5 @@
 import { sendToSer } from './../send/sendToSer.js';
+import { closeOpenIntervals } from '$lib/timers/intervals';
 const browser = typeof window !== 'undefined';
 
 /**
@@ -107,10 +108,22 @@ export async function startTimer(activeTimer, missionID, uId, pId, fetch, timerI
   } else if (!activeTimer.data.attributes.isActive) {
     // Case 2: Resume existing unsaved timer
     console.log("[Timers] Resuming existing unsaved timer:", timerId);
-    let timers = (activeTimer.data.attributes.timers || []).map(t => ({ start: t.start, stop: t.stop }));
+    const existing = (activeTimer.data.attributes.timers || []).map(t => ({ start: t.start, stop: t.stop }));
+
+    // A paused timer should have nothing open, but `isActive` and the interval
+    // list can disagree — a save, a clear or a lost stop turns the flag off
+    // without closing what it started. Resuming on top of that would leave the
+    // orphan open forever, and no later stop would ever reach it: stopTimer
+    // used to close only the last interval. Close them here instead, at the
+    // moment we know the member was not working.
+    const { intervals: timers, closed } = closeOpenIntervals(existing, now);
+    if (closed) {
+      console.warn(`[Timers] closed ${closed} orphaned interval(s) before resuming timer ${timerId}`);
+    }
     timers.push({ start: now });
-    
+
     params.timers = timers;
+    params.totalHours = calculateTotalHours(timers);
     params.newStart = now;
   } else {
     console.log("Timer is already active");
@@ -132,36 +145,38 @@ export async function startTimer(activeTimer, missionID, uId, pId, fetch, timerI
  */
 export async function stopTimer(timer, fetch, isSer = false, projectId = '', userId = '') {
   console.log('Stopping timer:', timer?.id);
-  
-  if (timer && timer.attributes?.isActive) {
-    const now = new Date().toISOString();
-    let intervals = [...(timer.attributes.timers || [])];
-    
-    if (intervals.length > 0) {
-      const lastInterval = { ...intervals[intervals.length - 1] };
-      lastInterval.stop = now;
-      intervals[intervals.length - 1] = lastInterval;
-      
-      const startTime = new Date(lastInterval.start);
-      const stopTime = new Date(now);
-      const duration = (stopTime.getTime() - startTime.getTime()) / 1000 / 60 / 60;
-      
-      let accumulatedTime = (timer.attributes.totalHours || 0) + duration;
+  if (!timer?.id) return timer;
 
-      const params = {
-        timerId: timer.id.toString(),
-        projectId: projectId.toString(),
-        userId: userId.toString(),
-        isActive: false,
-        totalHours: accumulatedTime,
-        timers: intervals.map(t => ({ start: t.start, stop: t.stop })),
-        isSer: isSer
-      };
+  const now = new Date().toISOString();
+  const existing = (timer.attributes?.timers || []).map(t => ({ start: t.start, stop: t.stop ?? null }));
+  const { intervals, closed } = closeOpenIntervals(existing, now);
 
-      return unwrapTimerResult(await executeTimerAction('timerStop', params, fetch));
-    }
+  // Idempotent on purpose. A stop that has already happened — a Telegram
+  // update redelivered, a button pressed twice, a second tab — finds nothing
+  // open and only has to make sure the flag and the total agree with the list.
+  // The old shape ("only act while isActive, then add the last lap to
+  // totalHours") could not be repeated safely: the counter grew by a lap that
+  // the interval list had already recorded, which is how a timer whose
+  // intervals sum to 49h came to store 68.
+  if (!intervals.length) return timer;
+  if (closed > 1) {
+    console.warn(`[Timers] timer ${timer.id} had ${closed} open intervals — closing all of them`);
   }
-  return timer;
+  if (!closed && timer.attributes?.isActive !== true) return timer;
+
+  const params = {
+    timerId: timer.id.toString(),
+    projectId: projectId.toString(),
+    userId: userId.toString(),
+    isActive: false,
+    // Derived from the list, never nudged by a delta: the intervals are the
+    // auditable record and the counter must not be able to drift away from them.
+    totalHours: calculateTotalHours(intervals),
+    timers: intervals,
+    isSer: isSer
+  };
+
+  return unwrapTimerResult(await executeTimerAction('timerStop', params, fetch));
 }
 
 /**
@@ -183,18 +198,34 @@ export async function saveTimer(timer, missionID, fetch, isSer = false, tasks = 
       return null;
     }
 
-    const timerSegments = timer.attributes?.activeTimer?.data?.attributes?.timers || [];
-    // totalHours is set server-side by stopTimer and is always accurate.
-    // calculateTotalHours only counts segments that have both start+stop,
-    // so it returns 0 if the store is stale (last segment still "open").
-    // Math.max covers both cases: fresh store ↔ stale store.
+    const rawSegments = timer.attributes?.activeTimer?.data?.attributes?.timers || [];
+    // Anything still open is closed here rather than dropped: an open interval
+    // contributes nothing to calculateTotalHours, so a save that ignored it
+    // would file fewer hours than the member worked — and leave the orphan
+    // behind to inflate every month-aware view afterwards. The server repeats
+    // this on its own copy (timerSave.ts); this keeps the number the member is
+    // shown honest before they sign it.
+    const timerSegments = closeOpenIntervals(rawSegments).intervals;
+
+    // The intervals are the claim. `totalHours` used to win whenever it was
+    // higher (Math.max), which meant a counter that had drifted upward — a lap
+    // added twice by a repeated stop — was what went to approval: a timer worth
+    // 49.36h asked the rikma to sign 68.23h. The list is what a member can see
+    // and dispute, so the list decides.
     const totalHoursFromServer = timer.attributes?.activeTimer?.data?.attributes?.totalHours || 0;
-    const fromSegments = calculateTotalHours(timerSegments);
-    const sessionHours = Math.max(totalHoursFromServer, fromSegments);
-    console.log('[saveTimer] hours calc:', { totalHoursFromServer, fromSegments, sessionHours });
+    const sessionHours = calculateTotalHours(timerSegments);
+    if (Math.abs(totalHoursFromServer - sessionHours) > 0.01) {
+      console.warn('[saveTimer] stored totalHours disagrees with the intervals — filing the intervals:', {
+        totalHoursFromServer,
+        fromSegments: sessionHours
+      });
+    }
 
     const now = new Date();
-    // hoursInMonth handles open segments by using Date.now() for missing stop — always safe.
+    // Only the part of this session that belongs to the month in progress lands
+    // on the counter — `howmanyhoursalready` is a month-less scalar that means
+    // "this month so far". Hours worked in a month that has already turned are
+    // filed by /api/monthi from the timers themselves, not from here.
     const sessionHoursThisMonth = hoursInMonth(timerSegments, now.getFullYear(), now.getMonth());
 
     const currentHoursAlready = timer.attributes?.howmanyhoursalready || 0;
@@ -343,7 +374,12 @@ export async function handleClearSingle(index, timer, fetch, isSer = false, proj
   timers.splice(index, 1);
 
   const timerData = timer.attributes?.activeTimer?.data || timer;
-  const kept = timers.map(t => ({ start: t.start, stop: t.stop ?? null }));
+  // This write turns the timer off (`isActive: false`), so anything left open
+  // must be closed with it — a surviving open interval on a stopped timer is
+  // the orphan that no later stop would ever reach.
+  const kept = closeOpenIntervals(
+    timers.map(t => ({ start: t.start, stop: t.stop ?? null }))
+  ).intervals;
 
   return unwrapTimerResult(await executeTimerAction('timerLogUpdate', {
     timerId: timerData.id.toString(),

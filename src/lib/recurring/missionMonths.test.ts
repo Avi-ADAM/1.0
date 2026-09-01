@@ -7,6 +7,7 @@ import {
   normalizeRows,
   reconcileMonter,
   segmentsFromTimers,
+  workMonthOf,
   type MonterRow
 } from './missionMonths.js';
 
@@ -297,5 +298,68 @@ describe('buildMonthlyLedger', () => {
 
     expect(months.find((m) => m.key === '2026-07')?.assigned).toBe(12);
     expect(months.find((m) => m.key === '2026-08')?.assigned).toBe(20);
+  });
+});
+
+describe('workMonthOf', () => {
+  it('files the work under the month it happened in, not the month it is saved in', () => {
+    // The case that mattered: a month of August work saved on the 1st of
+    // September was stamped September and left August's ledger empty.
+    const august = [
+      { start: at(2026, 8, 3, 9), stop: at(2026, 8, 3, 17) },
+      { start: at(2026, 8, 20, 9), stop: at(2026, 8, 20, 13) }
+    ];
+    expect(workMonthOf(august, new Date(at(2026, 9, 1, 12)).getTime())).toBe('2026-08-01');
+  });
+
+  it('picks the month holding most of the hours when a session spans two', () => {
+    const spread = [
+      { start: at(2026, 7, 30, 9), stop: at(2026, 7, 30, 10) },
+      { start: at(2026, 8, 2, 9), stop: at(2026, 8, 2, 17) }
+    ];
+    expect(workMonthOf(spread)).toBe('2026-08-01');
+  });
+
+  it('measures an open interval to now rather than ignoring it', () => {
+    const now = new Date(at(2026, 8, 5, 12)).getTime();
+    expect(workMonthOf([{ start: at(2026, 8, 5, 9), stop: null }], now)).toBe('2026-08-01');
+  });
+
+  it('answers null when there is nothing to go on, so the caller can fall back', () => {
+    expect(workMonthOf([])).toBeNull();
+    expect(workMonthOf(null)).toBeNull();
+    expect(workMonthOf([{ start: 'nonsense', stop: null }])).toBeNull();
+  });
+});
+
+describe('reconcileMonter — idempotency', () => {
+  const segments = [
+    { start: at(2026, 5, 4, 9), stop: at(2026, 5, 4, 12, 15) },
+    { start: at(2026, 5, 18, 9), stop: at(2026, 5, 18, 14, 40) }
+  ];
+  const now = new Date(at(2026, 7, 3, 10));
+
+  it('leaves a row alone when it already agrees at the precision it is stored in', () => {
+    // Strapi rounds hoursDone to two decimals, so the stored row can never equal
+    // the full-precision figure. Rewriting on that difference replaced every
+    // component row on every run.
+    const computed = reconcileMonter({ rows: [], segments, hoursassinged: 40, now });
+    const stored: MonterRow[] = computed.rows.map((r) => ({
+      ...r,
+      hoursDone: Math.round(r.hoursDone * 100) / 100
+    }));
+
+    const again = reconcileMonter({ rows: stored, segments, hoursassinged: 40, now });
+    expect(again.rows).toEqual(stored);
+    expect(again.changes).toEqual([]);
+  });
+
+  it('still corrects a row that is genuinely wrong', () => {
+    const stored: MonterRow[] = [
+      { monthStart: '2026-05-01', hours: 40, isDone: false, hoursDone: 99 }
+    ];
+    const result = reconcileMonter({ rows: stored, segments, hoursassinged: 40, now });
+    expect(result.changes.some((c) => c.kind === 'corrected' && c.from === 99)).toBe(true);
+    expect(result.rows[0].hoursDone).toBeCloseTo(8.917, 2);
   });
 });

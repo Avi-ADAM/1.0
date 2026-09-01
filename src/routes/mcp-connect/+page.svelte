@@ -15,7 +15,7 @@
       <p class="text-5xl mb-4">🤖</p>
       <h1 class="text-xl font-bold mb-2">Connect MCP</h1>
       <p class="text-gray-500 text-sm mb-6">
-        שלום <strong>{data.userName}</strong>, סוכן AI מבקש לחבר את הכלים שלו
+        שלום <strong>{data.userName}</strong>, {#if data.clientName}<strong>{data.clientName}</strong>{:else}סוכן AI{/if} מבקש לחבר את הכלים שלו
         לחשבונך. יאפשר לו לבצע פעולות בשמך.
       </p>
 
@@ -34,6 +34,7 @@
 
       <form method="POST" use:enhance>
         <input type="hidden" name="callback" value={data.callback} />
+        <input type="hidden" name="oauth" value={data.oauth ?? ''} />
         <div class="flex gap-3">
           <button
             type="submit"

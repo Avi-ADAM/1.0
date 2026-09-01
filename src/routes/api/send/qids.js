@@ -872,6 +872,10 @@ const qids_base = {
       id
       attributes {
         name
+        # saveTimer files this month's share onto the counter, so it has to read
+        # the counter it is adding to — without it the bot's save reset the
+        # mission's monthly hours to just the session that was being saved.
+        howmanyhoursalready
          users_permissions_user{data{id}}
          project{data{id}}
         activeTimer {

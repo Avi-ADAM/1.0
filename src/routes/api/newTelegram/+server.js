@@ -865,15 +865,23 @@ bot.action(/^saveTimer-(\d+)-(\d+)-(\d+)$/, async (ctx) => {
 
     try {
         const timerData = await sendToSer({ missionId: missionId }, '36getMissionTimer', 0, 0, true, fetch);
-        const timerToSave = timerData?.data?.mesimabetahalich?.data?.attributes?.timers?.data?.find(t => t.id == timerId);
-        if (!timerToSave) {
+        // `saveTimer` takes the **mission**, not a Timer: it reads the mission's
+        // activeTimer and its `howmanyhoursalready`. This used to look for
+        // `mesimabetahalich.attributes.timers`, a field 36getMissionTimer does
+        // not return at all, so `timerToSave` was always undefined and the
+        // button answered "timer not found" every single time.
+        const missionNode = timerData?.data?.mesimabetahalich?.data;
+        const activeTimerId = missionNode?.attributes?.activeTimer?.data?.id;
+        if (!missionNode || !activeTimerId || String(activeTimerId) !== String(timerId)) {
+            // The button carries the timer it was drawn for. If the mission has
+            // moved on to another one, saving would file the wrong session.
             await ctx.editMessageReplyMarkup(undefined).catch(() => { });
             ctx.reply(getText('timerNotFound', lang));
             return ctx.answerCbQuery(getText('timerNotFound', lang));
         }
 
-        const projectId = timerData?.data?.mesimabetahalich?.data?.attributes?.project?.data?.id;
-        const savedTimer = await saveTimer(timerToSave, missionId, fetch, true, null, projectId, userId);
+        const projectId = missionNode?.attributes?.project?.data?.id;
+        const savedTimer = await saveTimer(missionNode, missionId, fetch, true, null, projectId, userId);
 
         if (savedTimer) {
             await ctx.editMessageReplyMarkup(undefined).catch(() => { });
@@ -2039,11 +2047,44 @@ bot.on('text', async (ctx) => {
     }
 });
 
+/**
+ * Update ids already handled, newest last.
+ *
+ * Telegram redelivers an update whenever the webhook does not answer 200 in
+ * time or answers an error, and every redelivery re-ran the handler from
+ * scratch. On a timer button that meant two `stopTimer` runs racing each other:
+ * both read the timer before either wrote, both passed the `isActive` check,
+ * and both wrote the whole interval list back.
+ *
+ * The set is per-instance, so it cannot be the only defence (a redelivery that
+ * lands on a second instance still gets through, and the timer operations are
+ * idempotent now for exactly that reason) — but it stops the common case, where
+ * the retry comes back to the process that was slow.
+ */
+const handledUpdates = new Set();
+const HANDLED_UPDATES_MAX = 1000;
+
+function alreadyHandled(updateId) {
+    if (updateId == null) return false;
+    if (handledUpdates.has(updateId)) return true;
+    handledUpdates.add(updateId);
+    // A Set iterates in insertion order, so the oldest ids drop out first.
+    while (handledUpdates.size > HANDLED_UPDATES_MAX) {
+        handledUpdates.delete(handledUpdates.values().next().value);
+    }
+    return false;
+}
+
 // --- SvelteKit POST Endpoint ---
 export async function POST({ request, fetch: svelteFetch }) {
     try {
         const data = await request.json();
         // console.log("Incoming Telegram Update:", JSON.stringify(data, null, 2));
+
+        if (alreadyHandled(data?.update_id)) {
+            console.warn('[telegram] update', data.update_id, 'was already handled — ignoring the redelivery');
+            return new Response('', { status: 200 });
+        }
 
         await fetchUserData(svelteFetch);
 
@@ -2056,7 +2097,11 @@ export async function POST({ request, fetch: svelteFetch }) {
         return new Response('', { status: 200 });
     } catch (error) {
         console.error('--- ERROR in SvelteKit POST Handler ---', error, error.stack);
-        return new Response('Internal Server Error', { status: 500 });
+        // Answer 200 even on failure. A 500 makes Telegram send the same update
+        // again, which re-runs whatever half-finished work threw — and the
+        // handlers already report their own failures to the member in chat.
+        // There is nothing a redelivery can fix that a second tap cannot.
+        return new Response('', { status: 200 });
     }
 }
 

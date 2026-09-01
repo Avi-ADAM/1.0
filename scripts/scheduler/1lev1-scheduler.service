@@ -1,0 +1,43 @@
+[Unit]
+Description=1lev1 scheduler — maturation clock and monthly close
+Documentation=file:/opt/1lev1-scheduler/README.md
+# The jobs talk to the API container on 127.0.0.1:3000; docker only has to be
+# up, not any particular container — a job that cannot connect logs and retries.
+After=network-online.target docker.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/1lev1-scheduler
+
+# The month arithmetic on both sides is local-time, so the box must agree with
+# the rikma about when a month ends. Set this to your own zone.
+Environment=TZ=Asia/Jerusalem
+
+# Where the endpoints live and where the secrets come from. SCHEDULER_ENV_FILE
+# points at the API's own .env (the compose file's env_file), so the scheduler
+# and the app can never drift apart on ADMINMONTHER.
+Environment=SCHEDULER_BASE_URL=http://127.0.0.1:3000
+Environment=SCHEDULER_ENV_FILE=/opt/1lev1/.env
+Environment=SCHEDULER_STATE_FILE=/var/lib/1lev1-scheduler/state.json
+
+ExecStart=/usr/bin/node /opt/1lev1-scheduler/scheduler.mjs
+Restart=always
+RestartSec=30
+
+# The state file is the only thing it writes.
+StateDirectory=1lev1-scheduler
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=1lev1-scheduler
+
+# It only makes outbound HTTP calls and writes one JSON file.
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/1lev1-scheduler
+
+[Install]
+WantedBy=multi-user.target

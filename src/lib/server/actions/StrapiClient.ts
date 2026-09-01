@@ -164,8 +164,24 @@ export class StrapiClient {
   }
 
   /**
+   * Does this qid write? Read off the registered document, so a qid cannot be
+   * mis-declared: whatever the operation actually says is what decides.
+   * An unknown qid is treated as a mutation — the safe side of the guess.
+   */
+  private async isMutation(queryId: string): Promise<boolean> {
+    try {
+      await initQids();
+      const doc = qids[queryId];
+      if (!doc) return true;
+      return /^\s*mutation\b/.test(doc.replace(/^\s*#[^\n]*\n/g, ''));
+    } catch {
+      return true;
+    }
+  }
+
+  /**
    * Execute a GraphQL query or mutation with retry logic
-   * 
+   *
    * @param queryId - The QIDS query ID (e.g., '65checkProjectMembership')
    * @param variables - Variables for the GraphQL query
    * @param userJwt - Optional user JWT token (uses admin token if not provided)
@@ -182,8 +198,16 @@ export class StrapiClient {
     let lastError: StrapiError | null = null;
     let delay = this.retryConfig.initialDelayMs;
 
+    // A mutation is never retried. Retrying replays a request whose effect may
+    // already have landed: a timed-out call that Strapi is still processing is
+    // exactly the case the retry fires on, and a second write of a repeatable
+    // component list (Timer.timers) can leave both copies stored — every
+    // interval duplicated, byte for byte, stop timestamps included. Reads are
+    // safe to repeat, so they keep the backoff.
+    const maxRetries = (await this.isMutation(queryId)) ? 0 : this.retryConfig.maxRetries;
+
     // Try the operation with retries
-    for (let attempt = 0; attempt <= this.retryConfig.maxRetries; attempt++) {
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
       try {
         return await this.executeOnce(queryId, variables, userJwt, fetchFn);
       } catch (error) {
@@ -193,13 +217,22 @@ export class StrapiClient {
         }]);
 
         // If this is the last attempt or error is not retryable, throw
-        if (attempt === this.retryConfig.maxRetries || !isRetryableError(lastError)) {
+        if (attempt === maxRetries || !isRetryableError(lastError)) {
+          if (maxRetries === 0 && isRetryableError(lastError)) {
+            // Worth saying out loud: the write may or may not have landed, and
+            // nobody is going to find out by guessing. The caller sees the
+            // failure and the operator sees which write is in doubt.
+            console.error(
+              '[StrapiClient] a mutation failed and was NOT retried — its effect is unknown:',
+              { queryId, error: lastError.message }
+            );
+          }
           throw lastError;
         }
 
         // Log retry attempt
         console.warn(
-          `Strapi request failed (attempt ${attempt + 1}/${this.retryConfig.maxRetries + 1}), ` +
+          `Strapi request failed (attempt ${attempt + 1}/${maxRetries + 1}), ` +
           `retrying in ${delay}ms...`,
           { queryId, error: lastError.message }
         );

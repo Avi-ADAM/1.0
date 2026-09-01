@@ -58,6 +58,45 @@ export function isRunning(iv: Interval | null | undefined): boolean {
 	return !!iv?.start && !iv?.stop;
 }
 
+/** Every interval that was started and never stopped. */
+export function openIntervals(intervals: Interval[] | null | undefined): Interval[] {
+	return (Array.isArray(intervals) ? intervals : []).filter(isRunning);
+}
+
+/**
+ * Closes **every** open interval at `at`, not just the last one.
+ *
+ * A timer can only be running once, so a second open interval is always the
+ * residue of a lost write — a stop whose response never came back, a save or a
+ * clear that turned the timer off without closing what it had started. Nothing
+ * ever closed those: `stopTimer` only ever touched `intervals[length - 1]`, and
+ * `totalHours` skips an interval with no stop, so the orphan stayed invisible in
+ * Strapi while every month-aware view (`hoursByMonth`) measured it up to *now*
+ * and grew by 24 hours a day. That is how a 49-hour timer came to read 390.
+ *
+ * Closing them all is safe in both directions: it is a no-op on a list that has
+ * none, so calling it before a start, on a stop, or on a save costs nothing and
+ * makes each of those idempotent.
+ */
+export function closeOpenIntervals(
+	intervals: Interval[] | null | undefined,
+	at: string = new Date().toISOString()
+): { intervals: Interval[]; closed: number } {
+	const list = Array.isArray(intervals) ? intervals : [];
+	let closed = 0;
+	const next = list.map((iv) => {
+		if (!isRunning(iv)) return iv;
+		closed++;
+		// An interval whose start is already past `at` (clock skew, a hand-edited
+		// row) would become negative — close it on itself instead, so it counts
+		// as zero rather than as a subtraction.
+		const start = new Date(iv.start).getTime();
+		const stopMs = new Date(at).getTime();
+		return { ...iv, stop: Number.isFinite(start) && stopMs < start ? iv.start : at };
+	});
+	return { intervals: next, closed };
+}
+
 /**
  * Checks one candidate interval against the rest of the list.
  *
