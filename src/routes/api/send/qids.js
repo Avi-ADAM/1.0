@@ -521,7 +521,7 @@ const qids_base = {
 }`,
   "15createPgishauser": `mutation CreatePgishauser($id: ID!) {
   createPgishauser(data: {users_permissions_user: $id}) {data{id}}
-}`, '16createPgisha': `mutation CreatePgisha($ids: [ID],$name: String, $desc: String,pendIds:[ID]) {
+}`, '16createPgisha': `mutation CreatePgisha($ids: [ID],$name: String, $desc: String,$pendIds:[ID]) {
   createPgisha(data: {pgishausers: $ids,pgishauserpends:$pendIds, name: $name, desc: $desc}) {data{id}}
 }` , '17getUsers': `query GetUsers {
   usersPermissionsUsers{
@@ -680,12 +680,19 @@ const qids_base = {
   {data{id}}
 }`,
   '27getFiniApp': `query GetFiniApp($id: ID!) {
-   finiapruval(id:'$id'){
-   data{
-   id attributes{
-   
-   }}
-   }
+    finiapruval(id: $id) {
+      data {
+        id
+        attributes {
+          missname archived createdAt month noofhours perhour why iskvua isTimerSave
+          vots { id what why order zman users_permissions_user { data { id } } }
+          users_permissions_user { data { id attributes { username } } }
+          project { data { id attributes { projectName } } }
+          mesimabetahalich { data { id } }
+          timegrama { data { id attributes { date done } } }
+        }
+      }
+    }
 }`,
   "27GetOpenMissionsRegTr": `query GetOpenMissionsRegTr($start: Int, $limit: Int)
 {  openMissions(filters: { and: [ { or: [{ source: { null: true } }, { source: { ne: "selfNomination" } }] }, ${NOT_ARCHIVED} ] }, pagination: { start: $start, limit: $limit }) {
@@ -9680,7 +9687,7 @@ export const moachQids = {
           }
           createdAt
           chat { why id ide what zman users_permissions_user { data { id } } }
-          forums { data { id attributes { messages(pagination: { limit: 100 }) { data { id attributes { content createdAt users_permissions_user { data { id attributes { username profilePic { data { attributes { url formats } } } } } } } } } } }
+          forums { data { id attributes { messages(pagination: { limit: 100 }) { data { id attributes { content createdAt users_permissions_user { data { id attributes { username profilePic { data { attributes { url formats } } } } } } } } } } } }
           open_mission {
             data { id attributes {
               acts { data { id attributes { shem link des dateF dateS } } }
@@ -13247,7 +13254,8 @@ ${STIPEND_DECISION_FIELDS}
       # Same NULL guard as 281 - never-archived products often have NULL here.
       filters: {
         and: [
-          { or: [{ archived: { eq: false } }, { archived: { null: true } }] }, ${NOT_ARCHIVED} ] },
+          { or: [{ archived: { eq: false } }, { archived: { null: true } }] },
+          ${NOT_ARCHIVED},
           { or: [{ hideFromDiscovery: { eq: false } }, { hideFromDiscovery: { null: true } }] }
         ]
       }

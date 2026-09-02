@@ -14,9 +14,32 @@
 import { readFileSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
+import { createRequire } from 'module';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+
+// ─── Lazy-loaded GraphQL parser ───
+// The field checks below are regex-based, so a query that is not even valid
+// GraphQL (a stray brace, a missing `$`, a single-quoted argument) sails
+// through them and only fails at Strapi, as a 500 with
+// "Syntax Error: …" in the downstream error log.
+//
+// `graphql` is a devDependency, and nothing else in src/ imports it. Resolving
+// it through createRequire keeps it out of the production bundle: in dev and in
+// CI (where devDeps are installed) the parser is there and every qid is parsed;
+// in a --omit=dev container the require throws once and the syntax check is
+// skipped, exactly as it was before.
+let _parse; // undefined = not tried yet, null = unavailable
+function getParse() {
+  if (_parse !== undefined) return _parse;
+  try {
+    _parse = createRequire(import.meta.url)('graphql').parse;
+  } catch {
+    _parse = null;
+  }
+  return _parse;
+}
 
 // ─── Lazy-loaded schema cache ───
 let _schemaTypes = null;
@@ -168,15 +191,39 @@ function findMutationOperations(queryStr) {
  * @returns {{ valid: boolean, errors: string[], warnings: string[] }}
  */
 export function validateQuery(qid, queryStr) {
-  loadSchema();
-  
   const result = { valid: true, errors: [], warnings: [] };
-  
+
+  // ── Step 1: is it valid GraphQL at all? ──
+  // Runs before the schema is consulted, so a syntax error is reported even
+  // when graphql.ts could not be loaded.
+  const parse = getParse();
+  if (!parse) {
+    result.warnings.push('graphql not installed - syntax check skipped');
+  } else if (typeof queryStr !== 'string') {
+    result.valid = false;
+    result.errors.push(`Query is not a string (got ${typeof queryStr})`);
+    return result;
+  } else {
+    try {
+      parse(queryStr);
+    } catch (err) {
+      result.valid = false;
+      result.errors.push(`${err.message.split('\n')[0]}${
+        err.locations?.[0] ? ` (line ${err.locations[0].line}, column ${err.locations[0].column})` : ''
+      }`);
+      // Field checks below assume a parseable query — nothing more to say.
+      return result;
+    }
+  }
+
+  // ── Step 2: do the mutation input fields exist on the schema? ──
+  loadSchema();
+
   if (!_schemaTypes || _schemaTypes.size === 0) {
-    result.warnings.push('Schema not loaded - validation skipped');
+    result.warnings.push('Schema not loaded - field validation skipped');
     return result;
   }
-  
+
   const isMutation = /^\s*mutation/i.test(queryStr);
   
   if (isMutation) {
@@ -226,7 +273,7 @@ export function validateNewQuery(qid, queryStr) {
   
   if (!result.valid) {
     const errorMsg = [
-      `❌ Query '${qid}' has invalid fields:`,
+      `❌ Query '${qid}' is invalid:`,
       ...result.errors.map(e => `  - ${e}`),
       '',
       '💡 Check src/generated/STRAPI_SCHEMA_REFERENCE.md for correct field names.',

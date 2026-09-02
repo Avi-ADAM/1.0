@@ -680,37 +680,61 @@
     --rt-shadow: 0 4px 6px -1px rgba(212, 175, 55, 0.18);
     --rt-line: rgba(212, 175, 55, 0.55);
     --rt-line-soft: rgba(212, 175, 55, 0.28);
-    --rt-wash: rgba(212, 175, 55, 0.07);
+    /* Opaque, and it has to be: the ink below is dark, and the personal
+       theme's page is #070606 in light mode too (only the `dark:` utilities
+       move between modes - see the CARD SURFACE note in app.postcss). A 7%
+       gold wash let that black through, so every editor NOT sitting inside an
+       explicit light card - the description fields in `baci`, `conf/rich`,
+       `createNewMeeting` - rendered #43303a on near-black, 1.5:1. This is
+       --surface for the fill, so the panel is seamless inside a card and is
+       still a readable card when there is none. The gold identity survives in
+       the border, the shadow, the toolbar tint and the quote fill, which all
+       layer on top of it. */
+    --rt-wash: #ffffff;
     --rt-toolbar-bg: rgba(212, 175, 55, 0.06);
     --rt-ring: rgba(224, 33, 138, 0.18);
 
     --rt-pop-bg: #ffffff;
     --rt-pop-ink: #4a4a4a;
-    --rt-btn-ink: #b21a6d; /* 5.3:1 on the wash — #e0218a is 3.5:1 */
+    --rt-btn-ink: #b21a6d; /* 6.4:1 on the wash — #e0218a is 4.0:1 */
     --rt-btn-hover-bg: rgba(212, 175, 55, 0.16);
     --rt-btn-hover-ink: #8d1156;
     --rt-accent: #e0218a;
     --rt-accent-ink: #ffffff;
     --rt-accent-shadow: 0 2px 4px rgba(224, 33, 138, 0.3);
 
-    --rt-body-ink: #43303a; /* warm near-black, 11.4:1 on the wash */
+    --rt-body-ink: #43303a; /* warm near-black, 12.3:1 on the wash */
     --rt-head-ink: #c01a74;
     --rt-strong-ink: #43303a;
     --rt-link-ink: #a8195f; /* was --lturk: cyan on white, ~1.4:1 */
-    --rt-muted: #8a7a63;
+    --rt-muted: #7a6a52; /* blockquote ink + list markers; was #8a7a63, 3.9:1 */
     --rt-quote-bg: rgba(212, 175, 55, 0.12);
     --rt-quote-rule: #d4af37;
   }
 
   /* --- PERSONAL · DARK ---------------------------------------------------
      Every popover in here was a hard-coded `bg-white` with #4a4a4a text, so
-     night mode opened a white card over a near-black page. */
+     night mode opened a white card over a near-black page.
+
+     --rt-wash is opaque here for the same reason it is opaque in the light
+     fill above, mirrored: the ink is light (#ede5d8, the palette's --text),
+     and a 5%-alpha wash let whatever the caller painted show straight
+     through. Plenty of hosts were a flat light card with no `dark:` variant
+     — `bg-white` on the moach main sections and on the lev mission card, the
+     pale rows in `betaha` — and there the editor rendered light ink on
+     white, 1.25:1. That was the reported bug.
+
+     All four fills are opaque now, which is what the two business fills
+     (`var(--s1)`) always did, and why business dark read fine on those same
+     white cards while personal dark did not. `trans` callers (WishForm, the
+     lev cards that pass trans={true}) opt out of the fill and own their own
+     ground, as before. */
   :global(html.personal.dark) .editor-wrapper,
   :global(html.personal.dark) .bubble-menu {
     --rt-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
     --rt-line: rgba(238, 232, 170, 0.28);
     --rt-line-soft: rgba(238, 232, 170, 0.16);
-    --rt-wash: rgba(238, 232, 170, 0.05);
+    --rt-wash: #171512; /* = --surface, 14.6:1 under --rt-body-ink */
     --rt-toolbar-bg: rgba(238, 232, 170, 0.04);
     --rt-ring: rgba(255, 77, 158, 0.28);
 

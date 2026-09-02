@@ -22,24 +22,27 @@
 <div class="space-y-8">
   {#if projectBase}
     {#if projectBase.publicDescription}
-      <section id="description" class="bg-white p-6 rounded-xl shadow-sm">
+      <section
+        id="description"
+        class="bg-surface text-surfaceInk p-6 rounded-xl shadow-sm"
+      >
         <RichText editable={false} outpot={projectBase.publicDescription} />
       </section>
     {/if}
 
     {#if projectBase.descripFor}
       <section
-        class="bg-white p-6 rounded-xl shadow-sm border-t-4 border-primary"
+        class="bg-surface text-surfaceInk p-6 rounded-xl shadow-sm border-t-4 border-primary"
       >
         <RichText editable={false} outpot={projectBase.descripFor} />
       </section>
     {/if}
 
     {#if vallues.length > 0}
-      <section class="bg-white p-6 rounded-xl shadow-sm">
+      <section class="bg-surface text-surfaceInk p-6 rounded-xl shadow-sm">
         <h2 class="text-xl font-bold text-primary mb-4">{$t('moach.main.vap')}</h2>
         <div
-          class="flex flex-wrap justify-center gap-2 p-4 bg-gray-50 rounded-lg border border-gold"
+          class="flex flex-wrap justify-center gap-2 p-4 bg-surface2 rounded-lg border border-gold"
         >
           {#each vallues as vallue}
             <Tile

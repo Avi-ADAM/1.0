@@ -101,6 +101,16 @@ const config = {
         // renders at ~1.2:1 and is effectively invisible. `goldink` is the
         // readable counterpart for exactly that role.
         goldink: 'var(--goldink)',
+        // The one card surface, resolved per theme AND per mode by the
+        // appearance layer at the end of app.postcss. `bg-white` is only
+        // right in two of the four fills; this is right in all four.
+        // No `/opacity` modifiers on these - a bare var() cannot composite
+        // an alpha (see the note in richText.svelte's palette block).
+        surface: 'var(--surface)',
+        surface2: 'var(--surface-2)',
+        surfaceInk: 'var(--surface-ink)',
+        surfaceMuted: 'var(--surface-muted)',
+        surfaceLine: 'var(--surface-line)',
         neww: 'var(--neww)',
         lturk: 'var(--lturk)',
         mturk: 'var(--mturk)',

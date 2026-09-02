@@ -7,7 +7,8 @@
 
 import { readFileSync } from 'fs';
 import { join, dirname } from 'path';
-import { fileURLToPath } from 'url';
+import { fileURLToPath, pathToFileURL } from 'url';
+import { parse } from 'graphql';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -61,16 +62,13 @@ function loadInputTypes(filePath) {
   return inputTypes;
 }
 
-// ─── Parse qids entries ───
-function loadQids(filePath) {
-  const content = readFileSync(filePath, 'utf-8');
-  const entries = [];
-  const regex = /['"]([^'"]+)['"]\s*:\s*`([^`]+)`/g;
-  let match;
-  while ((match = regex.exec(content)) !== null) {
-    entries.push({ id: match[1], query: match[2] });
-  }
-  return entries;
+// ─── Load qids entries ───
+// The module is imported rather than regex-scraped so that template
+// interpolations (${NOT_ARCHIVED} and friends) are already resolved — the
+// string here is byte-for-byte what /api/send sends to Strapi.
+async function loadQids(filePath) {
+  const mod = await import(pathToFileURL(filePath).href);
+  return Object.entries(mod.qids).map(([id, query]) => ({ id, query }));
 }
 
 // ─── Extract mutation data fields ───
@@ -107,14 +105,38 @@ console.log('🔍 Validating qids.js against Strapi GraphQL schema...\n');
 const inputTypes = loadInputTypes(join(ROOT, 'src/generated/graphql.ts'));
 console.log(`📊 Loaded ${inputTypes.size} Input types from schema`);
 
-const qidEntries = loadQids(join(ROOT, 'src/routes/api/send/qids.js'));
+const qidEntries = await loadQids(join(ROOT, 'src/routes/api/send/qids.js'));
 console.log(`📋 Found ${qidEntries.length} queries in qids.js\n`);
 
 let errors = 0;
 let warnings = 0;
 let checked = 0;
+let syntaxErrors = 0;
 
+// ─── Pass 1: is every qid valid GraphQL? ───
+// The field checks below are regex-based and happily accept a query that no
+// parser would. Strapi does not: it answers a malformed query with
+// "Syntax Error: …", which surfaces as a 500 from /api/send.
 for (const { id, query } of qidEntries) {
+  if (typeof query !== 'string') {
+    syntaxErrors++;
+    console.log(`  ❌ [${id}] is not a string (got ${typeof query})`);
+    continue;
+  }
+  try {
+    parse(query);
+  } catch (err) {
+    syntaxErrors++;
+    const at = err.locations?.[0];
+    console.log(`  ❌ [${id}] ${err.message.split('\n')[0]}${at ? ` (line ${at.line}, column ${at.column})` : ''}`);
+  }
+}
+if (syntaxErrors === 0) console.log('✅ All queries parse as valid GraphQL');
+console.log('');
+
+// ─── Pass 2: do mutation input fields exist on the schema? ───
+for (const { id, query } of qidEntries) {
+  if (typeof query !== 'string') continue;
   const mutations = findMutations(query);
   
   for (const { action, entity } of mutations) {
@@ -141,12 +163,12 @@ for (const { id, query } of qidEntries) {
 }
 
 console.log('\n═══════════════════════════════════════════');
-console.log(`  📊 ${checked} mutations validated`);
-console.log(`  🔴 ${errors} errors | 🟡 ${warnings} warnings`);
+console.log(`  📊 ${qidEntries.length} queries parsed | ${checked} mutations validated`);
+console.log(`  🔴 ${syntaxErrors} syntax errors | ${errors} field errors | 🟡 ${warnings} warnings`);
 console.log('═══════════════════════════════════════════\n');
 
-if (errors > 0) {
-  console.log('💡 Fix: Check src/generated/STRAPI_SCHEMA_REFERENCE.md');
+if (syntaxErrors > 0 || errors > 0) {
+  if (errors > 0) console.log('💡 Fix: Check src/generated/STRAPI_SCHEMA_REFERENCE.md');
   process.exit(1);
 } else {
   console.log('✅ All mutations use valid schema fields!\n');

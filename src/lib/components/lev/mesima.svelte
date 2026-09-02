@@ -53,10 +53,10 @@ async function xyd () {
  <RingLoader size="260" color="#ff00ae" unit="px" duration="2s"></RingLoader>
  {:then data}
 
-<div dir="rtl"  style="overflow-y:auto" class=" d mb-4 mt-8 bg-white leading-normal w-full  bg-white lg:w-full">
+<div dir="rtl"  style="overflow-y:auto" class=" d mb-4 mt-8 bg-surface text-surfaceInk leading-normal w-full lg:w-full">
  <!-- <div class="h-48 lg:h-auto lg:w-48 flex-none bg-cover rounded-t lg:rounded-t-none lg:rounded-l text-center overflow-hidden bg-gold" style:background-image={`url('${src2}')`} title="">
   </div>-->
-   <div class="flex sm:items-center justify-between py-3 border-b-2 border-b-gray-200 bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre">
+   <div class="flex sm:items-center justify-between py-3 border-b-2 border-b-surfaceLine bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre">
       <div class="relative flex items-center space-x-1">
          <div class="relative">
          <img src={data.project.data.attributes.profilePic.data?.attributes.url}  alt="" class="w-10 sm:w-16 h-10 sm:h-16  rounded-full">
@@ -69,9 +69,9 @@ async function xyd () {
          </div>
          </div>
          </div>
-  <div  class=" bg-white rounded-b lg:rounded-b-none lg:rounded-r p-4 flex flex-col justify-between leading-normal">
+  <div  class=" bg-surface rounded-b lg:rounded-b-none lg:rounded-r p-4 flex flex-col justify-between leading-normal">
     <div  class="mb-8">
-         <p style="line-height: 1;" class="text-sm text-gray-600 flex items-center">
+         <p style="line-height: 1;" class="text-sm text-surfaceMuted flex items-center">
             <img style="width:2.5rem;" class=""  src="https://res.cloudinary.com/love1/image/upload/v1653148344/Crashing-Money_n6qaqj.svg" alt="howmuch"/>
             <span onmouseenter={()=>hover($t('common.valph'))} onmouseleave={()=>hover("0")} > {data.perhour.toLocaleString('en-US', {maximumFractionDigits:2})} לשעה </span> * <span onmouseenter={()=>hover($t('common.noofhours'))} onmouseleave={()=>hover("0")}  > {data.noofhours.toLocaleString('en-US', {maximumFractionDigits:2})} שעות </span> = <span onmouseenter={()=>hover($t('lev.cards.voteCard.inTotal'))} onmouseleave={()=>hover("0")}>{(data.noofhours * data.perhour).toLocaleString('en-US', {maximumFractionDigits:2})} </span>
       </p>

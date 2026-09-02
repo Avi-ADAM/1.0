@@ -2095,6 +2095,54 @@ html.business.dark {
 }
 
 
+/* --- THE CARD SURFACE ----------------------------------------------------
+   `bg-white` is written flat in a lot of markup and it is only correct in one
+   of the four fills. The personal theme's page is #070606 in BOTH modes (only
+   the `dark:` utilities move), so a card that forgot its `dark:` variant stays
+   white while every ink on it flips light - that is the light-on-light the
+   rich-text editor was reported for, and the card around it had the same bug.
+
+   --surface is the one card colour, resolved per theme AND per mode, with
+   --surface-ink as the text guaranteed to read on it, --surface-2 for a panel
+   nested inside a card (what `bg-gray-50` was reaching for) and --surface-line
+   for its hairlines. Reach them as `bg-surface text-surfaceInk` / `bg-surface2`
+   / `border-surfaceLine` (the entries in tailwind.config.cjs).
+
+   The values are the ones each theme already used, so swapping a card over
+   does not change how it looks in the fills that were already right - it only
+   supplies the fill that was missing. personal-dark is the palette's own warm
+   --s2, which is also the ground richText paints, so an editor sitting inside
+   a card is seamless instead of a box inside a box.
+   ------------------------------------------------------------------------ */
+html.personal {
+  --surface: #ffffff;
+  --surface-2: #f7f5ef;
+  --surface-ink: #2b2620; /* 13.9:1 on --surface */
+  --surface-muted: #6b6156; /* 6.1:1 - the `text-gray-600` role */
+  --surface-line: rgba(0, 0, 0, 0.1);
+}
+html.personal.dark {
+  --surface: #171512;
+  --surface-2: #201d19;
+  --surface-ink: #ede5d8; /* 14.6:1 */
+  --surface-muted: #a89a86; /* 6.6:1 */
+  --surface-line: rgba(238, 232, 170, 0.14);
+}
+html.business {
+  --surface: #ffffff;
+  --surface-2: #f1f5f9;
+  --surface-ink: #0f172a; /* 17.4:1 */
+  --surface-muted: #475569; /* 7.4:1 */
+  --surface-line: rgb(15 23 42 / 0.12);
+}
+html.business.dark {
+  --surface: #111b2e;
+  --surface-2: #172440;
+  --surface-ink: #e8eef7; /* 15.6:1 */
+  --surface-muted: #a3b3c9; /* 7.1:1 */
+  --surface-line: rgb(255 255 255 / 0.12);
+}
+
 /* --- identity colour families -------------------------------------------
    Consumed by the `pink`/`amber`/… entries in tailwind.config.cjs. These are
    the stock Tailwind values, declared on :root so an unclassed <html> still
