@@ -1,5 +1,6 @@
 <script>
       import Tile from '$lib/celim/tile.svelte';
+      import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
 import { animate, signal, all } from '$lib/func/animation.ts'
   import { onMount } from 'svelte';// afterUpdate,
       let colors = ["pink" ,"blue", "purple","wow","indigo",  "green", "yellow", "red", "gray"];
@@ -301,7 +302,7 @@ import { animate, signal, all } from '$lib/func/animation.ts'
            width=100
           height=100
         >
-          <button onclick={addPoint("middle",points.length,point.order)} class="bg-gold text-barbi rounded-full p-2">➕</button>
+          <button onclick={addPoint("middle",points.length,point.order)} class="bg-gold text-barbi rounded-full p-2"><EntityIcon kind="add" size={16} /></button>
         </foreignObject>
       {/if}
     {/each}
@@ -311,7 +312,7 @@ import { animate, signal, all } from '$lib/func/animation.ts'
            width=50
           height=50
         >
-          <button onclick={addPoint("top",points.length)} class="bg-gold text-barbi rounded-full p-2">➕</button>
+          <button onclick={addPoint("top",points.length)} class="bg-gold text-barbi rounded-full p-2"><EntityIcon kind="add" size={16} /></button>
         </foreignObject>
         <foreignObject
           x={points.length > 1 ? points.length > 2 ?  94*(w/100)+25 : 84*(w/100)+25  : 66.6*(w/100)+25}
@@ -319,7 +320,7 @@ import { animate, signal, all } from '$lib/func/animation.ts'
            width=50
           height=50
         >
-          <button onclick={addPoint("buttom",points.length)} class="bg-gold text-barbi rounded-full p-2">➕</button>
+          <button onclick={addPoint("buttom",points.length)} class="bg-gold text-barbi rounded-full p-2"><EntityIcon kind="add" size={16} /></button>
         </foreignObject>
   </svg>
   {/key}

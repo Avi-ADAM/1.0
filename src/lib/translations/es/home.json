@@ -235,7 +235,7 @@
     "flow": "Nos lo cuentas → Lev lo desglosa → se forma un grupo de proveedores → apruebas y recibes",
     "customerTitle": "Para clientes",
     "customerDesc": "Sin categorías, sin perseguir proveedores. Describe lo que quieres y recibe un plan completo para aprobar. Nada sale hasta que lo publicas.",
-    "customerCta": "Cuéntanos lo que quieres ✨",
+    "customerCta": "Cuéntanos lo que quieres",
     "providerTitle": "Para dueños de negocios y proveedores",
     "providerDesc": "Los clientes ya están buscando: deja que te encuentren. Cada deseo que incluya lo que ofreces te llega como un cliente potencial cálido y preseleccionado, con socios que te completan en un paquete entero.",
     "providerCta": "Consigue clientes: únete como proveedor",
@@ -339,7 +339,7 @@
       "emailInvalid": "Se requiere un correo electrónico válido",
       "locationRequired": "Debe seleccionarse al menos una ubicación",
       "agreementRequired": "Debes aceptar los términos de uso",
-      "serverSleep": "El servidor se durmió 😴, lo despertamos, intentándolo de nuevo",
+      "serverSleep": "El servidor se durmió, lo despertamos, intentándolo de nuevo",
       "contactSupport": "Si el problema persiste, puedes contactar con"
     },
     "agreement": {
@@ -393,19 +393,19 @@
     "rikmaDefinition": "Una Rikma es un grupo de personas con distintas habilidades y recursos que crean juntas un producto o prestan un servicio y reparten los beneficios según la inversión relativa y el acuerdo"
   },
   "grow": {
-    "eyebrow": "🌱 Agricultura colaborativa y trabajo con las manos",
+    "eyebrow": "Agricultura colaborativa y trabajo con las manos",
     "title": "¿Te encanta cultivar, construir o crear con tus manos? Ven a ver cómo 1💗1 puede ayudarte",
     "desc": "Para agricultores, jardineros, artesanos y cualquiera que quiera ganarse la vida con la tierra, sin capital inicial ni ir en solitario.",
     "cta": "A la página de Cultivar"
   },
   "guide": {
-    "eyebrow": "📖 La guía completa",
+    "eyebrow": "La guía completa",
     "title": "Todo lo que contiene el sistema, en un solo lugar",
     "desc": "Rikma, misión, recurso, producto, venta, reparto, agregado de demanda: qué es cada uno, por qué pasa desde la idea hasta el reparto del beneficio, y dónde se pulsa exactamente.",
     "cta": "Leer la guía"
   },
   "consensus": {
-    "eyebrow": "🤝 El motor de acuerdos",
+    "eyebrow": "El motor de acuerdos",
     "title": "No tenemos un \"no\": cada decisión se cierra por acuerdo",
     "desc": "Aprueba, sigue hablando o propón otra versión. Mira cómo funciona una asociación real por acuerdo mutuo, y prueba una demo en vivo.",
     "cta": "Conoce el motor de acuerdos"
@@ -417,7 +417,7 @@
     "cta": "Descubre el Quórum"
   },
   "fpage": {
-    "whyDifferentTitle": "💗 Por qué somos diferentes",
+    "whyDifferentTitle": "Por qué somos diferentes",
     "whyDifferentDesc": "1💗1 no es solo una plataforma de negocios: <strong>somos parte de un movimiento global</strong> de personas que eligen trabajar por acuerdo mutuo, no por coerción. Cada asociación aquí es prueba viviente de que trabajar de otra manera es posible.",
     "discoverAgreement": "Descubre el acuerdo global ➜",
     "agreedOnAgreement": "Aceptaron el acuerdo"
@@ -483,12 +483,12 @@
     "lev": {
       "tab": "Tarjetas del Corazón",
       "header": "El Corazón: acciones que esperan tu consentimiento",
-      "hint": "Desliza a la derecha para aprobar, a la izquierda para negociar; pruébalo 👇",
+      "hint": "Desliza a la derecha para aprobar, a la izquierda para negociar; pruébalo",
       "approve": "Aprobar",
       "reject": "Negociar",
       "approved": "¡Aprobada!",
       "rejected": "A negociación",
-      "done": "¡Eso es todo! Acabas de gestionar una asociación en 20 segundos 💗",
+      "done": "¡Eso es todo! Acabas de gestionar una asociación en 20 segundos",
       "doneSub": "En 1💗1 no hay rechazo: solo consentimiento o negociación, tarjeta a tarjeta, hasta que todos estén en paz con la decisión.",
       "restart": "De nuevo ↺",
       "cards": {
@@ -526,7 +526,7 @@
       },
       "negoTitle": "Contraoferta",
       "negoOrig": "Propuesto:",
-      "negoSend": "Enviar contraoferta 🤝",
+      "negoSend": "Enviar contraoferta",
       "negoBack": "Atrás",
       "negoSent": "¡Enviado a negociación!"
     }
@@ -622,7 +622,7 @@
     "decade": "En toda la década: quien trabaja por su cuenta se lleva {{freelancer}}× lo del empleado, y quien es socio {{partner}}×."
   },
   "why": {
-    "eyebrow": "💬 Por qué construimos esto",
+    "eyebrow": "Por qué construimos esto",
     "title": "Exactamente las mismas palabras. A veces son un pedido, a veces una exigencia.",
     "desc": "Toda la diferencia está en lo que ocurre cuando la respuesta es no, y de esa frase se deriva todo lo construido aquí. Hay una página que lo explica, con números y fuentes.",
     "cta": "Leer por qué",

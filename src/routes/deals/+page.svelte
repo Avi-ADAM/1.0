@@ -1,5 +1,6 @@
 <script lang="ts">
   import StatsRow from '$lib/components/deals/StatsRow.svelte';
+  import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
   import DealCard from '$lib/components/deals/DealCard.svelte';
   import PendingRequestCard from '$lib/components/deals/PendingRequestCard.svelte';
   import IncomingWishCard from '$lib/components/deals/IncomingWishCard.svelte';
@@ -57,7 +58,7 @@
   <!-- Quick Action Links -->
   <div class="quick-links anim">
     <a href="/deals/sales-center" class="quick-card quick-card--gold">
-      <span class="quick-icon">🏪</span>
+      <span class="quick-icon"><EntityIcon kind="store" size={20} /></span>
       <span class="quick-body">
         <span class="quick-title">{$t('deals.quick_sales_center')}</span>
         <span class="quick-hint">{$t('deals.quick_sales_center_hint')}</span>
@@ -65,7 +66,7 @@
       <span class="quick-arrow">←</span>
     </a>
     <a href="/concierge" class="quick-card quick-card--pink">
-      <span class="quick-icon">🎩</span>
+      <span class="quick-icon"><EntityIcon kind="service" size={20} /></span>
       <span class="quick-body">
         <span class="quick-title">{$t('deals.quick_concierge')}</span>
         <span class="quick-hint">{$t('deals.quick_concierge_hint')}</span>
@@ -78,8 +79,8 @@
     <section class="cycles-section anim">
       <h2 class="cycles-title">
         {$lang === 'he'
-          ? `💳 הוראות קבע - עדכון חודשי (${customerCycles.length})`
-          : `💳 Standing orders - monthly update (${customerCycles.length})`}
+          ? `הוראות קבע - עדכון חודשי (${customerCycles.length})`
+          : `Standing orders - monthly update (${customerCycles.length})`}
       </h2>
       <p class="cycles-sub">
         {$lang === 'he'
@@ -159,11 +160,11 @@
         </p>
         {#if tab === 'purchase'}
           <a href="/concierge" class="empty-cta empty-cta--pink">
-            🎩 {$t('deals.cta_find_products')}
+            <EntityIcon kind="service" size={15} /> {$t('deals.cta_find_products')}
           </a>
         {:else}
           <a href="/deals/sales-center" class="empty-cta empty-cta--gold">
-            🏪 {$t('deals.cta_start_selling')}
+            <EntityIcon kind="store" size={15} /> {$t('deals.cta_start_selling')}
           </a>
         {/if}
       </div>
@@ -182,7 +183,7 @@
         <p class="empty-text">{$t('deals.no_pending_requests')}</p>
         <p class="empty-sub">{$t('deals.cta_concierge_desc')}</p>
         <a href="/concierge" class="empty-cta empty-cta--pink">
-          🎩 {$t('deals.cta_find_products')}
+          <EntityIcon kind="service" size={15} /> {$t('deals.cta_find_products')}
         </a>
       </div>
     {:else}
@@ -203,7 +204,7 @@
         <p class="empty-text">{$t('deals.no_incoming_wishes')}</p>
         <p class="empty-sub">{$t('deals.incoming_wishes_hint')}</p>
         <a href="/concierge" class="empty-cta empty-cta--pink">
-          🎩 {$t('deals.cta_find_products')}
+          <EntityIcon kind="service" size={15} /> {$t('deals.cta_find_products')}
         </a>
       </div>
     {:else}

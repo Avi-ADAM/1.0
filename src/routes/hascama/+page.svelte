@@ -1,5 +1,6 @@
 <script>
   import { fbl } from '$lib/stores/fbl.js';
+  import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
 
   import { lang } from '$lib/stores/lang.js';
   import { goto } from '$app/navigation';
@@ -162,7 +163,7 @@ regHelperL = 0;
     <Mobile />
   {:else}
     <div class="handoff">
-      <div class="handoff-heart">💗</div>
+      <div class="handoff-heart"><EntityIcon kind="lev" size={34} /></div>
       <h2>{$t('home.amana.redirect.title')}</h2>
       <p>{$t('home.amana.redirect.hint')}</p>
       <a class="handoff-link" href={signupHref}

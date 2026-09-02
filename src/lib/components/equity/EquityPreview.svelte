@@ -10,6 +10,7 @@
    * a host card never breaks.
    */
   import { t, isRtl } from '$lib/translations';
+  import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
   import {
     computeEquityScenarios,
     computeEquityHorizons,
@@ -244,7 +245,7 @@
       class="rounded-xl bg-gray-100 dark:bg-slate-800 border border-gray-200 dark:border-slate-600 p-3 space-y-1.5 text-sm"
     >
       <div class="flex items-center gap-1.5 font-bold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide">
-        <span>💠</span>
+        <EntityIcon kind="equity" size={15} />
         <span>{heading}</span>
       </div>
 
@@ -334,7 +335,7 @@
             onmouseleave={() => hover('0')}
             role="contentinfo"
           >
-            <span>🔁</span>
+            <EntityIcon kind="recurring" size={15} />
             <span>{$t('equity.horizonsTitle')}</span>
           </div>
           {#each horizons as h (h.months)}

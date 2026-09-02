@@ -1,5 +1,6 @@
 <script>
   import { fly, scale } from 'svelte/transition';
+  import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
   import { quintOut } from 'svelte/easing';
   import { onMount } from 'svelte';
   import ScreenFrame from '$lib/components/onboard/ScreenFrame.svelte';
@@ -78,7 +79,7 @@
         />
       </svg>
       <span class="envelope">
-        <span class="float" style="display: inline-block;">✉️</span>
+        <span class="float" style="display: inline-block;"><EntityIcon kind="mail" size={30} /></span>
       </span>
     </div>
 
@@ -94,9 +95,9 @@
     {:else}
       <div class="actions">
         <button class="btn btn-ghost" onclick={resend} disabled={resending || !email}>
-          {resending ? '⟳ שולח...' : '📨 לא הגיע - שליחה חוזרת'}
+          {#if resending}⟳ שולח...{:else}<EntityIcon kind="mail" size={14} /> לא הגיע - שליחה חוזרת{/if}
         </button>
-        <a href="/signup" class="btn btn-skip">✏️ תיקון כתובת</a>
+        <a href="/signup" class="btn btn-skip"><EntityIcon kind="edit" size={14} /> תיקון כתובת</a>
       </div>
     {/if}
 

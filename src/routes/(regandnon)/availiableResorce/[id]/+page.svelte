@@ -1,5 +1,6 @@
 <script>
     import { toast } from 'svelte-sonner';
+    import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
     import SucssesConf from '$lib/celim/sucssesConf.svelte';
     import DiscoveryNav from '$lib/components/discovery/DiscoveryNav.svelte';
     import Share from '$lib/components/share/ShareLink.svelte';
@@ -288,8 +289,8 @@
     let sourceName = $derived(
         data.alld?.project?.data?.attributes?.projectName ??
             (isMaagadSrc
-                ? `🤝 ${$lang === 'he' ? 'מאגד ביקוש' : 'demand pool'}${maagadInfo?.name ? ` · ${maagadInfo.name}` : ''}`
-                : `🌟 ${$lang === 'he' ? "קונסיירז'" : 'concierge'}${ratsonName ? ` · ${ratsonName}` : ''}`)
+                ? `${$lang === 'he' ? 'מאגד ביקוש' : 'demand pool'}${maagadInfo?.name ? ` · ${maagadInfo.name}` : ''}`
+                : `${$lang === 'he' ? "קונסיירז'" : 'concierge'}${ratsonName ? ` · ${ratsonName}` : ''}`)
     );
 
     // ── שווי צפוי בריקמה ─────────────────────────────────────────────────
@@ -413,12 +414,12 @@
                                     <h2 class="text-barbi font-bold text-xl lg:text-4xl underline">{data.alld.name}</h2>
                                     {#if data.alld.recurring}
                                         <div class="inline-flex flex-wrap items-center gap-2 my-2 px-3 py-1.5 rounded-xl bg-blue-900/40 border border-gold/40">
-                                            <span class="text-gold font-bold text-sm lg:text-xl">🔁 {$t('pages.availResource.recurH')}</span>
+                                            <span class="text-gold font-bold text-sm lg:text-xl"><EntityIcon kind="recurring" size={15} /> {$t('pages.availResource.recurH')}</span>
                                             {#if Number(data.alld.cycleSize) > 1}
                                                 <span class="text-gray-100 text-xs lg:text-lg">· {$t('pages.availResource.everyH')} {data.alld.cycleSize} {data.alld.kindOf == "yearly" ? $t('pages.availResource.years') : $t('pages.availResource.monts')}</span>
                                             {/if}
                                             {#if !data.alld.sqadualedf}
-                                                <span class="text-gray-100 text-xs lg:text-lg">· ♾️ {$t('pages.availResource.noEndH')}</span>
+                                                <span class="text-gray-100 text-xs lg:text-lg">· <EntityIcon kind="endless" size={14} /> {$t('pages.availResource.noEndH')}</span>
                                             {/if}
                                         </div>
                                     {/if}

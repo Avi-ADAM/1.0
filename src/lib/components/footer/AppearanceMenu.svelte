@@ -1,5 +1,6 @@
 <script>
   import { t } from '$lib/translations';
+  import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
   import { theme, mode, resolvedMode, setTheme, setMode, THEMES, MODES, themeMeta } from '$lib/stores/theme';
   import LangSwitch from '$lib/components/onboard/LangSwitch.svelte';
 
@@ -84,7 +85,7 @@
     onclick={() => (open = !open)}
     title={$t('ui.appearance.title')}
   >
-    <span aria-hidden="true">🎨</span>
+    <EntityIcon kind="appearance" size={16} />
     {#if !compact}
       <span class="trigger-label">{$t('ui.appearance.title')}</span>
     {/if}

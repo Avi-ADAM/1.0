@@ -1,5 +1,6 @@
 <script>
   import { t, isRtl } from '$lib/translations';
+  import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
 
   /**
    * "Add your supply" sheet — PLAN_USER_OFFERINGS §4.3 (M4).
@@ -20,21 +21,22 @@
 
   const next = encodeURIComponent('/demand?lens=supply');
 
+  /** @type {{ icon: import('$lib/celim/icons/entityIcons').EntityIconKind, labelKey: string, hintKey: string, href: string }[]} */
   const options = $derived([
     {
-      emoji: '🛠️',
+      icon: 'mission',
       labelKey: 'demand.add_mission',
       hintKey: 'demand.add_mission_hint',
       href: isLoggedIn ? '/me/offerings?new=1' : `/signup?next=${next}`
     },
     {
-      emoji: '📦',
+      icon: 'resource',
       labelKey: 'demand.add_resource',
       hintKey: 'demand.add_resource_hint',
       href: isLoggedIn ? '/me#my-resources' : `/signup?next=${next}`
     },
     {
-      emoji: '🎁',
+      icon: 'product',
       labelKey: 'demand.add_product',
       hintKey: 'demand.add_product_hint',
       href: isLoggedIn ? '/me?createProduct=1#my-products' : `/signup?next=${next}`
@@ -84,7 +86,7 @@
           href={opt.href}
           class="flex items-center gap-3 rounded-xl border border-gray-200 dark:border-gray-600 px-3 py-2.5 hover:border-barbi transition-colors"
         >
-          <span class="text-2xl">{opt.emoji}</span>
+          <EntityIcon kind={opt.icon} size={22} />
           <span>
             <span class="block text-sm font-semibold text-gray-900 dark:text-gray-100">{$t(opt.labelKey)}</span>
             <span class="block text-xs text-gray-500 dark:text-gray-400">{$t(opt.hintKey)}</span>
@@ -97,7 +99,7 @@
           class="w-full flex items-center gap-3 rounded-xl border border-gray-200 dark:border-gray-600 px-3 py-2.5 hover:border-barbi transition-colors text-start"
           onclick={thresholdClick}
         >
-          <span class="text-2xl">🤝</span>
+          <EntityIcon kind="maagad" size={22} />
           <span>
             <span class="block text-sm font-semibold text-gray-900 dark:text-gray-100">{$t('demand.add_threshold')}</span>
             <span class="block text-xs text-gray-500 dark:text-gray-400">{$t('demand.add_threshold_hint')}</span>
@@ -108,7 +110,7 @@
           href={`/signup?next=${next}`}
           class="flex items-center gap-3 rounded-xl border border-gray-200 dark:border-gray-600 px-3 py-2.5 hover:border-barbi transition-colors"
         >
-          <span class="text-2xl">🤝</span>
+          <EntityIcon kind="maagad" size={22} />
           <span>
             <span class="block text-sm font-semibold text-gray-900 dark:text-gray-100">{$t('demand.add_threshold')}</span>
             <span class="block text-xs text-gray-500 dark:text-gray-400">{$t('demand.add_threshold_hint')}</span>

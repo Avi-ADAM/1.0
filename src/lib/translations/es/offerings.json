@@ -107,13 +107,13 @@
     "title": "¿Qué te gustaría ofrecer?",
     "sub": "Misiones y productos con precio: esto es lo que verán la conserjería y los clientes. También puedes omitirlo y añadirlo más tarde desde tu perfil.",
     "journey": "Mis ofertas",
-    "continue": "Finalizar ✨",
+    "continue": "Finalizar",
     "skip": "Saltar para finalizar",
     "done_supply_title": "Mira qué se demanda ahora mismo",
     "done_supply_sub": "El mapa de demanda: misiones y recursos que tejidos y clientes buscan a tu alrededor, además del botón para añadir tu oferta.",
     "done_supply_meta": "Para proveedores que quieren empezar ya",
-    "done_supply_chip_map": "🗺 Mapa de demanda",
-    "done_supply_chip_add": "➕ Añadir oferta"
+    "done_supply_chip_map": "Mapa de demanda",
+    "done_supply_chip_add": "Añadir oferta"
   },
   "badges": {
     "products": "Productos",
@@ -136,7 +136,7 @@
     "rikma_name_ph": "p. ej. Estudio de Dana",
     "back": "Atrás",
     "draft_note": "El borrador se guarda automáticamente: puedes volver cuando quieras",
-    "created": "¡Producto creado! 🎉",
+    "created": "¡Producto creado!",
     "expand": "Ampliar al formulario completo",
     "expand_hint": "Imagen, producto complejo (misiones y recursos), fechas y más: el borrador viaja contigo"
   },

@@ -1,5 +1,6 @@
 <script>
   import { t } from '$lib/translations';
+  import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
   import { executeAction } from '$lib/client/actionClient';
   import { toast } from 'svelte-sonner';
 
@@ -85,7 +86,7 @@
 <div class="cycle-card">
   <div class="cycle-head">
     <span class="cycle-name">
-      {cycle.productName || '🔁'}
+      {cycle.productName || '—'}
       {#if cycle.projectName}<span class="cycle-project">· {cycle.projectName}</span>{/if}
     </span>
     <span class="cycle-month">{$t('project.recurringCycle.month')} {monthLabel}</span>
@@ -106,10 +107,10 @@
   {#if role === 'holder' && cycle.customerName}
     {#if cycle.customerReportedAt && cycle.customerAmount != null}
       <p class="cycle-customer-line ok">
-        💳 {$t('project.recurringCycle.customerReported', { name: cycle.customerName || $t('project.recurringCycle.customer'), amt: cycle.customerAmount })}
+        <EntityIcon kind="card" size={13} /> {$t('project.recurringCycle.customerReported', { name: cycle.customerName || $t('project.recurringCycle.customer'), amt: cycle.customerAmount })}
       </p>
     {:else}
-      <p class="cycle-customer-line">💳 {$t('project.recurringCycle.customerWaiting')}</p>
+      <p class="cycle-customer-line"><EntityIcon kind="card" size={13} /> {$t('project.recurringCycle.customerWaiting')}</p>
     {/if}
   {/if}
 
@@ -126,7 +127,7 @@
   {/if}
 
   <button class="cycle-submit" onclick={submit} disabled={busy}>
-    {#if busy}⏳{:else}{confirmsCustomer ? `✔ ${$t('project.recurringCycle.confirmReceived')}` : $t('project.recurringCycle.report')}{/if}
+    {#if busy}<EntityIcon kind="waiting" size={13} />{:else}{confirmsCustomer ? `✔ ${$t('project.recurringCycle.confirmReceived')}` : $t('project.recurringCycle.report')}{/if}
   </button>
 </div>
 

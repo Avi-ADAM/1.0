@@ -1,16 +1,18 @@
 ﻿<script lang="ts">
   import { isRtl } from '$lib/translations';
+  import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
+  import type { EntityIconKind } from '$lib/celim/icons/entityIcons';
   import { goto } from '$app/navigation';
   import { t } from '$lib/translations';
   import { lang } from '$lib/stores/lang.js';
   import type { PendingRequestData } from '$lib/server/deals/dealsQueries';
 
-  const KIND_ICON: Record<string, string> = {
-    monthly: '📅',
-    yearly: '📆',
-    total: '⭐',
-    unlimited: '∞',
-    daily: '🌅'
+  const KIND_ICON: Record<string, EntityIconKind> = {
+    monthly: 'calendar',
+    yearly: 'date',
+    total: 'star',
+    unlimited: 'endless',
+    daily: 'sunrise'
   };
   const KIND_BG: Record<string, string> = {
     monthly: 'linear-gradient(135deg,#0a0a1a,#12122a)',
@@ -33,7 +35,7 @@
     daily: $t('deals.kindDaily')
   });
 
-  const icon = $derived(KIND_ICON[req.productKindOf ?? ''] ?? '🎁');
+  const icon = $derived(KIND_ICON[req.productKindOf ?? ''] ?? 'product');
   const bg = $derived(KIND_BG[req.productKindOf ?? ''] ?? 'linear-gradient(135deg,#1a1200,#2e2000)');
   const category = $derived(KIND_LABEL[req.productKindOf ?? ''] ?? $t('deals.kindDefault'));
 
@@ -59,7 +61,7 @@
 >
   <div class="toper">
     <div class="icon" style="background:{bg}">{icon}</div>
-    <span class="badge">⏳ {kind === 'buy' ? $t('deals.pendingBuy') : $t('deals.pendingSell')}</span>
+    <span class="badge"><EntityIcon kind="waiting" size={12} /> {kind === 'buy' ? $t('deals.pendingBuy') : $t('deals.pendingSell')}</span>
   </div>
 
   {#if req.sourceRatsonId}
@@ -79,7 +81,7 @@
   <div class="chips">
     <span class="chip">{category}</span>
     {#if kind === 'sell' && req.requesterName}
-      <span class="chip buyer">👤 {req.requesterName}</span>
+      <span class="chip buyer"><EntityIcon kind="person" size={12} /> {req.requesterName}</span>
     {/if}
   </div>
 

@@ -12,8 +12,8 @@
     "h4": "Del comensal de vuelta a la tierra: un círculo entero y armónico",
     "h5": "Empieza por los clientes. El negocio se construye en torno a la necesidad",
     "sub": "No hace falta capital inicial, comprar tierra ni ir en solitario. Cada uno aporta su parte -tierra, plantones, manos que trabajan, tiempo o ganas de consumir- y el modelo cooperativo de 1💗1 lo coordina todo con transparencia y reparte los frutos de forma justa.",
-    "ctaPrimary": "Crezcamos juntos ✿",
-    "ctaSecondary": "Quiero pedir una caja de verduras local 🥬"
+    "ctaPrimary": "Crezcamos juntos",
+    "ctaSecondary": "Quiero pedir una caja de verduras local"
   },
   "nav": {
     "barriers": "Las barreras",
@@ -31,20 +31,20 @@
     "b3": "Inestabilidad de comercialización: sin clientes garantizados de antemano, una parte importante de la cosecha puede desperdiciarse.",
     "b4": "Agotamiento y soledad: trabajo físico duro a todas horas, sin poder tomar días de descanso ni contar con reemplazo.",
     "cost": "Así se desvanece el sueño y la tierra fértil queda desolada.",
-    "turn": "En 1💗1 convertimos cada barrera en una oportunidad para otro socio del círculo ✿"
+    "turn": "En 1💗1 convertimos cada barrera en una oportunidad para otro socio del círculo"
   },
   "weave": {
     "title": "El tejido: una asociación viva inspirada en la naturaleza",
     "sub": "En 1💗1, una asociación se llama 'tejido', inspirada en el tejido vivo de un cuerpo. Cada célula del tejido tiene plena independencia, un rol único y libertad de acción, y juntas crean un organismo entero, palpitante y funcional que permite florecer en común sin renunciar a la libertad personal.",
-    "r1_t": "🌍 La célula del suelo y ancla del proyecto",
+    "r1_t": "La célula del suelo y ancla del proyecto",
     "r1_d": "Aporta la tierra disponible para el proyecto, participa en la toma de decisiones y disfruta de un retorno justo. La tierra vuelve a la vida en lugar de quedar en barbecho.",
-    "r2_t": "🌱 La célula de germinación y conocimiento",
+    "r2_t": "La célula de germinación y conocimiento",
     "r2_d": "Prepara y cuida plantones de calidad como parte de la inversión inicial en el tejido, y acompaña profesionalmente el proceso de cultivo.",
-    "r3_t": "🧑‍🌾 La célula de hacer y cuidar",
+    "r3_t": "La célula de hacer y cuidar",
     "r3_d": "Viene al trabajo práctico en el campo por pasión y conexión con la tierra. Las horas y la energía se traducen con transparencia en propiedad dentro del tejido.",
-    "r4_t": "🛡️ La célula de respaldo y resiliencia",
+    "r4_t": "La célula de respaldo y resiliencia",
     "r4_d": "Garantiza la continuidad y la estabilidad. Cuando hace falta descanso o vacaciones, otros socios apoyan y cubren, para que la tierra y el tejido sigan floreciendo.",
-    "r5_t": "⚖️ El sistema nervioso: sincronización y justicia",
+    "r5_t": "El sistema nervioso: sincronización y justicia",
     "r5_d": "La interfaz tecnológica de 1💗1 funciona como un sistema nervioso silencioso: coordina, documenta la contribución de cada célula y reparte los beneficios por consenso pleno.",
     "note": "Aquí no hay una estructura piramidal de 'empleadores' y 'empleados'. Hay un tejido igualitario: cada célula tiene libertad e independencia, y todos se complementan en armonía."
   },
@@ -54,7 +54,7 @@
     "p1": "Los vecinos expresan interés y encargan por adelantado una caja de verduras de temporada regular.",
     "p2": "En torno a esta demanda, propietarios, cultivadores y cuidadores de la misma zona se organizan juntos.",
     "p3": "Cultivamos exactamente lo que se encargó y en la cantidad necesaria: sin excedentes, sin desperdicio y con la máxima frescura.",
-    "basket": "🥬 Una caja de verduras semanal, local y rica, hecha especialmente para las personas que la esperan."
+    "basket": "Una caja de verduras semanal, local y rica, hecha especialmente para las personas que la esperan."
   },
   "paths": {
     "title": "Dos caminos de crecimiento - tú eliges",
@@ -101,8 +101,8 @@
   "cta": {
     "title": "La tierra está lista, la comunidad espera",
     "sub": "Ya sea que tengas tierra que ofrecer, manos que trabajan, conocimiento profesional, o simplemente ganas de comer alimentos locales y sanos, hay un lugar para ti en nuestro círculo.",
-    "register": "Crezcamos juntos ✿",
-    "wish": "Quiero una caja local 🥬",
+    "register": "Crezcamos juntos",
+    "wish": "Quiero una caja local",
     "login": "Iniciar sesión en una cuenta existente"
   }
 }

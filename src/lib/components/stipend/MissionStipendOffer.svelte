@@ -19,6 +19,7 @@
    * at the moment someone considers taking the mission, not buried in terms.
    */
   import { t } from '$lib/translations';
+  import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
   // This block is mounted on three very different hosts (a lev swiper card, the
   // offer page, the rikma's open board), each with its own background, so it
   // states its own ground and ink for all four appearance combinations rather
@@ -64,7 +65,7 @@
 
 {#if active}
   <div class="stipend-offer {SURFACE}" class:compact>
-    <p class="so-title {ACCENT}">💗 {$t('stipend.offer.title')}</p>
+    <p class="so-title {ACCENT}"><EntityIcon kind="support" size={14} /> {$t('stipend.offer.title')}</p>
 
     <div class="so-lines">
       <div class="so-line">
@@ -105,7 +106,7 @@
     <!-- §11.1. Not legal advice, and deliberately not hidden behind a link:
          a monthly sum computed from hours is the exact shape of a salary, and
          the difference here is real — a partner's stipend, not wages. -->
-    <p class="so-legal {FAINT}">⚖️ {$t('stipend.offer.legal')}</p>
+    <p class="so-legal {FAINT}"><EntityIcon kind="votes" size={13} /> {$t('stipend.offer.legal')}</p>
   </div>
 {/if}
 

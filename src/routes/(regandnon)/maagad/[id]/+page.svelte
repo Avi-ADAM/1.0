@@ -3,6 +3,7 @@
   import { page } from '$app/state';
   import MaagadOfferForm from '$lib/components/maagad/MaagadOfferForm.svelte';
   import ShareLink from '$lib/components/share/ShareLink.svelte';
+  import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
   import { t, isRtl } from '$lib/translations';
   import { Head } from 'svead';
 
@@ -72,7 +73,7 @@
 
 <div class="maagad-page" dir={$isRtl ? 'rtl' : 'ltr'}>
   <header class="head">
-    <p class="eyebrow">🤝 {$t('demand.maagad_title')}</p>
+    <p class="eyebrow"><EntityIcon kind="maagad" size={14} /> {$t('demand.maagad_title')}</p>
     <h1>{maagad.name || $t('demand.untitled')}</h1>
     {#if maagad.desc}
       <p class="desc">{maagad.desc}</p>
@@ -80,10 +81,10 @@
     <div class="badges">
       <span class="badge">{$t(`demand.status_${maagad.status}`)}</span>
       {#if maagad.scope === 'global'}
-        <span class="badge">🌐 {$t('demand.online_section')}</span>
+        <span class="badge"><EntityIcon kind="online" size={13} /> {$t('demand.online_section')}</span>
       {/if}
       {#if maagad.frequency && maagad.frequency !== 'one_time'}
-        <span class="badge">🔁 {maagad.frequency}</span>
+        <span class="badge"><EntityIcon kind="recurring" size={13} /> {maagad.frequency}</span>
       {/if}
       {#each maagad.categories as cat (cat)}
         <span class="badge soft">{cat}</span>
@@ -149,7 +150,7 @@
       <h2>{$t('demand.offers_title')} <span class="count">{maagad.offers.length}</span></h2>
       {#if data.isLoggedIn && !showOfferForm}
         <button class="ghost" onclick={() => (showOfferForm = true)}>
-          📣 {$t('demand.make_offer')}
+          <EntityIcon kind="offer" size={15} /> {$t('demand.make_offer')}
         </button>
       {/if}
     </div>
@@ -183,13 +184,13 @@
         {/if}
         <div class="offer-facts">
           {#if offer.unitPrice != null}
-            <span>💰 {offer.unitPrice}{offer.currency ? ` ${offer.currency}` : ''} {$t('demand.per_unit')}</span>
+            <span><EntityIcon kind="money" size={13} /> {offer.unitPrice}{offer.currency ? ` ${offer.currency}` : ''} {$t('demand.per_unit')}</span>
           {/if}
           {#if offer.deadline}
-            <span>⏳ {$t('demand.offer_deadline')} {fmtDate(offer.deadline)}</span>
+            <span><EntityIcon kind="waiting" size={13} /> {$t('demand.offer_deadline')} {fmtDate(offer.deadline)}</span>
           {/if}
           {#if offer.recurrence && offer.recurrence !== 'one_time'}
-            <span>🔁 {$t(`demand.rec_${offer.recurrence}`)}</span>
+            <span><EntityIcon kind="recurring" size={13} /> {$t(`demand.rec_${offer.recurrence}`)}</span>
           {/if}
         </div>
 
@@ -214,7 +215,7 @@
           {#if !data.isLoggedIn}
             <a class="primary" href={loginHref}>{$t('demand.login_to_join')}</a>
           {:else if my?.signedOfferId === offer.id}
-            <span class="joined">✍️ {$t('demand.my_signed')}</span>
+            <span class="joined"><EntityIcon kind="signed" size={13} /> {$t('demand.my_signed')}</span>
             {#if offer.status !== 'activated'}
               <button class="ghost" onclick={() => unsign(offer.id)} disabled={busy}>
                 {$t('demand.unsign')}
@@ -222,7 +223,7 @@
             {/if}
           {:else if (offer.status === 'open' || offer.status === 'quorum_reached') && !offer.proposerIsMe}
             <button class="primary" onclick={() => sign(offer.id)} disabled={busy || !!my?.signedOfferId}>
-              ✍️ {$t('demand.sign')}
+              <EntityIcon kind="signed" size={15} /> {$t('demand.sign')}
             </button>
             {#if my?.signedOfferId}
               <span class="muted small">{$t('demand.already_signed_other')}</span>
@@ -244,28 +245,28 @@
         {#each data.supplySuggestions.products as p (p.id)}
           <a class="sugg" href={`/gift/${p.id}`}>
             <span class="sugg-main">
-              🎁 <strong>{p.name}</strong>
+              <EntityIcon kind="product" size={14} /> <strong>{p.name}</strong>
               {#if p.sellerName}<span class="muted small">· {p.sellerName}</span>{/if}
             </span>
-            {#if p.price != null}<span class="muted small">💰 {p.price}</span>{/if}
+            {#if p.price != null}<span class="muted small"><EntityIcon kind="money" size={12} /> {p.price}</span>{/if}
           </a>
         {/each}
         {#each data.supplySuggestions.missionOffers as o (o.id)}
           <a class="sugg" class:mine-sugg={o.mine} href={o.ownerId ? `/user/${o.ownerId}` : '#'}>
             <span class="sugg-main">
-              🛠️ <strong>{o.name}</strong>
+              <EntityIcon kind="mission" size={14} /> <strong>{o.name}</strong>
               {#if o.ownerName}<span class="muted small">· {o.ownerName}</span>{/if}
               {#if o.mine}<span class="badge">{$t('demand.supply_sugg_mine')}</span>{/if}
             </span>
-            {#if o.perhour != null}<span class="muted small">💰 {o.perhour}</span>
-            {:else if o.price != null}<span class="muted small">💰 {o.price}</span>{/if}
+            {#if o.perhour != null}<span class="muted small"><EntityIcon kind="money" size={12} /> {o.perhour}</span>
+            {:else if o.price != null}<span class="muted small"><EntityIcon kind="money" size={12} /> {o.price}</span>{/if}
           </a>
         {/each}
       </div>
 
       {#if data.isLoggedIn && !showOfferForm}
         <button class="ghost" onclick={() => (showOfferForm = true)}>
-          📣 {$t('demand.supply_sugg_cta')}
+          <EntityIcon kind="offer" size={15} /> {$t('demand.supply_sugg_cta')}
         </button>
       {/if}
     </section>

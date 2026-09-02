@@ -34,9 +34,9 @@
     "totalLabel": "Total",
     "windowLabel": "Decision time remaining",
     "windowNote": "If you don't respond before the window closes, the proposal is silently approved.",
-    "skip": "⏩ Demo: no one responded → agreement by silence",
+    "skip": "Demo: no one responded → agreement by silence",
     "silenceExplainer": "Silence = agreement. If the window closes and no one approves, discusses, or counters, the last version on the table is approved on its own. No explicit \"yes\" is needed - just don't object in time. Try it: leave everything untouched and let the timer run down, or skip to the end of the window.",
-    "simulatePartnerCounter": "🔄 Demo: Dana counters",
+    "simulatePartnerCounter": "Demo: Dana counters",
     "actions": { "approve": "Approve", "discuss": "Discuss", "counter": "Counter" },
     "counterForm": {
       "title": "Your version",
@@ -50,7 +50,7 @@
     "chat": {
       "placeholder": "Write Dana a message…",
       "send": "Send",
-      "reply1": "Got it, give me a moment to think 🙏",
+      "reply1": "Got it, give me a moment to think",
       "reply2": "Still with you on this one - no need to rush."
     },
     "history": { "title": "Round history", "empty": "No previous rounds yet." },
@@ -61,9 +61,9 @@
       "countered": "New version proposed"
     },
     "signed": {
-      "title": "Signed ✍️",
+      "title": "Signed",
       "body": "Both sides now hold the exact same version. That's agreement.",
-      "silenceTitle": "Approved by silence 🔕",
+      "silenceTitle": "Approved by silence",
       "silenceBody": "The window closed and no one objected - so the last version on the table became agreement on its own. That's silence becoming agreement.",
       "restart": "Start a new round"
     },

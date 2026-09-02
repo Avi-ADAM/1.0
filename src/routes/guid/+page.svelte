@@ -1,5 +1,6 @@
 <script>
   import { t, isRtl } from '$lib/translations';
+  import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
   import { idPr } from '$lib/stores/idPr';
   // Reused, not copied: this atom already handles all five locales, writes the
   // `lang` cookie with `path=/` (a cookie written without it would scope to
@@ -39,50 +40,52 @@
    * the site map, inside an object card, and as a flow CTA without duplicating
    * any text.
    */
+  /** @type {Record<string, { href: string, icon: import('$lib/celim/icons/entityIcons').EntityIconKind, external?: boolean }>} */
   let LINKS = $derived({
-    hub: { href: '/hub', icon: '🧭' },
-    lev: { href: '/lev', icon: '💗' },
-    myacts: { href: '/myacts', icon: '📋' },
-    timers: { href: '/timers', icon: '⏱️' },
-    calendar: { href: '/myCalander', icon: '📅' },
-    meeting: { href: '/meeting', icon: '🎥' },
-    moach: { href: pid ? `/moach/${pid}/main` : '/moach', icon: '🧠' },
-    moachCreate: { href: moachTab('create'), icon: '➕' },
-    moachWork: { href: moachTab('progress'), icon: '🛠️' },
-    moachFlows: { href: moachTab('processes'), icon: '🔗' },
-    moachMoney: { href: moachTab('sales'), icon: '💰' },
-    moachOpps: { href: moachTab('wishes'), icon: '🌱' },
-    moachVotes: { href: moachTab('votes'), icon: '⚖️' },
-    projectPublic: { href: pid ? `/project/${pid}` : '/project', icon: '🪪' },
-    demand: { href: '/demand', icon: '🗺️' },
-    projects: { href: '/project', icon: '🧶' },
-    products: { href: '/gift', icon: '🎁' },
-    missions: { href: '/availableMission', icon: '🛠️' },
-    resources: { href: '/availiableResorce', icon: '📦' },
-    concierge: { href: '/concierge', icon: '🛎️' },
-    newWish: { href: '/wish/new', icon: '✨' },
-    deals: { href: '/deals', icon: '💼' },
-    salesCenter: { href: '/deals/sales-center', icon: '🧾' },
-    dealsRequest: { href: '/deals/request', icon: '📨' },
-    profile: { href: '/me', icon: '👤' },
-    settings: { href: '/me/settings', icon: '⚙️' },
-    offerings: { href: '/me/offerings', icon: '🫱' },
-    identity: { href: '/me/identity', icon: '🆔' },
-    devices: { href: '/me/devices', icon: '📱' },
-    onboard: { href: '/onboard', icon: '🚀' },
-    faq: { href: '/faq', icon: '❓' },
-    consensus: { href: '/consensus', icon: '🤝' },
-    agreement: { href: 'https://agreement.1lev1.com', icon: '📜', external: true },
-    love: { href: '/love', icon: '🌍' }
+    hub: { href: '/hub', icon: 'hub' },
+    lev: { href: '/lev', icon: 'lev' },
+    myacts: { href: '/myacts', icon: 'tasks' },
+    timers: { href: '/timers', icon: 'timer' },
+    calendar: { href: '/myCalander', icon: 'calendar' },
+    meeting: { href: '/meeting', icon: 'video' },
+    moach: { href: pid ? `/moach/${pid}/main` : '/moach', icon: 'moach' },
+    moachCreate: { href: moachTab('create'), icon: 'add' },
+    moachWork: { href: moachTab('progress'), icon: 'mission' },
+    moachFlows: { href: moachTab('processes'), icon: 'link' },
+    moachMoney: { href: moachTab('sales'), icon: 'money' },
+    moachOpps: { href: moachTab('wishes'), icon: 'opportunity' },
+    moachVotes: { href: moachTab('votes'), icon: 'votes' },
+    projectPublic: { href: pid ? `/project/${pid}` : '/project', icon: 'rikmaPage' },
+    demand: { href: '/demand', icon: 'map' },
+    projects: { href: '/project', icon: 'rikma' },
+    products: { href: '/gift', icon: 'product' },
+    missions: { href: '/availableMission', icon: 'mission' },
+    resources: { href: '/availiableResorce', icon: 'resource' },
+    concierge: { href: '/concierge', icon: 'concierge' },
+    newWish: { href: '/wish/new', icon: 'wish' },
+    deals: { href: '/deals', icon: 'deals' },
+    salesCenter: { href: '/deals/sales-center', icon: 'receipt' },
+    dealsRequest: { href: '/deals/request', icon: 'mail' },
+    profile: { href: '/me', icon: 'person' },
+    settings: { href: '/me/settings', icon: 'settings' },
+    offerings: { href: '/me/offerings', icon: 'offerings' },
+    identity: { href: '/me/identity', icon: 'identity' },
+    devices: { href: '/me/devices', icon: 'devices' },
+    onboard: { href: '/onboard', icon: 'onboard' },
+    faq: { href: '/faq', icon: 'faq' },
+    consensus: { href: '/consensus', icon: 'maagad' },
+    agreement: { href: 'https://agreement.1lev1.com', icon: 'agreement', external: true },
+    love: { href: '/love', icon: 'world' }
   });
 
+  /** @type {{ key: string, icon: import('$lib/celim/icons/entityIcons').EntityIconKind, href: string }[]} */
   const QUICK_STEPS = [
-    { key: 'signup', icon: '🚪', href: '/signup' },
-    { key: 'profile', icon: '🧬', href: '/me' },
-    { key: 'offerings', icon: '🫱', href: '/me/offerings' },
-    { key: 'rikma', icon: '🧶', href: '/me?action=createproject' },
-    { key: 'lev', icon: '💗', href: '/lev' },
-    { key: 'hub', icon: '🧭', href: '/hub' }
+    { key: 'signup', icon: 'signup', href: '/signup' },
+    { key: 'profile', icon: 'profile', href: '/me' },
+    { key: 'offerings', icon: 'offerings', href: '/me/offerings' },
+    { key: 'rikma', icon: 'rikma', href: '/me?action=createproject' },
+    { key: 'lev', icon: 'lev', href: '/lev' },
+    { key: 'hub', icon: 'hub', href: '/hub' }
   ];
 
   const MAP_GROUPS = [
@@ -108,31 +111,33 @@
   ];
 
   /** The object catalogue. `links` are keys into LINKS — reused labels, no new keys. */
+  /** @type {{ key: string, icon: import('$lib/celim/icons/entityIcons').EntityIconKind, links: string[] }[]} */
   const OBJECTS = [
-    { key: 'rikma', icon: '🧶', links: ['moach', 'projectPublic', 'projects'] },
-    { key: 'user', icon: '🧬', links: ['profile', 'offerings'] },
-    { key: 'mission', icon: '🛠️', links: ['moachCreate', 'moachWork', 'missions'] },
-    { key: 'resource', icon: '📦', links: ['moachCreate', 'resources', 'demand'] },
-    { key: 'product', icon: '🎁', links: ['moachMoney', 'products'] },
-    { key: 'sale', icon: '💰', links: ['salesCenter', 'moachMoney', 'lev'] },
-    { key: 'split', icon: '💸', links: ['moachMoney', 'lev'] },
-    { key: 'decision', icon: '⚖️', links: ['moachVotes', 'lev', 'consensus'] },
-    { key: 'nego', icon: '🤝', links: ['lev', 'consensus'] },
-    { key: 'wish', icon: '✨', links: ['newWish', 'concierge', 'demand'] },
-    { key: 'maagad', icon: '🧺', links: ['demand', 'moachOpps'] },
-    { key: 'service', icon: '🛍️', links: ['deals', 'dealsRequest', 'products'] },
-    { key: 'timer', icon: '⏱️', links: ['timers', 'myacts'] },
-    { key: 'process', icon: '🔗', links: ['moachFlows', 'moachWork'] }
+    { key: 'rikma', icon: 'rikma', links: ['moach', 'projectPublic', 'projects'] },
+    { key: 'user', icon: 'profile', links: ['profile', 'offerings'] },
+    { key: 'mission', icon: 'mission', links: ['moachCreate', 'moachWork', 'missions'] },
+    { key: 'resource', icon: 'resource', links: ['moachCreate', 'resources', 'demand'] },
+    { key: 'product', icon: 'product', links: ['moachMoney', 'products'] },
+    { key: 'sale', icon: 'money', links: ['salesCenter', 'moachMoney', 'lev'] },
+    { key: 'split', icon: 'split', links: ['moachMoney', 'lev'] },
+    { key: 'decision', icon: 'votes', links: ['moachVotes', 'lev', 'consensus'] },
+    { key: 'nego', icon: 'maagad', links: ['lev', 'consensus'] },
+    { key: 'wish', icon: 'wish', links: ['newWish', 'concierge', 'demand'] },
+    { key: 'maagad', icon: 'maagad', links: ['demand', 'moachOpps'] },
+    { key: 'service', icon: 'service', links: ['deals', 'dealsRequest', 'products'] },
+    { key: 'timer', icon: 'timer', links: ['timers', 'myacts'] },
+    { key: 'process', icon: 'link', links: ['moachFlows', 'moachWork'] }
   ];
 
+  /** @type {{ key: string, icon: import('$lib/celim/icons/entityIcons').EntityIconKind, href: string }[]} */
   let FLOWS = $derived([
-    { key: 'open_rikma', icon: '🧶', href: '/me?action=createproject' },
-    { key: 'create_task', icon: '➕', href: moachTab('create') },
-    { key: 'negotiation', icon: '🤝', href: moachTab('votes') },
-    { key: 'auto_approve', icon: '⏳', href: '/lev' },
-    { key: 'execution', icon: '⏱️', href: '/timers' },
-    { key: 'finish', icon: '✅', href: '/lev' },
-    { key: 'money', icon: '💰', href: '/deals/sales-center' }
+    { key: 'open_rikma', icon: 'rikma', href: '/me?action=createproject' },
+    { key: 'create_task', icon: 'add', href: moachTab('create') },
+    { key: 'negotiation', icon: 'maagad', href: moachTab('votes') },
+    { key: 'auto_approve', icon: 'waiting', href: '/lev' },
+    { key: 'execution', icon: 'timer', href: '/timers' },
+    { key: 'finish', icon: 'done', href: '/lev' },
+    { key: 'money', icon: 'money', href: '/deals/sales-center' }
   ]);
 
   const PRINCIPLES = ['noHardNo', 'silence', 'oneEngine', 'saleHolder', 'sovereignty'];
@@ -208,7 +213,7 @@
                 aria-hidden="true">{i + 1}</span
               >
               <h3 class="text-lg font-bold text-slate-900">
-                <span class="me-1" aria-hidden="true">{step.icon}</span>
+                <EntityIcon kind={step.icon} size={15} />
                 {$t(`guide.quickstart.steps.${step.key}.title`)}
               </h3>
             </div>
@@ -251,7 +256,7 @@
                     rel={link.external ? 'noreferrer' : undefined}
                     class="flex h-full items-start gap-3 rounded-xl border border-slate-200 p-3 transition hover:border-rose-300 hover:bg-rose-50/60"
                   >
-                    <span class="text-xl leading-none" aria-hidden="true">{link.icon}</span>
+                    <EntityIcon kind={link.icon} size={20} />
                     <span class="min-w-0">
                       <span class="block font-semibold text-slate-800">
                         {$t(`guide.map.links.${key}.label`)}
@@ -282,7 +287,7 @@
           >
             <header class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
               <h3 class="text-xl font-bold text-slate-900">
-                <span class="me-1" aria-hidden="true">{obj.icon}</span>
+                <EntityIcon kind={obj.icon} size={15} />
                 {$t(`guide.objects.items.${obj.key}.name`)}
               </h3>
               <code class="rounded bg-slate-100 px-2 py-0.5 text-xs text-slate-500" dir="ltr">
@@ -343,7 +348,7 @@
                     rel={link.external ? 'noreferrer' : undefined}
                     class="inline-flex items-center gap-1.5 rounded-full border border-rose-200 bg-rose-50 px-3 py-1 text-sm font-semibold text-rose-800 transition hover:border-rose-400 hover:bg-rose-100"
                   >
-                    <span aria-hidden="true">{link.icon}</span>
+                    <EntityIcon kind={link.icon} size={14} />
                     {$t(`guide.map.links.${key}.label`)}
                   </a>
                 </li>
@@ -366,7 +371,7 @@
           >
             <h3 class="text-lg font-bold text-slate-900">
               <span class="me-1 text-slate-400">{i + 1}.</span>
-              <span class="me-1" aria-hidden="true">{flow.icon}</span>
+              <EntityIcon kind={flow.icon} size={15} />
               {$t(`guide.flows.steps.${flow.key}.title`)}
             </h3>
             <p class="mt-2 leading-relaxed text-slate-700">

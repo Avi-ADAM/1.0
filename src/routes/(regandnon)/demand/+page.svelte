@@ -3,6 +3,7 @@
   import { page } from '$app/state';
   import DiscoveryMap from '$lib/components/location/DiscoveryMap.svelte';
   import DiscoveryNav from '$lib/components/discovery/DiscoveryNav.svelte';
+  import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
   import ShareLink from '$lib/components/share/ShareLink.svelte';
   import AddSupplySheet from '$lib/components/offerings/AddSupplySheet.svelte';
   import {
@@ -10,6 +11,7 @@
     LENS_LAYERS,
     type DiscoveryLens,
     type MapItem,
+    type MapItemKind,
     type MapLayer,
     type MapLayerId
   } from '$lib/map/discoveryTypes';
@@ -148,41 +150,50 @@
     mapComponent?.flyTo(item);
   }
 
-  const kindEmoji: Record<string, string> = {
-    wish: '🧺',
-    maagad: '🤝',
-    offer: '📣',
-    mission: '🛠️',
-    resource: '📦',
-    product: '🎁'
+  /**
+   * Each map kind's entry in the shared icon vocabulary (see EntityIcon).
+   * Covers the whole `MapItemKind` union — the emoji table this replaces had
+   * no row for `project`, so a rikma pin rendered with no glyph at all.
+   */
+  const kindIcon: Record<MapItemKind, 'wish' | 'maagad' | 'offer' | 'mission' | 'resource' | 'product' | 'rikma'> = {
+    wish: 'wish',
+    maagad: 'maagad',
+    offer: 'offer',
+    mission: 'mission',
+    resource: 'resource',
+    product: 'product',
+    project: 'rikma'
   };
 
-  function itemBadges(item: MapItem): string[] {
+  /** A badge is its text, optionally prefixed by an icon from the same table. */
+  type Badge = { text: string; icon?: 'money' };
+
+  function itemBadges(item: MapItem): Badge[] {
     const m = item.meta as Record<string, any>;
-    const badges: string[] = [];
+    const badges: Badge[] = [];
     if (item.kind === 'wish') {
-      if (m.minJoiners) badges.push(`${m.joinersCount ?? 0}/${m.minJoiners} ${$t('demand.joiners')}`);
-      else if (m.joinersCount) badges.push(`${m.joinersCount} ${$t('demand.joiners')}`);
-      if (m.frequency && m.frequency !== 'one_time') badges.push(String(m.frequency));
+      if (m.minJoiners) badges.push({ text: `${m.joinersCount ?? 0}/${m.minJoiners} ${$t('demand.joiners')}` });
+      else if (m.joinersCount) badges.push({ text: `${m.joinersCount} ${$t('demand.joiners')}` });
+      if (m.frequency && m.frequency !== 'one_time') badges.push({ text: String(m.frequency) });
     } else if (item.kind === 'maagad') {
-      badges.push(`${m.membersCount ?? 0} ${$t('demand.members')}`);
-      if (m.viabilityHint) badges.push(`${$t('demand.viability')} ${m.viabilityHint}`);
-      if (m.openOffers) badges.push(`${m.openOffers} ${$t('demand.open_offers')}`);
+      badges.push({ text: `${m.membersCount ?? 0} ${$t('demand.members')}` });
+      if (m.viabilityHint) badges.push({ text: `${$t('demand.viability')} ${m.viabilityHint}` });
+      if (m.openOffers) badges.push({ text: `${m.openOffers} ${$t('demand.open_offers')}` });
     } else if (item.kind === 'offer') {
-      badges.push(`${m.signed ?? 0}/${m.min ?? '?'} ${$t('demand.signed')}`);
+      badges.push({ text: `${m.signed ?? 0}/${m.min ?? '?'} ${$t('demand.signed')}` });
     } else if (item.kind === 'mission') {
-      if (m.projectName) badges.push(String(m.projectName));
-      if (m.hours) badges.push(`${m.hours} ${$t('demand.hours')}`);
-      for (const s of (m.skills ?? []).slice(0, 2)) badges.push(String(s));
+      if (m.projectName) badges.push({ text: String(m.projectName) });
+      if (m.hours) badges.push({ text: `${m.hours} ${$t('demand.hours')}` });
+      for (const s of (m.skills ?? []).slice(0, 2)) badges.push({ text: String(s) });
     } else if (item.kind === 'resource') {
-      if (m.projectName) badges.push(String(m.projectName));
-      if (m.kindOf) badges.push(String(m.kindOf));
+      if (m.projectName) badges.push({ text: String(m.projectName) });
+      if (m.kindOf) badges.push({ text: String(m.kindOf) });
     } else if (item.kind === 'product') {
-      if (m.price != null) badges.push(`💰 ${m.price}`);
-      if (m.sellerName) badges.push(String(m.sellerName));
-      if (m.personal) badges.push($t('demand.product_personal'));
+      if (m.price != null) badges.push({ text: String(m.price), icon: 'money' });
+      if (m.sellerName) badges.push({ text: String(m.sellerName) });
+      if (m.personal) badges.push({ text: $t('demand.product_personal') });
     }
-    if (item.concierge) badges.push($t('demand.concierge_badge'));
+    if (item.concierge) badges.push({ text: $t('demand.concierge_badge') });
     return badges;
   }
 </script>
@@ -209,7 +220,7 @@
         class:active={lens === 'join'}
         onclick={() => setLens('join')}
       >
-        🧺 {$t('demand.lens_join')}
+        <EntityIcon kind="wish" size={14} /> {$t('demand.lens_join')}
       </button>
       <button
         role="tab"
@@ -217,7 +228,7 @@
         class:active={lens === 'supply'}
         onclick={() => setLens('supply')}
       >
-        🛠️ {$t('demand.lens_supply')}
+        <EntityIcon kind="mission" size={14} /> {$t('demand.lens_supply')}
       </button>
     </div>
 
@@ -254,16 +265,19 @@
       {#if selected}
         <aside class="selected-card" aria-live="polite">
           <div class="card-head">
-            <span class="kind-emoji">{kindEmoji[selected.kind]}</span>
+            <span class="kind-icon"><EntityIcon kind={kindIcon[selected.kind]} size={17} /></span>
             <strong>{selected.title || $t('demand.untitled')}</strong>
             <button class="close" onclick={() => (selected = null)} aria-label="✕">✕</button>
           </div>
           {#if selected.hint}
-            <p class="hint">📍 {selected.hint}</p>
+            <p class="hint"><EntityIcon kind="place" size={13} /> {selected.hint}</p>
           {/if}
           <div class="badges">
-            {#each itemBadges(selected) as badge (badge)}
-              <span class="badge">{badge}</span>
+            {#each itemBadges(selected) as badge (badge.text)}
+              <span class="badge">
+                {#if badge.icon}<EntityIcon kind={badge.icon} size={12} />{/if}
+                {badge.text}
+              </span>
             {/each}
           </div>
           {#if selected.href}
@@ -275,7 +289,7 @@
           {/if}
           {#if selected.meta.projectId}
             <a class="proj-link" href={`/project/${selected.meta.projectId}`}>
-              🧶 {$t('discover.to_project')}
+              <EntityIcon kind="rikma" size={13} /> {$t('discover.to_project')}
             </a>
           {/if}
         </aside>
@@ -293,7 +307,7 @@
             <button class="row" onclick={() => pick(item)}>
               <span class="dot" style:--chip-color={LAYER_COLORS[item.kind === 'wish' ? 'wishes' : item.kind === 'maagad' ? 'maagadim' : item.kind === 'offer' ? 'offers' : item.kind === 'mission' ? 'missions' : item.kind === 'product' ? 'products' : 'resources']}></span>
               <span class="row-main">
-                <span class="row-title">{kindEmoji[item.kind]} {item.title || $t('demand.untitled')}</span>
+                <span class="row-title"><EntityIcon kind={kindIcon[item.kind]} size={13} /> {item.title || $t('demand.untitled')}</span>
                 {#if item.hint}<span class="row-hint">{item.hint}</span>{/if}
               </span>
             </button>
@@ -302,20 +316,23 @@
       </ul>
 
       {#if onlineItems.length}
-        <h2 class="online-head">🌐 {$t('demand.online_section')} <span class="count">{onlineItems.length}</span></h2>
+        <h2 class="online-head">
+          <EntityIcon kind="online" size={15} />
+          {$t('demand.online_section')} <span class="count">{onlineItems.length}</span>
+        </h2>
         <ul>
           {#each onlineItems as item (item.kind + item.id)}
             <li>
               {#if item.href}
                 <a class="row" href={item.href}>
                   <span class="row-main">
-                    <span class="row-title">{kindEmoji[item.kind]} {item.title || $t('demand.untitled')}</span>
+                    <span class="row-title"><EntityIcon kind={kindIcon[item.kind]} size={13} /> {item.title || $t('demand.untitled')}</span>
                   </span>
                 </a>
               {:else}
                 <span class="row static">
                   <span class="row-main">
-                    <span class="row-title">{kindEmoji[item.kind]} {item.title || $t('demand.untitled')}</span>
+                    <span class="row-title"><EntityIcon kind={kindIcon[item.kind]} size={13} /> {item.title || $t('demand.untitled')}</span>
                   </span>
                 </span>
               {/if}
@@ -333,7 +350,7 @@
     class:hot={lens === 'supply'}
     onclick={() => (addSupplyOpen = true)}
   >
-    ➕ {$t('demand.add_supply_fab')}
+    <EntityIcon kind="add" size={15} /> {$t('demand.add_supply_fab')}
   </button>
 </div>
 
@@ -543,6 +560,9 @@
   }
   .online-head {
     margin-top: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
   }
   .side ul {
     display: flex;

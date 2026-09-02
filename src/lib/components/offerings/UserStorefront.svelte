@@ -1,5 +1,6 @@
 <script>
   import { t, isRtl } from '$lib/translations';
+  import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
 
   /**
    * Public storefront on /user/[id] — PLAN_USER_OFFERINGS §4.5 (M7).
@@ -35,7 +36,7 @@
   >
     <div class="rounded-2xl bg-white dark:bg-gray-800 shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden">
       <div class="px-4 py-3 bg-gradient-to-l from-barbi to-mpink text-white">
-        <h2 class="text-lg font-bold">🛍️ {$t('offerings.storefront.title')}</h2>
+        <h2 class="text-lg font-bold">{$t('offerings.storefront.title')}</h2>
         <p class="text-xs opacity-80">{$t('offerings.storefront.subtitle')}</p>
       </div>
 
@@ -43,7 +44,7 @@
         {#if storefront.products?.length}
           <div>
             <h3 class="text-sm font-bold text-gray-500 dark:text-gray-400 mb-2">
-              🎁 {$t('offerings.storefront.products')}
+              <EntityIcon kind="product" size={14} /> {$t('offerings.storefront.products')}
             </h3>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {#each storefront.products as p (p.id)}
@@ -63,7 +64,7 @@
                       {p.attributes.name}
                     </span>
                     <span class="block text-xs text-gray-500 dark:text-gray-400">
-                      💰 {p.attributes.price}
+                      <EntityIcon kind="money" size={13} /> {p.attributes.price}
                     </span>
                   </span>
                   <span class="shrink-0 text-xs font-bold text-barbi">{$t('offerings.storefront.order')} ←</span>
@@ -76,7 +77,7 @@
         {#if storefront.resources?.length}
           <div>
             <h3 class="text-sm font-bold text-gray-500 dark:text-gray-400 mb-2">
-              📦 {$t('offerings.storefront.resources')}
+              <EntityIcon kind="resource" size={14} /> {$t('offerings.storefront.resources')}
             </h3>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {#each storefront.resources as r (r.id)}
@@ -89,7 +90,7 @@
                       {r.attributes.name}
                     </span>
                     <span class="block text-xs text-gray-500 dark:text-gray-400">
-                      💰 {r.attributes.price}
+                      <EntityIcon kind="money" size={13} /> {r.attributes.price}
                     </span>
                   </span>
                   <span class="shrink-0 text-xs font-bold text-barbi">{$t('offerings.storefront.order')} ←</span>
@@ -102,7 +103,7 @@
         {#if storefront.missionOffers?.length}
           <div>
             <h3 class="text-sm font-bold text-gray-500 dark:text-gray-400 mb-2">
-              🛠️ {$t('offerings.storefront.missions')}
+              <EntityIcon kind="mission" size={14} /> {$t('offerings.storefront.missions')}
             </h3>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {#each storefront.missionOffers as o (o.id)}
@@ -117,10 +118,10 @@
                         ''}
                     </span>
                     <span class="block text-xs text-gray-500 dark:text-gray-400 flex flex-wrap gap-x-2">
-                      {#if offerPrice(o.attributes)}<span>💰 {offerPrice(o.attributes)}</span>{/if}
-                      {#if o.attributes.hours > 0}<span>⏱️ {o.attributes.hours} {$t('offerings.storefront.hours')}</span>{/if}
-                      {#if o.attributes.location?.location_mode === 'online'}<span>🌐 {$t('offerings.storefront.online')}</span>
-                      {:else if o.attributes.location?.location_hint}<span>📍 {o.attributes.location.location_hint}</span>{/if}
+                      {#if offerPrice(o.attributes)}<span><EntityIcon kind="money" size={13} /> {offerPrice(o.attributes)}</span>{/if}
+                      {#if o.attributes.hours > 0}<span><EntityIcon kind="timer" size={13} /> {o.attributes.hours} {$t('offerings.storefront.hours')}</span>{/if}
+                      {#if o.attributes.location?.location_mode === 'online'}<span><EntityIcon kind="online" size={13} /> {$t('offerings.storefront.online')}</span>
+                      {:else if o.attributes.location?.location_hint}<span><EntityIcon kind="place" size={13} /> {o.attributes.location.location_hint}</span>{/if}
                     </span>
                   </span>
                   <span class="shrink-0 text-xs font-bold text-barbi">{$t('offerings.storefront.ask_concierge')} ←</span>

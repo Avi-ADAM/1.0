@@ -1,5 +1,6 @@
 <script>
   import { enhance } from '$app/forms';
+  import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
   import { fly, scale } from 'svelte/transition';
   import { quintOut } from 'svelte/easing';
   import { onMount } from 'svelte';
@@ -77,7 +78,7 @@
       <input type="hidden" name="displayName" value={displayName} />
 
       <div class="field">
-        <label class="field-label" for="email">📧 כתובת מייל</label>
+        <label class="field-label" for="email"><EntityIcon kind="mail" size={14} /> כתובת מייל</label>
         <div class="input-wrap" class:valid={emailValid && email.length > 0}>
           <input
             id="email"
@@ -98,7 +99,7 @@
       </div>
 
       <div class="field">
-        <label class="field-label" for="password">🔑 סיסמה</label>
+        <label class="field-label" for="password"><EntityIcon kind="key" size={14} /> סיסמה</label>
         <div class="input-wrap">
           <input
             id="password"
@@ -117,7 +118,7 @@
             onmouseleave={() => (showPassword = false)}
             aria-label="הצג סיסמה"
           >
-            {showPassword ? '🔒' : '👁'}
+            <EntityIcon kind={showPassword ? 'conceal' : 'reveal'} size={16} />
           </button>
         </div>
 
@@ -150,7 +151,7 @@
           <span class="spin">⟳</span> רגע…
         {:else}
           <span>פתיחת 1💗1</span>
-          <span style="font-size: 18px">🗝</span>
+          <EntityIcon kind="key" size={17} />
         {/if}
       </button>
 

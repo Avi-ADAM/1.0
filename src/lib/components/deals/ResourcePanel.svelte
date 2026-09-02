@@ -1,5 +1,6 @@
 <script lang="ts">
   import Panel from '$lib/components/Panel.svelte';
+  import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
   import { t } from '$lib/translations';
   import { lang } from '$lib/stores/lang.js';
   import type { Resource } from '$lib/types';
@@ -12,7 +13,7 @@
     <div class="res">
       <div class="row">
         <span class="name" class:warn={r.needsApproval}>
-          {#if r.needsApproval}⚡ {/if}{r.name}
+          {#if r.needsApproval}<EntityIcon kind="urgent" size={12} /> {/if}{r.name}
           {#if r.needsApproval}
             <span class="tag">{$t('deals.pendingYourApproval')}</span>
           {/if}

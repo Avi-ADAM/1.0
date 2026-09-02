@@ -1,5 +1,6 @@
 ﻿<script>
   import { isRtl, t } from '$lib/translations';
+  import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
   import { Head } from 'svead';
   import { page } from '$app/state';
   import { lang } from '$lib/stores/lang.js';
@@ -408,7 +409,7 @@
                   href={firstPendingId ? `/deals/request/${firstPendingId}` : '/deals'}
                   class="flex items-center gap-3 mb-4 px-4 py-3 rounded-lg border border-gold/40 bg-gold/10 text-sm font-semibold text-gold hover:bg-gold/20 transition-colors"
                 >
-                  <span class="text-lg">⏳</span>
+                  <EntityIcon kind="waiting" size={17} />
                   <span>
                     {$lang === 'he'
                       ? 'כבר שלחת בקשת רכישה - לצפייה בבקשה'
@@ -454,14 +455,14 @@
                     class="text-sm font-semibold text-barbi underline mb-3 inline-block"
                   >
                     {$lang === 'he'
-                      ? '✎ עריכת BOM / מוצר'
-                      : '✎ Edit BOM / product'}
+                      ? 'עריכת BOM / מוצר'
+                      : 'Edit BOM / product'}
                   </a>
                   <button
                     class="text-sm font-semibold text-gray-500 hover:text-barbi flex items-center gap-2 transition-colors"
                     onclick={toggleSaleInterface}
                   >
-                    <span class="text-xl">⚙️</span>
+                    <EntityIcon kind="settings" size={17} />
                     {showSaleInterface
                       ? $t('pages.gift.hideReport')
                       : $t('pages.gift.reportSale')}
@@ -491,7 +492,7 @@
               <div
                 class="mt-4 rounded-xl border border-barbi/20 bg-gradient-to-br from-white to-barbi/5 dark:from-gray-800 dark:to-barbi/10 p-5 text-center shadow-sm"
               >
-                <div class="mb-1 text-2xl">🛒</div>
+                <div class="mb-1 flex justify-center text-barbi"><EntityIcon kind="cart" size={24} /></div>
                 <h3 class="mb-1 text-base font-bold text-barbi">
                   {$t('pages.gift.inviteTitle')}
                 </h3>

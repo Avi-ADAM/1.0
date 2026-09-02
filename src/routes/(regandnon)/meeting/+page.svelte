@@ -1,5 +1,6 @@
 ﻿<script>
   import { isRtl, t } from '$lib/translations';
+  import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
   import CreateNewMeeting from '$lib/components/addnew/createNewMeeting.svelte';
   import { page } from '$app/state';
   import { lang } from '$lib/stores/lang';
@@ -140,8 +141,8 @@
       if (result.success) {
         toast.success(
           $lang === 'he'
-            ? '🎥 הפגישה התחילה! כל המשתתפים קיבלו התראה'
-            : '🎥 Meeting started! All participants have been notified'
+            ? 'הפגישה התחילה! כל המשתתפים קיבלו התראה'
+            : 'Meeting started! All participants have been notified'
         );
 
         if ($meetingsData[selectedMeetingForStart.id]) {
@@ -176,8 +177,8 @@
         if (result.pendingStart) {
           toast.info(
             $lang === 'he'
-              ? '⏳ ממתין למשתתפים אחרים...'
-              : '⏳ Waiting for other participants...'
+              ? 'ממתין למשתתפים אחרים...'
+              : 'Waiting for other participants...'
           );
         } else if (result.isLive) {
           // Redirect to the meeting page with forum/chat
@@ -225,8 +226,8 @@
         if (result.isLive || result.alreadyLive) {
           toast.success(
             $lang === 'he'
-              ? '🎥 הפגישה התחילה! מעביר אותך...'
-              : '🎥 Meeting started! Redirecting...'
+              ? 'הפגישה התחילה! מעביר אותך...'
+              : 'Meeting started! Redirecting...'
           );
           // Redirect to meeting room
           setTimeout(() => {
@@ -243,8 +244,8 @@
 
           toast.info(
             $lang === 'he'
-              ? `✅ אישרת! ממתין לעוד ${result.waitingFor} משתתפ/ים...`
-              : `✅ Ready! Waiting for ${result.waitingFor} more participant(s)...`
+              ? `אישרת! ממתין לעוד ${result.waitingFor} משתתפ/ים...`
+              : `Ready! Waiting for ${result.waitingFor} more participant(s)...`
           );
         }
       } else {
@@ -388,11 +389,9 @@
       class="max-w-2xl mx-auto mt-6 relative z-10 flex flex-col gap-3 text-sm text-gray-300 bg-white/5 p-4 rounded-2xl border border-white/10 backdrop-blur-sm"
     >
       <div class="flex items-center gap-2 text-pink-300 font-bold mb-1">
-        <span>✨</span>
         <span>{$t('pages.meetings.goldExplanation')}</span>
       </div>
       <div class="flex items-center gap-2 text-purple-300 leading-relaxed">
-        <span>🪄</span>
         <span>{$t('pages.meetings.goldMagic')}</span>
       </div>
     </div>
@@ -445,7 +444,7 @@
           <div
             class="w-20 h-20 rounded-full bg-gradient-to-tr from-pink-500 to-purple-600 flex items-center justify-center shadow-lg shadow-pink-500/30"
           >
-            <span class="text-4xl">✨</span>
+            <EntityIcon kind="wish" size={36} />
           </div>
           <p class="text-center text-gray-300 max-w-xs">{$t('pages.meetings.subtitle')}</p>
           <button
@@ -606,7 +605,7 @@
                           rel="noopener noreferrer"
                           class="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white text-sm font-bold py-2 px-4 rounded-full shadow-lg transform transition hover:-translate-y-1 hover:shadow-blue-500/30 flex items-center gap-2"
                         >
-                          <span>🎥</span>
+                          <EntityIcon kind="video" size={15} />
                           {$t('pages.meetings.joinVideo')}
                         </a>
                         <button
@@ -615,7 +614,7 @@
                             window.location.href = '/meeting/' + meeting.id;
                           }}
                         >
-                          <span>💬</span>
+                          <EntityIcon kind="chat" size={15} />
                           {$t('pages.meetings.openChat')}
                         </button>
                       </div>
@@ -636,7 +635,7 @@
                           <div
                             class="bg-green-500/20 text-green-400 text-xs font-bold px-4 py-2 rounded-xl flex items-center gap-2 border border-green-500/30"
                           >
-                            <span>✅</span>
+                            <EntityIcon kind="done" size={15} />
                             {$t('pages.meetings.ready')}
                           </div>
                         {:else}
@@ -650,7 +649,7 @@
                                 class="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"
                               ></span>
                             {:else}
-                              <span>✋</span>
+                              <EntityIcon kind="volunteer" size={15} />
                             {/if}
                             {$t('pages.meetings.joinMeeting')}
                           </button>
@@ -663,7 +662,7 @@
                           class="flex-1 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white text-sm font-bold py-2.5 px-4 rounded-xl shadow-lg transform transition hover:-translate-y-1 hover:shadow-green-500/30 flex items-center justify-center gap-2"
                           onclick={() => openStartMeetingModal(meeting)}
                         >
-                          <span>🚀</span>
+                          <EntityIcon kind="start" size={15} />
                           {$t('pages.meetings.startMeeting')}
                         </button>
                       </div>
@@ -690,7 +689,7 @@
           <div
             class="text-center py-12 text-gray-400 flex flex-col items-center"
           >
-            <span class="text-6xl mb-4 opacity-50">✨</span>
+            <span class="mb-4 opacity-50 flex justify-center"><EntityIcon kind="wish" size={56} /></span>
             <p>{$t('pages.meetings.noPending')}</p>
           </div>
         {:else}
@@ -795,7 +794,7 @@
         <div
           class="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-tr from-green-500 to-emerald-600 flex items-center justify-center shadow-lg shadow-green-500/30"
         >
-          <span class="text-3xl">🎥</span>
+          <EntityIcon kind="video" size={30} />
         </div>
         <h3 class="text-2xl font-bold text-white mb-2">
           {$t('pages.meetings.startMeetingTitle')}
@@ -831,7 +830,7 @@
                 ? 'left-3'
                 : 'right-3'} top-1/2 -translate-y-1/2 flex gap-1 opacity-50"
             >
-              <span class="text-sm">📹</span>
+              <EntityIcon kind="video" size={14} />
             </div>
           </div>
           <p class="text-xs text-gray-500 mt-2">
@@ -888,7 +887,7 @@
             ></span>
             {$t('pages.meetings.starting')}
           {:else}
-            <span>🚀</span>
+            <EntityIcon kind="start" size={15} />
             {$t('pages.meetings.start')}
           {/if}
         </button>

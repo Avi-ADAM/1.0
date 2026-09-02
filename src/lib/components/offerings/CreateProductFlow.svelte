@@ -1,5 +1,6 @@
 <script>
   import { onMount } from 'svelte';
+  import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
   import { goto } from '$app/navigation';
   import { RingLoader } from 'svelte-loading-spinners';
   import { executeAction } from '$lib/client/actionClient';
@@ -173,7 +174,7 @@
     class="w-full sm:max-w-md bg-white dark:bg-gray-800 rounded-t-2xl sm:rounded-2xl shadow-2xl overflow-hidden my-4"
   >
     <div class="px-4 py-3 bg-gradient-to-l from-barbi to-mpink text-white flex items-center justify-between">
-      <h2 class="text-lg font-bold">🎁 {$t('offerings.flow.title')}</h2>
+      <h2 class="text-lg font-bold">{$t('offerings.flow.title')}</h2>
       <button class="text-xl leading-none" onclick={() => onClose?.()} aria-label="✕">✕</button>
     </div>
 
@@ -192,7 +193,7 @@
           class="w-full flex items-center gap-3 rounded-xl border border-gray-200 dark:border-gray-600 px-3 py-3 hover:border-barbi transition-colors text-start"
           onclick={() => choose('new')}
         >
-          <span class="text-2xl">🌱</span>
+          <EntityIcon kind="opportunity" size={22} />
           <span>
             <span class="block text-sm font-semibold text-gray-900 dark:text-gray-100">{$t('offerings.flow.new_rikma')}</span>
             <span class="block text-xs text-gray-500 dark:text-gray-400">{$t('offerings.flow.new_rikma_hint')}</span>
@@ -203,7 +204,7 @@
           onclick={() => choose('existing')}
           disabled={projects.length === 0}
         >
-          <span class="text-2xl">🧬</span>
+          <EntityIcon kind="profile" size={22} />
           <span>
             <span class="block text-sm font-semibold text-gray-900 dark:text-gray-100">{$t('offerings.flow.existing_rikma')}</span>
             <span class="block text-xs text-gray-500 dark:text-gray-400">{$t('offerings.flow.existing_rikma_hint')}</span>
@@ -294,7 +295,7 @@
           </select>
         </label>
 
-        <p class="text-xs text-gray-500 dark:text-gray-400">💾 {$t('offerings.flow.draft_note')}</p>
+        <p class="text-xs text-gray-500 dark:text-gray-400 inline-flex items-center gap-1"><EntityIcon kind="save" size={12} /> {$t('offerings.flow.draft_note')}</p>
 
         <!-- Escape hatch to the full product form (image, complex recipe) -->
         <button
@@ -302,7 +303,7 @@
           onclick={expandToFull}
           disabled={saving}
         >
-          <span class="text-lg">🧩</span>
+          <EntityIcon kind="piece" size={18} />
           <span>
             <span class="block text-sm font-semibold text-gray-700 dark:text-gray-200">{$t('offerings.flow.expand')}</span>
             <span class="block text-xs text-gray-500 dark:text-gray-400">{$t('offerings.flow.expand_hint')}</span>

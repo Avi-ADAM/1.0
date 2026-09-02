@@ -3,6 +3,7 @@
 
 <script>
   import { t } from '$lib/translations';
+  import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
   let {
     topic = '',
     positions = [],
@@ -98,7 +99,7 @@
             <div
               class="absolute inset-0 flex items-center justify-center text-xl"
             >
-              🤖
+              <EntityIcon kind="ai" size={17} />
             </div>
           </div>
           <p class="text-sm text-gray-500">
@@ -126,7 +127,7 @@
         {#if feedback.strengths?.length}
           <div>
             <h3 class="text-sm font-semibold text-gray-700 mb-2">
-              ✅ {$t('negotiation.position_strengths')}
+              <EntityIcon kind="done" size={14} /> {$t('negotiation.position_strengths')}
             </h3>
             <ul class="space-y-1.5">
               {#each feedback.strengths as s}
@@ -144,7 +145,7 @@
         {#if feedback.bridgeOpportunities?.length}
           <div>
             <h3 class="text-sm font-semibold text-gray-700 mb-2">
-              🤝 {$t('negotiation.bridge_opportunities')}
+              <EntityIcon kind="maagad" size={14} /> {$t('negotiation.bridge_opportunities')}
             </h3>
             <div class="space-y-3">
               {#each feedback.bridgeOpportunities as bridge}
@@ -178,7 +179,7 @@
         {#if feedback.refinementSuggestions?.length}
           <div>
             <h3 class="text-sm font-semibold text-gray-700 mb-2">
-              💡 {$t('negotiation.refinement_suggestions')}
+              <EntityIcon kind="idea" size={14} /> {$t('negotiation.refinement_suggestions')}
             </h3>
             <ul class="space-y-1.5">
               {#each feedback.refinementSuggestions as s}
@@ -196,7 +197,7 @@
         {#if feedback.predictedImpact}
           <div class="bg-gray-50 rounded-xl p-4">
             <h3 class="text-sm font-semibold text-gray-700 mb-1">
-              🎯 {$t('negotiation.predicted_impact')}
+              <EntityIcon kind="finish" size={14} /> {$t('negotiation.predicted_impact')}
             </h3>
             <p class="text-xs text-gray-600">{feedback.predictedImpact}</p>
             {#if feedback.consensusMoveDirection !== undefined}

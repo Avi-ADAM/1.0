@@ -1,5 +1,7 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
+  import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
+  import type { EntityIconKind } from '$lib/celim/icons/entityIcons';
   import MatanotPublicView from '$lib/components/products/MatanotPublicView.svelte';
   import { toast } from 'svelte-sonner';
   import ChatSmall from '$lib/components/footer/chatSmall.svelte';
@@ -8,8 +10,8 @@
 
   let { data } = $props();
 
-  const KIND_ICON: Record<string, string> = {
-    monthly: '📅', yearly: '📆', total: '⭐', unlimited: '∞', daily: '🌅'
+  const KIND_ICON: Record<string, EntityIconKind> = {
+    monthly: 'calendar', yearly: 'date', total: 'star', unlimited: 'endless', daily: 'sunrise'
   };
   const KIND_LABEL: Record<string, string> = {
     monthly: 'מינוי חודשי', yearly: 'מינוי שנתי', total: 'תשלום חד פעמי',
@@ -159,13 +161,13 @@
     <div>
       <div class="pending-badge">
         {#if data.kind === 'buy'}
-          ⏳ ממתינה לאישור המוכר
+          <EntityIcon kind="waiting" size={14} /> ממתינה לאישור המוכר
         {:else if localAlreadyVoted && data.memberCount === 1}
           ✓ אושרה
         {:else if localAlreadyVoted}
           ✓ הצבעתך נרשמה
         {:else}
-          ⏳ ממתינה לאישורך
+          <EntityIcon kind="waiting" size={14} /> ממתינה לאישורך
         {/if}
       </div>
       <h1 class="product-name">{data.productName}</h1>
@@ -180,7 +182,10 @@
       <div class="rows">
         <div class="row">
           <span class="rl">סוג</span>
-          <span class="rv">{KIND_ICON[data.productKindOf] ?? '🎁'} {KIND_LABEL[data.productKindOf] ?? '—'}</span>
+          <span class="rv">
+              <EntityIcon kind={KIND_ICON[data.productKindOf] ?? 'product'} size={14} />
+              {KIND_LABEL[data.productKindOf] ?? '—'}
+            </span>
         </div>
         <div class="row">
           <span class="rl">כמות</span>
@@ -230,7 +235,7 @@
 
       {#if data.kind === 'buy'}
         <div class="status-box">
-          <div class="status-icon">⏳</div>
+          <div class="status-icon"><EntityIcon kind="waiting" size={20} /></div>
           <div class="status-text">
             הבקשה שלך התקבלה ומועברת לאישור הפרויקט.
             תקבל/י עדכון כשהפרויקט יאשר.

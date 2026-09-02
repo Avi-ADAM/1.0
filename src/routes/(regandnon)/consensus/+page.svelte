@@ -1,5 +1,6 @@
 <script>
   import { t, isRtl, locale } from '$lib/translations';
+  import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
   import LangSwitch from '$lib/components/onboard/LangSwitch.svelte';
   import { onDestroy } from 'svelte';
 
@@ -188,15 +189,15 @@
     <p class="cp-hero-subtitle">{$t('consensus.hero.subtitle')}</p>
     <div class="cp-hero-actions">
       <a href="#demo" class="cp-action-card cp-action-card--gold">
-        <span class="cp-action-label">✅ {$t('consensus.hero.action1.label')}</span>
+        <span class="cp-action-label"><EntityIcon kind="done" size={14} /> {$t('consensus.hero.action1.label')}</span>
         <span class="cp-action-desc">{$t('consensus.hero.action1.desc')}</span>
       </a>
       <a href="#demo" class="cp-action-card cp-action-card--cyan">
-        <span class="cp-action-label cp-action-label--blue">💬 {$t('consensus.hero.action2.label')}</span>
+        <span class="cp-action-label cp-action-label--blue"><EntityIcon kind="chat" size={14} /> {$t('consensus.hero.action2.label')}</span>
         <span class="cp-action-desc">{$t('consensus.hero.action2.desc')}</span>
       </a>
       <a href="#demo" class="cp-action-card cp-action-card--pink">
-        <span class="cp-action-label cp-action-label--pink">🔄 {$t('consensus.hero.action3.label')}</span>
+        <span class="cp-action-label cp-action-label--pink"><EntityIcon kind="recurring" size={14} /> {$t('consensus.hero.action3.label')}</span>
         <span class="cp-action-desc">{$t('consensus.hero.action3.desc')}</span>
       </a>
     </div>
@@ -214,7 +215,7 @@
         <circle cx="60" cy="60" r="52" class="cp-ring-fill" />
       </svg>
       <div class="cp-ring-label">
-        <span class="cp-ring-emoji">🤝</span>
+        <span class="cp-ring-icon"><EntityIcon kind="maagad" size={26} /></span>
         <span class="cp-ring-result">{$t('consensus.decisionTime.ringResult')}</span>
       </div>
     </div>
@@ -247,7 +248,9 @@
       <div class="cp-demo-inner">
         {#if demo.signed}
           <div class="cp-signed">
-            <div class="cp-signed-emoji">{demo.signedBy === 'silence' ? '🔕' : '✍️'}</div>
+            <div class="cp-signed-icon">
+              <EntityIcon kind={demo.signedBy === 'silence' ? 'silence' : 'signed'} size={40} />
+            </div>
             <div class="cp-signed-title">
               {demo.signedBy === 'silence'
                 ? $t('consensus.demo.signed.silenceTitle')
@@ -290,19 +293,19 @@
             </div>
 
             <div class="cp-silence-note">
-              <span class="cp-silence-note-icon">🔕</span>
+              <span class="cp-silence-note-icon"><EntityIcon kind="silence" size={15} /></span>
               <span>{$t('consensus.demo.silenceExplainer')}</span>
             </div>
 
             <div class="cp-round-actions">
               <button type="button" class="cp-btn cp-btn--wow" onclick={approve}>
-                ✅ {$t('consensus.demo.actions.approve')}
+                <EntityIcon kind="done" size={14} /> {$t('consensus.demo.actions.approve')}
               </button>
               <button type="button" class="cp-btn cp-btn--cyan" onclick={toggleChat}>
-                💬 {$t('consensus.demo.actions.discuss')}
+                <EntityIcon kind="chat" size={14} /> {$t('consensus.demo.actions.discuss')}
               </button>
               <button type="button" class="cp-btn cp-btn--pink" onclick={openCounter}>
-                🔄 {$t('consensus.demo.actions.counter')}
+                <EntityIcon kind="recurring" size={14} /> {$t('consensus.demo.actions.counter')}
               </button>
             </div>
 
@@ -641,8 +644,9 @@
     gap: 2px;
     animation: cp-decision-label 8s linear infinite;
   }
-  .cp-ring-emoji {
-    font-size: 26px;
+  .cp-ring-icon {
+    display: inline-flex;
+    color: var(--cp-gold-lighter);
   }
   .cp-ring-result {
     font-family: var(--bal);
@@ -735,8 +739,10 @@
     align-items: center;
     gap: 12px;
   }
-  .cp-signed-emoji {
-    font-size: 44px;
+  .cp-signed-icon {
+    display: flex;
+    justify-content: center;
+    color: var(--cp-gold-lighter);
   }
   .cp-signed-title {
     font-family: var(--bal);

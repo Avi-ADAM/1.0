@@ -1,5 +1,6 @@
 <script>
   import { t } from '$lib/translations';
+  import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
   import Close from '$lib/celim/close.svelte';
   import { lang } from '$lib/stores/lang.js';
   import LocationPicker from '$lib/components/location/LocationPicker.svelte';
@@ -93,10 +94,10 @@
         {/if}
       </p>
       <button onclick={() => (edit = true)}>
-        {#if changed}✏️{:else}🖍️{/if}</button
+        <EntityIcon kind={changed ? "edit" : "edited"} size={15} /></button
       >
       {#if changed && show2 != true}
-        <button onclick={() => (show2 = true)}>📑</button>
+        <button onclick={() => (show2 = true)}><EntityIcon kind="document" size={15} /></button>
       {:else if show2 == true}
         <div class="flex flex-col align-middle justify-center">
           <button onclick={() => (show2 = false)}><Close /></button>
@@ -113,6 +114,6 @@
     <div dir="ltr" class="mx-auto w-full max-w-xl">
       <LocationPicker bind:value={locationb} label={lebel} />
     </div>
-    <button onclick={() => (edit = false)}>✅</button>
+    <button onclick={() => (edit = false)}><EntityIcon kind="done" size={15} /></button>
   {/if}
 </div>

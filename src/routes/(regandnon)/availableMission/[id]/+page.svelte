@@ -1,5 +1,6 @@
 <script>
   import { toast } from 'svelte-sonner';
+  import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
   import SucssesConf from '$lib/celim/sucssesConf.svelte';
   import DiscoveryNav from '$lib/components/discovery/DiscoveryNav.svelte';
   import Tile from '$lib/celim/tile.svelte';
@@ -168,8 +169,8 @@
   let sourceName = $derived(
     data.alld?.attributes?.project?.data?.attributes?.projectName ??
       (isMaagadSrc
-        ? `🤝 ${$lang === 'he' ? 'מאגד ביקוש' : 'demand pool'}${maagadInfo?.name ? ` · ${maagadInfo.name}` : ''}`
-        : `🌟 ${$lang === 'he' ? "קונסיירז'" : 'concierge'}${ratsonName ? ` · ${ratsonName}` : ''}`)
+        ? `${$lang === 'he' ? 'מאגד ביקוש' : 'demand pool'}${maagadInfo?.name ? ` · ${maagadInfo.name}` : ''}`
+        : `${$lang === 'he' ? "קונסיירז'" : 'concierge'}${ratsonName ? ` · ${ratsonName}` : ''}`)
   );
   //TODO: header nav menu
 </script>
@@ -506,7 +507,7 @@
                             <div
                               class="flex flex-row space-x-2 items-start border-y-2 border-y-mturk"
                             >
-                              <span class="p-1">✅</span>
+                              <span class="p-1"><EntityIcon kind="done" size={16} /></span>
                               <h2 class="md:text-xl p-1 text-barbi">
                                 {datai.attributes.shem}
                               </h2>

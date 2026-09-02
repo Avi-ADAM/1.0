@@ -12,7 +12,7 @@
     label={$t('deals.activeDeals')}
     value={stats.activeDeals}
     sub={`<span style="color:#4ade80">↑ 1</span> ${$t('deals.fromLastMonth')}`}
-    icon="⚡"
+    iconKind="urgent"
     variant="gold"
   />
   <StatsCard
@@ -25,7 +25,7 @@
     label={$t('deals.pendingApprovalTitle')}
     value={stats.pendingApprovals}
     sub={$t('deals.newItems')}
-    icon="⏳"
+    iconKind="waiting"
     variant="pink"
   />
   <StatsCard

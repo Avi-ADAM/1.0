@@ -24,6 +24,7 @@
 -->
 <script>
   import { t, isRtl, locale } from '$lib/translations';
+  import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
   import { fly, fade } from 'svelte/transition';
   import { page } from '$app/stores';
 
@@ -374,7 +375,7 @@
 
       {:else if step === 'thanks'}
         <div class="text-center">
-          <div class="text-4xl mb-2">💗</div>
+          <div class="mb-2 flex justify-center text-barbi"><EntityIcon kind="lev" size={36} /></div>
           <h2 class="text-rose-700 font-bold text-2xl sm:text-xl mb-2">
             {$t('demo.thanks.title')}
           </h2>
@@ -393,7 +394,7 @@
                 rel="noopener"
                 class="block text-center bg-barbi hover:bg-white hover:text-barbi text-gold font-bold px-5 py-2.5 rounded-xl shadow transition-colors"
               >
-                🚪 {$t('demo.thanks.meetingCta')}
+                <EntityIcon kind="signup" size={15} /> {$t('demo.thanks.meetingCta')}
               </a>
               <p class="text-slate-600 text-xs mt-2">{$t('demo.thanks.meetingHint')}</p>
             </div>

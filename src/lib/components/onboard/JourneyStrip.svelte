@@ -1,4 +1,6 @@
 <script>
+  import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
+
   /** @type {{ stepIdx: number, totalSteps?: number, label?: string }} */
   let { stepIdx, totalSteps = 6, label = '' } = $props();
 
@@ -10,7 +12,7 @@
 
 <div class="j-strip">
   <div class="j-end">
-    <span class="icn">🚩</span>
+    <span class="icn"><EntityIcon kind="finish" size={14} /></span>
     <span class="lbl">התחלה</span>
   </div>
 
@@ -63,7 +65,7 @@
       <path d="M22 22 Q 26 26 24 32" stroke="#aa771c" stroke-width="1" fill="none" opacity="0.4" />
       <path d="M42 22 Q 38 26 40 32" stroke="#aa771c" stroke-width="1" fill="none" opacity="0.4" />
     </svg>
-    <span class="lbl">יעד 💗</span>
+    <span class="lbl">יעד</span>
   </div>
 </div>
 

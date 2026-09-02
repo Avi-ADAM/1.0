@@ -1,5 +1,6 @@
 ﻿<script lang="ts">
   import { isRtl, t } from '$lib/translations';
+  import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
   import { lang } from '$lib/stores/lang';
   import { fly } from 'svelte/transition';
   import { toast } from 'svelte-sonner';
@@ -74,7 +75,7 @@
             forumId: metadata.forumId
           };
           toast.success(
-            $lang === 'he' ? '🎥 הפגישה התחילה!' : '🎥 Meeting started!'
+            $lang === 'he' ? 'הפגישה התחילה!' : 'Meeting started!'
           );
           break;
 
@@ -91,7 +92,7 @@
           if (metadata.allOnline) {
             meeting = { ...meeting, available: true };
             toast.success(
-              $lang === 'he' ? '🎉 כולם זמינים!' : '🎉 Everyone is available!'
+              $lang === 'he' ? 'כולם זמינים!' : 'Everyone is available!'
             );
           }
           break;
@@ -196,11 +197,11 @@
         if (result.isLive) {
           meeting = { ...meeting, isLive: true };
           toast.success(
-            $lang === 'he' ? '🎥 הפגישה התחילה!' : '🎥 Meeting started!'
+            $lang === 'he' ? 'הפגישה התחילה!' : 'Meeting started!'
           );
         } else {
           meeting = { ...meeting, pendingStart: true };
-          toast.info($lang === 'he' ? '✅ אישרת מוכנות' : '✅ Marked as ready');
+          toast.info($lang === 'he' ? 'אישרת מוכנות' : 'Marked as ready');
         }
       }
     } catch (e) {
@@ -256,7 +257,7 @@
     <!-- Meeting Not Found -->
     <div class="flex items-center justify-center min-h-screen">
       <div class="text-center p-8">
-        <span class="text-6xl mb-4 block">😕</span>
+        <div class="mb-4 flex justify-center text-white/60"><EntityIcon kind="alert" size={56} /></div>
         <h1 class="text-2xl font-bold text-white mb-4">{$t('pages.meetingRoom.meetingNotFound')}</h1>
         <a
           href="/meeting"
@@ -313,7 +314,7 @@
             rel="noopener noreferrer"
             class="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-bold py-2 px-6 rounded-full shadow-lg transform transition hover:-translate-y-1 hover:shadow-blue-500/30 flex items-center gap-2"
           >
-            <span>🎥</span>
+            <EntityIcon kind="video" size={15} />
             {$t('pages.meetingRoom.joinVideo')}
           </a>
         {:else if meeting?.pendingStart}
@@ -327,7 +328,7 @@
                 class="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"
               ></span>
             {:else}
-              <span>🚀</span>
+              <EntityIcon kind="start" size={15} />
             {/if}
             {$t('pages.meetingRoom.joinMeeting')}
           </button>
@@ -345,7 +346,7 @@
         <h2
           class="text-lg font-bold text-purple-300 mb-4 flex items-center gap-2"
         >
-          <span>👥</span>
+          <EntityIcon kind="members" size={15} />
           {$t('pages.meetingRoom.participants')}
         </h2>
 
@@ -393,7 +394,7 @@
         <div class="p-4 border-b border-white/10 bg-gray-800/30">
           <div class="flex items-center justify-between">
             <h2 class="text-lg font-bold text-green-300 flex items-center gap-2">
-              <span>💬</span>
+              <EntityIcon kind="chat" size={15} />
               {$t('pages.meetingRoom.chat')}
             </h2>
             <button
@@ -401,7 +402,7 @@
               class="text-gray-400 hover:text-white transition-colors p-1 rounded"
               title="Refresh messages"
             >
-              🔄
+              <EntityIcon kind="refresh" size={15} />
             </button>
           </div>
         </div>
@@ -414,7 +415,7 @@
           {#if messages.length === 0}
             <div class="flex items-center justify-center h-full text-gray-500">
               <div class="text-center">
-                <span class="text-4xl mb-2 block">💬</span>
+                <div class="mb-2 flex justify-center text-white/50"><EntityIcon kind="chat" size={36} /></div>
                 <p>{$t('pages.meetingRoom.noMessages')}</p>
                 <p class="text-xs mt-2">Debug: {JSON.stringify({ messagesLength: messages.length, hasForumId: !!data.meeting?.forumId })}</p>
               </div>
@@ -489,7 +490,7 @@
                   class="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"
                 ></span>
               {:else}
-                <span>📤</span>
+                <EntityIcon kind="send" size={15} />
               {/if}
               {$t('pages.meetingRoom.send')}
             </button>

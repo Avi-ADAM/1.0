@@ -1,5 +1,6 @@
 ﻿<script>
   import { liUN } from '$lib/stores/liUN.js';
+  import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
   import { Canvas } from '@threlte/core';
   import Scene from './globu.svelte';
   import { locale, t, isRtl} from '$lib/translations';
@@ -712,7 +713,7 @@
           <TRan onDone={done} onErore={erorer} />
         {:else if a == 1}
           <div class="status-view success">
-            <div class="status-icon">✨</div>
+            <div class="status-icon"><EntityIcon kind="wish" size={20} /></div>
             <h3>{$t('home.amana.status.successTitle')}</h3>
             <p>{$t('home.amana.status.successMessage')}</p>
             <button class="action-btn-p" onclick={closer}
@@ -726,7 +727,7 @@
           </div>
         {:else if a == 3 || a == 5}
           <div class="status-view error">
-            <div class="status-icon">❌</div>
+            <div class="status-icon"><EntityIcon kind="close" size={20} /></div>
             <h3>{$t('home.amana.status.errorTitle')}</h3>
             <p>{$t('home.amana.status.errorMessage')}</p>
             <button
@@ -778,7 +779,7 @@
           <!-- Name Field -->
           <div class="form-group">
             <label for="name" class="form-label">
-              <span class="label-icon">👤</span>
+              <span class="label-icon"><EntityIcon kind="person" size={14} /></span>
               {$t('home.amana.form.nameLabel')}
             </label>
             <input
@@ -801,7 +802,7 @@
           <!-- Location Field -->
           <div class="form-group">
             <label for="location" class="form-label">
-              <span class="label-icon">🌍</span>
+              <span class="label-icon"><EntityIcon kind="world" size={14} /></span>
               {$t('home.amana.form.locationLabel')}
             </label>
             <div class="multiselect-wrapper" bind:this={locationField}>
@@ -831,7 +832,7 @@
           <!-- Email Field -->
           <div class="form-group">
             <label for="email" class="form-label">
-              <span class="label-icon">✉️</span>
+              <span class="label-icon"><EntityIcon kind="mail" size={14} /></span>
               {$t('home.amana.form.emailLabel')}
             </label>
             <input
@@ -858,11 +859,11 @@
               onclick={goToAgreementSite}
               class="agreement-btn-full"
             >
-              <span class="btn-icon">✨</span>
+              <span class="btn-icon"><EntityIcon kind="wish" size={15} /></span>
               <span class="text-2xl"
                 >{$t('home.amana.agreement.fullButton')}</span
               >
-              <span class="btn-icon">✨</span>
+              <span class="btn-icon"><EntityIcon kind="wish" size={15} /></span>
             </button>
             <p class="agreement-note">{$t('home.amana.agreement.note')}</p>
 
@@ -902,7 +903,7 @@
 
             <!-- Info Box -->
             <div class="info-box">
-              <div class="info-icon">💡</div>
+              <div class="info-icon"><EntityIcon kind="idea" size={16} /></div>
               <div class="info-text">
                 <strong>{$t('home.amana.agreement.infoTitle')}</strong>
                 <ul>

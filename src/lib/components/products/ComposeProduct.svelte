@@ -1,5 +1,6 @@
 ﻿<script lang="ts">
   import { isRtl, t } from '$lib/translations';
+  import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
   import { lang } from '$lib/stores/lang.js';
   import Button from '$lib/celim/ui/button.svelte';
   import UploadPic from '$lib/components/userPr/uploadPic.svelte';
@@ -545,7 +546,7 @@
         </strong>
       </div>
       {#if openItems > 0}
-        <div class="open-warn">⚡ {ui.openWarn} ({openItems})</div>
+        <div class="open-warn"><EntityIcon kind="urgent" size={13} /> {ui.openWarn} ({openItems})</div>
       {/if}
     </div>
   {/if}

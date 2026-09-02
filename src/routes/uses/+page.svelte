@@ -18,6 +18,7 @@
 -->
 <script>
   import { t, locale, isRtl } from '$lib/translations';
+  import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
   import { goto } from '$app/navigation';
 
   // The register route is spelled per language, the same mapping the homepage
@@ -36,13 +37,14 @@
   // because the latter is the providers' side and lives behind registration,
   // while the visitor this card is written for is not registered and does not
   // intend to be.
+  /** @type {{ key: string, icon: import('$lib/celim/icons/entityIcons').EntityIconKind, href: string }[]} */
   let cases = $derived([
-    { key: 'sales', icon: '📈', href: registerHref },
-    { key: 'team', icon: '🛠️', href: registerHref },
-    { key: 'idea', icon: '💡', href: '/availableMission' },
-    { key: 'concierge', icon: '✨', href: '/wish/new' },
-    { key: 'land', icon: '🌱', href: '/grow' },
-    { key: 'group', icon: '◉', href: '/quorum' }
+    { key: 'sales', icon: 'growth', href: registerHref },
+    { key: 'team', icon: 'mission', href: registerHref },
+    { key: 'idea', icon: 'idea', href: '/availableMission' },
+    { key: 'concierge', icon: 'wish', href: '/wish/new' },
+    { key: 'land', icon: 'opportunity', href: '/grow' },
+    { key: 'group', icon: 'members', href: '/quorum' }
   ]);
 </script>
 
@@ -63,7 +65,7 @@
   <div class="cases">
     {#each cases as c (c.key)}
       <article class="case">
-        <span class="icon" aria-hidden="true">{c.icon}</span>
+        <span class="icon"><EntityIcon kind={c.icon} size={26} /></span>
         <h2>{$t(`uses.cases.${c.key}.title`)}</h2>
         <p class="who">{$t(`uses.cases.${c.key}.who`)}</p>
         <p class="how">{$t(`uses.cases.${c.key}.how`)}</p>
@@ -130,7 +132,7 @@
   }
 
   .icon {
-    font-size: 1.6rem;
+    display: inline-flex;
     line-height: 1;
   }
 

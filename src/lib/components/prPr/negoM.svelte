@@ -1,5 +1,6 @@
 ﻿<script>
   import { role, ww, skil } from '$lib/components/prPr/mi.js';
+  import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
   import { onMount } from 'svelte';
   import { get } from 'svelte/store';
   import { lang } from '$lib/stores/lang';
@@ -583,7 +584,7 @@
       {@const candTot = (candidateRound.noofhours ?? noofhours) * (candidateRound.perhour ?? perhour)}
       <div class="mx-2 my-2 rounded-lg border border-barbi/50 bg-barbi/5 p-3 text-sm space-y-1">
         <p class="font-bold text-barbi text-base">
-          💡 {$t('nego.cand.proposalRef')}
+          <EntityIcon kind="idea" size={13} /> {$t('nego.cand.proposalRef')}
         </p>
         <div class="flex flex-wrap gap-x-4 gap-y-1 text-barbi/80">
           {#if candidateRound.noofhours != null}
@@ -618,7 +619,7 @@
             : null}
     />
     {#if onSubmit && candidateRound?.noofhours != null && candidateRound.noofhours !== noofhours}
-      <p class="text-xs text-barbi/70 px-2 -mt-1 mb-1 inline-flex items-center gap-1">💡 {$t('nego.cand.candidateProposed')} <strong>{candidateRound.noofhours}</strong></p>
+      <p class="text-xs text-barbi/70 px-2 -mt-1 mb-1 inline-flex items-center gap-1"><EntityIcon kind="idea" size={12} /> {$t('nego.cand.candidateProposed')} <strong>{candidateRound.noofhours}</strong></p>
     {/if}
     <Number
       old={negopendmissions.map((c) => c?.attributes?.perhour)}
@@ -627,7 +628,7 @@
       lebel={$t('mission.hourlyVallue')}
     />
     {#if onSubmit && candidateRound?.perhour != null && candidateRound.perhour !== perhour}
-      <p class="text-xs text-barbi/70 px-2 -mt-1 mb-1 inline-flex items-center gap-1">💡 {$t('nego.cand.candidateProposed')} <strong>{candidateRound.perhour}</strong></p>
+      <p class="text-xs text-barbi/70 px-2 -mt-1 mb-1 inline-flex items-center gap-1"><EntityIcon kind="idea" size={12} /> {$t('nego.cand.candidateProposed')} <strong>{candidateRound.perhour}</strong></p>
     {/if}
     <!-- שווי צפוי בריקמה — תצוגה חיה של החלק שהמשימה תהווה לפי השעות/השווי
          שמוקלדים כרגע. המשימה כבר קיימת ב-open_missions ⇒ alreadyCountedIn="pipeline". -->
@@ -644,7 +645,7 @@
     {/if}
     <DateNego date={mdate} bind:dateb={mdate2} lebel={$t('common.startDate')} />
     {#if onSubmit && candidateRound?.mdate}
-      <p class="text-xs text-barbi/70 px-2 -mt-1 mb-1 inline-flex items-center gap-1">💡 {$t('nego.cand.candidateProposed')} {new Date(candidateRound.mdate).toLocaleDateString($lang)}</p>
+      <p class="text-xs text-barbi/70 px-2 -mt-1 mb-1 inline-flex items-center gap-1"><EntityIcon kind="idea" size={12} /> {$t('nego.cand.candidateProposed')} {new Date(candidateRound.mdate).toLocaleDateString($lang)}</p>
     {/if}
     <DateNego
       date={mdates}
@@ -652,7 +653,7 @@
       lebel={$t('common.finishDate')}
     />
     {#if onSubmit && candidateRound?.mdates}
-      <p class="text-xs text-barbi/70 px-2 -mt-1 mb-1 inline-flex items-center gap-1">💡 {$t('nego.cand.candidateProposed')} {new Date(candidateRound.mdates).toLocaleDateString($lang)}</p>
+      <p class="text-xs text-barbi/70 px-2 -mt-1 mb-1 inline-flex items-center gap-1"><EntityIcon kind="idea" size={12} /> {$t('nego.cand.candidateProposed')} {new Date(candidateRound.mdates).toLocaleDateString($lang)}</p>
     {/if}
 
     <LocationNego

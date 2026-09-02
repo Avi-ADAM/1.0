@@ -1,5 +1,6 @@
 <script lang="ts">
   import { page } from '$app/stores';
+  import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
   ;
   import { t } from '$lib/translations';
 
@@ -27,16 +28,16 @@
     <img src="/deals logo.png" alt="Deals" class="logo-img" />
   </a>
   <nav class="main-nav">
-    <a href="/hub" class="nav-link"><span class="nav-icon">🏠</span><span class="nav-word">{nl('hub')}</span></a>
-    <a href="/lev" class="nav-link"><span class="nav-icon">💗</span><span class="nav-word">{nl('lev')}</span></a>
-    <a href="/moach" class="nav-link"><span class="nav-icon">🧠</span><span class="nav-word">{nl('moach')}</span></a>
+    <a href="/hub" class="nav-link"><span class="nav-icon"><EntityIcon kind="home" size={18} /></span><span class="nav-word">{nl('hub')}</span></a>
+    <a href="/lev" class="nav-link"><span class="nav-icon"><EntityIcon kind="lev" size={18} /></span><span class="nav-word">{nl('lev')}</span></a>
+    <a href="/moach" class="nav-link"><span class="nav-icon"><EntityIcon kind="moach" size={18} /></span><span class="nav-word">{nl('moach')}</span></a>
   </nav>
   <div class="right">
     <!-- TODO: re-enable once the premium tier has real meaning -->
     <!-- <div class="badge">{$t('header.premiumBadge')}</div> -->
     <!-- TODO: re-enable once the notifications button actually does something -->
     <!-- <button class="notif" aria-label={$t('header.notifications')}>
-      <span>🔔</span>
+      <EntityIcon kind="notifications" size={18} />
       <div class="notif-dot"></div>
     </button> -->
     <button class="avatar" title={userName} aria-label={$t('header.profile')}>

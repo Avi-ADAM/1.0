@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount, tick } from 'svelte';
+  import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
   import type {
     GeoJSONSource,
     Map as MapLibreMap,
@@ -316,7 +317,7 @@
     </div>
   {/if}
   {#if mapError}
-    <div class="map-overlay error">🗺️</div>
+    <div class="map-overlay error"><EntityIcon kind="map" size={28} /></div>
   {/if}
 </div>
 

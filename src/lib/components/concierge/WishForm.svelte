@@ -1,5 +1,6 @@
 <script>
   import { onMount, onDestroy } from 'svelte';
+  import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
   import { fade } from 'svelte/transition';
   import { showFoot } from '$lib/stores/showFoot.js';
   import { goto } from '$app/navigation';
@@ -63,13 +64,14 @@
 
   /* ===== Inspiration seeds ===== */
   /* Label and hint come from `concierge.new.seeds.<key>`. */
+  /** @type {{ icon: import('$lib/celim/icons/entityIcons').EntityIconKind, key: string }[]} */
   const SEEDS = [
-    { icon: '🎁', key: 'gift' },
-    { icon: '🛠', key: 'task' },
-    { icon: '🌿', key: 'community' },
-    { icon: '✈', key: 'trip' },
-    { icon: '👶', key: 'family' },
-    { icon: '✍', key: 'free' }
+    { icon: 'product', key: 'gift' },
+    { icon: 'mission', key: 'task' },
+    { icon: 'community', key: 'community' },
+    { icon: 'map', key: 'trip' },
+    { icon: 'family', key: 'family' },
+    { icon: 'signed', key: 'free' }
   ];
 
   /* ===== AI extraction (Lev rail — live analysis) ===== */
@@ -163,14 +165,15 @@
   ];
 
   /* Label/placeholder come from `concierge.new.jewels.<key>`. */
+  /** @type {{ icon: import('$lib/celim/icons/entityIcons').EntityIconKind, key: string, accent: string }[]} */
   const DETAIL_JEWELS = [
-    { icon: '📅', key: 'when', accent: 'gold' },
-    { icon: '📍', key: 'where', accent: 'blue' },
-    { icon: '💰', key: 'budget', accent: 'green' },
-    { icon: '👥', key: 'whoCanOffer', accent: 'barbi' },
-    { icon: '🔒', key: 'whoCanSee', accent: 'gold' },
-    { icon: '🤝', key: 'invite', accent: 'green' },
-    { icon: '🫂', key: 'joinKind', accent: 'barbi' }
+    { icon: 'date', key: 'when', accent: 'gold' },
+    { icon: 'place', key: 'where', accent: 'blue' },
+    { icon: 'money', key: 'budget', accent: 'green' },
+    { icon: 'members', key: 'whoCanOffer', accent: 'barbi' },
+    { icon: 'private', key: 'whoCanSee', accent: 'gold' },
+    { icon: 'maagad', key: 'invite', accent: 'green' },
+    { icon: 'audience', key: 'joinKind', accent: 'barbi' }
   ];
 
   /* Every option list below carries only its stored `value` plus the `key` used
@@ -702,7 +705,7 @@
         >
       {:else}
         <button class="notif-btn" aria-label={$t('concierge.new.notifications')}
-          >🔔<span class="notif-pip"></span></button
+          ><EntityIcon kind="notifications" size={16} /><span class="notif-pip"></span></button
         >
         <button class="av-btn" onclick={() => goto('/me')}>
           {#if $uPic}
@@ -777,7 +780,7 @@
       <div class="seeds anim anim-d2">
         {#each SEEDS as seed (seed.key)}
           <button class="seed-card" onclick={() => pickSeed(seed)}>
-            <span class="seed-icon">{seed.icon}</span>
+            <span class="seed-icon"><EntityIcon kind={seed.icon} size={18} /></span>
             <div style="min-width:0;text-align:start">
               <div class="seed-label">
                 {$t(`concierge.new.seeds.${seed.key}.label`)}
@@ -836,14 +839,14 @@
             <div class="scroll-toolbar">
               <div style="display:flex;gap:6px">
                 <button class="tool-btn" title={$t('concierge.new.tool.mic')}
-                  >🎙</button
+                  ><EntityIcon kind="voice" size={15} /></button
                 >
                 <button class="tool-btn" title={$t('concierge.new.tool.attach')}
-                  >📎</button
+                  ><EntityIcon kind="attach" size={15} /></button
                 >
                 <button
                   class="tool-btn"
-                  title={$t('concierge.new.tool.phrasing')}>✨</button
+                  title={$t('concierge.new.tool.phrasing')}><EntityIcon kind="wish" size={15} /></button
                 >
                 <button
                   class="tool-btn"
@@ -882,7 +885,7 @@
               >
                 <span
                   class="jewel-icon"
-                  style="background:{accentBg(j.accent, has)}">{j.icon}</span
+                  style="background:{accentBg(j.accent, has)}"><EntityIcon kind={j.icon} size={15} /></span
                 >
                 <div style="flex:1;min-width:0;text-align:start">
                   <div class="jewel-label">
@@ -1185,7 +1188,7 @@
                       <span
                         style="width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(116,191,255,.12);color:#74bfff;font-size:12px;flex-shrink:0"
                         aria-label={$t('concierge.new.lev.hiddenIdentity')}
-                        >🔒</span
+                        ><EntityIcon kind="private" size={12} /></span
                       >
                     {:else if p.avatar}
                       <img
@@ -1259,7 +1262,7 @@
           <div
             style="margin-top:16px;padding:10px 12px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:10px;display:flex;gap:10px;align-items:flex-start"
           >
-            <span style="font-size:13px">🔒</span>
+            <EntityIcon kind="private" size={13} />
             <div
               style="font-family:'Bellefair',serif;font-size:11.5px;color:#9a8f80;line-height:1.55"
             >
@@ -1343,7 +1346,7 @@
         <div class="location-modal-head">
           <div>
             <div class="modal-eyebrow">
-              {DETAIL_JEWELS[editingJewel].icon} · {$t(
+              <EntityIcon kind={DETAIL_JEWELS[editingJewel].icon} size={13} /> · {$t(
                 `concierge.new.jewels.${DETAIL_JEWELS[editingJewel].key}.label`
               )}
             </div>

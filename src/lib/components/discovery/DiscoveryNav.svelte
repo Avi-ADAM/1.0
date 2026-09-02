@@ -1,5 +1,6 @@
 <script lang="ts">
   import { t } from '$lib/translations';
+  import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
 
   /**
    * Cross-links between the public discovery surfaces (PLAN_DISCOVERY pages):
@@ -14,17 +15,17 @@
   let { current, isLoggedIn = true }: Props = $props();
 
   const BASE_LINKS = [
-    { key: 'map', href: '/demand', emoji: '🗺️' },
-    { key: 'projects', href: '/project', emoji: '🧶' },
-    { key: 'products', href: '/gift', emoji: '🎁' },
-    { key: 'missions', href: '/availableMission', emoji: '🛠️' },
-    { key: 'resources', href: '/availiableResorce', emoji: '📦' }
+    { key: 'map', href: '/demand', icon: 'map' },
+    { key: 'projects', href: '/project', icon: 'rikma' },
+    { key: 'products', href: '/gift', icon: 'product' },
+    { key: 'missions', href: '/availableMission', icon: 'mission' },
+    { key: 'resources', href: '/availiableResorce', icon: 'resource' }
   ] as const;
 
   const links = $derived(
     isLoggedIn
       ? [...BASE_LINKS]
-      : [{ key: 'home', href: '/', emoji: '💗' } as const, ...BASE_LINKS]
+      : [{ key: 'home', href: '/', icon: 'support' } as const, ...BASE_LINKS]
   );
 </script>
 
@@ -36,7 +37,7 @@
       class:active={current === link.key}
       aria-current={current === link.key ? 'page' : undefined}
     >
-      <span aria-hidden="true">{link.emoji}</span>
+      <EntityIcon kind={link.icon} size={15} />
       <span>{$t(`discover.nav_${link.key}`)}</span>
     </a>
   {/each}

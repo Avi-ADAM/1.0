@@ -3,6 +3,7 @@
 
 <script>
   import { t } from '$lib/translations';
+  import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
   let { dimensions = [], positions = [], loading = false } = $props();
 
   // מצב פרוס/מכווץ לכל ממד (חשוב למובייל)
@@ -42,7 +43,7 @@
     </div>
   {:else if dimensions.length === 0}
     <div class="text-center py-8 text-gray-400">
-      <div class="text-4xl mb-2">🔍</div>
+      <div class="mb-2 flex justify-center"><EntityIcon kind="search" size={36} /></div>
       <p class="text-sm">{$t('negotiation.add_min_2_positions')}</p>
     </div>
   {:else}

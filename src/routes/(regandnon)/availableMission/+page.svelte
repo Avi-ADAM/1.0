@@ -2,6 +2,7 @@
   import { page } from '$app/state';
   import DiscoveryMap from '$lib/components/location/DiscoveryMap.svelte';
   import DiscoveryNav from '$lib/components/discovery/DiscoveryNav.svelte';
+  import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
   import ShareLink from '$lib/components/share/ShareLink.svelte';
   import { LAYER_COLORS, type MapItem, type MapLayer } from '$lib/map/discoveryTypes';
   import { t, isRtl, locale } from '$lib/translations';
@@ -91,7 +92,7 @@
         desc={$t('ui.share.missions')}
       />
     </div>
-    <h1>🛠️ {$t('discover.missions_title')}</h1>
+    <h1>{$t('discover.missions_title')}</h1>
     <p class="sub">{$t('discover.missions_subtitle')}</p>
 
     <div class="controls">
@@ -105,10 +106,10 @@
           {$t('discover.filter_all')} <span class="count">{data.missions.length}</span>
         </button>
         <button class:active={filter === 'paid'} onclick={() => (filter = 'paid')}>
-          💰 {$t('discover.filter_with_value')}
+          <EntityIcon kind="money" size={14} /> {$t('discover.filter_with_value')}
         </button>
         <button class:active={filter === 'concierge'} onclick={() => (filter = 'concierge')}>
-          🪄 {$t('discover.filter_concierge')}
+          <EntityIcon kind="wish" size={14} /> {$t('discover.filter_concierge')}
         </button>
       </div>
     </div>
@@ -140,18 +141,18 @@
       {#if selected}
         <aside class="selected-card" aria-live="polite">
           <div class="card-head">
-            <span aria-hidden="true">🛠️</span>
+            <EntityIcon kind="mission" size={17} />
             <strong>{selected.title}</strong>
             <button class="close" onclick={() => (selected = null)} aria-label="✕">✕</button>
           </div>
           {#if selected.hint}
-            <p class="hint">📍 {selected.hint}</p>
+            <p class="hint"><EntityIcon kind="place" size={13} /> {selected.hint}</p>
           {/if}
           <a class="cta" href={selected.href}>{$t('discover.missions_apply')}</a>
         </aside>
       {/if}
       <p class="map-note">
-        <a href={demandHref(null)}>🗺️ {$t('discover.to_full_map')}</a>
+        <a href={demandHref(null)}><EntityIcon kind="map" size={14} /> {$t('discover.to_full_map')}</a>
       </p>
     </div>
   {/if}
@@ -168,12 +169,12 @@
             {#if m.projectPicUrl}
               <img class="avatar" src={m.projectPicUrl} alt="" loading="lazy" />
             {:else}
-              <div class="avatar fallback" aria-hidden="true">🧶</div>
+              <div class="avatar fallback"><EntityIcon kind="rikma" size={20} /></div>
             {/if}
             <div class="top-text">
               <h2>{m.name}</h2>
               {#if m.projectName}
-                <p class="proj-name">🧶 {m.projectName}</p>
+                <p class="proj-name"><EntityIcon kind="rikma" size={13} /> {m.projectName}</p>
               {/if}
             </div>
             {#if m.value}
@@ -188,15 +189,15 @@
           {/if}
           <div class="badges">
             {#if m.concierge}
-              <span class="badge concierge">🪄 {$t('discover.concierge_badge')}</span>
+              <span class="badge concierge"><EntityIcon kind="wish" size={13} /> {$t('discover.concierge_badge')}</span>
             {/if}
             {#if m.isOnline}
-              <span class="badge">🌐 {$t('discover.online_badge')}</span>
+              <span class="badge"><EntityIcon kind="online" size={13} /> {$t('discover.online_badge')}</span>
             {:else if m.hint}
-              <span class="badge">📍 {m.hint}</span>
+              <span class="badge"><EntityIcon kind="place" size={13} /> {m.hint}</span>
             {/if}
             {#if fmtDate(m.date)}
-              <span class="badge">🗓️ {fmtDate(m.date)}</span>
+              <span class="badge"><EntityIcon kind="date" size={13} /> {fmtDate(m.date)}</span>
             {/if}
             {#each m.skills.slice(0, 3) as s (s)}
               <span class="badge skill-badge">{s}</span>
@@ -209,10 +210,10 @@
         <div class="card-actions">
           <a class="cta small" href={`/availableMission/${m.id}`}>{$t('discover.missions_apply')}</a>
           {#if m.projectId}
-            <a class="mini" href={`/project/${m.projectId}`}>🧶 {$t('discover.to_project')}</a>
+            <a class="mini" href={`/project/${m.projectId}`}><EntityIcon kind="rikma" size={13} /> {$t('discover.to_project')}</a>
           {/if}
           {#if m.lat !== null}
-            <button class="mini" onclick={() => pickOnMap(m)}>📍 {$t('discover.show_here')}</button>
+            <button class="mini" onclick={() => pickOnMap(m)}><EntityIcon kind="place" size={13} /> {$t('discover.show_here')}</button>
           {/if}
         </div>
       </li>
@@ -543,7 +544,7 @@
     gap: 0.5rem;
     flex-wrap: wrap;
   }
-  /* ✨ shimmering gold accents (paused for prefers-reduced-motion) */
+  /* Shimmering gold accents (paused for prefers-reduced-motion) */
   @keyframes gold-shine {
     to {
       background-position: 220% center;

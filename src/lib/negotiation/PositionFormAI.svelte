@@ -240,7 +240,7 @@
       </span>
     {:else}
       {analyzed
-        ? `📍 ${$t('negotiation.add_position')} (${$t('negotiation.spectrum')}: ${aiAnalysis?.location ?? '?'})`
+        ? `${$t('negotiation.add_position')} (${$t('negotiation.spectrum')}: ${aiAnalysis?.location ?? '?'})`
         : $t('negotiation.add_position')}
     {/if}
   </button>

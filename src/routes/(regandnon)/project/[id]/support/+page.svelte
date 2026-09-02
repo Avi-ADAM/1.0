@@ -10,6 +10,10 @@
   import DonateDialog from '$lib/components/revenue/DonateDialog.svelte';
   import ShareLink from '$lib/components/share/ShareLink.svelte';
   import { htmlExcerpt } from '$lib/text/htmlExcerpt';
+  import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
+  import DiscordIcon from '$lib/celim/icons/discord.svelte';
+  import GithubIcon from '$lib/celim/icons/github.svelte';
+  import WhatsappIcon from '$lib/celim/icons/whatsapp.svelte';
 
   let { data } = $props();
 
@@ -200,7 +204,9 @@
         </h1>
 
         {#if attrs.city}
-          <p class="text-white/50 mb-2">📍 {attrs.city}</p>
+          <p class="text-white/50 mb-2 flex items-center justify-center gap-1.5">
+            <EntityIcon kind="place" size={15} /> {attrs.city}
+          </p>
         {/if}
 
         <p class="max-w-xl mx-auto text-lg text-white/80 mb-8">
@@ -215,7 +221,8 @@
               href={attrs.linkToWebsite}
               target="_blank"
               rel="noopener"
-              class="btn-ghost">🌐 {$t('pages.projectSupport.visitSite')}</a
+              class="btn-ghost">
+              <EntityIcon kind="online" size={15} /> {$t('pages.projectSupport.visitSite')}</a
             >
           {/if}
         </div>
@@ -224,9 +231,9 @@
         <div class="flex justify-center items-center gap-3 text-sm">
           {#if attrs.fblink}<a class="social-dot" target="_blank" rel="noopener" href={attrs.fblink} title="Facebook">f</a>{/if}
           {#if attrs.twiterlink}<a class="social-dot" target="_blank" rel="noopener" href={attrs.twiterlink} title="X / Twitter">𝕏</a>{/if}
-          {#if attrs.discordlink}<a class="social-dot" target="_blank" rel="noopener" href={attrs.discordlink} title="Discord">🎮</a>{/if}
-          {#if attrs.githublink}<a class="social-dot" target="_blank" rel="noopener" href={attrs.githublink} title="GitHub">🐙</a>{/if}
-          {#if attrs.watsapplink}<a class="social-dot" target="_blank" rel="noopener" href={attrs.watsapplink} title="WhatsApp">💬</a>{/if}
+          {#if attrs.discordlink}<a class="social-dot" target="_blank" rel="noopener" href={attrs.discordlink} title="Discord"><DiscordIcon width={18} /></a>{/if}
+          {#if attrs.githublink}<a class="social-dot" target="_blank" rel="noopener" href={attrs.githublink} title="GitHub"><GithubIcon width={18} /></a>{/if}
+          {#if attrs.watsapplink}<a class="social-dot" target="_blank" rel="noopener" href={attrs.watsapplink} title="WhatsApp"><WhatsappIcon width={18} /></a>{/if}
           <ShareLink
             path={`/project/${$page.params.id}/support`}
             title={attrs?.projectName ?? ''}
@@ -281,10 +288,10 @@
               {$t('pages.projectSupport.incomeBreakdown')}
             </h3>
             <div class="flex flex-wrap gap-2">
-              <span class="chip chip-gold">💗 {$t('pages.projectSupport.srcDonations')} · ₪{fmt(coverage.donationIncome)}</span>
-              <span class="chip chip-pink">🎁 {$t('pages.projectSupport.srcProducts')} · ₪{fmt(coverage.productIncome)}</span>
+              <span class="chip chip-gold"><EntityIcon kind="support" size={13} /> {$t('pages.projectSupport.srcDonations')} · ₪{fmt(coverage.donationIncome)}</span>
+              <span class="chip chip-pink"><EntityIcon kind="product" size={13} /> {$t('pages.projectSupport.srcProducts')} · ₪{fmt(coverage.productIncome)}</span>
               {#if coverage.otherIncome > 0}
-                <span class="chip">✨ {$t('pages.projectSupport.srcOther')} · ₪{fmt(coverage.otherIncome)}</span>
+                <span class="chip"><EntityIcon kind="money" size={13} /> {$t('pages.projectSupport.srcOther')} · ₪{fmt(coverage.otherIncome)}</span>
               {/if}
             </div>
           </div>
@@ -325,7 +332,7 @@
 
                 <div class="flex flex-wrap items-center gap-2 text-sm text-white/70">
                   {#if om.attributes.noofhours}
-                    <span>⏱ {fmt(om.attributes.noofhours)} {$t('pages.projectSupport.hours')}</span>
+                    <span><EntityIcon kind="timer" size={13} /> {fmt(om.attributes.noofhours)} {$t('pages.projectSupport.hours')}</span>
                   {/if}
                   {#if st?.value}
                     <span class="text-gold font-semibold">≈ ₪{fmt(st.value)}</span>
@@ -346,7 +353,7 @@
                 {#if stipendById.get(String(om.id))}
                   {@const stip = stipendById.get(String(om.id))}
                   <p class="stipend-note">
-                    💗 {$t('stipend.mission.onMission', { count: stip.stipendRate })}
+                    <EntityIcon kind="support" size={14} /> {$t('stipend.mission.onMission', { count: stip.stipendRate })}
                     {#if !stip.hasFunder}
                       <span class="stipend-seeking">
                         {$t('stipend.mission.seekingFunder')}
@@ -368,7 +375,7 @@
                     class="btn-fund !text-sm self-start"
                     onclick={() => fundMission(om, st)}
                   >
-                    💗 {$t('stipend.mission.fundThis')}
+                    <EntityIcon kind="support" size={14} /> {$t('stipend.mission.fundThis')}
                   </button>
                 </div>
               </div>
@@ -394,7 +401,7 @@
         </h2>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div class="glass rounded-2xl p-6 border-t-4 border-t-gold flex flex-col">
-            <div class="text-3xl mb-3">💗</div>
+            <div class="mb-3 text-gold"><EntityIcon kind="support" size={30} /></div>
             <h3 class="font-bold text-lg mb-2">{$t('pages.projectSupport.donateMoney')}</h3>
             <p class="text-white/60 text-sm leading-relaxed mb-4">{$t('pages.projectSupport.donateMoneyDesc')}</p>
             <button type="button" class="btn-primary !text-sm mt-auto self-start" onclick={openDonate}>
@@ -402,7 +409,7 @@
             </button>
           </div>
           <div class="glass rounded-2xl p-6 border-t-4 border-t-barbi">
-            <div class="text-3xl mb-3">🎁</div>
+            <div class="mb-3 text-barbi"><EntityIcon kind="product" size={30} /></div>
             <h3 class="font-bold text-lg mb-2">{$t('pages.projectSupport.donateBuy')}</h3>
             <p class="text-white/60 text-sm leading-relaxed mb-3">{$t('pages.projectSupport.donateBuyDesc')}</p>
             {#if products.length > 0}
@@ -410,7 +417,7 @@
             {/if}
           </div>
           <div class="glass rounded-2xl p-6 border-t-4 border-t-white/40">
-            <div class="text-3xl mb-3">🤝</div>
+            <div class="mb-3 text-white/70"><EntityIcon kind="maagad" size={30} /></div>
             <h3 class="font-bold text-lg mb-2">{$t('pages.projectSupport.donateTime')}</h3>
             <p class="text-white/60 text-sm leading-relaxed mb-3">{$t('pages.projectSupport.donateTimeDesc')}</p>
             <a href="#missions" class="text-gold text-sm underline hover:text-white">{$t('pages.projectSupport.toMissions')}</a>
@@ -437,7 +444,9 @@
                     loading="lazy"
                   />
                 {:else}
-                  <div class="w-full aspect-square flex items-center justify-center text-5xl bg-white/5">🎁</div>
+                  <div class="w-full aspect-square flex items-center justify-center bg-white/5 text-white/40">
+                    <EntityIcon kind="product" size={44} />
+                  </div>
                 {/if}
                 <div class="p-4">
                   <p class="font-semibold leading-snug mb-1">{matanot.attributes.name}</p>
@@ -487,7 +496,7 @@
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-14">
         {#if vallues.length > 0}
           <section class="glass rounded-2xl p-6">
-            <h2 class="text-xl font-bold text-gold mb-4">✨ {$t('pages.projectSupport.valuesTitle')}</h2>
+            <h2 class="text-xl font-bold text-gold mb-4">{$t('pages.projectSupport.valuesTitle')}</h2>
             <div class="flex flex-wrap gap-2">
               {#each vallues as v (v)}
                 <span class="chip chip-gold">{v}</span>

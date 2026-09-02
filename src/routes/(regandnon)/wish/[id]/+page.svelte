@@ -1,5 +1,6 @@
 <script>
   import { onMount, onDestroy } from 'svelte';
+  import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
   import { showFoot } from '$lib/stores/showFoot.js';
   import { page } from '$app/stores';
   import RichText from '$lib/celim/ui/richText.svelte';
@@ -261,7 +262,7 @@
           <span class="code-lbl hide-xs">קוד משאלה</span>
           <code class="wish-code">{wish.code}</code>
           <button class="btn-ghost btn-xs" onclick={copyLink}>
-            {copied ? '✓ הועתק' : '📤 שתפי'}
+            {#if copied}✓ הועתק{:else}<EntityIcon kind="share" size={13} /> שתפי{/if}
           </button>
         </div>
       </div>
@@ -302,9 +303,9 @@
         </div>
         <div class="hero-footer">
           <div class="hero-metas">
-            {#each [['📅', 'ליום', wish.when], ['📍', 'באזור', wish.where], ['💰', 'תקציב', wish.budget]] as [icon, lbl, val] (lbl)}
+            {#each [['date', 'ליום', wish.when], ['place', 'באזור', wish.where], ['money', 'תקציב', wish.budget]] as [icon, lbl, val] (lbl)}
               <div class="metai">
-                <span class="mi-icon">{icon}</span>
+                <span class="mi-icon"><EntityIcon kind={icon} size={16} /></span>
                 <div>
                   <div class="mi-lbl">{lbl}</div>
                   <div class="mi-val">{val}</div>
@@ -317,12 +318,12 @@
               {#if offerDone}
                 <span class="badge-open" style="font-size:13px">✓ ההצעה שלך נשלחה לבעלת המשאלה</span>
               {:else if myProposals.length}
-                <button class="btn-jewel" onclick={() => (offerOpen = true)}>📋 ההצעות שלי</button>
+                <button class="btn-jewel" onclick={() => (offerOpen = true)}><EntityIcon kind="offers" size={14} /> ההצעות שלי</button>
               {:else}
-                <button class="btn-jewel" onclick={() => (offerOpen = true)}>💗 אני יכולה לעזור</button>
+                <button class="btn-jewel" onclick={() => (offerOpen = true)}><EntityIcon kind="support" size={14} /> אני יכולה לעזור</button>
               {/if}
             {:else}
-              <a href={`/login?next=/wish/${wishId}`} class="btn-jewel">💗 אני יכולה לעזור</a>
+              <a href={`/login?next=/wish/${wishId}`} class="btn-jewel"><EntityIcon kind="support" size={14} /> אני יכולה לעזור</a>
             {/if}
           </div>
         </div>
@@ -429,10 +430,10 @@
               {#if offerDone}
                 <span class="badge-open" style="font-size:13px">✓ ההצעה שלך נשלחה</span>
               {:else}
-                <button class="btn-jewel" onclick={() => (offerOpen = true)}>💗 אני יכולה לעזור</button>
+                <button class="btn-jewel" onclick={() => (offerOpen = true)}><EntityIcon kind="support" size={14} /> אני יכולה לעזור</button>
               {/if}
             {:else}
-              <a href={`/login?next=/wish/${wishId}`} class="btn-jewel">💗 אני יכולה לעזור</a>
+              <a href={`/login?next=/wish/${wishId}`} class="btn-jewel"><EntityIcon kind="support" size={14} /> אני יכולה לעזור</a>
             {/if}
             <a href="/concierge" class="btn-ghost">משאלות אחרות בקהילה</a>
           </div>
@@ -443,7 +444,7 @@
       {#if isLoggedIn && myProposals.length}
         <div class="my-proposals anim anim-d3">
           <div class="mp-hdr">
-            <span class="mp-icon">📋</span>
+            <span class="mp-icon"><EntityIcon kind="offers" size={16} /></span>
             <h4 class="mp-title">ההצעות שלי לגבי משאלה זו</h4>
           </div>
           {#each myProposals as p (p.id)}
@@ -484,7 +485,7 @@
 
       <!-- Privacy footer -->
       <div class="privacy-strip anim anim-d3">
-        <span style="font-size:14px">🔒</span>
+        <EntityIcon kind="private" size={15} />
         <div>
           <div class="privacy-title">{wish.accessNote}</div>
           <div class="privacy-sub">
@@ -547,7 +548,7 @@
           onclick={submitOffer}
           disabled={offerSubmitting || (!offerSelected.size && !offerResourceSelected.size)}
         >
-          {offerSubmitting ? 'שולח…' : '💗 שלחי הצעה'}
+          {#if offerSubmitting}שולח…{:else}<EntityIcon kind="send" size={14} /> שלחי הצעה{/if}
         </button>
       </div>
     </div>
@@ -1054,7 +1055,7 @@
     gap: 9px;
   }
   .mi-icon {
-    font-size: 14px;
+    display: inline-flex;
     opacity: 0.85;
   }
   .mi-lbl {
@@ -1358,7 +1359,7 @@
     gap: 8px;
     margin-bottom: 14px;
   }
-  .mp-icon { font-size: 16px; }
+  .mp-icon { display: inline-flex; }
   .mp-title {
     font-family: 'Cinzel', serif;
     font-size: 11px;

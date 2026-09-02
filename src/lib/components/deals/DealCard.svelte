@@ -1,5 +1,6 @@
 ﻿<script lang="ts">
   import { isRtl } from '$lib/translations';
+  import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
   import { goto } from '$app/navigation';
   import { t } from '$lib/translations';
   import { lang } from '$lib/stores/lang.js';
@@ -44,7 +45,7 @@
   <div class="chips">
     <span class="chip">{deal.category}</span>
     {#if deal.pendingApprovalCount > 0}
-      <span class="chip warn">⚡ {deal.pendingApprovalCount} {$t('deals.approvalCount')}</span>
+      <span class="chip warn"><EntityIcon kind="urgent" size={12} /> {deal.pendingApprovalCount} {$t('deals.approvalCount')}</span>
     {/if}
   </div>
 

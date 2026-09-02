@@ -131,7 +131,7 @@
     <DialogContent class="donate-dialog" aria-label={$t('revenue.donate.title')}>
       <div dir={rtl ? 'rtl' : 'ltr'} class="dd-body">
         <div class="dd-head">
-          <h2>💗 {$t('revenue.donate.title')}</h2>
+          <h2>{$t('revenue.donate.title')}</h2>
           <button class="dd-x" onclick={close} aria-label={$t('revenue.donate.cancel')}>✕</button>
         </div>
         <p class="dd-intro">{$t('revenue.donate.intro')}</p>

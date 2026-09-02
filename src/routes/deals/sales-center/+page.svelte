@@ -1,5 +1,6 @@
 <script>
   import { isRtl, t } from '$lib/translations';
+  import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
   import { lang } from '$lib/stores/lang.js';
   import SaleComponent from '$lib/components/sales/SaleComponent.svelte';
   import RecurringCycleCard from '$lib/components/sales/RecurringCycleCard.svelte';
@@ -205,11 +206,11 @@
 <main class="page-wrap" dir={$isRtl ? 'rtl' : 'ltr'}>
   <div class="page-top anim">
     <div>
-      <h1 class="page-title">{$t('pages.salesCenter.title')} <span class="accent">🎁</span></h1>
+      <h1 class="page-title">{$t('pages.salesCenter.title')}</h1>
       <p class="page-sub">{$t('pages.salesCenter.subtitle')}</p>
     </div>
     <button class="new-btn" onclick={() => (creatingProduct = true)}>
-      ➕ {$t('pages.salesCenter.newProduct')}
+      <EntityIcon kind="add" size={15} /> {$t('pages.salesCenter.newProduct')}
     </button>
   </div>
 
@@ -236,8 +237,8 @@
     <section class="cycles-section anim">
       <h2 class="cycles-title">
         {$lang === 'he'
-          ? `🔁 מכירות מתחדשות - דיווח חודשי (${pendingCycles.length})`
-          : `🔁 Recurring sales - monthly report (${pendingCycles.length})`}
+          ? `מכירות מתחדשות - דיווח חודשי (${pendingCycles.length})`
+          : `Recurring sales - monthly report (${pendingCycles.length})`}
       </h2>
       <p class="cycles-sub">
         {$lang === 'he'

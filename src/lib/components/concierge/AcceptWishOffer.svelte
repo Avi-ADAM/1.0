@@ -1,5 +1,6 @@
 <script lang="ts">
   import { isRtl } from '$lib/translations';
+  import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
   /**
    * AcceptWishOffer — PLAN_CONCIERGE §5.3
    *
@@ -53,7 +54,7 @@
       negotiate: 'מו״מ (בקרוב)',
       decline: 'לא מתאים לי',
       submitting: 'מאשר את ההשמה…',
-      doneTitle: 'אישרת את ההשמה 🤍',
+      doneTitle: 'אישרת את ההשמה',
       doneBody: 'נכנסת כספק/ית למשימה. נשלחה התראה ליוזמ/ת המשאלה. הריקמה תיווצר כשכל המקומות יתמלאו.',
       close: 'סגירה',
       errTitle: 'משהו השתבש',
@@ -71,7 +72,7 @@
       negotiate: 'Negotiate (soon)',
       decline: 'Not for me',
       submitting: 'Approving your placement…',
-      doneTitle: 'Placement approved 🤍',
+      doneTitle: 'Placement approved',
       doneBody: "You joined the task as provider. The wisher was notified. The weave is created once all slots are filled.",
       close: 'Close',
       errTitle: 'Something went wrong',
@@ -128,8 +129,8 @@
       <div class="ofr-offer">
         <div class="ofr-offer-name">{item.name}</div>
         <div class="ofr-offer-meta">
-          {#if item.hours}<span>⏱ {item.hours} {t.hours}</span>{/if}
-          {#if item.price != null}<span>💰 ₪{Number(item.price).toLocaleString()}</span>{/if}
+          {#if item.hours}<span><EntityIcon kind="timer" size={13} /> {item.hours} {t.hours}</span>{/if}
+          {#if item.price != null}<span><EntityIcon kind="money" size={13} /> ₪{Number(item.price).toLocaleString()}</span>{/if}
         </div>
       </div>
 
@@ -145,7 +146,7 @@
 
     {:else if step === 'done'}
       <div class="ofr-done">
-        <div class="ofr-done-emoji">🤍</div>
+        <div class="ofr-done-icon"><EntityIcon kind="done" size={40} /></div>
         <h3 class="ofr-done-title">{t.doneTitle}</h3>
         <p class="ofr-done-body">{t.doneBody}</p>
         <button class="ofr-btn ofr-btn--primary" onclick={() => onClose?.()}>{t.close}</button>
@@ -259,7 +260,7 @@
   .ofr-decline:hover { color: var(--tm, #9a8f80); }
   .ofr-state { text-align: center; padding: 28px 12px; color: var(--tm, #9a8f80); font-size: 14px; }
   .ofr-done { text-align: center; padding: 14px 6px; }
-  .ofr-done-emoji { font-size: 38px; margin-bottom: 8px; }
+  .ofr-done-icon { font-size: 38px; margin-bottom: 8px; }
   .ofr-done-title { font-size: 18px; font-weight: 800; color: var(--text, #f3ece0); margin-bottom: 6px; }
   .ofr-done-body { font-size: 13px; color: var(--tm, #9a8f80); line-height: 1.55; margin-bottom: 16px; }
   .ofr-err-title { font-size: 16px; font-weight: 700; color: var(--pink-l, #ff6496); margin-bottom: 6px; }

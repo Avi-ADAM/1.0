@@ -1,5 +1,6 @@
 <script>
   import { onMount } from 'svelte';
+  import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
   import { isWebkitTextPathBidiBug, toVisualRtl } from '$lib/utils/rtlTextPath.js';
 
   let {
@@ -121,7 +122,7 @@
       {#if logoSrc}
         <img src={logoSrc} alt={projectName} class="logo"/>
       {:else}
-        <span class="fallback-spark text-4xl">✨</span>
+        <span class="fallback-spark"><EntityIcon kind="wish" size={34} /></span>
         <span class="fallback-monogram" aria-hidden="true">{monogram}</span>
       {/if}
     </div>

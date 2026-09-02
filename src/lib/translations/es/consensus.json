@@ -35,9 +35,9 @@
     "totalLabel": "Total",
     "windowLabel": "Tiempo de decisión restante",
     "windowNote": "Si no respondes antes de que la ventana se cierre, la propuesta se aprueba en silencio.",
-    "skip": "⏩ Demo: nadie respondió → acuerdo por silencio",
+    "skip": "Demo: nadie respondió → acuerdo por silencio",
     "silenceExplainer": "El silencio = acuerdo. Si la ventana se cierra y nadie aprueba, discute o contrapropone, la última versión sobre la mesa se aprueba por sí sola. No hace falta un \"sí\" explícito: basta con no objetar a tiempo. Pruébalo: deja todo intacto y que el temporizador llegue a cero, o salta al final de la ventana.",
-    "simulatePartnerCounter": "🔄 Demo: Dana contrapropone",
+    "simulatePartnerCounter": "Demo: Dana contrapropone",
     "actions": { "approve": "Aprobar", "discuss": "Discutir", "counter": "Contraproponer" },
     "counterForm": {
       "title": "Tu versión",
@@ -51,7 +51,7 @@
     "chat": {
       "placeholder": "Escribe un mensaje a Dana…",
       "send": "Enviar",
-      "reply1": "Entendido, dame un momento para pensar 🙏",
+      "reply1": "Entendido, dame un momento para pensar",
       "reply2": "Sigo contigo en esto, no hace falta apurarse."
     },
     "history": { "title": "Historial de rondas", "empty": "Aún no hay rondas anteriores." },
@@ -62,9 +62,9 @@
       "countered": "Nueva versión propuesta"
     },
     "signed": {
-      "title": "Firmado ✍️",
+      "title": "Firmado",
       "body": "Ahora ambas partes sostienen exactamente la misma versión. Eso es un acuerdo.",
-      "silenceTitle": "Aprobada por silencio 🔕",
+      "silenceTitle": "Aprobada por silencio",
       "silenceBody": "La ventana se cerró y nadie objetó, así que la última versión sobre la mesa se convirtió en acuerdo por sí sola. Eso es el silencio convertido en acuerdo.",
       "restart": "Iniciar una nueva ronda"
     },

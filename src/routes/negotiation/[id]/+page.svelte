@@ -3,6 +3,7 @@
 
 <script>
   import { animate, signal, all } from '$lib/func/animation.ts';
+  import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
   import { onMount } from 'svelte';
   import { page } from '$app/state';
   import { goto } from '$app/navigation';
@@ -14,6 +15,13 @@
   import DimensionsView from '$lib/negotiation/DimensionsView.svelte';
   import PositionFormAI from '$lib/negotiation/PositionFormAI.svelte';
   import RoundFeedback from '$lib/negotiation/RoundFeedback.svelte';
+
+  /** @type {{ id: string, label: string, icon: import('$lib/celim/icons/entityIcons').EntityIconKind }[]} */
+  const VIEW_TABS = [
+    { id: 'spectrum', label: 'ספקטרום', icon: 'chart' },
+    { id: 'dimensions', label: 'ממדים', icon: 'search' },
+    { id: 'add', label: 'הוסף עמדה', icon: 'add' }
+  ];
 
   let { data } = $props();
 
@@ -549,7 +557,7 @@
             class="bg-amber-50 border border-amber-200 rounded-xl p-4 space-y-2"
           >
             <p class="text-xs font-semibold text-amber-800">
-              💡 {$t('negotiation.ai_suggests_consider')}
+              <EntityIcon kind="idea" size={14} /> {$t('negotiation.ai_suggests_consider')}
             </p>
             {#each topicSuggestions.suggestedDimensions || [] as dim}
               <div class="bg-white rounded-lg p-3 border border-amber-100">
@@ -591,7 +599,7 @@
   >
     <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 space-y-4">
       <div class="text-center">
-        <div class="text-4xl mb-2">🎉</div>
+        <div class="mb-2 flex justify-center text-emerald-500"><EntityIcon kind="done" size={36} /></div>
         <h2 class="font-bold text-gray-800">
           {$t('negotiation.discussion_created')}
         </h2>
@@ -648,7 +656,7 @@
   >
     <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 space-y-4">
       <div class="text-center">
-        <div class="text-5xl mb-3">🏁</div>
+        <div class="mb-3 flex justify-center text-violet-500"><EntityIcon kind="finish" size={44} /></div>
         <h2 class="font-bold text-2xl text-gray-800">
           {$t('negotiation.discussion_results')}
         </h2>
@@ -739,7 +747,7 @@
               showShareModal = true;
             }}
             class="bg-white/15 hover:bg-white/25 text-white rounded-full w-8 h-8 flex items-center justify-center transition-colors text-base"
-            title={$t('negotiation.share')}>⬆️</button
+            title={$t('negotiation.share')}><EntityIcon kind="share" size={15} /></button
           >
         </div>
       </div>
@@ -749,7 +757,7 @@
   <!-- ── View Mode Tabs ── -->
   {#if isTopicSet && isFirstPositionSet}
     <div class="shrink-0 flex border-b border-white/10 bg-white/5">
-      {#each [{ id: 'spectrum', label: 'ספקטרום', icon: '📊' }, { id: 'dimensions', label: 'ממדים', icon: '🔍' }, { id: 'add', label: 'הוסף עמדה', icon: '➕' }] as tab}
+      {#each VIEW_TABS as tab (tab.id)}
         <button
           onclick={() => (viewMode = tab.id)}
           class="flex-1 py-2.5 text-xs font-medium transition-colors flex items-center justify-center gap-1.5
@@ -757,7 +765,7 @@
             ? 'text-white border-b-2 border-violet-400 bg-white/10'
             : 'text-white/50 hover:text-white/80'}"
         >
-          <span class="text-base leading-none">{tab.icon}</span>
+          <EntityIcon kind={tab.icon} size={16} />
           <span>{tab.label}</span>
         </button>
       {/each}
@@ -902,7 +910,7 @@
                       </p>
                       <div class="flex items-center gap-1 mt-1">
                         <span class="text-[9px] text-white/50"
-                          >👍 {point.voters?.length || 0}</span
+                          ><EntityIcon kind="vote" size={10} /> {point.voters?.length || 0}</span
                         >
                         {#if point.author === userName}
                           <span class="text-[9px] text-amber-300">• שלי</span>
@@ -924,7 +932,7 @@
               class="bg-violet-500/80 backdrop-blur-sm text-white rounded-2xl px-6 py-4 shadow-xl
                      hover:bg-violet-500 active:scale-95 transition-all border border-white/20"
             >
-              <div class="text-3xl mb-1">➕</div>
+              <div class="mb-1 flex justify-center"><EntityIcon kind="add" size={30} /></div>
               <p class="text-sm font-bold">הוסף עמדה ראשונה</p>
               <p class="text-xs text-white/70 mt-0.5">AI ימקם אותה בספקטרום</p>
             </button>
@@ -937,7 +945,7 @@
       <div class="p-4">
         {#if points.length < 2}
           <div class="text-center py-12 text-white/50">
-            <div class="text-4xl mb-3">🔍</div>
+            <div class="mb-3 flex justify-center"><EntityIcon kind="search" size={36} /></div>
             <p class="text-sm">הוסף לפחות 2 עמדות<br />כדי לראות ניתוח ממדים</p>
           </div>
         {:else}
@@ -1004,7 +1012,7 @@
             class="bg-amber-400/20 border border-amber-400/30 backdrop-blur-md rounded-2xl p-4 mb-4"
           >
             <p class="text-amber-200 text-xs font-semibold mb-2">
-              💡 AI מציע לדון בממדים אלה:
+              <EntityIcon kind="idea" size={14} /> AI מציע לדון בממדים אלה:
             </p>
             <div class="flex flex-wrap gap-2">
               {#each topicSuggestions.suggestedDimensions as dim}
@@ -1081,9 +1089,11 @@
           class="flex-1 py-3 rounded-xl font-bold text-sm bg-violet-500 text-white
                  hover:bg-violet-400 active:scale-95 transition-all shadow-lg"
         >
-          {currentRound >= maxRounds
-            ? '🏁 סיים דיון'
-            : `🔄 סבב ${currentRound + 1}`}
+          {#if currentRound >= maxRounds}
+            <EntityIcon kind="finish" size={15} /> סיים דיון
+          {:else}
+            <EntityIcon kind="refresh" size={15} /> סבב {currentRound + 1}
+          {/if}
         </button>
 
         <!-- Refresh dimensions -->
@@ -1100,7 +1110,7 @@
               class="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"
             ></span>
           {:else}
-            🤖
+            <EntityIcon kind="ai" size={17} />
           {/if}
         </button>
 
@@ -1109,7 +1119,7 @@
           onclick={resetSystem}
           class="py-3 px-4 rounded-xl font-medium text-sm bg-white/10 text-white/70
                  hover:bg-white/20 active:scale-95 transition-all"
-          title="איפוס">🔄</button
+          title="איפוס"><EntityIcon kind="reset" size={15} /></button
         >
       </div>
     </div>

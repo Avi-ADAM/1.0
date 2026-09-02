@@ -19,6 +19,7 @@
 -->
 <script>
   import { t, isRtl } from '$lib/translations';
+  import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
   import {
     a11y,
     a11yTouched,
@@ -92,7 +93,7 @@
       <p class="a11y-title">{$t('ui.a11y.title')}</p>
 
       <button type="button" class="a11y-item" onclick={cycleTextScale}>
-        <span aria-hidden="true">🔠</span>
+        <EntityIcon kind="textSize" size={16} />
         <span>{textLabel}</span>
       </button>
 
@@ -112,7 +113,7 @@
         aria-pressed={$a11y.highlightLinks}
         onclick={() => toggleA11y('highlightLinks')}
       >
-        <span aria-hidden="true">🔗</span>
+        <EntityIcon kind="link" size={16} />
         <span>{$t('ui.a11y.links')}</span>
       </button>
 
@@ -122,7 +123,7 @@
         aria-pressed={$a11y.readableFont}
         onclick={() => toggleA11y('readableFont')}
       >
-        <span aria-hidden="true">🔤</span>
+        <EntityIcon kind="language" size={16} />
         <span>{$t('ui.a11y.font')}</span>
       </button>
 
@@ -133,7 +134,7 @@
         class="a11y-item"
         onclick={() => setMotionChoice(nextMotionMode($motionMode))}
       >
-        <span aria-hidden="true">⏯</span>
+        <EntityIcon kind="motion" size={16} />
         <span>{motionLabel}</span>
       </button>
 

@@ -1,5 +1,6 @@
 ﻿<script>
   import { RingLoader } from 'svelte-loading-spinners';
+  import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
   import { lang } from '$lib/stores/lang.js';
   import { t, isRtl} from '$lib/translations';
 
@@ -224,12 +225,12 @@
 
         <div class="cta-buttons">
           <a href="/hascama" class="btn btn-primary">
-            <span class="btn-icon">✍️</span>
+            <span class="btn-icon"><EntityIcon kind="signed" size={16} /></span>
             <span>{$t('love.cta.btn1')}</span>
           </a>
 
           <a href="/he" class="btn btn-secondary">
-            <span class="btn-icon">🚀</span>
+            <span class="btn-icon"><EntityIcon kind="onboard" size={16} /></span>
             <span>{$t('love.cta.btn2')}</span>
           </a>
         </div>

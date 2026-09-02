@@ -1,15 +1,25 @@
 <script lang="ts">
+  import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
+  import type { EntityIconKind } from '$lib/celim/icons/entityIcons';
+
+  /**
+   * `iconKind` draws a Lucide stroke from the shared vocabulary; `icon` stays
+   * for the cards whose mark is a real typographic character (₪, ✓) that no
+   * icon set renders as well. Pass one or the other, not both.
+   */
   let {
     label,
     value,
     sub = '',
     icon = '',
+    iconKind,
     variant = 'default',
   }: {
     label:    string;
     value:    string | number;
     sub?:     string;
     icon?:    string;
+    iconKind?: EntityIconKind;
     variant?: 'default' | 'gold' | 'pink';
   } = $props();
 </script>
@@ -23,7 +33,11 @@
     {/if}
   </div>
   
-  {#if icon}
+  {#if iconKind}
+    <div class="stats-icon-wrapper">
+      <div class="stats-icon"><EntityIcon kind={iconKind} size={22} /></div>
+    </div>
+  {:else if icon}
     <div class="stats-icon-wrapper">
       <div class="stats-icon">{icon}</div>
     </div>

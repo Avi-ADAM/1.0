@@ -1,5 +1,6 @@
 ﻿<script>
   import { isRtl, t } from '$lib/translations';
+  import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
   import Text from '../conf/text.svelte';
   import NumberField from '../conf/number.svelte';
   import DateNego from '../conf/dateNego.svelte';
@@ -433,7 +434,7 @@
     {@const candTotal = (candidateRound.hm ?? hm) * (candidateRound.easy ?? candidateRound.price ?? easy ?? price)}
     <div class="mx-2 my-2 rounded-lg border border-barbi/50 bg-barbi/8 p-3 text-sm space-y-1">
       <p class="font-bold text-barbi text-base">
-        💡 {$t('nego.cand.proposalRef')}
+        <EntityIcon kind="idea" size={13} /> {$t('nego.cand.proposalRef')}
       </p>
       <div class="flex flex-wrap gap-x-4 gap-y-1 text-barbi/80">
         {#if candidateRound.hm != null}
@@ -462,13 +463,13 @@
     <div
       class="mx-2 my-2 rounded-lg border border-gold/60 bg-gold/10 p-2 text-sm text-center"
     >
-      🔁 {$t('nego.cand.recurringResourceNote')}
+      <EntityIcon kind="recurring" size={13} /> {$t('nego.cand.recurringResourceNote')}
     </div>
   {/if}
   <div class="flex flex-col align-middle justify-center">
     <Text text={name1} bind:textb={name2} lebel={$t('common.name')} />
     {#if onSubmit && candidateRound?.name && candidateRound.name !== name1}
-      <p class="text-xs text-barbi/70 px-2 -mt-1 mb-1 inline-flex items-center gap-1">💡 {$t('nego.cand.candidate')} {candidateRound.name}</p>
+      <p class="text-xs text-barbi/70 px-2 -mt-1 mb-1 inline-flex items-center gap-1"><EntityIcon kind="idea" size={12} /> {$t('nego.cand.candidate')} {candidateRound.name}</p>
     {/if}
     <Rich
       text={descrip}
@@ -486,7 +487,7 @@
     {#if !(kindOf == 'total' && kindOfb == 'total')}
       <NumberField number={hm} bind:numberb={hm2} lebel={$t('mash.noof')} />
       {#if onSubmit && candidateRound?.hm != null && candidateRound.hm !== hm}
-        <p class="text-xs text-barbi/70 px-2 -mt-1 mb-1 inline-flex items-center gap-1">💡 {$t('nego.cand.candidateProposed')} <strong>{candidateRound.hm}</strong></p>
+        <p class="text-xs text-barbi/70 px-2 -mt-1 mb-1 inline-flex items-center gap-1"><EntityIcon kind="idea" size={12} /> {$t('nego.cand.candidateProposed')} <strong>{candidateRound.hm}</strong></p>
       {/if}
     {/if}
     <NumberField
@@ -495,7 +496,7 @@
       lebel={$t('mash.shovi')}
     />
     {#if onSubmit && candidateRound?.price != null && candidateRound.price !== price}
-      <p class="text-xs text-barbi/70 px-2 -mt-1 mb-1 inline-flex items-center gap-1">💡 {$t('nego.cand.candidateProposed')} <strong>{candidateRound.price}</strong></p>
+      <p class="text-xs text-barbi/70 px-2 -mt-1 mb-1 inline-flex items-center gap-1"><EntityIcon kind="idea" size={12} /> {$t('nego.cand.candidateProposed')} <strong>{candidateRound.price}</strong></p>
     {/if}
     <NumberField
       number={easy}
@@ -503,7 +504,7 @@
       lebel={$t('mash.shovile')}
     />
     {#if onSubmit && candidateRound?.easy != null && candidateRound.easy !== easy}
-      <p class="text-xs text-barbi/70 px-2 -mt-1 mb-1 inline-flex items-center gap-1">💡 {$t('nego.cand.candidateProposed')} <strong>{candidateRound.easy}</strong></p>
+      <p class="text-xs text-barbi/70 px-2 -mt-1 mb-1 inline-flex items-center gap-1"><EntityIcon kind="idea" size={12} /> {$t('nego.cand.candidateProposed')} <strong>{candidateRound.easy}</strong></p>
     {/if}
     {#if kindOf == 'yearly' || kindOfb == 'yearly' || kindOfb == 'monthly' || kindOf == 'monthly' || kindOf == 'rent' || kindOfb == 'rent'}
       <DateNego
@@ -512,7 +513,7 @@
         lebel={$t('common.startDate')}
       />
       {#if onSubmit && candidateRound?.sqadualed}
-        <p class="text-xs text-barbi/70 px-2 -mt-1 mb-1 inline-flex items-center gap-1">💡 {$t('nego.cand.candidateProposed')} {new Date(candidateRound.sqadualed).toLocaleDateString($lang)}</p>
+        <p class="text-xs text-barbi/70 px-2 -mt-1 mb-1 inline-flex items-center gap-1"><EntityIcon kind="idea" size={12} /> {$t('nego.cand.candidateProposed')} {new Date(candidateRound.sqadualed).toLocaleDateString($lang)}</p>
       {/if}
       <DateNego
         date={sqadualedf}
@@ -520,7 +521,7 @@
         lebel={$t('common.finishDate')}
       />
       {#if onSubmit && candidateRound?.sqadualedf}
-        <p class="text-xs text-barbi/70 px-2 -mt-1 mb-1 inline-flex items-center gap-1">💡 {$t('nego.cand.candidateProposed')} {new Date(candidateRound.sqadualedf).toLocaleDateString($lang)}</p>
+        <p class="text-xs text-barbi/70 px-2 -mt-1 mb-1 inline-flex items-center gap-1"><EntityIcon kind="idea" size={12} /> {$t('nego.cand.candidateProposed')} {new Date(candidateRound.sqadualedf).toLocaleDateString($lang)}</p>
       {/if}
     {/if}
 

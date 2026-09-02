@@ -1,5 +1,6 @@
 <script>
   import axios from 'axios';
+  import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
   import { fade } from 'svelte/transition';
   import { t } from '$lib/translations';
 
@@ -88,7 +89,7 @@
   </form>
 {:else}
   <div class="auth-success" role="status">
-    <span class="auth-success-icon" aria-hidden="true">💌</span>
+    <span class="auth-success-icon"><EntityIcon kind="mailSent" size={30} /></span>
     <h1 class="auth-heading" style="margin-top: 0.2rem;">
       {$t('auth.reset.successTitle')}
     </h1>

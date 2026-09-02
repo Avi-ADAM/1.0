@@ -1,5 +1,6 @@
 ﻿<script>
   import { locale, t, isRtl } from '$lib/translations';
+  import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
   import { fly } from 'svelte/transition';
   import { cubicIn, cubicOut } from 'svelte/easing';
   import { goto } from '$app/navigation';
@@ -22,6 +23,43 @@
   const { progress } = useProgress();
   const url = 'https://1lev1.com/';
   const title = '1️💗1️';
+
+  /**
+   * Icon tables for the sections below. They live here rather than inline in
+   * the `{#each}` so the `@type` annotations actually reach the checker —
+   * a JSDoc cast inside a template expression does not.
+   */
+  /** @type {[import('$lib/celim/icons/entityIcons').EntityIconKind, string][]} */
+  const SPLIT_CARDS = [
+    ['search', 'b1'],
+    ['votes', 'b2'],
+    ['target', 'b3'],
+    ['opportunity', 'b4']
+  ];
+
+  /** @type {[import('$lib/celim/icons/entityIcons').EntityIconKind, string][]} */
+  const PLATFORM_FEATURES = [
+    ['folders', 'projectMgmt'],
+    ['maagad', 'negotiation'],
+    ['onboard', 'onboarding'],
+    ['telegram', 'telegram'],
+    ['ai', 'aiBot'],
+    ['search', 'transparency']
+  ];
+
+  /** @type {[import('$lib/celim/icons/entityIcons').EntityIconKind, string][]} */
+  const WHO_CARDS = [
+    ['appearance', 'whoFreelancer'],
+    ['store', 'whoBusiness'],
+    ['opportunity', 'whoCreators']
+  ];
+
+  /** @type {{ href: string, icon: import('$lib/celim/icons/entityIcons').EntityIconKind, title: string, desc: string, cta: string }[]} */
+  const deeperCards = $derived([
+    { href: '/guid', icon: 'agreement', title: $t('home.guide.title'), desc: $t('home.guide.desc'), cta: $t('home.guide.cta') },
+    { href: '/quorum', icon: 'members', title: $t('home.quorum.title'), desc: $t('home.quorum.desc'), cta: $t('home.quorum.cta') },
+    { href: '/grow', icon: 'opportunity', title: $t('home.grow.title'), desc: $t('home.grow.desc'), cta: $t('home.grow.cta') }
+  ]);
   function change(lan) {
     if (lan == 'en') {
       doesLang.set(true);
@@ -220,6 +258,14 @@
   let openResourcesCount = $state(0);
   let productsCount = $state(0);
   let statsLoaded = $state(false);
+
+  /** @type {{ icon: import('$lib/celim/icons/entityIcons').EntityIconKind, count: number, key: string, href: string }[]} */
+  const discoverLinks = $derived([
+    { icon: 'rikma', count: projectsCount, key: 'projects', href: '/project' },
+    { icon: 'mission', count: openMissionsCount, key: 'missions', href: '/availableMission' },
+    { icon: 'resource', count: openResourcesCount, key: 'resources', href: '/availiableResorce' },
+    { icon: 'product', count: productsCount, key: 'products', href: '/gift' }
+  ]);
 
   let size = $derived({
     width: w,
@@ -747,11 +793,11 @@
 
         <!-- מה זה נותן בפועל -->
         <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {#each [['🔍', 'b1'], ['⚖️', 'b2'], ['🎯', 'b3'], ['🌱', 'b4']] as [icon, key] (key)}
+          {#each SPLIT_CARDS as [icon, key] (key)}
             <div
               class="bg-cyan-50/70 backdrop-blur-sm border-2 border-gold rounded-lg p-4 shadow flex flex-col"
             >
-              <div class="text-2xl mb-1">{icon}</div>
+              <div class="mb-1"><EntityIcon kind={icon} size={24} /></div>
               <h3 class="text-rose-700 font-bold text-lg sm:text-base mb-1">
                 {$t(`home.split.${key}_t`)}
               </h3>
@@ -766,7 +812,7 @@
           <div
             class="sm:col-span-2 bg-cyan-50/70 backdrop-blur-sm border-2 border-barbi/60 rounded-lg p-4 shadow flex flex-col"
           >
-            <div class="text-2xl mb-1">🤝</div>
+            <div class="mb-1"><EntityIcon kind="maagad" size={24} /></div>
             <h3 class="text-rose-700 font-bold text-lg sm:text-base mb-1">
               {$t('home.split.b5_t')}
             </h3>
@@ -866,7 +912,7 @@
                   class="shrink-0 mt-0.5 w-6 h-6 rounded-full {good
                     ? 'bg-amber-100'
                     : 'bg-rose-100 text-rose-500'} flex items-center justify-center text-sm font-bold"
-                  >{good ? '💗' : '✕'}</span
+                  >{good ? '✓' : '✕'}</span
                 >
                 <p
                   class="text-slate-800 text-base sm:text-sm leading-relaxed text-start"
@@ -1067,7 +1113,7 @@
           <div
             class="relative shrink-0 w-16 h-16 rounded-2xl bg-barbi/10 flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300"
           >
-            <span class="text-3xl">🤝</span>
+            <EntityIcon kind="maagad" size={30} />
           </div>
 
           <!-- טקסט -->
@@ -1197,17 +1243,12 @@
             {$t('home.discover.sub')}
           </p>
           <div class="flex flex-col gap-2">
-            {#each [
-              { icon: '🧶', count: projectsCount, key: 'projects', href: '/project' },
-              { icon: '🛠️', count: openMissionsCount, key: 'missions', href: '/availableMission' },
-              { icon: '📦', count: openResourcesCount, key: 'resources', href: '/availiableResorce' },
-              { icon: '🎁', count: productsCount, key: 'products', href: '/gift' }
-            ] as { icon, count, key, href } (key)}
+            {#each discoverLinks as { icon, count, key, href } (key)}
               <a
                 {href}
                 class="group flex items-center gap-3 bg-cyan-50/80 hover:bg-gold/20 border border-gold/60 rounded-lg px-3 py-2 transition-colors"
               >
-                <span class="text-2xl" aria-hidden="true">{icon}</span>
+                <EntityIcon kind={icon} size={24} />
                 <span class="flex-1 text-slate-800 text-lg sm:text-base">
                   {#if statsLoaded && count}
                     <strong class="text-rose-700">{count}</strong>
@@ -1225,7 +1266,7 @@
               href="/demand"
               class="group flex items-center gap-3 bg-gradient-to-l from-gold/30 to-barbi/20 hover:from-gold/40 border border-gold/60 rounded-lg px-3 py-2 transition-colors"
             >
-              <span class="text-2xl" aria-hidden="true">🗺️</span>
+              <EntityIcon kind="map" size={24} />
               <span class="flex-1 text-slate-800 text-lg sm:text-base">
                 <strong>{$t('home.discover.map')}</strong>
                 <span class="block text-sm sm:text-xs text-slate-600"
@@ -1298,11 +1339,11 @@
             {$t('home.sections.featuresSub')}
           </p>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {#each [['🗂️', 'projectMgmt'], ['🤝', 'negotiation'], ['🚀', 'onboarding'], ['📲', 'telegram'], ['🤖', 'aiBot'], ['🔍', 'transparency']] as [icon, key]}
+            {#each PLATFORM_FEATURES as [icon, key]}
               <div
                 class="bg-cyan-50/70 backdrop-blur-sm border-2 border-gold rounded-lg p-4 shadow flex flex-col"
               >
-                <div class="text-2xl mb-1">{icon}</div>
+                <div class="mb-1"><EntityIcon kind={icon} size={24} /></div>
                 <h3 class="text-rose-700 font-bold text-lg sm:text-base mb-1">
                   {$t(`home.platform.${key}_t`)}
                 </h3>
@@ -1582,11 +1623,11 @@
             {$t('home.sections.whoSub')}
           </p>
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            {#each [['🧑‍🎨', 'whoFreelancer'], ['🏪', 'whoBusiness'], ['🌱', 'whoCreators']] as [icon, key]}
+            {#each WHO_CARDS as [icon, key]}
               <div
                 class="bg-cyan-50/70 backdrop-blur-sm border-2 border-gold rounded-lg p-4 shadow flex flex-col text-center"
               >
-                <div class="text-3xl mb-1">{icon}</div>
+                <div class="mb-1 flex justify-center"><EntityIcon kind={icon} size={30} /></div>
                 <h3 class="text-rose-700 font-bold text-lg sm:text-base mb-1">
                   {$t(`home.sections.${key}_t`)}
                 </h3>
@@ -1743,7 +1784,7 @@
             data-sveltekit-prefetch
             class="inline-block bg-barbi hover:bg-white hover:text-barbi text-gold font-semibold text-lg sm:text-base px-5 py-2 rounded-lg shadow-md hover:scale-105 transition-all duration-300"
           >
-            🗺️ {$t('home.sections.mapCta')}
+            <EntityIcon kind="map" size={16} /> {$t('home.sections.mapCta')}
           </a>
         </section>
 
@@ -1850,13 +1891,13 @@
             {$t('home.deeper.sub')}
           </p>
           <div class="grid gap-3 sm:grid-cols-3">
-            {#each [{ href: '/guid', icon: '📖', title: $t('home.guide.title'), desc: $t('home.guide.desc'), cta: $t('home.guide.cta') }, { href: '/quorum', icon: '◉', title: $t('home.quorum.title'), desc: $t('home.quorum.desc'), cta: $t('home.quorum.cta') }, { href: '/grow', icon: '🌱', title: $t('home.grow.title'), desc: $t('home.grow.desc'), cta: $t('home.grow.cta') }] as card}
+            {#each deeperCards as card (card.href)}
               <a
                 href={card.href}
                 data-sveltekit-prefetch
                 class="group flex flex-col gap-1.5 rounded-2xl border-2 border-gold/70 bg-cyan-50/70 backdrop-blur-sm px-4 py-4 shadow hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
               >
-                <span class="text-2xl" aria-hidden="true">{card.icon}</span>
+                <EntityIcon kind={card.icon} size={24} />
                 <span
                   class="font-bold text-rose-800 text-base sm:text-sm leading-snug"
                   >{card.title}</span
@@ -1949,7 +1990,7 @@
       {#if loadinga == true}
         <div class="mx-auto"><Lowding width="24px" height="24px" /></div>
       {:else}
-        <span class="text-3xl">🔑</span>
+        <EntityIcon kind="key" size={30} />
         <span class="text-xl text-barbi font-bold font-['Sababa']"
           >{$t('home.cta.login')}</span
         >
@@ -1972,7 +2013,7 @@
       {#if loading == true}
         <div class="mx-auto"><Lowding width="24px" height="24px" /></div>
       {:else}
-        <span class="text-3xl">✍️</span>
+        <EntityIcon kind="signed" size={30} />
         <span class="text-xl font-bold font-['Sababa']"
           >{$t('home.cta.register')}</span
         >
@@ -1985,7 +2026,7 @@
       onclick={() => (demoOpen = true)}
     >
       <span class="flex flex-row items-center gap-3">
-        <span class="text-3xl">💬</span>
+        <EntityIcon kind="chat" size={30} />
         <span class="text-lg text-barbi font-bold font-['Sababa']"
           >{$t('demo.button')}</span
         >
@@ -2009,7 +2050,7 @@
 />
 
 <style>
-  /* ✨ shimmering gold frame for the discovery strip */
+  /* Shimmering gold frame for the discovery strip */
   .gold-frame {
     background: linear-gradient(
       110deg,

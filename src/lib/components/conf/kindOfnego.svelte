@@ -1,6 +1,7 @@
 <script>
 
   import { t } from '$lib/translations';
+  import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
   import { get } from 'svelte/store';
   import Close from '$lib/celim/close.svelte';
 import { lang } from '$lib/stores/lang.js'
@@ -67,9 +68,9 @@ function checkAll (a, b){
     <div class="flex flex-row align-middle justify-center gap-x-2">
         <h2 class="underline decoration-mturk">{lebel}: </h2>
         <p class="text-gold">{#if htmlon.length > 0}{@html htmlon} {:else} {first}{/if}</p><button onclick={()=>edit = true}>
-            {#if kindOf == kindOfb}🖍️{:else}✏️{/if}</button>
+            <EntityIcon kind={kindOf == kindOfb ? "edited" : "edit"} size={15} /></button>
         {#if kindOf != kindOfb && show2 != true}
-        <button onclick={()=>show2 = true}>📑</button>
+        <button onclick={()=>show2 = true}><EntityIcon kind="document" size={15} /></button>
         {:else if show2 == true}
         <div class="flex flex-col align-middle justify-center ">
         <button onclick={()=>show2 = false}><Close/></button>
@@ -106,6 +107,6 @@ function checkAll (a, b){
 </div>  
 <button onclick={()=>{edit = false
 checkAll(kindOf,kindOfb)
-}}>✅</button>
+}}><EntityIcon kind="done" size={15} /></button>
 {/if}
 </div>

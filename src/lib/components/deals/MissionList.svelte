@@ -1,15 +1,17 @@
 <script lang="ts">
   import { t } from '$lib/translations';
+  import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
+  import type { EntityIconKind } from '$lib/celim/icons/entityIcons';
   import { lang } from '$lib/stores/lang.js';
   import type { Mission, MissionStatus } from '$lib/types';
 
   let { missions }: { missions: Mission[] } = $props();
 
-  const ICON: Record<MissionStatus, string> = {
-    'done':           '✅',
-    'in-progress':    '⚡',
-    'waiting':        '⏳',
-    'needs-approval': '⏳',
+  const ICON: Record<MissionStatus, EntityIconKind> = {
+    'done':           'done',
+    'in-progress':    'urgent',
+    'waiting':        'waiting',
+    'needs-approval': 'waiting',
   };
 
   const ICON_CLS: Record<MissionStatus, string> = {
@@ -39,7 +41,7 @@
 <div class="list">
   {#each missions as m (m.id)}
     <div class="item" class:needs-approval={m.status === 'needs-approval'}>
-      <div class="icon {ICON_CLS[m.status]}">{ICON[m.status]}</div>
+      <div class="icon {ICON_CLS[m.status]}"><EntityIcon kind={ICON[m.status]} size={15} /></div>
       <div class="info">
         <div class="name">{m.name}</div>
         {#if m.sub}<div class="sub">{m.sub}</div>{/if}
