@@ -6,7 +6,7 @@
   "hero": {
     "eyebrow": "◈ Why we are building this ◈",
     "title": "The same words exactly. Sometimes a request, sometimes a demand.",
-    "lede": "This page is not about bad people. It is about one arrangement, so ordinary that almost nobody examines it - and about what changes the moment somebody does.",
+    "lede": "People are mostly good. The arrangements we live inside are not always. This page is about one such arrangement, so ordinary that almost nobody examines it - and about what changes the moment somebody does.",
     "note": "And if you run a business that works and you just came for a management tool, skip this page with a clear conscience. The platform works perfectly well without it, and that is entirely your call."
   },
   "ask": {
@@ -111,6 +111,7 @@
     "title": "Where a world actually changes",
     "p1": "Not through laws and not through declarations. Through two people settling something between them without either of them having to.",
     "p2": "That is all this site does: it takes that moment, reduces it to mechanics - proposal, answer, clock, both signatures - and repeats it a great many times.",
+    "p3": "This is the global agreement, at another scale: hundreds of thousands of people who have already said they want to live without coercion and without violence. Between saying that and living it there is a distance, and it closes in small steps - a task settled by consent, a price set by negotiation, a partnership you can leave at any moment. Each such step takes a little coercion out of the world, and step after step is what a world free of coercion and violence is actually made of, starting where it really starts.",
     "ctaPrimary": "Start a rikma",
     "ctaSecondary": "See the consent engine",
     "ctaAgreement": "The global agreement"

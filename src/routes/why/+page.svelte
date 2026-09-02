@@ -196,6 +196,11 @@
     <h2>{$t('why.close.title')}</h2>
     <p>{$t('why.close.p1')}</p>
     <p>{$t('why.close.p2')}</p>
+    <!-- The one place the page names the global agreement. It comes last on
+         purpose: the argument above stands on its own for a reader who has no
+         interest in a worldwide declaration, and this paragraph is what the
+         declaration looks like on an ordinary Tuesday for a reader who does. -->
+    <p class="amana">{$t('why.close.p3')}</p>
     <div class="ctas">
       <a class="primary" href={registerHref} data-sveltekit-prefetch>
         {$t('why.close.ctaPrimary')}
@@ -447,6 +452,15 @@
     border: 2px solid var(--gold);
     border-radius: var(--radius-theme, 0.75rem);
     background: var(--s2, rgba(255, 255, 255, 0.04));
+  }
+
+  .amana {
+    margin: 1.5rem auto;
+    max-width: 34rem;
+    padding-top: 1.2rem;
+    border-top: 1px solid var(--gold);
+    font-size: 0.98rem;
+    color: var(--tm, #94a3b8);
   }
 
   .ctas {

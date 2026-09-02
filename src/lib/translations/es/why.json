@@ -6,7 +6,7 @@
   "hero": {
     "eyebrow": "◈ Por qué construimos esto ◈",
     "title": "Exactamente las mismas palabras. A veces son un pedido, a veces una exigencia.",
-    "lede": "Esta página no trata de gente mala. Trata de un arreglo tan obvio que casi nadie lo examina, y de lo que cambia en el momento en que alguien lo examina.",
+    "lede": "La gente es buena en su mayoría. Los arreglos dentro de los que vivimos no siempre lo son. Esta página trata de uno de ellos, tan obvio que casi nadie lo examina, y de lo que cambia en el momento en que alguien lo examina.",
     "note": "Y si tienes un negocio que funciona y solo buscas una herramienta de gestión, sáltate esta página con toda tranquilidad. La plataforma funciona muy bien sin ella, y la decisión es enteramente tuya."
   },
   "ask": {
@@ -111,6 +111,7 @@
     "title": "Por dónde cambia un mundo",
     "p1": "No por leyes ni por declaraciones. Por dos personas que cierran algo entre ellas sin que ninguna estuviera obligada.",
     "p2": "Y eso es todo lo que hace este sitio: toma ese momento, lo reduce a mecánica - propuesta, respuesta, reloj, firma de ambas partes - y lo repite muchísimas veces.",
+    "p3": "Y eso es exactamente el acuerdo mundial, a otra escala: cientos de miles de personas que ya han dicho que quieren vivir sin coerción y sin violencia. Entre decirlo y vivirlo hay una distancia, y se cierra con pasos pequeños: una tarea cerrada de común acuerdo, un precio fijado negociando, una sociedad de la que puedes salir en cualquier momento. Cada paso así quita un poco de coerción del mundo, y paso tras paso es de lo que está hecho un mundo sin coerción ni violencia, empezando por donde de verdad empieza.",
     "ctaPrimary": "Crear una rikma",
     "ctaSecondary": "Ver el motor de consentimiento",
     "ctaAgreement": "Al acuerdo mundial"
