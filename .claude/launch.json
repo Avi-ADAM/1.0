@@ -8,6 +8,13 @@
       "port": 5173
     },
     {
+      "name": "SvelteKit via dev.1lev1.com",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "port": 5173,
+      "url": "http://dev.1lev1.com:5173"
+    },
+    {
       "name": "Mastra AI Server",
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev:mastra"],

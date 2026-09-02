@@ -320,12 +320,25 @@ Whitelist של פעולות מותרות; כל השאר → 404. פעולות ש
 ## 5. שלב 3 — נעילת רשת ל-Strapi (העברת SvelteKit ל-VPS)
 
 ההחלטה: שרת ה-SvelteKit (node adapter) ירוץ **על אותו VPS** של Strapi.
-Strapi נחסם מבחוץ ומדבר רק עם SvelteKit דרך loopback.
+Strapi נחסם מבחוץ ומדבר רק עם SvelteKit דרך רשת הדוקר הפנימית.
 
-- Strapi מאזין על `127.0.0.1` בלבד (`HOST=127.0.0.1` ב-config) **וגם**
-  firewall (ufw/iptables) שחוסם 1337 מבחוץ — הגנה כפולה.
-- Nginx מקדימה את SvelteKit (TLS, gzip); SvelteKit → Strapi דרך
-  `http://127.0.0.1:1337`.
+- **⚠️ הכתובת הפנימית היא `http://strapi:1337`, לא `127.0.0.1:1337`.** שני
+  הצדדים רצים בקונטיינרים, ו-`127.0.0.1` בתוך `sveltekit-api` הוא הקונטיינר
+  עצמו — לא ה-host ולא Strapi. `strapi` הוא alias יציב על הרשת
+  `app_app-network`, ש-`deploy.ps1` בריפו של Strapi מצמיד לצבע ה-blue/green
+  הפעיל בכל פריסה (בלעדיו הכתובת הייתה `strapi-blue`/`strapi-green` ומשתנה
+  מתחת לרגליים). ראה את ההערה בראש `docker-compose.api.yml` ואת
+  `src/lib/server/strapiUrl.js`.
+- הערך יושב ב-`.env` של הקונטיינר על השרת בלבד
+  (`/home/ubuntu/api/.env` — `deploy-api.ps1` לעולם לא מעלה או דורס אותו),
+  ונקרא ב-**runtime** דרך `$env/dynamic/private` — כלומר שינוי דורש רק
+  `docker compose restart sveltekit-api`, **לא** rebuild.
+  ה-`.env` המקומי בריפו הוא עניין אחר: שם `STRAPI_URL=https://tovmeod.1lev1.com`
+  נכון, כי ה-dev רץ מחוץ ל-VPS.
+- Strapi לא מפרסם פורט ל-host (רק לרשת הדוקר) **וגם** firewall (ufw/iptables)
+  שחוסם 1337 מבחוץ — הגנה כפולה. לאמת: `sudo ss -tlnp | grep 1337` צריך
+  להראות רק את מה שדוקר מנהל פנימית, לא `0.0.0.0:1337`.
+- Nginx מקדימה את SvelteKit (TLS, gzip) ומאזינה ל-`127.0.0.1:3000`.
 - **⚠️ מלכודת `VITE_URL`:** זהו משתנה **build-time שנכנס גם ל-bundle של
   הלקוח** (prefix `VITE_`). אם נציב בו `127.0.0.1` לפני שכל הקומפוננטות
   ב-2.2.1 הוגרו — הן יקבלו כתובת localhost ויישברו אצל המשתמש. הסדר המחייב:
@@ -441,6 +454,12 @@ Strapi נחסם מבחוץ ומדבר רק עם SvelteKit דרך loopback.
   - `/etc/nginx/conf.d/strapi-gate-state.conf` — מצב פתוח/סגור (map סטטי).
   - בבלוק של tovmeod: אם אין header נכון וגם המצב סגור → 403, **חוץ מ**
     `/uploads/*` (תמונות לדפדפן) ו-acme-challenge (חידוש תעודות).
+
+> **הערה על היחס בין §10 ל-§5:** ברגע ש-`STRAPI_URL=http://strapi:1337`
+> (הכתובת הפנימית), הקריאות של `sveltekit-api` **לא עוברות ב-nginx בכלל** —
+> אז השער לא רלוונטי להן, וגם ה-`x-strapi-gate` שנחתם עליהן פשוט מתעלמים ממנו.
+> השער נשאר המנעול למי שכן מגיע מבחוץ דרך `tovmeod.1lev1.com` (dev מקומי,
+> כלים, שאריות). זה בדיוק מה שמאפשר להמשיך לפתח מהמחשב אחרי הסגירה — ראה §12ג.
 - **המתג (מה שביקשת):** בשרת — `sudo strapi-gate open` (חושף הכל, לעבודת אדמין),
   `sudo strapi-gate close` (נועל), `strapi-gate status`. עושה nginx reload לבד.
 
@@ -570,3 +589,139 @@ Strapi מחזיר **500 `"<origin> is not a valid origin"`** לכל בקשה ש�
 **בפרודקשן זה תקין** — האינסטנס על ה-VPS שולח `Origin: https://api.1lev1.com`,
 שנמצא ברשימה. אבל אם מוסיפים origin חדש (סביבת staging, preview של Vercel שפונה
 ישירות) — צריך להוסיף אותו ל-CORS של Strapi, אחרת הכל נופל ב-500 מבלבל.
+
+המעבר ל-`http://strapi:1337` (§5) **לא** משנה את זה: ה-`Origin` שנשלח הוא של
+הקורא (`https://api.1lev1.com`), לא של היעד. אין מה לגעת.
+
+---
+
+## 12. שלוש בדיקות לפני ההדלקה ב-Vercel (2026-09-02)
+
+### 12א. טלגרם — ממשיך לעבוד, אין מה לשנות
+
+הבוט **אינו תהליך נפרד**: הוא route של webhook בתוך האפליקציה עצמה —
+`src/routes/api/newTelegram/+server.js` (טלגרף ב-`bot.js` לצידו). ה-POST handler
+מזריק את `event.fetch` לתוך ה-update (`data.fetch = svelteFetch`), וכל גישה
+לדאטה עוברת `sendToSer(..., isSer=true, fetch)` → `/api/send` **יחסי**, או
+`actionService`. אין בו ולו קריאה אחת ישירה ל-Strapi — אומת ב-grep 2026-09-02
+(`timers.js` קורא ל-`/api/action`, לא ל-graphql).
+
+לכן שני התרחישים עובדים בלי שינוי:
+- webhook ל-**www.1lev1.com** (Vercel) → `handleFetch` מנתב את `/api/send`
+  ל-`SSR_API_BASE` עם `x-internal-secret`. קפיצה אחת נוספת, ותו לא.
+- webhook ל-**api.1lev1.com** → הכל נשאר in-process על ה-VPS.
+
+מה כן לבדוק לפני:
+1. לאן ה-webhook מוגדר בכלל — `curl "https://api.telegram.org/bot<TOKEN>/getWebhookInfo"`.
+   אם הוא מצביע לאיזה host ישן (Render/רנד) — זה הזמן להזיז אותו.
+2. ש-`ADMINMONTHER` תואם בין Vercel ל-VPS. כשל כאן **שקט במיוחד** בבוט:
+   `isSer:true` בלי הסוד הפנימי מתדרדר לעיקרון אנונימי, אז הבוט יראה רשימות
+   ריקות במקום ליפול עם שגיאה.
+
+הודעות **יוצאות** (`TelegramService`, `HalukaNotificationService`) הולכות
+ל-api.telegram.org ולא נוגעות ב-Strapi — לא מושפעות מהנעילה.
+
+### 12ב. acme-challenge — איך סוגרים את Strapi ומשאירים את חידוש התעודה
+
+החידוש הוא HTTP-01: certbot כותב קובץ ל-webroot, ו-Let's Encrypt מבקש
+`http://tovmeod.1lev1.com/.well-known/acme-challenge/<token>` **בלי שום header**.
+אם השער מחזיר לו 403 — החידוש נכשל בשקט והתעודה פגה בעוד 90 יום.
+
+הכלל בבלוק של tovmeod: location עם `^~` (prefix בעל עדיפות, גובר על regex),
+**לפני** בדיקת השער, ש-nginx מגיש מהדיסק ולא מפרוקסס ל-Strapi:
+
+```nginx
+location ^~ /.well-known/acme-challenge/ {
+    root /var/www/html;          # ה-webroot ש-certbot כותב אליו
+    allow all;                   # לפני כל בדיקת x-strapi-gate
+    try_files $uri =404;
+}
+```
+
+לאמת אחרי הסגירה — שתי בדיקות, שתיהן לא הרסניות:
+
+```bash
+sudo strapi-gate close
+echo ok | sudo tee /var/www/html/.well-known/acme-challenge/probe >/dev/null
+curl -s -o /dev/null -w '%{http_code}\n' http://tovmeod.1lev1.com/.well-known/acme-challenge/probe   # 200
+sudo certbot renew --dry-run
+```
+
+אלטרנטיבה שמנתקת את התלות לגמרי: לעבור ל-**DNS-01**, ואז אפשר לסגור גם את
+80/443 של tovmeod ולא רק את ה-API.
+
+### 12ג. ה-dev המקומי אחרי הסגירה
+
+**ימשיך לעבוד כמו שהוא.** `hooks.server.js` חותם `x-strapi-gate` על כל fetch
+צד-שרת ל-origin של `STRAPI_URL`, וה-key יושב ב-`.env` המקומי — זו בדיוק הסיבה
+שהשער הוא סוד ב-header ולא רק firewall. מה שכן: אם בהמשך Strapi ייסגר לחלוטין
+(בלי nginx ציבורי), dev לא יגיע אליו — ואז או SSH tunnel, או, עדיף, לפתח מול
+הפרוקסי בדיוק כמו Vercel (למטה).
+
+**כן — כדאי טסט מקומי לפני Vercel, וזה הטסט:** לדמות את Vercel במדויק, כולל
+שלילת הגישה הישירה. ב-`.env` המקומי:
+
+```
+VITE_API_BASE=https://api.1lev1.com
+SSR_API_BASE=https://api.1lev1.com
+STRAPI_URL=http://127.0.0.1:9        # כתובת מתה — כל נגיעה ישירה ב-Strapi תיפול מיד
+```
+
+ואז `npm run dev` וגלישה ל-`http://dev.1lev1.com:5173` (שורת hosts, §9 סעיף 3 —
+בלעדיה ה-cookie לא נשלח cross-site). כל מסלול שעדיין נוגע ב-Strapi ישירות נופל
+רועש ומיידי, ולא בפרודקשן. זה מבחן חזק יותר מ-`strapi-gate close`, כי הוא לא
+מסתמך על סוד שדווקא ה-dev כן מחזיק.
+
+לעבור: login, `/me`, `/lev`, `/deals`, `/love`, העלאת קובץ, שינוי סיסמה.
+
+**ומה עושים עם `STRAPI_URL` המקומי בסוף?** תלוי במצב-הקצה, ולא אותה תשובה:
+
+- **שער סגור + nginx של tovmeod קיים (§10):** להחזיר
+  `STRAPI_URL=https://tovmeod.1lev1.com`. ל-dev יש את `STRAPI_GATE_KEY`,
+  `hooks.server.js` חותם אותו, והפיתוח ממשיך כרגיל מול הדאטה האמיתי.
+- **נעילה מלאה בלי דלת מבחוץ:** אין מה להחזיר — הקונפיג הזמני הופך לקבוע,
+  ו-`STRAPI_URL` נשאר מת **בכוונה**, כשומר שמפיל כל קריאה ישירה חדשה.
+
+⚠️ **המחיר של האפשרות השנייה:** dev שעובד דרך api.1lev1.com מריץ UI מקומי מול
+**קוד שרת פרוס**. qid חדש, action חדש או שינוי ב-`hooks`/`/api/*` לא קיימים שם
+עד הפריסה הבאה — בדיוק ה-`400 Unknown queId` של §11.1. מצוין לפרונט, יקר
+לבקאנד. לכן כדאי להשאיר דלת אחת: **השער** (הציבור מקבל 403, מי שמחזיק את
+המפתח עובר — זו בדיוק מטרתו), או loopback + `ssh -L 1337:127.0.0.1:1337`
+(עובד רק אם הקונטיינר מפרסם ל-loopback של ה-host — `sudo ss -tlnp | grep 1337`).
+
+בכל מקרה `VITE_URL` נשאר רלוונטי בלקוח כבסיס לנתיבי מדיה יחסיים — ולכן
+`/uploads` נשאר ציבורי ב-nginx (§12ב).
+
+#### שתי מלכודות ב-`dev.1lev1.com` שנתקלנו בהן בפועל (2026-09-02)
+
+**1. `upgrade-insecure-requests` הרג את הדף — תוקן.** `app.html` נשא
+`<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">`
+כתגית קבועה. על origin **http שאינו localhost** (בדיוק `dev.1lev1.com:5173`)
+הוא שדרג כל מודול ונכס ל-`https://dev.1lev1.com:5173` — פורט שמדבר http — אז
+ה-SSR נשלח, שום דבר לא היה יכול להיטען, והדף נתקע על "רק רגע בבקשה" עם
+`ERR_BLOCKED_BY_CLIENT` על `entry.js`. localhost פטור מהשדרוג לפי הספק, ולכן
+`npm run dev` הרגיל מעולם לא נתקל בזה — רק ה-alias שנועד לבדיקת ה-cookies.
+התגית הפכה ל-`%upgradeInsecure%` שמוזרק ב-`transformPageChunk` רק כש-`isSecure`
+(אין נתיב prerender, אז בפרודקשן ההתנהגות זהה).
+
+**2. התחברות ב-dev לא נשמרת בדפדפן שמחובר לפרודקשן — התנהגות Chrome, לא באג.**
+ה-action מחזיר `{success:true}` ומדפיס Set-Cookie תקין (אומת ב-curl: כל חמשת
+ה-cookies נשמרים, ו-`/me`, `/love`, `/api/permissions` מחזירים 200), אבל
+הדפדפן זורק אותם והדף חוזר ל-`/login?from=…`. הסיבה: ב-`www.1lev1.com` אותם
+שמות (`jwt`,`id`,`un`,`when`,`email`) כבר קיימים על `Domain=.1lev1.com` עם
+`Secure`, ו-**origin לא-מאובטח אינו רשאי לדרוס cookie עם `Secure`** (Strict
+Secure Cookies). ב-jar נקי אין התנגשות והכל עובד.
+
+לכן, כדי לבדוק את החצי הקליינטי ב-dev, אחת מהשלוש:
+- לפתוח פרופיל דפדפן/חלון פרטי **שלא מחובר** ל-`www.1lev1.com` (הכי פשוט);
+- למחוק את ה-cookies של `1lev1.com` באותו פרופיל (יחזרו בכניסה הבאה לפרודקשן);
+- להגיש את ה-dev ב-https על `dev.1lev1.com` (cert עם SAN לשם הזה + CA מהימן) —
+  `vite.config.js` כבר מכיל בלוק https מוער, אבל ה-cert שבריפו מכסה רק
+  `localhost`.
+
+מה שלא נפגע: **כל צד ה-SSR** נבדק במלואו ב-`localhost:5173` (login → `/onboard`,
+`/me` עם הפרופיל האמיתי, `/deals`, `/love` עם 213 הסכמות) בזמן ש-`STRAPI_URL`
+הצביע לכתובת מתה — כלומר הדאטה יכול היה להגיע רק דרך `/api/send` ב-api.1lev1.com.
+ב-localhost רק **הקריאות מהדפדפן** ל-api.1lev1.com נכשלות ב-403, וזה צפוי: ה-cookie
+שם host-only ולא נשלח ל-subdomain אחר. בפרודקשן (www.1lev1.com) שני הצדדים
+תחת `.1lev1.com`, ולכן הבעיה הזו לא קיימת שם.

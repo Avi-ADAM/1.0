@@ -477,6 +477,19 @@ async function handleRequest({ event, resolve }) {
     // literal placeholder into the share card.
     transformPageChunk: ({ html }) =>
       html
+        // Only over https. As a literal tag in app.html it also fired on the
+        // http dev origin, where it upgraded every module/asset request to
+        // https://dev.1lev1.com:5173 — a port that speaks plain http — so the
+        // page shipped its SSR markup and then never hydrated
+        // (ERR_BLOCKED_BY_CLIENT on entry.js). localhost is exempt from the
+        // upgrade by spec, which is why only the dev.1lev1.com alias used for
+        // cross-subdomain cookie testing (PLAN_PROXY_SECURITY §9) ever hit it.
+        .replaceAll(
+          '%upgradeInsecure%',
+          isSecure
+            ? '<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">'
+            : ''
+        )
         .replaceAll('%themeclass%', themeClass)
         .replaceAll('%lang%', lang)
         .replaceAll('%canonical%', canonical)
