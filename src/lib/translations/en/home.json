@@ -618,5 +618,11 @@
       "d": "The slowest start of the three — a first rikma almost never pays in month one. But you can be a partner in several at once, and they add up. And when you stop, what you already built keeps paying."
     },
     "decade": "Across the whole decade: a freelancer takes home {{freelancer}}× what the employee did, and a partner {{partner}}×."
+  },
+  "why": {
+    "eyebrow": "💬 Why we are building this",
+    "title": "The same words exactly. Sometimes a request, sometimes a demand.",
+    "desc": "The whole difference is what happens when the answer is no - and everything built here follows from that one sentence. There is a page explaining why, with numbers and sources.",
+    "cta": "Read why"
   }
 }

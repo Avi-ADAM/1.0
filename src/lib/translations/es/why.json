@@ -1,0 +1,129 @@
+{
+  "meta": {
+    "title": "Por qué 1💗1 · Sobre pedir, exigir y un consentimiento que se renueva",
+    "description": "Casi toda relación laboral se apoya en un consentimiento dado una sola vez, hace mucho. Esto es lo que cambia cuando se sustituye por un consentimiento que se revisa en cada paso, y por qué también funciona comercialmente."
+  },
+  "hero": {
+    "eyebrow": "◈ Por qué construimos esto ◈",
+    "title": "Exactamente las mismas palabras. A veces son un pedido, a veces una exigencia.",
+    "lede": "Esta página no trata de gente mala. Trata de un arreglo tan obvio que casi nadie lo examina, y de lo que cambia en el momento en que alguien lo examina.",
+    "note": "Y si tienes un negocio que funciona y solo buscas una herramienta de gestión, sáltate esta página con toda tranquilidad. La plataforma funciona muy bien sin ella, y la decisión es enteramente tuya."
+  },
+  "ask": {
+    "kicker": "◈ Dos frases que suenan idénticas",
+    "title": "«¿Puedes quedarte hoy hasta las nueve?»",
+    "p1": "Lo pregunta un amigo y lo pregunta un jefe. Las mismas palabras, el mismo tono, la misma sonrisa. Y aun así son dos cosas completamente distintas, y todos sabemos distinguirlas sin que nadie nos lo haya enseñado.",
+    "p2": "La diferencia no está en la frase. Está en lo que ocurre cuando la respuesta es no.",
+    "quote": "Los pedidos se reciben como exigencias cuando quienes escuchan creen que serán culpados o castigados si no acceden.",
+    "cite": "Marshall Rosenberg, «Comunicación no violenta»",
+    "p3": "Si le dices que no a un amigo, la conversación sigue. Si dices que no donde hay autoridad, algo queda registrado. No necesariamente una reprimenda: a veces media frase, a veces solo saber que aparecerá en la evaluación de fin de año. Y desde que ese saber existe, lo dicho nunca fue un pedido. Fue una exigencia formulada con amabilidad.",
+    "p4": "Y aquí va la frase menos popular de esta página: la mayoría de los jefes no quiere forzar a nadie. La inmensa mayoría son personas decentes haciendo un trabajo difícil bajo presiones reales. La coerción no vive en la persona: vive en la estructura, y opera incluso cuando ambas partes tienen buenas intenciones."
+  },
+  "once": {
+    "kicker": "◈ La firma de ayer",
+    "title": "Consentiste una vez. Desde entonces ese consentimiento trabaja en tu nombre.",
+    "p1": "Una relación laboral casi siempre empieza con un consentimiento genuino. Alguien leyó, sopesó, quiso y firmó. Lo interesante es lo que viene después: desde ese día, aquel consentimiento, dado por otra persona, en otras circunstancias, hace dos años, es el que le obliga hoy.",
+    "p2": "Y salir de él no es sencillo. Hay un contrato, un preaviso, un alquiler el día uno y niños a los que hay que llevar. Así que el consentimiento sigue vigente, y la mayoría de los días incluso sigue siendo cierto. Solo que ya no se revisa.",
+    "quote": "La inalienabilidad fáctica de la acción humana responsable y de la toma de decisiones no depende de la duración del contrato.",
+    "cite": "David Ellerman, economista, ex asesor sénior del Banco Mundial",
+    "p3": "El argumento de Ellerman es simple: la responsabilidad y la decisión de una persona no pueden entregarse de hecho a otras manos. Se puede acordar actuar como si se hubieran entregado, pero quien ejecuta es siempre también quien decide ejecutar. En sus palabras: «No es cuestión de que no se deba; es que no se puede».",
+    "quote2": "A muchos de nosotros nos gobierna mucho más, y de forma mucho más intrusiva, el gobierno privado del lugar de trabajo.",
+    "cite2": "Elizabeth Anderson, Private Government, Princeton University Press, 2017",
+    "p4": "Anderson, filósofa de la Universidad de Michigan, abre el libro con un dato: uno de cada cuatro trabajadores estadounidenses describe su lugar de trabajo como una «dictadura». No llama villano a nadie. Solo pregunta por qué justamente de esta forma de gobierno, la única en la que la mayoría vivimos ocho horas al día, casi no hablamos."
+  },
+  "price": {
+    "kicker": "◈ Lo que cuesta",
+    "title": "No hace falta creernos. Hay números.",
+    "p1": "Si el arreglo funcionara bien, sería razonable verlo en los datos. Lo que se ve es esto:",
+    "stat1v": "20%",
+    "stat1l": "de los empleados del mundo está comprometido con su trabajo (2025): el nivel más bajo desde 2020",
+    "stat2v": "22%",
+    "stat2l": "de compromiso entre los mandos: nueve puntos menos en tres años",
+    "stat3v": "10 billones $",
+    "stat3l": "coste anual estimado para la economía mundial en productividad perdida",
+    "source": "Gallup, State of the Global Workplace 2026",
+    "p2": "Estos números no dicen que la gente sea perezosa. Dicen que un arreglo en el que uno decide y otro ejecuta saca de las personas mucho menos de lo que hay en ellas. Eso ya no es una discusión moral. Es aritmética."
+  },
+  "other": {
+    "kicker": "◈ El otro lado",
+    "title": "Lo contrario de la autoridad no es el caos. Lo contrario de la autoridad es la negociación.",
+    "p1": "La primera pregunta es siempre la misma: si nadie puede exigir, ¿cómo ocurre algo? La respuesta es que cada pedido se convierte en una propuesta, y una propuesta tiene tres respuestas posibles, y ninguna de ellas es un no que cierra la puerta.",
+    "a1t": "Aprobar",
+    "a1d": "Aceptar la propuesta tal como está y seguir adelante.",
+    "a2t": "Conversar",
+    "a2d": "Todavía no está claro. Se sigue aclarando antes de decidir.",
+    "a3t": "Contrapropuesta",
+    "a3d": "Una versión más precisa de la misma propuesta, devuelta a la otra parte. «No recibí nada» se dice aquí como contrapropuesta por importe cero, no como veto.",
+    "silence": "Y cada propuesta lleva un reloj. Si nadie responde antes de que se agote, la última versión sobre la mesa queda aprobada. Una contrapropuesta reinicia el reloj. Así el silencio nunca bloquea nada, y aun así a nadie se le pasa por encima.",
+    "p2": "No lo inventamos nosotros. En la sociocracia, un sistema de gobernanza organizativa con décadas de historia, esa misma distinción es el núcleo: se puede objetar, pero la objeción debe traer un motivo y no es un veto. El listón no es «a todos les encanta», sino «suficientemente bueno por ahora y suficientemente seguro para probar»."
+  },
+  "works": {
+    "kicker": "◈ Y además funciona",
+    "title": "La mayor procesadora de tomate del mundo trabaja sin un solo jefe",
+    "p1": "Morning Star: unos seiscientos colegas permanentes y otros cuatro mil de temporada, cerca de mil millones de dólares de facturación anual y líder mundial en procesamiento de tomate. Sin jefes, sin títulos y sin ascensos.",
+    "quote": "Todas las interacciones deben ser voluntarias. Ningún colega puede obligar a otro colega a hacer algo que no quiere hacer.",
+    "cite": "De los principios de autogestión de Morning Star",
+    "p2": "En lugar de una descripción de puesto escrita desde arriba, cada persona redacta allí una carta de entendimiento personal y la negocia con la decena de colegas a los que afecta su trabajo. Quien depende de ti es quien cierra contigo tus compromisos. Harvard Business Review le dedicó un artículo entero titulado «Primero, despidamos a todos los directivos».",
+    "p3": "Y no es un caso aislado. Virginie Pérotin, economista de la Universidad de Leeds, revisó decenas de estudios sobre empresas propiedad de sus trabajadores en todo el mundo:",
+    "quote2": "Las cooperativas sobreviven un 29 por ciento más de tiempo que las demás empresas.",
+    "cite2": "Virginie Pérotin, en entrevista con Shareable, 2019",
+    "p4": "Y sobre productividad lo resume en una frase: «En general, las empresas producirían más si se comportaran como cooperativas». Un negocio que la gente elige de nuevo cada mañana no es una concesión comercial. En casi todas las medidas es simplemente un mejor negocio."
+  },
+  "how": {
+    "kicker": "◈ De la idea a la mecánica",
+    "title": "Dónde vive esto realmente, en pantallas reales",
+    "sub": "Cada línea de aquí es una pantalla que existe en el sistema, no una intención futura.",
+    "r1t": "Toda propuesta sigue uno de tres caminos",
+    "r1d": "Precio, tarea, presupuesto, incorporar a un socio, repartir beneficios: todas son decisiones y todas se cierran con aprobación, conversación o contrapropuesta.",
+    "r2t": "Cada rikma fija su propio reloj",
+    "r2d": "Vosotros decidís cuánto tiempo hay para responder. El silencio madura en consentimiento al ritmo que elegisteis, no a uno impuesto.",
+    "r3t": "Los porcentajes salen de lo que diste",
+    "r3d": "Horas, dinero, equipos y conocimiento se registran de común acuerdo en el momento en que ocurren, y tu parte del beneficio se actualiza sola. Ningún número se fija una vez y se queda para siempre.",
+    "r4t": "Deshacer también pasa por el consentimiento",
+    "r4d": "Retirar una misión, un recurso o un producto de una rikma es un proceso de consentimiento igual que lo fue crearlos. Se puede proponer otra versión, y no se puede borrar a alguien lo que ya dio.",
+    "r5t": "No se puede declarar en nombre de otro",
+    "r5d": "Declarar que el dinero está en manos de otra persona es una afirmación sobre su situación financiera, así que requiere su consentimiento. Hasta que lo confirma, no se cuenta.",
+    "r6t": "Se puede salir",
+    "r6d": "Aquí no hay contrato que te ate hacia adelante. Lo acumulado sigue siendo tuyo, y la participación misma se revisa continuamente.",
+    "ctaConsensus": "Ver el motor de consentimiento en acción",
+    "ctaGuide": "Ir a la guía completa del sistema"
+  },
+  "not": {
+    "kicker": "◈ Y dicho claramente",
+    "title": "Lo que esta página no dice",
+    "n1t": "Esto no va contra los empleadores",
+    "n1d": "Si hoy das trabajo a otras personas, no eres el villano de esta historia. Lo más probable es que asumas un riesgo que ninguno de tus empleados asume, y que hayas pagado los sueldos a tiempo en meses en que dolió. Lo que se cuestiona es el arreglo, no tú.",
+    "n2t": "No te pide desmontar nada",
+    "n2d": "Nadie tiene que transformar su empresa en un día. Empieza por un proyecto paralelo con dos o tres socios y mira qué pasa.",
+    "n3t": "No es un movimiento ni una creencia",
+    "n3d": "Aquí no hay nada en lo que creer ni a lo que afiliarse. Hay una forma de trabajar, y su única prueba es si funciona para ti.",
+    "n4t": "No es «todos deciden todo»",
+    "n4d": "Quien es responsable de algo lo decide. La negociación solo hace falta cuando la decisión de una persona alcanza a otra.",
+    "n5t": "Y no significa que no exista el «no»",
+    "n5d": "Puedes rechazar cualquier cosa. Simplemente no hay un «no» que termine la conversación: hay un «no, y esta es la versión que sí me sirve»."
+  },
+  "biz": {
+    "title": "Y si viniste solo por el negocio",
+    "p1": "Es perfectamente válido. Puedes usar 1💗1 como un sistema de gestión cualquiera - tareas, tableros, horas, ventas, reparto de beneficios - sin leer una palabra de todo esto.",
+    "p2": "Esto está escrito porque hay quien sí lo pregunta y merece encontrar una respuesta. Los demás pueden ignorarlo tranquilamente."
+  },
+  "close": {
+    "title": "Por dónde cambia un mundo",
+    "p1": "No por leyes ni por declaraciones. Por dos personas que cierran algo entre ellas sin que ninguna estuviera obligada.",
+    "p2": "Y eso es todo lo que hace este sitio: toma ese momento, lo reduce a mecánica - propuesta, respuesta, reloj, firma de ambas partes - y lo repite muchísimas veces.",
+    "ctaPrimary": "Crear una rikma",
+    "ctaSecondary": "Ver el motor de consentimiento",
+    "ctaAgreement": "Al acuerdo mundial"
+  },
+  "sources": {
+    "title": "Fuentes",
+    "note": "Cada cita de esta página está atribuida y se puede verificar.",
+    "s1": "Elizabeth Anderson, Private Government: How Employers Rule Our Lives (and Why We Don't Talk about It), Princeton University Press, 2017",
+    "s2": "David Ellerman, Inalienable Rights: A Litmus Test, Law and Philosophy, 2010 · ellerman.org",
+    "s3": "Marshall B. Rosenberg, Nonviolent Communication: A Language of Life, PuddleDancer Press",
+    "s4": "Gallup, State of the Global Workplace 2026",
+    "s5": "Virginie Pérotin, What Do We Really Know About Worker Co-operatives?, Co-operatives UK, 2016 · Shareable, 2019",
+    "s6": "Gary Hamel, First, Let's Fire All the Managers, Harvard Business Review, December 2011 · Corporate Rebels on Morning Star",
+    "s7": "Sociocracy For All, Consent Decision Making"
+  }
+}

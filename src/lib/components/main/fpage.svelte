@@ -1763,6 +1763,40 @@
           </div>
         </section>
 
+        <!-- ===== באנר /why — העמוד שמאחורי המוצר =====
+             יושב אחרי השאלות הנפוצות ולא לפניהן, בכוונה. מי שהגיע עד לפה כבר
+             יודע מה המערכת עושה ולמי היא מתאימה, וזה הקהל היחיד שהשאלה "למה
+             בכלל בנינו את זה ככה" רלוונטית עבורו. גבוה יותר בעמוד, לפני
+             שהתועלת הפרקטית הובהרה, אותו טקסט קורא כאג'נדה ומבריח מבקר שבא
+             לבדוק כלי ניהול — ולכן גם כאן זה באנר קצר אחד, וכל הטיעון עצמו
+             (עם המספרים, הציטוטים והמקורות) יושב ב-/why. -->
+        <section
+          id="why"
+          class="w-full max-w-xl mt-2 mb-6 scroll-mt-16"
+          style="font-family:'Sababa',sans-serif;"
+        >
+          <a
+            href="/why"
+            data-sveltekit-prefetch
+            class="group flex flex-col gap-2 rounded-3xl border-2 border-gold/70 bg-gradient-to-br from-[#fff6ea] via-[#fdeef4] to-[#f6e6fb] px-6 py-5 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
+          >
+            <span class="text-barbi font-semibold text-xs tracking-wide">
+              {$t('home.why.eyebrow')}
+            </span>
+            <span class="text-rose-800 font-bold text-xl sm:text-lg leading-snug">
+              {$t('home.why.title')}
+            </span>
+            <span class="text-slate-700 text-base sm:text-sm leading-relaxed">
+              {$t('home.why.desc')}
+            </span>
+            <span
+              class="text-barbi font-semibold text-sm mt-0.5 group-hover:underline"
+            >
+              {$t('home.why.cta')} {$isRtl ? '←' : '→'}
+            </span>
+          </a>
+        </section>
+
         <!-- בלוק: באנר /guid — המדריך המלא. יושב מיד אחרי השאלות הנפוצות: מי
              שקרא תשובות קצרות ורוצה להעמיק, ממשיך לכאן. -->
         <!-- ===== להעמיק: שלושת העמודים הייעודיים, כרטיס אחד לכל אחד =====
