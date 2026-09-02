@@ -809,7 +809,8 @@
       "stipendProgram": "Programa de estipendio",
       "saleClaim": "Consentimiento del receptor",
       "newService": "Servicio nuevo",
-      "picVote": "Cambio de logo"
+      "picVote": "Cambio de logo",
+      "stipendaccrued": "Beca de subsistencia"
     },
     "fact": {
       "hours": "{{value}} horas",
@@ -858,14 +859,16 @@
       "siteSharePay": "La parte de plataforma que comprometiste",
       "siteShareDecide": "El reparto está aprobado — confirma tu parte",
       "stipendCycle": "Ciclo de estipendio cerrado — a pagar",
-      "stipendSent": "Marcado como enviado — espera tu confirmación"
+      "stipendSent": "Marcado como enviado — espera tu confirmación",
+      "stipendAccrued": "Horas aprobadas — a la espera de pago"
     },
     "title": {
       "transfer": "{{from}} → {{to}}",
       "sitesharepay": "Pago de la parte de plataforma",
       "sitesharedecide": "Aprobación de la parte de plataforma",
       "stipendpay": "Pago de estipendio",
-      "stipendconfirm": "Confirmación de estipendio recibido"
+      "stipendconfirm": "Confirmación de estipendio recibido",
+      "stipendaccrued": "Devengado para ti"
     },
     "cta": {
       "vote": "Votar",

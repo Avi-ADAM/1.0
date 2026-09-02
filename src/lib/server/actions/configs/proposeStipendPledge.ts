@@ -21,6 +21,7 @@ import { createProposedPledge } from '$lib/server/stipend/create.js';
 import {
   fetchProgram,
   fetchProjectContext,
+  fetchProjectPledges,
   fetchProjectStipendMissions,
   fetchApprovedHours
 } from '$lib/server/stipend/read.js';
@@ -121,6 +122,28 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
   if (wrongHands.length > 0) {
     throw new Error(
       'A stipend pays the member doing the mission — this mission is being done by someone else'
+    );
+  }
+
+  // **One stipend per person per piece of work.** Two live pledges covering
+  // the same recipient's same mission are not two agreements — they are the
+  // same agreement counted twice, and the settlement has no way to tell: each
+  // one meters the same approved hours from scratch. Live, four active pledges
+  // offered the funder four cards for the same 5.01 hours and confirming them
+  // drove the recipient's own equity to −2.25% (docs/FIXES.md §2). Changing the
+  // terms of a running stipend is `counterStipendTerms` on its decision, or
+  // `proposeObjectArchive` on its engine — not a second pledge.
+  const live = await fetchProjectPledges(exec, projectId, ['proposed', 'active']).catch(() => []);
+  const clash = live.find((p) => {
+    if (p.recipientId !== recipientId) return false;
+    if (p.terms.scope === 'allMissions' || terms.scope === 'allMissions') return true;
+    return p.missionIds.some((id) => missionIds.includes(id));
+  });
+  if (clash) {
+    throw new Error(
+      clash.status === 'active'
+        ? 'A stipend for this member’s work is already running. Change its terms on the running agreement instead of opening a second one — two would pay for the same approved hours twice'
+        : 'A stipend for this member’s work is already on the table, waiting for an answer. Counter that proposal instead of opening a second one'
     );
   }
 

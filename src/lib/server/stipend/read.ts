@@ -256,6 +256,7 @@ export async function fetchActivePrograms(
 export interface StipendPledgeRow {
   id: string;
   projectId: string | null;
+  projectName: string;
   programId: string | null;
   funderId: string | null;
   funderName: string;
@@ -268,6 +269,13 @@ export interface StipendPledgeRow {
   mashabetahalichId: string | null;
   /** Missions in progress — what a cycle meters approved hours against. */
   missionIds: string[];
+  /**
+   * The same missions with their names. Every screen that asks a person to pay
+   * or to confirm has to be able to say **what work** the money is for; the
+   * cards could only show an amount, so the recipient was signing for ₪2,100
+   * with no way to tell which mission it answered (docs/FIXES.md §12).
+   */
+  missions: Array<{ id: string; name: string }>;
   /**
    * Open missions the stipend is attached to but nobody has taken yet. They
    * carry no approved hours, so they never meter a payment — they are what
@@ -282,12 +290,12 @@ const PLEDGE_FIELDS = `
   mode costShare equityMultiplier stipendRate monthlyCap totalCap paidTotal
   noticeCycles revenueTrigger recourse scope status descrip start end cycleSize
   lastSettledAt
-  project { data { id } }
+  project { data { id attributes { projectName } } }
   stipend_program { data { id } }
   funder { data { id attributes { username } } }
   recipient { data { id attributes { username } } }
   mashabetahalich { data { id } }
-  mesimabetahaliches { data { id } }
+  mesimabetahaliches { data { id attributes { name } } }
   open_missions { data { id attributes { name } } }
   matbea { data { id } }
   decision { data { id } }`;
@@ -298,6 +306,7 @@ export function toPledge(row: any): StipendPledgeRow | null {
   return {
     id: String(row.id),
     projectId: a.project?.data?.id ? String(a.project.data.id) : null,
+    projectName: String(a.project?.data?.attributes?.projectName ?? ''),
     programId: a.stipend_program?.data?.id ? String(a.stipend_program.data.id) : null,
     funderId: a.funder?.data?.id ? String(a.funder.data.id) : null,
     funderName: String(a.funder?.data?.attributes?.username ?? ''),
@@ -323,6 +332,10 @@ export function toPledge(row: any): StipendPledgeRow | null {
     lastSettledAt: a.lastSettledAt ?? null,
     mashabetahalichId: a.mashabetahalich?.data?.id ? String(a.mashabetahalich.data.id) : null,
     missionIds: (a.mesimabetahaliches?.data ?? []).map((m: any) => String(m.id)),
+    missions: (a.mesimabetahaliches?.data ?? []).map((m: any) => ({
+      id: String(m.id),
+      name: String(m.attributes?.name ?? '')
+    })),
     openMissionIds: (a.open_missions?.data ?? []).map((m: any) => String(m.id)),
     matbeaId: a.matbea?.data?.id ? String(a.matbea.data.id) : null,
     decisionId: a.decision?.data?.id ? String(a.decision.data.id) : null
@@ -364,9 +377,27 @@ export interface ApprovedHoursRow {
 
 /**
  * Hours the rikma has **approved** for one member — the only hours a stipend
- * may ever be paid against (§6). A `finnished-mission` row exists once the
- * approval closed, which is exactly the event we want; `month`/`createdAt` is
- * when it landed.
+ * may ever be paid against (§6).
+ *
+ * The meter is the **`finiapruval`**, not the `finnished-mission`, and the
+ * difference is the whole reason a stipend could only ever pay once:
+ * `timerSave` and `closeFiniapruval` *accumulate* into an existing
+ * finnished-mission row of the same rate era rather than adding a row, so that
+ * row's `createdAt` is frozen at the first save it ever received while its
+ * `noofhours` keeps growing. Windowing on it meant that after the first
+ * settlement every later hour was invisible — the recipient worked and was
+ * never paid again (docs/FIXES.md §3).
+ *
+ * A finiapruval is one approval event: written once, `archived: true` the
+ * moment it closes, never rewritten. `archived` is exactly "approved" — a NO
+ * vote records the vote and leaves the row open (`closeFiniapruval`), and the
+ * silence finalizer bails before archiving when anyone voted no
+ * (`api/timegrama/finiapp.svelte`).
+ *
+ * Hours logged in a rikma with a single member never produce a finiapruval,
+ * and are correctly out of scope: a stipend needs a funder who is not the
+ * recipient, so it needs at least two members, and a payment for hours nobody
+ * ever approved is precisely what §6 forbids.
  */
 export async function fetchApprovedHours(
   exec: Exec,
@@ -377,26 +408,111 @@ export async function fetchApprovedHours(
   const sinceFilter = since ? `, createdAt: { gte: ${gqlStr(since)} }` : '';
   const data = await run(
     exec,
-    `{ finnishedMissions(filters: {
+    `{ finiapruvals(filters: {
         project: { id: { eq: ${gqlStr(projectId)} } },
-        users_permissions_user: { id: { eq: ${gqlStr(recipientId)} } }${sinceFilter}
+        users_permissions_user: { id: { eq: ${gqlStr(recipientId)} } },
+        archived: { eq: true }${sinceFilter}
       }, pagination: { limit: 200 }, sort: "createdAt:asc") {
       data { id attributes {
-        noofhours perhour total createdAt month
+        noofhours perhour createdAt month
         mesimabetahalich { data { id } }
       } } } }`,
     'approvedHours'
   );
-  return (data?.finnishedMissions?.data ?? []).map((row: any) => {
+  return (data?.finiapruvals?.data ?? []).map((row: any) => {
     const a = row.attributes ?? {};
+    const hours = num(a.noofhours) ?? 0;
+    const perhour = num(a.perhour);
     return {
-      hours: num(a.noofhours) ?? 0,
+      hours,
       approvedAt: String(a.createdAt ?? a.month ?? ''),
-      perhour: num(a.perhour),
-      total: num(a.total) ?? 0,
+      perhour,
+      total: hours * (perhour ?? 0),
       mesimabetahalichId: a.mesimabetahalich?.data?.id ? String(a.mesimabetahalich.data.id) : null
     };
   });
+}
+
+/**
+ * Hours of this recipient that stipend payments have **already metered** in
+ * this rikma — every non-cancelled `stipend-payment` row, whichever pledge
+ * wrote it.
+ *
+ * A pledge only ever knew about its own `lastSettledAt`, so two pledges
+ * covering the same person each metered the same approved hours from scratch:
+ * live, four active pledges offered the funder four payment cards for the same
+ * 5.01 hours, and confirming them drove the recipient's own equity negative
+ * (docs/FIXES.md §2). Hours are a finite thing the rikma approved once; this is
+ * what makes them finite in the ledger too.
+ */
+export async function fetchMeteredHours(
+  exec: Exec,
+  projectId: string,
+  recipientId: string,
+  from?: string | null
+): Promise<number> {
+  // Only payments that metered hours **inside this window**. A payment whose
+  // cycle opened before `from` was settling an earlier stretch of work — hours
+  // this settlement is not reading either — so subtracting it would silently
+  // eat the hours actually on the table.
+  const fromFilter = from ? `, cycleStart: { gte: ${gqlStr(from)} }` : '';
+  const data = await run(
+    exec,
+    `{ stipendPayments(filters: {
+        project: { id: { eq: ${gqlStr(projectId)} } },
+        recipient: { id: { eq: ${gqlStr(recipientId)} } },
+        status: { ne: "cancelled" }${fromFilter}
+      }, pagination: { limit: 200 }) {
+      data { id attributes { hours cycleStart cycleEnd } } } }`,
+    'meteredHours'
+  );
+  return (data?.stipendPayments?.data ?? []).reduce(
+    (sum: number, row: any) => sum + (num(row.attributes?.hours) ?? 0),
+    0
+  );
+}
+
+/**
+ * What the recipient's work is worth in this rikma's contribution ledger —
+ * `Σ finnished-mission.total + Σ rikmash.total`, the same two sums
+ * `whowhat.buildBase` adds up.
+ *
+ * It is the ceiling on how much equity a stipend may ever take off them: the
+ * `stipendRate ≤ perhour` guard bounds one pledge's rate, but nothing bounded
+ * the *sum* of α·P across pledges and cycles, and a recipient ended a live run
+ * at −2.25% of their own rikma (docs/FIXES.md §2).
+ */
+export async function fetchRecipientContribution(
+  exec: Exec,
+  projectId: string,
+  recipientId: string
+): Promise<{ contribution: number; equityDebited: number }> {
+  const data = await run(
+    exec,
+    `{
+      finnishedMissions(filters: {
+        project: { id: { eq: ${gqlStr(projectId)} } },
+        users_permissions_user: { id: { eq: ${gqlStr(recipientId)} } }
+      }, pagination: { limit: 500 }) { data { attributes { total } } }
+      rikmashes(filters: {
+        project: { id: { eq: ${gqlStr(projectId)} } },
+        users_permissions_user: { id: { eq: ${gqlStr(recipientId)} } }
+      }, pagination: { limit: 500 }) { data { attributes { total } } }
+      stipendPayments(filters: {
+        project: { id: { eq: ${gqlStr(projectId)} } },
+        recipient: { id: { eq: ${gqlStr(recipientId)} } },
+        status: { ne: "cancelled" }
+      }, pagination: { limit: 500 }) { data { attributes { equityDebit } } }
+    }`,
+    'recipientContribution'
+  );
+  const sum = (rows: any[], field: string) =>
+    rows.reduce((t: number, r: any) => t + (num(r.attributes?.[field]) ?? 0), 0);
+  return {
+    contribution:
+      sum(data?.finnishedMissions?.data ?? [], 'total') + sum(data?.rikmashes?.data ?? [], 'total'),
+    equityDebited: sum(data?.stipendPayments?.data ?? [], 'equityDebit')
+  };
 }
 
 export interface StipendPaymentRow {
@@ -408,6 +524,12 @@ export interface StipendPaymentRow {
   recipientId: string | null;
   amount: number;
   hours: number;
+  /**
+   * ₪ per approved hour this cycle was priced at. Selected by the query from
+   * the start and never mapped, so the ledger rendered "6 hours × ₪" with the
+   * rate simply missing — the one number that makes the amount checkable.
+   */
+  stipendRate: number;
   equityCredit: number;
   equityDebit: number;
   status: string;
@@ -415,6 +537,8 @@ export interface StipendPaymentRow {
   cycleEnd: string | null;
   halukaId: string | null;
   mode: StipendMode;
+  costShare: number;
+  equityMultiplier: number;
   timegramaId: string | null;
 }
 
@@ -441,6 +565,9 @@ function toPayment(row: any): StipendPaymentRow | null {
     recipientId: a.recipient?.data?.id ? String(a.recipient.data.id) : null,
     amount: num(a.amount) ?? 0,
     hours: num(a.hours) ?? 0,
+    stipendRate: num(a.stipendRate) ?? 0,
+    costShare: num(a.costShare) ?? 1,
+    equityMultiplier: num(a.equityMultiplier) ?? 1,
     equityCredit: num(a.equityCredit) ?? 0,
     equityDebit: num(a.equityDebit) ?? 0,
     status: String(a.status ?? 'pending'),

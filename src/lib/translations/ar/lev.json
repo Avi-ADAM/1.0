@@ -808,7 +808,8 @@
       "stipendProgram": "برنامج المنحة",
       "saleClaim": "موافقة حائز المبلغ",
       "newService": "خدمة جديدة",
-      "picVote": "تغيير الشعار"
+      "picVote": "تغيير الشعار",
+      "stipendaccrued": "منحة معيشة"
     },
     "fact": {
       "hours": "{{value}} ساعات",
@@ -857,14 +858,16 @@
       "siteSharePay": "حصة المنصة التي التزمت بها",
       "siteShareDecide": "تمت الموافقة على التقسيم — أكّد حصتك",
       "stipendCycle": "دورة منحة انتهت — للدفع",
-      "stipendSent": "وُسم كمُرسل — بانتظار تأكيدك"
+      "stipendSent": "وُسم كمُرسل — بانتظار تأكيدك",
+      "stipendAccrued": "ساعات معتمدة — بانتظار الدفع"
     },
     "title": {
       "transfer": "{{from}} ← {{to}}",
       "sitesharepay": "دفع حصة المنصة",
       "sitesharedecide": "إقرار حصة المنصة",
       "stipendpay": "دفع المنحة",
-      "stipendconfirm": "تأكيد استلام المنحة"
+      "stipendconfirm": "تأكيد استلام المنحة",
+      "stipendaccrued": "مستحق لك"
     },
     "cta": {
       "vote": "للتصويت",

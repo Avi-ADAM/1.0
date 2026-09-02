@@ -12,11 +12,12 @@
    * pledge keeps running and the funder can send again.
    */
   import { t, isRtl } from '$lib/translations';
-  import { executeAction } from '$lib/client/actionClient';
+  import { executeAction, actionErrorText } from '$lib/client/actionClient';
   import { toast } from 'svelte-sonner';
   import { isMobileOrTablet } from '$lib/utilities/device';
   import { stipendConfirmationsStore } from '$lib/stores/levStores';
   import CardHeader from './CardHeader.svelte';
+  import CycleFacts from '$lib/components/stipend/CycleFacts.svelte';
 
   let { buble, isFirst = false, onProj, onUser, onDone } = $props();
 
@@ -42,7 +43,7 @@
         paymentId: String(buble.paymentId),
         ...(amount != null ? { receivedAmount: Number(amount) } : {})
       });
-      if (res?.success === false) throw new Error(String(res?.error?.message ?? res?.error ?? 'failed'));
+      if (res?.success === false) throw new Error(actionErrorText(res, $t('stipend.toast.error')));
       toast.success(
         res?.data?.status === 'cancelled'
           ? $t('stipend.confirm.reportedNothing')
@@ -90,10 +91,18 @@
       })}
     </p>
 
-    <div class="rounded-xl border border-gray-200 dark:border-gray-700 p-3 text-sm space-y-1">
-      <p>{$t('stipend.pay.hours', { count: buble.hours })}</p>
-      <p>{$t('stipend.pay.rate', { count: buble.stipendRate })}</p>
-    </div>
+    <CycleFacts
+      side="recipient"
+      missionNames={buble.missionNames}
+      cycleStart={buble.cycleStart}
+      cycleEnd={buble.cycleEnd}
+      hours={buble.hours}
+      stipendRate={buble.stipendRate}
+      amount={buble.amount}
+      mode={buble.mode}
+      equityDebit={buble.equityDebit}
+      equityCredit={buble.equityCredit}
+    />
 
     <p class="text-xs text-gray-600 dark:text-gray-300">{$t('stipend.confirm.equityNote')}</p>
 

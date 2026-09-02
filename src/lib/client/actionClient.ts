@@ -635,6 +635,30 @@ export interface ActionParamsMap {
  * });
  * ```
  */
+/**
+ * The sentence to show the user when an action fails.
+ *
+ * `/api/action` answers a thrown handler with a generic
+ * `message: "An unexpected error occurred"` and puts the real reason — the one
+ * the handler wrote for this person to read ("the stipend rate is higher than
+ * the mission's market rate") — in `details`. Reading `message` alone turned
+ * every validation into "something went wrong", and `String(res.error)` on the
+ * object turned it into `[object Object]` (docs/FIXES.md §9). Details first,
+ * then message, then a caller-supplied fallback.
+ */
+export function actionErrorText(res: unknown, fallback = 'failed'): string {
+  const err = (res as ActionResponse | undefined)?.error as
+    | { message?: string; details?: unknown }
+    | string
+    | undefined;
+  if (!err) return fallback;
+  if (typeof err === 'string') return err;
+  const detail = typeof err.details === 'string' ? err.details.trim() : '';
+  if (detail) return detail;
+  const message = typeof err.message === 'string' ? err.message.trim() : '';
+  return message || fallback;
+}
+
 export async function executeAction<K extends ActionKey>(
   actionKey: K,
   params: K extends keyof ActionParamsMap ? ActionParamsMap[K] : Record<string, any>,

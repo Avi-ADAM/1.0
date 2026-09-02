@@ -128,7 +128,10 @@ async function x(id, kind, taid, fetch) {
   } else if (kind == 'stipend_payment') {
     // "Did the stipend arrive?" — no answer within restime confirms it
     // (PLAN_STIPEND §6), which is what lets its equity lines count.
-    await StipendPayment(id, taid);
+    // `fetch` is passed through so the maturation can tell both sides it
+    // happened — silence moves two people's percentages, and it used to move
+    // them without a word (docs/FIXES.md §8).
+    await StipendPayment(id, taid, fetch);
   } else if (kind == 'tosplit') {
     // A profit split nobody objected to within restime settles itself
     // (PLAN_TIMEGRAMA D5).

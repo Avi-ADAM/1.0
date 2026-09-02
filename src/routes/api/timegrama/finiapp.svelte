@@ -4,7 +4,7 @@
   import { SendToAdmin } from '$lib/server/sendToAdmin.js';
   // Server-only secret — this module is imported only by timegrama/+server.js.
   import { ADMINMONTHER } from '$env/static/private';
-  import { blendedRate, pickRateRow, resolveRate, rowRate, sumRowsValue } from '$lib/timers/rate.js';
+  import { pickRateRow, resolveRate, rowRate } from '$lib/timers/rate.js';
 
   // Free-text the user typed (`why`, `missname`) goes into an inline mutation
   // string, so it has to be escaped. An unescaped quote or newline breaks the
@@ -127,22 +127,21 @@
           `;
         }
       } else {
-        // Mission completion: create final FinnishedMission + mark mission done.
-        // Every accumulated row keeps its own rate; collapsing them at the
-        // mission's current value would re-price the whole history.
-        const accumulated = sumRowsValue(fmRows, perhour);
-        const totalHours = accumulated.hours + noofhours;
-        const totalValue = accumulated.value + noofhours * perhour;
-
+        // Mission completion: create the final FinnishedMission + mark the
+        // mission done. Only the hours this completion adds — the accumulated
+        // rows from the timer saves are still on the books and still counted,
+        // so writing the running total here counted the whole history twice in
+        // every percentage the rikma has (docs/FIXES.md §5). Same rule as
+        // closeFiniapruval.ts, which is the explicit-vote twin of this path.
         finnishedMissionMutation = `
           createFinnishedMission(data: {
             missionName: ${gqlStr(fa.missname)},
             why: ${gqlStr(fa.why ?? '')},
-            noofhours: ${totalHours},
+            noofhours: ${noofhours},
             mesimabetahalich: "${mba.id}",
             mission: "${mbaa.mission.data.id}",
-            perhour: ${blendedRate(totalHours, totalValue, perhour)},
-            total: ${totalValue},
+            perhour: ${perhour},
+            total: ${noofhours * perhour},
             project: "${projectId}",
             users_permissions_user: "${userId}",
             isFinished: true,

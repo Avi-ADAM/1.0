@@ -225,7 +225,16 @@
     "spentOf": "{{spent}} of {{cap}} used",
     "paidSoFar": "Paid so far: {{count}}",
     "funded": "Funded: {{count}}",
-    "received": "Received: {{count}}"
+    "received": "Received: {{count}}",
+    "accrued": "Earned, not yet paid",
+    "accruedHint": "{{hours}} approved hours · {{period}}",
+    "pendingHint": "Sent, waiting on the recipient",
+    "ofCap": "of {{count}}",
+    "mine": "me",
+    "cycles": "Cycles paid",
+    "noCycles": "No cycle has been paid yet",
+    "cycleEquity": "Equity: +{{credit}} funder · −{{debit}} recipient",
+    "filterAll": "All"
   },
   "funding": {
     "title": "Find a partner to fund this",
@@ -273,5 +282,25 @@
     "noteRikma": "The cost is spread across the whole rikma — every member is diluted together, and that was approved in the vote on this mission.",
     "noteGift": "The stipend is a gift — it does not affect anyone's percentage.",
     "legal": "A subsistence stipend between partners in a rikma — it is not a wage and creates no employer-employee relationship. The recipient is a partner receiving a living grant, not an employee. This is not legal or tax advice."
+  },
+  "cycle": {
+    "forWork": "For what work",
+    "period": "Period",
+    "equityTitle": "What this does to the shares",
+    "equityRecipient": "Confirming it arrived gives up {{count}} of your contribution value — that is what the stipend buys.",
+    "equityRecipientNone": "Your share does not move: you are not carrying the cost of this stipend.",
+    "equityFunder": "Once receipt is confirmed, your contribution value grows by {{count}}."
+  },
+  "payStatus": {
+    "pending": "Not sent yet",
+    "sent": "Awaiting confirmation",
+    "confirmed": "Confirmed",
+    "cancelled": "Never arrived"
+  },
+  "accrued": {
+    "cardType": "Earned, not yet paid",
+    "body": "{{name}} funds your subsistence stipend. This is what the current cycle has added up to, from approved hours.",
+    "note": "The figure comes from hours the rikma approved and grows with every further approval. It is not final until it is sent.",
+    "waiting": "The ball is with {{name}} — when the stipend is sent, a card to confirm it arrived will appear here."
   }
 }

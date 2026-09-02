@@ -808,7 +808,8 @@
       "stipendProgram": "Stipend program",
       "saleClaim": "Sale holder consent",
       "newService": "New service",
-      "picVote": "Logo change"
+      "picVote": "Logo change",
+      "stipendaccrued": "Subsistence stipend"
     },
     "fact": {
       "hours": "{{value}} hours",
@@ -857,14 +858,16 @@
       "siteSharePay": "The platform share you committed to",
       "siteShareDecide": "The split is approved — confirm your share",
       "stipendCycle": "A stipend cycle closed — to pay",
-      "stipendSent": "Marked as sent — awaiting your confirmation"
+      "stipendSent": "Marked as sent — awaiting your confirmation",
+      "stipendAccrued": "Approved hours — awaiting payment"
     },
     "title": {
       "transfer": "{{from}} → {{to}}",
       "sitesharepay": "Platform share payment",
       "sitesharedecide": "Platform share approval",
       "stipendpay": "Stipend payment",
-      "stipendconfirm": "Stipend receipt confirmation"
+      "stipendconfirm": "Stipend receipt confirmation",
+      "stipendaccrued": "Earned, unpaid"
     },
     "cta": {
       "vote": "Vote",

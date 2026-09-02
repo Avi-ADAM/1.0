@@ -484,6 +484,37 @@ export interface StipendConfirmationData {
   [key: string]: any;
 }
 
+/**
+ * **What I have earned this cycle that nobody has paid me yet** — the
+ * recipient's half of a stipend (PLAN_STIPEND §6, §8).
+ *
+ * The funder always had this number: it is the pay card. The person actually
+ * living on the money had no screen showing it anywhere, in the one feature
+ * whose entire point is that they can count on it (docs/FIXES.md §10).
+ *
+ * Nothing here is actionable, and that is honest — the next move is the
+ * funder's. The card exists so the recipient can see the month adding up
+ * instead of finding out when (or whether) it arrives.
+ */
+export interface StipendAccrualData {
+  pledgeId: string;
+  projectId: string | null;
+  projectName?: string;
+  funderId: string | null;
+  funderName: string;
+  hours: number;
+  amount: number;
+  gross?: number;
+  cappedBy?: string | null;
+  stipendRate: number;
+  mode: 'equity' | 'advance' | 'gift';
+  cycleStart: string | null;
+  cycleEnd: string | null;
+  missionNames?: string[];
+  equityDebit?: number;
+  [key: string]: any;
+}
+
 /** Filter configuration for what to display */
 export interface MilonConfig {
   hachla: boolean;   // החלטות
@@ -597,6 +628,9 @@ export const stipendPayablesStore: Writable<StipendPayableData[]> = writable([])
 
 /** Stipend money sent to me that I have not yet confirmed arrived */
 export const stipendConfirmationsStore: Writable<StipendConfirmationData[]> = writable([]);
+
+/** Stipend I have earned this cycle that has not been settled yet */
+export const stipendAccrualsStore: Writable<StipendAccrualData[]> = writable([]);
 
 // ========== UI State Stores ==========
 

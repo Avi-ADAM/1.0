@@ -31,6 +31,15 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3000
+      # Every month boundary in the app is computed in LOCAL time — deliberately,
+      # so a member's month is the month they live in (src/lib/recurring/
+      # missionMonths.ts). The container has no timezone of its own, so without
+      # this it runs in UTC and every boundary sits three hours early: work
+      # logged late on the 1st is filed to the previous month, and a recurring
+      # cycle opened at 00:00 Israel time reads as the *previous* month, so
+      # `hasOpenCycleFor` misses it and /api/monthi opens a second cycle for a
+      # month that already has one. Change it with the rikma, not per service.
+      - TZ=${TZ:-Asia/Jerusalem}
       # adapter-node needs ORIGIN for correct CSRF/origin checks behind Nginx
       - ORIGIN=${ORIGIN:-https://api.1lev1.com}
       - BODY_SIZE_LIMIT=${BODY_SIZE_LIMIT:-50M}
@@ -133,9 +142,45 @@ services:
     networks:
       - app-network
 
+  # ---- Scheduler (scripts/scheduler/) ----
+  # The clock the platform runs on: it matures timegramot, closes the month and
+  # runs the daily batch. It lives here rather than in a host systemd unit
+  # because this box has no node of its own — everything is docker — and because
+  # travelling with the compose file is what makes moving servers a copy.
+  #
+  # It reaches the API over the internal network, so the job endpoints never
+  # need to be exposed; `env_file` hands it ADMINMONTHER directly, so it does
+  # not read a .env of its own. The script is bind-mounted (deploy-api.ps1
+  # uploads it beside this file) — no image to rebuild to change a schedule.
+  scheduler:
+    image: node:22-alpine
+    container_name: 1lev1-scheduler
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      # Same reasoning as the API: the month it decides to close has to be the
+      # month the members are living in.
+      - TZ=${TZ:-Asia/Jerusalem}
+      - SCHEDULER_BASE_URL=http://sveltekit-api:3000
+      - SCHEDULER_STATE_FILE=/state/state.json
+      # It gets its secrets from env_file; there is no .env inside this image.
+      - SCHEDULER_ENV_FILE=/dev/null
+    command: ["node", "/app/scheduler.mjs"]
+    volumes:
+      - ./scheduler.mjs:/app/scheduler.mjs:ro
+      - scheduler-state:/state
+    depends_on:
+      - sveltekit-api
+    logging: *json-log
+    networks:
+      - app-network
+
 volumes:
   mastra-pgdata:
   vector-data:
+  # What has already run — the record that stops a month being closed twice and
+  # lets a box that was down on the 1st catch up when it comes back.
+  scheduler-state:
 
 networks:
   # Same external network the socket-server joins; put the Strapi container on

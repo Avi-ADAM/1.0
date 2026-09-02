@@ -18,7 +18,39 @@ rather than missing.
 that was down on the 1st runs the moment it comes back on the 2nd — the miss
 that used to cost a whole month of somebody's ledger.
 
-## Install on a fresh server
+## Two ways to run it — pick by what the box has
+
+**Docker (what the 1lev1 VPS uses).** `docker-compose.api.yml` declares a
+`scheduler` service beside the API, and `deploy-api.ps1` uploads `scheduler.mjs`
+next to the compose file. Nothing to install: it arrives with the deploy.
+
+```bash
+cd /home/ubuntu/api
+docker compose -f docker-compose.api.yml run --rm scheduler node /app/scheduler.mjs --status
+docker compose -f docker-compose.api.yml run --rm scheduler node /app/scheduler.mjs --once --dry
+docker compose -f docker-compose.api.yml up -d scheduler
+docker logs -f 1lev1-scheduler
+```
+
+It reaches the API on the internal network (`http://sveltekit-api:3000`), takes
+its secrets from the compose `env_file`, and keeps its state in the
+`scheduler-state` volume. Changing a schedule is a re-upload of `scheduler.mjs`
+and `docker compose restart scheduler` — there is no image to rebuild.
+
+**systemd**, for a box that has Node 18+ on the host and no docker — below.
+
+> ### The container's timezone is not a detail
+>
+> Every month boundary in the app is computed in **local time**, on purpose, so
+> a member's month is the month they live in. A container with no `TZ` runs in
+> UTC, and then every boundary sits three hours early: work logged late on the
+> 1st is filed to the previous month, and a recurring cycle opened at 00:00
+> Israel time reads as the *previous* month — so `hasOpenCycleFor` misses it and
+> the monthly close opens a **second** cycle for a month that already has one.
+> `docker-compose.api.yml` sets `TZ` on both the API and the scheduler. Change
+> it in one place, for both.
+
+## Install on a fresh server (systemd)
 
 Ubuntu 20.04 / 22.04, Node 18+ (`node --version`; install with
 `curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash - && sudo apt install -y nodejs`).

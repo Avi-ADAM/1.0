@@ -1,10 +1,8 @@
 import type { ActionConfig } from '../types.js';
 import {
-    blendedRate,
     pickRateRow,
     resolveRate,
     rowRate,
-    sumRowsValue,
     type RateRow,
 } from '$lib/timers/rate.js';
 
@@ -113,22 +111,29 @@ export const closeFiniapruvalConfig: ActionConfig = {
             }, context.jwt, context.fetch);
 
         } else {
-            // Mission completion: create final FinnishedMission and mark mission done.
-            // Each accumulated row keeps its own rate — `Σ hours × currentRate`
-            // would hand the whole mission the last value it ever had.
-            const accumulated = sumRowsValue(fmRows, perhour);
-            const totalHours = accumulated.hours + noofhours;
-            const totalValue = accumulated.value + noofhours * perhour;
-
+            // Mission completion: create the final FinnishedMission and mark the
+            // mission done.
+            //
+            // The row carries **only the hours this completion adds**, never the
+            // mission's running total. The accumulated rows from every timer save
+            // are still there and are still counted — this row used to be written
+            // as `accumulated + noofhours` while they stayed, so `buildBase`
+            // (which sums every finnished-mission of the rikma with no filter)
+            // counted the whole banked history a second time. Live: a mission with
+            // 5.005 banked hours completed at 5 more produced rows of 5.005 and
+            // 10.005 side by side — ₪250.26 of value out of thin air, straight
+            // into everybody's percentages (docs/FIXES.md §5).
+            //
+            // One row per rate era is also what the timer-save branch above
+            // already does, and what the single-member path in completeMission.ts
+            // does. This makes all three agree.
             await strapi.execute('119createFinnishedMissionFinal', {
                 missionName: fa.missname,
                 why: fa.why ?? '',
-                noofhours: totalHours,
+                noofhours,
                 mesimabetahalich: mba?.id,
-                // The one rate that keeps `noofhours × perhour === total` when
-                // several eras are collapsed into a single row.
-                perhour: blendedRate(totalHours, totalValue, perhour),
-                total: totalValue,
+                perhour,
+                total: noofhours * perhour,
                 project: fa.project?.data?.id,
                 mission: mbaa?.mission?.data?.id,
                 users_permissions_user: fa.users_permissions_user?.data?.id,

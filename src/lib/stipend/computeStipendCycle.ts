@@ -6,7 +6,14 @@
  * approval is later refused, money has already been paid for work the rikma
  * did not recognise, and there is no elegant way back.
  *
- *     amount = min(hours × rate, monthlyCap, remaining totalCap, program cap)
+ *     hours  = approved in the window − hours other pledges already metered
+ *     amount = min(hours × rate, monthlyCap, remaining totalCap, program cap,
+ *                  the recipient's remaining equity ÷ α)
+ *
+ * The last two terms of `hours` and of `amount` are the ones that keep the
+ * model honest when more than one stipend exists at once: hours the rikma
+ * approved are finite, and the equity they bought cannot be given away twice
+ * (docs/FIXES.md §2).
  */
 
 import type { PartialStipendTerms } from './types.js';
@@ -40,6 +47,24 @@ export interface CycleInput {
   programRemaining?: number | null;
   /** Missions the pledge covers — empty/undefined means "all of them". */
   missionIds?: string[] | null;
+  /**
+   * Hours of this recipient that stipend payments have already metered in this
+   * rikma — **whichever pledge** wrote them.
+   *
+   * Approved hours are a finite thing: the rikma signed them once. Each pledge
+   * used to know only its own `lastSettledAt`, so two pledges covering the same
+   * person each paid for the same hours from scratch (docs/FIXES.md §2).
+   */
+  hoursAlreadyMetered?: number | null;
+  /**
+   * ₪ of equity debit still available before the recipient's own contribution
+   * would go negative — `contribution − Σ equityDebit so far`.
+   *
+   * `stipendRate ≤ perhour` bounds one hour's rate; nothing bounded the sum,
+   * and a live run ended with the recipient at −2.25% of their own rikma.
+   * Null = don't check (a gift, or the caller has no figure).
+   */
+  equityHeadroom?: number | null;
 }
 
 export interface CycleResult {
@@ -50,7 +75,7 @@ export interface CycleResult {
   /** What is actually due. */
   amount: number;
   /** Which limit bit, when `amount < gross`. */
-  cappedBy: 'monthlyCap' | 'totalCap' | 'programCap' | null;
+  cappedBy: 'monthlyCap' | 'totalCap' | 'programCap' | 'equityFloor' | null;
   /** ₪ left under the pledge's own totalCap after this payment. */
   remainingAfter: number | null;
   /** True when this payment exhausts the pledge — it closes itself (§6). */
@@ -80,7 +105,9 @@ export function computeStipendCycle(input: CycleInput): CycleResult {
     if (Number.isFinite(h) && h > 0) hours += h;
   }
 
-  hours = round2(hours);
+  // Hours another pledge already paid for are spent, not available again.
+  const metered = Math.max(0, Number(input.hoursAlreadyMetered ?? 0) || 0);
+  hours = round2(Math.max(0, hours - metered));
   const gross = round2(hours * terms.stipendRate);
 
   const paidTotal = Math.max(0, Number(input.paidTotal ?? 0) || 0);
@@ -97,6 +124,12 @@ export function computeStipendCycle(input: CycleInput): CycleResult {
   if (terms.monthlyCap != null) limits.push([terms.monthlyCap, 'monthlyCap']);
   if (totalRemaining != null) limits.push([totalRemaining, 'totalCap']);
   if (programRemaining != null) limits.push([programRemaining, 'programCap']);
+  // The recipient's own equity can never go below zero: the debit is α·P, so
+  // the biggest payment their remaining contribution can carry is headroom/α.
+  // Only `equity` mode debits anything, and α=0 debits nothing at all.
+  if (input.equityHeadroom != null && terms.mode === 'equity' && terms.costShare > 0) {
+    limits.push([Math.max(0, Number(input.equityHeadroom) || 0) / terms.costShare, 'equityFloor']);
+  }
   for (const [limit, name] of limits) {
     if (amount > limit) {
       amount = limit;
@@ -117,6 +150,34 @@ export function computeStipendCycle(input: CycleInput): CycleResult {
       (remainingAfter != null && remainingAfter <= 0) ||
       (programRemaining != null && programRemaining - amount <= 0)
   };
+}
+
+/**
+ * Where a settlement starts reading approved hours from.
+ *
+ * Not the start of the calendar window: hours the rikma approved and nobody
+ * has paid for do not stop being owed because a month turned over. A funder
+ * who settles on the 1st of the next month — the way people actually pay — saw
+ * an empty card, and hours approved late in a settled month fell into a gap
+ * between the watermark and the next window and were never paid at all
+ * (docs/FIXES.md §3, §6).
+ *
+ * So the origin is the **watermark**: everything approved since the last
+ * settlement, never anything from before the pledge itself began. The monthly
+ * ceiling stays the funder's protection against a large carried-forward month.
+ */
+export function settlementFrom(
+  pledge: { lastSettledAt?: string | null; start?: string | null },
+  windowStart: string | Date
+): string {
+  const startMs = toTime(pledge.start);
+  const candidates = [pledge.lastSettledAt, pledge.start, windowStart];
+  const first = candidates.find((c) => c != null && c !== '' && Number.isFinite(toTime(c as any)));
+  const chosen = first ?? windowStart;
+  const chosenMs = toTime(chosen as any);
+  // A pledge never pays for work approved before it existed.
+  const effective = Number.isFinite(startMs) && chosenMs < startMs ? pledge.start! : chosen;
+  return effective instanceof Date ? effective.toISOString() : String(effective);
 }
 
 /**

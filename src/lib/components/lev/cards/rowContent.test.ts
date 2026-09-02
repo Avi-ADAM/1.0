@@ -91,6 +91,7 @@ const SAMPLES: Record<string, any> = {
   sitesharepay: { amount: 320, rikmaName: 'רקמת הלחם' },
   stipendpay: { recipientName: 'אורי', hours: 42, amount: 2100, stipendRate: 50 },
   stipendconfirm: { funderName: 'הדס', amount: 2100, hours: 42, stipendRate: 50 },
+  stipendaccrued: { funderName: 'הדס', amount: 600, hours: 12, stipendRate: 50 },
   sitesharedecide: { proposedAmount: 320, basisAmount: 6400 }
 };
 

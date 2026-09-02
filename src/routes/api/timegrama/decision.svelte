@@ -160,7 +160,14 @@
             membershipEnded: applied.membershipEnded ?? null
           });
         } catch (e) {
-          console.error('[timegrama/decision] archive maturation failed:', e);
+          // Same rule as the stipend branch below: a proposal that failed to
+          // apply is still standing, so the clock stays open and the next run
+          // retries rather than discarding it (docs/FIXES.md §1).
+          console.error(
+            '[timegrama/decision] archive maturation failed — clock left OPEN for retry:',
+            { decisionId: id, kind: a.kind, error: e }
+          );
+          return;
         }
         // applyStandingVersion closes the decision and its own timegrama; this
         // is the belt-and-braces for the case where that write failed.
@@ -200,7 +207,20 @@
             programId: applied.programId
           });
         } catch (e) {
-          console.error('[timegrama/decision] stipend maturation failed:', e);
+          // Do **not** close the clock. A failed maturation is not "nothing to
+          // act on" — it is a standing proposal that both sides agreed to and
+          // the machine could not write down, and closing the clock discards
+          // it with no way back. This is not hypothetical: the service token
+          // was missing `update` on stipend-pledge/stipend-program, every
+          // silence maturation threw `Forbidden access`, and every unanswered
+          // stipend proposal died here in silence. Leaving the row open means
+          // the next hourly run retries, and a permanently failing one stays
+          // visible in the queue instead of vanishing (docs/FIXES.md §1).
+          console.error(
+            '[timegrama/decision] stipend maturation failed — clock left OPEN for retry:',
+            { decisionId: id, kind: a.kind, error: e }
+          );
+          return;
         }
         return markDone();
       }

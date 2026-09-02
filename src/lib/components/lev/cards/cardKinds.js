@@ -47,6 +47,7 @@ const RENDERABLE = new Set([
   'sitesharepay',
   'stipendpay',
   'stipendconfirm',
+  'stipendaccrued',
   'sitesharedecide'
 ]);
 
@@ -100,6 +101,7 @@ const KIND_META = {
   sitesharepay: { key: 'sitesharepay', glow: 'gold' },
   stipendpay: { key: 'stipendpay', glow: 'purple' },
   stipendconfirm: { key: 'stipendconfirm', glow: 'purple' },
+  stipendaccrued: { key: 'stipendaccrued', glow: 'purple' },
   sitesharedecide: { key: 'sitesharedecide', glow: 'gold' }
 };
 
@@ -534,6 +536,18 @@ const ROW_CONTENT = {
       f('hours', n(b.hours)),
       f('rate', n(b.stipendRate))
     )
+  }),
+
+  // Informational, not a to-do. The funder's name is the title because "who
+  // owes me this" is the question the recipient is actually asking.
+  stipendaccrued: (b) => ({
+    title: T(b.funderName) ?? K('lev.list.title.stipendaccrued'),
+    subtitle: K('lev.list.sub.stipendAccrued'),
+    facts: chips(
+      f('amount', n(b.amount)),
+      f('hours', n(b.hours)),
+      f('rate', n(b.stipendRate))
+    )
   })
 };
 
@@ -605,6 +619,7 @@ const CTA_BY_ANI = {
   buy: 'confirm',
   vidu: 'confirm',
   stipendconfirm: 'confirm',
+  stipendaccrued: 'view',
   sitesharedecide: 'confirm',
   mtaha: 'view',
   walcomen: 'view'

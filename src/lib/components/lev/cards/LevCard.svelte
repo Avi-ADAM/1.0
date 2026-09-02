@@ -33,6 +33,7 @@
   import StipendDecisionCard from './StipendDecisionCard.svelte';
   import StipendPayCard from './StipendPayCard.svelte';
   import StipendConfirmCard from './StipendConfirmCard.svelte';
+  import StipendAccruedCard from './StipendAccruedCard.svelte';
   import SiteShareIncomeCard from './SiteShareIncomeCard.svelte';
   import SiteShareAutoApprovedCard from './SiteShareAutoApprovedCard.svelte';
   import WishOfferCard from './WishOfferCard.svelte';
@@ -164,6 +165,13 @@
       onProj={proj}
       onUser={user}
       onDone={delo}
+    />
+{:else if buble.ani === 'stipendaccrued'}
+  <StipendAccruedCard
+      {buble}
+      isFirst={isVisible}
+      onProj={proj}
+      onUser={user}
     />
 {:else if buble.ani === 'sitesharedecide'}
   <SiteShareAutoApprovedCard

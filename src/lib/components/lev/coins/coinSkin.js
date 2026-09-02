@@ -83,7 +83,8 @@ const FACE_BY_ANI = {
   sitesharepay: FACES.newcoin,
   sitesharedecide: FACES.coinnn,
   stipendpay: FACES.newcoin,
-  stipendconfirm: FACES.coin
+  stipendconfirm: FACES.coin,
+  stipendaccrued: FACES.coin
 };
 
 /** The face for a kind. Every kind has one — an unknown one gets the decision coin. */

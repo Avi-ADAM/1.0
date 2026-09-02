@@ -110,6 +110,13 @@ Step "Uploading vector.toml (log shipper config)"
 & scp @sshArgs "$RepoRoot\vector.toml" "$User@${Server}:$RemoteDir/vector.toml"
 if ($LASTEXITCODE -ne 0) { Fail "scp of vector.toml failed" }
 
+# The scheduler service bind-mounts this next to the compose file, the same way
+# vector does. It has to land before 'up -d' or the container starts with
+# nothing to run. Changing a schedule is this upload plus a restart — no rebuild.
+Step "Uploading scheduler.mjs (maturation clock + monthly close)"
+& scp @sshArgs "$RepoRoot\scripts\scheduler\scheduler.mjs" "$User@${Server}:$RemoteDir/scheduler.mjs"
+if ($LASTEXITCODE -ne 0) { Fail "scp of scheduler.mjs failed" }
+
 Invoke-Remote "cd $RemoteDir && test -f .env || { echo 'MISSING $RemoteDir/.env on server (STRAPI_URL, ORIGIN, secrets) — create it first'; exit 1; }"
 
 # ---------- 3. deliver + restart on the server ----------

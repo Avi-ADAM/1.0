@@ -36,14 +36,32 @@ if [ "$(timedatectl show -p Timezone --value 2>/dev/null)" != "$TZ_WANT" ]; then
   warn "system timezone is not $TZ_WANT — the unit sets TZ for the scheduler itself, so this is fine, but keep it in mind when reading logs"
 fi
 
-step "Node"
-if command -v node >/dev/null 2>&1; then
+step "Node on the host"
+NODE_BIN=$(command -v node 2>/dev/null || true)
+HOST_NODE=0
+if [ -n "$NODE_BIN" ]; then
   NODE_V=$(node --version)
   NODE_MAJOR=${NODE_V#v}; NODE_MAJOR=${NODE_MAJOR%%.*}
-  if [ "$NODE_MAJOR" -ge 18 ]; then ok "node $NODE_V at $(command -v node)"
-  else bad "node $NODE_V is too old — the scheduler needs 18+ for built-in fetch"; fi
+  if [ "$NODE_MAJOR" -ge 18 ]; then
+    HOST_NODE=1
+    ok "node $NODE_V at $NODE_BIN"
+  else
+    warn "node $NODE_V is too old for the systemd unit (needs 18+ for built-in fetch)"
+  fi
 else
-  bad "node is not installed. curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash - && sudo apt install -y nodejs"
+  warn "no node on the host — the systemd unit cannot run here"
+fi
+
+if [ "$HOST_NODE" = 0 ]; then
+  # A box that runs everything in docker has no business growing a host node
+  # just for this. The compose service is the better home there anyway: it
+  # travels with docker-compose.api.yml, so moving servers stays a copy.
+  if command -v docker >/dev/null 2>&1; then
+    ok "docker is present — use the compose service instead of systemd (see below)"
+    DOCKER_MODE=1
+  else
+    bad "neither node 18+ nor docker is available — nothing here can run the scheduler"
+  fi
 fi
 
 step "The API's .env (where the secrets come from)"
@@ -100,37 +118,79 @@ if [ -n "${ENV_FILE:-}" ]; then
   fi
 fi
 
+if [ "${DOCKER_MODE:-0}" = 1 ]; then
+  step "Timezone of the API container (this is the one that decides months)"
+  API_TZ=$(docker exec sveltekit-api sh -c 'echo -n "$TZ"' 2>/dev/null || echo '')
+  if [ "$API_TZ" = "$TZ_WANT" ]; then
+    ok "sveltekit-api runs in $API_TZ"
+  else
+    bad "sveltekit-api runs in ${API_TZ:-UTC (no TZ set)}, not $TZ_WANT. Every month boundary in the app is computed in LOCAL time, so this shifts them by the UTC offset: work logged late on the 1st is filed to the previous month, and a recurring cycle opened at 00:00 local reads as the previous month — so the monthly close opens a SECOND cycle for a month that already has one. docker-compose.api.yml now sets TZ; redeploy before starting the scheduler."
+  fi
+
+  echo ""
+  if [ "$FAILED" = 1 ]; then
+    printf '\033[31m==> Something above failed. Fix it before starting the scheduler.\033[0m\n'
+    exit 1
+  fi
+  printf '\033[32m==> Everything checks out. The scheduler is a compose service here, not systemd.\033[0m\n'
+  cat <<EOF
+
+This box has no host node, so the scheduler runs as a container beside the API.
+It ships with the deploy: docker-compose.api.yml declares it and deploy-api.ps1
+uploads scheduler.mjs next to the compose file. So from your machine:
+
+    .\\deploy-api.ps1
+
+Then, on the server:
+
+    cd /home/ubuntu/api
+    docker compose -f docker-compose.api.yml up -d scheduler
+    docker logs -f 1lev1-scheduler
+
+Before letting it loose, one dry pass in the same container:
+
+    docker compose -f docker-compose.api.yml run --rm scheduler node /app/scheduler.mjs --status
+    docker compose -f docker-compose.api.yml run --rm scheduler node /app/scheduler.mjs --once --dry
+EOF
+  exit 0
+fi
+
 step "Installing to $INSTALL_DIR"
 install -d -m 755 "$INSTALL_DIR"
 install -d -m 755 "$STATE_DIR"
 install -m 755 "$SRC_DIR/scheduler.mjs" "$INSTALL_DIR/scheduler.mjs" && ok "scheduler.mjs"
 [ -f "$SRC_DIR/README.md" ] && install -m 644 "$SRC_DIR/README.md" "$INSTALL_DIR/README.md" && ok "README.md"
 
-# The unit is written here rather than copied, so the .env path it points at is
-# the one actually found above — a unit with a wrong path fails silently at 03:00
-# on the 1st, which is the worst possible time to find out.
+# The unit is written here rather than copied, so the paths it points at are the
+# ones actually found above — a unit with a wrong path fails silently at 03:00
+# on the 1st, which is the worst possible time to find out. Refusing to write it
+# at all beats writing one with an empty ExecStart that systemd will reject.
 step "Writing $UNIT"
-sed -e "s#^Environment=SCHEDULER_ENV_FILE=.*#Environment=SCHEDULER_ENV_FILE=${ENV_FILE}#" \
-    -e "s#^Environment=SCHEDULER_BASE_URL=.*#Environment=SCHEDULER_BASE_URL=${BASE_URL}#" \
-    -e "s#^Environment=SCHEDULER_STATE_FILE=.*#Environment=SCHEDULER_STATE_FILE=${STATE_DIR}/state.json#" \
-    -e "s#^Environment=TZ=.*#Environment=TZ=${TZ_WANT}#" \
-    -e "s#^WorkingDirectory=.*#WorkingDirectory=${INSTALL_DIR}#" \
-    -e "s#^ExecStart=.*#ExecStart=$(command -v node) ${INSTALL_DIR}/scheduler.mjs#" \
-    -e "s#^ReadWritePaths=.*#ReadWritePaths=${STATE_DIR}#" \
-    "$SRC_DIR/1lev1-scheduler.service" > "$UNIT"
-ok "unit written, pointing at $ENV_FILE"
-grep -E '^(Environment|ExecStart|WorkingDirectory)=' "$UNIT" | sed 's/^/        /'
-systemctl daemon-reload && ok "systemd reloaded"
+if [ -z "$NODE_BIN" ]; then
+  bad "no node binary to point ExecStart at — not writing the unit"
+else
+  sed -e "s#^Environment=SCHEDULER_ENV_FILE=.*#Environment=SCHEDULER_ENV_FILE=${ENV_FILE}#" \
+      -e "s#^Environment=SCHEDULER_BASE_URL=.*#Environment=SCHEDULER_BASE_URL=${BASE_URL}#" \
+      -e "s#^Environment=SCHEDULER_STATE_FILE=.*#Environment=SCHEDULER_STATE_FILE=${STATE_DIR}/state.json#" \
+      -e "s#^Environment=TZ=.*#Environment=TZ=${TZ_WANT}#" \
+      -e "s#^WorkingDirectory=.*#WorkingDirectory=${INSTALL_DIR}#" \
+      -e "s#^ExecStart=.*#ExecStart=${NODE_BIN} ${INSTALL_DIR}/scheduler.mjs#" \
+      -e "s#^ReadWritePaths=.*#ReadWritePaths=${STATE_DIR}#" \
+      "$SRC_DIR/1lev1-scheduler.service" > "$UNIT"
+  ok "unit written, pointing at $ENV_FILE"
+  grep -E '^(Environment|ExecStart|WorkingDirectory)=' "$UNIT" | sed 's/^/        /'
+  systemctl daemon-reload && ok "systemd reloaded"
 
-step "What the scheduler thinks right now"
-env SCHEDULER_ENV_FILE="$ENV_FILE" SCHEDULER_BASE_URL="$BASE_URL" \
-    SCHEDULER_STATE_FILE="$STATE_DIR/state.json" TZ="$TZ_WANT" \
-    node "$INSTALL_DIR/scheduler.mjs" --status | sed 's/^/  /'
+  step "What the scheduler thinks right now"
+  env SCHEDULER_ENV_FILE="$ENV_FILE" SCHEDULER_BASE_URL="$BASE_URL" \
+      SCHEDULER_STATE_FILE="$STATE_DIR/state.json" TZ="$TZ_WANT" \
+      "$NODE_BIN" "$INSTALL_DIR/scheduler.mjs" --status | sed 's/^/  /'
 
-step "A dry pass — nothing is written, nothing matures"
-env SCHEDULER_ENV_FILE="$ENV_FILE" SCHEDULER_BASE_URL="$BASE_URL" \
-    SCHEDULER_STATE_FILE="$STATE_DIR/state.json" TZ="$TZ_WANT" \
-    node "$INSTALL_DIR/scheduler.mjs" --once --dry | sed 's/^/  /'
+  step "A dry pass — nothing is written, nothing matures"
+  env SCHEDULER_ENV_FILE="$ENV_FILE" SCHEDULER_BASE_URL="$BASE_URL" \
+      SCHEDULER_STATE_FILE="$STATE_DIR/state.json" TZ="$TZ_WANT" \
+      "$NODE_BIN" "$INSTALL_DIR/scheduler.mjs" --once --dry | sed 's/^/  /'
+fi
 
 echo ""
 if [ "$FAILED" = 1 ]; then
@@ -151,5 +211,5 @@ the maturation clock on its own first:
 
     sudo env SCHEDULER_ENV_FILE=$ENV_FILE SCHEDULER_BASE_URL=$BASE_URL \\
         SCHEDULER_STATE_FILE=$STATE_DIR/state.json TZ=$TZ_WANT \\
-        node $INSTALL_DIR/scheduler.mjs --run timegrama
+        $NODE_BIN $INSTALL_DIR/scheduler.mjs --run timegrama
 EOF

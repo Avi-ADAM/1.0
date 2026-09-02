@@ -15,12 +15,16 @@ import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { execFromContext } from '$lib/server/archive/exec.js';
 import {
   fetchActivePrograms,
+  fetchApprovedHours,
+  fetchMeteredHours,
   fetchProjectContext,
   fetchProjectStipendMissions,
   fetchProjectPayments,
-  fetchProjectPledges
+  fetchProjectPledges,
+  fetchRecipientContribution
 } from '$lib/server/stipend/read.js';
 import { effectiveStipendPolicy } from '$lib/stipend/computeStipendEquity.js';
+import { computeStipendCycle, cycleWindow, settlementFrom } from '$lib/stipend/computeStipendCycle.js';
 
 const handler: ActionExecutionHandler = async (params, context) => {
   const projectId = String(params.projectId ?? '');
@@ -61,6 +65,81 @@ const handler: ActionExecutionHandler = async (params, context) => {
 
   const names = new Map(project.members.map((m) => [m.id, m.username]));
 
+  /**
+   * Per pledge: what is **owed and not yet paid**, and what is **paid and not
+   * yet confirmed**. The rikma could see what had already moved and nothing
+   * about what was still coming, which is the half of the question the person
+   * waiting for the money actually asks (docs/FIXES.md §10, §14).
+   *
+   * Same window and same pure function as the settlement — a number here that
+   * the pay card would refuse to produce would be worse than no number.
+   */
+  const pledgeStates = await Promise.all(
+    pledges.map(async (pledge) => {
+      const sent = payments
+        .filter((p) => p.pledgeId === pledge.id && p.status === 'sent')
+        .reduce((sum, p) => sum + p.amount, 0);
+      const confirmed = payments.filter((p) => p.pledgeId === pledge.id && p.status === 'confirmed');
+      const base = {
+        pledgeId: pledge.id,
+        awaitingConfirmation: round2(sent),
+        cyclesPaid: confirmed.length,
+        lastPaidAt: confirmed[0]?.cycleEnd ?? null,
+        accruedUnpaid: 0,
+        accruedHours: 0,
+        cycleStart: null as string | null,
+        cycleEnd: null as string | null
+      };
+      if (pledge.status !== 'active' || !pledge.projectId || !pledge.recipientId) return base;
+
+      const window = cycleWindow(new Date(), pledge.terms.cycleSize ?? 1);
+      const from = settlementFrom(
+        { lastSettledAt: pledge.lastSettledAt, start: pledge.terms.start },
+        window.cycleStart
+      );
+      const [approved, metered, ledger] = await Promise.all([
+        fetchApprovedHours(exec, pledge.projectId, pledge.recipientId, from).catch(() => []),
+        fetchMeteredHours(exec, pledge.projectId, pledge.recipientId, from).catch(() => 0),
+        fetchRecipientContribution(exec, pledge.projectId, pledge.recipientId).catch(() => null)
+      ]);
+      const program = programs.find((p) => p.id === pledge.programId) ?? null;
+      const cycle = computeStipendCycle({
+        terms: pledge.terms,
+        approved,
+        cycleStart: from,
+        cycleEnd: window.cycleEnd,
+        paidTotal: pledge.paidTotal,
+        programRemaining: program?.remainingCap ?? null,
+        missionIds: pledge.terms.scope === 'allMissions' ? null : pledge.missionIds,
+        hoursAlreadyMetered: metered,
+        equityHeadroom: ledger ? Math.max(0, ledger.contribution - ledger.equityDebited) : null
+      });
+      return {
+        ...base,
+        accruedUnpaid: cycle.amount,
+        accruedHours: cycle.hours,
+        cycleStart: from,
+        cycleEnd: window.cycleEnd
+      };
+    })
+  );
+  const stateByPledge = new Map(pledgeStates.map((s) => [s.pledgeId, s]));
+
+  // The mission a payment answers, resolved once here rather than in the view:
+  // "₪2,100 in March" means nothing without "for building the site".
+  const missionNameById = new Map<string, string>(
+    missions.map((m) => [m.id, m.name] as [string, string])
+  );
+  const missionsByPledge = new Map<string, string[]>(
+    pledges.map(
+      (p) =>
+        [p.id, p.missionIds.map((id) => missionNameById.get(id) ?? '').filter(Boolean)] as [
+          string,
+          string[]
+        ]
+    )
+  );
+
   return {
     data: {
       projectId,
@@ -78,8 +157,23 @@ const handler: ActionExecutionHandler = async (params, context) => {
       defaultRate: project.defaultRate,
       defaultCostShare: project.defaultCostShare,
       programs,
-      pledges,
-      payments,
+      // Each pledge carries the names of the missions it meters and its live
+      // state, so the tab can say who is funding whom, for what work, how much
+      // is owed right now and how much is waiting to be confirmed — in one row.
+      pledges: pledges.map((p) => ({
+        ...p,
+        missionNames: missionsByPledge.get(p.id) ?? [],
+        state: stateByPledge.get(p.id) ?? null
+      })),
+      // The cycle-by-cycle ledger. It was always read here and never rendered,
+      // so "how much did this person get, and for what" had no screen at all
+      // (docs/FIXES.md §11).
+      payments: payments.map((p) => ({
+        ...p,
+        funderName: names.get(p.funderId ?? '') ?? '',
+        recipientName: names.get(p.recipientId ?? '') ?? '',
+        missionNames: p.pledgeId ? missionsByPledge.get(p.pledgeId) ?? [] : []
+      })),
       totals: {
         paid: paidTotal,
         equityCredit: creditTotal,
@@ -89,6 +183,8 @@ const handler: ActionExecutionHandler = async (params, context) => {
         pending: round2(
           payments.filter((p) => p.status === 'sent').reduce((sum, p) => sum + p.amount, 0)
         ),
+        /** Approved, owed, and nobody has settled it yet — across every pledge. */
+        accrued: round2(pledgeStates.reduce((sum, s) => sum + s.accruedUnpaid, 0)),
         budgetLeft: round2(sumBudgets(programs))
       },
       perMember: Array.from(perMember.values()).map((row) => ({

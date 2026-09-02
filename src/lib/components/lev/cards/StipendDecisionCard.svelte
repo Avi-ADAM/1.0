@@ -12,7 +12,7 @@
    * the recipient trades away for the cash.
    */
   import { t, isRtl } from '$lib/translations';
-  import { executeAction } from '$lib/client/actionClient';
+  import { executeAction, actionErrorText } from '$lib/client/actionClient';
   import { toast } from 'svelte-sonner';
   import { isMobileOrTablet } from '$lib/utilities/device';
   import CardHeader from './CardHeader.svelte';
@@ -210,14 +210,14 @@
         projectId,
         kind: stipend.kind
       });
-      if (res?.success === false) throw new Error(String(res?.error ?? 'failed'));
+      if (res?.success === false) throw new Error(actionErrorText(res, $t('stipend.toast.error')));
       toast.success(
         res?.data?.consensus ? $t('stipend.toast.matured') : $t('stipend.toast.signed')
       );
       onDone?.();
     } catch (e) {
       console.error('[StipendDecisionCard] approve failed:', e);
-      toast.error($t('stipend.toast.error'));
+      toast.error(e instanceof Error ? e.message : $t('stipend.toast.error'));
     } finally {
       approving = false;
     }

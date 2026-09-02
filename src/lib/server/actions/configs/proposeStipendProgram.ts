@@ -31,6 +31,7 @@ import { openStipendDecision } from '$lib/server/stipend/decision.js';
 import { createProposedPledge } from '$lib/server/stipend/create.js';
 import {
   fetchProjectContext,
+  fetchProjectPledges,
   fetchProjectStipendMissions
 } from '$lib/server/stipend/read.js';
 import {
@@ -131,6 +132,25 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
   }
   if (recipientId && funderId && recipientId === funderId) {
     throw new Error('A member cannot fund their own stipend');
+  }
+
+  // A program carries a concrete pledge underneath it, so it can create the
+  // same double-metering a second bare pledge would (docs/FIXES.md §2). Same
+  // rule, checked in the same place in the flow.
+  if (recipientId) {
+    const live = await fetchProjectPledges(exec, projectId, ['proposed', 'active']).catch(() => []);
+    const clash = live.find((p) => {
+      if (p.recipientId !== recipientId) return false;
+      if (p.terms.scope === 'allMissions' || terms.scope === 'allMissions') return true;
+      const covered = [...missionIds, ...(openMission ? [openMission.id] : [])];
+      return p.missionIds.some((id) => covered.includes(id)) ||
+        p.openMissionIds.some((id) => covered.includes(id));
+    });
+    if (clash) {
+      throw new Error(
+        'A stipend for this member’s work is already on the books. Change its terms on the running agreement rather than opening a second one — two would pay for the same approved hours twice'
+      );
+    }
   }
 
   const missionRates = [...missions, ...(openMission ? [openMission] : [])]

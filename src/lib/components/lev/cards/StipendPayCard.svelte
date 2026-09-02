@@ -11,17 +11,16 @@
    * ledger row, which stays `sent` until the recipient confirms it arrived.
    */
   import { t, isRtl } from '$lib/translations';
-  import { executeAction } from '$lib/client/actionClient';
+  import { executeAction, actionErrorText } from '$lib/client/actionClient';
   import { toast } from 'svelte-sonner';
   import { isMobileOrTablet } from '$lib/utilities/device';
   import { stipendPayablesStore } from '$lib/stores/levStores';
   import CardHeader from './CardHeader.svelte';
+  import CycleFacts from '$lib/components/stipend/CycleFacts.svelte';
 
   let { buble, isFirst = false, onProj, onDone } = $props();
 
   let busy = $state(false);
-
-  const capped = $derived(buble?.cappedBy ?? null);
 
   function handleProjectClick() {
     if (onProj && buble.projectId) onProj({ id: buble.projectId });
@@ -34,7 +33,7 @@
       const res = await executeAction('settleStipendCycle', {
         pledgeId: String(buble.pledgeId)
       });
-      if (res?.success === false) throw new Error(String(res?.error?.message ?? res?.error ?? 'failed'));
+      if (res?.success === false) throw new Error(actionErrorText(res, $t('stipend.toast.error')));
       if (res?.data?.settled === false) {
         toast($t('stipend.pay.nothingThisCycle'));
       } else {
@@ -83,21 +82,21 @@
     </p>
 
     <!-- The whole calculation, visible. Nothing here is typed by anyone. -->
-    <div class="rounded-xl border border-gray-200 dark:border-gray-700 p-3 text-sm space-y-1">
-      <p>{$t('stipend.pay.hours', { count: buble.hours })}</p>
-      <p>{$t('stipend.pay.rate', { count: buble.stipendRate })}</p>
-      <p class="font-bold">
-        {$t('stipend.pay.total', { count: Number(buble.amount).toFixed(2) })}
-      </p>
-      {#if capped}
-        <p class="text-xs text-amber-700 dark:text-amber-300">
-          {$t(`stipend.pay.capped.${capped}`, { count: Number(buble.gross).toFixed(2) })}
-        </p>
-      {/if}
-      {#if buble.exhausts}
-        <p class="text-xs text-amber-700 dark:text-amber-300">{$t('stipend.pay.lastCycle')}</p>
-      {/if}
-    </div>
+    <CycleFacts
+      side="funder"
+      missionNames={buble.missionNames}
+      cycleStart={buble.cycleStart}
+      cycleEnd={buble.cycleEnd}
+      hours={buble.hours}
+      stipendRate={buble.stipendRate}
+      amount={buble.amount}
+      gross={buble.gross}
+      cappedBy={buble.cappedBy}
+      exhausts={buble.exhausts}
+      mode={buble.mode}
+      equityCredit={buble.equityCredit}
+      equityDebit={buble.equityDebit}
+    />
 
     <p class="text-xs text-gray-600 dark:text-gray-300">
       {$t(`stipend.pay.modeNote.${buble.mode ?? 'equity'}`)}

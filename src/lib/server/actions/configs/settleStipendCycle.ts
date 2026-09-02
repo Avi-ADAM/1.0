@@ -16,13 +16,15 @@ import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { execFromContext } from '$lib/server/archive/exec.js';
 import { calcDeadlineMs } from './actionUtils.js';
 import { dateField, enumField, fields, gqlStr, numField, run, strField } from '$lib/server/archive/gql.js';
-import { computeStipendCycle, cycleWindow } from '$lib/stipend/computeStipendCycle.js';
+import { computeStipendCycle, cycleWindow, settlementFrom } from '$lib/stipend/computeStipendCycle.js';
 import { computeStipendEquity } from '$lib/stipend/computeStipendEquity.js';
 import {
   fetchApprovedHours,
+  fetchMeteredHours,
   fetchPledge,
   fetchProgram,
-  fetchProjectContext
+  fetchProjectContext,
+  fetchRecipientContribution
 } from '$lib/server/stipend/read.js';
 
 // `advance` stays in the Strapi enum (dropping a deployed enum value is a
@@ -53,15 +55,23 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
     ? { cycleStart: String(params.cycleStart), cycleEnd: String(params.cycleEnd) }
     : cycleWindow(params.reference ? String(params.reference) : new Date(), pledge.terms.cycleSize ?? 1);
 
-  // Hours already paid for must not be paid for twice: the previous settlement
-  // moved `lastSettledAt` forward, and anything before it is closed business.
-  const from =
-    pledge.lastSettledAt && new Date(pledge.lastSettledAt) > new Date(window.cycleStart)
-      ? pledge.lastSettledAt
-      : window.cycleStart;
+  // Hours already paid for must not be paid for twice, and hours approved and
+  // never paid for must not be lost when a month turns over — see
+  // `settlementFrom`.
+  const from = settlementFrom(
+    { lastSettledAt: pledge.lastSettledAt, start: pledge.terms.start },
+    window.cycleStart
+  );
 
   const approved = await fetchApprovedHours(exec, pledge.projectId, pledge.recipientId, from);
   const program = pledge.programId ? await fetchProgram(exec, pledge.programId) : null;
+  // What other pledges already paid this person for, and how much equity they
+  // have left to give up. Both are rikma-wide facts, not pledge-local ones —
+  // which is exactly why a pledge on its own got them wrong (docs/FIXES.md §2).
+  const [metered, ledger] = await Promise.all([
+    fetchMeteredHours(exec, pledge.projectId, pledge.recipientId, from).catch(() => 0),
+    fetchRecipientContribution(exec, pledge.projectId, pledge.recipientId).catch(() => null)
+  ]);
 
   const cycle = computeStipendCycle({
     terms: pledge.terms,
@@ -70,7 +80,9 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
     cycleEnd: window.cycleEnd,
     paidTotal: pledge.paidTotal,
     programRemaining: program?.remainingCap ?? null,
-    missionIds: pledge.terms.scope === 'allMissions' ? null : pledge.missionIds
+    missionIds: pledge.terms.scope === 'allMissions' ? null : pledge.missionIds,
+    hoursAlreadyMetered: metered,
+    equityHeadroom: ledger ? Math.max(0, ledger.contribution - ledger.equityDebited) : null
   });
 
   if (cycle.amount <= 0) {
@@ -169,7 +181,13 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
     exec,
     `mutation { updateStipendPledge(id: ${gqlStr(pledgeId)}, data: { ${fields(
       numField('paidTotal', newPaid),
-      dateField('lastSettledAt', window.cycleEnd),
+      // The moment of settlement, **not** the end of the cycle. Writing the
+      // cycle's end — a date in the future — closed the rest of the month:
+      // hours approved after a mid-month settlement fell after the watermark
+      // and before the next window, and were never paid at all
+      // (docs/FIXES.md §3). `now` is also the honest statement of fact: this is
+      // how far the books are settled.
+      dateField('lastSettledAt', nowISO),
       cycle.exhausts ? 'status: exhausted' : null
     )} }) { data { id } } }`,
     'settle:updatePledge'

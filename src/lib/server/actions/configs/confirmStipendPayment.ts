@@ -93,7 +93,18 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
       exec,
       `mutation { updateStipendPledge(id: ${gqlStr(pledge.id)}, data: { ${fields(
         numField('paidTotal', Math.max(0, Math.round((pledge.paidTotal - shortfall) * 100) / 100)),
-        pledge.status === 'exhausted' ? 'status: active' : null
+        pledge.status === 'exhausted' ? 'status: active' : null,
+        // Nothing arrived ⇒ the cycle never happened, so the settlement clock
+        // has to go back with the money. Without this the pledge kept
+        // `lastSettledAt` at the settled cycle, `settleStipendCycle` answered
+        // `nothing_approved_this_cycle` forever, and the card's own promise —
+        // "the pledge is still running, send again" — was impossible to keep
+        // (docs/FIXES.md §4).
+        //
+        // Only for a *zero* arrival. A partial one did move money for these
+        // hours; re-opening the window would let the whole cycle be metered a
+        // second time, and the difference belongs in the next cycle instead.
+        nothingArrived ? dateField('lastSettledAt', payment.cycleStart) : null
       )} }) { data { id } } }`,
       'confirmStipendPayment:refundPledge'
     ).catch((e) => console.warn('[confirmStipendPayment] pledge counter rollback failed:', e));

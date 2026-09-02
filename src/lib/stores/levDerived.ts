@@ -20,6 +20,7 @@ import {
   openSiteShareDecisionsStore,
   stipendPayablesStore,
   stipendConfirmationsStore,
+  stipendAccrualsStore,
   askedResourcesStore,
   decisionsStore,
   projectsStore,
@@ -49,6 +50,7 @@ import {
   processOpenSiteShareDecisions,
   processStipendPayables,
   processStipendConfirmations,
+  processStipendAccruals,
   mergeAndSort,
   type DisplayItem
 } from '$lib/utils/levProcessors';
@@ -299,6 +301,18 @@ export const processedStipendConfirmations: Readable<DisplayItem[]> = derived(
   ([$confirmations, $projects]) => processStipendConfirmations($confirmations, $projects)
 );
 
+/**
+ * What the recipient has earned this cycle and nobody has settled yet. Not a
+ * to-do — the next move is the funder's — so it sits in the OTHER band rather
+ * than competing with cards that need an answer. It is here at all because the
+ * number existed only on the funder's pay card, and the person living on the
+ * money had no screen showing it (docs/FIXES.md §10).
+ */
+export const processedStipendAccruals: Readable<DisplayItem[]> = derived(
+  [stipendAccrualsStore, projectsStore],
+  ([$accruals, $projects]) => processStipendAccruals($accruals, $projects)
+);
+
 export const processedOpenSiteShareDecisions: Readable<DisplayItem[]> = derived(
   [openSiteShareDecisionsStore, projectsStore, processedHalukas],
   ([$decisions, $projects, $halukas]) => {
@@ -346,7 +360,8 @@ export const mergedFeed: Readable<DisplayItem[]> = derived(
     processedSiteSharePayables,
     processedOpenSiteShareDecisions,
     processedStipendPayables,
-    processedStipendConfirmations
+    processedStipendConfirmations,
+    processedStipendAccruals
   ],
   ([
     $pends,
@@ -369,7 +384,8 @@ export const mergedFeed: Readable<DisplayItem[]> = derived(
     $siteSharePayables,
     $openSiteShareDecisions,
     $stipendPayables,
-    $stipendConfirmations
+    $stipendConfirmations,
+    $stipendAccruals
   ]) => {
     return mergeAndSort(
       $pends,
@@ -392,7 +408,8 @@ export const mergedFeed: Readable<DisplayItem[]> = derived(
       $siteSharePayables,
       $openSiteShareDecisions,
       $stipendPayables,
-      $stipendConfirmations
+      $stipendConfirmations,
+      $stipendAccruals
     );
   }
 );

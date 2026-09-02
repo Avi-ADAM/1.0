@@ -19,6 +19,7 @@ import type {
   OpenSiteShareDecisionData,
   StipendPayableData,
   StipendConfirmationData,
+  StipendAccrualData,
   WishOfferData
 } from '$lib/stores/levStores';
 // @ts-ignore
@@ -2512,6 +2513,44 @@ export function processStipendConfirmations(
       projectName: c.projectName || projectInfo.projectName || '',
       src: projectInfo.src2 || '',
       ...c
+    };
+  });
+}
+
+/**
+ * Stipend I have earned this cycle and nobody has settled yet (PLAN_STIPEND §6).
+ *
+ * Informational, not a to-do: the next move belongs to the funder, so it sits
+ * *below* the action bands rather than competing with cards that need an
+ * answer. It is here at all because the recipient had no way to see the month
+ * adding up — the funder's pay card carried the only copy of this number
+ * (docs/FIXES.md §10).
+ *
+ * Keyed on the cycle window, so a new month is a new card and a settled one
+ * disappears on the next load.
+ *
+ * Pure function; does not modify input.
+ */
+export function processStipendAccruals(
+  accruals: StipendAccrualData[],
+  projects: ProjectData[]
+): DisplayItem[] {
+  if (!accruals || !Array.isArray(accruals)) {
+    return [];
+  }
+
+  return accruals.map(a => {
+    const projectInfo = createProjectInfo(a.projectId ?? '');
+    return {
+      ani: 'stipendaccrued',
+      azmi: 'stipendaccrued',
+      pl: PRIORITY_BAND.OTHER + 12,
+      coinlapach: `stipendaccrued-${a.pledgeId}-${a.cycleEnd}`,
+      ...projectInfo,
+      projectId: a.projectId ?? '',
+      projectName: a.projectName || projectInfo.projectName || '',
+      src: projectInfo.src2 || '',
+      ...a
     };
   });
 }

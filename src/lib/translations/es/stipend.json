@@ -225,7 +225,16 @@
     "spentOf": "Usado {{spent}} de {{cap}}",
     "paidSoFar": "Pagado hasta ahora: {{count}}",
     "funded": "Financió: {{count}}",
-    "received": "Recibió: {{count}}"
+    "received": "Recibió: {{count}}",
+    "accrued": "Devengado, aún sin pagar",
+    "accruedHint": "{{hours}} horas aprobadas · {{period}}",
+    "pendingHint": "Enviado, a la espera del receptor",
+    "ofCap": "de {{count}}",
+    "mine": "yo",
+    "cycles": "Ciclos pagados",
+    "noCycles": "Todavía no se ha pagado ningún ciclo",
+    "cycleEquity": "Capital: +{{credit}} financiador · −{{debit}} receptor",
+    "filterAll": "Todos"
   },
   "funding": {
     "title": "Buscar un socio que lo financie",
@@ -273,5 +282,25 @@
     "noteRikma": "El coste se reparte por toda la rikma — todos se diluyen juntos, y eso se aprobó en la votación de la misión.",
     "noteGift": "La beca es una donación — no afecta al porcentaje de nadie.",
     "legal": "Una beca de subsistencia entre socios de una rikma: no es un salario ni crea una relación laboral. Quien la recibe es un socio que recibe una ayuda de subsistencia, no un empleado. Esto no es asesoramiento legal ni fiscal."
+  },
+  "cycle": {
+    "forWork": "Por qué trabajo",
+    "period": "Periodo",
+    "equityTitle": "Qué hace esto con los porcentajes",
+    "equityRecipient": "Confirmar la recepción cede {{count}} de tu valor aportado — eso es lo que compra la beca.",
+    "equityRecipientNone": "Tu porcentaje no se mueve: no estás asumiendo el coste de esta beca.",
+    "equityFunder": "Una vez confirmada la recepción, tu valor aportado crece en {{count}}."
+  },
+  "payStatus": {
+    "pending": "Aún sin enviar",
+    "sent": "Esperando confirmación",
+    "confirmed": "Confirmado",
+    "cancelled": "No llegó"
+  },
+  "accrued": {
+    "cardType": "Devengado, aún sin pagar",
+    "body": "{{name}} financia tu beca de subsistencia. Esto es lo que suma el ciclo actual, a partir de horas aprobadas.",
+    "note": "La cifra sale solo de las horas que la rikma aprobó y crece con cada nueva aprobación. No es definitiva hasta que se envía.",
+    "waiting": "La pelota está en {{name}} — cuando se envíe la beca aparecerá aquí una tarjeta para confirmar la recepción."
   }
 }
