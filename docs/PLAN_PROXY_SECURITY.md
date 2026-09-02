@@ -1,5 +1,25 @@
 # תכנית מיגרציה — שרת פרוקסי ונעילת Strapi
 
+> # ✅ הושלם ונאכף בפרודקשן — 2026-09-02
+>
+> `tovmeod.1lev1.com` מחזיר **403** לכל מי שאינו נושא את הסוד. אומת חי באותו יום:
+>
+> | בדיקה | תוצאה |
+> |---|---|
+> | `POST tovmeod/graphql` בלי סוד | **403** |
+> | `tovmeod/admin` בלי סוד | **403** |
+> | עם `x-strapi-gate` / עם cookie `strapi_gate` | 200 |
+> | acme-challenge (פורט 80) | 404 — מגיע ל-nginx, החידוש חי |
+> | `www.1lev1.com` — login, `/me`, `/lev`, `/deals`, `/love` | 200, דאטה אמיתי |
+> | ה-origins שהדפדפן פונה אליהם ב-`/lev` | www (נכסים), fonts, Cloudinary, **api.1lev1.com בלבד** |
+>
+> **מה מחזיק את זה:** `VITE_API_BASE` + `SSR_API_BASE` ב-Vercel (§9, §11) מנתבים
+> גם את הדפדפן וגם את ה-SSR ל-api.1lev1.com; ה-`sveltekit-api` על ה-VPS מדבר עם
+> Strapi ב-`http://strapi:1337` (§5); ו-nginx חוסם את כל השאר (§10). הפרונט על
+> Vercel לא נוגע ב-Strapi בשום מסלול מתוכנן.
+>
+> **מה שנשאר, כולו ניקוי ולא אבטחה:** ראה §13.
+
 > **מטרת-על:** Strapi ייגש רק דרך שרת ה-SvelteKit (פרוקסי). מבחוץ Strapi נעול
 > לחלוטין (bind ל-`127.0.0.1` / firewall). הפרונט פונה אך ורק ל-
 > `/api/send` (GraphQL לפי `qid`), `/api/action` (פעולות), `/api/upload`
@@ -469,8 +489,29 @@ forum `[forumId]` שלח `/api/action` ל-VITE_URL (באג — תוקן ליחס
 `love/+page.js` הפך ל-`+page.server.js` (השאילתה רצה בשרת). legacy שנשאר
 (salesService/authUtils עם bearer מהclient) ממילא מת מאז שה-jwt הפך httpOnly.
 
+> ⚠️ **נכתב מחדש 2026-09-02 — והמימוש חי בריפו `1.0b`, לא כאן.** הגרסה
+> הראשונה ישבה ב-`/tmp` על השרת ונמחקה ב-reboot (`sudo strapi-gate close` →
+> `command not found`). הסיבה העמוקה יותר: **nginx הוא קונטיינר של `1.0b`**,
+> ו-`nginx/default.conf` שלו נמחק ונוצר מחדש מ-`nginx/default.conf.template`
+> **בכל deploy** — כל עריכה ידנית של הקובץ החי נמחקת בפריסה הבאה.
+>
+> לכן השער יושב עכשיו בתבנית עצמה. הקבצים (כולם tracked, כך שהעברת שרת היא
+> `git clone` + deploy): `nginx/default.conf.template` (ה-maps + שורת ה-`if`),
+> `nginx/nginx.conf` (`map_hash_bucket_size 256` — מפתח באורך 64 לא נכנס לדלי
+> ברירת המחדל ו-nginx מסרב לעלות), `nginx/render-conf.sh` (מרנדר: צבע backend +
+> סוד + מצב השער), `nginx/strapi-gate` (ה-CLI), ו-`deploy.ps1` שקורא לרנדרר —
+> **כך שמצב "סגור" שורד פריסה**. תיעוד מלא: `1.0b/docs/STRAPI_GATE.md`.
+>
+> שני שיפורים על הגרסה שאבדה: **גישה גם ב-cookie** (`strapi_gate=<KEY>`), שבלעדיה
+> פאנל האדמין לא יכול לעבוד בדפדפן; ו**acme לא מוחרג אלא לא-מגודר מלכתחילה** —
+> ה-`if` יושב רק בבלוק ה-443, וה-challenge מוגש מבלוק ה-80. `if` ברמת server רץ
+> בשלב ה-rewrite לפני בחירת location, ולכן `location` לא היה יכול להחריג כלום.
+
 **סדר הפעלה:**
-1. חד-פעמי בשרת: `bash /tmp/setup-gate.sh` (הקבצים כבר ב-/tmp; ברירת מחדל פתוח).
+1. חד-פעמי בשרת (אחרי `git pull` ב-`/home/ubuntu/app`):
+   ```
+   printf '#!/bin/sh\nexec bash /home/ubuntu/app/nginx/strapi-gate "$@"\n' | sudo tee /usr/local/bin/strapi-gate >/dev/null && sudo chmod 755 /usr/local/bin/strapi-gate
+   ```
 2. להוסיף `STRAPI_GATE_KEY` (מה-`.env` המקומי) ל-env של **Vercel** + redeploy,
    ולפרוס image חדש ל-api (`.\deploy-api.ps1` — גם בשבילו ה-key ב-.env בשרת).
 3. בדיקה בלי סיכון: `curl -s -o /dev/null -w '%{http_code}' -H "x-strapi-gate: <KEY>"
@@ -650,6 +691,13 @@ sudo certbot renew --dry-run
 אלטרנטיבה שמנתקת את התלות לגמרי: לעבור ל-**DNS-01**, ואז אפשר לסגור גם את
 80/443 של tovmeod ולא רק את ה-API.
 
+> **ועל `/uploads` (עודכן 2026-09-02):** לפי הבעלים, uploads מקומיים של Strapi
+> שימשו רק לניסוי — בפרודקשן הכל Cloudinary (כתובות מוחלטות). כלומר הפטור
+> ל-`/uploads` הוא **זהירות, לא דרישה**: הוא קיים בשביל רשומה ישנה עם נתיב
+> יחסי שתגיע ל-fallback שבלקוח (`VITE_URL + /uploads/…`). הדרך הזולה להחליט:
+> לסגור את השער **עם** הפטור, ואז `grep ' /uploads' /var/log/nginx/access.log`
+> אחרי כמה ימים — אפס פניות ⇒ להסיר את הפטור ולהדק. acme-challenge נשאר בכל מקרה.
+
 ### 12ג. ה-dev המקומי אחרי הסגירה
 
 **ימשיך לעבוד כמו שהוא.** `hooks.server.js` חותם `x-strapi-gate` על כל fetch
@@ -725,3 +773,49 @@ Secure Cookies). ב-jar נקי אין התנגשות והכל עובד.
 ב-localhost רק **הקריאות מהדפדפן** ל-api.1lev1.com נכשלות ב-403, וזה צפוי: ה-cookie
 שם host-only ולא נשלח ל-subdomain אחר. בפרודקשן (www.1lev1.com) שני הצדדים
 תחת `.1lev1.com`, ולכן הבעיה הזו לא קיימת שם.
+
+---
+
+## 13. מה נשאר אחרי הסגירה (2026-09-02) — ניקוי, לא אבטחה
+
+הנעילה עצמה הושלמה (ראה הכותרת בראש המסמך). כל מה שלמטה הוא הידוק והסרת פיגומים.
+
+### 13.1 פתוח
+
+- [ ] **401 בודד בטעינת `/lev`** — אחת מ-6 הקריאות ל-api.1lev1.com. הדף נטען
+      מלא והנתונים שם, ולא ברור שהוא חדש (אין baseline מלפני המיגרציה). לזהות:
+      `docker logs --since 30m sveltekit-api | grep -i ' 401\|Unauthorized'`.
+- [ ] **הפטור ל-`/uploads`** — לפי הבעלים המדיה כולה Cloudinary, כלומר הפטור
+      מיותר. להחליט אמפירית: `grep ' /uploads' /var/log/nginx/access.log` אחרי
+      כמה ימים; אפס פניות ⇒ למחוק את השורה מה-map ב-`1.0b/nginx/default.conf.template`.
+- [ ] **`STRAPI_URL` + `STRAPI_GATE_KEY` ב-Vercel** — נשארו כרשת ביטחון לנתיב
+      שלא עובר ב-`SSR_API_BASE` (פנייה חיצונית ישירה ל-`www.1lev1.com/api/*`,
+      webhook שמצביע לשם). אם אחרי תקופת ריצה אין 403 בלוג של nginx שמקורו
+      ב-Vercel — להסיר את שניהם.
+- [ ] **`test-lev-socket`** — דף בדיקה שלא שייך לפרודקשן (§8 סעיף 6).
+- [ ] **אשכול הקוד המת** `salesService.js` / `productAggregationService.js` /
+      `projectMembershipService.js` (§3.5 "ממצא חדש") — כ-2000 שורות יתומות.
+- [ ] **`check:proxy` ב-CI** — עדיין אין `.github/workflows` (§3.4).
+
+### 13.2 מה שנלמד ונרשם במקום אחר
+
+- `1.0b/docs/STRAPI_GATE.md` — המימוש המלא של השער, כולל **מלכודת ה-inode**
+  (bind mount של קובץ בודד) ו**`--force-recreate` שמפיל את nginx** על compose
+  1.29.2. שתיהן עלו הפעם בהשבתה או בשעה אבודה.
+- `1.0b/TROUBLESHOOTING.md` — אותן שתיים, בשפת "מה עושים כשזה קורה".
+- §12ג כאן — למה התחברות ב-`dev.1lev1.com` לא נשמרת בדפדפן שמחובר לפרודקשן
+  (Strict Secure Cookies), ומה הטסט המקומי שמדמה את Vercel.
+
+### 13.3 החלפת מפתח (אין צורך ב-build)
+
+הסוד לא נאפה לאף image: nginx קורא אותו מקונפיג שמחובר כ-bind mount, וה-SvelteKit
+דרך `$env/dynamic/private`. לכן החלפה היא restart, לא בנייה — וכדי לא ליצור חלון
+שבו nginx מצפה למפתח חדש וה-api עדיין שולח ישן, פותחים קודם:
+
+```
+strapi-gate open
+# .env בשרת + docker-compose up -d sveltekit-api
+# cd /home/ubuntu/app && bash nginx/render-conf.sh
+# Vercel + .env מקומי
+strapi-gate close
+```
