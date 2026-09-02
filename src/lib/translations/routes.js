@@ -41,6 +41,9 @@ export const ROUTED = {
     offerings: at('/me', '/onboard', '/gift', '/user', '/deals/sales-center', /\/moach\/[^/]+\/sales/),
     consensus: at('/consensus'),
     uses: at('/uses'),
+    // The page behind the product - why consent is re-checked at every step.
+    // One route, one namespace; the homepage teaser for it lives in `home`.
+    why: at('/why'),
     planning: at(/\/moach\/[^/]+\/create/),
     // The rikma's API page — one route, one namespace, nowhere else.
     rikmaApi: at(/\/moach\/[^/]+\/api/),

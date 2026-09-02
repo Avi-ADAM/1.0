@@ -93,7 +93,8 @@
     "consensus": "Motor de acuerdo",
     "faq": "Preguntas",
     "login": "Entrar",
-    "signup": "Registrarse"
+    "signup": "Registrarse",
+    "why": "Por qué importa"
   },
   "status": {
     "success": "Hecho con éxito",

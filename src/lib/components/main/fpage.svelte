@@ -370,6 +370,13 @@
       {$t('home.nav.guide')}
     </a>
     <a
+      class="text-barbi border-2 border-lturk font-bold hover:text-gold bg-gold text-center hover:bg-barbi px-1.5 py-0.5 rounded text-base sm:text-sm whitespace-nowrap"
+      data-sveltekit-prefetch
+      href="/why"
+    >
+      {$t('home.nav.why')}
+    </a>
+    <a
       class="text-barbi border-2 border-lturk font-bold hover:text-gold text-center bg-gold hover:bg-barbi px-1.5 py-0.5 rounded text-base sm:text-sm whitespace-nowrap"
       target="_blank"
       href="https://agreement.1lev1.com/love"
@@ -430,6 +437,12 @@
       type="button"
       class="hover:text-gold transition-colors whitespace-nowrap"
       onclick={() => scrollToId('faq')}>{$t('home.sections.navFaq')}</button
+    >
+    <a
+      href="/why"
+      data-sveltekit-prefetch
+      class="hover:text-gold transition-colors whitespace-nowrap"
+      >{$t('home.nav.why')}</a
     >
   </nav>
   <div
@@ -876,6 +889,20 @@
             {$t('home.sections.painTurn')}
           </p>
         </div>
+        <!-- The one place on the page where "why is work like this at all?"
+             is the reader's own question rather than ours: they have just read
+             four lines describing it. A plain text link, not a card - the
+             banner for /why sits far below, and a second card here would read
+             as a pitch at the exact moment the section earns its trust. -->
+        <p class="mt-3 text-center">
+          <a
+            href="/why"
+            data-sveltekit-prefetch
+            class="text-barbi font-semibold text-base sm:text-sm underline decoration-barbi/40 underline-offset-4 hover:text-gold"
+          >
+            {$t('home.why.inline')} {$isRtl ? '←' : '→'}
+          </a>
+        </p>
         {#if $lang === 'he'}
           <div class="mt-5 text-center">
             <button
@@ -1761,6 +1788,40 @@
               </details>
             {/each}
           </div>
+        </section>
+
+        <!-- ===== באנר /why — העמוד שמאחורי המוצר =====
+             יושב אחרי השאלות הנפוצות ולא לפניהן, בכוונה. מי שהגיע עד לפה כבר
+             יודע מה המערכת עושה ולמי היא מתאימה, וזה הקהל היחיד שהשאלה "למה
+             בכלל בנינו את זה ככה" רלוונטית עבורו. גבוה יותר בעמוד, לפני
+             שהתועלת הפרקטית הובהרה, אותו טקסט קורא כאג'נדה ומבריח מבקר שבא
+             לבדוק כלי ניהול — ולכן גם כאן זה באנר קצר אחד, וכל הטיעון עצמו
+             (עם המספרים, הציטוטים והמקורות) יושב ב-/why. -->
+        <section
+          id="why"
+          class="w-full max-w-xl mt-2 mb-6 scroll-mt-16"
+          style="font-family:'Sababa',sans-serif;"
+        >
+          <a
+            href="/why"
+            data-sveltekit-prefetch
+            class="group flex flex-col gap-2 rounded-3xl border-2 border-gold/70 bg-gradient-to-br from-[#fff6ea] via-[#fdeef4] to-[#f6e6fb] px-6 py-5 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
+          >
+            <span class="text-barbi font-semibold text-xs tracking-wide">
+              {$t('home.why.eyebrow')}
+            </span>
+            <span class="text-rose-800 font-bold text-xl sm:text-lg leading-snug">
+              {$t('home.why.title')}
+            </span>
+            <span class="text-slate-700 text-base sm:text-sm leading-relaxed">
+              {$t('home.why.desc')}
+            </span>
+            <span
+              class="text-barbi font-semibold text-sm mt-0.5 group-hover:underline"
+            >
+              {$t('home.why.cta')} {$isRtl ? '←' : '→'}
+            </span>
+          </a>
         </section>
 
         <!-- בלוק: באנר /guid — המדריך המלא. יושב מיד אחרי השאלות הנפוצות: מי

@@ -46,7 +46,8 @@
     "faq": "Preguntas frecuentes",
     "guide": "Guía",
     "agreementMap": "Mapa de acuerdos",
-    "changeLanguage": "Cambiar idioma"
+    "changeLanguage": "Cambiar idioma",
+    "why": "Por qué importa"
   },
   "languages": {
     "en": "English",
@@ -619,5 +620,12 @@
       "d": "El arranque más lento de los tres: una primera rikma casi nunca paga el primer mes. Pero puedes ser socio de varias a la vez, y se suman. Y cuando paras, lo ya construido sigue pagando."
     },
     "decade": "En toda la década: quien trabaja por su cuenta se lleva {{freelancer}}× lo del empleado, y quien es socio {{partner}}×."
+  },
+  "why": {
+    "eyebrow": "💬 Por qué construimos esto",
+    "title": "Exactamente las mismas palabras. A veces son un pedido, a veces una exigencia.",
+    "desc": "Toda la diferencia está en lo que ocurre cuando la respuesta es no, y de esa frase se deriva todo lo construido aquí. Hay una página que lo explica, con números y fuentes.",
+    "cta": "Leer por qué",
+    "inline": "¿Y por qué es así, para empezar?"
   }
 }

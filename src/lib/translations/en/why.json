@@ -1,0 +1,128 @@
+{
+  "meta": {
+    "title": "Why 1💗1 · On requests, demands, and consent that stays current",
+    "description": "Almost every working relationship rests on consent given once, long ago. Here is what changes when it is replaced by consent that is re-checked at every step - and why that also works commercially."
+  },
+  "hero": {
+    "eyebrow": "◈ Why we are building this ◈",
+    "title": "The same words exactly. Sometimes a request, sometimes a demand.",
+    "lede": "This page is not about bad people. It is about one arrangement, so ordinary that almost nobody examines it - and about what changes the moment somebody does.",
+    "note": "And if you run a business that works and you just came for a management tool, skip this page with a clear conscience. The platform works perfectly well without it, and that is entirely your call."
+  },
+  "ask": {
+    "kicker": "◈ Two sentences that sound identical",
+    "title": "\"Could you stay until nine tonight?\"",
+    "p1": "A friend asks it. A manager asks it. Same words, same tone, same smile. And still they are two completely different things - and every one of us can tell them apart without ever having been taught how.",
+    "p2": "The difference is not in the sentence. It is in what happens when the answer is no.",
+    "quote": "Requests are received as demands when listeners believe that they will be blamed or punished if they do not comply.",
+    "cite": "Marshall B. Rosenberg, Nonviolent Communication",
+    "p3": "Say no to a friend and the conversation continues. Say no where authority exists and something is recorded. Not necessarily a reprimand - sometimes half a sentence, sometimes only the knowledge that it will come up at the review in December. And once that knowledge exists, what was said was never a request. It was a demand, phrased kindly.",
+    "p4": "Here is the least popular sentence on this page: most managers do not want to coerce anyone. The overwhelming majority are decent people doing a hard job under real pressure. Coercion does not live in the person - it lives in the structure, and it operates even when both sides mean well."
+  },
+  "once": {
+    "kicker": "◈ Yesterday's signature",
+    "title": "You consented once. It has been working on your behalf ever since.",
+    "p1": "Employment almost always begins with genuine consent. Someone read, considered, wanted it, and signed. What happens next is the interesting part: from that day on, that consent - given by a different person, in different circumstances, two years ago - is what binds them today.",
+    "p2": "And leaving is not simple. There is a contract, a notice period, rent due on the first, and children who need collecting. So the consent stands, and on most days it is still accurate. It has simply stopped being checked.",
+    "quote": "I cannot voluntarily transfer my own actions in like manner. It is not a matter of “should not”; it is can not do it.",
+    "cite": "David Ellerman, economist, formerly senior adviser at the World Bank",
+    "p3": "Ellerman's argument is simple: you can transfer ownership of an object to someone else, but you cannot transfer your own responsibility and your own decisions. Even when both sides agree to behave as though they had been transferred, whoever performs an action is always also the one choosing to perform it. And that, he adds, does not change with the length of the contract - not for a one-day engagement and not for a twenty-year one.",
+    "quote2": "Many of us are governed far more - and far more obtrusively - by the private government of the workplace.",
+    "cite2": "Elizabeth Anderson, Private Government, Princeton University Press, 2017",
+    "p4": "Anderson, a philosopher at the University of Michigan, opens the book with a single figure: one in four American workers describes their workplace as a \"dictatorship\". She calls nobody a villain. She only asks why this form of government - the one most of us actually live under for eight hours a day - is the one we never discuss."
+  },
+  "price": {
+    "kicker": "◈ What it costs",
+    "title": "You do not have to take our word for it. There are numbers.",
+    "p1": "If the arrangement worked well, you would expect that to show up in the data. What shows up is this:",
+    "stat1v": "20%",
+    "stat1l": "of employees worldwide are engaged at work (2025) - the lowest since 2020",
+    "stat2v": "22%",
+    "stat2l": "engagement among managers - down nine points in three years",
+    "stat3v": "$10 trillion",
+    "stat3l": "estimated annual cost to the world economy in lost productivity",
+    "source": "Gallup, State of the Global Workplace 2026",
+    "p2": "These numbers do not say people are lazy. They say that an arrangement where one person decides and another performs gets far less out of human beings than is actually in them. That is no longer a moral argument. It is arithmetic."
+  },
+  "other": {
+    "kicker": "◈ The other side",
+    "title": "The opposite of authority is not chaos. The opposite of authority is negotiation.",
+    "p1": "The first question is always: if nobody can demand anything, how does anything get done? The answer is that every request becomes a proposal - and a proposal has three possible answers, none of which is a door-closing no.",
+    "a1t": "Approve",
+    "a1d": "Take the proposal as it stands, and move on.",
+    "a2t": "Talk",
+    "a2d": "Not clear enough yet. Keep clarifying before deciding.",
+    "a3t": "Counter-propose",
+    "a3d": "A more precise version of the same proposal, sent back to the other side. \"I received nothing\" is said here as a counter-proposal of zero, not as a veto.",
+    "silence": "And every proposal carries a clock. If nobody responds before it runs out, the last version on the table is approved. A counter-proposal resets the clock. So silence never blocks anything - and nobody gets steamrolled either.",
+    "p2": "This is not something we invented. In sociocracy, a decades-old system of organisational governance, the same distinction is the core: you may object, but an objection has to carry a reason and is not a veto. The bar is not \"everybody loves it\" but \"good enough for now, and safe enough to try\"."
+  },
+  "works": {
+    "kicker": "◈ And it also works",
+    "title": "The world's largest tomato processor runs without a single manager",
+    "p1": "Morning Star: around six hundred permanent colleagues plus some four thousand seasonal ones, close to a billion dollars in annual revenue, and the global market leader in tomato processing. No bosses, no titles, no promotions.",
+    "quote": "All interactions should be voluntary. Not a single colleague can force another colleague to do something they don't want to do.",
+    "cite": "From Morning Star's self-management principles",
+    "p2": "Instead of a job description written from above, each person there writes a personal letter of understanding - and negotiates it with the roughly ten colleagues their work touches. The people who depend on you are the ones who agree your commitments with you. Harvard Business Review gave this a full article, titled \"First, Let's Fire All the Managers\".",
+    "p3": "Nor is it an isolated case. Virginie Pérotin, an economist at the University of Leeds, reviewed dozens of studies of employee-owned businesses around the world:",
+    "quote2": "The cooperatives survive 29 percent longer than the other firms.",
+    "cite2": "Virginie Pérotin, interviewed by Shareable, 2019",
+    "p4": "On productivity she sums it up in one sentence: \"In general businesses would produce more if they behaved like co-ops.\" A business people choose again every morning is not a commercial concession. On most measures it is simply a better business."
+  },
+  "how": {
+    "kicker": "◈ From idea to mechanics",
+    "title": "Where this actually lives, on real screens",
+    "sub": "Every line here is a screen that exists in the system, not a future intention.",
+    "r1t": "Every proposal takes one of three routes",
+    "r1d": "Price, task, budget, adding a partner, splitting profit - all of them are decisions, and all of them close by approval, conversation, or counter-proposal.",
+    "r2t": "Every rikma sets its own clock",
+    "r2d": "You decide how long there is to respond. Silence matures into consent at the pace you chose, not one imposed on you.",
+    "r3t": "Percentages follow what you gave",
+    "r3d": "Hours, money, equipment and knowledge are recorded by agreement as they happen, and your share of the profit updates itself. No number is fixed once and left forever.",
+    "r4t": "Undoing things needs consent too",
+    "r4d": "Removing a mission, a resource or a product from a rikma is a consent process exactly as its creation was. You can propose a different version, and nobody can erase what someone has already given.",
+    "r5t": "You cannot report on someone else's behalf",
+    "r5d": "Reporting that the money is held by another person is a statement about their finances, so it requires their consent. Until they confirm it, it is not counted.",
+    "r6t": "You can leave",
+    "r6d": "There is no contract here that binds you going forward. What you accrued stays yours, and participation itself is under constant review.",
+    "ctaConsensus": "See the consent engine working",
+    "ctaGuide": "Read the full system guide"
+  },
+  "not": {
+    "kicker": "◈ Explicitly",
+    "title": "What this page is not saying",
+    "n1t": "This is not against employers",
+    "n1d": "If you employ people today, you are not the villain here. You most likely carry risk none of your employees carry, and paid salaries on time in months when it hurt. The claim is about the arrangement, not about you.",
+    "n2t": "It does not ask you to dismantle anything",
+    "n2d": "Nobody has to convert their business overnight. Start with one side project and two or three partners, and see what happens.",
+    "n3t": "It is not a movement and not a belief",
+    "n3d": "There is nothing here to believe in and nothing to join. There is a way of working, and its only test is whether it works for you.",
+    "n4t": "It is not \"everyone decides everything\"",
+    "n4d": "Whoever is responsible for something decides it. Negotiation is needed only when one person's decision reaches into another person's life.",
+    "n5t": "And it does not mean there is no \"no\"",
+    "n5d": "You can refuse anything. There is simply no \"no\" that ends the conversation - there is \"no, and here is the version that would work for me\"."
+  },
+  "biz": {
+    "title": "And if you only came for the business",
+    "p1": "That is completely fine. You can use 1💗1 as an ordinary management system - tasks, boards, hours, sales, profit splits - and never read a word of this.",
+    "p2": "This is written because some people do ask, and they deserve to find an answer. Everyone else is welcome to ignore it."
+  },
+  "close": {
+    "title": "Where a world actually changes",
+    "p1": "Not through laws and not through declarations. Through two people settling something between them without either of them having to.",
+    "p2": "That is all this site does: it takes that moment, reduces it to mechanics - proposal, answer, clock, both signatures - and repeats it a great many times.",
+    "ctaPrimary": "Start a rikma",
+    "ctaSecondary": "See the consent engine",
+    "ctaAgreement": "The global agreement"
+  },
+  "sources": {
+    "title": "Sources",
+    "s1": "Elizabeth Anderson, Private Government: How Employers Rule Our Lives (and Why We Don't Talk about It), Princeton University Press, 2017",
+    "s2": "David Ellerman, Inalienable Rights: A Litmus Test, Law and Philosophy, 2010 · ellerman.org",
+    "s3": "Marshall B. Rosenberg, Nonviolent Communication: A Language of Life, PuddleDancer Press",
+    "s4": "Gallup, State of the Global Workplace 2026",
+    "s5": "Virginie Pérotin, What Do We Really Know About Worker Co-operatives?, Co-operatives UK, 2016 · Shareable, 2019",
+    "s6": "Gary Hamel, First, Let's Fire All the Managers, Harvard Business Review, December 2011 · Corporate Rebels on Morning Star",
+    "s7": "Sociocracy For All, Consent Decision Making"
+  }
+}
