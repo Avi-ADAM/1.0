@@ -208,8 +208,79 @@ MCP נותן **ידיים**, Skill נותן **שיקול דעת**. סוכן שמ
 
 **גל 2 — פרסום.** ✅ הריפו הציבורי עלה. ⬜ נותר: פרסום `1lev1-mcp@1.0.4` ל-npm
 (דורש `npm login` — הטוקן פג); PR לרשימות; דף `/ai`
-באתר; קישור מ-npm.
+באתר; קישור מ-npm; ✅ תיקון המניפסטים לסכימה + ⬜ תיאור ו-topics לריפו
+(ראה חלק ו').
 
 **גל 3 — העמקה.** `getProjectContextTool` ב-MCP; דפוס ההצעה-ואישור מ-שלב 2 של
 `PLAN_AI_ERA` על הפעולות הכבדות; Skill שני ייעודי ל-`/api/v1/tasks` (גשר
 issues↔מטלות) לקהל שכבר יש לו ריקמה.
+
+---
+
+## חלק ו' — גילוי: למה 1lev1 לא מופיע ב-buildwithclaude
+
+`buildwithclaude.com/plugins?q=1lev1` מחזיר ריק (2.9.2026). זה **לא** אומר
+שמשהו שבור — זו שאלה של איך האינדוקס עובד ומה עוד חסר לריפו.
+
+### איך האינדוקס באמת עובד
+
+buildwithclaude (`davepoon/buildwithclaude`) הוא **קטלוג קהילתי**, לא
+ה-marketplace הרשמי של Anthropic. הוא לא דורש הרשמה ואין לו טופס הגשה — ה-PR
+ב-`CONTRIBUTING.md` הוא רק ל-agents/commands/hooks שנכנסים לריפו שלו עצמו.
+marketplace-ים חיצוניים נסרקים אוטומטית מ-GitHub. מה שנצפה ב-API שלו:
+
+| עובדה | מה למדנו |
+|---|---|
+| `/api/marketplaces` מחזיר `total: 17784` | הקטלוג רחב, לא מסונן ידנית |
+| `lastIndexedAt` של הרשומות התחתונות = היום, `05:03Z` | יש סריקה **יומית** |
+| רשומות עם `stars: 0`, `pluginCount: 0`, `description: ""` נמצאות בפנים | **אין סף כוכבים ואין דרישת איכות** |
+| `description` ו-`categories` של רשומה = ה-description וה-**topics** של ריפו ה-GitHub, לא של `marketplace.json` | הקטלוג מושך מטא-דאטה מ-GitHub |
+| `/api/marketplaces?q=1lev1` → `{"marketplaces":[],"total":0}` | הריפו פשוט עוד לא נסרק |
+
+התנאי היחיד להיכנס: ריפו **ציבורי** עם `.claude-plugin/marketplace.json`
+בשורש, שהסורק מוצא דרך חיפוש ב-GitHub.
+
+### מה מצב `Avi-ADAM/1lev1-agent` בפועל
+
+✅ ציבורי · ✅ `.claude-plugin/marketplace.json` בשורש · ✅
+`plugins/1lev1/.claude-plugin/plugin.json` · ✅ `skills/1lev1-platform/SKILL.md`
+· ✅ LICENSE · ✅ README.
+
+**הקומיט הראשון הוא מ-30.8.2026 — הריפו בן שלושה ימים.** ההסבר הפשוט ביותר
+לחוסר הופעה הוא שחיפוש הקוד של GitHub עוד לא אינדקס ריפו חדש, קטן וללא כוכבים,
+ולכן הסורק היומי לא ראה אותו. זה נפתר מעצמו — אבל שלושה דברים מגדילים משמעותית
+את הסיכוי, ואחד מהם היה באג של ממש:
+
+1. **✅ תוקן — `marketplace.json` לא תאם לסכימה.** `description` ו-`version`
+   ישבו בתוך `metadata` במקום ברמה העליונה, ולרשומת ה-plugin חסרו
+   `author`, `license`, `homepage` ו-`repository` — שדות שהתיעוד הרשמי מגדיר
+   כנדרשים ברשומת plugin. פרסר מחמיר היה מדלג על הרשומה; פרסר סלחני היה מציג
+   plugin בלי תיאור ובלי בעלים. שני המניפסטים עודכנו ל-0.1.1 עם `$schema`.
+2. **⬜ לריפו אין `description` ואין `topics` ב-GitHub.** אלה בדיוק שני השדות
+   שהקטלוג מעתיק (`description`, `categories`). בלעדיהם הכרטיס בקטלוג יוצא ריק
+   גם אחרי שייסרק, וגם חיפוש `q=1lev1` נשען עליהם. להוסיף topics:
+   `claude-code`, `claude-code-plugin`, `claude-plugin`, `agent-skills`,
+   `mcp`, `mcp-server`, `partnership`, `equity`.
+3. **⬜ אין קישורים נכנסים.** הסורקים מגיעים לריפו דרך רשימות. PR ל-
+   `awesome-claude-code`, `hesreallyhim/awesome-claude-code`, ורשימות
+   plugins/skills — הוא גם ערוץ גילוי אנושי וגם מה שמכניס את הריפו לאינדקס
+   של GitHub מהר יותר.
+
+### ה-MCP הוא ערוץ נפרד ועוד לא נעשה בו כלום
+
+הקטלוג מציג גם ~4,500 שרתי MCP, והם **לא** מגיעים מ-`marketplace.json` אלא
+מרג'יסטרי MCP ציבוריים. `https://api.1lev1.com/api/mcp` לא רשום באף אחד מהם.
+זה ערוץ נפרד לגמרי, ובמקרה שלנו הוא דווקא החזק יותר: המצב הלא-מאומת מחזיר
+`getPlatformInfo` בלי שום הרשמה, כלומר כל מי שמדפדף ברג'יסטרי יכול לנסות אותנו
+בקליק. להירשם ל-registry.modelcontextprotocol.io (הרשמי) ולרשימות
+`awesome-mcp-servers`.
+
+### מה שלא יעזור
+
+- **להוסיף `marketplace.json` לריפו הזה (`Avi-ADAM/1.0`).** מקור האמת הוא
+  `1lev1-agent` בכוונה — ראה חלק ג'. שני marketplace-ים עם אותו `name: "1lev1"`
+  יתחרו זה בזה.
+- **ה-`.claude/skills/` שבריפו הזה.** אלה skills של צד שלישי שהותקנו לפיתוח
+  (`skills-lock.json`), לא שלנו, ואין להם שום קשר לגילוי.
+- **`.mcp.json` שבשורש.** זו הגדרה מקומית לפיתוח, לא מניפסט שמתפרסם לשום מקום.
+  ⚠️ הוא גם מכיל מפתח `Bearer` בתוך ריפו ציבורי — לבטל ולהעביר למשתנה סביבה.
