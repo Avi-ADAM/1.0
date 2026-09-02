@@ -45,7 +45,8 @@
     "faq": "FAQ",
     "guide": "Guide",
     "agreementMap": "Agreement Map",
-    "changeLanguage": "Change Language"
+    "changeLanguage": "Change Language",
+    "why": "Why this matters"
   },
   "languages": {
     "en": "English",
@@ -623,6 +624,7 @@
     "eyebrow": "💬 Why we are building this",
     "title": "The same words exactly. Sometimes a request, sometimes a demand.",
     "desc": "The whole difference is what happens when the answer is no - and everything built here follows from that one sentence. There is a page explaining why, with numbers and sources.",
-    "cta": "Read why"
+    "cta": "Read why",
+    "inline": "And why is it like this in the first place?"
   }
 }

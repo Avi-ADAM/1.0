@@ -46,7 +46,8 @@
     "faq": "Preguntas frecuentes",
     "guide": "Guía",
     "agreementMap": "Mapa de acuerdos",
-    "changeLanguage": "Cambiar idioma"
+    "changeLanguage": "Cambiar idioma",
+    "why": "Por qué importa"
   },
   "languages": {
     "en": "English",
@@ -624,6 +625,7 @@
     "eyebrow": "💬 Por qué construimos esto",
     "title": "Exactamente las mismas palabras. A veces son un pedido, a veces una exigencia.",
     "desc": "Toda la diferencia está en lo que ocurre cuando la respuesta es no, y de esa frase se deriva todo lo construido aquí. Hay una página que lo explica, con números y fuentes.",
-    "cta": "Leer por qué"
+    "cta": "Leer por qué",
+    "inline": "¿Y por qué es así, para empezar?"
   }
 }

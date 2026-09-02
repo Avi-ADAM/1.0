@@ -370,6 +370,13 @@
       {$t('home.nav.guide')}
     </a>
     <a
+      class="text-barbi border-2 border-lturk font-bold hover:text-gold bg-gold text-center hover:bg-barbi px-1.5 py-0.5 rounded text-base sm:text-sm whitespace-nowrap"
+      data-sveltekit-prefetch
+      href="/why"
+    >
+      {$t('home.nav.why')}
+    </a>
+    <a
       class="text-barbi border-2 border-lturk font-bold hover:text-gold text-center bg-gold hover:bg-barbi px-1.5 py-0.5 rounded text-base sm:text-sm whitespace-nowrap"
       target="_blank"
       href="https://agreement.1lev1.com/love"
@@ -430,6 +437,12 @@
       type="button"
       class="hover:text-gold transition-colors whitespace-nowrap"
       onclick={() => scrollToId('faq')}>{$t('home.sections.navFaq')}</button
+    >
+    <a
+      href="/why"
+      data-sveltekit-prefetch
+      class="hover:text-gold transition-colors whitespace-nowrap"
+      >{$t('home.nav.why')}</a
     >
   </nav>
   <div
@@ -876,6 +889,20 @@
             {$t('home.sections.painTurn')}
           </p>
         </div>
+        <!-- The one place on the page where "why is work like this at all?"
+             is the reader's own question rather than ours: they have just read
+             four lines describing it. A plain text link, not a card - the
+             banner for /why sits far below, and a second card here would read
+             as a pitch at the exact moment the section earns its trust. -->
+        <p class="mt-3 text-center">
+          <a
+            href="/why"
+            data-sveltekit-prefetch
+            class="text-barbi font-semibold text-base sm:text-sm underline decoration-barbi/40 underline-offset-4 hover:text-gold"
+          >
+            {$t('home.why.inline')} {$isRtl ? '←' : '→'}
+          </a>
+        </p>
         {#if $lang === 'he'}
           <div class="mt-5 text-center">
             <button

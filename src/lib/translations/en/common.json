@@ -92,7 +92,8 @@
     "consensus": "Agreement engine",
     "faq": "FAQ",
     "login": "Log in",
-    "signup": "Sign up"
+    "signup": "Sign up",
+    "why": "Why this matters"
   },
   "status": {
     "success": "Success",
