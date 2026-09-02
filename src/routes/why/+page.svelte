@@ -211,7 +211,6 @@
 
   <footer class="sources">
     <h2>{$t('why.sources.title')}</h2>
-    <p class="sub">{$t('why.sources.note')}</p>
     <ul>
       {#each SOURCES as s (s)}
         <li dir="ltr">{$t(`why.sources.${s}`)}</li>
