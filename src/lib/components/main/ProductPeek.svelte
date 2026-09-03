@@ -263,7 +263,7 @@
                   style="background: radial-gradient(circle at center, {levCards[cardIdx]
                     .glow}, transparent 70%);"
                 ></div>
-                <span class="relative"><EntityIcon kind={levCards[cardIdx].icon} size={20} /></span>
+                <span class="relative"><EntityIcon kind={levCards[cardIdx].icon} size={20} tone="brand" /></span>
                 <span class="relative flex-1 min-w-0">
                   <span class="block text-sm font-bold text-slate-800 truncate"
                     >{levCards[cardIdx].project}</span
@@ -402,7 +402,7 @@
             class="h-[250px] flex flex-col items-center justify-center text-center gap-2"
             in:fade={{ duration: 300 }}
           >
-            <EntityIcon kind="lev" size={46} />
+            <EntityIcon kind="lev" size={46} tone="onDark" />
             <p class="text-white font-bold text-lg">{$t('home.peek.lev.done')}</p>
             <p class="text-white/60 text-sm max-w-xs">{$t('home.peek.lev.doneSub')}</p>
             <button
@@ -436,7 +436,7 @@
             <span
               class="relative flex flex-col items-center gap-1 bg-white/5 border border-white/10 rounded-2xl px-4 py-3 min-w-[90px]"
             >
-              <EntityIcon kind={s.icon} size={20} />
+              <EntityIcon kind={s.icon} size={20} tone="onDark" />
               <span class="text-xs text-white/80 text-center">{s.label}</span>
               <span
                 class="absolute -top-1.5 -end-1.5 w-5 h-5 rounded-full bg-barbi text-white text-[10px] font-bold flex items-center justify-center"
@@ -454,7 +454,7 @@
             <div
               class="flex items-center gap-3 px-4 py-2.5 rounded-2xl bg-white/5 border border-white/10"
             >
-              <EntityIcon kind={item.icon} size={18} />
+              <EntityIcon kind={item.icon} size={18} tone="onDark" />
               <span class="flex-1 text-sm text-white text-start">{item.text}</span>
               <span class="text-white/30 text-xs shrink-0"
                 >{$locale === 'he' || $locale === 'ar' ? '←' : '→'}</span
@@ -468,7 +468,7 @@
         </p>
         <div class="rounded-2xl bg-white/5 border border-white/10 p-4">
           <div class="flex items-center gap-3">
-            <EntityIcon kind="piece" size={22} />
+            <EntityIcon kind="piece" size={22} tone="onDark" />
             <span class="text-white font-semibold text-base text-start flex-1">
               {$t('home.peek.mission.name')}
             </span>

@@ -55,7 +55,12 @@
     gap: 0.4rem;
     border: 1px solid rgba(179, 135, 40, 0.45);
     background: white;
-    color: var(--stgold, #574010);
+    /* Was --stgold, which business/dark flips to #cbd5e1 for the dark surfaces
+       it sits on elsewhere — but this pill's background is hard-coded white, so
+       the label and its icon measured 1.47:1 there. --ramp-ink is the token for
+       exactly this case: dark in every theme and every mode, because the
+       surface it inks never darkens (see :root in app.postcss). */
+    color: var(--ramp-ink, #16131b);
     border-radius: 9999px;
     padding: 0.35rem 0.9rem;
     font-size: 0.88rem;
