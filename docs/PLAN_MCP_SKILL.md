@@ -163,7 +163,7 @@ MCP נותן **ידיים**, Skill נותן **שיקול דעת**. סוכן שמ
 | ערוץ | מה נדרש |
 |---|---|
 | רשימות skills/plugins קהילתיות (awesome-claude-code וכו') | PR עם שורה + לינק |
-| רג'יסטרי MCP ציבורי | ה-`url` הציבורי + תיאור; המצב הלא-מאומת נותן demo בלי הרשמה |
+| רג'יסטרי MCP ציבורי | `server.json` עם `remotes` (לא `packages` — ה-CLI אינו שרת); המצב הלא-מאומת נותן demo בלי הרשמה |
 | npm | לקשר את `1lev1-mcp` לריפו ה-plugin ב-`repository` וב-README |
 | דף באתר — `/ai` או `/mcp` | "חבר את Claude/Cursor ל-1lev1 בשתי דקות". שלב 3ב'5 ב-`PLAN_AI_ERA` |
 | README של ריקמות ציבוריות | badge "מנוהל ב-1lev1" עם לינק להתקנה |
@@ -206,10 +206,12 @@ MCP נותן **ידיים**, Skill נותן **שיקול דעת**. סוכן שמ
 `/api/mcp/[apiKey]` משימוש (410). ⬜ נותר: rate limiting פר-מפתח,
 `touchLastUsed` בכל קריאת MCP (קיים ב-`apiKeys.ts`, לא מחובר לנתיב ה-MCP).
 
-**גל 2 — פרסום.** ✅ הריפו הציבורי עלה. ⬜ נותר: פרסום `1lev1-mcp@1.0.4` ל-npm
-(דורש `npm login` — הטוקן פג); PR לרשימות; דף `/ai`
-באתר; קישור מ-npm; ✅ תיקון המניפסטים לסכימה + ⬜ תיאור ו-topics לריפו
-(ראה חלק ו').
+**גל 2 — פרסום.** ✅ הריפו הציבורי עלה. ✅ **`1lev1-mcp@2.0.0` פורסם ל-npm
+ב-30.8.2026** — הסעיף הזה תיעד "נותר לפרסם `1.0.4`, הטוקן פג" והיה פשוט לא
+מעודכן; `registry.npmjs.org` מראה `dist-tags.latest = 2.0.0`, וגרסאות
+1.0.0/1.0.1/1.0.2 לפניה. אין 1.0.4 ולא היה. ✅ תיקון המניפסטים לסכימה.
+⬜ נותר: תיאור ו-topics לריפו `1lev1-agent` (ראה חלק ו'); רישום ברג'יסטרי
+ה-MCP הרשמי; PR לרשימות; דף `/ai` באתר.
 
 **גל 3 — העמקה.** `getProjectContextTool` ב-MCP; דפוס ההצעה-ואישור מ-שלב 2 של
 `PLAN_AI_ERA` על הפעולות הכבדות; Skill שני ייעודי ל-`/api/v1/tasks` (גשר
@@ -266,14 +268,40 @@ marketplace-ים חיצוניים נסרקים אוטומטית מ-GitHub. מה 
    plugins/skills — הוא גם ערוץ גילוי אנושי וגם מה שמכניס את הריפו לאינדקס
    של GitHub מהר יותר.
 
-### ה-MCP הוא ערוץ נפרד ועוד לא נעשה בו כלום
+### ה-MCP הוא ערוץ נפרד — ומה בדיוק רושמים שם
 
 הקטלוג מציג גם ~4,500 שרתי MCP, והם **לא** מגיעים מ-`marketplace.json` אלא
-מרג'יסטרי MCP ציבוריים. `https://api.1lev1.com/api/mcp` לא רשום באף אחד מהם.
-זה ערוץ נפרד לגמרי, ובמקרה שלנו הוא דווקא החזק יותר: המצב הלא-מאומת מחזיר
-`getPlatformInfo` בלי שום הרשמה, כלומר כל מי שמדפדף ברג'יסטרי יכול לנסות אותנו
-בקליק. להירשם ל-registry.modelcontextprotocol.io (הרשמי) ולרשימות
-`awesome-mcp-servers`.
+מרג'יסטרי MCP ציבוריים. אומת: `registry.modelcontextprotocol.io/v0/servers?search=1lev1`
+מחזיר `count: 0`. זה ערוץ נפרד לגמרי, ובמקרה שלנו הוא דווקא החזק יותר: המצב
+הלא-מאומת מחזיר `getPlatformInfo` בלי שום הרשמה, כלומר כל מי שמדפדף ברג'יסטרי
+יכול לנסות אותנו בקליק.
+
+**רושמים את השרת המרוחק, לא את חבילת ה-npm.** `1lev1-mcp` ב-npm הוא **לא**
+שרת MCP — הוא CLI שפותח דפדפן, מאמת, וכותב קונפיג. רישום שלו כ-`packages` היה
+גורם ללקוח רג'יסטרי להריץ אותו כשרת stdio ולקבל זרימת דפדפן במקום פרוטוקול.
+הרשומה הנכונה היא `remotes` בלבד — בדיוק הצורה של `ac.inference.sh/mcp`
+שכבר רשומה שם. `server.json` מאומת מול הסכימה
+(`2025-12-11/server.schema.json`) יושב ב-`Avi-ADAM/1lev1-mcp`:
+
+```json
+{
+  "name": "com.1lev1/mcp",
+  "title": "1lev1",
+  "description": "Track partnership work, log mission hours, and see what needs your approval on 1lev1.com.",
+  "version": "1.0.0",
+  "websiteUrl": "https://1lev1.com",
+  "remotes": [{ "type": "streamable-http", "url": "https://api.1lev1.com/api/mcp" }]
+}
+```
+
+שתי הערות על השם: `description` מוגבל ל-100 תווים בסכימה, ו-`name` חייב להתאים
+למנגנון האימות. `com.1lev1/mcp` דורש **DNS TXT על ה-apex של `1lev1.com`**
+(`v=MCPv1; k=ed25519; p=…`, לא תחת selector). החלופה הזולה היא
+`io.github.avi-adam/1lev1` עם `mcp-publisher login github` — בלי רשומת DNS
+בכלל. שתיהן עוברות את ה-regex של הסכימה; הראשונה נראית רשמית יותר, השנייה
+עולה היום. הפרסום עצמו דורש credentials שלך, אז זה שלב ידני.
+
+בנוסף: `awesome-mcp-servers` וכיוצא בו — PR עם שורה.
 
 ### מה שלא יעזור
 
