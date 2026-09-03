@@ -210,8 +210,9 @@ MCP נותן **ידיים**, Skill נותן **שיקול דעת**. סוכן שמ
 ב-30.8.2026** — הסעיף הזה תיעד "נותר לפרסם `1.0.4`, הטוקן פג" והיה פשוט לא
 מעודכן; `registry.npmjs.org` מראה `dist-tags.latest = 2.0.0`, וגרסאות
 1.0.0/1.0.1/1.0.2 לפניה. אין 1.0.4 ולא היה. ✅ תיקון המניפסטים לסכימה.
-⬜ נותר: תיאור ו-topics לריפו `1lev1-agent` (ראה חלק ו'); רישום ברג'יסטרי
-ה-MCP הרשמי; PR לרשימות; דף `/ai` באתר.
+✅ **השרת רשום ברג'יסטרי ה-MCP הרשמי** (3.9.2026,
+`io.github.Avi-ADAM/1lev1`). ⬜ נותר: תיאור ו-topics לריפו `1lev1-agent`
+(ראה חלק ו') — החסם היחיד שנשאר בצד ה-plugin; PR לרשימות; דף `/ai` באתר.
 
 **גל 3 — העמקה.** `getProjectContextTool` ב-MCP; דפוס ההצעה-ואישור מ-שלב 2 של
 `PLAN_AI_ERA` על הפעולות הכבדות; Skill שני ייעודי ל-`/api/v1/tasks` (גשר
@@ -268,38 +269,40 @@ marketplace-ים חיצוניים נסרקים אוטומטית מ-GitHub. מה 
    plugins/skills — הוא גם ערוץ גילוי אנושי וגם מה שמכניס את הריפו לאינדקס
    של GitHub מהר יותר.
 
-### ה-MCP הוא ערוץ נפרד — ומה בדיוק רושמים שם
+### ✅ ה-MCP — ערוץ נפרד, ורשום
 
-הקטלוג מציג גם ~4,500 שרתי MCP, והם **לא** מגיעים מ-`marketplace.json` אלא
-מרג'יסטרי MCP ציבוריים. אומת: `registry.modelcontextprotocol.io/v0/servers?search=1lev1`
-מחזיר `count: 0`. זה ערוץ נפרד לגמרי, ובמקרה שלנו הוא דווקא החזק יותר: המצב
-הלא-מאומת מחזיר `getPlatformInfo` בלי שום הרשמה, כלומר כל מי שמדפדף ברג'יסטרי
-יכול לנסות אותנו בקליק.
+הקטלוג מציג גם ~6,250 שרתי MCP, והם **לא** מגיעים מ-`marketplace.json` אלא
+מרג'יסטרי MCP ציבוריים. זה ערוץ נפרד לגמרי, ובמקרה שלנו הוא דווקא החזק יותר:
+המצב הלא-מאומת מחזיר `getPlatformInfo` בלי שום הרשמה, כלומר כל מי שמדפדף
+ברג'יסטרי יכול לנסות אותנו בקליק.
+
+**פורסם ב-3.9.2026 17:28Z ל-`registry.modelcontextprotocol.io`** כ-
+`io.github.Avi-ADAM/1lev1` — `status: active`, `isLatest: true`.
 
 **רושמים את השרת המרוחק, לא את חבילת ה-npm.** `1lev1-mcp` ב-npm הוא **לא**
 שרת MCP — הוא CLI שפותח דפדפן, מאמת, וכותב קונפיג. רישום שלו כ-`packages` היה
 גורם ללקוח רג'יסטרי להריץ אותו כשרת stdio ולקבל זרימת דפדפן במקום פרוטוקול.
 הרשומה הנכונה היא `remotes` בלבד — בדיוק הצורה של `ac.inference.sh/mcp`
-שכבר רשומה שם. `server.json` מאומת מול הסכימה
-(`2025-12-11/server.schema.json`) יושב ב-`Avi-ADAM/1lev1-mcp`:
+שכבר רשומה שם. `server.json` יושב ב-`Avi-ADAM/1lev1-mcp` (ענף **`master`**,
+לא `main` — בניגוד ל-`1lev1-agent`).
 
-```json
-{
-  "name": "com.1lev1/mcp",
-  "title": "1lev1",
-  "description": "Track partnership work, log mission hours, and see what needs your approval on 1lev1.com.",
-  "version": "1.0.0",
-  "websiteUrl": "https://1lev1.com",
-  "remotes": [{ "type": "streamable-http", "url": "https://api.1lev1.com/api/mcp" }]
-}
-```
+**למה `io.github` ולא `com.1lev1`.** בדף ה-MCP של buildwithclaude הכרטיס מציג
+`title` + `description` בלבד; ה-`name` עם ה-namespace לא מוצג שם כלל — הוא
+מזהה, לא כותרת. `com.1lev1/mcp` היה דורש **TXT על ה-apex של `1lev1.com`**
+(`v=MCPv1; k=ed25519; p=…`, SPF-style, לא תחת selector), ושם כבר יושבות שלוש
+רשומות — SPF של Zoho, `google-site-verification` ו-`zoho-verification`. עריכה
+שדורסת אותן במקום להוסיף מפילה את אימות המייל היוצא. התמורה לא הצדיקה את
+הסיכון. המחיר: **שם ברג'יסטרי אי אפשר לשנות** — מעבר ל-`com.1lev1` בעתיד הוא
+רשומה חדשה והישנה מסומנת deprecated.
 
-שתי הערות על השם: `description` מוגבל ל-100 תווים בסכימה, ו-`name` חייב להתאים
-למנגנון האימות. `com.1lev1/mcp` דורש **DNS TXT על ה-apex של `1lev1.com`**
-(`v=MCPv1; k=ed25519; p=…`, לא תחת selector). החלופה הזולה היא
-`io.github.avi-adam/1lev1` עם `mcp-publisher login github` — בלי רשומת DNS
-בכלל. שתיהן עוברות את ה-regex של הסכימה; הראשונה נראית רשמית יותר, השנייה
-עולה היום. הפרסום עצמו דורש credentials שלך, אז זה שלב ידני.
+שתי מלכודות ששילמנו עליהן, כדי שלא יחזרו:
+
+1. **קאסינג.** הפרסום נדחה ב-403: `You have permission to publish:
+   io.github.Avi-ADAM/*. Attempting to publish: io.github.avi-adam/1lev1`.
+   הרג'יסטרי גוזר את ה-namespace משם חשבון ה-GitHub **מילה במילה**, בלי
+   lowercase. כל הדוגמאות בתיעוד משתמשות בחשבונות שכבר קטנים, וזה מסתיר את
+   ההבדל.
+2. **`description` מוגבל ל-100 תווים** בסכימה. הנוכחי: 89.
 
 בנוסף: `awesome-mcp-servers` וכיוצא בו — PR עם שורה.
 
