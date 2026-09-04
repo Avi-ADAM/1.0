@@ -6,7 +6,11 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta http-equiv='content-language' content='%cl%'>
-    <meta name="robots" content="follow, index" />
+    <!-- No site-wide robots meta. "index, follow" is what a crawler does with
+         no tag at all, so the tag only ever asserted the default - while
+         sitting above %sveltekit.head%, where a page that needs `noindex`
+         (a draft, a thin page) could not replace it, leaving two conflicting
+         directives in one head. Pages that need to opt out declare their own. -->
     <meta name="theme-color" content="#EEE8AA">
     %upgradeInsecure%
 
@@ -87,13 +91,11 @@
 
     <!-- The site serves every locale from the same URLs and picks one from
          `?lang=` / cookie / Accept-Language, so the alternates are query
-         variants and x-default is the bare address (Hebrew, the default). -->
-    <link rel="alternate" hreflang="he" href="https://1lev1.com/" />
-    <link rel="alternate" hreflang="en" href="https://1lev1.com/?lang=en" />
-    <link rel="alternate" hreflang="ar" href="https://1lev1.com/?lang=ar" />
-    <link rel="alternate" hreflang="ru" href="https://1lev1.com/?lang=ru" />
-    <link rel="alternate" hreflang="es" href="https://1lev1.com/?lang=es" />
-    <link rel="alternate" hreflang="x-default" href="https://1lev1.com/" />
+         variants and x-default is the bare address (Hebrew, the default).
+         Built per request in hooks.server.js from the path being served: as
+         six literal tags they named the homepage on all ~90 pages, so every
+         inner page told crawlers its translations lived at "/". -->
+%hreflang%
 
     <meta name="msvalidate.01" content="401F6E4E20E82CED795C21C85ED50935" />
     <meta name="google-site-verification" content="OBaTsyCpA22qESpUMYcqAnafQf4NxOYLICeWuudw30Y" />
@@ -120,18 +122,54 @@
       }
     </script>
 
+    <!-- What the product actually is. Organization above says who publishes
+         the site; this says the site IS a piece of software, which is the
+         entity a "partnership management" search is looking for. -->
+    <script type="application/ld+json">
+      {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "1lev1",
+      "alternateName": "1\u25101",
+      "applicationCategory": "BusinessApplication",
+      "applicationSubCategory": "Project and partnership management",
+      "operatingSystem": "Web browser",
+      "url": "https://1lev1.com/",
+      "inLanguage": ["he", "en", "ar", "ru", "es"],
+      "publisher": { "@type": "Organization", "name": "1lev1", "url": "https://1lev1.com/" },
+      "description": "Run a partnership without a boss: publish open missions and resources, log hours and contributed resources, decide by consensus, and split profits transparently in proportion to what each partner actually contributed.",
+      "featureList": [
+      "Contribution-weighted profit and equity split",
+      "Consensus decision making with no outright rejection",
+      "Open missions and open resources marketplace",
+      "Hour logging and timers",
+      "Kanban, Gantt and process boards",
+      "AI assistant and MCP integration for external agents"
+      ],
+      "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "ILS",
+      "description": "Free to start a rikma and invite partners."
+      }
+      }
+    </script>
+
     %sveltekit.head%
 
     <!--
       Site-wide fallbacks. They sit AFTER %sveltekit.head% on purpose: a page
-      that declares its own title/description/og in svelte:head then owns the
-      first such tag in the document, and browsers and crawlers alike take the
-      first one they meet. Anything a page leaves undeclared falls through to
-      the values below. Moving this block above %sveltekit.head% would stamp
+      that declares its own title/description/og/canonical in svelte:head then
+      owns the first such tag in the document, and browsers and crawlers alike
+      take the first one they meet. Anything a page leaves undeclared falls
+      through to the values below — which is how the ~13 public pages that
+      never set a canonical get a self-referencing one, and how the five that
+      set no title at all stopped sharing the homepage's. Moving this block above %sveltekit.head% would stamp
       the homepage title onto all ~90 pages that set their own.
       (Written without literal tag syntax: a tag name spelled out here, even
       inside a comment, turns up when the raw HTML is grepped for it.)
     -->
+    <link rel="canonical" href="%canonical%" />
     <title>%title%</title>
     <meta name="description" content="%desc%">
     <meta property="og:title" content="%xtitle%" />

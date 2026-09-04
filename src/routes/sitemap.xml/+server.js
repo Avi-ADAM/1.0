@@ -70,6 +70,13 @@ const PAGES = [
   { path: '/about', lastmod: '2026-08-13T00:00:00+00:00', priority: '0.75', changefreq: 'monthly' },
   { path: '/grow', lastmod: '2026-08-13T00:00:00+00:00', priority: '0.75', changefreq: 'monthly' },
   { path: '/love', lastmod: '2026-08-13T00:00:00+00:00', priority: '0.70', changefreq: 'daily' },
+  // Written, live, linked from the homepage - and missing from this list until
+  // now, so nothing pointed a crawler at roughly 700 lines of copy. /solution
+  // and /kir are deliberately NOT here: both are still placeholder drafts, and
+  // they carry a noindex of their own so they stop borrowing the homepage's
+  // title in search results.
+  { path: '/why', lastmod: '2026-09-04T00:00:00+00:00', priority: '0.80', changefreq: 'monthly' },
+  { path: '/uses', lastmod: '2026-09-04T00:00:00+00:00', priority: '0.75', changefreq: 'monthly' },
 
   // Entry points into the product
   { path: '/wish/new', lastmod: '2026-08-13T00:00:00+00:00', priority: '0.85', changefreq: 'monthly' },

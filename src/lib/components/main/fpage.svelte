@@ -251,13 +251,19 @@
 
   let image = `https://res.cloudinary.com/love1/image/upload/v1640020897/cropped-PicsArt_01-28-07.49.25-1_wvt4qz.png`;
 
-  let projectsCount = $state(0);
-  let membersCount = $state(0);
-  let usersCount = $state(0);
-  let openMissionsCount = $state(0);
-  let openResourcesCount = $state(0);
-  let productsCount = $state(0);
-  let statsLoaded = $state(false);
+  /* The counters arrive from +page.server.js so they are in the server-rendered
+     HTML - a crawler used to be served "loading data..." and four zeroes.
+     `stats` is null when Strapi could not be reached during SSR, and then the
+     onMount fetch below is the only source, exactly as it was before. */
+  let { stats = null } = $props();
+
+  let projectsCount = $state(stats?.projects ?? 0);
+  let membersCount = $state(stats?.members ?? 0);
+  let usersCount = $state(stats?.users ?? 0);
+  let openMissionsCount = $state(stats?.openMissions ?? 0);
+  let openResourcesCount = $state(stats?.openResources ?? 0);
+  let productsCount = $state(stats?.products ?? 0);
+  let statsLoaded = $state(stats !== null);
 
   /** @type {{ icon: import('$lib/celim/icons/entityIcons').EntityIconKind, count: number, key: string, href: string }[]} */
   const discoverLinks = $derived([
@@ -295,7 +301,7 @@
   }
 
   onMount(() => {
-    loadStats();
+    if (!statsLoaded) loadStats();
     console.log($t('home.hero.headline1'));
   });
 </script>
@@ -605,6 +611,7 @@
 
       <div
         dir="ltr"
+        aria-hidden="true"
         style="text-shadow:none;"
         class="pt-2 sm:pt-6 font-bold sm:text-2xl text-2xl text-transparent
           bg-clip-text bg-[length:auto_200%] animate-gradienty
@@ -612,30 +619,48 @@
           flex-wrap flex flex-row"
       >
         <div class="flip">
-          <h1
+          <span
             class="font-bold sm:text-4xl text-3xl text-transparent bg-clip-text bg-[length:auto_200%] animate-gradienty
             bg-[linear-gradient(to_top,theme(colors.barbi),theme(colors.fuchsia.400),theme(colors.sky.400),theme(colors.mturk),theme(colors.sky.400),theme(colors.fuchsia.400),theme(colors.barbi))]"
           >
             1
-          </h1>
+          </span>
         </div>
         <div>
-          <h1
+          <span
             class="font-bold mt-2 sm:text-xl text-xl text-transparent bg-clip-text bg-[length:auto_200%] animate-gradienty
           bg-[linear-gradient(to_top,theme(colors.barbi),theme(colors.fuchsia.400),theme(colors.sky.400),theme(colors.mturk),theme(colors.sky.400),theme(colors.fuchsia.400),theme(colors.barbi))]"
           >
             💗
-          </h1>
+          </span>
         </div>
         <div>
-          <h1
+          <span
             class="font-bold sm:text-4xl text-3xl text-transparent bg-clip-text bg-[length:auto_200%] animate-gradienty
             bg-[linear-gradient(to_top,theme(colors.barbi),theme(colors.fuchsia.400),theme(colors.sky.400),theme(colors.mturk),theme(colors.sky.400),theme(colors.fuchsia.400),theme(colors.barbi))]"
           >
             1
-          </h1>
+          </span>
         </div>
       </div>
+
+      <!-- The page's one H1, and it says what the product does.
+
+           The wordmark above used to carry three of them - "1", the heart,
+           "1" - so the only headings a crawler found on the homepage were a
+           logo, and the business claim below was a rotating <div> that is not
+           a heading at all. A rotation cannot be the H1 either: whichever
+           line happens to be mounted when the crawler renders is the one it
+           indexes, and that is a coin toss between five different promises.
+           So: one fixed sentence here, the rotation demoted to the subhead it
+           always visually was. -->
+      <h1
+        class="w-full max-w-2xl text-center font-bold text-slate-800
+          {$lang === 'he' ? 'sm:text-3xl text-2xl' : 'sm:text-2xl text-xl'}"
+        style="font-family:'Sababa',sans-serif;"
+      >
+        {$t('home.hero.h1')}
+      </h1>
 
       <div
         class="relative w-full min-h-[4rem] sm:min-h-[5rem] mt-2 mb-8 overflow-hidden"

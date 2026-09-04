@@ -2,6 +2,15 @@
 
 </script>
 
+<!-- Still a draft: the copy below is placeholder ("more and more", repeated
+     headings, filler rows). Until it says something real it must not be
+     indexed - with no <title> of its own it was inheriting the homepage's,
+     so a search result for the brand could return this page under the
+     homepage's own title and description. -->
+<svelte:head>
+  <meta name="robots" content="noindex, follow" />
+</svelte:head>
+
 
 <div class="wall container">
     <div class="row">
