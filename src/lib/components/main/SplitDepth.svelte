@@ -45,17 +45,20 @@
     {$t('home.split.blame')}
   </p>
 
-  <!-- הפתרון: פשוט לחשב -->
+  <!-- הפתרון: פשוט לחשב.
+       הכרטיס הזה הוא גרדיאנט בהיר קבוע - הוא לא משתנה במצב כהה - ולכן אף
+       טקסט בתוכו לא מקבל בן-זוג `dark:`. הוספת דיו בהיר כאן הייתה מייצרת
+       לבן על זהב. -->
   <div
     class="mt-6 rounded-2xl border-2 border-gold bg-gradient-to-br from-amber-100 via-amber-50 to-rose-50 px-4 py-5 shadow-lg"
   >
     <h3
-      class="text-rose-700 dark:text-gold font-bold text-2xl sm:text-xl mb-1 text-center"
+      class="text-rose-800 font-bold text-2xl sm:text-xl mb-1 text-center"
     >
       {$t('home.split.solutionTitle')}
     </h3>
     <p
-      class="text-slate-800 dark:text-surfaceInk text-base sm:text-sm leading-relaxed text-center mb-4"
+      class="text-slate-800 text-base sm:text-sm leading-relaxed text-center mb-4"
     >
       {$t('home.split.solutionLead')}
     </p>
@@ -69,10 +72,10 @@
             >{i + 1}</span
           >
           <div class="text-start">
-            <h4 class="text-rose-700 dark:text-gold font-bold text-lg sm:text-base">
+            <h4 class="text-rose-800 font-bold text-lg sm:text-base">
               {$t(`home.split.${s}_t`)}
             </h4>
-            <p class="text-slate-800 dark:text-surfaceInk text-base sm:text-sm leading-relaxed">
+            <p class="text-slate-800 text-base sm:text-sm leading-relaxed">
               {$t(`home.split.${s}_d`)}
             </p>
           </div>
@@ -88,7 +91,7 @@
       {/each}
     </div>
     <p
-      class="mt-4 text-center text-rose-700 dark:text-gold font-bold text-lg sm:text-base"
+      class="mt-4 text-center text-rose-800 font-bold text-lg sm:text-base"
     >
       {$t('home.split.formula')}
     </p>

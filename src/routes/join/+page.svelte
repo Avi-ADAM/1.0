@@ -180,7 +180,7 @@
         <button
           type="button"
           onclick={() => (demoOpen = true)}
-          class="text-barbi font-bold underline underline-offset-4 hover:text-rose-700 dark:text-gold"
+          class="text-barbi dark:text-gold font-bold underline underline-offset-4 hover:text-rose-700 dark:hover:text-surfaceInk"
         >
           {$t('join.open.matchCta')}
         </button>
@@ -199,10 +199,11 @@
       <div
         class="rounded-2xl border-2 border-gold bg-gradient-to-br from-amber-100 via-amber-50 to-rose-50 px-4 py-5 shadow-lg text-center"
       >
-        <h2 class="text-rose-700 dark:text-gold font-bold text-2xl sm:text-xl mb-2">
+        <!-- Fixed light gradient in both modes: no `dark:` ink inside. -->
+        <h2 class="text-rose-800 font-bold text-2xl sm:text-xl mb-2">
           {$t('join.match.title')}
         </h2>
-        <p class="text-slate-800 dark:text-surfaceInk text-base sm:text-sm leading-relaxed mb-4 max-w-lg mx-auto">
+        <p class="text-slate-800 text-base sm:text-sm leading-relaxed mb-4 max-w-lg mx-auto">
           {$t('join.match.sub')}
         </p>
         <div class="flex flex-wrap justify-center gap-3">
@@ -215,7 +216,7 @@
           </button>
           <a
             href={startHref}
-            class="bg-cyan-50/80 dark:bg-surface2 hover:bg-white border-2 border-barbi text-barbi font-semibold text-lg sm:text-base px-6 py-3 rounded-2xl shadow-sm transition-colors"
+            class="bg-cyan-50/80 hover:bg-white border-2 border-barbi text-barbi font-semibold text-lg sm:text-base px-6 py-3 rounded-2xl shadow-sm transition-colors"
           >
             {$t('join.hero.ctaStart')}
           </a>

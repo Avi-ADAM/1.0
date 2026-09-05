@@ -115,7 +115,7 @@
         <a
           href="/availableMission"
           data-sveltekit-prefetch
-          class="bg-cyan-50/70 dark:bg-surface2 backdrop-blur-sm border-2 border-gold hover:bg-gold/25 text-slate-800 dark:text-surfaceInk hover:text-rose-800 dark:text-gold font-semibold text-lg sm:text-base px-6 py-3 rounded-2xl shadow-sm transition-colors"
+          class="bg-cyan-50/70 dark:bg-surface2 backdrop-blur-sm border-2 border-gold hover:bg-gold/25 text-slate-800 dark:text-surfaceInk hover:text-rose-800 dark:hover:text-gold font-semibold text-lg sm:text-base px-6 py-3 rounded-2xl shadow-sm transition-colors"
         >
           {$t('noboss.hero.ctaSecondary')}
         </a>
