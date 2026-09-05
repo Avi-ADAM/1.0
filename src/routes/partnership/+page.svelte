@@ -50,8 +50,14 @@
   {@html `<script type="application/ld+json">${jsonLdBody(crumbLd)}<\/script>`}
 </svelte:head>
 
+<!-- bg-surface, not a bare page. `body` paints --bg, which in the personal
+     theme is #070606 in BOTH modes (only `dark:` utilities move), so text
+     laid straight onto it was dark-grey on near-black. --surface is the one
+     card colour resolved per theme AND per mode, and --surface-ink is the ink
+     guaranteed to read on it, so the whole page now has a ground instead of
+     borrowing the app's. -->
 <main
-  class="min-h-screen w-full flex flex-col items-center px-4 py-10 sm:py-8"
+  class="min-h-screen w-full flex flex-col items-center px-4 py-10 sm:py-8 bg-surface text-surfaceInk"
   style="font-family:'Sababa',sans-serif;"
   dir={$isRtl ? 'rtl' : 'ltr'}
 >
@@ -60,12 +66,12 @@
       {$t('partnership.hero.eyebrow')}
     </p>
     <h1
-      class="text-rose-700 font-bold text-3xl sm:text-2xl mb-3"
+      class="text-rose-700 dark:text-gold font-bold text-3xl sm:text-2xl mb-3"
       style="text-shadow:1px 1px 2px rgba(0,0,0,0.15);"
     >
       {$t('partnership.hero.h1')}
     </h1>
-    <p class="text-slate-800 text-lg sm:text-base leading-relaxed max-w-lg mx-auto">
+    <p class="text-slate-800 dark:text-surfaceInk text-lg sm:text-base leading-relaxed max-w-lg mx-auto">
       {$t('partnership.hero.sub')}
     </p>
   </header>
@@ -80,10 +86,10 @@
        been through the mechanism and this is where they check it against
        their own numbers. -->
   <section class="w-full max-w-xl mt-10">
-    <h2 class="text-rose-700 font-bold text-2xl sm:text-xl mb-1 text-center">
+    <h2 class="text-rose-700 dark:text-gold font-bold text-2xl sm:text-xl mb-1 text-center">
       {$t('partnership.calc.title')}
     </h2>
-    <p class="text-center text-slate-700 text-base sm:text-sm mb-4">
+    <p class="text-center text-slate-700 dark:text-surfaceMuted text-base sm:text-sm mb-4">
       {$t('partnership.calc.sub')}
     </p>
     <SplitCalculator />
@@ -91,19 +97,19 @@
 
   <!-- The questions a partnership asks before it moves its accounting. -->
   <section class="w-full max-w-xl mt-10">
-    <h2 class="text-rose-700 font-bold text-2xl sm:text-xl mb-4 text-center">
+    <h2 class="text-rose-700 dark:text-gold font-bold text-2xl sm:text-xl mb-4 text-center">
       {$t('partnership.doubts.title')}
     </h2>
     <div class="flex flex-col gap-3">
       {#each ['q1', 'q2', 'q3'] as q}
         <details
-          class="bg-cyan-50/60 backdrop-blur-sm border-2 border-gold/70 rounded-xl px-4 py-3 shadow-sm"
+          class="bg-cyan-50/60 dark:bg-surface2 backdrop-blur-sm border-2 border-gold/70 rounded-xl px-4 py-3 shadow-sm"
         >
           <!-- Content stays in the served HTML while closed - the L2 rule. -->
-          <summary class="cursor-pointer text-rose-700 font-semibold text-base sm:text-sm">
+          <summary class="cursor-pointer text-rose-700 dark:text-gold font-semibold text-base sm:text-sm">
             {$t(`partnership.doubts.${q}_q`)}
           </summary>
-          <p class="mt-2 text-slate-800 text-base sm:text-sm leading-relaxed text-start">
+          <p class="mt-2 text-slate-800 dark:text-surfaceInk text-base sm:text-sm leading-relaxed text-start">
             {$t(`partnership.doubts.${q}_a`)}
           </p>
         </details>
@@ -112,10 +118,10 @@
   </section>
 
   <section class="w-full max-w-xl mt-12 text-center">
-    <h2 class="text-rose-700 font-bold text-2xl sm:text-xl mb-2">
+    <h2 class="text-rose-700 dark:text-gold font-bold text-2xl sm:text-xl mb-2">
       {$t('partnership.close.title')}
     </h2>
-    <p class="text-slate-800 text-base sm:text-sm leading-relaxed mb-5 max-w-lg mx-auto">
+    <p class="text-slate-800 dark:text-surfaceInk text-base sm:text-sm leading-relaxed mb-5 max-w-lg mx-auto">
       {$t('partnership.close.sub')}
     </p>
     <a

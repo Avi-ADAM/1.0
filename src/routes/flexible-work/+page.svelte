@@ -96,8 +96,14 @@
   {@html `<script type="application/ld+json">${jsonLdBody(crumbLd)}<\/script>`}
 </svelte:head>
 
+<!-- bg-surface, not a bare page. `body` paints --bg, which in the personal
+     theme is #070606 in BOTH modes (only `dark:` utilities move), so text
+     laid straight onto it was dark-grey on near-black. --surface is the one
+     card colour resolved per theme AND per mode, and --surface-ink is the ink
+     guaranteed to read on it, so the whole page now has a ground instead of
+     borrowing the app's. -->
 <main
-  class="min-h-screen w-full flex flex-col items-center px-4 py-10 sm:py-8"
+  class="min-h-screen w-full flex flex-col items-center px-4 py-10 sm:py-8 bg-surface text-surfaceInk"
   style="font-family:'Sababa',sans-serif;"
   dir={$isRtl ? 'rtl' : 'ltr'}
 >
@@ -106,16 +112,16 @@
       {$t('flexible.hero.eyebrow')}
     </p>
     <h1
-      class="text-rose-700 font-bold text-3xl sm:text-2xl mb-3"
+      class="text-rose-700 dark:text-gold font-bold text-3xl sm:text-2xl mb-3"
       style="text-shadow:1px 1px 2px rgba(0,0,0,0.15);"
     >
       {$t('flexible.hero.h1')}
     </h1>
-    <p class="text-slate-800 text-lg sm:text-base leading-relaxed max-w-lg mx-auto">
+    <p class="text-slate-800 dark:text-surfaceInk text-lg sm:text-base leading-relaxed max-w-lg mx-auto">
       {$t('flexible.hero.sub')}
     </p>
     <p
-      class="mt-4 inline-block bg-cyan-50/70 backdrop-blur-sm border-2 border-gold rounded-2xl px-5 py-3 text-slate-800 text-base sm:text-sm"
+      class="mt-4 inline-block bg-cyan-50/70 dark:bg-surface2 backdrop-blur-sm border-2 border-gold rounded-2xl px-5 py-3 text-slate-800 dark:text-surfaceInk text-base sm:text-sm"
     >
       {$t('flexible.hero.reassure')}
     </p>
@@ -129,7 +135,7 @@
       <button
         type="button"
         onclick={() => (demoOpen = true)}
-        class="bg-cyan-50/70 backdrop-blur-sm border-2 border-gold hover:bg-gold/25 text-slate-800 hover:text-rose-800 font-semibold text-lg sm:text-base px-6 py-3 rounded-2xl shadow-sm transition-colors"
+        class="bg-cyan-50/70 dark:bg-surface2 backdrop-blur-sm border-2 border-gold hover:bg-gold/25 text-slate-800 dark:text-surfaceInk hover:text-rose-800 dark:text-gold font-semibold text-lg sm:text-base px-6 py-3 rounded-2xl shadow-sm transition-colors"
       >
         {$t('flexible.hero.cta')}
       </button>
@@ -140,19 +146,19 @@
        these are situations, not tragedies, and the reader is living in one
        and does not need it dramatised back at them. -->
   <section class="w-full max-w-xl mt-12">
-    <h2 class="text-rose-700 font-bold text-2xl sm:text-xl mb-4 text-center">
+    <h2 class="text-rose-700 dark:text-gold font-bold text-2xl sm:text-xl mb-4 text-center">
       {$t('flexible.know.title')}
     </h2>
     <div class="flex flex-col gap-2.5">
       {#each ['k1', 'k2', 'k3', 'k4'] as k}
         <p
-          class="bg-cyan-50/55 backdrop-blur-sm border border-slate-300/80 rounded-xl px-4 py-3 shadow-sm text-slate-800 text-base sm:text-sm leading-relaxed text-start"
+          class="bg-cyan-50/55 dark:bg-surface2 backdrop-blur-sm border border-slate-300/80 rounded-xl px-4 py-3 shadow-sm text-slate-800 dark:text-surfaceInk text-base sm:text-sm leading-relaxed text-start"
         >
           {$t(`flexible.know.${k}`)}
         </p>
       {/each}
     </div>
-    <p class="mt-4 text-center text-rose-700 font-semibold text-lg sm:text-base">
+    <p class="mt-4 text-center text-rose-700 dark:text-gold font-semibold text-lg sm:text-base">
       {$t('flexible.know.turn')}
     </p>
   </section>
@@ -160,19 +166,19 @@
   <!-- The four things that are structurally different, each one a real
        property of the system rather than a promise about intentions. -->
   <section class="w-full max-w-xl mt-12">
-    <h2 class="text-rose-700 font-bold text-2xl sm:text-xl mb-4 text-center">
+    <h2 class="text-rose-700 dark:text-gold font-bold text-2xl sm:text-xl mb-4 text-center">
       {$t('flexible.fit.title')}
     </h2>
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
       {#each FIT_CARDS as [icon, key] (key)}
         <div
-          class="bg-cyan-50/70 backdrop-blur-sm border-2 border-gold rounded-lg p-4 shadow flex flex-col"
+          class="bg-cyan-50/70 dark:bg-surface2 backdrop-blur-sm border-2 border-gold rounded-lg p-4 shadow flex flex-col"
         >
           <div class="mb-1"><EntityIcon kind={icon} size={24} tone="brand" /></div>
-          <h3 class="text-rose-700 font-bold text-lg sm:text-base mb-1">
+          <h3 class="text-rose-700 dark:text-gold font-bold text-lg sm:text-base mb-1">
             {$t(`flexible.fit.${key}_t`)}
           </h3>
-          <p class="text-slate-800 text-base sm:text-sm leading-relaxed">
+          <p class="text-slate-800 dark:text-surfaceInk text-base sm:text-sm leading-relaxed">
             {$t(`flexible.fit.${key}_d`)}
           </p>
         </div>
@@ -182,19 +188,19 @@
 
   <!-- How it happens, in the order it happens. -->
   <section class="w-full max-w-xl mt-12">
-    <h2 class="text-rose-700 font-bold text-2xl sm:text-xl mb-4 text-center">
+    <h2 class="text-rose-700 dark:text-gold font-bold text-2xl sm:text-xl mb-4 text-center">
       {$t('flexible.how.title')}
     </h2>
     <ol class="flex flex-col gap-3">
       {#each ['s1', 's2', 's3', 's4'] as step, i}
         <li
-          class="flex items-start gap-3 bg-cyan-50/60 backdrop-blur-sm border-2 border-gold/70 rounded-xl px-4 py-3 shadow-sm"
+          class="flex items-start gap-3 bg-cyan-50/60 dark:bg-surface2 backdrop-blur-sm border-2 border-gold/70 rounded-xl px-4 py-3 shadow-sm"
         >
           <span
             class="shrink-0 mt-0.5 w-7 h-7 rounded-full bg-gold text-barbi flex items-center justify-center text-sm font-bold"
             >{i + 1}</span
           >
-          <p class="text-slate-800 text-base sm:text-sm leading-relaxed text-start">
+          <p class="text-slate-800 dark:text-surfaceInk text-base sm:text-sm leading-relaxed text-start">
             {$t(`flexible.how.${step}`)}
           </p>
         </li>
@@ -211,18 +217,18 @@
        and check your allowance before you earn. -->
   <section class="w-full max-w-xl mt-12">
     <div
-      class="rounded-2xl border-2 border-barbi/70 bg-cyan-50/70 backdrop-blur-sm px-5 py-5 shadow"
+      class="rounded-2xl border-2 border-barbi/70 bg-cyan-50/70 dark:bg-surface2 backdrop-blur-sm px-5 py-5 shadow"
     >
-      <h2 class="text-rose-700 font-bold text-2xl sm:text-xl mb-2 text-center">
+      <h2 class="text-rose-700 dark:text-gold font-bold text-2xl sm:text-xl mb-2 text-center">
         {$t('flexible.honest.title')}
       </h2>
-      <p class="text-slate-700 text-base sm:text-sm mb-4 text-center">
+      <p class="text-slate-700 dark:text-surfaceMuted text-base sm:text-sm mb-4 text-center">
         {$t('flexible.honest.lead')}
       </p>
       <ul class="flex flex-col gap-2.5">
         {#each ['h1', 'h2', 'h3'] as h}
           <li
-            class="flex items-start gap-3 text-slate-800 text-base sm:text-sm leading-relaxed text-start"
+            class="flex items-start gap-3 text-slate-800 dark:text-surfaceInk text-base sm:text-sm leading-relaxed text-start"
           >
             <span
               class="shrink-0 mt-0.5 w-6 h-6 rounded-full bg-barbi/15 text-barbi flex items-center justify-center text-sm font-bold"
@@ -238,7 +244,7 @@
   <!-- Listings only when they exist; otherwise the conversation. -->
   <section class="w-full max-w-xl mt-12">
     {#if hasListings}
-      <h2 class="text-rose-700 font-bold text-2xl sm:text-xl mb-4 text-center">
+      <h2 class="text-rose-700 dark:text-gold font-bold text-2xl sm:text-xl mb-4 text-center">
         {$t('flexible.open.title')}
       </h2>
       <div class="flex flex-col gap-2">
@@ -246,11 +252,11 @@
           <a
             {href}
             data-sveltekit-prefetch
-            class="group flex items-center gap-3 bg-cyan-50/80 hover:bg-gold/20 border border-gold/60 rounded-lg px-3 py-2 transition-colors"
+            class="group flex items-center gap-3 bg-cyan-50/80 dark:bg-surface2 hover:bg-gold/20 border border-gold/60 rounded-lg px-3 py-2 transition-colors"
           >
             <EntityIcon kind={icon} size={24} tone="brand" />
-            <span class="flex-1 text-slate-800 text-lg sm:text-base text-start">
-              <strong class="text-rose-700">{count}</strong>
+            <span class="flex-1 text-slate-800 dark:text-surfaceInk text-lg sm:text-base text-start">
+              <strong class="text-rose-700 dark:text-gold">{count}</strong>
               {$t(`flexible.open.${key}`)}
             </span>
             <span
@@ -269,10 +275,10 @@
     <div
       class="mt-4 rounded-2xl border-2 border-gold bg-gradient-to-br from-amber-100 via-amber-50 to-rose-50 px-4 py-5 shadow-lg text-center"
     >
-      <h2 class="text-rose-700 font-bold text-2xl sm:text-xl mb-2">
+      <h2 class="text-rose-700 dark:text-gold font-bold text-2xl sm:text-xl mb-2">
         {$t('flexible.match.title')}
       </h2>
-      <p class="text-slate-800 text-base sm:text-sm leading-relaxed mb-4 max-w-lg mx-auto">
+      <p class="text-slate-800 dark:text-surfaceInk text-base sm:text-sm leading-relaxed mb-4 max-w-lg mx-auto">
         {$t('flexible.match.sub')}
       </p>
       <div class="flex flex-wrap justify-center gap-3">
@@ -286,7 +292,7 @@
         <!-- The conversation leads here, but nobody has to wait for it. -->
         <a
           href={startHref}
-          class="bg-cyan-50/80 hover:bg-white border-2 border-barbi text-barbi font-semibold text-lg sm:text-base px-6 py-3 rounded-2xl shadow-sm transition-colors"
+          class="bg-cyan-50/80 dark:bg-surface2 hover:bg-white border-2 border-barbi text-barbi font-semibold text-lg sm:text-base px-6 py-3 rounded-2xl shadow-sm transition-colors"
         >
           {$t('flexible.hero.ctaStart')}
         </a>
@@ -295,19 +301,19 @@
   </section>
 
   <section class="w-full max-w-xl mt-12">
-    <h2 class="text-rose-700 font-bold text-2xl sm:text-xl mb-4 text-center">
+    <h2 class="text-rose-700 dark:text-gold font-bold text-2xl sm:text-xl mb-4 text-center">
       {$t('flexible.doubts.title')}
     </h2>
     <div class="flex flex-col gap-3">
       {#each ['q1', 'q2', 'q3', 'q4'] as q}
         <details
-          class="bg-cyan-50/60 backdrop-blur-sm border-2 border-gold/70 rounded-xl px-4 py-3 shadow-sm"
+          class="bg-cyan-50/60 dark:bg-surface2 backdrop-blur-sm border-2 border-gold/70 rounded-xl px-4 py-3 shadow-sm"
         >
           <!-- Content stays in the served HTML while closed - the L2 rule. -->
-          <summary class="cursor-pointer text-rose-700 font-semibold text-base sm:text-sm">
+          <summary class="cursor-pointer text-rose-700 dark:text-gold font-semibold text-base sm:text-sm">
             {$t(`flexible.doubts.${q}_q`)}
           </summary>
-          <p class="mt-2 text-slate-800 text-base sm:text-sm leading-relaxed text-start">
+          <p class="mt-2 text-slate-800 dark:text-surfaceInk text-base sm:text-sm leading-relaxed text-start">
             {$t(`flexible.doubts.${q}_a`)}
           </p>
         </details>

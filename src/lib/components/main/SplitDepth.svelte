@@ -40,7 +40,7 @@
 </script>
 
   <p
-    class="mt-4 bg-cyan-50/60 backdrop-blur-sm border-2 border-gold rounded-2xl px-4 py-3 text-slate-900 text-base sm:text-sm leading-relaxed text-center shadow"
+    class="mt-4 bg-cyan-50/60 dark:bg-surface2 backdrop-blur-sm border-2 border-gold rounded-2xl px-4 py-3 text-slate-900 dark:text-surfaceInk text-base sm:text-sm leading-relaxed text-center shadow"
   >
     {$t('home.split.blame')}
   </p>
@@ -50,12 +50,12 @@
     class="mt-6 rounded-2xl border-2 border-gold bg-gradient-to-br from-amber-100 via-amber-50 to-rose-50 px-4 py-5 shadow-lg"
   >
     <h3
-      class="text-rose-700 font-bold text-2xl sm:text-xl mb-1 text-center"
+      class="text-rose-700 dark:text-gold font-bold text-2xl sm:text-xl mb-1 text-center"
     >
       {$t('home.split.solutionTitle')}
     </h3>
     <p
-      class="text-slate-800 text-base sm:text-sm leading-relaxed text-center mb-4"
+      class="text-slate-800 dark:text-surfaceInk text-base sm:text-sm leading-relaxed text-center mb-4"
     >
       {$t('home.split.solutionLead')}
     </p>
@@ -69,10 +69,10 @@
             >{i + 1}</span
           >
           <div class="text-start">
-            <h4 class="text-rose-700 font-bold text-lg sm:text-base">
+            <h4 class="text-rose-700 dark:text-gold font-bold text-lg sm:text-base">
               {$t(`home.split.${s}_t`)}
             </h4>
-            <p class="text-slate-800 text-base sm:text-sm leading-relaxed">
+            <p class="text-slate-800 dark:text-surfaceInk text-base sm:text-sm leading-relaxed">
               {$t(`home.split.${s}_d`)}
             </p>
           </div>
@@ -88,7 +88,7 @@
       {/each}
     </div>
     <p
-      class="mt-4 text-center text-rose-700 font-bold text-lg sm:text-base"
+      class="mt-4 text-center text-rose-700 dark:text-gold font-bold text-lg sm:text-base"
     >
       {$t('home.split.formula')}
     </p>
@@ -98,13 +98,13 @@
   <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
     {#each SPLIT_CARDS as [icon, key] (key)}
       <div
-        class="bg-cyan-50/70 backdrop-blur-sm border-2 border-gold rounded-lg p-4 shadow flex flex-col"
+        class="bg-cyan-50/70 dark:bg-surface2 backdrop-blur-sm border-2 border-gold rounded-lg p-4 shadow flex flex-col"
       >
         <div class="mb-1"><EntityIcon kind={icon} size={24} tone="brand" /></div>
-        <h3 class="text-rose-700 font-bold text-lg sm:text-base mb-1">
+        <h3 class="text-rose-700 dark:text-gold font-bold text-lg sm:text-base mb-1">
           {$t(`home.split.${key}_t`)}
         </h3>
-        <p class="text-slate-800 text-base sm:text-sm leading-relaxed">
+        <p class="text-slate-800 dark:text-surfaceInk text-base sm:text-sm leading-relaxed">
           {$t(`home.split.${key}_d`)}
         </p>
       </div>
@@ -113,18 +113,18 @@
     <!-- החישוב מכריע כמה כל אחד לקח; ההצבעות מכריעות מה בכלל עושים.
          כרטיס רחב כי זו הפסקה היחידה כאן שמובילה הלאה — למנוע ההסכמה. -->
     <div
-      class="sm:col-span-2 bg-cyan-50/70 backdrop-blur-sm border-2 border-barbi/60 rounded-lg p-4 shadow flex flex-col"
+      class="sm:col-span-2 bg-cyan-50/70 dark:bg-surface2 backdrop-blur-sm border-2 border-barbi/60 rounded-lg p-4 shadow flex flex-col"
     >
       <div class="mb-1"><EntityIcon kind="maagad" size={24} tone="brand" /></div>
-      <h3 class="text-rose-700 font-bold text-lg sm:text-base mb-1">
+      <h3 class="text-rose-700 dark:text-gold font-bold text-lg sm:text-base mb-1">
         {$t('home.split.b5_t')}
       </h3>
-      <p class="text-slate-800 text-base sm:text-sm leading-relaxed">
+      <p class="text-slate-800 dark:text-surfaceInk text-base sm:text-sm leading-relaxed">
         {$t('home.split.b5_d')}
       </p>
       <button
         type="button"
-        class="mt-2 self-start text-barbi font-bold text-base sm:text-sm underline underline-offset-4 hover:text-rose-700 transition-colors"
+        class="mt-2 self-start text-barbi font-bold text-base sm:text-sm underline underline-offset-4 hover:text-rose-700 dark:text-gold transition-colors"
         onclick={onConsensus}
       >
         {$t('home.split.b5_link')}
@@ -133,7 +133,7 @@
   </div>
 
   <p
-    class="mt-4 text-center bg-cyan-50/60 backdrop-blur-sm border border-gold/70 rounded-2xl px-4 py-3 text-slate-800 text-base sm:text-sm leading-relaxed"
+    class="mt-4 text-center bg-cyan-50/60 dark:bg-surface2 backdrop-blur-sm border border-gold/70 rounded-2xl px-4 py-3 text-slate-800 dark:text-surfaceInk text-base sm:text-sm leading-relaxed"
   >
     {$t('home.split.more')}
   </p>

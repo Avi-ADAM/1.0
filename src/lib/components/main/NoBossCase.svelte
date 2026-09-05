@@ -43,7 +43,7 @@
       {$t('home.sections.problemEyebrow')}
     </p>
     <h2
-      class="text-rose-700 font-bold text-3xl sm:text-2xl mb-1 text-center"
+      class="text-rose-700 dark:text-gold font-bold text-3xl sm:text-2xl mb-1 text-center"
       style="text-shadow:1px 1px 2px rgba(0,0,0,0.15);"
     >
       {$t('home.sections.problemTitle')}
@@ -54,14 +54,14 @@
     <div class="flex flex-col gap-2.5">
       {#each ['pain1', 'pain2', 'pain3', 'pain4'] as p}
         <div
-          class="flex items-start gap-3 bg-cyan-50/55 backdrop-blur-sm border border-rose-300/70 rounded-xl px-4 py-3 shadow-sm"
+          class="flex items-start gap-3 bg-cyan-50/55 dark:bg-surface2 backdrop-blur-sm border border-rose-300/70 rounded-xl px-4 py-3 shadow-sm"
         >
           <span
             class="shrink-0 mt-0.5 w-6 h-6 rounded-full bg-rose-100 text-rose-500 flex items-center justify-center text-sm font-bold"
             >✕</span
           >
           <p
-            class="text-slate-800 text-base sm:text-sm leading-relaxed text-start"
+            class="text-slate-800 dark:text-surfaceInk text-base sm:text-sm leading-relaxed text-start"
           >
             {$t(`home.sections.${p}`)}
           </p>
@@ -69,16 +69,16 @@
       {/each}
     </div>
     <p
-      class="text-center text-rose-700 font-semibold italic text-lg sm:text-base mt-4"
+      class="text-center text-rose-700 dark:text-gold font-semibold italic text-lg sm:text-base mt-4"
     >
       {$t('home.sections.painCost')}
     </p>
     <!-- המפסיד הגדול מכולם: הלקוח -->
     <div
-      class="mt-6 bg-cyan-50/55 backdrop-blur-sm border-2 border-gold/70 rounded-2xl px-4 py-4 shadow-sm"
+      class="mt-6 bg-cyan-50/55 dark:bg-surface2 backdrop-blur-sm border-2 border-gold/70 rounded-2xl px-4 py-4 shadow-sm"
     >
       <h3
-        class="text-rose-700 font-bold text-xl sm:text-lg mb-3 text-center"
+        class="text-rose-700 dark:text-gold font-bold text-xl sm:text-lg mb-3 text-center"
       >
         {$t('home.sections.painCustomerTitle')}
       </h3>
@@ -92,7 +92,7 @@
               >{good ? '✓' : '✕'}</span
             >
             <p
-              class="text-slate-800 text-base sm:text-sm leading-relaxed text-start"
+              class="text-slate-800 dark:text-surfaceInk text-base sm:text-sm leading-relaxed text-start"
             >
               {$t(`home.sections.${p}`)}
             </p>
@@ -100,7 +100,7 @@
         {/each}
       </div>
       <p
-        class="text-center text-rose-700 font-semibold text-base sm:text-sm mt-3"
+        class="text-center text-rose-700 dark:text-gold font-semibold text-base sm:text-sm mt-3"
       >
         {$t('home.sections.painCustomerTurn')}
       </p>
@@ -150,11 +150,11 @@
     style="font-family:'Sababa',sans-serif;"
   >
     <h2
-      class="text-rose-700 font-bold text-3xl sm:text-2xl mb-1 text-center"
+      class="text-rose-700 dark:text-gold font-bold text-3xl sm:text-2xl mb-1 text-center"
     >
       {$t('home.sections.oldWayTitle')}
     </h2>
-    <p class="text-center text-slate-700 text-base sm:text-sm mb-5">
+    <p class="text-center text-slate-700 dark:text-surfaceMuted text-base sm:text-sm mb-5">
       {$t('home.sections.oldWaySub')}
     </p>
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 items-stretch">
@@ -172,7 +172,7 @@
           {/if}
           <h3
             class="font-bold text-lg sm:text-base mb-3 text-center {highlight
-              ? 'text-rose-700 mt-1'
+              ? 'text-rose-700 dark:text-gold mt-1'
               : 'text-slate-500'}"
           >
             {$t(`home.sections.${key}_t`)}
@@ -181,7 +181,7 @@
             {#each $t(`home.sections.${key}_d`).split('•') as item}
               <li
                 class="flex items-start gap-2 text-sm text-start {highlight
-                  ? 'text-slate-900 font-medium'
+                  ? 'text-slate-900 dark:text-surfaceInk font-medium'
                   : 'text-slate-600'}"
               >
                 <span

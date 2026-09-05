@@ -832,6 +832,42 @@
         </div>
       </section>
 
+      <!-- ===== The employee / lone-founder case, as a banner =====
+           This had a full gateway here before the section merge, and folding
+           it into a chip in the doors grid cost it more than it saved: the
+           chip states a category ("I'm employed, or self-employed alone")
+           while the banner states the feeling that brings someone to the
+           page. Both entrances now, same as /flexible-work, because these are
+           the two tracks a visitor arrives at without knowing they want. -->
+      <section
+        id="no-boss"
+        class="w-full max-w-xl mt-12 scroll-mt-16 animate-fade-in-up"
+        style="font-family:'Sababa',sans-serif;"
+      >
+        <a
+          href="/no-boss"
+          data-sveltekit-prefetch
+          class="group block rounded-2xl border-2 border-gold bg-gradient-to-br from-cyan-50/80 to-rose-50/70 backdrop-blur-sm px-5 py-5 shadow hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 text-center"
+        >
+          <p class="text-barbi font-bold text-base sm:text-sm tracking-widest mb-1">
+            {$t('home.sections.problemEyebrow')}
+          </p>
+          <h2 class="text-rose-700 font-bold text-2xl sm:text-xl mb-2">
+            {$t('home.sections.problemTitle')}
+          </h2>
+          <p
+            class="text-slate-800 text-base sm:text-sm mb-3 max-w-lg mx-auto leading-relaxed"
+          >
+            {$t('home.noboss.lead')}
+          </p>
+          <span
+            class="inline-block bg-barbi text-gold font-bold text-base sm:text-sm px-5 py-2 rounded-xl shadow group-hover:scale-105 transition-transform"
+          >
+            {$t('home.noboss.cta')} {$isRtl ? '\u2190' : '\u2192'}
+          </span>
+        </a>
+      </section>
+
       <!-- ===== A door for the reader the market keeps turning down =====
            This audience also has a chip in the splitter above, which is
            unusual - every other track gets one entrance. It earns two because
