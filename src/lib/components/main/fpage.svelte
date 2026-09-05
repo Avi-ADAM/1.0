@@ -28,6 +28,18 @@
    * the `{#each}` so the `@type` annotations actually reach the checker —
    * a JSDoc cast inside a template expression does not.
    */
+  /* The four doors of the splitter: [label key, description key, href].
+     Hoisted so the three that point at track pages stay in one place - they
+     are the whole reason those pages exist, and a link that rots here is a
+     page nothing points at. */
+  /** @type {[string, string, string][]} */
+  const DOORS = [
+    ['a1', 'd1', '/partnership'],
+    ['a2', 'd2', '/join'],
+    ['a5', 'd3', '/no-boss'],
+    ['a6', 'd4', '/uses']
+  ];
+
   /** @type {[import('$lib/celim/icons/entityIcons').EntityIconKind, string][]} */
   const PLATFORM_FEATURES = [
     ['folders', 'projectMgmt'],
@@ -49,7 +61,11 @@
   const deeperCards = $derived([
     { href: '/guid', icon: 'agreement', title: $t('home.guide.title'), desc: $t('home.guide.desc'), cta: $t('home.guide.cta') },
     { href: '/quorum', icon: 'members', title: $t('home.quorum.title'), desc: $t('home.quorum.desc'), cta: $t('home.quorum.cta') },
-    { href: '/grow', icon: 'opportunity', title: $t('home.grow.title'), desc: $t('home.grow.desc'), cta: $t('home.grow.cta') }
+    { href: '/grow', icon: 'opportunity', title: $t('home.grow.title'), desc: $t('home.grow.desc'), cta: $t('home.grow.cta') },
+    // /why used to get a full-width banner of its own directly above this
+    // grid - a fourth "there is another page, go to it" card, rendered as a
+    // section instead of as a card. Same job, so: same grid.
+    { href: '/why', icon: 'idea', title: $t('home.why.title'), desc: $t('home.why.desc'), cta: $t('home.why.cta') }
   ]);
   function change(lan) {
     if (lan == 'en') {
@@ -671,29 +687,49 @@
       </div>
 
       <!-- ===== ניווט קהלים: מי שכבר בפנים לא צריך לקרוא את הכאב של מי שבחוץ -->
+      <!-- ===== One splitter, four doors, and each one leaves the page =====
+           This block used to be three: a row of pills here, a teaser for
+           /no-boss two screens down, and a card for /uses near the bottom -
+           all asking the same question, "which of these are you", at three
+           unrelated moments. One question, asked once, in the first screen,
+           where a visitor is still deciding whether to read on.
+
+           The two that do not navigate are deliberate: what "just show me
+           the system" wants is genuinely on this page, and someone who wants
+           to understand before starting needs a person, not another section. -->
       <section
-        class="w-full max-w-xl animate-fade-in-up"
+        id="doors"
+        class="w-full max-w-xl scroll-mt-16 animate-fade-in-up"
         style="font-family:'Sababa',sans-serif;"
       >
-        <p class="text-center text-slate-700 text-base sm:text-sm mb-2">
-          {$t('home.audience.title')}
+        <h2 class="text-center text-rose-700 font-bold text-2xl sm:text-xl mb-1">
+          {$t('home.audience.doorsTitle')}
+        </h2>
+        <p class="text-center text-slate-700 text-base sm:text-sm mb-4">
+          {$t('home.audience.doorsSub')}
         </p>
-        <!-- Two of these now leave the page, which is the whole point of the
-             split: the segmentation already existed here and then walked all
-             four audiences down the same scroll. "I have a partnership" and
-             "I'm looking for a venture" each have somewhere of their own to
-             go. "Just show me the system" still scrolls, because what it asks
-             for is on this page. -->
-        <div class="flex flex-wrap justify-center gap-2">
-          {#each [['a1', '/partnership'], ['a2', '/join']] as [key, href]}
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {#each DOORS as [key, desc, href] (key)}
             <a
               {href}
               data-sveltekit-prefetch
-              class="bg-cyan-50/70 backdrop-blur-sm border-2 border-gold hover:bg-gold/25 text-slate-800 hover:text-rose-800 font-semibold text-base sm:text-sm px-4 py-2 rounded-full shadow-sm transition-colors"
+              class="group flex flex-col rounded-xl border-2 border-gold bg-cyan-50/70 backdrop-blur-sm px-4 py-3 shadow-sm hover:bg-gold/20 hover:-translate-y-0.5 transition-all duration-300 text-start"
             >
-              {$t(`home.audience.${key}`)}
+              <span class="text-rose-700 font-bold text-lg sm:text-base">
+                {$t(`home.audience.${key}`)}
+              </span>
+              <span class="text-slate-700 text-base sm:text-sm leading-relaxed mt-0.5">
+                {$t(`home.audience.${desc}`)}
+              </span>
+              <span class="mt-2 text-barbi font-semibold text-base sm:text-sm group-hover:underline">
+                {$isRtl ? '\u2190' : '\u2192'}
+              </span>
             </a>
           {/each}
+        </div>
+
+        <div class="mt-3 flex flex-wrap justify-center gap-2">
           <button
             type="button"
             onclick={() => scrollToId('demo')}
@@ -701,8 +737,6 @@
           >
             {$t('home.audience.a3')}
           </button>
-          <!-- המסלול הרביעי לא גולל לשום מקום בעמוד: מי שרוצה להבין לפני
-               שמתחיל/ה צריך/ה אדם, לא עוד סקשן. -->
           <button
             type="button"
             onclick={() => (demoOpen = true)}
@@ -792,48 +826,6 @@
           >
             {$t('home.split.ctaSecondary')}
           </button>
-        </div>
-      </section>
-
-      {@render flowLine($t('home.flow.toPain'))}
-
-      <!-- ===== Gateway: the case against working for a boss =====
-           This used to be three full blocks here - four pains, the
-           employee/solo/rikma comparison, the ten-year income curves - and it
-           is the whole argument of a different audience than the one the page
-           opens with. It moved to /no-boss, where it can be the page rather
-           than the middle of one, and where a search for "working without a
-           boss" can land on it directly. What stays is the door. -->
-      <section
-        id="no-boss"
-        class="w-full max-w-xl mt-12 scroll-mt-16 animate-fade-in-up"
-        style="font-family:'Sababa',sans-serif;"
-      >
-        <p
-          class="text-center text-barbi font-bold text-base sm:text-sm tracking-widest mb-1"
-        >
-          {$t('home.sections.problemEyebrow')}
-        </p>
-        <h2
-          class="text-rose-700 font-bold text-3xl sm:text-2xl mb-2 text-center"
-          style="text-shadow:1px 1px 2px rgba(0,0,0,0.15);"
-        >
-          {$t('home.sections.problemTitle')}
-        </h2>
-        <p
-          class="text-center text-slate-800 text-base sm:text-sm leading-relaxed mb-4 max-w-lg mx-auto"
-        >
-          {$t('home.noboss.lead')}
-        </p>
-        <div class="text-center">
-          <a
-            href="/no-boss"
-            data-sveltekit-prefetch
-            class="inline-flex items-center gap-2 bg-barbi hover:bg-white hover:text-barbi text-gold font-bold text-lg sm:text-base px-6 py-3 rounded-2xl shadow-lg hover:scale-105 transition-all duration-300"
-          >
-            {$t('home.noboss.cta')}
-            <span>{$isRtl ? '\u2190' : '\u2192'}</span>
-          </a>
         </div>
       </section>
 
@@ -1145,12 +1137,15 @@
               </div>
             {/each}
           </div>
-        </section>
 
-        <!-- בלוק: איך זה עובד ב‑4 צעדים -->
-        <section id="how" class="scroll-mt-16">
+          <!-- "How you start" stays in the same section as "what is in
+               here": a capability list answers what the product does and
+               immediately raises what a person actually does first, so
+               the four steps belong under the same heading rather than
+               as a section of their own. -->
           <h2
-            class="text-rose-700 font-bold text-3xl sm:text-2xl mb-4 text-center"
+            id="how"
+            class="text-rose-700 font-bold text-3xl sm:text-2xl mb-4 text-center scroll-mt-16"
           >
             {$t('home.sections.howTitle')}
           </h2>
@@ -1372,39 +1367,6 @@
         </section>
 
         <!-- בלוק: למי זה מתאים -->
-        <!-- ===== המקרה שלכם: הכניסה ל/uses =====
-             לקוח פוטנציאלי שאל "אני רוצה תוכנית שותפים לגיוס מכירות של פירות
-             וירקות" - ולאתר לא הייתה שום כניסה לפי סוג עסק. הוא כבר הבין את
-             העיקרון לבד; מה שחסר לו היה לדעת אם הוא חל עליו. הבלוק הזה יושב
-             מיד אחרי "למי זה מתאים", שעונה על אותה שאלה בהפשטה, ומחליף אותה
-             בתשובה קונקרטית. -->
-        <section id="yourcase" class="scroll-mt-16">
-          <a
-            href="/uses"
-            data-sveltekit-prefetch
-            class="group block rounded-2xl border-2 border-gold bg-gradient-to-br from-cyan-50/80 to-fuchsia-50/70 backdrop-blur-sm px-5 py-5 shadow hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 text-center"
-          >
-            <p
-              class="text-barbi font-bold text-base sm:text-sm tracking-widest mb-1"
-            >
-              {$t('home.uses.eyebrow')}
-            </p>
-            <h2 class="text-rose-700 font-bold text-2xl sm:text-xl mb-2">
-              {$t('home.uses.title')}
-            </h2>
-            <p
-              class="text-slate-700 text-base sm:text-sm mb-3 max-w-xl mx-auto leading-relaxed"
-            >
-              {$t('home.uses.sub')}
-            </p>
-            <span
-              class="inline-block bg-barbi text-gold font-bold text-base sm:text-sm px-5 py-2 rounded-xl shadow group-hover:scale-105 transition-transform"
-            >
-              {$t('home.uses.cta')} {$isRtl ? '←' : '→'}
-            </span>
-          </a>
-        </section>
-
         <section id="who" class="scroll-mt-16">
           <h2
             class="text-rose-700 font-bold text-3xl sm:text-2xl mb-1 text-center"
@@ -1429,10 +1391,11 @@
               </div>
             {/each}
           </div>
-        </section>
 
-        <!-- בלוק: ערך הליבה — מה באמת מקבלים -->
-        <section class="scroll-mt-16">
+          <!-- The core value, kept in the same section as "who is this
+               for": the personas above say who, and these say what they
+               actually walk away with. Split in two they were the same
+               answer given twice, five lines apart. -->
           <p
             class="text-center text-slate-800 text-lg sm:text-base leading-relaxed mb-5 max-w-lg mx-auto"
           >
@@ -1496,23 +1459,60 @@
           </div>
         </section>
 
-        <!-- בלוק: למה אנחנו שונים (תנועה עולמית) -->
-        <section class="text-center">
+        <!-- ===== Trust, in one place =====
+             Four separate sections used to make this one argument in four
+             stops: "why we are different", the live counters, the agreement
+             map, and what it costs. Split up they read as four small pitches;
+             together they are the answer to a single question a visitor asks
+             once, late, and all at once - is there anything real behind this,
+             and what will it cost me.
+
+             Order matters here. The numbers come first because they are the
+             only claim on the page nobody wrote: they are counted. The
+             movement and the map explain what the numbers are counting, and
+             the price comes last, when it is a question rather than an
+             objection. -->
+        <section id="trust" class="scroll-mt-16 text-center">
+          <h2 class="text-rose-700 font-bold text-3xl sm:text-2xl mb-1">
+            {$t('home.sections.proofTitle')}
+          </h2>
+          <p class="text-slate-700 text-base sm:text-sm mb-4 max-w-md mx-auto">
+            {$t('home.sections.proofSub')}
+          </p>
+
+          <!-- A tile is shown only when its number is real. Three zeroes
+               under "part of a worldwide movement" is not a modest claim, it
+               is a contradiction of the sentence above it - and it is what a
+               crawler and a first-time visitor saw whenever the counts had
+               not arrived. A count that is genuinely zero is not a smaller
+               number to display; it is an argument against the page. -->
+          <div class="flex justify-center items-stretch gap-3 flex-wrap">
+            {#each [[projectsCount, 'proofStatProjects'], [usersCount, 'proofStatMembers'], [membersCount, 'proofStatSigners']].filter(([n]) => n > 0) as [count, key]}
+              <div
+                class="bg-gradient-to-br from-gold via-barbi to-gold rounded-lg px-4 py-3 shadow min-w-[110px]"
+              >
+                <div class="text-2xl font-bold text-white">{count}</div>
+                <div class="text-white/90 text-sm sm:text-xs">
+                  {$t(`home.sections.${key}`)}
+                </div>
+              </div>
+            {/each}
+          </div>
+
+          <!-- What those numbers are part of, and where to see it. -->
           <div
-            class="bg-gradient-to-br from-amber-200 via-amber-300 to-rose-200 opacity-90 px-4 py-4 rounded-2xl border-2 border-gold shadow-xl backdrop-blur-sm"
+            class="mt-5 bg-gradient-to-br from-amber-200 via-amber-300 to-rose-200 opacity-90 px-4 py-4 rounded-2xl border-2 border-gold shadow-xl backdrop-blur-sm"
           >
-            <h2
-              class="text-rose-700 font-bold text-2xl sm:text-xl mb-2 text-center"
+            <h3
+              class="text-rose-700 font-bold text-2xl sm:text-xl mb-2"
               style="text-shadow: 1px 1px 2px rgba(0,0,0,0.3);"
             >
               {$t('home.fpage.whyDifferentTitle')}
-            </h2>
-            <p
-              class="text-slate-900 text-lg sm:text-base leading-relaxed text-center"
-            >
+            </h3>
+            <p class="text-slate-900 text-lg sm:text-base leading-relaxed">
               {@html $t('home.fpage.whyDifferentDesc')}
             </p>
-            <div class="mt-3 text-center">
+            <div class="mt-3 flex flex-wrap justify-center gap-2">
               <a
                 href={$locale === 'he'
                   ? '/hascama'
@@ -1523,71 +1523,23 @@
               >
                 {$t('home.fpage.discoverAgreement')}
               </a>
+              <a
+                href="/love"
+                data-sveltekit-prefetch
+                class="inline-block bg-cyan-50/80 hover:bg-white border-2 border-barbi text-barbi font-semibold text-lg sm:text-base px-4 py-2 rounded-lg shadow-md hover:scale-105 transition-all duration-300"
+              >
+                <EntityIcon kind="map" size={16} /> {$t('home.sections.mapCta')}
+              </a>
             </div>
           </div>
-        </section>
 
-        <!-- בלוק: הוכחה חברתית / תנועה עולמית -->
-        <section class="text-center">
-          <h2 class="text-rose-700 font-bold text-3xl sm:text-2xl mb-1">
-            {$t('home.sections.proofTitle')}
-          </h2>
-          <p class="text-slate-700 text-base sm:text-sm mb-4 max-w-md mx-auto">
-            {$t('home.sections.proofSub')}
-          </p>
-          <div class="flex justify-center items-stretch gap-3 flex-wrap">
-            <div
-              class="bg-gradient-to-br from-gold via-barbi to-gold rounded-lg px-4 py-3 shadow min-w-[110px]"
-            >
-              <div class="text-2xl font-bold text-white">{projectsCount}</div>
-              <div class="text-white/90 text-sm sm:text-xs">
-                {$t('home.sections.proofStatProjects')}
-              </div>
-            </div>
-            <div
-              class="bg-gradient-to-br from-gold via-barbi to-gold rounded-lg px-4 py-3 shadow min-w-[110px]"
-            >
-              <div class="text-2xl font-bold text-white">{usersCount}</div>
-              <div class="text-white/90 text-sm sm:text-xs">
-                {$t('home.sections.proofStatMembers')}
-              </div>
-            </div>
-            <div
-              class="bg-gradient-to-br from-gold via-barbi to-gold rounded-lg px-4 py-3 shadow min-w-[110px]"
-            >
-              <div class="text-2xl font-bold text-white">{membersCount}</div>
-              <div class="text-white/90 text-sm sm:text-xs">
-                {$t('home.sections.proofStatSigners')}
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- בלוק: מפת ההסכמה הגלובלית -->
-        <section class="text-center">
-          <h2 class="text-rose-700 font-bold text-3xl sm:text-2xl mb-1">
-            {$t('home.sections.mapTitle')}
-          </h2>
-          <p class="text-slate-700 text-base sm:text-sm mb-4 max-w-md mx-auto">
-            {$t('home.sections.mapSub')}
-          </p>
-          <a
-            href="/love"
-            data-sveltekit-prefetch
-            class="inline-block bg-barbi hover:bg-white hover:text-barbi text-gold font-semibold text-lg sm:text-base px-5 py-2 rounded-lg shadow-md hover:scale-105 transition-all duration-300"
-          >
-            <EntityIcon kind="map" size={16} /> {$t('home.sections.mapCta')}
-          </a>
-        </section>
-
-        <!-- בלוק: מודל / תמחור -->
-        <section class="text-center">
+          <!-- And the question every one of the audits found unanswered. -->
           <div
-            class="bg-cyan-50/70 backdrop-blur-sm border-2 border-gold rounded-2xl px-5 py-5 shadow"
+            class="mt-5 bg-cyan-50/70 backdrop-blur-sm border-2 border-gold rounded-2xl px-5 py-5 shadow"
           >
-            <h2 class="text-rose-700 font-bold text-3xl sm:text-2xl mb-1">
+            <h3 class="text-rose-700 font-bold text-2xl sm:text-xl mb-1">
               {$t('home.sections.modelTitle')}
-            </h2>
+            </h3>
             <p
               class="text-slate-800 text-lg sm:text-base leading-relaxed max-w-md mx-auto"
             >
@@ -1630,32 +1582,6 @@
              שהתועלת הפרקטית הובהרה, אותו טקסט קורא כאג'נדה ומבריח מבקר שבא
              לבדוק כלי ניהול — ולכן גם כאן זה באנר קצר אחד, וכל הטיעון עצמו
              (עם המספרים, הציטוטים והמקורות) יושב ב-/why. -->
-        <section
-          id="why"
-          class="w-full max-w-xl mt-2 mb-6 scroll-mt-16"
-          style="font-family:'Sababa',sans-serif;"
-        >
-          <a
-            href="/why"
-            data-sveltekit-prefetch
-            class="group flex flex-col gap-2 rounded-3xl border-2 border-gold/70 bg-gradient-to-br from-[#fff6ea] via-[#fdeef4] to-[#f6e6fb] px-6 py-5 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
-          >
-            <span class="text-barbi font-semibold text-xs tracking-wide">
-              {$t('home.why.eyebrow')}
-            </span>
-            <span class="text-rose-800 font-bold text-xl sm:text-lg leading-snug">
-              {$t('home.why.title')}
-            </span>
-            <span class="text-slate-700 text-base sm:text-sm leading-relaxed">
-              {$t('home.why.desc')}
-            </span>
-            <span
-              class="text-barbi font-semibold text-sm mt-0.5 group-hover:underline"
-            >
-              {$t('home.why.cta')} {$isRtl ? '←' : '→'}
-            </span>
-          </a>
-        </section>
 
         <!-- בלוק: באנר /guid — המדריך המלא. יושב מיד אחרי השאלות הנפוצות: מי
              שקרא תשובות קצרות ורוצה להעמיק, ממשיך לכאן. -->
@@ -1682,7 +1608,9 @@
           >
             {$t('home.deeper.sub')}
           </p>
-          <div class="grid gap-3 sm:grid-cols-3">
+          <!-- Two columns, not three: the grid holds four cards since /why
+               joined it, and 3-up leaves one stranded on its own row. -->
+          <div class="grid gap-3 sm:grid-cols-2">
             {#each deeperCards as card (card.href)}
               <a
                 href={card.href}

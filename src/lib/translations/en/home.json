@@ -64,7 +64,15 @@
     "a1": "I have a partnership (or an idea for one)",
     "a2": "I'm looking for a venture to join",
     "a3": "I just want to see the system",
-    "a4": "I want to understand before I start"
+    "a4": "I want to understand before I start",
+    "a5": "I am employed, or self-employed alone",
+    "a6": "I am not sure it fits my case",
+    "d1": "Why fifty-fifty breaks partnerships, and what to calculate instead",
+    "d2": "What is open now, and what hours buy you",
+    "d3": "The third way: not a boss, not going it alone",
+    "d4": "A partner programme, a project team, or an idea looking for people",
+    "doorsTitle": "Where are you today?",
+    "doorsSub": "Four starting points. Each one leads to a page of its own."
   },
   "sections": {
     "problemTitle": "Know that feeling?",
