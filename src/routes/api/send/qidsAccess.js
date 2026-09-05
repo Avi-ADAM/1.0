@@ -456,6 +456,7 @@ export const qidsAccess = {
   '104getUserForumSources': { allow: ['user', 'serviceAdmin'] },
   'getMashaabims': { allow: ['user', 'serviceAdmin'] },
   'getUserSpByMashaabim': { allow: ['user', 'serviceAdmin'] },
+  'getUserSpsAvailable': { allow: ['user', 'serviceAdmin'] },
 
   // ─── Manually classified (added after the script's last run — see
   //     docs/PLAN_API_PERMISSIONS.md §2 "נשאר לביקורת ידנית") ──────────

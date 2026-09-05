@@ -9,15 +9,13 @@
     import { t } from '$lib/translations';
     import { RingLoader } from 'svelte-loading-spinners';
     import { goto } from '$app/navigation';
-    import { SendTo } from '$lib/send/sendTo.svelte';
+    import { sendToSer } from '$lib/send/sendToSer.js';
     import { executeAction } from '$lib/client/actionClient';
     import Nego from '$lib/components/prPr/negoPend.svelte';
     import EquityPreview from '$lib/components/equity/EquityPreview.svelte';
     import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
     import { fly } from 'svelte/transition';
-    import RangeSlider from "svelte-range-slider-pips";
     import { Head } from 'svead';
-    import { calcX } from '$lib/func/calcX.svelte';
     import { montsi } from '$lib/func/montsi.svelte';
     import { MultiSelect } from 'svelte-multiselect';
     import { find_skill_id } from '$lib/func/findSkillId.svelte';
@@ -30,7 +28,9 @@
     let alrr = $state(false) 
     let tochoose = $state(false)
     let loading = $state(true)
-    let easyy = $state(0)
+    // The value the resource is offered at. Set from the rikma's asking price;
+    // changing it is the counter-proposal (nego) dialog's job, not this page's.
+    let offerValue = $state(0)
     let hovered = $state(false);
     let wid = $state();
 
@@ -62,37 +62,38 @@
         goto(`/login?from=/availiableResorce/${page.params.id}`);
     }
 
+    // "I'll create a new resource for this": there is nothing to choose here —
+    // the offer is simply made at the value the rikma asked for. Changing that
+    // value is what the counter-proposal (nego) dialog is for, so this path
+    // only states the amount and asks for confirmation.
     function torange(){
-        console.log("i am")   
-        // Check if data and data.alld are available before accessing
         if (data && data.alld) {
-            easyy = [Number(data.alld.price)]
+            offerValue = Number(data.alld.price) || 0
             easychoose = true
-            console.log("i am",easyy,data.alld.easy ,"kk", data.alld.price)
         }
     }
 
     async function tochoos(){
         tochoose = true
         loading = true
-        const cookieValueId = document.cookie
-            .split('; ')
-            .find((row) => row.startsWith('id='))
-            .split('=')[1];
-        const uId = cookieValueId;
         const inD = data.alld;
-
-        let id = inD.mashaabim.data.id
-        const que1 = `query { usersPermissionsUser (id: ${uId}){
-        data {
-            id attributes{
-                sps (filters: { mashaabim:{id : {eq:${id}}}}){data{id attributes{ name}}}
-            }
-        }}}`
-        const d1 = await SendTo(que1).then();
-        console.log(d1)
-        mash = d1.data.usersPermissionsUser.data.attributes.sps.data;
-        mash = mash
+        // A need without a `mashaabim` template (a stipend funding request has
+        // none) cannot be filtered by one — offer the whole list instead.
+        const mashaabimId = inD?.mashaabim?.data?.id;
+        try {
+            const d1 = await sendToSer(
+                mashaabimId ? { idL: '0', mashaabimId: String(mashaabimId) } : { idL: '0' },
+                mashaabimId ? 'getUserSpByMashaabim' : 'getUserSpsAvailable',
+                0,
+                0,
+                false,
+                fetch
+            );
+            mash = d1?.data?.usersPermissionsUser?.data?.attributes?.sps?.data ?? [];
+        } catch (e) {
+            console.error('[availiableResorce] failed to load my resources', e);
+            mash = [];
+        }
         loading = false
     }
 
@@ -108,123 +109,67 @@
         openNego(id)
     }
 
-    function getUid() {
-        return document.cookie
-            .split('; ')
-            .find((row) => row.startsWith('id='))
-            .split('=')[1];
-    }
-
     // Resolve the SP to invest: an existing one (spId != 0) or a freshly created
-    // resource of the requested type (spId == 0). Returns the real SP id.
+    // resource matching the need (spId == 0). Returns the real SP id, or null
+    // when the creation failed — the callers must not proceed on a null.
     async function ensureSpId(spId) {
         if (spId != 0) return spId;
         const inD = data.alld;
-        let d = new Date();
-        const uId = getUid();
-        const easy = (easyy > 0) ? easyy : 0;
-        const sdate = (inD.sqadualed !== undefined) ? `sdate: "${new Date(inD.sqadualed).toISOString()}",` : ``;
-        const fdate = (inD.sqadualedf !== undefined) ? `fdate: "${new Date(inD.sqadualedf).toISOString()}" ,` : ``;
-        let que0 =  `mutation { createSp(
-            data: {
-                name: "${inD.name}",
-                descrip: "${inD.descrip}",
-                kindOf: ${inD.kindOf},
-                unit: ${inD.hm},
-                spnot: "${inD.spnot}",
-                price: ${inD.price},
-                myp: ${easy},
-                linkto: "${inD.linkto}",
-                users_permissions_user: "${uId}",
-                mashaabim: "${inD.mashaabim.data.id}",
-                publishedAt: "${d.toISOString()}",
-                ${sdate}
-                ${fdate}
-            }
-        )  {data{id }}
-        } `
-        const d0 = await SendTo(que0).then();
-        return d0.data.createSp.data.id;
+        const result = await executeAction('createResourceRequest', {
+            // A need with no `mashaabim` template (a stipend funding request has
+            // none) still creates a resource — the relation is simply omitted.
+            mashaabimId: inD.mashaabim?.data?.id ? String(inD.mashaabim.data.id) : undefined,
+            name: inD.name,
+            descrip: inD.descrip ?? undefined,
+            kindOf: inD.kindOf ?? undefined,
+            hm: Number(inD.hm) || 1,
+            spnot: inD.spnot ?? undefined,
+            price: Number(inD.price) || 0,
+            myp: Number(offerValue) || 0,
+            linkto: inD.linkto ?? undefined,
+            // `!= null` and not `!== undefined`: Strapi answers with `null` for
+            // an unset date, and `new Date(null)` is 1970 — an open-ended
+            // resource used to be created with a 1970 end date.
+            sdate: inD.sqadualed != null ? new Date(inD.sqadualed).toISOString() : undefined,
+            fdate: inD.sqadualedf != null ? new Date(inD.sqadualedf).toISOString() : undefined
+        });
+        if (!result.success || !result.data?.id) {
+            toast.error(result.error?.message ?? $t('pages.availResource.askFailed'));
+            return null;
+        }
+        return String(result.data.id);
     }
 
+    // Offer the resource on the rikma's own terms. `createMashaabimRequest`
+    // owns the whole flow server-side (Askm, the requester's own vote when they
+    // are a member, the declined mark, the restime timegrama, and the
+    // solo-member auto-approval) — the page only reports the outcome.
     async function ask(spId) {
         alrr = true;
+        const inD = data.alld;
         const real = await ensureSpId(spId);
-        if (real) create(real);
-
-        async function create(spIdd){
-            const inD = data.alld;
-            let d = new Date();
-            const uId = getUid();
-            let myvote = ``;
-            let pid = inD.project.data.attributes.user_1s.data.map((t) => t.id);
-            if (pid.includes(uId)) {
-                myvote = `vots: [{
-                    what: true
-                    users_permissions_user: "${uId}"
-                    ide:${uId}
-                    zman:"${d.toISOString()}"
-                }]`;
+        if (!real) { alrr = false; return; }
+        try {
+            const result = await executeAction('createMashaabimRequest', {
+                openMashaabimId: String(data.mId),
+                projectId: String(inD.project.data.id),
+                spId: String(real),
+                missionName: inD.name != null ? String(inD.name) : undefined
+            });
+            if (!result.success) {
+                toast.error(result.error?.message ?? $t('pages.availResource.askFailed'));
+                alrr = false;
+                return;
             }
-
-            let quet =  `mutation { 
-                createAskm(
-                    data:{ 
-                        publishedAt: "${d.toISOString()}",
-                        open_mashaabim: ${data.mId},
-                        project: ${inD.project.data.id},
-                        sp: ${spIdd},
-                        users_permissions_user: ${uId},
-                        ${myvote}
-                    }
-                ){
-                    data {id}
-                }
-                updateSp(
-                    id: "${spIdd}" 
-                    data: {declinedm: "${data.mId}" }
-                ){
-                    data {
-                        attributes{
-                            declinedm{
-                                data{
-                                    id
-                                }
-                            }
-                        }
-                    }
-                }
-            }`
-            const d2 = await SendTo(quet).then();
-            const r2 = d2.data;
-            console.log(r2);
-            if (r2 != null) {
-                let restime = inD.project.data.attributes.restime;
-                let x = calcX(restime);
-                let fd = new Date(Date.now() + x);
-                let hiluzId = r2.createAskm.data.id;
-                let quee = `mutation 
-                    {createTimegrama(
-                        data:{
-                            date: "${fd.toISOString()}",
-                            whatami: "askm",
-                            askm: ${hiluzId},
-                        }
-                    ){
-                        data {id}
-                    }
-                }`;
-                const d3 = await SendTo(quee).then();
-                const r3 = d3.data;
-                console.log(r3);
-                if (r3 != null) {
-                    success = true;
-                    setTimeout(function () {
-                        success = false;
-                    }, 15000);
-                    toast.success(`${$t('pages.availResource.fnnn')}`);
-                }
-            }
+            success = true;
+            setTimeout(function () {
+                success = false;
+            }, 15000);
+            toast.success(`${$t('pages.availResource.fnnn')}`);
+        } catch (e) {
+            console.error('[availiableResorce] askm failed', e);
+            toast.error($t('pages.availResource.askFailed'));
+            alrr = false;
         }
     }
 
@@ -317,6 +262,9 @@
                       (data.alld?.kindOf === 'yearly' ? 12 : 1))
             : null
     );
+    // מה שהמשאב שווה בסך הכל בהצעה — אותו חישוב של שורת הכסף, על השווי המוצע.
+    // משאב מתחדש בלי תאריך סיום נספר במחזור אחד, כמו למעלה.
+    let offerTotal = $derived(offerValue * units * (isOpenEnded ? 1 : cycles));
 </script>
 
 {#await data.alld}
@@ -507,34 +455,50 @@
                                     {/if}
                                     
                                     {#if alr == true && alrr == false && !data.alld.declinedsps.data.map((c) => c.id).includes(data.uid)}
-                                        <div class="flex justify-center">
+                                        <!-- A column, not a row: the two paths (a new resource / one of
+                                             mine) each need the full width. As a flex row the heading was
+                                             squeezed to one letter per line and the value was unreadable. -->
+                                        <div class="flex flex-col items-center gap-3 mt-4">
                                             {#if easychoose != true}
-                                                <button onclick={torange} class="bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold py-2 px-4 m-4 rounded-full">{$t('pages.availResource.creatnew')}</button>
+                                                <button onclick={torange} class="bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold py-2 px-4 rounded-full">{$t('pages.availResource.creatnew')}</button>
                                             {:else}
-                                                <h3 class="text-barbi">{$t('pages.availResource.rangehead')}</h3>
-                                                <div class="w-full">
-                                                    <RangeSlider float={true} onstop={(e) => { console.log(e) }} bind:values={easyy} min=0 max={Number(data.alld.easy) ?? Number(data.alld.price)} />
+                                                <!-- No slider here: the offer is made at the value the rikma
+                                                     asked for, and it is simply stated. Offering a different
+                                                     value is what "propose other" (nego) is for. -->
+                                                <div class="w-full max-w-md rounded-2xl border border-gold/40 bg-black/30 p-4 text-center">
+                                                    <h3 class="text-barbi font-bold text-lg">{$t('pages.availResource.offerValueHead')}</h3>
+                                                    <p class="text-gold font-bold text-2xl lg:text-3xl my-2">
+                                                        {offerValue.toLocaleString('en-US')} ₪{#if data.alld.recurring}<span class="text-base font-normal">&nbsp;{data.alld.kindOf == "yearly" ? $t('pages.availResource.perY') : $t('pages.availResource.perM')}</span>{/if}
+                                                    </p>
+                                                    {#if offerTotal !== offerValue}
+                                                        <p class="text-gray-100 text-sm">{offerTotal.toLocaleString('en-US')} ₪ {$t('pages.availResource.total')}</p>
+                                                    {/if}
+                                                    <p class="text-gray-300 text-xs mt-2">{$t('pages.availResource.offerValueHint')}</p>
+                                                    <div class="flex flex-wrap justify-center gap-2 mt-3">
+                                                        <button onclick={()=>ask(0)} class="bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold py-2 px-4 rounded-full">{$t('pages.availResource.okk')}</button>
+                                                        <button onclick={()=>openNego(0)} class="border border-gold rounded-full text-gold hover:text-barbi hover:border-barbi font-bold py-2 px-4">{$t('lev.cards.proposeOther')}</button>
+                                                    </div>
                                                 </div>
-                                                <button onclick={()=>ask(0)} class="bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold py-2 px-4 m-4 rounded-full">{$t('pages.availResource.okk')}</button>
-                                                <button onclick={()=>openNego(0)} class="border border-gold rounded-full text-gold hover:text-barbi hover:border-barbi font-bold py-2 px-4 m-4">{$t('lev.cards.proposeOther')}</button>
                                             {/if}
-                                            
+
                                             {#if tochoose != true && alrr == false}
-                                                <button onclick={tochoos} class="bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold py-2 px-4 m-4 rounded-full">{$t('pages.availResource.choosee')}</button>
+                                                <button onclick={tochoos} class="bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold py-2 px-4 rounded-full">{$t('pages.availResource.choosee')}</button>
                                             {:else if alrr == false}
-                                                {#if loading == true || loading !=true && mash.length >0}
-                                                    <div class="m-4 mt-6">
-                                                        <MultiSelect {loading} --sms-open-z-index=4 --sms-options-max-height="10vh" --sms-text-color="var(--barbi-pink)" --sms-max-width="100%" bind:selected maxSelect={1} placeholder={$t('pages.availResource.plh')} noMatchingOptionsMsg={$t('pages.availResource.nom')} options={mash.map(c => c.attributes.name)} />
-                                                    </div>
-                                                {:else}
-                                                    <div class="m-4 mt-6">
-                                                        <p class="text-barbi">{$t('pages.availResource.nomash')}</p>
-                                                    </div>
-                                                {/if}
-                                                {#if selected.length>0}
-                                                    <button onclick={afterChoose} class="bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold py-2 px-4 m-4 rounded-full">{$t('pages.availResource.ok')}</button>
-                                                    <button onclick={afterChooseNego} class="border border-gold rounded-full text-gold hover:text-barbi hover:border-barbi font-bold py-2 px-4 m-4">{$t('lev.cards.proposeOther')}</button>
-                                                {/if}
+                                                <div class="w-full max-w-md flex flex-col items-center gap-3">
+                                                    {#if loading == true || loading !=true && mash.length >0}
+                                                        <div class="w-full">
+                                                            <MultiSelect {loading} --sms-open-z-index=4 --sms-options-max-height="10vh" --sms-text-color="var(--barbi-pink)" --sms-max-width="100%" bind:selected maxSelect={1} placeholder={$t('pages.availResource.plh')} noMatchingOptionsMsg={$t('pages.availResource.nom')} options={mash.map(c => c.attributes.name)} />
+                                                        </div>
+                                                    {:else}
+                                                        <p class="text-barbi text-center">{$t('pages.availResource.nomash')}</p>
+                                                    {/if}
+                                                    {#if selected.length>0}
+                                                        <div class="flex flex-wrap justify-center gap-2">
+                                                            <button onclick={afterChoose} class="bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold py-2 px-4 rounded-full">{$t('pages.availResource.ok')}</button>
+                                                            <button onclick={afterChooseNego} class="border border-gold rounded-full text-gold hover:text-barbi hover:border-barbi font-bold py-2 px-4">{$t('lev.cards.proposeOther')}</button>
+                                                        </div>
+                                                    {/if}
+                                                </div>
                                             {/if}
                                         </div>
                                     {/if}

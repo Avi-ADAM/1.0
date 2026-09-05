@@ -423,6 +423,7 @@ export type ActionKey =
   | 'voteOnDecision'
   | 'counterSaleClaim'
   | 'createResourceRequest'
+  | 'createMashaabimRequest'
   | 'updateResourceRequest'
   | 'ensurePersonalRikma'
   | 'publishUserResourceAsProduct'

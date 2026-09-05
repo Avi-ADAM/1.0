@@ -10569,6 +10569,26 @@ export const moachQids = {
         }
       }
     }
+  }`,
+  // Same list, with no mashaabim template to filter by: an open need can carry
+  // no `mashaabim` relation at all (a stipend funding request, for one), and
+  // filtering on a null template would return nothing to choose from.
+  'getUserSpsAvailable': `query GetUserSpsAvailable($idL: ID!) {
+    usersPermissionsUser(id: $idL) {
+      data {
+        attributes {
+          sps(filters: { archived: { eq: false }, panui: { ne: false } }, pagination: { limit: 100 }) {
+            data {
+              id
+              attributes {
+                name
+                panui
+              }
+            }
+          }
+        }
+      }
+    }
   }`
 };
 

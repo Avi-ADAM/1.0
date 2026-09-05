@@ -18,9 +18,11 @@ const handler: ActionExecutionHandler = async (params, context) => {
     myp:                     myp    != null ? myp   : 0,
     linkto:                  linkto || '',
     users_permissions_user:  userId,
-    mashaabim:               mashaabimId,
     publishedAt:             now
   };
+  // An open need does not have to carry a `mashaabim` template (a stipend
+  // funding request has none), and sending `mashaabim: null` would clear it.
+  if (mashaabimId) spData.mashaabim = mashaabimId;
   if (sdate) spData.sdate = sdate;
   if (fdate) spData.fdate = fdate;
 
@@ -46,7 +48,7 @@ export const createResourceRequestConfig: ActionConfig = {
   description: 'Create a personal resource offering (Sp)',
   graphqlOperation: handler,
   paramSchema: {
-    mashaabimId: { type: 'string',  required: true,  description: 'Mashaabim template ID' },
+    mashaabimId: { type: 'string',  required: false, description: 'Mashaabim template ID (omitted when the need carries none)' },
     name:        { type: 'string',  required: true,  description: 'Resource name' },
     descrip:     { type: 'string',  required: false, description: 'Description' },
     kindOf:      { type: 'string',  required: false, description: 'Type (total/monthly/yearly/perUnit/rent)' },
