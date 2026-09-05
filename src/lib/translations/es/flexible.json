@@ -1,0 +1,69 @@
+{
+  "meta": {
+    "title": "Trabajo flexible en tus propios términos — para etapas avanzadas, regresos tras una pausa y cualquiera a quien no le encaje un empleo estándar | 1lev1",
+    "description": "¿Te despidieron a los 55? ¿Vuelves tras años cuidando de tu familia? ¿Tienes días buenos y días menos buenos? Aquí publicas lo que puedes aportar y en qué condiciones, y te asocias con socios, en lugar de encajarte en la casilla de otro."
+  },
+  "hero": {
+    "eyebrow": "◈ En tus términos ◈",
+    "h1": "El trabajo se adapta a ti, y no al revés",
+    "sub": "Tienes un oficio, experiencia y motivación, pero el marco habitual no está hecho para tu ritmo — o sencillamente no responde. Aquí no te presentas a una casilla que diseñó otro: publicas lo que puedes aportar y en qué condiciones, y buscas socios a quienes les encaje.",
+    "reassure": "Sin capital inicial, sin comprometerte a un horario fijo y sin montar un negocio en solitario.",
+    "cta": "Cuéntanos qué sabes hacer"
+  },
+  "know": {
+    "title": "Si algo de esto te suena",
+    "k1": "Has enviado decenas de currículums. La mayoría sin respuesta, y sospechas que el motivo es tu año de nacimiento.",
+    "k2": "Criaste hijos o cuidaste de un padre durante años, y ahora la primera pregunta de cada entrevista es por ese vacío.",
+    "k3": "Hay días en que puedes dar seis horas y días en que no puedes dar ninguna — y todo puesto pide un compromiso fijo por adelantado.",
+    "k4": "Sabes exactamente cuánto vales, pero montar un negocio solo es un riesgo y una energía que no tienes.",
+    "turn": "El problema no es lo que puedes aportar. Es la forma en que se acostumbra a pedirlo."
+  },
+  "fit": {
+    "title": "Qué es realmente distinto aquí",
+    "terms_t": "Las condiciones las escribes tú",
+    "terms_d": "Puedes ofrecerte a una rikma con tus propias palabras: qué harás, cuánto y cuándo. No es una oferta de empleo en la que intentas encajar: es una propuesta que redactas tú, y que los socios aprueban o responden con otras condiciones.",
+    "hours_t": "Se cuentan las horas, no la presencia",
+    "hours_d": "Quien dio tres horas recibe la parte de tres horas. No hay bajas que negociar, nadie a quien explicarle una ausencia y nadie que decida si el motivo era suficiente.",
+    "mixed_t": "La edad y la experiencia son un recurso, no un obstáculo",
+    "mixed_d": "Una rikma se compone de personas que se complementan. La experiencia, el criterio y los contactos que has acumulado son justo lo que le falta a alguien más joven, y su rapidez técnica es lo que a ti te ahorra tiempo.",
+    "demand_t": "Clientes que llegan a la necesidad",
+    "demand_d": "La petición de un cliente se descompone en partes, y alrededor de cada parte se reúnen quienes pueden cubrirla. La dirección es la contraria a la del autobombo: no persigues al cliente, la petición llega a ti. (El mecanismo aún se está rodando; por ahora el emparejamiento se hace con acompañamiento personal.)"
+  },
+  "how": {
+    "title": "Cómo ocurre",
+    "s1": "Nos cuentas qué sabes hacer, de cuántas horas dispones y qué condiciones te importan. En una conversación, no en un formulario.",
+    "s2": "Encuentras una rikma que encaje — o publicas tu propia propuesta: «yo haré esto, en estas condiciones».",
+    "s3": "Los socios aprueban, o proponen otras condiciones y las hablan contigo. Tú respondes, hasta que todos firman la misma versión.",
+    "s4": "Desde la primera hora que registras, tu parte de los beneficios futuros empieza a acumularse. Transparente y acordado de antemano."
+  },
+  "honest": {
+    "title": "Y lo que conviene saber antes",
+    "lead": "Tres cosas que es mejor oír de nosotros ahora que descubrir dentro de dos meses:",
+    "h1": "Aquí no hay sueldo garantizado. Hay una parte de los beneficios si la rikma gana y cuando gane, por eso encaja junto a un ingreso o una prestación que ya tengas, y no como sustituto inmediato.",
+    "h2": "También aquí puedes oír «ahora no nos encaja» sobre una misión concreta. Lo que sí cambia: no hay un filtrado automático antes de que lo lea una persona, la decisión se te explica directamente, y un no en una misión no es un veredicto sobre ti.",
+    "h3": "Si cobras una pensión por discapacidad, de jubilación o una prestación por desempleo, un ingreso adicional puede afectarla. Compruébalo con quien te la paga antes de empezar a ganar. No sabemos qué aplica en tu caso y no vamos a fingir que sí."
+  },
+  "open": {
+    "title": "Qué hay abierto ahora",
+    "missions": "misiones que buscan quien las haga",
+    "projects": "rikmas activas",
+    "view": "ver"
+  },
+  "match": {
+    "title": "O simplemente cuéntanoslo",
+    "sub": "Repasar listados es un trabajo en sí mismo, y si has estado buscando empleo estos meses ya has hecho bastante. Una conversación breve, y buscamos por ti — o te ayudamos a redactar tu propia propuesta.",
+    "cta": "Concertar una conversación"
+  },
+  "doubts": {
+    "title": "Las preguntas que más se hacen aquí",
+    "q1_q": "No soy una persona técnica. ¿Me resultará demasiado complicado?",
+    "q1_a": "La entrada es una conversación con una persona, no un formulario. Y si el sistema en sí te resulta complicado, puedes decirlo y alguien lo repasará contigo. Nadie espera que lo aprendas solo.",
+    "q2_q": "Tengo 68 años. ¿Esto va conmigo siquiera?",
+    "q2_a": "Aquí no hay edad de jubilación, porque no hay un empleador que la fije. Lo que cuenta es cuánto quieres y puedes aportar, y a qué ritmo. Parte de quienes se suman buscan unas pocas horas a la semana que valgan algo, y con eso basta.",
+    "q3_q": "Tengo una limitación que requiere adaptaciones. ¿Cómo lo planteo?",
+    "q3_a": "Las condiciones las redactas tú al ofrecerte, incluidas las horas, la forma de trabajar y lo que necesitas. No es una petición especial que se presenta tras ser aceptado: es parte de la propuesta que todos acuerdan de antemano.",
+    "q4_q": "¿Y si no consigo dar lo que me comprometí a dar?",
+    "q4_a": "Lo que ya aportaste queda registrado y sigue siendo tuyo: la parte acumulada no se borra. Y si una misión deja de encajar, hay una manera ordenada de soltarla de común acuerdo en lugar de simplemente desaparecer."
+  },
+  "back": "Volver a la página de inicio"
+}

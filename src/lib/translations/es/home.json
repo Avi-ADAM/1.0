@@ -73,7 +73,9 @@
     "d3": "La tercera vía: ni un jefe ni montarlo solo",
     "d4": "Un programa de socios, un equipo de proyecto o una idea que busca gente",
     "doorsTitle": "¿Dónde estás hoy?",
-    "doorsSub": "Cuatro puntos de partida. Cada uno lleva a una página propia."
+    "doorsSub": "Cada uno lleva a una página propia. Elige el que más se te acerque.",
+    "a7": "Un empleo estándar no me encaja",
+    "d5": "Edad, una pausa profesional o un ritmo propio — y en tus términos"
   },
   "sections": {
     "problemTitle": "¿Conoces esa sensación?",
@@ -644,5 +646,11 @@
   },
   "crumb": {
     "home": "Inicio"
+  },
+  "flexible": {
+    "eyebrow": "◈ Y si el marco habitual no encaja ◈",
+    "title": "¿Te despidieron, vuelves tras una pausa o el cuerpo marca el ritmo?",
+    "lead": "Puedes publicar lo que eres capaz de aportar y en qué condiciones, y asociarte con socios, en lugar de encajarte en la casilla de otro.",
+    "cta": "Al trabajo flexible en tus términos"
   }
 }

@@ -50,6 +50,10 @@ export const ROUTED = {
     // The "looking for a venture to join" track. The homepage's discovery
     // strip keeps its own copy in `home`; this is the page behind it.
     join: at('/join'),
+    // The track for readers the ordinary job market keeps turning down. The
+    // homepage door and banner keep their copy in `home`, which loads
+    // everywhere; only the page's own copy is gated.
+    flexible: at('/flexible-work'),
     // The page behind the product - why consent is re-checked at every step.
     // One route, one namespace; the homepage teaser for it lives in `home`.
     why: at('/why'),

@@ -37,6 +37,9 @@
     ['a1', 'd1', '/partnership'],
     ['a2', 'd2', '/join'],
     ['a5', 'd3', '/no-boss'],
+    // The reader the other four doors quietly assume away: someone whose
+    // constraint is not "which of these am I" but "will any of this take me".
+    ['a7', 'd5', '/flexible-work'],
     ['a6', 'd4', '/uses']
   ];
 
@@ -827,6 +830,43 @@
             {$t('home.split.ctaSecondary')}
           </button>
         </div>
+      </section>
+
+      <!-- ===== A door for the reader the market keeps turning down =====
+           This audience also has a chip in the splitter above, which is
+           unusual - every other track gets one entrance. It earns two because
+           the splitter asks "where are you today?", and someone who has been
+           turned down for a year does not answer that question with a
+           category; they answer it with "nowhere". The banner names the
+           situation instead of the segment, so it can be recognised rather
+           than chosen. -->
+      <section
+        id="flexible"
+        class="w-full max-w-xl mt-12 scroll-mt-16 animate-fade-in-up"
+        style="font-family:'Sababa',sans-serif;"
+      >
+        <a
+          href="/flexible-work"
+          data-sveltekit-prefetch
+          class="group block rounded-2xl border-2 border-gold bg-gradient-to-br from-cyan-50/80 to-amber-50/70 backdrop-blur-sm px-5 py-5 shadow hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 text-center"
+        >
+          <p class="text-barbi font-bold text-base sm:text-sm tracking-widest mb-1">
+            {$t('home.flexible.eyebrow')}
+          </p>
+          <h2 class="text-rose-700 font-bold text-2xl sm:text-xl mb-2">
+            {$t('home.flexible.title')}
+          </h2>
+          <p
+            class="text-slate-800 text-base sm:text-sm mb-3 max-w-lg mx-auto leading-relaxed"
+          >
+            {$t('home.flexible.lead')}
+          </p>
+          <span
+            class="inline-block bg-barbi text-gold font-bold text-base sm:text-sm px-5 py-2 rounded-xl shadow group-hover:scale-105 transition-transform"
+          >
+            {$t('home.flexible.cta')} {$isRtl ? '\u2190' : '\u2192'}
+          </span>
+        </a>
       </section>
 
       {@render flowLine($t('home.flow.toDemo'))}
