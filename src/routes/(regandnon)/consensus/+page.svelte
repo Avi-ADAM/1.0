@@ -427,7 +427,11 @@
     --cp-gold: var(--gold);
     --cp-gold-lighter: #f0c040;
     --cp-gold-deep: var(--gre);
-    --cp-gold-shadow: var(--stgold);
+    /* Was --stgold, which business/dark flips pale for the dark surfaces it
+       inks elsewhere. This page's background is a hard-coded pale gradient in
+       every theme and mode, so its ink has to stay dark in every one — that is
+       what --ramp-ink is for. */
+    --cp-gold-shadow: var(--ramp-ink);
     --cp-gold-gra: var(--gra);
     --cp-gold-grc: var(--grc);
     --cp-barbi: var(--barbi-pink);
@@ -646,7 +650,10 @@
   }
   .cp-ring-icon {
     display: inline-flex;
-    color: var(--cp-gold-lighter);
+    /* --cp-gold-lighter is this page's ink for its DARK sections (the demo
+       frame). The ring sits on the pale hero, where it measured 1.46:1, so it
+       matches the .cp-ring-result label beside it instead. */
+    color: var(--cp-gold-shadow);
   }
   .cp-ring-result {
     font-family: var(--bal);

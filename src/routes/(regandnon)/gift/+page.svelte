@@ -222,7 +222,12 @@
     font-size: 1.6rem;
     font-weight: 700;
     margin-top: 0.75rem;
-    color: var(--stgold, #574010);
+    /* Was --stgold, a deep gold intended for light surfaces. This heading sits
+       on the page background, which is --bg: #070606 in the personal palette,
+       so it measured 2.3:1 there. --text flips together with --bg in every
+       palette; the gold accent the heading wants is still carried by the
+       ::after underline below. Same fix /project already carries. */
+    color: var(--text, #574010);
   }
   .head h1::after {
     content: '';
@@ -418,7 +423,9 @@
     background-size: 220% auto;
     animation: gold-shine 5s linear infinite;
     border: 1px solid rgba(179, 135, 40, 0.45);
-    color: var(--stgold, #574010);
+    /* Same case as the nav pill: this gold gradient is pale in every theme and
+       mode, so its ink has to stay dark in every one. */
+    color: var(--ramp-ink, #16131b);
     font-weight: 700;
   }
   .card-actions {

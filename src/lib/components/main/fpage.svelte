@@ -797,7 +797,7 @@
             <div
               class="bg-cyan-50/70 backdrop-blur-sm border-2 border-gold rounded-lg p-4 shadow flex flex-col"
             >
-              <div class="mb-1"><EntityIcon kind={icon} size={24} /></div>
+              <div class="mb-1"><EntityIcon kind={icon} size={24} tone="brand" /></div>
               <h3 class="text-rose-700 font-bold text-lg sm:text-base mb-1">
                 {$t(`home.split.${key}_t`)}
               </h3>
@@ -812,7 +812,7 @@
           <div
             class="sm:col-span-2 bg-cyan-50/70 backdrop-blur-sm border-2 border-barbi/60 rounded-lg p-4 shadow flex flex-col"
           >
-            <div class="mb-1"><EntityIcon kind="maagad" size={24} /></div>
+            <div class="mb-1"><EntityIcon kind="maagad" size={24} tone="brand" /></div>
             <h3 class="text-rose-700 font-bold text-lg sm:text-base mb-1">
               {$t('home.split.b5_t')}
             </h3>
@@ -1113,7 +1113,7 @@
           <div
             class="relative shrink-0 w-16 h-16 rounded-2xl bg-barbi/10 flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300"
           >
-            <EntityIcon kind="maagad" size={30} />
+            <EntityIcon kind="maagad" size={30} tone="brand" />
           </div>
 
           <!-- טקסט -->
@@ -1248,7 +1248,7 @@
                 {href}
                 class="group flex items-center gap-3 bg-cyan-50/80 hover:bg-gold/20 border border-gold/60 rounded-lg px-3 py-2 transition-colors"
               >
-                <EntityIcon kind={icon} size={24} />
+                <EntityIcon kind={icon} size={24} tone="brand" />
                 <span class="flex-1 text-slate-800 text-lg sm:text-base">
                   {#if statsLoaded && count}
                     <strong class="text-rose-700">{count}</strong>
@@ -1266,7 +1266,7 @@
               href="/demand"
               class="group flex items-center gap-3 bg-gradient-to-l from-gold/30 to-barbi/20 hover:from-gold/40 border border-gold/60 rounded-lg px-3 py-2 transition-colors"
             >
-              <EntityIcon kind="map" size={24} />
+              <EntityIcon kind="map" size={24} tone="brand" />
               <span class="flex-1 text-slate-800 text-lg sm:text-base">
                 <strong>{$t('home.discover.map')}</strong>
                 <span class="block text-sm sm:text-xs text-slate-600"
@@ -1343,7 +1343,7 @@
               <div
                 class="bg-cyan-50/70 backdrop-blur-sm border-2 border-gold rounded-lg p-4 shadow flex flex-col"
               >
-                <div class="mb-1"><EntityIcon kind={icon} size={24} /></div>
+                <div class="mb-1"><EntityIcon kind={icon} size={24} tone="brand" /></div>
                 <h3 class="text-rose-700 font-bold text-lg sm:text-base mb-1">
                   {$t(`home.platform.${key}_t`)}
                 </h3>
@@ -1627,7 +1627,7 @@
               <div
                 class="bg-cyan-50/70 backdrop-blur-sm border-2 border-gold rounded-lg p-4 shadow flex flex-col text-center"
               >
-                <div class="mb-1 flex justify-center"><EntityIcon kind={icon} size={30} /></div>
+                <div class="mb-1 flex justify-center"><EntityIcon kind={icon} size={30} tone="brand" /></div>
                 <h3 class="text-rose-700 font-bold text-lg sm:text-base mb-1">
                   {$t(`home.sections.${key}_t`)}
                 </h3>
@@ -1897,7 +1897,7 @@
                 data-sveltekit-prefetch
                 class="group flex flex-col gap-1.5 rounded-2xl border-2 border-gold/70 bg-cyan-50/70 backdrop-blur-sm px-4 py-4 shadow hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
               >
-                <EntityIcon kind={card.icon} size={24} />
+                <EntityIcon kind={card.icon} size={24} tone="brand" />
                 <span
                   class="font-bold text-rose-800 text-base sm:text-sm leading-snug"
                   >{card.title}</span
@@ -1990,7 +1990,7 @@
       {#if loadinga == true}
         <div class="mx-auto"><Lowding width="24px" height="24px" /></div>
       {:else}
-        <EntityIcon kind="key" size={30} />
+        <EntityIcon kind="key" size={30} tone="brand" />
         <span class="text-xl text-barbi font-bold font-['Sababa']"
           >{$t('home.cta.login')}</span
         >
@@ -2026,7 +2026,7 @@
       onclick={() => (demoOpen = true)}
     >
       <span class="flex flex-row items-center gap-3">
-        <EntityIcon kind="chat" size={30} />
+        <EntityIcon kind="chat" size={30} tone="brand" />
         <span class="text-lg text-barbi font-bold font-['Sababa']"
           >{$t('demo.button')}</span
         >
