@@ -70,8 +70,14 @@
    * @property {boolean} [cards]
    * @property {any} [chat]
    * @property {number} [order]
-   * @property {(payload: { ani: string, coinlapach: any }) => void} [onAcsept]
-   * @property {(payload: { ani: string, coinlapach: any }) => void} [onDecline]
+   * `finalized` says whether the request itself is over (accepted/declined for
+   * good) or the vote merely moved on — a recorded vote still waiting for other
+   * members, a counter round, or an acceptance parked on the candidate's
+   * consent. A list view collapses the card either way; a single-vote page must
+   * not announce "resolved" for the latter.
+   * `what` is the recorded position when the payload is a plain vote.
+   * @property {(payload: { ani: string, coinlapach: any, finalized?: boolean, what?: boolean }) => void} [onAcsept]
+   * @property {(payload: { ani: string, coinlapach: any, finalized?: boolean, what?: boolean }) => void} [onDecline]
    * @property {(payload: { id: string }) => void} [onHover]
    * @property {() => void} [onModal]
    * @property {(payload: { id: any }) => void} [onUser]
@@ -171,7 +177,7 @@
         id: String(openMid)
       });
       if (result.success) {
-        onDecline?.({ ani: 'askedma', coinlapach });
+        onDecline?.({ ani: 'askedma', coinlapach, finalized: true });
       }
     } finally {
       dismissing = false;
@@ -196,7 +202,8 @@
     negotiationLoading = false;
     masa = false;
     negotiationMode = false;
-    onAcsept?.({ ani: 'askedma', coinlapach });
+    // A counter round keeps the request alive — the other side has to answer.
+    onAcsept?.({ ani: 'askedma', coinlapach, finalized: false });
   }
 
   // Rights-holder intermediate proposal on a candidate's Askm. Stored as a
@@ -354,7 +361,13 @@
           existingVotes: users,
         });
         if (result.success) {
-          onAcsept?.({ ani: 'askedma', coinlapach });
+          // `materialized: false` = the bilateral gate parked the acceptance on
+          // the candidate's answer; nothing was registered yet.
+          onAcsept?.({
+            ani: 'askedma',
+            coinlapach,
+            finalized: result.data?.materialized !== false
+          });
         } else {
           error1 = result.error;
         }
@@ -371,7 +384,8 @@
           isFirstVote: isFirst,
         });
         if (result.success) {
-          onAcsept?.({ ani: 'askedma', coinlapach });
+          // Vote recorded only — the other members still have to answer.
+          onAcsept?.({ ani: 'askedma', coinlapach, finalized: false });
         } else {
           error1 = result.error;
         }
@@ -398,7 +412,7 @@
           existingVotes: users,
         });
         if (result.success) {
-          onDecline?.({ ani: 'askedma', coinlapach });
+          onDecline?.({ ani: 'askedma', coinlapach, finalized: true });
         } else {
           error1 = result.error;
         }
@@ -406,7 +420,37 @@
         error1 = e;
       }
     } else if (noofpu > 1) {
-      alert('soon');
+      // More than one member: a single no does not archive anything. It is
+      // recorded at the current negotiation round, where `computeNegoGate`
+      // reads it as "not these terms" — it blocks the silence/auto-approval
+      // path for round `orderon` and stops counting the moment either side
+      // opens a new round.
+      //
+      // TODO (consent redesign): there should be no plain "not in favor" here
+      // at all. Per the "no absolute no" principle, objecting is supposed to BE
+      // a nego round — this button should open the negotiation panel
+      // (toggleNegotiationMode → counterOnAskm) so the objection arrives with
+      // the terms the objector would sign, and the only way to reject a
+      // candidate outright should be accepting a different offer for the same
+      // resource (which archives the sibling Askms on its own). See
+      // src/lib/server/actions/configs/voteOnAskm.ts for the full note.
+      try {
+        const result = await executeAction('voteOnAskm', {
+          askmId: String(askId ?? id),
+          projectId: String(projectId),
+          what: false,
+          order: orderon ?? 0,
+          existingVotes: users,
+        });
+        if (result.success) {
+          // Recorded, not resolved: the request stays open for a counter round.
+          onDecline?.({ ani: 'askedma', coinlapach, finalized: false, what: false });
+        } else {
+          error1 = result.error;
+        }
+      } catch (e) {
+        error1 = e;
+      }
     }
   }
   let hovered = $state(false);

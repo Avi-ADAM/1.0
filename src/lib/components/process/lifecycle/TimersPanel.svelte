@@ -11,6 +11,8 @@
   import { t } from '$lib/translations';
   import { lang as langStore } from '$lib/stores/lang.js';
   import { groupTimersByMonth, mediaUrl } from '$lib/utils/processLifecycle';
+  import { normalizeSaveLinks, saveLinkLabel } from '$lib/timers/saveLinks.js';
+  import { readSaveFiles } from '$lib/timers/saveFiles.js';
   import MonthlyHours from '$lib/components/mission/MonthlyHours.svelte';
   import TimerSessions from '$lib/components/mission/TimerSessions.svelte';
 
@@ -79,6 +81,10 @@
             {#each group.entries as entry (entry.timer.id)}
               {@const attrs = entry.timer.attributes ?? {}}
               {@const timerUser = attrs.users_permissions_user?.data}
+              <!-- What the member filed alongside the note: links out, and
+                   files uploaded with the save. -->
+              {@const evidenceLinks = normalizeSaveLinks(attrs.saveLinks)}
+              {@const evidenceFiles = readSaveFiles(attrs.saveFiles)}
               <li class="tp-timer">
                 {#if timerUser?.attributes?.profilePic?.data?.attributes?.url}
                   <img
@@ -110,6 +116,24 @@
                 {/if}
                 {#if attrs.saveText}
                   <p class="tp-timer-note">{attrs.saveText}</p>
+                {/if}
+                {#if evidenceLinks.length || evidenceFiles.length}
+                  <ul class="tp-timer-evi">
+                    {#each evidenceLinks as link (link)}
+                      <li>
+                        <a href={link} target="_blank" rel="noopener noreferrer" title={link}>
+                          🔗 {saveLinkLabel(link)}
+                        </a>
+                      </li>
+                    {/each}
+                    {#each evidenceFiles as file (file.id)}
+                      <li>
+                        <a href={mediaUrl(file.url)} target="_blank" rel="noopener noreferrer" title={file.name}>
+                          📎 {file.name}
+                        </a>
+                      </li>
+                    {/each}
+                  </ul>
                 {/if}
                 {#if (attrs.acts?.data ?? []).length > 0}
                   <p class="tp-timer-acts">
@@ -274,4 +298,31 @@
   }
 
   .tp-timer-acts { color: var(--pcv-text-3, #a8a29e); }
+
+  .tp-timer-evi {
+    flex-basis: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .tp-timer-evi a {
+    display: inline-block;
+    max-width: 100%;
+    padding: 1px 7px;
+    border-radius: 9999px;
+    border: 1px solid var(--pcv-node-border, #e7e5e4);
+    font-size: 11px;
+    line-height: 1.5;
+    color: var(--pcv-link, #0369a1);
+    text-decoration: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .tp-timer-evi a:hover { text-decoration: underline; }
 </style>

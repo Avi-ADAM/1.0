@@ -15,9 +15,9 @@ import type { DeviceCert } from '$lib/consent/event';
 //   { cert }        — attaches a cert to an ALREADY-registered key (the
 //                     shadow-mode upgrade path: devices that TOFU'd before
 //                     enforcement get certified retroactively).
-export const POST: RequestHandler = async ({ request, cookies }) => {
+export const POST: RequestHandler = async ({ request, cookies, locals }) => {
   if (!cookies.get('jwt')) throw error(401, 'Unauthorized');
-  const userId = cookies.get('id');
+  const userId = locals.uid || undefined;
   if (!userId) throw error(401, 'no user id in session');
 
   const body = await request.json().catch(() => null);

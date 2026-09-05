@@ -64,13 +64,17 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
     'confirmStipendPayment'
   );
 
-  // The money leg follows the same answer.
+  // The money leg follows the same answer. A payment the funder had only
+  // *promised* (status `pending`, `senderconf: false`) is testified to by the
+  // arrival itself: money that got there was sent, whether or not its sender
+  // ever came back to say so.
   if (payment.halukaId) {
     await run(
       exec,
       `mutation { updateHaluka(id: ${gqlStr(payment.halukaId)}, data: { ${fields(
         numField('amount', received),
-        nothingArrived ? 'confirmed: false' : 'confirmed: true'
+        nothingArrived ? 'confirmed: false' : 'confirmed: true',
+        nothingArrived || payment.status !== 'pending' ? null : 'senderconf: true'
       )} }) { data { id } } }`,
       'confirmStipendPayment:haluka'
     ).catch((e) => console.warn('[confirmStipendPayment] haluka update failed (non-fatal):', e));

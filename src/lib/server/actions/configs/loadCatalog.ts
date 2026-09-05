@@ -23,7 +23,12 @@ const handler: ActionExecutionHandler = async (params, context) => {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${jwt}` },
     body: JSON.stringify({
-      query: `query { ${linkp} { data { id attributes { ${field} ${more} } } } }`
+      // Explicit limit: without one Strapi applies its default page size, so
+      // the picker this feeds silently showed only the first slice of the
+      // catalog — and a member whose resource sat past the cut-off would
+      // "create" a duplicate template for something that already existed.
+      // 500 matches qid 204getAllMashaabims, which reads the same collection.
+      query: `query { ${linkp}(pagination: { limit: 500 }) { data { id attributes { ${field} ${more} } } } }`
     })
   });
   const json = await res.json();

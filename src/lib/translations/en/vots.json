@@ -8,6 +8,8 @@
   "voteDetail": {
     "back": "→ All project votes",
     "closed": "This vote is resolved - thanks for taking part!",
+    "recorded": "Your vote is recorded. The proposal is waiting for the other members.",
+    "recordedNo": "Your objection is recorded. The proposal will not pass on these terms — you can offer different terms in a negotiation round.",
     "missing": "This item was not found or has already been archived."
   }
 }

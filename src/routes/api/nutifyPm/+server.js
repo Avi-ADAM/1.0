@@ -9,14 +9,14 @@ import { sendToSer } from '$lib/send/sendToSer.js';
 import { render } from 'svelty-email';
 
 //b sendMessages
-export async function POST({request, cookies, fetch}){
+export async function POST({request, cookies, fetch, locals}){
   const da = await request.json();
   const pid = da.pid || 0;
   const title = da.title || { he: '', en: '' };
   const body = da.body || { he: '', en: '' };
   const userIds = da.userIds || null; // רשימת IDs ספציפית (אופציונלי)
   const lang = cookies.get('lang') || "he";
-  const idL = cookies.get('id');
+  const idL = locals.uid || undefined;
   console.log(pid,idL,"nutifyPm 19", userIds ? "specific users" : "all project users")
   let datau = { data: { arg:{pid}, queId: '3projectJSONQue' } };
   let jsonim = []

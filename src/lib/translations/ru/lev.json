@@ -809,7 +809,8 @@
       "saleClaim": "Согласие держателя оплаты",
       "newService": "Новая услуга",
       "picVote": "Смена логотипа",
-      "stipendaccrued": "Стипендия на жизнь"
+      "stipendaccrued": "Стипендия на жизнь",
+      "stipendtransfer": "Перевод стипендии"
     },
     "fact": {
       "hours": "часов: {{value}}",
@@ -859,7 +860,8 @@
       "siteShareDecide": "Раздел утверждён — подтвердите свою долю",
       "stipendCycle": "Цикл стипендии закрыт — к оплате",
       "stipendSent": "Отмечено как отправленное — ждёт вашего подтверждения",
-      "stipendAccrued": "Утверждённые часы — ждут выплаты"
+      "stipendAccrued": "Утверждённые часы — ждут выплаты",
+      "stipendTransfer": "Сумма определена — перевод согласуется"
     },
     "title": {
       "transfer": "{{from}} → {{to}}",
@@ -867,7 +869,8 @@
       "sitesharedecide": "Подтверждение доли платформы",
       "stipendpay": "Выплата стипендии",
       "stipendconfirm": "Подтверждение получения стипендии",
-      "stipendaccrued": "Вам начислено"
+      "stipendaccrued": "Вам начислено",
+      "stipendtransfer": "Перевод стипендии"
     },
     "cta": {
       "vote": "Голосовать",

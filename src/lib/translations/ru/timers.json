@@ -68,5 +68,18 @@
   "recalculate": "Пересчитать",
   "recalcFailed": "Пересчёт не удался",
   "missingMissionId": "Ошибка: отсутствует идентификатор задачи",
-  "searchTasks": "Поиск поручений..."
+  "searchTasks": "Поиск поручений...",
+  "attachTitle": "Ссылки и файлы",
+  "attachHint": "Приложите ссылку (пул-реквест, документ, запись) или файл. Покажется в мозге рикмы и на карточке подтверждения.",
+  "attachLinkLabel": "Добавить ссылку",
+  "attachLinkPlaceholder": "https://…",
+  "attachLinkAdd": "Добавить",
+  "attachLinkInvalid": "Это не похоже на корректный веб-адрес",
+  "attachLinkFull": "Не больше {{count}} ссылок, и они должны уместиться в одну строку",
+  "attachFileLabel": "Прикрепить файл",
+  "attachUploading": "Загрузка…",
+  "attachFileFailed": "Не удалось загрузить файл",
+  "attachRemove": "Убрать",
+  "attachLinks": "Ссылки",
+  "attachFiles": "Файлы"
 }

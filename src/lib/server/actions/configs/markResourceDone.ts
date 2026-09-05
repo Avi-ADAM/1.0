@@ -8,9 +8,11 @@
  */
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import { bestEffort, releaseBookings } from '$lib/server/resources/bookingStore.js';
+import { execFromContext } from '$lib/server/archive/exec.js';
 
 const markResourceDoneHandler: ActionExecutionHandler = async (params, context, { strapi }) => {
-  const { mashabetahalichId } = params;
+  const { mashabetahalichId, spId, projectId } = params;
 
   await strapi.execute(
     'mrUpdateMashabetahalich',
@@ -19,8 +21,18 @@ const markResourceDoneHandler: ActionExecutionHandler = async (params, context, 
     context.fetch
   );
 
+  // Closing the engine used to be the whole story, and that is the bug: the
+  // resource stayed `panui: false` forever, so a projector lent once was never
+  // offered to anyone again. Releasing the bookings recomputes availability
+  // from the ledger, which is what actually hands the resource back.
+  const released = await bestEffort('markResourceDone', () =>
+    spId
+      ? releaseBookings(execFromContext(context), { spId, projectId: projectId ?? null })
+      : Promise.resolve([])
+  );
+
   return {
-    data: { mashabetahalichId, closed: true },
+    data: { mashabetahalichId, closed: true, released: released ?? [] },
     updateStrategy: { type: 'fullRefresh' },
   };
 };
@@ -33,6 +45,11 @@ export const markResourceDoneConfig: ActionConfig = {
   paramSchema: {
     mashabetahalichId: { type: 'string', required: true, description: 'ID of the mashabetahalich engine to close' },
     projectId: { type: 'string', required: true, description: 'Project ID (auth check)' },
+    spId: {
+      type: 'string',
+      required: false,
+      description: 'The held resource, so its bookings are released and it becomes available again',
+    },
   },
 
   authRules: [

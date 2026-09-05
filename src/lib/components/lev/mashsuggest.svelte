@@ -253,6 +253,7 @@
    * @property {any[]} [myAskUsers]
    * @property {any} [myRound]
    * @property {boolean} [selfNomination] - candidate-authored proposal (PLAN_SELF_NOMINATION)
+   * @property {import('$lib/resources/dateMatchView.js').DateMatch | null} [dateMatch] - date-overlap line (PLAN_RESOURCE_CALENDAR §6.4)
    */
 
   /** @type {Props} */
@@ -304,7 +305,11 @@
     // Project-less sources (PLAN_HUB_LEV_DEMAND_SYNC r2): identity click goes
     // to the wish/maagad page; offerHref replaces the Askm flow buttons.
     sourceHref = null,
-    offerHref = null
+    offerHref = null,
+    // The date-overlap line (PLAN_RESOURCE_CALENDAR §6.4). Null when the
+    // holder's window already covers the request.
+    /** @type {import('$lib/resources/dateMatchView.js').DateMatch | null} */
+    dateMatch = null
   } = $props();
 
   // Withdraw my own self-nominated resource offer (PLAN_SELF_NOMINATION §3.3):
@@ -611,6 +616,8 @@
                 {src}
                 {spnot}
                 {selfNomination}
+                {dateMatch}
+                onNegoDates={() => nego(oid)}
                 onWithdraw={withdrawSelfNom}
                 {offerHref}
                 onProj={projectNav}
@@ -651,6 +658,8 @@
     {src}
     {spnot}
     {selfNomination}
+    {dateMatch}
+    onNegoDates={() => nego(oid)}
     onWithdraw={withdrawSelfNom}
     {offerHref}
     onProj={projectNav}

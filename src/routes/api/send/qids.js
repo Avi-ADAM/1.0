@@ -468,7 +468,8 @@ const qids_base = {
               users_permissions_user{data{id}}
               acts{data{id attributes{shem myIshur link hashivut valiIshur des dateF dateS status naasa}}}
                activeTimer{data{id
-                attributes{start totalHours timers{start stop} acts{data{id}} isActive saved saveText}}}
+                attributes{start totalHours timers{start stop} acts{data{id}} isActive saved saveText saveLinks
+                saveFiles{data{id attributes{url name mime size}}}}}}
                 project{data{id attributes{projectName profilePic{data{attributes{formats url}}}}}} }}}
             }
           }
@@ -844,8 +845,13 @@ const qids_base = {
           }
         }
       `,
+  // `saveLinks` / `saveFiles` are the evidence that rides with `saveText`: the
+  // member's own account of a stretch of work is often a link (a PR, a doc, a
+  // design) or a file, not only a sentence. Both are optional variables — an
+  // absent one leaves what is stored alone, so an edit that only touches the
+  // note cannot wipe the attachments (and vice versa).
   '34UpdateTimer': `
-      mutation UpdateTimer($saved: Boolean,$timerId: ID!,$tasks: [ID], $newStart: DateTime , $timers:[ComponentNewTimesInput], $totalHours:Float, $isActive: Boolean, $saveText: String) {
+      mutation UpdateTimer($saved: Boolean,$timerId: ID!,$tasks: [ID], $newStart: DateTime , $timers:[ComponentNewTimesInput], $totalHours:Float, $isActive: Boolean, $saveText: String, $saveLinks: String, $saveFiles: [ID]) {
         updateTimer(id: $timerId,
           data: {
             saved: $saved,
@@ -854,13 +860,16 @@ const qids_base = {
             timers: $timers,
             totalHours: $totalHours,
             acts: $tasks,
-            saveText: $saveText
+            saveText: $saveText,
+            saveLinks: $saveLinks,
+            saveFiles: $saveFiles
           }
         ) {
           data {
             id
             attributes {
-             start totalHours rate timers{start stop} acts{data{id}} isActive saved saveText
+             start totalHours rate timers{start stop} acts{data{id}} isActive saved saveText saveLinks
+             saveFiles{data{id attributes{url name mime size}}}
             }
           }
         }
@@ -903,6 +912,8 @@ const qids_base = {
               isActive
               saved
               saveText
+              saveLinks
+              saveFiles { data { id attributes { url name mime size } } }
             }
           }
         }
@@ -944,7 +955,9 @@ const qids_base = {
         data{
           id
           attributes{
-          start totalHours timers{start stop} isActive saved saveText acts{data{id attributes{
+          start totalHours timers{start stop} isActive saved saveText saveLinks
+          saveFiles{data{id attributes{url name mime size}}}
+          acts{data{id attributes{
                   shem
                   } }}
           mesimabetahalich{data{id
@@ -5514,7 +5527,23 @@ ${STIPEND_DECISION_FIELDS}
                         id
                         attributes {
                           url
+                          name
+                          mime
                           formats
+                        }
+                      }
+                    }
+                    # A timer save carries its evidence on the timer itself:
+                    # \`saveFiles\` is copied onto \`what\` above so the card can
+                    # show it without a second hop, but \`saveLinks\` has no
+                    # column on Finiapruval — the approval reads it through the
+                    # timer it was opened from.
+                    timer {
+                      data {
+                        id
+                        attributes {
+                          saveLinks
+                          saveText
                         }
                       }
                     }
@@ -6714,7 +6743,9 @@ ${STIPEND_DECISION_FIELDS}
             }
           }
           finnished_missions(filters: { isNotFinished: { eq: true } }) {
-            data { id attributes { noofhours perhour why } }
+            # \`what\` comes back so a later save can *add* its attachments to the
+            # row instead of replacing the ones earlier sessions put there.
+            data { id attributes { noofhours perhour why what { data { id } } } }
           }
         }
       }
@@ -6732,7 +6763,8 @@ ${STIPEND_DECISION_FIELDS}
     $timer: ID,
     $month: Date,
     $why: String,
-    $perhour: Float
+    $perhour: Float,
+    $what: [ID]
   ) {
     createFiniapruval(
       data: {
@@ -6747,7 +6779,8 @@ ${STIPEND_DECISION_FIELDS}
         timer: $timer,
         month: $month,
         why: $why,
-        perhour: $perhour
+        perhour: $perhour,
+        what: $what
       }
     ) { data { id } }
   }`,
@@ -6778,7 +6811,8 @@ ${STIPEND_DECISION_FIELDS}
     $users_permissions_user: ID,
     $perhour: Float,
     $total: Float,
-    $why: String
+    $why: String,
+    $what: [ID]
   ) {
     createFinnishedMission(
       data: {
@@ -6793,7 +6827,8 @@ ${STIPEND_DECISION_FIELDS}
         total: $total,
         isNotFinished: true,
         isFinished: false,
-        why: $why
+        why: $why,
+        what: $what
       }
     ) { data { id } }
   }`,
@@ -6802,11 +6837,12 @@ ${STIPEND_DECISION_FIELDS}
     $id: ID!,
     $noofhours: Float!,
     $total: Float!,
-    $why: String
+    $why: String,
+    $what: [ID]
   ) {
     updateFinnishedMission(
       id: $id,
-      data: { noofhours: $noofhours, total: $total, why: $why }
+      data: { noofhours: $noofhours, total: $total, why: $why, what: $what }
     ) { data { id attributes { noofhours total why } } }
   }`,
 
@@ -9145,6 +9181,7 @@ export const moachQids = {
             } } }
             timers { data { id attributes {
               start finnish totalHours isActive saved appruved saveText saveLinks
+              saveFiles { data { id attributes { url name mime size } } }
               timers { start stop }
               users_permissions_user { data { id attributes { username profilePic { data { attributes { url } } } } } }
               acts { data { id attributes { shem } } }
@@ -9253,6 +9290,7 @@ export const moachQids = {
           totalHours
           saveText
           saveLinks
+          saveFiles { data { id attributes { url name mime size } } }
           createdAt
           timers { start stop }
           users_permissions_user { data { id attributes { username profilePic { data { attributes { url } } } } } }
@@ -11279,7 +11317,23 @@ export const qids = {
                         id
                         attributes {
                           url
+                          name
+                          mime
                           formats
+                        }
+                      }
+                    }
+                    # A timer save carries its evidence on the timer itself:
+                    # \`saveFiles\` is copied onto \`what\` above so the card can
+                    # show it without a second hop, but \`saveLinks\` has no
+                    # column on Finiapruval — the approval reads it through the
+                    # timer it was opened from.
+                    timer {
+                      data {
+                        id
+                        attributes {
+                          saveLinks
+                          saveText
                         }
                       }
                     }
@@ -13056,6 +13110,156 @@ ${STIPEND_DECISION_FIELDS}
     }
   }`,
 
+  // The user's own personal resources (Sp), read nested under the user so the
+  // query rides the user find permission instead of the sp collection one —
+  // same shape as 277 below. Self-only: guarded in guards.js, because unlike
+  // the storefront (268) this list also carries `rikma`-scoped resources, which
+  // are nobody else's business.
+  '308myResourcesViaUser': `query MyResourcesViaUser($uid: ID!) {
+    usersPermissionsUser(id: $uid) {
+      data { id attributes {
+        sps(
+          filters: { archived: { ne: true } }
+          pagination: { limit: 100 }
+          sort: "createdAt:desc"
+        ) {
+          data { id attributes {
+            name descrip kindOf unit price myp spnot linkto
+            sdate fdate offerScope panui archived
+            mashaabim { data { id attributes { name } } }
+            matanot { data { id attributes { archived } } }
+          } }
+        }
+      } }
+    }
+  }`,
+
+  // Resource occupancy for one holder — the data behind the personal calendar
+  // (docs/PLAN_RESOURCE_CALENDAR.md §6.2).
+  //
+  // Until the `resource-booking` collection exists, "when is this taken" is
+  // reconstructed from the two rows that already record it: the live engine
+  // (`Mashabetahalich.start/end`, recurring resources) and the grant archive
+  // (`Rikmash.sqadualed/sqadualef`, which for a `rent` or `total` resource is
+  // the *only* record there is). `bookingsFromLegacy.ts` merges and de-duplicates
+  // them, so the page works today and keeps working once real bookings land.
+  '309myResourceOccupancy': `query MyResourceOccupancy($uid: ID!) {
+    usersPermissionsUser(id: $uid) {
+      data { id attributes {
+        mashabetahaliches(
+          filters: ${NOT_ARCHIVED}
+          pagination: { limit: 200 }
+          sort: "start:desc"
+        ) {
+          data { id attributes {
+            name start end status_mashab finnished kindOf recurring
+            quantityAssigned lifecycle
+            mashaabim { data { id attributes { name } } }
+            project { data { id attributes { projectName profilePic { data { attributes { url } } } } } }
+            rikmash { data { id } }
+          } }
+        }
+        rikmashes(pagination: { limit: 200 }, sort: "createdAt:desc") {
+          data { id attributes {
+            name kindOf hm sqadualed sqadualef createdAt
+            sp { data { id attributes { name kindOf sdate fdate hm panui } } }
+            project { data { id attributes { projectName profilePic { data { attributes { url } } } } } }
+            mashabetahalich { data { id } }
+          } }
+        }
+      } }
+    }
+  }`,
+
+  // The rikma's side of the same picture (docs/PLAN_RESOURCE_CALENDAR.md §6.3):
+  // what it holds and until when, plus what it has committed to supply outward.
+  // Those two directions have never been on one screen, which is how a rikma
+  // sells the same week twice without noticing.
+  '310projectResourceOccupancy': `query ProjectResourceOccupancy($pid: ID!) {
+    project(id: $pid) {
+      data { id attributes {
+        projectName
+        mashabetahaliches(
+          filters: ${NOT_ARCHIVED}
+          pagination: { limit: 200 }
+          sort: "start:desc"
+        ) {
+          data { id attributes {
+            name start end status_mashab finnished kindOf recurring
+            quantityAssigned lifecycle
+            mashaabim { data { id attributes { name } } }
+            users_permissions_user { data { id attributes { username profilePic { data { attributes { url } } } } } }
+            rikmash { data { id } }
+          } }
+        }
+        rikmashes(pagination: { limit: 200 }, sort: "createdAt:desc") {
+          data { id attributes {
+            name kindOf hm sqadualed sqadualef createdAt
+            sp { data { id attributes { name kindOf sdate fdate hm panui } } }
+            users_permissions_user { data { id attributes { username profilePic { data { attributes { url } } } } } }
+            mashabetahalich { data { id } }
+          } }
+        }
+        sheiruts(
+          filters: { archived: { ne: true } }
+          pagination: { limit: 200 }
+          sort: "startDate:desc"
+        ) {
+          data { id attributes {
+            name quant startDate finnishDate isApruved archived createdAt
+            matanot { data { id attributes { name } } }
+          } }
+        }
+      } }
+    }
+  }`,
+
+  // What the rikma is openly looking for, for the public join page
+  // (PLAN_SELF_NOMINATION §4.1): both open missions *and* open resources, so a
+  // visitor can take something that already exists instead of only inventing
+  // an offer of their own. Same public filters 49GetProjectById applies to
+  // open_missions — not archived, not lifecycle-archived, and self-nominations
+  // (someone else's pending offer) stay out (§4.3).
+  '311projectOpenBoardPublic': `query ProjectOpenBoardPublic($id: ID!) {
+    project(id: $id) {
+      data {
+        id
+        attributes {
+          open_missions(
+            filters: { and: [
+              { archived: { eq: false } },
+              { or: [{ source: { null: true } }, { source: { ne: "selfNomination" } }] },
+              ${NOT_ARCHIVED}
+            ] }
+            pagination: { limit: 60 }
+            sort: "createdAt:desc"
+          ) {
+            data { id attributes {
+              name descrip noofhours perhour
+              skills { data { id attributes { skillName localizations { data { attributes { skillName } } } } } }
+            } }
+          }
+          open_mashaabims(
+            filters: { and: [
+              # ne:true, not eq:false — OpenMashaabim.archived is nullable, and a
+              # bare eq would drop every legacy NULL row exactly the way a bare
+              # lifecycle ne does. Same filter the moach open board uses.
+              { archived: { ne: true } },
+              { or: [{ source: { null: true } }, { source: { ne: "selfNomination" } }] },
+              ${NOT_ARCHIVED}
+            ] }
+            pagination: { limit: 60 }
+            sort: "createdAt:desc"
+          ) {
+            data { id attributes {
+              name descrip price kindOf hm recurring
+            } }
+          }
+        }
+      }
+    }
+  }`,
+
   '277myMissionOffersViaUser': `query MyMissionOffersViaUser($uid: ID!) {
     usersPermissionsUser(id: $uid) {
       data { id attributes {
@@ -14180,6 +14384,12 @@ ${STIPEND_DECISION_FIELDS}
           project { data { id attributes { projectName } } }
           mashaabim { data { id } }
           declinedsps { data { id } }
+          # The requested window — the date gate in matching/engine.ts
+          # (PLAN_RESOURCE_CALENDAR §7) compares it against each holder's
+          # own sdate..fdate. Without it, matching had no time dimension.
+          sqadualed
+          sqadualedf
+          kindOf
           match_suggestions(pagination: { limit: 1000 }) {
             data { id attributes { user { data { id } } } }
           }
@@ -14202,7 +14412,12 @@ ${STIPEND_DECISION_FIELDS}
           noMail
           location { lat lng radius location_mode }
           sps(filters: { archived: { ne: true } }) {
-            data { id attributes { mashaabim { data { id } } } }
+            data { id attributes {
+              mashaabim { data { id } }
+              # The holder's own offer window + kind, so the date gate can tell
+              # "available in April" from "stopped offering this in 2024".
+              kindOf sdate fdate hm panui
+            } }
           }
         }
       }

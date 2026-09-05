@@ -68,5 +68,18 @@
   "recalculate": "Recalculate",
   "recalcFailed": "Recalculation failed",
   "missingMissionId": "Error: missing mission id",
-  "searchTasks": "Search tasks..."
+  "searchTasks": "Search tasks...",
+  "attachTitle": "Links and files",
+  "attachHint": "Attach a link (a pull request, a document, a recording) or a file. Shown in the rikma's moach and on the approval card.",
+  "attachLinkLabel": "Add a link",
+  "attachLinkPlaceholder": "https://…",
+  "attachLinkAdd": "Add",
+  "attachLinkInvalid": "That does not look like a valid web address",
+  "attachLinkFull": "Up to {{count}} links, and they have to fit on one line",
+  "attachFileLabel": "Attach a file",
+  "attachUploading": "Uploading…",
+  "attachFileFailed": "The upload failed",
+  "attachRemove": "Remove",
+  "attachLinks": "Links",
+  "attachFiles": "Files"
 }

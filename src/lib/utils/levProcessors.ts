@@ -20,6 +20,7 @@ import type {
   StipendPayableData,
   StipendConfirmationData,
   StipendAccrualData,
+  StipendTransferData,
   WishOfferData
 } from '$lib/stores/levStores';
 // @ts-ignore
@@ -27,6 +28,8 @@ import { createProjectInfo, createUserInfo, getProjectMembers, getProjectUsers, 
 import { applyLocalization } from './localizationUtils';
 // @ts-ignore
 import { checkStb, checkHst, txx, letters } from '$lib/utils/levDataProcessors.js';
+import { normalizeSaveLinks } from '$lib/timers/saveLinks';
+import { readSaveFiles } from '$lib/timers/saveFiles';
 
 
 /**
@@ -541,6 +544,13 @@ export function processFiapp(
     // Priority calc
     const basePriority = votePriority(already);
 
+    // Everything the member filed with the hours: the files copied onto the
+    // approval, and the links that stayed on the timer it came from. `whatt` /
+    // `whattid` below are the pre-list single-file fields, kept so nothing that
+    // still reads them breaks.
+    const evidenceFiles = readSaveFiles(approval.what);
+    const evidenceLinks = normalizeSaveLinks(approval.saveLinks);
+
     // Prepare whatt link
     let whatt = null;
     let whattid = null;
@@ -602,6 +612,8 @@ export function processFiapp(
       why: approval.why,
       whatt,
       whattid,
+      evidenceFiles,
+      evidenceLinks,
       users,
 
       timegramaDate: approval.timegramaDate,
@@ -2513,6 +2525,44 @@ export function processStipendConfirmations(
       projectName: c.projectName || projectInfo.projectName || '',
       src: projectInfo.src2 || '',
       ...c
+    };
+  });
+}
+
+/**
+ * A settled stipend cycle whose money has not moved yet (PLAN_STIPEND §6).
+ *
+ * Both sides get the card, because arranging a transfer is a conversation:
+ * the funder needs somewhere to say "sent", the recipient somewhere to say
+ * where to send it. It sits with the other money cards that need an answer —
+ * a stipend nobody transfers is the one failure this whole feature exists to
+ * prevent.
+ *
+ * Keyed on the payment, so it disappears the moment the payment leaves
+ * `pending` on the next load.
+ *
+ * Pure function; does not modify input.
+ */
+export function processStipendTransfers(
+  transfers: StipendTransferData[],
+  projects: ProjectData[]
+): DisplayItem[] {
+  if (!transfers || !Array.isArray(transfers)) {
+    return [];
+  }
+
+  return transfers.map(tr => {
+    const projectInfo = createProjectInfo(tr.projectId ?? '');
+    return {
+      ani: 'stipendtransfer',
+      azmi: 'stipendtransfer',
+      pl: PRIORITY_BAND.VOTE_PENDING + 21,
+      coinlapach: `stipendtransfer-${tr.paymentId}`,
+      ...projectInfo,
+      projectId: tr.projectId ?? '',
+      projectName: tr.projectName || projectInfo.projectName || '',
+      src: projectInfo.src2 || '',
+      ...tr
     };
   });
 }

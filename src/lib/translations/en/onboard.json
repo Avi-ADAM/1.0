@@ -157,7 +157,7 @@
       "save_failed": "Save failed ({{status}})",
       "network_error": "Network error - please try again",
       "actions": {
-        "skip": "Skip to finish 🗝",
+        "skip": "Confirm & continue 🗝",
         "saving": "Saving...",
         "edit": "Continue to edit ✍️"
       },
@@ -170,6 +170,24 @@
       "skills": "Skills",
       "roles": "Roles",
       "style": "Style"
+    },
+    "resources_page": {
+      "title": "What do you have to share?",
+      "journey": "Step 5 · Resources to share",
+      "sub": "Things and places that are already yours — and can be put at a weave’s or a customer’s disposal. You can skip and add them later from your profile.",
+      "mode_recurring": "Ongoing —",
+      "mode_recurring_ex": "a workspace, a subscription, equipment that is always available",
+      "mode_once": "One-off —",
+      "mode_once_ex": "a 3D print, a ride, a single use of equipment",
+      "mode_period": "For a period —",
+      "mode_period_ex": "a short-let apartment, a car for a month, a venue for an event",
+      "continue": "Continue",
+      "skip": "Skip — I will add them later"
+    },
+    "manual_page": {
+      "title": "Provider profile · 1💗1",
+      "back": "← Back to review",
+      "skip": "Skip ahead"
     }
   },
   "actions": {

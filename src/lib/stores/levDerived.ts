@@ -21,6 +21,7 @@ import {
   stipendPayablesStore,
   stipendConfirmationsStore,
   stipendAccrualsStore,
+  stipendTransfersStore,
   askedResourcesStore,
   decisionsStore,
   projectsStore,
@@ -51,6 +52,7 @@ import {
   processStipendPayables,
   processStipendConfirmations,
   processStipendAccruals,
+  processStipendTransfers,
   mergeAndSort,
   type DisplayItem
 } from '$lib/utils/levProcessors';
@@ -313,6 +315,15 @@ export const processedStipendAccruals: Readable<DisplayItem[]> = derived(
   ([$accruals, $projects]) => processStipendAccruals($accruals, $projects)
 );
 
+/**
+ * Cycles settled before the money moved: the funder's "I'll transfer it" and
+ * the recipient's "tell me where" are the same card, seen from two sides.
+ */
+export const processedStipendTransfers: Readable<DisplayItem[]> = derived(
+  [stipendTransfersStore, projectsStore],
+  ([$transfers, $projects]) => processStipendTransfers($transfers, $projects)
+);
+
 export const processedOpenSiteShareDecisions: Readable<DisplayItem[]> = derived(
   [openSiteShareDecisionsStore, projectsStore, processedHalukas],
   ([$decisions, $projects, $halukas]) => {
@@ -361,7 +372,8 @@ export const mergedFeed: Readable<DisplayItem[]> = derived(
     processedOpenSiteShareDecisions,
     processedStipendPayables,
     processedStipendConfirmations,
-    processedStipendAccruals
+    processedStipendAccruals,
+    processedStipendTransfers
   ],
   ([
     $pends,
@@ -385,7 +397,8 @@ export const mergedFeed: Readable<DisplayItem[]> = derived(
     $openSiteShareDecisions,
     $stipendPayables,
     $stipendConfirmations,
-    $stipendAccruals
+    $stipendAccruals,
+    $stipendTransfers
   ]) => {
     return mergeAndSort(
       $pends,
@@ -409,7 +422,8 @@ export const mergedFeed: Readable<DisplayItem[]> = derived(
       $openSiteShareDecisions,
       $stipendPayables,
       $stipendConfirmations,
-      $stipendAccruals
+      $stipendAccruals,
+      $stipendTransfers
     );
   }
 );
@@ -491,6 +505,8 @@ export const finalSwiperArray: Readable<DisplayItem[]> = derived(
           return true; // Always show: a stipend cycle this member committed to fund
         case 'stipendconfirm':
           return true; // Always show: money is waiting on my word that it arrived
+        case 'stipendtransfer':
+          return true; // Always show: a settled cycle whose money has not moved yet
         // A stipend proposal is a decision like any other — same filter.
         case 'stipend':
           return $milon.hachla;

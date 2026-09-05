@@ -1,5 +1,11 @@
 # Unified Action System
 
+> Who is calling comes from `locals.uid` — the identity `hooks.server.js`
+> derives from the **signed** JWT (`src/lib/server/identity.js`). The `id`
+> cookie is written `httpOnly:false` for the UI, so any caller can set it to
+> any value; reading it on the server is a vulnerability, not a shortcut.
+> See docs/PLAN_PROXY_SECURITY.md §14.1.
+
 A comprehensive, type-safe system for managing all server-side operations with validation, authorization, and multi-channel notifications.
 
 ## Overview
@@ -150,14 +156,14 @@ import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 import { actionService } from '$lib/server/actions/index.js';
 
-export const POST: RequestHandler = async ({ request, cookies }) => {
+export const POST: RequestHandler = async ({ request, cookies, locals }) => {
   const { actionKey, params } = await request.json();
   
   const result = await actionService.executeAction(
     actionKey,
     params,
     {
-      userId: cookies.get('id')!,
+      userId: locals.uid as string,
       jwt: cookies.get('jwt')!,
       lang: cookies.get('lang') || 'he',
       fetch

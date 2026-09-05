@@ -14,9 +14,13 @@ declare global {
       isDesktop: boolean;
       /** JWT from the HttpOnly cookie, or false when signed out. */
       tok: string | false;
-      /** Signed-in user id, or false. */
+      /**
+       * Signed-in user id, or false. Derived from the **signed** JWT (see
+       * `src/lib/server/identity.js`) — never from the client-writable `id`
+       * cookie, which any caller can set to any value.
+       */
       uid: string | false;
-      /** Signed-in username, or false. */
+      /** Signed-in username, from the same verified source as `uid`. */
       un: string | false;
       /** Signed-in email, or false. */
       email: string | false;

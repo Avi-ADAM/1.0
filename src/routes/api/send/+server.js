@@ -8,7 +8,7 @@ import { STRAPI_URL } from '$lib/server/strapiUrl.js'
 const ep = STRAPI_URL + "/graphql"
 import { createHash } from 'node:crypto'
 import { isInternalRequest } from '$lib/server/internalSecret.js'
-import { resolveServicePrincipal, resolveCookiePrincipal } from '$lib/server/authz/principal.js'
+import { resolveServicePrincipal, resolveSessionPrincipal } from '$lib/server/authz/principal.js'
 import { applyAuthz } from '$lib/server/authz/authorize.js'
 import { runSendGuards, filterSendResponse } from './guards.js'
 
@@ -65,7 +65,8 @@ if (isDev) {
 	}
 }
 
-export async function POST({ request, cookies }) {
+export async function POST({ request, cookies, locals }) {
+	const reqId = locals?.reqId ?? null;
 	const data = await request.json();
 
 	// ── Resolve query string ─────────────────────────────────────────────────
@@ -92,8 +93,15 @@ export async function POST({ request, cookies }) {
 	// request carries the internal secret (injected by handleFetch for genuine
 	// server-side calls). A client cannot forge it.
 	const isSer = (data.isSer === true) && isInternalRequest(request);
-	const idL = cookies.get('id');
-	const un = cookies.get('un');   // username — used as voter-id for JWT path
+	// Caller identity comes from the signed session token, resolved once per
+	// request in hooks.server.js (src/lib/server/identity.js). It used to be
+	// read straight off the `id` / `un` cookies, which /api/auth writes
+	// httpOnly:false for the UI — so on a public gate a caller could simply
+	// send `Cookie: jwt=<their own>; id=<someone else>` and every guard below,
+	// plus every `idL` substitution, would compare one client-supplied value
+	// against another.
+	const idL = locals.uid || undefined;
+	const un = locals.un || undefined;   // username — used as voter-id for JWT path
 	const isConsensusQid = queId && CONSENSUS_QIDS.has(queId);
 
 	// ── Security: validate consensus proxy secret for service calls ──────────
@@ -115,7 +123,9 @@ export async function POST({ request, cookies }) {
 	// this layer. AUTHZ_MODE=enforce (default) returns 403 on denial;
 	// AUTHZ_MODE=log only logs would-be denials. Entity-level guards further down and the
 	// per-action authRules are unaffected — this is the coarse first layer.
-	const principal = isSer ? resolveServicePrincipal(request) : resolveCookiePrincipal(cookies);
+	const principal = isSer
+		? resolveServicePrincipal(request)
+		: resolveSessionPrincipal(cookies, { id: idL, username: un });
 	if (queId) {
 		const { blocked, decision } = applyAuthz({ principal, op: `send:${queId}` });
 		if (blocked) throw error(403, `Forbidden: ${decision.reason}`);
@@ -178,13 +188,20 @@ export async function POST({ request, cookies }) {
 		const isPosition = queId === '42UpdatePosition';
 		const entityType = isPosition ? 'position' : 'argument';
 
-		// Step 1 — Fetch current voters/votes
-		const fetchGql = `query GetVoters { ${entityType}(id: "${entityId}") { data { attributes { votes voters } } } }`;
+		// Step 1 — Fetch current voters/votes.
+		// Two literal queries rather than one interpolated: `entityId` comes from
+		// the client, and a quote inside it would end the string argument and let
+		// the rest of the value become query syntax. `entityType` is derived from
+		// the qid above, but picking between fixed strings is what keeps it that
+		// way even if the derivation ever changes.
+		const fetchGql = isPosition
+			? `query GetVoters($id: ID!) { position(id: $id) { data { attributes { votes voters } } } }`
+			: `query GetVoters($id: ID!) { argument(id: $id) { data { attributes { votes voters } } } }`;
 		let fetchData;
 		try {
 			const fetchRes = await fetch(ep, {
 				method: 'POST',
-				body: JSON.stringify({ query: fetchGql }),
+				body: JSON.stringify({ query: fetchGql, variables: { id: entityId } }),
 				headers: { 'Content-Type': 'application/json', Authorization: bearer1 }
 			});
 			fetchData = await fetchRes.json();
@@ -231,7 +248,7 @@ export async function POST({ request, cookies }) {
 	// ── Entity-level guards (qid-specific ownership/visibility) ──────────────
 	// Registered in src/routes/api/send/guards.js; run here (after the vote
 	// handler, before the fetch). PRE guards throw error() to block.
-	await runSendGuards({ queId, isSer, keyValueObject, variablesObject, identity, callerId: idL, bearer1, ep });
+	await runSendGuards({ queId, query, isSer, keyValueObject, variablesObject, identity, callerId: idL, bearer1, ep });
 
 	// ── Standard GraphQL fetch ───────────────────────────────────────────────
 	const controller = new AbortController();
@@ -276,7 +293,20 @@ export async function POST({ request, cookies }) {
 				err.message.includes('Unauthorized')
 			);
 			if (authError) throw error(401, authError.message);
-			return json(newd, { status: 500 });
+
+			// Strapi's error array names fields, types and constraints — a free
+			// schema dump for anyone who can provoke one. Server-originated callers
+			// (actions, jobs, SSR loads via handleFetch) parse these errors and
+			// keep getting them verbatim; a browser gets the shape it needs to
+			// detect failure, and the request id to quote when reporting it. The
+			// detail is in the server log above, tied to the same id.
+			if (isInternalRequest(request)) return json(newd, { status: 500 });
+			return json(
+				{
+					errors: [{ message: 'Request failed', extensions: { code: 'DOWNSTREAM_ERROR', reqId } }]
+				},
+				{ status: 500 }
+			);
 		}
 
 		console.error('Unexpected response structure:', {
@@ -290,7 +320,10 @@ export async function POST({ request, cookies }) {
 		if (newd.error?.status === 401 || newd.error?.name === 'UnauthorizedError') {
 			throw error(401, newd.error?.message || 'Unauthorized');
 		}
-		return json({ error: 'Unexpected response from server', details: newd }, { status: 500 });
+		if (isInternalRequest(request)) {
+			return json({ error: 'Unexpected response from server', details: newd }, { status: 500 });
+		}
+		return json({ error: 'Unexpected response from server', reqId }, { status: 500 });
 
 	} catch (e) {
 		clearTimeout(timeoutId);

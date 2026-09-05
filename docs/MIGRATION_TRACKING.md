@@ -220,6 +220,7 @@
 | `declineMissionRequest` | `configs/declineMissionRequest.ts` | דחיית בקשת משימה ע"י חבר פרויקט |
 | `finalizeAskmAcceptance` | `configs/finalizeAskmAcceptance.ts` | קבלת מועמד ל-Askm (solo/allVoted) |
 | `declineAskmRequest` | `configs/declineAskmRequest.ts` | דחיית בקשת Askm |
+| `voteOnAskm` | `configs/voteOnAskm.ts` | הצבעה (בעד/לא בעד) על Askm בריקמה עם יותר מחבר אחד — נרשמת בסבב הנוכחי ואינה מכריעה |
 | `voteOnPendm` | `configs/voteOnPendm.ts` | הצבעה על pending mission — שרת-authoritative (DB fetch, orderon, consensus → OpenMission) |
 | `voteOnPmash` | `configs/voteOnPmash.ts` | הצבעה על pending resource — שרת-authoritative (DB fetch, orderon, consensus → OpenMashaabim) |
 | `addDiunEntry` | `configs/addDiunEntry.ts` | הוספת תגובה/דיון ל-pendm או pmash |

@@ -1,5 +1,11 @@
 # Cookie-Based Socket.IO Authentication
 
+> Who is calling comes from `locals.uid` — the identity `hooks.server.js`
+> derives from the **signed** JWT (`src/lib/server/identity.js`). The `id`
+> cookie is written `httpOnly:false` for the UI, so any caller can set it to
+> any value; reading it on the server is a vulnerability, not a shortcut.
+> See docs/PLAN_PROXY_SECURITY.md §14.1.
+
 ## Overview
 
 Socket.IO authentication uses cookies for automatic authentication. Currently, the JWT cookie is accessible to JavaScript (`httpOnly: false`) for backward compatibility with legacy code.
@@ -99,7 +105,7 @@ Cookies are set in `src/hooks.server.js`:
 
 ```javascript
 event.locals.tok = event.cookies.get('jwt') || false;
-event.locals.uid = event.cookies.get('id') || false;
+event.locals.uid = (await resolveEventIdentity(event))?.id || false;
 ```
 
 For production, ensure cookies have:

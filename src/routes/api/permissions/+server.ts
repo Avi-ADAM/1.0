@@ -30,7 +30,7 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from '@sveltejs/kit';
 import {
-  resolveCookiePrincipal,
+  resolveSessionPrincipal,
   resolveApiKeyPrincipal
 } from '$lib/server/authz/principal.js';
 import { authorizeOperation } from '$lib/server/authz/authorize.js';
@@ -44,7 +44,11 @@ import '$lib/server/actions/configs/index.js';
 
 const MAX_OPS_PER_CHECK = 100;
 
-async function resolveCaller(request: Request, cookies: { get(name: string): string | undefined }): Promise<Principal> {
+async function resolveCaller(
+  request: Request,
+  cookies: { get(name: string): string | undefined },
+  locals: App.Locals
+): Promise<Principal> {
   const authHeader = request.headers.get('Authorization');
   if (authHeader) {
     const principal = await resolveApiKeyPrincipal(authHeader);
@@ -52,15 +56,20 @@ async function resolveCaller(request: Request, cookies: { get(name: string): str
     // A presented-but-invalid key must not fall back to cookies
     throw error(401, 'Invalid or expired API key');
   }
-  const principal = resolveCookiePrincipal(cookies);
+  // Identity from the signed token (resolved once in hooks), never from the
+  // client-writable `id` cookie — see src/lib/server/identity.js.
+  const principal = resolveSessionPrincipal(cookies, {
+    id: locals.uid || null,
+    username: locals.un || null
+  });
   if (principal.kind === 'anonymous') {
     throw error(401, 'Authentication required');
   }
   return principal;
 }
 
-export const GET: RequestHandler = async ({ request, cookies }) => {
-  const principal = await resolveCaller(request, cookies);
+export const GET: RequestHandler = async ({ request, cookies, locals }) => {
+  const principal = await resolveCaller(request, cookies, locals);
 
   const ops: string[] = [];
   for (const qid of Object.keys(qidsAccess)) {
@@ -75,8 +84,8 @@ export const GET: RequestHandler = async ({ request, cookies }) => {
   return json({ principal: principal.kind, ops });
 };
 
-export const POST: RequestHandler = async ({ request, cookies, fetch }) => {
-  const principal = await resolveCaller(request, cookies);
+export const POST: RequestHandler = async ({ request, cookies, fetch, locals }) => {
+  const principal = await resolveCaller(request, cookies, locals);
 
   let body: any;
   try {

@@ -69,5 +69,18 @@
   "recalculate": "Recalcular",
   "recalcFailed": "No se pudo recalcular",
   "missingMissionId": "Error: falta el identificador de la misión",
-  "searchTasks": "Buscar tareas..."
+  "searchTasks": "Buscar tareas...",
+  "attachTitle": "Enlaces y archivos",
+  "attachHint": "Adjunta un enlace (un pull request, un documento, una grabación) o un archivo. Se muestra en el moach de la rikma y en la tarjeta de aprobación.",
+  "attachLinkLabel": "Añadir un enlace",
+  "attachLinkPlaceholder": "https://…",
+  "attachLinkAdd": "Añadir",
+  "attachLinkInvalid": "Eso no parece una dirección web válida",
+  "attachLinkFull": "Hasta {{count}} enlaces, y tienen que caber en una línea",
+  "attachFileLabel": "Adjuntar un archivo",
+  "attachUploading": "Subiendo…",
+  "attachFileFailed": "No se pudo subir el archivo",
+  "attachRemove": "Quitar",
+  "attachLinks": "Enlaces",
+  "attachFiles": "Archivos"
 }

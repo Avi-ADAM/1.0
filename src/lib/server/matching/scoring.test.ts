@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { computeMissionMatchScore } from './scoring';
+import { computeDateFit, computeMissionMatchScore } from './scoring';
 import { calculateScore } from '$lib/utils/suggestionMatchers';
 
 /**
@@ -101,5 +101,72 @@ describe('computeMissionMatchScore', () => {
       { workWays: [], skills: ['s9'], roles: ['r9'] }
     );
     expect(res.score).toBeLessThanOrEqual(0);
+  });
+});
+
+describe('computeDateFit — the resource date gate', () => {
+  const req = { requestStart: '2026-04-01', requestEnd: '2026-04-11' };
+
+  it('is 1 when the offer window covers the whole request', () => {
+    expect(computeDateFit({ ...req, offerStart: '2026-01-01', offerEnd: '2026-12-31' })).toBe(1);
+  });
+
+  it('is the covered fraction when the offer only partly overlaps', () => {
+    // Offered from 6 April → 5 of the 10 requested days.
+    expect(computeDateFit({ ...req, offerStart: '2026-04-06', offerEnd: '2026-12-31' })).toBe(0.5);
+  });
+
+  it('is 0 when the windows do not touch — the suggestion is dropped', () => {
+    // The bug this closes: a projector nobody has offered since 2024 was still
+    // being suggested for an April 2026 request.
+    expect(computeDateFit({ ...req, offerStart: '2023-01-01', offerEnd: '2024-01-01' })).toBe(0);
+  });
+
+  it('touching edges do not count as an overlap', () => {
+    expect(computeDateFit({ ...req, offerStart: '2026-04-11', offerEnd: '2026-12-31' })).toBe(0);
+  });
+
+  it('an unlimited resource always fits', () => {
+    expect(
+      computeDateFit({
+        ...req,
+        offerStart: '2023-01-01',
+        offerEnd: '2024-01-01',
+        resource: { availability: 'unlimited' }
+      })
+    ).toBe(1);
+  });
+
+  it('every missing input resolves to 1 rather than hiding a suggestion', () => {
+    // A request with no dates has nothing to clash with, and a holder who never
+    // said when they are free has not said no.
+    expect(computeDateFit({})).toBe(1);
+    expect(computeDateFit({ offerStart: '2026-01-01', offerEnd: '2026-02-01' })).toBe(1);
+    expect(computeDateFit({ ...req })).toBe(1);
+    expect(computeDateFit({ ...req, offerStart: null, offerEnd: null })).toBe(1);
+  });
+
+  it('ignores unparseable dates instead of producing NaN', () => {
+    expect(computeDateFit({ requestStart: 'soon', requestEnd: 'later' })).toBe(1);
+    expect(computeDateFit({ ...req, offerStart: 'whenever' })).toBe(1);
+  });
+
+  it('an open-ended offer covers an open-ended request', () => {
+    expect(
+      computeDateFit({ requestStart: '2026-04-01', requestEnd: null, offerStart: '2026-01-01' })
+    ).toBe(1);
+  });
+
+  it('an existing booking eats into the fit once the ledger has rows', () => {
+    expect(
+      computeDateFit({
+        ...req,
+        offerStart: '2026-01-01',
+        offerEnd: '2026-12-31',
+        resource: { kindOf: 'rent' },
+        bookings: [{ start: '2026-04-06', end: '2026-04-20', status: 'confirmed', quantity: 1 }],
+        now: new Date('2026-03-01')
+      })
+    ).toBe(0.5);
   });
 });

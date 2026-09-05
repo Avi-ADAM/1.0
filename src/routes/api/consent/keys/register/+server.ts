@@ -14,9 +14,9 @@ import { judgeRegistration } from '$lib/server/consent/devicePolicy';
 // but every decision is logged with [device-cert-telemetry] — that stream is
 // the evidence for flipping enforcement. Chain reset (all keys revoked) makes
 // the next registration a fresh TOFU after the protest cooldown.
-export const POST: RequestHandler = async ({ request, cookies }) => {
+export const POST: RequestHandler = async ({ request, cookies, locals }) => {
   if (!cookies.get('jwt')) throw error(401, 'Unauthorized');
-  const userId = cookies.get('id');
+  const userId = locals.uid || undefined;
   if (!userId) throw error(401, 'no user id in session');
 
   const body = await request.json();

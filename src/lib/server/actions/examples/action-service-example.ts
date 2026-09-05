@@ -336,13 +336,16 @@ import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 import { actionService } from '$lib/server/actions/index.js';
 
-export const POST: RequestHandler = async ({ request, cookies }) => {
+export const POST: RequestHandler = async ({ request, cookies, locals }) => {
   try {
     // Parse request body
     const { actionKey, params } = await request.json();
-    
-    // Get user context from cookies
-    const userId = cookies.get('id');
+
+    // Who is calling. `locals.uid` is derived from the signed session token in
+    // hooks.server.js (src/lib/server/identity.js) — never read the `id`
+    // cookie for this: it is written httpOnly:false for the UI, so a caller
+    // can set it to anyone's id.
+    const userId = locals.uid || undefined;
     const jwt = cookies.get('jwt');
     const lang = cookies.get('lang') || 'he';
     

@@ -42,7 +42,8 @@
     openSiteShareDecisionsStore,
     stipendPayablesStore,
     stipendConfirmationsStore,
-    stipendAccrualsStore
+    stipendAccrualsStore,
+    stipendTransfersStore
   } from '$lib/stores/levStores';
   import { executeAction } from '$lib/client/actionClient';
 
@@ -288,6 +289,7 @@
         stipendPayablesStore.set(res.data?.payables ?? []);
         stipendConfirmationsStore.set(res.data?.confirmations ?? []);
         stipendAccrualsStore.set(res.data?.accruals ?? []);
+        stipendTransfersStore.set(res.data?.transfers ?? []);
       }
     } catch (e) {
       console.error('[Stipend] load work failed:', e);

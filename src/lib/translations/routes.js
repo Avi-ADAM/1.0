@@ -52,6 +52,11 @@ export const ROUTED = {
     mcp: at('/me'),
     // Archive/edit proposals surface as lev cards and on the rikma's object pages.
     archive: at('/lev', /\/moach\/[^/]+/),
+    // The resource booking calendar: the holder's own page under /me, the
+    // rikma's copy under /moach, the date-overlap line on lev's resource
+    // suggestion cards — and the onboarding resources step, which reads the
+    // same occupancy so a member does not offer a week that is already taken.
+    resources: at('/me', /\/moach\/[^/]+/, '/lev', '/onboard'),
     // Subsistence stipends: the heart's proposal/pay/confirm cards, the rikma's
     // own stipend tab — and the public support page, where a supporter can say
     // "I'll fund this mission" and the donation dialog names the stipend.

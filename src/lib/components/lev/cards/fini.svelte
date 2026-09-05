@@ -14,6 +14,8 @@
   import CardHeader from './CardHeader.svelte';
   import VoteStatusDisplay from './VoteStatusDisplay.svelte';
   import { getProjectData } from '$lib/stores/projectStore';
+  import { saveLinkLabel } from '$lib/timers/saveLinks';
+  import { mediaUrl } from '$lib/utils/processLifecycle';
 
   /**
    * @typedef {Object} Props
@@ -21,6 +23,8 @@
    * @property {boolean} [isVisible]
    * @property {any} projectName
    * @property {any} whatt
+   * @property {{id: string, url: string, name: string, size?: number}[]} [evidenceFiles] - files the member filed with these hours
+   * @property {string[]} [evidenceLinks] - links the member filed with these hours
    * @property {any} timegramaDate
    * @property {any} src
    * @property {any} why
@@ -50,6 +54,8 @@
     isVisible = false,
     projectName,
     whatt,
+    evidenceFiles = [],
+    evidenceLinks = [],
     timegramaDate,
     src,
     why,
@@ -287,7 +293,10 @@
           </div>
         {/if}
       {/if}
-      {#if whatt}
+      <!-- The single-file field the card was built around. `evidenceFiles` is
+           the full list of what was filed with these hours, so it takes over
+           whenever it has anything and this stays for the older rows. -->
+      {#if whatt && !evidenceFiles.length}
         <a
           target="_blank"
           href={whatt}
@@ -317,6 +326,48 @@
         </a>
       {/if}
     </div>
+
+    <!-- Everything the member filed with these hours: the links they gave and
+         the files they attached when they saved the timer. This is the evidence
+         a voter is being asked to sign against, so it sits above the vote. -->
+    {#if evidenceLinks.length || evidenceFiles.length}
+      <div class="flex flex-wrap gap-2">
+        {#each evidenceLinks as link (link)}
+          <a
+            target="_blank"
+            rel="noopener noreferrer"
+            href={link}
+            title={link}
+            class="inline-flex max-w-full items-center gap-1.5 px-3 py-1.5 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-xl text-xs font-medium hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors border border-blue-100 dark:border-blue-800/30"
+            onmouseenter={() => hover(`${$t('timers.attachLinks')}`)}
+            onmouseleave={() => hover('0')}
+          >
+            <svg class="w-3.5 h-3.5 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+            </svg>
+            <span class="truncate">{saveLinkLabel(link)}</span>
+          </a>
+        {/each}
+        {#each evidenceFiles as file (file.id)}
+          <a
+            target="_blank"
+            rel="noopener noreferrer"
+            href={mediaUrl(file.url)}
+            title={file.name}
+            class="inline-flex max-w-full items-center gap-1.5 px-3 py-1.5 bg-barbi/10 text-barbi rounded-xl text-xs font-medium hover:bg-barbi/20 transition-colors border border-barbi/20"
+            onmouseenter={() => hover(`${$t('timers.attachFiles')}`)}
+            onmouseleave={() => hover('0')}
+          >
+            <svg class="w-3.5 h-3.5 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+            </svg>
+            <span class="truncate">{file.name || $t('finiapp.file')}</span>
+          </a>
+        {/each}
+      </div>
+    {/if}
 
     <!-- משתמש מבקש וסיכום הצבעות -->
     <div

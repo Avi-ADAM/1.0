@@ -56,7 +56,7 @@ function getActionService(): ActionService {
 /**
  * POST handler for action execution
  */
-export const POST: RequestHandler = async ({ request, cookies, fetch }) => {
+export const POST: RequestHandler = async ({ request, cookies, fetch, locals }) => {
   // Set up timeout for the entire request
   const controller = new AbortController();
   const timeout = 30000; // 30-second timeout
@@ -76,8 +76,13 @@ export const POST: RequestHandler = async ({ request, cookies, fetch }) => {
       throw error(400, 'Missing or invalid params');
     }
 
-    // Extract user context from cookies
-    let userId = cookies.get('id');
+    // Caller identity comes from the signed session token, resolved once per
+    // request in hooks.server.js (src/lib/server/identity.js). It used to be
+    // `cookies.get('id')` — a cookie /api/auth writes httpOnly:false for the
+    // UI, so any caller could assert any id. That value becomes
+    // `context.userId`, which is what every `self` / `projectMember` authRule
+    // compares against; nothing below this line was ever stronger than it.
+    let userId = locals.uid || undefined;
     let jwt = cookies.get('jwt');
     const lang = cookies.get('lang') || 'he';
 
@@ -89,7 +94,8 @@ export const POST: RequestHandler = async ({ request, cookies, fetch }) => {
     // authenticated user and falls through to the cookie JWT below.
     if (isSer === true && isInternalRequest(request)) {
       jwt = ADMIN_TOKEN;
-      // If request is from server, use userId from params if available, otherwise fallback to cookie (likely undefined)
+      // If request is from server, act as the userId in params; otherwise keep
+      // whatever the (usually absent) session resolved to.
       if (params?.userId) {
         userId = params.userId.toString();
       }
@@ -106,7 +112,12 @@ export const POST: RequestHandler = async ({ request, cookies, fetch }) => {
     // executeAction — this is the coarse first layer. AUTHZ_MODE=enforce
     // (default) returns 403 on denial; set AUTHZ_MODE=log for shadow logging.
     if (getAction(actionKey)) {
-      const principal = resolvePrincipal({ request, cookies, isSerFlag: isSer === true });
+      const principal = resolvePrincipal({
+        request,
+        cookies,
+        isSerFlag: isSer === true,
+        identity: { id: locals.uid || null, username: locals.un || null }
+      });
       const { blocked, decision } = applyAuthz({ principal, op: `action:${actionKey}`, params });
       if (blocked) throw error(403, `Forbidden: ${decision.reason}`);
     }

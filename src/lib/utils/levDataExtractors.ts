@@ -28,6 +28,7 @@ import type {
   WishOfferData
 } from '$lib/stores/levStores';
 import { buildArchiveDecisionView } from '$lib/archive/decisionView.js';
+import { dateMatchFrom } from '$lib/resources/dateMatchView.js';
 import { buildStipendDecisionView } from '$lib/stipend/decisionView.js';
 import { calculateScore } from './suggestionMatchers';
 
@@ -186,6 +187,10 @@ export function extractFiapp(userData: any): ApprovalData[] {
         noofhours: approval.attributes.noofhours || 0,
         why: approval.attributes.why || '',
         what: approval.attributes.what || { data: [] },
+        // A timer save files its links on the timer (Finiapruval has no column
+        // for them) and copies its files onto `what` above — so the card needs
+        // both sides to show the member's full account of the work.
+        saveLinks: approval.attributes.timer?.data?.attributes?.saveLinks ?? '',
         vots: approval.attributes.vots || [],
         timegramaId: approval.attributes.timegrama?.data?.id,
         timegramaDate: approval.attributes.timegrama?.data?.attributes?.date,
@@ -1686,8 +1691,12 @@ export function buildResourceSuggestionsFromMatchRecords(
       myOrdern: myAskm?.attributes?.nego_mashes?.data?.[0]?.attributes?.ordern ?? 0,
       myRound: myAskm?.attributes?.nego_mashes?.data?.[0]?.attributes ?? null,
 
-      // Self-nomination badge / withdraw (PLAN_SELF_NOMINATION §4.2)
-      source: omAttrs.source,
+      // (`source` is already set above — it drives both the wish/maagad
+      // identity and the self-nomination badge, PLAN_SELF_NOMINATION §4.2.)
+
+      // The date-overlap line (PLAN_RESOURCE_CALENDAR §6.4). Null whenever the
+      // holder's window already covers the request, so the card stays quiet.
+      dateMatch: dateMatchFrom(record?.attributes?.matchedOn, omAttrs, mySp?.attributes),
 
       openMashaabimId: om.id,
       spId: spId

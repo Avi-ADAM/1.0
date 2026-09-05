@@ -15,6 +15,9 @@ import { matchOpenMashaabimToUsers } from '$lib/server/matching/engine';
 import { restimeLabel, voteUrl } from './actionUtils.js';
 import { STRAPI_GRAPHQL } from '$lib/server/strapiUrl.js';
 import { resolveRecurringPlan, cycleWindowIso } from '$lib/recurring/recurringPlan.js';
+import { bestEffort } from '$lib/server/resources/bookingStore.js';
+import { openGrantBooking } from '$lib/server/resources/grantBooking.js';
+import { execFromContext } from '$lib/server/archive/exec.js';
 
 // ─── helpers ───────────────────────────────────────────────────────────────
 async function gql(
@@ -455,6 +458,21 @@ const createResourceHandler: ActionExecutionHandler = async (params, context, { 
             updateSp(id: $id, data: $data) { data { id } }
           }
         `, { id: spId, data: { panui: false } });
+
+        // …and record *why* it is unavailable, with dates. `panui` alone cannot
+        // say "until March", cannot be undone, and is plain wrong for a pool
+        // that still has units. `syncPanui` inside `openGrantBooking` rewrites
+        // the flag from the ledger straight after.
+        await bestEffort('createResourceSelfAssign', () =>
+          openGrantBooking(execFromContext({ jwt, fetch: f }), {
+            spId,
+            projectId,
+            openMashaabimId: createdId,
+            ownerId: userId,
+            note: name,
+            terms: { kindOf, sqadualed: startDate, sqadualedf: endDate, hm },
+          })
+        );
       }
     }
   }

@@ -26,7 +26,10 @@
   let { mode = 'onboarding' } = $props();
 
   // Onboarding mode skips the Password step. We persist the wizard's stores to
-  // the user profile when step 4 → 5 completes, then redirect to /onboard/done.
+  // the user profile when step 4 → 5 completes, then hand over to the rest of
+  // the provider track. The manual wizard used to jump straight to
+  // /onboard/done, so anyone who filled their profile by hand never saw the
+  // resources or offerings steps at all.
   // Registration mode still goes through password.svelte which has its own save.
   let onboardingSaving = $state(false);
 
@@ -55,7 +58,7 @@
 
   $effect(() => {
     if (mode === 'onboarding' && show_value === 5) {
-      persistOnboarding().then(() => goto('/onboard/done'));
+      persistOnboarding().then(() => goto('/onboard/provider/resources'));
     }
   });
 

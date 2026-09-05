@@ -1,6 +1,8 @@
 // Mission processing utilities for lev page
 import { getProjectData } from '$lib/stores/projectStore.js';
 import { letters, txx } from './levDataProcessors.js';
+import { normalizeSaveLinks } from '$lib/timers/saveLinks';
+import { readSaveFiles } from '$lib/timers/saveFiles';
 
 export function mesimabetahalicha(data, mtaha, beta, lang) {
   const mtahan = data.data.usersPermissionsUser.data.attributes.mesimabetahaliches.data;
@@ -88,6 +90,16 @@ export function ishursium(dati, fiapp, fia, lang, idL) {
             ?.attributes?.url,
         whattid:
           start[i].attributes.finiapruvals.data[j].attributes.what?.data?.id,
+        // The member's full account of the work: the files copied onto the
+        // approval, plus the links that stayed on the timer it came from
+        // (Finiapruval has no column for links).
+        evidenceFiles: readSaveFiles(
+          start[i].attributes.finiapruvals.data[j].attributes.what
+        ),
+        evidenceLinks: normalizeSaveLinks(
+          start[i].attributes.finiapruvals.data[j].attributes.timer?.data
+            ?.attributes?.saveLinks
+        ),
         users: start[i].attributes.finiapruvals.data[j].attributes.vots,
         name: rt[0],
         // The untouched original. `name` is the same string now that

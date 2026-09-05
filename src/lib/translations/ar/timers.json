@@ -68,5 +68,18 @@
   "recalculate": "إعادة الحساب",
   "recalcFailed": "فشل الحساب",
   "missingMissionId": "خطأ: معرّف المهمة مفقود",
-  "searchTasks": "البحث عن مهام..."
+  "searchTasks": "البحث عن مهام...",
+  "attachTitle": "روابط وملفات",
+  "attachHint": "أرفق رابطًا (طلب دمج، مستند، تسجيل) أو ملفًا. يظهر في دماغ الريكما وفي بطاقة الموافقة.",
+  "attachLinkLabel": "إضافة رابط",
+  "attachLinkPlaceholder": "https://…",
+  "attachLinkAdd": "إضافة",
+  "attachLinkInvalid": "هذا لا يبدو عنوان ويب صالحًا",
+  "attachLinkFull": "حتى {{count}} روابط، ويجب أن تتسع في سطر واحد",
+  "attachFileLabel": "إرفاق ملف",
+  "attachUploading": "جارٍ الرفع…",
+  "attachFileFailed": "فشل رفع الملف",
+  "attachRemove": "إزالة",
+  "attachLinks": "روابط",
+  "attachFiles": "ملفات"
 }

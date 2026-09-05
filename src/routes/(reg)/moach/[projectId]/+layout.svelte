@@ -172,7 +172,9 @@
     // 'open' = the rikma's own open missions/resources looking for partners.
     // It sits after 'wishes' so the group keeps its landing page (and its
     // incoming-wishes badge) unchanged.
-    { id: 'opps', label: 'opps', tabs: ['wishes', 'open', 'demand'] },
+    // 'resources' sits next to 'open' on purpose: one is what the rikma is
+    // still looking for, the other is what it already holds and until when.
+    { id: 'opps', label: 'opps', tabs: ['wishes', 'open', 'resources', 'demand'] },
     { id: 'votes', label: 'votes', tabs: ['votes', 'archive'] }
   ];
 

@@ -412,17 +412,42 @@ async function upsertPledge(
 
   // The engine. Ending the stipend is `proposeObjectArchive` on this row, with
   // `endOfCycle` scheduling `archiveEffectiveFrom` — no bespoke stop flow.
-  const mashabetahalichId = await ensureEngine(exec, decision, terms, pledgeId, nowISO);
+  const mashabetahalichId = await ensurePledgeEngine(exec, {
+    pledgeId,
+    projectId: decision.projectId,
+    funderId: decision.funderId,
+    name: decision.decisionName,
+    why: decision.why,
+    terms,
+    nowISO
+  });
   return { pledgeId, mashabetahalichId };
 }
 
-async function ensureEngine(
+/**
+ * The pledge's life-cycle carrier, created or refreshed.
+ *
+ * Exported because the funder is not always known when the pledge matures: a
+ * rikma that recruited its funder through `publishStipendFundingRequest` only
+ * learns who they are when the request is taken, and the binding that happens
+ * then (./bindFunder.ts) has to be able to build the same engine the decision
+ * path builds — same `isStipend` marking, same fields — rather than letting the
+ * ordinary recurring-resource path build a different one beside it.
+ */
+export async function ensurePledgeEngine(
   exec: Exec,
-  decision: StipendDecision,
-  terms: StipendTerms,
-  pledgeId: string,
-  nowISO: string
+  args: {
+    pledgeId: string;
+    projectId: string | null;
+    funderId: string | null;
+    name: string;
+    why?: string | null;
+    terms: StipendTerms;
+    nowISO?: string;
+  }
 ): Promise<string | null> {
+  const { pledgeId, terms } = args;
+  const nowISO = args.nowISO ?? new Date().toISOString();
   const existing = await run(
     exec,
     `{ stipendPledge(id: ${gqlStr(pledgeId)}) { data { attributes { mashabetahalich { data { id } } } } } }`,
@@ -431,8 +456,8 @@ async function ensureEngine(
   const current = existing?.stipendPledge?.data?.attributes?.mashabetahalich?.data?.id;
 
   const engineFields = fields(
-    strField('name', decision.decisionName),
-    strField('descrip', decision.why),
+    strField('name', args.name),
+    strField('descrip', args.why ?? null),
     'recurring: true',
     'unit: hour',
     'kindOf: monthly',
@@ -462,8 +487,8 @@ async function ensureEngine(
       exec,
       `mutation { createMashabetahalich(data: { ${fields(
         engineFields,
-        decision.projectId ? strField('project', decision.projectId) : null,
-        decision.funderId ? strField('users_permissions_user', decision.funderId) : null,
+        args.projectId ? strField('project', args.projectId) : null,
+        args.funderId ? strField('users_permissions_user', args.funderId) : null,
         dateField('publishedAt', nowISO)
       )} }) { data { id } } }`,
       'createEngine'

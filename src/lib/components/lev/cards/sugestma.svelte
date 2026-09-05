@@ -11,6 +11,7 @@
   // רכיבים מודרניים חדשים
   import CardHeader from './CardHeader.svelte';
   import EquityPreview from '$lib/components/equity/EquityPreview.svelte';
+  import DateOverlap from '$lib/components/resource/DateOverlap.svelte';
 
   /**
    * @typedef {Object} Props
@@ -50,6 +51,8 @@
    * @property {() => void} [onTochat]
    * @property {boolean} [selfNomination] - candidate-authored proposal (PLAN_SELF_NOMINATION)
    * @property {(() => void) | null} [onWithdraw] - withdraw my self-nomination entirely
+   * @property {import('$lib/resources/dateMatchView.js').DateMatch | null} [dateMatch] - date-overlap line (PLAN_RESOURCE_CALENDAR §6.4)
+   * @property {(() => void)} [onNegoDates] - open the date counter-proposal
    * @property {string|null} [offerHref] - wish/maagad-sourced need: offer on the source page instead
    */
 
@@ -93,7 +96,13 @@
     // Self-nomination (PLAN_SELF_NOMINATION §4.2): this is the candidate's own
     // authored resource offer — they may withdraw it entirely.
     selfNomination = false,
-    onWithdraw = null
+    onWithdraw = null,
+    // Date-overlap line (PLAN_RESOURCE_CALENDAR §6.4). Null when the holder's
+    // window already covers the request, so the card stays quiet.
+    /** @type {import('$lib/resources/dateMatchView.js').DateMatch | null} */
+    dateMatch = null,
+    /** @type {(() => void) | undefined} opens the date counter-proposal */
+    onNegoDates = undefined
   } = $props();
 
 
@@ -461,6 +470,12 @@
           {#if sqadualedf}
             <span>{new Date(sqadualedf).toLocaleDateString()}</span>
           {/if}
+        </div>
+      {/if}
+
+      {#if dateMatch}
+        <div class="mt-2">
+          <DateOverlap match={dateMatch} onCounter={onNegoDates} />
         </div>
       {/if}
 

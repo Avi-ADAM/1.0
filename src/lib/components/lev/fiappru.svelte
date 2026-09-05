@@ -56,6 +56,8 @@
    * @property {any} noofusersWaiting
    * @property {any} uids
    * @property {any} whatt
+   * @property {{id: string, url: string, name: string}[]} [evidenceFiles] - files filed with the hours
+   * @property {string[]} [evidenceLinks] - links filed with the hours
    * @property {any} noofusersOk
    * @property {any} noofusersNo
    * @property {any} timegramaDate
@@ -111,6 +113,8 @@
     noofusersWaiting = $bindable(),
     uids = $bindable(),
     whatt,
+    evidenceFiles = [],
+    evidenceLinks = [],
     noofusersOk = $bindable(),
     noofusersNo,
     timegramaDate,
@@ -675,6 +679,8 @@
                 {noofusersNo}
                 {valph}
                 {whatt}
+                {evidenceFiles}
+                {evidenceLinks}
                 {users}
                 {onProj}
               />
@@ -707,6 +713,8 @@
     {noofusersNo}
     {valph}
     {whatt}
+    {evidenceFiles}
+    {evidenceLinks}
   />
 {/if}
 

@@ -36,9 +36,38 @@ export const DEFAULT_ACTION_ACCESS: PrincipalKind[] = ['user', 'serviceAdmin'];
 
 export type AuthzMode = 'off' | 'log' | 'enforce';
 
+/**
+ * `off` and `log` both take the whole static layer down, and they do it
+ * silently — a stray line in a `.env` looks exactly like a working deploy. So
+ * outside dev, `off` is not a configuration, it is a mistake: refuse rather
+ * than serve unguarded. `log` stays reachable (it is the documented rollback)
+ * but says so loudly, once, where a deploy log will show it.
+ */
+let shadowWarned = false;
+
+function assertUsableMode(mode: AuthzMode, isDev: boolean): AuthzMode {
+  if (isDev || mode === 'enforce') return mode;
+  if (mode === 'off') {
+    throw new Error(
+      'AUTHZ_MODE=off disables the static authorization layer entirely and is ' +
+        'refused outside development. Unset it (the default is `enforce`), or ' +
+        'set AUTHZ_MODE=log if you deliberately want shadow logging.'
+    );
+  }
+  if (!shadowWarned) {
+    shadowWarned = true;
+    console.warn(
+      '[authz] AUTHZ_MODE=log — running in SHADOW mode: denials are logged, not ' +
+        'blocked. This is the documented rollback lever, not a steady state.'
+    );
+  }
+  return mode;
+}
+
 export function getAuthzMode(): AuthzMode {
-  const mode = env.AUTHZ_MODE;
-  return mode === 'log' || mode === 'off' ? mode : 'enforce';
+  const raw = env.AUTHZ_MODE;
+  const mode: AuthzMode = raw === 'log' || raw === 'off' ? raw : 'enforce';
+  return assertUsableMode(mode, import.meta.env.DEV);
 }
 
 function denied(reason: string): AuthzDecision {

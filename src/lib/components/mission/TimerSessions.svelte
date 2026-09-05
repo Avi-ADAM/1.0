@@ -17,6 +17,8 @@
   import { lang } from '$lib/stores/lang.js';
   import { clock } from '$lib/stores/clock.svelte';
   import { buildTimerSessions } from '$lib/timers/timerSessions.js';
+  import { saveLinkLabel } from '$lib/timers/saveLinks.js';
+  import { mediaUrl } from '$lib/utils/processLifecycle';
 
   /**
    * @typedef {Object} Props
@@ -187,6 +189,46 @@
 
                 {#if session.note}
                   <p class="ts-text">{session.note}</p>
+                {/if}
+                <!-- The evidence the member filed with the note: what they
+                     linked to, and what they attached. -->
+                {#if session.links.length || session.files.length}
+                  <ul class="ts-evi">
+                    {#each session.links as link (link)}
+                      <li>
+                        <a
+                          class="ts-evi-item"
+                          href={link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          title={link}
+                        >
+                          <svg class="ts-evi-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+                            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+                          </svg>
+                          {saveLinkLabel(link)}
+                        </a>
+                      </li>
+                    {/each}
+                    {#each session.files as file (file.id)}
+                      <li>
+                        <a
+                          class="ts-evi-item"
+                          href={mediaUrl(file.url)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          title={file.name}
+                        >
+                          <svg class="ts-evi-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                            <polyline points="14 2 14 8 20 8" />
+                          </svg>
+                          {file.name}
+                        </a>
+                      </li>
+                    {/each}
+                  </ul>
                 {/if}
                 {#if session.acts.length}
                   <p class="ts-acts">{session.acts.join(' · ')}</p>
@@ -442,6 +484,43 @@
   }
   .ts-acts {
     opacity: 0.8;
+  }
+
+  /* Links and files sit on their own row under the note, as pill-shaped
+     targets — they are the only thing in a session row that is clickable. */
+  .ts-evi {
+    flex-basis: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .ts-evi-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    max-width: 100%;
+    padding: 2px 8px;
+    border-radius: 9999px;
+    border: 1px solid var(--ts-border);
+    background: var(--ts-chip-bg);
+    font-size: 11px;
+    line-height: 1.4;
+    color: var(--badge-sky-text, #67e8f9);
+    text-decoration: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .ts-evi-item:hover {
+    text-decoration: underline;
+  }
+  .ts-evi-icon {
+    width: 11px;
+    height: 11px;
+    flex: none;
   }
 
   .ts-more {

@@ -810,7 +810,8 @@
       "saleClaim": "Consentimiento del receptor",
       "newService": "Servicio nuevo",
       "picVote": "Cambio de logo",
-      "stipendaccrued": "Beca de subsistencia"
+      "stipendaccrued": "Beca de subsistencia",
+      "stipendtransfer": "Transferencia de beca"
     },
     "fact": {
       "hours": "{{value}} horas",
@@ -860,7 +861,8 @@
       "siteShareDecide": "El reparto está aprobado — confirma tu parte",
       "stipendCycle": "Ciclo de estipendio cerrado — a pagar",
       "stipendSent": "Marcado como enviado — espera tu confirmación",
-      "stipendAccrued": "Horas aprobadas — a la espera de pago"
+      "stipendAccrued": "Horas aprobadas — a la espera de pago",
+      "stipendTransfer": "Importe fijado — coordinando la transferencia"
     },
     "title": {
       "transfer": "{{from}} → {{to}}",
@@ -868,7 +870,8 @@
       "sitesharedecide": "Aprobación de la parte de plataforma",
       "stipendpay": "Pago de estipendio",
       "stipendconfirm": "Confirmación de estipendio recibido",
-      "stipendaccrued": "Devengado para ti"
+      "stipendaccrued": "Devengado para ti",
+      "stipendtransfer": "Transferencia de beca"
     },
     "cta": {
       "vote": "Votar",

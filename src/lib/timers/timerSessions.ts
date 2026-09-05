@@ -20,6 +20,8 @@
  */
 
 import { segmentsFromTimers } from '$lib/recurring/missionMonths.js';
+import { normalizeSaveLinks } from './saveLinks.js';
+import { readSaveFiles, type SaveFile } from './saveFiles.js';
 
 const HOUR_MS = 3_600_000;
 
@@ -54,6 +56,14 @@ export type TimerSession = {
   state: SessionState;
   /** `saveText` — what the member said they did. */
   note: string;
+  /**
+   * `saveLinks` — the evidence a sentence cannot carry. Re-normalized on read,
+   * so a row stored before the validation existed (or written by something
+   * other than the dialog) can still only render an `http(s)` link.
+   */
+  links: string[];
+  /** `saveFiles` — what the member attached to this timer. */
+  files: SaveFile[];
   /** `acts` the timer was filed against, by name. */
   acts: string[];
   /** The segment came from a pre-component Timer (entity `start`/`finnish`). */
@@ -129,6 +139,8 @@ export function buildTimerSessions(
     const state = timerState(attrs);
     const user = userOf(attrs);
     const note = typeof attrs.saveText === 'string' ? attrs.saveText.trim() : '';
+    const links = normalizeSaveLinks(attrs.saveLinks);
+    const files = readSaveFiles(attrs.saveFiles);
     const acts = (attrs.acts?.data ?? [])
       .map((act: any) => act?.attributes?.shem)
       .filter((name: unknown): name is string => typeof name === 'string' && name.length > 0);
@@ -162,6 +174,8 @@ export function buildTimerSessions(
         // stop is the one actually ticking.
         state: state === 'running' && !running ? 'open' : state,
         note,
+        links,
+        files,
         acts,
         legacy
       });

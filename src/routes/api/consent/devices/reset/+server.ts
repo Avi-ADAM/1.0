@@ -21,9 +21,9 @@ import '$lib/server/consent/verifyServerSide';
 //
 // Auth: JWT session (email login) — deliberately NOT a device signature for
 // the request path: the requester's whole problem is having no device.
-export const POST: RequestHandler = async ({ request, cookies }) => {
+export const POST: RequestHandler = async ({ request, cookies, locals }) => {
   if (!cookies.get('jwt')) throw error(401, 'Unauthorized');
-  const userId = cookies.get('id');
+  const userId = locals.uid || undefined;
   if (!userId) throw error(401, 'no user id in session');
 
   const body = (await request.json().catch(() => ({}))) as {

@@ -24,6 +24,7 @@
   import Newsp from './newsp.svelte';
   import Edsp from './editsp.svelte';
   import Button from '$lib/celim/ui/button.svelte';
+  import { CalendarDays } from '@lucide/svelte';
 
   import { slide, fly } from 'svelte/transition';
   import { executeAction } from '$lib/client/actionClient';
@@ -747,6 +748,17 @@ console.log("skillslist",skillslist);
       <p class="text-center text-md text-white">
         {$t('pages.editPic.editMyThing', { name: Valname })}
       </p>
+      {#if datan === 'mash'}
+        <p class="text-center">
+          <a
+            class="inline-flex items-center gap-1 text-sm text-gold hover:text-barbi underline"
+            href="/me/resources"
+          >
+            <CalendarDays size={16} aria-hidden="true" />
+            {$t('resources.page.title')}
+          </a>
+        </p>
+      {/if}
       {#if data.length > 0}
         <div
           class="  flex flex-col sm:flex-row sm:flex-wrap justify-center items-center d cd p-2 mb-1"
@@ -803,6 +815,17 @@ console.log("skillslist",skillslist);
                       <Grow width={17} height={17} /></button
                     >
                   {/if}
+                  <!-- The calendar link is outside the panui branch on purpose:
+                       a resource that is currently out is exactly the one whose
+                       dates its holder wants to look at. -->
+                  <a
+                    class="inline-flex hover:bg-gold text-barbi rounded-full"
+                    title={$t('resources.page.title')}
+                    aria-label={$t('resources.page.title')}
+                    href={`/me/resources?sp=${da.id}`}
+                  >
+                    <CalendarDays size={17} aria-hidden="true" />
+                  </a>
                 </Tile>
               {:else if datan !== 'skil' && datan !== 'taf' && datan !== 'val' && datan !== 'work'}
                 <div

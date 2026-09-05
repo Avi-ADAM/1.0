@@ -95,6 +95,15 @@
   // (same component instance) clears it automatically — no effect assignment.
   let closedFor = $state(null);
   let closed = $derived(closedFor != null && closedFor === entityId);
+  // A recorded-but-not-decisive vote (mine counted, the rest of the rikma still
+  // has to answer) is NOT a terminal state: the card stays on screen with the
+  // updated tally, above a banner that says so. Keyed to the entity id for the
+  // same reason `closedFor` is.
+  let votedFor = $state(null);
+  let voted = $derived(votedFor != null && votedFor === entityId);
+  // An objection ("not in favor") is recorded the same way, but it says
+  // something different: it blocks these terms until a new round replaces them.
+  let votedNo = $state(false);
 
   function upsertById(arr, item) {
     const others = (arr || []).filter((x) => String(x.id) !== String(item.id));
@@ -226,10 +235,18 @@
   const onCoinLapach = () => {
     closedFor = entityId;
   };
-  // ask/askm cards (Reqtojoin/Reqtom) emit onAcsept/onDecline when the request is
-  // finalized (consensus accept or full decline). On a standalone page there is
-  // no list to collapse into → flip to the same terminal state as pmash/pendm.
-  const onResolved = () => {
+  // ask/askm cards (Reqtojoin/Reqtom) emit onAcsept/onDecline on every action
+  // that removes the card from the heart — which includes a plain vote that did
+  // not decide anything. `finalized: false` marks those (my vote recorded and
+  // the rikma still voting, a counter round, an acceptance parked on the
+  // candidate's consent); only a real finalization is terminal here.
+  const onResolved = (payload) => {
+    if (payload?.finalized === false) {
+      votedFor = entityId;
+      votedNo = payload?.what === false;
+      refetch();
+      return;
+    }
     closedFor = entityId;
   };
   const hover = () => {};
@@ -261,6 +278,16 @@
   >
     {$t('vots.voteDetail.back')}
   </a>
+
+  {#if voted && !closed}
+    <p
+      class="mb-4 rounded-xl border px-4 py-3 text-center text-sm font-bold {votedNo
+        ? 'border-amber-200 bg-amber-50 text-amber-900 dark:border-amber-800 dark:bg-amber-900/30 dark:text-amber-100'
+        : 'border-green-200 bg-green-50 text-green-800 dark:border-green-800 dark:bg-green-900/30 dark:text-green-200'}"
+    >
+      {votedNo ? $t('vots.voteDetail.recordedNo') : $t('vots.voteDetail.recorded')}
+    </p>
+  {/if}
 
   {#if !browser || !mounted}
     <div class="flex justify-center p-12"><Lowding /></div>

@@ -46,11 +46,14 @@ describe('Action API Endpoint', () => {
           return undefined;
         })
       };
+      // The handler reads the caller from the verified session identity
+      // (hooks.server.js → locals.uid), not from the `id` cookie.
+      const locals = { uid: 'user123', un: false } as any;
       
       const fetch = global.fetch;
       
       try {
-        await POST({ request, cookies, fetch } as any);
+        await POST({ request, cookies, locals, fetch } as any);
         expect.fail('Should have thrown an error');
       } catch (e: any) {
         expect(e.status).toBe(400);
@@ -73,11 +76,14 @@ describe('Action API Endpoint', () => {
           return undefined;
         })
       };
+      // The handler reads the caller from the verified session identity
+      // (hooks.server.js → locals.uid), not from the `id` cookie.
+      const locals = { uid: 'user123', un: false } as any;
       
       const fetch = global.fetch;
       
       try {
-        await POST({ request, cookies, fetch } as any);
+        await POST({ request, cookies, locals, fetch } as any);
         expect.fail('Should have thrown an error');
       } catch (e: any) {
         expect(e.status).toBe(400);
@@ -98,11 +104,14 @@ describe('Action API Endpoint', () => {
       const cookies = {
         get: vi.fn(() => undefined) // No cookies
       };
+      // The handler reads the caller from the verified session identity
+      // (hooks.server.js → locals.uid), not from the `id` cookie.
+      const locals = { uid: false, un: false } as any;
       
       const fetch = global.fetch;
       
       try {
-        await POST({ request, cookies, fetch } as any);
+        await POST({ request, cookies, locals, fetch } as any);
         expect.fail('Should have thrown an error');
       } catch (e: any) {
         expect(e.status).toBe(401);
@@ -153,10 +162,14 @@ describe('Action API Endpoint', () => {
           return undefined;
         })
       };
+      // The handler reads the caller from the verified session identity
+      // (hooks.server.js → locals.uid), not from the `id` cookie.
+      const locals = { uid: 'user123', un: false } as any;
       
       const response = await POST({
         request,
         cookies,
+        locals,
         fetch: mockFetch
       } as any);
       
@@ -199,12 +212,16 @@ describe('Action API Endpoint', () => {
           return undefined;
         })
       };
+      // The handler reads the caller from the verified session identity
+      // (hooks.server.js → locals.uid), not from the `id` cookie.
+      const locals = { uid: 'user123', un: false } as any;
       
       const mockFetch = vi.fn();
       
       const response = await POST({
         request,
         cookies,
+        locals,
         fetch: mockFetch
       } as any);
       
@@ -234,12 +251,16 @@ describe('Action API Endpoint', () => {
           return undefined;
         })
       };
+      // The handler reads the caller from the verified session identity
+      // (hooks.server.js → locals.uid), not from the `id` cookie.
+      const locals = { uid: 'user123', un: false } as any;
       
       const mockFetch = vi.fn();
       
       const response = await POST({
         request,
         cookies,
+        locals,
         fetch: mockFetch
       } as any);
       
@@ -290,13 +311,17 @@ describe('Action API Endpoint', () => {
           return undefined;
         })
       };
+      // The handler reads the caller from the verified session identity
+      // (hooks.server.js → locals.uid), not from the `id` cookie.
+      const locals = { uid: 'user456', un: false } as any;
       
-      const response = await POST({ request, cookies, fetch: mockFetch } as any);
+      const response = await POST({ request, cookies, locals, fetch: mockFetch } as any);
       
-      // Verify cookies were accessed
-      expect(cookies.get).toHaveBeenCalledWith('id');
+      // The token and the locale still come from cookies; the identity does
+      // not — an `id` cookie read here would be the bug this asserts against.
       expect(cookies.get).toHaveBeenCalledWith('jwt');
       expect(cookies.get).toHaveBeenCalledWith('lang');
+      expect(cookies.get).not.toHaveBeenCalledWith('id');
       
       // Verify the action executed successfully
       const result = await response.json();
@@ -342,10 +367,14 @@ describe('Action API Endpoint', () => {
           return undefined;
         })
       };
+      // The handler reads the caller from the verified session identity
+      // (hooks.server.js → locals.uid), not from the `id` cookie.
+      const locals = { uid: 'user789', un: false } as any;
       
       const response = await POST({
         request,
         cookies,
+        locals,
         fetch: mockFetch
       } as any);
       
@@ -398,8 +427,11 @@ describe('Action API Endpoint', () => {
           return undefined;
         })
       };
+      // The handler reads the caller from the verified session identity
+      // (hooks.server.js → locals.uid), not from the `id` cookie.
+      const locals = { uid: 'user123', un: false } as any;
       
-      const response = await POST({ request, cookies, fetch: mockFetch } as any);
+      const response = await POST({ request, cookies, locals, fetch: mockFetch } as any);
       const result = await response.json();
       
       // The timeout is handled by SvelteKit's built-in timeout mechanism
@@ -438,10 +470,14 @@ describe('Action API Endpoint', () => {
           return undefined;
         })
       };
+      // The handler reads the caller from the verified session identity
+      // (hooks.server.js → locals.uid), not from the `id` cookie.
+      const locals = { uid: 'user123', un: false } as any;
       
       const response = await POST({
         request,
         cookies,
+        locals,
         fetch: vi.fn()
       } as any);
       
@@ -492,10 +528,14 @@ describe('Action API Endpoint', () => {
           return undefined;
         })
       };
+      // The handler reads the caller from the verified session identity
+      // (hooks.server.js → locals.uid), not from the `id` cookie.
+      const locals = { uid: 'user123', un: false } as any;
       
       const response = await POST({
         request,
         cookies,
+        locals,
         fetch: mockFetch
       } as any);
       

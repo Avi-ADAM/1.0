@@ -6,7 +6,10 @@
   import timeGridPlugin from '@fullcalendar/timegrid';
   import interactionPlugin from '@fullcalendar/interaction';
   import { lang } from '$lib/stores/lang';
-  
+  import { normalizeSaveLinks, saveLinkLabel } from '$lib/timers/saveLinks.js';
+  import { readSaveFiles } from '$lib/timers/saveFiles.js';
+  import { mediaUrl } from '$lib/utils/processLifecycle';
+
   
   let calendarEl = $state();
   let calendar = $state();
@@ -245,6 +248,45 @@
   });
 </script>
 
+<!--
+  The links and files the member filed with the timer's note. Rendered in two
+  places (the list card and the timer modal), so it lives as one snippet rather
+  than as two copies that drift.
+-->
+{#snippet saveEvidence(timerData)}
+  {@const links = normalizeSaveLinks(timerData?.saveLinks)}
+  {@const files = readSaveFiles(timerData?.saveFiles)}
+  {#if links.length || files.length}
+    <div class="mt-3">
+      <span class="font-medium text-sm">{$t('timers.attachTitle')}:</span>
+      <div class="flex flex-wrap gap-2 mt-1">
+        {#each links as link (link)}
+          <a
+            href={link}
+            target="_blank"
+            rel="noopener noreferrer"
+            title={link}
+            class="px-2 py-1 bg-sky-100 text-sky-800 rounded text-xs max-w-full truncate hover:underline"
+          >
+            🔗 {saveLinkLabel(link)}
+          </a>
+        {/each}
+        {#each files as file (file.id)}
+          <a
+            href={mediaUrl(file.url)}
+            target="_blank"
+            rel="noopener noreferrer"
+            title={file.name}
+            class="px-2 py-1 bg-pink-100 text-pink-800 rounded text-xs max-w-full truncate hover:underline"
+          >
+            📎 {file.name}
+          </a>
+        {/each}
+      </div>
+    </div>
+  {/if}
+{/snippet}
+
 <!-- הקומפוננטה עם הנתונים -->
 <div class="project-timers-calendar bg-white rounded-lg shadow-lg pt-4 px-1 sm:p-6" dir={$isRtl ? 'rtl' : 'ltr'}>
   <div class="flex justify-between items-center mb-6" dir={$isRtl ? 'rtl' : 'ltr'}>
@@ -327,6 +369,8 @@
                     <p class="mt-1 text-sm text-gray-700 whitespace-pre-line">{timerData.saveText}</p>
                   </div>
                 {/if}
+
+                {@render saveEvidence(timerData)}
 
                 {#if timerData.acts?.data?.length > 0}
                   <div class="mt-3">
@@ -449,6 +493,8 @@
             <p class="mt-1 text-sm text-gray-700 whitespace-pre-line">{selectedTimerData.timerData.saveText}</p>
           </div>
         {/if}
+
+        {@render saveEvidence(selectedTimerData.timerData)}
 
         {#if selectedTimerData.timerData.acts?.data?.length > 0}
           <div>

@@ -485,6 +485,46 @@ export interface StipendConfirmationData {
 }
 
 /**
+ * A cycle that was settled **before** the money moved (PLAN_STIPEND §6).
+ *
+ * Closing a cycle and transferring it are two different acts, and the pay card
+ * used to fuse them: pressing "pay" testified that the money had gone out,
+ * which for most people it had not. Answering "not yet" produces this instead —
+ * the amount is fixed at the derived number, nothing is claimed to have been
+ * sent, no clock runs, and both sides get the same card with a chat to arrange
+ * it in.
+ *
+ * `side` is which of the two is looking: the funder gets "I sent it", the
+ * recipient gets "it arrived".
+ */
+export interface StipendTransferData {
+  paymentId: string;
+  pledgeId: string | null;
+  projectId: string | null;
+  projectName?: string;
+  side: 'funder' | 'recipient';
+  funderId: string | null;
+  funderName: string;
+  funderPic?: string | null;
+  recipientId: string | null;
+  recipientName: string;
+  recipientPic?: string | null;
+  amount: number;
+  hours: number;
+  stipendRate: number;
+  mode: 'equity' | 'advance' | 'gift';
+  cycleStart: string | null;
+  cycleEnd: string | null;
+  halukaId: string | null;
+  forumId: string | null;
+  senderconf?: boolean;
+  confirmed?: boolean;
+  missionNames?: string[];
+  missions?: Array<{ id: string; name: string }>;
+  [key: string]: any;
+}
+
+/**
  * **What I have earned this cycle that nobody has paid me yet** — the
  * recipient's half of a stipend (PLAN_STIPEND §6, §8).
  *
@@ -631,6 +671,9 @@ export const stipendConfirmationsStore: Writable<StipendConfirmationData[]> = wr
 
 /** Stipend I have earned this cycle that has not been settled yet */
 export const stipendAccrualsStore: Writable<StipendAccrualData[]> = writable([]);
+
+/** Settled stipend cycles whose money has not moved yet — both sides see it */
+export const stipendTransfersStore: Writable<StipendTransferData[]> = writable([]);
 
 // ========== UI State Stores ==========
 

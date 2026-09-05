@@ -53,6 +53,9 @@
         {$t('offerings.onboard.continue')}
       </button>
       <a class="skip" href="/onboard/done">{$t('offerings.onboard.skip')}</a>
+      <a class="skip" href="/onboard/provider/resources"
+        >{$t('onboard.actions.back')}</a
+      >
     </div>
   </div>
 </ScreenFrame>

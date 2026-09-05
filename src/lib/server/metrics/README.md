@@ -1,5 +1,11 @@
 # Migration Metrics System
 
+> Who is calling comes from `locals.uid` — the identity `hooks.server.js`
+> derives from the **signed** JWT (`src/lib/server/identity.js`). The `id`
+> cookie is written `httpOnly:false` for the UI, so any caller can set it to
+> any value; reading it on the server is a vulnerability, not a shortcut.
+> See docs/PLAN_PROXY_SECURITY.md §14.1.
+
 This system tracks the migration from the old QIDS system to the new Action System, providing real-time metrics on usage, performance, and error rates.
 
 ## Overview
@@ -177,9 +183,9 @@ These logs can be ingested by log aggregation systems (e.g., ELK, Splunk) for lo
 
 ```typescript
 // Before: Old QIDS system
-export const POST: RequestHandler = async ({ request, cookies }) => {
+export const POST: RequestHandler = async ({ request, cookies, locals }) => {
   const { taskId, status } = await request.json();
-  const userId = cookies.get('id');
+  const userId = locals.uid;
   
   const result = await sendToSer(
     { taskId, status },
@@ -196,9 +202,9 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 // During Migration: Track QIDS calls
 import { trackQidsCall } from '$lib/server/metrics/QidsMetricsWrapper';
 
-export const POST: RequestHandler = async ({ request, cookies }) => {
+export const POST: RequestHandler = async ({ request, cookies, locals }) => {
   const { taskId, status } = await request.json();
-  const userId = cookies.get('id');
+  const userId = locals.uid;
   
   const result = await trackQidsCall(
     'updateTask',
@@ -219,9 +225,9 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 // After Migration: Use Action System (automatic tracking)
 import { executeAction } from '$lib/client/actionClient';
 
-export const POST: RequestHandler = async ({ request, cookies }) => {
+export const POST: RequestHandler = async ({ request, cookies, locals }) => {
   const { taskId, status } = await request.json();
-  const userId = cookies.get('id');
+  const userId = locals.uid;
   const jwt = cookies.get('jwt');
   const lang = cookies.get('lang');
   

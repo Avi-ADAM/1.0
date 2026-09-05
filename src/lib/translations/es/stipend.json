@@ -302,5 +302,17 @@
     "body": "{{name}} financia tu beca de subsistencia. Esto es lo que suma el ciclo actual, a partir de horas aprobadas.",
     "note": "La cifra sale solo de las horas que la rikma aprobó y crece con cada nueva aprobación. No es definitiva hasta que se envía.",
     "waiting": "La pelota está en {{name}} — cuando se envíe la beca aparecerá aquí una tarjeta para confirmar la recepción."
+  },
+  "transfer": {
+    "cardType": "Transferencia de la beca por coordinar",
+    "ask": "¿Ya se lo transferiste a {{name}}?",
+    "askNote": "El importe ya está fijado por las horas aprobadas. La única pregunta es si el dinero ya salió.",
+    "alreadySent": "Sí, ya lo transferí",
+    "notYet": "Todavía no",
+    "opened": "Se abrió una tarjeta de transferencia con chat",
+    "funderBody": "El ciclo está cerrado y el importe fijado. Queda enviárselo a {{name}} — coordínenlo en el chat de aquí y márcalo cuando el dinero salga.",
+    "recipientBody": "{{name}} cerró el ciclo, pero el dinero aún no ha salido. Escribe aquí a dónde enviarlo.",
+    "iSentIt": "Ya lo envié",
+    "note": "Los porcentajes solo se mueven tras confirmar la recepción. Hasta entonces nada se mueve."
   }
 }

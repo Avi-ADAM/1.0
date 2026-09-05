@@ -9,6 +9,8 @@
   "voteDetail": {
     "back": "→ Todas las votaciones del proyecto",
     "closed": "La votación está resuelta: ¡gracias por participar!",
+    "recorded": "Tu voto quedó registrado. La propuesta espera la respuesta de los demás miembros.",
+    "recordedNo": "Tu objeción quedó registrada. La propuesta no se aprobará con estos términos: puedes proponer otros en una ronda de negociación.",
     "missing": "Este elemento no se encontró o ya fue archivado."
   }
 }

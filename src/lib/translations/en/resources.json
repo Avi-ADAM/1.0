@@ -1,0 +1,69 @@
+{
+  "page": {
+    "title": "My resource calendar",
+    "sub": "When each resource is taken, and by whom",
+    "all": "All resources",
+    "single": "Single resource",
+    "block_dates": "Block dates",
+    "back_to_profile": "Back to profile",
+    "project_title": "The weave's resource calendar",
+    "project_sub": "What the weave holds, until when, and what it supplies outward"
+  },
+  "calendar": {
+    "view_label": "View",
+    "view_list": "List",
+    "view_month": "Month",
+    "view_week": "Week",
+    "filter_resource": "Resource",
+    "filter_clear": "Clear",
+    "filter_party": "Held by",
+    "party_project": "Weave",
+    "party_sheirut": "Customer",
+    "party_user": "Person",
+    "party_none": "Self-block",
+    "live_only": "Active only",
+    "empty": "Nothing booked in this range",
+    "today": "Today",
+    "open_ended": "no end date",
+    "loading": "Loading calendar…",
+    "grid_failed": "The grid could not load. The list still works."
+  },
+  "status": {
+    "hold": "Awaiting approval",
+    "confirmed": "Approved",
+    "active": "In use",
+    "done": "Finished",
+    "cancelled": "Cancelled"
+  },
+  "source": {
+    "rikma": "Weave",
+    "concierge": "Customer",
+    "personal": "Personal",
+    "blackout": "Blocked",
+    "external": "External"
+  },
+  "model": {
+    "label": "Occupancy type",
+    "exclusive": "One unit — taken for a date range",
+    "pooled": "Stock — several units at once",
+    "unlimited": "Unlimited — digital, never taken",
+    "consumable": "Consumable — handed over, does not come back",
+    "capacity": "How many units",
+    "lead_time": "Gap between loans (hours)"
+  },
+  "overlap": {
+    "requested": "Requested",
+    "free": "Free with you",
+    "days": "{{count}} days overlap",
+    "none": "No date overlap",
+    "full": "Full overlap",
+    "next_free": "Free from",
+    "propose_other": "Propose other dates",
+    "out_of_window": "Outside the range you offered"
+  },
+  "conflict": {
+    "released_title": "Proposal released",
+    "released_body": "The resource was approved for another proposal that overlaps these dates. You can propose different dates.",
+    "two_claims": "Two requests on the same dates"
+  }
+}

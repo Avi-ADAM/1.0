@@ -94,6 +94,8 @@
     <CycleFacts
       side="recipient"
       missionNames={buble.missionNames}
+      missions={buble.missions}
+      projectId={buble.projectId}
       cycleStart={buble.cycleStart}
       cycleEnd={buble.cycleEnd}
       hours={buble.hours}

@@ -12,7 +12,20 @@
  *           − 2·missingSkills − missingRoles
  *
  * which is what this module computes directly from the two ID sets.
+ *
+ * The resource side adds one more dimension — `computeDateFit` at the bottom —
+ * which the mission scoring above deliberately does not touch.
  */
+
+import { checkAvailability, rangeDays } from '$lib/resources/availability.js';
+import type { BookingLike, Range, ResourceLike } from '$lib/resources/types.js';
+
+/** Anything date-shaped → a valid Date, or null. */
+function toDate(value: string | Date | null | undefined): Date | null {
+  if (value == null || value === '') return null;
+  const d = value instanceof Date ? value : new Date(value);
+  return Number.isNaN(d.getTime()) ? null : d;
+}
 
 export interface MissionRequirements {
   /** open-mission id */
@@ -91,3 +104,63 @@ export function computeMissionMatchScore(
 
 /** A suggestion is only worth storing (and mailing about) above this. */
 export const MIN_SUGGESTION_SCORE = 1;
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Date fit — the resource side (docs/PLAN_RESOURCE_CALENDAR.md §7)
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * How much of a requested window a holder can actually cover.
+ *
+ * Until this existed, matching had no time dimension at all: a rikma that needs
+ * a projector for three days in April was offered one that is rented out until
+ * December, and one whose owner stopped offering it two years ago.
+ *
+ * The scale is deliberately continuous rather than a yes/no. A partial overlap
+ * is a real answer — "I have it for half of what you asked" — and the consent
+ * model says that becomes a date counter-proposal, not a rejection. Only a
+ * genuine zero (no shared day at all) removes the suggestion.
+ */
+export interface DateFitInput {
+  /** The rikma's requested window (`open_mashaabim.sqadualed/sqadualedf`). */
+  requestStart?: string | Date | null;
+  requestEnd?: string | Date | null;
+  /** The holder's offer window (`Sp.sdate/fdate`). */
+  offerStart?: string | Date | null;
+  offerEnd?: string | Date | null;
+  /** Bookings already on the resource, once the ledger exists. */
+  bookings?: BookingLike[];
+  /** Occupancy model + capacity of the holder's resource. */
+  resource?: ResourceLike | null;
+  now?: Date;
+}
+
+/**
+ * `1` = the whole request fits, `0` = nothing does, in between = the fraction
+ * that does.
+ *
+ * Every missing input resolves to `1`, and that direction is chosen on purpose:
+ * a request with no dates has nothing to clash with, and a holder who never
+ * said when they are available has not said no. Guessing the other way would
+ * silently delete suggestions that are perfectly fine.
+ */
+export function computeDateFit(input: DateFitInput): number {
+  const requestStart = toDate(input.requestStart);
+  if (!requestStart) return 1;
+
+  const requestEnd = toDate(input.requestEnd);
+  const request: Range = { start: requestStart, end: requestEnd };
+  const requestedDays = rangeDays(request);
+  if (!(requestedDays > 0) || !Number.isFinite(requestedDays)) return 1;
+
+  const resource: ResourceLike = {
+    ...(input.resource ?? {}),
+    sdate: input.offerStart ?? input.resource?.sdate ?? null,
+    fdate: input.offerEnd ?? input.resource?.fdate ?? null
+  };
+
+  const result = checkAvailability(resource, input.bookings ?? [], request, 1, {
+    now: input.now ?? new Date()
+  });
+  return result.dateFit;
+}

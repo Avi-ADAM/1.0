@@ -14,6 +14,14 @@
     calculateTotalHours
   } from '$lib/func/timers.js';
   import { timers, updateTimers, lockTimerForEdit, unlockTimerForEdit } from '$lib/stores/timers';
+  import {
+    normalizeSaveLink,
+    normalizeSaveLinks,
+    saveLinkLabel,
+    SAVE_LINKS_MAX
+  } from '$lib/timers/saveLinks';
+  import { readSaveFiles, fileSizeLabel } from '$lib/timers/saveFiles';
+  import { mediaUrl } from '$lib/utils/processLifecycle';
   import { page } from '$app/state';
   // The interval list itself — shared with the global editor and the chat card.
   import TimeEditor from './TimeEditor.svelte';
@@ -62,6 +70,129 @@
       if (!saveTextTouched && !saveText) saveText = stored;
     });
   });
+
+  // ── Evidence: the links and files that go with the note ────────────────────
+  // A sentence is often not the account of the work — the account is a PR, a
+  // document, a recording, a file. Both ride with `saveText` into the timer,
+  // and from there into the approval the rikma signs (files are copied onto the
+  // Finiapruval's own media so the card can show them; links stay on the timer,
+  // which the approval points at).
+  /** @type {string[]} */
+  let links = $state([]);
+  /** @type {{id: string, url: string, name: string, mime: string, size: number}[]} */
+  let files = $state([]);
+  let linkDraft = $state('');
+  let evidenceError = $state('');
+  let uploading = $state(false);
+  let evidenceTouched = $state(false);
+  /** @type {HTMLInputElement|null} */
+  let fileInput = $state(null);
+
+  // Same rule as the note: seed from the timer, never over what the member is
+  // in the middle of attaching.
+  $effect(() => {
+    const attrs = timer?.attributes?.activeTimer?.data?.attributes;
+    if (!attrs) return;
+    untrack(() => {
+      if (evidenceTouched) return;
+      if (!links.length) {
+        const stored = normalizeSaveLinks(attrs.saveLinks);
+        if (stored.length) links = stored;
+      }
+      if (!files.length) {
+        const stored = readSaveFiles(attrs.saveFiles);
+        if (stored.length) files = stored;
+      }
+    });
+  });
+
+  function addLink() {
+    const link = normalizeSaveLink(linkDraft);
+    if (!link) {
+      evidenceError = $t('timers.attachLinkInvalid');
+      return;
+    }
+    if (links.includes(link)) {
+      linkDraft = '';
+      return;
+    }
+    // normalizeSaveLinks is the one that knows the column's width, so ask it
+    // rather than counting characters here: if it refuses the new list, the
+    // link does not fit and the member is told instead of losing it silently.
+    const next = normalizeSaveLinks([...links, link]);
+    if (!next.includes(link)) {
+      evidenceError = $t('timers.attachLinkFull', { count: SAVE_LINKS_MAX });
+      return;
+    }
+    links = next;
+    linkDraft = '';
+    evidenceError = '';
+    evidenceTouched = true;
+  }
+
+  /** @param {KeyboardEvent} event */
+  function onLinkKey(event) {
+    if (event.key !== 'Enter') return;
+    // Enter inside the dialog would otherwise submit/close it.
+    event.preventDefault();
+    addLink();
+  }
+
+  /** @param {string} link */
+  function removeLink(link) {
+    links = links.filter((l) => l !== link);
+    evidenceTouched = true;
+  }
+
+  /** @param {Event} event */
+  async function onFilePick(event) {
+    const input = /** @type {HTMLInputElement} */ (event.currentTarget);
+    const picked = [...(input.files ?? [])];
+    if (!picked.length) return;
+
+    uploading = true;
+    evidenceError = '';
+    try {
+      const fd = new FormData();
+      for (const file of picked) fd.append('files', file);
+      const resp = await fetch('/api/upload', { method: 'POST', body: fd });
+      if (!resp.ok) {
+        // /api/upload answers 413/415 with the reason (too big, wrong type);
+        // it is the only thing that can tell the member which file failed.
+        const detail = await resp.json().catch(() => null);
+        evidenceError = detail?.message || $t('timers.attachFileFailed');
+        return;
+      }
+      const uploaded = await resp.json();
+      const added = readSaveFiles(uploaded);
+      files = [...files, ...added.filter((f) => !files.some((k) => k.id === f.id))];
+      evidenceTouched = true;
+    } catch (error) {
+      console.error('[TimerDialogs] attachment upload failed', error);
+      evidenceError = $t('timers.attachFileFailed');
+    } finally {
+      uploading = false;
+      // Let the same file be picked again after a failure.
+      input.value = '';
+    }
+  }
+
+  /** @param {string} id */
+  function removeFile(id) {
+    // Only detached from this timer — the uploaded file itself is left alone,
+    // because an earlier save may already have filed it on an approval row.
+    files = files.filter((file) => file.id !== id);
+    evidenceTouched = true;
+  }
+
+  function resetEvidence() {
+    links = [];
+    files = [];
+    linkDraft = '';
+    evidenceError = '';
+    evidenceTouched = false;
+    if (fileInput) fileInput.value = '';
+  }
 
   // פונקציות
   function closeDialog() {
@@ -130,7 +261,12 @@
     await updateTimer(
       timer.attributes.activeTimer.data,
       'tasks',
-      { selectedTaskIds, saveText: saveText.trim() },
+      {
+        selectedTaskIds,
+        saveText: saveText.trim(),
+        saveLinks: links,
+        saveFiles: files.map((file) => file.id)
+      },
       fetch,
       timer.projectId,
       page.data.uid
@@ -180,7 +316,8 @@
       tasksToSave,
       timer.projectId,
       page.data.uid,
-      saveText
+      saveText,
+      { links, files: files.map((file) => file.id) }
     );
 
     if (result) {
@@ -200,6 +337,7 @@
       dialogEdit = false;
       saveText = '';
       saveTextTouched = false;
+      resetEvidence();
       unlockTimerForEdit(timer.mId, { refresh: true });
 
       toast.success($t('timers.saveSuccess'));
@@ -452,6 +590,91 @@
           <span class="save-note-count">{saveText.length}/{SAVE_TEXT_MAX}</span>
         </div>
 
+        <!-- Links and files: the part of the account a sentence cannot carry. -->
+        <div class="save-evi">
+          <span class="save-note-label">{$t('timers.attachTitle')}</span>
+          <p class="save-evi-hint">{$t('timers.attachHint')}</p>
+
+          <div class="save-evi-row">
+            <input
+              id="timer-save-link"
+              class="save-evi-input"
+              type="url"
+              inputmode="url"
+              bind:value={linkDraft}
+              onkeydown={onLinkKey}
+              placeholder={$t('timers.attachLinkPlaceholder')}
+              aria-label={$t('timers.attachLinkLabel')}
+            />
+            <button
+              type="button"
+              class="save-evi-add"
+              onclick={addLink}
+              disabled={!linkDraft.trim() || links.length >= SAVE_LINKS_MAX}
+            >
+              {$t('timers.attachLinkAdd')}
+            </button>
+          </div>
+
+          {#if links.length}
+            <ul class="save-evi-list">
+              {#each links as link (link)}
+                <li class="save-evi-chip">
+                  <a href={link} target="_blank" rel="noopener noreferrer">{saveLinkLabel(link)}</a>
+                  <button
+                    type="button"
+                    class="save-evi-drop"
+                    onclick={() => removeLink(link)}
+                    aria-label={$t('timers.attachRemove')}
+                    title={$t('timers.attachRemove')}>×</button
+                  >
+                </li>
+              {/each}
+            </ul>
+          {/if}
+
+          <div class="save-evi-row">
+            <input
+              bind:this={fileInput}
+              id="timer-save-file"
+              class="save-evi-file"
+              type="file"
+              multiple
+              accept="image/jpeg,image/png,image/webp,image/gif,image/svg+xml,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+              disabled={uploading}
+              onchange={onFilePick}
+              aria-label={$t('timers.attachFileLabel')}
+            />
+            {#if uploading}
+              <span class="save-evi-busy">{$t('timers.attachUploading')}</span>
+            {/if}
+          </div>
+
+          {#if files.length}
+            <ul class="save-evi-list">
+              {#each files as file (file.id)}
+                <li class="save-evi-chip">
+                  <a href={mediaUrl(file.url)} target="_blank" rel="noopener noreferrer">
+                    {file.name}
+                    {#if file.size}<span class="save-evi-size">{fileSizeLabel(file.size)}</span>{/if}
+                  </a>
+                  <button
+                    type="button"
+                    class="save-evi-drop"
+                    onclick={() => removeFile(file.id)}
+                    aria-label={$t('timers.attachRemove')}
+                    title={$t('timers.attachRemove')}>×</button
+                  >
+                </li>
+              {/each}
+            </ul>
+          {/if}
+
+          {#if evidenceError}
+            <p class="save-evi-error" role="alert">{evidenceError}</p>
+          {/if}
+        </div>
+
         {#if dialogEdit != true}
           <div class="time-summary">
             <p>{elapsedTime}</p>
@@ -619,6 +842,142 @@
     align-self: flex-end;
     font-size: 0.75rem;
     color: rgba(255, 255, 255, 0.55);
+  }
+
+  /* ── Evidence: links + files, on the dialog's own dark glass ───────────── */
+  .save-evi {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    margin-top: 0.9rem;
+  }
+
+  .save-evi-hint {
+    margin: 0;
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.55);
+  }
+
+  .save-evi-row {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+  }
+
+  .save-evi-input {
+    flex: 1 1 12rem;
+    min-width: 0;
+    padding: 0.45rem 0.55rem;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(0, 0, 0, 0.25);
+    color: #fff;
+    font: inherit;
+    /* A URL is always LTR, even inside the RTL dialog. */
+    direction: ltr;
+    text-align: start;
+  }
+
+  .save-evi-input::placeholder {
+    color: rgba(255, 255, 255, 0.45);
+  }
+
+  .save-evi-input:focus {
+    outline: none;
+    border-color: #00ffff;
+  }
+
+  .save-evi-add {
+    padding: 0.45rem 0.8rem;
+    border-radius: 6px;
+    border: 1px solid rgba(0, 255, 255, 0.5);
+    background: rgba(0, 255, 255, 0.12);
+    color: #00ffff;
+    font: inherit;
+    cursor: pointer;
+  }
+
+  .save-evi-add:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  .save-evi-file {
+    flex: 1 1 12rem;
+    min-width: 0;
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  .save-evi-file::file-selector-button {
+    margin-inline-end: 0.5rem;
+    padding: 0.35rem 0.7rem;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+    font: inherit;
+    cursor: pointer;
+  }
+
+  .save-evi-busy {
+    font-size: 0.75rem;
+    color: #00ffff;
+  }
+
+  .save-evi-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .save-evi-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    max-width: 100%;
+    padding: 0.25rem 0.5rem;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(0, 0, 0, 0.3);
+    font-size: 0.78rem;
+  }
+
+  .save-evi-chip a {
+    max-width: 16rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: #7ee0ff;
+    text-decoration: underline;
+  }
+
+  .save-evi-size {
+    margin-inline-start: 0.3rem;
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  .save-evi-drop {
+    border: none;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 1rem;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  .save-evi-drop:hover {
+    color: #ff8fb1;
+  }
+
+  .save-evi-error {
+    margin: 0;
+    font-size: 0.78rem;
+    color: #ffb4c6;
   }
 
   .save-btn {

@@ -96,15 +96,28 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
   const nowISO = new Date().toISOString();
   const lines = computeStipendEquity(cycle.amount, pledge.terms);
 
-  // The money leg. `senderconf` is true because settling *is* the funder saying
-  // "I sent it"; `confirmed` waits for the recipient, like every other Haluka.
+  /**
+   * Did the money already move? Closing a cycle and transferring it are two
+   * different acts, and the card used to fuse them: pressing "pay" wrote
+   * `senderconf: true` — the funder testifying they had sent something they
+   * often had not — and started the recipient's silence clock, so a transfer
+   * nobody had made could be confirmed by nobody answering.
+   *
+   * So the card asks first. "Yes, I transferred" is the path above. "Not yet"
+   * settles the cycle at the derived amount and opens a transfer both sides
+   * can see and talk in, with no clock running until the money actually goes.
+   */
+  const transferred = params.transferred !== false;
+
+  // The money leg. `senderconf` is the funder's own statement that they sent
+  // it; `confirmed` waits for the recipient, like every other Haluka.
   const halukaData = fields(
     strField('usersend', pledge.funderId),
     strField('userrecive', pledge.recipientId),
     numField('amount', cycle.amount),
     strField('project', pledge.projectId),
     pledge.matbeaId ? strField('matbea', pledge.matbeaId) : null,
-    'senderconf: true',
+    transferred ? 'senderconf: true' : 'senderconf: false',
     'confirmed: false',
     'ushar: true',
     dateField('publishedAt', nowISO)
@@ -115,6 +128,27 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
     'settle:createHaluka'
   );
   const halukaId = halukaRes?.createHaluka?.data?.id ? String(halukaRes.createHaluka.data.id) : null;
+
+  // The coordination channel. Created up front only when the money has *not*
+  // moved yet, because that is the case where the two of them still have
+  // something to arrange ("which account", "Tuesday") — and a chat that has to
+  // be created before it can be opened is a chat nobody opens.
+  let forumId: string | null = null;
+  if (!transferred && halukaId) {
+    const forumRes = await run(
+      exec,
+      `mutation { createForum(data: { ${fields(
+        strField('project', pledge.projectId),
+        strField('haluka', halukaId),
+        dateField('publishedAt', nowISO)
+      )} }) { data { id } } }`,
+      'settle:createForum'
+    ).catch((e) => {
+      console.warn('[settleStipendCycle] transfer chat creation failed (non-fatal):', e);
+      return null;
+    });
+    forumId = forumRes?.createForum?.data?.id ? String(forumRes.createForum.data.id) : null;
+  }
 
   // The ledger row. equityCredit/equityDebit are written now but only *count*
   // once status is `confirmed` — the same invariant a Sale has while its holder
@@ -137,7 +171,7 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
       enumField('mode', pledge.terms.mode, MODES),
       numField('costShare', pledge.terms.costShare),
       numField('equityMultiplier', pledge.terms.equityMultiplier),
-      'status: sent',
+      transferred ? 'status: sent' : 'status: pending',
       halukaId ? strField('haluka', halukaId) : null,
       pledge.matbeaId ? strField('matbea', pledge.matbeaId) : null,
       strField(
@@ -156,22 +190,28 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
   // Silence-as-consent on "did it arrive?": same pattern as a sale claim —
   // no answer within the rikma's restime confirms the last version on the
   // table, and "I got nothing" is a counter of amount 0, not a veto.
+  //
+  // A payment that has not been transferred yet gets **no** clock: silence
+  // cannot confirm the arrival of money nobody sent. The clock starts when the
+  // funder says it went out (`markStipendTransferSent`).
   let timegramaId: string | null = null;
-  try {
-    const deadline = new Date(Date.now() + calcDeadlineMs(project?.restime ?? 'feh'));
-    const tg = await run(
-      exec,
-      `mutation { createTimegrama(data: { ${fields(
-        dateField('date', deadline),
-        strField('whatami', 'stipend_payment'),
-        strField('stipend_payment', paymentId),
-        'done: false'
-      )} }) { data { id } } }`,
-      'settle:timegrama'
-    );
-    timegramaId = tg?.createTimegrama?.data?.id ? String(tg.createTimegrama.data.id) : null;
-  } catch (e) {
-    console.warn('[settleStipendCycle] confirmation clock failed:', e);
+  if (transferred) {
+    try {
+      const deadline = new Date(Date.now() + calcDeadlineMs(project?.restime ?? 'feh'));
+      const tg = await run(
+        exec,
+        `mutation { createTimegrama(data: { ${fields(
+          dateField('date', deadline),
+          strField('whatami', 'stipend_payment'),
+          strField('stipend_payment', paymentId),
+          'done: false'
+        )} }) { data { id } } }`,
+        'settle:timegrama'
+      );
+      timegramaId = tg?.createTimegrama?.data?.id ? String(tg.createTimegrama.data.id) : null;
+    } catch (e) {
+      console.warn('[settleStipendCycle] confirmation clock failed:', e);
+    }
   }
 
   // Move the pledge's own counters. `paidTotal` is what the next cycle's
@@ -210,11 +250,18 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
         {
           recipients: { type: 'specificUsers', config: { userIdsParam: 'recipients' } },
           templates: {
-            title: { he: 'מלגת הקיום נשלחה', en: 'Your stipend was sent' },
-            body: {
-              he: `${cycle.hours} שעות שאושרו × ₪${pledge.terms.stipendRate} = ₪${cycle.amount}. אישור הקבלה הוא מה שמעדכן את האחוזים — בלעדיו כלום לא זז.`,
-              en: `${cycle.hours} approved hours × ${pledge.terms.stipendRate} = ${cycle.amount}. Confirming it arrived is what updates the shares — until then nothing moves.`
-            }
+            title: transferred
+              ? { he: 'מלגת הקיום נשלחה', en: 'Your stipend was sent' }
+              : { he: 'מחזור המלגה נסגר — ההעברה בתיאום', en: 'Your stipend cycle closed — the transfer is being arranged' },
+            body: transferred
+              ? {
+                  he: `${cycle.hours} שעות שאושרו × ₪${pledge.terms.stipendRate} = ₪${cycle.amount}. אישור הקבלה הוא מה שמעדכן את האחוזים — בלעדיו כלום לא זז.`,
+                  en: `${cycle.hours} approved hours × ${pledge.terms.stipendRate} = ${cycle.amount}. Confirming it arrived is what updates the shares — until then nothing moves.`
+                }
+              : {
+                  he: `${cycle.hours} שעות שאושרו × ₪${pledge.terms.stipendRate} = ₪${cycle.amount}. הכסף עוד לא יצא — נפתח כרטיס העברה עם צ׳אט לתיאום, ואפשר לכתוב שם לאן להעביר.`,
+                  en: `${cycle.hours} approved hours × ${pledge.terms.stipendRate} = ${cycle.amount}. The money has not gone out yet — a transfer card with a chat is open, so you can say where to send it.`
+                }
           },
           channels: ['socket', 'push'],
           metadata: { type: 'stipendPayment', url: 'lev', priority: 'high' }
@@ -231,7 +278,10 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
       settled: true,
       paymentId,
       halukaId,
+      forumId,
       timegramaId,
+      transferred,
+      status: transferred ? 'sent' : 'pending',
       ...cycle,
       cycleStart: from,
       cycleEnd: window.cycleEnd,
@@ -250,6 +300,12 @@ export const settleStipendCycleConfig: ActionConfig = {
 
   paramSchema: {
     pledgeId: { type: 'string', required: true, description: 'The pledge being settled' },
+    transferred: {
+      type: 'boolean',
+      required: false,
+      description:
+        'Has the money already been transferred? true (default) marks it sent and starts the recipient’s confirmation clock; false settles the cycle as pending, opens a transfer chat and starts no clock.'
+    },
     reference: { type: 'string', required: false, description: 'Any date inside the cycle (defaults to now)' },
     cycleStart: { type: 'string', required: false, description: 'Explicit window start' },
     cycleEnd: { type: 'string', required: false, description: 'Explicit window end' }

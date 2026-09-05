@@ -4,6 +4,10 @@
  */
 
 import { cycleWindowIso, normalizeCycleSize } from '$lib/recurring/recurringPlan.js';
+import { bestEffort } from '$lib/server/resources/bookingStore.js';
+import { openGrantBooking } from '$lib/server/resources/grantBooking.js';
+import { execFromContext } from '$lib/server/archive/exec.js';
+import { bindStipendFunder, readStipendRequest } from '$lib/server/stipend/bindFunder.js';
 
 type StrapiExecutor = {
   execute: (
@@ -287,16 +291,67 @@ export async function runResourceAskmAcceptance(
     }
   }
 
-  // Recurring expense? Activate the draft engine and make this Maap cycle #1.
-  // The open resource was just archived, but the lookup reads it by id, so a
-  // solo rikma's recurring OpenMashaabim still yields its terms.
-  await activateRecurringEngine(strapi, context, {
-    projectId,
-    resourceName: missionName,
-    acceptedUserId,
-    maapId,
-    openMashaabimId,
-  });
+  // A stipend funding request is not a resource the rikma buys — it is a
+  // partner taking on the pledges (PLAN_STIPEND §12.2). Binding them to the
+  // programme *replaces* the recurring-resource engine: leaving both would ask
+  // the funder for a typed monthly amount on one card while the derived one
+  // waits on another, and approving the typed one would credit them a Rikmash
+  // for money the stipend ledger already credits.
+  const exec = execFromContext(context);
+  const stipendRequest = await readStipendRequest(exec, String(openMashaabimId)).catch(() => ({
+    isStipendRequest: false,
+    programId: null,
+  }));
+  if (stipendRequest.isStipendRequest) {
+    await bindStipendFunder(exec, {
+      openMashaabimId: String(openMashaabimId),
+      funderId: String(acceptedUserId),
+      programId: stipendRequest.programId,
+    }).catch((e) => {
+      // An unbound funder is a stipend still looking for one — a state the
+      // system shows. Undoing the acceptance over it would be worse.
+      console.error('runResourceAskmAcceptance: binding the stipend funder failed', e);
+      return null;
+    });
+    // The acceptance Maap has done its job as the record of who took it. Left
+    // open it asks the rikma to approve a delivery that has not happened and
+    // turns into a Rikmash when they do.
+    if (maapId) {
+      await strapi
+        .execute('mrUpdateCycleMaap', { id: maapId, data: { archived: true } }, jwt, fetchFn)
+        .catch((e: unknown) =>
+          console.error('runResourceAskmAcceptance: closing the stipend acceptance maap failed', e)
+        );
+    }
+  } else {
+    // Recurring expense? Activate the draft engine and make this Maap cycle #1.
+    // The open resource was just archived, but the lookup reads it by id, so a
+    // solo rikma's recurring OpenMashaabim still yields its terms.
+    await activateRecurringEngine(strapi, context, {
+      projectId,
+      resourceName: missionName,
+      acceptedUserId,
+      maapId,
+      openMashaabimId,
+    });
+  }
+
+  // Record the grant on the booking ledger. This is the *only* live record a
+  // non-recurring grant gets — `activateRecurringEngine` above builds an engine
+  // for monthly/yearly resources and nothing at all for a `rent`, which is why
+  // today nothing can answer "taken until when" for a rental.
+  await bestEffort('askmAcceptance', () =>
+    openGrantBooking(execFromContext(context), {
+      spId,
+      projectId,
+      openMashaabimId,
+      maapId,
+      ownerId: acceptedUserId,
+      note: missionName,
+      strapi,
+      context,
+    })
+  );
 
   if (newnew) {
     await strapi.execute(

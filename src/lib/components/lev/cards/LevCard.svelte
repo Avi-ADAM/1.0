@@ -34,6 +34,7 @@
   import StipendPayCard from './StipendPayCard.svelte';
   import StipendConfirmCard from './StipendConfirmCard.svelte';
   import StipendAccruedCard from './StipendAccruedCard.svelte';
+  import StipendTransferCard from './StipendTransferCard.svelte';
   import SiteShareIncomeCard from './SiteShareIncomeCard.svelte';
   import SiteShareAutoApprovedCard from './SiteShareAutoApprovedCard.svelte';
   import WishOfferCard from './WishOfferCard.svelte';
@@ -164,6 +165,13 @@
       isFirst={isVisible}
       onProj={proj}
       onUser={user}
+      onDone={delo}
+    />
+{:else if buble.ani === 'stipendtransfer'}
+  <StipendTransferCard
+      {buble}
+      isFirst={isVisible}
+      onProj={proj}
       onDone={delo}
     />
 {:else if buble.ani === 'stipendaccrued'}
@@ -439,6 +447,8 @@
       why={buble.why}
       whatt={buble.whatt}
       whattid={buble.whattid}
+      evidenceFiles={buble.evidenceFiles}
+      evidenceLinks={buble.evidenceLinks}
       missionBName={buble.openName}
       name={buble.name}
       projectId={buble.projectId}
@@ -679,6 +689,7 @@
       spnot={buble.spnot}
       easy={buble.easy}
       selfNomination={buble.source === 'selfNomination'}
+      dateMatch={buble.dateMatch ?? null}
     />
 {:else if buble.ani === 'archObject' && milon.hachla == true}
   <ArchiveObjectCard

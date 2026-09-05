@@ -1,7 +1,6 @@
 ﻿<script lang="ts">
   import { isRtl, t } from '$lib/translations';
   import { onMount } from 'svelte';
-  import { goto } from '$app/navigation';
   import { lang } from '$lib/stores/lang.js';
   import { toast } from 'svelte-sonner';
   import axios from 'axios';
@@ -231,14 +230,35 @@ const dayValues = ['sun', 'mon', 'thu', 'wen', 'teh', 'fri', 'shabat'];
     toast.success('השינויים נשמרו');
   }
 
-  function logout() {
-    localStorage.clear();
-    document.cookie.split(';').forEach(function (c) {
-      document.cookie = c
-        .replace(/^ +/, '')
-        .replace(/=.*/, '=;expires=' + new Date().toUTCString() + ';path=/');
-    });
-    goto('/');
+  let loggingOut = $state(false);
+
+  // Signing out has to happen on the server. `jwt` is HttpOnly and the cookies
+  // are written on the `.1lev1.com` domain scope, so the old client-side
+  // `document.cookie = '…expires=…'` loop could not touch either of them — the
+  // visitor stayed signed in. /logout deletes every scope, then a full
+  // `location.href` navigation (not `goto`) throws away every client store and
+  // cached load so nothing of the previous session survives.
+  async function logout() {
+    if (loggingOut) return;
+    loggingOut = true;
+    try {
+      await fetch('/logout', { method: 'POST', credentials: 'same-origin' });
+    } catch (e) {
+      console.error('logout request failed', e);
+    }
+    try {
+      localStorage.clear();
+      sessionStorage.clear();
+    } catch {
+      // storage disabled (private mode / blocked cookies) — nothing cached
+    }
+    // Client-readable leftovers only; the real auth cookies are already gone.
+    for (const c of document.cookie.split(';')) {
+      const name = c.split('=')[0].trim();
+      if (!name || name === 'lang' || name === 'theme') continue;
+      document.cookie = `${name}=;expires=${new Date(0).toUTCString()};path=/`;
+    }
+    window.location.href = '/login';
   }
 
   // --- Password Change ---
@@ -679,7 +699,8 @@ const dayValues = ['sun', 'mon', 'thu', 'wen', 'teh', 'fri', 'shabat'];
         <Separator />
         <button
           onclick={logout}
-          class="!bg-red-500 text-white hover:!bg-red-600 px-8 py-2 rounded-xl border-b-[4px] hover:brightness-105 hover:-translate-y-[2px] hover:border-b-[6px] active:border-b-[2px] active:brightness-95 active:translate-y-[2px] border-barbi shadow-lg hover:shadow-xl font-bold font-rubik"
+          disabled={loggingOut}
+          class="disabled:opacity-60 disabled:cursor-wait !bg-red-500 text-white hover:!bg-red-600 px-8 py-2 rounded-xl border-b-[4px] hover:brightness-105 hover:-translate-y-[2px] hover:border-b-[6px] active:border-b-[2px] active:brightness-95 active:translate-y-[2px] border-barbi shadow-lg hover:shadow-xl font-bold font-rubik"
         >
           <div
             class="flex flex-row align-center justify-center items-center gap-4"

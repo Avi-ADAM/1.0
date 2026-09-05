@@ -89,6 +89,7 @@ import { declineOpenMissionConfig } from './declineOpenMission.js';
 import { declineMissionRequestConfig } from './declineMissionRequest.js';
 import { finalizeAskmAcceptanceConfig } from './finalizeAskmAcceptance.js';
 import { declineAskmRequestConfig } from './declineAskmRequest.js';
+import { voteOnAskmConfig } from './voteOnAskm.js';
 import { voteOnPendmConfig } from './voteOnPendm.js';
 import { voteOnPmashConfig } from './voteOnPmash.js';
 import { addDiunEntryConfig } from './addDiunEntry.js';
@@ -149,6 +150,11 @@ import { updateUserBasicConfig } from './updateUserBasic.js';
 import { archiveUserResourceConfig } from './archiveUserResource.js';
 import { createWeaveConfig } from './createWeave.js';
 import { markResourceDoneConfig } from './markResourceDone.js';
+import { createResourceBookingConfig } from './createResourceBooking.js';
+import { confirmResourceBookingConfig } from './confirmResourceBooking.js';
+import { cancelResourceBookingConfig } from './cancelResourceBooking.js';
+import { blockResourceDatesConfig } from './blockResourceDates.js';
+import { releaseResourceBookingConfig } from './releaseResourceBooking.js';
 import { ensurePersonalRikmaConfig } from './ensurePersonalRikma.js';
 import { publishUserResourceAsProductConfig } from './publishUserResourceAsProduct.js';
 import { createMissionOfferConfig } from './createMissionOffer.js';
@@ -165,6 +171,7 @@ import { proposeStipendProgramConfig } from './proposeStipendProgram.js';
 import { counterStipendTermsConfig } from './counterStipendTerms.js';
 import { settleStipendCycleConfig } from './settleStipendCycle.js';
 import { confirmStipendPaymentConfig } from './confirmStipendPayment.js';
+import { markStipendTransferSentConfig } from './markStipendTransferSent.js';
 import { publishStipendFundingRequestConfig } from './publishStipendFundingRequest.js';
 import { getStipendWorkConfig } from './getStipendWork.js';
 import { getStipendOverviewConfig } from './getStipendOverview.js';
@@ -268,6 +275,7 @@ export function registerAllActions(): void {
   registerAction(declineMissionRequestConfig);
   registerAction(finalizeAskmAcceptanceConfig);
   registerAction(declineAskmRequestConfig);
+  registerAction(voteOnAskmConfig);
 
   // Pendm / Pmash vote actions + discussion
   registerAction(voteOnPendmConfig);
@@ -426,6 +434,14 @@ export function registerAllActions(): void {
   // Recurring monthly resources: close a mashabetahalich engine (mark done)
   registerAction(markResourceDoneConfig);
 
+  // The resource booking ledger — when a resource is taken, and by whom
+  // (PLAN_RESOURCE_CALENDAR). All five no-op while RESOURCE_BOOKINGS=off.
+  registerAction(createResourceBookingConfig);
+  registerAction(confirmResourceBookingConfig);
+  registerAction(cancelResourceBookingConfig);
+  registerAction(blockResourceDatesConfig);
+  registerAction(releaseResourceBookingConfig);
+
   // Object archival & edit consent flow (PLAN_OBJECT_ARCHIVAL)
   registerAction(proposeObjectArchiveConfig);
   registerAction(proposeObjectEditConfig);
@@ -438,6 +454,7 @@ export function registerAllActions(): void {
   registerAction(counterStipendTermsConfig);
   registerAction(settleStipendCycleConfig);
   registerAction(confirmStipendPaymentConfig);
+  registerAction(markStipendTransferSentConfig);
   registerAction(publishStipendFundingRequestConfig);
   registerAction(getStipendWorkConfig);
   registerAction(getStipendOverviewConfig);

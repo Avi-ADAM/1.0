@@ -31,17 +31,35 @@ export interface CookieReader {
   get(name: string): string | undefined;
 }
 
+/** A user id and name that something has actually verified — see identity.js. */
+export interface VerifiedIdentity {
+  id?: string | null;
+  username?: string | null;
+}
+
 /**
- * Principal from the httpOnly cookies (the normal browser path, and also
- * server `load` functions forwarding the user's cookies).
+ * Principal for the normal browser path (and for a server `load` forwarding the
+ * user's cookies).
+ *
+ * The `jwt` cookie says *that* there is a session; `identity` — resolved from
+ * that token by `$lib/server/identity.js` and published as `locals.uid` — says
+ * *whose*. The `id` / `un` cookies are written httpOnly:false for the UI and
+ * are attacker-controlled on a public gate, so they are never read here.
+ *
+ * A token we could not resolve to a user is not a session: it degrades to
+ * anonymous and the authorization layer denies from there.
  */
-export function resolveCookiePrincipal(cookies: CookieReader): Principal {
+export function resolveSessionPrincipal(
+  cookies: CookieReader,
+  identity?: VerifiedIdentity | null
+): Principal {
   const jwt = cookies.get('jwt');
   if (!jwt) return { kind: 'anonymous' };
+  if (!identity?.id) return { kind: 'anonymous' };
   return {
     kind: 'user',
-    userId: cookies.get('id') ?? undefined,
-    username: cookies.get('un') ?? undefined
+    userId: String(identity.id),
+    username: identity.username ?? undefined
   };
 }
 
@@ -70,8 +88,10 @@ export function resolvePrincipal(opts: {
   request: Request;
   cookies: CookieReader;
   isSerFlag?: boolean;
+  /** verified session identity (`locals.uid` / `locals.un`), when there is one */
+  identity?: VerifiedIdentity | null;
 }): Principal {
-  const { request, cookies, isSerFlag } = opts;
+  const { request, cookies, isSerFlag, identity } = opts;
   if (isSerFlag === true && isInternalRequest(request)) {
     return resolveServicePrincipal(request);
   }
@@ -81,7 +101,7 @@ export function resolvePrincipal(opts: {
   if (isMeetingsRequest(request)) {
     return { kind: 'serviceMeetings' };
   }
-  return resolveCookiePrincipal(cookies);
+  return resolveSessionPrincipal(cookies, identity);
 }
 
 /**

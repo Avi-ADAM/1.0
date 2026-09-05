@@ -13,9 +13,9 @@ import { resolveFromStore } from '$lib/server/consent/verifyServerSide';
 // signed by an ACTIVE device of the same user (self-revoke allowed — a
 // device may retire itself). The JWT session gates spam; the signature is
 // the authority, so a stolen session alone cannot revoke devices.
-export const POST: RequestHandler = async ({ request, cookies }) => {
+export const POST: RequestHandler = async ({ request, cookies, locals }) => {
   if (!cookies.get('jwt')) throw error(401, 'Unauthorized');
-  const userId = cookies.get('id');
+  const userId = locals.uid || undefined;
   if (!userId) throw error(401, 'no user id in session');
 
   const body = await request.json().catch(() => null);

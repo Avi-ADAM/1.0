@@ -20,6 +20,8 @@
   /**
    * @typedef {Object} Props
    * @property {string[]} [missionNames] - the work the hours were logged on
+   * @property {Array<{id: string, name: string}>} [missions] - the same work with ids, so it can be opened
+   * @property {string|null} [projectId] - the rikma the missions belong to (needed for the link)
    * @property {string|null} [cycleStart]
    * @property {string|null} [cycleEnd]
    * @property {number} hours - approved hours behind the amount
@@ -37,6 +39,8 @@
   /** @type {Props} */
   let {
     missionNames = [],
+    missions = [],
+    projectId = null,
     cycleStart = null,
     cycleEnd = null,
     hours = 0,
@@ -52,7 +56,20 @@
   } = $props();
 
   const period = $derived(cycleLabel(cycleStart, cycleEnd, $locale || 'he'));
-  const work = $derived((missionNames ?? []).filter(Boolean));
+  /**
+   * The work, linked where we know its id. Naming the mission was already an
+   * improvement over an amount on its own, but a funder who wanted to check
+   * the hours behind the number still had nowhere to go from the card — the
+   * mission page is one tap away and was not offered (PLAN_STIPEND §8).
+   */
+  const work = $derived.by(() => {
+    const linked = (missions ?? [])
+      .filter((m) => m && m.name)
+      .map((m) => ({ name: m.name, href: m.id && projectId ? missionHref(m.id) : null }));
+    if (linked.length) return linked;
+    return (missionNames ?? []).filter(Boolean).map((name) => ({ name, href: null }));
+  });
+  const missionHref = (id) => `/moach/${projectId}/object/betahalich/${id}`;
   // A gift moves cash and nothing else, so there is no share line to show.
   const movesEquity = $derived(mode === 'equity' && (equityDebit > 0 || equityCredit > 0));
   const money = (n) => `₪${Number(n ?? 0).toLocaleString(undefined, { maximumFractionDigits: 2 })}`;
@@ -64,7 +81,18 @@
       {#if work.length}
         <div class="min-w-0">
           <span class={LABEL}>{$t('stipend.cycle.forWork')}</span>
-          <p class="{BODY} text-sm font-medium break-words">{work.join(' · ')}</p>
+          <p class="{BODY} text-sm font-medium break-words">
+            {#each work as item, i}
+              {#if i > 0}<span class={FAINT}> · </span>{/if}
+              {#if item.href}
+                <a href={item.href} class="underline decoration-dotted underline-offset-2"
+                  >{item.name}</a
+                >
+              {:else}
+                {item.name}
+              {/if}
+            {/each}
+          </p>
         </div>
       {/if}
       {#if period}

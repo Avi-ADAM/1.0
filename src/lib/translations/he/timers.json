@@ -68,5 +68,18 @@
   "recalculate": "חישוב מחדש",
   "recalcFailed": "החישוב נכשל",
   "missingMissionId": "שגיאה: חסר מזהה משימה",
-  "searchTasks": "חיפוש מטלות..."
+  "searchTasks": "חיפוש מטלות...",
+  "attachTitle": "קישורים וקבצים",
+  "attachHint": "אפשר לצרף קישור (למשל לפול-ריקווסט, למסמך או להקלטה) או קובץ. יוצג במוח הריקמה ובכרטיס האישור.",
+  "attachLinkLabel": "הוספת קישור",
+  "attachLinkPlaceholder": "https://…",
+  "attachLinkAdd": "הוספה",
+  "attachLinkInvalid": "זו לא נראית ככתובת אינטרנט תקינה",
+  "attachLinkFull": "אפשר לצרף עד {{count}} קישורים, והם צריכים להיכנס לשורה אחת",
+  "attachFileLabel": "צירוף קובץ",
+  "attachUploading": "מעלה…",
+  "attachFileFailed": "העלאת הקובץ נכשלה",
+  "attachRemove": "הסרה",
+  "attachLinks": "קישורים",
+  "attachFiles": "קבצים"
 }

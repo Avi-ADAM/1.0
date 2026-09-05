@@ -6,6 +6,7 @@ import { getInternalSecret, INTERNAL_HEADER } from '$lib/server/internalSecret.j
 import { ssrApiBase, rewriteToApiBase } from '$lib/server/ssrApiBase.js';
 import { STRAPI_URL } from '$lib/server/strapiUrl.js';
 import { isExpiredJwt, clearStaleAuthCookies } from '$lib/server/session.js';
+import { resolveEventIdentity } from '$lib/server/identity.js';
 import { log, requestId } from '$lib/server/log.js';
 import {
   DEFAULT_THEME,
@@ -356,8 +357,14 @@ async function handleRequest({ event, resolve }) {
 
   event.locals.sessionExpired = sessionExpired;
   event.locals.tok = sessionExpired ? false : rawTok;
-  event.locals.uid = sessionExpired ? false : event.cookies.get('id') || false;
-  event.locals.un = sessionExpired ? false : event.cookies.get('un') || false;
+  // The `id` and `un` cookies are written httpOnly:false for the UI and are
+  // therefore attacker-controlled — the gate is public, so `curl` can assert
+  // any pair it likes. The identity below comes from the signed token instead;
+  // see src/lib/server/identity.js. Everything downstream (45 reads of
+  // locals.uid, /api/send, /api/action) inherits the fix from this one line.
+  const identity = sessionExpired ? null : await resolveEventIdentity(event);
+  event.locals.uid = identity?.id || false;
+  event.locals.un = identity?.username || false;
   event.locals.email = event.cookies.get('email') || false;
   const isSecure = event.url.protocol === 'https:';
 

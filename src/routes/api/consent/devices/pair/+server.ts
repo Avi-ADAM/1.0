@@ -9,9 +9,9 @@ import { openPairing, findPairing, PAIRING_TTL_MS } from '$lib/server/consent/pa
 //        a 6-char code to show the user.
 // GET ?code= — the EXISTING device (same user session) fetches the pending
 //        device to display for confirmation before signing the DeviceCert.
-export const POST: RequestHandler = async ({ request, cookies }) => {
+export const POST: RequestHandler = async ({ request, cookies, locals }) => {
   if (!cookies.get('jwt')) throw error(401, 'Unauthorized');
-  const userId = cookies.get('id');
+  const userId = locals.uid || undefined;
   if (!userId) throw error(401, 'no user id in session');
 
   const body = await request.json().catch(() => null);
@@ -37,9 +37,9 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
   return json({ ok: true, code: session.code, ttlMs: PAIRING_TTL_MS });
 };
 
-export const GET: RequestHandler = async ({ url, cookies }) => {
+export const GET: RequestHandler = async ({ url, cookies, locals }) => {
   if (!cookies.get('jwt')) throw error(401, 'Unauthorized');
-  const userId = cookies.get('id');
+  const userId = locals.uid || undefined;
   if (!userId) throw error(401, 'no user id in session');
 
   const code = url.searchParams.get('code') ?? '';

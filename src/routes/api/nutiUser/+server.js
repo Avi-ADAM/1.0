@@ -9,13 +9,13 @@ import { sendToSer } from '$lib/send/sendToSer.js';
 import { render } from 'svelty-email';
 
 //b sendMessages
-export async function POST({request, cookies, fetch}){
+export async function POST({request, cookies, fetch, locals}){
   const da = await request.json();
   const uid = da.uid || 0;
   const title = da.title || { he: '', en: '' };
   const body = da.body || { he: '', en: '' };
   const lang = cookies.get('lang') || "he";
-  const idL = cookies.get('id');
+  const idL = locals.uid || undefined;
   console.log(uid,"nutifyUser 19");
   if(uid == 0){
     return new Response(JSON.stringify({ error: 'User not found' }), {

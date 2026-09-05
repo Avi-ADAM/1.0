@@ -83,9 +83,9 @@ async function loadOwnedKey(id: string, jwt: string) {
 
 // ─── POST — create a new key ──────────────────────────────────────
 
-export const POST: RequestHandler = async ({ request, cookies }) => {
+export const POST: RequestHandler = async ({ request, cookies, locals }) => {
   const jwt  = cookies.get('jwt');
-  const userIdStr = cookies.get('id');
+  const userIdStr = locals.uid || undefined;
   if (!jwt || !userIdStr) throw error(401, 'Unauthorized');
   const userId = parseInt(userIdStr, 10);
   if (isNaN(userId)) throw error(400, 'Invalid user ID');
@@ -186,9 +186,9 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 // ─── GET — list the authenticated user's keys ─────────────────────
 // Optional ?projectId= narrows to that rikma's key(s) for the integration panels.
 
-export const GET: RequestHandler = async ({ url, cookies }) => {
+export const GET: RequestHandler = async ({ url, cookies, locals }) => {
   const jwt  = cookies.get('jwt');
-  const userId = cookies.get('id');
+  const userId = locals.uid || undefined;
   if (!jwt || !userId) throw error(401, 'Unauthorized');
 
   const projectId = url.searchParams.get('projectId');
@@ -229,9 +229,9 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
 // Separate from POST so pointing a webhook at a new host does not force the
 // user to rotate a key that is already deployed in their system.
 
-export const PATCH: RequestHandler = async ({ request, url, cookies }) => {
+export const PATCH: RequestHandler = async ({ request, url, cookies, locals }) => {
   const jwt  = cookies.get('jwt');
-  const userId = cookies.get('id');
+  const userId = locals.uid || undefined;
   if (!jwt || !userId) throw error(401, 'Unauthorized');
 
   const id = url.searchParams.get('id');
@@ -277,9 +277,9 @@ export const PATCH: RequestHandler = async ({ request, url, cookies }) => {
 
 // ─── DELETE — remove a specific key ──────────────────────────────
 
-export const DELETE: RequestHandler = async ({ url, cookies }) => {
+export const DELETE: RequestHandler = async ({ url, cookies, locals }) => {
   const jwt  = cookies.get('jwt');
-  const userId = cookies.get('id');
+  const userId = locals.uid || undefined;
   if (!jwt || !userId) throw error(401, 'Unauthorized');
 
   const id = url.searchParams.get('id');

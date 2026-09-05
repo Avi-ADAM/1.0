@@ -52,6 +52,16 @@ export const timerLogUpdateConfig: ActionConfig = {
             type: 'string',
             required: false,
             description: 'Short description of what was done during this timer'
+        },
+        saveLinks: {
+            type: 'string',
+            required: false,
+            description: 'Newline-separated http(s) links backing up this timer'
+        },
+        saveFiles: {
+            type: 'array',
+            required: false,
+            description: 'Strapi media ids of files attached to this timer'
         }
     },
 

@@ -44,6 +44,41 @@
     $t(`pages.restime.${attrs?.restime ?? 'feh'}`)
   );
 
+  /**
+   * sveltekit-i18n *flattens* a JSON array into `key.0`, `key.1`, … (the same
+   * shape `onboard.tracks.provider.chips.0` and `pages.editBasic.days.${i}`
+   * are already read with). `$t('…howSteps')` therefore resolves to nothing
+   * and falls back to echoing the key — and `{#each}` over that string
+   * iterated its *characters*, which threw `each_key_duplicate` ('p' at 0 and
+   * 6 of "pages.projectJoin.howSteps") and killed hydration for the whole
+   * page. Read the steps by index, stopping at the first missing one so
+   * adding a step to the JSON needs no change here.
+   */
+  let howSteps = $derived.by(() => {
+    const out = [];
+    for (let i = 0; i < 12; i++) {
+      const key = `pages.projectJoin.howSteps.${i}`;
+      const step = $t(key);
+      if (!step || step === key) break;
+      out.push(step);
+    }
+    return out;
+  });
+
+  // What the rikma is already looking for. Loaded best-effort by the server
+  // load — an empty board just hides the section, it never blocks the form.
+  let openMissions = $derived(data.openMissions ?? []);
+  let openResources = $derived(data.openResources ?? []);
+  let hasBoard = $derived(openMissions.length > 0 || openResources.length > 0);
+
+  /** @param {any} sk */
+  function skillName(sk) {
+    const loc = sk?.attributes?.localizations?.data;
+    return $lang === 'he' && loc?.length > 0
+      ? loc[0].attributes.skillName
+      : sk?.attributes?.skillName;
+  }
+
   /** @type {'mission' | 'resource'} */
   let kind = $state('mission');
 
@@ -159,14 +194,7 @@
         </div>
       {/if}
 
-      {#if isMember}
-        <!-- Member: redirect to moach -->
-        <div class="glass rounded-3xl p-8 text-center">
-          <h2 class="text-2xl font-bold text-gold mb-2">{$t('pages.projectJoin.memberTitle')}</h2>
-          <p class="text-white/70 mb-6">{$t('pages.projectJoin.memberBody')}</p>
-          <a href="/moach/{projectId}" class="btn-primary">{$t('pages.projectJoin.toMoach')}</a>
-        </div>
-      {:else if sent}
+      {#if sent}
         <!-- Success -->
         <div class="glass rounded-3xl p-8 text-center">
           <h2 class="text-2xl font-bold text-gold mb-2">{$t('pages.projectJoin.sentTitle')}</h2>
@@ -179,6 +207,110 @@
           </div>
         </div>
       {:else}
+        {#if isMember}
+          <!-- A member is already inside; the board below is still the useful
+               part of this page for them, so the card sits above it instead of
+               replacing everything. -->
+          <div class="glass rounded-3xl p-6 sm:p-8 mb-6 text-center">
+            <h2 class="text-2xl font-bold text-gold mb-2">{$t('pages.projectJoin.memberTitle')}</h2>
+            <p class="text-white/70 mb-6">{$t('pages.projectJoin.memberBody')}</p>
+            <a href="/moach/{projectId}" class="btn-primary">{$t('pages.projectJoin.toMoach')}</a>
+          </div>
+        {/if}
+
+        <!-- What the rikma is already looking for: take an open mission /
+             resource instead of only inventing an offer of your own. -->
+        {#if hasBoard}
+          <div class="glass rounded-3xl p-6 sm:p-8 mb-6">
+            <h2 class="text-xl font-bold text-gold mb-1">{$t('pages.projectJoin.boardTitle')}</h2>
+            <p class="text-white/60 text-sm mb-5">{$t('pages.projectJoin.boardSub')}</p>
+
+            {#if openMissions.length > 0}
+              <p class="text-xs uppercase tracking-widest text-white/40 mb-2">
+                {$t('pages.projectJoin.boardMissions')}
+              </p>
+              <div class="grid gap-2 sm:grid-cols-2 mb-5">
+                {#each openMissions as om (om.id)}
+                  <a href="/availableMission/{om.id}" class="open-item">
+                    <span class="open-name">{om.attributes.name}</span>
+                    {#if om.attributes.descrip}
+                      <span class="open-desc">{om.attributes.descrip}</span>
+                    {/if}
+                    <span class="open-meta">
+                      {#if om.attributes.noofhours}
+                        <span class="chip">{om.attributes.noofhours} {$t('pages.projectJoin.hoursUnit')}</span>
+                      {/if}
+                      {#each (om.attributes.skills?.data || []).slice(0, 3) as sk (sk.id)}
+                        <span class="chip">{skillName(sk)}</span>
+                      {/each}
+                    </span>
+                  </a>
+                {/each}
+              </div>
+            {/if}
+
+            {#if openResources.length > 0}
+              <p class="text-xs uppercase tracking-widest text-white/40 mb-2">
+                {$t('pages.projectJoin.boardResources')}
+              </p>
+              <div class="grid gap-2 sm:grid-cols-2">
+                {#each openResources as omr (omr.id)}
+                  <a href="/availiableResorce/{omr.id}" class="open-item">
+                    <span class="open-name">{omr.attributes.name}</span>
+                    {#if omr.attributes.descrip}
+                      <span class="open-desc">{omr.attributes.descrip}</span>
+                    {/if}
+                    <span class="open-meta">
+                      {#if omr.attributes.price}
+                        <span class="chip">
+                          {omr.attributes.price} ₪
+                          {#if omr.attributes.kindOf}
+                            · {$t(`pages.projectJoin.kinds.${omr.attributes.kindOf}`)}
+                          {/if}
+                        </span>
+                      {/if}
+                      {#if omr.attributes.recurring}
+                        <span class="chip">{$t('pages.projectJoin.rRecurring')}</span>
+                      {/if}
+                    </span>
+                  </a>
+                {/each}
+              </div>
+            {/if}
+
+            <p class="text-white/50 text-sm mt-5">
+              {isMember
+                ? $t('pages.projectJoin.boardOrOwnMember')
+                : $t('pages.projectJoin.boardOrOwn')}
+            </p>
+          </div>
+        {/if}
+
+        {#if isMember}
+          <!-- A member does not self-nominate — creating a mission/resource is
+               a moach action. The same two choices, pointed at the create page
+               with the matching form already open (?action=…). -->
+          <div class="glass rounded-3xl p-6 sm:p-8 mb-6">
+            <h2 class="text-xl font-bold text-gold mb-1">
+              {$t('pages.projectJoin.memberCreateTitle')}
+            </h2>
+            <p class="text-white/60 text-sm mb-5">{$t('pages.projectJoin.memberCreateBody')}</p>
+            <div class="flex flex-col sm:flex-row gap-3">
+              <a
+                href="/moach/{projectId}/create?action=createmission"
+                class="kind-tab kind-link kind-active"
+              >
+                {$t('pages.projectJoin.memberCreateMission')}
+              </a>
+              <a
+                href="/moach/{projectId}/create?action=createresource"
+                class="kind-tab kind-link"
+              >
+                {$t('pages.projectJoin.memberCreateResource')}
+              </a>
+            </div>
+          </div>
+        {:else}
         <!-- The offer form -->
         <div class="glass rounded-3xl p-6 sm:p-8 mb-6">
           <!-- kind switch -->
@@ -281,11 +413,12 @@
         <div class="glass rounded-2xl p-6 mb-6">
           <h3 class="font-bold text-white/80 mb-3">{$t('pages.projectJoin.how')}</h3>
           <ol class="space-y-2 text-sm text-white/60 list-decimal ps-5">
-            {#each $t('pages.projectJoin.howSteps') as step (step)}
+            {#each howSteps as step, i (i)}
               <li>{step.replace('{restime}', restimeLabel)}</li>
             {/each}
           </ol>
         </div>
+        {/if}
 
         <p class="text-center text-sm">
           <a href="/project/{projectId}/support" class="text-gold underline hover:text-white">
@@ -328,6 +461,44 @@
     background: rgba(255, 255, 255, 0.07);
     border: 1px solid rgba(255, 255, 255, 0.12);
   }
+  .open-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    padding: 0.85rem 1rem;
+    border-radius: 1rem;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: border-color 0.2s, background 0.2s, transform 0.2s;
+  }
+  .open-item:hover {
+    border-color: rgba(255, 215, 0, 0.5);
+    background: rgba(255, 215, 0, 0.06);
+    transform: translateY(-2px);
+  }
+  .open-name {
+    font-weight: 700;
+    color: #fff;
+  }
+  .open-desc {
+    font-size: 0.82rem;
+    color: rgba(255, 255, 255, 0.6);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .open-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
+  .open-meta .chip {
+    font-size: 0.72rem;
+    padding: 0.15rem 0.55rem;
+  }
+
   .chip-gold {
     background: rgba(255, 215, 0, 0.12);
     border-color: rgba(255, 215, 0, 0.35);
@@ -377,6 +548,12 @@
     border: 1px solid rgba(255, 255, 255, 0.1);
     transition: all 0.2s;
     cursor: pointer;
+  }
+  /* The member's two create choices are links, not tabs — same shape, but they
+     navigate to the moach create form instead of switching a local mode. */
+  .kind-link {
+    text-align: center;
+    text-decoration: none;
   }
   .kind-active {
     color: #000;

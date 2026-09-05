@@ -9,6 +9,7 @@
   import { page } from '$app/state';
   import { get } from 'svelte/store';
   import { onMount } from 'svelte';
+  import { t, isRtl } from '$lib/translations';
 
   onMount(() => {
     // Bein's children (skills/vallues/...) read $userName for the greeting.
@@ -75,16 +76,23 @@
 </script>
 
 <svelte:head>
-  <title>פרופיל ספק · 1💗1</title>
+  <title>{$t('onboard.provider.manual_page.title')}</title>
   <link
     href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;600;700&display=swap"
     rel="stylesheet"
   />
 </svelte:head>
 
-<div class="back-bar">
-  <a href="/onboard/provider/review" class="back-link">← חזרה לסקירה</a>
-  <a href="/onboard/done" class="back-link skip">דלגו לסיום</a>
+<div class="back-bar" dir={$isRtl ? 'rtl' : 'ltr'}>
+  <a href="/onboard/provider/review" class="back-link"
+    >{$t('onboard.provider.manual_page.back')}</a
+  >
+  <!-- Skipping the wizard continues the track (resources → offerings), it does
+       not end onboarding: this link used to jump straight to /onboard/done,
+       which is how the manual path bypassed both remaining steps. -->
+  <a href="/onboard/provider/resources" class="back-link skip"
+    >{$t('onboard.provider.manual_page.skip')}</a
+  >
 </div>
 
 <div class="bein-wrap">
@@ -103,7 +111,6 @@
     backdrop-filter: blur(12px);
     border-bottom: 1px solid rgba(218, 165, 32, 0.25);
     font-family: 'Heebo', sans-serif;
-    direction: rtl;
   }
   /* Offset Bein's sticky tabs by the back-bar height so the two sticky rows
      stack instead of overlapping when the user scrolls the wizard content. */

@@ -1,0 +1,69 @@
+{
+  "page": {
+    "title": "Calendario de mis recursos",
+    "sub": "Cuándo está ocupado cada recurso y en manos de quién",
+    "all": "Todos los recursos",
+    "single": "Un solo recurso",
+    "block_dates": "Bloquear fechas",
+    "back_to_profile": "Volver al perfil",
+    "project_title": "Calendario de recursos del tejido",
+    "project_sub": "Qué tiene el tejido, hasta cuándo y qué presta hacia fuera"
+  },
+  "calendar": {
+    "view_label": "Vista",
+    "view_list": "Lista",
+    "view_month": "Mes",
+    "view_week": "Semana",
+    "filter_resource": "Recurso",
+    "filter_clear": "Limpiar",
+    "filter_party": "En manos de",
+    "party_project": "Tejido",
+    "party_sheirut": "Cliente",
+    "party_user": "Persona",
+    "party_none": "Bloqueo propio",
+    "live_only": "Solo activos",
+    "empty": "No hay nada reservado en este rango",
+    "today": "Hoy",
+    "open_ended": "sin fecha de fin",
+    "loading": "Cargando calendario…",
+    "grid_failed": "No se pudo cargar la cuadrícula. La lista sigue funcionando."
+  },
+  "status": {
+    "hold": "Pendiente de aprobación",
+    "confirmed": "Aprobado",
+    "active": "En uso",
+    "done": "Finalizado",
+    "cancelled": "Cancelado"
+  },
+  "source": {
+    "rikma": "Tejido",
+    "concierge": "Cliente",
+    "personal": "Personal",
+    "blackout": "Bloqueado",
+    "external": "Externo"
+  },
+  "model": {
+    "label": "Tipo de ocupación",
+    "exclusive": "Una unidad — ocupada durante un periodo",
+    "pooled": "Existencias — varias unidades a la vez",
+    "unlimited": "Sin límite — digital, nunca se ocupa",
+    "consumable": "Consumible — se entrega y no vuelve",
+    "capacity": "Cuántas unidades",
+    "lead_time": "Intervalo entre préstamos (horas)"
+  },
+  "overlap": {
+    "requested": "Solicitado",
+    "free": "Libre contigo",
+    "days": "Solapamiento de {{count}} días",
+    "none": "Las fechas no se solapan",
+    "full": "Solapamiento completo",
+    "next_free": "Libre desde",
+    "propose_other": "Proponer otras fechas",
+    "out_of_window": "Fuera del rango que ofreciste"
+  },
+  "conflict": {
+    "released_title": "Propuesta liberada",
+    "released_body": "El recurso se aprobó para otra propuesta que se solapa en fechas. Puedes proponer fechas distintas.",
+    "two_claims": "Dos solicitudes sobre las mismas fechas"
+  }
+}

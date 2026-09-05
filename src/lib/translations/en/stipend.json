@@ -302,5 +302,17 @@
     "body": "{{name}} funds your subsistence stipend. This is what the current cycle has added up to, from approved hours.",
     "note": "The figure comes from hours the rikma approved and grows with every further approval. It is not final until it is sent.",
     "waiting": "The ball is with {{name}} — when the stipend is sent, a card to confirm it arrived will appear here."
+  },
+  "transfer": {
+    "cardType": "Stipend transfer to arrange",
+    "ask": "Have you already transferred it to {{name}}?",
+    "askNote": "The amount is already set by the approved hours. The only question is whether the money has gone out.",
+    "alreadySent": "Yes, I transferred it",
+    "notYet": "Not yet",
+    "opened": "A transfer card with a chat is open",
+    "funderBody": "The cycle is closed and the amount is set. What is left is sending it to {{name}} — arrange it in the chat here, and mark it once the money goes out.",
+    "recipientBody": "{{name}} closed the cycle, but the money has not gone out yet. Say here where to send it.",
+    "iSentIt": "I sent it",
+    "note": "Shares move only once the arrival is confirmed. Until then nothing moves."
   }
 }

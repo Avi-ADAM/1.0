@@ -58,6 +58,9 @@ export const qidsAccess = {
   '265listMyPersonalMatanots': { allow: ['user', 'serviceAdmin'] },
   '276myOfferingsViaUser': { allow: ['user', 'serviceAdmin'] },
   '277myMissionOffersViaUser': { allow: ['user', 'serviceAdmin'] },
+  '308myResourcesViaUser': { allow: ['user', 'serviceAdmin'] }, // self-only on the JWT path — PRE guard in guards.js
+  '309myResourceOccupancy': { allow: ['user', 'serviceAdmin'] }, // self-only on the JWT path — PRE guard in guards.js
+  '310projectResourceOccupancy': { allow: ['user', 'serviceAdmin'] }, // members only — PRE guard in guards.js
   '278myMissionsViaUser': { allow: ['user', 'serviceAdmin'] },
   '272myOfferingsCounts': { allow: ['serviceAdmin'] }, // unreferenced in codebase (2026-07-18) — tightened to serviceAdmin-only
   '273myMissionsFull': { allow: ['serviceAdmin'] }, // unreferenced in codebase (2026-07-18) — tightened to serviceAdmin-only
@@ -113,6 +116,10 @@ export const qidsAccess = {
   '211findMatchSuggestionsByMashaabim': { allow: ['user', 'serviceAdmin'] },
   '212levResourceMatchSuggestions': { allow: ['user', 'serviceAdmin'] },
   '1chatsend': { allow: ['user', 'serviceAdmin'] },
+  // Guest chat: only /api/guest/message calls it, with the admin token and after
+  // checking the forum really belongs to the guest's meeting. A browser reaching it
+  // directly could post as any guest name into any forum, so `user` is not granted.
+  '1chatsendGuest': { allow: ['serviceAdmin'] },
   '2forumCr': { allow: ['user', 'serviceAdmin'] },
   '2forumCrHaluka': { allow: ['user', 'serviceAdmin'] },
   '2forumCrBasic': { allow: ['user', 'serviceAdmin'] },
@@ -190,6 +197,10 @@ export const qidsAccess = {
   '47GetGiftById': { allow: ['serviceAdmin'] }, // unreferenced in codebase (2026-07-18) — tightened to serviceAdmin-only
   '48GetServiceById': { allow: ['user', 'serviceAdmin'] },
   '49GetProjectById': { allow: ['user', 'serviceAdmin'] },
+  // Public, like 49 — the same open missions plus the open resources, for the
+  // join page's "what the rikma is looking for" board. Guests reach it through
+  // the SSR service token.
+  '311projectOpenBoardPublic': { allow: ['user', 'serviceAdmin'] },
   '50GetOpenMashaabimById': { allow: ['user', 'serviceAdmin'] },
   '51GetOpenMissionById': { allow: ['user', 'serviceAdmin'] },
   'getOpenMissionExtractedKey': { allow: ['user', 'serviceAdmin'] },
@@ -273,7 +284,7 @@ export const qidsAccess = {
   '56SetMeetingSet': { allow: ['user', 'serviceAdmin'] },
   '57StartMeeting': { allow: ['user', 'serviceAdmin'] },
   '58CreateMeetingForum': { allow: ['user', 'serviceAdmin'] },
-  '59GetMeetingDetails': { allow: ['user', 'serviceAdmin'] },
+  '59GetMeetingDetails': { allow: ['user', 'serviceAdmin', 'serviceMeetings'] }, // magik-meetings renders a guest's meeting page through this (x-meetings-secret); qidsAccess.test.ts is the tripwire that keeps the grant to this one read
   '60EndMeeting': { allow: ['user', 'serviceAdmin'] }, // meeting qid — magik-meetings surface
   '61RequestMeetingStart': { allow: ['user', 'serviceAdmin'] },
   '62SetUserReadyForStart': { allow: ['user', 'serviceAdmin'] },

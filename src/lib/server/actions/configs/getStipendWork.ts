@@ -5,6 +5,7 @@
  *
  *   payables      — cycles I owe as a funder ("42h × ₪50 = ₪2,100 — pay")
  *   confirmations — money sent to me that I have not confirmed arrived
+ *   transfers     — cycles settled but not yet transferred, for both sides
  *   pledges       — my running stipends, either side, for context on the cards
  *
  * The due amount is computed here, from approved hours, using the same pure
@@ -24,6 +25,23 @@ import {
   fetchRecipientContribution,
   toPledge
 } from '$lib/server/stipend/read.js';
+
+/**
+ * A cycle that was settled before the money moved (`transferred: false`).
+ * Both sides get the same row, because arranging a transfer is a conversation
+ * and neither of them can have it alone: the funder needs somewhere to say
+ * "sent it", the recipient somewhere to say where to send it.
+ */
+const TRANSFER_FIELDS = `
+  amount hours stipendRate mode costShare equityMultiplier
+  equityCredit equityDebit cycleStart cycleEnd status createdAt
+  project { data { id attributes { projectName profilePic { data { attributes { url } } } } } }
+  funder { data { id attributes { username profilePic { data { attributes { url } } } } } }
+  recipient { data { id attributes { username profilePic { data { attributes { url } } } } } }
+  stipend_pledge { data { id attributes {
+    mesimabetahaliches { data { id attributes { name } } }
+  } } }
+  haluka { data { id attributes { senderconf confirmed forum { data { id } } } } }`;
 
 const handler: ActionExecutionHandler = async (_params, context) => {
   const exec = execFromContext(context);
@@ -73,6 +91,12 @@ const handler: ActionExecutionHandler = async (_params, context) => {
           } } }
           haluka { data { id } }
         } }
+      }
+      owedOut: stipendPayments(filters: { funder: { id: { eq: ${gqlStr(userId)} } }, status: { eq: "pending" } }, pagination: { limit: 50 }, sort: "createdAt:desc") {
+        data { id attributes { ${TRANSFER_FIELDS} } }
+      }
+      owedIn: stipendPayments(filters: { recipient: { id: { eq: ${gqlStr(userId)} } }, status: { eq: "pending" } }, pagination: { limit: 50 }, sort: "createdAt:desc") {
+        data { id attributes { ${TRANSFER_FIELDS} } }
       }
     }`,
     'getStipendWork'
@@ -141,6 +165,10 @@ const handler: ActionExecutionHandler = async (_params, context) => {
       // missing from the card, so the funder was asked to pay an amount with
       // no mission attached to it (docs/FIXES.md §12, §13).
       missionNames: (pledge.missions ?? []).map((m: any) => m.name).filter(Boolean),
+      // The missions with their ids, so the card can *link* to the work rather
+      // than only name it: a funder asked to pay for "פיתוח האתר" could not get
+      // from the card to the mission whose hours produced the number.
+      missions: pledge.missions ?? [],
       equityCredit: lines.equityCredit,
       equityDebit: lines.equityDebit,
       budgetLeft: cycle.remainingAfter ?? program?.remainingCap ?? null
@@ -199,6 +227,7 @@ const handler: ActionExecutionHandler = async (_params, context) => {
       cycleStart: from,
       cycleEnd: window.cycleEnd,
       missionNames: (pledge.missions ?? []).map((m: any) => m.name).filter(Boolean),
+      missions: pledge.missions ?? [],
       equityDebit: lines.equityDebit
     });
   }
@@ -227,6 +256,9 @@ const handler: ActionExecutionHandler = async (_params, context) => {
       missionNames: (a.stipend_pledge?.data?.attributes?.mesimabetahaliches?.data ?? [])
         .map((m: any) => String(m.attributes?.name ?? ''))
         .filter(Boolean),
+      missions: (a.stipend_pledge?.data?.attributes?.mesimabetahaliches?.data ?? []).map(
+        (m: any) => ({ id: String(m.id), name: String(m.attributes?.name ?? '') })
+      ),
       costShare: Number(a.costShare ?? 1),
       equityMultiplier: Number(a.equityMultiplier ?? 1),
       equityDebit: Number(a.equityDebit) || 0,
@@ -234,8 +266,65 @@ const handler: ActionExecutionHandler = async (_params, context) => {
     };
   });
 
+  /**
+   * Cycles settled but not yet transferred — the same row for both sides, with
+   * `side` saying which button this viewer gets ("I sent it" vs "it arrived").
+   * The pair is deduped by id so a funder who is also somehow the recipient
+   * never gets the card twice.
+   */
+  const seenTransfers = new Set<string>();
+  const transfers: Array<Record<string, unknown>> = [];
+  for (const row of [...(data?.owedOut?.data ?? []), ...(data?.owedIn?.data ?? [])] as any[]) {
+    const id = String(row.id);
+    if (seenTransfers.has(id)) continue;
+    seenTransfers.add(id);
+    const a = row.attributes ?? {};
+    const funderId = a.funder?.data?.id ? String(a.funder.data.id) : null;
+    const missions = (a.stipend_pledge?.data?.attributes?.mesimabetahaliches?.data ?? []).map(
+      (m: any) => ({ id: String(m.id), name: String(m.attributes?.name ?? '') })
+    );
+    transfers.push({
+      paymentId: id,
+      pledgeId: a.stipend_pledge?.data?.id ? String(a.stipend_pledge.data.id) : null,
+      projectId: a.project?.data?.id ? String(a.project.data.id) : null,
+      projectName: a.project?.data?.attributes?.projectName ?? '',
+      side: funderId === userId ? 'funder' : 'recipient',
+      funderId,
+      funderName: a.funder?.data?.attributes?.username ?? '',
+      funderPic: a.funder?.data?.attributes?.profilePic?.data?.attributes?.url ?? null,
+      recipientId: a.recipient?.data?.id ? String(a.recipient.data.id) : null,
+      recipientName: a.recipient?.data?.attributes?.username ?? '',
+      recipientPic: a.recipient?.data?.attributes?.profilePic?.data?.attributes?.url ?? null,
+      amount: Number(a.amount) || 0,
+      hours: Number(a.hours) || 0,
+      stipendRate: Number(a.stipendRate) || 0,
+      mode: a.mode ?? 'equity',
+      cycleStart: a.cycleStart ?? null,
+      cycleEnd: a.cycleEnd ?? null,
+      halukaId: a.haluka?.data?.id ? String(a.haluka.data.id) : null,
+      forumId: a.haluka?.data?.attributes?.forum?.data?.id
+        ? String(a.haluka.data.attributes.forum.data.id)
+        : null,
+      senderconf: a.haluka?.data?.attributes?.senderconf === true,
+      confirmed: a.haluka?.data?.attributes?.confirmed === true,
+      missionNames: missions.map((m: any) => m.name).filter(Boolean),
+      missions,
+      costShare: Number(a.costShare ?? 1),
+      equityMultiplier: Number(a.equityMultiplier ?? 1),
+      equityCredit: Number(a.equityCredit) || 0,
+      equityDebit: Number(a.equityDebit) || 0
+    });
+  }
+
   return {
-    data: { payables, confirmations, accruals, funded: fundedPledges, received: receivedPledges },
+    data: {
+      payables,
+      confirmations,
+      accruals,
+      transfers,
+      funded: fundedPledges,
+      received: receivedPledges
+    },
     updateStrategy: { type: 'none' as const }
   };
 };
@@ -243,7 +332,7 @@ const handler: ActionExecutionHandler = async (_params, context) => {
 export const getStipendWorkConfig: ActionConfig = {
   key: 'getStipendWork',
   description:
-    'Read-only. The current member’s stipend to-dos: cycles they owe as a funder (amount derived from approved hours), payments awaiting their confirmation as a recipient, and their running pledges on both sides.',
+    'Read-only. The current member’s stipend to-dos: cycles they owe as a funder (amount derived from approved hours), payments awaiting their confirmation as a recipient, transfers settled but not yet made, and their running pledges on both sides.',
   graphqlOperation: handler,
   paramSchema: {},
   authRules: [{ type: 'jwt', errorMessage: 'Must be logged in to read your stipends' }],

@@ -128,6 +128,24 @@
         };
         addM = true;
       }
+
+      // ?action=createresource — the resource twin of the above, used by the
+      // "open something new" buttons on /project/[id]/join and by anything else
+      // that wants to land a member straight in the resource form. No vocabulary
+      // to resolve here: ResourceCreator's initialSpec is plain values.
+      if (page.url.searchParams.get('action') === 'createresource') {
+        const params = page.url.searchParams;
+        const price = Number(params.get('price'));
+        const quantity = Number(params.get('quantity'));
+        resourcePrefill = {
+          name: params.get('name') ?? '',
+          descrip: params.get('descrip') ?? '',
+          ...(params.get('kindOf') ? { kindOf: params.get('kindOf') } : {}),
+          ...(Number.isFinite(price) && params.get('price') ? { price } : {}),
+          ...(Number.isFinite(quantity) && params.get('quantity') ? { quantity } : {})
+        };
+        addN = true;
+      }
     }
   });
 

@@ -809,7 +809,8 @@
       "saleClaim": "אישור מחזיק התמורה",
       "newService": "מוצר חדש",
       "picVote": "החלפת לוגו",
-      "stipendaccrued": "מלגת קיום"
+      "stipendaccrued": "מלגת קיום",
+      "stipendtransfer": "העברת מלגה"
     },
     "fact": {
       "hours": "{{value}} שעות",
@@ -859,7 +860,8 @@
       "siteShareDecide": "החלוקה אושרה — נותר לאשר את חלקך",
       "stipendCycle": "מחזור מלגה שנסגר — לתשלום",
       "stipendSent": "סומן כנשלח — ממתין לאישור שלך",
-      "stipendAccrued": "שעות שאושרו — ממתין לתשלום"
+      "stipendAccrued": "שעות שאושרו — ממתין לתשלום",
+      "stipendTransfer": "הסכום נקבע — ההעברה בתיאום"
     },
     "title": {
       "transfer": "{{from}} ← {{to}}",
@@ -867,7 +869,8 @@
       "sitesharedecide": "אישור חלק הפלטפורמה",
       "stipendpay": "תשלום מלגה",
       "stipendconfirm": "אישור קבלת מלגה",
-      "stipendaccrued": "נצבר לך"
+      "stipendaccrued": "נצבר לך",
+      "stipendtransfer": "העברת מלגה"
     },
     "cta": {
       "vote": "להצבעה",

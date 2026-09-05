@@ -13,14 +13,14 @@ import type { RequestHandler } from './$types';
 import { sendToSer } from '$lib/send/sendToSer.js';
 import { HalukaNotificationService } from '$lib/server/notifications/HalukaNotificationService.js';
 
-export const POST: RequestHandler = async ({ request, cookies, fetch }) => {
+export const POST: RequestHandler = async ({ request, cookies, fetch, locals }) => {
   try {
     const body = await request.json();
     const { tosplitId, userId, users, halukot } = body;
 
     // Get auth from cookies
     const jwt = cookies.get('jwt');
-    const cookieUserId = cookies.get('id');
+    const cookieUserId = locals.uid || undefined;
     const lang = cookies.get('lang') || 'he';
 
     if (!jwt || !cookieUserId) {

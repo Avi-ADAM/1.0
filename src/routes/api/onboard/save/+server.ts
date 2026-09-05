@@ -108,16 +108,76 @@ async function resolveIds(category: string, items: SaveItem[], jwt: string, lang
   return ids;
 }
 
+/**
+ * Resolve a free-text resource name onto a `mashaabim` template, creating the
+ * template when nothing matches.
+ *
+ * This relation is not cosmetic: `src/lib/server/matching/engine.ts` matches a
+ * member to an open resource request *solely* by comparing
+ * `sp.mashaabim === openMashaabim.mashaabim`. An Sp created without it can
+ * never surface to any rikma looking for that exact thing — which is what
+ * every resource this endpoint created used to be.
+ */
+async function resolveMashaabimId(
+  name: string,
+  jwt: string,
+  catalog: Map<string, string>
+): Promise<string | null> {
+  const key = name.trim().toLowerCase();
+  const hit = catalog.get(key);
+  if (hit) return hit;
+  const d = new Date().toISOString();
+  const query = `mutation { createMashaabim(data: {
+    name: "${sanitize(name)}",
+    kindOf: total,
+    publishedAt: "${d}"
+  }) { data { id } } }`;
+  try {
+    const result = await gql(query, jwt);
+    const id = result?.createMashaabim?.data?.id;
+    if (id) {
+      catalog.set(key, String(id));
+      return String(id);
+    }
+  } catch (e) {
+    console.warn('[onboard/save] createMashaabim failed', e);
+  }
+  return null;
+}
+
+async function loadMashaabimCatalog(jwt: string): Promise<Map<string, string>> {
+  const map = new Map<string, string>();
+  try {
+    const result = await gql(
+      `query { mashaabims(pagination: { limit: 500 }) { data { id attributes { name } } } }`,
+      jwt
+    );
+    for (const row of result?.mashaabims?.data ?? []) {
+      const n = row?.attributes?.name;
+      if (n) map.set(String(n).trim().toLowerCase(), String(row.id));
+    }
+  } catch (e) {
+    console.warn('[onboard/save] mashaabim catalog load failed', e);
+  }
+  return map;
+}
+
 async function createSps(items: SaveItem[], userId: string, jwt: string, lang: Lang): Promise<string[]> {
   if (!items?.length) return [];
   const d = new Date().toISOString();
   const ids: string[] = [];
+  const catalog = await loadMashaabimCatalog(jwt);
   for (const it of items) {
     if (!it.name?.trim()) continue;
+    const resolved = await resolveMashaabimId(it.name, jwt, catalog);
+    // Ids come back from Strapi, never from the client, but this document is
+    // built by interpolation — keep it to digits so it stays that way.
+    const mashaabimId = resolved && /^\d+$/.test(resolved) ? resolved : null;
     // Default locale (no `locale:` arg) so the user-relation can find it.
     const query = `mutation { createSp(data: {
       name: "${sanitize(it.name)}",
       descrip: "${sanitize(it.descrip ?? '')}",
+      ${mashaabimId ? `mashaabim: ${mashaabimId},` : ''}
       users_permissions_user: ${userId},
       publishedAt: "${d}"
     }) { data { id } } }`;
@@ -140,8 +200,8 @@ async function createSps(items: SaveItem[], userId: string, jwt: string, lang: L
   return ids;
 }
 
-export const POST: RequestHandler = async ({ request, cookies, fetch }) => {
-  const userId = cookies.get('id');
+export const POST: RequestHandler = async ({ request, cookies, fetch, locals }) => {
+  const userId = locals.uid || undefined;
   const jwt = cookies.get('jwt');
 
   if (!userId || !jwt) {

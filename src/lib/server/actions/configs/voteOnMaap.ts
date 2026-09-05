@@ -21,6 +21,9 @@ import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { STRAPI_URL } from '$lib/server/strapiUrl.js';
 import { gqlString } from './actionUtils.js';
 import { settleCycleMaap } from '$lib/server/recurring/settleCycleMaap';
+import { bestEffort } from '$lib/server/resources/bookingStore.js';
+import { openGrantBooking } from '$lib/server/resources/grantBooking.js';
+import { execFromContext } from '$lib/server/archive/exec.js';
 
 function normalizeVote(v: any): Record<string, any> {
   const uid =
@@ -354,11 +357,32 @@ const voteOnMaapHandler: ActionExecutionHandler = async (params, context, { stra
         throw new Error(`voteOnMaap consensus mutation failed: ${JSON.stringify(responseData.errors)}`);
       }
 
+      const rikmashId = responseData.data?.createRikmash?.data?.id;
+
+      // Record the grant on the booking ledger, and let `syncPanui` rewrite the
+      // flag the mutation above just forced to false. The blunt `panui: false`
+      // is what makes a lent resource vanish forever today: nothing sets it
+      // back, and it is wrong from the start for a pool that still has units
+      // and for anything `unlimited`. Best-effort — a consensus that people
+      // reached must never fail over a calendar row.
+      await bestEffort('voteOnMaapConsensus', () =>
+        openGrantBooking(execFromContext(context), {
+          spId,
+          projectId,
+          openMashaabimId: om?.id ?? null,
+          maapId: askId,
+          rikmashId: rikmashId ?? null,
+          ownerId: applicantId || null,
+          note: missionBName,
+          terms: { kindOf, sqadualed, sqadualedf, hm },
+        })
+      );
+
       // Consensus archives the Maap and creates a Rikmash — refresh everywhere.
       return {
         data: {
           askId,
-          rikmashId: responseData.data?.createRikmash?.data?.id,
+          rikmashId,
           consensus: true,
         },
         updateStrategy: { type: 'fullRefresh' },

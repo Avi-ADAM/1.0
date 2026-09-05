@@ -188,6 +188,13 @@
         'onboard.cvSavedIds',
         JSON.stringify(body.ids ?? {})
       );
+      // Hand the confirmed resources to the resources step, which is where the
+      // member says how they want to share each one (one-off / ongoing / for a
+      // period) and to whom. Saving here only records that they own the thing.
+      sessionStorage.setItem(
+        'onboard.proposedSps',
+        JSON.stringify(payload?.resources ?? [])
+      );
       // Invalidate SkillSelector's `_fresh` cache so the next mount re-fetches
       // and includes the skills we just created. Without this the manual
       // wizard's Skills step would show no chips for the new entries.
@@ -206,9 +213,11 @@
 
   async function confirm() {
     const ok = await persist();
-    // Continue to the offerings step (PLAN_USER_OFFERINGS §4.2 / M7): priced
-    // mission offers + personal products, skippable, before the finish screen.
-    if (ok) setTimeout(() => goto('/onboard/provider/offers'), 220);
+    // Continue to the resources step (PLAN_ONBOARDING M5): the things and
+    // places the member can share, with how and to whom. It then leads on to
+    // the offerings step (priced missions + personal products) and the finish
+    // screen. Both are skippable.
+    if (ok) setTimeout(() => goto('/onboard/provider/resources'), 220);
   }
 
   async function editManual() {

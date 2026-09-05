@@ -5,6 +5,8 @@ import { execFromContext } from '$lib/server/archive/exec.js';
 import { run } from '$lib/server/archive/gql.js';
 import { pickRateRow, resolveRate, rowRate, type RateRow } from '$lib/timers/rate.js';
 import { closeOpenIntervals, totalHours as hoursOfIntervals } from '$lib/timers/intervals.js';
+import { serializeSaveLinks } from '$lib/timers/saveLinks.js';
+import { saveFileIds } from '$lib/timers/saveFiles.js';
 import { workMonthOf } from '$lib/recurring/missionMonths.js';
 
 /**
@@ -25,11 +27,13 @@ async function readTimer(
     saved: boolean;
     intervals: { start: string; stop: string | null }[];
     totalHours: number;
+    /** Ids of the files already attached to this timer. */
+    fileIds: string[];
 } | null> {
     try {
         const data = await run(
             execFromContext(context),
-            `{ timer(id: "${timerId}") { data { attributes { rate saved totalHours timers { start stop } } } } }`,
+            `{ timer(id: "${timerId}") { data { attributes { rate saved totalHours timers { start stop } saveFiles { data { id } } } } } }`,
             'timerSave:timer',
         );
         const a = data?.timer?.data?.attributes;
@@ -39,6 +43,7 @@ async function readTimer(
             saved: a.saved === true,
             intervals: (a.timers ?? []).map((s: any) => ({ start: s?.start, stop: s?.stop ?? null })),
             totalHours: Number(a.totalHours ?? 0) || 0,
+            fileIds: saveFileIds(a.saveFiles),
         };
     } catch (e) {
         // Unreadable is not "already saved" — fall through to the legacy
@@ -100,6 +105,24 @@ export const timerSaveConfig: ActionConfig = {
         // finished-mission row — so the rikma reads it wherever the hours land.
         const saveText: string = (params.saveText ?? '').toString().trim();
 
+        // The evidence that rides with the note. Links are re-normalized here
+        // rather than trusted: the dialog validates them so the member is told
+        // early, but a client can post whatever it likes, and these URLs are
+        // rendered as links other members click. Files were uploaded through
+        // /api/upload (which checks the JWT, the size and the MIME type) and
+        // arrive as Strapi media ids.
+        // A caller that says nothing about links/files (the bot, the MCP agent,
+        // an old client) must not clear what the member already attached, so
+        // absence and emptiness are told apart: only a caller that *sent* the
+        // field gets to replace it — including with nothing, which is how the
+        // dialog removes an attachment.
+        const sentLinks = params.saveLinks !== undefined && params.saveLinks !== null;
+        const sentFiles = Array.isArray(params.saveFiles);
+        const saveLinks: string = sentLinks ? serializeSaveLinks(params.saveLinks) : '';
+        const saveFiles: string[] = sentFiles
+            ? params.saveFiles.map((id: any) => String(id)).filter(Boolean)
+            : [];
+
         // Step 0: read the timer before touching it — its stamped rate, and
         // whether it has already been saved.
         const hasTimer = Boolean(params.timerId && params.timerId !== '0');
@@ -138,7 +161,9 @@ export const timerSaveConfig: ActionConfig = {
                 ...(intervals.length
                     ? { timers: intervals, totalHours: hoursOfIntervals(intervals) }
                     : {}),
-                ...(saveText ? { saveText } : {})
+                ...(saveText ? { saveText } : {}),
+                ...(sentLinks ? { saveLinks } : {}),
+                ...(sentFiles ? { saveFiles } : {})
             }, context.jwt, context.fetch);
         }
 
@@ -177,6 +202,14 @@ export const timerSaveConfig: ActionConfig = {
         // `editObject` re-prices every hour ever logged (src/lib/timers/rate.ts).
         const rate = resolveRate(timerBefore?.rate, at.perhour);
 
+        // The files this save is filed with: what the caller sent, or — when it
+        // said nothing — whatever is already on the timer, so an agent saving a
+        // timer a member attached files to still carries them to approval.
+        // Finiapruval and FinnishedMission both have a `what` media relation;
+        // neither has a column for links, so the links stay on the timer and
+        // the approval reads them through its `timer` relation.
+        const filesForRow: string[] = sentFiles ? saveFiles : (timerBefore?.fileIds ?? []);
+
         const fmRows: RateRow[] = (at.finnished_missions?.data ?? []).map((fm: any) => ({
             id: String(fm.id),
             noofhours: Number(fm.attributes?.noofhours ?? 0),
@@ -207,11 +240,18 @@ export const timerSaveConfig: ActionConfig = {
                 const mergedWhy = saveText
                     ? (prevWhy && prevWhy !== 'timer save' ? `${prevWhy}\n${saveText}` : saveText)
                     : null;
+                // Same for the attachments: a media relation is *replaced* by
+                // what is written, so this session's files are added to the
+                // ones earlier sessions filed rather than sent on their own.
+                const mergedFiles = filesForRow.length
+                    ? [...new Set([...saveFileIds(existingFm.attributes?.what), ...filesForRow])]
+                    : null;
                 await strapi.execute('114updateFinnishedMissionHours', {
                     id: existingFm.id,
                     noofhours: newHours,
                     total: newHours * rowRate(targetRow, rate),
-                    ...(mergedWhy ? { why: clampWhy(mergedWhy) } : {})
+                    ...(mergedWhy ? { why: clampWhy(mergedWhy) } : {}),
+                    ...(mergedFiles ? { what: mergedFiles } : {})
                 }, context.jwt, context.fetch);
             } else {
                 await strapi.execute('113createFinnishedMissionForTimerSave', {
@@ -224,7 +264,8 @@ export const timerSaveConfig: ActionConfig = {
                     users_permissions_user: at.users_permissions_user?.data?.id,
                     perhour: rate,
                     total: sessionHoursTotal * rate,
-                    why: saveText ? clampWhy(saveText) : 'timer save'
+                    why: saveText ? clampWhy(saveText) : 'timer save',
+                    ...(filesForRow.length ? { what: filesForRow } : {})
                 }, context.jwt, context.fetch);
             }
 
@@ -250,7 +291,8 @@ export const timerSaveConfig: ActionConfig = {
                 // Carried onto the approval so a vote that lands after the
                 // mission's value changed still prices these hours correctly.
                 perhour: rate,
-                ...(saveText ? { why: clampWhy(saveText) } : {})
+                ...(saveText ? { why: clampWhy(saveText) } : {}),
+                ...(filesForRow.length ? { what: filesForRow } : {})
             }, context.jwt, context.fetch);
 
             const finiId = finiRes?.data?.createFiniapruval?.data?.id;
@@ -284,6 +326,8 @@ export const timerSaveConfig: ActionConfig = {
         totalHours: { type: 'number', required: false, description: 'Fallback total hours' },
         stname: { type: 'string', required: false, description: 'Status name' },
         saveText: { type: 'string', required: false, description: 'Short description of what was done during this timer' },
+        saveLinks: { type: 'string', required: false, description: 'Newline-separated http(s) links backing up this timer (PR, doc, recording). Re-validated server-side.' },
+        saveFiles: { type: 'array', required: false, description: 'Strapi media ids of files attached to this timer (uploaded through /api/upload)' },
         x: { type: 'number', required: false, description: 'Legacy timer value (unused)' },
         tasks: { type: 'array', required: false, description: 'Task IDs to link to the timer' }
     },

@@ -24,7 +24,11 @@
     myId,
     projectId,
     onEnsureHaluka = null,
-    oncomplete = null
+    oncomplete = null,
+    onSenderConfirm = null,
+    onReceiverConfirm = null,
+    senderLabel = '',
+    receiverLabel = ''
   }: {
     halukaId: string;
     senderId: string;
@@ -48,6 +52,20 @@
     onEnsureHaluka?: (() => Promise<string | null>) | null;
     /** Fired once a confirmation makes BOTH sides confirmed (transfer done). */
     oncomplete?: (() => void) | null;
+    /**
+     * Replace the write behind the two confirm buttons.
+     *
+     * The default is `confirmSheirutHaluka`, which only touches the Haluka.
+     * A transfer that a ledger also tracks — a stipend cycle, whose payment row
+     * is the only thing that ever moves a percentage — has to move both in one
+     * action, so it supplies its own. Return true when the write succeeded; the
+     * card flips the flag and toasts, exactly as it does for its own path.
+     */
+    onSenderConfirm?: (() => Promise<boolean>) | null;
+    onReceiverConfirm?: (() => Promise<boolean>) | null;
+    /** Override the two button captions (default: sent / received). */
+    senderLabel?: string;
+    receiverLabel?: string;
   } = $props();
 
   // Resolve the working Haluka id, creating it on demand the first time a
@@ -87,6 +105,14 @@
     if (isProcessing || senderconf) return;
     isProcessing = true;
     try {
+      if (onSenderConfirm) {
+        const ok = await onSenderConfirm();
+        if (ok) {
+          senderconf = true;
+          if (confirmed) oncomplete?.();
+        }
+        return;
+      }
       const hid = await resolveHalukaId();
       if (!hid) throw new Error('no_haluka');
       const res = await fetch('/api/action', {
@@ -114,6 +140,14 @@
     if (isProcessing || confirmed) return;
     isProcessing = true;
     try {
+      if (onReceiverConfirm) {
+        const ok = await onReceiverConfirm();
+        if (ok) {
+          confirmed = true;
+          if (senderconf) oncomplete?.();
+        }
+        return;
+      }
       const hid = await resolveHalukaId();
       if (!hid) throw new Error('no_haluka');
       const res = await fetch('/api/action', {
@@ -359,7 +393,9 @@
           onclick={handleConfirmSent}
           disabled={isProcessing}
         >
-          {isProcessing ? $t('lev.cards.sheirutHaluka.processing') : $t('lev.cards.sheirutHaluka.confirmSent')}
+          {isProcessing
+            ? $t('lev.cards.sheirutHaluka.processing')
+            : senderLabel || $t('lev.cards.sheirutHaluka.confirmSent')}
         </button>
       {/if}
 
@@ -370,7 +406,9 @@
           onclick={handleConfirmReceived}
           disabled={isProcessing}
         >
-          {isProcessing ? $t('lev.cards.sheirutHaluka.processing') : $t('lev.cards.sheirutHaluka.confirmReceived')}
+          {isProcessing
+            ? $t('lev.cards.sheirutHaluka.processing')
+            : receiverLabel || $t('lev.cards.sheirutHaluka.confirmReceived')}
         </button>
       {/if}
     </div>

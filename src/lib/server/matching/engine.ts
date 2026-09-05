@@ -19,6 +19,7 @@
  */
 
 import {
+  computeDateFit,
   computeMissionMatchScore,
   MIN_SUGGESTION_SCORE,
   type MissionRequirements,
@@ -265,16 +266,40 @@ export async function matchOpenMashaabimToUsers(
     );
     const declinedSpIds = new Set(ids(attrs.declinedsps));
 
+    // The candidate's best-fitting Sp for this resource, and how much of the
+    // requested window it covers (PLAN_RESOURCE_CALENDAR §7). A holder whose
+    // offer window does not touch the request at all is not suggested —
+    // previously they were, which is how a rikma needing a projector for three
+    // days in April got offered one nobody has lent since 2024.
+    const bestFit = (u: any): { sp: any; fit: number } | null => {
+      const spsData: any[] = u.attributes?.sps?.data ?? [];
+      let best: { sp: any; fit: number } | null = null;
+      for (const sp of spsData) {
+        if (oneId(sp.attributes?.mashaabim) !== mashId) continue;
+        if (declinedSpIds.has(String(sp.id))) continue;
+        const fit = computeDateFit({
+          requestStart: attrs.sqadualed,
+          requestEnd: attrs.sqadualedf,
+          offerStart: sp.attributes?.sdate,
+          offerEnd: sp.attributes?.fdate,
+          resource: { kindOf: sp.attributes?.kindOf, hm: sp.attributes?.hm }
+        });
+        if (!best || fit > best.fit) best = { sp, fit };
+      }
+      return best;
+    };
+
+    const fits = new Map<string, { sp: any; fit: number }>();
     const relevant = candidates
       .filter((u) => {
         if (alreadySuggested.has(String(u.id))) return false;
         // physical resource request → provider must be within reach
         if (!isLocationCompatible(attrs.location, userLocations(u.attributes))) return false;
-        const spsData: any[] = u.attributes?.sps?.data ?? [];
-        // the user's sp for this mashaabim must not be in the declined list
-        return spsData.some(
-          (sp) => oneId(sp.attributes?.mashaabim) === mashId && !declinedSpIds.has(String(sp.id))
-        );
+        const best = bestFit(u);
+        // No matching Sp, or no shared day at all.
+        if (!best || best.fit <= 0) return false;
+        fits.set(String(u.id), best);
+        return true;
       })
       .slice(0, MAX_SUGGESTIONS_PER_EVENT);
 
@@ -292,14 +317,29 @@ export async function matchOpenMashaabimToUsers(
         !!user.attributes?.email &&
         windowOpen &&
         underDailyCap(sentCounts.get(String(user.id)) ?? 0);
+      const best = fits.get(String(user.id));
+      const fit = best?.fit ?? 1;
       const ok = await createSuggestion(deps, {
         userId: String(user.id),
         openMashaabimId: String(om.id),
         kind: 'resource',
-        score: 1,
+        // Resource score used to be the constant 1, so ordering was arbitrary.
+        // Scaling by date fit sorts the fully-available holders above the ones
+        // who can only cover part of the window.
+        score: Math.max(1, Math.round(fit * 10)),
         status: wantsMail ? 'notified' : 'new',
         source,
-        matchedOn: { mashaabim: mashId }
+        // `dateFit` rides in the existing JSON column — the lev card reads it to
+        // say "you are free 3–20 May, they asked for 1 May – 1 June".
+        matchedOn: {
+          mashaabim: mashId,
+          dateFit: fit,
+          spId: best?.sp?.id != null ? String(best.sp.id) : null,
+          requestStart: attrs.sqadualed ?? null,
+          requestEnd: attrs.sqadualedf ?? null,
+          offerStart: best?.sp?.attributes?.sdate ?? null,
+          offerEnd: best?.sp?.attributes?.fdate ?? null
+        }
       });
       if (ok) {
         created++;

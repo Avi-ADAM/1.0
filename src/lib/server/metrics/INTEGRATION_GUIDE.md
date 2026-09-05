@@ -1,5 +1,11 @@
 # Migration Metrics Integration Guide
 
+> Who is calling comes from `locals.uid` — the identity `hooks.server.js`
+> derives from the **signed** JWT (`src/lib/server/identity.js`). The `id`
+> cookie is written `httpOnly:false` for the UI, so any caller can set it to
+> any value; reading it on the server is a vulnerability, not a shortcut.
+> See docs/PLAN_PROXY_SECURITY.md §14.1.
+
 This guide shows you how to integrate migration metrics tracking into your existing code during the QIDS to Action System migration.
 
 ## Quick Start
@@ -13,9 +19,9 @@ Find your existing QIDS calls and wrap them with the metrics tracker:
 // src/routes/api/update-task/+server.ts
 import { sendToSer } from '$lib/send/sendToSer';
 
-export const POST: RequestHandler = async ({ request, cookies }) => {
+export const POST: RequestHandler = async ({ request, cookies, locals }) => {
   const { taskId, status } = await request.json();
-  const userId = cookies.get('id');
+  const userId = locals.uid;
   
   const result = await sendToSer(
     { taskId, status },
@@ -36,9 +42,9 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 import { sendToSer } from '$lib/send/sendToSer';
 import { trackQidsCall } from '$lib/server/metrics/QidsMetricsWrapper';
 
-export const POST: RequestHandler = async ({ request, cookies }) => {
+export const POST: RequestHandler = async ({ request, cookies, locals }) => {
   const { taskId, status } = await request.json();
-  const userId = cookies.get('id');
+  const userId = locals.uid;
   
   const result = await trackQidsCall(
     'updateTask', // Action key for metrics
@@ -65,9 +71,9 @@ When you're ready to migrate, replace the QIDS call with the Action System:
 // src/routes/api/update-task/+server.ts
 import { executeAction } from '$lib/client/actionClient';
 
-export const POST: RequestHandler = async ({ request, cookies }) => {
+export const POST: RequestHandler = async ({ request, cookies, locals }) => {
   const { taskId, status } = await request.json();
-  const userId = cookies.get('id');
+  const userId = locals.uid;
   const jwt = cookies.get('jwt');
   const lang = cookies.get('lang');
   
@@ -98,9 +104,9 @@ Navigate to `/migration-dashboard` to see:
 import { trackQidsCall } from '$lib/server/metrics/QidsMetricsWrapper';
 import type { RequestHandler } from '@sveltejs/kit';
 
-export const POST: RequestHandler = async ({ request, cookies }) => {
+export const POST: RequestHandler = async ({ request, cookies, locals }) => {
   const params = await request.json();
-  const userId = cookies.get('id');
+  const userId = locals.uid;
   
   const result = await trackQidsCall(
     'actionKeyName',
@@ -118,8 +124,8 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 import { trackQidsCall } from '$lib/server/metrics/QidsMetricsWrapper';
 import type { PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async ({ params, cookies, fetch }) => {
-  const userId = cookies.get('id');
+export const load: PageServerLoad = async ({ params, cookies, locals, fetch }) => {
+  const userId = locals.uid;
   
   const data = await trackQidsCall(
     'loadProjectData',

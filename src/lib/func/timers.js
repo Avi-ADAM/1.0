@@ -1,5 +1,6 @@
 import { sendToSer } from './../send/sendToSer.js';
 import { closeOpenIntervals } from '$lib/timers/intervals';
+import { serializeSaveLinks } from '$lib/timers/saveLinks';
 const browser = typeof window !== 'undefined';
 
 /**
@@ -189,9 +190,12 @@ export async function stopTimer(timer, fetch, isSer = false, projectId = '', use
  * @param {string} [projectId=''] - Project ID
  * @param {string} [userId=''] - User ID
  * @param {string} [saveText=''] - Short description of what was done in this timer
+ * @param {{links?: string[], files?: (string|number)[]}} [evidence] - Links and
+ *   already-uploaded file ids that back up the note. Omit the whole object to
+ *   leave whatever is stored on the timer alone; pass an empty list to clear it.
  * @returns {Promise<Object>} - Results
  */
-export async function saveTimer(timer, missionID, fetch, isSer = false, tasks = null, projectId = '', userId = '', saveText = '') {
+export async function saveTimer(timer, missionID, fetch, isSer = false, tasks = null, projectId = '', userId = '', saveText = '', evidence = undefined) {
   try {
     if (!timer || !missionID) {
       console.error("Missing parameters for saveTimer");
@@ -244,6 +248,11 @@ export async function saveTimer(timer, missionID, fetch, isSer = false, tasks = 
       x: 0,
       tasks: tasks || [],
       saveText: (saveText || '').trim(),
+      // Only sent when the caller actually has an opinion — the server tells
+      // "no field" (leave the timer's attachments alone) from "an empty field"
+      // (the member removed them). The telegram/bot path sends neither.
+      ...(evidence?.links ? { saveLinks: serializeSaveLinks(evidence.links) } : {}),
+      ...(evidence?.files ? { saveFiles: evidence.files.map((id) => String(id)) } : {}),
       isSer: isSer
     };
 
@@ -356,7 +365,15 @@ export async function updateTimer(timer, whatToUpdate, params = {}, fetch, proje
       // Only send the note when the caller has one — an absent GraphQL variable
       // leaves the stored saveText alone, an empty string would wipe it.
       if (params.saveText) paramsToUpdate.saveText = params.saveText;
-      
+      // Links and files are the opposite: the dialog always hands over the full
+      // list it is showing, so sending an empty one is how a removal sticks.
+      if (params.saveLinks !== undefined) {
+        paramsToUpdate.saveLinks = serializeSaveLinks(params.saveLinks);
+      }
+      if (params.saveFiles !== undefined) {
+        paramsToUpdate.saveFiles = (params.saveFiles || []).map((id) => String(id));
+      }
+
       return unwrapTimerResult(await executeTimerAction('timerLogUpdate', paramsToUpdate, fetch));
     }
 

@@ -1,0 +1,69 @@
+{
+  "page": {
+    "title": "לוח המשאבים שלי",
+    "sub": "מתי כל משאב תפוס, ואצל מי",
+    "all": "כל המשאבים",
+    "single": "משאב בודד",
+    "block_dates": "חסום תאריכים",
+    "back_to_profile": "חזרה לפרופיל",
+    "project_title": "לוח המשאבים של הריקמה",
+    "project_sub": "מה הריקמה מחזיקה, עד מתי, ומה היא מספקת החוצה"
+  },
+  "calendar": {
+    "view_label": "תצוגה",
+    "view_list": "רשימה",
+    "view_month": "חודש",
+    "view_week": "שבוע",
+    "filter_resource": "משאב",
+    "filter_clear": "נקה",
+    "filter_party": "אצל מי",
+    "party_project": "ריקמה",
+    "party_sheirut": "לקוח",
+    "party_user": "אדם",
+    "party_none": "חסימה עצמית",
+    "live_only": "רק פעילות",
+    "empty": "אין תפוסה בטווח הזה",
+    "today": "היום",
+    "open_ended": "ללא תאריך סיום",
+    "loading": "טוען לוח שנה…",
+    "grid_failed": "לא הצלחנו לטעון את הלוח. הרשימה עדיין זמינה."
+  },
+  "status": {
+    "hold": "ממתין לאישור",
+    "confirmed": "מאושר",
+    "active": "בשימוש",
+    "done": "הסתיים",
+    "cancelled": "בוטל"
+  },
+  "source": {
+    "rikma": "ריקמה",
+    "concierge": "לקוח",
+    "personal": "אישי",
+    "blackout": "חסום",
+    "external": "חיצוני"
+  },
+  "model": {
+    "label": "סוג התפוסה",
+    "exclusive": "יחידה אחת — נתפסת לטווח תאריכים",
+    "pooled": "מלאי — כמה יחידות במקביל",
+    "unlimited": "ללא הגבלה — דיגיטלי, לא נתפס",
+    "consumable": "נצרך — נמסר ולא חוזר",
+    "capacity": "כמה יחידות",
+    "lead_time": "מרווח בין השאלות (שעות)"
+  },
+  "overlap": {
+    "requested": "ביקשו",
+    "free": "פנוי אצלך",
+    "days": "חפיפה {{count}} ימים",
+    "none": "אין חפיפה בתאריכים",
+    "full": "חפיפה מלאה",
+    "next_free": "פנוי מ־",
+    "propose_other": "הצע תאריך אחר",
+    "out_of_window": "מחוץ לטווח שהצעת"
+  },
+  "conflict": {
+    "released_title": "ההצעה שוחררה",
+    "released_body": "המשאב אושר להצעה אחרת שחופפת בתאריכים. אפשר להציע תאריכים אחרים.",
+    "two_claims": "שתי בקשות על אותם תאריכים"
+  }
+}

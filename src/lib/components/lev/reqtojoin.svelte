@@ -64,6 +64,11 @@
    * @property {boolean} [cards]
    * @property {any} [onUser]
    * @property {any} [onProj]
+   * Both receive `{ ani, coinlapach, finalized }`. `finalized` says whether the
+   * request itself is over (accepted/declined for good) or the vote merely moved
+   * on — a recorded vote still waiting for other members, a counter round, or an
+   * acceptance parked on the assignee's consent. A list view collapses the card
+   * either way; a single-vote page must not announce "resolved" for the latter.
    * @property {any} [onAcsept]
    * @property {any} [onDecline]
    * @property {any} [onHover]
@@ -153,7 +158,7 @@
         id: String(openMid)
       });
       if (result.success) {
-        onDecline?.({ ani: 'asked', coinlapach });
+        onDecline?.({ ani: 'asked', coinlapach, finalized: true });
       }
     } finally {
       dismissing = false;
@@ -309,7 +314,13 @@
           projectSrc: src2
         });
         if (result.success) {
-          onAcsept?.({ ani: 'asked', coinlapach: coinlapach });
+          // `materialized: false` = the bilateral gate parked the acceptance on
+          // the assignee's answer; nothing was registered yet.
+          onAcsept?.({
+            ani: 'asked',
+            coinlapach: coinlapach,
+            finalized: result.data?.materialized !== false
+          });
         } else {
           error1 = result.error;
         }
@@ -345,7 +356,13 @@
           projectSrc: src2
         });
         if (result.success) {
-          onAcsept?.({ ani: 'asked', coinlapach: coinlapach });
+          // `materialized: false` = the bilateral gate parked the acceptance on
+          // the assignee's answer; nothing was registered yet.
+          onAcsept?.({
+            ani: 'asked',
+            coinlapach: coinlapach,
+            finalized: result.data?.materialized !== false
+          });
         } else {
           error1 = result.error;
         }
@@ -363,7 +380,8 @@
         };
         const result = await executeAction('addVote', voteParams);
         if (result.success) {
-          onAcsept?.({ ani: 'asked', coinlapach: coinlapach });
+          // Vote recorded only — the other members still have to answer.
+          onAcsept?.({ ani: 'asked', coinlapach: coinlapach, finalized: false });
           // Phase 1 shadow signing — best-effort.
           shadowSignFromCookie(addVoteConsentSpec, voteParams);
         } else {
@@ -473,7 +491,7 @@
           declinedUserId: String(userId)
         });
         if (result.success) {
-          onDecline?.({ ani: 'asked', coinlapach });
+          onDecline?.({ ani: 'asked', coinlapach, finalized: true });
         } else {
           error1 = result.error;
         }
@@ -635,10 +653,12 @@
     negotiationLoading = false;
     masa = false;
     negotiationMode = false;
-    // Only call onAcsept if negotiation was successful (saved)
+    // Only call onAcsept if negotiation was successful (saved).
+    // A counter round keeps the request alive — the other side has to answer.
     onAcsept?.({
       ani: 'asked',
-      coinlapach
+      coinlapach,
+      finalized: false
     });
   }
 

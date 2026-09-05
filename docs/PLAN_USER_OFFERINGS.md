@@ -240,8 +240,9 @@ collection `mission-offer` מלא + `CLAUDE.md` המתעד את הענף החי.
 
 ### 4.2 Onboarding (Track A — ספק)
 
-- **שלב משאבים** (M5 של PLAN_ONBOARDING, `newsp` בתוך wrapper): מוסיפים את אותו
-  toggle "גם ללקוחות ישירות" — אותו רכיב, אותו action.
+- **שלב משאבים** ✅ (M5 של PLAN_ONBOARDING): `/onboard/provider/resources` עם
+  `MyResourcesEditor.svelte` — בורר טמפלט `mashaabim`, ואז `newsp` הקיים על כל מה
+  שנבחר, כולל אותו toggle "גם ללקוחות ישירות". אותם רכיבים, אותם actions.
 - **שלב חדש — "מה אני יודע לעשות"**: `MissionOffersEditor` (טופס המשימה) כשלב אחרי ה-review
   (מימוש M3.5). אם עלה CV — ה-tasks המחולצים כבר ממופים ל-missions ומוצגים
   כברירת בחירה.

@@ -48,6 +48,7 @@ const RENDERABLE = new Set([
   'stipendpay',
   'stipendconfirm',
   'stipendaccrued',
+  'stipendtransfer',
   'sitesharedecide'
 ]);
 
@@ -102,6 +103,7 @@ const KIND_META = {
   stipendpay: { key: 'stipendpay', glow: 'purple' },
   stipendconfirm: { key: 'stipendconfirm', glow: 'purple' },
   stipendaccrued: { key: 'stipendaccrued', glow: 'purple' },
+  stipendtransfer: { key: 'stipendtransfer', glow: 'purple' },
   sitesharedecide: { key: 'sitesharedecide', glow: 'gold' }
 };
 
@@ -538,6 +540,20 @@ const ROW_CONTENT = {
     )
   }),
 
+  // The other side's name, whichever side is looking: the row's question is
+  // "the money between me and them has not moved yet".
+  stipendtransfer: (b) => ({
+    title:
+      T(b.side === 'funder' ? b.recipientName : b.funderName) ??
+      K('lev.list.title.stipendtransfer'),
+    subtitle: K('lev.list.sub.stipendTransfer'),
+    facts: chips(
+      f('amount', n(b.amount)),
+      f('hours', n(b.hours)),
+      f('rate', n(b.stipendRate))
+    )
+  }),
+
   // Informational, not a to-do. The funder's name is the title because "who
   // owes me this" is the question the recipient is actually asking.
   stipendaccrued: (b) => ({
@@ -620,6 +636,7 @@ const CTA_BY_ANI = {
   vidu: 'confirm',
   stipendconfirm: 'confirm',
   stipendaccrued: 'view',
+  stipendtransfer: 'confirm',
   sitesharedecide: 'confirm',
   mtaha: 'view',
   walcomen: 'view'

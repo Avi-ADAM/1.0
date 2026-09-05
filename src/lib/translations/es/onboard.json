@@ -158,7 +158,7 @@
       "save_failed": "Error al guardar ({{status}})",
       "network_error": "Error de red: inténtalo de nuevo",
       "actions": {
-        "skip": "Saltar para finalizar 🗝",
+        "skip": "Confirmar y continuar 🗝",
         "saving": "Guardando...",
         "edit": "Continuar para editar ✍️"
       },
@@ -171,6 +171,24 @@
       "skills": "Habilidades",
       "roles": "Roles",
       "style": "Estilo"
+    },
+    "resources_page": {
+      "title": "¿Qué tienes para compartir?",
+      "journey": "Paso 5 · Recursos para compartir",
+      "sub": "Cosas y lugares que ya son tuyos — y que puedes poner a disposición de un tejido o un cliente. Puedes saltarlo y añadirlos luego desde tu perfil.",
+      "mode_recurring": "Permanente —",
+      "mode_recurring_ex": "un espacio de trabajo, una suscripción, equipo siempre disponible",
+      "mode_once": "Una vez —",
+      "mode_once_ex": "una impresión 3D, un traslado, un uso puntual de un equipo",
+      "mode_period": "Por un periodo —",
+      "mode_period_ex": "un piso de alquiler corto, un coche por un mes, un local para un evento",
+      "continue": "Continuar",
+      "skip": "Saltar — los añadiré más tarde"
+    },
+    "manual_page": {
+      "title": "Perfil de proveedor · 1💗1",
+      "back": "← Volver a la revisión",
+      "skip": "Saltar adelante"
     }
   },
   "actions": {
