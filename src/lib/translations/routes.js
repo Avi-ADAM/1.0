@@ -41,6 +41,9 @@ export const ROUTED = {
     offerings: at('/me', '/onboard', '/gift', '/user', '/deals/sales-center', /\/moach\/[^/]+\/sales/),
     consensus: at('/consensus'),
     uses: at('/uses'),
+    // The "instead of a boss" track page. Its own copy only - the teaser that
+    // points at it from the homepage lives in `home`, which loads everywhere.
+    noboss: at('/no-boss'),
     // The page behind the product - why consent is re-checked at every step.
     // One route, one namespace; the homepage teaser for it lives in `home`.
     why: at('/why'),

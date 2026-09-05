@@ -1,0 +1,34 @@
+{
+  "meta": {
+    "title": "Work with partners instead of for a boss | 1lev1",
+    "description": "You do not have to choose between a boss and going it alone. Join a venture with partners, contribute your time and skills, and take a share of the profit in proportion to what you actually gave. You can start with a few hours a week."
+  },
+  "hero": {
+    "eyebrow": "◈ The third way ◈",
+    "h1": "You do not have to choose between a boss and going it alone",
+    "sub": "There is a path in between: join a venture with partners, contribute what you are good at, and take a share of the profit in proportion to what you actually contributed — without building the whole thing yourself, and without someone else deciding for you.",
+    "risk": "You do not have to quit. You can start with a few hours a week, alongside the job.",
+    "ctaPrimary": "Tell us what you are good at",
+    "ctaSecondary": "See rikmas looking for partners"
+  },
+  "next": {
+    "title": "What happens after you click",
+    "s1": "A 20-minute conversation, no commitment. You tell us what you are good at and how much time you have.",
+    "s2": "We look for a rikma that fits your skills and your schedule — or help you open one.",
+    "s3": "From the first hour you log, your share of the profit starts accruing. Transparent, and agreed in advance."
+  },
+  "doubts": {
+    "title": "What actually stops people",
+    "q1_q": "How do I know I will not get taken advantage of?",
+    "q1_a": "The split is not settled by argument but by a formula: the time and resources you contributed, logged and approved. And every decision that touches you goes through consent — there is no button in the system that rejects you outright.",
+    "q2_q": "What if I work more than the others?",
+    "q2_a": "Then your share is larger. That is exactly the difference from fifty-fifty: the split moves with actual contribution instead of staying stuck on whatever was agreed on day one.",
+    "q3_q": "And if there is a dispute?",
+    "q3_a": "Every claim stays open for the period the rikma set, and you answer it with a counter-proposal rather than a refusal. Both sides sign the same version, or the clock matures whatever is on the table."
+  },
+  "close": {
+    "title": "Shall we start?",
+    "sub": "No long forms and no credit card. Just a short conversation, after which you will know whether this fits you.",
+    "back": "Back to the homepage"
+  }
+}

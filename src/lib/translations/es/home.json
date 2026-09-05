@@ -628,5 +628,9 @@
     "desc": "Toda la diferencia está en lo que ocurre cuando la respuesta es no, y de esa frase se deriva todo lo construido aquí. Hay una página que lo explica, con números y fuentes.",
     "cta": "Leer por qué",
     "inline": "¿Y por qué es así, para empezar?"
+  },
+  "noboss": {
+    "lead": "¿Sigues empleado, o trabajas por tu cuenta en solitario? Hay una página entera sobre la tercera vía: qué no funciona hoy y cómo se ve dentro de una rikma.",
+    "cta": "Trabaja con socios en lugar de para un jefe"
   }
 }

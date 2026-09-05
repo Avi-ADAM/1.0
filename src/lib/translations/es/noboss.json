@@ -1,0 +1,34 @@
+{
+  "meta": {
+    "title": "Trabaja con socios en lugar de para un jefe | 1lev1",
+    "description": "No tienes que elegir entre un jefe y montarlo todo tú solo. Únete a un proyecto con socios, aporta tu tiempo y tus habilidades y recibe una parte de los beneficios según lo que realmente aportaste. Puedes empezar con unas pocas horas a la semana."
+  },
+  "hero": {
+    "eyebrow": "◈ La tercera vía ◈",
+    "h1": "No tienes que elegir entre un jefe y montarlo todo tú solo",
+    "sub": "Hay un camino intermedio: unirte a un proyecto con socios, aportar aquello que sabes hacer y recibir una parte de los beneficios según tu aportación real — sin construirlo todo tú solo y sin que otro decida por ti.",
+    "risk": "No hace falta renunciar. Puedes empezar con unas pocas horas a la semana, junto a tu trabajo.",
+    "ctaPrimary": "Cuéntanos en qué eres bueno",
+    "ctaSecondary": "Ver rikmas que buscan socios"
+  },
+  "next": {
+    "title": "Qué pasa después de pulsar",
+    "s1": "Una conversación de 20 minutos, sin compromiso. Nos cuentas en qué eres bueno y de cuánto tiempo dispones.",
+    "s2": "Buscamos una rikma que encaje con tus habilidades y tu horario — o te ayudamos a abrir una.",
+    "s3": "Desde la primera hora que registras, tu parte de los beneficios empieza a acumularse. Transparente y acordado de antemano."
+  },
+  "doubts": {
+    "title": "Lo que de verdad frena a la gente",
+    "q1_q": "¿Cómo sé que no se aprovecharán de mí?",
+    "q1_a": "El reparto no se resuelve discutiendo sino con una fórmula: el tiempo y los recursos que aportaste, registrados y aprobados. Y toda decisión que te afecta pasa por el consenso — no hay en el sistema un botón que te rechace sin más.",
+    "q2_q": "¿Y si trabajo más que los demás?",
+    "q2_a": "Entonces tu parte es mayor. Esa es justamente la diferencia con el cincuenta-cincuenta: el reparto se mueve con la aportación real en lugar de quedarse anclado en lo que se acordó el primer día.",
+    "q3_q": "¿Y si surge un conflicto?",
+    "q3_a": "Cada reclamación queda abierta durante el plazo que fijó la rikma, y se responde con una contrapropuesta, no con un rechazo. Ambas partes firman la misma versión, o el plazo madura lo que hay sobre la mesa."
+  },
+  "close": {
+    "title": "¿Empezamos?",
+    "sub": "Sin formularios largos y sin tarjeta. Solo una conversación breve tras la cual sabrás si esto encaja contigo.",
+    "back": "Volver a la página de inicio"
+  }
+}
