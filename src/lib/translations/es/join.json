@@ -1,0 +1,51 @@
+{
+  "meta": {
+    "title": "Encontrar un proyecto al que unirte como socio | 1lev1",
+    "description": "¿Buscas un proyecto al que unirte? Aporta tus habilidades y tu tiempo y recibe una parte de los beneficios según lo que realmente diste, sin poner dinero y sin montar un negocio en solitario."
+  },
+  "hero": {
+    "eyebrow": "◈ ¿Buscas un proyecto al que unirte? ◈",
+    "h1": "Únete a un proyecto como socio, no como empleado",
+    "sub": "Tienes un oficio y algo de tiempo libre, y no tienes una idea ni el capital para empezar algo solo. Unirte a una rikma te da una parte de los beneficios según lo que realmente aportaste, en lugar de un sueldo que se acaba a fin de mes."
+  },
+  "deal": {
+    "title": "Qué aportas y qué recibes",
+    "give_t": "Lo que traes",
+    "give_d": "Lo que sabes hacer y las horas de que dispones. No hace falta dinero ni un compromiso a jornada completa: unas pocas horas a la semana también cuentan.",
+    "get_t": "Lo que recibes",
+    "get_d": "Una parte de la rikma que crece con cada aportación que te aprueban, y una porción de los beneficios según esa parte. No es un bono ni una promesa: es propiedad que se registra mientras trabajas.",
+    "note": "Tu parte sigue la aportación real, así que no se decide negociando el primer día ni depende de lo bien que supieras regatear."
+  },
+  "how": {
+    "title": "Cómo ocurre en la práctica",
+    "s1": "Encuentra una misión o un recurso abierto que encaje contigo, o cuéntanos en qué eres bueno y buscamos nosotros.",
+    "s2": "Preséntate. Los socios de la rikma aprueban, o proponen otras condiciones: no hay rechazo unilateral.",
+    "s3": "Registra horas y recursos mientras trabajas. Cada entrada la aprueban los socios en el momento en que ocurre.",
+    "s4": "Cuando entra dinero, el reparto ya está calculado según lo que aportó cada uno. Sin discusión y sin cálculos a ojo."
+  },
+  "open": {
+    "title": "Qué hay abierto ahora",
+    "sub": "Todo esto se puede consultar antes de registrarse:",
+    "missions": "misiones esperando candidatos",
+    "resources": "recursos solicitados",
+    "projects": "rikmas activas",
+    "view": "ver",
+    "orMatch": "¿No encuentras nada que encaje?",
+    "matchCta": "Cuéntanos en qué eres bueno"
+  },
+  "match": {
+    "title": "Cuéntanos en qué eres bueno",
+    "sub": "Ahora mismo no hay una misión abierta que te encaje, así que en lugar de mandarte a una lista vacía haremos el emparejamiento a mano. Una conversación breve, y te buscamos una rikma o te ayudamos a abrir una.",
+    "cta": "Concertar una conversación"
+  },
+  "doubts": {
+    "title": "Lo que frena a la gente a la hora de unirse",
+    "q1_q": "¿A cuántas horas tengo que comprometerme?",
+    "q1_a": "A las que quieras. El sistema cuenta horas, no presencia: quien dio tres horas recibe la parte de tres horas. Puedes empezar poco a poco junto a tu trabajo actual y ampliar si funciona.",
+    "q2_q": "¿Qué pasa si lo dejo a mitad de camino?",
+    "q2_a": "Lo que ya aportaste queda registrado y sigue siendo tuyo: la parte acumulada no se borra cuando paras. Sí se diluye con el tiempo, porque quien sigue aportando agranda el denominador, pero no llega a cero.",
+    "q3_q": "¿Hay ingresos garantizados?",
+    "q3_a": "No, y esa es la diferencia con el trabajo que conoces. No hay sueldo fijo: hay una parte de los beneficios si la rikma gana y cuando gane. Por eso encaja como complemento a una fuente de ingresos existente, no como sustituto inmediato."
+  },
+  "back": "Volver a la página de inicio"
+}

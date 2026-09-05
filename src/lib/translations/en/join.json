@@ -1,0 +1,51 @@
+{
+  "meta": {
+    "title": "Find a venture to join as a partner | 1lev1",
+    "description": "Looking for a venture to join? Contribute your skills and your time and take a share of the profit in proportion to what you actually gave - without putting in money and without building a business alone."
+  },
+  "hero": {
+    "eyebrow": "◈ Looking for a venture to join? ◈",
+    "h1": "Join a venture as a partner, not as an employee",
+    "sub": "You have a craft and some spare time, and you do not have an idea or the capital to start something alone. Joining a rikma gives you a share of the profit in proportion to what you actually contributed - instead of a wage that runs out at the end of the month."
+  },
+  "deal": {
+    "title": "What you put in and what you get back",
+    "give_t": "What you bring",
+    "give_d": "What you know how to do, and the hours you have. No money required, and no full-time commitment - a few hours a week count too.",
+    "get_t": "What you get",
+    "get_d": "A share of the rikma that grows with every contribution approved for you, and a portion of the profit at that share. It is not a bonus and not a promise - it is ownership recorded while you work.",
+    "note": "Your share follows actual contribution, so it is not settled by negotiation on day one and does not depend on how well you bargained."
+  },
+  "how": {
+    "title": "How it actually happens",
+    "s1": "Find an open mission or resource that fits you - or tell us what you are good at and we will look.",
+    "s2": "Put yourself forward. The rikma's partners approve, or propose different terms - there is no one-sided refusal.",
+    "s3": "Log hours and resources as you work. Each entry is approved by the partners at the moment it happens.",
+    "s4": "When money comes in, the split is already calculated from what each person gave. No argument and no eyeballing."
+  },
+  "open": {
+    "title": "What is open right now",
+    "sub": "All of these can be browsed before you sign up:",
+    "missions": "missions waiting for candidates",
+    "resources": "resources being sought",
+    "projects": "active rikmas",
+    "view": "view",
+    "orMatch": "Nothing that fits?",
+    "matchCta": "Tell us what you are good at"
+  },
+  "match": {
+    "title": "Tell us what you are good at",
+    "sub": "There is no open mission that fits you right now - so rather than send you to an empty list, we will make the match by hand. A short conversation, and we look for a rikma for you or help open one.",
+    "cta": "Book a conversation"
+  },
+  "doubts": {
+    "title": "What stops people from joining",
+    "q1_q": "How many hours do I have to commit to?",
+    "q1_a": "As many as you want. The system counts hours, not attendance - someone who gave three hours gets the share of three hours. You can start small alongside your existing work and scale up if it works.",
+    "q2_q": "What happens if I leave partway through?",
+    "q2_a": "What you already contributed stays recorded and stays yours - the share you accrued is not erased when you stop. It does dilute over time, because whoever keeps contributing grows the denominator, but it does not go to zero.",
+    "q3_q": "Is there guaranteed income?",
+    "q3_a": "No, and that is the difference from the work you know. There is no fixed salary - there is a share of the profit if and when the rikma earns. Which is why this fits as an addition alongside an existing income, not as an immediate replacement for one."
+  },
+  "back": "Back to the homepage"
+}

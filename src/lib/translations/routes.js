@@ -47,6 +47,9 @@ export const ROUTED = {
     // The "I already have a partnership" track. The hook and the calculator
     // stay on the homepage in `home`; only the depth behind them is gated.
     partnership: at('/partnership'),
+    // The "looking for a venture to join" track. The homepage's discovery
+    // strip keeps its own copy in `home`; this is the page behind it.
+    join: at('/join'),
     // The page behind the product - why consent is re-checked at every step.
     // One route, one namespace; the homepage teaser for it lives in `home`.
     why: at('/why'),

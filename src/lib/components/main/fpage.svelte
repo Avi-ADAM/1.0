@@ -678,16 +678,29 @@
         <p class="text-center text-slate-700 text-base sm:text-sm mb-2">
           {$t('home.audience.title')}
         </p>
+        <!-- Two of these now leave the page, which is the whole point of the
+             split: the segmentation already existed here and then walked all
+             four audiences down the same scroll. "I have a partnership" and
+             "I'm looking for a venture" each have somewhere of their own to
+             go. "Just show me the system" still scrolls, because what it asks
+             for is on this page. -->
         <div class="flex flex-wrap justify-center gap-2">
-          {#each [['a1', 'split'], ['a2', 'discover'], ['a3', 'demo']] as [key, target]}
-            <button
-              type="button"
-              onclick={() => scrollToId(target)}
+          {#each [['a1', '/partnership'], ['a2', '/join']] as [key, href]}
+            <a
+              {href}
+              data-sveltekit-prefetch
               class="bg-cyan-50/70 backdrop-blur-sm border-2 border-gold hover:bg-gold/25 text-slate-800 hover:text-rose-800 font-semibold text-base sm:text-sm px-4 py-2 rounded-full shadow-sm transition-colors"
             >
               {$t(`home.audience.${key}`)}
-            </button>
+            </a>
           {/each}
+          <button
+            type="button"
+            onclick={() => scrollToId('demo')}
+            class="bg-cyan-50/70 backdrop-blur-sm border-2 border-gold hover:bg-gold/25 text-slate-800 hover:text-rose-800 font-semibold text-base sm:text-sm px-4 py-2 rounded-full shadow-sm transition-colors"
+          >
+            {$t('home.audience.a3')}
+          </button>
           <!-- המסלול הרביעי לא גולל לשום מקום בעמוד: מי שרוצה להבין לפני
                שמתחיל/ה צריך/ה אדם, לא עוד סקשן. -->
           <button
