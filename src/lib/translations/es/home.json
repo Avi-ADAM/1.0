@@ -641,5 +641,8 @@
   "noboss": {
     "lead": "¿Sigues empleado, o trabajas por tu cuenta en solitario? Hay una página entera sobre la tercera vía: qué no funciona hoy y cómo se ve dentro de una rikma.",
     "cta": "Trabaja con socios en lugar de para un jefe"
+  },
+  "crumb": {
+    "home": "Inicio"
   }
 }

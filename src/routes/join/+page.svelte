@@ -16,6 +16,7 @@
 -->
 <script>
   import { t, isRtl } from '$lib/translations';
+  import { breadcrumbs, jsonLdBody } from '$lib/seo/jsonLd.js';
   import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
   import DemoRequest from '$lib/components/main/DemoRequest.svelte';
 
@@ -43,6 +44,16 @@
      number to show - it is a link that wastes the one visit. */
   let doors = $derived(allDoors.filter((d) => d.count > 0));
   let hasListings = $derived(doors.length > 0);
+
+  /* Home > this page. Two levels is the whole trail - these pages hang
+     directly off the homepage - but it is what puts the site name and the
+     page's own name into the search result instead of a bare URL. */
+  const crumbLd = $derived(
+    breadcrumbs([
+      { name: $t('home.crumb.home'), url: 'https://1lev1.com/' },
+      { name: $t('join.hero.h1'), url: 'https://1lev1.com/join' }
+    ])
+  );
 </script>
 
 <svelte:head>
@@ -50,6 +61,7 @@
   <meta name="description" content={$t('join.meta.description')} />
   <meta property="og:title" content={$t('join.meta.title')} />
   <meta property="og:description" content={$t('join.meta.description')} />
+  {@html `<script type="application/ld+json">${jsonLdBody(crumbLd)}<\/script>`}
 </svelte:head>
 
 <main

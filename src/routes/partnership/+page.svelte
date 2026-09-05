@@ -20,6 +20,7 @@
 -->
 <script>
   import { t, isRtl, locale } from '$lib/translations';
+  import { breadcrumbs, jsonLdBody } from '$lib/seo/jsonLd.js';
   import { goto } from '$app/navigation';
   import SplitDepth from '$lib/components/main/SplitDepth.svelte';
   import SplitCalculator from '$lib/components/main/SplitCalculator.svelte';
@@ -35,6 +36,16 @@
           : '/convention'
     );
   }
+
+  /* Home > this page. Two levels is the whole trail - these pages hang
+     directly off the homepage - but it is what puts the site name and the
+     page's own name into the search result instead of a bare URL. */
+  const crumbLd = $derived(
+    breadcrumbs([
+      { name: $t('home.crumb.home'), url: 'https://1lev1.com/' },
+      { name: $t('partnership.hero.h1'), url: 'https://1lev1.com/partnership' }
+    ])
+  );
 </script>
 
 <svelte:head>
@@ -42,6 +53,7 @@
   <meta name="description" content={$t('partnership.meta.description')} />
   <meta property="og:title" content={$t('partnership.meta.title')} />
   <meta property="og:description" content={$t('partnership.meta.description')} />
+  {@html `<script type="application/ld+json">${jsonLdBody(crumbLd)}<\/script>`}
 </svelte:head>
 
 <main

@@ -1,16 +1,38 @@
 ﻿<script>
-  import { t, locale, isRtl} from '$lib/translations';
+  import { t, isRtl } from '$lib/translations';
+  import { faqPage, jsonLdBody } from '$lib/seo/jsonLd.js';
 
   const questionCount = 13;
   const questionKeys = Array.from({ length: questionCount }, (_, i) => i + 1);
+
+  /* The FAQPage entity, built from the very keys the markup below renders.
+     Structured data has to describe what the page actually shows, so the list
+     is derived rather than kept as a second copy that could drift - and it is
+     reactive because `$t` resolves per locale, so the entity is emitted in
+     whatever language the page is being served in. */
+  const faqLd = $derived(
+    faqPage(
+      questionKeys.map((i) => ({
+        question: $t(`faq.q${i}`),
+        // The markup turns newlines into <br>; the entity wants plain text.
+        answer: $t(`faq.a${i}`).split('\n').join(' ')
+      }))
+    )
+  );
 </script>
 
 <svelte:head>
   <title>{$t('faq.title')} · 1lev1</title>
-  <meta name="description" content={$locale === 'he' ? 'שאלות ותשובות נפוצות על 1lev1' : 'Frequently asked questions about 1lev1'} />
+  <!-- Was a `$locale === 'he' ? … : …` ternary, which is the inline-dictionary
+       regression CLAUDE.md warns about: Arabic, Russian and Spanish visitors
+       all got the English sentence. One key, five files. -->
+  <meta name="description" content={$t('faq.metaDescription')} />
   <meta property="og:title" content="{$t('faq.title')} · 1lev1" />
-  <meta property="og:description" content={$locale === 'he' ? 'שאלות ותשובות נפוצות על 1lev1' : 'Frequently asked questions about 1lev1'} />
+  <meta property="og:description" content={$t('faq.metaDescription')} />
   <meta property="og:type" content="website" />
+  {#if faqLd}
+    {@html `<script type="application/ld+json">${jsonLdBody(faqLd)}<\/script>`}
+  {/if}
 </svelte:head>
 
 <div class="faq-container" dir={$isRtl ? 'rtl' : 'ltr'}>

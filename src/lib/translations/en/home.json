@@ -640,5 +640,8 @@
   "noboss": {
     "lead": "Still employed, or self-employed on your own? There is a whole page on the third way: what does not work today, and what looks different inside a rikma.",
     "cta": "Work with partners instead of for a boss"
+  },
+  "crumb": {
+    "home": "Home"
   }
 }

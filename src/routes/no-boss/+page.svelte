@@ -24,6 +24,7 @@
 -->
 <script>
   import { t, isRtl } from '$lib/translations';
+  import { breadcrumbs, jsonLdBody } from '$lib/seo/jsonLd.js';
   import NoBossCase from '$lib/components/main/NoBossCase.svelte';
   import DemoRequest from '$lib/components/main/DemoRequest.svelte';
 
@@ -36,6 +37,16 @@
   let openMissions = $derived(data.stats?.openMissions ?? 0);
   let activeRikmas = $derived(data.stats?.projects ?? 0);
   let hasSomewhereToGo = $derived(openMissions > 0 || activeRikmas > 0);
+
+  /* Home > this page. Two levels is the whole trail - these pages hang
+     directly off the homepage - but it is what puts the site name and the
+     page's own name into the search result instead of a bare URL. */
+  const crumbLd = $derived(
+    breadcrumbs([
+      { name: $t('home.crumb.home'), url: 'https://1lev1.com/' },
+      { name: $t('noboss.hero.h1'), url: 'https://1lev1.com/no-boss' }
+    ])
+  );
 </script>
 
 <svelte:head>
@@ -43,6 +54,7 @@
   <meta name="description" content={$t('noboss.meta.description')} />
   <meta property="og:title" content={$t('noboss.meta.title')} />
   <meta property="og:description" content={$t('noboss.meta.description')} />
+  {@html `<script type="application/ld+json">${jsonLdBody(crumbLd)}<\/script>`}
 </svelte:head>
 
 <main
