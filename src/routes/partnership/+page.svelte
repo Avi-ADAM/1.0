@@ -22,20 +22,14 @@
   import { t, isRtl, locale } from '$lib/translations';
   import { breadcrumbs, jsonLdBody } from '$lib/seo/jsonLd.js';
   import { goto } from '$app/navigation';
+  import { registerHref } from '$lib/nav/registerHref.js';
   import SplitDepth from '$lib/components/main/SplitDepth.svelte';
   import SplitCalculator from '$lib/components/main/SplitCalculator.svelte';
 
-  /* Registration lives behind the agreement, and which agreement depends on
-     the language - the same mapping fpage uses for its own CTA. */
-  function gotoRegister() {
-    goto(
-      $locale === 'he'
-        ? '/hascama'
-        : $locale === 'ar'
-          ? '/aitifaqia'
-          : '/convention'
-    );
-  }
+  /* The locale-to-agreement mapping was inline here and inline in fpage; it
+     now lives in one module, and this is a link rather than a scripted goto
+     so it behaves like every other navigation on the page. */
+  let startHref = $derived(registerHref($locale, '/partnership'));
 
   /* Home > this page. Two levels is the whole trail - these pages hang
      directly off the homepage - but it is what puts the site name and the
@@ -124,13 +118,12 @@
     <p class="text-slate-800 text-base sm:text-sm leading-relaxed mb-5 max-w-lg mx-auto">
       {$t('partnership.close.sub')}
     </p>
-    <button
-      type="button"
-      onclick={gotoRegister}
-      class="bg-barbi hover:bg-white hover:text-barbi text-gold font-bold text-lg sm:text-base px-7 py-3 rounded-2xl shadow-lg hover:scale-105 transition-all duration-300"
+    <a
+      href={startHref}
+      class="inline-block bg-barbi hover:bg-white hover:text-barbi text-gold font-bold text-lg sm:text-base px-7 py-3 rounded-2xl shadow-lg hover:scale-105 transition-all duration-300"
     >
       {$t('partnership.close.cta')}
-    </button>
+    </a>
     <p class="mt-6">
       <a
         href="/"

@@ -23,7 +23,8 @@
   homepage with its copy unchanged.
 -->
 <script>
-  import { t, isRtl } from '$lib/translations';
+  import { t, isRtl, locale } from '$lib/translations';
+  import { registerHref } from '$lib/nav/registerHref.js';
   import { breadcrumbs, jsonLdBody } from '$lib/seo/jsonLd.js';
   import NoBossCase from '$lib/components/main/NoBossCase.svelte';
   import DemoRequest from '$lib/components/main/DemoRequest.svelte';
@@ -31,6 +32,12 @@
   let { data } = $props();
 
   let demoOpen = $state(false);
+
+  /* Signing up is the primary path and the demo is the alternative, not the
+     other way round. Every CTA on this page used to open the demo dialog,
+     which quietly made a booked call the only way in - fine for a reader who
+     wants reassurance first, a wall for one who has already decided. */
+  let startHref = $derived(registerHref($locale, '/no-boss'));
 
   /* Only what a guest can actually walk into. `stats` is null when the count
      could not be fetched, and null reads as zero on purpose. */
@@ -92,13 +99,12 @@
     </p>
 
     <div class="mt-6 flex flex-wrap justify-center gap-3">
-      <button
-        type="button"
-        onclick={() => (demoOpen = true)}
+      <a
+        href={startHref}
         class="bg-barbi hover:bg-white hover:text-barbi text-gold font-bold text-lg sm:text-base px-6 py-3 rounded-2xl shadow-lg hover:scale-105 transition-all duration-300"
       >
-        {$t('noboss.hero.ctaPrimary')}
-      </button>
+        {$t('noboss.hero.ctaStart')}
+      </a>
       {#if hasSomewhereToGo}
         <a
           href="/availableMission"
@@ -109,6 +115,16 @@
         </a>
       {/if}
     </div>
+    <p class="mt-3 text-slate-700 text-base sm:text-sm">
+      {$t('noboss.hero.ctaOr')}
+      <button
+        type="button"
+        onclick={() => (demoOpen = true)}
+        class="text-barbi font-bold underline underline-offset-4 hover:text-rose-700"
+      >
+        {$t('noboss.hero.ctaPrimary')}
+      </button>
+    </p>
   </header>
 
   <!-- The argument, moved here from the homepage. -->
@@ -176,13 +192,22 @@
     <p class="text-slate-800 text-base sm:text-sm leading-relaxed mb-5 max-w-lg mx-auto">
       {$t('noboss.close.sub')}
     </p>
-    <button
-      type="button"
-      onclick={() => (demoOpen = true)}
-      class="bg-barbi hover:bg-white hover:text-barbi text-gold font-bold text-lg sm:text-base px-7 py-3 rounded-2xl shadow-lg hover:scale-105 transition-all duration-300"
+    <a
+      href={startHref}
+      class="inline-block bg-barbi hover:bg-white hover:text-barbi text-gold font-bold text-lg sm:text-base px-7 py-3 rounded-2xl shadow-lg hover:scale-105 transition-all duration-300"
     >
-      {$t('noboss.hero.ctaPrimary')}
-    </button>
+      {$t('noboss.hero.ctaStart')}
+    </a>
+    <p class="mt-3 text-slate-700 text-base sm:text-sm">
+      {$t('noboss.hero.ctaOr')}
+      <button
+        type="button"
+        onclick={() => (demoOpen = true)}
+        class="text-barbi font-bold underline underline-offset-4 hover:text-rose-700"
+      >
+        {$t('noboss.hero.ctaPrimary')}
+      </button>
+    </p>
     <p class="mt-6">
       <a
         href="/"

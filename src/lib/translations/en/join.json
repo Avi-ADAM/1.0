@@ -6,7 +6,9 @@
   "hero": {
     "eyebrow": "◈ Looking for a venture to join? ◈",
     "h1": "Join a venture as a partner, not as an employee",
-    "sub": "You have a craft and some spare time, and you do not have an idea or the capital to start something alone. Joining a rikma gives you a share of the profit in proportion to what you actually contributed - instead of a wage that runs out at the end of the month."
+    "sub": "You have a craft and some spare time, and you do not have an idea or the capital to start something alone. Joining a rikma gives you a share of the profit in proportion to what you actually contributed - instead of a wage that runs out at the end of the month.",
+    "ctaStart": "Start now",
+    "ctaOr": "Or, if you would rather we looked for you:"
   },
   "deal": {
     "title": "What you put in and what you get back",

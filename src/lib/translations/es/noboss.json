@@ -9,7 +9,9 @@
     "sub": "Hay un camino intermedio: unirte a un proyecto con socios, aportar aquello que sabes hacer y recibir una parte de los beneficios según tu aportación real — sin construirlo todo tú solo y sin que otro decida por ti.",
     "risk": "No hace falta renunciar. Puedes empezar con unas pocas horas a la semana, junto a tu trabajo.",
     "ctaPrimary": "Cuéntanos en qué eres bueno",
-    "ctaSecondary": "Ver rikmas que buscan socios"
+    "ctaSecondary": "Ver rikmas que buscan socios",
+    "ctaStart": "Empezar ahora",
+    "ctaOr": "O, si prefieres preguntar primero:"
   },
   "next": {
     "title": "Qué pasa después de pulsar",

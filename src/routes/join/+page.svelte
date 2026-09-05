@@ -15,7 +15,8 @@
   its first people.
 -->
 <script>
-  import { t, isRtl } from '$lib/translations';
+  import { t, isRtl, locale } from '$lib/translations';
+  import { registerHref } from '$lib/nav/registerHref.js';
   import { breadcrumbs, jsonLdBody } from '$lib/seo/jsonLd.js';
   import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
   import DemoRequest from '$lib/components/main/DemoRequest.svelte';
@@ -23,6 +24,12 @@
   let { data } = $props();
 
   let demoOpen = $state(false);
+
+  /* Signing up is offered next to every "we'll match you by hand" prompt.
+     Having us look on your behalf is a service, not a turnstile - a reader
+     who already knows what they want should not have to book a call to get
+     started. */
+  let startHref = $derived(registerHref($locale, '/join'));
 
   /* Hoisted out of the `{#each}` for the same reason fpage hoists its icon
      tables: a JSDoc cast written inside a template expression does not reach
@@ -172,6 +179,14 @@
           {$t('join.open.matchCta')}
         </button>
       </p>
+      <div class="mt-4 text-center">
+        <a
+          href={startHref}
+          class="inline-block bg-barbi hover:bg-white hover:text-barbi text-gold font-bold text-lg sm:text-base px-6 py-3 rounded-2xl shadow-lg hover:scale-105 transition-all duration-300"
+        >
+          {$t('join.hero.ctaStart')}
+        </a>
+      </div>
     {:else}
       <!-- Nothing published. Not a dead end and not an apology - the same
            door the audits recommended, which is a person rather than a list. -->
@@ -184,13 +199,21 @@
         <p class="text-slate-800 text-base sm:text-sm leading-relaxed mb-4 max-w-lg mx-auto">
           {$t('join.match.sub')}
         </p>
-        <button
-          type="button"
-          onclick={() => (demoOpen = true)}
-          class="bg-barbi hover:bg-white hover:text-barbi text-gold font-bold text-lg sm:text-base px-6 py-3 rounded-2xl shadow-lg hover:scale-105 transition-all duration-300"
-        >
-          {$t('join.match.cta')}
-        </button>
+        <div class="flex flex-wrap justify-center gap-3">
+          <button
+            type="button"
+            onclick={() => (demoOpen = true)}
+            class="bg-barbi hover:bg-white hover:text-barbi text-gold font-bold text-lg sm:text-base px-6 py-3 rounded-2xl shadow-lg hover:scale-105 transition-all duration-300"
+          >
+            {$t('join.match.cta')}
+          </button>
+          <a
+            href={startHref}
+            class="bg-cyan-50/80 hover:bg-white border-2 border-barbi text-barbi font-semibold text-lg sm:text-base px-6 py-3 rounded-2xl shadow-sm transition-colors"
+          >
+            {$t('join.hero.ctaStart')}
+          </a>
+        </div>
       </div>
     {/if}
   </section>

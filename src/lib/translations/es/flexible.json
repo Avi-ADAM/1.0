@@ -8,7 +8,9 @@
     "h1": "El trabajo se adapta a ti, y no al revés",
     "sub": "Tienes un oficio, experiencia y motivación, pero el marco habitual no está hecho para tu ritmo — o sencillamente no responde. Aquí no te presentas a una casilla que diseñó otro: publicas lo que puedes aportar y en qué condiciones, y buscas socios a quienes les encaje.",
     "reassure": "Sin capital inicial, sin comprometerte a un horario fijo y sin montar un negocio en solitario.",
-    "cta": "Cuéntanos qué sabes hacer"
+    "cta": "Cuéntanos qué sabes hacer",
+    "ctaStart": "Empezar por tu cuenta",
+    "ctaOr": "O, si te resulta más fácil hablar antes con una persona:"
   },
   "know": {
     "title": "Si algo de esto te suena",

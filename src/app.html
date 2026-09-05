@@ -8,9 +8,17 @@
     <meta http-equiv='content-language' content='%cl%'>
     <!-- No site-wide robots meta. "index, follow" is what a crawler does with
          no tag at all, so the tag only ever asserted the default - while
-         sitting above %sveltekit.head%, where a page that needs `noindex`
+         sitting above the head slot below, where a page that needs `noindex`
          (a draft, a thin page) could not replace it, leaving two conflicting
-         directives in one head. Pages that need to opt out declare their own. -->
+         directives in one head. Pages that need to opt out declare their own.
+
+         Do NOT name the head placeholder in any comment that sits ABOVE the
+         real one: the substitution replaces the first occurrence in the file,
+         so a mention here consumes it. The rendered head then lands inside
+         this comment - its own SSR markers close the comment early, spilling
+         the rest of this text onto the page - and the real slot further down
+         survives as literal text. The two comments that name it further down
+         are safe only because they come after it. -->
     <meta name="theme-color" content="#EEE8AA">
     %upgradeInsecure%
 

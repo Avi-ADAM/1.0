@@ -42,7 +42,8 @@
   depth) follows /join, for the same reasons documented there.
 -->
 <script>
-  import { t, isRtl } from '$lib/translations';
+  import { t, isRtl, locale } from '$lib/translations';
+  import { registerHref } from '$lib/nav/registerHref.js';
   import { breadcrumbs, jsonLdBody } from '$lib/seo/jsonLd.js';
   import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
   import DemoRequest from '$lib/components/main/DemoRequest.svelte';
@@ -50,6 +51,16 @@
   let { data } = $props();
 
   let demoOpen = $state(false);
+
+  /* Both doors, side by side, and neither one hidden.
+
+     The conversation genuinely helps this reader - which is exactly why it
+     was tempting to make it the only way in, and why that would have been
+     wrong. Someone who has spent a year being told to wait for a callback
+     does not need one more gate; and being able to start alone, right now,
+     is the whole claim the page makes about who is in charge. Offering only
+     a booked call would contradict the headline. */
+  let startHref = $derived(registerHref($locale, '/flexible-work'));
 
   /* Hoisted so the @type annotation reaches the checker - a JSDoc cast inside
      a template expression does not. */
@@ -108,11 +119,17 @@
     >
       {$t('flexible.hero.reassure')}
     </p>
-    <div class="mt-6">
+    <div class="mt-6 flex flex-wrap justify-center gap-3">
+      <a
+        href={startHref}
+        class="bg-barbi hover:bg-white hover:text-barbi text-gold font-bold text-lg sm:text-base px-6 py-3 rounded-2xl shadow-lg hover:scale-105 transition-all duration-300"
+      >
+        {$t('flexible.hero.ctaStart')}
+      </a>
       <button
         type="button"
         onclick={() => (demoOpen = true)}
-        class="bg-barbi hover:bg-white hover:text-barbi text-gold font-bold text-lg sm:text-base px-6 py-3 rounded-2xl shadow-lg hover:scale-105 transition-all duration-300"
+        class="bg-cyan-50/70 backdrop-blur-sm border-2 border-gold hover:bg-gold/25 text-slate-800 hover:text-rose-800 font-semibold text-lg sm:text-base px-6 py-3 rounded-2xl shadow-sm transition-colors"
       >
         {$t('flexible.hero.cta')}
       </button>
@@ -258,13 +275,22 @@
       <p class="text-slate-800 text-base sm:text-sm leading-relaxed mb-4 max-w-lg mx-auto">
         {$t('flexible.match.sub')}
       </p>
-      <button
-        type="button"
-        onclick={() => (demoOpen = true)}
-        class="bg-barbi hover:bg-white hover:text-barbi text-gold font-bold text-lg sm:text-base px-6 py-3 rounded-2xl shadow-lg hover:scale-105 transition-all duration-300"
-      >
-        {$t('flexible.match.cta')}
-      </button>
+      <div class="flex flex-wrap justify-center gap-3">
+        <button
+          type="button"
+          onclick={() => (demoOpen = true)}
+          class="bg-barbi hover:bg-white hover:text-barbi text-gold font-bold text-lg sm:text-base px-6 py-3 rounded-2xl shadow-lg hover:scale-105 transition-all duration-300"
+        >
+          {$t('flexible.match.cta')}
+        </button>
+        <!-- The conversation leads here, but nobody has to wait for it. -->
+        <a
+          href={startHref}
+          class="bg-cyan-50/80 hover:bg-white border-2 border-barbi text-barbi font-semibold text-lg sm:text-base px-6 py-3 rounded-2xl shadow-sm transition-colors"
+        >
+          {$t('flexible.hero.ctaStart')}
+        </a>
+      </div>
     </div>
   </section>
 

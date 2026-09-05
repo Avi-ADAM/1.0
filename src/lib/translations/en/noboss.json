@@ -9,7 +9,9 @@
     "sub": "There is a path in between: join a venture with partners, contribute what you are good at, and take a share of the profit in proportion to what you actually contributed — without building the whole thing yourself, and without someone else deciding for you.",
     "risk": "You do not have to quit. You can start with a few hours a week, alongside the job.",
     "ctaPrimary": "Tell us what you are good at",
-    "ctaSecondary": "See rikmas looking for partners"
+    "ctaSecondary": "See rikmas looking for partners",
+    "ctaStart": "Start now",
+    "ctaOr": "Or, if you would rather ask first:"
   },
   "next": {
     "title": "What happens after you click",

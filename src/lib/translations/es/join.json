@@ -6,7 +6,9 @@
   "hero": {
     "eyebrow": "◈ ¿Buscas un proyecto al que unirte? ◈",
     "h1": "Únete a un proyecto como socio, no como empleado",
-    "sub": "Tienes un oficio y algo de tiempo libre, y no tienes una idea ni el capital para empezar algo solo. Unirte a una rikma te da una parte de los beneficios según lo que realmente aportaste, en lugar de un sueldo que se acaba a fin de mes."
+    "sub": "Tienes un oficio y algo de tiempo libre, y no tienes una idea ni el capital para empezar algo solo. Unirte a una rikma te da una parte de los beneficios según lo que realmente aportaste, en lugar de un sueldo que se acaba a fin de mes.",
+    "ctaStart": "Empezar ahora",
+    "ctaOr": "O, si prefieres que busquemos por ti:"
   },
   "deal": {
     "title": "Qué aportas y qué recibes",
