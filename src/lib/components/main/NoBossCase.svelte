@@ -38,7 +38,7 @@
     style="font-family:'Sababa',sans-serif;"
   >
     <p
-      class="text-center text-barbi font-bold text-base sm:text-sm tracking-widest mb-1"
+      class="text-center text-barbi dark:text-gold font-bold text-base sm:text-sm tracking-widest mb-1"
     >
       {$t('home.sections.problemEyebrow')}
     </p>
@@ -48,7 +48,7 @@
     >
       {$t('home.sections.problemTitle')}
     </h2>
-    <p class="text-center text-rose-500 text-base sm:text-sm mb-4">
+    <p class="text-center text-rose-700 dark:text-rose-300 text-base sm:text-sm mb-4">
       {$t('home.sections.painLead')}
     </p>
     <div class="flex flex-col gap-2.5">
@@ -57,7 +57,7 @@
           class="flex items-start gap-3 bg-cyan-50/55 dark:bg-surface2 backdrop-blur-sm border border-rose-300/70 rounded-xl px-4 py-3 shadow-sm"
         >
           <span
-            class="shrink-0 mt-0.5 w-6 h-6 rounded-full bg-rose-100 text-rose-500 flex items-center justify-center text-sm font-bold"
+            class="shrink-0 mt-0.5 w-6 h-6 rounded-full bg-rose-100 text-rose-700 flex items-center justify-center text-sm font-bold"
             >✕</span
           >
           <p
@@ -87,8 +87,8 @@
           <div class="flex items-start gap-3">
             <span
               class="shrink-0 mt-0.5 w-6 h-6 rounded-full {good
-                ? 'bg-amber-100'
-                : 'bg-rose-100 text-rose-500'} flex items-center justify-center text-sm font-bold"
+                ? 'bg-amber-100 text-amber-900'
+                : 'bg-rose-100 text-rose-700'} flex items-center justify-center text-sm font-bold"
               >{good ? '✓' : '✕'}</span
             >
             <p
@@ -107,7 +107,7 @@
     </div>
     <div class="mt-5 text-center">
       <p
-        class="inline-block bg-gradient-to-r from-gold via-barbi to-gold bg-[length:200%_auto] animate-gradientx text-white font-bold text-xl sm:text-lg px-6 py-3 rounded-2xl shadow-lg"
+        class="inline-block bg-barbi text-gold font-bold text-xl sm:text-lg px-6 py-3 rounded-2xl shadow-lg"
       >
         {$t('home.sections.painTurn')}
       </p>
@@ -121,7 +121,7 @@
       <a
         href="/why"
         data-sveltekit-prefetch
-        class="text-barbi font-semibold text-base sm:text-sm underline decoration-barbi/40 underline-offset-4 hover:text-gold"
+        class="text-barbi dark:text-gold font-semibold text-base sm:text-sm underline decoration-barbi/40 underline-offset-4 hover:text-rose-800 dark:hover:text-surfaceInk"
       >
         {$t('home.why.inline')} {$isRtl ? '←' : '→'}
       </a>
@@ -194,8 +194,8 @@
               >
                 <span
                   class="shrink-0 {highlight
-                    ? 'text-emerald-600'
-                    : 'text-rose-400'}">{highlight ? '✓' : '✕'}</span
+                    ? 'text-emerald-800'
+                    : 'text-rose-700'}">{highlight ? '✓' : '✕'}</span
                 >
                 <span>{item.trim()}</span>
               </li>

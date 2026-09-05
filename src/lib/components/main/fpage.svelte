@@ -450,7 +450,7 @@
 <!-- Sticky header: anchor nav + שפות/קישורים + CTA (מחשב) -->
 <header
   dir={$isRtl ? 'rtl' : 'ltr'}
-  class="hidden sm:flex fixed top-0 inset-x-0 z-[600] items-center gap-4 px-6 py-2 bg-cyan-50/40 backdrop-blur-md border-b border-white/40 shadow-sm"
+  class="hidden sm:flex fixed top-0 inset-x-0 z-[600] items-center gap-4 px-6 py-2 bg-surface/90 backdrop-blur-md border-b border-surfaceLine shadow-sm"
   style="font-family:'Sababa',sans-serif;"
 >
   <img
@@ -460,49 +460,49 @@
     style="animation:none;"
   />
   <nav
-    class="flex flex-1 items-center justify-center gap-4 min-w-0 text-barbi font-bold text-sm lg:text-base"
+    class="flex flex-1 items-center justify-center gap-4 min-w-0 text-barbi dark:text-gold font-bold text-sm lg:text-base"
   >
     <button
       type="button"
-      class="hover:text-gold transition-colors whitespace-nowrap"
+      class="hover:text-rose-800 dark:hover:text-surfaceInk transition-colors whitespace-nowrap"
       onclick={() => scrollToId('split')}>{$t('home.sections.navSplit')}</button
     >
     <button
       type="button"
-      class="hover:text-gold transition-colors whitespace-nowrap"
+      class="hover:text-rose-800 dark:hover:text-surfaceInk transition-colors whitespace-nowrap"
       onclick={() => scrollToId('demo')}>{$t('home.sections.navDemo')}</button
     >
     <button
       type="button"
-      class="hover:text-gold transition-colors whitespace-nowrap"
+      class="hover:text-rose-800 dark:hover:text-surfaceInk transition-colors whitespace-nowrap"
       onclick={() => scrollToId('features')}
       >{$t('home.sections.navFeatures')}</button
     >
     <button
       type="button"
-      class="hover:text-gold transition-colors whitespace-nowrap"
+      class="hover:text-rose-800 dark:hover:text-surfaceInk transition-colors whitespace-nowrap"
       onclick={() => scrollToId('how')}>{$t('home.sections.navHow')}</button
     >
     <button
       type="button"
-      class="hover:text-gold transition-colors whitespace-nowrap"
+      class="hover:text-rose-800 dark:hover:text-surfaceInk transition-colors whitespace-nowrap"
       onclick={() => scrollToId('concierge')}
       >{$t('home.sections.navConcierge')}</button
     >
     <button
       type="button"
-      class="hover:text-gold transition-colors whitespace-nowrap"
+      class="hover:text-rose-800 dark:hover:text-surfaceInk transition-colors whitespace-nowrap"
       onclick={() => scrollToId('who')}>{$t('home.sections.whoTitle')}</button
     >
     <button
       type="button"
-      class="hover:text-gold transition-colors whitespace-nowrap"
+      class="hover:text-rose-800 dark:hover:text-surfaceInk transition-colors whitespace-nowrap"
       onclick={() => scrollToId('faq')}>{$t('home.sections.navFaq')}</button
     >
     <a
       href="/why"
       data-sveltekit-prefetch
-      class="hover:text-gold transition-colors whitespace-nowrap"
+      class="hover:text-rose-800 dark:hover:text-surfaceInk transition-colors whitespace-nowrap"
       >{$t('home.nav.why')}</a
     >
   </nav>
@@ -538,7 +538,7 @@
 
 <div
   dir={$isRtl ? 'rtl' : 'ltr'}
-  class="relative h-screen w-screen overflow-hidden bg-[length:200%_auto] animate-gradientx bg-gradient-to-br from-[#e0e7ff] via-[#f3e8ff] to-[#e0e7ff]"
+  class="relative h-screen w-screen overflow-hidden bg-[length:200%_auto] animate-gradientx bg-gradient-to-br from-[#eef2ff] via-[#faf5ff] to-[#eef2ff]"
 >
   <!-- 3D Scene Background.
        `aria-hidden`: the scene is decoration — it restates in pictures what the
@@ -675,10 +675,16 @@
         class="relative w-full min-h-[4rem] sm:min-h-[5rem] mt-2 mb-8 overflow-hidden"
       >
         {#key currentHeadline}
+          <!-- The deep ramp, not the wordmark's. Same seven stops and the same
+               animation, one family darker: fuchsia-400 / sky-400 / mturk are
+               2.1:1, 2.0:1 and 1.6:1 on this hero, so for most of the cycle
+               the sentence was a pale shimmer. The wordmark above may keep
+               the bright ramp - it is aria-hidden, a logo rather than text -
+               but this is the promise the visitor is meant to read. -->
           <div
             class="absolute inset-0 flex items-center justify-center text-center font-bold text-transparent
               bg-clip-text bg-[length:auto_200%] animate-gradienty
-              bg-[linear-gradient(to_top,theme(colors.barbi),theme(colors.fuchsia.400),theme(colors.sky.400),theme(colors.mturk),theme(colors.sky.400),theme(colors.fuchsia.400),theme(colors.barbi))]
+              bg-[linear-gradient(to_top,theme(colors.barbi),theme(colors.fuchsia.700),theme(colors.sky.700),theme(colors.teal.700),theme(colors.sky.700),theme(colors.fuchsia.700),theme(colors.barbi))]
               {$lang === 'he' ? 'sm:text-2xl text-xl' : 'sm:text-lg text-base'}"
             style="text-shadow:none;"
             in:fly={{ x: headlineDir * 60, duration: 450, easing: cubicOut }}
@@ -926,7 +932,7 @@
         style="font-family:'Sababa',sans-serif;"
       >
         <div
-          class="rounded-3xl border-2 border-barbi/60 bg-gradient-to-br from-[#fff6ea] via-[#fdeef4] to-[#f6e6fb] px-6 py-6 shadow-lg text-center"
+          class="rounded-3xl border-2 border-barbi/60 bg-gradient-to-br from-[#fffaf3] via-[#fef6f9] to-[#fdf4ff] px-6 py-6 shadow-lg text-center"
         >
           <p
             class="text-barbi font-bold text-sm tracking-widest uppercase mb-1"
@@ -959,7 +965,7 @@
       >
         <a
           href="/consensus"
-          class="group relative flex flex-col sm:flex-row items-center gap-5 w-full overflow-hidden rounded-3xl border-2 border-barbi/60 bg-gradient-to-br from-[#fff6ea] via-[#fdeef4] to-[#f6e6fb] px-6 py-6 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
+          class="group relative flex flex-col sm:flex-row items-center gap-5 w-full overflow-hidden rounded-3xl border-2 border-barbi/60 bg-gradient-to-br from-[#fffaf3] via-[#fef6f9] to-[#fdf4ff] px-6 py-6 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
         >
           <!-- רקע דקורטיבי -->
           <div
@@ -1043,12 +1049,12 @@
       <div class="w-full max-w-xl flex flex-col gap-6 mt-10">
         <!-- Stats -->
         <div
-          class="bg-gradient-to-br from-gold via-barbi to-gold opacity-80 px-4 py-3 mt-2 rounded-lg border-2 border-gold shadow-lg"
+          class="bg-barbi px-4 py-3 mt-2 rounded-lg border-2 border-gold shadow-lg"
         >
           {#if statsLoaded}
             <div class="text-center">
               <p
-                class="text-white font-semibold text-xl sm:text-lg mb-2"
+                class="text-gold font-semibold text-xl sm:text-lg mb-2"
                 style="font-family: 'Sababa', sans-serif;"
               >
                 {$t('home.stats.currently')}
@@ -1058,21 +1064,21 @@
                   <div class="text-2xl font-bold text-gold">
                     {projectsCount}
                   </div>
-                  <div class="text-white text-base sm:text-sm">
+                  <div class="text-gold text-base sm:text-sm">
                     {$t('home.stats.partnerships')}
                   </div>
                 </div>
                 <div class="text-gold text-2xl">•</div>
                 <div class="bg-cyan-50/20 rounded-lg px-3 py-2 backdrop-blur-sm">
                   <div class="text-2xl font-bold text-gold">{usersCount}</div>
-                  <div class="text-white text-base sm:text-sm">
+                  <div class="text-gold text-base sm:text-sm">
                     {$t('home.stats.members')}
                   </div>
                 </div>
                 <div class="text-gold text-2xl">•</div>
                 <div class="bg-cyan-50/20 rounded-lg px-3 py-2 backdrop-blur-sm">
                   <div class="text-2xl font-bold text-gold">{membersCount}</div>
-                  <div class="text-white text-sm">
+                  <div class="text-gold text-sm">
                     {$t('home.fpage.agreedOnAgreement')}
                   </div>
                 </div>
@@ -1080,7 +1086,7 @@
             </div>
           {:else}
             <div
-              class="text-center text-white font-semibold text-lg sm:text-base"
+              class="text-center text-gold font-semibold text-lg sm:text-base"
               style="font-family: 'Sababa', sans-serif;"
             >
               {$t('home.stats.loading')}
@@ -1106,7 +1112,7 @@
             {#each discoverLinks as { icon, count, key, href } (key)}
               <a
                 {href}
-                class="group flex items-center gap-3 bg-cyan-50/80 hover:bg-gold/20 border border-gold/60 rounded-lg px-3 py-2 transition-colors"
+                class="group flex items-center gap-3 bg-cyan-50 hover:bg-gold/25 border border-gold/60 rounded-lg px-3 py-2 transition-colors"
               >
                 <EntityIcon kind={icon} size={24} tone="brand" />
                 <span class="flex-1 text-slate-800 text-lg sm:text-base">
@@ -1124,7 +1130,7 @@
             {/each}
             <a
               href="/demand"
-              class="group flex items-center gap-3 bg-gradient-to-l from-gold/30 to-barbi/20 hover:from-gold/40 border border-gold/60 rounded-lg px-3 py-2 transition-colors"
+              class="group flex items-center gap-3 bg-cyan-50 bg-gradient-to-l from-gold/25 to-barbi/15 hover:from-gold/40 border border-barbi/60 rounded-lg px-3 py-2 transition-colors"
             >
               <EntityIcon kind="map" size={24} tone="brand" />
               <span class="flex-1 text-slate-800 text-lg sm:text-base">
@@ -1394,7 +1400,7 @@
           <p class="text-center text-slate-800 text-lg sm:text-base mb-2">
             {$t('home.concierge.subtitle')}
           </p>
-          <p class="text-center text-rose-600 text-base sm:text-sm mb-5">
+          <p class="text-center text-rose-800 text-base sm:text-sm mb-5">
             {$t('home.concierge.flow')}
           </p>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -1565,10 +1571,10 @@
           <div class="flex justify-center items-stretch gap-3 flex-wrap">
             {#each [[projectsCount, 'proofStatProjects'], [usersCount, 'proofStatMembers'], [membersCount, 'proofStatSigners']].filter(([n]) => n > 0) as [count, key]}
               <div
-                class="bg-gradient-to-br from-gold via-barbi to-gold rounded-lg px-4 py-3 shadow min-w-[110px]"
+                class="bg-barbi rounded-lg px-4 py-3 shadow min-w-[110px]"
               >
-                <div class="text-2xl font-bold text-white">{count}</div>
-                <div class="text-white/90 text-sm sm:text-xs">
+                <div class="text-2xl font-bold text-gold">{count}</div>
+                <div class="text-gold text-sm sm:text-xs">
                   {$t(`home.sections.${key}`)}
                 </div>
               </div>
@@ -1714,12 +1720,12 @@
         <!-- בלוק: קריאה לפעולה סופית -->
         <section class="mb-8">
           <div
-            class="bg-gradient-to-br from-gold via-barbi to-gold px-5 py-6 rounded-2xl border-2 border-gold shadow-xl text-center"
+            class="bg-barbi px-5 py-6 rounded-2xl border-2 border-gold shadow-xl text-center"
           >
-            <h2 class="text-3xl sm:text-2xl font-bold text-white mb-2">
+            <h2 class="text-3xl sm:text-2xl font-bold text-gold mb-2">
               {$t('home.sections.ctaFinalTitle')}
             </h2>
-            <p class="text-white/90 text-lg sm:text-base mb-4">
+            <p class="text-gold text-lg sm:text-base mb-4">
               {$t('home.sections.ctaFinalSub')}
             </p>
             <div class="flex gap-3 justify-center flex-wrap">
@@ -1748,13 +1754,13 @@
                 {$t('home.cta.register')}
               </button>
               <button
-                class="bg-white/20 border-2 border-white text-white font-bold text-lg sm:text-base px-5 py-2 rounded-xl shadow-lg hover:bg-white hover:text-barbi hover:scale-105 transition-all duration-300"
+                class="border-2 border-gold text-gold font-bold text-lg sm:text-base px-5 py-2 rounded-xl shadow-lg hover:bg-gold hover:text-barbi hover:scale-105 transition-all duration-300"
                 onclick={() => (demoOpen = true)}
               >
                 {$t('demo.button')}
               </button>
             </div>
-            <p class="text-white/90 text-sm mt-3">{$t('demo.reassure')}</p>
+            <p class="text-gold text-sm mt-3">{$t('demo.reassure')}</p>
           </div>
         </section>
       </div>
@@ -1794,7 +1800,7 @@
     </button>
 
     <button
-      class="group flex text-barbi flex-row items-center gap-3 px-6 py-3 rounded-2xl bg-barbi/80 backdrop-blur-md border border-white/40 shadow-[0_8px_32px_0_rgba(31,38,135,0.37)] hover:text-gold hover:bg-barbi hover:scale-105 transition-all duration-300 min-w-[160px]"
+      class="group flex text-gold flex-row items-center gap-3 px-6 py-3 rounded-2xl bg-barbi/80 backdrop-blur-md border border-white/40 shadow-[0_8px_32px_0_rgba(31,38,135,0.37)] hover:text-gold hover:bg-barbi hover:scale-105 transition-all duration-300 min-w-[160px]"
       onclick={() => {
         goto(
           `${$locale == 'he' ? '/hascama' : $locale == 'ar' ? '/aitifaqia' : '/convention'}`

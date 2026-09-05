@@ -221,7 +221,14 @@ function getLanguage(event) {
     return fromPath;
   }
   if (!coociLang) {
-    return userAgent?.includes('he') ? 'he' : 'en';
+    // No header at all is not "not Hebrew" - it is no signal, and the answer
+    // to no signal is the site's default. Every browser sends the header, so
+    // this branch is almost only crawlers, and they are exactly who must see
+    // Hebrew here: the hreflang table and the sitemap both declare the bare
+    // address to be the Hebrew one. Returning `en` made the bare URL serve a
+    // language it had just told Google lived at `?lang=en`.
+    if (!userAgent) return 'he';
+    return userAgent.includes('he') ? 'he' : 'en';
   }
   // The cookie is user-writable, so validate it too — an unknown value here
   // would propagate into locals.lang and out to the metadata maps.
@@ -481,8 +488,20 @@ async function handleRequest({ event, resolve }) {
   // an inner page resolved back to "/" . Build it from the request instead —
   // pathname only (percent-encoded, so it cannot break out of the attribute)
   // plus the locale marker, matching the hreflang table in app.html.
+  // Built from the URL that was ASKED FOR, not from the language that was
+  // resolved. Those differ whenever the language came from a header or a
+  // cookie rather than from `?lang=`, and using the resolved one meant the
+  // bare address never pointed at itself: `/no-boss` fetched with an English
+  // header declared its canonical to be `/no-boss?lang=en`, while the
+  // hreflang table on the same page named the bare address as both `he` and
+  // `x-default`. A URL that disowns itself is dropped as a duplicate of the
+  // variant it names - and the bare address is the one every link points at.
+  const askedLang = event.url.searchParams.get('lang');
+  const canonicalLang =
+    askedLang && SUPPORTED_LANGS.includes(askedLang) ? askedLang : 'he';
   const canonical =
-    `${SITE_ORIGIN}${event.url.pathname}` + (lang === 'he' ? '' : `?lang=${lang}`);
+    `${SITE_ORIGIN}${event.url.pathname}` +
+    (canonicalLang === 'he' ? '' : `?lang=${canonicalLang}`);
   // The alternates for THIS path, not for the homepage. app.html used to carry
   // them as six literal tags naming "/", so every inner page claimed its
   // translations lived at the homepage - the one signal that tells Google the

@@ -14,7 +14,12 @@
    */
   import { t, locale } from '$lib/translations';
 
+  /* Two lists, not one: PALETTE fills the share bar and the dot, INK writes
+     the partner's name. A bar only has to be told apart from its neighbour,
+     a name has to be read - and #e0a800 / #3aa7a0 measure 2.0:1 and 2.9:1 as
+     text on the card. Same hues, one step deeper, all >=4.5:1 on the fill. */
   const PALETTE = ['#ff0092', '#e0a800', '#3aa7a0', '#8b5cf6'];
+  const INK = ['#b80069', '#8a6a15', '#0f766e', '#6d28d9'];
   const MAX_PARTNERS = 4;
   const MAX_TASKS = 6;
   const MAX_COSTS = 4;
@@ -116,6 +121,7 @@
         equal,
         delta: byWork - equal,
         color: PALETTE[i % PALETTE.length],
+        ink: INK[i % INK.length],
         label: p.name.trim() || $t(`home.split.calc.${p.key}`)
       };
     })
@@ -195,14 +201,14 @@
     bind:value={row.name}
     placeholder={nameOf(row, fallbackKey)}
     aria-label={$t(`home.split.calc.${aria}`)}
-    class="w-full min-w-0 bg-transparent text-slate-800 text-sm sm:text-xs font-semibold border-b border-transparent placeholder:text-slate-500 placeholder:font-normal focus:border-barbi focus:outline-none"
+    class="w-full min-w-0 bg-transparent text-slate-800 text-sm sm:text-xs font-semibold border-b border-transparent placeholder:text-slate-600 placeholder:font-normal focus:border-barbi focus:outline-none"
   />
 {/snippet}
 
 {#snippet moneyField(row, field, aria, step)}
   <span class="flex items-center gap-1">
     {#if symbolFirst}
-      <span class="text-slate-500 text-xs">{symbol}</span>
+      <span class="text-slate-600 text-xs">{symbol}</span>
     {/if}
     <input
       type="number"
@@ -213,7 +219,7 @@
       class="w-20 rounded border border-gold/70 bg-white px-1 py-0.5 text-center text-slate-900 text-sm tabular-nums focus:border-barbi focus:outline-none"
     />
     {#if !symbolFirst}
-      <span class="text-slate-500 text-xs">{symbol}</span>
+      <span class="text-slate-600 text-xs">{symbol}</span>
     {/if}
   </span>
 {/snippet}
@@ -224,7 +230,7 @@
     onclick={() => drop(list, i)}
     aria-label={$t(`home.split.calc.${aria}`)}
     title={$t(`home.split.calc.${aria}`)}
-    class="shrink-0 w-6 h-6 rounded-full bg-slate-100 hover:bg-rose-100 text-slate-500 hover:text-rose-600 flex items-center justify-center text-xs font-bold transition-colors"
+    class="shrink-0 w-6 h-6 rounded-full bg-slate-100 hover:bg-rose-100 text-slate-600 hover:text-rose-600 flex items-center justify-center text-xs font-bold transition-colors"
   >
     ✕
   </button>
@@ -232,8 +238,13 @@
 
 <div
   id="calc"
-  class="scroll-mt-16 rounded-2xl border-2 border-barbi/60 bg-cyan-50/80 backdrop-blur-sm px-3 sm:px-4 py-5 shadow-lg"
+  class="scroll-mt-16 rounded-2xl border-2 border-barbi/60 bg-cyan-50 px-3 sm:px-4 py-5 shadow-lg"
 >
+  <!-- Opaque, and fixed light in all four fills. At `bg-cyan-50/80` the page
+       came through the remaining 20%, so the same ink measured differently in
+       each of the four and the marginal greys fell under AA in the two dark
+       ones. Everything inside is therefore fixed dark ink with no `dark:`
+       partner - the calculator is a figure, like the graph. -->
   <h3 class="text-rose-700 font-bold text-2xl sm:text-xl mb-1 text-center">
     {$t('home.split.calc.title')}
   </h3>
@@ -245,7 +256,7 @@
   <div class="flex flex-col gap-3">
     {#each rows as row (row.p.id)}
       <div
-        class="rounded-xl border-2 bg-white/70 px-3 py-3 shadow-sm"
+        class="rounded-xl border-2 bg-white px-3 py-3 shadow-sm"
         style="border-color: {row.color}66;"
       >
         <div class="flex items-center gap-2 mb-2">
@@ -269,7 +280,7 @@
               onclick={() => removePartner(row.i)}
               aria-label={$t('home.split.calc.removePartner')}
               title={$t('home.split.calc.removePartner')}
-              class="shrink-0 w-6 h-6 rounded-full bg-slate-100 hover:bg-rose-100 text-slate-500 hover:text-rose-600 flex items-center justify-center text-sm font-bold transition-colors"
+              class="shrink-0 w-6 h-6 rounded-full bg-slate-100 hover:bg-rose-100 text-slate-600 hover:text-rose-600 flex items-center justify-center text-sm font-bold transition-colors"
             >
               ✕
             </button>
@@ -287,7 +298,7 @@
               <div class="mt-1 flex flex-wrap items-center gap-x-1.5 gap-y-1">
                 <span
                   dir="ltr"
-                  class="flex items-center gap-0.5 text-slate-500 text-xs"
+                  class="flex items-center gap-0.5 text-slate-600 text-xs"
                 >
                   <input
                     type="number"
@@ -308,7 +319,7 @@
                     class="w-11 rounded border border-gold/70 bg-white px-1 py-0.5 text-center text-slate-900 text-sm tabular-nums focus:border-barbi focus:outline-none"
                   />
                 </span>
-                <span class="text-slate-500 text-xs">×</span>
+                <span class="text-slate-600 text-xs">×</span>
                 <input
                   type="number"
                   min="0"
@@ -317,7 +328,7 @@
                   aria-label={$t('home.split.calc.rateLabel')}
                   class="w-14 rounded border border-gold/70 bg-white px-1 py-0.5 text-center text-slate-900 text-sm tabular-nums focus:border-barbi focus:outline-none"
                 />
-                <span class="text-slate-500 text-xs"
+                <span class="text-slate-600 text-xs"
                   >{$t('home.split.calc.perHour')}</span
                 >
                 <span
@@ -394,7 +405,7 @@
   </p>
 
   <!-- ההכנסה: לא מספר שנופל מהשמיים, אלא המכירות שהיו -->
-  <div class="mt-4 rounded-xl border-2 border-gold bg-white/70 px-3 py-3">
+  <div class="mt-4 rounded-xl border-2 border-gold bg-white px-3 py-3">
     <p class="text-slate-800 text-base sm:text-sm font-bold mb-2">
       {$t('home.split.calc.salesTitle')}
     </p>
@@ -404,7 +415,7 @@
           {@render lineName(sale, 'sale', 'productLabel')}
           <div class="mt-1 flex flex-wrap items-center gap-x-1.5 gap-y-1">
             {@render moneyField(sale, 'price', 'priceLabel', 1)}
-            <span class="text-slate-500 text-xs">×</span>
+            <span class="text-slate-600 text-xs">×</span>
             <input
               type="number"
               min="0"
@@ -413,7 +424,7 @@
               aria-label={$t('home.split.calc.qtyLabel')}
               class="w-16 rounded border border-gold/70 bg-white px-1 py-0.5 text-center text-slate-900 text-sm tabular-nums focus:border-barbi focus:outline-none"
             />
-            <span class="text-slate-500 text-xs"
+            <span class="text-slate-600 text-xs"
               >{$t('home.split.calc.qtyUnit')}</span
             >
             <span
@@ -468,7 +479,7 @@
           <div class="flex items-baseline justify-between gap-2">
             <span
               class="font-bold text-base sm:text-sm truncate"
-              style="color: {row.color};">{row.label}</span
+              style="color: {row.ink};">{row.label}</span
             >
             <span class="text-rose-700 font-bold text-xl sm:text-lg tabular-nums">
               {pct.format(row.share)}%
@@ -481,15 +492,15 @@
               {$t('home.split.calc.calcLabel')}
               <strong class="tabular-nums">{money.format(row.byWork)}</strong>
             </span>
-            <span class="text-slate-500">
+            <span class="text-slate-600">
               {$t('home.split.calc.equalLabel')}
               <span class="tabular-nums">{money.format(row.equal)}</span>
             </span>
             {#if Math.abs(row.delta) >= 1}
               <span
                 class="font-bold tabular-nums {row.delta > 0
-                  ? 'text-emerald-600'
-                  : 'text-rose-600'}"
+                  ? 'text-emerald-700'
+                  : 'text-rose-700'}"
               >
                 {moneySigned.format(row.delta)}
               </span>
@@ -500,7 +511,7 @@
     </div>
 
     <p
-      class="mt-3 text-center text-rose-700 font-semibold text-base sm:text-sm leading-relaxed"
+      class="mt-3 text-center text-rose-800 font-semibold text-base sm:text-sm leading-relaxed"
     >
       {$t('home.split.calc.punch')}
     </p>

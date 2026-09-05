@@ -82,7 +82,7 @@
         </div>
         {#if i < 2}
           <div
-            class="text-center text-gold text-xl leading-none"
+            class="text-center text-barbi text-xl leading-none"
             aria-hidden="true"
           >
             ↓
@@ -127,7 +127,7 @@
       </p>
       <button
         type="button"
-        class="mt-2 self-start text-barbi font-bold text-base sm:text-sm underline underline-offset-4 hover:text-rose-700 dark:text-gold transition-colors"
+        class="mt-2 self-start text-barbi dark:text-gold font-bold text-base sm:text-sm underline underline-offset-4 hover:text-rose-700 dark:hover:text-surfaceInk transition-colors"
         onclick={onConsensus}
       >
         {$t('home.split.b5_link')}

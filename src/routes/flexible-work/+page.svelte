@@ -108,7 +108,7 @@
   dir={$isRtl ? 'rtl' : 'ltr'}
 >
   <header class="w-full max-w-xl text-center">
-    <p class="text-barbi font-bold text-base sm:text-sm tracking-widest mb-2">
+    <p class="text-barbi dark:text-gold font-bold text-base sm:text-sm tracking-widest mb-2">
       {$t('flexible.hero.eyebrow')}
     </p>
     <h1
@@ -231,7 +231,7 @@
             class="flex items-start gap-3 text-slate-800 dark:text-surfaceInk text-base sm:text-sm leading-relaxed text-start"
           >
             <span
-              class="shrink-0 mt-0.5 w-6 h-6 rounded-full bg-barbi/15 text-barbi flex items-center justify-center text-sm font-bold"
+              class="shrink-0 mt-0.5 w-6 h-6 rounded-full bg-barbi/15 dark:bg-gold/20 text-barbi dark:text-gold flex items-center justify-center text-sm font-bold"
               >!</span
             >
             <span>{$t(`flexible.honest.${h}`)}</span>
@@ -260,7 +260,7 @@
               {$t(`flexible.open.${key}`)}
             </span>
             <span
-              class="text-barbi font-semibold text-base sm:text-sm group-hover:underline whitespace-nowrap"
+              class="text-barbi dark:text-gold font-semibold text-base sm:text-sm group-hover:underline whitespace-nowrap"
             >
               {$t('flexible.open.view')} {$isRtl ? '‹' : '›'}
             </span>
@@ -326,7 +326,7 @@
     <p>
       <a
         href="/"
-        class="text-barbi font-semibold text-base sm:text-sm underline decoration-barbi/40 underline-offset-4 hover:text-gold"
+        class="text-barbi dark:text-gold font-semibold text-base sm:text-sm underline decoration-barbi/40 underline-offset-4 hover:text-rose-800 dark:hover:text-surfaceInk"
       >
         {$t('flexible.back')} {$isRtl ? '←' : '→'}
       </a>

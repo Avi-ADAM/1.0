@@ -83,7 +83,7 @@
   dir={$isRtl ? 'rtl' : 'ltr'}
 >
   <header class="w-full max-w-xl text-center">
-    <p class="text-barbi font-bold text-base sm:text-sm tracking-widest mb-2">
+    <p class="text-barbi dark:text-gold font-bold text-base sm:text-sm tracking-widest mb-2">
       {$t('join.hero.eyebrow')}
     </p>
     <h1
@@ -168,7 +168,7 @@
               {$t(`join.open.${key}`)}
             </span>
             <span
-              class="text-barbi font-semibold text-base sm:text-sm group-hover:underline whitespace-nowrap"
+              class="text-barbi dark:text-gold font-semibold text-base sm:text-sm group-hover:underline whitespace-nowrap"
             >
               {$t('join.open.view')} {$isRtl ? '‹' : '›'}
             </span>
@@ -251,7 +251,7 @@
     <p>
       <a
         href="/"
-        class="text-barbi font-semibold text-base sm:text-sm underline decoration-barbi/40 underline-offset-4 hover:text-gold"
+        class="text-barbi dark:text-gold font-semibold text-base sm:text-sm underline decoration-barbi/40 underline-offset-4 hover:text-rose-800 dark:hover:text-surfaceInk"
       >
         {$t('join.back')} {$isRtl ? '←' : '→'}
       </a>

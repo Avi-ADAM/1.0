@@ -78,7 +78,7 @@
   <!-- Hero. The pain is here and nowhere after it. -->
   <header class="w-full max-w-xl text-center">
     <p
-      class="text-barbi font-bold text-base sm:text-sm tracking-widest mb-2"
+      class="text-barbi dark:text-gold font-bold text-base sm:text-sm tracking-widest mb-2"
     >
       {$t('noboss.hero.eyebrow')}
     </p>
@@ -211,7 +211,7 @@
     <p class="mt-6">
       <a
         href="/"
-        class="text-barbi font-semibold text-base sm:text-sm underline decoration-barbi/40 underline-offset-4 hover:text-gold"
+        class="text-barbi dark:text-gold font-semibold text-base sm:text-sm underline decoration-barbi/40 underline-offset-4 hover:text-rose-800 dark:hover:text-surfaceInk"
       >
         {$t('noboss.close.back')} {$isRtl ? '←' : '→'}
       </a>

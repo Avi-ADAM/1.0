@@ -223,7 +223,7 @@
   {#key active}
     <div class="min-h-[330px] p-3 sm:p-4" in:fade={{ duration: 250 }}>
       {#if active === 'lev'}
-        <p class="text-xs font-semibold text-white/40 uppercase tracking-wider mb-1">
+        <p class="text-xs font-semibold text-white/70 uppercase tracking-wider mb-1">
           {$t('home.peek.lev.header')}
         </p>
         <p class="text-center text-gold/90 text-sm mb-3">{$t('home.peek.lev.hint')}</p>
@@ -268,7 +268,7 @@
                   <span class="block text-sm font-bold text-slate-800 truncate"
                     >{levCards[cardIdx].project}</span
                   >
-                  <span class="block text-[11px] text-amber-700 font-semibold"
+                  <span class="block text-[11px] text-amber-900 font-semibold"
                     >{levCards[cardIdx].type}</span
                   >
                 </span>
@@ -368,7 +368,7 @@
                   <div class="w-px bg-slate-100"></div>
                   <button
                     type="button"
-                    class="flex-1 py-3 text-green-600 font-bold text-sm hover:bg-green-50 transition-colors"
+                    class="flex-1 py-3 text-green-700 font-bold text-sm hover:bg-green-50 transition-colors"
                     onclick={approve}
                     >✓ {$t('home.peek.lev.approve')}</button
                   >
@@ -394,7 +394,7 @@
               {/if}
             </div>
           </div>
-          <p class="text-center text-white/40 text-xs mt-2">
+          <p class="text-center text-white/70 text-xs mt-2">
             {cardIdx + 1} / {levCards.length}
           </p>
         {:else}
@@ -428,7 +428,7 @@
           {/each}
         </div>
 
-        <p class="text-xs font-semibold text-white/40 uppercase tracking-wider mt-3 mb-2">
+        <p class="text-xs font-semibold text-white/70 uppercase tracking-wider mt-3 mb-2">
           {$t('home.peek.hub.shortcuts')}
         </p>
         <div class="flex gap-2 flex-wrap">
@@ -446,7 +446,7 @@
           {/each}
         </div>
 
-        <p class="text-xs font-semibold text-white/40 uppercase tracking-wider mt-4 mb-2">
+        <p class="text-xs font-semibold text-white/70 uppercase tracking-wider mt-4 mb-2">
           {$t('home.peek.hub.feedTitle')}
         </p>
         <div class="space-y-2">
@@ -463,7 +463,7 @@
           {/each}
         </div>
       {:else if active === 'mission'}
-        <p class="text-xs font-semibold text-white/40 uppercase tracking-wider mb-2">
+        <p class="text-xs font-semibold text-white/70 uppercase tracking-wider mb-2">
           {$t('home.peek.mission.header')}
         </p>
         <div class="rounded-2xl bg-white/5 border border-white/10 p-4">
@@ -495,7 +495,7 @@
           <EntityIcon kind="idea" size={13} /> {$t('home.peek.mission.equity')}
         </p>
       {:else}
-        <p class="text-xs font-semibold text-white/40 uppercase tracking-wider mb-2">
+        <p class="text-xs font-semibold text-white/70 uppercase tracking-wider mb-2">
           {$t('home.peek.vote.header')}
         </p>
         <div class="rounded-2xl bg-white/5 border border-white/10 p-4">
