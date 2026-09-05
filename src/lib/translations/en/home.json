@@ -212,7 +212,8 @@
         "cost": "New expense",
         "sale": "New product"
       }
-    }
+    },
+    "depthCta": "How the calculation works"
   },
   "platform": {
     "projectMgmt_t": "Your whole project at a glance",

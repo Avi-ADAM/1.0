@@ -1,0 +1,30 @@
+{
+  "meta": {
+    "title": "Business partnership management and contribution-based profit split | 1lev1",
+    "description": "Fifty-fifty is not fairness, it is giving up on the arithmetic. Here is how to measure what each partner actually gave - in time, money and equipment - and derive the split from it. With a calculator you can run on your own numbers."
+  },
+  "hero": {
+    "eyebrow": "◈ Already have a partnership? ◈",
+    "h1": "How to split profits between partners without arguing about fifty-fifty",
+    "sub": "The homepage showed you the problem and the calculator. What sits underneath them is here: why the four failures of fifty-fifty belong to the method rather than to the partners, how the calculation works step by step, and what transparency buys once it is in place."
+  },
+  "calc": {
+    "title": "Now on your own numbers",
+    "sub": "The same calculation that runs on real rikma data. Change the hours, the investments and the sales, and watch what it does to the comparison against fifty-fifty."
+  },
+  "doubts": {
+    "title": "What partnerships ask before they move their books",
+    "q1_q": "We are already fifty-fifty partners. Can we switch without reopening everything?",
+    "q1_a": "Yes. You can start logging from today onward without touching history - the calculation covers the period you started from. And if you want to bring the past in, you can enter it as prior contributions, provided every partner approves them.",
+    "q2_q": "What about contributions that are hard to measure - contacts, reputation, the idea?",
+    "q2_a": "They enter like any other contribution: someone proposes a value, and the partners either approve it or propose a different one. The system does not decide what a contact is worth - it only makes sure the number is agreed and recorded rather than an argument that returns every quarter.",
+    "q3_q": "Is this legally binding on us?",
+    "q3_a": "The system runs the consent and the arithmetic; it does not replace a legal agreement. Many partnerships use it precisely to work out what to put in one - because for the first time there are agreed numbers to write down."
+  },
+  "close": {
+    "title": "Ready to start measuring?",
+    "sub": "You can open a rikma and invite your partners in a few minutes. Logging starts with the next hour, not the next month.",
+    "cta": "Open a rikma",
+    "back": "Back to the homepage"
+  }
+}

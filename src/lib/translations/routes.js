@@ -44,6 +44,9 @@ export const ROUTED = {
     // The "instead of a boss" track page. Its own copy only - the teaser that
     // points at it from the homepage lives in `home`, which loads everywhere.
     noboss: at('/no-boss'),
+    // The "I already have a partnership" track. The hook and the calculator
+    // stay on the homepage in `home`; only the depth behind them is gated.
+    partnership: at('/partnership'),
     // The page behind the product - why consent is re-checked at every step.
     // One route, one namespace; the homepage teaser for it lives in `home`.
     why: at('/why'),

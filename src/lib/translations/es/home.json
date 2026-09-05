@@ -213,7 +213,8 @@
         "cost": "Nuevo gasto",
         "sale": "Nuevo producto"
       }
-    }
+    },
+    "depthCta": "Cómo funciona el cálculo"
   },
   "platform": {
     "projectMgmt_t": "Todo tu proyecto de un vistazo",

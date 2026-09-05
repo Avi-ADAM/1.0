@@ -1,0 +1,30 @@
+{
+  "meta": {
+    "title": "Gestión de sociedades y reparto de beneficios por aportación | 1lev1",
+    "description": "El cincuenta-cincuenta no es equidad, es renunciar al cálculo. Así se mide lo que cada socio aportó de verdad - en tiempo, dinero y equipo - y de ahí sale el reparto. Con una calculadora que puedes probar con tus propios números."
+  },
+  "hero": {
+    "eyebrow": "◈ ¿Ya tienes una sociedad? ◈",
+    "h1": "Cómo repartir beneficios entre socios sin discutir por el cincuenta-cincuenta",
+    "sub": "La página de inicio te mostró el problema y la calculadora. Lo que hay debajo está aquí: por qué los cuatro fallos del cincuenta-cincuenta son del método y no de los socios, cómo funciona el cálculo paso a paso y qué aporta la transparencia una vez instalada."
+  },
+  "calc": {
+    "title": "Ahora con tus propios números",
+    "sub": "El mismo cálculo que corre sobre datos de una rikma real. Cambia las horas, las inversiones y las ventas, y mira qué le hace a la comparación frente al cincuenta-cincuenta."
+  },
+  "doubts": {
+    "title": "Lo que preguntan las sociedades antes de mover sus cuentas",
+    "q1_q": "Ya somos socios al cincuenta por ciento. ¿Podemos cambiar sin reabrirlo todo?",
+    "q1_a": "Sí. Podéis empezar a registrar desde hoy sin tocar el historial: el cálculo cubre el periodo desde el que empezasteis. Y si queréis incorporar el pasado, se puede introducir como aportaciones previas, siempre que todos los socios las aprueben.",
+    "q2_q": "¿Y las aportaciones difíciles de medir: contactos, reputación, la idea?",
+    "q2_a": "Entran como cualquier otra aportación: alguien propone un valor y los socios lo aprueban o proponen otro. El sistema no decide cuánto vale un contacto; solo se asegura de que la cifra esté acordada y registrada, en lugar de ser una discusión que vuelve cada trimestre.",
+    "q3_q": "¿Nos obliga legalmente?",
+    "q3_a": "El sistema gestiona el consenso y el cálculo; no sustituye a un acuerdo legal. Muchas sociedades lo usan precisamente para saber qué poner en uno, porque por primera vez hay cifras acordadas que escribir."
+  },
+  "close": {
+    "title": "¿Empezamos a medir?",
+    "sub": "Puedes abrir una rikma e invitar a tus socios en unos minutos. El registro empieza con la próxima hora, no con el próximo mes.",
+    "cta": "Abrir una rikma",
+    "back": "Volver a la página de inicio"
+  }
+}

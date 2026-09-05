@@ -29,14 +29,6 @@
    * a JSDoc cast inside a template expression does not.
    */
   /** @type {[import('$lib/celim/icons/entityIcons').EntityIconKind, string][]} */
-  const SPLIT_CARDS = [
-    ['search', 'b1'],
-    ['votes', 'b2'],
-    ['target', 'b3'],
-    ['opportunity', 'b4']
-  ];
-
-  /** @type {[import('$lib/celim/icons/entityIcons').EntityIconKind, string][]} */
   const PLATFORM_FEATURES = [
     ['folders', 'projectMgmt'],
     ['maagad', 'negotiation'],
@@ -752,120 +744,34 @@
           {/each}
         </div>
 
+
+        <!-- The formula stays: it is the whole claim in one line, and the
+             reader has just been shown four ways its absence breaks a
+             partnership. What moved to /partnership is the explaining around
+             it - why those four are the method's fault, the three steps the
+             mechanism runs, and what transparency buys. -->
         <p
-          class="mt-4 bg-cyan-50/60 backdrop-blur-sm border-2 border-gold rounded-2xl px-4 py-3 text-slate-900 text-base sm:text-sm leading-relaxed text-center shadow"
+          class="mt-6 rounded-2xl border-2 border-gold bg-gradient-to-br from-amber-100 via-amber-50 to-rose-50 px-4 py-4 text-center text-rose-700 font-bold text-lg sm:text-base shadow-lg"
         >
-          {$t('home.split.blame')}
+          {$t('home.split.formula')}
         </p>
 
-        <!-- הפתרון: פשוט לחשב -->
-        <div
-          class="mt-6 rounded-2xl border-2 border-gold bg-gradient-to-br from-amber-100 via-amber-50 to-rose-50 px-4 py-5 shadow-lg"
-        >
-          <h3
-            class="text-rose-700 font-bold text-2xl sm:text-xl mb-1 text-center"
-          >
-            {$t('home.split.solutionTitle')}
-          </h3>
-          <p
-            class="text-slate-800 text-base sm:text-sm leading-relaxed text-center mb-4"
-          >
-            {$t('home.split.solutionLead')}
-          </p>
-          <div class="flex flex-col gap-2">
-            {#each ['step1', 'step2', 'step3'] as s, i}
-              <div
-                class="flex items-start gap-3 bg-cyan-50/80 border border-gold/60 rounded-xl px-3 py-3"
-              >
-                <span
-                  class="shrink-0 w-7 h-7 rounded-full bg-barbi text-gold font-bold flex items-center justify-center text-sm"
-                  >{i + 1}</span
-                >
-                <div class="text-start">
-                  <h4 class="text-rose-700 font-bold text-lg sm:text-base">
-                    {$t(`home.split.${s}_t`)}
-                  </h4>
-                  <p class="text-slate-800 text-base sm:text-sm leading-relaxed">
-                    {$t(`home.split.${s}_d`)}
-                  </p>
-                </div>
-              </div>
-              {#if i < 2}
-                <div
-                  class="text-center text-gold text-xl leading-none"
-                  aria-hidden="true"
-                >
-                  ↓
-                </div>
-              {/if}
-            {/each}
-          </div>
-          <p
-            class="mt-4 text-center text-rose-700 font-bold text-lg sm:text-base"
-          >
-            {$t('home.split.formula')}
-          </p>
-        </div>
-
-        <!-- ולא רק להסביר את הנוסחה — להריץ אותה. אותו חישוב שרץ ב‑
-             `prPr/hachcal.svelte` על נתוני ריקמה אמיתית, עם מספרים לשחק בהם
-             ובלי הרשמה. -->
+        <!-- And not only state the formula - run it. The same calculation
+             `prPr/hachcal.svelte` runs on real rikma data, with numbers to
+             play with and no signup. It is the strongest thing on the page,
+             so it stays on the page. -->
         <div class="mt-6">
           <SplitCalculator />
         </div>
 
-        <!-- מה זה נותן בפועל -->
-        <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {#each SPLIT_CARDS as [icon, key] (key)}
-            <div
-              class="bg-cyan-50/70 backdrop-blur-sm border-2 border-gold rounded-lg p-4 shadow flex flex-col"
-            >
-              <div class="mb-1"><EntityIcon kind={icon} size={24} tone="brand" /></div>
-              <h3 class="text-rose-700 font-bold text-lg sm:text-base mb-1">
-                {$t(`home.split.${key}_t`)}
-              </h3>
-              <p class="text-slate-800 text-base sm:text-sm leading-relaxed">
-                {$t(`home.split.${key}_d`)}
-              </p>
-            </div>
-          {/each}
-
-          <!-- החישוב מכריע כמה כל אחד לקח; ההצבעות מכריעות מה בכלל עושים.
-               כרטיס רחב כי זו הפסקה היחידה כאן שמובילה הלאה — למנוע ההסכמה. -->
-          <div
-            class="sm:col-span-2 bg-cyan-50/70 backdrop-blur-sm border-2 border-barbi/60 rounded-lg p-4 shadow flex flex-col"
-          >
-            <div class="mb-1"><EntityIcon kind="maagad" size={24} tone="brand" /></div>
-            <h3 class="text-rose-700 font-bold text-lg sm:text-base mb-1">
-              {$t('home.split.b5_t')}
-            </h3>
-            <p class="text-slate-800 text-base sm:text-sm leading-relaxed">
-              {$t('home.split.b5_d')}
-            </p>
-            <button
-              type="button"
-              class="mt-2 self-start text-barbi font-bold text-base sm:text-sm underline underline-offset-4 hover:text-rose-700 transition-colors"
-              onclick={() => scrollToId('consensus')}
-            >
-              {$t('home.split.b5_link')}
-            </button>
-          </div>
-        </div>
-
-        <p
-          class="mt-4 text-center bg-cyan-50/60 backdrop-blur-sm border border-gold/70 rounded-2xl px-4 py-3 text-slate-800 text-base sm:text-sm leading-relaxed"
-        >
-          {$t('home.split.more')}
-        </p>
-
         <div class="mt-5 flex flex-wrap gap-3 justify-center">
-          <button
-            type="button"
+          <a
+            href="/partnership"
+            data-sveltekit-prefetch
             class="bg-barbi hover:bg-white hover:text-barbi text-gold font-bold text-lg sm:text-base px-6 py-3 rounded-2xl shadow-lg hover:scale-105 transition-all duration-300"
-            onclick={() => gotoRegister()}
           >
-            {$t('home.split.cta')}
-          </button>
+            {$t('home.split.depthCta')} {$isRtl ? '\u2190' : '\u2192'}
+          </a>
           <button
             type="button"
             class="bg-gold hover:bg-barbi hover:text-gold text-barbi font-bold text-lg sm:text-base px-6 py-3 rounded-2xl shadow-lg hover:scale-105 transition-all duration-300 border-2 border-gold"

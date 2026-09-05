@@ -81,6 +81,7 @@ const PAGES = [
   // through in a single scroll. High priority: it is a landing page for its
   // own search intent, not a supporting page.
   { path: '/no-boss', lastmod: '2026-09-04T00:00:00+00:00', priority: '0.85', changefreq: 'monthly' },
+  { path: '/partnership', lastmod: '2026-09-05T00:00:00+00:00', priority: '0.85', changefreq: 'monthly' },
 
   // Entry points into the product
   { path: '/wish/new', lastmod: '2026-08-13T00:00:00+00:00', priority: '0.85', changefreq: 'monthly' },
