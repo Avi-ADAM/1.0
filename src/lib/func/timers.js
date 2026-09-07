@@ -246,7 +246,11 @@ export async function saveTimer(timer, missionID, fetch, isSer = false, tasks = 
       sessionHoursThisMonth,
       stname: "saved",
       x: 0,
-      tasks: tasks || [],
+      // Same rule as the links/files below: a caller that says nothing about
+      // the acts must not wipe the ones already linked to this timer. The
+      // dialog always hands over the list it is showing (an empty array is how
+      // "I unlinked them all" sticks); the bot and the MCP agent pass null.
+      ...(Array.isArray(tasks) ? { tasks: tasks.map((id) => id.toString()) } : {}),
       saveText: (saveText || '').trim(),
       // Only sent when the caller actually has an opinion — the server tells
       // "no field" (leave the timer's attachments alone) from "an empty field"

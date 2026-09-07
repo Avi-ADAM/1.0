@@ -1,5 +1,9 @@
 <script>
-  import { startTimer, stopTimer } from '$lib/func/timers.js';
+  import {
+    applyTimerState,
+    startMissionTimer,
+    stopMissionTimer
+  } from '$lib/timers/timerControls.js';
   import NumberFlow, { NumberFlowGroup } from '@number-flow/svelte';
   import { untrack } from 'svelte';
   import { page } from '$app/state';
@@ -127,110 +131,30 @@
   );
 
   // 4. Simplified Actions (Call API -> Update Store)
+  // The optimistic start/stop dance lives in $lib/timers/timerControls.js — the
+  // business theme drives the very same store from a list view.
 
-  // Helper to update global store
+  /**
+   * @param {boolean} running
+   * @param {any} [res]
+   */
   function updateStore(running, res = null) {
-    updateTimers(
-      $timers.map((t) =>
-        t.mId === missionId
-          ? {
-              ...t,
-              running: running,
-              attributes: {
-                ...t.attributes,
-                activeTimer: {
-                  ...t.attributes.activeTimer,
-                  data: res || t.attributes.activeTimer.data,
-                  isActive: running
-                }
-              }
-            }
-          : t
-      )
-    );
+    applyTimerState(missionId, running, res);
   }
 
   async function handleStart() {
-    const now = new Date().toISOString();
-
-    // 0. Capture current state for the API call
-    // This prevents the optimistic update from making the API call think the timer is already active/inactive
-    const activeTimerToStart = timer.attributes?.activeTimer;
-    const currentData = activeTimerToStart?.data;
-    const currentMissionId = timer.mId;
-    const currentProjectId = timer.projectId;
-    const currentTimerId = currentData?.attributes?.saved
-      ? 0
-      : currentData?.id || 0;
-
-    // 1. Create optimistic data with new running segment
-    const currentTimers = currentData?.attributes?.timers || [];
-    const optimisticTimers = [...currentTimers, { start: now, stop: null }];
-
-    const optimisticData = {
-      ...currentData,
-      id: currentData?.id,
-      attributes: {
-        ...currentData?.attributes,
-        isActive: true,
-        timers: optimisticTimers
-      }
-    };
-
-    // 2. Apply optimistic update to UI immediately
-    updateStore(true, optimisticData);
-
-    // 3. Perform actual server-side action with pre-update data
-    try {
-      const res = await startTimer(
-        activeTimerToStart,
-        currentMissionId,
-        page.data.uid,
-        currentProjectId,
-        fetch,
-        currentTimerId,
-        false
-      );
-      if (res) updateStore(true, res);
-    } catch (e) {
-      console.error('Start failed', e);
-      // Revert if failed
-      updateStore(false);
-    }
+    await startMissionTimer(timer, page.data.uid);
   }
 
   async function handleStop() {
-    // 0. Capture current state for the API call
-    const timerDataToStop = timer.attributes?.activeTimer?.data;
-    const currentProjectId = timer.projectId;
+    const stopped = await stopMissionTimer(timer, page.data.uid);
+    if (!stopped) return;
 
-    // 1. Apply optimistic update
-    updateStore(false);
-
-    // 2. Perform actual server-side action
-    try {
-      const res = await stopTimer(
-        timerDataToStop,
-        fetch,
-        false,
-        currentProjectId,
-        page.data.uid
-      );
-
-      if (res) {
-        updateStore(false, res);
-
-        // Show dialog logic
-        const { hours, minutes, seconds } = getTimeComponents(localZman);
-        elapsedTime = `${hours}:${minutes}:${seconds}`;
-        showSaveDialog = true;
-        lockTimerForEdit(missionId);
-        dialogEdit = false;
-      }
-    } catch (e) {
-      console.error('Stop failed', e);
-      updateStore(true); // Revert
-    }
+    const { hours, minutes, seconds } = getTimeComponents(localZman);
+    elapsedTime = `${hours}:${minutes}:${seconds}`;
+    showSaveDialog = true;
+    lockTimerForEdit(missionId);
+    dialogEdit = false;
   }
 
   async function handleToggleTimer() {
@@ -274,7 +198,7 @@
   bind:elapsedTime
   bind:selectedTasks
   bind:taskSearchTerm
-  onUpdate-timer={({ detail }) => {
+  onUpdateTimer={(detail) => {
     if (detail.timer) {
       // Ensure store is updated based on the event result
       updateStore(detail.running, detail.timer);
@@ -300,7 +224,7 @@
         localZman = 0;
       }
     } else {
-      console.warn('update-timer event received without timer data:', detail);
+      console.warn('timer update reported without timer data:', detail);
       updateStore(false);
     }
   }}

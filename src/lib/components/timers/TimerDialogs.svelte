@@ -71,6 +71,28 @@
     });
   });
 
+  // Which acts this timer's hours are attributed to.
+  //
+  // Seeded here, from the timer itself, rather than trusting every caller to do
+  // it: an empty list is no longer "no opinion" on save, it is "unlink them
+  // all", so a dialog that opened with every box unticked would quietly drop
+  // the acts the member had linked. `timer.svelte` seeds its own copy and finds
+  // this a no-op; `ProTimerRow` does not, and used to lose them.
+  let seededTasksFor = null;
+  $effect(() => {
+    const active = timer?.attributes?.activeTimer?.data;
+    const timerId = active?.id ?? null;
+    const acts = active?.attributes?.acts?.data;
+    untrack(() => {
+      // Once per timer: re-running after the member unticks a box would put
+      // it straight back.
+      if (timerId == null || seededTasksFor === timerId) return;
+      seededTasksFor = timerId;
+      if (selectedTasks.length) return;
+      if (acts?.length) selectedTasks = acts.map((task) => task.id);
+    });
+  });
+
   // ── Evidence: the links and files that go with the note ────────────────────
   // A sentence is often not the account of the work — the account is a PR, a
   // document, a recording, a file. Both ride with `saveText` into the timer,
@@ -281,7 +303,7 @@
         showSaveDialog = false;
         dialogEdit = false;
         selectedTasks =
-          timer?.attributes.activeTimer?.data?.attributes.acts.data.map(
+          timer?.attributes?.activeTimer?.data?.attributes?.acts?.data?.map(
             (task) => task.id
           ) ?? [];
         taskSearchTerm = '';
@@ -305,8 +327,10 @@
       return;
     }
 
-    const tasksToSave =
-      selectedTasks && selectedTasks.length > 0 ? selectedTasks : null;
+    // Always an array: the list the member is looking at *is* their answer, so
+    // unticking everything has to reach the server as "no acts" rather than as
+    // "no opinion". saveTimer only omits the field when it is handed null.
+    const tasksToSave = Array.isArray(selectedTasks) ? selectedTasks : [];
 
     const result = await saveTimer(
       timer,
@@ -398,15 +422,26 @@
       ? $t('timers.stoppedAfter', { duration: lastTimerDuration })
       : $t('timers.noTimerYet')
   );
+  // The acts this timer's hours can be attributed to: every act still open on
+  // *this member's own* mission-in-progress.
+  //
+  // This list used to also require `myIshur` — the assignee's acceptance —
+  // which is a flag nothing sets on an act that was never assigned to an
+  // individual (an act opened on the mission itself, one opened to a role, one
+  // that came in through the external Tasks API) and that legacy rows carry as
+  // NULL. On those missions the whole chooser vanished: the section is drawn
+  // `{#if …length}`, so an empty filter reads as "this mission has no tasks".
+  // Acceptance is about who owes the work, not about which act an hour belongs
+  // to, so it is no longer asked here; `naasa` (already reported done) is.
+  let linkableTasks = $derived(
+    timer?.attributes?.acts?.data?.filter((task) => !task.attributes?.naasa) ?? []
+  );
   let filteredTasks = $derived(
-    timer?.attributes?.acts?.data?.filter(
-      (task) =>
-        !task.attributes.naasa &&
-        task.attributes.myIshur &&
-        task.attributes.shem
-          .toLowerCase()
-          .includes(taskSearchTerm.toLowerCase())
-    ) || []
+    linkableTasks.filter((task) =>
+      (task.attributes?.shem ?? '')
+        .toLowerCase()
+        .includes(taskSearchTerm.toLowerCase())
+    )
   );
 </script>
 
@@ -549,7 +584,7 @@
       </button>
       <div class="dialog-content mt-4" dir={$isRtl ? 'rtl' : 'ltr'}>
         <h2 class="dialog-title">{$t('timers.saveTimer')}</h2>
-        {#if filteredTasks.length}
+        {#if linkableTasks.length}
           <h3>{$t('timers.chooseTasks')}</h3>
           <div class="task-selection">
             <input
@@ -560,7 +595,7 @@
             />
 
             <div class="task-list d">
-              {#each filteredTasks as task}
+              {#each filteredTasks as task (task.id)}
                 <label class="task-item">
                   <input
                     type="checkbox"
@@ -569,6 +604,11 @@
                   />
                   <span>{task.attributes.shem}</span>
                 </label>
+              {:else}
+                <!-- The search, not the mission, is what emptied the list —
+                     say so instead of leaving a blank box that reads like
+                     "you have no tasks". -->
+                <p class="task-empty">{$t('timers.noTasksMatch')}</p>
               {/each}
             </div>
           </div>
@@ -1069,5 +1109,138 @@
 
   .task-item:hover {
     background: rgba(255, 255, 255, 0.1);
+  }
+
+  .task-empty {
+    opacity: 0.7;
+    font-size: 0.9rem;
+    padding: 0.25rem 0.5rem;
+  }
+
+  /* ── Business skin ──────────────────────────────────────────────────────
+     The dialog's own palette is the personal theme's: a black→azure wash with
+     cyan headings, neon-green and hot-pink gradient buttons. Opened off the
+     business timers page it reads as a different product. Rather than
+     re-authoring a thousand lines, this block repaints only what carries
+     colour — off the same surface tokens the page uses — so the dialog lands
+     in whichever theme the page around it is wearing.
+
+     `.timer-dialog` is portaled to <body>, hence the :global() on the shell;
+     everything inside it is ordinary markup of this component and keeps its
+     scope class, so `:global(html.business) .x` is enough for the rest. */
+  :global(html.business [data-svelte-dialog-content].timer-dialog) {
+    background: var(--surface);
+    color: var(--surface-ink);
+    border: 1px solid var(--surface-line);
+    border-radius: var(--radius-theme, 4px);
+    box-shadow: var(--shadow-theme);
+  }
+  :global(html.business) .close-button {
+    color: var(--surface-muted);
+  }
+  :global(html.business) .close-button:hover {
+    background: var(--gold-dd);
+    /* A quarter-turn on a close button is decoration, not feedback. */
+    transform: none;
+  }
+  :global(html.business) .dialog-title {
+    color: var(--surface-ink);
+    font-size: 1.15rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+  :global(html.business) .dialog-message {
+    font-size: 0.95rem;
+    color: var(--surface-muted);
+  }
+
+  /* Buttons: one accent for the affirmative action, an outline for the rest.
+     No gradients, no lift on hover. */
+  :global(html.business) .save-btn,
+  :global(html.business) .clear-btn,
+  :global(html.business) .recalc-btn,
+  :global(html.business) .clear-all-btn {
+    border-radius: var(--radius-theme, 4px);
+    font-weight: 600;
+    background: transparent;
+    border: 1px solid var(--border-g);
+    color: var(--goldink);
+  }
+  :global(html.business) .save-btn {
+    background: var(--barbi-pink);
+    border-color: var(--barbi-pink);
+    color: var(--gold);
+  }
+  :global(html.business) .clear-btn,
+  :global(html.business) .clear-all-btn {
+    border-color: var(--destructive);
+    color: var(--destructive);
+  }
+  :global(html.business) .save-btn:hover,
+  :global(html.business) .clear-btn:hover,
+  :global(html.business) .recalc-btn:hover,
+  :global(html.business) .clear-all-btn:hover {
+    transform: none;
+    filter: brightness(1.05);
+  }
+
+  /* Inputs and the note field. */
+  :global(html.business) .save-note-label,
+  :global(html.business) .save-evi-busy {
+    color: var(--surface-muted);
+  }
+  :global(html.business) .save-note-input,
+  :global(html.business) .save-evi-input,
+  :global(html.business) .task-search {
+    background: var(--surface-2);
+    border: 1px solid var(--input, var(--surface-line));
+    color: var(--surface-ink);
+  }
+  :global(html.business) .save-note-input::placeholder,
+  :global(html.business) .save-evi-input::placeholder {
+    color: var(--surface-muted);
+  }
+  :global(html.business) .save-note-input:focus,
+  :global(html.business) .save-evi-input:focus {
+    border-color: var(--barbi-pink);
+  }
+  :global(html.business) .save-note-count,
+  :global(html.business) .save-evi-hint,
+  :global(html.business) .save-evi-size,
+  :global(html.business) .save-evi-file,
+  :global(html.business) .save-evi-drop {
+    color: var(--surface-muted);
+  }
+  :global(html.business) .save-evi-add {
+    background: transparent;
+    border-color: var(--border-g);
+    color: var(--goldink);
+  }
+  :global(html.business) .save-evi-file::file-selector-button {
+    background: var(--surface-2);
+    border-color: var(--input, var(--surface-line));
+    color: var(--surface-ink);
+  }
+  :global(html.business) .save-evi-chip {
+    background: var(--surface-2);
+    border-color: var(--surface-line);
+  }
+  :global(html.business) .save-evi-chip a {
+    color: var(--goldink);
+  }
+  :global(html.business) .save-evi-drop:hover,
+  :global(html.business) .save-evi-error {
+    color: var(--destructive);
+  }
+
+  /* The act picker. */
+  :global(html.business) .task-item {
+    background: var(--surface-2);
+    border: 1px solid var(--surface-line);
+    border-radius: var(--radius-theme, 4px);
+  }
+  :global(html.business) .task-item:hover {
+    border-color: var(--barbi-pink);
+    background: var(--surface-2);
   }
 </style>

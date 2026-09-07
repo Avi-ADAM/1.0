@@ -663,30 +663,36 @@
   bind:elapsedTime
   bind:selectedTasks
   bind:taskSearchTerm
-  onUpdate-timer={({ detail }) => {
-    if (detail.timer) {
+  onUpdateTimer={({ timer: updated, running, hoursdon: donenow }) => {
+    // TimerDialogs calls this prop with a plain object. It used to be spelled
+    // `onUpdate-timer` and destructured a `detail` - the shape a Svelte 4
+    // `createEventDispatcher` event had - so the callback was never wired at
+    // all: the card only caught up ~500ms later, when the unlock refetched.
+    if (updated) {
       // Write the result back to the global store (single source of truth);
       // storeTimer/isRunning/zman re-derive automatically.
-      updateStore(detail.running, detail.timer);
-
-      if (detail.hoursdon !== undefined) {
-        updateTimers(
-          $timers.map((t) =>
-            t.mId === mId
-              ? {
-                  ...t,
-                  attributes: {
-                    ...t.attributes,
-                    howmanyhoursalready: detail.hoursdon
-                  }
-                }
-              : t
-          )
-        );
-      }
+      updateStore(running, updated);
     } else {
-      console.warn('update-timer event received without timer data:', detail);
+      // A save answers with { success, missionId } and carries no timer -
+      // that is not a failure, it just means the store has nothing new to
+      // take beyond "this is no longer running".
       updateStore(false);
+    }
+
+    if (donenow !== undefined) {
+      updateTimers(
+        $timers.map((t) =>
+          t.mId === mId
+            ? {
+                ...t,
+                attributes: {
+                  ...t.attributes,
+                  howmanyhoursalready: donenow
+                }
+              }
+            : t
+        )
+      );
     }
   }}
 />

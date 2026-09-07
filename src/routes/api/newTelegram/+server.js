@@ -1,7 +1,13 @@
 // create a server with telegraf to listen for new messages
 import { Telegraf, Markup } from 'telegraf';
 import { sendToSer } from '$lib/send/sendToSer.js';
-import { startTimer, stopTimer, saveTimer, updateTimer } from '$lib/func/timers.js';
+import { startTimer, stopTimer, saveTimer, updateTimer, calculateTotalHours } from '$lib/func/timers.js';
+import {
+    normalizeSaveLink,
+    normalizeSaveLinks,
+    saveLinkLabel,
+    SAVE_LINKS_MAX
+} from '$lib/timers/saveLinks';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { actionService } from '$lib/server/actions/index.js';
 import { normalizeAdminToken } from '$lib/server/adminToken.js';
@@ -45,6 +51,12 @@ const translations = {
         updateTasksBtn: '<<update tasks 📝 עדכון משימות>>',
         saveTimerBtn: '<<save timer 🕒 שמירת טיימר>>',
         timerSaved: 'הטיימר נשמר בהצלחה',
+        timerSaveNotePrompt: '✍️ שלח/י תיאור קצר של מה שעשית בזמן הזה (טקסט חופשי).\nלמחיקת התיאור שלח/י "-", לביטול שלח/י "ביטול".',
+        timerSaveLinkPrompt: '🔗 שלח/י קישור שמגבה את העבודה (PR, מסמך, הקלטה).\nלביטול שלח/י "ביטול".',
+        timerSaveInvalidLink: '❌ הקישור אינו תקין. יש לשלוח כתובת http/https.',
+        timerSaveLinksFull: '❌ אין מקום לקישור נוסף (עד {{count}} קישורים). אפשר לנקות ולהתחיל מחדש.',
+        timerSaveCancelled: 'השמירה בוטלה. השעות נשארו בטיימר וניתן לשמור אותן מאוחר יותר.',
+        timerSaveExpired: 'הכרטיס כבר אינו פעיל. יש להתחיל שמירה מחדש.',
         aiUnderstandError: 'מצטער, לא הצלחתי להבין את בקשתך. נסה/י לנסח אחרת או השתמש/י בכפתורים.',
         aiActionFailed: 'אופסס, אירעה שגיאה בעת ביצוע הפעולה המבוקשת.',
         notRegisteredWelcome: `ברוך הבא לבוט של 1💗1!\n1💗1 היא פלטפורמה לשיתוף פעולה מבוסס הסכמה (${SITE_CONTEXT.split('\n')[1].trim()}).\nנראה שחשבון הטלגרם שלך אינו מקושר עדיין לחשבון משתמש פעיל.`,
@@ -133,6 +145,12 @@ const translations = {
         updateTasksBtn: '<<update tasks 📝>>',
         saveTimerBtn: '<<save timer 🕒>>',
         timerSaved: 'Timer saved successfully',
+        timerSaveNotePrompt: '✍️ Send a short account of what you did in this time (free text).\nSend "-" to clear it, "cancel" to go back.',
+        timerSaveLinkPrompt: '🔗 Send a link backing up the work (PR, document, recording).\nSend "cancel" to go back.',
+        timerSaveInvalidLink: '❌ That is not a valid link. Send an http/https address.',
+        timerSaveLinksFull: '❌ No room for another link (up to {{count}}). You can clear them and start over.',
+        timerSaveCancelled: 'Save cancelled. The hours are still on the timer and can be saved later.',
+        timerSaveExpired: 'This card is no longer active. Start the save again.',
         aiUnderstandError: 'Sorry, I couldn\'t understand your request. Please try rephrasing or use the buttons.',
         aiActionFailed: 'Sorry, an error occurred while performing the requested action.',
         notRegisteredWelcome: `Welcome to the 1💗1 Bot!\n1💗1 is a platform for consent-based collaboration (${SITE_CONTEXT.split('\n')[1].trim()}).\nIt seems your Telegram account is not yet linked to an active user account.`,
@@ -225,6 +243,15 @@ const pendingTask = new Map();
 // value: { projectId, projectName, assignedUserId, assigneeName,
 //          tafkidId, roleName, pendingField: null|'name' }
 
+// State for tracking an in-progress timer save per user — the note and the
+// links the member is attaching before the hours go to the rikma for approval.
+// Same three fields the web dialog offers, minus the file upload (a Telegram
+// document would have to be relayed to /api/upload, which is its own step).
+const pendingTimerSave = new Map();
+// key: userId string
+// value: { missionId, timerId, projectId, missionName, note, links: string[],
+//          pendingField: null|'note'|'link', messageId }
+
 // State for tracking in-progress sale per user
 const pendingSale = new Map();
 // key: userId string
@@ -311,9 +338,16 @@ async function getUserMissions(uid, fetchInstance, onlyStartable = false, onlySt
         return missions.map(item => ({
             id: item.id, name: item.attributes.name,
             projectName: item.attributes.project?.data?.attributes?.projectName || 'N/A',
+            projectId: item.attributes.project?.data?.id || null,
             isActiveTimer: item.attributes.activeTimer?.data?.attributes?.isActive || false,
             timerId: item.attributes.activeTimer?.data?.id || null,
-            tasks: item.attributes.acts?.data?.map(task => ({ id: task.id, name: task.attributes.shem })) || []
+            // The acts an hour can be attributed to: the mission's own, minus
+            // the ones already reported done. Acceptance (`myIshur`) is not
+            // asked — an act opened on the mission or to a role never carries
+            // it, and asking left members with nothing to link.
+            tasks: (item.attributes.acts?.data ?? [])
+                .filter(task => !task.attributes?.naasa)
+                .map(task => ({ id: task.id, name: task.attributes.shem || `#${task.id}` }))
         }));
     } catch (error) {
         console.error(`getUserMissions Error for user ${uid}:`, error);
@@ -496,6 +530,74 @@ function buildSaleCardKeyboard(sale, uid, lang) {
     buttons.push([Markup.button.callback(lang === 'he' ? '✅ שלח מכירה' : '✅ Send Sale', `saleSend-${uid}`)]);
     buttons.push([Markup.button.callback(lang === 'he' ? '❌ ביטול' : '❌ Cancel', `saleCancel-${uid}`)]);
     return Markup.inlineKeyboard(buttons).resize();
+}
+
+// --- Helpers for the timer-save card (note + links) ---
+
+/**
+ * `Finiapruval.why` is a 255-char column and the save copies the note into it,
+ * so the bot holds a member to the same length the web dialog does.
+ */
+const TIMER_NOTE_MAX = 240;
+
+function formatTimerSaveCard(state, lang) {
+    const he = lang === 'he';
+    const lines = [];
+    lines.push(he
+        ? `💾 שמירת טיימר — ${state.missionName}`
+        : `💾 Save timer — ${state.missionName}`);
+    // The hours are the claim the rikma is asked to sign, so the card says how
+    // many before the member signs it - not only after.
+    const hours = (state.hours ?? 0).toFixed(2);
+    lines.push(he ? `⏱️ שעות לשמירה: ${hours}` : `⏱️ Hours to file: ${hours}`);
+    lines.push('');
+    lines.push(he ? `✍️ תיאור: ${state.note || '—'}` : `✍️ Note: ${state.note || '—'}`);
+    if (state.links.length) {
+        lines.push(he ? '🔗 קישורים:' : '🔗 Links:');
+        for (const link of state.links) lines.push(`• ${saveLinkLabel(link)}`);
+    } else {
+        lines.push(he ? '🔗 קישורים: —' : '🔗 Links: —');
+    }
+    return lines.join('\n');
+}
+
+function buildTimerSaveKeyboard(state, uid, lang) {
+    const he = lang === 'he';
+    const buttons = [
+        [
+            Markup.button.callback(he ? '✍️ תיאור' : '✍️ Note', `tsFld-note-${uid}`),
+            Markup.button.callback(he ? '🔗 קישור' : '🔗 Link', `tsFld-link-${uid}`)
+        ]
+    ];
+    if (state.links.length) {
+        buttons.push([
+            Markup.button.callback(he ? '🧹 ניקוי הקישורים' : '🧹 Clear links', `tsLinksClear-${uid}`)
+        ]);
+    }
+    buttons.push([
+        Markup.button.callback(
+            getText('updateTasksBtn', lang),
+            `updateTasks-${state.missionId}-${uid}-${state.timerId}`
+        )
+    ]);
+    buttons.push([
+        Markup.button.callback(
+            he ? '💾 שמירה סופית' : '💾 Save now',
+            `tsGo-${state.missionId}-${uid}-${state.timerId}`
+        )
+    ]);
+    buttons.push([Markup.button.callback(he ? '❌ ביטול' : '❌ Cancel', `tsCancel-${uid}`)]);
+    return Markup.inlineKeyboard(buttons).resize();
+}
+
+/** Draw (or redraw) the card as a fresh message and remember its id. */
+async function showTimerSaveCard(ctx, state, uid, lang) {
+    const msg = await ctx.reply(
+        formatTimerSaveCard(state, lang),
+        buildTimerSaveKeyboard(state, uid, lang)
+    );
+    state.messageId = msg.message_id;
+    return msg;
 }
 
 // פונקציה חדשה למציאת משימות רלוונטיות
@@ -853,7 +955,28 @@ bot.action(/^stopTimer-(\d+)-(\d+)$/, async (ctx) => {
     if (!ctx.answered) await ctx.answerCbQuery();
 });
 
-// Save Timer
+/**
+ * Read the mission the save button was drawn for, and refuse when the mission
+ * has moved on to a different timer - saving then would file the wrong session.
+ */
+async function readTimerForSave(missionId, timerId, fetch) {
+    const timerData = await sendToSer({ missionId: missionId }, '36getMissionTimer', 0, 0, true, fetch);
+    // `saveTimer` takes the **mission**, not a Timer: it reads the mission's
+    // activeTimer and its `howmanyhoursalready`. This used to look for
+    // `mesimabetahalich.attributes.timers`, a field 36getMissionTimer does
+    // not return at all, so `timerToSave` was always undefined and the
+    // button answered "timer not found" every single time.
+    const missionNode = timerData?.data?.mesimabetahalich?.data;
+    const activeTimerId = missionNode?.attributes?.activeTimer?.data?.id;
+    if (!missionNode || !activeTimerId || String(activeTimerId) !== String(timerId)) return null;
+    return missionNode;
+}
+
+// Save Timer - step 1: the save card.
+// Saving used to happen on this very tap, which left a member on Telegram no
+// way to say what the hours were for. The rikma is asked to approve those
+// hours, so the account of them belongs with the claim: the same note and the
+// same links the web dialog collects, gathered here before the save.
 bot.action(/^saveTimer-(\d+)-(\d+)-(\d+)$/, async (ctx) => {
     const missionId = ctx.match[1];
     const userId = ctx.match[2];
@@ -864,26 +987,76 @@ bot.action(/^saveTimer-(\d+)-(\d+)-(\d+)$/, async (ctx) => {
     if (!userInfo || userInfo.uid != userId) return ctx.answerCbQuery(getText('unauthorized', lang));
 
     try {
-        const timerData = await sendToSer({ missionId: missionId }, '36getMissionTimer', 0, 0, true, fetch);
-        // `saveTimer` takes the **mission**, not a Timer: it reads the mission's
-        // activeTimer and its `howmanyhoursalready`. This used to look for
-        // `mesimabetahalich.attributes.timers`, a field 36getMissionTimer does
-        // not return at all, so `timerToSave` was always undefined and the
-        // button answered "timer not found" every single time.
-        const missionNode = timerData?.data?.mesimabetahalich?.data;
-        const activeTimerId = missionNode?.attributes?.activeTimer?.data?.id;
-        if (!missionNode || !activeTimerId || String(activeTimerId) !== String(timerId)) {
-            // The button carries the timer it was drawn for. If the mission has
-            // moved on to another one, saving would file the wrong session.
+        const missionNode = await readTimerForSave(missionId, timerId, fetch);
+        if (!missionNode) {
             await ctx.editMessageReplyMarkup(undefined).catch(() => { });
             ctx.reply(getText('timerNotFound', lang));
             return ctx.answerCbQuery(getText('timerNotFound', lang));
         }
 
-        const projectId = missionNode?.attributes?.project?.data?.id;
-        const savedTimer = await saveTimer(missionNode, missionId, fetch, true, null, projectId, userId);
+        const attrs = missionNode.attributes.activeTimer.data.attributes;
+        const state = {
+            missionId,
+            timerId,
+            projectId: missionNode.attributes.project?.data?.id,
+            missionName: missionNode.attributes.name || '',
+            // Seeded from the timer itself, so a note or a link added in the
+            // app earlier is shown here rather than quietly replaced.
+            note: (attrs.saveText ?? '').toString(),
+            links: normalizeSaveLinks(attrs.saveLinks),
+            hours: calculateTotalHours(attrs.timers ?? []),
+            pendingField: null,
+            messageId: null
+        };
+        pendingTimerSave.set(userInfo.uid.toString(), state);
+
+        await ctx.editMessageReplyMarkup(undefined).catch(() => { });
+        await showTimerSaveCard(ctx, state, userId, lang);
+    } catch (error) {
+        console.error("Error opening the timer save card:", error);
+        await ctx.editMessageReplyMarkup(undefined).catch(() => { });
+        ctx.reply(getText('aiActionFailed', lang));
+    }
+    if (!ctx.answered) await ctx.answerCbQuery();
+});
+
+// Save Timer - step 2: file the hours, with whatever the card collected.
+bot.action(/^tsGo-(\d+)-(\d+)-(\d+)$/, async (ctx) => {
+    const missionId = ctx.match[1];
+    const userId = ctx.match[2];
+    const timerId = ctx.match[3];
+    const userInfo = ctx.state.userInfo;
+    const lang = ctx.state.lang;
+    const fetch = ctx.update.fetch;
+    if (!userInfo || userInfo.uid != userId) return ctx.answerCbQuery(getText('unauthorized', lang));
+
+    const uid = userInfo.uid.toString();
+    const state = pendingTimerSave.get(uid);
+
+    try {
+        const missionNode = await readTimerForSave(missionId, timerId, fetch);
+        if (!missionNode) {
+            await ctx.editMessageReplyMarkup(undefined).catch(() => { });
+            pendingTimerSave.delete(uid);
+            ctx.reply(getText('timerNotFound', lang));
+            return ctx.answerCbQuery(getText('timerNotFound', lang));
+        }
+
+        const projectId = missionNode.attributes.project?.data?.id;
+        const savedTimer = await saveTimer(
+            missionNode, missionId, fetch, true,
+            // No opinion about the acts: whatever the member linked from the
+            // task list stays linked. Passing [] here would unlink them.
+            null,
+            projectId, userId,
+            state?.note ?? '',
+            // The links the card is showing are the member's answer, so an
+            // emptied list is sent as one - that is how a removal sticks.
+            { links: state?.links ?? [] }
+        );
 
         if (savedTimer) {
+            pendingTimerSave.delete(uid);
             await ctx.editMessageReplyMarkup(undefined).catch(() => { });
             // Filled reply with keyboard
             ctx.reply(
@@ -903,6 +1076,57 @@ bot.action(/^saveTimer-(\d+)-(\d+)-(\d+)$/, async (ctx) => {
     if (!ctx.answered) await ctx.answerCbQuery();
 });
 
+// Save Timer - ask for the note / the next link.
+bot.action(/^tsFld-(note|link)-(\d+)$/, async (ctx) => {
+    const field = ctx.match[1];
+    const userId = ctx.match[2];
+    const userInfo = ctx.state.userInfo;
+    const lang = ctx.state.lang;
+    if (!userInfo || userInfo.uid != userId) return ctx.answerCbQuery(getText('unauthorized', lang));
+
+    const state = pendingTimerSave.get(userInfo.uid.toString());
+    if (!state) return ctx.answerCbQuery(getText('timerSaveExpired', lang));
+
+    if (field === 'link' && state.links.length >= SAVE_LINKS_MAX) {
+        return ctx.answerCbQuery(getText('timerSaveLinksFull', lang, { count: SAVE_LINKS_MAX }));
+    }
+
+    state.pendingField = field;
+    await ctx.answerCbQuery();
+    await ctx.reply(getText(field === 'note' ? 'timerSaveNotePrompt' : 'timerSaveLinkPrompt', lang));
+});
+
+// Save Timer - drop every attached link.
+bot.action(/^tsLinksClear-(\d+)$/, async (ctx) => {
+    const userId = ctx.match[1];
+    const userInfo = ctx.state.userInfo;
+    const lang = ctx.state.lang;
+    if (!userInfo || userInfo.uid != userId) return ctx.answerCbQuery(getText('unauthorized', lang));
+
+    const state = pendingTimerSave.get(userInfo.uid.toString());
+    if (!state) return ctx.answerCbQuery(getText('timerSaveExpired', lang));
+
+    state.links = [];
+    state.pendingField = null;
+    await ctx.answerCbQuery();
+    await ctx.editMessageReplyMarkup(undefined).catch(() => { });
+    await showTimerSaveCard(ctx, state, userId, lang);
+});
+
+// Save Timer - leave the card without filing anything. The timer is untouched:
+// its hours stay where they are and can be saved later from anywhere.
+bot.action(/^tsCancel-(\d+)$/, async (ctx) => {
+    const userId = ctx.match[1];
+    const userInfo = ctx.state.userInfo;
+    const lang = ctx.state.lang;
+    if (!userInfo || userInfo.uid != userId) return ctx.answerCbQuery(getText('unauthorized', lang));
+
+    pendingTimerSave.delete(userInfo.uid.toString());
+    await ctx.answerCbQuery();
+    await ctx.editMessageReplyMarkup(undefined).catch(() => { });
+    await ctx.reply(getText('timerSaveCancelled', lang));
+});
+
 // Update Tasks - Show list
 bot.action(/^updateTasks-(\d+)-(\d+)-(\d+)$/, async (ctx) => {
     const missionId = ctx.match[1];
@@ -919,7 +1143,12 @@ bot.action(/^updateTasks-(\d+)-(\d+)-(\d+)$/, async (ctx) => {
         if (!currentMission) throw new Error(`Mission ${missionId} not found`);
 
         const timerData = await sendToSer({ missionId: missionId }, '36getMissionTimer', 0, 0, true, fetch);
-        const activeTimer = timerData?.data?.attributes?.activeTimer?.data;
+        // 36getMissionTimer answers `{ mesimabetahalich: { data } }`. Reading
+        // `data.attributes` straight off the response — as this did — is always
+        // undefined, so "link tasks to the timer" answered "timer not found"
+        // every single time. The same slip was fixed in the save handler once.
+        const missionNode = timerData?.data?.mesimabetahalich?.data;
+        const activeTimer = missionNode?.attributes?.activeTimer?.data;
         if (!activeTimer) {
             await ctx.editMessageReplyMarkup(undefined).catch(() => { });
             ctx.reply(getText('timerNotFound', lang));
@@ -927,7 +1156,7 @@ bot.action(/^updateTasks-(\d+)-(\d+)-(\d+)$/, async (ctx) => {
         }
 
         const allTasks = currentMission.tasks;
-        const selectedTaskIds = activeTimer.attributes.acts?.data?.map(t => t.id) || [];
+        const selectedTaskIds = (activeTimer.attributes.acts?.data ?? []).map(t => String(t.id));
 
         if (!allTasks || allTasks.length === 0) {
             await ctx.editMessageReplyMarkup(undefined).catch(() => { });
@@ -936,13 +1165,15 @@ bot.action(/^updateTasks-(\d+)-(\d+)-(\d+)$/, async (ctx) => {
         }
 
         const taskButtons = allTasks.map(task => {
-            const isSelected = selectedTaskIds.includes(task.id);
+            const isSelected = selectedTaskIds.includes(String(task.id));
             return [Markup.button.callback(`${isSelected ? '✅ ' : '⬜ '}${task.name}`, `toggleTask-${missionId}-${userId}-${timerId}-${task.id}`)];
         });
         taskButtons.push([Markup.button.callback(getText('saveTasksBtn', lang), `saveTasks-${missionId}-${userId}-${timerId}`)]);
         taskButtons.push([Markup.button.callback(getText('backToStart', lang), `timerStart-${userId}`)]);
 
         await ctx.editMessageReplyMarkup(undefined).catch(() => { });
+        // "Save tasks" leads back to the save card when one is in flight, so a
+        // member who came here to link acts is not left holding unsaved hours.
         ctx.reply(getText('selectTasks', lang), Markup.inlineKeyboard(taskButtons).resize());
 
     } catch (error) {
@@ -965,19 +1196,31 @@ bot.action(/^toggleTask-(\d+)-(\d+)-(\d+)-(\d+)$/, async (ctx) => {
     if (!userInfo || userInfo.uid != userId) return ctx.answerCbQuery(getText('unauthorized', lang));
 
     try {
-        const timerData = await sendToSer({ missionId: timerId }, '36getMissionTimer', 0, 0, true, fetch);
-        const activeTimer = timerData?.data?.attributes?.activeTimer?.data;
+        // The query is keyed by the **mission**, not the timer — passing
+        // `timerId` here asked Strapi for a mission that does not exist.
+        const timerData = await sendToSer({ missionId: missionId }, '36getMissionTimer', 0, 0, true, fetch);
+        const missionNode = timerData?.data?.mesimabetahalich?.data;
+        const activeTimer = missionNode?.attributes?.activeTimer?.data;
         if (!activeTimer) throw new Error(`Timer ${timerId} not found.`);
+        const projectId = missionNode?.attributes?.project?.data?.id;
 
         const selectedTasks = activeTimer.attributes.acts?.data || [];
-        const selectedTaskIds = selectedTasks.map(t => t.id);
-        const isCurrentlySelected = selectedTaskIds.includes(taskId);
+        const selectedTaskIds = selectedTasks.map(t => String(t.id));
+        const isCurrentlySelected = selectedTaskIds.includes(String(taskId));
 
         const newSelectedTaskIds = isCurrentlySelected
-            ? selectedTaskIds.filter(id => id != taskId)
-            : [...selectedTaskIds, taskId];
+            ? selectedTaskIds.filter(id => id !== String(taskId))
+            : [...selectedTaskIds, String(taskId)];
 
-        const updatedTimer = await updateTimer(activeTimer, 'tasks', { acts: newSelectedTaskIds, isSer: true }, fetch);
+        // `updateTimer` reads the list off `selectedTaskIds`, and timerLogUpdate
+        // requires the project and the user for its authorization. This call
+        // named the field `acts` and passed neither, so even once it reached the
+        // action it would have sent an empty relation — unlinking everything.
+        const updatedTimer = await updateTimer(
+            activeTimer, 'tasks',
+            { selectedTaskIds: newSelectedTaskIds, isSer: true },
+            fetch, projectId, userId
+        );
 
         if (updatedTimer) {
             const missionDetails = await getUserMissions(userId, fetch);
@@ -987,10 +1230,10 @@ bot.action(/^toggleTask-(\d+)-(\d+)-(\d+)-(\d+)$/, async (ctx) => {
             const task = allTasks.find(t => t.id == taskId);
             const taskName = task ? task.name : `ID ${taskId}`;
 
-            const latestSelectedTaskIds = updatedTimer.attributes.acts?.data?.map(t => t.id) || [];
+            const latestSelectedTaskIds = (updatedTimer.attributes?.acts?.data ?? []).map(t => String(t.id));
 
             const taskButtons = allTasks.map(t => {
-                const isSelected = latestSelectedTaskIds.includes(t.id);
+                const isSelected = latestSelectedTaskIds.includes(String(t.id));
                 return [Markup.button.callback(`${isSelected ? '✅ ' : '⬜ '}${t.name}`, `toggleTask-${missionId}-${userId}-${timerId}-${t.id}`)];
             });
             taskButtons.push([Markup.button.callback(getText('saveTasksBtn', lang), `saveTasks-${missionId}-${userId}-${timerId}`)]);
@@ -1029,6 +1272,14 @@ bot.action(/^saveTasks-(\d+)-(\d+)-(\d+)$/, async (ctx) => {
 
     try {
         await ctx.answerCbQuery(getText('tasksUpdated', lang));
+        const saveState = pendingTimerSave.get(userInfo.uid.toString());
+        if (saveState) {
+            // The member came here from the save card and still has hours to
+            // file - hand the card back rather than ending the flow.
+            await ctx.editMessageText(getText('tasksUpdated', lang));
+            await showTimerSaveCard(ctx, saveState, userId, lang);
+            return;
+        }
         // Filled reply and keyboard
         await ctx.editMessageText(
             getText('tasksUpdated', lang),
@@ -1806,6 +2057,45 @@ bot.on('text', async (ctx) => {
                 pendingEdits.delete(uid);
                 await ctx.reply(getText('aiActionFailed', lang));
             }
+            return;
+        }
+
+        // Handle the note / link a member is attaching to a timer save
+        if (pendingTimerSave.has(uid) && pendingTimerSave.get(uid).pendingField) {
+            const state = pendingTimerSave.get(uid);
+            const field = state.pendingField;
+            const cancelWords = ['ביטול', 'בטל', 'cancel', 'stop', 'quit'];
+            const trimmed = userText.trim();
+
+            if (cancelWords.includes(trimmed.toLowerCase())) {
+                // Only the field is abandoned, not the save: the card comes
+                // back so the member can still file the hours.
+                state.pendingField = null;
+                await showTimerSaveCard(ctx, state, uid, lang);
+                return;
+            }
+
+            if (field === 'note') {
+                state.note = (trimmed === '-') ? '' : trimmed.slice(0, TIMER_NOTE_MAX);
+            } else {
+                const link = normalizeSaveLink(trimmed);
+                if (!link) {
+                    await ctx.reply(getText('timerSaveInvalidLink', lang));
+                    return;
+                }
+                // normalizeSaveLinks is the one that knows the column's width:
+                // if it refuses the new list, the link does not fit and the
+                // member is told instead of losing it silently.
+                const next = normalizeSaveLinks([...state.links, link]);
+                if (!next.includes(link)) {
+                    await ctx.reply(getText('timerSaveLinksFull', lang, { count: SAVE_LINKS_MAX }));
+                    return;
+                }
+                state.links = next;
+            }
+
+            state.pendingField = null;
+            await showTimerSaveCard(ctx, state, uid, lang);
             return;
         }
 

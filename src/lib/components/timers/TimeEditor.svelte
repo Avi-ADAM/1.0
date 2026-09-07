@@ -335,7 +335,15 @@
 
 <style>
   .te {
+    /* Every surface in the editor is one of three fills over its host, and the
+       host is a dark glass panel in the personal theme. Naming them means the
+       business theme can hand the whole editor a light ground in one block
+       instead of chasing thirteen `rgba(255,255,255,…)` literals. */
     --te-line: rgba(255, 255, 255, 0.14);
+    --te-fill: rgba(255, 255, 255, 0.06);
+    --te-fill-2: rgba(255, 255, 255, 0.1);
+    --te-fill-3: rgba(255, 255, 255, 0.12);
+    --te-scheme: dark;
     display: flex;
     flex-direction: column;
     gap: 0.6rem;
@@ -410,11 +418,11 @@
     padding: 0.5rem 0.65rem;
     border: 1px solid var(--te-line);
     border-radius: 8px;
-    background: rgba(255, 255, 255, 0.06);
+    background: var(--te-fill);
   }
 
   .te-row.editing {
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--te-fill-2);
     border-color: rgba(212, 175, 55, 0.55);
   }
 
@@ -483,7 +491,7 @@
   }
 
   .te-field input {
-    background: rgba(255, 255, 255, 0.12);
+    background: var(--te-fill-3);
     border: 1px solid var(--te-line);
     border-radius: 6px;
     color: inherit;
@@ -491,7 +499,7 @@
     font-size: 0.85rem;
     /* The native picker's own glyphs stay legible on the dark surfaces the
        editor sits on. */
-    color-scheme: dark;
+    color-scheme: var(--te-scheme);
   }
 
   .te-form-actions {
@@ -519,7 +527,7 @@
   }
 
   .te-ghost {
-    background: rgba(255, 255, 255, 0.12);
+    background: var(--te-fill-3);
     color: inherit;
     border-color: var(--te-line);
   }
@@ -530,7 +538,7 @@
   }
 
   .te-add {
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--te-fill-2);
     border-color: var(--te-line);
     color: inherit;
   }
@@ -547,7 +555,7 @@
   }
 
   .te-icon:hover {
-    background: rgba(255, 255, 255, 0.12);
+    background: var(--te-fill-3);
   }
 
   .te-icon-danger:hover {
@@ -576,5 +584,48 @@
 
   .te-compact .te-list {
     max-height: 34vh;
+  }
+
+  /* ── Business skin ──────────────────────────────────────────────────────
+     The editor is drawn as glass over a dark host. In the business theme the
+     host is a plain card, so the same three fills become ink-on-paper values
+     off the surface tokens; the two gradient buttons flatten to the theme's
+     one accent, because a "professional" look is mostly the absence of a
+     second one. */
+  :global(html.business) .te {
+    --te-line: var(--surface-line);
+    --te-fill: var(--surface-2);
+    --te-fill-2: var(--surface-2);
+    --te-fill-3: var(--surface);
+    --te-scheme: light dark;
+    color: var(--surface-ink);
+  }
+  :global(html.business) .te-dur {
+    background: var(--surface-2);
+    border: 1px solid var(--surface-line);
+  }
+  :global(html.business) .te-dur.running {
+    background: transparent;
+    border-color: var(--destructive);
+    color: var(--destructive);
+  }
+  :global(html.business) .te-field input,
+  :global(html.business) .te-ghost,
+  :global(html.business) .te-add,
+  :global(html.business) .te-icon {
+    border-color: var(--input, var(--surface-line));
+    color: var(--surface-ink);
+  }
+  :global(html.business) .te-primary {
+    background: var(--barbi-pink);
+    color: var(--gold);
+  }
+  :global(html.business) .te-danger {
+    background: transparent;
+    border-color: var(--destructive);
+    color: var(--destructive);
+  }
+  :global(html.business) .te-error {
+    color: var(--destructive);
   }
 </style>

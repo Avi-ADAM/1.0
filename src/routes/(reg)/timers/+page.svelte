@@ -10,8 +10,14 @@
     cleanupTimerListener,
     timers
   } from '$lib/stores/timers';
+  import { isBusiness } from '$lib/stores/theme';
   import Timer from '$lib/components/timers/timer.svelte';
+  import ProTimers from '$lib/components/timers/ProTimers.svelte';
   let hoverText = '0';
+  // The business theme reads the same store as a work log rather than as an
+  // orbit of dials — see ProTimers.svelte. Everything below the fetch is the
+  // radial layout's own geometry and simply has nothing to do there.
+  let loading = $state(true);
   let tx = $state(200);
   $effect(() => {
     if ($timers.length > 10) {
@@ -49,6 +55,7 @@
 
     const res = await fetchTimers(page.data.uid, fetch).then((x) => {
       newState = true;
+      loading = false;
 
       // עדכון מידות
       updateSizes();
@@ -56,11 +63,9 @@
       // מירכוז התצוגה
       centerViewOnLoad();
 
-      // האזנה לשינויי גודל החלון
-      window.addEventListener('resize', () => {
-        updateSizes();
-        centerViewOnLoad();
-      });
+      // האזנה לשינויי גודל החלון. הפונקציות בטוחות גם בתצוגה העסקית: הן
+      // מחפשות את #screen ויוצאות בשקט כשהוא לא קיים.
+      window.addEventListener('resize', onResize);
     });
     // Initialize the timer listener using the new socketClient-based approach
     timerCleanup = initialWebSocketForTimer(
@@ -75,6 +80,28 @@
       timerCleanup();
     }
     cleanupTimerListener();
+    if (typeof window !== 'undefined') {
+      window.removeEventListener('resize', onResize);
+    }
+  });
+
+  // Named, so onDestroy can take it off again — an anonymous listener could
+  // only ever be added.
+  function onResize() {
+    updateSizes();
+    centerViewOnLoad();
+  }
+
+  // Switching the appearance back to `personal` remounts the radial layout at
+  // scroll 0,0, so the dial has to be re-centred — but ONLY on an actual flip.
+  // Firing on the first run too would put a second smooth scroll in the air
+  // alongside the one `onMount` already started, and the scroll-preserving
+  // effect below snaps whatever is mid-flight back to where it started.
+  let wasBusiness = $isBusiness;
+  $effect(() => {
+    const now = $isBusiness;
+    if (wasBusiness && !now && newState) centerViewOnLoad();
+    wasBusiness = now;
   });
 
   function project() {}
@@ -286,45 +313,50 @@
   <title>{$lang === 'he' ? 'טיימרים' : $lang === 'ar' ? 'المؤقتات' : 'Timers'} · 1lev1</title>
 </svelte:head>
 
-<div
-  id="screen"
-  dir="ltr"
-  bind:clientWidth={ow}
-  bind:clientHeight={oh}
-  style="position: fixed; width: 100vw; height: 100vh; top: 0; left: 0; max-width: 100vw; max-height: 100vh;"
-  class="timer-container d"
->
-  <div class="center-wrapper">
-    <div
-      id="timer-content"
-      dir="ltr"
-      bind:clientWidth={w}
-      bind:clientHeight={h}
-      style="position: relative; width: {w}px; height: {h}px;"
-      class="screen d"
-    >
-      {#each $timers as timer, index (timer.id)}
-        <Timer
-          orders={orders[index]}
-          missionId={timer.mId}
-          {tx}
-          {size}
-          {bigsize}
-          {add}
-          {center}
-          {tiltAngle}
-          {hover}
-          {project}
-          {linke}
-          hoursAssigned={timer.hoursAssigned}
-        />
-      {/each}
+{#if $isBusiness}
+  <!-- Business: a work log. Same store, same dialogs, no orbit. -->
+  <ProTimers {loading} />
+{:else}
+  <div
+    id="screen"
+    dir="ltr"
+    bind:clientWidth={ow}
+    bind:clientHeight={oh}
+    style="position: fixed; width: 100vw; height: 100vh; top: 0; left: 0; max-width: 100vw; max-height: 100vh;"
+    class="timer-container d"
+  >
+    <div class="center-wrapper">
+      <div
+        id="timer-content"
+        dir="ltr"
+        bind:clientWidth={w}
+        bind:clientHeight={h}
+        style="position: relative; width: {w}px; height: {h}px;"
+        class="screen d"
+      >
+        {#each $timers as timer, index (timer.id)}
+          <Timer
+            orders={orders[index]}
+            missionId={timer.mId}
+            {tx}
+            {size}
+            {bigsize}
+            {add}
+            {center}
+            {tiltAngle}
+            {hover}
+            {project}
+            {linke}
+            hoursAssigned={timer.hoursAssigned}
+          />
+        {/each}
 
-      <!-- סמן מרכז - שימושי לפיתוח - להסרת ההערה לצורך בדיקות -->
-      <!-- <div class="center-marker"></div> -->
+        <!-- סמן מרכז - שימושי לפיתוח - להסרת ההערה לצורך בדיקות -->
+        <!-- <div class="center-marker"></div> -->
+      </div>
     </div>
   </div>
-</div>
+{/if}
 
 <style>
   .timer-container {

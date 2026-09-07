@@ -1,5 +1,15 @@
 import { MCPServer } from '@mastra/mcp';
-import { verifyApiKey } from '$lib/server/apiKeys';
+import {
+    checkApiKey,
+    isRejected,
+    repairPlan,
+    SHADOWING_WARNING,
+    CONFIG_LOCATIONS,
+    CONNECT_URL,
+    KEYS_PAGE_URL,
+    MCP_ENDPOINT,
+    type KeyVerdict
+} from '$lib/server/mcp/keyDiagnosis';
 import { oauthChallenge } from '$lib/server/oauth/challenge.js';
 import { setMcpContext } from '$lib/server/mcpContext';
 import { toReqRes, toFetchResponse } from 'fetch-to-node';
@@ -50,12 +60,69 @@ const howToConnect = createTool({
                 "2. Restart your agent so it picks up the new configuration.",
                 "3. Manual alternative: register at https://1lev1.com, then Settings -> API keys -> create a key named 'MCP'.",
                 "4. Add it to your MCP client headers: { 'Authorization': 'Bearer YOUR_KEY' }",
-                "5. The endpoint is https://api.1lev1.com/api/mcp"
+                `5. The endpoint is ${MCP_ENDPOINT}`
             ],
+            // Said here too, not only in the rejected-key path: someone who is
+            // reconnecting a client that already has an entry is one restart away
+            // from the same silent shadowing loop.
+            if_a_key_is_already_configured: SHADOWING_WARNING,
+            look_for_existing_entries_in: CONFIG_LOCATIONS,
             is_unauthenticated: true
         };
     }
 });
+
+/**
+ * The "just do it" tool. `howToConnect` explains; this one hands over the exact
+ * command and URL, and repeats the delete-first step, because it is reachable
+ * from the rejected-key state where minting alone provably does not help.
+ */
+const createNewApiKey = createTool({
+    id: 'createNewApiKey',
+    description:
+        'Get a NEW 1lev1 API key: the exact command to run (npx 1lev1-mcp) and the ' +
+        'approval URL. Also lists the stale config entries that must be deleted first, ' +
+        'otherwise the new key is shadowed and nothing changes after a restart.',
+    inputSchema: z.object({}),
+    execute: async () => {
+        return {
+            before_you_mint: SHADOWING_WARNING,
+            delete_stale_entries_in: CONFIG_LOCATIONS,
+            install_and_mint: 'npx 1lev1-mcp',
+            what_it_does:
+                `Opens ${CONNECT_URL}, the user logs in and approves the connection, ` +
+                "and the package writes the key into the MCP client's user-level config.",
+            then: 'Restart the MCP client so it re-reads its configuration.',
+            manual_alternative: {
+                page: KEYS_PAGE_URL,
+                header: { Authorization: 'Bearer <your key>' },
+                endpoint: MCP_ENDPOINT
+            },
+            keep_it_out_of_git:
+                'Never write the key into a file the repository tracks (a project .mcp.json ' +
+                'is the usual one). A committed key gets revoked, and you land back here.'
+        };
+    }
+});
+
+/**
+ * Built per-request, because the diagnosis belongs in the tool *description* —
+ * an agent picking tools reads the list long before it calls anything, and the
+ * list is the only place a refusal can be stated loudly enough to stop the
+ * "reinstall and restart" loop.
+ */
+function makeFixRejectedApiKeyTool(reason: 'malformed' | 'unknown' | 'revoked') {
+    return createTool({
+        id: 'fixRejectedApiKey',
+        description:
+            `STOP — the 1lev1 API key this client sent was REJECTED (${reason}). You are ` +
+            'NOT connected to the user\'s account and no mission, timer or project tool is ' +
+            'available. This is NOT the same as an unregistered user, so do not simply tell ' +
+            'them to sign up. Call this tool for the repair steps and relay them.',
+        inputSchema: z.object({}),
+        execute: async () => repairPlan(reason)
+    });
+}
 
 // --- Tool exposure, classified by blast radius ---------------------------
 //
@@ -91,11 +158,19 @@ async function handleMcpRequest(request: Request, url: URL, svelteFetch: typeof 
     const authHeader = request.headers.get('Authorization');
     let user = null;
     let apiKey = null;
+    let verdict: KeyVerdict = 'absent';
 
     if (authHeader) {
         apiKey = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : authHeader;
-        user = await verifyApiKey(apiKey);
-        console.log(`[MCP] Request from ${user ? 'authenticated user: ' + user.id : 'unauthenticated client'} at ${url.pathname} (${request.method})`);
+        // `verifyApiKey` collapses malformed/unknown/revoked into null. Keep the
+        // distinction: "you sent a dead key" and "you sent no key" need different
+        // answers, and conflating them is what made a revoked key look like an
+        // unregistered user for three restarts running.
+        ({ user, verdict } = await checkApiKey(apiKey));
+        console.log(
+            `[MCP] Request from ${user ? 'authenticated user: ' + user.id : `client with a ${verdict} key`}` +
+            ` at ${url.pathname} (${request.method})`
+        );
     } else {
         console.log(`[MCP] Unauthenticated request to ${url.pathname} (${request.method})`);
     }
@@ -194,11 +269,28 @@ async function handleMcpRequest(request: Request, url: URL, svelteFetch: typeof 
         const challenge = oauthChallenge(url);
         if (challenge) return challenge;
 
-        // --- UNAUTHENTICATED MODE (public probe) ---
-        toolsToExpose = {
-            getPlatformInfo,
-            howToConnect
-        };
+        if (isRejected(verdict)) {
+            // --- REJECTED-KEY MODE ---
+            // Deliberately NOT the public probe. The caller is configured, tried to
+            // authenticate, and failed; answering with the newcomer's tool set sends
+            // the agent off to mint a key that the same stale config will shadow on
+            // the next restart. Name the failure instead.
+            console.warn(
+                `[MCP] Rejected key (${verdict}) at ${url.pathname} — exposing the repair tools only.`
+            );
+            toolsToExpose = {
+                fixRejectedApiKey: makeFixRejectedApiKeyTool(verdict),
+                createNewApiKey,
+                getPlatformInfo
+            };
+        } else {
+            // --- UNAUTHENTICATED MODE (public probe) ---
+            toolsToExpose = {
+                getPlatformInfo,
+                howToConnect,
+                createNewApiKey
+            };
+        }
     }
 
     let mcpServer;
@@ -207,9 +299,13 @@ async function handleMcpRequest(request: Request, url: URL, svelteFetch: typeof 
             id: '1lev1-mcp-server',
             name: '1lev1 Platform MCP',
             version: '1.0.0',
-            description: user 
+            description: user
                 ? '1lev1 Platform APIs with direct AI Agents and Context access over standard MCP'
-                : 'Limited access to 1lev1 Platform. Please authenticate for full AI Agent and Tool access.',
+                : isRejected(verdict)
+                    ? `NOT CONNECTED — the API key this client sent was rejected (${verdict}). ` +
+                      'Call fixRejectedApiKey. Delete the stale config entry before minting a ' +
+                      'new key, or the replacement will be shadowed again.'
+                    : 'Limited access to 1lev1 Platform. Please authenticate for full AI Agent and Tool access.',
             agents: agentsToExpose,
             workflows: workflowsToExpose,
             tools: toolsToExpose

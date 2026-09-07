@@ -203,7 +203,11 @@ export interface TimerSaveParams {
   /** Total hours to commit */
   totalHours: number;
 
-  /** Array of task IDs associated with this timer session */
+  /**
+   * The acts (tasks) these hours are attributed to. Omitting the field leaves
+   * whatever is already linked to the timer alone; sending an empty array is
+   * how "unlink them all" is expressed.
+   */
   tasks?: string[];
 }
 

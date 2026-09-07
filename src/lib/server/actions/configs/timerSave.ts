@@ -118,6 +118,12 @@ export const timerSaveConfig: ActionConfig = {
         // dialog removes an attachment.
         const sentLinks = params.saveLinks !== undefined && params.saveLinks !== null;
         const sentFiles = Array.isArray(params.saveFiles);
+        // The acts these hours are attributed to follow the very same rule.
+        // `tasks: params.tasks || []` used to send an empty relation on every
+        // save that carried no list — and an empty relation *replaces*, so a
+        // save from the bot, the MCP agent or an old client silently unlinked
+        // every act the member had attached from the dialog beforehand.
+        const sentTasks = Array.isArray(params.tasks);
         const saveLinks: string = sentLinks ? serializeSaveLinks(params.saveLinks) : '';
         const saveFiles: string[] = sentFiles
             ? params.saveFiles.map((id: any) => String(id)).filter(Boolean)
@@ -157,7 +163,7 @@ export const timerSaveConfig: ActionConfig = {
                 timerId: params.timerId,
                 isActive: false,
                 saved: true,
-                tasks: params.tasks || [],
+                ...(sentTasks ? { tasks: params.tasks.map((id: any) => String(id)) } : {}),
                 ...(intervals.length
                     ? { timers: intervals, totalHours: hoursOfIntervals(intervals) }
                     : {}),
@@ -329,7 +335,7 @@ export const timerSaveConfig: ActionConfig = {
         saveLinks: { type: 'string', required: false, description: 'Newline-separated http(s) links backing up this timer (PR, doc, recording). Re-validated server-side.' },
         saveFiles: { type: 'array', required: false, description: 'Strapi media ids of files attached to this timer (uploaded through /api/upload)' },
         x: { type: 'number', required: false, description: 'Legacy timer value (unused)' },
-        tasks: { type: 'array', required: false, description: 'Task IDs to link to the timer' }
+        tasks: { type: 'array', required: false, description: 'Act (task) IDs these hours are attributed to. Omit to leave the acts already on the timer alone; send an empty array to unlink them all.' }
     },
 
     authRules: [

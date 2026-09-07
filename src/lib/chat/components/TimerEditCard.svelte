@@ -79,4 +79,21 @@
   .tec-expand:hover {
     background: rgba(212, 175, 55, 0.12);
   }
+
+  /* Business skin. The card hosts the same TimeEditor as the dialogs do, so it
+     has to flip with it — a light editor inside this green glass would be
+     unreadable. */
+  :global(html.business) .tec {
+    background: var(--surface);
+    border-color: var(--surface-line);
+    border-radius: var(--radius-theme, 4px);
+    color: var(--surface-ink);
+  }
+  :global(html.business) .tec-expand {
+    border-color: var(--border-g);
+    color: var(--goldink);
+  }
+  :global(html.business) .tec-expand:hover {
+    background: var(--gold-dd);
+  }
 </style>

@@ -149,4 +149,18 @@
     text-align: center;
     opacity: 0.85;
   }
+
+  /* Business skin — see the same block in TimerDialogs.svelte. The shell is
+     portaled to <body>, the close button is not. */
+  :global(html.business [data-svelte-dialog-content].time-editor-dialog) {
+    background: var(--surface);
+    color: var(--surface-ink);
+    border: 1px solid var(--surface-line);
+    border-radius: var(--radius-theme, 4px);
+    box-shadow: var(--shadow-theme);
+  }
+  :global(html.business) .ted-close,
+  :global(html.business) .ted-msg {
+    color: var(--surface-muted);
+  }
 </style>
