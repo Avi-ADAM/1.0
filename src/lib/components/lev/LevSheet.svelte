@@ -121,7 +121,22 @@
   }
 </script>
 
-<div class="sheet" style:transform={`translateY(${dragY}px)`} dir={$isRtl ? 'rtl' : 'ltr'}>
+<!--
+  The drag transform is applied only while a finger is actually moving the
+  sheet. A permanent `translateY(0px)` is still a transform, and a transformed
+  ancestor becomes the containing block for every `position: fixed` descendant
+  — which re-anchors any modal a card opens inline to this box and lets
+  `.sheet-body`'s `overflow: hidden` clip it. `none` while at rest keeps those
+  modals anchored to the viewport, where they were written to live. The
+  compositor hint rides along with it — `will-change: transform` establishes
+  the same containing block in Chrome.
+-->
+<div
+  class="sheet"
+  style:transform={dragY ? `translateY(${dragY}px)` : 'none'}
+  style:will-change={dragY ? 'transform' : 'auto'}
+  dir={$isRtl ? 'rtl' : 'ltr'}
+>
   <div
     class="handle"
     role="presentation"
@@ -169,8 +184,6 @@
     display: flex;
     flex-direction: column;
     background: #fdfcf4;
-    /* Only the drag gesture moves this, and only while a finger is down. */
-    will-change: transform;
   }
   :global(html.dark) .sheet {
     background: #0a0904;
