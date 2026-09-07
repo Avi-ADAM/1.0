@@ -5,6 +5,7 @@
     "description": "Crea una red de socios sin jefe ni capital inicial: misiones y recursos abiertos, registra tus horas, decidid por consenso y repartid beneficios según la aportación real."
   },
   "hero": {
+    "h1": "Gestiona una sociedad y reparte beneficios según la aportación real",
     "subtitle": "Asociación empresarial inteligente: crea con pasión, gana con justicia",
     "headline1": "Seguridad financiera a través de la co-creación",
     "headline2": "Gestión empresarial inteligente con el corazón abierto",
@@ -64,7 +65,17 @@
     "a1": "Tengo una asociación (o una idea para una)",
     "a2": "Busco un proyecto al que unirme",
     "a3": "Solo quiero ver el sistema",
-    "a4": "Quiero entenderlo antes de empezar"
+    "a4": "Quiero entenderlo antes de empezar",
+    "a5": "Soy empleado, o autónomo en solitario",
+    "a6": "No estoy seguro de que encaje en mi caso",
+    "d1": "Por qué el cincuenta-cincuenta rompe sociedades y qué calcular en su lugar",
+    "d2": "Qué hay abierto ahora y qué te dan las horas",
+    "d3": "La tercera vía: ni un jefe ni montarlo solo",
+    "d4": "Un programa de socios, un equipo de proyecto o una idea que busca gente",
+    "doorsTitle": "¿Dónde estás hoy?",
+    "doorsSub": "Cada uno lleva a una página propia. Elige el que más se te acerque.",
+    "a7": "Un empleo estándar no me encaja",
+    "d5": "Edad, una pausa profesional o un ritmo propio — y en tus términos"
   },
   "sections": {
     "problemTitle": "¿Conoces esa sensación?",
@@ -212,7 +223,8 @@
         "cost": "Nuevo gasto",
         "sale": "Nuevo producto"
       }
-    }
+    },
+    "depthCta": "Cómo funciona el cálculo"
   },
   "platform": {
     "projectMgmt_t": "Todo tu proyecto de un vistazo",
@@ -627,5 +639,18 @@
     "desc": "Toda la diferencia está en lo que ocurre cuando la respuesta es no, y de esa frase se deriva todo lo construido aquí. Hay una página que lo explica, con números y fuentes.",
     "cta": "Leer por qué",
     "inline": "¿Y por qué es así, para empezar?"
+  },
+  "noboss": {
+    "lead": "¿Sigues empleado, o trabajas por tu cuenta en solitario? Hay una página entera sobre la tercera vía: qué no funciona hoy y cómo se ve dentro de una rikma.",
+    "cta": "Trabaja con socios en lugar de para un jefe"
+  },
+  "crumb": {
+    "home": "Inicio"
+  },
+  "flexible": {
+    "eyebrow": "◈ Y si el marco habitual no encaja ◈",
+    "title": "¿Te despidieron, vuelves tras una pausa o el cuerpo marca el ritmo?",
+    "lead": "Puedes publicar lo que eres capaz de aportar y en qué condiciones, y asociarte con socios, en lugar de encajarte en la casilla de otro.",
+    "cta": "Al trabajo flexible en tus términos"
   }
 }

@@ -70,6 +70,20 @@ const PAGES = [
   { path: '/about', lastmod: '2026-08-13T00:00:00+00:00', priority: '0.75', changefreq: 'monthly' },
   { path: '/grow', lastmod: '2026-08-13T00:00:00+00:00', priority: '0.75', changefreq: 'monthly' },
   { path: '/love', lastmod: '2026-08-13T00:00:00+00:00', priority: '0.70', changefreq: 'daily' },
+  // Written, live, linked from the homepage - and missing from this list until
+  // now, so nothing pointed a crawler at roughly 700 lines of copy. /solution
+  // and /kir are deliberately NOT here: both are still placeholder drafts, and
+  // they carry a noindex of their own so they stop borrowing the homepage's
+  // title in search results.
+  { path: '/why', lastmod: '2026-09-04T00:00:00+00:00', priority: '0.80', changefreq: 'monthly' },
+  { path: '/uses', lastmod: '2026-09-04T00:00:00+00:00', priority: '0.75', changefreq: 'monthly' },
+  // One of the three audience tracks the homepage used to walk everyone
+  // through in a single scroll. High priority: it is a landing page for its
+  // own search intent, not a supporting page.
+  { path: '/no-boss', lastmod: '2026-09-04T00:00:00+00:00', priority: '0.85', changefreq: 'monthly' },
+  { path: '/partnership', lastmod: '2026-09-05T00:00:00+00:00', priority: '0.85', changefreq: 'monthly' },
+  { path: '/join', lastmod: '2026-09-05T00:00:00+00:00', priority: '0.85', changefreq: 'weekly' },
+  { path: '/flexible-work', lastmod: '2026-09-05T00:00:00+00:00', priority: '0.85', changefreq: 'monthly' },
 
   // Entry points into the product
   { path: '/wish/new', lastmod: '2026-08-13T00:00:00+00:00', priority: '0.85', changefreq: 'monthly' },

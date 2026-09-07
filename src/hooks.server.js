@@ -203,6 +203,9 @@ const cl = {
 // into <title>, the description and the manifest link.
 const SUPPORTED_LANGS = ['he', 'en', 'ar', 'ru', 'es'];
 
+// The legacy per-locale homepage paths, 301'd to `?lang=` below.
+const LOCALE_PATHS = new Set(SUPPORTED_LANGS.map((l) => `/${l}`));
+
 let lang = 'he'; // Default language set to Hebrew
 
 // Helper function to get language from URL or cookies
@@ -219,7 +222,14 @@ function getLanguage(event) {
     return fromPath;
   }
   if (!coociLang) {
-    return userAgent?.includes('he') ? 'he' : 'en';
+    // No header at all is not "not Hebrew" - it is no signal, and the answer
+    // to no signal is the site's default. Every browser sends the header, so
+    // this branch is almost only crawlers, and they are exactly who must see
+    // Hebrew here: the hreflang table and the sitemap both declare the bare
+    // address to be the Hebrew one. Returning `en` made the bare URL serve a
+    // language it had just told Google lived at `?lang=en`.
+    if (!userAgent) return 'he';
+    return userAgent.includes('he') ? 'he' : 'en';
   }
   // The cookie is user-writable, so validate it too — an unknown value here
   // would propagate into locals.lang and out to the metadata maps.
@@ -400,9 +410,18 @@ async function handleRequest({ event, resolve }) {
     }
     return response;
   };
-  // Set language cookie based on URL path
-  if (event.url.pathname === '/en' || event.url.pathname === '/ar' || event.url.pathname === '/he' || event.url.pathname === '/ru') {
+  // /he, /en and /ar rendered a byte-identical copy of the homepage, and /ru
+  // and /es 404'd. They are not part of the locale scheme the rest of the site
+  // agrees on - app.html's hreflang table and the sitemap both say a locale is
+  // `?lang=`, and the bare path is Hebrew - so they were three more addresses
+  // serving "/" and two dead ends. 301 (not 303) so the redirect is permanent
+  // and whatever links point at them consolidate onto the canonical address.
+  if (LOCALE_PATHS.has(event.url.pathname)) {
     event.cookies.set('lang', lang, { path: '/' });
+    return pinTheme(new Response('Redirect', {
+      status: 301,
+      headers: { Location: lang === 'he' ? '/' : `/?lang=${lang}` }
+    }));
   }
 
   // Redirect logic based on authentication
@@ -476,8 +495,32 @@ async function handleRequest({ event, resolve }) {
   // an inner page resolved back to "/" . Build it from the request instead —
   // pathname only (percent-encoded, so it cannot break out of the attribute)
   // plus the locale marker, matching the hreflang table in app.html.
+  // Built from the URL that was ASKED FOR, not from the language that was
+  // resolved. Those differ whenever the language came from a header or a
+  // cookie rather than from `?lang=`, and using the resolved one meant the
+  // bare address never pointed at itself: `/no-boss` fetched with an English
+  // header declared its canonical to be `/no-boss?lang=en`, while the
+  // hreflang table on the same page named the bare address as both `he` and
+  // `x-default`. A URL that disowns itself is dropped as a duplicate of the
+  // variant it names - and the bare address is the one every link points at.
+  const askedLang = event.url.searchParams.get('lang');
+  const canonicalLang =
+    askedLang && SUPPORTED_LANGS.includes(askedLang) ? askedLang : 'he';
   const canonical =
-    `${SITE_ORIGIN}${event.url.pathname}` + (lang === 'he' ? '' : `?lang=${lang}`);
+    `${SITE_ORIGIN}${event.url.pathname}` +
+    (canonicalLang === 'he' ? '' : `?lang=${canonicalLang}`);
+  // The alternates for THIS path, not for the homepage. app.html used to carry
+  // them as six literal tags naming "/", so every inner page claimed its
+  // translations lived at the homepage - the one signal that tells Google the
+  // pages are the same page in another language. Same shape as the sitemap:
+  // Hebrew is the bare address and doubles as x-default, the rest are `?lang=`.
+  const hreflang = [...SUPPORTED_LANGS, 'x-default']
+    .map((code) => {
+      const l = code === 'x-default' ? 'he' : code;
+      const href = `${SITE_ORIGIN}${event.url.pathname}` + (l === 'he' ? '' : `?lang=${l}`);
+      return `    <link rel="alternate" hreflang="${code}" href="${href}" />`;
+    })
+    .join('\n');
   const response = await resolve(event, {
     // replaceAll, not replace: app.html reuses `%xtitle%` for both og:title and
     // twitter:title, and `replace` would have left the second one rendering the
@@ -500,6 +543,7 @@ async function handleRequest({ event, resolve }) {
         .replaceAll('%themeclass%', themeClass)
         .replaceAll('%lang%', lang)
         .replaceAll('%canonical%', canonical)
+        .replaceAll('%hreflang%', hreflang)
         .replaceAll('%xtitle%', title[lang])
         .replaceAll('%title%', title[lang])
         .replaceAll('%desc%', desc[lang])

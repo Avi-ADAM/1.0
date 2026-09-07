@@ -37,10 +37,15 @@
   /** How long after the stop the "and then?" column looks. */
   const LOOK_AHEAD = 3;
 
+  /* `color` draws the curve; `ink` writes the number. They are two jobs and
+     they were one value, which is why the legend failed: a stroke only has to
+     be distinguishable, but a label has to be readable, and #3aa7a0 / #ff0092
+     measure 2.9:1 and 3.7:1 on a white card. `ink` is the same hue one step
+     deeper, at AA on the card fill below. */
   const TRACKS = /** @type {const} */ ([
-    { key: 'employee', color: '#64748b', fn: employeeAt },
-    { key: 'freelancer', color: '#3aa7a0', fn: freelancerAt },
-    { key: 'partner', color: '#ff0092', fn: partnerAt }
+    { key: 'employee', color: '#64748b', ink: '#475569', fn: employeeAt },
+    { key: 'freelancer', color: '#3aa7a0', ink: '#0f766e', fn: freelancerAt },
+    { key: 'partner', color: '#ff0092', ink: '#b80069', fn: partnerAt }
   ]);
 
   let stopYear = $state(DEFAULT_STOP);
@@ -81,9 +86,10 @@
       : `${linePath(points)} L${x(points[points.length - 1].year).toFixed(2)},${y(0).toFixed(2)} L${x(points[0].year).toFixed(2)},${y(0).toFixed(2)} Z`;
 
   let rows = $derived(
-    TRACKS.map(({ key, color, fn }) => ({
+    TRACKS.map(({ key, color, ink, fn }) => ({
       key,
       color,
+      ink,
       path: linePath(curves[key]),
       /** What they were earning the day before they stopped. */
       before: Math.round(fn(stopYear - CLIFF_EPSILON, stopYear)),
@@ -139,8 +145,15 @@
 </script>
 
 <div
-  class="rounded-3xl border-2 border-barbi/40 bg-white/70 backdrop-blur-sm px-4 py-5 sm:px-3 shadow-lg"
+  class="rounded-3xl border-2 border-barbi/40 bg-slate-50 px-4 py-5 sm:px-3 shadow-lg"
 >
+  <!-- The chart is a figure: one fixed light ground in all four fills
+       (personal/business x light/dark), and therefore no `dark:` ink
+       anywhere inside it. It used to be `bg-white/70`, which let the page
+       through and composited to a different grey in each fill - in the two
+       dark ones that dropped the axis labels to 1.3:1. An opaque fill is the
+       only way the curve colours, the grid and the labels keep the one
+       relationship they were chosen for. -->
   <h3 class="text-rose-800 font-bold text-2xl sm:text-xl text-center mb-1">
     {$t('home.curves.title')}
   </h3>
@@ -194,7 +207,7 @@
       <text
         x={x(0) + 2}
         y={y(EMPLOYEE_BASE) - 5}
-        class="fill-slate-400"
+        class="fill-slate-600"
         style="font-size:11px"
       >
         {$t('home.curves.baseline')}
@@ -214,7 +227,7 @@
           x={x(tick)}
           y={y(0) + 15}
           text-anchor="middle"
-          class="fill-slate-400"
+          class="fill-slate-600"
           style="font-size:11px">{tick}</text
         >
       {/each}
@@ -222,7 +235,7 @@
         x={x(YEARS)}
         y={y(0) + 29}
         text-anchor="end"
-        class="fill-slate-400"
+        class="fill-slate-600"
         style="font-size:11px">{$t('home.curves.axisYears')}</text
       >
 
@@ -240,7 +253,7 @@
         x={x(stopYear)}
         y={PAD.top - 5}
         text-anchor="middle"
-        class="fill-rose-600 font-bold"
+        class="fill-rose-700 font-bold"
         style="font-size:12px">{$t('home.curves.stopMark')}</text
       >
 
@@ -293,7 +306,7 @@
           ? 'border-barbi bg-barbi/5'
           : 'border-slate-200 bg-slate-50'}"
       >
-        <p class="text-xs font-bold mb-2" style="color:{row.color}">
+        <p class="text-xs font-bold mb-2" style="color:{row.ink}">
           {$t(`home.curves.${row.key}.name`)}
         </p>
         <!-- Before and after carry the same weight on purpose. Only the
@@ -304,18 +317,18 @@
              visible on every card, and every number moves as the slider does. -->
         <dl class="text-[11px] leading-tight space-y-1">
           <div>
-            <dt class="text-slate-400">
+            <dt class="text-slate-600">
               {$t('home.curves.beforeLabel')}
             </dt>
-            <dd class="text-lg font-bold text-slate-500 leading-none">
+            <dd class="text-lg font-bold text-slate-700 leading-none">
               {row.before}<span class="text-xs font-normal">%</span>
             </dd>
           </div>
           <div>
-            <dt class="text-slate-500">
+            <dt class="text-slate-600">
               {$t('home.curves.afterLabel', { years: LOOK_AHEAD })}
             </dt>
-            <dd class="text-lg font-bold leading-none" style="color:{row.color}">
+            <dd class="text-lg font-bold leading-none" style="color:{row.ink}">
               {row.after}<span class="text-xs font-normal">%</span>
             </dd>
           </div>

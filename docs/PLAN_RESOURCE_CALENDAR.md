@@ -565,15 +565,19 @@ onSelect, onPickDate }`. שלוש תצוגות — `list` / `month` / `week`; צ
 
 ### מה שנשאר לך
 
-1. **commit + deploy** של `1.0b` (ענף `shabab`).
-2. **Settings → Users & Permissions → Roles → Authenticated** — לסמן
-   `find` / `findOne` / `create` / `update` על `resource-booking`.
-   בלי זה כל קריאה תיפול ב‑`bestEffort` ותירשם כאזהרה: כלום לא יישבר, אבל
-   גם כלום לא ייכתב.
-3. `npm run types:update` בפרונט, לרענון `src/generated/`.
-4. לשנות את שני ה‑qids של הלב ל‑`status: { notIn: ["dismissed", "dateBlocked"] }`
-   (§2.5) — לפני שמישהו כותב `dateBlocked` בפועל.
-5. `RESOURCE_BOOKINGS=shadow` → backfill (§8 M2) → השוואה → `enforce`.
+1. ~~**commit + deploy** של `1.0b` (ענף `shabab`).~~ **בוצע.**
+2. ~~**Settings → Users & Permissions → Roles → Authenticated** — לסמן
+   `find` / `findOne` / `create` / `update` על `resource-booking`.~~ **בוצע.**
+3. ~~`npm run types:update` בפרונט.~~ **בוצע** — `ResourceBooking` ו‑`Sp.availability`
+   כבר ב‑`src/generated/`.
+4. ~~לשנות את שני ה‑qids של הלב.~~ **בוצע** — `209levMatchSuggestions`
+   ו‑`212levResourceMatchSuggestions` מסננים
+   `status: { notIn: ["dismissed", "dateBlocked"] }`.
+5. `RESOURCE_BOOKINGS=shadow` → backfill → השוואה → `enforce`. הכלים לזה
+   נכתבו — **ראה §13**. מה שנשאר הוא הרצה והכרעה, לא קוד. ההשוואה כבר רצה פעם
+   אחת מול הפרודקשן (§13.1.1): 22 `staleLocked` להחזיר להיצע, ו‑23 `blockers`
+   שכולם חלון‑היצע שפג ולא תפוסה כפולה. שני הצעדים שנשארו הם הדגל עצמו
+   וה‑backfill — ואחריהם השוואה שנייה.
 6. **לשאול את ציר התפוסה בטופס היצירה.** `newsp.svelte` / `editsp.svelte` (§12)
    שואלים היום רק `kindOf`, ולכן קובץ דיגיטלי נכנס כ‑`total` ונגזר ל‑`consumable` —
    כלומר ננעל אחרי השאלה הראשונה (§0.2 באג 2). המקום הטבעי לשאלה הוא שלב
@@ -609,3 +613,146 @@ onSelect, onPickDate }`. שלוש תצוגות — `list` / `month` / `week`; צ
   `src/lib/components/resource/ResourceCreator.svelte`
 - `src/lib/translations/routes.js` (שער ה‑namespace החדש) →
   `npm run check:i18n`
+
+---
+
+## 13. ההרצה: shadow → backfill → השוואה → enforce
+
+שלב 5 ב‑§11 אינו שינוי קוד אלא **סדר פעולות**, ולכל שלב בו יש עכשיו כלי.
+הכל יושב מאחורי endpoint אחד, נעול במפתח בדיוק כמו `/api/monthi`:
+
+```
+GET /api/resource-bookings?op=compare              # קריאה בלבד
+GET /api/resource-bookings?op=backfill&dry=1       # מה ייכתב, בלי לכתוב
+GET /api/resource-bookings?op=backfill             # כתיבה
+```
+
+המפתח הוא `ADMINMONTHER` — בכותרת `x-monthi-key`, או `?key=` למי שמריץ מ‑cron.
+
+> ⚠️ **הרשאה שנייה, נפרדת מזו שב‑§11.2.** תפקיד `Authenticated` מכסה את
+> הזרימות החיות (הן רצות עם ה‑JWT של המשתמש דרך `execFromContext`), אבל
+> ה‑backfill רץ עם **טוקן ה‑API** של השרת (`SendToAdmin`), ולטוקן יש רשימת
+> הרשאות משלו. טוקן מסוג *Custom* לא מקבל קולקציה חדשה מאליו, וזה נראה בדיוק
+> כמו `"Forbidden access"` בלי שום רמז למה. לכן:
+> **Settings → API Tokens → הטוקן של השרת → `find` / `findOne` / `create` /
+> `update` על `resource-booking`.** ה‑endpoint מחזיר את המשפט הזה כ‑`hint`
+> כשהוא נתקל בשגיאה הזו.
+
+| קובץ | מה |
+|---|---|
+| `src/lib/resources/backfillPlan.ts` + טסט (15) | **מה** ייכתב: `Rikmash` → שורת יומן, כולל דה‑דופליקציה |
+| `src/lib/resources/panuiCompare.ts` + טסט (11) | **ההשוואה**: `panui` מול תשובת היומן, ומי חוסם את ההיפוך |
+| `src/lib/server/resources/backfill.ts` | ה‑IO: דפדוף על Strapi, כתיבה דרך `createBooking`, `syncPanui` |
+| `src/routes/api/resource-bookings/+server.js` | ה‑endpoint הנעול |
+
+### 13.1 סדר הפעולות
+
+**1. `RESOURCE_BOOKINGS=shadow`** ב‑`.env` של ה‑API (ואז restart). מכאן כל
+מתן משאב חדש רושם שורת יומן; `panui` עדיין השער, אז שום דבר בהתנהגות לא זז.
+
+**2. Backfill.** קודם `&dry=1` — הוא מחזיר את הספירה לפי סטטוס ולפי סיבת דילוג
+בלי לכתוב כלום, ו‑`&plan=1` מוסיף את השורות עצמן. כשהמספרים נראים סבירים,
+אותה קריאה בלי `dry`.
+
+עוגן ההרצה הוא `Rikmash` ולא המנוע, כי הוא הרשומה היחידה שנושאת `sp` — מנוע
+מגיע למשאב *דרך* הארכיון שלו (בדיוק כמו `bookingsFromLegacy.ts`), ומנוע בלי
+ארכיון אין לו משאב לרשום עליו. חלון הזמן נלקח מהמנוע כשיש אחד ומהארכיון כשאין,
+והסטטוס מהמנוע (`closed`/`cancelled`/`finnished`) לפני התאריכים — כי הוא החלטה
+שמישהו קיבל, והתאריכים רק מתארים אותה.
+
+ההרצה **אידמפוטנטית**: שורה שכבר קיימת מזוהה לפי `rikmash`, לפי
+`mashabetahalich`, ולבסוף לפי חתימת `sp|project|יום התחלה|יום סיום` — האחרונה
+תופסת שורות שנכתבו בזרימה החיה לפני שהארכיון בכלל נוצר. אפשר להריץ שוב בלי
+לשכפל.
+
+בסוף ההרצה `syncPanui` רץ על כל משאב שנגעו בו — כי `panui` נשאר מטמון, ומטמון
+שנכתב מיומן ריק הוא שקר.
+
+> **מה שה‑backfill בכוונה לא עושה:** מתן `total` פתוח משנת 2023 בלי `sqadualef`
+> נרשם כ‑`active` עם `end: null`, כלומר תפוס לתמיד. זה בדיוק מה ש‑`panui:false`
+> אומר עליו היום, ולכן ההשוואה שותקת ושום משאב לא משתחרר בטעות. שחרור הוא
+> הכרעה של המחזיק (`availability: 'unlimited'`, §7), לא של מיגרציה.
+
+**3. השוואה** (`op=compare`). מחזיר, לכל `Sp`, את שתי התשובות ואת ההפרש:
+
+- `staleLocked` — `panui:false` על משאב שהיומן אומר שהוא פנוי. זה באג §0.2.1
+  (שום מסלול לא החזיר `panui` ל‑true). **צפוי שיהיו הרבה, וזה הרווח**: ההיפוך
+  מחזיר את המשאבים האלה להיצע.
+- `overOffered` — מוצע היום, תפוס לפי היומן. **זה הכיוון המסוכן**, ורק הוא
+  נספר כ‑`blockers`: ב‑`enforce` הצעה חיה תיעלם. כל שורה כזו היא או תפוסה
+  כפולה אמיתית שהייתה סמויה עד עכשיו, או שורת backfill שגויה — ויש לקרוא אותן
+  אחת‑אחת לפני ההיפוך.
+
+`panui` ריק (`null`) נחשב **מוצע**, כי כך הפילטרים החיים קוראים אותו
+(`panui: { ne: false }`) — כל השוואה אחרת הייתה מודדת משהו שלא קורה בפועל.
+
+**4. `RESOURCE_BOOKINGS=enforce`** — רק כאשר רשימת ה‑`blockers` ריקה או הוסברה.
+
+כדי שאפשר יהיה לקרוא אותן בלי שאילתה נוספת, כל שורת השוואה נושאת `reason`
+(`bookedOut` / `invalidWindow` / `offerWindowEnded` / `offerNotYetOpen` /
+`unknown`) ואת חלון ההיצע עצמו (`offerStartsAt` / `offerEndsAt`), והסיכום מוסיף
+`blockersByReason` — הספירה על **כל** הזנב, לא רק על ה‑50 הראשונים. חלון ההיצע
+נבדק לפני ההזמנות כי הוא מכריע: מחוץ לחלון אין בכלל זמינות להזמין ממנה, וקריאה
+ל‑`bookedOut` הייתה מפנה את הקורא להזמנות שאינן מה שתופס.
+
+#### 13.1.1 ההרצה הראשונה של `op=compare` (6.9.2026, מול הפרודקשן, `mode: off`)
+
+```
+resources 94 | agree 49 | staleLocked 22 | overOffered 23
+byModel  { consumable: 27, pooled: 14, exclusive: 4 }
+blockersByReason { offerWindowEnded: 22, invalidWindow: 1 }
+```
+
+**23 ה‑blockers מוסברים במלואם, ואף אחד מהם אינו תפוסה כפולה.** היומן עדיין ריק
+(ה‑backfill לא רץ), ולכן `holdingBookings: 0` בכולם: מה שסוגר אותם הוא חלון
+ההיצע של המחזיק. 22 מהם הם שורות ה‑seed מ‑2022 שבהן `fdate = sdate + שנתיים`,
+כלומר היצע שפג ב‑2024 ו‑`panui` נשאר `true`. ב‑`enforce` הם ייעלמו מההיצע — וזה
+מה שהמחזיק כבר אמר כשקבע תאריך סיום.
+
+היוצא היחיד הוא **`sp` 94 (`חומרי ניקוי`)**: `sdate: 2026-08-03` עם
+`fdate: 1970-01-01` — חלון הפוך, כלומר שדה תאריך ריק שנשמר כ‑epoch. זו לא פקיעה
+אלא באג נתונים בשורה אחת; שלושת מסלולי הכתיבה בקוד (`newsp` / `editsp` /
+`createResource`) כולם שולחים `undefined` על תאריך ריק, אז מקורה מחוץ להם. יש
+לנקות את `fdate` שלה ידנית בפאנל לפני ההיפוך.
+
+> ההשוואה הזו נמדדה מול יומן ריק, ולכן היא מודדת `panui` מול חלון ההיצע בלבד.
+> **צריך להריץ אותה שוב אחרי ה‑backfill** — שם, ורק שם, `bookedOut` יכול להופיע.
+
+**החזרה היבשה של ה‑backfill** (`op=backfill&dry=1`, אותו יום) על 34 מתנים:
+
+```
+create 34 | skipped 0 | status_done 17 | status_active 17 | existing 0
+```
+
+והרצת אותן 34 השורות דרך `comparePanui` לפני שנכתבו — כלומר מה שההשוואה תראה
+אחרי ההרצה — נותנת: `agree 53 · staleLocked 18 · overOffered 23`, עם
+**`bookedOut: 0`**. ה‑backfill לא מוסיף אף חסם: הוא מזיז ארבעה משאבים
+מ‑`staleLocked` ל‑`agree` (`panui:false` שהיומן מאשר עכשיו), ורשימת ה‑23 נשארת
+בדיוק אותה רשימה של חלונות שפגו.
+
+### 13.2 באג שההרצה הראשונה חשפה: `Sp.hm` לא קיים
+
+הריצה הראשונה של `op=compare` נפלה מיד על
+`Cannot query field "hm" on type "Sp"`. ל‑`Sp` אין `hm` — הכמות ליחידה נקראת
+שם **`unit`**; `hm` הוא שמה של אותה כמות ב‑`Rikmash` וב‑`OpenMashaabim`, וזה
+השם ש‑`ResourceLike` משתמש בו.
+
+השגיאה הזו מפילה את **כל** המסמך, לא רק את השדה, ולכן היא שברה בשקט ארבעה
+מקומות:
+
+| קובץ | מה נשבר |
+|---|---|
+| `qids.js` `309myResourceOccupancy` / `310projectResourceOccupancy` | שתי השאילתות שמזינות את `/me/resources` ואת לוח הריקמה — כלומר העמודים האלה לא החזירו דבר |
+| `bookingStore.ts` (`SP_FIELDS`, `loadSpLedger`) | כל `syncPanui` / `confirmBookingAndRelease` / `checkSpAvailability` — כלומר היומן היה נשבר ברגע ש‑`RESOURCE_BOOKINGS` יוצא מ‑`off`, ו‑`bestEffort` היה בולע את זה כאזהרה |
+| `bookingView.ts` (`normalizeResourceNode`) | קרא `a.hm` על צומת `Sp` וקיבל תמיד `undefined` — כל pool נראה בקיבולת 1 |
+
+תוקן: השאילתות מבקשות `unit`, והממפים קוראים `a.unit ?? a.hm` כדי לשרת את שתי
+הצורות. `npm run validate:qids` לא תופס את זה — הוא מאמת שדות של **mutations**
+בלבד, ועל queries רק בודק שהן פארסות.
+
+### 13.3 מה עוד לא נכנס ל‑backfill
+
+`Sheirut` (התחייבות לספק ללקוח קונסיירז') אינו חלק מההרצה: §8 M2 מגדיר אותה
+על `Mashabetahalich` + `Rikmash` בלבד, והקישור `Sheirut`↔הזמנה עדיין פתוח
+(§9.4, יחד עם `PLAN_COMPLEX_PRODUCTS §7`). עד שייסגר, לוח הריקמה ממשיך לקרוא
+את ההתחייבויות האלה דרך `bookingsFromLegacy.ts`, כפי שהוא עושה היום.

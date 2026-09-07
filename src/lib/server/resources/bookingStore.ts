@@ -89,7 +89,7 @@ async function run(exec: Exec, query: string, label: string): Promise<any> {
 }
 
 const SP_FIELDS = `sp { data { id attributes {
-  name kindOf availability capacity hm sdate fdate leadTimeHours granularity panui
+  name kindOf availability capacity unit sdate fdate leadTimeHours granularity panui
 } } }`;
 
 const BOOKING_FIELDS = `id attributes {
@@ -141,7 +141,7 @@ export async function loadSpLedger(
       ) { data { ${BOOKING_FIELDS} } }
       sp(id: ${JSON.stringify(String(spId))}) {
         data { id attributes {
-          name kindOf availability capacity hm sdate fdate leadTimeHours granularity panui
+          name kindOf availability capacity unit sdate fdate leadTimeHours granularity panui
           users_permissions_user { data { id } }
         } }
       }
@@ -159,7 +159,12 @@ export async function loadSpLedger(
           kindOf: spAttrs.kindOf ?? null,
           availability: spAttrs.availability ?? null,
           capacity: spAttrs.capacity ?? null,
-          hm: spAttrs.hm ?? null,
+          // `Sp` calls the per-unit quantity `unit`; the engine and the open
+          // request call the same number `hm`, which is the name `ResourceLike`
+          // uses. Asking Strapi for `hm` on an `Sp` is a validation error, and
+          // it takes the whole document down with it — every read here would
+          // have failed silently inside `bestEffort`.
+          hm: spAttrs.unit ?? null,
           sdate: spAttrs.sdate ?? null,
           fdate: spAttrs.fdate ?? null,
           leadTimeHours: spAttrs.leadTimeHours ?? null,

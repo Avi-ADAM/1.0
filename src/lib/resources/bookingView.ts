@@ -141,7 +141,9 @@ export function normalizeResourceNode(node: any): (ResourceLike & { id: string; 
     kindOf: a.kindOf ?? null,
     availability: a.availability ?? null,
     capacity: a.capacity ?? null,
-    hm: a.hm ?? null,
+    // `Sp` spells the per-unit quantity `unit`; `Rikmash`/`OpenMashaabim` spell
+    // the same number `hm`. Both shapes reach this mapper, so read either.
+    hm: a.unit ?? a.hm ?? null,
     sdate: a.sdate ?? null,
     fdate: a.fdate ?? null,
     leadTimeHours: a.leadTimeHours ?? null,

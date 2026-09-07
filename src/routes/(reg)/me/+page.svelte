@@ -429,6 +429,17 @@
       guid();
     }
   });
+  // `/me#my-resources` (the demand sheet's "add a resource") means "show me my
+  // resources", not "scroll to them": this page is a fixed-height collage that
+  // never scrolls, so the anchor alone can do nothing. Open the card instead.
+  let handledHash = '';
+  $effect(() => {
+    const hash = page.url.hash;
+    if (hash === handledHash) return;
+    handledHash = hash;
+    if (hash === '#my-resources') current = 'a3';
+  });
+
   function guid() {
     isG = true;
     run();
@@ -1184,14 +1195,24 @@
   .body {
     width: 100vw;
     height: 100vh;
+    /* `clip`, not just `hidden`: an `overflow:hidden` box is still a scroll
+       container, so anything that calls scrollIntoView() inside it — a
+       `/me#my-resources` deep link, a focused element — could scroll this
+       fixed-height collage up and leave the badge and the top cards off
+       screen, with no scrollbar to get back. `hidden` stays first as the
+       fallback for browsers without `clip`. */
     overflow: hidden;
+    overflow: clip;
     position: relative;
     padding-bottom: 10vh;
   }
 
   .me-page-bg {
     position: relative;
+    /* Sits on the same element as `.body` and would otherwise win on source
+       order and hand the collage a scrollport back — see the note there. */
     overflow: hidden;
+    overflow: clip;
     background: radial-gradient(
       circle at bottom center,
       var(--gold) 0%,

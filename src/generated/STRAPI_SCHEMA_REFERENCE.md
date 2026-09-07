@@ -1,6 +1,6 @@
 # Strapi GraphQL Schema Reference
 > Auto-generated from `src/generated/graphql.ts`
-> Last updated: 2026-08-26
+> Last updated: 2026-09-05
 > Source: `codegen.ts` → `http://localhost:1337/graphql`
 
 This file provides a compact reference of all types available from the Strapi backend.
@@ -23,7 +23,7 @@ import type { StrapiEntity, StrapiCollection, StrapiMedia } from '$lib/types/str
 
 ---
 
-## 🏗️ Content Type Entities (124)
+## 🏗️ Content Type Entities (125)
 
 These are the main content types in the Strapi backend.
 
@@ -1178,6 +1178,7 @@ These are the main content types in the Strapi backend.
 | `createRatsonMatchJob` | `Maybe<RatsonMatchJobEntityResponse>` |
 | `createRatsonProposal` | `Maybe<RatsonProposalEntityResponse>` |
 | `createRatsonShare` | `Maybe<RatsonShareEntityResponse>` |
+| `createResourceBooking` | `Maybe<ResourceBookingEntityResponse>` |
 | `createRichtext` | `Maybe<RichtextEntityResponse>` |
 | `createRichtextLocalization` | `Maybe<RichtextEntityResponse>` |
 | `createRikmash` | `Maybe<RikmashEntityResponse>` |
@@ -1300,6 +1301,7 @@ These are the main content types in the Strapi backend.
 | `deleteRatsonMatchJob` | `Maybe<RatsonMatchJobEntityResponse>` |
 | `deleteRatsonProposal` | `Maybe<RatsonProposalEntityResponse>` |
 | `deleteRatsonShare` | `Maybe<RatsonShareEntityResponse>` |
+| `deleteResourceBooking` | `Maybe<ResourceBookingEntityResponse>` |
 | `deleteRichtext` | `Maybe<RichtextEntityResponse>` |
 | `deleteRikmash` | `Maybe<RikmashEntityResponse>` |
 | `deleteSale` | `Maybe<SaleEntityResponse>` |
@@ -1418,6 +1420,7 @@ These are the main content types in the Strapi backend.
 | `updateRatsonMatchJob` | `Maybe<RatsonMatchJobEntityResponse>` |
 | `updateRatsonProposal` | `Maybe<RatsonProposalEntityResponse>` |
 | `updateRatsonShare` | `Maybe<RatsonShareEntityResponse>` |
+| `updateResourceBooking` | `Maybe<ResourceBookingEntityResponse>` |
 | `updateRichtext` | `Maybe<RichtextEntityResponse>` |
 | `updateRikmash` | `Maybe<RikmashEntityResponse>` |
 | `updateSale` | `Maybe<SaleEntityResponse>` |
@@ -1973,6 +1976,7 @@ These are the main content types in the Strapi backend.
 | `publicDescription` | `Maybe<Scalars['String']['output']>` |
 | `publishedAt` | `Maybe<Scalars['DateTime']['output']>` |
 | `ratson_proposals` | `Maybe<RatsonProposalRelationResponseCollection>` |
+| `resource_bookings` | `Maybe<ResourceBookingRelationResponseCollection>` |
 | `restime` | `Maybe<Enum_Project_Restime>` |
 | `rikmashes` | `Maybe<RikmashRelationResponseCollection>` |
 | `sales` | `Maybe<SaleRelationResponseCollection>` |
@@ -2220,6 +2224,8 @@ These are the main content types in the Strapi backend.
 | `ratsonShare` | `Maybe<RatsonShareEntityResponse>` |
 | `ratsonShares` | `Maybe<RatsonShareEntityResponseCollection>` |
 | `ratsons` | `Maybe<RatsonEntityResponseCollection>` |
+| `resourceBooking` | `Maybe<ResourceBookingEntityResponse>` |
+| `resourceBookings` | `Maybe<ResourceBookingEntityResponseCollection>` |
 | `richtext` | `Maybe<RichtextEntityResponse>` |
 | `richtexts` | `Maybe<RichtextEntityResponseCollection>` |
 | `rikmash` | `Maybe<RikmashEntityResponse>` |
@@ -2418,6 +2424,30 @@ These are the main content types in the Strapi backend.
 | `status_share` | `Maybe<Enum_Ratsonshare_Status_Share>` |
 | `updatedAt` | `Maybe<Scalars['DateTime']['output']>` |
 | `users_permissions_user` | `Maybe<UsersPermissionsUserEntityResponse>` |
+
+### ResourceBooking
+| Field | Type |
+|-------|------|
+| `cancelReason` | `Maybe<Enum_Resourcebooking_Cancelreason>` |
+| `consumer_user` | `Maybe<UsersPermissionsUserEntityResponse>` |
+| `createdAt` | `Maybe<Scalars['DateTime']['output']>` |
+| `end` | `Maybe<Scalars['DateTime']['output']>` |
+| `holdExpiresAt` | `Maybe<Scalars['DateTime']['output']>` |
+| `maap` | `Maybe<MaapEntityResponse>` |
+| `mashaabim` | `Maybe<MashaabimEntityResponse>` |
+| `mashabetahalich` | `Maybe<MashabetahalichEntityResponse>` |
+| `note` | `Maybe<Scalars['String']['output']>` |
+| `open_mashaabim` | `Maybe<OpenMashaabimEntityResponse>` |
+| `owner` | `Maybe<UsersPermissionsUserEntityResponse>` |
+| `project` | `Maybe<ProjectEntityResponse>` |
+| `quantity` | `Maybe<Scalars['Float']['output']>` |
+| `rikmash` | `Maybe<RikmashEntityResponse>` |
+| `sheirut` | `Maybe<SheirutEntityResponse>` |
+| `source` | `Maybe<Enum_Resourcebooking_Source>` |
+| `sp` | `Maybe<SpEntityResponse>` |
+| `start` | `Scalars['DateTime']['output']` |
+| `status` | `Maybe<Enum_Resourcebooking_Status>` |
+| `updatedAt` | `Maybe<Scalars['DateTime']['output']>` |
 
 ### ResponseCollectionMeta
 | Field | Type |
@@ -2705,11 +2735,15 @@ These are the main content types in the Strapi backend.
 |-------|------|
 | `archived` | `Scalars['Boolean']['output']` |
 | `askms` | `Maybe<AskmRelationResponseCollection>` |
+| `availability` | `Maybe<Enum_Sp_Availability>` |
+| `capacity` | `Maybe<Scalars['Int']['output']>` |
 | `createdAt` | `Maybe<Scalars['DateTime']['output']>` |
 | `declinedm` | `Maybe<OpenMashaabimEntityResponse>` |
 | `descrip` | `Maybe<Scalars['String']['output']>` |
 | `fdate` | `Maybe<Scalars['DateTime']['output']>` |
+| `granularity` | `Maybe<Enum_Sp_Granularity>` |
 | `kindOf` | `Maybe<Enum_Sp_Kindof>` |
+| `leadTimeHours` | `Maybe<Scalars['Int']['output']>` |
 | `linkto` | `Maybe<Scalars['String']['output']>` |
 | `locale` | `Maybe<Scalars['String']['output']>` |
 | `localizations` | `Maybe<SpRelationResponseCollection>` |
@@ -2727,6 +2761,7 @@ These are the main content types in the Strapi backend.
 | `price` | `Maybe<Scalars['Float']['output']>` |
 | `project` | `Maybe<ProjectEntityResponse>` |
 | `publishedAt` | `Maybe<Scalars['DateTime']['output']>` |
+| `resource_bookings` | `Maybe<ResourceBookingRelationResponseCollection>` |
 | `rikmash` | `Maybe<RikmashEntityResponse>` |
 | `sdate` | `Maybe<Scalars['DateTime']['output']>` |
 | `splited` | `Maybe<Scalars['Boolean']['output']>` |
@@ -3176,6 +3211,7 @@ These are the main content types in the Strapi backend.
 | `ratson_proposals` | `Maybe<RatsonProposalRelationResponseCollection>` |
 | `ratson_shares` | `Maybe<RatsonShareRelationResponseCollection>` |
 | `ratsons` | `Maybe<RatsonRelationResponseCollection>` |
+| `resource_bookings` | `Maybe<ResourceBookingRelationResponseCollection>` |
 | `rikmashes` | `Maybe<RikmashRelationResponseCollection>` |
 | `rishonvesopen` | `Maybe<OpenMissionRelationResponseCollection>` |
 | `role` | `Maybe<UsersPermissionsRoleEntityResponse>` |
@@ -4414,7 +4450,7 @@ These are Strapi components (reusable field groups).
 
 ---
 
-## 📝 Input Types (122)
+## 📝 Input Types (123)
 
 Used for creating/updating content.
 
@@ -6012,6 +6048,7 @@ Used for creating/updating content.
 | `publicDescription` | `InputMaybe<Scalars['String']['input']>` |
 | `publishedAt` | `InputMaybe<Scalars['DateTime']['input']>` |
 | `ratson_proposals` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
+| `resource_bookings` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `restime` | `InputMaybe<Enum_Project_Restime>` |
 | `rikmashes` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `sales` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
@@ -6214,6 +6251,28 @@ Used for creating/updating content.
 | `role` | `InputMaybe<Enum_Ratsonshare_Role>` |
 | `status_share` | `InputMaybe<Enum_Ratsonshare_Status_Share>` |
 | `users_permissions_user` | `InputMaybe<Scalars['ID']['input']>` |
+
+### ResourceBookingInput
+| Field | Type |
+|-------|------|
+| `cancelReason` | `InputMaybe<Enum_Resourcebooking_Cancelreason>` |
+| `consumer_user` | `InputMaybe<Scalars['ID']['input']>` |
+| `end` | `InputMaybe<Scalars['DateTime']['input']>` |
+| `holdExpiresAt` | `InputMaybe<Scalars['DateTime']['input']>` |
+| `maap` | `InputMaybe<Scalars['ID']['input']>` |
+| `mashaabim` | `InputMaybe<Scalars['ID']['input']>` |
+| `mashabetahalich` | `InputMaybe<Scalars['ID']['input']>` |
+| `note` | `InputMaybe<Scalars['String']['input']>` |
+| `open_mashaabim` | `InputMaybe<Scalars['ID']['input']>` |
+| `owner` | `InputMaybe<Scalars['ID']['input']>` |
+| `project` | `InputMaybe<Scalars['ID']['input']>` |
+| `quantity` | `InputMaybe<Scalars['Float']['input']>` |
+| `rikmash` | `InputMaybe<Scalars['ID']['input']>` |
+| `sheirut` | `InputMaybe<Scalars['ID']['input']>` |
+| `source` | `InputMaybe<Enum_Resourcebooking_Source>` |
+| `sp` | `InputMaybe<Scalars['ID']['input']>` |
+| `start` | `InputMaybe<Scalars['DateTime']['input']>` |
+| `status` | `InputMaybe<Enum_Resourcebooking_Status>` |
 
 ### RichtextInput
 | Field | Type |
@@ -6460,10 +6519,14 @@ Used for creating/updating content.
 |-------|------|
 | `archived` | `InputMaybe<Scalars['Boolean']['input']>` |
 | `askms` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
+| `availability` | `InputMaybe<Enum_Sp_Availability>` |
+| `capacity` | `InputMaybe<Scalars['Int']['input']>` |
 | `declinedm` | `InputMaybe<Scalars['ID']['input']>` |
 | `descrip` | `InputMaybe<Scalars['String']['input']>` |
 | `fdate` | `InputMaybe<Scalars['DateTime']['input']>` |
+| `granularity` | `InputMaybe<Enum_Sp_Granularity>` |
 | `kindOf` | `InputMaybe<Enum_Sp_Kindof>` |
+| `leadTimeHours` | `InputMaybe<Scalars['Int']['input']>` |
 | `linkto` | `InputMaybe<Scalars['String']['input']>` |
 | `location` | `InputMaybe<ComponentNewLocationInput>` |
 | `maaps` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
@@ -6479,6 +6542,7 @@ Used for creating/updating content.
 | `price` | `InputMaybe<Scalars['Float']['input']>` |
 | `project` | `InputMaybe<Scalars['ID']['input']>` |
 | `publishedAt` | `InputMaybe<Scalars['DateTime']['input']>` |
+| `resource_bookings` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `rikmash` | `InputMaybe<Scalars['ID']['input']>` |
 | `sdate` | `InputMaybe<Scalars['DateTime']['input']>` |
 | `splited` | `InputMaybe<Scalars['Boolean']['input']>` |
@@ -6884,6 +6948,7 @@ Used for creating/updating content.
 | `ratson_shares` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `ratsons` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `resetPasswordToken` | `InputMaybe<Scalars['String']['input']>` |
+| `resource_bookings` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `rikmashes` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `rishonvesopen` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `role` | `InputMaybe<Scalars['ID']['input']>` |
@@ -7014,12 +7079,12 @@ Used for creating/updating content.
 
 ---
 
-## 🔍 Filter Input Types (111)
+## 🔍 Filter Input Types (112)
 
 Used for querying/filtering content. Each content type has a corresponding filter input.
 
 <details>
-<summary>Click to expand all 111 filter types</summary>
+<summary>Click to expand all 112 filter types</summary>
 
 #### ActFiltersInput
 Fields: `and`, `createdAt`, `dateF`, `dateS`, `des`, `externalId`, `forums`, `hashivut`, `id`, `isAssigned`, `link`, `locale`, `localizations`, `mesimabetahaliches`, `my`, `myIshur`, `naasa`, `negopendmissions`, `not`, `open_mission`, `or`, `partofs`, `pendm`, `project`, `publishedAt`, `shem`, `source`, `status`, `tafkidims`, `taskdis`, `timegrama`, `timers`, `updatedAt`, `userAndIshur`, `vali`, `valiIshur`
@@ -7220,7 +7285,7 @@ Fields: `and`, `archived`, `askm`, `createdAt`, `cycleSize`, `descrip`, `diun`, 
 Fields: `aiMeta`, `and`, `arguments`, `author`, `authorEmail`, `authorExternalId`, `authorType`, `clauses`, `createdAt`, `description`, `heading`, `id`, `intensity`, `isAnchor`, `kind`, `location`, `negotiation`, `not`, `or`, `order`, `pole`, `publishedAt`, `relativePlacement`, `selfPlacement`, `tags`, `updatedAt`, `voters`, `votes`
 
 #### ProjectFiltersInput
-Fields: `acts`, `addHoursManualy`, `and`, `api_keys`, `askms`, `asks`, `askwants`, `city`, `countries`, `createdAt`, `deals`, `decisions`, `deffinitions`, `descripFor`, `discordlink`, `dormancyDays`, `drivelink`, `fblink`, `finiapruvals`, `finnishedM72HForDecline`, `finnishedMAllApruve`, `finnished_missions`, `forums`, `githublink`, `haamadapruvs`, `haamadas`, `halukas`, `halukas_recive`, `id`, `isMachzikim`, `isMachzikimPublik`, `isOt`, `isPlatform`, `joinPolicy`, `linkToWebsite`, `locale`, `localizations`, `location`, `maaps`, `machshirs`, `mashaabims`, `mashabetahaliches`, `matanotofs`, `mesimabetahaliches`, `missions`, `newMeMissionOuto72ho`, `newOpenMissionAllApruve`, `newOpenMotoAfter72hoursWithnono`, `newmeOpenAllapruve`, `not`, `open_mashaabims`, `open_missions`, `or`, `pendms`, `pledges`, `pmashes`, `projectName`, `project_plan_boards`, `publicDescription`, `publishedAt`, `ratson_proposals`, `restime`, `rikmashes`, `sales`, `sales_source`, `sheirutpends`, `sheiruts`, `sheiruts_sourced`, `site_share_contributions`, `spirit`, `sps`, `stipendDefaultCostShare`, `stipendDefaultRate`, `stipendPolicy`, `stipend_payments`, `stipend_pledges`, `stipend_programs`, `supportPage`, `tafkidims`, `timeToP`, `timerOnlyTOrAlsoManuallyF`, `timers`, `tosplits`, `totalinyearone`, `totalinyearsec`, `totalmaxyearone`, `totalmaxyearsec`, `totalminyearone`, `totalminyearsec`, `twiterlink`, `updatedAt`, `user_1s`, `usersOfP`, `vallues`, `watsapplink`, `welcom_tops`, `work_ways`, `zohars`
+Fields: `acts`, `addHoursManualy`, `and`, `api_keys`, `askms`, `asks`, `askwants`, `city`, `countries`, `createdAt`, `deals`, `decisions`, `deffinitions`, `descripFor`, `discordlink`, `dormancyDays`, `drivelink`, `fblink`, `finiapruvals`, `finnishedM72HForDecline`, `finnishedMAllApruve`, `finnished_missions`, `forums`, `githublink`, `haamadapruvs`, `haamadas`, `halukas`, `halukas_recive`, `id`, `isMachzikim`, `isMachzikimPublik`, `isOt`, `isPlatform`, `joinPolicy`, `linkToWebsite`, `locale`, `localizations`, `location`, `maaps`, `machshirs`, `mashaabims`, `mashabetahaliches`, `matanotofs`, `mesimabetahaliches`, `missions`, `newMeMissionOuto72ho`, `newOpenMissionAllApruve`, `newOpenMotoAfter72hoursWithnono`, `newmeOpenAllapruve`, `not`, `open_mashaabims`, `open_missions`, `or`, `pendms`, `pledges`, `pmashes`, `projectName`, `project_plan_boards`, `publicDescription`, `publishedAt`, `ratson_proposals`, `resource_bookings`, `restime`, `rikmashes`, `sales`, `sales_source`, `sheirutpends`, `sheiruts`, `sheiruts_sourced`, `site_share_contributions`, `spirit`, `sps`, `stipendDefaultCostShare`, `stipendDefaultRate`, `stipendPolicy`, `stipend_payments`, `stipend_pledges`, `stipend_programs`, `supportPage`, `tafkidims`, `timeToP`, `timerOnlyTOrAlsoManuallyF`, `timers`, `tosplits`, `totalinyearone`, `totalinyearsec`, `totalmaxyearone`, `totalmaxyearsec`, `totalminyearone`, `totalminyearsec`, `twiterlink`, `updatedAt`, `user_1s`, `usersOfP`, `vallues`, `watsapplink`, `welcom_tops`, `work_ways`, `zohars`
 
 #### ProjectPlanBoardFiltersInput
 Fields: `ai_meta`, `and`, `createdAt`, `creator`, `descrip`, `expandedAt`, `forums`, `id`, `items`, `not`, `or`, `order`, `origin`, `project`, `publishedAt`, `rationale`, `revisionNote`, `sourceText`, `status`, `title`, `updatedAt`
@@ -7242,6 +7307,9 @@ Fields: `and`, `auto_generated`, `covered_missions`, `covered_resources`, `creat
 
 #### RatsonShareFiltersInput
 Fields: `and`, `createdAt`, `halukas`, `id`, `joinedAt`, `leftAt`, `matbea`, `maxContribution`, `not`, `notificationsOn`, `or`, `publishedAt`, `ratson`, `role`, `status_share`, `updatedAt`, `users_permissions_user`
+
+#### ResourceBookingFiltersInput
+Fields: `and`, `cancelReason`, `consumer_user`, `createdAt`, `end`, `holdExpiresAt`, `id`, `maap`, `mashaabim`, `mashabetahalich`, `not`, `note`, `open_mashaabim`, `or`, `owner`, `project`, `quantity`, `rikmash`, `sheirut`, `source`, `sp`, `start`, `status`, `updatedAt`
 
 #### RichtextFiltersInput
 Fields: `and`, `bg`, `createdAt`, `desc`, `id`, `locale`, `localizations`, `not`, `or`, `updatedAt`
@@ -7286,7 +7354,7 @@ Fields: `and`, `createdAt`, `descrip`, `id`, `locale`, `localizations`, `mission
 Fields: `and`, `createdAt`, `deas`, `id`, `not`, `or`, `publishedAt`, `updatedAt`
 
 #### SpFiltersInput
-Fields: `and`, `archived`, `askms`, `createdAt`, `declinedm`, `descrip`, `fdate`, `id`, `kindOf`, `linkto`, `locale`, `localizations`, `location`, `maaps`, `mashaabim`, `matanot`, `mode`, `myp`, `name`, `not`, `offerScope`, `openask`, `or`, `panui`, `price`, `project`, `publishedAt`, `rikmash`, `sdate`, `splited`, `spnot`, `unit`, `updatedAt`, `users_permissions_user`, `yat`
+Fields: `and`, `archived`, `askms`, `availability`, `capacity`, `createdAt`, `declinedm`, `descrip`, `fdate`, `granularity`, `id`, `kindOf`, `leadTimeHours`, `linkto`, `locale`, `localizations`, `location`, `maaps`, `mashaabim`, `matanot`, `mode`, `myp`, `name`, `not`, `offerScope`, `openask`, `or`, `panui`, `price`, `project`, `publishedAt`, `resource_bookings`, `rikmash`, `sdate`, `splited`, `spnot`, `unit`, `updatedAt`, `users_permissions_user`, `yat`
 
 #### StipendPaymentFiltersInput
 Fields: `amount`, `and`, `confirmedAt`, `confirmedBy`, `costShare`, `createdAt`, `cycleEnd`, `cycleStart`, `equityCredit`, `equityDebit`, `equityMultiplier`, `funder`, `haluka`, `hours`, `id`, `matbea`, `mode`, `not`, `note`, `or`, `project`, `publishedAt`, `recipient`, `repaid`, `status`, `stipendRate`, `stipend_pledge`, `stipend_program`, `timegrama`, `updatedAt`
@@ -7331,7 +7399,7 @@ Fields: `action`, `and`, `createdAt`, `id`, `not`, `or`, `role`, `updatedAt`
 Fields: `and`, `createdAt`, `description`, `id`, `name`, `not`, `or`, `permissions`, `type`, `updatedAt`, `users`
 
 #### UsersPermissionsUserFiltersInput
-Fields: `acts`, `actsVali`, `and`, `api_keys`, `arr1`, `arrdate`, `askeds`, `askms`, `asks`, `askwants`, `auto_created_via`, `availability_pref`, `bio`, `blocked`, `chezin`, `city`, `confirmationToken`, `confirmed`, `createdAt`, `cuntries`, `cv_extracted_at`, `cv_extraction`, `deals`, `declined`, `declinedByP`, `declinedm`, `device_token`, `discordlink`, `email`, `fblink`, `filtertags`, `finiapruvals`, `finnished_missions`, `forum_last_seens`, `frd`, `free_person`, `githublink`, `haamadas`, `halukasend`, `halukasres`, `haskama`, `haskamac`, `haskamaz`, `hatzaas`, `hervachti`, `iGotMOneyForSheirut`, `id`, `isSigned`, `lang`, `lat`, `levManualAlready`, `lng`, `location`, `machshirs`, `mashaabims`, `mashabetahaliches`, `matanot_recipe_missions`, `matanot_recipe_resources`, `match_suggestions`, `mesimabetahaliches`, `messages`, `mission_offers`, `missions_i_can_do`, `moachManualAlready`, `nego_mashes`, `negopendmissions`, `negotiations`, `negotiationsIparticipante`, `noMail`, `noMoachGuide`, `noOfHoursProject1`, `not`, `onboarding_status`, `onboarding_track`, `open_missions`, `or`, `owned_matanots`, `password`, `pendms`, `pendmsforme`, `personal_project`, `pgishas`, `pgishasPendStrat`, `pgishauserpends`, `pgishausers`, `pledges`, `pmashes`, `positionsAuthor`, `preferCards`, `pricing_pref`, `profilManualAlready`, `project_plan_boards`, `projects_1s`, `provider`, `radius`, `ratson_proposals`, `ratson_shares`, `ratsons`, `resetPasswordToken`, `rikmashes`, `rishonvesopen`, `role`, `sales`, `sales_as_customer`, `sales_reported`, `sheirutnegos`, `sheirutpends`, `sheiruts`, `sheiruts_iCanGetMonay`, `shekelsPerHoureProject1`, `site_share_contributions`, `skills`, `socketId`, `sphmin`, `sps`, `stipend_payments_funded`, `stipend_payments_received`, `stipend_pledges_funded`, `stipend_pledges_received`, `stipend_programs_funded`, `tafkidims`, `telegramId`, `timeForVid`, `timers`, `twiterlink`, `updatedAt`, `username`, `vallues`, `videoval`, `votes`, `wants`, `welcom_tops`, `work_ways`, `zohars`
+Fields: `acts`, `actsVali`, `and`, `api_keys`, `arr1`, `arrdate`, `askeds`, `askms`, `asks`, `askwants`, `auto_created_via`, `availability_pref`, `bio`, `blocked`, `chezin`, `city`, `confirmationToken`, `confirmed`, `createdAt`, `cuntries`, `cv_extracted_at`, `cv_extraction`, `deals`, `declined`, `declinedByP`, `declinedm`, `device_token`, `discordlink`, `email`, `fblink`, `filtertags`, `finiapruvals`, `finnished_missions`, `forum_last_seens`, `frd`, `free_person`, `githublink`, `haamadas`, `halukasend`, `halukasres`, `haskama`, `haskamac`, `haskamaz`, `hatzaas`, `hervachti`, `iGotMOneyForSheirut`, `id`, `isSigned`, `lang`, `lat`, `levManualAlready`, `lng`, `location`, `machshirs`, `mashaabims`, `mashabetahaliches`, `matanot_recipe_missions`, `matanot_recipe_resources`, `match_suggestions`, `mesimabetahaliches`, `messages`, `mission_offers`, `missions_i_can_do`, `moachManualAlready`, `nego_mashes`, `negopendmissions`, `negotiations`, `negotiationsIparticipante`, `noMail`, `noMoachGuide`, `noOfHoursProject1`, `not`, `onboarding_status`, `onboarding_track`, `open_missions`, `or`, `owned_matanots`, `password`, `pendms`, `pendmsforme`, `personal_project`, `pgishas`, `pgishasPendStrat`, `pgishauserpends`, `pgishausers`, `pledges`, `pmashes`, `positionsAuthor`, `preferCards`, `pricing_pref`, `profilManualAlready`, `project_plan_boards`, `projects_1s`, `provider`, `radius`, `ratson_proposals`, `ratson_shares`, `ratsons`, `resetPasswordToken`, `resource_bookings`, `rikmashes`, `rishonvesopen`, `role`, `sales`, `sales_as_customer`, `sales_reported`, `sheirutnegos`, `sheirutpends`, `sheiruts`, `sheiruts_iCanGetMonay`, `shekelsPerHoureProject1`, `site_share_contributions`, `skills`, `socketId`, `sphmin`, `sps`, `stipend_payments_funded`, `stipend_payments_received`, `stipend_pledges_funded`, `stipend_pledges_received`, `stipend_programs_funded`, `tafkidims`, `telegramId`, `timeForVid`, `timers`, `twiterlink`, `updatedAt`, `username`, `vallues`, `videoval`, `votes`, `wants`, `welcom_tops`, `work_ways`, `zohars`
 
 #### VallueFiltersInput
 Fields: `and`, `createdAt`, `decisions`, `decisionsles`, `descrip`, `id`, `locale`, `localizations`, `not`, `open_missions`, `or`, `pendms`, `projects`, `publishedAt`, `ratsons`, `updatedAt`, `users`, `valueName`
@@ -7358,12 +7426,12 @@ Fields: `allSubmited`, `and`, `createdAt`, `done`, `id`, `mesimabetahalich`, `no
 
 ---
 
-## 📦 Entity Response Types (429)
+## 📦 Entity Response Types (433)
 
 Wrapper types for GraphQL responses.
 
 <details>
-<summary>Click to expand all 429 response types</summary>
+<summary>Click to expand all 433 response types</summary>
 
 - **ActEntity**: `attributes: Maybe<Act>`, `id: Maybe<Scalars['ID']['output']>`
 - **ActEntityResponse**: `data: Maybe<ActEntity>`
@@ -7652,6 +7720,10 @@ Wrapper types for GraphQL responses.
 - **RatsonShareEntityResponse**: `data: Maybe<RatsonShareEntity>`
 - **RatsonShareEntityResponseCollection**: `data: Array<RatsonShareEntity>`, `meta: ResponseCollectionMeta`
 - **RatsonShareRelationResponseCollection**: `data: Array<RatsonShareEntity>`
+- **ResourceBookingEntity**: `attributes: Maybe<ResourceBooking>`, `id: Maybe<Scalars['ID']['output']>`
+- **ResourceBookingEntityResponse**: `data: Maybe<ResourceBookingEntity>`
+- **ResourceBookingEntityResponseCollection**: `data: Array<ResourceBookingEntity>`, `meta: ResponseCollectionMeta`
+- **ResourceBookingRelationResponseCollection**: `data: Array<ResourceBookingEntity>`
 - **RichtextEntity**: `attributes: Maybe<Richtext>`, `id: Maybe<Scalars['ID']['output']>`
 - **RichtextEntityResponse**: `data: Maybe<RichtextEntity>`
 - **RichtextEntityResponseCollection**: `data: Array<RichtextEntity>`, `meta: ResponseCollectionMeta`
@@ -7798,10 +7870,10 @@ Wrapper types for GraphQL responses.
 
 ---
 
-## 🔢 Enum Types (133)
+## 🔢 Enum Types (138)
 
 <details>
-<summary>Click to expand all 133 enum types</summary>
+<summary>Click to expand all 138 enum types</summary>
 
 - **Enum_Act_Hashivut**: 
 - **Enum_Act_Source**: 
@@ -7906,6 +7978,9 @@ Wrapper types for GraphQL responses.
 - **Enum_Ratson_Share_Status**: 
 - **Enum_Ratson_Status_Ratson**: 
 - **Enum_Ratson_Willingnessmodel**: 
+- **Enum_Resourcebooking_Cancelreason**: 
+- **Enum_Resourcebooking_Source**: 
+- **Enum_Resourcebooking_Status**: 
 - **Enum_Rikmash_Kindof**: 
 - **Enum_Sale_Confirmedby**: 
 - **Enum_Sale_Holderstatus**: 
@@ -7915,6 +7990,8 @@ Wrapper types for GraphQL responses.
 - **Enum_Sitereport_Type**: 
 - **Enum_Sitesharecontribution_Des_Status**: 
 - **Enum_Sitesharecontribution_Direction**: 
+- **Enum_Sp_Availability**: 
+- **Enum_Sp_Granularity**: 
 - **Enum_Sp_Kindof**: 
 - **Enum_Sp_Offerscope**: 
 - **Enum_Stipendpayment_Confirmedby**: 
@@ -7951,7 +8028,7 @@ Wrapper types for GraphQL responses.
 ```
 src/
 ├── generated/
-│   ├── graphql.ts              # Auto-generated types (codegen) - 20846 lines
+│   ├── graphql.ts              # Auto-generated types (codegen) - 21052 lines
 │   ├── index.ts                # Re-export hub
 │   └── STRAPI_SCHEMA_REFERENCE.md  # This file (AI agent reference)
 ├── lib/

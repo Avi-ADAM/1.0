@@ -370,11 +370,14 @@ textarea::-webkit-resizer {
   --accent-color: #ff3e00;
   --heading-color: rgba(0, 0, 0, 0.7);
   --text-color: #444444;
-  --gold: #eee8aa;
+  --gold-rgb: 238 232 170;
+  --gold: rgb(var(--gold-rgb));
   /* Fallback only — the real per-theme value lives in the appearance layer at
      the end of this file. Kept here so an unclassed <html> still renders. */
-  --goldink: #8a6a15;
-  --barbi-pink: #ff0092;
+  --goldink-rgb: 138 106 21;
+  --goldink: rgb(var(--goldink-rgb));
+  --barbi-pink-rgb: 255 0 146;
+  --barbi-pink: rgb(var(--barbi-pink-rgb));
   --pinki: rgb(242, 229, 242);
 
   --blue: rgb(182, 240, 255);
@@ -1627,7 +1630,8 @@ button:focus:not(:focus-visible) {
   --s2: #171512;
   --s3: #201d19;
   --s4: #2a2520;
-  --gold: #eee8aa;
+  --gold-rgb: 238 232 170;
+  --gold: rgb(var(--gold-rgb));
   --gold-l: #f0c040;
   --gold-ll: #fde68a;
   --gold-d: rgba(200, 150, 12, 0.18);
@@ -1885,8 +1889,10 @@ html.business {
 /* Pins today's look so a stray `:root` further up cannot drift it. Only
    --goldink is genuinely new here; it fixes the invisible outline buttons. */
 html.personal {
-  --gold: #eee8aa;
-  --goldink: #8a6a15; /* 5.1:1 on white */
+  --gold-rgb: 238 232 170;
+  --gold: rgb(var(--gold-rgb));
+  --goldink-rgb: 138 106 21;
+  --goldink: rgb(var(--goldink-rgb)); /* 5.1:1 on white */
   /* Was #ff0092, the only value in this block with no ratio noted - because it
      did not meet the contract stated above. --gold on it measured 2.96:1 and
      it measured 3.71:1 as ink on white, against the 4.5:1 this file requires;
@@ -1895,7 +1901,8 @@ html.personal {
      swaps to. No brand-appropriate ink passes on #ff0092 - even white reaches
      only 3.71:1 - so the saturated side is what had to move. Same hue family,
      one step deeper, and now it satisfies the pair contract in both roles. */
-  --barbi-pink: #b80069; /* 6.5:1 on white · --gold on it = 5.2:1 */
+  --barbi-pink-rgb: 184 0 105;
+  --barbi-pink: rgb(var(--barbi-pink-rgb)); /* 6.5:1 on white · --gold on it = 5.2:1 */
   --pinki: rgb(242, 229, 242);
   --blue: rgb(182, 240, 255);
   --naim: rgba(251, 207, 232);
@@ -1913,15 +1920,19 @@ html.personal {
    Inverting the pair here would break those pairings, so only --goldink —
    which has no legacy call sites — flips. */
 html.personal.dark {
-  --goldink: #f0c040; /* 8.6:1 on slate-800 */
+  --goldink-rgb: 240 192 64;
+  --goldink: rgb(var(--goldink-rgb)); /* 8.6:1 on slate-800 */
 }
 
 /* --- BUSINESS · LIGHT ---------------------------------------------------- */
 html.business {
   /* the pair */
-  --gold: #f8fafc;
-  --goldink: #1e3a8a; /* 10.2:1 on white */
-  --barbi-pink: #1d4ed8; /* 6.6:1 on white · --gold on it = 6.4:1 */
+  --gold-rgb: 248 250 252;
+  --gold: rgb(var(--gold-rgb));
+  --goldink-rgb: 30 58 138;
+  --goldink: rgb(var(--goldink-rgb)); /* 10.2:1 on white */
+  --barbi-pink-rgb: 29 78 216;
+  --barbi-pink: rgb(var(--barbi-pink-rgb)); /* 6.6:1 on white · --gold on it = 6.4:1 */
 
   /* surfaces */
   --pinki: #f1f5f9;
@@ -2022,9 +2033,12 @@ html.business.dark {
      same 4.8:1 as ink on the pale cards where `text-barbi` overwhelmingly
      sits. Bare `text-barbi` directly on the page background is the weak
      case; components that put text there use `dark:text-*` utilities. */
-  --gold: #f1f5fb;
-  --goldink: #93c5fd; /* 8.1:1 on slate-800 */
-  --barbi-pink: #2563eb;
+  --gold-rgb: 241 245 251;
+  --gold: rgb(var(--gold-rgb));
+  --goldink-rgb: 147 197 253;
+  --goldink: rgb(var(--goldink-rgb)); /* 8.1:1 on slate-800 */
+  --barbi-pink-rgb: 37 99 235;
+  --barbi-pink: rgb(var(--barbi-pink-rgb));
 
   --pinki: #16223a;
   --blue: #16334d;
@@ -2115,31 +2129,47 @@ html.business.dark {
    a card is seamless instead of a box inside a box.
    ------------------------------------------------------------------------ */
 html.personal {
-  --surface: #ffffff;
-  --surface-2: #f7f5ef;
-  --surface-ink: #2b2620; /* 13.9:1 on --surface */
-  --surface-muted: #6b6156; /* 6.1:1 - the `text-gray-600` role */
+  --surface-rgb: 255 255 255;
+  --surface: rgb(var(--surface-rgb));
+  --surface-2-rgb: 247 245 239;
+  --surface-2: rgb(var(--surface-2-rgb));
+  --surface-ink-rgb: 43 38 32;
+  --surface-ink: rgb(var(--surface-ink-rgb)); /* 13.9:1 on --surface */
+  --surface-muted-rgb: 107 97 86;
+  --surface-muted: rgb(var(--surface-muted-rgb)); /* 6.1:1 - the `text-gray-600` role */
   --surface-line: rgba(0, 0, 0, 0.1);
 }
 html.personal.dark {
-  --surface: #171512;
-  --surface-2: #201d19;
-  --surface-ink: #ede5d8; /* 14.6:1 */
-  --surface-muted: #a89a86; /* 6.6:1 */
+  --surface-rgb: 23 21 18;
+  --surface: rgb(var(--surface-rgb));
+  --surface-2-rgb: 32 29 25;
+  --surface-2: rgb(var(--surface-2-rgb));
+  --surface-ink-rgb: 237 229 216;
+  --surface-ink: rgb(var(--surface-ink-rgb)); /* 14.6:1 */
+  --surface-muted-rgb: 168 154 134;
+  --surface-muted: rgb(var(--surface-muted-rgb)); /* 6.6:1 */
   --surface-line: rgba(238, 232, 170, 0.14);
 }
 html.business {
-  --surface: #ffffff;
-  --surface-2: #f1f5f9;
-  --surface-ink: #0f172a; /* 17.4:1 */
-  --surface-muted: #475569; /* 7.4:1 */
+  --surface-rgb: 255 255 255;
+  --surface: rgb(var(--surface-rgb));
+  --surface-2-rgb: 241 245 249;
+  --surface-2: rgb(var(--surface-2-rgb));
+  --surface-ink-rgb: 15 23 42;
+  --surface-ink: rgb(var(--surface-ink-rgb)); /* 17.4:1 */
+  --surface-muted-rgb: 71 85 105;
+  --surface-muted: rgb(var(--surface-muted-rgb)); /* 7.4:1 */
   --surface-line: rgb(15 23 42 / 0.12);
 }
 html.business.dark {
-  --surface: #111b2e;
-  --surface-2: #172440;
-  --surface-ink: #e8eef7; /* 15.6:1 */
-  --surface-muted: #a3b3c9; /* 7.1:1 */
+  --surface-rgb: 17 27 46;
+  --surface: rgb(var(--surface-rgb));
+  --surface-2-rgb: 23 36 64;
+  --surface-2: rgb(var(--surface-2-rgb));
+  --surface-ink-rgb: 232 238 247;
+  --surface-ink: rgb(var(--surface-ink-rgb)); /* 15.6:1 */
+  --surface-muted-rgb: 163 179 201;
+  --surface-muted: rgb(var(--surface-muted-rgb)); /* 7.1:1 */
   --surface-line: rgb(255 255 255 / 0.12);
 }
 

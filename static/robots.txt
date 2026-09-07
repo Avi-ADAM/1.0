@@ -1,3 +1,8 @@
 # https://www.robotstxt.org/robotstxt.html
 User-agent: *
 Disallow:
+
+# The one line that tells a crawler where the map is. Without it a crawler
+# finds pages only by following links, and the explanatory pages are reached
+# from the homepage footer alone.
+Sitemap: https://1lev1.com/sitemap.xml

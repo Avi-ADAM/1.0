@@ -92,7 +92,7 @@
   });
 
   const colorMap = {
-    blue:   'bg-blue-400/20   text-blue-700   border-blue-300/60   hover:bg-blue-400/35   hover:border-blue-400/80   dark:bg-blue-600/75   dark:text-blue-50    dark:border-blue-500/60   dark:hover:bg-blue-600/90',
+    blue:   'bg-blue-400/20   text-blue-700   border-blue-300/60   hover:bg-blue-400/35   hover:border-blue-400/80   dark:bg-blue-700/90   dark:text-blue-50    dark:border-blue-500/60   dark:hover:bg-blue-600/90',
     gray:   'bg-white/20      text-gray-600   border-gray-300/50   hover:bg-white/35     hover:border-gray-400/70   dark:bg-gray-600/75   dark:text-gray-50    dark:border-gray-500/50   dark:hover:bg-gray-600/90',
     red:    'bg-red-400/20    text-red-700    border-red-300/60    hover:bg-red-400/35   hover:border-red-400/80    dark:bg-red-700/75    dark:text-red-50     dark:border-red-500/60    dark:hover:bg-red-700/90',
     green:  'bg-green-500/25  text-green-900  border-green-400/60  hover:bg-green-500/40 hover:border-green-500/80  dark:bg-green-700/75  dark:text-green-50   dark:border-green-500/50  dark:hover:bg-green-700/90',

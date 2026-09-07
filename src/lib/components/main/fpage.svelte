@@ -11,7 +11,6 @@
   import Scene from '$lib/components/main/1lev1.svelte';
   import ProductPeek from '$lib/components/main/ProductPeek.svelte';
   import SplitCalculator from '$lib/components/main/SplitCalculator.svelte';
-  import IncomeCurves from '$lib/components/main/IncomeCurves.svelte';
   import VideoModal from '$lib/components/main/VideoModal.svelte';
   import DemoRequest from '$lib/components/main/DemoRequest.svelte';
   import ResizeHandler from '$lib/components/ResizeHandler.svelte';
@@ -29,12 +28,19 @@
    * the `{#each}` so the `@type` annotations actually reach the checker —
    * a JSDoc cast inside a template expression does not.
    */
-  /** @type {[import('$lib/celim/icons/entityIcons').EntityIconKind, string][]} */
-  const SPLIT_CARDS = [
-    ['search', 'b1'],
-    ['votes', 'b2'],
-    ['target', 'b3'],
-    ['opportunity', 'b4']
+  /* The four doors of the splitter: [label key, description key, href].
+     Hoisted so the three that point at track pages stay in one place - they
+     are the whole reason those pages exist, and a link that rots here is a
+     page nothing points at. */
+  /** @type {[string, string, string][]} */
+  const DOORS = [
+    ['a1', 'd1', '/partnership'],
+    ['a2', 'd2', '/join'],
+    ['a5', 'd3', '/no-boss'],
+    // The reader the other four doors quietly assume away: someone whose
+    // constraint is not "which of these am I" but "will any of this take me".
+    ['a7', 'd5', '/flexible-work'],
+    ['a6', 'd4', '/uses']
   ];
 
   /** @type {[import('$lib/celim/icons/entityIcons').EntityIconKind, string][]} */
@@ -58,7 +64,11 @@
   const deeperCards = $derived([
     { href: '/guid', icon: 'agreement', title: $t('home.guide.title'), desc: $t('home.guide.desc'), cta: $t('home.guide.cta') },
     { href: '/quorum', icon: 'members', title: $t('home.quorum.title'), desc: $t('home.quorum.desc'), cta: $t('home.quorum.cta') },
-    { href: '/grow', icon: 'opportunity', title: $t('home.grow.title'), desc: $t('home.grow.desc'), cta: $t('home.grow.cta') }
+    { href: '/grow', icon: 'opportunity', title: $t('home.grow.title'), desc: $t('home.grow.desc'), cta: $t('home.grow.cta') },
+    // /why used to get a full-width banner of its own directly above this
+    // grid - a fourth "there is another page, go to it" card, rendered as a
+    // section instead of as a card. Same job, so: same grid.
+    { href: '/why', icon: 'idea', title: $t('home.why.title'), desc: $t('home.why.desc'), cta: $t('home.why.cta') }
   ]);
   function change(lan) {
     if (lan == 'en') {
@@ -193,7 +203,6 @@
   );
 
   const VIDEO_HOW_IT_WORKS = 'l0d1yv6Qtz4'; //'FqzccJ4lqTc'; // איך 1💗1 עובדת (הפתרון)
-  const VIDEO_THIRD_WAY = 'FcyaiAIqeA4'; // הבעיה והדרך השלישית
   let videoOpen = $state(false);
   let videoId = $state('');
   let videoTitle = $state('');
@@ -251,13 +260,19 @@
 
   let image = `https://res.cloudinary.com/love1/image/upload/v1640020897/cropped-PicsArt_01-28-07.49.25-1_wvt4qz.png`;
 
-  let projectsCount = $state(0);
-  let membersCount = $state(0);
-  let usersCount = $state(0);
-  let openMissionsCount = $state(0);
-  let openResourcesCount = $state(0);
-  let productsCount = $state(0);
-  let statsLoaded = $state(false);
+  /* The counters arrive from +page.server.js so they are in the server-rendered
+     HTML - a crawler used to be served "loading data..." and four zeroes.
+     `stats` is null when Strapi could not be reached during SSR, and then the
+     onMount fetch below is the only source, exactly as it was before. */
+  let { stats = null } = $props();
+
+  let projectsCount = $state(stats?.projects ?? 0);
+  let membersCount = $state(stats?.members ?? 0);
+  let usersCount = $state(stats?.users ?? 0);
+  let openMissionsCount = $state(stats?.openMissions ?? 0);
+  let openResourcesCount = $state(stats?.openResources ?? 0);
+  let productsCount = $state(stats?.products ?? 0);
+  let statsLoaded = $state(stats !== null);
 
   /** @type {{ icon: import('$lib/celim/icons/entityIcons').EntityIconKind, count: number, key: string, href: string }[]} */
   const discoverLinks = $derived([
@@ -295,7 +310,7 @@
   }
 
   onMount(() => {
-    loadStats();
+    if (!statsLoaded) loadStats();
     console.log($t('home.hero.headline1'));
   });
 </script>
@@ -435,7 +450,7 @@
 <!-- Sticky header: anchor nav + שפות/קישורים + CTA (מחשב) -->
 <header
   dir={$isRtl ? 'rtl' : 'ltr'}
-  class="hidden sm:flex fixed top-0 inset-x-0 z-[600] items-center gap-4 px-6 py-2 bg-cyan-50/40 backdrop-blur-md border-b border-white/40 shadow-sm"
+  class="hidden sm:flex fixed top-0 inset-x-0 z-[600] items-center gap-4 px-6 py-2 bg-surface/90 backdrop-blur-md border-b border-surfaceLine shadow-sm"
   style="font-family:'Sababa',sans-serif;"
 >
   <img
@@ -445,49 +460,49 @@
     style="animation:none;"
   />
   <nav
-    class="flex flex-1 items-center justify-center gap-4 min-w-0 text-barbi font-bold text-sm lg:text-base"
+    class="flex flex-1 items-center justify-center gap-4 min-w-0 text-barbi dark:text-gold font-bold text-sm lg:text-base"
   >
     <button
       type="button"
-      class="hover:text-gold transition-colors whitespace-nowrap"
+      class="hover:text-rose-800 dark:hover:text-surfaceInk transition-colors whitespace-nowrap"
       onclick={() => scrollToId('split')}>{$t('home.sections.navSplit')}</button
     >
     <button
       type="button"
-      class="hover:text-gold transition-colors whitespace-nowrap"
+      class="hover:text-rose-800 dark:hover:text-surfaceInk transition-colors whitespace-nowrap"
       onclick={() => scrollToId('demo')}>{$t('home.sections.navDemo')}</button
     >
     <button
       type="button"
-      class="hover:text-gold transition-colors whitespace-nowrap"
+      class="hover:text-rose-800 dark:hover:text-surfaceInk transition-colors whitespace-nowrap"
       onclick={() => scrollToId('features')}
       >{$t('home.sections.navFeatures')}</button
     >
     <button
       type="button"
-      class="hover:text-gold transition-colors whitespace-nowrap"
+      class="hover:text-rose-800 dark:hover:text-surfaceInk transition-colors whitespace-nowrap"
       onclick={() => scrollToId('how')}>{$t('home.sections.navHow')}</button
     >
     <button
       type="button"
-      class="hover:text-gold transition-colors whitespace-nowrap"
+      class="hover:text-rose-800 dark:hover:text-surfaceInk transition-colors whitespace-nowrap"
       onclick={() => scrollToId('concierge')}
       >{$t('home.sections.navConcierge')}</button
     >
     <button
       type="button"
-      class="hover:text-gold transition-colors whitespace-nowrap"
+      class="hover:text-rose-800 dark:hover:text-surfaceInk transition-colors whitespace-nowrap"
       onclick={() => scrollToId('who')}>{$t('home.sections.whoTitle')}</button
     >
     <button
       type="button"
-      class="hover:text-gold transition-colors whitespace-nowrap"
+      class="hover:text-rose-800 dark:hover:text-surfaceInk transition-colors whitespace-nowrap"
       onclick={() => scrollToId('faq')}>{$t('home.sections.navFaq')}</button
     >
     <a
       href="/why"
       data-sveltekit-prefetch
-      class="hover:text-gold transition-colors whitespace-nowrap"
+      class="hover:text-rose-800 dark:hover:text-surfaceInk transition-colors whitespace-nowrap"
       >{$t('home.nav.why')}</a
     >
   </nav>
@@ -523,7 +538,7 @@
 
 <div
   dir={$isRtl ? 'rtl' : 'ltr'}
-  class="relative h-screen w-screen overflow-hidden bg-[length:200%_auto] animate-gradientx bg-gradient-to-br from-[#e0e7ff] via-[#f3e8ff] to-[#e0e7ff]"
+  class="relative h-screen w-screen overflow-hidden bg-[length:200%_auto] animate-gradientx bg-gradient-to-br from-[#eef2ff] via-[#faf5ff] to-[#eef2ff]"
 >
   <!-- 3D Scene Background.
        `aria-hidden`: the scene is decoration — it restates in pictures what the
@@ -605,6 +620,7 @@
 
       <div
         dir="ltr"
+        aria-hidden="true"
         style="text-shadow:none;"
         class="pt-2 sm:pt-6 font-bold sm:text-2xl text-2xl text-transparent
           bg-clip-text bg-[length:auto_200%] animate-gradienty
@@ -612,39 +628,63 @@
           flex-wrap flex flex-row"
       >
         <div class="flip">
-          <h1
+          <span
             class="font-bold sm:text-4xl text-3xl text-transparent bg-clip-text bg-[length:auto_200%] animate-gradienty
             bg-[linear-gradient(to_top,theme(colors.barbi),theme(colors.fuchsia.400),theme(colors.sky.400),theme(colors.mturk),theme(colors.sky.400),theme(colors.fuchsia.400),theme(colors.barbi))]"
           >
             1
-          </h1>
+          </span>
         </div>
         <div>
-          <h1
+          <span
             class="font-bold mt-2 sm:text-xl text-xl text-transparent bg-clip-text bg-[length:auto_200%] animate-gradienty
           bg-[linear-gradient(to_top,theme(colors.barbi),theme(colors.fuchsia.400),theme(colors.sky.400),theme(colors.mturk),theme(colors.sky.400),theme(colors.fuchsia.400),theme(colors.barbi))]"
           >
             💗
-          </h1>
+          </span>
         </div>
         <div>
-          <h1
+          <span
             class="font-bold sm:text-4xl text-3xl text-transparent bg-clip-text bg-[length:auto_200%] animate-gradienty
             bg-[linear-gradient(to_top,theme(colors.barbi),theme(colors.fuchsia.400),theme(colors.sky.400),theme(colors.mturk),theme(colors.sky.400),theme(colors.fuchsia.400),theme(colors.barbi))]"
           >
             1
-          </h1>
+          </span>
         </div>
       </div>
+
+      <!-- The page's one H1, and it says what the product does.
+
+           The wordmark above used to carry three of them - "1", the heart,
+           "1" - so the only headings a crawler found on the homepage were a
+           logo, and the business claim below was a rotating <div> that is not
+           a heading at all. A rotation cannot be the H1 either: whichever
+           line happens to be mounted when the crawler renders is the one it
+           indexes, and that is a coin toss between five different promises.
+           So: one fixed sentence here, the rotation demoted to the subhead it
+           always visually was. -->
+      <h1
+        class="w-full max-w-2xl text-center font-bold text-slate-800
+          {$lang === 'he' ? 'sm:text-3xl text-2xl' : 'sm:text-2xl text-xl'}"
+        style="font-family:'Sababa',sans-serif;"
+      >
+        {$t('home.hero.h1')}
+      </h1>
 
       <div
         class="relative w-full min-h-[4rem] sm:min-h-[5rem] mt-2 mb-8 overflow-hidden"
       >
         {#key currentHeadline}
+          <!-- The deep ramp, not the wordmark's. Same seven stops and the same
+               animation, one family darker: fuchsia-400 / sky-400 / mturk are
+               2.1:1, 2.0:1 and 1.6:1 on this hero, so for most of the cycle
+               the sentence was a pale shimmer. The wordmark above may keep
+               the bright ramp - it is aria-hidden, a logo rather than text -
+               but this is the promise the visitor is meant to read. -->
           <div
             class="absolute inset-0 flex items-center justify-center text-center font-bold text-transparent
               bg-clip-text bg-[length:auto_200%] animate-gradienty
-              bg-[linear-gradient(to_top,theme(colors.barbi),theme(colors.fuchsia.400),theme(colors.sky.400),theme(colors.mturk),theme(colors.sky.400),theme(colors.fuchsia.400),theme(colors.barbi))]
+              bg-[linear-gradient(to_top,theme(colors.barbi),theme(colors.fuchsia.700),theme(colors.sky.700),theme(colors.teal.700),theme(colors.sky.700),theme(colors.fuchsia.700),theme(colors.barbi))]
               {$lang === 'he' ? 'sm:text-2xl text-xl' : 'sm:text-lg text-base'}"
             style="text-shadow:none;"
             in:fly={{ x: headlineDir * 60, duration: 450, easing: cubicOut }}
@@ -656,25 +696,56 @@
       </div>
 
       <!-- ===== ניווט קהלים: מי שכבר בפנים לא צריך לקרוא את הכאב של מי שבחוץ -->
+      <!-- ===== One splitter, four doors, and each one leaves the page =====
+           This block used to be three: a row of pills here, a teaser for
+           /no-boss two screens down, and a card for /uses near the bottom -
+           all asking the same question, "which of these are you", at three
+           unrelated moments. One question, asked once, in the first screen,
+           where a visitor is still deciding whether to read on.
+
+           The two that do not navigate are deliberate: what "just show me
+           the system" wants is genuinely on this page, and someone who wants
+           to understand before starting needs a person, not another section. -->
       <section
-        class="w-full max-w-xl animate-fade-in-up"
+        id="doors"
+        class="w-full max-w-xl scroll-mt-16 animate-fade-in-up"
         style="font-family:'Sababa',sans-serif;"
       >
-        <p class="text-center text-slate-700 text-base sm:text-sm mb-2">
-          {$t('home.audience.title')}
+        <h2 class="text-center text-rose-700 font-bold text-2xl sm:text-xl mb-1">
+          {$t('home.audience.doorsTitle')}
+        </h2>
+        <p class="text-center text-slate-700 text-base sm:text-sm mb-4">
+          {$t('home.audience.doorsSub')}
         </p>
-        <div class="flex flex-wrap justify-center gap-2">
-          {#each [['a1', 'split'], ['a2', 'discover'], ['a3', 'demo']] as [key, target]}
-            <button
-              type="button"
-              onclick={() => scrollToId(target)}
-              class="bg-cyan-50/70 backdrop-blur-sm border-2 border-gold hover:bg-gold/25 text-slate-800 hover:text-rose-800 font-semibold text-base sm:text-sm px-4 py-2 rounded-full shadow-sm transition-colors"
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {#each DOORS as [key, desc, href] (key)}
+            <a
+              {href}
+              data-sveltekit-prefetch
+              class="group flex flex-col rounded-xl border-2 border-gold bg-cyan-50/70 backdrop-blur-sm px-4 py-3 shadow-sm hover:bg-gold/20 hover:-translate-y-0.5 transition-all duration-300 text-start"
             >
-              {$t(`home.audience.${key}`)}
-            </button>
+              <span class="text-rose-700 font-bold text-lg sm:text-base">
+                {$t(`home.audience.${key}`)}
+              </span>
+              <span class="text-slate-700 text-base sm:text-sm leading-relaxed mt-0.5">
+                {$t(`home.audience.${desc}`)}
+              </span>
+              <span class="mt-2 text-barbi font-semibold text-base sm:text-sm group-hover:underline">
+                {$isRtl ? '\u2190' : '\u2192'}
+              </span>
+            </a>
           {/each}
-          <!-- המסלול הרביעי לא גולל לשום מקום בעמוד: מי שרוצה להבין לפני
-               שמתחיל/ה צריך/ה אדם, לא עוד סקשן. -->
+        </div>
+
+        <div class="mt-3 flex flex-wrap justify-center gap-2">
+          <button
+            type="button"
+            onclick={() => scrollToId('demo')}
+            class="bg-cyan-50/70 backdrop-blur-sm border-2 border-gold hover:bg-gold/25 text-slate-800 hover:text-rose-800 font-semibold text-base sm:text-sm px-4 py-2 rounded-full shadow-sm transition-colors"
+          >
+            {$t('home.audience.a3')}
+          </button>
           <button
             type="button"
             onclick={() => (demoOpen = true)}
@@ -729,120 +800,34 @@
           {/each}
         </div>
 
+
+        <!-- The formula stays: it is the whole claim in one line, and the
+             reader has just been shown four ways its absence breaks a
+             partnership. What moved to /partnership is the explaining around
+             it - why those four are the method's fault, the three steps the
+             mechanism runs, and what transparency buys. -->
         <p
-          class="mt-4 bg-cyan-50/60 backdrop-blur-sm border-2 border-gold rounded-2xl px-4 py-3 text-slate-900 text-base sm:text-sm leading-relaxed text-center shadow"
+          class="mt-6 rounded-2xl border-2 border-gold bg-gradient-to-br from-amber-100 via-amber-50 to-rose-50 px-4 py-4 text-center text-rose-700 font-bold text-lg sm:text-base shadow-lg"
         >
-          {$t('home.split.blame')}
+          {$t('home.split.formula')}
         </p>
 
-        <!-- הפתרון: פשוט לחשב -->
-        <div
-          class="mt-6 rounded-2xl border-2 border-gold bg-gradient-to-br from-amber-100 via-amber-50 to-rose-50 px-4 py-5 shadow-lg"
-        >
-          <h3
-            class="text-rose-700 font-bold text-2xl sm:text-xl mb-1 text-center"
-          >
-            {$t('home.split.solutionTitle')}
-          </h3>
-          <p
-            class="text-slate-800 text-base sm:text-sm leading-relaxed text-center mb-4"
-          >
-            {$t('home.split.solutionLead')}
-          </p>
-          <div class="flex flex-col gap-2">
-            {#each ['step1', 'step2', 'step3'] as s, i}
-              <div
-                class="flex items-start gap-3 bg-cyan-50/80 border border-gold/60 rounded-xl px-3 py-3"
-              >
-                <span
-                  class="shrink-0 w-7 h-7 rounded-full bg-barbi text-gold font-bold flex items-center justify-center text-sm"
-                  >{i + 1}</span
-                >
-                <div class="text-start">
-                  <h4 class="text-rose-700 font-bold text-lg sm:text-base">
-                    {$t(`home.split.${s}_t`)}
-                  </h4>
-                  <p class="text-slate-800 text-base sm:text-sm leading-relaxed">
-                    {$t(`home.split.${s}_d`)}
-                  </p>
-                </div>
-              </div>
-              {#if i < 2}
-                <div
-                  class="text-center text-gold text-xl leading-none"
-                  aria-hidden="true"
-                >
-                  ↓
-                </div>
-              {/if}
-            {/each}
-          </div>
-          <p
-            class="mt-4 text-center text-rose-700 font-bold text-lg sm:text-base"
-          >
-            {$t('home.split.formula')}
-          </p>
-        </div>
-
-        <!-- ולא רק להסביר את הנוסחה — להריץ אותה. אותו חישוב שרץ ב‑
-             `prPr/hachcal.svelte` על נתוני ריקמה אמיתית, עם מספרים לשחק בהם
-             ובלי הרשמה. -->
+        <!-- And not only state the formula - run it. The same calculation
+             `prPr/hachcal.svelte` runs on real rikma data, with numbers to
+             play with and no signup. It is the strongest thing on the page,
+             so it stays on the page. -->
         <div class="mt-6">
           <SplitCalculator />
         </div>
 
-        <!-- מה זה נותן בפועל -->
-        <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {#each SPLIT_CARDS as [icon, key] (key)}
-            <div
-              class="bg-cyan-50/70 backdrop-blur-sm border-2 border-gold rounded-lg p-4 shadow flex flex-col"
-            >
-              <div class="mb-1"><EntityIcon kind={icon} size={24} tone="brand" /></div>
-              <h3 class="text-rose-700 font-bold text-lg sm:text-base mb-1">
-                {$t(`home.split.${key}_t`)}
-              </h3>
-              <p class="text-slate-800 text-base sm:text-sm leading-relaxed">
-                {$t(`home.split.${key}_d`)}
-              </p>
-            </div>
-          {/each}
-
-          <!-- החישוב מכריע כמה כל אחד לקח; ההצבעות מכריעות מה בכלל עושים.
-               כרטיס רחב כי זו הפסקה היחידה כאן שמובילה הלאה — למנוע ההסכמה. -->
-          <div
-            class="sm:col-span-2 bg-cyan-50/70 backdrop-blur-sm border-2 border-barbi/60 rounded-lg p-4 shadow flex flex-col"
-          >
-            <div class="mb-1"><EntityIcon kind="maagad" size={24} tone="brand" /></div>
-            <h3 class="text-rose-700 font-bold text-lg sm:text-base mb-1">
-              {$t('home.split.b5_t')}
-            </h3>
-            <p class="text-slate-800 text-base sm:text-sm leading-relaxed">
-              {$t('home.split.b5_d')}
-            </p>
-            <button
-              type="button"
-              class="mt-2 self-start text-barbi font-bold text-base sm:text-sm underline underline-offset-4 hover:text-rose-700 transition-colors"
-              onclick={() => scrollToId('consensus')}
-            >
-              {$t('home.split.b5_link')}
-            </button>
-          </div>
-        </div>
-
-        <p
-          class="mt-4 text-center bg-cyan-50/60 backdrop-blur-sm border border-gold/70 rounded-2xl px-4 py-3 text-slate-800 text-base sm:text-sm leading-relaxed"
-        >
-          {$t('home.split.more')}
-        </p>
-
         <div class="mt-5 flex flex-wrap gap-3 justify-center">
-          <button
-            type="button"
+          <a
+            href="/partnership"
+            data-sveltekit-prefetch
             class="bg-barbi hover:bg-white hover:text-barbi text-gold font-bold text-lg sm:text-base px-6 py-3 rounded-2xl shadow-lg hover:scale-105 transition-all duration-300"
-            onclick={() => gotoRegister()}
           >
-            {$t('home.split.cta')}
-          </button>
+            {$t('home.split.depthCta')} {$isRtl ? '\u2190' : '\u2192'}
+          </a>
           <button
             type="button"
             class="bg-gold hover:bg-barbi hover:text-gold text-barbi font-bold text-lg sm:text-base px-6 py-3 rounded-2xl shadow-lg hover:scale-105 transition-all duration-300 border-2 border-gold"
@@ -853,196 +838,77 @@
         </div>
       </section>
 
-      {@render flowLine($t('home.flow.toPain'))}
-
-      <!-- ===== הבעיה / הכאב — לקהל שעוד אין לו שותפות ===== -->
+      <!-- ===== The employee / lone-founder case, as a banner =====
+           This had a full gateway here before the section merge, and folding
+           it into a chip in the doors grid cost it more than it saved: the
+           chip states a category ("I'm employed, or self-employed alone")
+           while the banner states the feeling that brings someone to the
+           page. Both entrances now, same as /flexible-work, because these are
+           the two tracks a visitor arrives at without knowing they want. -->
       <section
-        class="w-full max-w-xl mt-12 animate-fade-in-up"
+        id="no-boss"
+        class="w-full max-w-xl mt-12 scroll-mt-16 animate-fade-in-up"
         style="font-family:'Sababa',sans-serif;"
       >
-        <p
-          class="text-center text-barbi font-bold text-base sm:text-sm tracking-widest mb-1"
+        <a
+          href="/no-boss"
+          data-sveltekit-prefetch
+          class="group block rounded-2xl border-2 border-gold bg-gradient-to-br from-cyan-50/80 to-rose-50/70 backdrop-blur-sm px-5 py-5 shadow hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 text-center"
         >
-          {$t('home.sections.problemEyebrow')}
-        </p>
-        <h2
-          class="text-rose-700 font-bold text-3xl sm:text-2xl mb-1 text-center"
-          style="text-shadow:1px 1px 2px rgba(0,0,0,0.15);"
-        >
-          {$t('home.sections.problemTitle')}
-        </h2>
-        <p class="text-center text-rose-500 text-base sm:text-sm mb-4">
-          {$t('home.sections.painLead')}
-        </p>
-        <div class="flex flex-col gap-2.5">
-          {#each ['pain1', 'pain2', 'pain3', 'pain4'] as p}
-            <div
-              class="flex items-start gap-3 bg-cyan-50/55 backdrop-blur-sm border border-rose-300/70 rounded-xl px-4 py-3 shadow-sm"
-            >
-              <span
-                class="shrink-0 mt-0.5 w-6 h-6 rounded-full bg-rose-100 text-rose-500 flex items-center justify-center text-sm font-bold"
-                >✕</span
-              >
-              <p
-                class="text-slate-800 text-base sm:text-sm leading-relaxed text-start"
-              >
-                {$t(`home.sections.${p}`)}
-              </p>
-            </div>
-          {/each}
-        </div>
-        <p
-          class="text-center text-rose-700 font-semibold italic text-lg sm:text-base mt-4"
-        >
-          {$t('home.sections.painCost')}
-        </p>
-        <!-- המפסיד הגדול מכולם: הלקוח -->
-        <div
-          class="mt-6 bg-cyan-50/55 backdrop-blur-sm border-2 border-gold/70 rounded-2xl px-4 py-4 shadow-sm"
-        >
-          <h3
-            class="text-rose-700 font-bold text-xl sm:text-lg mb-3 text-center"
-          >
-            {$t('home.sections.painCustomerTitle')}
-          </h3>
-          <div class="flex flex-col gap-2.5">
-            {#each [['painCustomer1', false], ['painCustomer2', false], ['painCustomer3', true]] as [p, good]}
-              <div class="flex items-start gap-3">
-                <span
-                  class="shrink-0 mt-0.5 w-6 h-6 rounded-full {good
-                    ? 'bg-amber-100'
-                    : 'bg-rose-100 text-rose-500'} flex items-center justify-center text-sm font-bold"
-                  >{good ? '✓' : '✕'}</span
-                >
-                <p
-                  class="text-slate-800 text-base sm:text-sm leading-relaxed text-start"
-                >
-                  {$t(`home.sections.${p}`)}
-                </p>
-              </div>
-            {/each}
-          </div>
-          <p
-            class="text-center text-rose-700 font-semibold text-base sm:text-sm mt-3"
-          >
-            {$t('home.sections.painCustomerTurn')}
+          <p class="text-barbi font-bold text-base sm:text-sm tracking-widest mb-1">
+            {$t('home.sections.problemEyebrow')}
           </p>
-        </div>
-        <div class="mt-5 text-center">
+          <h2 class="text-rose-700 font-bold text-2xl sm:text-xl mb-2">
+            {$t('home.sections.problemTitle')}
+          </h2>
           <p
-            class="inline-block bg-gradient-to-r from-gold via-barbi to-gold bg-[length:200%_auto] animate-gradientx text-white font-bold text-xl sm:text-lg px-6 py-3 rounded-2xl shadow-lg"
+            class="text-slate-800 text-base sm:text-sm mb-3 max-w-lg mx-auto leading-relaxed"
           >
-            {$t('home.sections.painTurn')}
+            {$t('home.noboss.lead')}
           </p>
-        </div>
-        <!-- The one place on the page where "why is work like this at all?"
-             is the reader's own question rather than ours: they have just read
-             four lines describing it. A plain text link, not a card - the
-             banner for /why sits far below, and a second card here would read
-             as a pitch at the exact moment the section earns its trust. -->
-        <p class="mt-3 text-center">
-          <a
-            href="/why"
-            data-sveltekit-prefetch
-            class="text-barbi font-semibold text-base sm:text-sm underline decoration-barbi/40 underline-offset-4 hover:text-gold"
+          <span
+            class="inline-block bg-barbi text-gold font-bold text-base sm:text-sm px-5 py-2 rounded-xl shadow group-hover:scale-105 transition-transform"
           >
-            {$t('home.why.inline')} {$isRtl ? '←' : '→'}
-          </a>
-        </p>
-        {#if $lang === 'he'}
-          <div class="mt-5 text-center">
-            <button
-              type="button"
-              onclick={() =>
-                openVideo(
-                  VIDEO_HOW_IT_WORKS,
-                  $t('home.videos.howItWorksLabel')
-                )}
-              class="inline-flex items-center gap-2 bg-barbi hover:bg-white hover:text-barbi text-gold font-bold text-lg sm:text-base px-6 py-3 rounded-2xl shadow-lg hover:scale-105 transition-all duration-300"
-            >
-              <span class="text-2xl leading-none">▶</span>
-              {$t('home.videos.howItWorksCta')}
-            </button>
-          </div>
-        {/if}
+            {$t('home.noboss.cta')} {$isRtl ? '\u2190' : '\u2192'}
+          </span>
+        </a>
       </section>
 
-      <!-- ===== הדרך השלישית: שכיר / יזם בודד / ריקמה ===== -->
+      <!-- ===== A door for the reader the market keeps turning down =====
+           This audience also has a chip in the splitter above, which is
+           unusual - every other track gets one entrance. It earns two because
+           the splitter asks "where are you today?", and someone who has been
+           turned down for a year does not answer that question with a
+           category; they answer it with "nowhere". The banner names the
+           situation instead of the segment, so it can be recognised rather
+           than chosen. -->
       <section
-        class="w-full max-w-xl mt-10 animate-fade-in-up"
+        id="flexible"
+        class="w-full max-w-xl mt-12 scroll-mt-16 animate-fade-in-up"
         style="font-family:'Sababa',sans-serif;"
       >
-        <h2
-          class="text-rose-700 font-bold text-3xl sm:text-2xl mb-1 text-center"
+        <a
+          href="/flexible-work"
+          data-sveltekit-prefetch
+          class="group block rounded-2xl border-2 border-gold bg-gradient-to-br from-cyan-50/80 to-amber-50/70 backdrop-blur-sm px-5 py-5 shadow hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 text-center"
         >
-          {$t('home.sections.oldWayTitle')}
-        </h2>
-        <p class="text-center text-slate-700 text-base sm:text-sm mb-5">
-          {$t('home.sections.oldWaySub')}
-        </p>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 items-stretch">
-          {#each [['colEmployee', false], ['colSolo', false], ['colRikma', true]] as [key, highlight]}
-            <div
-              class="relative flex flex-col rounded-2xl p-4 {highlight
-                ? 'bg-gradient-to-br from-amber-200 via-gold to-rose-200 border-2 border-gold shadow-xl ring-2 ring-gold/50'
-                : 'bg-slate-100/70 backdrop-blur-sm border border-slate-300 shadow-sm'}"
-            >
-              {#if highlight}
-                <span
-                  class="absolute -top-3 left-1/2 -translate-x-1/2 bg-barbi text-gold text-xs font-bold px-3 py-1 rounded-full shadow whitespace-nowrap"
-                  >{$t('home.sections.colRikma_badge')}</span
-                >
-              {/if}
-              <h3
-                class="font-bold text-lg sm:text-base mb-3 text-center {highlight
-                  ? 'text-rose-700 mt-1'
-                  : 'text-slate-500'}"
-              >
-                {$t(`home.sections.${key}_t`)}
-              </h3>
-              <ul class="flex flex-col gap-2">
-                {#each $t(`home.sections.${key}_d`).split('•') as item}
-                  <li
-                    class="flex items-start gap-2 text-sm text-start {highlight
-                      ? 'text-slate-900 font-medium'
-                      : 'text-slate-600'}"
-                  >
-                    <span
-                      class="shrink-0 {highlight
-                        ? 'text-emerald-600'
-                        : 'text-rose-400'}">{highlight ? '✓' : '✕'}</span
-                    >
-                    <span>{item.trim()}</span>
-                  </li>
-                {/each}
-              </ul>
-            </div>
-          {/each}
-        </div>
-        {#if $lang === 'he'}
-          <div class="mt-6 text-center">
-            <button
-              type="button"
-              onclick={() =>
-                openVideo(VIDEO_THIRD_WAY, $t('home.videos.thirdWayLabel'))}
-              class="inline-flex items-center gap-2 bg-gold hover:bg-barbi hover:text-gold text-barbi font-bold text-lg sm:text-base px-6 py-3 rounded-2xl shadow-lg hover:scale-105 transition-all duration-300 border-2 border-gold"
-            >
-              <span class="text-2xl leading-none">▶</span>
-              {$t('home.videos.thirdWayCta')}
-            </button>
-          </div>
-        {/if}
-      </section>
-
-      <!-- ===== הגרף: איך נראית פרנסה לאורך עשור בכל אחד מהשלושה =====
-           ממוקם מיד אחרי טבלת ההשוואה כי הוא בדיוק אותה טענה בציר זמן: שם
-           רואים *מה* שונה, וכאן רואים *מתי* זה מתחיל להיות שונה - ומה קורה
-           ביום שמפסיקים לעבוד, שזה ההבדל היחיד שאי אפשר להתווכח עליו. -->
-      <section
-        class="w-full max-w-xl mt-8 animate-fade-in-up"
-        style="font-family:'Sababa',sans-serif;"
-      >
-        <IncomeCurves />
+          <p class="text-barbi font-bold text-base sm:text-sm tracking-widest mb-1">
+            {$t('home.flexible.eyebrow')}
+          </p>
+          <h2 class="text-rose-700 font-bold text-2xl sm:text-xl mb-2">
+            {$t('home.flexible.title')}
+          </h2>
+          <p
+            class="text-slate-800 text-base sm:text-sm mb-3 max-w-lg mx-auto leading-relaxed"
+          >
+            {$t('home.flexible.lead')}
+          </p>
+          <span
+            class="inline-block bg-barbi text-gold font-bold text-base sm:text-sm px-5 py-2 rounded-xl shadow group-hover:scale-105 transition-transform"
+          >
+            {$t('home.flexible.cta')} {$isRtl ? '\u2190' : '\u2192'}
+          </span>
+        </a>
       </section>
 
       {@render flowLine($t('home.flow.toDemo'))}
@@ -1066,7 +932,7 @@
         style="font-family:'Sababa',sans-serif;"
       >
         <div
-          class="rounded-3xl border-2 border-barbi/60 bg-gradient-to-br from-[#fff6ea] via-[#fdeef4] to-[#f6e6fb] px-6 py-6 shadow-lg text-center"
+          class="rounded-3xl border-2 border-barbi/60 bg-gradient-to-br from-[#fffaf3] via-[#fef6f9] to-[#fdf4ff] px-6 py-6 shadow-lg text-center"
         >
           <p
             class="text-barbi font-bold text-sm tracking-widest uppercase mb-1"
@@ -1099,7 +965,7 @@
       >
         <a
           href="/consensus"
-          class="group relative flex flex-col sm:flex-row items-center gap-5 w-full overflow-hidden rounded-3xl border-2 border-barbi/60 bg-gradient-to-br from-[#fff6ea] via-[#fdeef4] to-[#f6e6fb] px-6 py-6 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
+          class="group relative flex flex-col sm:flex-row items-center gap-5 w-full overflow-hidden rounded-3xl border-2 border-barbi/60 bg-gradient-to-br from-[#fffaf3] via-[#fef6f9] to-[#fdf4ff] px-6 py-6 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
         >
           <!-- רקע דקורטיבי -->
           <div
@@ -1183,12 +1049,12 @@
       <div class="w-full max-w-xl flex flex-col gap-6 mt-10">
         <!-- Stats -->
         <div
-          class="bg-gradient-to-br from-gold via-barbi to-gold opacity-80 px-4 py-3 mt-2 rounded-lg border-2 border-gold shadow-lg"
+          class="bg-barbi px-4 py-3 mt-2 rounded-lg border-2 border-gold shadow-lg"
         >
           {#if statsLoaded}
             <div class="text-center">
               <p
-                class="text-white font-semibold text-xl sm:text-lg mb-2"
+                class="text-gold font-semibold text-xl sm:text-lg mb-2"
                 style="font-family: 'Sababa', sans-serif;"
               >
                 {$t('home.stats.currently')}
@@ -1198,21 +1064,21 @@
                   <div class="text-2xl font-bold text-gold">
                     {projectsCount}
                   </div>
-                  <div class="text-white text-base sm:text-sm">
+                  <div class="text-gold text-base sm:text-sm">
                     {$t('home.stats.partnerships')}
                   </div>
                 </div>
                 <div class="text-gold text-2xl">•</div>
                 <div class="bg-cyan-50/20 rounded-lg px-3 py-2 backdrop-blur-sm">
                   <div class="text-2xl font-bold text-gold">{usersCount}</div>
-                  <div class="text-white text-base sm:text-sm">
+                  <div class="text-gold text-base sm:text-sm">
                     {$t('home.stats.members')}
                   </div>
                 </div>
                 <div class="text-gold text-2xl">•</div>
                 <div class="bg-cyan-50/20 rounded-lg px-3 py-2 backdrop-blur-sm">
                   <div class="text-2xl font-bold text-gold">{membersCount}</div>
-                  <div class="text-white text-sm">
+                  <div class="text-gold text-sm">
                     {$t('home.fpage.agreedOnAgreement')}
                   </div>
                 </div>
@@ -1220,7 +1086,7 @@
             </div>
           {:else}
             <div
-              class="text-center text-white font-semibold text-lg sm:text-base"
+              class="text-center text-gold font-semibold text-lg sm:text-base"
               style="font-family: 'Sababa', sans-serif;"
             >
               {$t('home.stats.loading')}
@@ -1246,7 +1112,7 @@
             {#each discoverLinks as { icon, count, key, href } (key)}
               <a
                 {href}
-                class="group flex items-center gap-3 bg-cyan-50/80 hover:bg-gold/20 border border-gold/60 rounded-lg px-3 py-2 transition-colors"
+                class="group flex items-center gap-3 bg-cyan-50 hover:bg-gold/25 border border-gold/60 rounded-lg px-3 py-2 transition-colors"
               >
                 <EntityIcon kind={icon} size={24} tone="brand" />
                 <span class="flex-1 text-slate-800 text-lg sm:text-base">
@@ -1264,7 +1130,7 @@
             {/each}
             <a
               href="/demand"
-              class="group flex items-center gap-3 bg-gradient-to-l from-gold/30 to-barbi/20 hover:from-gold/40 border border-gold/60 rounded-lg px-3 py-2 transition-colors"
+              class="group flex items-center gap-3 bg-cyan-50 bg-gradient-to-l from-gold/25 to-barbi/15 hover:from-gold/40 border border-barbi/60 rounded-lg px-3 py-2 transition-colors"
             >
               <EntityIcon kind="map" size={24} tone="brand" />
               <span class="flex-1 text-slate-800 text-lg sm:text-base">
@@ -1353,12 +1219,15 @@
               </div>
             {/each}
           </div>
-        </section>
 
-        <!-- בלוק: איך זה עובד ב‑4 צעדים -->
-        <section id="how" class="scroll-mt-16">
+          <!-- "How you start" stays in the same section as "what is in
+               here": a capability list answers what the product does and
+               immediately raises what a person actually does first, so
+               the four steps belong under the same heading rather than
+               as a section of their own. -->
           <h2
-            class="text-rose-700 font-bold text-3xl sm:text-2xl mb-4 text-center"
+            id="how"
+            class="text-rose-700 font-bold text-3xl sm:text-2xl mb-4 text-center scroll-mt-16"
           >
             {$t('home.sections.howTitle')}
           </h2>
@@ -1531,7 +1400,7 @@
           <p class="text-center text-slate-800 text-lg sm:text-base mb-2">
             {$t('home.concierge.subtitle')}
           </p>
-          <p class="text-center text-rose-600 text-base sm:text-sm mb-5">
+          <p class="text-center text-rose-800 text-base sm:text-sm mb-5">
             {$t('home.concierge.flow')}
           </p>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -1580,39 +1449,6 @@
         </section>
 
         <!-- בלוק: למי זה מתאים -->
-        <!-- ===== המקרה שלכם: הכניסה ל/uses =====
-             לקוח פוטנציאלי שאל "אני רוצה תוכנית שותפים לגיוס מכירות של פירות
-             וירקות" - ולאתר לא הייתה שום כניסה לפי סוג עסק. הוא כבר הבין את
-             העיקרון לבד; מה שחסר לו היה לדעת אם הוא חל עליו. הבלוק הזה יושב
-             מיד אחרי "למי זה מתאים", שעונה על אותה שאלה בהפשטה, ומחליף אותה
-             בתשובה קונקרטית. -->
-        <section id="yourcase" class="scroll-mt-16">
-          <a
-            href="/uses"
-            data-sveltekit-prefetch
-            class="group block rounded-2xl border-2 border-gold bg-gradient-to-br from-cyan-50/80 to-fuchsia-50/70 backdrop-blur-sm px-5 py-5 shadow hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 text-center"
-          >
-            <p
-              class="text-barbi font-bold text-base sm:text-sm tracking-widest mb-1"
-            >
-              {$t('home.uses.eyebrow')}
-            </p>
-            <h2 class="text-rose-700 font-bold text-2xl sm:text-xl mb-2">
-              {$t('home.uses.title')}
-            </h2>
-            <p
-              class="text-slate-700 text-base sm:text-sm mb-3 max-w-xl mx-auto leading-relaxed"
-            >
-              {$t('home.uses.sub')}
-            </p>
-            <span
-              class="inline-block bg-barbi text-gold font-bold text-base sm:text-sm px-5 py-2 rounded-xl shadow group-hover:scale-105 transition-transform"
-            >
-              {$t('home.uses.cta')} {$isRtl ? '←' : '→'}
-            </span>
-          </a>
-        </section>
-
         <section id="who" class="scroll-mt-16">
           <h2
             class="text-rose-700 font-bold text-3xl sm:text-2xl mb-1 text-center"
@@ -1637,10 +1473,11 @@
               </div>
             {/each}
           </div>
-        </section>
 
-        <!-- בלוק: ערך הליבה — מה באמת מקבלים -->
-        <section class="scroll-mt-16">
+          <!-- The core value, kept in the same section as "who is this
+               for": the personas above say who, and these say what they
+               actually walk away with. Split in two they were the same
+               answer given twice, five lines apart. -->
           <p
             class="text-center text-slate-800 text-lg sm:text-base leading-relaxed mb-5 max-w-lg mx-auto"
           >
@@ -1704,23 +1541,60 @@
           </div>
         </section>
 
-        <!-- בלוק: למה אנחנו שונים (תנועה עולמית) -->
-        <section class="text-center">
+        <!-- ===== Trust, in one place =====
+             Four separate sections used to make this one argument in four
+             stops: "why we are different", the live counters, the agreement
+             map, and what it costs. Split up they read as four small pitches;
+             together they are the answer to a single question a visitor asks
+             once, late, and all at once - is there anything real behind this,
+             and what will it cost me.
+
+             Order matters here. The numbers come first because they are the
+             only claim on the page nobody wrote: they are counted. The
+             movement and the map explain what the numbers are counting, and
+             the price comes last, when it is a question rather than an
+             objection. -->
+        <section id="trust" class="scroll-mt-16 text-center">
+          <h2 class="text-rose-700 font-bold text-3xl sm:text-2xl mb-1">
+            {$t('home.sections.proofTitle')}
+          </h2>
+          <p class="text-slate-700 text-base sm:text-sm mb-4 max-w-md mx-auto">
+            {$t('home.sections.proofSub')}
+          </p>
+
+          <!-- A tile is shown only when its number is real. Three zeroes
+               under "part of a worldwide movement" is not a modest claim, it
+               is a contradiction of the sentence above it - and it is what a
+               crawler and a first-time visitor saw whenever the counts had
+               not arrived. A count that is genuinely zero is not a smaller
+               number to display; it is an argument against the page. -->
+          <div class="flex justify-center items-stretch gap-3 flex-wrap">
+            {#each [[projectsCount, 'proofStatProjects'], [usersCount, 'proofStatMembers'], [membersCount, 'proofStatSigners']].filter(([n]) => n > 0) as [count, key]}
+              <div
+                class="bg-barbi rounded-lg px-4 py-3 shadow min-w-[110px]"
+              >
+                <div class="text-2xl font-bold text-gold">{count}</div>
+                <div class="text-gold text-sm sm:text-xs">
+                  {$t(`home.sections.${key}`)}
+                </div>
+              </div>
+            {/each}
+          </div>
+
+          <!-- What those numbers are part of, and where to see it. -->
           <div
-            class="bg-gradient-to-br from-amber-200 via-amber-300 to-rose-200 opacity-90 px-4 py-4 rounded-2xl border-2 border-gold shadow-xl backdrop-blur-sm"
+            class="mt-5 bg-gradient-to-br from-amber-200 via-amber-300 to-rose-200 opacity-90 px-4 py-4 rounded-2xl border-2 border-gold shadow-xl backdrop-blur-sm"
           >
-            <h2
-              class="text-rose-700 font-bold text-2xl sm:text-xl mb-2 text-center"
+            <h3
+              class="text-rose-700 font-bold text-2xl sm:text-xl mb-2"
               style="text-shadow: 1px 1px 2px rgba(0,0,0,0.3);"
             >
               {$t('home.fpage.whyDifferentTitle')}
-            </h2>
-            <p
-              class="text-slate-900 text-lg sm:text-base leading-relaxed text-center"
-            >
+            </h3>
+            <p class="text-slate-900 text-lg sm:text-base leading-relaxed">
               {@html $t('home.fpage.whyDifferentDesc')}
             </p>
-            <div class="mt-3 text-center">
+            <div class="mt-3 flex flex-wrap justify-center gap-2">
               <a
                 href={$locale === 'he'
                   ? '/hascama'
@@ -1731,71 +1605,23 @@
               >
                 {$t('home.fpage.discoverAgreement')}
               </a>
+              <a
+                href="/love"
+                data-sveltekit-prefetch
+                class="inline-block bg-cyan-50/80 hover:bg-white border-2 border-barbi text-barbi font-semibold text-lg sm:text-base px-4 py-2 rounded-lg shadow-md hover:scale-105 transition-all duration-300"
+              >
+                <EntityIcon kind="map" size={16} /> {$t('home.sections.mapCta')}
+              </a>
             </div>
           </div>
-        </section>
 
-        <!-- בלוק: הוכחה חברתית / תנועה עולמית -->
-        <section class="text-center">
-          <h2 class="text-rose-700 font-bold text-3xl sm:text-2xl mb-1">
-            {$t('home.sections.proofTitle')}
-          </h2>
-          <p class="text-slate-700 text-base sm:text-sm mb-4 max-w-md mx-auto">
-            {$t('home.sections.proofSub')}
-          </p>
-          <div class="flex justify-center items-stretch gap-3 flex-wrap">
-            <div
-              class="bg-gradient-to-br from-gold via-barbi to-gold rounded-lg px-4 py-3 shadow min-w-[110px]"
-            >
-              <div class="text-2xl font-bold text-white">{projectsCount}</div>
-              <div class="text-white/90 text-sm sm:text-xs">
-                {$t('home.sections.proofStatProjects')}
-              </div>
-            </div>
-            <div
-              class="bg-gradient-to-br from-gold via-barbi to-gold rounded-lg px-4 py-3 shadow min-w-[110px]"
-            >
-              <div class="text-2xl font-bold text-white">{usersCount}</div>
-              <div class="text-white/90 text-sm sm:text-xs">
-                {$t('home.sections.proofStatMembers')}
-              </div>
-            </div>
-            <div
-              class="bg-gradient-to-br from-gold via-barbi to-gold rounded-lg px-4 py-3 shadow min-w-[110px]"
-            >
-              <div class="text-2xl font-bold text-white">{membersCount}</div>
-              <div class="text-white/90 text-sm sm:text-xs">
-                {$t('home.sections.proofStatSigners')}
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- בלוק: מפת ההסכמה הגלובלית -->
-        <section class="text-center">
-          <h2 class="text-rose-700 font-bold text-3xl sm:text-2xl mb-1">
-            {$t('home.sections.mapTitle')}
-          </h2>
-          <p class="text-slate-700 text-base sm:text-sm mb-4 max-w-md mx-auto">
-            {$t('home.sections.mapSub')}
-          </p>
-          <a
-            href="/love"
-            data-sveltekit-prefetch
-            class="inline-block bg-barbi hover:bg-white hover:text-barbi text-gold font-semibold text-lg sm:text-base px-5 py-2 rounded-lg shadow-md hover:scale-105 transition-all duration-300"
-          >
-            <EntityIcon kind="map" size={16} /> {$t('home.sections.mapCta')}
-          </a>
-        </section>
-
-        <!-- בלוק: מודל / תמחור -->
-        <section class="text-center">
+          <!-- And the question every one of the audits found unanswered. -->
           <div
-            class="bg-cyan-50/70 backdrop-blur-sm border-2 border-gold rounded-2xl px-5 py-5 shadow"
+            class="mt-5 bg-cyan-50/70 backdrop-blur-sm border-2 border-gold rounded-2xl px-5 py-5 shadow"
           >
-            <h2 class="text-rose-700 font-bold text-3xl sm:text-2xl mb-1">
+            <h3 class="text-rose-700 font-bold text-2xl sm:text-xl mb-1">
               {$t('home.sections.modelTitle')}
-            </h2>
+            </h3>
             <p
               class="text-slate-800 text-lg sm:text-base leading-relaxed max-w-md mx-auto"
             >
@@ -1838,32 +1664,6 @@
              שהתועלת הפרקטית הובהרה, אותו טקסט קורא כאג'נדה ומבריח מבקר שבא
              לבדוק כלי ניהול — ולכן גם כאן זה באנר קצר אחד, וכל הטיעון עצמו
              (עם המספרים, הציטוטים והמקורות) יושב ב-/why. -->
-        <section
-          id="why"
-          class="w-full max-w-xl mt-2 mb-6 scroll-mt-16"
-          style="font-family:'Sababa',sans-serif;"
-        >
-          <a
-            href="/why"
-            data-sveltekit-prefetch
-            class="group flex flex-col gap-2 rounded-3xl border-2 border-gold/70 bg-gradient-to-br from-[#fff6ea] via-[#fdeef4] to-[#f6e6fb] px-6 py-5 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
-          >
-            <span class="text-barbi font-semibold text-xs tracking-wide">
-              {$t('home.why.eyebrow')}
-            </span>
-            <span class="text-rose-800 font-bold text-xl sm:text-lg leading-snug">
-              {$t('home.why.title')}
-            </span>
-            <span class="text-slate-700 text-base sm:text-sm leading-relaxed">
-              {$t('home.why.desc')}
-            </span>
-            <span
-              class="text-barbi font-semibold text-sm mt-0.5 group-hover:underline"
-            >
-              {$t('home.why.cta')} {$isRtl ? '←' : '→'}
-            </span>
-          </a>
-        </section>
 
         <!-- בלוק: באנר /guid — המדריך המלא. יושב מיד אחרי השאלות הנפוצות: מי
              שקרא תשובות קצרות ורוצה להעמיק, ממשיך לכאן. -->
@@ -1890,7 +1690,9 @@
           >
             {$t('home.deeper.sub')}
           </p>
-          <div class="grid gap-3 sm:grid-cols-3">
+          <!-- Two columns, not three: the grid holds four cards since /why
+               joined it, and 3-up leaves one stranded on its own row. -->
+          <div class="grid gap-3 sm:grid-cols-2">
             {#each deeperCards as card (card.href)}
               <a
                 href={card.href}
@@ -1918,12 +1720,12 @@
         <!-- בלוק: קריאה לפעולה סופית -->
         <section class="mb-8">
           <div
-            class="bg-gradient-to-br from-gold via-barbi to-gold px-5 py-6 rounded-2xl border-2 border-gold shadow-xl text-center"
+            class="bg-barbi px-5 py-6 rounded-2xl border-2 border-gold shadow-xl text-center"
           >
-            <h2 class="text-3xl sm:text-2xl font-bold text-white mb-2">
+            <h2 class="text-3xl sm:text-2xl font-bold text-gold mb-2">
               {$t('home.sections.ctaFinalTitle')}
             </h2>
-            <p class="text-white/90 text-lg sm:text-base mb-4">
+            <p class="text-gold text-lg sm:text-base mb-4">
               {$t('home.sections.ctaFinalSub')}
             </p>
             <div class="flex gap-3 justify-center flex-wrap">
@@ -1952,13 +1754,13 @@
                 {$t('home.cta.register')}
               </button>
               <button
-                class="bg-white/20 border-2 border-white text-white font-bold text-lg sm:text-base px-5 py-2 rounded-xl shadow-lg hover:bg-white hover:text-barbi hover:scale-105 transition-all duration-300"
+                class="border-2 border-gold text-gold font-bold text-lg sm:text-base px-5 py-2 rounded-xl shadow-lg hover:bg-gold hover:text-barbi hover:scale-105 transition-all duration-300"
                 onclick={() => (demoOpen = true)}
               >
                 {$t('demo.button')}
               </button>
             </div>
-            <p class="text-white/90 text-sm mt-3">{$t('demo.reassure')}</p>
+            <p class="text-gold text-sm mt-3">{$t('demo.reassure')}</p>
           </div>
         </section>
       </div>
@@ -1998,7 +1800,7 @@
     </button>
 
     <button
-      class="group flex text-barbi flex-row items-center gap-3 px-6 py-3 rounded-2xl bg-barbi/80 backdrop-blur-md border border-white/40 shadow-[0_8px_32px_0_rgba(31,38,135,0.37)] hover:text-gold hover:bg-barbi hover:scale-105 transition-all duration-300 min-w-[160px]"
+      class="group flex text-gold flex-row items-center gap-3 px-6 py-3 rounded-2xl bg-barbi/80 backdrop-blur-md border border-white/40 shadow-[0_8px_32px_0_rgba(31,38,135,0.37)] hover:text-gold hover:bg-barbi hover:scale-105 transition-all duration-300 min-w-[160px]"
       onclick={() => {
         goto(
           `${$locale == 'he' ? '/hascama' : $locale == 'ar' ? '/aitifaqia' : '/convention'}`

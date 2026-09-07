@@ -13162,7 +13162,7 @@ ${STIPEND_DECISION_FIELDS}
         rikmashes(pagination: { limit: 200 }, sort: "createdAt:desc") {
           data { id attributes {
             name kindOf hm sqadualed sqadualef createdAt
-            sp { data { id attributes { name kindOf sdate fdate hm panui } } }
+            sp { data { id attributes { name kindOf sdate fdate unit panui availability capacity leadTimeHours granularity } } }
             project { data { id attributes { projectName profilePic { data { attributes { url } } } } } }
             mashabetahalich { data { id } }
           } }
@@ -13195,7 +13195,7 @@ ${STIPEND_DECISION_FIELDS}
         rikmashes(pagination: { limit: 200 }, sort: "createdAt:desc") {
           data { id attributes {
             name kindOf hm sqadualed sqadualef createdAt
-            sp { data { id attributes { name kindOf sdate fdate hm panui } } }
+            sp { data { id attributes { name kindOf sdate fdate unit panui availability capacity leadTimeHours granularity } } }
             users_permissions_user { data { id attributes { username profilePic { data { attributes { url } } } } } }
             mashabetahalich { data { id } }
           } }
@@ -14475,7 +14475,7 @@ ${STIPEND_DECISION_FIELDS}
     matchSuggestions(
       filters: { and: [
         { user: { id: { eq: $idL } } },
-        { status: { ne: "dismissed" } },
+        { status: { notIn: ["dismissed", "dateBlocked"] } },
         { kind: { eq: "mission" } },
         { open_mission: { archived: { eq: false } } },
         { or: [{ open_mission: { lifecycle: { null: true } } }, { open_mission: { lifecycle: { ne: "archived" } } }] }
@@ -14569,7 +14569,7 @@ ${STIPEND_DECISION_FIELDS}
     matchSuggestions(
       filters: { and: [
         { user: { id: { eq: $idL } } },
-        { status: { ne: "dismissed" } },
+        { status: { notIn: ["dismissed", "dateBlocked"] } },
         { kind: { eq: "resource" } },
         { open_mashaabim: { archived: { eq: false } } },
         { or: [{ open_mashaabim: { lifecycle: { null: true } } }, { open_mashaabim: { lifecycle: { ne: "archived" } } }] }

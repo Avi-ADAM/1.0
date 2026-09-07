@@ -61,7 +61,7 @@
       </p>
     </div>
     <a
-      href="/me#my-resources"
+      href="/me"
       class="shrink-0 inline-flex items-center gap-1 text-sm text-surfaceMuted hover:text-barbi"
     >
       {#if $isRtl}

@@ -31,6 +31,11 @@
 }
 	.center{
 		margin:0 auto;
+		/* The disc under this number is `radial-gradient(white 50% ...)` - always
+		   white, in every theme and both modes - so the ink has to be fixed dark.
+		   With no colour of its own it inherited the page's, which in the two
+		   dark fills is a near-white on white: the number read as an empty ring. */
+		color:#1e293b;
 	}
 </style>
 

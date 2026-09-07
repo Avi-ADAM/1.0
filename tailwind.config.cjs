@@ -93,23 +93,30 @@ const config = {
         gre: 'var(--gre)',
         graa: 'var(--graa)',
         grbb: 'var(--grbb)',
-        barbi: 'var(--barbi-pink)',
-        gold: 'var(--gold)',
+        // rgb(var(--x-rgb) / <alpha-value>) and not a bare var(--x): with a
+        // bare var() Tailwind has no channels to composite, so EVERY opacity
+        // modifier on these tokens failed silently — `bg-gold/25` and
+        // `bg-barbi/15` computed to transparent, `border-gold/70` fell back
+        // to gray-200, `text-gold/90` to the inherited colour. 323 call sites
+        // across the app were written expecting these to work. The channel
+        // triplets live next to each token in app.postcss's appearance layer,
+        // which is also where the identity families (`--c-pink-*`) already
+        // used exactly this form.
+        barbi: 'rgb(var(--barbi-pink-rgb) / <alpha-value>)',
+        gold: 'rgb(var(--gold-rgb) / <alpha-value>)',
         // `gold` is the *light* side of the gold/barbi pair — it is the page
         // wash and the text laid on top of `bg-barbi`. Using it as ink on a
         // white surface (the `bg-white border-gold text-gold` outline button)
         // renders at ~1.2:1 and is effectively invisible. `goldink` is the
         // readable counterpart for exactly that role.
-        goldink: 'var(--goldink)',
+        goldink: 'rgb(var(--goldink-rgb) / <alpha-value>)',
         // The one card surface, resolved per theme AND per mode by the
         // appearance layer at the end of app.postcss. `bg-white` is only
         // right in two of the four fills; this is right in all four.
-        // No `/opacity` modifiers on these - a bare var() cannot composite
-        // an alpha (see the note in richText.svelte's palette block).
-        surface: 'var(--surface)',
-        surface2: 'var(--surface-2)',
-        surfaceInk: 'var(--surface-ink)',
-        surfaceMuted: 'var(--surface-muted)',
+        surface: 'rgb(var(--surface-rgb) / <alpha-value>)',
+        surface2: 'rgb(var(--surface-2-rgb) / <alpha-value>)',
+        surfaceInk: 'rgb(var(--surface-ink-rgb) / <alpha-value>)',
+        surfaceMuted: 'rgb(var(--surface-muted-rgb) / <alpha-value>)',
         surfaceLine: 'var(--surface-line)',
         neww: 'var(--neww)',
         lturk: 'var(--lturk)',
