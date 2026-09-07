@@ -585,4 +585,12 @@ export const qidsAccess = {
   // The member's own income history. JWT only in practice — the guard in
   // guards.js pins `uid` to the caller, so 'user' here means "yourself".
   '307myIncomeHistory': { allow: ['user', 'serviceAdmin'] },
+  // Read-only lookup into the UGC translation cache (PLAN_UGC_TRANSLATION §4.1).
+  // Called server-side from `$lib/server/translation/store.ts` with isSer:true —
+  // the public discovery pages are read by anonymous visitors who have no JWT,
+  // and a cache row is not anyone's private data. `user` stays allowed so a
+  // logged-in client path can read it too. An API key gets nothing: a
+  // translation of someone's bio is not API surface. Writes go through the
+  // `cacheTranslations` action (P2), never through a qid.
+  '312translationsByHash': { allow: ['user', 'serviceAdmin'] },
 };

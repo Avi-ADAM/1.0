@@ -1,0 +1,22 @@
+{
+    "from": "Traducido del {{lang}}",
+    "machineNotice": "Traducción automática",
+    "showOriginal": "Ver original",
+    "showTranslation": "Ver traducción",
+    "pending": "Traduciendo…",
+    "lang": {
+        "he": "hebreo",
+        "en": "inglés",
+        "ar": "árabe",
+        "ru": "ruso",
+        "es": "español"
+    },
+    "pref": {
+        "title": "Traducir lo que escriben los miembros",
+        "desc": "Los textos de otros miembros — nombres de rikmas, descripciones de misiones, biografías — se muestran en tu idioma cuando existe una traducción. El original está siempre a un toque.",
+        "off": "Desactivado — mostrar siempre el original",
+        "onDemand": "Bajo demanda — mostrar la traducción que ya exista",
+        "always": "Siempre — pedir también las traducciones que aún no existen",
+        "saved": "Guardado en este dispositivo"
+    }
+}

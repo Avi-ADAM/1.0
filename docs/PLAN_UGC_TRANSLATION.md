@@ -1,8 +1,22 @@
 # PLAN — Translating user-generated content (תרגום תוכן משתמשים)
 
-Status: **draft / not implemented.** Nothing in this document exists in the
-codebase yet. Phase 1 is deliberately shaped so it can ship on its own, cost
-nothing, and be reverted without leaving a trace.
+Status: **P0 + P1 shipped (app side); P2–P5 not started.**
+
+The manifest, the glossary, normalization/detection, the batched cache read, the
+`<Translated>` component, the `translated` namespace in all five locales, the
+`/me` preference and `npm run check:translatable` are all in the codebase and
+tested. **No translation engine exists**, so every string is a cache miss and
+the site renders exactly what it rendered before, in every language, at zero API
+cost — which is the shape P1 was designed to have.
+
+One piece of P0 is *not* code and is therefore still open: the Strapi
+`text-translation` collection and its two permission grants. See
+[`STRAPI_TEXT_TRANSLATION_SETUP.md`](./STRAPI_TEXT_TRANSLATION_SETUP.md). Until
+it exists the read path fails soft, logs once, and reports every string as a
+miss.
+
+Where the shipped code deviates from what is written below, the deviation is
+noted inline as **shipped as:**.
 
 ---
 
@@ -16,6 +30,12 @@ layers it needs to:
 | **T1 — UI chrome** | every `$t('ns.key')` string | **done.** `src/lib/translations/<locale>/<ns>.json`, generated loader table, `npm run check:i18n` |
 | **T2 — shared catalog** | skills, values, roles, work-ways, missions, countries | **done.** Strapi i18n `localizations`, read through `oneLangAdj` / `langAdjast` and the `localizations { … }` sub-selections already baked into the qids |
 | **T3 — user content** | project names and descriptions, open-mission names/`descrip`/`hearotMeyuchadot`, user `bio`/`city`, product names and descriptions, forum messages, negotiation claims | **nothing.** Rendered raw, in whatever language the author typed |
+
+> **Do not confuse the two endpoints.** `/api/translations` already exists and
+> belongs to **T2**: it auto-localizes a *catalog* row (a skill, a role) through
+> Strapi's own `localizations`, with Groq. It is not the T3 path and must not be
+> extended into one — a `Skill` is a curated row we own, a member's project
+> description is not.
 
 The consequence today: a Spanish speaker lands on `/availableMission` and sees a
 wall of Hebrew. Every marketing, SEO and onboarding investment stops at the
@@ -79,7 +99,7 @@ entity it came from:
 | field | type | meaning |
 |---|---|---|
 | `key` | `String` (uid, unique) | `${srcLang}.${tgtLang}.${hash}` — the only lookup key |
-| `hash` | `String` (indexed) | first 32 hex of `sha256(normalized source)` |
+| `hash` | `String` (indexed) | first 32 hex of `sha256(normalized source)` — **the column the read path actually filters on**, because the reader does not know the source language; `key` stays the unique constraint |
 | `srcLang` | Enum `he\|en\|ar\|ru\|es` | detected or declared source language |
 | `tgtLang` | Enum `he\|en\|ar\|ru\|es` | |
 | `source` | `Text` | the original — for debugging, human repair, and so backfill never needs the entity again |
@@ -133,7 +153,14 @@ That is all. Property test: `normalize(normalize(x)) === normalize(x)`, and
 
 ## 3. What is translatable — one manifest, three consumers
 
-`src/lib/translation/fields.ts` is the single source of truth:
+`src/lib/translation/fields.js` is the single source of truth:
+
+> **shipped as:** `fields.js`, not `.ts`. `scripts/check-translatable.mjs` is a
+> dependency-free node script and imports the real module rather than re-parsing
+> it — which is the only way a manifest and its checker cannot drift — exactly
+> as `check-i18n-routes.mjs` imports `translations/routes.js`. JSDoc carries the
+> same types into app code.
+
 
 ```ts
 export const TRANSLATABLE = {
@@ -544,8 +571,8 @@ Each phase is shippable and reversible on its own.
 
 | phase | scope | cost | risk |
 |---|---|---|---|
-| **P0** | Strapi `text-translation` collection (+ **both** permission grants), qids, `fields.ts`, `glossary.ts`, `normalize`/`detect`, `check:translatable`, tests | zero | none — nothing reads it yet |
-| **P1** | Read path only: batched cache read, `<Translated>`, `translated` namespace ×5, the `/me` preference. **No Gemini adapter at all** — every string is a miss and renders source, exactly as today | zero | zero API spend by construction; the component is provably correct before a single request is bought |
+| **P0** ✅ | Strapi `text-translation` collection (+ **both** permission grants), qids, `fields.js`, `glossary.ts`, `normalize`/`detect`, `check:translatable`, tests | zero | none — nothing reads it yet |
+| **P1** ✅ | Read path only: batched cache read, `<Translated>`, `translated` namespace ×5, the `/me` preference. **No Gemini adapter at all** — every string is a miss and renders source, exactly as today | zero | zero API spend by construction; the component is provably correct before a single request is bought |
 | **P2** | Write path: `gemini.ts`, `governor.ts`, `validate.ts`, `/api/translate/warm`, `cacheTranslations`. Enable on **one** surface (`/availableMission`) behind an env flag | bounded by `TRANSLATE_RPD` | measurable on one route before it is everywhere |
 | **P3** | `backfill-translations.ts` + state file + priority queue; run by hand for a week; then add it to `scripts/scheduler/` | free quota only | it is budget-bounded and idempotent |
 | **P4** | Surface rollout in the order of §7 (chat last, on-demand only) | cache hits, mostly | |
@@ -556,13 +583,36 @@ translation-aware, with the provenance UI in place, at literally zero API cost �
 and if the answer to "is this worth it" turns out to be no, deleting one
 component and one collection undoes it completely.
 
+### What P0 + P1 actually put in the tree
+
+| file | what it is |
+|---|---|
+| `src/lib/translation/fields.js` | the manifest (§3), 11 fields across 5 entities |
+| `src/lib/translation/glossary.ts` | canonical renderings of the domain nouns (§6), plus the post-hoc violation check P2 will use |
+| `src/lib/translation/normalize.ts` | `normalizeForHash`, `hashSource`, `cacheKey`, `isWorthTranslating` (§2.3) |
+| `src/lib/translation/sha256.ts` | a synchronous SHA-256 — the loader and the browser must compute the same key, and `crypto.subtle` is async |
+| `src/lib/translation/detect.ts` | the cheap script/stop-word guess that makes identity rows possible (§2.2) |
+| `src/lib/translation/collect.ts` | the runtime collector — turns already-fetched data into deduplicated hashes (§4.1) |
+| `src/lib/server/translation/store.ts` | the batched, fail-soft cache read. Read only |
+| `src/lib/components/ui/Translated.svelte` | the provenance UI (§4.2) |
+| `src/lib/translations/<locale>/translated.json` | the new namespace, ×5, loaded globally |
+| `src/lib/stores/autoTranslate.js` | the reader preference and the show-original toggle (§4.4) |
+| `src/routes/api/send/qids.js` | `312translationsByHash` — the one query the read path may make |
+| `scripts/check-translatable.mjs` | `npm run check:translatable` |
+
+Nothing yet **calls** `translateFor()` from a loader: P2 enables the read on one
+surface (`/availableMission`) behind an env flag, which is where the first real
+cache read belongs. Until then the whole read path is exercised by its tests and
+by nothing else, which is exactly the zero-risk shape P1 asked for.
+
 ---
 
 ## 12. Open questions
 
 1. **`projectName`** — translate as prose, or treat as a brand and only
    transliterate? §4.3 recommends translating, with a per-project override
-   deferred. Confirm.
+   deferred. **Shipped as `translate`** (the recommendation), reversible by one
+   line in `fields.js`. Still worth confirming before P2 spends anything on it.
 2. **Chat / forum messages** — on-demand button only (recommended), or
    automatic like everything else? Volume is high and value per string is low.
 3. **Default preference** — `onDemand` for everyone, or `always` for users whose

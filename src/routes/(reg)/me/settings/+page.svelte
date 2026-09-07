@@ -4,6 +4,11 @@
   import { goto } from '$app/navigation';
   import { executeAction } from '$lib/client/actionClient';
   import EditB from '$lib/components/userPr/editBasic.svelte';
+  import {
+    autoTranslate,
+    AUTO_TRANSLATE_VALUES,
+    setAutoTranslate
+  } from '$lib/stores/autoTranslate.js';
   let { data } = $props();
 
   // Locales that render left-to-right; everything else is RTL. Mirrors
@@ -156,6 +161,36 @@
     >
       {$t('mcp.banner.cta')}
     </a>
+  </div>
+
+  <!-- Translation of what *other members* wrote (PLAN_UGC_TRANSLATION §4.4).
+       Separate from the display-language picker inside <EditB> on purpose:
+       that one chooses the language of the site's own chrome and is saved to
+       Strapi; this one only says what to do with text the platform did not
+       write, and lives in localStorage until the backend has a column for it. -->
+  <div
+    class="mb-6 rounded-xl border border-zinc-200 dark:border-zinc-700 p-4 bg-white/60 dark:bg-zinc-900/40"
+  >
+    <p class="font-medium text-goldink">🌐 {$t('translated.pref.title')}</p>
+    <p class="text-sm text-zinc-500 mt-1">{$t('translated.pref.desc')}</p>
+
+    <div class="mt-3 flex flex-col gap-2">
+      {#each AUTO_TRANSLATE_VALUES as value (value)}
+        <label class="flex items-start gap-2 text-sm cursor-pointer">
+          <input
+            type="radio"
+            name="autoTranslate"
+            {value}
+            checked={$autoTranslate === value}
+            onchange={() => setAutoTranslate(value)}
+            class="mt-1 shrink-0"
+          />
+          <span>{$t(`translated.pref.${value}`)}</span>
+        </label>
+      {/each}
+    </div>
+
+    <p class="text-xs text-zinc-400 mt-2">{$t('translated.pref.saved')}</p>
   </div>
 
   {#if meData}

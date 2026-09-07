@@ -26,6 +26,7 @@ SvelteKit + Svelte 5 app, npm, Node 22.
 | `npm run check:proxy` | Proxy-security lint (see `docs/PLAN_PROXY_SECURITY.md`). |
 | `npm run check:i18n` | Verifies every `$t('ns.…')` is reachable on the routes that use it (see i18n section). |
 | `npm run check:script` | Flags words that mix alphabets (a Cyrillic `г` inside a Hebrew word, …). |
+| `npm run check:translatable` | Verifies the UGC translation manifest (`src/lib/translation/fields.js`) against the generated Strapi schema. |
 
 Tests are colocated (`*.test.ts` / `*.integration.test.ts` / `*.pbt.test.ts`
 property-based via fast-check) and run on the `happy-dom`/`jsdom` environment.
@@ -144,6 +145,26 @@ Hebrew, Arabic and Cyrillic have look-alike letters, and a bad bulk edit leaves
 one alphabet's glyph inside another's word (`מפгש`, `ליוوي`, `pתוח`). It renders
 as garbage and reorders the RTL run, and no other check sees it —
 `npm run check:script` does.
+
+### T3 — translating what *members* wrote
+
+`$t()` covers the platform's own words. Text **members** typed — project names
+and descriptions, mission `descrip`, bios, product names — is a separate layer
+with its own machinery in `src/lib/translation/` (pure) and
+`src/lib/server/translation/` (the cache read). See
+`docs/PLAN_UGC_TRANSLATION.md`; P0 + P1 are in, there is no translation engine
+yet, so every string is a cache miss and renders as the author wrote it.
+
+- What may be translated at all is the manifest, `src/lib/translation/fields.js` —
+  never a decision at a call site. `npm run check:translatable` holds it to the
+  generated Strapi schema.
+- The cache is **content-addressed** (`hashSource(normalizeForHash(text))`), so
+  editing the source misses the cache and the stale row is simply never looked
+  up again. There is no invalidation code, deliberately.
+- Rendering goes through `<Translated>`, which always states that a translation
+  is a translation and always keeps the original one tap away.
+- The inverse regression to watch for: routing **UI** text through this to avoid
+  adding a JSON key. `$t()` stays the only path for anything the platform says.
 
 ## Money / revenue domain (site-share)
 

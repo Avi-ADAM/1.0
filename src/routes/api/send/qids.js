@@ -15302,6 +15302,46 @@ ${STIPEND_DECISION_FIELDS}
     }
   }`,
 
+  // ── UGC translation cache — the whole read path (PLAN_UGC_TRANSLATION §4.1) ─
+  //
+  // One batched read for every translatable string a loader already fetched. A
+  // page load NEVER waits on a translation API: this is the only query the read
+  // path is allowed to make, misses render the source text, and a crawler
+  // walking /availableMission therefore cannot burn anyone's quota.
+  //
+  // Filtered on `hash` + `tgtLang` rather than on the composite `key`
+  // (`${srcLang}.${tgtLang}.${hash}`) precisely because the reader does not know
+  // the source language — that is what it is asking about. `hash` is the
+  // indexed column for exactly this lookup; `key` still comes back so a caller
+  // can see the pair it got.
+  //
+  // `source` is deliberately NOT selected: it is stored for the backfill worker
+  // and for human repair, and shipping every original alongside every
+  // translation would double the payload of every list page to no purpose.
+  //
+  // Read-only. Rows are written by the `cacheTranslations` action (P2), never
+  // through /api/send.
+  '312translationsByHash': `query TranslationsByHash($hashes: [String]!, $tgt: String!, $limit: Int = 300) {
+    textTranslations(
+      filters: { hash: { in: $hashes }, tgtLang: { eq: $tgt } }
+      pagination: { limit: $limit }
+    ) {
+      data {
+        id
+        attributes {
+          key
+          hash
+          srcLang
+          tgtLang
+          text
+          mode
+          engine
+          quality
+        }
+      }
+    }
+  }`,
+
   ...qids_base,
   ...moachQids
 };

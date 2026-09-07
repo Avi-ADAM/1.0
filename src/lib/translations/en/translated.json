@@ -1,0 +1,22 @@
+{
+    "from": "Translated from {{lang}}",
+    "machineNotice": "Machine translation",
+    "showOriginal": "Show original",
+    "showTranslation": "Show translation",
+    "pending": "Translating…",
+    "lang": {
+        "he": "Hebrew",
+        "en": "English",
+        "ar": "Arabic",
+        "ru": "Russian",
+        "es": "Spanish"
+    },
+    "pref": {
+        "title": "Translating what members write",
+        "desc": "Text other members wrote — rikma names, mission descriptions, bios — is shown in your language when a translation exists. The original is always one tap away.",
+        "off": "Off — always show the original",
+        "onDemand": "On demand — show a translation when one already exists",
+        "always": "Always — also ask for translations that do not exist yet",
+        "saved": "Saved on this device"
+    }
+}
