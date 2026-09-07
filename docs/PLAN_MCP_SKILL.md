@@ -163,7 +163,7 @@ MCP נותן **ידיים**, Skill נותן **שיקול דעת**. סוכן שמ
 | ערוץ | מה נדרש |
 |---|---|
 | רשימות skills/plugins קהילתיות (awesome-claude-code וכו') | PR עם שורה + לינק |
-| רג'יסטרי MCP ציבורי | ה-`url` הציבורי + תיאור; המצב הלא-מאומת נותן demo בלי הרשמה |
+| רג'יסטרי MCP ציבורי | `server.json` עם `remotes` (לא `packages` — ה-CLI אינו שרת); המצב הלא-מאומת נותן demo בלי הרשמה |
 | npm | לקשר את `1lev1-mcp` לריפו ה-plugin ב-`repository` וב-README |
 | דף באתר — `/ai` או `/mcp` | "חבר את Claude/Cursor ל-1lev1 בשתי דקות". שלב 3ב'5 ב-`PLAN_AI_ERA` |
 | README של ריקמות ציבוריות | badge "מנוהל ב-1lev1" עם לינק להתקנה |
@@ -206,10 +206,112 @@ MCP נותן **ידיים**, Skill נותן **שיקול דעת**. סוכן שמ
 `/api/mcp/[apiKey]` משימוש (410). ⬜ נותר: rate limiting פר-מפתח,
 `touchLastUsed` בכל קריאת MCP (קיים ב-`apiKeys.ts`, לא מחובר לנתיב ה-MCP).
 
-**גל 2 — פרסום.** ✅ הריפו הציבורי עלה. ⬜ נותר: פרסום `1lev1-mcp@1.0.4` ל-npm
-(דורש `npm login` — הטוקן פג); PR לרשימות; דף `/ai`
-באתר; קישור מ-npm.
+**גל 2 — פרסום.** ✅ הריפו הציבורי עלה. ✅ **`1lev1-mcp@2.0.0` פורסם ל-npm
+ב-30.8.2026** — הסעיף הזה תיעד "נותר לפרסם `1.0.4`, הטוקן פג" והיה פשוט לא
+מעודכן; `registry.npmjs.org` מראה `dist-tags.latest = 2.0.0`, וגרסאות
+1.0.0/1.0.1/1.0.2 לפניה. אין 1.0.4 ולא היה. ✅ תיקון המניפסטים לסכימה.
+✅ **השרת רשום ברג'יסטרי ה-MCP הרשמי** (3.9.2026,
+`io.github.Avi-ADAM/1lev1`). ⬜ נותר: תיאור ו-topics לריפו `1lev1-agent`
+(ראה חלק ו') — החסם היחיד שנשאר בצד ה-plugin; PR לרשימות; דף `/ai` באתר.
 
 **גל 3 — העמקה.** `getProjectContextTool` ב-MCP; דפוס ההצעה-ואישור מ-שלב 2 של
 `PLAN_AI_ERA` על הפעולות הכבדות; Skill שני ייעודי ל-`/api/v1/tasks` (גשר
 issues↔מטלות) לקהל שכבר יש לו ריקמה.
+
+---
+
+## חלק ו' — גילוי: למה 1lev1 לא מופיע ב-buildwithclaude
+
+`buildwithclaude.com/plugins?q=1lev1` מחזיר ריק (2.9.2026). זה **לא** אומר
+שמשהו שבור — זו שאלה של איך האינדוקס עובד ומה עוד חסר לריפו.
+
+### איך האינדוקס באמת עובד
+
+buildwithclaude (`davepoon/buildwithclaude`) הוא **קטלוג קהילתי**, לא
+ה-marketplace הרשמי של Anthropic. הוא לא דורש הרשמה ואין לו טופס הגשה — ה-PR
+ב-`CONTRIBUTING.md` הוא רק ל-agents/commands/hooks שנכנסים לריפו שלו עצמו.
+marketplace-ים חיצוניים נסרקים אוטומטית מ-GitHub. מה שנצפה ב-API שלו:
+
+| עובדה | מה למדנו |
+|---|---|
+| `/api/marketplaces` מחזיר `total: 17784` | הקטלוג רחב, לא מסונן ידנית |
+| `lastIndexedAt` של הרשומות התחתונות = היום, `05:03Z` | יש סריקה **יומית** |
+| רשומות עם `stars: 0`, `pluginCount: 0`, `description: ""` נמצאות בפנים | **אין סף כוכבים ואין דרישת איכות** |
+| `description` ו-`categories` של רשומה = ה-description וה-**topics** של ריפו ה-GitHub, לא של `marketplace.json` | הקטלוג מושך מטא-דאטה מ-GitHub |
+| `/api/marketplaces?q=1lev1` → `{"marketplaces":[],"total":0}` | הריפו פשוט עוד לא נסרק |
+
+התנאי היחיד להיכנס: ריפו **ציבורי** עם `.claude-plugin/marketplace.json`
+בשורש, שהסורק מוצא דרך חיפוש ב-GitHub.
+
+### מה מצב `Avi-ADAM/1lev1-agent` בפועל
+
+✅ ציבורי · ✅ `.claude-plugin/marketplace.json` בשורש · ✅
+`plugins/1lev1/.claude-plugin/plugin.json` · ✅ `skills/1lev1-platform/SKILL.md`
+· ✅ LICENSE · ✅ README.
+
+**הקומיט הראשון הוא מ-30.8.2026 — הריפו בן שלושה ימים.** ההסבר הפשוט ביותר
+לחוסר הופעה הוא שחיפוש הקוד של GitHub עוד לא אינדקס ריפו חדש, קטן וללא כוכבים,
+ולכן הסורק היומי לא ראה אותו. זה נפתר מעצמו — אבל שלושה דברים מגדילים משמעותית
+את הסיכוי, ואחד מהם היה באג של ממש:
+
+1. **✅ תוקן — `marketplace.json` לא תאם לסכימה.** `description` ו-`version`
+   ישבו בתוך `metadata` במקום ברמה העליונה, ולרשומת ה-plugin חסרו
+   `author`, `license`, `homepage` ו-`repository` — שדות שהתיעוד הרשמי מגדיר
+   כנדרשים ברשומת plugin. פרסר מחמיר היה מדלג על הרשומה; פרסר סלחני היה מציג
+   plugin בלי תיאור ובלי בעלים. שני המניפסטים עודכנו ל-0.1.1 עם `$schema`.
+2. **⬜ לריפו אין `description` ואין `topics` ב-GitHub.** אלה בדיוק שני השדות
+   שהקטלוג מעתיק (`description`, `categories`). בלעדיהם הכרטיס בקטלוג יוצא ריק
+   גם אחרי שייסרק, וגם חיפוש `q=1lev1` נשען עליהם. להוסיף topics:
+   `claude-code`, `claude-code-plugin`, `claude-plugin`, `agent-skills`,
+   `mcp`, `mcp-server`, `partnership`, `equity`.
+3. **⬜ אין קישורים נכנסים.** הסורקים מגיעים לריפו דרך רשימות. PR ל-
+   `awesome-claude-code`, `hesreallyhim/awesome-claude-code`, ורשימות
+   plugins/skills — הוא גם ערוץ גילוי אנושי וגם מה שמכניס את הריפו לאינדקס
+   של GitHub מהר יותר.
+
+### ✅ ה-MCP — ערוץ נפרד, ורשום
+
+הקטלוג מציג גם ~6,250 שרתי MCP, והם **לא** מגיעים מ-`marketplace.json` אלא
+מרג'יסטרי MCP ציבוריים. זה ערוץ נפרד לגמרי, ובמקרה שלנו הוא דווקא החזק יותר:
+המצב הלא-מאומת מחזיר `getPlatformInfo` בלי שום הרשמה, כלומר כל מי שמדפדף
+ברג'יסטרי יכול לנסות אותנו בקליק.
+
+**פורסם ב-3.9.2026 17:28Z ל-`registry.modelcontextprotocol.io`** כ-
+`io.github.Avi-ADAM/1lev1` — `status: active`, `isLatest: true`.
+
+**רושמים את השרת המרוחק, לא את חבילת ה-npm.** `1lev1-mcp` ב-npm הוא **לא**
+שרת MCP — הוא CLI שפותח דפדפן, מאמת, וכותב קונפיג. רישום שלו כ-`packages` היה
+גורם ללקוח רג'יסטרי להריץ אותו כשרת stdio ולקבל זרימת דפדפן במקום פרוטוקול.
+הרשומה הנכונה היא `remotes` בלבד — בדיוק הצורה של `ac.inference.sh/mcp`
+שכבר רשומה שם. `server.json` יושב ב-`Avi-ADAM/1lev1-mcp` (ענף **`master`**,
+לא `main` — בניגוד ל-`1lev1-agent`).
+
+**למה `io.github` ולא `com.1lev1`.** בדף ה-MCP של buildwithclaude הכרטיס מציג
+`title` + `description` בלבד; ה-`name` עם ה-namespace לא מוצג שם כלל — הוא
+מזהה, לא כותרת. `com.1lev1/mcp` היה דורש **TXT על ה-apex של `1lev1.com`**
+(`v=MCPv1; k=ed25519; p=…`, SPF-style, לא תחת selector), ושם כבר יושבות שלוש
+רשומות — SPF של Zoho, `google-site-verification` ו-`zoho-verification`. עריכה
+שדורסת אותן במקום להוסיף מפילה את אימות המייל היוצא. התמורה לא הצדיקה את
+הסיכון. המחיר: **שם ברג'יסטרי אי אפשר לשנות** — מעבר ל-`com.1lev1` בעתיד הוא
+רשומה חדשה והישנה מסומנת deprecated.
+
+שתי מלכודות ששילמנו עליהן, כדי שלא יחזרו:
+
+1. **קאסינג.** הפרסום נדחה ב-403: `You have permission to publish:
+   io.github.Avi-ADAM/*. Attempting to publish: io.github.avi-adam/1lev1`.
+   הרג'יסטרי גוזר את ה-namespace משם חשבון ה-GitHub **מילה במילה**, בלי
+   lowercase. כל הדוגמאות בתיעוד משתמשות בחשבונות שכבר קטנים, וזה מסתיר את
+   ההבדל.
+2. **`description` מוגבל ל-100 תווים** בסכימה. הנוכחי: 89.
+
+בנוסף: `awesome-mcp-servers` וכיוצא בו — PR עם שורה.
+
+### מה שלא יעזור
+
+- **להוסיף `marketplace.json` לריפו הזה (`Avi-ADAM/1.0`).** מקור האמת הוא
+  `1lev1-agent` בכוונה — ראה חלק ג'. שני marketplace-ים עם אותו `name: "1lev1"`
+  יתחרו זה בזה.
+- **ה-`.claude/skills/` שבריפו הזה.** אלה skills של צד שלישי שהותקנו לפיתוח
+  (`skills-lock.json`), לא שלנו, ואין להם שום קשר לגילוי.
+- **`.mcp.json` שבשורש.** זו הגדרה מקומית לפיתוח, לא מניפסט שמתפרסם לשום מקום.
+  ⚠️ הוא גם מכיל מפתח `Bearer` בתוך ריפו ציבורי — לבטל ולהעביר למשתנה סביבה.
