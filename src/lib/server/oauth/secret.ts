@@ -43,6 +43,14 @@ export function clientSigningKey(): Buffer {
   return derive('1lev1-oauth-client-v1');
 }
 
+/**
+ * HMAC key for the derived client_secret. Separate from the client_id signing
+ * key so that publishing a secret never leaks the ability to forge a client_id.
+ */
+export function clientSecretKey(): Buffer {
+  return derive('1lev1-oauth-client-secret-v1');
+}
+
 /** AES-256-GCM key for authorization-code envelopes. */
 export function codeEncryptionKey(): Buffer {
   return derive('1lev1-oauth-code-v1');

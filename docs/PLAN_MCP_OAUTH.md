@@ -1,6 +1,9 @@
 # PLAN — OAuth for the MCP server (cloud connectors)
 
-Status: **draft, not deployed.** Implemented behind `MCP_OAUTH_ENABLED`.
+Status: **deployed to production, waiting on one env var.** Every route below
+answers on `www.1lev1.com` today; `/api/mcp` still returns 200 to an
+unauthenticated caller because `MCP_OAUTH_ENABLED` is not yet `true` there, and
+until it is, no browser client begins the handshake.
 
 ## Why
 
@@ -107,6 +110,12 @@ the response that hides an auth failure.
 MCP_OAUTH_REDIRECT_HOSTS=claude.ai,*.claude.ai,claude.com,*.claude.com
 ```
 
+> Leaving `MCP_OAUTH_REDIRECT_HOSTS` **unset** is now the better default: the
+> built-in list covers the Claude and ChatGPT callbacks together. Set it only to
+> add a host the defaults do not carry (a Gemini Enterprise tenant), and
+> remember that setting it *replaces* the defaults — include the Claude and
+> ChatGPT entries yourself.
+
 `https://claude.ai/api/mcp/auth_callback` is the one that matters. Wildcards
 match a single leading label only. `http://` is refused except on localhost.
 
@@ -172,6 +181,128 @@ and the 401's headers.
 **Not yet exercised:** the consent step itself (`/mcp-connect` → code →
 `/oauth/token` → access token), because it needs a logged-in browser session.
 The pieces on either side of it are tested; the join is not.
+
+## Verification (8.9.2026)
+
+Against **production**, before any change here — the OAuth surface is live and
+only the challenge is switched off:
+
+| Check | Result |
+|---|---|
+| `www.1lev1.com/.well-known/oauth-authorization-server` | 200, correct metadata |
+| `www.1lev1.com/.well-known/oauth-protected-resource` | 200 |
+| `POST /oauth/register`, claude.ai callback | 201 + signed client_id |
+| `POST /api/mcp`, no token | **200** — `MCP_OAUTH_ENABLED` is not set |
+| `api.1lev1.com/.well-known/…` | 301 → `www` (see the issuer trap above) |
+
+Against a **dev server with `MCP_OAUTH_ENABLED=true`**, after this change:
+
+| Check | Result |
+|---|---|
+| `POST /api/mcp`, no token | 401 + `WWW-Authenticate: Bearer resource_metadata="…"` |
+| `POST /api/mcp?public=1` | 200 — the escape hatch still answers |
+| `POST /oauth/register`, ChatGPT callback + `auth_method: none` | 201 **with** `client_secret` |
+| `POST /oauth/register`, `client_secret_post` | 201 |
+| `POST /oauth/register`, `private_key_jwt` | 400, and the error names the three supported methods |
+| `POST /oauth/register`, `chatgpt.com.evil.com` | 400 `invalid_redirect_uri` |
+| `POST /oauth/token` with an HTTP Basic header | parses the header, then 400 `invalid_grant` on the bad code |
+
+44 unit tests across `oauth.test.ts`, `defaultHosts.test.ts`, `challenge.test.ts`
+and `keyDiagnosis.test.ts`.
+
+## The issuer/origin trap (`api.` vs `www.`)
+
+The metadata is derived from the origin the request arrived on
+(`issuerFor(url)`), which is what lets one deployment answer on both hosts. It
+also means the **URL a user pastes into the connector form decides the whole
+handshake**, and the two hosts do not behave the same. Probed 8.9.2026:
+
+```
+GET https://api.1lev1.com/.well-known/oauth-protected-resource
+  -> 301 https://www.1lev1.com/.well-known/oauth-protected-resource
+  -> 200 {"resource":"https://www.1lev1.com/api/mcp", ...}
+```
+
+So a user who registers the connector as `https://api.1lev1.com/api/mcp` gets
+back metadata claiming the resource is `https://www.1lev1.com/api/mcp`. RFC 9728
+§3.3 says the client must check that the `resource` matches the server it is
+talking to; a client that enforces it refuses the connector, and one that does
+not carries on. We should not be relying on which of the two a given vendor
+implemented.
+
+Two ways out, and they are not exclusive:
+
+1. **Publish `https://www.1lev1.com/api/mcp`** as the connector URL (the guide
+   page and `1lev1-mcp/server.json` currently say `api.`). Costs nothing.
+2. **Stop nginx redirecting `/.well-known/` on `api.1lev1.com`** so the api host
+   serves its own metadata and the resource matches. nginx already special-cases
+   `/.well-known/acme-challenge/`; this is the same shape of rule.
+
+Until one of them is done, test the connector against **both** hosts rather than
+assuming the `api.` URL works because the endpoint does.
+
+---
+
+## Part B — agents other than Claude
+
+The server speaks plain MCP over Streamable HTTP, so "which agents can use it"
+is a question about each vendor's client, not about us. State of play, 8.9.2026:
+
+| Surface | How it connects | What we had to do |
+|---|---|---|
+| claude.ai (web + mobile app), Claude Code cloud sessions | custom connector, OAuth | nothing beyond this plan — connectors are passed into cloud sessions by the host |
+| Claude Code / Desktop / Cursor / Windsurf / Cline / Roo / Continue / Antigravity / VS Code | `npx 1lev1-mcp` writes a Bearer header | already worked |
+| **ChatGPT** (Plus and up) | Developer mode → custom connector, OAuth + DCR | redirect allowlist + `client_secret`, below |
+| **Gemini CLI** | `~/.gemini/settings.json`, `httpUrl` + headers | manual for now; a CLI writer is a follow-up |
+| **Gemini Enterprise** (Business edition) | admin adds a Streamable-HTTP MCP server under Connected apps | needs a **manually issued** client id + secret; no DCR |
+| **Codex CLI** | `~/.codex/config.toml`, `url` + `bearer_token_env_var` | manual — TOML, and the CLI's writers are JSON-only |
+| consumer Gemini app | not possible | connectors there are partnership-only |
+| n8n / Zapier / anything home-grown | Bearer header against `/api/mcp` | already worked |
+
+### Why a PKCE-only server now hands out a `client_secret`
+
+Two clients refuse to work without one, for unrelated reasons:
+
+- **ChatGPT** registers with `token_endpoint_auth_method: "none"` and then fails
+  the connection if the 201 carries no `client_secret`. Reported repeatedly
+  against other MCP servers; Claude registers fine against the same endpoint.
+- **Gemini Enterprise** has no DCR at all. Its form has required Client ID and
+  Client Secret fields that an admin types in.
+
+`clientSecretFor()` derives the secret from the client_id with a **separate**
+HKDF key (`1lev1-oauth-client-secret-v1`), so publishing a secret can never
+forge a client_id. The token endpoint accepts the secret in the body
+(`client_secret_post`) or as HTTP Basic (`client_secret_basic`), and:
+
+- **absent** → public client, PKCE alone decides, unchanged from before;
+- **correct** → accepted;
+- **wrong** → `invalid_client`, 401.
+
+The secret is deliberately **not load-bearing**. PKCE is still what protects the
+exchange. This is a compatibility shim, and the comments in `clients.ts` say so
+in as many words, so nobody later mistakes it for a second factor.
+
+### Redirect allowlist
+
+`DEFAULT_HOSTS` now also carries `chatgpt.com,*.chatgpt.com,openai.com,
+*.openai.com` — ChatGPT's callback is
+`https://chatgpt.com/connector_platform_oauth_redirect`. Gemini Enterprise
+callbacks are per-tenant and are **not** in the default list on purpose: an
+organisation that needs one is added through `MCP_OAUTH_REDIRECT_HOSTS`, which
+replaces the list rather than extending it. `defaultHosts.test.ts` pins both
+halves of that decision.
+
+### Still manual, worth doing next
+
+- A **`/oauth/manual-client`** screen (or a support flow) that mints a
+  client_id + client_secret for a pasted redirect_uri, so a Gemini Enterprise
+  admin is self-serve instead of emailing us. `mintClientId` already makes this
+  a small job; the redirect allowlist is the part that needs a decision.
+- **Gemini CLI and Codex CLI writers** in `1lev1-mcp`. Gemini CLI is JSON
+  (`~/.gemini/settings.json`, key `httpUrl`) and drops straight into the
+  existing writer table. Codex CLI is TOML and needs a new writer.
+
+---
 
 ## Not in scope
 

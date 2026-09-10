@@ -11,7 +11,7 @@
 // token still requires the user to sit through the consent screen.
 
 import crypto from 'crypto';
-import { clientSigningKey, b64url, fromB64url, safeEqual } from './secret.js';
+import { clientSigningKey, clientSecretKey, b64url, fromB64url, safeEqual } from './secret.js';
 import { isAllowedRedirectUri } from './redirects.js';
 
 export interface ClientPayload {
@@ -58,4 +58,33 @@ export function parseClientId(clientId: string): ClientPayload | null {
 export function isRegisteredRedirectUri(client: ClientPayload, redirectUri: string): boolean {
   if (!client.redirect_uris.some((u) => safeEqual(u, redirectUri))) return false;
   return isAllowedRedirectUri(redirectUri);
+}
+
+/**
+ * A client_secret derived from the client_id, so it needs no storage either.
+ *
+ * We are a PKCE-only authorization server: the token endpoint is protected by
+ * the code verifier, not by this secret. It exists because two real clients
+ * refuse to work without one — ChatGPT's dynamic registration expects a
+ * `client_secret` in the 201 even though it registers with
+ * `token_endpoint_auth_method: "none"`, and Gemini Enterprise's manual MCP
+ * connector form has a required Client Secret field. Handing out a value that
+ * is verifiable but not load-bearing satisfies both without weakening PKCE.
+ *
+ * It is derived from the whole client_id, signature included, so it changes
+ * with the registration and dies with OAUTH_SECRET.
+ */
+export function clientSecretFor(clientId: string): string {
+  return crypto.createHmac('sha256', clientSecretKey()).update(clientId).digest('base64url');
+}
+
+/**
+ * True when no secret was presented at all (a public client, the normal case),
+ * or when the one presented is the one we would have issued. A wrong secret is
+ * refused rather than ignored: a client that sends credentials is entitled to
+ * be told they are wrong instead of silently succeeding.
+ */
+export function clientSecretOk(clientId: string, presented: string | null | undefined): boolean {
+  if (!presented) return true;
+  return safeEqual(presented, clientSecretFor(clientId));
 }
