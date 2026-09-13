@@ -29,9 +29,10 @@
     <Translated text={m.descrip} hit={translations.hits[hash]} />
 -->
 <script>
-  import { t } from '$lib/translations';
   import { hashSource } from '$lib/translation/normalize.js';
   import { autoTranslate, showOriginals } from '$lib/stores/autoTranslate.js';
+  import { isRealTranslation } from '$lib/translation/hits.js';
+  import TranslatedNote from './TranslatedNote.svelte';
 
   /**
    * @typedef {import('$lib/translation/types.js').TranslationHit} TranslationHit
@@ -64,38 +65,22 @@
   // `off` means the reader asked for the author's words. Honour it here too,
   // not only in the read path, so a payload fetched before the setting changed
   // does not keep rendering translations.
-  const available = $derived(!!row?.text && $autoTranslate !== 'off');
+  //
+  // An **identity row** is not a translation — its `text` is the source (§2.2)
+  // — so it renders as a plain source string with no note and no toggle. See
+  // the header of hits.js.
+  const available = $derived(isRealTranslation(row) && $autoTranslate !== 'off');
   const showing = $derived(available && !$showOriginals ? 'translation' : 'source');
   const body = $derived(showing === 'translation' && row ? row.text : source);
-
-  const fromLang = $derived(row ? $t(`translated.lang.${row.srcLang}`) : '');
 </script>
 
 {#if source}
   <svelte:element this={as} class={className} dir="auto">{body}</svelte:element>
 
-  {#if available && showNote && row}
-    <span class="block text-xs text-zinc-500 dark:text-zinc-400 mt-0.5" dir="auto">
-      {#if showing === 'translation'}
-        <!-- The honest half: what it is, and where it came from. A reviewed
-             row has a human behind it, so it drops the "machine" wording but
-             still says which language it was written in (§9.1). -->
-        <span>
-          {$t('translated.from', { lang: fromLang })}{#if row.quality !== 'reviewed'}
-            · {$t('translated.machineNotice')}{/if}
-        </span>
-        <button
-          type="button"
-          class="underline hover:text-zinc-700 dark:hover:text-zinc-200"
-          onclick={() => showOriginals.set(true)}
-        >{$t('translated.showOriginal')}</button>
-      {:else}
-        <button
-          type="button"
-          class="underline hover:text-zinc-700 dark:hover:text-zinc-200"
-          onclick={() => showOriginals.set(false)}
-        >{$t('translated.showTranslation')}</button>
-      {/if}
-    </span>
+  <!-- The provenance line lives in its own component because a card whose body
+       is one <a href> cannot nest a <button>; it renders one note per card
+       outside the anchor instead. Same markup, one implementation. -->
+  {#if showNote}
+    <TranslatedNote hit={available ? row : undefined} />
   {/if}
 {/if}

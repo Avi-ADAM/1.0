@@ -2,6 +2,16 @@ import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { get } from 'svelte/store';
 
 /**
+ * The mirror to Strapi goes through `updateUserBasic` and nothing else
+ * (PLAN_UGC_TRANSLATION §4.4). Mocking the action client is also what keeps a
+ * pending debounce from firing a real fetch after a test has finished.
+ */
+const executeAction = vi.fn(async () => ({ success: true }));
+vi.mock('$lib/client/actionClient', () => ({
+    executeAction: (...args: unknown[]) => executeAction(...(args as [])),
+}));
+
+/**
  * `src/test-setup.js` installs a `localStorage` whose methods are bare
  * `vi.fn()`s — they record calls and store nothing. That is fine for code that
  * only writes, but this module's whole point is *reading back* what it wrote,
@@ -24,6 +34,12 @@ describe('autoTranslate — the reader preference', () => {
     beforeEach(() => {
         installRealLocalStorage();
         vi.resetModules();
+        executeAction.mockClear();
+        vi.useFakeTimers();
+    });
+
+    afterEach(() => {
+        vi.useRealTimers();
     });
 
     it('defaults to onDemand — show what exists, never buy anything', async () => {
@@ -57,9 +73,61 @@ describe('autoTranslate — the reader preference', () => {
         expect(coercePref(7)).toBe('onDemand');
     });
 
-    it('does not mirror to Strapi yet — the column does not exist', async () => {
+    it('mirrors to the account through updateUserBasic, and nowhere else', async () => {
         const { mirrorToProfile } = await import('./autoTranslate.js');
-        await expect(mirrorToProfile()).resolves.toBe(false);
+        await expect(mirrorToProfile('always')).resolves.toBe(true);
+
+        expect(executeAction).toHaveBeenCalledTimes(1);
+        const [key, params, opts] = executeAction.mock.calls[0] as unknown as [string, any, any];
+        expect(key).toBe('updateUserBasic');
+        expect(params).toEqual({ autoTranslate: 'always' });
+        // Silent by design: a failed *preference sync* is not the reader's
+        // problem, and re-running the /me loader teaches this device nothing.
+        expect(opts).toMatchObject({ showErrorToast: false, skipUpdateStrategy: true });
+    });
+
+    it('reports failure rather than throwing when the action fails', async () => {
+        executeAction.mockResolvedValueOnce({ success: false } as never);
+        const { mirrorToProfile } = await import('./autoTranslate.js');
+        await expect(mirrorToProfile('off')).resolves.toBe(false);
+    });
+
+    it('debounces: three clicks in a second are one write', async () => {
+        const { setAutoTranslate } = await import('./autoTranslate.js');
+        setAutoTranslate('off');
+        setAutoTranslate('always');
+        setAutoTranslate('onDemand');
+        expect(executeAction).not.toHaveBeenCalled();
+
+        await vi.advanceTimersByTimeAsync(1000);
+        expect(executeAction).toHaveBeenCalledTimes(1);
+        expect((executeAction.mock.calls[0] as unknown as [string, any])[1]).toEqual({
+            autoTranslate: 'onDemand'
+        });
+    });
+
+    it('adopts the account value only on a device that never chose', async () => {
+        const { adoptFromProfile, autoTranslate } = await import('./autoTranslate.js');
+        expect(adoptFromProfile('always')).toBe(true);
+        expect(get(autoTranslate)).toBe('always');
+
+        // Adopting must not echo the value straight back to the server.
+        await vi.advanceTimersByTimeAsync(1000);
+        expect(executeAction).not.toHaveBeenCalled();
+    });
+
+    it('never overwrites a choice this device already made', async () => {
+        localStorage.setItem('autoTranslate', 'off');
+        const { adoptFromProfile, autoTranslate } = await import('./autoTranslate.js');
+        expect(adoptFromProfile('always')).toBe(false);
+        expect(get(autoTranslate)).toBe('off');
+    });
+
+    it('ignores a junk value from the profile', async () => {
+        const { adoptFromProfile, autoTranslate } = await import('./autoTranslate.js');
+        expect(adoptFromProfile('sure-why-not')).toBe(false);
+        expect(adoptFromProfile(null)).toBe(false);
+        expect(get(autoTranslate)).toBe('onDemand');
     });
 });
 

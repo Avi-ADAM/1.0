@@ -24,9 +24,9 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { pathToFileURL } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
-const ROOT = path.resolve(new URL('..', import.meta.url).pathname);
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const REF = path.join(ROOT, 'src/generated/STRAPI_SCHEMA_REFERENCE.md');
 const MANIFEST = path.join(ROOT, 'src/lib/translation/fields.js');
 

@@ -23,9 +23,9 @@ export const HIDDEN_PROJECT_IDS: string[] = [
   '82',
   '86',
   '81',
-  '79'
-  
-    // '123',
+  '79',
+  '88'
+  // '123',
 ];
 
 const hidden = new Set(HIDDEN_PROJECT_IDS.map(String));

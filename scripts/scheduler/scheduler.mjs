@@ -158,6 +158,38 @@ const JOBS = [
     onSuccess(state, now) {
       state.lastDay = dayKey(now);
     }
+  },
+  {
+    name: 'translate-backfill',
+    description: 'UGC translation cache — fill it before a guest arrives',
+    // PLAN_UGC_TRANSLATION §8.3, §15. A guest cannot fill the translation
+    // cache: no account means the `onDemand` default, and only `always`
+    // readers warm — deliberately, because an anonymous public page is what a
+    // crawler walks. So the cache has to be full before they get there, and
+    // this is the clock that fills it.
+    //
+    // Safe to run more often than needed and cheap when there is nothing to
+    // do: strings already cached are skipped before the governor is consulted,
+    // so a covered corpus costs one corpus query and zero requests. The day's
+    // budget is the governor's, not this file's — the run stops clean when it
+    // is gone and resumes from its cursor tomorrow.
+    path: CRON_SECRET
+      ? `/api/cron/translate-backfill?key=${encodeURIComponent(CRON_SECRET)}`
+      : '/api/cron/translate-backfill',
+    dryPath: CRON_SECRET
+      ? `/api/cron/translate-backfill?dry=1&key=${encodeURIComponent(CRON_SECRET)}`
+      : '/api/cron/translate-backfill?dry=1',
+    timeoutMs: num('SCHEDULER_BACKFILL_TIMEOUT_SECONDS', 900) * 1000,
+    due(now, state) {
+      const hour = num('SCHEDULER_BACKFILL_HOUR', 5);
+      const day = dayKey(now);
+      if (state.lastDay === day) return null;
+      if (now.getHours() < hour) return null;
+      return `${day} not run yet`;
+    },
+    onSuccess(state, now) {
+      state.lastDay = dayKey(now);
+    }
   }
 ];
 

@@ -5,12 +5,19 @@
   import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
   import ShareLink from '$lib/components/share/ShareLink.svelte';
   import { LAYER_COLORS, type MapItem, type MapLayer } from '$lib/map/discoveryTypes';
-  import { t, isRtl } from '$lib/translations';
+  import { t, isRtl, locale } from '$lib/translations';
   import { Head } from 'svead';
+  import Translated from '$lib/components/ui/Translated.svelte';
+  import TranslatedNote from '$lib/components/ui/TranslatedNote.svelte';
+  import { pageTranslations } from '$lib/translation/pageTranslations.svelte';
 
   let { data } = $props();
 
   type ProjectCard = (typeof data.projects)[number];
+
+  // UGC translation (PLAN_UGC_TRANSLATION §4, §7.1) — the rikma's name and the
+  // card's excerpt, with one provenance line per card.
+  const tr = pageTranslations(() => data, () => $locale);
 
   let search = $state('');
   let filter = $state<'all' | 'missions' | 'products'>('all');
@@ -152,12 +159,14 @@
             <div class="pic-fallback" aria-hidden="true">{p.name.slice(0, 1)}</div>
           {/if}
           <div class="card-body">
-            <h2>{p.name}</h2>
+            <h2><Translated text={p.name} hit={tr.hitFor(p.name)} showNote={false} /></h2>
             {#if p.city || p.hint}
               <p class="place"><EntityIcon kind="place" size={13} /> {p.city ?? p.hint}</p>
             {/if}
             {#if p.description}
-              <p class="desc">{p.description}</p>
+              <p class="desc">
+                <Translated text={p.description} hit={tr.hitFor(p.description)} showNote={false} />
+              </p>
             {/if}
             <div class="badges">
               <span class="badge"><EntityIcon kind="members" size={13} /> {p.membersCount} {$t('discover.projects_members')}</span>
@@ -173,6 +182,7 @@
             </div>
           </div>
         </a>
+        <TranslatedNote hit={tr.firstReal(p.name, p.description)} class="card-tnote" />
         <div class="card-actions">
           <a class="mini" href={demandHref(p)}><EntityIcon kind="map" size={13} /> {$t('discover.on_demand_map')}</a>
           {#if p.lat !== null}
@@ -427,6 +437,11 @@
   }
   .badge.hot {
     background: rgba(59, 130, 246, 0.14);
+  }
+  /* The card's provenance line, inset to the card body's gutter. `:global`
+     because the class is handed to TranslatedNote. */
+  .card :global(.card-tnote) {
+    padding: 0 0.85rem 0.4rem;
   }
   .card-actions {
     display: flex;

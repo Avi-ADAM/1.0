@@ -17,6 +17,6 @@
         "off": "Off — always show the original",
         "onDemand": "On demand — show a translation when one already exists",
         "always": "Always — also ask for translations that do not exist yet",
-        "saved": "Saved on this device"
+        "saved": "Saved to your account and carried to your other devices"
     }
 }

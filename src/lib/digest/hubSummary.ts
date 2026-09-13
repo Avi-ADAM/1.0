@@ -1,0 +1,231 @@
+/**
+ * The hub's "what is waiting for me" calculation — shared by the hub page and
+ * the daily digest (docs/PLAN_DAILY_DIGEST.md §1.1, G4).
+ *
+ * It used to be a private function inside `hub/+page.server.ts`. The digest
+ * needs exactly the same answer, and two copies of "which votes are still
+ * mine to cast" is how TIMEGRAMA §1 describes its own drift — so there is one.
+ *
+ * Pure: raw qid `85levHubSummary` (or its service twin `320digestForUser`) in,
+ * summary out. `now` is injectable for the tests.
+ */
+
+export interface HubKpi {
+  votes: number;
+  urgent: number;
+  suggestions: number;
+  activePurchases: number;
+  activeSales: number;
+}
+
+/**
+ * One vote-awaiting item, ready for the hub ActionFeed. `type` is the lev
+ * `ani` value of the item's card type, so the client can deep-link into the
+ * matching quantum slice (`/lev?focus=<type>&project=<projectId>`).
+ * `title` may be empty (e.g. decisions have no name) — the client falls back
+ * to a localized type label.
+ */
+export interface HubFeedItem {
+  id: string;
+  type: string;
+  title: string;
+  projectId: string;
+  projectName: string;
+  urgent: boolean;
+  deadline: string | null;
+  createdAt: string | null;
+}
+
+export interface HubSummary {
+  kpi: HubKpi;
+  topFive: HubFeedItem[];
+  username: string;
+  profilePic?: string;
+  /** Rikmot the user is a member of — the digest's "what's new" scope. */
+  projectIds: string[];
+  /**
+   * Every vote-awaiting item, most pressing first. `topFive` is its head; the
+   * digest needs the whole list to tell "a new item turned urgent" apart from
+   * "the same count as yesterday".
+   */
+  feed: HubFeedItem[];
+}
+
+export const URGENT_THRESHOLD_MS = 24 * 60 * 60 * 1000; // 24h
+
+export function emptyHubSummary(): HubSummary {
+  return {
+    kpi: { votes: 0, urgent: 0, suggestions: 0, activePurchases: 0, activeSales: 0 },
+    topFive: [],
+    username: '',
+    projectIds: [],
+    feed: []
+  };
+}
+
+export function isUrgent(deadlineStr: string | null | undefined, now: number = Date.now()): boolean {
+  if (!deadlineStr) return false;
+  const t = new Date(deadlineStr).getTime();
+  return t > now && t - now < URGENT_THRESHOLD_MS;
+}
+
+/**
+ * Items that use ordered voting rounds (pendms, tosplits, sheirutpends).
+ * orderon = max(negoCount, max vote order).
+ * User still needs to vote when they have no vote with order === orderon.
+ */
+export function needsOrderedVote(vots: any[], negoCount: number, uid: string): boolean {
+  const maxVoteOrder = vots.reduce((max, v) => Math.max(max, v.order ?? 0), 0);
+  const orderon = Math.max(negoCount, maxVoteOrder);
+  return !vots.some(
+    (v) => String(v.users_permissions_user?.data?.id) === String(uid) && (v.order ?? 0) === orderon
+  );
+}
+
+/**
+ * Items that use simple voting (finiapruvals, askms, maaps, decisions).
+ * User still needs to vote when they have no vote entry at all.
+ */
+export function needsSimpleVote(vots: any[], uid: string): boolean {
+  return !vots.some((v) => String(v.users_permissions_user?.data?.id) === String(uid));
+}
+
+/** Most pressing first: urgent, then nearest deadline, then longest-waiting. */
+export function compareFeedItems(a: HubFeedItem, b: HubFeedItem): number {
+  if (a.urgent !== b.urgent) return a.urgent ? -1 : 1;
+  const ad = a.deadline ? new Date(a.deadline).getTime() : Infinity;
+  const bd = b.deadline ? new Date(b.deadline).getTime() : Infinity;
+  if (ad !== bd) return ad - bd;
+  const ac = a.createdAt ? new Date(a.createdAt).getTime() : Infinity;
+  const bc = b.createdAt ? new Date(b.createdAt).getTime() : Infinity;
+  return ac - bc;
+}
+
+export function processHubSummary(raw: any, uid: string, now: number = Date.now()): HubSummary {
+  const userData = raw?.data?.usersPermissionsUser?.data;
+  if (!userData) return emptyHubSummary();
+
+  const attrs = userData.attributes ?? {};
+  let votes = 0;
+  let urgent = 0;
+  const feed: HubFeedItem[] = [];
+  const projects = attrs.projects_1s?.data ?? [];
+
+  for (const project of projects) {
+    const pa = project.attributes ?? {};
+    const projectId = String(project.id);
+    const projectName = pa.projectName ?? '';
+
+    // Register one vote-awaiting item: bump the KPIs and add a feed candidate.
+    const noteVote = (type: string, item: any, title: string) => {
+      votes++;
+      const deadline = item.attributes?.timegrama?.data?.attributes?.date ?? null;
+      const isU = isUrgent(deadline, now);
+      if (isU) urgent++;
+      feed.push({
+        id: String(item.id),
+        type,
+        title,
+        projectId,
+        projectName,
+        urgent: isU,
+        deadline,
+        createdAt: item.attributes?.createdAt ?? null
+      });
+    };
+
+    // pendms – ordered (negopendmissions count matters for orderon)
+    for (const pend of pa.pendms?.data ?? []) {
+      const a = pend.attributes;
+      const negoCount = a.negopendmissions?.data?.length ?? 0;
+      if (needsOrderedVote(a.users ?? [], negoCount, uid)) {
+        noteVote('pends', pend, a.name ?? '');
+      }
+    }
+
+    // finiapruvals – simple (no order)
+    for (const fin of pa.finiapruvals?.data ?? []) {
+      const a = fin.attributes;
+      if (needsSimpleVote(a.vots ?? [], uid)) {
+        noteVote('fiapp', fin, a.missname ?? '');
+      }
+    }
+
+    // askms – simple (no order)
+    for (const askm of pa.askms?.data ?? []) {
+      const a = askm.attributes;
+      if (needsSimpleVote(a.vots ?? [], uid)) {
+        const title =
+          a.open_mashaabim?.data?.attributes?.name ??
+          a.pmash?.data?.attributes?.name ??
+          a.sp?.data?.attributes?.name ??
+          '';
+        noteVote('askedm', askm, title);
+      }
+    }
+
+    // maaps – simple (no order)
+    for (const maap of pa.maaps?.data ?? []) {
+      const a = maap.attributes;
+      if (needsSimpleVote(a.vots ?? [], uid)) {
+        noteVote('wegets', maap, a.name || (a.mashabetahalich?.data?.attributes?.name ?? ''));
+      }
+    }
+
+    // decisions – simple (any vote counts); no name field → client shows a type label
+    for (const dec of pa.decisions?.data ?? []) {
+      if (needsSimpleVote(dec.attributes.vots ?? [], uid)) {
+        noteVote('hachla', dec, '');
+      }
+    }
+
+    // tosplits – ordered
+    for (const ts of pa.tosplits?.data ?? []) {
+      if (needsOrderedVote(ts.attributes.vots ?? [], 0, uid)) {
+        noteVote('haluk', ts, ts.attributes.name ?? '');
+      }
+    }
+
+    // sheirutpends – ordered, relational votes (Vote entity)
+    for (const sp of pa.sheirutpends?.data ?? []) {
+      const a = sp.attributes;
+      const normalizedVots = (a.votes?.data ?? []).map((v: any) => ({
+        order: v.attributes?.order,
+        what: v.attributes?.what,
+        users_permissions_user: v.attributes?.users_permissions_user
+      }));
+      if (needsOrderedVote(normalizedVots, 0, uid)) {
+        noteVote('sheirutp', sp, a.sheirut?.data?.attributes?.name ?? '');
+      }
+    }
+  }
+
+  feed.sort(compareFeedItems);
+
+  // Active purchases (user as buyer – sheiruts directly on user)
+  const activePurchases = (attrs.sheiruts?.data ?? []).filter((s: any) => {
+    const sa = s.attributes;
+    return !(sa.moneyTransfered && sa.productExepted);
+  }).length;
+
+  // Active sales (user as seller – sheiruts via projects_1s)
+  let activeSales = 0;
+  for (const project of projects) {
+    activeSales += (project.attributes?.sheiruts?.data ?? []).filter((s: any) => {
+      const sa = s.attributes;
+      return !(sa.moneyTransfered && sa.productExepted);
+    }).length;
+  }
+
+  // suggestions proxy: active missions the user is working in
+  const suggestions = attrs.mesimabetahaliches?.data?.length ?? 0;
+
+  return {
+    kpi: { votes, urgent, suggestions, activePurchases, activeSales },
+    topFive: feed.slice(0, 5),
+    username: attrs.username ?? '',
+    profilePic: attrs.profilePic?.data?.attributes?.url,
+    projectIds: projects.map((p: any) => String(p.id)),
+    feed
+  };
+}

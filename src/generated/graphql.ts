@@ -3968,12 +3968,51 @@ export enum Enum_Stipendprogram_Status {
   Proposed = 'proposed'
 }
 
+export enum Enum_Texttranslation_Engine {
+  Gemini = 'gemini',
+  Glossary = 'glossary',
+  Human = 'human',
+  Identity = 'identity'
+}
+
+export enum Enum_Texttranslation_Mode {
+  Translate = 'translate',
+  Transliterate = 'transliterate'
+}
+
+export enum Enum_Texttranslation_Quality {
+  Machine = 'machine',
+  Reviewed = 'reviewed'
+}
+
+export enum Enum_Texttranslation_Srclang {
+  Ar = 'ar',
+  En = 'en',
+  Es = 'es',
+  He = 'he',
+  Ru = 'ru'
+}
+
+export enum Enum_Texttranslation_Tgtlang {
+  Ar = 'ar',
+  En = 'en',
+  Es = 'es',
+  He = 'he',
+  Ru = 'ru'
+}
+
 export enum Enum_Tosplit_Split_Origin {
   Equal = 'equal',
   Manual = 'manual',
   WillingnessPareto = 'willingness_pareto',
   WillingnessProportional = 'willingness_proportional',
   WillingnessVickrey = 'willingness_vickrey'
+}
+
+export enum Enum_Userspermissionsuser_Autotranslate {
+  Always = 'always',
+  Off = 'off',
+  OnDemand = 'onDemand'
 }
 
 export enum Enum_Userspermissionsuser_Auto_Created_Via {
@@ -4660,7 +4699,7 @@ export type ForumRelationResponseCollection = {
   data: Array<ForumEntity>;
 };
 
-export type GenericMorph = Act | Actt | ApiKey | Argument | Ask | Askm | Askwant | Bakasha | Category | Chezin | Clause | ComponentDesisionEditPend | ComponentDesisionNegoarch | ComponentDesisionNegodes | ComponentDesisionNegom | ComponentDesisionNegostipend | ComponentNewCoveredMissions | ComponentNewCoveredResources | ComponentNewEdits | ComponentNewExtractedMissions | ComponentNewExtractedResources | ComponentNewLocation | ComponentNewMeeting | ComponentNewMonter | ComponentNewNego | ComponentNewNegom | ComponentNewSeen | ComponentNewTimes | ComponentNewUserAndIshur | ComponentNewWillingnessEntries | ComponentProjectsChatre | ComponentProjectsConsumedMashabetahalichDeliveries | ComponentProjectsConsumedMissionHours | ComponentProjectsConsumedOpenMu | ComponentProjectsDeliveries | ComponentProjectsHervachti | ComponentProjectsIGotMoney | ComponentProjectsMeeting | ComponentProjectsMonter | ComponentProjectsNegodes | ComponentProjectsNegom | ComponentProjectsPendmnego | ComponentProjectsShift | ComponentProjectsTaskdis | ComponentProjectsUsersOf | ComponentProjectsVots | ConsentEvent | ContentReleasesRelease | ContentReleasesReleaseAction | ConventionText | Cuntry | Dea | Deal | Decision | Deffinition | DemoRequest | Filtertag | Finiapruval | FinnishedMission | Forum | ForumLastSeen | Haamada | Haamadapruv | Haluka | Hatzaa | Hazbaah | I18NLocale | Issue | Maagad | MaagadMember | MaagadOffer | Maap | Machshir | Mashaabim | Mashabetahalich | Matanot | MatanotRecipeMission | MatanotRecipeResource | Matanotpend | Matbea | MatchSuggestion | Mesimabetahalich | Message | Mission | MissionOffer | Mode | Monter | Nego | NegoMash | Negopendmission | Negotiation | OpenMashaabim | OpenMission | Partof | Pendm | Pgisha | Pgishauser | Pgishauserpend | Pledge | Pmash | Position | Project | ProjectPlanBoard | ProjectPlanItem | ProviderProfile | Ratson | RatsonMatchJob | RatsonProposal | RatsonShare | ResourceBooking | Richtext | Rikmash | Sale | SealedEnvelope | Seeder | Sheirut | SheirutFulfillment | Sheirutnego | Sheirutpend | Sidur | SiteReport | SiteShareContribution | Skill | Solution | Sp | StipendPayment | StipendPledge | StipendProgram | Tafkidim | Tikunolam | Timegrama | Timer | Tosplit | Translate | UploadFile | UploadFolder | UserKey | UsersPermissionsPermission | UsersPermissionsRole | UsersPermissionsUser | Vallue | Vote | Want | WelcomTop | Whatandwhy | WorkWay | Yat | Zohar;
+export type GenericMorph = Act | Actt | ApiKey | Argument | Ask | Askm | Askwant | Bakasha | Category | Chezin | Clause | ComponentDesisionEditPend | ComponentDesisionNegoarch | ComponentDesisionNegodes | ComponentDesisionNegom | ComponentDesisionNegostipend | ComponentNewCoveredMissions | ComponentNewCoveredResources | ComponentNewEdits | ComponentNewExtractedMissions | ComponentNewExtractedResources | ComponentNewLocation | ComponentNewMeeting | ComponentNewMonter | ComponentNewNego | ComponentNewNegom | ComponentNewSeen | ComponentNewTimes | ComponentNewUserAndIshur | ComponentNewWillingnessEntries | ComponentProjectsChatre | ComponentProjectsConsumedMashabetahalichDeliveries | ComponentProjectsConsumedMissionHours | ComponentProjectsConsumedOpenMu | ComponentProjectsDeliveries | ComponentProjectsHervachti | ComponentProjectsIGotMoney | ComponentProjectsMeeting | ComponentProjectsMonter | ComponentProjectsNegodes | ComponentProjectsNegom | ComponentProjectsPendmnego | ComponentProjectsShift | ComponentProjectsTaskdis | ComponentProjectsUsersOf | ComponentProjectsVots | ConsentEvent | ContentReleasesRelease | ContentReleasesReleaseAction | ConventionText | Cuntry | Dea | Deal | Decision | Deffinition | DemoRequest | Filtertag | Finiapruval | FinnishedMission | Forum | ForumLastSeen | Haamada | Haamadapruv | Haluka | Hatzaa | Hazbaah | I18NLocale | Issue | Maagad | MaagadMember | MaagadOffer | Maap | Machshir | Mashaabim | Mashabetahalich | Matanot | MatanotRecipeMission | MatanotRecipeResource | Matanotpend | Matbea | MatchSuggestion | Mesimabetahalich | Message | Mission | MissionOffer | Mode | Monter | Nego | NegoMash | Negopendmission | Negotiation | OpenMashaabim | OpenMission | Partof | Pendm | Pgisha | Pgishauser | Pgishauserpend | Pledge | Pmash | Position | Project | ProjectPlanBoard | ProjectPlanItem | ProviderProfile | Ratson | RatsonMatchJob | RatsonProposal | RatsonShare | ResourceBooking | Richtext | Rikmash | Sale | SealedEnvelope | Seeder | Sheirut | SheirutFulfillment | Sheirutnego | Sheirutpend | Sidur | SiteReport | SiteShareContribution | Skill | Solution | Sp | StipendPayment | StipendPledge | StipendProgram | Tafkidim | TextTranslation | Tikunolam | Timegrama | Timer | Tosplit | Translate | UploadFile | UploadFolder | UserKey | UsersPermissionsPermission | UsersPermissionsRole | UsersPermissionsUser | Vallue | Vote | Want | WelcomTop | Whatandwhy | WorkWay | Yat | Zohar;
 
 export type Haamada = {
   __typename?: 'Haamada';
@@ -7954,6 +7993,7 @@ export type Mutation = {
   createStipendProgram?: Maybe<StipendProgramEntityResponse>;
   createTafkidim?: Maybe<TafkidimEntityResponse>;
   createTafkidimLocalization?: Maybe<TafkidimEntityResponse>;
+  createTextTranslation?: Maybe<TextTranslationEntityResponse>;
   createTikunolam?: Maybe<TikunolamEntityResponse>;
   createTikunolamLocalization?: Maybe<TikunolamEntityResponse>;
   createTimegrama?: Maybe<TimegramaEntityResponse>;
@@ -8073,6 +8113,7 @@ export type Mutation = {
   deleteStipendPledge?: Maybe<StipendPledgeEntityResponse>;
   deleteStipendProgram?: Maybe<StipendProgramEntityResponse>;
   deleteTafkidim?: Maybe<TafkidimEntityResponse>;
+  deleteTextTranslation?: Maybe<TextTranslationEntityResponse>;
   deleteTikunolam?: Maybe<TikunolamEntityResponse>;
   deleteTimegrama?: Maybe<TimegramaEntityResponse>;
   deleteTimer?: Maybe<TimerEntityResponse>;
@@ -8198,6 +8239,7 @@ export type Mutation = {
   updateStipendPledge?: Maybe<StipendPledgeEntityResponse>;
   updateStipendProgram?: Maybe<StipendProgramEntityResponse>;
   updateTafkidim?: Maybe<TafkidimEntityResponse>;
+  updateTextTranslation?: Maybe<TextTranslationEntityResponse>;
   updateTikunolam?: Maybe<TikunolamEntityResponse>;
   updateTimegrama?: Maybe<TimegramaEntityResponse>;
   updateTimer?: Maybe<TimerEntityResponse>;
@@ -8894,6 +8936,11 @@ export type MutationCreateTafkidimLocalizationArgs = {
 };
 
 
+export type MutationCreateTextTranslationArgs = {
+  data: TextTranslationInput;
+};
+
+
 export type MutationCreateTikunolamArgs = {
   data: TikunolamInput;
   locale?: InputMaybe<Scalars['I18NLocaleCode']['input']>;
@@ -9521,6 +9568,11 @@ export type MutationDeleteStipendProgramArgs = {
 export type MutationDeleteTafkidimArgs = {
   id: Scalars['ID']['input'];
   locale?: InputMaybe<Scalars['I18NLocaleCode']['input']>;
+};
+
+
+export type MutationDeleteTextTranslationArgs = {
+  id: Scalars['ID']['input'];
 };
 
 
@@ -10246,6 +10298,12 @@ export type MutationUpdateTafkidimArgs = {
   data: TafkidimInput;
   id: Scalars['ID']['input'];
   locale?: InputMaybe<Scalars['I18NLocaleCode']['input']>;
+};
+
+
+export type MutationUpdateTextTranslationArgs = {
+  data: TextTranslationInput;
+  id: Scalars['ID']['input'];
 };
 
 
@@ -13923,6 +13981,8 @@ export type Query = {
   stipendPrograms?: Maybe<StipendProgramEntityResponseCollection>;
   tafkidim?: Maybe<TafkidimEntityResponse>;
   tafkidims?: Maybe<TafkidimEntityResponseCollection>;
+  textTranslation?: Maybe<TextTranslationEntityResponse>;
+  textTranslations?: Maybe<TextTranslationEntityResponseCollection>;
   tikunolam?: Maybe<TikunolamEntityResponse>;
   tikunolams?: Maybe<TikunolamEntityResponseCollection>;
   timegrama?: Maybe<TimegramaEntityResponse>;
@@ -15213,6 +15273,18 @@ export type QueryTafkidimsArgs = {
   locale?: InputMaybe<Scalars['I18NLocaleCode']['input']>;
   pagination?: InputMaybe<PaginationArg>;
   publicationState?: InputMaybe<PublicationState>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+
+export type QueryTextTranslationArgs = {
+  id?: InputMaybe<Scalars['ID']['input']>;
+};
+
+
+export type QueryTextTranslationsArgs = {
+  filters?: InputMaybe<TextTranslationFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
   sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
 };
 
@@ -18419,6 +18491,77 @@ export type TafkidimRelationResponseCollection = {
   data: Array<TafkidimEntity>;
 };
 
+export type TextTranslation = {
+  __typename?: 'TextTranslation';
+  createdAt?: Maybe<Scalars['DateTime']['output']>;
+  engine?: Maybe<Enum_Texttranslation_Engine>;
+  firstSeenOn?: Maybe<Scalars['String']['output']>;
+  hash: Scalars['String']['output'];
+  hits?: Maybe<Scalars['Int']['output']>;
+  key: Scalars['String']['output'];
+  mode?: Maybe<Enum_Texttranslation_Mode>;
+  model?: Maybe<Scalars['String']['output']>;
+  quality?: Maybe<Enum_Texttranslation_Quality>;
+  source?: Maybe<Scalars['String']['output']>;
+  srcLang: Enum_Texttranslation_Srclang;
+  text?: Maybe<Scalars['String']['output']>;
+  tgtLang: Enum_Texttranslation_Tgtlang;
+  updatedAt?: Maybe<Scalars['DateTime']['output']>;
+};
+
+export type TextTranslationEntity = {
+  __typename?: 'TextTranslationEntity';
+  attributes?: Maybe<TextTranslation>;
+  id?: Maybe<Scalars['ID']['output']>;
+};
+
+export type TextTranslationEntityResponse = {
+  __typename?: 'TextTranslationEntityResponse';
+  data?: Maybe<TextTranslationEntity>;
+};
+
+export type TextTranslationEntityResponseCollection = {
+  __typename?: 'TextTranslationEntityResponseCollection';
+  data: Array<TextTranslationEntity>;
+  meta: ResponseCollectionMeta;
+};
+
+export type TextTranslationFiltersInput = {
+  and?: InputMaybe<Array<InputMaybe<TextTranslationFiltersInput>>>;
+  createdAt?: InputMaybe<DateTimeFilterInput>;
+  engine?: InputMaybe<StringFilterInput>;
+  firstSeenOn?: InputMaybe<StringFilterInput>;
+  hash?: InputMaybe<StringFilterInput>;
+  hits?: InputMaybe<IntFilterInput>;
+  id?: InputMaybe<IdFilterInput>;
+  key?: InputMaybe<StringFilterInput>;
+  mode?: InputMaybe<StringFilterInput>;
+  model?: InputMaybe<StringFilterInput>;
+  not?: InputMaybe<TextTranslationFiltersInput>;
+  or?: InputMaybe<Array<InputMaybe<TextTranslationFiltersInput>>>;
+  quality?: InputMaybe<StringFilterInput>;
+  source?: InputMaybe<StringFilterInput>;
+  srcLang?: InputMaybe<StringFilterInput>;
+  text?: InputMaybe<StringFilterInput>;
+  tgtLang?: InputMaybe<StringFilterInput>;
+  updatedAt?: InputMaybe<DateTimeFilterInput>;
+};
+
+export type TextTranslationInput = {
+  engine?: InputMaybe<Enum_Texttranslation_Engine>;
+  firstSeenOn?: InputMaybe<Scalars['String']['input']>;
+  hash?: InputMaybe<Scalars['String']['input']>;
+  hits?: InputMaybe<Scalars['Int']['input']>;
+  key?: InputMaybe<Scalars['String']['input']>;
+  mode?: InputMaybe<Enum_Texttranslation_Mode>;
+  model?: InputMaybe<Scalars['String']['input']>;
+  quality?: InputMaybe<Enum_Texttranslation_Quality>;
+  source?: InputMaybe<Scalars['String']['input']>;
+  srcLang?: InputMaybe<Enum_Texttranslation_Srclang>;
+  text?: InputMaybe<Scalars['String']['input']>;
+  tgtLang?: InputMaybe<Enum_Texttranslation_Tgtlang>;
+};
+
 export type Tikunolam = {
   __typename?: 'Tikunolam';
   amort?: Maybe<Scalars['String']['output']>;
@@ -19357,6 +19500,7 @@ export type UsersPermissionsUser = {
   askms?: Maybe<AskmRelationResponseCollection>;
   asks?: Maybe<AskRelationResponseCollection>;
   askwants?: Maybe<AskwantRelationResponseCollection>;
+  autoTranslate?: Maybe<Enum_Userspermissionsuser_Autotranslate>;
   auto_created_via?: Maybe<Enum_Userspermissionsuser_Auto_Created_Via>;
   availability_pref?: Maybe<Scalars['JSON']['output']>;
   bio?: Maybe<Scalars['String']['output']>;
@@ -20125,6 +20269,7 @@ export type UsersPermissionsUserFiltersInput = {
   askms?: InputMaybe<AskmFiltersInput>;
   asks?: InputMaybe<AskFiltersInput>;
   askwants?: InputMaybe<AskwantFiltersInput>;
+  autoTranslate?: InputMaybe<StringFilterInput>;
   auto_created_via?: InputMaybe<StringFilterInput>;
   availability_pref?: InputMaybe<JsonFilterInput>;
   bio?: InputMaybe<StringFilterInput>;
@@ -20262,6 +20407,7 @@ export type UsersPermissionsUserInput = {
   askms?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   asks?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   askwants?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  autoTranslate?: InputMaybe<Enum_Userspermissionsuser_Autotranslate>;
   auto_created_via?: InputMaybe<Enum_Userspermissionsuser_Auto_Created_Via>;
   availability_pref?: InputMaybe<Scalars['JSON']['input']>;
   bio?: InputMaybe<Scalars['String']['input']>;

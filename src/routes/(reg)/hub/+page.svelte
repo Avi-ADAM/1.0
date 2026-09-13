@@ -12,6 +12,7 @@
   import ActionFeed from '$lib/components/hub/ActionFeed.svelte';
   import HubSkeleton from '$lib/components/hub/HubSkeleton.svelte';
   import FirstSteps from '$lib/components/hub/FirstSteps.svelte';
+  import DailyBrief from '$lib/components/hub/DailyBrief.svelte';
 
   /** @type {{ data: import('./$types').PageData }} */
   let { data } = $props();
@@ -110,6 +111,15 @@
         <div class="stagger" style="--i:1">
           <FirstSteps username={summary.username} />
         </div>
+        <!-- No votes yet does not mean nothing to say: suggestions and
+             what's new can already be waiting -->
+        {#await data.streamed.brief then brief}
+          {#if brief}
+            <div class="stagger" style="--i:2">
+              <DailyBrief payload={brief.payload} failed={brief.failed} />
+            </div>
+          {/if}
+        {/await}
         <!-- The public demand map is the recruitment engine — show a new user
              what the community seeks and offers right now -->
         {#await data.streamed.demand then demand}
@@ -133,6 +143,16 @@
             activeSales={summary.kpi.activeSales}
           />
         </div>
+
+        <!-- The daily brief (PLAN_DAILY_DIGEST): the same payload the morning
+             digest is composed from. Streams in after the summary. -->
+        {#await data.streamed.brief then brief}
+          {#if brief}
+            <div class="stagger" style="--i:3">
+              <DailyBrief payload={brief.payload} failed={brief.failed} />
+            </div>
+          {/if}
+        {/await}
 
         <div class="stagger" style="--i:3">
           <CustomPurchaseCta />

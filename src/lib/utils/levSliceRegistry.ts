@@ -187,7 +187,7 @@ export const LEV_SLICES: Record<string, LevSliceDef> = {
 /**
  * Virtual focus groups: a single ?focus= value that expands to several slice
  * types. `votes` mirrors the hub KPI "votes waiting" count, which sums the
- * open-vote items across these collections (see hub/+page.server.ts):
+ * open-vote items across these collections (see $lib/digest/hubSummary.ts):
  * pendms, finiapruvals, askms, maaps, decisions, tosplits, sheirutpends.
  */
 export const LEV_FOCUS_GROUPS: Record<string, string[]> = {

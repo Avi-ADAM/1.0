@@ -7,10 +7,32 @@
   import { LAYER_COLORS, type MapItem, type MapLayer } from '$lib/map/discoveryTypes';
   import { t, isRtl, locale } from '$lib/translations';
   import { Head } from 'svead';
+  import Translated from '$lib/components/ui/Translated.svelte';
+  import TranslatedNote from '$lib/components/ui/TranslatedNote.svelte';
+  import { pageTranslations } from '$lib/translation/pageTranslations.svelte';
 
   let { data } = $props();
 
   type MissionCard = (typeof data.missions)[number];
+
+  // ── UGC translation (PLAN_UGC_TRANSLATION §4, §7) ────────────────────────
+  //
+  // `data.translations` is what the loader's single batched cache read found;
+  // a miss is simply absent and `<Translated>` renders the author's own words,
+  // which is what this page did before the feature existed. Resolving a row,
+  // and warming for an `always` reader, is `pageTranslations`' job.
+  const tr = pageTranslations(() => data, () => $locale);
+  const hitFor = tr.hitFor;
+
+  // One card, one provenance line: the note belongs to the card rather than to
+  // each of its three fields, and a <button> cannot live inside the card's <a>.
+  //
+  // The first *real* translation, not simply the first row: a card can easily
+  // have an identity row for its English title (§2.2 — the reader's own
+  // language) beside a genuine translation of its Hebrew excerpt, and picking
+  // the identity row would leave the translated excerpt with no provenance
+  // line at all. §9.1 does not bend for whichever field happened to be first.
+  const cardHit = (m: MissionCard) => tr.firstReal(m.name, m.excerpt, m.projectName);
 
   let search = $state('');
   let filter = $state<'all' | 'concierge' | 'paid'>('all');
@@ -172,9 +194,12 @@
               <div class="avatar fallback"><EntityIcon kind="rikma" size={20} /></div>
             {/if}
             <div class="top-text">
-              <h2>{m.name}</h2>
+              <h2><Translated text={m.name} hit={hitFor(m.name)} showNote={false} /></h2>
               {#if m.projectName}
-                <p class="proj-name"><EntityIcon kind="rikma" size={13} /> {m.projectName}</p>
+                <p class="proj-name">
+                  <EntityIcon kind="rikma" size={13} />
+                  <Translated text={m.projectName} hit={hitFor(m.projectName)} showNote={false} />
+                </p>
               {/if}
             </div>
             {#if m.value}
@@ -185,7 +210,9 @@
             {/if}
           </div>
           {#if m.excerpt}
-            <p class="desc">{m.excerpt}</p>
+            <p class="desc">
+              <Translated text={m.excerpt} hit={hitFor(m.excerpt)} showNote={false} />
+            </p>
           {/if}
           <div class="badges">
             {#if m.concierge}
@@ -207,6 +234,7 @@
             {/each}
           </div>
         </a>
+        <TranslatedNote hit={cardHit(m)} class="card-tnote" />
         <div class="card-actions">
           <a class="cta small" href={`/availableMission/${m.id}`}>{$t('discover.missions_apply')}</a>
           {#if m.projectId}
@@ -509,6 +537,12 @@
   }
   .badge.concierge {
     background: rgba(255, 0, 146, 0.12);
+  }
+  /* The card's provenance line sits between the link body and the actions,
+     inset to the same gutter as the rest of the card. `:global` because the
+     class is handed to TranslatedNote, which owns the element. */
+  .card :global(.card-tnote) {
+    padding: 0 0.85rem 0.4rem;
   }
   .card-actions {
     display: flex;

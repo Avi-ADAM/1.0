@@ -12,6 +12,15 @@
 
   let { data }: { data: { projects: Project[] } } = $props();
 
+  let query = $state('');
+
+  const all = $derived((data.projects ?? []).filter(Boolean));
+  const showSearch = $derived(all.length > 5);
+  const shown = $derived.by(() => {
+    const q = query.trim().toLowerCase();
+    if (!q || !showSearch) return all;
+    return all.filter((p) => (p.projectName ?? '').toLowerCase().includes(q));
+  });
 
   onMount(() => {
     if ($idPr && $idPr !== 0) {
@@ -50,8 +59,49 @@
   >
     {$t('moach.list.choose')}
   </h1>
+  {#if showSearch}
+    <div class="mb-4 flex flex-col items-center gap-1">
+      <div class="relative w-full max-w-sm">
+        <input
+          type="search"
+          bind:value={query}
+          placeholder={$t('moach.list.search')}
+          aria-label={$t('moach.list.search')}
+          onkeydown={(e) => e.key === 'Escape' && (query = '')}
+          class="search w-full rounded-full border-2 border-barbi/70 focus:border-gold bg-slate-900/60 text-gold placeholder:text-barbi/70 py-2 ps-4 pe-10 outline-none transition-colors"
+        />
+        {#if query}
+          <button
+            type="button"
+            onclick={() => (query = '')}
+            title={$t('moach.list.clearSearch')}
+            aria-label={$t('moach.list.clearSearch')}
+            class="absolute inset-y-0 end-3 flex items-center text-barbi hover:text-gold"
+          >
+            <svg
+              class="w-5 h-5"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+              aria-hidden="true"
+            >
+              <path d="M6 6l12 12M18 6L6 18" />
+            </svg>
+          </button>
+        {/if}
+      </div>
+      {#if query.trim()}
+        <span class="text-xs text-barbi/80">
+          {$t('moach.list.showing', { count: shown.length, total: all.length })}
+        </span>
+      {/if}
+    </div>
+  {/if}
+
   <div class="flex flex-wrap justify-center items-center gap-4">
-    {#each data.projects as project}
+    {#each shown as project (project.id)}
       {#if project}
         <button
           class="group relative overflow-hidden border-2 border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-gray-700 hover:text-gold p-2 m-1 rounded-xl shadow-lg shadow-fuchsia-400 hover:shadow-2xl hover:shadow-fuchsia-400 transition-all duration-300 transform hover:scale-105 flex items-center gap-3"
@@ -82,6 +132,9 @@
         </button>
       {/if}
     {/each}
+    {#if shown.length === 0}
+      <p class="text-barbi py-4">{$t('moach.list.noMatch')}</p>
+    {/if}
   </div>
 </div>
 
@@ -97,6 +150,13 @@
 </div>
 
 <style>
+  /* the browser's own clear affordance — we render our own */
+  .search::-webkit-search-cancel-button,
+  .search::-webkit-search-decoration {
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
   .alli {
     /*   background: radial-gradient(circle at 0.9% 49.5%, rgb(0, 250, 255) 0%, rgb(2, 255, 187) 100.2%); */
     /*  background: radial-gradient(

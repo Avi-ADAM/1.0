@@ -269,7 +269,11 @@
   "list": {
     "myProjects": "مشاريعي",
     "choose": "اختيار شبكة",
-    "createNew": "إنشاء شبكة جديدة"
+    "createNew": "إنشاء شبكة جديدة",
+    "search": "البحث عن شبكة…",
+    "clearSearch": "مسح البحث",
+    "noMatch": "لا توجد شبكة بهذا الاسم",
+    "showing": "عرض {{count}} من {{total}}"
   },
   "guide": {
     "header": "دليل عقل المجموعة",

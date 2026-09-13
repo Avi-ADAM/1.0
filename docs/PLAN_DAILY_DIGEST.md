@@ -1,6 +1,7 @@
 # בריף יומי — שרת ה-Digest
 
-> **סטטוס: תכנית. שום שורת קוד לא נכתבה עדיין.**
+> **סטטוס: יסודות בנויים (2026-09-11) — ר׳ §13.** שלבים 1 ו-3 בנויים, שלב 2
+> חלקית (בלי `user-digest`), והבריף כבר מוצג למשתמש ב-hub. שליחה עוד לא.
 > נכתב 2026-08-26.
 >
 > המסמך מאפיין מה צריך להיבנות כדי ששרת ייעודי, שירוץ כל בוקר על ה-VPS
@@ -67,8 +68,13 @@ export interface HubKpi {
 
 השאילתה היחידה שהוא מריץ היא qid `85levHubSummary`
 (`src/routes/api/send/qids.js:10503`), שכבר מסומנת
-`allow: ['user', 'serviceAdmin']` ב-`qidsAccess.js` — כלומר **השירות יכול
-להריץ אותה בשם המשתמש כבר היום, בלי שינוי הרשאות**.
+`allow: ['user', 'serviceAdmin']` ב-`qidsAccess.js`.
+
+> **⚠️ תיקון (2026-09-11): ההנחה שהשירות "יכול להריץ אותה בשם המשתמש" שגויה.**
+> `/api/send` מחליף את `idL` במזהה של ה-session **בכל קריאה, גם בקריאת
+> שירות** (`+server.js`: `key === 'idL' ? idL : …`). ל-cron אין session, ולכן
+> המשתנה פשוט נמחק והשאילתה מחזירה משתמש ריק. הפתרון שנבנה: לכל קריאה יש
+> "תאום שירות" עם `$uid` שמותר ל-`serviceAdmin` בלבד (ר׳ §13.2).
 
 > **המשמעות:** `processHubSummary` צריך לצאת מקובץ ה-`+page.server.ts`
 > ולעבור ל-`src/lib/server/digest/` (או ל-`src/lib/hub/`), כדי ששני
@@ -273,6 +279,10 @@ GET /api/digest?uid=123&force=1     — שליחה כפויה (עוקף חלון
 > ר׳ פריט **S1** ב-§10.
 
 ### 3.5 שאילתות חדשות (qids)
+
+> **עודכן 2026-09-11:** המספרים 290–294 נתפסו בינתיים. מה שנבנה בפועל הוא
+> 340–347 ב-`src/routes/api/send/qidsDigest.js` — ר׳ הטבלה ב-§13.2. הטבלה
+> שלמטה נשארת כתיעוד של הכוונה המקורית.
 
 | qid מוצע | מה | הרשאה ב-`qidsAccess.js` |
 |---|---|---|
@@ -846,3 +856,82 @@ timegrama שנכשל נראה בדיוק כמו timegrama שממתין."* אסו
   ההפך המכוון — **הצטברות**.
 - **לא** בריף לפי ריקמה. הודעה אחת לאדם, על כל הריקמות שלו.
 - **לא** SMS. עלות דומה לווצאפ בלי הכפתורים ובלי העיצוב.
+
+---
+
+## 13. מה נבנה — 2026-09-11
+
+### 13.1 השכבות
+
+| קובץ | מה | שלב |
+|---|---|---|
+| `src/lib/digest/hubSummary.ts` | `processHubSummary` וחבריו, שחולצו מ-`hub/+page.server.ts` בלי שינוי התנהגות. מחזיר עכשיו גם `feed` מלא ו-`projectIds`. | 1 ✅ |
+| `src/lib/digest/work.ts` | §4.2–4.3: משימות (`active` / `running` / `notStarted`), אזהרת רדימות (`dormantSoon`, 3 ימים לפני), מטלות (`open` / `overdue` / `dueSoon` = היום או מחר לפי שעון ישראל). | 3 ✅ |
+| `src/lib/digest/suggestions.ts` | §4.5: ספירה, "חדשות" (`new`/`notified`), 3 המובילות לפי score. | 3 ✅ |
+| `src/lib/digest/whatsNew.ts` | §4.4: `resolveSince` — בלי cursor = 24 שעות, cursor ישן נחתך לשבוע. | 2 ✅ |
+| `src/lib/digest/compose.ts` | `DigestPayload` + `digestCounts` (התמונה ל-`lastCounts`, כולל `urgentKeys`). | 3 ✅ |
+| `src/lib/digest/policy.ts` | חמשת הכללים של §5.1 + בחירת ערוץ §6.4. מחזיר **סיבה**, לא רק כן/לא. | 3 ✅ |
+| `src/lib/server/digest/collect.ts` | ארבע הקריאות, שתי "דלתות" (session / service), כל חלק מתיישב בנפרד ומדווח כישלון כנתון. | 2 ✅ |
+| `src/lib/server/digest/run.ts` | הרצה יבשה: משתמש בודד או עמוד מהקהל + סיכום. | 0 ✅ |
+| `src/lib/server/cronAuth.js` | שער סוד אחיד (S1). `required: true` נכשל סגור כש-`CRON_SECRET` לא מוגדר. | S1 חלקי |
+| `src/routes/api/digest/+server.js` | `?dry=1`, `?uid=`, `?page=`/`?pageSize=`, `?force=1`. בלי `dry` מחזיר 501. | 4 חלקי |
+| `src/lib/components/hub/DailyBrief.svelte` | הבריף בתוך ה-hub (ר׳ §13.3). | — ✅ |
+
+טסטים: `src/lib/digest/*.test.ts`, `src/lib/server/cronAuth.test.ts` (45).
+
+### 13.2 ה-qids — שתי דלתות
+
+`/api/send` כופה `idL` = המשתמש המחובר (ר׳ התיקון ב-§1.1). לכן כל קריאה
+קיימת פעמיים, והשם של המשתנה הוא ההרשאה:
+
+| דלת | qids | משתנה | הרשאה |
+|---|---|---|---|
+| hub (המשתמש עצמו) | `85levHubSummary`, `340digestWork`, `341digestSuggestions`, `342digestWhatsNew` | `$idL` — תמיד "אני" | `user` + `serviceAdmin` |
+| הרצת הבריף (cron) | `347digestHubSummaryFor`, `343digestWorkFor`, `344digestSuggestionsFor`, `345digestWhatsNewFor` | `$uid` — כל משתמש | `serviceAdmin` **בלבד** |
+| קהל | `346digestAudience` | עמודים | `serviceAdmin` **בלבד**, מזהים בלבד |
+
+`347` נבנה מ-`85` בהחלפת `$idL`→`$uid` (ב-`qids.js`), כך שאין שני עותקים של
+לוגיקת ההצבעות. `343` הוא היחיד שבוחר שדות מסירה (`email`, `lang`,
+`telegramId`, `noMail`, `machshirs`) — `346` מחזיר מזהים בלבד.
+
+נבדק מול Strapi אמיתי (משתמש בדיקה 256): 340/341/342 מחזירים נתונים;
+343/346 נחסמים ב-403 למשתמש רגיל.
+
+### 13.3 ה-hub
+
+`hub/+page.server.ts` מזרים `brief` לצד `summary`. קריאת 85 אחת משרתת את
+שניהם, ושלוש קריאות הבריף מתחילות **אחרי** ש-85 מסתיימת, כדי שלא יתחרו
+בחיבור ל-Strapi. `DailyBrief.svelte` מציג את כל מה שבבריף **חוץ מהצבעות**
+(ה-hub כבר פותח בהן: הגלולה הדחופה, ה-KPI, הפיד): אזהרות רדימות ראשונות, אחריהן
+משימות, מטלות (עם עד 3 דחופות), חדש ברקמות (24 שעות), והצעות. בריף ריק לא
+מוצג; חלק שנכשל נאמר במפורש ("חלק מהבריף לא נטען") ולא מוצג כאפס.
+
+### 13.4 סטיות מהתכנית
+
+- **`tasks.dueToday` → `dueSoon`** (היום **או מחר**, כמו ש-§4.3 מתאר בפועל).
+  מטלה פתוחה בלי דדליין קרוב נספרת ב-`open` אבל לא מופיעה ברשימה.
+- **`missions.waiting` → `running` + `notStarted`.** משימה עם שעות וטיימר
+  עצור היא לא "ממתינה להתחלה".
+- **אזהרת רדימות רק למשימה בלי שעות ובלי טיימר רץ** — בדיוק התנאי שבו
+  `openDormancyProposal` באמת פותח הצעה. אחרת זו אזעקת שווא.
+- **`cta.label {he,en,ar}` לא ב-payload.** ה-payload נושא מספרים וקישורים
+  בלבד; הניסוח שייך למרנדר (`$t()` ב-hub, תבנית הערוץ בשרת).
+- **משימות חדשות לא כוללות `source: selfNomination`** — מועמדות מופיעה ממילא
+  כהצבעה.
+- **מכירה "חדשה"** = נוצרה בחלון כ-`self`/null, **או** אושרה בחלון
+  (`holderStatus: confirmed` + `holderDecidedAt`). מכירה `open` לעולם לא.
+- **סיבת דילוג נוספת `failedRead`**: אם קריאת ההצבעות נכשלה, לא שולחים ולא
+  מדווחים "ריק".
+
+### 13.5 מה חסום ולמה
+
+| חסר | חוסם את | תלוי ב |
+|---|---|---|
+| קולקציית `user-digest` ב-Strapi (1.0b) + 2 הרשאות (Authenticated + API token) + `types:update` | `record`, `lastSentAt`, `cursor`, שליחה אמיתית | פריסה של ה-backend |
+| `CRON_SECRET` ב-`.env` של השרת | `/api/digest` בכלל (נכשל סגור) | הגדרת סביבה |
+| תבנית `dailyDigest.svelte`, `List-Unsubscribe`, `sendTelegramDirect` | שלב 4 | — |
+| הכרעת Q1 (מיילי ההצעות) ו-S3 (R4) | השקה | החלטת מוצר |
+
+**הצעד הבא המומלץ: שלב 0.** להגדיר `CRON_SECRET` ולהריץ
+`/api/digest?dry=1&pageSize=20` — `summary.nonEmpty` הוא בדיוק המספר ש-§10
+שלב 0 שואל עליו.

@@ -5,12 +5,23 @@
   import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
   import ShareLink from '$lib/components/share/ShareLink.svelte';
   import { LAYER_COLORS, type MapItem, type MapLayer } from '$lib/map/discoveryTypes';
-  import { t, isRtl } from '$lib/translations';
+  import { t, isRtl, locale } from '$lib/translations';
   import { Head } from 'svead';
+  import Translated from '$lib/components/ui/Translated.svelte';
+  import TranslatedNote from '$lib/components/ui/TranslatedNote.svelte';
+  import { pageTranslations } from '$lib/translation/pageTranslations.svelte';
 
   let { data } = $props();
 
   type ProductCard = (typeof data.products)[number];
+
+  // UGC translation (PLAN_UGC_TRANSLATION §4, §7.1) — the product's name, and
+  // the rikma's name when a rikma is the seller. A personal seller is a person,
+  // whose name is transliterated rather than translated (§4.3) — the loader
+  // does not look it up, so it renders as written.
+  const tr = pageTranslations(() => data, () => $locale);
+  const cardHit = (p: ProductCard) =>
+    tr.firstReal(p.name, p.personal ? null : p.sellerName);
 
   let search = $state('');
   let filter = $state<'all' | 'rikma' | 'personal'>('all');
@@ -151,12 +162,16 @@
             <div class="pic-fallback"><EntityIcon kind="product" size={28} /></div>
           {/if}
           <div class="card-body">
-            <h2>{p.name}</h2>
+            <h2><Translated text={p.name} hit={tr.hitFor(p.name)} showNote={false} /></h2>
             {#if p.sellerName}
               <p class="place">
                 <EntityIcon kind={p.personal ? 'person' : 'rikma'} size={13} />
                 {$t('discover.products_by')}
-                {p.sellerName}
+                {#if p.personal}
+                  {p.sellerName}
+                {:else}
+                  <Translated text={p.sellerName} hit={tr.hitFor(p.sellerName)} showNote={false} />
+                {/if}
               </p>
             {/if}
             {#if p.hint}
@@ -175,6 +190,7 @@
             </div>
           </div>
         </a>
+        <TranslatedNote hit={cardHit(p)} class="card-tnote" />
         <div class="card-actions">
           {#if p.projectId && !p.personal}
             <a class="mini" href={`/project/${p.projectId}`}><EntityIcon kind="rikma" size={13} /> {$t('discover.to_project')}</a>
@@ -427,6 +443,11 @@
        mode, so its ink has to stay dark in every one. */
     color: var(--ramp-ink, #16131b);
     font-weight: 700;
+  }
+  /* The card's provenance line, inset to the card body's gutter. `:global`
+     because the class is handed to TranslatedNote. */
+  .card :global(.card-tnote) {
+    padding: 0 0.85rem 0.4rem;
   }
   .card-actions {
     display: flex;

@@ -25,5 +25,27 @@
     "moach": "Brain",
     "me": "My profile",
     "feed": "Waiting for you"
+  },
+  "brief": {
+    "title": "Daily brief",
+    "sub": "What's on your plate today",
+    "missions": "active missions",
+    "running": "in progress now",
+    "notStarted": "not started",
+    "tasks": "open tasks",
+    "overdue": "overdue",
+    "dueSoon": "due today or tomorrow",
+    "whatsNew": "new in your rikmot since yesterday",
+    "suggestions": "suggestions that fit you",
+    "fresh": "new",
+    "dormantSoon": "No activity yet — in {{count}} days a proposal to release it will open",
+    "dormantTomorrow": "No activity yet — tomorrow a proposal to release it will open",
+    "partial": "Part of the brief couldn't load right now",
+    "kinds": {
+      "missions": "missions",
+      "resources": "resources",
+      "products": "products",
+      "sales": "sales"
+    }
   }
 }

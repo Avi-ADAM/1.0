@@ -151,9 +151,21 @@ as garbage and reorders the RTL run, and no other check sees it —
 `$t()` covers the platform's own words. Text **members** typed — project names
 and descriptions, mission `descrip`, bios, product names — is a separate layer
 with its own machinery in `src/lib/translation/` (pure) and
-`src/lib/server/translation/` (the cache read). See
-`docs/PLAN_UGC_TRANSLATION.md`; P0 + P1 are in, there is no translation engine
-yet, so every string is a cache miss and renders as the author wrote it.
+`src/lib/server/translation/` (the cache read, the engine, the governor, the
+backfill). See `docs/PLAN_UGC_TRANSLATION.md`; P0–P3 are in and P4 covers
+the public directories and their entity pages (missions, resources, rikmot,
+products). A page reads its loader's payload through `pageTranslations`
+(`src/lib/translation/pageTranslations.svelte.ts`) — never by hand.
+
+**The whole thing is off unless the env says otherwise**, so the default
+behaviour is still "every string renders as the author wrote it". Three
+switches, and they are independent on purpose: `TRANSLATE_SURFACES` decides
+which surfaces read the cache at all, `TRANSLATE_WRITE` (+ a Gemini key)
+decides whether anything may be *bought*, and `TRANSLATE_STATE_DIR` is where
+the quota counter, the backfill cursor and the guest demand log live. A page
+that is not translated almost always means "nobody has paid for these strings
+yet", not a bug — `npx tsx src/lib/jobs/backfill-translations.ts --status`
+says which.
 
 - What may be translated at all is the manifest, `src/lib/translation/fields.js` —
   never a decision at a call site. `npm run check:translatable` holds it to the
@@ -163,6 +175,21 @@ yet, so every string is a cache miss and renders as the author wrote it.
   up again. There is no invalidation code, deliberately.
 - Rendering goes through `<Translated>`, which always states that a translation
   is a translation and always keeps the original one tap away.
+- A guest can never fill the cache — no account means the `onDemand` default,
+  and only `always` readers warm, deliberately, because an anonymous public
+  page is what a crawler walks. The cache is filled *before* they arrive, by
+  `/api/cron/translate-backfill` on a daily clock. So a new public surface is
+  not finished when its loader reads the cache: it also needs a row in
+  `src/lib/server/translation/backfillSources.ts`, or nothing will ever fill it
+  (a test fails for any `SurfaceKey` no walker feeds).
+- Whatever a surface renders is what the backfill must hash, **byte for byte**
+  — a card shows a 220-char excerpt, its page shows the whole flattened
+  description, and those are two different rows. A walker that flattens text
+  even slightly differently from its loader spends the entire quota on rows no
+  page can look up, and nothing errors: every page just renders source.
+- An `identity` row (source language = reader's language) is a cache **hit**
+  but **not a translation**. `isRealTranslation` in `src/lib/translation/hits.js`
+  is the only predicate for that distinction — `!!hit.text` is the bug.
 - The inverse regression to watch for: routing **UI** text through this to avoid
   adding a JSON key. `$t()` stays the only path for anything the platform says.
 

@@ -151,6 +151,10 @@
   let wid = $state();
   import { Head } from 'svead';
   import RichText from '$lib/celim/ui/richText.svelte';
+  import Translated from '$lib/components/ui/Translated.svelte';
+  import TranslatedNote from '$lib/components/ui/TranslatedNote.svelte';
+  import { plainForTranslation } from '$lib/translation/richText.js';
+  import { pageTranslations } from '$lib/translation/pageTranslations.svelte';
 
   let title = 'This is Svead a Svelte Head Component';
   let image = `https://res.cloudinary.com/love1/image/upload/v1640020897/cropped-PicsArt_01-28-07.49.25-1_wvt4qz.png`;
@@ -172,6 +176,50 @@
         ? `${$lang === 'he' ? 'מאגד ביקוש' : 'demand pool'}${maagadInfo?.name ? ` · ${maagadInfo.name}` : ''}`
         : `${$lang === 'he' ? "קונסיירז'" : 'concierge'}${ratsonName ? ` · ${ratsonName}` : ''}`)
   );
+  // ── UGC translation (PLAN_UGC_TRANSLATION §4, §7) ────────────────────────
+  //
+  // `data.translations` is the loader's single batched cache read. A miss is
+  // simply absent and the page renders the author's own words, which is what
+  // it did before the feature existed. Resolving a row, and warming for an
+  // `always` reader, is `pageTranslations`' job.
+  const tr = pageTranslations(() => data, () => $lang);
+  const hitFor = tr.hitFor;
+
+  // The two rich-text fields are hashed as their *flattened* text, by the same
+  // helper the loader used — the two strings have to be identical or the page
+  // would render source for a translation sitting in its own payload.
+  const descripPlain = $derived(plainForTranslation(data.alld?.attributes?.descrip));
+  const hearotPlain = $derived(
+    plainForTranslation(data.alld?.attributes?.hearotMeyuchadot)
+  );
+  const descripHit = $derived(hitFor(descripPlain));
+  const hearotHit = $derived(hitFor(hearotPlain));
+
+  // The provenance line under the description speaks for the page's heading
+  // too — the mission's name and its rikma's name are shown with no note of
+  // their own, and a translated name above an untranslated description must
+  // still say it was translated (§9.1).
+  const headHit = $derived(
+    tr.firstReal(
+      descripPlain,
+      data.alld?.attributes?.name,
+      data.alld?.attributes?.project?.data?.attributes?.projectName
+    )
+  );
+
+  // Whether to show the flat translation in place of the formatted original.
+  // `showOriginals` (one flag for the whole site) and `off` both send the
+  // reader back to the tiptap HTML, untouched — the original is never lost,
+  // only the *translated* view is flat.
+  //
+  // It is a *real* translation that is asked about, and that matters most
+  // here: an identity row's text is the source, so without the distinction a
+  // Hebrew reader on Hebrew content would have their formatted description
+  // silently replaced by the same words as flat text — losing the author's
+  // layout to translate nothing.
+  const showDescripTranslation = $derived(tr.showsTranslation(descripPlain));
+  const showHearotTranslation = $derived(tr.showsTranslation(hearotPlain));
+
   //TODO: header nav menu
 </script>
 
@@ -258,9 +306,18 @@
                   >{$t('pages.availMission.headi')}</span
                 >
               </div>
-              <span class="pn ml-1 text-lg sm:text-xl lg:text-2xl text-grey-200"
-                >{sourceName}</span
-              >
+              <!-- --ramp-ink, not an inherited colour: this row sits on the
+                   pale steel/gold gradient in every theme, and the class that
+                   used to be here (`text-grey-200`) is not a Tailwind class at
+                   all, so the name inherited the page's near-white ink and
+                   measured 1.01:1 on the business ramp — invisible. -->
+              <Translated
+                as="span"
+                class="pn ml-1 text-lg sm:text-xl lg:text-2xl text-[color:var(--ramp-ink,#16131b)]"
+                text={sourceName}
+                hit={hitFor(sourceName)}
+                showNote={false}
+              />
             </div>
           </div>
           <div>
@@ -294,23 +351,42 @@
             <div class="  mb-2">
               <div class="flex flex-row justify-between">
                 <div class="px-2">
-                  <h2
+                  <Translated
+                    as="h2"
                     class="text-barbi font-bold text-xl lg:text-4xl underline"
-                  >
-                    {data.alld.attributes.name}
-                  </h2>
+                    text={data.alld.attributes.name}
+                    hit={hitFor(data.alld.attributes.name)}
+                    showNote={false}
+                  />
                   {#if data.alld.attributes.descrip !== null && data.alld.attributes.descrip !== 'null' && data.alld.attributes.descrip !== 'undefined' && data.alld.attributes.descrip !== undefined && data.alld.attributes.descrip}
-                    <RichText
-                      outpot={data.alld.attributes.descrip}
-                      editable={false}
-                    />{/if}
+                    <!-- The translated view is flat text: the cache stores
+                         plain strings on purpose (the validator strips markup),
+                         so a translation cannot carry the tiptap formatting.
+                         "Show original" below brings the formatted HTML back
+                         untouched — nothing is destroyed, and a wall of Hebrew
+                         is the worse default for a reader who cannot read it. -->
+                    {#if showDescripTranslation}
+                      <p dir="auto" class="whitespace-pre-line">{descripHit.text}</p>
+                    {:else}
+                      <RichText
+                        outpot={data.alld.attributes.descrip}
+                        editable={false}
+                      />
+                    {/if}
+                  {/if}
+                  <TranslatedNote hit={headHit} />
 
                   {#if data.tok == true}
                     {#if data.alld.attributes.hearotMeyuchadot !== null && data.alld.attributes.hearotMeyuchadot !== 'null' && data.alld.attributes.hearotMeyuchadot !== 'undefined' && data.alld.attributes.hearotMeyuchadot !== undefined && data.alld.attributes.hearotMeyuchadot}
-                      <RichText
-                        outpot={data.alld.attributes.hearotMeyuchadot}
-                        editable={false}
-                      />
+                      {#if showHearotTranslation}
+                        <p dir="auto" class="whitespace-pre-line">{hearotHit.text}</p>
+                      {:else}
+                        <RichText
+                          outpot={data.alld.attributes.hearotMeyuchadot}
+                          editable={false}
+                        />
+                      {/if}
+                      <TranslatedNote hit={hearotHit} />
                     {/if}
                   {:else}
                     <div

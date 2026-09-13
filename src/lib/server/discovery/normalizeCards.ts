@@ -21,8 +21,17 @@ function picUrlOf(pic: any): string | null {
   return attrs.formats?.small?.url || attrs.formats?.thumbnail?.url || attrs.url || null;
 }
 
-/** descrip fields hold tiptap HTML — cards want a plain-text excerpt. */
-function excerptOf(html: unknown, max = 220): string | null {
+/**
+ * descrip fields hold tiptap HTML — cards want a plain-text excerpt.
+ *
+ * The UGC translation cache keys on the exact string this returns: the
+ * backfill walker builds its cards with the normalizers below rather than
+ * re-deriving an excerpt, because the cache is content-addressed and a walker
+ * that flattened the HTML even slightly differently would fill rows the card
+ * can never look up (PLAN_UGC_TRANSLATION §12, and the same discipline
+ * `richText.js` exists for on the detail page).
+ */
+export function excerptOf(html: unknown, max = 220): string | null {
   if (typeof html !== 'string' || !html) return null;
   const text = html
     .replace(/<[^>]*>/g, ' ')

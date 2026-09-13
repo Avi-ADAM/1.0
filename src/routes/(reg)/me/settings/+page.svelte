@@ -7,7 +7,8 @@
   import {
     autoTranslate,
     AUTO_TRANSLATE_VALUES,
-    setAutoTranslate
+    setAutoTranslate,
+    adoptFromProfile
   } from '$lib/stores/autoTranslate.js';
   let { data } = $props();
 
@@ -69,6 +70,10 @@
     githublink = data.meData.githublink;
     noMail = data.meData.noMail;
     isG = data.meData.profilManualAlready;
+    // A device that has never chosen picks up the account's answer
+    // (PLAN_UGC_TRANSLATION §4.4). A device that *has* chosen keeps its own —
+    // adoptFromProfile decides, not this page.
+    adoptFromProfile(data.meData.autoTranslate);
   });
 
   async function sendD() {
@@ -165,9 +170,10 @@
 
   <!-- Translation of what *other members* wrote (PLAN_UGC_TRANSLATION §4.4).
        Separate from the display-language picker inside <EditB> on purpose:
-       that one chooses the language of the site's own chrome and is saved to
-       Strapi; this one only says what to do with text the platform did not
-       write, and lives in localStorage until the backend has a column for it. -->
+       that one chooses the language of the site's own chrome; this one only
+       says what to do with text the platform did not write. Saved to
+       localStorage for the first paint and mirrored to the profile on a
+       debounce, so it follows the account to the next device. -->
   <div
     class="mb-6 rounded-xl border border-zinc-200 dark:border-zinc-700 p-4 bg-white/60 dark:bg-zinc-900/40"
   >

@@ -1,3 +1,5 @@
+import { digestQids, serviceTwin } from './qidsDigest.js';
+
 /**
  * "Not archived by a rikma decision" (PLAN_OBJECT_ARCHIVAL).
  *
@@ -14243,6 +14245,7 @@ ${STIPEND_DECISION_FIELDS}
           bio
           preferCards
           lang
+          autoTranslate
           location { location_mode lat lng radius location_hint }
           machshirs { data { id attributes { jsoni } } }
           email
@@ -15342,6 +15345,188 @@ ${STIPEND_DECISION_FIELDS}
     }
   }`,
 
+  // ── UGC translation cache — the write path (PLAN_UGC_TRANSLATION §5.4) ──────
+  //
+  // Reached ONLY through the `cacheTranslations` action, which runs them with
+  // the admin token via StrapiClient. They are listed in qidsAccess as
+  // serviceAdmin-only so that a client calling /api/send with either id is
+  // refused by the static layer before anything else looks at it: a member who
+  // could write this cache could put words in another member's mouth on every
+  // page of the site.
+  //
+  // Existence check first, then create. There is deliberately no update qid:
+  // the cache is content-addressed, so the same key always means the same
+  // source string and the same language pair — a second answer for it is not a
+  // correction, it is a duplicate. Editing a source changes its hash, misses,
+  // and leaves the old row unreferenced (§2.2). Promotion of a machine row to
+  // `reviewed` is P5's `reviewTranslation`, and gets its own qid then.
+  '313translationsByKeys': `query TranslationsByKeys($keys: [String]!, $limit: Int = 300) {
+    textTranslations(filters: { key: { in: $keys } }, pagination: { limit: $limit }) {
+      data {
+        id
+        attributes {
+          key
+          quality
+        }
+      }
+    }
+  }`,
+
+  '314createTextTranslation': `mutation CreateTextTranslation(
+    $key: String!
+    $hash: String!
+    $srcLang: ENUM_TEXTTRANSLATION_SRCLANG!
+    $tgtLang: ENUM_TEXTTRANSLATION_TGTLANG!
+    $source: String
+    $text: String
+    $mode: ENUM_TEXTTRANSLATION_MODE
+    $engine: ENUM_TEXTTRANSLATION_ENGINE
+    $model: String
+    $quality: ENUM_TEXTTRANSLATION_QUALITY
+    $hits: Int
+    $firstSeenOn: String
+  ) {
+    createTextTranslation(
+      data: {
+        key: $key
+        hash: $hash
+        srcLang: $srcLang
+        tgtLang: $tgtLang
+        source: $source
+        text: $text
+        mode: $mode
+        engine: $engine
+        model: $model
+        quality: $quality
+        hits: $hits
+        firstSeenOn: $firstSeenOn
+      }
+    ) {
+      data {
+        id
+        attributes {
+          key
+        }
+      }
+    }
+  }`,
+
+  // ── UGC translation backfill — the walker's corpus (PLAN_UGC_TRANSLATION §15) ─
+  //
+  // Deliberately NOT a reuse of 283discoverMissions. That query selects the
+  // whole card — location, skills, roles, pictures, the source wish — and caps
+  // at 500 with no page argument, because a directory renders one page. The
+  // backfill walks the entire corpus a few hundred rows at a time, over days,
+  // and every field it does not translate is bytes it pays for on every page
+  // of every run.
+  //
+  // The FILTER is the part that matters and it is copied from 283 on purpose:
+  // "reachable with no session" (§15.3.2) is defined by what the public
+  // directory shows, not guessed. A mission the directory hides is reachable
+  // only by direct link, and filling it would be spend with no reader.
+  //
+  // `hearotMeyuchadot` is here and not on 283 because the mission's own page
+  // renders it and the card does not — one walk feeds both surfaces (§12).
+  //
+  // serviceAdmin-only: this is a batch job's query, and a member paging the
+  // whole corpus through /api/send is not something to leave open.
+  '315backfillMissions': `query BackfillMissions($page: Int = 1, $pageSize: Int = 200) {
+    openMissions(
+      filters: { and: [ { archived: { eq: false } }, ${NOT_ARCHIVED} ] }
+      pagination: { page: $page, pageSize: $pageSize }
+      sort: "createdAt:desc"
+    ) {
+      data { id attributes {
+        name descrip hearotMeyuchadot updatedAt
+        project { data { id attributes { projectName } } }
+      } }
+      meta { pagination { page pageSize pageCount total } }
+    }
+  }`,
+
+  // The requested-resources corpus (P4 — /availiableResorce and each
+  // resource's own page). Same reasoning as 315: the FILTER is 284's, copied on
+  // purpose, and only the translated fields are selected. `project.id` is here
+  // so the walker can drop the rikmot `hiddenProjects.ts` keeps off the
+  // directories — the loader filters them, so the walker must too.
+  '317backfillResources': `query BackfillResources($page: Int = 1, $pageSize: Int = 200) {
+    openMashaabims(
+      filters: { and: [ { archived: { eq: false } }, ${NOT_ARCHIVED} ] }
+      pagination: { page: $page, pageSize: $pageSize }
+      sort: "createdAt:desc"
+    ) {
+      data { id attributes {
+        name descrip updatedAt
+        project { data { id attributes { projectName } } }
+      } }
+      meta { pagination { page pageSize pageCount total } }
+    }
+  }`,
+
+  // The rikma corpus (P4 — /project and /project/[id]). Unfiltered like 281,
+  // because a rikma has no archive state of its own. The two relation slices
+  // mirror 49GetProjectById exactly — the page renders the names of those
+  // missions and products, so those are the strings its rows are keyed on:
+  // open_missions with 49's filter (not archived, not a self-nomination),
+  // matanotofs unfiltered, as 49 has it.
+  '318backfillProjects': `query BackfillProjects($page: Int = 1, $pageSize: Int = 200) {
+    projects(
+      pagination: { page: $page, pageSize: $pageSize }
+      sort: "createdAt:desc"
+    ) {
+      data { id attributes {
+        projectName publicDescription updatedAt
+        open_missions(filters: { and: [{ archived: { eq: false } }, { or: [{ source: { null: true } }, { source: { ne: "selfNomination" } }] }, ${NOT_ARCHIVED} ] }, pagination: { limit: 100 }) { data { id attributes { name } } }
+        matanotofs(pagination: { limit: 100 }) { data { id attributes { name } } }
+      } }
+      meta { pagination { page pageSize pageCount total } }
+    }
+  }`,
+
+  // The products corpus (P4 — /gift). 282's filter, including the seller's own
+  // hideFromDiscovery opt-out: a product the directory hides is reachable only
+  // by direct link, and filling it would be spend with no reader.
+  '319backfillProducts': `query BackfillProducts($page: Int = 1, $pageSize: Int = 200) {
+    matanots(
+      filters: {
+        and: [
+          { or: [{ archived: { eq: false } }, { archived: { null: true } }] },
+          ${NOT_ARCHIVED},
+          { or: [{ hideFromDiscovery: { eq: false } }, { hideFromDiscovery: { null: true } }] }
+        ]
+      }
+      pagination: { page: $page, pageSize: $pageSize }
+      sort: "createdAt:desc"
+    ) {
+      data { id attributes {
+        name origin updatedAt
+        projectcreates { data { id attributes { projectName } } }
+      } }
+      meta { pagination { page pageSize pageCount total } }
+    }
+  }`,
+
+  // What the backfill already has, for a set of hashes — the whole of its
+  // idempotence (§8.1). Deliberately NOT 312translationsByHash: that one pins
+  // one target locale, because a reader reads in one language. The worker fills
+  // all five in a single request (§5.1), so what it needs to know is which of
+  // the five each hash is missing.
+  //
+  // `text` and `source` are not selected. The worker only asks "is this pair
+  // present", and pulling every original and every translation back for a few
+  // hundred hashes would be megabytes to answer a set-membership question.
+  '316translationCoverage': `query TranslationCoverage($hashes: [String]!, $limit: Int = 1500) {
+    textTranslations(filters: { hash: { in: $hashes } }, pagination: { limit: $limit }) {
+      data { id attributes { hash tgtLang } }
+    }
+  }`,
+
   ...qids_base,
-  ...moachQids
+  ...moachQids,
+  ...digestQids
 };
+
+// The daily digest's service twin of 85 — the same query text with `$uid` for
+// the session-bound `$idL`, so the digest counts votes exactly as the hub does
+// (PLAN_DAILY_DIGEST §1.1). serviceAdmin only; see qidsDigest.js.
+qids['347digestHubSummaryFor'] = serviceTwin(qids['85levHubSummary'], 'DigestHubSummaryFor');

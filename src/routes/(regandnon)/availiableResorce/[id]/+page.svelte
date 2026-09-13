@@ -19,6 +19,9 @@
     import { montsi } from '$lib/func/montsi.svelte';
     import { MultiSelect } from 'svelte-multiselect';
     import { find_skill_id } from '$lib/func/findSkillId.svelte';
+    import Translated from '$lib/components/ui/Translated.svelte';
+    import TranslatedNote from '$lib/components/ui/TranslatedNote.svelte';
+    import { pageTranslations } from '$lib/translation/pageTranslations.svelte';
 
     let selected = $state([])
     let mash = $state([])
@@ -238,6 +241,15 @@
                 : `${$lang === 'he' ? "קונסיירז'" : 'concierge'}${ratsonName ? ` · ${ratsonName}` : ''}`)
     );
 
+    // ── UGC translation (PLAN_UGC_TRANSLATION §4, §7.1) ──────────────────
+    // The resource's name, its description (plain text here, not tiptap — so
+    // `<Translated>` can render it directly) and its rikma's name. Only a
+    // rikma's name is ever looked up: the maagad/concierge fallbacks above are
+    // labels this page builds, not text anybody wrote.
+    const tr = pageTranslations(() => data, () => $lang);
+    let projectName = $derived(data.alld?.project?.data?.attributes?.projectName ?? null);
+    let pageHit = $derived(tr.firstReal(data.alld?.name, data.alld?.descrip, projectName));
+
     // ── שווי צפוי בריקמה ─────────────────────────────────────────────────
     // אותו חישוב שמוצג בשורת הכסף למעלה: השווי המבוקש × כמות × מספר המחזורים.
     // משאב מתחדש בלי תאריך סיום מתומחר במחזור אחד, ושורות ה-1/2/5 שנים הן שנותנות
@@ -340,7 +352,17 @@
                             <div class="sm:text-sm text-md mt-1 flex items-center">
                                 <span class="text-barbi text-center mr-3 sm:text-2xl lg:text-4xl text-xl">{$t('pages.availResource.headi')}</span>
                             </div>
-                            <span class="pn ml-1 text-lg sm:text-xl lg:text-2xl text-grey-200">{sourceName}</span>
+                            {#if projectName}
+                                <Translated
+                                    as="span"
+                                    class="pn ml-1 text-lg sm:text-xl lg:text-2xl text-[color:var(--ramp-ink,#16131b)]"
+                                    text={projectName}
+                                    hit={tr.hitFor(projectName)}
+                                    showNote={false}
+                                />
+                            {:else}
+                                <span class="pn ml-1 text-lg sm:text-xl lg:text-2xl text-[color:var(--ramp-ink,#16131b)]">{sourceName}</span>
+                            {/if}
                         </div>
                     </div>
                     <div>
@@ -359,7 +381,13 @@
                         <div class="mb-2">
                             <div class="flex flex-row justify-between">
                                 <div class="px-2">
-                                    <h2 class="text-barbi font-bold text-xl lg:text-4xl underline">{data.alld.name}</h2>
+                                    <Translated
+                                        as="h2"
+                                        class="text-barbi font-bold text-xl lg:text-4xl underline"
+                                        text={data.alld.name}
+                                        hit={tr.hitFor(data.alld.name)}
+                                        showNote={false}
+                                    />
                                     {#if data.alld.recurring}
                                         <div class="inline-flex flex-wrap items-center gap-2 my-2 px-3 py-1.5 rounded-xl bg-blue-900/40 border border-gold/40">
                                             <span class="text-gold font-bold text-sm lg:text-xl"><EntityIcon kind="recurring" size={15} /> {$t('pages.availResource.recurH')}</span>
@@ -372,8 +400,18 @@
                                         </div>
                                     {/if}
                                     {#if data.alld.descrip !== null && data.alld.descrip !== 'null' && data.alld.descrip !== 'undefined' && data.alld.descrip !== undefined}
-                                        <p class="cd d max-h-16 text-gray-100 text-lg lg-text-2xl overflow-y-auto">{data.alld.descrip}</p>
+                                        <Translated
+                                            as="p"
+                                            class="cd d max-h-16 text-gray-100 text-lg lg-text-2xl overflow-y-auto"
+                                            text={data.alld.descrip}
+                                            hit={tr.hitFor(data.alld.descrip)}
+                                            showNote={false}
+                                        />
                                     {/if}
+                                    <!-- One provenance line for the page's
+                                         user-written text: name, description
+                                         and rikma name share it (§9.1). -->
+                                    <TranslatedNote hit={pageHit} />
                                     
                                     {#if data.alld.sqadualed || data.alld.sqadualedf}
                                         <p style="line-height: 1;" class="text-sm text-gray-100 flex items-center lg:text-2xl m-5">

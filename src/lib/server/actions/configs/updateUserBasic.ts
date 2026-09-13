@@ -9,8 +9,13 @@ import { STRAPI_GRAPHQL } from '$lib/server/strapiUrl.js';
  * Uses GraphQL variables so free-text fields are escaped safely.
  *
  * Client sends any subset of:
- *   { username, bio, frd, lang, fblink, twiterlink, discordlink, githublink,
- *     preferCards, noMail, location }
+ *   { username, bio, frd, lang, autoTranslate, fblink, twiterlink,
+ *     discordlink, githublink, preferCards, noMail, location }
+ *
+ * `autoTranslate` is the UGC-translation preference (PLAN_UGC_TRANSLATION §4.4).
+ * It lives in localStorage for the first paint and is mirrored here so it
+ * follows the account across devices — this is the single write path for it;
+ * `src/lib/stores/autoTranslate.js` calls this action and nothing else.
  *
  * `location` mirrors LocationPicker's value shape ({ location_mode, lat, lng,
  * radius, location_hint }) and is stored as the user's single-point entry in
@@ -77,6 +82,12 @@ const handler: ActionExecutionHandler = async (params, context) => {
   if (params.lang !== undefined && LANG_VALUES.includes(params.lang)) {
     lines.push(`lang: ${params.lang}`);
   }
+  // Enum_Userspermissionsuser_Autotranslate. Kept in step with
+  // AUTO_TRANSLATE_VALUES in $lib/stores/autoTranslate.js.
+  const AUTO_TRANSLATE_VALUES = ['off', 'onDemand', 'always'];
+  if (params.autoTranslate !== undefined && AUTO_TRANSLATE_VALUES.includes(params.autoTranslate)) {
+    lines.push(`autoTranslate: ${params.autoTranslate}`);
+  }
 
   if (params.preferCards !== undefined) lines.push(`preferCards: ${!!params.preferCards}`);
   if (params.noMail !== undefined) lines.push(`noMail: ${!!params.noMail}`);
@@ -109,7 +120,7 @@ const handler: ActionExecutionHandler = async (params, context) => {
         updateUsersPermissionsUser(id: ${userId}, data: { ${lines.join(', ')} }) {
           data {
             attributes {
-              username bio frd lang preferCards noMail
+              username bio frd lang autoTranslate preferCards noMail
               fblink twiterlink discordlink githublink
               location { location_mode lat lng radius location_hint }
             }
@@ -138,6 +149,7 @@ export const updateUserBasicConfig: ActionConfig = {
     bio: { type: 'string', required: false },
     frd: { type: 'string', required: false },
     lang: { type: 'string', required: false },
+    autoTranslate: { type: 'string', required: false },
     fblink: { type: 'string', required: false },
     twiterlink: { type: 'string', required: false },
     discordlink: { type: 'string', required: false },

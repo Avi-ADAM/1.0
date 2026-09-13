@@ -14,6 +14,10 @@
   import AuthorityBadge from '$lib/components/ui/AuthorityBadge.svelte';
   import DiscoveryNav from '$lib/components/discovery/DiscoveryNav.svelte';
   import ShareLink from '$lib/components/share/ShareLink.svelte';
+  import Translated from '$lib/components/ui/Translated.svelte';
+  import TranslatedNote from '$lib/components/ui/TranslatedNote.svelte';
+  import { pageTranslations } from '$lib/translation/pageTranslations.svelte';
+  import { plainForTranslation } from '$lib/translation/richText.js';
 
   let { data } = $props();
   // Derived so navigating between /project/A and /project/B (same component
@@ -96,6 +100,22 @@
   // משתנה לרוחב המסך
   let w = $state(0);
   let isMobile = $derived(w < 640);
+
+  // ── UGC translation (PLAN_UGC_TRANSLATION §4, §7.1, §12) ──────────────
+  // The description is tiptap HTML, so it is looked up by its flattened text —
+  // through the same helper the loader used, or the page would render source
+  // for a translation sitting in its own payload. Its translated view is flat;
+  // "show original" brings the formatted HTML back untouched.
+  //
+  // Mission names go to `Tile`, which only takes a string, so they are handed
+  // over already resolved (`textFor`) and the panel carries one provenance
+  // line for all of them. The rikma's own name is not translated: it is drawn
+  // on the seal, an identity mark, and the loader does not look it up.
+  const tr = pageTranslations(() => data, () => $lang);
+  let descripPlain = $derived(plainForTranslation(project?.attributes?.publicDescription));
+  let products = $derived(project?.attributes?.matanotofs?.data ?? []);
+  let missionsHit = $derived(tr.firstReal(...projecto.map((om) => om.attributes?.name)));
+  let productsHit = $derived(tr.firstReal(...products.map((m) => m.attributes?.name)));
 
   // טקסטים
   let pageTitle = $derived(
@@ -301,10 +321,15 @@
       {#if project.attributes.publicDescription}
         <div class="glass-panel mb-8 text-center">
           <h2 class="section-title mb-3">{$t('pages.projectPublic.about')}</h2>
-          <RichText
-            editable={false}
-            outpot={project.attributes.publicDescription}
-          />
+          {#if tr.showsTranslation(descripPlain)}
+            <p dir="auto" class="whitespace-pre-line">{tr.textFor(descripPlain)}</p>
+          {:else}
+            <RichText
+              editable={false}
+              outpot={project.attributes.publicDescription}
+            />
+          {/if}
+          <TranslatedNote hit={tr.hitFor(descripPlain)} />
         </div>
       {/if}
 
@@ -379,7 +404,7 @@
                     bg="wow"
                     sm={true}
                     big={true}
-                    word={om.attributes.name}
+                    word={tr.textFor(om.attributes.name)}
                   />
                 </button>
               {/each}
@@ -387,6 +412,7 @@
               <p class="text-gray-400 text-sm">אין משימות פתוחות כרגע</p>
             {/if}
           </div>
+          <TranslatedNote hit={missionsHit} class="mt-2" />
           <!-- Self-nomination entry (PLAN_SELF_NOMINATION §4.1): even with no
                open missions, anyone who connects to the direction can offer
                themselves on their own terms. -->
@@ -422,9 +448,13 @@
                   <div
                     class="bg-black/40 rounded-xl p-4 border border-white/10 hover:border-gold/50 transition-colors"
                   >
-                    <p class="text-lg font-semibold text-white mb-2">
-                      {matanot.attributes.name}
-                    </p>
+                    <Translated
+                      as="p"
+                      class="text-lg font-semibold text-white mb-2"
+                      text={matanot.attributes.name}
+                      hit={tr.hitFor(matanot.attributes.name)}
+                      showNote={false}
+                    />
                     <p class="text-barbi font-bold text-xl mb-2">
                       {matanot.attributes.price}
                     </p>
@@ -436,6 +466,7 @@
                   </div>
                 {/each}
               </div>
+              <TranslatedNote hit={productsHit} class="mt-3" />
             </div>
           {/if}
         </div>

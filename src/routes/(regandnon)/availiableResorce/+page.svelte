@@ -5,12 +5,21 @@
   import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
   import ShareLink from '$lib/components/share/ShareLink.svelte';
   import { LAYER_COLORS, type MapItem, type MapLayer } from '$lib/map/discoveryTypes';
-  import { t, isRtl } from '$lib/translations';
+  import { t, isRtl, locale } from '$lib/translations';
   import { Head } from 'svead';
+  import Translated from '$lib/components/ui/Translated.svelte';
+  import TranslatedNote from '$lib/components/ui/TranslatedNote.svelte';
+  import { pageTranslations } from '$lib/translation/pageTranslations.svelte';
 
   let { data } = $props();
 
   type ResourceCard = (typeof data.resources)[number];
+
+  // UGC translation (PLAN_UGC_TRANSLATION §4, §7.1) — one provenance line per
+  // card, about the first field that is really translated. See the missions
+  // directory, which this page mirrors.
+  const tr = pageTranslations(() => data, () => $locale);
+  const cardHit = (r: ResourceCard) => tr.firstReal(r.name, r.excerpt, r.projectName);
 
   let search = $state('');
   let concierge = $state(false);
@@ -159,9 +168,12 @@
               <div class="avatar fallback"><EntityIcon kind="resource" size={20} /></div>
             {/if}
             <div class="top-text">
-              <h2>{r.name}</h2>
+              <h2><Translated text={r.name} hit={tr.hitFor(r.name)} showNote={false} /></h2>
               {#if r.projectName}
-                <p class="proj-name"><EntityIcon kind="rikma" size={13} /> {r.projectName}</p>
+                <p class="proj-name">
+                  <EntityIcon kind="rikma" size={13} />
+                  <Translated text={r.projectName} hit={tr.hitFor(r.projectName)} showNote={false} />
+                </p>
               {/if}
             </div>
             {#if r.price}
@@ -174,7 +186,9 @@
             {/if}
           </div>
           {#if r.excerpt}
-            <p class="desc">{r.excerpt}</p>
+            <p class="desc">
+              <Translated text={r.excerpt} hit={tr.hitFor(r.excerpt)} showNote={false} />
+            </p>
           {/if}
           <div class="badges">
             {#if r.kindOf}
@@ -193,6 +207,7 @@
             {/if}
           </div>
         </a>
+        <TranslatedNote hit={cardHit(r)} class="card-tnote" />
         <div class="card-actions">
           <a class="cta small" href={`/availiableResorce/${r.id}`}>{$t('discover.resources_apply')}</a>
           {#if r.projectId}
@@ -498,6 +513,11 @@
   }
   .badge.concierge {
     background: rgba(255, 0, 146, 0.12);
+  }
+  /* The card's provenance line sits between the link body and the actions.
+     `:global` because the class is handed to TranslatedNote. */
+  .card :global(.card-tnote) {
+    padding: 0 0.85rem 0.4rem;
   }
   .card-actions {
     display: flex;

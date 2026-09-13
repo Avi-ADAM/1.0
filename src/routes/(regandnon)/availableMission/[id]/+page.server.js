@@ -6,6 +6,7 @@
 import { sendToSer } from '$lib/send/sendToSer.js';
 import { langAdjast } from '$lib/func/langAdjast.svelte';
 import { isAuthFailure } from '$lib/server/session.js';
+import { translateSurface, missionDetailGroups } from '$lib/server/translation/surfaces.js';
 
 /**
  * One read of the mission, either as the visitor (JWT) or as the service.
@@ -133,7 +134,8 @@ async function awaitapi(mId, lang, tok, fetch) {
  * @param {Object} params.params - URL parameters
  * @param {string} params.params.id - Mission ID from URL
  * @param {typeof globalThis.fetch} params.fetch - SvelteKit fetch function
- * 
+ * @param {import('@sveltejs/kit').Cookies} params.cookies - carries the reader's `autoTranslate` preference
+ *
  * @returns {Promise<{
  *   uid: string,
  *   lang: string,
@@ -143,7 +145,9 @@ async function awaitapi(mId, lang, tok, fetch) {
  *   authExpired: boolean,
  *   loadError: 'auth'|'notfound'|'server'|null,
  *   sessionExpired: boolean,
- *   fullfild: boolean
+ *   fullfild: boolean,
+ *   translations: import('$lib/translation/types.js').TranslationPayload | null,
+ *   pending: import('$lib/translation/types.js').TranslatableString[]
  * }>} Page data for the component
  *
  * @example
@@ -152,7 +156,7 @@ async function awaitapi(mId, lang, tok, fetch) {
  * // data.alld contains the mission information
  * // data.uid contains the user ID
  */
-export async function load({ locals, params, fetch }) {
+export async function load({ locals, params, fetch, cookies }) {
   /** @type {string} */
   const mId = params.id;
 
@@ -172,10 +176,25 @@ export async function load({ locals, params, fetch }) {
 
   const { alld, authExpired, loadError } = await awaitapi(mId, lang, tok, fetch);
 
+  // UGC translation (PLAN_UGC_TRANSLATION §7) — the mission's own page. The
+  // directory already bought this mission's *name* and its rikma's name, so
+  // those two arrive as cache hits at no cost; the full description is the one
+  // string this surface adds. One extra query at most, never an LLM call, and
+  // a miss renders the author's own words exactly as it did before.
+  const { translations, pending } = await translateSurface(
+    'missionDetail',
+    missionDetailGroups(alld ? { id: mId, attributes: alld.attributes } : null),
+    lang,
+    fetch,
+    cookies.get('autoTranslate')
+  );
+
   return {
     uid,
     lang,
     mId,
+    translations,
+    pending,
     // A cookie we could not use is not a session: render the guest view, and
     // let `authExpired` explain why and offer the way back in.
     tok: tok !== false && !authExpired,

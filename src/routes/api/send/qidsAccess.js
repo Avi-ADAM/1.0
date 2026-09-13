@@ -9,6 +9,18 @@
 
 export const qidsAccess = {
   '85levHubSummary': { allow: ['user', 'serviceAdmin'] },
+  // Daily digest (PLAN_DAILY_DIGEST, qidsDigest.js). The `$idL` reads answer
+  // only "me" (/api/send rebinds idL to the session), so they may be `user`.
+  // The `$uid` twins take any id and 346 enumerates the site's users — they are
+  // serviceAdmin only, and must never be widened to user or apiKey.
+  '340digestWork': { allow: ['user', 'serviceAdmin'] },
+  '341digestSuggestions': { allow: ['user', 'serviceAdmin'] },
+  '342digestWhatsNew': { allow: ['user', 'serviceAdmin'] },
+  '343digestWorkFor': { allow: ['serviceAdmin'] },
+  '344digestSuggestionsFor': { allow: ['serviceAdmin'] },
+  '345digestWhatsNewFor': { allow: ['serviceAdmin'] },
+  '346digestAudience': { allow: ['serviceAdmin'] },
+  '347digestHubSummaryFor': { allow: ['serviceAdmin'] },
   '87levSliceSheirutp': { allow: ['user', 'serviceAdmin'] },
   '87levSliceSales': { allow: ['user', 'serviceAdmin'] },
   '87levSliceFiapp': { allow: ['user', 'serviceAdmin'] },
@@ -593,4 +605,19 @@ export const qidsAccess = {
   // translation of someone's bio is not API surface. Writes go through the
   // `cacheTranslations` action (P2), never through a qid.
   '312translationsByHash': { allow: ['user', 'serviceAdmin'] },
+  // The write half of the UGC translation cache. serviceAdmin only, and not
+  // because it is unreferenced: whoever can write this cache can put words in
+  // another member's mouth on every page that renders their text. Reached only
+  // through the `cacheTranslations` action (PLAN_UGC_TRANSLATION §5.4).
+  '313translationsByKeys': { allow: ['serviceAdmin'] },
+  '314createTextTranslation': { allow: ['serviceAdmin'] },
+  // The backfill walker's corpus query (PLAN_UGC_TRANSLATION §15.3). Same
+  // rows the public directory already shows, but paged over the whole corpus —
+  // a batch job's query, not a page's, so it stays closed to members.
+  '315backfillMissions': { allow: ['serviceAdmin'] },
+  '316translationCoverage': { allow: ['serviceAdmin'] },
+  // The P4 corpora — resources, rikmot, products. Same rule as 315.
+  '317backfillResources': { allow: ['serviceAdmin'] },
+  '318backfillProjects': { allow: ['serviceAdmin'] },
+  '319backfillProducts': { allow: ['serviceAdmin'] },
 };

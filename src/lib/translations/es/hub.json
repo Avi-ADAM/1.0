@@ -26,5 +26,27 @@
     "moach": "Cerebro",
     "me": "Mi perfil",
     "feed": "Esperándote"
+  },
+  "brief": {
+    "title": "Resumen diario",
+    "sub": "Lo que tienes hoy",
+    "missions": "misiones activas",
+    "running": "en curso ahora",
+    "notStarted": "sin empezar",
+    "tasks": "tareas abiertas",
+    "overdue": "atrasadas",
+    "dueSoon": "para hoy o mañana",
+    "whatsNew": "novedades en tus rikmot desde ayer",
+    "suggestions": "sugerencias para ti",
+    "fresh": "nuevas",
+    "dormantSoon": "Sin actividad — en {{count}} días se abrirá una propuesta para liberarla",
+    "dormantTomorrow": "Sin actividad — mañana se abrirá una propuesta para liberarla",
+    "partial": "Parte del resumen no se pudo cargar ahora",
+    "kinds": {
+      "missions": "misiones",
+      "resources": "recursos",
+      "products": "productos",
+      "sales": "ventas"
+    }
   }
 }

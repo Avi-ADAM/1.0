@@ -269,7 +269,11 @@
   "list": {
     "myProjects": "הריקמות שלי",
     "choose": "בחירת ריקמה",
-    "createNew": "יצירת ריקמה חדשה"
+    "createNew": "יצירת ריקמה חדשה",
+    "search": "חיפוש ריקמה…",
+    "clearSearch": "ניקוי החיפוש",
+    "noMatch": "אין ריקמה בשם הזה",
+    "showing": "מציג {{count}} מתוך {{total}}"
   },
   "guide": {
     "header": "מדריך למוח הריקמה",

@@ -1,5 +1,6 @@
 import { sendToSer } from '$lib/send/sendToSer.js';
 import { isAuthFailure } from '$lib/server/session.js';
+import { translateSurface, resourceDetailGroups } from '$lib/server/translation/surfaces.js';
 
 // The page resolves these with $t — the server has no per-request locale of
 // its own to render them in.
@@ -76,7 +77,7 @@ async function awaitapi(mId, lang, tok, fetch) {
   }
 }
 
-export async function load({ locals, params, fetch }) {
+export async function load({ locals, params, fetch, cookies }) {
   const mId = params.id;
   const lang = locals.lang;
   const tok = locals.tok;
@@ -85,10 +86,24 @@ export async function load({ locals, params, fetch }) {
 
   const { alld, authExpired } = await awaitapi(mId, lang, tok, fetch);
 
+  // UGC translation (PLAN_UGC_TRANSLATION §7.1) — the resource's own page. The
+  // directory already bought the name and the rikma's name; a description
+  // short enough not to be cut on the card is the same string here too. One
+  // extra query at most, never an LLM call, and a miss renders source.
+  const { translations, pending } = await translateSurface(
+    'resourceDetail',
+    resourceDetailGroups(alld?.archived === false ? { id: mId, attributes: alld } : null),
+    lang,
+    fetch,
+    cookies.get('autoTranslate')
+  );
+
   return {
     uid,
     lang,
     mId,
+    translations,
+    pending,
     // Cookies we could not use are not a session — render the guest view and
     // let `authExpired` explain why (see the banner on the page).
     tok: tok !== false && !authExpired,

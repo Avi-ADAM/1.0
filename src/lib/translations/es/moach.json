@@ -269,7 +269,11 @@
   "list": {
     "myProjects": "Mis rikmas",
     "choose": "Elegir una rikma",
-    "createNew": "Crear una nueva rikma"
+    "createNew": "Crear una nueva rikma",
+    "search": "Buscar rikma…",
+    "clearSearch": "Borrar búsqueda",
+    "noMatch": "Ninguna rikma coincide",
+    "showing": "Mostrando {{count}} de {{total}}"
   },
   "guide": {
     "header": "Guía del cerebro de la rikmá",

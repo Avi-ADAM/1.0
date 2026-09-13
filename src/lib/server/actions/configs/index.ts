@@ -69,6 +69,7 @@ import {
   createPlanBoardFromTextAction,
   seedPlanBoardsAction
 } from './planningRuns.js';
+import { cacheTranslationsConfig } from './cacheTranslations.js';
 import { requestSuggestionConfig } from './requestSuggestion.js';
 import { requestWishMissionConfig } from './requestWishMission.js';
 import { requestWishResourceConfig } from './requestWishResource.js';
@@ -319,6 +320,9 @@ export function registerAllActions(): void {
   registerAction(expandPlanBoardAction);
   registerAction(createPlanBoardFromTextAction);
   registerAction(seedPlanBoardsAction);
+
+  // UGC translation cache (PLAN_UGC_TRANSLATION P2) - service principal only
+  registerAction(cacheTranslationsConfig);
   registerAction(requestSuggestionConfig);
   registerAction(requestWishMissionConfig);
   registerAction(requestWishResourceConfig);
@@ -511,5 +515,6 @@ export {
   voteOnDecisionConfig,
   getDecisionDetailsConfig,
   proposeSheirutConfig,
-  requestSheirutJoinConfig
+  requestSheirutJoinConfig,
+  cacheTranslationsConfig
 };

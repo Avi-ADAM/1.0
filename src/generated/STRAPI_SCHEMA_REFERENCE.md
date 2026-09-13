@@ -1,6 +1,6 @@
 # Strapi GraphQL Schema Reference
 > Auto-generated from `src/generated/graphql.ts`
-> Last updated: 2026-09-05
+> Last updated: 2026-09-08
 > Source: `codegen.ts` → `http://localhost:1337/graphql`
 
 This file provides a compact reference of all types available from the Strapi backend.
@@ -23,7 +23,7 @@ import type { StrapiEntity, StrapiCollection, StrapiMedia } from '$lib/types/str
 
 ---
 
-## 🏗️ Content Type Entities (125)
+## 🏗️ Content Type Entities (126)
 
 These are the main content types in the Strapi backend.
 
@@ -1204,6 +1204,7 @@ These are the main content types in the Strapi backend.
 | `createStipendProgram` | `Maybe<StipendProgramEntityResponse>` |
 | `createTafkidim` | `Maybe<TafkidimEntityResponse>` |
 | `createTafkidimLocalization` | `Maybe<TafkidimEntityResponse>` |
+| `createTextTranslation` | `Maybe<TextTranslationEntityResponse>` |
 | `createTikunolam` | `Maybe<TikunolamEntityResponse>` |
 | `createTikunolamLocalization` | `Maybe<TikunolamEntityResponse>` |
 | `createTimegrama` | `Maybe<TimegramaEntityResponse>` |
@@ -1321,6 +1322,7 @@ These are the main content types in the Strapi backend.
 | `deleteStipendPledge` | `Maybe<StipendPledgeEntityResponse>` |
 | `deleteStipendProgram` | `Maybe<StipendProgramEntityResponse>` |
 | `deleteTafkidim` | `Maybe<TafkidimEntityResponse>` |
+| `deleteTextTranslation` | `Maybe<TextTranslationEntityResponse>` |
 | `deleteTikunolam` | `Maybe<TikunolamEntityResponse>` |
 | `deleteTimegrama` | `Maybe<TimegramaEntityResponse>` |
 | `deleteTimer` | `Maybe<TimerEntityResponse>` |
@@ -1440,6 +1442,7 @@ These are the main content types in the Strapi backend.
 | `updateStipendPledge` | `Maybe<StipendPledgeEntityResponse>` |
 | `updateStipendProgram` | `Maybe<StipendProgramEntityResponse>` |
 | `updateTafkidim` | `Maybe<TafkidimEntityResponse>` |
+| `updateTextTranslation` | `Maybe<TextTranslationEntityResponse>` |
 | `updateTikunolam` | `Maybe<TikunolamEntityResponse>` |
 | `updateTimegrama` | `Maybe<TimegramaEntityResponse>` |
 | `updateTimer` | `Maybe<TimerEntityResponse>` |
@@ -2264,6 +2267,8 @@ These are the main content types in the Strapi backend.
 | `stipendPrograms` | `Maybe<StipendProgramEntityResponseCollection>` |
 | `tafkidim` | `Maybe<TafkidimEntityResponse>` |
 | `tafkidims` | `Maybe<TafkidimEntityResponseCollection>` |
+| `textTranslation` | `Maybe<TextTranslationEntityResponse>` |
+| `textTranslations` | `Maybe<TextTranslationEntityResponseCollection>` |
 | `tikunolam` | `Maybe<TikunolamEntityResponse>` |
 | `tikunolams` | `Maybe<TikunolamEntityResponseCollection>` |
 | `timegrama` | `Maybe<TimegramaEntityResponse>` |
@@ -2888,6 +2893,24 @@ These are the main content types in the Strapi backend.
 | `updatedAt` | `Maybe<Scalars['DateTime']['output']>` |
 | `users_permissions_users` | `Maybe<UsersPermissionsUserRelationResponseCollection>` |
 
+### TextTranslation
+| Field | Type |
+|-------|------|
+| `createdAt` | `Maybe<Scalars['DateTime']['output']>` |
+| `engine` | `Maybe<Enum_Texttranslation_Engine>` |
+| `firstSeenOn` | `Maybe<Scalars['String']['output']>` |
+| `hash` | `Scalars['String']['output']` |
+| `hits` | `Maybe<Scalars['Int']['output']>` |
+| `key` | `Scalars['String']['output']` |
+| `mode` | `Maybe<Enum_Texttranslation_Mode>` |
+| `model` | `Maybe<Scalars['String']['output']>` |
+| `quality` | `Maybe<Enum_Texttranslation_Quality>` |
+| `source` | `Maybe<Scalars['String']['output']>` |
+| `srcLang` | `Enum_Texttranslation_Srclang` |
+| `text` | `Maybe<Scalars['String']['output']>` |
+| `tgtLang` | `Enum_Texttranslation_Tgtlang` |
+| `updatedAt` | `Maybe<Scalars['DateTime']['output']>` |
+
 ### Tikunolam
 | Field | Type |
 |-------|------|
@@ -3126,6 +3149,7 @@ These are the main content types in the Strapi backend.
 | `askms` | `Maybe<AskmRelationResponseCollection>` |
 | `asks` | `Maybe<AskRelationResponseCollection>` |
 | `askwants` | `Maybe<AskwantRelationResponseCollection>` |
+| `autoTranslate` | `Maybe<Enum_Userspermissionsuser_Autotranslate>` |
 | `auto_created_via` | `Maybe<Enum_Userspermissionsuser_Auto_Created_Via>` |
 | `availability_pref` | `Maybe<Scalars['JSON']['output']>` |
 | `bio` | `Maybe<Scalars['String']['output']>` |
@@ -4450,7 +4474,7 @@ These are Strapi components (reusable field groups).
 
 ---
 
-## 📝 Input Types (123)
+## 📝 Input Types (124)
 
 Used for creating/updating content.
 
@@ -6684,6 +6708,22 @@ Used for creating/updating content.
 | `skills` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `users_permissions_users` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 
+### TextTranslationInput
+| Field | Type |
+|-------|------|
+| `engine` | `InputMaybe<Enum_Texttranslation_Engine>` |
+| `firstSeenOn` | `InputMaybe<Scalars['String']['input']>` |
+| `hash` | `InputMaybe<Scalars['String']['input']>` |
+| `hits` | `InputMaybe<Scalars['Int']['input']>` |
+| `key` | `InputMaybe<Scalars['String']['input']>` |
+| `mode` | `InputMaybe<Enum_Texttranslation_Mode>` |
+| `model` | `InputMaybe<Scalars['String']['input']>` |
+| `quality` | `InputMaybe<Enum_Texttranslation_Quality>` |
+| `source` | `InputMaybe<Scalars['String']['input']>` |
+| `srcLang` | `InputMaybe<Enum_Texttranslation_Srclang>` |
+| `text` | `InputMaybe<Scalars['String']['input']>` |
+| `tgtLang` | `InputMaybe<Enum_Texttranslation_Tgtlang>` |
+
 ### TikunolamInput
 | Field | Type |
 |-------|------|
@@ -6861,6 +6901,7 @@ Used for creating/updating content.
 | `askms` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `asks` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `askwants` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
+| `autoTranslate` | `InputMaybe<Enum_Userspermissionsuser_Autotranslate>` |
 | `auto_created_via` | `InputMaybe<Enum_Userspermissionsuser_Auto_Created_Via>` |
 | `availability_pref` | `InputMaybe<Scalars['JSON']['input']>` |
 | `bio` | `InputMaybe<Scalars['String']['input']>` |
@@ -7079,12 +7120,12 @@ Used for creating/updating content.
 
 ---
 
-## 🔍 Filter Input Types (112)
+## 🔍 Filter Input Types (113)
 
 Used for querying/filtering content. Each content type has a corresponding filter input.
 
 <details>
-<summary>Click to expand all 112 filter types</summary>
+<summary>Click to expand all 113 filter types</summary>
 
 #### ActFiltersInput
 Fields: `and`, `createdAt`, `dateF`, `dateS`, `des`, `externalId`, `forums`, `hashivut`, `id`, `isAssigned`, `link`, `locale`, `localizations`, `mesimabetahaliches`, `my`, `myIshur`, `naasa`, `negopendmissions`, `not`, `open_mission`, `or`, `partofs`, `pendm`, `project`, `publishedAt`, `shem`, `source`, `status`, `tafkidims`, `taskdis`, `timegrama`, `timers`, `updatedAt`, `userAndIshur`, `vali`, `valiIshur`
@@ -7368,6 +7409,9 @@ Fields: `and`, `costShare`, `createdAt`, `decision`, `descrip`, `end`, `equityMu
 #### TafkidimFiltersInput
 Fields: `acts`, `and`, `createdAt`, `descrip`, `finnished_missions`, `id`, `locale`, `localizations`, `mesimabetahaliches`, `missions`, `negopendmissions`, `not`, `open_missions`, `or`, `pendms`, `projects`, `publishedAt`, `roleDescription`, `skills`, `updatedAt`, `users_permissions_users`
 
+#### TextTranslationFiltersInput
+Fields: `and`, `createdAt`, `engine`, `firstSeenOn`, `hash`, `hits`, `id`, `key`, `mode`, `model`, `not`, `or`, `quality`, `source`, `srcLang`, `text`, `tgtLang`, `updatedAt`
+
 #### TikunolamFiltersInput
 Fields: `amort`, `amortf`, `amorth`, `amorts`, `amortt`, `and`, `createdAt`, `email`, `id`, `locale`, `localizations`, `more`, `name`, `not`, `notes`, `or`, `publishedAt`, `updatedAt`
 
@@ -7399,7 +7443,7 @@ Fields: `action`, `and`, `createdAt`, `id`, `not`, `or`, `role`, `updatedAt`
 Fields: `and`, `createdAt`, `description`, `id`, `name`, `not`, `or`, `permissions`, `type`, `updatedAt`, `users`
 
 #### UsersPermissionsUserFiltersInput
-Fields: `acts`, `actsVali`, `and`, `api_keys`, `arr1`, `arrdate`, `askeds`, `askms`, `asks`, `askwants`, `auto_created_via`, `availability_pref`, `bio`, `blocked`, `chezin`, `city`, `confirmationToken`, `confirmed`, `createdAt`, `cuntries`, `cv_extracted_at`, `cv_extraction`, `deals`, `declined`, `declinedByP`, `declinedm`, `device_token`, `discordlink`, `email`, `fblink`, `filtertags`, `finiapruvals`, `finnished_missions`, `forum_last_seens`, `frd`, `free_person`, `githublink`, `haamadas`, `halukasend`, `halukasres`, `haskama`, `haskamac`, `haskamaz`, `hatzaas`, `hervachti`, `iGotMOneyForSheirut`, `id`, `isSigned`, `lang`, `lat`, `levManualAlready`, `lng`, `location`, `machshirs`, `mashaabims`, `mashabetahaliches`, `matanot_recipe_missions`, `matanot_recipe_resources`, `match_suggestions`, `mesimabetahaliches`, `messages`, `mission_offers`, `missions_i_can_do`, `moachManualAlready`, `nego_mashes`, `negopendmissions`, `negotiations`, `negotiationsIparticipante`, `noMail`, `noMoachGuide`, `noOfHoursProject1`, `not`, `onboarding_status`, `onboarding_track`, `open_missions`, `or`, `owned_matanots`, `password`, `pendms`, `pendmsforme`, `personal_project`, `pgishas`, `pgishasPendStrat`, `pgishauserpends`, `pgishausers`, `pledges`, `pmashes`, `positionsAuthor`, `preferCards`, `pricing_pref`, `profilManualAlready`, `project_plan_boards`, `projects_1s`, `provider`, `radius`, `ratson_proposals`, `ratson_shares`, `ratsons`, `resetPasswordToken`, `resource_bookings`, `rikmashes`, `rishonvesopen`, `role`, `sales`, `sales_as_customer`, `sales_reported`, `sheirutnegos`, `sheirutpends`, `sheiruts`, `sheiruts_iCanGetMonay`, `shekelsPerHoureProject1`, `site_share_contributions`, `skills`, `socketId`, `sphmin`, `sps`, `stipend_payments_funded`, `stipend_payments_received`, `stipend_pledges_funded`, `stipend_pledges_received`, `stipend_programs_funded`, `tafkidims`, `telegramId`, `timeForVid`, `timers`, `twiterlink`, `updatedAt`, `username`, `vallues`, `videoval`, `votes`, `wants`, `welcom_tops`, `work_ways`, `zohars`
+Fields: `acts`, `actsVali`, `and`, `api_keys`, `arr1`, `arrdate`, `askeds`, `askms`, `asks`, `askwants`, `autoTranslate`, `auto_created_via`, `availability_pref`, `bio`, `blocked`, `chezin`, `city`, `confirmationToken`, `confirmed`, `createdAt`, `cuntries`, `cv_extracted_at`, `cv_extraction`, `deals`, `declined`, `declinedByP`, `declinedm`, `device_token`, `discordlink`, `email`, `fblink`, `filtertags`, `finiapruvals`, `finnished_missions`, `forum_last_seens`, `frd`, `free_person`, `githublink`, `haamadas`, `halukasend`, `halukasres`, `haskama`, `haskamac`, `haskamaz`, `hatzaas`, `hervachti`, `iGotMOneyForSheirut`, `id`, `isSigned`, `lang`, `lat`, `levManualAlready`, `lng`, `location`, `machshirs`, `mashaabims`, `mashabetahaliches`, `matanot_recipe_missions`, `matanot_recipe_resources`, `match_suggestions`, `mesimabetahaliches`, `messages`, `mission_offers`, `missions_i_can_do`, `moachManualAlready`, `nego_mashes`, `negopendmissions`, `negotiations`, `negotiationsIparticipante`, `noMail`, `noMoachGuide`, `noOfHoursProject1`, `not`, `onboarding_status`, `onboarding_track`, `open_missions`, `or`, `owned_matanots`, `password`, `pendms`, `pendmsforme`, `personal_project`, `pgishas`, `pgishasPendStrat`, `pgishauserpends`, `pgishausers`, `pledges`, `pmashes`, `positionsAuthor`, `preferCards`, `pricing_pref`, `profilManualAlready`, `project_plan_boards`, `projects_1s`, `provider`, `radius`, `ratson_proposals`, `ratson_shares`, `ratsons`, `resetPasswordToken`, `resource_bookings`, `rikmashes`, `rishonvesopen`, `role`, `sales`, `sales_as_customer`, `sales_reported`, `sheirutnegos`, `sheirutpends`, `sheiruts`, `sheiruts_iCanGetMonay`, `shekelsPerHoureProject1`, `site_share_contributions`, `skills`, `socketId`, `sphmin`, `sps`, `stipend_payments_funded`, `stipend_payments_received`, `stipend_pledges_funded`, `stipend_pledges_received`, `stipend_programs_funded`, `tafkidims`, `telegramId`, `timeForVid`, `timers`, `twiterlink`, `updatedAt`, `username`, `vallues`, `videoval`, `votes`, `wants`, `welcom_tops`, `work_ways`, `zohars`
 
 #### VallueFiltersInput
 Fields: `and`, `createdAt`, `decisions`, `decisionsles`, `descrip`, `id`, `locale`, `localizations`, `not`, `open_missions`, `or`, `pendms`, `projects`, `publishedAt`, `ratsons`, `updatedAt`, `users`, `valueName`
@@ -7426,12 +7470,12 @@ Fields: `allSubmited`, `and`, `createdAt`, `done`, `id`, `mesimabetahalich`, `no
 
 ---
 
-## 📦 Entity Response Types (433)
+## 📦 Entity Response Types (436)
 
 Wrapper types for GraphQL responses.
 
 <details>
-<summary>Click to expand all 433 response types</summary>
+<summary>Click to expand all 436 response types</summary>
 
 - **ActEntity**: `attributes: Maybe<Act>`, `id: Maybe<Scalars['ID']['output']>`
 - **ActEntityResponse**: `data: Maybe<ActEntity>`
@@ -7797,6 +7841,9 @@ Wrapper types for GraphQL responses.
 - **TafkidimEntityResponse**: `data: Maybe<TafkidimEntity>`
 - **TafkidimEntityResponseCollection**: `data: Array<TafkidimEntity>`, `meta: ResponseCollectionMeta`
 - **TafkidimRelationResponseCollection**: `data: Array<TafkidimEntity>`
+- **TextTranslationEntity**: `attributes: Maybe<TextTranslation>`, `id: Maybe<Scalars['ID']['output']>`
+- **TextTranslationEntityResponse**: `data: Maybe<TextTranslationEntity>`
+- **TextTranslationEntityResponseCollection**: `data: Array<TextTranslationEntity>`, `meta: ResponseCollectionMeta`
 - **TikunolamEntity**: `attributes: Maybe<Tikunolam>`, `id: Maybe<Scalars['ID']['output']>`
 - **TikunolamEntityResponse**: `data: Maybe<TikunolamEntity>`
 - **TikunolamEntityResponseCollection**: `data: Array<TikunolamEntity>`, `meta: ResponseCollectionMeta`
@@ -7870,10 +7917,10 @@ Wrapper types for GraphQL responses.
 
 ---
 
-## 🔢 Enum Types (138)
+## 🔢 Enum Types (144)
 
 <details>
-<summary>Click to expand all 138 enum types</summary>
+<summary>Click to expand all 144 enum types</summary>
 
 - **Enum_Act_Hashivut**: 
 - **Enum_Act_Source**: 
@@ -8005,7 +8052,13 @@ Wrapper types for GraphQL responses.
 - **Enum_Stipendprogram_Mode**: 
 - **Enum_Stipendprogram_Scope**: 
 - **Enum_Stipendprogram_Status**: 
+- **Enum_Texttranslation_Engine**: 
+- **Enum_Texttranslation_Mode**: 
+- **Enum_Texttranslation_Quality**: 
+- **Enum_Texttranslation_Srclang**: 
+- **Enum_Texttranslation_Tgtlang**: 
 - **Enum_Tosplit_Split_Origin**: 
+- **Enum_Userspermissionsuser_Autotranslate**: 
 - **Enum_Userspermissionsuser_Auto_Created_Via**: 
 - **Enum_Userspermissionsuser_Frd**: 
 - **Enum_Userspermissionsuser_Lang**: 
@@ -8028,7 +8081,7 @@ Wrapper types for GraphQL responses.
 ```
 src/
 ├── generated/
-│   ├── graphql.ts              # Auto-generated types (codegen) - 21052 lines
+│   ├── graphql.ts              # Auto-generated types (codegen) - 21198 lines
 │   ├── index.ts                # Re-export hub
 │   └── STRAPI_SCHEMA_REFERENCE.md  # This file (AI agent reference)
 ├── lib/
