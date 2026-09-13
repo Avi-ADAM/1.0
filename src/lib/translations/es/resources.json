@@ -6,8 +6,8 @@
     "single": "Un solo recurso",
     "block_dates": "Bloquear fechas",
     "back_to_profile": "Volver al perfil",
-    "project_title": "Calendario de recursos del tejido",
-    "project_sub": "Qué tiene el tejido, hasta cuándo y qué presta hacia fuera"
+    "project_title": "Calendario de recursos de la rikma",
+    "project_sub": "Qué tiene la rikma, hasta cuándo y qué presta hacia fuera"
   },
   "calendar": {
     "view_label": "Vista",
@@ -17,7 +17,7 @@
     "filter_resource": "Recurso",
     "filter_clear": "Limpiar",
     "filter_party": "En manos de",
-    "party_project": "Tejido",
+    "party_project": "Rikma",
     "party_sheirut": "Cliente",
     "party_user": "Persona",
     "party_none": "Bloqueo propio",
@@ -36,7 +36,7 @@
     "cancelled": "Cancelado"
   },
   "source": {
-    "rikma": "Tejido",
+    "rikma": "Rikma",
     "concierge": "Cliente",
     "personal": "Personal",
     "blackout": "Bloqueado",

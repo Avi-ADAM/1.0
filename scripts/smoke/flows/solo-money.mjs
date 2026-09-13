@@ -81,13 +81,13 @@ const run = async () => {
 
   // ── 1. create the rikma ────────────────────────────────────────────────────
   await visit(page, '/me');
-  await page.getByRole('button', { name: /יצירת ריקמה חדשה/ }).first().click();
+  await page.getByRole('button', { name: /יצירת רקמה חדשה/ }).first().click();
   await page.waitForTimeout(4000);
   await page.fill('input[name="des"]', RIKMA_NAME);
   const editors = page.locator('[contenteditable="true"]');
   for (let i = 0; i < Math.min(await editors.count(), 2); i++) {
     await editors.nth(i).click();
-    await page.keyboard.type(i === 0 ? 'ריקמה שנוצרה על ידי בדיקה אוטומטית.' : 'תיאור פנימי.');
+    await page.keyboard.type(i === 0 ? 'רקמה שנוצרה על ידי בדיקה אוטומטית.' : 'תיאור פנימי.');
     await page.waitForTimeout(300);
   }
   await page.fill('input[name="de"]', 'https://example.com');

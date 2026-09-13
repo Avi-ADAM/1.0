@@ -1271,7 +1271,7 @@
           rikn = meData[meData.length - 1].projectName;
         }
         let text = `שלום ${usernames} ! יש לך הצעה חדשה: ביצוע משימה  ${
-          rikn !== '0' ? `ברקמת ${rikn}` : 'בריקמה'
+          rikn !== '0' ? `ברקמת ${rikn}` : 'ברקמה'
         }`;
         const head = { he: '1💗1 הצעה חדשה', en: '1💗1 new suggestion' };
         nutifi(head[$lang], text, 'lev');
@@ -2312,9 +2312,9 @@
         }
         let linkop = 'lev';
         let text = `שלום ${usernames} ! יש לך הצעה חדשה: שיתוף משאב  ${
-          rikn !== '0' ? `ברקמת ${rikn}` : 'בריקמה'
+          rikn !== '0' ? `ברקמת ${rikn}` : 'ברקמה'
         }`;
-        nutifi('1💗1 ריקמה חדשה', text, linkop);
+        nutifi('1💗1 רקמה חדשה', text, linkop);
       }
     }
   }
@@ -2781,7 +2781,7 @@
         //    let img = 'https://res.cloudinary.com/love1/image/upload/v1648817031/maskable_icon_x128_tt2kgj.png';
         let text = `שלום ${usernames} ! הצטרפת בהצלחה לרקמת ${rikn}`;
         let linkop = 'lev';
-        nutifi('1💗1 ריקמה חדשה', text, linkop);
+        nutifi('1💗1 רקמה חדשה', text, linkop);
 
         /*   navigator.serviceWorker.register('sw.js');
             Notification.requestPermission(function(result) {

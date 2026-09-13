@@ -3,7 +3,7 @@ import { bookingsFromLegacy, resourcesFromSps } from './bookingsFromLegacy.js';
 
 const NOW = new Date('2026-04-10T00:00:00Z');
 
-const project = (id = 11, name = 'ריקמת האור') => ({
+const project = (id = 11, name = 'רקמת האור') => ({
   data: { id, attributes: { projectName: name, profilePic: { data: { attributes: { url: '/p.png' } } } } }
 });
 
@@ -66,7 +66,7 @@ describe('bookingsFromLegacy', () => {
       source: 'rikma',
       quantity: 1
     });
-    expect(booking.counterparty).toEqual({ kind: 'project', id: '11', name: 'ריקמת האור', pic: '/p.png' });
+    expect(booking.counterparty).toEqual({ kind: 'project', id: '11', name: 'רקמת האור', pic: '/p.png' });
   });
 
   it('reads a rental out of the archive — the only record a `rent` grant leaves', () => {

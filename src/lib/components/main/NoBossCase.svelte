@@ -144,7 +144,7 @@
     {/if}
   </section>
 
-  <!-- ===== הדרך השלישית: שכיר / יזם בודד / ריקמה ===== -->
+  <!-- ===== הדרך השלישית: שכיר / יזם בודד / רקמה ===== -->
   <section
     class="w-full max-w-xl mt-10 animate-fade-in-up"
     style="font-family:'Sababa',sans-serif;"

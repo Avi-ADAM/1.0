@@ -99,7 +99,7 @@ async function xyd () {
                 {#each data.work_ways.data as rol}<p onmouseenter={()=>hover($t('lev.cards.common.wwneed'))} onmouseleave={()=>hover("0")} class="m-0" style="text-shadow:none;" >
               <Tile bg="gold"   word={rol.attributes.workWayName}/></p>{/each}
     </div>{/if}
-           <button onclick={()=>project(data.project.data.id)} class="px-4 hover:text-barbi text-gold bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink rounded text-sm mt-2 border-2 border-gold" >לצפיה בריקמה </button >
+           <button onclick={()=>project(data.project.data.id)} class="px-4 hover:text-barbi text-gold bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink rounded text-sm mt-2 border-2 border-gold" >לצפיה ברקמה </button >
 
     </div>
   
@@ -158,14 +158,14 @@ async function xyd () {
               {/if}
              </td>
         </tr><tr>
-          <th>הערות יחודיות לריקמה שלי</th>
+          <th>הערות יחודיות לרקמה שלי</th>
           <td>
             {#if data.hearotMeyuchadot != "undefined" }
             {data.hearotMeyuchadot}
             {/if}
            </td>
       </tr><tr>
-        <th>קישורים יחודיים לריקמה שלי</th>
+        <th>קישורים יחודיים לרקמה שלי</th>
         <td>          {#if data.privatlinks != "undefined"} 
 
           {data.privatlinks} 

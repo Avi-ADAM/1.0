@@ -151,7 +151,7 @@ export const counterOnAskConfig: ActionConfig = {
     recipients: { type: 'specificUsers', config: { userIdsParam: 'recipientIds' } },
     templates: {
       title: { he: 'הצעת ביניים למשימה', en: 'Intermediate proposal for a mission' },
-      body: { he: 'הוגשה הצעת ביניים על משימה בריקמה', en: 'An intermediate proposal was submitted for a mission' },
+      body: { he: 'הוגשה הצעת ביניים על משימה ברקמה', en: 'An intermediate proposal was submitted for a mission' },
     },
     channels: ['socket'],
     metadata: { type: 'base', url: 'lev' },

@@ -5,13 +5,13 @@
 
 ## Context — למה זה נבנה
 
-לחברי ריקמה יש אתרי מכירה משלהם (חנות, דף נחיתה, מערכת סליקה). היום כל
+לחברי רקמה יש אתרי מכירה משלהם (חנות, דף נחיתה, מערכת סליקה). היום כל
 מכירה כזו מחייבת דיווח ידני ב‑1lev1. המטרה: **שרת API "טיפש" (REST פשוט,
 לא MCP)** שמערכת צד־שלישי קוראת לו אחרי סליקה ומדווחת את המכירה אוטומטית.
 
-בעמוד המוצרים של הריקמה (מוח ← מכירות) המשתמש יקבל:
+בעמוד המוצרים של הרקמה (מוח ← מכירות) המשתמש יקבל:
 
-1. **מפתח API שמוגדר רק לריקמה הזו** (scoped key).
+1. **מפתח API שמוגדר רק לרקמה הזו** (scoped key).
 2. **פיסת קוד מוכנה להעתקה** — שתילה באתר שלו (למשל ב‑callback של הסליקה)
    שולחת אלינו את פרטי המכירה.
 3. **הדרכה קצרה על המשתנים** שהוא צריך לחבר מהמערכת שלו.
@@ -32,16 +32,16 @@
 ## מיפוי הקיים — על מה רוכבים
 
 הכלל כאן זהה ל‑PLAN_sale_holder_consent: **לא ממציאים מסלול מכירה חדש**.
-כל התשתית כבר קיימת, רק חסרה לה כניסה חיצונית ו‑scoping לריקמה.
+כל התשתית כבר קיימת, רק חסרה לה כניסה חיצונית ו‑scoping לרקמה.
 
 | רכיב קיים | קובץ | מה הוא נותן לנו |
 |---|---|---|
 | מפתחות API (user-scoped) | `src/lib/server/apiKeys.ts` | יצירה (`1lev1_{uid36}_{rand}`), HMAC‑hash, `verifyApiKey` עם cache |
 | CRUD מפתחות | `src/routes/api/api-keys/+server.ts` | יצירה/רשימה/מחיקה מול Strapi, raw מוחזר פעם אחת בלבד |
-| UI ניהול מפתחות (משתמש) | `src/lib/components/userPr/api-keys.svelte` | תבנית UI לניהול מפתחות — נשכפל לרמת ריקמה |
+| UI ניהול מפתחות (משתמש) | `src/lib/components/userPr/api-keys.svelte` | תבנית UI לניהול מפתחות — נשכפל לרמת רקמה |
 | דוגמת endpoint מבוסס‑מפתח | `src/routes/api/v1/actions/+server.ts` | התבנית המדויקת: Bearer→`verifyApiKey`→whitelist→`actionService.executeAction` עם `ADMINMONTHER` |
 | פעולת דיווח מכירה | `src/lib/server/actions/configs/createSale.ts` | **נקודת החנק היחידה**: יצירת Sale, הפחתת מלאי, Monter למנויים, ו‑saleClaim consent כשהכסף אצל אחר |
-| עמוד מוצרים בריקמה | `src/routes/(reg)/moach/[projectId]/sales/+page.svelte` + `src/lib/components/prPr/hamatanot.svelte` | הנקודה שבה נציג את פאנל האינטגרציה |
+| עמוד מוצרים ברקמה | `src/routes/(reg)/moach/[projectId]/sales/+page.svelte` + `src/lib/components/prPr/hamatanot.svelte` | הנקודה שבה נציג את פאנל האינטגרציה |
 | סכמת api-key ב‑Strapi | `1.0b/src/api/api-key/.../schema.json` | `name`, `key_hash`, `key_prefix`, `users_permissions_user` — **חסר** קשר לפרויקט |
 
 ### עקרון‑על שחייבים לשמר — הסכמת מחזיק־הכסף
@@ -64,11 +64,11 @@
 ```
 אתר הלקוח (אחרי סליקה, browser או server)
         │  POST https://1lev1.com/api/v1/sales
-        │  Authorization: Bearer 1lev1_xxx   (מפתח scoped לריקמה)
+        │  Authorization: Bearer 1lev1_xxx   (מפתח scoped לרקמה)
         ▼
 SvelteKit: src/routes/api/v1/sales/+server.ts   ← חדש
         │  1. verifyApiKey → משתמש + פרויקט + scope
-        │  2. ולידציה: מוצר שייך לריקמה, holder חבר ריקמה
+        │  2. ולידציה: מוצר שייך לרקמה, holder חבר רקמה
         │  3. אידמפוטנטיות: externalId כבר דווח? ⇒ 200 (לא כפול)
         │  4. actionService.executeAction('createSale', …)
         ▼
@@ -83,8 +83,8 @@ createSale.ts (ללא שינוי מהותי) → Strapi
 
 1. **`api-key`** מקבל:
    - `project` — relation manyToOne → `api::project.project`
-     (+ צד הפוך `api_keys` ב‑project). מפתח עם `project` ⇒ scoped לריקמה.
-   - `scopes` — json (למשל `["sales:report"]`). מפתח ריקמה נוצר עם scope
+     (+ צד הפוך `api_keys` ב‑project). מפתח עם `project` ⇒ scoped לרקמה.
+   - `scopes` — json (למשל `["sales:report"]`). מפתח רקמה נוצר עם scope
      הזה בלבד ולא מקבל שום יכולת אחרת (MCP/actions).
    - `allowed_origins` — json, רשימת דומיינים מותרים (אופציונלי, ל‑hardening).
    - `revoked` — boolean, ביטול רך בלי למחוק היסטוריה.
@@ -109,12 +109,12 @@ createSale.ts (ללא שינוי מהותי) → Strapi
 ### 1b. הרחבת `POST /api/api-keys`
 
 - מקבל אופציונלית `projectId`. כשנשלח:
-  - ולידציה שהמשתמש חבר בריקמה (qid `saleClaimProjectInfo` הקיים מספיק —
+  - ולידציה שהמשתמש חבר ברקמה (qid `saleClaimProjectInfo` הקיים מספיק —
     בודקים ש‑`userId ∈ user_1s`).
   - יצירה עם `project: projectId`, `scopes: ["sales:report"]`,
-    `name: "sales-api"` (מפתח אחד פעיל לריקמה+משתמש; יצירה חוזרת מחליפה,
+    `name: "sales-api"` (מפתח אחד פעיל לרקמה+משתמש; יצירה חוזרת מחליפה,
     כמו התנהגות ה‑MCP הקיימת).
-- `GET` יקבל `?projectId=` לרשימת מפתחות הריקמה (לתצוגה בפאנל).
+- `GET` יקבל `?projectId=` לרשימת מפתחות הרקמה (לתצוגה בפאנל).
 
 ### 1c. Endpoint חדש: `POST /api/v1/sales`
 
@@ -148,7 +148,7 @@ createSale.ts (ללא שינוי מהותי) → Strapi
 | `note` | ✖ | — | `Sale.note` |
 
 `projectId` **לא** מתקבל מהלקוח — הוא נגזר מהמפתח. זה מה שהופך את המפתח
-ל"מוגדר רק לריקמה הזו".
+ל"מוגדר רק לרקמה הזו".
 
 **זרימה**
 
@@ -184,7 +184,7 @@ createSale.ts (ללא שינוי מהותי) → Strapi
 - רישום `lastUsedAt` (עדכון אסינכרוני, לא חוסם את התשובה).
 - Rate-limit בסיסי בזיכרון per-key (למשל 60 בקשות/דקה) ⇒ `429`.
 
-## Phase 2 — UI בעמוד המוצרים של הריקמה (`1.0`)
+## Phase 2 — UI בעמוד המוצרים של הרקמה (`1.0`)
 
 קומפוננטה חדשה `src/lib/components/prPr/SalesApiIntegration.svelte`,
 נפתחת מכפתור/אקורדיון בעמוד `moach/[projectId]/sales` (ליד `Hamatanot`,
@@ -193,7 +193,7 @@ createSale.ts (ללא שינוי מהותי) → Strapi
 
 הפאנל, מלמעלה למטה:
 
-1. **מפתח API לריקמה** — מצב קיים (prefix + lastUsedAt + כפתור ביטול) או
+1. **מפתח API לרקמה** — מצב קיים (prefix + lastUsedAt + כפתור ביטול) או
    כפתור "צור מפתח". אחרי יצירה ה‑raw מוצג **פעם אחת** עם אזהרה והעתקה
    (אותה התנהגות כמו `userPr/api-keys.svelte`).
 2. **בחירת מוצר ומחזיק־כסף** — select מוצרים (`bmiData`) + select חבר
@@ -261,14 +261,14 @@ createSale.ts (ללא שינוי מהותי) → Strapi
 
 1. **מפתח בדפדפן הוא מפתח פומבי.** ההטמעה הקלה (snippet בדף תודה) חושפת
    את המפתח לכל מי שצופה במקור. לכן: (א) ההמלצה הראשית ב‑UI היא צד־שרת;
-   (ב) ה‑scope של המפתח הוא *דיווח מכירה לריקמה אחת בלבד* — התוקף הגרוע
+   (ב) ה‑scope של המפתח הוא *דיווח מכירה לרקמה אחת בלבד* — התוקף הגרוע
    ביותר יכול רק לייצר דיווחי־שווא; (ג) דיווח שבו holder ≠ בעל המפתח נעצר
    ממילא מאחורי הסכמת המחזיק (saleClaim); (ד) דיווח holder == בעל המפתח
    מגדיל את "הכסף שאצל" בעל המפתח — כלומר מזיק בעיקר למי שהמפתח שלו דלף,
    תמריץ עצמי לשמור עליו; (ה) `revoked` + יצירת מפתח חדש בלחיצה.
 2. **לעולם לא סומכים על `projectId` מהלקוח** — נגזר מהמפתח בלבד.
-3. ולידציה שהמוצר שייך לריקמה ושhoder חבר בה — בצד השרת, לא ב‑snippet.
-4. `externalId` ייחודי פר ריקמה מונע כפילויות retry של סליקה.
+3. ולידציה שהמוצר שייך לרקמה ושhoder חבר בה — בצד השרת, לא ב‑snippet.
+4. `externalId` ייחודי פר רקמה מונע כפילויות retry של סליקה.
 5. ה‑endpoint "טיפש" בכוונה: אין קריאת נתונים, אין מחיקה, אין עדכון —
    POST יחיד, whitelist של פעולה אחת.
 
@@ -286,7 +286,7 @@ createSale.ts (ללא שינוי מהותי) → Strapi
 - **Vitest**: ולידציית payload (טיפוסים/גבולות/תאריכים), מיפוי שדות אל
   פרמטרי `createSale`, לוגיקת אידמפוטנטיות (mock ל‑strapi executor) —
   באותו סגנון של `saleClaimShared.test.ts`.
-- **ידני/curl**: מפתח תקין ⇒ 201; מפתח של ריקמה אחרת ⇒ 403/404 על המוצר;
+- **ידני/curl**: מפתח תקין ⇒ 201; מפתח של רקמה אחרת ⇒ 403/404 על המוצר;
   `externalId` כפול ⇒ duplicated; holder אחר ⇒ נפתחת saleClaim ונשלחת
   התראה למחזיק; מפתח revoked ⇒ 401.
 
@@ -297,7 +297,7 @@ createSale.ts (ללא שינוי מהותי) → Strapi
 2. **מכירה בכמות ממוצר מוגבל שנגמר** — `createSale` מפחית מלאי גם למינוס?
    כנראה לדחות ב‑API כש‑`quant < quantity` (המערכת החיצונית היא מקור האמת
    על מה נמכר בפועל — אולי רק אזהרה?). להחליט לפני Phase 1.
-3. **כמה מפתחות לריקמה** — אחד פר (ריקמה,משתמש) כמו MCP, או ריבוי מפתחות
-   בעלי שם (פר אתר)? המסמך מניח אחד פר משתמש+ריקמה; קל להרחיב.
+3. **כמה מפתחות לרקמה** — אחד פר (רקמה,משתמש) כמו MCP, או ריבוי מפתחות
+   בעלי שם (פר אתר)? המסמך מניח אחד פר משתמש+רקמה; קל להרחיב.
 4. **התראות** — האם לשלוח push לבעל המפתח על כל דיווח API שנקלט (שקיפות),
    או רק סיכום יומי? ברירת מחדל מוצעת: push רגיל כמו דיווח ידני.

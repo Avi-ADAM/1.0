@@ -34,7 +34,7 @@ export const customizeOpenMashaabimConfig: ActionConfig = {
     recipients: { type: 'specificUsers', config: { userIdsParam: 'recipientIds' } },
     templates: {
       title: { he: 'התאמה אישית למשאב', en: 'Customized resource terms' },
-      body: { he: 'חבר ריקמה לקח משאב בתנאים מותאמים', en: 'A member took a resource on customized terms' },
+      body: { he: 'חבר רקמה לקח משאב בתנאים מותאמים', en: 'A member took a resource on customized terms' },
     },
     channels: ['socket'],
     metadata: { type: 'mashaabimRequest', url: 'lev' },

@@ -52,7 +52,7 @@ export const S6_Negotiation: React.FC = () => {
           <GoldText size={54} weight={900}>מו"מ שקוף בתוך הפלטפורמה</GoldText>
         </div>
         <div style={{...sub, fontFamily: theme.font, fontSize: 26, color: theme.colors.muted, marginBottom: 28}}>
-          שותפי הריקמה ומועמדים מתדיינים על תנאים — הכול בתוך הפלטפורמה, הכול שקוף.
+          שותפי הרקמה ומועמדים מתדיינים על תנאים — הכול בתוך הפלטפורמה, הכול שקוף.
         </div>
 
         <div style={{display: 'flex', flexDirection: 'column', gap: 0, background: 'rgba(255,255,255,0.03)', borderRadius: 24, padding: '24px 28px', border: '1px solid rgba(255,255,255,0.08)'}}>

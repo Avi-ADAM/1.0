@@ -12,7 +12,7 @@ The codebase mixes Hebrew and English. The terms below appear both as field name
 
 | Hebrew | Code term | Meaning |
 |---|---|---|
-| ריקמה | `project` / FreeMate | A collaborative project |
+| רקמה (rikma) | `project` | A collaborative partnership — the canonical term in every language |
 | מוח | `moach` (Brain) | The project dashboard |
 | מסימה | `mission` | A task someone takes on |
 | משאב | `mashaab` | A needed input (money / material / info) |

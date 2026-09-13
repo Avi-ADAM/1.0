@@ -131,13 +131,13 @@ const run = async () => {
   if (resuming) return await finishJoin(a, apiA, cached);
 
   await visit(a.page, '/me');
-  await a.page.getByRole('button', { name: /יצירת ריקמה חדשה/ }).first().click();
+  await a.page.getByRole('button', { name: /יצירת רקמה חדשה/ }).first().click();
   await a.page.waitForTimeout(4000);
   await a.page.fill('input[name="des"]', RIKMA_NAME);
   const editors = a.page.locator('[contenteditable="true"]');
   for (let i = 0; i < Math.min(await editors.count(), 2); i++) {
     await editors.nth(i).click();
-    await a.page.keyboard.type(i === 0 ? 'ריקמה לבדיקת הסכמה בין שני חברים.' : 'תיאור פנימי.');
+    await a.page.keyboard.type(i === 0 ? 'רקמה לבדיקת הסכמה בין שני חברים.' : 'תיאור פנימי.');
     await a.page.waitForTimeout(300);
   }
   await a.page.fill('input[name="de"]', 'https://example.com');

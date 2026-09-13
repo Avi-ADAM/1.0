@@ -574,7 +574,7 @@ id: ${pendId}
           <button
             onclick={() => project()}
             onmouseenter={() =>
-              hover(` לחיצה למעבר למוח הריקמה ${projectName}`)}
+              hover(` לחיצה למעבר למוח הרקמה ${projectName}`)}
             onmouseleave={() => hover('0')}
           >
             <img class="img" {src} alt="projectlogo" />
@@ -630,7 +630,7 @@ id: ${pendId}
         ><div id="normSmll">
           <button
             onclick={() => linke()}
-            onmouseenter={() => hover('לחיצה למעבר לדף הציבורי של הריקמה')}
+            onmouseenter={() => hover('לחיצה למעבר לדף הציבורי של הרקמה')}
             onmouseleave={() => hover('0')}
             class="ab pn"><h3 class="ab pn pt-8 px-2">{projectName}</h3></button
           >

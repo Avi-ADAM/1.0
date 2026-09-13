@@ -120,11 +120,11 @@
   let addN = $state(false);
   let addM = $state(false);
   let hosafa = {
-    he: 'הוספת פעולות נדרשות לריקמה',
+    he: 'הוספת פעולות נדרשות לרקמה',
     en: 'add needed missions to FreeMates'
   };
   let hosafat = {
-    he: 'הוספת משאבים נדרשים לריקמה',
+    he: 'הוספת משאבים נדרשים לרקמה',
     en: 'add needed resources to FreeMates'
   };
   const noVallue = {
@@ -761,7 +761,7 @@
     en: 'the Logo you choose will be waiting for the approval of all FreeMates members'
   };
   const toalart = {
-    he: 'בריקמה עם מס חברים גדול מ-1 יש צורך בהסכמה של כולם, מערכת ההצבעות משתחררת בקרוב ודרכה ניתן יהיה לשנות',
+    he: 'ברקמה עם מס חברים גדול מ-1 יש צורך בהסכמה של כולם, מערכת ההצבעות משתחררת בקרוב ודרכה ניתן יהיה לשנות',
     en: 'if number of users in freemates is greater than 1 you need everyone to agree, this feature will be released soon'
   };
 
@@ -1263,20 +1263,20 @@
     tab = 4;
     finiss.scrollIntoView(true);
   }
-  const title = { he: 'מוח הריקמה 1💗1', en: '1💗1 FreeMates Brain' };
+  const title = { he: 'מוח הרקמה 1💗1', en: '1💗1 FreeMates Brain' };
   const mwa = { he: 'פעולות ממתינות לאישור', en: 'panding missions' };
   const errmsg = { he: ' אירעה שגיאה', en: 'error' };
   const editpic = {
-    he: 'עריכת תמונת הפרופיל של הריקמה',
+    he: 'עריכת תמונת הפרופיל של הרקמה',
     en: 'edit FreeMates logo'
   };
   const upload = {
-    he: 'העלאת תמונת פרופיל לריקמה',
+    he: 'העלאת תמונת פרופיל לרקמה',
     en: 'upload logo for your FreeMates'
   };
-  const editd = { he: 'עריכת פרטי ריקמה', en: 'edit FreeMates details' };
+  const editd = { he: 'עריכת פרטי רקמה', en: 'edit FreeMates details' };
   const publicp = {
-    he: 'לעמוד הציבורי של הריקמה',
+    he: 'לעמוד הציבורי של הרקמה',
     en: 'view FreeMates public page'
   };
   const tower = { he: 'לינק לאתר', en: 'link to website' };
@@ -1288,29 +1288,29 @@
     en: 'link to a shared Google Drive'
   };
   const githublinkde = {
-    he: 'לינק לגיטהב של הריקמה',
+    he: 'לינק לגיטהב של הרקמה',
     en: 'link to the FreeMates GitHub'
   };
   const fblinkde = {
-    he: 'לינק לפייסבוק של הריקמה',
+    he: 'לינק לפייסבוק של הרקמה',
     en: 'link to the FreeMates Facebook'
   };
   const discordlinkde = {
-    he: 'לינק לדיסקורד של הריקמה',
+    he: 'לינק לדיסקורד של הרקמה',
     en: 'link to the FreeMates Discord'
   };
   const twiterlinkde = {
-    he: 'לינק לטוויטר של הריקמה',
+    he: 'לינק לטוויטר של הרקמה',
     en: 'link to the FreeMates twitter'
   };
   const watsapplinkde = {
-    he: 'לינק לווטסאפ של הריקמה',
+    he: 'לינק לווטסאפ של הרקמה',
     en: 'link to the FreeMates WhatsApp'
   };
   const vap = { he: 'ערכים ומטרות', en: 'vallues and objectives' };
   const opmi = { he: 'משימות פנויות', en: "open mission's" };
   const noopen = {
-    he: 'אין פעולות פתוחות לריקמה זו, מומלץ ליצור כבר עכשיו',
+    he: 'אין פעולות פתוחות לרקמה זו, מומלץ ליצור כבר עכשיו',
     en: ''
   };
   const neww = {
@@ -1335,7 +1335,7 @@
   };
 
   const maini = { he: 'ראשי', en: 'main' };
-  const choo = { he: 'בחירת ריקמה', en: 'choose FreeMate' };
+  const choo = { he: 'בחירת רקמה', en: 'choose FreeMate' };
   const timersT = { he: 'טיימרים', en: 'timers' };
   let sid = false;
   let gan = false;
@@ -1576,8 +1576,8 @@
   function add(event) {
     console.log(event);
   }
-  const backList = { he: 'בחירת ריקמה אחרת', en: 'choose another FreeMate' };
-  const createNewRikma = { he: 'יצירת ריקמה חדשה', en: 'Create new FreeMate' };
+  const backList = { he: 'בחירת רקמה אחרת', en: 'choose another FreeMate' };
+  const createNewRikma = { he: 'יצירת רקמה חדשה', en: 'Create new FreeMate' };
 
   function backToProjects() {
     idPr.set(0);
@@ -1613,9 +1613,9 @@
   };
   let createMode = $state(null);
   const createMissionT = { he: 'משימה', en: 'Mission' };
-  const createMissionDesc = { he: 'יצירת פעולה עצמאית לריקמה', en: 'Create a standalone mission' };
+  const createMissionDesc = { he: 'יצירת פעולה עצמאית לרקמה', en: 'Create a standalone mission' };
   const createResourceT = { he: 'משאב', en: 'Resource' };
-  const createResourceDesc = { he: 'הוספת משאב נדרש לריקמה', en: 'Add a needed resource' };
+  const createResourceDesc = { he: 'הוספת משאב נדרש לרקמה', en: 'Add a needed resource' };
   const createProcessT = { he: 'תהליך', en: 'Process' };
   const createProcessDesc = { he: 'ניהול תהליך הכולל משימות ומשאבים', en: 'Manage a process containing missions and resources' };
   const backBtn = { he: 'חזרה', en: 'Back' };
@@ -2933,7 +2933,7 @@ pointer-events: none;"
               </svg></button
             >
             <h2>
-              אין פעולות פתוחות לריקמה זו, מומלץ ליצור כבר עכשיו
+              אין פעולות פתוחות לרקמה זו, מומלץ ליצור כבר עכשיו
               <br />
               (לחצו על היד המחזיקה מנורה שלמעלה)
             </h2>
@@ -2966,7 +2966,7 @@ pointer-events: none;"
               </svg></button
             >
             <h2>
-              אין משאבים מבוקשים לריקמה זו, מומלץ ליצור כבר עכשיו
+              אין משאבים מבוקשים לרקמה זו, מומלץ ליצור כבר עכשיו
               <br />
               (לחצו על היד המחזיקה מגנט שלמעלה)
             </h2>

@@ -727,7 +727,7 @@ vots: [${userss},
     perMonth: { he: 'לכל חודש', en: 'per month' },
     perYear: { he: 'לכל שנה', en: 'per year' },
     forPeriod: { he: 'לכל התקופה', en: 'for the whole period' },
-    maxValueForRikma: { he: 'שווי מקסימלי לחישוב בריקמה', en: 'Maximum value for calculation' },
+    maxValueForRikma: { he: 'שווי מקסימלי לחישוב ברקמה', en: 'Maximum value for calculation' },
     suggestedValue: { he: 'שווי מוצע', en: 'Suggested Value' },
     linkForDetails: { he: 'לינק לפרטי מוצר\\ מחיר \\ רכישה', en: 'Link for product details/price/purchase' },
     link: { he: 'לינק', en: 'Link' }

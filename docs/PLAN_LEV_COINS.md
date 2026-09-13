@@ -150,7 +150,7 @@ it is not cosmetic, it is missed consent.
 The coin branches were never migrated to `$t()`. Hard-coded Hebrew strings still
 sit in the coin markup of `pmas` (56 lines with Hebrew), `didiget` (44),
 `missionInProgress` (40), `halukaask` (32), `pandingMesima` (31) and more — e.g.
-`בקשת חלוקה`, `לחיצה למעבר למוח הריקמה`. An English/Arabic/Russian/Spanish user
+`בקשת חלוקה`, `לחיצה למעבר למוח הרקמה`. An English/Arabic/Russian/Spanish user
 gets Hebrew coins. This is the regression `CLAUDE.md` §i18n explicitly calls out.
 
 Related: four processors run the item name through `letters()`

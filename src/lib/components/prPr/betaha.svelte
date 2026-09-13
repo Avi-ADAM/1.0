@@ -119,7 +119,7 @@
 
         <!-- Special Notes Row -->
         <tr class="hover:bg-surface2 transition-colors duration-200">
-          <td class="px-6 py-4 font-semibold text-gray-700 bg-gradient-to-r from-purple-100 to-pink-100 border-r border-surfaceLine">{$lang == 'en' ? "Special Notes for My Fabric" : "הערות יחודיות לריקמה שלי"}</td>
+          <td class="px-6 py-4 font-semibold text-gray-700 bg-gradient-to-r from-purple-100 to-pink-100 border-r border-surfaceLine">{$lang == 'en' ? "Special Notes for My Fabric" : "הערות יחודיות לרקמה שלי"}</td>
           {#each bmiData as data, i}
             <td class="px-6 py-4 border-r border-surfaceLine last:border-r-0">
               {#if data.attributes.hearotMeyuchadot !== undefined && data.attributes.hearotMeyuchadot !== "undefined" && data.attributes.hearotMeyuchadot !== null && data.attributes.hearotMeyuchadot !== "" && data.attributes.hearotMeyuchadot !== "null"}
@@ -133,7 +133,7 @@
 
         <!-- Private Links Row -->
         <tr class="hover:bg-surface2 transition-colors duration-200">
-          <td class="px-6 py-4 font-semibold text-gray-700 bg-gradient-to-r from-purple-100 to-pink-100 border-r border-surfaceLine">{$lang == 'en' ? "Private Links for My Fabric" : "קישורים יחודיים לריקמה שלי"}</td>
+          <td class="px-6 py-4 font-semibold text-gray-700 bg-gradient-to-r from-purple-100 to-pink-100 border-r border-surfaceLine">{$lang == 'en' ? "Private Links for My Fabric" : "קישורים יחודיים לרקמה שלי"}</td>
           {#each bmiData as data, i}
             <td class="px-6 py-4 border-r border-surfaceLine last:border-r-0">
               {#if data.attributes.privatlinks !== undefined && data.attributes.privatlinks !== "undefined" && data.attributes.privatlinks !== null && data.attributes.privatlinks !== "" && data.attributes.privatlinks !== "null"}

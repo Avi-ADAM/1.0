@@ -3,26 +3,26 @@
   "journey": "Step 3 · Path Selection",
   "plaque": {
     "title": "We'd love to know you",
-    "sub": "How would you like to integrate into the Rikma network of 1💗1?"
+    "sub": "How would you like to integrate into the rikma network of 1💗1?"
   },
   "tile_info": "This affects what we offer - we match the pace to who you are.",
   "tracks": {
     "provider": {
-      "title": "Want to offer skills and join a Rikma",
-      "sub": "Let's build a profile displaying your capabilities, to integrate as an equal partner in Rikmas (consensual partnerships), participate in voting and profit sharing, or provide a collective response to client demands.",
+      "title": "Want to offer skills and join a rikma",
+      "sub": "Let's build a profile displaying your capabilities, to integrate as an equal partner in rikmas (consensual partnerships), participate in voting and profit sharing, or provide a collective response to client demands.",
       "meta": "~ 4 min · Profile built from CV or manually",
       "chips": [
         "Skills Profile",
-        "Join a Rikma",
+        "Join a rikma",
         "Profit Sharing"
       ]
     },
     "business": {
       "title": "Have a business or a project idea",
-      "sub": "Set up a new Rikma (consensual partnership) or wrap an existing business - to recruit equal partners, manage profits and decisions together, and above all connect directly to a stream of clients and projects in the system.",
+      "sub": "Set up a new rikma (consensual partnership) or wrap an existing business - to recruit equal partners, manage profits and decisions together, and above all connect directly to a stream of clients and projects in the system.",
       "meta": "~ 5 min · Extracted from site or free description",
       "chips": [
-        "Set up Rikma & Partners",
+        "Set up rikma & Partners",
         "Voting & Profit Sharing",
         "Connect to Projects & Clients"
       ]
@@ -35,11 +35,11 @@
       "title": "So glad you made it!",
       "sub": "Your profile is live and breathing"
     },
-    "info": "🎉 Profile saved. The Concierge is already starting to look for matches, potential Rikmas and client wishes.<br /><b>Where to continue from here?</b>",
+    "info": "🎉 Profile saved. The Concierge is already starting to look for matches, potential rikmas and client wishes.<br /><b>Where to continue from here?</b>",
     "choices": {
       "matches": {
         "title": "To your profile + user guide",
-        "sub": "The Concierge is already looking for matching Rikmas and client demands. Let's learn how to manage a consensual partnership on the go.",
+        "sub": "The Concierge is already looking for matching rikmas and client demands. Let's learn how to manage a consensual partnership on the go.",
         "meta": "Recommended - The natural way to continue",
         "chips": {
           "realtime": "✨ Real-time suggestions",
@@ -47,11 +47,11 @@
         }
       },
       "business": {
-        "title": "Set up a Rikma (Partnership)",
-        "sub": "Have a project idea, product or partnership? It's time to set up a Rikma, recruit partners and connect to client projects in the system.",
+        "title": "Set up a rikma (Partnership)",
+        "sub": "Have a project idea, product or partnership? It's time to set up a rikma, recruit partners and connect to client projects in the system.",
         "meta": "Can also be done later from profile",
         "chips": {
-          "project": "Set up a Rikma",
+          "project": "Set up a rikma",
           "products": "Voting & Profits",
           "partners": "Partners & Clients"
         }
@@ -69,7 +69,7 @@
     "choices": {
       "cv": {
         "title": "Upload CV",
-        "sub": "AI will extract your skills and experience from the CV to match you with suitable Rikmas and projects.",
+        "sub": "AI will extract your skills and experience from the CV to match you with suitable rikmas and projects.",
         "meta": "~ 30 sec · PDF · DOCX · TXT",
         "chips": {
           "suggested": "⚡ Recommended",
@@ -78,7 +78,7 @@
       },
       "describe": {
         "title": "Describe in your own words",
-        "sub": "Write freely about your skills, desires and experience. The AI will connect you with suitable Rikmas.",
+        "sub": "Write freely about your skills, desires and experience. The AI will connect you with suitable rikmas.",
         "meta": "~ 2 min · 2-3 paragraphs",
         "chips": {
           "free": "✍️ Free"
@@ -106,7 +106,7 @@
       "stage_ready": "Ready for confirmation",
       "err_size": "File is too large - up to 5MB",
       "err_format": "Unsupported format",
-      "info": "✨ The AI will extract your skills and experience from the CV - so we can offer you suitable Rikmas and consensual co-management. You can always edit.",
+      "info": "✨ The AI will extract your skills and experience from the CV - so we can offer you suitable rikmas and consensual co-management. You can always edit.",
       "back_choice": "← Back to choice"
     },
     "describe_page": {
@@ -114,9 +114,9 @@
       "journey": "Step 4 · Personal Story",
       "plaque": {
         "title": "Tell us about yourself",
-        "sub": "AI will extract skills and values to match you with suitable Rikmas"
+        "sub": "AI will extract skills and values to match you with suitable rikmas"
       },
-      "info": "✨ 2-3 free paragraphs: what are your skills, which Rikmas are you interested in joining as an equal partner, and what value do you wish to bring.",
+      "info": "✨ 2-3 free paragraphs: what are your skills, which rikmas are you interested in joining as an equal partner, and what value do you wish to bring.",
       "label": "Your story",
       "placeholder": "Example: Fullstack development with 5 years of experience. Interested in joining early-stage startups as a technology partner, especially in education and health. Daily routine involves React & Node.js, database design and lead development...",
       "analyzing": "✨ Analyzing story...",
@@ -174,7 +174,7 @@
     "resources_page": {
       "title": "What do you have to share?",
       "journey": "Step 5 · Resources to share",
-      "sub": "Things and places that are already yours — and can be put at a weave’s or a customer’s disposal. You can skip and add them later from your profile.",
+      "sub": "Things and places that are already yours — and can be put at a rikma’s or a customer’s disposal. You can skip and add them later from your profile.",
       "mode_recurring": "Ongoing —",
       "mode_recurring_ex": "a workspace, a subscription, equipment that is always available",
       "mode_once": "One-off —",
@@ -199,16 +199,16 @@
     "choose_other": "← Choose other"
   },
   "business": {
-    "title": "Set up a Rikma (Partnership) · 1💗1",
-    "journey": "Step 4 · Building the Rikma",
+    "title": "Set up a rikma (Partnership) · 1💗1",
+    "journey": "Step 4 · Building the rikma",
     "plaque": {
-      "title": "Tell us about your Rikma",
+      "title": "Tell us about your rikma",
       "sub": "Consensual partnership, profit sharing and direct connection to clients"
     },
     "choices": {
       "url": {
         "title": "I have a website or business page",
-        "sub": "Paste URL - AI will set up the Rikma, define areas of activity, and extract matches for partners and client projects.",
+        "sub": "Paste URL - AI will set up the rikma, define areas of activity, and extract matches for partners and client projects.",
         "meta": "~ 45 sec · Everything can be edited",
         "chips": {
           "fast": "⚡ Fastest",
@@ -217,7 +217,7 @@
       },
       "describe": {
         "title": "Describe in your own words",
-        "sub": "2-3 free paragraphs. Write about the Rikma, your needs and how you'd like to address client projects.",
+        "sub": "2-3 free paragraphs. Write about the rikma, your needs and how you'd like to address client projects.",
         "meta": "~ 2 min · AI will build a draft"
       },
       "manual": {
@@ -227,13 +227,13 @@
       }
     },
     "url_page": {
-      "title": "Paste Link to Rikma · 1💗1",
-      "journey": "Step 5 · Setting up Rikma",
+      "title": "Paste Link to rikma · 1💗1",
+      "journey": "Step 5 · Setting up rikma",
       "plaque": {
-        "title": "Paste Rikma link",
+        "title": "Paste rikma link",
         "sub": "Website / Landing Page / Facebook / Instagram"
       },
-      "info": "⚡ AI will read the page and automatically set up the Rikma, including the project name, description, and required skills for partners - you can always edit.",
+      "info": "⚡ AI will read the page and automatically set up the rikma, including the project name, description, and required skills for partners - you can always edit.",
       "label": "Link",
       "hint_ok": "✓ Looks good",
       "hint_err": "Paste full address - including https://",
@@ -241,15 +241,15 @@
       "scanning": "Lev is scanning..."
     },
     "describe_page": {
-      "title": "Describe Rikma · 1💗1",
-      "journey": "Step 5 · Setting up Rikma",
+      "title": "Describe rikma · 1💗1",
+      "journey": "Step 5 · Setting up rikma",
       "plaque": {
-        "title": "Tell us about the Rikma",
-        "sub": "AI will build a Rikma draft, partner definitions and matching client projects"
+        "title": "Tell us about the rikma",
+        "sub": "AI will build a rikma draft, partner definitions and matching client projects"
       },
-      "info": "✨ 2-3 free paragraphs: about your Rikma or project, what kind of partners you need, and what skills would complement you.",
+      "info": "✨ 2-3 free paragraphs: about your rikma or project, what kind of partners you need, and what skills would complement you.",
       "label": "Description",
-      "placeholder": "Example: Setting up a Rikma (partnership) connecting local farmers to direct consumers. Partner needed to lead marketing and sales, with experience in community management and social networks. Equal partnership offered, including consensual decision-making and structured profit sharing...",
+      "placeholder": "Example: Setting up a rikma (partnership) connecting local farmers to direct consumers. Partner needed to lead marketing and sales, with experience in community management and social networks. Equal partnership offered, including consensual decision-making and structured profit sharing...",
       "char_count": "chars",
       "can_continue": "✓ Can continue",
       "min_chars": "Please reach at least {{count}}",

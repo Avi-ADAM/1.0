@@ -14,7 +14,7 @@ export const S1_Intro: React.FC = () => {
   const sub = useRise(22);
   const steps = useRise(42);
 
-  const flowSteps = ['הרשמה', 'ריקמה', 'משימות', 'אשרור', 'חלוקה'];
+  const flowSteps = ['הרשמה', 'רקמה', 'משימות', 'אשרור', 'חלוקה'];
 
   return (
     <AbsoluteFill style={{justifyContent: 'center', alignItems: 'center', flexDirection: 'column', gap: 0}}>

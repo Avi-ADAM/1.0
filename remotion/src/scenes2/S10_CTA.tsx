@@ -41,7 +41,7 @@ export const S10_CTA: React.FC = () => {
         direction: 'rtl',
         marginBottom: 28,
       }}>
-        הקימו ריקמה עכשיו — בחינם
+        הקימו רקמה עכשיו — בחינם
       </div>
 
       <div style={{

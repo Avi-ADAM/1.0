@@ -157,12 +157,12 @@ export const proposeSheirutConfig: ActionConfig = {
     },
     templates: {
       title: {
-        he: 'הוצע שירות חדש בריקמה',
+        he: 'הוצע שירות חדש ברקמה',
         en: 'A new service was proposed',
         ar: 'تم اقتراح خدمة جديدة'
       },
       body: {
-        he: 'חבר בריקמה הציע שירות חדש. אם לא תגיבו עד תום זמן התגובה, ההצעה תאושר מאליה.',
+        he: 'חבר ברקמה הציע שירות חדש. אם לא תגיבו עד תום זמן התגובה, ההצעה תאושר מאליה.',
         en: 'A member proposed a new service. With no response before restime runs out, it is approved.',
         ar: 'اقترح أحد الأعضاء خدمة جديدة. في حال عدم الرد قبل انتهاء المهلة، تتم الموافقة عليها.'
       }

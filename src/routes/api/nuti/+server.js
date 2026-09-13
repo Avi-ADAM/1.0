@@ -16,8 +16,8 @@ async function sendMail(
   rishon,
   eid){
     const previewText = {
-      "he": `הצבעה על ${kind == "finiappmi"? "אישור סיום המשימה":"ההצעה"} של ${un} בריקמה ${pn}`,
-      "en":`Vote for ${un}'s ${kind == "finiappmi"?"mission complition appruval":"suggestion"} on the freeMates ${pn}`
+      "he": `הצבעה על ${kind == "finiappmi"? "אישור סיום המשימה":"ההצעה"} של ${un} ברקמה ${pn}`,
+      "en":`Vote for ${un}'s ${kind == "finiappmi"?"mission complition appruval":"suggestion"} on the rikma ${pn}`
     };
   const emailHtmlObj = await render(
     PendJustCreated,

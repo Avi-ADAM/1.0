@@ -1197,7 +1197,7 @@
                                                             {openmissionName}
                                                         </textPath>
                                                     </text>
-                                              <g on:click={()=>linke("p")} on:mouseenter={()=>hover("לחיצה למעבר לעמוד הציבורי של הריקמה")} on:mouseleave={()=>hover("0")}  data-sveltekit-prefetch x="0" y="-40" >
+                                              <g on:click={()=>linke("p")} on:mouseenter={()=>hover("לחיצה למעבר לעמוד הציבורי של הרקמה")} on:mouseleave={()=>hover("0")}  data-sveltekit-prefetch x="0" y="-40" >
                                                     <text fill="#FF0092" text-anchor="middle"  x="0" y="-29"   style="font-size: 15px; line-height: 1; font-weight: bold; white-space: pre;">{projectName}</text>
                                               </g>  
                                                     <foreignObject x='-50' y='0 ' width='56px' height='56px' transform="translate(-28,-28)" >
@@ -1207,7 +1207,7 @@
 
                                                 </foreignObject>
                                                                                                     <foreignObject x='0' y='-60 ' width='40px' height='40px' transform="translate(-20,-20)" >
-                                                   <button on:click={()=>project()} on:mouseenter={()=>hover(` לחיצה למעבר למוח הריקמה ${projectName}`)} on:mouseleave={()=>hover("0")}>
+                                                   <button on:click={()=>project()} on:mouseenter={()=>hover(` לחיצה למעבר למוח הרקמה ${projectName}`)} on:mouseleave={()=>hover("0")}>
                                                         <img style="margin-top: 0px; margin-bottom: 0px; margin-right:auto; margin-left: auto; border-radius: 50%;" src={src} width="40" height="40" alt="projectlogo" title={projectName}>
                                                    </button>
 

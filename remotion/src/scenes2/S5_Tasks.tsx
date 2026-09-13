@@ -63,7 +63,7 @@ export const S5_Tasks: React.FC = () => {
       <div style={{flex: 1.1, display: 'flex', flexDirection: 'column', gap: 18}}>
         <div style={{...title}}><GoldText size={56} weight={900}>משימות ומשאבים</GoldText></div>
         <div style={{...sub, fontFamily: theme.font, fontSize: 28, color: theme.colors.muted}}>
-          כל פעולה בריקמה מוגדרת כמשימה (עם טיימר) או משאב (עם מחיר).
+          כל פעולה ברקמה מוגדרת כמשימה (עם טיימר) או משאב (עם מחיר).
         </div>
 
         <Card

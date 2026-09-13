@@ -114,7 +114,7 @@ export const getSitePagesTool = createTool({
           {
             "name": "Moach - My Projects List",
             "path": "/moach",
-            "description": "Select or manage your Rikma (FreeMate) projects. Landing page that redirects to a specific project if one is already selected (registered users only)",
+            "description": "Select or manage your rikmas. Landing page that redirects to a specific project if one is already selected (registered users only)",
             "authRequired": true
           },
           {

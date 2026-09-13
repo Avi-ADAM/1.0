@@ -181,7 +181,7 @@ class="hover:scale-290 duration-1000 ease-in-out" transition:fly|local={{y: 250,
     </svg>
 
 <!--
-    <button class="bg-lturk p-0.5 te" on:click={project(id)}>למוח הריקמה</button>-->
+    <button class="bg-lturk p-0.5 te" on:click={project(id)}>למוח הרקמה</button>-->
 </div>
 <style>
     .rou{

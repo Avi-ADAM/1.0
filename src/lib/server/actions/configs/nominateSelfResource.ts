@@ -137,7 +137,7 @@ export const nominateSelfResourceConfig: ActionConfig = {
     recipients: { type: 'projectMembers', config: { projectIdParam: 'projectId' } },
     templates: {
       title: {
-        he: 'מישהו מציע להביא משאב לריקמה שלכם 🌱',
+        he: 'מישהו מציע להביא משאב לרקמה שלכם 🌱',
         en: 'Someone offers to bring a resource to your rikma 🌱',
         ar: 'شخص ما يعرض جلب مورد لنسيجكم 🌱',
       },

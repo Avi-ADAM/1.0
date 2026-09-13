@@ -504,7 +504,7 @@
         color: 'gold',
         time: relTime(data.wish.lastMatchedAt),
         ts: +new Date(data.wish.lastMatchedAt),
-        text: 'Lev סרקה את הריקמות וחיפשה התאמות.'
+        text: 'Lev סרקה את הרקמות וחיפשה התאמות.'
       });
     }
     items.push({
@@ -1214,7 +1214,7 @@
     {
       color: 'pink',
       time: 'לפני שעה',
-      text: 'Lev מצאה 6 התאמות מ־3 ריקמות שונות.'
+      text: 'Lev מצאה 6 התאמות מ־3 רקמות שונות.'
     },
     {
       color: 'gold',
@@ -1301,7 +1301,7 @@
       });
       const out = await res.json();
       if (!out?.success) throw new Error(out?.error || 'סגירת ההסכמה נכשלה');
-      toast.success('המעגל נסגר - נוצרה ריקמת שותפים והדיל נפתח 💗');
+      toast.success('המעגל נסגר - נוצרה רקמת שותפים והדיל נפתח 💗');
       goto('/deals');
     } catch (err) {
       console.error('[concierge/[id]] materializeWish failed:', err);
@@ -1391,7 +1391,7 @@
       <a href="/lev" class="nav-lnk">הסקירה שלי</a>
       <a href="/concierge" class="nav-lnk nav-act">משאלות</a>
       <a href="/deals" class="nav-lnk">דילים</a>
-      <a href="/moach" class="nav-lnk">ריקמות</a>
+      <a href="/moach" class="nav-lnk">רקמות</a>
     </nav>
 
     <div class="hdr-right">
@@ -2002,7 +2002,7 @@
             <!-- Ready products a weave offers (service-request track) -->
             {#if PRODUCTS.length}
               <div class="panel">
-                <h4>מוצרים מוכנים מריקמות</h4>
+                <h4>מוצרים מוכנים מרקמות</h4>
                 <div style="display:flex;flex-direction:column;gap:12px">
                   {#each PRODUCTS.slice(0, 6) as m (m.id)}
                     {@const k = `m${m.id}`}
@@ -2435,10 +2435,10 @@
                 {#if !isOwner}
                   רק יוצר/ת המשאלה יכול/ה לסגור את ההסכמה.
                 {:else if !readyToClose}
-                  כשכל החלקים יקבלו ספק מאושר - אפשר יהיה לסגור ולפתוח ריקמת
+                  כשכל החלקים יקבלו ספק מאושר - אפשר יהיה לסגור ולפתוח רקמת
                   שותפים.
                 {:else}
-                  בלחיצה ייווצרו ריקמת שותפים ודיל - אחד לכל שותף/ה שהצטרף/ה.
+                  בלחיצה ייווצרו רקמת שותפים ודיל - אחד לכל שותף/ה שהצטרף/ה.
                 {/if}
               </span>
             </div>

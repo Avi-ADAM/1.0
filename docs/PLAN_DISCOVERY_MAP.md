@@ -3,7 +3,7 @@
 > נכתב: 2026-07-03. מסמך משלים ל-[PLAN_SHARED_PURCHASE.md](./PLAN_SHARED_PURCHASE.md) (v2) ול-[PLAN_LOCATION_MAPS.md](./PLAN_LOCATION_MAPS.md). **לא מחליף אותם** — הוא ממקד אותם למסך אחד: **מפה ציבורית אחת, שני צדדים של שוק**.
 >
 > - **צד הצרכן**: לגלות על המפה ביקושים באזורי — משאלות שמחפשות מצטרפים, מאגדי-ביקוש (maagad), והצעות מותנות-סף של ספקים ("מיניבוס — 7/10 נרשמו") — ולהצטרף.
-> - **צד נותן השירות**: לגלות על המפה הזדמנויות — משימות פתוחות ומשאבים מבוקשים מריקמות, צרכים שפורסמו מהקונסיירז', ומאגדי-ביקוש שמחכים לספק.
+> - **צד נותן השירות**: לגלות על המפה הזדמנויות — משימות פתוחות ומשאבים מבוקשים מרקמות, צרכים שפורסמו מהקונסיירז', ומאגדי-ביקוש שמחכים לספק.
 
 ---
 
@@ -28,8 +28,8 @@
 
 ```
 🧺 מחפשים יחד (צרכן)                    🛠 נותנים שירות (ספק)
-├─ משאלות שמחפשות מצטרפים               ├─ משימות פתוחות (ריקמות)
-├─ מאגדי ביקוש (forming/visible)        ├─ משאבים מבוקשים (ריקמות)
+├─ משאלות שמחפשות מצטרפים               ├─ משימות פתוחות (רקמות)
+├─ מאגדי ביקוש (forming/visible)        ├─ משאבים מבוקשים (רקמות)
 └─ הצעות-סף של ספקים (Track C)          ├─ צרכי קונסיירז' (open-mission.ratson≠null)
                                         └─ מאגדים שמחכים לספק (visible)
 ```
@@ -103,7 +103,7 @@ src/routes/api/send/qids.js                     ← 207–210 (ראה §5)
 | M1 | `/demand` ציבורי: מפה + שתי עדשות + שכבות ratson/open-mission/open-mashaabim מהסכמה הקיימת + רשימת-צד + deep-links | M0 | סשן זה |
 | M2 | `/maagad/[id]` (צפייה/הצטרפות/עזיבה/חתימה/ביטול-חתימה, פרטיות בשרת) + actions: `openMaagad`/`joinMaagad`/`leaveMaagad`/`createMaagadOffer`/`signMaagadOffer`/`unsignMaagadOffer`/`confirmMaagadQuorum`/`expireMaagadOffers`/`clusterRatsons` (QIDs 224–233) + מכונות טהורות `offerStateMachine.ts` (22) + `clustering.ts` (11) + `MaagadOfferForm` + חיבור מהמפה | סכמה בפרודקשן (הענף מוכן) | **סשן זה** — חסר רק: Sheirutpend מותנה + הרצת pipeline העסקה פר-חבר בהפעלה; שדרוג `similarity()` ל-Pinecone |
 | M3 | ✅ עדשת-ספק בהקשר פרויקט: `/moach/[projectId]/demand` (אותו `DiscoveryMap`, מרוכז על מיקום הפרויקט, ביקוש ממוין לפי מרחק, CTA "הצע" → `/maagad/[id]`; QID `234getProjectLocation`). | M2 | סשן קודם |
-| M4 | ✅ **הפעלה אטומית → עסקאות אמת**: `confirmMaagadQuorum` יוצר `Sheirutpend` חי פר-חבר-חתום על ריקמת הספק (`proposer_project`), במחיר ה-tier שהושג (`resolveTierPrice`), מקושר ל-`maagad_offer` ול-`maagad-member.sheirutpend`. העסקאות צפות ב-`/deals` (fallback לשם ההצעה כשאין מוצר). QIDs `235crMaagadSheirutpend` + הרחבת `226`/`123dealsForUser`. יצירה-בהפעלה בלבד → אין pends יתומים בביטול/פקיעה. | M2 | **סשן זה** |
+| M4 | ✅ **הפעלה אטומית → עסקאות אמת**: `confirmMaagadQuorum` יוצר `Sheirutpend` חי פר-חבר-חתום על רקמת הספק (`proposer_project`), במחיר ה-tier שהושג (`resolveTierPrice`), מקושר ל-`maagad_offer` ול-`maagad-member.sheirutpend`. העסקאות צפות ב-`/deals` (fallback לשם ההצעה כשאין מוצר). QIDs `235crMaagadSheirutpend` + הרחבת `226`/`123dealsForUser`. יצירה-בהפעלה בלבד → אין pends יתומים בביטול/פקיעה. | M2 | **סשן זה** |
 | M5 | הצעות-סף (Track C) עם progress חי (socket) + heat-layer; **מחזוריות (§7.5)**: `sheirut-fulfillment` פר-מחזור; שדרוג `similarity()` ל-Pinecone; badge "ממתין לסף" ב-`/deals` לפני הפעלה | P4/P5 | עתידי |
 
 ## 7. אימות

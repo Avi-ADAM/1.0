@@ -1,5 +1,5 @@
 /**
- * Create Weave — the "יצירת ריקמה" flow from baci.svelte, moved server-side.
+ * Create Weave — the "יצירת רקמה" flow from baci.svelte, moved server-side.
  *
  * Reusable project-creation action so the JWT never reaches the client:
  *   1. Mint any vallues the user typed that don't exist yet (collect their ids).
@@ -40,7 +40,7 @@ const handler: ActionExecutionHandler = async (params, context, util) => {
   };
 
   if (!projectName || !String(projectName).trim()) {
-    throw new Error('שם הריקמה חסר');
+    throw new Error('שם הרקמה חסר');
   }
 
   const now = new Date().toISOString();
@@ -85,7 +85,7 @@ const handler: ActionExecutionHandler = async (params, context, util) => {
   );
 
   const project = pRes?.data?.createProject?.data;
-  if (!project?.id) throw new Error('יצירת הריקמה נכשלה');
+  if (!project?.id) throw new Error('יצירת הרקמה נכשלה');
 
   return {
     data: {
@@ -99,7 +99,7 @@ const handler: ActionExecutionHandler = async (params, context, util) => {
 export const createWeaveConfig: ActionConfig = {
   key: 'createWeave',
   description:
-    'Create a new weave (project / "ריקמה") with the creator as sole member. Mints any new vallues first, then creates the project with all form fields. Reusable project-creation flow; keeps the JWT server-side.',
+    'Create a new weave (project / "רקמה") with the creator as sole member. Mints any new vallues first, then creates the project with all form fields. Reusable project-creation flow; keeps the JWT server-side.',
   graphqlOperation: handler,
   paramSchema: {
     projectName: { type: 'string', required: true },

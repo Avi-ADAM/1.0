@@ -6,8 +6,8 @@
     "single": "مورد واحد",
     "block_dates": "حجز تواريخ لنفسي",
     "back_to_profile": "العودة إلى الملف الشخصي",
-    "project_title": "تقويم موارد النسيج",
-    "project_sub": "ما الذي يحتفظ به النسيج، وحتى متى، وما الذي يقدمه للخارج"
+    "project_title": "تقويم موارد الريكما",
+    "project_sub": "ما الذي تحتفظ به الريكما، وحتى متى، وما الذي تقدمه للخارج"
   },
   "calendar": {
     "view_label": "العرض",
@@ -17,7 +17,7 @@
     "filter_resource": "المورد",
     "filter_clear": "مسح",
     "filter_party": "لدى من",
-    "party_project": "نسيج",
+    "party_project": "ريكما",
     "party_sheirut": "زبون",
     "party_user": "شخص",
     "party_none": "حجز ذاتي",
@@ -36,7 +36,7 @@
     "cancelled": "أُلغي"
   },
   "source": {
-    "rikma": "نسيج",
+    "rikma": "ريكما",
     "concierge": "زبون",
     "personal": "شخصي",
     "blackout": "محجوز",

@@ -5,12 +5,12 @@ Welcome to **1💗1**, a platform designed for collaborative decision-making and
 ## Key Features:
 
 - **Unanimous Decision Making**: Our unique system facilitates unanimous decision-making among project collaborators.
-- **Effortless Project Establishment**: Easily create and locate a project, known as a "FreeMate," with its human and material components at a single click.
-- **Tailored Connection**: Discover and connect with FreeMates that align perfectly with your values, skills, and work approach.
-- **Decentralized Digital Ledger**: for Account Management in the FreeMates based on Agreements
-- **Collaborative Management Tools**: Access various management tools like graphs, Gantt charts, task boards, and more to aid shared FreeMates management.
-- **Resource Sharing and Earnings**: Share surplus resources with matching FreeMates and earn a dynamic percentage of profits throughout the FreeMates' lifespan.
-- **Collaborative Income Distribution**: Fairly distribute funds based on total investment and pre-set agreements within the FreeMates group.
+- **Effortless Project Establishment**: Easily create and locate a project, known as a "rikma," with its human and material components at a single click.
+- **Tailored Connection**: Discover and connect with rikmas that align perfectly with your values, skills, and work approach.
+- **Decentralized Digital Ledger**: for Account Management in the rikma based on Agreements
+- **Collaborative Management Tools**: Access various management tools like graphs, Gantt charts, task boards, and more to aid shared rikma management.
+- **Resource Sharing and Earnings**: Share surplus resources with matching rikmas and earn a dynamic percentage of profits throughout the rikma's lifespan.
+- **Collaborative Income Distribution**: Fairly distribute funds based on total investment and pre-set agreements within the rikma.
 
 ## Contribution:
 

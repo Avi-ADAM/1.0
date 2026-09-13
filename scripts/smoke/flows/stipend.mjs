@@ -188,7 +188,7 @@ const run = async () => {
   await a.page.waitForTimeout(3000);
   const escalated = await text(a.page);
   const gate =
-    escalated.includes('התנאים האלה צריכים את הסכמת הריקמה') &&
+    escalated.includes('התנאים האלה צריכים את הסכמת הרקמה') &&
     escalated.includes('לפתוח תוכנית מלגות');
   if (!gate) await shot(a.page, 'stipend-4-gate');
   record(
@@ -207,7 +207,7 @@ const run = async () => {
     await setField(a.page, 'number', 1, TOTAL_CAP);
     await a.page.waitForTimeout(1500);
     apiA.clear();
-    await clickText(a.page, /^לשלוח את ההצעה$|^לשלוח לריקמה$|^לשלוח$/);
+    await clickText(a.page, /^לשלוח את ההצעה$|^לשלוח לרקמה$|^לשלוח$/);
     await a.page.waitForTimeout(14000);
     const program = apiA.last('proposeStipendProgram');
     programOk = program?.status === 200 && program?.json?.success === true;
@@ -257,7 +257,7 @@ const run = async () => {
   await visit(a.page, `/moach/${pid}/stipend`, { wait: 13000 });
   const tab = await text(a.page);
   const hasPledge = !tab.includes('אין עדיין התחייבויות');
-  const hasProgram = !tab.includes('אין עדיין תוכנית מלגות בריקמה');
+  const hasProgram = !tab.includes('אין עדיין תוכנית מלגות ברקמה');
   if (!hasPledge || !hasProgram) await shot(a.page, 'stipend-7-tab');
   record(
     '7. the stipend tab shows the pledge and the programme it needed',

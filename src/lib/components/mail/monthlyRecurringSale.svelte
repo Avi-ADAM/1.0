@@ -59,7 +59,7 @@
     he: {
       title: 'מכירה מתחדשת - דיווח חודשי 🔁',
       greeting: `שלום ${username},`,
-      intro: `הגיע הזמן לדווח כמה נכנס החודש (${monthLabel}) מ"${productName}"${projectName ? ` בריקמה "${projectName}"` : ''}.`,
+      intro: `הגיע הזמן לדווח כמה נכנס החודש (${monthLabel}) מ"${productName}"${projectName ? ` ברקמה "${projectName}"` : ''}.`,
       amountLabel: 'הסכום הצפוי',
       ask: 'היכנסו למרכז המכירות, אשרו או עדכנו את הסכום שנכנס בפועל החודש - גם 0 הוא דיווח (הוראת קבע שבוטלה אפשר לסגור באותו מקום).',
       cta: 'דיווח במרכז המכירות',
@@ -102,7 +102,7 @@
     he: {
       title: 'הוראת קבע - עדכון חודשי 💳',
       greeting: `שלום ${username},`,
-      intro: `נפתח חלון הדיווח החודשי (${monthLabel}) עבור "${productName}"${projectName ? ` של הריקמה "${projectName}"` : ''}.`,
+      intro: `נפתח חלון הדיווח החודשי (${monthLabel}) עבור "${productName}"${projectName ? ` של הרקמה "${projectName}"` : ''}.`,
       amountLabel: 'הסכום הצפוי',
       ask: 'היכנסו לעמוד העסקאות ועדכנו כמה העברתם החודש - כך המוכר יוכל לאשרר שהתקבל. גם 0 הוא עדכון לגיטימי.',
       cta: 'עדכון בעמוד העסקאות',

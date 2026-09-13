@@ -10,7 +10,7 @@ import { gqlString } from './actionUtils';
  */
 describe('gqlString', () => {
   it('escapes the quotes that rich-text descriptions always contain', () => {
-    const descrip = '<p style="text-align: right;">עיצוב לוגו לריקמה</p>';
+    const descrip = '<p style="text-align: right;">עיצוב לוגו לרקמה</p>';
     const literal = gqlString(descrip);
 
     expect(literal.startsWith('"')).toBe(true);

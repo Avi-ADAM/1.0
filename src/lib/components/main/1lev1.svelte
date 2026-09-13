@@ -226,7 +226,7 @@ let isHovering = false, isPointerDown = false
   <Glttf {poz} s={ss} {fi} {hover} {scrolli}/>
 </T.Group>
 
-<!-- מערכה 2: לב-הליבה (withlev.glb) שהריקמה מתלכדת סביבו -->
+<!-- מערכה 2: לב-הליבה (withlev.glb) שהרקמה מתלכדת סביבו -->
 {#if heartVisible}
   <Withlev
     bind:ref={heartRef}
@@ -235,7 +235,7 @@ let isHovering = false, isPointerDown = false
   />
 {/if}
 
-<!-- הריקמה: נקודות בודדות → רשת בצורת לב → כדור-עולם -->
+<!-- הרקמה: נקודות בודדות → רשת בצורת לב → כדור-עולם -->
 <Rikma {scrollProgress} />
 
 <!-- הפרי המשותף: מטבעות-זהב שזורמים מהמרכז אל השותפים -->

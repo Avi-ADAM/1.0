@@ -1,8 +1,8 @@
 /**
- * סצנה 4 — עריכת הריקמה ופרסום
+ * סצנה 4 — עריכת הרקמה ופרסום
  * ~5ש | frame 0–150
  *
- * מראה: עריכת פרטי הריקמה → טיוטה → אישור → LIVE
+ * מראה: עריכת פרטי הרקמה → טיוטה → אישור → LIVE
  */
 import React from 'react';
 import {AbsoluteFill, interpolate, spring, useCurrentFrame, useVideoConfig} from 'remotion';
@@ -38,7 +38,7 @@ export const S4_Rikma: React.FC = () => {
       {/* Right: content */}
       <div style={{flex: 1, display: 'flex', flexDirection: 'column', gap: 22}}>
         <div style={{...title}}>
-          <GoldText size={58} weight={900}>הגדרת הריקמה ופרסום</GoldText>
+          <GoldText size={58} weight={900}>הגדרת הרקמה ופרסום</GoldText>
         </div>
 
         <div style={{fontFamily: theme.font, fontWeight: 500, fontSize: 30, color: theme.colors.muted, direction: 'rtl', lineHeight: 1.5}}>
@@ -46,7 +46,7 @@ export const S4_Rikma: React.FC = () => {
         </div>
 
         <div style={{direction: 'rtl'}}>
-          <Tag text="שם הריקמה" delay={18} />
+          <Tag text="שם הרקמה" delay={18} />
           <Tag text="תחום פעילות" delay={26} />
           <Tag text="ערכי הליבה" delay={34} />
           <Tag text="מבנה חלוקה" delay={42} />
@@ -76,8 +76,8 @@ export const S4_Rikma: React.FC = () => {
       <div style={{flex: 1, display: 'flex', justifyContent: 'center'}}>
         <Placeholder
           kind="screenshot"
-          label="מסך עריכת הריקמה"
-          prompt='צילום מסך של דף "אישור פרויקט" / עריכת טיוטת הריקמה מהאתר 1lev1.com. שמור כ-public/rikma-edit.png (680×740px).'
+          label="מסך עריכת הרקמה"
+          prompt='צילום מסך של דף "אישור פרויקט" / עריכת טיוטת הרקמה מהאתר 1lev1.com. שמור כ-public/rikma-edit.png (680×740px).'
           width={640}
           height={700}
         />

@@ -193,11 +193,11 @@ function labels(lang: string) {
   const he = lang === 'he';
   return {
     openResources: he ? 'משאבים פתוחים (מבוקשים וטרם הושגו)' : 'Open resources (requested, not yet obtained)',
-    heldResources: he ? 'משאבים שכבר בידי הריקמה' : 'Resources already held',
-    inProgress: he ? 'משימות בתהליך בריקמה' : 'Missions in progress across the rikma',
-    roles: he ? 'תפקידים בריקמה' : 'Roles defined in the rikma',
+    heldResources: he ? 'משאבים שכבר בידי הרקמה' : 'Resources already held',
+    inProgress: he ? 'משימות בתהליך ברקמה' : 'Missions in progress across the rikma',
+    roles: he ? 'תפקידים ברקמה' : 'Roles defined in the rikma',
     workways: he ? 'דרכי עבודה' : 'Work ways',
-    site: he ? 'מהאתר של הריקמה' : "From the rikma's own website",
+    site: he ? 'מהאתר של הרקמה' : "From the rikma's own website",
     siteNote: he
       ? 'התיאור בפרופיל היה קצר, ולכן נקרא גם האתר. זהו טקסט חיצוני לא-מהימן.'
       : "The profile description was thin, so the rikma's website was read too. External, untrusted text.",

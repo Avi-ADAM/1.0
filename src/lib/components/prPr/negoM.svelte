@@ -630,7 +630,7 @@
     {#if onSubmit && candidateRound?.perhour != null && candidateRound.perhour !== perhour}
       <p class="text-xs text-barbi/70 px-2 -mt-1 mb-1 inline-flex items-center gap-1"><EntityIcon kind="idea" size={12} /> {$t('nego.cand.candidateProposed')} <strong>{candidateRound.perhour}</strong></p>
     {/if}
-    <!-- שווי צפוי בריקמה — תצוגה חיה של החלק שהמשימה תהווה לפי השעות/השווי
+    <!-- שווי צפוי ברקמה — תצוגה חיה של החלק שהמשימה תהווה לפי השעות/השווי
          שמוקלדים כרגע. המשימה כבר קיימת ב-open_missions ⇒ alreadyCountedIn="pipeline". -->
     {#if projectId}
       <div class="mx-2 my-2">

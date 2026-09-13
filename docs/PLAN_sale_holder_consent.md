@@ -8,9 +8,9 @@
 1. **הכסף אצלי** — דיווח ריבוני על עצמי. במודל היעד
    (PLAN_user_sovereign_consent) זה אירוע חתום שתקף מיידית: אני מעיד על
    עצמי שאני מחזיק בכסף, ואין צד אחר שצריך להסכים.
-2. **הכסף אצל מישהו אחר** — היום זה נשמר בלי שום שער: כל חבר ריקמה יכול
+2. **הכסף אצל מישהו אחר** — היום זה נשמר בלי שום שער: כל חבר רקמה יכול
    ליצור `Sale` שבו `users_permissions_user` מצביע על חבר אחר, ומאותו רגע
-   אותו חבר "מחזיק כסף של הריקמה" לצורך חישובי מי-חייב-למי
+   אותו חבר "מחזיק כסף של הרקמה" לצורך חישובי מי-חייב-למי
    (`whowhat.svelte`), חלוקות (tosplit→haluka) ו-hervachti — בלי שאישר,
    בלי שנשאל, ובלי חתימה של אף אחד.
 
@@ -25,7 +25,7 @@
 > **משא-ומתן** — העלאת טענה מקבילה מדויקת יותר, שחוזרת פינג-פונג למדווח
 > עד שמגיעים לגרסה ששני הצדדים חתומים עליה.
 >
-> **שתיקה היא הסכמה, בקצב הריקמה**: כל טענה עומדת פתוחה למשך ה-`restime`
+> **שתיקה היא הסכמה, בקצב הרקמה**: כל טענה עומדת פתוחה למשך ה-`restime`
 > של הפרויקט (למשל 72 שעות, דרך `timegrama`). לא הגבת בזמן — הגרסה
 > האחרונה שעל השולחן מאושרת אוטומטית. טענה נגדית מאפסת את השעון.
 >
@@ -54,8 +54,8 @@
 | מקום | קובץ | הערות |
 |------|------|-------|
 | מרכז מכירות | `src/routes/(reg)/sales-center/+page.svelte` | הדף שהוזכר במשימה |
-| דף ריקמה (מוח) | `src/lib/components/prPr/sale.svelte` | עטיפה דקה ל-SaleComponent |
-| רשימת מוצרים בריקמה | `src/lib/components/prPr/hamatanot.svelte` | |
+| דף רקמה (מוח) | `src/lib/components/prPr/sale.svelte` | עטיפה דקה ל-SaleComponent |
+| רשימת מוצרים ברקמה | `src/lib/components/prPr/hamatanot.svelte` | |
 | דף מתנה ציבורי | `src/routes/(regandnon)/gift/[id]/+page.svelte` | עם `defaultHolder` |
 | צ'אט AI | `src/lib/chat/components/ProductList.svelte` (מוזן מ-`src/mastra/tools/saleActionTool.ts`) | הסוכן רק שולף מוצרים; הדיווח עצמו עובר ב-SaleComponent |
 
@@ -63,7 +63,7 @@
 האתר בבת אחת.** אין call-site שעוקף את ה-action (ה-`salesService.js`
 הישן עדיין מכיל מוטציה ישירה — ראו "ניקוי" בפאזה 1).
 
-**חריג מכוון**: `createPlatformSale.ts` (הכנסת site-share לריקמת הפלטפורמה)
+**חריג מכוון**: `createPlatformSale.ts` (הכנסת site-share לרקמת הפלטפורמה)
 נשאר מחוץ לתכנית — לפי SITE_SHARE_TRANSFER_SPEC ההכנסה הזו auto-approved,
 וההעברה הפיזית שלה כבר מאושרת דו-צדדית דרך transfer-Halukas.
 
@@ -154,7 +154,7 @@ saleRecord: 'sale.record'   // המדווח חותם על הטענה המקור�
 
 **Policy** (`policy.ts`): כולם `NOT_REQUIRED` לקוורום — הסכמה דו-צדדית
 בין שני אנשים ספציפיים, לא הכרעת קבוצה (בשונה מ-decision רגיל של כל
-חברי הריקמה — ההבחנה לפי `kind` ב-predicate/subject).
+חברי הרקמה — ההבחנה לפי `kind` ב-predicate/subject).
 
 **Reducers** (פאזה 4): `saleRecord.ts` חדש + הרחבת
 `proposalCounter.ts`/`consensusTimeout.ts` ו-reducer ל-`decision.vote`
@@ -208,7 +208,7 @@ decision        relation oneToOne ← decision.sale             // הצד השנ
 **שרת — `src/lib/server/actions/configs/createSale.ts`:**
 - השוואת `params.userId` (המחזיק הנבחר) מול `context.userId` (המדווח):
   - שווים → `holderStatus: 'self'`, `reporter: context.userId`.
-  - שונים → אימות שהמחזיק הנטען חבר בריקמה, ואז:
+  - שונים → אימות שהמחזיק הנטען חבר ברקמה, ואז:
     1. `holderStatus: 'open'`, `reporter: context.userId`.
     2. יצירת `Decision` `{ kind: 'saleClaim', sale, projects: [projectId],
        decisionName: <שם המוצר+סכום> }`.
@@ -249,7 +249,7 @@ decision        relation oneToOne ← decision.sale             // הצד השנ
 הלוגיקה שם כבר מפוצלת per-kind):
 ```
 agree (הצבעה):
-  משתתפי הקונסנזוס = reporter + holder בלבד (לא כל חברי הריקמה —
+  משתתפי הקונסנזוס = reporter + holder בלבד (לא כל חברי הרקמה —
   בשונה משאר ה-kinds). מותר להצביע רק לצד שעוד לא חתום על הסבב
   העומד (max order).
   יצירת vote { what: true, order: <הסבב העומד> } דרך addVote
@@ -346,13 +346,13 @@ extractors), לא בניית צינור חדש:
    רק אישור / צ'אט / דיוק נגדי. "לא קיבלתי" = דיוק לכמות 0.
 2. **רכיבה על Decision** — הוחלט (עקרון-על, נרשם ב-CLAUDE.md): לא
    יוצרים מודל הצבעה חדש; `kind: 'saleClaim'` + relation ל-Sale.
-   הקונסנזוס ל-kind הזה הוא דו-צדדי (reporter+holder) ולא כלל-ריקמתי.
-3. **שתיקה כהסכמה** — הוחלט: restime של הריקמה דרך timegrama, איפוס שעון
+   הקונסנזוס ל-kind הזה הוא דו-צדדי (reporter+holder) ולא כלל-רקמתי.
+3. **שתיקה כהסכמה** — הוחלט: restime של הרקמה דרך timegrama, איפוס שעון
    בכל סבב דיוק. עקרון-על שחל על כל flow הסכמה חדש (נרשם ב-CLAUDE.md).
 4. **עיתוי הורדת מלאי** — מיידי בעת הדיווח (שריון), התאמת דלתא כשהגרסה
    הסופית שונה. חלופה (להוריד רק בהבשלה) פותחת חלון מכירה-כפולה.
 5. **מי רשאי לדייק** — שני הצדדים בלבד (holder/reporter), בתורות: מגיב
-   רק מי שלא חתום על הסבב העומד. שאר חברי הריקמה רואים סטטוס בלבד.
+   רק מי שלא חתום על הסבב העומד. שאר חברי הרקמה רואים סטטוס בלבד.
 6. **גרסת מובייל/צ'אט** — מכוסה אוטומטית כי הכול עובר ב-SaleComponent.
 
 ---
@@ -361,10 +361,10 @@ extractors), לא בניית צינור חדש:
 
 ### Unit (Vitest)
 - `createSale`: self → `'self'`; other-holder → `'open'` + Decision
-  saleClaim + vote order 1 + timegrama; other-holder שאינו חבר ריקמה → נדחה.
+  saleClaim + vote order 1 + timegrama; other-holder שאינו חבר רקמה → נדחה.
 - `voteOnDecision` (ענף saleClaim): agree של המחזיק בסבב 1 → `confirmed`
   + archived; הצבעה של צד שכבר חתום על הסבב העומד → נדחית; הצבעה של חבר
-  ריקמה שאינו צד → נדחית (בשונה משאר ה-kinds!).
+  רקמה שאינו צד → נדחית (בשונה משאר ה-kinds!).
 - `counterSaleClaim`: negom + vote order 2 + timegrama חדש וישן done;
   agree של המדווח על סבב 2 → Sale מעודכן בגרסת ה-negom + דלתא מלאי;
   דיוק לכמות 0 שמבשיל → מלאי מושב במלואו.

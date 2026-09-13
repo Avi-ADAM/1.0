@@ -716,7 +716,7 @@
               <g
                 onclick={() => linke('p')}
                 onmouseenter={() =>
-                  hover('לחיצה למעבר לעמוד הציבורי של הריקמה')}
+                  hover('לחיצה למעבר לעמוד הציבורי של הרקמה')}
                 onmouseleave={() => hover('0')}
                 x="0"
                 y="-40"
@@ -740,7 +740,7 @@
                 <button
                   onclick={() => project(projectId)}
                   onmouseenter={() =>
-                    hover(` לחיצה למעבר למוח ריקמת ${projectName}`)}
+                    hover(` לחיצה למעבר למוח רקמת ${projectName}`)}
                   onmouseleave={() => hover('0')}
                 >
                   <img

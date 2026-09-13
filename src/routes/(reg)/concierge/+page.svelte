@@ -141,7 +141,7 @@
       proposalsCount: 2,
       missionsCount: 1,
       resourcesCount: 2,
-      lastEvent: 'Lev מצאה 2 התאמות מ־1 ריקמה',
+      lastEvent: 'Lev מצאה 2 התאמות מ־1 רקמה',
       lastEventTime: 'לפני 4 שעות',
       budget: '₪ 80–150',
       whenStr: 'שבוע הקרוב',
@@ -305,7 +305,7 @@
     {
       icon: '?',
       kind: 'question',
-      text: 'האם לחפש שותפויות נוספות לבישול שבת? יש 3 ריקמות חדשות בקרבת מקום.'
+      text: 'האם לחפש שותפויות נוספות לבישול שבת? יש 3 רקמות חדשות בקרבת מקום.'
     },
     {
       icon: '✦',

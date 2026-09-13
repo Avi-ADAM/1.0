@@ -70,7 +70,7 @@ export const S7_Approval: React.FC = () => {
         <GoldText size={62} weight={900}>אשרור פה-אחד</GoldText>
       </div>
       <div style={{...sub, fontFamily: theme.font, fontSize: 30, color: theme.colors.muted, direction: 'rtl', textAlign: 'center', maxWidth: 780, lineHeight: 1.45, marginBottom: 48}}>
-        תנאי המשימה + ההשמה לחבר — נרשמים סופית רק לאחר שכל שותפי הריקמה אישרו.
+        תנאי המשימה + ההשמה לחבר — נרשמים סופית רק לאחר שכל שותפי הרקמה אישרו.
       </div>
 
       {/* Vote cards */}

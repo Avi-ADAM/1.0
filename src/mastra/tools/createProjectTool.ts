@@ -3,9 +3,9 @@ import { z } from 'zod';
 
 export const createProjectTool = createTool({
   id: 'createProjectTool',
-  description: 'Generate a URL to create a new Partnership (also known as "Embroidery" or "ריקמה"). This tool allows preparing all the project details for the user. שותפות היא ריקמה.',
+  description: 'Generate a URL to create a new Partnership (also known as "Embroidery" or "רקמה"). This tool allows preparing all the project details for the user. שותפות היא רקמה.',
   inputSchema: z.object({
-    name: z.string().describe('The name of the new Partnership (Embroidery/ריקמה). This is required.'),
+    name: z.string().describe('The name of the new Partnership (Embroidery/רקמה). This is required.'),
     desc: z.string().optional().describe('A short public description of the partnership.'),
     details: z.string().optional().describe('A detailed description of the partnership in HTML format.'),
     url: z.string().optional().describe('A link to a website related to the project.'),

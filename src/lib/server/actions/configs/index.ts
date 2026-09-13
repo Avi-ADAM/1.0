@@ -413,7 +413,7 @@ export function registerAllActions(): void {
   registerAction(updateUserBasicConfig);
   registerAction(archiveUserResourceConfig);
 
-  // Weave creation (baci.svelte — "יצירת ריקמה", reusable project creation)
+  // Weave creation (baci.svelte — "יצירת רקמה", reusable project creation)
   registerAction(createWeaveConfig);
 
   // User offerings (PLAN_USER_OFFERINGS): home rikma + publish Sp as product

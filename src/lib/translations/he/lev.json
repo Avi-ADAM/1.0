@@ -211,9 +211,9 @@
       "approveMonthlyExpense": "אישור ההוצאה החודשית"
     },
     "sugestma": {
-      "head": "הצעה לשיתוף משאב בריקמה",
-      "recurHead": "🔁 משאב חוזר · הצעה לשיתוף משאב בריקמה",
-      "askedVal": "הצעת הריקמה",
+      "head": "הצעה לשיתוף משאב ברקמה",
+      "recurHead": "🔁 משאב חוזר · הצעה לשיתוף משאב ברקמה",
+      "askedVal": "הצעת הרקמה",
       "myval": "ההצעה שלי",
       "offerAtSource": "להצעה בעמוד המקור",
       "withdrawSelfNomination": "משיכת ההצעה העצמית - הצעת המשאב שחיברת תיסגר כולה",
@@ -225,7 +225,7 @@
       "totalInvest": "סך השקעה משוער",
       "totalInvestHint": "סך השקעה משוער לכל התקופה",
       "noEndDate": "ללא תאריך סיום - עד לסימון כהושלם",
-      "cycleApprovalNote": "בכל מחזור ייפתח חיוב לאישור ההוצאה בפועל מול הריקמה"
+      "cycleApprovalNote": "בכל מחזור ייפתח חיוב לאישור ההוצאה בפועל מול הרקמה"
     },
     "welcome": {
       "welcome": "ברוך הבא {{username}} לרקמה {{projectName}}!",
@@ -304,7 +304,7 @@
       "perHour": "לשעה",
       "monthly": "בחודש",
       "todoList": "רשימת מטלות:",
-      "watchpr": "לצפיה בריקמה",
+      "watchpr": "לצפיה ברקמה",
       "min": "מינימום",
       "max": "מקסימום",
       "firstYear": "שנה ראשונה",
@@ -322,7 +322,7 @@
     },
     "reqtojoin": {
       "headRishon": "אישור והשמת משימה",
-      "headJoin": "אישור צירוף לריקמה והשמת משימה"
+      "headJoin": "אישור צירוף לרקמה והשמת משימה"
     },
     "hachlata": {
       "monthly": "חודשי",
@@ -340,7 +340,7 @@
       "recurringTag": "🔁 משאב חוזר",
       "assignment": "אישרור השמה ושיתוף משאב",
       "request": "אישרור בקשה לשיתוף משאב",
-      "joinRequest": "אישרור צירוף לריקמה ושיתוף משאב"
+      "joinRequest": "אישרור צירוף לרקמה ושיתוף משאב"
     },
     "nav": {
       "heart": "לב 1💗1",
@@ -351,7 +351,7 @@
       "forward": "הבא",
       "prevImage": "https://res.cloudinary.com/love1/image/upload/v1641155352/bac_aqagcn.svg",
       "nextImage": "https://res.cloudinary.com/love1/image/upload/v1641155352/kad_njjz2a.svg",
-      "nothing": "לא נמצאו הצעות או פעולות עבורך, מומלץ לגשת לעמוד הפרופיל כדי להוסיף כישורים, משאבים או כדי ליצור ריקמה חדשה, בהצלחה"
+      "nothing": "לא נמצאו הצעות או פעולות עבורך, מומלץ לגשת לעמוד הפרופיל כדי להוסיף כישורים, משאבים או כדי ליצור רקמה חדשה, בהצלחה"
     },
     "sugestmi": {
       "head": "הצעה למשימה",
@@ -369,7 +369,7 @@
   },
   "reqtojoin": {
     "chatWith": "צ'אט עם",
-    "onJoining": "על צירופו לריקמה",
+    "onJoining": "על צירופו לרקמה",
     "selfNominationTitle": "המועמד/ת חיבר/ה את המשימה והתנאים בעצמו/ה",
     "requester": "מבקש/ת:",
     "tasksList": "רשימת מטלות",
@@ -380,11 +380,11 @@
   },
   "reqtosherut": {
     "chatWith": "צ'אט עם",
-    "onJoining": "על צירופו לריקמה"
+    "onJoining": "על צירופו לרקמה"
   },
   "mashsuggest": {
     "cancel": "ביטול",
-    "chatOnJoining": "צ'אט על הצטרפות לריקמה"
+    "chatOnJoining": "צ'אט על הצטרפות לרקמה"
   },
   "pandingMesima": {
     "error": "אם הבעיה נמשכת baruch@1lev1.com שגיאה יש לנסות שנית, ניתן ליצור קשר במייל "
@@ -422,10 +422,10 @@
     "heartOf": "לב 1💗1",
     "clickToProfile": "לחיצה למעבר לעמוד הפרופיל של {{name}}",
     "resourceName": "שם המשאב המוצע",
-    "clickToPublic": "לחיצה למעבר לעמוד הציבורי של הריקמה",
-    "clickToBrain": "לחיצה למעבר למוח הריקמה {{projectName}}",
+    "clickToPublic": "לחיצה למעבר לעמוד הציבורי של הרקמה",
+    "clickToBrain": "לחיצה למעבר למוח הרקמה {{projectName}}",
     "cancel": "ביטול",
-    "chatOnJoining": "צ'אט על הצטרפות לריקמה"
+    "chatOnJoining": "צ'אט על הצטרפות לרקמה"
   },
   "pmas": {
     "error": "אם הבעיה נמשכת baruch@1lev1.com שגיאה יש לנסות שנית, ניתן ליצור קשר במייל "
@@ -456,8 +456,8 @@
   },
   "welcomTo": {
     "joined": "הצטרפת לרקמה",
-    "toHeadquarters": "לכניסה למטה הריקמה",
-    "welcome": "קבלת פנים לרגל הצטרפותך לריקמה חדשה",
+    "toHeadquarters": "לכניסה למטה הרקמה",
+    "welcome": "קבלת פנים לרגל הצטרפותך לרקמה חדשה",
     "heartOf": "לב 1💗1"
   },
   "revenue": {
@@ -596,14 +596,14 @@
     "selfNomination": "הצעה עצמית",
     "negotiationMode": "מצב משא ומתן",
     "negotiationsWord": "משא ומתן",
-    "memberProposing": "חבר/ת הריקמה המציע/ה:",
+    "memberProposing": "חבר/ת הרקמה המציע/ה:",
     "resourceOfferedBy": "מציע/ה את המשאב:",
     "cost": "עלות:",
     "listedCost": "עלות רשומה",
     "offeredValue": "שווי מוצע:",
     "submittedOffer": "ההצעה שהתקבלה",
-    "ourValue": "שווי הריקמה:",
-    "ourOffer": "ההצעה של הריקמה",
+    "ourValue": "שווי הרקמה:",
+    "ourOffer": "ההצעה של הרקמה",
     "resourceDescription": "תיאור המשאב:",
     "specialNotes": "הערות מיוחדות:",
     "exit": "יציאה",
@@ -611,8 +611,8 @@
     "notAFit": "לא מתאים לנו כרגע",
     "closeSelfNomination": "סגירת ההצעה העצמית כולה - המועמד/ת יקבל/תקבל הודעה מכבדת",
     "notNow": "לא מתאים כרגע",
-    "willJoinRikma": "האישור מצרף אותו/ה לריקמה",
-    "baselineTerms": "תנאי הבסיס של הריקמה (ההצעה החיה למעלה):",
+    "willJoinRikma": "האישור מצרף אותו/ה לרקמה",
+    "baselineTerms": "תנאי הבסיס של הרקמה (ההצעה החיה למעלה):",
     "roundDates": "מועדים בהצעה:",
     "perCycleHint": "עלות משוערת למחזור",
     "perMonth": "לחודש",
@@ -626,8 +626,8 @@
     "totalInvest": "סך השקעה משוער:",
     "totalInvestHint": "סך השקעה משוער לכל התקופה",
     "noEndDate": "ללא תאריך סיום - עד לסימון כהושלם",
-    "recurringApprovalNote": "האישור פותח את מנוע המשאב החוזר; בכל מחזור ייפתח חיוב נפרד לאישור ההוצאה בפועל מול הריקמה",
-    "recurringJoinNote": "האישור מצרף את המציע/ה לריקמה ופותח את מנוע המשאב החוזר; רק אחר כך, בכל מחזור, ייפתח חיוב נפרד לאישור ההוצאה בפועל"
+    "recurringApprovalNote": "האישור פותח את מנוע המשאב החוזר; בכל מחזור ייפתח חיוב נפרד לאישור ההוצאה בפועל מול הרקמה",
+    "recurringJoinNote": "האישור מצרף את המציע/ה לרקמה ופותח את מנוע המשאב החוזר; רק אחר כך, בכל מחזור, ייפתח חיוב נפרד לאישור ההוצאה בפועל"
   },
   "hachlata": {
     "theClaim": "הדיווח",
@@ -702,14 +702,14 @@
     "onlyJoinAndInvestRequests": "הצגת בקשות להצטרפות ולהשקעת משאבים ברקמות בלבד"
   },
   "rikma": {
-    "discordLink": "לינק לדיסקורד של הריקמה",
+    "discordLink": "לינק לדיסקורד של הרקמה",
     "websiteLink": "לינק לאתר",
-    "twitterLink": "לינק לטוויטר של הריקמה",
-    "githubLink": "לינק לגיטהב של הריקמה",
-    "facebookLink": "לינק לפייסבוק של הריקמה",
+    "twitterLink": "לינק לטוויטר של הרקמה",
+    "githubLink": "לינק לגיטהב של הרקמה",
+    "facebookLink": "לינק לפייסבוק של הרקמה",
     "valuesAndObjectives": "ערכים ומטרות",
-    "openMissions": "משימות פנויות בריקמה",
-    "loadError": "טעינת הריקמה נכשלה. יש לנסות שנית."
+    "openMissions": "משימות פנויות ברקמה",
+    "loadError": "טעינת הרקמה נכשלה. יש לנסות שנית."
   },
   "hevel": {
     "skills": "כישורים",
@@ -727,7 +727,7 @@
     "missionCount": "{{name}}: {{count}}"
   },
   "decision": {
-    "logoVote": "הצבעה על שינוי לוגו הריקמה",
+    "logoVote": "הצבעה על שינוי לוגו הרקמה",
     "logoVoteShort": "הצבעה על שינוי הלוגו",
     "saleConsent": "הסכמה על מכירה{{suffix}}",
     "currentLogo": "הלוגו העכשווי",
@@ -747,9 +747,9 @@
     "none": "ללא רווח"
   },
   "suggestor": {
-    "joinSuggestion": "הצעה להצטרפות לריקמה",
-    "chatOnJoining": "צ'אט על הצטרפות לריקמה",
-    "openPublicPage": "לחיצה כפולה לצפיה בעמוד הציבורי של ריקמת {{projectName}}",
+    "joinSuggestion": "הצעה להצטרפות לרקמה",
+    "chatOnJoining": "צ'אט על הצטרפות לרקמה",
+    "openPublicPage": "לחיצה כפולה לצפיה בעמוד הציבורי של רקמת {{projectName}}",
     "missionNameHint": "שם המשימה, 2 לחיצות להרחבה",
     "suggestedMission": "המשימה המוצעת",
     "neededSkills": "הכישורים הנדרשים",

@@ -659,7 +659,7 @@
         {#snippet diamondContent()}
           <!-- עוטפים את היהלום במדריך (TourItem) ומעבירים אליו את הסכום והכותרת.
                היהלום כבר מציג "סך הכל הרווחתי", ולכן הוא גם הכניסה הטבעית לעמוד
-               שמפרק את המספר הזה לאורך זמן ולפי ריקמה. -->
+               שמפרק את המספר הזה לאורך זמן ולפי רקמה. -->
           <a href="/me/income" data-sveltekit-prefetch title={$t('me.income.title')}>
             <TourItem message={$t('pages.me.message10')}>
               <Diamond

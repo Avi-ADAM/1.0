@@ -523,7 +523,7 @@
 
   function hoverc(event) {
     if (event.x == '0') {
-      u = 'הצבעה על בקשה לחלוקת הרווחים שנצברו לריקמה';
+      u = 'הצבעה על בקשה לחלוקת הרווחים שנצברו לרקמה';
     } else {
       u = event.x;
     }
@@ -1872,7 +1872,7 @@
               <img
                 onclick={() => project()}
                 onkeypress={() => project()}
-                onmouseenter={() => hover('לוגו הריקמה')}
+                onmouseenter={() => hover('לוגו הרקמה')}
                 onmouseleave={() => hover('0')}
                 style=" border-radius: 50%;"
                 {src}
@@ -1886,7 +1886,7 @@
               style="overflow:hidden; text-anchor: middle;"
               onclick={() => linke('p')}
               onmouseenter={() =>
-                hover('לחיצה כפולה לצפיה בעמוד הציבורי של הריקמה')}
+                hover('לחיצה כפולה לצפיה בעמוד הציבורי של הרקמה')}
               onmouseleave={() => hover('0')}
             >
               <text
@@ -1956,7 +1956,7 @@
         <text font-family="Digital" on:mouseenter={()=>hover("טיימר")} on:mouseleave={()=>hover("0")} text-anchor="middle" fill="red" y="10" font-size="7" style="font-weight: 300; letter-spacing: 1px;">
             {formatTime(zman)}
         </text>
-                <g style="overflow:hidden; text-anchor: middle;" on:click={()=>linke("p")} on:mouseenter={()=>hover("לחיצה כפולה לצפיה בעמוד הציבורי של הריקמה")} on:mouseleave={()=>hover("0")}  >
+                <g style="overflow:hidden; text-anchor: middle;" on:click={()=>linke("p")} on:mouseenter={()=>hover("לחיצה כפולה לצפיה בעמוד הציבורי של הרקמה")} on:mouseleave={()=>hover("0")}  >
                   <text y='-8' style="filter: url(#glow); fill: var(--gold);"  text-anchor="middle" font-size="8" >{projectName}</text>
                   <text y='-8'  style="fill: black;"  text-anchor="middle" font-size="8" >{projectName}</text></g>
          <g style="overflow:hidden; text-anchor: middle;">
@@ -1965,7 +1965,7 @@
     </g>
                                                      <foreignObject  x='-12' y='-42' width='25px' height='56px'>   
     <span class="{`normSml${perhour}-${projectId}-${mId}`}"></span>
-        <img on:click={()=>project()} on:mouseenter={()=>hover("לוגו הריקמה")} on:mouseleave={()=>hover("0")} style=" border-radius: 50%;" src={src} width="24" height="24"   alt="logo">
+        <img on:click={()=>project()} on:mouseenter={()=>hover("לוגו הרקמה")} on:mouseleave={()=>hover("0")} style=" border-radius: 50%;" src={src} width="24" height="24"   alt="logo">
          
 
        {#if dueDateOrCountToDedline !== null} <h5 style="margin: 7px; font-size: 13px; line-height: 1;">{dueDateOrCountToDedline}</h5>{/if}

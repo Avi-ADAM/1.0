@@ -1,9 +1,9 @@
 <!--
-  Rikma.svelte — the "ריקמה" (network) that tells the site's story with scroll.
+  Rikma.svelte — the "רקמה" (network) that tells the site's story with scroll.
 
   A single cloud of points morphs through three layouts driven by scrollProgress:
     scatter (a few isolated individuals, the minimal opening)  →  globe (a
-    worldwide movement)  →  heart (the ריקמה closing around the "1💗1" reveal).
+    worldwide movement)  →  heart (the רקמה closing around the "1💗1" reveal).
   Glowing lines between neighbours fade in as the points gather into the globe,
   so the viewer literally watches "alone" become "together", and fade out again
   when the heart forms so the final logo reveal stays clean.

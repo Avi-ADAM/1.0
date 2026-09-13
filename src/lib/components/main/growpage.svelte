@@ -353,7 +353,7 @@
       </div>
     </section>
 
-    <!-- ===== Weave (ריקמה כשותפות חיה) - Cellular Bento Layout ===== -->
+    <!-- ===== Weave (רקמה כשותפות חיה) - Cellular Bento Layout ===== -->
     <section id="weave" class="scroll-mt-24">
       <div class="text-center mb-12">
         <h2 class="text-emerald-900 font-extrabold text-3xl sm:text-4xl mb-4">

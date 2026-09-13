@@ -478,7 +478,7 @@
                       monthly={data.alld.attributes.iskvua}
                     />
                   </div>
-                  <!-- שווי צפוי בריקמה — עמוד ציבורי, ולכן isSer מושך דרך
+                  <!-- שווי צפוי ברקמה — עמוד ציבורי, ולכן isSer מושך דרך
                        טוקן השירות; מסתתר בשקט אם אין הרשאת קריאה. -->
                   {#if data.alld.attributes.project?.data?.id}
                     <div class="my-3">

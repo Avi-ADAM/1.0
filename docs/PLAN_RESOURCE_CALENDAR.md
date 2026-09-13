@@ -53,8 +53,8 @@
 מכאן חמישה באגים ישירים:
 
 1. **משאב שהושאל פעם אחת נעלם לתמיד.** אין שום מסלול שמחזיר `panui = true`.
-2. **משאב דיגיטלי/בלתי‑מוגבל ננעל בדיוק כמו רכב.** קובץ שניתן לריקמה אחת
-   כבר לא יוצע לאף ריקמה אחרת, למרות שאין שום מגבלה פיזית.
+2. **משאב דיגיטלי/בלתי‑מוגבל ננעל בדיוק כמו רכב.** קובץ שניתן לרקמה אחת
+   כבר לא יוצע לאף רקמה אחרת, למרות שאין שום מגבלה פיזית.
 3. **`perUnit` לא סופר מלאי.** יש `hm` (כמות) אבל אין שדה "כמה כבר תפוס" על
    `Sp` — `reservedQuantity` קיים רק על `Mashabetahalich` (ראה
    `PLAN_COMPLEX_PRODUCTS §7`), כלומר רק בזרימת המוצרים, לא בזרימת המשאבים.
@@ -71,7 +71,7 @@
 | ישות | התחלה | סיום |
 |---|---|---|
 | `Sp` (המשאב האישי) | `sdate` | `fdate` |
-| `OpenMashaabim` (בקשת ריקמה) | `sqadualed` | `sqadualed**f**` |
+| `OpenMashaabim` (בקשת רקמה) | `sqadualed` | `sqadualed**f**` |
 | `Rikmash` (ארכיון) | `sqadualed` | `sqadual**ef**` |
 | `Mashabetahalich` (מנוע) | `start` | `end` |
 | `Sheirut` (לקוח) | `startDate` | `finnishDate` |
@@ -99,7 +99,7 @@
 
 [`src/lib/server/matching/scoring.ts`](../src/lib/server/matching/scoring.ts)
 מחשב `score = matchedRoles + 2·matchedSkills + wwAdjustment − 2·missingSkills −
-missingRoles`. אין שום רכיב תאריך, ו‑`engine.ts` לא מסנן לפי חפיפה. ריקמה
+missingRoles`. אין שום רכיב תאריך, ו‑`engine.ts` לא מסנן לפי חפיפה. רקמה
 שצריכה מקרן ל‑3 ימים באפריל מקבלת הצעה על מקרן שמושכר עד דצמבר.
 
 ---
@@ -107,7 +107,7 @@ missingRoles`. אין שום רכיב תאריך, ו‑`engine.ts` לא מסנן
 ## 1. העיקרון: תפוסה היא **נגזרת**, לא דגל
 
 > **מקור אמת אחד:** טווח תאריכים על משאב נרשם במקום אחד — רשומת הזמנה —
-> ולא משנה מי הצד השני (ריקמה, לקוח קונסיירז', או המחזיק עצמו).
+> ולא משנה מי הצד השני (רקמה, לקוח קונסיירז', או המחזיק עצמו).
 > "פנוי?" הוא **חישוב** מעל הרשומות האלה, לעולם לא שדה שמישהו כותב.
 
 זה מקביל ישירות לכלל שכבר קיים בכסף: מכירה נספרת רק כשהיא *effective*, ולא
@@ -131,9 +131,9 @@ missingRoles`. אין שום רכיב תאריך, ו‑`engine.ts` לא מסנן
 | `end` | DateTime (nullable) | סיום. **null = פתוח** (עד סגירה ידנית) |
 | `quantity` | Decimal, default 1 | ל‑pool: כמה יחידות נתפסות |
 | `status` | enum `hold \| confirmed \| active \| done \| cancelled` | ראה 2.2 |
-| `holdExpiresAt` | DateTime | פקיעת ה‑hold (נגזר מ‑restime של הריקמה) |
+| `holdExpiresAt` | DateTime | פקיעת ה‑hold (נגזר מ‑restime של הרקמה) |
 | `source` | enum `rikma \| concierge \| personal \| blackout \| external` | מי יצר |
-| `project` | manyToOne → `Project` (nullable) | הצד השני כשזו ריקמה |
+| `project` | manyToOne → `Project` (nullable) | הצד השני כשזו רקמה |
 | `sheirut` | manyToOne → `Sheirut` (nullable) | הצד השני כשזה לקוח קונסיירז' |
 | `consumer_user` | manyToOne → user (nullable) | הצד השני כשזה אדם |
 | `mashabetahalich` | manyToOne (nullable) | המנוע, כשקיים |
@@ -194,7 +194,7 @@ missingRoles`. אין שום רכיב תאריך, ו‑`engine.ts` לא מסנן
 `or: [{availability: {null: true}}, {availability: {eq: "..."}}]` — `ne` חשוף
 מחריג שורות NULL ב‑SQL ויסתיר כל משאב קיים.
 
-### 2.4 שדות חדשים על `OpenMashaabim` (בקשת הריקמה)
+### 2.4 שדות חדשים על `OpenMashaabim` (בקשת הרקמה)
 
 | שדה | טיפוס | תפקיד |
 |---|---|---|
@@ -309,12 +309,12 @@ export function conflictingHolds(sp, bookings, winner, opts?): BookingLike[];
 | qid | תפקיד |
 |---|---|
 | `2xxMyResourceBookings($uid,$from,$to,$spIds)` | הלוח האישי. מחזיר `sp`, טווח, `status`, `project`/`sheirut`, `source` |
-| `2xxProjectResourceBookings($pid,$from,$to)` | לוח הריקמה — מה היא מחזיקה ועד מתי, ומה היא השאילה החוצה |
+| `2xxProjectResourceBookings($pid,$from,$to)` | לוח הרקמה — מה היא מחזיקה ועד מתי, ומה היא השאילה החוצה |
 | `2xxSpAvailabilityWindow($spId,$from,$to)` | הזמנות של Sp יחיד — הקלט ל‑`checkAvailability` |
 | `2xxSpsAvailabilityBulk($spIds,$from,$to)` | אצווה לשידוך, שלא לירות N שאילתות |
 
 כולן נכנסות ל‑[`qidsAccess.js`](../src/routes/api/send/qidsAccess.js).
-הרשאות: הלוח האישי `self`, לוח הריקמה `projectMember`, החלון הציבורי
+הרשאות: הלוח האישי `self`, לוח הרקמה `projectMember`, החלון הציבורי
 (`2xxSpAvailabilityWindow`) מחזיר **רק טווחים תפוסים בלי זהות הצד השני**
 למי שאינו ה‑owner — מי שוכר את המקרן זה לא עניינו של המחפש.
 
@@ -327,7 +327,7 @@ export function conflictingHolds(sp, bookings, winner, opts?): BookingLike[];
 props: `{ bookings, resources, view, selectedSpIds, selectedParties, liveOnly,
 onSelect, onPickDate }`. שלוש תצוגות — `list` / `month` / `week`; צבע לפי
 `status` (hold=מקווקו, confirmed=זהב, active=ורוד, blackout=ניטרלי) מטוקני ערכת
-הנושא בלבד, ותווית = שם המשאב + שם הריקמה/הלקוח.
+הנושא בלבד, ותווית = שם המשאב + שם הרקמה/הלקוח.
 
 **`list` היא ברירת המחדל והיא כתובה במארקאפ רגיל** — פתיחת העמוד בטלפון לא
 מורידה שום ספריית לוח שנה. `@event-calendar` נטענת ב‑`import()` דינמי ממוזכר
@@ -342,7 +342,7 @@ onSelect, onPickDate }`. שלוש תצוגות — `list` / `month` / `week`; צ
 - נגיש מכפתור 📅 ליד כל משאב ב‑`#my-resources` שבעמוד הפרופיל
   ([`userPr/edit.svelte`](../src/lib/components/userPr/edit.svelte), הבלוק
   שמרונדר עם `datan={'mash'}`), וגם מקישור אחד "לוח כל המשאבים" בראש הקטגוריה.
-- מסננים: לפי משאב (multi‑select), לפי צד שני (ריקמה / לקוח / חסימה עצמית),
+- מסננים: לפי משאב (multi‑select), לפי צד שני (רקמה / לקוח / חסימה עצמית),
   לפי סטטוס, לפי טווח.
 - `?sp=<id>` פותח ישירות במצב **משאב בודד** — בדיוק הדרישה "לפלטר ולראות רק
   אחד ספציפי".
@@ -350,11 +350,11 @@ onSelect, onPickDate }`. שלוש תצוגות — `list` / `month` / `week`; צ
 - משאב עם `availability:'unlimited'` מוצג בפס נפרד "ללא תפוסה" ולא תופס
   שורות בלוח.
 
-### 6.3 בריקמה: `/moach/[projectId]/resources`
+### 6.3 ברקמה: `/moach/[projectId]/resources`
 
 טאב/עמוד עם אותו `ResourceCalendar`, שמראה:
-- משאבים שהריקמה **מקבלת** (`Mashabetahalich` פעילים) ועד מתי,
-- משאבים שהריקמה **מספקת** החוצה (ללקוחות קונסיירז' / לריקמות אחרות),
+- משאבים שהרקמה **מקבלת** (`Mashabetahalich` פעילים) ועד מתי,
+- משאבים שהרקמה **מספקת** החוצה (ללקוחות קונסיירז' / לרקמות אחרות),
 - התנגשויות צפויות (שני `Sheirut` על אותו משאב).
 
 מתחבר ללוח הפתוח הקיים
@@ -405,7 +405,7 @@ onSelect, onPickDate }`. שלוש תצוגות — `list` / `month` / `week`; צ
 | M2 | Backfill: לכל `Mashabetahalich` פעיל עם `sp` → `resource-booking` `status:'active'` עם `start`/`end` שלו; לכל `Rikmash` סגור → `status:'done'` | נמוך, קריאה בלבד + יצירה |
 | M3 | קריאה כפולה: `checkAvailability` רץ בצל ומדווח ל‑`metrics` איפה הוא חולק על `panui`. **`panui` עדיין השער** | אפס |
 | M4 | היפוך: `checkAvailability` הוא השער, `panui` נכתב כנגזרת | בינוני — כאן צריך את M3 ירוק |
-| M5 | UI: לוח אישי + לוח ריקמה | — |
+| M5 | UI: לוח אישי + לוח רקמה | — |
 | M6 | שער התאריכים בשידוך | בינוני — מסתיר הצעות; לפתוח מאחורי דגל |
 | M7 | UI לבחירת `availability` מפורשת (`total` → `unlimited` למי שרוצה) | — |
 
@@ -489,7 +489,7 @@ onSelect, onPickDate }`. שלוש תצוגות — `list` / `month` / `week`; צ
 | `components/resource/ResourceCalendar.svelte` (+ `.svelte.test.ts`) | רשימה במארקאפ, רשת ב‑`import()` דינמי |
 | `components/resource/DateOverlap.svelte` | "ביקשו … · פנוי אצלך … · חפיפה N ימים" + כפתור הצעת תאריך אחר |
 | `routes/(reg)/me/resources/` | "לוח המשאבים שלי", כולל `?sp=<id>` |
-| `routes/(reg)/moach/[projectId]/resources/` | לוח הריקמה — מה שהיא מחזיקה ומה שהיא התחייבה לספק |
+| `routes/(reg)/moach/[projectId]/resources/` | לוח הרקמה — מה שהיא מחזיקה ומה שהיא התחייבה לספק |
 | `moach/[projectId]/+layout.svelte` | טאב `resources` בקבוצת `opps`, ליד `open` |
 | `userPr/edit.svelte` | קישור 📅 לכל משאב + קישור ללוח המלא |
 | `lev/cards/sugestma.svelte` + `mashsuggest.svelte` + `LevCard.svelte` | שורת החפיפה על כרטיס הצעת המשאב |
@@ -500,7 +500,7 @@ onSelect, onPickDate }`. שלוש תצוגות — `list` / `month` / `week`; צ
 | קובץ | מה |
 |---|---|
 | `qids.js` `309myResourceOccupancy` | תפוסה של מחזיק — נעולה ל‑`self` ב‑`guards.js` |
-| `qids.js` `310projectResourceOccupancy` | תפוסה של ריקמה — נעולה לחברי הריקמה ב‑`guards.js` (בדיקת חברות אמיתית, לא רק id) |
+| `qids.js` `310projectResourceOccupancy` | תפוסה של רקמה — נעולה לחברי הרקמה ב‑`guards.js` (בדיקת חברות אמיתית, לא רק id) |
 | `qids.js` `204` / `205` | הורחבו בשדות התאריך שהשער ב‑§7 צריך |
 | `src/lib/translations/*/resources.json` + `routes.js` + `moach.json` | namespace חדש ב‑5 שפות + תווית הטאב |
 | `vitest.config.js` | שני projects — רק `*.svelte.test.ts` מקבל את תנאי ה‑`browser` |
@@ -742,7 +742,7 @@ create 34 | skipped 0 | status_done 17 | status_active 17 | existing 0
 
 | קובץ | מה נשבר |
 |---|---|
-| `qids.js` `309myResourceOccupancy` / `310projectResourceOccupancy` | שתי השאילתות שמזינות את `/me/resources` ואת לוח הריקמה — כלומר העמודים האלה לא החזירו דבר |
+| `qids.js` `309myResourceOccupancy` / `310projectResourceOccupancy` | שתי השאילתות שמזינות את `/me/resources` ואת לוח הרקמה — כלומר העמודים האלה לא החזירו דבר |
 | `bookingStore.ts` (`SP_FIELDS`, `loadSpLedger`) | כל `syncPanui` / `confirmBookingAndRelease` / `checkSpAvailability` — כלומר היומן היה נשבר ברגע ש‑`RESOURCE_BOOKINGS` יוצא מ‑`off`, ו‑`bestEffort` היה בולע את זה כאזהרה |
 | `bookingView.ts` (`normalizeResourceNode`) | קרא `a.hm` על צומת `Sp` וקיבל תמיד `undefined` — כל pool נראה בקיבולת 1 |
 
@@ -754,5 +754,5 @@ create 34 | skipped 0 | status_done 17 | status_active 17 | existing 0
 
 `Sheirut` (התחייבות לספק ללקוח קונסיירז') אינו חלק מההרצה: §8 M2 מגדיר אותה
 על `Mashabetahalich` + `Rikmash` בלבד, והקישור `Sheirut`↔הזמנה עדיין פתוח
-(§9.4, יחד עם `PLAN_COMPLEX_PRODUCTS §7`). עד שייסגר, לוח הריקמה ממשיך לקרוא
+(§9.4, יחד עם `PLAN_COMPLEX_PRODUCTS §7`). עד שייסגר, לוח הרקמה ממשיך לקרוא
 את ההתחייבויות האלה דרך `bookingsFromLegacy.ts`, כפי שהוא עושה היום.

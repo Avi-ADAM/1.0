@@ -139,7 +139,7 @@ export const counterOnAskmConfig: ActionConfig = {
     recipients: { type: 'specificUsers', config: { userIdsParam: 'recipientIds' } },
     templates: {
       title: { he: 'הצעת ביניים למשאב', en: 'Intermediate proposal for a resource' },
-      body: { he: 'הוגשה הצעת ביניים על משאב בריקמה', en: 'An intermediate proposal was submitted for a resource' },
+      body: { he: 'הוגשה הצעת ביניים על משאב ברקמה', en: 'An intermediate proposal was submitted for a resource' },
     },
     channels: ['socket'],
     metadata: { type: 'base', url: 'lev' },
