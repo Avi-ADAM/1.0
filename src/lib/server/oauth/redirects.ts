@@ -7,7 +7,13 @@
 
 import { env } from '$env/dynamic/private';
 
-const DEFAULT_HOSTS = 'claude.ai,*.claude.ai,claude.com,*.claude.com';
+// claude.* covers Claude web, the mobile app and Claude Code cloud sessions.
+// chatgpt.com / openai.com cover ChatGPT's custom connectors, whose callback is
+// https://chatgpt.com/connector_platform_oauth_redirect. Anything else — a
+// Gemini Enterprise tenant, an n8n instance, a self-hosted agent — is added by
+// the deployment through MCP_OAUTH_REDIRECT_HOSTS, which replaces this list.
+const DEFAULT_HOSTS =
+  'claude.ai,*.claude.ai,claude.com,*.claude.com,chatgpt.com,*.chatgpt.com,openai.com,*.openai.com';
 
 function allowedHosts(): string[] {
   return (env.MCP_OAUTH_REDIRECT_HOSTS ?? DEFAULT_HOSTS)

@@ -19,7 +19,10 @@ export function authorizationServerMetadata(url: URL) {
     response_types_supported: ['code'],
     grant_types_supported: ['authorization_code'],
     code_challenge_methods_supported: ['S256'],
-    token_endpoint_auth_methods_supported: ['none'],
+    // PKCE is what actually protects the exchange; the secret-bearing methods
+    // are advertised because ChatGPT and Gemini Enterprise insist on a
+    // client_secret. See oauth/clients.ts → clientSecretFor().
+    token_endpoint_auth_methods_supported: ['none', 'client_secret_post', 'client_secret_basic'],
     scopes_supported: ['mcp'],
     service_documentation: 'https://1lev1.com/mcp-connect'
   };

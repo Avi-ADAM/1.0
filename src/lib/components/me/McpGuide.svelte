@@ -23,8 +23,17 @@
   }
 }`;
 
+  const CODEX_SNIPPET = `[mcp_servers.lev1]
+url = "${ENDPOINT}"
+bearer_token_env_var = "LEV1_API_KEY"`;
+
   const EXAMPLE_KEYS = ['ex1', 'ex2', 'ex3', 'ex4', 'ex5', 'ex6'];
   const BOUNDARY_KEYS = ['boundary1', 'boundary2', 'boundary3', 'boundary4'];
+  const CONNECTOR_STEPS = ['step1', 'step2', 'step3', 'step4'];
+  // Each entry is a label (the agent) and the one line that says what to do
+  // there. Kept as a list rather than prose because people scan this section
+  // looking for their own tool, not reading it.
+  const OTHER_AGENTS = ['chatgpt', 'geminiCli', 'geminiEnterprise', 'codex', 'anyMcp'];
 
   /** Which snippet is currently showing its "copied" state. */
   let copiedKey = $state('');
@@ -60,6 +69,27 @@
       </button>
     </div>
     <p class="hint">{$t('mcp.quickNote')}</p>
+  </section>
+
+  <!-- The no-terminal path. It sits directly under the command because the two
+       are alternatives, and someone reading this on a phone cannot run either
+       command shown above. -->
+  <section>
+    <h3>{$t('mcp.connectorTitle')}</h3>
+    <p class="body">{$t('mcp.connectorBody')}</p>
+    <ol class="steps">
+      {#each CONNECTOR_STEPS as key (key)}
+        <li>{$t(`mcp.connector_${key}`)}</li>
+      {/each}
+    </ol>
+    <p class="label">{$t('mcp.endpointLabel')}</p>
+    <div class="cmd">
+      <code>{ENDPOINT}</code>
+      <button type="button" onclick={() => copy(ENDPOINT, 'connector-endpoint')}>
+        {copiedKey === 'connector-endpoint' ? $t('mcp.copied') : $t('mcp.copy')}
+      </button>
+    </div>
+    <p class="hint">{$t('mcp.connectorNote')}</p>
   </section>
 
   <section>
@@ -107,6 +137,26 @@
   <section>
     <h3>{$t('mcp.agentsTitle')}</h3>
     <p class="body">{$t('mcp.agentsBody')}</p>
+  </section>
+
+  <section>
+    <h3>{$t('mcp.othersTitle')}</h3>
+    <p class="body">{$t('mcp.othersBody')}</p>
+    <ul class="bullets">
+      {#each OTHER_AGENTS as key (key)}
+        <li>
+          <strong>{$t(`mcp.other_${key}_name`)}</strong>
+          {$t(`mcp.other_${key}_how`)}
+        </li>
+      {/each}
+    </ul>
+    <div class="snippet">
+      <pre dir="ltr"><code>{CODEX_SNIPPET}</code></pre>
+      <button type="button" onclick={() => copy(CODEX_SNIPPET, 'codex')}>
+        {copiedKey === 'codex' ? $t('mcp.copied') : $t('mcp.copy')}
+      </button>
+    </div>
+    <p class="hint">{$t('mcp.othersNote')}</p>
   </section>
 
   <section>
@@ -260,6 +310,20 @@
     font-style: italic;
     opacity: 0.9;
   }
+  /* Numbered because the connector flow is a sequence — the bullets elsewhere
+     on this page are unordered facts. */
+  .steps {
+    margin: 0;
+    padding-inline-start: 1.3rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+  .steps li {
+    font-size: 0.88rem;
+    line-height: 1.55;
+    opacity: 0.9;
+  }
   .bullets {
     margin: 0;
     padding-inline-start: 1.1rem;
@@ -271,6 +335,9 @@
     font-size: 0.88rem;
     line-height: 1.5;
     opacity: 0.9;
+  }
+  .bullets strong {
+    color: var(--goldink, #8a6a15);
   }
 
   /* The consent boundary is the part people skip and then complain about, so

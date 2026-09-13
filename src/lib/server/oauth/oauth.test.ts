@@ -9,7 +9,8 @@ vi.mock('$env/dynamic/private', () => ({
   }
 }));
 
-const { mintClientId, parseClientId, isRegisteredRedirectUri } = await import('./clients.js');
+const { mintClientId, parseClientId, isRegisteredRedirectUri, clientSecretFor, clientSecretOk } =
+  await import('./clients.js');
 const { mintCode, redeemCode, __resetReplayCache } = await import('./codes.js');
 const { challengeFor, verifyChallenge, isSupportedMethod } = await import('./pkce.js');
 const { isAllowedRedirectUri } = await import('./redirects.js');
@@ -60,6 +61,34 @@ describe('client_id', () => {
     expect(isRegisteredRedirectUri(client, CB)).toBe(true);
     expect(isRegisteredRedirectUri(client, CB + '/../evil')).toBe(false);
     expect(isRegisteredRedirectUri(client, 'https://claude.ai/api/mcp/auth_callback2')).toBe(false);
+  });
+});
+
+describe('client_secret', () => {
+  const id = mintClientId({ redirect_uris: [CB], client_name: 'ChatGPT', iat: 1 });
+
+  it('is derived from the client_id, so it needs no storage', () => {
+    expect(clientSecretFor(id)).toBe(clientSecretFor(id));
+    const other = mintClientId({ redirect_uris: [CB], client_name: 'Other', iat: 2 });
+    expect(clientSecretFor(other)).not.toBe(clientSecretFor(id));
+  });
+
+  it('is not the client_id signature — publishing it must not forge a client_id', () => {
+    expect(clientSecretFor(id)).not.toBe(id.split('.')[1]);
+  });
+
+  it('accepts a public client that presents nothing', () => {
+    expect(clientSecretOk(id, undefined)).toBe(true);
+    expect(clientSecretOk(id, '')).toBe(true);
+    expect(clientSecretOk(id, null)).toBe(true);
+  });
+
+  it('accepts the secret it issued and refuses any other', () => {
+    expect(clientSecretOk(id, clientSecretFor(id))).toBe(true);
+    expect(clientSecretOk(id, 'not-the-secret')).toBe(false);
+    // A secret minted for a different registration must not travel.
+    const other = mintClientId({ redirect_uris: [CB], client_name: 'Other', iat: 2 });
+    expect(clientSecretOk(id, clientSecretFor(other))).toBe(false);
   });
 });
 
