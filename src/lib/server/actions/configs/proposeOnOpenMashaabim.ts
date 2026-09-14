@@ -186,7 +186,7 @@ export const proposeOnOpenMashaabimConfig: ActionConfig = {
     templates: {
       title: { he: 'הצעה מקבילה למשאב', en: 'Counter-proposal for a resource' },
       body: {
-        he: 'מועמד הגיש הצעה מתוקנת למשאב בריקמה',
+        he: 'מועמד הגיש הצעה מתוקנת למשאב ברקמה',
         en: 'A candidate submitted revised terms for a resource',
       },
     },

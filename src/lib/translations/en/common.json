@@ -107,7 +107,7 @@
     "cancel": "Cancel"
   },
   "forumInbox": {
-    "project": "Project",
+    "project": "Rikma",
     "process": "Process",
     "mission": "Mission",
     "ask": "Request",
@@ -123,13 +123,13 @@
   },
   "forumPage": {
     "title": "Choose a forum from the list",
-    "body": "Open an existing conversation, search by project, or share a direct forum link.",
+    "body": "Open an existing conversation, search by rikma, or share a direct forum link.",
     "hint": "On desktop the thread opens here. On mobile the list gives way to the conversation."
   },
   "forumLayout": {
     "title": "Forums",
     "subtitle": "All conversations relevant to you in one place",
-    "search": "Search by title, project or message",
+    "search": "Search by title, rikma or message",
     "blocked": "You do not have permission to view that forum.",
     "loadError": "We could not load your forums right now."
   },

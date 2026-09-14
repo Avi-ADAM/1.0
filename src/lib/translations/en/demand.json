@@ -76,7 +76,7 @@
   "km": "km",
   "add_supply_fab": "Add your supply",
   "add_supply_title": "What would you like to offer?",
-  "add_supply_sub": "Your supply is shown to customers, the concierge and weaves",
+  "add_supply_sub": "Your supply is shown to customers, the concierge and rikmas",
   "add_mission": "A mission I do",
   "add_mission_hint": "A priced service: what, for how much and where",
   "add_resource": "A resource",
@@ -93,12 +93,12 @@
   "supply_sugg_mine": "mine",
   "supply_sugg_cta": "Make a threshold offer based on your supply",
   "lev_panel_fab": "Demand map",
-  "lev_panel_sub": "Live demand and supply - wishes, pools, missions and resources from all weaves.",
+  "lev_panel_sub": "Live demand and supply - wishes, pools, missions and resources from all rikmas.",
   "lev_panel_full": "Open the full map page",
   "lev_panel_error": "Loading the map failed.",
   "lev_panel_retry": "Try again",
   "lev_panel_close": "Close",
-  "hub_teaser_sub": "What people seek and offer right now - pools and weaves together.",
+  "hub_teaser_sub": "What people seek and offer right now - pools and rikmas together.",
   "hub_teaser_cta": "To the demand map",
   "hub_items_active": "active items"
 }

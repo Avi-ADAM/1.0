@@ -329,7 +329,7 @@
       compact={isMobileOrTablet()}
     />
 
-    <!-- שווי צפוי בריקמה — כמה מהריקמה תהיה שווה המשימה אם תושלם היום.
+    <!-- שווי צפוי ברקמה — כמה מהרקמה תהיה שווה המשימה אם תושלם היום.
          המשימה היא אחת מ-open_missions ⇒ alreadyCountedIn="pipeline". -->
     {#if projectId}
       <EquityPreview
@@ -510,7 +510,7 @@
           >
         </a>
       {:else if myRoundProposedBy === 'project'}
-        <!-- B2: הריקמה הציעה הצעה נגדית — לאשר או להעלות סבב נגדי -->
+        <!-- B2: הרקמה הציעה הצעה נגדית — לאשר או להעלות סבב נגדי -->
         <button
           class="flex-2 py-3 bg-gradient-to-r from-barbi to-mpink text-white font-extrabold rounded-xl shadow-md hover:shadow-lg flex justify-center items-center gap-2 transform hover:-translate-y-1 transition-all"
           style="flex: 2;"

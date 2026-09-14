@@ -8240,7 +8240,7 @@ ${STIPEND_DECISION_FIELDS}
     }
   }`,
 
-  /* ── Weave creation (baci.svelte "יצירת ריקמה") ────────────────────────────
+  /* ── Weave creation (baci.svelte "יצירת רקמה") ────────────────────────────
    * Reusable project-creation flow moved server-side so the JWT stays in the
    * HttpOnly cookie. `baciFormData` feeds the create form (vallue options +
    * existing project names for the uniqueness check). `crVallue` mints any

@@ -155,10 +155,23 @@
     "aiBanner": {
       "eyebrow": "🤖 AI-powered",
       "title": "Come build with AI",
-      "desc": "Our AI scans the project and suggests directions and tasks ready for your approval - try it below",
+      "desc": "Our AI scans the rikma and suggests directions and tasks ready for your approval - try it below",
       "cta": "Plan with AI"
     },
-    "preparingMission": "Matching the suggested skills to the platform’s vocabulary…"
+    "preparingMission": "Matching the suggested skills to the platform’s vocabulary…",
+    "agentConnect": {
+      "title": "Work on this rikma from Claude",
+      "desc": "Connect Claude once, and it can add planning boards, tasks and missions here for you",
+      "step1": "1. Connect - once",
+      "connector": "Claude on the web or in the app - as a connector",
+      "claudeCode": "Claude Code - one command in the terminal",
+      "step2": "2. Tell Claude which rikma to work in",
+      "step2Body": "Claude can reach all your rikmas, and some may share a name. Start the conversation with this line so it works on this one:",
+      "prompt": "In this conversation we are working on the rikma \"{{name}}\" on 1lev1 (projectId: {{projectId}}). Use this projectId in every 1lev1 tool.",
+      "copy": "Copy",
+      "copied": "Copied",
+      "note": "Missions and planning boards Claude prepares wait for your approval, and a task it assigns to a member waits for that member's approval."
+    }
   },
   "objectList": {
     "active": "Active",
@@ -251,9 +264,9 @@
     "sale": "Sales"
   },
   "tour": {
-    "badge": "FreeMates is a collaboration group - everyone contributes their skills and earns according to their contribution",
-    "members": "FreeMates members - a pulsing green ring means a member is currently working on the project. Click a photo to visit their profile",
-    "tabsIntro": "The tabs are the management hub of the FreeMates - each tab shows a different aspect of the project",
+    "badge": "A rikma is a collaboration group - everyone contributes their skills and earns according to their contribution",
+    "members": "Rikma members - a pulsing green ring means a member is currently working for the rikma. Click a photo to visit their profile",
+    "tabsIntro": "The tabs are the management hub of the rikma - each tab shows a different aspect of the rikma",
     "create": "📋 Create: add missions and request resources (money, gear, info) - for existing members or to find new partners. Every published mission or resource gets a unique shareable link with a beautiful page optimized for social networks and partner recruitment",
     "progress": "🔄 Progress: list of all active missions - who is working on what and at which stage",
     "acts": "✅ Acts & Tasks: manage small tasks - what is done, what is on the way",
@@ -261,7 +274,7 @@
     "wishes": "💌 Incoming Wishes: warm leads from concierge customers that your project is a match for - ready business opportunities",
     "sales": "🛒 Sales & Products: Simple product = fixed price. Complex product = price shaped by missions, resources and decisions made together during the purchase process. Every product gets a beautiful shareable page optimized for social media and attracting customers",
     "split": "💰 Split: revenue-split calculator - everyone gets paid according to their contribution",
-    "votes": "🗳️ Votes: decisions made through consensus - unique negotiation tools until everyone is genuinely happy with the outcome. Not majority vote, but real agreement from all FreeMates members",
+    "votes": "🗳️ Votes: decisions made through consensus - unique negotiation tools until everyone is genuinely happy with the outcome. Not majority vote, but real agreement from all rikma members",
     "chains": "🔗 Chains: every mission and resource across its entire lifecycle - from the opening proposal through voting all the way to the archive. Full transparency and deep understanding of every project process",
     "gantt": "📊 Gantt & Kanban: visual project management and timeline",
     "helpBtn": "Show guide again"
@@ -276,8 +289,8 @@
     "showing": "Showing {{count}} of {{total}}"
   },
   "guide": {
-    "header": "Project Brain Guide",
-    "text": "Would you like a quick tour of what you can do in the project brain?\n(You can reopen it via the ? button in the header)",
+    "header": "Rikma Brain Guide",
+    "text": "Would you like a quick tour of what you can do in the rikma brain?\n(You can reopen it via the ? button in the header)",
     "yes": "Yes",
     "no": "No thanks"
   },

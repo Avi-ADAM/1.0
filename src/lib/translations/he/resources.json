@@ -6,8 +6,8 @@
     "single": "משאב בודד",
     "block_dates": "חסום תאריכים",
     "back_to_profile": "חזרה לפרופיל",
-    "project_title": "לוח המשאבים של הריקמה",
-    "project_sub": "מה הריקמה מחזיקה, עד מתי, ומה היא מספקת החוצה"
+    "project_title": "לוח המשאבים של הרקמה",
+    "project_sub": "מה הרקמה מחזיקה, עד מתי, ומה היא מספקת החוצה"
   },
   "calendar": {
     "view_label": "תצוגה",
@@ -17,7 +17,7 @@
     "filter_resource": "משאב",
     "filter_clear": "נקה",
     "filter_party": "אצל מי",
-    "party_project": "ריקמה",
+    "party_project": "רקמה",
     "party_sheirut": "לקוח",
     "party_user": "אדם",
     "party_none": "חסימה עצמית",
@@ -36,7 +36,7 @@
     "cancelled": "בוטל"
   },
   "source": {
-    "rikma": "ריקמה",
+    "rikma": "רקמה",
     "concierge": "לקוח",
     "personal": "אישי",
     "blackout": "חסום",

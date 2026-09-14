@@ -20,7 +20,7 @@
 | **שלב 2 — מסך גיבוש**     | `/concierge/[id]`: `PLAN_ROWS` (שורה לכל משימה/משאב) + ספקים ממוינים + עריכת פירוק inline (הוסף/הסר/חובה↔רצוי) דרך `updateRatsonExtraction` + "טוטאל"/כיסוי + harmony ring + כרוניקה.                                                                              | מימוש ה"מסך עריכה וגיבוש תכנית" שתיארת.                                                                                        |
 | **הצמדה לקיים**           | enrichment גרાונדד מה-DB: אנשים לפי כישורים, משאבים פנויים (Sp), מוצרים מוכנים. נשמר ב-`ai_meta.enrichment` ונקרא ב-`/[id]` בלי לחשב מחדש.                                                                                                                         | תואם [[concierge-enrichment-persistence]].                                                                                     |
 | **בקשה מספק / "הזמיני"**  | אדם → `requestWishMission`, משאב → `requestWishResource`, מוצר מוכן → `requestSuggestion` (Track service-request). הלקוח **מחבר את ההצעה** דרך `mission.svelte`/`ResourceCreator.svelte` ב-`specMode`.                                                             | מימוש מתוקן של §5.3 (הלקוח יוצר, לא הספק).                                                                                     |
-| **binding למוצר מורכב**   | `requestWishMission` יוצר draft `derivedComplexMatanot` (qid 139) + `pendm` חסר-ריקמה (137) + שורת BOM לא-מוקצית (125) + proposal (101). הספק מאשר השמה ב-`acceptWishOffer` (143/144 assign + 112 willingness).                                                    | פאזת ההרכבה של §5.3 — בנויה.                                                                                                   |
+| **binding למוצר מורכב**   | `requestWishMission` יוצר draft `derivedComplexMatanot` (qid 139) + `pendm` חסר-רקמה (137) + שורת BOM לא-מוקצית (125) + proposal (101). הספק מאשר השמה ב-`acceptWishOffer` (143/144 assign + 112 willingness).                                                    | פאזת ההרכבה של §5.3 — בנויה.                                                                                                   |
 | **שער הסכמה (לקוחה)**     | `acceptRatsonProposal` / `rejectRatsonProposal` בכרטיסי ההצעה.                                                                                                                                                                                                     | M5 (חלקי — ראה פערים).                                                                                                         |
 | **Surfacing לנמען**       | `/deals` טאבים "בקשות ממתינות" (Track A) + "משאלות אלייך" (Track B, `IncomingWishCard`); `/moach/[projectId]/wishes` (qid 107).                                                                                                                                    | תואם §5.2. אובייקט-לב (`ani:wishInvite`) **דולג** ל-MVP.                                                                       |
 | **Matching**              | `matchRatson(mode='keyword')` נורה אוטומטית אחרי פרסום.                                                                                                                                                                                                            | M3 בנוי; vector/ai_full כ-enum בלבד (החילוץ החי כבר משתמש ב-Gemini/Pinecone).                                                  |
@@ -44,9 +44,9 @@
 3. **רוויזיית AI עם טקסט חופשי** ◑ — עריכת הפירוק ידנית (הוסף/הסר/חובה↔רצוי) קיימת; "בקשת רוויזיה מה-AI עם כל המידע שנצבר + בקשה טקסטואלית" **לא** (יש רק חילוץ ראשוני חי).
 4. **רשימת ספקים מלאה לכל משימה/משאב** ◑ — כיום: אנשים לפי כישורים + משאבים-פנויים לפי Sp + מוצרים מוכנים. **חסר:** "משתמשים שביצעו את המשימה" ו"קישור-טמפלט בפרופיל" כמקורות גראונדינג; קישור-אוטומטי-לטמפלט + "יצירת טמפלט בשם בלבד" בשלב 1.
 5. **הערכת עלות בלי ספק** ◑ — `requestWishMission` כן יוצר pendm/recipe (→ עלות), אבל קשור להזמנת ספק ספציפי; "pend להערכה בלבד, גם בלי הצעת ספק" עדיין לא מסלול עצמאי.
-6. **Materialize — יצירת ריקמת השותפים** ✅ (נבנה 2026-06-05) — פעולה `materializeWish` + כפתור "סגרי את ההסכמה" חי ב-`/[id]`. כשכל שורות ה-BOM משובצות (ספקים אישרו), הלקוחה סוגרת → נוצרת **ריקמה ייעודית** (`166crWishWeave`: הספקים=חברים, הלקוחה=לקוחה/לא-חברה), המוצר המורכב מתארח עליה (`167hostWishMatanot`), כל `pendm.rishon`/`pmash.selfProposalUser` נקשר לספק, ואז `createSheirutFromPending` הקיים מייצר Sheirut + מפעיל BOM (mesimabetahalich/maap) → `/deals`. readiness נאכף בשרת. `ratson.status='fulfilled'`. (qids: 166/167/168 + הרחבת q72 ב-`pendm.rishon`.)
+6. **Materialize — יצירת רקמת השותפים** ✅ (נבנה 2026-06-05) — פעולה `materializeWish` + כפתור "סגרי את ההסכמה" חי ב-`/[id]`. כשכל שורות ה-BOM משובצות (ספקים אישרו), הלקוחה סוגרת → נוצרת **רקמה ייעודית** (`166crWishWeave`: הספקים=חברים, הלקוחה=לקוחה/לא-חברה), המוצר המורכב מתארח עליה (`167hostWishMatanot`), כל `pendm.rishon`/`pmash.selfProposalUser` נקשר לספק, ואז `createSheirutFromPending` הקיים מייצר Sheirut + מפעיל BOM (mesimabetahalich/maap) → `/deals`. readiness נאכף בשרת. `ratson.status='fulfilled'`. (qids: 166/167/168 + הרחבת q72 ב-`pendm.rishon`.)
    - **עריכה מלאה ללקוח** ✅ — `requestWishMission`/`requestWishResource` מקבלים כעת `targetUserId` **אופציונלי**: בלי יעד נוצרת שורת BOM לא-משובצת (להערכת עלות / שיבוץ בהמשך). כפתורי "➕ הוסיפי משימה / ◐ הגדירי משאב" ב-`/[id]` פותחים `mission.svelte`/`ResourceCreator` ב-specMode.
-7. **ניהול מהמסך + שלב אחרי-סיום** ❌ — ניהול ע"י הספקים מהמשאלה, וההצעה לספקים בסיום (לארכב את הריקמה אחרי חלוקת כסף / להמשיך ולפרסם את המוצר המורכב ולשתף פעולה ללקוחות נוספים) — עתידי, לא בנוי.
+7. **ניהול מהמסך + שלב אחרי-סיום** ❌ — ניהול ע"י הספקים מהמשאלה, וההצעה לספקים בסיום (לארכב את הרקמה אחרי חלוקת כסף / להמשיך ולפרסם את המוצר המורכב ולשתף פעולה ללקוחות נוספים) — עתידי, לא בנוי.
 
 ---
 
@@ -68,9 +68,9 @@
 - המשתמש רואה אילו **הצעות** יש לו (לבצע משימות / לתת משאבים) ובעתיד גם **מו"מ** (תנאים שונים — ייבוא `negoM`/`negoPend`).
 - **עריכה חופשית** של רשימת המשימות (הוסף/הסר), או **בקשת רוויזיה מה-AI** עם כל המידע שנצבר + בקשה טקסטואלית.
 
-**שער הסכמה + פאזת ייצור.** רק אחרי שאושרה **השמה לכל** המשימות והמשאבים → נוצרת **ריקמה** + **מוצר מורכב** מקושר אליה: כל הספקים = **חברים** בריקמה, הלקוח = **הלקוח** שקונה את המוצר המורכב. משם משתמשים בלוגיקת האישרורים של המכירות ([PLAN_COMPLEX_PRODUCTS.md](./PLAN_COMPLEX_PRODUCTS.md)). עדיף לאפשר ניהול **ממסך המשאלה** (וגם לספקים).
+**שער הסכמה + פאזת ייצור.** רק אחרי שאושרה **השמה לכל** המשימות והמשאבים → נוצרת **רקמה** + **מוצר מורכב** מקושר אליה: כל הספקים = **חברים** ברקמה, הלקוח = **הלקוח** שקונה את המוצר המורכב. משם משתמשים בלוגיקת האישרורים של המכירות ([PLAN_COMPLEX_PRODUCTS.md](./PLAN_COMPLEX_PRODUCTS.md)). עדיף לאפשר ניהול **ממסך המשאלה** (וגם לספקים).
 
-**אחרי סיום.** מציעים לספקים: לארכב את הריקמה (אחרי חלוקת הכסף) **או** להמשיך ולפרסם את המוצר המורכב שנוצר — להרכיב מוצרים מורכבים יחד ולהמשיך לשתף פעולה ללקוחות אחרים.
+**אחרי סיום.** מציעים לספקים: לארכב את הרקמה (אחרי חלוקת הכסף) **או** להמשיך ולפרסם את המוצר המורכב שנוצר — להרכיב מוצרים מורכבים יחד ולהמשיך לשתף פעולה ללקוחות אחרים.
 
 ---
 
@@ -259,7 +259,7 @@ job log לריצות ה‑matching (להבדל בין ידני, מתוזמן, AI
 | ✅ בנוי     | M0–M2     | טופס משאלה → `createRatson`; hub שלי+browse; `/[id]` view.                                                  |
 | ✅ בנוי     | M3        | `matchRatson(keyword)` נורה אוטומטית; ProposalList.                                                         |
 | ◑ חלקי      | M4        | משאלות פתוחות ב-`/moach/wishes`; הזמנה דרך `requestWishMission/Resource`. ספק-יוזם-עצמאי לא מלא.            |
-| ✅ בנוי      | M5        | accept/reject + `acceptWishOffer` (השמה) + **materialize** (`materializeWish`: ריקמה ייעודית → `createSheirutFromPending` → `/deals`). |
+| ✅ בנוי      | M5        | accept/reject + `acceptWishOffer` (השמה) + **materialize** (`materializeWish`: רקמה ייעודית → `createSheirutFromPending` → `/deals`). |
 | ✅+         | M6 / M6.5 | חילוץ AI **חי** בכתיבה + enrichment (Gemini/Pinecone) — מקדים את התכנית. **חסר:** רוויזיית-AI עם פרומפט.    |
 | ❌          | M7–M9     | auto-compose מלא, multi-provider stitching, agent בצ'אט — עתידי.                                            |
 | ❌          | —         | מו"מ (`negoM`/`negoPend`), פרסום-קהילה דרך `sugestmi`/`sugestma`, שלב אחרי-סיום (ארכוב/פרסום-מוצר).         |
@@ -353,7 +353,7 @@ ratson_proposal.status='accepted' (סופי) + ratson.status_ratson='fulfilled' 
 | --------------------------------------------------- | --------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- | --------- |
 | **Track A** — מוצר (`kind='matanot'`)               | `Sheirutpend` (בקשת שירות)                                      | `/deals` → טאב **"בקשות ממתינות"** (`PendingRequestCard`, כולל pill "הגיע ממשאלה" דרך `sheirutpend.ratson_proposal`). **כבר עבד.** | ✅        |
 | **Track B** — אדם/משאב (`kind='person'/'resource'`) | `ratson_proposal` (status `suggested`, `proposer_users=[נמען]`) | עד עכשיו: רק התראת push ל-`/lev`. **המסך החדש:** `/deals` → טאב **"משאלות אלייך"**.                                                | ✅ (חדש)  |
-| **רמת ריקמה** (פרויקט מועמד)                        | `ratson_proposal` עם `project` (auto_generated מ-`matchRatson`) | `/moach/[projectId]/wishes` — **כבר היה קיים** (`107listRatsonsForProject`). זו ה"ריקמה" ששאלת עליה — מופעל.                       | ✅ (קיים) |
+| **רמת רקמה** (פרויקט מועמד)                        | `ratson_proposal` עם `project` (auto_generated מ-`matchRatson`) | `/moach/[projectId]/wishes` — **כבר היה קיים** (`107listRatsonsForProject`). זו ה"רקמה" ששאלת עליה — מופעל.                       | ✅ (קיים) |
 
 ### מה נבנה ב-surface הזה (Track B → /deals)
 
@@ -374,33 +374,33 @@ ratson_proposal.status='accepted' (סופי) + ratson.status_ratson='fulfilled' 
 
 > נכתב: 2026-06-04. ההמשך הישיר של §5.2. אומת מול `src/generated/STRAPI_SCHEMA_REFERENCE.md`.
 >
-> **⚠️ תיקון (אותו יום) — מי יוצר את המשימה:** הסעיף נכתב במקור כאילו **הספק** יוצר את המשימה (בחירת ריקמה + `mission.svelte` במודאל האישור). זו התנהגות שגויה. **המודל הנכון:** **הלקוח** מחבר את המשימה (= ההצעה/חוזה) בזמן ההזמנה — `mission.svelte` ב-`specMode` (פולט spec, מסתיר UI תלוי-פרויקט). פעולת `requestWishMission` יוצרת draft `derivedComplexMatanot` + `pendm` **חסר-ריקמה** (`137createPendmForRecipe` בלי `project` → `isglobal`) + שורת `matanot-recipe-mission` **לא-מוקצית** + proposal (מזהה השורה ב-`covered_missions[].extracted_mission_idx`). הספק רק **מאשר השמה**: `acceptWishOffer` מצומצמת ל-`assignedMember` בלבד (qid `143`/`144`) — **בלי בחירת ריקמה, בלי יצירה**. מודאל `AcceptWishOffer.svelte` = צפייה + [תמונה מלאה→/wish/id] + [אישור השמה] + [מו"מ — placeholder]. הריקמה נוצרת רק בסוף (phase 2, טרם מומש). הטבלה למטה משקפת את הישויות; ה"סדר בנייה" המקורי למטה הוחלף ע"י התיקון הזה.
+> **⚠️ תיקון (אותו יום) — מי יוצר את המשימה:** הסעיף נכתב במקור כאילו **הספק** יוצר את המשימה (בחירת רקמה + `mission.svelte` במודאל האישור). זו התנהגות שגויה. **המודל הנכון:** **הלקוח** מחבר את המשימה (= ההצעה/חוזה) בזמן ההזמנה — `mission.svelte` ב-`specMode` (פולט spec, מסתיר UI תלוי-פרויקט). פעולת `requestWishMission` יוצרת draft `derivedComplexMatanot` + `pendm` **חסר-רקמה** (`137createPendmForRecipe` בלי `project` → `isglobal`) + שורת `matanot-recipe-mission` **לא-מוקצית** + proposal (מזהה השורה ב-`covered_missions[].extracted_mission_idx`). הספק רק **מאשר השמה**: `acceptWishOffer` מצומצמת ל-`assignedMember` בלבד (qid `143`/`144`) — **בלי בחירת רקמה, בלי יצירה**. מודאל `AcceptWishOffer.svelte` = צפייה + [תמונה מלאה→/wish/id] + [אישור השמה] + [מו"מ — placeholder]. הרקמה נוצרת רק בסוף (phase 2, טרם מומש). הטבלה למטה משקפת את הישויות; ה"סדר בנייה" המקורי למטה הוחלף ע"י התיקון הזה.
 
-### העיקרון: ספק = יוצר pendm/pmash בריקמה שלו; המשאלה = מוצר מורכב שמרכיב את כולם; הלקוחה = קונה
+### העיקרון: ספק = יוצר pendm/pmash ברקמה שלו; המשאלה = מוצר מורכב שמרכיב את כולם; הלקוחה = קונה
 
 הקבלת היחסים (כל השדות **כבר קיימים ב‑Strapi** — אפס שינוי סכמה):
 
 | מה                     | היכן מוגדר                                                                                                                                                 |
 | ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| התרומה של הספק (משימה) | `pendm` בריקמת הספק (נוצר ע"י `mission.svelte`/`createMission` הקיים) → שורת BOM `matanot-recipe-mission.pendm` + `assignedMember`=ספק, `mode='createNew'` |
-| התרומה של הספק (משאב)  | `pmash` בריקמת הספק (`ResourceCreator.svelte`/`createResource`) → `matanot-recipe-resource.pmash` + `assignedMember`                                       |
+| התרומה של הספק (משימה) | `pendm` ברקמת הספק (נוצר ע"י `mission.svelte`/`createMission` הקיים) → שורת BOM `matanot-recipe-mission.pendm` + `assignedMember`=ספק, `mode='createNew'` |
+| התרומה של הספק (משאב)  | `pmash` ברקמת הספק (`ResourceCreator.svelte`/`createResource`) → `matanot-recipe-resource.pmash` + `assignedMember`                                       |
 | המוצר המורכב           | `matanot` (`pricingMode='estimated'/'quote'`, `process`) — ה‑aggregator                                                                                    |
 | משאלה ↔ מוצר           | `ratson.derivedComplexMatanot` (oneToOne→matanot) + `ratson.process`                                                                                       |
 | התחייבות הספק          | רכיב `ratson_willingness_entry` על ה‑proposal (`agree,item_idx,item_kind,willingHours/Amount,user`)                                                        |
-| הלקוחה כקונה           | `sheirut` (נפתח מהמוצר המורכב; `sheirutpend` מפזר הסכמה לכל ריקמת ספק)                                                                                     |
+| הלקוחה כקונה           | `sheirut` (נפתח מהמוצר המורכב; `sheirutpend` מפזר הסכמה לכל רקמת ספק)                                                                                     |
 | מה נוצר/נצרך בזמן אמת  | `sheirut-fulfillment` (`createdMissions`/`createdMaaps`) — מזין את `deals/[id]`                                                                            |
 
 ### שתי פאזות (החלטת בעלות — מאושר)
 
-1. **פאזת הרכבה (commitment):** **לא** יוצרים ריקמה — כבד ומזהם. המוצר המורכב הוא aggregator קל‑משקל המעוגן ל‑`ratson.process`; כל `pendm/pmash` חי בריקמה הקיימת של הספק. כל תרומה רק **מוסיפה שורת recipe** למוצר. (M8 stitching חוצה‑ריקמות.)
-2. **פאזת ייצור (אחרי שכולם התחייבו + הלקוחה אישרה):** אין מנוס — **יוצרים ריקמה ייעודית לכל השותפים**. **הלקוחה היא הלקוחה של הריקמה, לא חברה בה.** המוצר המורכב עובר/נקשר לריקמה הזו, ו‑`createSheirutFromPending` מפעיל את ה‑BOM.
+1. **פאזת הרכבה (commitment):** **לא** יוצרים רקמה — כבד ומזהם. המוצר המורכב הוא aggregator קל‑משקל המעוגן ל‑`ratson.process`; כל `pendm/pmash` חי ברקמה הקיימת של הספק. כל תרומה רק **מוסיפה שורת recipe** למוצר. (M8 stitching חוצה‑רקמות.)
+2. **פאזת ייצור (אחרי שכולם התחייבו + הלקוחה אישרה):** אין מנוס — **יוצרים רקמה ייעודית לכל השותפים**. **הלקוחה היא הלקוחה של הרקמה, לא חברה בה.** המוצר המורכב עובר/נקשר לרקמה הזו, ו‑`createSheirutFromPending` מפעיל את ה‑BOM.
 
 ### סדר בנייה מוצע (אינקרמנטלי)
 
-- **S1 — accept modal נשלף (reusable):** `AcceptWishOffer.svelte` (props: `proposalId, ratsonId, item{kind,idx,name,hours/qty}`). בוחר ריקמה מארחת (מגשר על `projectId:null`) → מטמיע `mission.svelte`/`ResourceCreator.svelte` ממולא מ‑`extracted_*`. שמיש מ‑wish/lev/deals.
+- **S1 — accept modal נשלף (reusable):** `AcceptWishOffer.svelte` (props: `proposalId, ratsonId, item{kind,idx,name,hours/qty}`). בוחר רקמה מארחת (מגשר על `projectId:null`) → מטמיע `mission.svelte`/`ResourceCreator.svelte` ממולא מ‑`extracted_*`. שמיש מ‑wish/lev/deals.
 - **S2 — action `acceptWishOffer`:** יוצר/מוצא את `ratson.derivedComplexMatanot` (lazy, מעוגן ל‑`ratson.process`), מוסיף שורת `matanot-recipe-mission/resource` עם ה‑pendm/pmash שנוצר, כותב `ratson_willingness_entry`, מעדכן `status_proposal`, מתריע ללקוחה.
 - **S3 — decline:** action קטן (status + התראה).
-- **S4 — materialize:** כשכל הצרכים מכוסים + הלקוחה מאשרת → יצירת ריקמת השותפים + `createSheirutFromPending` (M7 path קיים) + `sheirut-fulfillment` → `deals/[id]`.
+- **S4 — materialize:** כשכל הצרכים מכוסים + הלקוחה מאשרת → יצירת רקמת השותפים + `createSheirutFromPending` (M7 path קיים) + `sheirut-fulfillment` → `deals/[id]`.
 
 > פתוח: בחירת ה‑`item_kind`/idx מתוך `extracted_*`; mapping בין proposal יחיד (person/resource) לבין שורת ה‑recipe; תמחור (`willingAmount`/`ratePerHour`).
 

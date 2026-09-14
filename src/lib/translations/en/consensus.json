@@ -9,15 +9,15 @@
     "action3": { "label": "Counter", "desc": "Propose a new version of the same ask" }
   },
   "decisionTime": {
-    "kicker": "The Rhythm of the Weave",
+    "kicker": "The Rhythm of the rikma",
     "title": "Silence that becomes agreement",
-    "body": "Every proposal carries its own decision window - the rikma's decision time (between 48 hours and a week, depending on the settings your rikma sets). If no one responds before the window closes, the proposal stands approved. Not because anyone said yes out loud, but because no one objected. That's the rhythm of the weave: time to think, then forward motion.",
+    "body": "Every proposal carries its own decision window - the rikma's decision time (between 48 hours and a week, depending on the settings your rikma sets). If no one responds before the window closes, the proposal stands approved. Not because anyone said yes out loud, but because no one objected. That's the rhythm of the rikma: time to think, then forward motion.",
     "ringResult": "Agreed!"
   },
   "essence": {
     "kicker": "What this really is",
     "title": "A place to build a livelihood together - by agreement",
-    "body": "1💗1 isn't just a nice idea. It's a platform where people run real partnerships (rikmot): a shared project, its missions, its income and its profit-split - all by mutual agreement, with no boss and no majority steamroll. The agreement engine you see here is how every decision in such a partnership is made: money, roles, tasks - each side proposes, and you only move forward on a version both sides hold.",
+    "body": "1💗1 isn't just a nice idea. It's a platform where people run real partnerships (rikmas): a shared project, its missions, its income and its profit-split - all by mutual agreement, with no boss and no majority steamroll. The agreement engine you see here is how every decision in such a partnership is made: money, roles, tasks - each side proposes, and you only move forward on a version both sides hold.",
     "point1": { "title": "Shared partnerships", "desc": "Run a project, its missions and its money together - in full transparency." },
     "point2": { "title": "Fair profit-split", "desc": "Everyone's contribution is measured and split by agreement, not by force." },
     "point3": { "title": "No boss, no majority steamroll", "desc": "Every decision matures by agreement or by silence - at the pace you set." }

@@ -10,15 +10,15 @@
     "action3": { "label": "Contrapropuesta", "desc": "Propón una nueva versión de la misma petición" }
   },
   "decisionTime": {
-    "kicker": "El ritmo del tejido",
+    "kicker": "El ritmo de la rikma",
     "title": "El silencio que se convierte en acuerdo",
-    "body": "Cada propuesta lleva su propia ventana de decisión: el tiempo de decisión de la rikma (entre 48 horas y una semana, según los ajustes que defina tu rikma). Si nadie responde antes de que la ventana se cierre, la propuesta queda aprobada. No porque alguien dijera que sí en voz alta, sino porque nadie objetó. Ese es el ritmo del tejido: tiempo para pensar y luego avanzar.",
+    "body": "Cada propuesta lleva su propia ventana de decisión: el tiempo de decisión de la rikma (entre 48 horas y una semana, según los ajustes que defina tu rikma). Si nadie responde antes de que la ventana se cierre, la propuesta queda aprobada. No porque alguien dijera que sí en voz alta, sino porque nadie objetó. Ese es el ritmo de la rikma: tiempo para pensar y luego avanzar.",
     "ringResult": "¡Acordado!"
   },
   "essence": {
     "kicker": "Qué es esto realmente",
     "title": "Un lugar para construir juntos un sustento - por acuerdo",
-    "body": "1💗1 no es solo una idea bonita. Es una plataforma donde las personas gestionan asociaciones reales (rikmot): un proyecto compartido, sus misiones, sus ingresos y su reparto de beneficios, todo por acuerdo mutuo, sin jefe ni imposición de la mayoría. El motor de acuerdos que ves aquí es la forma en que se toma cada decisión en una asociación así: dinero, roles, tareas; cada parte propone, y solo se avanza con una versión que ambas partes sostienen.",
+    "body": "1💗1 no es solo una idea bonita. Es una plataforma donde las personas gestionan asociaciones reales (rikmas): un proyecto compartido, sus misiones, sus ingresos y su reparto de beneficios, todo por acuerdo mutuo, sin jefe ni imposición de la mayoría. El motor de acuerdos que ves aquí es la forma en que se toma cada decisión en una asociación así: dinero, roles, tareas; cada parte propone, y solo se avanza con una versión que ambas partes sostienen.",
     "point1": { "title": "Asociaciones compartidas", "desc": "Gestiona un proyecto, sus misiones y su dinero en conjunto, con total transparencia." },
     "point2": { "title": "Reparto justo de beneficios", "desc": "La contribución de cada uno se mide y se reparte por acuerdo, no por la fuerza." },
     "point3": { "title": "Sin jefe ni imposición de la mayoría", "desc": "Cada decisión madura por acuerdo o por silencio, al ritmo que tú marcas." }

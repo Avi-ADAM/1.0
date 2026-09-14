@@ -14,7 +14,7 @@ let {
   projectId,
   pd,
   username = "New Partner",
-  projectName = "Amazing FreeMates Project",
+  projectName = "Amazing Rikma",
   partnershipDetails,
   onWelcomeClick = () => console.log("Welcome clicked!"),
   src = "https://res.cloudinary.com/love1/image/upload/v1645647192/apple-touch-icon_irclue.png"

@@ -100,7 +100,7 @@ async function sendPP() {
     // Site-activity feed entry (same-origin internal endpoint, no token).
     const data = {
       name: userName_value,
-      action: 'יצר ריקמה חדשה בשם:',
+      action: 'יצר רקמה חדשה בשם:',
       det: `${$baciStore.projectName_value} והתיאור: ${$baciStore.desP}`
     };
     fetch('/api/ste', {

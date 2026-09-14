@@ -47,7 +47,7 @@ const clean = JSON.stringify({
       name: 'רישיון Canva',
       descrip: '',
       imp: 'nice',
-      rationale: 'אין כלי עיצוב בריקמה.',
+      rationale: 'אין כלי עיצוב ברקמה.',
       kindOf: 'equipment',
       price: 240
     }

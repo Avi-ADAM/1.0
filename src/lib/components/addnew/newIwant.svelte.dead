@@ -32,7 +32,7 @@
   async function sendP() {
     if (name.length < 1) {
       naex = {
-        he: 'שם הריקמה חייב להיות ארוך יותר',
+        he: 'שם הרקמה חייב להיות ארוך יותר',
         en: 'please choose name for the FreeMate'
       };
       shgi = true;
@@ -300,7 +300,7 @@
   let newcontent = $state(true);
   let addne = $derived({ he: `הוספת "${ugug}"`, en: `Create "${ugug}"` });
   const timeto = {
-    he: 'כמה זמן עד שהריקמה תכניס כסף',
+    he: 'כמה זמן עד שהרקמה תכניס כסף',
     en: 'how much time until the FreeMates will be profitable'
   };
   const timetoex = {
@@ -308,7 +308,7 @@
     en: 'the time until money can be splited from when all of the missions has asigned and all the resources has accepted'
   };
   const cvar = {
-    he: 'הריקמה כבר רווחית',
+    he: 'הרקמה כבר רווחית',
     en: 'the FreeMates is already profitable'
   };
   const week = { he: 'שבוע', en: 'week' };

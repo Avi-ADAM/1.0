@@ -71,18 +71,18 @@
       "heartTitle": "Heart of the system",
       "heartDesc": "Heart of the system, click on the diamonds to filter the actions",
       "switchView": "Change the view from coins to cards",
-      "showSuggestions": "Show only suggested missions in freemates",
+      "showSuggestions": "Show only suggested missions in rikmas",
       "showVotes": "Show only votes on new missions",
-      "showJoinRequests": "Show only requests for doing missions for FreeMates",
+      "showJoinRequests": "Show only requests to do missions for rikmas",
       "showSplitRequests": "Show only votes on money splittings",
       "showInProgress": "Show only my missions in progress",
-      "showWelcome": "Show only welcomes to FreeMates",
+      "showWelcome": "Show only welcomes to rikmas",
       "showCompletionApproval": "Show only approval of finished missions",
       "personalDashboard": "Click to go to your control room",
       "showResourceApproval": "Show only vote on approval of receiving resources",
-      "showResourceInvestment": "Show only suggested investments of resources in FreeMates",
-      "showResourceVotes": "Show only votes on new resource for FreeMates",
-      "showJoinAndInvest": "Show only requests to join and invest resources on FreeMates",
+      "showResourceInvestment": "Show only suggested investments of resources in rikmas",
+      "showResourceVotes": "Show only votes on new resources for rikmas",
+      "showJoinAndInvest": "Show only requests to join and invest resources in rikmas",
       "showMyPurchases": "Show only my purchases",
       "items": {
         "fiap": "Mission Completion Approvals ({{count}})",
@@ -211,8 +211,8 @@
       "approveMonthlyExpense": "approve monthly expense"
     },
     "sugestma": {
-      "head": "Suggestion for sharing a resource with FreeMates",
-      "recurHead": "🔁 Recurring resource · offer to share a resource with the weave",
+      "head": "Suggestion for sharing a resource with the rikma",
+      "recurHead": "🔁 Recurring resource · offer to share a resource with the rikma",
       "askedVal": "Asked value",
       "myval": "My value",
       "offerAtSource": "Offer on the source page",
@@ -340,7 +340,7 @@
       "recurringTag": "🔁 Recurring resource",
       "assignment": "Resource assignment & share approval",
       "request": "Resource request approval",
-      "joinRequest": "Approve joining the weave & sharing the resource"
+      "joinRequest": "Approve joining the rikma & sharing the resource"
     },
     "nav": {
       "heart": "Heart of 1💗1",
@@ -418,11 +418,11 @@
     }
   },
   "reqtom": {
-    "voteTitle": "vote on request to join the FreeMates and share a resorce ",
+    "voteTitle": "vote on a request to join the rikma and share a resource",
     "heartOf": "the heart of 1💗1",
     "clickToProfile": "click twice to see {{name}} profile",
     "resourceName": "name of the suggested resorce",
-    "clickToPublic": "click twice to see FreeMates public page",
+    "clickToPublic": "click twice to see the rikma's public page",
     "clickToBrain": "click twice to go to the {{projectName}} Brain",
     "cancel": "close",
     "chatOnJoining": "chat on joining"
@@ -455,9 +455,9 @@
     "openMission": "open mission"
   },
   "welcomTo": {
-    "joined": "welcome to the FreeMates",
-    "toHeadquarters": "to the FreeMates headquarters",
-    "welcome": "welcome to new FreeMates",
+    "joined": "welcome to the rikma",
+    "toHeadquarters": "to the rikma headquarters",
+    "welcome": "welcome to a new rikma",
     "heartOf": "the heart of 1💗1"
   },
   "revenue": {
@@ -611,8 +611,8 @@
     "notAFit": "Not a fit right now",
     "closeSelfNomination": "Close the whole self-nomination - the candidate gets a respectful note",
     "notNow": "Not now",
-    "willJoinRikma": "Approving also brings them into the weave",
-    "baselineTerms": "The weave's baseline terms (the live offer is above):",
+    "willJoinRikma": "Approving also brings them into the rikma",
+    "baselineTerms": "The rikma's baseline terms (the live offer is above):",
     "roundDates": "Dates in this offer:",
     "perCycleHint": "Estimated cost per cycle",
     "perMonth": "per month",
@@ -626,8 +626,8 @@
     "totalInvest": "Estimated total investment:",
     "totalInvestHint": "Estimated total investment for the whole period",
     "noEndDate": "No end date - until marked complete",
-    "recurringApprovalNote": "Approval starts the recurring-resource engine; each cycle then opens its own charge for the weave to approve the actual spend",
-    "recurringJoinNote": "Approval brings the offerer into the weave and starts the recurring-resource engine; only afterwards does each cycle open its own charge for the actual spend"
+    "recurringApprovalNote": "Approval starts the recurring-resource engine; each cycle then opens its own charge for the rikma to approve the actual spend",
+    "recurringJoinNote": "Approval brings the offerer into the rikma and starts the recurring-resource engine; only afterwards does each cycle open its own charge for the actual spend"
   },
   "hachlata": {
     "theClaim": "The claim",
@@ -690,10 +690,10 @@
   "diamonds": {
     "onlySuggestedMissions": "Show only mission suggestions",
     "onlyNewMissionVotes": "Show only votes on new missions",
-    "onlyJoinRequests": "Show only requests to do missions for FreeMates",
+    "onlyJoinRequests": "Show only requests to do missions for rikmas",
     "onlyMoneySplitVotes": "Show only votes on money splits",
     "onlyInProgress": "Show only missions in progress",
-    "onlyWelcomes": "Show only welcomes to FreeMates",
+    "onlyWelcomes": "Show only welcomes to rikmas",
     "onlyFinishedApprovals": "Show only approvals of finished missions",
     "toControlRoom": "Go to your control room",
     "onlyResourceReceiptApprovals": "Show only approvals of resource receipts",
@@ -702,11 +702,11 @@
     "onlyJoinAndInvestRequests": "Show only requests to join and invest resources"
   },
   "rikma": {
-    "discordLink": "Link to the FreeMates Discord",
+    "discordLink": "Link to the rikma's Discord",
     "websiteLink": "Link to website",
-    "twitterLink": "Link to the FreeMates Twitter",
-    "githubLink": "Link to the FreeMates GitHub",
-    "facebookLink": "Link to the FreeMates Facebook",
+    "twitterLink": "Link to the rikma's Twitter",
+    "githubLink": "Link to the rikma's GitHub",
+    "facebookLink": "Link to the rikma's Facebook",
     "valuesAndObjectives": "Values and objectives",
     "openMissions": "Open missions",
     "loadError": "Could not load the rikma. Please try again."
@@ -714,7 +714,7 @@
   "hevel": {
     "skills": "Skills",
     "roles": "Roles",
-    "freemates": "FreeMates",
+    "freemates": "Rikmas",
     "waysOfCreation": "Ways of creation",
     "values": "Values",
     "resources": "Resources",
@@ -727,7 +727,7 @@
     "missionCount": "{{name}}: {{count}}"
   },
   "decision": {
-    "logoVote": "Vote on changing the FreeMates logo",
+    "logoVote": "Vote on changing the rikma's logo",
     "logoVoteShort": "Vote on the logo change",
     "saleConsent": "Sale consent{{suffix}}",
     "currentLogo": "Current logo",

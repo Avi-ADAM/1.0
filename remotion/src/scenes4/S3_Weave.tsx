@@ -1,5 +1,5 @@
 /**
- * סצנה 3 — ריקמה: כל אחד מביא חוט. כל חסם הופך לתפקיד של מישהו.
+ * סצנה 3 — רקמה: כל אחד מביא חוט. כל חסם הופך לתפקיד של מישהו.
  * ~6.5ש | 195f
  */
 import React from 'react';
@@ -41,7 +41,7 @@ export const S3_Weave: React.FC = () => {
   return (
     <AbsoluteFill style={{justifyContent: 'center', alignItems: 'center', flexDirection: 'column', gap: 20, padding: 50}}>
       <div style={{...title}}>
-        <GoldText size={56} weight={900}>ריקמה — כל חוט בונה את הבד</GoldText>
+        <GoldText size={56} weight={900}>רקמה — כל חוט בונה את הבד</GoldText>
       </div>
       <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 18}}>
         {ROLES.map((r, i) => (

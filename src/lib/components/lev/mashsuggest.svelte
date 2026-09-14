@@ -175,11 +175,11 @@
   let hovered = $state(false);
 
   let w = $derived(0);
-  let u = 'הצעה לשיתוף משאב והצטרפות לריקמה';
+  let u = 'הצעה לשיתוף משאב והצטרפות לרקמה';
 
   function hover(id) {
     if (id == '0') {
-      u = 'הצעה לשיתוף משאב והצטרפות לריקמה';
+      u = 'הצעה לשיתוף משאב והצטרפות לרקמה';
     } else {
       u = id;
     }
@@ -188,7 +188,7 @@
 
   function hoverc(event) {
     if (event.x == '0') {
-      u = 'הצעה לשיתוף משאב והצטרפות לריקמה';
+      u = 'הצעה לשיתוף משאב והצטרפות לרקמה';
     } else {
       u = event.x;
     }
@@ -447,7 +447,7 @@
           <div id="normSml">
             <span class={`normSml${oid}`}></span>
             <img
-              onmouseenter={() => hover('לוגו הריקמה')}
+              onmouseenter={() => hover('לוגו הרקמה')}
               onmouseleave={() => hover('0')}
               class="img"
               {src}
@@ -455,7 +455,7 @@
             />
             <button
               onclick={() => linke()}
-              onmouseenter={() => hover('לחיצה למעבר לעמוד הציבורי של הריקמה')}
+              onmouseenter={() => hover('לחיצה למעבר לעמוד הציבורי של הרקמה')}
               onmouseleave={() => hover('0')}
               class="hover:scale-110 lt">{projectName}</button
             >
@@ -491,7 +491,7 @@
               >
               /<span
                 role="contentinfo"
-                onmouseenter={() => hover('ההצעה של הריקמה')}
+                onmouseenter={() => hover('ההצעה של הרקמה')}
                 onmouseleave={() => hover('0')}
               >
                 {myp}</span

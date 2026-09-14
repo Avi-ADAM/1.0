@@ -138,24 +138,24 @@ addval == false;
 	}
   const svbt = {"he": "שמירת שינויים","en": "save changes"}
 
-  const githublinkde = {"he":"לינק לגיטהב של הריקמה","en":"link to the FreeMates GitHub"}
-   const fblinkde = {"he":"לינק לפייסבוק של הריקמה","en":"link to the FreeMates Facebook"}
-   const discordlinkde = {"he":"לינק לדיסקורד של הריקמה","en":"link to the FreeMates Discord"}
-   const drivelinkde = {"he":"לינק לגוגל דרייב של הריקמה","en":"link to the FreeMates Google Drive"}
-   const twiterlinkde = {"he":"לינק לטוויטר של הריקמה","en":"link to the FreeMates twitter"}
-   const watsapplinkde = {"he":"לינק לווטסאפ של הריקמה","en":"link to the FreeMates WhatsApp"}
+  const githublinkde = {"he":"לינק לגיטהב של הרקמה","en":"link to the FreeMates GitHub"}
+   const fblinkde = {"he":"לינק לפייסבוק של הרקמה","en":"link to the FreeMates Facebook"}
+   const discordlinkde = {"he":"לינק לדיסקורד של הרקמה","en":"link to the FreeMates Discord"}
+   const drivelinkde = {"he":"לינק לגוגל דרייב של הרקמה","en":"link to the FreeMates Google Drive"}
+   const twiterlinkde = {"he":"לינק לטוויטר של הרקמה","en":"link to the FreeMates twitter"}
+   const watsapplinkde = {"he":"לינק לווטסאפ של הרקמה","en":"link to the FreeMates WhatsApp"}
 
    
  </script>  
 
 <div dir="rtl" class="jho">
-  <h1>עריכת ריקמה</h1>
+  <h1>עריכת רקמה</h1>
 <br>
 
         <div dir="rtl" class='textinput'>
   <input onchange={ch}  name="des" bind:value={projectName_value}  
  type='text' class='input'required >
-  <label for="des" class='label'>שם הריקמה</label>
+  <label for="des" class='label'>שם הרקמה</label>
   <span class='line'></span>
 </div>
 {#if shgi == true}<small class="text-red-600">השם כבר קיים</small>{/if}
@@ -216,7 +216,7 @@ addval == false;
   <span class='line'></span>
 </div>
 <h4 class="text-barbi text:md mt-4">
- ערכים ומטרות שהריקמה תקדם
+ ערכים ומטרות שהרקמה תקדם
 </h4> 
 
  <div  >
@@ -239,7 +239,7 @@ addval == false;
   {:else if addval == true} <AddnewVal color={"--barbi-pink"} addS={true} onAddnew={addnew} rn={vallues.map(c => c.attributes.valueName)}/>{/if}</div>
   <br>
  <div dir="rtl" class="mb-3 xl:w-96 ">
-   <h2 class=" text-barbi">זמן תגובה לקבלת החלטות בריקמה</h2>
+   <h2 class=" text-barbi">זמן תגובה לקבלת החלטות ברקמה</h2>
     <select onchange={ch}  bind:value={restime} class="round form-select appearance-none
       block
       w-80

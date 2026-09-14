@@ -12,7 +12,7 @@ import { PROFIT_IDS, RES_IDS, encodeProjectDraft } from '../../lib/prefill/proje
 export const createProjectTool = createTool({
   id: 'createProjectTool',
   description:
-    'Prepare the "create a Partnership" form (a Partnership is also called an Embroidery, or "ריקמה") and return a link that opens it pre-filled. ' +
+    'Prepare the "create a Partnership" form (a Partnership is also called a rikma, or "רקמה") and return a link that opens it pre-filled. ' +
     'Nothing is created yet: status is "prepared" until the user opens the link and approves the form. ' +
     'Give the user `url` exactly as returned — do not decode, shorten or rebuild it. ' +
     'A public-benefit or nonprofit initiative is a normal Partnership, not a failed business: every Partnership has a public support page ' +

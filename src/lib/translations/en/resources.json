@@ -6,8 +6,8 @@
     "single": "Single resource",
     "block_dates": "Block dates",
     "back_to_profile": "Back to profile",
-    "project_title": "The weave's resource calendar",
-    "project_sub": "What the weave holds, until when, and what it supplies outward"
+    "project_title": "The rikma's resource calendar",
+    "project_sub": "What the rikma holds, until when, and what it supplies outward"
   },
   "calendar": {
     "view_label": "View",
@@ -17,7 +17,7 @@
     "filter_resource": "Resource",
     "filter_clear": "Clear",
     "filter_party": "Held by",
-    "party_project": "Weave",
+    "party_project": "Rikma",
     "party_sheirut": "Customer",
     "party_user": "Person",
     "party_none": "Self-block",
@@ -36,7 +36,7 @@
     "cancelled": "Cancelled"
   },
   "source": {
-    "rikma": "Weave",
+    "rikma": "Rikma",
     "concierge": "Customer",
     "personal": "Personal",
     "blackout": "Blocked",

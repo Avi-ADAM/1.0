@@ -525,12 +525,12 @@
   }
   let w = $state(0);
 
-  let u = 'הצבעה על פרסום הצעת משימה לריקמה';
+  let u = 'הצבעה על פרסום הצעת משימה לרקמה';
   let hovered = $state(false);
 
   function hover(id) {
     if (id == '0') {
-      u = 'הצבעה על פרסום הצעת משימה לריקמה';
+      u = 'הצבעה על פרסום הצעת משימה לרקמה';
     } else {
       u = id;
     }
@@ -544,7 +544,7 @@
     if (hovered == false) {
       u = 'לב המערכת';
     } else {
-      u = 'הצבעה על פרסום הצעת משימה לריקמה';
+      u = 'הצבעה על פרסום הצעת משימה לרקמה';
     }
     onHover?.({
       id: u
@@ -553,7 +553,7 @@
 
   function hoverc(event) {
     if (event.x == '0') {
-      u = 'הצבעה על פרסום הצעת משימה לריקמה';
+      u = 'הצבעה על פרסום הצעת משימה לרקמה';
     } else {
       u = event.x;
     }
@@ -765,7 +765,7 @@
           <button
             onclick={() => project()}
             onmouseenter={() =>
-              hover(` לחיצה למעבר למוח הריקמה ${projectName}`)}
+              hover(` לחיצה למעבר למוח הרקמה ${projectName}`)}
             onmouseleave={() => hover('0')}
           >
             <img class="img" {src} alt="projectlogo" />
@@ -829,7 +829,7 @@
           <button onclick={() => linke()} class="ab na">
             <h3
               class="ab na"
-              onmouseenter={() => hover('לחיצה לצפיה בעמוד הציבורי של הריקמה')}
+              onmouseenter={() => hover('לחיצה לצפיה בעמוד הציבורי של הרקמה')}
               onmouseleave={() => hover('0')}
             >
               {projectName}

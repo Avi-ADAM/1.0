@@ -200,7 +200,7 @@ async function handleObjectChangeVote(
             body: outcome.consensus
               ? {
                   he: endedFor
-                    ? 'ההצעה אושרה פה אחד. עם האובייקט הסתיימה גם חברותו של החבר בריקמה.'
+                    ? 'ההצעה אושרה פה אחד. עם האובייקט הסתיימה גם חברותו של החבר ברקמה.'
                     : 'ההצעה אושרה פה אחד והוחלה.',
                   en: endedFor
                     ? 'Approved unanimously. The member’s membership of the rikma ended along with the object.'

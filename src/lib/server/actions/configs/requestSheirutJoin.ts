@@ -93,12 +93,12 @@ export const requestSheirutJoinConfig: ActionConfig = {
     },
     templates: {
       title: {
-        he: 'בקשה לקבל שירות מהריקמה',
+        he: 'בקשה לקבל שירות מהרקמה',
         en: 'Someone asked to receive a service',
         ar: 'طلب أحدهم الحصول على خدمة'
       },
       body: {
-        he: 'התקבלה בקשה לקבל אחד מהשירותים שלכם. בלי אישור של חבר בריקמה הבקשה לא תאושר מאליה.',
+        he: 'התקבלה בקשה לקבל אחד מהשירותים שלכם. בלי אישור של חבר ברקמה הבקשה לא תאושר מאליה.',
         en: 'A request to receive one of your services arrived. Without a member approving it, it will not mature on its own.',
         ar: 'وصل طلب للحصول على إحدى خدماتكم. من دون موافقة أحد الأعضاء لن تتم الموافقة تلقائيًا.'
       }

@@ -6,8 +6,8 @@
     "single": "Один ресурс",
     "block_dates": "Заблокировать даты",
     "back_to_profile": "Назад в профиль",
-    "project_title": "Календарь ресурсов ткани",
-    "project_sub": "Что ткань держит, до какого срока и что отдаёт наружу"
+    "project_title": "Календарь ресурсов рикмы",
+    "project_sub": "Что рикма держит, до какого срока и что отдаёт наружу"
   },
   "calendar": {
     "view_label": "Вид",
@@ -17,7 +17,7 @@
     "filter_resource": "Ресурс",
     "filter_clear": "Сбросить",
     "filter_party": "У кого",
-    "party_project": "Ткань",
+    "party_project": "Рикма",
     "party_sheirut": "Клиент",
     "party_user": "Человек",
     "party_none": "Своя блокировка",
@@ -36,7 +36,7 @@
     "cancelled": "Отменено"
   },
   "source": {
-    "rikma": "Ткань",
+    "rikma": "Рикма",
     "concierge": "Клиент",
     "personal": "Личное",
     "blackout": "Заблокировано",

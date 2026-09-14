@@ -116,7 +116,7 @@
   let reportInput = $state(/** @type {number | null} */ (null));
   const plannedDefault = $derived(Number(quantityDelivered || pricePerUnit || 0));
   const effectiveAmount = $derived(reportInput ?? plannedDefault);
-  // שווי המשאב עבור "החלק שלך בריקמה": מחזור מתחדש נמדד בסכום המדווח/מתוכנן
+  // שווי המשאב עבור "החלק שלך ברקמה": מחזור מתחדש נמדד בסכום המדווח/מתוכנן
   // לחודש הזה, ואספקה חד-פעמית לפי אותו חישוב שמוצג בשורת הכסף שמעליה.
   const equityValue = $derived(
     isRecurringCycle
@@ -395,8 +395,8 @@
         {/if}
       </div>
 
-      <!-- שווי צפוי בריקמה — מה החלק שהמשאב הזה מקנה בריקמה. מחזור של הוצאה
-           מתחדשת כבר נמנה בזרימה החודשית של הריקמה (alreadyCountedIn="approved"),
+      <!-- שווי צפוי ברקמה — מה החלק שהמשאב הזה מקנה ברקמה. מחזור של הוצאה
+           מתחדשת כבר נמנה בזרימה החודשית של הרקמה (alreadyCountedIn="approved"),
            ואילו אספקה חד-פעמית עוד לא נמצאת באף דלי. -->
       {#if projectId && equityValue > 0}
         <EquityPreview

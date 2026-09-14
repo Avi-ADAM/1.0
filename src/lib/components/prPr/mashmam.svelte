@@ -182,7 +182,7 @@
             <h2>{data.attributes.price}</h2>
           </td>{/each}
       </tr><tr>
-        <th>שווי מקסימלי לחישוב בריקמה</th>
+        <th>שווי מקסימלי לחישוב ברקמה</th>
         {#each meData as data, i}
           <td>
             <small for="name" 

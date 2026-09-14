@@ -3,7 +3,7 @@ import { buildArchiveEntries } from './archiveScreen.js';
 
 function project(over: any = {}) {
   return {
-    projectName: 'ריקמת הבוקר',
+    projectName: 'רקמת הבוקר',
     open_missions: { data: [] },
     mesimabetahaliches: { data: [] },
     open_mashaabims: { data: [] },

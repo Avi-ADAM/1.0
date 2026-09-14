@@ -18,7 +18,7 @@
    */
 
   const terminology = [
-    ['ריקמה', 'project', 'A collaborative group that creates together and shares what it creates'],
+    ['רקמה', 'project', 'A collaborative group that creates together and shares what it creates'],
     ['מוח', 'moach', "The rikma's dashboard (project brain)"],
     ['לב', 'lev', "The user's personal decision feed - one merged, priority-sorted card stream"],
     ['משימה', 'mission', 'A vocabulary-level mission template'],

@@ -19,7 +19,7 @@
 | `src/lib/components/deals/IncomingWishCard.svelte` | כרטיס ספק — הזמנה נכנסת |
 | `src/lib/components/concierge/AcceptWishOffer.svelte` | ספק מאשר / מנהל מו"מ |
 | `src/lib/server/actions/configs/offerWishHelp.ts` | פעולת "אני בפנים" |
-| `src/lib/server/actions/configs/materializeWish.ts` | הפיכת משאלה לריקמה בפועל |
+| `src/lib/server/actions/configs/materializeWish.ts` | הפיכת משאלה לרקמה בפועל |
 
 ---
 

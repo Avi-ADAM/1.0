@@ -1597,9 +1597,9 @@
                 {#if valphE}<Done />{:else}<EditIcon />{/if}</button
               >
             </div>
-            <!-- שווי צפוי בריקמה — כמה מהריקמה תהווה המשימה החדשה שנוצרת כאן.
+            <!-- שווי צפוי ברקמה — כמה מהרקמה תהווה המשימה החדשה שנוצרת כאן.
                  משימה חדשה שעדיין לא פורסמה ⇒ alreadyCountedIn="none".
-                 specMode/publishMode הם ללא ריקמה, ולכן projectId ריק והתצוגה מוסתרת. -->
+                 specMode/publishMode הם ללא רקמה, ולכן projectId ריק והתצוגה מוסתרת. -->
             <!-- "This mission also wants a subsistence stipend" (PLAN_STIPEND
                  §13). Right under the money row, because it is the same
                  question: what this mission costs and what it pays. -->

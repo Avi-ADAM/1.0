@@ -212,7 +212,7 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
               en: `Proposal to ${scope === 'release' ? 'release' : 'archive'}: ${target.name}`,
             },
             body: {
-              he: `${why || 'ללא נימוק'}${membership.isLastTie ? ' · שימו לב: זו המשימה היחידה של החבר בריקמה ולא נצברו בה שעות, ולכן אישור ההצעה יסיים גם את חברותו בריקמה.' : ''} - אפשר לאשר, להציע נוסחה חליפית או לפתוח שיחה. ללא תגובה תוך ${restimeLabel(target.projectRestime, 'he')} ההצעה תאושר מעצמה.`,
+              he: `${why || 'ללא נימוק'}${membership.isLastTie ? ' · שימו לב: זו המשימה היחידה של החבר ברקמה ולא נצברו בה שעות, ולכן אישור ההצעה יסיים גם את חברותו ברקמה.' : ''} - אפשר לאשר, להציע נוסחה חליפית או לפתוח שיחה. ללא תגובה תוך ${restimeLabel(target.projectRestime, 'he')} ההצעה תאושר מעצמה.`,
               en: `${why || 'No reason given'}${membership.isLastTie ? ' · Note: this is the member’s only commitment here and nothing accrued, so approving also ends their membership of the rikma.' : ''} - approve, propose different terms, or open a discussion. With no response within ${window} it is approved on its own.`,
             },
           },

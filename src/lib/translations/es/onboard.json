@@ -4,26 +4,26 @@
   "journey": "Paso 3 · Selección de camino",
   "plaque": {
     "title": "Nos encantaría conocerte",
-    "sub": "¿Cómo te gustaría integrarte en la red de Rikmas de 1💗1?"
+    "sub": "¿Cómo te gustaría integrarte en la red de rikmas de 1💗1?"
   },
   "tile_info": "Esto afecta a lo que te ofrecemos: adaptamos el ritmo a quién eres.",
   "tracks": {
     "provider": {
-      "title": "Quiero ofrecer habilidades y unirme a una Rikma",
-      "sub": "Construyamos un perfil que muestre tus capacidades, para integrarte como socio igualitario en Rikmas (asociaciones por consenso), participar en votaciones y en el reparto de beneficios, o dar una respuesta colectiva a la demanda de clientes.",
+      "title": "Quiero ofrecer habilidades y unirme a una rikma",
+      "sub": "Construyamos un perfil que muestre tus capacidades, para integrarte como socio igualitario en rikmas (asociaciones por consenso), participar en votaciones y en el reparto de beneficios, o dar una respuesta colectiva a la demanda de clientes.",
       "meta": "~ 4 min · Perfil creado a partir del CV o manualmente",
       "chips": [
         "Perfil de habilidades",
-        "Unirse a una Rikma",
+        "Unirse a una rikma",
         "Reparto de beneficios"
       ]
     },
     "business": {
       "title": "Tengo un negocio o una idea de proyecto",
-      "sub": "Crea una nueva Rikma (asociación por consenso) o envuelve un negocio existente, para reclutar socios igualitarios, gestionar beneficios y decisiones juntos y, sobre todo, conectarte directamente con un flujo de clientes y proyectos en el sistema.",
+      "sub": "Crea una nueva rikma (asociación por consenso) o envuelve un negocio existente, para reclutar socios igualitarios, gestionar beneficios y decisiones juntos y, sobre todo, conectarte directamente con un flujo de clientes y proyectos en el sistema.",
       "meta": "~ 5 min · Extraído del sitio o de una descripción libre",
       "chips": [
-        "Crear Rikma y socios",
+        "Crear rikma y socios",
         "Votación y reparto de beneficios",
         "Conectar con proyectos y clientes"
       ]
@@ -36,11 +36,11 @@
       "title": "¡Qué alegría que lo hayas logrado!",
       "sub": "Tu perfil está vivo y respirando"
     },
-    "info": "🎉 Perfil guardado. La Conserjería ya está empezando a buscar coincidencias, Rikmas potenciales y deseos de clientes.<br /><b>¿Por dónde seguimos?</b>",
+    "info": "🎉 Perfil guardado. La Conserjería ya está empezando a buscar coincidencias, rikmas potenciales y deseos de clientes.<br /><b>¿Por dónde seguimos?</b>",
     "choices": {
       "matches": {
         "title": "A tu perfil + guía de usuario",
-        "sub": "La Conserjería ya está buscando Rikmas y demandas de clientes que coincidan. Aprendamos a gestionar una asociación por consenso sobre la marcha.",
+        "sub": "La Conserjería ya está buscando rikmas y demandas de clientes que coincidan. Aprendamos a gestionar una asociación por consenso sobre la marcha.",
         "meta": "Recomendado - La forma natural de continuar",
         "chips": {
           "realtime": "✨ Sugerencias en tiempo real",
@@ -48,11 +48,11 @@
         }
       },
       "business": {
-        "title": "Crear una Rikma (Asociación)",
-        "sub": "¿Tienes una idea de proyecto, producto o asociación? Es hora de crear una Rikma, reclutar socios y conectar con proyectos de clientes en el sistema.",
+        "title": "Crear una rikma (Asociación)",
+        "sub": "¿Tienes una idea de proyecto, producto o asociación? Es hora de crear una rikma, reclutar socios y conectar con proyectos de clientes en el sistema.",
         "meta": "También se puede hacer más tarde desde el perfil",
         "chips": {
-          "project": "Crear una Rikma",
+          "project": "Crear una rikma",
           "products": "Votación y beneficios",
           "partners": "Socios y clientes"
         }
@@ -70,7 +70,7 @@
     "choices": {
       "cv": {
         "title": "Subir CV",
-        "sub": "La IA extraerá tus habilidades y experiencia del CV para emparejarte con Rikmas y proyectos adecuados.",
+        "sub": "La IA extraerá tus habilidades y experiencia del CV para emparejarte con rikmas y proyectos adecuados.",
         "meta": "~ 30 s · PDF · DOCX · TXT",
         "chips": {
           "suggested": "⚡ Recomendado",
@@ -79,7 +79,7 @@
       },
       "describe": {
         "title": "Describe con tus palabras",
-        "sub": "Escribe libremente sobre tus habilidades, deseos y experiencia. La IA te conectará con Rikmas adecuadas.",
+        "sub": "Escribe libremente sobre tus habilidades, deseos y experiencia. La IA te conectará con rikmas adecuadas.",
         "meta": "~ 2 min · 2-3 párrafos",
         "chips": {
           "free": "✍️ Libre"
@@ -107,7 +107,7 @@
       "stage_ready": "Listo para confirmar",
       "err_size": "El archivo es demasiado grande: hasta 5 MB",
       "err_format": "Formato no compatible",
-      "info": "✨ La IA extraerá tus habilidades y experiencia del CV para poder ofrecerte Rikmas adecuadas y una cogestión por consenso. Siempre puedes editarlo.",
+      "info": "✨ La IA extraerá tus habilidades y experiencia del CV para poder ofrecerte rikmas adecuadas y una cogestión por consenso. Siempre puedes editarlo.",
       "back_choice": "← Volver a la elección"
     },
     "describe_page": {
@@ -115,9 +115,9 @@
       "journey": "Paso 4 · Historia personal",
       "plaque": {
         "title": "Cuéntanos sobre ti",
-        "sub": "La IA extraerá habilidades y valores para emparejarte con Rikmas adecuadas"
+        "sub": "La IA extraerá habilidades y valores para emparejarte con rikmas adecuadas"
       },
-      "info": "✨ 2-3 párrafos libres: cuáles son tus habilidades, a qué Rikmas te interesa unirte como socio igualitario y qué valor deseas aportar.",
+      "info": "✨ 2-3 párrafos libres: cuáles son tus habilidades, a qué rikmas te interesa unirte como socio igualitario y qué valor deseas aportar.",
       "label": "Tu historia",
       "placeholder": "Ejemplo: Desarrollo fullstack con 5 años de experiencia. Interesado en unirme a startups en fase inicial como socio tecnológico, especialmente en educación y salud. Mi rutina diaria incluye React y Node.js, diseño de bases de datos y desarrollo principal...",
       "analyzing": "✨ Analizando la historia...",
@@ -175,7 +175,7 @@
     "resources_page": {
       "title": "¿Qué tienes para compartir?",
       "journey": "Paso 5 · Recursos para compartir",
-      "sub": "Cosas y lugares que ya son tuyos — y que puedes poner a disposición de un tejido o un cliente. Puedes saltarlo y añadirlos luego desde tu perfil.",
+      "sub": "Cosas y lugares que ya son tuyos — y que puedes poner a disposición de una rikma o un cliente. Puedes saltarlo y añadirlos luego desde tu perfil.",
       "mode_recurring": "Permanente —",
       "mode_recurring_ex": "un espacio de trabajo, una suscripción, equipo siempre disponible",
       "mode_once": "Una vez —",
@@ -200,16 +200,16 @@
     "choose_other": "← Elegir otra"
   },
   "business": {
-    "title": "Crear una Rikma (Asociación) · 1💗1",
-    "journey": "Paso 4 · Construyendo la Rikma",
+    "title": "Crear una rikma (Asociación) · 1💗1",
+    "journey": "Paso 4 · Construyendo la rikma",
     "plaque": {
-      "title": "Cuéntanos sobre tu Rikma",
+      "title": "Cuéntanos sobre tu rikma",
       "sub": "Asociación por consenso, reparto de beneficios y conexión directa con clientes"
     },
     "choices": {
       "url": {
         "title": "Tengo un sitio web o página de negocio",
-        "sub": "Pega la URL: la IA creará la Rikma, definirá las áreas de actividad y extraerá coincidencias para socios y proyectos de clientes.",
+        "sub": "Pega la URL: la IA creará la rikma, definirá las áreas de actividad y extraerá coincidencias para socios y proyectos de clientes.",
         "meta": "~ 45 s · Todo se puede editar",
         "chips": {
           "fast": "⚡ Lo más rápido",
@@ -218,7 +218,7 @@
       },
       "describe": {
         "title": "Describe con tus palabras",
-        "sub": "2-3 párrafos libres. Escribe sobre la Rikma, tus necesidades y cómo te gustaría atender los proyectos de clientes.",
+        "sub": "2-3 párrafos libres. Escribe sobre la rikma, tus necesidades y cómo te gustaría atender los proyectos de clientes.",
         "meta": "~ 2 min · La IA creará un borrador"
       },
       "manual": {
@@ -228,13 +228,13 @@
       }
     },
     "url_page": {
-      "title": "Pega el enlace a la Rikma · 1💗1",
-      "journey": "Paso 5 · Configurando la Rikma",
+      "title": "Pega el enlace a la rikma · 1💗1",
+      "journey": "Paso 5 · Configurando la rikma",
       "plaque": {
-        "title": "Pega el enlace de la Rikma",
+        "title": "Pega el enlace de la rikma",
         "sub": "Sitio web / Página de aterrizaje / Facebook / Instagram"
       },
-      "info": "⚡ La IA leerá la página y configurará la Rikma automáticamente, incluyendo el nombre del proyecto, la descripción y las habilidades requeridas para los socios; siempre puedes editar.",
+      "info": "⚡ La IA leerá la página y configurará la rikma automáticamente, incluyendo el nombre del proyecto, la descripción y las habilidades requeridas para los socios; siempre puedes editar.",
       "label": "Enlace",
       "hint_ok": "✓ Tiene buena pinta",
       "hint_err": "Pega la dirección completa, incluyendo https://",
@@ -242,15 +242,15 @@
       "scanning": "Lev está escaneando..."
     },
     "describe_page": {
-      "title": "Describe la Rikma · 1💗1",
-      "journey": "Paso 5 · Configurando la Rikma",
+      "title": "Describe la rikma · 1💗1",
+      "journey": "Paso 5 · Configurando la rikma",
       "plaque": {
-        "title": "Cuéntanos sobre la Rikma",
-        "sub": "La IA creará un borrador de Rikma, definiciones de socios y proyectos de clientes que coincidan"
+        "title": "Cuéntanos sobre la rikma",
+        "sub": "La IA creará un borrador de rikma, definiciones de socios y proyectos de clientes que coincidan"
       },
-      "info": "✨ 2-3 párrafos libres: sobre tu Rikma o proyecto, qué tipo de socios necesitas y qué habilidades te complementarían.",
+      "info": "✨ 2-3 párrafos libres: sobre tu rikma o proyecto, qué tipo de socios necesitas y qué habilidades te complementarían.",
       "label": "Descripción",
-      "placeholder": "Ejemplo: Creando una Rikma (asociación) que conecta a agricultores locales con consumidores directos. Se busca socio para liderar marketing y ventas, con experiencia en gestión de comunidad y redes sociales. Se ofrece una asociación igualitaria, incluyendo toma de decisiones por consenso y reparto estructurado de beneficios...",
+      "placeholder": "Ejemplo: Creando una rikma (asociación) que conecta a agricultores locales con consumidores directos. Se busca socio para liderar marketing y ventas, con experiencia en gestión de comunidad y redes sociales. Se ofrece una asociación igualitaria, incluyendo toma de decisiones por consenso y reparto estructurado de beneficios...",
       "char_count": "caracteres",
       "can_continue": "✓ Se puede continuar",
       "min_chars": "Alcanza al menos {{count}}",

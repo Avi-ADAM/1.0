@@ -129,8 +129,8 @@ const handler: ActionExecutionHandler = async (params, context, util) => {
     '166crWishWeave',
     {
       members: providers,
-      projectName: `${wishName} - ריקמה`,
-      descripFor: `ריקמת שותפים שנוצרה מהמשאלה "${wishName}".`,
+      projectName: `${wishName} - רקמה`,
+      descripFor: `רקמת שותפים שנוצרה מהמשאלה "${wishName}".`,
       isOt: true,
       publishedAt: now
     },
@@ -140,7 +140,7 @@ const handler: ActionExecutionHandler = async (params, context, util) => {
   const weaveId = weaveRes?.data?.createProject?.data?.id
     ? String(weaveRes.data.createProject.data.id)
     : null;
-  if (!weaveId) throw new Error('יצירת ריקמת השותפים נכשלה');
+  if (!weaveId) throw new Error('יצירת רקמת השותפים נכשלה');
 
   // ── 5. Host the composed product on the weave + activate it ────────────────
   try {
@@ -152,7 +152,7 @@ const handler: ActionExecutionHandler = async (params, context, util) => {
     );
   } catch (e) {
     console.error('[materializeWish] hosting product on weave failed:', e);
-    throw new Error('שיוך המוצר לריקמה נכשל');
+    throw new Error('שיוך המוצר לרקמה נכשל');
   }
 
   // ── 6. Open a Sheirutpend (client = wisher) for the composed product ───────
@@ -188,7 +188,7 @@ const handler: ActionExecutionHandler = async (params, context, util) => {
     serviceId = (out as any)?.data?.serviceId ?? null;
   } catch (e) {
     console.error('[materializeWish] createSheirutFromPending failed:', e);
-    throw new Error('הריקמה נוצרה אך פתיחת הדיל נכשלה - אפשר לנסות שוב מתוך הדילים');
+    throw new Error('הרקמה נוצרה אך פתיחת הדיל נכשלה - אפשר לנסות שוב מתוך הדילים');
   }
 
   // ── 8. Mark the wish fulfilled ─────────────────────────────────────────────
@@ -209,7 +209,7 @@ const handler: ActionExecutionHandler = async (params, context, util) => {
           fidn: parseInt(String(chatForumId), 10),
           idL: context.userId,
           da: now,
-          mes: 'המעגל נסגר - נוצרה ריקמת שותפים והדיל יצא לדרך. 💗'
+          mes: 'המעגל נסגר - נוצרה רקמת שותפים והדיל יצא לדרך. 💗'
         },
         context.jwt,
         context.fetch
@@ -255,7 +255,7 @@ export const materializeWishConfig: ActionConfig = {
         ar: 'تحققت الأمنية 💗'
       },
       body: {
-        he: 'נוצרה ריקמת שותפים והדיל נפתח - אפשר להתחיל לעבוד.',
+        he: 'נוצרה רקמת שותפים והדיל נפתח - אפשר להתחיל לעבוד.',
         en: 'A partner weave was created and the deal opened - you can start working.',
         ar: 'تم إنشاء نسيج شركاء وفُتحت الصفقة - يمكنكم البدء.'
       }

@@ -856,7 +856,7 @@
             >
             /<span
               role="contentinfo"
-              onmouseenter={() => hover('ההצעה של הריקמה')}
+              onmouseenter={() => hover('ההצעה של הרקמה')}
               onmouseleave={() => hover('0')}
             >
               {easy}</span

@@ -5,9 +5,9 @@ import MailNoReg from '$lib/components/mail/nonreg.svelte';
 
 const getPreviewText = (lang, projectName, missionName) => {
 	if (lang === 'he') {
-		return `התקבלת לריקמה ויש לך משימה חדשה ב${projectName}: ${missionName}`;
+		return `התקבלת לרקמה ויש לך משימה חדשה ב${projectName}: ${missionName}`;
 	}
-	return `You've been accepted to a FreeMate and have a new mission in ${projectName}: ${missionName}`;
+	return `You've been accepted to a rikma and have a new mission in ${projectName}: ${missionName}`;
 };
 
 export async function POST({ request, fetch }) {

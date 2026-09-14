@@ -136,7 +136,7 @@ export const nominateSelfMissionConfig: ActionConfig = {
     recipients: { type: 'projectMembers', config: { projectIdParam: 'projectId' } },
     templates: {
       title: {
-        he: 'מישהו מציע את עצמו לריקמה שלכם 🌱',
+        he: 'מישהו מציע את עצמו לרקמה שלכם 🌱',
         en: 'Someone is nominating themselves to your rikma 🌱',
         ar: 'شخص ما يرشّح نفسه لنسيجكم 🌱',
       },

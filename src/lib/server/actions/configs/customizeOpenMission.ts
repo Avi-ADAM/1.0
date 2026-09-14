@@ -32,7 +32,7 @@ export const customizeOpenMissionConfig: ActionConfig = {
     recipients: { type: 'specificUsers', config: { userIdsParam: 'recipientIds' } },
     templates: {
       title: { he: 'התאמה אישית למשימה', en: 'Customized mission terms' },
-      body: { he: 'חבר ריקמה לקח משימה בתנאים מותאמים', en: 'A member took a mission on customized terms' },
+      body: { he: 'חבר רקמה לקח משימה בתנאים מותאמים', en: 'A member took a mission on customized terms' },
     },
     channels: ['socket'],
     metadata: { type: 'missionApplication', url: 'lev' },

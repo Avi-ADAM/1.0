@@ -77,7 +77,7 @@
   "km": "km",
   "add_supply_fab": "Añade tu oferta",
   "add_supply_title": "¿Qué te gustaría ofrecer?",
-  "add_supply_sub": "Tu oferta se muestra a clientes, a la conserjería y a los tejidos",
+  "add_supply_sub": "Tu oferta se muestra a clientes, a la conserjería y a las rikmas",
   "add_mission": "Una misión que realizo",
   "add_mission_hint": "Un servicio con precio: qué, por cuánto y dónde",
   "add_resource": "Un recurso",
@@ -94,12 +94,12 @@
   "supply_sugg_mine": "mía",
   "supply_sugg_cta": "Haz una oferta por umbral basada en tu oferta",
   "lev_panel_fab": "Mapa de demanda",
-  "lev_panel_sub": "Demanda y oferta en vivo: deseos, grupos, misiones y recursos de todos los tejidos.",
+  "lev_panel_sub": "Demanda y oferta en vivo: deseos, grupos, misiones y recursos de todas las rikmas.",
   "lev_panel_full": "Abrir la página completa del mapa",
   "lev_panel_error": "No se pudo cargar el mapa.",
   "lev_panel_retry": "Intentar de nuevo",
   "lev_panel_close": "Cerrar",
-  "hub_teaser_sub": "Lo que la gente busca y ofrece ahora mismo: grupos y tejidos juntos.",
+  "hub_teaser_sub": "Lo que la gente busca y ofrece ahora mismo: grupos y rikmas juntos.",
   "hub_teaser_cta": "Al mapa de demanda",
   "hub_items_active": "elementos activos"
 }

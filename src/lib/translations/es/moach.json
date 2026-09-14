@@ -158,7 +158,20 @@
       "desc": "Nuestra IA escanea el proyecto y sugiere direcciones y tareas listas para tu aprobación - pruébalo abajo",
       "cta": "Planificar con IA"
     },
-    "preparingMission": "Emparejando las habilidades sugeridas con el vocabulario de la plataforma…"
+    "preparingMission": "Emparejando las habilidades sugeridas con el vocabulario de la plataforma…",
+    "agentConnect": {
+      "title": "Trabajar en esta rikma desde Claude",
+      "desc": "Conecta Claude una vez y podrá añadir aquí tableros de planificación, tareas y misiones por ti",
+      "step1": "1. Conexión - una sola vez",
+      "connector": "Claude en la web o en la app - como conector",
+      "claudeCode": "Claude Code - con un solo comando en la terminal",
+      "step2": "2. Dile a Claude en qué rikma trabajar",
+      "step2Body": "Claude puede acceder a todas tus rikmas, y algunas pueden tener el mismo nombre. Empieza la conversación con esta línea para que trabaje en esta:",
+      "prompt": "En esta conversación trabajamos en la rikma \"{{name}}\" de 1lev1 (projectId: {{projectId}}). Usa este projectId en todas las herramientas de 1lev1.",
+      "copy": "Copiar",
+      "copied": "Copiado",
+      "note": "Las misiones y los tableros que prepara Claude esperan tu aprobación, y una tarea que asigna a un miembro espera la aprobación de ese miembro."
+    }
   },
   "objectList": {
     "active": "Activos",

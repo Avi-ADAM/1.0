@@ -23,7 +23,7 @@ function node(over: Record<string, any> = {}) {
       note: 'the good projector',
       sp: { data: { id: 3, attributes: { name: 'מקרן' } } },
       project: {
-        data: { id: 11, attributes: { projectName: 'ריקמת האור', profilePic: { data: { attributes: { url: '/p.png' } } } } }
+        data: { id: 11, attributes: { projectName: 'רקמת האור', profilePic: { data: { attributes: { url: '/p.png' } } } } }
       },
       ...over
     }
@@ -40,7 +40,7 @@ const view = (over: Partial<BookingView> = {}): BookingView => ({
   note: null,
   spId: '3',
   spName: 'מקרן',
-  counterparty: { kind: 'project', id: '11', name: 'ריקמת האור', pic: null },
+  counterparty: { kind: 'project', id: '11', name: 'רקמת האור', pic: null },
   ...over
 });
 
@@ -60,7 +60,7 @@ describe('normalizeBookingNode', () => {
     expect(result?.counterparty).toEqual({
       kind: 'project',
       id: '11',
-      name: 'ריקמת האור',
+      name: 'רקמת האור',
       pic: '/p.png'
     });
   });

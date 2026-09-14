@@ -57,7 +57,7 @@ export async function ensurePersonalRikmaFor(
   }
 
   const username = uAttrs.username || '';
-  const projectName = username ? `הריקמה של ${username}` : 'הריקמה שלי';
+  const projectName = username ? `הרקמה של ${username}` : 'הרקמה שלי';
   const now = new Date().toISOString();
 
   // Same creation path as the createWeave action (crWeaveFull): the caller is
@@ -81,7 +81,7 @@ export async function ensurePersonalRikmaFor(
     context.fetch
   );
   const project = pRes?.data?.createProject?.data;
-  if (!project?.id) throw new Error('יצירת ריקמת הבית נכשלה');
+  if (!project?.id) throw new Error('יצירת רקמת הבית נכשלה');
 
   await strapi.execute(
     '251setUserPersonalProject',

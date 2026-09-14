@@ -20,7 +20,7 @@
     "back": "Atrás"
   },
   "fini": {
-    "heading": "Distribución de valor del FreeMate",
+    "heading": "Distribución de valor de la rikma",
     "closeDetails": "cerrar los detalles",
     "approvedMissions": "misiones aprobadas",
     "details": "Detalles",
@@ -29,8 +29,8 @@
     "description": "Descripción",
     "executionDate": "Fecha de ejecución",
     "publicLinks": "Enlaces públicos",
-    "privateNotes": "Mis notas exclusivas para el FreeMate",
-    "privateLinks": "Mis enlaces exclusivos para el FreeMate",
+    "privateNotes": "Mis notas exclusivas para la rikma",
+    "privateLinks": "Mis enlaces exclusivos para la rikma",
     "hoursTaken": "Horas empleadas",
     "valuePerHour": "Valor por hora",
     "missionValue": "Valor total de la misión",
@@ -42,7 +42,7 @@
     "startDate": "Fecha de inicio",
     "endDate": "Fecha de fin",
     "specialNotes": "Notas especiales",
-    "maxValue": "Valor máximo para el cálculo del FreeMate",
+    "maxValue": "Valor máximo para el cálculo de la rikma",
     "monetaryValue": "Valor monetario",
     "perMonth": "al mes",
     "perYear": "al año",

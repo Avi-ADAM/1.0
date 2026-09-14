@@ -212,7 +212,7 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
   const budgetLabel = openEnded
     ? `עד ₪${terms.monthlyCap} לחודש, עד עצירה`
     : `תקציב ₪${terms.totalCap}`;
-  const forWhom = recipientName ? `ל${recipientName}` : 'לריקמה';
+  const forWhom = recipientName ? `ל${recipientName}` : 'לרקמה';
   const namedMission = missions.length === 1 ? missions[0] : openMission;
   const forWhat = namedMission ? ` · ${namedMission.name}` : '';
   const name = params.name
@@ -339,7 +339,7 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
     const missionEn = missionNames.length > 0 ? ` for “${missionNames.join('”, “')}”` : '';
     const forWhomHe = recipientName
       ? `מלגת קיום ל${recipientName}${missionHe}`
-      : 'תקציב מלגות קיום לריקמה';
+      : 'תקציב מלגות קיום לרקמה';
     const forWhomEn = recipientName
       ? `A subsistence stipend for ${recipientName}${missionEn}`
       : 'A subsistence stipend budget for the rikma';
@@ -382,7 +382,7 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
                 en: 'A subsistence stipend was proposed for you'
               },
               body: {
-                he: `הוצע שהריקמה תממן לך ₪${terms.stipendRate} לשעה מאושרת${missionHe}, ${budgetHe}. הקלף מראה מה את/ה מקבל/ת ומה זה עושה לחלק שלך. אפשר לאשר, לפתוח שיחה או להציע תנאים אחרים.`,
+                he: `הוצע שהרקמה תממן לך ₪${terms.stipendRate} לשעה מאושרת${missionHe}, ${budgetHe}. הקלף מראה מה את/ה מקבל/ת ומה זה עושה לחלק שלך. אפשר לאשר, לפתוח שיחה או להציע תנאים אחרים.`,
                 en: `It was proposed that the rikma funds you at ${terms.stipendRate} per approved hour${missionEn}, ${budgetEn}. The card shows what you receive and what it does to your share. Approve, open a discussion, or propose different terms.`
               }
             },

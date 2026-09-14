@@ -1,4 +1,4 @@
-# PLAN — Mission Equity Preview (שווי צפוי בריקמה)
+# PLAN — Mission Equity Preview (שווי צפוי ברקמה)
 
 > **Round 2 (2026-07-30) — resources + the donut.** Owner request: do for
 > **משאבים** what was done for missions, and add an interactive pie chart beside
@@ -355,18 +355,18 @@ passes; otherwise it hides itself.
 In [addNewMission.svelte](../src/lib/components/addnew/addNewMission.svelte):
 live `<EquityPreview>` bound to the form's current `hours × perhour`
 (`missionValue` is `$derived`), `alreadyCountedIn="none"`, label
-`missionShareAtCreation` ("כמה מהריקמה תהיה שווה המשימה הזו"). Debounce is not
+`missionShareAtCreation` ("כמה מהרקמה תהיה שווה המשימה הזו"). Debounce is not
 needed — the summary is fetched once, only the pure math re-runs on keystroke.
 If the same form is reused for editing an existing open mission, keep
 `alreadyCountedIn="pipeline"`.
 
-### 5.4 Member's in-progress mission ("מה יהיה התגמול בשווי בריקמה")
+### 5.4 Member's in-progress mission ("מה יהיה התגמול בשווי ברקמה")
 
 In [mission.svelte](../src/lib/components/prPr/mission.svelte) (moach missions
 tab, mesimabetahalich view): `missionValue = hoursassinged × perhour`,
 `alreadyCountedIn="approved"` — the mission is already inside
 `approvedInProgressValue`, so the 'approved' baseline must not add V twice.
-Label: `yourShareIfDone` ("החלק שלך בריקמה בסיום המשימה").
+Label: `yourShareIfDone` ("החלק שלך ברקמה בסיום המשימה").
 
 ### 5.5 Nego dialog (nice-to-have, same run if trivial)
 

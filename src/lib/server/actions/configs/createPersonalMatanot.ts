@@ -54,13 +54,13 @@ const handler: ActionExecutionHandler = async (params, context, util) => {
     );
     const members = pRes?.data?.project?.data?.attributes?.user_1s?.data ?? [];
     const isMember = members.some((m: any) => String(m.id) === String(ctx.userId));
-    if (!isMember) throw new Error('רק חבר ריקמה יכול ליצור בה מוצר');
+    if (!isMember) throw new Error('רק חבר רקמה יכול ליצור בה מוצר');
     hostProjectId = requestedProjectId;
     origin = 'project';
   } else if (newRikmaName) {
     const rikmaVerdict = screenLabel(newRikmaName, { checkLength: false });
     if (rikmaVerdict.flagged) {
-      throw new Error(`שם הריקמה לא עבר בדיקת תוכן (${rikmaVerdict.reasons.join(', ')})`);
+      throw new Error(`שם הרקמה לא עבר בדיקת תוכן (${rikmaVerdict.reasons.join(', ')})`);
     }
     const wRes = await strapi.execute(
       'crWeaveFull',
@@ -81,7 +81,7 @@ const handler: ActionExecutionHandler = async (params, context, util) => {
       ctx.fetch
     );
     const project = wRes?.data?.createProject?.data;
-    if (!project?.id) throw new Error('יצירת הריקמה נכשלה');
+    if (!project?.id) throw new Error('יצירת הרקמה נכשלה');
     hostProjectId = String(project.id);
     origin = 'project';
   } else {

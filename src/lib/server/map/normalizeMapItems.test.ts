@@ -171,7 +171,7 @@ describe('normalizeProduct', () => {
         origin: 'personal',
         location: { lat: 32.0853, lng: 34.7818 },
         owner_user: { data: { id: 7, attributes: { username: 'dana' } } },
-        projectcreates: { data: [{ id: 9, attributes: { projectName: 'הריקמה של dana' } }] }
+        projectcreates: { data: [{ id: 9, attributes: { projectName: 'הרקמה של dana' } }] }
       }
     });
     expect(item).not.toBeNull();

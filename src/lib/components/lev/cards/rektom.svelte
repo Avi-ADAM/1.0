@@ -169,7 +169,7 @@
 
   // טקסט כותרת:
   // isRishon (isSelfProposal) = חבר פרויקט שיצר ישירות → אישרור כפול: גם ה"צורך" וגם שהחבר נותן אותו
-  // joinsRikma = המציע/ה עדיין אינו/ה חבר/ה → האישור מצרף אותו/ה לריקמה
+  // joinsRikma = המציע/ה עדיין אינו/ה חבר/ה → האישור מצרף אותו/ה לרקמה
   // recurring הוא *תוספת* לכותרת ולא מחליף אותה: הפעולה כאן אינה אישרור מחזור
   // (המחזורים נפתחים רק אחרי הצירוף), אלא אישרור הצירוף ושיתוף המשאב.
   const cardTypeKey = $derived(
@@ -314,7 +314,7 @@
     class="d bg-white dark:bg-slate-800 transition-all duration-300 p-4 flex-1 overflow-y-auto d flex flex-col space-y-4"
   >
     <!-- ההצעה החיה: סבב המו"מ האחרון על המועמדות הזו.
-         בלעדיו חברי הריקמה רואים רק את תנאי הבסיס שלהם ולא את מה שהוצע בפועל. -->
+         בלעדיו חברי הרקמה רואים רק את תנאי הבסיס שלהם ולא את מה שהוצע בפועל. -->
     {#if latestRound}
       {@const nameChanged =
         latestRound.name && latestRound.name !== openmissionName}
@@ -531,7 +531,7 @@
         <p class="text-gray-900 dark:text-white font-bold text-base mb-1">
           {useraplyname}
         </p>
-        <!-- העיקר של הפעולה כשהמציע/ה עדיין לא בריקמה: האישור מצרף אותו/ה. -->
+        <!-- העיקר של הפעולה כשהמציע/ה עדיין לא ברקמה: האישור מצרף אותו/ה. -->
         {#if joinsRikma}
           <p class="text-xs text-emerald-700 dark:text-emerald-400 font-semibold">
             🤝 {$t('lev.rektom.willJoinRikma')}
@@ -545,7 +545,7 @@
       class="bg-gray-100 dark:bg-gray-900/50 p-4 rounded-xl space-y-3 border border-gray-200 dark:border-gray-700/50"
     >
       {#if latestRound}
-        <!-- כשיש סבב פתוח, המספרים כאן הם בסיס הריקמה — ההצעה החיה למעלה. -->
+        <!-- כשיש סבב פתוח, המספרים כאן הם בסיס הרקמה — ההצעה החיה למעלה. -->
         <p class="text-xs text-gray-500 dark:text-gray-400">
           {$t('lev.rektom.baselineTerms')}
         </p>
@@ -665,7 +665,7 @@
           <span class="ms-2 text-xs sm:text-sm whitespace-nowrap">{$t('lev.cards.confirmApprove')}</span>
         </button>
 
-        <!-- כפתור משא ומתן (isRishon) או דחיה (שאר חברי הריקמה) -->
+        <!-- כפתור משא ומתן (isRishon) או דחיה (שאר חברי הרקמה) -->
         <button
           aria-label={isRishon
             ? negotiationMode

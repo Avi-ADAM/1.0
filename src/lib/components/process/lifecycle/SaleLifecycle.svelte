@@ -42,7 +42,7 @@
       donation: 'תרומה',
       siteShare: 'חלק האתר',
       siteSharePaid: 'שולם',
-      siteShareFrom: 'מריקמה',
+      siteShareFrom: 'מרקמה',
       splited: 'חולק',
       notSplited: 'טרם חולק',
       toSplit: 'למחשבון החלוקה',

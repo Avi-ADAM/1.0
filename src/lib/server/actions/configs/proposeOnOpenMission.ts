@@ -151,7 +151,7 @@ export const proposeOnOpenMissionConfig: ActionConfig = {
     templates: {
       title: { he: 'הצעה מקבילה למשימה', en: 'Counter-proposal for a mission' },
       body: {
-        he: 'מועמד הגיש הצעה מתוקנת למשימה בריקמה',
+        he: 'מועמד הגיש הצעה מתוקנת למשימה ברקמה',
         en: 'A candidate submitted revised terms for a mission',
       },
     },

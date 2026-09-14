@@ -101,7 +101,7 @@ const passed =
   positiveVotes === eligibleVoters.length &&
   negativeVotes === 0;
 ```
-**שימוש:** pend בפרויקטים (הצבעת ריקמה)
+**שימוש:** pend בפרויקטים (הצבעת רקמה)
 
 ### 3.2 `majority` — רוב פשוט
 ```typescript

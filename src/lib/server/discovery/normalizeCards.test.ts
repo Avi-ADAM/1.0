@@ -54,7 +54,7 @@ describe('normalizeProductCard', () => {
         origin: 'personal',
         location: { ...TLV },
         owner_user: { data: { id: 7, attributes: { username: 'dana' } } },
-        projectcreates: { data: [{ id: 9, attributes: { projectName: 'הריקמה של dana' } }] }
+        projectcreates: { data: [{ id: 9, attributes: { projectName: 'הרקמה של dana' } }] }
       }
     });
     expect(card?.personal).toBe(true);

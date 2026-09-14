@@ -72,18 +72,18 @@
       "heartTitle": "Corazón del sistema",
       "heartDesc": "Corazón del sistema; haz clic en los diamantes para filtrar las acciones",
       "switchView": "Cambia la vista de monedas a tarjetas",
-      "showSuggestions": "Mostrar solo misiones sugeridas en los freemates",
+      "showSuggestions": "Mostrar solo misiones sugeridas en rikmas",
       "showVotes": "Mostrar solo votos sobre nuevas misiones",
-      "showJoinRequests": "Mostrar solo solicitudes para realizar misiones para los FreeMates",
+      "showJoinRequests": "Mostrar solo solicitudes para realizar misiones para rikmas",
       "showSplitRequests": "Mostrar solo votos sobre repartos de dinero",
       "showInProgress": "Mostrar solo mis misiones en curso",
-      "showWelcome": "Mostrar solo bienvenidas a los FreeMates",
+      "showWelcome": "Mostrar solo bienvenidas a rikmas",
       "showCompletionApproval": "Mostrar solo aprobaciones de misiones finalizadas",
       "personalDashboard": "Haz clic para ir a tu sala de control",
       "showResourceApproval": "Mostrar solo votos sobre la aprobación de recepción de recursos",
-      "showResourceInvestment": "Mostrar solo inversiones sugeridas de recursos en los FreeMates",
-      "showResourceVotes": "Mostrar solo votos sobre nuevos recursos para los FreeMates",
-      "showJoinAndInvest": "Mostrar solo solicitudes para unirse e invertir recursos en los FreeMates",
+      "showResourceInvestment": "Mostrar solo inversiones sugeridas de recursos en rikmas",
+      "showResourceVotes": "Mostrar solo votos sobre nuevos recursos para rikmas",
+      "showJoinAndInvest": "Mostrar solo solicitudes para unirse e invertir recursos en rikmas",
       "showMyPurchases": "Mostrar solo mis compras",
       "items": {
         "fiap": "Aprobaciones de finalización de misión ({{count}})",
@@ -213,7 +213,7 @@
     },
     "sugestma": {
       "head": "Propuesta para compartir un recurso con la rikma",
-      "recurHead": "🔁 Recurso recurrente · oferta para compartir un recurso con el tejido",
+      "recurHead": "🔁 Recurso recurrente · oferta para compartir un recurso con la rikma",
       "askedVal": "Valor solicitado",
       "myval": "Mi propuesta",
       "offerAtSource": "Oferta en la página de origen",
@@ -341,7 +341,7 @@
       "recurringTag": "🔁 Recurso recurrente",
       "assignment": "Aprobación de asignación y uso compartido del recurso",
       "request": "Aprobación de solicitud de recurso compartido",
-      "joinRequest": "Aprobación de incorporación al tejido y del recurso compartido"
+      "joinRequest": "Aprobación de incorporación a la rikma y del recurso compartido"
     },
     "nav": {
       "heart": "Corazón de 1💗1",
@@ -419,11 +419,11 @@
     }
   },
   "reqtom": {
-    "voteTitle": "votar sobre la solicitud de unirse a los FreeMates y compartir un recurso ",
+    "voteTitle": "votar sobre la solicitud de unirse a la rikma y compartir un recurso",
     "heartOf": "el corazón de 1💗1",
     "clickToProfile": "haz doble clic para ver el perfil de {{name}}",
     "resourceName": "nombre del recurso sugerido",
-    "clickToPublic": "haz doble clic para ver la página pública de los FreeMates",
+    "clickToPublic": "haz doble clic para ver la página pública de la rikma",
     "clickToBrain": "haz doble clic para ir al Cerebro de {{projectName}}",
     "cancel": "cerrar",
     "chatOnJoining": "chatear sobre unirse"
@@ -456,9 +456,9 @@
     "openMission": "misión abierta"
   },
   "welcomTo": {
-    "joined": "bienvenido a los FreeMates",
-    "toHeadquarters": "al cuartel general de los FreeMates",
-    "welcome": "bienvenidos nuevos FreeMates",
+    "joined": "bienvenido a la rikma",
+    "toHeadquarters": "al cuartel general de la rikma",
+    "welcome": "bienvenido a una nueva rikma",
     "heartOf": "el corazón de 1💗1"
   },
   "revenue": {
@@ -612,8 +612,8 @@
     "notAFit": "Ahora mismo no encaja",
     "closeSelfNomination": "Cerrar toda la autonominación: el candidato recibirá un mensaje respetuoso",
     "notNow": "Ahora no",
-    "willJoinRikma": "La aprobación también lo/la incorpora al tejido",
-    "baselineTerms": "Condiciones base del tejido (la oferta vigente está arriba):",
+    "willJoinRikma": "La aprobación también lo/la incorpora a la rikma",
+    "baselineTerms": "Condiciones base de la rikma (la oferta vigente está arriba):",
     "roundDates": "Fechas de esta oferta:",
     "perCycleHint": "Coste estimado por ciclo",
     "perMonth": "al mes",
@@ -627,8 +627,8 @@
     "totalInvest": "Inversión total estimada:",
     "totalInvestHint": "Inversión total estimada para todo el período",
     "noEndDate": "Sin fecha de fin - hasta marcarlo como completado",
-    "recurringApprovalNote": "La aprobación pone en marcha el motor de recurso recurrente; después, cada ciclo abre su propio cargo para que el tejido apruebe el gasto real",
-    "recurringJoinNote": "La aprobación incorpora a quien ofrece al tejido y pone en marcha el motor de recurso recurrente; solo después cada ciclo abre su propio cargo para el gasto real"
+    "recurringApprovalNote": "La aprobación pone en marcha el motor de recurso recurrente; después, cada ciclo abre su propio cargo para que la rikma apruebe el gasto real",
+    "recurringJoinNote": "La aprobación incorpora a quien ofrece a la rikma y pone en marcha el motor de recurso recurrente; solo después cada ciclo abre su propio cargo para el gasto real"
   },
   "hachlata": {
     "theClaim": "La declaración",

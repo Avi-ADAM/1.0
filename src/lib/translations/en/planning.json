@@ -2,9 +2,9 @@
   "boards": {
     "aiBadge": "🤖 AI-powered",
     "heading": "Planning boards",
-    "intro": "A space to plan how to advance the project. Nothing is created until you approve it in the form.",
+    "intro": "A space to plan how to advance the rikma. Nothing is created until you approve it in the form.",
     "scan": "🧭 What's worth advancing?",
-    "scanning": "Scanning the project…",
+    "scanning": "Scanning the rikma…",
     "rescan": "Scan again",
     "noDirections": "No suggestions right now. Try writing your own direction.",
     "freeTextLabel": "Or write freely what you want to advance",

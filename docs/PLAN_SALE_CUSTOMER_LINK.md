@@ -8,13 +8,13 @@
 ה-Sheirut הוא רשומת הרכישה/השירות של הלקוח: הוא זה שמופיע בעמוד העסקאות של
 הלקוח (`/deals` → "הרכישות שלי", דרך `dealsQueries`), נושא את מנגנון זרימת
 הכסף הקיים (`iTransferMoney` / `iTransferedTo` / `iGotMoney` /
-`moneyTransfered`) ואת הקשרים ל-matanot, לריקמה ול-sales.
+`moneyTransfered`) ואת הקשרים ל-matanot, לרקמה ול-sales.
 
 ```
 User (לקוח) ──users_permissions_users──▶ Sheirut ◀──sales──▶ Sale
                                             │
                                             ├─▶ Matanot (המוצר)
-                                            └─▶ Project (הריקמה)
+                                            └─▶ Project (הרקמה)
 ```
 
 בנוסף קיים על `Sale` שדה `customer` — **מצביע דנורמליזציה בלבד** לצורך
@@ -69,23 +69,23 @@ PLAN_RECURRING_SALES): ה-monther מקשר כל Sale-מחזור גם ל-Sheirut 
    `holderStatus: 'self'`, `receivedConfirmedAt`, `Sheirut.moneyTransfered:
    true` — והמכירה זורמת לחלוקות.
 4. **שתיקה במסגרת ה-restime** — לפי עקרון "שתיקה היא הסכמה": לפתוח `Decision`
-   בילטרלי (בסגנון `saleClaim`, אבל בין מוכר ללקוח שאינו חבר ריקמה) עם
+   בילטרלי (בסגנון `saleClaim`, אבל בין מוכר ללקוח שאינו חבר רקמה) עם
    `timegrama`; בתום זמן התגובה הגרסה העומדת מאושררת אוטומטית. דורש הרחבת
    scope של `saleClaim` (או `kind` חדש, למשל `paymentRequest`) למשתתף שאינו
-   חבר ריקמה — זו הנקודה היחידה שדורשת עבודת עומק.
+   חבר רקמה — זו הנקודה היחידה שדורשת עבודת עומק.
 5. **תזכורות** — timegrama + מיילים כמו במחזורים החודשיים.
 
 ### מה כבר מוכן לקראת זה
 
 - Sale תומך ב-`pending` + `holderStatus:'open'` שלא נספרים.
 - `customerAmount`/`customerReportedAt`/`receivedConfirmedAt` על Sale.
-- פעולות עם בדיקת ישות ללקוח שאינו חבר ריקמה
+- פעולות עם בדיקת ישות ללקוח שאינו חבר רקמה
   (`customerReportRecurringSaleCycle` היא התבנית).
 - כרטיסי לקוח בעמוד העסקאות (`RecurringCycleCard` role='customer').
 
 ### מה חסר
 
-- `kind` חדש ל-Decision (או הרחבת `saleClaim`) לצד שאינו חבר ריקמה +
+- `kind` חדש ל-Decision (או הרחבת `saleClaim`) לצד שאינו חבר רקמה +
   timegrama finalizer מתאים.
 - פעולת `requestPaymentFromCustomer` (יצירת השילוש Sheirut+Sale+Decision).
 - UI ב-SaleComponent: מתג "טרם שולם — לשלוח בקשת תשלום".

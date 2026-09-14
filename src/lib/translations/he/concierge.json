@@ -3,7 +3,7 @@
   "my_overview": "הסקירה שלי",
   "wishes": "משאלות",
   "deals": "דילים",
-  "moach": "ריקמות",
+  "moach": "רקמות",
   "notifications": "התראות",
   "personal_concierge": "קונסיירז׳ אישי",
   "hero_title": "מה ברצונך שיקרה?",
@@ -58,7 +58,7 @@
   "quick_links_title": "קישורים מהירים",
   "my_overview_link": "הסקירה שלי",
   "active_deals_link": "הדילים הפעילים",
-  "my_moach_link": "הריקמות שלי",
+  "my_moach_link": "הרקמות שלי",
   "filters_all": "כולן",
   "filters_near_me": "קרובות אליי",
   "filters_my_skills": "מתאימות לכישוריי",
@@ -88,7 +88,7 @@
       "overview": "הסקירה שלי",
       "wishes": "משאלות",
       "deals": "דילים",
-      "moach": "ריקמות",
+      "moach": "רקמות",
       "wishList": "רשימת המשאלות שלי"
     },
     "steps": {
@@ -171,11 +171,11 @@
       },
       "whoCanOffer": {
         "label": "מי יכול/ה להציע",
-        "placeholder": "פתוח לכל / חברי הריקמה"
+        "placeholder": "פתוח לכל / חברי הרקמה"
       },
       "whoCanSee": {
         "label": "מי יכול/ה לראות",
-        "placeholder": "פרטי · ריקמות בלבד · קהילה"
+        "placeholder": "פרטי · רקמות בלבד · קהילה"
       },
       "invite": {
         "label": "האם להזמין שותפים",
@@ -192,7 +192,7 @@
         "hint": "כל מי שיש לו/ה מוצר מתאים יכול/ה להציע."
       },
       "mine": {
-        "label": "ריקמות שלי בלבד",
+        "label": "רקמות שלי בלבד",
         "hint": "רק חברי/ות פרויקטים שאני בהם יוכלו להציע."
       }
     },

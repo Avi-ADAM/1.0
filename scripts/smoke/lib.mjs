@@ -317,7 +317,7 @@ export async function visit(page, pathname, { wait = 8000 } = {}) {
 }
 
 /**
- * Close the first-visit guide dialogs ("מדריך למוח הריקמה", the profile tour).
+ * Close the first-visit guide dialogs ("מדריך למוח הרקמה", the profile tour).
  *
  * They matter more than they look: while one is open it covers the page, so a
  * click on anything underneath is swallowed — including a forced one, which
@@ -356,7 +356,7 @@ export async function firstProjectId(page) {
   const count = await buttons.count();
   for (let i = 0; i < count; i++) {
     const label = (await buttons.nth(i).innerText().catch(() => '')).trim();
-    if (!label || /יצירת ריקמה/.test(label)) continue;
+    if (!label || /יצירת רקמה/.test(label)) continue;
     await buttons.nth(i).click({ timeout: 5000 }).catch(() => {});
     await page.waitForTimeout(6000);
     const m = page.url().match(/\/moach\/(\d+)/);

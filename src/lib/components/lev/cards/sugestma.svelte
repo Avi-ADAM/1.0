@@ -437,8 +437,8 @@
         {/if}
       </div>
 
-      <!-- שווי צפוי בריקמה — משאב פתוח נמנה ב-open_mashaabims, כלומר הוא כבר
-           בתוך ה-pipeline של הריקמה, ולכן alreadyCountedIn="pipeline". -->
+      <!-- שווי צפוי ברקמה — משאב פתוח נמנה ב-open_mashaabims, כלומר הוא כבר
+           בתוך ה-pipeline של הרקמה, ולכן alreadyCountedIn="pipeline". -->
       {#if projectId}
         <EquityPreview
           {projectId}
@@ -529,7 +529,7 @@
           >
         </a>
       {:else if myRoundProposedBy === 'project'}
-        <!-- B2: הריקמה הציעה הצעה נגדית — לאשר או להעלות סבב נגדי -->
+        <!-- B2: הרקמה הציעה הצעה נגדית — לאשר או להעלות סבב נגדי -->
         <button
           onmouseenter={() => hover($t('lev.cards.acceptCounter'))}
           onmouseleave={() => hover('0')}
@@ -583,7 +583,7 @@
           <span class="whitespace-nowrap">{$t('lev.cards.approve')}</span>
         </button>
       {:else}
-        <!-- ההצעה שלי ממתינה לריקמה — תקשורת זמינה תמיד, ומשיכה על הצעה עצמית -->
+        <!-- ההצעה שלי ממתינה לרקמה — תקשורת זמינה תמיד, ומשיכה על הצעה עצמית -->
         {#if onTochat}
           <button
             onmouseenter={() => hover($t('lev.rektom.chat'))}

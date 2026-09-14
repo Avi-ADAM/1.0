@@ -307,7 +307,7 @@ export const POST: RequestHandler = async ({ request, fetch, getClientAddress })
         strapiId ? `🗄 demo-request #${strapiId}` : null,
         meetingLink ? `🚪 פגישת אורח: ${esc(meetingLink)}` : null,
         tasks.coordActId && projectId
-          ? `🛠️ מטלות בריקמה המרכזית: ${[tasks.coordActId, tasks.callActId]
+          ? `🛠️ מטלות ברקמה המרכזית: ${[tasks.coordActId, tasks.callActId]
               .filter(Boolean)
               .join(', ')}`
           : null,

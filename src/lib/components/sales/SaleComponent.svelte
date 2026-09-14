@@ -176,7 +176,7 @@
         toast.info(
           $lang === 'en'
             ? `Report sent - awaiting ${holderName}'s consent. It will auto-approve after the rikma's response time if there is no reply.`
-            : `הדיווח נשלח - ממתין להסכמת ${holderName}. יאושר אוטומטית בתום זמן התגובה של הריקמה אם לא תגיע תגובה.`
+            : `הדיווח נשלח - ממתין להסכמת ${holderName}. יאושר אוטומטית בתום זמן התגובה של הרקמה אם לא תגיע תגובה.`
         );
       }
 

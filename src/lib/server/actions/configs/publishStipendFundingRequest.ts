@@ -76,13 +76,13 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
   const descrip = params.descrip
     ? String(params.descrip)
     : [
-        `הריקמה מחפשת שותף שיממן מלגות קיום לחברים שעובדים בה.`,
+        `הרקמה מחפשת שותף שיממן מלגות קיום לחברים שעובדים בה.`,
         `תעריף המלגה: ${nis(Number(program.stipendRate) || 0)} לשעה שאושרה.`,
         `הבקשה: ${nis(monthly)} לחודש למשך ${months} חודשים — סה"כ ${nis(total)}.`,
         program.mode === 'equity'
-          ? `הכסף נספר כתרומה לריקמה ומזכה בחלק בה (מקדם ${program.equityMultiplier}).`
-          : `הכסף נרשם כתרומה — בלי חלק בריקמה.`,
-        `מי שייקח את המשאב הזה מצטרף לריקמה כשותף.`
+          ? `הכסף נספר כתרומה לרקמה ומזכה בחלק בה (מקדם ${program.equityMultiplier}).`
+          : `הכסף נרשם כתרומה — בלי חלק ברקמה.`,
+        `מי שייקח את המשאב הזה מצטרף לרקמה כשותף.`
       ].join(' ');
 
   const nowISO = new Date().toISOString();

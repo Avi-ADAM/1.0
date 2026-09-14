@@ -521,7 +521,7 @@
                 onclick={() => linke('p')}
                 ontouchstart={() => linke('p')}
                 onmouseenter={() =>
-                  hover('לחיצה כפולה לצפיה בעמוד הציבורי של הריקמה')}
+                  hover('לחיצה כפולה לצפיה בעמוד הציבורי של הרקמה')}
                 onmouseleave={() => hover('0')}
                 x="0"
                 y="-40"
@@ -545,7 +545,7 @@
                 <button
                   onclick={() => project(projectId)}
                   onmouseenter={() =>
-                    hover(` לחיצה כפולה למעבר למוח הריקמה ${projectName}`)}
+                    hover(` לחיצה כפולה למעבר למוח הרקמה ${projectName}`)}
                   onmouseleave={() => hover('0')}
                 >
                   <img

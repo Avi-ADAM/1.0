@@ -1,5 +1,5 @@
 <!--
-  Fruit.svelte — the shared fruit / profit of the ריקמה.
+  Fruit.svelte — the shared fruit / profit of the רקמה.
 
   Gold coins stamped with the 1💗1 logo bloom from the centre and stream
   outward to the partners, looping continuously. Emission distance and

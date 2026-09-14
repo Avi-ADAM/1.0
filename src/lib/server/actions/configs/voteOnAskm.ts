@@ -109,7 +109,7 @@ export const voteOnAskmConfig: ActionConfig = {
     templates: {
       title: { he: 'הצבעה חדשה', en: 'New vote', ar: 'تصويت جديد' },
       body: {
-        he: 'חבר/ה בריקמה הצביע/ה על בקשת שיתוף משאב',
+        he: 'חבר/ה ברקמה הצביע/ה על בקשת שיתוף משאב',
         en: 'A member voted on a resource sharing request',
         ar: 'صوت أحد الأعضاء على طلب مشاركة مورد',
       },

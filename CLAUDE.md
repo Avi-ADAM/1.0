@@ -193,6 +193,40 @@ says which.
 - The inverse regression to watch for: routing **UI** text through this to avoid
   adding a JSON key. `$t()` stays the only path for anything the platform says.
 
+## Terminology — the group is a **rikma**, in every language
+
+A rikma (Hebrew `רקמה`: biological tissue, and also embroidery/weave) is the
+consensual partnership the whole platform is built around. It has exactly **one**
+name in user-facing text, in all five locales — the transliteration:
+
+| he | en | es | ar | ru |
+|---|---|---|---|---|
+| `רקמה` / `רקמות` | `rikma` / `rikmas` | `rikma` / `rikmas` | `ريكما` / `ريكمات` | `рикма` / `рикмы` |
+
+- **Hebrew spelling is `רקמה`, never `ריקמה`.** Per the Academy, an *i* vowel before
+  a letter with shva nach takes no yud (the `שִׂמְחָה` pattern). The yud spelling was
+  once dominant here and was normalised away — don't reintroduce it.
+- **English `rikma` is a common noun**, lowercase like *kibbutz* (`a rikma`,
+  `the rikma's clock`); capitalised only sentence- or label-initially.
+- **Grammatical gender:** feminine in every language that marks it — `la rikma`
+  (never `el rikma`), `الريكما … تفعل`, `рикма` declines as a feminine 1st-declension
+  noun (`рикмы / рикме / рикму / рикмой`, pl. `рикмы / рикм / рикмам / рикмами`).
+- **These are retired — never reintroduce any of them:** `FreeMate`/`FreeMates`
+  (it named *people*, and read as a plural for a singular group), `weave`,
+  `tissue`, `tejido`, `نسيج`, `شبكة`, `نسائج`, `ткань`, `плетение`, `переплетение`.
+- **The native tissue-word survives only as an explanatory gloss** where the text
+  actually explains the metaphor — `en` "inspired by living tissue", `es` "el
+  tejido vivo de un cuerpo", `ar` `نسيج الخلايا في جسم حيّ` / `ريكما (نسيج)`,
+  `ru` «тканью клеток» — plus genuine other senses (`شبكة أمان` safety net,
+  `Ошибка сети` network error, `شبكة من الريكمات` / `сеть рикм` a *network of*
+  rikmas). Don't "fix" those into `rikma`.
+- **`project` is the DB entity, not the UI word.** Strapi calls the group
+  `Project` (`api::project.project`) and that stays; user-facing copy says rikma.
+  Plain-English "project" is still fine where it isn't the entity ("start with one
+  side project").
+- **`Rikmash` is a different thing entirely** — `api::rikmash.rikmash` is a
+  *received resource*, not a plural of rikma. Never surface it in UI.
+
 ## Money / revenue domain (site-share)
 
 Site-share = the platform (1lev1) taking part in a rikma's profit split as a

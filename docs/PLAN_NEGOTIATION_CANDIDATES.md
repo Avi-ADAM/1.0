@@ -1,6 +1,6 @@
 # תכנית: משא ומתן בין מועמדים לחברי פרויקט (openMission / openMashaabim)
 
-מסמך מעקב למימוש מו"מ על תנאי שותפות בהצעות הפתוחות של הריקמה, במקביל למו"מ
+מסמך מעקב למימוש מו"מ על תנאי שותפות בהצעות הפתוחות של הרקמה, במקביל למו"מ
 הפנימי הקיים (pendm / pmash).
 
 עודכן לאחרונה: 2026-06-23 · ענף: `main`
@@ -12,7 +12,7 @@
 במו"מ הפנימי (`pendm`/`pmash`) בעלי-הזכות מנהלים מו"מ זה עם זה, וההצעה החדשה
 **דורסת** את הישות (מותר — זה פנימי). כאן המצב שונה:
 
-- המו"מ הוא בין **מועמד** (חיצוני או חבר-ריקמה) ל**פרויקט קיים** (ריקמה).
+- המו"מ הוא בין **מועמד** (חיצוני או חבר-רקמה) ל**פרויקט קיים** (רקמה).
 - ל־openMission/openMashaabim אחד יכולים להיות **כמה מועמדים במקביל**, כל אחד
   עם הצעה משלו → **אסור לדרוס** את ההצעה הפתוחה.
 - לכל מועמד יש `Ask`/`Askm` משלו. ההצעה המתוקנת של המועמד נשמרת כ**סבב**
@@ -24,7 +24,7 @@
   סקלריים על Ask/Askm.
 
 ### מסלול isRishon (הצעה-עצמית, נפרד מ-4 המסלולים)
-כשחבר ריקמה **יוצר הצעה ישירה** (`isSelfProposal`/`isRishon`) — זה זהה למו"מ
+כשחבר רקמה **יוצר הצעה ישירה** (`isSelfProposal`/`isRishon`) — זה זהה למו"מ
 הפנימי הקיים (`submitNegoMash`/`submitNegoMission` על pmash/pendm). נשמר כמסלול
 נפרד ואינו חלק ממכונת-המצבים שלהלן.
 
@@ -39,9 +39,9 @@
 
 ### A.1 העיקרון המלכד (timegrama + שער דו-צדדי)
 
-1. **יצירת timegrama** — נוצר **ברגע שקיימת הצבעת-בעד ראשונה של חבר-ריקמה**
+1. **יצירת timegrama** — נוצר **ברגע שקיימת הצבעת-בעד ראשונה של חבר-רקמה**
    על ה-Ask/Askm. למבקש שהוא **חבר** — קורה מיד (כי הצבעתו נכנסת בעת הבקשה).
-   למבקש **חיצוני** — נדחה עד שחבר ריקמה מצביע בעד / מגיב.
+   למבקש **חיצוני** — נדחה עד שחבר רקמה מצביע בעד / מגיב.
 2. **שער האישור האוטומטי (בפקיעת הזמן)** — אישור רק כשהסבב האחרון **מוסכם
    על שני הצדדים**. מוערך מתוך הסבבים + ה-vots:
 
@@ -50,7 +50,7 @@
    L       = latest?.ordern  (בלי סבב — בסיס: אין שער-סבב)
    takerId = ask.users_permissions_user        // מי שעתיד להתקבל
    votesAtL = vots עם (order ?? 0) >= L
-   hasPMyes = יש חבר-ריקמה שהצביע what:true ב-votesAtL
+   hasPMyes = יש חבר-רקמה שהצביע what:true ב-votesAtL
    hasNo    = יש what:false ב-votesAtL
    takerYes = latest.proposedBy === 'candidate'      // המועמד-יוצר הסבב → הסכמה מובלעת
               || !latest                              // בסיס (Path A/C) → הבקשה = הסכמה
@@ -79,8 +79,8 @@
 | **B2** | חבר מגיב בהצעה נגדית | `counterOnAsk` / `counterOnAskm` | סבב `project` (`ordern+1`) + הצבעת החבר | נוצר/מתאפס מרגע ההצעה הנגדית | **לא** עד שהמועמד מאשר |
 | **— ** | מועמד מאשר הצעה נגדית | `acceptCounterOnAsk` / `acceptCounterOnAskm` (**חדש**) | הצבעת-בעד של ה-taker ב-`order ≥ L` | קיים | כן |
 | **— ** | מועמד מעלה סבב נגדי | `proposeOnOpenMission/Mashaabim` (סבב נוסף) | סבב `candidate` (`ordern+1`) | **מתבטל/מתאפס** | — (חוזר להמתנה לחבר) |
-| **C** | חבר-ריקמה, בתנאים רגילים | `applyToMission` / `createMashaabimRequest` (requester=member) | Ask/Askm + הצבעת החבר | נוצר מיד | כן, אם אין `false` |
-| **D** | חבר-ריקמה, התאמה אישית | `customizeOpenMission` / `customizeOpenMashaabim` (**חדש**) | Ask/Askm + סבב `project` + הצבעת החבר | נוצר מיד | כן, בתנאים שקבע |
+| **C** | חבר-רקמה, בתנאים רגילים | `applyToMission` / `createMashaabimRequest` (requester=member) | Ask/Askm + הצבעת החבר | נוצר מיד | כן, אם אין `false` |
+| **D** | חבר-רקמה, התאמה אישית | `customizeOpenMission` / `customizeOpenMashaabim` (**חדש**) | Ask/Askm + סבב `project` + הצבעת החבר | נוצר מיד | כן, בתנאים שקבע |
 
 > **החלטה (מסלול D):** התנאים המותאמים של החבר נשמרים כ**סבב `project` על ה-Ask/Askm
 > של החבר עצמו** — לא דורסים את ה-OpenMission/OpenMashaabim המשותף (בטוח למועמדים
@@ -143,7 +143,7 @@
 - `pend.svelte` — pendm שהבשיל בשתיקה: ללא `rishon` → OpenMission ציבורי
   (+match-suggestions); עם `rishon` → OpenMission מוקצה (`isRishon`, `archived`)
   + Ask למוקצה + timegrama משלו, כך שההקצאה נשמרת וההסכמה שלו עדיין נדרשת.
-  (אותו פיצול ב-`voteOnPendm` כשהריקמה מאשרת פה-אחד, כולל נוטיפיקציה למוקצה.)
+  (אותו פיצול ב-`voteOnPendm` כשהרקמה מאשרת פה-אחד, כולל נוטיפיקציה למוקצה.)
 
 ---
 
@@ -200,7 +200,7 @@ timegrama פעיל, ליצור; אם יש, להאריך/לאפס את ה-date ל
 `candidate` נוסף. **חדש:** לאתר את ה-timegrama הקיים ולאפס/לבטל אותו (השער ימילא
 את החסם ממילא, אך איפוס מונע מימוש מוקדם).
 
-### 4.8 "לא בעד" בריקמה מרובת-חברים — זמני, ובעתיד רק מו"מ
+### 4.8 "לא בעד" ברקמה מרובת-חברים — זמני, ובעתיד רק מו"מ
 עד עכשיו `reqtom.decline()` הריץ `alert('soon')` כשיש יותר מחבר אחד, והלחיצה
 אבדה. כעת היא נרשמת דרך `voteOnAskm` (`what:false`, `order = orderon`) — הצבעה
 ולא הכרעה: `computeNegoGate` סופר רק הצבעות ב-`order ≥ L`, ולכן ההתנגדות חוסמת
@@ -229,11 +229,11 @@ timegrama פעיל, ליצור; אם יש, להאריך/לאפס את ה-date ל
    (כולל `createdAt` + מציע הסבב), וה-extractor חושף אותן כ-`negopendmissions`+
    `orderon`. **הרינדור:** `cards/reqtojoin.svelte` (משימה) ו-`cards/rektom.svelte`
    (משאב) מציגים באנר "ההצעה החיה" עם הסבב האחרון — תג `candidate`/`project`,
-   מספר הסבב ותאריכו, שווי/עלות מול דרישת הריקמה, שינויי שם/מועדים/תיאור/הערות.
+   מספר הסבב ותאריכו, שווי/עלות מול דרישת הרקמה, שינויי שם/מועדים/תיאור/הערות.
    ב-`rektom` גם החישובים הנגזרים (עלות למחזור, סך השקעה, כותרת הקלף) רצים על
    התנאים ה**אפקטיביים** (`round ?? baseline`) — אותם תנאים ש-
    `runResourceAskmAcceptance` מחיל על ה-OpenMashaabim באישור. באנר של תג
-   `N משא ומתן` בלבד היה מסתיר את ההצעה עצמה מחברי הריקמה.
+   `N משא ומתן` בלבד היה מסתיר את ההצעה עצמה מחברי הרקמה.
    *(ל-`isRishon` הסבבים הם snapshots היסטוריים של ה-pmash ולכן אינם מוצגים כאן.)*
 2. **חישוב סבב/תור בצד הלקוח** — helper משותף שגוזר `currentRound=max(ordern)`,
    `turn` מ-`proposedBy` של הסבב האחרון, ו-`approvable` (אותה נוסחה כמו השרת,
@@ -297,11 +297,11 @@ timegrama פעיל, ליצור; אם יש, להאריך/לאפס את ה-date ל
 - [x] **טעינת הסבבים** לכרטיסי בעל-הזכות — `nego_mashes`/`negopendmissions`
        (+`done` על ה-timegrama) נוספו ל-`83levMainUserQuery` (project-scoped asks/askms),
        וממופים ב-extractors ל-`negopendmissions`/`orderon`/`timegramaDone`.
-- [x] **מסלול D — ניתוב לפי חברות** ב-`mashsuggest`/`projectSuggestor`: חבר-ריקמה →
+- [x] **מסלול D — ניתוב לפי חברות** ב-`mashsuggest`/`projectSuggestor`: חבר-רקמה →
        `customizeOpen…` (התאמה אישית); לא-חבר → `proposeOnOpen…` (הצעה מקבילה).
        זיהוי חברות: `getProjectData(projectId,'uids')` + `$userId`.
 - [x] **תגובת מועמד (B2)** — `acceptCounterOn…`/`candidateCounterOn…` בכרטיסי
-       ההצעה (`projectSuggestor`/`mashsuggest`). באנר "הריקמה הציעה הצעה נגדית"
+       ההצעה (`projectSuggestor`/`mashsuggest`). באנר "הרקמה הציעה הצעה נגדית"
        עם [אשר]/[הצע אחר] כשהסבב האחרון `proposedBy=project`.
        - הסבבים+vots(order) של הבקשה-של-המועמד נטענים ב-`83levMainUserQuery`
          (user-scoped asks/askms) וממופים ב-extractors ל-`myRoundProposedBy`/

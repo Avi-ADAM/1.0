@@ -56,7 +56,7 @@ export const S8_Products: React.FC = () => {
         fontFamily: theme.font, fontSize: 26, color: theme.colors.muted,
         textAlign: 'center', direction: 'rtl', marginBottom: 32,
       }}>
-        לקוח קונה מוצר → הפלטפורמה יוצרת אוטומטית את המשימות והמשאבים → חברי הריקמה מבצעים ומתקשרים עם הלקוח מתוך האתר.
+        לקוח קונה מוצר → הפלטפורמה יוצרת אוטומטית את המשימות והמשאבים → חברי הרקמה מבצעים ומתקשרים עם הלקוח מתוך האתר.
       </div>
 
       {/* Flow row */}
@@ -65,7 +65,7 @@ export const S8_Products: React.FC = () => {
         <Arrow delay={30} />
         <FlowNode icon="📦" text="מוצר" sub="תבנית משימות+משאבים" delay={38} color="#a855f7" />
         <Arrow delay={48} />
-        <FlowNode icon="⚙️" text="ביצוע" sub="חברים מבצעים בתוך הריקמה" delay={56} color={theme.colors.green} />
+        <FlowNode icon="⚙️" text="ביצוע" sub="חברים מבצעים בתוך הרקמה" delay={56} color={theme.colors.green} />
         <Arrow delay={66} />
         <FlowNode icon="💬" text="תקשורת" sub="מול הלקוח דרך האתר" delay={74} color="#f59e0b" />
         <Arrow delay={84} />

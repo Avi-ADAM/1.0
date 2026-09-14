@@ -15,7 +15,7 @@ All data is already fetched in the moach page load. Probably No new backend enti
 
 ## Glossary
 
-- **Moach_Page**: The project management page at `src/routes/(reg)/moach/+page.svelte` that serves as the central hub for a project (ריקמה/FreeMate).
+- **Moach_Page**: The project management page at `src/routes/(reg)/moach/+page.svelte` that serves as the central hub for a project (רקמה/FreeMate).
 - **Process_Chain_View**: The new Svelte component (`ProcessChainView.svelte`) that renders mission and resource lifecycle chains.
 - **Mission_Chain**: A visual sequence of linked objects representing the full lifecycle of a single mission: pendm → open_mission → asks/requests → mesimabetahalich → acts → finiapruvals → finnished_mission.
 - **Resource_Chain**: A visual sequence of linked objects representing the full lifecycle of a single resource: pmashes (pending) → open_mashaabim (open) → offers (askm) → approval vote (maap) → approved completed (rikmash).

@@ -59,7 +59,8 @@ bearer_token_env_var = "LEV1_API_KEY"`;
     <p>{$t('mcp.subtitle')}</p>
   </header>
 
-  <section>
+  <!-- Anchor ids are linked from the rikma create page (AgentConnectCard). -->
+  <section id="claude-code">
     <h3>{$t('mcp.quickTitle')}</h3>
     <p class="body">{$t('mcp.quickBody')}</p>
     <div class="cmd">
@@ -74,7 +75,7 @@ bearer_token_env_var = "LEV1_API_KEY"`;
   <!-- The no-terminal path. It sits directly under the command because the two
        are alternatives, and someone reading this on a phone cannot run either
        command shown above. -->
-  <section>
+  <section id="connector">
     <h3>{$t('mcp.connectorTitle')}</h3>
     <p class="body">{$t('mcp.connectorBody')}</p>
     <ol class="steps">
@@ -218,6 +219,8 @@ bearer_token_env_var = "LEV1_API_KEY"`;
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
+    /* Deep links land below the sticky header, not under it. */
+    scroll-margin-top: 5rem;
   }
   section h3 {
     font-weight: 800;

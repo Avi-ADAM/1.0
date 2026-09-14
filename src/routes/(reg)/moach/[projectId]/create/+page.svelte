@@ -13,6 +13,7 @@
   import ResourceCreator from '$lib/components/resource/ResourceCreator.svelte';
   import Handp from '$lib/components/prPr/handp.svelte';
   import PlanBoards from '$lib/components/planning/PlanBoards.svelte';
+  import AgentConnectCard from '$lib/components/planning/AgentConnectCard.svelte';
   import Crtask from '$lib/components/prPr/tasks/crtask.svelte';
   import Newmatana from '$lib/components/prPr/newmatana.svelte';
   import { executeAction } from '$lib/client/actionClient';
@@ -561,6 +562,9 @@
         >
       </div>
     </a>
+
+    <!-- חיבור Claude לרקמה הזו — קישור למדריך + שורת פתיחה עם ה-projectId -->
+    <AgentConnectCard projectId={String(projectId)} projectName={pn} />
 
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-4xl mx-auto py-12">
 

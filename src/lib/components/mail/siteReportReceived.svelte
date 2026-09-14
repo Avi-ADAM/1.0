@@ -86,7 +86,7 @@
 	// somebody's actual work, and here is how that works here".
 	const BODY = {
 		he: (/** @type {string} */ k) =>
-			`קיבלנו ${k}. אצלנו זה לא נעלם בתיבת דואר: הפנייה נפתחה כמטלה בריקמה שמפתחת את האתר, וחבר/ה בריקמה לוקח/ת אותה על עצמו/ה. כשמישהו לוקח את המטלה, וכשהיא נסגרת — הסטטוס של הפנייה שלך מתעדכן בהתאם.`,
+			`קיבלנו ${k}. אצלנו זה לא נעלם בתיבת דואר: הפנייה נפתחה כמטלה ברקמה שמפתחת את האתר, וחבר/ה ברקמה לוקח/ת אותה על עצמו/ה. כשמישהו לוקח את המטלה, וכשהיא נסגרת — הסטטוס של הפנייה שלך מתעדכן בהתאם.`,
 		en: (/** @type {string} */ k) =>
 			`We received ${k}. It does not vanish into an inbox here: it was opened as a task in the rikma that builds this site, and a member there takes it on. When somebody picks it up, and when it is closed, your report's status follows.`,
 		ar: (/** @type {string} */ k) =>

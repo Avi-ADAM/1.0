@@ -150,7 +150,7 @@
   <meta
     name="description"
     content={$lang === 'he'
-      ? `הציעו את עצמכם לריקמה ${attrs?.projectName ?? ''} - בתנאים שלכם`
+      ? `הציעו את עצמכם לרקמה ${attrs?.projectName ?? ''} - בתנאים שלכם`
       : `Nominate yourself to ${attrs?.projectName ?? ''} - on your own terms`}
   />
 </svelte:head>
