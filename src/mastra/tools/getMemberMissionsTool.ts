@@ -37,7 +37,7 @@ export const getMemberMissionsTool = createTool({
   id: 'getMemberMissionsTool',
   description:
     "List a project member's in-progress missions. A task is linked to a mission-in-progress the assignee performs, so call this after choosing the assignee (a person) to pick the missionId to pass to createTaskTool. " +
-    'createTaskTool is listed only for API keys with the mcp:write scope; without it, use createPlanBoardTool with type "act" and missionName instead.',
+    'If no mission in progress covers the work, it is not a task: prepare a mission with prepareMissionTool instead.',
   inputSchema: z.object({
     projectId: z.string().describe('ID of the project'),
     userId: z.string().describe('ID of the member (assignee) whose in-progress missions to list')

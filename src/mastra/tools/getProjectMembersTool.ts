@@ -49,7 +49,7 @@ export const getProjectMembersTool = createTool({
   id: 'getProjectMembersTool',
   description:
     'List the people (members) and roles (tafkidim) of a project. Use this to resolve a task assignee - a person or a role - to its ID before calling createTaskTool. ' +
-    'createTaskTool is listed only for API keys with the mcp:write scope; if it is not in your tool list, put the chore on a planning board with createPlanBoardTool (type "act", assigneeName) for the user to approve instead.',
+    'For a task with no specific person, pick the roles that fit it here and pass their IDs as tafkidims.',
   inputSchema: z.object({
     projectId: z.string().describe('ID of the project'),
     query: z

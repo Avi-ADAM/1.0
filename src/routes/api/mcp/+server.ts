@@ -136,6 +136,10 @@ function makeFixRejectedApiKeyTool(reason: 'malformed' | 'unknown' | 'revoked') 
 //   read         — queries. Always available.
 //   prepare      — returns a prefilled URL, writes nothing. Always available.
 //   selfWrite    — changes only the caller's own records (their timers/hours).
+//   consentWrite — lands something on another member that still waits for
+//                  them: an act assigned to a person needs that person's
+//                  approval (`myIshur`), an act aimed at roles waits for one of
+//                  the holders to pick it up. Always available.
 //   sharedWrite  — creates obligations for other people. Requires 'mcp:write'.
 //
 // Scopes live on the api-key record; `ops` is the list we honour here.
@@ -238,10 +242,16 @@ async function handleMcpRequest(request: Request, url: URL, svelteFetch: typeof 
             timerActionTool
         };
 
-        // Creates work and obligations for other members; `createTaskTool` also
-        // executes with the admin token rather than the caller's session.
+        // Creating an act is the everyday move for a member who wants something
+        // new done in a project, so it is never hidden behind a scope. It runs
+        // with the admin token, but `createTask` is projectMember-gated on the
+        // key's owner, and nobody is bound by it until they accept it.
+        const consentWriteTools = {
+            createTaskTool
+        };
+
+        // Publishes work directly, with no human approving the form.
         const sharedWriteTools = {
-            createTaskTool,
             createMissionTool
         };
 
@@ -252,6 +262,7 @@ async function handleMcpRequest(request: Request, url: URL, svelteFetch: typeof 
             ...readTools,
             ...prepareTools,
             ...selfWriteTools,
+            ...consentWriteTools,
             ...(mayWriteShared ? sharedWriteTools : {}),
             howToConnect // Included even in auth mode for convenience
         };

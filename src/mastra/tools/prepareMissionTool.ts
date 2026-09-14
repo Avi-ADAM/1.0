@@ -23,6 +23,7 @@ export const prepareMissionTool = createTool({
   description:
     'Prepare the mission creation form and return a link that opens it pre-filled. ' +
     'Use this when the user should review and confirm the mission before it is published. ' +
+    'A mission is for work that needs an implementer to be found. If a mission in progress already covers the work, create a task (act) on it with createTaskTool instead. ' +
     'Nothing is created yet: status is "prepared" until the user opens the link and publishes. ' +
     'Give the user `url` exactly as returned — do not decode, shorten or rebuild it. ' +
     'Requires a projectId - use findUserProjects first if not known.',
