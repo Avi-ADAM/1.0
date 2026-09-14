@@ -259,10 +259,26 @@ nginx + `sveltekit-api` logs, then reproduced with curl:
    the same name. Claude Desktop's key started failing with "unknown key" four
    minutes later. **Fix:** an OAuth client's key is `MCP · <client_name>`, so
    each client replaces only its own key.
-3. **The `api.` vs `www.` resource mismatch** (above) is still there. The code
-   side is in: `OAUTH_AUTHORIZATION_SERVER`. It also needs nginx on
-   `api.1lev1.com` to proxy `/.well-known/oauth-protected-resource` to
-   `sveltekit-api` instead of 301ing it to www.
+3. **The `api.` vs `www.` resource mismatch** (above). **Fix:** the
+   authorization server moved to `api.1lev1.com`, next to the resource it
+   protects. nginx there (1.0b `nginx/default.conf.template`) now proxies
+   `/.well-known/oauth-{protected-resource,authorization-server}` and
+   `/oauth/{authorize,token,register}` to `sveltekit-api` instead of 301ing
+   them to www. The consent and login pages still redirect to www, where the
+   user's session lives.
+
+   That split only works if both instances derive from the same root secret: a
+   request signed on api gets verified by `/mcp-connect` on Vercel, and a code
+   encrypted there gets redeemed at api's `/oauth/token`. Verified 14.9.2026 by
+   having api's `/oauth/authorize` accept a client_id registered on www (302 to
+   login) and reject a forged one (400). **Rotating `OAUTH_SECRET` /
+   `API_KEY_NONCE` on one side only breaks every connector.**
+
+   Moving it also makes `REPLAY_CACHE` exact again: it is per-process, which a
+   single container honours and Vercel's many instances did not.
+
+   `OAUTH_AUTHORIZATION_SERVER` (metadata.ts) stays as an unset escape hatch; it
+   is not needed with this layout.
 
 ---
 
