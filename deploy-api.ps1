@@ -131,7 +131,17 @@ Invoke-Remote "cd $RemoteDir && test -f .env || { echo 'MISSING $RemoteDir/.env 
 # leftovers are caught as well. Volumes are named, so postgres keeps its data.
 #   Long-term fix: install the compose v2 plugin on the server — the $DC probe
 #   below already prefers it, and v2 does not have this bug.
-$RemoveStale = "docker ps -aq --filter name=sveltekit-api --filter name=mastra-postgres --filter name=vector | xargs -r docker rm -f >/dev/null 2>&1 || true"
+# EVERY container in the compose file has to be in this list: one that is left
+# out gets recreated by v1 and the whole deploy dies (that is how the scheduler
+# broke it). The guard below fails the deploy before any container is touched
+# if a new service's container_name was not added here.
+$StaleNames = @("sveltekit-api", "mastra-postgres", "vector", "1lev1-scheduler")
+$ComposeNames = Select-String -Path "$RepoRoot\docker-compose.api.yml" -Pattern '^\s*container_name:\s*[''"]?([^''"\s]+)' |
+    ForEach-Object { $_.Matches[0].Groups[1].Value }
+$Missing = $ComposeNames | Where-Object { $StaleNames -notcontains $_ }
+if ($Missing) { Fail "docker-compose.api.yml has container(s) not in `$StaleNames: $($Missing -join ', ') — add them, or compose v1 will crash recreating them" }
+$StaleFilters = ($StaleNames | ForEach-Object { "--filter name=$_" }) -join " "
+$RemoveStale = "docker ps -aq $StaleFilters | xargs -r docker rm -f >/dev/null 2>&1 || true"
 if (-not $Tarball) {
     # ---- default: push to GHCR, pull on the server ----
     Step "Pushing $FullImage to $Registry"
