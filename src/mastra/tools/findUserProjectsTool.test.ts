@@ -91,6 +91,40 @@ describe('findUserProjectsTool identity handling', () => {
   });
 });
 
+describe('findUserProjectsTool ordering and paging', () => {
+  const rows = [
+    { id: '41', attributes: { projectName: 'givit', createdAt: '2025-01-01T00:00:00.000Z' } },
+    { id: '50', attributes: { projectName: 'freeMeet', createdAt: '2026-09-14T08:00:00.000Z' } },
+    { id: '43', attributes: { projectName: 'FreeMeet', createdAt: '2025-06-01T00:00:00.000Z' } }
+  ];
+
+  beforeEach(() => {
+    sendToSer.mockResolvedValue({
+      data: { usersPermissionsUser: { data: { attributes: { projects_1s: { data: rows } } } } }
+    });
+    getMcpContext.mockReturnValue({ userId: '42', fetchInstance: vi.fn() });
+  });
+
+  it('returns newest first with createdAt, so same-named rikmot can be told apart', async () => {
+    const res = await run({ query: 'freemeet' });
+    expect(res.projects.map((p: any) => p.id)).toEqual(['50', '43']);
+    expect(res.projects[0].createdAt).toBe('2026-09-14T08:00:00.000Z');
+    expect(res.total).toBe(2);
+    expect(res.hasMore).toBe(false);
+  });
+
+  it('pages with limit/offset and says where the next page starts', async () => {
+    const first = await run({ limit: 2 });
+    expect(first.projects.map((p: any) => p.id)).toEqual(['50', '43']);
+    expect(first).toMatchObject({ total: 3, hasMore: true, nextOffset: 2 });
+
+    const second = await run({ limit: 2, offset: 2 });
+    expect(second.projects.map((p: any) => p.id)).toEqual(['41']);
+    expect(second.hasMore).toBe(false);
+    expect(second.nextOffset).toBeUndefined();
+  });
+});
+
 describe('findUserProjectsTool contract', () => {
   it('marks userId optional so an external client can call it at all', () => {
     const shape = (findUserProjectsTool.inputSchema as any).shape;

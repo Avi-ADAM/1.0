@@ -19,6 +19,7 @@
   import { isLinkableMissionType } from '$lib/acts/publishAsMission.js';
   import { toast } from 'svelte-sonner';
   import { invalidateAll } from '$app/navigation';
+  import { decodeMissionDraft } from '$lib/prefill/missionDraft';
 
   const moachStore = getMoachStore();
 
@@ -92,20 +93,35 @@
       await tick();
       if (page.url.searchParams.get('action') === 'createmission') {
         const params = page.url.searchParams;
-        prefillMissionName    = params.get('name') ?? '';
-        prefillMissionDescrip = params.get('descrip') ?? '';
         // Set only here: the act is linked to whatever this form produces.
         fromActId = params.get('fromAct');
         assignActToMe = params.get('assignActToMe') === '1';
 
-        const nhours = Number(params.get('nhours'));
-        const valph  = Number(params.get('valph'));
+        // An agent-prepared form arrives as one opaque `draft` (see
+        // $lib/prefill/draftCodec.ts). The per-field params are the site's own
+        // "publish as a mission" link and older agent links; a URL decoded once
+        // on its way here loses everything after the first `&` in `descrip`.
+        let draft = null;
+        if (params.has('draft')) {
+          draft = await decodeMissionDraft(params.get('draft'));
+          if (!draft) toast.error($t('toasts.draftUnreadable'), { duration: 12000 });
+        }
 
-        const names = {
-          skills:   csv(params.get('skills')),
-          roles:    csv(params.get('roles')),
-          workways: csv(params.get('workways'))
-        };
+        prefillMissionName    = draft ? draft.name : (params.get('name') ?? '');
+        prefillMissionDescrip = draft ? (draft.descrip ?? '') : (params.get('descrip') ?? '');
+
+        const nhours = draft ? Number(draft.nhours) : Number(params.get('nhours'));
+        const valph  = draft ? Number(draft.valph)  : Number(params.get('valph'));
+        const hasNhours = draft ? draft.nhours != null : !!params.get('nhours');
+        const hasValph  = draft ? draft.valph  != null : !!params.get('valph');
+
+        const names = draft
+          ? { skills: draft.skills ?? [], roles: draft.roles ?? [], workways: draft.workways ?? [] }
+          : {
+              skills:   csv(params.get('skills')),
+              roles:    csv(params.get('roles')),
+              workways: csv(params.get('workways'))
+            };
 
         // Resolve BEFORE opening the form: mission.svelte hydrates from
         // `initialSpec` on mount only, so ids that arrive later would never
@@ -123,8 +139,8 @@
           ...(vocab?.roles.length ? { roles: vocab.roles.map((t) => t.name) } : {}),
           ...(vocab?.workways.length ? { workways: vocab.workways.map((t) => t.name) } : {}),
           ...(vocab ? { vocab } : {}),
-          ...(Number.isFinite(nhours) && params.get('nhours') ? { nhours } : {}),
-          ...(Number.isFinite(valph)  && params.get('valph')  ? { valph }  : {})
+          ...(Number.isFinite(nhours) && hasNhours ? { nhours } : {}),
+          ...(Number.isFinite(valph)  && hasValph  ? { valph }  : {})
         };
         addM = true;
       }

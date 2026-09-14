@@ -1,4 +1,5 @@
 {
   "suc": "done sucssefully!",
+  "draftUnreadable": "We couldn't read the prepared details — the link may have been cut off. The form opened empty: fill it in yourself or ask the agent for a new link.",
   "er": "error: please try again, if the problem not solved please contact us at baruch@1lev1.com"
 }

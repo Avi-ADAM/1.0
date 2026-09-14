@@ -323,6 +323,7 @@
   "me": {
     "pickFile": "Please select a file to upload",
     "uploadError": "Error uploading file",
+    "draftUnreadable": "We couldn't read the prepared rikma details — the link may have been cut off. The form opened empty: fill it in yourself or ask the agent for a new link.",
     "title": "1💗1 profile and settings",
     "deletew": "Delete",
     "om": "One moment please",

@@ -1,51 +1,76 @@
 import { createTool } from '@mastra/core/tools'
 import { z } from 'zod';
+import { MAX_DRAFT_PARAM, SITE_ORIGIN } from '../../lib/prefill/draftCodec';
+import { PROFIT_IDS, RES_IDS, encodeProjectDraft } from '../../lib/prefill/projectDraft';
 
+/**
+ * Nothing is created here — this prepares the creation form for a human to
+ * review and approve. The whole draft travels as one opaque `draft` parameter
+ * (see $lib/prefill/projectDraft.ts for why the per-field query string lost
+ * `details` and `vals` silently).
+ */
 export const createProjectTool = createTool({
   id: 'createProjectTool',
-  description: 'Generate a URL to create a new Partnership (also known as "Embroidery" or "ריקמה"). This tool allows preparing all the project details for the user. שותפות היא ריקמה.',
+  description:
+    'Prepare the "create a Partnership" form (a Partnership is also called an Embroidery, or "ריקמה") and return a link that opens it pre-filled. ' +
+    'Nothing is created yet: status is "prepared" until the user opens the link and approves the form. ' +
+    'Give the user `url` exactly as returned — do not decode, shorten or rebuild it.',
   inputSchema: z.object({
-    name: z.string().describe('The name of the new Partnership (Embroidery/ריקמה). This is required.'),
-    desc: z.string().optional().describe('A short public description of the partnership.'),
-    details: z.string().optional().describe('A detailed description of the partnership in HTML format.'),
+    name: z.string().describe('The name of the new Partnership. Required.'),
+    desc: z.string().optional().describe('A short public description (plain text, one or two sentences).'),
+    details: z
+      .string()
+      .optional()
+      .describe(
+        'Detailed description as raw HTML, e.g. `<h2>Title</h2><p>Body</p>`. ' +
+          'Allowed tags: h1, h2, h3, p, ul, ol, li, strong, em, u, s, a, br, blockquote. ' +
+          'Do NOT HTML-escape it (send `<p>`, not `&lt;p&gt;`).'
+      ),
     url: z.string().optional().describe('A link to a website related to the project.'),
-    vals: z.array(z.string()).optional().describe('A list of values and goals for the partnership. Pass the actual value names.'),
-    res: z.enum(['feh', 'sth', 'nsh', 'sevend']).optional().describe('Response time ID: feh (48h), sth (72h), nsh (96h), sevend (1 week).'),
-    profit: z.enum(['already', 'week', 'month', 'threeM', 'sixM', 'oneY', 'twoY', 'more', 'never']).optional().describe('Time to profit ID.'),
+    vals: z.array(z.string()).optional().describe('Values and goals of the partnership, as their names. A value may contain commas.'),
+    res: z.enum(RES_IDS).optional().describe('Response time ID: feh (48h), sth (72h), nsh (96h), sevend (1 week).'),
+    profit: z.enum(PROFIT_IDS).optional().describe('Time to profit ID.'),
     ont: z.boolean().optional().describe('Whether the partnership is continuous (true) or a one-time event (false).'),
   }),
   outputSchema: z.object({
-    success: z.boolean(),
-    url: z.string().describe('The URL that will open the pre-filled project creation form.'),
-    navigation: z.object({
-      url: z.string(),
-      pageName: z.string(),
-    }),
+    success: z.boolean().describe('The link was prepared. It does NOT mean the partnership exists.'),
+    status: z.enum(['prepared', 'tooLong']),
+    url: z.string().optional().describe('Absolute link that opens the pre-filled form. Pass it on verbatim.'),
+    message: z.string(),
+    navigation: z
+      .object({
+        url: z.string(),
+        pageName: z.string(),
+      })
+      .optional(),
   }),
-  execute: async (inputData, context) => {
-    const { name, desc, details, url, vals, res, profit, ont } = inputData;
+  execute: async (inputData) => {
+    const draft = await encodeProjectDraft(inputData);
 
-    const params = new URLSearchParams();
-    params.set('action', 'createproject');
-    params.set('name', name);
+    if (draft.length > MAX_DRAFT_PARAM) {
+      // Refused here, where the agent can act on it, rather than as a 414 at
+      // the proxy or a form that quietly opens half-empty.
+      return {
+        success: false,
+        status: 'tooLong' as const,
+        message:
+          `The draft is too long to fit in a link (${draft.length} > ${MAX_DRAFT_PARAM} encoded characters). ` +
+          'Shorten `details` and call createProjectTool again; the user can add more text in the form afterwards.',
+      };
+    }
 
-    if (desc) params.set('desc', desc);
-    if (details) params.set('details', details);
-    if (url) params.set('url', url);
-    if (vals && vals.length > 0) params.set('vals', vals.join(','));
-    if (res) params.set('res', res);
-    if (profit) params.set('profit', profit);
-    if (ont !== undefined) params.set('ont', ont.toString());
-
-    const finalUrl = `/me?${params.toString()}`;
-
-    console.log(`🚀 Generated project creation URL for partnership: ${name}`);
+    const path = `/me?${new URLSearchParams({ action: 'createproject', draft })}`;
+    console.log(`🚀 Prepared project creation form for partnership: ${inputData.name} (${path.length} chars)`);
 
     return {
       success: true,
-      url: finalUrl,
+      status: 'prepared' as const,
+      url: `${SITE_ORIGIN}${path}`,
+      message:
+        'Form prepared, nothing created yet. Ask the user to open the link, review the fields and approve it.',
+      // Relative: the site's own bots `goto()` it inside the app.
       navigation: {
-        url: finalUrl,
+        url: path,
         pageName: 'Create Partnership',
       },
     };

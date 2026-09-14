@@ -1949,6 +1949,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
               id
               attributes {
                 projectName
+                createdAt
                 profilePic {
                   data {
                     attributes {

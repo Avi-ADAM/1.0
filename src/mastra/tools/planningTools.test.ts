@@ -1,9 +1,52 @@
 import { describe, expect, it } from 'vitest';
 import {
   buildBoardReviewUrl,
+  describeActionFailure,
   planProjectWorkTool,
   scanProjectDirectionsTool
 } from './planningTools';
+
+describe('describeActionFailure', () => {
+  const strapi = (extensions: Record<string, unknown>, message = 'x') => ({
+    code: 'STRAPI_ERROR',
+    message: 'Database operation failed',
+    details: [{ message, extensions }]
+  });
+
+  it('names a Strapi permission denial as a server problem that retrying cannot fix', () => {
+    const f = describeActionFailure(strapi({ code: 'FORBIDDEN' }, 'Forbidden access'), 'r1');
+    expect(f).toMatchObject({ code: 'SERVER_PERMISSION_DENIED', retryable: false, requestId: 'r1' });
+    expect(f.hint).toMatch(/not your input/);
+  });
+
+  it('treats an HTTP 403 from Strapi the same way', () => {
+    expect(describeActionFailure(strapi({ code: 'HTTP_ERROR', status: 403 }), 'r').code).toBe(
+      'SERVER_PERMISSION_DENIED'
+    );
+  });
+
+  it('marks network and 5xx failures retryable', () => {
+    expect(describeActionFailure(strapi({ code: 'NETWORK_ERROR' }), 'r').retryable).toBe(true);
+    expect(describeActionFailure(strapi({ code: 'HTTP_ERROR', status: 502 }), 'r').retryable).toBe(true);
+  });
+
+  it('keeps any other Strapi rejection non-retryable', () => {
+    expect(describeActionFailure(strapi({ code: 'BAD_USER_INPUT' }), 'r')).toMatchObject({
+      code: 'PLAN_SAVE_FAILED',
+      retryable: false
+    });
+  });
+
+  it('passes the membership reason through', () => {
+    const f = describeActionFailure({ code: 'UNAUTHORIZED', message: 'You must be a member of this project to plan it' }, 'r');
+    expect(f.code).toBe('NOT_ALLOWED');
+    expect(f.hint).toMatch(/member of this project/);
+  });
+
+  it('never throws on a missing error', () => {
+    expect(describeActionFailure(undefined, 'r')).toMatchObject({ code: 'INTERNAL_ERROR', retryable: false });
+  });
+});
 
 describe('buildBoardReviewUrl', () => {
   it('points at the project create page, where the boards live', () => {

@@ -8,7 +8,8 @@
  *
  * Why this exists as an endpoint rather than only inside the planning engine:
  * the mission creation form is also reached by a plain URL —
- * `/moach/<id>/create?action=createmission&skills=a,b,c` — which any producer
+ * `/moach/<id>/create?action=createmission&skills=a,b,c` (or `&draft=…`, see
+ * `$lib/prefill/missionDraft.ts`) — which any producer
  * can build (the bot's `prepareMissionTool`, an external MCP agent, a link
  * someone pasted). The form maps chips back to ids against the catalogue it
  * loaded and silently drops what it cannot find, so names arriving that way

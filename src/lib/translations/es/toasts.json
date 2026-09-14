@@ -1,5 +1,6 @@
 {
   "_review": true,
   "suc": "¡hecho correctamente!",
+  "draftUnreadable": "No pudimos leer los datos preparados; puede que el enlace se haya cortado. El formulario se abrió vacío: complétalo tú o pide al agente un enlace nuevo.",
   "er": "error: inténtalo de nuevo; si el problema no se resuelve, contáctanos en baruch@1lev1.com"
 }

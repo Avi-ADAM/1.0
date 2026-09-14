@@ -347,6 +347,7 @@
 
   import { RingLoader } from 'svelte-loading-spinners';
   import { toast } from 'svelte-sonner';
+  import { decodeProjectDraft, sanitizeProjectDraft } from '$lib/prefill/projectDraft';
   import CrNewProject from '$lib/celim/icons/crNewProject.svelte';
   import { end } from 'happy-dom/lib/PropertySymbol.js';
   import ProfileBadge from '$lib/components/userPr/ProfileBadge.svelte';
@@ -398,19 +399,39 @@
       await tick();
       if (page.url.searchParams.get('action') === 'createproject') {
         const params = page.url.searchParams;
-        baciStore.update((s) => ({
-          ...s,
-          projectName_value: params.get('name') || s.projectName_value,
-          desP: params.get('desc') || s.desP,
-          desPl: params.get('details') || s.desPl,
-          linkP: params.get('url') || s.linkP,
-          selected: params.get('vals')
-            ? params.get('vals').split(',').filter(Boolean)
-            : s.selected,
-          restime: params.get('res') || s.restime,
-          timeToP: params.get('profit') || s.timeToP,
-          ont: params.has('ont') ? params.get('ont') === 'true' : s.ont
-        }));
+        // An agent-prepared form arrives as one opaque `draft` (see
+        // $lib/prefill/projectDraft.ts). The per-field params below are older
+        // links: a URL decoded once on its way here silently loses everything
+        // after the first `&` inside `details`, so never go back to them.
+        const draft = params.has('draft')
+          ? await decodeProjectDraft(params.get('draft'))
+          : sanitizeProjectDraft({
+              name: params.get('name'),
+              desc: params.get('desc'),
+              details: params.get('details'),
+              url: params.get('url'),
+              vals: params.get('vals')?.split(','),
+              res: params.get('res'),
+              profit: params.get('profit'),
+              ont: params.has('ont') ? params.get('ont') === 'true' : undefined
+            });
+        if (draft) {
+          baciStore.update((s) => ({
+            ...s,
+            projectName_value: draft.name,
+            desP: draft.desc ?? s.desP,
+            desPl: draft.details ?? s.desPl,
+            linkP: draft.url ?? s.linkP,
+            selected: draft.vals ?? s.selected,
+            restime: draft.res ?? s.restime,
+            timeToP: draft.profit ?? s.timeToP,
+            ont: draft.ont ?? s.ont
+          }));
+        } else if (params.has('draft')) {
+          // Opening an empty form as if it were the prepared one is exactly the
+          // silent loss this replaced — say so.
+          toast.error($t('pages.me.draftUnreadable'), { duration: 12000 });
+        }
         iwant = false;
         addP = true;
       } else if (page.url.searchParams.get('action') === 'editbasic') {
