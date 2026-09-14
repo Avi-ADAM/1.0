@@ -241,6 +241,29 @@ Two ways out, and they are not exclusive:
 Until one of them is done, test the connector against **both** hosts rather than
 assuming the `api.` URL works because the endpoint does.
 
+## First real claude.ai connect failed (14.9.2026) — three causes
+
+Reference `ofid_9a6c29184449b9d9`, "Authorization with 1lev1 failed". Read from
+nginx + `sveltekit-api` logs, then reproduced with curl:
+
+1. **`/oauth/token` answered 403 before our code ran.** RFC 6749 requires a
+   form-encoded token request, and a server-to-server call carries no `Origin`.
+   SvelteKit's built-in CSRF check refuses exactly that
+   (`403 Cross-site POST form submissions are forbidden`), runs before `handle`,
+   and has no per-route exemption. The "verified" 400s above were sent as JSON,
+   which the check ignores, so this was never exercised. **Fix:** kit's check is
+   off (`csrf.trustedOrigins: ['*']`) and `$lib/server/csrf.js` reproduces it in
+   `handle`, exempting only `/oauth/token`, which reads no session.
+2. **Approving revoked the user's existing CLI/plugin key.** `/mcp-connect`
+   always minted a key named `MCP`, and `POST /api/api-keys` deletes keys with
+   the same name. Claude Desktop's key started failing with "unknown key" four
+   minutes later. **Fix:** an OAuth client's key is `MCP · <client_name>`, so
+   each client replaces only its own key.
+3. **The `api.` vs `www.` resource mismatch** (above) is still there. The code
+   side is in: `OAUTH_AUTHORIZATION_SERVER`. It also needs nginx on
+   `api.1lev1.com` to proxy `/.well-known/oauth-protected-resource` to
+   `sveltekit-api` instead of 301ing it to www.
+
 ---
 
 ## Part B — agents other than Claude

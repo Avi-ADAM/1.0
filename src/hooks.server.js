@@ -8,6 +8,8 @@ import { STRAPI_URL } from '$lib/server/strapiUrl.js';
 import { isExpiredJwt, clearStaleAuthCookies } from '$lib/server/session.js';
 import { resolveEventIdentity } from '$lib/server/identity.js';
 import { log, requestId } from '$lib/server/log.js';
+import { csrfRejection } from '$lib/server/csrf.js';
+import { dev } from '$app/environment';
 import {
   DEFAULT_THEME,
   THEME_COOKIE,
@@ -298,6 +300,13 @@ const LOG_SKIP = /^\/(api\/health|_app\/immutable|favicon|robots\.txt|sw\.js)/;
  * @type {import('@sveltejs/kit').Handle}
  */
 export async function handle({ event, resolve }) {
+  // Kit's built-in CSRF check is off (svelte.config.js) so this one can exempt
+  // /oauth/token. Like kit's, it does not run under vite dev.
+  if (!dev) {
+    const forbidden = csrfRejection(event.request, event.url);
+    if (forbidden) return forbidden;
+  }
+
   const reqId = requestId(event.request);
   event.locals.reqId = reqId;
   event.locals.log = log.child({ reqId });

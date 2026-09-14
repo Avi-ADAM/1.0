@@ -5,8 +5,24 @@
 // a single origin here would break the moment the app answers on both
 // api.1lev1.com and www.1lev1.com — which it does.
 
+import { env } from '$env/dynamic/private';
+
 export function issuerFor(url: URL): string {
   return url.origin;
+}
+
+/**
+ * Where the protected resource sends clients to authorize. Defaults to the
+ * request's own origin. api.1lev1.com only serves /api/* and 301s everything
+ * else to www (Vercel), so on that host set
+ * OAUTH_AUTHORIZATION_SERVER=https://www.1lev1.com: the resource metadata then
+ * names `https://api.1lev1.com/api/mcp` (matching the URL the user pasted,
+ * RFC 9728 §3.3) while authorize/token/register all run on www, whose own
+ * metadata issuer is www — so both checks hold.
+ */
+export function authorizationServerFor(url: URL): string {
+  const configured = env.OAUTH_AUTHORIZATION_SERVER?.trim().replace(/\/+$/, '');
+  return configured || issuerFor(url);
 }
 
 export function authorizationServerMetadata(url: URL) {
@@ -32,7 +48,7 @@ export function protectedResourceMetadata(url: URL) {
   const issuer = issuerFor(url);
   return {
     resource: `${issuer}/api/mcp`,
-    authorization_servers: [issuer],
+    authorization_servers: [authorizationServerFor(url)],
     bearer_methods_supported: ['header'],
     scopes_supported: ['mcp']
   };

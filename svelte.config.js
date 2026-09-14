@@ -10,7 +10,10 @@ if (process.env.ADAPTER === 'vercel') {
     kit: {
       adapter: vercel({
         runtime: 'nodejs20.x'
-      })
+      }),
+      // The cross-site form check lives in hooks.server.js ($lib/server/csrf.js)
+      // so /oauth/token can be exempt — kit's own check has no per-route escape.
+      csrf: { trustedOrigins: ['*'] }
     }
   };
 } else if (process.env.ADAPTER === 'mobile') {
@@ -47,19 +50,11 @@ if (process.env.ADAPTER === 'vercel') {
       adapter: adapter({
         out: 'build'
       }),
-      // The node instance (api.1lev1.com) receives cross-origin /api/* calls
-      // from the Vercel-served frontend. Without this, SvelteKit's CSRF check
-      // rejects cross-origin form/multipart POSTs (/api/upload) with 403.
-      // JSON POSTs pass anyway; cookie auth stays same-site (*.1lev1.com).
-      csrf: {
-        trustedOrigins: [
-          'https://www.1lev1.com',
-          'https://1lev1.com',
-          'https://app.1lev1.com',
-          'http://dev.1lev1.com:5173',
-          'http://localhost:5173'
-        ]
-      }
+      // The cross-site form check lives in hooks.server.js ($lib/server/csrf.js),
+      // which carries the trusted-origin list (the Vercel front posting
+      // /api/upload here) and exempts /oauth/token — kit's own check has no
+      // per-route escape.
+      csrf: { trustedOrigins: ['*'] }
     }
   };
 }
