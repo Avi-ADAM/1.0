@@ -206,6 +206,26 @@ export function dedupeAgainstProject(
     .map(({ item }, idx) => ({ ...item, order: idx }));
 }
 
+/**
+ * Flag each row against what the project already has, keeping the caller's
+ * order and every row. For rows a caller wrote on purpose (an agent's
+ * structured plan) — `dedupeAgainstProject` re-sorts and collapses, which is
+ * right for model output and wrong for a list someone already ordered.
+ */
+export function markExisting(
+  items: ExpandedItem[],
+  ctx: ProjectContext,
+  extras: PlanningExtras = EMPTY_EXTRAS,
+  threshold: number = DUPLICATE_THRESHOLD
+): ExpandedItem[] {
+  const candidates = collectExistingCandidates(ctx, extras);
+  return items.map((item, order) => ({
+    ...item,
+    existingRef: findExisting(item.name, candidates, threshold, item.kind),
+    order
+  }));
+}
+
 /** Drop nulls/empties so a row's `spec` carries only what it actually knows. */
 function compact(spec: Record<string, unknown>): Record<string, unknown> {
   const out: Record<string, unknown> = {};

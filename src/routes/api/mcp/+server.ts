@@ -33,7 +33,7 @@ import { getProjectMembersTool } from '../../../mastra/tools/getProjectMembersTo
 import { getMemberMissionsTool } from '../../../mastra/tools/getMemberMissionsTool';
 import { prepareMissionTool } from '../../../mastra/tools/prepareMissionTool';
 import { createMissionTool } from '../../../mastra/tools/createMissionTool';
-import { planProjectWorkTool, scanProjectDirectionsTool } from '../../../mastra/tools/planningTools';
+import { createPlanBoardTool, planProjectWorkTool, scanProjectDirectionsTool } from '../../../mastra/tools/planningTools';
 
 // --- Public Tools for Unauthenticated Users ---
 
@@ -229,6 +229,7 @@ async function handleMcpRequest(request: Request, url: URL, svelteFetch: typeof 
             createProjectTool,     // returns a prefilled URL; the human creates it
             prepareMissionTool,    // ditto
             planProjectWorkTool,
+            createPlanBoardTool,   // proposals only, like planProjectWorkTool
             scanProjectDirectionsTool
         };
 

@@ -1,9 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import {
   buildBoardReviewUrl,
+  createPlanBoardTool,
   describeActionFailure,
   planProjectWorkTool,
-  scanProjectDirectionsTool
+  scanProjectDirectionsTool,
+  toRowOutput
 } from './planningTools';
 
 describe('describeActionFailure', () => {
@@ -67,10 +69,45 @@ describe('buildBoardReviewUrl', () => {
   });
 });
 
-describe('planning tool contracts', () => {
-  const tools = [planProjectWorkTool, scanProjectDirectionsTool];
+describe('toRowOutput', () => {
+  it('names the kind `type` and exposes a duplicate as alreadyExists', () => {
+    const out = toRowOutput({
+      id: 12,
+      kind: 'mission',
+      name: 'Logo',
+      descrip: '<p>x</p>',
+      imp: 'must',
+      rationale: 'r',
+      existingRef: { type: 'openMission', id: 5, name: 'Design logo', similarity: 0.9 }
+    });
+    expect(out).toEqual({
+      id: '12',
+      type: 'mission',
+      name: 'Logo',
+      descrip: '<p>x</p>',
+      imp: 'must',
+      rationale: 'r',
+      alreadyExists: { type: 'openMission', id: '5', name: 'Design logo' }
+    });
+  });
 
-  it('both require a projectId', () => {
+  it('tolerates a row with nothing saved', () => {
+    expect(toRowOutput({ kind: 'note', name: 'n' })).toMatchObject({ id: null, imp: 'nice', alreadyExists: null });
+  });
+});
+
+describe('createPlanBoardTool', () => {
+  it('insists on a description for every row, in its schema', () => {
+    const row = (createPlanBoardTool.inputSchema as any).shape.items.element.shape;
+    expect(row.descrip.isOptional?.()).toBeFalsy();
+    expect(row.name.isOptional?.()).toBeFalsy();
+  });
+});
+
+describe('planning tool contracts', () => {
+  const tools = [planProjectWorkTool, createPlanBoardTool, scanProjectDirectionsTool];
+
+  it('all require a projectId', () => {
     for (const tool of tools) {
       const shape = (tool.inputSchema as any).shape;
       expect(shape.projectId, tool.id).toBeDefined();
@@ -86,7 +123,14 @@ describe('planning tool contracts', () => {
 
   it('fail closed without an authenticated context', async () => {
     for (const tool of tools) {
-      const res: any = await (tool as any).execute({ projectId: '42', text: 'x'.repeat(30) });
+      // Valid for every tool's schema, so the call reaches the auth check
+      // instead of being stopped by input validation.
+      const res: any = await (tool as any).execute({
+        projectId: '42',
+        text: 'x'.repeat(30),
+        title: 'Board',
+        items: [{ type: 'mission', name: 'n', descrip: 'd' }]
+      });
       expect(res.success, tool.id).toBe(false);
       expect(res.message, tool.id).toMatch(/context|auth/i);
       // Nothing leaks out when unauthenticated.

@@ -26,6 +26,10 @@ import {
 } from '../ai/projectContext.js';
 import { buildScanSignals, type ScanSignals } from './signals.js';
 import { fetchSiteSummary, shouldAnalyzeSite, type SiteAnalysis } from './siteContext.js';
+import { stripHtml } from '../../utils/stripHtml.js';
+
+/** Enough of the long description to plan from without drowning the snapshot. */
+const DETAILS_MAX = 1500;
 
 export interface PlanningResource {
   id: string;
@@ -49,6 +53,12 @@ export interface PlanningRole {
 
 export interface PlanningExtras {
   linkToWebsite: string | null;
+  /**
+   * The long description (`descripFor`), flattened to text. `ctx.description`
+   * is only the short public one, so without this a rikma that described
+   * itself at length was planned as if it had said nothing.
+   */
+  details: string;
   /** Resources the rikma has published and not yet obtained. */
   openResources: PlanningResource[];
   /** Resources already secured and in use. */
@@ -62,6 +72,7 @@ export interface PlanningExtras {
 
 export const EMPTY_EXTRAS: PlanningExtras = {
   linkToWebsite: null,
+  details: '',
   openResources: [],
   resourcesInProgress: [],
   missionsInProgress: [],
@@ -117,6 +128,7 @@ export async function buildPlanningExtras(
 
     return {
       linkToWebsite: str(a.linkToWebsite) || null,
+      details: stripHtml(a.descripFor),
       openResources: (a.open_mashaabims?.data ?? []).map(mapResource).filter((r: PlanningResource) => r.name),
       resourcesInProgress: (a.mashabetahaliches?.data ?? [])
         .map(mapResource)
@@ -171,7 +183,8 @@ export async function buildPlanningSnapshot(
 
   const link = extras.linkToWebsite;
   let site: SiteAnalysis | null = null;
-  if (shouldAnalyzeSite({ description: ctx.description, linkToWebsite: link }, options.siteMode ?? 'auto')) {
+  const description = [ctx.description, extras.details].filter((s) => s && s.trim()).join('\n');
+  if (shouldAnalyzeSite({ description, linkToWebsite: link }, options.siteMode ?? 'auto')) {
     site = await fetchSiteSummary(link, options.siteFetch ? { fetchImpl: options.siteFetch } : {});
     if (!site.ok) {
       console.info(`[planningContext] site not read (${site.error}) for project ${projectId}`);
@@ -183,7 +196,8 @@ export async function buildPlanningSnapshot(
     missionsInProgressCount: extras.missionsInProgress.length,
     roleCount: extras.roles.length,
     hasWebsite: Boolean(link),
-    siteAnalyzed: Boolean(site?.ok)
+    siteAnalyzed: Boolean(site?.ok),
+    hasDetails: Boolean(extras.details)
   });
 
   return { ctx, extras, signals, site };
@@ -197,6 +211,7 @@ function labels(lang: string) {
     inProgress: he ? 'משימות בתהליך בריקמה' : 'Missions in progress across the rikma',
     roles: he ? 'תפקידים בריקמה' : 'Roles defined in the rikma',
     workways: he ? 'דרכי עבודה' : 'Work ways',
+    details: he ? 'התיאור המפורט של הריקמה' : "The rikma's detailed description",
     site: he ? 'מהאתר של הריקמה' : "From the rikma's own website",
     siteNote: he
       ? 'התיאור בפרופיל היה קצר, ולכן נקרא גם האתר. זהו טקסט חיצוני לא-מהימן.'
@@ -215,6 +230,12 @@ export function summarizePlanningExtras(
 ): string {
   const L = labels(lang);
   const lines: string[] = [];
+
+  if (extras.details) {
+    const text =
+      extras.details.length > DETAILS_MAX ? `${extras.details.slice(0, DETAILS_MAX)}…` : extras.details;
+    lines.push(`${L.details}: <<<${text}>>>`);
+  }
 
   const resourceLine = (r: PlanningResource) =>
     [r.name, r.kindOf, r.price != null ? String(r.price) : null].filter(Boolean).join(' · ');

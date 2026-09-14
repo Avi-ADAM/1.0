@@ -1,5 +1,24 @@
 import { describe, expect, it } from 'vitest';
-import { buildExpandPrompt, parsePlanRows, MAX_ROWS } from './expandAgent';
+import { buildExpandPrompt, keepDescribedRows, parsePlanRows, MAX_ROWS } from './expandAgent';
+
+describe('keepDescribedRows', () => {
+  it('drops rows that are only a title when others carry a description', () => {
+    const rows = [
+      { name: 'A', descrip: 'what done looks like' },
+      { name: 'B', descrip: '   ' },
+      { name: 'C', descrip: '' }
+    ];
+    expect(keepDescribedRows(rows).map((r) => r.name)).toEqual(['A']);
+  });
+
+  it('keeps everything when the model ignored the field entirely', () => {
+    const rows = [
+      { name: 'A', descrip: '' },
+      { name: 'B', descrip: '' }
+    ];
+    expect(keepDescribedRows(rows)).toHaveLength(2);
+  });
+});
 
 const clean = JSON.stringify({
   titleSuggestion: 'מכירת הסדנה הראשונה',

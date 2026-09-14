@@ -434,9 +434,20 @@ nullable היו מלכלכים את הסכמה; `{type,id}` כן ומספיק.
 ### כלי הבוט/MCP (`src/mastra/tools/planningTools.ts`)
 
 - **`scanProjectDirectionsTool`** — מדרגה 1 לשאלה פתוחה ("מה כדאי לעשות?").
-- **`planProjectWorkTool`** — טקסט חופשי → לוח עם שורות → `reviewUrl`.
+- **`planProjectWorkTool`** — טקסט חופשי → לוח עם שורות → `reviewUrl`. מחזיר גם
+  את השורות עצמן (`items`), כדי שהסוכן יציג אותן בצ'אט לפני שהמשתמש פותח דפדפן.
+- **`createPlanBoardTool`** (MCP בלבד) — לסוכן שכבר מחזיק את הפירוק: שורות
+  מובנות → פעולה `createPlanBoardFromItems` → לוח, **בלי** ריצת מודל. הבדיקה
+  ב-`src/lib/server/planning/agentBoard.ts`: שורה בלי `descrip` נדחית ומוחזרת
+  ב-`rejected`, `descrip` של משימה נשמר כ-HTML עשיר ושל שאר הסוגים כטקסט. אוצר
+  המילים נפתר כמו בשורה שהמודל הציע, והכפילויות מסומנות (`markExisting`) בלי
+  לשנות סדר או להשמיט שורות.
 
-שניהם רשומים ב-`reg-bot` וב-`/api/mcp`, ושניהם מחזירים `reviewUrl` במקום ליצור
+שורה ממודל בלי תיאור נזרקת (`keepDescribedRows`) — אלא אם אף שורה לא תוארה, ואז
+נשמר הלוח כמו שהוא כדי לא להחזיר כלום. תמונת המצב של התכנון קוראת גם את
+`descripFor` (התיאור המפורט), ולא רק את `publicDescription`.
+
+הכלים רשומים ב-`/api/mcp` (ושני הראשונים גם ב-`reg-bot`), וכולם מחזירים `reviewUrl` במקום ליצור
 ישויות — זהו דפוס "הצעה + ניווט לאישור" של `PLAN_AI_ERA` שלב 2, על *קבוצת*
 ישויות. ה-`reviewUrl` הוא deep link `?board=<id>` שהדף צורך ופותח את הלוח.
 

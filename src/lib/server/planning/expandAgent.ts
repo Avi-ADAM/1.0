@@ -103,6 +103,9 @@ Return ONLY valid JSON - no markdown, no code fences, no commentary. Start with
 
 Per-field rules:
 - items: 3 to ${MAX_ROWS} rows. Fewer good rows beats more filler.
+- descrip: REQUIRED on every row. What has to be done, its scope, and what DONE
+  looks like. A row without it is a bare title nobody can act on, and it is
+  discarded.
 - rationale: one short sentence naming the fact from the snapshot this row
   answers. If you cannot name one, do not propose the row.
 - skills / roles / workways: only on "mission" rows, and only what THAT row
@@ -291,6 +294,17 @@ export function parsePlanRows(rawText: string): PlanRowsResult {
   };
 }
 
+/**
+ * Drop rows that came back with no description — a title alone is not
+ * something a partner can pick up. Only when at least one row IS described,
+ * though: a model that ignored the field entirely still leaves a board to edit
+ * rather than nothing at all.
+ */
+export function keepDescribedRows<T extends { descrip: string }>(rows: T[]): T[] {
+  const described = rows.filter((r) => r.descrip.trim());
+  return described.length > 0 ? described : rows;
+}
+
 /** The user-turn: the direction being expanded, over the project snapshot. */
 export function buildExpandPrompt(
   brief: string,
@@ -326,7 +340,8 @@ export async function planRows(
     const result = await agent.generate([
       { role: 'user', content: buildExpandPrompt(brief, snapshotText, stage) }
     ]);
-    return parsePlanRows(result?.text ?? '');
+    const parsed = parsePlanRows(result?.text ?? '');
+    return { ...parsed, items: keepDescribedRows(parsed.items) };
   } catch (err) {
     console.error('[expandAgent] row generation failed:', err);
     return { ...EMPTY_PLAN_ROWS };

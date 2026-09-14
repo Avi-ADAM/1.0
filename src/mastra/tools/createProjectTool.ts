@@ -14,7 +14,9 @@ export const createProjectTool = createTool({
   description:
     'Prepare the "create a Partnership" form (a Partnership is also called an Embroidery, or "ריקמה") and return a link that opens it pre-filled. ' +
     'Nothing is created yet: status is "prepared" until the user opens the link and approves the form. ' +
-    'Give the user `url` exactly as returned — do not decode, shorten or rebuild it.',
+    'Give the user `url` exactly as returned — do not decode, shorten or rebuild it. ' +
+    'A public-benefit or nonprofit initiative is a normal Partnership, not a failed business: every Partnership has a public support page ' +
+    '(/project/<id>/support) where anyone can donate to it or fund a specific mission, so the public can cover the members\' work hours even when nothing is ever sold.',
   inputSchema: z.object({
     name: z.string().describe('The name of the new Partnership. Required.'),
     desc: z.string().optional().describe('A short public description (plain text, one or two sentences).'),
@@ -29,7 +31,14 @@ export const createProjectTool = createTool({
     url: z.string().optional().describe('A link to a website related to the project.'),
     vals: z.array(z.string()).optional().describe('Values and goals of the partnership, as their names. A value may contain commas.'),
     res: z.enum(RES_IDS).optional().describe('Response time ID: feh (48h), sth (72h), nsh (96h), sevend (1 week).'),
-    profit: z.enum(PROFIT_IDS).optional().describe('Time to profit ID.'),
+    profit: z
+      .enum(PROFIT_IDS)
+      .optional()
+      .describe(
+        'When the Partnership expects to earn from sales: already, week, month, threeM, sixM, oneY, twoY, more, or never. ' +
+          '`never` is the correct value for a nonprofit / public-benefit initiative - it means "selling is not the goal", not "it will fail". ' +
+          'Such a Partnership is funded through its public support page, where donors can cover the work hours.'
+      ),
     ont: z.boolean().optional().describe('Whether the partnership is continuous (true) or a one-time event (false).'),
   }),
   outputSchema: z.object({

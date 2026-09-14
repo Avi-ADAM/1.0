@@ -115,6 +115,14 @@ describe('buildScanSignals', () => {
     expect(joined).toMatch(/no values have been declared/);
   });
 
+  it('counts a long description alone as a description', () => {
+    // A rikma created with only `details` was told it had none, and the scan
+    // spent one of its few directions on "write a description".
+    const s = buildScanSignals(ctx(), { hasDetails: true });
+    expect(s.hasDescription).toBe(true);
+    expect(s.facts.join(' ')).not.toMatch(/no public description/);
+  });
+
   it('flags resources requested and never supplied', () => {
     const s = buildScanSignals(ctx(), { openResourceCount: 2 });
     expect(s.facts.join(' ')).toMatch(/2 resource\(s\) were requested/);

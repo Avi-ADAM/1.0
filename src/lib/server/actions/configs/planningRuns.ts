@@ -21,6 +21,7 @@
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import type { ExpandedItem } from '../../planning/expandDirection.js';
+import { stripHtml } from '../../../utils/stripHtml.js';
 
 /**
  * The planning engines are loaded lazily, inside the handlers.
@@ -56,14 +57,41 @@ function asSiteMode(v: unknown): SiteMode {
   return 'auto';
 }
 
-/** Persist one expansion row as a `project-plan-item`. */
+/**
+ * What a caller is shown of a saved row. An agent relays these to the user, who
+ * can ask to drop or change one before ever opening the board — returning only
+ * a count made the review link the first place anyone saw the plan.
+ */
+export interface PersistedRow {
+  id: string | null;
+  kind: ExpandedItem['kind'];
+  name: string;
+  descrip: string;
+  imp: 'must' | 'nice';
+  rationale: string;
+  existingRef: ExpandedItem['existingRef'];
+}
+
+function describePersisted(item: ExpandedItem, id: string | null): PersistedRow {
+  return {
+    id,
+    kind: item.kind,
+    name: item.name,
+    descrip: item.descrip ?? '',
+    imp: item.imp,
+    rationale: typeof item.spec?.rationale === 'string' ? item.spec.rationale : '',
+    existingRef: item.existingRef ?? null
+  };
+}
+
+/** Persist one expansion row as a `project-plan-item`; returns its id. */
 async function persistItem(
   strapi: any,
   context: any,
   boardId: string,
   item: ExpandedItem
-): Promise<void> {
-  await strapi.execute(
+): Promise<string | null> {
+  const res = await strapi.execute(
     '289createPlanItem',
     {
       kind: item.kind,
@@ -80,6 +108,8 @@ async function persistItem(
     context.jwt,
     context.fetch
   );
+  const id = res?.data?.createProjectPlanItem?.data?.id;
+  return id != null ? String(id) : null;
 }
 
 /** Load a board and assert it belongs to `projectId` (see planningBoards.ts). */
@@ -198,8 +228,9 @@ const expandHandler: ActionExecutionHandler = async (params, context, { strapi }
     { lang: asLang(lang), siteMode: asSiteMode(siteMode) }
   );
 
+  const items: PersistedRow[] = [];
   for (const item of expansion.items) {
-    await persistItem(strapi, context, String(boardId), item);
+    items.push(describePersisted(item, await persistItem(strapi, context, String(boardId), item)));
   }
 
   // The board is now expanded — and accepted by definition, since the user
@@ -222,6 +253,7 @@ const expandHandler: ActionExecutionHandler = async (params, context, { strapi }
     boardId: String(boardId),
     itemCount: expansion.items.length,
     duplicateCount: expansion.items.filter((i) => i.existingRef).length,
+    items,
     hints: expansion.hints,
     siteUsed: expansion.siteUsed,
     usedFallback: expansion.usedFallback
@@ -306,8 +338,9 @@ const fromTextHandler: ActionExecutionHandler = async (params, context, { strapi
   const boardNode = boardRes?.data?.createProjectPlanBoard?.data;
   if (!boardNode) throw new Error('Failed to create planning board');
 
+  const items: PersistedRow[] = [];
   for (const item of expansion.items) {
-    await persistItem(strapi, context, String(boardNode.id), item);
+    items.push(describePersisted(item, await persistItem(strapi, context, String(boardNode.id), item)));
   }
 
   return {
@@ -315,6 +348,7 @@ const fromTextHandler: ActionExecutionHandler = async (params, context, { strapi
     title: boardTitle,
     itemCount: expansion.items.length,
     duplicateCount: expansion.items.filter((i) => i.existingRef).length,
+    items,
     hints: expansion.hints,
     siteUsed: expansion.siteUsed,
     usedFallback: expansion.usedFallback
@@ -337,6 +371,111 @@ export const createPlanBoardFromTextAction: ActionConfig = {
       description:
         "Whether to read the rikma's own website for extra context: auto (default) | always | never"
     }
+  },
+  access: ['user', 'serviceAdmin'],
+  authRules: [
+    { type: 'jwt', errorMessage: 'You must be logged in to plan' },
+    {
+      type: 'projectMember',
+      config: { projectIdParam: 'projectId' },
+      errorMessage: 'You must be a member of this project to plan it'
+    }
+  ]
+};
+
+// ── Structured entry point: rows the caller already wrote ──────────────────
+
+const loadAgentBoard = () => import('../../planning/agentBoard.js');
+const loadPlanningContext = () => import('../../planning/planningContext.js');
+
+/**
+ * A board from rows an agent already structured. No model runs: the rows are
+ * validated (`normalizeAgentItems` — a row with no description is refused),
+ * their vocabulary is resolved exactly as a model-planned row's is, and each is
+ * flagged against what the rikma already has without being reordered or
+ * dropped. Still proposals only.
+ */
+const fromItemsHandler: ActionExecutionHandler = async (params, context, { strapi }) => {
+  const { projectId, title, descrip, items, lang } = params as Record<string, any>;
+
+  const boardTitle = String(title || '').trim().slice(0, 200);
+  if (!boardTitle) throw new Error('title is required');
+
+  const { normalizeAgentItems } = await loadAgentBoard();
+  const { rows, rejected } = normalizeAgentItems(items);
+  if (rows.length === 0) {
+    throw new Error('No usable rows: every item needs a name and a description');
+  }
+
+  const { toExpandedItem, resolveRowVocabulary, markExisting } = await loadExpandDirection();
+  let expanded = await resolveRowVocabulary(rows.map(toExpandedItem), context.fetch, asLang(lang));
+
+  // Best-effort, like the rest of the snapshot: a failed read costs the
+  // "already exists" flags, not the board.
+  try {
+    const { buildPlanningSnapshot } = await loadPlanningContext();
+    const snapshot = await buildPlanningSnapshot(String(projectId), String(context.userId), context.fetch, {
+      siteMode: 'never'
+    });
+    expanded = markExisting(expanded, snapshot.ctx, snapshot.extras);
+  } catch (err) {
+    console.warn('[createPlanBoardFromItems] duplicate check skipped:', err);
+  }
+
+  const boardRes = await strapi.execute(
+    '287createPlanBoard',
+    {
+      title: boardTitle,
+      // Shown as plain text on the board.
+      descrip: stripHtml(String(descrip ?? '')).slice(0, 2000),
+      rationale: '',
+      origin: 'agent',
+      // Arrives with its rows — nothing left to expand.
+      status: 'expanded',
+      sourceText: '',
+      order: 0,
+      projectId: String(projectId),
+      userId: String(context.userId),
+      publishedAt: new Date().toISOString()
+    },
+    context.jwt,
+    context.fetch
+  );
+
+  const boardNode = boardRes?.data?.createProjectPlanBoard?.data;
+  if (!boardNode) throw new Error('Failed to create planning board');
+
+  const saved: PersistedRow[] = [];
+  for (const item of expanded) {
+    saved.push(describePersisted(item, await persistItem(strapi, context, String(boardNode.id), item)));
+  }
+
+  return {
+    boardId: String(boardNode.id),
+    title: boardTitle,
+    itemCount: saved.length,
+    duplicateCount: saved.filter((i) => i.existingRef).length,
+    items: saved,
+    rejected
+  };
+};
+
+export const createPlanBoardFromItemsAction: ActionConfig = {
+  key: 'createPlanBoardFromItems',
+  description:
+    'Create a planning board from rows the caller already structured (an agent holding the full context). No model run; proposals only.',
+  graphqlOperation: fromItemsHandler,
+  paramSchema: {
+    projectId: { type: 'string', required: true, description: 'ID of the project' },
+    title: { type: 'string', required: true, description: 'Board title' },
+    descrip: { type: 'string', required: false, description: 'What the board is for (plain text)' },
+    items: {
+      type: 'array',
+      required: true,
+      description:
+        '[{ type|kind, name, descrip, imp, rationale, skills, roles, workways, nhours, valph, assigneeKind, assigneeName, missionName, kindOf, price, quantity }]'
+    },
+    lang: { type: 'string', required: false, description: 'he | en | ar - the language new vocabulary entries are created in' }
   },
   access: ['user', 'serviceAdmin'],
   authRules: [

@@ -33,12 +33,22 @@ export const prepareMissionTool = createTool({
       .string()
       .optional()
       .describe(
-        'Mission description: plain text, or raw HTML such as `<p>Body</p>` (h1, h3, p, ul, ol, li, strong, em, a, br). ' +
+        'Mission description as rich HTML - strongly preferred over plain text; a partner decides whether to join from this. ' +
+          'Allowed tags: h1, h3, p, ul, ol, li, strong, em, a, br. Recommended shape: a short intro <p>, then a <ul> of concrete deliverables and what done looks like. ' +
           'Do NOT HTML-escape it (send `<p>`, not `&lt;p&gt;`).'
       ),
-    skills: z.array(z.string()).optional().describe('Suggested skill names (shown as AI chips). Up to 8.'),
-    roles: z.array(z.string()).optional().describe('Suggested role names. Up to 8.'),
-    workways: z.array(z.string()).optional().describe('Suggested work-mode names. Up to 8.'),
+    skills: z
+      .array(z.string())
+      .optional()
+      .describe('Skill names, free text in the user\'s language. Matched to the platform catalogue; a skill that does not exist yet is created. Up to 8.'),
+    roles: z
+      .array(z.string())
+      .optional()
+      .describe('Role names, free text. Matched to the catalogue; created when missing. Up to 8.'),
+    workways: z
+      .array(z.string())
+      .optional()
+      .describe('Work-mode names (how the work is done, e.g. "remote", "on-site"), free text. Matched to the catalogue; created when missing. Up to 8.'),
     nhours: z.number().optional().describe('Estimated hours.'),
     valph: z.number().optional().describe('Value per hour.'),
   }),

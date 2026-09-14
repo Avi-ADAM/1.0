@@ -54,6 +54,12 @@ export interface ExtraSignals {
   roleCount?: number;
   hasWebsite?: boolean;
   siteAnalyzed?: boolean;
+  /**
+   * The rikma filled its long description (`descripFor`, the create form's
+   * "details"). A rikma that wrote only that one was told it had "no
+   * description" and handed a direction to write one.
+   */
+  hasDetails?: boolean;
 }
 
 /**
@@ -91,7 +97,7 @@ export function buildScanSignals(ctx: ProjectContext, extra: ExtraSignals = {}):
   const myInProgressCount = myMissions.length;
   const runningTimerCount = myMissions.filter((m) => m.activeTimer?.isActive).length;
   const valueCount = ctx.values?.length ?? 0;
-  const hasDescription = Boolean((ctx.description ?? '').trim());
+  const hasDescription = Boolean((ctx.description ?? '').trim()) || Boolean(extra.hasDetails);
   const openResourceCount = extra.openResourceCount ?? 0;
   const missionsInProgressCount = extra.missionsInProgressCount ?? myInProgressCount;
   const roleCount = extra.roleCount ?? 0;

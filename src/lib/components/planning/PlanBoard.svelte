@@ -12,6 +12,7 @@
   import { t } from '$lib/translations';
   import { executeAction } from '$lib/client/actionClient';
   import Button from '$lib/celim/ui/button.svelte';
+  import { stripHtml } from '$lib/utils/stripHtml';
 
   /**
    * @typedef {Object} Props
@@ -175,7 +176,7 @@
 
           <p class="font-semibold text-[color:var(--ramp-ink,#16131b)]">{a.name}</p>
           {#if a.descrip}
-            <p class="text-sm text-[color:var(--ramp-ink,#16131b)]">{a.descrip}</p>
+            <p class="text-sm text-[color:var(--ramp-ink,#16131b)]">{stripHtml(a.descrip)}</p>
           {/if}
           {#if rationaleOf(item)}
             <p class="text-xs text-[color:var(--ramp-ink,#16131b)] italic mt-1">

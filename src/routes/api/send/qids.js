@@ -14969,7 +14969,7 @@ ${STIPEND_DECISION_FIELDS}
   '291getProjectPlanningContext': `query GetProjectPlanningContext($pid: ID!) {
     project(id: $pid) {
       data { id attributes {
-        projectName publicDescription linkToWebsite
+        projectName publicDescription descripFor linkToWebsite
         open_mashaabims(filters: { and: [ { archived: { eq: false } }, ${NOT_ARCHIVED} ] }, pagination: { limit: 30 }) {
           data { id attributes { name kindOf price hm } }
         }

@@ -67,6 +67,7 @@ import {
   scanProjectDirectionsAction,
   expandPlanBoardAction,
   createPlanBoardFromTextAction,
+  createPlanBoardFromItemsAction,
   seedPlanBoardsAction
 } from './planningRuns.js';
 import { cacheTranslationsConfig } from './cacheTranslations.js';
@@ -319,6 +320,7 @@ export function registerAllActions(): void {
   registerAction(scanProjectDirectionsAction);
   registerAction(expandPlanBoardAction);
   registerAction(createPlanBoardFromTextAction);
+  registerAction(createPlanBoardFromItemsAction);
   registerAction(seedPlanBoardsAction);
 
   // UGC translation cache (PLAN_UGC_TRANSLATION P2) - service principal only
