@@ -6,6 +6,10 @@
   "addAnyway": "Añadir de todos modos",
   "tryAgain": "Intentar de nuevo",
   "errorMsg": "Vaya, algo salió mal. Inténtalo de nuevo",
+  "repo": {
+    "label": "El código de la rikma",
+    "title": "Abrir el repositorio de código de la rikma en una pestaña nueva"
+  },
   "share": {
     "label": "Compartir",
     "defaultTitle": "Ven a ver esto en 1💗1",

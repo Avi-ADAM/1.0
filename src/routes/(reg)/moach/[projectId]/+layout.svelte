@@ -4,6 +4,7 @@
   import { goto } from '$app/navigation';
   import { idPr } from '$lib/stores/idPr.js';
   import AuthorityBadge from '$lib/components/ui/AuthorityBadge.svelte';
+  import RikmaRepoLink from '$lib/components/ui/RikmaRepoLink.svelte';
   import Pub from '$lib/celim/icons/pub.svelte';
   import {
     projectTimersStore,
@@ -287,6 +288,12 @@
           >?</button>
         </div>
 
+        {#if projectBase.githublink}
+          <div class="flex justify-center">
+            <RikmaRepoLink href={projectBase.githublink} />
+          </div>
+        {/if}
+
         <div class="flex flex-row items-center justify-center gap-2">
           {#if projectBase.discordlink}
             <a
@@ -365,20 +372,6 @@
                 src="https://tochat.be/whatsapp-icon-white.png"
                 class="w-6 h-6"
                 alt="WhatsApp"
-              />
-            </a>
-          {/if}
-          {#if projectBase.githublink}
-            <a
-              href={projectBase.githublink}
-              target="_blank"
-              class="p-2 hover:bg-white rounded-full transition-colors"
-              title="GitHub"
-            >
-              <img
-                src="https://visualpharm.com/assets/720/Github-595b40b65ba036ed117d442f.svg"
-                class="w-6 h-6"
-                alt="GitHub"
               />
             </a>
           {/if}

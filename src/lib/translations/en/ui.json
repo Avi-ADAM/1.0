@@ -5,6 +5,10 @@
   "addAnyway": "Add anyway",
   "tryAgain": "Try Again",
   "errorMsg": "Oops, something went wrong. Please try again",
+  "repo": {
+    "label": "The rikma's code",
+    "title": "Open the rikma's code repository in a new tab"
+  },
   "share": {
     "label": "Share",
     "defaultTitle": "Come see this on 1💗1",

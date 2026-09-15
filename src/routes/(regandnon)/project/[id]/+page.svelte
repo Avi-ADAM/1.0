@@ -14,6 +14,7 @@
   import AuthorityBadge from '$lib/components/ui/AuthorityBadge.svelte';
   import DiscoveryNav from '$lib/components/discovery/DiscoveryNav.svelte';
   import ShareLink from '$lib/components/share/ShareLink.svelte';
+  import RikmaRepoLink from '$lib/components/ui/RikmaRepoLink.svelte';
   import Translated from '$lib/components/ui/Translated.svelte';
   import TranslatedNote from '$lib/components/ui/TranslatedNote.svelte';
   import { pageTranslations } from '$lib/translation/pageTranslations.svelte';
@@ -40,10 +41,12 @@
   );
 
   let linkP = $derived(project?.attributes?.linkToWebsite);
-  let githublink = $derived(project?.attributes?.githubLink);
+  // Strapi field names are all lowercase (49GetProjectById); the camelCase
+  // spellings these once read were always undefined, so the icons never showed.
+  let githublink = $derived(project?.attributes?.githublink);
   let fblink = $derived(project?.attributes?.fblink);
-  let discordlink = $derived(project?.attributes?.discordLink);
-  let twiterlink = $derived(project?.attributes?.twiterLink);
+  let discordlink = $derived(project?.attributes?.discordlink);
+  let twiterlink = $derived(project?.attributes?.twiterlink);
 
   let show = $state(false);
 
@@ -164,6 +167,13 @@
           />
         </div>
 
+        <!-- The rikma's code, right under its seal -->
+        {#if githublink}
+          <div class="relative z-30 mb-4">
+            <RikmaRepoLink href={githublink} />
+          </div>
+        {/if}
+
         <!-- Social Links (Glassy container) -->
         <!-- `relative z-30`: the door-cards below are `backdrop-filter` layers,
              so without a stacking context of its own this row (and the open
@@ -241,14 +251,6 @@
               <img
                 src="https://visualpharm.com/assets/700/Twitter-595b40b65ba036ed117d4613.svg"
                 alt="Twitter"
-              />
-            </a>
-          {/if}
-          {#if githublink}
-            <a target="_blank" href={githublink} class="social-btn group">
-              <img
-                src="https://visualpharm.com/assets/720/Github-595b40b65ba036ed117d442f.svg"
-                alt="GitHub"
               />
             </a>
           {/if}
