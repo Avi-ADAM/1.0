@@ -40,6 +40,18 @@ describe('classifyWebhook', () => {
     ).toEqual({ type: 'reposRemoved', installationId: '555', repoIds: ['1', '2'] });
   });
 
+  it('hands issues to the label rule', () => {
+    const payload = {
+      action: 'opened',
+      installation,
+      repository: { id: 1, name: 'a', full_name: 'o/a' },
+      issue: { number: 3, title: 't', labels: [{ name: '1lev1' }], user: { id: 7 } }
+    };
+    expect(classifyWebhook('issues', payload)).toMatchObject({ type: 'issueTask', issue: { repoId: '1', number: 3 } });
+    expect(classifyWebhook('issues', { ...payload, action: 'closed' }).type).toBe('issueClosed');
+    expect(classifyWebhook('issues', { ...payload, issue: { ...payload.issue, labels: [] } }).type).toBe('ignored');
+  });
+
   it('acknowledges events of later stages without acting', () => {
     expect(classifyWebhook('pull_request', { action: 'closed', installation }).type).toBe('ignored');
     expect(classifyWebhook(null, {}).type).toBe('ignored');

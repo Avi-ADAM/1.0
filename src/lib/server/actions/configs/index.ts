@@ -161,7 +161,8 @@ import {
   unlinkGithubAccountConfig,
   syncProjectReposConfig,
   setGithubInstallationStatusConfig,
-  disconnectProjectRepoConfig
+  disconnectProjectRepoConfig,
+  githubIssueClosedConfig
 } from './githubActions.js';
 import { releaseResourceBookingConfig } from './releaseResourceBooking.js';
 import { ensurePersonalRikmaConfig } from './ensurePersonalRikma.js';
@@ -459,6 +460,8 @@ export function registerAllActions(): void {
   registerAction(syncProjectReposConfig);
   registerAction(setGithubInstallationStatusConfig);
   registerAction(disconnectProjectRepoConfig);
+  // Code rikma — issues become tasks (PLAN_CODE_RIKMA S3)
+  registerAction(githubIssueClosedConfig);
   registerAction(releaseResourceBookingConfig);
 
   // Object archival & edit consent flow (PLAN_OBJECT_ARCHIVAL)

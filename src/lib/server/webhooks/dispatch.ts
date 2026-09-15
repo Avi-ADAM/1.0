@@ -159,10 +159,13 @@ export async function onTaskChanged(opts: {
   // Site reports live in exactly one rikma, so only that rikma pays the cost of
   // looking. Every other project keeps the original "no targets ⇒ stop" path.
   const mayHoldSiteReports = projectId === centralProjectId();
+  // A finished task may have come from a GitHub issue that is waiting to hear
+  // about it. "Done" is rare enough that reading the task for it is cheap.
+  const mayMirrorGithub = event === 'task.done';
 
   const targets = await getWebhookTargets(projectId, strapi, fetchFn);
   const interested = targets.filter((t) => wants(t, event));
-  if (interested.length === 0 && !mayHoldSiteReports) return;
+  if (interested.length === 0 && !mayHoldSiteReports && !mayMirrorGithub) return;
 
   const actId = actIdFor(actionKey, params, result);
   if (!actId) return;
@@ -188,6 +191,18 @@ export async function onTaskChanged(opts: {
       fetch: fetchFn,
       strapi
     });
+  }
+
+  // A task opened from a GitHub issue (PLAN_CODE_RIKMA S3): finishing it leaves
+  // a comment on the issue. Imported lazily — the GitHub module is irrelevant
+  // to every rikma without a connected repository.
+  if (event === 'task.done' && view.externalId.startsWith('gh:')) {
+    try {
+      const { commentTaskDoneOnIssue } = await import('$lib/server/github/issueComment.js');
+      await commentTaskDoneOnIssue({ externalId: view.externalId, projectId, strapi, fetch: fetchFn });
+    } catch (e) {
+      console.warn('[webhooks] could not comment on the GitHub issue for act', actId, e);
+    }
   }
 
   if (interested.length === 0) return;

@@ -83,8 +83,13 @@ describe('normalizeSaveLinks', () => {
 });
 
 describe('saveLinkLabel', () => {
-  it('names the host plus the last segment, which is what tells two PRs apart', () => {
-    expect(saveLinkLabel('https://github.com/Avi-ADAM/1.0/pull/482')).toBe('github.com/482');
+  it('names the host plus the last segment, which is what tells two links apart', () => {
+    expect(saveLinkLabel('https://figma.com/file/abc')).toBe('figma.com/abc');
+  });
+
+  it('writes a GitHub issue or PR the way GitHub does — github.com/482 could be any repository', () => {
+    expect(saveLinkLabel('https://github.com/Avi-ADAM/1.0/pull/482')).toBe('1.0#482');
+    expect(saveLinkLabel('https://github.com/o/web/issues/7')).toBe('web#7');
   });
 
   it('falls back to the host alone', () => {

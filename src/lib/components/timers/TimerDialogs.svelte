@@ -21,6 +21,8 @@
     SAVE_LINKS_MAX
   } from '$lib/timers/saveLinks';
   import { readSaveFiles, fileSizeLabel } from '$lib/timers/saveFiles';
+  import { parseGithubRef, sameGithubRef } from '$lib/github/refs';
+  import GithubWorkPicker from './GithubWorkPicker.svelte';
   import { mediaUrl } from '$lib/utils/processLifecycle';
   import { page } from '$app/state';
   // The interval list itself — shared with the global editor and the chat card.
@@ -163,6 +165,31 @@
   /** @param {string} link */
   function removeLink(link) {
     links = links.filter((l) => l !== link);
+    evidenceTouched = true;
+  }
+
+  // The GitHub picker's toggle. An issue or PR the member already attached —
+  // pasted by hand, in another spelling — counts as the same item, so a second
+  // tap removes it instead of adding a duplicate.
+  /** @param {string} url */
+  function toggleGithubLink(url) {
+    const ref = parseGithubRef(url);
+    if (!ref) return;
+    const attached = links.find((l) => {
+      const other = parseGithubRef(l);
+      return other !== null && sameGithubRef(other, ref);
+    });
+    if (attached) {
+      removeLink(attached);
+      return;
+    }
+    const next = normalizeSaveLinks([...links, url]);
+    if (!next.includes(url)) {
+      evidenceError = $t('timers.attachLinkFull', { count: SAVE_LINKS_MAX });
+      return;
+    }
+    links = next;
+    evidenceError = '';
     evidenceTouched = true;
   }
 
@@ -656,6 +683,11 @@
         <div class="save-evi">
           <span class="save-note-label">{$t('timers.attachTitle')}</span>
           <p class="save-evi-hint">{$t('timers.attachHint')}</p>
+
+          <!-- Renders nothing unless the rikma has connected repositories. -->
+          {#if showSaveFinal && timer?.projectId}
+            <GithubWorkPicker projectId={timer.projectId} {links} onToggle={toggleGithubLink} />
+          {/if}
 
           <div class="save-evi-row">
             <input

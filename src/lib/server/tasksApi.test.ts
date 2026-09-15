@@ -30,6 +30,15 @@ describe('validateTasksPayload', () => {
     });
   });
 
+  it('refuses the gh: prefix, which only the GitHub webhook may write', () => {
+    for (const externalId of ['gh:123#4', 'GH:anything']) {
+      const r = validateTasksPayload({ name: 'x', externalId });
+      expect(r.ok).toBe(false);
+      if (r.ok === false) expect(r.status).toBe(400);
+    }
+    expect(ok({ name: 'x', externalId: 'github-123' }).externalId).toBe('github-123');
+  });
+
   it('requires a non-blank name', () => {
     for (const body of [{}, { name: '' }, { name: '   ' }, { name: null }]) {
       const r = validateTasksPayload(body);

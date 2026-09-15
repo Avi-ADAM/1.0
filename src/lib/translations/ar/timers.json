@@ -100,5 +100,13 @@
   "proProgressLabel": "التقدّم مقابل الساعات المخصّصة",
   "proStart": "تشغيل",
   "proStop": "إيقاف",
-  "proManage": "إدارة الأوقات"
+  "proManage": "إدارة الأوقات",
+  "githubTitle": "على أي issue أو PR عملت؟",
+  "githubHint": "اختره من مستودعات الريكما. يُحفظ الرابط مع الساعات، فيرى الجميع على أي كود صُرفت.",
+  "githubSearch": "البحث بالعنوان أو الرقم",
+  "githubIssue": "Issue",
+  "githubPull": "PR",
+  "githubMerged": "مدموج",
+  "githubClosed": "مغلق",
+  "githubNoMatch": "لا يوجد issue أو PR مطابق."
 }

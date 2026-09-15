@@ -1,15 +1,19 @@
 /**
- * The few GitHub HTTP calls S2 needs. No SDK: four endpoints do not justify a
- * dependency, and every call here is a plain JSON request.
+ * The few GitHub HTTP calls the integration needs. No SDK: a handful of
+ * endpoints do not justify a dependency, and every call here is a plain JSON
+ * request.
  *
  * The user's OAuth token is used only inside the callback that received it —
  * to learn who they are and whether they really can reach the installation
- * they came back with — and is never stored.
+ * they came back with — and is never stored. Everything else runs on an
+ * installation token, scoped by GitHub to the repositories that installation
+ * was granted.
  */
 
 import { createAppJwt } from './appJwt.js';
 import type { GithubAppConfig } from './config.js';
 import { toRepoRow, type RepoRowInput } from './repos.js';
+import { toWorkItem, type WorkItem } from '$lib/github/workItems.js';
 
 const API = 'https://api.github.com';
 
@@ -82,7 +86,20 @@ export async function userCanAccessInstallation(
   return false;
 }
 
+/**
+ * Installation tokens live an hour. The timer dialog lists every connected
+ * repository each time it opens, and several repositories usually share one
+ * installation — so a token is reused until five minutes before it expires
+ * rather than minted per request (GitHub rate-limits token creation too).
+ */
+const tokenCache = new Map<string, { token: string; expiresAt: number }>();
+const TOKEN_MARGIN_MS = 5 * 60 * 1000;
+
 async function installationToken(cfg: GithubAppConfig, installationId: string, fetchFn: Fetch): Promise<string> {
+  const key = `${cfg.appId}:${installationId}`;
+  const cached = tokenCache.get(key);
+  if (cached && cached.expiresAt - Date.now() > TOKEN_MARGIN_MS) return cached.token;
+
   const jwt = createAppJwt(cfg.appId, cfg.privateKey);
   const body = await ghJson(
     await fetchFn(`${API}/app/installations/${encodeURIComponent(installationId)}/access_tokens`, {
@@ -92,8 +109,14 @@ async function installationToken(cfg: GithubAppConfig, installationId: string, f
     'installation token'
   );
   if (!body?.token) throw new Error('GitHub returned no installation token');
-  return String(body.token);
+  const token = String(body.token);
+  const expiresAt = Date.parse(String(body.expires_at ?? '')) || Date.now() + 50 * 60 * 1000;
+  tokenCache.set(key, { token, expiresAt });
+  return token;
 }
+
+const repoPath = (repo: { owner: string; name: string }) =>
+  `${API}/repos/${encodeURIComponent(repo.owner)}/${encodeURIComponent(repo.name)}`;
 
 /** Every repository the installation was granted, as row fields. */
 export async function listInstallationRepos(
@@ -116,4 +139,48 @@ export async function listInstallationRepos(
     if (repos.length < 100) break;
   }
   return out;
+}
+
+/**
+ * A repository's most recently updated issues and pull requests, open or
+ * not — a PR merged an hour ago is exactly what someone saving a timer now
+ * worked on. The issues listing includes pull requests.
+ */
+export async function listRecentWorkItems(
+  cfg: GithubAppConfig,
+  installationId: string,
+  repo: { owner: string; name: string },
+  fetchFn: Fetch,
+  perPage = 30
+): Promise<WorkItem[]> {
+  const token = await installationToken(cfg, installationId, fetchFn);
+  const body = await ghJson(
+    await fetchFn(`${repoPath(repo)}/issues?state=all&sort=updated&direction=desc&per_page=${perPage}`, {
+      headers: ghHeaders(token)
+    }),
+    'issue listing'
+  );
+  return (Array.isArray(body) ? body : [])
+    .map((json) => toWorkItem(json, repo))
+    .filter((item): item is WorkItem => item !== null);
+}
+
+/** Leave a comment on an issue (or pull request). Needs Issues: write. */
+export async function commentOnIssue(
+  cfg: GithubAppConfig,
+  installationId: string,
+  repo: { owner: string; name: string },
+  number: number,
+  body: string,
+  fetchFn: Fetch
+): Promise<void> {
+  const token = await installationToken(cfg, installationId, fetchFn);
+  await ghJson(
+    await fetchFn(`${repoPath(repo)}/issues/${number}/comments`, {
+      method: 'POST',
+      headers: { ...ghHeaders(token), 'Content-Type': 'application/json' },
+      body: JSON.stringify({ body })
+    }),
+    'issue comment'
+  );
 }

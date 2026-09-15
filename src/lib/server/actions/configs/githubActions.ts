@@ -21,20 +21,11 @@
 
 import { env } from '$env/dynamic/private';
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
-import { planRepoSync, type ExistingRepoRow, type RepoRowInput, type RepoStatus } from '$lib/server/github/repos.js';
+import { planRepoSync, toExistingRows, type RepoRowInput, type RepoStatus } from '$lib/server/github/repos.js';
 
 const adminToken = () => (env.ADMINMONTHER ?? '').replace(/\s+/g, '').replace(/^ADMINMONTHER=/, '');
 
 const STATUSES: RepoStatus[] = ['active', 'suspended', 'removed'];
-
-function toExisting(rows: any[]): ExistingRepoRow[] {
-  return rows.map((r) => ({
-    id: String(r.id),
-    repoId: String(r.attributes?.repoId),
-    projectId: r.attributes?.project?.data?.id != null ? String(r.attributes.project.data.id) : null,
-    status: (r.attributes?.status ?? null) as RepoStatus | null
-  }));
-}
 
 /** Only well-formed rows reach Strapi, whatever the caller handed over. */
 function cleanRepos(input: unknown): RepoRowInput[] {
@@ -129,7 +120,7 @@ const syncProjectReposHandler: ActionExecutionHandler = async (params, context, 
     context.jwt,
     context.fetch
   );
-  const plan = planRepoSync(projectId, repos, toExisting(res?.data?.projectRepos?.data ?? []));
+  const plan = planRepoSync(projectId, repos, toExistingRows(res?.data?.projectRepos?.data ?? []));
   const connectedBy = params.connectedBy ? String(params.connectedBy) : undefined;
 
   for (const row of plan.create) {
@@ -187,7 +178,7 @@ const setGithubInstallationStatusHandler: ActionExecutionHandler = async (params
     context.jwt,
     context.fetch
   );
-  const rows = toExisting(res?.data?.projectRepos?.data ?? []).filter((r) => {
+  const rows = toExistingRows(res?.data?.projectRepos?.data ?? []).filter((r) => {
     if (only && !only.has(r.repoId)) return false;
     if (r.status === 'removed') return false; // a removed connection is not revived by GitHub
     return r.status !== status;
@@ -251,5 +242,50 @@ export const disconnectProjectRepoConfig: ActionConfig = {
     },
     channels: ['socket'],
     metadata: { type: 'base', url: 'moach' }
+  }
+};
+
+// ─── githubIssueClosed (S3) ─────────────────────────────────────────────────
+
+/**
+ * Nothing is written: this action exists for its notification. Closing an
+ * issue is a maintainer's decision on GitHub; whether the task counts as done
+ * is the rikma's, so the task is left open and the people it concerns are
+ * told. Called only from the signed webhook, after it found the task.
+ */
+const githubIssueClosedHandler: ActionExecutionHandler = async (params) => {
+  return { data: { taskId: String(params.taskId) }, updateStrategy: { type: 'none' } };
+};
+
+export const githubIssueClosedConfig: ActionConfig = {
+  key: 'githubIssueClosed',
+  description:
+    'Service only: tell a rikma that the GitHub issue behind one of its tasks was closed. Suggests marking the task done; never closes it.',
+  graphqlOperation: githubIssueClosedHandler,
+  paramSchema: {
+    projectId: { type: 'string', required: true },
+    taskId: { type: 'string', required: true },
+    taskName: { type: 'string', required: true },
+    issueUrl: { type: 'string', required: false },
+    notifyUserIds: { type: 'array', required: false }
+  },
+  access: ['serviceAdmin'],
+  authRules: [],
+  notification: {
+    // The task's assignee; with nobody assigned, the rule falls back to the
+    // rikma's members.
+    recipients: {
+      type: 'specificUsers',
+      config: { userIdsParam: 'notifyUserIds', projectIdParam: 'projectId', excludeSender: false }
+    },
+    templates: {
+      title: { he: 'ה-issue נסגר ב-GitHub', en: 'Issue closed on GitHub' },
+      body: {
+        he: 'ה-issue של המטלה "{{taskName}}" נסגר. אם העבודה הושלמה, אפשר לסמן את המטלה כבוצעה.',
+        en: 'The issue behind "{{taskName}}" was closed. If the work is finished, the task can be marked done.'
+      }
+    },
+    channels: ['socket', 'push'],
+    metadata: { priority: 'normal', url: '/lev?project={{projectId}}' }
   }
 };

@@ -1,8 +1,44 @@
 import { describe, it, expect } from 'vitest';
 import { createHmac } from 'node:crypto';
-import { STATE_TTL_MS, createState, readState, stateKey } from './state';
+import {
+  PICK_TTL_MS,
+  STATE_TTL_MS,
+  createPickToken,
+  createState,
+  pickKey,
+  readPickToken,
+  readState,
+  stateKey
+} from './state';
 
 const key = stateKey('client-secret');
+
+describe('github repo pick token', () => {
+  const pk = pickKey('client-secret');
+  const input = { uid: '7', projectId: '12', installationId: '345' };
+
+  it('round-trips', () => {
+    expect(readPickToken(createPickToken(input, pk), pk)).toMatchObject(input);
+  });
+
+  it('cannot be swapped with a state cookie, either way', () => {
+    expect(readPickToken(createPickToken(input, pk), key)).toBeNull();
+    const { value } = createState({ uid: '7', intent: 'install', projectId: '12' }, key);
+    expect(readPickToken(value, pk)).toBeNull();
+    expect(readState(createPickToken(input, pk), pk)).toBeNull();
+  });
+
+  it('expires', () => {
+    const now = 1_000_000;
+    const value = createPickToken(input, pk, now);
+    expect(readPickToken(value, pk, now + PICK_TTL_MS - 1)).not.toBeNull();
+    expect(readPickToken(value, pk, now + PICK_TTL_MS)).toBeNull();
+  });
+
+  it('refuses a non-numeric installation', () => {
+    expect(readPickToken(createPickToken({ ...input, installationId: 'x' }, pk), pk)).toBeNull();
+  });
+});
 
 describe('github connect state', () => {
   it('round-trips a link and an install intent', () => {

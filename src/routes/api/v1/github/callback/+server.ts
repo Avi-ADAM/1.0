@@ -2,13 +2,8 @@ import { redirect } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { actionService } from '$lib/server/actions/index.js';
 import { githubAppConfig } from '$lib/server/github/config.js';
-import { STATE_COOKIE, readState, stateKey } from '$lib/server/github/state.js';
-import {
-  exchangeCode,
-  getGithubUser,
-  listInstallationRepos,
-  userCanAccessInstallation
-} from '$lib/server/github/client.js';
+import { STATE_COOKIE, createPickToken, pickKey, readState, stateKey } from '$lib/server/github/state.js';
+import { exchangeCode, getGithubUser, userCanAccessInstallation } from '$lib/server/github/client.js';
 import { isProjectMember, serviceContext } from '$lib/server/github/service.js';
 
 /**
@@ -23,9 +18,15 @@ import { isProjectMember, serviceContext } from '$lib/server/github/service.js';
  *  - that `installation_id` is theirs → `/user/installations` with that token.
  *
  * A GitHub identity is linked only when the OAuth `state` came back matching
- * the cookie. GitHub may return from an install without `state`; the repos are
- * still attached after the checks above, but no identity is linked from it.
- * The user's token is used inside this request and never stored.
+ * the cookie. GitHub may return from an install without `state`; the
+ * installation is still verified after the checks above, but no identity is
+ * linked from it. The user's token is used inside this request and never stored.
+ *
+ * An install attaches nothing by itself. GitHub's install screen offers "All
+ * repositories", and a member who chose it used to find every repository on
+ * their account connected to the rikma. The callback only verifies, then hands
+ * the code tab a signed pick token; the member chooses the one repository to
+ * connect there (`/api/v1/github/pick`).
  */
 export const GET: RequestHandler = async ({ url, locals, cookies, fetch }) => {
   const cfg = githubAppConfig();
@@ -39,8 +40,10 @@ export const GET: RequestHandler = async ({ url, locals, cookies, fetch }) => {
   const back =
     (state.returnOrigin ?? '') +
     (state.intent === 'install' ? `/moach/${state.projectId}/code` : '/me/settings');
+  let pickToken = '';
   const outcome = await settle();
-  throw redirect(303, `${back}?github=${outcome}`);
+  const pick = pickToken ? `&pick=${encodeURIComponent(pickToken)}` : '';
+  throw redirect(303, `${back}?github=${outcome}${pick}`);
 
   async function settle(): Promise<string> {
     if (!locals.uid || String(locals.uid) !== state!.uid) return 'wrongUser';
@@ -78,17 +81,11 @@ export const GET: RequestHandler = async ({ url, locals, cookies, fetch }) => {
       // Membership can change in the minutes the member spent on GitHub.
       if (!(await isProjectMember(state!.projectId!, state!.uid, fetch))) return 'wrongUser';
 
-      const repos = await listInstallationRepos(cfg!, installationId, fetch);
-      const synced = await actionService.executeAction(
-        'syncProjectRepos',
-        { projectId: state!.projectId, installationId, repos, connectedBy: state!.uid },
-        ctx
+      pickToken = createPickToken(
+        { uid: state!.uid, projectId: state!.projectId!, installationId },
+        pickKey(cfg!.clientSecret)
       );
-      if (!synced.success) {
-        console.error('[github/callback] repo sync failed:', synced.error);
-        return 'failed';
-      }
-      return synced.data?.conflicts?.length ? 'conflicts' : 'connected';
+      return 'pick';
     } catch (e) {
       console.error('[github/callback] failed:', e);
       return 'failed';

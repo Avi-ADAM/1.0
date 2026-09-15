@@ -14320,6 +14320,28 @@ ${STIPEND_DECISION_FIELDS}
     }
   }`,
 
+  // S3: an issue event names a repository by GitHub's numeric id; this is the
+  // rikma it belongs to, the installation it must arrive through, and who
+  // connected it (the fallback author of the task an issue becomes).
+  'githubRepoByRepoId': `query GithubRepoByRepoId($repoId: String!) {
+    projectRepos(filters: { repoId: { eq: $repoId } }, pagination: { limit: 1 }) {
+      data {
+        id
+        attributes {
+          repoId owner name installationId status
+          project { data { id } }
+          connectedBy { data { id } }
+        }
+      }
+    }
+  }`,
+
+  'githubUsersByGithubIds': `query GithubUsersByGithubIds($githubIds: [String]) {
+    usersPermissionsUsers(filters: { githubId: { in: $githubIds } }, pagination: { limit: 100 }) {
+      data { id attributes { githubId } }
+    }
+  }`,
+
   'githubReposByRepoIds': `query GithubReposByRepoIds($repoIds: [String]) {
     projectRepos(filters: { repoId: { in: $repoIds } }, pagination: { limit: 500 }) {
       data { id attributes { repoId status project { data { id } } } }

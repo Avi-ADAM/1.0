@@ -1,10 +1,11 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { actionService, strapiClient } from '$lib/server/actions/index.js';
+import { actionService } from '$lib/server/actions/index.js';
 import { githubWebhookSecret } from '$lib/server/github/config.js';
 import { SIGNATURE_HEADER, verifyGithubSignature } from '$lib/server/github/signature.js';
 import { classifyWebhook } from '$lib/server/github/events.js';
-import { adminToken, serviceContext } from '$lib/server/github/service.js';
+import { serviceContext } from '$lib/server/github/service.js';
+import { notifyIssueClosed, syncIssueTask } from '$lib/server/github/issueSync.js';
 
 /**
  * POST /api/v1/github/webhook — deliveries from the 1lev1 GitHub App
@@ -13,8 +14,8 @@ import { adminToken, serviceContext } from '$lib/server/github/service.js';
  *
  * The signature is checked against the raw body before anything is parsed; an
  * unconfigured server answers 503 to every delivery. Every write goes through
- * a service-only action. Events for later stages are acknowledged with 202 so
- * GitHub does not mark the App's deliveries as failing.
+ * an action. Events for later stages are acknowledged with 202 so GitHub does
+ * not mark the App's deliveries as failing.
  */
 export const POST: RequestHandler = async ({ request, fetch }) => {
   const secret = githubWebhookSecret();
@@ -67,33 +68,25 @@ export const POST: RequestHandler = async ({ request, fetch }) => {
       return res.success ? json({ ok: true, ...res.data }) : fail('repos removed', res.error);
     }
 
-    case 'reposAdded': {
-      // The rikma is whichever one this installation was connected to through
-      // the install callback. An installation nobody connected is left alone.
-      let projectId: string | null = null;
+    case 'reposAdded':
+      // Not attached. A repository joins a rikma only when a member picks it in
+      // the code tab (/api/v1/github/pick). Granting the App more repositories
+      // on GitHub — or "All repositories" — says nothing about which rikma, if
+      // any, each of them belongs to.
+      return json({ ok: true, ignored: 'repositories join a rikma only when a member picks them' }, { status: 202 });
+
+    case 'issueTask':
       try {
-        const rows = await strapiClient.execute(
-          'githubReposByInstallation',
-          { installationId: intent.installationId },
-          adminToken(),
-          fetch
-        );
-        const live = (rows?.data?.projectRepos?.data ?? []).find(
-          (r: any) => r.attributes?.status !== 'removed' && r.attributes?.project?.data?.id
-        );
-        projectId = live ? String(live.attributes.project.data.id) : null;
-      } catch (e) {
-        return fail('installation lookup', e);
+        return json({ ok: true, ...(await syncIssueTask(intent.issue, fetch)) });
+      } catch (err) {
+        return fail('issue task', err);
       }
-      if (!projectId) {
-        return json({ ok: true, ignored: 'installation is not connected to a rikma' }, { status: 202 });
+
+    case 'issueClosed':
+      try {
+        return json({ ok: true, ...(await notifyIssueClosed(intent.issue, fetch)) });
+      } catch (err) {
+        return fail('issue closed', err);
       }
-      const res = await actionService.executeAction(
-        'syncProjectRepos',
-        { projectId, installationId: intent.installationId, repos: intent.repos },
-        ctx
-      );
-      return res.success ? json({ ok: true, ...res.data }) : fail('repos added', res.error);
-    }
   }
 };

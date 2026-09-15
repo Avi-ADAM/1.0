@@ -100,5 +100,13 @@
   "proProgressLabel": "התקדמות מול השעות שהוקצו",
   "proStart": "הפעלה",
   "proStop": "עצירה",
-  "proManage": "ניהול זמנים"
+  "proManage": "ניהול זמנים",
+  "githubTitle": "על איזה issue או PR עבדת?",
+  "githubHint": "בחרו מהמאגרים של הרקמה. הקישור נשמר עם השעות, כך שרואים על איזה קוד הן נעשו.",
+  "githubSearch": "חיפוש לפי כותרת או מספר",
+  "githubIssue": "Issue",
+  "githubPull": "PR",
+  "githubMerged": "מוזג",
+  "githubClosed": "נסגר",
+  "githubNoMatch": "אין issue או PR שמתאימים לחיפוש."
 }

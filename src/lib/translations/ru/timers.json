@@ -100,5 +100,13 @@
   "proProgressLabel": "Прогресс относительно назначенных часов",
   "proStart": "Запустить",
   "proStop": "Остановить",
-  "proManage": "Управление временем"
+  "proManage": "Управление временем",
+  "githubTitle": "Над каким issue или PR вы работали?",
+  "githubHint": "Выберите его из репозиториев рикмы. Ссылка сохранится вместе с часами, и будет видно, на какой код они ушли.",
+  "githubSearch": "Поиск по названию или номеру",
+  "githubIssue": "Issue",
+  "githubPull": "PR",
+  "githubMerged": "Слит",
+  "githubClosed": "Закрыт",
+  "githubNoMatch": "Нет подходящих issue или PR."
 }

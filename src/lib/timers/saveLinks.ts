@@ -17,6 +17,8 @@
  *    silently having the last one cut in half by the database.
  */
 
+import { githubRefLabel, parseGithubRef } from '../github/refs.js';
+
 /** What `Timer.saveLinks` can hold, minus the newline separators. */
 export const SAVE_LINKS_MAX_CHARS = 250;
 
@@ -99,9 +101,13 @@ export function serializeSaveLinks(links: unknown): string {
 
 /**
  * The label a link is shown under: its host plus the last path segment, which
- * is what tells `…/pull/482` apart from `…/pull/91` in a list.
+ * is what tells `…/pull/482` apart from `…/pull/91` in a list. A GitHub issue
+ * or pull request is written the way GitHub writes it — `repo#482` — because
+ * `github.com/482` could be either, in any repository.
  */
 export function saveLinkLabel(link: string): string {
+  const ref = parseGithubRef(link);
+  if (ref) return githubRefLabel(ref);
   try {
     const url = new URL(link);
     const host = url.hostname.replace(/^www\./, '');

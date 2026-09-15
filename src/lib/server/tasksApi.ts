@@ -5,6 +5,8 @@
 // validation + field-mapping logic can be unit-tested without the request
 // machinery — the same split `salesApi.ts` uses.
 
+import { GITHUB_EXTERNAL_PREFIX } from '../github/refs.js';
+
 export const TASKS_CREATE_SCOPE = 'tasks:create';
 export const TASKS_READ_SCOPE = 'tasks:read';
 export const TASK_SOURCE = 'api';
@@ -60,6 +62,16 @@ export function validateTasksPayload(body: any): ValidationResult {
   const description = body.description != null ? String(body.description) : '';
   const link = body.link != null ? String(body.link).trim() : '';
   const externalId = body.externalId != null ? String(body.externalId).trim() : '';
+  // `gh:` is how a task opened from a GitHub issue finds its issue again, and
+  // marking such a task done comments on that issue. A key holder must not be
+  // able to mint one.
+  if (externalId.toLowerCase().startsWith(GITHUB_EXTERNAL_PREFIX)) {
+    return {
+      ok: false,
+      status: 400,
+      message: `externalId may not start with "${GITHUB_EXTERNAL_PREFIX}" — that prefix is reserved for tasks opened from GitHub issues`
+    };
+  }
 
   const missionId =
     body.missionId != null && String(body.missionId).trim() !== ''

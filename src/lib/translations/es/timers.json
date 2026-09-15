@@ -101,5 +101,13 @@
   "proProgressLabel": "Progreso frente a las horas asignadas",
   "proStart": "Iniciar",
   "proStop": "Detener",
-  "proManage": "Gestionar tiempos"
+  "proManage": "Gestionar tiempos",
+  "githubTitle": "¿En qué issue o PR trabajaste?",
+  "githubHint": "Elígelo de los repositorios de la rikma. El enlace se guarda con las horas, así se ve en qué código se invirtieron.",
+  "githubSearch": "Buscar por título o número",
+  "githubIssue": "Issue",
+  "githubPull": "PR",
+  "githubMerged": "Fusionado",
+  "githubClosed": "Cerrado",
+  "githubNoMatch": "Ningún issue o PR coincide."
 }

@@ -4,7 +4,7 @@
 ונהנים ממה שכל רקמה כבר מקבלת: **חלוקה הוגנת של שווי הרקמה** לפי מה שכל אחד
 תרם, בהסכמה ולא בהחלטה של בעלים.
 
-נוצר: 2026-09-15 · סטטוס: **בבנייה** · מומש: S0, S1 (קוד; נוסח משפטי פתוח) (ר' §8)
+נוצר: 2026-09-15 · סטטוס: **בבנייה** · מומש: S0, S1 (קוד; נוסח משפטי פתוח), S2, S3 (label `1lev1`), סימון issue/PR בשמירת טיימר (ר' §8)
 
 מסמכים קשורים: [`PLAN_EXTERNAL_TASKS_API.md`](PLAN_EXTERNAL_TASKS_API.md) ·
 [`PLAN_MCP_SKILL.md`](PLAN_MCP_SKILL.md) ·
@@ -129,9 +129,15 @@
   `/api/v1/github/callback`. נשמרים רק `githubId`, `githubLogin`, `githubLinkedAt`. הטוקן של המשתמש לא נשמר.
 - **חיבור מאגרים לרקמה:** `/moach/[pid]/code` → `connect?intent=install&projectId=` (בודק חברות) →
   התקנת ה-App → callback. ה-callback מאמת שהמשתמש המחובר הוא מי שהתחיל, שה-`installation_id`
-  באמת נגיש לו (`/user/installations`), ושהוא עדיין חבר ברקמה. רק אחרי זה נכתבות השורות.
+  באמת נגיש לו (`/user/installations`), ושהוא עדיין חבר ברקמה.
+- **בחירת מאגר — אחד בכל פעם:** ה-callback **לא** מחבר את מאגרי ההתקנה. מסך ההתקנה של GitHub מציע
+  "All repositories", ומי שבחר בו קיבל פעם את כל המאגרים שלו מחוברים לרקמה, והיה צריך לנתק אותם אחד
+  אחד. עכשיו ה-callback חותם pick token (משתמש · רקמה · התקנה, 30 דקות, מפתח נפרד מזה של ה-cookie) ושולח
+  ל-`/moach/[pid]/code?github=pick&pick=…`. שם החבר בוחר מאגר אחד, ו-`/api/v1/github/pick` (GET רשימה
+  מסומנת, POST חיבור) בודק שוב חברות וקורא את המאגר מחדש מ-GitHub. מאגר נוסף = שוב "חיבור מאגר נוסף".
 - **Webhook:** חתימה נבדקת על ה-body הגולמי. מטופלים רק `installation` (השהיה, ביטול השהיה, מחיקה) ו-
-  `installation_repositories`. כל השאר מקבל 202 ונשאר ל-S3/S4.
+  `installation_repositories.removed`. `added` **לא** מחבר כלום — הרשאה ב-GitHub לא אומרת לאיזו רקמה
+  המאגר שייך. כל השאר מקבל 202 ונשאר ל-S3/S4.
 - **כלל:** מאגר שייך לרקמה אחת לכל היותר. מאגר שעדיין מחובר לרקמה אחרת לא מועבר.
 - **כתיבה:** כל כתיבה של זהות או מאגרים עוברת דרך actions שזמינים רק ל-`serviceAdmin`, כך שלקוח
   לא יכול לטעון לחשבון GitHub של מישהו אחר. ניתוק מאגר וביטול קישור הם פעולות של חבר.
@@ -152,13 +158,32 @@
 
 | סוג Issue | הופך ל- | איך |
 |---|---|---|
-| issue רגיל ב-repo מחובר | `Act` בתוך משימה בתהליך מסוג "תחזוקה" | `createTask`, עם `externalId = gh:owner/repo#123` (אידמפוטנטי) |
-| issue עם label `1lev1:open` | `open_mission` ציבורית עם הערכת שעות/שווי | מופיע בלוח "מה הרקמה מחפשת עכשיו" ובדף `/join` |
+| issue עם label `1lev1` ב-repo מחובר | `Act` של הרקמה (בלי משימה; ממוען לחבר אם הוא assignee) | `createTask`, עם `externalId = gh:<repoId>#123` (אידמפוטנטי) — ✅ S3 |
+| issue עם label `1lev1:open` | `open_mission` ציבורית עם הערכת שעות/שווי | מופיע בלוח "מה הרקמה מחפשת עכשיו" ובדף `/join` — ⏳ S3b |
+
+**למה label ולא כל issue:** repo פעיל מחזיק מאות issues, ו-`createTask` בלי ממוען מודיע לכל
+הרקמה בכל הערוצים. לכן issue נכנס לרקמה רק כשמישהו בחר בו — אותו כלל כמו מאגר שמצטרף רק כשחבר בוחר
+בו (§3.3). ה-`externalId` נשען על **המזהה המספרי** של ה-repo ולא על השם, כי repo אפשר לשנות שם או
+להעביר, וה-webhook הבא עדיין צריך למצוא את המטלה.
 
 הסנכרון דו־כיווני:
-- issue נסגר ב-GitHub → הצעה לסמן את ה-Act כבוצע (`naasa`). זו הצעה, לא סגירה
-  אוטומטית.
-- מטלה נסגרת ב-1lev1 → comment על ה-issue.
+- issue נסגר ב-GitHub → הודעה לממוען (ובלי ממוען — לרקמה) שאפשר לסמן את ה-Act כבוצע (`naasa`).
+  זו הצעה, לא סגירה אוטומטית. ✅
+- מטלה מסומנת כבוצעה ב-1lev1 → comment על ה-issue. את ה-issue עצמו סוגרים המתחזקים. ✅
+
+### 4.1.1 מה נבנה ב-S3
+
+- **כללים (טהור):** `src/lib/server/github/issues.ts` — אילו אירועי `issues` פותחים מטלה
+  (`opened`/`reopened` עם התווית, `labeled` רק כשהתווית שנוספה היא `1lev1`), מי היוצר (מחבר ה-issue אם
+  הוא חבר מקושר, אחרת מי שחיבר את המאגר; אם אף אחד מהם כבר לא חבר — לא נפתחת מטלה), ומי הממוען (ה-
+  assignee הראשון שהוא חבר מקושר, כהצעה `myIshur:false`).
+- **I/O:** `issueSync.ts` (מה-webhook) ו-`issueComment.ts` (מה-hook של `updateTask` ב-
+  `webhooks/dispatch.ts`). GitHub שולח `opened` ו-`labeled` כמעט יחד ל-issue שנוצר עם התווית, ולכן יש
+  נעילה בזיכרון לפי `externalId` — ה-API רץ כמופע אחד.
+- **action:** `githubIssueClosed` (service בלבד) — קיים בשביל ההודעה בלבד, לא כותב כלום.
+- **אבטחה:** הקידומת `gh:` שמורה — `/api/v1/tasks` מסרב לה, כדי שבעל API key לא יוכל לייצר מטלה
+  שסגירתה כותבת על issue. גם כך, comment נכתב רק כשהמאגר מחובר ופעיל **באותה רקמה** של המטלה.
+- **הפעלה:** לסמן את האירוע `Issues` ב-App (`GITHUB_APP_SETUP.md` §3). אין שינוי ב-Strapi.
 
 ### 4.2 PR ממוזג → תביעת עבודה, ולא אחוזים אוטומטיים
 
@@ -167,6 +192,13 @@
 1. PR ממוזג של חבר מקושר פותח **טיוטת תביעה** על המשימה הקשורה. המשימה מזוהה לפי
    ה-issue שה-PR סוגר, לפי שם ה-branch, או בבחירה ידנית.
 2. שעות מטיימר שרץ על אותה משימה מצורפות לתביעה אוטומטית. זה כבר קיים (MCP / timers).
+   **הקישור בין השעות לקוד נרשם כבר בשמירת הטיימר (✅ נבנה):** בדיאלוג השמירה, ברקמה עם מאגרים
+   מחוברים, מופיעה רשימת ה-issues וה-PRs האחרונים (`GithubWorkPicker.svelte` ←
+   `/api/v1/github/work-items`, חברים בלבד). מה שנבחר נשמר כ-URL קנוני ב-`Timer.saveLinks` הקיים
+   (`src/lib/github/refs.ts`), כך שאין שדה חדש ב-Strapi, וקישור שהודבק ידנית נחשב אותו פריט. מוצג כ-
+   `repo#123` בכל מקום שמציג קישורי טיימר. ב-S4, תביעה של PR ממוזג תאסוף את הטיימרים שה-`saveLinks` שלהם
+   מצביע על ה-PR או על ה-issue שהוא סוגר (`githubRefsIn` + `sameGithubRef`), ו-agent דרך MCP יכול
+   לשלוח את אותו URL ב-`saveLinks`.
 3. **הצעה** להיקף העבודה (גודל ה-PR, כמות reviews, הערכת Mission AI) מוצגת
    **כהמלצה בלבד**. היא אף פעם לא הערך הסופי.
 4. התביעה עוברת את מסלול השעות המאושרות הקיים (`finiapruval`):
@@ -276,7 +308,7 @@ PR ממוזג של מי שעוד לא חבר ברקמה נותן לו בחירה
 | **S0** | לינק GitHub בולט מתחת ללוגו, בדף הציבורי ובמוח (`RikmaRepoLink.svelte`). תוקנו גם שמות השדות discord/twitter/github בדף הציבורי, שלא הוצגו אף פעם | ✅ 2026-09-15 |
 | S1 | `Project.codeLicense` + Decision לשינוי + הצגה בדף הציבורי; טיוטות רישיון והסכם תורם **מול עורך דין** | 🟡 2026-09-15 — קוד: `Project.codeLicense/codeLicenseOpenYears/codeLicenseSince`, `Decision.kind:'codeLicense'` (+`newCodeLicense/newCodeLicenseYears`), מקור אמת `src/lib/codeLicense/codeLicense.ts`, אישור פה אחד (`voteOnDecision`) או שתיקה (`timegrama/decision.svelte`), `RikmaLicenseBadge.svelte` בדף הציבורי ובמוח. **פתוח:** נוסח הרישיון והסכם התורם מול עורך דין — שום טקסט רישיון לא מתפרסם עד אז |
 | S2 | GitHub App + webhook + `project-repo` + קישור זהות (`githubId`) | 🟡 2026-09-15 — קוד: `src/lib/server/github/`, `/api/v1/github/{connect,callback,webhook}`, actions ב-`githubActions.ts`, טאב `/moach/[pid]/code`, כרטיס חשבון ב-`/me/settings`. **פתוח:** רישום ה-App ב-GitHub + env + הרשאות Strapi (§3.3) |
-| S3 | Issues → Act / open_mission (דרך `createTask` / tasksApi), סנכרון דו־כיווני | ⏳ |
+| S3 | Issues → Act / open_mission (דרך `createTask` / tasksApi), סנכרון דו־כיווני | 🟡 2026-09-16 — issue עם label `1lev1` → Act (אידמפוטנטי, `gh:<repoId>#n`), סגירה ב-GitHub → הודעה, Act בוצע → comment (§4.1.1). **בנוסף:** סימון issue/PR בשמירת טיימר (§4.2 סעיף 2). **פתוח:** לסמן את האירוע `Issues` ב-App; `1lev1:open` → open_mission (S3b) |
 | S4 | PR ממוזג / review → תביעת עבודה במסלול `finiapruval`; טאב "קוד" במוח | ⏳ |
 | S5 | תורם מבחוץ → הצעה עצמית / מתנה; תרומות שלא נתבעו | ⏳ |
 | S6 | `/project/[id]/contribute`, badge, מסנן "רקמות קוד" ב-discovery | ⏳ |

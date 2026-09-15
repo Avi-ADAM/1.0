@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { planRepoSync, repoUrl, toRepoRow, type RepoRowInput } from './repos';
+import { markPickable, planRepoSync, repoUrl, toRepoRow, type RepoRowInput } from './repos';
 
 const row = (repoId: string, name = `r${repoId}`): RepoRowInput => ({
   repoId,
@@ -71,6 +71,27 @@ describe('planRepoSync', () => {
 
   it('ignores duplicates in one delivery', () => {
     expect(planRepoSync('5', [row('1'), row('1')], []).create).toHaveLength(1);
+  });
+});
+
+describe('markPickable', () => {
+  it('marks each repository and puts the connectable ones first', () => {
+    const marked = markPickable('5', [row('1', 'zeta'), row('2', 'beta'), row('3', 'alpha'), row('4', 'gamma')], [
+      { id: '90', repoId: '1', projectId: '5', status: 'active' },
+      { id: '91', repoId: '2', projectId: '6', status: 'active' },
+      { id: '92', repoId: '4', projectId: '6', status: 'removed' }
+    ]);
+    expect(marked.map((r) => [r.name, r.pick])).toEqual([
+      ['alpha', 'available'],
+      ['gamma', 'available'],
+      ['zeta', 'here'],
+      ['beta', 'elsewhere']
+    ]);
+  });
+
+  it('offers again a repository this rikma disconnected', () => {
+    const [r] = markPickable('5', [row('1')], [{ id: '90', repoId: '1', projectId: '5', status: 'removed' }]);
+    expect(r.pick).toBe('available');
   });
 });
 

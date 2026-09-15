@@ -479,6 +479,8 @@ export const qidsAccess = {
   'githubUserByGithubId': { allow: ['serviceAdmin'] },
   'githubLinkUser': { allow: ['serviceAdmin'] },
   'githubProjectMembers': { allow: ['serviceAdmin'] },
+  'githubRepoByRepoId': { allow: ['serviceAdmin'] },
+  'githubUsersByGithubIds': { allow: ['serviceAdmin'] },
   'githubReposByRepoIds': { allow: ['serviceAdmin'] },
   'githubReposByInstallation': { allow: ['serviceAdmin'] },
   'githubProjectRepoById': { allow: ['serviceAdmin'] },

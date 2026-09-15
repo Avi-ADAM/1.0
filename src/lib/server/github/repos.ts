@@ -82,6 +82,55 @@ export function planRepoSync(
   return plan;
 }
 
+/** `projectRepos.data` from Strapi → the rows `planRepoSync` compares against. */
+export function toExistingRows(rows: any[]): ExistingRepoRow[] {
+  return rows.map((r) => ({
+    id: String(r.id),
+    repoId: String(r.attributes?.repoId),
+    projectId: r.attributes?.project?.data?.id != null ? String(r.attributes.project.data.id) : null,
+    status: (r.attributes?.status ?? null) as RepoStatus | null
+  }));
+}
+
+/**
+ * `available` — can be connected now; `here` — already connected to this
+ * rikma; `elsewhere` — still connected to another rikma, so it cannot be.
+ */
+export type PickState = 'available' | 'here' | 'elsewhere';
+
+export type PickableRepo = RepoRowInput & { pick: PickState };
+
+/**
+ * An installation's repositories, as the picker offers them. GitHub's install
+ * screen lets a member grant "All repositories", so nothing is attached until
+ * they choose one here. Uses the same rule as `planRepoSync`; connectable
+ * repositories first, then by name.
+ */
+export function markPickable(
+  projectId: string,
+  incoming: RepoRowInput[],
+  existing: ExistingRepoRow[]
+): PickableRepo[] {
+  const byRepo = new Map(existing.map((e) => [String(e.repoId), e]));
+  const order: Record<PickState, number> = { available: 0, here: 1, elsewhere: 2 };
+  const seen = new Set<string>();
+  const out: PickableRepo[] = [];
+
+  for (const row of incoming) {
+    if (seen.has(row.repoId)) continue;
+    seen.add(row.repoId);
+    const ex = byRepo.get(row.repoId);
+    let pick: PickState = 'available';
+    if (ex && ex.projectId && ex.status !== 'removed') {
+      pick = String(ex.projectId) === String(projectId) ? 'here' : 'elsewhere';
+    }
+    out.push({ ...row, pick });
+  }
+
+  const label = (r: RepoRowInput) => `${r.owner}/${r.name}`.toLowerCase();
+  return out.sort((a, b) => order[a.pick] - order[b.pick] || label(a).localeCompare(label(b)));
+}
+
 /** `owner/name` → the repository's web URL. */
 export function repoUrl(row: { owner: string; name: string }): string {
   return `https://github.com/${encodeURIComponent(row.owner)}/${encodeURIComponent(row.name)}`;

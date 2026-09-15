@@ -53,7 +53,7 @@ GitHub → התמונה שלך → **Settings** → **Developer settings** → *
 | שדה | מה לעשות | למה |
 |---|---|---|
 | **Setup URL (optional)** | ⚠️ **להשאיר ריק** — למחוק את מה ששמת | כשמסמנים את "Request user authorization during installation", GitHub מתעלם מ-Setup URL ושולח ל-Callback URL. אם השדה נעול אחרי הסימון, זה תקין |
-| **Redirect on update** | ✅ לסמן | כשחבר ברקמה לוחץ "הוספה או הסרה של מאגרים ב-GitHub", הוא יחזור לטאב הקוד של הרקמה. גם בלי הסימון ה-webhook מעדכן את הרשימה, אבל המשתמש לא יחזור לאתר |
+| **Redirect on update** | ✅ לסמן | כשחבר ברקמה לוחץ "חיבור מאגר נוסף" וההתקנה כבר קיימת, GitHub מציג את מסך העדכון. בלי הסימון הוא לא יחזור לבורר המאגרים בטאב הקוד — וה-webhook לא מחבר מאגרים בעצמו |
 
 ### Webhook
 
@@ -124,10 +124,11 @@ openssl rand -hex 32
 
 - **`installation` ו-`installation_repositories` נשלחים לכל App אוטומטית.** הם לא מופיעים ברשימה ולא
   צריך לסמן אותם. בדיוק בהם S2 משתמש.
-- **ב-S2 לא מסמנים שום אירוע.** אחרי בחירת Issues ו-Pull requests יופיעו גם Issues, Issue comment,
-  Pull request ו-Pull request review. להשאיר אותם **לא מסומנים** עד ש-S3/S4 ייפרסו. שינוי מנויים
-  לאירועים **לא** דורש אישור מחדש מהמתקינים, אז אין מחיר לחכות.
-  (גם אם יסומנו, השרת עונה עליהם 202 ומתעלם. זה רק רעש.)
+- **S3 — לסמן `Issues`.** issue עם התווית `1lev1` נפתח כמטלה, סגירה שלו מודיעה לרקמה, וסימון המטלה
+  כבוצעה כותב comment (לכן Issues: **Read and write**). שינוי מנויים לאירועים **לא** דורש אישור מחדש
+  מהמתקינים.
+- **Issue comment, Pull request, Pull request review — עדיין לא.** להשאיר לא מסומנים עד S4
+  (השרת עונה עליהם 202 ומתעלם; זה רק רעש).
 - **Installation target, Meta, Security advisory:** לא לסמן.
 
 ---
