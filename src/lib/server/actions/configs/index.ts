@@ -156,6 +156,13 @@ import { createResourceBookingConfig } from './createResourceBooking.js';
 import { confirmResourceBookingConfig } from './confirmResourceBooking.js';
 import { cancelResourceBookingConfig } from './cancelResourceBooking.js';
 import { blockResourceDatesConfig } from './blockResourceDates.js';
+import {
+  linkGithubAccountConfig,
+  unlinkGithubAccountConfig,
+  syncProjectReposConfig,
+  setGithubInstallationStatusConfig,
+  disconnectProjectRepoConfig
+} from './githubActions.js';
 import { releaseResourceBookingConfig } from './releaseResourceBooking.js';
 import { ensurePersonalRikmaConfig } from './ensurePersonalRikma.js';
 import { publishUserResourceAsProductConfig } from './publishUserResourceAsProduct.js';
@@ -446,6 +453,12 @@ export function registerAllActions(): void {
   registerAction(confirmResourceBookingConfig);
   registerAction(cancelResourceBookingConfig);
   registerAction(blockResourceDatesConfig);
+  // Code rikma — GitHub connection (PLAN_CODE_RIKMA S2)
+  registerAction(linkGithubAccountConfig);
+  registerAction(unlinkGithubAccountConfig);
+  registerAction(syncProjectReposConfig);
+  registerAction(setGithubInstallationStatusConfig);
+  registerAction(disconnectProjectRepoConfig);
   registerAction(releaseResourceBookingConfig);
 
   // Object archival & edit consent flow (PLAN_OBJECT_ARCHIVAL)

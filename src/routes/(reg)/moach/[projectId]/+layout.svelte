@@ -5,6 +5,7 @@
   import { idPr } from '$lib/stores/idPr.js';
   import AuthorityBadge from '$lib/components/ui/AuthorityBadge.svelte';
   import RikmaRepoLink from '$lib/components/ui/RikmaRepoLink.svelte';
+  import RikmaLicenseBadge from '$lib/components/ui/RikmaLicenseBadge.svelte';
   import Pub from '$lib/celim/icons/pub.svelte';
   import {
     projectTimersStore,
@@ -168,7 +169,9 @@
     { id: 'work', label: 'work', tabs: ['progress', 'acts', 'kanban', 'gantt', 'timers', 'shifts'] },
     // 'api' = how work reaches this rikma from systems outside it — the same
     // group as the flows work moves along once it is here.
-    { id: 'flows', label: 'flows', tabs: ['processes', 'chains', 'api'] },
+    // 'code' = the rikma's connected repositories (PLAN_CODE_RIKMA) — another
+    // way work reaches it from outside, so it sits next to 'api'.
+    { id: 'flows', label: 'flows', tabs: ['processes', 'chains', 'api', 'code'] },
     { id: 'money', label: 'money', tabs: ['sales', 'split', 'stipend'] },
     // 'open' = the rikma's own open missions/resources looking for partners.
     // It sits after 'wishes' so the group keeps its landing page (and its
@@ -288,9 +291,14 @@
           >?</button>
         </div>
 
-        {#if projectBase.githublink}
-          <div class="flex justify-center">
-            <RikmaRepoLink href={projectBase.githublink} />
+        {#if projectBase.githublink || projectBase.codeLicense}
+          <div class="flex flex-col items-center gap-2">
+            {#if projectBase.githublink}<RikmaRepoLink href={projectBase.githublink} />{/if}
+            <RikmaLicenseBadge
+              license={projectBase.codeLicense}
+              openYears={projectBase.codeLicenseOpenYears}
+              since={projectBase.codeLicenseSince}
+            />
           </div>
         {/if}
 

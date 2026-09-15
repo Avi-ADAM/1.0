@@ -424,6 +424,9 @@ export type ActionKey =
   | 'cancelResourceBooking'
   | 'blockResourceDates'
   | 'releaseResourceBooking'
+  // Code rikma — GitHub connection (PLAN_CODE_RIKMA S2)
+  | 'unlinkGithubAccount'
+  | 'disconnectProjectRepo'
   // Registered since the unified action system landed, but never listed here —
   // which is why `weget.svelte` had three type errors on its own vote calls.
   | 'voteOnMaap'

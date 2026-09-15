@@ -10,6 +10,15 @@
     "label": "El código de la rikma",
     "title": "Abrir el repositorio de código de la rikma en una pestaña nueva"
   },
+  "license": {
+    "mit": "Licencia MIT",
+    "apache": "Licencia Apache 2.0",
+    "rikma": "Licencia rikma",
+    "rikmaDelayed": "Licencia rikma · se abre en {{years}} años",
+    "openHint": "Código abierto: libre para cualquier uso.",
+    "rikmaHint": "El código es visible y quien contribuye a él es socio. El uso comercial requiere el consentimiento de la rikma.",
+    "since": "desde {{date}}"
+  },
   "share": {
     "label": "Compartir",
     "defaultTitle": "Ven a ver esto en 1💗1",

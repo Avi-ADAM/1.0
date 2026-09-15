@@ -306,7 +306,8 @@ const FIELD_DECISIONS = new Set([
   'timtoM',
   'vallueadd',
   'vallueles',
-  'pic'
+  'pic',
+  'codeLicense'
 ]);
 
 /**

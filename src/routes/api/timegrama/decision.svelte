@@ -10,6 +10,7 @@
     fetchStipendDecision,
     funderHasSigned
   } from '$lib/server/stipend/apply.js';
+  import { normalizeLicenseChange } from '$lib/codeLicense/codeLicense.js';
 
   // GraphQL string-literal escaping for values interpolated into an inline
   // (non-parameterized) query — SendToAdmin takes a raw query string, no
@@ -68,6 +69,18 @@
         `mutation { updateProject(id: ${projectId}, data: { restime: ${a.timtoM} }) { data { id } } }`,
         ADMINMONTHER
       );
+    } else if (a.kind === 'codeLicense') {
+      // codeLicense is an enum written as an unquoted literal, so the stored
+      // string is re-validated against the list before it reaches the query.
+      const next = normalizeLicenseChange(a.newCodeLicense, a.newCodeLicenseYears);
+      if (next) {
+        await SendToAdmin(
+          `mutation { updateProject(id: ${projectId}, data: { codeLicense: ${next.license}, codeLicenseOpenYears: ${
+            next.openYears ?? 'null'
+          }, codeLicenseSince: ${gqlStr(new Date().toISOString())} }) { data { id } } }`,
+          ADMINMONTHER
+        );
+      }
     } else if (a.kind === 'vallueadd' || a.kind === 'vallueles') {
       const projRes = await SendToAdmin(
         `{ project(id: ${projectId}) { data { attributes { vallues { data { id } } } } } }`,
@@ -128,6 +141,8 @@
           newFlink
           newWlink
           timtoM
+          newCodeLicense
+          newCodeLicenseYears
           valluesadd { data { id } }
           valluesles { data { id } }
         } } }

@@ -568,6 +568,7 @@
   <!-- 4 ── Field reference -->
   <section>
     <h3>{$t('rikmaApi.varsTitle')}</h3>
+    <div class="table-scroll">
     <table class="vars">
       <thead>
         <tr>
@@ -619,6 +620,7 @@
         </tr>
       </tbody>
     </table>
+    </div>
     <p class="hint">{$t('rikmaApi.varsNote')}</p>
   </section>
 
@@ -636,15 +638,30 @@
 </div>
 
 <style>
+  /* The moach layout's radial gradient is light in the middle and near-black at
+     the edges, so no single text colour reads on it — every block carries its
+     own dark, nearly opaque ground instead. */
   .rikma-api {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
+    color: #e2e8f0;
+  }
+  .intro,
+  section {
+    background: rgba(15, 23, 42, 0.92);
+    backdrop-filter: blur(6px);
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
+  }
+  .intro {
+    border: 1px solid rgba(212, 175, 55, 0.35);
+    border-radius: 0.75rem;
+    padding: 1rem;
   }
   .intro h2 {
     font-size: 1.5rem;
     font-weight: 800;
-    color: var(--gold-l, #f5d98b);
+    color: #f5d98b;
     margin: 0 0 0.25rem;
   }
   .intro p {
@@ -656,7 +673,7 @@
     border-inline-start: 3px solid var(--gold, #d4af37);
     padding-inline-start: 0.6rem;
     opacity: 1 !important;
-    color: var(--gold-l, #f5d98b);
+    color: #f5d98b;
   }
   section {
     border: 1px solid rgba(212, 175, 55, 0.35);
@@ -670,7 +687,7 @@
     font-weight: 800;
     font-size: 1.1rem;
     margin: 0;
-    color: var(--gold-l, #f5d98b);
+    color: #f5d98b;
   }
   section h4 {
     font-weight: 700;
@@ -832,6 +849,19 @@
     border: 1px solid rgba(148, 163, 184, 0.25);
     padding: 0.35rem 0.5rem;
     text-align: start;
+  }
+  .id-table thead th,
+  table.vars thead th {
+    background: rgba(212, 175, 55, 0.18);
+    color: #f5d98b;
+    font-weight: 700;
+  }
+  .id-table tbody tr:nth-child(even),
+  table.vars tbody tr:nth-child(even) {
+    background: rgba(255, 255, 255, 0.04);
+  }
+  .table-scroll {
+    overflow-x: auto;
   }
   .id-copy {
     display: inline-flex;

@@ -1,5 +1,6 @@
 import type { ActionConfig, ActionExecutionHandler } from '../types';
 import { calcDeadlineMs } from './actionUtils.js';
+import { licenseChanged, normalizeLicenseChange } from '$lib/codeLicense/codeLicense.js';
 
 const toVal = (v: string | undefined | null): string | null =>
   v && v.trim() !== '' ? v.trim() : null;
@@ -25,8 +26,17 @@ const handler: ActionExecutionHandler = async (params, context, util) => {
     watsapplink,
     restime,
     vallueIds = [],
-    newPicId
+    newPicId,
+    codeLicense,
+    codeLicenseOpenYears
   } = params;
+
+  // PLAN_CODE_RIKMA §2.2 — an unknown license is refused, not guessed.
+  const nextLicense =
+    codeLicense !== undefined ? normalizeLicenseChange(codeLicense, codeLicenseOpenYears) : null;
+  if (codeLicense !== undefined && !nextLicense) {
+    throw new Error(`Unknown code license: ${codeLicense}`);
+  }
 
   const projectRes = await strapi.execute(
     'getProjectBaseInfo',
@@ -42,6 +52,11 @@ const handler: ActionExecutionHandler = async (params, context, util) => {
   const memberCount: number = attrs.user_1s?.data?.length ?? 1;
   const currentRestime: string = attrs.restime ?? 'feh';
   const currentVallueIds: string[] = (attrs.vallues?.data ?? []).map((v: { id: string }) => String(v.id));
+  const licenseDiff =
+    nextLicense &&
+    licenseChanged({ license: attrs.codeLicense, openYears: attrs.codeLicenseOpenYears }, nextLicense)
+      ? nextLicense
+      : null;
 
   if (memberCount <= 1) {
     const result = await strapi.execute(
@@ -59,7 +74,15 @@ const handler: ActionExecutionHandler = async (params, context, util) => {
         twiterlink: toVal(twiterlink),
         watsapplink: toVal(watsapplink),
         restime: restime || currentRestime,
-        vallues: vallueIds.map(String)
+        vallues: vallueIds.map(String),
+        // Omitted (not null) when unchanged, so the since-date is kept.
+        ...(licenseDiff
+          ? {
+              codeLicense: licenseDiff.license,
+              codeLicenseOpenYears: licenseDiff.openYears,
+              codeLicenseSince: new Date().toISOString()
+            }
+          : {})
       },
       context.jwt,
       context.fetch
@@ -108,6 +131,12 @@ const handler: ActionExecutionHandler = async (params, context, util) => {
   }
   if (newPicId) {
     decisionsToCreate.push({ kind: 'pic', extra: { newpic: newPicId } });
+  }
+  if (licenseDiff) {
+    decisionsToCreate.push({
+      kind: 'codeLicense',
+      extra: { newCodeLicense: licenseDiff.license, newCodeLicenseYears: licenseDiff.openYears }
+    });
   }
 
   const newVallueIds = vallueIds.map(String);
@@ -205,7 +234,9 @@ export const updateProjectDetailsConfig: ActionConfig = {
     watsapplink: { type: 'string', required: false },
     restime: { type: 'string', required: false },
     vallueIds: { type: 'array', required: false },
-    newPicId: { type: 'string', required: false }
+    newPicId: { type: 'string', required: false },
+    codeLicense: { type: 'string', required: false },
+    codeLicenseOpenYears: { type: 'number', required: false }
   },
 
   authRules: [

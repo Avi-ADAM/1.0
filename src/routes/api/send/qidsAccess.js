@@ -473,6 +473,18 @@ export const qidsAccess = {
   'getAct': { allow: ['user', 'serviceAdmin'] },
   'getAllVallues': { allow: ['user', 'serviceAdmin'] },
   'updateProjectDetails': { allow: ['user', 'serviceAdmin'] },
+  // Code rikma — GitHub connection (PLAN_CODE_RIKMA S2). Service only: these
+  // write GitHub-verified facts (identity, installation repos); a client that
+  // could run them could claim another member's GitHub account.
+  'githubUserByGithubId': { allow: ['serviceAdmin'] },
+  'githubLinkUser': { allow: ['serviceAdmin'] },
+  'githubProjectMembers': { allow: ['serviceAdmin'] },
+  'githubReposByRepoIds': { allow: ['serviceAdmin'] },
+  'githubReposByInstallation': { allow: ['serviceAdmin'] },
+  'githubProjectRepoById': { allow: ['serviceAdmin'] },
+  'githubProjectRepos': { allow: ['serviceAdmin'] },
+  'githubCreateProjectRepo': { allow: ['serviceAdmin'] },
+  'githubUpdateProjectRepo': { allow: ['serviceAdmin'] },
   'createProjectDecision': { allow: ['user', 'serviceAdmin'] },
   '103getForumThreadById': { allow: ['user', 'serviceAdmin'] },
   '105getForumSummaryById': { allow: ['user', 'serviceAdmin'] },

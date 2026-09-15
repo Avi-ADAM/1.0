@@ -4,6 +4,9 @@
   import { goto } from '$app/navigation';
   import { executeAction } from '$lib/client/actionClient';
   import EditB from '$lib/components/userPr/editBasic.svelte';
+  import GithubIcon from '$lib/celim/icons/github.svelte';
+  import { page } from '$app/state';
+  import { invalidateAll } from '$app/navigation';
   import {
     autoTranslate,
     AUTO_TRANSLATE_VALUES,
@@ -110,6 +113,27 @@
     sendD();
   }
 
+  // GitHub account link (PLAN_CODE_RIKMA §3.2). The link itself happens on the
+  // server after GitHub confirms the account; this page only starts it and
+  // reads back the outcome it was redirected with.
+  let githubLogin = $derived(meData?.githubLogin ?? null);
+  let githubNotice = $derived(page.url.searchParams.get('github'));
+  let githubNoticeText = $derived.by(() => {
+    const key = `rikmaCode.status.${githubNotice}`;
+    return githubNotice && $t(key) !== key ? $t(key) : '';
+  });
+  let unlinking = $state(false);
+  let unlinkError = $state('');
+
+  async function unlinkGithub() {
+    unlinking = true;
+    unlinkError = '';
+    const res = await executeAction('unlinkGithubAccount', {});
+    unlinking = false;
+    if (res.success) await invalidateAll();
+    else unlinkError = $t('rikmaCode.account.unlinkFailed');
+  }
+
   // The guided tour walks elements that only exist on /me itself, so
   // resuming it means navigating back there and letting it kick off.
   function onGuid() {
@@ -166,6 +190,48 @@
     >
       {$t('mcp.banner.cta')}
     </a>
+  </div>
+
+  <div
+    class="mb-6 rounded-xl border border-zinc-200 dark:border-zinc-700 p-4 bg-white/60 dark:bg-zinc-900/40"
+  >
+    <div class="flex items-center justify-between gap-3 flex-wrap">
+      <div class="min-w-0">
+        <p class="font-medium text-goldink flex items-center gap-2">
+          <GithubIcon width={18} />
+          {$t('rikmaCode.account.title')}
+        </p>
+        <p class="text-sm text-zinc-500 mt-1">{$t('rikmaCode.account.desc')}</p>
+        {#if githubLogin}
+          <p class="text-sm mt-1 font-medium">
+            <bdi dir="ltr">{$t('rikmaCode.account.linkedAs', { login: githubLogin })}</bdi>
+          </p>
+        {/if}
+      </div>
+      {#if githubLogin}
+        <button
+          class="shrink-0 px-4 py-2 rounded-full border border-zinc-400 text-zinc-600 dark:text-zinc-300 font-bold hover:bg-zinc-500/10 disabled:opacity-50"
+          onclick={unlinkGithub}
+          disabled={unlinking}
+        >
+          {$t('rikmaCode.account.unlink')}
+        </button>
+      {:else}
+        <a
+          href={`${data.githubConnectBase ?? ''}/api/v1/github/connect?intent=link&return=${encodeURIComponent(page.url.origin)}`}
+          data-sveltekit-reload
+          class="shrink-0 px-4 py-2 rounded-full border border-goldink text-goldink font-bold hover:bg-goldink/10"
+        >
+          {$t('rikmaCode.account.link')}
+        </a>
+      {/if}
+    </div>
+    {#if githubNoticeText}
+      <p class="text-sm mt-2 text-zinc-600 dark:text-zinc-300" role="status">{githubNoticeText}</p>
+    {/if}
+    {#if unlinkError}
+      <p class="text-sm mt-2 text-red-600" role="alert">{unlinkError}</p>
+    {/if}
   </div>
 
   <!-- Translation of what *other members* wrote (PLAN_UGC_TRANSLATION §4.4).

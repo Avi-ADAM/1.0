@@ -15,6 +15,7 @@
   import DiscoveryNav from '$lib/components/discovery/DiscoveryNav.svelte';
   import ShareLink from '$lib/components/share/ShareLink.svelte';
   import RikmaRepoLink from '$lib/components/ui/RikmaRepoLink.svelte';
+  import RikmaLicenseBadge from '$lib/components/ui/RikmaLicenseBadge.svelte';
   import Translated from '$lib/components/ui/Translated.svelte';
   import TranslatedNote from '$lib/components/ui/TranslatedNote.svelte';
   import { pageTranslations } from '$lib/translation/pageTranslations.svelte';
@@ -168,9 +169,14 @@
         </div>
 
         <!-- The rikma's code, right under its seal -->
-        {#if githublink}
-          <div class="relative z-30 mb-4">
-            <RikmaRepoLink href={githublink} />
+        {#if githublink || project.attributes.codeLicense}
+          <div class="relative z-30 mb-4 flex flex-col items-center gap-2">
+            {#if githublink}<RikmaRepoLink href={githublink} />{/if}
+            <RikmaLicenseBadge
+              license={project.attributes.codeLicense}
+              openYears={project.attributes.codeLicenseOpenYears}
+              since={project.attributes.codeLicenseSince}
+            />
           </div>
         {/if}
 

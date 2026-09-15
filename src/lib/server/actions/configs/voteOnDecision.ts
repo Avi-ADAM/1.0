@@ -23,6 +23,7 @@ import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { execFromContext } from '$lib/server/archive/exec.js';
 import { signObjectChange } from '$lib/server/archive/vote.js';
 import { signStipend } from '$lib/server/stipend/vote.js';
+import { normalizeLicenseChange } from '$lib/codeLicense/codeLicense.js';
 import {
   fetchSaleClaim,
   standingOrder,
@@ -440,6 +441,23 @@ const voteOnDecisionHandler: ActionExecutionHandler = async (params, context, { 
         context.jwt,
         context.fetch,
       );
+    } else if (kind === 'codeLicense') {
+      // PLAN_CODE_RIKMA §2.2 — the value is re-validated here, never trusted
+      // from the Decision row, and the change date is stamped on consensus.
+      const next = normalizeLicenseChange(da.newCodeLicense, da.newCodeLicenseYears);
+      if (next) {
+        await strapi.execute(
+          'updateProjectDetails',
+          {
+            id: projectId,
+            codeLicense: next.license,
+            codeLicenseOpenYears: next.openYears,
+            codeLicenseSince: now.toISOString(),
+          },
+          context.jwt,
+          context.fetch,
+        );
+      }
     } else if (kind === 'vallueadd' || kind === 'vallueles') {
       // Fetch current project vallue IDs
       const projRes2 = await strapi.execute(

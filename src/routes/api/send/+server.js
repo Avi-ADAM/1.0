@@ -8,7 +8,7 @@ import { STRAPI_URL } from '$lib/server/strapiUrl.js'
 const ep = STRAPI_URL + "/graphql"
 import { createHash } from 'node:crypto'
 import { isInternalRequest } from '$lib/server/internalSecret.js'
-import { resolveServicePrincipal, resolveSessionPrincipal } from '$lib/server/authz/principal.js'
+import { resolvePrincipal } from '$lib/server/authz/principal.js'
 import { applyAuthz } from '$lib/server/authz/authorize.js'
 import { runSendGuards, filterSendResponse } from './guards.js'
 
@@ -123,9 +123,16 @@ export async function POST({ request, cookies, locals }) {
 	// this layer. AUTHZ_MODE=enforce (default) returns 403 on denial;
 	// AUTHZ_MODE=log only logs would-be denials. Entity-level guards further down and the
 	// per-action authRules are unaffected — this is the coarse first layer.
-	const principal = isSer
-		? resolveServicePrincipal(request)
-		: resolveSessionPrincipal(cookies, { id: idL, username: un });
+	// resolvePrincipal is the one place that recognizes the meetings app's
+	// x-meetings-secret. Building the principal by hand here skipped it, so a
+	// guest's meeting read arrived as `anonymous` and 403'd on 59GetMeetingDetails.
+	const principal = resolvePrincipal({
+		request,
+		cookies,
+		isSerFlag: data.isSer === true,
+		identity: { id: idL, username: un }
+	});
+	const isMeetingsService = principal.kind === 'serviceMeetings';
 	if (queId) {
 		const { blocked, decision } = applyAuthz({ principal, op: `send:${queId}` });
 		if (blocked) throw error(403, `Forbidden: ${decision.reason}`);
@@ -134,15 +141,20 @@ export async function POST({ request, cookies, locals }) {
 	// ── Token selection ──────────────────────────────────────────────────────
 	// Service calls to consensus qids use the limited-scope token; other service
 	// calls keep the admin token; JWT calls use the user's own token.
+	// The meetings service has no user JWT (it reads for a guest); authz above
+	// already pinned it to its qidsAccess reads, so it borrows the service token
+	// the same way /api/guest/message does.
 	let jw;
 	if (isSer) {
 		jw = getServiceToken(isConsensusQid);
+	} else if (isMeetingsService) {
+		jw = getServiceToken(false);
 	} else {
 		jw = cookies.get('jwt');
 	}
 
 	if (!jw) {
-		if (!isSer) throw error(401, 'Unauthorized: No token found');
+		if (!isSer && !isMeetingsService) throw error(401, 'Unauthorized: No token found');
 		throw error(500, 'Server misconfiguration: service token not set');
 	}
 

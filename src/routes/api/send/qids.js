@@ -1790,6 +1790,9 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
           restime
           matanotofs{data{id attributes{name price }}}
           githublink
+          codeLicense
+          codeLicenseOpenYears
+          codeLicenseSince
           fblink
           discordlink
           twiterlink
@@ -3294,6 +3297,8 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
           newFlink
           newWlink
           timtoM
+          newCodeLicense
+          newCodeLicenseYears
           valluesadd { data { id attributes { valueName } } }
           valluesles { data { id attributes { valueName } } }
           vots {
@@ -3329,6 +3334,8 @@ ${STIPEND_DECISION_FIELDS}
           newFlink
           newWlink
           timtoM
+          newCodeLicense
+          newCodeLicenseYears
           valluesadd { data { id attributes { valueName } } }
           valluesles { data { id attributes { valueName } } }
         }
@@ -3343,6 +3350,8 @@ ${STIPEND_DECISION_FIELDS}
           fblink
           linkToWebsite
           restime
+          codeLicense
+          codeLicenseOpenYears
           vallues { data { id attributes { valueName } } }
         }
       }
@@ -8995,6 +9004,7 @@ export const moachQids = {
           user_1s { data { id attributes { email username lang profilePic { data { attributes { url formats } } } } } }
           supportPage
           restime githublink fblink discordlink drivelink twiterlink watsapplink linkToWebsite
+          codeLicense codeLicenseOpenYears codeLicenseSince
           vallues { data { id attributes { valueName localizations { data { attributes { valueName } } } } } }
           acts{data{id attributes{shem hashivut isAssigned open_mission{data{id attributes {name}}} pendm{data{id attributes{name}}}
                  dateS naasa my{data{ id attributes{ username profilePic {data{attributes{ url }}}}}}
@@ -9017,6 +9027,7 @@ export const moachQids = {
           user_1s { data { id attributes { email username lang profilePic { data { attributes { url formats } } } } } }
           supportPage
           restime githublink fblink discordlink drivelink twiterlink watsapplink linkToWebsite
+          codeLicense codeLicenseOpenYears codeLicenseSince
           vallues { data { id attributes { valueName localizations { data { attributes { locale valueName } } } } } }
           acts{data{id attributes{shem hashivut isAssigned open_mission{data{id attributes {name}}} pendm{data{id attributes{name}}}
                  dateS naasa my{data{ id attributes{ username profilePic {data{attributes{ url }}}}}}
@@ -9910,6 +9921,9 @@ export const moachQids = {
     $watsapplink: String
     $restime: ENUM_PROJECT_RESTIME
     $vallues: [ID]
+    $codeLicense: ENUM_PROJECT_CODELICENSE
+    $codeLicenseOpenYears: Int
+    $codeLicenseSince: DateTime
   ) {
     updateProject(id: $id, data: {
       projectName: $projectName
@@ -9924,11 +9938,15 @@ export const moachQids = {
       watsapplink: $watsapplink
       restime: $restime
       vallues: $vallues
+      codeLicense: $codeLicense
+      codeLicenseOpenYears: $codeLicenseOpenYears
+      codeLicenseSince: $codeLicenseSince
     }) {
       data {
         attributes {
           projectName publicDescription descripFor linkToWebsite
           githublink fblink discordlink drivelink twiterlink watsapplink restime
+          codeLicense codeLicenseOpenYears codeLicenseSince
           vallues { data { id attributes { valueName localizations { data { attributes { valueName } } } } } }
         }
       }
@@ -9949,6 +9967,8 @@ export const moachQids = {
     $valluesadd: [ID]
     $valluesles: [ID]
     $newpic: ID
+    $newCodeLicense: String
+    $newCodeLicenseYears: Int
     $vots: [ComponentProjectsVotsInput]
   ) {
     createDecision(data: {
@@ -9965,6 +9985,8 @@ export const moachQids = {
       valluesadd: $valluesadd
       valluesles: $valluesles
       newpic: $newpic
+      newCodeLicense: $newCodeLicense
+      newCodeLicenseYears: $newCodeLicenseYears
       vots: $vots
     }) {
       data { id }
@@ -14243,6 +14265,7 @@ ${STIPEND_DECISION_FIELDS}
           twiterlink
           discordlink
           githublink
+          githubLogin
           bio
           preferCards
           lang
@@ -14263,6 +14286,129 @@ ${STIPEND_DECISION_FIELDS}
           work_ways { data { id attributes { workWayName localizations { data { attributes { workWayName } } } } } }
         }
       }
+    }
+  }`,
+
+  // ── Code rikma — GitHub connection (PLAN_CODE_RIKMA S2) ───────────────────
+  // Service token only (see qidsAccess.js): every input here is something
+  // GitHub vouched for in /api/v1/github/*, never a client-supplied claim.
+
+  'githubUserByGithubId': `query GithubUserByGithubId($githubId: String!) {
+    usersPermissionsUsers(filters: { githubId: { eq: $githubId } }) {
+      data { id }
+    }
+  }`,
+
+  'githubLinkUser': `mutation GithubLinkUser(
+    $uid: ID!
+    $githubId: String
+    $githubLogin: String
+    $githubLinkedAt: DateTime
+  ) {
+    updateUsersPermissionsUser(id: $uid, data: {
+      githubId: $githubId
+      githubLogin: $githubLogin
+      githubLinkedAt: $githubLinkedAt
+    }) {
+      data { id }
+    }
+  }`,
+
+  'githubProjectMembers': `query GithubProjectMembers($pid: ID!) {
+    project(id: $pid) {
+      data { id attributes { user_1s { data { id } } } }
+    }
+  }`,
+
+  'githubReposByRepoIds': `query GithubReposByRepoIds($repoIds: [String]) {
+    projectRepos(filters: { repoId: { in: $repoIds } }, pagination: { limit: 500 }) {
+      data { id attributes { repoId status project { data { id } } } }
+    }
+  }`,
+
+  'githubReposByInstallation': `query GithubReposByInstallation($installationId: String!) {
+    projectRepos(filters: { installationId: { eq: $installationId } }, pagination: { limit: 500 }) {
+      data { id attributes { repoId status project { data { id } } } }
+    }
+  }`,
+
+  'githubProjectRepoById': `query GithubProjectRepoById($id: ID!) {
+    projectRepo(id: $id) {
+      data { id attributes { repoId status project { data { id } } } }
+    }
+  }`,
+
+  'githubProjectRepos': `query GithubProjectRepos($pid: ID!) {
+    projectRepos(
+      filters: {
+        project: { id: { eq: $pid } }
+        or: [{ status: { null: true } }, { status: { ne: "removed" } }]
+      }
+      sort: ["owner:asc", "name:asc"]
+      pagination: { limit: 200 }
+    ) {
+      data {
+        id
+        attributes {
+          repoId owner name defaultBranch license isPrivate status installationId createdAt
+          connectedBy { data { id attributes { username } } }
+        }
+      }
+    }
+  }`,
+
+  'githubCreateProjectRepo': `mutation GithubCreateProjectRepo(
+    $project: ID
+    $repoId: String!
+    $owner: String!
+    $name: String!
+    $installationId: String
+    $defaultBranch: String
+    $license: String
+    $isPrivate: Boolean
+    $connectedBy: ID
+  ) {
+    createProjectRepo(data: {
+      project: $project
+      provider: github
+      repoId: $repoId
+      owner: $owner
+      name: $name
+      installationId: $installationId
+      defaultBranch: $defaultBranch
+      license: $license
+      isPrivate: $isPrivate
+      status: active
+      connectedBy: $connectedBy
+    }) {
+      data { id }
+    }
+  }`,
+
+  'githubUpdateProjectRepo': `mutation GithubUpdateProjectRepo(
+    $id: ID!
+    $project: ID
+    $owner: String
+    $name: String
+    $installationId: String
+    $defaultBranch: String
+    $license: String
+    $isPrivate: Boolean
+    $status: ENUM_PROJECTREPO_STATUS
+    $connectedBy: ID
+  ) {
+    updateProjectRepo(id: $id, data: {
+      project: $project
+      owner: $owner
+      name: $name
+      installationId: $installationId
+      defaultBranch: $defaultBranch
+      license: $license
+      isPrivate: $isPrivate
+      status: $status
+      connectedBy: $connectedBy
+    }) {
+      data { id }
     }
   }`,
 

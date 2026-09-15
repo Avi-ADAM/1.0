@@ -138,6 +138,7 @@
     "resources": "Resource calendar",
     "archive": "Archive",
     "api": "API",
+    "code": "Code",
     "stipend": "Stipends"
   },
   "create": {

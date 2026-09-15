@@ -1,0 +1,36 @@
+{
+  "title": "El código de la rikma",
+  "intro": "Conecta los repositorios de GitHub de la rikma. El código se queda en GitHub; 1lev1 registra de quién es el trabajo.",
+  "connect": "Conectar repositorios de GitHub",
+  "connectMore": "Añadir o quitar repositorios en GitHub",
+  "notConfigured": "La integración con GitHub todavía no está configurada en este servidor.",
+  "empty": "Todavía no hay ningún repositorio conectado a la rikma.",
+  "private": "Privado",
+  "branch": "Rama principal: {{branch}}",
+  "suspended": "Suspendido en GitHub",
+  "connectedBy": "Conectado por {{name}}",
+  "disconnect": "Desconectar",
+  "disconnectConfirm": "¿Desconectar {{repo}} de la rikma? La instalación en GitHub se mantiene.",
+  "disconnectFailed": "No se pudo desconectar, inténtalo de nuevo",
+  "next": "Próximamente: los issues se convertirán en tareas y los pull requests fusionados en reclamaciones de trabajo que la rikma aprueba.",
+  "status": {
+    "connected": "Los repositorios se conectaron a la rikma.",
+    "conflicts": "Algunos repositorios ya están conectados a otra rikma, así que no se movieron.",
+    "linked": "Tu cuenta de GitHub quedó vinculada.",
+    "taken": "Esta cuenta de GitHub ya está vinculada a otra cuenta de 1lev1.",
+    "denied": "Se canceló la autorización en GitHub.",
+    "invalid": "No pudimos verificar la solicitud. Vuelve a empezar.",
+    "expired": "Pasó demasiado tiempo. Vuelve a empezar.",
+    "wrongUser": "La conexión la inició otro usuario. Vuelve a empezar.",
+    "noInstallation": "GitHub no devolvió ninguna instalación.",
+    "failed": "Algo salió mal con GitHub. Inténtalo de nuevo."
+  },
+  "account": {
+    "title": "Cuenta de GitHub",
+    "desc": "Vincular tu cuenta permite que las rikmas reconozcan tus aportes a su código. Solo se guardan tu id y tu nombre de usuario de GitHub, nunca tu email.",
+    "link": "Vincular cuenta de GitHub",
+    "linkedAs": "Vinculada como @{{login}}",
+    "unlink": "Desvincular",
+    "unlinkFailed": "No se pudo desvincular, inténtalo de nuevo"
+  }
+}

@@ -2657,6 +2657,8 @@ export type Decision = {
   negom?: Maybe<Array<Maybe<ComponentProjectsNegom>>>;
   negos?: Maybe<NegoRelationResponseCollection>;
   negostip?: Maybe<Array<Maybe<ComponentDesisionNegostipend>>>;
+  newCodeLicense?: Maybe<Scalars['String']['output']>;
+  newCodeLicenseYears?: Maybe<Scalars['Int']['output']>;
   newDormancyDays?: Maybe<Scalars['Int']['output']>;
   newFlink?: Maybe<Scalars['String']['output']>;
   newHours?: Maybe<Scalars['Int']['output']>;
@@ -2811,6 +2813,8 @@ export type DecisionFiltersInput = {
   negom?: InputMaybe<ComponentProjectsNegomFiltersInput>;
   negos?: InputMaybe<NegoFiltersInput>;
   negostip?: InputMaybe<ComponentDesisionNegostipendFiltersInput>;
+  newCodeLicense?: InputMaybe<StringFilterInput>;
+  newCodeLicenseYears?: InputMaybe<IntFilterInput>;
   newDormancyDays?: InputMaybe<IntFilterInput>;
   newFlink?: InputMaybe<StringFilterInput>;
   newHours?: InputMaybe<IntFilterInput>;
@@ -2864,6 +2868,8 @@ export type DecisionInput = {
   negom?: InputMaybe<Array<InputMaybe<ComponentProjectsNegomInput>>>;
   negos?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   negostip?: InputMaybe<Array<InputMaybe<ComponentDesisionNegostipendInput>>>;
+  newCodeLicense?: InputMaybe<Scalars['String']['input']>;
+  newCodeLicenseYears?: InputMaybe<Scalars['Int']['input']>;
   newDormancyDays?: InputMaybe<Scalars['Int']['input']>;
   newFlink?: InputMaybe<Scalars['String']['input']>;
   newHours?: InputMaybe<Scalars['Int']['input']>;
@@ -3219,6 +3225,7 @@ export enum Enum_Decision_Archsource {
 
 export enum Enum_Decision_Kind {
   ArchiveObject = 'archiveObject',
+  CodeLicense = 'codeLicense',
   Discord = 'discord',
   DormtoM = 'dormtoM',
   Drive = 'drive',
@@ -3677,6 +3684,24 @@ export enum Enum_Project_Restime {
 export enum Enum_Project_Spirit {
   Commercial = 'commercial',
   Volunteer = 'volunteer'
+}
+
+export enum Enum_Project_Codelicense {
+  Apache = 'apache',
+  Mit = 'mit',
+  None = 'none',
+  Rikma = 'rikma',
+  RikmaDelayed = 'rikmaDelayed'
+}
+
+export enum Enum_Projectrepo_Provider {
+  Github = 'github'
+}
+
+export enum Enum_Projectrepo_Status {
+  Active = 'active',
+  Removed = 'removed',
+  Suspended = 'suspended'
 }
 
 export enum Enum_Project_Stipendpolicy {
@@ -12811,6 +12836,9 @@ export type Project = {
   asks?: Maybe<AskRelationResponseCollection>;
   askwants?: Maybe<AskwantRelationResponseCollection>;
   city?: Maybe<Scalars['String']['output']>;
+  codeLicense?: Maybe<Enum_Project_Codelicense>;
+  codeLicenseOpenYears?: Maybe<Scalars['Int']['output']>;
+  codeLicenseSince?: Maybe<Scalars['DateTime']['output']>;
   countries?: Maybe<CuntryRelationResponseCollection>;
   createdAt?: Maybe<Scalars['DateTime']['output']>;
   deals?: Maybe<DealRelationResponseCollection>;
@@ -12860,6 +12888,7 @@ export type Project = {
   profilePic?: Maybe<UploadFileEntityResponse>;
   projectName: Scalars['String']['output'];
   project_plan_boards?: Maybe<ProjectPlanBoardRelationResponseCollection>;
+  project_repos?: Maybe<ProjectRepoRelationResponseCollection>;
   publicDescription?: Maybe<Scalars['String']['output']>;
   publishedAt?: Maybe<Scalars['DateTime']['output']>;
   ratson_proposals?: Maybe<RatsonProposalRelationResponseCollection>;
@@ -13343,6 +13372,9 @@ export type ProjectFiltersInput = {
   asks?: InputMaybe<AskFiltersInput>;
   askwants?: InputMaybe<AskwantFiltersInput>;
   city?: InputMaybe<StringFilterInput>;
+  codeLicense?: InputMaybe<StringFilterInput>;
+  codeLicenseOpenYears?: InputMaybe<IntFilterInput>;
+  codeLicenseSince?: InputMaybe<DateTimeFilterInput>;
   countries?: InputMaybe<CuntryFiltersInput>;
   createdAt?: InputMaybe<DateTimeFilterInput>;
   deals?: InputMaybe<DealFiltersInput>;
@@ -13393,6 +13425,7 @@ export type ProjectFiltersInput = {
   pmashes?: InputMaybe<PmashFiltersInput>;
   projectName?: InputMaybe<StringFilterInput>;
   project_plan_boards?: InputMaybe<ProjectPlanBoardFiltersInput>;
+  project_repos?: InputMaybe<ProjectRepoFiltersInput>;
   publicDescription?: InputMaybe<StringFilterInput>;
   publishedAt?: InputMaybe<DateTimeFilterInput>;
   ratson_proposals?: InputMaybe<RatsonProposalFiltersInput>;
@@ -13436,6 +13469,79 @@ export type ProjectFiltersInput = {
   zohars?: InputMaybe<ZoharFiltersInput>;
 };
 
+export type ProjectRepo = {
+  __typename?: 'ProjectRepo';
+  connectedBy?: Maybe<UsersPermissionsUserEntityResponse>;
+  createdAt?: Maybe<Scalars['DateTime']['output']>;
+  defaultBranch?: Maybe<Scalars['String']['output']>;
+  installationId?: Maybe<Scalars['String']['output']>;
+  isPrivate?: Maybe<Scalars['Boolean']['output']>;
+  license?: Maybe<Scalars['String']['output']>;
+  name: Scalars['String']['output'];
+  owner: Scalars['String']['output'];
+  project?: Maybe<ProjectEntityResponse>;
+  provider?: Maybe<Enum_Projectrepo_Provider>;
+  repoId: Scalars['String']['output'];
+  status?: Maybe<Enum_Projectrepo_Status>;
+  updatedAt?: Maybe<Scalars['DateTime']['output']>;
+};
+
+export type ProjectRepoEntity = {
+  __typename?: 'ProjectRepoEntity';
+  attributes?: Maybe<ProjectRepo>;
+  id?: Maybe<Scalars['ID']['output']>;
+};
+
+export type ProjectRepoEntityResponse = {
+  __typename?: 'ProjectRepoEntityResponse';
+  data?: Maybe<ProjectRepoEntity>;
+};
+
+export type ProjectRepoEntityResponseCollection = {
+  __typename?: 'ProjectRepoEntityResponseCollection';
+  data: Array<ProjectRepoEntity>;
+  meta: ResponseCollectionMeta;
+};
+
+export type ProjectRepoFiltersInput = {
+  and?: InputMaybe<Array<InputMaybe<ProjectRepoFiltersInput>>>;
+  connectedBy?: InputMaybe<UsersPermissionsUserFiltersInput>;
+  createdAt?: InputMaybe<DateTimeFilterInput>;
+  defaultBranch?: InputMaybe<StringFilterInput>;
+  id?: InputMaybe<IdFilterInput>;
+  installationId?: InputMaybe<StringFilterInput>;
+  isPrivate?: InputMaybe<BooleanFilterInput>;
+  license?: InputMaybe<StringFilterInput>;
+  name?: InputMaybe<StringFilterInput>;
+  not?: InputMaybe<ProjectRepoFiltersInput>;
+  or?: InputMaybe<Array<InputMaybe<ProjectRepoFiltersInput>>>;
+  owner?: InputMaybe<StringFilterInput>;
+  project?: InputMaybe<ProjectFiltersInput>;
+  provider?: InputMaybe<StringFilterInput>;
+  repoId?: InputMaybe<StringFilterInput>;
+  status?: InputMaybe<StringFilterInput>;
+  updatedAt?: InputMaybe<DateTimeFilterInput>;
+};
+
+export type ProjectRepoInput = {
+  connectedBy?: InputMaybe<Scalars['ID']['input']>;
+  defaultBranch?: InputMaybe<Scalars['String']['input']>;
+  installationId?: InputMaybe<Scalars['String']['input']>;
+  isPrivate?: InputMaybe<Scalars['Boolean']['input']>;
+  license?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  owner?: InputMaybe<Scalars['String']['input']>;
+  project?: InputMaybe<Scalars['ID']['input']>;
+  provider?: InputMaybe<Enum_Projectrepo_Provider>;
+  repoId?: InputMaybe<Scalars['String']['input']>;
+  status?: InputMaybe<Enum_Projectrepo_Status>;
+};
+
+export type ProjectRepoRelationResponseCollection = {
+  __typename?: 'ProjectRepoRelationResponseCollection';
+  data: Array<ProjectRepoEntity>;
+};
+
 export type ProjectInput = {
   acts?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   addHoursManualy?: InputMaybe<Scalars['Boolean']['input']>;
@@ -13444,6 +13550,9 @@ export type ProjectInput = {
   asks?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   askwants?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   city?: InputMaybe<Scalars['String']['input']>;
+  codeLicense?: InputMaybe<Enum_Project_Codelicense>;
+  codeLicenseOpenYears?: InputMaybe<Scalars['Int']['input']>;
+  codeLicenseSince?: InputMaybe<Scalars['DateTime']['input']>;
   countries?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   deals?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   decisions?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
@@ -13490,6 +13599,7 @@ export type ProjectInput = {
   profilePic?: InputMaybe<Scalars['ID']['input']>;
   projectName?: InputMaybe<Scalars['String']['input']>;
   project_plan_boards?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  project_repos?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   publicDescription?: InputMaybe<Scalars['String']['input']>;
   publishedAt?: InputMaybe<Scalars['DateTime']['input']>;
   ratson_proposals?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
@@ -19527,6 +19637,9 @@ export type UsersPermissionsUser = {
   forum_last_seens?: Maybe<ForumLastSeenRelationResponseCollection>;
   frd?: Maybe<Enum_Userspermissionsuser_Frd>;
   free_person?: Maybe<Scalars['Int']['output']>;
+  githubId?: Maybe<Scalars['String']['output']>;
+  githubLinkedAt?: Maybe<Scalars['DateTime']['output']>;
+  githubLogin?: Maybe<Scalars['String']['output']>;
   githublink?: Maybe<Scalars['String']['output']>;
   haamadas?: Maybe<HaamadaRelationResponseCollection>;
   halukasend?: Maybe<HalukaRelationResponseCollection>;
@@ -20296,6 +20409,9 @@ export type UsersPermissionsUserFiltersInput = {
   forum_last_seens?: InputMaybe<ForumLastSeenFiltersInput>;
   frd?: InputMaybe<StringFilterInput>;
   free_person?: InputMaybe<IntFilterInput>;
+  githubId?: InputMaybe<StringFilterInput>;
+  githubLinkedAt?: InputMaybe<DateTimeFilterInput>;
+  githubLogin?: InputMaybe<StringFilterInput>;
   githublink?: InputMaybe<StringFilterInput>;
   haamadas?: InputMaybe<HaamadaFiltersInput>;
   halukasend?: InputMaybe<HalukaFiltersInput>;
@@ -20434,6 +20550,9 @@ export type UsersPermissionsUserInput = {
   forum_last_seens?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   frd?: InputMaybe<Enum_Userspermissionsuser_Frd>;
   free_person?: InputMaybe<Scalars['Int']['input']>;
+  githubId?: InputMaybe<Scalars['String']['input']>;
+  githubLinkedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  githubLogin?: InputMaybe<Scalars['String']['input']>;
   githublink?: InputMaybe<Scalars['String']['input']>;
   haamadas?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   halukasend?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;

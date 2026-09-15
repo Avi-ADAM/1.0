@@ -1,0 +1,36 @@
+{
+  "title": "The rikma's code",
+  "intro": "Connect the rikma's GitHub repositories. The code stays on GitHub; 1lev1 records whose work it is.",
+  "connect": "Connect repositories from GitHub",
+  "connectMore": "Add or remove repositories on GitHub",
+  "notConfigured": "The GitHub integration is not set up on this server yet.",
+  "empty": "No repository is connected to the rikma yet.",
+  "private": "Private",
+  "branch": "Default branch: {{branch}}",
+  "suspended": "Suspended on GitHub",
+  "connectedBy": "Connected by {{name}}",
+  "disconnect": "Disconnect",
+  "disconnectConfirm": "Disconnect {{repo}} from the rikma? The installation on GitHub itself stays in place.",
+  "disconnectFailed": "Disconnecting failed, please try again",
+  "next": "Coming next: issues become tasks, and merged pull requests become work claims the rikma consents to.",
+  "status": {
+    "connected": "The repositories are connected to the rikma.",
+    "conflicts": "Some repositories are already connected to another rikma, so they were not moved.",
+    "linked": "Your GitHub account is linked.",
+    "taken": "This GitHub account is already linked to another 1lev1 account.",
+    "denied": "The authorization on GitHub was cancelled.",
+    "invalid": "We could not verify the request. Please start again.",
+    "expired": "Too much time passed. Please start again.",
+    "wrongUser": "The connection was started by a different user. Please start again.",
+    "noInstallation": "No installation came back from GitHub.",
+    "failed": "Something went wrong with GitHub. Please try again."
+  },
+  "account": {
+    "title": "GitHub account",
+    "desc": "Linking your account lets rikmas recognise your contributions to their code. Only your GitHub id and username are stored, never your email.",
+    "link": "Link GitHub account",
+    "linkedAs": "Linked as @{{login}}",
+    "unlink": "Unlink",
+    "unlinkFailed": "Unlinking failed, please try again"
+  }
+}

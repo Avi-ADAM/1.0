@@ -9,6 +9,7 @@ import { isExpiredJwt, clearStaleAuthCookies } from '$lib/server/session.js';
 import { resolveEventIdentity } from '$lib/server/identity.js';
 import { log, requestId } from '$lib/server/log.js';
 import { csrfRejection } from '$lib/server/csrf.js';
+import { allowedCorsOrigins } from '$lib/server/corsOrigins.js';
 import { dev } from '$app/environment';
 import {
   DEFAULT_THEME,
@@ -63,27 +64,8 @@ if (STRAPI_GATE_KEY && !globalThis.__strapiGateFetchPatched) {
   };
 }
 
-// Frontend origins allowed to call /api/* cross-origin (the api.1lev1.com
-// instance serving browsers that load the app from Vercel). Cookies ride along
-// because *.1lev1.com is same-site; CORS is what un-blocks the JS response.
-// Override with CORS_ALLOWED_ORIGINS (comma-separated) in the runtime .env.
-const DEFAULT_CORS_ORIGINS = [
-  'https://www.1lev1.com',
-  'https://1lev1.com',
-  'https://app.1lev1.com',
-  // dev: hosts-file alias dev.1lev1.com → 127.0.0.1 keeps cookies same-site
-  'http://dev.1lev1.com:5173',
-  'http://localhost:5173',
-  'http://127.0.0.1:5173'
-];
-
-function allowedCorsOrigins() {
-  const fromEnv = (env.CORS_ALLOWED_ORIGINS || '')
-    .split(',')
-    .map((s) => s.trim().replace(/\/+$/, ''))
-    .filter(Boolean);
-  return fromEnv.length ? fromEnv : DEFAULT_CORS_ORIGINS;
-}
+// The frontend origins allowed to call /api/* cross-origin live in
+// $lib/server/corsOrigins.js, shared with the GitHub connect flow.
 
 // set() (not append) so a route with its own CORS headers (e.g. /api/chat)
 // doesn't end up with duplicate values the browser rejects.

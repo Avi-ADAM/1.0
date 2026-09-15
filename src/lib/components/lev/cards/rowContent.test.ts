@@ -257,6 +257,10 @@ describe('sub-kinds get their own label', () => {
       key: 'lev.list.decision.timtoM',
       params: undefined
     });
+    expect(rowContent({ ani: 'hachla', kind: 'codeLicense' }).title).toEqual({
+      key: 'lev.list.decision.codeLicense',
+      params: undefined
+    });
     expect(
       rowContent({ ani: 'hachla', kind: 'saleClaim', saleClaim: { productName: 'עוגה' } })
         .title

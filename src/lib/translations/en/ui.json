@@ -9,6 +9,15 @@
     "label": "The rikma's code",
     "title": "Open the rikma's code repository in a new tab"
   },
+  "license": {
+    "mit": "MIT license",
+    "apache": "Apache 2.0 license",
+    "rikma": "Rikma license",
+    "rikmaDelayed": "Rikma license · opens after {{years}} years",
+    "openHint": "Open source — free for any use.",
+    "rikmaHint": "The code is visible, and whoever contributes to it is a partner. Commercial use needs the rikma's consent.",
+    "since": "since {{date}}"
+  },
   "share": {
     "label": "Share",
     "defaultTitle": "Come see this on 1💗1",

@@ -1,5 +1,6 @@
 import { redirect } from '@sveltejs/kit';
 import { sendViaProxy } from '$lib/server/sendViaProxy.js';
+import { ssrApiBase } from '$lib/server/ssrApiBase.js';
 
 const DEFAULT_PIC =
   'https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png';
@@ -85,6 +86,8 @@ export async function load({ locals, fetch, depends }) {
       avatarSmall,
       total: meData.hervachti ?? 0,
       showGuide: meData.profilManualAlready !== true,
+      // The GitHub connect flow runs on the API host (settings page card).
+      githubConnectBase: ssrApiBase(),
       loadError: false
     };
   } catch (e) {

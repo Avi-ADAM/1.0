@@ -4,7 +4,7 @@
 ונהנים ממה שכל רקמה כבר מקבלת: **חלוקה הוגנת של שווי הרקמה** לפי מה שכל אחד
 תרם, בהסכמה ולא בהחלטה של בעלים.
 
-נוצר: 2026-09-15 · סטטוס: **טיוטה** · מומש: S0 בלבד (ר' §8)
+נוצר: 2026-09-15 · סטטוס: **בבנייה** · מומש: S0, S1 (קוד; נוסח משפטי פתוח) (ר' §8)
 
 מסמכים קשורים: [`PLAN_EXTERNAL_TASKS_API.md`](PLAN_EXTERNAL_TASKS_API.md) ·
 [`PLAN_MCP_SKILL.md`](PLAN_MCP_SKILL.md) ·
@@ -121,6 +121,26 @@
 - **תרומות שעוד לא נתבעו:** PR של מי שעוד לא קישר חשבון נרשם תחת ה-login שלו
   ב-GitHub. כשהוא מקשר, התרומות "מחכות לו" והוא יכול לתבוע אותן. זה גם ערוץ
   גיוס (§6): *"יש לך תרומות שמחכות לך ב-1lev1"*.
+
+### 3.3 מה נבנה ב-S2 ואיך מפעילים
+
+**הזרימות**
+- **קישור חשבון:** `/me/settings` → `/api/v1/github/connect?intent=link` → OAuth ב-GitHub →
+  `/api/v1/github/callback`. נשמרים רק `githubId`, `githubLogin`, `githubLinkedAt`. הטוקן של המשתמש לא נשמר.
+- **חיבור מאגרים לרקמה:** `/moach/[pid]/code` → `connect?intent=install&projectId=` (בודק חברות) →
+  התקנת ה-App → callback. ה-callback מאמת שהמשתמש המחובר הוא מי שהתחיל, שה-`installation_id`
+  באמת נגיש לו (`/user/installations`), ושהוא עדיין חבר ברקמה. רק אחרי זה נכתבות השורות.
+- **Webhook:** חתימה נבדקת על ה-body הגולמי. מטופלים רק `installation` (השהיה, ביטול השהיה, מחיקה) ו-
+  `installation_repositories`. כל השאר מקבל 202 ונשאר ל-S3/S4.
+- **כלל:** מאגר שייך לרקמה אחת לכל היותר. מאגר שעדיין מחובר לרקמה אחרת לא מועבר.
+- **כתיבה:** כל כתיבה של זהות או מאגרים עוברת דרך actions שזמינים רק ל-`serviceAdmin`, כך שלקוח
+  לא יכול לטעון לחשבון GitHub של מישהו אחר. ניתוק מאגר וביטול קישור הם פעולות של חבר.
+
+**הגדרה (פעם אחת):** מדריך מלא, שדה אחרי שדה, ב-[`GITHUB_APP_SETUP.md`](GITHUB_APP_SETUP.md).
+- **host:** כל נתיבי GitHub רצים על **`api.1lev1.com`**, וה-secrets יושבים רק שם. הדפים ב-www
+  (Vercel) שולחים את המשתמש ל-api ומקבלים אותו בחזרה.
+- **env:** רק ב-`/home/ubuntu/api/.env`. ב-Vercel לא מוסיפים כלום.
+- **Strapi:** ל-API token הרשאות `find`, `findOne`, `create`, `update` על `project-repo`.
 
 ---
 
@@ -254,8 +274,8 @@ PR ממוזג של מי שעוד לא חבר ברקמה נותן לו בחירה
 | שלב | מה | סטטוס |
 |---|---|---|
 | **S0** | לינק GitHub בולט מתחת ללוגו, בדף הציבורי ובמוח (`RikmaRepoLink.svelte`). תוקנו גם שמות השדות discord/twitter/github בדף הציבורי, שלא הוצגו אף פעם | ✅ 2026-09-15 |
-| S1 | `Project.codeLicense` + Decision לשינוי + הצגה בדף הציבורי; טיוטות רישיון והסכם תורם **מול עורך דין** | ⏳ |
-| S2 | GitHub App + webhook + `project-repo` + קישור זהות (`githubId`) | ⏳ |
+| S1 | `Project.codeLicense` + Decision לשינוי + הצגה בדף הציבורי; טיוטות רישיון והסכם תורם **מול עורך דין** | 🟡 2026-09-15 — קוד: `Project.codeLicense/codeLicenseOpenYears/codeLicenseSince`, `Decision.kind:'codeLicense'` (+`newCodeLicense/newCodeLicenseYears`), מקור אמת `src/lib/codeLicense/codeLicense.ts`, אישור פה אחד (`voteOnDecision`) או שתיקה (`timegrama/decision.svelte`), `RikmaLicenseBadge.svelte` בדף הציבורי ובמוח. **פתוח:** נוסח הרישיון והסכם התורם מול עורך דין — שום טקסט רישיון לא מתפרסם עד אז |
+| S2 | GitHub App + webhook + `project-repo` + קישור זהות (`githubId`) | 🟡 2026-09-15 — קוד: `src/lib/server/github/`, `/api/v1/github/{connect,callback,webhook}`, actions ב-`githubActions.ts`, טאב `/moach/[pid]/code`, כרטיס חשבון ב-`/me/settings`. **פתוח:** רישום ה-App ב-GitHub + env + הרשאות Strapi (§3.3) |
 | S3 | Issues → Act / open_mission (דרך `createTask` / tasksApi), סנכרון דו־כיווני | ⏳ |
 | S4 | PR ממוזג / review → תביעת עבודה במסלול `finiapruval`; טאב "קוד" במוח | ⏳ |
 | S5 | תורם מבחוץ → הצעה עצמית / מתנה; תרומות שלא נתבעו | ⏳ |

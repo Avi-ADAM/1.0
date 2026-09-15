@@ -11,6 +11,7 @@
  */
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import { effectiveLicense } from '$lib/codeLicense/codeLicense.js';
 
 const RESTIME_LABELS: Record<string, { he: string; en: string }> = {
   feh:    { he: '48 שעות', en: '48 hours' },
@@ -29,7 +30,22 @@ const KIND_LABELS: Record<string, { he: string; en: string }> = {
   vallueadd: { he: 'הוספת ערכים', en: 'Adding values' },
   vallueles: { he: 'הסרת ערכים', en: 'Removing values' },
   pic:       { he: 'שינוי לוגו הפרויקט', en: 'Project logo change' },
+  codeLicense: { he: 'שינוי רישיון הקוד', en: 'Code license change' },
 };
+
+const LICENSE_LABELS: Record<string, { he: string; en: string }> = {
+  none:         { he: 'לא הוגדר', en: 'Not set' },
+  mit:          { he: 'MIT (קוד פתוח)', en: 'MIT (open source)' },
+  apache:       { he: 'Apache 2.0 (קוד פתוח)', en: 'Apache 2.0 (open source)' },
+  rikma:        { he: 'רישיון רקמה', en: 'Rikma license' },
+  rikmaDelayed: { he: 'רישיון רקמה שנפתח אחרי', en: 'Rikma license, opens after' },
+};
+
+function licenseLabel(license: unknown, years: unknown): string {
+  const l = effectiveLicense(license);
+  const base = LICENSE_LABELS[l].he;
+  return l === 'rikmaDelayed' && years ? `${base} ${years} שנים` : base;
+}
 
 const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
   const { decisionId, projectId } = params;
@@ -100,6 +116,11 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
       newValue = '';  // removing → no "new" value
       break;
     }
+
+    case 'codeLicense':
+      currentValue = licenseLabel(projAttrs?.codeLicense, projAttrs?.codeLicenseOpenYears);
+      newValue = licenseLabel(decAttrs.newCodeLicense, decAttrs.newCodeLicenseYears);
+      break;
 
     case 'pic':
       // pic handled separately in decisionMaking via src/src2 props

@@ -60,6 +60,8 @@ export const ROUTED = {
     planning: at(/\/moach\/[^/]+\/create/),
     // The rikma's API page — one route, one namespace, nowhere else.
     rikmaApi: at(/\/moach\/[^/]+\/api/),
+    // The rikma's code tab, plus the GitHub account card on the settings page.
+    rikmaCode: at(/\/moach\/[^/]+\/code/, '/me'),
     // The "connect your AI agent" guide, plus the banner that points at it from
     // the settings page — both live under /me, so one gate covers them.
     mcp: at('/me'),

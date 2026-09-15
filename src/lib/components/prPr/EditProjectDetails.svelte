@@ -9,6 +9,12 @@
   import RichText from '$lib/celim/ui/richText.svelte';
   import { onMount } from 'svelte';
   import Uplad from '$lib/components/userPr/uploadPic.svelte';
+  import {
+    DEFAULT_OPEN_YEARS,
+    MAX_OPEN_YEARS,
+    MIN_OPEN_YEARS,
+    effectiveLicense
+  } from '$lib/codeLicense/codeLicense.js';
 
 
 
@@ -26,6 +32,8 @@
   let twiterlink = $state(projectBase?.twiterlink ?? '');
   let watsapplink = $state(projectBase?.watsapplink ?? '');
   let restime = $state(projectBase?.restime ?? 'feh');
+  let codeLicense = $state(effectiveLicense(projectBase?.codeLicense));
+  let codeLicenseOpenYears = $state(projectBase?.codeLicenseOpenYears ?? DEFAULT_OPEN_YEARS);
   let srcP = $state(projectBase?.profilePic?.data?.attributes?.url ?? '');
   let newPicId = $state(null);
 
@@ -123,6 +131,8 @@
       twiterlink,
       watsapplink,
       restime,
+      codeLicense,
+      codeLicenseOpenYears: Number(codeLicenseOpenYears),
       vallueIds: resolveVallueIds(selectedVallueNames),
       newPicId
     });
@@ -191,6 +201,30 @@
   <div class="field-group">
     <label class="field-label" for="epd-github">{$t('project.editDetails.github')}</label>
     <input id="epd-github" class="field-input" type="url" bind:value={githublink} />
+  </div>
+
+  <!-- Code license (PLAN_CODE_RIKMA §2.2) -->
+  <div class="field-group">
+    <label class="field-label" for="epd-license">{$t('project.editDetails.codeLicense')}</label>
+    <select id="epd-license" class="field-select" bind:value={codeLicense}>
+      <option value="none">{$t('project.editDetails.codeLicenseNone')}</option>
+      <option value="mit">{$t('project.editDetails.codeLicenseMit')}</option>
+      <option value="apache">{$t('project.editDetails.codeLicenseApache')}</option>
+      <option value="rikma">{$t('project.editDetails.codeLicenseRikma')}</option>
+      <option value="rikmaDelayed">{$t('project.editDetails.codeLicenseRikmaDelayed')}</option>
+    </select>
+    {#if codeLicense === 'rikmaDelayed'}
+      <label class="field-label" for="epd-license-years">{$t('project.editDetails.codeLicenseYears')}</label>
+      <input
+        id="epd-license-years"
+        class="field-input"
+        type="number"
+        min={MIN_OPEN_YEARS}
+        max={MAX_OPEN_YEARS}
+        bind:value={codeLicenseOpenYears}
+      />
+    {/if}
+    <small class="text-gold">{$t('project.editDetails.codeLicenseNote')}</small>
   </div>
 
   <!-- Facebook -->
