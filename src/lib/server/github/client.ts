@@ -66,24 +66,26 @@ export async function getGithubUser(token: string, fetchFn: Fetch): Promise<{ id
 }
 
 /**
- * Does this user really have access to `installationId`? The callback's
- * `installation_id` query parameter is not proof of anything on its own.
+ * Every installation of *this* App the user can reach — the endpoint is scoped
+ * to the App whose user token is presented.
+ *
+ * It answers two questions at once: whether the `installation_id` GitHub put in
+ * the callback URL is really theirs (it is not proof of anything on its own),
+ * and — when they arrive without one because the App is installed already —
+ * which installations to offer repositories from.
  */
-export async function userCanAccessInstallation(
-  token: string,
-  installationId: string,
-  fetchFn: Fetch
-): Promise<boolean> {
+export async function listUserInstallationIds(token: string, fetchFn: Fetch): Promise<string[]> {
+  const ids: string[] = [];
   for (let page = 1; page <= 5; page++) {
     const body = await ghJson(
       await fetchFn(`${API}/user/installations?per_page=100&page=${page}`, { headers: ghHeaders(token) }),
       'installations lookup'
     );
     const list: any[] = body?.installations ?? [];
-    if (list.some((i) => String(i?.id) === String(installationId))) return true;
-    if (list.length < 100) return false;
+    for (const i of list) if (i?.id != null) ids.push(String(i.id));
+    if (list.length < 100) break;
   }
-  return false;
+  return ids;
 }
 
 /**

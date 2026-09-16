@@ -77,6 +77,11 @@
       <h3>{$t('rikmaCode.pick.title')}</h3>
       {#if pickRepos.length === 0}
         <p class="muted">{$t('rikmaCode.pick.empty')}</p>
+        <!-- The App is installed on an account that granted it no repository —
+             which is a GitHub-side setting, and only reachable there. -->
+        <a class="cancel" href="https://github.com/settings/installations" target="_blank" rel="noopener noreferrer">
+          {$t('rikmaCode.pick.manage')}
+        </a>
       {:else}
         <p class="muted">{$t('rikmaCode.pick.intro', { count: pickRepos.length })}</p>
         <input type="hidden" name="token" value={data.pick.token} />

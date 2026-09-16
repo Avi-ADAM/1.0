@@ -24,7 +24,8 @@
     "here": "Ya conectado",
     "elsewhere": "Conectado a otra rikma",
     "noMatch": "Ningún repositorio coincide.",
-    "empty": "GitHub no dio acceso a ningún repositorio."
+    "empty": "GitHub no dio acceso a ningún repositorio.",
+    "manage": "Comprueba en GitHub a qué repositorios puede acceder la App"
   },
   "status": {
     "connected": "El repositorio se conectó a la rikma.",

@@ -15,10 +15,20 @@ const key = stateKey('client-secret');
 
 describe('github repo pick token', () => {
   const pk = pickKey('client-secret');
-  const input = { uid: '7', projectId: '12', installationId: '345' };
+  const input = { uid: '7', projectId: '12', installationIds: ['345'] };
 
-  it('round-trips', () => {
+  it('round-trips, one installation or several', () => {
     expect(readPickToken(createPickToken(input, pk), pk)).toMatchObject(input);
+    const many = { ...input, installationIds: ['345', '678'] };
+    expect(readPickToken(createPickToken(many, pk), pk)?.installationIds).toEqual(['345', '678']);
+  });
+
+  it('still reads a token from the release that named one installation', () => {
+    const body = Buffer.from(
+      JSON.stringify({ uid: '7', projectId: '12', installationId: '345', exp: Date.now() + 1000 })
+    ).toString('base64url');
+    const legacy = `${body}.${createHmac('sha256', pk).update(body).digest('base64url')}`;
+    expect(readPickToken(legacy, pk)?.installationIds).toEqual(['345']);
   });
 
   it('cannot be swapped with a state cookie, either way', () => {
@@ -35,8 +45,9 @@ describe('github repo pick token', () => {
     expect(readPickToken(value, pk, now + PICK_TTL_MS)).toBeNull();
   });
 
-  it('refuses a non-numeric installation', () => {
-    expect(readPickToken(createPickToken({ ...input, installationId: 'x' }, pk), pk)).toBeNull();
+  it('refuses a non-numeric installation, and a token naming none', () => {
+    expect(readPickToken(createPickToken({ ...input, installationIds: ['x'] }, pk), pk)).toBeNull();
+    expect(readPickToken(createPickToken({ ...input, installationIds: [] }, pk), pk)).toBeNull();
   });
 });
 

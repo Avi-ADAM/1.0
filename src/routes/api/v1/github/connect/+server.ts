@@ -13,6 +13,14 @@ import { isAllowedFrontendOrigin } from '$lib/server/corsOrigins.js';
  * the signed JWT (`locals.uid`), never from the query string; the rikma is
  * checked for membership here and again on the way back. What the callback
  * may trust is written into a signed, short-lived cookie before leaving.
+ *
+ * **Both intents go to OAuth, not to the install screen.** Sending a member
+ * straight to `installations/new` works once: after that GitHub shows the
+ * App's settings page for the existing installation, and someone who has
+ * nothing to change there has no button that returns them to 1lev1 — they
+ * press back and never reach the repository picker. So the flow asks GitHub
+ * who they are first; the callback then either offers the repositories of the
+ * installations they already have, or sends them on to install the App.
  */
 export const GET: RequestHandler = async ({ url, locals, cookies, fetch }) => {
   if (!locals.uid) throw error(401, 'Sign in to connect GitHub');
@@ -49,13 +57,6 @@ export const GET: RequestHandler = async ({ url, locals, cookies, fetch }) => {
     secure: url.protocol === 'https:',
     maxAge: Math.floor(STATE_TTL_MS / 1000)
   });
-
-  if (intent === 'install') {
-    throw redirect(
-      303,
-      `https://github.com/apps/${encodeURIComponent(cfg.slug)}/installations/new?state=${encodeURIComponent(state.nonce)}`
-    );
-  }
 
   const authorize = new URL('https://github.com/login/oauth/authorize');
   authorize.searchParams.set('client_id', cfg.clientId);

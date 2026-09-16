@@ -34,6 +34,16 @@ export function githubAppConfig(): GithubAppConfig | null {
   return { appId, slug, clientId, clientSecret, privateKey };
 }
 
+/**
+ * GitHub's install screen. Only for a member who has no installation of the
+ * App yet: once there is one, GitHub shows its *settings* page instead, which
+ * has no way back to us unless something is changed and saved — so the flow
+ * reaches the repository picker through OAuth rather than through here.
+ */
+export function appInstallUrl(cfg: GithubAppConfig, nonce: string): string {
+  return `https://github.com/apps/${encodeURIComponent(cfg.slug)}/installations/new?state=${encodeURIComponent(nonce)}`;
+}
+
 export function githubWebhookSecret(): string | null {
   return env.GITHUB_WEBHOOK_SECRET?.trim() || null;
 }

@@ -13,9 +13,12 @@
  * `state`, and the callback then refuses to link an identity from it.
  *
  * The pick token is the second signed value here: what the callback hands the
- * code tab once an installation is verified, so the member can choose which
- * repository joins the rikma. It is signed with its own derived key, so a
+ * code tab once the member's installations are verified, so they can choose
+ * which repository joins the rikma. It is signed with its own derived key, so a
  * state cookie can never be replayed as a pick token or the other way round.
+ * It names *every* installation the member can reach — someone with the App on
+ * their personal account and on an org has repositories in both, and which
+ * installation a chosen repository belongs to is not their problem.
  */
 
 import { createHmac, randomBytes, timingSafeEqual } from 'node:crypto';
@@ -23,6 +26,9 @@ import { createHmac, randomBytes, timingSafeEqual } from 'node:crypto';
 export const STATE_COOKIE = 'gh_connect';
 export const STATE_TTL_MS = 10 * 60 * 1000;
 export const PICK_TTL_MS = 30 * 60 * 1000;
+
+/** More than this from one account is not a member picking a repository. */
+const MAX_INSTALLATIONS = 20;
 
 export type GithubIntent = 'link' | 'install';
 
@@ -41,11 +47,11 @@ export interface GithubState {
   exp: number;
 }
 
-/** A verified installation, waiting for a member to choose its repository. */
+/** Verified installations, waiting for a member to choose a repository. */
 export interface PickToken {
   uid: string;
   projectId: string;
-  installationId: string;
+  installationIds: string[];
   /** epoch ms */
   exp: number;
 }
@@ -122,14 +128,14 @@ export function readState(
 }
 
 export function createPickToken(
-  input: { uid: string; projectId: string; installationId: string },
+  input: { uid: string; projectId: string; installationIds: string[] },
   key: Buffer | string,
   now = Date.now()
 ): string {
   const token: PickToken = {
     uid: String(input.uid),
     projectId: String(input.projectId),
-    installationId: String(input.installationId),
+    installationIds: input.installationIds.map(String).slice(0, MAX_INSTALLATIONS),
     exp: now + PICK_TTL_MS
   };
   return seal(token, key);
@@ -143,7 +149,15 @@ export function readPickToken(
   const p = unseal(value, key);
   if (typeof p?.uid !== 'string' || !DIGITS.test(p.uid)) return null;
   if (typeof p.projectId !== 'string' || !DIGITS.test(p.projectId)) return null;
-  if (typeof p.installationId !== 'string' || !DIGITS.test(p.installationId)) return null;
+  // A token minted by the previous release names a single installation; it is
+  // valid for another half hour and there is no reason to fail it.
+  const ids: unknown = Array.isArray(p.installationIds)
+    ? p.installationIds
+    : p.installationId !== undefined
+      ? [p.installationId]
+      : null;
+  if (!Array.isArray(ids) || ids.length === 0 || ids.length > MAX_INSTALLATIONS) return null;
+  if (!ids.every((id) => typeof id === 'string' && DIGITS.test(id))) return null;
   if (typeof p.exp !== 'number' || p.exp <= now) return null;
-  return p as PickToken;
+  return { uid: p.uid, projectId: p.projectId, installationIds: ids as string[], exp: p.exp };
 }

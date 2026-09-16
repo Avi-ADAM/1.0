@@ -106,15 +106,15 @@ export type PickableRepo = RepoRowInput & { pick: PickState };
  * they choose one here. Uses the same rule as `planRepoSync`; connectable
  * repositories first, then by name.
  */
-export function markPickable(
+export function markPickable<T extends RepoRowInput>(
   projectId: string,
-  incoming: RepoRowInput[],
+  incoming: T[],
   existing: ExistingRepoRow[]
-): PickableRepo[] {
+): (T & { pick: PickState })[] {
   const byRepo = new Map(existing.map((e) => [String(e.repoId), e]));
   const order: Record<PickState, number> = { available: 0, here: 1, elsewhere: 2 };
   const seen = new Set<string>();
-  const out: PickableRepo[] = [];
+  const out: (T & { pick: PickState })[] = [];
 
   for (const row of incoming) {
     if (seen.has(row.repoId)) continue;
