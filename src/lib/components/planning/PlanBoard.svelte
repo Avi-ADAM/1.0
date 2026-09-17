@@ -46,7 +46,10 @@
   /** Skill names the AI suggested for a row, for display as chips. */
   function skillsOf(item) {
     const raw = item?.attributes?.spec?.skills;
-    return Array.isArray(raw) ? raw.filter(Boolean).slice(0, 6) : [];
+    if (!Array.isArray(raw)) return [];
+    // Agent-written specs can repeat a skill; the chip list is keyed by name.
+    const names = raw.map((s) => (typeof s === 'string' ? s.trim() : '')).filter(Boolean);
+    return [...new Set(names)].slice(0, 6);
   }
 
   /** Why the AI proposed this row, grounded in the rikma's real state. */
@@ -125,7 +128,7 @@
       <div class="mb-3 rounded-xl border border-barbi/30 bg-white/70 p-3">
         <p class="text-xs font-semibold mb-1 text-[color:var(--ramp-ink,#16131b)]">{$t('planning.board.hint')}</p>
         <ul class="list-disc list-inside text-sm text-[color:var(--ramp-ink,#16131b)]">
-          {#each hints as hint (hint.text)}
+          {#each hints as hint, i (i)}
             <li>{hint.text}</li>
           {/each}
         </ul>
