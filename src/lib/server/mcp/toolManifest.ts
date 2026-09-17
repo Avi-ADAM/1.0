@@ -45,7 +45,10 @@ import {
   searchCatalogTool,
   listMyWishesTool,
   getWishDetailsTool,
-  listMyWishOffersTool
+  listMyWishOffersTool,
+  previewWishTool,
+  draftWishTool,
+  conciergeWriteEnabled
 } from '../../../mastra/tools/conciergeTools';
 import {
   getProjectDetailsTool,
@@ -55,6 +58,8 @@ import {
 
 export interface McpManifestEntry extends McpToolPolicy {
   tool: { id: string; [k: string]: any };
+  /** Feature flag. Absent ⇒ always exposed; false ⇒ the tool does not exist for the client. */
+  enabled?: () => boolean;
 }
 
 export const MCP_WRITE_SCOPE = 'mcp:write';
@@ -82,6 +87,9 @@ export const MCP_TOOL_MANIFEST: Record<string, McpManifestEntry> = {
   listMyWishesTool: { tool: listMyWishesTool, tier: 'read' },
   getWishDetailsTool: { tool: getWishDetailsTool, tier: 'read' },
   listMyWishOffersTool: { tool: listMyWishOffersTool, tier: 'read' },
+  // Behind CONCIERGE_MCP_WRITE: one run costs Gemini tokens, the other writes a row.
+  previewWishTool: { tool: previewWishTool, tier: 'read', ai: true, enabled: conciergeWriteEnabled },
+  draftWishTool: { tool: draftWishTool, tier: 'selfWrite', enabled: conciergeWriteEnabled },
 
   getSitePagesTool: { tool: getSitePagesTool, tier: 'read' },
   getPageContextTool: { tool: getPageContextTool, tier: 'read' },
@@ -109,6 +117,11 @@ export const MCP_TOOL_MANIFEST: Record<string, McpManifestEntry> = {
   // --- sharedWrite (needs MCP_WRITE_SCOPE) ---
   createMissionTool: { tool: createMissionTool, tier: 'sharedWrite', project: 'member' }
 };
+
+/** Whether an entry is switched on at all (feature flags). */
+export function entryEnabled(entry: McpManifestEntry): boolean {
+  return entry.enabled ? entry.enabled() : true;
+}
 
 /** Whether a key with these ops may see a tool of this tier. */
 export function tierAllowed(tier: McpToolPolicy['tier'], ops: string[]): boolean {

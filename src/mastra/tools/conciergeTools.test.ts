@@ -219,3 +219,80 @@ describe('tools', () => {
     expect(sendToSer.mock.calls[0][1]).toBe('282discoverProducts');
   });
 });
+
+describe('P4 — write half', () => {
+  const executeAction = vi.fn();
+  const extractWish = vi.fn();
+
+  vi.doMock('../../lib/server/actions/index.js', () => ({ actionService: { executeAction } }));
+  vi.doMock('../../lib/server/adminToken.js', () => ({ normalizeAdminToken: (t: any) => t ?? 'admin' }));
+  vi.doMock('../../lib/server/ai/extractWish', () => ({ extractWish: (...a: any[]) => extractWish(...a) }));
+  vi.doMock('$env/static/private', () => ({ GEMINI_API_KEY: 'test-key' }));
+
+  beforeEach(() => {
+    executeAction.mockReset();
+    extractWish.mockReset();
+    getMcpContext.mockReset().mockReturnValue({ userId: '42', fetchInstance: vi.fn() });
+  });
+
+  it('shapeExtraction flattens the model output and normalises importance', async () => {
+    const { shapeExtraction } = await import('./conciergeTools');
+    expect(
+      shapeExtraction({
+        titleSuggestion: 'A bookshelf',
+        missions: [{ name: 'build', imp: 'must' }, { name: 'paint' }],
+        resources: [{ name: 'oak', imp: 'must' }],
+        skills: [{ name: 'carpentry' }],
+        categories: ['home'],
+        hints: [{ kind: 'question', text: 'how tall?' }]
+      })
+    ).toEqual({
+      titleSuggestion: 'A bookshelf',
+      missions: [
+        { name: 'build', importance: 'must' },
+        { name: 'paint', importance: 'nice' }
+      ],
+      resources: [{ name: 'oak', importance: 'must' }],
+      skills: ['carpentry'],
+      categories: ['home'],
+      hints: [{ kind: 'question', text: 'how tall?' }]
+    });
+  });
+
+  it('previewWish saves nothing and says so', async () => {
+    const { previewWishTool } = await import('./conciergeTools');
+    extractWish.mockResolvedValue({ titleSuggestion: 'A bookshelf', missions: [], resources: [] });
+    const res: any = await (previewWishTool as any).execute({ text: 'I need a bookshelf for the corner' }, {});
+    expect(res.success).toBe(true);
+    expect(res.titleSuggestion).toBe('A bookshelf');
+    expect(res.note).toMatch(/Nothing was saved/);
+    expect(executeAction).not.toHaveBeenCalled();
+  });
+
+  it('draftWish creates a private draft owned by the key holder, never a published wish', async () => {
+    const { draftWishTool } = await import('./conciergeTools');
+    executeAction.mockResolvedValue({ success: true, data: { id: '9' } });
+
+    const res: any = await (draftWishTool as any).execute(
+      { name: 'A bookshelf', text: 'oak, fits the corner', missions: [{ name: 'build it', importance: 'must' }] },
+      {}
+    );
+
+    const [action, params, context] = executeAction.mock.calls[0];
+    expect(action).toBe('createRatson');
+    expect(params.status_ratson).toBe('draft');
+    expect(params.access_mode).toBe('personal');
+    expect(params.extracted_missions).toEqual([{ name: 'build it', importance: 'must', hoursEst: undefined }]);
+    expect(context.userId).toBe('42');
+    expect(res).toMatchObject({ success: true, wishId: '9', status: 'draft' });
+    expect(res.url).toMatch(/\/concierge\/9$/);
+  });
+
+  it('draftWish reports a failed action without leaking its internals', async () => {
+    const { draftWishTool } = await import('./conciergeTools');
+    executeAction.mockResolvedValue({ success: false, error: { message: 'GraphQL: forbidden field' } });
+    const res: any = await (draftWishTool as any).execute({ name: 'Shelf', text: 'something long enough' }, {});
+    expect(res.success).toBe(false);
+    expect(res.message).not.toMatch(/GraphQL/);
+  });
+});

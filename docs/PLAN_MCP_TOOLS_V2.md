@@ -178,7 +178,7 @@
 | **P1b** | שארית P0: מניפסט כלים + בדיקה; תחום מפתח לכלים לפי `missionId`; סינון רשימות משימות למפתח מוגבל | P0 | ✅ 2026-09-17 |
 | **P2** | G7 הגבלת קצב + audit log; M3 `getProjectStatsTool` | P0 | ✅ 2026-09-17 |
 | **P3** | M7 קונסיירז' — קריאה: `searchCatalogTool`, `listMyWishesTool`, `getWishDetailsTool`, `listMyWishOffersTool` | P2 (קצב) | ✅ 2026-09-17 |
-| **P4** | M7 כתיבה: `previewWish`, `draftWish` | P2 (דלי `ai`) | ⏳ |
+| **P4** | M7 כתיבה: `previewWishTool`, `draftWishTool` | P2 (דלי `ai`) | ✅ 2026-09-17 |
 | **P5** | M4 `postProjectUpdate` + M2 `proposeProjectLink` (שכבת `communicate`) | D1, P2 | ⏳ |
 | **P6** | M5 `searchContent` | P2 | ⏳ |
 | **P7** | M6 Outreach (Strapi collection + 2 actions + 3 כלים + תצוגה במואך) | שינוי backend | ⏳ |
@@ -290,3 +290,28 @@
 
 **בדיקות**: `conciergeTools.test.ts` (20) — כולל צופה-זר מול טיוטה/משאלה אישית,
 סינון רקמות מוסתרות, ושגיאת backend שלא דולפת.
+
+### 2026-09-17 — P4 (קונסיירז', כתיבה)
+
+- `previewWishTool(text)` — מריץ את `extractWish` (אותו מנוע של `/api/concierge-extract`)
+  ישירות בשרת ומחזיר פירוק למשימות/משאבים/כישורים/קטגוריות + שאלות חוזרות. **לא שומר כלום.**
+  שכבה `read` עם `ai:true`, כלומר דלי של 10 קריאות בשעה למפתח.
+- `draftWishTool({name, text, missions?, resources?, startDate?, finnishDate?})` —
+  `createRatson` עם `status_ratson:'draft'` ו-`access_mode:'personal'`. הבעלים הוא
+  `context.userId`, כלומר בעל המפתח בלבד. מחזיר URL ל-`/concierge/[id]`, ושם האדם עובר
+  על הפירוק ומפרסם — הסוכן לא מפרסם (D2).
+- **שניהם מאחורי `CONCIERGE_MCP_WRITE=true`**. כבוי (ברירת המחדל) ⇒ הכלים לא מופיעים
+  ברשימה בכלל, ולא "נכשלים כשקוראים להם". המנגנון הוא `enabled?: () => boolean` על שורת
+  המניפסט, כך שכל דגל עתידי נכנס באותה דרך.
+- הבדיקה "לכל כתיבה יש שער רקמה/משימה" מחריגה את `draftWishTool` במפורש: משאלה שייכת
+  לאדם ולא לרקמה, והזהות מגיעה מהמפתח.
+- **בדיקות**: 5 נוספות ב-`conciergeTools.test.ts` (סה"כ 25) — הפירוק לא שומר, הטיוטה
+  נשמרת כ-`draft`+`personal` על שם בעל המפתח, וכשל של ה-action לא דולף החוצה.
+
+### פתוח לשלב הבא
+
+- **G9 (חדש)** — `POST /api/concierge-extract` פתוח לגמרי: אין בו בדיקת session, וכל בקשה
+  היא ריצת Gemini. ה-MCP כבר לא עובר דרכו (הוא קורא ל-`extractWish` ישירות), אבל העמוד
+  הציבורי כן. לדרוש `locals.uid` או מגבלת קצב לפי IP.
+- P5–P8 כמתוכנן: `postProjectUpdate` + `proposeProjectLink`, `searchContent`, Outreach,
+  ואז עדכון ה-skill.

@@ -20,7 +20,7 @@ import { createTool } from '@mastra/core/tools';
 import { z } from 'zod';
 
 import { wrapMcpTool } from '$lib/server/mcp/guard';
-import { MCP_TOOL_MANIFEST, tierAllowed } from '$lib/server/mcp/toolManifest';
+import { MCP_TOOL_MANIFEST, tierAllowed, entryEnabled } from '$lib/server/mcp/toolManifest';
 import { MCP_INSTRUCTIONS } from '$lib/server/mcp/instructions';
 import { normalizeApiKeyScopes } from '$lib/server/apiKeys';
 
@@ -201,6 +201,9 @@ async function handleMcpRequest(request: Request, url: URL, svelteFetch: typeof 
         toolsToExpose = { howToConnect }; // included even in auth mode for convenience
         const withheld: string[] = [];
         for (const [name, entry] of Object.entries(MCP_TOOL_MANIFEST)) {
+            // A tool switched off by env is simply absent — not a refusal the
+            // agent has to discover by calling it.
+            if (!entryEnabled(entry)) continue;
             if (tierAllowed(entry.tier, ops)) toolsToExpose[name] = WRAPPED_TOOLS[name];
             else withheld.push(name);
         }

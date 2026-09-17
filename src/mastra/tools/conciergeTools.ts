@@ -6,9 +6,11 @@
  * missing from MCP entirely, which is backwards: an agent conversation is
  * exactly where "I need X" gets said out loud.
  *
- * This file only reads. Creating a wish is P4 and publishing it stays with a
- * human (decision D2); accepting a proposal, which moves money and binds two
- * people, never happens here — the tools hand back the URL of the card.
+ * Reads are always on. The two write tools at the bottom (previewWish, which
+ * costs a model run, and draftWish, which creates a row) are behind the
+ * CONCIERGE_MCP_WRITE env flag. Publishing a wish stays with a human (decision
+ * D2), and accepting a proposal — which moves money and binds two people —
+ * never happens here at all: the tools hand back the URL of the card.
  *
  * Access, since all of it runs on the service token:
  *  - listMyWishes / listMyWishOffers are keyed to the caller's own id;
@@ -22,6 +24,7 @@ import { z } from 'zod';
 import { sendToSer } from '../../lib/send/sendToSer';
 import { getMcpContext } from '../../lib/server/mcpContext.js';
 import { isHiddenProject } from '../../lib/server/discovery/hiddenProjects.js';
+import { env } from '$env/dynamic/private';
 
 const SITE = 'https://www.1lev1.com';
 const rows = (rel: any): any[] => (Array.isArray(rel?.data) ? rel.data : []);
@@ -329,6 +332,162 @@ export const listMyWishOffersTool = createTool({
     } catch (error) {
       console.error('[listMyWishOffers] failed:', error);
       return { success: false, message: 'Could not load your offers right now. Try again shortly.' };
+    }
+  }
+});
+
+// ── P4: the write half ─────────────────────────────────────────────────────
+//
+// Both tools below are gated by CONCIERGE_MCP_WRITE (env): one costs Gemini
+// tokens per call, the other creates a real row. Unset ⇒ they are not exposed
+// at all, so turning the feature on is a deliberate act in production.
+
+/** Whether the concierge write tools are exposed. Default: off. */
+export function conciergeWriteEnabled(): boolean {
+  return env.CONCIERGE_MCP_WRITE === 'true';
+}
+
+/** The extraction, flattened into what an agent can act on. */
+export function shapeExtraction(extraction: any) {
+  return {
+    titleSuggestion: text(extraction?.titleSuggestion),
+    missions: (extraction?.missions ?? []).map((m: any) => ({
+      name: text(m?.name),
+      importance: m?.imp === 'must' ? 'must' : 'nice'
+    })),
+    resources: (extraction?.resources ?? []).map((r: any) => ({
+      name: text(r?.name),
+      importance: r?.imp === 'must' ? 'must' : 'nice'
+    })),
+    skills: (extraction?.skills ?? []).map((s: any) => text(s?.name)).filter(Boolean),
+    categories: (extraction?.categories ?? []).map(text).filter(Boolean),
+    hints: (extraction?.hints ?? []).map((h: any) => ({ kind: text(h?.kind), text: text(h?.text) }))
+  };
+}
+
+export const previewWishTool = createTool({
+  id: 'previewWish',
+  description:
+    'Break a free-text need into the missions (work) and resources it is made of, plus the skills and categories it touches, ' +
+    'and questions worth asking back. Nothing is saved - this is the preview a person sees while typing a wish. ' +
+    'Show the result to the user and let them correct it before draftWish. Costs a model run, so it is rate limited.',
+  inputSchema: z.object({
+    text: z
+      .string()
+      .min(20)
+      .max(4000)
+      .describe('What the person needs, in their own words. Under 20 characters there is nothing to extract.')
+  }),
+  execute: async ({ text: wishText }) => {
+    const ctx = getMcpContext();
+    if (!ctx?.userId) return { success: false, message: 'Not authenticated.' };
+    try {
+      // Imported lazily: this pulls in the model client and its env.
+      const [{ extractWish }, { GEMINI_API_KEY }] = await Promise.all([
+        import('../../lib/server/ai/extractWish'),
+        import('$env/static/private')
+      ]);
+      const extraction = await extractWish(wishText, GEMINI_API_KEY);
+      return {
+        success: true,
+        note: 'Nothing was saved. Confirm the breakdown with the user, then call draftWish.',
+        ...shapeExtraction(extraction)
+      };
+    } catch (error) {
+      console.error('[previewWish] failed:', error);
+      return { success: false, message: 'Could not analyse the wish right now. Try again shortly.' };
+    }
+  }
+});
+
+export const draftWishTool = createTool({
+  id: 'draftWish',
+  description:
+    'Save a wish as a DRAFT on the caller\'s own account: a name, the text, and optionally the missions and resources ' +
+    'from previewWish. It is private and is NOT published to the community - the tool returns the URL where the person ' +
+    'reviews the breakdown and publishes it themselves. Use it only when the user asked to keep or act on this need.',
+  inputSchema: z.object({
+    name: z.string().min(2).max(120).describe('Short title for the wish.'),
+    text: z.string().min(10).max(4000).describe("The need in the person's own words."),
+    missions: z
+      .array(
+        z.object({
+          name: z.string(),
+          importance: z.enum(['must', 'nice']).optional(),
+          hoursEstimate: z.number().optional()
+        })
+      )
+      .optional()
+      .describe('Work the wish needs, usually straight from previewWish.'),
+    resources: z
+      .array(
+        z.object({
+          name: z.string(),
+          importance: z.enum(['must', 'nice']).optional(),
+          quantityEstimate: z.number().optional()
+        })
+      )
+      .optional()
+      .describe('Things the wish needs (equipment, materials, money).'),
+    startDate: z.string().optional().describe('ISO date the person wants it by/from.'),
+    finnishDate: z.string().optional().describe('ISO date it has to be done by.')
+  }),
+  execute: async (input) => {
+    const ctx = getMcpContext();
+    if (!ctx?.userId || !ctx.fetchInstance) return { success: false, message: 'Not authenticated.' };
+    try {
+      const [{ actionService }, { normalizeAdminToken }] = await Promise.all([
+        import('../../lib/server/actions/index.js'),
+        import('../../lib/server/adminToken.js')
+      ]);
+
+      const result = await actionService.executeAction(
+        'createRatson',
+        {
+          name: input.name.trim(),
+          desc: excerpt(input.text, 400),
+          longDes: input.text,
+          startDate: input.startDate ?? null,
+          finnishDate: input.finnishDate ?? null,
+          // A draft, private by default: publishing is the person's own act (D2).
+          status_ratson: 'draft',
+          access_mode: 'personal',
+          extracted_missions: (input.missions ?? []).map((m) => ({
+            name: m.name,
+            importance: m.importance ?? 'nice',
+            hoursEst: m.hoursEstimate
+          })),
+          extracted_resources: (input.resources ?? []).map((r) => ({
+            name: r.name,
+            importance: r.importance ?? 'nice',
+            quantityEst: r.quantityEstimate
+          }))
+        },
+        {
+          userId: ctx.userId,
+          jwt: normalizeAdminToken(process.env.ADMINMONTHER),
+          lang: ctx.lang ?? 'he',
+          fetch: ctx.fetchInstance
+        }
+      );
+
+      if (!result.success) {
+        console.error('[draftWish] action failed:', result.error);
+        return { success: false, message: 'The wish could not be saved. Nothing was created.' };
+      }
+
+      const id = result.data?.id ?? result.data?.ratson?.id;
+      return {
+        success: true,
+        wishId: id ? String(id) : null,
+        status: 'draft',
+        message:
+          'Saved as a private draft. It is not published yet: the person reviews the breakdown and publishes it from this page.',
+        url: id ? `${SITE}/concierge/${id}` : `${SITE}/concierge`
+      };
+    } catch (error) {
+      console.error('[draftWish] failed:', error);
+      return { success: false, message: 'The wish could not be saved right now. Try again shortly.' };
     }
   }
 });
