@@ -24,6 +24,11 @@ export interface McpContext {
    * that the workflow only acts on behalf of the logged-in user.
    */
   isInternalBot?: boolean;
+  /**
+   * Rikmot the API key is limited to (`scopes.projects`). Absent ⇒ the key may
+   * reach every rikma its owner belongs to. Enforced by `src/lib/server/mcp/guard.ts`.
+   */
+  keyProjects?: string[];
   /** Optional: last mission search result for disambiguation */
   lastMissionSearch?: {
     filter?: string;

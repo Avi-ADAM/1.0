@@ -2,6 +2,7 @@ import { createTool } from '@mastra/core/tools'
 import { z } from 'zod';
 import { sendToSer } from '../../lib/send/sendToSer';
 import { getMcpContext } from '../../lib/server/mcpContext.js';
+import { filterToKeyProjects } from '../../lib/server/mcp/guard.js';
 
 const DEFAULT_LIMIT = 50;
 const MAX_LIMIT = 200;
@@ -109,7 +110,8 @@ export const findUserProjectsTool = createTool({
 
       const projects = await findUserProjects(parseInt(String(effectiveUserId)), fetchInstance, isServerRequest);
 
-      let matching = projects;
+      // A key limited to some rikmot (scopes.projects) must not even list the others.
+      let matching = globalContext.isInternalBot ? projects : filterToKeyProjects(projects, globalContext.keyProjects);
       if (query && query.trim()) {
         const searchTerm = query.toLowerCase().trim();
         matching = projects.filter((project) => project.name.toLowerCase().includes(searchTerm));

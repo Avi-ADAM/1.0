@@ -34,6 +34,10 @@ import { getMemberMissionsTool } from '../../../mastra/tools/getMemberMissionsTo
 import { prepareMissionTool } from '../../../mastra/tools/prepareMissionTool';
 import { createMissionTool } from '../../../mastra/tools/createMissionTool';
 import { createPlanBoardTool, planProjectWorkTool, scanProjectDirectionsTool } from '../../../mastra/tools/planningTools';
+import { getProjectDetailsTool, listProjectResourcesTool } from '../../../mastra/tools/projectDetailsTools';
+import { guardProjectTool } from '$lib/server/mcp/guard';
+import { MCP_INSTRUCTIONS } from '$lib/server/mcp/instructions';
+import { normalizeApiKeyScopes } from '$lib/server/apiKeys';
 
 // --- Public Tools for Unauthenticated Users ---
 
@@ -44,6 +48,7 @@ const getPlatformInfo = createTool({
     execute: async () => {
         return {
             info: SITE_CONTEXT,
+            howAgentsShouldWorkHere: MCP_INSTRUCTIONS,
             message: "This is general information about the 1lev1 platform."
         };
     }
@@ -201,7 +206,8 @@ async function handleMcpRequest(request: Request, url: URL, svelteFetch: typeof 
         // the userId is always tied to the verified API key owner.
         setMcpContext({
             userId: user.id.toString(),
-            fetchInstance: svelteFetch
+            fetchInstance: svelteFetch,
+            keyProjects: normalizeApiKeyScopes(user.scopes)?.projects
         });
 
         // Agents and workflows are deliberately NOT exposed. MCPServer turns
@@ -214,27 +220,37 @@ async function handleMcpRequest(request: Request, url: URL, svelteFetch: typeof 
         agentsToExpose = {};
         workflowsToExpose = {};
 
+        // Every tool that takes a projectId is wrapped at exposure, so the key's
+        // project scope and the caller's membership are checked before the tool
+        // runs on the service token (PLAN_MCP_TOOLS_V2 §1). `member` = must be a
+        // member; `scope` = key scope only, for tools that serve the public face
+        // or whose projectId merely filters the caller's own records.
+        const member = <T extends { id: string }>(t: T) => guardProjectTool(t, { requireMember: true });
+        const scope = <T extends { id: string }>(t: T) => guardProjectTool(t, { requireMember: false });
+
         const readTools = {
-            listUserMissionsTool,
+            listUserMissionsTool: scope(listUserMissionsTool),
             getActiveTimersTool,
             getMissionDetailsTool,
-            getTimerHistoryTool,
-            getMissionStatsTool,
+            getTimerHistoryTool: scope(getTimerHistoryTool),
+            getMissionStatsTool: scope(getMissionStatsTool),
             getSitePagesTool,
             getPageContextTool,
             findMissionTool,
             findUserProjectsTool,
-            getProjectMembersTool,
-            getMemberMissionsTool
+            getProjectDetailsTool: scope(getProjectDetailsTool),
+            listProjectResourcesTool: scope(listProjectResourcesTool),
+            getProjectMembersTool: member(getProjectMembersTool),
+            getMemberMissionsTool: member(getMemberMissionsTool)
         };
 
         const prepareTools = {
             navigateToPageTool,
             createProjectTool,     // returns a prefilled URL; the human creates it
-            prepareMissionTool,    // ditto
-            planProjectWorkTool,
-            createPlanBoardTool,   // proposals only, like planProjectWorkTool
-            scanProjectDirectionsTool
+            prepareMissionTool: member(prepareMissionTool),    // ditto
+            planProjectWorkTool: member(planProjectWorkTool),
+            createPlanBoardTool: member(createPlanBoardTool),   // proposals only, like planProjectWorkTool
+            scanProjectDirectionsTool: member(scanProjectDirectionsTool)
         };
 
         // Only ever touches the caller's own timers/hours.
@@ -247,12 +263,12 @@ async function handleMcpRequest(request: Request, url: URL, svelteFetch: typeof 
         // with the admin token, but `createTask` is projectMember-gated on the
         // key's owner, and nobody is bound by it until they accept it.
         const consentWriteTools = {
-            createTaskTool
+            createTaskTool: member(createTaskTool)
         };
 
         // Publishes work directly, with no human approving the form.
         const sharedWriteTools = {
-            createMissionTool
+            createMissionTool: member(createMissionTool)
         };
 
         const ops = keyOps(user);
@@ -318,6 +334,9 @@ async function handleMcpRequest(request: Request, url: URL, svelteFetch: typeof 
                       'Call fixRejectedApiKey. Delete the stale config entry before minting a ' +
                       'new key, or the replacement will be shadowed again.'
                     : 'Limited access to 1lev1 Platform. Please authenticate for full AI Agent and Tool access.',
+            // The platform model an outside agent otherwise has to guess. A
+            // rejected key gets none: nothing but the repair tools applies there.
+            instructions: isRejected(verdict) ? undefined : MCP_INSTRUCTIONS,
             agents: agentsToExpose,
             workflows: workflowsToExpose,
             tools: toolsToExpose
@@ -371,8 +390,9 @@ export const OPTIONS: RequestHandler = async () => {
         headers: {
             'Access-Control-Allow-Origin': '*',
             'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-            'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-            'Access-Control-Allow-Credentials': 'true',
+            // No Allow-Credentials: auth is a Bearer header, never a cookie, and
+            // credentials with a `*` origin is a combination browsers reject anyway.
+            'Access-Control-Allow-Headers': 'Content-Type, Authorization, Mcp-Session-Id, Mcp-Protocol-Version'
         }
     });
 };

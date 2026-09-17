@@ -15769,6 +15769,32 @@ ${STIPEND_DECISION_FIELDS}
     }
   }`,
 
+  // PLAN_MCP_TOOLS_V2 M1/M2 — what an external agent needs to know about a rikma
+  // before it plans anything: identity, links, members (usernames only), and the
+  // titles of what is open or running. Service path only: the MCP guard checks
+  // key scope + membership first, and the tool strips the private half for a
+  // non-member.
+  '320mcpProjectDetails': `query McpProjectDetails($pid: ID!) {
+    project(id: $pid) {
+      data {
+        id
+        attributes {
+          projectName publicDescription descripFor city spirit joinPolicy restime createdAt
+          codeLicense codeLicenseOpenYears
+          linkToWebsite githublink drivelink discordlink fblink twiterlink watsapplink
+          vallues { data { attributes { valueName localizations { data { attributes { valueName } } } } } }
+          user_1s { data { id attributes { username } } }
+          tafkidims { data { id attributes { roleDescription } } }
+          open_missions(filters: { and: [{ archived: { eq: false } }, { or: [{ source: { null: true } }, { source: { ne: "selfNomination" } }] }, ${NOT_ARCHIVED} ] }, pagination: { limit: 100 }) { data { id attributes { name } } }
+          mesimabetahaliches(filters: { and: [ { finnished: { ne: true } }, ${NOT_ARCHIVED} ] }, pagination: { limit: 100 }) { data { id attributes { name users_permissions_user { data { id attributes { username } } } } } }
+          open_mashaabims(filters: { and: [ { archived: { ne: true } }, ${NOT_ARCHIVED} ] }, pagination: { limit: 100 }) { data { id attributes { name kindOf } } }
+          mashabetahaliches(filters: { and: [ { finnished: { ne: true } }, ${NOT_ARCHIVED} ] }, pagination: { limit: 100 }) { data { id attributes { name kindOf users_permissions_user { data { id attributes { username } } } } } }
+          matanotofs(pagination: { limit: 100 }) { data { id attributes { name price } } }
+        }
+      }
+    }
+  }`,
+
   ...qids_base,
   ...moachQids,
   ...digestQids

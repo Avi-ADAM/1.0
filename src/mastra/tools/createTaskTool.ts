@@ -48,7 +48,8 @@ export const createTaskTool = createTool({
       isAssigned: inputData.assignedUserId ? true : !hasRoles
     };
 
-    console.log(`[createTaskTool] Executing for user: ${userId}`, actionParams);
+    // Ids only: names and descriptions are member-written and stay out of the logs.
+    console.log(`[createTaskTool] user ${userId} → project ${inputData.projectId}`);
 
     try {
       const result = await actionService.executeAction(

@@ -640,4 +640,6 @@ export const qidsAccess = {
   '317backfillResources': { allow: ['serviceAdmin'] },
   '318backfillProjects': { allow: ['serviceAdmin'] },
   '319backfillProducts': { allow: ['serviceAdmin'] },
+  // PLAN_MCP_TOOLS_V2 — read only by the MCP project tools, behind the MCP guard.
+  '320mcpProjectDetails': { allow: ['serviceAdmin'] },
 };
