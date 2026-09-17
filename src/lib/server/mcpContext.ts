@@ -29,6 +29,8 @@ export interface McpContext {
    * reach every rikma its owner belongs to. Enforced by `src/lib/server/mcp/guard.ts`.
    */
   keyProjects?: string[];
+  /** Strapi api-key record id of an external MCP caller (rate limits, audit). */
+  keyId?: string;
   /** Optional: last mission search result for disambiguation */
   lastMissionSearch?: {
     filter?: string;

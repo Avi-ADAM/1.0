@@ -160,6 +160,8 @@ export interface KeyCheck {
   /** The owning user (with normalized scopes) when the key verifies, else null. */
   user: any | null;
   verdict: KeyVerdict;
+  /** Strapi api-key record id when the key verifies — the rate-limit and audit identity. */
+  keyId?: string;
 }
 
 /**
@@ -180,6 +182,7 @@ export async function checkApiKey(rawKey: string | null | undefined): Promise<Ke
   const scopes = normalizeApiKeyScopes(detailed.scopes);
   return {
     user: scopes ? { ...detailed.user, scopes } : detailed.user,
-    verdict: 'ok'
+    verdict: 'ok',
+    keyId: detailed.keyId
   };
 }

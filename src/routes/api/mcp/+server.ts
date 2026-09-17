@@ -19,23 +19,8 @@ import { SITE_CONTEXT } from '$lib/bot/context';
 import { createTool } from '@mastra/core/tools';
 import { z } from 'zod';
 
-// Import timer and platform tools to expose them explicitly
-import { timerActionTool } from '../../../mastra/tools/timerActionTool';
-import { listUserMissionsTool, getActiveTimersTool, getMissionDetailsTool, getTimerHistoryTool, getMissionStatsTool } from '../../../mastra/tools/missionTimers';
-import { getSitePagesTool } from '../../../mastra/tools/siteNavigationTool';
-import { navigateToPageTool } from '../../../mastra/tools/navigateToPageTool';
-import { findMissionTool } from '../../../mastra/tools/findMissionTool';
-import { findUserProjectsTool } from '../../../mastra/tools/findUserProjectsTool';
-import { getPageContextTool } from '../../../mastra/tools/pageContextTool';
-import { createProjectTool } from '../../../mastra/tools/createProjectTool';
-import { createTaskTool } from '../../../mastra/tools/createTaskTool';
-import { getProjectMembersTool } from '../../../mastra/tools/getProjectMembersTool';
-import { getMemberMissionsTool } from '../../../mastra/tools/getMemberMissionsTool';
-import { prepareMissionTool } from '../../../mastra/tools/prepareMissionTool';
-import { createMissionTool } from '../../../mastra/tools/createMissionTool';
-import { createPlanBoardTool, planProjectWorkTool, scanProjectDirectionsTool } from '../../../mastra/tools/planningTools';
-import { getProjectDetailsTool, listProjectResourcesTool } from '../../../mastra/tools/projectDetailsTools';
-import { guardProjectTool } from '$lib/server/mcp/guard';
+import { wrapMcpTool } from '$lib/server/mcp/guard';
+import { MCP_TOOL_MANIFEST, tierAllowed } from '$lib/server/mcp/toolManifest';
 import { MCP_INSTRUCTIONS } from '$lib/server/mcp/instructions';
 import { normalizeApiKeyScopes } from '$lib/server/apiKeys';
 
@@ -129,26 +114,16 @@ function makeFixRejectedApiKeyTool(reason: 'malformed' | 'unknown' | 'revoked') 
     });
 }
 
-// --- Tool exposure, classified by blast radius ---------------------------
+// --- Tool exposure ------------------------------------------------------
 //
 // A key minted by the `npx 1lev1-mcp` flow carries no scopes, so the default
-// set has to be the one that is safe to hand an autonomous agent. The line we
-// draw is the platform's own: anything that only touches the key's owner is on
-// by default; anything that lands work or obligations on ANOTHER member needs
-// an explicit grant, because that is exactly the kind of act 1lev1 requires
-// human consent for.
-//
-//   read         — queries. Always available.
-//   prepare      — returns a prefilled URL, writes nothing. Always available.
-//   selfWrite    — changes only the caller's own records (their timers/hours).
-//   consentWrite — lands something on another member that still waits for
-//                  them: an act assigned to a person needs that person's
-//                  approval (`myIshur`), an act aimed at roles waits for one of
-//                  the holders to pick it up. Always available.
-//   sharedWrite  — creates obligations for other people. Requires 'mcp:write'.
-//
-// Scopes live on the api-key record; `ops` is the list we honour here.
-const MCP_WRITE_SCOPE = 'mcp:write';
+// set has to be the one that is safe to hand an autonomous agent. Which tools
+// exist, their blast-radius tier and how each is guarded (rate limit, key
+// scope, membership, audit) all live in one place: $lib/server/mcp/toolManifest.
+// Wrapped once here; the wrappers read the caller from the per-request context.
+const WRAPPED_TOOLS: Record<string, any> = Object.fromEntries(
+    Object.entries(MCP_TOOL_MANIFEST).map(([name, entry]) => [name, wrapMcpTool(entry.tool, entry)])
+);
 
 /** Reads the `ops` list off a verified key's scopes, if it has any. */
 function keyOps(user: any): string[] {
@@ -168,6 +143,7 @@ async function handleMcpRequest(request: Request, url: URL, svelteFetch: typeof 
     let user = null;
     let apiKey = null;
     let verdict: KeyVerdict = 'absent';
+    let keyId: string | undefined;
 
     if (authHeader) {
         apiKey = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : authHeader;
@@ -175,7 +151,7 @@ async function handleMcpRequest(request: Request, url: URL, svelteFetch: typeof 
         // distinction: "you sent a dead key" and "you sent no key" need different
         // answers, and conflating them is what made a revoked key look like an
         // unregistered user for three restarts running.
-        ({ user, verdict } = await checkApiKey(apiKey));
+        ({ user, verdict, keyId } = await checkApiKey(apiKey));
         console.log(
             `[MCP] Request from ${user ? 'authenticated user: ' + user.id : `client with a ${verdict} key`}` +
             ` at ${url.pathname} (${request.method})`
@@ -207,7 +183,8 @@ async function handleMcpRequest(request: Request, url: URL, svelteFetch: typeof 
         setMcpContext({
             userId: user.id.toString(),
             fetchInstance: svelteFetch,
-            keyProjects: normalizeApiKeyScopes(user.scopes)?.projects
+            keyProjects: normalizeApiKeyScopes(user.scopes)?.projects,
+            keyId
         });
 
         // Agents and workflows are deliberately NOT exposed. MCPServer turns
@@ -220,72 +197,17 @@ async function handleMcpRequest(request: Request, url: URL, svelteFetch: typeof 
         agentsToExpose = {};
         workflowsToExpose = {};
 
-        // Every tool that takes a projectId is wrapped at exposure, so the key's
-        // project scope and the caller's membership are checked before the tool
-        // runs on the service token (PLAN_MCP_TOOLS_V2 §1). `member` = must be a
-        // member; `scope` = key scope only, for tools that serve the public face
-        // or whose projectId merely filters the caller's own records.
-        const member = <T extends { id: string }>(t: T) => guardProjectTool(t, { requireMember: true });
-        const scope = <T extends { id: string }>(t: T) => guardProjectTool(t, { requireMember: false });
-
-        const readTools = {
-            listUserMissionsTool: scope(listUserMissionsTool),
-            getActiveTimersTool,
-            getMissionDetailsTool,
-            getTimerHistoryTool: scope(getTimerHistoryTool),
-            getMissionStatsTool: scope(getMissionStatsTool),
-            getSitePagesTool,
-            getPageContextTool,
-            findMissionTool,
-            findUserProjectsTool,
-            getProjectDetailsTool: scope(getProjectDetailsTool),
-            listProjectResourcesTool: scope(listProjectResourcesTool),
-            getProjectMembersTool: member(getProjectMembersTool),
-            getMemberMissionsTool: member(getMemberMissionsTool)
-        };
-
-        const prepareTools = {
-            navigateToPageTool,
-            createProjectTool,     // returns a prefilled URL; the human creates it
-            prepareMissionTool: member(prepareMissionTool),    // ditto
-            planProjectWorkTool: member(planProjectWorkTool),
-            createPlanBoardTool: member(createPlanBoardTool),   // proposals only, like planProjectWorkTool
-            scanProjectDirectionsTool: member(scanProjectDirectionsTool)
-        };
-
-        // Only ever touches the caller's own timers/hours.
-        const selfWriteTools = {
-            timerActionTool
-        };
-
-        // Creating an act is the everyday move for a member who wants something
-        // new done in a project, so it is never hidden behind a scope. It runs
-        // with the admin token, but `createTask` is projectMember-gated on the
-        // key's owner, and nobody is bound by it until they accept it.
-        const consentWriteTools = {
-            createTaskTool: member(createTaskTool)
-        };
-
-        // Publishes work directly, with no human approving the form.
-        const sharedWriteTools = {
-            createMissionTool: member(createMissionTool)
-        };
-
         const ops = keyOps(user);
-        const mayWriteShared = ops.includes(MCP_WRITE_SCOPE);
-
-        toolsToExpose = {
-            ...readTools,
-            ...prepareTools,
-            ...selfWriteTools,
-            ...consentWriteTools,
-            ...(mayWriteShared ? sharedWriteTools : {}),
-            howToConnect // Included even in auth mode for convenience
-        };
+        toolsToExpose = { howToConnect }; // included even in auth mode for convenience
+        const withheld: string[] = [];
+        for (const [name, entry] of Object.entries(MCP_TOOL_MANIFEST)) {
+            if (tierAllowed(entry.tier, ops)) toolsToExpose[name] = WRAPPED_TOOLS[name];
+            else withheld.push(name);
+        }
 
         console.log(
-            `[MCP] user ${user.id}: exposing ${Object.keys(toolsToExpose).length} tools ` +
-            `(shared-write ${mayWriteShared ? 'granted' : 'withheld — needs the ' + MCP_WRITE_SCOPE + ' scope'})`
+            `[MCP] user ${user.id}: exposing ${Object.keys(toolsToExpose).length} tools` +
+            (withheld.length ? ` (withheld by key scope: ${withheld.join(', ')})` : '')
         );
     } else {
         // A spec client (claude.ai, or anything else that speaks the MCP

@@ -10,7 +10,7 @@ vi.mock('../../lib/server/mcpContext.js', () => ({
   getMcpContext: () => getMcpContext()
 }));
 
-const { shapeProjectDetails, safeUrl, getProjectDetailsTool, listProjectResourcesTool } = await import(
+const { shapeProjectDetails, shapeProjectStats, safeUrl, getProjectDetailsTool, listProjectResourcesTool } = await import(
   './projectDetailsTools'
 );
 
@@ -104,5 +104,53 @@ describe('tools', () => {
     const res: any = await (getProjectDetailsTool as any).execute({ projectId: '89' }, {});
     expect(res.success).toBe(false);
     expect(res.message).not.toMatch(/GraphQL/);
+  });
+});
+
+describe('shapeProjectStats', () => {
+  const count = (total: number) => ({ meta: { pagination: { total } } });
+
+  it('counts, sums hours and finds the latest activity', () => {
+    const s = shapeProjectStats(
+      {
+        project: { data: { id: '89', attributes: { projectName: 'Rikma', user_1s: { data: [{ id: '1' }, { id: '2' }] } } } },
+        openMissions: count(3),
+        inProgress: count(2),
+        openResources: count(1),
+        openDecisions: count(4),
+        activeTimers: count(1),
+        finishedRecent: {
+          ...count(2),
+          data: [
+            { attributes: { noofhours: 5.25, createdAt: '2026-09-10T10:00:00.000Z' } },
+            { attributes: { noofhours: 2, createdAt: '2026-09-01T10:00:00.000Z' } }
+          ]
+        },
+        savedRecent: { data: [{ attributes: { totalHours: 1.04 } }, { attributes: { totalHours: null } }] },
+        lastDecision: { data: [{ attributes: { createdAt: '2026-09-12T08:00:00.000Z' } }] },
+        lastTimer: { data: [] }
+      },
+      30
+    )!;
+    expect(s).toMatchObject({
+      projectId: '89',
+      members: 2,
+      openMissions: 3,
+      missionsInProgress: 2,
+      openResources: 1,
+      openDecisions: 4,
+      activeTimers: 1,
+      missionsFinishedInWindow: 2,
+      approvedHoursInWindow: 7.3,
+      savedTimerHoursInWindow: 1,
+      lastActivityAt: '2026-09-12T08:00:00.000Z'
+    });
+  });
+
+  it('returns null for a missing rikma and zeros for empty data', () => {
+    expect(shapeProjectStats({ project: { data: null } }, 30)).toBeNull();
+    const s = shapeProjectStats({ project: { data: { id: '1', attributes: {} } } }, 7)!;
+    expect(s.openMissions).toBe(0);
+    expect(s.lastActivityAt).toBeNull();
   });
 });

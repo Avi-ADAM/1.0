@@ -15795,6 +15795,26 @@ ${STIPEND_DECISION_FIELDS}
     }
   }`,
 
+  // PLAN_MCP_TOOLS_V2 M3 — a rikma's pulse as counts only, no per-member money.
+  // `limit: 1` + meta.total is the cheap count; the two 500-row pulls sum hours.
+  '321mcpProjectStats': `query McpProjectStats($pid: ID!, $since: DateTime!) {
+    project(id: $pid) { data { id attributes { projectName user_1s(pagination: { limit: 500 }) { data { id } } } } }
+    openMissions(filters: { and: [ { project: { id: { eq: $pid } } }, { archived: { eq: false } }, ${NOT_ARCHIVED} ] }, pagination: { limit: 1 }) { meta { pagination { total } } }
+    inProgress: mesimabetahaliches(filters: { and: [ { project: { id: { eq: $pid } } }, { finnished: { ne: true } }, ${NOT_ARCHIVED} ] }, pagination: { limit: 1 }) { meta { pagination { total } } }
+    openResources: openMashaabims(filters: { and: [ { project: { id: { eq: $pid } } }, { archived: { ne: true } }, ${NOT_ARCHIVED} ] }, pagination: { limit: 1 }) { meta { pagination { total } } }
+    openDecisions: decisions(filters: { projects: { id: { eq: $pid } }, archived: { eq: false } }, pagination: { limit: 1 }) { meta { pagination { total } } }
+    activeTimers: timers(filters: { project: { id: { eq: $pid } }, isActive: { eq: true } }, pagination: { limit: 1 }) { meta { pagination { total } } }
+    finishedRecent: finnishedMissions(filters: { project: { id: { eq: $pid } }, createdAt: { gte: $since } }, sort: "createdAt:desc", pagination: { limit: 500 }) {
+      meta { pagination { total } }
+      data { attributes { noofhours createdAt } }
+    }
+    savedRecent: timers(filters: { project: { id: { eq: $pid } }, saved: { eq: true }, updatedAt: { gte: $since } }, sort: "updatedAt:desc", pagination: { limit: 500 }) {
+      data { attributes { totalHours updatedAt } }
+    }
+    lastDecision: decisions(filters: { projects: { id: { eq: $pid } } }, sort: "createdAt:desc", pagination: { limit: 1 }) { data { attributes { createdAt } } }
+    lastTimer: timers(filters: { project: { id: { eq: $pid } } }, sort: "updatedAt:desc", pagination: { limit: 1 }) { data { attributes { updatedAt } } }
+  }`,
+
   ...qids_base,
   ...moachQids,
   ...digestQids

@@ -220,3 +220,91 @@ export const listProjectResourcesTool = createTool({
     }
   }
 });
+
+const total = (conn: any): number => conn?.meta?.pagination?.total ?? 0;
+const round1 = (n: number): number => Math.round(n * 10) / 10;
+
+export interface ProjectStats {
+  projectId: string;
+  projectName: string;
+  windowDays: number;
+  members: number;
+  openMissions: number;
+  missionsInProgress: number;
+  openResources: number;
+  openDecisions: number;
+  activeTimers: number;
+  missionsFinishedInWindow: number;
+  approvedHoursInWindow: number;
+  savedTimerHoursInWindow: number;
+  lastActivityAt: string | null;
+}
+
+/** Pure mapping from qid 321. Counts only — nothing about any one member's money. */
+export function shapeProjectStats(data: any, windowDays: number): ProjectStats | null {
+  const project = data?.project?.data;
+  if (!project?.id) return null;
+  const finished = rows(data.finishedRecent);
+  const saved = rows(data.savedRecent);
+  const sum = (list: any[], field: string) =>
+    list.reduce((acc, r) => acc + (Number(r?.attributes?.[field]) || 0), 0);
+
+  const stamps = [
+    rows(data.lastDecision)[0]?.attributes?.createdAt,
+    rows(data.lastTimer)[0]?.attributes?.updatedAt,
+    finished[0]?.attributes?.createdAt
+  ].filter((s): s is string => typeof s === 'string' && !Number.isNaN(Date.parse(s)));
+  const lastActivityAt = stamps.length
+    ? new Date(Math.max(...stamps.map((s) => Date.parse(s)))).toISOString()
+    : null;
+
+  return {
+    projectId: String(project.id),
+    projectName: project.attributes?.projectName ?? '',
+    windowDays,
+    members: rows(project.attributes?.user_1s).length,
+    openMissions: total(data.openMissions),
+    missionsInProgress: total(data.inProgress),
+    openResources: total(data.openResources),
+    openDecisions: total(data.openDecisions),
+    activeTimers: total(data.activeTimers),
+    missionsFinishedInWindow: total(data.finishedRecent),
+    approvedHoursInWindow: round1(sum(finished, 'noofhours')),
+    savedTimerHoursInWindow: round1(sum(saved, 'totalHours')),
+    lastActivityAt
+  };
+}
+
+export const getProjectStatsTool = createTool({
+  id: 'getProjectStats',
+  description:
+    'Get the pulse of one rikma as numbers: members, open missions, missions in progress, open resources, open decisions (votes), ' +
+    'active timers, missions finished and hours logged in the last N days, and when anything last happened. ' +
+    'Use it to judge whether a rikma is active before planning. Members only; no per-member financial data.',
+  inputSchema: z.object({
+    projectId: z.string().describe('Rikma (project) id, from findUserProjectsTool.'),
+    days: z.number().int().min(1).max(365).optional().describe('Window for the "recent" numbers, default 30.')
+  }),
+  execute: async ({ projectId, days }) => {
+    const ctx = getMcpContext();
+    if (!ctx?.userId || !ctx.fetchInstance) return { success: false, message: 'Not authenticated.' };
+    const windowDays = days ?? 30;
+    try {
+      const since = new Date(Date.now() - windowDays * 24 * 60 * 60 * 1000).toISOString();
+      const res: any = await sendToSer(
+        { pid: String(projectId), since },
+        '321mcpProjectStats',
+        0,
+        0,
+        !ctx.isInternalBot,
+        ctx.fetchInstance
+      );
+      const stats = shapeProjectStats(res?.data, windowDays);
+      if (!stats) return { success: false, message: `Rikma ${projectId} was not found.` };
+      return { success: true, ...stats };
+    } catch (error) {
+      console.error('[getProjectStats] failed:', error);
+      return { success: false, message: 'Could not load the rikma stats right now. Try again shortly.' };
+    }
+  }
+});

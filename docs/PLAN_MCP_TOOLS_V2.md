@@ -175,8 +175,8 @@
 |---|---|---|---|
 | **P0** | G1, G2 (שער מרכזי), G4 (`instructions`), G5, G6, G8 | — | ✅ 2026-09-17 (ראו §7) |
 | **P1** | M1 `getProjectDetailsTool` + M2-list `listProjectResourcesTool` | P0 | ✅ 2026-09-17 (ראו §7) |
-| **P1b** | שארית P0: מניפסט כלים + בדיקה; תחום מפתח לכלים לפי `missionId`; סינון רשימות משימות למפתח מוגבל | P0 | ⏳ |
-| **P2** | G7 הגבלת קצב + audit log; M3 `getProjectStats` | P0 | ⏳ |
+| **P1b** | שארית P0: מניפסט כלים + בדיקה; תחום מפתח לכלים לפי `missionId`; סינון רשימות משימות למפתח מוגבל | P0 | ✅ 2026-09-17 |
+| **P2** | G7 הגבלת קצב + audit log; M3 `getProjectStatsTool` | P0 | ✅ 2026-09-17 |
 | **P3** | M7 קונסיירז' — קריאה: `searchCatalog`, `listMyWishes`, `getWishDetails`, `listWishRequestsToMe` | P2 (קצב) | ⏳ |
 | **P4** | M7 כתיבה: `previewWish`, `draftWish` | P2 (דלי `ai`) | ⏳ |
 | **P5** | M4 `postProjectUpdate` + M2 `proposeProjectLink` (שכבת `communicate`) | D1, P2 | ⏳ |
@@ -233,3 +233,34 @@
 - **לא אומת מקצה לקצה**: המפתח ב-`~/.claude.json` נדחה (`unknown`), גם בפרודקשן וגם מקומית.
   צריך מפתח חדש (`npx 1lev1-mcp`) כדי להריץ `tools/list` ו-`getProjectDetailsTool` מאומתים.
 - **שים לב**: כלי עטוף לא מצהיר `outputSchema` (אחרת הסירוב נדחה כפלט פגום).
+
+### 2026-09-17 — P1b + P2
+
+- **מניפסט אחד** — `src/lib/server/mcp/toolManifest.ts` הוא כעת רשימת החשיפה: שם הכלי,
+  השכבה, איך הוא נשמר (`project`/`mission`: `member` או `scope`), האם הוא עולה כסף
+  (`ai`), מה נדרש ממפתח מוגבל ואילו מערכי פלט מצטמצמים לתחומו. `+server.ts` רק עובר
+  על המניפסט — כלי שלא רשום שם פשוט לא קיים ללקוח.
+  - `toolManifest.test.ts` נכשל אם כלי מקבל `projectId`/`missionId` בלי מדיניות. הבדיקה
+    כבר תפסה אחד: ל-`createTaskTool` יש `missionId`, ובלי שער אפשר היה לתלות מטלה
+    במשימה של רקמה זרה.
+- **פערים נוספים שנסגרו**:
+  - `getMissionDetailsTool` קרא כל משימה לפי מספר בלי לבדוק כלום. עכשיו `mission:'member'`,
+    דרך הרקמה שהמשימה שייכת לה, והסירוב לא מגלה איזו רקמה זו.
+  - `timerActionTool` — תחום מפתח על המשימה, ומפתח מוגבל חייב לציין `missionId`
+    (בלעדיו הכלי "מוצא את הטיימר הרץ", שיכול להיות ברקמה אחרת).
+  - `getActiveTimersTool` מחזיר `projectId` לכל טיימר, אחרת אי אפשר לצמצם את הרשימה.
+  - `getTimerHistoryTool` **הוסר מהחשיפה** — הוא קורא ל-qid `getTimerHistory` שמעולם לא
+    נכתב, כלומר תמיד נכשל. יחזור כשתהיה לו שאילתה אמיתית.
+- **הגבלת קצב (G7)** — `rateLimit.ts`, דלי אסימונים בזיכרון לפי מפתח:
+  read 120/דקה, write 20/דקה, `ai` 10/שעה (scanProjectDirections, planProjectWork —
+  שניהם קוראים ל-Gemini). התשובה היא `{rateLimited:true, retryAfterSeconds}`.
+  מגבלה ידועה: הדלי הוא per-process, כך שמאחורי N מכונות המגבלה בפועל היא ×N — זה שומר
+  מפני לולאת סוכן, לא מונה חיוב.
+- **Audit** — `audit.ts`: שורת JSON לכל כתיבה, ריצת AI וכל סירוב (keyId, userId, כלי,
+  שכבה, רקמה, תוצאה, משך). בלי תוכן הפרמטרים. עדיין ללוג בלבד; collection ייעודי
+  ייבחן אם יידרש.
+- **M3** — `getProjectStatsTool` + qid `321mcpProjectStats`: חברים, משימות פתוחות/בתהליך,
+  משאבים פתוחים, החלטות פתוחות, טיימרים פעילים, משימות שהסתיימו ושעות ב-N הימים
+  האחרונים (ברירת מחדל 30), ותאריך הפעילות האחרונה. מספרים בלבד, חברים בלבד.
+- **בדיקות**: 42 ב-`src/lib/server/mcp` (guard 20, manifest 8, rateLimit 3, keyDiagnosis 11),
+  ועוד 9 ב-`projectDetailsTools.test.ts`. `npm run check` חזר לבסיס.
