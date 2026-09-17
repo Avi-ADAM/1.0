@@ -42,6 +42,12 @@ import {
   scanProjectDirectionsTool
 } from '../../../mastra/tools/planningTools';
 import {
+  searchCatalogTool,
+  listMyWishesTool,
+  getWishDetailsTool,
+  listMyWishOffersTool
+} from '../../../mastra/tools/conciergeTools';
+import {
   getProjectDetailsTool,
   listProjectResourcesTool,
   getProjectStatsTool
@@ -70,6 +76,13 @@ export const MCP_TOOL_MANIFEST: Record<string, McpManifestEntry> = {
   getActiveTimersTool: { tool: getActiveTimersTool, tier: 'read', scopedOutput: ['timers'] },
   // Aggregates can't be narrowed after the fact — a scoped key must name the rikma.
   getMissionStatsTool: { tool: getMissionStatsTool, tier: 'read', project: 'scope', scopedKeyNeeds: 'projectId' },
+  // --- concierge reads (M7). No projectId: a wish belongs to a person, not to a
+  // rikma, so each tool keys itself to the caller or checks the viewer inside.
+  searchCatalogTool: { tool: searchCatalogTool, tier: 'read' },
+  listMyWishesTool: { tool: listMyWishesTool, tier: 'read' },
+  getWishDetailsTool: { tool: getWishDetailsTool, tier: 'read' },
+  listMyWishOffersTool: { tool: listMyWishOffersTool, tier: 'read' },
+
   getSitePagesTool: { tool: getSitePagesTool, tier: 'read' },
   getPageContextTool: { tool: getPageContextTool, tier: 'read' },
 

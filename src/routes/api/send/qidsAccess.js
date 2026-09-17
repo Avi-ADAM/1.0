@@ -643,4 +643,5 @@ export const qidsAccess = {
   // PLAN_MCP_TOOLS_V2 — read only by the MCP project tools, behind the MCP guard.
   '320mcpProjectDetails': { allow: ['serviceAdmin'] },
   '321mcpProjectStats': { allow: ['serviceAdmin'] },
+  '322mcpMyWishOffers': { allow: ['serviceAdmin'] },
 };

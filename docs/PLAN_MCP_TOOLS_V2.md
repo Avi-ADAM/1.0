@@ -177,7 +177,7 @@
 | **P1** | M1 `getProjectDetailsTool` + M2-list `listProjectResourcesTool` | P0 | ✅ 2026-09-17 (ראו §7) |
 | **P1b** | שארית P0: מניפסט כלים + בדיקה; תחום מפתח לכלים לפי `missionId`; סינון רשימות משימות למפתח מוגבל | P0 | ✅ 2026-09-17 |
 | **P2** | G7 הגבלת קצב + audit log; M3 `getProjectStatsTool` | P0 | ✅ 2026-09-17 |
-| **P3** | M7 קונסיירז' — קריאה: `searchCatalog`, `listMyWishes`, `getWishDetails`, `listWishRequestsToMe` | P2 (קצב) | ⏳ |
+| **P3** | M7 קונסיירז' — קריאה: `searchCatalogTool`, `listMyWishesTool`, `getWishDetailsTool`, `listMyWishOffersTool` | P2 (קצב) | ✅ 2026-09-17 |
 | **P4** | M7 כתיבה: `previewWish`, `draftWish` | P2 (דלי `ai`) | ⏳ |
 | **P5** | M4 `postProjectUpdate` + M2 `proposeProjectLink` (שכבת `communicate`) | D1, P2 | ⏳ |
 | **P6** | M5 `searchContent` | P2 | ⏳ |
@@ -264,3 +264,29 @@
   האחרונים (ברירת מחדל 30), ותאריך הפעילות האחרונה. מספרים בלבד, חברים בלבד.
 - **בדיקות**: 42 ב-`src/lib/server/mcp` (guard 20, manifest 8, rateLimit 3, keyDiagnosis 11),
   ועוד 9 ב-`projectDetailsTools.test.ts`. `npm run check` חזר לבסיס.
+
+### 2026-09-17 — P3 (קונסיירז', קריאה)
+
+ארבעה כלים ב-`src/mastra/tools/conciergeTools.ts`, כולם `read`:
+
+- `searchCatalogTool(query, kinds?, limit?)` — מה שכבר מוצע בציבור: מוצרים (282),
+  משימות פתוחות (283), משאבים פתוחים (284). מסנן `isHiddenProject`, מחזיר תקציר
+  נקי מ-HTML (300 תווים) וקישור לעמוד הציבורי. מטרתו לענות "אולי מישהו כבר עושה את זה"
+  לפני שנפתחת משאלה או משימה חדשה.
+- `listMyWishesTool()` — המשאלות של המתקשר (106), עם סטטוס, ציון כיסוי ומספר
+  המשימות/המשאבים שחסרים. מזהה המשתמש מגיע מהמפתח, לא מהקלט.
+- `getWishDetailsTool(wishId)` — משאלה אחת (105). **הבעלים ומי שהגיש הצעה** רואים את
+  הפירוק ואת ההצעות; כל אחד אחר מקבל את הכרטיס הציבורי, ורק אם המשאלה באמת פתוחה —
+  טיוטה, `access_mode:'personal'` או משאלה שמומשה מוחזרות כ-`denied`.
+- `listMyWishOffersTool()` — צד הספק: כל ההצעות שהמתקשר הוא המציע בהן (qid חדש
+  `322mcpMyWishOffers`), כלומר גם מה שלקוח ביקש ממנו. התגובה עצמה נשארת בעמוד.
+
+**קבלה או דחייה של הצעה לא קיימות כאן** (D2 + §1.5): הכלים מחזירים URL, ואדם לוחץ.
+ה-`instructions` מסבירים עכשיו גם מה זו משאלה ומתי להתחיל מ-`searchCatalogTool`.
+
+לא הוגדר דגל `CONCIERGE_MCP_ENABLED` לשלב הזה: ארבעת הכלים קוראים בלבד, ותחת אותם
+שערי זהות כמו שאר הכלים. הדגל יידרש ב-P4, כשנכנסת כתיבה (`draftWish`) וחילוץ שעולה כסף
+(`previewWish`, דלי `ai`).
+
+**בדיקות**: `conciergeTools.test.ts` (20) — כולל צופה-זר מול טיוטה/משאלה אישית,
+סינון רקמות מוסתרות, ושגיאת backend שלא דולפת.

@@ -15815,6 +15815,31 @@ ${STIPEND_DECISION_FIELDS}
     lastTimer: timers(filters: { project: { id: { eq: $pid } } }, sort: "updatedAt:desc", pagination: { limit: 1 }) { data { attributes { updatedAt } } }
   }`,
 
+  // PLAN_MCP_TOOLS_V2 M7 — the supplier side of the concierge: every proposal
+  // this member is the proposer of, which is what a wisher's request to them
+  // becomes (`requestWishMission` / `requestWishResource` create it).
+  '322mcpMyWishOffers': `query McpMyWishOffers($uid: ID!) {
+    ratsonProposals(
+      filters: { proposer_users: { id: { eq: $uid } } }
+      sort: ["createdAt:desc"]
+      pagination: { limit: 50 }
+    ) {
+      data {
+        id
+        attributes {
+          kind
+          status_proposal
+          total_price
+          createdAt
+          ratson { data { id attributes { name desc status_ratson fulfilled } } }
+          project { data { id attributes { projectName } } }
+          matanot { data { id attributes { name } } }
+          open_mission { data { id attributes { name } } }
+        }
+      }
+    }
+  }`,
+
   ...qids_base,
   ...moachQids,
   ...digestQids
