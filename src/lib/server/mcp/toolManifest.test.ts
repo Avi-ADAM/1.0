@@ -39,9 +39,10 @@ describe('MCP tool manifest', () => {
   });
 
   it('every write names a rikma or mission guard', () => {
-    // draftWish creates a wish on the caller's own account: it names no rikma,
-    // and the caller's identity comes from the key, so there is nothing to gate.
-    const OWN_RECORD_ONLY = ['draftWishTool'];
+    // draftWish creates a wish on the caller's own account; posting is gated by
+    // the forum's own participant rule plus forumAllowedByKey inside the tool.
+    // Neither names a rikma in its input, so there is nothing for the wrapper to gate.
+    const OWN_RECORD_ONLY = ['draftWishTool', 'postConversationMessageTool'];
     for (const [name, entry] of entries) {
       if (entry.tier === 'read' || entry.tier === 'prepare') continue;
       if (OWN_RECORD_ONLY.includes(name)) continue;

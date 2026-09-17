@@ -179,7 +179,7 @@
 | **P2** | G7 הגבלת קצב + audit log; M3 `getProjectStatsTool` | P0 | ✅ 2026-09-17 |
 | **P3** | M7 קונסיירז' — קריאה: `searchCatalogTool`, `listMyWishesTool`, `getWishDetailsTool`, `listMyWishOffersTool` | P2 (קצב) | ✅ 2026-09-17 |
 | **P4** | M7 כתיבה: `previewWishTool`, `draftWishTool` | P2 (דלי `ai`) | ✅ 2026-09-17 |
-| **P5** | M4 `postProjectUpdate` + M2 `proposeProjectLink` (שכבת `communicate`) | D1, P2 | ⏳ |
+| **P5** | M4 שיחות (`listMyConversations`/`readConversation`/`postConversationMessage`) + M2 `proposeProjectLink` | D1, P2 | ✅ 2026-09-17 |
 | **P6** | M5 `searchContent` | P2 | ⏳ |
 | **P7** | M6 Outreach (Strapi collection + 2 actions + 3 כלים + תצוגה במואך) | שינוי backend | ⏳ |
 | **P8** | `publishWish`, עדכון ה-skill `1lev1-platform` ו-`PLAN_MCP_SKILL` | D2 | ⏳ |
@@ -315,3 +315,42 @@
   הציבורי כן. לדרוש `locals.uid` או מגבלת קצב לפי IP.
 - P5–P8 כמתוכנן: `postProjectUpdate` + `proposeProjectLink`, `searchContent`, Outreach,
   ואז עדכון ה-skill.
+
+### 2026-09-17 — P5 (שיחות + קישורים)
+
+**סטייה מהתכנית, במכוון**: M4 דיבר על "הודעה ל-forum הראשי של הרקמה". **אין דבר כזה.**
+פורום במודל הזה תלוי ב*דבר* — משימה, מטלה, החלטה, חלוקה, הצעה למשאלה — והמשתתפים שלו
+הם בדיוק האנשים שאותו דבר נוגע להם. "לפרסם לרקמה" היה אומר להמציא חדר שאף אחד לא קורא.
+לכן במקום `postProjectUpdate` יש שלושה כלים ב-`src/mastra/tools/forumTools.ts`:
+
+- `listMyConversationsTool(projectId?, limit?)` — השיחות שהמתקשר משתתף בהן (action
+  `getUserForums`, שכבר מחזיר רק מה שמותר לו), עם ההודעה האחרונה.
+- `readConversationTool(forumId, limit?)` — הודעות השרשור (action `getForumThread`,
+  עם `forumParticipant`).
+- `postConversationMessageTool(forumId, message)` — שכבת `communicate` (D1): כתיבה בשם
+  המשתמש בשרשור שהוא חלק ממנו, עד 4,000 תווים. התיאור אומר במפורש: רק כשהמשתמש ביקש,
+  ולעולם לא כדי לאשר או לסרב בשמו.
+
+שימוש ב-actions ולא ב-qid גולמי הוא הנקודה: כלל `forumParticipant` כבר קיים שם.
+מה שהעטיפה הכללית **לא** יכולה לבדוק כאן הוא תחום המפתח — הקלט מזהה פורום, ורק
+השרשור הטעון יודע לאיזו רקמה הוא שייך. לכן `forumAllowedByKey` יושב בתוך הכלים:
+הרשימה מסוננת, קריאה נדחית, וכתיבה עם מפתח מוגבל **טוענת את השרשור קודם** ורק אז כותבת.
+פורום בלי רקמה (הצעה למשאלה) הוא מחוץ לכל תחום מפתח.
+
+**מה שלא נעשה ולמה**: אין תגית "נכתב דרך סוכן" על ההודעה. ל-`Message` אין שדה מטא־דאטה
+(`content`, `when`, `forum`, מחבר — זה הכל), ו-`md` שהפעולה מקבלת פשוט נזרק. סימון כזה
+דורש שדה ב-Strapi; בינתיים ה-audit רושם את זה. **פתוח.**
+
+**M2 — `proposeProjectLinkTool(projectId, kind, url)`**: אתר, GitHub, Drive, Discord,
+פייסבוק, X, וואטסאפ. `consentWrite`, חברים בלבד.
+- מלכודת אמיתית שנמצאה תוך כדי: `updateProjectDetails` כותב את **כל** שדות הקישורים בשני
+  המסלולים שלו, כך ששדה שלא נשלח נכתב כ-NULL. כלומר קריאה תמימה "רק תוסיף GitHub" הייתה
+  מוחקת את שאר הקישורים ואת התיאור. הכלי קורא קודם את הרקמה (qid 320) ומחזיר את כל מה
+  שלא משתנה. `buildLinkUpdate` בדוק בדיוק על זה.
+- גם יצא מזה תיקון ל-qid 320: `vallues` נשלף בלי `id`, ובלי זה הערכים היו נשלחים בחזרה
+  כ-`"undefined"`.
+- ההסכמה נשארת במקומה: ברקמה עם יותר מחבר אחד ה-action פותח Decision לאתר/פייסבוק לבד,
+  והכלי רק מדווח `decisionOpened:true`.
+
+**בדיקות**: `forumTools.test.ts` (13) + 5 חדשות ב-`projectDetailsTools.test.ts`. סה"כ 124
+ב-`src/mastra` + `src/lib/server/mcp`.

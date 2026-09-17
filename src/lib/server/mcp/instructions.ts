@@ -14,6 +14,7 @@ Vocabulary:
 - resource (mashaabim): something a partner brings - equipment, money, a service, a space. Open resource = needed; in progress = someone provides it.
 - product (matanot): what the rikma sells. A sale is income; a haluka is a profit split between partners.
 - decision: a vote of the rikma. restime is the rikma's consent clock.
+- conversation (forum): the thread attached to one mission, act, decision, profit split or wish proposal. There is no rikma-wide chat room.
 - wish (ratson): a request in the concierge - someone describes what they need, the platform breaks it into missions and resources, and partners or suppliers propose on it. A wish can be personal (something made to order, a trip, a renovation) or shared.
 
 House rules - they shape what you should do:

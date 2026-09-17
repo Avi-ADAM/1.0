@@ -308,3 +308,126 @@ export const getProjectStatsTool = createTool({
     }
   }
 });
+
+// ── M2: proposing a link ───────────────────────────────────────────────────
+//
+// `updateProjectDetails` writes the whole set of links every time: a field the
+// call leaves out is written as NULL, in both its paths. So this tool reads the
+// rikma first and sends back everything that is not being changed. Where the
+// action opens a Decision instead (website and Facebook in a rikma with more
+// than one member), it does — the consent rules stay exactly where they are.
+
+const LINK_FIELDS = {
+  website: 'linkToWebsite',
+  github: 'githublink',
+  drive: 'drivelink',
+  discord: 'discordlink',
+  facebook: 'fblink',
+  x: 'twiterlink',
+  whatsapp: 'watsapplink'
+} as const;
+
+type LinkKind = keyof typeof LINK_FIELDS;
+
+/** The unchanged fields the action would otherwise overwrite with NULL. */
+export function buildLinkUpdate(attrs: any, field: string, url: string | null) {
+  const current: Record<string, unknown> = {
+    projectName: attrs?.projectName,
+    publicDescription: attrs?.publicDescription ?? '',
+    descripFor: attrs?.descripFor ?? '',
+    linkToWebsite: attrs?.linkToWebsite ?? '',
+    githublink: attrs?.githublink ?? '',
+    fblink: attrs?.fblink ?? '',
+    discordlink: attrs?.discordlink ?? '',
+    drivelink: attrs?.drivelink ?? '',
+    twiterlink: attrs?.twiterlink ?? '',
+    watsapplink: attrs?.watsapplink ?? '',
+    restime: attrs?.restime ?? undefined,
+    // Ids only: a row without one would go back as the string "undefined" and
+    // the update would fail or drop the value.
+    vallueIds: rows(attrs?.vallues)
+      .map((v: any) => (v?.id == null ? null : String(v.id)))
+      .filter(Boolean)
+  };
+  return { ...current, [field]: url ?? '' };
+}
+
+export const proposeProjectLinkTool = createTool({
+  id: 'proposeProjectLink',
+  description:
+    "Set or clear one of a rikma's links - its website, GitHub repo, Drive, Discord, Facebook, X or WhatsApp. " +
+    'In a rikma with more than one member, changing the website or the Facebook link opens a decision the members vote on ' +
+    '(silence approves it when the rikma clock runs out); the other links change directly. Members only. ' +
+    'Check listProjectResourcesTool first - the link may already be there.',
+  inputSchema: z.object({
+    projectId: z.string().describe('Rikma (project) id.'),
+    kind: z
+      .enum(['website', 'github', 'drive', 'discord', 'facebook', 'x', 'whatsapp'])
+      .describe('Which link to set.'),
+    url: z.string().describe('The URL. Pass an empty string to clear the link.')
+  }),
+  execute: async ({ projectId, kind, url }) => {
+    const ctx = getMcpContext();
+    if (!ctx?.userId || !ctx.fetchInstance) return { success: false, message: 'Not authenticated.' };
+
+    const clearing = String(url).trim() === '';
+    const safe = clearing ? null : safeUrl(url);
+    if (!clearing && !safe) {
+      return { success: false, message: 'That is not a usable http(s) URL, so nothing was changed.' };
+    }
+
+    try {
+      const res: any = await sendToSer(
+        { pid: String(projectId) },
+        '320mcpProjectDetails',
+        0,
+        0,
+        !ctx.isInternalBot,
+        ctx.fetchInstance
+      );
+      const attrs = res?.data?.project?.data?.attributes;
+      if (!attrs) return { success: false, message: `Rikma ${projectId} was not found.` };
+
+      const field = LINK_FIELDS[kind as LinkKind];
+      const [{ actionService }, { normalizeAdminToken }] = await Promise.all([
+        import('../../lib/server/actions/index.js'),
+        import('../../lib/server/adminToken.js')
+      ]);
+
+      const result = await actionService.executeAction(
+        'updateProjectDetails',
+        { projectId: String(projectId), ...buildLinkUpdate(attrs, field, safe) },
+        {
+          userId: ctx.userId,
+          jwt: normalizeAdminToken(process.env.ADMINMONTHER),
+          lang: ctx.lang ?? 'he',
+          fetch: ctx.fetchInstance
+        }
+      );
+
+      if (!result.success) {
+        console.error('[proposeProjectLink] action failed:', result.error);
+        return { success: false, message: 'The link was not changed.' };
+      }
+
+      const decisions = result.data?.decisionsCreated ?? 0;
+      return {
+        success: true,
+        projectId: String(projectId),
+        kind,
+        url: safe,
+        decisionOpened: decisions > 0,
+        message:
+          decisions > 0
+            ? 'A decision was opened for the members. It passes when they approve, or when the rikma clock runs out without an objection.'
+            : clearing
+              ? 'The link was cleared.'
+              : 'The link was set.',
+        url_page: `${SITE}/moach/${projectId}`
+      };
+    } catch (error) {
+      console.error('[proposeProjectLink] failed:', error);
+      return { success: false, message: 'The link was not changed. Try again shortly.' };
+    }
+  }
+});

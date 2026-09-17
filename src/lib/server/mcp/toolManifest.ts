@@ -51,9 +51,15 @@ import {
   conciergeWriteEnabled
 } from '../../../mastra/tools/conciergeTools';
 import {
+  listMyConversationsTool,
+  readConversationTool,
+  postConversationMessageTool
+} from '../../../mastra/tools/forumTools';
+import {
   getProjectDetailsTool,
   listProjectResourcesTool,
-  getProjectStatsTool
+  getProjectStatsTool,
+  proposeProjectLinkTool
 } from '../../../mastra/tools/projectDetailsTools';
 
 export interface McpManifestEntry extends McpToolPolicy {
@@ -91,6 +97,13 @@ export const MCP_TOOL_MANIFEST: Record<string, McpManifestEntry> = {
   previewWishTool: { tool: previewWishTool, tier: 'read', ai: true, enabled: conciergeWriteEnabled },
   draftWishTool: { tool: draftWishTool, tier: 'selfWrite', enabled: conciergeWriteEnabled },
 
+  // --- conversations (M4). A forum belongs to a mission/decision/haluka, not to
+  // a rikma, so the rikma gate lives inside the tools (forumAllowedByKey) and the
+  // participant check is the action's own `forumParticipant` rule.
+  listMyConversationsTool: { tool: listMyConversationsTool, tier: 'read', project: 'scope' },
+  readConversationTool: { tool: readConversationTool, tier: 'read' },
+  postConversationMessageTool: { tool: postConversationMessageTool, tier: 'communicate' },
+
   getSitePagesTool: { tool: getSitePagesTool, tier: 'read' },
   getPageContextTool: { tool: getPageContextTool, tier: 'read' },
 
@@ -112,6 +125,9 @@ export const MCP_TOOL_MANIFEST: Record<string, McpManifestEntry> = {
   // owner, and nobody is bound by it until they accept it.
   // missionId (the running mission the act belongs to) is guarded too: without it
   // an act could be pinned to a mission of a rikma the caller has no part in.
+  // Sets one rikma link. In a rikma with more than one member the action turns
+  // the website/Facebook change into a Decision by itself — consent stays put.
+  proposeProjectLinkTool: { tool: proposeProjectLinkTool, tier: 'consentWrite', project: 'member' },
   createTaskTool: { tool: createTaskTool, tier: 'consentWrite', project: 'member', mission: 'member' },
 
   // --- sharedWrite (needs MCP_WRITE_SCOPE) ---

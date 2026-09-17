@@ -10,7 +10,15 @@ vi.mock('../../lib/server/mcpContext.js', () => ({
   getMcpContext: () => getMcpContext()
 }));
 
-const { shapeProjectDetails, shapeProjectStats, safeUrl, getProjectDetailsTool, listProjectResourcesTool } = await import(
+const {
+  shapeProjectDetails,
+  shapeProjectStats,
+  buildLinkUpdate,
+  safeUrl,
+  getProjectDetailsTool,
+  listProjectResourcesTool,
+  proposeProjectLinkTool
+} = await import(
   './projectDetailsTools'
 );
 
@@ -25,7 +33,7 @@ function project(id = '89') {
       linkToWebsite: 'rikma.example.org',
       githublink: 'javascript:alert(1)',
       drivelink: 'https://drive.google.com/x',
-      vallues: { data: [{ attributes: { valueName: 'openness' } }] },
+      vallues: { data: [{ id: '4', attributes: { valueName: 'openness' } }, { attributes: { valueName: 'no id' } }] },
       user_1s: { data: [{ id: '42', attributes: { username: 'noa' } }] },
       tafkidims: { data: [{ id: '3', attributes: { roleDescription: 'dev' } }] },
       open_missions: { data: [{ id: '5', attributes: { name: 'design' } }] },
@@ -152,5 +160,63 @@ describe('shapeProjectStats', () => {
     const s = shapeProjectStats({ project: { data: { id: '1', attributes: {} } } }, 7)!;
     expect(s.openMissions).toBe(0);
     expect(s.lastActivityAt).toBeNull();
+  });
+});
+
+describe('proposeProjectLink', () => {
+  const executeAction = vi.fn();
+  vi.doMock('../../lib/server/actions/index.js', () => ({ actionService: { executeAction } }));
+  vi.doMock('../../lib/server/adminToken.js', () => ({ normalizeAdminToken: (t: any) => t ?? 'admin' }));
+
+  beforeEach(() => {
+    executeAction.mockReset().mockResolvedValue({ success: true, data: { decisionsCreated: 0 } });
+    sendToSer.mockReset().mockResolvedValue({ data: { project: { data: project() } } });
+    getMcpContext.mockReset().mockReturnValue({ userId: '42', fetchInstance: vi.fn() });
+  });
+
+  it('carries the other links through, so the action cannot null them', () => {
+    const update: any = buildLinkUpdate(project().attributes, 'githublink', 'https://github.com/a/b');
+    // The action writes every field it is given; anything missing here is wiped.
+    expect(update.githublink).toBe('https://github.com/a/b');
+    expect(update.drivelink).toBe('https://drive.google.com/x');
+    expect(update.linkToWebsite).toBe('rikma.example.org');
+    expect(update.publicDescription).toBe('public text');
+    expect(update.vallueIds).toEqual(['4']);
+  });
+
+  it('refuses a URL that is not http(s) and changes nothing', async () => {
+    const res: any = await (proposeProjectLinkTool as any).execute(
+      { projectId: '89', kind: 'website', url: 'javascript:alert(1)' },
+      {}
+    );
+    expect(res.success).toBe(false);
+    expect(executeAction).not.toHaveBeenCalled();
+  });
+
+  it('sets a link and reports it changed directly', async () => {
+    const res: any = await (proposeProjectLinkTool as any).execute(
+      { projectId: '89', kind: 'github', url: 'github.com/a/b' },
+      {}
+    );
+    const [action, params] = executeAction.mock.calls[0];
+    expect(action).toBe('updateProjectDetails');
+    expect(params.githublink).toBe('https://github.com/a/b');
+    expect(res).toMatchObject({ success: true, decisionOpened: false });
+  });
+
+  it('says a decision was opened when the action opened one', async () => {
+    executeAction.mockResolvedValue({ success: true, data: { decisionsCreated: 1 } });
+    const res: any = await (proposeProjectLinkTool as any).execute(
+      { projectId: '89', kind: 'website', url: 'https://rikma.example.org' },
+      {}
+    );
+    expect(res).toMatchObject({ success: true, decisionOpened: true });
+    expect(res.message).toMatch(/decision/i);
+  });
+
+  it('clears a link when passed an empty string', async () => {
+    const res: any = await (proposeProjectLinkTool as any).execute({ projectId: '89', kind: 'drive', url: '' }, {});
+    expect(executeAction.mock.calls[0][1].drivelink).toBe('');
+    expect(res).toMatchObject({ success: true, url: null });
   });
 });

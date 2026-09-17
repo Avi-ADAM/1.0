@@ -15782,7 +15782,7 @@ ${STIPEND_DECISION_FIELDS}
           projectName publicDescription descripFor city spirit joinPolicy restime createdAt
           codeLicense codeLicenseOpenYears
           linkToWebsite githublink drivelink discordlink fblink twiterlink watsapplink
-          vallues { data { attributes { valueName localizations { data { attributes { valueName } } } } } }
+          vallues { data { id attributes { valueName localizations { data { attributes { valueName } } } } } }
           user_1s { data { id attributes { username } } }
           tafkidims { data { id attributes { roleDescription } } }
           open_missions(filters: { and: [{ archived: { eq: false } }, { or: [{ source: { null: true } }, { source: { ne: "selfNomination" } }] }, ${NOT_ARCHIVED} ] }, pagination: { limit: 100 }) { data { id attributes { name } } }
