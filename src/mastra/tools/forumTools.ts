@@ -27,6 +27,17 @@ import { createTool } from '@mastra/core/tools';
 import { z } from 'zod';
 import { getMcpContext } from '../../lib/server/mcpContext.js';
 
+/**
+ * An action's Strapi error repeats the same message once per denied field —
+ * a hundred identical lines in the log. Keep the distinct ones.
+ */
+function summarizeActionError(error: any): string {
+  const details = Array.isArray(error?.details) ? error.details : [];
+  const messages = [...new Set(details.map((d: any) => String(d?.message ?? '')))].filter(Boolean);
+  const qid = details[0]?.extensions?.queryId;
+  return [error?.message, qid && `query ${qid}`, messages.join(' | ')].filter(Boolean).join(' — ');
+}
+
 const SITE = 'https://www.1lev1.com';
 const MAX_MESSAGE = 4000;
 
@@ -38,14 +49,14 @@ async function runAction(key: string, params: Record<string, unknown>) {
   const ctx = getMcpContext();
   if (!ctx?.userId || !ctx.fetchInstance) return { error: 'Not authenticated.' } as const;
 
-  const [{ actionService }, { normalizeAdminToken }] = await Promise.all([
+  const [{ actionService }, { adminToken }] = await Promise.all([
     import('../../lib/server/actions/index.js'),
     import('../../lib/server/adminToken.js')
   ]);
 
   const result = await actionService.executeAction(key, params, {
     userId: ctx.userId,
-    jwt: normalizeAdminToken(process.env.ADMINMONTHER),
+    jwt: adminToken(),
     lang: ctx.lang ?? 'he',
     fetch: ctx.fetchInstance
   });
@@ -97,7 +108,7 @@ export const listMyConversationsTool = createTool({
       const out = await runAction('getUserForums', {});
       if ('error' in out) return { success: false, message: out.error };
       if (!out.result.success) {
-        console.error('[listMyConversations] action failed:', out.result.error);
+        console.error('[listMyConversations] action failed:', summarizeActionError(out.result.error));
         return { success: false, message: 'Could not load your conversations right now.' };
       }
 

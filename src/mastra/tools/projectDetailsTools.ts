@@ -17,6 +17,7 @@ import { z } from 'zod';
 import { sendToSer } from '../../lib/send/sendToSer';
 import { getMcpContext } from '../../lib/server/mcpContext.js';
 import { isHiddenProject } from '../../lib/server/discovery/hiddenProjects.js';
+import { describeStrapiFailure } from '../../lib/server/mcp/strapiErrors.js';
 
 const SITE = 'https://www.1lev1.com';
 
@@ -156,6 +157,9 @@ async function loadDetails(projectId: string) {
     !ctx.isInternalBot,
     ctx.fetchInstance
   );
+  const failure = describeStrapiFailure(res, 'getProjectDetails');
+  if (failure) return { error: failure } as const;
+
   const details = shapeProjectDetails(res?.data?.project?.data, ctx.userId);
   // A QA rikma hidden from the public directories stays hidden from outsiders here too.
   if (!details || (!details.isMember && isHiddenProject(details.projectId))) {
@@ -299,6 +303,9 @@ export const getProjectStatsTool = createTool({
         !ctx.isInternalBot,
         ctx.fetchInstance
       );
+      const failure = describeStrapiFailure(res, 'getProjectStats');
+      if (failure) return { success: false, message: failure };
+
       const stats = shapeProjectStats(res?.data, windowDays);
       if (!stats) return { success: false, message: `Rikma ${projectId} was not found.` };
       return { success: true, ...stats };
@@ -385,11 +392,14 @@ export const proposeProjectLinkTool = createTool({
         !ctx.isInternalBot,
         ctx.fetchInstance
       );
+      const failure = describeStrapiFailure(res, 'proposeProjectLink');
+      if (failure) return { success: false, message: failure };
+
       const attrs = res?.data?.project?.data?.attributes;
       if (!attrs) return { success: false, message: `Rikma ${projectId} was not found.` };
 
       const field = LINK_FIELDS[kind as LinkKind];
-      const [{ actionService }, { normalizeAdminToken }] = await Promise.all([
+      const [{ actionService }, { adminToken }] = await Promise.all([
         import('../../lib/server/actions/index.js'),
         import('../../lib/server/adminToken.js')
       ]);
@@ -399,7 +409,7 @@ export const proposeProjectLinkTool = createTool({
         { projectId: String(projectId), ...buildLinkUpdate(attrs, field, safe) },
         {
           userId: ctx.userId,
-          jwt: normalizeAdminToken(process.env.ADMINMONTHER),
+          jwt: adminToken(),
           lang: ctx.lang ?? 'he',
           fetch: ctx.fetchInstance
         }

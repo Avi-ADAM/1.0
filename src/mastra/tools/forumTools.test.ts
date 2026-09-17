@@ -5,7 +5,7 @@ const getMcpContext = vi.fn();
 
 vi.mock('../../lib/server/mcpContext.js', () => ({ getMcpContext: () => getMcpContext() }));
 vi.mock('../../lib/server/actions/index.js', () => ({ actionService: { executeAction } }));
-vi.mock('../../lib/server/adminToken.js', () => ({ normalizeAdminToken: (t: any) => t ?? 'admin' }));
+vi.mock('../../lib/server/adminToken.js', () => ({ normalizeAdminToken: (t: any) => t ?? 'admin', adminToken: () => 'admin' }));
 
 const {
   forumAllowedByKey,

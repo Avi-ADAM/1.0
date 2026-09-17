@@ -18,7 +18,7 @@ import { createTool } from '@mastra/core/tools';
 import { z } from 'zod';
 import { actionService } from '../../lib/server/actions/index.js';
 import { getMcpContext } from '../../lib/server/mcpContext.js';
-import { normalizeAdminToken } from '../../lib/server/adminToken.js';
+import { adminToken } from '../../lib/server/adminToken.js';
 import {
   MAX_AGENT_ITEMS,
   MAX_ROW_DESCRIP,
@@ -203,7 +203,7 @@ function resolveCallContext() {
     userId: ctx.userId,
     lang: ctx.lang ?? 'he',
     fetch: ctx.fetchInstance,
-    jwt: normalizeAdminToken(process.env.ADMINMONTHER)
+    jwt: adminToken()
   };
 }
 

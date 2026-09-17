@@ -225,7 +225,7 @@ describe('P4 — write half', () => {
   const extractWish = vi.fn();
 
   vi.doMock('../../lib/server/actions/index.js', () => ({ actionService: { executeAction } }));
-  vi.doMock('../../lib/server/adminToken.js', () => ({ normalizeAdminToken: (t: any) => t ?? 'admin' }));
+  vi.doMock('../../lib/server/adminToken.js', () => ({ normalizeAdminToken: (t: any) => t ?? 'admin', adminToken: () => 'admin' }));
   vi.doMock('../../lib/server/ai/extractWish', () => ({ extractWish: (...a: any[]) => extractWish(...a) }));
   vi.doMock('$env/static/private', () => ({ GEMINI_API_KEY: 'test-key' }));
 

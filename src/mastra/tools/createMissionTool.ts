@@ -13,6 +13,7 @@ import { createTool } from '@mastra/core/tools';
 import { z } from 'zod';
 import { actionService } from '../../lib/server/actions/index.js';
 import { getMcpContext } from '../../lib/server/mcpContext.js';
+import { adminToken as readAdminToken } from '../../lib/server/adminToken.js';
 import { resolveMissionSpec } from '../../lib/server/mission/resolveMissionSpec.js';
 
 export const createMissionTool = createTool({
@@ -55,7 +56,7 @@ export const createMissionTool = createTool({
 
     const userId = ctx.userId;
     const fetchInstance = ctx.fetchInstance;
-    const adminToken = process.env.ADMINMONTHER ?? '';
+    const adminToken = readAdminToken();
     const lang = (ctx.lang as 'he' | 'en' | 'ar') ?? 'he';
 
     console.log(`[createMissionTool] Resolving spec for "${inputData.missionName}" in project ${inputData.projectId}`);

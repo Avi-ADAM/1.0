@@ -23,6 +23,7 @@ import { createTool } from '@mastra/core/tools';
 import { z } from 'zod';
 import { sendToSer } from '../../lib/send/sendToSer';
 import { getMcpContext } from '../../lib/server/mcpContext.js';
+import { describeStrapiFailure } from '../../lib/server/mcp/strapiErrors.js';
 
 const SITE = 'https://www.1lev1.com';
 
@@ -43,14 +44,14 @@ async function runAction(key: string, params: Record<string, unknown>) {
   const ctx = getMcpContext();
   if (!ctx?.userId || !ctx.fetchInstance) return { error: 'Not authenticated.' } as const;
 
-  const [{ actionService }, { normalizeAdminToken }] = await Promise.all([
+  const [{ actionService }, { adminToken }] = await Promise.all([
     import('../../lib/server/actions/index.js'),
     import('../../lib/server/adminToken.js')
   ]);
 
   const result = await actionService.executeAction(key, params, {
     userId: ctx.userId,
-    jwt: normalizeAdminToken(process.env.ADMINMONTHER),
+    jwt: adminToken(),
     lang: ctx.lang ?? 'he',
     fetch: ctx.fetchInstance
   });
@@ -103,6 +104,9 @@ export const listRikmaProcessesTool = createTool({
         !ctx.isInternalBot,
         ctx.fetchInstance
       );
+      const failure = describeStrapiFailure(res, 'listRikmaProcesses');
+      if (failure) return { success: false, message: failure };
+
       const attrs = res?.data?.project?.data?.attributes;
       if (!attrs) return { success: false, message: `Rikma ${projectId} was not found.` };
 

@@ -296,8 +296,30 @@ async function handleMcpRequest(request: Request, url: URL, svelteFetch: typeof 
         throw error(500, `MCP Server startHTTP Error: ${e.message}`);
     }
 
-    // 5. Convert back to SvelteKit / winterTC Response format
-    return toFetchResponse(nodeRes);
+    // 5. Convert back to SvelteKit / winterTC Response format.
+    //
+    // The body is drained here instead of being handed over as a live stream,
+    // and that is load-bearing: fetch-to-node closes its stream controller from
+    // the node response's 'finish' event, which arrives on a timer, AFTER the
+    // runtime has already finished with the body and closed it. The late close
+    // then throws ERR_INVALID_STATE asynchronously — nothing can catch it, and
+    // it takes the whole server process down. It reproduced on every tools/list.
+    // Reading the body to the end happens while the stream is still ours, so the
+    // close lands exactly once.
+    //
+    // A streaming response (SSE) must NOT be drained — it never ends — so it is
+    // passed through untouched. In serverless mode MCP answers with plain JSON.
+    // toFetchResponse resolves to the Response — it is a promise, not the object.
+    const fetchRes = await toFetchResponse(nodeRes);
+    if (fetchRes.headers.get('content-type')?.includes('text/event-stream')) {
+        return fetchRes;
+    }
+    const body = await fetchRes.arrayBuffer();
+    return new Response(body, {
+        status: fetchRes.status,
+        statusText: fetchRes.statusText,
+        headers: fetchRes.headers
+    });
 }
 
 // We expose both GET mapping and POST mapping requests directly connecting to the new MCP Server

@@ -1,3 +1,5 @@
+import { env as dynamicEnv } from '$env/dynamic/private';
+
 /**
  * Normalize the Strapi admin/service token before it is used as a Bearer
  * credential.
@@ -13,4 +15,20 @@
  */
 export function normalizeAdminToken(raw?: string | null): string {
   return (raw || '').replace(/\s+/g, '').replace(/^ADMINMONTHER=/, '');
+}
+
+/**
+ * The admin token, read the way SvelteKit actually provides it.
+ *
+ * `process.env` is empty under `vite dev` — only `$env/dynamic/private` is
+ * populated there — so `normalizeAdminToken(process.env.ADMINMONTHER)` yields
+ * an empty Bearer locally and Strapi answers "Forbidden access" to every field.
+ * Production was fine, which is exactly what made it hard to see: the MCP tools
+ * that run actions (conversations, processes, tasks, wishes, links) all failed
+ * in dev only. `$lib/server/actions/index.ts` already guards against this for
+ * its own client; this is the same guard for callers that pass the token as
+ * `context.jwt`.
+ */
+export function adminToken(): string {
+  return normalizeAdminToken(dynamicEnv.ADMINMONTHER || process.env.ADMINMONTHER);
 }

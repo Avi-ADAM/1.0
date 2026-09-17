@@ -7,7 +7,7 @@ const getMcpContext = vi.fn();
 vi.mock('../../lib/send/sendToSer', () => ({ sendToSer: (...a: any[]) => sendToSer(...a) }));
 vi.mock('../../lib/server/mcpContext.js', () => ({ getMcpContext: () => getMcpContext() }));
 vi.mock('../../lib/server/actions/index.js', () => ({ actionService: { executeAction } }));
-vi.mock('../../lib/server/adminToken.js', () => ({ normalizeAdminToken: (t: any) => t ?? 'admin' }));
+vi.mock('../../lib/server/adminToken.js', () => ({ normalizeAdminToken: (t: any) => t ?? 'admin', adminToken: () => 'admin' }));
 
 const { shapeProcess, ATTACHABLE, listRikmaProcessesTool, startProcessTool, attachToProcessTool } = await import(
   './processTools'

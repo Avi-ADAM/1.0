@@ -24,6 +24,7 @@ import { z } from 'zod';
 import { sendToSer } from '../../lib/send/sendToSer';
 import { getMcpContext } from '../../lib/server/mcpContext.js';
 import { isHiddenProject } from '../../lib/server/discovery/hiddenProjects.js';
+import { describeStrapiFailure } from '../../lib/server/mcp/strapiErrors.js';
 import { env } from '$env/dynamic/private';
 
 const SITE = 'https://www.1lev1.com';
@@ -116,13 +117,20 @@ export const searchCatalogTool = createTool({
     const cap = limit ?? 10;
 
     try {
+      const failures: string[] = [];
       const results = await Promise.all(
         wanted.map(async (kind) => {
           const res: any = await sendToSer({}, CATALOG_QIDS[kind], 0, 0, !ctx.isInternalBot, ctx.fetchInstance);
+          const failure = describeStrapiFailure(res, `searchCatalog:${kind}`);
+          if (failure) failures.push(`${kind}: ${failure}`);
           return shapeCatalog(kind, res?.data, query, cap);
         })
       );
       const items = results.flat();
+      // One unreadable directory must not read as "nothing is offered".
+      if (failures.length === wanted.length) {
+        return { success: false, message: failures[0] };
+      }
       return {
         success: true,
         note: MEMBER_WRITTEN_NOTE,
@@ -175,6 +183,9 @@ export const listMyWishesTool = createTool({
         !ctx.isInternalBot,
         ctx.fetchInstance
       );
+      const failure = describeStrapiFailure(res, 'listMyWishes');
+      if (failure) return { success: false, message: failure };
+
       const wishes = shapeMyWishes(res?.data);
       return { success: true, note: MEMBER_WRITTEN_NOTE, totalCount: wishes.length, wishes };
     } catch (error) {
@@ -273,6 +284,9 @@ export const getWishDetailsTool = createTool({
         !ctx.isInternalBot,
         ctx.fetchInstance
       );
+      const failure = describeStrapiFailure(res, 'getWishDetails');
+      if (failure) return { success: false, message: failure };
+
       const wish = shapeWishDetails(res?.data, ctx.userId);
       if (!wish) return { success: false, message: `Wish ${wishId} was not found.` };
       if (!wish.visible) {
@@ -327,6 +341,9 @@ export const listMyWishOffersTool = createTool({
         !ctx.isInternalBot,
         ctx.fetchInstance
       );
+      const failure = describeStrapiFailure(res, 'listMyWishOffers');
+      if (failure) return { success: false, message: failure };
+
       const offers = shapeMyWishOffers(res?.data);
       return { success: true, note: MEMBER_WRITTEN_NOTE, totalCount: offers.length, offers };
     } catch (error) {
@@ -436,7 +453,7 @@ export const draftWishTool = createTool({
     const ctx = getMcpContext();
     if (!ctx?.userId || !ctx.fetchInstance) return { success: false, message: 'Not authenticated.' };
     try {
-      const [{ actionService }, { normalizeAdminToken }] = await Promise.all([
+      const [{ actionService }, { adminToken }] = await Promise.all([
         import('../../lib/server/actions/index.js'),
         import('../../lib/server/adminToken.js')
       ]);
@@ -465,7 +482,7 @@ export const draftWishTool = createTool({
         },
         {
           userId: ctx.userId,
-          jwt: normalizeAdminToken(process.env.ADMINMONTHER),
+          jwt: adminToken(),
           lang: ctx.lang ?? 'he',
           fetch: ctx.fetchInstance
         }
@@ -557,13 +574,17 @@ export const searchContentTool = createTool({
 
     try {
       const res: any = await sendToSer(
-        { uid: ctx.userId, q: query.trim(), limit: cap },
+        // qj is the same text for the one JSON-typed field (product descriptions).
+        { uid: ctx.userId, q: query.trim(), qj: query.trim(), limit: cap },
         '324mcpSearchMine',
         0,
         0,
         !ctx.isInternalBot,
         ctx.fetchInstance
       );
+      const failure = describeStrapiFailure(res, 'searchContent');
+      if (failure) return { success: false, message: failure };
+
       let items = shapeSearchResults(res?.data, cap);
       // A key limited to some rikmot never sees rows from the others.
       const keyProjects = ctx.isInternalBot ? undefined : ctx.keyProjects;

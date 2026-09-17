@@ -2,7 +2,7 @@ import { createTool } from '@mastra/core/tools';
 import { z } from 'zod';
 import { actionService } from '../../lib/server/actions/index.js';
 import { getMcpContext } from '../../lib/server/mcpContext.js';
-import { normalizeAdminToken } from '../../lib/server/adminToken.js';
+import { adminToken } from '../../lib/server/adminToken.js';
 
 export const createTaskTool = createTool({
   id: 'createTaskTool',
@@ -37,7 +37,7 @@ export const createTaskTool = createTool({
 
     const userId = ctx.userId;
     const fetchInstance = ctx.fetchInstance;
-    const adminToken = normalizeAdminToken(process.env.ADMINMONTHER);
+    const jwt = adminToken();
 
     // A task is assigned to a specific person only when assignedUserId is given.
     // When roles (tafkidims) are provided instead, the underlying action stores
@@ -57,7 +57,7 @@ export const createTaskTool = createTool({
         actionParams,
         {
           userId,
-          jwt: adminToken, // Use admin token to perform action on behalf of user
+          jwt, // Use admin token to perform action on behalf of user
           lang: 'he',
           fetch: fetchInstance
         }

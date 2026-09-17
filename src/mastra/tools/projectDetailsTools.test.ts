@@ -166,7 +166,7 @@ describe('shapeProjectStats', () => {
 describe('proposeProjectLink', () => {
   const executeAction = vi.fn();
   vi.doMock('../../lib/server/actions/index.js', () => ({ actionService: { executeAction } }));
-  vi.doMock('../../lib/server/adminToken.js', () => ({ normalizeAdminToken: (t: any) => t ?? 'admin' }));
+  vi.doMock('../../lib/server/adminToken.js', () => ({ normalizeAdminToken: (t: any) => t ?? 'admin', adminToken: () => 'admin' }));
 
   beforeEach(() => {
     executeAction.mockReset().mockResolvedValue({ success: true, data: { decisionsCreated: 0 } });

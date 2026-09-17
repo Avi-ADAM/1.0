@@ -417,4 +417,89 @@
 2. **התראות לצ'אט הרקמה** — דייג'סט במקום הודעה-להודעה, לפני שנותנים לו כניסה ב-UI.
 3. **G9** — `POST /api/concierge-extract` בלי בדיקת session: כל בקשה היא ריצת Gemini.
 4. **P8** — לעדכן את ה-skill `1lev1-platform` ואת `PLAN_MCP_SKILL` לכלים החדשים.
-5. **אימות מקצה-לקצה** של המסלול המאומת — תלוי במפתח API תקין.
+5. **הרשאות ל-API token של Strapi** — ראו §9. בלעדיהן השיחות, התהליכים והצעות המשאלה
+   לא עובדות ב-MCP.
+
+---
+
+## 9. אימות מקצה-לקצה מול מפתח אמיתי (2026-09-17)
+
+הרצתי את הכלים מול שרת הפיתוח עם מפתח חדש. `tools/list` מחזיר **35 כלים**, בלי
+`createMissionTool` (דורש `mcp:write`) ובלי `previewWish`/`draftWish` (הדגל כבוי) — בדיוק
+כמתוכנן. מה שנמצא בדרך:
+
+### 9.1 באג שהפיל את השרת — `fetch-to-node` (תוקן)
+
+**כל קריאת `tools/list` הפילה את התהליך.** לא שגיאה 500 — קריסה:
+
+```
+TypeError [ERR_INVALID_STATE]: Invalid state: Controller is already closed
+  at ReadableStreamDefaultController.close
+  at FetchServerResponse.<anonymous> (fetch-to-node/dist/fetch-to-node/http-server.js:332)
+  at onFinish (http-outgoing.js:1153) at listOnTimeout
+```
+
+`fetch-to-node` בונה את גוף ה-`Response` ברגע ששולחים את הכותרות, וסוגר את ה-controller
+מאוחר יותר, באירוע `finish` של תגובת ה-node שמגיע דרך timer. בתשובה גדולה הצרכן כבר
+ניקז וסגר את הזרם עד אז, וה-close המאוחר נזרק **אסינכרונית** — אי אפשר לתפוס אותו, והוא
+מפיל את כל התהליך. תשובה קטנה (`tools/call`) שרדה; `tools/list` עם כל הכלים לא.
+
+**התיקון** ב-`+server.ts`: לנקז את הגוף בעצמנו לפני שמחזירים אותו, כך שה-close קורה בדיוק
+פעם אחת בזמן שהזרם עדיין שלנו. תשובת SSE (`text/event-stream`) עוברת כמות שהיא — אותה
+אסור לנקז, היא לא נגמרת. **שימו לב**: `toFetchResponse` מחזיר Promise, לא Response; בלי
+`await` מקבלים 500. אחרי התיקון: חמש קריאות `tools/list` רצופות, 35 כלים, השרת חי.
+
+> זה כנראה מסביר חוסר יציבות של ה-MCP גם בפרודקשן — זה אותו קוד ואותה ספרייה.
+
+### 9.2 `process.env` ריק ב-dev (תוקן)
+
+כל הכלים שמריצים action העבירו `normalizeAdminToken(process.env.ADMINMONTHER)`, ותחת
+`vite dev` זה מחרוזת ריקה — Strapi ענה "Forbidden access" על הכל. בפרודקשן זה עבד, וזה
+בדיוק מה שהסתיר את זה (אותה תקלה מתועדת כבר ב-`actions/index.ts`). נוספה
+`adminToken()` ב-`$lib/server/adminToken.ts` שקוראת מ-`$env/dynamic/private`, וכל כלי
+עבר אליה.
+
+### 9.3 שגיאות GraphQL נבלעו והוצגו כ"אין תוצאות" (תוקן)
+
+Strapi עונה לשאילתה חסומה-חלקית גם ב-`data` וגם ב-`errors`. הכלים מיפו את `data`
+והתעלמו מ-`errors`, כך ש-`getWishDetails` החזיר "אפס הצעות" במקום "אין לי הרשאה לקרוא
+אותן". סוכן לא יכול להבדיל בין השניים. נוסף `src/lib/server/mcp/strapiErrors.ts`, וכל
+כלי חדש עובר דרכו: או שקיבל את הנתונים, או שהוא אומר שלא.
+
+### 9.4 באג בשאילתת החיפוש (תוקן)
+
+`324mcpSearchMine` נכשל כולו על `Variable "$q" of type "String!" used in position expecting
+type "JSON"`. מכל שדות התיאור, `Matanot.desc` הוא היחיד שהפילטר שלו הוא `JsonFilterInput`.
+נוסף משתנה `$qj: JSON!` לשדה הזה בלבד. אחרי התיקון החיפוש מחזיר תוצאות אמיתיות.
+
+### 9.5 ✅ מה שעובד מול הנתונים האמיתיים
+
+`findUserProjects`, `getProjectDetails`, `listProjectResources`, `getProjectStats`,
+`getProjectMembers`, `getMissionDetails`, `listUserMissions`, `getMissionStats`,
+`searchCatalog`, `searchContent`, `listMyWishes`, `listRikmaProcesses`.
+
+**שערי האבטחה נבדקו בפועל**: `getProjectMembers` על רקמה 82 (לא חבר) ⇒
+`denied: "You are not a member of rikma 82"`; רקמות מוסתרות לא נראות לזר; משימה נבדקת
+דרך הרקמה שלה.
+
+### 9.6 ⛔ חסר: הרשאות ל-API token של Strapi (צד הבקאנד — לא קוד)
+
+בדיקה ישירה מול `tovmeod.1lev1.com/graphql` עם ה-token:
+
+| קולקציה | מצב | מה זה חוסם |
+|---|---|---|
+| `message` | **DENIED** (find) | כל כלי השיחות — אין הודעות |
+| `ratson-proposal` | **DENIED** (find) | הצעות על משאלה: `getWishDetails`, `listMyWishOffers` |
+| `partof` | **DENIED** (find) | תהליכים: יצירה וחיבור |
+| `pgisha`, `pgisha-user` | **DENIED** (find) | שיחות של פגישות ברשימה |
+| `forum` | find מותר, **create נדחה** | `ensureProjectForum` (הלובי) ו-`createProcess` |
+| `forums`, `halukas`, `asks`, `sheiruts`, `sheirutpends`, `sales`, `decisions`, `acts`, `mesimabetahaliches`, `projects`, `users` | ok | — |
+
+**מה לעשות** (פאנל Strapi → Settings → API Tokens → ה-token של השרת): להעניק `find`
+ל-`message`, `ratson-proposal`, `partof`, `pgisha`, `pgisha-user`; ו-`create`
+ל-`forum`, `partof`, `message` (+`update` ל-`forum`, לכתיבת ה-subject).
+זה בדיוק הדפוס של [[project_strapi_new_collection_permissions]]: המניפסט שלנו
+(`qidsAccess`) מתיר, אבל Strapi עצמו לא.
+
+עד שזה ייעשה, ארבעת הכלים האלה מחזירים הודעת "לא קריא עם הרשאות השירות" (§9.3) ולא
+תוצאה ריקה מטעה.
