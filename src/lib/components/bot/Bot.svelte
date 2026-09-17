@@ -161,7 +161,7 @@
 {#if !isOnChatPage}
   <div
     dir={$isRtl ? 'rtl' : 'ltr'}
-    class="fixed bottom-20 sm:bottom-12 {$locale == 'he' || $locale == 'ar'
+    class="fixed bottom-[var(--rail-bottom,5rem)] sm:bottom-12 {$locale == 'he' || $locale == 'ar'
       ? 'left-4'
       : 'right-4'} z-50"
   >

@@ -325,6 +325,12 @@
   }
 
   onMount(() => {
+    // lifts the floating widgets' rail above the pinned mobile CTA row (app.postcss)
+    document.documentElement.classList.add('has-cta-bar');
+    return () => document.documentElement.classList.remove('has-cta-bar');
+  });
+
+  onMount(() => {
     if (!statsLoaded) loadStats();
     console.log($t('home.hero.headline1'));
   });
@@ -620,7 +626,7 @@
     }}
   >
     <div
-      class="flex flex-col items-center w-full min-h-full pb-24 sm:pb-10 sm:w-1/2 p-4 transition-all duration-300"
+      class="flex flex-col items-center w-full min-h-full pb-44 sm:pb-10 sm:w-1/2 p-4 transition-all duration-300"
       class:sm:ml-auto={$locale === 'he' || $locale === 'ar'}
       class:sm:mr-0={$locale === 'he' || $locale === 'ar'}
       class:sm:mr-auto={$locale !== 'he' && $locale !== 'ar'}
@@ -1853,6 +1859,40 @@
        above on purpose: the control that hides the artwork is also the only way
        back to it. -->
   <MotionControl />
+
+  <!-- Pinned CTA row, phone only: the desktop gets the floating column below,
+       a phone had them only at the far end of a very long scroll. Sits just
+       above the site's bottom nav (h-14 at bottom-0). -->
+  <div
+    class="sm:hidden fixed inset-x-0 bottom-16 z-[45] px-3 pointer-events-none"
+    style="font-family:'Sababa',sans-serif;"
+  >
+    <div
+      class="pointer-events-auto mx-auto max-w-lg grid grid-cols-3 gap-2 rounded-2xl bg-barbi/90 backdrop-blur-md border-2 border-gold p-1.5 shadow-[0_8px_24px_rgba(0,0,0,0.3)]"
+    >
+      <button
+        class="bg-gold text-barbi font-bold text-base py-2 rounded-xl leading-tight"
+        onclick={() => gotoRegister()}
+      >
+        {$t('home.bottomCta.register')}
+      </button>
+      <button
+        class="bg-white text-barbi font-bold text-base py-2 rounded-xl leading-tight"
+        onclick={() => (demoOpen = true)}
+      >
+        {$t('home.bottomCta.demo')}
+      </button>
+      <button
+        class="border-2 border-gold text-gold font-bold text-base py-2 rounded-xl leading-tight"
+        onclick={() => {
+          goto('/login');
+          fi = true;
+        }}
+      >
+        {$t('home.bottomCta.login')}
+      </button>
+    </div>
+  </div>
 
   <!-- Float Buttons Desktop -->
   <div

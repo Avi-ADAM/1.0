@@ -2434,6 +2434,14 @@ html.business .boxleft {
   }
 }
 
+/* The homepage pins a row of three CTAs above the mobile footer (fpage.svelte
+   sets this class while mounted), so the rail starts above that row instead. */
+@media (max-width: 639px) {
+  :root.has-cta-bar {
+    --rail-bottom: 8rem;
+  }
+}
+
 /* Text size, applied at the root.
 
    Tailwind's type and spacing scales are both rem-based, i.e. relative to this
