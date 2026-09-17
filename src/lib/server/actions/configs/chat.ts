@@ -1,5 +1,6 @@
 
 import type { ActionConfig } from '../types.js';
+import { env } from '$env/dynamic/private';
 import { getForumEntity, normalizeForum, participantIdsForForum } from '../forumAccess.js';
 import { createChatMessageConsentSpec } from '$lib/consent/specs/s2b';
 
@@ -11,7 +12,7 @@ export const chatActions: ActionConfig[] = [
         consentSpec: createChatMessageConsentSpec,
         description: 'Create a new message in a forum with multi-channel notifications',
         graphqlOperation: async (params, context, { strapi }) => {
-            const { forumId, message } = params;
+            const { forumId, message, via } = params;
             const userId = context.userId;
             const publishedAt = new Date().toISOString();
 
@@ -27,15 +28,23 @@ export const chatActions: ActionConfig[] = [
             const senderName =
                 userRes?.data?.usersPermissionsUser?.data?.attributes?.username || 'User';
 
-            // 1. Execute the GraphQL operation to save the message
+            // 1. Execute the GraphQL operation to save the message.
+            //
+            // `via: 'agent'` marks a message an agent wrote for the member (MCP).
+            // It goes through a separate query because the Message field exists
+            // only once the backend is deployed; CHAT_VIA_ENABLED is the switch
+            // that says it is. Until then the mark is dropped and the message is
+            // saved exactly as before, rather than failing.
+            const markVia = via === 'agent' && env.CHAT_VIA_ENABLED === 'true';
             const result = await strapi.execute(
-                '1chatsend',
+                markVia ? '1chatsendVia' : '1chatsend',
                 {
                     fid: forumId,
                     fidn: parseInt(forumId),
                     idL: userId,
                     da: publishedAt,
-                    mes: message.trim()
+                    mes: message.trim(),
+                    ...(markVia ? { via: 'agent' } : {})
                 },
                 context.jwt,
                 context.fetch
@@ -83,6 +92,8 @@ export const chatActions: ActionConfig[] = [
         paramSchema: {
             forumId: { type: 'string', required: true },
             message: { type: 'string', required: true },
+            // 'agent' ⇒ written through an agent on the member's behalf.
+            via: { type: 'string', required: false },
             md: { type: 'object', required: false }, // Metadata object
             username: { type: 'string', required: false }
         },

@@ -34,6 +34,7 @@ import { ensureVoteForumConfig } from './ensureVoteForum.js';
 import { createProcessConfig } from './createProcess.js';
 import { attachEntityToProcessConfig } from './attachEntityToProcess.js';
 import { ensureProcessForumConfig } from './ensureProcessForum.js';
+import { ensureProjectForumConfig } from './ensureProjectForum.js';
 import { ensureStageForumConfig } from './ensureStageForum.js';
 import { closeFiniapruvalConfig } from './closeFiniapruval.js';
 import { updateProjectDetailsConfig } from './updateProjectDetails.js';
@@ -237,6 +238,7 @@ export function registerAllActions(): void {
   registerAction(createProcessConfig);
   registerAction(attachEntityToProcessConfig);
   registerAction(ensureProcessForumConfig);
+  registerAction(ensureProjectForumConfig);
   registerAction(ensureStageForumConfig);
   registerAction(completeMissionConfig);
 
@@ -521,6 +523,7 @@ export {
   createProcessConfig,
   attachEntityToProcessConfig,
   ensureProcessForumConfig,
+  ensureProjectForumConfig,
   ensureStageForumConfig,
   completeMissionConfig,
   chatActions,

@@ -180,7 +180,7 @@
 | **P3** | M7 קונסיירז' — קריאה: `searchCatalogTool`, `listMyWishesTool`, `getWishDetailsTool`, `listMyWishOffersTool` | P2 (קצב) | ✅ 2026-09-17 |
 | **P4** | M7 כתיבה: `previewWishTool`, `draftWishTool` | P2 (דלי `ai`) | ✅ 2026-09-17 |
 | **P5** | M4 שיחות (`listMyConversations`/`readConversation`/`postConversationMessage`) + M2 `proposeProjectLink` | D1, P2 | ✅ 2026-09-17 |
-| **P6** | M5 `searchContent` | P2 | ⏳ |
+| **P6** | M5 `searchContentTool` + צ'אט הרקמה + תגית `via` | P2 | ✅ 2026-09-17 |
 | **P7** | M6 Outreach (Strapi collection + 2 actions + 3 כלים + תצוגה במואך) | שינוי backend | ⏳ |
 | **P8** | `publishWish`, עדכון ה-skill `1lev1-platform` ו-`PLAN_MCP_SKILL` | D2 | ⏳ |
 
@@ -354,3 +354,36 @@
 
 **בדיקות**: `forumTools.test.ts` (13) + 5 חדשות ב-`projectDetailsTools.test.ts`. סה"כ 124
 ב-`src/mastra` + `src/lib/server/mcp`.
+
+### 2026-09-17 — P6 + צ'אט הרקמה + תגית "נכתב דרך סוכן"
+
+**1. `searchContentTool(query, limit?)`** — חיפוש בתוך הרקמות שהמתקשר חבר בהן: שמות
+ותיאורי רקמות, משימות פתוחות, משימות בתהליך, מטלות, משאבים פתוחים ובתהליך, ומוצרים
+(qid `324mcpSearchMine`). **החברות היא חלק מהפילטר עצמו** (`project: { user_1s: { id: { eq: $uid } } }`),
+כלומר השאילתה לא *יכולה* להחזיר רקמה זרה — לא צריך לסמוך על הכלי שיסנן אחר כך.
+מפתח מוגבל מסונן בנוסף בכלי, כי השורות מגיעות משבע קולקציות. חומר ציבורי לא נמצא כאן
+במכוון — זה `searchCatalogTool`.
+
+**2. צ'אט רחב לכל הרקמה — בלי שינוי סכמה בכלל.**
+התברר ש-`Forum.project` כבר קיים, ש-`forumKind` כבר נופל ל-`'project'` כשאין ישות אחרת,
+שהמשתתפים שלו הם כל חברי הרקמה, ושה-forums של רקמה כבר נאספים לרשימת השיחות של כל חבר
+(`104getUserForumSources`). לכן "פורום כללי" הוא פשוט פורום עם רקמה, עם subject יציב,
+בלי שום דבר אחר מחובר אליו.
+- `ensureProjectForum` (action, `projectMember`) — מוצא לפי `RIKMA::<pid>`, ואם אין, יוצר
+  פעם אחת. qid `323projectGeneralForum`.
+- `openRikmaConversationTool` (MCP, `communicate`) מחזיר את ה-forumId, ומשם ממשיכים עם
+  `readConversationTool` / `postConversationMessageTool`.
+- **נוצר עצלן**: רקמה שלא פותחת צ'אט כללי — לא מקבלת אחד.
+- **מה שחסר לפני שמים לזה כניסה ב-UI**: היום `createChatMessage` מודיע לכל המשתתפים על כל
+  הודעה. בשרשור של משימה זה נכון; בלובי של רקמה עם 30 חברים זה מקור ספאם. לפני כניסה
+  גלויה ב-UI צריך ששרשור מסוג `project` יתן התראה מרוכזת (דייג'סט) ולא אחת להודעה.
+
+**3. תגית `via` על הודעה** — שינוי בבקאנד (1.0b, commit `9779119`): `Message.via` כ-enum
+עם ערך אחד, `agent`.
+- הצד הקדמי: qid **נפרד** `1chatsendVia`, ו-`createChatMessage` בוחר בו רק כאשר
+  `via==='agent'` **וגם** `CHAT_VIA_ENABLED === 'true'`. כך הסדר לא משנה: לפני פריסת
+  הבקאנד ההודעה נשמרת בלי הסימון במקום להיכשל; אחרי הפריסה מדליקים את הדגל.
+- `postConversationMessageTool` מסמן `via:'agent'` תמיד.
+- **נשאר**: הצגת התגית ב-UI דורשת להוסיף `via` לשליפות ההודעות (`103getForumThreadById`,
+  `105getForumSummaryById`, `ForumListCore`) — וזה שובר את הפורום אם הפרונט נפרס לפני
+  הבקאנד. לכן זה צעד נפרד, **אחרי** שהבקאנד למעלה.

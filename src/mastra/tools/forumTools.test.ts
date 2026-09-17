@@ -107,7 +107,7 @@ describe('postConversationMessage', () => {
     const res: any = await run(postConversationMessageTool, { forumId: '1', message: '  done today  ' });
     const [action, params] = executeAction.mock.calls[0];
     expect(action).toBe('createChatMessage');
-    expect(params).toEqual({ forumId: '1', message: 'done today' });
+    expect(params).toEqual({ forumId: '1', message: 'done today', via: 'agent' });
     expect(res).toMatchObject({ success: true, messageId: '77' });
   });
 
@@ -138,5 +138,26 @@ describe('postConversationMessage', () => {
 
     expect(executeAction.mock.calls.map((c) => c[0])).toEqual(['getForumThread', 'createChatMessage']);
     expect(res).toMatchObject({ success: true, messageId: '78' });
+  });
+});
+
+describe('openRikmaConversation', () => {
+  it('returns the existing thread, and says when it had to create one', async () => {
+    const { openRikmaConversationTool } = await import('./forumTools');
+    executeAction.mockResolvedValue({ success: true, data: { forumId: '12', created: true } });
+
+    const res: any = await run(openRikmaConversationTool, { projectId: '89' });
+
+    expect(executeAction.mock.calls[0][0]).toBe('ensureProjectForum');
+    expect(res).toMatchObject({ success: true, forumId: '12', created: true });
+    expect(res.url).toMatch(/\/forum\/12$/);
+  });
+
+  it('refuses for a non-member without echoing the action error', async () => {
+    const { openRikmaConversationTool } = await import('./forumTools');
+    executeAction.mockResolvedValue({ success: false, error: { message: 'User is not a member of project 89' } });
+    const res: any = await run(openRikmaConversationTool, { projectId: '89' });
+    expect(res).toMatchObject({ success: false, denied: true });
+    expect(res.message).not.toMatch(/not a member of project/);
   });
 });

@@ -179,6 +179,28 @@ const qids_base = {
         
     }`,
   /**
+   * The agent twin of 1chatsend (PLAN_MCP_TOOLS_V2 §M4).
+   *
+   * `via` says a message was written through an agent on the member's behalf.
+   * It is a separate qid, not a field on 1chatsend, because the Message field
+   * only exists once the backend (1.0b) is deployed: until then this query
+   * would fail, while plain chat keeps working untouched. `createChatMessage`
+   * picks it only when CHAT_VIA_ENABLED is on.
+   */
+  '1chatsendVia': `mutation CreateMessageVia($fid: ID, $fidn: Int, $idL: ID, $da: DateTime, $mes: String, $via: ENUM_MESSAGE_VIA) {
+    createMessage(
+      data: {
+        forum: $fid,
+        fid: $fidn,
+        users_permissions_user: $idL,
+        when: $da,
+        publishedAt: $da,
+        content: $mes,
+        via: $via
+      }
+    ) { data { id attributes { forum { data { id } } } } }
+  }`,
+  /**
    * The guest twin of 1chatsend.
    *
    * A meeting guest has no Strapi account, so there is no
@@ -15813,6 +15835,61 @@ ${STIPEND_DECISION_FIELDS}
     }
     lastDecision: decisions(filters: { projects: { id: { eq: $pid } } }, sort: "createdAt:desc", pagination: { limit: 1 }) { data { attributes { createdAt } } }
     lastTimer: timers(filters: { project: { id: { eq: $pid } } }, sort: "updatedAt:desc", pagination: { limit: 1 }) { data { attributes { updatedAt } } }
+  }`,
+
+  // PLAN_MCP_TOOLS_V2 M5 — cross-rikma search, for the caller only.
+  //
+  // Membership is part of every filter (`project: { user_1s: { id: { eq: $uid } } }`),
+  // so the query itself cannot return a rikma the caller is not in — the tool
+  // does not have to be trusted to filter afterwards. Public material is not
+  // here on purpose: that is searchCatalogTool.
+  '324mcpSearchMine': `query McpSearchMine($uid: ID!, $q: String!, $limit: Int = 10) {
+    rikmas: projects(
+      filters: { user_1s: { id: { eq: $uid } }, or: [{ projectName: { containsi: $q } }, { publicDescription: { containsi: $q } }, { descripFor: { containsi: $q } }] }
+      pagination: { limit: $limit }
+    ) { data { id attributes { projectName publicDescription } } }
+
+    openMissions(
+      filters: { and: [ { project: { user_1s: { id: { eq: $uid } } } }, { archived: { eq: false } }, ${NOT_ARCHIVED}, { or: [{ name: { containsi: $q } }, { descrip: { containsi: $q } }] } ] }
+      sort: ["createdAt:desc"]
+      pagination: { limit: $limit }
+    ) { data { id attributes { name descrip project { data { id attributes { projectName } } } } } }
+
+    missionsInProgress: mesimabetahaliches(
+      filters: { and: [ { project: { user_1s: { id: { eq: $uid } } } }, { finnished: { ne: true } }, ${NOT_ARCHIVED}, { or: [{ name: { containsi: $q } }, { descrip: { containsi: $q } }] } ] }
+      sort: ["updatedAt:desc"]
+      pagination: { limit: $limit }
+    ) { data { id attributes { name descrip project { data { id attributes { projectName } } } users_permissions_user { data { attributes { username } } } } } }
+
+    acts(
+      filters: { and: [ { project: { user_1s: { id: { eq: $uid } } } }, { or: [{ shem: { containsi: $q } }, { des: { containsi: $q } }] } ] }
+      sort: ["createdAt:desc"]
+      pagination: { limit: $limit }
+    ) { data { id attributes { shem des naasa project { data { id attributes { projectName } } } } } }
+
+    openResources: openMashaabims(
+      filters: { and: [ { project: { user_1s: { id: { eq: $uid } } } }, { archived: { ne: true } }, ${NOT_ARCHIVED}, { or: [{ name: { containsi: $q } }, { descrip: { containsi: $q } }] } ] }
+      sort: ["createdAt:desc"]
+      pagination: { limit: $limit }
+    ) { data { id attributes { name descrip kindOf project { data { id attributes { projectName } } } } } }
+
+    resourcesInProgress: mashabetahaliches(
+      filters: { and: [ { project: { user_1s: { id: { eq: $uid } } } }, { finnished: { ne: true } }, ${NOT_ARCHIVED}, { or: [{ name: { containsi: $q } }, { descrip: { containsi: $q } }] } ] }
+      pagination: { limit: $limit }
+    ) { data { id attributes { name descrip kindOf project { data { id attributes { projectName } } } } } }
+
+    products: matanots(
+      filters: { and: [ { projectcreates: { user_1s: { id: { eq: $uid } } } }, { archived: { ne: true } }, ${NOT_ARCHIVED}, { or: [{ name: { containsi: $q } }, { desc: { containsi: $q } }] } ] }
+      pagination: { limit: $limit }
+    ) { data { id attributes { name desc price projectcreates { data { id attributes { projectName } } } } } }
+  }`,
+
+  // PLAN_MCP_TOOLS_V2 M4b — the rikma general forum, looked up by its stable
+  // subject so "ensure" never creates a second one.
+  '323projectGeneralForum': `query ProjectGeneralForum($pid: ID!, $subject: String!) {
+    forums(filters: { project: { id: { eq: $pid } }, subject: { eq: $subject } }, pagination: { limit: 1 }) {
+      data { id attributes { subject } }
+    }
   }`,
 
   // PLAN_MCP_TOOLS_V2 M7 — the supplier side of the concierge: every proposal

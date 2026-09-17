@@ -296,3 +296,50 @@ describe('P4 — write half', () => {
     expect(res.message).not.toMatch(/GraphQL/);
   });
 });
+
+describe('searchContent', () => {
+  const data = {
+    rikmas: { data: [{ id: '89', attributes: { projectName: 'Carpentry', publicDescription: 'we build' } }] },
+    openMissions: {
+      data: [
+        { id: '5', attributes: { name: 'logo', descrip: 'draw it', project: { data: { id: '89', attributes: { projectName: 'Carpentry' } } } } }
+      ]
+    },
+    acts: {
+      data: [
+        { id: '7', attributes: { shem: 'logo file', des: 'upload', naasa: true, project: { data: { id: '90', attributes: { projectName: 'Other' } } } } }
+      ]
+    },
+    products: {
+      data: [{ id: '9', attributes: { name: 'logo pack', desc: 'svg', price: 50, projectcreates: { data: [{ id: '89', attributes: { projectName: 'Carpentry' } }] } } }]
+    }
+  };
+
+  beforeEach(() => {
+    sendToSer.mockReset().mockResolvedValue({ data });
+    getMcpContext.mockReset().mockReturnValue({ userId: '42', fetchInstance: vi.fn() });
+  });
+
+  it('labels every row with its kind and rikma', async () => {
+    const { shapeSearchResults } = await import('./conciergeTools');
+    const items = shapeSearchResults(data, 10);
+    expect(items.map((i: any) => i.kind)).toEqual(['rikma', 'openMission', 'act', 'product']);
+    expect(items.find((i: any) => i.kind === 'act')).toMatchObject({ name: 'logo file', projectId: '90', done: true });
+    expect(items.find((i: any) => i.kind === 'product')).toMatchObject({ projectName: 'Carpentry', price: 50 });
+  });
+
+  it('passes the caller id to the query, so membership is filtered server-side', async () => {
+    const { searchContentTool } = await import('./conciergeTools');
+    await (searchContentTool as any).execute({ query: 'logo' }, {});
+    expect(sendToSer.mock.calls[0][0]).toMatchObject({ uid: '42', q: 'logo' });
+    expect(sendToSer.mock.calls[0][1]).toBe('324mcpSearchMine');
+  });
+
+  it('drops rows outside a limited key', async () => {
+    const { searchContentTool } = await import('./conciergeTools');
+    getMcpContext.mockReturnValue({ userId: '42', fetchInstance: vi.fn(), keyProjects: ['89'] });
+    const res: any = await (searchContentTool as any).execute({ query: 'logo' }, {});
+    expect(res.items.every((i: any) => i.projectId === '89')).toBe(true);
+    expect(res.items.some((i: any) => i.kind === 'act')).toBe(false);
+  });
+});

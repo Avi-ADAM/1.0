@@ -16,11 +16,11 @@
  * Posting is `communicate` (decision D1): it is visible to other people under
  * the caller's name, but it binds nobody.
  *
- * Provenance is deliberately NOT written into the message: `Message` has no
- * metadata field (content, when, forum, author — that is all), so a `via` tag
- * would be accepted by the action and silently dropped. The audit line records
- * it instead; showing "written through an agent" in the UI needs a Strapi field
- * first (see the plan).
+ * Provenance: every message posted here carries `via: 'agent'`, so a reader can
+ * tell the member's agent wrote it for them. The Message field behind it lives
+ * in the backend repo and the mark is only written when CHAT_VIA_ENABLED says
+ * that backend is deployed — otherwise the message is saved unmarked rather
+ * than failing. The audit line records it either way.
  */
 
 import { createTool } from '@mastra/core/tools';
@@ -169,7 +169,8 @@ export const postConversationMessageTool = createTool({
     'Post a message, as the user, in a conversation (forum) they take part in - an update on a mission, an answer in a ' +
     'decision thread, a note on a profit split. The other participants are notified. ' +
     'Use it ONLY when the user asked to say or record something; never to think out loud, and never to agree or refuse ' +
-    'on their behalf (approving a decision, a split or a proposal is always their own click).',
+    'on their behalf (approving a decision, a split or a proposal is always their own click). ' +
+    'The message is marked as written through an agent.',
   inputSchema: z.object({
     forumId: z.string().describe('Forum id, from listMyConversations.'),
     message: z
@@ -197,7 +198,8 @@ export const postConversationMessageTool = createTool({
 
       const out = await runAction('createChatMessage', {
         forumId: String(forumId),
-        message: body
+        message: body,
+        via: 'agent'
       });
       if ('error' in out) return { success: false, message: out.error };
       if (!out.result.success) {
@@ -214,6 +216,42 @@ export const postConversationMessageTool = createTool({
     } catch (error) {
       console.error('[postConversationMessage] failed:', error);
       return { success: false, message: 'The message was not posted. Try again shortly.' };
+    }
+  }
+});
+
+export const openRikmaConversationTool = createTool({
+  id: 'openRikmaConversation',
+  description:
+    "Get the rikma's own general conversation - the one thread that belongs to the whole rikma rather than to a single " +
+    'mission, act or decision. It is created the first time someone opens it. Use it for "what are we doing next" talk; ' +
+    'anything about a specific mission, decision or profit split belongs in that thing\'s own thread, where it stays on record. ' +
+    'Returns a forumId for readConversation and postConversationMessage. Members only.',
+  inputSchema: z.object({
+    projectId: z.string().describe('Rikma (project) id.')
+  }),
+  execute: async ({ projectId }) => {
+    try {
+      const out = await runAction('ensureProjectForum', { projectId: String(projectId) });
+      if ('error' in out) return { success: false, message: out.error };
+      if (!out.result.success) {
+        return { success: false, denied: true, message: `Rikma ${projectId} is not available to you.` };
+      }
+
+      const forumId = String(out.result.data?.forumId ?? '');
+      return {
+        success: true,
+        forumId,
+        projectId: String(projectId),
+        created: !!out.result.data?.created,
+        message: out.result.data?.created
+          ? 'This rikma had no general conversation; it has one now.'
+          : 'The rikma general conversation.',
+        url: `${SITE}/forum/${forumId}`
+      };
+    } catch (error) {
+      console.error('[openRikmaConversation] failed:', error);
+      return { success: false, message: 'Could not open the rikma conversation right now. Try again shortly.' };
     }
   }
 });

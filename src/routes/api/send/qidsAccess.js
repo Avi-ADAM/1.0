@@ -128,6 +128,7 @@ export const qidsAccess = {
   '211findMatchSuggestionsByMashaabim': { allow: ['user', 'serviceAdmin'] },
   '212levResourceMatchSuggestions': { allow: ['user', 'serviceAdmin'] },
   '1chatsend': { allow: ['user', 'serviceAdmin'] },
+  '1chatsendVia': { allow: ['user', 'serviceAdmin'] },
   // Guest chat: only /api/guest/message calls it, with the admin token and after
   // checking the forum really belongs to the guest's meeting. A browser reaching it
   // directly could post as any guest name into any forum, so `user` is not granted.
@@ -644,4 +645,8 @@ export const qidsAccess = {
   '320mcpProjectDetails': { allow: ['serviceAdmin'] },
   '321mcpProjectStats': { allow: ['serviceAdmin'] },
   '322mcpMyWishOffers': { allow: ['serviceAdmin'] },
+  '323projectGeneralForum': { allow: ['user', 'serviceAdmin'] },
+  // Membership is inside the query's own filters; still service-only, like the
+  // other MCP reads, because the MCP guard is what stands in front of it.
+  '324mcpSearchMine': { allow: ['serviceAdmin'] },
 };

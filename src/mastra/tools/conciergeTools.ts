@@ -491,3 +491,97 @@ export const draftWishTool = createTool({
     }
   }
 });
+
+// ── M5: searching what the caller already has access to ────────────────────
+
+/** Pure shaping of qid 324. Each row says which rikma it came from. */
+export function shapeSearchResults(data: any, limit: number) {
+  const row = (
+    kind: string,
+    node: any,
+    name: unknown,
+    description: unknown,
+    project: any,
+    extra: Record<string, unknown> = {}
+  ) => ({
+    kind,
+    id: String(node?.id ?? ''),
+    name: text(name),
+    description: excerpt(description, 200),
+    projectId: project?.id ? String(project.id) : null,
+    projectName: text(project?.attributes?.projectName),
+    ...extra
+  });
+
+  const items: any[] = [];
+  const take = (key: string, map: (node: any) => any) => {
+    for (const node of rows(data?.[key]).slice(0, limit)) items.push(map(node));
+  };
+  // A rikma is its own "project": the row points at itself.
+  take('rikmas', (n) => row('rikma', n, n.attributes?.projectName, n.attributes?.publicDescription, n));
+  take('openMissions', (n) => row('openMission', n, n.attributes?.name, n.attributes?.descrip, n.attributes?.project?.data));
+  take('missionsInProgress', (n) =>
+    row('missionInProgress', n, n.attributes?.name, n.attributes?.descrip, n.attributes?.project?.data, {
+      holder: text(n.attributes?.users_permissions_user?.data?.attributes?.username) || null
+    })
+  );
+  take('acts', (n) =>
+    row('act', n, n.attributes?.shem, n.attributes?.des, n.attributes?.project?.data, { done: !!n.attributes?.naasa })
+  );
+  take('openResources', (n) => row('openResource', n, n.attributes?.name, n.attributes?.descrip, n.attributes?.project?.data));
+  take('resourcesInProgress', (n) =>
+    row('resourceInProgress', n, n.attributes?.name, n.attributes?.descrip, n.attributes?.project?.data)
+  );
+  take('products', (n) =>
+    row('product', n, n.attributes?.name, n.attributes?.desc, n.attributes?.projectcreates?.data?.[0], {
+      price: n.attributes?.price ?? null
+    })
+  );
+  return items;
+}
+
+export const searchContentTool = createTool({
+  id: 'searchContent',
+  description:
+    'Search inside the rikmas the caller belongs to: rikma names and descriptions, open missions, missions in progress, ' +
+    'acts, open and in-progress resources, and products. Use it to find something when the rikma is not known - ' +
+    '"where was that task about the logo". For public listings of other rikmas use searchCatalogTool instead.',
+  inputSchema: z.object({
+    query: z.string().min(2).max(100).describe('Free text; matched against names and descriptions.'),
+    limit: z.number().int().min(1).max(25).optional().describe('Maximum rows per kind, default 10.')
+  }),
+  execute: async ({ query, limit }) => {
+    const ctx = getMcpContext();
+    if (!ctx?.userId || !ctx.fetchInstance) return { success: false, message: 'Not authenticated.' };
+    const cap = limit ?? 10;
+
+    try {
+      const res: any = await sendToSer(
+        { uid: ctx.userId, q: query.trim(), limit: cap },
+        '324mcpSearchMine',
+        0,
+        0,
+        !ctx.isInternalBot,
+        ctx.fetchInstance
+      );
+      let items = shapeSearchResults(res?.data, cap);
+      // A key limited to some rikmot never sees rows from the others.
+      const keyProjects = ctx.isInternalBot ? undefined : ctx.keyProjects;
+      if (keyProjects?.length) {
+        const allowed = new Set(keyProjects.map(String));
+        items = items.filter((i) => i.projectId != null && allowed.has(String(i.projectId)));
+      }
+
+      return {
+        success: true,
+        note: MEMBER_WRITTEN_NOTE,
+        query,
+        totalFound: items.length,
+        items
+      };
+    } catch (error) {
+      console.error('[searchContent] failed:', error);
+      return { success: false, message: 'Could not search right now. Try again shortly.' };
+    }
+  }
+});

@@ -46,6 +46,7 @@ import {
   listMyWishesTool,
   getWishDetailsTool,
   listMyWishOffersTool,
+  searchContentTool,
   previewWishTool,
   draftWishTool,
   conciergeWriteEnabled
@@ -53,7 +54,8 @@ import {
 import {
   listMyConversationsTool,
   readConversationTool,
-  postConversationMessageTool
+  postConversationMessageTool,
+  openRikmaConversationTool
 } from '../../../mastra/tools/forumTools';
 import {
   getProjectDetailsTool,
@@ -90,6 +92,9 @@ export const MCP_TOOL_MANIFEST: Record<string, McpManifestEntry> = {
   // --- concierge reads (M7). No projectId: a wish belongs to a person, not to a
   // rikma, so each tool keys itself to the caller or checks the viewer inside.
   searchCatalogTool: { tool: searchCatalogTool, tier: 'read' },
+  // Its query filters by membership itself; the key scope is applied in the tool,
+  // because the rows come from seven collections at once.
+  searchContentTool: { tool: searchContentTool, tier: 'read' },
   listMyWishesTool: { tool: listMyWishesTool, tier: 'read' },
   getWishDetailsTool: { tool: getWishDetailsTool, tier: 'read' },
   listMyWishOffersTool: { tool: listMyWishOffersTool, tier: 'read' },
@@ -103,6 +108,9 @@ export const MCP_TOOL_MANIFEST: Record<string, McpManifestEntry> = {
   listMyConversationsTool: { tool: listMyConversationsTool, tier: 'read', project: 'scope' },
   readConversationTool: { tool: readConversationTool, tier: 'read' },
   postConversationMessageTool: { tool: postConversationMessageTool, tier: 'communicate' },
+  // Creates the rikma-wide thread on first use (the only forum that is not
+  // attached to some object), then hands its id to the two tools above.
+  openRikmaConversationTool: { tool: openRikmaConversationTool, tier: 'communicate', project: 'member' },
 
   getSitePagesTool: { tool: getSitePagesTool, tier: 'read' },
   getPageContextTool: { tool: getPageContextTool, tier: 'read' },
