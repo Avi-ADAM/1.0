@@ -52,6 +52,11 @@ import {
   conciergeWriteEnabled
 } from '../../../mastra/tools/conciergeTools';
 import {
+  listRikmaProcessesTool,
+  startProcessTool,
+  attachToProcessTool
+} from '../../../mastra/tools/processTools';
+import {
   listMyConversationsTool,
   readConversationTool,
   postConversationMessageTool,
@@ -115,6 +120,9 @@ export const MCP_TOOL_MANIFEST: Record<string, McpManifestEntry> = {
   getSitePagesTool: { tool: getSitePagesTool, tier: 'read' },
   getPageContextTool: { tool: getPageContextTool, tier: 'read' },
 
+  // --- processes (M6). What a rikma is pursuing before it is a mission yet.
+  listRikmaProcessesTool: { tool: listRikmaProcessesTool, tier: 'read', project: 'member' },
+
   // --- prepare ---
   navigateToPageTool: { tool: navigateToPageTool, tier: 'prepare' },
   createProjectTool: { tool: createProjectTool, tier: 'prepare' }, // returns a prefilled URL; the human creates it
@@ -136,6 +144,9 @@ export const MCP_TOOL_MANIFEST: Record<string, McpManifestEntry> = {
   // Sets one rikma link. In a rikma with more than one member the action turns
   // the website/Facebook change into a Decision by itself — consent stays put.
   proposeProjectLinkTool: { tool: proposeProjectLinkTool, tier: 'consentWrite', project: 'member' },
+  // Both open or extend a shared object of the rikma, and bind nobody.
+  startProcessTool: { tool: startProcessTool, tier: 'communicate', project: 'member' },
+  attachToProcessTool: { tool: attachToProcessTool, tier: 'communicate', project: 'member' },
   createTaskTool: { tool: createTaskTool, tier: 'consentWrite', project: 'member', mission: 'member' },
 
   // --- sharedWrite (needs MCP_WRITE_SCOPE) ---

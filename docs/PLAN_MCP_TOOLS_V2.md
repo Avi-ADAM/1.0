@@ -132,22 +132,36 @@
 - שאילתה 2–100 תווים, עד 50 תוצאות, דלי קצב `read`.
 - v1: `containsi` בשרת על שדות השם והתיאור. v2: אינדקס (אם יתברר שצריך).
 
-### M6 — Outreach לשותפים: `createPartnerOutreach` / `updateOutreach` / `listOutreach`
-- **אין היום ישות כזו**, ולכן זה הפריט הכבד ביותר (שינוי ב-Strapi).
-- **collection חדש `partner-outreach`**: `project` (רלציה), `createdBy`, `orgName`,
-  `orgWebsite`, `contactChannel` (enum: email/phone/form/social/meeting/other),
-  `contactRef` (אופציונלי — פרטי הקשר), `status` (enum: draft/sent/replied/meeting/
-  agreed/notNow/stale), `sentText` (richtext), `lastContactAt`, `nextStepAt`, `notes`,
-  `lifecycle` (כמו בשאר האובייקטים; null = active).
-- **הכלי לעולם לא שולח** אימייל או הודעה. הוא רושם מה המשתמש שלח (או טיוטה שהמשתמש
-  ישלח בעצמו). כך אין לנו שום משטח ספאם.
-- **נראות**: חברי הרקמה בלבד (כדי ששני שותפים לא יפנו לאותו ארגון). לא נכנס לשום
-  query ציבורי. `contactRef` לא חוזר ב-`listOutreach` אלא אם ביקשו `includeContact:true`.
-- **סטטוס "לא עכשיו" ולא "סירוב"** — ברוח העיקרון שאין "לא" מוחלט.
-- שכבה: `selfWrite`-ish, כי זו רשומה פנימית ולא חובה על מישהו. actions חדשים:
-  `createPartnerOutreach`, `updatePartnerOutreach` עם `authRules: projectMember`.
-- **זכור**: collection חדש צריך **שתי** הרשאות ב-Strapi (Authenticated + API token),
-  ו-`validate:qids` לא תופס query שגוי.
+### M6 — פנייה לשותפים = **תהליך**, לא CRM (נכתב מחדש 2026-09-17)
+
+הגרסה הראשונה של M6 הייתה טבלת CRM: ארגונים, סטטוסים, וטקסט שנשלח. זו הצורה הלא נכונה
+לפלטפורמה הזו. פנייה לשותף היא לא פתק — היא רקמה שאומרת "יש כאן עבודה שצריך לעשות" או
+"יש כאן משאב שאנחנו צריכים", והתשובה לה היא **משימה פתוחה, משאב פתוח או תרומה**. CRM מקביל
+היה משאיר את הכוונה הזו מחוץ לכל מה שהרקמה באמת רצה עליו.
+
+מה שכן נכון: פנייה כמעט אף פעם לא מתחילה מגובשת. היא מתחילה כפסקה. לזה כבר יש מיכל —
+**תהליך** (`Partof` + פורום, `createProcess` / `attachEntityToProcess`, ועמוד
+`moach/[pid]/processes`): עוגן עם שיחה משלו, שההודעה הראשונה בה היא הטקסט הגולמי, ושאוסף
+אליו את המשימות והמשאבים שמתגבשים ממנו.
+
+| כלי | שכבה | מה עושה |
+|---|---|---|
+| `listRikmaProcessesTool(projectId)` | read | מה הרקמה מריצה כרגע, עם הפורום של כל תהליך והאובייקטים שנוצרו בו (משתמש ב-`mapProjectProcesses`, אותו mapper של עמוד המואך). |
+| `startProcessTool(projectId, name, description?)` | communicate | פותח תהליך; התיאור הופך להודעה הראשונה. זה המקום של "יש ארגון שאולי יממן את הסדנה". |
+| `attachToProcessTool(projectId, processId, entityType, entityId, name?)` | communicate | מחבר משימה פתוחה / משאב פתוח / משימה בתהליך / pendm / pmash / maap לתהליך. **לא יוצר** את האובייקט — קודם יוצרים אותו בדרך הרגילה. |
+
+ה-`instructions` אומרים לסוכן במפורש: פנייה לשותף היא תהליך, ומה שמתגבש ממנה הופך למשימה
+פתוחה או למשאב — לא נשאר כטקסט אצלו.
+
+**מה שלא נבנה, במכוון**: אין collection `partner-outreach`, אין שדות סטטוס
+(`draft/sent/replied`) ואין שמירת פרטי קשר של אנשים חיצוניים. סטטוס הפנייה הוא מצב
+האובייקטים שנתלו על התהליך, והשיחה היא הפורום שלו. אם בהמשך יתברר שחסר "למי פנינו ומתי",
+זה שדה על התהליך — לא מערכת שנייה.
+
+**נמצא בדרך**: ה-qid `getProjectProcesses` שולף `project.processes { name descrip }`.
+ל-`Project` אין רלציה `processes` ול-`Partof` אין `name`/`descrip` — השאילתה הזו לא יכולה
+לעבוד. היא מסומנת unreferenced ב-`qidsAccess`, וזה מסביר למה. הדרך החיה היא
+`102projectProcessesQuery` + `mapProjectProcesses`.
 
 ### M7 — קונסיירז' ב-MCP ★ (האסטרטגי)
 **למה זה חשוב**: היום מחפשים ספקים ואחר כך לקוחות. כש-Claude יכול לנסח משאלה ולהביא
@@ -181,7 +195,7 @@
 | **P4** | M7 כתיבה: `previewWishTool`, `draftWishTool` | P2 (דלי `ai`) | ✅ 2026-09-17 |
 | **P5** | M4 שיחות (`listMyConversations`/`readConversation`/`postConversationMessage`) + M2 `proposeProjectLink` | D1, P2 | ✅ 2026-09-17 |
 | **P6** | M5 `searchContentTool` + צ'אט הרקמה + תגית `via` | P2 | ✅ 2026-09-17 |
-| **P7** | M6 Outreach (Strapi collection + 2 actions + 3 כלים + תצוגה במואך) | שינוי backend | ⏳ |
+| **P7** | M6 — תהליכים: `listRikmaProcesses`, `startProcess`, `attachToProcess` (בלי collection חדש) | — | ✅ 2026-09-17 |
 | **P8** | `publishWish`, עדכון ה-skill `1lev1-platform` ו-`PLAN_MCP_SKILL` | D2 | ⏳ |
 
 כל שלב: בדיקות vitest לכלים (כולל מקרים של לא-חבר ומפתח מחוץ לתחום), `npm run check`,
@@ -387,3 +401,20 @@
 - **נשאר**: הצגת התגית ב-UI דורשת להוסיף `via` לשליפות ההודעות (`103getForumThreadById`,
   `105getForumSummaryById`, `ForumListCore`) — וזה שובר את הפורום אם הפרונט נפרס לפני
   הבקאנד. לכן זה צעד נפרד, **אחרי** שהבקאנד למעלה.
+
+### 2026-09-17 — P7 (פנייה לשותפים כתהליך)
+
+ראו §M6 שנכתב מחדש. שלושת הכלים ב-`src/mastra/tools/processTools.ts`, על ה-actions
+הקיימים `createProcess` / `attachEntityToProcess` (שניהם `projectMember`) ועל
+`102projectProcessesQuery`. `ATTACHABLE` מכיל בדיוק את מה ש-`attachEntityToProcess` יודע
+לחבר — הרשימה הראשונה שכתבתי כללה `act` ו-`matanot`, שהיו נכשלים ב-`Unsupported entity type`.
+**בדיקות**: `processTools.test.ts` (7).
+
+## 8. מה נשאר
+
+1. **אחרי פריסת הבקאנד**: להדליק `CHAT_VIA_ENABLED`, ואז להוסיף `via` לשליפות ההודעות
+   ולהציג תגית "נכתב דרך סוכן" בצ'אט.
+2. **התראות לצ'אט הרקמה** — דייג'סט במקום הודעה-להודעה, לפני שנותנים לו כניסה ב-UI.
+3. **G9** — `POST /api/concierge-extract` בלי בדיקת session: כל בקשה היא ריצת Gemini.
+4. **P8** — לעדכן את ה-skill `1lev1-platform` ואת `PLAN_MCP_SKILL` לכלים החדשים.
+5. **אימות מקצה-לקצה** של המסלול המאומת — תלוי במפתח API תקין.
