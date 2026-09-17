@@ -4,6 +4,8 @@
   "connect": "Conectar un repositorio de GitHub",
   "connectMore": "Conectar otro repositorio",
   "connectTip": "En GitHub puedes elegir «Only select repositories». En cualquier caso, después eliges aquí el único repositorio que se une a la rikma; no se conecta ningún otro.",
+  "manageAccess": "Editar el acceso en GitHub",
+  "manageAccessTip": "Para añadir repositorios que no incluiste al instalar. Después de guardar en GitHub vuelves aquí para elegir uno.",
   "notConfigured": "La integración con GitHub todavía no está configurada en este servidor.",
   "empty": "Todavía no hay ningún repositorio conectado a la rikma.",
   "private": "Privado",
@@ -14,7 +16,6 @@
   "disconnectConfirm": "¿Desconectar {{repo}} de la rikma? La instalación en GitHub se mantiene.",
   "disconnectFailed": "No se pudo desconectar, inténtalo de nuevo",
   "issuesHint": "Un issue con la etiqueta {{label}} se abre como tarea en la rikma. Cuando se cierra en GitHub la rikma recibe un aviso, y cuando la tarea se marca como hecha se deja un comentario en el issue.",
-  "next": "Próximamente: los pull requests fusionados se convertirán en reclamaciones de trabajo que la rikma aprueba, junto con las horas del temporizador marcadas en ellos.",
   "pick": {
     "title": "¿Qué repositorio se une a la rikma?",
     "intro": "GitHub dio acceso a {{count}} repositorios. Elige uno para conectarlo; luego puedes conectar otro.",
@@ -25,7 +26,8 @@
     "elsewhere": "Conectado a otra rikma",
     "noMatch": "Ningún repositorio coincide.",
     "empty": "GitHub no dio acceso a ningún repositorio.",
-    "manage": "Comprueba en GitHub a qué repositorios puede acceder la App"
+    "manage": "Comprueba en GitHub a qué repositorios puede acceder la App",
+    "missing": "¿No ves el repositorio? Dale acceso en GitHub"
   },
   "status": {
     "connected": "El repositorio se conectó a la rikma.",
@@ -46,5 +48,57 @@
     "linkedAs": "Vinculada como @{{login}}",
     "unlink": "Desvincular",
     "unlinkFailed": "No se pudo desvincular, inténtalo de nuevo"
+  },
+  "work": {
+    "title": "Trabajo en GitHub",
+    "intro": "PRs fusionados y las revisiones sobre ellos. Quien hizo el trabajo puede presentar horas por él, y la rikma las aprueba como cualquier hora de temporizador. Las líneas de código nunca se convierten en participación.",
+    "onlyMine": "Solo lo mío",
+    "loading": "Cargando trabajo de GitHub…",
+    "failed": "No se pudo leer el trabajo de GitHub. Intenta actualizar.",
+    "empty": "Aún no hay PRs fusionados en los repositorios conectados.",
+    "mineOpen": "Puedes presentar horas por {{count}} trabajos tuyos.",
+    "linkFirst": "Para que la rikma reconozca tu trabajo, vincula tu cuenta de GitHub.",
+    "linkFirstCta": "Vincúlala en ajustes",
+    "pull": "PR",
+    "review": "Revisión",
+    "unlinked": "Sin vincular — el trabajo le espera",
+    "notMember": "No es miembro de la rikma",
+    "logged": "{{hours}} h en temporizadores",
+    "claimed": "Presentado para aprobación",
+    "filed": "Registrado",
+    "invite": "Copiar enlace de invitación",
+    "inviteCopied": "Enlace copiado",
+    "refresh": "Actualizar"
+  },
+  "claim": {
+    "open": "Presentar horas",
+    "mission": "¿Para cuál de tus misiones es?",
+    "missionPick": "Elige una misión",
+    "hours": "¿Cuántas horas llevó el trabajo?",
+    "suggestion": "Sugerencia según el tamaño del cambio: {{hours}} h. Solo un punto de partida — tú decides.",
+    "alreadyLogged": "Ya tienes {{hours}} h en temporizadores etiquetados con este trabajo. Presenta solo horas que no se midieron.",
+    "note": "Una nota para la rikma (opcional)",
+    "consent": "Las horas pasan a la aprobación habitual de la rikma: aprobar, conversar o contraproponer — y el silencio hasta el tiempo de respuesta es consentimiento.",
+    "submit": "Presentar para aprobación",
+    "noMissions": "No tienes ninguna misión abierta en esta rikma. Para presentar horas primero necesitas una misión.",
+    "errors": {
+      "notConfigured": "La integración con GitHub no está configurada en el servidor.",
+      "invalid": "La solicitud no es válida.",
+      "invalidHours": "El número de horas no es válido.",
+      "notConnected": "El repositorio ya no está conectado a la rikma.",
+      "notLinked": "Primero vincula tu cuenta de GitHub.",
+      "notYourMission": "La misión elegida no es tuya en esta rikma.",
+      "notFound": "No se encontró el PR en GitHub.",
+      "notYourWork": "Según GitHub este trabajo no es tuyo.",
+      "notMerged": "El PR aún no está fusionado.",
+      "alreadyClaimed": "Ya presentaste horas por este trabajo.",
+      "failed": "No se pudo presentar, inténtalo de nuevo."
+    }
+  },
+  "badge": {
+    "title": "Insignia para el README",
+    "intro": "Pégala en el README del repositorio. Muestra que es una rikma, cuántos socios tiene y cómo sumarse, y enlaza a la página de la rikma.",
+    "copy": "Copiar el código",
+    "copied": "Copiado"
   }
 }

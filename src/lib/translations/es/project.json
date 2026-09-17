@@ -203,6 +203,8 @@
     "codeLicenseApache": "Apache 2.0 — código abierto",
     "codeLicenseRikma": "Licencia rikma — el uso comercial requiere el consentimiento de la rikma",
     "codeLicenseRikmaDelayed": "Licencia rikma que pasa a código abierto al cabo de unos años",
+    "codeLicenseRikmaShared": "Rikma compartida — el código es la herramienta, y quien quiera construir algo así está invitado a unirse",
+    "codeLicenseRikmaSharedDelayed": "Rikma compartida cuyo código pasa a código abierto al cabo de unos años",
     "codeLicenseYears": "Años hasta que el código se abra",
     "codeLicenseNote": "Un cambio de licencia solo se aplica a las versiones que se publiquen a partir de ahora. El texto de la licencia rikma sigue en revisión legal.",
     "facebook": "Enlace a Facebook",

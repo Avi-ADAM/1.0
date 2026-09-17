@@ -4,11 +4,26 @@
   import { enhance } from '$app/forms';
   import { executeAction } from '$lib/client/actionClient';
   import GithubIcon from '$lib/celim/icons/github.svelte';
+  import GithubContributions from '$lib/components/rikmaCode/GithubContributions.svelte';
   import { page } from '$app/state';
+  import { badgeMarkdown } from '$lib/github/badge';
 
   let { data } = $props();
 
   let busyId = $state(null);
+
+  // The README badge (S6): the rikma's public page, drawn by /api/badge.
+  let badgeCode = $derived(badgeMarkdown(page.url.origin, String(data.projectId)));
+  let badgeCopied = $state(false);
+  async function copyBadge() {
+    try {
+      await navigator.clipboard.writeText(badgeCode);
+      badgeCopied = true;
+      setTimeout(() => (badgeCopied = false), 2000);
+    } catch {
+      /* clipboard refused — the code stays selectable */
+    }
+  }
   let errorMsg = $state('');
 
   const OK_NOTICES = ['connected', 'linked'];
@@ -22,6 +37,9 @@
       `&projectId=${encodeURIComponent(data.projectId)}` +
       `&return=${encodeURIComponent(page.url.origin)}`
   );
+  // The same flow, sent to GitHub's install screen on purpose: to grant the App
+  // repositories left out the first time. Saving there returns to the picker.
+  let manageHref = $derived(`${connectHref}&manage=1`);
 
   // The picker: one repository at a time, whatever GitHub was granted.
   let query = $state('');
@@ -78,10 +96,8 @@
       {#if pickRepos.length === 0}
         <p class="muted">{$t('rikmaCode.pick.empty')}</p>
         <!-- The App is installed on an account that granted it no repository —
-             which is a GitHub-side setting, and only reachable there. -->
-        <a class="cancel" href="https://github.com/settings/installations" target="_blank" rel="noopener noreferrer">
-          {$t('rikmaCode.pick.manage')}
-        </a>
+             a GitHub-side setting. The manage flow comes back to this picker. -->
+        <a class="cancel" href={manageHref} data-sveltekit-reload>{$t('rikmaCode.pick.manage')}</a>
       {:else}
         <p class="muted">{$t('rikmaCode.pick.intro', { count: pickRepos.length })}</p>
         <input type="hidden" name="token" value={data.pick.token} />
@@ -117,6 +133,7 @@
             {/each}
           </ul>
         {/if}
+        <a class="cancel small" href={manageHref} data-sveltekit-reload>{$t('rikmaCode.pick.missing')}</a>
       {/if}
       <div class="pick-actions">
         {#if pickRepos.length > 0}
@@ -129,11 +146,17 @@
       </div>
     </form>
   {:else if data.configured}
-    <a class="connect" href={connectHref} data-sveltekit-reload>
-      <GithubIcon width={18} />
-      {data.repos.length ? $t('rikmaCode.connectMore') : $t('rikmaCode.connect')}
-    </a>
+    <div class="connect-row">
+      <a class="connect" href={connectHref} data-sveltekit-reload>
+        <GithubIcon width={18} />
+        {data.repos.length ? $t('rikmaCode.connectMore') : $t('rikmaCode.connect')}
+      </a>
+      <a class="manage" href={manageHref} data-sveltekit-reload>
+        {$t('rikmaCode.manageAccess')}
+      </a>
+    </div>
     <p class="muted small">{$t('rikmaCode.connectTip')}</p>
+    <p class="muted small">{$t('rikmaCode.manageAccessTip')}</p>
   {:else}
     <p class="muted">{$t('rikmaCode.notConfigured')}</p>
   {/if}
@@ -172,7 +195,19 @@
     <p class="muted small">{$t('rikmaCode.issuesHint', { label: data.issueLabel })}</p>
   {/if}
 
-  <p class="muted small next">{$t('rikmaCode.next')}</p>
+  {#if data.configured && data.repos.length > 0 && !data.pick}
+    <GithubContributions projectId={String(data.projectId)} />
+  {/if}
+
+  <section class="badge">
+    <h3>{$t('rikmaCode.badge.title')}</h3>
+    <p class="muted small">{$t('rikmaCode.badge.intro')}</p>
+    <img src={`/api/badge/${data.projectId}.svg`} alt={$t('rikmaCode.badge.title')} height="20" />
+    <code class="badge-code" dir="ltr">{badgeCode}</code>
+    <button class="manage" type="button" onclick={copyBadge}>
+      {badgeCopied ? $t('rikmaCode.badge.copied') : $t('rikmaCode.badge.copy')}
+    </button>
+  </section>
 </section>
 
 <style>
@@ -206,6 +241,12 @@
     background: rgba(20, 83, 45, 0.35);
     color: #bbf7d0;
   }
+  .connect-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+  }
   .connect {
     align-self: flex-start;
     display: inline-flex;
@@ -224,6 +265,21 @@
   }
   .connect:disabled {
     opacity: 0.5;
+  }
+  /* The secondary action beside "connect": an outline, not a second gold pill. */
+  .manage {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    border-radius: 9999px;
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .manage:hover,
+  .manage:focus-visible {
+    background: rgba(203, 213, 225, 0.08);
   }
   .picker {
     display: flex;
@@ -343,8 +399,28 @@
   .disconnect:disabled {
     opacity: 0.5;
   }
-  .next {
+  .badge {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
     border-top: 1px solid rgba(203, 213, 225, 0.2);
     padding-top: 0.75rem;
+  }
+  .badge h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--gold);
+  }
+  .badge-code {
+    display: block;
+    max-width: 100%;
+    padding: 0.45rem 0.6rem;
+    border-radius: 0.5rem;
+    background: rgba(2, 6, 23, 0.6);
+    color: #e2e8f0;
+    font-size: 0.75rem;
+    overflow-wrap: anywhere;
+    user-select: all;
   }
 </style>

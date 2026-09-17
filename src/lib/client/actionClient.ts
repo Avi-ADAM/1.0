@@ -427,6 +427,8 @@ export type ActionKey =
   // Code rikma — GitHub connection (PLAN_CODE_RIKMA S2)
   | 'unlinkGithubAccount'
   | 'disconnectProjectRepo'
+  // Merged PRs and reviews → hours for approval (PLAN_CODE_RIKMA S4)
+  | 'claimGithubWork'
   // Registered since the unified action system landed, but never listed here —
   // which is why `weget.svelte` had three type errors on its own vote calls.
   | 'voteOnMaap'

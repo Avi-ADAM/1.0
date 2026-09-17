@@ -1,13 +1,12 @@
 import type { ActionConfig } from '../types.js';
-import { calcDeadlineMs } from './actionUtils.js';
 import { touchDormancy } from '$lib/server/archive/dormancyClock.js';
 import { execFromContext } from '$lib/server/archive/exec.js';
 import { run } from '$lib/server/archive/gql.js';
-import { pickRateRow, resolveRate, rowRate, type RateRow } from '$lib/timers/rate.js';
+import { resolveRate } from '$lib/timers/rate.js';
 import { closeOpenIntervals, totalHours as hoursOfIntervals } from '$lib/timers/intervals.js';
 import { serializeSaveLinks } from '$lib/timers/saveLinks.js';
 import { saveFileIds } from '$lib/timers/saveFiles.js';
-import { workMonthOf } from '$lib/recurring/missionMonths.js';
+import { fileHours } from '$lib/server/timers/fileHours.js';
 
 /**
  * The timer as the server sees it, read before anything is written to it.
@@ -51,45 +50,6 @@ async function readTimer(
         console.warn('[timerSave] could not read the timer (non-fatal):', e);
         return null;
     }
-}
-
-/**
- * `why` on Finiapruval and FinnishedMission is a Strapi `string` — a 255-char
- * column. The timer's own `saveText` is richtext and keeps the note in full;
- * these copies are summaries, so trim them rather than let the write fail.
- * The newest note is the one that matters, so trimming eats the oldest lines.
- */
-const WHY_MAX = 250;
-
-function clampWhy(text: string): string {
-    if (text.length <= WHY_MAX) return text;
-    const lines = text.split('\n');
-    while (lines.length > 1 && lines.join('\n').length > WHY_MAX - 2) lines.shift();
-    const kept = lines.join('\n');
-    if (kept.length <= WHY_MAX - 2) return `…\n${kept}`;
-    // A single note longer than the column on its own — cut its head off.
-    return `…${kept.slice(kept.length - (WHY_MAX - 1))}`;
-}
-
-function todayDateString(): string {
-  const d = new Date();
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, '0');
-  const day = String(d.getDate()).padStart(2, '0');
-  return `${y}-${m}-${day}`;
-}
-
-/**
- * The month the approval is filed under.
- *
- * It used to be today's date, so a member who worked all through August and
- * saved on the 1st of September had every one of those hours booked to
- * September. The hours carry their own dates — `workMonthOf` reads the month
- * that holds most of them — and only a timer with no usable interval falls back
- * to today.
- */
-function approvalMonth(intervals: { start?: string | null; stop?: string | null }[]): string {
-  return workMonthOf(intervals) ?? todayDateString();
 }
 
 export const timerSaveConfig: ActionConfig = {
@@ -182,7 +142,6 @@ export const timerSaveConfig: ActionConfig = {
         if (!missionData) throw new Error(`Mission ${mId} not found`);
 
         const at = missionData.attributes;
-        const userCount = at.project?.data?.attributes?.user_1s?.data?.length ?? 1;
 
         // What the rikma is asked to sign comes from the intervals on the
         // server's own copy of the timer, not from a number the client sent:
@@ -216,12 +175,6 @@ export const timerSaveConfig: ActionConfig = {
         // the approval reads them through its `timer` relation.
         const filesForRow: string[] = sentFiles ? saveFiles : (timerBefore?.fileIds ?? []);
 
-        const fmRows: RateRow[] = (at.finnished_missions?.data ?? []).map((fm: any) => ({
-            id: String(fm.id),
-            noofhours: Number(fm.attributes?.noofhours ?? 0),
-            perhour: fm.attributes?.perhour == null ? null : Number(fm.attributes.perhour),
-        }));
-
         // Step 3: Update mission monthly hours counter + clear activeTimer
         await strapi.execute('112updateMissionMonthlyHours', {
             id: mId,
@@ -229,90 +182,20 @@ export const timerSaveConfig: ActionConfig = {
             stname: params.stname || 'saved'
         }, context.jwt, context.fetch);
 
-        if (userCount === 1) {
-            // --- Single-user: directly write to FinnishedMission ---
-            // One row per rate era: hours worked at the old value never land on
-            // a row priced at the new one.
-            const targetRow = pickRateRow(fmRows, rate);
-            const existingFm = targetRow
-                ? at.finnished_missions?.data?.find((fm: any) => String(fm.id) === targetRow.id)
-                : null;
-
-            if (existingFm && targetRow) {
-                const newHours = (existingFm.attributes.noofhours ?? 0) + sessionHoursTotal;
-                // The row accumulates sessions, so the notes accumulate too —
-                // one line per save, oldest first, rather than the last one winning.
-                const prevWhy: string = (existingFm.attributes.why ?? '').toString();
-                const mergedWhy = saveText
-                    ? (prevWhy && prevWhy !== 'timer save' ? `${prevWhy}\n${saveText}` : saveText)
-                    : null;
-                // Same for the attachments: a media relation is *replaced* by
-                // what is written, so this session's files are added to the
-                // ones earlier sessions filed rather than sent on their own.
-                const mergedFiles = filesForRow.length
-                    ? [...new Set([...saveFileIds(existingFm.attributes?.what), ...filesForRow])]
-                    : null;
-                await strapi.execute('114updateFinnishedMissionHours', {
-                    id: existingFm.id,
-                    noofhours: newHours,
-                    total: newHours * rowRate(targetRow, rate),
-                    ...(mergedWhy ? { why: clampWhy(mergedWhy) } : {}),
-                    ...(mergedFiles ? { what: mergedFiles } : {})
-                }, context.jwt, context.fetch);
-            } else {
-                await strapi.execute('113createFinnishedMissionForTimerSave', {
-                    missionName: at.name,
-                    noofhours: sessionHoursTotal,
-                    mesimabetahalich: mId,
-                    mission: at.mission?.data?.id,
-                    project: at.project?.data?.id,
-                    publishedAt: now.toISOString(),
-                    users_permissions_user: at.users_permissions_user?.data?.id,
-                    perhour: rate,
-                    total: sessionHoursTotal * rate,
-                    why: saveText ? clampWhy(saveText) : 'timer save',
-                    ...(filesForRow.length ? { what: filesForRow } : {})
-                }, context.jwt, context.fetch);
-            }
-
-            await strapi.execute('115updateMissionTotalHoursSaved', {
-                id: mId,
-                totalHoursSaved: (at.totalHoursSaved ?? 0) + sessionHoursTotal
-            }, context.jwt, context.fetch);
-
-        } else {
-            // --- Multi-user: create Finiapruval for approval vote ---
-            const vots = [{ what: true, users_permissions_user: context.userId }];
-
-            const finiRes = await strapi.execute('111createFiniapruvalForTimer', {
-                missname: at.name,
-                noofhours: sessionHoursTotal,
-                mesimabetahalich: mId,
-                project: at.project?.data?.id,
-                publishedAt: now.toISOString(),
-                users_permissions_user: at.users_permissions_user?.data?.id,
-                vots,
-                timer: hasTimer ? params.timerId : undefined,
-                month: approvalMonth(intervals),
-                // Carried onto the approval so a vote that lands after the
-                // mission's value changed still prices these hours correctly.
-                perhour: rate,
-                ...(saveText ? { why: clampWhy(saveText) } : {}),
-                ...(filesForRow.length ? { what: filesForRow } : {})
-            }, context.jwt, context.fetch);
-
-            const finiId = finiRes?.data?.createFiniapruval?.data?.id;
-
-            if (finiId) {
-                const restime = at.project?.data?.attributes?.restime ?? 'feh';
-                const deadline = new Date(Date.now() + calcDeadlineMs(restime)).toISOString();
-                await strapi.execute('32createTimeGrama', {
-                    date: deadline,
-                    whatami: 'finiapruval',
-                    finiapruval: finiId
-                }, context.jwt, context.fetch);
-            }
-        }
+        // Step 4: file the hours — straight onto the mission for a rikma of
+        // one, otherwise as an approval the rikma signs (fileHours.ts).
+        await fileHours({
+            strapi,
+            context,
+            missionId: String(mId),
+            at,
+            hours: sessionHoursTotal,
+            rate,
+            saveText,
+            files: filesForRow,
+            intervals,
+            timerId: hasTimer ? String(params.timerId) : undefined,
+        });
 
         // Logged hours mean the mission is alive (PLAN_OBJECT_ARCHIVAL).
         await touchDormancy(execFromContext(context), String(mId)).catch(() => null);

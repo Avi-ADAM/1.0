@@ -11,7 +11,15 @@
  * `null` = legacy = `none` — every rikma created before S1 has no license set.
  */
 
-export const CODE_LICENSES = ['none', 'mit', 'apache', 'rikma', 'rikmaDelayed'] as const;
+export const CODE_LICENSES = [
+  'none',
+  'mit',
+  'apache',
+  'rikma',
+  'rikmaDelayed',
+  'rikmaShared',
+  'rikmaSharedDelayed'
+] as const;
 export type CodeLicense = (typeof CODE_LICENSES)[number];
 
 /** BSL's customary change date; a rikma can pick anything in the range below. */
@@ -34,20 +42,37 @@ export function isRikmaLicense(v: unknown): boolean {
   return l === 'rikma' || l === 'rikmaDelayed';
 }
 
+/**
+ * "Create with us" (PLAN_CODE_RIKMA §2.1.1): the code is the rikma's tool, not
+ * its product, so nothing is for sale. The UI shows an invitation to the join
+ * page's two tracks (missions / resources) — never a prohibition. The
+ * competing-service clause lives only in the legal text.
+ */
+export function isSharedLicense(v: unknown): boolean {
+  const l = effectiveLicense(v);
+  return l === 'rikmaShared' || l === 'rikmaSharedDelayed';
+}
+
+/** Licenses that open to MIT/Apache after `openYears` (BSL / FSL shape). */
+export function isDelayedLicense(v: unknown): boolean {
+  const l = effectiveLicense(v);
+  return l === 'rikmaDelayed' || l === 'rikmaSharedDelayed';
+}
+
 export interface LicenseTerms {
   license: CodeLicense;
-  /** Only meaningful for `rikmaDelayed`; always null otherwise. */
+  /** Only meaningful for the delayed licenses; always null otherwise. */
   openYears: number | null;
 }
 
 /**
  * Validate a proposed license + years pair. Returns null for anything that
  * is not a real license, so callers can refuse instead of guessing.
- * `openYears` is clamped into range for `rikmaDelayed` and cleared for the rest.
+ * `openYears` is clamped into range for the delayed licenses and cleared for the rest.
  */
 export function normalizeLicenseChange(license: unknown, openYears?: unknown): LicenseTerms | null {
   if (!isCodeLicense(license)) return null;
-  if (license !== 'rikmaDelayed') return { license, openYears: null };
+  if (!isDelayedLicense(license)) return { license, openYears: null };
   const n = Math.round(Number(openYears));
   const years = Number.isFinite(n) && n > 0 ? n : DEFAULT_OPEN_YEARS;
   return {

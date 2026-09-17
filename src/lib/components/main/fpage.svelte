@@ -32,6 +32,21 @@
      Hoisted so the three that point at track pages stay in one place - they
      are the whole reason those pages exist, and a link that rots here is a
      page nothing points at. */
+  /* The five-sentence summary: [sentence key, id of the section that expands it]. */
+  /** @type {[string, string][]} */
+  const SUMMARY = [
+    ['s1', 'split'],
+    ['s2', 'consensus'],
+    ['s3', 'features'],
+    ['s4', 'discover'],
+    ['s5', 'concierge']
+  ];
+
+  /* The split walkthrough is long; a visitor who has not asked for it reads
+     four "50/50" cards and takes that for what the site offers. Closed until
+     they ask. */
+  let splitDemoOpen = $state(false);
+
   /** @type {[string, string, string][]} */
   const DOORS = [
     ['a1', 'd1', '/partnership'],
@@ -706,6 +721,42 @@
            The two that do not navigate are deliberate: what "just show me
            the system" wants is genuinely on this page, and someone who wants
            to understand before starting needs a person, not another section. -->
+      <!-- ===== The whole platform in five sentences =====
+           Someone thumbing past on a phone reads this and nothing else, so it
+           has to stand on its own. Each line points at the section that
+           explains it further down, rather than at another page. -->
+      <section
+        id="summary"
+        class="w-full max-w-xl mb-8 scroll-mt-16 animate-fade-in-up"
+        style="font-family:'Sababa',sans-serif;"
+      >
+        <h2 class="text-center text-rose-700 font-bold text-2xl sm:text-xl mb-3">
+          {$t('home.summary.title')}
+        </h2>
+        <ol
+          class="flex flex-col gap-2 rounded-2xl border-2 border-gold bg-cyan-50/70 backdrop-blur-sm px-4 py-4 shadow-sm"
+        >
+          {#each SUMMARY as [key, target], i (key)}
+            <li class="flex items-start gap-3 text-start">
+              <span
+                class="shrink-0 mt-0.5 h-6 w-6 rounded-full bg-barbi text-gold flex items-center justify-center text-sm font-bold"
+                >{i + 1}</span
+              >
+              <p class="text-slate-800 text-base sm:text-sm leading-relaxed">
+                {$t(`home.summary.${key}`)}
+                <button
+                  type="button"
+                  onclick={() => scrollToId(target)}
+                  class="text-barbi font-semibold underline underline-offset-2 hover:text-rose-800 whitespace-nowrap"
+                >
+                  {$t('home.summary.more')} {$isRtl ? '←' : '→'}
+                </button>
+              </p>
+            </li>
+          {/each}
+        </ol>
+      </section>
+
       <section
         id="doors"
         class="w-full max-w-xl scroll-mt-16 animate-fade-in-up"
@@ -780,6 +831,31 @@
           {$t('home.split.lead')}
         </p>
 
+        <!-- The formula stays in view even with the walkthrough folded: it is
+             the whole claim in one line. What moved to /partnership is the explaining around
+             it - why those four are the method's fault, the three steps the
+             mechanism runs, and what transparency buys. -->
+        <p
+          class="mb-5 rounded-2xl border-2 border-gold bg-gradient-to-br from-amber-100 via-amber-50 to-rose-50 px-4 py-4 text-center text-rose-700 font-bold text-lg sm:text-base shadow-lg"
+        >
+          {$t('home.split.formula')}
+        </p>
+
+        <div class="flex justify-center">
+          <button
+            type="button"
+            aria-expanded={splitDemoOpen}
+            aria-controls="split-demo"
+            onclick={() => (splitDemoOpen = !splitDemoOpen)}
+            class="bg-barbi hover:bg-white hover:text-barbi border-2 border-barbi text-gold font-bold text-lg sm:text-base px-6 py-3 rounded-2xl shadow-lg transition-all duration-300"
+          >
+            {splitDemoOpen ? $t('home.splitDemo.hide') : $t('home.splitDemo.show')}
+            <span aria-hidden="true">{splitDemoOpen ? '▴' : '▾'}</span>
+          </button>
+        </div>
+
+        {#if splitDemoOpen}
+        <div id="split-demo" class="mt-5">
         <!-- מה חצי‑חצי עושה לשותפות -->
         <div class="flex flex-col gap-2.5">
           {#each ['f1', 'f2', 'f3', 'f4'] as f}
@@ -801,16 +877,6 @@
         </div>
 
 
-        <!-- The formula stays: it is the whole claim in one line, and the
-             reader has just been shown four ways its absence breaks a
-             partnership. What moved to /partnership is the explaining around
-             it - why those four are the method's fault, the three steps the
-             mechanism runs, and what transparency buys. -->
-        <p
-          class="mt-6 rounded-2xl border-2 border-gold bg-gradient-to-br from-amber-100 via-amber-50 to-rose-50 px-4 py-4 text-center text-rose-700 font-bold text-lg sm:text-base shadow-lg"
-        >
-          {$t('home.split.formula')}
-        </p>
 
         <!-- And not only state the formula - run it. The same calculation
              `prPr/hachcal.svelte` runs on real rikma data, with numbers to
@@ -820,22 +886,31 @@
           <SplitCalculator />
         </div>
 
-        <div class="mt-5 flex flex-wrap gap-3 justify-center">
+        <!-- The next step deeper only makes sense once this one is open:
+             /partnership is the explanation behind what was just shown. -->
+        <div class="mt-5 flex justify-center">
           <a
             href="/partnership"
             data-sveltekit-prefetch
-            class="bg-barbi hover:bg-white hover:text-barbi text-gold font-bold text-lg sm:text-base px-6 py-3 rounded-2xl shadow-lg hover:scale-105 transition-all duration-300"
+            class="bg-gold hover:bg-barbi hover:text-gold text-barbi font-bold text-lg sm:text-base px-6 py-3 rounded-2xl shadow-lg hover:scale-105 transition-all duration-300 border-2 border-gold"
           >
             {$t('home.split.depthCta')} {$isRtl ? '\u2190' : '\u2192'}
           </a>
+        </div>
+        </div>
+        {/if}
+
+        <!-- A quiet link, not a third button: it leaves the partnership topic
+             for the live system further down this page. -->
+        <p class="mt-4 text-center">
           <button
             type="button"
-            class="bg-gold hover:bg-barbi hover:text-gold text-barbi font-bold text-lg sm:text-base px-6 py-3 rounded-2xl shadow-lg hover:scale-105 transition-all duration-300 border-2 border-gold"
+            class="text-barbi font-semibold text-base sm:text-sm underline underline-offset-2 hover:text-rose-800"
             onclick={() => scrollToId('demo')}
           >
-            {$t('home.split.ctaSecondary')}
+            {$t('home.split.ctaSecondary')} {'\u2193'}
           </button>
-        </div>
+        </p>
       </section>
 
       <!-- ===== The employee / lone-founder case, as a banner =====
@@ -1728,18 +1803,13 @@
             <p class="text-gold text-lg sm:text-base mb-4">
               {$t('home.sections.ctaFinalSub')}
             </p>
-            <div class="flex gap-3 justify-center flex-wrap">
+            <!-- One row of three on a phone, where this is the last thing a
+                 scrolling visitor reaches: short labels so they fit side by
+                 side. From sm up the full labels return, and the floating
+                 buttons at the page's edge already carry the same three. -->
+            <div class="grid grid-cols-3 gap-2 sm:flex sm:gap-3 sm:justify-center sm:flex-wrap">
               <button
-                class="bg-white text-barbi font-bold text-lg sm:text-base px-5 py-2 rounded-xl shadow-lg hover:scale-105 transition-all duration-300"
-                onclick={() => {
-                  goto('/login');
-                  fi = true;
-                }}
-              >
-                {$t('home.cta.login')}
-              </button>
-              <button
-                class="bg-barbi text-gold font-bold text-lg sm:text-base px-5 py-2 rounded-xl shadow-lg hover:scale-105 transition-all duration-300"
+                class="bg-gold text-barbi font-bold text-base sm:text-base px-2 sm:px-5 py-3 sm:py-2 rounded-xl shadow-lg hover:scale-105 transition-all duration-300 leading-tight"
                 onclick={() => {
                   goto(
                     $locale == 'he'
@@ -1751,13 +1821,25 @@
                   fi = true;
                 }}
               >
-                {$t('home.cta.register')}
+                <span class="sm:hidden">{$t('home.bottomCta.register')}</span>
+                <span class="hidden sm:inline">{$t('home.cta.register')}</span>
               </button>
               <button
-                class="border-2 border-gold text-gold font-bold text-lg sm:text-base px-5 py-2 rounded-xl shadow-lg hover:bg-gold hover:text-barbi hover:scale-105 transition-all duration-300"
+                class="bg-white text-barbi font-bold text-base sm:text-base px-2 sm:px-5 py-3 sm:py-2 rounded-xl shadow-lg hover:scale-105 transition-all duration-300 leading-tight"
                 onclick={() => (demoOpen = true)}
               >
-                {$t('demo.button')}
+                <span class="sm:hidden">{$t('home.bottomCta.demo')}</span>
+                <span class="hidden sm:inline">{$t('demo.button')}</span>
+              </button>
+              <button
+                class="border-2 border-gold text-gold font-bold text-base sm:text-base px-2 sm:px-5 py-3 sm:py-2 rounded-xl shadow-lg hover:bg-gold hover:text-barbi hover:scale-105 transition-all duration-300 leading-tight"
+                onclick={() => {
+                  goto('/login');
+                  fi = true;
+                }}
+              >
+                <span class="sm:hidden">{$t('home.bottomCta.login')}</span>
+                <span class="hidden sm:inline">{$t('home.cta.login')}</span>
               </button>
             </div>
             <p class="text-gold text-sm mt-3">{$t('demo.reassure')}</p>

@@ -13,7 +13,8 @@
     DEFAULT_OPEN_YEARS,
     MAX_OPEN_YEARS,
     MIN_OPEN_YEARS,
-    effectiveLicense
+    effectiveLicense,
+    isDelayedLicense
   } from '$lib/codeLicense/codeLicense.js';
 
 
@@ -212,8 +213,10 @@
       <option value="apache">{$t('project.editDetails.codeLicenseApache')}</option>
       <option value="rikma">{$t('project.editDetails.codeLicenseRikma')}</option>
       <option value="rikmaDelayed">{$t('project.editDetails.codeLicenseRikmaDelayed')}</option>
+      <option value="rikmaShared">{$t('project.editDetails.codeLicenseRikmaShared')}</option>
+      <option value="rikmaSharedDelayed">{$t('project.editDetails.codeLicenseRikmaSharedDelayed')}</option>
     </select>
-    {#if codeLicense === 'rikmaDelayed'}
+    {#if isDelayedLicense(codeLicense)}
       <label class="field-label" for="epd-license-years">{$t('project.editDetails.codeLicenseYears')}</label>
       <input
         id="epd-license-years"

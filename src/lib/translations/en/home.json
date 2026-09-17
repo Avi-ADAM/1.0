@@ -163,7 +163,7 @@
     "b5_link": "Meet the Agreement Engine ↓",
     "more": "And on top of that - a million business tools in one package: tasks, kanban, Gantt, timers, shifts, sales, decisions and votes, a Telegram bot and an AI assistant. It all runs on the same data that feeds the calculation, so you manage once and get both the management and a fair split.",
     "cta": "Start a rikma",
-    "ctaSecondary": "See it working",
+    "ctaSecondary": "Or take a peek at the system itself",
     "calc": {
       "title": "Try it: what would happen in yours?",
       "sub": "These are sample numbers from one rikma - an online import-and-sell venture. Change any line and see immediately what each partner takes home, against an equal split.",
@@ -223,7 +223,7 @@
         "sale": "New product"
       }
     },
-    "depthCta": "How the calculation works"
+    "depthCta": "The full explanation of the method"
   },
   "platform": {
     "projectMgmt_t": "Your whole project at a glance",
@@ -651,5 +651,23 @@
     "title": "Let go, coming back after a break, or does your body set the pace?",
     "lead": "You can publish what you are able to give and on what terms, and team up with partners — instead of fitting yourself into someone else's slot.",
     "cta": "Flexible work on your terms"
+  },
+  "summary": {
+    "title": "1💗1 in five sentences",
+    "s1": "Partners split profit by what each one actually gave - time, money, equipment and know-how - not 50/50.",
+    "s2": "Every decision closes by consent: approve, talk it over, or propose another version - and silence within the agreed time counts as yes.",
+    "s3": "All of the business runs in one place: missions, timers, shifts, sales and an AI assistant.",
+    "s4": "You can join existing rikmas and turn your working hours into ownership.",
+    "s5": "Customers ask for what they want, and a group of service providers forms around the request.",
+    "more": "Read more"
+  },
+  "splitDemo": {
+    "show": "Show me how it works",
+    "hide": "Hide the demo"
+  },
+  "bottomCta": {
+    "register": "Sign up",
+    "demo": "Book a demo",
+    "login": "Log in"
   }
 }

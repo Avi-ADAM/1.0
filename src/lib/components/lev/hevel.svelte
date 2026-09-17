@@ -7,7 +7,11 @@
 function pr (x){
   onProj?.({id:x})
 }
-let user = $state([]);
+// The user's own attributes from 52GetUserById — an object, not a list. It was
+// initialised as `[]`, which typed every read off it (`user.githublink`,
+// `user.skills`, …) as a property of an array and failed the typecheck.
+/** @type {any} */
+let user = $state({});
 let fblink = $state(), twiterlink = $state(), discordlink = $state(), githublink = $state()
 let load = $state(false)
 let projects =$state([]);

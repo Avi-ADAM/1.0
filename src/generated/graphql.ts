@@ -3691,7 +3691,9 @@ export enum Enum_Project_Codelicense {
   Mit = 'mit',
   None = 'none',
   Rikma = 'rikma',
-  RikmaDelayed = 'rikmaDelayed'
+  RikmaDelayed = 'rikmaDelayed',
+  RikmaShared = 'rikmaShared',
+  RikmaSharedDelayed = 'rikmaSharedDelayed'
 }
 
 export enum Enum_Projectrepo_Provider {

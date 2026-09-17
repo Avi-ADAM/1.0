@@ -3,9 +3,10 @@
  *
  * S2 acts on the App's own lifecycle: repositories removed from an
  * installation, and the installation being suspended or deleted. S3 adds
- * issues — only the ones labelled for the rikma (issues.ts). Pull requests and
- * reviews are acknowledged and ignored until S4 gives them somewhere to go —
- * GitHub retries failed deliveries, so "ignored" must still answer 2xx.
+ * issues — only the ones labelled for the rikma (issues.ts). S4 adds merged
+ * pull requests and reviews, as work the member who did it may claim
+ * (pullEvents.ts). Everything else is acknowledged and ignored — GitHub
+ * retries failed deliveries, so "ignored" must still answer 2xx.
  *
  * A new installation (`installation.created`) is deliberately not acted on
  * here: the webhook cannot tell which rikma it is for. That link is made in
@@ -14,6 +15,7 @@
 
 import { toRepoRow, type RepoRowInput, type RepoStatus } from './repos.js';
 import { classifyIssueEvent, type IssueEvent } from './issues.js';
+import { classifyPullEvent, type ClaimableWork } from './pullEvents.js';
 
 export type WebhookIntent =
   | { type: 'ping' }
@@ -22,6 +24,7 @@ export type WebhookIntent =
   | { type: 'reposRemoved'; installationId: string; repoIds: string[] }
   | { type: 'issueTask'; issue: IssueEvent }
   | { type: 'issueClosed'; issue: IssueEvent }
+  | { type: 'claimableWork'; work: ClaimableWork }
   | { type: 'ignored'; reason: string };
 
 const INSTALLATION_STATUS: Record<string, RepoStatus> = {
@@ -60,6 +63,7 @@ export function classifyWebhook(event: string | null | undefined, payload: any):
   }
 
   if (event === 'issues') return classifyIssueEvent(payload);
+  if (event === 'pull_request' || event === 'pull_request_review') return classifyPullEvent(event, payload);
 
-  return { type: 'ignored', reason: `${event ?? 'unknown'} is not handled yet (PLAN_CODE_RIKMA S4)` };
+  return { type: 'ignored', reason: `${event ?? 'unknown'} is not handled` };
 }

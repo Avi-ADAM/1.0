@@ -1,6 +1,6 @@
 import { error, redirect } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { githubAppConfig } from '$lib/server/github/config.js';
+import { appInstallUrl, githubAppConfig } from '$lib/server/github/config.js';
 import { STATE_COOKIE, STATE_TTL_MS, createState, stateKey } from '$lib/server/github/state.js';
 import { isProjectMember } from '$lib/server/github/service.js';
 import { isAllowedFrontendOrigin } from '$lib/server/corsOrigins.js';
@@ -57,6 +57,15 @@ export const GET: RequestHandler = async ({ url, locals, cookies, fetch }) => {
     secure: url.protocol === 'https:',
     maxAge: Math.floor(STATE_TTL_MS / 1000)
   });
+
+  // "Edit access on GitHub" (`manage=1`): the member goes to the App's install
+  // screen on purpose, to grant repositories they left out the first time.
+  // Saving there — with "Redirect on update" on — brings them back through the
+  // callback with that installation's id, straight to the picker. Pressing back
+  // instead loses nothing: they came to change something and chose not to.
+  if (intent === 'install' && url.searchParams.get('manage') === '1') {
+    throw redirect(303, appInstallUrl(cfg, state.nonce));
+  }
 
   const authorize = new URL('https://github.com/login/oauth/authorize');
   authorize.searchParams.set('client_id', cfg.clientId);

@@ -22,6 +22,7 @@
 import { env } from '$env/dynamic/private';
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { planRepoSync, toExistingRows, type RepoRowInput, type RepoStatus } from '$lib/server/github/repos.js';
+import { claimGithubWork, ClaimError } from '$lib/server/github/claim.js';
 
 const adminToken = () => (env.ADMINMONTHER ?? '').replace(/\s+/g, '').replace(/^ADMINMONTHER=/, '');
 
@@ -283,6 +284,110 @@ export const githubIssueClosedConfig: ActionConfig = {
       body: {
         he: 'ה-issue של המטלה "{{taskName}}" נסגר. אם העבודה הושלמה, אפשר לסמן את המטלה כבוצעה.',
         en: 'The issue behind "{{taskName}}" was closed. If the work is finished, the task can be marked done.'
+      }
+    },
+    channels: ['socket', 'push'],
+    metadata: { priority: 'normal', url: '/lev?project={{projectId}}' }
+  }
+};
+
+// ─── githubWorkClaimable (S4) ───────────────────────────────────────────────
+
+/**
+ * Nothing is written: a merged PR or a review is the occasion for a claim, not
+ * a claim. The member who did the work is told it can be claimed from the
+ * rikma's code tab. Called only from the signed webhook, after it matched the
+ * GitHub account to a linked member of the rikma.
+ */
+const githubWorkClaimableHandler: ActionExecutionHandler = async (params) => {
+  return { data: { url: String(params.url ?? '') }, updateStrategy: { type: 'none' } };
+};
+
+export const githubWorkClaimableConfig: ActionConfig = {
+  key: 'githubWorkClaimable',
+  description:
+    'Service only: tell a member that a PR they merged, or a review they gave, can be claimed as hours in the rikma. Files nothing.',
+  graphqlOperation: githubWorkClaimableHandler,
+  paramSchema: {
+    projectId: { type: 'string', required: true },
+    kind: { type: 'string', required: true },
+    label: { type: 'string', required: true },
+    title: { type: 'string', required: false },
+    url: { type: 'string', required: false },
+    notifyUserIds: { type: 'array', required: true }
+  },
+  access: ['serviceAdmin'],
+  authRules: [],
+  notification: {
+    recipients: {
+      type: 'specificUsers',
+      config: { userIdsParam: 'notifyUserIds', projectIdParam: 'projectId', excludeSender: false }
+    },
+    templates: {
+      title: { he: 'עבודה ב-GitHub שאפשר לתבוע', en: 'GitHub work you can claim' },
+      body: {
+        he: 'העבודה שלך על {{label}} אפשר להגיש כשעות לאישור הרקמה, מלשונית הקוד.',
+        en: 'Your work on {{label}} can be filed as hours for the rikma to approve, from the code tab.'
+      }
+    },
+    channels: ['socket', 'push'],
+    metadata: { priority: 'normal', url: '/moach/{{projectId}}/code' }
+  }
+};
+
+// ─── claimGithubWork (S4) ───────────────────────────────────────────────────
+
+const claimGithubWorkHandler: ActionExecutionHandler = async (params, context, { strapi }) => {
+  try {
+    const result = await claimGithubWork(
+      {
+        projectId: String(params.projectId),
+        missionId: String(params.missionId),
+        url: String(params.url),
+        kind: params.kind === 'review' ? 'review' : 'pull',
+        hours: Number(params.hours),
+        note: String(params.note ?? '')
+      },
+      { userId: String(context.userId), jwt: context.jwt, fetch: context.fetch as typeof fetch },
+      strapi as any
+    );
+    return { data: result, updateStrategy: { type: 'none' } };
+  } catch (e) {
+    // The code is what the tab translates; the message is only for the log.
+    if (e instanceof ClaimError) throw new Error(`claimGithubWork:${e.code}`);
+    throw e;
+  }
+};
+
+export const claimGithubWorkConfig: ActionConfig = {
+  key: 'claimGithubWork',
+  description:
+    'Claim hours for a merged PR you wrote, or a review you gave, on one of your missions in the rikma. Verified against GitHub, filed through the same approval as timer hours.',
+  graphqlOperation: claimGithubWorkHandler,
+  paramSchema: {
+    projectId: { type: 'string', required: true },
+    missionId: { type: 'string', required: true },
+    url: { type: 'string', required: true, description: 'Canonical GitHub pull request URL' },
+    kind: { type: 'string', required: true, description: "'pull' (author) or 'review' (reviewer)" },
+    hours: { type: 'number', required: true },
+    note: { type: 'string', required: false }
+  },
+  access: ['user', 'serviceAdmin'],
+  authRules: [
+    { type: 'jwt', errorMessage: 'Must be authenticated' },
+    {
+      type: 'projectMember',
+      config: { projectIdParam: 'projectId' },
+      errorMessage: 'Must be a member of the rikma'
+    }
+  ],
+  notification: {
+    recipients: { type: 'projectMembers', config: { projectIdParam: 'projectId', excludeSender: true } },
+    templates: {
+      title: { he: 'שעות על עבודת קוד ממתינות לאישור', en: 'Hours for code work await approval' },
+      body: {
+        he: 'חבר ברקמה הגיש שעות על PR או review ב-GitHub. אפשר לאשר, לשוחח או להציע נגדית.',
+        en: 'A member filed hours for a GitHub PR or review. You can approve, discuss or counter.'
       }
     },
     channels: ['socket', 'push'],

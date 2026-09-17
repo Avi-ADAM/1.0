@@ -6,6 +6,7 @@ import { SIGNATURE_HEADER, verifyGithubSignature } from '$lib/server/github/sign
 import { classifyWebhook } from '$lib/server/github/events.js';
 import { serviceContext } from '$lib/server/github/service.js';
 import { notifyIssueClosed, syncIssueTask } from '$lib/server/github/issueSync.js';
+import { notifyClaimableWork } from '$lib/server/github/pullSync.js';
 
 /**
  * POST /api/v1/github/webhook — deliveries from the 1lev1 GitHub App
@@ -87,6 +88,13 @@ export const POST: RequestHandler = async ({ request, fetch }) => {
         return json({ ok: true, ...(await notifyIssueClosed(intent.issue, fetch)) });
       } catch (err) {
         return fail('issue closed', err);
+      }
+
+    case 'claimableWork':
+      try {
+        return json({ ok: true, ...(await notifyClaimableWork(intent.work, fetch)) });
+      } catch (err) {
+        return fail('claimable work', err);
       }
   }
 };

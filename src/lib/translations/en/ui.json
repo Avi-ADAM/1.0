@@ -14,6 +14,10 @@
     "apache": "Apache 2.0 license",
     "rikma": "Rikma license",
     "rikmaDelayed": "Rikma license · opens after {{years}} years",
+    "rikmaShared": "Shared rikma",
+    "rikmaSharedDelayed": "Shared rikma · opens after {{years}} years",
+    "sharedHint": "The code is open to read, and you are invited to create with us: take a mission or bring a resource",
+    "sharedJoin": "How to join",
     "openHint": "Open source — free for any use.",
     "rikmaHint": "The code is visible, and whoever contributes to it is a partner. Commercial use needs the rikma's consent.",
     "since": "since {{date}}"

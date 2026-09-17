@@ -176,6 +176,7 @@
               license={project.attributes.codeLicense}
               openYears={project.attributes.codeLicenseOpenYears}
               since={project.attributes.codeLicenseSince}
+              joinHref="/project/{projectId}/join"
             />
           </div>
         {/if}

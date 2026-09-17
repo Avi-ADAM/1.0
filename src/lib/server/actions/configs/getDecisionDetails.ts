@@ -11,7 +11,7 @@
  */
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
-import { effectiveLicense } from '$lib/codeLicense/codeLicense.js';
+import { effectiveLicense, isDelayedLicense } from '$lib/codeLicense/codeLicense.js';
 
 const RESTIME_LABELS: Record<string, { he: string; en: string }> = {
   feh:    { he: '48 שעות', en: '48 hours' },
@@ -39,12 +39,14 @@ const LICENSE_LABELS: Record<string, { he: string; en: string }> = {
   apache:       { he: 'Apache 2.0 (קוד פתוח)', en: 'Apache 2.0 (open source)' },
   rikma:        { he: 'רישיון רקמה', en: 'Rikma license' },
   rikmaDelayed: { he: 'רישיון רקמה שנפתח אחרי', en: 'Rikma license, opens after' },
+  rikmaShared: { he: 'רקמה שיתופית — יוצרים יחד', en: 'Shared rikma — create with us' },
+  rikmaSharedDelayed: { he: 'רקמה שיתופית שנפתחת אחרי', en: 'Shared rikma, opens after' },
 };
 
 function licenseLabel(license: unknown, years: unknown): string {
   const l = effectiveLicense(license);
   const base = LICENSE_LABELS[l].he;
-  return l === 'rikmaDelayed' && years ? `${base} ${years} שנים` : base;
+  return isDelayedLicense(l) && years ? `${base} ${years} שנים` : base;
 }
 
 const handler: ActionExecutionHandler = async (params, context, { strapi }) => {

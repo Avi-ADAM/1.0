@@ -164,7 +164,7 @@
     "b5_link": "Conoce el motor de acuerdos ↓",
     "more": "Y además, un millón de herramientas de gestión en un solo paquete: tareas, kanban, Gantt, temporizadores, turnos, ventas, decisiones y votaciones, bot de Telegram y asistente de IA. Todo funciona con los mismos datos que alimentan el cálculo, así que gestionas una vez y obtienes tanto la gestión como un reparto justo.",
     "cta": "Iniciar una rikma",
-    "ctaSecondary": "Ver cómo funciona",
+    "ctaSecondary": "O echa un vistazo al sistema en sí",
     "calc": {
       "title": "Pruébalo: ¿qué pasaría en la tuya?",
       "sub": "Son datos de ejemplo de una rikma: importar y vender online. Cambia cualquier línea y verás al instante lo que se lleva cada socio, frente a un reparto por partes iguales.",
@@ -224,7 +224,7 @@
         "sale": "Nuevo producto"
       }
     },
-    "depthCta": "Cómo funciona el cálculo"
+    "depthCta": "La explicación completa del método"
   },
   "platform": {
     "projectMgmt_t": "Todo tu proyecto de un vistazo",
@@ -652,5 +652,23 @@
     "title": "¿Te despidieron, vuelves tras una pausa o el cuerpo marca el ritmo?",
     "lead": "Puedes publicar lo que eres capaz de aportar y en qué condiciones, y asociarte con socios, en lugar de encajarte en la casilla de otro.",
     "cta": "Al trabajo flexible en tus términos"
+  },
+  "summary": {
+    "title": "1💗1 en cinco frases",
+    "s1": "Los socios reparten la ganancia según lo que cada uno aportó de verdad - tiempo, dinero, equipo y conocimiento - no 50/50.",
+    "s2": "Cada decisión se cierra por consenso: aprobar, conversarlo o proponer otra versión - y el silencio dentro del plazo acordado cuenta como sí.",
+    "s3": "Toda la gestión del negocio en un solo lugar: misiones, temporizadores, turnos, ventas y un asistente de IA.",
+    "s4": "Puedes unirte a rikmas existentes y convertir tus horas de trabajo en propiedad.",
+    "s5": "Los clientes piden lo que quieren, y un grupo de proveedores se organiza alrededor del pedido.",
+    "more": "Leer más"
+  },
+  "splitDemo": {
+    "show": "Muéstrame cómo funciona",
+    "hide": "Ocultar la demo"
+  },
+  "bottomCta": {
+    "register": "Registrarse",
+    "demo": "Agendar demo",
+    "login": "Entrar"
   }
 }

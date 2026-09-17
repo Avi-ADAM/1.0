@@ -3290,7 +3290,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
           decisionName
           projects { data { id } }
           newpic { data { id attributes { url } } }
-          timegrama { data { id attributes { date } } }
+          timegrama { data { id attributes { date done } } }
           newname
           newpubdes
           newprides
@@ -14431,6 +14431,85 @@ ${STIPEND_DECISION_FIELDS}
       connectedBy: $connectedBy
     }) {
       data { id }
+    }
+  }`,
+
+  // ── Code rikma — merged PRs and reviews as claimable work (S4) ────────────
+  // Service token only. A claim reads which GitHub account a member linked,
+  // their open missions in the rikma, and the hours already tagged with a
+  // GitHub link, then files a timer that is never the mission's active one.
+
+  'githubContributorsByGithubIds': `query GithubContributorsByGithubIds($githubIds: [String]) {
+    usersPermissionsUsers(filters: { githubId: { in: $githubIds } }, pagination: { limit: 200 }) {
+      data { id attributes { githubId username } }
+    }
+  }`,
+
+  'githubUserById': `query GithubUserById($uid: ID!) {
+    usersPermissionsUser(id: $uid) {
+      data { id attributes { githubId githubLogin } }
+    }
+  }`,
+
+  'githubClaimMissions': `query GithubClaimMissions($pid: ID!, $uid: ID!) {
+    mesimabetahaliches(
+      filters: {
+        and: [
+          { project: { id: { eq: $pid } } }
+          { users_permissions_user: { id: { eq: $uid } } }
+          { finnished: { ne: true } }
+          ${NOT_ARCHIVED}
+        ]
+      }
+      pagination: { limit: 100 }
+    ) {
+      data { id attributes { name perhour } }
+    }
+  }`,
+
+  'githubProjectLinkedTimers': `query GithubProjectLinkedTimers($pid: ID!) {
+    timers(
+      filters: { project: { id: { eq: $pid } }, saveLinks: { containsi: "github.com/" } }
+      sort: ["updatedAt:desc"]
+      pagination: { limit: 1000 }
+    ) {
+      data { id attributes { totalHours saved saveText saveLinks users_permissions_user { data { id } } } }
+    }
+  }`,
+
+  'githubCreateClaimTimer': `mutation GithubCreateClaimTimer(
+    $missionId: ID!
+    $userId: ID!
+    $projectId: ID!
+    $start: DateTime!
+    $rate: Float
+    $timers: [ComponentNewTimesInput]
+    $totalHours: Float
+    $saveText: String
+    $saveLinks: String
+  ) {
+    createTimer(data: {
+      mesimabetahalich: $missionId
+      users_permissions_user: $userId
+      project: $projectId
+      start: $start
+      rate: $rate
+      isActive: false
+      saved: true
+      totalHours: $totalHours
+      timers: $timers
+      saveText: $saveText
+      saveLinks: $saveLinks
+    }) {
+      data { id }
+    }
+  }`,
+
+  // S6: the README badge (/api/badge/<pid>.svg). Public facts only — the
+  // partner count and the license the rikma's public page already shows.
+  'badgeProject': `query BadgeProject($pid: ID!) {
+    project(id: $pid) {
+      data { id attributes { codeLicense user_1s { data { id } } } }
     }
   }`,
 

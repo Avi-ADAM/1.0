@@ -4,6 +4,8 @@
   "connect": "Connect a repository from GitHub",
   "connectMore": "Connect another repository",
   "connectTip": "On GitHub you can choose “Only select repositories”. Either way, you then pick here the one repository that joins the rikma — nothing else is connected.",
+  "manageAccess": "Edit access on GitHub",
+  "manageAccessTip": "To add repositories you left out when installing. After saving on GitHub you come back here to pick one.",
   "notConfigured": "The GitHub integration is not set up on this server yet.",
   "empty": "No repository is connected to the rikma yet.",
   "private": "Private",
@@ -14,7 +16,6 @@
   "disconnectConfirm": "Disconnect {{repo}} from the rikma? The installation on GitHub itself stays in place.",
   "disconnectFailed": "Disconnecting failed, please try again",
   "issuesHint": "An issue labelled {{label}} opens as a task in the rikma. When it is closed on GitHub the rikma is told, and when the task is marked done a comment is left on the issue.",
-  "next": "Coming next: merged pull requests become work claims the rikma consents to, together with the timer hours tagged with them.",
   "pick": {
     "title": "Which repository joins the rikma?",
     "intro": "GitHub gave access to {{count}} repositories. Pick one to connect — you can connect another one later.",
@@ -25,7 +26,8 @@
     "elsewhere": "Connected to another rikma",
     "noMatch": "No repository matches.",
     "empty": "GitHub did not give access to any repository.",
-    "manage": "Check on GitHub which repositories the App may reach"
+    "manage": "Check on GitHub which repositories the App may reach",
+    "missing": "Don't see the repository? Grant it access on GitHub"
   },
   "status": {
     "connected": "The repository is connected to the rikma.",
@@ -46,5 +48,57 @@
     "linkedAs": "Linked as @{{login}}",
     "unlink": "Unlink",
     "unlinkFailed": "Unlinking failed, please try again"
+  },
+  "work": {
+    "title": "Work on GitHub",
+    "intro": "Merged PRs and the reviews on them. Whoever did the work can file hours for it, and the rikma approves them like any timer hours. Lines of code never become a share.",
+    "onlyMine": "Only mine",
+    "loading": "Loading work from GitHub…",
+    "failed": "Could not read the work from GitHub. Try refreshing.",
+    "empty": "No merged PRs in the connected repositories yet.",
+    "mineOpen": "{{count}} pieces of your work can be filed as hours.",
+    "linkFirst": "For the rikma to recognise your work, link your GitHub account.",
+    "linkFirstCta": "Link it in settings",
+    "pull": "PR",
+    "review": "Review",
+    "unlinked": "Not linked — the work is waiting for them",
+    "notMember": "Not a member of the rikma",
+    "logged": "{{hours}} h on timers",
+    "claimed": "Filed for approval",
+    "filed": "Recorded",
+    "invite": "Copy invite link",
+    "inviteCopied": "Link copied",
+    "refresh": "Refresh"
+  },
+  "claim": {
+    "open": "File hours",
+    "mission": "Which of your missions is it for?",
+    "missionPick": "Choose a mission",
+    "hours": "How many hours did the work take?",
+    "suggestion": "Suggested from the size of the change: {{hours}} h. Only a starting point — you decide.",
+    "alreadyLogged": "You already have {{hours}} h on timers tagged with this work. File only hours that were not measured.",
+    "note": "A note for the rikma (optional)",
+    "consent": "The hours go to the rikma’s usual approval: approve, discuss or counter — and silence until the response time is consent.",
+    "submit": "File for approval",
+    "noMissions": "You have no open mission in this rikma. Filing hours needs a mission first.",
+    "errors": {
+      "notConfigured": "The GitHub integration is not set up on the server.",
+      "invalid": "The request is not valid.",
+      "invalidHours": "The number of hours is not valid.",
+      "notConnected": "The repository is no longer connected to the rikma.",
+      "notLinked": "Link your GitHub account first.",
+      "notYourMission": "The chosen mission is not yours in this rikma.",
+      "notFound": "The PR was not found on GitHub.",
+      "notYourWork": "According to GitHub this work is not yours.",
+      "notMerged": "The PR is not merged yet.",
+      "alreadyClaimed": "You already filed hours for this work.",
+      "failed": "Filing failed, please try again."
+    }
+  },
+  "badge": {
+    "title": "README badge",
+    "intro": "Paste it into the repository’s README. It shows that this is a rikma, how many partners it has and how to join, and links to the rikma’s page.",
+    "copy": "Copy the code",
+    "copied": "Copied"
   }
 }

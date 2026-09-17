@@ -24,6 +24,7 @@ import { execFromContext } from '$lib/server/archive/exec.js';
 import { signObjectChange } from '$lib/server/archive/vote.js';
 import { signStipend } from '$lib/server/stipend/vote.js';
 import { normalizeLicenseChange } from '$lib/codeLicense/codeLicense.js';
+import { calcDeadlineMs } from './actionUtils.js';
 import {
   fetchSaleClaim,
   standingOrder,
@@ -349,13 +350,18 @@ const voteOnDecisionHandler: ActionExecutionHandler = async (params, context, { 
       const vid = String(v.users_permissions_user?.data?.id ?? v.ide ?? '');
       return vid !== String(userId);
     })
-    .map((v: any) => ({
-      what: v.what ?? true,
-      users_permissions_user: String(v.users_permissions_user?.data?.id ?? v.ide ?? ''),
-      ide: v.ide != null ? parseInt(String(v.ide), 10) : parseInt(String(userId), 10),
-      zman: v.zman ?? now.toISOString(),
-      order: v.order ?? 0,
-    }));
+    .map((v: any) => {
+      // The voter is the relation; `ide` mirrors it. Falling back to the
+      // *current* voter's id stamped someone else's id onto old votes.
+      const voter = String(v.users_permissions_user?.data?.id ?? v.ide ?? '');
+      return {
+        what: v.what ?? true,
+        users_permissions_user: voter,
+        ide: parseInt(voter, 10),
+        zman: v.zman ?? now.toISOString(),
+        order: v.order ?? 0,
+      };
+    });
 
   // 4. Append this user's YES vote
   const newVote = {
@@ -513,6 +519,35 @@ const voteOnDecisionHandler: ActionExecutionHandler = async (params, context, { 
       context.jwt,
       context.fetch,
     );
+
+    // Silence can only mature this decision while a timegrama is open. A clock
+    // that was closed (or never created) leaves a standing proposal nothing
+    // will ever finalize — decision 3 sat with 2/3 yes for months that way.
+    // A vote on such a decision gives the rest of the rikma a fresh restime.
+    const tg = decisionData.attributes.timegrama?.data;
+    if (!tg || tg.attributes?.done) {
+      try {
+        const baseRes = await strapi.execute(
+          'getProjectBaseInfo',
+          { pid: projectId },
+          context.jwt,
+          context.fetch,
+        );
+        const restime: string = baseRes?.data?.project?.data?.attributes?.restime ?? 'feh';
+        await strapi.execute(
+          '32createTimeGrama',
+          {
+            whatami: 'decision',
+            decision: decisionId,
+            date: new Date(now.getTime() + calcDeadlineMs(restime)).toISOString(),
+          },
+          context.jwt,
+          context.fetch,
+        );
+      } catch (err) {
+        console.warn('[voteOnDecision] reopening the decision clock failed:', err);
+      }
+    }
 
     // Vote in Strapi-nested shape so the decisions store can append it and
     // processDecisions() recomputes the live counts for every member + device.

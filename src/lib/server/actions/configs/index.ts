@@ -162,7 +162,9 @@ import {
   syncProjectReposConfig,
   setGithubInstallationStatusConfig,
   disconnectProjectRepoConfig,
-  githubIssueClosedConfig
+  githubIssueClosedConfig,
+  githubWorkClaimableConfig,
+  claimGithubWorkConfig
 } from './githubActions.js';
 import { releaseResourceBookingConfig } from './releaseResourceBooking.js';
 import { ensurePersonalRikmaConfig } from './ensurePersonalRikma.js';
@@ -462,6 +464,9 @@ export function registerAllActions(): void {
   registerAction(disconnectProjectRepoConfig);
   // Code rikma — issues become tasks (PLAN_CODE_RIKMA S3)
   registerAction(githubIssueClosedConfig);
+  // Merged PRs and reviews → claimable hours (PLAN_CODE_RIKMA S4)
+  registerAction(githubWorkClaimableConfig);
+  registerAction(claimGithubWorkConfig);
   registerAction(releaseResourceBookingConfig);
 
   // Object archival & edit consent flow (PLAN_OBJECT_ARCHIVAL)

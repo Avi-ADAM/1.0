@@ -202,6 +202,8 @@
     "codeLicenseApache": "Apache 2.0 — קוד פתוח",
     "codeLicenseRikma": "רישיון רקמה — שימוש מסחרי בהסכמת הרקמה",
     "codeLicenseRikmaDelayed": "רישיון רקמה שנפתח לקוד פתוח אחרי כמה שנים",
+    "codeLicenseRikmaShared": "רקמה שיתופית — הקוד הוא הכלי, ומי שרוצה לבנות כזה מוזמן להצטרף",
+    "codeLicenseRikmaSharedDelayed": "רקמה שיתופית שהקוד שלה נפתח לקוד פתוח אחרי כמה שנים",
     "codeLicenseYears": "מספר שנים עד שהקוד נפתח",
     "codeLicenseNote": "שינוי הרישיון חל רק על גרסאות שיפורסמו מעכשיו. נוסח רישיון הרקמה עדיין בבדיקה משפטית.",
     "facebook": "לינק לפייסבוק",

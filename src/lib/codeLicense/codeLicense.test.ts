@@ -4,6 +4,8 @@ import {
   MAX_OPEN_YEARS,
   effectiveLicense,
   isCodeLicense,
+  isDelayedLicense,
+  isSharedLicense,
   isRikmaLicense,
   licenseChanged,
   normalizeLicenseChange
@@ -34,6 +36,28 @@ describe('codeLicense', () => {
       openYears: MAX_OPEN_YEARS
     });
     expect(normalizeLicenseChange('rikmaDelayed', 0)?.openYears).toBe(DEFAULT_OPEN_YEARS);
+  });
+
+  it('rikmaSharedDelayed carries years like rikmaDelayed; rikmaShared does not', () => {
+    expect(normalizeLicenseChange('rikmaShared', 3)).toEqual({
+      license: 'rikmaShared',
+      openYears: null
+    });
+    expect(normalizeLicenseChange('rikmaSharedDelayed', 3)).toEqual({
+      license: 'rikmaSharedDelayed',
+      openYears: 3
+    });
+    expect(isDelayedLicense('rikmaSharedDelayed')).toBe(true);
+    expect(isDelayedLicense('rikmaShared')).toBe(false);
+  });
+
+  it('keeps the shared licenses apart from the restrictive ones', () => {
+    expect(isSharedLicense('rikmaShared')).toBe(true);
+    expect(isSharedLicense('rikmaSharedDelayed')).toBe(true);
+    expect(isSharedLicense('rikma')).toBe(false);
+    expect(isSharedLicense(null)).toBe(false);
+    expect(isRikmaLicense('rikmaShared')).toBe(false);
+    expect(isRikmaLicense('rikmaSharedDelayed')).toBe(false);
   });
 
   it('marks only the restrictive licenses as rikma licenses', () => {

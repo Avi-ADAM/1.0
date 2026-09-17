@@ -186,3 +186,57 @@ export async function commentOnIssue(
     'issue comment'
   );
 }
+
+// ── S4: merged pull requests and their reviews ────────────────────────────
+
+/**
+ * A repository's recently closed pull requests, merged ones only. The listing
+ * carries no size (`additions` / `deletions`) — `getPull` does, for the few
+ * rows a size suggestion is shown on.
+ */
+export async function listMergedPulls(
+  cfg: GithubAppConfig,
+  installationId: string,
+  repo: { owner: string; name: string },
+  fetchFn: Fetch,
+  perPage = 30
+): Promise<any[]> {
+  const token = await installationToken(cfg, installationId, fetchFn);
+  const body = await ghJson(
+    await fetchFn(`${repoPath(repo)}/pulls?state=closed&sort=updated&direction=desc&per_page=${perPage}`, {
+      headers: ghHeaders(token)
+    }),
+    'pull request listing'
+  );
+  return (Array.isArray(body) ? body : []).filter((p) => p?.merged_at);
+}
+
+/** One pull request, with its size. `null` when it does not exist. */
+export async function getPull(
+  cfg: GithubAppConfig,
+  installationId: string,
+  repo: { owner: string; name: string },
+  number: number,
+  fetchFn: Fetch
+): Promise<any | null> {
+  const token = await installationToken(cfg, installationId, fetchFn);
+  const res = await fetchFn(`${repoPath(repo)}/pulls/${number}`, { headers: ghHeaders(token) });
+  if (res.status === 404) return null;
+  return ghJson(res, 'pull request lookup');
+}
+
+/** Every review on a pull request (GitHub pages at 100; a PR with more is not a real case). */
+export async function listPullReviews(
+  cfg: GithubAppConfig,
+  installationId: string,
+  repo: { owner: string; name: string },
+  number: number,
+  fetchFn: Fetch
+): Promise<any[]> {
+  const token = await installationToken(cfg, installationId, fetchFn);
+  const body = await ghJson(
+    await fetchFn(`${repoPath(repo)}/pulls/${number}/reviews?per_page=100`, { headers: ghHeaders(token) }),
+    'review listing'
+  );
+  return Array.isArray(body) ? body : [];
+}
