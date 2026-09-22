@@ -147,13 +147,13 @@ describe('explain', () => {
     expect(reasonKey('nonsense')).toBe('shifts.reason.tieBreak');
   });
 
-  it('cycles the stance on each tap, back to empty', () => {
+  it('cycles the stance on each tap, round the four stances', () => {
     expect([nextStance(null), nextStance('want'), nextStance('can'), nextStance('ifNeeded'), nextStance('cannot')]).toEqual([
       'want',
       'can',
       'ifNeeded',
       'cannot',
-      null
+      'want'
     ]);
   });
 

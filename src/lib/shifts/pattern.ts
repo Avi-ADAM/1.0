@@ -185,7 +185,7 @@ export function shiftHours(shift: { start: string; end: string }): number {
 }
 
 /**
- * Nominal staffed person-hours per week: Σ window length × need, averaged over
+ * Nominal staffed person-hours per week: sum of window length × need, averaged over
  * a multi-week cycle. Wall-clock arithmetic on purpose — this is the number
  * the form shows while someone is still drawing the pattern, not a pay figure.
  */

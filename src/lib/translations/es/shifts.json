@@ -1,0 +1,69 @@
+{
+  "page": {
+    "title": "Turnos",
+    "off": "El sistema de turnos aún no está activado. Se abre poco a poco, rikma por rikma.",
+    "shadow": "Modo de prueba: las declaraciones se guardan y el cuadrante se calcula, pero todavía no se envía a nadie ni compromete a nadie.",
+    "loadError": "No pudimos cargar los turnos ahora. El resto de la rikma funciona con normalidad.",
+    "empty": "Esta rikma todavía no tiene una misión con plan de cobertura.",
+    "emptyHint": "Un plan de cobertura se crea desde una misión: en el formulario de la misión, indica que necesita cubrirse en horarios fijos.",
+    "notOnMission": "No estás en esta misión, así que aquí no hay nada que declarar. Para participar, pide unirte a la misión.",
+    "planLabel": "Plan de cobertura"
+  },
+  "cycle": {
+    "prev": "Ciclo anterior",
+    "next": "Ciclo siguiente",
+    "range": "{{from}} – {{to}}"
+  },
+  "phase": {
+    "upcoming": "Las declaraciones de este ciclo se abren el {{date}}",
+    "declaring": "Las declaraciones están abiertas. El borrador se publica el {{date}}",
+    "draft": "El borrador está publicado. Puedes liberar, intercambiar o ofrecerte hasta el {{date}}",
+    "closed": "El cuadrante de este ciclo está cerrado",
+    "running": "El ciclo está en curso",
+    "past": "Un ciclo terminado"
+  },
+  "tabs": {
+    "roster": "Cuadrante",
+    "mine": "Mi disponibilidad",
+    "fairness": "Equidad",
+    "settings": "Ajustes"
+  },
+  "stance": {
+    "want": "Quiero",
+    "can": "Puedo",
+    "ifNeeded": "Si hace falta",
+    "cannot": "No puedo",
+    "none": "Sin declarar"
+  },
+  "grid": {
+    "tapHint": "Toca un turno para pasar entre: quiero → puedo → si hace falta → no puedo. La estrella marca una primera opción.",
+    "need": "Se necesitan {{count}}",
+    "youComing": "Estás en el turno",
+    "youBackup": "Estás en espera, número {{rank}}",
+    "topChoice": "Primera opción",
+    "saveError": "El cambio no se guardó. Inténtalo de nuevo."
+  },
+  "roster": {
+    "you": "Tú",
+    "coming": "Vienen",
+    "empty": "Todavía no hay nadie asignado",
+    "backups": "En espera",
+    "missing": "Faltan {{count}}",
+    "more": "y {{count}} más",
+    "noDraft": "El cuadrante aparece aquí cuando se publica el borrador."
+  },
+  "reason": {
+    "onlyCandidate": "La única persona que se declaró para este turno",
+    "wanted": "Marcó «quiero», que va antes que «puedo»",
+    "ownPreference": "Lo marcó como primera opción",
+    "belowQuota": "La más lejos de su parte en este ciclo",
+    "owed": "Recibió menos de su parte en ciclos anteriores",
+    "declaredFirst": "Se declaró antes",
+    "tieBreak": "Un sorteo fijo entre candidatos exactamente iguales",
+    "overQuota": "Más allá de su parte — nadie más estaba disponible; se equilibra en el próximo ciclo",
+    "backup": "En espera — se le llama si alguien libera el turno",
+    "volunteered": "Se ofreció para un turno al que le faltaba gente",
+    "swapped": "Un intercambio acordado por ambas partes",
+    "cover": "Entró en lugar de quien liberó el turno"
+  }
+}

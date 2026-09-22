@@ -95,7 +95,7 @@ describe('computeQuotas — properties', () => {
   });
   const members = fc.uniqueArray(member, { selector: (x) => x.userId, maxLength: 6 });
 
-  it('every quota lies inside the member’s own bounds, and they sum to min(places, Σhi)', () => {
+  it('every quota lies inside the member’s own bounds, and they sum to min(places, sum(hi))', () => {
     fc.assert(
       fc.property(fc.integer({ min: 0, max: 40 }), members, (slots, ms) => {
         const r = computeQuotas(slots, ms);

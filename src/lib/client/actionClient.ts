@@ -424,6 +424,18 @@ export type ActionKey =
   | 'cancelResourceBooking'
   | 'blockResourceDates'
   | 'releaseResourceBooking'
+  // Shifts (docs/PLAN_SHIFTS.md §8)
+  | 'declareShiftAvailability'
+  | 'createShiftPlan'
+  | 'updateShiftPlan'
+  | 'setShiftPlanStatus'
+  | 'releaseShiftAssignment'
+  | 'answerShiftCall'
+  | 'claimShiftHole'
+  | 'reopenForShiftHole'
+  | 'proposeShiftSwap'
+  | 'decideShiftSwap'
+  | 'logShiftHours'
   // Code rikma — GitHub connection (PLAN_CODE_RIKMA S2)
   | 'unlinkGithubAccount'
   | 'disconnectProjectRepo'

@@ -34,8 +34,14 @@ export function stanceKey(stance: Stance): string {
   return `shifts.stance.${stance}`;
 }
 
-/** The next stance when a member taps a cell: want → can → ifNeeded → cannot → (none) → want. */
-export function nextStance(current: Stance | null | undefined): Stance | null {
+/**
+ * The next stance when a member taps a cell: want → can → ifNeeded → cannot → want.
+ *
+ * There is no way back to "no answer": `shift-availability` is never deleted
+ * (no role has `delete` on it), and `cannot` already says everything an empty
+ * cell would — more, since it tells the rikma the question was seen.
+ */
+export function nextStance(current: Stance | null | undefined): Stance {
   switch (current) {
     case 'want':
       return 'can';
@@ -43,8 +49,6 @@ export function nextStance(current: Stance | null | undefined): Stance | null {
       return 'ifNeeded';
     case 'ifNeeded':
       return 'cannot';
-    case 'cannot':
-      return null;
     default:
       return 'want';
   }

@@ -157,6 +157,7 @@ import { createResourceBookingConfig } from './createResourceBooking.js';
 import { confirmResourceBookingConfig } from './confirmResourceBooking.js';
 import { cancelResourceBookingConfig } from './cancelResourceBooking.js';
 import { blockResourceDatesConfig } from './blockResourceDates.js';
+import { shiftActionConfigs } from './shifts.js';
 import {
   linkGithubAccountConfig,
   unlinkGithubAccountConfig,
@@ -458,6 +459,8 @@ export function registerAllActions(): void {
   registerAction(confirmResourceBookingConfig);
   registerAction(cancelResourceBookingConfig);
   registerAction(blockResourceDatesConfig);
+  // Shifts and shared staffing (docs/PLAN_SHIFTS.md §8). All no-op while SHIFTS=off.
+  for (const config of shiftActionConfigs) registerAction(config);
   // Code rikma — GitHub connection (PLAN_CODE_RIKMA S2)
   registerAction(linkGithubAccountConfig);
   registerAction(unlinkGithubAccountConfig);

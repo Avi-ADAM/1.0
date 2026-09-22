@@ -6,7 +6,7 @@
  * except where their own commitment caps them lower or floors them higher.**
  * That is max-min fair "water-filling": find one common level L such that
  *
- *     Σ clamp(L − carry_i, lo_i, hi_i) = slots
+ *     sum over members of clamp(L − carry_i, lo_i, hi_i) = slots
  *
  * where lo/hi are the member's agreed `shiftsMin`/`shiftsMax` (a term of their
  * assignment, §3.8) — hi further capped by how many shifts they actually
@@ -16,9 +16,9 @@
  * naive rounding invents a hole or a phantom extra place.
  *
  * Two edges are reported, never forced (§6.2 point 5):
- *   shortage — Σhi < slots: the rikma's commitments cannot cover the cycle.
+ *   shortage — sum(hi) < slots: the rikma's commitments cannot cover the cycle.
  *              Known before any draft; it opens the hole card early.
- *   belowMin — Σlo > slots: more commitment than work. Nobody's minimum is a
+ *   belowMin — sum(lo) > slots: more commitment than work. Nobody's minimum is a
  *              claim on the rikma — no shifts are invented — so quotas drop
  *              below lo evenly and the list says who is affected.
  */
@@ -39,9 +39,9 @@ export interface QuotaResult {
   quotas: Record<string, number>;
   /** The effective bounds used, for the fairness view and the snapshot. */
   bounds: Record<string, { lo: number; hi: number; carry: number }>;
-  /** Places no commitment can cover (Σhi < slots). */
+  /** Places no commitment can cover (sum(hi) < slots). */
   shortage: number;
-  /** Members whose quota fell below their agreed minimum (Σlo > slots). */
+  /** Members whose quota fell below their agreed minimum (sum(lo) > slots). */
   belowMin: string[];
   /** The common level L (continuous), for explaining the result. */
   level: number;
@@ -58,7 +58,7 @@ interface Bound {
   carry: number;
 }
 
-/** Σ clamp(L − c, lo, hi) — monotone non-decreasing in L. */
+/** sum of clamp(L − c, lo, hi) — monotone non-decreasing in L. */
 function fill(bounds: Bound[], L: number): number {
   let s = 0;
   for (const b of bounds) s += Math.min(b.hi, Math.max(b.lo, L - b.carry));
@@ -68,7 +68,7 @@ function fill(bounds: Bound[], L: number): number {
 /**
  * The continuous level at which fill(L) = target, found exactly: between
  * consecutive breakpoints (lo+c, hi+c) the function is linear, so locate the
- * segment and solve it. Assumes Σlo ≤ target ≤ Σhi.
+ * segment and solve it. Assumes sum(lo) ≤ target ≤ sum(hi).
  */
 function solveLevel(bounds: Bound[], target: number): number {
   const points = [

@@ -1,0 +1,69 @@
+{
+  "page": {
+    "title": "Shifts",
+    "off": "The shift system is not switched on yet. It is opening gradually, one rikma at a time.",
+    "shadow": "Trial mode: declarations are saved and the roster is computed, but it is not sent to anyone and does not bind anyone yet.",
+    "loadError": "We could not load the shifts right now. The rest of the rikma works as usual.",
+    "empty": "This rikma has no mission with a staffing plan yet.",
+    "emptyHint": "A staffing plan is made from a mission: in the mission form, mark that it needs to be staffed at set hours.",
+    "notOnMission": "You are not on this mission, so there is nothing for you to declare here. To take part, ask to join the mission.",
+    "planLabel": "Staffing plan"
+  },
+  "cycle": {
+    "prev": "Previous cycle",
+    "next": "Next cycle",
+    "range": "{{from}} – {{to}}"
+  },
+  "phase": {
+    "upcoming": "Declarations for this cycle open on {{date}}",
+    "declaring": "Declarations are open. The draft is published on {{date}}",
+    "draft": "The draft is out. You can release, swap or volunteer until {{date}}",
+    "closed": "The roster for this cycle is closed",
+    "running": "This cycle is under way",
+    "past": "A finished cycle"
+  },
+  "tabs": {
+    "roster": "Roster",
+    "mine": "My availability",
+    "fairness": "Fairness",
+    "settings": "Settings"
+  },
+  "stance": {
+    "want": "Want to",
+    "can": "Can",
+    "ifNeeded": "If needed",
+    "cannot": "Can't",
+    "none": "Not declared yet"
+  },
+  "grid": {
+    "tapHint": "Tap a shift to move between: want to → can → if needed → can't. The star marks a top choice.",
+    "need": "{{count}} needed",
+    "youComing": "You're on",
+    "youBackup": "You're in line, number {{rank}}",
+    "topChoice": "Top choice",
+    "saveError": "The change was not saved. Please try again."
+  },
+  "roster": {
+    "you": "You",
+    "coming": "Coming",
+    "empty": "Nobody rostered yet",
+    "backups": "In line",
+    "missing": "{{count}} missing",
+    "more": "and {{count}} more",
+    "noDraft": "The roster appears here once the draft is published."
+  },
+  "reason": {
+    "onlyCandidate": "The only one who declared for this shift",
+    "wanted": "Marked 'want to', which comes before 'can'",
+    "ownPreference": "Marked it as a top choice",
+    "belowQuota": "Furthest below their share this cycle",
+    "owed": "Got less than their share in earlier cycles",
+    "declaredFirst": "Declared earlier",
+    "tieBreak": "A fixed draw between exactly equal candidates",
+    "overQuota": "Beyond their share — nobody else was available; it evens out next cycle",
+    "backup": "In line — called if someone releases",
+    "volunteered": "Volunteered for a shift that was short",
+    "swapped": "A swap both sides agreed to",
+    "cover": "Stepped in for someone who released"
+  }
+}

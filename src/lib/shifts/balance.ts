@@ -34,7 +34,7 @@ export interface ClosedCycle {
 }
 
 /**
- * Carry-over per member: Σ (taken − quota) × decay^age, age 0 = the most
+ * Carry-over per member: sum of (taken − quota) × decay^age, age 0 = the most
  * recent closed cycle. Positive = took more than their share (next quota
  * shrinks); negative = is owed.
  */
