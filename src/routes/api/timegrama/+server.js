@@ -25,6 +25,9 @@ import { Tosplit } from './tosplit.svelte';
 import { Maap } from './maap.svelte';
 import { Sheirutpend } from './sheirutpend.svelte';
 import { Askwant } from './askwant.svelte';
+import { matureRosterPeriod } from '$lib/server/shifts/engine.js';
+import { asService } from '$lib/server/shifts/exec.js';
+import { shiftsEnabled, shiftsMode } from '$lib/server/shifts/mode.js';
 //ask need to creater 0on first vote or on request if the requester is project member4
 //מעביר ראשון ראשון ברסק , אם מישהו ביקש מחכים למענה בעניינו ורק לאחר שיש כן 1 לפחות או לא 1 לפחות  ניתן לקבלו או לא 1 לפחות וניתן להציע לאנשים נוספים, בקשה של הקודם כאשר יש לא נשארת אך ניתן להוסיף עוד סקשות
 import { SendToAdmin } from '$lib/server/sendToAdmin.js';
@@ -50,7 +53,11 @@ const HANDLED_KINDS = new Set([
   'tosplit',
   'maap',
   'sheirutpend',
-  'askwant'
+  'askwant',
+  // A roster cycle's objection window has run out (docs/PLAN_SHIFTS.md §7).
+  // The whatami is the relation's own name — the dispatcher reads
+  // `attributes[whatami]` — so it is `roster_period`, not `rosterPeriod`.
+  'roster_period'
 ]);
 
 /**
@@ -88,6 +95,17 @@ const RELATION_FIELDS = [
   'mashabetahalich',
   'matanot'
 ];
+
+/**
+ * `roster_period` only exists once the shift schema is deployed. Every field
+ * here goes into ONE query, so asking for it before then would fail the whole
+ * query and stop every consent clock on the platform — not just the shift
+ * ones. It is asked for only while SHIFTS is on (shadow or on), which is only
+ * ever switched after the deploy.
+ */
+function relationFields() {
+  return shiftsEnabled() ? [...RELATION_FIELDS, 'roster_period'] : RELATION_FIELDS;
+}
 
 /** Close a clock. Every "we are not acting on this" path ends here. */
 async function markDone(taid, why) {
@@ -144,6 +162,15 @@ async function x(id, kind, taid, fetch) {
     // A proposed service nobody objected to joins the rikma's catalogue
     // (PLAN_TIMEGRAMA phase 4.3).
     await Sheirutpend(id, taid);
+  } else if (kind == 'roster_period') {
+    // The draft becomes the roster (PLAN_SHIFTS §7). Idempotent: the shifts
+    // cron may have closed it already, and then this only closes the clock.
+    try {
+      const outcome = await matureRosterPeriod(String(id), { exec: asService(fetch), mode: shiftsMode() });
+      if (outcome !== 'off') await markDone(taid, `roster period ${outcome}`);
+    } catch (e) {
+      console.error(`[timegrama] roster period #${id} failed:`, e);
+    }
   } else if (kind == 'askwant') {
     // Someone asked to receive a service. Matures only once a member said yes
     // (PLAN_TIMEGRAMA D2).
@@ -165,7 +192,7 @@ export async function GET({ fetch }) {
     pagination: { limit: 500 }
   ) {data{ id attributes{
     whatami date
-    ${RELATION_FIELDS.map((f) => `${f}{data{id}}`).join('\n    ')}
+    ${relationFields().map((f) => `${f}{data{id}}`).join('\n    ')}
 }}}
  }
     `;
@@ -185,6 +212,14 @@ export async function GET({ fetch }) {
       // A kind nobody handles and nobody is going to: dead relation fields, or
       // a typo'd whatami. Nothing will ever act on it — close it rather than
       // re-reading it every run for the rest of the system's life.
+      // With SHIFTS off the relation above is not even queried, so the check
+      // below would read it as a deleted target and close a live clock. Leave
+      // it standing instead: when shifts come back on, it matures as normal.
+      if (kind === 'roster_period' && !shiftsEnabled()) {
+        stats.waiting++;
+        continue;
+      }
+
       if (!HANDLED_KINDS.has(kind) && !AWAITING_HANDLER.has(kind)) {
         console.warn(`[timegrama] #${tgid}: unknown whatami="${kind}"`);
         await markDone(tgid, `unknown whatami "${kind}"`);

@@ -50,7 +50,8 @@
     "backups": "In line",
     "missing": "{{count}} missing",
     "more": "and {{count}} more",
-    "noDraft": "The roster appears here once the draft is published."
+    "noDraft": "The roster appears here once the draft is published.",
+    "shadowNote": "Trial roster: this is what the roster would look like. It has not been sent to anyone and binds nobody."
   },
   "reason": {
     "onlyCandidate": "The only one who declared for this shift",
@@ -65,5 +66,26 @@
     "volunteered": "Volunteered for a shift that was short",
     "swapped": "A swap both sides agreed to",
     "cover": "Stepped in for someone who released"
+  },
+  "fairness": {
+    "intro": "Everyone gets the same number of shifts, except where their own commitment caps them lower or lifts them higher.",
+    "noSnapshot": "Shares are computed when this cycle's draft is published.",
+    "shortage": "{{count}} shifts are not covered by any commitment in the rikma — a call to fill the holes will open.",
+    "member": "Member",
+    "commitment": "Commitment per cycle",
+    "quota": "Share",
+    "assigned": "Rostered",
+    "carry": "Running balance",
+    "carryHelp": "Positive: got more than their share before, so the next share is smaller. Negative: is owed.",
+    "commitmentRange": "{{min}}–{{max}}",
+    "noCommitment": "Not set",
+    "noMax": "no cap",
+    "why": {
+      "equalShare": "An equal share",
+      "cappedByMax": "Capped by the agreed commitment",
+      "cappedByAvailability": "Capped by the availability declared",
+      "raisedToMin": "Lifted to the agreed minimum",
+      "belowMin": "Below the minimum — not enough shifts this cycle"
+    }
   }
 }

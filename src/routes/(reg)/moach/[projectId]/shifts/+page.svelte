@@ -9,6 +9,7 @@
   import { dayLabel, localDateKey, moment } from '$lib/shifts/format';
   import AvailabilityGrid from '$lib/components/shifts/AvailabilityGrid.svelte';
   import RosterGrid from '$lib/components/shifts/RosterGrid.svelte';
+  import FairnessPanel from '$lib/components/shifts/FairnessPanel.svelte';
 
   let { data } = $props();
 
@@ -21,7 +22,7 @@
 
   let planIdx = $state(0);
   let cycleIdx = $state(0);
-  let tab = $state<'roster' | 'mine'>('roster');
+  let tab = $state<'roster' | 'mine' | 'fairness'>('roster');
 
   const block = $derived(data.plans[planIdx] ?? null);
   const cycle = $derived(block?.cycles[cycleIdx] ?? null);
@@ -36,7 +37,21 @@
       : []
   );
   const shiftIds = $derived(new Set(cycleShifts.map((s) => s.id)));
-  const cycleAssignments = $derived(data.window.assignments.filter((a) => shiftIds.has(a.shiftId)));
+  const period = $derived(block && cycle ? (block.periods.find((p) => p.periodKey === cycle.periodKey) ?? null) : null);
+  const snapshot = $derived((period?.quotaSnapshot ?? null) as any);
+  /**
+   * SHIFTS=shadow writes no assignment rows; the roster it would have written
+   * is kept on the period, and shown here under a banner so it is never
+   * mistaken for the real thing (PLAN_SHIFTS §11).
+   */
+  const shadowRoster = $derived(
+    data.mode === 'shadow' && Array.isArray(snapshot?.shadow)
+      ? snapshot.shadow.map((a: any) => ({ ...a, state: 'draft' as const }))
+      : null
+  );
+  const cycleAssignments = $derived(
+    shadowRoster ?? data.window.assignments.filter((a) => shiftIds.has(a.shiftId))
+  );
   const myDeclarations = $derived(
     data.window.declarations.filter((d) => d.userId === uid && shiftIds.has(d.shiftId))
   );
@@ -150,11 +165,20 @@
           class="px-3 py-2 {tab === 'mine' ? 'border-b-2 border-gold font-bold' : ''}"
           onclick={() => (tab = 'mine')}>{$t('shifts.tabs.mine')}</button
         >
+        <button
+          type="button"
+          role="tab"
+          aria-selected={tab === 'fairness'}
+          class="px-3 py-2 {tab === 'fairness' ? 'border-b-2 border-gold font-bold' : ''}"
+          onclick={() => (tab = 'fairness')}>{$t('shifts.tabs.fairness')}</button
+        >
       </div>
 
       <div role="tabpanel">
         {#if tab === 'roster'}
-          {#if !hasDraft}
+          {#if shadowRoster}
+            <p class="mb-3 rounded-lg border border-amber-400 p-2 text-sm">{$t('shifts.roster.shadowNote')}</p>
+          {:else if !hasDraft}
             <p class="mb-3 text-sm text-surfaceMuted">{$t('shifts.roster.noDraft')}</p>
           {/if}
           <RosterGrid
@@ -166,6 +190,8 @@
             cycleStart={cycle.start}
             cycleEnd={cycle.end}
           />
+        {:else if tab === 'fairness'}
+          <FairnessPanel {snapshot} balance={block.plan.balanceCache} {names} {uid} />
         {:else if !block.onMission}
           <p class="rounded-xl border border-surfaceLine bg-surface2 p-4">{$t('shifts.page.notOnMission')}</p>
         {:else}

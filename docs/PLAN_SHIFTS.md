@@ -932,9 +932,8 @@ draftRoster({ shifts, candidates, commitments, availabilities, quotas, carryOver
 - [x] **P3 — מודולים טהורים.** `src/lib/shifts/` — 73 טסטים. פירוט ב‑§13.3.
 - [x] **P4 — `ShiftGrid` + הצהרות.** שכבת השרת, `declareShiftAvailability`,
       העמוד החדש עם "הסידור" ו"הזמינות שלי". פירוט ב‑§13.4.
-- [ ] **P5 — מנוע הטיוטה והסגירה.** `runRosterDraft`, `closeRosterPeriod`,
-      `whatami: 'rosterPeriod'` (+ `HANDLED_KINDS` + `RELATION_FIELDS`),
-      `/api/cron/shifts`. מריצים ב‑`SHIFTS=shadow` ומשווים ידנית.
+- [x] **P5 — מנוע הטיוטה והסגירה.** `engine.ts`, `/api/cron/shifts`, timegrama
+      `roster_period`, מצב shadow, לשונית ההוגנות. פירוט ב‑§13.5.
 - [ ] **P6 — הטופס והתחייבות המשמרות.** `ShiftPlanForm`, חישוב "כמה אנשים",
       מחיקת הבלוק הישן מ‑`mission.svelte`, מעבר ל‑`$t()`. **וגם §3.8:** שדות
       `shiftsMin`/`shiftsMax` ב‑`Ask`, `Negopendmission`, `Mesimabetahalich`
@@ -1148,6 +1147,51 @@ GraphQL החי.
 **נבדק:** 86 טסטים על כל שכבות המשמרות (כולל 7 רינדור); `npm run check`,
 `check:i18n`, `check:script` נקיים; טסטי ה‑authz עוברים עם הפעולה הרשומה.
 **לא נבדק חי** — העמוד מאחורי התחברות, והקולקציות טרם עלו.
+
+### 13.5 P5 — המנוע
+
+[`src/lib/server/shifts/engine.ts`](../src/lib/server/shifts/engine.ts):
+
+- **`tickPlan`** (כל שעה, מה‑cron): מממש את הדפוס **מעכשיו** ועד סוף האופק (תכנית
+  שנוצרה באמצע שבוע לא מגדלת משמרות בעבר), פותח כל מחזור שכבר מותר להצהיר עליו,
+  מפרסם טיוטה ב‑`draftAt` וסוגר ב‑`closesAt`. מחזור שכבר רץ כשנראה לראשונה —
+  `cancelled`, לא משובץ בדיעבד.
+- **`runDraft`**: ה‑seed הוא `periodKey` ונשמר; ההתחייבויות נטענות מהמשימה;
+  המאזן מ‑`balanceCache`. כל שורות השיבוץ נכתבות ב‑`draft`, ה‑`quotaSnapshot`
+  נשמר על המחזור, ונפתח timegrama לסגירה.
+- **`closePeriod`**: `draft` ← `confirmed`, המשמרות ← `rostered`, והמאזן זז לפי
+  `C_n = (נלקח − מכסה) + decay · C_{n−1}` — אותה רקורסיה ש‑`carryOver()` מחשבת
+  מכל ההיסטוריה.
+- **`rebuildBalance`** בונה את ה‑cache מחדש מההיסטוריה — ההוכחה שהוא באמת רק
+  cache (§1.4). נגיש כ‑`/api/cron/shifts?plan=<id>&rebuild=1`.
+- **אידמפוטנטי בכל שלב**: טיוטה שכבר כתבה שורות לא כותבת שוב; מחזור סגור לא
+  נסגר פעמיים — ה‑cron וה‑timegrama יכולים שניהם להגיע.
+
+**שני תיקונים לתכנון, שעלו מקריאת ה‑dispatcher:**
+
+1. **ה‑`whatami` הוא `roster_period`, לא `rosterPeriod`.** ה‑dispatcher קורא
+   `attributes[whatami]`, כך שה‑whatami חייב להיות שם ה‑relation עצמו.
+2. **השדה נשאל רק כש‑`SHIFTS` דלוק.** ה‑dispatcher שואל את כל ה‑relations
+   **בשאילתה אחת**; שדה שעוד לא קיים ב‑Strapi היה מפיל את השאילתה — ו**עוצר
+   את כל שעוני ההסכמה בפלטפורמה**, לא רק של המשמרות. בנוסף, כש‑`SHIFTS=off`,
+   שעון `roster_period` נשאר עומד במקום להיסגר כ"יעד שנמחק".
+
+**`/api/cron/shifts`** — GET עם `?key=<CRON_SECRET>`, כמו שאר ה‑crons. צריך
+**לתזמן אותו כל שעה**, לצד `/api/timegrama`.
+
+**shadow**: אין שורות שיבוץ, אין timegrama, המאזן לא זז. הסידור שהיה נכתב נשמר
+ב‑`quotaSnapshot.shadow` ומוצג בלשונית הסידור תחת באנר "סידור ניסיון".
+
+**לשונית ההוגנות** — [`FairnessPanel`](../src/lib/components/shifts/FairnessPanel.svelte):
+לכל חבר/ה — התחייבות, מכסה והסיבה לה (`explainQuota`), כמה שובץ/ה, והמאזן
+המצטבר. חוסר כיסוי (`shortage`) מוצג במפורש.
+
+**נבדק:** [`engine.test.ts`](../src/lib/server/shifts/engine.test.ts) מריץ מחזור
+שלם מול Strapi בזיכרון (הקוד הטהור אמיתי): פתיחה ← טיוטה (פעם אחת, עם שעון
+סגירה) ← סגירה (אושר, `rostered`, מאזן) ; cron + timegrama על אותה סגירה;
+ספירת חורים; מחזור שכבר רץ; תכנית מושהית; ו‑shadow שלא כותב דבר מחייב.
+94 טסטים בכל שכבות המשמרות, `check`, `check:i18n`, `check:script`,
+`check:proxy` נקיים.
 
 ---
 

@@ -50,7 +50,8 @@
     "backups": "En espera",
     "missing": "Faltan {{count}}",
     "more": "y {{count}} más",
-    "noDraft": "El cuadrante aparece aquí cuando se publica el borrador."
+    "noDraft": "El cuadrante aparece aquí cuando se publica el borrador.",
+    "shadowNote": "Cuadrante de prueba: así se vería el cuadrante. No se ha enviado a nadie ni compromete a nadie."
   },
   "reason": {
     "onlyCandidate": "La única persona que se declaró para este turno",
@@ -65,5 +66,26 @@
     "volunteered": "Se ofreció para un turno al que le faltaba gente",
     "swapped": "Un intercambio acordado por ambas partes",
     "cover": "Entró en lugar de quien liberó el turno"
+  },
+  "fairness": {
+    "intro": "Todas las personas reciben el mismo número de turnos, salvo cuando su propio compromiso las limita por abajo o por arriba.",
+    "noSnapshot": "Las partes se calculan cuando se publica el borrador de este ciclo.",
+    "shortage": "{{count}} turnos no los cubre ningún compromiso de la rikma — se abrirá un llamado para cubrir los huecos.",
+    "member": "Miembro",
+    "commitment": "Compromiso por ciclo",
+    "quota": "Parte",
+    "assigned": "Asignado",
+    "carry": "Saldo acumulado",
+    "carryHelp": "Positivo: recibió antes más de su parte, así que la próxima será menor. Negativo: se le debe.",
+    "commitmentRange": "{{min}}–{{max}}",
+    "noCommitment": "Sin definir",
+    "noMax": "sin tope",
+    "why": {
+      "equalShare": "Una parte igual",
+      "cappedByMax": "Limitado por el compromiso acordado",
+      "cappedByAvailability": "Limitado por la disponibilidad declarada",
+      "raisedToMin": "Elevado al mínimo acordado",
+      "belowMin": "Por debajo del mínimo — no hay suficientes turnos este ciclo"
+    }
   }
 }
