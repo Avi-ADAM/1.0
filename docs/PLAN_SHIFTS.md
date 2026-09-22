@@ -1,6 +1,7 @@
 # תכנית: משמרות ואיוש משותף ברקמה (Shifts & Staffing)
 
-> סטטוס: **P1 (משימה לכמה אנשים) מומש — טרם commit/deploy. P2 ואילך: תכנון.**
+> סטטוס: **P1 (משימה לכמה אנשים) ב‑commit `e39d5e32`, טרם deploy. P2 (הסכימה)
+> נכתבה ונבדקה ב‑1.0b, טרם commit/deploy — ראה §13.2. P3 ואילך: תכנון.**
 > ההכרעות ב‑§14 סגורות (2026‑09‑22), כולל שלושה שינויים שלך מול ההמלצה
 > המקורית: התחייבות משמרות כתנאי השמה (§3.8), כרטיס חור עם שתי אפשרויות
 > (§7.1), ועומק גיבוי נגזר (§6.3). המסמך נכתב מקריאת הקוד הקיים (לא מהזיכרון),
@@ -288,11 +289,13 @@ archiveSiblingAsks = archiveOpenMission
     "name":         { "type": "string" },
     "pattern":      { "type": "json" },      // §3.6
     "timezone":     { "type": "string", "default": "Asia/Jerusalem" },
-    "cycleDays":         { "type": "integer", "default": 7 },
-    "horizonDays":       { "type": "integer", "default": 28 },
-    "closeOffsetHours":  { "type": "integer", "default": 48 },
-    "draftWindowHours":  { "type": "integer", "default": 24 },
-    "declareOpenDays":   { "type": "integer", "default": 21 },
+    // כל שדות הזמן nullable, בלי default: NULL = ירושה מ-Project (§3.7), ומשם
+    // לקבוע בקוד (7 / 28 / 48 / 24 / 21). default כאן היה מבטל את דריסת הרקמה.
+    "cycleDays":         { "type": "integer", "min": 1 },
+    "horizonDays":       { "type": "integer", "min": 1 },
+    "closeOffsetHours":  { "type": "integer", "min": 0 },
+    "draftWindowHours":  { "type": "integer", "min": 0 },
+    "declareOpenDays":   { "type": "integer", "min": 1 },
     "maxBackups":   { "type": "integer" },    // NULL = כל מי שזמין מקבל דרגה (§6.3)
     "minRestHours": { "type": "integer" },
     "fairness":     { "type": "enumeration", "enum": ["commitments","manual"], "default": "commitments" },  // §6.2
@@ -314,7 +317,8 @@ archiveSiblingAsks = archiveOpenMission
   "roster_period":{ "relation": "manyToOne", "target": "api::roster-period.roster-period" },
   "start": { "type": "datetime", "required": true },
   "end":   { "type": "datetime", "required": true },
-  "need":  { "type": "integer", "default": 1 },
+  "slotKey": { "type": "string", "unique": true },   // "<planId>|<startISO>" — ה-materializer לעולם לא מכפיל
+  "need":  { "type": "integer", "default": 1, "min": 1 },
   "state": { "type": "enumeration",
              "enum": ["open","rostered","running","done","cancelled"], "default": "open" },
   "tafkidim": { "relation": "manyToOne", "target": "api::tafkidim.tafkidim" },  // משמרת של תפקיד מסוים
@@ -335,6 +339,7 @@ archiveSiblingAsks = archiveOpenMission
   "project":    { "relation": "manyToOne", "target": "api::project.project" },
   "stance": { "type": "enumeration", "enum": ["want","can","ifNeeded","cannot"], "required": true },
   "prefRank":   { "type": "integer" },     // הסדר של החבר עצמו בתוך המחזור
+  "declKey":    { "type": "string", "unique": true },  // "<shiftId>|<userId>" — הצהרה אחת לאדם למשמרת
   "declaredAt": { "type": "datetime", "required": true },
   "note":       { "type": "text" }
 }
@@ -361,6 +366,7 @@ archiveSiblingAsks = archiveOpenMission
                 "enum": ["open","draft","closed","cancelled"], "default": "open" },
   "draftedAt": { "type": "datetime" },
   "closedAt":  { "type": "datetime" },
+  "periodKey": { "type": "string", "unique": true },  // "<planId>|<startISO>"
   "seed":      { "type": "string" },       // שובר־שוויון משוחזר — §1.6
   "holes":     { "type": "integer", "default": 0 },
   "quotaSnapshot": { "type": "json" },     // המכסות שחושבו, לתצוגה ולביקורת
@@ -913,8 +919,9 @@ draftRoster({ shifts, candidates, commitments, availabilities, quotas, carryOver
       (גילוי); עריכת `howMeny` אחרי יצירה דרך סבב `proposeObjectEdit` (הרכיב
       `negoarch` לא נושא אותו היום); עותק ההתראה "נותרו N מקומות" (תבנית
       ההתראה של הפינלייזרים סטטית).
-- [ ] **P2 — סכימה ב‑1.0b.** חמש הקולקציות + שדות ה‑`Project`; שתי ההרשאות
-      לכל קולקציה; `npm run types:update` ב‑1.0main.
+- [x] **P2 — סכימה ב‑1.0b.** נכתבה ונבדקה 2026‑09‑23, **טרם commit/deploy**
+      (ענף `shabab`). חמש הקולקציות, שדות ה‑`Project`, שדות ההתחייבות של §3.8
+      והצד של `Timegrama`. פירוט ומה שנשאר לך ב‑§13.2.
 - [ ] **P3 — מודולים טהורים.** `src/lib/shifts/` במלואו + כל הטסטים. אפס UI.
 - [ ] **P4 — `ShiftGrid` + הצהרות.** הרכיב, `declareShiftAvailability`,
       טאב "הזמינות שלי". אפשר להצהיר; עוד אין סידור.
@@ -976,10 +983,91 @@ draftRoster({ shifts, candidates, commitments, availabilities, quotas, carryOver
 **לא נבדק חי:** התג עם `howMeny > 1` וההשמה עצמה מול Strapi — דורשים ליצור
 משימה אמיתית לכמה אנשים ולקבל אליה שני אנשים. זה המבחן הראשון אחרי deploy.
 
+**commit:** `e39d5e32` ב‑1.0main. ב‑`mission.svelte`, שורת ה‑`EquityPreview`
+נשמרה ב‑commit כ‑`perPersonValue * seats` — העטיפה `inRikma(…)` שייכת לעבודת
+ריבוי המטבעות שעדיין לא נכנסה, ונשארה רק בעץ העבודה.
+
 **סוויטת הטסטים המלאה:** 47 כשלונות ב‑10 קבצים שקדמו לעבודה הזאת ואינם
 מייבאים אף קובץ שנגעתי בו (רישום כפול ב‑`registry`, mock של `fetch` בלי
 `res.text` ב‑`proposeObjectArchive`, `TaskApprovalButton.test.ts` שנקרא בלי
 `.svelte.` ולכן רץ בפרויקט הלא נכון, ועוד).
+
+### 13.2 P2 — הסכימה ב‑1.0b
+
+**מה נוצר** (ענף `shabab`, לא commit ולא deploy):
+
+| קובץ | מה |
+|---|---|
+| `src/api/{shift-plan,shift,shift-availability,roster-period,shift-assignment}/` | חמש הקולקציות: `schema.json` + boilerplate של `factories.createCore*` (מועתק מ‑`ratson-proposal`) |
+| `src/api/project/…/schema.json` | `shiftCycleDays`, `shiftCloseOffsetHours`, `shiftDraftWindowHours` (`localized: false` — `Project` מתורגם), `shift_plans` |
+| `src/api/timegrama/…/schema.json` | `roster_period` (`inversedBy`, כמו כל ה‑relations של timegrama) |
+| `ask`, `negopendmission`, `mesimabetahalich`, `components/desision/negoarch.json` | `shiftsMin`, `shiftsMax` (§3.8) |
+
+**הכרעות שנלקחו בזמן הכתיבה:**
+
+- **`draftAndPublish: false` בכל החמש** — אותו נימוק כמו `resource-booking`: ליומן
+  אין מצב טיוטה, ושורה בלי `publishedAt` הייתה בלתי נראית לשאילתות.
+- **שלושה מפתחות ייחודיים** — `shift.slotKey`, `shift-availability.declKey`,
+  `roster-period.periodKey`. ה‑cron והלחיצה הכפולה יכולים לרוץ פעמיים; `unique`
+  הופך כפילות לשגיאה במקום לשורה שנייה. משמרת שבוטלה ונוספה מחדש באותה שעה
+  **מחייה את השורה הקיימת** (אותו מפתח) — חוק ל‑P3/P5.
+- **שדות הזמן של התכנית nullable בלי default** — אחרת דריסת הרקמה (§3.7) לא
+  הייתה נכנסת לתוקף אף פעם.
+- **מינימום צדדים הפוכים**, כמו ב‑`resource-booking`: רק `project.shift_plans`,
+  `shift-plan.{shifts,roster_periods}`, `roster-period.{shifts,assignments}`,
+  `shift.{availabilities,assignments}` ו‑`timegrama.roster_period`. המשתמש,
+  `open_mission`, `mission`, `tafkidim`, `mesimabetahalich`, `timer` — **חד‑כיווניים**.
+  בפרט **סכימת המשתמש לא נגעה**: "ההצהרות שלי" / "המשמרות שלי" מסננות מהשורש
+  (`shiftAvailabilities(filters: {users_permissions_user: …})`).
+- **ה‑`Decision` של `shiftSwap` (P8) לא נכנס כאן.** P2 כולל בדיוק מה ש‑§3
+  מגדיר, ועוד שדות ההתחייבות של §3.8. ה‑swap ייכנס עם העיצוב של P8, לא כניחוש
+  עכשיו.
+
+**שמות ה‑GraphQL** — הופקו מ‑`naming` של `@strapi/plugin-graphql` עצמו, לא נוחשו:
+
+| קולקציה | type | רשימה / יחיד | כתיבה | enums |
+|---|---|---|---|---|
+| `shift-plan` | `ShiftPlan` | `shiftPlans` / `shiftPlan` | `createShiftPlan` / `updateShiftPlan` | `ENUM_SHIFTPLAN_FAIRNESS`, `_LIFECYCLE`, `_STATUS` |
+| `shift` | `Shift` | `shifts` / `shift` | `createShift` / `updateShift` | `ENUM_SHIFT_STATE` |
+| `shift-availability` | `ShiftAvailability` | `shiftAvailabilities` / `shiftAvailability` | `createShiftAvailability` / `updateShiftAvailability` | `ENUM_SHIFTAVAILABILITY_STANCE` |
+| `roster-period` | `RosterPeriod` | `rosterPeriods` / `rosterPeriod` | `createRosterPeriod` / `updateRosterPeriod` | `ENUM_ROSTERPERIOD_STATE` |
+| `shift-assignment` | `ShiftAssignment` | `shiftAssignments` / `shiftAssignment` | `createShiftAssignment` / `updateShiftAssignment` | `ENUM_SHIFTASSIGNMENT_STATE`, `_SOURCE` |
+
+זכור: ב‑`FiltersInput` ה‑enums הם `StringFilterInput`, לא `ENUM_…`
+(`project_strapi_enum_filters_are_strings`).
+
+**נבדק:**
+
+1. **סריקה סטטית של כל 115 הסכימות** — כל `target` קיים, כל זוג
+   `inversedBy`/`mappedBy` מצביע חזרה עם קרדינליות תואמת, כל ערך enum הוא שם
+   GraphQL חוקי. אפס בעיות חדשות; ארבע הקיימות הן אלה שכבר מתועדות ב‑
+   [`PLAN_RESOURCE_CALENDAR.md`](./PLAN_RESOURCE_CALENDAR.md) §11.
+2. **שלב ה‑`register()` של Strapi עצמו** — טעינה ואימות של כל ה‑content types
+   והרכיבים, **בלי לפתוח DB** (`bootstrap()` הוא המתודה שיוצרת את `this.db`, והיא
+   לא נקראת; הבדיקה גם נכשלת אם נוצר handle). כל החמש נרשמו, וכל השדות החדשים
+   נמצאים על הסכימות הקיימות.
+3. **לא הרצתי את Strapi מול DB.** ב‑`.env` של 1.0b, `DATABASE_HOST` **אינו
+   מקומי** — ו‑Strapi מריץ מיגרציות אוטומטית מול כל DB שהוא מתחבר אליו.
+
+**באג שנמצא בדרך (לא שלנו):** `strapi ts:generate-types` נופל על כל שדה עם
+`min: 0` ובלי `max` — `(max && typeofMax) ?? (min && typeofMin)` הופך את 0 ל‑0.
+`act`, `sp` ו‑`stipend-pledge` כבר חיים עם `min: 0`, כך שה‑runtime מקבל את זה;
+רק ה‑typegen שבור מאז, וזו הסיבה ש‑`types/generated/` ב‑1.0b לא מעודכן
+(אין בו אפילו `ResourceBooking`). הפרונט לא נשען עליו — הוא מייצר טיפוסים מה‑
+GraphQL החי.
+
+**מה שנשאר לך:**
+
+1. **commit + deploy** של 1.0b (ענף `shabab`). המיגרציה רק מוסיפה טבלאות
+   ועמודות — אין שינוי או מחיקה של שדה קיים.
+2. **Settings → Users & Permissions → Roles → Authenticated** — על כל חמש
+   הקולקציות: `find`, `findOne`, `create`, `update`. **בלי `delete`** — שורה
+   מבוטלת נשארת, המאזן מחושב מההיסטוריה.
+3. **אותן הרשאות ל‑API token** שה‑cron משתמש בו, אם הוא לא full‑access
+   (`project_strapi_new_collection_permissions`) — ה‑materializer ומנוע הסגירה
+   (P5) כותבים דרכו.
+4. `npm run types:update` ב‑1.0main — ואז `STRAPI_SCHEMA_REFERENCE.md` יכלול את
+   החמש.
 
 ---
 
