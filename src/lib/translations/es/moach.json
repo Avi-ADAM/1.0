@@ -351,6 +351,11 @@
     "perUnit": "por unidad",
     "perPeriod": "por todo el período",
     "shareResource": "Se necesita el recurso \"{{name}}\" en la rikma {{projectName}} en 1💗1",
-    "progressLink": "{{count}} misiones y recursos siguen buscando socios"
+    "progressLink": "{{count}} misiones y recursos siguen buscando socios",
+    "staffing": "{{filled}} de {{need}} cubiertos",
+    "staffingNeed": "se necesitan {{need}} personas",
+    "seatsLeft": "quedan {{count}} plazas",
+    "seatsLeftOne": "queda una plaza",
+    "overfilled": "se unieron {{filled}} — más de las {{need}} previstas"
   }
 }

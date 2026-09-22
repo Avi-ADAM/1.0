@@ -13,6 +13,7 @@
   import Share from '$lib/components/share/shareButtons/index.svelte';
   import ArchiveObjectButton from '$lib/components/archive/ArchiveObjectButton.svelte';
   import { htmlExcerpt } from '$lib/text/htmlExcerpt';
+  import { computeHeadcount } from '$lib/missions/headcount';
 
   /**
    * @typedef {Object} Props
@@ -44,6 +45,13 @@
 
   /** Candidates who asked to join and were not withdrawn — the vote-worthy ones. */
   let candidates = $derived((a.asks?.data ?? []).filter((k) => k?.attributes?.archived !== true));
+
+  /**
+   * A mission can ask for several people (PLAN_SHIFTS §2). It then stays open,
+   * and every standing candidacy stays valid, until the last seat is taken —
+   * so the card has to say how many are still free.
+   */
+  let staffing = $derived(computeHeadcount(a));
 
   let startDate = $derived(a.sqadualed ?? a.dates ?? null);
 
@@ -154,6 +162,28 @@
   {/if}
 
   <div class="mt-auto flex flex-wrap items-center gap-1.5 pt-1 text-xs text-slate-300">
+    {#if staffing.need > 1}
+      <span
+        class="rounded-full px-2 py-0.5 font-semibold {staffing.isFull
+          ? 'bg-slate-700/70 text-slate-200'
+          : 'bg-gold/20 text-gold'}"
+      >
+        {#if pending}
+          👥 {$t('moach.open.staffingNeed', { need: staffing.need })}
+        {:else if staffing.overfilled}
+          👥 {$t('moach.open.overfilled', { filled: staffing.filled, need: staffing.need })}
+        {:else}
+          👥 {$t('moach.open.staffing', { filled: staffing.filled, need: staffing.need })}
+        {/if}
+      </span>
+      {#if !pending && staffing.remaining > 0}
+        <span class="rounded-full bg-barbi/20 px-2 py-0.5 text-gold">
+          {staffing.remaining === 1
+            ? $t('moach.open.seatsLeftOne')
+            : $t('moach.open.seatsLeft', { count: staffing.remaining })}
+        </span>
+      {/if}
+    {/if}
     {#if fmtDate(startDate)}
       <span class="rounded-full bg-slate-700/70 px-2 py-0.5">🗓️ {fmtDate(startDate)}</span>
     {/if}

@@ -16,6 +16,7 @@
   import MissionStipendOffer from '$lib/components/stipend/MissionStipendOffer.svelte';
   import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
   import { fly } from 'svelte/transition';
+  import { computeHeadcount } from '$lib/missions/headcount';
 
   //TODO: get asked from server then show you alr .., find a way to get title
   let error1 = null;
@@ -166,6 +167,12 @@
   let isMaagadSrc = $derived(
     !!maagadInfo || data.alld?.attributes?.source === 'maagad'
   );
+  /**
+   * A mission can be for several people (PLAN_SHIFTS §2). The candidate
+   * deciding whether to apply should see that it is still open, and how many
+   * places are left, rather than a page that reads as a single slot.
+   */
+  let staffing = $derived(computeHeadcount(data.alld?.attributes));
   let ratsonId = $derived(data.alld?.attributes?.ratson?.data?.id ?? null);
   let ratsonName = $derived(
     data.alld?.attributes?.ratson?.data?.attributes?.name ?? ''
@@ -539,6 +546,22 @@
                       {data.alld.attributes.iskvua ? $t('pages.availMission.monhly') : ''}
                     </span>
                   </p>
+                  {#if staffing.need > 1}
+                    <p class="flex flex-wrap items-center justify-center gap-2 text-sm">
+                      <span class="rounded-full bg-gold/20 px-3 py-1 font-semibold">
+                        👥 {staffing.overfilled
+                          ? $t('moach.open.overfilled', { filled: staffing.filled, need: staffing.need })
+                          : $t('moach.open.staffing', { filled: staffing.filled, need: staffing.need })}
+                      </span>
+                      {#if staffing.remaining > 0}
+                        <span class="rounded-full bg-barbi/20 px-3 py-1">
+                          {staffing.remaining === 1
+                            ? $t('moach.open.seatsLeftOne')
+                            : $t('moach.open.seatsLeft', { count: staffing.remaining })}
+                        </span>
+                      {/if}
+                    </p>
+                  {/if}
                   <!-- מלגת קיום שהמשימה פורסמה איתה (PLAN_STIPEND §13):
                        ההשקעה בפרויקט והמלגה זו לצד זו, עם מי שמממן אותה
                        וההסתייגות שזו שותפות ולא יחסי עובד-מעביד. -->

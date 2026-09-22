@@ -7,6 +7,7 @@ import { resolveAcceptedActs } from '../helpers/roundActs.js';
 import { touchDormancy } from '$lib/server/archive/dormancyClock.js';
 import { execFromContext } from '$lib/server/archive/exec.js';
 import { carryStipendToMission } from '$lib/server/stipend/fromMission.js';
+import { acceptanceEffect } from '$lib/server/missions/headcountGate.js';
 import { gqlString } from './actionUtils.js';
 
 function formatVotesForInline(votes: any[]): string {
@@ -158,6 +159,12 @@ const finalizeJoinAcceptanceHandler: ActionExecutionHandler = async (params, con
   // acceptance — in BOTH the solo and allVoted variants.
   const otherAsksFragment = 'asks { data { id } } acts { data { id } }';
 
+  // A mission created for several people (`howMeny`) does not close on the
+  // first person to join: the need is still on the table, and so are the other
+  // candidacies (docs/PLAN_SHIFTS.md §2). Read before the mutation, because
+  // afterwards this acceptance is already part of the count.
+  const headcount = await acceptanceEffect(strapi, context, openMid);
+
   const welcomeFragment = newnew
     ? `createWelcomTop(data: {
         users_permissions_user: "${acceptedUserId}",
@@ -203,7 +210,7 @@ const finalizeJoinAcceptanceHandler: ActionExecutionHandler = async (params, con
       ${sdateFragment}
     }) { data { id attributes { project { data { id } } } } }
 
-    updateOpenMission(id: "${openMid}", data: { archived: true }) {
+    updateOpenMission(id: "${openMid}", data: { archived: ${headcount.archiveOpenMission} }) {
       data { id attributes { archived ${otherAsksFragment} } }
     }
 
@@ -283,10 +290,12 @@ const finalizeJoinAcceptanceHandler: ActionExecutionHandler = async (params, con
     }
   }
 
-  // Archive the other (losing) candidates' asks on this OpenMission, and spin
-  // up a Monter for recurring missions. Runs for BOTH variants — a single-member
-  // (solo) project still needs sibling candidate asks archived so they can no
-  // longer be voted on.
+  // Spin up a Monter for recurring missions, and — only once the mission is
+  // actually full — archive the other candidates' asks. While seats remain,
+  // those candidacies are still live proposals on a need that still exists;
+  // archiving them would silently withdraw people who never withdrew
+  // (docs/PLAN_SHIFTS.md §2.2). Runs for BOTH variants — a single-member
+  // (solo) project still needs sibling asks archived once it closes.
   const otherAsks: any[] = openMissionAttrs.asks?.data || [];
   const siblingAsks = otherAsks.filter((a) => String(a.id) !== String(askId));
   const startDate = fStart
@@ -301,24 +310,24 @@ const finalizeJoinAcceptanceHandler: ActionExecutionHandler = async (params, con
       }) { data { id } }`
     : '';
 
-  if (siblingAsks.length > 0) {
-    for (let i = 0; i < siblingAsks.length; i++) {
-      const archiveQuery = `mutation {
-        ${i === 0 ? monterFragment : ''}
-        updateAsk(id: "${siblingAsks[i].id}", data: { archived: true }) { data { id } }
-      }`;
-      await context.fetch(graphqlUrl, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify({ query: archiveQuery }),
-      });
-    }
-  } else if (monterFragment) {
+  if (monterFragment) {
     await context.fetch(graphqlUrl, {
       method: 'POST',
       headers,
       body: JSON.stringify({ query: `mutation { ${monterFragment} }` }),
     });
+  }
+
+  if (headcount.archiveSiblingAsks) {
+    for (const sibling of siblingAsks) {
+      await context.fetch(graphqlUrl, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          query: `mutation { updateAsk(id: "${sibling.id}", data: { archived: true }) { data { id } } }`,
+        }),
+      });
+    }
   }
 
   // Update timegrama if provided
@@ -389,7 +398,17 @@ const finalizeJoinAcceptanceHandler: ActionExecutionHandler = async (params, con
   }
 
   return {
-    data: responseData.data,
+    data: {
+      ...responseData.data,
+      // So the client can say "3 of 5 joined — the mission stays open" instead
+      // of the flat "accepted" it shows today.
+      headcount: {
+        need: headcount.before.need,
+        filled: headcount.filledAfter,
+        remaining: headcount.remainingAfter,
+        isFull: headcount.archiveOpenMission,
+      },
+    },
     updateStrategy: { type: 'none' },
   };
 };

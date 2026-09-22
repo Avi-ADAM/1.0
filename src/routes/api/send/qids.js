@@ -1895,6 +1895,11 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
           stipendCostShare
           stipendMode
           stipendFunder { data { id attributes { username } } }
+          # "2 of 4 joined" for the candidate deciding whether to apply
+          # (PLAN_SHIFTS §2.6). Seat state only — no user relation, because
+          # a guest reads this page with the service token.
+          howMeny
+          mesimabetahaliches { data { id attributes { lifecycle finnished } } }
         }
       }
     }
@@ -6333,6 +6338,40 @@ ${STIPEND_DECISION_FIELDS}
       }
     }
   }`,
+  // How many seats this open mission still has (docs/PLAN_SHIFTS.md §2).
+  // `mesimabetahaliches` carries `lifecycle` and `finnished` because a seat is
+  // freed by a member leaving, not only by the mission being deleted; `asks`
+  // carries `archived` so the shortfall ("seats nobody is even applying for")
+  // is derived from the same read. Computed by src/lib/missions/headcount.ts.
+  '327getOpenMissionHeadcount': `query GetOpenMissionHeadcount($id: ID!) {
+    openMission(id: $id) {
+      data {
+        id
+        attributes {
+          howMeny
+          archived
+          name
+          mesimabetahaliches {
+            data {
+              id
+              attributes {
+                lifecycle
+                finnished
+              }
+            }
+          }
+          asks {
+            data {
+              id
+              attributes {
+                archived
+              }
+            }
+          }
+        }
+      }
+    }
+  }`,
   '98getAskForums': `query GetAskForums($id: ID!) {
     ask(id: $id) {
       data {
@@ -8493,6 +8532,7 @@ ${STIPEND_DECISION_FIELDS}
     $noofhours: Float
     $perhour: Float
     $iskvua: Boolean
+    $howMeny: Long
     $sqadualed: DateTime
     $dates: DateTime
     $publicklinks: String
@@ -8518,6 +8558,7 @@ ${STIPEND_DECISION_FIELDS}
       noofhours: $noofhours
       perhour: $perhour
       iskvua: $iskvua
+      howMeny: $howMeny
       sqadualed: $sqadualed
       dates: $dates
       publicklinks: $publicklinks
@@ -8547,6 +8588,7 @@ ${STIPEND_DECISION_FIELDS}
     $noofhours: Float
     $perhour: Float
     $iskvua: Boolean
+    $howMeny: Long
     $sqadualed: DateTime
     $dates: DateTime
     $publicklinks: String
@@ -8574,6 +8616,7 @@ ${STIPEND_DECISION_FIELDS}
       noofhours: $noofhours
       perhour: $perhour
       iskvua: $iskvua
+      howMeny: $howMeny
       sqadualed: $sqadualed
       dates: $dates
       publicklinks: $publicklinks
@@ -9345,6 +9388,7 @@ export const moachQids = {
               attributes {
                 lifecycle
                 name hearotMeyuchadot descrip noofhours perhour sqadualed
+                howMeny
                 stipendRate stipendCostShare stipendMode
                 stipendFunder { data { id attributes { username } } }
                 privatlinks publicklinks acts { data { id attributes { shem dateS } } }
@@ -9354,6 +9398,11 @@ export const moachQids = {
                 rishon { data { id } }
                 pendm { data { id } }
                 mission { data { id } }
+                # Seats already taken, for "2 of 4 joined" (PLAN_SHIFTS §2.6).
+                # Unfiltered on purpose: the "does this still hold a seat?"
+                # rule lives in src/lib/missions/headcount.ts, so the card and
+                # the finalizer cannot answer it differently.
+                mesimabetahaliches { data { id attributes { lifecycle finnished } } }
                 asks { data { id attributes { archived users_permissions_user { data { id attributes { username profilePic { data { attributes { url } } } } } } forums { data { id } } } } }
                 createdAt
               }
@@ -9387,6 +9436,7 @@ export const moachQids = {
               id
               attributes {
                 name descrip noofhours perhour createdAt dates hearotMeyuchadot sqadualed privatlinks publicklinks
+                howMeny
                 rishon { data { id } }
                 skills { data { id attributes { skillName } } }
                 tafkidims { data { id attributes { roleDescription } } }

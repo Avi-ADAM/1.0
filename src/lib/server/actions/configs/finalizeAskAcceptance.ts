@@ -7,6 +7,7 @@ import { resolveAcceptedActs } from '../helpers/roundActs.js';
 import { touchDormancy } from '$lib/server/archive/dormancyClock.js';
 import { execFromContext } from '$lib/server/archive/exec.js';
 import { carryStipendToMission } from '$lib/server/stipend/fromMission.js';
+import { acceptanceEffect } from '$lib/server/missions/headcountGate.js';
 import { gqlString } from './actionUtils.js';
 
 function formatVotesForInline(votes: any[]): string {
@@ -135,8 +136,15 @@ const finalizeAskAcceptanceHandler: ActionExecutionHandler = async (params, cont
   const dateFragment = finalDeadline ? `admaticedai: "${finalDeadline}"` : '';
   const sdateFragment = finalSqedualed ? `start: "${finalSqedualed}"` : '';
   const tafkidimsStr = finalTafkidims.join(',');
-  const otherAsksFragment = variant === 'allVoted' ? 'asks { data { id } }' : '';
+  // Pulled in both variants, not just `allVoted`: whether the losing
+  // candidacies get archived now depends on occupancy, not on the variant.
+  const otherAsksFragment = 'asks { data { id } }';
   const actsFragment = 'acts { data { id } }';
+
+  // A service mission asked for several people stays open until it has them
+  // (docs/PLAN_SHIFTS.md §2). Read before the mutation — afterwards this
+  // acceptance is already part of the count.
+  const headcount = await acceptanceEffect(strapi, context, openMid);
 
   const strapiUrl = STRAPI_URL;
   const graphqlUrl = `${strapiUrl}/graphql`;
@@ -165,7 +173,7 @@ const finalizeAskAcceptanceHandler: ActionExecutionHandler = async (params, cont
       ${sdateFragment}
     }) { data { id attributes { project { data { id } } } } }
 
-    updateOpenMission(id: "${openMid}", data: { archived: true }) {
+    updateOpenMission(id: "${openMid}", data: { archived: ${headcount.archiveOpenMission} }) {
       data { id attributes { archived ${otherAsksFragment} ${actsFragment} } }
     }
 
@@ -236,34 +244,48 @@ const finalizeAskAcceptanceHandler: ActionExecutionHandler = async (params, cont
       });
   }
 
-  // allVoted case: archive other asks + optional createMonter on first iteration
-  if (variant === 'allVoted') {
+  // Spin up the Monter for a recurring service, and archive the losing
+  // candidacies once — and only once — the mission is actually full
+  // (docs/PLAN_SHIFTS.md §2.2).
+  //
+  // The Monter is now sent on its own rather than riding the first archive
+  // iteration: it used to be skipped entirely whenever there was exactly one
+  // Ask on the mission (`otherAsks.length > 1`), which is the ordinary case
+  // for a service that only one client asked for.
+  {
     const chiluzh = responseData.data?.createMesimabetahalich?.data?.id;
     const otherAsks: any[] = responseData.data?.updateOpenMission?.data?.attributes?.asks?.data || [];
+    const siblingAsks = otherAsks.filter((a) => String(a.id) !== String(askId));
 
     const startDate = sqedualed
       ? (new Date(sqedualed) > d ? sqedualed : now)
       : now;
 
-    const monterFragment = iskvua && chiluzh
-      ? `createMonter(data: {
-          mesimabetahalich: "${chiluzh}",
-          ani: "mesimabetahalich"
-          start: "${startDate}"
-          ${deadline ? `finish: "${deadline}"` : ''}
-        }) { data { id } }`
-      : '';
+    if (variant === 'allVoted' && iskvua && chiluzh) {
+      await context.fetch(graphqlUrl, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          query: `mutation {
+            createMonter(data: {
+              mesimabetahalich: "${chiluzh}",
+              ani: "mesimabetahalich"
+              start: "${startDate}"
+              ${deadline ? `finish: "${deadline}"` : ''}
+            }) { data { id } }
+          }`,
+        }),
+      });
+    }
 
-    if (otherAsks.length > 1) {
-      for (let i = 0; i < otherAsks.length; i++) {
-        const archiveQuery = `mutation {
-          ${i === 0 ? monterFragment : ''}
-          updateAsk(id: "${otherAsks[i].id}", data: { archived: true }) { data { id } }
-        }`;
+    if (headcount.archiveSiblingAsks) {
+      for (const sibling of siblingAsks) {
         await context.fetch(graphqlUrl, {
           method: 'POST',
           headers,
-          body: JSON.stringify({ query: archiveQuery }),
+          body: JSON.stringify({
+            query: `mutation { updateAsk(id: "${sibling.id}", data: { archived: true }) { data { id } } }`,
+          }),
         });
       }
     }
@@ -310,7 +332,15 @@ const finalizeAskAcceptanceHandler: ActionExecutionHandler = async (params, cont
   }
 
   return {
-    data: responseData.data,
+    data: {
+      ...responseData.data,
+      headcount: {
+        need: headcount.before.need,
+        filled: headcount.filledAfter,
+        remaining: headcount.remainingAfter,
+        isFull: headcount.archiveOpenMission,
+      },
+    },
     updateStrategy: { type: 'none' },
   };
 };

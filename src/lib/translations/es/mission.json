@@ -48,7 +48,12 @@
     "publishedSuccess": "¡Misión publicada correctamente!",
     "requestedRole": "rol solicitado",
     "requestedWorkways": "formas de trabajo para la misión",
-    "searchUser": "buscar usuario"
+    "searchUser": "buscar usuario",
+    "headcountLabel": "¿Cuántas personas se necesitan?",
+    "headcountOne": "Una persona — la misión se cierra con la primera asignación.",
+    "headcountMany": "La misión sigue abierta, y las solicitudes siguen vigentes, hasta que se unan {{count}} personas.",
+    "perPerson": "por persona",
+    "rikmaTotal": "Total para la rikma: {{count}} personas × {{value}} = {{total}}"
   },
   "location": {
     "title": "Ubicación",

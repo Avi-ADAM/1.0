@@ -351,6 +351,11 @@
     "perUnit": "за единицу",
     "perPeriod": "за весь период",
     "shareResource": "Нужен ресурс «{{name}}» в рикме {{projectName}} на 1💗1",
-    "progressLink": "{{count}} задач и ресурсов всё ещё ищут партнёров"
+    "progressLink": "{{count}} задач и ресурсов всё ещё ищут партнёров",
+    "staffing": "{{filled}} из {{need}} занято",
+    "staffingNeed": "нужно {{need}} человек",
+    "seatsLeft": "осталось мест: {{count}}",
+    "seatsLeftOne": "осталось одно место",
+    "overfilled": "присоединились {{filled}} — больше, чем планировалось ({{need}})"
   }
 }

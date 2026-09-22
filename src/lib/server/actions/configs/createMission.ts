@@ -34,6 +34,7 @@ import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { calcDeadlineMs, restimeLabel, voteUrl } from './actionUtils.js';
 import { createMissionConsentSpec } from '$lib/consent/specs/s2b';
 import { matchOpenMissionToUsers } from '$lib/server/matching/engine';
+import { normalizeNeed } from '$lib/missions/headcount.js';
 
 interface ChecklistItem {
   shem: string;
@@ -73,6 +74,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
     nhours = 0,
     valph = 0,
     iskvua = false,
+    howMeny,              // how many people the mission needs (PLAN_SHIFTS §2)
     dateStart,
     dateEnd,
     publicklinks,
@@ -195,6 +197,10 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
     noofhours: nhours > 0 ? nhours : null,
     perhour: valph > 0 ? valph : null,
     iskvua,
+    // An assigned mission is an offer to ONE named person (branch 2): its
+    // OpenMission is created archived and is never offered to anyone else, so
+    // a multi-seat need only makes sense published open.
+    howMeny: assignedUserId ? 1 : normalizeNeed(howMeny),
     sqadualed: dateStart ?? null,
     dates: dateEnd ?? null,
     publicklinks: publicklinks ?? null,
@@ -571,6 +577,7 @@ export const createMissionConfig: ActionConfig = {
     nhours:             { type: 'number',  required: false, description: 'Number of hours' },
     valph:              { type: 'number',  required: false, description: 'Value per hour' },
     iskvua:             { type: 'boolean', required: false, description: 'Is recurring mission' },
+    howMeny:            { type: 'number',  required: false, description: 'How many people the mission needs (default 1). The OpenMission stays open, and other candidacies stay valid, until that many have joined — docs/PLAN_SHIFTS.md §2' },
     dateStart:          { type: 'string',  required: false, description: 'Start date ISO string' },
     dateEnd:            { type: 'string',  required: false, description: 'End date ISO string' },
     isOnline:           { type: 'boolean', required: false, description: 'Whether the mission can happen online' },

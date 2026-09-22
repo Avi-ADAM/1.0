@@ -47,7 +47,12 @@
     "publishedSuccess": "Mission published successfully!",
     "requestedRole": "requested role",
     "requestedWorkways": "ways of work for the mission",
-    "searchUser": "search user"
+    "searchUser": "search user",
+    "headcountLabel": "How many people are needed?",
+    "headcountOne": "One person — the mission closes with the first assignment.",
+    "headcountMany": "The mission stays open, and join requests stay valid, until {{count}} people have joined.",
+    "perPerson": "per person",
+    "rikmaTotal": "Total for the rikma: {{count}} people × {{value}} = {{total}}"
   },
   "location": {
     "title": "Location",

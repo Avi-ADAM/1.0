@@ -361,6 +361,9 @@
       missionName: '',
       valph: 50,
       nhours: 1,
+      // How many people the mission needs (PLAN_SHIFTS §2). `nhours` is per
+      // person, so the rikma's real commitment is nhours × valph × howMeny.
+      howMeny: 1,
       iskvua: false,
       date: null,
       dates: null,
@@ -392,6 +395,18 @@
    * "apply all" must not overwrite it.
    */
   let moneyBaseline = $state({ valph: 50, nhours: 1 });
+
+  /**
+   * Seats the mission opens (PLAN_SHIFTS §2). An assigned mission is an offer
+   * to one named person, so it is always 1 there whatever the field says.
+   */
+  const seats = $derived(
+    miData[0].myM === true ? 1 : Math.max(1, Math.floor(Number(miData[0].howMeny) || 1))
+  );
+  /** One person's value — `nhours` is per person (PLAN_SHIFTS §2.5). */
+  const perPersonValue = $derived(
+    (Number(miData[0].nhours) || 0) * (Number(miData[0].valph) || 0)
+  );
 
   let error1 = null;
   let gloading = $state(false);
@@ -748,6 +763,9 @@
         nhours: Number(element.nhours),
         valph: Number(element.valph),
         iskvua: element.iskvua,
+        // An assigned mission is an offer to one named person — the server
+        // forces 1 there anyway; only an open mission carries a headcount.
+        howMeny: element.myM === true ? undefined : Math.max(1, Math.floor(Number(element.howMeny) || 1)),
         dateStart,
         dateEnd,
         isOnline: element.location?.location_mode === 'online',
@@ -1575,6 +1593,7 @@
                   <NumberInput bind:value={miData[0].nhours} />
                 {/if}
                 {mf.hours}
+                {#if seats > 1}{$trans('mission.form.perPerson')}{/if}
                 {miData[0].iskvua ? mf.perMonth : mf.total}
               </span> <span> = </span>
               <span
@@ -1597,6 +1616,39 @@
                 {#if valphE}<Done />{:else}<EditIcon />{/if}</button
               >
             </div>
+            <!-- How many people the mission needs (PLAN_SHIFTS §2). Not shown
+                 for an assigned mission: that is an offer to one named person. -->
+            {#if projectId && !specMode && !publishMode && miData[0].myM !== true}
+              <div class="mx-5 my-2 flex flex-col gap-1 text-barbie">
+                <label class="flex flex-wrap items-center gap-2 text-lg lg:text-xl">
+                  <span>👥 {$trans('mission.form.headcountLabel')}</span>
+                  <input
+                    type="number"
+                    min="1"
+                    step="1"
+                    inputmode="numeric"
+                    class="w-20 rounded-lg border border-gold bg-transparent px-2 py-1 text-center"
+                    bind:value={miData[0].howMeny}
+                  />
+                </label>
+                <small class="text-sm opacity-90">
+                  {seats > 1
+                    ? $trans('mission.form.headcountMany', { count: seats })
+                    : $trans('mission.form.headcountOne')}
+                </small>
+                {#if seats > 1}
+                  <small class="text-sm font-semibold">
+                    {$trans('mission.form.rikmaTotal', {
+                      count: seats,
+                      value: perPersonValue.toLocaleString('en-US', { maximumFractionDigits: 2 }),
+                      total: (perPersonValue * seats).toLocaleString('en-US', {
+                        maximumFractionDigits: 2
+                      })
+                    })}
+                  </small>
+                {/if}
+              </div>
+            {/if}
             <!-- שווי צפוי ברקמה — כמה מהרקמה תהווה המשימה החדשה שנוצרת כאן.
                  משימה חדשה שעדיין לא פורסמה ⇒ alreadyCountedIn="none".
                  specMode/publishMode הם ללא רקמה, ולכן projectId ריק והתצוגה מוסתרת. -->
@@ -1617,11 +1669,8 @@
               <div class="my-2">
                 <EquityPreview
                   {projectId}
-                  missionValue={(Number(miData[0].nhours) || 0) *
-                    (Number(miData[0].valph) || 0)}
-                  monthlyValue={miData[0].iskvua
-                    ? (Number(miData[0].nhours) || 0) * (Number(miData[0].valph) || 0)
-                    : null}
+                  missionValue={perPersonValue * seats}
+                  monthlyValue={miData[0].iskvua ? perPersonValue * seats : null}
                   alreadyCountedIn="none"
                   titleKey="equity.missionShareAtCreation"
                 />

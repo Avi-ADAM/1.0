@@ -47,7 +47,12 @@
     "publishedSuccess": "המשימה פורסמה בהצלחה!",
     "requestedRole": "תפקיד מבוקש",
     "requestedWorkways": "דרכי עבודה מבוקשות",
-    "searchUser": "חיפוש משתמש"
+    "searchUser": "חיפוש משתמש",
+    "headcountLabel": "כמה אנשים דרושים?",
+    "headcountOne": "אדם אחד — המשימה נסגרת עם ההשמה הראשונה.",
+    "headcountMany": "המשימה תישאר פתוחה, ובקשות ההצטרפות יישארו בתוקף, עד שיצטרפו {{count}} אנשים.",
+    "perPerson": "לאדם",
+    "rikmaTotal": "סה\"כ לרקמה: {{count}} אנשים × {{value}} = {{total}}"
   },
   "location": {
     "title": "מיקום",

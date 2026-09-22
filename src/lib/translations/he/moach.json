@@ -351,6 +351,11 @@
     "perUnit": "ליחידה",
     "perPeriod": "לכל התקופה",
     "shareResource": "דרוש משאב \"{{name}}\" ברקמה: {{projectName}}, באתר 1💗1",
-    "progressLink": "{{count}} משימות ומשאבים עדיין מחפשים שותפים"
+    "progressLink": "{{count}} משימות ומשאבים עדיין מחפשים שותפים",
+    "staffing": "{{filled}} מתוך {{need}} מאוישים",
+    "staffingNeed": "דרושים {{need}} אנשים",
+    "seatsLeft": "נותרו {{count}} מקומות",
+    "seatsLeftOne": "נותר מקום אחד",
+    "overfilled": "{{filled}} הצטרפו — יותר מ-{{need}} שתוכננו"
   }
 }

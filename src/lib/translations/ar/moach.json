@@ -351,6 +351,11 @@
     "perUnit": "لكل وحدة",
     "perPeriod": "لكامل الفترة",
     "shareResource": "مطلوب مورد \"{{name}}\" في الريكما {{projectName}} على 1💗1",
-    "progressLink": "{{count}} مهام وموارد ما زالت تبحث عن شركاء"
+    "progressLink": "{{count}} مهام وموارد ما زالت تبحث عن شركاء",
+    "staffing": "{{filled}} من {{need}} مشغولة",
+    "staffingNeed": "مطلوب {{need}} أشخاص",
+    "seatsLeft": "بقيت {{count}} أماكن",
+    "seatsLeftOne": "بقي مكان واحد",
+    "overfilled": "انضم {{filled}} — أكثر من {{need}} المخطط لهم"
   }
 }

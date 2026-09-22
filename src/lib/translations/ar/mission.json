@@ -47,7 +47,12 @@
     "publishedSuccess": "تم نشر المهمة بنجاح!",
     "requestedRole": "الدور المطلوب",
     "requestedWorkways": "طرق العمل المطلوبة",
-    "searchUser": "بحث عن مستخدم"
+    "searchUser": "بحث عن مستخدم",
+    "headcountLabel": "كم شخصًا مطلوبًا؟",
+    "headcountOne": "شخص واحد — تُغلق المهمة مع أول تعيين.",
+    "headcountMany": "تبقى المهمة مفتوحة، وتبقى طلبات الانضمام سارية، حتى ينضم {{count}} أشخاص.",
+    "perPerson": "للشخص",
+    "rikmaTotal": "المجموع للريكما: {{count}} أشخاص × {{value}} = {{total}}"
   },
   "location": {
     "title": "الموقع",

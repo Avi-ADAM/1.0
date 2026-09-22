@@ -338,6 +338,7 @@ export const qidsAccess = {
   '95updateMesimabetahalichPartofs': { allow: ['user', 'serviceAdmin'] },
   '96updateMaapPartofs': { allow: ['user', 'serviceAdmin'] },
   '97getOpenMissionPartofs': { allow: ['user', 'serviceAdmin'] },
+  '327getOpenMissionHeadcount': { allow: ['user', 'serviceAdmin'] },
   '98getAskForums': { allow: ['user', 'serviceAdmin'] },
   '99updateAskForums': { allow: ['user', 'serviceAdmin'] },
   '100getMesimabetahalichForums': { allow: ['user', 'serviceAdmin'] },
