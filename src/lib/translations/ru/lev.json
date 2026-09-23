@@ -813,7 +813,8 @@
       "stipendtransfer": "Перевод стипендии",
       "shiftDeclare": "Доступность для смен",
       "shiftDraft": "Черновик графика",
-      "shiftHole": "Незакрытая смена"
+      "shiftHole": "Незакрытая смена",
+      "shiftSwap": "Обмен сменой"
     },
     "fact": {
       "hours": "часов: {{value}}",
@@ -869,7 +870,9 @@
       "shiftDeclare": "Смен, ждущих вашего ответа: {{count}}",
       "shiftDraft": "Ваших мест в черновике: {{count}}",
       "shiftHole": "Эту смену пока никто не закрывает",
-      "shiftHoleNext": "Вы следующий в очереди резерва"
+      "shiftHoleNext": "Вы следующий в очереди резерва",
+      "shiftSwap": "Вам предложили обмен сменой",
+      "shiftSwapCounter": "Предложен другой вариант вашего обмена"
     },
     "title": {
       "transfer": "{{from}} → {{to}}",

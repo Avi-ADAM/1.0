@@ -8,6 +8,9 @@
  *             the invitation, not a reminder to comply.
  *   draft   — a published draft I have places in, with the reason for each,
  *             while the objection window is open.
+ *   swap    — a swap another member offered me, or answered, and now waits
+ *             on me (§1.2). Approve, counter with a different place, or — if
+ *             it is my own offer — withdraw it.
  *   hole    — a coming shift nobody is covering. Two ways out, and both close
  *             the card (§7.1): "I'll take it" or "open the mission to one
  *             more candidate". Whoever is next in the backup chain, and whoever
@@ -19,6 +22,7 @@
 
 import { coverageOf, nextInLine } from './coverage.js';
 import { phaseAt, type CycleWindow } from './settings.js';
+import { swapTurn } from './swap.js';
 import type { AssignmentLike, Declaration, ReasonCode, ShiftLike } from './types.js';
 
 export interface WorkPlanInput {
@@ -31,6 +35,51 @@ export interface WorkPlanInput {
   periods: Record<string, { id: string; state: 'open' | 'draft' | 'closed' | 'cancelled'; closesAt: string; reopened?: boolean }>;
   /** The mission's agreed commitments, for "you have room for more". */
   commitments: Array<{ userId: string; max?: number | null }>;
+  /** Open swaps in this plan that I am a party to. */
+  swaps?: SwapRow[];
+  /** userId → display name, for the other side of a swap. */
+  names?: Record<string, string>;
+}
+
+export interface SwapRow {
+  id: string;
+  giveId: string | null;
+  takeId: string | null;
+  fromUserId: string;
+  toUserId: string;
+  deadline: string | null;
+  silence: boolean;
+  signatures: Array<{ userId: string; order: number }>;
+}
+
+export interface SwapPlace {
+  assignmentId: string;
+  start: string;
+  end: string;
+}
+
+export interface SwapItem {
+  decisionId: string;
+  planId: string;
+  timeZone: string;
+  planName: string;
+  projectId: string | null;
+  /** The swap waits on my answer. */
+  myTurn: boolean;
+  /** I opened it. */
+  mine: boolean;
+  otherUserId: string;
+  otherName: string;
+  /** The proposer's place, going to the other member. */
+  give: SwapPlace;
+  /** The place coming back to the proposer, if any. */
+  take: SwapPlace | null;
+  deadline: string | null;
+  /** Silence at the deadline completes it (the one waiting declared they can). */
+  silence: boolean;
+  round: number;
+  /** What a counter may ask for instead: the asked member's other coming places. */
+  options: SwapPlace[];
 }
 
 export interface DeclareItem {
@@ -85,6 +134,7 @@ export interface ShiftWork {
   declare: DeclareItem[];
   drafts: DraftItem[];
   holes: HoleItem[];
+  swaps: SwapItem[];
 }
 
 const COMING = new Set(['draft', 'confirmed', 'done']);
@@ -96,7 +146,7 @@ export function buildShiftWork(
   opts: { shadow?: boolean } = {}
 ): ShiftWork {
   const t = new Date(now).getTime();
-  const work: ShiftWork = { declare: [], drafts: [], holes: [] };
+  const work: ShiftWork = { declare: [], drafts: [], holes: [], swaps: [] };
 
   for (const p of plans) {
     const myDecl = new Set(p.declarations.filter((d) => String(d.userId) === uid).map((d) => String(d.shiftId)));
@@ -194,6 +244,9 @@ export function buildShiftWork(
     }
   }
 
+  if (!opts.shadow) for (const p of plans) work.swaps.push(...swapItems(uid, p, t));
+  work.swaps.sort((a, b) => Number(b.myTurn) - Number(a.myTurn) || (a.deadline ?? '').localeCompare(b.deadline ?? ''));
+
   // The members who can most easily fill a hole see it first (§7.1).
   work.holes.sort(
     (a, b) =>
@@ -203,4 +256,49 @@ export function buildShiftWork(
       a.start.localeCompare(b.start)
   );
   return work;
+}
+
+function swapItems(uid: string, p: WorkPlanInput, t: number): SwapItem[] {
+  const out: SwapItem[] = [];
+  const placeOf = (id: string | null): SwapPlace | null => {
+    if (!id) return null;
+    const a = p.assignments.find((x) => String(x.id) === String(id));
+    const s = a && p.shifts.find((x) => String(x.id) === String(a.shiftId));
+    return s ? { assignmentId: String(id), start: s.start, end: s.end } : null;
+  };
+  for (const sw of p.swaps ?? []) {
+    const from = String(sw.fromUserId);
+    const to = String(sw.toUserId);
+    if (uid !== from && uid !== to) continue;
+    const give = placeOf(sw.giveId);
+    if (!give) continue;
+    const turn = swapTurn({ fromUserId: from, toUserId: to }, sw.signatures);
+    if (turn.agreed) continue;
+    const other = uid === from ? to : from;
+    const giveShift = p.assignments.find((x) => String(x.id) === String(sw.giveId))?.shiftId;
+    const options = p.assignments
+      .filter((a) => String(a.userId) === to && a.rank === 1 && (a.state === 'draft' || a.state === 'confirmed'))
+      .filter((a) => String(a.shiftId) !== String(giveShift))
+      .map((a) => placeOf(a.id ?? null))
+      .filter((x): x is SwapPlace => !!x && new Date(x.start).getTime() > t)
+      .sort((a, b) => a.start.localeCompare(b.start));
+    out.push({
+      decisionId: sw.id,
+      planId: p.plan.id,
+      timeZone: p.plan.timeZone,
+      planName: p.plan.name,
+      projectId: p.plan.projectId,
+      myTurn: turn.waitingOn === uid,
+      mine: uid === from,
+      otherUserId: other,
+      otherName: p.names?.[other] ?? '',
+      give,
+      take: placeOf(sw.takeId),
+      deadline: sw.deadline,
+      silence: sw.silence,
+      round: turn.round,
+      options
+    });
+  }
+  return out;
 }

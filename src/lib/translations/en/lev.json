@@ -813,7 +813,8 @@
       "stipendtransfer": "Stipend transfer",
       "shiftDeclare": "Shift availability",
       "shiftDraft": "Draft roster",
-      "shiftHole": "Uncovered shift"
+      "shiftHole": "Uncovered shift",
+      "shiftSwap": "Shift swap"
     },
     "fact": {
       "hours": "{{value}} hours",
@@ -869,7 +870,9 @@
       "shiftDeclare": "{{count}} shifts waiting for your answer",
       "shiftDraft": "You have {{count}} places in the draft",
       "shiftHole": "Nobody is covering this shift yet",
-      "shiftHoleNext": "You're next in line as backup"
+      "shiftHoleNext": "You're next in line as backup",
+      "shiftSwap": "You were offered a shift swap",
+      "shiftSwapCounter": "A different version of your swap was proposed"
     },
     "title": {
       "transfer": "{{from}} → {{to}}",

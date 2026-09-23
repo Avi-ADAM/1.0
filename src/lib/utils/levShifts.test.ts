@@ -23,7 +23,7 @@ const hole = (shiftId: string, nextInLine: boolean) => ({
 describe('processShiftWork', () => {
   it('is empty for no work', () => {
     expect(processShiftWork(null)).toEqual([]);
-    expect(processShiftWork({ declare: [], drafts: [], holes: [] })).toEqual([]);
+    expect(processShiftWork({ declare: [], drafts: [], holes: [], swaps: [] })).toEqual([]);
   });
 
   it('turns each kind of shift work into a card the heart can render', () => {
@@ -56,7 +56,8 @@ describe('processShiftWork', () => {
           holes: 0
         }
       ],
-      holes: [hole('a', false), hole('b', true)]
+      holes: [hole('a', false), hole('b', true)],
+      swaps: []
     });
     expect(items.map((i) => i.ani)).toEqual(['shiftDeclare', 'shiftDraft', 'shiftHole', 'shiftHole']);
     expect(items.every((i) => RENDERABLE_ANIS.includes(i.ani))).toBe(true);
@@ -66,5 +67,27 @@ describe('processShiftWork', () => {
     const [, , a, b] = items;
     expect(b.pl).toBeLessThan(a.pl);
     expect(items.every((i) => i.pl >= PRIORITY_BAND.VOTE_PENDING)).toBe(true);
+  });
+
+  it('puts on the heart only the swaps that wait on me', () => {
+    const swap = (decisionId: string, myTurn: boolean) => ({
+      decisionId,
+      planId: 'p',
+      timeZone: 'Asia/Jerusalem',
+      planName: 'Front desk',
+      projectId: '3',
+      myTurn,
+      mine: false,
+      otherUserId: '7',
+      otherName: 'Ron',
+      give: { assignmentId: '1', start: '2026-10-05T08:00:00Z', end: '2026-10-05T12:00:00Z' },
+      take: null,
+      deadline: '2026-10-04T00:00:00Z',
+      silence: false,
+      round: 1,
+      options: []
+    });
+    const items = processShiftWork({ declare: [], drafts: [], holes: [], swaps: [swap('700', true), swap('701', false)] });
+    expect(items.map((i) => [i.ani, i.decisionId])).toEqual([['shiftSwap', '700']]);
   });
 });

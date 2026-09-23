@@ -53,7 +53,8 @@ const RENDERABLE = new Set([
   // Shift cards (PLAN_SHIFTS §9.4) — ungated: a question addressed to me.
   'shiftDeclare',
   'shiftDraft',
-  'shiftHole'
+  'shiftHole',
+  'shiftSwap'
 ]);
 
 /**
@@ -111,7 +112,8 @@ const KIND_META = {
   sitesharedecide: { key: 'sitesharedecide', glow: 'gold' },
   shiftDeclare: { key: 'shiftDeclare', glow: 'teal' },
   shiftDraft: { key: 'shiftDraft', glow: 'teal' },
-  shiftHole: { key: 'shiftHole', glow: 'red' }
+  shiftHole: { key: 'shiftHole', glow: 'red' },
+  shiftSwap: { key: 'shiftSwap', glow: 'teal' }
 };
 
 /** Translation key for a kind's label, e.g. `lev.list.kind.pends`. */
@@ -588,6 +590,11 @@ const ROW_CONTENT = {
   shiftHole: (b) => ({
     title: T(b.planName),
     subtitle: b.nextInLine ? K('lev.list.sub.shiftHoleNext') : K('lev.list.sub.shiftHole')
+  }),
+
+  shiftSwap: (b) => ({
+    title: T(b.otherName) ?? T(b.planName),
+    subtitle: K(b.mine ? 'lev.list.sub.shiftSwapCounter' : 'lev.list.sub.shiftSwap')
   })
 };
 
@@ -666,7 +673,8 @@ const CTA_BY_ANI = {
   walcomen: 'view',
   shiftDeclare: 'answer',
   shiftDraft: 'view',
-  shiftHole: 'answer'
+  shiftHole: 'answer',
+  shiftSwap: 'answer'
 };
 
 /** Translation key for the row's primary button. */

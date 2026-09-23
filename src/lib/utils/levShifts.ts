@@ -10,6 +10,7 @@
  *   shiftDeclare — a cycle is waiting for my availability
  *   shiftDraft   — a published draft I am in, while objections are open
  *   shiftHole    — a coming shift nobody covers
+ *   shiftSwap    — a swap waiting on my answer
  */
 
 import { derived, writable, type Readable, type Writable } from 'svelte/store';
@@ -18,9 +19,9 @@ import { createProjectInfo } from '$lib/utils/projectHelpers.js';
 import { PRIORITY_BAND, type DisplayItem } from './levProcessors';
 import { projectsStore } from '$lib/stores/levStores';
 
-export const SHIFT_ANIS = ['shiftDeclare', 'shiftDraft', 'shiftHole'] as const;
+export const SHIFT_ANIS = ['shiftDeclare', 'shiftDraft', 'shiftHole', 'shiftSwap'] as const;
 
-export const shiftWorkStore: Writable<ShiftWork> = writable({ declare: [], drafts: [], holes: [] });
+export const shiftWorkStore: Writable<ShiftWork> = writable({ declare: [], drafts: [], holes: [], swaps: [] });
 
 /** Pure: ShiftWork → DisplayItem[]. Never throws on missing data. */
 export function processShiftWork(work: ShiftWork | null | undefined): DisplayItem[] {
@@ -63,6 +64,18 @@ export function processShiftWork(work: ShiftWork | null | undefined): DisplayIte
       ...h
     });
   });
+  // Only the swaps that wait on me: the ones I offered live on the shifts page.
+  for (const s of work.swaps ?? []) {
+    if (!s.myTurn) continue;
+    items.push({
+      ...base(s.projectId),
+      ani: 'shiftSwap',
+      azmi: 'shiftSwap',
+      pl: PRIORITY_BAND.VOTE_PENDING + 10,
+      coinlapach: `shiftSwap-${s.decisionId}-${s.round}`,
+      ...s
+    });
+  }
   return items;
 }
 

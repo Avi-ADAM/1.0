@@ -26,6 +26,7 @@ import { cycleContaining, cyclesBetween, resolveSettings, type CycleWindow, type
 import type { ShiftsMode } from './mode.js';
 import type { AssignmentLike } from '$lib/shifts/types.js';
 import { run, type ShiftExec } from './exec.js';
+import { matureDueSwaps } from './swaps.js';
 import { planIsActive, type PeriodView, type ShiftPlanView } from './read.js';
 import {
   attachShifts,
@@ -66,6 +67,7 @@ export interface TickReport {
   opened: string[];
   drafted: Array<{ periodId: string; holes: number; assignments: number }>;
   closed: Array<{ periodId: string; holes: number }>;
+  swaps?: { done: string[]; lapsed: string[] };
   errors: string[];
 }
 
@@ -123,6 +125,15 @@ export async function tickPlan(ctx: EngineContext, plan: ShiftPlanView): Promise
       await advance(ctx, resolved, period, cycle, now, report);
     } catch (e) {
       report.errors.push(`cycle ${cycle.periodKey}: ${(e as Error).message}`);
+    }
+  }
+
+  // 3. Swaps whose deadline passed (§1.2): silence completes them only where it may.
+  if (ctx.mode === 'on') {
+    try {
+      report.swaps = await matureDueSwaps(ctx.exec, plan.id, now);
+    } catch (e) {
+      report.errors.push(`swaps: ${(e as Error).message}`);
     }
   }
   return report;

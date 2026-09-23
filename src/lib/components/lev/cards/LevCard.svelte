@@ -42,6 +42,7 @@
   import ShiftDeclareCard from './ShiftDeclareCard.svelte';
   import ShiftDraftCard from './ShiftDraftCard.svelte';
   import ShiftHoleCard from './ShiftHoleCard.svelte';
+  import ShiftSwapCard from './ShiftSwapCard.svelte';
 
   /**
    * @typedef {Object} Props
@@ -190,6 +191,8 @@
   <ShiftDraftCard {buble} isFirst={isVisible} onProj={proj} onDone={delo} />
 {:else if buble.ani === 'shiftHole'}
   <ShiftHoleCard {buble} isFirst={isVisible} onProj={proj} onDone={delo} />
+{:else if buble.ani === 'shiftSwap'}
+  <ShiftSwapCard {buble} isFirst={isVisible} onProj={proj} onDone={delo} />
 {:else if buble.ani === 'sitesharedecide'}
   <SiteShareAutoApprovedCard
       {buble}

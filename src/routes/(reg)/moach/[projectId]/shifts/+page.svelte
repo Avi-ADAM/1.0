@@ -10,6 +10,7 @@
   import AvailabilityGrid from '$lib/components/shifts/AvailabilityGrid.svelte';
   import RosterGrid from '$lib/components/shifts/RosterGrid.svelte';
   import FairnessPanel from '$lib/components/shifts/FairnessPanel.svelte';
+  import SwapPanel from '$lib/components/shifts/SwapPanel.svelte';
 
   let { data } = $props();
 
@@ -190,6 +191,18 @@
             cycleStart={cycle.start}
             cycleEnd={cycle.end}
           />
+          {#if data.mode === 'on' && block.onMission && !shadowRoster}
+            <SwapPanel
+              shifts={cycleShifts}
+              assignments={cycleAssignments}
+              members={block.commitments.map((c) => c.userId)}
+              {names}
+              {uid}
+              timeZone={tz}
+              now={data.now}
+              swaps={data.swaps.filter((s) => s.planId === block.plan.id)}
+            />
+          {/if}
         {:else if tab === 'fairness'}
           <FairnessPanel {snapshot} balance={block.plan.balanceCache} {names} {uid} />
         {:else if !block.onMission}

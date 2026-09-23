@@ -3,10 +3,12 @@ import { asUser } from '$lib/server/shifts/exec.js';
 import { shiftsMode } from '$lib/server/shifts/mode.js';
 import {
   loadCommitments,
+  loadOpenSwapsFor,
   loadPeriods,
   loadProjectPlans,
   loadProjectTiming,
   loadWindow,
+  type SwapView,
   type WindowData
 } from '$lib/server/shifts/store.js';
 import { planIsActive, type CommitmentView, type PeriodView, type ShiftPlanView } from '$lib/server/shifts/read.js';
@@ -36,7 +38,7 @@ export interface PlanBlock {
 export const load: PageServerLoad = async ({ params, locals, fetch }) => {
   const mode = shiftsMode();
   const now = new Date();
-  const empty = { mode, now: now.toISOString(), plans: [] as PlanBlock[], window: { shifts: [], declarations: [], assignments: [] } as WindowData, loadError: null as string | null };
+  const empty = { mode, now: now.toISOString(), plans: [] as PlanBlock[], window: { shifts: [], declarations: [], assignments: [] } as WindowData, swaps: [] as SwapView[], loadError: null as string | null };
   if (mode === 'off') return empty;
 
   const exec = asUser({ jwt: locals.tok || undefined, fetch });
@@ -69,7 +71,9 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
     }
     const from = blocks.length ? blocks.map((b) => b.cycles[0]?.start).filter(Boolean).sort()[0] : now.toISOString();
     const window = await loadWindow(exec, blocks.map((b) => b.plan.id), from, new Date(horizonEnd).toISOString());
-    return { ...empty, plans: blocks, window };
+    // Swaps bind a roster, so they exist only when SHIFTS=on (never in shadow).
+    const swaps = mode === 'on' && uid ? await loadOpenSwapsFor(exec, uid).catch(() => [] as SwapView[]) : [];
+    return { ...empty, plans: blocks, window, swaps };
   } catch (e) {
     console.error('[moach/shifts] load failed:', e);
     return { ...empty, loadError: e instanceof Error ? e.message.slice(0, 300) : 'load failed' };

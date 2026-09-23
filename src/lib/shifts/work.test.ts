@@ -113,3 +113,36 @@ describe('buildShiftWork — holes', () => {
     expect(w.holes.every((h) => h.reopened)).toBe(true);
   });
 });
+
+describe('buildShiftWork — swaps', () => {
+  const closed = { [cycle.periodKey]: { id: '50', state: 'closed' as const, closesAt: cycle.closesAt } };
+  const swapRow = (signatures: Array<{ userId: string; order: number }>) => ({
+    id: '700',
+    giveId: 'a-ron',
+    takeId: null,
+    fromUserId: 'ron',
+    toUserId: 'dana',
+    deadline: '2026-10-04T00:00:00Z',
+    silence: true,
+    signatures
+  });
+  const base = { periods: closed, assignments: [row('a', 'ron', 1, 'confirmed'), row('b', 'dana', 1, 'confirmed'), row('c', 'dana', 1, 'confirmed')], names: { ron: 'Ron', dana: 'Dana' } };
+
+  it('puts an offer on the heart of the member it waits on, with what a counter may ask for', () => {
+    const w = buildShiftWork('dana', [plan({ ...base, swaps: [swapRow([{ userId: 'ron', order: 1 }])] })], '2026-10-03T00:00:00Z');
+    expect(w.swaps).toHaveLength(1);
+    expect(w.swaps[0]).toMatchObject({ decisionId: '700', myTurn: true, mine: false, otherName: 'Ron', take: null, silence: true, round: 1 });
+    expect(w.swaps[0].options.map((o) => o.assignmentId)).toEqual(['b-dana', 'c-dana']);
+  });
+
+  it('the proposer sees it as waiting on the other side', () => {
+    const w = buildShiftWork('ron', [plan({ ...base, swaps: [swapRow([{ userId: 'ron', order: 1 }])] })], '2026-10-03T00:00:00Z');
+    expect(w.swaps[0]).toMatchObject({ myTurn: false, mine: true });
+  });
+
+  it('shows nothing once both signed, or in shadow mode', () => {
+    const agreed = swapRow([{ userId: 'ron', order: 1 }, { userId: 'dana', order: 1 }]);
+    expect(buildShiftWork('dana', [plan({ ...base, swaps: [agreed] })], '2026-10-03T00:00:00Z').swaps).toEqual([]);
+    expect(buildShiftWork('dana', [plan({ ...base, swaps: [swapRow([{ userId: 'ron', order: 1 }])] })], '2026-10-03T00:00:00Z', { shadow: true }).swaps).toEqual([]);
+  });
+});

@@ -814,7 +814,8 @@
       "stipendtransfer": "Transferencia de beca",
       "shiftDeclare": "Disponibilidad para turnos",
       "shiftDraft": "Borrador del cuadrante",
-      "shiftHole": "Turno sin cubrir"
+      "shiftHole": "Turno sin cubrir",
+      "shiftSwap": "Cambio de turno"
     },
     "fact": {
       "hours": "{{value}} horas",
@@ -870,7 +871,9 @@
       "shiftDeclare": "{{count}} turnos esperan tu respuesta",
       "shiftDraft": "Tienes {{count}} lugares en el borrador",
       "shiftHole": "Nadie cubre este turno todavía",
-      "shiftHoleNext": "Eres la siguiente persona en la fila de respaldo"
+      "shiftHoleNext": "Eres la siguiente persona en la fila de respaldo",
+      "shiftSwap": "Te ofrecieron un cambio de turno",
+      "shiftSwapCounter": "Se propuso otra versión de tu cambio"
     },
     "title": {
       "transfer": "{{from}} → {{to}}",

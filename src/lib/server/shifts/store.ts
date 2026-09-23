@@ -719,3 +719,174 @@ export async function loadMyAssignments(exec: ShiftExec, userId: string, from: s
     .filter((x: any): x is AssignmentView & { shift: ShiftView | null; projectId: string | null } => !!x);
 }
 
+
+// ── swaps (§1.2, §7 step 3) ──────────────────────────────────────────────────
+// A swap is a bilateral `Decision` (`kind: shiftSwap`). It is deliberately not
+// linked to `projects`: every project-decision reader (the heart, the votes
+// tab) would otherwise show it to the whole rikma as a vote. It is found
+// through its own relations instead.
+
+const SWAP_FIELDS = `decisionName swapStatus swapSilence swapDeadline createdAt
+  swapGive { data { id } } swapTake { data { id } } swapFrom { data { id } } swapTo { data { id } }
+  swapPlan { data { id } } vots { what order zman users_permissions_user { data { id } } }`;
+
+export interface SwapView {
+  id: string;
+  name: string;
+  giveId: string | null;
+  takeId: string | null;
+  fromUserId: string;
+  toUserId: string;
+  planId: string | null;
+  deadline: string | null;
+  status: 'open' | 'done' | 'lapsed' | 'withdrawn';
+  /** May silence complete the standing round (see `silenceMayComplete`). */
+  silence: boolean;
+  signatures: Array<{ userId: string; order: number; at: string | null }>;
+  createdAt: string | null;
+}
+
+function toSwap(n: any): SwapView {
+  const a = n?.attributes ?? {};
+  const id = (rel: any) => (rel?.data?.id != null ? String(rel.data.id) : null);
+  return {
+    id: String(n.id),
+    name: a.decisionName ?? '',
+    giveId: id(a.swapGive),
+    takeId: id(a.swapTake),
+    fromUserId: id(a.swapFrom) ?? '',
+    toUserId: id(a.swapTo) ?? '',
+    planId: id(a.swapPlan),
+    deadline: a.swapDeadline ?? null,
+    status: a.swapStatus ?? 'open',
+    silence: a.swapSilence === true,
+    signatures: (a.vots ?? [])
+      .filter((v: any) => v?.what !== false && id(v?.users_permissions_user))
+      .map((v: any) => ({ userId: id(v.users_permissions_user)!, order: Number(v.order) || 1, at: v.zman ?? null })),
+    createdAt: a.createdAt ?? null
+  };
+}
+
+const votsInput = (sigs: SwapView['signatures']) =>
+  sigs.map((s) => ({ what: true, order: s.order, users_permissions_user: s.userId, zman: s.at ?? new Date().toISOString() }));
+
+export interface SwapInput {
+  name: string;
+  giveId: string;
+  takeId: string | null;
+  fromUserId: string;
+  toUserId: string;
+  planId: string;
+  deadline: string;
+  silence: boolean;
+}
+
+export async function createSwap(exec: ShiftExec, s: SwapInput): Promise<SwapView> {
+  const now = new Date().toISOString();
+  const d = await run(
+    exec,
+    `mutation ($data: DecisionInput!) { createDecision(data: $data) { data { id attributes { ${SWAP_FIELDS} } } } }`,
+    'createSwap',
+    {
+      data: {
+        kind: 'shiftSwap',
+        decisionName: s.name.slice(0, 200),
+        swapGive: s.giveId,
+        swapTake: s.takeId,
+        swapFrom: s.fromUserId,
+        swapTo: s.toUserId,
+        swapPlan: s.planId,
+        swapDeadline: s.deadline,
+        swapStatus: 'open',
+        swapSilence: s.silence,
+        vots: votsInput([{ userId: s.fromUserId, order: 1, at: now }]),
+        publishedAt: now
+      }
+    }
+  );
+  return toSwap(d?.createDecision?.data);
+}
+
+export async function loadSwap(exec: ShiftExec, id: string): Promise<SwapView | null> {
+  const d = await run(exec, `query ($id: ID!) { decision(id: $id) { data { id attributes { kind ${SWAP_FIELDS} } } } }`, 'loadSwap', { id });
+  const n = d?.decision?.data;
+  return n && n.attributes?.kind === 'shiftSwap' ? toSwap(n) : null;
+}
+
+/** Open swaps one member is a party to — the heart's cards and the page's "waiting" list. */
+export async function loadOpenSwapsFor(exec: ShiftExec, uid: string): Promise<SwapView[]> {
+  const d = await run(
+    exec,
+    `query ($uid: ID!) { decisions(filters: { kind: { eq: "shiftSwap" }, swapStatus: { eq: "open" },
+      or: [{ swapFrom: { id: { eq: $uid } } }, { swapTo: { id: { eq: $uid } } }] }, pagination: { limit: 100 }) {
+      data { id attributes { ${SWAP_FIELDS} } } } }`,
+    'loadOpenSwapsFor',
+    { uid }
+  );
+  return nodes(d?.decisions).map(toSwap);
+}
+
+/** Open swaps of a plan whose deadline has passed — the cron matures or lapses them. */
+export async function loadDueSwaps(exec: ShiftExec, planId: string, now: string): Promise<SwapView[]> {
+  const d = await run(
+    exec,
+    `query ($pid: ID!, $now: DateTime) { decisions(filters: { kind: { eq: "shiftSwap" }, swapStatus: { eq: "open" },
+      swapPlan: { id: { eq: $pid } }, swapDeadline: { lte: $now } }, pagination: { limit: 200 }) {
+      data { id attributes { ${SWAP_FIELDS} } } } }`,
+    'loadDueSwaps',
+    { pid: planId, now }
+  );
+  return nodes(d?.decisions).map(toSwap);
+}
+
+export async function updateSwap(
+  exec: ShiftExec,
+  swap: SwapView,
+  data: Partial<{ takeId: string | null; status: SwapView['status']; silence: boolean; deadline: string; signatures: SwapView['signatures'] }>
+): Promise<void> {
+  const out: Record<string, unknown> = {};
+  if ('takeId' in data) out.swapTake = data.takeId;
+  if (data.status) out.swapStatus = data.status;
+  if (data.silence !== undefined) out.swapSilence = data.silence;
+  if (data.deadline) out.swapDeadline = data.deadline;
+  if (data.signatures) out.vots = votsInput(data.signatures);
+  await run(exec, `mutation ($id: ID!, $data: DecisionInput!) { updateDecision(id: $id, data: $data) { data { id } } }`, 'updateSwap', { id: swap.id, data: out });
+}
+
+/** Assignments by id, with their shift — the two places a swap names. */
+export async function loadAssignmentsByIds(exec: ShiftExec, ids: string[]): Promise<Array<AssignmentView & { shift: ShiftView | null; planId: string | null; projectId: string | null }>> {
+  const want = ids.filter(Boolean);
+  if (want.length === 0) return [];
+  const d = await run(
+    exec,
+    `query ($ids: [ID]) { shiftAssignments(filters: { id: { in: $ids } }, pagination: { limit: 50 }) {
+      data { id attributes { ${ASSIGN_FIELDS} shift { data { id attributes { ${SHIFT_FIELDS} } } } shift_plan { data { id } } project { data { id } } } } } }`,
+    'loadAssignmentsByIds',
+    { ids: want }
+  );
+  return nodes(d?.shiftAssignments)
+    .map((n: any) => {
+      const base = toAssignment(n);
+      if (!base) return null;
+      return {
+        ...base,
+        shift: n.attributes?.shift?.data ? toShift(n.attributes.shift.data) : null,
+        planId: n.attributes?.shift_plan?.data?.id ? String(n.attributes.shift_plan.data.id) : null,
+        projectId: n.attributes?.project?.data?.id ? String(n.attributes.project.data.id) : null
+      };
+    })
+    .filter((x: any): x is AssignmentView & { shift: ShiftView | null; planId: string | null; projectId: string | null } => !!x);
+}
+
+/** Display names for a handful of members (the other side of a swap). */
+export async function loadUserNames(exec: ShiftExec, ids: string[]): Promise<Record<string, string>> {
+  const want = [...new Set(ids.filter(Boolean))];
+  if (want.length === 0) return {};
+  const d = await run(
+    exec,
+    `query ($ids: [ID]) { usersPermissionsUsers(filters: { id: { in: $ids } }, pagination: { limit: 100 }) { data { id attributes { username } } } }`,
+    'loadUserNames',
+    { ids: want }
+  );
+  return Object.fromEntries(nodes(d?.usersPermissionsUsers).map((n: any) => [String(n.id), n.attributes?.username ?? '']));
+}

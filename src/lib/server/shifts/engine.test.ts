@@ -31,6 +31,7 @@ const shiftOf = (sid: string) => db.shifts.find((s) => s.id === sid)!;
 
 vi.mock('./store.js', () => ({
   loadProjectTiming: async () => ({}),
+  loadDueSwaps: async () => [],
   syncShifts: async (_e: unknown, plan: Row, instances: Row[]) => {
     let created = 0;
     for (const inst of instances) {

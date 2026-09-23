@@ -813,7 +813,8 @@
       "stipendtransfer": "تحويل منحة",
       "shiftDeclare": "التوفّر للمناوبات",
       "shiftDraft": "مسودة جدول المناوبات",
-      "shiftHole": "مناوبة غير مغطّاة"
+      "shiftHole": "مناوبة غير مغطّاة",
+      "shiftSwap": "تبديل مناوبة"
     },
     "fact": {
       "hours": "{{value}} ساعات",
@@ -869,7 +870,9 @@
       "shiftDeclare": "{{count}} مناوبات بانتظار إجابتك",
       "shiftDraft": "لديك {{count}} أماكن في المسودة",
       "shiftHole": "لا أحد يغطّي هذه المناوبة بعد",
-      "shiftHoleNext": "أنت التالي في دور الاحتياط"
+      "shiftHoleNext": "أنت التالي في دور الاحتياط",
+      "shiftSwap": "عُرض عليك تبديل مناوبة",
+      "shiftSwapCounter": "اقتُرحت نسخة أخرى من تبديلك"
     },
     "title": {
       "transfer": "{{from}} ← {{to}}",

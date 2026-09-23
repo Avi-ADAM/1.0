@@ -942,7 +942,9 @@ draftRoster({ shifts, candidates, commitments, availabilities, quotas, carryOver
       בסגירה. פירוט ב‑§13.8.
 - [ ] **P7b — שארית P7.** שינוי תבנית המשמרות בהצבעת עריכה; הצעת `editObject`
       לחלון שלא מתמלא K מחזורים (§7.1 שלב 5).
-- [ ] **P8 — החלפות.** `Decision kind:'shiftSwap'` דו־צדדי + פורום.
+- [x] **P8 — החלפות.** `Decision kind:'shiftSwap'` דו־צדדי: הצעה, אישור, קונטרה,
+      ביטול; שתיקה משלימה רק כשהמקבל/ת כבר הצהיר/ה. פירוט ב‑§13.9.
+- [ ] **P8b — שארית P8.** פורום להחלפה (`forumAccess`), היסטוריית תנאי הסבבים.
 - [ ] **P9 — שעות.** קישור `Timer`, כרטיס `shiftStarting`, הצעת רישום בדיעבד.
 - [ ] **P10 — כללי קבע ו‑`/me/shifts`.** "אני אף פעם לא בשישי", תצוגה
       חוצת־רקמות.
@@ -1025,7 +1027,7 @@ draftRoster({ shifts, candidates, commitments, availabilities, quotas, carryOver
   `open_mission`, `mission`, `tafkidim`, `mesimabetahalich`, `timer` — **חד‑כיווניים**.
   בפרט **סכימת המשתמש לא נגעה**: "ההצהרות שלי" / "המשמרות שלי" מסננות מהשורש
   (`shiftAvailabilities(filters: {users_permissions_user: …})`).
-- **ה‑`Decision` של `shiftSwap` (P8) לא נכנס כאן.** P2 כולל בדיוק מה ש‑§3
+- **ה‑`Decision` של `shiftSwap` (P8) לא נכנס כאן — נוסף ב‑§13.9.** P2 כולל בדיוק מה ש‑§3
   מגדיר, ועוד שדות ההתחייבות של §3.8. ה‑swap ייכנס עם העיצוב של P8, לא כניחוש
   עכשיו.
 
@@ -1356,6 +1358,104 @@ Strapi first").
   `shiftPattern` (§13.2), אבל ה‑UI של `proposeObjectEdit` עוד לא מציע אותו.
 - **שלב 5 בסולם (§7.1)** — הצעת `editObject` אחרי K מחזורים שבהם אותו חלון לא
   מתמלא. דורש מעקב חורים לפי חלון בין מחזורים.
+
+### 13.9 P8 — החלפות
+
+**הדגם.** החלפה היא `Decision` עם `kind: 'shiftSwap'`, והיא דו־צדדית: רק שני
+החברים חותמים.
+
+- **התנאים:** המקום של המציע/ה (`swapGive`) עובר לחבר/ה השני/ה (`swapTo`).
+  אופציונלית, מקום של החבר/ה השני/ה (`swapTake`) חוזר למציע/ה. אם אין מקום
+  חוזר — "פשוט קח/י את שלי".
+- **חתימות:** כל חתימה היא שורת `vots`, ו‑`order` שלה הוא הסבב.
+- **תור:** מי שעוד לא חתם/ה על הסבב העומד — אליו/ה ההחלפה ממתינה
+  ([`swapTurn`](../src/lib/shifts/swap.ts)).
+- **קונטרה:** משנה רק את `swapTake` (גם ל"כלום בתמורה"), פותחת סבב חדש, ומאפסת
+  את השעון.
+
+**שתיקה היא הסכמה — רק איפה שכבר נאמרה הסכמה.** §1.1 גובר: הסידור לעולם לא
+משבץ מי שלא הצהיר, והחלפה לא יכולה להיות דלת אחורית לכלל הזה. לכן שתיקה משלימה
+החלפה ([`silenceMayComplete`](../src/lib/shifts/swap.ts)) רק כששני תנאים
+מתקיימים:
+
+1. מי שלא ענה/תה הצהיר/ה `want`/`can`/`ifNeeded` על המשמרת שהוא/היא אמור/ה
+   לקבל.
+2. קבלתה לא מעבירה אותו/ה את ה‑`shiftsMax` במחזור.
+
+בכל מקרה אחר, בלי תשובה עד המועד, ההחלפה **פוקעת** והסידור נשאר כמו שהיה.
+כרטיס הלב אומר מראש איזה משני המצבים חל. ה‑cron בודק את התנאים שוב ברגע
+ההבשלה, כי הצהרה או מקסימום יכולים להשתנות בינתיים.
+
+**אין "לא".** האפשרויות הן אישור, קונטרה, או ביטול ההצעה **שלי** (רק המציע/ה).
+ההצעה של המציע/ה היא שלו/ה לבטל, ואף אחד אחר לא "דוחה" אותה.
+
+**המועד** = המוקדם מבין:
+
+- `restime` של הרקמה;
+- `closesAt` של הטיוטה, כל עוד היא פתוחה;
+- תחילת אחת המשמרות.
+
+([`swapDeadline`](../src/lib/shifts/swap.ts), ‏§1.3.)
+
+**הביצוע** ([`applySwap`](../src/lib/server/shifts/swaps.ts)):
+
+- **בדיקה חוזרת לפני כתיבה.** אם התנאים כבר לא עומדים — ההחלפה פוקעת ולא
+  נכתב כלום. דוגמאות: מישהו שוחרר, נוצרה חפיפה, המשמרת התחילה.
+- **שמירה על ההיסטוריה:** השורות הישנות משתחררות (`releaseReason: 'swap'`),
+  ונוצרות שורות rank 1 חדשות עם `source: 'swap'`, `reason: 'swapped'`,
+  ו‑`coveredFor` שמצביע על השורה שהוחלפה.
+- **מקום גיבוי** שהיה למקבל/ת באותה משמרת משתחרר.
+
+**בדיקות** ([`checkSwap`](../src/lib/shifts/swap.ts)):
+
+- רק מקום שלי שבו אני מגיע/ה, לא מקום בתור.
+- רק מול מי שמשובץ/ת במשימה.
+- לא משמרת שהתחילה.
+- לא מישהו שכבר מגיע/ה לאותה משמרת.
+- לעולם לא שתי משמרות חופפות.
+- הצעה פתוחה אחת לכל מקום.
+
+**ה‑Decision לא מקושר ל‑`projects` — במכוון.** כל קורא של החלטות רקמה (הלב,
+לשונית ההצבעות) היה מציג אותו לכל הרקמה כהצבעה. ההחלפה נמצאת דרך היחסים שלה,
+`swapFrom`/`swapTo`/`swapPlan`. אין לה `timegrama`: השעון שלה הוא ה‑cron של
+המשמרות (`tickPlan` → [`matureDueSwaps`](../src/lib/server/shifts/swaps.ts)),
+ורק כש‑`SHIFTS=on`.
+
+**סכימה (1.0b, טרם commit):** ל‑`Decision` נוספו:
+
+| שדה | סוג |
+|---|---|
+| `kind` | הערך `shiftSwap` |
+| `swapGive`, `swapTake` | `manyToOne` → `shift-assignment` |
+| `swapFrom`, `swapTo` | `manyToOne` → user |
+| `swapPlan` | `manyToOne` → `shift-plan` |
+| `swapDeadline` | datetime |
+| `swapStatus` | `open \| done \| lapsed \| withdrawn` |
+| `swapSilence` | boolean |
+
+כל היחסים חד־כיווניים. נבדק ב‑register של Strapi בלי DB.
+
+**קוד:**
+
+| מה | איפה |
+|---|---|
+| חוקים (טהור) | [`swap.ts`](../src/lib/shifts/swap.ts) |
+| שרת | [`swaps.ts`](../src/lib/server/shifts/swaps.ts); ב‑`store.ts`: `createSwap`, `loadSwap`, `loadOpenSwapsFor`, `loadDueSwaps`, `updateSwap`, `loadAssignmentsByIds`, `loadUserNames` |
+| פעולות | [`shiftSwapActions.ts`](../src/lib/server/actions/configs/shiftSwapActions.ts): `proposeShiftSwap`, `decideShiftSwap` |
+| עבודת הלב | `buildShiftWork` מחזיר גם `swaps` (עם `myTurn`, `options` לקונטרה) |
+| כרטיס | `ShiftSwapCard.svelte` (`ani: 'shiftSwap'`) — רק החלפות שממתינות לי |
+| עמוד המשמרות | `SwapPanel.svelte` מתחת לסידור — המקומות שלי, "להציע החלפה", ההצעות שלי שממתינות עם ביטול |
+| i18n | `shifts.swap.*` כולל `problem.*`, וב‑`lev.list.*` המפתחות `shiftSwap` |
+
+**טסטים:** `swap.test.ts` 13, `work.test.ts` +3, `levShifts.test.ts` +1.
+
+**לא נעשה — P8b:**
+
+- **שיחה (פורום) על החלפה.** `forums` קיים על ה‑`Decision`, אבל
+  [`forumAccess.ts`](../src/lib/server/actions/forumAccess.ts) צריך ללמוד את
+  המשתתפים של `shiftSwap` לפני שפותחים אותו.
+- **היסטוריית סבבים.** הסבב שומר רק את התנאים העומדים ואת החתימות, בלי תנאי
+  הסבבים הקודמים.
 
 ---
 

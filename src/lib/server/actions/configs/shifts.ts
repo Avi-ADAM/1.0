@@ -13,11 +13,14 @@ import {
   releaseShiftAssignmentConfig,
   reopenForShiftHoleConfig
 } from './shiftCardActions.js';
+import { decideShiftSwapConfig, proposeShiftSwapConfig } from './shiftSwapActions.js';
 
 export const shiftActionConfigs: ActionConfig[] = [
   declareShiftAvailabilityConfig,
   getShiftWorkConfig,
   releaseShiftAssignmentConfig,
   claimShiftHoleConfig,
-  reopenForShiftHoleConfig
+  reopenForShiftHoleConfig,
+  proposeShiftSwapConfig,
+  decideShiftSwapConfig
 ];

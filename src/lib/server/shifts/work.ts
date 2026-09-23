@@ -12,6 +12,8 @@ import { planIsActive } from './read.js';
 import {
   loadCommitments,
   loadMyShiftMissions,
+  loadOpenSwapsFor,
+  loadUserNames,
   loadPeriods,
   loadPlansForOpenMissions,
   loadProjectTiming,
@@ -19,12 +21,17 @@ import {
 } from './store.js';
 
 const DAY = 86_400_000;
-export const EMPTY_WORK: ShiftWork = { declare: [], drafts: [], holes: [] };
+export const EMPTY_WORK: ShiftWork = { declare: [], drafts: [], holes: [], swaps: [] };
 
 export async function loadShiftWork(exec: ShiftExec, uid: string, mode: ShiftsMode, now = new Date()): Promise<ShiftWork> {
   if (mode === 'off' || !uid) return EMPTY_WORK;
   const omIds = await loadMyShiftMissions(exec, uid);
   const plans = (await loadPlansForOpenMissions(exec, omIds)).filter(planIsActive);
+  // Swaps exist only once a roster binds anyone — never in shadow.
+  const swaps = mode === 'on' ? await loadOpenSwapsFor(exec, uid).catch(() => []) : [];
+  const names = await loadUserNames(exec, swaps.flatMap((s) => [s.fromUserId, s.toUserId]).filter((id) => id !== uid)).catch(
+    () => ({}) as Record<string, string>
+  );
   const timing = new Map<string, Awaited<ReturnType<typeof loadProjectTiming>>>();
 
   const inputs: WorkPlanInput[] = [];
@@ -52,7 +59,9 @@ export async function loadShiftWork(exec: ShiftExec, uid: string, mode: ShiftsMo
             { id: p.id, state: p.state, closesAt: p.closesAt, reopened: !!(p.quotaSnapshot as any)?.reopenedAt }
           ])
       ),
-      commitments: commitments.map((c) => ({ userId: c.userId, max: c.max ?? null }))
+      commitments: commitments.map((c) => ({ userId: c.userId, max: c.max ?? null })),
+      swaps: swaps.filter((s) => s.planId === plan.id),
+      names
     });
   }
   return buildShiftWork(uid, inputs, now, { shadow: mode === 'shadow' });
