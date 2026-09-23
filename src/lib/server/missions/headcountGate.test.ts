@@ -4,7 +4,8 @@
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-const env: Record<string, string | undefined> = {};
+// vi.mock is hoisted above every const, so the shared env object must be too.
+const { env } = vi.hoisted(() => ({ env: {} as Record<string, string | undefined> }));
 vi.mock('$env/dynamic/private', () => ({ env }));
 
 import { acceptanceEffectAsAdmin } from './headcountGate';

@@ -100,7 +100,19 @@ const SAMPLES: Record<string, any> = {
     hours: 42,
     stipendRate: 50
   },
-  sitesharedecide: { proposedAmount: 320, basisAmount: 6400 }
+  sitesharedecide: { proposedAmount: 320, basisAmount: 6400 },
+  shiftDeclare: { planName: 'עמדת קבלה', undeclared: 3, total: 5 },
+  shiftDraft: { planName: 'עמדת קבלה', mine: [{ assignmentId: '5', rank: 1 }], holes: 0 },
+  shiftHole: { planName: 'עמדת קבלה', missing: 1, nextInLine: true },
+  shiftSwap: {
+    planName: 'עמדת קבלה',
+    otherName: 'הדס',
+    mine: false,
+    give: { assignmentId: '5', start: '2026-10-05T05:00:00Z', end: '2026-10-05T09:00:00Z' },
+    take: null
+  },
+  shiftStarting: { planName: 'עמדת קבלה', hours: 4 },
+  shiftLog: { planName: 'עמדת קבלה', hours: 4 }
 };
 
 const base = (ani: string) => ({
