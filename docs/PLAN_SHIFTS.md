@@ -1256,6 +1256,30 @@ GraphQL החי.
 `check`, `check:i18n` (השער הורחב ל‑`/availableMission`, `/concierge`,
 `/onboard` — הטופס מיובא שם), `check:script`, `validate:qids` נקיים.
 
+### 13.7 סדר הפריסה — ה‑commit שדורש את 1.0b
+
+**עד 166.5 כולל, כל commit של המשמרות בטוח לפריסה בלי 1.0b:** כל קריאה או כתיבה
+של שדה שעוד לא קיים עוברת דרך `store.ts` או מוגנת ב‑`shiftsEnabled()`, ו‑`SHIFTS`
+כבוי כברירת מחדל.
+
+**166.6 שונה, ובמכוון.** הוא מוסיף שדות חדשים לשאילתות סטטיות ב‑`qids.js` —
+ואלה אי אפשר לגדר בדגל:
+
+| שאילתה | מה נוסף | בשביל מה |
+|---|---|---|
+| `ARCH_DECISION_FIELDS` (הלב, דף ההצבעה) | `negoarch { shiftsMin shiftsMax howMany }`, `archOpenMission.howMeny`, `archMesimabetahalich { shiftsMin shiftsMax }` | כרטיס העריכה מציג "מ‑→ל‑" לתנאי המשמרות — המצביעים רואים על מה הם חותמים |
+| `getMissionInProgress`, `getProjectMissions` | `shiftsMin shiftsMax`, `open_missions { isshift }` | להעביר `shiftCommitment` ל‑`MissionControls` ([`commitmentOf`](../src/lib/shifts/commitment.ts)) |
+
+⚠️ **פריסת 166.6 לפני 1.0b שוברת את דף הלב לכולם** (GraphQL דוחה שדה לא
+קיים — כל השאילתה נופלת). הסדר המחייב:
+
+1. deploy של 1.0b (הסכימה מ‑§13.2 + `shift-plan.pendm` + `negoarch.howMany/shiftPattern`);
+2. deploy של 1.0main עד 166.6 ומעלה;
+3. `SHIFTS=shadow`.
+
+זה אותו כלל שכבר חל על עבודת ריבוי המטבעות ועל הספרייה המשותפת ("deploy
+Strapi first").
+
 ---
 
 ## 14. הכרעות — סגורות (2026‑09‑22)

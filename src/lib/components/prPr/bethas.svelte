@@ -33,6 +33,7 @@
   import { sendToSer } from '$lib/send/sendToSer.js';
   import { buildMonthlyLedger, segmentsFromTimers } from '$lib/recurring/missionMonths.js';
   import { htmlExcerpt } from '$lib/text/htmlExcerpt';
+  import { commitmentOf } from '$lib/shifts/commitment';
 
   /**
    * @typedef {Object} Props
@@ -567,6 +568,7 @@
                 accruedHours={m.attributes?.howmanyhoursalready}
                 hoursAssigned={m.attributes?.hoursassinged}
                 perhour={m.attributes?.perhour}
+                shiftCommitment={commitmentOf(m.attributes)}
                 compact={true}
                 onStatus={(value) => (statusOverride = { ...statusOverride, [String(m.id)]: value })}
                 onCompleted={(outcome) =>

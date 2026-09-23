@@ -46,15 +46,19 @@ const ARCH_DECISION_FIELDS = `
                       hoursOutcome
                       hoursToCredit
                       effectiveFrom
+                      shiftsMin
+                      shiftsMax
+                      howMany
                       proposedBy { data { id attributes { username } } }
                       transferTo { data { id attributes { name } } }
                     }
                     archOpenMission {
-                      data { id attributes { name descrip noofhours perhour sqadualed dates } }
+                      data { id attributes { name descrip noofhours perhour sqadualed dates howMeny } }
                     }
                     archMesimabetahalich {
                       data { id attributes {
                         name descrip howmanyhoursalready hoursassinged perhour start dates
+                        shiftsMin shiftsMax
                         users_permissions_user { data { id attributes {
                           username profilePic { data { attributes { url formats } } }
                         } } }
@@ -9420,11 +9424,12 @@ export const moachQids = {
               attributes {
                 name status iskvua finnished howmanyhoursalready perhour hoursassinged createdAt start dates
                 hearotMeyuchadot descrip admaticedai privatlinks publicklinks
+                shiftsMin shiftsMax
                 stipendRate stipendCostShare stipendMode
                 stipendFunder { data { id attributes { username } } }
                 monter { monthStart hours isDone hoursDone }
                 forums { data { id } }
-                open_missions { data { id } }
+                open_missions { data { id attributes { isshift } } }
                 finiapruvals { data { id attributes { missname archived } } }
                 tafkidims { data { id attributes { roleDescription localizations { data { attributes { roleDescription } } } } } }
                 acts { data { id attributes {
@@ -9939,6 +9944,8 @@ export const moachQids = {
           name status iskvua howmanyhoursalready hoursassinged perhour
           finnished createdAt start dates admaticedai privatlinks publicklinks
           hearotMeyuchadot descrip
+          shiftsMin shiftsMax
+          open_missions { data { id attributes { isshift } } }
           stipendRate stipendCostShare stipendMode
           stipendFunder { data { id attributes { username } } }
           monter { monthStart hours isDone hoursDone }

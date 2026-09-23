@@ -24,6 +24,7 @@
   import MissionControls from '$lib/components/mission/MissionControls.svelte';
   import EquityPreview from '$lib/components/equity/EquityPreview.svelte';
   import MissionStipendOffer from '$lib/components/stipend/MissionStipendOffer.svelte';
+  import { commitmentOf } from '$lib/shifts/commitment';
   import { forum, isChatOpen, newChat, nowChatId } from '$lib/stores/pendMisMes.js';
 
   let { data } = $props();
@@ -289,6 +290,7 @@
         accruedHours={attrs.howmanyhoursalready}
         hoursAssigned={attrs.hoursassinged}
         perhour={attrs.perhour}
+        shiftCommitment={commitmentOf(attrs)}
         onStatus={(value) => (statusOverride = value)}
         onCompleted={() => (submitted = true)}
         onTimerSaved={loadSessions}
