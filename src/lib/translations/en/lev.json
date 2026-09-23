@@ -814,7 +814,9 @@
       "shiftDeclare": "Shift availability",
       "shiftDraft": "Draft roster",
       "shiftHole": "Uncovered shift",
-      "shiftSwap": "Shift swap"
+      "shiftSwap": "Shift swap",
+      "shiftStarting": "Shift starting",
+      "shiftLog": "Shift hours"
     },
     "fact": {
       "hours": "{{value}} hours",
@@ -872,7 +874,9 @@
       "shiftHole": "Nobody is covering this shift yet",
       "shiftHoleNext": "You're next in line as backup",
       "shiftSwap": "You were offered a shift swap",
-      "shiftSwapCounter": "A different version of your swap was proposed"
+      "shiftSwapCounter": "A different version of your swap was proposed",
+      "shiftStarting": "Start the timer",
+      "shiftLog": "The shift ended without a timer"
     },
     "title": {
       "transfer": "{{from}} → {{to}}",

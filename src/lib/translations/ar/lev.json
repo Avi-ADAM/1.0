@@ -814,7 +814,9 @@
       "shiftDeclare": "التوفّر للمناوبات",
       "shiftDraft": "مسودة جدول المناوبات",
       "shiftHole": "مناوبة غير مغطّاة",
-      "shiftSwap": "تبديل مناوبة"
+      "shiftSwap": "تبديل مناوبة",
+      "shiftStarting": "مناوبة تبدأ",
+      "shiftLog": "ساعات المناوبة"
     },
     "fact": {
       "hours": "{{value}} ساعات",
@@ -872,7 +874,9 @@
       "shiftHole": "لا أحد يغطّي هذه المناوبة بعد",
       "shiftHoleNext": "أنت التالي في دور الاحتياط",
       "shiftSwap": "عُرض عليك تبديل مناوبة",
-      "shiftSwapCounter": "اقتُرحت نسخة أخرى من تبديلك"
+      "shiftSwapCounter": "اقتُرحت نسخة أخرى من تبديلك",
+      "shiftStarting": "تشغيل المؤقت",
+      "shiftLog": "انتهت المناوبة من دون مؤقت"
     },
     "title": {
       "transfer": "{{from}} ← {{to}}",

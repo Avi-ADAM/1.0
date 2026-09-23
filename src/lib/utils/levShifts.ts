@@ -11,6 +11,8 @@
  *   shiftDraft   — a published draft I am in, while objections are open
  *   shiftHole    — a coming shift nobody covers
  *   shiftSwap    — a swap waiting on my answer
+ *   shiftStarting — my shift is starting: start its timer
+ *   shiftLog     — my shift ended with no timer: log its hours?
  */
 
 import { derived, writable, type Readable, type Writable } from 'svelte/store';
@@ -19,9 +21,9 @@ import { createProjectInfo } from '$lib/utils/projectHelpers.js';
 import { PRIORITY_BAND, type DisplayItem } from './levProcessors';
 import { projectsStore } from '$lib/stores/levStores';
 
-export const SHIFT_ANIS = ['shiftDeclare', 'shiftDraft', 'shiftHole', 'shiftSwap'] as const;
+export const SHIFT_ANIS = ['shiftDeclare', 'shiftDraft', 'shiftHole', 'shiftSwap', 'shiftStarting', 'shiftLog'] as const;
 
-export const shiftWorkStore: Writable<ShiftWork> = writable({ declare: [], drafts: [], holes: [], swaps: [] });
+export const shiftWorkStore: Writable<ShiftWork> = writable({ declare: [], drafts: [], holes: [], swaps: [], starting: [], toLog: [] });
 
 /** Pure: ShiftWork → DisplayItem[]. Never throws on missing data. */
 export function processShiftWork(work: ShiftWork | null | undefined): DisplayItem[] {
@@ -74,6 +76,27 @@ export function processShiftWork(work: ShiftWork | null | undefined): DisplayIte
       pl: PRIORITY_BAND.VOTE_PENDING + 10,
       coinlapach: `shiftSwap-${s.decisionId}-${s.round}`,
       ...s
+    });
+  }
+  // Now, not later: a shift starting is the most time-bound thing on the heart.
+  for (const h of work.starting ?? []) {
+    items.push({
+      ...base(h.projectId),
+      ani: 'shiftStarting',
+      azmi: 'shiftStarting',
+      pl: PRIORITY_BAND.VOTE_PENDING,
+      coinlapach: `shiftStarting-${h.assignmentId}`,
+      ...h
+    });
+  }
+  for (const h of work.toLog ?? []) {
+    items.push({
+      ...base(h.projectId),
+      ani: 'shiftLog',
+      azmi: 'shiftLog',
+      pl: PRIORITY_BAND.VOTE_PENDING + 40,
+      coinlapach: `shiftLog-${h.assignmentId}`,
+      ...h
     });
   }
   return items;

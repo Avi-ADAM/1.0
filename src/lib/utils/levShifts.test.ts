@@ -23,7 +23,7 @@ const hole = (shiftId: string, nextInLine: boolean) => ({
 describe('processShiftWork', () => {
   it('is empty for no work', () => {
     expect(processShiftWork(null)).toEqual([]);
-    expect(processShiftWork({ declare: [], drafts: [], holes: [], swaps: [] })).toEqual([]);
+    expect(processShiftWork({ declare: [], drafts: [], holes: [], swaps: [], starting: [], toLog: [] })).toEqual([]);
   });
 
   it('turns each kind of shift work into a card the heart can render', () => {
@@ -57,7 +57,9 @@ describe('processShiftWork', () => {
         }
       ],
       holes: [hole('a', false), hole('b', true)],
-      swaps: []
+      swaps: [],
+      starting: [],
+      toLog: []
     });
     expect(items.map((i) => i.ani)).toEqual(['shiftDeclare', 'shiftDraft', 'shiftHole', 'shiftHole']);
     expect(items.every((i) => RENDERABLE_ANIS.includes(i.ani))).toBe(true);
@@ -87,7 +89,7 @@ describe('processShiftWork', () => {
       round: 1,
       options: []
     });
-    const items = processShiftWork({ declare: [], drafts: [], holes: [], swaps: [swap('700', true), swap('701', false)] });
+    const items = processShiftWork({ declare: [], drafts: [], holes: [], swaps: [swap('700', true), swap('701', false)], starting: [], toLog: [] });
     expect(items.map((i) => [i.ani, i.decisionId])).toEqual([['shiftSwap', '700']]);
   });
 });

@@ -194,5 +194,19 @@
       "noPlan": "The shift plan was not found",
       "notFound": "The swap was not found"
     }
+  },
+  "hours": {
+    "startingType": "Your shift is starting",
+    "startingBody": "A shift does not count as hours by itself. Starting the mission timer records what you actually work.",
+    "start": "Start the timer",
+    "started": "The timer is running",
+    "noTimer": "The mission timer has not loaded yet. You can start it from the timers page.",
+    "logType": "Log your shift hours?",
+    "logBody": "The shift ended and no timer ran. Log {{hours}} hours?",
+    "log": "Log {{hours}} hours",
+    "logged": "The hours were logged and sent for approval",
+    "notWorked": "I didn't work this shift",
+    "notWorkedDone": "Noted that the shift was not worked",
+    "approvalNote": "The hours go to the rikma for approval like any other hours."
   }
 }

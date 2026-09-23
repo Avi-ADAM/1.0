@@ -815,7 +815,9 @@
       "shiftDeclare": "Disponibilidad para turnos",
       "shiftDraft": "Borrador del cuadrante",
       "shiftHole": "Turno sin cubrir",
-      "shiftSwap": "Cambio de turno"
+      "shiftSwap": "Cambio de turno",
+      "shiftStarting": "Turno empezando",
+      "shiftLog": "Horas del turno"
     },
     "fact": {
       "hours": "{{value}} horas",
@@ -873,7 +875,9 @@
       "shiftHole": "Nadie cubre este turno todavía",
       "shiftHoleNext": "Eres la siguiente persona en la fila de respaldo",
       "shiftSwap": "Te ofrecieron un cambio de turno",
-      "shiftSwapCounter": "Se propuso otra versión de tu cambio"
+      "shiftSwapCounter": "Se propuso otra versión de tu cambio",
+      "shiftStarting": "Iniciar el temporizador",
+      "shiftLog": "El turno terminó sin temporizador"
     },
     "title": {
       "transfer": "{{from}} → {{to}}",

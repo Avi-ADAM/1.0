@@ -814,7 +814,9 @@
       "shiftDeclare": "זמינות למשמרות",
       "shiftDraft": "טיוטת סידור",
       "shiftHole": "משמרת לא מאוישת",
-      "shiftSwap": "החלפת משמרת"
+      "shiftSwap": "החלפת משמרת",
+      "shiftStarting": "משמרת מתחילה",
+      "shiftLog": "שעות משמרת"
     },
     "fact": {
       "hours": "{{value}} שעות",
@@ -872,7 +874,9 @@
       "shiftHole": "אף אחד עוד לא מכסה את המשמרת",
       "shiftHoleNext": "את/ה הבא/ה בתור לגיבוי",
       "shiftSwap": "הוצעה לך החלפת משמרת",
-      "shiftSwapCounter": "הוצעה גרסה אחרת להחלפה שלך"
+      "shiftSwapCounter": "הוצעה גרסה אחרת להחלפה שלך",
+      "shiftStarting": "להפעיל את הטיימר",
+      "shiftLog": "המשמרת הסתיימה בלי טיימר"
     },
     "title": {
       "transfer": "{{from}} ← {{to}}",

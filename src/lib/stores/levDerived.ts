@@ -516,6 +516,8 @@ export const finalSwiperArray: Readable<DisplayItem[]> = derived(
         case 'shiftDraft':
         case 'shiftHole':
         case 'shiftSwap':
+        case 'shiftStarting':
+        case 'shiftLog':
           return true; // Always show: a shift question addressed to me, with a deadline
         // A stipend proposal is a decision like any other — same filter.
         case 'stipend':

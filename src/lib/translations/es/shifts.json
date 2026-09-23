@@ -194,5 +194,19 @@
       "noPlan": "No se encontró el plan de turnos",
       "notFound": "No se encontró el cambio"
     }
+  },
+  "hours": {
+    "startingType": "Tu turno está empezando",
+    "startingBody": "Un turno no cuenta como horas por sí solo. Iniciar el temporizador de la misión registra lo que realmente trabajas.",
+    "start": "Iniciar el temporizador",
+    "started": "El temporizador está en marcha",
+    "noTimer": "El temporizador de la misión aún no se cargó. Puedes iniciarlo desde la página de temporizadores.",
+    "logType": "¿Registrar las horas del turno?",
+    "logBody": "El turno terminó y no corrió ningún temporizador. ¿Registrar {{hours}} horas?",
+    "log": "Registrar {{hours}} horas",
+    "logged": "Las horas se registraron y se enviaron para aprobación",
+    "notWorked": "No trabajé este turno",
+    "notWorkedDone": "Se anotó que el turno no se trabajó",
+    "approvalNote": "Las horas van a la rikma para su aprobación como cualquier otra."
   }
 }

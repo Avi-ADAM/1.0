@@ -146,3 +146,26 @@ describe('buildShiftWork — swaps', () => {
     expect(buildShiftWork('dana', [plan({ ...base, swaps: [swapRow([{ userId: 'ron', order: 1 }])] })], '2026-10-03T00:00:00Z', { shadow: true }).swaps).toEqual([]);
   });
 });
+
+describe('buildShiftWork — hours (§10)', () => {
+  const closed = { [cycle.periodKey]: { id: '50', state: 'closed' as const, closesAt: cycle.closesAt } };
+  // Shift a: 4 Oct 08:00–12:00Z.
+  const mine = (over: Record<string, unknown> = {}) => ({ ...row('a', 'ron', 1, 'confirmed'), mesimabetahalichId: '40', ...over });
+
+  it('offers to start the timer from half an hour before the shift until it ends', () => {
+    const at = (iso: string) => buildShiftWork('ron', [plan({ periods: closed, assignments: [mine()] })], iso);
+    expect(at('2026-10-04T07:20:00Z').starting).toEqual([]);
+    expect(at('2026-10-04T07:31:00Z').starting).toEqual([expect.objectContaining({ assignmentId: 'a-ron', missionId: '40', hours: 4 })]);
+    expect(at('2026-10-04T11:59:00Z').starting).toHaveLength(1);
+  });
+
+  it('once it ended without a timer, asks to log the hours — for a week', () => {
+    const at = (iso: string, over = {}) => buildShiftWork('ron', [plan({ periods: closed, assignments: [mine(over)] })], iso);
+    expect(at('2026-10-04T12:00:00Z').toLog).toEqual([expect.objectContaining({ assignmentId: 'a-ron', hours: 4 })]);
+    expect(at('2026-10-12T00:00:00Z').toLog).toEqual([]);
+    // A timer already ran for it: nothing to ask.
+    expect(at('2026-10-04T13:00:00Z', { timerId: '9' }).toLog).toEqual([]);
+    // A draft that never closed was never agreed on.
+    expect(at('2026-10-04T13:00:00Z', { state: 'draft' }).toLog).toEqual([]);
+  });
+});

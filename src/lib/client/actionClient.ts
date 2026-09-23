@@ -436,6 +436,7 @@ export type ActionKey =
   | 'proposeShiftSwap'
   | 'decideShiftSwap'
   | 'logShiftHours'
+  | 'linkShiftTimer'
   // Code rikma — GitHub connection (PLAN_CODE_RIKMA S2)
   | 'unlinkGithubAccount'
   | 'disconnectProjectRepo'

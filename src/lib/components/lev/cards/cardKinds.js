@@ -54,7 +54,9 @@ const RENDERABLE = new Set([
   'shiftDeclare',
   'shiftDraft',
   'shiftHole',
-  'shiftSwap'
+  'shiftSwap',
+  'shiftStarting',
+  'shiftLog'
 ]);
 
 /**
@@ -113,7 +115,9 @@ const KIND_META = {
   shiftDeclare: { key: 'shiftDeclare', glow: 'teal' },
   shiftDraft: { key: 'shiftDraft', glow: 'teal' },
   shiftHole: { key: 'shiftHole', glow: 'red' },
-  shiftSwap: { key: 'shiftSwap', glow: 'teal' }
+  shiftSwap: { key: 'shiftSwap', glow: 'teal' },
+  shiftStarting: { key: 'shiftStarting', glow: 'teal' },
+  shiftLog: { key: 'shiftLog', glow: 'teal' }
 };
 
 /** Translation key for a kind's label, e.g. `lev.list.kind.pends`. */
@@ -595,6 +599,17 @@ const ROW_CONTENT = {
   shiftSwap: (b) => ({
     title: T(b.otherName) ?? T(b.planName),
     subtitle: K(b.mine ? 'lev.list.sub.shiftSwapCounter' : 'lev.list.sub.shiftSwap')
+  }),
+
+  shiftStarting: (b) => ({
+    title: T(b.planName),
+    subtitle: K('lev.list.sub.shiftStarting')
+  }),
+
+  shiftLog: (b) => ({
+    title: T(b.planName),
+    subtitle: K('lev.list.sub.shiftLog'),
+    facts: chips(f('hours', n(b.hours)))
   })
 };
 
@@ -674,7 +689,9 @@ const CTA_BY_ANI = {
   shiftDeclare: 'answer',
   shiftDraft: 'view',
   shiftHole: 'answer',
-  shiftSwap: 'answer'
+  shiftSwap: 'answer',
+  shiftStarting: 'answer',
+  shiftLog: 'answer'
 };
 
 /** Translation key for the row's primary button. */

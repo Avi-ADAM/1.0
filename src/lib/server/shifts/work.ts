@@ -21,7 +21,7 @@ import {
 } from './store.js';
 
 const DAY = 86_400_000;
-export const EMPTY_WORK: ShiftWork = { declare: [], drafts: [], holes: [], swaps: [] };
+export const EMPTY_WORK: ShiftWork = { declare: [], drafts: [], holes: [], swaps: [], starting: [], toLog: [] };
 
 export async function loadShiftWork(exec: ShiftExec, uid: string, mode: ShiftsMode, now = new Date()): Promise<ShiftWork> {
   if (mode === 'off' || !uid) return EMPTY_WORK;
@@ -41,7 +41,8 @@ export async function loadShiftWork(exec: ShiftExec, uid: string, mode: ShiftsMo
     const current = cycleContaining(plan.id, now, settings);
     const until = new Date(new Date(current.start).getTime() + settings.horizonDays * DAY);
     const [win, periods, commitments] = await Promise.all([
-      loadWindow(exec, [plan.id], current.start, until.toISOString()),
+      // One cycle back as well: a shift that ended yesterday may still wait for its hours.
+      loadWindow(exec, [plan.id], new Date(new Date(current.start).getTime() - settings.cycleDays * DAY).toISOString(), until.toISOString()),
       loadPeriods(exec, plan.id, { limit: 8 }),
       plan.openMissionId ? loadCommitments(exec, plan.openMissionId) : Promise.resolve([])
     ]);

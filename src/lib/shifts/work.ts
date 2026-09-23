@@ -11,6 +11,11 @@
  *   swap    — a swap another member offered me, or answered, and now waits
  *             on me (§1.2). Approve, counter with a different place, or — if
  *             it is my own offer — withdraw it.
+ *   starting — my shift starts soon (or has started) and no timer runs for it:
+ *             one tap starts the mission's ordinary timer (§10).
+ *   toLog   — my shift ended and no timer ever ran for it: "log N hours?" in
+ *             one tap — an ordinary record the rikma approves like any other
+ *             hours. A shift is never hours by itself (§10).
  *   hole    — a coming shift nobody is covering. Two ways out, and both close
  *             the card (§7.1): "I'll take it" or "open the mission to one
  *             more candidate". Whoever is next in the backup chain, and whoever
@@ -30,7 +35,7 @@ export interface WorkPlanInput {
   cycles: CycleWindow[];
   shifts: ShiftLike[];
   declarations: Declaration[];
-  assignments: AssignmentLike[];
+  assignments: Array<AssignmentLike & { timerId?: string | null; mesimabetahalichId?: string | null }>;
   /** Stored periods by `periodKey`. */
   periods: Record<string, { id: string; state: 'open' | 'draft' | 'closed' | 'cancelled'; closesAt: string; reopened?: boolean }>;
   /** The mission's agreed commitments, for "you have room for more". */
@@ -130,11 +135,33 @@ export interface HoleItem {
   reopened: boolean;
 }
 
+/** How early before a shift the "starting" card appears. */
+export const START_LEAD_MINUTES = 30;
+/** How long after a shift the "log the hours?" card keeps asking. */
+export const LOG_LOOKBACK_DAYS = 7;
+
+export interface HoursItem {
+  planId: string;
+  timeZone: string;
+  planName: string;
+  projectId: string | null;
+  assignmentId: string;
+  /** The mission-in-progress the hours belong to (the timer's mission). */
+  missionId: string | null;
+  shiftId: string;
+  start: string;
+  end: string;
+  /** The shift's length in hours — what "log the hours" proposes. */
+  hours: number;
+}
+
 export interface ShiftWork {
   declare: DeclareItem[];
   drafts: DraftItem[];
   holes: HoleItem[];
   swaps: SwapItem[];
+  starting: HoursItem[];
+  toLog: HoursItem[];
 }
 
 const COMING = new Set(['draft', 'confirmed', 'done']);
@@ -146,7 +173,7 @@ export function buildShiftWork(
   opts: { shadow?: boolean } = {}
 ): ShiftWork {
   const t = new Date(now).getTime();
-  const work: ShiftWork = { declare: [], drafts: [], holes: [], swaps: [] };
+  const work: ShiftWork = { declare: [], drafts: [], holes: [], swaps: [], starting: [], toLog: [] };
 
   for (const p of plans) {
     const myDecl = new Set(p.declarations.filter((d) => String(d.userId) === uid).map((d) => String(d.shiftId)));
@@ -244,7 +271,16 @@ export function buildShiftWork(
     }
   }
 
-  if (!opts.shadow) for (const p of plans) work.swaps.push(...swapItems(uid, p, t));
+  if (!opts.shadow) {
+    for (const p of plans) {
+      work.swaps.push(...swapItems(uid, p, t));
+      const h = hoursItems(uid, p, t);
+      work.starting.push(...h.starting);
+      work.toLog.push(...h.toLog);
+    }
+  }
+  work.starting.sort((a, b) => a.start.localeCompare(b.start));
+  work.toLog.sort((a, b) => a.start.localeCompare(b.start));
   work.swaps.sort((a, b) => Number(b.myTurn) - Number(a.myTurn) || (a.deadline ?? '').localeCompare(b.deadline ?? ''));
 
   // The members who can most easily fill a hole see it first (§7.1).
@@ -299,6 +335,34 @@ function swapItems(uid: string, p: WorkPlanInput, t: number): SwapItem[] {
       round: turn.round,
       options
     });
+  }
+  return out;
+}
+
+function hoursItems(uid: string, p: WorkPlanInput, t: number): { starting: HoursItem[]; toLog: HoursItem[] } {
+  const out = { starting: [] as HoursItem[], toLog: [] as HoursItem[] };
+  for (const a of p.assignments) {
+    if (String(a.userId) !== uid || a.rank !== 1 || a.timerId) continue;
+    if (a.state !== 'confirmed' && a.state !== 'draft') continue;
+    const s = p.shifts.find((x) => String(x.id) === String(a.shiftId));
+    if (!s || s.state === 'cancelled' || !a.id) continue;
+    const s0 = new Date(s.start).getTime();
+    const s1 = new Date(s.end).getTime();
+    const item: HoursItem = {
+      planId: p.plan.id,
+      timeZone: p.plan.timeZone,
+      planName: p.plan.name,
+      projectId: p.plan.projectId,
+      assignmentId: String(a.id),
+      missionId: a.mesimabetahalichId ?? null,
+      shiftId: String(s.id),
+      start: s.start,
+      end: s.end,
+      hours: Math.round(((s1 - s0) / 3_600_000) * 100) / 100
+    };
+    if (t >= s0 - START_LEAD_MINUTES * 60_000 && t < s1) out.starting.push(item);
+    // Only a confirmed place was worked: a draft that never closed is not a shift anyone agreed on.
+    else if (a.state === 'confirmed' && t >= s1 && t - s1 <= LOG_LOOKBACK_DAYS * 86_400_000) out.toLog.push(item);
   }
   return out;
 }
