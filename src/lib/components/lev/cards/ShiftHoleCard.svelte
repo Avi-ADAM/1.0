@@ -15,6 +15,7 @@
   import { t, isRtl, locale } from '$lib/translations';
   import { toast } from 'svelte-sonner';
   import { executeAction, actionErrorText } from '$lib/client/actionClient';
+  import { describeShiftError } from '$lib/shifts/errors';
   import { isMobileOrTablet } from '$lib/utilities/device';
   import { dayLabel, localDateKey, timeRange } from '$lib/shifts/format';
   import { shiftWorkStore } from '$lib/utils/levShifts';
@@ -42,7 +43,7 @@
     busy = true;
     try {
       const res = await executeAction('claimShiftHole', { shiftId: String(buble.shiftId) });
-      if (res?.success === false) throw new Error(actionErrorText(res, $t('shifts.cards.error')));
+      if (res?.success === false) throw new Error(describeShiftError(actionErrorText(res, ''), $t, $t('shifts.cards.error')));
       toast.success(res?.data?.claimed === false ? $t('shifts.cards.hole.alreadyCovered') : $t('shifts.cards.hole.taken'));
       dropCard();
     } catch (e) {
@@ -60,7 +61,7 @@
         periodId: String(buble.periodId),
         shiftId: String(buble.shiftId)
       });
-      if (res?.success === false) throw new Error(actionErrorText(res, $t('shifts.cards.error')));
+      if (res?.success === false) throw new Error(describeShiftError(actionErrorText(res, ''), $t, $t('shifts.cards.error')));
       toast.success($t('shifts.cards.hole.reopened'));
       // Every hole of this cycle now shares the same answer.
       shiftWorkStore.update((w) => ({

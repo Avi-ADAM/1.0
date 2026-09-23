@@ -13,6 +13,7 @@
  */
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import { shiftError } from '$lib/shifts/errors.js';
 import { asUser, run } from '$lib/server/shifts/exec.js';
 import { shiftsEnabled } from '$lib/server/shifts/mode.js';
 import { normalizeRules, validateRules, type StandingRule } from '$lib/shifts/rules.js';
@@ -32,8 +33,8 @@ const setShiftRules: ActionExecutionHandler = async (params, context) => {
     { id }
   );
   const owner = d?.mesimabetahalich?.data?.attributes?.users_permissions_user?.data?.id;
-  if (!owner) throw new Error('Mission not found');
-  if (String(owner) !== String(context.userId)) throw new Error('Forbidden: you can only set your own standing rules');
+  if (!owner) throw shiftError('notFound');
+  if (String(owner) !== String(context.userId)) throw shiftError('notYours');
 
   const clean = normalizeRules(rules);
   const at = new Date().toISOString();

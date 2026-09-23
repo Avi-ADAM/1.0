@@ -19,6 +19,7 @@
  */
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import { shiftError } from '$lib/shifts/errors.js';
 import { asUser } from '$lib/server/shifts/exec.js';
 import { shiftsEnabled } from '$lib/server/shifts/mode.js';
 import { loadCommitments, loadShift, upsertDeclaration } from '$lib/server/shifts/store.js';
@@ -34,19 +35,19 @@ const handler: ActionExecutionHandler = async (params, context) => {
   const exec = asUser(context);
 
   const ctx = await loadShift(exec, String(params.shiftId));
-  if (!ctx) throw new Error('Shift not found');
+  if (!ctx) throw shiftError('notFound');
   const { shift } = ctx;
   if (shift.state === 'cancelled' || shift.state === 'done') {
-    throw new Error('This shift is no longer open for declarations');
+    throw shiftError('notOpen');
   }
   if (new Date(shift.end).getTime() <= Date.now()) {
-    throw new Error('This shift has already ended');
+    throw shiftError('started');
   }
-  if (!ctx.openMissionId) throw new Error('This shift plan is not attached to a mission');
+  if (!ctx.openMissionId) throw shiftError('noMission');
 
   const onMission = (await loadCommitments(exec, ctx.openMissionId)).some((c) => c.userId === userId);
   if (!onMission) {
-    throw new Error('Forbidden: only members assigned to this mission declare availability for its shifts');
+    throw shiftError('notOnMission');
   }
 
   const prefRank =

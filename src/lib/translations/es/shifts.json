@@ -248,5 +248,24 @@
     "draft": "Borrador",
     "toRoster": "Al cuadrante de la rikma",
     "link": "Todos mis turnos, de todas las rikmas"
+  },
+  "error": {
+    "notFound": "No encontrado — puede que haya cambiado mientras tanto",
+    "notYours": "Eso no es tuyo",
+    "notOnShift": "No estás en este turno",
+    "started": "El turno ya empezó",
+    "notEnded": "El turno aún no terminó",
+    "notOpen": "El turno ya no está abierto",
+    "notConfirmed": "Solo se puede registrar un turno confirmado",
+    "noMission": "El turno no está ligado a una misión",
+    "notOnMission": "Solo pueden hacerlo quienes están asignados a la misión",
+    "clash": "Ya tienes un turno a esa hora",
+    "wrongRoster": "El turno no pertenece a este cuadrante",
+    "notParty": "Solo las dos personas del cambio lo responden",
+    "onlyProposer": "Solo quien lo ofreció puede retirarlo",
+    "notYourTurn": "El cambio espera la respuesta de la otra persona",
+    "counterSame": "Una nueva propuesta debe cambiar algo — o apruébala tal cual",
+    "badAnswer": "Respuesta desconocida",
+    "saveFailed": "No se pudo guardar. Inténtalo de nuevo."
   }
 }

@@ -15,6 +15,7 @@
  */
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import { shiftError } from '$lib/shifts/errors.js';
 import { asUser } from '$lib/server/shifts/exec.js';
 import { shiftsEnabled, shiftsLive, shiftsMode } from '$lib/server/shifts/mode.js';
 import { loadShiftWork, EMPTY_WORK } from '$lib/server/shifts/work.js';
@@ -57,13 +58,13 @@ const releaseShiftAssignment: ActionExecutionHandler = async (params, context, {
   if (!shiftsLive()) return skipped('SHIFTS is not on');
   const exec = asUser(context);
   const a = await loadAssignment(exec, String(params.assignmentId));
-  if (!a || !a.shift) throw new Error('Assignment not found');
+  if (!a || !a.shift) throw shiftError('notFound');
   if (String(a.userId) !== String(context.userId)) {
-    throw new Error('Forbidden: you can only release your own place');
+    throw shiftError('notYours');
   }
   if (a.state === 'released') return { data: { released: true, already: true }, updateStrategy: { type: 'none' } };
   if (a.state === 'done' || new Date(a.shift.start).getTime() <= Date.now()) {
-    throw new Error('This shift has already started');
+    throw shiftError('started');
   }
 
   const now = new Date().toISOString();
@@ -125,15 +126,15 @@ const claimShiftHole: ActionExecutionHandler = async (params, context) => {
   const uid = String(context.userId);
   const exec = asUser(context);
   const ctx = await loadShift(exec, String(params.shiftId));
-  if (!ctx) throw new Error('Shift not found');
+  if (!ctx) throw shiftError('notFound');
   const { shift } = ctx;
   if (shift.state === 'cancelled' || new Date(shift.start).getTime() <= Date.now()) {
-    throw new Error('This shift is no longer open');
+    throw shiftError('notOpen');
   }
-  if (!ctx.openMissionId) throw new Error('This shift plan is not attached to a mission');
+  if (!ctx.openMissionId) throw shiftError('noMission');
   const commitments = await loadCommitments(exec, ctx.openMissionId);
   const me = commitments.find((c) => c.userId === uid);
-  if (!me) throw new Error('Forbidden: only members assigned to this mission take its shifts');
+  if (!me) throw shiftError('notOnMission');
 
   const win = await loadWindow(exec, [ctx.planId], shift.start, new Date(new Date(shift.start).getTime() + 1).toISOString());
   const cov = coverageOf(shift, win.assignments);
@@ -155,7 +156,7 @@ const claimShiftHole: ActionExecutionHandler = async (params, context) => {
     const s = around.shifts.find((x) => x.id === a.shiftId);
     return !!s && new Date(s.start).getTime() < span[1] && span[0] < new Date(s.end).getTime();
   });
-  if (clash) throw new Error('You already have a shift at that time');
+  if (clash) throw shiftError('clash');
 
   // Taking the shift is itself the statement of availability (§1.1).
   await upsertDeclaration(exec, { shiftId: shift.id, planId: ctx.planId, projectId: ctx.projectId, userId: uid, stance: 'want' });
@@ -198,15 +199,15 @@ const reopenForShiftHole: ActionExecutionHandler = async (params, context) => {
   const uid = String(context.userId);
   const exec = asUser(context);
   const period = await loadPeriod(exec, String(params.periodId));
-  if (!period || !period.planId) throw new Error('Roster period not found');
+  if (!period || !period.planId) throw shiftError('notFound');
   if ((period.quotaSnapshot as any)?.reopenedAt) {
     return { data: { reopened: false, already: true }, updateStrategy: { type: 'none' } };
   }
   const shiftCtx = params.shiftId ? await loadShift(exec, String(params.shiftId)) : null;
   const openMissionId = shiftCtx?.openMissionId;
-  if (!openMissionId || shiftCtx?.planId !== period.planId) throw new Error('This hole does not belong to that roster');
+  if (!openMissionId || shiftCtx?.planId !== period.planId) throw shiftError('wrongRoster');
   const onMission = (await loadCommitments(exec, openMissionId)).some((c) => c.userId === uid);
-  if (!onMission) throw new Error('Forbidden: only members assigned to this mission open it to more candidates');
+  if (!onMission) throw shiftError('notOnMission');
 
   const { howMeny } = await recruitOneMore(exec, openMissionId);
   await markPeriodReopened(exec, period, new Date().toISOString());

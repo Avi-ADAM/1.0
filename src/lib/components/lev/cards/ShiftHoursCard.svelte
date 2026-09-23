@@ -15,6 +15,7 @@
   import { t, isRtl, locale } from '$lib/translations';
   import { toast } from 'svelte-sonner';
   import { executeAction, actionErrorText } from '$lib/client/actionClient';
+  import { describeShiftError } from '$lib/shifts/errors';
   import { isMobileOrTablet } from '$lib/utilities/device';
   import { dayLabel, localDateKey, timeRange } from '$lib/shifts/format';
   import { shiftWorkStore } from '$lib/utils/levShifts';
@@ -67,7 +68,7 @@
     busy = true;
     try {
       const res = await executeAction('logShiftHours', { assignmentId: String(buble.assignmentId), worked });
-      if (res?.success === false) throw new Error(actionErrorText(res, $t('shifts.cards.error')));
+      if (res?.success === false) throw new Error(describeShiftError(actionErrorText(res, ''), $t, $t('shifts.cards.error')));
       toast.success(worked ? $t('shifts.hours.logged') : $t('shifts.hours.notWorkedDone'));
       dropCard();
     } catch (e) {

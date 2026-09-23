@@ -10,6 +10,7 @@
   import { t, isRtl, locale } from '$lib/translations';
   import { toast } from 'svelte-sonner';
   import { executeAction, actionErrorText } from '$lib/client/actionClient';
+  import { describeShiftError } from '$lib/shifts/errors';
   import { isMobileOrTablet } from '$lib/utilities/device';
   import { dayLabel, localDateKey, moment, timeRange } from '$lib/shifts/format';
   import { reasonKey } from '$lib/shifts/explain';
@@ -32,7 +33,7 @@
     releasing = place.assignmentId;
     try {
       const res = await executeAction('releaseShiftAssignment', { assignmentId: String(place.assignmentId) });
-      if (res?.success === false) throw new Error(actionErrorText(res, $t('shifts.cards.error')));
+      if (res?.success === false) throw new Error(describeShiftError(actionErrorText(res, ''), $t, $t('shifts.cards.error')));
       toast.success($t('shifts.cards.draft.released'));
       shiftWorkStore.update((w) => ({
         ...w,

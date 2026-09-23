@@ -13,6 +13,7 @@
  */
 
 import type { ActionConfig, ActionExecutionHandler, ActionContext } from '../types.js';
+import { shiftError } from '$lib/shifts/errors.js';
 import { asUser } from '$lib/server/shifts/exec.js';
 import { shiftsLive } from '$lib/server/shifts/mode.js';
 import { createSwap, loadOpenSwapsFor, loadSwap, updateSwap, type SwapView } from '$lib/server/shifts/store.js';
@@ -122,8 +123,8 @@ const decideShiftSwap: ActionExecutionHandler = async (params, context, { notifi
   const uid = String(context.userId);
   const exec = asUser(context);
   const swap = await loadSwap(exec, String(params.decisionId));
-  if (!swap) throw new Error('Swap not found');
-  if (uid !== swap.fromUserId && uid !== swap.toUserId) throw new Error('Forbidden: only the two members of a swap answer it');
+  if (!swap) throw shiftError('notFound');
+  if (uid !== swap.fromUserId && uid !== swap.toUserId) throw shiftError('notParty');
   if (swap.status !== 'open') return { data: { status: swap.status, already: true }, updateStrategy: { type: 'none' } };
 
   const parties = { fromUserId: swap.fromUserId, toUserId: swap.toUserId };
@@ -133,12 +134,12 @@ const decideShiftSwap: ActionExecutionHandler = async (params, context, { notifi
   const answer = String(params.answer);
 
   if (answer === 'withdraw') {
-    if (uid !== swap.fromUserId) throw new Error('Only the member who offered a swap can withdraw it');
+    if (uid !== swap.fromUserId) throw shiftError('onlyProposer');
     await updateSwap(exec, swap, { status: 'withdrawn' });
     return { data: { status: 'withdrawn' }, updateStrategy: { type: 'fullRefresh' } };
   }
 
-  if (turn.waitingOn !== uid) throw new Error('This swap is waiting on the other member');
+  if (turn.waitingOn !== uid) throw shiftError('notYourTurn');
 
   if (answer === 'approve') {
     const signatures = [...swap.signatures, { userId: uid, order: turn.round, at: now.toISOString() }];
@@ -161,7 +162,7 @@ const decideShiftSwap: ActionExecutionHandler = async (params, context, { notifi
 
   if (answer === 'counter') {
     const terms = { giveId: swap.giveId ?? '', takeId: params.takeAssignmentId ? String(params.takeAssignmentId) : null };
-    if (terms.takeId === swap.takeId) throw new Error('A counter must change the terms — or approve them as they are');
+    if (terms.takeId === swap.takeId) throw shiftError('counterSame');
     let scene: SwapScene;
     try {
       scene = await loadSwapScene(exec, terms);
@@ -183,7 +184,7 @@ const decideShiftSwap: ActionExecutionHandler = async (params, context, { notifi
     return { data: { status: 'open', round: turn.round + 1, silence }, updateStrategy: { type: 'fullRefresh' } };
   }
 
-  throw new Error(`Unknown answer: ${answer}`);
+  throw shiftError('badAnswer');
 };
 
 export const decideShiftSwapConfig: ActionConfig = {

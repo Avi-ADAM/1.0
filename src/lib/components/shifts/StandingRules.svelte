@@ -10,6 +10,7 @@
   import { t } from '$lib/translations';
   import { toast } from 'svelte-sonner';
   import { executeAction, actionErrorText } from '$lib/client/actionClient';
+  import { describeShiftError } from '$lib/shifts/errors';
   import { stanceKey } from '$lib/shifts/explain';
   import { MAX_RULES, validateRules, type StandingRule } from '$lib/shifts/rules';
   import type { Stance } from '$lib/shifts/types';
@@ -54,7 +55,7 @@
         mesimabetahalichId,
         rules: $state.snapshot(draft).map((r) => ({ ...r, from: r.from || undefined, to: r.to || undefined }))
       });
-      if (res?.success === false) throw new Error(actionErrorText(res, $t('shifts.cards.error')));
+      if (res?.success === false) throw new Error(describeShiftError(actionErrorText(res, ''), $t, $t('shifts.cards.error')));
       toast.success($t('shifts.rules.saved'));
       await invalidateAll();
     } catch (e) {

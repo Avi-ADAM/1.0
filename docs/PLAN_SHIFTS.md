@@ -511,8 +511,8 @@ archiveSiblingAsks = archiveOpenMission
    בשליטתנו; `time-grid` לא.
 4. **`$t()`.** רכיב שלנו מתורגם לחמש השפות דרך המנגנון הרגיל.
 5. **נגישות.** תא רב־מצבי צריך `role="gridcell"` + `aria-label` שמתאר מצב וקיבולת.
-6. **תלות.** `@event-calendar/interaction` מיובא היום **רק** ב‑`sidur.svelte`.
-   עם החלפתו אפשר להסיר אותו מה‑`package.json`.
+6. **תלות.** ~~`@event-calendar/interaction` מיובא היום **רק** ב‑`sidur.svelte`.~~ **תוקן ב‑P11:**
+   `ResourceCalendar.svelte` טוען אותו דינמית, ולכן הוא נשאר (§13.12).
 
 מה כן נשאיר לספרייה: אם וכאשר תידרש **שכבת־על חודשית חוצת־משימות**
 (§9.4, שלב מאוחר) — שם `@event-calendar/day-grid` הוא בדיוק הכלי הנכון,
@@ -949,8 +949,8 @@ draftRoster({ shifts, candidates, commitments, availabilities, quotas, carryOver
       `shiftLog` (רישום בדיעבד דרך `timerSave`, או "לא עבדתי"). פירוט ב‑§13.10.
 - [x] **P10 — כללי קבע ו‑`/me/shifts`.** כלל = הצהרה עומדת שנגזרת בקריאה וממלאת
       רק את השתיקה; `/me/shifts` חוצה־רקמות. פירוט ב‑§13.11.
-- [ ] **P11 — i18n מלא.** `shifts.json` ×5, `ROUTED`, `check:i18n`,
-      `check:script`. הסרת `@event-calendar/interaction`.
+- [x] **P11 — i18n מלא.** שגיאות מקודדות (`errors.ts`), 221 מפתחות ×5, `sidur.svelte`
+      נמחק. `@event-calendar/interaction` **נשאר** — `ResourceCalendar` משתמש בו. פירוט ב‑§13.12.
 - [ ] **P12 — הפעלה.** `SHIFTS=on` ברקמת פיילוט אחת, מחזור אחד, סקירה.
 
 ### 13.1 P1 — מה נעשה בפועל
@@ -1538,6 +1538,29 @@ Strapi first").
 | שרת | `loadPlanLabels` ב‑store; `toCommitments` קורא את הכללים |
 
 **טסטים:** `rules.test.ts` 6.
+
+### 13.12 P11 — i18n מלא וניקוי
+
+- **שגיאות מקודדות.** כל סירוב שמגיע לחבר/ה מפעולות המשמרות הוא קוד ולא משפט
+  אנגלי ([`errors.ts`](../src/lib/shifts/errors.ts)): `shift:<code>` →
+  `shifts.error.*`, ‏`swap:<problem>` → `shifts.swap.problem.*`,
+  ‏`rules:<issue>:<i>` → `shifts.rules.issue.*`. הסיבה: השרת לא יודע באיזו שפה
+  החבר/ה קורא/ת, ומשפט אנגלי בכרטיס עברי הוא בדיוק הרגרסיה שכללי ה‑i18n
+  אוסרים. `describeShiftError` בכל הכרטיסים מתרגם בחזרה, ונופל לטקסט השרת רק
+  בהודעה לא מקודדת (למשל ממערכת הטיימרים).
+- **`shifts.json`:** 221 מפתחות, זהים בחמש השפות. `check:i18n`, ‏`check:script`
+  ובדיקת זוגיות המפתחות — נקיים. אין מחרוזת עברית או ערבית קשיחה ברכיבי
+  המשמרות.
+- **התראות שרת** (`notifier` בפעולות) נשארות אובייקטים `{ he, en }` לפי שפת
+  **הנמען** — זה המקרה היחיד ש‑`$t()` לא מבטא (CLAUDE.md).
+- **`sidur.svelte` נמחק.** אף אחד כבר לא ייבא אותו מאז P4.
+- **`@event-calendar/interaction` נשאר — תיקון ל‑§5.2 סעיף 6.** הקביעה שהוא
+  מיובא רק ב‑`sidur.svelte` לא נכונה: [`ResourceCalendar.svelte`](../src/lib/components/resource/ResourceCalendar.svelte)
+  טוען אותו בייבוא דינמי (לוח הזמינות של משאבים). הסרה ניסיונית נתפסה ב‑`npm run check`
+  והוחזרה, כך ש‑`package.json` לא השתנה.
+
+**טסטים:** `errors.test.ts` 3 — המיפוי, קיום מילים לכל קוד ב‑`he`, והנפילה
+לחלופה.
 
 ---
 

@@ -248,5 +248,24 @@
     "draft": "Draft",
     "toRoster": "To the rikma's roster",
     "link": "All my shifts, from every rikma"
+  },
+  "error": {
+    "notFound": "Not found — it may have changed in the meantime",
+    "notYours": "That is not yours",
+    "notOnShift": "You are not on this shift",
+    "started": "The shift has already started",
+    "notEnded": "The shift has not ended yet",
+    "notOpen": "The shift is no longer open",
+    "notConfirmed": "Only a confirmed shift can be logged",
+    "noMission": "The shift is not tied to a mission",
+    "notOnMission": "Only members assigned to the mission can do this",
+    "clash": "You already have a shift at that time",
+    "wrongRoster": "The shift does not belong to this roster",
+    "notParty": "Only the two members of a swap answer it",
+    "onlyProposer": "Only the member who offered it can withdraw it",
+    "notYourTurn": "The swap is waiting on the other member",
+    "counterSame": "A new proposal must change something — or approve it as it is",
+    "badAnswer": "Unknown answer",
+    "saveFailed": "Saving failed. Please try again."
   }
 }

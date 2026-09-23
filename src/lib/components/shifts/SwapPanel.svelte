@@ -12,6 +12,7 @@
   import { t, locale } from '$lib/translations';
   import { toast } from 'svelte-sonner';
   import { executeAction, actionErrorText } from '$lib/client/actionClient';
+  import { describeShiftError } from '$lib/shifts/errors';
   import { dayLabel, localDateKey, timeRange } from '$lib/shifts/format';
   import type { AssignmentLike } from '$lib/shifts/types';
 
@@ -67,12 +68,6 @@
   const nameOf = (id: string) => names[id] || `#${id}`;
   const theirPlaces = $derived(toUser ? placesOf(toUser) : []);
 
-  function errorText(res: any) {
-    const raw = actionErrorText(res, $t('shifts.cards.error'));
-    const m = /swap:(\w+)/.exec(raw);
-    return m ? $t(`shifts.swap.problem.${m[1]}`) || $t('shifts.cards.error') : raw;
-  }
-
   async function propose(giveId: string) {
     if (busy || !toUser) return;
     busy = true;
@@ -82,7 +77,7 @@
         toUserId: toUser,
         ...(takeId ? { takeAssignmentId: takeId } : {})
       });
-      if (res?.success === false) throw new Error(errorText(res));
+      if (res?.success === false) throw new Error(describeShiftError(actionErrorText(res, ''), $t, $t('shifts.cards.error')));
       toast.success(res?.data?.silence ? $t('shifts.swap.sentSilence') : $t('shifts.swap.sent'));
       openFor = null;
       await invalidateAll();
@@ -98,7 +93,7 @@
     busy = true;
     try {
       const res = await executeAction('decideShiftSwap', { decisionId: swapId, answer: 'withdraw' });
-      if (res?.success === false) throw new Error(errorText(res));
+      if (res?.success === false) throw new Error(describeShiftError(actionErrorText(res, ''), $t, $t('shifts.cards.error')));
       toast.success($t('shifts.swap.withdrawn'));
       await invalidateAll();
     } catch (e) {

@@ -17,6 +17,7 @@
  */
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import { shiftError } from '$lib/shifts/errors.js';
 import { asUser, run } from '$lib/server/shifts/exec.js';
 import { shiftsLive } from '$lib/server/shifts/mode.js';
 import { loadAssignment, updateAssignment } from '$lib/server/shifts/store.js';
@@ -26,10 +27,10 @@ const skipped = (why: string) => ({ data: { skipped: true, reason: why }, update
 async function ownPlace(context: any, assignmentId: string) {
   const exec = asUser(context);
   const a = await loadAssignment(exec, assignmentId);
-  if (!a || !a.shift) throw new Error('Assignment not found');
-  if (String(a.userId) !== String(context.userId)) throw new Error('Forbidden: this is not your shift');
-  if (a.rank !== 1 || a.state === 'released') throw new Error('You are not on this shift');
-  if (!a.mesimabetahalichId) throw new Error('This shift is not tied to a mission in progress');
+  if (!a || !a.shift) throw shiftError('notFound');
+  if (String(a.userId) !== String(context.userId)) throw shiftError('notYours');
+  if (a.rank !== 1 || a.state === 'released') throw shiftError('notOnShift');
+  if (!a.mesimabetahalichId) throw shiftError('noMission');
   return { exec, a };
 }
 
@@ -71,9 +72,9 @@ const logShiftHours: ActionExecutionHandler = async (params, context) => {
   if (!shiftsLive()) return skipped('SHIFTS is not on');
   const { exec, a } = await ownPlace(context, String(params.assignmentId));
   const shift = a.shift!;
-  if (new Date(shift.end).getTime() > Date.now()) throw new Error('This shift has not ended yet');
+  if (new Date(shift.end).getTime() > Date.now()) throw shiftError('notEnded');
   if (a.timerId) return { data: { logged: true, already: true }, updateStrategy: { type: 'none' } };
-  if (a.state !== 'confirmed') throw new Error('Only a confirmed shift can be logged');
+  if (a.state !== 'confirmed') throw shiftError('notConfirmed');
 
   if (params.worked === false) {
     await updateAssignment(exec, a.id, { state: 'released', releasedAt: new Date().toISOString(), releaseReason: 'notWorked' });
@@ -87,7 +88,7 @@ const logShiftHours: ActionExecutionHandler = async (params, context) => {
     { id: a.mesimabetahalichId }
   );
   const ma = m?.mesimabetahalich?.data?.attributes;
-  if (!ma) throw new Error('Mission not found');
+  if (!ma) throw shiftError('notFound');
   const projectId = String(ma.project?.data?.id ?? a.projectId ?? '');
   const hours = Math.round(((new Date(shift.end).getTime() - new Date(shift.start).getTime()) / 3_600_000) * 100) / 100;
 
@@ -111,7 +112,7 @@ const logShiftHours: ActionExecutionHandler = async (params, context) => {
     }
   );
   const timerId = created?.createTimer?.data?.id ? String(created.createTimer.data.id) : null;
-  if (!timerId) throw new Error('Could not record the shift hours');
+  if (!timerId) throw shiftError('saveFailed');
   await updateAssignment(exec, a.id, { timer: timerId });
 
   // The month counter moves only for hours that fall in this month — the same

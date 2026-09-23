@@ -14,6 +14,7 @@
   import { t, isRtl, locale } from '$lib/translations';
   import { toast } from 'svelte-sonner';
   import { executeAction, actionErrorText } from '$lib/client/actionClient';
+  import { describeShiftError } from '$lib/shifts/errors';
   import { isMobileOrTablet } from '$lib/utilities/device';
   import { dayLabel, localDateKey, moment, timeRange } from '$lib/shifts/format';
   import { shiftWorkStore } from '$lib/utils/levShifts';
@@ -38,13 +39,6 @@
     if (onProj && buble.projectId) onProj({ id: buble.projectId });
   }
 
-  /** A refusal from the server arrives as `swap:<problem>`; anything else is shown as is. */
-  function errorText(res) {
-    const raw = actionErrorText(res, $t('shifts.cards.error'));
-    const m = /swap:(\w+)/.exec(raw);
-    return m ? $t(`shifts.swap.problem.${m[1]}`) || $t('shifts.cards.error') : raw;
-  }
-
   function dropCard() {
     shiftWorkStore.update((w) => ({ ...w, swaps: w.swaps.filter((s) => s.decisionId !== buble.decisionId) }));
     onDone?.({ coinlapach: buble.coinlapach });
@@ -60,7 +54,7 @@
         answer,
         ...(answer === 'counter' && choice ? { takeAssignmentId: choice } : {})
       });
-      if (res?.success === false) throw new Error(errorText(res));
+      if (res?.success === false) throw new Error(describeShiftError(actionErrorText(res, ''), $t, $t('shifts.cards.error')));
       const status = res?.data?.status;
       toast.success(
         answer === 'counter'
