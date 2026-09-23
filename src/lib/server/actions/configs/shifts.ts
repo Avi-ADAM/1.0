@@ -15,6 +15,7 @@ import {
 } from './shiftCardActions.js';
 import { decideShiftSwapConfig, proposeShiftSwapConfig } from './shiftSwapActions.js';
 import { linkShiftTimerConfig, logShiftHoursConfig } from './shiftHoursActions.js';
+import { setShiftRulesConfig } from './shiftRulesActions.js';
 
 export const shiftActionConfigs: ActionConfig[] = [
   declareShiftAvailabilityConfig,
@@ -25,5 +26,6 @@ export const shiftActionConfigs: ActionConfig[] = [
   proposeShiftSwapConfig,
   decideShiftSwapConfig,
   linkShiftTimerConfig,
-  logShiftHoursConfig
+  logShiftHoursConfig,
+  setShiftRulesConfig
 ];

@@ -335,7 +335,7 @@ export async function loadCommitments(exec: ShiftExec, openMissionId: string): P
     exec,
     `query ($id: ID!) { openMission(id: $id) { data { id attributes {
       mesimabetahaliches(pagination: { limit: 500 }) { data { id attributes {
-        lifecycle finnished shiftsMin shiftsMax users_permissions_user { data { id } } tafkidims { data { id } } } } } } } } }`,
+        lifecycle finnished shiftsMin shiftsMax shiftRules shiftRulesAt users_permissions_user { data { id } } tafkidims { data { id } } } } } } } } }`,
     'loadCommitments',
     { id: openMissionId }
   );
@@ -889,4 +889,30 @@ export async function loadUserNames(exec: ShiftExec, ids: string[]): Promise<Rec
     { ids: want }
   );
   return Object.fromEntries(nodes(d?.usersPermissionsUsers).map((n: any) => [String(n.id), n.attributes?.username ?? '']));
+}
+
+/** Plan names, time zones and rikma names for a set of plans — the `/me/shifts` labels. */
+export async function loadPlanLabels(
+  exec: ShiftExec,
+  planIds: string[]
+): Promise<Record<string, { name: string; timeZone: string | null; projectId: string | null; projectName: string }>> {
+  const want = [...new Set(planIds.filter(Boolean))];
+  if (want.length === 0) return {};
+  const d = await run(
+    exec,
+    `query ($ids: [ID]) { shiftPlans(filters: { id: { in: $ids } }, pagination: { limit: 100 }) {
+      data { id attributes { name timezone project { data { id attributes { projectName } } } } } } }`,
+    'loadPlanLabels',
+    { ids: want }
+  );
+  return Object.fromEntries(
+    nodes(d?.shiftPlans).map((n: any) => {
+      const a = n.attributes ?? {};
+      const p = a.project?.data;
+      return [
+        String(n.id),
+        { name: a.name ?? '', timeZone: a.timezone ?? null, projectId: p?.id ? String(p.id) : null, projectName: p?.attributes?.projectName ?? '' }
+      ];
+    })
+  );
 }

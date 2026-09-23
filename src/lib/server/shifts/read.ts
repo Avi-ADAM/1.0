@@ -18,6 +18,7 @@ import type {
   Stance
 } from '$lib/shifts/types.js';
 import { holdsSeat } from '$lib/missions/headcount.js';
+import type { StandingRule } from '$lib/shifts/rules.js';
 
 type Node = { id?: string | number | null; attributes?: Record<string, any> | null } | null | undefined;
 
@@ -201,6 +202,9 @@ export function toPeriod(n: Node): PeriodView {
 
 export interface CommitmentView extends Commitment {
   mesimabetahalichId: string;
+  /** The member's standing rules on this mission (src/lib/shifts/rules.ts). */
+  rules?: StandingRule[] | null;
+  rulesAt?: string | null;
 }
 
 /**
@@ -225,7 +229,9 @@ export function toCommitments(openMissionAttrs: Record<string, any>): Commitment
       mesimabetahalichId: prev?.mesimabetahalichId ?? String(n?.id),
       min: prev ? Math.max(prev.min ?? 0, min ?? 0) || null : min,
       max: prev ? (prev.max == null || max == null ? null : Math.max(prev.max, max)) : max,
-      tafkidimIds: [...new Set([...(prev?.tafkidimIds ?? []), ...relIds(a.tafkidims)])]
+      tafkidimIds: [...new Set([...(prev?.tafkidimIds ?? []), ...relIds(a.tafkidims)])],
+      rules: prev?.rules ?? (Array.isArray(a.shiftRules) ? a.shiftRules : null),
+      rulesAt: prev?.rulesAt ?? a.shiftRulesAt ?? null
     });
   }
   return [...out.values()];

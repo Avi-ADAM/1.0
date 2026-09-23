@@ -6,6 +6,7 @@
 
 import { buildShiftWork, type ShiftWork, type WorkPlanInput } from '$lib/shifts/work.js';
 import { cycleContaining, cyclesBetween, resolveSettings } from '$lib/shifts/settings.js';
+import { withStandingRules } from '$lib/shifts/rules.js';
 import type { ShiftExec } from './exec.js';
 import type { ShiftsMode } from './mode.js';
 import { planIsActive } from './read.js';
@@ -50,7 +51,7 @@ export async function loadShiftWork(exec: ShiftExec, uid: string, mode: ShiftsMo
       plan: { id: plan.id, name: plan.name, projectId: plan.projectId, openMissionId: plan.openMissionId, timeZone: settings.timeZone },
       cycles: cyclesBetween(plan.id, current.start, until, settings),
       shifts: win.shifts,
-      declarations: win.declarations,
+      declarations: withStandingRules(win.declarations, win.shifts, commitments, settings.timeZone),
       assignments: win.assignments,
       periods: Object.fromEntries(
         periods

@@ -10,6 +10,7 @@
 import { calcDeadlineMs } from '$lib/server/actions/configs/actionUtils.js';
 import { checkSwap, silenceMayComplete, swapDeadline, swapOps, swapTurn, type SwapProblem, type SwapTerms, type SwapWorld } from '$lib/shifts/swap.js';
 import { cycleContaining, resolveSettings, type ShiftSettings } from '$lib/shifts/settings.js';
+import { withStandingRules } from '$lib/shifts/rules.js';
 import type { ShiftExec } from './exec.js';
 import type { AssignmentView, CommitmentView, PeriodView, ShiftView } from './read.js';
 import {
@@ -77,7 +78,7 @@ export async function loadSwapScene(exec: ShiftExec, terms: SwapTerms): Promise<
     world: {
       shifts: win.shifts,
       assignments: win.assignments,
-      declarations: win.declarations,
+      declarations: withStandingRules(win.declarations, win.shifts, commitments, settings.timeZone),
       commitments: commitments.map((c) => ({ userId: c.userId, max: c.max ?? null })),
       cycle: null
     }

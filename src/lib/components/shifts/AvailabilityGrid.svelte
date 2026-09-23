@@ -31,6 +31,8 @@
     shiftId: string;
     stance: Stance;
     prefRank?: number | null;
+    /** Said by a standing rule, not tapped (src/lib/shifts/rules.ts). A tap overrides it. */
+    fromRule?: boolean;
   }
 
   interface Props {
@@ -48,12 +50,12 @@
   let { shifts, declarations, ranks = {}, timeZone, cycleStart, cycleEnd, disabled = false }: Props = $props();
 
   /** Taps not yet reflected in `declarations` (the page reloads its data only on navigation). */
-  let local = $state<Record<string, { stance: Stance; prefRank: number | null }>>({});
+  let local = $state<Record<string, { stance: Stance; prefRank: number | null; fromRule?: boolean }>>({});
   let saving = $state<Record<string, boolean>>({});
 
   let stances = $derived.by(() => {
-    const out: Record<string, { stance: Stance; prefRank: number | null }> = {};
-    for (const d of declarations) out[d.shiftId] = { stance: d.stance, prefRank: d.prefRank ?? null };
+    const out: Record<string, { stance: Stance; prefRank: number | null; fromRule?: boolean }> = {};
+    for (const d of declarations) out[d.shiftId] = { stance: d.stance, prefRank: d.prefRank ?? null, fromRule: d.fromRule === true };
     return { ...out, ...local };
   });
 
@@ -107,6 +109,9 @@
       >
         <span class="av-time">{range}</span>
         <span class="av-stance">{mine ? $t(stanceKey(mine.stance)) : $t('shifts.stance.none')}</span>
+        {#if mine?.fromRule}
+          <span class="av-meta av-rule">{$t('shifts.rules.byRule')}</span>
+        {/if}
         {#if s.need > 1}
           <span class="av-meta">{$t('shifts.grid.need', { count: s.need })}</span>
         {/if}
@@ -191,6 +196,9 @@
   }
   .av-coming {
     font-weight: 700;
+  }
+  .av-rule {
+    font-style: italic;
   }
   .av-star {
     position: absolute;

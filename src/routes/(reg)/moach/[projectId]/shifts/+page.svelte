@@ -11,6 +11,8 @@
   import RosterGrid from '$lib/components/shifts/RosterGrid.svelte';
   import FairnessPanel from '$lib/components/shifts/FairnessPanel.svelte';
   import SwapPanel from '$lib/components/shifts/SwapPanel.svelte';
+  import StandingRules from '$lib/components/shifts/StandingRules.svelte';
+  import { withStandingRules } from '$lib/shifts/rules';
 
   let { data } = $props();
 
@@ -53,8 +55,15 @@
   const cycleAssignments = $derived(
     shadowRoster ?? data.window.assignments.filter((a) => shiftIds.has(a.shiftId))
   );
+  const myCommitment = $derived(block?.commitments.find((c) => c.userId === uid) ?? null);
+  // What I tapped, plus what my standing rules say about the shifts I did not.
   const myDeclarations = $derived(
-    data.window.declarations.filter((d) => d.userId === uid && shiftIds.has(d.shiftId))
+    withStandingRules(
+      data.window.declarations.filter((d) => d.userId === uid && shiftIds.has(d.shiftId)),
+      cycleShifts,
+      myCommitment ? [myCommitment] : [],
+      tz
+    ).filter((d) => d.userId === uid)
   );
   const myRanks = $derived(
     Object.fromEntries(
@@ -95,7 +104,12 @@
 </svelte:head>
 
 <div class="mx-auto flex max-w-6xl flex-col gap-4 rounded-2xl bg-surface p-4 text-surfaceInk">
-  <h1 class="text-2xl font-bold">{$t('shifts.page.title')}</h1>
+  <div class="flex flex-wrap items-baseline justify-between gap-2">
+    <h1 class="text-2xl font-bold">{$t('shifts.page.title')}</h1>
+    {#if data.mode !== 'off'}
+      <a class="text-sm underline" href="/me/shifts">{$t('shifts.me.link')}</a>
+    {/if}
+  </div>
 
   {#if data.mode === 'off'}
     <p class="rounded-xl border border-surfaceLine bg-surface2 p-4">{$t('shifts.page.off')}</p>
@@ -208,7 +222,12 @@
         {:else if !block.onMission}
           <p class="rounded-xl border border-surfaceLine bg-surface2 p-4">{$t('shifts.page.notOnMission')}</p>
         {:else}
-          {#key `${block.plan.id}|${cycle.periodKey}`}
+          {#if myCommitment}
+            {#key `${myCommitment.mesimabetahalichId}|${myCommitment.rulesAt ?? ''}`}
+              <StandingRules mesimabetahalichId={myCommitment.mesimabetahalichId} rules={myCommitment.rules ?? []} />
+            {/key}
+          {/if}
+          {#key `${block.plan.id}|${cycle.periodKey}|${myCommitment?.rulesAt ?? ''}`}
             <AvailabilityGrid
               shifts={cycleShifts}
               declarations={myDeclarations}

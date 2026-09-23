@@ -208,5 +208,45 @@
     "notWorked": "I didn't work this shift",
     "notWorkedDone": "Noted that the shift was not worked",
     "approvalNote": "The hours go to the rikma for approval like any other hours."
+  },
+  "rules": {
+    "title": "Standing rules",
+    "hint": "For example \"never on Fridays\" or \"Sunday mornings — want\". A rule answers every shift you haven't answered by hand; tapping a shift in the grid always wins over a rule. The first rule that matches decides, so put a narrow rule above a broad one.",
+    "days": "Days",
+    "day": {
+      "0": "Sun",
+      "1": "Mon",
+      "2": "Tue",
+      "3": "Wed",
+      "4": "Thu",
+      "5": "Fri",
+      "6": "Sat"
+    },
+    "from": "From",
+    "to": "To",
+    "stance": "Answer",
+    "up": "Move up",
+    "down": "Move down",
+    "remove": "Remove",
+    "add": "Add a rule",
+    "save": "Save rules",
+    "saved": "Rules saved",
+    "byRule": "By standing rule",
+    "issue": {
+      "noDays": "Pick at least one day",
+      "badDay": "Invalid day",
+      "badTime": "Invalid time",
+      "emptyRange": "The end time must be after the start time",
+      "badStance": "Pick an answer",
+      "tooMany": "Too many rules"
+    }
+  },
+  "me": {
+    "title": "My coming shifts",
+    "shadow": "Shifts are still in trial mode: no roster binds anyone yet, so there are no shifts here.",
+    "empty": "You have no coming shifts.",
+    "draft": "Draft",
+    "toRoster": "To the rikma's roster",
+    "link": "All my shifts, from every rikma"
   }
 }

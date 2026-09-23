@@ -208,5 +208,45 @@
     "notWorked": "No trabajé este turno",
     "notWorkedDone": "Se anotó que el turno no se trabajó",
     "approvalNote": "Las horas van a la rikma para su aprobación como cualquier otra."
+  },
+  "rules": {
+    "title": "Reglas fijas",
+    "hint": "Por ejemplo, \"nunca los viernes\" o \"las mañanas de domingo — quiero\". Una regla responde a cada turno que no respondiste a mano; tocar un turno en la tabla siempre gana a una regla. Decide la primera regla que coincide, así que pon una regla estrecha encima de una amplia.",
+    "days": "Días",
+    "day": {
+      "0": "Dom",
+      "1": "Lun",
+      "2": "Mar",
+      "3": "Mié",
+      "4": "Jue",
+      "5": "Vie",
+      "6": "Sáb"
+    },
+    "from": "Desde",
+    "to": "Hasta",
+    "stance": "Respuesta",
+    "up": "Subir",
+    "down": "Bajar",
+    "remove": "Quitar",
+    "add": "Añadir una regla",
+    "save": "Guardar reglas",
+    "saved": "Reglas guardadas",
+    "byRule": "Por regla fija",
+    "issue": {
+      "noDays": "Elige al menos un día",
+      "badDay": "Día no válido",
+      "badTime": "Hora no válida",
+      "emptyRange": "La hora de fin debe ser posterior a la de inicio",
+      "badStance": "Elige una respuesta",
+      "tooMany": "Demasiadas reglas"
+    }
+  },
+  "me": {
+    "title": "Mis próximos turnos",
+    "shadow": "Los turnos aún están en modo de prueba: ningún cuadrante obliga a nadie todavía, así que aquí no hay turnos.",
+    "empty": "No tienes turnos próximos.",
+    "draft": "Borrador",
+    "toRoster": "Al cuadrante de la rikma",
+    "link": "Todos mis turnos, de todas las rikmas"
   }
 }

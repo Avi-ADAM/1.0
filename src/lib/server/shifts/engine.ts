@@ -27,6 +27,7 @@ import type { ShiftsMode } from './mode.js';
 import type { AssignmentLike } from '$lib/shifts/types.js';
 import { run, type ShiftExec } from './exec.js';
 import { matureDueSwaps } from './swaps.js';
+import { withStandingRules } from '$lib/shifts/rules.js';
 import { planIsActive, type PeriodView, type ShiftPlanView } from './read.js';
 import {
   attachShifts,
@@ -190,7 +191,8 @@ export async function runDraft(
   const seed = period.seed ?? period.periodKey ?? `period-${period.id}`;
   const result = draftRoster({
     shifts,
-    declarations: win.declarations,
+    // A standing rule is a standing declaration (rules.ts): it fills the silence.
+    declarations: withStandingRules(win.declarations, shifts, commitments, settings.timeZone),
     commitments,
     carryOver: plan.balanceCache ?? {},
     seed,
