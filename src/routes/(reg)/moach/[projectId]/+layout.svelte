@@ -21,9 +21,12 @@
   import Dialog from '$lib/celim/ui/dialog.svelte';
   import { sendToSer } from '$lib/send/sendToSer.js';
   import { browser } from '$app/environment';
+  import { provideRikmaCurrency } from '$lib/money/context.svelte';
 
   let { children, data } = $props();
   const moachStore = setMoachStore();
+  // Every amount on this rikma's pages is stored in its currency (PLAN_MULTI_CURRENCY D-C2).
+  provideRikmaCurrency(() => data?.projectBase?.currencyCode);
   let socketUnsubscribe;
   let projectId = $derived(page.params.projectId);
 
@@ -165,7 +168,10 @@
   // unchanged — only the nav is regrouped. 'edit' moved to the header pencil,
   // 'create' is the gold action pill at the start of the nav row.
   const groups = [
-    { id: 'main', label: 'main', tabs: ['main'] },
+    // 'docs' = the rikma's shared library (PLAN_RIKMA_SHARED_INFO). It sits
+    // beside 'main' because it is the rikma's own material — what it holds and
+    // refers to — rather than work moving through it.
+    { id: 'main', label: 'main', tabs: ['main', 'docs'] },
     { id: 'work', label: 'work', tabs: ['progress', 'acts', 'kanban', 'gantt', 'timers', 'shifts'] },
     // 'api' = how work reaches this rikma from systems outside it — the same
     // group as the flows work moves along once it is here.

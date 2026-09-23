@@ -1,4 +1,5 @@
 <script>
+  import { useFormatMoney } from '$lib/money/context.svelte';
   /**
    * "Dana marked ₪2,100 as sent — did it arrive?" (PLAN_STIPEND §6, §8).
    *
@@ -20,6 +21,7 @@
   import CycleFacts from '$lib/components/stipend/CycleFacts.svelte';
 
   let { buble, isFirst = false, onProj, onUser, onDone } = $props();
+  const fmtMoney = useFormatMoney();
 
   let busy = $state(false);
   let counterOpen = $state(false);
@@ -76,7 +78,7 @@
     logoSrc={buble.src}
     projectName={buble.projectName}
     cardType={$t('stipend.confirm.cardType')}
-    cardTitle={`₪${Number(buble.amount).toFixed(2)}`}
+    cardTitle={fmtMoney(Number(buble.amount), null, { fraction: 'full' })}
     glowColor="teal"
     onProjectClick={() => onProj?.({ id: buble.projectId })}
   />
@@ -87,7 +89,7 @@
     <p class="text-sm text-gray-700 dark:text-gray-300">
       {$t('stipend.confirm.body', {
         name: buble.funderName,
-        count: Number(buble.amount).toFixed(2)
+        count: fmtMoney(buble.amount, null, { fraction: 'full' })
       })}
     </p>
 

@@ -399,6 +399,13 @@ project באותו רגע (`project.join` בלי `project.leave`). דחייה = 
 
 ### T8 — WebRTC (S3b)
 
+> **קדם-T8 (ספטמבר 2026): פיילוט מדידה בספריית הרקמה** —
+> [PLAN_P2P_PILOT.md](./PLAN_P2P_PILOT.md). signaling דרך socket-server עם כרטיס
+> חברוּת חתום, `src/lib/p2p/peer.ts` (העברה אחת על DataChannel, נבדק בדפדפן אמיתי),
+> וטלמטריה שעונה על H1 (קישוריות בלי TURN) ו-H2 (זמינות עמית אונליין) לפני
+> שמחליטים על S3. כש-T8 יתחיל: לשמור את ה-signaling ואת `peer.ts`, ולהוסיף
+> `SYNC_HEADS/SYNC_DIFF` כסוג הודעה נוסף על אותו ערוץ.
+
 הפרוטוקול ב-`protocol.ts` אגנוסטי לתעבורה בכוונה: אותם `SYNC_HEADS`/
 `SYNC_DIFF` על DataChannel. ה-relay נשאר signaling + fallback. אל תיגע
 בפרוטוקול — רק תעבורה חדשה שקוראת לאותן פונקציות.

@@ -1,4 +1,5 @@
 <script>
+  import { useFormatMoney } from '$lib/money/context.svelte';
   /**
    * "This mission also wants a subsistence stipend" — stated while the mission
    * is being written (docs/PLAN_STIPEND.md §13).
@@ -49,6 +50,7 @@
     hours = 0,
     iskvua = false
   } = $props();
+  const fmtMoney = useFormatMoney();
 
   let open = $state(false);
 
@@ -112,7 +114,7 @@
         <input type="number" min="0" step="1" bind:value={rate} class={INPUT} />
         {#if Number(marketRate) > 0}
           <span class={MUTED}>
-            {$t('stipend.terms.marketRate', { count: marketRate })}
+            {$t('stipend.terms.marketRate', { count: fmtMoney(marketRate) })}
           </span>
         {/if}
       </label>
@@ -187,7 +189,7 @@
             {$t(
               iskvua ? 'stipend.mission.budgetCycle' : 'stipend.mission.budget',
               {
-                count: budget.toLocaleString()
+                count: fmtMoney(budget, null, { fraction: 'whole' })
               }
             )}
           </p>
@@ -203,7 +205,7 @@
             <p class="font-semibold">
               {$t('stipend.tradeoff.with', {
                 count: tradeoff.sharePctWith.toFixed(1),
-                cash: Math.round(tradeoff.cash).toLocaleString()
+                cash: fmtMoney(Math.round(tradeoff.cash), null, { fraction: 'whole' })
               })}
             </p>
           </div>

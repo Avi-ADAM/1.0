@@ -1,4 +1,6 @@
 ﻿<script>
+  import { useFormatMoney } from '$lib/money/context.svelte';
+  import Money from '$lib/components/money/Money.svelte';
   //טבלת מתנות כפתור מכירה מקפיץ תפריט של איפה הכסף יושב
   import Col from './column/main.svelte';
   import New from './newmatana.svelte';
@@ -35,6 +37,8 @@
 
   // One-line, human-readable summary of a site-share note for dense contexts
   // (table cells, CSV export) where the full card would be too large.
+  const fmtMoney = useFormatMoney();
+
   function siteShareSummary(note) {
     const p = parseSiteShareNote(note);
     if (!p) return note || '';
@@ -42,13 +46,13 @@
     if (p.fromProjectId)
       parts.push(`${$t('project.hamatanot.siteShare.fromRikma')} #${p.fromProjectId}`);
     if (p.paid !== null)
-      parts.push(`${$t('project.hamatanot.siteShare.paid')} ₪${p.paid}`);
+      parts.push(`${$t('project.hamatanot.siteShare.paid')} ${fmtMoney(p.paid)}`);
     if (p.adjustDirection) {
       const dir =
         p.adjustDirection === 'less'
           ? $t('project.hamatanot.siteShare.less')
           : $t('project.hamatanot.siteShare.more');
-      const proposed = p.proposed !== null ? ` (₪${p.proposed})` : '';
+      const proposed = p.proposed !== null ? ` (${fmtMoney(p.proposed)})` : '';
       const reason = p.reason ? ` - ${p.reason}` : '';
       parts.push(`${dir}${proposed}${reason}`);
     }
@@ -825,7 +829,7 @@
                   class="text-xl font-semibold text-center bg-gradient-to-r from-cyan-500 to-barbi bg-clip-text text-transparent"
                   title={$t('project.hamatanot.amount')}
                 >
-                  ₪{data.attributes.in}
+                  <Money amount={data.attributes.in} entry={data.attributes} />
                 </p>
               </div>
 
@@ -1093,7 +1097,7 @@
                   >
                     <td>{index + 1}</td>
                     <td class="font-semibold">{getMatanaName(sale)}</td>
-                    <td class="font-bold">₪{sale.attributes.in}</td>
+                    <td class="font-bold"><Money amount={sale.attributes.in} entry={sale.attributes} /></td>
                     <td>
                       <div class="flex items-center gap-2">
                         <img
@@ -1146,7 +1150,7 @@
               <tfoot>
                 <tr class="total-row">
                   <td colspan="2" class="font-bold">{$t('project.hamatanot.total')}</td>
-                  <td class="font-bold">₪{totalSales}</td>
+                  <td class="font-bold"><Money amount={totalSales} /></td>
                   <td colspan="4"></td>
                 </tr>
               </tfoot>

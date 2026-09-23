@@ -1,12 +1,15 @@
 <script>
+  import { useFormatMoney } from '$lib/money/context.svelte';
   import { onMount, onDestroy } from 'svelte';
   import { showFoot } from '$lib/stores/showFoot.js';
   import { goto } from '$app/navigation';
   import { uPic } from '$lib/stores/uPic.js';
   import { t } from '$lib/translations';
+  import { page } from '$app/state';
 
   /** @type {{ data: { mine: any[]; publicFeed: any[]; queryOk: { mine: boolean; public: boolean }; uid?: string; un?: string } }} */
   let { data } = $props();
+  const fmtMoney = useFormatMoney();
 
   onMount(() => showFoot.set(false));
   onDestroy(() => showFoot.set(true));
@@ -43,7 +46,7 @@
   }
   function fmtBudget(n) {
     if (n == null || !Number.isFinite(+n)) return 'לפי הצעה';
-    return `₪ ${(+n).toLocaleString('he-IL')}`;
+    return fmtMoney(+n);
   }
   function relativeTime(iso) {
     if (!iso) return '';
@@ -83,6 +86,7 @@
       status: c.status,
       coveredPct: coveredFromScore(c.fulfillmentScore),
       proposalsCount: c.proposalsCount || 0,
+      pendingCount: c.pendingCount || 0,
       missionsCount: c.missionsCount || 0,
       resourcesCount: c.resourcesCount || 0,
       lastEvent: eventFromStatus(c.status, (c.proposalsCount || 0) > 0),
@@ -90,7 +94,8 @@
       budget: fmtBudget(c.totalBounti),
       whenStr: fmtDate(c.startDate),
       values: c.values || [],
-      pinkAccent: c.status === 'negotiating'
+      // Glow where something is waiting for the customer's answer.
+      pinkAccent: c.status === 'negotiating' || (c.pendingCount || 0) > 0
     };
   }
   function toPublicCard(c) {
@@ -230,9 +235,15 @@
   ];
 
   /* ===== Resolved lists: real data when present, mock otherwise ===== */
-  const MY_WISHES = $derived(
-    data?.mine?.length ? data.mine.map(toMineCard) : MOCK_MINE
+  /* The design mock stands in only when the query itself failed. A real
+     customer with no wishes yet used to be shown someone else's ("a day off
+     for mom") as their own — the fastest way to get lost on arrival. */
+  const usingMock = $derived(!data?.queryOk?.mine);
+  const ALL_MINE = $derived(
+    usingMock ? MOCK_MINE : (data?.mine ?? []).map(toMineCard)
   );
+  const MY_WISHES = $derived(ALL_MINE.filter((w) => w.status !== 'draft'));
+  const MY_DRAFTS = $derived(ALL_MINE.filter((w) => w.status === 'draft'));
   const PUBLIC_FEED = $derived(
     data?.publicFeed?.length ? data.publicFeed.map(toPublicCard) : MOCK_PUBLIC
   );
@@ -258,10 +269,15 @@
       label: $t('concierge.community_tab'),
       count: PUBLIC_FEED.length
     },
-    { id: 'drafts', label: $t('concierge.drafts_tab'), count: 0 }
+    { id: 'drafts', label: $t('concierge.drafts_tab'), count: MY_DRAFTS.length }
   ]);
 
-  let activeTab = $state('mine');
+  // `?tab=drafts` — the profile badge links straight to the drafts.
+  let activeTab = $state(
+    ['mine', 'browse', 'drafts'].includes(page.url.searchParams.get('tab') ?? '')
+      ? /** @type {string} */ (page.url.searchParams.get('tab'))
+      : 'mine'
+  );
   let searchQ = $state('');
 
   const filteredMine = $derived(
@@ -338,6 +354,10 @@
 
   function openWish(id) {
     goto(`/concierge/${id}`);
+  }
+  /** A draft is finished in the composer, not reviewed. */
+  function openDraft(id) {
+    goto(`/concierge/new?draft=${id}`);
   }
   function newWish() {
     goto('/concierge/new');
@@ -485,12 +505,30 @@
             </div>
 
             {#if filteredMine.length === 0}
+              <!-- Nothing sent yet is not "no search results". -->
+              {@const firstTime = !searchQ.trim()}
               <div class="empty">
                 <div class="empty-icon">✶</div>
                 <div class="empty-title">
-                  {$t('concierge.no_search_results')}
+                  {firstTime
+                    ? $t('concierge.no_wishes_title')
+                    : $t('concierge.no_search_results')}
                 </div>
-                <div class="empty-sub">{$t('concierge.try_another_word')}</div>
+                <div class="empty-sub">
+                  {#if firstTime && MY_DRAFTS.length}
+                    <button
+                      class="empty-link"
+                      onclick={() => (activeTab = 'drafts')}
+                      >{$t('concierge.no_wishes_has_drafts', {
+                        count: MY_DRAFTS.length
+                      })}</button
+                    >
+                  {:else}
+                    {firstTime
+                      ? $t('concierge.no_wishes_sub')
+                      : $t('concierge.try_another_word')}
+                  {/if}
+                </div>
                 <button
                   class="btn-jewel"
                   style="margin-top:14px"
@@ -518,6 +556,13 @@
                         ></span>
                         {statusLabel(w.status)}
                       </span>
+                      {#if w.pendingCount > 0}
+                        <span class="wc-news"
+                          >{$t('concierge.pending_offers', {
+                            count: w.pendingCount
+                          })}</span
+                        >
+                      {/if}
                       <code class="wc-code">{w.code}</code>
                     </div>
 
@@ -686,19 +731,54 @@
           {#if activeTab === 'drafts'}
             <div class="section-label">
               <span class="lead"
-                ><span class="gem"></span>{$t('concierge.drafts_label')} · 0</span
+                ><span class="gem"></span>{$t('concierge.drafts_label')} · {MY_DRAFTS.length}</span
               >
             </div>
-            <div class="empty">
-              <div class="empty-icon">✎</div>
-              <div class="empty-title">{$t('concierge.no_drafts_title')}</div>
-              <div class="empty-sub">{$t('concierge.no_drafts_sub')}</div>
-              <button
-                class="btn-jewel"
-                style="margin-top:14px"
-                onclick={newWish}>{$t('concierge.start_wish_btn')}</button
-              >
-            </div>
+            {#if MY_DRAFTS.length === 0}
+              <div class="empty">
+                <div class="empty-icon">✎</div>
+                <div class="empty-title">{$t('concierge.no_drafts_title')}</div>
+                <div class="empty-sub">{$t('concierge.no_drafts_sub')}</div>
+                <button
+                  class="btn-jewel"
+                  style="margin-top:14px"
+                  onclick={newWish}>{$t('concierge.start_wish_btn')}</button
+                >
+              </div>
+            {:else}
+              <div class="wish-grid">
+                {#each MY_DRAFTS as w, i (w.id)}
+                  <button
+                    class="wish-card"
+                    onclick={() => openDraft(w.id)}
+                    style="animation-delay:{(i + 1) * 0.06}s"
+                  >
+                    <div class="wc-top">
+                      <span
+                        class="wc-status"
+                        style="color:{statusColor(w.status)}"
+                      >
+                        <span
+                          class="wc-status-dot"
+                          style="background:{statusDot(w.status)}"
+                        ></span>
+                        {statusLabel(w.status)}
+                      </span>
+                      <span class="wc-event-time">{w.lastEventTime}</span>
+                    </div>
+                    <div class="wc-title">{w.title}</div>
+                    {#if w.excerpt}
+                      <div class="wc-excerpt">{w.excerpt}</div>
+                    {/if}
+                    <div class="wc-bottom">
+                      <span class="wc-event-text"
+                        >{$t('concierge.draft_continue')}</span
+                      >
+                    </div>
+                  </button>
+                {/each}
+              </div>
+            {/if}
           {/if}
         </main>
 
@@ -719,8 +799,10 @@
               </div>
             </div>
 
+            <!-- The tips are sample copy about the mock wishes — shown with the
+                 mock only, never beside a real customer's own list. -->
             <div class="lev-tips">
-              {#each LEV_TIPS as tip (tip.text)}
+              {#each usingMock ? LEV_TIPS : [] as tip (tip.text)}
                 <div class="lev-tip {tip.kind}">
                   <span class="lev-tip-icon">{tip.icon}</span>
                   <div class="lev-tip-text">{tip.text}</div>
@@ -1530,6 +1612,22 @@
     width: 7px;
     height: 7px;
     border-radius: 50%;
+  }
+  .wc-news {
+    margin-inline-start: auto;
+    margin-inline-end: 8px;
+    padding: 2px 9px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #1a0a12;
+    background: #ff4d9e;
+    box-shadow: 0 0 10px rgba(255, 77, 158, 0.45);
+  }
+  .empty-link {
+    color: #fde68a;
+    text-decoration: underline;
+    text-underline-offset: 3px;
   }
   .wc-code {
     font-family: 'Fira Mono', monospace;

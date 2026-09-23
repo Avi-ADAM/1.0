@@ -1,4 +1,5 @@
 <script>
+  import { useFormatMoney } from '$lib/money/context.svelte';
   /**
    * The dialog behind every "מלגת קיום" button (docs/PLAN_STIPEND.md §8).
    *
@@ -71,6 +72,7 @@
     programId = null,
     onDone
   } = $props();
+  const fmtMoney = useFormatMoney();
 
   /**
    * The dialog can change its own mind about which agreement this is.
@@ -445,7 +447,7 @@
               <option value={missionKey(m)}>
                 {m.kind === 'open' ? `🔓 ${m.name}` : m.name}{m.username
                   ? ` · ${m.username}`
-                  : ''}{m.perhour ? ` · ₪${m.perhour}/${$t('stipend.card.hour')}` : ''}
+                  : ''}{m.perhour ? ` · ${fmtMoney(m.perhour)}/${$t('stipend.card.hour')}` : ''}
               </option>
             {/each}
           </select>
@@ -454,7 +456,7 @@
               {chosenMissionRow.hours != null && chosenMissionRow.perhour != null
                 ? $t('stipend.card.missionValue', {
                     hours: chosenMissionRow.hours,
-                    rate: chosenMissionRow.perhour,
+                    rate: fmtMoney(chosenMissionRow.perhour),
                     value: Math.round(
                       Number(chosenMissionRow.hours) * Number(chosenMissionRow.perhour)
                     )
@@ -547,7 +549,7 @@
             <p class="font-semibold">
               {$t('stipend.tradeoff.with', {
                 count: tradeoff.sharePctWith.toFixed(1),
-                cash: Math.round(tradeoff.cash)
+                cash: fmtMoney(Math.round(tradeoff.cash), null, { fraction: 'whole' })
               })}
             </p>
             {#if tradeoff.equityGivenUp === 0}

@@ -42,6 +42,7 @@ onMessage(messaging, (payload) => {
   import { toast } from 'svelte-sonner';
   import { addMes } from '$lib/stores/pendMisMes.js';
   import { forumStore } from '$lib/stores/forumStore';
+  import { MoneyState, provideMoney, ensureRates } from '$lib/money/context.svelte';
 
   /**
    * @typedef {Object} Props
@@ -51,6 +52,27 @@ onMessage(messaging, (payload) => {
 
   /** @type {Props} */
   let { data, children } = $props();
+
+  // The reader's currency and today's rates for every <Money> below
+  // (PLAN_MULTI_CURRENCY D-C6). Per app instance, never a module store — see
+  // $lib/money/context.svelte.ts.
+  const money = provideMoney(
+    new MoneyState({
+      currency: data?.currency,
+      chosen: data?.currencyChosen,
+      fx: data?.fx,
+      lang: data?.lang
+    })
+  );
+  $effect(() => {
+    if (data?.lang) money.lang = data.lang;
+    // A newer table arrives with a later navigation (the day rolled over, or
+    // the first load gave up waiting on a cold provider).
+    if (data?.fx) money.fx = data.fx;
+  });
+  onMount(() => {
+    void ensureRates(money);
+  });
 
   // The bottom bar, for the rest of the site.
   //

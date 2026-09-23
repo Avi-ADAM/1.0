@@ -42,7 +42,16 @@ services:
       - TZ=${TZ:-Asia/Jerusalem}
       # adapter-node needs ORIGIN for correct CSRF/origin checks behind Nginx
       - ORIGIN=${ORIGIN:-https://api.1lev1.com}
-      - BODY_SIZE_LIMIT=${BODY_SIZE_LIMIT:-50M}
+      # The rikma library uploads land here as a single PUT (docs/
+       # PLAN_RIKMA_SHARED_INFO.md stage 2), so this has to clear
+       # SPACE_DOCS_MAX_MB (default 100MB) — and nginx's client_max_body_size
+       # on api.1lev1.com, which is already 100M.
+      - BODY_SIZE_LIMIT=${BODY_SIZE_LIMIT:-110M}
+      # Where the rikma library keeps its files. Private: nothing serves this
+      # directory — the only way in or out is a signed blob ticket checked by
+      # /api/v1/space-docs/blob. Unset it and the library falls back to the
+      # old Strapi/Cloudinary upload (public by URL).
+      - SPACE_DOCS_DIR=${SPACE_DOCS_DIR:-/data/space-docs}
     # /etc/docker/daemon.json sets the same caps globally, but only for
     # containers created AFTER a daemon restart — declaring it here means the
     # rotation is real from the next `up -d`, with no daemon bounce.
@@ -51,6 +60,11 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
+    volumes:
+      # A named volume, not a bind mount: it survives `docker-compose down`,
+      # image rebuilds and blue/green flips, and `docker run --rm -v` can copy
+      # it out for a backup without touching the container.
+      - space-docs:/data/space-docs
     ports:
       # loopback only — Nginx terminates TLS and proxies to 127.0.0.1:3000
       - "127.0.0.1:3000:3000"
@@ -176,6 +190,12 @@ services:
       - app-network
 
 volumes:
+  # The rikma libraries' files (docs/PLAN_RIKMA_SHARED_INFO.md stage 2).
+  # Back this up: unlike everything else on this box it is not derivable from
+  # Strapi — losing it loses members' documents.
+  #   docker run --rm -v api_space-docs:/d -v "$PWD":/b alpine \
+  #     tar czf /b/space-docs-$(date +%F).tgz -C /d .
+  space-docs:
   mastra-pgdata:
   vector-data:
   # What has already run — the record that stops a month being closed twice and

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Money from '$lib/components/money/Money.svelte';
   import Panel from '$lib/components/Panel.svelte';
   import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
   import { t } from '$lib/translations';
@@ -18,7 +19,7 @@
             <span class="tag">{$t('deals.pendingYourApproval')}</span>
           {/if}
         </span>
-        <span class="cost" class:warn={r.needsApproval}>₪ {r.cost.toLocaleString()}</span>
+        <span class="cost" class:warn={r.needsApproval}><Money amount={r.cost} /></span>
       </div>
       <div class="track">
         <div

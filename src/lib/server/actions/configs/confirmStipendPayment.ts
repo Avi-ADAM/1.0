@@ -17,7 +17,8 @@ import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { execFromContext } from '$lib/server/archive/exec.js';
 import { dateField, fields, gqlStr, numField, run } from '$lib/server/archive/gql.js';
 import { computeStipendEquity } from '$lib/stipend/computeStipendEquity.js';
-import { fetchPayment, fetchPledge, fetchProgram } from '$lib/server/stipend/read.js';
+import { fetchPayment, fetchPledge, fetchProgram, fetchProjectContext } from '$lib/server/stipend/read.js';
+import { moneyTextFor } from '$lib/server/money/notifyMoney.js';
 
 const handler: ActionExecutionHandler = async (params, context, { notifier }) => {
   const paymentId = String(params.paymentId ?? '');
@@ -47,6 +48,9 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
   }
 
   const pledge = payment.pledgeId ? await fetchPledge(exec, payment.pledgeId) : null;
+  // Amounts are stored in the rikma's currency; the notice says them in it.
+  const rikma = payment.projectId ? await fetchProjectContext(exec, payment.projectId) : null;
+  const money = moneyTextFor(rikma?.currency ?? 'ILS');
   const lines = computeStipendEquity(received, pledge?.terms ?? { mode: payment.mode });
   const nowISO = new Date().toISOString();
   const nothingArrived = received <= 0;
@@ -143,8 +147,8 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
                   en: 'The recipient reported nothing arrived. The pledge is still running — send again and settle the cycle afresh.'
                 }
               : {
-                  he: `אושר קבלת ₪${received}. האחוזים עודכנו בהתאם לתנאי המלגה.`,
-                  en: `Receipt of ${received} confirmed. The shares moved according to the pledge's terms.`
+                  he: `אושר קבלת ${money(received)}. האחוזים עודכנו בהתאם לתנאי המלגה.`,
+                  en: `Receipt of ${money(received, 'en')} confirmed. The shares moved according to the pledge's terms.`
                 }
           },
           channels: ['socket', 'push'],

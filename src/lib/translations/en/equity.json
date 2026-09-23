@@ -12,7 +12,7 @@
   "horizon2y": "After 2 years",
   "horizon5y": "After 5 years",
   "horizonNote": "The projection assumes this keeps running and that the rikma keeps accruing value at the rate of the recurring missions and resources it has today.",
-  "perMonthEstimate": "≈ ₪{{amount}} / month",
+  "perMonthEstimate": "≈ {{amount}} / month",
   "estimateNote": "The ₪ figure is a rough estimate only (≈): it is calculated from the rikma's income over the last {{months}} months, and it can change.",
   "estimateNoteCommitments": "The ₪ figure is a rough estimate only (≈): it is calculated from the rikma's standing monthly commitments, and it can change.",
   "yourShareIfDone": "Your share in the rikma once the mission is done",

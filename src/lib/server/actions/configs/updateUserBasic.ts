@@ -1,5 +1,6 @@
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { STRAPI_GRAPHQL } from '$lib/server/strapiUrl.js';
+import { normalizeCode } from '$lib/money/currencies.js';
 
 /**
  * Update the current user's basic profile fields and settings.
@@ -89,6 +90,13 @@ const handler: ActionExecutionHandler = async (params, context) => {
     lines.push(`autoTranslate: ${params.autoTranslate}`);
   }
 
+  // The reader's display currency (PLAN_MULTI_CURRENCY D-C9). An ISO code or
+  // nothing: a string field, so it is validated here rather than by an enum.
+  if (params.currency !== undefined) {
+    const code = normalizeCode(params.currency);
+    if (code) lines.push(`currency: ${JSON.stringify(code)}`);
+  }
+
   if (params.preferCards !== undefined) lines.push(`preferCards: ${!!params.preferCards}`);
   if (params.noMail !== undefined) lines.push(`noMail: ${!!params.noMail}`);
 
@@ -120,7 +128,7 @@ const handler: ActionExecutionHandler = async (params, context) => {
         updateUsersPermissionsUser(id: ${userId}, data: { ${lines.join(', ')} }) {
           data {
             attributes {
-              username bio frd lang autoTranslate preferCards noMail
+              username bio frd lang autoTranslate${params.currency !== undefined ? " currency" : ""} preferCards noMail
               fblink twiterlink discordlink githublink
               location { location_mode lat lng radius location_hint }
             }
@@ -150,6 +158,7 @@ export const updateUserBasicConfig: ActionConfig = {
     frd: { type: 'string', required: false },
     lang: { type: 'string', required: false },
     autoTranslate: { type: 'string', required: false },
+    currency: { type: 'string', required: false, description: 'ISO-4217 display currency' },
     fblink: { type: 'string', required: false },
     twiterlink: { type: 'string', required: false },
     discordlink: { type: 'string', required: false },

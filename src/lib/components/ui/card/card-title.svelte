@@ -4,7 +4,7 @@
 </script>
 
 <h3
-	class={cn("text-lg text-gold font-semibold leading-none tracking-tight", className)}
+	class={cn("text-lg text-goldink font-semibold leading-none tracking-tight", className)}
 	{...others}
 >
 	 {#if children}

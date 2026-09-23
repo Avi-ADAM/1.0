@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { projectsStore } from '$lib/stores/levStores';
+  import { provideProjectCurrencies } from '$lib/money/context.svelte';
   import { t } from '$lib/translations';
   import { onMount } from 'svelte';
   import { page } from '$app/state';
@@ -13,6 +15,13 @@
   import HubSkeleton from '$lib/components/hub/HubSkeleton.svelte';
   import FirstSteps from '$lib/components/hub/FirstSteps.svelte';
   import DailyBrief from '$lib/components/hub/DailyBrief.svelte';
+
+  // The heart shows cards from every rikma the member belongs to, each keeping
+  // its books in its own currency (PLAN_MULTI_CURRENCY). One lookup for all of
+  // them; a card passes its own projectId to <Money>.
+  provideProjectCurrencies((pid) =>
+    $projectsStore.find((p) => String(p.id) === String(pid))?.attributes?.currencyCode ?? null
+  );
 
   /** @type {{ data: import('./$types').PageData }} */
   let { data } = $props();

@@ -139,7 +139,8 @@
     "archive": "Archivo",
     "api": "API",
     "code": "Código",
-    "stipend": "Becas"
+    "stipend": "Becas",
+    "docs": "Info compartida"
   },
   "create": {
     "mission": "Crear una misión",

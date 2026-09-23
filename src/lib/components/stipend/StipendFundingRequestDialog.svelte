@@ -1,4 +1,6 @@
 <script>
+  import { useFormatMoney } from '$lib/money/context.svelte';
+  import Money from '$lib/components/money/Money.svelte';
   /**
    * "Find someone to fund our members" (docs/PLAN_STIPEND.md §12.2).
    *
@@ -28,6 +30,7 @@
 
   /** @type {Props} */
   let { program = $bindable(null), projectName = '', onDone } = $props();
+  const fmtMoney = useFormatMoney();
 
   let months = $state(12);
   let name = $state('');
@@ -103,8 +106,8 @@
       <div class="mt-4 flex flex-col gap-4">
         <div class="{WELL} p-3 text-sm space-y-1">
           <p class="font-bold">{program.name}</p>
-          <p>{$t('stipend.terms.rate')}: ₪{program.stipendRate}</p>
-          <p>{$t('stipend.terms.totalCap')}: ₪{budget.toLocaleString()}</p>
+          <p>{$t('stipend.terms.rate')}: <Money amount={program.stipendRate} /></p>
+          <p>{$t('stipend.terms.totalCap')}: <Money amount={budget} /></p>
           <p class={MUTED}>
             {$t(`stipend.mode.${program.mode}Explain`)}
           </p>
@@ -121,7 +124,7 @@
           />
           {#if monthly > 0}
             <span class={MUTED}>
-              {$t('stipend.funding.monthly', { count: monthly.toLocaleString() })}
+              {$t('stipend.funding.monthly', { count: fmtMoney(monthly, null, { fraction: 'whole' }) })}
             </span>
           {/if}
         </label>

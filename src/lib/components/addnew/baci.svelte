@@ -1,5 +1,6 @@
 ﻿<script>
   import { isRtl, t } from '$lib/translations';
+  import { useMoney } from '$lib/money/context.svelte';
     import { lang } from '$lib/stores/lang.js'
     import { Confetti } from "svelte-confetti"
    import { quintOut } from "svelte/easing";
@@ -82,6 +83,9 @@ async function sendPP() {
       timeToP: $baciStore.timeToP,
       imageId: $baciStore.imageId ? String($baciStore.imageId) : undefined,
       isOt: $baciStore.ont,
+      // A new rikma keeps its books in its founder's currency by default
+      // (PLAN_MULTI_CURRENCY); changeable in its settings while no money exists.
+      currency: money.currency,
       vallueIds,
       newVallueNames
     });
@@ -243,6 +247,7 @@ let suc = $state(false);
   import { isMobileOrTablet } from '$lib/utilities/device.js';
   import MobileModal from '$lib/celim/ui/mobileModal.svelte';
   let { userName_value } = $props();
+  const money = useMoney();
  const closer = () => {
     isOpen = false;
   a = 0;

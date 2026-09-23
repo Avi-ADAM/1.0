@@ -119,6 +119,13 @@ function createSocketClient() {
   // Space sync wake-ups (HANDOFF_DISTRIBUTED_DB T1). Subscriptions survive
   // reconnects: the set is replayed on every auth_success.
   const spaceSubscriptions = new Set<string>();
+  // Generic channel listeners (the P2P pilot's signaling, docs/PLAN_P2P_PILOT.md).
+  // Kept here, not on the socket, because connect() replaces the socket
+  // instance: every (re)created socket gets them re-attached.
+  const channelHandlers = new Map<string, Set<(data: any) => void>>();
+  // Called after every successful (re)authentication — where a feature re-joins
+  // the rooms it needs, since a new socket starts in none.
+  const readyListeners = new Set<() => void>();
   let spaceChangedListeners: Array<(spaceId: string) => void> = [];
 
   /**
@@ -222,6 +229,10 @@ function createSocketClient() {
       withCredentials: true // Sends cookies automatically
     });
 
+    for (const [event, handlers] of channelHandlers) {
+      for (const handler of handlers) socket.on(event, handler);
+    }
+
     // Connection established
     socket.on('connect', () => {
       console.log('[SocketClient] Connected, waiting for server authentication via cookies...');
@@ -251,6 +262,14 @@ function createSocketClient() {
       for (const spaceId of spaceSubscriptions) {
         socket?.emit('space:subscribe', { spaceId });
       }
+
+      readyListeners.forEach(listener => {
+        try {
+          listener();
+        } catch (error) {
+          console.error('[SocketClient] ready listener failed', error);
+        }
+      });
     });
 
     // Space changed (T1) — metadata-only wake-up; replicas pull the content
@@ -421,6 +440,53 @@ function createSocketClient() {
   }
 
   /**
+   * Listen to a server event on this and every future socket. Returns `off`.
+   */
+  function on(event: string, handler: (data: any) => void): () => void {
+    let set = channelHandlers.get(event);
+    if (!set) channelHandlers.set(event, (set = new Set()));
+    set.add(handler);
+    socket?.on(event, handler);
+    return () => {
+      set!.delete(handler);
+      socket?.off(event, handler);
+    };
+  }
+
+  /**
+   * Emit and wait for the server's acknowledgement. Resolves null when not
+   * connected or when the server does not answer within `timeoutMs`.
+   */
+  function request<T = any>(event: string, data: unknown, timeoutMs = 5000): Promise<T | null> {
+    return new Promise(resolve => {
+      if (!socket?.connected) return resolve(null);
+      socket.timeout(timeoutMs).emit(event, data, (err: unknown, res: T) => resolve(err ? null : res));
+    });
+  }
+
+  /** Fire-and-forget emit; a no-op while disconnected. */
+  function send(event: string, data: unknown): void {
+    if (socket?.connected) socket.emit(event, data);
+  }
+
+  /**
+   * Run `listener` now if authenticated, and again after every reconnect.
+   * Returns `off`.
+   */
+  function onReady(listener: () => void): () => void {
+    readyListeners.add(listener);
+    if (isReady()) listener();
+    return () => {
+      readyListeners.delete(listener);
+    };
+  }
+
+  /** This connection's socket id — how peers address us. */
+  function socketId(): string | null {
+    return socket?.connected ? (socket.id ?? null) : null;
+  }
+
+  /**
    * Subscribe this connection to a space's change wake-ups (T1). Idempotent;
    * survives reconnects. Pair with unsubscribeSpace on teardown.
    */
@@ -494,6 +560,11 @@ function createSocketClient() {
     subscribeSpace,
     unsubscribeSpace,
     onSpaceChanged,
+    on,
+    request,
+    send,
+    onReady,
+    socketId,
     ping,
     getState,
     isReady

@@ -139,7 +139,8 @@
     "archive": "Archive",
     "api": "API",
     "code": "Code",
-    "stipend": "Stipends"
+    "stipend": "Stipends",
+    "docs": "Shared info"
   },
   "create": {
     "mission": "Create Mission",

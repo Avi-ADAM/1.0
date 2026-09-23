@@ -45,5 +45,17 @@
       "span": "months since the first payout",
       "best": "best month"
     }
+  },
+  "concierge": {
+    "title": "My concierge",
+    "open": "All my requests",
+    "drafts": "drafts",
+    "draftsTip": "Drafts waiting to be finished: {{count}}",
+    "ordered": "on order",
+    "orderedTip": "Sent requests being put together: {{count}}",
+    "updates": "updates",
+    "updatesTip": "Offers waiting for your answer: {{count}}",
+    "newWish": "New request",
+    "customerHint": "All your orders, drafts and offers - in one place"
   }
 }

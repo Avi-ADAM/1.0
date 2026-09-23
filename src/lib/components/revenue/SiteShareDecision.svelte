@@ -1,4 +1,5 @@
 ﻿<script>
+  import Money from '$lib/components/money/Money.svelte';
   import { t, locale, isRtl } from '$lib/translations';
   /**
    * SiteShareDecision — the single shared decision UI for the per-member site
@@ -75,7 +76,7 @@
 <div class="ssd" class:compact dir={$isRtl ? 'rtl' : 'ltr'}>
   <div class="ssd-head">
     <span class="ssd-title">{$t('lev.revenue.siteShareDecision.title')}</span>
-    <span class="ssd-amount">{Number(finalAmount).toFixed(2)} {currency}</span>
+    <span class="ssd-amount"><Money amount={Number(finalAmount)} fraction="full" /></span>
   </div>
 
   <p class="ssd-sub">

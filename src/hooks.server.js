@@ -11,6 +11,8 @@ import { log, requestId } from '$lib/server/log.js';
 import { csrfRejection } from '$lib/server/csrf.js';
 import { allowedCorsOrigins } from '$lib/server/corsOrigins.js';
 import { dev } from '$app/environment';
+import { guessCurrency } from '$lib/money/guess.js';
+import { normalizeCode } from '$lib/money/currencies.js';
 import {
   DEFAULT_THEME,
   THEME_COOKIE,
@@ -349,6 +351,11 @@ async function handleRequest({ event, resolve }) {
 
   event.locals.lang = lang;
   event.locals.userAgent = event.request.headers.get('accept-language');
+  // The reader's display currency (PLAN_MULTI_CURRENCY D-C9): their own choice
+  // from the cookie, else a guess from the region in Accept-Language.
+  const chosenCurrency = normalizeCode(event.cookies.get('currency'));
+  event.locals.currency = chosenCurrency ?? guessCurrency(event.locals.userAgent);
+  event.locals.currencyChosen = chosenCurrency !== null;
   event.locals.isDesktop = event.request.headers.get('sec-ch-ua-mobile') === '?0';
   // An expired cookie is worse than no cookie: it makes every layer below
   // believe there is a session and then fail. Downgrade to guest and wipe it.
@@ -417,9 +424,11 @@ async function handleRequest({ event, resolve }) {
 
   // Redirect logic based on authentication
   if (event.url.pathname === '/convention' || event.url.pathname === '/aitifaqia') {
+    // Keep the query: `?intent=concierge` / `?invite=` have to reach /hascama's
+    // load, and for en/ar readers this redirect is the only way there.
     return pinTheme(new Response('Redirect', {
       status: 303,
-      headers: { Location: '/hascama' }
+      headers: { Location: `/hascama${event.url.search}` }
     }));
   }
 

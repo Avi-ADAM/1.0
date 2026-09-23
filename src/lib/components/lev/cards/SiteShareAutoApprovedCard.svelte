@@ -1,4 +1,5 @@
 ﻿<script lang="ts">
+  import { useFormatMoney } from '$lib/money/context.svelte';
   import { t, isRtl } from '$lib/translations';
   /**
    * SiteShareAutoApprovedCard — the swiper-card form of an OPEN (pending)
@@ -19,6 +20,7 @@
   import SiteShareDecision from '$lib/components/revenue/SiteShareDecision.svelte';
 
   let { buble, isFirst = false, onProj } = $props();
+  const fmtMoney = useFormatMoney();
 
 
   let busy = $state(false);
@@ -84,7 +86,7 @@
     logoSrc={buble.projectLogo || buble.src}
     projectName={buble.projectName}
     cardType={$t('lev.revenue.siteShareAutoApprovedCard.cardType')}
-    cardTitle={`${Number(buble.proposedAmount || 0).toFixed(2)} ₪`}
+    cardTitle={fmtMoney(Number(buble.proposedAmount || 0), null, { fraction: 'full' })}
     glowColor="gold"
     onProjectClick={handleProjectClick}
   />

@@ -1,3 +1,4 @@
+import { rikmaMoneyText } from '$lib/server/money/notifyMoney.js';
 /**
  * Action Configuration: Customer reports the monthly transfer on a
  * recurring-sale cycle (PLAN_RECURRING_SALES)
@@ -68,6 +69,12 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
     try {
       const productName = attrs.matanot?.data?.attributes?.name ?? '';
       const projectName = attrs.project?.data?.attributes?.projectName ?? '';
+      // The cycle amount is in the rikma's currency; say it in that currency.
+      const money = await rikmaMoneyText(
+        attrs.project?.data?.id,
+        context.jwt as string,
+        context.fetch as typeof fetch
+      );
       const customerName = attrs.customer?.data?.attributes?.username ?? '';
       await notifier.notify(
         {
@@ -78,8 +85,8 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
               en: 'Customer reported a monthly transfer'
             },
             body: {
-              he: `${customerName} דיווח שהעביר ${transferred}₪ החודש${productName ? ` עבור ${productName}` : ''}. היכנסו למרכז המכירות לאשר שהתקבל.`,
-              en: `${customerName} reported transferring ${transferred}₪ this month${productName ? ` for ${productName}` : ''}. Confirm receipt in the sales center.`
+              he: `${customerName} דיווח שהעביר ${money(transferred)} החודש${productName ? ` עבור ${productName}` : ''}. היכנסו למרכז המכירות לאשר שהתקבל.`,
+              en: `${customerName} reported transferring ${money(transferred, 'en')} this month${productName ? ` for ${productName}` : ''}. Confirm receipt in the sales center.`
             }
           },
           channels: ['socket', 'push', 'email'],

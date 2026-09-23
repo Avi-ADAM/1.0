@@ -35,7 +35,7 @@
   "no_matches_found": "No matching wishes found",
   "clear_filter_sub": "Try clearing the search or choosing another filter.",
   "no_drafts_title": "No saved drafts at the moment",
-  "no_drafts_sub": "Any wish you start writing will be saved automatically until you choose to publish.",
+  "no_drafts_sub": "Press \"Save draft\" while writing - and your request will wait for you here.",
   "start_wish_btn": "Start a Wish",
   "i_can_help": "I can help ›",
   "offers_so_far": "Offers so far",
@@ -309,8 +309,29 @@
     "maxJoinersPlaceholder": "No ceiling",
     "joinDeadline": "Joining closes on (optional)",
     "groupHint": "Once {{count}} participants join you can lock the group, decide together and pay together. Until then the wish is gathering.",
-    "soloHint": "The default - you organise and the community proposes. Choosing a group kind opens joining, shared decisions and shared payment."
+    "soloHint": "The default - you organise and the community proposes. Choosing a group kind opens joining, shared decisions and shared payment.",
+    "untitledDraft": "Untitled draft",
+    "draftSaving": "Saving…",
+    "draftSaved": "Draft saved - find it in the concierge and on your profile",
+    "draftSavedDevice": "Saved in this browser. Sign up to keep it in your account and send it",
+    "draftSaveFailed": "We couldn't save the draft - please try again",
+    "savedOnDevice": "Saved in this browser",
+    "welcome": {
+      "title": "Welcome - you're in.",
+      "start": "No questionnaires, no profile: tell us what you'd like, and we'll take it from there together.",
+      "draftKept": "The request you wrote before signing up is waiting here, saved as a draft in your account. Keep editing and send it when ready.",
+      "dismiss": "Close"
+    },
+    "autoSend": {
+      "title": "Sending your request…",
+      "sub": "This is the request you wrote before signing up. In a moment you'll see the plan taking shape around it."
+    }
   },
   "no_wishes_found_title": "No wishes found",
-  "proposals_so_far": "Proposals so far"
+  "proposals_so_far": "Proposals so far",
+  "no_wishes_title": "You haven't sent a request yet",
+  "no_wishes_sub": "Tell us what you'd like - and the concierge will get to work.",
+  "no_wishes_has_drafts": "You have drafts waiting to be finished ({{count}}) →",
+  "pending_offers": "{{count}} new",
+  "draft_continue": "Continue writing →"
 }

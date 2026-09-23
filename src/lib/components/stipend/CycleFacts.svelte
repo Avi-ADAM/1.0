@@ -1,4 +1,5 @@
 <script>
+  import { useFormatMoney } from '$lib/money/context.svelte';
   /**
    * The four facts a stipend cycle card must state before it asks anyone for
    * anything: **which work**, **which period**, **how the number was reached**,
@@ -72,7 +73,8 @@
   const missionHref = (id) => `/moach/${projectId}/object/betahalich/${id}`;
   // A gift moves cash and nothing else, so there is no share line to show.
   const movesEquity = $derived(mode === 'equity' && (equityDebit > 0 || equityCredit > 0));
-  const money = (n) => `₪${Number(n ?? 0).toLocaleString(undefined, { maximumFractionDigits: 2 })}`;
+  const fmtMoney = useFormatMoney();
+  const money = (n) => fmtMoney(Number(n ?? 0));
 </script>
 
 <div class="{WELL} p-3 space-y-3">
@@ -115,7 +117,7 @@
 
   {#if cappedBy}
     <p class="text-xs text-amber-700 dark:text-amber-300">
-      {$t(`stipend.pay.capped.${cappedBy}`, { count: Number(gross).toFixed(2) })}
+      {$t(`stipend.pay.capped.${cappedBy}`, { count: fmtMoney(gross, null, { fraction: 'full' }) })}
     </p>
   {/if}
   {#if exhausts}

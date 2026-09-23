@@ -1,4 +1,5 @@
 <script>
+  import { useFormatMoney } from '$lib/money/context.svelte';
   import { onMount, onDestroy } from 'svelte';
   import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
   import { showFoot } from '$lib/stores/showFoot.js';
@@ -11,6 +12,7 @@
 
   /** @type {{ data: { wish: any | null; proposalsCount: number; myProposals: any[]; uid: string | null; isLoggedIn: boolean; loadOk: boolean } }} */
   let { data } = $props();
+  const fmtMoney = useFormatMoney();
 
   const isLoggedIn = $derived(!!data?.isLoggedIn);
   const myProposals = $derived(data?.myProposals ?? []);
@@ -40,7 +42,7 @@
   }
   function fmtBudget(n) {
     if (n == null || !Number.isFinite(+n)) return 'לפי הצעה';
-    return `₪ ${(+n).toLocaleString('he-IL')}`;
+    return fmtMoney(+n);
   }
   function relativePublishedAt(iso) {
     if (!iso) return '';

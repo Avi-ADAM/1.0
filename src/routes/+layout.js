@@ -14,10 +14,15 @@ if (isMobileBuild) {
   inject({ mode: dev ? 'development' : 'production' });
 }
 
-function cookieLang() {
+/** @param {string} name */
+function cookieValue(name) {
   if (typeof document === 'undefined') return null;
-  const m = document.cookie.match(/(?:^|;\s*)lang=([^;]+)/);
+  const m = document.cookie.match(new RegExp(`(?:^|;\\s*)${name}=([^;]+)`));
   return m ? decodeURIComponent(m[1]) : null;
+}
+
+function cookieLang() {
+  return cookieValue('lang');
 }
 
 export const load = async ({ url, data }) => {
@@ -29,5 +34,9 @@ export const load = async ({ url, data }) => {
   locale.set(lang);
   await loadTranslations(lang, pathname);
 
-  return { ...(data || {}), lang };
+  // Mobile has no server data: the reader's currency comes from the cookie the
+  // settings page wrote, and the rates from /api/fx on mount.
+  const currency = data?.currency || cookieValue('currency') || undefined;
+
+  return { ...(data || {}), lang, currency };
 };

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Money from '$lib/components/money/Money.svelte';
   import { goto } from '$app/navigation';
   import { t, isRtl } from '$lib/translations';
   import { toast } from 'svelte-sonner';
@@ -161,7 +162,7 @@
       <div class="flex-1">
         <div class="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-0.5">{$t('lev.cards.wishOffer.price')}</div>
         <div class="text-base font-bold text-yellow-700 dark:text-yellow-400">
-          {buble.price != null ? `₪ ${Number(buble.price).toLocaleString()}` : $t('lev.cards.wishOffer.byOffer')}
+          {#if buble.price != null}<Money amount={buble.price} />{:else}{$t('lev.cards.wishOffer.byOffer')}{/if}
         </div>
       </div>
     </div>

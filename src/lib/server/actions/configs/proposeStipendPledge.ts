@@ -1,3 +1,4 @@
+import { moneyTextFor } from '$lib/server/money/notifyMoney.js';
 /**
  * Action: proposeStipendPledge (docs/PLAN_STIPEND.md §5).
  *
@@ -220,6 +221,8 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
   });
   if (!pledgeId) throw new Error('Failed to record the stipend proposal');
 
+  // Amounts are stored in the rikma's currency; the notices say them in it.
+  const money = moneyTextFor(project.currency);
   const funderName = project.members.find((m) => m.id === funderId)?.username ?? '';
   const recipientName = project.members.find((m) => m.id === recipientId)?.username ?? '';
 
@@ -254,8 +257,8 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
             templates: {
               title: { he: 'הצעה למלגת קיום', en: 'A subsistence stipend was proposed' },
               body: {
-                he: `${funderName} מציע/ה לממן לך ₪${terms.stipendRate} לשעה${missionHe}. הקלף מראה מה את/ה מקבל/ת ומה זה עושה לחלק שלך. אפשר לאשר, לפתוח שיחה או להציע תנאים אחרים. ללא תגובה תוך ${restimeLabel(project.restime, 'he')} ההצעה תאושר מעצמה.`,
-                en: `${funderName} offers to fund you at ${terms.stipendRate} per hour${missionEn}. The card shows what you receive and what it does to your share. Approve, open a discussion, or propose different terms — with no response within ${restimeLabel(project.restime, lang)} it is approved on its own.`
+                he: `${funderName} מציע/ה לממן לך ${money(terms.stipendRate)} לשעה${missionHe}. הקלף מראה מה את/ה מקבל/ת ומה זה עושה לחלק שלך. אפשר לאשר, לפתוח שיחה או להציע תנאים אחרים. ללא תגובה תוך ${restimeLabel(project.restime, 'he')} ההצעה תאושר מעצמה.`,
+                en: `${funderName} offers to fund you at ${money(terms.stipendRate, 'en')} per hour${missionEn}. The card shows what you receive and what it does to your share. Approve, open a discussion, or propose different terms — with no response within ${restimeLabel(project.restime, lang)} it is approved on its own.`
               }
             },
             channels: ['socket', 'push'],
@@ -279,7 +282,7 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
                 en: 'You were named as the funder of a stipend'
               },
               body: {
-                he: `הוצע שאת/ה תממן/י את ${recipientName} ב־₪${terms.stipendRate} לשעה${missionHe}. זו התחייבות לתשלום מכיסך: היא לא תיכנס לתוקף בלי אישור מפורש שלך — שתיקה לא מאשרת אותה. אפשר לאשר, לפתוח שיחה או להציע תנאים אחרים.`,
+                he: `הוצע שאת/ה תממן/י את ${recipientName} ב־${money(terms.stipendRate)} לשעה${missionHe}. זו התחייבות לתשלום מכיסך: היא לא תיכנס לתוקף בלי אישור מפורש שלך — שתיקה לא מאשרת אותה. אפשר לאשר, לפתוח שיחה או להציע תנאים אחרים.`,
                 en: `It was proposed that you fund ${recipientName} at ${terms.stipendRate} per hour${missionEn}. This is a commitment to pay out of your own pocket: it cannot take effect without your explicit approval — silence will not approve it. Approve, open a discussion, or propose different terms.`
               }
             },

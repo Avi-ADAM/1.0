@@ -30,6 +30,8 @@
  * so the server doesn't need to look up names.
  */
 
+import { ENTRY_CURRENCY_PARAM, entryFields, normalizeEntry } from '$lib/server/money/normalizeEntry.js';
+import { rikmaCurrency } from '$lib/money/resolve.js';
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { calcDeadlineMs, restimeLabel, voteUrl } from './actionUtils.js';
 import { createMissionConsentSpec } from '$lib/consent/specs/s2b';
@@ -76,7 +78,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
     workwayIds = [],
     vallueIds = [],
     nhours = 0,
-    valph = 0,
+    valph: valphTyped = 0,
     iskvua = false,
     howMeny,              // how many people the mission needs (PLAN_SHIFTS §2)
     dateStart,
@@ -95,7 +97,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
     // The mission's own subsistence-stipend need (PLAN_STIPEND §13): "this
     // mission also wants ₪X an hour of living money, and here is whether it
     // dilutes". Stated on the proposal so the rikma answers both in one vote.
-    stipendRate,
+    stipendRate: stipendRateTyped,
     stipendCostShare,
     stipendMode,
     stipendFunderId,
@@ -159,6 +161,22 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
 
   const locationInput = buildLocationInput(isOnline, lat, lng, radius, location_hint);
 
+  // The hourly value and the stipend were typed in the proposer's currency;
+  // the rikma counts in its own (PLAN_MULTI_CURRENCY C5). One rate for both.
+  const entry = await normalizeEntry({
+    amounts: {
+      valph: Number(valphTyped) || 0,
+      stipendRate: Number(stipendRateTyped) > 0 ? Number(stipendRateTyped) : null
+    },
+    entryCurrency: params.entryCurrency,
+    projectId,
+    jwt: context.jwt as string,
+    fetchFn: context.fetch as typeof fetch,
+    rikmaCurrency: rikmaCurrency(projAttrs)
+  });
+  const valph = entry.values.valph ?? 0;
+  const stipendRate = entry.values.stipendRate;
+
   // A stipend rate above the mission's own market rate would drive the
   // recipient's equity negative — the same guard the pledge action applies,
   // enforced here so a mission can never be *created* carrying illegal terms.
@@ -221,6 +239,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
     publishedAt: nowISO,
     ...(locationInput ? { location: locationInput } : {}),
     ...stipendFields,
+    ...entryFields(entry),
   };
 
   const initialVote = [
@@ -347,6 +366,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
         sqedualed: dateStart ?? null,
         deadline: dateEnd ?? null,
         ...stipendFields,
+        ...entryFields(entry),
       },
       context.jwt,
       context.fetch,
@@ -640,6 +660,7 @@ export const createMissionConfig: ActionConfig = {
     vallueIds:          { type: 'array',   required: false, description: 'Vallue entity IDs from project' },
     nhours:             { type: 'number',  required: false, description: 'Number of hours' },
     valph:              { type: 'number',  required: false, description: 'Value per hour' },
+    entryCurrency:      ENTRY_CURRENCY_PARAM,
     iskvua:             { type: 'boolean', required: false, description: 'Is recurring mission' },
     howMeny:            { type: 'number',  required: false, description: 'How many people the mission needs (default 1). The OpenMission stays open, and other candidacies stay valid, until that many have joined — docs/PLAN_SHIFTS.md §2' },
     shiftPlan:          { type: 'object',  required: false, description: 'Staffing plan { pattern, name?, timezone?, cycleDays?, closeOffsetHours?, draftWindowHours?, minRestHours? } — created with the mission; waits for the vote on a proposal. Ignored while SHIFTS=off — docs/PLAN_SHIFTS.md §13.6' },

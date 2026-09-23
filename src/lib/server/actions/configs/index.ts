@@ -38,6 +38,7 @@ import { ensureProjectForumConfig } from './ensureProjectForum.js';
 import { ensureStageForumConfig } from './ensureStageForum.js';
 import { closeFiniapruvalConfig } from './closeFiniapruval.js';
 import { updateProjectDetailsConfig } from './updateProjectDetails.js';
+import { setRikmaCurrencyConfig } from './setRikmaCurrency.js';
 import { completeMissionConfig } from './completeMission.js';
 import { chatActions } from './chat.js';
 import { maagadActions } from './maagad.js';
@@ -57,6 +58,7 @@ import { matchRatsonConfig } from './matchRatson.js';
 import { acceptRatsonProposalConfig } from './acceptRatsonProposal.js';
 import { rejectRatsonProposalConfig } from './rejectRatsonProposal.js';
 import { updateRatsonExtractionConfig } from './updateRatsonExtraction.js';
+import { updateRatsonDraftConfig } from './updateRatsonDraft.js';
 import {
   createPlanBoardAction,
   updatePlanBoardAction,
@@ -169,6 +171,11 @@ import {
   claimGithubWorkConfig
 } from './githubActions.js';
 import { releaseResourceBookingConfig } from './releaseResourceBooking.js';
+import {
+  createSpaceDocConfig,
+  updateSpaceDocConfig,
+  archiveSpaceDocConfig
+} from './spaceDocs.js';
 import { ensurePersonalRikmaConfig } from './ensurePersonalRikma.js';
 import { publishUserResourceAsProductConfig } from './publishUserResourceAsProduct.js';
 import { createMissionOfferConfig } from './createMissionOffer.js';
@@ -246,6 +253,7 @@ export function registerAllActions(): void {
   // Finiapruval voting and closing
   registerAction(closeFiniapruvalConfig);
   registerAction(updateProjectDetailsConfig);
+  registerAction(setRikmaCurrencyConfig);
 
   // Chat actions
   chatActions.forEach(registerAction);
@@ -323,6 +331,7 @@ export function registerAllActions(): void {
   registerAction(acceptRatsonProposalConfig);
   registerAction(rejectRatsonProposalConfig);
   registerAction(updateRatsonExtractionConfig);
+  registerAction(updateRatsonDraftConfig);
 
   // Planning boards (PLAN_PROJECT_PLANNING_BOARDS)
   registerAction(createPlanBoardAction);
@@ -474,6 +483,12 @@ export function registerAllActions(): void {
   registerAction(claimGithubWorkConfig);
   registerAction(releaseResourceBookingConfig);
 
+  // The rikma's shared library — documents, images, links
+  // (PLAN_RIKMA_SHARED_INFO stage 1)
+  registerAction(createSpaceDocConfig);
+  registerAction(updateSpaceDocConfig);
+  registerAction(archiveSpaceDocConfig);
+
   // Object archival & edit consent flow (PLAN_OBJECT_ARCHIVAL)
   registerAction(proposeObjectArchiveConfig);
   registerAction(proposeObjectEditConfig);
@@ -523,6 +538,7 @@ export {
   ensureRatsonProposalForumConfig,
   closeFiniapruvalConfig,
   updateProjectDetailsConfig,
+  setRikmaCurrencyConfig,
   createProcessConfig,
   attachEntityToProcessConfig,
   ensureProcessForumConfig,

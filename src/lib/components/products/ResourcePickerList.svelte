@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Money from '$lib/components/money/Money.svelte';
   import { lang } from '$lib/stores/lang.js';
   import ResourceDetailsModal from './ResourceDetailsModal.svelte';
   import type {
@@ -16,6 +17,8 @@
     projectMembers?: ProjectMember[];
     resourceTemplates?: ResourceTemplate[];
     multiMember?: boolean;
+    /** The currency the rates are typed in (the composer's picker). */
+    currency?: string;
   };
 
   let {
@@ -24,7 +27,8 @@
     availableResources = [],
     projectMembers = [],
     resourceTemplates = [],
-    multiMember = false
+    multiMember = false,
+    currency
   }: Props = $props();
 
   const kindMap: Record<string, RecipeResourceRow['kindOf']> = {
@@ -409,7 +413,7 @@
         </span>
         <span class="row-total">
           {t.rowTotal}:
-          <strong>₪ {rowTotal(r).toLocaleString('en', { maximumFractionDigits: 2 })}</strong>
+          <strong><Money amount={rowTotal(r)} {currency} /></strong>
         </span>
       </div>
     </div>

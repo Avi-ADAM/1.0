@@ -10,6 +10,7 @@
   import { shadowSignFromCookie } from '$lib/client/shadowSign';
   import { createSaleConsentSpec } from '$lib/consent/specs/createSale';
   import { t } from '$lib/translations';
+  import Money from '$lib/components/money/Money.svelte';
 
   /**
    * @typedef {Object} Props
@@ -344,7 +345,7 @@
       {kindOf === 'monthly' ? $t('sales.perMonth') : $t('sales.perYear')}
     {/if}
   </small>
-  <p class="text-center text-barbi">{total}</p>
+  <p class="text-center text-barbi"><Money amount={total} /></p>
 
   {#if already == false}
     <div class="flex items-center justify-center">

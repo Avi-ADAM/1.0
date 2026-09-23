@@ -1,5 +1,6 @@
 ﻿<!-- src/lib/components/prPr/kanban/KanbanBoard.svelte -->
 <script lang="ts">
+  import { useFormatMoney } from '$lib/money/context.svelte';
   import { t, isRtl } from '$lib/translations';
 
   interface RawItem {
@@ -64,6 +65,7 @@
     onCardClick?: ((e: { id: string; kind: string }) => void) | null;
     onActClick?: ((act: Record<string, any>) => void) | null;
   } = $props();
+  const fmtMoney = useFormatMoney();
 
   /* ׳’ג€ג‚¬׳’ג€ג‚¬׳’ג€ג‚¬׳’ג€ג‚¬׳’ג€ג‚¬׳’ג€ג‚¬׳’ג€ג‚¬׳’ג€ג‚¬׳’ג€ג‚¬׳’ג€ג‚¬׳’ג€ג‚¬׳’ג€ג‚¬׳’ג€ג‚¬׳’ג€ג‚¬׳’ג€ג‚¬׳’ג€ג‚¬׳’ג€ג‚¬׳’ג€ג‚¬׳’ג€ג‚¬׳’ג€ג‚¬׳’ג€ג‚¬׳’ג€ג‚¬׳’ג€ג‚¬׳’ג€ג‚¬׳’ג€ג‚¬׳’ג€ג‚¬׳’ג€ג‚¬׳’ג€ג‚¬׳’ג€ג‚¬׳’ג€ג‚¬׳’ג€ג‚¬׳’ג€ג‚¬׳’ג€ג‚¬׳’ג€ג‚¬׳’ג€ג‚¬׳’ג€ג‚¬׳’ג€ג‚¬׳’ג€ג‚¬׳’ג€ג‚¬׳’ג€ג‚¬׳’ג€ג‚¬׳’ג€ג‚¬׳’ג€ג‚¬׳’ג€ג‚¬׳’ג€ג‚¬׳’ג€ג‚¬׳’ג€ג‚¬׳’ג€ג‚¬׳’ג€ג‚¬׳’ג€ג‚¬׳’ג€ג‚¬׳’ג€ג‚¬
      Mission normalisation
@@ -834,7 +836,7 @@
                           d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"
                         />
                       </svg>
-                      {item.hours}{item.perhour ? `×${item.perhour}₪` : 'h'}
+                      {item.hours}{item.perhour ? `×${fmtMoney(item.perhour)}` : 'h'}
                     </span>
                   {/if}
                   <span class="text-[10px] text-slate-600 ms-auto tabular-nums"

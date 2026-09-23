@@ -1,3 +1,4 @@
+import { matbeaCode, rikmaCurrency } from '$lib/money/resolve.js';
 import { redirect } from '@sveltejs/kit';
 import { sendViaProxy } from '$lib/server/sendViaProxy.js';
 import { buildIncomeSeries } from '$lib/income/buildIncomeSeries.js';
@@ -27,8 +28,12 @@ function toPayout(node) {
     isSiteShare: a.isSiteShare,
     projectId: a.project?.data?.id ? String(a.project.data.id) : null,
     projectName: a.project?.data?.attributes?.projectName ?? null,
-    currency: a.matbea?.data?.attributes?.simbol ?? null,
-    currencyName: a.matbea?.data?.attributes?.name ?? null
+    // An ISO code (PLAN_MULTI_CURRENCY D-C1). A haluka's amount is in its
+    // rikma's currency; the legacy `matbea` relation only ever said "shekel".
+    currency: a.project?.data?.attributes?.currencyCode
+      ? rikmaCurrency(a.project.data.attributes)
+      : (matbeaCode(a.matbea) ?? rikmaCurrency(null)),
+    currencyName: null
   };
 }
 

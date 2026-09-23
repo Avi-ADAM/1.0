@@ -377,7 +377,7 @@
   "recurringCycle": {
     "month": "الشهر",
     "expected": "المبلغ المتوقّع",
-    "customerReported": "{{name}} أبلغ أنه حوّل {{amt}} ₪",
+    "customerReported": "{{name}} أبلغ أنه حوّل {{amt}}",
     "customerWaiting": "لم يبلغ العميل عن تحويل هذا الشهر بعد",
     "amountLabelHolder": "كم دخل فعليًا هذا الشهر؟ (0 = لا شيء)",
     "amountLabelCustomer": "كم حوّلت هذا الشهر؟ (0 = لم أحوّل)",

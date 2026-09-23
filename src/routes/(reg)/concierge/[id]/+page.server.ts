@@ -1,4 +1,5 @@
 import { sendToSer } from '$lib/send/sendToSer.js';
+import { matbeaCode } from '$lib/money/resolve.js';
 import { redirect } from '@sveltejs/kit';
 import { actionViaProxy } from '$lib/server/actionViaProxy.js';
 import { enrichWish, EMPTY_ENRICHMENT, type WishEnrichment } from '$lib/server/ai/enrichWish';
@@ -143,6 +144,7 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
           negoIds: (pa.negos?.data ?? []).map((n: any) => n.id),
           currencyName: pa.matbea?.data?.attributes?.name ?? null,
           currencySymbol: pa.matbea?.data?.attributes?.simbol ?? '₪',
+          currencyCode: matbeaCode(pa.matbea),
           coveredMissions: (pa.covered_missions ?? []).map((c: any) => ({
             id: c.id,
             extractedMissionIdx: c.extracted_mission_idx,
@@ -168,6 +170,11 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
   // Non-owners land on the public provider view.
   if (wish && !isOwner) {
     throw redirect(302, `/wish/${params.id}`);
+  }
+
+  // A draft has no plan to review yet — it is finished in the composer.
+  if (wish && wish.status === 'draft') {
+    throw redirect(302, `/concierge/new?draft=${params.id}`);
   }
 
   // ── Auto-extract on load ──────────────────────────────────────────────────

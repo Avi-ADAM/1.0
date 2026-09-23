@@ -1,4 +1,6 @@
 <script>
+  import { projectsStore } from '$lib/stores/levStores';
+  import { provideProjectCurrencies } from '$lib/money/context.svelte';
   import { onMount, onDestroy } from 'svelte';
   import { page } from '$app/state';
   import { goto } from '$app/navigation';
@@ -57,6 +59,13 @@
   import Rikma from '$lib/components/lev/rikma.svelte';
   import Mesima from '$lib/components/lev/mesima.svelte';
   import { userStore } from '$lib/stores/levStores';
+
+  // The heart shows cards from every rikma the member belongs to, each keeping
+  // its books in its own currency (PLAN_MULTI_CURRENCY). One lookup for all of
+  // them; a card passes its own projectId to <Money>.
+  provideProjectCurrencies((pid) =>
+    $projectsStore.find((p) => String(p.id) === String(pid))?.attributes?.currencyCode ?? null
+  );
   /** @type {{ data: any }} */
   let { data } = $props();
 

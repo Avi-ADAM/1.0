@@ -1,4 +1,5 @@
 <script>
+  import { useFormatMoney } from '$lib/money/context.svelte';
   /**
    * "The cycle is settled — now move the money" (PLAN_STIPEND §6, §8).
    *
@@ -25,6 +26,7 @@
   import CycleFacts from '$lib/components/stipend/CycleFacts.svelte';
 
   let { buble, isFirst = false, onProj, onDone } = $props();
+  const fmtMoney = useFormatMoney();
 
   const myId = $derived(String($userStore?.id ?? ''));
   const isFunder = $derived(buble.side === 'funder');
@@ -89,7 +91,7 @@
     logoSrc={buble.src}
     projectName={buble.projectName}
     cardType={$t('stipend.transfer.cardType')}
-    cardTitle={`₪${Number(buble.amount).toFixed(2)}`}
+    cardTitle={fmtMoney(Number(buble.amount), null, { fraction: 'full' })}
     glowColor="teal"
     onProjectClick={() => onProj?.({ id: buble.projectId })}
   />

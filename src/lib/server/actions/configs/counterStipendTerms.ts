@@ -21,6 +21,7 @@ import {
 } from '$lib/server/stipend/apply.js';
 import { normalizeTerms, validateStipendTerms } from '$lib/stipend/computeStipendEquity.js';
 import { fetchProjectContext } from '$lib/server/stipend/read.js';
+import { moneyTextFor } from '$lib/server/money/notifyMoney.js';
 
 const handler: ActionExecutionHandler = async (params, context, { notifier }) => {
   const decisionId = String(params.decisionId ?? '');
@@ -62,6 +63,8 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
   });
 
   const project = decision.projectId ? await fetchProjectContext(exec, decision.projectId) : null;
+  // Amounts are stored in the rikma's currency; the notice says them in it.
+  const money = moneyTextFor(project?.currency ?? 'ILS');
   const validation = validateStipendTerms({
     terms,
     marketRate: params.marketRate != null ? Number(params.marketRate) : null,
@@ -98,8 +101,8 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
           templates: {
             title: { he: 'הצעה נגדית על המלגה', en: 'Counter-terms on the stipend' },
             body: {
-              he: `הוצעו תנאים אחרים: ₪${terms.stipendRate} לשעה${terms.totalCap ? `, תקרה ₪${terms.totalCap}` : ''}. הגרסה החדשה היא זו שעל השולחן.`,
-              en: `Different terms are on the table: ${terms.stipendRate} per hour${terms.totalCap ? `, cap ${terms.totalCap}` : ''}. The new version is the one being decided.`
+              he: `הוצעו תנאים אחרים: ${money(terms.stipendRate)} לשעה${terms.totalCap ? `, תקרה ${money(terms.totalCap)}` : ''}. הגרסה החדשה היא זו שעל השולחן.`,
+              en: `Different terms are on the table: ${money(terms.stipendRate, 'en')} per hour${terms.totalCap ? `, cap ${money(terms.totalCap, 'en')}` : ''}. The new version is the one being decided.`
             }
           },
           channels: ['socket', 'push'],

@@ -1,4 +1,6 @@
 <script>
+  import CurrencySymbol from '$lib/components/money/CurrencySymbol.svelte';
+  import Money from '$lib/components/money/Money.svelte';
   import { Drawer } from 'vaul-svelte';
   import { ProgressBar } from 'progressbar-svelte';
   import { goto } from '$app/navigation';
@@ -502,7 +504,7 @@
             <p style="font-size:0.9em; color:#9aa0a6; text-align:center; margin:4px 0;">
               {useraplyname} {$t('lev.weget.reportedExpenseOf')}
             </p>
-            <p class="p" style="font-size:1.6em; font-weight:bold; color:var(--gold)">{shownAmount} ₪</p>
+            <p class="p" style="font-size:1.6em; font-weight:bold; color:var(--gold)"><Money amount={shownAmount} {projectId} /></p>
           {/if}
           <br />
           <button class="add" onclick={confirmRecurring}>{$t('lev.weget.confirmExpense')}</button>
@@ -533,7 +535,7 @@
             {missionBName}{#if cycleIndex} · {$t('lev.weget.cycleLabel')} #{cycleIndex}{/if}
           </p>
           <p style="font-size:0.85em; color:#9aa0a6; text-align:center; margin:2px 0;">
-            {$t('lev.weget.reportedAmount')} {quantityDelivered} ₪
+            {$t('lev.weget.reportedAmount')} <Money amount={quantityDelivered} {projectId} />
           </p>
           <label style="display:flex; align-items:center; gap:6px; margin:6px 0;">
             {$t('lev.weget.proposedAmount')}
@@ -544,7 +546,7 @@
               bind:value={negoAmount}
               placeholder={$t('lev.weget.amountYouPropose')}
             />
-            ₪
+            <CurrencySymbol />
           </label>
           <input
             minlength="3"
@@ -792,7 +794,7 @@
                 <span
                   onmouseenter={() => hover('ההוצאה שדווחה החודש - לחצו על הלב לאישור')}
                   onmouseleave={() => hover('0')}
-                  style="color:var(--gold)">🔁 {shownAmount} ₪</span
+                  style="color:var(--gold)">🔁 <Money amount={shownAmount} {projectId} /></span
                 >
               {:else}
                 <span
@@ -803,7 +805,7 @@
                         : 'ממתין לדיווח ההוצאה ע"י האחראי'
                     )}
                   onmouseleave={() => hover('0')}
-                  style="color:#9aa0a6;">🔁 ~{pricePerUnit} ₪ {isResponsible ? '(מתוכנן)' : '(טרם דווח)'}</span
+                  style="color:#9aa0a6;">🔁 ~<Money amount={pricePerUnit} {projectId} /> {isResponsible ? '(מתוכנן)' : '(טרם דווח)'}</span
                 >
               {/if}
               {#if cycleIndex}

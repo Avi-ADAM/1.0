@@ -1,0 +1,86 @@
+{
+  "title": "La información compartida de la rikma",
+  "intro": "Un solo lugar para los documentos, las imágenes y los enlaces con los que trabaja la rikma. Todos los miembros los ven y todos pueden añadir.",
+  "loadFailed": "No pudimos cargar el estante ahora mismo. Puedes añadir un elemento igualmente y la lista se pondrá al día.",
+  "filterLegend": "Filtrar por tipo",
+  "unfiled": "Sin carpeta",
+  "empty": "El estante todavía está vacío. El primer elemento — un contrato, una foto, un enlace a vuestro Drive — lo empieza.",
+  "emptyFilter": "Todavía no hay nada de ese tipo.",
+  "vaultNote": "Las contraseñas y los secretos no se guardan aquí. Un secreto en un campo de texto es un secreto que el servidor puede leer — la caja fuerte cifrada llega en una etapa aparte.",
+  "filters": {
+    "all": "Todo",
+    "file": "Documentos",
+    "image": "Imágenes",
+    "link": "Enlaces"
+  },
+  "kinds": {
+    "file": "Documento",
+    "image": "Imagen",
+    "link": "Enlace"
+  },
+  "drive": {
+    "title": "El Drive de la rikma",
+    "note": "El enlace ya configurado en los datos de la rikma"
+  },
+  "add": {
+    "open": "Añadir un elemento",
+    "close": "Cerrar",
+    "kindLegend": "Qué tipo de elemento",
+    "url": "Dirección",
+    "urlHint": "Un enlace a un Drive, a un documento o a cualquier sitio. El archivo se queda donde está — aquí solo se guarda el enlace.",
+    "file": "Archivo",
+    "name": "Nombre",
+    "folder": "Carpeta",
+    "folderPlaceholder": "por ejemplo: contratos/2026",
+    "note": "Descripción",
+    "save": "Guardar",
+    "saving": "Guardando…",
+    "choose": "Elige un archivo — o suéltalo aquí",
+    "fileHintMax": "Hasta {{max}}. Documentos, hojas de cálculo, presentaciones, imágenes, PDF, texto y zip.",
+    "privateHint": "Se guarda en almacenamiento privado — solo los miembros de la rikma pueden abrirlo"
+  },
+  "row": {
+    "edit": "Editar",
+    "remove": "Quitar",
+    "removeConfirm": "¿Quitar «{{name}}» del estante? Sale de la lista y no se borra para siempre.",
+    "saveEdit": "Guardar",
+    "cancel": "Cancelar",
+    "open": "Abrir",
+    "openLink": "Ir al enlace",
+    "private": "Privado"
+  },
+  "errors": {
+    "upload": "La subida falló.",
+    "save": "No se pudo guardar.",
+    "remove": "No se pudo quitar.",
+    "name": "El elemento necesita un nombre."
+  },
+  "p2p": {
+    "badge": "Piloto",
+    "title": "Compartir entre socios",
+    "lead": "Cuando este dispositivo se une, los archivos del estante pueden llegar directamente desde el dispositivo de otro socio de la rikma, sin pasar por el servidor. Es un piloto que mide si esto nos funciona.",
+    "statusPeers": "Conectado — {{count}} socios disponibles ahora",
+    "statusAlone": "Conectado — ahora no hay socios disponibles",
+    "status": {
+      "off": "Apagado",
+      "connecting": "Conectando…",
+      "offline": "Sin conexión por ahora — los archivos se abren desde el servidor"
+    },
+    "cache": "En este dispositivo: {{count}} archivos ({{size}})",
+    "served": "Pasaste {{count}} archivos a socios",
+    "clear": "Borrar los archivos de este dispositivo",
+    "clearConfirm": "¿Borrar los archivos guardados en este dispositivo? Siguen en el estante.",
+    "moreInfo": "¿Qué significa exactamente?",
+    "lessInfo": "Menos detalles",
+    "termIp": "Los socios de la rikma que reciben un archivo tuyo pueden ver la dirección IP pública de este dispositivo.",
+    "termBandwidth": "El dispositivo usa parte de tu ancho de banda para pasar archivos a socios, solo mientras esta pestaña está abierta y como máximo dos transferencias a la vez.",
+    "termVerify": "Cada archivo que llega de un socio se comprueba con la huella registrada al subirlo. Si no coincide, se descarta y se abre desde el servidor.",
+    "termMeasure": "Solo se guardan estadísticas: de dónde llegó el archivo y cuánto tardó. Ni el nombre del archivo ni quién lo abrió.",
+    "fetching": "Trayendo…",
+    "source": {
+      "cache": "Desde este dispositivo",
+      "peer": "Desde un socio",
+      "origin": "Desde el servidor"
+    }
+  }
+}

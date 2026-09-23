@@ -9,6 +9,8 @@
   import RichText from '$lib/celim/ui/richText.svelte';
   import { onMount } from 'svelte';
   import Uplad from '$lib/components/userPr/uploadPic.svelte';
+  import CurrencyPicker from '$lib/components/money/CurrencyPicker.svelte';
+  import { DEFAULT_CURRENCY } from '$lib/money/currencies.js';
   import {
     DEFAULT_OPEN_YEARS,
     MAX_OPEN_YEARS,
@@ -56,6 +58,33 @@
   let loading = $state(false);
   let successMsg = $state('');
   let errorMsg = $state('');
+
+  // The rikma's own books (PLAN_MULTI_CURRENCY D-C8). Saved on its own, not
+  // with the rest of the form: the server refuses it once money exists, and
+  // that refusal must not take the whole "save details" with it.
+  let rikmaCurrency = $state(projectBase?.currencyCode || DEFAULT_CURRENCY);
+  let currencyMsg = $state('');
+  let currencyErr = $state('');
+  let currencySaving = $state(false);
+
+  async function saveCurrency(code) {
+    currencyMsg = '';
+    currencyErr = '';
+    currencySaving = true;
+    const res = await executeAction(
+      'setRikmaCurrency',
+      { projectId: String(projectId), currency: code },
+      { showErrorToast: false }
+    );
+    currencySaving = false;
+    if (res?.success) {
+      currencyMsg = $t('money.rikma.saved');
+      await invalidateAll();
+    } else {
+      currencyErr = res?.error?.message || $t('money.rikma.locked');
+      rikmaCurrency = projectBase?.currencyCode || DEFAULT_CURRENCY;
+    }
+  }
 
   const isMultiUser = memberCount > 1;
 
@@ -172,6 +201,22 @@
     <div class="flex justify-center bg-gray-50 rounded-lg p-4 border-2 border-dashed border-gold/30">
       <Uplad onMessage={handleUpload} current={srcP} noHeader={true} />
     </div>
+  </div>
+
+  <!-- The currency the rikma keeps its books in (PLAN_MULTI_CURRENCY). Every
+       member still reads amounts in their own; this is only the unit the
+       rikma counts in, and it can be set while no money has been recorded. -->
+  <div class="field-group">
+    <label class="field-label" for="epd-currency">{$t('money.rikma.title')}</label>
+    <CurrencyPicker
+      id="epd-currency"
+      bind:value={rikmaCurrency}
+      disabled={currencySaving}
+      onchange={saveCurrency}
+    />
+    <small class="text-gold">{$t('money.rikma.desc')}</small>
+    {#if currencyMsg}<small class="text-green-600 block" role="status">{currencyMsg}</small>{/if}
+    {#if currencyErr}<small class="text-red-600 block" role="alert">{currencyErr}</small>{/if}
   </div>
 
   <!-- Name -->

@@ -7,6 +7,7 @@
  * differently.
  */
 
+import { rikmaCurrency } from '$lib/money/resolve.js';
 import { gqlStr, run, type Exec } from '$lib/server/archive/gql.js';
 import type {
   StipendMode,
@@ -142,6 +143,8 @@ export async function fetchProjectStipendMissions(
 }
 
 export interface StipendProjectContext {
+  /** ISO-4217 code every amount of this rikma is stored in. */
+  currency: string;
   projectId: string;
   projectName: string;
   restime: string | null;
@@ -160,7 +163,7 @@ export async function fetchProjectContext(
   const data = await run(
     exec,
     `{ project(id: ${gqlStr(projectId)}) { data { id attributes {
-      projectName restime stipendPolicy stipendDefaultCostShare stipendDefaultRate
+      projectName restime stipendPolicy stipendDefaultCostShare stipendDefaultRate currencyCode
       user_1s { data { id attributes { username } } }
     } } } }`,
     'project'
@@ -175,6 +178,8 @@ export async function fetchProjectContext(
   return {
     projectId: String(p.id),
     projectName: String(a.projectName ?? ''),
+    // The rikma's books (PLAN_MULTI_CURRENCY); null = legacy = ILS.
+    currency: rikmaCurrency(a),
     restime: a.restime ?? null,
     policy: (a.stipendPolicy ?? null) as StipendPolicy | null,
     defaultCostShare: num(a.stipendDefaultCostShare),

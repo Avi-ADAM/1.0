@@ -6,12 +6,29 @@
   import ScreenFrame from '$lib/components/onboard/ScreenFrame.svelte';
   import JourneyStrip from '$lib/components/onboard/JourneyStrip.svelte';
   import Plaque from '$lib/components/onboard/Plaque.svelte';
+  import { t } from '$lib/translations';
+  import {
+    CONCIERGE_LANDING,
+    hasConciergeIntentCookie
+  } from '$lib/concierge/regIntent.js';
+  import { readGuestDraft } from '$lib/concierge/wishDraft.js';
 
   let email = $state('');
   let resent = $state(false);
   let resending = $state(false);
+  /**
+   * A customer on the concierge track, and what is waiting for them: a wish
+   * they already pressed "send" on, one they only wrote, or nothing yet. The
+   * draft lives in this browser only, so they need to open the link here.
+   * @type {'' | 'send' | 'saved' | 'none'}
+   */
+  let conciergeDraft = $state('');
 
   onMount(() => {
+    if (hasConciergeIntentCookie(document.cookie)) {
+      const draft = readGuestDraft();
+      conciergeDraft = !draft ? 'none' : draft.sendOnReturn ? 'send' : 'saved';
+    }
     const match = document.cookie.split('; ').find((r) => r.startsWith('email='));
     if (match) email = decodeURIComponent(match.split('=')[1]);
   });
@@ -44,7 +61,15 @@
 
 <ScreenFrame>
   {#snippet journey()}
-    <JourneyStrip stepIdx={2} totalSteps={6} label="שלב 2 · אישור מייל" />
+    {#if conciergeDraft}
+      <JourneyStrip
+        stepIdx={3}
+        totalSteps={3}
+        label={$t('madeForYou.reg.stepEmail')}
+      />
+    {:else}
+      <JourneyStrip stepIdx={2} totalSteps={6} label="שלב 2 · אישור מייל" />
+    {/if}
   {/snippet}
 
   <div class="content" in:scale={{ duration: 600, opacity: 0.5, start: 0.96, easing: quintOut }}>
@@ -90,6 +115,13 @@
       לחצו על הקישור במייל כדי לאשר ולפתוח את הדלת. הקישור תקף שעה.
     </div>
 
+    {#if conciergeDraft}
+      <div class="wish-note" in:fly={{ y: 6, duration: 400 }}>
+        <span class="wish-note-icon"><EntityIcon kind="concierge" size={18} /></span>
+        <p>{$t(`madeForYou.reg.draft_${conciergeDraft}`)}</p>
+      </div>
+    {/if}
+
     {#if resent}
       <p class="resent-msg" in:fly={{ y: -4, duration: 300 }}>✓ מייל נשלח שוב!</p>
     {:else}
@@ -104,7 +136,12 @@
     <div class="spam-tip">בודקים בתיבת הספאם? לפעמים גוגל מסתיר אותנו שם.</div>
 
     <div class="footer">
-      אחרי האישור, <a href="/login" class="link">לחצו להתחבר</a>
+      אחרי האישור, <a
+        href={conciergeDraft
+          ? `/login?from=${encodeURIComponent(CONCIERGE_LANDING)}`
+          : '/login'}
+        class="link">לחצו להתחבר</a
+      >
     </div>
   </div>
 </ScreenFrame>
@@ -154,6 +191,27 @@
     gap: 8px;
     flex-wrap: wrap;
     justify-content: center;
+  }
+  .wish-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    max-width: 360px;
+    padding: 10px 14px;
+    border-radius: 14px;
+    background: #fffaf0;
+    border: 1px solid #d4af37;
+    color: #4a3712;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  .wish-note p {
+    margin: 0;
+  }
+  .wish-note-icon {
+    flex: none;
+    margin-top: 2px;
+    color: #9a6b10;
   }
   .spam-tip {
     font-size: 11.5px;

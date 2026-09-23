@@ -1,4 +1,5 @@
-import { safeRedirectTarget } from '$lib/auth/redirectTarget.js';
+import { DEFAULT_REDIRECT, safeRedirectTarget } from '$lib/auth/redirectTarget.js';
+import { signInHome } from '$lib/concierge/regIntent.js';
 
 /**
  * The address is remembered at signup and re-stamped by /confirm-email, so the
@@ -16,7 +17,12 @@ export const actions = {
         const password = data.get('password');
         // The hidden field is filled from an already-checked value, but the form
         // is a public POST endpoint: anyone can send their own `from`.
-        const redirectTo = safeRedirectTarget(data.get('from'));
+        // With no destination asked for, a concierge customer goes to their
+        // wishes — the default, /onboard, is the flow their track skips.
+        const redirectTo = safeRedirectTarget(
+            data.get('from'),
+            signInHome(cookies, DEFAULT_REDIRECT)
+        );
 
         if (!email || !password) {
             return { success: false, error: 'Please fill all fields.' };

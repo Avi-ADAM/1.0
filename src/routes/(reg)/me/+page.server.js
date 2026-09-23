@@ -1,6 +1,8 @@
 import { redirect } from '@sveltejs/kit';
 import { sendViaProxy } from '$lib/server/sendViaProxy.js';
 import { ssrApiBase } from '$lib/server/ssrApiBase.js';
+import { sendToSer } from '$lib/send/sendToSer.js';
+import { summarizeRatsonNodes } from '$lib/concierge/summary.js';
 
 const DEFAULT_PIC =
   'https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png';
@@ -49,8 +51,28 @@ export async function load({ locals, fetch, depends }) {
     throw redirect(303, '/login');
   }
 
+  // The concierge summary (drafts / on order / updates) rides alongside the
+  // profile, not after it — and never fails the page: null just hides the
+  // badge. See $lib/concierge/summary.js.
+  const conciergePromise = sendToSer(
+    { uid: String(uid) },
+    '106listMyRatsons',
+    0,
+    0,
+    false,
+    fetch
+  )
+    .then((res) => summarizeRatsonNodes(res?.data?.ratsons?.data ?? []))
+    .catch((e) => {
+      console.warn('me: concierge summary failed', e);
+      return null;
+    });
+
   try {
-    const data = await sendViaProxy(fetch, 'meProfile', { uid: String(uid) });
+    const [data, concierge] = await Promise.all([
+      sendViaProxy(fetch, 'meProfile', { uid: String(uid) }),
+      conciergePromise
+    ]);
 
     const userData = data?.usersPermissionsUser?.data;
     if (!userData || !userData.attributes) {
@@ -86,6 +108,7 @@ export async function load({ locals, fetch, depends }) {
       avatarSmall,
       total: meData.hervachti ?? 0,
       showGuide: meData.profilManualAlready !== true,
+      concierge,
       // The GitHub connect flow runs on the API host (settings page card).
       githubConnectBase: ssrApiBase(),
       loadError: false
@@ -106,6 +129,7 @@ export async function load({ locals, fetch, depends }) {
       avatarSmall: '',
       total: 0,
       showGuide: false,
+      concierge: null,
       loadError: true
     };
   }

@@ -1,0 +1,22 @@
+{
+    "converted": "Convertido de {{original}} al tipo de referencia del {{date}}",
+    "writtenAs": "Registrado originalmente como {{original}}",
+    "currency": "Moneda",
+    "search": "Buscar moneda…",
+    "common": "Frecuentes",
+    "all": "Todas las monedas",
+    "inRikma": "≈ {{amount}} en la moneda de la rikma",
+    "noRate": "Ahora mismo no hay tipo de cambio para esta moneda",
+    "pref": {
+        "title": "Mi moneda",
+        "desc": "Todos los importes del sitio se te muestran en esta moneda, a un tipo de referencia diario. Cada persona registra en su propia moneda, y el importe original siempre está a un paso del cursor.",
+        "saved": "Se guarda en tu cuenta y te acompaña en otros dispositivos",
+        "guessed": "Lo dedujimos de la configuración de tu navegador; puedes cambiarlo"
+    },
+    "rikma": {
+        "title": "Moneda de la rikma",
+        "desc": "La rikma cuenta todo su dinero en una sola moneda: ventas, repartos y valor de las misiones. Cada socio registra en su propia moneda, el importe se convierte al tipo de ese día y cada uno lo ve en la suya.",
+        "locked": "Ya se ha registrado dinero en esta rikma, así que su moneda ya no se puede cambiar.",
+        "saved": "Moneda de la rikma actualizada"
+    }
+}

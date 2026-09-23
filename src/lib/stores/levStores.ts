@@ -19,6 +19,8 @@ export interface ProjectData {
   id: string;
   attributes: {
     projectName: string;
+    /** ISO-4217 code this rikma keeps its books in; null = legacy = ILS. */
+    currencyCode?: string | null;
     restime?: any;
     profilePic?: {
       data?: {

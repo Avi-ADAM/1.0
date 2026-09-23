@@ -1,4 +1,5 @@
 import { sendToSer } from '$lib/send/sendToSer.js';
+import { pendingProposalCount, ratsonStatus, summarizeRatsonNodes } from '$lib/concierge/summary.js';
 import type { PageServerLoad } from './$types';
 
 type RatsonCard = {
@@ -10,6 +11,8 @@ type RatsonCard = {
   fulfilled: boolean;
   fulfillmentScore: number | null;
   proposalsCount: number;
+  /** Offers still waiting for the owner's answer. */
+  pendingCount: number;
   missionsCount: number;
   resourcesCount: number;
   values: string[];
@@ -35,7 +38,17 @@ function shortCode(id: string | number): string {
 
 function excerpt(text: string | null, max = 180): string {
   if (!text) return '';
-  const trimmed = text.replace(/\s+/g, ' ').trim();
+  // longDes is the composer's rich-text HTML; a card shows its words only.
+  const trimmed = text
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/\s+/g, ' ')
+    .trim();
   return trimmed.length > max ? trimmed.slice(0, max - 1) + '…' : trimmed;
 }
 
@@ -55,10 +68,11 @@ function mapRatsonCard(node: any): RatsonCard {
     code: shortCode(node.id),
     name: a.name || '(ללא שם)',
     excerpt: excerpt(a.longDes || a.desc),
-    status: a.status_ratson || (a.fulfilled ? 'fulfilled' : 'open'),
+    status: ratsonStatus(a),
     fulfilled: !!a.fulfilled,
     fulfillmentScore: typeof a.fulfillment_score === 'number' ? a.fulfillment_score : null,
-    proposalsCount: 0,
+    proposalsCount: a.ratson_proposals?.data?.length ?? 0,
+    pendingCount: pendingProposalCount(a),
     missionsCount: a.missions?.data?.length ?? 0,
     resourcesCount: a.mashaabims?.data?.length ?? 0,
     values: (a.vallues?.data ?? []).map((v: any) => v.attributes?.valueName).filter(Boolean),
@@ -88,6 +102,7 @@ export const load: PageServerLoad = async ({ locals, fetch }) => {
   const uid = (locals as any)?.uid;
 
   let mine: RatsonCard[] = [];
+  let summary = summarizeRatsonNodes([]);
   let publicFeed: PublicRatsonCard[] = [];
   let queryOk = { mine: false, public: false };
 
@@ -96,6 +111,7 @@ export const load: PageServerLoad = async ({ locals, fetch }) => {
       const res: any = await sendToSer({ uid }, '106listMyRatsons', 0, 0, false, fetch);
       const nodes = res?.data?.ratsons?.data ?? [];
       mine = nodes.map(mapRatsonCard);
+      summary = summarizeRatsonNodes(nodes);
       queryOk.mine = true;
     } catch (e) {
       console.error('[concierge] 106listMyRatsons failed', e);
@@ -111,5 +127,5 @@ export const load: PageServerLoad = async ({ locals, fetch }) => {
     console.error('[concierge] 109listOpenRatsons failed', e);
   }
 
-  return { mine, publicFeed, queryOk, uid };
+  return { mine, publicFeed, queryOk, uid, summary };
 };

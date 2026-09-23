@@ -1,4 +1,8 @@
 ﻿<script lang="ts">
+  import Money from '$lib/components/money/Money.svelte';
+  import CurrencyPicker from '$lib/components/money/CurrencyPicker.svelte';
+  import { useMoney, useRikmaCurrency } from '$lib/money/context.svelte';
+  import { DEFAULT_CURRENCY } from '$lib/money/currencies.js';
   import { isRtl, t } from '$lib/translations';
   import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
   import { lang } from '$lib/stores/lang.js';
@@ -94,7 +98,15 @@
 
   // ─── complex-only fields ──────────────────────────────────────────────────
   let marginPct = $state(0);
-  const currency = 'ILS';
+  // The currency every price on this form is typed in — the price and each
+  // recipe rate alike. The server converts all of them into the rikma's
+  // (PLAN_MULTI_CURRENCY C5). A blank form starts in the writer's own; a draft
+  // arrives with numbers already in the rikma's, so it starts there.
+  const money = useMoney();
+  const enclosingRikma = useRikmaCurrency();
+  let currency = $state(
+    initialDraft?.price != null ? (enclosingRikma() ?? DEFAULT_CURRENCY) : money.currency
+  );
   let recipeMissions = $state<RecipeMissionRow[]>([]);
   let recipeResources = $state<RecipeResourceRow[]>([]);
 
@@ -386,6 +398,11 @@
     ></textarea>
   </label>
 
+  <label class="field">
+    <span class="label-block">{$t('money.currency')}</span>
+    <CurrencyPicker bind:value={currency} />
+  </label>
+
   <!-- Price (simple only) -->
   {#if !isComplex}
     <label class="field">
@@ -476,7 +493,7 @@
       <div class="sum-row total">
         <span>{ui.total}</span>
         <strong>
-          ₪ {simpleTotal.toLocaleString('en', { maximumFractionDigits: 2 })}
+          <Money amount={simpleTotal} {currency} />
           {#if unlimitedM || kindOf === 'unlimited'}
             <small>/ unit</small>
           {/if}
@@ -496,6 +513,7 @@
       <MissionPickerList
         bind:rows={recipeMissions}
         {projectId}
+        {currency}
         {availableMissions}
         {projectMembers}
         {missionTemplates}
@@ -510,6 +528,7 @@
       <ResourcePickerList
         bind:rows={recipeResources}
         {projectId}
+        {currency}
         {availableResources}
         {projectMembers}
         {resourceTemplates}
@@ -536,13 +555,13 @@
       <div class="sum-row">
         <span>{ui.subtotal}</span>
         <strong>
-          ₪ {subTotal.toLocaleString('en', { maximumFractionDigits: 2 })}
+          <Money amount={subTotal} {currency} />
         </strong>
       </div>
       <div class="sum-row total">
         <span>{ui.estimated}</span>
         <strong>
-          ₪ {estimatedPrice.toLocaleString('en', { maximumFractionDigits: 2 })}
+          <Money amount={estimatedPrice} {currency} />
         </strong>
       </div>
       {#if openItems > 0}

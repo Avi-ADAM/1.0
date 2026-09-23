@@ -1,10 +1,15 @@
 <script lang="ts">
+  import { currencySymbol } from '$lib/money/format.js';
+  import { useMoney } from '$lib/money/context.svelte';
+  import { useFormatMoney } from '$lib/money/context.svelte';
   import StatsCard from './StatsCard.svelte';
   import { t } from '$lib/translations';
   import { lang } from '$lib/stores/lang.js';
   import type { DashboardStats } from '$lib/types';
 
   let { stats }: { stats: DashboardStats } = $props();
+  const fmtMoney = useFormatMoney();
+  const money = useMoney();
 </script>
 
 <div class="row">
@@ -17,9 +22,9 @@
   />
   <StatsCard
     label={$t('deals.totalPaid')}
-    value="₪ {stats.totalPaid.toLocaleString()}"
-    sub="{$t('deals.outOf')} {stats.totalCost.toLocaleString()} ₪"
-    icon="₪"
+    value={fmtMoney(stats.totalPaid)}
+    sub="{$t('deals.outOf')} {fmtMoney(stats.totalCost)}"
+    icon={currencySymbol(money.currency, money.lang)}
   />
   <StatsCard
     label={$t('deals.pendingApprovalTitle')}

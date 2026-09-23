@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Money from '$lib/components/money/Money.svelte';
   import Panel from '$lib/components/Panel.svelte';
   import { t } from '$lib/translations';
   import { lang } from '$lib/stores/lang.js';
@@ -24,9 +25,9 @@
         <div class="item-name">{a.name}</div>
         <div class="item-sub">
           {#if a.type === 'mission'}
-            {$t('deals.newMission')} · {a.hours} {$t('deals.hoursShort')} · ₪ {a.cost.toLocaleString()}
+            {$t('deals.newMission')} · {a.hours} {$t('deals.hoursShort')} · <Money amount={a.cost} />
           {:else}
-            {$t('deals.newResource')} · ₪ {a.cost.toLocaleString()}
+            {$t('deals.newResource')} · <Money amount={a.cost} />
           {/if}
         </div>
         <div class="btns">

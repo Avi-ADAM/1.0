@@ -1,3 +1,4 @@
+import { rikmaMoneyText } from '$lib/server/money/notifyMoney.js';
 /**
  * Action Configuration: Counter-offer on a recurring monthly cycle (Maap)
  *
@@ -134,9 +135,10 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
       forumId = fRes?.data?.createForum?.data?.id ?? null;
     }
     if (forumId) {
+      const money = await rikmaMoneyText(mashProjectId, context.jwt as string, context.fetch as typeof fetch);
       const mes =
         `🔁 הצעת סכום חדשה למחזור #${cycleIndex}: ` +
-        `${Number(oldAmount)} ₪ ← ${proposed} ₪` +
+        `${money(oldAmount)} ← ${money(proposed)}` +
         (reason ? `\nסיבה: ${reason}` : '');
       await strapi.execute(
         '1chatsend',

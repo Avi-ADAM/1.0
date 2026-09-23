@@ -73,6 +73,8 @@ export const qidsAccess = {
   '308myResourcesViaUser': { allow: ['user', 'serviceAdmin'] }, // self-only on the JWT path — PRE guard in guards.js
   '309myResourceOccupancy': { allow: ['user', 'serviceAdmin'] }, // self-only on the JWT path — PRE guard in guards.js
   '310projectResourceOccupancy': { allow: ['user', 'serviceAdmin'] }, // members only — PRE guard in guards.js
+  '325projectSpaceDocs': { allow: ['user', 'serviceAdmin'] }, // members only — PRE guard in guards.js
+  '326spaceDocForServe': { allow: ['serviceAdmin'] }, // any doc id → the serve endpoint decides membership against locals.uid
   '278myMissionsViaUser': { allow: ['user', 'serviceAdmin'] },
   '272myOfferingsCounts': { allow: ['serviceAdmin'] }, // unreferenced in codebase (2026-07-18) — tightened to serviceAdmin-only
   '273myMissionsFull': { allow: ['serviceAdmin'] }, // unreferenced in codebase (2026-07-18) — tightened to serviceAdmin-only

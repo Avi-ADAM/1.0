@@ -1,4 +1,5 @@
 <script>
+  import Money from '$lib/components/money/Money.svelte';
   import { onMount, onDestroy } from 'svelte';
   import { showFoot } from '$lib/stores/showFoot.js';
   import { goto } from '$app/navigation';
@@ -1711,7 +1712,7 @@
                     >{/if}
                   {#if row.need.bestPrice}<span
                       style="font-size:12px;color:#fde68a"
-                      >₪{row.need.bestPrice}</span
+                      ><Money amount={row.need.bestPrice} /></span
                     >{/if}
                   {#if isOwner && HAS_REAL}
                     <span class="need-tools">
@@ -1784,7 +1785,7 @@
                               <span class="pproj">· מוצר מוכן</span>
                               {#if m.price != null}<span
                                   style="color:#fde68a;font-size:12px"
-                                  >{m.currencySymbol || '₪'}{fmt(m.price)}</span
+                                  ><Money amount={m.price} currency={m.currencyCode} /></span
                                 >{/if}
                             </div>
                           </div>
@@ -1866,7 +1867,7 @@
                                 >{/if}
                               {#if r.price != null}<span
                                   style="color:#fde68a;font-size:12px"
-                                  >₪{fmt(r.price)}</span
+                                  ><Money amount={r.price} /></span
                                 >{/if}
                             </div>
                           </div>
@@ -1942,7 +1943,7 @@
                         {#if p.hours}<span style="opacity:.7"
                             >{p.hours} שע׳ ·
                           </span>{/if}
-                        <span style="color:#fde68a">₪{fmt(p.price)}</span>
+                        <span style="color:#fde68a"><Money amount={p.price} /></span>
                       </div>
                       {#if p.status === 'accepted'}
                         <span
@@ -2016,7 +2017,7 @@
                             >{/if}
                           {#if m.price != null}<span
                               style="color:#fde68a;font-size:12px"
-                              >{m.currencySymbol || '₪'}{fmt(m.price)}</span
+                              ><Money amount={m.price} currency={m.currencyCode} /></span
                             >{/if}
                         </div>
                       </div>
@@ -2108,7 +2109,7 @@
                             >{/if}
                           {#if r.price != null}<span
                               style="color:#fde68a;font-size:12px"
-                              >₪{fmt(r.price)}</span
+                              ><Money amount={r.price} /></span
                             >{/if}
                         </div>
                       </div>
@@ -2389,7 +2390,7 @@
                       ? '#52493e'
                       : '#fde68a'};white-space:nowrap"
                   >
-                    {line.status === 'open' ? '—' : '₪' + fmt(line.price)}
+                    {#if line.status === 'open'}—{:else}<Money amount={line.price} />{/if}
                   </div>
                 </div>
               {/each}
@@ -2403,7 +2404,7 @@
               >
               <span
                 style="font-family:'Sababa','Heebo',sans-serif;font-size:28px;color:#fde68a"
-                >₪{fmt(grandTotal)}</span
+                ><Money amount={grandTotal} /></span
               >
             </div>
             <div style="display:flex;gap:10px;margin-top:16px">

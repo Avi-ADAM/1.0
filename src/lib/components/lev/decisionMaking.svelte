@@ -1,4 +1,5 @@
 <script>
+  import Money from '$lib/components/money/Money.svelte';
   import { t, isRtl } from '$lib/translations';
   import { get } from 'svelte/store';
   import { Drawer } from 'vaul-svelte';
@@ -1468,7 +1469,7 @@
       </label>
 
       <p class="nego-total">
-        {$t('lev.decisionMaking.total')}: {(Number(nqty) || 0) * (Number(nprice) || 0)}₪
+        {$t('lev.decisionMaking.total')}: <Money amount={(Number(nqty) || 0) * (Number(nprice) || 0)} {projectId} />
       </p>
 
       <div class="nego-actions">

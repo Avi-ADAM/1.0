@@ -381,6 +381,7 @@ export type ActionKey =
   | 'ensureStageForum'
   | 'updateProjectDetails'
   | 'createResource'
+  | 'setRikmaCurrency'
   | 'submitNegoMission'
   | 'submitNegoMash'
   | 'submitNegoMaap'
@@ -502,6 +503,12 @@ export type ActionKey =
   | 'createComplexMatanot'
   // Mission progress percentage — the lev card and the moach progress board.
   | 'updateMissionStatus'
+  // The rikma's shared library — documents, images, links
+  // (PLAN_RIKMA_SHARED_INFO stage 1). No vault key here on purpose: a secret
+  // never travels through this path.
+  | 'createSpaceDoc'
+  | 'updateSpaceDoc'
+  | 'archiveSpaceDoc'
   ;
 
 
@@ -601,6 +608,8 @@ export interface ActionParamsMap {
     lng?: number | null;
     radius?: number | null;
     location_hint?: string | null;
+    /** ISO code `price`/`easy` were typed in (PLAN_MULTI_CURRENCY); absent = the rikma's. */
+    entryCurrency?: string;
   };
   submitNegoMission: SubmitNegoMissionParams;
   submitNegoMash: SubmitNegoMashParams;

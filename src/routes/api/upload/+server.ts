@@ -1,6 +1,7 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from '@sveltejs/kit';
 import { STRAPI_URL } from '$lib/server/strapiUrl.js';
+import { checkUpload, PROXY_MAX_BYTES } from '$lib/uploads/policy.js';
 
 /**
  * POST /api/upload
@@ -9,14 +10,9 @@ import { STRAPI_URL } from '$lib/server/strapiUrl.js';
  * Expects multipart/form-data with a 'files' field.
  * Returns the Strapi upload response (array of uploaded files).
  */
-// Guard rails for proxied uploads. Keep in sync with the Strapi provider limits.
-const MAX_FILE_BYTES = 15 * 1024 * 1024; // 15 MB per file
-const ALLOWED_MIME = new Set([
-  'image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/svg+xml',
-  'application/pdf',
-  'application/msword',
-  'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-]);
+// Guard rails for proxied uploads. The whitelist is shared with the direct
+// R2 path (docs/PLAN_RIKMA_SHARED_INFO.md stage 2) — see $lib/uploads/policy.
+// The cap is the proxy's own: these bytes pass through this server.
 
 export const POST: RequestHandler = async ({ request, cookies, fetch }) => {
   const jwt = cookies.get('jwt');
@@ -35,11 +31,9 @@ export const POST: RequestHandler = async ({ request, cookies, fetch }) => {
       throw error(400, 'No files provided');
     }
     for (const file of files) {
-      if (file.size > MAX_FILE_BYTES) {
-        throw error(413, `File "${file.name}" exceeds the ${MAX_FILE_BYTES / (1024 * 1024)}MB limit`);
-      }
-      if (!ALLOWED_MIME.has(file.type)) {
-        throw error(415, `Unsupported file type: ${file.type || 'unknown'}`);
+      const refusal = checkUpload(file, PROXY_MAX_BYTES);
+      if (refusal) {
+        throw error(refusal.code === 'size' ? 413 : refusal.code === 'type' ? 415 : 400, refusal.message);
       }
     }
 

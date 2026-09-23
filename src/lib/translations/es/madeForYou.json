@@ -1,0 +1,95 @@
+{
+  "meta": {
+    "title": "Concierge personal · Lo que quieras, exactamente como lo quieras · 1lev1",
+    "description": "Cuéntanos con tus palabras lo que necesitas: un regalo, una reforma, un evento o un servicio fijo. El concierge encuentra a los profesionales y arma para ti un único plan, hecho a tu medida. Nada avanza sin tu aprobación."
+  },
+  "hero": {
+    "eyebrow": "Concierge personal",
+    "h1a": "Lo que quieras.",
+    "h1b": "Exactamente como lo quieras.",
+    "sub": "Cuéntanos con tus palabras lo que necesitas: un regalo, una reforma, un evento, un servicio fijo. El concierge desglosa el pedido, encuentra a los profesionales adecuados y vuelve con un único plan, hecho a tu medida.",
+    "cta": "Cuéntanos qué quieres",
+    "ctaNote": "Puedes empezar a escribir sin registrarte · el pedido es gratis",
+    "how": "Cómo funciona"
+  },
+  "card": {
+    "label": "Nuevo pedido",
+    "text": "Una tarta de cumpleaños de tres pisos para mi hija, con temática de mar, entregada en casa el viernes.",
+    "tag1": "Repostería y decoración",
+    "tag2": "Entrega",
+    "tag3": "Viernes · a domicilio",
+    "found": "3 profesionales adecuados",
+    "approved": "Aprobado ✓ empezamos"
+  },
+  "promise": {
+    "p1t": "Pides, no buscas",
+    "p1d": "Sin categorías, sin comparar y sin perseguir proveedores. Escribes lo que quieres, y listo.",
+    "p2t": "A tu medida, hasta el último detalle",
+    "p2d": "Nada de estantería: cada pedido se construye en torno a lo que pediste: tus tiempos, tu lugar y tu presupuesto.",
+    "p3t": "Nada avanza sin tu «sí»",
+    "p3d": "Ves la propuesta completa y la apruebas. Hasta entonces, ningún compromiso."
+  },
+  "how": {
+    "title": "Cómo funciona",
+    "s1t": "Cuéntanos",
+    "s1d": "Escríbelo con tus palabras, como un mensaje a un amigo. Puedes añadir cuándo, dónde y con qué presupuesto.",
+    "s2t": "Desglosamos y buscamos",
+    "s2d": "Lev, nuestro asistente inteligente, divide el pedido en partes y encuentra quién puede aportar cada una.",
+    "s3t": "Tú eliges",
+    "s3d": "Te llegan propuestas. Puedes hablar con cada proveedor antes de decidir y aprobar solo lo que encaje.",
+    "s4t": "Recibes",
+    "s4d": "Cuando todas las partes están aprobadas, el equipo se pone a trabajar, y tú lo sigues todo desde un solo lugar."
+  },
+  "consent": {
+    "eyebrow": "Qué es distinto aquí",
+    "title": "Aquí nadie te presiona.",
+    "sub": "Todo en el concierge ocurre por acuerdo mutuo. Ni precios impuestos, ni «lo tomas o lo dejas», ni letra pequeña.",
+    "c1t": "Tú eliges quién hace qué",
+    "c1d": "Ningún proveedor se asigna a tu pedido sin tu aprobación.",
+    "c2t": "¿No encaja? Se habla",
+    "c2d": "En lugar de un «no» y cada uno por su lado: una conversación directa con el proveedor hasta llegar a algo que sirva a los dos.",
+    "c3t": "Todo claro desde el principio",
+    "c3d": "Ves el plan completo, quién, qué y cuándo, antes de comprometerte a nada.",
+    "c4t": "La misma regla para todos",
+    "c4d": "Los proveedores firman el mismo acuerdo: nadie impone nada a nadie."
+  },
+  "ideas": {
+    "title": "¿Qué se puede pedir?",
+    "sub": "Casi cualquier cosa. Algunas ideas para empezar:",
+    "gift": "Un regalo que nadie más tiene",
+    "task": "Una reparación o reforma en casa",
+    "community": "Un evento para amigos o la comunidad",
+    "trip": "Un viaje planeado al detalle",
+    "family": "Ayuda fija para la familia",
+    "free": "Algo completamente distinto"
+  },
+  "faq": {
+    "title": "Preguntas rápidas",
+    "q1": "¿Tengo que registrarme?",
+    "a1": "Para empezar a escribir, no. Cuando quieras enviarlo: una firma breve del acuerdo, correo y contraseña, una confirmación por correo, y el pedido se envía solo. Sin cuestionarios ni perfil.",
+    "q2": "¿Qué es el acuerdo que firmo?",
+    "a2": "Un único compromiso mutuo: no imponer ni obligar. Te protege exactamente igual que a quien te da el servicio.",
+    "q3": "¿Cuánto cuesta?",
+    "a3": "El pedido en sí es gratis. El precio lo marcan las propuestas que recibas, y puedes indicar un presupuesto de antemano para que se ajusten a él.",
+    "q4": "¿Quién verá mi pedido?",
+    "a4": "Eliges al escribirlo si es privado o abierto a la comunidad.",
+    "q5": "Empecé a escribir y no terminé, ¿qué pasa?",
+    "a5": "El pedido se guarda como borrador y lo encontrarás en el concierge y en tu perfil, justo donde lo dejaste."
+  },
+  "final": {
+    "title": "¿Tienes algo en mente?",
+    "sub": "Cuéntanoslo. El resto lo construimos juntos, de común acuerdo.",
+    "cta": "Empezamos"
+  },
+  "reg": {
+    "eyebrow": "Pedido personal",
+    "agreementOnly": "Un paso y estás dentro: firmar el acuerdo. Sin cuestionarios ni perfil: tras confirmar tu correo vas directo a tu pedido.",
+    "whyAgreement": "El acuerdo es una promesa mutua: nadie impone nada a nadie, tampoco a ti.",
+    "stepSignup": "Paso 2 de 3 · Cuenta",
+    "signupSub": "Solo correo y contraseña, y de ahí directo a tu pedido",
+    "stepEmail": "Paso 3 de 3 · Confirmar correo",
+    "draft_send": "El pedido que escribiste está guardado en este navegador y se enviará solo en cuanto confirmes tu correo. Abre el enlace aquí, en este mismo dispositivo.",
+    "draft_saved": "El pedido que empezaste está guardado en este navegador y te esperará como borrador. Abre el enlace aquí, en este mismo dispositivo.",
+    "draft_none": "Tras confirmar tu correo irás directo a escribir tu pedido, sin pasos adicionales."
+  }
+}

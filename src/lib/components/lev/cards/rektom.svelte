@@ -1,4 +1,5 @@
 ﻿<script>
+  import Money from '$lib/components/money/Money.svelte';
   import { lang } from '$lib/stores/lang.js';
   import { t, isRtl} from '$lib/translations';
   import Lev from '../../../celim/lev.svelte';
@@ -472,7 +473,7 @@
             onmouseleave={() => hover('0')}
             class="font-bold text-barbi text-base sm:text-lg"
           >
-            {perCycle.toLocaleString()} ₪ {unitWord.per}
+            <Money amount={perCycle} {projectId} /> {unitWord.per}
           </span>
           {#if cycleSize > 1}
             <span class="text-sm text-gray-600 dark:text-gray-300">
@@ -490,7 +491,7 @@
           >
             {$t('lev.rektom.totalInvest')}
             <span class="font-black text-gray-900 dark:text-white"
-              >{recurTotal.toLocaleString()} ₪</span
+              ><Money amount={recurTotal} {projectId} /></span
             >
             <span class="text-gray-500 dark:text-gray-400"
               >({perCycle.toLocaleString()} × {cycleCountLabel})</span

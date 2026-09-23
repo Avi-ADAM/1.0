@@ -1,4 +1,7 @@
 ﻿<script lang="ts">
+  import { currencySymbol } from '$lib/money/format.js';
+  import { useMoney, useRikmaCurrency } from '$lib/money/context.svelte';
+  import Money from '$lib/components/money/Money.svelte';
   import { isRtl } from '$lib/translations';
   import { lang } from '$lib/stores/lang.js';
   import RichText from '$lib/celim/ui/richText.svelte';
@@ -51,6 +54,9 @@
   };
 
   let { matanot }: Props = $props();
+  const money = useMoney();
+  const rikmaCur = useRikmaCurrency();
+  const sym = $derived(currencySymbol(rikmaCur() ?? 'ILS', money.lang));
 
   const isComplex = $derived(matanot.pricingMode && matanot.pricingMode !== 'fixed');
   const showBom = $derived(isComplex);
@@ -81,9 +87,9 @@
           resources: 'משאבים',
           hoursPerUnit: 'שעות ליחידה',
           unitsPerProduct: 'יחידות',
-          ratePerHour: '₪/שעה',
+          ratePerHour: `${sym}/שעה`,
           quantity: 'כמות',
-          pricePer: '₪/יחידה',
+          pricePer: `${sym}/יחידה`,
           subtotal: 'סך עלות BOM',
           margin: 'אחוז רווח',
           estimated: 'מחיר משוער',
@@ -101,9 +107,9 @@
           resources: 'Resources',
           hoursPerUnit: 'hours / unit',
           unitsPerProduct: 'units',
-          ratePerHour: '₪/h',
+          ratePerHour: `${sym}/h`,
           quantity: 'qty',
-          pricePer: '₪/unit',
+          pricePer: `${sym}/unit`,
           subtotal: 'BOM subtotal',
           margin: 'Margin',
           estimated: 'Estimated price',
@@ -217,7 +223,7 @@
       <div class="summary">
         <div class="row">
           <span>{t.subtotal}</span>
-          <strong>₪ {bomSubtotal.toLocaleString('en', { maximumFractionDigits: 2 })}</strong>
+          <strong><Money amount={bomSubtotal} /></strong>
         </div>
         {#if matanot.marginPct}
           <div class="row">
@@ -228,7 +234,7 @@
         <div class="row total">
           <span>{t.estimated}</span>
           <strong>
-            ₪ {Number(matanot.estimatedPrice ?? 0).toLocaleString('en', { maximumFractionDigits: 2 })}
+            <Money amount={Number(matanot.estimatedPrice ?? 0)} entry={matanot} />
           </strong>
         </div>
       </div>

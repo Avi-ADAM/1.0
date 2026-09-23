@@ -12,7 +12,7 @@
   "horizon2y": "Al cabo de 2 años",
   "horizon5y": "Al cabo de 5 años",
   "horizonNote": "La proyección supone que esto continúa y que la rikma sigue acumulando valor al ritmo de las misiones y los recursos recurrentes que tiene hoy.",
-  "perMonthEstimate": "≈ {{amount}} ₪ / mes",
+  "perMonthEstimate": "≈ {{amount}} / mes",
   "estimateNote": "El importe es solo una estimación aproximada (≈): se calcula según los ingresos de la rikma en los últimos {{months}} meses y puede variar.",
   "estimateNoteCommitments": "El importe es solo una estimación aproximada (≈): se calcula según los compromisos mensuales vigentes de la rikma y puede variar.",
   "yourShareIfDone": "Tu parte en la rikma al terminar la misión",

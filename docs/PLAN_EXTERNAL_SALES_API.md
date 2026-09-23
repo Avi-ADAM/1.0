@@ -146,6 +146,7 @@ createSale.ts (ללא שינוי מהותי) → Strapi
 | `startDate` / `finishDate` | ✖ | — | מנויים; `Sale.startDate/finishDate` |
 | `externalId` | מומלץ מאוד | — | `Sale.externalId` (אידמפוטנטיות) |
 | `note` | ✖ | — | `Sale.note` |
+| `currency` | ✖ | מטבע הרקמה | קוד ISO (`USD`); `amount` מומר למטבע הרקמה לפי שער היום, והמקור נשמר ב-`Sale.entryCurrency/entryRate` ([PLAN_MULTI_CURRENCY](./PLAN_MULTI_CURRENCY.md)) |
 
 `projectId` **לא** מתקבל מהלקוח — הוא נגזר מהמפתח. זה מה שהופך את המפתח
 ל"מוגדר רק לרקמה הזו".

@@ -1,4 +1,5 @@
 <script>
+  import { useFormatMoney } from '$lib/money/context.svelte';
   /**
    * "The cycle closed: 42 hours × ₪50 = ₪2,100 — pay" (PLAN_STIPEND §6, §8).
    *
@@ -28,6 +29,7 @@
   import CycleFacts from '$lib/components/stipend/CycleFacts.svelte';
 
   let { buble, isFirst = false, onProj, onDone } = $props();
+  const fmtMoney = useFormatMoney();
 
   let busy = $state(false);
   /** The "did you already transfer it?" step, between the button and the write. */
@@ -122,7 +124,7 @@
     logoSrc={buble.src}
     projectName={buble.projectName}
     cardType={$t('stipend.pay.cardType')}
-    cardTitle={`₪${Number(buble.amount).toFixed(2)}`}
+    cardTitle={fmtMoney(Number(buble.amount), null, { fraction: 'full' })}
     glowColor="teal"
     onProjectClick={handleProjectClick}
   />

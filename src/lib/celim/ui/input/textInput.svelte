@@ -37,11 +37,11 @@
     {autocomplete}
     class="input"
     required
-    style={color == "barbi" ? "color:var(--barbi-pink); border-bottom: solid 1px var(--barbi-pink)" : "color:var(--gold); border-bottom: solid 1px var(--gold)"}	
+    style={color == "barbi" ? "color:var(--barbi-pink); border-bottom: solid 1px var(--barbi-pink)" : "color:var(--goldink); border-bottom: solid 1px var(--goldink)"}	
   />
   <label
     for="name"
-    style="{color == 'barbi' ? 'color:var(--barbi-pink)' : 'color:var(--gold)'}"
+    style="{color == 'barbi' ? 'color:var(--barbi-pink)' : 'color:var(--goldink)'}"
     class="label">{displayLabel}</label
   >
   <span class="line"></span>

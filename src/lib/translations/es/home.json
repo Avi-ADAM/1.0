@@ -11,7 +11,16 @@
     "headline2": "Gestión empresarial inteligente con el corazón abierto",
     "headline3": "Plena independencia dentro de una comunidad que te apoya",
     "headline4": "Deja de alquilar tu tiempo",
-    "headline5": "Convierte cada hora en propiedad - juntos, por consenso"
+    "headline5": "Convierte cada hora en propiedad - juntos, por consenso",
+    "chipTime": "Tiempo",
+    "chipTimeV": "Horas de trabajo",
+    "chipMoney": "Dinero",
+    "chipMoneyV": "Inversión",
+    "chipGear": "Equipo",
+    "chipGearV": "Recursos",
+    "chipKnow": "Conocimiento",
+    "chipKnowV": "Experiencia",
+    "stageResult": "= tu parte de las ganancias"
   },
   "intro": {
     "q1": "¿Tienes un talento increíble pero te cuesta monetizarlo solo?",
@@ -48,7 +57,10 @@
     "guide": "Guía",
     "agreementMap": "Mapa de acuerdos",
     "changeLanguage": "Cambiar idioma",
-    "why": "Por qué importa"
+    "why": "Por qué importa",
+    "homeAria": "1💗1 — inicio",
+    "pageNav": "En esta página",
+    "footer": "Enlaces"
   },
   "languages": {
     "en": "English",
@@ -131,7 +143,8 @@
     "colRikma_d": "Propiedad real en %•Plena libertad•Decisiones por consenso•Socios que te complementan•Beneficio de por vida",
     "navDemo": "Demo en vivo",
     "navSplit": "El método",
-    "problemEyebrow": "◈ ¿Y si aún no tienes una asociación? ◈"
+    "problemEyebrow": "◈ ¿Y si aún no tienes una asociación? ◈",
+    "modelCta": "Empezar gratis"
   },
   "split": {
     "eyebrow": "◈ ¿Tienes una asociación? ¿O una idea para una? ◈",
@@ -224,7 +237,12 @@
         "sale": "Nuevo producto"
       }
     },
-    "depthCta": "La explicación completa del método"
+    "depthCta": "La explicación completa del método",
+    "previewSub": "Datos de ejemplo de una rikma: importación y venta en línea.",
+    "viewLabel": "Forma de reparto",
+    "byGiven": "Según lo que aportaste",
+    "byEqual": "A partes iguales",
+    "equalLine": "La línea = {{percent}} en un reparto igual"
   },
   "platform": {
     "projectMgmt_t": "Todo tu proyecto de un vistazo",
@@ -251,7 +269,11 @@
     "providerTitle": "Para dueños de negocios y proveedores",
     "providerDesc": "Los clientes ya están buscando: deja que te encuentren. Cada deseo que incluya lo que ofreces te llega como un cliente potencial cálido y preseleccionado, con socios que te completan en un paquete entero.",
     "providerCta": "Consigue clientes: únete como proveedor",
-    "bridge": "Por eso los deseos y las asociaciones viven en un mismo sitio: cuando los proveedores son socios de una rikma en lugar de empleados de alguien, tu dinero es su ingreso directo, y su corazón está justo donde está el cliente."
+    "bridge": "Por eso los deseos y las asociaciones viven en un mismo sitio: cuando los proveedores son socios de una rikma en lugar de empleados de alguien, tu dinero es su ingreso directo, y su corazón está justo donde está el cliente.",
+    "more": "Cómo funciona: la página del concierge →",
+    "wishLabel": "¿Qué te gustaría?",
+    "wishPlaceholder": "Por ejemplo: un taller de cerámica para diez personas",
+    "providerShort": "Cada deseo que incluye lo que ofreces te llega como un contacto cálido."
   },
   "maze": {
     "title": "Aclaremos las cosas",
@@ -420,7 +442,24 @@
     "eyebrow": "El motor de acuerdos",
     "title": "No tenemos un \"no\": cada decisión se cierra por acuerdo",
     "desc": "Aprueba, sigue hablando o propón otra versión. Mira cómo funciona una asociación real por acuerdo mutuo, y prueba una demo en vivo.",
-    "cta": "Conoce el motor de acuerdos"
+    "cta": "Conoce el motor de acuerdos",
+    "c1_t": "Aprobar",
+    "c1_d": "La propuesta pasa cuando todos han firmado",
+    "c2_t": "Conversar",
+    "c2_d": "Abrir una conversación sobre la propuesta",
+    "c3_t": "Contraproponer",
+    "c3_d": "Una versión más precisa vuelve a votación",
+    "vote": {
+      "caption": "Ejemplo de tarjeta de votación",
+      "open": "Votación abierta",
+      "left": "Quedan 2 días",
+      "title": "Sumar una nueva socia a la rikma",
+      "count": "{{approved}} de {{total}} aprobaron",
+      "approve": "Aprobar",
+      "talk": "Conversar",
+      "counter": "Contrapropuesta",
+      "note": "No hay botón de \"no\". Quien no responda antes de que se acabe el tiempo: su silencio cuenta como consentimiento."
+    }
   },
   "quorum": {
     "eyebrow": "◉ Compra colectiva, sin el grupo",

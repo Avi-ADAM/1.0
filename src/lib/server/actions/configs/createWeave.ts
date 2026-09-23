@@ -11,6 +11,7 @@
  * same-origin internal endpoint with no token involved.
  */
 
+import { normalizeCode } from '$lib/money/currencies.js';
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 
 const handler: ActionExecutionHandler = async (params, context, util) => {
@@ -24,6 +25,7 @@ const handler: ActionExecutionHandler = async (params, context, util) => {
     timeToP,
     imageId,
     isOt,
+    currency,
     vallueIds = [],
     newVallueNames = []
   } = params as {
@@ -35,6 +37,7 @@ const handler: ActionExecutionHandler = async (params, context, util) => {
     timeToP?: string | null;
     imageId?: string | number | null;
     isOt?: boolean;
+    currency?: string | null;
     vallueIds?: (string | number)[];
     newVallueNames?: string[];
   };
@@ -77,6 +80,9 @@ const handler: ActionExecutionHandler = async (params, context, util) => {
       restime: restime || null,
       timeToP: timeToP || null,
       profilePic: imageId ? String(imageId) : null,
+      // The currency this rikma keeps its books in (PLAN_MULTI_CURRENCY D-C8):
+      // the founder's own, unless they picked another. Null stays legacy ILS.
+      currencyCode: normalizeCode(currency),
       isOt: isOt ?? false,
       publishedAt: now
     },
@@ -110,6 +116,7 @@ export const createWeaveConfig: ActionConfig = {
     timeToP: { type: 'string', required: false },
     imageId: { type: 'string', required: false },
     isOt: { type: 'boolean', required: false },
+    currency: { type: 'string', required: false, description: 'ISO-4217 code the rikma keeps its books in (PLAN_MULTI_CURRENCY)' },
     vallueIds: { type: 'array', required: false },
     newVallueNames: { type: 'array', required: false }
   },

@@ -1,4 +1,5 @@
 <script>
+  import { useFormatMoney } from '$lib/money/context.svelte';
   import { t } from '$lib/translations';
   /**
    * DonateDialog — the "communication between a person and the rikma to move
@@ -49,6 +50,7 @@
     /** called after a successful record/request */
     onDone
   } = $props();
+  const fmtMoney = useFormatMoney();
 
   const rtl = $derived($lang === 'he');
 
@@ -162,7 +164,7 @@
                 {$t('stipend.fund.forMission', { name: mission.name ?? '' })}
                 {#if mission.stipendRate}
                   <span class="dd-mission-sub">
-                    {$t('stipend.mission.onMission', { count: mission.stipendRate })}
+                    {$t('stipend.mission.onMission', { count: fmtMoney(mission.stipendRate) })}
                   </span>
                 {/if}
               </p>

@@ -1,4 +1,5 @@
 ﻿<script>
+  import { useFormatMoney } from '$lib/money/context.svelte';
   import { t, isRtl } from '$lib/translations';
   /**
    * SiteSharePayCard — the swiper-card form of a single committed-but-unpaid
@@ -28,6 +29,7 @@
   import SheirutHalukaCard from './SheirutHalukaCard.svelte';
 
   let { buble, isFirst = false, onProj } = $props();
+  const fmtMoney = useFormatMoney();
 
 
   let busy = $state(false);
@@ -142,7 +144,7 @@
     logoSrc={buble.rikmaLogo || buble.src}
     projectName={buble.rikmaName || buble.projectName}
     cardType={$t('lev.revenue.siteSharePayCard.cardType')}
-    cardTitle={`${Number(buble.amount).toFixed(2)} ₪`}
+    cardTitle={fmtMoney(Number(buble.amount), null, { fraction: 'full' })}
     glowColor="gold"
     onProjectClick={handleProjectClick}
   />

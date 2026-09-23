@@ -388,7 +388,7 @@
     "seller": "מוכר",
     "invalid": "נדרש סכום תקין (0 ומעלה)",
     "error": "שגיאה בשליחת הדיווח",
-    "customerReported": "{{name}} דיווח שהעביר {{amt}} ₪"
+    "customerReported": "{{name}} דיווח שהעביר {{amt}}"
   },
   "resourceCreator": {
     "title": "בקשת משאב חדש",

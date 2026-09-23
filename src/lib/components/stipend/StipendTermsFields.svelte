@@ -1,4 +1,5 @@
 <script>
+  import { useFormatMoney } from '$lib/money/context.svelte';
   /**
    * The three parameters of a subsistence stipend, in one place
    * (docs/PLAN_STIPEND.md §1).
@@ -50,6 +51,7 @@
     allowRikmaScope = false,
     suggestion = null
   } = $props();
+  const fmtMoney = useFormatMoney();
 
   /**
    * Which of the two budget shapes the form is on. Derived from the terms
@@ -119,13 +121,13 @@
       ? null
       : suggestion.months != null
         ? $t('stipend.terms.budgetFromMonths', {
-            amount: suggestion.amount,
+            amount: fmtMoney(suggestion.amount, null, { fraction: 'whole' }),
             count: suggestion.months,
-            total: suggestion.totalCap
+            total: fmtMoney(suggestion.totalCap, null, { fraction: 'whole' })
           })
         : suggestion.shape === 'monthly'
-          ? $t('stipend.terms.budgetFromMonthly', { amount: suggestion.amount })
-          : $t('stipend.terms.budgetFromMission', { amount: suggestion.amount })
+          ? $t('stipend.terms.budgetFromMonthly', { amount: fmtMoney(suggestion.amount, null, { fraction: 'whole' }) })
+          : $t('stipend.terms.budgetFromMission', { amount: fmtMoney(suggestion.amount, null, { fraction: 'whole' }) })
   );
 
   const scope = $derived(consensusScope(terms));
@@ -182,7 +184,7 @@
     />
     {#if marketRate != null && marketRate > 0}
       <span class={MUTED}>
-        {$t('stipend.terms.marketRate', { count: marketRate })}
+        {$t('stipend.terms.marketRate', { count: fmtMoney(marketRate) })}
       </span>
     {/if}
   </label>

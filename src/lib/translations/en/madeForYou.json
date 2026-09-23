@@ -1,0 +1,95 @@
+{
+  "meta": {
+    "title": "Personal concierge · Whatever you want, exactly how you want it · 1lev1",
+    "description": "Tell us in your own words what you need - a gift, a home repair, an event or a regular service. The concierge finds the professionals and builds one plan made entirely for you. Nothing moves without your approval."
+  },
+  "hero": {
+    "eyebrow": "Personal concierge",
+    "h1a": "Whatever you want.",
+    "h1b": "Exactly how you want it.",
+    "sub": "Tell us in your own words what you need - a gift, a renovation, an event, a regular service. The concierge breaks the request down, finds the right professionals and comes back with one plan, made entirely for you.",
+    "cta": "Tell us what you'd like",
+    "ctaNote": "Start writing without signing up · the request itself is free",
+    "how": "How it works"
+  },
+  "card": {
+    "label": "New request",
+    "text": "A three-tier sea-themed birthday cake for my daughter, delivered to our door on Friday.",
+    "tag1": "Cake baking & design",
+    "tag2": "Delivery",
+    "tag3": "Friday · to the door",
+    "found": "3 matching professionals",
+    "approved": "Approved ✓ starting"
+  },
+  "promise": {
+    "p1t": "Ask, don't search",
+    "p1d": "No categories, no comparing, no chasing suppliers. Write what you want - that's it.",
+    "p2t": "Made for you, down to the detail",
+    "p2d": "Nothing off the shelf: every request is built around what you asked for - your timing, your place, your budget.",
+    "p3t": "Nothing moves without your yes",
+    "p3d": "You see the full offer and you approve it. Until then - no commitment."
+  },
+  "how": {
+    "title": "How it works",
+    "s1t": "Tell us",
+    "s1d": "Write it in your own words, like a message to a friend. Add when, where and what budget if you like.",
+    "s2t": "We break it down and search",
+    "s2d": "Lev, our smart assistant, splits the request into parts and finds who can provide each one.",
+    "s3t": "You choose",
+    "s3d": "Offers come to you. You can chat with any provider before deciding, and approve only what fits.",
+    "s4t": "You receive",
+    "s4d": "Once every part is approved the team gets to work - and you follow it all from one place."
+  },
+  "consent": {
+    "eyebrow": "What's different here",
+    "title": "Nobody pressures you here.",
+    "sub": "Everything in the concierge happens by mutual agreement. No imposed price, no \"take it or leave it\", no fine print.",
+    "c1t": "You choose who does what",
+    "c1d": "No provider is assigned to your request without your approval.",
+    "c2t": "Doesn't fit? Talk",
+    "c2d": "Instead of \"no\" and parting ways - a direct conversation with the provider until you reach something that works for you both.",
+    "c3t": "Everything up front",
+    "c3d": "You see the full plan - who, what and when - before you commit to anything.",
+    "c4t": "One rule for everyone",
+    "c4d": "Providers sign the same agreement: nobody forces anything on anyone."
+  },
+  "ideas": {
+    "title": "What can you ask for?",
+    "sub": "Almost anything. A few ideas to start:",
+    "gift": "A gift no one else has",
+    "task": "A repair or renovation at home",
+    "community": "An event for friends or community",
+    "trip": "A trip planned to the detail",
+    "family": "Regular help for the family",
+    "free": "Something else entirely"
+  },
+  "faq": {
+    "title": "Quick questions",
+    "q1": "Do I need to sign up?",
+    "a1": "To start writing - no. When you want to send it: a short signature on the agreement, email and password, a confirmation email - and the request goes out by itself. No questionnaires, no profile.",
+    "q2": "What is the agreement I sign?",
+    "a2": "One mutual commitment: not to force or coerce. It protects you exactly as it protects whoever serves you.",
+    "q3": "How much does it cost?",
+    "a3": "The request itself is free. The price comes from the offers you receive - and you can state a budget up front so the offers fit it.",
+    "q4": "Who will see my request?",
+    "a4": "You choose while writing whether it is private or open to the community.",
+    "q5": "I started writing and didn't finish - what happens?",
+    "a5": "The request is saved as a draft, and you'll find it in the concierge and on your profile - exactly where you left it."
+  },
+  "final": {
+    "title": "Got something in mind?",
+    "sub": "Tell us. We'll build the rest together - by agreement.",
+    "cta": "Let's start"
+  },
+  "reg": {
+    "eyebrow": "Personal order",
+    "agreementOnly": "One step and you're in: sign the agreement. No questionnaires, no profile - after confirming your email you go straight to your request.",
+    "whyAgreement": "The agreement is a mutual promise: nobody forces anything on anyone - you included.",
+    "stepSignup": "Step 2 of 3 · Account",
+    "signupSub": "Just email and password - then straight to your request",
+    "stepEmail": "Step 3 of 3 · Confirm email",
+    "draft_send": "The request you wrote is saved in this browser and will be sent by itself as soon as you confirm your email. Open the link here, on this device.",
+    "draft_saved": "The request you started is saved in this browser and will wait for you as a draft. Open the link here, on this device.",
+    "draft_none": "After confirming your email you'll go straight to writing your request - no extra steps."
+  }
+}

@@ -1,4 +1,7 @@
 <script>
+  import { useFormatMoney } from '$lib/money/context.svelte';
+  import { provideRikmaCurrency } from '$lib/money/context.svelte';
+  import Money from '$lib/components/money/Money.svelte';
   import { t } from '$lib/translations';
   import Header from '$lib/components/header/header.svelte';
   import { goto } from '$app/navigation';
@@ -16,6 +19,9 @@
   import WhatsappIcon from '$lib/celim/icons/whatsapp.svelte';
 
   let { data } = $props();
+  const fmtMoney = useFormatMoney();
+  // Amounts on this page are stored in the rikma's currency (PLAN_MULTI_CURRENCY D-C2).
+  provideRikmaCurrency(() => data.projectData?.attributes?.currencyCode);
 
   let projectId = $derived(data.projectId);
   let isRegisteredUser = $derived(data.isRegisteredUser);
@@ -254,7 +260,7 @@
 
         <!-- the big bar -->
         <div class="mb-3 flex justify-between items-end flex-wrap gap-2">
-          <span class="text-white/70 text-sm">{$t('pages.projectSupport.doneValue')}: <b class="text-white">₪{fmt(coverage.doneValue)}</b></span>
+          <span class="text-white/70 text-sm">{$t('pages.projectSupport.doneValue')}: <b class="text-white"><Money amount={coverage.doneValue} fraction="whole" /></b></span>
           <span class="text-gold font-black text-3xl">{coveragePct}% <span class="text-base font-normal text-white/60">{$t('pages.projectSupport.covered')}</span></span>
         </div>
         <div class="coverage-track" role="img" aria-label="{coveragePct}%">
@@ -264,19 +270,19 @@
         <!-- stat tiles -->
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mt-8">
           <div class="stat">
-            <span class="stat-num">₪{fmt(coverage.doneValue)}</span>
+            <span class="stat-num"><Money amount={coverage.doneValue} fraction="whole" /></span>
             <span class="stat-label">{$t('pages.projectSupport.doneValue')}</span>
           </div>
           <div class="stat">
-            <span class="stat-num text-gold">₪{fmt(coverage.incomeTotal)}</span>
+            <span class="stat-num text-gold"><Money amount={coverage.incomeTotal} fraction="whole" /></span>
             <span class="stat-label">{$t('pages.projectSupport.incomeTotal')}</span>
           </div>
           <div class="stat">
-            <span class="stat-num">₪{fmt(coverage.paidOut)}</span>
+            <span class="stat-num"><Money amount={coverage.paidOut} fraction="whole" /></span>
             <span class="stat-label">{$t('pages.projectSupport.paidOut')}</span>
           </div>
           <div class="stat">
-            <span class="stat-num text-barbi">₪{fmt(coverage.availableForFuture)}</span>
+            <span class="stat-num text-barbi"><Money amount={coverage.availableForFuture} fraction="whole" /></span>
             <span class="stat-label">{$t('pages.projectSupport.availableForFuture')}</span>
           </div>
         </div>
@@ -288,10 +294,10 @@
               {$t('pages.projectSupport.incomeBreakdown')}
             </h3>
             <div class="flex flex-wrap gap-2">
-              <span class="chip chip-gold"><EntityIcon kind="support" size={13} /> {$t('pages.projectSupport.srcDonations')} · ₪{fmt(coverage.donationIncome)}</span>
-              <span class="chip chip-pink"><EntityIcon kind="product" size={13} /> {$t('pages.projectSupport.srcProducts')} · ₪{fmt(coverage.productIncome)}</span>
+              <span class="chip chip-gold"><EntityIcon kind="support" size={13} /> {$t('pages.projectSupport.srcDonations')} · <Money amount={coverage.donationIncome} fraction="whole" /></span>
+              <span class="chip chip-pink"><EntityIcon kind="product" size={13} /> {$t('pages.projectSupport.srcProducts')} · <Money amount={coverage.productIncome} fraction="whole" /></span>
               {#if coverage.otherIncome > 0}
-                <span class="chip"><EntityIcon kind="money" size={13} /> {$t('pages.projectSupport.srcOther')} · ₪{fmt(coverage.otherIncome)}</span>
+                <span class="chip"><EntityIcon kind="money" size={13} /> {$t('pages.projectSupport.srcOther')} · <Money amount={coverage.otherIncome} fraction="whole" /></span>
               {/if}
             </div>
           </div>
@@ -335,7 +341,7 @@
                     <span><EntityIcon kind="timer" size={13} /> {fmt(om.attributes.noofhours)} {$t('pages.projectSupport.hours')}</span>
                   {/if}
                   {#if st?.value}
-                    <span class="text-gold font-semibold">≈ ₪{fmt(st.value)}</span>
+                    <span class="text-gold font-semibold">≈ <Money amount={st.value} fraction="whole" /></span>
                   {/if}
                 </div>
 
@@ -353,7 +359,7 @@
                 {#if stipendById.get(String(om.id))}
                   {@const stip = stipendById.get(String(om.id))}
                   <p class="stipend-note">
-                    <EntityIcon kind="support" size={14} /> {$t('stipend.mission.onMission', { count: stip.stipendRate })}
+                    <EntityIcon kind="support" size={14} /> {$t('stipend.mission.onMission', { count: fmtMoney(stip.stipendRate) })}
                     {#if !stip.hasFunder}
                       <span class="stipend-seeking">
                         {$t('stipend.mission.seekingFunder')}
@@ -451,7 +457,7 @@
                 <div class="p-4">
                   <p class="font-semibold leading-snug mb-1">{matanot.attributes.name}</p>
                   {#if matanot.attributes.price != null}
-                    <p class="text-gold font-bold">₪{fmt(matanot.attributes.price)}</p>
+                    <p class="text-gold font-bold"><Money amount={matanot.attributes.price} entry={matanot.attributes} fraction="whole" /></p>
                   {/if}
                   <p class="text-xs text-white/50 underline group-hover:text-gold mt-1">
                     {$t('pages.projectSupport.productLink')}
@@ -473,7 +479,7 @@
             {#each coverage.supporters as s, i (i)}
               <div class="glass rounded-xl px-4 py-3 min-w-[10rem]">
                 <p class="font-semibold">{s.name || $t('pages.projectSupport.anonymous')}</p>
-                <p class="text-gold text-sm font-bold">₪{fmt(s.amount)}</p>
+                <p class="text-gold text-sm font-bold"><Money amount={s.amount} fraction="whole" /></p>
                 {#if s.msg}
                   <p class="text-white/60 text-xs italic mt-1">"{s.msg}"</p>
                 {/if}

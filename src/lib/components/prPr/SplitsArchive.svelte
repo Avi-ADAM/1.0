@@ -1,4 +1,5 @@
 ﻿<script>
+  import { useFormatMoney } from '$lib/money/context.svelte';
   import { locale, isRtl, t } from '$lib/translations';
   /**
    * SplitsArchive — M5 comprehensive distribution archive (PLAN_SITE_SHARE_PER_MEMBER §6).
@@ -26,7 +27,8 @@
   let expanded = $state({}); // splitId -> bool
   let isHe = $derived($locale === 'he');
 
-  const fmt = (n) => `₪${(Number(n) || 0).toLocaleString()}`;
+  const fmtMoney = useFormatMoney();
+  const fmt = (n) => fmtMoney(Number(n) || 0);
   const fmtDate = (s) => {
     if (!s) return '';
     try {

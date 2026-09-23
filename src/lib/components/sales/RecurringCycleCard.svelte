@@ -1,4 +1,6 @@
 <script>
+  import { useFormatMoney } from '$lib/money/context.svelte';
+  import Money from '$lib/components/money/Money.svelte';
   import { t } from '$lib/translations';
   import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
   import { executeAction } from '$lib/client/actionClient';
@@ -28,6 +30,7 @@
 
   /** @type {{ cycle: Cycle, role?: 'holder' | 'customer', onDone?: () => void }} */
   let { cycle, role = 'holder', onDone = () => {} } = $props();
+  const fmtMoney = useFormatMoney();
 
   // Seed once from the cycle — the card is keyed by cycle.id, so a data
   // refresh remounts it with fresh values.
@@ -94,7 +97,7 @@
 
   <div class="cycle-meta">
     {#if cycle.expectedAmount != null}
-      <span>{$t('project.recurringCycle.expected')}: <b>{cycle.expectedAmount} ₪</b></span>
+      <span>{$t('project.recurringCycle.expected')}: <b><Money amount={cycle.expectedAmount} /></b></span>
     {/if}
     {#if role === 'holder' && cycle.customerName}
       <span>{$t('project.recurringCycle.customer')}: <b>{cycle.customerName}</b></span>
@@ -107,7 +110,7 @@
   {#if role === 'holder' && cycle.customerName}
     {#if cycle.customerReportedAt && cycle.customerAmount != null}
       <p class="cycle-customer-line ok">
-        <EntityIcon kind="card" size={13} /> {$t('project.recurringCycle.customerReported', { name: cycle.customerName || $t('project.recurringCycle.customer'), amt: cycle.customerAmount })}
+        <EntityIcon kind="card" size={13} /> {$t('project.recurringCycle.customerReported', { name: cycle.customerName || $t('project.recurringCycle.customer'), amt: fmtMoney(cycle.customerAmount) })}
       </p>
     {:else}
       <p class="cycle-customer-line"><EntityIcon kind="card" size={13} /> {$t('project.recurringCycle.customerWaiting')}</p>

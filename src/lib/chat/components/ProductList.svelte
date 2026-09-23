@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Money from '$lib/components/money/Money.svelte';
   import SaleComponent from '$lib/components/sales/SaleComponent.svelte';
   import { lang } from '$lib/stores/lang.js';
 
@@ -99,7 +100,7 @@
             <span class="product-name">{product.name}</span>
             <span class="project-tag">{product.projectName}</span>
           </div>
-          <div class="product-price">{product.price} ₪</div>
+          <div class="product-price"><Money amount={product.price} /></div>
         </button>
       {/each}
     </div>

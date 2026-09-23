@@ -18,6 +18,7 @@ import { calcDeadlineMs } from './actionUtils.js';
 import { dateField, enumField, fields, gqlStr, numField, run, strField } from '$lib/server/archive/gql.js';
 import { computeStipendCycle, cycleWindow, settlementFrom } from '$lib/stipend/computeStipendCycle.js';
 import { computeStipendEquity } from '$lib/stipend/computeStipendEquity.js';
+import { moneyTextFor } from '$lib/server/money/notifyMoney.js';
 import {
   fetchApprovedHours,
   fetchMeteredHours,
@@ -93,6 +94,8 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
   }
 
   const project = await fetchProjectContext(exec, pledge.projectId);
+  // Amounts are stored in the rikma's currency; the notice says them in it.
+  const money = moneyTextFor(project?.currency ?? 'ILS');
   const nowISO = new Date().toISOString();
   const lines = computeStipendEquity(cycle.amount, pledge.terms);
 
@@ -255,12 +258,12 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
               : { he: 'מחזור המלגה נסגר — ההעברה בתיאום', en: 'Your stipend cycle closed — the transfer is being arranged' },
             body: transferred
               ? {
-                  he: `${cycle.hours} שעות שאושרו × ₪${pledge.terms.stipendRate} = ₪${cycle.amount}. אישור הקבלה הוא מה שמעדכן את האחוזים — בלעדיו כלום לא זז.`,
-                  en: `${cycle.hours} approved hours × ${pledge.terms.stipendRate} = ${cycle.amount}. Confirming it arrived is what updates the shares — until then nothing moves.`
+                  he: `${cycle.hours} שעות שאושרו × ${money(pledge.terms.stipendRate)} = ${money(cycle.amount)}. אישור הקבלה הוא מה שמעדכן את האחוזים — בלעדיו כלום לא זז.`,
+                  en: `${cycle.hours} approved hours × ${money(pledge.terms.stipendRate, 'en')} = ${money(cycle.amount, 'en')}. Confirming it arrived is what updates the shares — until then nothing moves.`
                 }
               : {
-                  he: `${cycle.hours} שעות שאושרו × ₪${pledge.terms.stipendRate} = ₪${cycle.amount}. הכסף עוד לא יצא — נפתח כרטיס העברה עם צ׳אט לתיאום, ואפשר לכתוב שם לאן להעביר.`,
-                  en: `${cycle.hours} approved hours × ${pledge.terms.stipendRate} = ${cycle.amount}. The money has not gone out yet — a transfer card with a chat is open, so you can say where to send it.`
+                  he: `${cycle.hours} שעות שאושרו × ${money(pledge.terms.stipendRate)} = ${money(cycle.amount)}. הכסף עוד לא יצא — נפתח כרטיס העברה עם צ׳אט לתיאום, ואפשר לכתוב שם לאן להעביר.`,
+                  en: `${cycle.hours} approved hours × ${money(pledge.terms.stipendRate, 'en')} = ${money(cycle.amount, 'en')}. The money has not gone out yet — a transfer card with a chat is open, so you can say where to send it.`
                 }
           },
           channels: ['socket', 'push'],

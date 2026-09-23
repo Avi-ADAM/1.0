@@ -7,6 +7,8 @@
   import ScreenFrame from '$lib/components/onboard/ScreenFrame.svelte';
   import JourneyStrip from '$lib/components/onboard/JourneyStrip.svelte';
   import Plaque from '$lib/components/onboard/Plaque.svelte';
+  import { t } from '$lib/translations';
+  import { hasConciergeIntentCookie } from '$lib/concierge/regIntent.js';
 
   let { form } = $props();
 
@@ -16,8 +18,11 @@
   let displayName = $state('');
   let showPassword = $state(false);
   let loading = $state(false);
+  /** Came to order something: three steps, not the six of the onboarding. */
+  let concierge = $state(false);
 
   onMount(() => {
+    concierge = hasConciergeIntentCookie(document.cookie);
     const cookies = document.cookie.split('; ');
     const emailMatch = cookies.find((r) => r.startsWith('email='));
     if (emailMatch) {
@@ -55,13 +60,23 @@
 
 <ScreenFrame>
   {#snippet journey()}
-    <JourneyStrip stepIdx={1} totalSteps={6} label="שלב 1 · כניסה" />
+    {#if concierge}
+      <JourneyStrip
+        stepIdx={2}
+        totalSteps={3}
+        label={$t('madeForYou.reg.stepSignup')}
+      />
+    {:else}
+      <JourneyStrip stepIdx={1} totalSteps={6} label="שלב 1 · כניסה" />
+    {/if}
   {/snippet}
 
   <div class="content" in:scale={{ duration: 600, opacity: 0.5, start: 0.96, easing: quintOut }}>
     <Plaque
       title={displayName ? `שלום ${displayName}!` : 'שלום! יוצרים חשבון'}
-      sub="רק מייל וסיסמה - הכל אחר־כך"
+      sub={concierge
+        ? $t('madeForYou.reg.signupSub')
+        : 'רק מייל וסיסמה - הכל אחר־כך'}
     />
 
     <form

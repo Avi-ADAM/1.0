@@ -1,4 +1,6 @@
 <script>
+  import CurrencySymbol from '$lib/components/money/CurrencySymbol.svelte';
+  import Money from '$lib/components/money/Money.svelte';
     import { toast } from 'svelte-sonner';
     import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
     import SucssesConf from '$lib/celim/sucssesConf.svelte';
@@ -433,7 +435,7 @@
                                                 <span> ↔️ {data.alld.easy}</span>
                                             {/if}
                                             {#if data.alld.recurring}
-                                                <span class="text-gold"> ₪ {data.alld.kindOf == "yearly" ? $t('pages.availResource.perY') : $t('pages.availResource.perM')}</span>
+                                                <span class="text-gold"> <CurrencySymbol /> {data.alld.kindOf == "yearly" ? $t('pages.availResource.perY') : $t('pages.availResource.perM')}</span>
                                             {/if}
                                         </span>
                                         {#if data.alld.kindOf != "total" && units > 1}
@@ -506,10 +508,10 @@
                                                 <div class="w-full max-w-md rounded-2xl border border-gold/40 bg-black/30 p-4 text-center">
                                                     <h3 class="text-barbi font-bold text-lg">{$t('pages.availResource.offerValueHead')}</h3>
                                                     <p class="text-gold font-bold text-2xl lg:text-3xl my-2">
-                                                        {offerValue.toLocaleString('en-US')} ₪{#if data.alld.recurring}<span class="text-base font-normal">&nbsp;{data.alld.kindOf == "yearly" ? $t('pages.availResource.perY') : $t('pages.availResource.perM')}</span>{/if}
+                                                        <Money amount={offerValue} />{#if data.alld.recurring}<span class="text-base font-normal">&nbsp;{data.alld.kindOf == "yearly" ? $t('pages.availResource.perY') : $t('pages.availResource.perM')}</span>{/if}
                                                     </p>
                                                     {#if offerTotal !== offerValue}
-                                                        <p class="text-gray-100 text-sm">{offerTotal.toLocaleString('en-US')} ₪ {$t('pages.availResource.total')}</p>
+                                                        <p class="text-gray-100 text-sm"><Money amount={offerTotal} /> {$t('pages.availResource.total')}</p>
                                                     {/if}
                                                     <p class="text-gray-300 text-xs mt-2">{$t('pages.availResource.offerValueHint')}</p>
                                                     <div class="flex flex-wrap justify-center gap-2 mt-3">

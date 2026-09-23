@@ -1,4 +1,5 @@
 <script>
+  import { useFormatMoney } from '$lib/money/context.svelte';
   import { lang } from '$lib/stores/lang.js';
   import { t } from '$lib/translations';
   import { goto } from '$app/navigation';
@@ -6,6 +7,7 @@
 
   /** @type {{ data: import('./$types').PageData }} */
   let { data } = $props();
+  const fmtMoney = useFormatMoney();
 
   const projectId = $derived(page.params.projectId);
 
@@ -48,7 +50,7 @@
 
   function fmtBudget(n) {
     if (n == null || !Number.isFinite(+n)) return 'לפי הצעה';
-    return `₪ ${(+n).toLocaleString('he-IL')}`;
+    return fmtMoney(+n);
   }
   const HE_MONTHS = ['ינו','פבר','מרץ','אפר','מאי','יוני','יולי','אוג','ספט','אוק','נוב','דצמ'];
   function fmtDate(iso) {

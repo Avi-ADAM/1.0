@@ -1,9 +1,10 @@
 
 import { loadTranslations } from '$lib/translations';
+import { clientRates } from '$lib/server/fx/index.js';
 
 export const load = async ({ url, locals }) => {
   const { pathname } = url;
-  const { lang, uid, un, email, isDesktop, userAgent, tok, sessionExpired } = locals;
+  const { lang, uid, un, email, isDesktop, userAgent, tok, sessionExpired, currency, currencyChosen } = locals;
   // `locale` (from sveltekit-i18n) is a single module-level store shared by
   // every concurrent request this server process handles — it is NOT
   // per-request state. Reading `locale.get()` here used to let one user's
@@ -11,6 +12,11 @@ export const load = async ({ url, locals }) => {
   // set it last "wins"). The only per-request source of truth is `locals.lang`,
   // which hooks.server.js derives fresh from this request's own cookie/URL.
   const initLocale = lang || 'he';
+
+  // Today's rates for <Money> (PLAN_MULTI_CURRENCY D-C6). Memory-cached, so a
+  // warm process answers at once; a cold one gives up after a moment and the
+  // browser fetches /api/fx instead of the page waiting on a provider.
+  const fx = await clientRates([], { maxWaitMs: 800 });
 
   await loadTranslations(initLocale, pathname); // keep this just before the `return`
 
@@ -27,6 +33,10 @@ export const load = async ({ url, locals }) => {
     // and all reads/mutations go through /api/send + /api/action which read it
     // server-side. Expose only a boolean login flag.
     loggedIn: !!tok,
+    // The reader's display currency and whether they chose it (PLAN_MULTI_CURRENCY D-C9).
+    currency,
+    currencyChosen,
+    fx,
     // Set once, on the request where the dead cookie was found and cleared, so
     // the layout can show "your session expired — sign in again" instead of
     // letting a long-absent member think they were never logged in.

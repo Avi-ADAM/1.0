@@ -5,6 +5,8 @@
 // validation + field-mapping logic can be unit-tested without the request
 // machinery (mirrors the split used by saleClaimShared).
 
+import { normalizeCode } from '$lib/money/currencies.js';
+
 export const SALES_SCOPE = 'sales:report';
 export const SALE_SOURCE = 'api';
 
@@ -18,6 +20,11 @@ export interface SalesPayload {
   finishDate: string | null;
   externalId: string;
   note: string;
+  /**
+   * ISO-4217 code `amount` is in (PLAN_MULTI_CURRENCY). Optional: absent means
+   * the rikma's own currency, which is what every caller sent before it existed.
+   */
+  currency?: string | null;
 }
 
 export type ValidationResult =
@@ -45,6 +52,10 @@ export function validateSalesPayload(body: any): ValidationResult {
   const quantity = body.quantity == null ? 1 : Number(body.quantity);
   const externalId = body.externalId != null ? String(body.externalId).trim() : '';
   const note = body.note != null ? String(body.note) : '';
+  const currency = body.currency == null || body.currency === '' ? null : normalizeCode(body.currency);
+  if (body.currency != null && body.currency !== '' && !currency) {
+    return { ok: false, status: 400, message: 'currency must be an ISO-4217 code, e.g. "USD"' };
+  }
 
   if (!productId) return { ok: false, status: 400, message: 'productId is required' };
   if (!holderUserId) return { ok: false, status: 400, message: 'holderUserId is required' };
@@ -73,7 +84,7 @@ export function validateSalesPayload(body: any): ValidationResult {
 
   return {
     ok: true,
-    value: { productId, holderUserId, amount, quantity, saleDate, startDate, finishDate, externalId, note }
+    value: { productId, holderUserId, amount, quantity, saleDate, startDate, finishDate, externalId, note, currency }
   };
 }
 
@@ -104,5 +115,6 @@ export function buildCreateSaleParams(args: {
   if (payload.finishDate) params.finishDate = payload.finishDate;
   if (payload.externalId) params.externalId = payload.externalId;
   if (payload.note.trim()) params.note = payload.note.trim();
+  if (payload.currency) params.entryCurrency = payload.currency;
   return params;
 }

@@ -36,7 +36,7 @@
   "no_matches_found": "No se encontraron deseos que coincidan",
   "clear_filter_sub": "Intenta borrar la búsqueda o elegir otro filtro.",
   "no_drafts_title": "No hay borradores guardados por ahora",
-  "no_drafts_sub": "Cualquier deseo que empieces a escribir se guardará automáticamente hasta que elijas publicarlo.",
+  "no_drafts_sub": "Pulsa «Guardar borrador» mientras escribes y tu pedido te esperará aquí.",
   "start_wish_btn": "Empezar un deseo",
   "i_can_help": "Puedo ayudar ›",
   "offers_so_far": "Ofertas hasta ahora",
@@ -310,8 +310,29 @@
     "maxJoinersPlaceholder": "Sin tope",
     "joinDeadline": "Fecha de cierre de incorporación (opcional)",
     "groupHint": "Cuando se unan {{count}} participantes se podrá cerrar el grupo, decidir juntos y pagar juntos. Hasta entonces el deseo está en modo de reunión.",
-    "soloHint": "La opción por defecto - tú organizas y la comunidad propone. Elegir un tipo grupal abre la incorporación, las decisiones compartidas y el pago compartido."
+    "soloHint": "La opción por defecto - tú organizas y la comunidad propone. Elegir un tipo grupal abre la incorporación, las decisiones compartidas y el pago compartido.",
+    "untitledDraft": "Borrador sin título",
+    "draftSaving": "Guardando…",
+    "draftSaved": "Borrador guardado: lo encontrarás en el concierge y en tu perfil",
+    "draftSavedDevice": "Guardado en este navegador. Regístrate para guardarlo en tu cuenta y enviarlo",
+    "draftSaveFailed": "No pudimos guardar el borrador. Inténtalo de nuevo",
+    "savedOnDevice": "Guardado en este navegador",
+    "welcome": {
+      "title": "Bienvenido: ya estás dentro.",
+      "start": "Sin cuestionarios ni perfil: cuéntanos qué quieres y seguimos juntos desde ahí.",
+      "draftKept": "El pedido que escribiste antes de registrarte te espera aquí, guardado como borrador en tu cuenta. Puedes seguir editándolo y enviarlo.",
+      "dismiss": "Cerrar"
+    },
+    "autoSend": {
+      "title": "Enviando tu pedido…",
+      "sub": "Es el pedido que escribiste antes de registrarte. En un momento verás el plan que se arma a su alrededor."
+    }
   },
   "no_wishes_found_title": "No se encontraron deseos",
-  "proposals_so_far": "Propuestas hasta ahora"
+  "proposals_so_far": "Propuestas hasta ahora",
+  "no_wishes_title": "Aún no has enviado ningún pedido",
+  "no_wishes_sub": "Cuéntanos qué quieres y el concierge se pondrá a trabajar.",
+  "no_wishes_has_drafts": "Tienes borradores por terminar ({{count}}) →",
+  "pending_offers": "{{count}} nuevas",
+  "draft_continue": "Seguir escribiendo →"
 }

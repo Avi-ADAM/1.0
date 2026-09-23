@@ -388,7 +388,7 @@
     "seller": "Seller",
     "invalid": "A valid amount (0 or more) is required",
     "error": "Failed to submit the report",
-    "customerReported": "{{name}} reported transferring {{amt}} ₪"
+    "customerReported": "{{name}} reported transferring {{amt}}"
   },
   "resourceCreator": {
     "title": "Request New Resource",

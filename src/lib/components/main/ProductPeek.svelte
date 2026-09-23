@@ -4,6 +4,14 @@
   import { goto } from '$app/navigation';
   import { fade } from 'svelte/transition';
 
+  /**
+   * @typedef {Object} Props
+   * @property {boolean} [bare] drop the peek's own heading and sign-up button,
+   *   for a host that already titles it and carries the CTA (the homepage tile)
+   */
+  /** @type {Props} */
+  let { bare = false } = $props();
+
   let active = $state('lev');
 
   /** @type {{ id: string, icon: import('$lib/celim/icons/entityIcons').EntityIconKind, label: string }[]} */
@@ -184,12 +192,14 @@
   }
 </script>
 
+{#if !bare}
 <h2 class="text-rose-700 font-bold text-3xl sm:text-2xl mb-1 text-center">
   {$t('home.peek.title')}
 </h2>
 <p class="text-center text-slate-700 text-base sm:text-sm mb-5">
   {$t('home.peek.sub')}
 </p>
+{/if}
 
 <!-- Tabs -->
 <div class="flex justify-center gap-2 flex-wrap mb-3">
@@ -546,6 +556,7 @@
   {/key}
 </div>
 
+{#if !bare}
 <p class="text-center text-slate-600 text-sm mt-3">{$t('home.peek.note')}</p>
 <div class="mt-3 text-center">
   <button
@@ -556,3 +567,4 @@
     {$t('home.peek.cta')} <EntityIcon kind="signed" size={15} />
   </button>
 </div>
+{/if}

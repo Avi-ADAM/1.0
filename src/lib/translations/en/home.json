@@ -10,7 +10,16 @@
     "headline2": "Smart business management with an open heart",
     "headline3": "Full independence within a supportive community",
     "headline4": "Stop renting out your time",
-    "headline5": "Turn every hour into ownership - together, by consensus"
+    "headline5": "Turn every hour into ownership - together, by consensus",
+    "chipTime": "Time",
+    "chipTimeV": "Work hours",
+    "chipMoney": "Money",
+    "chipMoneyV": "Investment",
+    "chipGear": "Equipment",
+    "chipGearV": "Resources",
+    "chipKnow": "Knowledge",
+    "chipKnowV": "Experience",
+    "stageResult": "= your share of the profit"
   },
   "intro": {
     "q1": "You have amazing talent - but struggle to monetize it alone?",
@@ -47,7 +56,10 @@
     "guide": "Guide",
     "agreementMap": "Agreement Map",
     "changeLanguage": "Change Language",
-    "why": "Why this matters"
+    "why": "Why this matters",
+    "homeAria": "1💗1 — home",
+    "pageNav": "On this page",
+    "footer": "Links"
   },
   "languages": {
     "en": "English",
@@ -130,7 +142,8 @@
     "colRikma_d": "Real ownership in %•Full freedom•Decisions by consensus•Partners who complete you•Lifetime profit",
     "navDemo": "Live demo",
     "navSplit": "The method",
-    "problemEyebrow": "◈ And if you don't have a partnership yet ◈"
+    "problemEyebrow": "◈ And if you don't have a partnership yet ◈",
+    "modelCta": "Start for free"
   },
   "split": {
     "eyebrow": "◈ Have a partnership? Or an idea for one? ◈",
@@ -223,7 +236,12 @@
         "sale": "New product"
       }
     },
-    "depthCta": "The full explanation of the method"
+    "depthCta": "The full explanation of the method",
+    "previewSub": "Sample data from one rikma - importing and selling online.",
+    "viewLabel": "Split method",
+    "byGiven": "By what you gave",
+    "byEqual": "Split equally",
+    "equalLine": "The line = {{percent}} in an equal split"
   },
   "platform": {
     "projectMgmt_t": "Your whole project at a glance",
@@ -250,7 +268,11 @@
     "providerTitle": "For business owners & providers",
     "providerDesc": "Customers are already searching - let them find you. Every wish that includes what you offer reaches you as a warm, pre-matched lead, with partners who complete you into a whole package.",
     "providerCta": "Get leads - join as a provider",
-    "bridge": "That's why wishes and partnerships live on one site: when providers are partners in a rikma rather than someone's employees, your money is their direct income - and their heart is exactly where the customer is."
+    "bridge": "That's why wishes and partnerships live on one site: when providers are partners in a rikma rather than someone's employees, your money is their direct income - and their heart is exactly where the customer is.",
+    "more": "How it works - the concierge page →",
+    "wishLabel": "What would you like?",
+    "wishPlaceholder": "For example: a pottery workshop for ten people",
+    "providerShort": "Every wish that includes what you offer reaches you as a warm lead."
   },
   "maze": {
     "title": "Let's clear things up",
@@ -419,7 +441,24 @@
     "eyebrow": "The Agreement Engine",
     "title": "We have no \"no\" - every decision closes by agreement",
     "desc": "Approve, keep talking, or propose another version. See how a real partnership runs by mutual agreement - and try a live demo.",
-    "cta": "Meet the Agreement Engine"
+    "cta": "Meet the Agreement Engine",
+    "c1_t": "Approve",
+    "c1_d": "The proposal passes once everyone has signed",
+    "c2_t": "Talk",
+    "c2_d": "Open a conversation about the proposal itself",
+    "c3_t": "Counter-propose",
+    "c3_d": "A more precise version goes back to the vote",
+    "vote": {
+      "caption": "An example vote card",
+      "open": "Open vote",
+      "left": "2 days left",
+      "title": "Adding a new partner to the rikma",
+      "count": "{{approved}} of {{total}} approved",
+      "approve": "Approve",
+      "talk": "Talk",
+      "counter": "Counter",
+      "note": "There is no \"no\" button. Whoever has not responded when time runs out - their silence counts as consent."
+    }
   },
   "quorum": {
     "eyebrow": "◉ Group buying - without the group",

@@ -1,0 +1,86 @@
+{
+  "title": "The rikma's shared information",
+  "intro": "One place for the documents, images and links the rikma works with. Every member can see them, and every member can add.",
+  "loadFailed": "We couldn't load the shelf just now. You can still add an item, and the list will catch up.",
+  "filterLegend": "Filter by kind",
+  "unfiled": "No folder",
+  "empty": "The shelf is still empty. The first item — a contract, a photo, a link to your Drive — starts it off.",
+  "emptyFilter": "Nothing of that kind yet.",
+  "vaultNote": "Passwords and secrets are not kept here. A secret in a text field is a secret the server can read — the encrypted vault comes as a separate step.",
+  "filters": {
+    "all": "All",
+    "file": "Documents",
+    "image": "Images",
+    "link": "Links"
+  },
+  "kinds": {
+    "file": "Document",
+    "image": "Image",
+    "link": "Link"
+  },
+  "drive": {
+    "title": "The rikma's Drive",
+    "note": "The link already set in the rikma's details"
+  },
+  "add": {
+    "open": "Add an item",
+    "close": "Close",
+    "kindLegend": "What kind of item",
+    "url": "Address",
+    "urlHint": "A link to a Drive, a doc or any site. The file stays where it is — only the link is stored here.",
+    "file": "File",
+    "name": "Name",
+    "folder": "Folder",
+    "folderPlaceholder": "e.g. contracts/2026",
+    "note": "Description",
+    "save": "Save",
+    "saving": "Saving…",
+    "choose": "Choose a file — or drop it here",
+    "fileHintMax": "Up to {{max}}. Documents, spreadsheets, slides, images, PDF, text and zip.",
+    "privateHint": "Kept in private storage — only the rikma’s members can open it"
+  },
+  "row": {
+    "edit": "Edit",
+    "remove": "Remove",
+    "removeConfirm": "Take “{{name}}” off the shelf? It leaves the list and is not deleted for good.",
+    "saveEdit": "Save",
+    "cancel": "Cancel",
+    "open": "Open",
+    "openLink": "Go to link",
+    "private": "Private"
+  },
+  "errors": {
+    "upload": "The upload failed.",
+    "save": "Saving failed.",
+    "remove": "Removing failed.",
+    "name": "The item needs a name."
+  },
+  "p2p": {
+    "badge": "Pilot",
+    "title": "Sharing between partners",
+    "lead": "When this device joins, files on the shelf can come straight from another partner’s device in the rikma — without passing through the server. It is a pilot that measures whether this works for us.",
+    "statusPeers": "Connected — {{count}} partners available now",
+    "statusAlone": "Connected — no partners available right now",
+    "status": {
+      "off": "Off",
+      "connecting": "Connecting…",
+      "offline": "Not connected right now — files open from the server"
+    },
+    "cache": "On this device: {{count}} files ({{size}})",
+    "served": "You passed {{count}} files to partners",
+    "clear": "Delete the files from this device",
+    "clearConfirm": "Delete the files stored on this device? They stay on the shelf.",
+    "moreInfo": "What does this mean exactly?",
+    "lessInfo": "Less detail",
+    "termIp": "Partners in the rikma who receive a file from you can see this device’s public IP address.",
+    "termBandwidth": "The device uses some of your bandwidth to pass files to partners, only while this tab is open — at most two transfers at once.",
+    "termVerify": "Every file from a partner is checked against the fingerprint recorded at upload. A file that does not match is discarded and opened from the server instead.",
+    "termMeasure": "Only statistics are kept — where a file came from and how long it took. Not the file name, and not who opened it.",
+    "fetching": "Fetching…",
+    "source": {
+      "cache": "From this device",
+      "peer": "From a partner",
+      "origin": "From the server"
+    }
+  }
+}

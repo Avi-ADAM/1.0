@@ -1,0 +1,22 @@
+{
+    "converted": "Converted from {{original}} at the {{date}} reference rate",
+    "writtenAs": "Originally entered as {{original}}",
+    "currency": "Currency",
+    "search": "Search currency…",
+    "common": "Common",
+    "all": "All currencies",
+    "inRikma": "≈ {{amount}} in the rikma's currency",
+    "noRate": "No exchange rate for this currency right now",
+    "pref": {
+        "title": "My currency",
+        "desc": "Every amount on the site is shown to you in this currency, at a daily reference rate. Everyone enters amounts in their own currency, and the original is always one hover away.",
+        "saved": "Saved to your account, so it follows you to other devices",
+        "guessed": "Guessed from your browser settings — you can change it"
+    },
+    "rikma": {
+        "title": "Rikma currency",
+        "desc": "The rikma counts all its money in one currency — sales, splits and mission values. Each partner enters amounts in their own currency, the amount is converted at that day's rate, and everyone sees it in their own currency.",
+        "locked": "Money has already been recorded in this rikma, so its currency can no longer be changed.",
+        "saved": "Rikma currency updated"
+    }
+}

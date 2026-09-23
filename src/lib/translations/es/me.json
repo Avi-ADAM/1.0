@@ -46,5 +46,17 @@
       "span": "meses desde el primer pago",
       "best": "mejor mes"
     }
+  },
+  "concierge": {
+    "title": "Mi concierge",
+    "open": "Todos mis pedidos",
+    "drafts": "borradores",
+    "draftsTip": "Borradores por terminar: {{count}}",
+    "ordered": "en pedido",
+    "orderedTip": "Pedidos enviados en preparación: {{count}}",
+    "updates": "novedades",
+    "updatesTip": "Propuestas que esperan tu respuesta: {{count}}",
+    "newWish": "Nuevo pedido",
+    "customerHint": "Todos tus pedidos, borradores y propuestas, en un solo lugar"
   }
 }

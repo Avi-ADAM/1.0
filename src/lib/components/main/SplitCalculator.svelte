@@ -13,61 +13,30 @@
    * הערכה בדיעבד), וההכנסה מפורטת למכירות מאותה סיבה.
    */
   import { t, locale } from '$lib/translations';
+  // The seed rikma, the palette and the formula live in one module so the
+  // homepage's comparison card and this calculator can never disagree.
+  import {
+    PALETTE,
+    INK,
+    SEED_PARTNERS,
+    SEED_SALES,
+    num,
+    taskValue,
+    valueOf
+  } from './splitSeed.js';
 
-  /* Two lists, not one: PALETTE fills the share bar and the dot, INK writes
-     the partner's name. A bar only has to be told apart from its neighbour,
-     a name has to be read - and #e0a800 / #3aa7a0 measure 2.0:1 and 2.9:1 as
-     text on the card. Same hues, one step deeper, all >=4.5:1 on the fill. */
-  const PALETTE = ['#ff0092', '#e0a800', '#3aa7a0', '#8b5cf6'];
-  const INK = ['#b80069', '#8a6a15', '#0f766e', '#6d28d9'];
+  /**
+   * @typedef {Object} Props
+   * @property {number} [initialPartners] how many seed partners it opens with
+   *   (2–4). The homepage opens with all four, to match the card above it.
+   */
+  /** @type {Props} */
+  let { initialPartners = 2 } = $props();
+
   const MAX_PARTNERS = 4;
   const MAX_TASKS = 6;
   const MAX_COSTS = 4;
   const MAX_SALES = 5;
-
-  /**
-   * נתוני הפתיחה הם רקמה אחת שלמה ועקבית — ייבוא ומכירה אונליין: מי בנה את
-   * אתר המכירות, מי סגר את הספק והמכס, מה נקנה בכסף, ומה נמכר בסוף. `k` הוא
-   * מפתח תרגום ולא טקסט, כדי שהשורות יישארו קריאות בכל שפה.
-   */
-  const SEED_PARTNERS = [
-    {
-      k: 'p1',
-      tasks: [
-        { k: 'p1t1', h: 50, m: 0, rate: 100 },
-        { k: 'p1t2', h: 22, m: 30, rate: 100 },
-        { k: 'p1t3', h: 14, m: 20, rate: 100 }
-      ],
-      costs: [{ k: 'p1c1', amount: 1200 }]
-    },
-    {
-      k: 'p2',
-      tasks: [
-        { k: 'p2t1', h: 20, m: 0, rate: 100 },
-        { k: 'p2t2', h: 15, m: 25, rate: 100 }
-      ],
-      costs: [{ k: 'p2c1', amount: 1800 }]
-    },
-    {
-      k: 'p3',
-      tasks: [
-        { k: 'p3t1', h: 18, m: 40, rate: 90 },
-        { k: 'p3t2', h: 9, m: 15, rate: 90 }
-      ],
-      costs: [{ k: 'p3c1', amount: 450 }]
-    },
-    {
-      k: 'p4',
-      tasks: [{ k: 'p4t1', h: 6, m: 30, rate: 120 }],
-      costs: [{ k: 'p4c1', amount: 900 }]
-    }
-  ];
-
-  const SEED_SALES = [
-    { k: 's1', price: 89, qty: 120 },
-    { k: 's2', price: 149, qty: 45 },
-    { k: 's3', price: 25, qty: 60 }
-  ];
 
   /**
    * `id` is minted, never derived from the position: removing a middle row and
@@ -89,16 +58,14 @@
   };
   const seedSales = () => SEED_SALES.map((x) => ({ id: uid(), name: '', ...x }));
 
-  let partners = $state([seedPartner(0), seedPartner(1)]);
+  // Read once: the prop picks the opening state, and the visitor owns the
+  // rows from there.
+  // svelte-ignore state_referenced_locally
+  const openWith = Math.min(MAX_PARTNERS, Math.max(2, initialPartners));
+  let partners = $state(Array.from({ length: openWith }, (_, i) => seedPartner(i)));
   let sales = $state(seedSales());
 
-  const num = (v) => (Number.isFinite(+v) && +v > 0 ? +v : 0);
-  /** דקות ולא עשרוני: 15:25 זה 15.4167 שעות, וזה מה שהטיימר באמת מדד. */
-  const taskValue = (task) => (num(task.h) + num(task.m) / 60) * num(task.rate);
   const saleValue = (sale) => num(sale.price) * num(sale.qty);
-  const valueOf = (p) =>
-    p.tasks.reduce((sum, task) => sum + taskValue(task), 0) +
-    p.costs.reduce((sum, cost) => sum + num(cost.amount), 0);
 
   /** שם שהוקלד גובר על שם הדוגמה; אחרת נופלים על מפתח התרגום. */
   const nameOf = (row, fallbackKey) =>

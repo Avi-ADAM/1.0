@@ -12,7 +12,10 @@
   import { email } from '$lib/components/registration/email.js';
   import { linkos } from '$lib/stores/linkos.js';
   import { fpval } from '$lib/components/registration/fpval.js';
-  import { t } from '$lib/translations';
+  import { t, isRtl } from '$lib/translations';
+
+  /** @type {{ data: { concierge?: boolean } }} */
+  let { data } = $props();
 
   let user = 0;
 
@@ -154,6 +157,15 @@ regHelperL = 0;
 <svelte:window onbeforeunload={reportExit} />
 
 <div class="main">
+  {#if data.concierge && regHelperL !== 1}
+    <!-- A customer who came to order something: the agreement is the one
+         step that stays, and they should know it is the only one. -->
+    <aside class="mfy-ribbon" dir={$isRtl ? 'rtl' : 'ltr'}>
+      <span class="mfy-eyebrow">{$t('madeForYou.reg.eyebrow')}</span>
+      <p class="mfy-line">{$t('madeForYou.reg.agreementOnly')}</p>
+      <p class="mfy-sub">{$t('madeForYou.reg.whyAgreement')}</p>
+    </aside>
+  {/if}
   <!--{#if user > 0}
 { goto("/lev", )}
 {:else}-->
@@ -189,6 +201,39 @@ regHelperL = 0;
   *:after,
   *:before {
     box-sizing: border-box;
+  }
+
+  .mfy-ribbon {
+    position: relative;
+    z-index: 5;
+    margin: 0.75rem auto 0;
+    width: min(640px, calc(100% - 2rem));
+    padding: 0.75rem 1.1rem;
+    border-radius: 18px;
+    background: rgba(255, 251, 240, 0.95);
+    border: 1px solid #d4af37;
+    box-shadow: 0 8px 28px rgba(87, 64, 16, 0.18);
+    color: #3b2a12;
+    font-family: 'Rubik', sans-serif;
+    text-align: center;
+  }
+  .mfy-eyebrow {
+    display: inline-block;
+    font-size: 0.72rem;
+    letter-spacing: 0.18em;
+    color: #8a5d0c;
+    font-weight: 700;
+  }
+  .mfy-line {
+    margin: 0.2rem 0 0;
+    font-weight: 600;
+    font-size: 1rem;
+    line-height: 1.45;
+  }
+  .mfy-sub {
+    margin: 0.2rem 0 0;
+    font-size: 0.85rem;
+    color: #5f4f33;
   }
 
   .handoff {

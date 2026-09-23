@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Money from '$lib/components/money/Money.svelte';
   import { isRtl } from '$lib/translations';
   import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
   /**
@@ -130,7 +131,7 @@
         <div class="ofr-offer-name">{item.name}</div>
         <div class="ofr-offer-meta">
           {#if item.hours}<span><EntityIcon kind="timer" size={13} /> {item.hours} {t.hours}</span>{/if}
-          {#if item.price != null}<span><EntityIcon kind="money" size={13} /> ₪{Number(item.price).toLocaleString()}</span>{/if}
+          {#if item.price != null}<span><EntityIcon kind="money" size={13} /> <Money amount={item.price} /></span>{/if}
         </div>
       </div>
 

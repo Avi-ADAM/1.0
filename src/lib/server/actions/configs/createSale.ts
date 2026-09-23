@@ -1,4 +1,7 @@
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import { ENTRY_CURRENCY_PARAM, entryFields, normalizeEntry } from '$lib/server/money/normalizeEntry.js';
+import { formatMoney } from '$lib/money/format.js';
+import { rikmaCurrency } from '$lib/money/resolve.js';
 import { createSaleConsentSpec } from '$lib/consent/specs/createSale';
 
 /**
@@ -75,6 +78,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
   // silence-as-consent timegrama).
   let restime: string | null = null;
   let projectName = '';
+  let knownCurrency: string | null = null;
   if (!isSelf) {
     const projInfo = await strapi.execute(
       'saleClaimProjectInfo',
@@ -89,7 +93,19 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
     }
     restime = projAttrs?.restime ?? null;
     projectName = projAttrs?.projectName ?? '';
+    knownCurrency = rikmaCurrency(projAttrs);
   }
+
+  // Typed in the reporter's currency ⇒ stored in the rikma's (PLAN_MULTI_CURRENCY C5).
+  const entry = await normalizeEntry({
+    amounts: { in: Number(total) },
+    entryCurrency: (params as Record<string, unknown>).entryCurrency,
+    projectId,
+    jwt: context.jwt as string,
+    fetchFn: context.fetch as typeof fetch,
+    rikmaCurrency: knownCurrency
+  });
+  const saleIn = entry.values.in ?? Number(total);
 
   const holderStatus = isSelf ? 'self' : 'open';
 
@@ -119,7 +135,8 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
     project: projectId,
     matanot: productId,
     users_permissions_user: userId,
-    in: Number(total),
+    in: saleIn,
+    ...entryFields(entry),
     unit: Number(quantity),
     date: saleDate,
     publishedAt: now,
@@ -179,9 +196,9 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
         matanot: productId,
         sales: [saleId],
         name: productName || 'מכירה',
-        price: qty > 0 ? Number(total) / qty : Number(total),
+        price: qty > 0 ? saleIn / qty : saleIn,
         quant: qty,
-        total: Number(total),
+        total: saleIn,
         oneTime: !isRecurringEngine,
         isApruved: true,
         archived: false,
@@ -229,7 +246,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
       zman: now,
       order: 1
     };
-    const decisionName = `${saleData.attributes?.matanot?.data?.attributes?.name ?? 'מכירה'} · ${Number(total)}₪`;
+    const decisionName = `${saleData.attributes?.matanot?.data?.attributes?.name ?? 'מכירה'} · ${formatMoney(saleIn, entry.currency, 'he')}`;
 
     const decRes = await strapi.execute(
       'createSaleClaimDecision',
@@ -287,8 +304,8 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
                 en: 'A sale report awaits your consent'
               },
               body: {
-                he: `דווח שקיבלת ${Number(total)}₪ ממכירת ${productName}. אפשר לאשר, לדייק (משא-ומתן) או לברר. אם לא תגיב - יאושר אוטומטית בתום זמן התגובה של הרקמה.`,
-                en: `It was reported that you hold ${Number(total)}₪ from the sale of ${productName}. You can approve, refine (negotiate) or discuss. If you don't respond it is auto-approved after the rikma's response time.`
+                he: `דווח שקיבלת ${formatMoney(saleIn, entry.currency, 'he')} ממכירת ${productName}. אפשר לאשר, לדייק (משא-ומתן) או לברר. אם לא תגיב - יאושר אוטומטית בתום זמן התגובה של הרקמה.`,
+                en: `It was reported that you hold ${formatMoney(saleIn, entry.currency, 'en')} from the sale of ${productName}. You can approve, refine (negotiate) or discuss. If you don't respond it is auto-approved after the rikma's response time.`
               }
             },
             channels: ['socket', 'push'],
@@ -335,6 +352,7 @@ export const createSaleConfig: ActionConfig = {
     note: { type: 'string', required: false },
     externalId: { type: 'string', required: false },
     source: { type: 'string', required: false },
+    entryCurrency: ENTRY_CURRENCY_PARAM,
     customerIdentifier: {
       type: 'string',
       required: false,

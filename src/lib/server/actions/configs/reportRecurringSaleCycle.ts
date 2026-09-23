@@ -1,3 +1,4 @@
+import { rikmaMoneyText } from '$lib/server/money/notifyMoney.js';
 /**
  * Action Configuration: Monthly report on a recurring-sale cycle
  * (PLAN_RECURRING_SALES)
@@ -105,6 +106,12 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
     try {
       const productName = attrs.matanot?.data?.attributes?.name ?? '';
       const projectName = attrs.project?.data?.attributes?.projectName ?? '';
+      // The cycle amount is in the rikma's currency; say it in that currency.
+      const money = await rikmaMoneyText(
+        attrs.project?.data?.id,
+        context.jwt as string,
+        context.fetch as typeof fetch
+      );
       await notifier.notify(
         {
           recipients: { type: 'specificUsers', config: { userIdsParam: 'recipients' } },
@@ -114,8 +121,8 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
               en: 'Your monthly payment was recorded'
             },
             body: {
-              he: `${projectName}: נרשם שהתקבלו ${reported}₪ החודש${productName ? ` עבור ${productName}` : ''}.`,
-              en: `${projectName}: ${reported}₪ received this month${productName ? ` for ${productName}` : ''} was recorded.`
+              he: `${projectName}: נרשם שהתקבלו ${money(reported)} החודש${productName ? ` עבור ${productName}` : ''}.`,
+              en: `${projectName}: ${money(reported, 'en')} received this month${productName ? ` for ${productName}` : ''} was recorded.`
             }
           },
           channels: ['socket', 'push'],

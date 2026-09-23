@@ -1,4 +1,5 @@
 <script>
+  import Money from '$lib/components/money/Money.svelte';
   import { isRtl } from '$lib/translations';
   let isonly = $state(false);
   import RichText from '$lib/celim/ui/richText.svelte';
@@ -176,7 +177,7 @@
                   <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
                   </svg>
-                  ₪{data.attributes.perhour}
+                  <Money amount={data.attributes.perhour} entry={data.attributes} />
                 </span>
               {/if}
             </td>
@@ -193,10 +194,10 @@
                   <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 8h6m-5 0a3 3 0 110 6H9l3 3m-3-6h6m6 1a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                   </svg>
-                  ₪{data.attributes.perhour * data.attributes.hoursassinged}
+                  <Money amount={data.attributes.perhour * data.attributes.hoursassinged} entry={data.attributes} />
                 </span>
               {:else}
-                <span class="text-surfaceMuted font-medium">₪0</span>
+                <span class="text-surfaceMuted font-medium"><Money amount={0} /></span>
               {/if}
             </td>
           {/each}

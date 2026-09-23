@@ -14,6 +14,7 @@ import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { matchOpenMashaabimToUsers } from '$lib/server/matching/engine';
 import { restimeLabel, voteUrl } from './actionUtils.js';
 import { STRAPI_GRAPHQL } from '$lib/server/strapiUrl.js';
+import { ENTRY_CURRENCY_PARAM, entryFields, normalizeEntry } from '$lib/server/money/normalizeEntry.js';
 import { resolveRecurringPlan, cycleWindowIso } from '$lib/recurring/recurringPlan.js';
 import { bestEffort } from '$lib/server/resources/bookingStore.js';
 import { openGrantBooking } from '$lib/server/resources/grantBooking.js';
@@ -127,11 +128,11 @@ const createResourceHandler: ActionExecutionHandler = async (params, context, { 
     projectId,
     name,
     description = '',
-    price = 0,
+    price: priceTyped = 0,
     kindOf = 'total',
     hm = 1,
     spnot = '',
-    easy = 0,
+    easy: easyTyped = 0,
     linkto = '',
     mashaabimId,
     startDate,
@@ -163,6 +164,18 @@ const createResourceHandler: ActionExecutionHandler = async (params, context, { 
   const f = context.fetch as typeof fetch;
   const jwt = context.jwt as string;
   const userId = context.userId as string;
+
+  // Both prices were typed in the writer's currency; the rikma counts in its
+  // own (PLAN_MULTI_CURRENCY C5). Nothing is read when `entryCurrency` is absent.
+  const entry = await normalizeEntry({
+    amounts: { price: Number(priceTyped) || 0, easy: Number(easyTyped) || 0 },
+    entryCurrency: params.entryCurrency,
+    projectId,
+    jwt,
+    fetchFn: f
+  });
+  const price = entry.values.price ?? 0;
+  const easy = entry.values.easy ?? 0;
   const ensuredMashaabimId = await ensureMashaabim(f, jwt, {
     id: mashaabimId,
     name,
@@ -225,7 +238,8 @@ const createResourceHandler: ActionExecutionHandler = async (params, context, { 
     easy:        easy || price,
     linkto,
     publishedAt: now,
-    archived:    isAssigned   // archived=true means it's self-assigned / claimed
+    archived:    isAssigned,  // archived=true means it's self-assigned / claimed
+    ...entryFields(entry)
   };
 
   resourceData.mashaabim = ensuredMashaabimId;
@@ -644,6 +658,7 @@ export const createResourceAction: ActionConfig = {
   graphqlOperation: createResourceHandler,
   
   paramSchema: {
+    entryCurrency: ENTRY_CURRENCY_PARAM,
     projectId: {
       type: 'string',
       required: true,

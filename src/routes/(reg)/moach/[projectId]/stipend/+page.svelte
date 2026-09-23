@@ -1,4 +1,6 @@
 <script>
+  import { useFormatMoney } from '$lib/money/context.svelte';
+  import Money from '$lib/components/money/Money.svelte';
   /**
    * The rikma's subsistence-stipend tab (docs/PLAN_STIPEND.md §8).
    *
@@ -112,8 +114,9 @@
     payFilter === 'all' ? payments : payments.filter((p) => String(p.recipientId) === payFilter)
   );
 
+  const fmtMoney = useFormatMoney();
   function money(n) {
-    return `₪${Number(n ?? 0).toLocaleString(undefined, { maximumFractionDigits: 2 })}`;
+    return fmtMoney(Number(n ?? 0));
   }
 </script>
 
@@ -194,7 +197,7 @@
               <div class="grow">
                 <p class={TITLE}>{p.name}</p>
                 <p class={MUTED}>
-                  ₪{p.stipendRate}/{$t('stipend.card.hour')} ·
+                  <Money amount={p.stipendRate} />/{$t('stipend.card.hour')} ·
                   {$t('stipend.terms.costShare')} {Math.round(Number(p.costShare) * 100)}% ·
                   {$t(`stipend.mode.${p.mode}`)} ·
                   {$t(`stipend.status.${p.status}`)}
@@ -266,7 +269,7 @@
                     {pl.funderName || $t('stipend.card.noFunderYet')}
                     <span class={ACCENT}>→</span>
                     {pl.recipientName}
-                    <span class={FAINT}>· ₪{pl.terms.stipendRate}/{$t('stipend.card.hour')}</span>
+                    <span class={FAINT}>· <Money amount={pl.terms.stipendRate} />/{$t('stipend.card.hour')}</span>
                   </p>
                 </div>
                 <span class="{MUTED} whitespace-nowrap">
@@ -295,7 +298,7 @@
               </div>
 
               <p class={MUTED}>
-                ₪{pl.terms.stipendRate}/{$t('stipend.card.hour')} ·
+                <Money amount={pl.terms.stipendRate} />/{$t('stipend.card.hour')} ·
                 {$t(`stipend.mode.${pl.terms.mode}`)} ·
                 {pl.terms.costShare >= 1
                   ? $t('stipend.terms.costShareRecipient')
@@ -395,7 +398,7 @@
                 </p>
                 <p class="{MUTED} truncate">
                   {#if p.missionNames?.length}{p.missionNames.join(' · ')} · {/if}
-                  {$t('stipend.pay.hours', { count: p.hours })} × ₪{p.stipendRate}
+                  {$t('stipend.pay.hours', { count: p.hours })} × <Money amount={p.stipendRate} />
                 </p>
               </div>
               <div class="cycle-money">

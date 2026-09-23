@@ -6,6 +6,7 @@
   import { executeAction } from '$lib/client/actionClient';
   import { sendToSer } from '$lib/send/sendToSer.js';
   import { t, isRtl } from '$lib/translations';
+  import { useMoney } from '$lib/money/context.svelte';
 
   /**
    * Create-product flow (PLAN_USER_OFFERINGS, profile feedback 2026-07-13):
@@ -18,6 +19,7 @@
    */
 
   let { uid, onDone, onClose } = $props();
+  const money = useMoney();
 
   const DRAFT_KEY = 'offerings.productDraft.v1';
 
@@ -143,7 +145,11 @@
     }
     saving = true;
     try {
-      const result = await executeAction('createWeave', { projectName: rikmaName });
+      const result = await executeAction('createWeave', {
+        projectName: rikmaName,
+        // The founder's currency is this rikma's (PLAN_MULTI_CURRENCY).
+        currency: money.currency
+      });
       if (!result.success || !result.data?.projectId) {
         error1 = result.error?.message || $t('offerings.products.save_failed');
       } else {

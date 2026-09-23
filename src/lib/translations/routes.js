@@ -38,6 +38,10 @@ export const ROUTED = {
     demand: at('/demand', '/lev', '/maagad', /\/moach\/[^/]+\/demand/),
     discover: at('/demand', '/project', '/gift', '/availableMission', '/availiableResorce'),
     concierge: at('/concierge', '/wish'),
+    // The concierge landing page for customers, plus the short registration
+    // track it opens: the agreement's "one step only" ribbon and the signup
+    // and check-email screens' three-step wording (see regIntent.js).
+    madeForYou: at('/made-for-you', '/hascama', '/signup'),
     offerings: at('/me', '/onboard', '/gift', '/user', '/deals/sales-center', /\/moach\/[^/]+\/sales/),
     consensus: at('/consensus'),
     uses: at('/uses'),
@@ -62,6 +66,8 @@ export const ROUTED = {
     rikmaApi: at(/\/moach\/[^/]+\/api/),
     // The rikma's code tab, plus the GitHub account card on the settings page.
     rikmaCode: at(/\/moach\/[^/]+\/code/, '/me'),
+    // The rikma's shared library — one route, one namespace, nowhere else.
+    rikmaDocs: at(/\/moach\/[^/]+\/docs/),
     // The "connect your AI agent" guide, plus the banner that points at it from
     // the settings page — both live under /me, so one gate covers them.
     mcp: at('/me'),

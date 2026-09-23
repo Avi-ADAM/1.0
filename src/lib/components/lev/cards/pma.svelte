@@ -1,4 +1,6 @@
 ﻿<script>
+  import CurrencySymbol from '$lib/components/money/CurrencySymbol.svelte';
+  import Money from '$lib/components/money/Money.svelte';
   import Chaticon from '../../../celim/chaticon.svelte';
   import { lang } from '$lib/stores/lang.js';
   import { t, isRtl} from '$lib/translations';
@@ -399,7 +401,7 @@
                 ? easy
                 : price
             ).toLocaleString()}
-            ₪ {kindOf === 'yearly' ? 'לשנה' : 'לחודש'}
+            <CurrencySymbol /> {kindOf === 'yearly' ? 'לשנה' : 'לחודש'}
           </span>
           <span class="text-gray-400">·</span>
           <span
@@ -587,7 +589,7 @@
               >
                 {$t('lev.cards.voteCard.inTotal')}:
               </span>
-              <span>{Math.round(dateRangeTotal).toLocaleString()} ₪</span>
+              <span><Money amount={Math.round(dateRangeTotal)} {projectId} /></span>
               <span class="text-gray-400 font-normal text-xs">
                 ({unitPrice.toLocaleString()} × {periodCount.toFixed(1)}
                 {isYearlyResource

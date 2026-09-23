@@ -1,4 +1,5 @@
 <script>
+  import Money from '$lib/components/money/Money.svelte';
   /**
    * SiteShareSaleNote — renders the structured site-share Sale `note` as a
    * readable breakdown instead of the raw `site-share · paid=… · from_project=…`
@@ -43,7 +44,7 @@
           <span class="text-xs text-amber-800/80 dark:text-amber-200/80">
             {$t('project.hamatanot.siteShare.paid')}
           </span>
-          <span class="font-black text-amber-700 dark:text-amber-300">₪{parsed.paid}</span>
+          <span class="font-black text-amber-700 dark:text-amber-300"><Money amount={parsed.paid} /></span>
         </div>
       {/if}
 
@@ -58,7 +59,7 @@
             </span>
             {#if parsed.proposed !== null}
               <span class="text-xs text-amber-900/70 dark:text-amber-100/70">
-                {$t('project.hamatanot.siteShare.proposed')}: ₪{parsed.proposed}
+                {$t('project.hamatanot.siteShare.proposed')}: <Money amount={parsed.proposed} />
               </span>
             {/if}
           </div>

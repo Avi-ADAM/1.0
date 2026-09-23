@@ -1,4 +1,5 @@
 <script>
+  import Money from '$lib/components/money/Money.svelte';
   import { t } from '$lib/translations';
   import Header from '$lib/components/header/header.svelte';
   import { lang } from '$lib/stores/lang.js';
@@ -263,7 +264,7 @@
                     <span class="open-meta">
                       {#if omr.attributes.price}
                         <span class="chip">
-                          {omr.attributes.price} ₪
+                          <Money amount={omr.attributes.price} entry={omr.attributes} />
                           {#if omr.attributes.kindOf}
                             · {$t(`pages.projectJoin.kinds.${omr.attributes.kindOf}`)}
                           {/if}

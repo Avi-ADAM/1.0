@@ -1,4 +1,6 @@
 ﻿<script>
+  import { useFormatMoney } from '$lib/money/context.svelte';
+  import Money from '$lib/components/money/Money.svelte';
   import { isRtl } from '$lib/translations';
   import { t } from '$lib/translations';
   import { get } from 'svelte/store';
@@ -78,6 +80,7 @@
     /** @type {string} proposed new value */
     newValue = '',
   } = $props();
+  const fmtMoney = useFormatMoney();
   let user_1s = $derived.by(() => {
     return getProjectData(projectId, 'us') || [];
   });
@@ -187,7 +190,7 @@
       }))
     ];
     const money = (n) =>
-      n == null || Number.isNaN(Number(n)) ? '—' : `${Number(n).toLocaleString()}₪`;
+      n == null || Number.isNaN(Number(n)) ? '—' : fmtMoney(n);
     return raw.map((r, i) => {
       const prev = i > 0 ? raw[i - 1] : null;
       const total = r.hm != null && r.price != null ? r.hm * r.price : null;
@@ -414,11 +417,11 @@
             </div>
             <div class="bg-white dark:bg-gray-800 rounded-lg py-2 border border-gray-200 dark:border-gray-600">
               <div class="text-[10px] text-gray-500 dark:text-gray-400">{$t('lev.hachlata.unitPrice')}</div>
-              <div class="font-bold text-gray-800 dark:text-gray-100">{saleClaimPrice}₪</div>
+              <div class="font-bold text-gray-800 dark:text-gray-100"><Money amount={saleClaimPrice} {projectId} /></div>
             </div>
             <div class="bg-barbi/5 dark:bg-mpink/10 rounded-lg py-2 border border-barbi/30 dark:border-mpink/30">
               <div class="text-[10px] text-gray-500 dark:text-gray-400">{$t('lev.hachlata.total')}</div>
-              <div class="font-extrabold text-barbi dark:text-mpink">{saleClaimTotal}₪</div>
+              <div class="font-extrabold text-barbi dark:text-mpink"><Money amount={saleClaimTotal} {projectId} /></div>
             </div>
           </div>
 

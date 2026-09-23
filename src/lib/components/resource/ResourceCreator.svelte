@@ -1,4 +1,8 @@
 ﻿<script>
+  import Money from '$lib/components/money/Money.svelte';
+  import CurrencyPicker from '$lib/components/money/CurrencyPicker.svelte';
+  import { useRikmaCurrency } from '$lib/money/context.svelte';
+  import { DEFAULT_CURRENCY } from '$lib/money/currencies.js';
   import { isRtl, t } from '$lib/translations';
   import { onMount } from 'svelte';
   import MultiSelect from 'svelte-multiselect';
@@ -64,6 +68,11 @@
   let name = $state('');
   let description = $state('');
   let price = $state(0);
+  // The currency the two prices are typed in (PLAN_MULTI_CURRENCY C5). Starts
+  // in the rikma's: templates and prefills bring numbers already in it.
+  const enclosingRikma = useRikmaCurrency();
+  const rikmaCur = $derived(enclosingRikma() ?? DEFAULT_CURRENCY);
+  let entryCurrency = $state(enclosingRikma() ?? DEFAULT_CURRENCY);
   let maxInvestment = $state(0);
   let maxInvestmentTouched = $state(false);
   let kindOf = $state('total');
@@ -431,6 +440,7 @@
         description,
         price,
         easy: maxInvestment || price,
+        entryCurrency: entryCurrency !== rikmaCur ? entryCurrency : undefined,
         kindOf,
         recurring: isRecurring && (kindOf === 'monthly' || kindOf === 'yearly'),
         cycleSize:
@@ -568,6 +578,12 @@
           >
           <NumberInput value={price} onValueChange={handlePriceInput} />
         </div>
+        {#if !specMode && !publishMode}
+          <div class="flex flex-col">
+            <label class="text-sm text-barbie mb-1 font-medium" for="resource-currency">{$t('money.currency')}</label>
+            <CurrencyPicker id="resource-currency" bind:value={entryCurrency} compact />
+          </div>
+        {/if}
         <div class="flex flex-col">
           <label class="text-sm text-barbie mb-1 font-medium"
             >{publishMode ? $t('project.resourceCreator.maxValue') : $t('project.resourceCreator.maxInvestment')}</label
@@ -848,13 +864,13 @@
           <div class="summary-item">
             <span class="summary-label">{$t('project.resourceCreator.totalPrice')}</span>
             <span class="summary-value price"
-              >{(+totalPrice || 0).toLocaleString()} ₪</span
+              ><Money amount={+totalPrice || 0} currency={entryCurrency} /></span
             >
           </div>
           <div class="summary-item">
             <span class="summary-label">{$t('project.resourceCreator.totalMax')}</span>
             <span class="summary-value max"
-              >{(+totalMax || 0).toLocaleString()} ₪</span
+              ><Money amount={+totalMax || 0} currency={entryCurrency} /></span
             >
           </div>
         </div>

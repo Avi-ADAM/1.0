@@ -13,7 +13,14 @@
     setAutoTranslate,
     adoptFromProfile
   } from '$lib/stores/autoTranslate.js';
+  import CurrencyPicker from '$lib/components/money/CurrencyPicker.svelte';
+  import { useMoney, setDisplayCurrency, adoptCurrencyFromProfile } from '$lib/money/context.svelte';
+  import { formatMoney } from '$lib/money/format.js';
   let { data } = $props();
+
+  // The reader's display currency (PLAN_MULTI_CURRENCY D-C9).
+  const money = useMoney();
+  let currencyVal = $state(money.currency);
 
   // Locales that render left-to-right; everything else is RTL. Mirrors
   // LangSwitch.svelte — saving a preferred language here must flip the same
@@ -77,6 +84,8 @@
     // (PLAN_UGC_TRANSLATION §4.4). A device that *has* chosen keeps its own —
     // adoptFromProfile decides, not this page.
     adoptFromProfile(data.meData.autoTranslate);
+    // Same rule for the currency: a device that chose keeps its choice.
+    if (adoptCurrencyFromProfile(money, data.meData.currency)) currencyVal = money.currency;
   });
 
   async function sendD() {
@@ -150,11 +159,11 @@
   class="min-h-screen w-full mx-auto max-w-3xl p-4 md:p-8"
   dir={$isRtl ? 'rtl' : 'ltr'}
 >
-  <a href="/me" data-sveltekit-prefetch class="text-sm text-gold hover:underline"
+  <a href="/me" data-sveltekit-prefetch class="text-sm text-goldink hover:underline"
     >{$t('pages.meSettings.back')}</a
   >
 
-  <h1 class="text-2xl font-bold mt-4 mb-6 text-center text-gold">
+  <h1 class="text-2xl font-bold mt-4 mb-6 text-center text-goldink">
     {$t('pages.meSettings.title')}
   </h1>
 
@@ -162,7 +171,7 @@
     class="mb-6 flex items-center justify-between gap-3 flex-wrap rounded-xl border border-zinc-200 dark:border-zinc-700 p-4 bg-white/60 dark:bg-zinc-900/40"
   >
     <div>
-      <p class="font-medium text-gold">{$t('pages.meSettings.onboarding')}</p>
+      <p class="font-medium text-goldink">{$t('pages.meSettings.onboarding')}</p>
       <p class="text-sm text-zinc-500">{$t('pages.meSettings.onboardingDesc')}</p>
     </div>
     <a
@@ -263,6 +272,28 @@
     </div>
 
     <p class="text-xs text-zinc-400 mt-2">{$t('translated.pref.saved')}</p>
+  </div>
+
+  <!-- The reader's currency (PLAN_MULTI_CURRENCY D-C9). Everyone writes in their
+       own currency; this only chooses what *this* reader sees amounts in. The
+       cookie makes the next server render right, the account copy follows. -->
+  <div
+    class="mb-6 rounded-xl border border-zinc-200 dark:border-zinc-700 p-4 bg-white/60 dark:bg-zinc-900/40"
+  >
+    <p class="font-medium text-goldink">💱 {$t('money.pref.title')}</p>
+    <p class="text-sm text-zinc-500 mt-1">{$t('money.pref.desc')}</p>
+    <div class="mt-3 flex flex-wrap items-center gap-3">
+      <CurrencyPicker
+        id="display-currency"
+        ariaLabel={$t('money.pref.title')}
+        bind:value={currencyVal}
+        onchange={(code) => setDisplayCurrency(money, code)}
+      />
+      <span class="text-sm text-zinc-500" dir="ltr">{formatMoney(100, 'ILS', money.lang)} = {money.fmt(100, 'ILS')}</span>
+    </div>
+    <p class="text-xs text-zinc-400 mt-2">
+      {money.chosen ? $t('money.pref.saved') : $t('money.pref.guessed')}
+    </p>
   </div>
 
   {#if meData}

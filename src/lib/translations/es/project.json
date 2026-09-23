@@ -378,7 +378,7 @@
   "recurringCycle": {
     "month": "Mes",
     "expected": "Importe previsto",
-    "customerReported": "{{name}} informó que transfirió {{amt}} ₪",
+    "customerReported": "{{name}} informó que transfirió {{amt}}",
     "customerWaiting": "La clientela aún no ha informado de una transferencia este mes",
     "amountLabelHolder": "¿Cuánto entró realmente este mes? (0 = nada)",
     "amountLabelCustomer": "¿Cuánto transferiste este mes? (0 = nada)",

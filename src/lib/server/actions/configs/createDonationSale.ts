@@ -1,5 +1,7 @@
+import { rikmaCurrency } from '$lib/money/resolve.js';
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { buildDonationNote, type DonationVia } from '$lib/revenue/parseDonationNote';
+import { moneyTextFor } from '$lib/server/money/notifyMoney.js';
 
 /**
  * Record a donation (PLAN_VOLUNTEER_RIKMA §2.1).
@@ -66,6 +68,8 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
     context.fetch
   );
   const projAttrs = projInfo?.data?.project?.data?.attributes;
+  // Amounts are stored in the rikma's currency; say them in it (PLAN_MULTI_CURRENCY C7).
+  const money = moneyTextFor(rikmaCurrency(projAttrs));
   const memberIds: string[] = (projAttrs?.user_1s?.data ?? []).map((m: any) => String(m.id));
   if (!memberIds.includes(holderId)) {
     throw new Error('The money-holder must be a member of this rikma');
@@ -107,7 +111,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
       zman: now,
       order: 1
     };
-    const decisionName = `${from ? `${from} · ` : ''}תרומה · ${Number(amount)}₪`;
+    const decisionName = `${from ? `${from} · ` : ''}תרומה · ${money(amount)}`;
 
     const decRes = await strapi.execute(
       'createSaleClaimDecision',
@@ -162,8 +166,8 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
                 en: 'A reported donation awaits your confirmation'
               },
               body: {
-                he: `דווח שהתקבלה אצלך תרומה של ${Number(amount)}₪${from ? ` מ${from}` : ''}. אפשר לאשר, לדייק (משא-ומתן) או לברר. אם לא תגיב - תאושר אוטומטית בתום זמן התגובה של הרקמה.`,
-                en: `It was reported that you received a ${Number(amount)}₪ donation${from ? ` from ${from}` : ''}. You can approve, refine (negotiate) or discuss. If you don't respond it is auto-approved after the rikma's response time.`
+                he: `דווח שהתקבלה אצלך תרומה של ${money(amount)}${from ? ` מ${from}` : ''}. אפשר לאשר, לדייק (משא-ומתן) או לברר. אם לא תגיב - תאושר אוטומטית בתום זמן התגובה של הרקמה.`,
+                en: `It was reported that you received a ${money(amount, 'en')} donation${from ? ` from ${from}` : ''}. You can approve, refine (negotiate) or discuss. If you don't respond it is auto-approved after the rikma's response time.`
               }
             },
             channels: ['socket', 'push'],

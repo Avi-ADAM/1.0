@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Money from '$lib/components/money/Money.svelte';
   import { goto } from '$app/navigation';
   import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
   import type { EntityIconKind } from '$lib/celim/icons/entityIcons';
@@ -193,11 +194,11 @@
         </div>
         <div class="row">
           <span class="rl">מחיר ליחידה</span>
-          <span class="rv">₪ {Number(data.price).toLocaleString()}</span>
+          <span class="rv"><Money amount={data.price} /></span>
         </div>
         <div class="row total-row">
           <span class="rl">סה"כ</span>
-          <span class="rv gold">₪ {Number(data.total).toLocaleString()}</span>
+          <span class="rv gold"><Money amount={data.total} /></span>
         </div>
         {#if data.startDate}
           <div class="row">

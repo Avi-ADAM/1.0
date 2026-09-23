@@ -43,6 +43,15 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
 
     const a = node.attributes || {};
 
+    // A draft is not a wish yet: only its owner sees it, in the composer.
+    if (a.status_ratson === 'draft') {
+      const owners = a.users_permissions_users?.data ?? [];
+      if (owners.some((o: any) => String(o.id) === String(uid))) {
+        throw redirect(302, `/concierge/new?draft=${params.id}`);
+      }
+      throw error(404, 'משאלה לא נמצאה');
+    }
+
     // Public access guard — `personal` means private.
     if (a.access_mode === 'personal') {
       // If the owner is viewing their own private wish via the /wish URL, redirect them

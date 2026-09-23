@@ -1,3 +1,9 @@
+import {
+  isConciergeIntent,
+  REG_INTENT_COOKIE,
+  setConciergeIntent
+} from '$lib/concierge/regIntent.js';
+
 /**
  * Capture an email-bound guest invitation token off the register link.
  *
@@ -5,6 +11,10 @@
  * The onboarding UI is client-driven and hops through /signup, so we stash the
  * token in a short-lived cookie here; the signup action consumes it after the
  * account is created and imports the meeting (see importInvitedMeeting).
+ *
+ * `?intent=concierge` marks a customer who came to order something: the
+ * agreement is still theirs to sign, but after the email confirmation they go
+ * straight to their wish instead of the onboarding (see regIntent.js).
  */
 export function load({ url, cookies }) {
   const invite = url.searchParams.get('invite');
@@ -17,5 +27,11 @@ export function load({ url, cookies }) {
       maxAge: 60 * 60 // 1 hour — long enough to finish signup
     });
   }
-  return {};
+
+  let concierge = isConciergeIntent(cookies.get(REG_INTENT_COOKIE));
+  if (isConciergeIntent(url.searchParams.get('intent'))) {
+    setConciergeIntent(cookies, url);
+    concierge = true;
+  }
+  return { concierge };
 }

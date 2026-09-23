@@ -1,4 +1,6 @@
 <script>
+  import { useMoney } from '$lib/money/context.svelte';
+  import { formatMoney, currencyName } from '$lib/money/format.js';
   /**
    * /me/income — the homepage's "three ways to earn a living" graph, drawn from
    * the member's own rows.
@@ -13,17 +15,17 @@
   import MyIncomeChart from '$lib/components/income/MyIncomeChart.svelte';
 
   let { data } = $props();
+  const reader = useMoney();
 
   let series = $derived(data.summary.series ?? []);
   /** Which currency is on screen. Amounts in different currencies never mix. */
   let picked = $state(0);
   let current = $derived(series[Math.min(picked, Math.max(series.length - 1, 0))] ?? null);
 
-  const fmtNumber = (/** @type {number} */ n, /** @type {string} */ loc) =>
-    new Intl.NumberFormat(loc, { maximumFractionDigits: 0 }).format(n);
-
+  // Each tab stays in its own currency: this page is the receipt, and a
+  // receipt is not converted.
   let money = $derived((/** @type {number} */ n) =>
-    current ? `${fmtNumber(n, $isRtl ? 'he' : 'en')} ${current.currency}`.trim() : ''
+    current ? formatMoney(n, current.currency, reader.lang, { fraction: 'whole' }) : ''
   );
 
   /** 'YYYY-MM' → a month the reader recognises. */
@@ -100,7 +102,7 @@
               ? 'bg-barbi text-gold'
               : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}"
           >
-            {s.currencyName || s.currency || $t('me.income.noCurrency')}
+            {s.currencyName || (s.currency ? currencyName(s.currency, reader.lang) : $t('me.income.noCurrency'))}
           </button>
         {/each}
       </div>

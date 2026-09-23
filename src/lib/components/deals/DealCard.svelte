@@ -1,4 +1,5 @@
 ﻿<script lang="ts">
+  import Money from '$lib/components/money/Money.svelte';
   import { isRtl } from '$lib/translations';
   import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
   import { goto } from '$app/navigation';
@@ -69,11 +70,11 @@
   <div class="meta">
     <div class="meta-item">
       <div class="ml">{$t('deals.totalCost')}</div>
-      <div class="mv gold">₪ {deal.totalCost.toLocaleString()}</div>
+      <div class="mv gold"><Money amount={deal.totalCost} /></div>
     </div>
     <div class="meta-item">
       <div class="ml">{$t('deals.paid')}</div>
-      <div class="mv">₪ {deal.paid.toLocaleString()}</div>
+      <div class="mv"><Money amount={deal.paid} /></div>
     </div>
     <div class="meta-item">
       <div class="ml">{$t('deals.estimatedEnd')}</div>

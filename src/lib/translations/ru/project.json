@@ -377,7 +377,7 @@
   "recurringCycle": {
     "month": "Месяц",
     "expected": "Ожидаемая сумма",
-    "customerReported": "{{name}} сообщил о переводе {{amt}} ₪",
+    "customerReported": "{{name}} сообщил о переводе {{amt}}",
     "customerWaiting": "Клиент ещё не сообщил о переводе в этом месяце",
     "amountLabelHolder": "Сколько фактически поступило в этом месяце? (0 = ничего)",
     "amountLabelCustomer": "Сколько вы перевели в этом месяце? (0 = ничего)",

@@ -14,7 +14,7 @@
   <a
     href="/me/settings"
     data-sveltekit-prefetch
-    class="text-sm text-gold hover:underline"
+    class="text-sm text-goldink hover:underline"
   >
     {$t('mcp.back')}
   </a>

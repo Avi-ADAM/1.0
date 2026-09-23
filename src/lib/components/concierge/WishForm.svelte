@@ -1,9 +1,19 @@
 <script>
-  import { onMount, onDestroy } from 'svelte';
+  import { useFormatMoney } from '$lib/money/context.svelte';
+  import Money from '$lib/components/money/Money.svelte';
+  import { onMount, onDestroy, tick } from 'svelte';
   import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
   import { fade } from 'svelte/transition';
   import { showFoot } from '$lib/stores/showFoot.js';
-  import { goto } from '$app/navigation';
+  import { goto, replaceState } from '$app/navigation';
+  import { toast } from 'svelte-sonner';
+  import {
+    clearGuestDraft,
+    readGuestDraft,
+    saveGuestDraft,
+    WISH_PREFILL_KEY
+  } from '$lib/concierge/wishDraft.js';
+  import { CONCIERGE_INTENT } from '$lib/concierge/regIntent.js';
   import LocationPicker from '$lib/components/location/LocationPicker.svelte';
   import RichText from '$lib/celim/ui/richText.svelte';
   import { uPic } from '$lib/stores/uPic.js';
@@ -11,27 +21,120 @@
 
   /**
    * @type {{
-   *   data?: { uid?: string; un?: string },
+   *   data?: {
+   *     uid?: string;
+   *     un?: string;
+   *     welcome?: boolean;
+   *     draft?: import('../../../routes/(reg)/concierge/new/+page.server').ServerWishDraft | null
+   *   },
    *   anon?: boolean
    * }}
-   * `anon` = public/guest mode (V1): the wish is composed before an account
-   * exists. Matches are shown with supplier identities masked, and "publish"
-   * stashes a draft and routes to registration instead of creating the Ratson.
+   * `anon` = public/guest mode: the wish is composed before an account exists.
+   * Matches are shown with supplier identities masked, and "publish" keeps the
+   * draft on this device and routes to registration instead of creating the
+   * Ratson. `data.draft` resumes a saved draft (status_ratson 'draft');
+   * `data.welcome` is the first visit after the customer registration track.
    */
   let { data = {}, anon = false } = $props();
+  const fmtMoney = useFormatMoney();
+
+  /* ===== Drafts (the customer track) =====
+     A logged-in wish can be saved as a draft Ratson and resumed from
+     /concierge or the profile; once it exists, edits save themselves.
+     A guest's wish waits on this device (wishDraft.js) until the account
+     exists — then it is sent, if they had pressed "send", or saved as a
+     draft on the account, if they had not. */
+  let draftId = $state(/** @type {string | null} */ (null));
+  let draftSaving = $state(false);
+  let draftSavedAt = $state(/** @type {number | null} */ (null));
+  /** Sending a wish the guest already pressed "send" on, before registering. */
+  let autoSending = $state(false);
+  /** The first screen after signing up — greet, rather than drop them in. */
+  let welcome = $state(false);
+  /** Their pre-registration wish is back in the form. */
+  let restoredGuestDraft = $state(false);
 
   onMount(() => {
     showFoot.set(false);
-    // Resume a draft stashed by the guest composer before registration (V1).
-    if (!anon) restoreDraftIfAny();
+    welcome = !anon && !!data.welcome;
+    if (!anon) {
+      if (data.draft) applyServerDraft(data.draft);
+      else resumeGuestDraft();
+    }
+    // `?seed=gift` — an idea picked on /made-for-you. Never over a draft.
+    const seedKey = new URLSearchParams(window.location.search).get('seed');
+    const seed = SEEDS.find((s) => s.key === seedKey);
+    if (seed && !title.trim() && !data.draft && !restoredGuestDraft) {
+      pickSeed(seed);
+    }
+    // What the visitor typed into the homepage's wish field. Handed over in
+    // sessionStorage rather than the URL, so the wish never lands in a log or
+    // a shared link; read once, and never over a draft.
+    try {
+      const prefill = sessionStorage.getItem(WISH_PREFILL_KEY);
+      if (prefill) {
+        sessionStorage.removeItem(WISH_PREFILL_KEY);
+        if (!title.trim() && !data.draft && !restoredGuestDraft) {
+          title = prefill.slice(0, 120);
+        }
+      }
+    } catch {
+      // storage blocked (private mode, sandbox) - the form simply opens empty
+    }
   });
   onDestroy(() => showFoot.set(true));
 
-  function restoreDraftIfAny() {
+  /** @param {NonNullable<typeof data.draft>} d */
+  function applyServerDraft(d) {
+    draftId = d.id;
+    title = d.title;
+    body = d.body;
+    if (d.startDate) startDate = d.startDate;
+    if (d.finnishDate) finnishDate = d.finnishDate;
+    if (typeof d.budgetAmount === 'number') budgetAmount = d.budgetAmount;
+    whoCanOffer = d.whoCanOffer;
+    whoCanSee = d.whoCanSee;
+    location = { ...location, ...d.location };
+    if (d.extractedMissions.length) extractedMissions = d.extractedMissions;
+    if (d.extractedResources.length) extractedResources = d.extractedResources;
+    const meta = d.aiMeta ?? {};
+    if (meta.invitePartners) invitePartners = meta.invitePartners;
+    if (Array.isArray(meta.skills)) {
+      extractedSkills = meta.skills.map((name) => ({ name }));
+    }
+    if (Array.isArray(meta.categories)) extractedCategories = meta.categories;
+    if (meta.enrichment) matchedEnrichment = meta.enrichment;
+  }
+
+  /**
+   * The wish written before registration, back in the form.
+   *
+   * It is taken off the device *before* the server call, not after: the
+   * composer can mount twice while a slow first load settles, and a second
+   * mount that still found it would send or save it a second time. If the
+   * server call fails it goes back, for the next visit.
+   */
+  async function resumeGuestDraft() {
+    const d = readGuestDraft();
+    if (!d) return;
+    clearGuestDraft();
+    restoreDraftFields(d);
+    restoredGuestDraft = true;
+    await tick();
+    let kept;
+    if (d.sendOnReturn && isReady) {
+      autoSending = true;
+      kept = await publish();
+      if (!kept) autoSending = false;
+    } else {
+      kept = await saveDraft({ quiet: true });
+    }
+    if (!kept) saveGuestDraft(d, { sendOnReturn: d.sendOnReturn === true });
+  }
+
+  /** @param {Record<string, any>} d */
+  function restoreDraftFields(d) {
     try {
-      const raw = sessionStorage.getItem('wishDraft');
-      if (!raw) return;
-      const d = JSON.parse(raw);
       if (d.title && !title) title = d.title;
       if (d.body && !body) body = d.body;
       if (Array.isArray(d.values) && values.length === 0) values = d.values;
@@ -46,8 +149,17 @@
       if (typeof d.maxJoiners === 'number') maxJoiners = d.maxJoiners;
       if (d.joinDeadline) joinDeadline = d.joinDeadline;
       if (d.location) location = d.location;
-      // Extraction re-runs automatically once `body` is set (debounced $effect).
-      sessionStorage.removeItem('wishDraft');
+      // What Lev had found, so a send right after registration carries the
+      // same breakdown and matches the guest saw. Extraction also re-runs by
+      // itself once `body` is set (debounced $effect).
+      if (Array.isArray(d.extractedMissions)) extractedMissions = d.extractedMissions;
+      if (Array.isArray(d.extractedResources)) extractedResources = d.extractedResources;
+      if (Array.isArray(d.extractedSkills)) extractedSkills = d.extractedSkills;
+      if (Array.isArray(d.extractedCategories)) extractedCategories = d.extractedCategories;
+      if (Array.isArray(d.matchedPeople)) matchedPeople = d.matchedPeople;
+      if (Array.isArray(d.matchedMissions)) matchedMissions = d.matchedMissions;
+      if (Array.isArray(d.matchedResources)) matchedResources = d.matchedResources;
+      if (d.matchedEnrichment) matchedEnrichment = d.matchedEnrichment;
     } catch (err) {
       console.warn('[WishForm] could not restore draft:', err);
     }
@@ -295,7 +407,7 @@
     typeof budgetAmount === 'number' &&
       Number.isFinite(budgetAmount) &&
       budgetAmount > 0
-      ? `₪ ${budgetAmount.toLocaleString($locale || 'he')}`
+      ? fmtMoney(budgetAmount)
       : ''
   );
   const whoCanOfferJewelValue = $derived(
@@ -359,128 +471,245 @@
     return location.location_hint?.trim() || '';
   });
 
-  function saveDraftAndRegister() {
-    // V1: stash the composed wish so it survives the jump to registration.
-    // (V2 replaces this with a server-side Strapi draft + draft_token claimed
-    //  at signup, so it also survives cross-device email confirmation.)
-    try {
-      const draft = {
-        title,
-        body,
-        values,
-        startDate,
-        finnishDate,
-        budgetAmount,
-        whoCanOffer,
-        whoCanSee,
-        invitePartners,
-        joinKind,
-        minJoiners,
-        maxJoiners,
-        joinDeadline,
-        location,
-        extractedMissions,
-        extractedResources,
-        extractedSkills,
-        extractedCategories,
-        savedAt: Date.now()
-      };
-      sessionStorage.setItem('wishDraft', JSON.stringify(draft));
-    } catch (err) {
-      console.warn('[WishForm] could not stash draft:', err);
-    }
-    goto(`${registerPath()}?from=${encodeURIComponent('/concierge/new')}&intent=wish`);
+  /** The composer's state as it would be stored on the device. */
+  function guestDraftPayload() {
+    return {
+      title,
+      body,
+      values,
+      startDate,
+      finnishDate,
+      budgetAmount,
+      whoCanOffer,
+      whoCanSee,
+      invitePartners,
+      joinKind,
+      minJoiners,
+      maxJoiners,
+      joinDeadline,
+      location,
+      extractedMissions,
+      extractedResources,
+      extractedSkills,
+      extractedCategories,
+      matchedPeople,
+      matchedMissions,
+      matchedResources,
+      matchedEnrichment
+    };
   }
 
-  async function publish() {
-    if (!isReady) return;
+  /**
+   * Keep the guest's wish on this device and go sign the agreement. The
+   * registration track (regIntent.js) then skips the onboarding and brings
+   * them back here, where the wish is sent (`sendOnReturn`) or kept as a
+   * draft on their new account.
+   *
+   * @param {{ sendOnReturn?: boolean }} [opts]
+   */
+  function saveDraftAndRegister(opts = {}) {
+    if (title.trim() || bodyText) {
+      saveGuestDraft(guestDraftPayload(), { sendOnReturn: opts.sendOnReturn });
+    }
+    goto(
+      `${registerPath()}?intent=${CONCIERGE_INTENT}&from=${encodeURIComponent('/concierge/new')}`
+    );
+  }
+
+  /** Everything the Ratson row takes from the form, status aside. */
+  function wishParams() {
+    const hasBudget =
+      typeof budgetAmount === 'number' &&
+      Number.isFinite(budgetAmount) &&
+      budgetAmount > 0;
+    const name =
+      title.trim() ||
+      bodyText.slice(0, 60).trim() ||
+      $t('concierge.new.untitledDraft');
+
+    // Persist the AI extraction so the review stage (/concierge/[id]) starts
+    // from a structured spec instead of re-deriving it.
+    const extractedMissionsParam = extractedMissions.map((m) => ({
+      name: m.name,
+      importance: m.imp === 'must' ? 'must' : 'nice'
+    }));
+    const extractedResourcesParam = extractedResources.map((r) => ({
+      name: r.name,
+      importance: r.imp === 'must' ? 'must' : 'nice'
+    }));
+    const aiMeta = {
+      ...(invitePartners !== 'lev' ? { invitePartners } : {}),
+      skills: extractedSkills.map((s) => s.name),
+      categories: extractedCategories,
+      suggestedPeople: matchedPeople.map((p) => p.id),
+      matchedMissions: matchedMissions.map((m) => m.id),
+      // Full, renderable match snapshot — /concierge/[id] reads this straight
+      // from Strapi instead of re-running the analysis on every page load.
+      enrichment: matchedEnrichment
+        ? {
+            skills: matchedEnrichment.skills ?? [],
+            missions: matchedEnrichment.missions ?? [],
+            people: matchedEnrichment.people ?? [],
+            resources: matchedEnrichment.resources ?? [],
+            products: matchedEnrichment.products ?? [],
+            computedAt: new Date().toISOString()
+          }
+        : null
+    };
+
+    return {
+      name,
+      desc: name,
+      longDes: body.trim(),
+      access_mode: whoCanSee,
+      allowJoin: whoCanOffer,
+      bounti: hasBudget,
+      totalbounti: hasBudget ? budgetAmount : 0,
+      startDate: startDate ? new Date(startDate).toISOString() : null,
+      finnishDate: finnishDate ? new Date(finnishDate).toISOString() : null,
+      isOnline: location.location_mode === 'online',
+      lat: location.lat,
+      lng: location.lng,
+      radius: location.radius,
+      location_hint: location.location_hint,
+      joinKind,
+      minJoiners:
+        isGroupKind && typeof minJoiners === 'number' ? minJoiners : null,
+      maxJoiners:
+        isGroupKind && typeof maxJoiners === 'number' ? maxJoiners : null,
+      joinDeadline:
+        isGroupKind && joinDeadline
+          ? new Date(joinDeadline).toISOString()
+          : null,
+      extracted_missions: extractedMissionsParam,
+      extracted_resources: extractedResourcesParam,
+      ai_meta: aiMeta
+    };
+  }
+
+  /**
+   * @param {string} actionKey
+   * @param {Record<string, any>} params
+   */
+  async function runAction(actionKey, params) {
+    const res = await fetch('/api/action', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ actionKey, params })
+    });
+    const out = await res.json();
+    if (!out?.success) {
+      throw new Error(out?.error?.message || out?.error || `${actionKey} failed`);
+    }
+    return out.data ?? {};
+  }
+
+  /**
+   * Save the wish as a draft on the account (a guest's stays on the device).
+   * The first save creates a draft Ratson; later ones rewrite it.
+   *
+   * @param {{ quiet?: boolean }} [opts] quiet — an autosave, no toast
+   * @returns {Promise<boolean>}
+   */
+  async function saveDraft(opts = {}) {
+    if (!title.trim() && !bodyText) return false;
     if (anon) {
-      saveDraftAndRegister();
+      const kept = saveGuestDraft(guestDraftPayload());
+      if (!opts.quiet) {
+        if (kept) toast.success($t('concierge.new.draftSavedDevice'));
+        else toast.error($t('concierge.new.draftSaveFailed'));
+      }
+      if (kept) draftSavedAt = Date.now();
+      return kept;
+    }
+    if (draftSaving || publishing) return false;
+    draftSaving = true;
+    try {
+      if (draftId) {
+        await runAction('updateRatsonDraft', {
+          ratsonId: draftId,
+          ...wishParams()
+        });
+      } else {
+        const created = await runAction('createRatson', {
+          ...wishParams(),
+          status_ratson: 'draft'
+        });
+        if (!created.ratsonId) throw new Error('no ratsonId');
+        draftId = String(created.ratsonId);
+        // Refreshing or sharing this URL now reopens the same draft.
+        const url = new URL(window.location.href);
+        url.searchParams.set('draft', draftId);
+        url.searchParams.delete('welcome');
+        url.searchParams.delete('seed');
+        replaceState(url, {});
+      }
+      draftSavedAt = Date.now();
+      if (!opts.quiet) toast.success($t('concierge.new.draftSaved'));
+      return true;
+    } catch (err) {
+      console.warn('[WishForm] draft save failed:', err);
+      if (!opts.quiet) toast.error($t('concierge.new.draftSaveFailed'));
+      return false;
+    } finally {
+      draftSaving = false;
+    }
+  }
+
+  /* Once a draft exists, keep it current — a few seconds after the last
+     change, so a customer who closes the tab mid-thought loses nothing. */
+  let lastAutosaved = '';
+  $effect(() => {
+    if (anon || !draftId || autoSending) return;
+    const snapshot = JSON.stringify([
+      title,
+      body,
+      startDate,
+      finnishDate,
+      budgetAmount,
+      whoCanOffer,
+      whoCanSee,
+      location
+    ]);
+    if (!lastAutosaved) {
+      lastAutosaved = snapshot;
       return;
+    }
+    if (snapshot === lastAutosaved) return;
+    const timer = setTimeout(async () => {
+      if (await saveDraft({ quiet: true })) lastAutosaved = snapshot;
+    }, 3500);
+    return () => clearTimeout(timer);
+  });
+
+  /** @returns {Promise<boolean>} whether the wish went out */
+  async function publish() {
+    if (!isReady) return false;
+    if (anon) {
+      saveDraftAndRegister({ sendOnReturn: true });
+      return false;
     }
     publishing = true;
     publishError = '';
     try {
-      const hasBudget =
-        typeof budgetAmount === 'number' &&
-        Number.isFinite(budgetAmount) &&
-        budgetAmount > 0;
-
-      // Persist the AI extraction so the review stage (/concierge/[id]) starts
-      // from a structured spec instead of re-deriving it.
-      const extractedMissionsParam = extractedMissions.map((m) => ({
-        name: m.name,
-        importance: m.imp === 'must' ? 'must' : 'nice'
-      }));
-      const extractedResourcesParam = extractedResources.map((r) => ({
-        name: r.name,
-        importance: r.imp === 'must' ? 'must' : 'nice'
-      }));
-      const aiMeta = {
-        ...(invitePartners !== 'lev' ? { invitePartners } : {}),
-        skills: extractedSkills.map((s) => s.name),
-        categories: extractedCategories,
-        suggestedPeople: matchedPeople.map((p) => p.id),
-        matchedMissions: matchedMissions.map((m) => m.id),
-        // Full, renderable match snapshot — /concierge/[id] reads this straight
-        // from Strapi instead of re-running the analysis on every page load.
-        enrichment: matchedEnrichment
-          ? {
-              skills: matchedEnrichment.skills ?? [],
-              missions: matchedEnrichment.missions ?? [],
-              people: matchedEnrichment.people ?? [],
-              resources: matchedEnrichment.resources ?? [],
-              products: matchedEnrichment.products ?? [],
-              computedAt: new Date().toISOString()
-            }
-          : null
-      };
-
-      const createRes = await fetch('/api/action', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          actionKey: 'createRatson',
-          params: {
-            name: title.trim(),
-            desc: title.trim(),
-            longDes: body.trim(),
-            status_ratson: 'open',
-            access_mode: whoCanSee,
-            allowJoin: whoCanOffer,
-            bounti: hasBudget,
-            totalbounti: hasBudget ? budgetAmount : 0,
-            startDate: startDate ? new Date(startDate).toISOString() : null,
-            finnishDate: finnishDate
-              ? new Date(finnishDate).toISOString()
-              : null,
-            isOnline: location.location_mode === 'online',
-            lat: location.lat,
-            lng: location.lng,
-            radius: location.radius,
-            location_hint: location.location_hint,
-            joinKind,
-            minJoiners:
-              isGroupKind && typeof minJoiners === 'number' ? minJoiners : null,
-            maxJoiners:
-              isGroupKind && typeof maxJoiners === 'number' ? maxJoiners : null,
-            joinDeadline:
-              isGroupKind && joinDeadline
-                ? new Date(joinDeadline).toISOString()
-                : null,
-            extracted_missions: extractedMissionsParam,
-            extracted_resources: extractedResourcesParam,
-            ai_meta: aiMeta
-          }
-        })
-      });
-      const created = await createRes.json();
-      if (!created?.success || !created?.data?.ratsonId) {
-        throw new Error(
-          created?.error?.message || created?.error || 'Failed to create wish'
-        );
+      let ratsonId;
+      if (draftId) {
+        // Publishing a draft keeps its id: the draft *becomes* the wish.
+        await runAction('updateRatsonDraft', {
+          ratsonId: draftId,
+          publish: true,
+          ...wishParams()
+        });
+        ratsonId = draftId;
+      } else {
+        const created = await runAction('createRatson', {
+          ...wishParams(),
+          status_ratson: 'open'
+        });
+        ratsonId = created.ratsonId;
+        if (!ratsonId) throw new Error('Failed to create wish');
       }
-      const ratsonId = created.data.ratsonId;
+      clearGuestDraft();
 
       // Fire matching but don't block navigation — the detail page will
       // refresh on its own and pick up the new proposals.
@@ -496,12 +725,14 @@
       );
 
       goto(`/concierge/${ratsonId}`);
+      return true;
     } catch (err) {
       console.error('[concierge/new] publish failed:', err);
       publishError =
         err instanceof Error
           ? err.message
           : $t('concierge.new.publishFailed');
+      return false;
     } finally {
       publishing = false;
     }
@@ -628,8 +859,12 @@
         ? '/aitifaqia'
         : '/convention';
   }
+  /** Registering from the header — whatever was written is kept, not sent. */
   function gotoRegister(dest) {
-    goto(`${registerPath()}?from=${encodeURIComponent(dest || '/concierge/new')}`);
+    if (title.trim() || bodyText) saveGuestDraft(guestDraftPayload());
+    goto(
+      `${registerPath()}?intent=${CONCIERGE_INTENT}&from=${encodeURIComponent(dest || '/concierge/new')}`
+    );
   }
 
   // Guests can't reach the app's inner pages. Instead of bouncing them home,
@@ -654,6 +889,18 @@
 </script>
 
 <svelte:window onkeydown={handleWindowKeydown} />
+
+{#if autoSending}
+  <!-- The wish they pressed "send" on before registering, going out now. -->
+  <div class="autosend" dir={$isRtl ? 'rtl' : 'ltr'} role="status" transition:fade>
+    <div class="autosend-card">
+      <img src="/logo-concierge.png" class="autosend-coin" alt="" />
+      <div class="autosend-title">{$t('concierge.new.autoSend.title')}</div>
+      <div class="autosend-sub">{$t('concierge.new.autoSend.sub')}</div>
+      <div class="autosend-bar"><span></span></div>
+    </div>
+  </div>
+{/if}
 
 <!-- ===================================================================
      NEW WISH — form page (mock, design-only)
@@ -764,6 +1011,27 @@
         >
       </div>
 
+      {#if welcome}
+        <!-- First screen after the customer registration track: no onboarding,
+             just where they came for. -->
+        <div class="welcome-note anim" role="status">
+          <span class="welcome-icon"><EntityIcon kind="concierge" size={18} /></span>
+          <div>
+            <div class="welcome-title">{$t('concierge.new.welcome.title')}</div>
+            <div class="welcome-sub">
+              {restoredGuestDraft
+                ? $t('concierge.new.welcome.draftKept')
+                : $t('concierge.new.welcome.start')}
+            </div>
+          </div>
+          <button
+            class="welcome-close"
+            aria-label={$t('concierge.new.welcome.dismiss')}
+            onclick={() => (welcome = false)}>×</button
+          >
+        </div>
+      {/if}
+
       <!-- OPENING INCANTATION -->
       <div class="anim anim-d1" style="text-align:center;padding:24px 0 6px">
         <div class="incant-rule">{$t('concierge.new.incantRule')}</div>
@@ -816,10 +1084,21 @@
                 {$t('concierge.new.draftBadge')}
               </span>
               <span style="flex:1"></span>
-              <span
-                style="font-family:'Bellefair',serif;font-size:12px;color:#9a8f80"
-                >{$t('concierge.new.autosaved')}</span
-              >
+              <!-- Only once there is something saved — it used to claim an
+                   autosave that never happened. -->
+              {#if draftSaving}
+                <span
+                  style="font-family:'Bellefair',serif;font-size:12px;color:#9a8f80"
+                  >{$t('concierge.new.draftSaving')}</span
+                >
+              {:else if draftSavedAt}
+                <span
+                  style="font-family:'Bellefair',serif;font-size:12px;color:#9a8f80"
+                  >{anon
+                    ? $t('concierge.new.savedOnDevice')
+                    : $t('concierge.new.autosaved')}</span
+                >
+              {/if}
             </div>
 
             <!-- Title -->
@@ -938,7 +1217,14 @@
             <div
               style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"
             >
-              <button class="btn-ghost">{$t('concierge.new.saveDraft')}</button>
+              <button
+                class="btn-ghost"
+                onclick={() => saveDraft()}
+                disabled={draftSaving || publishing}
+                >{draftSaving
+                  ? $t('concierge.new.draftSaving')
+                  : $t('concierge.new.saveDraft')}</button
+              >
               <button
                 class="btn-jewel pub-btn"
                 disabled={!isReady}
@@ -1006,7 +1292,7 @@
           </div>
 
           {#if anon && hasMatches}
-            <button class="anon-cta" onclick={saveDraftAndRegister}>
+            <button class="anon-cta" onclick={() => saveDraftAndRegister()}>
               {$t('concierge.new.lev.anonCta', {
                 count:
                   matchedPeople.length +
@@ -1148,7 +1434,7 @@
                       {#if typeof r.price === 'number' && r.price > 0}
                         <span
                           style="font-size:11px;color:#fde68a;white-space:nowrap"
-                          >₪ {r.price.toLocaleString('he-IL')}</span
+                          >{fmtMoney(r.price)}</span
                         >
                       {/if}
                     </div>
@@ -1440,7 +1726,7 @@
                   type="button"
                   class="preset-pill"
                   onclick={() => pickBudgetPreset(v)}
-                  >₪ {v.toLocaleString($locale || 'he')}</button
+                  >{fmtMoney(v)}</button
                 >
               {/each}
               <button
@@ -2784,5 +3070,127 @@
     text-transform: uppercase;
     color: #9a8f80;
     margin-bottom: 6px;
+  }
+
+  /* ── Customer track: welcome after signup + the automatic send ── */
+  .welcome-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin: 18px auto 0;
+    max-width: 640px;
+    padding: 14px 16px;
+    border-radius: 16px;
+    background: linear-gradient(
+      135deg,
+      rgba(191, 149, 63, 0.16),
+      rgba(255, 77, 158, 0.08)
+    );
+    border: 1px solid rgba(253, 230, 138, 0.35);
+  }
+  .welcome-icon {
+    flex: none;
+    margin-top: 2px;
+    color: #fde68a;
+  }
+  .welcome-title {
+    font-family: 'Bellefair', serif;
+    font-size: 17px;
+    color: #fde68a;
+  }
+  .welcome-sub {
+    margin-top: 2px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: #d8cdb8;
+  }
+  .welcome-close {
+    margin-inline-start: auto;
+    flex: none;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    color: #d8cdb8;
+    font-size: 18px;
+    line-height: 1;
+  }
+  .welcome-close:hover {
+    background: rgba(253, 230, 138, 0.12);
+    color: #fde68a;
+  }
+  .autosend {
+    position: fixed;
+    inset: 0;
+    z-index: 900;
+    display: grid;
+    place-items: center;
+    padding: 16px;
+    background: rgba(14, 13, 12, 0.82);
+    backdrop-filter: blur(6px);
+  }
+  .autosend-card {
+    width: min(360px, 100%);
+    padding: 28px 24px;
+    border-radius: 22px;
+    text-align: center;
+    background: #15130f;
+    border: 1px solid rgba(253, 230, 138, 0.3);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  }
+  .autosend-coin {
+    width: 56px;
+    height: 56px;
+    margin: 0 auto 12px;
+    animation: autosend-pulse 1.6s ease-in-out infinite;
+  }
+  .autosend-title {
+    font-family: 'Bellefair', serif;
+    font-size: 21px;
+    color: #fde68a;
+  }
+  .autosend-sub {
+    margin-top: 6px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: #d8cdb8;
+  }
+  .autosend-bar {
+    position: relative;
+    height: 3px;
+    margin-top: 18px;
+    overflow: hidden;
+    border-radius: 3px;
+    background: rgba(253, 230, 138, 0.15);
+  }
+  .autosend-bar span {
+    position: absolute;
+    inset-block: 0;
+    width: 40%;
+    border-radius: 3px;
+    background: linear-gradient(90deg, #bf953f, #fcf6ba, #b38728);
+    animation: autosend-slide 1.3s ease-in-out infinite;
+  }
+  @keyframes autosend-pulse {
+    0%,
+    100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.08);
+    }
+  }
+  @keyframes autosend-slide {
+    from {
+      inset-inline-start: -40%;
+    }
+    to {
+      inset-inline-start: 100%;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .autosend-coin,
+    .autosend-bar span {
+      animation: none;
+    }
   }
 </style>

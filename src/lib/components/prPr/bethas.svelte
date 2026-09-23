@@ -1,4 +1,5 @@
 <script>
+  import Money from '$lib/components/money/Money.svelte';
   /**
    * The rikma's in-progress board — every mission someone is actually working
    * on right now, in one list.
@@ -424,7 +425,7 @@
                      one" (PLAN_STIPEND §8). -->
                 {#if Number(m.attributes?.stipendRate) > 0}
                   <span class="pb-badge pb-badge-stipend" title={$t('stipend.mission.title')}>
-                    💗 ₪{Number(m.attributes.stipendRate).toLocaleString()}
+                    💗 <Money amount={m.attributes.stipendRate} entry={m.attributes} />
                   </span>
                 {/if}
               </div>

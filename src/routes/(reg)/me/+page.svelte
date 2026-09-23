@@ -353,6 +353,7 @@
   import ProfileBadge from '$lib/components/userPr/ProfileBadge.svelte';
   import Diamond from '$lib/components/userPr/Diamond.svelte';
   import OfferingsBadges from '$lib/components/offerings/OfferingsBadges.svelte';
+  import ConciergeBadge from '$lib/components/concierge/ConciergeBadge.svelte';
   let mass = $state(false);
 
   function massss(event) {
@@ -488,7 +489,24 @@
   });
   let width = $state(),
     height = $state();
-  let showSaveDialog = $state(data.showGuide);
+
+  /**
+   * Someone who came to order through the concierge and has not (yet) joined
+   * anything: no rikma, no skills, no roles, but wishes. For them the tour of
+   * roles/skills/resources is noise and the concierge badge is the way in.
+   * @param {any} d page data
+   */
+  function conciergeCustomerOf(d) {
+    const m = d?.meData;
+    return (
+      (d?.concierge?.total ?? 0) > 0 &&
+      !(m?.projects_1s?.data?.length ?? 0) &&
+      !(m?.skills?.data?.length ?? 0) &&
+      !(m?.tafkidims?.data?.length ?? 0)
+    );
+  }
+  let isConciergeCustomer = $derived(conciergeCustomerOf(data));
+  let showSaveDialog = $state(data.showGuide && !conciergeCustomerOf(data));
 </script>
 
 <svelte:head>
@@ -843,7 +861,15 @@
              ההרחבות: מוצרים → /deals/sales-center, משימות → /me/offerings -->
         <div id="my-mission-offers" class="w-full px-2">
           <div id="my-products"></div>
+          <!-- הקונסיירז' שלי: טיוטות / בהזמנה / התפתחויות. ללקוחה שבאה רק
+               להזמין הוא מוביל את השורה — שאר הפרופיל ריק אצלה. -->
+          {#if isConciergeCustomer}
+            <ConciergeBadge summary={data.concierge} prominent />
+          {/if}
           <OfferingsBadges uid={data.uid} />
+          {#if !isConciergeCustomer}
+            <ConciergeBadge summary={data.concierge} />
+          {/if}
         </div>
         <div class="a6">
           <TourItem message={$t('pages.me.message9')}>

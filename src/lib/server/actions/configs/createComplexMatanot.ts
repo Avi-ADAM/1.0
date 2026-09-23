@@ -19,6 +19,8 @@
  */
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import { ENTRY_CURRENCY_PARAM, entryFields, normalizeEntry } from '$lib/server/money/normalizeEntry.js';
+import { roundTo } from '$lib/money/currencies.js';
 
 type RecipeMissionInput = {
   pendmId?: string | null;
@@ -190,7 +192,22 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
   }
 
   // ── 2. Create matanot row ───────────────────────────────────────────────
-  const matanotPrice = isComplex ? Number(estimatedPrice) || 0 : Number(fixedPrice) || 0;
+  // Every figure on the form — the price and each recipe rate — was typed in
+  // `currency`; the rikma counts in its own (PLAN_MULTI_CURRENCY C5). One
+  // rate for the product and its whole bill of materials.
+  const entry = await normalizeEntry({
+    amounts: {
+      price: isComplex ? Number(estimatedPrice) || 0 : Number(fixedPrice) || 0,
+      estimatedPrice: Number(estimatedPrice) || 0
+    },
+    entryCurrency: currency,
+    projectId,
+    jwt: context.jwt as string,
+    fetchFn: context.fetch as typeof fetch
+  });
+  const toRikma = (n: unknown) =>
+    entry.entryRate ? roundTo((Number(n) || 0) * entry.entryRate, entry.currency) : Number(n) || 0;
+  const matanotPrice = entry.values.price ?? 0;
   const statusOfVoting = isComplex ? (multiMember ? 'voting' : 'active') : 'active';
 
   const createMatanotVars: Record<string, unknown> = {
@@ -203,9 +220,10 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
     oneForeProject,
     pricingMode,
     marginPct: Number(marginPct) || 0,
-    estimatedPrice: Number(estimatedPrice) || 0,
+    estimatedPrice: entry.values.estimatedPrice ?? 0,
     status_of_voting: statusOfVoting,
-    publishedAt: now
+    publishedAt: now,
+    ...entryFields(entry)
   };
   if (picId) createMatanotVars.pic = picId;
   if (dates) createMatanotVars.startDate = new Date(dates).toISOString();
@@ -240,7 +258,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
           const pendmVars: Record<string, unknown> = {
               name: m.name || `${String(name).trim()} - mission`,
               project: projectId,
-              perhour: Number(m.ratePerHour) || 0,
+              perhour: toRikma(m.ratePerHour),
               noofhours:
                 (Number(m.hoursPerUnit) || 0) * (Number(m.unitsPerProduct) || 1),
               descrip: m.notes || '',
@@ -265,7 +283,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
         matanot: matanotId,
         hoursPerUnit: Number(m.hoursPerUnit) || 0,
         unitsPerProduct: Number(m.unitsPerProduct) || 1,
-        ratePerHour: Number(m.ratePerHour) || 0,
+        ratePerHour: toRikma(m.ratePerHour),
         mode: missionMode,
         notes: m.notes || '',
         publishedAt: now
@@ -299,8 +317,8 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
           const pmashVars: Record<string, unknown> = {
               name: r.name || `${String(name).trim()} - resource`,
               project: projectId,
-              price: Number(r.pricePerUnit) || 0,
-              easy: Number(r.pricePerUnit) || 0,
+              price: toRikma(r.pricePerUnit),
+              easy: toRikma(r.pricePerUnit),
               hm: Number(r.quantityPerUnit) || 1,
               kindOf: enumKindOf || 'total',
               descrip: r.notes || '',
@@ -324,7 +342,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
       const vars: Record<string, unknown> = {
         matanot: matanotId,
         quantityPerUnit: Number(r.quantityPerUnit) || 0,
-        pricePerUnit: Number(r.pricePerUnit) || 0,
+        pricePerUnit: toRikma(r.pricePerUnit),
         mode: resourceMode,
         notes: r.notes || '',
         publishedAt: now
@@ -373,7 +391,7 @@ export const createComplexMatanotConfig: ActionConfig = {
     pricingMode: { type: 'string', required: false },
     marginPct: { type: 'number', required: false },
     estimatedPrice: { type: 'number', required: false },
-    currency: { type: 'string', required: false },
+    currency: { ...ENTRY_CURRENCY_PARAM, description: 'ISO-4217 code every price on the form was typed in; converted to the rikma currency (PLAN_MULTI_CURRENCY)' },
     fixedPrice: { type: 'number', required: false },
     kindOf: { type: 'string', required: false },
     quant: { type: 'number', required: false },

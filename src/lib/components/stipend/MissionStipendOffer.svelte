@@ -1,4 +1,6 @@
 <script>
+  import { useFormatMoney } from '$lib/money/context.svelte';
+  import Money from '$lib/components/money/Money.svelte';
   /**
    * What a funded mission is actually offering, in two separate lines
    * (docs/PLAN_STIPEND.md §8, §11.1).
@@ -49,6 +51,7 @@
     monthly = false,
     compact = false
   } = $props();
+  const fmtMoney = useFormatMoney();
 
   const investment = $derived(
     Math.round((Number(hours) || 0) * (Number(perhour) || 0))
@@ -70,18 +73,18 @@
     <div class="so-lines">
       <div class="so-line">
         <span class="so-label {MUTED}">{$t('stipend.offer.investment')}</span>
-        <span class="so-value">₪{fmt(investment)}</span>
+        <span class="so-value"><Money amount={investment} fraction="whole" /></span>
         <span class="so-sub {FAINT}">
-          {$t('stipend.offer.investmentSub', { count: fmt(perhour) })}
+          {$t('stipend.offer.investmentSub', { count: fmtMoney(perhour, null, { fraction: 'whole' }) })}
           {monthly ? $t('stipend.offer.perCycle') : ''}
         </span>
       </div>
 
       <div class="so-line">
         <span class="so-label {MUTED}">{$t('stipend.offer.stipend')}</span>
-        <span class="so-value {ACCENT}">₪{fmt(stipend)}</span>
+        <span class="so-value {ACCENT}"><Money amount={stipend} fraction="whole" /></span>
         <span class="so-sub {FAINT}">
-          {$t('stipend.offer.stipendSub', { count: fmt(stipendRate) })}
+          {$t('stipend.offer.stipendSub', { count: fmtMoney(stipendRate, null, { fraction: 'whole' }) })}
           {monthly ? $t('stipend.offer.perCycle') : ''}
         </span>
       </div>

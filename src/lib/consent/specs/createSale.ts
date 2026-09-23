@@ -30,6 +30,8 @@ export const createSaleConsentSpec: ConsentSpec = {
     // The claimed holder of the money (the crux of what needs consent).
     holder: params.userId != null ? String(params.userId) : undefined,
     total: params.total,
+    // The currency `total` was typed in (PLAN_MULTI_CURRENCY); absent = the rikma's.
+    currency: params.entryCurrency != null ? String(params.entryCurrency) : undefined,
     quantity: params.quantity,
     saleDate: params.saleDate,
     kindOf: params.kindOf ?? 'total',

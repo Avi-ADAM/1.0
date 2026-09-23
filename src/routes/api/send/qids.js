@@ -2666,6 +2666,8 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
     $stipendCostShare: Float,
     $stipendMode: ENUM_MESIMABETAHALICH_STIPENDMODE,
     $stipendFunder: ID,
+    $entryCurrency: String,
+    $entryRate: Float,
     $publishedAt: DateTime!
   ) {
     createMesimabetahalich(data: {
@@ -2688,7 +2690,9 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
       stipendRate: $stipendRate,
       stipendCostShare: $stipendCostShare,
       stipendMode: $stipendMode,
-      stipendFunder: $stipendFunder
+      stipendFunder: $stipendFunder,
+      entryCurrency: $entryCurrency,
+      entryRate: $entryRate
     }) {
       data {
         id
@@ -3840,6 +3844,7 @@ ${STIPEND_DECISION_FIELDS}
       data {
         attributes {
           restime
+          currencyCode
           projectName
           profilePic { data { attributes { url } } }
           user_1s { data { id attributes { username } } }
@@ -4343,6 +4348,7 @@ ${STIPEND_DECISION_FIELDS}
             id
             attributes {
               projectName
+              currencyCode
               restime
               user_1s {
                 data {
@@ -7626,6 +7632,8 @@ ${STIPEND_DECISION_FIELDS}
     $status_of_voting: ENUM_MATANOT_STATUS_OF_VOTING,
     $process: ID,
     $location: ComponentNewLocationInput,
+    $entryCurrency: String,
+    $entryRate: Float,
     $publishedAt: DateTime
   ) {
     createMatanot(data: {
@@ -7645,6 +7653,8 @@ ${STIPEND_DECISION_FIELDS}
       status_of_voting: $status_of_voting,
       process: $process,
       location: $location,
+      entryCurrency: $entryCurrency,
+      entryRate: $entryRate,
       publishedAt: $publishedAt
     }) {
       data {
@@ -7802,7 +7812,7 @@ ${STIPEND_DECISION_FIELDS}
           }
           project { data { id attributes { projectName } } }
           matanot { data { id attributes { name } } }
-          matbea { data { id attributes { name simbol } } }
+          matbea { data { id attributes { name simbol code } } }
           forum { data { id } }
           negos { data { id } }
           open_mission { data { id } }
@@ -7840,6 +7850,9 @@ ${STIPEND_DECISION_FIELDS}
           mashaabims { data { id attributes { name } } }
           extracted_missions { id name importance }
           extracted_resources { id name importance }
+          ratson_proposals(pagination: { limit: 100 }) {
+            data { id attributes { status_proposal } }
+          }
         }
       }
     }
@@ -8350,6 +8363,7 @@ ${STIPEND_DECISION_FIELDS}
     $timeToP: ENUM_PROJECT_TIMETOP,
     $profilePic: ID,
     $isOt: Boolean,
+    $currencyCode: String,
     $publishedAt: DateTime
   ) {
     createProject(data: {
@@ -8363,6 +8377,7 @@ ${STIPEND_DECISION_FIELDS}
       timeToP: $timeToP,
       profilePic: $profilePic,
       isOt: $isOt,
+      currencyCode: $currencyCode,
       publishedAt: $publishedAt
     }) {
       data { id attributes { projectName } }
@@ -8551,6 +8566,8 @@ ${STIPEND_DECISION_FIELDS}
     $stipendCostShare: Float
     $stipendMode: ENUM_PENDM_STIPENDMODE
     $stipendFunder: ID
+    $entryCurrency: String
+    $entryRate: Float
     $publishedAt: DateTime!
   ) {
     createPendm(data: {
@@ -8578,6 +8595,8 @@ ${STIPEND_DECISION_FIELDS}
       stipendCostShare: $stipendCostShare
       stipendMode: $stipendMode
       stipendFunder: $stipendFunder
+      entryCurrency: $entryCurrency
+      entryRate: $entryRate
       publishedAt: $publishedAt
     }) {
       data { id }
@@ -8611,6 +8630,8 @@ ${STIPEND_DECISION_FIELDS}
     $stipendCostShare: Float
     $stipendMode: ENUM_OPENMISSION_STIPENDMODE
     $stipendFunder: ID
+    $entryCurrency: String
+    $entryRate: Float
     $publishedAt: DateTime!
   ) {
     createOpenMission(data: {
@@ -8640,6 +8661,8 @@ ${STIPEND_DECISION_FIELDS}
       stipendCostShare: $stipendCostShare
       stipendMode: $stipendMode
       stipendFunder: $stipendFunder
+      entryCurrency: $entryCurrency
+      entryRate: $entryRate
       publishedAt: $publishedAt
     }) {
       data { id }
@@ -9100,7 +9123,7 @@ export const moachQids = {
           publicDescription
           profilePic { data { attributes { url formats } } }
           user_1s { data { id attributes { email username lang profilePic { data { attributes { url formats } } } } } }
-          supportPage
+          supportPage currencyCode
           restime githublink fblink discordlink drivelink twiterlink watsapplink linkToWebsite
           codeLicense codeLicenseOpenYears codeLicenseSince
           vallues { data { id attributes { valueName localizations { data { attributes { locale valueName } } } } } }
@@ -13758,7 +13781,9 @@ ${STIPEND_DECISION_FIELDS}
     $source: ENUM_SALE_SOURCE,
     $recurring: Boolean,
     $isMonterActive: Boolean,
-    $customer: ID
+    $customer: ID,
+    $entryCurrency: String,
+    $entryRate: Float
   ) {
     createSale(data: {
       project: $project,
@@ -13777,7 +13802,9 @@ ${STIPEND_DECISION_FIELDS}
       source: $source,
       recurring: $recurring,
       isMonterActive: $isMonterActive,
-      customer: $customer
+      customer: $customer,
+      entryCurrency: $entryCurrency,
+      entryRate: $entryRate
     }) {
       data {
         id
@@ -14110,6 +14137,7 @@ ${STIPEND_DECISION_FIELDS}
         attributes {
           projectName
           restime
+          currencyCode
           user_1s { data { id } }
         }
       }
@@ -14355,6 +14383,7 @@ ${STIPEND_DECISION_FIELDS}
           preferCards
           lang
           autoTranslate
+          currency
           location { location_mode lat lng radius location_hint }
           machshirs { data { id attributes { jsoni } } }
           email
@@ -15098,7 +15127,7 @@ ${STIPEND_DECISION_FIELDS}
       data {
         id
         attributes {
-          projectName
+          projectName currencyCode
           publicDescription
           linkToWebsite
           githublink
@@ -15203,6 +15232,7 @@ ${STIPEND_DECISION_FIELDS}
         attributes {
           projectName
           restime
+          currencyCode
           supportPage
           user_1s { data { id attributes { username } } }
         }
@@ -15617,8 +15647,8 @@ ${STIPEND_DECISION_FIELDS}
                 confirmed
                 createdAt
                 isSiteShare
-                matbea { data { id attributes { name simbol } } }
-                project { data { id attributes { projectName } } }
+                matbea { data { id attributes { name simbol code } } }
+                project { data { id attributes { projectName currencyCode } } }
               }
             }
           }
@@ -15898,6 +15928,51 @@ ${STIPEND_DECISION_FIELDS}
     }
     lastDecision: decisions(filters: { projects: { id: { eq: $pid } } }, sort: "createdAt:desc", pagination: { limit: 1 }) { data { attributes { createdAt } } }
     lastTimer: timers(filters: { project: { id: { eq: $pid } } }, sort: "updatedAt:desc", pagination: { limit: 1 }) { data { attributes { updatedAt } } }
+  }`,
+
+  // The rikma's shared library — documents, images and links
+  // (docs/PLAN_RIKMA_SHARED_INFO.md §3.1, stage 1).
+  //
+  // Members-only: a project id proves nothing about the caller, so this qid
+  // carries a PRE guard in guards.js exactly like 310projectResourceOccupancy.
+  //
+  // `archived` is the soft delete, and it is filtered the NULL-safe way — a
+  // bare `{ ne: true }` drops every row written before the column had a value,
+  // which in SQL is every legacy row. Same idiom as NOT_ARCHIVED above.
+  '325projectSpaceDocs': `query ProjectSpaceDocs($pid: ID!) {
+    project(id: $pid) {
+      data { id attributes {
+        projectName
+        drivelink
+        space_docs(
+          filters: { or: [{ archived: { null: true } }, { archived: { eq: false } }] }
+          pagination: { limit: 300 }
+          sort: "createdAt:desc"
+        ) {
+          data { id attributes {
+            name note kind url folder archived createdAt updatedAt
+            storageKey fileName mime size sha256
+            file { data { id attributes { url name mime size ext } } }
+            uploadedBy { data { id attributes { username profilePic { data { attributes { url } } } } } }
+          } }
+        }
+      } }
+    }
+  }`,
+
+  // One library entry plus the members of the rikma that owns it — what the
+  // serve endpoint (/api/v1/space-docs/[id]/file) needs to decide, in one
+  // round trip, whether the caller may have a signed URL for it.
+  // serviceAdmin only: it answers for any doc id, and the membership decision
+  // is made by the endpoint against locals.uid, never by the client.
+  '326spaceDocForServe': `query SpaceDocForServe($id: ID!) {
+    spaceDoc(id: $id) {
+      data { id attributes {
+        kind archived storageKey fileName mime url
+        file { data { attributes { url name mime } } }
+        project { data { id attributes { user_1s { data { id } } } } }
+      } }
+    }
   }`,
 
   // PLAN_MCP_TOOLS_V2 M5 — cross-rikma search, for the caller only.

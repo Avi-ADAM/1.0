@@ -1,4 +1,5 @@
 <script>
+  import { useFormatMoney } from '$lib/money/context.svelte';
   /**
    * EquityPreview — reusable "what share of the rikma will this mission be
    * worth" widget. Display-only; the math lives in the pure
@@ -53,6 +54,7 @@
     chart = true,
     onHover = null
   } = $props();
+  const fmtMoney = useFormatMoney();
 
   /** @type {ProjectValueSummary|null} */
   let fetchedState = $state(null);
@@ -138,7 +140,9 @@
   }
   function monthly(scenario) {
     if (scenario?.monthlyEstimate == null) return null;
-    return $t('equity.perMonthEstimate', { amount: fmtNum(scenario.monthlyEstimate) });
+    return $t('equity.perMonthEstimate', {
+      amount: fmtMoney(scenario.monthlyEstimate, null, { fraction: 'whole' })
+    });
   }
   // The ₪/month figure is a projection, not a promise. Say so in visible text
   // (a tooltip is invisible on touch): which basis it used, and that it can

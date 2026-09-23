@@ -1,5 +1,10 @@
 import { redirect, fail } from '@sveltejs/kit';
 import { signupCookieOptions } from '$lib/server/signupCookies.js';
+import {
+  CONCIERGE_LANDING,
+  isConciergeIntent,
+  REG_INTENT_COOKIE
+} from '$lib/concierge/regIntent.js';
 import type { Actions, PageServerLoad } from './$types';
 
 /**
@@ -79,10 +84,24 @@ export const load: PageServerLoad = async ({ url, cookies, fetch }) => {
     cookies.set('email', email, { ...signupCookieOptions(url), httpOnly: false });
   }
 
+  // A customer who registered to order something skips the onboarding — the
+  // roles/skills/CV steps are for joining rikmas — and continues to their wish
+  // (see $lib/concierge/regIntent.js). Only in this browser: the cookie and
+  // the wish draft both live here.
+  const next = isConciergeIntent(cookies.get(REG_INTENT_COOKIE))
+    ? CONCIERGE_LANDING
+    : '/onboard';
+
   // Strapi's endpoint returns no JWT, so a session can only be continued, not
-  // created: same browser as the signup → straight into onboarding, otherwise
-  // log in with the password just chosen.
-  throw redirect(303, cookies.get('jwt') ? '/onboard' : '/login?confirmed=1');
+  // created: same browser as the signup → straight on, otherwise log in with
+  // the password just chosen.
+  if (cookies.get('jwt')) throw redirect(303, next);
+  throw redirect(
+    303,
+    next === '/onboard'
+      ? '/login?confirmed=1'
+      : `/login?confirmed=1&from=${encodeURIComponent(next)}`
+  );
 };
 
 export const actions: Actions = {

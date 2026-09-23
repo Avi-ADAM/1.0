@@ -53,6 +53,45 @@ function writeShape(queId, query) {
  * @property {typeof globalThis.fetch} [fetch]  injectable for tests
  */
 
+/**
+ * Throw unless `callerId` is a member of `pid`.
+ *
+ * A project id in the variables proves nothing about who is asking, so every
+ * partnership-internal read has to look the membership up. Shared by the
+ * resource calendar and the shared library so the two cannot drift apart.
+ *
+ * @param {SendGuardContext} ctx
+ * @param {string} label   qid name, for the 400 when `pid` is missing
+ * @param {string} denial  the 403 message
+ */
+async function requireProjectMember(ctx, label, denial) {
+  const { callerId, variablesObject, bearer1, ep, fetch: injected } = ctx;
+  if (!callerId) throw error(401, 'Unauthorized: No caller id');
+  const pid = variablesObject.pid;
+  if (!pid) throw error(400, `Missing pid for ${label}`);
+
+  const doFetch = injected || fetch;
+  let data;
+  try {
+    const res = await doFetch(ep, {
+      method: 'POST',
+      body: JSON.stringify({
+        query: `query ProjectMembers($id: ID!) { project(id: $id) { data { attributes { user_1s { data { id } } } } } }`,
+        variables: { id: String(pid) }
+      }),
+      headers: { 'Content-Type': 'application/json', Authorization: bearer1 }
+    });
+    data = await res.json();
+  } catch (e) {
+    throw error(500, `Failed to fetch project members for ${label}: ${e.message}`);
+  }
+
+  const members = data?.data?.project?.data?.attributes?.user_1s?.data ?? [];
+  if (!members.some((m) => String(m.id) === String(callerId))) {
+    throw error(403, denial);
+  }
+}
+
 /** @type {Record<string, (ctx: SendGuardContext) => void | Promise<void>>} */
 const PRE_GUARDS = {
   // Co-member lookup is self-only on the JWT path. The qid takes `uid` from the
@@ -118,32 +157,25 @@ const PRE_GUARDS = {
   // which customers the rikma has committed weeks to. That is partnership-
   // internal, so it is members-only — and membership has to be looked up,
   // because a project id alone proves nothing about the caller.
-  '310projectResourceOccupancy': async ({ isSer, callerId, variablesObject, bearer1, ep, fetch: injected }) => {
-    if (isSer) return;
-    if (!callerId) throw error(401, 'Unauthorized: No caller id');
-    const pid = variablesObject.pid;
-    if (!pid) throw error(400, 'Missing pid for 310projectResourceOccupancy');
+  '310projectResourceOccupancy': async (ctx) => {
+    if (ctx.isSer) return;
+    await requireProjectMember(
+      ctx,
+      '310projectResourceOccupancy',
+      'Forbidden: Only members can read the rikma’s resource calendar'
+    );
+  },
 
-    const doFetch = injected || fetch;
-    let data;
-    try {
-      const res = await doFetch(ep, {
-        method: 'POST',
-        body: JSON.stringify({
-          query: `query ProjectMembers($id: ID!) { project(id: $id) { data { attributes { user_1s { data { id } } } } } }`,
-          variables: { id: String(pid) }
-        }),
-        headers: { 'Content-Type': 'application/json', Authorization: bearer1 }
-      });
-      data = await res.json();
-    } catch (e) {
-      throw error(500, `Failed to fetch project members for occupancy check: ${e.message}`);
-    }
-
-    const members = data?.data?.project?.data?.attributes?.user_1s?.data ?? [];
-    if (!members.some((m) => String(m.id) === String(callerId))) {
-      throw error(403, 'Forbidden: Only members can read the rikma’s resource calendar');
-    }
+  // The rikma's shared library (docs/PLAN_RIKMA_SHARED_INFO.md §5): contracts,
+  // scans, internal links. Partnership-internal by definition, so members-only
+  // on the same lookup as the calendar above.
+  '325projectSpaceDocs': async (ctx) => {
+    if (ctx.isSer) return;
+    await requireProjectMember(
+      ctx,
+      '325projectSpaceDocs',
+      'Forbidden: Only members can read the rikma’s shared library'
+    );
   },
 
   // UpdateClause ownership:

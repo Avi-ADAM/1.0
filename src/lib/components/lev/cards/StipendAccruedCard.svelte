@@ -1,4 +1,5 @@
 <script>
+  import { useFormatMoney } from '$lib/money/context.svelte';
   /**
    * "You have earned ₪600 this month and it has not been paid yet."
    * (PLAN_STIPEND §6, §8 — docs/FIXES.md §10.)
@@ -19,6 +20,7 @@
   import CycleFacts from '$lib/components/stipend/CycleFacts.svelte';
 
   let { buble, isFirst = false, onProj, onUser } = $props();
+  const fmtMoney = useFormatMoney();
 </script>
 
 <div
@@ -38,7 +40,7 @@
     logoSrc={buble.src}
     projectName={buble.projectName}
     cardType={$t('stipend.accrued.cardType')}
-    cardTitle={`₪${Number(buble.amount ?? 0).toFixed(2)}`}
+    cardTitle={fmtMoney(Number(buble.amount ?? 0), null, { fraction: 'full' })}
     glowColor="purple"
     onProjectClick={() => onProj?.({ id: buble.projectId })}
   />

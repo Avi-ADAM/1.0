@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Money from '$lib/components/money/Money.svelte';
   import { goto, invalidateAll } from '$app/navigation';
   import { toast } from 'svelte-sonner';
   import Panel from '$lib/components/Panel.svelte';
@@ -110,11 +111,11 @@
       </div>
       <div class="hero-stats">
         <div class="hs">
-          <div class="hs-v gold">₪ {deal.totalCost.toLocaleString()}</div>
+          <div class="hs-v gold"><Money amount={deal.totalCost} /></div>
           <div class="hs-l">עלות כוללת</div>
         </div>
         <div class="hs">
-          <div class="hs-v" style="color:#4ade80">₪ {deal.paid.toLocaleString()}</div>
+          <div class="hs-v" style="color:#4ade80"><Money amount={deal.paid} /></div>
           <div class="hs-l">שולם</div>
         </div>
         <div class="hs">

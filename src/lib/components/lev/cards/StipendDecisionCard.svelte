@@ -1,4 +1,6 @@
 <script>
+  import { useFormatMoney } from '$lib/money/context.svelte';
+  import Money from '$lib/components/money/Money.svelte';
   /**
    * Lev card for a stipend proposal — pledge or program (PLAN_STIPEND §8).
    *
@@ -57,6 +59,7 @@
     onChat,
     onDone
   } = $props();
+  const fmtMoney = useFormatMoney();
 
   let approving = $state(false);
   let counterOpen = $state(false);
@@ -107,7 +110,7 @@
 
   const cardTitle = $derived(
     isProgram
-      ? `₪${standing.stipendRate ?? 0} / ${$t('stipend.card.hour')}`
+      ? `${fmtMoney(standing.stipendRate ?? 0)} / ${$t('stipend.card.hour')}`
       : `${stipend?.funderName ?? ''} → ${stipend?.recipientName ?? ''}`
   );
 
@@ -290,18 +293,18 @@
       <div class="rounded-xl border-2 border-barbi bg-barbi/5 p-3 text-sm">
         <p class="font-bold text-gray-900 dark:text-white">{$t('stipend.card.youPayTitle')}</p>
         <p class="text-gray-800 dark:text-gray-100">
-          {$t('stipend.card.youPayBody', { count: standing.stipendRate ?? 0 })}
+          {$t('stipend.card.youPayBody', { count: fmtMoney(standing.stipendRate ?? 0) })}
         </p>
         {#if monthlyCommitment}
           <p class="text-gray-800 dark:text-gray-100">
-            {$t('stipend.card.youPayMonthly', { count: monthlyCommitment })}
+            {$t('stipend.card.youPayMonthly', { count: fmtMoney(monthlyCommitment) })}
           </p>
         {/if}
         {#if openEnded}
           <p class="font-semibold text-gray-900 dark:text-white">{$t('stipend.card.youPayOpenEnded')}</p>
         {:else if standing.totalCap != null}
           <p class="text-gray-800 dark:text-gray-100">
-            {$t('stipend.card.youPayTotal', { count: standing.totalCap })}
+            {$t('stipend.card.youPayTotal', { count: fmtMoney(standing.totalCap) })}
           </p>
         {/if}
       </div>
@@ -310,7 +313,7 @@
         <p class="font-bold text-gray-900 dark:text-white">{$t('stipend.card.youReceiveTitle')}</p>
         <p class="text-gray-800 dark:text-gray-100">
           {$t('stipend.card.youReceiveBody', {
-            count: standing.stipendRate ?? 0,
+            count: fmtMoney(standing.stipendRate ?? 0),
             name: stipend?.funderName ?? ''
           })}
         </p>
@@ -339,11 +342,11 @@
               {#if m.hours != null && m.perhour != null}
                 {$t('stipend.card.missionValue', {
                   hours: m.hours,
-                  rate: m.perhour,
-                  value: Math.round(Number(m.value))
+                  rate: fmtMoney(m.perhour),
+                  value: fmtMoney(Math.round(Number(m.value)))
                 })}
               {:else if m.perhour != null}
-                {$t('stipend.terms.marketRate', { count: m.perhour })}
+                {$t('stipend.terms.marketRate', { count: fmtMoney(m.perhour) })}
               {/if}
               {#if m.recurring}
                 · {$t('stipend.card.missionRecurring')}
@@ -380,7 +383,7 @@
 
     <!-- The terms, in the order a person asks about them. -->
     <div class="rounded-xl border border-gray-200 dark:border-gray-700 p-3 space-y-1 text-sm">
-      <p>{$t('stipend.terms.rate')}: <b>₪{standing.stipendRate ?? 0}</b></p>
+      <p>{$t('stipend.terms.rate')}: <b><Money amount={standing.stipendRate ?? 0} {projectId} /></b></p>
       {#if standing.mode === 'equity'}
         <p>
           {$t('stipend.terms.costShare')}:
@@ -395,10 +398,10 @@
         </p>
       {/if}
       {#if standing.totalCap != null && Number(standing.totalCap) > 0}
-        <p>{$t('stipend.terms.totalCap')}: <b>₪{standing.totalCap}</b></p>
+        <p>{$t('stipend.terms.totalCap')}: <b><Money amount={standing.totalCap} {projectId} /></b></p>
       {/if}
       {#if standing.monthlyCap != null && Number(standing.monthlyCap) > 0}
-        <p>{$t('stipend.terms.monthlyCap')}: <b>₪{standing.monthlyCap}</b></p>
+        <p>{$t('stipend.terms.monthlyCap')}: <b><Money amount={standing.monthlyCap} {projectId} /></b></p>
       {/if}
       {#if openEnded}
         <!-- No final number to show, so say that instead of leaving a gap. -->
@@ -406,7 +409,7 @@
       {/if}
       {#if standing.revenueTrigger != null}
         <p class="text-xs text-gray-600 dark:text-gray-300">
-          {$t('stipend.terms.revenueTriggerSet', { count: standing.revenueTrigger })}
+          {$t('stipend.terms.revenueTriggerSet', { count: fmtMoney(standing.revenueTrigger) })}
         </p>
       {/if}
     </div>
@@ -480,7 +483,7 @@
       <p class="font-bold text-gray-900 dark:text-white">{$t('stipend.card.confirmFunderTitle')}</p>
       <p class="text-gray-800 dark:text-gray-100">
         {$t('stipend.card.confirmFunderBody', {
-          count: standing.stipendRate ?? 0,
+          count: fmtMoney(standing.stipendRate ?? 0),
           name: recipientLabel
         })}
       </p>

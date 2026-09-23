@@ -297,6 +297,11 @@
   import LocationPicker from '$lib/components/location/LocationPicker.svelte';
   import EquityPreview from '$lib/components/equity/EquityPreview.svelte';
   import MissionStipendSection from '$lib/components/stipend/MissionStipendSection.svelte';
+  import CurrencyPicker from '$lib/components/money/CurrencyPicker.svelte';
+  import CurrencySymbol from '$lib/components/money/CurrencySymbol.svelte';
+  import { useMoney, useRikmaCurrency } from '$lib/money/context.svelte';
+  import { convert } from '$lib/money/convert.js';
+  import { DEFAULT_CURRENCY } from '$lib/money/currencies.js';
 
   let {
     pu = [],
@@ -347,6 +352,22 @@
      */
     initialSpec = null
   } = $props();
+
+  // The hourly value is typed in the proposer's own currency and converted to
+  // the rikma's on the server (PLAN_MULTI_CURRENCY C5). Spec/publish modes
+  // hand the rate back to a caller that has no rikma, so they stay put.
+  const money = useMoney();
+  const enclosingRikma = useRikmaCurrency();
+  const rikmaCur = $derived(enclosingRikma() ?? DEFAULT_CURRENCY);
+  // Starts in the rikma's currency, not the reader's: the field arrives
+  // prefilled (a default, an AI suggestion, an edit) with numbers that already
+  // are in the rikma's currency, and re-labelling them would silently change
+  // their value. The picker sits beside the number for a writer who types in
+  // their own.
+  let entryCurrency = $state(enclosingRikma() ?? DEFAULT_CURRENCY);
+  /** An amount typed in `entryCurrency`, as the rikma will count it — for the equity preview. */
+  const inRikma = (/** @type {number} */ n) =>
+    entryCurrency === rikmaCur ? n : (convert(n, entryCurrency, rikmaCur, money.fx) ?? n);
 
   const missionByLang = { he: heMission, en: enMission, ar: arMission };
   const mf = $derived((missionByLang[$lang] ?? missionByLang.he).form);
@@ -771,6 +792,7 @@
         vallueIds: (vallues || []).map(String),
         nhours: Number(element.nhours),
         valph: Number(element.valph),
+        entryCurrency: entryCurrency !== rikmaCur ? entryCurrency : undefined,
         iskvua: element.iskvua,
         // An assigned mission is an offer to one named person — the server
         // forces 1 there anyway; only an open mission carries a headcount.
@@ -1346,6 +1368,11 @@
                   })}
                 {:else}
                   <NumberInput bind:value={miData[0].valph} />{/if}
+                {#if valphE && projectId && !specMode && !publishMode}
+                  <CurrencyPicker bind:value={entryCurrency} compact />
+                {:else}
+                  <CurrencySymbol currency={specMode || publishMode ? null : entryCurrency} />
+                {/if}
                 {mf.perHour}
               </span><span> ✖ </span><span
                 >{#if valphE == false}
@@ -1432,8 +1459,8 @@
               <div class="my-2">
                 <EquityPreview
                   {projectId}
-                  missionValue={perPersonValue * seats}
-                  monthlyValue={miData[0].iskvua ? perPersonValue * seats : null}
+                  missionValue={inRikma(perPersonValue * seats)}
+                  monthlyValue={miData[0].iskvua ? inRikma(perPersonValue * seats) : null}
                   alreadyCountedIn="none"
                   titleKey="equity.missionShareAtCreation"
                 />

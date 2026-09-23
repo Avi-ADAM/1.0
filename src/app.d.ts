@@ -10,6 +10,10 @@ declare global {
       lang: 'he' | 'en' | 'ar' | 'ru' | 'es';
       /** Raw Accept-Language header, kept for client-side fallbacks. */
       userAgent: string | null;
+      /** ISO-4217 code amounts are shown in: the `currency` cookie, else guessed from Accept-Language. */
+      currency: string;
+      /** Whether `currency` is the reader's own choice (cookie) rather than a guess. */
+      currencyChosen: boolean;
       /** Derived from the sec-ch-ua-mobile client hint. */
       isDesktop: boolean;
       /** JWT from the HttpOnly cookie, or false when signed out. */

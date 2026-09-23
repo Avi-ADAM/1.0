@@ -32,6 +32,8 @@ export const createMissionConsentSpec: ConsentSpec = {
     name: params.missionName != null ? String(params.missionName) : undefined,
     hours: typeof params.nhours === 'number' && params.nhours > 0 ? params.nhours : undefined,
     perhour: typeof params.valph === 'number' && params.valph > 0 ? params.valph : undefined,
+    // The currency `perhour` was typed in (PLAN_MULTI_CURRENCY); absent = the rikma's.
+    currency: params.entryCurrency != null ? String(params.entryCurrency) : undefined,
     assignee: params.assignedUserId != null ? String(params.assignedUserId) : undefined,
     branch: params.branch,
     stageIds: params.stageIds

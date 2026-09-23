@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Money from '$lib/components/money/Money.svelte';
   import Panel from '$lib/components/Panel.svelte';
   import { t } from '$lib/translations';
   import { lang } from '$lib/stores/lang.js';
@@ -24,34 +25,34 @@
   <!-- Total box -->
   <div class="total-box">
     <span class="total-label">{$t('deals.totalCost')}</span>
-    <span class="total-value"><span class="sym">₪</span>{totalCost.toLocaleString()}</span>
+    <span class="total-value"><Money amount={totalCost} /></span>
   </div>
 
   <!-- Breakdown rows -->
   <div class="rows">
     <div class="row">
       <span class="l">{$t('deals.missions')}</span>
-      <span class="v">₪ {costBreakdown.missions.toLocaleString()}</span>
+      <span class="v"><Money amount={costBreakdown.missions} /></span>
     </div>
     <div class="row">
       <span class="l">{$t('deals.resources')}</span>
-      <span class="v">₪ {costBreakdown.resources.toLocaleString()}</span>
+      <span class="v"><Money amount={costBreakdown.resources} /></span>
     </div>
 
     <div class="divider"></div>
 
     <div class="row">
       <span class="l">{$t('deals.paidSoFar')}</span>
-      <span class="v paid">₪ {paid.toLocaleString()}</span>
+      <span class="v paid"><Money amount={paid} /></span>
     </div>
     <div class="row">
       <span class="l">{$t('deals.remaining')}</span>
-      <span class="v pending">₪ {remaining.toLocaleString()}</span>
+      <span class="v pending"><Money amount={remaining} /></span>
     </div>
     {#if pendingCost > 0}
       <div class="row">
         <span class="l">{$t('deals.pendingApproval')}</span>
-        <span class="v approval">₪ {pendingCost.toLocaleString()}</span>
+        <span class="v approval"><Money amount={pendingCost} /></span>
       </div>
     {/if}
   </div>

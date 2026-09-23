@@ -1,4 +1,4 @@
-﻿<script lang="ts">
+<script lang="ts">
   import { isRtl, t } from '$lib/translations';
   import { onMount } from 'svelte';
   import { lang } from '$lib/stores/lang.js';
@@ -370,7 +370,7 @@ const dayValues = ['sun', 'mon', 'thu', 'wen', 'teh', 'fri', 'shabat'];
 </script>
 
 <div dir={$isRtl ? 'rtl' : 'ltr'}>
-  <h1 class="text-2xl font-bold text-center mb-6 text-gold">{$t('pages.editBasic.head')}</h1>
+  <h1 class="text-2xl font-bold text-center mb-6 text-goldink">{$t('pages.editBasic.head')}</h1>
 
   <div class="grid grid-cols-1 md:grid-cols-2 gap-6 p-5">
     <!-- Personal Details -->
@@ -381,13 +381,13 @@ const dayValues = ['sun', 'mon', 'thu', 'wen', 'teh', 'fri', 'shabat'];
       <CardContent class="space-y-4 ">
         <TextInput lebel={$t('common.labels.name')} bind:text={un} />
         <div>
-          <label for="bio" class="block text-gold text-sm font-medium mb-1"
+          <label for="bio" class="block text-goldink text-sm font-medium mb-1"
             >{$t('pages.editBasic.bio')}</label
           >
           <textarea
             id="bio"
             bind:value={bi}
-            class="w-full p-2 border rounded-md text-gold bg-transparent"
+            class="w-full p-2 border rounded-md text-zinc-900 dark:text-zinc-100 border-zinc-300 dark:border-zinc-700 bg-white/50 dark:bg-zinc-900/50"
             rows="4"
           ></textarea>
         </div>
@@ -436,13 +436,13 @@ const dayValues = ['sun', 'mon', 'thu', 'wen', 'teh', 'fri', 'shabat'];
       </CardHeader>
       <CardContent class="space-y-6">
         <div>
-          <label for="free-day" class="block text-sm font-medium mb-1 text-gold"
+          <label for="free-day" class="block text-sm font-medium mb-1 text-goldink"
             >{$t('pages.editBasic.freeDay')}</label
           >
           <select
             id="free-day"
             bind:value={frd}
-            class="w-full p-2 border rounded-md bg-barbi text-lg text-gold"
+            class="w-full p-2 border rounded-md bg-white dark:bg-zinc-900 border-zinc-300 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 text-lg font-medium"
           >
             <option value="na" selected>{$t('pages.editBasic.freeDay')}</option>
             {#each dayValues as day, i (day)}
@@ -451,13 +451,13 @@ const dayValues = ['sun', 'mon', 'thu', 'wen', 'teh', 'fri', 'shabat'];
           </select>
         </div>
         <div>
-          <label for="language" class="block text-sm font-medium text-gold mb-1"
+          <label for="language" class="block text-sm font-medium text-goldink mb-1"
             >{$t('pages.editBasic.preferredLang')}</label
           >
           <select
             id="language"
             bind:value={lango}
-            class="w-full p-2 border rounded-md bg-barbi text-lg text-gold"
+            class="w-full p-2 border rounded-md bg-white dark:bg-zinc-900 border-zinc-300 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 text-lg font-medium"
           >
             <option value="he">עברית</option>
             <option value="en">English</option>
@@ -502,7 +502,7 @@ const dayValues = ['sun', 'mon', 'thu', 'wen', 'teh', 'fri', 'shabat'];
         <a
           href="/me/identity"
           data-sveltekit-prefetch
-          class="text-sm text-gold hover:underline"
+          class="text-sm text-goldink hover:underline"
         >
           {$t('pages.editBasic.identityManage')} →
         </a>
@@ -549,7 +549,7 @@ const dayValues = ['sun', 'mon', 'thu', 'wen', 'teh', 'fri', 'shabat'];
           <div class="space-y-2 bg-gray-50/50 p-3 rounded-lg border">
             <label
               for="api-key-name"
-              class="block text-sm font-medium text-gold"
+              class="block text-sm font-medium text-goldink"
               >{$t('pages.editBasic.keyName')}</label
             >
             <div class="flex gap-2">
@@ -557,19 +557,19 @@ const dayValues = ['sun', 'mon', 'thu', 'wen', 'teh', 'fri', 'shabat'];
                 id="api-key-name"
                 bind:value={newKeyName}
                 placeholder="Claude Desktop"
-                class="flex-1 border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold bg-transparent text-gold"
+                class="flex-1 border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-goldink border-zinc-300 dark:border-zinc-700 bg-white/50 dark:bg-zinc-900/50 text-zinc-900 dark:text-zinc-100"
                 required
                 minlength="2"
               />
               <button
                 onclick={createKey}
-                class="px-4 py-2 bg-gold text-barbi rounded text-sm font-bold hover:brightness-110"
+                class="px-4 py-2 bg-gold text-barbi rounded text-sm font-bold hover:brightness-110 shadow-sm"
               >
                 {$t('pages.editBasic.create')}
               </button>
               <button
                 onclick={() => (isCreatingKey = false)}
-                class="px-4 py-2 border rounded text-sm hover:bg-gray-100/10 text-gold shadow-md"
+                class="px-4 py-2 border rounded text-sm hover:bg-gray-100/10 text-goldink border-zinc-300 dark:border-zinc-700 shadow-md"
               >
                 {$t('pages.editBasic.cancel')}
               </button>
@@ -596,7 +596,7 @@ const dayValues = ['sun', 'mon', 'thu', 'wen', 'teh', 'fri', 'shabat'];
                   class="flex items-center justify-between px-4 py-3 hover:bg-white/5 transition-colors"
                 >
                   <div class="flex-1 min-w-0">
-                    <p class="font-medium text-sm text-gold truncate">
+                    <p class="font-medium text-sm text-goldink truncate">
                       {key.name}
                     </p>
                     <p class="text-xs text-gray-400 font-mono">
@@ -629,7 +629,7 @@ const dayValues = ['sun', 'mon', 'thu', 'wen', 'teh', 'fri', 'shabat'];
           disabled={!!sub}
         />
         <div>
-          <h3 class="flex items-center justify-center text-gold font-bold p-2">
+          <h3 class="flex items-center justify-center text-goldink font-bold p-2">
             {teleredy ? $t('pages.editBasic.manageTelegram') : $t('pages.editBasic.telegramNuti')}
             <svg class="h-5 w-5 ms-2" fill="#1da1f2" viewBox="0 0 24 24">
               <path
@@ -705,7 +705,7 @@ const dayValues = ['sun', 'mon', 'thu', 'wen', 'teh', 'fri', 'shabat'];
           <div
             class="flex flex-row align-center justify-center items-center gap-4"
           >
-            <h2 class="text-lg font-bold text-gold">
+            <h2 class="text-lg font-bold text-white">
               {$t('pages.editBasic.logout')}
             </h2>
           </div>
@@ -720,7 +720,7 @@ const dayValues = ['sun', 'mon', 'thu', 'wen', 'teh', 'fri', 'shabat'];
       <div
         class="max-w-3xl mx-auto flex items-center justify-between gap-4 px-4 py-3 flex-wrap"
       >
-        <p class="text-sm font-medium text-gold">
+        <p class="text-sm font-medium text-goldink">
           {$t('pages.editBasic.unsavedChanges')}
         </p>
         <Button

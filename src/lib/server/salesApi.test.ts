@@ -168,3 +168,26 @@ describe('buildCreateSaleParams', () => {
     expect(params.kindOf).toBe('monthly');
   });
 });
+
+describe('currency (PLAN_MULTI_CURRENCY)', () => {
+  const base = { productId: '1', holderUserId: '2', amount: 50 };
+
+  it('is optional and absent by default', () => {
+    const r = validateSalesPayload(base);
+    expect(r.ok && r.value.currency).toBe(null);
+    if (!r.ok) throw new Error('expected ok');
+    expect(buildCreateSaleParams({ payload: r.value, projectId: '9', availableQuantity: -1, kindOf: 'total' }).entryCurrency).toBeUndefined();
+  });
+
+  it('is normalized and passed on as entryCurrency', () => {
+    const r = validateSalesPayload({ ...base, currency: 'usd' });
+    if (!r.ok) throw new Error('expected ok');
+    expect(r.value.currency).toBe('USD');
+    expect(buildCreateSaleParams({ payload: r.value, projectId: '9', availableQuantity: -1, kindOf: 'total' }).entryCurrency).toBe('USD');
+  });
+
+  it('rejects something that is not a code', () => {
+    const r = validateSalesPayload({ ...base, currency: 'dollars' });
+    expect(r.ok).toBe(false);
+  });
+});

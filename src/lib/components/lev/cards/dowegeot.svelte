@@ -1,4 +1,6 @@
 ﻿<script>
+  import CurrencySymbol from '$lib/components/money/CurrencySymbol.svelte';
+  import Money from '$lib/components/money/Money.svelte';
   import { t, isRtl} from '$lib/translations';
   import Lowbtn from '$lib/celim/lowbtn.svelte';
   import Lev from '../../../celim/lev.svelte';
@@ -259,10 +261,10 @@
                     class="w-32 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 px-2 py-1 text-base text-gray-900 dark:text-gray-100"
                     placeholder={`~${pricePerUnit}`}
                   />
-                  <span class="font-bold">₪</span>
+                  <CurrencySymbol class="font-bold" />
                 </span>
                 <span class="text-xs text-gray-500">
-                  {$t('lev.cards.dowegeot.planned')}: ~{pricePerUnit.toLocaleString('en-US', { maximumFractionDigits: 2 })} ₪
+                  {$t('lev.cards.dowegeot.planned')}: ~<Money amount={pricePerUnit} {projectId} />
                 </span>
               </label>
             {:else if cycleReported}
@@ -273,7 +275,7 @@
                   <span class="font-bold">{useraplyname}</span>:
                 </span>
                 <span style="color:var(--barbi-pink)" class="font-extrabold text-2xl">
-                  {quantityDelivered.toLocaleString('en-US', { maximumFractionDigits: 2 })} ₪
+                  <Money amount={quantityDelivered} {projectId} />
                 </span>
                 <span class="text-xs text-gray-500">
                   {$t('lev.cards.dowegeot.forLabel')} {missionBName}{#if cycleIndex} · {$t('lev.cards.dowegeot.cycle')} #{cycleIndex}{/if}
@@ -281,7 +283,7 @@
               </div>
             {:else}
               <span style="color:#9aa0a6;">
-                ~{pricePerUnit.toLocaleString('en-US', { maximumFractionDigits: 2 })} ₪
+                ~<Money amount={pricePerUnit} {projectId} />
                 {$t('lev.cards.dowegeot.notYetReported')}
               </span>
             {/if}

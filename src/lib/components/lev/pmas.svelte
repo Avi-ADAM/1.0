@@ -1,4 +1,5 @@
 <script>
+  import CurrencySymbol from '$lib/components/money/CurrencySymbol.svelte';
   import Diun from './diun.svelte';
   import { Drawer } from 'vaul-svelte';
   import { executeAction } from '$lib/client/actionClient';
@@ -748,7 +749,7 @@ diunim = ` ${diu},`
                       : price}</span
                 >
                 <span style="color: aqua"
-                  >₪ {kindOf === 'yearly' ? 'לשנה' : 'לחודש'}</span
+                  ><CurrencySymbol /> {kindOf === 'yearly' ? 'לשנה' : 'לחודש'}</span
                 >
               </p>
               <p class="recur-note">

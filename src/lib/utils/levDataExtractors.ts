@@ -646,6 +646,9 @@ export function extractProjects(userData: any): ProjectData[] {
     id: project.id,
     attributes: {
       projectName: project.attributes?.projectName || '',
+      // The rikma's own books (PLAN_MULTI_CURRENCY): the heart shows cards from
+      // several rikmas at once, so each amount needs to know which one it is in.
+      currencyCode: project.attributes?.currencyCode ?? null,
       restime: project.attributes?.restime,
       profilePic: project.attributes?.profilePic,
       user_1s: project.attributes?.user_1s,

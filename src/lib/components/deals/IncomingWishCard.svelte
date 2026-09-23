@@ -1,4 +1,5 @@
 ﻿<script lang="ts">
+  import Money from '$lib/components/money/Money.svelte';
   import { isRtl } from '$lib/translations';
   import { t } from '$lib/translations';
   import { lang } from '$lib/stores/lang.js';
@@ -101,9 +102,7 @@
     <div class="meta-item">
       <div class="ml">{$t('deals.inviteBudget')}</div>
       <div class="mv gold">
-        {wish.totalBounti != null
-          ? `₪ ${Number(wish.totalBounti).toLocaleString()}`
-          : $t('deals.byOffer')}
+        {#if wish.totalBounti != null}<Money amount={wish.totalBounti} />{:else}{$t('deals.byOffer')}{/if}
       </div>
     </div>
     <div class="meta-item">

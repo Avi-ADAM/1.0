@@ -16,6 +16,7 @@ import { execFromContext } from '$lib/server/archive/exec.js';
 import { calcDeadlineMs } from './actionUtils.js';
 import { dateField, fields, gqlStr, run, strField } from '$lib/server/archive/gql.js';
 import { fetchPayment, fetchProjectContext } from '$lib/server/stipend/read.js';
+import { moneyTextFor } from '$lib/server/money/notifyMoney.js';
 
 const handler: ActionExecutionHandler = async (params, context, { notifier }) => {
   const paymentId = String(params.paymentId ?? '');
@@ -54,12 +55,15 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
     ).catch((e) => console.warn('[markStipendTransferSent] haluka update failed (non-fatal):', e));
   }
 
+  // Amounts are stored in the rikma's currency; the notice says them in it.
+  const rikma = payment.projectId ? await fetchProjectContext(exec, payment.projectId) : null;
+  const money = moneyTextFor(rikma?.currency ?? 'ILS');
+
   // Now — and only now — silence starts meaning "it arrived".
   let timegramaId: string | null = payment.timegramaId;
   if (!timegramaId) {
     try {
-      const project = payment.projectId ? await fetchProjectContext(exec, payment.projectId) : null;
-      const deadline = new Date(Date.now() + calcDeadlineMs(project?.restime ?? 'feh'));
+      const deadline = new Date(Date.now() + calcDeadlineMs(rikma?.restime ?? 'feh'));
       const tg = await run(
         exec,
         `mutation { createTimegrama(data: { ${fields(
@@ -84,8 +88,8 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
           templates: {
             title: { he: 'מלגת הקיום נשלחה', en: 'Your stipend was sent' },
             body: {
-              he: `₪${payment.amount} יצאו אליך. אישור הקבלה הוא מה שמעדכן את האחוזים — בלעדיו כלום לא זז.`,
-              en: `${payment.amount} is on its way. Confirming it arrived is what updates the shares — until then nothing moves.`
+              he: `${money(payment.amount)} יצאו אליך. אישור הקבלה הוא מה שמעדכן את האחוזים — בלעדיו כלום לא זז.`,
+              en: `${money(payment.amount, 'en')} is on its way. Confirming it arrived is what updates the shares — until then nothing moves.`
             }
           },
           channels: ['socket', 'push'],

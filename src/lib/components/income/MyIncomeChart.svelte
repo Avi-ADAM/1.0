@@ -1,4 +1,5 @@
 <script>
+  import { formatMoney } from '$lib/money/format.js';
   /**
    * MyIncomeChart — one currency of a member's own earnings, month by month.
    *
@@ -49,7 +50,8 @@
   );
 
   let money = $derived(
-    (/** @type {number} */ n) => `${fmt(n)} ${series.currency}`.trim()
+    (/** @type {number} */ n) =>
+      series.currency ? formatMoney(n, series.currency, $locale, { fraction: 'whole' }) : fmt(n)
   );
 
   let colorOf = $derived.by(() => {

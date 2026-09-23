@@ -1,4 +1,5 @@
 ﻿<script>
+  import { useFormatMoney } from '$lib/money/context.svelte';
   import { locale, isRtl, t } from '$lib/translations';
   /**
    * SiteShareArchive — M5 (PLAN_SITE_SHARE_PER_MEMBER §6).
@@ -28,7 +29,8 @@
     !!data && ((Number(data.totalCommitted) || 0) > 0 || (Number(data.totalReceived) || 0) > 0)
   );
 
-  const fmt = (n) => `₪${(Number(n) || 0).toLocaleString()}`;
+  const fmtMoney = useFormatMoney();
+  const fmt = (n) => fmtMoney(Number(n) || 0);
 
   async function load() {
     if (!projectId) {
