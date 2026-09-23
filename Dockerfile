@@ -43,7 +43,7 @@ COPY . .
 # ADAPTER is unset -> svelte.config.js falls back to adapter-node (out: build)
 # Bump V8 heap: the vite build peaks past the default ~2GB old-space cap and OOMs.
 RUN --mount=type=secret,id=envfile,target=/app/.env \
-    NODE_OPTIONS=--max-old-space-size=4096 npm run build
+    NODE_OPTIONS=--max-old-space-size=8192 npm run build
 
 # ---- Stage 2: runtime ----
 FROM node:22-alpine
