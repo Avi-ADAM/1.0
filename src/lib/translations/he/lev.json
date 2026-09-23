@@ -810,7 +810,10 @@
       "newService": "מוצר חדש",
       "picVote": "החלפת לוגו",
       "stipendaccrued": "מלגת קיום",
-      "stipendtransfer": "העברת מלגה"
+      "stipendtransfer": "העברת מלגה",
+      "shiftDeclare": "זמינות למשמרות",
+      "shiftDraft": "טיוטת סידור",
+      "shiftHole": "משמרת לא מאוישת"
     },
     "fact": {
       "hours": "{{value}} שעות",
@@ -862,7 +865,11 @@
       "stipendCycle": "מחזור מלגה שנסגר — לתשלום",
       "stipendSent": "סומן כנשלח — ממתין לאישור שלך",
       "stipendAccrued": "שעות שאושרו — ממתין לתשלום",
-      "stipendTransfer": "הסכום נקבע — ההעברה בתיאום"
+      "stipendTransfer": "הסכום נקבע — ההעברה בתיאום",
+      "shiftDeclare": "{{count}} משמרות מחכות לתשובה שלך",
+      "shiftDraft": "יש לך {{count}} מקומות בטיוטה",
+      "shiftHole": "אף אחד עוד לא מכסה את המשמרת",
+      "shiftHoleNext": "את/ה הבא/ה בתור לגיבוי"
     },
     "title": {
       "transfer": "{{from}} ← {{to}}",

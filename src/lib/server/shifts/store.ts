@@ -193,6 +193,68 @@ export async function activatePlanForPendm(exec: ShiftExec, pendmId: string, ope
   return ids;
 }
 
+// ── a member's shift missions (the heart's cards, §9.4) ──────────────────────
+
+/** Open missions staffed in shifts that `uid` currently holds a seat on. */
+export async function loadMyShiftMissions(exec: ShiftExec, uid: string): Promise<string[]> {
+  const d = await run(
+    exec,
+    `query ($uid: ID!) { mesimabetahaliches(filters: { users_permissions_user: { id: { eq: $uid } }, finnished: { ne: true },
+      or: [{ lifecycle: { null: true } }, { lifecycle: { in: ["active", "archiveProposed"] } }] },
+      pagination: { limit: 200 }) { data { id attributes { open_missions { data { id attributes { isshift } } } } } } }`,
+    'loadMyShiftMissions',
+    { uid }
+  );
+  const ids = new Set<string>();
+  for (const mb of nodes(d?.mesimabetahaliches)) {
+    for (const om of nodes((mb as any)?.attributes?.open_missions)) {
+      if ((om as any)?.attributes?.isshift === true) ids.add(String(om?.id));
+    }
+  }
+  return [...ids];
+}
+
+export async function loadPlansForOpenMissions(exec: ShiftExec, openMissionIds: string[]): Promise<ShiftPlanView[]> {
+  if (openMissionIds.length === 0) return [];
+  const d = await run(
+    exec,
+    `query ($ids: [ID]) { shiftPlans(filters: { open_mission: { id: { in: $ids } } }, pagination: { limit: 200 }) {
+      data { id attributes { ${PLAN_FIELDS} } } } }`,
+    'loadPlansForOpenMissions',
+    { ids: openMissionIds }
+  );
+  return nodes(d?.shiftPlans).map(toPlan);
+}
+
+/**
+ * Open the mission to one more candidate (§7.1): headcount +1, and back on
+ * the open board if it had closed. Recruiting forces nothing on anyone, so it
+ * needs no vote — what it does change is reported to the rikma.
+ */
+export async function recruitOneMore(exec: ShiftExec, openMissionId: string): Promise<{ howMeny: number }> {
+  const d = await run(
+    exec,
+    `query ($id: ID!) { openMission(id: $id) { data { id attributes { howMeny archived } } } }`,
+    'recruitOneMore:read',
+    { id: openMissionId }
+  );
+  const a = d?.openMission?.data?.attributes;
+  if (!a) throw new Error(`open mission ${openMissionId} not found`);
+  const howMeny = Math.max(1, Math.floor(Number(a.howMeny) || 1)) + 1;
+  await run(
+    exec,
+    `mutation ($id: ID!, $data: OpenMissionInput!) { updateOpenMission(id: $id, data: $data) { data { id } } }`,
+    'recruitOneMore:write',
+    { id: openMissionId, data: { howMeny, archived: false } }
+  );
+  return { howMeny };
+}
+
+/** Record on the period that its holes already led to recruitment — once per cycle. */
+export async function markPeriodReopened(exec: ShiftExec, period: PeriodView, at: string): Promise<void> {
+  await updatePeriod(exec, period.id, { quotaSnapshot: { ...(period.quotaSnapshot ?? {}), reopenedAt: at } });
+}
+
 // ── the shift commitment, a term of the assignment (§3.8) ────────────────────
 
 export interface CommitmentValue {

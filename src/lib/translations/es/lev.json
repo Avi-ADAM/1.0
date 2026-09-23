@@ -811,7 +811,10 @@
       "newService": "Servicio nuevo",
       "picVote": "Cambio de logo",
       "stipendaccrued": "Beca de subsistencia",
-      "stipendtransfer": "Transferencia de beca"
+      "stipendtransfer": "Transferencia de beca",
+      "shiftDeclare": "Disponibilidad para turnos",
+      "shiftDraft": "Borrador del cuadrante",
+      "shiftHole": "Turno sin cubrir"
     },
     "fact": {
       "hours": "{{value}} horas",
@@ -863,7 +866,11 @@
       "stipendCycle": "Ciclo de estipendio cerrado — a pagar",
       "stipendSent": "Marcado como enviado — espera tu confirmación",
       "stipendAccrued": "Horas aprobadas — a la espera de pago",
-      "stipendTransfer": "Importe fijado — coordinando la transferencia"
+      "stipendTransfer": "Importe fijado — coordinando la transferencia",
+      "shiftDeclare": "{{count}} turnos esperan tu respuesta",
+      "shiftDraft": "Tienes {{count}} lugares en el borrador",
+      "shiftHole": "Nadie cubre este turno todavía",
+      "shiftHoleNext": "Eres la siguiente persona en la fila de respaldo"
     },
     "title": {
       "transfer": "{{from}} → {{to}}",

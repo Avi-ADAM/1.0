@@ -39,6 +39,9 @@
   import SiteShareAutoApprovedCard from './SiteShareAutoApprovedCard.svelte';
   import WishOfferCard from './WishOfferCard.svelte';
   import ArchiveObjectCard from './ArchiveObjectCard.svelte';
+  import ShiftDeclareCard from './ShiftDeclareCard.svelte';
+  import ShiftDraftCard from './ShiftDraftCard.svelte';
+  import ShiftHoleCard from './ShiftHoleCard.svelte';
 
   /**
    * @typedef {Object} Props
@@ -181,6 +184,12 @@
       onProj={proj}
       onUser={user}
     />
+{:else if buble.ani === 'shiftDeclare'}
+  <ShiftDeclareCard {buble} isFirst={isVisible} onProj={proj} />
+{:else if buble.ani === 'shiftDraft'}
+  <ShiftDraftCard {buble} isFirst={isVisible} onProj={proj} onDone={delo} />
+{:else if buble.ani === 'shiftHole'}
+  <ShiftHoleCard {buble} isFirst={isVisible} onProj={proj} onDone={delo} />
 {:else if buble.ani === 'sitesharedecide'}
   <SiteShareAutoApprovedCard
       {buble}

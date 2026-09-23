@@ -37,6 +37,8 @@ import {
   loadPlan,
   loadProjectTiming,
   loadWindow,
+  markPeriodReopened,
+  recruitOneMore,
   setShift,
   syncShifts,
   updateAssignment,
@@ -287,7 +289,34 @@ export async function closePeriod(
 
   const holes = holesIn(shifts, assignments).reduce((n, c) => n + c.missing, 0);
   await updatePeriod(ctx.exec, period.id, { state: 'closed', closedAt: now.toISOString(), holes });
+
+  // Silence is consent (§1.7, §7.1): the hole card offered "open the mission
+  // to one more candidate", nobody took the hole, so recruitment starts now.
+  // One more person per short cycle — a hole is a missing shift, not a missing
+  // person; the next cycle measures again.
+  if (ctx.mode === 'on' && holes > 0 && plan.openMissionId && !(snapshot as any).reopenedAt) {
+    try {
+      await recruitOneMore(ctx.exec, plan.openMissionId);
+      await markPeriodReopened(ctx.exec, { ...period, quotaSnapshot: snapshot as any }, now.toISOString());
+      await rematch(plan.openMissionId);
+    } catch (e) {
+      console.error(`[shifts] recruitment after holes failed for plan ${plan.id}:`, e);
+    }
+  }
   return { holes };
+}
+
+/** Tell matching members about the reopened mission. Best-effort. */
+async function rematch(openMissionId: string): Promise<void> {
+  try {
+    const [{ matchOpenMissionToUsers }, { strapiClient }] = await Promise.all([
+      import('$lib/server/matching/engine'),
+      import('$lib/server/actions/index.js')
+    ]);
+    await matchOpenMissionToUsers(openMissionId, 'missionCreated', { strapi: strapiClient, fetch });
+  } catch (e) {
+    console.warn('[shifts] rematch failed:', e);
+  }
 }
 
 /**

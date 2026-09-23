@@ -7,5 +7,17 @@
 
 import type { ActionConfig } from '../types.js';
 import { declareShiftAvailabilityConfig } from './declareShiftAvailability.js';
+import {
+  claimShiftHoleConfig,
+  getShiftWorkConfig,
+  releaseShiftAssignmentConfig,
+  reopenForShiftHoleConfig
+} from './shiftCardActions.js';
 
-export const shiftActionConfigs: ActionConfig[] = [declareShiftAvailabilityConfig];
+export const shiftActionConfigs: ActionConfig[] = [
+  declareShiftAvailabilityConfig,
+  getShiftWorkConfig,
+  releaseShiftAssignmentConfig,
+  claimShiftHoleConfig,
+  reopenForShiftHoleConfig
+];

@@ -810,7 +810,10 @@
       "newService": "خدمة جديدة",
       "picVote": "تغيير الشعار",
       "stipendaccrued": "منحة معيشة",
-      "stipendtransfer": "تحويل منحة"
+      "stipendtransfer": "تحويل منحة",
+      "shiftDeclare": "التوفّر للمناوبات",
+      "shiftDraft": "مسودة جدول المناوبات",
+      "shiftHole": "مناوبة غير مغطّاة"
     },
     "fact": {
       "hours": "{{value}} ساعات",
@@ -862,7 +865,11 @@
       "stipendCycle": "دورة منحة انتهت — للدفع",
       "stipendSent": "وُسم كمُرسل — بانتظار تأكيدك",
       "stipendAccrued": "ساعات معتمدة — بانتظار الدفع",
-      "stipendTransfer": "المبلغ محدد — التحويل قيد التنسيق"
+      "stipendTransfer": "المبلغ محدد — التحويل قيد التنسيق",
+      "shiftDeclare": "{{count}} مناوبات بانتظار إجابتك",
+      "shiftDraft": "لديك {{count}} أماكن في المسودة",
+      "shiftHole": "لا أحد يغطّي هذه المناوبة بعد",
+      "shiftHoleNext": "أنت التالي في دور الاحتياط"
     },
     "title": {
       "transfer": "{{from}} ← {{to}}",

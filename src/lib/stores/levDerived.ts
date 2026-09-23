@@ -29,6 +29,8 @@ import {
   projectFilter
 } from './levStores';
 import { timers } from './timers';
+// Shift cards come from their own server read, gated on SHIFTS (PLAN_SHIFTS §9.4).
+import { processedShiftWork } from '$lib/utils/levShifts';
 import {
   processPends,
   processMtaha,
@@ -373,7 +375,8 @@ export const mergedFeed: Readable<DisplayItem[]> = derived(
     processedStipendPayables,
     processedStipendConfirmations,
     processedStipendAccruals,
-    processedStipendTransfers
+    processedStipendTransfers,
+    processedShiftWork
   ],
   ([
     $pends,
@@ -398,7 +401,8 @@ export const mergedFeed: Readable<DisplayItem[]> = derived(
     $stipendPayables,
     $stipendConfirmations,
     $stipendAccruals,
-    $stipendTransfers
+    $stipendTransfers,
+    $shiftWork
   ]) => {
     return mergeAndSort(
       $pends,
@@ -423,7 +427,8 @@ export const mergedFeed: Readable<DisplayItem[]> = derived(
       $stipendPayables,
       $stipendConfirmations,
       $stipendAccruals,
-      $stipendTransfers
+      $stipendTransfers,
+      $shiftWork
     );
   }
 );
@@ -507,6 +512,10 @@ export const finalSwiperArray: Readable<DisplayItem[]> = derived(
           return true; // Always show: money is waiting on my word that it arrived
         case 'stipendtransfer':
           return true; // Always show: a settled cycle whose money has not moved yet
+        case 'shiftDeclare':
+        case 'shiftDraft':
+        case 'shiftHole':
+          return true; // Always show: a shift question addressed to me, with a deadline
         // A stipend proposal is a decision like any other — same filter.
         case 'stipend':
           return $milon.hachla;

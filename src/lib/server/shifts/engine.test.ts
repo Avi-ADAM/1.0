@@ -22,7 +22,8 @@ const db = {
   assignments: [] as Row[],
   plan: {} as Row,
   commitments: [] as Row[],
-  timegramas: [] as Row[]
+  timegramas: [] as Row[],
+  recruited: [] as string[]
 };
 const id = () => String(db.seq++);
 const inRange = (iso: string, from: string, to: string) => iso >= from && iso < to;
@@ -70,8 +71,17 @@ vi.mock('./store.js', () => ({
   updatePlan: async (_e: unknown, _pid: string, data: Row) => Object.assign(db.plan, data),
   loadPeriod: async (_e: unknown, pid: string) => ({ ...db.periods.find((p) => p.id === pid) }),
   loadPeriods: async () => db.periods.filter((p) => p.state === 'closed').map((p) => ({ ...p })),
-  loadPlan: async () => ({ plan: { ...db.plan }, project: {} })
+  loadPlan: async () => ({ plan: { ...db.plan }, project: {} }),
+  recruitOneMore: async (_e: unknown, omId: string) => {
+    db.recruited.push(omId);
+    return { howMeny: 3 };
+  },
+  markPeriodReopened: async (_e: unknown, period: Row, at: string) => {
+    Object.assign(db.periods.find((p) => p.id === period.id)!, { quotaSnapshot: { ...(period.quotaSnapshot ?? {}), reopenedAt: at } });
+  }
 }));
+vi.mock('$lib/server/matching/engine', () => ({ matchOpenMissionToUsers: async () => ({}) }));
+vi.mock('$lib/server/actions/index.js', () => ({ strapiClient: {} }));
 vi.mock('./exec.js', () => ({
   run: async (_e: unknown, _q: string, label: string, vars: Row) => {
     if (label === 'createTimegrama') db.timegramas.push(vars.data);
@@ -97,6 +107,7 @@ function reset(mode: 'on' | 'shadow' = 'on') {
   db.declarations = [];
   db.assignments = [];
   db.timegramas = [];
+  db.recruited = [];
   db.plan = {
     id: 'plan',
     projectId: 'p1',
@@ -199,6 +210,25 @@ describe('the life of one cycle (SHIFTS=on)', () => {
     expect(cyclePeriod().holes).toBe(1);
     await tickPlan({ ...ctx, now: T.closed }, db.plan as any);
     expect(cyclePeriod().holes).toBe(1);
+    // Silence is consent: nobody took the hole, so the mission recruits one more.
+    expect(db.recruited).toEqual(['om1']);
+    expect(cyclePeriod().quotaSnapshot.reopenedAt).toBeTruthy();
+  });
+
+  it('does not recruit twice when a member already opened the mission this cycle', async () => {
+    await tickPlan({ ...ctx, now: T.declaring }, db.plan as any);
+    await tickPlan({ ...ctx, now: T.draft }, db.plan as any);
+    cyclePeriod().quotaSnapshot = { ...cyclePeriod().quotaSnapshot, reopenedAt: '2026-10-02T10:00:00Z' };
+    await tickPlan({ ...ctx, now: T.closed }, db.plan as any);
+    expect(db.recruited).toEqual([]);
+  });
+
+  it('does not recruit when the cycle closes fully covered', async () => {
+    await tickPlan({ ...ctx, now: T.declaring }, db.plan as any);
+    declareAll();
+    await tickPlan({ ...ctx, now: T.draft }, db.plan as any);
+    await tickPlan({ ...ctx, now: T.closed }, db.plan as any);
+    expect(db.recruited).toEqual([]);
   });
 
   it('does not roster a cycle that was already running when first seen', async () => {

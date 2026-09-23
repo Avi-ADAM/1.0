@@ -46,6 +46,7 @@
     stipendTransfersStore
   } from '$lib/stores/levStores';
   import { executeAction } from '$lib/client/actionClient';
+  import { shiftWorkStore } from '$lib/utils/levShifts';
 
   // Dialog components
   import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
@@ -296,6 +297,17 @@
     }
   }
 
+  // Shifts (PLAN_SHIFTS §7): cycles waiting on my availability, my places in a
+  // published draft, and coming shifts nobody covers. All derived server-side.
+  async function loadShiftWork() {
+    try {
+      const res = await executeAction('getShiftWork', {});
+      if (res?.success && res.data) shiftWorkStore.set(res.data);
+    } catch (e) {
+      console.error('[Shifts] load work failed:', e);
+    }
+  }
+
   function handleCoinLapach(event) {
     // Remove item from display optimistically
     displayItems = displayItems.filter(
@@ -347,6 +359,7 @@
     loadSiteSharePayables();
     loadOpenSiteShareDecisions();
     loadStipendWork();
+    loadShiftWork();
 
     // Errors of a background refresh must not blank an already-rendered page —
     // only an expired session needs action.

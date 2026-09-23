@@ -810,7 +810,10 @@
       "newService": "New service",
       "picVote": "Logo change",
       "stipendaccrued": "Subsistence stipend",
-      "stipendtransfer": "Stipend transfer"
+      "stipendtransfer": "Stipend transfer",
+      "shiftDeclare": "Shift availability",
+      "shiftDraft": "Draft roster",
+      "shiftHole": "Uncovered shift"
     },
     "fact": {
       "hours": "{{value}} hours",
@@ -862,7 +865,11 @@
       "stipendCycle": "A stipend cycle closed — to pay",
       "stipendSent": "Marked as sent — awaiting your confirmation",
       "stipendAccrued": "Approved hours — awaiting payment",
-      "stipendTransfer": "Amount set — arranging the transfer"
+      "stipendTransfer": "Amount set — arranging the transfer",
+      "shiftDeclare": "{{count}} shifts waiting for your answer",
+      "shiftDraft": "You have {{count}} places in the draft",
+      "shiftHole": "Nobody is covering this shift yet",
+      "shiftHoleNext": "You're next in line as backup"
     },
     "title": {
       "transfer": "{{from}} → {{to}}",

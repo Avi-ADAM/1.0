@@ -118,5 +118,36 @@
     "hint": "How many shifts per cycle (usually a week) can you take? It is part of your joining terms, like hours and rate — and later it changes only by the rikma's vote.",
     "min": "At least",
     "max": "At most"
+  },
+  "cards": {
+    "declare": {
+      "type": "Shift availability",
+      "body": "The cycle {{range}} is open for declarations. You haven't answered {{count}} shifts yet — when can you come?",
+      "deadline": "You can declare until {{date}}. \"I can't\" is a full answer too.",
+      "cta": "Mark my availability"
+    },
+    "draft": {
+      "type": "Draft roster",
+      "body": "The draft is out. Here is your place in it, and why. If you don't respond by {{date}}, it closes as it is.",
+      "release": "I can't make it after all",
+      "released": "Your place was released and the next person in line was told",
+      "holes": "The draft still has {{count}} uncovered places"
+    },
+    "hole": {
+      "type": "Uncovered shift",
+      "body": "This shift still needs {{count}} more people.",
+      "nextInLine": "You're next in line as backup for this shift",
+      "spare": "You have room for {{count}} more shifts under what you agreed to",
+      "clashes": "You already have a shift that overlaps this one",
+      "take": "I'll take this shift",
+      "taken": "Thank you! The shift is yours",
+      "alreadyCovered": "Someone already took this shift",
+      "reopen": "Open the mission to one more candidate",
+      "reopened": "The mission is open to one more candidate",
+      "alreadyReopened": "The mission was already opened to another candidate this cycle",
+      "silenceNote": "If nobody takes this shift before the cycle closes, the mission opens to another candidate on its own."
+    },
+    "fullRoster": "See the full roster",
+    "error": "That didn't go through. Please try again."
   }
 }

@@ -118,5 +118,36 @@
     "hint": "¿Cuántos turnos por ciclo (normalmente una semana) puedes asumir? Es parte de tus condiciones de ingreso, como las horas y la tarifa — y después solo cambia por votación de la rikma.",
     "min": "Como mínimo",
     "max": "Como máximo"
+  },
+  "cards": {
+    "declare": {
+      "type": "Disponibilidad para turnos",
+      "body": "El ciclo {{range}} está abierto a declaraciones. Aún no respondiste {{count}} turnos: ¿cuándo puedes venir?",
+      "deadline": "Puedes declarar hasta el {{date}}. \"No puedo\" también es una respuesta completa.",
+      "cta": "Marcar mi disponibilidad"
+    },
+    "draft": {
+      "type": "Borrador del cuadrante",
+      "body": "Se publicó el borrador. Este es tu lugar en él, y por qué. Si no respondes antes del {{date}}, se cierra tal cual.",
+      "release": "Al final no podré ir",
+      "released": "Tu lugar quedó libre y se avisó a la siguiente persona en la fila",
+      "holes": "El borrador aún tiene {{count}} lugares sin cubrir"
+    },
+    "hole": {
+      "type": "Turno sin cubrir",
+      "body": "A este turno le faltan {{count}} personas.",
+      "nextInLine": "Eres la siguiente persona en la fila de respaldo para este turno",
+      "spare": "Según lo que acordaste, te queda lugar para {{count}} turnos más",
+      "clashes": "Ya tienes un turno que se superpone con este",
+      "take": "Yo tomo este turno",
+      "taken": "¡Gracias! El turno es tuyo",
+      "alreadyCovered": "Alguien ya tomó este turno",
+      "reopen": "Abrir la misión a una persona candidata más",
+      "reopened": "La misión quedó abierta a una persona candidata más",
+      "alreadyReopened": "La misión ya se abrió a otra persona candidata en este ciclo",
+      "silenceNote": "Si nadie toma este turno antes de que cierre el ciclo, la misión se abre sola a otra persona candidata."
+    },
+    "fullRoster": "Ver el cuadrante completo",
+    "error": "No se pudo completar. Inténtalo de nuevo."
   }
 }

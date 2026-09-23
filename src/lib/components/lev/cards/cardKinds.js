@@ -49,7 +49,11 @@ const RENDERABLE = new Set([
   'stipendconfirm',
   'stipendaccrued',
   'stipendtransfer',
-  'sitesharedecide'
+  'sitesharedecide',
+  // Shift cards (PLAN_SHIFTS §9.4) — ungated: a question addressed to me.
+  'shiftDeclare',
+  'shiftDraft',
+  'shiftHole'
 ]);
 
 /**
@@ -104,7 +108,10 @@ const KIND_META = {
   stipendconfirm: { key: 'stipendconfirm', glow: 'purple' },
   stipendaccrued: { key: 'stipendaccrued', glow: 'purple' },
   stipendtransfer: { key: 'stipendtransfer', glow: 'purple' },
-  sitesharedecide: { key: 'sitesharedecide', glow: 'gold' }
+  sitesharedecide: { key: 'sitesharedecide', glow: 'gold' },
+  shiftDeclare: { key: 'shiftDeclare', glow: 'teal' },
+  shiftDraft: { key: 'shiftDraft', glow: 'teal' },
+  shiftHole: { key: 'shiftHole', glow: 'red' }
 };
 
 /** Translation key for a kind's label, e.g. `lev.list.kind.pends`. */
@@ -565,6 +572,22 @@ const ROW_CONTENT = {
       f('hours', n(b.hours)),
       f('rate', n(b.stipendRate))
     )
+  }),
+
+  // ── shifts (PLAN_SHIFTS §7) ──────────────────────────────────────────────
+  shiftDeclare: (b) => ({
+    title: T(b.planName),
+    subtitle: K('lev.list.sub.shiftDeclare', { count: b.undeclared ?? 0 })
+  }),
+
+  shiftDraft: (b) => ({
+    title: T(b.planName),
+    subtitle: K('lev.list.sub.shiftDraft', { count: b.mine?.length ?? 0 })
+  }),
+
+  shiftHole: (b) => ({
+    title: T(b.planName),
+    subtitle: b.nextInLine ? K('lev.list.sub.shiftHoleNext') : K('lev.list.sub.shiftHole')
   })
 };
 
@@ -640,7 +663,10 @@ const CTA_BY_ANI = {
   stipendtransfer: 'confirm',
   sitesharedecide: 'confirm',
   mtaha: 'view',
-  walcomen: 'view'
+  walcomen: 'view',
+  shiftDeclare: 'answer',
+  shiftDraft: 'view',
+  shiftHole: 'answer'
 };
 
 /** Translation key for the row's primary button. */

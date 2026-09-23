@@ -430,7 +430,7 @@ export type ActionKey =
   | 'updateShiftPlan'
   | 'setShiftPlanStatus'
   | 'releaseShiftAssignment'
-  | 'answerShiftCall'
+  | 'getShiftWork'
   | 'claimShiftHole'
   | 'reopenForShiftHole'
   | 'proposeShiftSwap'
