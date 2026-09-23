@@ -6,6 +6,9 @@
   import { strapiClient } from '$lib/server/actions/index.js';
   import { matchOpenMissionToUsers } from '$lib/server/matching/engine';
   import { calcDeadlineMs } from '$lib/server/actions/configs/actionUtils.js';
+  import { shiftsEnabled } from '$lib/server/shifts/mode.js';
+  import { asService } from '$lib/server/shifts/exec.js';
+  import { activatePlanForPendm } from '$lib/server/shifts/store.js';
 //get by id
 //calculate votes
 //if no no create open mission
@@ -109,6 +112,15 @@ export async function Pend(id,taid,fetchFn){
               console.log(res3.data,"pend res3 data ,pend line 83 ")
 
               const newOpenMissionId = res3.data?.createOpenMission?.data?.id;
+
+              // A staffing plan proposed with this mission was waiting, paused,
+              // for exactly this vote (PLAN_SHIFTS §13.6). Best-effort: the
+              // mission stands either way, and the plan can be relinked.
+              if (newOpenMissionId && shiftsEnabled()) {
+                await activatePlanForPendm(asService(fetchFn || fetch), String(id), String(newOpenMissionId)).catch((e) =>
+                  console.error('pend: shift plan not activated', e)
+                );
+              }
 
               if (assigneeId != null) {
                 // Offer it to the assignee: an Ask carrying the rikma's yes

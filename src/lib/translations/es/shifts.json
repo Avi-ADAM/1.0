@@ -87,5 +87,36 @@
       "raisedToMin": "Elevado al mínimo acordado",
       "belowMin": "Por debajo del mínimo — no hay suficientes turnos este ciclo"
     }
+  },
+  "form": {
+    "enable": "Esta misión necesita cobertura en horarios fijos",
+    "enableHint": "Márcalo si alguien tiene que estar aquí a ciertas horas. La rikma aprueba el horario de cobertura junto con la misión, y quienes se unan organizan los turnos entre sí.",
+    "daysLabel": "Días y horas de cobertura",
+    "closed": "Cerrado",
+    "from": "Desde",
+    "to": "Hasta",
+    "needAtOnce": "Cuántas a la vez",
+    "removeWindow": "Quitar",
+    "addWindow": "Otra franja horaria",
+    "noWindows": "Marca al menos un día con una franja horaria.",
+    "invalid": "Hay {{count}} campos no válidos en el horario — revisa el inicio, el fin y el número de personas.",
+    "weeklyHours": "Horas de cobertura por semana: {{hours}}",
+    "hoursPerPerson": "¿Cuántas horas por semana dará una persona?",
+    "suggested": "{{hours}} horas ÷ {{per}} por persona = se necesitan {{count}} personas",
+    "useSuggestion": "Fijar la misión en {{count}} personas",
+    "advanced": "Ajustes del ciclo (los predeterminados sirven)",
+    "cycleDays": "Duración del ciclo (días)",
+    "closeOffsetHours": "Horas antes del ciclo en que se publica el borrador",
+    "draftWindowHours": "Ventana de objeciones (horas)",
+    "minRestHours": "Descanso mínimo entre turnos (horas)",
+    "advancedHint": "Un campo vacío usa el valor predeterminado de la rikma.",
+    "fixBeforeSend": "El plan de cobertura está incompleto — complétalo o desmárcalo antes de publicar.",
+    "planNotSaved": "La misión se creó, pero su plan de cobertura no se guardó. Puedes añadirlo de nuevo."
+  },
+  "join": {
+    "legend": "Compromiso de turnos",
+    "hint": "¿Cuántos turnos por ciclo (normalmente una semana) puedes asumir? Es parte de tus condiciones de ingreso, como las horas y la tarifa — y después solo cambia por votación de la rikma.",
+    "min": "Como mínimo",
+    "max": "Como máximo"
   }
 }

@@ -20,6 +20,10 @@ import { matchOpenMissionToUsers } from '$lib/server/matching/engine';
 import { STRAPI_URL } from '$lib/server/strapiUrl.js';
 import { ensureCandidacyTimegrama } from '../../nego/timegrama.js';
 import { voteUrl, gqlString } from './actionUtils.js';
+import { normalizeNeed } from '$lib/missions/headcount.js';
+import { shiftsEnabled } from '$lib/server/shifts/mode.js';
+import { asUser as asShiftUser } from '$lib/server/shifts/exec.js';
+import { activatePlanForPendm } from '$lib/server/shifts/store.js';
 
 // Helper: normalise a vote component row to a plain object for GraphQL variables
 function normalizeVote(v: any): Record<string, any> {
@@ -188,6 +192,11 @@ const voteOnPendmHandler: ActionExecutionHandler = async (params, context, { str
         project: "${projectId}",
         mission: "${missionId}",
         iskvua: ${attrs.iskvua ?? false},
+        # How many people, and whether it is staffed in shifts (PLAN_SHIFTS §2):
+        # the timegrama path always copied these; the vote path did not, so a
+        # proposal for five approved by an immediate vote became a mission for one.
+        howMeny: ${normalizeNeed(assigneeId ? 1 : attrs.howMeny)},
+        isshift: ${attrs.isshift === true},
         work_ways: [${workwayIds.join(',')}],
         hearotMeyuchadot: ${gqlString(attrs.hearotMeyuchadot)},
         name: ${gqlString(attrs.name)},
@@ -227,6 +236,14 @@ const voteOnPendmHandler: ActionExecutionHandler = async (params, context, { str
     }
 
     const newOpenMissionId = responseData.data?.createOpenMission?.data?.id;
+
+    // The staffing plan proposed with this mission was waiting for this vote
+    // (PLAN_SHIFTS §13.6) — the same step the timegrama path takes in pend.svelte.
+    if (newOpenMissionId && shiftsEnabled()) {
+      await activatePlanForPendm(asShiftUser(context), String(pendId), String(newOpenMissionId)).catch((e) =>
+        console.error('[voteOnPendm] shift plan not activated:', e)
+      );
+    }
 
     if (assigneeId && newOpenMissionId) {
       // Assigned proposal → offer it to the assignee instead of to everyone.

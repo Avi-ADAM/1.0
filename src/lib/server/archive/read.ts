@@ -9,6 +9,7 @@
  */
 
 import { gqlStr, run, type Exec } from './gql.js';
+import { shiftsEnabled } from '$lib/server/shifts/mode.js';
 import { TARGET_META, type TargetKind } from './targets.js';
 import type { ArchiveScope, HoursOutcome, RoundMode, StandingRound } from './apply.js';
 import type { ArchiveSource, DecisionKind } from './decision.js';
@@ -74,6 +75,7 @@ export async function fetchObjectChangeDecision(
       negoarch {
         ordern mode why zman name descrip hm price kindOf
         sqadualed sqadualedf hoursOutcome hoursToCredit effectiveFrom
+        ${shiftsEnabled() ? 'shiftsMin shiftsMax howMany' : ''}
         proposedBy { data { id } }
         transferTo { data { id } }
       }
@@ -130,6 +132,9 @@ export async function fetchObjectChangeDecision(
         hoursToCredit: num(r.hoursToCredit),
         transferToId: r.transferTo?.data?.id ? String(r.transferTo.data.id) : null,
         effectiveFrom: r.effectiveFrom ?? null,
+        shiftsMin: num(r.shiftsMin),
+        shiftsMax: num(r.shiftsMax),
+        howMany: num(r.howMany),
         proposedById: r.proposedBy?.data?.id ? String(r.proposedBy.data.id) : null,
         zman: r.zman ?? null,
       }),

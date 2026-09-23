@@ -8,7 +8,6 @@
   import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
   import { fly, slide } from 'svelte/transition';
   import Close from '$lib/celim/close.svelte';
-  import SveltyPicker from 'svelty-picker';
   import moment from 'moment';
   import { toast } from 'svelte-sonner';
   import { confettiStore } from '$lib/stores/confettiStore';
@@ -291,6 +290,8 @@
   import LinkIcon from '$lib/celim/icons/linkIcon.svelte';
   import LinkToIcon from '$lib/celim/icons/linkToIcon.svelte';
   import ShiftsIcon from '$lib/celim/icons/shiftsIcon.svelte';
+  import ShiftPlanForm, { emptyShiftPlan } from '$lib/components/shifts/ShiftPlanForm.svelte';
+  import { validatePattern } from '$lib/shifts/pattern';
   import MobileModal from '$lib/celim/ui/mobileModal.svelte';
   import { page } from '$app/state';
   import LocationPicker from '$lib/components/location/LocationPicker.svelte';
@@ -721,6 +722,14 @@
       return;
     }
 
+    // A staffing plan is part of what the rikma votes on; an incomplete one
+    // must not go out half-drawn.
+    if (shiftsOn && !shiftPlanReady) {
+      loading = false;
+      toast.warning($trans('shifts.form.fixBeforeSend'));
+      return;
+    }
+
     const skills = find_skill_id(element.selectedSkills);
     const work_ways = find_workway_id(element.selectedWorkways);
     const tafkidims = find_role_id(element.selectedRoles);
@@ -766,6 +775,15 @@
         // An assigned mission is an offer to one named person — the server
         // forces 1 there anyway; only an open mission carries a headcount.
         howMeny: element.myM === true ? undefined : Math.max(1, Math.floor(Number(element.howMeny) || 1)),
+        shiftPlan: shiftsOn && shiftPlan.enabled
+          ? {
+              pattern: $state.snapshot(shiftPlan.pattern),
+              cycleDays: shiftPlan.cycleDays,
+              closeOffsetHours: shiftPlan.closeOffsetHours,
+              draftWindowHours: shiftPlan.draftWindowHours,
+              minRestHours: shiftPlan.minRestHours
+            }
+          : undefined,
         dateStart,
         dateEnd,
         isOnline: element.location?.location_mode === 'online',
@@ -787,6 +805,8 @@
           : undefined
       });
       if (result.success) {
+        // The mission stands even if its plan could not be saved — say so.
+        if (result.data?.shiftPlanError) toast.warning($trans('shifts.form.planNotSaved'));
         handleSuccess(result.data);
       } else {
         loading = false;
@@ -804,13 +824,6 @@
   let addS = false;
   let rishon = 0;
   let rishonves = 0;
-
-  function shifter(a) {
-    if (a == true) {
-      isOpen = true;
-      console.log('', days);
-    }
-  }
 
   async function addW(id, mid, e) {
     if (e) if (e.type === 'add') console.log(id);
@@ -876,133 +889,24 @@
     isOpen = false;
   };
   let addn = $derived(`${mf.missionType}: "${searchText}"`);
-  let days = $state([
-    {
-      nameKey: 'sunday',
-      id: 1,
-      st: '11:00',
-      cl: '17:00',
-      shiftp: 1,
-      shifts: [
-        {
-          st: '11:00',
-          cl: '17:00',
-          ii: 1
-        }
-      ]
-    },
-    {
-      nameKey: 'monday',
-      id: 2,
-      st: '11:00',
-      cl: '17:00',
-      shiftp: 1,
-      shifts: [
-        {
-          st: '11:00',
-          cl: '17:00',
-          ii: 1
-        }
-      ]
-    },
-    {
-      nameKey: 'tuesday',
-      id: 3,
-      st: '11:00',
-      cl: '17:00',
-      shiftp: 1,
-      shifts: [
-        {
-          st: '11:00',
-          cl: '17:00',
-          ii: 1
-        }
-      ]
-    },
-    {
-      nameKey: 'wednesday',
-      id: 4,
-      st: '11:00',
-      cl: '17:00',
-      shiftp: 1,
-      shifts: [
-        {
-          st: '11:00',
-          cl: '17:00',
-          ii: 1
-        }
-      ]
-    },
-    {
-      nameKey: 'thursday',
-      id: 5,
-      st: '11:00',
-      cl: '17:00',
-      shiftp: 1,
-      shifts: [
-        {
-          st: '11:00',
-          cl: '17:00',
-          ii: 1
-        }
-      ]
-    },
-    {
-      nameKey: 'friday',
-      id: 6,
-      st: '11:00',
-      cl: '17:00',
-      shiftp: 1,
-      shifts: [
-        {
-          st: '11:00',
-          cl: '17:00',
-          ii: 1
-        }
-      ]
-    },
-    {
-      nameKey: 'saturday',
-      id: 7,
-      st: null,
-      cl: null,
-      shiftp: 0,
-      shifts: []
-    }
-  ]);
-  let shift = $state([
-    {
-      ii: 1
-    }
-  ]);
-  let shifts = $state(1);
-
-  function shifterr(o) {
-    //todo reduce and adding 2 together, not to mention v a l i d a t i o n
-    days[o].shifts.push({
-      st: '11:00',
-      cl: '17:00',
-      ii: 1
-    });
-    days = days;
-
-    for (let i = 0; i < days.length; i++) {
-      if (days[i].shiftp > shifts) {
-        shifts = days[i].shiftp;
-        shift = [
-          ...Array(shifts)
-            .fill(0)
-            .map((x) => ({
-              ii: ''
-            }))
-        ];
-      }
-    }
-    shift = shift;
-    console.log(days, shift);
-  }
-
-  function kova() {}
+  /**
+   * The staffing plan proposed with this mission (PLAN_SHIFTS §9.5, §13.6).
+   * Offered only while the shift system is on — with SHIFTS=off the server
+   * ignores a plan, and a form that silently does nothing is worse than none.
+   */
+  let shiftPlan = $state(emptyShiftPlan());
+  let shiftsOn = $state(false);
+  onMount(() => {
+    fetch('/api/shifts/status')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => (shiftsOn = !!d && d.mode !== 'off'))
+      .catch(() => (shiftsOn = false));
+  });
+  const shiftPlanReady = $derived(
+    !shiftPlan.enabled ||
+      (validatePattern(shiftPlan.pattern).length === 0 &&
+        shiftPlan.pattern.days.some((d) => d.windows.length > 0))
+  );
 
   let error = $state(false),
     success = $state(false),
@@ -1077,148 +981,7 @@
       aria-label="form"
       class={dialog === 2 ? 'formi' : 'contenti'}
     >
-      {#if dialog == 1}
-        <div
-          style="z-index: 400; overflow-x: auto;"
-          dir={$isRtl ? 'rtl' : 'ltr'}
-          class="d"
-        >
-          <button
-            class=" hover:bg-barbi text-mturk rounded-full"
-            onclick={closer}
-            ><Close />
-          </button>
-          <table
-            dir={$isRtl ? 'rtl' : 'ltr'}
-            class="d"
-            style="overflow-x: auto; font-size: 95%;"
-          >
-            <caption class="sm:text-right md:text-center text-right">
-              <h1 class="md:text-center text-2xl md:text-2xl font-bold">
-                {mf.editShift}
-              </h1>
-            </caption>
-            <thead>
-              <tr class="gg">
-                <th class="gg ddd">{mf.dayOfWeek}</th>
-                {#each days as day}
-                  <td class="gg" style="font-size: 1rem"
-                    >{mf.days[day.nameKey]}</td
-                  >
-                {/each}
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <th class="ddd">{mf.openTime}</th>
-                {#each days as day}
-                  <td
-                    ><SveltyPicker
-                      inputClasses="form-control"
-                      format="hh:ii"
-                      bind:value={day.st}
-                    ></SveltyPicker>
-                  </td>
-                {/each}
-              </tr>
-              <tr>
-                <th class="ddd">{mf.closeTime}</th>
-                {#each days as day}
-                  <td
-                    ><SveltyPicker
-                      inputClasses="form-control"
-                      format="hh:ii"
-                      bind:value={day.cl}
-                    ></SveltyPicker></td
-                  >
-                {/each}
-              </tr>
-              <tr>
-                <th class="ddd">{mf.numShifts}</th>
-                {#each days as day, i}
-                  <td>
-                    <div dir={$isRtl ? 'rtl' : 'ltr'} class="textinput">
-                      <input
-                        type="number"
-                        id={`shif${i}`}
-                        onchange={() => shifterr(i)}
-                        name="parti"
-                        bind:value={day.shiftp}
-                        class="input"
-                        required
-                      />
-                      <label for={`shif${i}`} class="label"
-                        >{mf.numShifts}</label
-                      >
-                      <span class="line"></span>
-                    </div></td
-                  >
-                {/each}
-              </tr>
-
-              {#each shift as shi, t}
-                <tr>
-                  <th class="ddd">{mf.shiftOpen} {t + 1}</th>
-                  {#each days as day, i}
-                    {#if day.shifts[t] != undefined}
-                      <td
-                        ><SveltyPicker
-                          inputClasses="form-control"
-                          format="hh:ii"
-                          bind:value={day.shifts[t].st}
-                        ></SveltyPicker></td
-                      >
-                    {:else}
-                      <td></td>
-                    {/if}
-                  {/each}
-                </tr>
-                <tr>
-                  <th class="ddd">{mf.shiftClose} {t + 1}</th>
-                  {#each days as day, i}
-                    {#if day.shifts[t] != undefined}
-                      <td
-                        ><SveltyPicker
-                          inputClasses="form-control"
-                          format="hh:ii"
-                          bind:value={day.shifts[t].cl}
-                        ></SveltyPicker></td
-                      >
-                    {:else}
-                      <td></td>
-                    {/if}
-                  {/each}
-                </tr>
-                <tr>
-                  <th class="ddd">{mf.perShift} {t + 1}</th>
-                  {#each days as day, i}
-                    {#if day.shifts[t] != undefined}
-                      <td style="font-size: 3rem">
-                        <div dir={$isRtl ? 'rtl' : 'ltr'} class="textinput">
-                          <input
-                            type="number"
-                            id={`part${i}`}
-                            name="part"
-                            bind:value={day.shifts[t].ii}
-                            class="input"
-                            required
-                          />
-                          <label for={`part${i}`} class="label"
-                            >{mf.perShift}</label
-                          >
-                          <span class="line"></span>
-                        </div>
-                      </td>
-                    {:else}
-                      <td></td>
-                    {/if}
-                  {/each}
-                </tr>
-              {/each}
-            </tbody>
-          </table>
-        </div>
-      {:else if dialog === 2}
+      {#if dialog === 2}
         <Crtask
           {misid}
           fromMis={true}
@@ -2027,25 +1790,19 @@
               {/if}
             </div>
             <div>
-              {#if shiftE}
-                <input
-                  bind:checked={miData[0].isshif}
-                  type="checkbox"
-                  id="isss"
-                  name="is"
-                  value="no"
-                  onchange={() => shifter(miData[0].isshif)}
+              {#if shiftE && shiftsOn}
+                <!-- A staffing plan travels with the mission and is approved in
+                     the same vote (PLAN_SHIFTS §9.5, §13.6). -->
+                <ShiftPlanForm
+                  bind:value={shiftPlan}
+                  onHeadcount={(n) => {
+                    miData[0].howMeny = n;
+                  }}
                 />
-                <label for="isss"><mark>{mf.isShift}</mark></label>
-                {#if miData[0].isshif == true}
-                  <button onclick={() => shifter(miData[0].isshif)}
-                    >{mf.editShift}</button
-                  >
-                {/if}
                 <button
                   onclick={() => (shiftE = !shiftE)}
                   class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
-                  title={mf.isShift}><Done /></button
+                  title={$trans('shifts.form.enable')}><Done /></button
                 >
               {/if}
             </div>
@@ -2072,11 +1829,11 @@
                   title={$trans('mission.linkToMission')}
                   ><LinkToIcon /></button
                 >{/if}
-              {#if !shiftE}
+              {#if !shiftE && shiftsOn && projectId && !specMode && !publishMode}
                 <button
                   onclick={() => (shiftE = !shiftE)}
                   class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
-                  title={mf.isShift}><ShiftsIcon /></button
+                  title={$trans('shifts.form.enable')}><ShiftsIcon /></button
                 >{/if}
             </div>
             <div class="flex flex-row flex-wrap items-center justify-end gap-3">
@@ -2105,11 +1862,6 @@
 </div>
 
 <style>
-  .ddd {
-    position: sticky;
-    right: 1px;
-  }
-
   :global([data-svelte-dialog-content].contenti) {
     background-color: rgba(247, 250, 36, 0.5);
     width: 90vw;
@@ -2147,19 +1899,6 @@
     border-color: transparent transparent var(--barbi-pink) var(--barbi-pink);
   }
 
-  .gg {
-    position: sticky;
-    top: 1px;
-    background-color: #6b0f1a;
-    background-image: linear-gradient(315deg, #6b0f1a 0%, #b91372 74%);
-
-    border-width: 4px;
-    border-color: rgb(103, 232, 249);
-    border-radius: 4%;
-    opacity: 1;
-    color: rgb(132, 241, 223);
-  }
-
   .ggd {
     position: sticky;
     bottom: 1px;
@@ -2184,7 +1923,6 @@
   }
 
   .ggr:hover,
-  .gg:hover,
   .ggd:hover {
     background: var(--barbi-pink);
   }
@@ -2203,60 +1941,6 @@
     width: 96vw;
     padding-left: 0.5em;
     padding-right: 0.5em;
-  }
-
-  table,
-  th,
-  td {
-    border-collapse: collapse;
-    border-width: 4px;
-    border-color: rgb(103, 232, 249);
-    border-radius: 4%;
-  }
-
-  table {
-    text-align: center;
-    color: var(--barbi-pink);
-    margin: 0 auto;
-  }
-
-  th {
-    background-color: #6b0f1a;
-    background-image: linear-gradient(315deg, #6b0f1a 0%, #b91372 74%);
-    color: rgb(132, 241, 223);
-  }
-
-  td {
-    background-color: #5efaf2;
-    background-image: linear-gradient(8deg, #5efaf2 0%, #eee 74%);
-  }
-
-  th:hover {
-    background: var(--barbi-pink);
-  }
-
-  td:hover {
-    background: rgb(132, 241, 223);
-  }
-
-  .textinput {
-    position: relative;
-    width: 100%;
-    display: block;
-  }
-
-  .input {
-    border: none;
-    margin: 0;
-    padding: 10px 0;
-    outline: none;
-    border-bottom: solid 1px var(--mturk);
-    font-size: 15px;
-    margin-top: 12px;
-    width: 100%;
-    color: var(--barbi-pink);
-    -webkit-tap-highlight-color: transparent;
-    background: transparent;
   }
 
   #check table {
@@ -2289,38 +1973,5 @@
     font-size: 12px;
     color: var(--barbi-pink);
     border-bottom: solid 1px rgba(255, 255, 255, 0.1);
-  }
-  .label {
-    font-size: 15px;
-    position: absolute;
-    right: 0;
-    top: 22px;
-    transition: 0.2s cubic-bezier(0, 0, 0.3, 1);
-    pointer-events: none;
-    color: var(--barbi-pink);
-    user-select: none;
-  }
-
-  .line {
-    height: 2px;
-    background-color: #2196f3;
-    position: absolute;
-    transform: translateX(-50%);
-    left: 50%;
-    bottom: 0;
-    width: 0;
-    transition: 0.2s cubic-bezier(0, 0, 0.3, 1);
-  }
-
-  .input:focus ~ .line,
-  .input:valid ~ .line {
-    width: 100%;
-  }
-
-  .input:focus ~ .label,
-  .input:valid ~ .label {
-    font-size: 11px;
-    color: #2196f3;
-    top: 0;
   }
 </style>

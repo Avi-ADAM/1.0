@@ -75,7 +75,10 @@
     "cancel": "Cancelar",
     "sending": "Enviando…",
     "clockReset": "Enviar reinicia el reloj de la decisión",
-    "kindOf": "Tipo"
+    "kindOf": "Tipo",
+    "howMany": "Personas necesarias",
+    "shiftsMin": "Mínimo de turnos por ciclo",
+    "shiftsMax": "Máximo de turnos por ciclo"
   },
   "toast": {
     "approved": "Firmaste la versión sobre la mesa",

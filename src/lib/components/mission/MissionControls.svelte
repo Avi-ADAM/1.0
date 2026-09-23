@@ -52,6 +52,9 @@
    * @property {number} [accruedHours] - hours already logged (`howmanyhoursalready`).
    * @property {number|null} [hoursAssigned] - hours agreed for the mission (`hoursassinged`).
    * @property {number|null} [perhour] - hourly value agreed for the mission.
+   * @property {{ min: number|null, max: number|null } | null} [shiftCommitment] - the agreed
+   *   per-cycle shift commitment, for a mission staffed in shifts (PLAN_SHIFTS §3.8). When
+   *   given, "request update" can also propose a new commitment.
    * @property {(status: number) => void} [onStatus] - progress was saved.
    * @property {(outcome: 'approvalPending'|'completed') => void} [onCompleted] -
    *   the finish went through. `completed` means the server closed the mission
@@ -76,6 +79,7 @@
     accruedHours = 0,
     hoursAssigned = null,
     perhour = null,
+    shiftCommitment = null,
     onStatus,
     onCompleted,
     onTimerSaved
@@ -446,6 +450,7 @@
       targetName={missionName}
       currentHm={hoursAssigned}
       currentPrice={perhour}
+      {shiftCommitment}
       icon="✎"
       className="mc-btn"
     />

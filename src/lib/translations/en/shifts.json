@@ -87,5 +87,36 @@
       "raisedToMin": "Lifted to the agreed minimum",
       "belowMin": "Below the minimum — not enough shifts this cycle"
     }
+  },
+  "form": {
+    "enable": "This mission needs to be staffed at set hours",
+    "enableHint": "Tick this if someone has to be here at certain hours. The rikma approves the staffing hours together with the mission, and whoever joins arranges shifts among themselves.",
+    "daysLabel": "Staffed days and hours",
+    "closed": "Closed",
+    "from": "From",
+    "to": "Until",
+    "needAtOnce": "How many at once",
+    "removeWindow": "Remove",
+    "addWindow": "Another time window",
+    "noWindows": "Mark at least one day with a time window.",
+    "invalid": "{{count}} fields in the hours are not valid — check the start, the end and the number of people.",
+    "weeklyHours": "Staffed hours per week: {{hours}}",
+    "hoursPerPerson": "How many hours a week will one person give?",
+    "suggested": "{{hours}} hours ÷ {{per}} per person = {{count}} people needed",
+    "useSuggestion": "Set the mission to {{count}} people",
+    "advanced": "Cycle settings (the defaults are fine)",
+    "cycleDays": "Cycle length (days)",
+    "closeOffsetHours": "Hours before the cycle the draft is published",
+    "draftWindowHours": "Objection window (hours)",
+    "minRestHours": "Minimum rest between shifts (hours)",
+    "advancedHint": "An empty field means the rikma's default.",
+    "fixBeforeSend": "The staffing plan is incomplete — finish it or untick it before publishing.",
+    "planNotSaved": "The mission was created, but its staffing plan was not saved. You can add it again."
+  },
+  "join": {
+    "legend": "Shift commitment",
+    "hint": "How many shifts per cycle (usually a week) can you take? It is part of your joining terms, like hours and rate — and later it changes only by the rikma's vote.",
+    "min": "At least",
+    "max": "At most"
   }
 }

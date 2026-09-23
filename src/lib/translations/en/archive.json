@@ -75,7 +75,10 @@
     "cancel": "Cancel",
     "sending": "Sending…",
     "clockReset": "Sending resets the decision clock",
-    "kindOf": "Kind"
+    "kindOf": "Kind",
+    "howMany": "People needed",
+    "shiftsMin": "Minimum shifts per cycle",
+    "shiftsMax": "Maximum shifts per cycle"
   },
   "toast": {
     "approved": "You signed the version on the table",

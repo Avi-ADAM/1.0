@@ -17,11 +17,32 @@ import { restimeLabel } from './actionUtils.js';
 import { applyObjectChange, setLifecycle, type StandingRound } from '$lib/server/archive/apply.js';
 import { openObjectChangeDecision } from '$lib/server/archive/decision.js';
 import { execFromContext } from '$lib/server/archive/exec.js';
+import { shiftsEnabled } from '$lib/server/shifts/mode.js';
 import { fetchTarget, TARGET_KINDS, type TargetKind } from '$lib/server/archive/targets.js';
 
 const KIND_OFS = ['total', 'monthly', 'yearly', 'perUnit', 'rent', 'unlimited', 'daily'];
 
 /** Only the fields a round can carry; anything else is silently ignored. */
+/**
+ * The shift terms a round may carry, and only on the object they belong to
+ * (PLAN_SHIFTS §3.8, §13.6): the per-cycle commitment on a mission in
+ * progress, the headcount on an open mission. Nothing while SHIFTS is off —
+ * the fields do not exist in Strapi until the shift schema is deployed.
+ */
+function shiftTerms(values: Record<string, any>, targetKind: string): Partial<StandingRound> {
+  if (!shiftsEnabled()) return {};
+  const int = (v: unknown, min: number) =>
+    v == null || v === '' || !Number.isFinite(Number(v)) ? null : Math.max(min, Math.floor(Number(v)));
+  if (targetKind === 'missionInProgress') {
+    const shiftsMin = int(values.shiftsMin, 0);
+    let shiftsMax = int(values.shiftsMax, 0);
+    if (shiftsMin != null && shiftsMax != null && shiftsMax < shiftsMin) shiftsMax = shiftsMin;
+    return { shiftsMin, shiftsMax };
+  }
+  if (targetKind === 'openMission') return { howMany: int(values.howMany ?? values.howMeny, 1) };
+  return {};
+}
+
 function buildRound(values: Record<string, any>, why: string): StandingRound {
   const num = (v: unknown) => (v == null || v === '' ? null : Number(v));
   const kindOf = values.kindOf && KIND_OFS.includes(String(values.kindOf)) ? String(values.kindOf) : null;
@@ -40,7 +61,10 @@ function buildRound(values: Record<string, any>, why: string): StandingRound {
 }
 
 function hasAnyChange(round: StandingRound): boolean {
-  return [round.name, round.descrip, round.hm, round.price, round.kindOf, round.sqadualed, round.sqadualedf].some(
+  return [
+    round.name, round.descrip, round.hm, round.price, round.kindOf, round.sqadualed, round.sqadualedf,
+    round.shiftsMin, round.shiftsMax, round.howMany,
+  ].some(
     (v) => v != null && v !== '',
   );
 }
@@ -68,7 +92,7 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
     throw new Error('Only a member of the rikma may propose changes to its objects');
   }
 
-  const round = buildRound(values, why);
+  const round = { ...buildRound(values, why), ...shiftTerms(values, targetKind) };
   if (!hasAnyChange(round)) throw new Error('Nothing to change - send at least one new value');
 
   const otherMembers = target.memberIds.filter((id) => id !== userId);

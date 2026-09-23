@@ -34,6 +34,15 @@
     goto('/project/' + x);
   }
 
+  /**
+   * A mission staffed in shifts asks the candidate what they commit to per
+   * cycle — "only 2 a week", "up to 7" (PLAN_SHIFTS §3.8). It is a term of the
+   * request, like hours and rate: agreed on acceptance, changed only by vote.
+   */
+  let commitMin = $state(/** @type {number|null} */ (null));
+  let commitMax = $state(/** @type {number|null} */ (null));
+  const isShiftMission = $derived(data.alld?.attributes?.isshift === true);
+
   async function ask() {
     alr = true;
     const inD = data.alld;
@@ -71,7 +80,10 @@
     try {
       const result = await executeAction('applyToMission', {
         openMissionId: String(data.mId),
-        projectId: String(inD.attributes.project.data.id)
+        projectId: String(inD.attributes.project.data.id),
+        ...(isShiftMission
+          ? { shiftsMin: commitMin ?? undefined, shiftsMax: commitMax ?? undefined }
+          : {})
       });
 
       if (!result.success) {
@@ -715,6 +727,22 @@
                   {/if}
                 </div>
               {:else if data.tok != false}
+                {#if isShiftMission && alr == false}
+                  <fieldset class="mx-auto mt-4 flex max-w-md flex-col gap-2 rounded-xl border border-gold/60 p-3 text-barbi">
+                    <legend class="px-1 font-semibold">{$t('shifts.join.legend')}</legend>
+                    <p class="text-sm">{$t('shifts.join.hint')}</p>
+                    <div class="flex flex-wrap gap-3">
+                      <label class="flex flex-col text-sm">
+                        <span>{$t('shifts.join.min')}</span>
+                        <input type="number" min="0" step="1" class="w-24 rounded-lg border border-gold/60 bg-transparent px-2 py-1" bind:value={commitMin} />
+                      </label>
+                      <label class="flex flex-col text-sm">
+                        <span>{$t('shifts.join.max')}</span>
+                        <input type="number" min="0" step="1" class="w-24 rounded-lg border border-gold/60 bg-transparent px-2 py-1" bind:value={commitMax} />
+                      </label>
+                    </div>
+                  </fieldset>
+                {/if}
                 <div class="flex flex-wrap gap-3 justify-center items-center">
                   {#if alr == false && !(data.alld.attributes.users?.data ?? [])
                       .map((c) => c.id)

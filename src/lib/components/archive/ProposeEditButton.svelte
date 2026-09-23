@@ -23,6 +23,11 @@
    * @property {string} [targetName]
    * @property {number|null} [currentHm] - hours/quantity agreed today
    * @property {number|null} [currentPrice] - hourly value / unit price today
+   * @property {{ min: number|null, max: number|null } | null} [shiftCommitment] - a mission in
+   *   progress staffed in shifts: its agreed per-cycle commitment (PLAN_SHIFTS §3.8). When set, the
+   *   drawer offers to change it — by this same vote, like hours and rate.
+   * @property {number|null} [currentHowMany] - an open mission's headcount; when not undefined the
+   *   drawer offers to change how many people it needs (PLAN_SHIFTS §2).
    * @property {boolean} [soleMember]
    * @property {string} [label]
    * @property {string} [icon] - leading glyph, kept in its own element so RTL bidi
@@ -38,6 +43,8 @@
     targetName = '',
     currentHm = null,
     currentPrice = null,
+    shiftCommitment = null,
+    currentHowMany = undefined,
     soleMember = false,
     label = '',
     icon = '',
@@ -50,6 +57,12 @@
   let price = $state(/** @type {number|null} */ (null));
   let why = $state('');
   let sending = $state(false);
+  let shiftsMin = $state(/** @type {number|null} */ (null));
+  let shiftsMax = $state(/** @type {number|null} */ (null));
+  let howMany = $state(/** @type {number|null} */ (null));
+
+  const showCommitment = $derived(targetKind === 'missionInProgress' && shiftCommitment != null);
+  const showHowMany = $derived(targetKind === 'openMission' && currentHowMany !== undefined);
 
   // Open on today's terms, so a proposal about the hours cannot accidentally
   // restate the rate as something it never was.
@@ -57,12 +70,20 @@
     if (!open) return;
     hm = currentHm;
     price = currentPrice;
+    shiftsMin = shiftCommitment?.min ?? null;
+    shiftsMax = shiftCommitment?.max ?? null;
+    howMany = currentHowMany ?? null;
     why = '';
   });
 
+  const differs = (/** @type {unknown} */ a, /** @type {unknown} */ b) =>
+    a != null && a !== '' && Number(a) !== Number(b ?? NaN);
+
   const changed = $derived(
     (hm != null && Number(hm) !== Number(currentHm)) ||
-      (price != null && Number(price) !== Number(currentPrice))
+      (price != null && Number(price) !== Number(currentPrice)) ||
+      (showCommitment && (differs(shiftsMin, shiftCommitment?.min) || differs(shiftsMax, shiftCommitment?.max))) ||
+      (showHowMany && differs(howMany, currentHowMany))
   );
 
   // Moving the hourly value of a mission that is already running is the one
@@ -86,7 +107,14 @@
         why: why.trim() || undefined,
         newValues: {
           hm: hm != null ? Number(hm) : undefined,
-          price: price != null ? Number(price) : undefined
+          price: price != null ? Number(price) : undefined,
+          ...(showCommitment
+            ? {
+                shiftsMin: shiftsMin != null ? Number(shiftsMin) : undefined,
+                shiftsMax: shiftsMax != null ? Number(shiftsMax) : undefined
+              }
+            : {}),
+          ...(showHowMany && howMany != null ? { howMany: Number(howMany) } : {})
         }
       });
       if (res?.success === false)
@@ -176,6 +204,55 @@
             {/if}
           </label>
         </div>
+
+        {#if showCommitment}
+          <!-- The per-cycle shift commitment is a term of this assignment
+               (PLAN_SHIFTS §3.8): it changes only by this vote. -->
+          <div class="grid grid-cols-2 gap-3">
+            <label class="block">
+              <span class="text-sm text-gray-600 dark:text-gray-400">{$t('archive.nego.shiftsMin')}</span>
+              <input
+                type="number"
+                min="0"
+                step="1"
+                bind:value={shiftsMin}
+                class="mt-1 w-full rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-900 p-2"
+              />
+              <span class="text-xs text-gray-400">
+                {$t('archive.nego.was', { value: shiftCommitment?.min == null ? '—' : String(shiftCommitment.min) })}
+              </span>
+            </label>
+            <label class="block">
+              <span class="text-sm text-gray-600 dark:text-gray-400">{$t('archive.nego.shiftsMax')}</span>
+              <input
+                type="number"
+                min="0"
+                step="1"
+                bind:value={shiftsMax}
+                class="mt-1 w-full rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-900 p-2"
+              />
+              <span class="text-xs text-gray-400">
+                {$t('archive.nego.was', { value: shiftCommitment?.max == null ? '—' : String(shiftCommitment.max) })}
+              </span>
+            </label>
+          </div>
+        {/if}
+
+        {#if showHowMany}
+          <label class="block">
+            <span class="text-sm text-gray-600 dark:text-gray-400">{$t('archive.nego.howMany')}</span>
+            <input
+              type="number"
+              min="1"
+              step="1"
+              bind:value={howMany}
+              class="mt-1 w-full rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-900 p-2"
+            />
+            <span class="text-xs text-gray-400">
+              {$t('archive.nego.was', { value: currentHowMany == null ? '1' : String(currentHowMany) })}
+            </span>
+          </label>
+        {/if}
 
         <label class="block">
           <span class="text-sm text-gray-600 dark:text-gray-400"

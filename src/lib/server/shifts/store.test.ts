@@ -14,7 +14,16 @@ import { parse } from 'graphql';
 vi.mock('$env/dynamic/private', () => ({ env: {} }));
 vi.mock('$lib/server/strapiUrl.js', () => ({ STRAPI_URL: 'http://strapi', STRAPI_GRAPHQL: 'http://strapi/graphql' }));
 
-import { ensurePeriod, loadPeriods, loadWindow, syncShifts, upsertDeclaration } from './store';
+import {
+  activatePlanForPendm,
+  commitmentForAsk,
+  ensurePeriod,
+  loadPeriods,
+  loadWindow,
+  setAskCommitment,
+  syncShifts,
+  upsertDeclaration
+} from './store';
 import type { ShiftExec } from './exec';
 
 interface Call {
@@ -153,6 +162,60 @@ describe('document shape', () => {
       closesAt: '2026-10-03T00:00:00Z'
     });
     expect(created).toBe(true);
+    assertWellFormed(calls);
+  });
+});
+
+
+describe('the shift commitment (PLAN_SHIFTS §3.8)', () => {
+  it('writes the stated commitment on the request, cleaned', async () => {
+    const { exec, calls } = fake([]);
+    const v = await setAskCommitment(exec, '42', { min: 3, max: 2 });
+    // "At least 3, at most 2" cannot be kept; it reads as 3–3.
+    expect(v).toEqual({ min: 3, max: 3 });
+    expect(calls[0].variables).toEqual({ id: '42', data: { shiftsMin: 3, shiftsMax: 3 } });
+    assertWellFormed(calls);
+  });
+
+  it('takes the latest negotiation round that states one over the original request', async () => {
+    const { exec, calls } = fake([
+      [
+        /query/,
+        () => ({
+          ask: {
+            data: {
+              id: '42',
+              attributes: {
+                shiftsMin: 1,
+                shiftsMax: 2,
+                negopendmissions: {
+                  data: [
+                    { id: '3', attributes: { ordern: 3, shiftsMin: null, shiftsMax: null } },
+                    { id: '2', attributes: { ordern: 2, shiftsMin: 2, shiftsMax: 5 } }
+                  ]
+                }
+              }
+            }
+          }
+        })
+      ]
+    ]);
+    expect(await commitmentForAsk(exec, '42')).toEqual({ min: 2, max: 5 });
+    assertWellFormed(calls);
+  });
+
+  it('falls back to the request, and to nothing when neither says anything', async () => {
+    const reqOnly = fake([[/query/, () => ({ ask: { data: { id: '1', attributes: { shiftsMin: null, shiftsMax: 4, negopendmissions: { data: [] } } } } })]]);
+    expect(await commitmentForAsk(reqOnly.exec, '1')).toEqual({ min: null, max: 4 });
+    const none = fake([[/query/, () => ({ ask: { data: { id: '1', attributes: { negopendmissions: { data: [] } } } } })]]);
+    expect(await commitmentForAsk(none.exec, '1')).toBeNull();
+  });
+
+  it('activates the plan that waited on a proposal, on the mission it became', async () => {
+    const { exec, calls } = fake([[/shiftPlans\(filters: \{ pendm/, () => ({ shiftPlans: { data: [{ id: '7' }] } })]]);
+    expect(await activatePlanForPendm(exec, '55', '99')).toEqual(['7']);
+    const update = calls.find((c) => /updateShiftPlan/.test(c.query))!;
+    expect(update.variables).toEqual({ id: '7', data: { open_mission: '99', status: 'active' } });
     assertWellFormed(calls);
   });
 });

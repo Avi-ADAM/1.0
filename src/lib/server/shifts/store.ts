@@ -146,14 +146,113 @@ function planData(input: Partial<PlanInput>) {
   return data;
 }
 
-export async function createPlan(exec: ShiftExec, input: PlanInput): Promise<ShiftPlanView> {
+/**
+ * A plan proposed together with a mission that still awaits the rikma's vote
+ * is created `paused` and hung on the pendm; `activatePlanForPendm` links it to
+ * the OpenMission when the proposal matures. The staffing hours were part of
+ * what the rikma voted on, so they start only when the vote passes.
+ */
+export async function createPlan(
+  exec: ShiftExec,
+  input: PlanInput & { pendmId?: string | null; status?: 'active' | 'paused' }
+): Promise<ShiftPlanView> {
   const d = await run(
     exec,
     `mutation ($data: ShiftPlanInput!) { createShiftPlan(data: $data) { data { id attributes { ${PLAN_FIELDS} } } } }`,
     'createPlan',
-    { data: { ...planData(input), status: 'active', fairness: 'commitments', archived: false } }
+    {
+      data: {
+        ...planData(input),
+        ...(input.pendmId ? { pendm: input.pendmId } : {}),
+        status: input.status ?? 'active',
+        fairness: 'commitments',
+        archived: false
+      }
+    }
   );
   return toPlan(d?.createShiftPlan?.data);
+}
+
+/** The pendm matured into an OpenMission: its plan goes live on that mission. */
+export async function activatePlanForPendm(exec: ShiftExec, pendmId: string, openMissionId: string): Promise<string[]> {
+  const d = await run(
+    exec,
+    `query ($id: ID!) { shiftPlans(filters: { pendm: { id: { eq: $id } } }, pagination: { limit: 10 }) { data { id } } }`,
+    'activatePlanForPendm:find',
+    { id: pendmId }
+  );
+  const ids = nodes(d?.shiftPlans).map((n) => String(n?.id));
+  for (const id of ids) {
+    await run(
+      exec,
+      `mutation ($id: ID!, $data: ShiftPlanInput!) { updateShiftPlan(id: $id, data: $data) { data { id } } }`,
+      'activatePlanForPendm:update',
+      { id, data: { open_mission: openMissionId, status: 'active' } }
+    );
+  }
+  return ids;
+}
+
+// ── the shift commitment, a term of the assignment (§3.8) ────────────────────
+
+export interface CommitmentValue {
+  min: number | null;
+  max: number | null;
+}
+
+const cleanCommitment = (c: Partial<CommitmentValue>): CommitmentValue => {
+  const n = (v: unknown) => (v == null || v === '' || !Number.isFinite(Number(v)) ? null : Math.max(0, Math.floor(Number(v))));
+  const min = n(c.min);
+  let max = n(c.max);
+  // "At least 3, at most 2" is not a commitment anyone can keep; read it as 3–3.
+  if (min != null && max != null && max < min) max = min;
+  return { min, max };
+};
+
+/** What the candidate stated on their request (`Ask.shiftsMin/Max`). */
+export async function setAskCommitment(exec: ShiftExec, askId: string, c: Partial<CommitmentValue>): Promise<CommitmentValue> {
+  const v = cleanCommitment(c);
+  await run(
+    exec,
+    `mutation ($id: ID!, $data: AskInput!) { updateAsk(id: $id, data: $data) { data { id } } }`,
+    'setAskCommitment',
+    { id: askId, data: { shiftsMin: v.min, shiftsMax: v.max } }
+  );
+  return v;
+}
+
+/** The agreed commitment lands on the assignment itself (`Mesimabetahalich.shiftsMin/Max`). */
+export async function setMissionCommitment(exec: ShiftExec, mesimabetahalichId: string, c: Partial<CommitmentValue>): Promise<CommitmentValue> {
+  const v = cleanCommitment(c);
+  await run(
+    exec,
+    `mutation ($id: ID!, $data: MesimabetahalichInput!) { updateMesimabetahalich(id: $id, data: $data) { data { id } } }`,
+    'setMissionCommitment',
+    { id: mesimabetahalichId, data: { shiftsMin: v.min, shiftsMax: v.max } }
+  );
+  return v;
+}
+
+/**
+ * The commitment an acceptance agrees to: the latest negotiation round that
+ * states one wins over the original request, exactly like hours and rate.
+ */
+export async function commitmentForAsk(exec: ShiftExec, askId: string): Promise<CommitmentValue | null> {
+  const d = await run(
+    exec,
+    `query ($id: ID!) { ask(id: $id) { data { id attributes { shiftsMin shiftsMax
+      negopendmissions(sort: "ordern:desc", pagination: { limit: 20 }) { data { id attributes { ordern shiftsMin shiftsMax } } } } } } }`,
+    'commitmentForAsk',
+    { id: askId }
+  );
+  const a = d?.ask?.data?.attributes;
+  if (!a) return null;
+  const round = nodes(a.negopendmissions)
+    .map((n) => n?.attributes ?? {})
+    .find((r: any) => r.shiftsMin != null || r.shiftsMax != null);
+  const src = round ?? a;
+  if (src.shiftsMin == null && src.shiftsMax == null) return null;
+  return cleanCommitment({ min: src.shiftsMin, max: src.shiftsMax });
 }
 
 export async function updatePlan(

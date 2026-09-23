@@ -35,6 +35,10 @@ import { calcDeadlineMs, restimeLabel, voteUrl } from './actionUtils.js';
 import { createMissionConsentSpec } from '$lib/consent/specs/s2b';
 import { matchOpenMissionToUsers } from '$lib/server/matching/engine';
 import { normalizeNeed } from '$lib/missions/headcount.js';
+import { validatePattern } from '$lib/shifts/pattern.js';
+import { shiftsEnabled } from '$lib/server/shifts/mode.js';
+import { asUser as asShiftUser } from '$lib/server/shifts/exec.js';
+import { createPlan } from '$lib/server/shifts/store.js';
 
 interface ChecklistItem {
   shem: string;
@@ -95,11 +99,18 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
     stipendCostShare,
     stipendMode,
     stipendFunderId,
+    // "This mission needs to be staffed at these hours" (PLAN_SHIFTS §13.6):
+    // part of the proposal, so the rikma answers it in the same vote.
+    shiftPlan,
   } = params;
 
   const { userId } = context;
   const now = new Date();
   const nowISO = now.toISOString();
+
+  // Validated before anything is written: a bad pattern must not leave half a
+  // mission behind. Ignored entirely while SHIFTS=off.
+  const planToCreate = shiftsEnabled() && shiftPlan ? checkedShiftPlan(shiftPlan) : null;
 
   // 1. Fetch project to determine member count and restime
   const projRes = await strapi.execute(
@@ -201,6 +212,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
     // OpenMission is created archived and is never offered to anyone else, so
     // a multi-seat need only makes sense published open.
     howMeny: assignedUserId ? 1 : normalizeNeed(howMeny),
+    isshift: planToCreate != null,
     sqadualed: dateStart ?? null,
     dates: dateEnd ?? null,
     publicklinks: publicklinks ?? null,
@@ -394,6 +406,30 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
     await strapi.execute('4crtask', taskParams, context.jwt, context.fetch).catch(() => {});
   }
 
+  // 4b. The staffing plan. On a proposal (pendm) it waits, paused, for the vote
+  //     that approves the mission; on a published mission it starts now. A
+  //     self-assigned solo mission has no OpenMission to staff and gets none.
+  let shiftPlanId: string | null = null;
+  let shiftPlanError: string | null = null;
+  if (planToCreate && createdEntityId && (createdEntityType === 'pendm' || createdEntityType === 'openMission')) {
+    try {
+      const plan = await createPlan(asShiftUser(context), {
+        ...planToCreate,
+        projectId: String(projectId),
+        missionId: String(missionId),
+        name: planToCreate.name || String(missionName ?? ''),
+        ...(createdEntityType === 'pendm'
+          ? { pendmId: String(createdEntityId), status: 'paused' as const }
+          : { openMissionId: String(createdEntityId), status: 'active' as const })
+      });
+      shiftPlanId = plan.id;
+    } catch (e) {
+      // The mission stands; the plan can be added again. Say so rather than fail.
+      shiftPlanError = e instanceof Error ? e.message.slice(0, 300) : 'shift plan failed';
+      console.error('[createMission] shift plan not created:', e);
+    }
+  }
+
   // 5. Case-specific notifications (fire-and-forget — never block the response).
   //    Branch 1 (pendm): every member gets a deep link to the vote page plus an
   //    explanation that during the restime they may reshape the proposal.
@@ -551,10 +587,38 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
       createdEntityType,
       notificationKind,
       userCount,
+      shiftPlanId,
+      shiftPlanError,
     },
     updateStrategy: { type: 'none' },
   };
 };
+
+/**
+ * The plan as the client sent it, checked. Only the pattern and the timing
+ * fields are taken — nothing else a client adds can reach the collection.
+ */
+function checkedShiftPlan(raw: any) {
+  const pattern = raw?.pattern;
+  const issues = validatePattern(pattern);
+  if (!pattern || issues.length) {
+    throw new Error(`Invalid shift pattern: ${issues.map((i) => `${i.path}:${i.code}`).join(', ') || 'missing'}`);
+  }
+  if (!(pattern.days ?? []).some((d: any) => (d.windows ?? []).length)) {
+    throw new Error('Invalid shift pattern: no staffed window');
+  }
+  const int = (v: unknown, min: number) =>
+    v == null || v === '' || !Number.isFinite(Number(v)) ? null : Math.max(min, Math.floor(Number(v)));
+  return {
+    name: typeof raw.name === 'string' ? raw.name.slice(0, 200) : '',
+    pattern,
+    timezone: typeof raw.timezone === 'string' && raw.timezone ? raw.timezone : null,
+    cycleDays: int(raw.cycleDays, 1),
+    closeOffsetHours: int(raw.closeOffsetHours, 0),
+    draftWindowHours: int(raw.draftWindowHours, 0),
+    minRestHours: int(raw.minRestHours, 0)
+  };
+}
 
 export const createMissionConfig: ActionConfig = {
   key: 'createMission',
@@ -578,6 +642,7 @@ export const createMissionConfig: ActionConfig = {
     valph:              { type: 'number',  required: false, description: 'Value per hour' },
     iskvua:             { type: 'boolean', required: false, description: 'Is recurring mission' },
     howMeny:            { type: 'number',  required: false, description: 'How many people the mission needs (default 1). The OpenMission stays open, and other candidacies stay valid, until that many have joined — docs/PLAN_SHIFTS.md §2' },
+    shiftPlan:          { type: 'object',  required: false, description: 'Staffing plan { pattern, name?, timezone?, cycleDays?, closeOffsetHours?, draftWindowHours?, minRestHours? } — created with the mission; waits for the vote on a proposal. Ignored while SHIFTS=off — docs/PLAN_SHIFTS.md §13.6' },
     dateStart:          { type: 'string',  required: false, description: 'Start date ISO string' },
     dateEnd:            { type: 'string',  required: false, description: 'End date ISO string' },
     isOnline:           { type: 'boolean', required: false, description: 'Whether the mission can happen online' },

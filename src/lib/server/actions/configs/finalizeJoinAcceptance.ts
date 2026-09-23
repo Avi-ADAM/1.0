@@ -8,6 +8,9 @@ import { touchDormancy } from '$lib/server/archive/dormancyClock.js';
 import { execFromContext } from '$lib/server/archive/exec.js';
 import { carryStipendToMission } from '$lib/server/stipend/fromMission.js';
 import { acceptanceEffect } from '$lib/server/missions/headcountGate.js';
+import { shiftsEnabled } from '$lib/server/shifts/mode.js';
+import { asUser as asShiftUser } from '$lib/server/shifts/exec.js';
+import { commitmentForAsk, setMissionCommitment } from '$lib/server/shifts/store.js';
 import { gqlString } from './actionUtils.js';
 
 function formatVotesForInline(votes: any[]): string {
@@ -240,6 +243,19 @@ const finalizeJoinAcceptanceHandler: ActionExecutionHandler = async (params, con
   // the mission is never asked about, not a failed assignment.
   if (chiluzh) {
     await touchDormancy(execFromContext(context), String(chiluzh)).catch(() => null);
+  }
+
+  // The shift commitment agreed on this candidacy — the latest round that
+  // states one, else the request itself — lands on the assignment, like hours
+  // and rate (PLAN_SHIFTS §3.8). Best-effort; the acceptance stands either way.
+  if (chiluzh && shiftsEnabled()) {
+    try {
+      const exec = asShiftUser(context);
+      const commitment = await commitmentForAsk(exec, String(askId));
+      if (commitment) await setMissionCommitment(exec, String(chiluzh), commitment);
+    } catch (e) {
+      console.error('[finalizeJoinAcceptance] shift commitment not carried:', e);
+    }
   }
 
   // A mission that was proposed with a subsistence stipend attached carries it

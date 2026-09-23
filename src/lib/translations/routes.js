@@ -68,8 +68,11 @@ export const ROUTED = {
     // Archive/edit proposals surface as lev cards and on the rikma's object pages.
     archive: at('/lev', /\/moach\/[^/]+/),
     // Shifts (docs/PLAN_SHIFTS.md): the rikma's shifts tab and plan form under
-    // /moach, the member's own shifts under /me, and the heart's shift cards.
-    shifts: at('/lev', /\/moach\/[^/]+/, '/me'),
+    // /moach, the member's own shifts under /me, the heart's shift cards, and
+    // the shift commitment a candidate states on a public mission page. The
+    // last two carry the mission form in spec/publish mode, where the plan
+    // editor stays hidden — the gate still has to match the import graph.
+    shifts: at('/lev', /\/moach\/[^/]+/, '/me', '/availableMission', '/concierge', '/onboard'),
     // The resource booking calendar: the holder's own page under /me, the
     // rikma's copy under /moach, the date-overlap line on lev's resource
     // suggestion cards — and the onboarding resources step, which reads the

@@ -64,6 +64,9 @@ export function roundFragment(round: StandingRound, proposedBy: string, zman: st
     numField('hoursToCredit', round.hoursToCredit),
     round.transferToId ? strField('transferTo', round.transferToId) : null,
     dateField('effectiveFrom', round.effectiveFrom),
+    numField('shiftsMin', round.shiftsMin),
+    numField('shiftsMax', round.shiftsMax),
+    numField('howMany', round.howMany),
   )} }`;
 }
 

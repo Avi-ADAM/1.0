@@ -4,6 +4,21 @@ import { touchDormancy } from '$lib/server/archive/dormancyClock.js';
 import { execFromContext } from '$lib/server/archive/exec.js';
 import { carryStipendToMission } from '$lib/server/stipend/fromMission.js';
 import { gqlString } from './actionUtils.js';
+import { shiftsEnabled } from '$lib/server/shifts/mode.js';
+import { asUser as asShiftUser } from '$lib/server/shifts/exec.js';
+import { setAskCommitment, setMissionCommitment } from '$lib/server/shifts/store.js';
+
+/**
+ * "I can do only 2 shifts a week" / "I want up to 7" (PLAN_SHIFTS §3.8): a
+ * term the candidate states with the request, like hours and rate. Null when
+ * the candidate said nothing, or while SHIFTS=off.
+ */
+function statedCommitment(params: Record<string, any>) {
+  if (!shiftsEnabled()) return null;
+  const has = (v: unknown) => v != null && v !== '';
+  if (!has(params.shiftsMin) && !has(params.shiftsMax)) return null;
+  return { min: has(params.shiftsMin) ? Number(params.shiftsMin) : null, max: has(params.shiftsMax) ? Number(params.shiftsMax) : null };
+}
 
 const applyToMissionHandler: ActionExecutionHandler = async (params, context, { strapi, notifier }) => {
   const { openMissionId, projectId } = params;
@@ -273,6 +288,14 @@ const applyToMissionHandler: ActionExecutionHandler = async (params, context, { 
     }
     if (!chiluzh) throw new Error('Failed to create Mesimabetahalich (solo path)');
 
+    // Solo: nobody else to agree with, so the stated commitment is the agreed one.
+    const soloCommitment = statedCommitment(params);
+    if (soloCommitment) {
+      await setMissionCommitment(asShiftUser(context), String(chiluzh), soloCommitment).catch((e) =>
+        console.error('[applyToMission] shift commitment not saved:', e)
+      );
+    }
+
   // A mission that was proposed with a subsistence stipend attached carries it
   // to whoever takes it (PLAN_STIPEND §13): the terms move onto the mission in
   // progress, and when a funder was already named the bilateral pledge opens
@@ -398,6 +421,14 @@ const applyToMissionHandler: ActionExecutionHandler = async (params, context, { 
   const askId = askRes?.data?.createAsk?.data?.id;
   if (!askId) throw new Error('Failed to create Ask');
 
+  // Stated on the request; the acceptance copies it onto the assignment.
+  const commitment = statedCommitment(params);
+  if (commitment) {
+    await setAskCommitment(asShiftUser(context), String(askId), commitment).catch((e) =>
+      console.error('[applyToMission] shift commitment not saved:', e)
+    );
+  }
+
   // Create Timegrama deadline ONLY when the applicant is a rikma member (Path C:
   // their own favorable vote already exists, so the auto-approval clock can run).
   // For an external candidate (Path A) the timegrama is deferred until a member
@@ -437,6 +468,9 @@ export const applyToMissionConfig: ActionConfig = {
     // projectId is optional: concierge open missions (source='concierge') have no
     // project — the action detects this and routes to the ratsonProposal flow instead.
     projectId: { type: 'string', required: false },
+    // Shift commitment per cycle, for a mission staffed in shifts (PLAN_SHIFTS §3.8).
+    shiftsMin: { type: 'number', required: false },
+    shiftsMax: { type: 'number', required: false },
   },
 
   authRules: [{ type: 'jwt' }],

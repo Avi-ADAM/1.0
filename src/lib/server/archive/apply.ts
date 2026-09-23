@@ -24,6 +24,7 @@ import {
   type Exec,
 } from './gql.js';
 import { TARGET_META, type ArchiveTarget, type Lifecycle, type TargetKind } from './targets.js';
+import { computeHeadcount } from '$lib/missions/headcount.js';
 import { assessMembership, endMembership } from './membership.js';
 import { flushHoursBeforeRateChange, type FlushResult } from '../timers/flushRateChange.js';
 import { pickRateRow, rowRate } from '$lib/timers/rate.js';
@@ -55,6 +56,15 @@ export interface StandingRound {
   hoursToCredit?: number | null;
   transferToId?: string | null;
   effectiveFrom?: string | null;
+  /**
+   * Shift terms (docs/PLAN_SHIFTS.md §3.8, §13.6). The commitment is a term
+   * of a mission in progress, the headcount a term of an open mission — and
+   * both change the way hours and rate do: by this vote. Only ever set while
+   * SHIFTS is on, i.e. after the schema that holds them is deployed.
+   */
+  shiftsMin?: number | null;
+  shiftsMax?: number | null;
+  howMany?: number | null;
 }
 
 export interface ApplyResult {
@@ -121,6 +131,7 @@ function editFragment(kind: TargetKind, round: StandingRound): string {
         numField('perhour', round.price),
         dateField('sqadualed', round.sqadualed),
         dateField('dates', round.sqadualedf),
+        numField('howMeny', round.howMany),
       );
     case 'missionInProgress':
       return fields(
@@ -130,6 +141,8 @@ function editFragment(kind: TargetKind, round: StandingRound): string {
         numField('perhour', round.price),
         dateField('start', round.sqadualed),
         dateField('dates', round.sqadualedf),
+        numField('shiftsMin', round.shiftsMin),
+        numField('shiftsMax', round.shiftsMax),
       );
     case 'openResource':
       return fields(
@@ -287,6 +300,19 @@ async function closeOpenOffers(exec: Exec, target: ArchiveTarget): Promise<strin
   return closed;
 }
 
+/** Re-open an archived open mission whose (new) headcount has seats left. */
+async function reopenIfSeatsFree(exec: Exec, openMissionId: string): Promise<void> {
+  const data = await run(
+    exec,
+    `{ openMission(id: ${gqlStr(openMissionId)}) { data { id attributes { howMeny archived
+      mesimabetahaliches { data { id attributes { lifecycle finnished } } } } } } }`,
+    'keep:headcount',
+  );
+  const a = data?.openMission?.data?.attributes;
+  if (!a?.archived) return;
+  if (computeHeadcount(a).remaining > 0) await reopenOpenMission(exec, openMissionId);
+}
+
 /**
  * Put the need back on the table: the assignment ends, the open mission it
  * came from returns to the pool. Only the *commitment* is withdrawn here —
@@ -432,6 +458,13 @@ export async function applyObjectChange(
       `mutation { ${TARGET_META[target.kind].mutation}(id: ${gqlStr(target.id)}, data: { ${data} }) { data { id } } }`,
       `keep:${target.kind}`,
     );
+
+    // More seats than people now: the mission goes back on the open board
+    // (PLAN_SHIFTS §2). Fewer seats than people removes nobody — over-filling
+    // is a state the card reports, never a reason to drop someone.
+    if (target.kind === 'openMission' && round.howMany != null) {
+      await reopenIfSeatsFree(exec, target.id);
+    }
 
     // The rikma agreed among itself; the people who applied did not. Hand each
     // of them the new terms as a counter round so their earlier yes — and their

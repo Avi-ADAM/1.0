@@ -350,3 +350,53 @@ describe('buildTermRows — what the vote is actually about', () => {
     expect(standingChanges(undefined)).toEqual([]);
   });
 });
+
+describe('buildTermRows — shift terms (PLAN_SHIFTS §3.8, §13.6)', () => {
+  it('shows a new shift commitment beside the agreed one, like hours and rate', () => {
+    const view = buildArchiveDecisionView(
+      node({
+        kind: 'editObject',
+        archMesimabetahalich: {
+          data: { id: '10', attributes: { name: 'משמרת ערב', hoursassinged: 10, perhour: 50, shiftsMin: 2, shiftsMax: 3 } },
+        },
+        negoarch: [{ ordern: 1, mode: 'keep', shiftsMax: 5 }],
+      }),
+      MEMBERS,
+      '1',
+    )!;
+    const rows = buildTermRows(view);
+    const max = rows.find((r) => r.field === 'shiftsMax')!;
+    expect(max).toMatchObject({ from: 3, to: 5, changed: true, delta: 2, isNumeric: true });
+    // Untouched: the minimum is shown as it stands, not as a change to nothing.
+    expect(rows.find((r) => r.field === 'shiftsMin')).toMatchObject({ from: 2, changed: false });
+  });
+
+  it('shows a new headcount for an open mission', () => {
+    const view = buildArchiveDecisionView(
+      node({
+        kind: 'editObject',
+        targetKind: 'openMission',
+        archMesimabetahalich: { data: null },
+        archOpenMission: { data: { id: '20', attributes: { name: 'קבלה', noofhours: 8, perhour: 40, howMeny: '2' } } },
+        negoarch: [{ ordern: 1, mode: 'keep', howMany: 4 }],
+      }),
+      MEMBERS,
+      '1',
+    )!;
+    const row = buildTermRows(view).find((r) => r.field === 'howMany')!;
+    expect(row).toMatchObject({ from: 2, to: 4, changed: true, delta: 2 });
+  });
+
+  it('carries shift terms into the counter defaults', () => {
+    const view = buildArchiveDecisionView(
+      node({
+        kind: 'editObject',
+        archMesimabetahalich: { data: { id: '10', attributes: { name: 'x', shiftsMin: 1, shiftsMax: 2 } } },
+        negoarch: [{ ordern: 1, mode: 'keep', shiftsMax: 4 }],
+      }),
+      MEMBERS,
+      '1',
+    )!;
+    expect(counterDefaults(view)).toMatchObject({ shiftsMin: 1, shiftsMax: 4 });
+  });
+});

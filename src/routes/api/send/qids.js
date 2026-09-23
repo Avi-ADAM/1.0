@@ -1899,6 +1899,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
           # (PLAN_SHIFTS §2.6). Seat state only — no user relation, because
           # a guest reads this page with the service token.
           howMeny
+          isshift
           mesimabetahaliches { data { id attributes { lifecycle finnished } } }
         }
       }
@@ -3023,6 +3024,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
         id
         attributes {
           name descrip hearotMeyuchadot noofhours perhour iskvua privatlinks publicklinks sqadualed dates
+          howMeny isshift
           stipendRate stipendCostShare stipendMode
           stipendFunder { data { id } }
           rishon { data { id } }
@@ -8533,6 +8535,7 @@ ${STIPEND_DECISION_FIELDS}
     $perhour: Float
     $iskvua: Boolean
     $howMeny: Long
+    $isshift: Boolean
     $sqadualed: DateTime
     $dates: DateTime
     $publicklinks: String
@@ -8559,6 +8562,7 @@ ${STIPEND_DECISION_FIELDS}
       perhour: $perhour
       iskvua: $iskvua
       howMeny: $howMeny
+      isshift: $isshift
       sqadualed: $sqadualed
       dates: $dates
       publicklinks: $publicklinks
@@ -8589,6 +8593,7 @@ ${STIPEND_DECISION_FIELDS}
     $perhour: Float
     $iskvua: Boolean
     $howMeny: Long
+    $isshift: Boolean
     $sqadualed: DateTime
     $dates: DateTime
     $publicklinks: String
@@ -8617,6 +8622,7 @@ ${STIPEND_DECISION_FIELDS}
       perhour: $perhour
       iskvua: $iskvua
       howMeny: $howMeny
+      isshift: $isshift
       sqadualed: $sqadualed
       dates: $dates
       publicklinks: $publicklinks

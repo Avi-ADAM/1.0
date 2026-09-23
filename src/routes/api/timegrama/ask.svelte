@@ -3,6 +3,10 @@
   // Server-only secret — this module is imported only by timegrama/+server.js.
   import { ADMINMONTHER } from '$env/static/private';
   import { computeNegoGate, normId } from '$lib/server/nego/negoGate';
+  import { acceptanceEffectAsAdmin } from '$lib/server/missions/headcountGate';
+  import { shiftsEnabled } from '$lib/server/shifts/mode.js';
+  import { asService } from '$lib/server/shifts/exec.js';
+  import { commitmentForAsk, setMissionCommitment } from '$lib/server/shifts/store.js';
 
   export async function Ask(id, taid, fetch) {
     console.log(id, taid, 'ask compo started');
@@ -147,6 +151,10 @@
           ){data{attributes {user_1s{data {id attributes{ email lang}}}}}}`;
       }
 
+      // A mission for several people stays open — and the other candidacies
+      // stay valid — until its last seat is taken (PLAN_SHIFTS §2). The two
+      // action finalizers learned this in P1; silence approves candidacies too.
+      const headcount = await acceptanceEffectAsAdmin((q) => SendToAdmin(q, ADMINMONTHER), omId);
       let qub = `mutation
                 {
                   createMesimabetahalich(
@@ -172,7 +180,7 @@
                   ${adduser}
 updateOpenMission(
   id: "${omId}"
-  data: {archived: true}
+  data: {archived: ${headcount.archiveOpenMission}}
 ) {data{id attributes{ archived asks{data{id}}}}}
 
  updateAsk(
@@ -194,6 +202,18 @@ updateOpenMission(
         return;
       }
       let chiluzh = res3.data.createMesimabetahalich.data.id;
+
+      // The shift commitment agreed on this candidacy moves onto the
+      // assignment, like hours and rate (PLAN_SHIFTS §3.8).
+      if (shiftsEnabled()) {
+        try {
+          const exec = asService(fetch);
+          const commitment = await commitmentForAsk(exec, String(id));
+          if (commitment) await setMissionCommitment(exec, String(chiluzh), commitment);
+        } catch (e) {
+          console.error('ask finalizer: shift commitment not carried', e);
+        }
+      }
 
       // Recurring mission → spin up its Monter.
       if (om.iskvua == true) {
@@ -265,7 +285,7 @@ updateOpenMission(
 
       // Archive the other (losing) candidates' asks on this mission.
       const otherasks = res3.data.updateOpenMission.data.attributes.asks.data;
-      if (otherasks.length > 1) {
+      if (headcount.archiveSiblingAsks && otherasks.length > 1) {
         for (let i = 0; i < otherasks.length; i++) {
           if (String(otherasks[i].id) === String(id)) continue;
           let nextquery = `mutation {

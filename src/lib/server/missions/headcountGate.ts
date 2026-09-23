@@ -43,6 +43,32 @@ interface ContextLike {
 }
 
 /**
+ * The same decision for the timegrama's silence path (`timegrama/ask.svelte`),
+ * which runs with no user and speaks raw GraphQL through `SendToAdmin`.
+ * The query mirrors qid `327getOpenMissionHeadcount`.
+ */
+export async function acceptanceEffectAsAdmin(
+  send: (query: string) => Promise<any>,
+  openMissionId: string | number
+): Promise<AcceptanceDecision> {
+  if (!headcountEnabled()) {
+    return { ...effectOfAcceptance(null, { enabled: false }), degraded: true };
+  }
+  try {
+    const res = await send(`{ openMission(id: ${JSON.stringify(String(openMissionId))}) { data { id attributes {
+      howMeny archived
+      mesimabetahaliches { data { id attributes { lifecycle finnished } } }
+      asks { data { id attributes { archived } } } } } } }`);
+    const attributes = res?.data?.openMission?.data?.attributes;
+    if (!attributes) throw new Error('open mission not found');
+    return { ...effectOfAcceptance(attributes), degraded: false };
+  } catch (e) {
+    console.error(`[headcount] could not read occupancy of open mission ${openMissionId} (admin) — archiving:`, e);
+    return { ...effectOfAcceptance(null, { enabled: false }), degraded: true };
+  }
+}
+
+/**
  * What this acceptance does to the OpenMission.
  *
  * On a failed read we fall back to archiving — today's behaviour — rather than

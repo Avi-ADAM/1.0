@@ -37,6 +37,11 @@ export interface ArchVersion {
   kindOf: string | null;
   sqadualed: string | null;
   sqadualedf: string | null;
+  /** Shift terms (PLAN_SHIFTS §3.8, §13.6): the headcount of an open mission… */
+  howMany: number | null;
+  /** …and the per-cycle shift commitment of a mission in progress. */
+  shiftsMin: number | null;
+  shiftsMax: number | null;
 }
 
 /** The fields a round can move, in the order the card lists them. */
@@ -44,6 +49,9 @@ export const TERM_FIELDS = [
   'name',
   'hm',
   'price',
+  'howMany',
+  'shiftsMin',
+  'shiftsMax',
   'sqadualed',
   'sqadualedf',
   'kindOf',
@@ -52,7 +60,7 @@ export const TERM_FIELDS = [
 
 export type ArchTermField = (typeof TERM_FIELDS)[number];
 
-const NUMERIC_FIELDS: readonly ArchTermField[] = ['hm', 'price'];
+const NUMERIC_FIELDS: readonly ArchTermField[] = ['hm', 'price', 'howMany', 'shiftsMin', 'shiftsMax'];
 const DATE_FIELDS: readonly ArchTermField[] = ['sqadualed', 'sqadualedf'];
 
 /**
@@ -141,6 +149,9 @@ function roundOf(raw: any): ArchRoundView {
     kindOf: raw?.kindOf ?? null,
     sqadualed: raw?.sqadualed ?? null,
     sqadualedf: raw?.sqadualedf ?? null,
+    howMany: num(raw?.howMany),
+    shiftsMin: num(raw?.shiftsMin),
+    shiftsMax: num(raw?.shiftsMax),
     hoursOutcome: (raw?.hoursOutcome ?? null) as ArchHoursOutcome | null,
     hoursToCredit: num(raw?.hoursToCredit),
     transferToName: raw?.transferTo?.data?.attributes?.name ?? null,
@@ -237,6 +248,9 @@ export function counterDefaults(view: ArchiveDecisionView, target: Partial<ArchV
     kindOf: s.kindOf ?? target.kindOf ?? c.kindOf ?? null,
     sqadualed: s.sqadualed ?? target.sqadualed ?? c.sqadualed ?? null,
     sqadualedf: s.sqadualedf ?? target.sqadualedf ?? c.sqadualedf ?? null,
+    howMany: s.howMany ?? target.howMany ?? c.howMany ?? null,
+    shiftsMin: s.shiftsMin ?? target.shiftsMin ?? c.shiftsMin ?? null,
+    shiftsMax: s.shiftsMax ?? target.shiftsMax ?? c.shiftsMax ?? null,
   };
 }
 
@@ -260,6 +274,10 @@ function currentOf(kind: ArchTargetKind, ta: any): ArchVersion {
         kindOf: null,
         sqadualed: ta?.sqadualed ?? null,
         sqadualedf: ta?.dates ?? null,
+        // Unset headcount means one person — the same rule the finalizers use.
+        howMany: ta?.howMeny == null ? null : num(ta.howMeny),
+        shiftsMin: null,
+        shiftsMax: null,
       };
     case 'missionInProgress':
       return {
@@ -270,6 +288,9 @@ function currentOf(kind: ArchTargetKind, ta: any): ArchVersion {
         kindOf: null,
         sqadualed: ta?.start ?? null,
         sqadualedf: ta?.dates ?? null,
+        howMany: null,
+        shiftsMin: num(ta?.shiftsMin),
+        shiftsMax: num(ta?.shiftsMax),
       };
     case 'openResource':
       return {
@@ -280,6 +301,9 @@ function currentOf(kind: ArchTargetKind, ta: any): ArchVersion {
         kindOf: ta?.kindOf ?? null,
         sqadualed: ta?.sqadualed ?? null,
         sqadualedf: ta?.sqadualedf ?? null,
+        howMany: null,
+        shiftsMin: null,
+        shiftsMax: null,
       };
     case 'resourceInProgress':
       return {
@@ -290,6 +314,9 @@ function currentOf(kind: ArchTargetKind, ta: any): ArchVersion {
         kindOf: ta?.kindOf ?? null,
         sqadualed: ta?.start ?? null,
         sqadualedf: ta?.end ?? null,
+        howMany: null,
+        shiftsMin: null,
+        shiftsMax: null,
       };
     case 'matanot':
       // `desc` is a JSON field on matanot; only a plain string is comparable.
@@ -301,6 +328,9 @@ function currentOf(kind: ArchTargetKind, ta: any): ArchVersion {
         kindOf: ta?.kindOf ?? null,
         sqadualed: ta?.startDate ?? null,
         sqadualedf: ta?.finnishDate ?? null,
+        howMany: null,
+        shiftsMin: null,
+        shiftsMax: null,
       };
   }
 }
