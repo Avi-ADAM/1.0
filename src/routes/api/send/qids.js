@@ -8095,12 +8095,14 @@ ${STIPEND_DECISION_FIELDS}
           lat
           lng
           radius
+          location { lat lng radius location_mode }
           categories { data { id attributes { name } } }
           projectcreates {
             data {
               id
               attributes {
                 projectName
+                location { lat lng radius location_mode }
                 vallues { data { id attributes { valueName } } }
               }
             }

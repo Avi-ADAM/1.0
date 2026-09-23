@@ -71,6 +71,32 @@ function proximityScore(
   return Math.max(0, 1 - dist / (radius * 2));
 }
 
+const num = (v: unknown): number | null => {
+  if (v === null || v === undefined || v === '') return null;
+  const n = typeof v === 'number' ? v : parseFloat(String(v));
+  return Number.isFinite(n) ? n : null;
+};
+
+/**
+ * Where a product is. Every current product flow (ComposeProduct,
+ * createPersonalMatanot) writes the `location` component, and only older rows
+ * carry the flat lat/lng — so read the component first, then the flat pair,
+ * then the hosting rikma's location (PLAN_LOCATION_MAPS §6 fallback chain).
+ */
+export function matanotPoint(a: any): { lat: number; lng: number } | null {
+  const candidates = [
+    a?.location,
+    { lat: a?.lat, lng: a?.lng },
+    a?.projectcreates?.data?.[0]?.attributes?.location
+  ];
+  for (const c of candidates) {
+    const lat = num(c?.lat);
+    const lng = num(c?.lng);
+    if (lat !== null && lng !== null) return { lat, lng };
+  }
+  return null;
+}
+
 type CandidateMatanot = {
   id: string;
   name: string;
@@ -141,14 +167,15 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
     candidates = nodes.map((n: any) => {
       const a = n.attributes ?? {};
       const proj = a.projectcreates?.data?.[0];
+      const point = matanotPoint(a);
       return {
         id: String(n.id),
         name: a.name ?? '',
         sub_category: a.sub_category ?? null,
         price: typeof a.price === 'number' ? a.price : null,
         estimatedPrice: typeof a.estimatedPrice === 'number' ? a.estimatedPrice : null,
-        lat: typeof a.lat === 'number' ? a.lat : null,
-        lng: typeof a.lng === 'number' ? a.lng : null,
+        lat: point?.lat ?? null,
+        lng: point?.lng ?? null,
         categories: (a.categories?.data ?? []).map((c: any) => String(c.id)),
         projectId: proj?.id ? String(proj.id) : null,
         projectVallues: (proj?.attributes?.vallues?.data ?? []).map((v: any) => String(v.id))

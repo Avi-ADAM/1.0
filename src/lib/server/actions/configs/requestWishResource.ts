@@ -223,7 +223,9 @@ export const requestWishResourceConfig: ActionConfig = {
         ar: 'أعدّ أحدهم عرض مورد جاهزًا لك. افتح Deals للموافقة.'
       }
     },
-    channels: ['socket', 'push'],
+    // A direct request to one provider — same channels as requestSuggestion.
+    channels: ['socket', 'email', 'telegram', 'push'],
+    emailTemplate: 'SimpleNuti',
     metadata: { priority: 'high', type: 'ratsonProposal', url: '/deals' }
   },
   updateStrategy: { type: 'none' }

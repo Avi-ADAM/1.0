@@ -186,6 +186,30 @@ describe('TelegramService', () => {
       expect(call.urladd).toBe('lev/project/123/task/456');
     });
 
+    it('should strip a leading slash from the metadata URL', async () => {
+      const recipients: UserProfile[] = [
+        {
+          id: '1',
+          username: 'user',
+          email: 'user@example.com',
+          lang: 'he',
+          telegramId: '123456789',
+          machshirs: []
+        }
+      ];
+
+      const notification: NotificationData = {
+        title: { he: 'כותרת', en: 'Title' },
+        body: { he: 'תוכן', en: 'Content' },
+        metadata: { url: '/deals' }
+      };
+
+      await telegramService.sendBulk(recipients, notification, mockContext);
+
+      const call = JSON.parse(mockFetch.mock.calls[0][1].body);
+      expect(call.urladd).toBe('deals');
+    });
+
     it('should use default URL when metadata URL is not provided', async () => {
       const recipients: UserProfile[] = [
         {

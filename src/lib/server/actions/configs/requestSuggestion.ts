@@ -291,13 +291,18 @@ export const requestSuggestionConfig: ActionConfig = {
         ar: 'طلب جديد من أمنية'
       },
       body: {
-        he: 'נשלחה פנייה אליך דרך משאלה בקונסיירז׳. יש להיכנס ל־Lev כדי להגיב.',
-        en: 'Someone reached out to you through a concierge wish. Open Lev to respond.',
-        ar: 'تواصل معك أحدهم عبر أمنية. افتح Lev للرد.'
+        he: 'נשלחה פנייה אליך דרך משאלה בקונסיירז׳. יש להיכנס ל־Deals כדי להגיב.',
+        en: 'Someone reached out to you through a concierge wish. Open Deals to respond.',
+        ar: 'تواصل معك أحدهم عبر أمنية. افتح Deals للرد.'
       }
     },
-    channels: ['socket', 'push'],
-    metadata: { priority: 'high', type: 'ratsonProposal', url: '/lev' }
+    // A customer asking a provider directly is the same event as a product
+    // request from /gift (createSheirutpend), so it reaches the same channels.
+    // Both tracks land on /deals: Track A as a pending request, Track B under
+    // "wishes for you" — Lev shows neither to the provider.
+    channels: ['socket', 'email', 'telegram', 'push'],
+    emailTemplate: 'SimpleNuti',
+    metadata: { priority: 'high', type: 'ratsonProposal', url: '/deals' }
   },
   updateStrategy: { type: 'none' }
 };

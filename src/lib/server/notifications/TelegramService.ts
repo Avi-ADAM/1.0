@@ -78,7 +78,9 @@ export class TelegramService {
         chat_id: user.telegramId,
         det: title,
         message: body,
-        urladd: notification.metadata?.url || 'lev'
+        // /api/ste appends this to 'https://www.1lev1.com/', so a config url
+        // written as a route ('/deals') would become '//deals'.
+        urladd: String(notification.metadata?.url || 'lev').replace(/^\/+/, '') || 'lev'
       };
 
       // Send via existing Telegram API
