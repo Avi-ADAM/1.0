@@ -951,7 +951,8 @@ draftRoster({ shifts, candidates, commitments, availabilities, quotas, carryOver
       רק את השתיקה; `/me/shifts` חוצה־רקמות. פירוט ב‑§13.11.
 - [x] **P11 — i18n מלא.** שגיאות מקודדות (`errors.ts`), 221 מפתחות ×5, `sidur.svelte`
       נמחק. `@event-calendar/interaction` **נשאר** — `ResourceCalendar` משתמש בו. פירוט ב‑§13.12.
-- [ ] **P12 — הפעלה.** `SHIFTS=on` ברקמת פיילוט אחת, מחזור אחד, סקירה.
+- [ ] **P12 — הפעלה.** `SHIFTS=on` ברקמת פיילוט אחת, מחזור אחד, סקירה. **ספר ההרצה
+      כתוב (§13.13); הביצוע דורש deploy של 1.0b ושל 1.0main — בידיים שלך.**
 
 ### 13.1 P1 — מה נעשה בפועל
 
@@ -1561,6 +1562,78 @@ Strapi first").
 
 **טסטים:** `errors.test.ts` 3 — המיפוי, קיום מילים לכל קוד ב‑`he`, והנפילה
 לחלופה.
+
+### 13.13 P12 — הפעלה: ספר ההרצה
+
+**P12 הוא פריסה, ולכן לא בוצע בקוד.** זה הסדר המחייב. כל שלב הפיך עד שלב 6.
+
+**1. 1.0b (ענף `shabab`) — commit ו‑deploy.** כל הסכימה עדיין לא ב‑commit:
+
+| שלב | מה |
+|---|---|
+| P2 | חמש הקולקציות; `Project.shiftCycleDays/shiftCloseOffsetHours/shiftDraftWindowHours`; `shiftsMin/Max` על `ask`, `negopendmission`, `mesimabetahalich`, `negoarch`; `timegrama.roster_period` |
+| P6 | `shift-plan.pendm`; `negoarch.howMany/shiftPattern` |
+| P8 | `Decision.kind` ‏`shiftSwap` + שדות `swap*` |
+| P10 | `mesimabetahalich.shiftRules/shiftRulesAt` |
+
+כל אלה נבדקו ב‑register של Strapi בלי DB. אין להריץ את 1.0b מקומית.
+
+**2. הרשאות Strapi — שני מקומות לכל קולקציה חדשה** (`project_strapi_new_collection_permissions`):
+
+- **Authenticated role וגם API token**, על `shift-plan`, `shift`,
+  `shift-availability`, `roster-period`, `shift-assignment`:
+  - הפעולות: `find`, `findOne`, `create`, `update`.
+  - **בלי `delete`** — שום דבר במערכת לא מוחק שורה. שחרור ושינוי נשמרים
+    כהיסטוריה.
+- **לוודא שקיימות כבר:**
+  - `decision`: create / update / find.
+  - `mesimabetahalich`: update — נדרש ל‑`setShiftRules`.
+  - `timer`: create — נדרש ל‑`logShiftHours`.
+  - `users-permissions.user`: find — שמות בצד השני של החלפה.
+
+**3. 1.0main — deploy עד 166.11.** מ‑166.6 ואילך אי אפשר לפרוס לפני שלב 1
+(§13.7): GraphQL דוחה שדה לא קיים ומפיל את דף הלב לכולם.
+
+**4. משתני סביבה:**
+
+- **`CRON_SECRET` — חובה.** בלעדיו `/api/cron/shifts` פתוח לכל מי שמכיר את
+  הכתובת.
+- **`SHIFTS=shadow`:**
+  - חברים מצהירים, והמנוע מחשב טיוטה ושומר אותה על ה‑`roster-period` בלבד.
+  - לא נכתב שום שיבוץ, ואין כרטיסי טיוטה, חור, החלפה או שעות.
+- **`MISSION_HEADCOUNT`** — משאירים ריק (פעיל). `off` מחזיר את התנהגות המשימה
+  הישנה אחד לאחד.
+
+**5. cron — כל שעה:** `GET /api/cron/shifts?key=<CRON_SECRET>`.
+
+- פתיחת מחזורים, טיוטה, סגירה, גיוס בשתיקה (§13.8), הבשלת החלפות (§13.9).
+- `?plan=<id>` מריץ תכנית אחת, ו‑`&rebuild=1` בונה מחדש את מאזן ההוגנות שלה.
+
+**6. פיילוט — רקמה אחת, מחזור אחד ב‑shadow:**
+
+1. יוצרים משימה עם תכנית איוש בטופס החדש.
+2. החברים מצהירים (ואפשר גם כללי קבע).
+3. אחרי `draftAt`, לשונית "הוגנות" מציגה את הסידור שהיה נוצר, תחת באנר shadow.
+4. **לבדוק:**
+   - אף אחד לא שובץ במשמרת שלא הצהיר עליה, ואף אחד לא מעל ה‑`shiftsMax` שלו/ה.
+   - לכל מקום יש סיבה.
+   - החורים הגיוניים.
+   - אותו אדם לא תמיד מספר 1.
+
+**7. `SHIFTS=on` באותה רקמה, למחזור אחד. לבדוק בסוף המחזור:**
+
+- טיוטה פורסמה, ונשלחו כרטיסים.
+- שחרור מקדם את הבא/ה בתור.
+- חור נסגר ב"אני אקח", או שהמשימה נפתחה למועמד נוסף.
+- החלפה אחת לפחות עברה מקצה לקצה.
+- השעות נרשמו דרך הטיימר או דרך `shiftLog`, ועברו `finiapruval`.
+- המאזן (`balanceCache`) זז.
+
+**8. חזרה אחורה בכל שלב: `SHIFTS=off`.**
+
+- כל הקריאות והכרטיסים נכבים, וה‑cron לא נוגע בכלום.
+- הנתונים נשארים, והמשימות עובדות כמו לפני המערכת.
+- ה‑timegrama של `roster_period` ממתין ולא נסגר (§13.5).
 
 ---
 
