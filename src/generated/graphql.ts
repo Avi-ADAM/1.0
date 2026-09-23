@@ -441,6 +441,8 @@ export type Ask = {
   partofs?: Maybe<PartofRelationResponseCollection>;
   project?: Maybe<ProjectEntityResponse>;
   publishedAt?: Maybe<Scalars['DateTime']['output']>;
+  shiftsMax?: Maybe<Scalars['Int']['output']>;
+  shiftsMin?: Maybe<Scalars['Int']['output']>;
   timegrama?: Maybe<TimegramaEntityResponse>;
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
   users_permissions_user?: Maybe<UsersPermissionsUserEntityResponse>;
@@ -515,6 +517,8 @@ export type AskFiltersInput = {
   partofs?: InputMaybe<PartofFiltersInput>;
   project?: InputMaybe<ProjectFiltersInput>;
   publishedAt?: InputMaybe<DateTimeFilterInput>;
+  shiftsMax?: InputMaybe<IntFilterInput>;
+  shiftsMin?: InputMaybe<IntFilterInput>;
   timegrama?: InputMaybe<TimegramaFiltersInput>;
   updatedAt?: InputMaybe<DateTimeFilterInput>;
   users_permissions_user?: InputMaybe<UsersPermissionsUserFiltersInput>;
@@ -530,6 +534,8 @@ export type AskInput = {
   partofs?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   project?: InputMaybe<Scalars['ID']['input']>;
   publishedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  shiftsMax?: InputMaybe<Scalars['Int']['input']>;
+  shiftsMin?: InputMaybe<Scalars['Int']['input']>;
   timegrama?: InputMaybe<Scalars['ID']['input']>;
   users_permissions_user?: InputMaybe<Scalars['ID']['input']>;
   vots?: InputMaybe<Array<InputMaybe<ComponentProjectsVotsInput>>>;
@@ -1095,6 +1101,7 @@ export type ComponentDesisionNegoarch = {
   hm?: Maybe<Scalars['Float']['output']>;
   hoursOutcome?: Maybe<Enum_Componentdesisionnegoarch_Hoursoutcome>;
   hoursToCredit?: Maybe<Scalars['Float']['output']>;
+  howMany?: Maybe<Scalars['Int']['output']>;
   id: Scalars['ID']['output'];
   kindOf?: Maybe<Enum_Componentdesisionnegoarch_Kindof>;
   mode?: Maybe<Enum_Componentdesisionnegoarch_Mode>;
@@ -1102,6 +1109,9 @@ export type ComponentDesisionNegoarch = {
   ordern?: Maybe<Scalars['Int']['output']>;
   price?: Maybe<Scalars['Float']['output']>;
   proposedBy?: Maybe<UsersPermissionsUserEntityResponse>;
+  shiftPattern?: Maybe<Scalars['JSON']['output']>;
+  shiftsMax?: Maybe<Scalars['Int']['output']>;
+  shiftsMin?: Maybe<Scalars['Int']['output']>;
   sqadualed?: Maybe<Scalars['DateTime']['output']>;
   sqadualedf?: Maybe<Scalars['DateTime']['output']>;
   transferTo?: Maybe<MesimabetahalichEntityResponse>;
@@ -1116,6 +1126,7 @@ export type ComponentDesisionNegoarchFiltersInput = {
   hm?: InputMaybe<FloatFilterInput>;
   hoursOutcome?: InputMaybe<StringFilterInput>;
   hoursToCredit?: InputMaybe<FloatFilterInput>;
+  howMany?: InputMaybe<IntFilterInput>;
   kindOf?: InputMaybe<StringFilterInput>;
   mode?: InputMaybe<StringFilterInput>;
   name?: InputMaybe<StringFilterInput>;
@@ -1124,6 +1135,9 @@ export type ComponentDesisionNegoarchFiltersInput = {
   ordern?: InputMaybe<IntFilterInput>;
   price?: InputMaybe<FloatFilterInput>;
   proposedBy?: InputMaybe<UsersPermissionsUserFiltersInput>;
+  shiftPattern?: InputMaybe<JsonFilterInput>;
+  shiftsMax?: InputMaybe<IntFilterInput>;
+  shiftsMin?: InputMaybe<IntFilterInput>;
   sqadualed?: InputMaybe<DateTimeFilterInput>;
   sqadualedf?: InputMaybe<DateTimeFilterInput>;
   transferTo?: InputMaybe<MesimabetahalichFiltersInput>;
@@ -1137,6 +1151,7 @@ export type ComponentDesisionNegoarchInput = {
   hm?: InputMaybe<Scalars['Float']['input']>;
   hoursOutcome?: InputMaybe<Enum_Componentdesisionnegoarch_Hoursoutcome>;
   hoursToCredit?: InputMaybe<Scalars['Float']['input']>;
+  howMany?: InputMaybe<Scalars['Int']['input']>;
   id?: InputMaybe<Scalars['ID']['input']>;
   kindOf?: InputMaybe<Enum_Componentdesisionnegoarch_Kindof>;
   mode?: InputMaybe<Enum_Componentdesisionnegoarch_Mode>;
@@ -1144,6 +1159,9 @@ export type ComponentDesisionNegoarchInput = {
   ordern?: InputMaybe<Scalars['Int']['input']>;
   price?: InputMaybe<Scalars['Float']['input']>;
   proposedBy?: InputMaybe<Scalars['ID']['input']>;
+  shiftPattern?: InputMaybe<Scalars['JSON']['input']>;
+  shiftsMax?: InputMaybe<Scalars['Int']['input']>;
+  shiftsMin?: InputMaybe<Scalars['Int']['input']>;
   sqadualed?: InputMaybe<Scalars['DateTime']['input']>;
   sqadualedf?: InputMaybe<Scalars['DateTime']['input']>;
   transferTo?: InputMaybe<Scalars['ID']['input']>;
@@ -2674,6 +2692,14 @@ export type Decision = {
   stipRecipient?: Maybe<UsersPermissionsUserEntityResponse>;
   stipendPledge?: Maybe<StipendPledgeEntityResponse>;
   stipendProgram?: Maybe<StipendProgramEntityResponse>;
+  swapDeadline?: Maybe<Scalars['DateTime']['output']>;
+  swapFrom?: Maybe<UsersPermissionsUserEntityResponse>;
+  swapGive?: Maybe<ShiftAssignmentEntityResponse>;
+  swapPlan?: Maybe<ShiftPlanEntityResponse>;
+  swapSilence?: Maybe<Scalars['Boolean']['output']>;
+  swapStatus?: Maybe<Enum_Decision_Swapstatus>;
+  swapTake?: Maybe<ShiftAssignmentEntityResponse>;
+  swapTo?: Maybe<UsersPermissionsUserEntityResponse>;
   targetKind?: Maybe<Enum_Decision_Targetkind>;
   timegrama?: Maybe<TimegramaEntityResponse>;
   timtoM?: Maybe<Scalars['String']['output']>;
@@ -2831,6 +2857,14 @@ export type DecisionFiltersInput = {
   stipRecipient?: InputMaybe<UsersPermissionsUserFiltersInput>;
   stipendPledge?: InputMaybe<StipendPledgeFiltersInput>;
   stipendProgram?: InputMaybe<StipendProgramFiltersInput>;
+  swapDeadline?: InputMaybe<DateTimeFilterInput>;
+  swapFrom?: InputMaybe<UsersPermissionsUserFiltersInput>;
+  swapGive?: InputMaybe<ShiftAssignmentFiltersInput>;
+  swapPlan?: InputMaybe<ShiftPlanFiltersInput>;
+  swapSilence?: InputMaybe<BooleanFilterInput>;
+  swapStatus?: InputMaybe<StringFilterInput>;
+  swapTake?: InputMaybe<ShiftAssignmentFiltersInput>;
+  swapTo?: InputMaybe<UsersPermissionsUserFiltersInput>;
   targetKind?: InputMaybe<StringFilterInput>;
   timegrama?: InputMaybe<TimegramaFiltersInput>;
   timtoM?: InputMaybe<StringFilterInput>;
@@ -2885,6 +2919,14 @@ export type DecisionInput = {
   stipRecipient?: InputMaybe<Scalars['ID']['input']>;
   stipendPledge?: InputMaybe<Scalars['ID']['input']>;
   stipendProgram?: InputMaybe<Scalars['ID']['input']>;
+  swapDeadline?: InputMaybe<Scalars['DateTime']['input']>;
+  swapFrom?: InputMaybe<Scalars['ID']['input']>;
+  swapGive?: InputMaybe<Scalars['ID']['input']>;
+  swapPlan?: InputMaybe<Scalars['ID']['input']>;
+  swapSilence?: InputMaybe<Scalars['Boolean']['input']>;
+  swapStatus?: InputMaybe<Enum_Decision_Swapstatus>;
+  swapTake?: InputMaybe<Scalars['ID']['input']>;
+  swapTo?: InputMaybe<Scalars['ID']['input']>;
   targetKind?: InputMaybe<Enum_Decision_Targetkind>;
   timegrama?: InputMaybe<Scalars['ID']['input']>;
   timtoM?: InputMaybe<Scalars['String']['input']>;
@@ -3239,6 +3281,7 @@ export enum Enum_Decision_Kind {
   Prides = 'prides',
   Pubdes = 'pubdes',
   SaleClaim = 'saleClaim',
+  ShiftSwap = 'shiftSwap',
   StipendPledge = 'stipendPledge',
   StipendProgram = 'stipendProgram',
   TimtoM = 'timtoM',
@@ -3246,6 +3289,13 @@ export enum Enum_Decision_Kind {
   Vallueadd = 'vallueadd',
   Vallueles = 'vallueles',
   Whatsapp = 'whatsapp'
+}
+
+export enum Enum_Decision_Swapstatus {
+  Done = 'done',
+  Lapsed = 'lapsed',
+  Open = 'open',
+  Withdrawn = 'withdrawn'
 }
 
 export enum Enum_Decision_Targetkind {
@@ -3857,6 +3907,13 @@ export enum Enum_Rikmash_Kindof {
   Yearly = 'yearly'
 }
 
+export enum Enum_Rosterperiod_State {
+  Cancelled = 'cancelled',
+  Closed = 'closed',
+  Draft = 'draft',
+  Open = 'open'
+}
+
 export enum Enum_Sale_Confirmedby {
   Timeout = 'timeout',
   Vote = 'vote'
@@ -3878,6 +3935,52 @@ export enum Enum_Sheirutfulfillment_Status_Process {
   Completed = 'completed',
   Delivered = 'delivered',
   Pending = 'pending'
+}
+
+export enum Enum_Shiftassignment_Source {
+  Auto = 'auto',
+  Cover = 'cover',
+  Swap = 'swap',
+  Volunteer = 'volunteer'
+}
+
+export enum Enum_Shiftassignment_State {
+  Confirmed = 'confirmed',
+  Done = 'done',
+  Draft = 'draft',
+  Released = 'released'
+}
+
+export enum Enum_Shiftavailability_Stance {
+  Can = 'can',
+  Cannot = 'cannot',
+  IfNeeded = 'ifNeeded',
+  Want = 'want'
+}
+
+export enum Enum_Shiftplan_Fairness {
+  Commitments = 'commitments',
+  Manual = 'manual'
+}
+
+export enum Enum_Shiftplan_Lifecycle {
+  Active = 'active',
+  ArchiveProposed = 'archiveProposed',
+  Archived = 'archived',
+  Released = 'released'
+}
+
+export enum Enum_Shiftplan_Status {
+  Active = 'active',
+  Paused = 'paused'
+}
+
+export enum Enum_Shift_State {
+  Cancelled = 'cancelled',
+  Done = 'done',
+  Open = 'open',
+  Rostered = 'rostered',
+  Running = 'running'
 }
 
 export enum Enum_Sitereport_Status {
@@ -4786,7 +4889,7 @@ export type FxRateInput = {
   source?: InputMaybe<Scalars['String']['input']>;
 };
 
-export type GenericMorph = Act | Actt | ApiKey | Argument | Ask | Askm | Askwant | Bakasha | Category | Chezin | Clause | ComponentDesisionEditPend | ComponentDesisionNegoarch | ComponentDesisionNegodes | ComponentDesisionNegom | ComponentDesisionNegostipend | ComponentNewCoveredMissions | ComponentNewCoveredResources | ComponentNewEdits | ComponentNewExtractedMissions | ComponentNewExtractedResources | ComponentNewLocation | ComponentNewMeeting | ComponentNewMonter | ComponentNewNego | ComponentNewNegom | ComponentNewSeen | ComponentNewTimes | ComponentNewUserAndIshur | ComponentNewWillingnessEntries | ComponentProjectsChatre | ComponentProjectsConsumedMashabetahalichDeliveries | ComponentProjectsConsumedMissionHours | ComponentProjectsConsumedOpenMu | ComponentProjectsDeliveries | ComponentProjectsHervachti | ComponentProjectsIGotMoney | ComponentProjectsMeeting | ComponentProjectsMonter | ComponentProjectsNegodes | ComponentProjectsNegom | ComponentProjectsPendmnego | ComponentProjectsShift | ComponentProjectsTaskdis | ComponentProjectsUsersOf | ComponentProjectsVots | ConsentEvent | ContentReleasesRelease | ContentReleasesReleaseAction | ConventionText | Cuntry | Dea | Deal | Decision | Deffinition | DemoRequest | Filtertag | Finiapruval | FinnishedMission | Forum | ForumLastSeen | FxRate | Haamada | Haamadapruv | Haluka | Hatzaa | Hazbaah | I18NLocale | Issue | Maagad | MaagadMember | MaagadOffer | Maap | Machshir | Mashaabim | Mashabetahalich | Matanot | MatanotRecipeMission | MatanotRecipeResource | Matanotpend | Matbea | MatchSuggestion | Mesimabetahalich | Message | Mission | MissionOffer | Mode | Monter | Nego | NegoMash | Negopendmission | Negotiation | OpenMashaabim | OpenMission | Partof | Pendm | Pgisha | Pgishauser | Pgishauserpend | Pledge | Pmash | Position | Project | ProjectPlanBoard | ProjectPlanItem | ProjectRepo | ProviderProfile | Ratson | RatsonMatchJob | RatsonProposal | RatsonShare | ResourceBooking | Richtext | Rikmash | Sale | SealedEnvelope | Seeder | Sheirut | SheirutFulfillment | Sheirutnego | Sheirutpend | Sidur | SiteReport | SiteShareContribution | Skill | Solution | Sp | SpaceDoc | StipendPayment | StipendPledge | StipendProgram | Tafkidim | TextTranslation | Tikunolam | Timegrama | Timer | Tosplit | Translate | UploadFile | UploadFolder | UserKey | UsersPermissionsPermission | UsersPermissionsRole | UsersPermissionsUser | Vallue | Vote | Want | WelcomTop | Whatandwhy | WorkWay | Yat | Zohar;
+export type GenericMorph = Act | Actt | ApiKey | Argument | Ask | Askm | Askwant | Bakasha | Category | Chezin | Clause | ComponentDesisionEditPend | ComponentDesisionNegoarch | ComponentDesisionNegodes | ComponentDesisionNegom | ComponentDesisionNegostipend | ComponentNewCoveredMissions | ComponentNewCoveredResources | ComponentNewEdits | ComponentNewExtractedMissions | ComponentNewExtractedResources | ComponentNewLocation | ComponentNewMeeting | ComponentNewMonter | ComponentNewNego | ComponentNewNegom | ComponentNewSeen | ComponentNewTimes | ComponentNewUserAndIshur | ComponentNewWillingnessEntries | ComponentProjectsChatre | ComponentProjectsConsumedMashabetahalichDeliveries | ComponentProjectsConsumedMissionHours | ComponentProjectsConsumedOpenMu | ComponentProjectsDeliveries | ComponentProjectsHervachti | ComponentProjectsIGotMoney | ComponentProjectsMeeting | ComponentProjectsMonter | ComponentProjectsNegodes | ComponentProjectsNegom | ComponentProjectsPendmnego | ComponentProjectsShift | ComponentProjectsTaskdis | ComponentProjectsUsersOf | ComponentProjectsVots | ConsentEvent | ContentReleasesRelease | ContentReleasesReleaseAction | ConventionText | Cuntry | Dea | Deal | Decision | Deffinition | DemoRequest | Filtertag | Finiapruval | FinnishedMission | Forum | ForumLastSeen | FxRate | Haamada | Haamadapruv | Haluka | Hatzaa | Hazbaah | I18NLocale | Issue | Maagad | MaagadMember | MaagadOffer | Maap | Machshir | Mashaabim | Mashabetahalich | Matanot | MatanotRecipeMission | MatanotRecipeResource | Matanotpend | Matbea | MatchSuggestion | Mesimabetahalich | Message | Mission | MissionOffer | Mode | Monter | Nego | NegoMash | Negopendmission | Negotiation | OpenMashaabim | OpenMission | Partof | Pendm | Pgisha | Pgishauser | Pgishauserpend | Pledge | Pmash | Position | Project | ProjectPlanBoard | ProjectPlanItem | ProjectRepo | ProviderProfile | Ratson | RatsonMatchJob | RatsonProposal | RatsonShare | ResourceBooking | Richtext | Rikmash | RosterPeriod | Sale | SealedEnvelope | Seeder | Sheirut | SheirutFulfillment | Sheirutnego | Sheirutpend | Shift | ShiftAssignment | ShiftAvailability | ShiftPlan | Sidur | SiteReport | SiteShareContribution | Skill | Solution | Sp | SpaceDoc | StipendPayment | StipendPledge | StipendProgram | Tafkidim | TextTranslation | Tikunolam | Timegrama | Timer | Tosplit | Translate | UploadFile | UploadFolder | UserKey | UsersPermissionsPermission | UsersPermissionsRole | UsersPermissionsUser | Vallue | Vote | Want | WelcomTop | Whatandwhy | WorkWay | Yat | Zohar;
 
 export type Haamada = {
   __typename?: 'Haamada';
@@ -7169,6 +7272,10 @@ export type Mesimabetahalich = {
   publishedAt?: Maybe<Scalars['DateTime']['output']>;
   seeders?: Maybe<SeederRelationResponseCollection>;
   sheirut_fulfillments?: Maybe<SheirutFulfillmentRelationResponseCollection>;
+  shiftRules?: Maybe<Scalars['JSON']['output']>;
+  shiftRulesAt?: Maybe<Scalars['DateTime']['output']>;
+  shiftsMax?: Maybe<Scalars['Int']['output']>;
+  shiftsMin?: Maybe<Scalars['Int']['output']>;
   start?: Maybe<Scalars['DateTime']['output']>;
   status?: Maybe<Scalars['Int']['output']>;
   stipendCostShare?: Maybe<Scalars['Float']['output']>;
@@ -7387,6 +7494,10 @@ export type MesimabetahalichFiltersInput = {
   publishedAt?: InputMaybe<DateTimeFilterInput>;
   seeders?: InputMaybe<SeederFiltersInput>;
   sheirut_fulfillments?: InputMaybe<SheirutFulfillmentFiltersInput>;
+  shiftRules?: InputMaybe<JsonFilterInput>;
+  shiftRulesAt?: InputMaybe<DateTimeFilterInput>;
+  shiftsMax?: InputMaybe<IntFilterInput>;
+  shiftsMin?: InputMaybe<IntFilterInput>;
   start?: InputMaybe<DateTimeFilterInput>;
   status?: InputMaybe<IntFilterInput>;
   stipendCostShare?: InputMaybe<FloatFilterInput>;
@@ -7444,6 +7555,10 @@ export type MesimabetahalichInput = {
   publishedAt?: InputMaybe<Scalars['DateTime']['input']>;
   seeders?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   sheirut_fulfillments?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  shiftRules?: InputMaybe<Scalars['JSON']['input']>;
+  shiftRulesAt?: InputMaybe<Scalars['DateTime']['input']>;
+  shiftsMax?: InputMaybe<Scalars['Int']['input']>;
+  shiftsMin?: InputMaybe<Scalars['Int']['input']>;
   start?: InputMaybe<Scalars['DateTime']['input']>;
   status?: InputMaybe<Scalars['Int']['input']>;
   stipendCostShare?: InputMaybe<Scalars['Float']['input']>;
@@ -8096,6 +8211,7 @@ export type Mutation = {
   createRichtext?: Maybe<RichtextEntityResponse>;
   createRichtextLocalization?: Maybe<RichtextEntityResponse>;
   createRikmash?: Maybe<RikmashEntityResponse>;
+  createRosterPeriod?: Maybe<RosterPeriodEntityResponse>;
   createSale?: Maybe<SaleEntityResponse>;
   createSealedEnvelope?: Maybe<SealedEnvelopeEntityResponse>;
   createSeeder?: Maybe<SeederEntityResponse>;
@@ -8105,6 +8221,10 @@ export type Mutation = {
   createSheirutnego?: Maybe<SheirutnegoEntityResponse>;
   createSheirutpend?: Maybe<SheirutpendEntityResponse>;
   createSheirutpendLocalization?: Maybe<SheirutpendEntityResponse>;
+  createShift?: Maybe<ShiftEntityResponse>;
+  createShiftAssignment?: Maybe<ShiftAssignmentEntityResponse>;
+  createShiftAvailability?: Maybe<ShiftAvailabilityEntityResponse>;
+  createShiftPlan?: Maybe<ShiftPlanEntityResponse>;
   createSidur?: Maybe<SidurEntityResponse>;
   createSiteReport?: Maybe<SiteReportEntityResponse>;
   createSiteShareContribution?: Maybe<SiteShareContributionEntityResponse>;
@@ -8224,6 +8344,7 @@ export type Mutation = {
   deleteResourceBooking?: Maybe<ResourceBookingEntityResponse>;
   deleteRichtext?: Maybe<RichtextEntityResponse>;
   deleteRikmash?: Maybe<RikmashEntityResponse>;
+  deleteRosterPeriod?: Maybe<RosterPeriodEntityResponse>;
   deleteSale?: Maybe<SaleEntityResponse>;
   deleteSealedEnvelope?: Maybe<SealedEnvelopeEntityResponse>;
   deleteSeeder?: Maybe<SeederEntityResponse>;
@@ -8231,6 +8352,10 @@ export type Mutation = {
   deleteSheirutFulfillment?: Maybe<SheirutFulfillmentEntityResponse>;
   deleteSheirutnego?: Maybe<SheirutnegoEntityResponse>;
   deleteSheirutpend?: Maybe<SheirutpendEntityResponse>;
+  deleteShift?: Maybe<ShiftEntityResponse>;
+  deleteShiftAssignment?: Maybe<ShiftAssignmentEntityResponse>;
+  deleteShiftAvailability?: Maybe<ShiftAvailabilityEntityResponse>;
+  deleteShiftPlan?: Maybe<ShiftPlanEntityResponse>;
   deleteSidur?: Maybe<SidurEntityResponse>;
   deleteSiteReport?: Maybe<SiteReportEntityResponse>;
   deleteSiteShareContribution?: Maybe<SiteShareContributionEntityResponse>;
@@ -8353,6 +8478,7 @@ export type Mutation = {
   updateResourceBooking?: Maybe<ResourceBookingEntityResponse>;
   updateRichtext?: Maybe<RichtextEntityResponse>;
   updateRikmash?: Maybe<RikmashEntityResponse>;
+  updateRosterPeriod?: Maybe<RosterPeriodEntityResponse>;
   updateSale?: Maybe<SaleEntityResponse>;
   updateSealedEnvelope?: Maybe<SealedEnvelopeEntityResponse>;
   updateSeeder?: Maybe<SeederEntityResponse>;
@@ -8360,6 +8486,10 @@ export type Mutation = {
   updateSheirutFulfillment?: Maybe<SheirutFulfillmentEntityResponse>;
   updateSheirutnego?: Maybe<SheirutnegoEntityResponse>;
   updateSheirutpend?: Maybe<SheirutpendEntityResponse>;
+  updateShift?: Maybe<ShiftEntityResponse>;
+  updateShiftAssignment?: Maybe<ShiftAssignmentEntityResponse>;
+  updateShiftAvailability?: Maybe<ShiftAvailabilityEntityResponse>;
+  updateShiftPlan?: Maybe<ShiftPlanEntityResponse>;
   updateSidur?: Maybe<SidurEntityResponse>;
   updateSiteReport?: Maybe<SiteReportEntityResponse>;
   updateSiteShareContribution?: Maybe<SiteShareContributionEntityResponse>;
@@ -8953,6 +9083,11 @@ export type MutationCreateRikmashArgs = {
 };
 
 
+export type MutationCreateRosterPeriodArgs = {
+  data: RosterPeriodInput;
+};
+
+
 export type MutationCreateSaleArgs = {
   data: SaleInput;
 };
@@ -9001,6 +9136,26 @@ export type MutationCreateSheirutpendLocalizationArgs = {
   data?: InputMaybe<SheirutpendInput>;
   id?: InputMaybe<Scalars['ID']['input']>;
   locale?: InputMaybe<Scalars['I18NLocaleCode']['input']>;
+};
+
+
+export type MutationCreateShiftArgs = {
+  data: ShiftInput;
+};
+
+
+export type MutationCreateShiftAssignmentArgs = {
+  data: ShiftAssignmentInput;
+};
+
+
+export type MutationCreateShiftAvailabilityArgs = {
+  data: ShiftAvailabilityInput;
+};
+
+
+export type MutationCreateShiftPlanArgs = {
+  data: ShiftPlanInput;
 };
 
 
@@ -9638,6 +9793,11 @@ export type MutationDeleteRikmashArgs = {
 };
 
 
+export type MutationDeleteRosterPeriodArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
 export type MutationDeleteSaleArgs = {
   id: Scalars['ID']['input'];
 };
@@ -9672,6 +9832,26 @@ export type MutationDeleteSheirutnegoArgs = {
 export type MutationDeleteSheirutpendArgs = {
   id: Scalars['ID']['input'];
   locale?: InputMaybe<Scalars['I18NLocaleCode']['input']>;
+};
+
+
+export type MutationDeleteShiftArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteShiftAssignmentArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteShiftAvailabilityArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteShiftPlanArgs = {
+  id: Scalars['ID']['input'];
 };
 
 
@@ -10368,6 +10548,12 @@ export type MutationUpdateRikmashArgs = {
 };
 
 
+export type MutationUpdateRosterPeriodArgs = {
+  data: RosterPeriodInput;
+  id: Scalars['ID']['input'];
+};
+
+
 export type MutationUpdateSaleArgs = {
   data: SaleInput;
   id: Scalars['ID']['input'];
@@ -10409,6 +10595,30 @@ export type MutationUpdateSheirutpendArgs = {
   data: SheirutpendInput;
   id: Scalars['ID']['input'];
   locale?: InputMaybe<Scalars['I18NLocaleCode']['input']>;
+};
+
+
+export type MutationUpdateShiftArgs = {
+  data: ShiftInput;
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationUpdateShiftAssignmentArgs = {
+  data: ShiftAssignmentInput;
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationUpdateShiftAvailabilityArgs = {
+  data: ShiftAvailabilityInput;
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationUpdateShiftPlanArgs = {
+  data: ShiftPlanInput;
+  id: Scalars['ID']['input'];
 };
 
 
@@ -10910,6 +11120,8 @@ export type Negopendmission = {
   perhour?: Maybe<Scalars['Float']['output']>;
   proposedBy?: Maybe<Enum_Negopendmission_Proposedby>;
   publishedAt?: Maybe<Scalars['DateTime']['output']>;
+  shiftsMax?: Maybe<Scalars['Int']['output']>;
+  shiftsMin?: Maybe<Scalars['Int']['output']>;
   skills?: Maybe<SkillRelationResponseCollection>;
   status?: Maybe<Enum_Negopendmission_Status>;
   tafkidims?: Maybe<TafkidimRelationResponseCollection>;
@@ -11009,6 +11221,8 @@ export type NegopendmissionFiltersInput = {
   perhour?: InputMaybe<FloatFilterInput>;
   proposedBy?: InputMaybe<StringFilterInput>;
   publishedAt?: InputMaybe<DateTimeFilterInput>;
+  shiftsMax?: InputMaybe<IntFilterInput>;
+  shiftsMin?: InputMaybe<IntFilterInput>;
   skills?: InputMaybe<SkillFiltersInput>;
   status?: InputMaybe<StringFilterInput>;
   tafkidims?: InputMaybe<TafkidimFiltersInput>;
@@ -11040,6 +11254,8 @@ export type NegopendmissionInput = {
   perhour?: InputMaybe<Scalars['Float']['input']>;
   proposedBy?: InputMaybe<Enum_Negopendmission_Proposedby>;
   publishedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  shiftsMax?: InputMaybe<Scalars['Int']['input']>;
+  shiftsMin?: InputMaybe<Scalars['Int']['input']>;
   skills?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   status?: InputMaybe<Enum_Negopendmission_Status>;
   tafkidims?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
@@ -13080,6 +13296,10 @@ export type Project = {
   sheirutpends?: Maybe<SheirutpendRelationResponseCollection>;
   sheiruts?: Maybe<SheirutRelationResponseCollection>;
   sheiruts_sourced?: Maybe<SheirutRelationResponseCollection>;
+  shiftCloseOffsetHours?: Maybe<Scalars['Int']['output']>;
+  shiftCycleDays?: Maybe<Scalars['Int']['output']>;
+  shiftDraftWindowHours?: Maybe<Scalars['Int']['output']>;
+  shift_plans?: Maybe<ShiftPlanRelationResponseCollection>;
   site_share_contributions?: Maybe<SiteShareContributionRelationResponseCollection>;
   space_docs?: Maybe<SpaceDocRelationResponseCollection>;
   spirit?: Maybe<Enum_Project_Spirit>;
@@ -13426,6 +13646,13 @@ export type ProjectSheiruts_SourcedArgs = {
 };
 
 
+export type ProjectShift_PlansArgs = {
+  filters?: InputMaybe<ShiftPlanFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+
 export type ProjectSite_Share_ContributionsArgs = {
   filters?: InputMaybe<SiteShareContributionFiltersInput>;
   pagination?: InputMaybe<PaginationArg>;
@@ -13633,6 +13860,10 @@ export type ProjectFiltersInput = {
   sheirutpends?: InputMaybe<SheirutpendFiltersInput>;
   sheiruts?: InputMaybe<SheirutFiltersInput>;
   sheiruts_sourced?: InputMaybe<SheirutFiltersInput>;
+  shiftCloseOffsetHours?: InputMaybe<IntFilterInput>;
+  shiftCycleDays?: InputMaybe<IntFilterInput>;
+  shiftDraftWindowHours?: InputMaybe<IntFilterInput>;
+  shift_plans?: InputMaybe<ShiftPlanFiltersInput>;
   site_share_contributions?: InputMaybe<SiteShareContributionFiltersInput>;
   space_docs?: InputMaybe<SpaceDocFiltersInput>;
   spirit?: InputMaybe<StringFilterInput>;
@@ -13736,6 +13967,10 @@ export type ProjectInput = {
   sheirutpends?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   sheiruts?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   sheiruts_sourced?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  shiftCloseOffsetHours?: InputMaybe<Scalars['Int']['input']>;
+  shiftCycleDays?: InputMaybe<Scalars['Int']['input']>;
+  shiftDraftWindowHours?: InputMaybe<Scalars['Int']['input']>;
+  shift_plans?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   site_share_contributions?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   space_docs?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   spirit?: InputMaybe<Enum_Project_Spirit>;
@@ -14260,6 +14495,8 @@ export type Query = {
   richtexts?: Maybe<RichtextEntityResponseCollection>;
   rikmash?: Maybe<RikmashEntityResponse>;
   rikmashes?: Maybe<RikmashEntityResponseCollection>;
+  rosterPeriod?: Maybe<RosterPeriodEntityResponse>;
+  rosterPeriods?: Maybe<RosterPeriodEntityResponseCollection>;
   sale?: Maybe<SaleEntityResponse>;
   sales?: Maybe<SaleEntityResponseCollection>;
   sealedEnvelope?: Maybe<SealedEnvelopeEntityResponse>;
@@ -14274,6 +14511,14 @@ export type Query = {
   sheirutpend?: Maybe<SheirutpendEntityResponse>;
   sheirutpends?: Maybe<SheirutpendEntityResponseCollection>;
   sheiruts?: Maybe<SheirutEntityResponseCollection>;
+  shift?: Maybe<ShiftEntityResponse>;
+  shiftAssignment?: Maybe<ShiftAssignmentEntityResponse>;
+  shiftAssignments?: Maybe<ShiftAssignmentEntityResponseCollection>;
+  shiftAvailabilities?: Maybe<ShiftAvailabilityEntityResponseCollection>;
+  shiftAvailability?: Maybe<ShiftAvailabilityEntityResponse>;
+  shiftPlan?: Maybe<ShiftPlanEntityResponse>;
+  shiftPlans?: Maybe<ShiftPlanEntityResponseCollection>;
+  shifts?: Maybe<ShiftEntityResponseCollection>;
   sidur?: Maybe<SidurEntityResponse>;
   sidurs?: Maybe<SidurEntityResponseCollection>;
   siteReport?: Maybe<SiteReportEntityResponse>;
@@ -15388,6 +15633,18 @@ export type QueryRikmashesArgs = {
 };
 
 
+export type QueryRosterPeriodArgs = {
+  id?: InputMaybe<Scalars['ID']['input']>;
+};
+
+
+export type QueryRosterPeriodsArgs = {
+  filters?: InputMaybe<RosterPeriodFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+
 export type QuerySaleArgs = {
   id?: InputMaybe<Scalars['ID']['input']>;
 };
@@ -15475,6 +15732,54 @@ export type QuerySheirutpendsArgs = {
 export type QuerySheirutsArgs = {
   filters?: InputMaybe<SheirutFiltersInput>;
   locale?: InputMaybe<Scalars['I18NLocaleCode']['input']>;
+  pagination?: InputMaybe<PaginationArg>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+
+export type QueryShiftArgs = {
+  id?: InputMaybe<Scalars['ID']['input']>;
+};
+
+
+export type QueryShiftAssignmentArgs = {
+  id?: InputMaybe<Scalars['ID']['input']>;
+};
+
+
+export type QueryShiftAssignmentsArgs = {
+  filters?: InputMaybe<ShiftAssignmentFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+
+export type QueryShiftAvailabilitiesArgs = {
+  filters?: InputMaybe<ShiftAvailabilityFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+
+export type QueryShiftAvailabilityArgs = {
+  id?: InputMaybe<Scalars['ID']['input']>;
+};
+
+
+export type QueryShiftPlanArgs = {
+  id?: InputMaybe<Scalars['ID']['input']>;
+};
+
+
+export type QueryShiftPlansArgs = {
+  filters?: InputMaybe<ShiftPlanFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+
+export type QueryShiftsArgs = {
+  filters?: InputMaybe<ShiftFiltersInput>;
   pagination?: InputMaybe<PaginationArg>;
   sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
 };
@@ -16852,6 +17157,105 @@ export type RikmashRelationResponseCollection = {
   data: Array<RikmashEntity>;
 };
 
+export type RosterPeriod = {
+  __typename?: 'RosterPeriod';
+  assignments?: Maybe<ShiftAssignmentRelationResponseCollection>;
+  closedAt?: Maybe<Scalars['DateTime']['output']>;
+  closesAt: Scalars['DateTime']['output'];
+  createdAt?: Maybe<Scalars['DateTime']['output']>;
+  draftedAt?: Maybe<Scalars['DateTime']['output']>;
+  end: Scalars['DateTime']['output'];
+  holes?: Maybe<Scalars['Int']['output']>;
+  periodKey?: Maybe<Scalars['String']['output']>;
+  project?: Maybe<ProjectEntityResponse>;
+  quotaSnapshot?: Maybe<Scalars['JSON']['output']>;
+  seed?: Maybe<Scalars['String']['output']>;
+  shift_plan?: Maybe<ShiftPlanEntityResponse>;
+  shifts?: Maybe<ShiftRelationResponseCollection>;
+  start: Scalars['DateTime']['output'];
+  state?: Maybe<Enum_Rosterperiod_State>;
+  timegrama?: Maybe<TimegramaEntityResponse>;
+  updatedAt?: Maybe<Scalars['DateTime']['output']>;
+};
+
+
+export type RosterPeriodAssignmentsArgs = {
+  filters?: InputMaybe<ShiftAssignmentFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+
+export type RosterPeriodShiftsArgs = {
+  filters?: InputMaybe<ShiftFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+export type RosterPeriodEntity = {
+  __typename?: 'RosterPeriodEntity';
+  attributes?: Maybe<RosterPeriod>;
+  id?: Maybe<Scalars['ID']['output']>;
+};
+
+export type RosterPeriodEntityResponse = {
+  __typename?: 'RosterPeriodEntityResponse';
+  data?: Maybe<RosterPeriodEntity>;
+};
+
+export type RosterPeriodEntityResponseCollection = {
+  __typename?: 'RosterPeriodEntityResponseCollection';
+  data: Array<RosterPeriodEntity>;
+  meta: ResponseCollectionMeta;
+};
+
+export type RosterPeriodFiltersInput = {
+  and?: InputMaybe<Array<InputMaybe<RosterPeriodFiltersInput>>>;
+  assignments?: InputMaybe<ShiftAssignmentFiltersInput>;
+  closedAt?: InputMaybe<DateTimeFilterInput>;
+  closesAt?: InputMaybe<DateTimeFilterInput>;
+  createdAt?: InputMaybe<DateTimeFilterInput>;
+  draftedAt?: InputMaybe<DateTimeFilterInput>;
+  end?: InputMaybe<DateTimeFilterInput>;
+  holes?: InputMaybe<IntFilterInput>;
+  id?: InputMaybe<IdFilterInput>;
+  not?: InputMaybe<RosterPeriodFiltersInput>;
+  or?: InputMaybe<Array<InputMaybe<RosterPeriodFiltersInput>>>;
+  periodKey?: InputMaybe<StringFilterInput>;
+  project?: InputMaybe<ProjectFiltersInput>;
+  quotaSnapshot?: InputMaybe<JsonFilterInput>;
+  seed?: InputMaybe<StringFilterInput>;
+  shift_plan?: InputMaybe<ShiftPlanFiltersInput>;
+  shifts?: InputMaybe<ShiftFiltersInput>;
+  start?: InputMaybe<DateTimeFilterInput>;
+  state?: InputMaybe<StringFilterInput>;
+  timegrama?: InputMaybe<TimegramaFiltersInput>;
+  updatedAt?: InputMaybe<DateTimeFilterInput>;
+};
+
+export type RosterPeriodInput = {
+  assignments?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  closedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  closesAt?: InputMaybe<Scalars['DateTime']['input']>;
+  draftedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  holes?: InputMaybe<Scalars['Int']['input']>;
+  periodKey?: InputMaybe<Scalars['String']['input']>;
+  project?: InputMaybe<Scalars['ID']['input']>;
+  quotaSnapshot?: InputMaybe<Scalars['JSON']['input']>;
+  seed?: InputMaybe<Scalars['String']['input']>;
+  shift_plan?: InputMaybe<Scalars['ID']['input']>;
+  shifts?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  start?: InputMaybe<Scalars['DateTime']['input']>;
+  state?: InputMaybe<Enum_Rosterperiod_State>;
+  timegrama?: InputMaybe<Scalars['ID']['input']>;
+};
+
+export type RosterPeriodRelationResponseCollection = {
+  __typename?: 'RosterPeriodRelationResponseCollection';
+  data: Array<RosterPeriodEntity>;
+};
+
 export type Sale = {
   __typename?: 'Sale';
   confirmedBy?: Maybe<Enum_Sale_Confirmedby>;
@@ -17722,6 +18126,365 @@ export type SheirutpendInput = {
 export type SheirutpendRelationResponseCollection = {
   __typename?: 'SheirutpendRelationResponseCollection';
   data: Array<SheirutpendEntity>;
+};
+
+export type Shift = {
+  __typename?: 'Shift';
+  assignments?: Maybe<ShiftAssignmentRelationResponseCollection>;
+  availabilities?: Maybe<ShiftAvailabilityRelationResponseCollection>;
+  createdAt?: Maybe<Scalars['DateTime']['output']>;
+  end: Scalars['DateTime']['output'];
+  need?: Maybe<Scalars['Int']['output']>;
+  note?: Maybe<Scalars['String']['output']>;
+  project?: Maybe<ProjectEntityResponse>;
+  roster_period?: Maybe<RosterPeriodEntityResponse>;
+  shift_plan?: Maybe<ShiftPlanEntityResponse>;
+  slotKey?: Maybe<Scalars['String']['output']>;
+  start: Scalars['DateTime']['output'];
+  state?: Maybe<Enum_Shift_State>;
+  tafkidim?: Maybe<TafkidimEntityResponse>;
+  updatedAt?: Maybe<Scalars['DateTime']['output']>;
+};
+
+
+export type ShiftAssignmentsArgs = {
+  filters?: InputMaybe<ShiftAssignmentFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+
+export type ShiftAvailabilitiesArgs = {
+  filters?: InputMaybe<ShiftAvailabilityFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+export type ShiftAssignment = {
+  __typename?: 'ShiftAssignment';
+  coveredFor?: Maybe<ShiftAssignmentEntityResponse>;
+  createdAt?: Maybe<Scalars['DateTime']['output']>;
+  mesimabetahalich?: Maybe<MesimabetahalichEntityResponse>;
+  project?: Maybe<ProjectEntityResponse>;
+  rank: Scalars['Int']['output'];
+  reason?: Maybe<Scalars['String']['output']>;
+  releaseReason?: Maybe<Scalars['String']['output']>;
+  releasedAt?: Maybe<Scalars['DateTime']['output']>;
+  roster_period?: Maybe<RosterPeriodEntityResponse>;
+  shift?: Maybe<ShiftEntityResponse>;
+  shift_plan?: Maybe<ShiftPlanEntityResponse>;
+  source?: Maybe<Enum_Shiftassignment_Source>;
+  state?: Maybe<Enum_Shiftassignment_State>;
+  timer?: Maybe<TimerEntityResponse>;
+  updatedAt?: Maybe<Scalars['DateTime']['output']>;
+  users_permissions_user?: Maybe<UsersPermissionsUserEntityResponse>;
+};
+
+export type ShiftAssignmentEntity = {
+  __typename?: 'ShiftAssignmentEntity';
+  attributes?: Maybe<ShiftAssignment>;
+  id?: Maybe<Scalars['ID']['output']>;
+};
+
+export type ShiftAssignmentEntityResponse = {
+  __typename?: 'ShiftAssignmentEntityResponse';
+  data?: Maybe<ShiftAssignmentEntity>;
+};
+
+export type ShiftAssignmentEntityResponseCollection = {
+  __typename?: 'ShiftAssignmentEntityResponseCollection';
+  data: Array<ShiftAssignmentEntity>;
+  meta: ResponseCollectionMeta;
+};
+
+export type ShiftAssignmentFiltersInput = {
+  and?: InputMaybe<Array<InputMaybe<ShiftAssignmentFiltersInput>>>;
+  coveredFor?: InputMaybe<ShiftAssignmentFiltersInput>;
+  createdAt?: InputMaybe<DateTimeFilterInput>;
+  id?: InputMaybe<IdFilterInput>;
+  mesimabetahalich?: InputMaybe<MesimabetahalichFiltersInput>;
+  not?: InputMaybe<ShiftAssignmentFiltersInput>;
+  or?: InputMaybe<Array<InputMaybe<ShiftAssignmentFiltersInput>>>;
+  project?: InputMaybe<ProjectFiltersInput>;
+  rank?: InputMaybe<IntFilterInput>;
+  reason?: InputMaybe<StringFilterInput>;
+  releaseReason?: InputMaybe<StringFilterInput>;
+  releasedAt?: InputMaybe<DateTimeFilterInput>;
+  roster_period?: InputMaybe<RosterPeriodFiltersInput>;
+  shift?: InputMaybe<ShiftFiltersInput>;
+  shift_plan?: InputMaybe<ShiftPlanFiltersInput>;
+  source?: InputMaybe<StringFilterInput>;
+  state?: InputMaybe<StringFilterInput>;
+  timer?: InputMaybe<TimerFiltersInput>;
+  updatedAt?: InputMaybe<DateTimeFilterInput>;
+  users_permissions_user?: InputMaybe<UsersPermissionsUserFiltersInput>;
+};
+
+export type ShiftAssignmentInput = {
+  coveredFor?: InputMaybe<Scalars['ID']['input']>;
+  mesimabetahalich?: InputMaybe<Scalars['ID']['input']>;
+  project?: InputMaybe<Scalars['ID']['input']>;
+  rank?: InputMaybe<Scalars['Int']['input']>;
+  reason?: InputMaybe<Scalars['String']['input']>;
+  releaseReason?: InputMaybe<Scalars['String']['input']>;
+  releasedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  roster_period?: InputMaybe<Scalars['ID']['input']>;
+  shift?: InputMaybe<Scalars['ID']['input']>;
+  shift_plan?: InputMaybe<Scalars['ID']['input']>;
+  source?: InputMaybe<Enum_Shiftassignment_Source>;
+  state?: InputMaybe<Enum_Shiftassignment_State>;
+  timer?: InputMaybe<Scalars['ID']['input']>;
+  users_permissions_user?: InputMaybe<Scalars['ID']['input']>;
+};
+
+export type ShiftAssignmentRelationResponseCollection = {
+  __typename?: 'ShiftAssignmentRelationResponseCollection';
+  data: Array<ShiftAssignmentEntity>;
+};
+
+export type ShiftAvailability = {
+  __typename?: 'ShiftAvailability';
+  createdAt?: Maybe<Scalars['DateTime']['output']>;
+  declKey?: Maybe<Scalars['String']['output']>;
+  declaredAt: Scalars['DateTime']['output'];
+  note?: Maybe<Scalars['String']['output']>;
+  prefRank?: Maybe<Scalars['Int']['output']>;
+  project?: Maybe<ProjectEntityResponse>;
+  shift?: Maybe<ShiftEntityResponse>;
+  shift_plan?: Maybe<ShiftPlanEntityResponse>;
+  stance: Enum_Shiftavailability_Stance;
+  updatedAt?: Maybe<Scalars['DateTime']['output']>;
+  users_permissions_user?: Maybe<UsersPermissionsUserEntityResponse>;
+};
+
+export type ShiftAvailabilityEntity = {
+  __typename?: 'ShiftAvailabilityEntity';
+  attributes?: Maybe<ShiftAvailability>;
+  id?: Maybe<Scalars['ID']['output']>;
+};
+
+export type ShiftAvailabilityEntityResponse = {
+  __typename?: 'ShiftAvailabilityEntityResponse';
+  data?: Maybe<ShiftAvailabilityEntity>;
+};
+
+export type ShiftAvailabilityEntityResponseCollection = {
+  __typename?: 'ShiftAvailabilityEntityResponseCollection';
+  data: Array<ShiftAvailabilityEntity>;
+  meta: ResponseCollectionMeta;
+};
+
+export type ShiftAvailabilityFiltersInput = {
+  and?: InputMaybe<Array<InputMaybe<ShiftAvailabilityFiltersInput>>>;
+  createdAt?: InputMaybe<DateTimeFilterInput>;
+  declKey?: InputMaybe<StringFilterInput>;
+  declaredAt?: InputMaybe<DateTimeFilterInput>;
+  id?: InputMaybe<IdFilterInput>;
+  not?: InputMaybe<ShiftAvailabilityFiltersInput>;
+  note?: InputMaybe<StringFilterInput>;
+  or?: InputMaybe<Array<InputMaybe<ShiftAvailabilityFiltersInput>>>;
+  prefRank?: InputMaybe<IntFilterInput>;
+  project?: InputMaybe<ProjectFiltersInput>;
+  shift?: InputMaybe<ShiftFiltersInput>;
+  shift_plan?: InputMaybe<ShiftPlanFiltersInput>;
+  stance?: InputMaybe<StringFilterInput>;
+  updatedAt?: InputMaybe<DateTimeFilterInput>;
+  users_permissions_user?: InputMaybe<UsersPermissionsUserFiltersInput>;
+};
+
+export type ShiftAvailabilityInput = {
+  declKey?: InputMaybe<Scalars['String']['input']>;
+  declaredAt?: InputMaybe<Scalars['DateTime']['input']>;
+  note?: InputMaybe<Scalars['String']['input']>;
+  prefRank?: InputMaybe<Scalars['Int']['input']>;
+  project?: InputMaybe<Scalars['ID']['input']>;
+  shift?: InputMaybe<Scalars['ID']['input']>;
+  shift_plan?: InputMaybe<Scalars['ID']['input']>;
+  stance?: InputMaybe<Enum_Shiftavailability_Stance>;
+  users_permissions_user?: InputMaybe<Scalars['ID']['input']>;
+};
+
+export type ShiftAvailabilityRelationResponseCollection = {
+  __typename?: 'ShiftAvailabilityRelationResponseCollection';
+  data: Array<ShiftAvailabilityEntity>;
+};
+
+export type ShiftEntity = {
+  __typename?: 'ShiftEntity';
+  attributes?: Maybe<Shift>;
+  id?: Maybe<Scalars['ID']['output']>;
+};
+
+export type ShiftEntityResponse = {
+  __typename?: 'ShiftEntityResponse';
+  data?: Maybe<ShiftEntity>;
+};
+
+export type ShiftEntityResponseCollection = {
+  __typename?: 'ShiftEntityResponseCollection';
+  data: Array<ShiftEntity>;
+  meta: ResponseCollectionMeta;
+};
+
+export type ShiftFiltersInput = {
+  and?: InputMaybe<Array<InputMaybe<ShiftFiltersInput>>>;
+  assignments?: InputMaybe<ShiftAssignmentFiltersInput>;
+  availabilities?: InputMaybe<ShiftAvailabilityFiltersInput>;
+  createdAt?: InputMaybe<DateTimeFilterInput>;
+  end?: InputMaybe<DateTimeFilterInput>;
+  id?: InputMaybe<IdFilterInput>;
+  need?: InputMaybe<IntFilterInput>;
+  not?: InputMaybe<ShiftFiltersInput>;
+  note?: InputMaybe<StringFilterInput>;
+  or?: InputMaybe<Array<InputMaybe<ShiftFiltersInput>>>;
+  project?: InputMaybe<ProjectFiltersInput>;
+  roster_period?: InputMaybe<RosterPeriodFiltersInput>;
+  shift_plan?: InputMaybe<ShiftPlanFiltersInput>;
+  slotKey?: InputMaybe<StringFilterInput>;
+  start?: InputMaybe<DateTimeFilterInput>;
+  state?: InputMaybe<StringFilterInput>;
+  tafkidim?: InputMaybe<TafkidimFiltersInput>;
+  updatedAt?: InputMaybe<DateTimeFilterInput>;
+};
+
+export type ShiftInput = {
+  assignments?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  availabilities?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  need?: InputMaybe<Scalars['Int']['input']>;
+  note?: InputMaybe<Scalars['String']['input']>;
+  project?: InputMaybe<Scalars['ID']['input']>;
+  roster_period?: InputMaybe<Scalars['ID']['input']>;
+  shift_plan?: InputMaybe<Scalars['ID']['input']>;
+  slotKey?: InputMaybe<Scalars['String']['input']>;
+  start?: InputMaybe<Scalars['DateTime']['input']>;
+  state?: InputMaybe<Enum_Shift_State>;
+  tafkidim?: InputMaybe<Scalars['ID']['input']>;
+};
+
+export type ShiftPlan = {
+  __typename?: 'ShiftPlan';
+  archived?: Maybe<Scalars['Boolean']['output']>;
+  balanceCache?: Maybe<Scalars['JSON']['output']>;
+  carryDecay?: Maybe<Scalars['Float']['output']>;
+  closeOffsetHours?: Maybe<Scalars['Int']['output']>;
+  createdAt?: Maybe<Scalars['DateTime']['output']>;
+  cycleDays?: Maybe<Scalars['Int']['output']>;
+  declareOpenDays?: Maybe<Scalars['Int']['output']>;
+  draftWindowHours?: Maybe<Scalars['Int']['output']>;
+  fairness?: Maybe<Enum_Shiftplan_Fairness>;
+  horizonDays?: Maybe<Scalars['Int']['output']>;
+  lifecycle?: Maybe<Enum_Shiftplan_Lifecycle>;
+  maxBackups?: Maybe<Scalars['Int']['output']>;
+  minRestHours?: Maybe<Scalars['Int']['output']>;
+  mission?: Maybe<MissionEntityResponse>;
+  name?: Maybe<Scalars['String']['output']>;
+  open_mission?: Maybe<OpenMissionEntityResponse>;
+  pattern?: Maybe<Scalars['JSON']['output']>;
+  pendm?: Maybe<PendmEntityResponse>;
+  project?: Maybe<ProjectEntityResponse>;
+  roster_periods?: Maybe<RosterPeriodRelationResponseCollection>;
+  shifts?: Maybe<ShiftRelationResponseCollection>;
+  status?: Maybe<Enum_Shiftplan_Status>;
+  timezone?: Maybe<Scalars['String']['output']>;
+  updatedAt?: Maybe<Scalars['DateTime']['output']>;
+};
+
+
+export type ShiftPlanRoster_PeriodsArgs = {
+  filters?: InputMaybe<RosterPeriodFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+
+export type ShiftPlanShiftsArgs = {
+  filters?: InputMaybe<ShiftFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+export type ShiftPlanEntity = {
+  __typename?: 'ShiftPlanEntity';
+  attributes?: Maybe<ShiftPlan>;
+  id?: Maybe<Scalars['ID']['output']>;
+};
+
+export type ShiftPlanEntityResponse = {
+  __typename?: 'ShiftPlanEntityResponse';
+  data?: Maybe<ShiftPlanEntity>;
+};
+
+export type ShiftPlanEntityResponseCollection = {
+  __typename?: 'ShiftPlanEntityResponseCollection';
+  data: Array<ShiftPlanEntity>;
+  meta: ResponseCollectionMeta;
+};
+
+export type ShiftPlanFiltersInput = {
+  and?: InputMaybe<Array<InputMaybe<ShiftPlanFiltersInput>>>;
+  archived?: InputMaybe<BooleanFilterInput>;
+  balanceCache?: InputMaybe<JsonFilterInput>;
+  carryDecay?: InputMaybe<FloatFilterInput>;
+  closeOffsetHours?: InputMaybe<IntFilterInput>;
+  createdAt?: InputMaybe<DateTimeFilterInput>;
+  cycleDays?: InputMaybe<IntFilterInput>;
+  declareOpenDays?: InputMaybe<IntFilterInput>;
+  draftWindowHours?: InputMaybe<IntFilterInput>;
+  fairness?: InputMaybe<StringFilterInput>;
+  horizonDays?: InputMaybe<IntFilterInput>;
+  id?: InputMaybe<IdFilterInput>;
+  lifecycle?: InputMaybe<StringFilterInput>;
+  maxBackups?: InputMaybe<IntFilterInput>;
+  minRestHours?: InputMaybe<IntFilterInput>;
+  mission?: InputMaybe<MissionFiltersInput>;
+  name?: InputMaybe<StringFilterInput>;
+  not?: InputMaybe<ShiftPlanFiltersInput>;
+  open_mission?: InputMaybe<OpenMissionFiltersInput>;
+  or?: InputMaybe<Array<InputMaybe<ShiftPlanFiltersInput>>>;
+  pattern?: InputMaybe<JsonFilterInput>;
+  pendm?: InputMaybe<PendmFiltersInput>;
+  project?: InputMaybe<ProjectFiltersInput>;
+  roster_periods?: InputMaybe<RosterPeriodFiltersInput>;
+  shifts?: InputMaybe<ShiftFiltersInput>;
+  status?: InputMaybe<StringFilterInput>;
+  timezone?: InputMaybe<StringFilterInput>;
+  updatedAt?: InputMaybe<DateTimeFilterInput>;
+};
+
+export type ShiftPlanInput = {
+  archived?: InputMaybe<Scalars['Boolean']['input']>;
+  balanceCache?: InputMaybe<Scalars['JSON']['input']>;
+  carryDecay?: InputMaybe<Scalars['Float']['input']>;
+  closeOffsetHours?: InputMaybe<Scalars['Int']['input']>;
+  cycleDays?: InputMaybe<Scalars['Int']['input']>;
+  declareOpenDays?: InputMaybe<Scalars['Int']['input']>;
+  draftWindowHours?: InputMaybe<Scalars['Int']['input']>;
+  fairness?: InputMaybe<Enum_Shiftplan_Fairness>;
+  horizonDays?: InputMaybe<Scalars['Int']['input']>;
+  lifecycle?: InputMaybe<Enum_Shiftplan_Lifecycle>;
+  maxBackups?: InputMaybe<Scalars['Int']['input']>;
+  minRestHours?: InputMaybe<Scalars['Int']['input']>;
+  mission?: InputMaybe<Scalars['ID']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  open_mission?: InputMaybe<Scalars['ID']['input']>;
+  pattern?: InputMaybe<Scalars['JSON']['input']>;
+  pendm?: InputMaybe<Scalars['ID']['input']>;
+  project?: InputMaybe<Scalars['ID']['input']>;
+  roster_periods?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  shifts?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  status?: InputMaybe<Enum_Shiftplan_Status>;
+  timezone?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type ShiftPlanRelationResponseCollection = {
+  __typename?: 'ShiftPlanRelationResponseCollection';
+  data: Array<ShiftPlanEntity>;
+};
+
+export type ShiftRelationResponseCollection = {
+  __typename?: 'ShiftRelationResponseCollection';
+  data: Array<ShiftEntity>;
 };
 
 export type Sidur = {
@@ -19139,6 +19902,7 @@ export type Timegrama = {
   open_mission?: Maybe<OpenMissionEntityResponse>;
   pendm?: Maybe<PendmEntityResponse>;
   pmash?: Maybe<PmashEntityResponse>;
+  roster_period?: Maybe<RosterPeriodEntityResponse>;
   sheirutpend?: Maybe<SheirutpendEntityResponse>;
   stipend_payment?: Maybe<StipendPaymentEntityResponse>;
   timer?: Maybe<TimerEntityResponse>;
@@ -19188,6 +19952,7 @@ export type TimegramaFiltersInput = {
   or?: InputMaybe<Array<InputMaybe<TimegramaFiltersInput>>>;
   pendm?: InputMaybe<PendmFiltersInput>;
   pmash?: InputMaybe<PmashFiltersInput>;
+  roster_period?: InputMaybe<RosterPeriodFiltersInput>;
   sheirutpend?: InputMaybe<SheirutpendFiltersInput>;
   stipend_payment?: InputMaybe<StipendPaymentFiltersInput>;
   timer?: InputMaybe<TimerFiltersInput>;
@@ -19215,6 +19980,7 @@ export type TimegramaInput = {
   open_mission?: InputMaybe<Scalars['ID']['input']>;
   pendm?: InputMaybe<Scalars['ID']['input']>;
   pmash?: InputMaybe<Scalars['ID']['input']>;
+  roster_period?: InputMaybe<Scalars['ID']['input']>;
   sheirutpend?: InputMaybe<Scalars['ID']['input']>;
   stipend_payment?: InputMaybe<Scalars['ID']['input']>;
   timer?: InputMaybe<Scalars['ID']['input']>;
