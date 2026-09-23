@@ -267,6 +267,7 @@
       "skills": "✶ Skills needed",
       "existing": "◆ Already in the system",
       "freeResources": "◐ Available resources · {{count}}",
+      "products": "🎁 Ready products · {{count}}",
       "people": "♥ People who could help · {{count}}",
       "hiddenIdentity": "Identity hidden",
       "hints": "Gentle suggestions",

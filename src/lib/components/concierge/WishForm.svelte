@@ -197,7 +197,7 @@
   let extractedCategories = $state(/** @type {string[]} */ ([]));
   let extractedHints = $state(/** @type {{kind:string,text:string}[]} */ ([]));
   let matchedPeople = $state(
-    /** @type {{id:string,username:string,avatar:string|null,matchedSkills:string[],projects:string[]}[]} */ ([])
+    /** @type {{id:string,username:string,avatar:string|null,matchedSkills:string[],projects:string[],distanceKm?:number|null}[]} */ ([])
   );
   let matchedMissions = $state(
     /** @type {{id:string,name:string,matchedTerm:string}[]} */ ([])
@@ -209,6 +209,13 @@
    *  persisted into ai_meta so /concierge/[id] renders it without re-running
    *  the Gemini/Pinecone analysis on every load. */
   let matchedEnrichment = $state(/** @type {any} */ (null));
+  /** Ready products a rikma or member already sells — nearest first when the
+   *  wish has a place (enrichWish drops the ones that cannot reach her). */
+  const matchedProducts = $derived(
+    /** @type {{id:string,name:string,price:number|null,projectName:string|null,distanceKm?:number|null}[]} */ (
+      matchedEnrichment?.products ?? []
+    )
+  );
   let extracting = $state(false);
 
   /** Debounced AI extraction — fires 1.2s after user stops typing */
@@ -229,13 +236,21 @@
       matchedEnrichment = null;
       return;
     }
+    // Read the place here so a changed location re-grounds the suggestions:
+    // providers that cannot reach her drop out, the rest come nearest first.
+    const place = {
+      lat: location.lat,
+      lng: location.lng,
+      radius: location.radius,
+      isOnline: location.location_mode === 'online'
+    };
     const timer = setTimeout(async () => {
       extracting = true;
       try {
         const res = await fetch('/api/concierge-extract', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ text })
+          body: JSON.stringify({ text, place })
         });
         if (res.ok) {
           const data = await res.json();
@@ -445,7 +460,11 @@
       0
   );
   const hasMatches = $derived(
-    matchedPeople.length + matchedMissions.length + matchedResources.length > 0
+    matchedPeople.length +
+      matchedMissions.length +
+      matchedResources.length +
+      matchedProducts.length >
+      0
   );
   const activeStep = $derived(hasMatches ? 2 : hasExtraction ? 1 : 0);
 
@@ -552,6 +571,7 @@
             people: matchedEnrichment.people ?? [],
             resources: matchedEnrichment.resources ?? [],
             products: matchedEnrichment.products ?? [],
+            place: matchedEnrichment.place ?? null,
             computedAt: new Date().toISOString()
           }
         : null
@@ -711,9 +731,10 @@
       }
       clearGuestDraft();
 
-      // Fire matching but don't block navigation — the detail page will
-      // refresh on its own and pick up the new proposals.
-      fetch('/api/action', {
+      // Give matching a few seconds so the review page opens with the products
+      // it found already on their rows; past that, navigate anyway — matching
+      // keeps running server-side and "search again" there picks it up.
+      const matching = fetch('/api/action', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -723,6 +744,10 @@
       }).catch((err) =>
         console.warn('[concierge/new] matchRatson dispatch failed:', err)
       );
+      await Promise.race([
+        matching,
+        new Promise((resolve) => setTimeout(resolve, 5000))
+      ]);
 
       goto(`/concierge/${ratsonId}`);
       return true;
@@ -1409,6 +1434,53 @@
             </div>
           {/if}
 
+          <!-- Ready products that answer the wish (nearest first) -->
+          {#if matchedProducts.length > 0}
+            <div
+              style="margin-top:16px;padding-top:14px;border-top:1px solid rgba(255,255,255,.05)"
+            >
+              <div class="lev-col-lbl" style="margin-bottom:8px">
+                {$t('concierge.new.lev.products', {
+                  count: matchedProducts.length
+                })}
+              </div>
+              <div style="display:flex;flex-direction:column;gap:6px">
+                {#each matchedProducts as m (m.id)}
+                  <div
+                    style="padding:8px 10px;border-radius:9px;background:rgba(255,77,158,.04);border:1px solid rgba(255,77,158,.16)"
+                  >
+                    <div
+                      style="display:flex;justify-content:space-between;gap:8px;align-items:baseline"
+                    >
+                      <span
+                        style="font-family:'Bellefair',serif;font-size:12.5px;color:#ede5d8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"
+                        >{m.name}</span
+                      >
+                      {#if typeof m.price === 'number' && m.price > 0}
+                        <span
+                          style="font-size:11px;color:#fde68a;white-space:nowrap"
+                          >{fmtMoney(m.price)}</span
+                        >
+                      {/if}
+                    </div>
+                    {#if m.projectName || m.distanceKm != null}
+                      <div
+                        style="font-size:10.5px;color:#9a8f80;margin-top:2px"
+                      >
+                        {m.projectName || ''}{m.projectName &&
+                        m.distanceKm != null
+                          ? ' · '
+                          : ''}{m.distanceKm != null
+                          ? $t('concierge.km_away', { distance: m.distanceKm })
+                          : ''}
+                      </div>
+                    {/if}
+                  </div>
+                {/each}
+              </div>
+            </div>
+          {/if}
+
           <!-- Available resources (free Sp instances) that match -->
           {#if matchedResources.length > 0}
             <div
@@ -1494,11 +1566,16 @@
                       >
                         {anon ? '••••••••' : p.username}
                       </div>
-                      {#if p.matchedSkills.length > 0}
+                      {#if p.matchedSkills.length > 0 || p.distanceKm != null}
                         <div
                           style="font-size:10.5px;color:#74bfff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"
                         >
-                          {p.matchedSkills.join(' · ')}
+                          {[
+                            ...p.matchedSkills,
+                            ...(p.distanceKm != null
+                              ? [$t('concierge.km_away', { distance: p.distanceKm })]
+                              : [])
+                          ].join(' · ')}
                         </div>
                       {/if}
                     </div>

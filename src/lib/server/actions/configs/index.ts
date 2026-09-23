@@ -55,6 +55,7 @@ import { createComplexMatanotConfig } from './createComplexMatanot.js';
 import { approveMatanotConfig } from './approveMatanot.js';
 import { createRatsonConfig } from './createRatson.js';
 import { matchRatsonConfig } from './matchRatson.js';
+import { refreshWishMatchesConfig } from './refreshWishMatches.js';
 import { acceptRatsonProposalConfig } from './acceptRatsonProposal.js';
 import { rejectRatsonProposalConfig } from './rejectRatsonProposal.js';
 import { updateRatsonExtractionConfig } from './updateRatsonExtraction.js';
@@ -328,6 +329,7 @@ export function registerAllActions(): void {
   // Concierge / Ratson (wish flow — PLAN_CONCIERGE)
   registerAction(createRatsonConfig);
   registerAction(matchRatsonConfig);
+  registerAction(refreshWishMatchesConfig);
   registerAction(acceptRatsonProposalConfig);
   registerAction(rejectRatsonProposalConfig);
   registerAction(updateRatsonExtractionConfig);
@@ -552,6 +554,7 @@ export {
   approveMatanotConfig,
   createRatsonConfig,
   matchRatsonConfig,
+  refreshWishMatchesConfig,
   acceptRatsonProposalConfig,
   rejectRatsonProposalConfig,
   finalizeJoinAcceptanceConfig,

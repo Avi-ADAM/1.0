@@ -8,6 +8,7 @@
   import Mission from '$lib/components/prPr/mission.svelte';
   import ResourceCreator from '$lib/components/resource/ResourceCreator.svelte';
   import { toast } from 'svelte-sonner';
+  import { t } from '$lib/translations';
 
   /** @type {{ data: { wish: any | null; proposals: any[]; loadOk: boolean; uid?: string; isOwner: boolean; enrichment?: any; forumMessages?: any[]; missionTemplates?: any[] } }} */
   let { data } = $props();
@@ -236,6 +237,7 @@
           );
           return {
             proposalId: p.id,
+            kind: p.kind,
             name: p.proposerName,
             project: p.proposerProject?.name || (p.matanot?.name ?? ''),
             avatar: p.proposerAvatar,
@@ -775,14 +777,44 @@
     }
   }
 
-  const requestProduct = (m, label) =>
+  /** @param need the plan row asked from, if any — the request then shows on that row. */
+  const requestProduct = (m, label, need = null) =>
     requestSuggestion(`m${m.id}`, {
       kind: 'matanot',
       matanotId: m.id,
       projectId: m.projectId,
       totalPrice: m.price ?? 0,
-      label
+      label,
+      ...(need ? { needIdx: need.idx, needIsResource: need.isResource } : {})
     });
+
+  /* ── Re-ground the wish for its place and re-run automatic matching — new
+   * products that answer a need land on their rows (refreshWishMatches). ── */
+  let refreshBusy = $state(false);
+  async function refreshMatches() {
+    if (!wishId || refreshBusy) return;
+    refreshBusy = true;
+    try {
+      const res = await fetch('/api/action', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          actionKey: 'refreshWishMatches',
+          params: { ratsonId: wishId, rematch: true }
+        })
+      });
+      const out = await res.json();
+      if (!out?.success) throw new Error(out?.error || 'החיפוש נכשל');
+      const n = Number(out?.data?.proposalsCreated ?? 0);
+      toast.success(n > 0 ? `נמצאו ${n} התאמות חדשות` : 'החיפוש עודכן');
+      window.location.reload();
+    } catch (err) {
+      console.error('[concierge/[id]] refreshWishMatches failed:', err);
+      toast.error(err instanceof Error ? err.message : 'אירעה שגיאה');
+    } finally {
+      refreshBusy = false;
+    }
+  }
 
   /* ── Customer builds the plan freely (PLAN_CONCIERGE §0.1): add a mission /
    * define a resource with NO specific provider — an unassigned BOM slot for
@@ -1672,6 +1704,13 @@
                 onclick={() => (addResourceOpen = true)}
                 >◐ הגדירי משאב נדרש</button
               >
+              <button
+                class="btn-ghost"
+                style="padding:8px 14px;font-size:12px"
+                disabled={refreshBusy}
+                onclick={refreshMatches}
+                >{refreshBusy ? '⏳ מחפשת…' : '🔎 חפשי שוב התאמות'}</button
+              >
             </div>
           {/if}
 
@@ -1783,6 +1822,9 @@
                                   >{m.projectName}</span
                                 >{/if}
                               <span class="pproj">· מוצר מוכן</span>
+                              {#if m.distanceKm != null}<span class="pproj"
+                                  >· {$t('concierge.km_away', { distance: m.distanceKm })}</span
+                                >{/if}
                               {#if m.price != null}<span
                                   style="color:#fde68a;font-size:12px"
                                   ><Money amount={m.price} currency={m.currencyCode} /></span
@@ -1800,7 +1842,7 @@
                               class="btn-jewel"
                               style="padding:6px 12px;font-size:12px"
                               disabled={inviteBusy[k]}
-                              onclick={() => requestProduct(m, row.need.title)}
+                              onclick={() => requestProduct(m, row.need.title, row.need)}
                               >{inviteBusy[k] ? '⏳' : 'בקשת שירות'}</button
                             >
                           {/if}
@@ -1913,7 +1955,7 @@
                     </div>
                   {/if}
                 {/if}
-                {#each row.providers as p (p.name)}
+                {#each row.providers as p (p.proposalId ?? p.name)}
                   <div class="pcard {p.status}">
                     <div class="pcard-top">
                       <div
@@ -1945,7 +1987,13 @@
                           </span>{/if}
                         <span style="color:#fde68a"><Money amount={p.price} /></span>
                       </div>
-                      {#if p.status === 'accepted'}
+                      {#if p.status === 'accepted' && p.kind === 'existing_matanot'}
+                        <span
+                          class="sbadge pending"
+                          style="padding:4px 10px;font-size:10px"
+                          >נשלחה לספק · ממתינה לאישורו</span
+                        >
+                      {:else if p.status === 'accepted'}
                         <span
                           class="sbadge ready"
                           style="padding:4px 10px;font-size:10px">שותפים</span
@@ -2015,6 +2063,9 @@
                           {#if m.projectName}<span class="pbadge"
                               >{m.projectName}</span
                             >{/if}
+                          {#if m.distanceKm != null}<span class="pproj"
+                              >· {$t('concierge.km_away', { distance: m.distanceKm })}</span
+                            >{/if}
                           {#if m.price != null}<span
                               style="color:#fde68a;font-size:12px"
                               ><Money amount={m.price} currency={m.currencyCode} /></span
@@ -2062,6 +2113,9 @@
                             >{/each}
                           {#if p.projects?.length}<span class="pproj"
                               >· {p.projects[0]}</span
+                            >{/if}
+                          {#if p.distanceKm != null}<span class="pproj"
+                              >· {$t('concierge.km_away', { distance: p.distanceKm })}</span
                             >{/if}
                         </div>
                       </div>

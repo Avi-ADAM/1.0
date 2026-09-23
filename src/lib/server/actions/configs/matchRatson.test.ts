@@ -1,35 +1,59 @@
 import { describe, it, expect } from 'vitest';
-import { matanotPoint } from './matchRatson';
+import { scoreCandidate } from './matchRatson';
+import { productPlace } from '../../concierge/localMatch';
 
-describe('matanotPoint', () => {
-  it('reads the location component written by current product flows', () => {
+const TIBERIAS = { lat: 32.7922, lng: 35.5312 };
+const TEL_AVIV = { lat: 32.0853, lng: 34.7818 };
+
+const wish = {
+  needs: [
+    { name: 'משלוח מצרכים עד הבית', isResource: false, idx: 0 },
+    { name: 'עגלת קניות', isResource: true, idx: 0 }
+  ],
+  place: { ...TIBERIAS, radius: 10 },
+  categoryIds: [],
+  categoryLabels: ['מזון'],
+  vallues: []
+};
+
+function cand(name: string, attrs: any, categoryNames: string[] = []) {
+  return {
+    name,
+    place: productPlace(attrs),
+    categoryIds: [],
+    categoryNames,
+    projectVallues: []
+  };
+}
+
+describe('matchRatson scoreCandidate', () => {
+  it('suggests the local grocery, attached to the delivery need', () => {
+    const s = scoreCandidate(cand('משלוח מכולת טבריה', { location: { ...TIBERIAS, radius: 15 } }), wish);
+    expect(s).not.toBeNull();
+    expect(s!.need).toEqual({ name: 'משלוח מצרכים עד הבית', isResource: false, idx: 0 });
+    expect(s!.score).toBeGreaterThanOrEqual(0.25);
+  });
+
+  it('never suggests a product that shares no word with any need', () => {
+    expect(scoreCandidate(cand('שיעור יוגה', { location: TIBERIAS }, ['מזון']), wish)).toBeNull();
+  });
+
+  it('drops a physical product whose delivery area does not reach her', () => {
     expect(
-      matanotPoint({ location: { lat: 32.79, lng: 35.53, radius: '15' }, lat: null, lng: null })
-    ).toEqual({ lat: 32.79, lng: 35.53 });
+      scoreCandidate(cand('משלוח מצרכים', { location: { ...TEL_AVIV, radius: 20 } }), wish)
+    ).toBeNull();
   });
 
-  it('falls back to the flat lat/lng of older rows', () => {
-    expect(matanotPoint({ location: null, lat: 32.08, lng: 34.78 })).toEqual({
-      lat: 32.08,
-      lng: 34.78
-    });
+  it('ranks the nearby grocery above the same product with no known place', () => {
+    const near = scoreCandidate(cand('משלוח מכולת', { location: { ...TIBERIAS, radius: 15 } }), wish)!;
+    const unknown = scoreCandidate(cand('משלוח מכולת', {}), wish)!;
+    expect(near.score).toBeGreaterThan(unknown.score);
   });
 
-  it("falls back to the hosting rikma's location", () => {
-    expect(
-      matanotPoint({
-        projectcreates: { data: [{ attributes: { location: { lat: '32.79', lng: '35.53' } } }] }
-      })
-    ).toEqual({ lat: 32.79, lng: 35.53 });
-  });
-
-  it('ignores a component with no coordinates (online / hint only)', () => {
-    expect(
-      matanotPoint({ location: { location_mode: 'online', lat: null, lng: null }, lat: 31.7, lng: 35.2 })
-    ).toEqual({ lat: 31.7, lng: 35.2 });
-  });
-
-  it('returns null for an unlocated product', () => {
-    expect(matanotPoint({})).toBeNull();
+  it('counts a category label match', () => {
+    const plain = scoreCandidate(cand('משלוח מכולת', {}), wish)!;
+    const food = scoreCandidate(cand('משלוח מכולת', {}, ['מזון ומשקאות']), wish)!;
+    expect(food.catScore).toBe(1);
+    expect(food.score).toBeGreaterThan(plain.score);
   });
 });

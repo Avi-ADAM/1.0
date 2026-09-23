@@ -267,6 +267,7 @@
       "skills": "✶ כישורים שצריך",
       "existing": "◆ כבר קיים במערכת",
       "freeResources": "◐ משאבים פנויים · {{count}}",
+      "products": "🎁 מוצרים מוכנים · {{count}}",
       "people": "♥ אנשים שיכולים לעזור · {{count}}",
       "hiddenIdentity": "זהות מוסתרת",
       "hints": "הצעות עדינות",

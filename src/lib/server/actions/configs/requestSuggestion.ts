@@ -25,6 +25,19 @@ import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 
 type SuggestionKind = 'matanot' | 'person' | 'resource';
 
+/** covered_* for the need a request answers, so /concierge/[id] shows it on that row. */
+export function coveredFor(
+  needIdx: number | string | null | undefined,
+  isResource: boolean | undefined,
+  price: number
+): Record<string, unknown> {
+  if (needIdx === null || needIdx === undefined || String(needIdx).trim() === '') return {};
+  const idx = String(needIdx);
+  return isResource
+    ? { covered_resources: [{ extracted_resource_idx: idx, quantity: null, price }] }
+    : { covered_missions: [{ extracted_mission_idx: idx, hours: null, price }] };
+}
+
 const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
   const {
     ratsonId,
@@ -33,7 +46,9 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
     projectId = null,
     targetUserId = null,
     totalPrice = null,
-    label = ''
+    label = '',
+    needIdx = null,
+    needIsResource = false
   } = params as {
     ratsonId: string;
     kind: SuggestionKind;
@@ -42,6 +57,9 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
     targetUserId?: string | null;
     totalPrice?: number | null;
     label?: string;
+    /** The plan row asked from (extracted_* index) — the request shows there. */
+    needIdx?: number | string | null;
+    needIsResource?: boolean;
   };
 
   if (!ratsonId) throw new Error('ratsonId is required');
@@ -95,6 +113,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
           project: projectId,
           total_price: price,
           auto_generated: false,
+          ...coveredFor(needIdx, needIsResource, price),
           publishedAt: now
         },
         context.jwt,
@@ -276,7 +295,9 @@ export const requestSuggestionConfig: ActionConfig = {
     projectId: { type: 'string', required: false },
     targetUserId: { type: 'string', required: false },
     totalPrice: { type: 'number', required: false },
-    label: { type: 'string', required: false }
+    label: { type: 'string', required: false },
+    needIdx: { type: 'number', required: false },
+    needIsResource: { type: 'boolean', required: false }
   },
   authRules: [{ type: 'jwt', errorMessage: 'Must be logged in to reach out' }],
   notification: {

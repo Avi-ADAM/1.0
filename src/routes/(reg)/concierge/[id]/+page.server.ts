@@ -2,7 +2,7 @@ import { sendToSer } from '$lib/send/sendToSer.js';
 import { matbeaCode } from '$lib/money/resolve.js';
 import { redirect } from '@sveltejs/kit';
 import { actionViaProxy } from '$lib/server/actionViaProxy.js';
-import { enrichWish, EMPTY_ENRICHMENT, type WishEnrichment } from '$lib/server/ai/enrichWish';
+import { enrichWish, placeKey, EMPTY_ENRICHMENT, type WishEnrichment } from '$lib/server/ai/enrichWish';
 import { extractWish, type WishExtraction } from '$lib/server/ai/extractWish';
 import { GEMINI_API_KEY } from '$env/static/private';
 import type { PageServerLoad } from './$types';
@@ -283,9 +283,10 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
   //
   //    Prefer the snapshot persisted at creation (ai_meta.enrichment) — the
   //    analysis already ran in /concierge/new, so we read it straight from
-  //    Strapi instead of re-hitting Gemini/Pinecone on every page load. Only
-  //    wishes created before this was stored fall back to a live recompute
-  //    (still best-effort: a failure degrades to an empty panel).
+  //    Strapi instead of re-hitting Gemini/Pinecone on every page load. A
+  //    snapshot that is missing, or was taken for another place, is recomputed
+  //    and saved through `refreshWishMatches` (best-effort: a failure degrades
+  //    to a live, unsaved recompute, then to an empty panel).
   let enrichment: WishEnrichment = EMPTY_ENRICHMENT;
   const savedEnrichment = wish?.aiMeta?.enrichment;
   const hasSavedEnrichment =
@@ -295,35 +296,72 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
       (savedEnrichment.resources?.length ?? 0) > 0 ||
       (savedEnrichment.products?.length ?? 0) > 0 ||
       (savedEnrichment.missions?.length ?? 0) > 0);
+  // A snapshot is only as good as the place it was filtered for: taken before
+  // the wish had a location (or before locations counted at all), it may list
+  // a grocery 100km away and miss the one around the corner.
+  const wishPlace = wish
+    ? { lat: wish.lat, lng: wish.lng, radius: wish.radius, isOnline: wish.isOnline }
+    : null;
+  // Snapshots that record their place are trusted even when empty ("nothing
+  // reaches her yet" is an answer); older ones only when they have content
+  // and the wish has no place to filter by.
+  const snapshotFresh =
+    !!savedEnrichment &&
+    typeof savedEnrichment === 'object' &&
+    ('place' in savedEnrichment
+      ? (savedEnrichment.place ?? null) === placeKey(wishPlace)
+      : hasSavedEnrichment && placeKey(wishPlace) === null);
+  const hasNeeds =
+    !!wish && (wish.extractedMissions.length > 0 || wish.extractedResources.length > 0);
 
-  if (hasSavedEnrichment) {
+  if (snapshotFresh) {
     enrichment = {
       skills: savedEnrichment.skills ?? [],
       missions: savedEnrichment.missions ?? [],
       people: savedEnrichment.people ?? [],
       resources: savedEnrichment.resources ?? [],
-      products: savedEnrichment.products ?? []
+      products: savedEnrichment.products ?? [],
+      place: savedEnrichment.place ?? null
     };
-  } else if (wish && (wish.extractedMissions.length > 0 || wish.extractedResources.length > 0)) {
-    try {
-      const aiSkills: string[] = Array.isArray(wish.aiMeta?.skills) ? wish.aiMeta.skills : [];
-      const extraction: WishExtraction = {
-        missions: wish.extractedMissions.map((m: any) => ({
-          name: m.name,
-          imp: m.importance === 'must' ? 'must' : 'nice'
-        })),
-        resources: wish.extractedResources.map((r: any) => ({
-          name: r.name,
-          imp: r.importance === 'must' ? 'must' : 'nice'
-        })),
-        skills: aiSkills.map((name: string) => ({ name })),
-        categories: [],
-        titleSuggestion: '',
-        hints: []
-      };
-      enrichment = await enrichWish(extraction, fetch);
-    } catch (e) {
-      console.warn('[concierge/:id] enrichment failed (non-fatal):', e);
+  } else if (hasNeeds) {
+    // Recompute for the wish's place and save it, so the next load is instant.
+    let refreshed = false;
+    if (uid && tok) {
+      try {
+        const res = await actionViaProxy(fetch, 'refreshWishMatches', {
+          ratsonId: String(wish.id)
+        });
+        if (res?.success && res.data?.enrichment) {
+          enrichment = res.data.enrichment;
+          refreshed = true;
+        }
+      } catch (e) {
+        console.warn('[concierge/:id] refreshWishMatches failed (non-fatal):', e);
+      }
+    }
+    if (!refreshed) {
+      // Not saved (or the breakdown above was only extracted this load) —
+      // compute for this render; still best-effort.
+      try {
+        const aiSkills: string[] = Array.isArray(wish.aiMeta?.skills) ? wish.aiMeta.skills : [];
+        const extraction: WishExtraction = {
+          missions: wish.extractedMissions.map((m: any) => ({
+            name: m.name,
+            imp: m.importance === 'must' ? 'must' : 'nice'
+          })),
+          resources: wish.extractedResources.map((r: any) => ({
+            name: r.name,
+            imp: r.importance === 'must' ? 'must' : 'nice'
+          })),
+          skills: aiSkills.map((name: string) => ({ name })),
+          categories: [],
+          titleSuggestion: '',
+          hints: []
+        };
+        enrichment = await enrichWish(extraction, fetch, { place: wishPlace });
+      } catch (e) {
+        console.warn('[concierge/:id] enrichment failed (non-fatal):', e);
+      }
     }
   }
 

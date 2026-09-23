@@ -12654,10 +12654,10 @@ ${STIPEND_DECISION_FIELDS}
 
   // Find real platform members who hold a given skill — the heart of
   // "check if there are people with these skills and suggest them".
-  '201findUsersBySkill': `query FindUsersBySkill($q: String) {
+  '201findUsersBySkill': `query FindUsersBySkill($q: String, $limit: Int = 8) {
     usersPermissionsUsers(
       filters: { skills: { skillName: { containsi: $q } } }
-      pagination: { limit: 8 }
+      pagination: { limit: $limit }
     ) {
       data {
         id
@@ -12666,6 +12666,7 @@ ${STIPEND_DECISION_FIELDS}
           profilePic { data { attributes { url formats } } }
           skills { data { id attributes { skillName } } }
           projects_1s { data { id attributes { projectName } } }
+          location { lat lng radius location_mode }
         }
       }
     }
@@ -12674,7 +12675,7 @@ ${STIPEND_DECISION_FIELDS}
   // Find *available* resource instances (Sp = who holds a resource; mashaabim is
   // the template). panui=true means free. Used to suggest real resources +
   // their owners for a wish's extracted resources.
-  '202findAvailableSp': `query FindAvailableSp($q: String) {
+  '202findAvailableSp': `query FindAvailableSp($q: String, $limit: Int = 6) {
     sps(
       filters: {
         archived: { eq: false }
@@ -12685,7 +12686,7 @@ ${STIPEND_DECISION_FIELDS}
           { mashaabim: { name: { containsi: $q } } }
         ]
       }
-      pagination: { limit: 6 }
+      pagination: { limit: $limit }
     ) {
       data {
         id
@@ -12695,9 +12696,10 @@ ${STIPEND_DECISION_FIELDS}
           price
           panui
           kindOf
+          location { lat lng radius location_mode }
           mashaabim { data { id attributes { name } } }
-          users_permissions_user { data { id attributes { username profilePic { data { attributes { url } } } } } }
-          project { data { id attributes { projectName } } }
+          users_permissions_user { data { id attributes { username profilePic { data { attributes { url } } } location { lat lng radius location_mode } } } }
+          project { data { id attributes { projectName location { lat lng radius location_mode } } } }
         }
       }
     }
@@ -12706,12 +12708,12 @@ ${STIPEND_DECISION_FIELDS}
   // Find existing *products* (matanot) a weave (project) already offers, by name.
   // A wish's need may be fulfilled by a ready product — picking one routes into
   // the built-in service-request flow (createSheirutpend). Active, non-archived only.
-  '203findMatanotByText': `query FindMatanotByText($q: String) {
+  '203findMatanotByText': `query FindMatanotByText($q: String, $limit: Int = 6) {
     matanots(
       filters: { and: [ { archived: { eq: false }
         status_of_voting: { eq: "active" }
         name: { containsi: $q } }, ${NOT_ARCHIVED} ] }
-      pagination: { limit: 6 }
+      pagination: { limit: $limit }
     ) {
       data {
         id
@@ -12720,9 +12722,11 @@ ${STIPEND_DECISION_FIELDS}
           desc
           price
           estimatedPrice
+          lat lng radius
+          location { lat lng radius location_mode }
           currency { data { id attributes { name simbol } } }
           projectcreates {
-            data { id attributes { projectName profilePic { data { attributes { url } } } } }
+            data { id attributes { projectName profilePic { data { attributes { url } } } location { lat lng radius location_mode } } }
           }
         }
       }
@@ -13519,6 +13523,7 @@ ${STIPEND_DECISION_FIELDS}
           profilePic { data { attributes { url } } }
           skills { data { attributes { skillName } } }
           projects_1s { data { attributes { projectName } } }
+          location { lat lng radius location_mode }
         } } }
       } }
     }
