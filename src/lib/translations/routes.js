@@ -62,6 +62,9 @@ export const ROUTED = {
     // One route, one namespace; the homepage teaser for it lives in `home`.
     why: at('/why'),
     planning: at(/\/moach\/[^/]+\/create/),
+    // The rikma-import review screen (PLAN_AI_SIGNUP_CONCIERGE §4.5): a new
+    // rikma at /moach/import/…, an existing one at /moach/<id>/import/….
+    rikmaImport: at(/\/moach\/(?:[^/]+\/)?import\//),
     // The rikma's API page — one route, one namespace, nowhere else.
     rikmaApi: at(/\/moach\/[^/]+\/api/),
     // The rikma's code tab, plus the GitHub account card on the settings page.

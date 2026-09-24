@@ -1,0 +1,58 @@
+{
+  "title": "Import a rikma",
+  "subtitleNew": "This is a draft - nothing has been created yet. Fix what needs fixing, untick what is not for now, and create it all with one click.",
+  "subtitleExisting": "Adding to the rikma \"{{name}}\". Nothing has been created yet - tick what to create and click once.",
+  "track": {
+    "business": "Business",
+    "partnership": "Existing partnership",
+    "idea": "Idea"
+  },
+  "field": {
+    "name": "Rikma name"
+  },
+  "groups": {
+    "products": "Products - what the rikma sells",
+    "rikmaMissions": "Missions",
+    "rikmaResources": "Resources",
+    "partners": "Partners"
+  },
+  "holder": {
+    "me": "I do this",
+    "open": "Looking for someone",
+    "partner": "Brought by: {{name}}"
+  },
+  "row": {
+    "name": "Name",
+    "created": "created",
+    "notNow": "Not now",
+    "partOf": "Will be created as part of \"{{name}}\"",
+    "madeOf": "Made of: {{names}}",
+    "price": "Price",
+    "priceOnRequest": "On request",
+    "keywords": "Words people will search for",
+    "keywordsHint": "Comma-separated - how a customer would describe the need, not the product's name. This is how the concierge finds you."
+  },
+  "partner": {
+    "noEmail": "No email"
+  },
+  "selectedCount": "{{count}} selected",
+  "submit": "Create ({{count}})",
+  "creating": "Creating…",
+  "conflict": "The draft changed meanwhile (maybe in the chat with your assistant) - this is the latest version. Check it and click again.",
+  "error": "Creating did not work. Try again in a moment.",
+  "result": {
+    "title": "Created",
+    "created": "{{count}} items were created.",
+    "failed": "Not created:",
+    "proposals": "The rows you did not tick were kept as proposals on the rikma's planning board.",
+    "openRikma": "Go to the rikma",
+    "openBoards": "Go to the planning board"
+  },
+  "invite": {
+    "invited": "{{name}} was invited - a card on their heart page and an email.",
+    "notRegistered": "{{name}} is not on 1lev1 yet. Send them the join link:",
+    "pendingVote": "{{name}} will be invited once the rikma approves the mission.",
+    "noEmail": "No email was given for {{name}}, so no invitation was sent.",
+    "other": "The invitation to {{name}} was not sent."
+  }
+}

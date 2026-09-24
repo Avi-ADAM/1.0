@@ -594,3 +594,26 @@ action, ובצדק): הם נתיבי `/api/assistant/*` ציבוריים, עם r
 |---|---|---|
 | 2026-09-24 | qid 203 מסנן `hideFromDiscovery` | `src/routes/api/send/qids.js` |
 | 2026-09-24 | ליבה טהורה: טיפוסים, `applyOps` (+undo), סכימת השרטוט, מתכנן ה-materialize (סדר צעדים + params לכל action קיים + לוחות לשורות שלא סומנו) — 53 בדיקות כולל fast-check | `src/lib/assistant/` |
+| 2026-09-24 | מבצע ה-materialize (אידמפוטנטי, שומר התקדמות אחרי כל צעד), הזמנת שותפים בזרימה הרגילה (`invitePartnerToOpenEntities`, `source:'invited'`), `discoveryKeywords` בכתיבה נפרדת best-effort | `src/lib/server/assistant/materialize.ts`, `matching/engine.ts`, `createComplexMatanot.ts` |
+| 2026-09-24 | מאגר ה-session (בדיקת גרסה), actions: `proposeRikmaBlueprint`, `getAssistantSession`, `setAssistantItems`, `undoAssistantRevision`, `materializeRikmaBlueprint` (`access:['user']` בלבד) | `session.ts`, `configs/assistantSessions.ts`, `qidsAssistant.js` (363–366, 370–372) |
+| 2026-09-24 | כלי MCP מאחורי `ASSISTANT_MCP_ENABLED`: `proposeRikmaBlueprint`, `getAssistant`, `setAssistantItems`, `undoAssistant` + פסקת הנחיות לשרת | `src/mastra/tools/assistantTools.ts` |
+| 2026-09-24 | מסך האישור: `BlueprintReview.svelte`, `/moach/import/[sessionId]`, `/moach/[projectId]/import/[sessionId]`, namespace `rikmaImport` ב-5 שפות | `src/lib/components/assistant/`, `src/routes/(reg)/moach/…/import/` |
+
+### 14.1 כדי להפעיל (סדר)
+
+1. **Deploy `1.0b`** (ענף `claude/ai-signup-concierge-97frwr` → `shabab`): `assistant-session`, `matanot.discoveryKeywords`,
+   `match-suggestion.source += 'invited'`. **לא** לסמן הרשאות Authenticated על `assistant-session` (§8.3).
+2. `npm run types:update` ב-`1.0`, ואז `npm run validate:qids` — עד השלב הזה qids 363–372 מתייחסים לשדות שעוד
+   לא קיימים בסכמה שנוצרה, והאימות ידווח עליהם.
+3. `ASSISTANT_MCP_ENABLED=true` ב-env של ה-VPS (`api.1lev1.com`) — רק שם רץ ה-MCP.
+4. בדיקת עשן: מ-Claude — "תוסיף את העסק שלי: <אתר>" ← `reviewUrl` ← "ליצור" ← המוצרים מופיעים ב-`/gift`
+   ובקונסיירז'.
+
+### 14.2 מה עוד לא נבנה (לפי סדר §12)
+
+- M4 המשך: qid 203 מחפש גם ב-`discoveryKeywords` — **אחרי** ה-deploy (שדה חסר שובר את השאילתה).
+- M2 המשך: `/api/analyze-business` מחזיר שרטוט (כדי שגם האתר, בלי Claude, ייצור session).
+- כפתור "ליצור את כל המסומנים" ב-`PlanBoard.svelte` (אותו מבצע).
+- M6 תצוגה מקדימה/הדגמה (`/preview/rikma/[shareKey]`), M7–M8 הרשמה דרך סוכן + כניסה מקישור המייל,
+  M9 ספק חדש ⇒ משאלות פתוחות, M10–M11 אונבורדינג וקונסיירז' בשיחה, M12 הרשמה מחלון ה-OAuth.
+- שותף **לא רשום**: היום מקבל המייסד קישור הצטרפות לשלוח בעצמו; מייל הזמנה מהמערכת לכתובת חיצונית — החלטה נפרדת.

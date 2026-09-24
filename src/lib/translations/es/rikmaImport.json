@@ -1,0 +1,58 @@
+{
+  "title": "Importar una rikma",
+  "subtitleNew": "Es un borrador: todavía no se ha creado nada. Corrige lo que haga falta, desmarca lo que no es para ahora y créalo todo con un clic.",
+  "subtitleExisting": "Añadir a la rikma «{{name}}». Todavía no se ha creado nada: marca qué crear y haz clic una vez.",
+  "track": {
+    "business": "Negocio",
+    "partnership": "Asociación existente",
+    "idea": "Idea"
+  },
+  "field": {
+    "name": "Nombre de la rikma"
+  },
+  "groups": {
+    "products": "Productos: lo que vende la rikma",
+    "rikmaMissions": "Misiones",
+    "rikmaResources": "Recursos",
+    "partners": "Socios"
+  },
+  "holder": {
+    "me": "Lo hago yo",
+    "open": "Buscamos a alguien",
+    "partner": "Lo aporta: {{name}}"
+  },
+  "row": {
+    "name": "Nombre",
+    "created": "creado",
+    "notNow": "Ahora no",
+    "partOf": "Se creará como parte de «{{name}}»",
+    "madeOf": "Compuesto de: {{names}}",
+    "price": "Precio",
+    "priceOnRequest": "A consultar",
+    "keywords": "Palabras con las que te buscarán",
+    "keywordsHint": "Separadas por comas: cómo describiría un cliente su necesidad, no el nombre del producto. Así te encuentra el conserje."
+  },
+  "partner": {
+    "noEmail": "Sin correo"
+  },
+  "selectedCount": "{{count}} marcados",
+  "submit": "Crear ({{count}})",
+  "creating": "Creando…",
+  "conflict": "El borrador cambió mientras tanto (quizá en el chat con tu asistente): esta es la versión más reciente. Revísala y vuelve a hacer clic.",
+  "error": "No se pudo crear. Inténtalo de nuevo en un momento.",
+  "result": {
+    "title": "Creado",
+    "created": "Se crearon {{count}} elementos.",
+    "failed": "No se crearon:",
+    "proposals": "Las filas que no marcaste se guardaron como propuestas en el tablero de planificación de la rikma.",
+    "openRikma": "Ir a la rikma",
+    "openBoards": "Ir al tablero de planificación"
+  },
+  "invite": {
+    "invited": "{{name}} recibió una invitación: una tarjeta en su página del corazón y un correo.",
+    "notRegistered": "{{name}} aún no está en 1lev1. Envíale el enlace para unirse:",
+    "pendingVote": "{{name}} será invitado/a cuando la rikma apruebe la misión.",
+    "noEmail": "No se indicó el correo de {{name}}, así que no se envió invitación.",
+    "other": "La invitación a {{name}} no se envió."
+  }
+}

@@ -509,6 +509,12 @@ export type ActionKey =
   | 'createSpaceDoc'
   | 'updateSpaceDoc'
   | 'archiveSpaceDoc'
+  // Assistant sessions — rikma import review screen (PLAN_AI_SIGNUP_CONCIERGE §4.5)
+  | 'proposeRikmaBlueprint'
+  | 'getAssistantSession'
+  | 'setAssistantItems'
+  | 'undoAssistantRevision'
+  | 'materializeRikmaBlueprint'
   ;
 
 
