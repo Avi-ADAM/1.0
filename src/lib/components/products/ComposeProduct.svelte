@@ -77,6 +77,9 @@
   let oneForeProject = $state(false);
   let croppedImage = $state<unknown>(null);
   let fixedPrice = $state(0); // used when pricingMode='fixed'
+  // Priced per request (a grocery basket): the buyer describes what she needs,
+  // the seller names the price on the request (PLAN_CONCIERGE_LOCAL_PROVIDERS §6).
+  let byQuote = $state(false);
 
   // Hydrate base fields from the quick-flow draft (once, on init).
   if (initialDraft) {
@@ -94,6 +97,7 @@
     if (initialDraft.price != null && Number(initialDraft.price) > 0) {
       fixedPrice = Number(initialDraft.price);
     }
+    if ((initialDraft as any).pricingMode === 'quote') byQuote = true;
   }
 
   // ─── complex-only fields ──────────────────────────────────────────────────
@@ -147,7 +151,9 @@
   }
 
   const isComplex = $derived(mode === 'complex');
-  const pricingMode = $derived<PricingMode>(isComplex ? 'estimated' : 'fixed');
+  const pricingMode = $derived<PricingMode>(
+    isComplex ? 'estimated' : byQuote ? 'quote' : 'fixed'
+  );
 
   const sumMissions = $derived(
     recipeMissions.reduce(
@@ -195,6 +201,9 @@
     desc: $t('offerings.compose.desc'),
     image: $t('offerings.compose.image'),
     price: $t('offerings.compose.price'),
+    byQuote: $t('offerings.compose.byQuote'),
+    byQuoteHint: $t('offerings.compose.byQuoteHint'),
+    priceFrom: $t('offerings.compose.priceFrom'),
     kindOf: $t('offerings.compose.kindOf'),
     kindTotal: $t('offerings.compose.kindTotal'),
     kindMonthly: $t('offerings.compose.kindMonthly'),
@@ -405,8 +414,13 @@
 
   <!-- Price (simple only) -->
   {#if !isComplex}
+    <label class="field quote-toggle">
+      <input type="checkbox" bind:checked={byQuote} />
+      <span>{ui.byQuote}</span>
+    </label>
+    {#if byQuote}<p class="quote-hint">{ui.byQuoteHint}</p>{/if}
     <label class="field">
-      <span class="label-block">{ui.price}</span>
+      <span class="label-block">{byQuote ? ui.priceFrom : ui.price}</span>
       <input
         class="inputt"
         type="number"
@@ -621,6 +635,19 @@
     --pink-l: var(--pink-l, #ff5a99);
   }
 
+  .quote-toggle {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+  }
+  .quote-hint {
+    margin: -4px 0 4px;
+    font-size: 12px;
+    opacity: 0.75;
+    line-height: 1.5;
+  }
   .mode-tabs {
     display: flex;
     gap: 0.5rem;

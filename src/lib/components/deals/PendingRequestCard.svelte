@@ -92,7 +92,9 @@
   <div class="meta">
     <div class="meta-item">
       <div class="ml">{$t('deals.metaTotal')}</div>
-      <div class="mv gold"><Money amount={Number(req.total || 0)} /></div>
+      <div class="mv gold">
+        {#if req.openPrice}{$t('deals.quote.byQuote')}{:else}<Money amount={Number(req.total || 0)} />{/if}
+      </div>
     </div>
     <div class="meta-item">
       <div class="ml">{$t('deals.metaQuantity')}</div>

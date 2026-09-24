@@ -1,29 +1,45 @@
 /**
- * Match Ratson (Wish) Action — PLAN_CONCIERGE §3.4 / §6
+ * Match Ratson (Wish) Action — PLAN_CONCIERGE §3.4 / §6,
+ * docs/PLAN_CONCIERGE_LOCAL_PROVIDERS.md
  *
- * MVP keyword matching (M3):
- *   1. Load the Ratson (categories, vallues, sub_category, lat/lng, language).
- *   2. Load candidate active matanots (with their project's vallues).
- *   3. Score each candidate by a weighted blend:
- *        w1·jaccard(ratson.vallues,  project.vallues)
- *      + w2·jaccard(ratson.categories, matanot.categories)
- *      + w3·(ratson.sub_category == matanot.sub_category ? 1 : 0)
- *      + w4·distanceProxScore(ratson lat/lng, matanot lat/lng, ratson.radius)
- *   4. Filter by THRESHOLD and create a `ratson_proposal` per candidate
- *      (kind='existing_matanot', auto_generated=true, status='suggested').
- *   5. Log a `ratson_match_job` and update the Ratson's
- *      `last_matched_at` + best `fulfillment_score`.
+ * Runs after a wish is published (and on demand from /concierge/[id]):
+ *   1. Load the Ratson — its extracted needs, AI category labels, values and
+ *      location.
+ *   2. Load candidate active matanots (with location + their rikma's values).
+ *   3. Keep a candidate only when its name shares words with one of the needs
+ *      (so the proposal has a plan row to live on) and, for a located wish,
+ *      only when the product's service area reaches her.
+ *   4. Score: w·text + w·categories + w·values + w·proximity, and create a
+ *      `ratson_proposal` above THRESHOLD (kind='existing_matanot',
+ *      auto_generated=true, status='suggested') carrying `covered_*` for its
+ *      need — the row then offers "✓ אני בוחרת" (acceptRatsonProposal →
+ *      Sheirutpend to the provider).
+ *   5. Log a `ratson_match_job` and update `last_matched_at` +
+ *      `fulfillment_score`.
+ *
+ * Why categories are compared by label: the composer stores the AI's category
+ * labels in `ai_meta.categories`, never as Category relations, and matanot has
+ * no `sub_category` — the old id-only formula could never reach its threshold.
  *
  * Out of scope here: vector embeddings (M6.5), AI semantic re-rank (M7+).
  */
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import {
+  bestNeedFor,
+  labelOverlap,
+  productPlace,
+  reachFor,
+  wishHasPlace,
+  type WishNeed,
+  type WishPlace
+} from '../../concierge/localMatch.js';
 
-const W = {
-  vallues: 0.35,
-  categories: 0.35,
-  subCategory: 0.15,
-  proximity: 0.15
+export const W = {
+  text: 0.45,
+  categories: 0.2,
+  vallues: 0.15,
+  proximity: 0.2
 } as const;
 
 const THRESHOLD = 0.25;
@@ -39,47 +55,70 @@ function jaccard(a: string[], b: string[]): number {
   return union ? inter / union : 0;
 }
 
-function haversineKm(
-  lat1: number | null,
-  lng1: number | null,
-  lat2: number | null,
-  lng2: number | null
-): number | null {
-  if (lat1 == null || lng1 == null || lat2 == null || lng2 == null) return null;
-  const R = 6371;
-  const toRad = (d: number) => (d * Math.PI) / 180;
-  const dLat = toRad(lat2 - lat1);
-  const dLon = toRad(lng2 - lng1);
-  const a =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
-  return 2 * R * Math.asin(Math.sqrt(a));
+/**
+ * 1 at the wish's door, 0.5 at the edge of the product's reach; a product with
+ * no point (online, or never located) is possible but unproven — 0.3. A wish
+ * with no place scores everyone 0, so proximity never decides alone.
+ */
+export function proximityScore(place: ReturnType<typeof productPlace>, wish: WishPlace): number {
+  if (!wishHasPlace(wish)) return 0;
+  const r = reachFor(place, wish);
+  if (!r.ok) return 0;
+  if (r.distanceKm === null) return 0.3;
+  const reach = (Number(place?.radius) || 50) + (Number(wish.radius) || 0);
+  return Math.max(0.5, 1 - (r.distanceKm / reach) * 0.5);
 }
 
-function proximityScore(
-  ratsonLat: number | null,
-  ratsonLng: number | null,
-  ratsonRadiusKm: number | null,
-  candLat: number | null,
-  candLng: number | null
-): number {
-  const dist = haversineKm(ratsonLat, ratsonLng, candLat, candLng);
-  if (dist == null) return 0;
-  const radius = ratsonRadiusKm && ratsonRadiusKm > 0 ? ratsonRadiusKm : 50;
-  if (dist <= 0) return 1;
-  if (dist >= radius * 2) return 0;
-  return Math.max(0, 1 - dist / (radius * 2));
+export interface ScoredCandidate {
+  need: WishNeed;
+  score: number;
+  textScore: number;
+  catScore: number;
+  valScore: number;
+  proxScore: number;
+}
+
+/** Pure scoring of one candidate product against a wish. null = not a match. */
+export function scoreCandidate(
+  cand: {
+    name: string;
+    place: ReturnType<typeof productPlace>;
+    categoryIds: string[];
+    categoryNames: string[];
+    projectVallues: string[];
+  },
+  wish: {
+    needs: WishNeed[];
+    place: WishPlace;
+    categoryIds: string[];
+    categoryLabels: string[];
+    vallues: string[];
+  }
+): ScoredCandidate | null {
+  const best = bestNeedFor(wish.needs, cand.name);
+  if (!best) return null;
+  if (!reachFor(cand.place, wish.place).ok) return null;
+  const textScore = best.score;
+  const catScore = Math.max(
+    jaccard(wish.categoryIds, cand.categoryIds),
+    labelOverlap(wish.categoryLabels, cand.categoryNames)
+  );
+  const valScore = jaccard(wish.vallues, cand.projectVallues);
+  const proxScore = proximityScore(cand.place, wish.place);
+  const score =
+    W.text * textScore + W.categories * catScore + W.vallues * valScore + W.proximity * proxScore;
+  return { need: best.need, score, textScore, catScore, valScore, proxScore };
 }
 
 type CandidateMatanot = {
   id: string;
   name: string;
-  sub_category: string | null;
   price: number | null;
   estimatedPrice: number | null;
-  lat: number | null;
-  lng: number | null;
-  categories: string[];
+  pricingMode: string | null;
+  place: ReturnType<typeof productPlace>;
+  categoryIds: string[];
+  categoryNames: string[];
   projectId: string | null;
   projectVallues: string[];
 };
@@ -110,17 +149,43 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
     throw new Error('Ratson not found');
   }
   const ratAttrs = ratNode.attributes ?? {};
-  const ratsonVallues: string[] = (ratAttrs.vallues?.data ?? []).map((v: any) => String(v.id));
-  const ratsonCategories: string[] = (ratAttrs.categories?.data ?? []).map((c: any) =>
-    String(c.id)
-  );
-  const ratsonSubCat: string | null = ratAttrs.sub_category ?? null;
-  const ratsonLat: number | null = typeof ratAttrs.lat === 'number' ? ratAttrs.lat : null;
-  const ratsonLng: number | null = typeof ratAttrs.lng === 'number' ? ratAttrs.lng : null;
-  const ratsonRadius: number | null =
-    typeof ratAttrs.radius === 'number' ? ratAttrs.radius : null;
 
-  // Index existing proposals by matanot id so we don't duplicate.
+  // Only the wisher runs matching on her own wish — it writes proposals onto it.
+  const owners = ratAttrs.users_permissions_users?.data ?? [];
+  if (!owners.some((o: any) => String(o.id) === String(context.userId))) {
+    throw new Error('Only the ratson owner may run matching on it');
+  }
+
+  const aiMeta = ratAttrs.ai_meta && typeof ratAttrs.ai_meta === 'object' ? ratAttrs.ai_meta : {};
+  const wishFacts = {
+    needs: [
+      ...(ratAttrs.extracted_missions ?? []).map((m: any, idx: number) => ({
+        name: String(m?.name ?? ''),
+        isResource: false,
+        idx
+      })),
+      ...(ratAttrs.extracted_resources ?? []).map((r: any, idx: number) => ({
+        name: String(r?.name ?? ''),
+        isResource: true,
+        idx
+      }))
+    ].filter((n: WishNeed) => n.name.trim().length > 0),
+    place: {
+      lat: ratAttrs.lat ?? null,
+      lng: ratAttrs.lng ?? null,
+      radius: ratAttrs.radius ?? null,
+      isOnline: !!ratAttrs.isOnline
+    } as WishPlace,
+    categoryIds: (ratAttrs.categories?.data ?? []).map((c: any) => String(c.id)),
+    categoryLabels: [
+      ...(Array.isArray(aiMeta.categories) ? aiMeta.categories : []),
+      ...(ratAttrs.categories?.data ?? []).map((c: any) => c?.attributes?.name)
+    ].filter((l: unknown): l is string => typeof l === 'string' && l.trim().length > 0),
+    vallues: (ratAttrs.vallues?.data ?? []).map((v: any) => String(v.id))
+  };
+
+  // Index existing proposals by matanot id so we don't duplicate — including
+  // ones she dismissed: a declined product is not offered again.
   const existingByMatanot = new Map<string, string>();
   const propsNodes = ratRes?.data?.ratsonProposals?.data ?? [];
   for (const p of propsNodes) {
@@ -130,49 +195,46 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
 
   // ── 2. Load candidate matanots ───────────────────────────────────────────
   let candidates: CandidateMatanot[] = [];
-  try {
-    const candRes = await strapi.execute(
-      '110listCandidateMatanots',
-      { limit },
-      context.jwt,
-      context.fetch
-    );
-    const nodes = candRes?.data?.matanots?.data ?? [];
-    candidates = nodes.map((n: any) => {
-      const a = n.attributes ?? {};
-      const proj = a.projectcreates?.data?.[0];
-      return {
-        id: String(n.id),
-        name: a.name ?? '',
-        sub_category: a.sub_category ?? null,
-        price: typeof a.price === 'number' ? a.price : null,
-        estimatedPrice: typeof a.estimatedPrice === 'number' ? a.estimatedPrice : null,
-        lat: typeof a.lat === 'number' ? a.lat : null,
-        lng: typeof a.lng === 'number' ? a.lng : null,
-        categories: (a.categories?.data ?? []).map((c: any) => String(c.id)),
-        projectId: proj?.id ? String(proj.id) : null,
-        projectVallues: (proj?.attributes?.vallues?.data ?? []).map((v: any) => String(v.id))
-      };
-    });
-  } catch (err) {
-    console.warn('[matchRatson] candidate fetch failed:', err);
+  if (wishFacts.needs.length > 0) {
+    try {
+      const candRes = await strapi.execute(
+        '110listCandidateMatanots',
+        { limit },
+        context.jwt,
+        context.fetch
+      );
+      const nodes = candRes?.data?.matanots?.data ?? [];
+      candidates = nodes.map((n: any) => {
+        const a = n.attributes ?? {};
+        const proj = a.projectcreates?.data?.[0];
+        return {
+          id: String(n.id),
+          name: a.name ?? '',
+          price: typeof a.price === 'number' ? a.price : null,
+          estimatedPrice: typeof a.estimatedPrice === 'number' ? a.estimatedPrice : null,
+          pricingMode: a.pricingMode ?? null,
+          place: productPlace(a),
+          categoryIds: (a.categories?.data ?? []).map((c: any) => String(c.id)),
+          categoryNames: (a.categories?.data ?? [])
+            .map((c: any) => c?.attributes?.name)
+            .filter((x: unknown): x is string => typeof x === 'string'),
+          projectId: proj?.id ? String(proj.id) : null,
+          projectVallues: (proj?.attributes?.vallues?.data ?? []).map((v: any) => String(v.id))
+        };
+      });
+    } catch (err) {
+      console.warn('[matchRatson] candidate fetch failed:', err);
+    }
   }
 
   // ── 3. Score ─────────────────────────────────────────────────────────────
   const scored = candidates
+    .filter((c) => c.projectId && !existingByMatanot.has(c.id))
     .map((c) => {
-      const valScore = jaccard(ratsonVallues, c.projectVallues);
-      const catScore = jaccard(ratsonCategories, c.categories);
-      const subScore = ratsonSubCat && c.sub_category && ratsonSubCat === c.sub_category ? 1 : 0;
-      const proxScore = proximityScore(ratsonLat, ratsonLng, ratsonRadius, c.lat, c.lng);
-      const score =
-        W.vallues * valScore +
-        W.categories * catScore +
-        W.subCategory * subScore +
-        W.proximity * proxScore;
-      return { ...c, score, valScore, catScore, subScore, proxScore };
+      const s = scoreCandidate(c, wishFacts);
+      return s ? { ...c, ...s } : null;
     })
-    .filter((c) => c.score >= threshold && !existingByMatanot.has(c.id))
+    .filter((c): c is CandidateMatanot & ScoredCandidate => !!c && c.score >= threshold)
     .sort((a, b) => b.score - a.score)
     .slice(0, topK);
 
@@ -180,7 +242,9 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
   const createdProposalIds: string[] = [];
   for (const cand of scored) {
     try {
-      const totalPrice = cand.estimatedPrice ?? cand.price ?? 0;
+      // Priced by quote: no number to propose — the shop names it on the request.
+      const totalPrice =
+        cand.pricingMode === 'quote' ? null : (cand.estimatedPrice ?? cand.price ?? 0);
       const proposalVars: Record<string, unknown> = {
         ratson: ratsonId,
         kind: 'existing_matanot',
@@ -190,6 +254,14 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
         total_price: totalPrice,
         match_score: cand.score,
         auto_generated: true,
+        // The plan row this product answers — /concierge/[id] renders the
+        // proposal there, with the accept/dismiss buttons.
+        covered_missions: cand.need.isResource
+          ? []
+          : [{ extracted_mission_idx: String(cand.need.idx), hours: null, price: totalPrice }],
+        covered_resources: cand.need.isResource
+          ? [{ extracted_resource_idx: String(cand.need.idx), quantity: null, price: totalPrice }]
+          : [],
         publishedAt: startedAt
       };
       const r = await strapi.execute(

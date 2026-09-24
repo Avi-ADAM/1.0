@@ -135,6 +135,12 @@
       toast.success($t('lev.cards.productRequest.successApprove'));
     } catch (err) {
       console.error(err);
+      // A quote waiting on the customer is not an error to hide: send the
+      // seller to the request, where the price conversation is.
+      if (err instanceof Error && /customer|price first/i.test(err.message)) {
+        handleViewRequest();
+        return;
+      }
       toast.error($t('lev.cards.productRequest.error'));
     } finally {
       isProcessing = false;
@@ -255,7 +261,7 @@
             class="w-5 h-5"
           />
           <span class="font-bold text-gray-800 dark:text-gray-100"
-            >{buble.price}</span
+            >{buble.openPrice ? $t('deals.quote.byQuote') : buble.price}</span
           >
         </div>
       </div>
@@ -279,7 +285,9 @@
             alt="money"
             class="w-6 h-6"
           />
-          <span class="text-xl font-black text-barbi">{buble.total}</span>
+          <span class="text-xl font-black text-barbi"
+            >{buble.openPrice ? $t('deals.quote.byQuote') : buble.total}</span
+          >
         </div>
       </div>
     </div>
@@ -374,6 +382,15 @@
     >
       {$t('lev.cards.productRequest.refuse')}
     </button>
+    {#if buble.openPrice}
+    <!-- Priced by quote: nothing to approve until the shop names a price. -->
+    <button
+      class="flex-2 py-2 bg-gradient-to-r from-barbi to-mpink text-white font-extrabold rounded-xl shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all"
+      onclick={(e) => { e.stopPropagation(); handleViewRequest(); }}
+    >
+      {$t('deals.quote.propose')}
+    </button>
+    {:else}
     <button
       class="flex-2 py-2 bg-gradient-to-r from-barbi to-mpink text-white font-extrabold rounded-xl shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all disabled:opacity-50"
       onclick={(e) => { e.stopPropagation(); handleAction('approve'); }}
@@ -389,6 +406,7 @@
         {$t('lev.cards.productRequest.approve')}
       {/if}
     </button>
+    {/if}
   </div>
 </div>
 

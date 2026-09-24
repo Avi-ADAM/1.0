@@ -25,6 +25,8 @@
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { requestWishMissionConfig } from './requestWishMission.js';
+import { openingPrice, plainExcerpt } from '$lib/sheirut/quoteState';
+import { loadQuote, postToRequestChat } from '../../sheirut/quote.js';
 
 const ACCEPTABLE_FROM_STATUSES = new Set(['suggested', 'viewed']);
 
@@ -186,8 +188,8 @@ const handler: ActionExecutionHandler = async (params, context, util) => {
       }
     }
 
-    // Notify the chosen volunteer (socket + push). The action-level config targets
-    // projectMembers and yields nobody here, so dispatch explicitly. Fire & forget.
+    // Notify the chosen volunteer. The action-level config targets the proposer
+    // rikma, which a volunteer does not have, so dispatch explicitly. Fire & forget.
     if (util.notifier) {
       util.notifier
         .notify(
@@ -205,7 +207,8 @@ const handler: ActionExecutionHandler = async (params, context, util) => {
                 ar: `تم اختيارك لتنفيذ "${missionName}".`
               }
             },
-            channels: ['socket', 'push'],
+            channels: ['socket', 'email', 'telegram', 'push'],
+            emailTemplate: 'SimpleNuti',
             metadata: { priority: 'high', type: 'ratsonProposal', url: `/concierge/${ratsonId}` }
           },
           params,
@@ -228,7 +231,8 @@ const handler: ActionExecutionHandler = async (params, context, util) => {
         statusProposal: 'accepted',
         concierge: true
       },
-      recipientIds: [volunteerId],
+      // No recipientIds / projectId here: the volunteer was notified above, and
+      // the action-level notification (to a proposer rikma) must stay silent.
       updateStrategy: { type: 'none' as const }
     };
   }
@@ -249,15 +253,23 @@ const handler: ActionExecutionHandler = async (params, context, util) => {
   );
 
   // ── 3. Create the Sheirutpend so the proposer side can vote ─────────────
+  // A proposal without a price (a product priced by quote) opens at her
+  // budget, or open — the shop names it on the request (§6 of
+  // PLAN_CONCIERGE_LOCAL_PROVIDERS).
+  const requestPrice = openingPrice({
+    price: typeof pa.total_price === 'number' ? pa.total_price : null,
+    budget:
+      ratsonAttrs.bounti && typeof ratsonAttrs.totalbounti === 'number' ? ratsonAttrs.totalbounti : null
+  });
   const sheirutpendRes = await strapi.execute(
     '71createSheirutpend',
     {
       project: projectId,
       userId: wisherUserId,
       matanots: [matanotId],
-      price: totalPrice,
+      price: requestPrice,
       quant: 1,
-      total: totalPrice,
+      total: requestPrice,
       startDate: ratsonStart,
       finnishDate: ratsonFinish,
       appruved: false
@@ -287,6 +299,12 @@ const handler: ActionExecutionHandler = async (params, context, util) => {
         '[acceptRatsonProposal] could not link sheirutpend.ratson_proposal - schema field may be missing:',
         err
       );
+    }
+    // Her wish, where the shop answers it — the request's chat.
+    const wishText = plainExcerpt(ratsonAttrs.longDes || ratsonAttrs.desc || '');
+    if (wishText) {
+      const q = await loadQuote(strapi as any, sheirutpendId).catch(() => null);
+      if (q) await postToRequestChat(strapi as any, q, String(context.userId), `📝 ${wishText}`);
     }
   }
 
@@ -348,9 +366,14 @@ export const acceptRatsonProposalConfig: ActionConfig = {
   },
   authRules: [{ type: 'jwt', errorMessage: 'Must be logged in to accept a proposal' }],
   notification: {
+    // The provider rikma comes from the *result* — the client sends only
+    // proposalId/ratsonId, so a `projectMembers` rule reading params.projectId
+    // resolved nobody and the provider never heard that she accepted.
+    // `specificUsers` with no ids falls back to projectIdParam on the result.
     recipients: {
-      type: 'projectMembers',
+      type: 'specificUsers',
       config: {
+        userIdsParam: 'recipientIds',
         projectIdParam: 'projectId',
         excludeSender: true
       }
@@ -362,16 +385,17 @@ export const acceptRatsonProposalConfig: ActionConfig = {
         ar: 'تمت الموافقة على العرض - مطلوبة موافقتك'
       },
       body: {
-        he: 'הלקוחה אישרה את ההצעה. נא לאשר את הבקשה ב־Sheirutpend כדי שהדיל ייסגר.',
-        en: 'The wisher accepted your proposal. Please approve the Sheirutpend so the deal can close.',
-        ar: 'وافقت العميلة على عرضك. الرجاء الموافقة على الـ Sheirutpend لإغلاق الصفقة.'
+        he: 'לקוחה בחרה במוצר שלך דרך הקונסיירז׳. יש להיכנס ל־Deals כדי לאשר את הבקשה.',
+        en: 'A customer chose your product through the concierge. Open Deals to approve the request.',
+        ar: 'اختارت عميلة منتجك عبر الكونسيرج. افتح Deals للموافقة على الطلب.'
       }
     },
-    channels: ['socket', 'push'],
+    channels: ['socket', 'email', 'telegram', 'push'],
+    emailTemplate: 'SimpleNuti',
     metadata: {
       priority: 'high',
       type: 'sheirutUpdate',
-      url: '/lev'
+      url: '/deals'
     }
   }
 };

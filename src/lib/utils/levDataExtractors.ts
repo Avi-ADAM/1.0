@@ -1893,6 +1893,10 @@ export function extractProductRequests(userData: any): ProductRequestData[] {
         price: attrs.price || firstMatana?.price || 0,
         quant: attrs.quant || firstMatana?.quant || 0,
         total: attrs.total || 0,
+        // A product request with no price is priced by quote: the shop names it
+        // on the request page (PLAN_CONCIERGE_LOCAL_PROVIDERS §6). A service
+        // proposal carries `sheirut` and never had a price.
+        openPrice: attrs.price == null && !sheirut,
         kindOf: firstMatana?.kindOf || sheirut?.kindOf || '',
         pricingMode: firstMatana?.pricingMode,
         src: firstMatana?.pic?.data?.attributes?.url,

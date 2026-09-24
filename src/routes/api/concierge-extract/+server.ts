@@ -12,6 +12,9 @@
  * ({ missions, resources, hints }) and adds { skills, categories,
  * titleSuggestion, matches: { missions, people } }.
  *
+ * With { place: { lat, lng, radius, isOnline } } the enrichment keeps only
+ * providers that reach the wish, nearest first (PLAN_CONCIERGE_LOCAL_PROVIDERS).
+ *
  * Enrichment is skipped automatically for short/empty extractions and can be
  * turned off per-request with { enrich: false } (e.g. while the user is still
  * typing) to keep the keystroke-debounced path cheap.
@@ -22,6 +25,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { extractWish, EMPTY_EXTRACTION, type WishExtraction } from '$lib/server/ai/extractWish';
 import { enrichWish, EMPTY_ENRICHMENT, type WishEnrichment } from '$lib/server/ai/enrichWish';
+import type { WishPlace } from '$lib/server/concierge/localMatch';
 
 /** Below this length, grounding the wish in the DB is noise — skip enrichment. */
 const ENRICH_MIN_TEXT = 40;
@@ -44,6 +48,16 @@ export const POST: RequestHandler = async ({ request, fetch }) => {
   const body = await request.json().catch(() => ({}));
   const text: string = body?.text ?? '';
   const wantEnrich: boolean = body?.enrich !== false;
+  const rawPlace = body?.place;
+  const place: WishPlace | null =
+    rawPlace && typeof rawPlace === 'object'
+      ? {
+          lat: rawPlace.lat ?? null,
+          lng: rawPlace.lng ?? null,
+          radius: rawPlace.radius ?? null,
+          isOnline: rawPlace.isOnline === true
+        }
+      : null;
 
   console.log(`[concierge-extract] ▶ text length: ${text.length}, enrich: ${wantEnrich}`);
 
@@ -72,7 +86,7 @@ export const POST: RequestHandler = async ({ request, fetch }) => {
   if (wantEnrich && hasSignal && text.trim().length >= ENRICH_MIN_TEXT) {
     const t1 = Date.now();
     try {
-      enrichment = await enrichWish(extraction, fetch);
+      enrichment = await enrichWish(extraction, fetch, { place });
       console.log(
         `[concierge-extract] ✓ enriched in ${Date.now() - t1}ms - ` +
           `missions:${enrichment.missions.length} people:${enrichment.people.length}`

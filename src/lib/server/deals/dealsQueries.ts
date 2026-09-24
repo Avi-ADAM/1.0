@@ -12,6 +12,8 @@ export interface PendingRequestData {
   projectId: string;
   projectName: string;
   price: number;
+  /** No price yet — priced by quote; the seller names it on the request. */
+  openPrice?: boolean;
   quant: number;
   total: number;
   startDate?: string;
@@ -114,6 +116,7 @@ function mapSheirutpend(node: any, projectId?: string, projectName?: string): Pe
     projectId: proj?.id ? String(proj.id) : (projectId ?? ''),
     projectName: proj?.attributes?.projectName || projectName || '',
     price: Number(attrs.price) || 0,
+    openPrice: attrs.price === null && !attrs.sheirut?.data,
     quant: Number(attrs.quant) || 0,
     total: Number(attrs.total) || 0,
     startDate: attrs.startDate || undefined,

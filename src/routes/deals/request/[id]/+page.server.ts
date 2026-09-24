@@ -1,6 +1,7 @@
 import { redirect, error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { sendViaProxy } from '$lib/server/sendViaProxy.js';
+import { actionViaProxy } from '$lib/server/actionViaProxy.js';
 
 export const load: PageServerLoad = async ({ locals, params, fetch }) => {
   const tok = (locals as any).tok as string | undefined;
@@ -26,13 +27,34 @@ export const load: PageServerLoad = async ({ locals, params, fetch }) => {
     if (!isOwner && !isProjectMember) throw error(403, 'Not authorized');
 
     const votes = attrs.votes?.data ?? [];
-    const voteCount = votes.filter((v: any) => v.attributes?.what === true).length;
-    const alreadyVoted = votes.some((v: any) => {
-      const voterId = String(v.attributes?.users_permissions_user?.data?.id ?? '');
-      return voterId === String(uid) && v.attributes?.what === true;
-    });
+    // Counted per round once prices are negotiated: a yes to an earlier price
+    // is not a yes to the one on the table now.
+    const yesAt = (order: number | null) =>
+      votes.filter(
+        (v: any) =>
+          v.attributes?.what === true &&
+          (order === null || Number(v.attributes?.order ?? 0) === order)
+      );
 
     const mAttrsFull = mAttrs;
+
+    // Price rounds and whose turn it is (PLAN_CONCIERGE_LOCAL_PROVIDERS §6).
+    // Best-effort: without it the page behaves as it always did.
+    let quote: any = null;
+    try {
+      const q = await actionViaProxy(fetch, 'getSheirutpendQuote', { sheirutpendId: params.id });
+      if (q?.success && q.data?.state) quote = q.data;
+    } catch (e) {
+      console.warn('[deals/request] quote load failed (non-fatal):', e);
+    }
+    const roundVotes = yesAt(quote && quote.state.rounds.length > 0 ? quote.state.order : null);
+    const memberIdSet = new Set(members.map((m: any) => String(m.id)));
+    const voteCount = roundVotes.filter((v: any) =>
+      memberIdSet.has(String(v.attributes?.users_permissions_user?.data?.id ?? ''))
+    ).length;
+    const alreadyVoted = roundVotes.some(
+      (v: any) => String(v.attributes?.users_permissions_user?.data?.id ?? '') === String(uid)
+    );
 
     return {
       id: params.id,
@@ -63,7 +85,8 @@ export const load: PageServerLoad = async ({ locals, params, fetch }) => {
       requesterPic: user?.attributes?.profilePic?.data?.attributes?.url || null,
       votes: attrs.votes?.data ?? [],
       createdAt: attrs.createdAt || null,
-      forumId: attrs.forum?.data?.id || null
+      forumId: attrs.forum?.data?.id || null,
+      quote
     };
   } catch (e: any) {
     if (e?.status) throw e;

@@ -55,6 +55,13 @@ import { createComplexMatanotConfig } from './createComplexMatanot.js';
 import { approveMatanotConfig } from './approveMatanot.js';
 import { createRatsonConfig } from './createRatson.js';
 import { matchRatsonConfig } from './matchRatson.js';
+import { refreshWishMatchesConfig } from './refreshWishMatches.js';
+import {
+  quoteSheirutpendConfig,
+  acceptSheirutQuoteConfig,
+  getSheirutpendQuoteConfig,
+  noteSheirutpendConfig
+} from './sheirutQuote.js';
 import { acceptRatsonProposalConfig } from './acceptRatsonProposal.js';
 import { rejectRatsonProposalConfig } from './rejectRatsonProposal.js';
 import { updateRatsonExtractionConfig } from './updateRatsonExtraction.js';
@@ -328,6 +335,13 @@ export function registerAllActions(): void {
   // Concierge / Ratson (wish flow — PLAN_CONCIERGE)
   registerAction(createRatsonConfig);
   registerAction(matchRatsonConfig);
+  registerAction(refreshWishMatchesConfig);
+
+  // Price quotes on product requests (PLAN_CONCIERGE_LOCAL_PROVIDERS §6)
+  registerAction(quoteSheirutpendConfig);
+  registerAction(acceptSheirutQuoteConfig);
+  registerAction(getSheirutpendQuoteConfig);
+  registerAction(noteSheirutpendConfig);
   registerAction(acceptRatsonProposalConfig);
   registerAction(rejectRatsonProposalConfig);
   registerAction(updateRatsonExtractionConfig);
@@ -552,6 +566,11 @@ export {
   approveMatanotConfig,
   createRatsonConfig,
   matchRatsonConfig,
+  refreshWishMatchesConfig,
+  quoteSheirutpendConfig,
+  acceptSheirutQuoteConfig,
+  getSheirutpendQuoteConfig,
+  noteSheirutpendConfig,
   acceptRatsonProposalConfig,
   rejectRatsonProposalConfig,
   finalizeJoinAcceptanceConfig,

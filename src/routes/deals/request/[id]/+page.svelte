@@ -8,6 +8,9 @@
   import ChatSmall from '$lib/components/footer/chatSmall.svelte';
   import { forum, nowChatId, isChatOpen, initialForum } from '$lib/stores/pendMisMes.js';
   import { addVote, rejectSheirutpend } from '$lib/client/actionClient';
+  import QuotePanel from '$lib/components/deals/QuotePanel.svelte';
+  import { t } from '$lib/translations';
+  import { providerCanApprove } from '$lib/sheirut/quoteState';
 
   let { data } = $props();
 
@@ -47,6 +50,20 @@
   let isProcessing = $state(false);
   let localVoteCount = $state(data.voteCount ?? 0);
   let localAlreadyVoted = $state(data.alreadyVoted ?? false);
+
+  /* Price quotes: the panel shows while the request is open; the seller's
+   * approve waits until there is a price and it is theirs to answer. */
+  const quote = $derived(data.quote && !data.quote.closed ? data.quote : null);
+  const approveBlocked = $derived(
+    !!quote && quote.side === 'provider' && !providerCanApprove(quote.state)
+  );
+  const approveBlockedWhy = $derived(
+    !quote
+      ? ''
+      : quote.state.openPrice
+        ? $t('deals.quote.approveBlockedOpen')
+        : $t('deals.quote.approveBlockedCustomer')
+  );
 
   async function handleApprove() {
     if (isProcessing || localAlreadyVoted) return;
@@ -176,6 +193,15 @@
     </div>
   </div>
 
+  {#if quote}
+    <QuotePanel
+      sheirutpendId={String(data.id)}
+      side={quote.side}
+      quote={quote.state}
+      silenceAt={quote.silenceAt ?? null}
+    />
+  {/if}
+
   <div class="cards-row">
     <!-- Details card -->
     <div class="info-card">
@@ -190,15 +216,23 @@
         </div>
         <div class="row">
           <span class="rl">כמות</span>
-          <span class="rv">{data.quant}</span>
+          <span class="rv">{quote?.state.quant ?? data.quant}</span>
         </div>
         <div class="row">
           <span class="rl">מחיר ליחידה</span>
-          <span class="rv"><Money amount={data.price} /></span>
+          <span class="rv"
+            >{#if quote?.state.openPrice}{$t('deals.quote.byQuote')}{:else}<Money
+                amount={quote?.state.price ?? data.price}
+              />{/if}</span
+          >
         </div>
         <div class="row total-row">
           <span class="rl">סה"כ</span>
-          <span class="rv gold"><Money amount={data.total} /></span>
+          <span class="rv gold"
+            >{#if quote?.state.openPrice}{$t('deals.quote.byQuote')}{:else}<Money
+                amount={quote?.state.total ?? data.total}
+              />{/if}</span
+          >
         </div>
         {#if data.startDate}
           <div class="row">
@@ -252,6 +286,9 @@
               <span class="vote-label">{localVoteCount} / {data.memberCount} אישורים</span>
             </div>
           {/if}
+          {#if approveBlocked}
+            <div class="vote-label">{approveBlockedWhy}</div>
+          {/if}
           <div class="seller-btns">
             <button
               class="btn-reject"
@@ -263,7 +300,8 @@
             <button
               class="btn-approve"
               onclick={handleApprove}
-              disabled={isProcessing || localAlreadyVoted}
+              disabled={isProcessing || localAlreadyVoted || approveBlocked}
+              title={approveBlocked ? approveBlockedWhy : undefined}
             >
               {#if isProcessing}
                 מעבד...

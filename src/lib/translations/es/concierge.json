@@ -268,6 +268,8 @@
       "skills": "✶ Habilidades necesarias",
       "existing": "◆ Ya existe en el sistema",
       "freeResources": "◐ Recursos disponibles · {{count}}",
+      "products": "🎁 Productos listos · {{count}}",
+      "byQuote": "Precio a presupuesto",
       "people": "♥ Personas que pueden ayudar · {{count}}",
       "hiddenIdentity": "Identidad oculta",
       "hints": "Sugerencias suaves",

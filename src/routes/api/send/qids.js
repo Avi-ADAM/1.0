@@ -8092,15 +8092,18 @@ ${STIPEND_DECISION_FIELDS}
           name
           price
           estimatedPrice
+          pricingMode
           lat
           lng
           radius
+          location { lat lng radius location_mode }
           categories { data { id attributes { name } } }
           projectcreates {
             data {
               id
               attributes {
                 projectName
+                location { lat lng radius location_mode }
                 vallues { data { id attributes { valueName } } }
               }
             }
@@ -12652,10 +12655,10 @@ ${STIPEND_DECISION_FIELDS}
 
   // Find real platform members who hold a given skill — the heart of
   // "check if there are people with these skills and suggest them".
-  '201findUsersBySkill': `query FindUsersBySkill($q: String) {
+  '201findUsersBySkill': `query FindUsersBySkill($q: String, $limit: Int = 8) {
     usersPermissionsUsers(
       filters: { skills: { skillName: { containsi: $q } } }
-      pagination: { limit: 8 }
+      pagination: { limit: $limit }
     ) {
       data {
         id
@@ -12664,6 +12667,7 @@ ${STIPEND_DECISION_FIELDS}
           profilePic { data { attributes { url formats } } }
           skills { data { id attributes { skillName } } }
           projects_1s { data { id attributes { projectName } } }
+          location { lat lng radius location_mode }
         }
       }
     }
@@ -12672,7 +12676,7 @@ ${STIPEND_DECISION_FIELDS}
   // Find *available* resource instances (Sp = who holds a resource; mashaabim is
   // the template). panui=true means free. Used to suggest real resources +
   // their owners for a wish's extracted resources.
-  '202findAvailableSp': `query FindAvailableSp($q: String) {
+  '202findAvailableSp': `query FindAvailableSp($q: String, $limit: Int = 6) {
     sps(
       filters: {
         archived: { eq: false }
@@ -12683,7 +12687,7 @@ ${STIPEND_DECISION_FIELDS}
           { mashaabim: { name: { containsi: $q } } }
         ]
       }
-      pagination: { limit: 6 }
+      pagination: { limit: $limit }
     ) {
       data {
         id
@@ -12693,9 +12697,10 @@ ${STIPEND_DECISION_FIELDS}
           price
           panui
           kindOf
+          location { lat lng radius location_mode }
           mashaabim { data { id attributes { name } } }
-          users_permissions_user { data { id attributes { username profilePic { data { attributes { url } } } } } }
-          project { data { id attributes { projectName } } }
+          users_permissions_user { data { id attributes { username profilePic { data { attributes { url } } } location { lat lng radius location_mode } } } }
+          project { data { id attributes { projectName location { lat lng radius location_mode } } } }
         }
       }
     }
@@ -12704,12 +12709,12 @@ ${STIPEND_DECISION_FIELDS}
   // Find existing *products* (matanot) a weave (project) already offers, by name.
   // A wish's need may be fulfilled by a ready product — picking one routes into
   // the built-in service-request flow (createSheirutpend). Active, non-archived only.
-  '203findMatanotByText': `query FindMatanotByText($q: String) {
+  '203findMatanotByText': `query FindMatanotByText($q: String, $limit: Int = 6) {
     matanots(
       filters: { and: [ { archived: { eq: false }
         status_of_voting: { eq: "active" }
         name: { containsi: $q } }, ${NOT_ARCHIVED} ] }
-      pagination: { limit: 6 }
+      pagination: { limit: $limit }
     ) {
       data {
         id
@@ -12718,9 +12723,12 @@ ${STIPEND_DECISION_FIELDS}
           desc
           price
           estimatedPrice
+          pricingMode
+          lat lng radius
+          location { lat lng radius location_mode }
           currency { data { id attributes { name simbol } } }
           projectcreates {
-            data { id attributes { projectName profilePic { data { attributes { url } } } } }
+            data { id attributes { projectName profilePic { data { attributes { url } } } location { lat lng radius location_mode } } }
           }
         }
       }
@@ -13517,6 +13525,7 @@ ${STIPEND_DECISION_FIELDS}
           profilePic { data { attributes { url } } }
           skills { data { attributes { skillName } } }
           projects_1s { data { attributes { projectName } } }
+          location { lat lng radius location_mode }
         } } }
       } }
     }
@@ -15494,6 +15503,56 @@ ${STIPEND_DECISION_FIELDS}
   '296createSheirutpendProposal': `mutation CreateSheirutpendProposal($sheirut: ID!, $project: ID!, $userId: ID) {
     createSheirutpend(data: { sheirut: $sheirut, project: $project, users_permissions_user: $userId, archived: false, appruved: false }) {
       data { id }
+    }
+  }`,
+
+  /**
+   * Price quotes on a product request (docs/PLAN_CONCIERGE_LOCAL_PROVIDERS.md
+   * §6): the request, its `sheirutnego` rounds and the votes on them — what
+   * src/lib/sheirut/quoteState.ts needs to say whose turn it is.
+   */
+  '360getSheirutpendQuote': `query GetSheirutpendQuote($id: ID!) {
+    sheirutpend(id: $id) {
+      data {
+        id
+        attributes {
+          archived
+          appruved
+          price
+          quant
+          total
+          users_permissions_user { data { id attributes { username } } }
+          project { data { id attributes { projectName restime user_1s { data { id } } } } }
+          forum { data { id } }
+          sheirut { data { id attributes { isApruved archived } } }
+          matanots { data { id attributes { name pricingMode } } }
+          sheirutnegos(pagination: { limit: 100 }) {
+            data { id attributes { price quant createdAt users_permissions_user { data { id } } } }
+          }
+          votes(pagination: { limit: 200 }) {
+            data { id attributes { what order users_permissions_user { data { id } } } }
+          }
+        }
+      }
+    }
+  }`,
+
+  '361createSheirutnego': `mutation CreateSheirutnego($sheirutpend: ID!, $price: Float, $quant: Float, $userId: ID!, $publishedAt: DateTime!) {
+    createSheirutnego(data: {
+      sheirutpend: $sheirutpend
+      price: $price
+      quant: $quant
+      users_permissions_user: $userId
+      isOriginal: false
+      publishedAt: $publishedAt
+    }) {
+      data { id }
+    }
+  }`,
+
+  '362getActiveTimegramaForSheirutpend': `query GetActiveTimegramaForSheirutpend($id: ID!) {
+    timegramas(filters: { sheirutpend: { id: { eq: $id } }, done: { ne: true } }, sort: "id:desc", pagination: { limit: 1 }) {
+      data { id attributes { date } }
     }
   }`,
 

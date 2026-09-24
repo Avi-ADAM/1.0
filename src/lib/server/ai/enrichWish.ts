@@ -15,12 +15,28 @@
  *      Sp is the per-owner instance with `panui` (free) — so we look up free Sp
  *      rows and surface their owners (`202findAvailableSp`).
  *
+ * Location (docs/PLAN_CONCIERGE_LOCAL_PROVIDERS.md): when the wish has a
+ * place, providers whose area does not reach it are dropped and the rest are
+ * ordered nearest first, each carrying `distanceKm`. Online / unlocated
+ * providers are kept, after the located ones. With no place, nothing changes.
+ *
  * DB calls go through the vetted `/api/send` proxy with the request-scoped
  * `fetch`, so auth cookies + the qids allow-list are reused.
  */
 
 import { fuzzyMissionMatch } from '../../utils/fuzzyMatch';
 import { matchCategory, type MatchResult } from '../../embed/matcher';
+import {
+  byDistance,
+  personPlaces,
+  productPlace,
+  reachFor,
+  reachForPerson,
+  toNum,
+  wishHasPlace,
+  type Reach,
+  type WishPlace
+} from '../concierge/localMatch';
 import type { WishExtraction } from './extractWish';
 
 type FetchFn = typeof globalThis.fetch;
@@ -51,6 +67,8 @@ export interface SuggestedPerson {
   skills: string[];
   matchedSkills: string[];
   projects: string[];
+  /** km from the wish; null when unknown (no place on either side). */
+  distanceKm?: number | null;
 }
 
 export interface AvailableResource {
@@ -64,6 +82,7 @@ export interface AvailableResource {
   ownerAvatar: string | null;
   project: string | null;
   matchedTerm: string;
+  distanceKm?: number | null;
 }
 
 export interface SuggestedProduct {
@@ -78,6 +97,9 @@ export interface SuggestedProduct {
   currencyName: string | null;
   currencySymbol: string | null;
   matchedTerm: string;
+  distanceKm?: number | null;
+  /** 'quote' = priced per request (a grocery basket) — `price` is not the deal. */
+  pricingMode?: string | null;
 }
 
 export interface WishEnrichment {
@@ -86,7 +108,27 @@ export interface WishEnrichment {
   people: SuggestedPerson[];
   resources: AvailableResource[];
   products: SuggestedProduct[];
+  /**
+   * The place these results were filtered for (`placeKey`), or null when the
+   * wish had none — lets a reader tell whether a saved snapshot is stale.
+   */
+  place?: string | null;
 }
+
+/** Stable key of a wish place, for comparing a snapshot with the wish. */
+export function placeKey(place: WishPlace | null | undefined): string | null {
+  if (!wishHasPlace(place)) return null;
+  const r = (n: unknown) => Math.round((toNum(n) ?? 0) * 1000) / 1000;
+  return `${r(place.lat)},${r(place.lng)},${toNum(place.radius) ?? ''}`;
+}
+
+export interface EnrichOptions {
+  /** Where the wish is — filters and orders providers by reach. */
+  place?: WishPlace | null;
+}
+
+/** Wider pages when we will filter by place, so near providers are not cut. */
+const LOCATED_LIMIT = 20;
 
 export const EMPTY_ENRICHMENT: WishEnrichment = {
   skills: [],
@@ -158,8 +200,11 @@ function dedupeCap(values: string[], cap: number): string[] {
 
 export async function enrichWish(
   extraction: WishExtraction,
-  fetchFn: FetchFn
+  fetchFn: FetchFn,
+  opts: EnrichOptions = {}
 ): Promise<WishEnrichment> {
+  const place = wishHasPlace(opts.place) ? opts.place : null;
+  const limitArg = place ? { limit: LOCATED_LIMIT } : {};
   const skillTerms = extraction.skills.map((s) => s.name);
   const missionNames = extraction.missions.map((m) => m.name);
   const resourceNames = extraction.resources.map((r) => r.name);
@@ -191,15 +236,17 @@ export async function enrichWish(
 
   // ── 2, 4 & 5. People + available resources + existing products, in parallel ─
   const [peopleResults, resourceResults, productResults] = await Promise.all([
-    Promise.all(peopleTerms.map((q) => sendQid(fetchFn, '201findUsersBySkill', { q }))),
+    Promise.all(
+      peopleTerms.map((q) => sendQid(fetchFn, '201findUsersBySkill', { q, ...limitArg }))
+    ),
     Promise.all(
       dedupeCap(resourceNames, 4).map((q) =>
-        sendQid(fetchFn, '202findAvailableSp', { q }).then((data) => ({ q, data }))
+        sendQid(fetchFn, '202findAvailableSp', { q, ...limitArg }).then((data) => ({ q, data }))
       )
     ),
     Promise.all(
       productTerms.map((q) =>
-        sendQid(fetchFn, '203findMatanotByText', { q }).then((data) => ({ q, data }))
+        sendQid(fetchFn, '203findMatanotByText', { q, ...limitArg }).then((data) => ({ q, data }))
       )
     )
   ]);
@@ -214,6 +261,8 @@ export async function enrichWish(
     for (const node of data?.usersPermissionsUsers?.data ?? []) {
       const id = String(node.id);
       const a = node?.attributes ?? {};
+      const reach = reachForPerson(personPlaces(a), place);
+      if (!reach.ok) continue;
       let person = personById.get(id);
       if (!person) {
         person = {
@@ -228,6 +277,7 @@ export async function enrichWish(
           projects: (a.projects_1s?.data ?? [])
             .map((p: any) => p?.attributes?.projectName)
             .filter((p: any): p is string => typeof p === 'string'),
+          distanceKm: reach.distanceKm,
           _matched: new Set<string>()
         };
         personById.set(id, person);
@@ -235,9 +285,12 @@ export async function enrichWish(
       person._matched.add(term);
     }
   });
+  // Most matched skills first; among equals, nearest first.
+  const byFit = (a: SuggestedPerson, b: SuggestedPerson) =>
+    b.matchedSkills.length - a.matchedSkills.length || byDistance(a, b);
   let people = [...personById.values()]
     .map(({ _matched, ...rest }) => ({ ...rest, matchedSkills: [..._matched] }))
-    .sort((a, b) => b.matchedSkills.length - a.matchedSkills.length)
+    .sort(byFit)
     .slice(0, 10);
 
   // Mission-offer providers (PLAN_USER_OFFERINGS §3.6 / M6): users holding an
@@ -255,6 +308,8 @@ export async function enrichWish(
       const u = a.users_permissions_user?.data;
       if (!u?.id) continue;
       const id = String(u.id);
+      const reach = reachForPerson(personPlaces(u.attributes), place);
+      if (!reach.ok) continue;
       const missionName: string =
         a.mission?.data?.attributes?.missionName ?? a.name ?? '';
       const existing = merged.get(id);
@@ -278,12 +333,11 @@ export async function enrichWish(
         matchedSkills: missionName ? [missionName] : [],
         projects: (ua.projects_1s?.data ?? [])
           .map((p: any) => p?.attributes?.projectName)
-          .filter((p: any): p is string => typeof p === 'string')
+          .filter((p: any): p is string => typeof p === 'string'),
+        distanceKm: reach.distanceKm
       });
     }
-    people = [...merged.values()]
-      .sort((a, b) => b.matchedSkills.length - a.matchedSkills.length)
-      .slice(0, 10);
+    people = [...merged.values()].sort(byFit).slice(0, 10);
   }
 
   // Resource (Sp) aggregation ────────────────────────────────────────────────
@@ -294,6 +348,8 @@ export async function enrichWish(
       if (resourceById.has(id)) continue;
       const a = node?.attributes ?? {};
       const owner = a.users_permissions_user?.data;
+      const reach = resourceReach(a, place);
+      if (!reach.ok) continue;
       resourceById.set(id, {
         id,
         name: a.name ?? a.mashaabim?.data?.attributes?.name ?? '',
@@ -304,11 +360,12 @@ export async function enrichWish(
         ownerName: owner?.attributes?.username ?? null,
         ownerAvatar: owner?.attributes?.profilePic?.data?.attributes?.url ?? null,
         project: a.project?.data?.attributes?.projectName ?? null,
-        matchedTerm: q
+        matchedTerm: q,
+        distanceKm: reach.distanceKm
       });
     }
   }
-  const resources = [...resourceById.values()].slice(0, 8);
+  const resources = [...resourceById.values()].sort(byDistance).slice(0, 8);
 
   // Product (matanot) aggregation ────────────────────────────────────────────
   const productById = new Map<string, SuggestedProduct>();
@@ -317,6 +374,8 @@ export async function enrichWish(
       const id = String(node.id);
       if (productById.has(id)) continue;
       const a = node?.attributes ?? {};
+      const reach = reachFor(productPlace(a), place);
+      if (!reach.ok) continue;
       const proj = a.projectcreates?.data?.[0];
       const price =
         typeof a.estimatedPrice === 'number'
@@ -335,13 +394,34 @@ export async function enrichWish(
         projectLogo: proj?.attributes?.profilePic?.data?.attributes?.url ?? null,
         currencyName: a.currency?.data?.attributes?.name ?? null,
         currencySymbol: a.currency?.data?.attributes?.simbol ?? null,
-        matchedTerm: q
+        matchedTerm: q,
+        distanceKm: reach.distanceKm,
+        pricingMode: a.pricingMode ?? null
       });
     }
   }
-  const products = [...productById.values()].slice(0, 8);
+  const products = [...productById.values()].sort(byDistance).slice(0, 8);
 
-  return { skills: normalisedSkills, missions, people, resources, products };
+  return {
+    skills: normalisedSkills,
+    missions,
+    people,
+    resources,
+    products,
+    place: placeKey(place)
+  };
+}
+
+/**
+ * A free resource instance serves from its own location, else its rikma's,
+ * else wherever its owner is.
+ */
+function resourceReach(a: any, place: WishPlace | null): Reach {
+  const own = productPlace({ location: a?.location });
+  if (own) return reachFor(own, place);
+  const proj = productPlace({ location: a?.project?.data?.attributes?.location });
+  if (proj) return reachFor(proj, place);
+  return reachForPerson(personPlaces(a?.users_permissions_user?.data?.attributes), place);
 }
 
 /**

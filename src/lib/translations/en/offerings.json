@@ -183,7 +183,10 @@
     "locationEmpty": "Add location (optional)",
     "locationOnline": "Online",
     "locationSelected": "Location set",
-    "locationDone": "Done"
+    "locationDone": "Done",
+    "byQuote": "Priced per order (quote)",
+    "byQuoteHint": "For a shopping basket or a service whose price varies: the customer writes what they need and you answer with a price. No need to list every item.",
+    "priceFrom": "Base price / delivery fee (optional)"
   },
   "resources": {
     "title": "My resources",
