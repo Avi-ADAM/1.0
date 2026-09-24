@@ -119,7 +119,19 @@ const translations = {
         taskCancelled: 'יצירת המטלה בוטלה.',
         chooseTaskMission: '🎯 לאיזו משימה בתהליך לקשר את המטלה?',
         noMissionsForMember: 'לאדם זה אין משימות בתהליך בפרויקט. המטלה תיווצר ללא קישור למשימה.',
-        taskMissionNoneBtn: '➖ ללא משימה'
+        taskMissionNoneBtn: '➖ ללא משימה',
+        meetAvailBtn: '📅 זמינות לפגישה',
+        meetAvailTitle: '📅 זמינות לפגישות\n✅ = סימנת זמינות · 💤 = לא זמין/ה\nלחיצה על פגישה מסמנת או מבטלת את הזמינות שלך בה.',
+        meetAvailNone: 'לא נמצאו פגישות שאת/ה משתתף/ת בהן.',
+        meetAvailAllOnBtn: '🟢 זמין/ה לכל הפגישות',
+        meetAvailAllOffBtn: '💤 ביטול זמינות לכל הפגישות',
+        meetAvailOn: '✅ סימנת זמינות לפגישה "{{name}}". שאר המשתתפים קיבלו עדכון.',
+        meetAvailOff: '💤 הזמינות שלך לפגישה "{{name}}" בוטלה.',
+        meetAvailAllOn: '✅ סימנת זמינות לכל הפגישות שלך.',
+        meetAvailAllOff: '💤 הזמינות שלך בכל הפגישות בוטלה.',
+        meetAvailReady: '✨ כל המשתתפים בפגישה "{{name}}" זמינים — אפשר להתחיל!',
+        meetAvailError: '❌ עדכון הזמינות נכשל. נסה/י שוב.',
+        meetAvailOpenSite: '🌐 פתיחת הפגישות באתר'
     },
     en: {
         welcome: 'Welcome to 1💗1',
@@ -213,7 +225,19 @@ const translations = {
         taskCancelled: 'Task creation cancelled.',
         chooseTaskMission: '🎯 Which in-progress mission should the task be linked to?',
         noMissionsForMember: 'This person has no in-progress missions in the project. The task will be created without a mission link.',
-        taskMissionNoneBtn: '➖ No mission'
+        taskMissionNoneBtn: '➖ No mission',
+        meetAvailBtn: '📅 Meeting availability',
+        meetAvailTitle: '📅 Meeting availability\n✅ = you are available · 💤 = not available\nTap a meeting to mark or cancel your availability for it.',
+        meetAvailNone: 'No meetings found that you take part in.',
+        meetAvailAllOnBtn: '🟢 Available for all meetings',
+        meetAvailAllOffBtn: '💤 Cancel availability for all meetings',
+        meetAvailOn: '✅ You are now available for "{{name}}". The other participants were notified.',
+        meetAvailOff: '💤 Your availability for "{{name}}" was cancelled.',
+        meetAvailAllOn: '✅ You are now available for all your meetings.',
+        meetAvailAllOff: '💤 Your availability was cancelled in all meetings.',
+        meetAvailReady: '✨ Everyone in "{{name}}" is available — you can start!',
+        meetAvailError: '❌ Updating your availability failed. Please try again.',
+        meetAvailOpenSite: '🌐 Open meetings on the site'
     } // Add other EN translations if needed
 };
 
@@ -430,6 +454,33 @@ async function getMemberMissionsInProject(memberId, projectId, fetchInstance) {
             .map(m => ({ id: m.id, name: m.attributes?.name || m.attributes?.stname || `#${m.id}` }));
     } catch (error) {
         console.error('getMemberMissionsInProject error:', error);
+        return [];
+    }
+}
+
+// A member's meetings and whether they marked themselves available in each.
+// Each meeting has its own pgishauser row for the member — the same row the
+// `toggleOnline` action updates from the site's meeting page.
+async function getUserMeetings(uid, fetchInstance) {
+    try {
+        const res = await sendToSer({ id: uid }, '23myUserMeeting', 0, 0, true, fetchInstance);
+        const rows = res?.data?.pgishausers?.data ?? [];
+        const meetings = [];
+        for (const pu of rows) {
+            for (const m of pu.attributes?.pgishas?.data ?? []) {
+                const participants = m.attributes?.pgishausers?.data ?? [];
+                meetings.push({
+                    id: String(m.id),
+                    name: m.attributes?.name || `#${m.id}`,
+                    available: pu.attributes?.available === true,
+                    onlineCount: participants.filter(p => p.attributes?.available === true).length,
+                    total: participants.length
+                });
+            }
+        }
+        return meetings;
+    } catch (error) {
+        console.error('getUserMeetings error:', error);
         return [];
     }
 }
@@ -658,7 +709,7 @@ async function understandUserIntent(userText, uid, lang, fetchInstance) {
     const activeTimersText = stoppableMissions.map(m => `- "${m.name}" (ID: ${m.id})`).join('\n');
 
     const prompt = `
-You are a helpful assistant for the 1lev1 platform Telegram bot. Your goal is to understand the user's request regarding starting or stopping timers for their missions.
+You are a helpful assistant for the 1lev1 platform Telegram bot. Your goal is to understand the user's request regarding starting or stopping timers for their missions, or marking their availability for meetings.
 
 User ID: ${uid}
 User Language: ${lang}
@@ -669,7 +720,8 @@ Available actions:
 3.  'ask_help': User is asking for general help.
 4.  'clarify_start': User wants to start a timer but didn't specify which one, and multiple options exist.
 5.  'clarify_stop': User wants to stop a timer but didn't specify which one, and multiple options exist.
-6.  'unknown': The user's intent is unclear or unrelated.
+6.  'meeting_availability': User wants to mark themselves available for a meeting, cancel their availability for a meeting, or see which meetings they are available for (e.g. "I'm free to meet", "אני זמין לפגישה", "בטל זמינות"). No parameters needed.
+7.  'unknown': The user's intent is unclear or unrelated.
 
 Missions available to START a timer for:
 ${missionListText || "None"}
@@ -692,6 +744,7 @@ Examples:
 - User: "start a timer", Multiple startable missions exist -> {"intent": "clarify_start"}
 - User: "stop my timer", Only one active timer for mission ID 789 -> {"intent": "stop_timer", "parameters": {"missionId": "789"}}
 - User: "stop my timer", Multiple active timers -> {"intent": "clarify_stop"}
+- User: "I'm available for a meeting" or "cancel my meeting availability" -> {"intent": "meeting_availability"}
 - User: "help" or "how does this work?" -> {"intent": "ask_help"}
 - User: "What's the weather?" -> {"intent": "unknown"}
 
@@ -770,7 +823,8 @@ bot.start(async (ctx) => {
                 [Markup.button.callback(getText('startTimerBtn', lang), `timerStart-${userInfo.uid}`)],
                 [Markup.button.callback(getText('stopTimerBtn', lang), `timerStop-${userInfo.uid}`)],
                 [Markup.button.callback(getText('reportSaleBtn', lang), `reportSale-${userInfo.uid}`)],
-                [Markup.button.callback(getText('newTaskBtn', lang), `newTask-${userInfo.uid}`)]
+                [Markup.button.callback(getText('newTaskBtn', lang), `newTask-${userInfo.uid}`)],
+                [Markup.button.callback(getText('meetAvailBtn', lang), `meetAvail-${userInfo.uid}`)]
             ]).resize()
         );
     } else {
@@ -1998,6 +2052,139 @@ bot.action(/^taskCancel-(\d+)$/, async (ctx) => {
 });
 
 // --- Text Message Handler (Using global fetch for helpers) ---
+// ─── Meeting Availability Handlers ─────────────────────────────────────────
+//
+// Marking yourself available for a meeting (or cancelling it) goes through the
+// same `toggleOnline` action the site's meeting page uses, so the meeting's own
+// `available` flag stays in sync and the other participants are notified.
+// Each button carries the status it sets rather than "flip", so tapping an old
+// list twice cannot undo itself.
+
+function buildMeetingAvailKeyboard(meetings, uid, lang) {
+    const rows = meetings.map(m => [
+        Markup.button.callback(
+            `${m.available ? '✅' : '💤'} ${m.name} (${m.onlineCount}/${m.total})`,
+            `meetTgl-${m.id}-${m.available ? 0 : 1}-${uid}`
+        )
+    ]);
+    if (meetings.length > 1) {
+        rows.push([Markup.button.callback(getText('meetAvailAllOnBtn', lang), `meetAll-1-${uid}`)]);
+        rows.push([Markup.button.callback(getText('meetAvailAllOffBtn', lang), `meetAll-0-${uid}`)]);
+    }
+    rows.push([Markup.button.url(getText('meetAvailOpenSite', lang), 'https://1lev1.com/meeting')]);
+    return Markup.inlineKeyboard(rows);
+}
+
+async function showMeetingAvailList(ctx, uid, lang, fetch, { edit = false } = {}) {
+    const meetings = await getUserMeetings(uid, fetch);
+    if (meetings.length === 0) {
+        if (edit) await ctx.editMessageReplyMarkup(undefined).catch(() => { });
+        await ctx.reply(getText('meetAvailNone', lang));
+        return meetings;
+    }
+    const text = getText('meetAvailTitle', lang);
+    const keyboard = buildMeetingAvailKeyboard(meetings, uid, lang);
+    if (edit) {
+        // Telegram refuses an edit that changes nothing; the list is still right.
+        await ctx.editMessageText(text, keyboard).catch(() => { });
+    } else {
+        await ctx.reply(text, keyboard);
+    }
+    return meetings;
+}
+
+async function setMeetingAvailability(uid, status, meetingId, lang, fetch) {
+    const params = { status };
+    if (meetingId) params.meetingId = meetingId;
+    return actionService.executeAction('toggleOnline', params, {
+        userId: String(uid),
+        jwt: normalizeAdminToken(ADMINMONTHER),
+        lang,
+        fetch
+    });
+}
+
+// Step 1: list the member's meetings with their current availability
+bot.action(/^meetAvail-(\d+)$/, async (ctx) => {
+    const userId = ctx.match[1];
+    const userInfo = ctx.state.userInfo;
+    const lang = ctx.state.lang;
+    const fetch = ctx.update.fetch;
+    if (!userInfo || userInfo.uid != userId) return ctx.answerCbQuery(getText('unauthorized', lang));
+
+    await ctx.answerCbQuery();
+    try {
+        await ctx.editMessageReplyMarkup(undefined).catch(() => { });
+        await showMeetingAvailList(ctx, userId, lang, fetch);
+    } catch (error) {
+        console.error('meetAvail error:', error);
+        ctx.reply(getText('generalError', lang));
+    }
+});
+
+// Step 2a: mark / cancel availability for one meeting
+bot.action(/^meetTgl-(\d+)-([01])-(\d+)$/, async (ctx) => {
+    const meetingId = ctx.match[1];
+    const status = ctx.match[2] === '1';
+    const userId = ctx.match[3];
+    const userInfo = ctx.state.userInfo;
+    const lang = ctx.state.lang;
+    const fetch = ctx.update.fetch;
+    if (!userInfo || userInfo.uid != userId) return ctx.answerCbQuery(getText('unauthorized', lang));
+
+    await ctx.answerCbQuery();
+    try {
+        const result = await setMeetingAvailability(userId, status, meetingId, lang, fetch);
+        if (!result?.success) {
+            console.error('meetTgl action error:', result?.error);
+            await ctx.reply(getText('meetAvailError', lang));
+            return;
+        }
+        const meetings = await showMeetingAvailList(ctx, userId, lang, fetch, { edit: true });
+        const meeting = meetings.find(m => m.id === meetingId);
+        const name = meeting?.name || `#${meetingId}`;
+        await ctx.reply(getText(status ? 'meetAvailOn' : 'meetAvailOff', lang, { name }));
+        if (status && meeting && meeting.total > 1 && meeting.onlineCount === meeting.total) {
+            await ctx.reply(getText('meetAvailReady', lang, { name }));
+        }
+    } catch (error) {
+        console.error('meetTgl error:', error);
+        ctx.reply(getText('meetAvailError', lang));
+    }
+});
+
+// Step 2b: mark / cancel availability for all the member's meetings at once
+bot.action(/^meetAll-([01])-(\d+)$/, async (ctx) => {
+    const status = ctx.match[1] === '1';
+    const userId = ctx.match[2];
+    const userInfo = ctx.state.userInfo;
+    const lang = ctx.state.lang;
+    const fetch = ctx.update.fetch;
+    if (!userInfo || userInfo.uid != userId) return ctx.answerCbQuery(getText('unauthorized', lang));
+
+    await ctx.answerCbQuery();
+    try {
+        const result = await setMeetingAvailability(userId, status, null, lang, fetch);
+        if (!result?.success) {
+            console.error('meetAll action error:', result?.error);
+            await ctx.reply(getText('meetAvailError', lang));
+            return;
+        }
+        const meetings = await showMeetingAvailList(ctx, userId, lang, fetch, { edit: true });
+        await ctx.reply(getText(status ? 'meetAvailAllOn' : 'meetAvailAllOff', lang));
+        if (status) {
+            for (const m of meetings) {
+                if (m.total > 1 && m.onlineCount === m.total) {
+                    await ctx.reply(getText('meetAvailReady', lang, { name: m.name }));
+                }
+            }
+        }
+    } catch (error) {
+        console.error('meetAll error:', error);
+        ctx.reply(getText('meetAvailError', lang));
+    }
+});
+
 bot.on('text', async (ctx) => {
     const userText = ctx.message.text;
     const userInfo = ctx.state.userInfo;
@@ -2300,6 +2487,10 @@ bot.on('text', async (ctx) => {
                 } else { ctx.reply(getText('noTasksToStop', lang)); }
                 break;
 
+            case 'meeting_availability':
+                await showMeetingAvailList(ctx, userInfo.uid, lang, fetch);
+                break;
+
             case 'ask_help':
                 const helpAnswer = await answerUnregisteredUserQuery(userText, lang);
                 ctx.reply(helpAnswer);
@@ -2308,7 +2499,8 @@ bot.on('text', async (ctx) => {
                     Markup.inlineKeyboard([
                         [Markup.button.url(getText('login', lang), 'https://1lev1.com/login')],
                         [Markup.button.callback(getText('startTimerBtn', lang), `timerStart-${userInfo.uid}`)],
-                        [Markup.button.callback(getText('stopTimerBtn', lang), `timerStop-${userInfo.uid}`)]
+                        [Markup.button.callback(getText('stopTimerBtn', lang), `timerStop-${userInfo.uid}`)],
+                        [Markup.button.callback(getText('meetAvailBtn', lang), `meetAvail-${userInfo.uid}`)]
                     ]).resize()
                 );
                 break;
