@@ -108,7 +108,21 @@
       "mic": "Microphone",
       "attach": "Attach an image",
       "phrasing": "Phrasing suggestion from Lev",
-      "language": "Language"
+      "language": "Language",
+      "micStop": "Stop dictation",
+      "micDenied": "The browser is blocking the microphone. Click the lock icon next to the address → Microphone → Allow, then try again. On Windows also check Settings → Privacy → Microphone",
+      "micFailed": "Dictation stopped. You can try again",
+      "phrasingWorking": "Lev is phrasing…",
+      "phrasingTooShort": "Write a few words first, and Lev will suggest a phrasing",
+      "phrasingBusy": "Lev is a little busy — try again in a minute",
+      "phrasingFailed": "We couldn't suggest a phrasing right now",
+      "phrasingDone": "Lev suggested a new phrasing",
+      "phrasingRestore": "Back to my version",
+      "micInsecure": "Dictation only works over a secure connection (https or localhost)",
+      "micMissing": "No microphone was found on this device",
+      "micRecording": "Recording — tap the microphone again when you are done",
+      "micTranscribing": "Transcribing your recording…",
+      "micNothingHeard": "No speech was heard in the recording"
     },
     "sectionDetails": "Practical details",
     "sectionValues": "Values that matter to me",
@@ -327,7 +341,9 @@
     "autoSend": {
       "title": "Sending your request…",
       "sub": "This is the request you wrote before signing up. In a moment you'll see the plan taking shape around it."
-    }
+    },
+    "levFilled": "Lev filled this in from what you wrote — you can change it",
+    "bodyPlaceholder": "Tell us in your own words what you need, for whom, when and where…"
   },
   "no_wishes_found_title": "No wishes found",
   "proposals_so_far": "Proposals so far",

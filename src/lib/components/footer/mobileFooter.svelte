@@ -66,7 +66,24 @@
       if (saved === 'mini' || saved === 'vertical') footMode = saved;
     } catch {}
   });
+  // The concierge pages (the wish composer, the wish list, a wish) keep the bar
+  // but start it folded to the mini pill: they are long single-purpose screens
+  // and the full bar sat over their own actions. Decided from the route id, not
+  // from a flag the page sets on mount, so the server already renders the pill
+  // and the full bar never flashes first. Opening it there lasts until the
+  // member leaves those pages and never overwrites the saved layout.
+  const COMPACT_ROUTES = /^\/\((?:reg|regandnon)\)\/(?:concierge|wish)(?:\/|$)/;
+  let compact = $derived(COMPACT_ROUTES.test(page.route.id ?? ''));
+  let compactPick = $state(/** @type {string | null} */ (null));
+  $effect(() => {
+    if (!compact) compactPick = null;
+  });
+  let shownMode = $derived(compact ? (compactPick ?? 'mini') : footMode);
   function setMode(m) {
+    if (compact) {
+      compactPick = m;
+      return;
+    }
     footMode = m;
     try {
       localStorage.setItem('footMode', m);
@@ -81,7 +98,7 @@
   // free, so it reserves nothing.
   const FOOT_PAD = { bar: '4.5rem', mini: '3rem', vertical: '0px' };
   $effect(() => {
-    const want = FOOT_PAD[footMode] ?? '0px';
+    const want = FOOT_PAD[shownMode] ?? '0px';
     const root = document.documentElement;
     const body = document.body;
     // `--foot-pad` below is conditional — a page that fits the viewport gets
@@ -113,7 +130,7 @@
     return () => {
       ro.disconnect();
       window.removeEventListener('resize', sync);
-      // The pages that hide the bar (the wish composer, onboarding) must not
+      // The pages that hide the bar (onboarding) must not
       // keep a reserve for a bar that is gone — but a handover between the two
       // mount points must not clear the one that just took over either.
       if (--live === 0) {
@@ -158,7 +175,7 @@
       : '/login'
   );
 
-  let vertical = $derived(footMode === 'vertical');
+  let vertical = $derived(shownMode === 'vertical');
 
   // The bar keeps concierge dead centre by always holding an *odd* number of
   // tabs, shedding one from each side as it narrows:
@@ -188,7 +205,7 @@
   );
 </script>
 
-{#if footMode === 'mini'}
+{#if shownMode === 'mini'}
   <!-- Minimized: a small pill offering the two expand directions, centered so it
        doesn't collide with the chat bot bubble docked at the end corner -->
   <div

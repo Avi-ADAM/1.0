@@ -1,10 +1,11 @@
 <script>
-  import { useFormatMoney } from '$lib/money/context.svelte';
+  import { useFormatMoney, useRikmaCurrency } from '$lib/money/context.svelte';
+  import { DEFAULT_CURRENCY } from '$lib/money/currencies';
   import Money from '$lib/components/money/Money.svelte';
   import { onMount, onDestroy, tick } from 'svelte';
   import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
   import { fade } from 'svelte/transition';
-  import { showFoot } from '$lib/stores/showFoot.js';
+  import '$lib/styles/concierge.css';
   import { goto, replaceState } from '$app/navigation';
   import { toast } from 'svelte-sonner';
   import {
@@ -37,6 +38,7 @@
    */
   let { data = {}, anon = false } = $props();
   const fmtMoney = useFormatMoney();
+  const rikmaCurrency = useRikmaCurrency();
 
   /* ===== Drafts (the customer track) =====
      A logged-in wish can be saved as a draft Ratson and resumed from
@@ -55,7 +57,6 @@
   let restoredGuestDraft = $state(false);
 
   onMount(() => {
-    showFoot.set(false);
     welcome = !anon && !!data.welcome;
     if (!anon) {
       if (data.draft) applyServerDraft(data.draft);
@@ -82,7 +83,6 @@
       // storage blocked (private mode, sandbox) - the form simply opens empty
     }
   });
-  onDestroy(() => showFoot.set(true));
 
   /** @param {NonNullable<typeof data.draft>} d */
   function applyServerDraft(d) {
@@ -244,13 +244,16 @@
       radius: location.radius,
       isOnline: location.location_mode === 'online'
     };
+    // Lev filling the place square in from the text changes `location`, which
+    // lands back here — and the server already grounded that very place.
+    if (groundKey(text, place) === grounded) return;
     const timer = setTimeout(async () => {
       extracting = true;
       try {
         const res = await fetch('/api/concierge-extract', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ text, place })
+          body: JSON.stringify({ text, place, lang: $locale })
         });
         if (res.ok) {
           const data = await res.json();
@@ -267,6 +270,13 @@
           if (!title.trim() && data.titleSuggestion) {
             title = data.titleSuggestion;
           }
+          applyDetails(data.details);
+          grounded = groundKey(text, {
+            lat: location.lat,
+            lng: location.lng,
+            radius: location.radius,
+            isOnline: location.location_mode === 'online'
+          });
         }
       } catch (err) {
         console.warn('[concierge/new] extraction failed:', err);
@@ -276,6 +286,94 @@
     }, 1200);
     return () => clearTimeout(timer);
   });
+
+  /* ===== Details Lev read in the text =====
+     A date, a budget, a place, "online", a shared initiative — when the writer
+     states one in the text, Lev puts it in its square. Only in a square she
+     has not set herself: `leved` remembers what Lev last wrote in each, and a
+     square still holding exactly that is Lev's to update or clear as the text
+     changes. Anything else — set by hand, restored from a draft — is hers,
+     and Lev never touches it. */
+  /** text + place the last extraction answered for (plain — not tracked) */
+  let grounded = '';
+  function groundKey(/** @type {string} */ text, /** @type {object} */ place) {
+    return JSON.stringify([text, place]);
+  }
+  let leved = $state({
+    when: '',
+    where: '',
+    budget: /** @type {number|null} */ (null),
+    joinKind: ''
+  });
+  function placeKey(/** @type {typeof location} */ l) {
+    return [l.location_mode, l.lat ?? '', l.lng ?? '', l.location_hint ?? ''].join('|');
+  }
+
+  /** @param {any} d the `details` of /api/concierge-extract */
+  function applyDetails(d) {
+    if (!d || typeof d !== 'object') return;
+
+    // When
+    const whenNow = `${startDate}|${finnishDate}`;
+    if (whenNow === '|' || whenNow === leved.when) {
+      startDate = d.dateFrom || '';
+      finnishDate = d.dateTo || d.dateFrom || '';
+      leved.when = startDate ? `${startDate}|${finnishDate}` : '';
+    }
+
+    // Budget — only an amount in the currency the square counts in; a
+    // converted guess would be worse than an empty square.
+    const cur = rikmaCurrency() ?? DEFAULT_CURRENCY;
+    const budgetOk = d.budget > 0 && (!d.currency || d.currency === cur);
+    if (budgetAmount == null || budgetAmount === leved.budget) {
+      budgetAmount = budgetOk ? d.budget : null;
+      leved.budget = budgetOk ? d.budget : null;
+    }
+
+    // Where — the point comes from the server's geocoder (OpenStreetMap).
+    const whereNow = placeKey(location);
+    const placeUnset =
+      location.location_mode === 'unspecified' &&
+      !hasLocationPoint &&
+      !location.location_hint?.trim();
+    if (placeUnset || whereNow === leved.where) {
+      const base = { ...location, lat: null, lng: null, location_hint: '' };
+      const next =
+        d.online === true
+          ? { ...base, location_mode: 'online', isOnline: true }
+          : d.geo
+            ? {
+                ...base,
+                location_mode: 'onsite',
+                isOnline: false,
+                lat: d.geo.lat,
+                lng: d.geo.lng,
+                location_hint: d.geo.label || d.place
+              }
+            : d.place
+              ? { ...base, location_mode: 'onsite', isOnline: false, location_hint: d.place }
+              : { ...base, location_mode: 'unspecified', isOnline: false };
+      const nextKey = placeKey(/** @type {any} */ (next));
+      if (nextKey !== whereNow) location = /** @type {any} */ (next);
+      leved.where = next.location_mode === 'unspecified' ? '' : nextKey;
+    }
+
+    // A shared initiative others join
+    if (joinKind === 'solo' || joinKind === leved.joinKind) {
+      joinKind = d.groupKind || 'solo';
+      leved.joinKind = d.groupKind || '';
+    }
+  }
+
+  /** Did Lev fill this square (and nobody has changed it since)? */
+  function jewelIsLeved(/** @type {number} */ index) {
+    if (index === 0) return !!leved.when && `${startDate}|${finnishDate}` === leved.when;
+    if (index === LOCATION_JEWEL_INDEX)
+      return !!leved.where && placeKey(location) === leved.where;
+    if (index === 2) return leved.budget != null && budgetAmount === leved.budget;
+    if (index === 6) return !!leved.joinKind && joinKind === leved.joinKind;
+    return false;
+  }
 
   /* Value keys — labels live under `concierge.new.values.<key>`. */
   const ALL_VALUES = [
@@ -335,28 +433,28 @@
 
   const ACCENT = {
     gold: {
-      ring: 'rgba(238,232,170,0.4)',
-      glow: 'rgba(238,232,170,0.25)',
-      text: '#fde68a',
-      rgb: '238,232,170'
+      ring: 'rgb(var(--cg-gold-rgb) / 0.4)',
+      glow: 'rgb(var(--cg-gold-rgb) / 0.25)',
+      text: 'var(--cg-goldhi)',
+      rgb: 'var(--cg-gold-rgb)'
     },
     barbi: {
-      ring: 'rgba(255,77,158,0.5)',
-      glow: 'rgba(255,77,158,0.3)',
-      text: '#ff4d9e',
-      rgb: '255,77,158'
+      ring: 'rgb(var(--cg-pink-rgb) / 0.5)',
+      glow: 'rgb(var(--cg-pink-rgb) / 0.3)',
+      text: 'var(--cg-pink)',
+      rgb: 'var(--cg-pink-rgb)'
     },
     blue: {
-      ring: 'rgba(116,191,255,0.4)',
-      glow: 'rgba(116,191,255,0.25)',
-      text: '#74bfff',
-      rgb: '116,191,255'
+      ring: 'rgb(var(--cg-sky-rgb) / 0.4)',
+      glow: 'rgb(var(--cg-sky-rgb) / 0.25)',
+      text: 'var(--cg-sky)',
+      rgb: 'var(--cg-sky-rgb)'
     },
     green: {
-      ring: 'rgba(2,255,187,0.4)',
-      glow: 'rgba(2,255,187,0.25)',
-      text: '#02ffbb',
-      rgb: '2,255,187'
+      ring: 'rgb(var(--cg-mint-rgb) / 0.4)',
+      glow: 'rgb(var(--cg-mint-rgb) / 0.25)',
+      text: 'var(--cg-mint)',
+      rgb: 'var(--cg-mint-rgb)'
     }
   };
 
@@ -446,6 +544,280 @@
   );
   const words = $derived(bodyText ? bodyText.split(' ').length : 0);
   const fullness = $derived(Math.min(1, words / 50));
+
+  /** Plain text → editor HTML, one <p> per paragraph (never trusted markup). */
+  function textToHtml(/** @type {string} */ text) {
+    const esc = (/** @type {string} */ s) =>
+      s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    return text
+      .split(/\n\s*\n/)
+      .map((p) => p.trim())
+      .filter(Boolean)
+      .map((p) => `<p>${esc(p).replace(/\n/g, '<br>')}</p>`)
+      .join('');
+  }
+
+  /** Editor HTML → plain paragraphs separated by a blank line. */
+  function htmlToText(/** @type {string} */ html) {
+    return html
+      .replace(/<br\s*\/?>/gi, '\n')
+      .replace(/<\/(p|h[1-6]|li|blockquote)>/gi, '\n\n')
+      .replace(/<[^>]*>/g, '')
+      .replace(/&nbsp;/g, ' ')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&quot;/g, '"')
+      .replace(/&#39;/g, "'")
+      .replace(/&amp;/g, '&')
+      .replace(/\n{3,}/g, '\n\n')
+      .trim();
+  }
+
+  /* ── Dictation ────────────────────────────────────────────────────────────
+     Two engines behind one button:
+       1. the browser's own Web Speech API — live, free, no key (Chrome, Edge,
+          Safari);
+       2. a recording sent to /api/concierge-transcribe (Groq Whisper, Gemini
+          as fallback) — for Firefox, which has no Web Speech, and for the
+          browsers that ship it but block its service (Brave, Electron shells,
+          managed installs). Those report `not-allowed` exactly like a real
+          permission denial, which is why the first cut told everyone to go
+          and fix their browser settings.
+     The microphone is asked for explicitly first. That is what raises the
+     browser's permission prompt, and it tells a real denial (the user or the
+     OS said no) apart from a blocked speech service (the mic is fine). ── */
+  const SPEECH_LANG = /** @type {Record<string, string>} */ ({
+    he: 'he-IL',
+    en: 'en-US',
+    ar: 'ar-SA',
+    ru: 'ru-RU',
+    es: 'es-ES'
+  });
+  /** A recorded clip is cut here, in ms — the transcription cap is ~a minute. */
+  const RECORD_MAX_MS = 60_000;
+
+  let canDictate = $state(false);
+  let dictating = $state(false);
+  let transcribing = $state(false);
+  /** set once this browser's Web Speech service has refused us */
+  let speechBlocked = false;
+  /** @type {any} */
+  let recognition = null;
+  /** @type {MediaRecorder | null} */
+  let recorder = null;
+  /** @type {ReturnType<typeof setTimeout> | undefined} */
+  let recordTimer;
+
+  onMount(() => {
+    const w = /** @type {any} */ (window);
+    const hasSpeech = !!(w.SpeechRecognition || w.webkitSpeechRecognition);
+    const hasRecorder = typeof w.MediaRecorder === 'function';
+    canDictate = !!navigator.mediaDevices?.getUserMedia && (hasSpeech || hasRecorder);
+  });
+  onDestroy(() => {
+    recognition?.abort();
+    if (recorder && recorder.state !== 'inactive') {
+      recorder.onstop = null;
+      recorder.stop();
+    }
+    recorder?.stream.getTracks().forEach((tr) => tr.stop());
+    clearTimeout(recordTimer);
+  });
+
+  function appendDictated(/** @type {string} */ text) {
+    const clean = text.trim();
+    if (!clean) return;
+    const esc = textToHtml(clean).replace(/^<p>|<\/p>$/g, '');
+    // Continue the last paragraph rather than opening a new one per phrase.
+    body = /<\/p>\s*$/.test(body) && bodyText
+      ? body.replace(/<\/p>\s*$/, () => ` ${esc}</p>`)
+      : `${bodyText ? body : ''}<p>${esc}</p>`;
+  }
+
+  /** @returns {Promise<MediaStream | null>} */
+  async function askForMic() {
+    if (!window.isSecureContext) {
+      toast.error($t('concierge.new.tool.micInsecure'));
+      return null;
+    }
+    try {
+      return await navigator.mediaDevices.getUserMedia({ audio: true });
+    } catch (err) {
+      const name = /** @type {any} */ (err)?.name;
+      if (name === 'NotFoundError' || name === 'OverconstrainedError') {
+        toast.error($t('concierge.new.tool.micMissing'));
+      } else if (name === 'NotAllowedError' || name === 'SecurityError') {
+        toast.error($t('concierge.new.tool.micDenied'), { duration: 8000 });
+      } else {
+        toast.error($t('concierge.new.tool.micFailed'));
+      }
+      return null;
+    }
+  }
+
+  async function toggleDictation() {
+    if (transcribing) return;
+    if (dictating) {
+      recognition?.stop();
+      if (recorder && recorder.state !== 'inactive') recorder.stop();
+      return;
+    }
+    const stream = await askForMic();
+    if (!stream) return;
+
+    const w = /** @type {any} */ (window);
+    const Recognition = w.SpeechRecognition || w.webkitSpeechRecognition;
+    if (Recognition && !speechBlocked) {
+      // Web Speech opens its own capture; ours only raised the prompt.
+      stream.getTracks().forEach((tr) => tr.stop());
+      startSpeech(Recognition);
+    } else {
+      startRecording(stream);
+    }
+  }
+
+  function startSpeech(/** @type {any} */ Recognition) {
+    let fallBack = false;
+    recognition = new Recognition();
+    recognition.lang = SPEECH_LANG[$locale] ?? 'he-IL';
+    recognition.continuous = true;
+    recognition.interimResults = false;
+    recognition.onresult = (/** @type {any} */ e) => {
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        if (e.results[i].isFinal) appendDictated(e.results[i][0].transcript);
+      }
+    };
+    recognition.onerror = (/** @type {any} */ e) => {
+      // The microphone was just granted, so these mean the browser's speech
+      // service is off-limits — not the user's settings. Record instead.
+      if (['not-allowed', 'service-not-allowed', 'network'].includes(e.error)) {
+        speechBlocked = true;
+        fallBack = typeof MediaRecorder === 'function';
+        if (!fallBack) toast.error($t('concierge.new.tool.micFailed'));
+      } else if (e.error === 'audio-capture') {
+        toast.error($t('concierge.new.tool.micMissing'));
+      } else if (e.error !== 'no-speech' && e.error !== 'aborted') {
+        toast.error($t('concierge.new.tool.micFailed'));
+      }
+    };
+    recognition.onend = async () => {
+      dictating = false;
+      recognition = null;
+      if (!fallBack) return;
+      const stream = await askForMic();
+      if (stream) startRecording(stream);
+    };
+    try {
+      recognition.start();
+      dictating = true;
+    } catch {
+      dictating = false;
+      recognition = null;
+    }
+  }
+
+  function startRecording(/** @type {MediaStream} */ stream) {
+    /** @type {Blob[]} */
+    const chunks = [];
+    try {
+      recorder = new MediaRecorder(stream);
+    } catch {
+      stream.getTracks().forEach((tr) => tr.stop());
+      toast.error($t('concierge.new.tool.micFailed'));
+      return;
+    }
+    recorder.ondataavailable = (e) => {
+      if (e.data.size) chunks.push(e.data);
+    };
+    recorder.onstop = () => {
+      clearTimeout(recordTimer);
+      stream.getTracks().forEach((tr) => tr.stop());
+      const type = recorder?.mimeType || 'audio/webm';
+      recorder = null;
+      dictating = false;
+      sendRecording(new Blob(chunks, { type }));
+    };
+    recorder.start();
+    dictating = true;
+    recordTimer = setTimeout(() => {
+      if (recorder && recorder.state !== 'inactive') recorder.stop();
+    }, RECORD_MAX_MS);
+    toast.info($t('concierge.new.tool.micRecording'));
+  }
+
+  async function sendRecording(/** @type {Blob} */ clip) {
+    // Under ~2KB is a click of the button with nothing said.
+    if (clip.size < 2000) return;
+    transcribing = true;
+    const id = toast.loading($t('concierge.new.tool.micTranscribing'));
+    try {
+      const form = new FormData();
+      form.append('audio', clip);
+      form.append('lang', $locale);
+      const res = await fetch('/api/concierge-transcribe', { method: 'POST', body: form });
+      const data = await res.json().catch(() => ({}));
+      const text = typeof data?.text === 'string' ? data.text.trim() : '';
+      if (text) {
+        appendDictated(text);
+        toast.dismiss(id);
+      } else if (res.ok && !data?.reason) {
+        toast.info($t('concierge.new.tool.micNothingHeard'), { id });
+      } else {
+        toast.error($t('concierge.new.tool.micFailed'), { id });
+      }
+    } catch {
+      toast.error($t('concierge.new.tool.micFailed'), { id });
+    } finally {
+      transcribing = false;
+    }
+  }
+
+  /* ── Lev's phrasing suggestion — /api/concierge-rephrase (Gemini). The
+     writer's own version is one tap away in the toast, and in undo. ── */
+  let rephrasing = $state(false);
+
+  async function rephrase() {
+    const text = htmlToText(body);
+    if (rephrasing) return;
+    if (text.length < 10) {
+      toast.info($t('concierge.new.tool.phrasingTooShort'));
+      return;
+    }
+    rephrasing = true;
+    // The model can take half a minute; say so rather than sit silent.
+    const id = toast.loading($t('concierge.new.tool.phrasingWorking'));
+    try {
+      const res = await fetch('/api/concierge-rephrase', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title, text })
+      });
+      const data = await res.json().catch(() => ({}));
+      const next = typeof data?.text === 'string' ? data.text.trim() : '';
+      if (!next) {
+        toast.error(
+          res.status === 429
+            ? $t('concierge.new.tool.phrasingBusy')
+            : $t('concierge.new.tool.phrasingFailed'),
+          { id }
+        );
+        return;
+      }
+      const before = body;
+      body = textToHtml(next);
+      toast.success($t('concierge.new.tool.phrasingDone'), {
+        id,
+        action: {
+          label: $t('concierge.new.tool.phrasingRestore'),
+          onClick: () => (body = before)
+        }
+      });
+    } catch {
+      toast.error($t('concierge.new.tool.phrasingFailed'), { id });
+    } finally {
+      rephrasing = false;
+    }
+  }
   const isReady = $derived(
     title.trim().length > 6 && bodyText.length > 30 && !publishing
   );
@@ -862,15 +1234,15 @@
     const a = ACCENT[acc] || ACCENT.gold;
     return hasVal
       ? `border-color:${a.ring};box-shadow:0 0 18px ${a.glow}`
-      : 'border-color:rgba(255,255,255,0.06)';
+      : 'border-color:rgb(var(--cg-fg-rgb) / calc(0.06 * var(--cg-fg-k)))';
   }
   function accentText(acc, hasVal) {
-    return hasVal ? (ACCENT[acc] || ACCENT.gold).text : '#9a8f80';
+    return hasVal ? (ACCENT[acc] || ACCENT.gold).text : 'var(--cg-muted)';
   }
   function accentBg(acc, hasVal) {
-    if (!hasVal) return 'rgba(255,255,255,0.03)';
+    if (!hasVal) return 'rgb(var(--cg-fg-rgb) / calc(0.03 * var(--cg-fg-k)))';
     const r = (ACCENT[acc] || ACCENT.gold).rgb;
-    return `rgba(${r},0.1)`;
+    return `rgb(${r} / 0.1)`;
   }
 
   function gemCls(imp) {
@@ -1063,7 +1435,7 @@
         <h1 class="incant-h1">{$t('concierge.new.incantTitle')}</h1>
         <p class="incant-p">
           {$t('concierge.new.incantBody')}<br />
-          <span style="color:#fde68a"
+          <span style="color:var(--cg-goldhi)"
             >{$t('concierge.new.incantPrivacy')}</span
           >
         </p>
@@ -1101,10 +1473,10 @@
               style="display:flex;align-items:center;gap:12px;margin-bottom:14px"
             >
               <span
-                style="width:8px;height:8px;border-radius:50%;background:#ff4d9e;box-shadow:0 0 12px #ff4d9e"
+                style="width:8px;height:8px;border-radius:50%;background:var(--cg-pink);box-shadow:0 0 12px var(--cg-pink)"
               ></span>
               <span
-                style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:#fde68a"
+                style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--cg-goldhi)"
               >
                 {$t('concierge.new.draftBadge')}
               </span>
@@ -1113,12 +1485,12 @@
                    autosave that never happened. -->
               {#if draftSaving}
                 <span
-                  style="font-family:'Bellefair',serif;font-size:12px;color:#9a8f80"
+                  style="font-family:'Bellefair',serif;font-size:12px;color:var(--cg-muted)"
                   >{$t('concierge.new.draftSaving')}</span
                 >
               {:else if draftSavedAt}
                 <span
-                  style="font-family:'Bellefair',serif;font-size:12px;color:#9a8f80"
+                  style="font-family:'Bellefair',serif;font-size:12px;color:var(--cg-muted)"
                   >{anon
                     ? $t('concierge.new.savedOnDevice')
                     : $t('concierge.new.autosaved')}</span
@@ -1136,30 +1508,64 @@
 
             <!-- Body -->
             <div class="rich-body-wrap">
-              <RichText bind:outpot={body} trans={true} sml={true} />
+              <RichText
+                bind:outpot={body}
+                trans={true}
+                sml={true}
+                placeholder={$t('concierge.new.bodyPlaceholder')}
+              />
             </div>
 
             <!-- Toolbar -->
             <div class="scroll-toolbar">
               <div style="display:flex;gap:6px">
-                <button class="tool-btn" title={$t('concierge.new.tool.mic')}
-                  ><EntityIcon kind="voice" size={15} /></button
-                >
+                {#if canDictate}
+                  <button
+                    type="button"
+                    class="tool-btn"
+                    class:tool-live={dictating}
+                    class:tool-busy={transcribing}
+                    disabled={transcribing}
+                    aria-pressed={dictating}
+                    title={dictating
+                      ? $t('concierge.new.tool.micStop')
+                      : $t('concierge.new.tool.mic')}
+                    aria-label={dictating
+                      ? $t('concierge.new.tool.micStop')
+                      : $t('concierge.new.tool.mic')}
+                    onclick={toggleDictation}
+                    ><EntityIcon kind="voice" size={15} /></button
+                  >
+                {/if}
+                <!-- Not wired yet — kept for the design. Attaching needs the
+                     upload to land on the wish's `pics` through the draft and
+                     publish actions, and guests cannot upload at all.
                 <button class="tool-btn" title={$t('concierge.new.tool.attach')}
                   ><EntityIcon kind="attach" size={15} /></button
                 >
+                -->
                 <button
+                  type="button"
                   class="tool-btn"
-                  title={$t('concierge.new.tool.phrasing')}><EntityIcon kind="wish" size={15} /></button
+                  class:tool-busy={rephrasing}
+                  disabled={rephrasing}
+                  title={$t('concierge.new.tool.phrasing')}
+                  aria-label={$t('concierge.new.tool.phrasing')}
+                  onclick={rephrase}
+                  ><EntityIcon kind="wish" size={15} /></button
                 >
+                <!-- Not wired yet — kept for the design. What "language"
+                     should do (translate the draft? pick the wish's language?)
+                     is still open.
                 <button
                   class="tool-btn"
                   title={$t('concierge.new.tool.language')}>⇄</button
                 >
+                -->
               </div>
               <div style="display:flex;align-items:center;gap:12px">
                 <span
-                  style="font-family:'Bellefair',serif;font-size:12px;color:#7a6f5e"
+                  style="font-family:'Bellefair',serif;font-size:12px;color:var(--cg-muted2)"
                   >{$t('concierge.new.wordCount', { count: words })}</span
                 >
                 <div class="word-gauge">
@@ -1194,6 +1600,11 @@
                 <div style="flex:1;min-width:0;text-align:start">
                   <div class="jewel-label">
                     {$t(`concierge.new.jewels.${j.key}.label`)}
+                    {#if jewelIsLeved(i)}
+                      <span class="lev-mark" title={$t('concierge.new.levFilled')}
+                        >✦ Lev</span
+                      >
+                    {/if}
                   </div>
                   <div
                     class="jewel-val"
@@ -1202,7 +1613,7 @@
                     {detailJewelValue(j, i)}
                   </div>
                 </div>
-                <span style="font-size:12px;color:#52493e">›</span>
+                <span style="font-size:12px;color:var(--cg-dim)">›</span>
               </button>
             {/each}
           </div>
@@ -1255,11 +1666,11 @@
                 disabled={!isReady}
                 onclick={publish}
                 style="opacity:{isReady ? 1 : 0.5};background:{isReady
-                  ? 'linear-gradient(135deg,#bf953f,#fcf6ba 30%,#b38728 60%,#aa771c)'
-                  : 'linear-gradient(135deg,#c8155f,#ff4d9e)'};color:{isReady
-                  ? '#574010'
-                  : '#fde68a'};text-shadow:{isReady
-                  ? '1px 1px 0 rgba(255,255,255,0.5)'
+                  ? 'linear-gradient(135deg,var(--cg-g-metal-a),var(--cg-g-metal-b) 30%,var(--cg-g-metal-c) 60%,var(--cg-g-metal-d))'
+                  : 'linear-gradient(135deg,var(--cg-g-pinkd),var(--cg-g-pink))'};color:{isReady
+                  ? 'var(--cg-on-metal)'
+                  : 'var(--cg-on-cta)'};text-shadow:{isReady
+                  ? '1px 1px 0 var(--cg-on-metal-glow)'
                   : 'none'}"
                 >{anon
                   ? $t('concierge.new.publishRegister')
@@ -1273,13 +1684,13 @@
           </div>
 
           <div
-            style="margin-top:14px;text-align:center;font-family:'Bellefair',serif;font-size:12px;color:#9a8f80"
+            style="margin-top:14px;text-align:center;font-family:'Bellefair',serif;font-size:12px;color:var(--cg-muted)"
           >
             {$t('concierge.new.afterPublish')}
           </div>
           {#if publishError}
             <div
-              style="margin-top:10px;padding:10px 14px;background:rgba(255,77,158,.06);border:1px solid rgba(255,77,158,.3);border-radius:12px;font-family:'Bellefair',serif;font-size:13px;color:#ff4d9e;text-align:center"
+              style="margin-top:10px;padding:10px 14px;background:rgb(var(--cg-pink-rgb) / .06);border:1px solid rgb(var(--cg-pink-rgb) / .3);border-radius:12px;font-family:'Bellefair',serif;font-size:13px;color:var(--cg-pink);text-align:center"
             >
               {publishError}
             </div>
@@ -1295,21 +1706,21 @@
             <div style="position:relative">
               <img
                 src="/botlogo.png"
-                style="width:36px;height:36px;border-radius:50%;border:2px solid rgba(116,191,255,.4)"
+                style="width:36px;height:36px;border-radius:50%;border:2px solid rgb(var(--cg-sky-rgb) / .4)"
                 alt="Lev"
               />
               <span
-                style="position:absolute;bottom:-2px;inset-inline-end:-2px;width:12px;height:12px;border-radius:50%;background:#02ffbb;border:2px solid #0e0d0c;box-shadow:0 0 10px #02ffbb"
+                style="position:absolute;bottom:-2px;inset-inline-end:-2px;width:12px;height:12px;border-radius:50%;background:var(--cg-mint);border:2px solid var(--cg-s1);box-shadow:0 0 10px var(--cg-mint)"
               ></span>
             </div>
             <div>
               <div
-                style="font-family:'Cinzel',serif;font-size:13px;color:#74bfff;letter-spacing:.18em"
+                style="font-family:'Cinzel',serif;font-size:13px;color:var(--cg-sky);letter-spacing:.18em"
               >
                 LEV
               </div>
               <div
-                style="font-family:'Bellefair',serif;font-size:11px;color:#7a6f5e"
+                style="font-family:'Bellefair',serif;font-size:11px;color:var(--cg-muted2)"
               >
                 {$t('concierge.new.lev.sub')}
               </div>
@@ -1345,7 +1756,7 @@
 
           {#if extracting}
             <div
-              style="padding:14px 12px;border-radius:10px;background:rgba(255,255,255,.02);border:1px dashed rgba(255,255,255,.08);font-family:'Bellefair',serif;font-size:12.5px;color:#9a8f80;line-height:1.55;text-align:center"
+              style="padding:14px 12px;border-radius:10px;background:rgb(var(--cg-fg-rgb) / calc(.02 * var(--cg-fg-k)));border:1px dashed rgb(var(--cg-fg-rgb) / calc(.08 * var(--cg-fg-k)));font-family:'Bellefair',serif;font-size:12.5px;color:var(--cg-muted);line-height:1.55;text-align:center"
             >
               <span style="opacity:.6"
                 >{$t('concierge.new.lev.listening')}</span
@@ -1394,7 +1805,7 @@
             <!-- body has text but no results yet — show nothing, wait for debounce -->
           {:else}
             <div
-              style="padding:14px 12px;border-radius:10px;background:rgba(255,255,255,.02);border:1px dashed rgba(255,255,255,.08);font-family:'Bellefair',serif;font-size:12.5px;color:#9a8f80;line-height:1.55;text-align:center"
+              style="padding:14px 12px;border-radius:10px;background:rgb(var(--cg-fg-rgb) / calc(.02 * var(--cg-fg-k)));border:1px dashed rgb(var(--cg-fg-rgb) / calc(.08 * var(--cg-fg-k)));font-family:'Bellefair',serif;font-size:12.5px;color:var(--cg-muted);line-height:1.55;text-align:center"
             >
               {$t('concierge.new.lev.emptyHint')}
             </div>
@@ -1417,7 +1828,7 @@
           <!-- Existing missions in the library that match -->
           {#if matchedMissions.length > 0}
             <div
-              style="margin-top:16px;padding-top:14px;border-top:1px solid rgba(255,255,255,.05)"
+              style="margin-top:16px;padding-top:14px;border-top:1px solid rgb(var(--cg-fg-rgb) / calc(.05 * var(--cg-fg-k)))"
             >
               <div class="lev-col-lbl" style="margin-bottom:8px">
                 {$t('concierge.new.lev.existing')}
@@ -1425,7 +1836,7 @@
               <div style="display:flex;flex-direction:column;gap:6px">
                 {#each matchedMissions as m (m.id)}
                   <div
-                    style="padding:8px 10px;border-radius:9px;background:rgba(2,255,187,.04);border:1px solid rgba(2,255,187,.16);font-family:'Bellefair',serif;font-size:12.5px;color:#ede5d8"
+                    style="padding:8px 10px;border-radius:9px;background:rgb(var(--cg-mint-rgb) / .04);border:1px solid rgb(var(--cg-mint-rgb) / .16);font-family:'Bellefair',serif;font-size:12.5px;color:var(--cg-ink)"
                   >
                     {m.name}
                   </div>
@@ -1437,7 +1848,7 @@
           <!-- Ready products that answer the wish (nearest first) -->
           {#if matchedProducts.length > 0}
             <div
-              style="margin-top:16px;padding-top:14px;border-top:1px solid rgba(255,255,255,.05)"
+              style="margin-top:16px;padding-top:14px;border-top:1px solid rgb(var(--cg-fg-rgb) / calc(.05 * var(--cg-fg-k)))"
             >
               <div class="lev-col-lbl" style="margin-bottom:8px">
                 {$t('concierge.new.lev.products', {
@@ -1447,30 +1858,30 @@
               <div style="display:flex;flex-direction:column;gap:6px">
                 {#each matchedProducts as m (m.id)}
                   <div
-                    style="padding:8px 10px;border-radius:9px;background:rgba(255,77,158,.04);border:1px solid rgba(255,77,158,.16)"
+                    style="padding:8px 10px;border-radius:9px;background:rgb(var(--cg-pink-rgb) / .04);border:1px solid rgb(var(--cg-pink-rgb) / .16)"
                   >
                     <div
                       style="display:flex;justify-content:space-between;gap:8px;align-items:baseline"
                     >
                       <span
-                        style="font-family:'Bellefair',serif;font-size:12.5px;color:#ede5d8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"
+                        style="font-family:'Bellefair',serif;font-size:12.5px;color:var(--cg-ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap"
                         >{m.name}</span
                       >
                       {#if m.pricingMode === 'quote'}
                         <span
-                          style="font-size:11px;color:#fde68a;white-space:nowrap"
+                          style="font-size:11px;color:var(--cg-goldhi);white-space:nowrap"
                           >{$t('concierge.new.lev.byQuote')}</span
                         >
                       {:else if typeof m.price === 'number' && m.price > 0}
                         <span
-                          style="font-size:11px;color:#fde68a;white-space:nowrap"
+                          style="font-size:11px;color:var(--cg-goldhi);white-space:nowrap"
                           >{fmtMoney(m.price)}</span
                         >
                       {/if}
                     </div>
                     {#if m.projectName || m.distanceKm != null}
                       <div
-                        style="font-size:10.5px;color:#9a8f80;margin-top:2px"
+                        style="font-size:10.5px;color:var(--cg-muted);margin-top:2px"
                       >
                         {m.projectName || ''}{m.projectName &&
                         m.distanceKm != null
@@ -1489,7 +1900,7 @@
           <!-- Available resources (free Sp instances) that match -->
           {#if matchedResources.length > 0}
             <div
-              style="margin-top:16px;padding-top:14px;border-top:1px solid rgba(255,255,255,.05)"
+              style="margin-top:16px;padding-top:14px;border-top:1px solid rgb(var(--cg-fg-rgb) / calc(.05 * var(--cg-fg-k)))"
             >
               <div class="lev-col-lbl" style="margin-bottom:8px">
                 {$t('concierge.new.lev.freeResources', {
@@ -1499,25 +1910,25 @@
               <div style="display:flex;flex-direction:column;gap:6px">
                 {#each matchedResources as r (r.id)}
                   <div
-                    style="padding:8px 10px;border-radius:9px;background:rgba(238,232,170,.04);border:1px solid rgba(238,232,170,.16)"
+                    style="padding:8px 10px;border-radius:9px;background:rgb(var(--cg-gold-rgb) / .04);border:1px solid rgb(var(--cg-gold-rgb) / .16)"
                   >
                     <div
                       style="display:flex;justify-content:space-between;gap:8px;align-items:baseline"
                     >
                       <span
-                        style="font-family:'Bellefair',serif;font-size:12.5px;color:#ede5d8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"
+                        style="font-family:'Bellefair',serif;font-size:12.5px;color:var(--cg-ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap"
                         >{r.name}</span
                       >
                       {#if typeof r.price === 'number' && r.price > 0}
                         <span
-                          style="font-size:11px;color:#fde68a;white-space:nowrap"
+                          style="font-size:11px;color:var(--cg-goldhi);white-space:nowrap"
                           >{fmtMoney(r.price)}</span
                         >
                       {/if}
                     </div>
                     {#if r.ownerName || r.project}
                       <div
-                        style="font-size:10.5px;color:#9a8f80;margin-top:2px"
+                        style="font-size:10.5px;color:var(--cg-muted);margin-top:2px"
                       >
                         {anon
                           ? r.ownerName
@@ -1537,7 +1948,7 @@
           <!-- Real people who hold the needed skills -->
           {#if matchedPeople.length > 0}
             <div
-              style="margin-top:16px;padding-top:14px;border-top:1px solid rgba(255,255,255,.05)"
+              style="margin-top:16px;padding-top:14px;border-top:1px solid rgb(var(--cg-fg-rgb) / calc(.05 * var(--cg-fg-k)))"
             >
               <div class="lev-col-lbl" style="margin-bottom:8px">
                 {$t('concierge.new.lev.people', { count: matchedPeople.length })}
@@ -1545,11 +1956,11 @@
               <div style="display:flex;flex-direction:column;gap:8px">
                 {#each matchedPeople as p (p.id)}
                   <div
-                    style="display:flex;gap:9px;align-items:center;padding:8px 10px;border-radius:10px;background:rgba(116,191,255,.04);border:1px solid rgba(116,191,255,.16)"
+                    style="display:flex;gap:9px;align-items:center;padding:8px 10px;border-radius:10px;background:rgb(var(--cg-sky-rgb) / .04);border:1px solid rgb(var(--cg-sky-rgb) / .16)"
                   >
                     {#if anon}
                       <span
-                        style="width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(116,191,255,.12);color:#74bfff;font-size:12px;flex-shrink:0"
+                        style="width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgb(var(--cg-sky-rgb) / .12);color:var(--cg-sky);font-size:12px;flex-shrink:0"
                         aria-label={$t('concierge.new.lev.hiddenIdentity')}
                         ><EntityIcon kind="private" size={12} /></span
                       >
@@ -1557,23 +1968,23 @@
                       <img
                         src={p.avatar}
                         alt={p.username}
-                        style="width:30px;height:30px;border-radius:50%;object-fit:cover;border:1px solid rgba(116,191,255,.4);flex-shrink:0"
+                        style="width:30px;height:30px;border-radius:50%;object-fit:cover;border:1px solid rgb(var(--cg-sky-rgb) / .4);flex-shrink:0"
                       />
                     {:else}
                       <span
-                        style="width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(116,191,255,.12);color:#74bfff;font-size:12px;flex-shrink:0"
+                        style="width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgb(var(--cg-sky-rgb) / .12);color:var(--cg-sky);font-size:12px;flex-shrink:0"
                         >{(p.username || '?').slice(0, 2)}</span
                       >
                     {/if}
                     <div style="min-width:0;flex:1">
                       <div
-                        style="font-family:'Bellefair',serif;font-size:13px;color:#ede5d8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"
+                        style="font-family:'Bellefair',serif;font-size:13px;color:var(--cg-ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap"
                       >
                         {anon ? '••••••••' : p.username}
                       </div>
                       {#if p.matchedSkills.length > 0 || p.distanceKm != null}
                         <div
-                          style="font-size:10.5px;color:#74bfff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"
+                          style="font-size:10.5px;color:var(--cg-sky);overflow:hidden;text-overflow:ellipsis;white-space:nowrap"
                         >
                           {[
                             ...p.matchedSkills,
@@ -1593,7 +2004,7 @@
           <!-- Lev hints (only shown when AI returned results) -->
           {#if extractedHints.length > 0}
             <div
-              style="margin-top:18px;padding-top:16px;border-top:1px solid rgba(255,255,255,.05)"
+              style="margin-top:18px;padding-top:16px;border-top:1px solid rgb(var(--cg-fg-rgb) / calc(.05 * var(--cg-fg-k)))"
             >
               <div class="lev-col-lbl" style="margin-bottom:10px">
                 {$t('concierge.new.lev.hints')}
@@ -1603,20 +2014,20 @@
                   <div
                     style="padding:10px 12px;border-radius:10px;background:{hint.kind ===
                     'question'
-                      ? 'rgba(238,232,170,.05)'
-                      : 'rgba(116,191,255,.04)'};border:1px solid {hint.kind ===
+                      ? 'rgb(var(--cg-gold-rgb) / .05)'
+                      : 'rgb(var(--cg-sky-rgb) / .04)'};border:1px solid {hint.kind ===
                     'question'
-                      ? 'rgba(238,232,170,.15)'
-                      : 'rgba(116,191,255,.15)'};display:flex;gap:8px"
+                      ? 'rgb(var(--cg-gold-rgb) / .15)'
+                      : 'rgb(var(--cg-sky-rgb) / .15)'};display:flex;gap:8px"
                   >
                     <span
                       style="font-size:11px;color:{hint.kind === 'question'
-                        ? '#fde68a'
-                        : '#74bfff'};margin-top:1px"
+                        ? 'var(--cg-goldhi)'
+                        : 'var(--cg-sky)'};margin-top:1px"
                       >{hint.kind === 'question' ? '?' : '✶'}</span
                     >
                     <div
-                      style="font-family:'Bellefair',serif;font-size:12.5px;color:#ede5d8;line-height:1.5"
+                      style="font-family:'Bellefair',serif;font-size:12.5px;color:var(--cg-ink);line-height:1.5"
                     >
                       {hint.text}
                     </div>
@@ -1628,11 +2039,11 @@
 
           <!-- Privacy hint -->
           <div
-            style="margin-top:16px;padding:10px 12px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:10px;display:flex;gap:10px;align-items:flex-start"
+            style="margin-top:16px;padding:10px 12px;background:rgb(var(--cg-fg-rgb) / calc(.02 * var(--cg-fg-k)));border:1px solid rgb(var(--cg-fg-rgb) / calc(.06 * var(--cg-fg-k)));border-radius:10px;display:flex;gap:10px;align-items:flex-start"
           >
             <EntityIcon kind="private" size={13} />
             <div
-              style="font-family:'Bellefair',serif;font-size:11.5px;color:#9a8f80;line-height:1.55"
+              style="font-family:'Bellefair',serif;font-size:11.5px;color:var(--cg-muted);line-height:1.55"
             >
               {$t('concierge.new.lev.privacy')}
             </div>
@@ -1992,8 +2403,8 @@
 
   /* ── Page ── */
   .cp {
-    background: #070606;
-    color: #ede5d8;
+    background: var(--cg-bg);
+    color: var(--cg-ink);
     font-family: 'Heebo', 'Rubik', system-ui, sans-serif;
     min-height: 100vh;
     position: relative;
@@ -2007,17 +2418,17 @@
     background:
       radial-gradient(
         ellipse 70% 50% at 10% -10%,
-        rgba(200, 150, 12, 0.1) 0%,
+        rgb(var(--cg-amber-rgb) / 0.1) 0%,
         transparent 55%
       ),
       radial-gradient(
         ellipse 60% 65% at 90% 110%,
-        rgba(200, 21, 95, 0.09) 0%,
+        rgb(var(--cg-pinkd-rgb) / 0.09) 0%,
         transparent 55%
       ),
       radial-gradient(
         ellipse 50% 40% at 50% 50%,
-        rgba(2, 255, 187, 0.035) 0%,
+        rgb(var(--cg-mint-rgb) / 0.035) 0%,
         transparent 60%
       );
   }
@@ -2087,10 +2498,10 @@
     position: sticky;
     top: 0;
     z-index: 100;
-    background: rgba(7, 6, 6, 0.84);
+    background: rgb(var(--cg-bg-rgb) / 0.84);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border-bottom: 1px solid rgba(200, 150, 12, 0.2);
+    border-bottom: 1px solid rgb(var(--cg-amber-rgb) / 0.2);
     padding: 0 14px;
     height: 60px;
     display: flex;
@@ -2114,7 +2525,7 @@
     width: 28px;
     height: 28px;
     border-radius: 50%;
-    box-shadow: 0 0 14px rgba(238, 232, 170, 0.4);
+    box-shadow: 0 0 14px rgb(var(--cg-gold-rgb) / 0.4);
   }
   .hdr-brand {
     display: flex;
@@ -2125,20 +2536,20 @@
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background: #02ffbb;
-    box-shadow: 0 0 10px #02ffbb;
+    background: var(--cg-mint);
+    box-shadow: 0 0 10px var(--cg-mint);
   }
   .hdr-name {
     font-family: 'Cinzel', serif;
     font-size: clamp(13px, 3vw, 18px);
-    color: #f0c040;
+    color: var(--cg-gold2);
     letter-spacing: 0.22em;
     text-transform: uppercase;
   }
   .hdr-sub {
     font-family: 'Bellefair', serif;
     font-size: 13px;
-    color: #9a8f80;
+    color: var(--cg-muted);
   }
   .hdr-nav {
     display: flex;
@@ -2160,16 +2571,16 @@
     gap: 12px;
     padding: 10px 12px 10px 16px;
     border-radius: 14px;
-    background: rgba(23, 21, 18, 0.96);
-    border: 1px solid rgba(255, 77, 158, 0.4);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+    background: rgb(var(--cg-s2-rgb) / 0.96);
+    border: 1px solid rgb(var(--cg-pink-rgb) / 0.4);
+    box-shadow: 0 12px 40px rgb(var(--cg-shade-rgb) / calc(0.5 * var(--cg-shade-k)));
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
   }
   .nav-notice-txt {
     font-family: 'Bellefair', serif;
     font-size: 13.5px;
-    color: #ede5d8;
+    color: var(--cg-ink);
   }
   .nav-notice-reg {
     padding: 6px 14px;
@@ -2179,14 +2590,14 @@
     font-family: 'Sababa', 'Heebo', sans-serif;
     font-weight: 700;
     font-size: 13px;
-    color: #fde68a;
-    background: linear-gradient(135deg, #c8155f, #ff4d9e);
+    color: var(--cg-on-cta);
+    background: linear-gradient(135deg, var(--cg-g-pinkd), var(--cg-g-pink));
     white-space: nowrap;
   }
   .nav-notice-x {
     background: none;
     border: none;
-    color: #9a8f80;
+    color: var(--cg-muted);
     font-size: 20px;
     line-height: 1;
     cursor: pointer;
@@ -2194,13 +2605,13 @@
   }
   .nav-lnk {
     font-size: 13px;
-    color: #9a8f80;
+    color: var(--cg-muted);
     text-decoration: none;
     letter-spacing: 0.02em;
   }
   .nav-act {
-    color: #fde68a;
-    text-shadow: 0 0 12px rgba(238, 232, 170, 0.4);
+    color: var(--cg-goldhi);
+    text-shadow: 0 0 12px rgb(var(--cg-gold-rgb) / 0.4);
   }
   .hdr-right {
     display: flex;
@@ -2216,9 +2627,9 @@
     font-family: 'Sababa', 'Heebo', sans-serif;
     font-weight: 700;
     font-size: 14px;
-    color: #fde68a;
-    background: linear-gradient(135deg, #c8155f, #ff4d9e);
-    box-shadow: 0 6px 20px rgba(200, 21, 95, 0.4);
+    color: var(--cg-on-cta);
+    background: linear-gradient(135deg, var(--cg-g-pinkd), var(--cg-g-pink));
+    box-shadow: 0 6px 20px rgb(var(--cg-pinkd-rgb) / 0.4);
     white-space: nowrap;
     transition: transform 0.2s;
   }
@@ -2233,11 +2644,11 @@
     align-items: center;
     justify-content: center;
     border-radius: 10px;
-    background: #171512;
-    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: var(--cg-s2);
+    border: 1px solid rgb(var(--cg-fg-rgb) / calc(0.06 * var(--cg-fg-k)));
     cursor: pointer;
     font-size: 14px;
-    color: #fde68a;
+    color: var(--cg-goldhi);
   }
   .notif-pip {
     position: absolute;
@@ -2246,21 +2657,21 @@
     width: 7px;
     height: 7px;
     border-radius: 50%;
-    background: #ff4d9e;
-    box-shadow: 0 0 8px #ff4d9e;
+    background: var(--cg-pink);
+    box-shadow: 0 0 8px var(--cg-pink);
   }
   .av-btn {
     width: 34px;
     height: 34px;
     border-radius: 50%;
-    border: 2px solid #eee8aa;
-    background: linear-gradient(135deg, #201d19, #2a2520);
+    border: 2px solid var(--cg-gold);
+    background: linear-gradient(135deg, var(--cg-g-s3), var(--cg-g-s4));
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 11px;
     font-weight: 700;
-    color: #f0c040;
+    color: var(--cg-gold2);
     cursor: pointer;
     overflow: hidden;
     padding: 0;
@@ -2294,7 +2705,7 @@
     align-items: center;
     gap: 5px;
     font-size: 11px;
-    color: #7a6f5e;
+    color: var(--cg-muted2);
   }
   .step-dot {
     width: 22px;
@@ -2306,27 +2717,27 @@
     font-family: 'Cinzel', serif;
     font-weight: 700;
     font-size: 10px;
-    background: rgba(255, 255, 255, 0.04);
-    color: #7a6f5e;
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgb(var(--cg-fg-rgb) / calc(0.04 * var(--cg-fg-k)));
+    color: var(--cg-muted2);
+    border: 1px solid rgb(var(--cg-fg-rgb) / calc(0.12 * var(--cg-fg-k)));
     flex-shrink: 0;
   }
   .step.active .step-dot {
-    background: linear-gradient(135deg, #c8155f, #ff4d9e);
-    color: #fde68a;
-    border-color: rgba(255, 77, 158, 0.5);
-    box-shadow: 0 0 18px rgba(255, 77, 158, 0.5);
+    background: linear-gradient(135deg, var(--cg-g-pinkd), var(--cg-g-pink));
+    color: var(--cg-on-cta);
+    border-color: rgb(var(--cg-pink-rgb) / 0.5);
+    box-shadow: 0 0 18px rgb(var(--cg-pink-rgb) / 0.5);
   }
   .step.active {
-    color: #ff4d9e;
+    color: var(--cg-pink);
   }
   .step.done .step-dot {
-    background: rgba(2, 255, 187, 0.14);
-    color: #02ffbb;
-    border-color: rgba(2, 255, 187, 0.4);
+    background: rgb(var(--cg-mint-rgb) / 0.14);
+    color: var(--cg-mint);
+    border-color: rgb(var(--cg-mint-rgb) / 0.4);
   }
   .step.done {
-    color: #02ffbb;
+    color: var(--cg-mint);
   }
   .step-en {
     font-family: 'Cinzel', serif;
@@ -2341,7 +2752,7 @@
   .step-sep {
     width: 22px;
     height: 1px;
-    background: rgba(255, 255, 255, 0.08);
+    background: rgb(var(--cg-fg-rgb) / calc(0.08 * var(--cg-fg-k)));
     flex-shrink: 0;
   }
 
@@ -2357,13 +2768,13 @@
     font-family: 'Sababa', 'Heebo', sans-serif;
     font-weight: 700;
     font-size: 15px;
-    color: #fde68a;
+    color: var(--cg-on-cta);
     white-space: nowrap;
-    background: linear-gradient(135deg, #c8155f, #ff4d9e);
+    background: linear-gradient(135deg, var(--cg-g-pinkd), var(--cg-g-pink));
     box-shadow:
-      inset 1px 1px 0 rgba(255, 255, 255, 0.25),
-      inset -1px -1px 0 rgba(0, 0, 0, 0.4),
-      0 6px 20px rgba(200, 21, 95, 0.4);
+      inset 1px 1px 0 rgb(var(--cg-fg-rgb) / calc(0.25 * var(--cg-fg-k))),
+      inset -1px -1px 0 rgb(var(--cg-shade-rgb) / calc(0.4 * var(--cg-shade-k))),
+      0 6px 20px rgb(var(--cg-pinkd-rgb) / 0.4);
     transition: transform 0.2s;
   }
   .btn-jewel:hover:not(:disabled) {
@@ -2371,8 +2782,8 @@
   }
   .btn-ghost {
     background: transparent;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: #9a8f80;
+    border: 1px solid rgb(var(--cg-fg-rgb) / calc(0.1 * var(--cg-fg-k)));
+    color: var(--cg-muted);
     padding: 9px 16px;
     border-radius: 12px;
     font-size: 13px;
@@ -2384,9 +2795,9 @@
     white-space: nowrap;
   }
   .btn-ghost:hover {
-    color: #ede5d8;
-    border-color: rgba(238, 232, 170, 0.3);
-    background: rgba(238, 232, 170, 0.04);
+    color: var(--cg-ink);
+    border-color: rgb(var(--cg-gold-rgb) / 0.3);
+    background: rgb(var(--cg-gold-rgb) / 0.04);
   }
   .btn-xs {
     padding: 7px 12px;
@@ -2398,21 +2809,21 @@
     width: 8px;
     height: 8px;
     display: inline-block;
-    background: linear-gradient(135deg, #ff4d9e, #c8155f);
+    background: linear-gradient(135deg, var(--cg-g-pink), var(--cg-g-pinkd));
     transform: rotate(45deg);
-    box-shadow: 0 0 12px rgba(255, 77, 158, 0.7);
+    box-shadow: 0 0 12px rgb(var(--cg-pink-rgb) / 0.7);
     flex-shrink: 0;
   }
   .gem-gold {
-    background: linear-gradient(135deg, #fde68a, #aa771c);
-    box-shadow: 0 0 12px rgba(238, 232, 170, 0.7);
+    background: linear-gradient(135deg, var(--cg-g-goldhi), var(--cg-g-metal-d));
+    box-shadow: 0 0 12px rgb(var(--cg-gold-rgb) / 0.7);
   }
 
   /* ── Section label ── */
   .section-label {
     font-size: 11px;
     font-weight: 700;
-    color: #9a8f80;
+    color: var(--cg-muted);
     letter-spacing: 0.24em;
     text-transform: uppercase;
     display: flex;
@@ -2427,7 +2838,7 @@
     background: linear-gradient(
       to right,
       transparent,
-      rgba(255, 255, 255, 0.08),
+      rgb(var(--cg-fg-rgb) / calc(0.08 * var(--cg-fg-k))),
       transparent
     );
   }
@@ -2444,19 +2855,19 @@
     border-radius: 999px;
     font-family: 'Bellefair', serif;
     font-size: 12.5px;
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    color: #ede5d8;
+    background: rgb(var(--cg-fg-rgb) / calc(0.04 * var(--cg-fg-k)));
+    border: 1px solid rgb(var(--cg-fg-rgb) / calc(0.08 * var(--cg-fg-k)));
+    color: var(--cg-ink);
   }
   .chip.must {
-    background: rgba(255, 0, 146, 0.1);
-    border-color: rgba(255, 0, 146, 0.35);
-    color: #ff4d9e;
+    background: rgb(var(--cg-pink-rgb) / 0.1);
+    border-color: rgb(var(--cg-pink-rgb) / 0.35);
+    color: var(--cg-pink);
   }
   .chip.nice {
-    background: rgba(238, 232, 170, 0.07);
-    border-color: rgba(238, 232, 170, 0.25);
-    color: #fde68a;
+    background: rgb(var(--cg-gold-rgb) / 0.07);
+    border-color: rgb(var(--cg-gold-rgb) / 0.25);
+    color: var(--cg-goldhi);
   }
 
   /* ── Opening incantation ── */
@@ -2465,7 +2876,7 @@
     font-size: 11px;
     letter-spacing: 0.36em;
     text-transform: uppercase;
-    color: #9a8f80;
+    color: var(--cg-muted);
     margin-bottom: 12px;
   }
   .incant-h1 {
@@ -2474,13 +2885,13 @@
     font-size: clamp(28px, 8vw, 44px);
     font-weight: 700;
     line-height: 1.1;
-    color: #ede5d8;
+    color: var(--cg-ink);
   }
   .incant-p {
     margin: 14px auto 0;
     font-family: 'Bellefair', serif;
     font-size: clamp(14px, 2.5vw, 17px);
-    color: #9a8f80;
+    color: var(--cg-muted);
     line-height: 1.6;
     max-width: 560px;
   }
@@ -2503,16 +2914,16 @@
     gap: 10px;
     align-items: center;
     padding: 11px 12px;
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: rgb(var(--cg-fg-rgb) / calc(0.02 * var(--cg-fg-k)));
+    border: 1px solid rgb(var(--cg-fg-rgb) / calc(0.06 * var(--cg-fg-k)));
     border-radius: 14px;
     cursor: pointer;
     transition: all 0.2s;
     text-align: start;
   }
   .seed-card:hover {
-    border-color: rgba(238, 232, 170, 0.32);
-    background: rgba(238, 232, 170, 0.04);
+    border-color: rgb(var(--cg-gold-rgb) / 0.32);
+    background: rgb(var(--cg-gold-rgb) / 0.04);
     transform: translateY(-1px);
   }
   .seed-icon {
@@ -2522,13 +2933,13 @@
   .seed-label {
     font-family: 'Bellefair', serif;
     font-size: 13px;
-    color: #ede5d8;
+    color: var(--cg-ink);
     line-height: 1.2;
   }
   .seed-hint {
     font-size: 11.5px;
     /* #52493e sat at 2.3:1 against the near-black page — unreadable. */
-    color: #9a8f80;
+    color: var(--cg-muted);
     margin-top: 3px;
     line-height: 1.35;
   }
@@ -2555,15 +2966,15 @@
     background:
       linear-gradient(
         180deg,
-        rgba(238, 232, 170, 0.04) 0%,
-        rgba(7, 6, 6, 0) 30%
+        rgb(var(--cg-gold-rgb) / 0.04) 0%,
+        rgb(var(--cg-bg-rgb) / 0) 30%
       ),
-      linear-gradient(180deg, rgba(255, 77, 158, 0.025), rgba(7, 6, 6, 0)),
-      #0e0d0c;
-    border: 1px solid rgba(238, 232, 170, 0.2);
+      linear-gradient(180deg, rgb(var(--cg-pink-rgb) / 0.025), rgb(var(--cg-bg-rgb) / 0)),
+      var(--cg-s1);
+    border: 1px solid rgb(var(--cg-gold-rgb) / 0.2);
     box-shadow:
-      0 0 0 1px rgba(238, 232, 170, 0.06) inset,
-      0 30px 80px rgba(0, 0, 0, 0.4);
+      0 0 0 1px rgb(var(--cg-gold-rgb) / 0.06) inset,
+      0 30px 80px rgb(var(--cg-shade-rgb) / calc(0.4 * var(--cg-shade-k)));
   }
   @media (min-width: 640px) {
     .scroll-frame {
@@ -2576,9 +2987,9 @@
     position: absolute;
     width: 14px;
     height: 14px;
-    background: linear-gradient(135deg, #fde68a, #aa771c);
+    background: linear-gradient(135deg, var(--cg-g-goldhi), var(--cg-g-metal-d));
     transform: rotate(45deg);
-    box-shadow: 0 0 14px rgba(238, 232, 170, 0.7);
+    box-shadow: 0 0 14px rgb(var(--cg-gold-rgb) / 0.7);
     border-radius: 2px;
   }
   .corner-tl {
@@ -2588,14 +2999,14 @@
   .corner-tr {
     top: -7px;
     inset-inline-end: 22px;
-    background: linear-gradient(135deg, #ff4d9e, #c8155f);
-    box-shadow: 0 0 14px rgba(255, 77, 158, 0.7);
+    background: linear-gradient(135deg, var(--cg-g-pink), var(--cg-g-pinkd));
+    box-shadow: 0 0 14px rgb(var(--cg-pink-rgb) / 0.7);
   }
   .corner-bl {
     bottom: -7px;
     inset-inline-start: 22px;
-    background: linear-gradient(135deg, #ff4d9e, #c8155f);
-    box-shadow: 0 0 14px rgba(255, 77, 158, 0.7);
+    background: linear-gradient(135deg, var(--cg-g-pink), var(--cg-g-pinkd));
+    box-shadow: 0 0 14px rgb(var(--cg-pink-rgb) / 0.7);
   }
   .corner-br {
     bottom: -7px;
@@ -2609,42 +3020,99 @@
     border: none;
     outline: none;
     padding: 6px 0 12px;
-    border-bottom: 1px solid rgba(238, 232, 170, 0.18);
+    border-bottom: 1px solid rgb(var(--cg-gold-rgb) / 0.18);
     font-family: 'Sababa', 'Heebo', sans-serif;
     font-size: clamp(22px, 5vw, 32px);
     font-weight: 700;
-    color: #ede5d8;
+    color: var(--cg-ink);
     line-height: 1.2;
     transition: border-color 0.2s;
   }
   .wish-title-inp::placeholder {
-    color: #7a6f5e;
+    color: var(--cg-muted2);
     font-weight: 400;
     font-family: 'Bellefair', serif;
   }
   .wish-title-inp:focus {
-    border-bottom-color: rgba(238, 232, 170, 0.5);
+    border-bottom-color: rgb(var(--cg-gold-rgb) / 0.5);
   }
 
-  /* ── RichText inside dark scroll-frame ── */
-  .rich-body-wrap :global(.editor-wrapper) {
-    border: none;
-    box-shadow: none;
-    border-top: 1px solid rgba(238, 232, 170, 0.12);
+  /* ── RichText inside dark scroll-frame ──
+     The frame is dark parchment in every theme, but RichText picks its palette
+     from <html>: business·light handed it a white toolbar and navy bold text
+     and headings (#0f172a on #0f0d0b), personal·light a #43303a bold. Pin its
+     tokens to the dark set here. The selector is long for weight: RichText's
+     `html.personal.dark .editor-wrapper` is 0,4,1, and Svelte 5 scopes only
+     the first class here — the rest are `:where()`, worth nothing. */
+  .scroll-frame .rich-body-wrap :global(.editor-wrapper.rt-trans),
+  .scroll-frame .rich-body-wrap :global(.tiptap-content .bubble-menu) {
+    --barbi-pink: var(--cg-pink);
+    --rt-radius: 12px;
+    --rt-shadow: 0 6px 18px rgb(var(--cg-shade-rgb) / calc(0.5 * var(--cg-shade-k)));
+    --rt-line: rgb(var(--cg-gold-rgb) / 0.28);
+    --rt-line-soft: rgb(var(--cg-gold-rgb) / 0.14);
+    --rt-wash: transparent;
+    --rt-toolbar-bg: rgb(var(--cg-gold-rgb) / 0.035);
+    --rt-ring: rgb(var(--cg-goldhi-rgb) / 0.12);
+    --rt-pop-bg: var(--cg-s3);
+    --rt-pop-ink: var(--cg-ink);
+    --rt-btn-ink: var(--cg-ink2b);
+    --rt-btn-hover-bg: rgb(var(--cg-gold-rgb) / 0.12);
+    --rt-btn-hover-ink: var(--cg-goldhi);
+    --rt-accent: var(--cg-pink);
+    --rt-accent-ink: var(--cg-on-pink);
+    --rt-accent-shadow: none;
+    --rt-body-ink: var(--cg-ink);
+    --rt-head-ink: var(--cg-goldhi);
+    --rt-strong-ink: var(--cg-ink-max);
+    --rt-link-ink: var(--cg-pink-l);
+    --rt-muted: var(--cg-muted);
+    --rt-quote-bg: rgb(var(--cg-gold-rgb) / 0.07);
+    --rt-quote-rule: var(--cg-gold3);
+  }
+  /* The writing area reads as a field: framed, lifted on focus. It used to be
+     a borderless strip under a toolbar, and nothing said "type here". */
+  .scroll-frame .rich-body-wrap :global(.editor-wrapper) {
     margin-top: 18px;
-    border-radius: 0;
+    background: rgb(var(--cg-fg-rgb) / calc(0.025 * var(--cg-fg-k)));
+    border: 1px solid rgb(var(--cg-gold-rgb) / 0.16);
+    border-radius: 12px;
+    box-shadow: none;
+    transition:
+      border-color 0.2s,
+      box-shadow 0.2s;
+  }
+  .scroll-frame .rich-body-wrap :global(.editor-wrapper:focus-within) {
+    border-color: rgb(var(--cg-goldhi-rgb) / 0.5);
+    box-shadow: 0 0 0 3px rgb(var(--cg-goldhi-rgb) / 0.1);
+  }
+  .rich-body-wrap :global(.rt-toolbar) {
+    padding: 6px 10px;
   }
   .rich-body-wrap :global(.tiptap-content) {
     min-height: 160px;
+    padding: 14px 16px 8px;
+  }
+  .rich-body-wrap :global(.tiptap-content .ProseMirror) {
+    min-height: 138px;
+  }
+  .rich-body-wrap :global(.rt-placeholder) {
+    color: var(--cg-muted2);
+    font-family: 'Bellefair', serif;
+    font-size: clamp(14px, 2vw, 17px);
+    line-height: 1.7;
+  }
+  .rich-body-wrap :global(.custom-prose p) {
+    font-size: inherit;
   }
   .rich-body-wrap :global(.custom-prose) {
-    color: #ede5d8 !important;
+    color: var(--cg-ink) !important;
     font-family: 'Bellefair', serif !important;
     font-size: clamp(14px, 2vw, 17px) !important;
     line-height: 1.7 !important;
   }
   .rich-body-wrap :global(.custom-prose p.is-editor-empty:first-child::before) {
-    color: #7a6f5e;
+    color: var(--cg-muted2);
     content: attr(data-placeholder);
     /* `right` pinned the placeholder to the wrong edge in LTR locales. */
     float: inline-start;
@@ -2652,21 +3120,21 @@
     height: 0;
   }
   .rich-body-wrap :global(button) {
-    color: #c8bba8;
+    color: var(--cg-ink2);
   }
   .rich-body-wrap :global(button:hover) {
-    color: #fde68a;
-    background: rgba(238, 232, 170, 0.08) !important;
-    border-color: rgba(238, 232, 170, 0.25) !important;
+    color: var(--cg-goldhi);
+    background: rgb(var(--cg-gold-rgb) / 0.08) !important;
+    border-color: rgb(var(--cg-gold-rgb) / 0.25) !important;
   }
   .rich-body-wrap :global(button.active) {
-    background: rgba(255, 77, 158, 0.25) !important;
-    color: #ff4d9e !important;
-    border-color: rgba(255, 77, 158, 0.4) !important;
+    background: rgb(var(--cg-pink-rgb) / 0.25) !important;
+    color: var(--cg-pink) !important;
+    border-color: rgb(var(--cg-pink-rgb) / 0.4) !important;
     box-shadow: none !important;
   }
   .rich-body-wrap :global(.w-px.bg-gold\/50) {
-    background: rgba(238, 232, 170, 0.2);
+    background: rgb(var(--cg-gold-rgb) / 0.2);
   }
 
   .wish-body-inp {
@@ -2677,13 +3145,13 @@
     outline: none;
     font-family: 'Bellefair', serif;
     font-size: clamp(14px, 2vw, 17px);
-    color: #ede5d8;
+    color: var(--cg-ink);
     line-height: 1.7;
     resize: vertical;
     min-height: 160px;
   }
   .wish-body-inp::placeholder {
-    color: #7a6f5e;
+    color: var(--cg-muted2);
     line-height: 1.7;
   }
 
@@ -2693,40 +3161,68 @@
     justify-content: space-between;
     gap: 12px;
     margin-top: 12px;
-    border-top: 1px solid rgba(238, 232, 170, 0.12);
+    border-top: 1px solid rgb(var(--cg-gold-rgb) / 0.12);
     padding-top: 12px;
   }
   .tool-btn {
     width: 32px;
     height: 32px;
     border-radius: 9px;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    color: #c8bba8;
+    background: rgb(var(--cg-fg-rgb) / calc(0.03 * var(--cg-fg-k)));
+    border: 1px solid rgb(var(--cg-fg-rgb) / calc(0.06 * var(--cg-fg-k)));
+    color: var(--cg-ink2);
     cursor: pointer;
     font-size: 14px;
     transition: all 0.2s;
   }
   .tool-btn:hover {
-    background: rgba(238, 232, 170, 0.1);
-    border-color: rgba(238, 232, 170, 0.3);
-    color: #fde68a;
+    background: rgb(var(--cg-gold-rgb) / 0.1);
+    border-color: rgb(var(--cg-gold-rgb) / 0.3);
+    color: var(--cg-goldhi);
     transform: translateY(-1px);
+  }
+  .tool-btn:focus-visible {
+    outline: 2px solid var(--cg-goldhi);
+    outline-offset: 2px;
+  }
+  /* recording */
+  .tool-btn.tool-live {
+    background: rgb(var(--cg-pink-rgb) / 0.2);
+    border-color: rgb(var(--cg-pink-rgb) / 0.6);
+    color: var(--cg-pink);
+    animation: tool-pulse 1.4s ease-in-out infinite;
+  }
+  /* waiting on Lev */
+  .tool-btn.tool-busy {
+    cursor: progress;
+    color: var(--cg-goldhi);
+    animation: tool-pulse 1s ease-in-out infinite;
+  }
+  @keyframes tool-pulse {
+    50% {
+      box-shadow: 0 0 0 4px rgb(var(--cg-pink-rgb) / 0.15);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .tool-btn.tool-live,
+    .tool-btn.tool-busy {
+      animation: none;
+    }
   }
 
   .word-gauge {
     width: 70px;
     height: 4px;
     border-radius: 999px;
-    background: rgba(255, 255, 255, 0.06);
+    background: rgb(var(--cg-fg-rgb) / calc(0.06 * var(--cg-fg-k)));
     overflow: hidden;
   }
   .word-fill {
     height: 100%;
-    background: linear-gradient(90deg, #c8155f, #fde68a, #02ffbb);
+    background: linear-gradient(90deg, var(--cg-g-pinkd), var(--cg-g-goldhi), var(--cg-g-mint));
     transition: width 0.3s;
     border-radius: 999px;
-    box-shadow: 0 0 10px rgba(238, 232, 170, 0.4);
+    box-shadow: 0 0 10px rgb(var(--cg-gold-rgb) / 0.4);
   }
 
   /* ── Subsection heading ── */
@@ -2735,7 +3231,7 @@
     font-size: 12px;
     letter-spacing: 0.18em;
     text-transform: uppercase;
-    color: #fde68a;
+    color: var(--cg-goldhi);
     margin: 26px 0 10px;
     display: flex;
     align-items: center;
@@ -2748,7 +3244,7 @@
     background: linear-gradient(
       to left,
       transparent,
-      rgba(238, 232, 170, 0.18)
+      rgb(var(--cg-gold-rgb) / 0.18)
     );
   }
 
@@ -2764,16 +3260,16 @@
     gap: 12px;
     padding: 12px 14px;
     border-radius: 14px;
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: rgb(var(--cg-fg-rgb) / calc(0.02 * var(--cg-fg-k)));
+    border: 1px solid rgb(var(--cg-fg-rgb) / calc(0.06 * var(--cg-fg-k)));
     cursor: pointer;
     transition: all 0.2s;
     width: 100%;
     text-align: start;
   }
   .detail-jewel:hover {
-    background: rgba(238, 232, 170, 0.04);
-    border-color: rgba(238, 232, 170, 0.25);
+    background: rgb(var(--cg-gold-rgb) / 0.04);
+    border-color: rgb(var(--cg-gold-rgb) / 0.25);
     transform: translateY(-1px);
   }
   .detail-jewel.location-trigger {
@@ -2784,7 +3280,7 @@
     position: absolute;
     inset: 6px;
     border-radius: 12px;
-    border: 1px solid rgba(116, 191, 255, 0.08);
+    border: 1px solid rgb(var(--cg-sky-rgb) / 0.08);
     pointer-events: none;
   }
   .jewel-icon {
@@ -2802,7 +3298,17 @@
     font-weight: 700;
     letter-spacing: 0.22em;
     text-transform: uppercase;
-    color: #9a8f80;
+    color: var(--cg-muted);
+  }
+  /* "Lev filled this in from your text" */
+  .lev-mark {
+    margin-inline-start: 6px;
+    padding: 1px 6px;
+    border-radius: 999px;
+    background: rgb(var(--cg-goldhi-rgb) / 0.12);
+    color: var(--cg-goldhi);
+    letter-spacing: 0.06em;
+    text-transform: none;
   }
   .jewel-val {
     font-family: 'Bellefair', serif;
@@ -2822,7 +3328,7 @@
     align-items: center;
     justify-content: center;
     padding: 18px;
-    background: rgba(7, 6, 6, 0.78);
+    background: rgb(var(--cg-bg-rgb) / 0.78);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
   }
@@ -2831,17 +3337,17 @@
     max-height: min(88vh, 860px);
     overflow: auto;
     border-radius: 20px;
-    border: 1px solid rgba(116, 191, 255, 0.28);
+    border: 1px solid rgb(var(--cg-sky-rgb) / 0.28);
     background:
       linear-gradient(
         180deg,
-        rgba(116, 191, 255, 0.06),
-        rgba(7, 6, 6, 0.98) 26%
+        rgb(var(--cg-sky-rgb) / 0.06),
+        rgb(var(--cg-bg-rgb) / 0.98) 26%
       ),
-      #0e0d0c;
+      var(--cg-s1);
     box-shadow:
-      0 24px 80px rgba(0, 0, 0, 0.62),
-      0 0 0 1px rgba(255, 255, 255, 0.04) inset;
+      0 24px 80px rgb(var(--cg-shade-rgb) / calc(0.62 * var(--cg-shade-k))),
+      0 0 0 1px rgb(var(--cg-fg-rgb) / calc(0.04 * var(--cg-fg-k))) inset;
     padding: 16px;
   }
   .location-modal-head {
@@ -2857,30 +3363,30 @@
     font-weight: 700;
     letter-spacing: 0.24em;
     text-transform: uppercase;
-    color: #74bfff;
+    color: var(--cg-sky);
   }
   .location-modal h2 {
     margin: 2px 0 0;
     font-family: 'Sababa', 'Heebo', sans-serif;
     font-size: clamp(20px, 5vw, 28px);
     line-height: 1.15;
-    color: #ede5d8;
+    color: var(--cg-ink);
   }
   .modal-close {
     width: 36px;
     height: 36px;
     border-radius: 10px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    background: rgba(255, 255, 255, 0.03);
-    color: #c8bba8;
+    border: 1px solid rgb(var(--cg-fg-rgb) / calc(0.1 * var(--cg-fg-k)));
+    background: rgb(var(--cg-fg-rgb) / calc(0.03 * var(--cg-fg-k)));
+    color: var(--cg-ink2);
     cursor: pointer;
     font-size: 24px;
     line-height: 1;
   }
   .modal-close:hover {
-    border-color: rgba(238, 232, 170, 0.32);
-    color: #fde68a;
-    background: rgba(238, 232, 170, 0.06);
+    border-color: rgb(var(--cg-gold-rgb) / 0.32);
+    color: var(--cg-goldhi);
+    background: rgb(var(--cg-gold-rgb) / 0.06);
   }
   .location-modal-actions {
     display: flex;
@@ -2923,15 +3429,15 @@
     font-size: 10px;
     letter-spacing: 0.22em;
     text-transform: uppercase;
-    color: #9a8f80;
+    color: var(--cg-muted);
   }
   .field-inp {
     width: 100%;
     box-sizing: border-box;
     padding: 10px 12px;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(238, 232, 170, 0.18);
-    color: #ede5d8;
+    background: rgb(var(--cg-fg-rgb) / calc(0.03 * var(--cg-fg-k)));
+    border: 1px solid rgb(var(--cg-gold-rgb) / 0.18);
+    color: var(--cg-ink);
     border-radius: 10px;
     font-family: 'Bellefair', serif;
     font-size: 14px;
@@ -2939,7 +3445,7 @@
     transition: border-color 0.2s;
   }
   .field-inp:focus {
-    border-color: rgba(238, 232, 170, 0.4);
+    border-color: rgb(var(--cg-gold-rgb) / 0.4);
   }
   .field-inp::-webkit-calendar-picker-indicator {
     filter: invert(0.7);
@@ -2955,32 +3461,32 @@
     padding: 6px 12px;
     border-radius: 999px;
     cursor: pointer;
-    border: 1px solid rgba(238, 232, 170, 0.22);
-    background: rgba(238, 232, 170, 0.05);
-    color: #fde68a;
+    border: 1px solid rgb(var(--cg-gold-rgb) / 0.22);
+    background: rgb(var(--cg-gold-rgb) / 0.05);
+    color: var(--cg-goldhi);
     font-family: 'Bellefair', serif;
     font-size: 12.5px;
     transition: all 0.2s;
   }
   .preset-pill:hover {
-    border-color: rgba(238, 232, 170, 0.5);
-    background: rgba(238, 232, 170, 0.1);
+    border-color: rgb(var(--cg-gold-rgb) / 0.5);
+    background: rgb(var(--cg-gold-rgb) / 0.1);
   }
   .preset-pill.ghost {
     background: transparent;
-    border-color: rgba(255, 255, 255, 0.1);
-    color: #9a8f80;
+    border-color: rgb(var(--cg-fg-rgb) / calc(0.1 * var(--cg-fg-k)));
+    color: var(--cg-muted);
   }
   .preset-pill.ghost:hover {
-    color: #ede5d8;
-    border-color: rgba(238, 232, 170, 0.3);
+    color: var(--cg-ink);
+    border-color: rgb(var(--cg-gold-rgb) / 0.3);
   }
 
   .modal-hint {
     margin: 0;
     font-family: 'Bellefair', serif;
     font-size: 12.5px;
-    color: #9a8f80;
+    color: var(--cg-muted);
     line-height: 1.55;
   }
 
@@ -2995,33 +3501,33 @@
     align-items: flex-start;
     padding: 12px 14px;
     cursor: pointer;
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgb(var(--cg-fg-rgb) / calc(0.06 * var(--cg-fg-k)));
+    background: rgb(var(--cg-fg-rgb) / calc(0.02 * var(--cg-fg-k)));
     border-radius: 12px;
     transition: all 0.2s;
   }
   .radio-row:hover {
-    border-color: rgba(238, 232, 170, 0.25);
+    border-color: rgb(var(--cg-gold-rgb) / 0.25);
   }
   .radio-row.on {
-    border-color: rgba(255, 77, 158, 0.5);
-    background: rgba(255, 77, 158, 0.06);
-    box-shadow: 0 0 14px rgba(255, 77, 158, 0.1);
+    border-color: rgb(var(--cg-pink-rgb) / 0.5);
+    background: rgb(var(--cg-pink-rgb) / 0.06);
+    box-shadow: 0 0 14px rgb(var(--cg-pink-rgb) / 0.1);
   }
   .radio-row input[type='radio'] {
-    accent-color: #ff4d9e;
+    accent-color: var(--cg-pink);
     margin-top: 3px;
     flex-shrink: 0;
   }
   .radio-label {
     font-family: 'Bellefair', serif;
     font-size: 14px;
-    color: #ede5d8;
+    color: var(--cg-ink);
   }
   .radio-hint {
     font-family: 'Bellefair', serif;
     font-size: 12px;
-    color: #9a8f80;
+    color: var(--cg-muted);
     margin-top: 3px;
     line-height: 1.45;
   }
@@ -3035,18 +3541,18 @@
   .val-pill {
     padding: 6px 13px;
     border-radius: 999px;
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid rgb(var(--cg-fg-rgb) / calc(0.08 * var(--cg-fg-k)));
     background: transparent;
-    color: #9a8f80;
+    color: var(--cg-muted);
     font-family: 'Bellefair', serif;
     font-size: 13px;
     cursor: pointer;
     transition: all 0.2s;
   }
   .val-pill.on {
-    border-color: rgba(255, 77, 158, 0.5);
-    background: rgba(255, 77, 158, 0.12);
-    color: #ff4d9e;
+    border-color: rgb(var(--cg-pink-rgb) / 0.5);
+    background: rgb(var(--cg-pink-rgb) / 0.12);
+    color: var(--cg-pink);
   }
 
   /* ── Publish bar ── */
@@ -3060,16 +3566,16 @@
     background:
       radial-gradient(
         120% 80% at 0% 0%,
-        rgba(238, 232, 170, 0.06),
+        rgb(var(--cg-gold-rgb) / 0.06),
         transparent 60%
       ),
       radial-gradient(
         120% 80% at 100% 100%,
-        rgba(200, 21, 95, 0.08),
+        rgb(var(--cg-pinkd-rgb) / 0.08),
         transparent 60%
       ),
-      #0e0d0c;
-    border: 1px solid rgba(238, 232, 170, 0.22);
+      var(--cg-s1);
+    border: 1px solid rgb(var(--cg-gold-rgb) / 0.22);
     gap: 14px;
     flex-wrap: wrap;
   }
@@ -3078,30 +3584,30 @@
     height: 40px;
     border-radius: 50%;
     flex-shrink: 0;
-    background: linear-gradient(135deg, #201d19, #2a2520);
-    border: 2px solid rgba(238, 232, 170, 0.3);
+    background: linear-gradient(135deg, var(--cg-g-s3), var(--cg-g-s4));
+    border: 2px solid rgb(var(--cg-gold-rgb) / 0.3);
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 16px;
-    color: #52493e;
+    color: var(--cg-dim);
     transition: all 0.3s;
   }
   .pub-dot.ready {
-    background: linear-gradient(135deg, #02ffbb, #037d5b);
-    border-color: #02ffbb;
-    color: #0e0d0c;
-    box-shadow: 0 0 18px rgba(2, 255, 187, 0.5);
+    background: linear-gradient(135deg, var(--cg-g-mint), var(--cg-g-mintd));
+    border-color: var(--cg-mint);
+    color: var(--cg-on-mint);
+    box-shadow: 0 0 18px rgb(var(--cg-mint-rgb) / 0.5);
   }
   .pub-status {
     font-family: 'Sababa', 'Heebo', sans-serif;
     font-size: 17px;
-    color: #ede5d8;
+    color: var(--cg-ink);
   }
   .pub-hint {
     font-family: 'Bellefair', serif;
     font-size: 12.5px;
-    color: #9a8f80;
+    color: var(--cg-muted);
     margin-top: 2px;
   }
   .pub-btn {
@@ -3119,25 +3625,25 @@
     font-family: 'Bellefair', serif;
     font-size: 12.5px;
     line-height: 1.5;
-    color: #fde68a;
+    color: var(--cg-goldhi);
     text-align: start;
-    background: linear-gradient(135deg, rgba(200, 21, 95, 0.18), rgba(255, 77, 158, 0.1));
-    border: 1px solid rgba(255, 77, 158, 0.4);
-    box-shadow: 0 0 18px rgba(255, 77, 158, 0.12);
+    background: linear-gradient(135deg, rgb(var(--cg-pinkd-rgb) / 0.18), rgb(var(--cg-pink-rgb) / 0.1));
+    border: 1px solid rgb(var(--cg-pink-rgb) / 0.4);
+    box-shadow: 0 0 18px rgb(var(--cg-pink-rgb) / 0.12);
     transition: all 0.2s;
   }
   .anon-cta:hover {
-    border-color: rgba(255, 77, 158, 0.7);
+    border-color: rgb(var(--cg-pink-rgb) / 0.7);
     transform: translateY(-1px);
   }
 
   /* ── Lev rail ── */
   .lev-rail {
-    background: #171512;
-    border: 1px solid rgba(116, 191, 255, 0.18);
+    background: var(--cg-s2);
+    border: 1px solid rgb(var(--cg-sky-rgb) / 0.18);
     border-radius: 20px;
     padding: 18px;
-    box-shadow: 0 0 30px rgba(116, 191, 255, 0.06);
+    box-shadow: 0 0 30px rgb(var(--cg-sky-rgb) / 0.06);
   }
   @media (min-width: 1024px) {
     .lev-rail {
@@ -3150,7 +3656,7 @@
     font-weight: 700;
     letter-spacing: 0.22em;
     text-transform: uppercase;
-    color: #9a8f80;
+    color: var(--cg-muted);
     margin-bottom: 6px;
   }
 
@@ -3165,26 +3671,26 @@
     border-radius: 16px;
     background: linear-gradient(
       135deg,
-      rgba(191, 149, 63, 0.16),
-      rgba(255, 77, 158, 0.08)
+      rgb(var(--cg-amber-rgb) / 0.16),
+      rgb(var(--cg-pink-rgb) / 0.08)
     );
-    border: 1px solid rgba(253, 230, 138, 0.35);
+    border: 1px solid rgb(var(--cg-goldhi-rgb) / 0.35);
   }
   .welcome-icon {
     flex: none;
     margin-top: 2px;
-    color: #fde68a;
+    color: var(--cg-goldhi);
   }
   .welcome-title {
     font-family: 'Bellefair', serif;
     font-size: 17px;
-    color: #fde68a;
+    color: var(--cg-goldhi);
   }
   .welcome-sub {
     margin-top: 2px;
     font-size: 13px;
     line-height: 1.5;
-    color: #d8cdb8;
+    color: var(--cg-ink2b);
   }
   .welcome-close {
     margin-inline-start: auto;
@@ -3192,13 +3698,13 @@
     width: 28px;
     height: 28px;
     border-radius: 50%;
-    color: #d8cdb8;
+    color: var(--cg-ink2b);
     font-size: 18px;
     line-height: 1;
   }
   .welcome-close:hover {
-    background: rgba(253, 230, 138, 0.12);
-    color: #fde68a;
+    background: rgb(var(--cg-goldhi-rgb) / 0.12);
+    color: var(--cg-goldhi);
   }
   .autosend {
     position: fixed;
@@ -3207,7 +3713,7 @@
     display: grid;
     place-items: center;
     padding: 16px;
-    background: rgba(14, 13, 12, 0.82);
+    background: rgb(var(--cg-s1-rgb) / 0.82);
     backdrop-filter: blur(6px);
   }
   .autosend-card {
@@ -3215,9 +3721,9 @@
     padding: 28px 24px;
     border-radius: 22px;
     text-align: center;
-    background: #15130f;
-    border: 1px solid rgba(253, 230, 138, 0.3);
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    background: var(--cg-s2);
+    border: 1px solid rgb(var(--cg-goldhi-rgb) / 0.3);
+    box-shadow: 0 20px 60px rgb(var(--cg-shade-rgb) / calc(0.5 * var(--cg-shade-k)));
   }
   .autosend-coin {
     width: 56px;
@@ -3228,13 +3734,13 @@
   .autosend-title {
     font-family: 'Bellefair', serif;
     font-size: 21px;
-    color: #fde68a;
+    color: var(--cg-goldhi);
   }
   .autosend-sub {
     margin-top: 6px;
     font-size: 13px;
     line-height: 1.5;
-    color: #d8cdb8;
+    color: var(--cg-ink2b);
   }
   .autosend-bar {
     position: relative;
@@ -3242,14 +3748,14 @@
     margin-top: 18px;
     overflow: hidden;
     border-radius: 3px;
-    background: rgba(253, 230, 138, 0.15);
+    background: rgb(var(--cg-goldhi-rgb) / 0.15);
   }
   .autosend-bar span {
     position: absolute;
     inset-block: 0;
     width: 40%;
     border-radius: 3px;
-    background: linear-gradient(90deg, #bf953f, #fcf6ba, #b38728);
+    background: linear-gradient(90deg, var(--cg-g-metal-a), var(--cg-g-metal-b), var(--cg-g-metal-c));
     animation: autosend-slide 1.3s ease-in-out infinite;
   }
   @keyframes autosend-pulse {

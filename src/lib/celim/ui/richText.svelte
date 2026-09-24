@@ -22,6 +22,7 @@
    * @property {boolean} [editable]
    * @property {boolean} [sml]
    * @property {boolean} [minw]
+   * @property {string} [placeholder] - shown while the editor is empty
    */
 
   /** @type {Props} */
@@ -33,7 +34,8 @@
     trans = false,
     editable = true,
     sml = false,
-    minw = false
+    minw = false,
+    placeholder = ''
   } = $props();
 
   let element = $state();
@@ -46,6 +48,7 @@
      only when editable) removes the flash and keeps the formatting bubble out
      of read-only views entirely. */
   let mounted = $state(false);
+  let isEmpty = $state(true);
 
   let activeStates = $state({
     bold: false,
@@ -259,9 +262,21 @@
         outjson = jsonc;
         editorHtml = html;
         outpot = html; // תמיד מחזיר HTML החוצה
+        isEmpty = editor.isEmpty;
       }
     });
+    isEmpty = editor.isEmpty;
   });
+
+  /* ProseMirror's own element is only as tall as its text, so the rest of the
+     writing area — the part that looks like the field — swallowed clicks and
+     never showed a caret. A click on that empty space now puts the caret at
+     the end, the way a textarea behaves. */
+  function focusFromArea(event) {
+    if (!editor || !editable) return;
+    if (event.target !== element && event.target !== editor.view.dom) return;
+    editor.commands.focus('end');
+  }
 
   onDestroy(() => {
     if (editor) {
@@ -524,12 +539,19 @@
   {/if}
 
   <!-- Editor Content -->
+  <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
   <div
     class="tiptap-content text-barbi min-h-[150px] outline-none {sml
       ? ''
       : 'p-6'}"
+    class:rt-editable={editable}
     bind:this={element}
-  ></div>
+    onclick={focusFromArea}
+  >
+    {#if placeholder && editable && editor && isEmpty}
+      <div class="rt-placeholder" aria-hidden="true">{placeholder}</div>
+    {/if}
+  </div>
 
   <!-- Floating Menu / Add Button -->
   {#if editor && editable}
@@ -857,6 +879,23 @@
     color: var(--rt-accent-ink) !important;
     box-shadow: var(--rt-accent-shadow);
     border-color: var(--rt-accent) !important;
+  }
+
+  .tiptap-content {
+    position: relative;
+  }
+  .tiptap-content.rt-editable {
+    cursor: text;
+  }
+  /* Sits over the empty first paragraph; clicks fall through to the area. */
+  .rt-placeholder {
+    position: absolute;
+    inset-inline: 0;
+    top: 0;
+    padding: inherit;
+    color: var(--rt-muted);
+    pointer-events: none;
+    user-select: none;
   }
 
   .rt-sep,

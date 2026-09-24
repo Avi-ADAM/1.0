@@ -33,7 +33,16 @@ Start with { and end with }. Exact shape:
   "skills":     [{"name": "..."}],
   "categories": ["..."],
   "titleSuggestion": "...",
-  "hints":      [{"kind": "question" | "suggestion", "text": "..."}]
+  "hints":      [{"kind": "question" | "suggestion", "text": "..."}],
+  "details": {
+    "dateFrom": "YYYY-MM-DD" | "",
+    "dateTo":   "YYYY-MM-DD" | "",
+    "budget":   number | null,
+    "currency": "ILS" | "USD" | "EUR" | ... | "",
+    "place":    "..." | "",
+    "online":   true | false | null,
+    "groupKind": "group_purchase" | "group_trip" | "community_event" | "public_renovation" | "recurring_subscription" | ""
+  }
 }
 
 Field rules:
@@ -47,6 +56,23 @@ Field rules:
                 "הסעות", "טכנולוגיה").
 - titleSuggestion = a short, warm 3-7 word title for the wish.
 - hints       = 1-3 gentle clarifying questions or suggestions to sharpen the wish.
+- details     = ONLY facts the writer actually stated. Never guess; leave a
+                field empty ("" / null) when the text does not say it.
+  - dateFrom / dateTo: when it should happen. Resolve relative dates ("next
+    Friday", "end of October", "בעוד שבועיים") against the "Today" line you are
+    given. A single day → both the same. A month or a period → its first and
+    last day. A past date as written means the next occurrence.
+  - budget: the amount the writer is willing to spend, as a plain number (no
+    separators). "up to 3000" → 3000. A range → its upper end.
+  - currency: ISO 4217 code of that amount ("ש\\"ח"/"שקל" → ILS, "$"/"dollars"
+    → USD, "€" → EUR). "" when no amount or no currency is written.
+  - place: the city / address / area where it happens, as a geocodable name
+    ("Haifa", "רחוב הרצל 5, תל אביב"). "" when not stated.
+  - online: true when it is explicitly remote/online/by zoom, false when a
+    physical place is required, null when not stated.
+  - groupKind: only when the writer describes something OTHERS join —
+    buying together, a shared trip, a community event, fixing a public space,
+    a recurring shared subscription. Otherwise "".
 
 General rules:
 - ALWAYS answer in the SAME language as the input.

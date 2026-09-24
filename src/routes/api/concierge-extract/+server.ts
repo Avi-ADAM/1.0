@@ -23,15 +23,38 @@
 import { GEMINI_API_KEY } from '$env/static/private';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { extractWish, EMPTY_EXTRACTION, type WishExtraction } from '$lib/server/ai/extractWish';
+import {
+  extractWish,
+  EMPTY_EXTRACTION,
+  EMPTY_DETAILS,
+  type WishExtraction
+} from '$lib/server/ai/extractWish';
 import { enrichWish, EMPTY_ENRICHMENT, type WishEnrichment } from '$lib/server/ai/enrichWish';
 import type { WishPlace } from '$lib/server/concierge/localMatch';
+import { geocodePlace, type GeoPoint } from '$lib/server/geo/geocode';
 
 /** Below this length, grounding the wish in the DB is noise — skip enrichment. */
 const ENRICH_MIN_TEXT = 40;
+const LANGS = new Set(['he', 'en', 'ar', 'ru', 'es']);
 
-function buildResponse(extraction: WishExtraction, enrichment: WishEnrichment) {
+function hasPoint(p: WishPlace | null): boolean {
+  return (
+    typeof p?.lat === 'number' &&
+    Number.isFinite(p.lat) &&
+    typeof p?.lng === 'number' &&
+    Number.isFinite(p.lng)
+  );
+}
+
+function buildResponse(
+  extraction: WishExtraction,
+  enrichment: WishEnrichment,
+  geo: GeoPoint | null = null
+) {
   return {
+    // What the writer stated — dates, budget, place (+ its point), online,
+    // group kind. The composer fills only the squares she has not set.
+    details: { ...(extraction.details ?? EMPTY_DETAILS), geo },
     // Back-compat fields (consumed by the existing Lev rail).
     missions: extraction.missions,
     resources: extraction.resources,
@@ -48,8 +71,9 @@ export const POST: RequestHandler = async ({ request, fetch }) => {
   const body = await request.json().catch(() => ({}));
   const text: string = body?.text ?? '';
   const wantEnrich: boolean = body?.enrich !== false;
+  const lang: string = LANGS.has(body?.lang) ? body.lang : 'he';
   const rawPlace = body?.place;
-  const place: WishPlace | null =
+  let place: WishPlace | null =
     rawPlace && typeof rawPlace === 'object'
       ? {
           lat: rawPlace.lat ?? null,
@@ -80,6 +104,22 @@ export const POST: RequestHandler = async ({ request, fetch }) => {
     return json(buildResponse(EMPTY_EXTRACTION, EMPTY_ENRICHMENT));
   }
 
+  // ── 1b. Place — the text named one; find its point (best-effort) ─────────
+  const details = extraction.details ?? EMPTY_DETAILS;
+  let geo: GeoPoint | null = null;
+  if (details.place && details.online !== true) {
+    geo = await geocodePlace(details.place, lang);
+  }
+  // The writer has not picked a place yet: ground the matches in the one she
+  // wrote, the same way the composer is about to fill it in for her.
+  if (!hasPoint(place) && !place?.isOnline) {
+    if (geo) {
+      place = { lat: geo.lat, lng: geo.lng, radius: place?.radius ?? 15, isOnline: false };
+    } else if (details.online === true) {
+      place = { lat: null, lng: null, radius: null, isOnline: true };
+    }
+  }
+
   // ── 2. Enrich (best-effort, never breaks the response) ─────────────────────
   let enrichment: WishEnrichment = EMPTY_ENRICHMENT;
   const hasSignal = extraction.skills.length > 0 || extraction.missions.length > 0;
@@ -96,5 +136,5 @@ export const POST: RequestHandler = async ({ request, fetch }) => {
     }
   }
 
-  return json(buildResponse(extraction, enrichment));
+  return json(buildResponse(extraction, enrichment, geo));
 };

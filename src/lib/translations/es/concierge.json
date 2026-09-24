@@ -109,7 +109,21 @@
       "mic": "Micrófono",
       "attach": "Adjuntar una imagen",
       "phrasing": "Sugerencia de redacción de Lev",
-      "language": "Idioma"
+      "language": "Idioma",
+      "micStop": "Detener el dictado",
+      "micDenied": "El navegador bloquea el micrófono. Haz clic en el candado junto a la dirección → Micrófono → Permitir, y vuelve a intentarlo. En Windows revisa también Configuración → Privacidad → Micrófono",
+      "micFailed": "El dictado se detuvo. Puedes intentarlo de nuevo",
+      "phrasingWorking": "Lev está redactando…",
+      "phrasingTooShort": "Escribe primero unas palabras y Lev te sugerirá una redacción",
+      "phrasingBusy": "Lev está un poco ocupado — inténtalo en un minuto",
+      "phrasingFailed": "No pudimos sugerir una redacción ahora",
+      "phrasingDone": "Lev sugirió una nueva redacción",
+      "phrasingRestore": "Volver a mi versión",
+      "micInsecure": "El dictado solo funciona con una conexión segura (https o localhost)",
+      "micMissing": "No se encontró ningún micrófono en este dispositivo",
+      "micRecording": "Grabando — toca el micrófono otra vez cuando termines",
+      "micTranscribing": "Transcribiendo tu grabación…",
+      "micNothingHeard": "No se oyó voz en la grabación"
     },
     "sectionDetails": "Detalles prácticos",
     "sectionValues": "Valores que me importan",
@@ -328,7 +342,9 @@
     "autoSend": {
       "title": "Enviando tu pedido…",
       "sub": "Es el pedido que escribiste antes de registrarte. En un momento verás el plan que se arma a su alrededor."
-    }
+    },
+    "levFilled": "Lev lo completó a partir de lo que escribiste — puedes cambiarlo",
+    "bodyPlaceholder": "Cuéntanos con tus palabras qué necesitas, para quién, cuándo y dónde…"
   },
   "no_wishes_found_title": "No se encontraron deseos",
   "proposals_so_far": "Propuestas hasta ahora",

@@ -1,0 +1,311 @@
+/* ==========================================================================
+   CONCIERGE PALETTE — theme (personal | business) × mode (light | dark)
+   --------------------------------------------------------------------------
+   The concierge pages (/concierge, /concierge/new, /concierge/[id], /wish/new,
+   /wish/[id]) were drawn in one fill only: the dark parchment of
+   personal·dark, with every colour written as a literal. In the other three
+   fills they stayed dark while the rest of the site went light or blue.
+
+   Every colour those pages paint now comes from a `--cg-*` token below. The
+   personal·dark values ARE the old literals, so that fill looks exactly as it
+   did; the other three are the same roles re-drawn for their ground.
+
+   Naming follows the role the dark literal played, not its hue — `--cg-goldhi`
+   is "the accent ink labels and headings use", which is navy in business.
+     --cg-bg / s1…s4        page ground and the stacked card surfaces
+     --cg-ink…dim           text, strongest to faintest
+     --cg-fg-rgb / -k       the wash/hairline colour (white on dark, ink on
+                            light) and a strength multiplier for its alpha
+     --cg-gold…gold3        the gold accent family
+     --cg-pink…             the barbi accent family
+     --cg-mint / --cg-sky   success and info
+     --cg-g-*               the same families where they sit INSIDE a gradient
+                            fill — a fill needs a different value than an ink
+     --cg-on-cta / -metal / -pink   ink laid on those fills
+     --cg-shade-rgb/-k      shadow colour and a strength multiplier (a black
+                            shadow at .5 is right on #070606 and a smear on cream)
+   `-rgb` variants are space-separated channels: `rgb(var(--cg-gold-rgb) / .3)`.
+
+   Declared on :root as personal·dark so an unclassed <html> still paints the
+   original look; the three `html.*` blocks override it.
+   ========================================================================== */
+
+/* --- PERSONAL · DARK (the original) -------------------------------------- */
+:root {
+  --cg-bg: #070606;
+  --cg-bg-rgb: 7 6 6;
+  --cg-s1: #0e0d0c;
+  --cg-s1-rgb: 14 13 12;
+  --cg-s2: #171512;
+  --cg-s2-rgb: 23 21 18;
+  --cg-s3: #201d19;
+  --cg-s4: #2a2520;
+
+  --cg-ink: #ede5d8;
+  --cg-ink-hi: #f3ece0;
+  --cg-ink-max: #fffaf0;
+  --cg-ink2: #c8bba8;
+  --cg-ink2b: #d8cdb8;
+  --cg-muted: #9a8f80;
+  --cg-muted-rgb: 154 143 128;
+  --cg-muted2: #7a6f5e;
+  --cg-dim: #52493e;
+  --cg-dim-rgb: 82 73 62;
+
+  --cg-fg-rgb: 255 255 255;
+  --cg-fg-k: 1;
+  --cg-shade-rgb: 0 0 0;
+  --cg-shade-k: 1;
+
+  --cg-gold: #eee8aa;
+  --cg-gold-rgb: 238 232 170;
+  --cg-goldhi: #fde68a;
+  --cg-goldhi-rgb: 253 230 138;
+  --cg-gold2: #f0c040;
+  --cg-gold3: #e8d59a;
+  --cg-amber-rgb: 200 150 12;
+
+  --cg-pink: #ff4d9e;
+  --cg-pink-rgb: 255 77 158;
+  --cg-pink-l: #ffa3cd;
+  --cg-pink-d: #c8155f;
+  --cg-pinkd-rgb: 200 21 95;
+
+  --cg-mint: #02ffbb;
+  --cg-mint-rgb: 2 255 187;
+  --cg-mint-d: #037d5b;
+  --cg-sky: #74bfff;
+  --cg-sky-rgb: 116 191 255;
+  --cg-sky-d: #04619f;
+
+  /* fills */
+  --cg-g-pink: #ff4d9e;
+  --cg-g-pinkd: #c8155f;
+  --cg-g-goldhi: #fde68a;
+  --cg-g-metal-a: #bf953f;
+  --cg-g-metal-b: #fcf6ba;
+  --cg-g-metal-c: #b38728;
+  --cg-g-metal-d: #aa771c;
+  --cg-g-metal-e: #574010;
+  --cg-g-mint: #02ffbb;
+  --cg-g-mintd: #037d5b;
+  --cg-g-sky: #74bfff;
+  --cg-g-skyd: #04619f;
+  --cg-g-s3: #201d19;
+  --cg-g-s4: #2a2520;
+
+  /* ink on fills */
+  --cg-on-cta: #fde68a;
+  --cg-on-metal: #574010;
+  --cg-on-metal-glow: rgb(255 255 255 / 0.5);
+  --cg-on-pink: #1a1114;
+  --cg-on-mint: #0e0d0c;
+}
+
+/* --- PERSONAL · LIGHT ---------------------------------------------------- */
+/* Warm parchment — the same ground the home page draws in this fill. Ink
+   ratios are against --cg-s1 (#fffdf7). */
+html.personal:not(.dark) {
+  --cg-bg: #fbf6ea;
+  --cg-bg-rgb: 251 246 234;
+  --cg-s1: #fffdf7;
+  --cg-s1-rgb: 255 253 247;
+  --cg-s2: #f7f0e0;
+  --cg-s2-rgb: 247 240 224;
+  --cg-s3: #f0e7d2;
+  --cg-s4: #e8dcc0;
+
+  --cg-ink: #2b2110; /* 15.6:1 */
+  --cg-ink-hi: #22190b;
+  --cg-ink-max: #1a1206;
+  --cg-ink2: #4a3c22; /* 10.4:1 */
+  --cg-ink2b: #3f321b;
+  --cg-muted: #6b5a3a; /* 6.6:1 */
+  --cg-muted-rgb: 107 90 58;
+  --cg-muted2: #76654a; /* 5.6:1 */
+  --cg-dim: #8f7f60; /* 3.8:1 — the faint tier, as #52493e is on dark */
+  --cg-dim-rgb: 143 127 96;
+
+  --cg-fg-rgb: 74 52 14;
+  --cg-fg-k: 1.7;
+  --cg-shade-rgb: 87 64 16;
+  --cg-shade-k: 0.3;
+
+  --cg-gold: #c9a94a;
+  --cg-gold-rgb: 138 106 21;
+  --cg-goldhi: #7c5e12; /* 6.1:1 */
+  --cg-goldhi-rgb: 124 94 18;
+  --cg-gold2: #8a6a15; /* 5.2:1 */
+  --cg-gold3: #7c5e12;
+  --cg-amber-rgb: 200 150 12;
+
+  --cg-pink: #b80069; /* 6.4:1 */
+  --cg-pink-rgb: 184 0 105;
+  --cg-pink-l: #a8195f;
+  --cg-pink-d: #8a0050;
+  --cg-pinkd-rgb: 138 0 80;
+
+  --cg-mint: #047857; /* 5.4:1 */
+  --cg-mint-rgb: 4 120 87;
+  --cg-mint-d: #065f46;
+  --cg-sky: #0369a1; /* 5.9:1 */
+  --cg-sky-rgb: 3 105 161;
+  --cg-sky-d: #075985;
+
+  --cg-g-pink: #b80069;
+  --cg-g-pinkd: #8a0050;
+  --cg-g-goldhi: #f0c040;
+  --cg-g-mint: #059669;
+  --cg-g-mintd: #065f46;
+  --cg-g-sky: #0284c7;
+  --cg-g-skyd: #075985;
+  --cg-g-s3: #f3ead6;
+  --cg-g-s4: #eadfc5;
+
+  --cg-on-cta: #fff7d6; /* 7.9:1 on #b80069 */
+  --cg-on-pink: #fff7d6;
+  --cg-on-mint: #fffdf7;
+}
+
+/* --- BUSINESS · LIGHT ---------------------------------------------------- */
+/* Slate and blue, the business identity's own palette (app.postcss). Gold's
+   role — labels, headings, the "open" accent — becomes navy; barbi's — the
+   call to action — becomes the primary blue. */
+html.business {
+  --cg-bg: #eef2f7;
+  --cg-bg-rgb: 238 242 247;
+  --cg-s1: #ffffff;
+  --cg-s1-rgb: 255 255 255;
+  --cg-s2: #f8fafc;
+  --cg-s2-rgb: 248 250 252;
+  --cg-s3: #f1f5f9;
+  --cg-s4: #e2e8f0;
+
+  --cg-ink: #0f172a; /* 17.4:1 */
+  --cg-ink-hi: #0b1220;
+  --cg-ink-max: #020617;
+  --cg-ink2: #334155; /* 10.4:1 */
+  --cg-ink2b: #1e293b;
+  --cg-muted: #475569; /* 7.4:1 */
+  --cg-muted-rgb: 71 85 105;
+  --cg-muted2: #5b6b82; /* 5.5:1 */
+  --cg-dim: #748299; /* 3.6:1 — the faint tier */
+  --cg-dim-rgb: 116 130 153;
+
+  --cg-fg-rgb: 15 23 42;
+  --cg-fg-k: 1.6;
+  --cg-shade-rgb: 15 23 42;
+  --cg-shade-k: 0.3;
+
+  --cg-gold: #93c5fd;
+  --cg-gold-rgb: 30 64 175;
+  --cg-goldhi: #1e3a8a; /* 10.2:1 */
+  --cg-goldhi-rgb: 30 58 138;
+  --cg-gold2: #1e40af;
+  --cg-gold3: #1e3a8a;
+  --cg-amber-rgb: 29 78 216;
+
+  --cg-pink: #1d4ed8; /* 6.6:1 */
+  --cg-pink-rgb: 29 78 216;
+  --cg-pink-l: #2563eb;
+  --cg-pink-d: #1e3a8a;
+  --cg-pinkd-rgb: 30 58 138;
+
+  --cg-mint: #047857;
+  --cg-mint-rgb: 4 120 87;
+  --cg-mint-d: #065f46;
+  --cg-sky: #0369a1;
+  --cg-sky-rgb: 3 105 161;
+  --cg-sky-d: #075985;
+
+  --cg-g-pink: #2563eb;
+  --cg-g-pinkd: #1d4ed8;
+  --cg-g-goldhi: #93c5fd;
+  --cg-g-metal-a: #1e40af;
+  --cg-g-metal-b: #2563eb; /* white on it 5.2:1 */
+  --cg-g-metal-c: #1d4ed8;
+  --cg-g-metal-d: #1e3a8a;
+  --cg-g-metal-e: #172554;
+  --cg-g-mint: #059669;
+  --cg-g-mintd: #047857;
+  --cg-g-sky: #0284c7;
+  --cg-g-skyd: #0369a1;
+  --cg-g-s3: #f1f5f9;
+  --cg-g-s4: #e2e8f0;
+
+  --cg-on-cta: #f8fafc; /* 6.4:1 on #1d4ed8 */
+  --cg-on-metal: #f8fafc;
+  --cg-on-metal-glow: transparent;
+  --cg-on-pink: #f8fafc;
+  --cg-on-mint: #f8fafc;
+}
+
+/* --- BUSINESS · DARK ----------------------------------------------------- */
+html.business.dark {
+  --cg-bg: #0b1220;
+  --cg-bg-rgb: 11 18 32;
+  --cg-s1: #111b2e;
+  --cg-s1-rgb: 17 27 46;
+  --cg-s2: #172440;
+  --cg-s2-rgb: 23 36 64;
+  --cg-s3: #1f2f4d;
+  --cg-s4: #2a3c5e;
+
+  --cg-ink: #e8eef7;
+  --cg-ink-hi: #f1f5f9;
+  --cg-ink-max: #f8fafc;
+  --cg-ink2: #cbd5e1;
+  --cg-ink2b: #d6dee9;
+  --cg-muted: #a3b3c9; /* 8.3:1 on --cg-s1 */
+  --cg-muted-rgb: 163 179 201;
+  --cg-muted2: #8394ab;
+  --cg-dim: #5d6d85;
+  --cg-dim-rgb: 93 109 133;
+
+  --cg-fg-rgb: 255 255 255;
+  --cg-fg-k: 1;
+  --cg-shade-rgb: 0 0 0;
+  --cg-shade-k: 1;
+
+  --cg-gold: #60a5fa;
+  --cg-gold-rgb: 147 197 253;
+  --cg-goldhi: #93c5fd;
+  --cg-goldhi-rgb: 147 197 253;
+  --cg-gold2: #60a5fa;
+  --cg-gold3: #bfdbfe;
+  --cg-amber-rgb: 96 165 250;
+
+  --cg-pink: #7cb4fb;
+  --cg-pink-rgb: 96 165 250;
+  --cg-pink-l: #93c5fd;
+  --cg-pink-d: #1d4ed8;
+  --cg-pinkd-rgb: 29 78 216;
+
+  --cg-mint: #34d399;
+  --cg-mint-rgb: 52 211 153;
+  --cg-mint-d: #047857;
+  --cg-sky: #7dd3fc;
+  --cg-sky-rgb: 125 211 252;
+  --cg-sky-d: #0369a1;
+
+  --cg-g-pink: #3b82f6;
+  --cg-g-pinkd: #1d4ed8;
+  --cg-g-goldhi: #93c5fd;
+  --cg-g-metal-a: #1e40af;
+  --cg-g-metal-b: #2563eb; /* white on it 5.2:1 */
+  --cg-g-metal-c: #1d4ed8;
+  --cg-g-metal-d: #1e3a8a;
+  --cg-g-metal-e: #172554;
+  --cg-g-mint: #34d399;
+  --cg-g-mintd: #047857;
+  --cg-g-sky: #7dd3fc;
+  --cg-g-skyd: #0369a1;
+  --cg-g-s3: #1f2f4d;
+  --cg-g-s4: #2a3c5e;
+
+  --cg-on-cta: #f8fafc;
+  --cg-on-metal: #f8fafc;
+  --cg-on-metal-glow: transparent;
+  --cg-on-pink: #0b1220;
+  --cg-on-mint: #0b1220;
+}
