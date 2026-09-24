@@ -41,6 +41,7 @@ import { updateProjectDetailsConfig } from './updateProjectDetails.js';
 import { setRikmaCurrencyConfig } from './setRikmaCurrency.js';
 import { completeMissionConfig } from './completeMission.js';
 import { chatActions } from './chat.js';
+import { assistantActions } from './assistantSessions.js';
 import { maagadActions } from './maagad.js';
 
 import { createTaskAction } from './createTask.js';
@@ -264,6 +265,9 @@ export function registerAllActions(): void {
 
   // Chat actions
   chatActions.forEach(registerAction);
+
+  // Assistant sessions — rikma import, living lists (PLAN_AI_SIGNUP_CONCIERGE)
+  assistantActions.forEach(registerAction);
   maagadActions.forEach(registerAction);
   forumReadActions.forEach(registerAction);
 

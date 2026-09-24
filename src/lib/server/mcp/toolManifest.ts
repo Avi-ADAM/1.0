@@ -63,6 +63,13 @@ import {
   openRikmaConversationTool
 } from '../../../mastra/tools/forumTools';
 import {
+  proposeRikmaBlueprintTool,
+  getAssistantTool,
+  setAssistantItemsTool,
+  undoAssistantTool,
+  assistantMcpEnabled
+} from '../../../mastra/tools/assistantTools';
+import {
   getProjectDetailsTool,
   listProjectResourcesTool,
   getProjectStatsTool,
@@ -106,6 +113,14 @@ export const MCP_TOOL_MANIFEST: Record<string, McpManifestEntry> = {
   // Behind CONCIERGE_MCP_WRITE: one run costs Gemini tokens, the other writes a row.
   previewWishTool: { tool: previewWishTool, tier: 'read', ai: true, enabled: conciergeWriteEnabled },
   draftWishTool: { tool: draftWishTool, tier: 'selfWrite', enabled: conciergeWriteEnabled },
+
+  // --- rikma import (PLAN_AI_SIGNUP_CONCIERGE §4, §10), behind ASSISTANT_MCP_ENABLED.
+  // All four touch only the caller's own draft; creating happens on the review
+  // page, by the person. No model call: the agent does the decomposition.
+  proposeRikmaBlueprintTool: { tool: proposeRikmaBlueprintTool, tier: 'prepare', project: 'member', enabled: assistantMcpEnabled },
+  getAssistantTool: { tool: getAssistantTool, tier: 'read', enabled: assistantMcpEnabled },
+  setAssistantItemsTool: { tool: setAssistantItemsTool, tier: 'prepare', enabled: assistantMcpEnabled },
+  undoAssistantTool: { tool: undoAssistantTool, tier: 'prepare', enabled: assistantMcpEnabled },
 
   // --- conversations (M4). A forum belongs to a mission/decision/haluka, not to
   // a rikma, so the rikma gate lives inside the tools (forumAllowedByKey) and the

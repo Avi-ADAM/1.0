@@ -21,7 +21,8 @@ import { z } from 'zod';
 
 import { wrapMcpTool } from '$lib/server/mcp/guard';
 import { MCP_TOOL_MANIFEST, tierAllowed, entryEnabled } from '$lib/server/mcp/toolManifest';
-import { MCP_INSTRUCTIONS } from '$lib/server/mcp/instructions';
+import { MCP_INSTRUCTIONS, mcpInstructions } from '$lib/server/mcp/instructions';
+import { assistantMcpEnabled } from '../../../mastra/tools/assistantTools';
 import { normalizeApiKeyScopes } from '$lib/server/apiKeys';
 
 // --- Public Tools for Unauthenticated Users ---
@@ -261,7 +262,11 @@ async function handleMcpRequest(request: Request, url: URL, svelteFetch: typeof 
                     : 'Limited access to 1lev1 Platform. Please authenticate for full AI Agent and Tool access.',
             // The platform model an outside agent otherwise has to guess. A
             // rejected key gets none: nothing but the repair tools applies there.
-            instructions: isRejected(verdict) ? undefined : MCP_INSTRUCTIONS,
+            instructions: isRejected(verdict)
+                ? undefined
+                : user
+                    ? mcpInstructions({ rikmaImport: assistantMcpEnabled() })
+                    : MCP_INSTRUCTIONS,
             agents: agentsToExpose,
             workflows: workflowsToExpose,
             tools: toolsToExpose

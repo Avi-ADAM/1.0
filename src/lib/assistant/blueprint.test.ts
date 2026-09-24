@@ -33,7 +33,7 @@ describe('parseBlueprint', () => {
   it('reports what is wrong instead of throwing', () => {
     const r = parseBlueprint({ fields: { track: 'shop', name: '' }, products: [{ name: 'a', price: -1 }] });
     expect(r.ok).toBe(false);
-    if (!r.ok) expect(r.issues.map((i) => i.path)).toEqual(expect.arrayContaining(['fields.track', 'fields.name', 'products.0.price']));
+    if ('issues' in r) expect(r.issues.map((i) => i.path)).toEqual(expect.arrayContaining(['fields.track', 'fields.name', 'products.0.price']));
   });
 
   it('refuses a non-http website', () => {

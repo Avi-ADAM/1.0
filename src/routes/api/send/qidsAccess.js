@@ -667,4 +667,5 @@ export const qidsAccess = {
   // Written only by createComplexMatanot, after its rikma-membership check. Open
   // to `user` it would let anyone rewrite any product's keywords via /api/send.
   '371setMatanotDiscoveryKeywords': { allow: ['serviceAdmin'] },
+  '372assistantProjectContext': { allow: ['serviceAdmin'] },
 };

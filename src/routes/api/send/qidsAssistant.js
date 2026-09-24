@@ -62,6 +62,14 @@ export const assistantQids = {
     }
   }`,
 
+  // A rikma an import targets: its name (for the partner email) and its members
+  // (membership check + whether new rows go to a vote).
+  '372assistantProjectContext': `query AssistantProjectContext($pid: ID!) {
+    project(id: $pid) {
+      data { id attributes { projectName user_1s { data { id } } } }
+    }
+  }`,
+
   // A partner named in a rikma import: exact address only (no enumeration),
   // and only the fields the "new suggestion" email needs.
   '370findUserForInvite': `query FindUserForInvite($email: String!) {
