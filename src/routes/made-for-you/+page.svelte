@@ -195,6 +195,12 @@
       <details class="mfy-q">
         <summary>{$t(`madeForYou.faq.q${i}`)}</summary>
         <p>{$t(`madeForYou.faq.a${i}`)}</p>
+        {#if i === 2}
+          <a href="/consensus" class="mfy-q-more">
+            {$t('madeForYou.faq.a2link')}
+            <span aria-hidden="true">{$isRtl ? '←' : '→'}</span>
+          </a>
+        {/if}
       </details>
     {/each}
   </section>
@@ -714,6 +720,20 @@
   .mfy-q p {
     padding: 0 0.25rem 1.2rem;
     color: var(--ink-soft);
+  }
+  .mfy-q p:has(+ .mfy-q-more) {
+    padding-bottom: 0.5rem;
+  }
+  .mfy-q-more {
+    display: inline-flex;
+    gap: 0.4rem;
+    margin: 0 0.25rem 1.2rem;
+    color: var(--gold);
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .mfy-q-more:hover {
+    text-decoration: underline;
   }
 
   /* ── Final ── */
