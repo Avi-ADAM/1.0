@@ -115,6 +115,7 @@ type CandidateMatanot = {
   name: string;
   price: number | null;
   estimatedPrice: number | null;
+  pricingMode: string | null;
   place: ReturnType<typeof productPlace>;
   categoryIds: string[];
   categoryNames: string[];
@@ -211,6 +212,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
           name: a.name ?? '',
           price: typeof a.price === 'number' ? a.price : null,
           estimatedPrice: typeof a.estimatedPrice === 'number' ? a.estimatedPrice : null,
+          pricingMode: a.pricingMode ?? null,
           place: productPlace(a),
           categoryIds: (a.categories?.data ?? []).map((c: any) => String(c.id)),
           categoryNames: (a.categories?.data ?? [])
@@ -240,7 +242,9 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
   const createdProposalIds: string[] = [];
   for (const cand of scored) {
     try {
-      const totalPrice = cand.estimatedPrice ?? cand.price ?? 0;
+      // Priced by quote: no number to propose — the shop names it on the request.
+      const totalPrice =
+        cand.pricingMode === 'quote' ? null : (cand.estimatedPrice ?? cand.price ?? 0);
       const proposalVars: Record<string, unknown> = {
         ratson: ratsonId,
         kind: 'existing_matanot',

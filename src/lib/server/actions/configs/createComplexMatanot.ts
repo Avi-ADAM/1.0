@@ -133,7 +133,12 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
   };
 
   const now = new Date().toISOString();
-  const isComplex = pricingMode !== 'fixed';
+  // A product priced by quote with no bill of materials (a grocery basket) is a
+  // simple product whose price is set per request — not a complex one: no
+  // BOM vote, and its listed price (a delivery fee / "from") stays as typed.
+  const quoteSimple =
+    pricingMode === 'quote' && !recipeMissions?.length && !recipeResources?.length;
+  const isComplex = pricingMode !== 'fixed' && !quoteSimple;
   const locationInput = buildLocationInput(isOnline, lat, lng, radius, location_hint);
 
   // Determine member count once (used to decide whether to open a matanotpend

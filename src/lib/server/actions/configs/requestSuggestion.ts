@@ -22,6 +22,8 @@
  */
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import { openingPrice, plainExcerpt } from '$lib/sheirut/quoteState';
+import { loadQuote, postToRequestChat } from '../../sheirut/quote.js';
 
 type SuggestionKind = 'matanot' | 'person' | 'resource';
 
@@ -29,7 +31,7 @@ type SuggestionKind = 'matanot' | 'person' | 'resource';
 export function coveredFor(
   needIdx: number | string | null | undefined,
   isResource: boolean | undefined,
-  price: number
+  price: number | null
 ): Record<string, unknown> {
   if (needIdx === null || needIdx === undefined || String(needIdx).trim() === '') return {};
   const idx = String(needIdx);
@@ -48,7 +50,8 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
     totalPrice = null,
     label = '',
     needIdx = null,
-    needIsResource = false
+    needIsResource = false,
+    pricingMode = null
   } = params as {
     ratsonId: string;
     kind: SuggestionKind;
@@ -60,6 +63,8 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
     /** The plan row asked from (extracted_* index) — the request shows there. */
     needIdx?: number | string | null;
     needIsResource?: boolean;
+    /** The product's pricing mode — 'quote' opens the request without a price. */
+    pricingMode?: string | null;
   };
 
   if (!ratsonId) throw new Error('ratsonId is required');
@@ -99,7 +104,15 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
         String(p?.attributes?.matanot?.data?.id) === String(matanotId) &&
         !TERMINAL.has(p?.attributes?.status_proposal)
     );
-    const price = typeof totalPrice === 'number' ? totalPrice : 0;
+    // A product priced by quote (a grocery basket) opens at her budget, or open:
+    // the shop names the price on the request (PLAN_CONCIERGE_LOCAL_PROVIDERS §6).
+    const budget =
+      ratAttrs.bounti && typeof ratAttrs.totalbounti === 'number' ? ratAttrs.totalbounti : null;
+    const price = openingPrice({
+      price: typeof totalPrice === 'number' ? totalPrice : null,
+      pricingMode,
+      budget
+    });
 
     let proposalId: string | null = dupe ? String(dupe.id) : null;
     if (!proposalId) {
@@ -157,6 +170,12 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
         );
       } catch (err) {
         console.warn('[requestSuggestion] sheirutpend backlink failed (non-fatal):', err);
+      }
+      // What she actually needs goes where the shop answers it — the request's chat.
+      const wishText = plainExcerpt(ratAttrs.longDes || ratAttrs.desc || '');
+      if (wishText) {
+        const q = await loadQuote(strapi as any, sheirutpendId).catch(() => null);
+        if (q) await postToRequestChat(strapi as any, q, String(context.userId), `📝 ${wishText}`);
       }
     }
 
@@ -296,6 +315,7 @@ export const requestSuggestionConfig: ActionConfig = {
     targetUserId: { type: 'string', required: false },
     totalPrice: { type: 'number', required: false },
     label: { type: 'string', required: false },
+    pricingMode: { type: 'string', required: false },
     needIdx: { type: 'number', required: false },
     needIsResource: { type: 'boolean', required: false }
   },

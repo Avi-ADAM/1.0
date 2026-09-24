@@ -8092,6 +8092,7 @@ ${STIPEND_DECISION_FIELDS}
           name
           price
           estimatedPrice
+          pricingMode
           lat
           lng
           radius
@@ -12722,6 +12723,7 @@ ${STIPEND_DECISION_FIELDS}
           desc
           price
           estimatedPrice
+          pricingMode
           lat lng radius
           location { lat lng radius location_mode }
           currency { data { id attributes { name simbol } } }
@@ -15501,6 +15503,56 @@ ${STIPEND_DECISION_FIELDS}
   '296createSheirutpendProposal': `mutation CreateSheirutpendProposal($sheirut: ID!, $project: ID!, $userId: ID) {
     createSheirutpend(data: { sheirut: $sheirut, project: $project, users_permissions_user: $userId, archived: false, appruved: false }) {
       data { id }
+    }
+  }`,
+
+  /**
+   * Price quotes on a product request (docs/PLAN_CONCIERGE_LOCAL_PROVIDERS.md
+   * §6): the request, its `sheirutnego` rounds and the votes on them — what
+   * src/lib/sheirut/quoteState.ts needs to say whose turn it is.
+   */
+  '360getSheirutpendQuote': `query GetSheirutpendQuote($id: ID!) {
+    sheirutpend(id: $id) {
+      data {
+        id
+        attributes {
+          archived
+          appruved
+          price
+          quant
+          total
+          users_permissions_user { data { id attributes { username } } }
+          project { data { id attributes { projectName restime user_1s { data { id } } } } }
+          forum { data { id } }
+          sheirut { data { id attributes { isApruved archived } } }
+          matanots { data { id attributes { name pricingMode } } }
+          sheirutnegos(pagination: { limit: 100 }) {
+            data { id attributes { price quant createdAt users_permissions_user { data { id } } } }
+          }
+          votes(pagination: { limit: 200 }) {
+            data { id attributes { what order users_permissions_user { data { id } } } }
+          }
+        }
+      }
+    }
+  }`,
+
+  '361createSheirutnego': `mutation CreateSheirutnego($sheirutpend: ID!, $price: Float, $quant: Float, $userId: ID!, $publishedAt: DateTime!) {
+    createSheirutnego(data: {
+      sheirutpend: $sheirutpend
+      price: $price
+      quant: $quant
+      users_permissions_user: $userId
+      isOriginal: false
+      publishedAt: $publishedAt
+    }) {
+      data { id }
+    }
+  }`,
+
+  '362getActiveTimegramaForSheirutpend': `query GetActiveTimegramaForSheirutpend($id: ID!) {
+    timegramas(filters: { sheirutpend: { id: { eq: $id } }, done: { ne: true } }, sort: "id:desc", pagination: { limit: 1 }) {
+      data { id attributes { date } }
     }
   }`,
 

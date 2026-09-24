@@ -212,7 +212,7 @@
   /** Ready products a rikma or member already sells — nearest first when the
    *  wish has a place (enrichWish drops the ones that cannot reach her). */
   const matchedProducts = $derived(
-    /** @type {{id:string,name:string,price:number|null,projectName:string|null,distanceKm?:number|null}[]} */ (
+    /** @type {{id:string,name:string,price:number|null,projectName:string|null,distanceKm?:number|null,pricingMode?:string|null}[]} */ (
       matchedEnrichment?.products ?? []
     )
   );
@@ -1456,7 +1456,12 @@
                         style="font-family:'Bellefair',serif;font-size:12.5px;color:#ede5d8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"
                         >{m.name}</span
                       >
-                      {#if typeof m.price === 'number' && m.price > 0}
+                      {#if m.pricingMode === 'quote'}
+                        <span
+                          style="font-size:11px;color:#fde68a;white-space:nowrap"
+                          >{$t('concierge.new.lev.byQuote')}</span
+                        >
+                      {:else if typeof m.price === 'number' && m.price > 0}
                         <span
                           style="font-size:11px;color:#fde68a;white-space:nowrap"
                           >{fmtMoney(m.price)}</span

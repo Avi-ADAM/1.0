@@ -239,7 +239,12 @@
     "complexPriceMaxLabel": "Maximum price",
     "complexPriceExplain": "The price shown is the maximum - assuming all resources and tasks are fully consumed. In practice, you pay only for actual task hours and resources used. If more than estimated is needed, you will receive an overhead approval request.",
     "pageTitle": "1💗1 | Product \"{{name}}\" in the rikma {{projectName}}",
-    "titleWithName": "{{kind}} - {{name}}"
+    "titleWithName": "{{kind}} - {{name}}",
+    "quoteHint": "This product is priced per order. Write what you need — the seller will propose a price, and you can accept it or propose another.",
+    "quoteNote": "What do you need?",
+    "quoteNotePlaceholder": "e.g. 2 bottles of cola, 200 g yellow cheese, bread",
+    "quoteBudget": "How much would you pay? (optional)",
+    "quoteBudgetPlaceholder": "You can leave this empty"
   },
   "editBasic": {
     "head": "Edit Profile",

@@ -26,7 +26,12 @@
   // Form state
   let showPurchaseForm = $state(false);
   let quantity = $state(1);
-  let price = $state(data.alld?.price || 0);
+  // Priced by quote (a grocery basket): the buyer may leave the price empty
+  // and describe what she needs — the seller names the price on the request
+  // (docs/PLAN_CONCIERGE_LOCAL_PROVIDERS.md §6).
+  const byQuote = data.alld?.pricingMode === 'quote';
+  let price = $state(byQuote ? null : data.alld?.price || 0);
+  let orderNote = $state('');
   let startDate = $state(new Date().toISOString().split('T')[0]);
   let endDate = $state('');
   let isSubmitting = $state(false);
@@ -84,9 +89,11 @@
             matanots: [data.mId],
             startDate: new Date(startDate).toISOString(),
             finnishDate: finishDate,
-            price: price,
             quant: quantity,
-            total: totalPrice
+            // An empty price on a quote product = open: no price, no total.
+            ...(price === null || price === undefined || price === ''
+              ? {}
+              : { price: Number(price), total: totalPrice })
           }
         })
       });
@@ -103,6 +110,18 @@
 
       // Redirect to the pending request page (or /deals as fallback)
       const newId = result?.data?.createSheirutpend?.data?.id;
+      // What she needs goes into the request's chat, where the seller prices it.
+      if (newId && orderNote.trim()) {
+        await fetch('/api/action', {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            actionKey: 'noteSheirutpend',
+            params: { sheirutpendId: String(newId), text: `📝 ${orderNote.trim()}` }
+          })
+        }).catch((e) => console.warn('order note failed (non-fatal):', e));
+      }
       await goto(newId ? `/deals/request/${newId}` : '/deals');
     } catch (error) {
       console.error('Error creating service request:', error);
@@ -591,6 +610,31 @@
             />
           </div>
 
+          {#if byQuote}
+            <div class="space-y-2">
+              <p class="text-sm text-gray-600 dark:text-gray-300">{$t('pages.gift.quoteHint')}</p>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                {$t('pages.gift.quoteNote')}
+                <textarea
+                  bind:value={orderNote}
+                  rows="3"
+                  maxlength="2000"
+                  placeholder={$t('pages.gift.quoteNotePlaceholder')}
+                  class="mt-1 w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-barbi focus:border-barbi outline-none dark:bg-gray-700 dark:border-gray-600"
+                ></textarea>
+              </label>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                {$t('pages.gift.quoteBudget')}
+                <input
+                  type="number"
+                  min="0"
+                  bind:value={price}
+                  placeholder={$t('pages.gift.quoteBudgetPlaceholder')}
+                  class="mt-1 w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-barbi focus:border-barbi outline-none dark:bg-gray-700 dark:border-gray-600"
+                />
+              </label>
+            </div>
+          {:else}
           <div>
             <NumberInput
               bind:value={price}
@@ -599,6 +643,7 @@
               noNegative={true}
             />
           </div>
+          {/if}
           {#if data.alld.kindOf === 'monthly' || data.alld.kindOf === 'yearly'}
             <div class="grid grid-cols-1 gap-4">
               <div>

@@ -240,7 +240,12 @@
     "complexPriceMaxLabel": "Precio máximo",
     "complexPriceExplain": "El precio mostrado es el máximo, suponiendo que todos los recursos y tareas se consuman por completo. En la práctica pagarás solo por las horas de tareas y los recursos realmente consumidos. Si hiciera falta más de lo estimado, recibirás una solicitud de aprobación de gastos adicionales.",
     "pageTitle": "1💗1 | Producto \"{{name}}\" en la rikma {{projectName}}",
-    "titleWithName": "{{kind}} - {{name}}"
+    "titleWithName": "{{kind}} - {{name}}",
+    "quoteHint": "El precio de este producto depende del pedido. Escribe lo que necesitas — el vendedor propondrá un precio, y podrás aceptarlo o proponer otro.",
+    "quoteNote": "¿Qué necesitas?",
+    "quoteNotePlaceholder": "p. ej.: 2 botellas de cola, queso amarillo 200 g, pan",
+    "quoteBudget": "¿Cuánto pagarías? (opcional)",
+    "quoteBudgetPlaceholder": "Puedes dejarlo vacío"
   },
   "editBasic": {
     "head": "Editar perfil",

@@ -5,6 +5,8 @@
  * תומך ב-pend (users component) ו-sheirutpend (vots component)
  */
 
+import { loadQuote } from '../../sheirut/quote.js';
+import { providerCanApprove } from '$lib/sheirut/quoteState';
 import type { ActionConfig, ActionExecutionHandler } from '../types';
 import { createSheirutFromPendingConfig } from './createSheirutFromPending';
 import { addVoteConsentSpec } from '$lib/consent/specs/addVote';
@@ -162,6 +164,25 @@ const addVoteHandler: ActionExecutionHandler = async (params, context, util) => 
 
     if (!sheirutpendData) {
       throw new Error(`Sheirutpend ${id} not found`);
+    }
+
+    // Price quotes (PLAN_CONCIERGE_LOCAL_PROVIDERS §6): an open price has to be
+    // quoted before anyone can approve it, and the seller's own quote is the
+    // customer's to answer — approving it here would close a deal she never saw.
+    // Only open product requests: a service *proposal* (proposeSheirut) has a
+    // `sheirut` from birth and no price, and counts as closed here.
+    const quote = await loadQuote(strapi as any, String(id)).catch(() => null);
+    if (
+      quote &&
+      !quote.closed &&
+      quote.customerId !== String(userId) &&
+      !providerCanApprove(quote.state)
+    ) {
+      throw new Error(
+        quote.state.openPrice
+          ? 'Set a price first — this request is priced by quote'
+          : 'Waiting for the customer to answer the current price'
+      );
     }
 
     const currentVots = sheirutpendData.votes?.data || [];

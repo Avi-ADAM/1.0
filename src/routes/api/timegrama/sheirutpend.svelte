@@ -25,6 +25,9 @@
     sheirutGate
   } from '$lib/server/sheirut/approveSheirutRequests';
   import { SendToAdmin } from '$lib/server/sendToAdmin.js';
+  import { loadQuote, votesOf } from '$lib/server/sheirut/quote';
+  import { silenceOutcome } from '$lib/sheirut/quoteState';
+  import { settleQuote } from '$lib/server/actions/configs/sheirutQuote';
   // Server-only secret — this module is imported only by timegrama/+server.js.
   import { ADMINMONTHER } from '$env/static/private';
 
@@ -41,6 +44,27 @@
     }
   }
 
+  /**
+   * A quoted product request whose restime ran out: the last version on the
+   * table stands unless someone objected to it. The original request alone
+   * never matures — a shop is not bound by an order it never answered.
+   */
+  async function QuoteSilence(id, taid) {
+    const q = await loadQuote(strapi, String(id));
+    if (!q) return markDone(taid, `sheirutpend ${id} no longer exists`);
+    if (q.closed) return markDone(taid, `sheirutpend ${id} already closed`);
+    const outcome = silenceOutcome(q.state, votesOf(q.attrs));
+    if (outcome.action === 'close') return markDone(taid, `sheirutpend ${id}: ${outcome.why}`);
+    // Left open on failure (the catch in Sheirutpend): this is an agreement.
+    await settleQuote(q, {}, { strapi });
+    console.log('[timegrama/sheirutpend] quote matured on silence', {
+      sheirutpendId: id,
+      order: q.state.order,
+      total: q.state.total
+    });
+    return markDone(taid, `sheirutpend ${id} quote round ${q.state.order} matured on silence`);
+  }
+
   export async function Sheirutpend(id, taid) {
     try {
       const res = await strapi.execute('295getSheirutpendForFinalize', { id: String(id) });
@@ -55,8 +79,9 @@
 
       const sheirut = a.sheirut?.data;
       if (!sheirut) {
-        // The proposal outlived the service it proposed. Nothing to approve.
-        return markDone(taid, `sheirutpend ${id} has no sheirut to approve`);
+        // A customer's product request, not a service proposal: its clock is
+        // the price quote's (docs/PLAN_CONCIERGE_LOCAL_PROVIDERS.md §6).
+        return QuoteSilence(id, taid);
       }
       if (sheirut.attributes?.archived === true) {
         return markDone(taid, `sheirutpend ${id}: sheirut ${sheirut.id} was archived`);

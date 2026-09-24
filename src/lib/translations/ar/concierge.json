@@ -268,6 +268,7 @@
       "existing": "◆ موجود في النظام مسبقًا",
       "freeResources": "◐ موارد متاحة · {{count}}",
       "products": "🎁 منتجات جاهزة · {{count}}",
+      "byQuote": "السعر حسب العرض",
       "people": "♥ أشخاص يمكنهم المساعدة · {{count}}",
       "hiddenIdentity": "هوية مخفية",
       "hints": "اقتراحات لطيفة",

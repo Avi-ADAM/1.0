@@ -98,6 +98,8 @@ export interface SuggestedProduct {
   currencySymbol: string | null;
   matchedTerm: string;
   distanceKm?: number | null;
+  /** 'quote' = priced per request (a grocery basket) — `price` is not the deal. */
+  pricingMode?: string | null;
 }
 
 export interface WishEnrichment {
@@ -393,7 +395,8 @@ export async function enrichWish(
         currencyName: a.currency?.data?.attributes?.name ?? null,
         currencySymbol: a.currency?.data?.attributes?.simbol ?? null,
         matchedTerm: q,
-        distanceKm: reach.distanceKm
+        distanceKm: reach.distanceKm,
+        pricingMode: a.pricingMode ?? null
       });
     }
   }

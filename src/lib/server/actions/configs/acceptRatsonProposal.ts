@@ -25,6 +25,8 @@
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { requestWishMissionConfig } from './requestWishMission.js';
+import { openingPrice, plainExcerpt } from '$lib/sheirut/quoteState';
+import { loadQuote, postToRequestChat } from '../../sheirut/quote.js';
 
 const ACCEPTABLE_FROM_STATUSES = new Set(['suggested', 'viewed']);
 
@@ -251,15 +253,23 @@ const handler: ActionExecutionHandler = async (params, context, util) => {
   );
 
   // ── 3. Create the Sheirutpend so the proposer side can vote ─────────────
+  // A proposal without a price (a product priced by quote) opens at her
+  // budget, or open — the shop names it on the request (§6 of
+  // PLAN_CONCIERGE_LOCAL_PROVIDERS).
+  const requestPrice = openingPrice({
+    price: typeof pa.total_price === 'number' ? pa.total_price : null,
+    budget:
+      ratsonAttrs.bounti && typeof ratsonAttrs.totalbounti === 'number' ? ratsonAttrs.totalbounti : null
+  });
   const sheirutpendRes = await strapi.execute(
     '71createSheirutpend',
     {
       project: projectId,
       userId: wisherUserId,
       matanots: [matanotId],
-      price: totalPrice,
+      price: requestPrice,
       quant: 1,
-      total: totalPrice,
+      total: requestPrice,
       startDate: ratsonStart,
       finnishDate: ratsonFinish,
       appruved: false
@@ -289,6 +299,12 @@ const handler: ActionExecutionHandler = async (params, context, util) => {
         '[acceptRatsonProposal] could not link sheirutpend.ratson_proposal - schema field may be missing:',
         err
       );
+    }
+    // Her wish, where the shop answers it — the request's chat.
+    const wishText = plainExcerpt(ratsonAttrs.longDes || ratsonAttrs.desc || '');
+    if (wishText) {
+      const q = await loadQuote(strapi as any, sheirutpendId).catch(() => null);
+      if (q) await postToRequestChat(strapi as any, q, String(context.userId), `📝 ${wishText}`);
     }
   }
 

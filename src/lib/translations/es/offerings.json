@@ -184,7 +184,10 @@
     "locationEmpty": "Añade una ubicación (opcional)",
     "locationOnline": "En línea",
     "locationSelected": "Ubicación establecida",
-    "locationDone": "Listo"
+    "locationDone": "Listo",
+    "byQuote": "Precio según el pedido (presupuesto)",
+    "byQuoteHint": "Para una cesta de compras o un servicio de precio variable: el cliente escribe lo que necesita y respondes con un precio. No hace falta cargar cada artículo.",
+    "priceFrom": "Precio base / envío (opcional)"
   },
   "resources": {
     "title": "Mis recursos",
