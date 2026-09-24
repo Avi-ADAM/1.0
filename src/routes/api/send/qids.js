@@ -12709,11 +12709,15 @@ ${STIPEND_DECISION_FIELDS}
   // Find existing *products* (matanot) a weave (project) already offers, by name.
   // A wish's need may be fulfilled by a ready product — picking one routes into
   // the built-in service-request flow (createSheirutpend). Active, non-archived only.
+  // The concierge's product lookup (enrichWish). A product its seller hid from
+  // the directory (282) is hidden here too — a members-only or one-customer
+  // offer is not something to suggest to a stranger's wish. Same NULL guard.
   '203findMatanotByText': `query FindMatanotByText($q: String, $limit: Int = 6) {
     matanots(
       filters: { and: [ { archived: { eq: false }
         status_of_voting: { eq: "active" }
-        name: { containsi: $q } }, ${NOT_ARCHIVED} ] }
+        name: { containsi: $q }
+        or: [{ hideFromDiscovery: { eq: false } }, { hideFromDiscovery: { null: true } }] }, ${NOT_ARCHIVED} ] }
       pagination: { limit: $limit }
     ) {
       data {
