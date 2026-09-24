@@ -655,4 +655,16 @@ export const qidsAccess = {
   // Membership is inside the query's own filters; still service-only, like the
   // other MCP reads, because the MCP guard is what stands in front of it.
   '324mcpSearchMine': { allow: ['serviceAdmin'] },
+  // Assistant sessions (qidsAssistant.js) — only the assistant actions, which
+  // check ownership, may touch the collection; never a user or an api key.
+  '363createAssistantSession': { allow: ['serviceAdmin'] },
+  '364getAssistantSession': { allow: ['serviceAdmin'] },
+  '365updateAssistantSession': { allow: ['serviceAdmin'] },
+  '366findMyAssistantSessions': { allow: ['serviceAdmin'] },
+  // Exact-email lookup for a partner named in a rikma import. Returns contact
+  // fields, so it must never be widened beyond the materialize step.
+  '370findUserForInvite': { allow: ['serviceAdmin'] },
+  // Written only by createComplexMatanot, after its rikma-membership check. Open
+  // to `user` it would let anyone rewrite any product's keywords via /api/send.
+  '371setMatanotDiscoveryKeywords': { allow: ['serviceAdmin'] },
 };

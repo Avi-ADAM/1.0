@@ -34,7 +34,7 @@ const MAX_CANDIDATES = 500;
 const MAX_SUGGESTIONS_PER_EVENT = 50;
 const CREATE_CONCURRENCY = 5;
 
-export type SuggestionSource = 'missionCreated' | 'resourceCreated' | 'profileUpdated' | 'backfill';
+export type SuggestionSource = 'missionCreated' | 'resourceCreated' | 'profileUpdated' | 'backfill' | 'invited';
 
 export interface MatchDeps {
   /** StrapiClient instance (actionService's `strapi`) */
@@ -508,6 +508,106 @@ export async function matchUserToOpenEntities(
 // ─────────────────────────────────────────────────────────────────────────────
 
 /** Mark this user's suggestion for a mission/resource as dismissed (on decline). */
+// ─────────────────────────────────────────────────────────────────────────────
+// A partner named in a rikma import → invite them to what they bring
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** Well above any computed score, so an invitation sorts first on the lev page. */
+const INVITED_SCORE = 100;
+
+export interface InviteTargets {
+  openMissions: { id: string; name: string }[];
+  openMashaabims: { id: string; name: string }[];
+}
+
+/**
+ * The partner-invite half of a rikma import (PLAN_AI_SIGNUP_CONCIERGE §4.5).
+ *
+ * The founder listed a partner and what they bring; those missions and
+ * resources were just created *open*, exactly as if the founder had opened
+ * them by hand. Here the partner — found by exact email — gets a
+ * `match-suggestion` per open item (`source:'invited'`) and the usual "new
+ * suggestion" email, i.e. the same lev card a matched stranger would see. From
+ * there they apply, and the rikma approves them through the ordinary ask flow.
+ * Nothing is assigned to them and nothing is decided for them.
+ *
+ * Returns `notRegistered` when no account has that address: the caller shows
+ * the founder a join link to send themselves — we do not email addresses that
+ * are not members of the platform.
+ */
+export async function invitePartnerToOpenEntities(
+  email: string,
+  targets: InviteTargets,
+  projectName: string,
+  deps: MatchDeps & { invitedBy: string }
+): Promise<{ result: 'invited' | 'notRegistered' | 'self' | 'nothingToInvite' | 'failed'; userId?: string; created: number }> {
+  const total = targets.openMissions.length + targets.openMashaabims.length;
+  if (total === 0) return { result: 'nothingToInvite', created: 0 };
+  try {
+    const res = await deps.strapi.execute('370findUserForInvite', {
+      email: String(email).trim().toLowerCase()
+    });
+    const u = res?.data?.usersPermissionsUsers?.data?.[0];
+    if (!u?.id) return { result: 'notRegistered', created: 0 };
+    const userId = String(u.id);
+    if (userId === String(deps.invitedBy)) return { result: 'self', userId, created: 0 };
+
+    let created = 0;
+    const matchedOn = { invitedBy: String(deps.invitedBy) };
+    for (const m of targets.openMissions) {
+      if (
+        await createSuggestion(deps, {
+          userId,
+          openMissionId: m.id,
+          kind: 'mission',
+          score: INVITED_SCORE,
+          status: 'notified',
+          source: 'invited',
+          matchedOn
+        })
+      ) created++;
+    }
+    for (const r of targets.openMashaabims) {
+      if (
+        await createSuggestion(deps, {
+          userId,
+          openMashaabimId: r.id,
+          kind: 'resource',
+          score: INVITED_SCORE,
+          status: 'notified',
+          source: 'invited',
+          matchedOn
+        })
+      ) created++;
+    }
+
+    // One email, not one per row: it names the first thing and the lev page
+    // shows the rest.
+    const a = u.attributes ?? {};
+    const first = targets.openMissions[0] ?? targets.openMashaabims[0];
+    const recipient: SuggestionRecipient = {
+      id: userId,
+      username: a.username ?? '',
+      email: a.email ?? '',
+      lang: a.lang ?? undefined,
+      noMail: a.noMail === true
+    };
+    if (created > 0 && recipient.email) {
+      await sendNewSuggestionEmails(
+        [recipient],
+        targets.openMissions.length ? 'mission' : 'resource',
+        first.name,
+        projectName,
+        { fetch: deps.fetch, lang: deps.lang }
+      );
+    }
+    return { result: 'invited', userId, created };
+  } catch (err) {
+    console.error('[matching] partner invite failed:', err);
+    return { result: 'failed', created: 0 };
+  }
+}
+
 export async function dismissSuggestion(
   userId: string,
   target: { openMissionId?: string; openMashaabimId?: string },

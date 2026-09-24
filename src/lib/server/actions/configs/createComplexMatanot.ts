@@ -106,7 +106,8 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
     radius = null,
     location_hint = null,
     recipeMissions = [],
-    recipeResources = []
+    recipeResources = [],
+    discoveryKeywords = null
   } = params as {
     projectId: string;
     name: string;
@@ -130,6 +131,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
     location_hint?: string | null;
     recipeMissions?: RecipeMissionInput[];
     recipeResources?: RecipeResourceInput[];
+    discoveryKeywords?: string | null;
   };
 
   const now = new Date().toISOString();
@@ -247,6 +249,26 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
     throw new Error('Failed to create matanot');
   }
   const matanotId = String(matanot.id);
+
+  // Synonyms / need-terms the concierge's text search also looks at (qid 203),
+  // sent by a rikma import. A separate, best-effort write: the product is what
+  // the member asked for, and a form that never sets keywords never touches
+  // the field at all.
+  const keywords = typeof discoveryKeywords === 'string' ? discoveryKeywords.trim().slice(0, 1000) : '';
+  if (keywords) {
+    try {
+      // Service token: the qid is serviceAdmin-only, and the membership rule
+      // of this action already ran.
+      await strapi.execute(
+        '371setMatanotDiscoveryKeywords',
+        { id: matanotId, discoveryKeywords: keywords },
+        undefined,
+        context.fetch
+      );
+    } catch (err) {
+      console.warn('[createComplexMatanot] discovery keywords not saved:', err);
+    }
+  }
 
   // ── 3. Persist recipe rows (complex only) ───────────────────────────────
   const recipeMissionIds: string[] = [];
@@ -411,7 +433,8 @@ export const createComplexMatanotConfig: ActionConfig = {
     radius: { type: 'number', required: false },
     location_hint: { type: 'string', required: false },
     recipeMissions: { type: 'array', required: false },
-    recipeResources: { type: 'array', required: false }
+    recipeResources: { type: 'array', required: false },
+    discoveryKeywords: { type: 'string', required: false, description: 'Comma-separated synonyms / need-terms for concierge discovery (rikma import)' }
   },
   authRules: [
     { type: 'jwt', errorMessage: 'Must be logged in to create a product' },

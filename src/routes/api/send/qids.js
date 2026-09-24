@@ -1,4 +1,5 @@
 import { digestQids, serviceTwin } from './qidsDigest.js';
+import { assistantQids } from './qidsAssistant.js';
 
 /**
  * "Not archived by a rikma decision" (PLAN_OBJECT_ARCHIVAL).
@@ -16120,7 +16121,8 @@ ${STIPEND_DECISION_FIELDS}
 
   ...qids_base,
   ...moachQids,
-  ...digestQids
+  ...digestQids,
+  ...assistantQids
 };
 
 // The daily digest's service twin of 85 — the same query text with `$uid` for
