@@ -156,19 +156,19 @@ const manifestLink = {
  * descriptions near 110–160, which is what search results actually render.
  */
 const desc = {
-  he: '1💗1 היא פלטפורמה לשותפויות הוגנות: רקמת שותפים ללא בוס וללא הון התחלתי, משימות ומשאבים פתוחים, תיעוד שעות, החלטות בהסכמה וחלוקת רווחים שקופה לפי תרומה.',
-  en: '1💗1 is a platform for fair partnerships: build a network with no boss and no upfront capital, publish open missions and resources, log hours, decide by consensus, split profits by contribution.',
-  ar: '1💗1 منصة للشراكات العادلة: شبكة شركاء بلا مدير وبلا رأس مال، مهام وموارد مفتوحة، تسجيل الساعات، قرارات بالتوافق، وتقاسم شفاف للأرباح حسب المساهمة.',
-  ru: '1💗1 - платформа честных партнёрств: сеть без начальника и стартового капитала, открытые задачи и ресурсы, учёт часов, решения по согласию и прозрачный раздел прибыли по вкладу.',
-  es: '1💗1 es una plataforma de asociaciones justas: una red sin jefe ni capital inicial, misiones y recursos abiertos, registro de horas, decisiones por consenso y reparto transparente de beneficios.'
+  he: '1💗1 היא פלטפורמה לשותפויות משתלמות: רקמת שותפים ללא בוס וללא הון התחלתי, משימות ומשאבים פתוחים, תיעוד שעות, החלטות בהסכמה וחלוקת רווחים שקופה לפי תרומה.',
+  en: '1💗1 is a platform for profitable partnerships: build a network with no boss and no upfront capital, publish open missions and resources, log hours, decide by consensus, split profits by contribution.',
+  ar: '1💗1 منصة للشراكات المربحة: شبكة شركاء بلا مدير وبلا رأس مال، مهام وموارد مفتوحة، تسجيل الساعات، قرارات بالتوافق، وتقاسم شفاف للأرباح حسب المساهمة.',
+  ru: '1💗1 - платформа выгодных партнёрств: сеть без начальника и стартового капитала, открытые задачи и ресурсы, учёт часов, решения по согласию и прозрачный раздел прибыли по вкладу.',
+  es: '1💗1 es una plataforma de asociaciones rentables: una red sin jefe ni capital inicial, misiones y recursos abiertos, registro de horas, decisiones por consenso y reparto transparente de beneficios.'
 };
 
 const title = {
-  he: '1💗1 · שותפויות הוגנות: משימות, שעות וחלוקת רווחים',
-  en: '1💗1 · Fair Partnerships: Missions, Hours, Profit Split',
-  ar: '1💗1 · شراكات عادلة: مهام وساعات وتقاسم الأرباح',
-  ru: '1💗1 · Честные партнёрства: задачи, часы и доля прибыли',
-  es: '1💗1 · Asociaciones justas: misiones, horas y reparto'
+  he: '1💗1 · שותפויות משתלמות: משימות, שעות וחלוקת רווחים',
+  en: '1💗1 · Profitable Partnerships: Missions, Hours, Profit Split',
+  ar: '1💗1 · شراكات مربحة: مهام وساعات وتقاسم الأرباح',
+  ru: '1💗1 · Выгодные партнёрства: задачи, часы и доля прибыли',
+  es: '1💗1 · Asociaciones rentables: misiones, horas y reparto'
 };
 
 // Public address of the site, used to build og:url. Not derived from
