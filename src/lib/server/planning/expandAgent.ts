@@ -58,6 +58,13 @@ export interface PlannedRow {
   kindOf: string | null;
   price: number | null;
   quantity: number | null;
+  /**
+   * `product` rows only — how a customer would describe the need (synonyms,
+   * occasions), and 1-3 broad domains. They become `discoveryKeywords` and
+   * `Category` links, which is how the concierge finds the product.
+   */
+  keywords?: string[];
+  categories?: string[];
 }
 
 export interface PlanRowsResult {
@@ -95,7 +102,9 @@ Return ONLY valid JSON - no markdown, no code fences, no commentary. Start with
       "missionName": "...",
       "kindOf": "...",
       "price": 0,
-      "quantity": 0
+      "quantity": 0,
+      "keywords": ["..."],
+      "categories": ["..."]
     }
   ],
   "hints": [{ "kind": "question" | "suggestion", "text": "..." }]
@@ -117,6 +126,11 @@ Per-field rules:
   the chore belongs to. Never invent a member.
 - kindOf / price / quantity: only on "resource" and "product" rows. kindOf is
   one of: money, equipment, space, knowledge, other.
+- keywords / categories: only on "product" rows. keywords = 4-10 words or short
+  phrases a CUSTOMER would use for the need this product answers - synonyms,
+  occasions, the problem it solves - not the product's own name (a breakfast
+  tray: "brunch", "birthday surprise", "hosting guests"). categories = 1-3
+  broad domains ("events", "food", "wellbeing"). Both in the output language.
 - hints: 0-3 short clarifying questions for the members. Ask about what would
   most change the plan.
 - Omit any field that does not apply to the row's kind. Never emit null.`;
@@ -245,7 +259,10 @@ export function normalizePlannedRow(raw: unknown): PlannedRow | null {
     missionName: isAct ? asText(o.missionName, 120) || null : null,
     kindOf: isSupply ? asText(o.kindOf, 40).toLowerCase() || null : null,
     price: isSupply ? asPositive(o.price) : null,
-    quantity: isSupply ? asPositive(o.quantity) : null
+    quantity: isSupply ? asPositive(o.quantity) : null,
+    ...(kind === 'product'
+      ? { keywords: asStrings(o.keywords, 12), categories: asStrings(o.categories, 3) }
+      : {})
   };
 }
 

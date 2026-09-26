@@ -1,6 +1,6 @@
 <!--
   Money — an amount, in the reader's currency, and saying so
-  (docs/PLAN_MULTI_CURRENCY.md §1.3).
+  (docs/done/PLAN_MULTI_CURRENCY.md §1.3).
 
   The same promise `<Translated>` makes for words: a conversion is never
   presented as what someone wrote. When the reader's currency differs from the

@@ -1,6 +1,6 @@
 /**
  * `cacheTranslations` — the write half of the UGC translation cache
- * (§5.4 of docs/PLAN_UGC_TRANSLATION.md).
+ * (§5.4 of docs/inprogress/PLAN_UGC_TRANSLATION.md).
  *
  * Per CLAUDE.md every write goes through the Action System, and this is the
  * only door into `text-translation`. Three properties it has to hold:

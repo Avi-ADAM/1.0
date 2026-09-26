@@ -106,7 +106,7 @@ export function computeMissionMatchScore(
 export const MIN_SUGGESTION_SCORE = 1;
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Date fit — the resource side (docs/PLAN_RESOURCE_CALENDAR.md §7)
+// Date fit — the resource side (docs/inprogress/PLAN_RESOURCE_CALENDAR.md §7)
 // ─────────────────────────────────────────────────────────────────────────────
 
 /**

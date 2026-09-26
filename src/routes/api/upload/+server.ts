@@ -11,7 +11,7 @@ import { checkUpload, PROXY_MAX_BYTES } from '$lib/uploads/policy.js';
  * Returns the Strapi upload response (array of uploaded files).
  */
 // Guard rails for proxied uploads. The whitelist is shared with the direct
-// R2 path (docs/PLAN_RIKMA_SHARED_INFO.md stage 2) — see $lib/uploads/policy.
+// R2 path (docs/inprogress/PLAN_RIKMA_SHARED_INFO.md stage 2) — see $lib/uploads/policy.
 // The cap is the proxy's own: these bytes pass through this server.
 
 export const POST: RequestHandler = async ({ request, cookies, fetch }) => {

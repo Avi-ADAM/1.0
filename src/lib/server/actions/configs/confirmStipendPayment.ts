@@ -1,5 +1,5 @@
 /**
- * Action: confirmStipendPayment (docs/PLAN_STIPEND.md §6).
+ * Action: confirmStipendPayment (docs/done/PLAN_STIPEND.md §6).
  *
  * The recipient says the money arrived. This is the only event in the whole
  * feature that moves a percentage:
@@ -107,7 +107,7 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
         // `lastSettledAt` at the settled cycle, `settleStipendCycle` answered
         // `nothing_approved_this_cycle` forever, and the card's own promise —
         // "the pledge is still running, send again" — was impossible to keep
-        // (docs/FIXES.md §4).
+        // (docs/inprogress/FIXES.md §4).
         //
         // Only for a *zero* arrival. A partial one did move money for these
         // hours; re-opening the window would let the whole cycle be metered a

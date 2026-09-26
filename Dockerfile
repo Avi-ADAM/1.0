@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 # SvelteKit API instance (adapter-node) — runs on the Linux VPS alongside Strapi.
-# See docs/DEPLOY_API_DOCKER.md and docs/PLAN_PROXY_SECURITY.md (stage 3).
+# See docs/DEPLOY_API_DOCKER.md and docs/done/PLAN_PROXY_SECURITY.md (stage 3).
 #
 # Build (from repo root, BuildKit required):
 #   docker build --secret id=envfile,src=.env -t 1lev1/sveltekit-api:latest .
@@ -65,6 +65,11 @@ EXPOSE 3000
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
     CMD node -e "require('http').get('http://localhost:3000/api/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
+
+# Mount points for the named volumes in docker-compose.api.yml. A fresh named
+# volume takes the owner of the directory it is mounted over — and a path the
+# image does not have is created root-owned, which USER node cannot write.
+RUN mkdir -p /data/space-docs /data/translate-state && chown -R node:node /data
 
 USER node
 

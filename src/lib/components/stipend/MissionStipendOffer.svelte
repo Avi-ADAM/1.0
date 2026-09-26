@@ -3,7 +3,7 @@
   import Money from '$lib/components/money/Money.svelte';
   /**
    * What a funded mission is actually offering, in two separate lines
-   * (docs/PLAN_STIPEND.md §8, §11.1).
+   * (docs/done/PLAN_STIPEND.md §8, §11.1).
    *
    * These are two different things and the whole model depends on nobody
    * confusing them:

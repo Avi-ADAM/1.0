@@ -1,5 +1,5 @@
 /**
- * One file over one WebRTC connection (docs/PLAN_P2P_PILOT.md §1).
+ * One file over one WebRTC connection (docs/inprogress/PLAN_P2P_PILOT.md §1).
  *
  * Both halves live here so they cannot drift: `fetchFromPeer` (the member who
  * wants the file — makes the offer, opens the channel, verifies what arrives)

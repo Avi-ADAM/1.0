@@ -425,7 +425,7 @@ export type ActionKey =
   | 'cancelResourceBooking'
   | 'blockResourceDates'
   | 'releaseResourceBooking'
-  // Shifts (docs/PLAN_SHIFTS.md §8)
+  // Shifts (docs/inprogress/PLAN_SHIFTS.md §8)
   | 'declareShiftAvailability'
   | 'createShiftPlan'
   | 'updateShiftPlan'
@@ -515,6 +515,12 @@ export type ActionKey =
   | 'setAssistantItems'
   | 'undoAssistantRevision'
   | 'materializeRikmaBlueprint'
+  | 'importPlanBoardRows'
+  | 'shareRikmaPreview'
+  | 'claimAssistantSession'
+  | 'startAssistantSession'
+  | 'reviseAssistantSession'
+  | 'applyAssistantSession'
   ;
 
 
@@ -697,7 +703,7 @@ export interface ActionParamsMap {
  * the handler wrote for this person to read ("the stipend rate is higher than
  * the mission's market rate") — in `details`. Reading `message` alone turned
  * every validation into "something went wrong", and `String(res.error)` on the
- * object turned it into `[object Object]` (docs/FIXES.md §9). Details first,
+ * object turned it into `[object Object]` (docs/inprogress/FIXES.md §9). Details first,
  * then message, then a caller-supplied fallback.
  */
 export function actionErrorText(res: unknown, fallback = 'failed'): string {

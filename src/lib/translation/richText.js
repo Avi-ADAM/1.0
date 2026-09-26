@@ -1,7 +1,7 @@
 /**
  * The one plain-text rendering of a tiptap/`descrip` HTML field that the UGC
  * translation cache is allowed to key on (§5.5 of
- * docs/PLAN_UGC_TRANSLATION.md).
+ * docs/inprogress/PLAN_UGC_TRANSLATION.md).
  *
  * Why plain text at all: the cache stores plain strings on purpose. The output
  * validator strips markup precisely because a model handed tags invents more of

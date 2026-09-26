@@ -177,7 +177,7 @@
         } catch (e) {
           // Same rule as the stipend branch below: a proposal that failed to
           // apply is still standing, so the clock stays open and the next run
-          // retries rather than discarding it (docs/FIXES.md §1).
+          // retries rather than discarding it (docs/inprogress/FIXES.md §1).
           console.error(
             '[timegrama/decision] archive maturation failed — clock left OPEN for retry:',
             { decisionId: id, kind: a.kind, error: e }
@@ -230,7 +230,7 @@
           // silence maturation threw `Forbidden access`, and every unanswered
           // stipend proposal died here in silence. Leaving the row open means
           // the next hourly run retries, and a permanently failing one stays
-          // visible in the queue instead of vanishing (docs/FIXES.md §1).
+          // visible in the queue instead of vanishing (docs/inprogress/FIXES.md §1).
           console.error(
             '[timegrama/decision] stipend maturation failed — clock left OPEN for retry:',
             { decisionId: id, kind: a.kind, error: e }

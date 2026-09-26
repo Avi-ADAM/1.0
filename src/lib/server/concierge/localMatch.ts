@@ -2,7 +2,7 @@
  * Local matching for the concierge — pure, no I/O.
  *
  * Two questions the concierge asks about every provider it considers
- * (docs/PLAN_CONCIERGE_LOCAL_PROVIDERS.md):
+ * (docs/inprogress/PLAN_CONCIERGE_LOCAL_PROVIDERS.md):
  *
  *   1. *Can they reach her?* A product's location is its service area (a
  *      grocery's delivery radius); a member's is where they work. A physical

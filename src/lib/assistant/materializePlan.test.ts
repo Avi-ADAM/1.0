@@ -61,6 +61,17 @@ describe('planMaterialization', () => {
     expect(plan.steps[0]).toEqual({ type: 'product', key: 'i2', missionKeys: [], resourceKeys: [] });
   });
 
+  it('an unticked row imported from a planning board stays on its board, not copied to a new one', () => {
+    const fromBoard: AssistantState = {
+      items: [
+        it_({ key: 'i1', group: 'products', label: 'סדנה', spec: { planItem: { boardId: '40', itemId: '401' } } }),
+        it_({ key: 'i2', group: 'rikmaMissions', label: 'צילום', spec: { planItem: { boardId: '40', itemId: '402' } } })
+      ]
+    };
+    const plan = planMaterialization(fromBoard, ['i1'], true);
+    expect(plan.steps).toEqual([{ type: 'product', key: 'i1', missionKeys: [], resourceKeys: [] }]);
+  });
+
   it('a recipe mission is standalone when its product was not ticked', () => {
     const plan = planMaterialization(state, ['i3'], true);
     expect(plan.steps[0]).toEqual({ type: 'mission', key: 'i3' });

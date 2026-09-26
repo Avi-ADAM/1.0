@@ -1,6 +1,6 @@
 # Moach (FreeMates Project Brain) — AI Agent Guide
 
-This file describes the structure, entities, available pages, and possible actions inside a Moach project, after the route-based migration described in [`MOACH_MIGRATION_PLAN.md`](MOACH_MIGRATION_PLAN.md).
+This file describes the structure, entities, available pages, and possible actions inside a Moach project, after the route-based migration described in [`MOACH_MIGRATION_PLAN.md`](done/MOACH_MIGRATION_PLAN.md).
 
 AI agents working on behalf of users **must** consult this file before acting inside a Moach project. It tells you which URL holds which entity, what data lives there, and which actions are safe to perform vs. which require explicit per-action user confirmation.
 
@@ -108,7 +108,7 @@ Every entity page exposes the same machine-readable contract:
 }
 ```
 
-`actionKey` maps to the Unified Action System ([`src/lib/server/actions/registry.ts`](src/lib/server/actions/registry.ts)). Use `actionService.executeAction(actionKey, params, context)` from server-side code; or post to the API route exposing it. **Never** invent an action that is not listed in `availableActions[]`.
+`actionKey` maps to the Unified Action System ([`src/lib/server/actions/registry.ts`](../src/lib/server/actions/registry.ts)). Use `actionService.executeAction(actionKey, params, context)` from server-side code; or post to the API route exposing it. **Never** invent an action that is not listed in `availableActions[]`.
 
 ### 3.3 Stable anchors
 Every entity page has these anchors (when applicable):
@@ -181,12 +181,12 @@ Every entity page has these anchors (when applicable):
 
 ### 4.6 `process` (existing pattern)
 - **URL:** `/moach/[projectId]/processes/[processId]`
-- See [`src/lib/components/process/PROCESS_DATA_MODEL.md`](src/lib/components/process/PROCESS_DATA_MODEL.md) for the full data model.
-- The current implementation lives at [`src/routes/(reg)/moach/process/[processid]/+page.svelte`](src/routes/(reg)/moach/process/[processid]/+page.svelte) and is the reference for entity-page structure.
+- See [`src/lib/components/process/PROCESS_DATA_MODEL.md`](../src/lib/components/process/PROCESS_DATA_MODEL.md) for the full data model.
+- The current implementation lives at [`src/routes/(reg)/moach/process/[processid]/+page.svelte`](../src/routes/(reg)/moach/process/[processid]/+page.svelte) and is the reference for entity-page structure.
 
 ### 4.7 `chain` (reconstructed lifecycle)
 - **URL:** `/moach/[projectId]/chains/[chainId]`
-- Reconstructed in-memory from missions / asks / acts via [`src/lib/utils/reconstructChains.js`](src/lib/utils/reconstructChains.js) (`reconstructMissionChains`, `reconstructResourceChains`).
+- Reconstructed in-memory from missions / asks / acts via [`src/lib/utils/reconstructChains.js`](../src/lib/utils/reconstructChains.js) (`reconstructMissionChains`, `reconstructResourceChains`).
 - **AI may:** read the full lifecycle of one mission/resource. No direct mutations on the chain itself — operate on the underlying entity.
 
 ---
@@ -229,15 +229,15 @@ Every entity page has these anchors (when applicable):
 
 ## 7. Field-reference cheat sheet
 
-- Mission / resource entities: see [`src/lib/components/process/PROCESS_DATA_MODEL.md`](src/lib/components/process/PROCESS_DATA_MODEL.md).
-- All other entities: fetch via `sendToSer({ id }, '<qid-name>', null, null, false, fetch)` using QIDs registered in [`src/routes/api/send/qids.js`](src/routes/api/send/qids.js).
-- The full QID list is in [`MOACH_MIGRATION_PLAN.md`](MOACH_MIGRATION_PLAN.md) §6.
+- Mission / resource entities: see [`src/lib/components/process/PROCESS_DATA_MODEL.md`](../src/lib/components/process/PROCESS_DATA_MODEL.md).
+- All other entities: fetch via `sendToSer({ id }, '<qid-name>', null, null, false, fetch)` using QIDs registered in [`src/routes/api/send/qids.js`](../src/routes/api/send/qids.js).
+- The full QID list is in [`MOACH_MIGRATION_PLAN.md`](done/MOACH_MIGRATION_PLAN.md) §6.
 
 ---
 
 ## 8. MCP tools cross-reference
 
-When invoked via the MCP integration ([`mcp__1lev1-mcp__*`](.mcp.json) tools), prefer:
+When invoked via the MCP integration ([`mcp__1lev1-mcp__*`](../.mcp.json) tools), prefer:
 
 | Goal | MCP tool |
 |---|---|

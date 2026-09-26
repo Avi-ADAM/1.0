@@ -24,7 +24,7 @@ or split. That is why legacy rows are now read *as* `gift`: it preserves their
 real behaviour exactly.
 
 **In the product: a promise nothing kept.** The repayment side was specified in
-`docs/PLAN_STIPEND.md` §6 ("the outstanding balance is shown to the recipient,
+`docs/done/PLAN_STIPEND.md` §6 ("the outstanding balance is shown to the recipient,
 and a *repay* button opens when they receive distribution money") and **never
 implemented** — there was no debt ledger, no balance, no repay action, no
 collection, and `distribute()` was deliberately never touched. So the mode

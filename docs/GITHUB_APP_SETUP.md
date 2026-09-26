@@ -1,6 +1,6 @@
 # הגדרת ה-GitHub App של 1lev1 — מדריך שדה אחרי שדה
 
-מלווה את [`PLAN_CODE_RIKMA.md`](PLAN_CODE_RIKMA.md) §3.3 (שלב S2). עושים את זה פעם אחת.
+מלווה את [`PLAN_CODE_RIKMA.md`](inprogress/PLAN_CODE_RIKMA.md) §3.3 (שלב S2). עושים את זה פעם אחת.
 
 ---
 

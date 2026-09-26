@@ -336,7 +336,7 @@ const routeToAgent = createStep({
         agentType = 'general';
     }
 
-    // Persistent memory (docs/PLAN_CHAT_MEMORY.md): when the user is
+    // Persistent memory (docs/done/PLAN_CHAT_MEMORY.md): when the user is
     // registered and a durable store is configured, Mastra replays the thread
     // from Postgres and injects the user's structured working memory. In that
     // mode the client's `history` array is NOT re-sent — doing both duplicates

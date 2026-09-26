@@ -1,6 +1,6 @@
 /**
  * Conversion between currencies, and the "written in mine, counted in the
- * rikma's" normalization (docs/PLAN_MULTI_CURRENCY.md §1, D-C2/D-C3).
+ * rikma's" normalization (docs/done/PLAN_MULTI_CURRENCY.md §1, D-C2/D-C3).
  *
  * Pure: every function takes the rates table as an argument. The server gets
  * it from `$lib/server/fx/rates`, the browser from the root layout.

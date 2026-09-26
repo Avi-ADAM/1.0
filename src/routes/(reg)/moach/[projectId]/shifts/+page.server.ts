@@ -15,7 +15,7 @@ import { planIsActive, type CommitmentView, type PeriodView, type ShiftPlanView 
 import { cycleContaining, cyclesBetween, resolveSettings, type CycleWindow, type ShiftSettings } from '$lib/shifts/settings.js';
 
 /**
- * The rikma's shifts tab (docs/PLAN_SHIFTS.md §9.3).
+ * The rikma's shifts tab (docs/inprogress/PLAN_SHIFTS.md §9.3).
  *
  * Membership is enforced by the `[projectId]` layout. Everything is read with
  * the member's own JWT, so the Authenticated role — not a service token —

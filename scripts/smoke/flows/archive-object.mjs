@@ -1,5 +1,5 @@
 /**
- * Object archival between two real members (docs/PLAN_OBJECT_ARCHIVAL.md).
+ * Object archival between two real members (docs/done/PLAN_OBJECT_ARCHIVAL.md).
  *
  *   node scripts/smoke/flows/two-member.mjs --yes    # once, builds the pair
  *   node scripts/smoke/flows/archive-object.mjs --yes

@@ -1,6 +1,6 @@
 import { moneyTextFor } from '$lib/server/money/notifyMoney.js';
 /**
- * Action: proposeStipendPledge (docs/PLAN_STIPEND.md §5).
+ * Action: proposeStipendPledge (docs/done/PLAN_STIPEND.md §5).
  *
  * "I'll fund your living costs while you work here" — or, from the other side,
  * "I need a stipend to be able to keep working here". Both open the same
@@ -131,7 +131,7 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
   // same agreement counted twice, and the settlement has no way to tell: each
   // one meters the same approved hours from scratch. Live, four active pledges
   // offered the funder four cards for the same 5.01 hours and confirming them
-  // drove the recipient's own equity to −2.25% (docs/FIXES.md §2). Changing the
+  // drove the recipient's own equity to −2.25% (docs/inprogress/FIXES.md §2). Changing the
   // terms of a running stipend is `counterStipendTerms` on its decision, or
   // `proposeObjectArchive` on its engine — not a second pledge.
   const live = await fetchProjectPledges(exec, projectId, ['proposed', 'active']).catch(() => []);

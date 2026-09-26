@@ -1,6 +1,6 @@
 <script lang="ts">
   /**
-   * Why each member's share is what it is (docs/PLAN_SHIFTS.md §6.2, §9.2).
+   * Why each member's share is what it is (docs/inprogress/PLAN_SHIFTS.md §6.2, §9.2).
    *
    * One sentence carries the whole rule — everyone gets the same number,
    * except where their own agreed commitment caps them lower or floors them

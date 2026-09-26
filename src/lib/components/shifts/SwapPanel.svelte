@@ -1,7 +1,7 @@
 <script lang="ts">
   /**
    * My coming places in this cycle, and a way to offer each one to another
-   * member of the mission (docs/PLAN_SHIFTS.md §1.2). "I can't make it" is a
+   * member of the mission (docs/inprogress/PLAN_SHIFTS.md §1.2). "I can't make it" is a
    * release (on the heart); "can you take it — maybe for one of yours?" is a
    * swap, and it lives here, next to the roster it changes.
    *

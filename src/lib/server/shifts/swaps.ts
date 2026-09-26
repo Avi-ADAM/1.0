@@ -1,5 +1,5 @@
 /**
- * Shift swaps on the server (docs/PLAN_SHIFTS.md §1.2, §7 step 3): read what a
+ * Shift swaps on the server (docs/inprogress/PLAN_SHIFTS.md §1.2, §7 step 3): read what a
  * swap is about, and carry it out. The rules are in `$lib/shifts/swap.ts`;
  * the authorization in the actions; this file joins the two to the store.
  *

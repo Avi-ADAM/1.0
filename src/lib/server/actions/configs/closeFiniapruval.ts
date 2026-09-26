@@ -122,7 +122,7 @@ export const closeFiniapruvalConfig: ActionConfig = {
             // counted the whole banked history a second time. Live: a mission with
             // 5.005 banked hours completed at 5 more produced rows of 5.005 and
             // 10.005 side by side — ₪250.26 of value out of thin air, straight
-            // into everybody's percentages (docs/FIXES.md §5).
+            // into everybody's percentages (docs/inprogress/FIXES.md §5).
             //
             // One row per rate era is also what the timer-save branch above
             // already does, and what the single-member path in completeMission.ts

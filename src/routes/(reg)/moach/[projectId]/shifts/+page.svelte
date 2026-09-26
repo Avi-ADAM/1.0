@@ -1,6 +1,6 @@
 <script lang="ts">
   /**
-   * The rikma's shifts (docs/PLAN_SHIFTS.md §9.3): the roster of a cycle, and
+   * The rikma's shifts (docs/inprogress/PLAN_SHIFTS.md §9.3): the roster of a cycle, and
    * the member's own availability for it. Replaces the old demo calendar.
    */
   import { page } from '$app/state';

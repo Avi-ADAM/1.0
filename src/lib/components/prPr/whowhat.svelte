@@ -651,7 +651,7 @@
       //      (physical money movement, tracked with both-sides confirm + chat).
       // The Sale references the transfer halukas so an archive can link the two
       // sides. The adjustment (less/more) is auto-approved (PLAN §5); reason kept.
-      // See docs/PLAN_SITE_SHARE.md §6.1 and src/generated/SITE_SHARE_TRANSFER_SPEC.md.
+      // See docs/done/PLAN_SITE_SHARE.md §6.1 and src/generated/SITE_SHARE_TRANSFER_SPEC.md.
       console.log('[SiteShare] submit - platformInfo:', JSON.stringify(platformInfo),
                   '| direction:', siteShareDirection, '| final:', siteShareFinal,
                   '| transferHalukas:', JSON.stringify(platformHalukaIds));
@@ -794,7 +794,7 @@
       // there is nobody else to wait for. Opening a restime timegrama here would
       // park the money for 48h waiting on a vote that can never arrive, so we
       // finalize immediately — the same call halukaask makes when the last
-      // member approves. See docs/QA_SOLO_RIKMA_2026-08.md B1.
+      // member approves. See docs/inprogress/QA_SOLO_RIKMA_2026-08.md B1.
       if (isSoloRikma) {
         const soloRes = await executeAction('approveHaluka', {
           tosplitId: String(tosplitId),

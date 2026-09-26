@@ -1,5 +1,5 @@
 /**
- * TIMEGRAMA — the rikma's maturation clock (docs/PLAN_TIMEGRAMA.md).
+ * TIMEGRAMA — the rikma's maturation clock (docs/inprogress/PLAN_TIMEGRAMA.md).
  *
  * Pulls every timegrama whose deadline has arrived and dispatches it to the
  * handler for its `whatami`. "Silence is consent, at the rikma's pace" is what
@@ -36,7 +36,7 @@ import { ADMINMONTHER } from '$env/static/private';
 
 /**
  * Kinds that already have a finalizer below. Everything the codebase creates
- * must end up here — `docs/PLAN_TIMEGRAMA.md` §6 makes that the rule for any
+ * must end up here — `docs/inprogress/PLAN_TIMEGRAMA.md` §6 makes that the rule for any
  * new kind.
  */
 const HANDLED_KINDS = new Set([
@@ -54,7 +54,7 @@ const HANDLED_KINDS = new Set([
   'maap',
   'sheirutpend',
   'askwant',
-  // A roster cycle's objection window has run out (docs/PLAN_SHIFTS.md §7).
+  // A roster cycle's objection window has run out (docs/inprogress/PLAN_SHIFTS.md §7).
   // The whatami is the relation's own name — the dispatcher reads
   // `attributes[whatami]` — so it is `roster_period`, not `rosterPeriod`.
   'roster_period'
@@ -148,7 +148,7 @@ async function x(id, kind, taid, fetch) {
     // (PLAN_STIPEND §6), which is what lets its equity lines count.
     // `fetch` is passed through so the maturation can tell both sides it
     // happened — silence moves two people's percentages, and it used to move
-    // them without a word (docs/FIXES.md §8).
+    // them without a word (docs/inprogress/FIXES.md §8).
     await StipendPayment(id, taid, fetch);
   } else if (kind == 'tosplit') {
     // A profit split nobody objected to within restime settles itself

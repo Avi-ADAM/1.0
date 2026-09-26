@@ -21,7 +21,7 @@ const THREAD_KEY = 'bot_thread_id';
  * Conversation id sent to /api/chat as `threadId`.
  *
  * The server keeps the real conversation (messages + the user's structured
- * working memory) in Mastra/Postgres — see docs/PLAN_CHAT_MEMORY.md — and this
+ * working memory) in Mastra/Postgres — see docs/done/PLAN_CHAT_MEMORY.md — and this
  * is the handle to it. It must therefore outlive a reload, which is why it sits
  * in localStorage next to the message history, and it is regenerated on
  * `clear()` so "new conversation" starts a genuinely new server-side thread

@@ -1,6 +1,6 @@
 /**
  * Presentation-side helpers for the resource calendar
- * (docs/PLAN_RESOURCE_CALENDAR.md §6).
+ * (docs/inprogress/PLAN_RESOURCE_CALENDAR.md §6).
  *
  * Everything here is pure: Strapi nodes in, plain objects out. The calendar
  * component only paints — it does not reach into `attributes.data.attributes`,

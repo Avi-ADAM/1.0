@@ -10,23 +10,29 @@
   let { data, form } = $props();
 
   let sending = $state(false);
+  let continuing = $state(false);
 
-  // A successful confirmation never renders — the load redirects. What reaches
-  // this page is a spent/unknown token, a link with no token at all, or Strapi
-  // being unreachable.
+  // `ready`: a link with a token — one button confirms and signs in (the POST
+  // redirects on success, so a good confirmation never renders past it). The
+  // action answers the rest: a spent/unknown token, or Strapi unreachable.
+  const pageState = $derived(form?.state ?? data.state);
   const title = $derived(
-    data.state === 'error'
-      ? $t('auth.confirm.errorTitle')
-      : data.state === 'missing'
-        ? $t('auth.confirm.missingTitle')
-        : $t('auth.confirm.spentTitle')
+    pageState === 'ready'
+      ? $t('auth.confirm.readyTitle')
+      : pageState === 'error'
+        ? $t('auth.confirm.errorTitle')
+        : pageState === 'missing'
+          ? $t('auth.confirm.missingTitle')
+          : $t('auth.confirm.spentTitle')
   );
   const body = $derived(
-    data.state === 'error'
-      ? $t('auth.confirm.errorBody')
-      : data.state === 'missing'
-        ? $t('auth.confirm.missingBody')
-        : $t('auth.confirm.spentBody')
+    pageState === 'ready'
+      ? $t('auth.confirm.readyBody')
+      : pageState === 'error'
+        ? $t('auth.confirm.errorBody')
+        : pageState === 'missing'
+          ? $t('auth.confirm.missingBody')
+          : $t('auth.confirm.spentBody')
   );
 </script>
 
@@ -43,13 +49,24 @@
   <div class="content" in:scale={{ duration: 600, opacity: 0.5, start: 0.96, easing: quintOut }}>
     <div class="mark" aria-hidden="true">💌</div>
 
-    <Plaque {title} sub={data.state === 'spent' ? $t('auth.confirm.spentSub') : ''} />
+    <Plaque {title} sub={pageState === 'spent' ? $t('auth.confirm.spentSub') : ''} />
 
     <div class="tile-info">{body}</div>
 
-    <a href="/login" class="btn btn-key">{$t('auth.confirm.goToLogin')}</a>
+    {#if pageState === 'ready'}
+      <!-- A real POST, not a link: only a person presses it (see the loader). -->
+      <form method="POST" action="?/continue" onsubmit={() => (continuing = true)}>
+        <input type="hidden" name="confirmation" value={data.confirmation} />
+        <input type="hidden" name="email" value={data.email} />
+        <button class="btn btn-key" type="submit" disabled={continuing}>
+          {continuing ? $t('auth.confirm.continuing') : $t('auth.confirm.continue')}
+        </button>
+      </form>
+    {:else}
+      <a href="/login" class="btn btn-key">{$t('auth.confirm.goToLogin')}</a>
+    {/if}
 
-    {#if data.state !== 'error'}
+    {#if pageState !== 'error' && pageState !== 'ready'}
       {#if form?.resent}
         <p class="resent-msg" in:fly={{ y: -4, duration: 300 }}>
           {$t('auth.confirm.resent')}

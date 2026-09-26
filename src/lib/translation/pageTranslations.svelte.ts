@@ -1,6 +1,6 @@
 /**
  * The page half of the UGC translation read path (§4 of
- * docs/PLAN_UGC_TRANSLATION.md) — what every surface's `+page.svelte` did by
+ * docs/inprogress/PLAN_UGC_TRANSLATION.md) — what every surface's `+page.svelte` did by
  * hand, in one place.
  *
  * A loader that called `translateSurface` hands the page two things:

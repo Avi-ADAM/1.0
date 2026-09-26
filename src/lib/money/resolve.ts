@@ -1,5 +1,5 @@
 /**
- * Which currency a stored number is in (docs/PLAN_MULTI_CURRENCY.md D-C2, D-C7).
+ * Which currency a stored number is in (docs/done/PLAN_MULTI_CURRENCY.md D-C2, D-C7).
  *
  * Every `amount` on a rikma row is in the rikma's currency. The rikma's
  * currency is `Project.currencyCode`, and null there is legacy — every rikma

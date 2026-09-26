@@ -1,6 +1,6 @@
 <script>
   /**
-   * The "subsistence stipend" entry point (docs/PLAN_STIPEND.md §8).
+   * The "subsistence stipend" entry point (docs/done/PLAN_STIPEND.md §8).
    *
    * One button, wherever the question naturally comes up:
    *   - on my own mission in progress   → "I need a stipend to keep at this"

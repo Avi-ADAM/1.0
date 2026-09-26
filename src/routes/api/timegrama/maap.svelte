@@ -1,6 +1,6 @@
 <script module>
   /**
-   * Monthly cycle maturation on silence (docs/PLAN_TIMEGRAMA.md, D1).
+   * Monthly cycle maturation on silence (docs/inprogress/PLAN_TIMEGRAMA.md, D1).
    *
    * `/api/monthi` opens a cycle `Maap` for every recurring expense each month
    * and attaches a clock to it. Nothing was ever wired to that clock: the only

@@ -1,6 +1,6 @@
 /**
  * End-to-end money loop of a ONE-MEMBER rikma, from an empty account to a
- * closed profit split. This is the path that docs/QA_SOLO_RIKMA_2026-08.md
+ * closed profit split. This is the path that docs/inprogress/QA_SOLO_RIKMA_2026-08.md
  * found broken in two places, so it is the path worth re-running after a deploy.
  *
  *   node scripts/smoke/flows/solo-money.mjs --yes

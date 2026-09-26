@@ -1,6 +1,6 @@
 /**
  * What "create" on the blueprint review screen actually runs
- * (docs/PLAN_AI_SIGNUP_CONCIERGE.md §4.5) — decided here, purely, so the
+ * (docs/inprogress/PLAN_AI_SIGNUP_CONCIERGE.md §4.5) — decided here, purely, so the
  * order and every param are tested without a server.
  *
  * Nothing new is invented on the write side: each step is one of the actions
@@ -17,7 +17,8 @@
  *    created as that product's bill-of-materials line, not a second time on
  *    its own;
  *  - ticked-off rows that are not dropped become planning-board proposals
- *    (seedPlanBoards), so nothing the person did not explicitly refuse is lost.
+ *    (seedPlanBoards), so nothing the person did not explicitly refuse is lost —
+ *    unless they came from a planning board (`spec.planItem`) and are still on it.
  */
 
 import { DEFAULT_RESTIME } from './blueprint.js';
@@ -125,7 +126,9 @@ export function planMaterialization(
         !inRecipe.has(it.key) &&
         it.status !== 'dropped' &&
         it.status !== 'applied' &&
-        !it.createdRef
+        !it.createdRef &&
+        // Imported from a planning board: it is still there, a copy would duplicate it.
+        !it.spec?.planItem
     )
     .map((it) => it.key);
 
@@ -147,6 +150,8 @@ export interface ParamContext {
   userId: string;
   /** Members of the rikma before this run; a new rikma has one (the founder). */
   memberCount: number;
+  /** Category ids resolved per product key (see $lib/assistant/categories.ts). */
+  categories?: Record<string, string[]>;
   /** Vocabulary ids resolved per mission key (see resolveRowVocabulary). */
   vocab?: Record<string, { skillIds?: string[]; roleIds?: string[]; workwayIds?: string[] }>;
 }
@@ -261,6 +266,7 @@ export function productParams(
     ...(typeof s.isOnline === 'boolean' ? { isOnline: s.isOnline } : {}),
     ...locationParams(state.fields),
     ...(keywords.length ? { discoveryKeywords: (keywords as string[]).join(', ') } : {}),
+    ...(ctx.categories?.[item.key]?.length ? { categoryIds: ctx.categories[item.key] } : {}),
     recipeMissions: recipe.missions.map((m) => ({
       name: m.label,
       hoursPerUnit: num(m.spec?.hours) ?? 0,
@@ -324,7 +330,8 @@ export function leftoverBoards(
           valph: num(s.ratePerHour) ?? null,
           kindOf: str(s.kindOf) ?? null,
           price: num(s.price) ?? null,
-          quantity: num(s.quantity) ?? num(s.quant) ?? null
+          quantity: num(s.quantity) ?? num(s.quant) ?? null,
+          ...(it.group === 'products' ? { keywords: list(s.keywords), categories: list(s.categories) } : {})
         }
       };
     });

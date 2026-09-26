@@ -1,6 +1,6 @@
 /**
  * The budget a stipend proposal should already be holding when the form opens
- * (docs/PLAN_STIPEND.md §6).
+ * (docs/done/PLAN_STIPEND.md §6).
  *
  * Nobody should have to compute the ceiling by hand. Every input it needs is
  * already on the table the moment a mission is chosen: the stipend pays

@@ -1,6 +1,6 @@
 /**
  * `GET /api/fx` — today's reference rates for the browser
- * (docs/PLAN_MULTI_CURRENCY.md D-C6).
+ * (docs/done/PLAN_MULTI_CURRENCY.md D-C6).
  *
  * Public on purpose: a guest reading a product page in dollars needs the rate
  * as much as a member does, and the table is the same published reference

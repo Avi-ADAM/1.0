@@ -45,6 +45,10 @@
       "resource": "Resource",
       "product": "Product",
       "note": "Note"
-    }
+    },
+    "createAll": "Create them all on one screen ({{count}})",
+    "createAllBusy": "Preparing…",
+    "createAllHelp": "The board's products, missions and resources on one review screen: tick what to create and create it in one click.",
+    "createAllError": "We couldn't prepare the review screen. Try again in a moment."
   }
 }

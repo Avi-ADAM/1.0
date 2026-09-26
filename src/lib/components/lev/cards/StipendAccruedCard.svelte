@@ -2,7 +2,7 @@
   import { useFormatMoney } from '$lib/money/context.svelte';
   /**
    * "You have earned ₪600 this month and it has not been paid yet."
-   * (PLAN_STIPEND §6, §8 — docs/FIXES.md §10.)
+   * (PLAN_STIPEND §6, §8 — docs/inprogress/FIXES.md §10.)
    *
    * The one card in this feature with no button, on purpose. The next move
    * belongs to the funder: the recipient cannot settle their own stipend, and

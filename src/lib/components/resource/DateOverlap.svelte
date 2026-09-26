@@ -4,7 +4,7 @@
 
   /**
    * "They asked 1 May – 1 June · you are free 3–20 May · 17 days overlap"
-   * (docs/PLAN_RESOURCE_CALENDAR.md §6.4).
+   * (docs/inprogress/PLAN_RESOURCE_CALENDAR.md §6.4).
    *
    * Renders nothing when the offer already covers the request — `dateMatchFrom`
    * returns null there, and a line that says "yes, fine" on every card is noise.

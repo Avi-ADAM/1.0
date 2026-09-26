@@ -1,5 +1,5 @@
 /**
- * The shift engine's hourly clock (docs/PLAN_SHIFTS.md §7, §8).
+ * The shift engine's hourly clock (docs/inprogress/PLAN_SHIFTS.md §7, §8).
  *
  *   GET /api/cron/shifts?key=<CRON_SECRET>            — tick every active plan
  *   GET /api/cron/shifts?key=…&plan=<id>              — tick one plan

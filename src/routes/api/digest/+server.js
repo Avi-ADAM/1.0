@@ -1,5 +1,5 @@
 /**
- * `GET /api/digest` — the daily digest run (docs/PLAN_DAILY_DIGEST.md §3.4).
+ * `GET /api/digest` — the daily digest run (docs/inprogress/PLAN_DAILY_DIGEST.md §3.4).
  *
  * **Dry only, for now.** Sending needs the `user-digest` collection (§3.3):
  * without `lastSentAt` a retried cron sends twice, and without `cursor` every

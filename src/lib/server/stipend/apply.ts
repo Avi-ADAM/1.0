@@ -1,6 +1,6 @@
 /**
  * Reading a stipend Decision back and applying the version on the table
- * (docs/PLAN_STIPEND.md §5, §6).
+ * (docs/done/PLAN_STIPEND.md §5, §6).
  *
  * Written once and called from two places — the explicit vote and the restime
  * clock — because "approved by everyone" and "nobody objected in time" must

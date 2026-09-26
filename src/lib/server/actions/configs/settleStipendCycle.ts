@@ -1,5 +1,5 @@
 /**
- * Action: settleStipendCycle (docs/PLAN_STIPEND.md §6).
+ * Action: settleStipendCycle (docs/done/PLAN_STIPEND.md §6).
  *
  * The funder closes one cycle. They do **not** type an amount: it is derived
  * from the hours the rikma approved inside the window, at the pledged rate,
@@ -68,7 +68,7 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
   const program = pledge.programId ? await fetchProgram(exec, pledge.programId) : null;
   // What other pledges already paid this person for, and how much equity they
   // have left to give up. Both are rikma-wide facts, not pledge-local ones —
-  // which is exactly why a pledge on its own got them wrong (docs/FIXES.md §2).
+  // which is exactly why a pledge on its own got them wrong (docs/inprogress/FIXES.md §2).
   const [metered, ledger] = await Promise.all([
     fetchMeteredHours(exec, pledge.projectId, pledge.recipientId, from).catch(() => 0),
     fetchRecipientContribution(exec, pledge.projectId, pledge.recipientId).catch(() => null)
@@ -228,7 +228,7 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
       // cycle's end — a date in the future — closed the rest of the month:
       // hours approved after a mid-month settlement fell after the watermark
       // and before the next window, and were never paid at all
-      // (docs/FIXES.md §3). `now` is also the honest statement of fact: this is
+      // (docs/inprogress/FIXES.md §3). `now` is also the honest statement of fact: this is
       // how far the books are settled.
       dateField('lastSettledAt', nowISO),
       cycle.exhausts ? 'status: exhausted' : null

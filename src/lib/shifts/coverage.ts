@@ -1,5 +1,5 @@
 /**
- * coverage — the live picture every shift screen reads (docs/PLAN_SHIFTS.md §6.7):
+ * coverage — the live picture every shift screen reads (docs/inprogress/PLAN_SHIFTS.md §6.7):
  * who comes, who is next in line, where the holes are.
  *
  * Derived from the stored assignments on every read; nothing here is saved.

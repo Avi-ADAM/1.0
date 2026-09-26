@@ -6,7 +6,7 @@ import { validateAttempt } from '$lib/p2p/telemetry.js';
 
 /**
  * POST /api/v1/p2p/telemetry — one line per open attempt
- * (docs/PLAN_P2P_PILOT.md §3).
+ * (docs/inprogress/PLAN_P2P_PILOT.md §3).
  *
  * Signed-in members only (the numbers are about members' devices), shape
  * enforced by `validateAttempt`, which also strips anything not in the shape.

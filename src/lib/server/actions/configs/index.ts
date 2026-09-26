@@ -57,6 +57,7 @@ import { approveMatanotConfig } from './approveMatanot.js';
 import { createRatsonConfig } from './createRatson.js';
 import { matchRatsonConfig } from './matchRatson.js';
 import { refreshWishMatchesConfig } from './refreshWishMatches.js';
+import { fetchExternalOffersConfig, dismissExternalOfferConfig } from './fetchExternalOffers.js';
 import {
   quoteSheirutpendConfig,
   acceptSheirutQuoteConfig,
@@ -149,6 +150,7 @@ import { loadCatalogConfig } from './loadCatalog.js';
 import { toggleGuideStatusConfig } from './toggleGuideStatus.js';
 import { createMissionTemplateConfig } from './createMissionTemplate.js';
 import { offerWishHelpConfig } from './offerWishHelp.js';
+import { offerNewProductsToWishesConfig } from './offerNewProductsToWishes.js';
 import { addAskmChatEntryConfig } from './addAskmChatEntry.js';
 import { addAskChatEntryConfig } from './addAskChatEntry.js';
 import { createSaleConfig } from './createSale.js';
@@ -340,6 +342,8 @@ export function registerAllActions(): void {
   registerAction(createRatsonConfig);
   registerAction(matchRatsonConfig);
   registerAction(refreshWishMatchesConfig);
+  registerAction(fetchExternalOffersConfig);
+  registerAction(dismissExternalOfferConfig);
 
   // Price quotes on product requests (PLAN_CONCIERGE_LOCAL_PROVIDERS §6)
   registerAction(quoteSheirutpendConfig);
@@ -373,6 +377,7 @@ export function registerAllActions(): void {
   registerAction(materializeWishConfig);
   registerAction(publishWishNeedToCommunityConfig);
   registerAction(offerWishHelpConfig);
+  registerAction(offerNewProductsToWishesConfig);
 
   // Decision card display (read action — current vs. proposed values)
   registerAction(getDecisionDetailsConfig);
@@ -486,7 +491,7 @@ export function registerAllActions(): void {
   registerAction(confirmResourceBookingConfig);
   registerAction(cancelResourceBookingConfig);
   registerAction(blockResourceDatesConfig);
-  // Shifts and shared staffing (docs/PLAN_SHIFTS.md §8). All no-op while SHIFTS=off.
+  // Shifts and shared staffing (docs/inprogress/PLAN_SHIFTS.md §8). All no-op while SHIFTS=off.
   for (const config of shiftActionConfigs) registerAction(config);
   // Code rikma — GitHub connection (PLAN_CODE_RIKMA S2)
   registerAction(linkGithubAccountConfig);
@@ -571,6 +576,8 @@ export {
   createRatsonConfig,
   matchRatsonConfig,
   refreshWishMatchesConfig,
+  fetchExternalOffersConfig,
+  dismissExternalOfferConfig,
   quoteSheirutpendConfig,
   acceptSheirutQuoteConfig,
   getSheirutpendQuoteConfig,

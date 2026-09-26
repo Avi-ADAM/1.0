@@ -1,6 +1,6 @@
 <script lang="ts">
   /**
-   * The roster for one cycle (docs/PLAN_SHIFTS.md §6.7, §9.2): who comes, who
+   * The roster for one cycle (docs/inprogress/PLAN_SHIFTS.md §6.7, §9.2): who comes, who
    * is next in line, and where nobody is coming yet.
    *
    * Each name carries the reason it is there (§1.5) — shown on hover and read

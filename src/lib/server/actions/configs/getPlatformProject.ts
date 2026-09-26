@@ -7,7 +7,7 @@
  *
  * Returns { configured, projectId, treasuryUserId }. `configured` is true only
  * when a platform project exists and has at least one member to receive the
- * site-share Haluka. See docs/PLAN_SITE_SHARE.md §2.
+ * site-share Haluka. See docs/done/PLAN_SITE_SHARE.md §2.
  */
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';

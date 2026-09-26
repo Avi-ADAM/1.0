@@ -1,6 +1,6 @@
 /**
  * The server side of "does this acceptance close the mission?"
- * (docs/PLAN_SHIFTS.md §2).
+ * (docs/inprogress/PLAN_SHIFTS.md §2).
  *
  * Both acceptance finalizers used to archive the OpenMission — and every other
  * candidate's Ask — on the first acceptance, whatever `howMeny` said. This

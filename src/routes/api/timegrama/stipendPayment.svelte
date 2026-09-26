@@ -21,7 +21,7 @@
    * Silence maturation moved two people's percentages and told neither — the
    * explicit `confirmStipendPayment` notifies, this path did not, so the one
    * event that happens *without* anybody pressing anything was also the one
-   * nobody heard about (docs/FIXES.md §8). `fetch` is SvelteKit's, so the
+   * nobody heard about (docs/inprogress/FIXES.md §8). `fetch` is SvelteKit's, so the
    * relative call is stamped as internal by `handleFetch`.
    */
   async function announce(fetch, uid, title, body) {

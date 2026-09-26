@@ -1,6 +1,6 @@
 /**
  * Per-surface read wiring for the UGC translation cache (§7 of
- * docs/PLAN_UGC_TRANSLATION.md).
+ * docs/inprogress/PLAN_UGC_TRANSLATION.md).
  *
  * One place, so the P4 rollout is entries in this file rather than translation
  * logic sprinkled through loaders, and so every surface obeys the same rules:

@@ -1,6 +1,6 @@
 /**
  * The shift actions refuse with a code, never with a sentence
- * (docs/PLAN_SHIFTS.md P11): the server does not know the member's language,
+ * (docs/inprogress/PLAN_SHIFTS.md P11): the server does not know the member's language,
  * and a raw English message in a Hebrew card is exactly the regression the
  * i18n rules forbid. The card turns the code back into words through `$t()`.
  *

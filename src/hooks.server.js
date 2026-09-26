@@ -23,7 +23,7 @@ import {
 
 // ── Strapi gate: stamp every server→Strapi request with a shared secret ─────
 // tovmeod's nginx blocks requests without x-strapi-gate once the gate is
-// closed (`strapi-gate close` on the VPS — see docs/PLAN_PROXY_SECURITY.md §10).
+// closed (`strapi-gate close` on the VPS — see docs/done/PLAN_PROXY_SECURITY.md §10).
 // Patching the global fetch here covers every call site (SSR loads, /api
 // routes, actions) without touching them. No-op unless STRAPI_GATE_KEY is set.
 const STRAPI_GATE_KEY = env.STRAPI_GATE_KEY || '';

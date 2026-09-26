@@ -6,7 +6,7 @@ import { PROXY_MAX_BYTES } from '$lib/uploads/policy.js';
 import type { PageServerLoad } from './$types';
 
 /**
- * The rikma's shared library (docs/PLAN_RIKMA_SHARED_INFO.md §5, stage 1).
+ * The rikma's shared library (docs/inprogress/PLAN_RIKMA_SHARED_INFO.md §5, stage 1).
  *
  * One place for the material a partnership actually shares: contracts and
  * scans, photos of the work, and links to whatever already lives in a Drive

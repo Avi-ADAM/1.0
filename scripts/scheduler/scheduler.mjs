@@ -190,6 +190,42 @@ const JOBS = [
     onSuccess(state, now) {
       state.lastDay = dayKey(now);
     }
+  },
+  {
+    name: 'shifts',
+    description: 'shift engine — materialize shifts, open cycles, close rosters',
+    // PLAN_SHIFTS §7, §8. Hourly, beside the timegrama; both close rosters and
+    // both are idempotent. With SHIFTS=off the endpoint answers `skipped` and
+    // touches nothing, so it is safe to schedule before the flag is on.
+    path: CRON_SECRET ? `/api/cron/shifts?key=${encodeURIComponent(CRON_SECRET)}` : '/api/cron/shifts',
+    timeoutMs: num('SCHEDULER_SHIFTS_TIMEOUT_SECONDS', 300) * 1000,
+    due(now, state) {
+      const every = num('SCHEDULER_SHIFTS_MINUTES', 60) * 60 * 1000;
+      if (!state.lastSuccess) return 'never run on this box';
+      const since = now.getTime() - Date.parse(state.lastSuccess);
+      return since >= every ? `${Math.round(since / 60000)}m since the last run` : null;
+    }
+  },
+  {
+    name: 'assistant-cleanup',
+    description: 'agent-prepared signups nobody claimed — delete after 14 days',
+    // PLAN_AI_SIGNUP_CONCIERGE §5.4 (M13). A pending session holds someone's
+    // name, email and words and has no owner; only rows past `claimExpiresAt`
+    // are deleted, never a claimed one.
+    path: CRON_SECRET
+      ? `/api/cron/assistant-cleanup?key=${encodeURIComponent(CRON_SECRET)}`
+      : '/api/cron/assistant-cleanup',
+    timeoutMs: num('SCHEDULER_ASSISTANT_CLEANUP_TIMEOUT_SECONDS', 300) * 1000,
+    due(now, state) {
+      const hour = num('SCHEDULER_ASSISTANT_CLEANUP_HOUR', 6);
+      const day = dayKey(now);
+      if (state.lastDay === day) return null;
+      if (now.getHours() < hour) return null;
+      return `${day} not run yet`;
+    },
+    onSuccess(state, now) {
+      state.lastDay = dayKey(now);
+    }
   }
 ];
 

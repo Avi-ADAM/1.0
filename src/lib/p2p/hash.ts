@@ -1,5 +1,5 @@
 /**
- * Content addressing for the P2P pilot (docs/PLAN_P2P_PILOT.md §2).
+ * Content addressing for the P2P pilot (docs/inprogress/PLAN_P2P_PILOT.md §2).
  *
  * A file is named by the sha256 of its bytes. That is what makes a stranger's
  * bytes safe to accept: the receiver recomputes the hash and compares it with

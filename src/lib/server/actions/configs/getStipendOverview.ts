@@ -1,5 +1,5 @@
 /**
- * Action: getStipendOverview (docs/PLAN_STIPEND.md §8 — the moach tab).
+ * Action: getStipendOverview (docs/done/PLAN_STIPEND.md §8 — the moach tab).
  *
  * One rikma's stipend picture: the programs and what is left of their budgets,
  * every pledge and who is on both ends, what has actually been paid, and — the
@@ -69,7 +69,7 @@ const handler: ActionExecutionHandler = async (params, context) => {
    * Per pledge: what is **owed and not yet paid**, and what is **paid and not
    * yet confirmed**. The rikma could see what had already moved and nothing
    * about what was still coming, which is the half of the question the person
-   * waiting for the money actually asks (docs/FIXES.md §10, §14).
+   * waiting for the money actually asks (docs/inprogress/FIXES.md §10, §14).
    *
    * Same window and same pure function as the settlement — a number here that
    * the pay card would refuse to produce would be worse than no number.
@@ -167,7 +167,7 @@ const handler: ActionExecutionHandler = async (params, context) => {
       })),
       // The cycle-by-cycle ledger. It was always read here and never rendered,
       // so "how much did this person get, and for what" had no screen at all
-      // (docs/FIXES.md §11).
+      // (docs/inprogress/FIXES.md §11).
       payments: payments.map((p) => ({
         ...p,
         funderName: names.get(p.funderId ?? '') ?? '',

@@ -12,7 +12,7 @@
  * The result is the same `{ success, data, error }` shape `executeAction`
  * returns, so a call site only changes its import.
  *
- * See docs/PLAN_PROXY_SECURITY.md §11 and $lib/server/ssrApiBase.js.
+ * See docs/done/PLAN_PROXY_SECURITY.md §11 and $lib/server/ssrApiBase.js.
  */
 
 /**

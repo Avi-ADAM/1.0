@@ -410,6 +410,32 @@
       "title": "One moment - opening your account…",
       "hint": "If this screen doesn't move on within a few seconds, continue from here:",
       "link": "Continue to signup"
+    },
+    "agent": {
+      "banner": "Your assistant filled these in - check them before you sign.",
+      "intent": {
+        "join": "After you confirm your email we'll continue to your profile, with what you told your assistant.",
+        "business": "After you confirm your email you'll land right on the screen that creates the business and products your assistant prepared.",
+        "partnership": "After you confirm your email you'll land right on the screen that creates the partnership your assistant prepared.",
+        "idea": "After you confirm your email you'll land right on the screen that creates the rikma from your idea.",
+        "order": "After you confirm your email you'll land right on your draft wish."
+      },
+      "password": "Password",
+      "password2": "Password again",
+      "passwordRule": "At least 8 characters and one capital English letter",
+      "submit": "Sign and register",
+      "sending": "Registering…",
+      "fine": "Your assistant only filled in the details. Signing, the password and confirming your email are yours alone.",
+      "errors": {
+        "fields": "Please fill in a name and a valid email address.",
+        "countries": "Please choose at least one place in the world.",
+        "agreement": "To continue, sign the agreement.",
+        "weak": "The password needs at least 8 characters and one capital English letter.",
+        "mismatch": "The two passwords don't match.",
+        "expired": "This link has expired. You can register as usual, or ask your assistant for a new link.",
+        "rate-limited": "Too many attempts. Try again in a few minutes.",
+        "failed": "Something went wrong. Try again in a moment."
+      }
     }
   },
   "setitle": "Creating a new reality, together",

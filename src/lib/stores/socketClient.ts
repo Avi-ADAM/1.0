@@ -119,7 +119,7 @@ function createSocketClient() {
   // Space sync wake-ups (HANDOFF_DISTRIBUTED_DB T1). Subscriptions survive
   // reconnects: the set is replayed on every auth_success.
   const spaceSubscriptions = new Set<string>();
-  // Generic channel listeners (the P2P pilot's signaling, docs/PLAN_P2P_PILOT.md).
+  // Generic channel listeners (the P2P pilot's signaling, docs/inprogress/PLAN_P2P_PILOT.md).
   // Kept here, not on the socket, because connect() replaces the socket
   // instance: every (re)created socket gets them re-attached.
   const channelHandlers = new Map<string, Set<(data: any) => void>>();

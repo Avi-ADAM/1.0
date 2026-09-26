@@ -1,5 +1,5 @@
 /**
- * Room tickets for the P2P pilot (docs/PLAN_P2P_PILOT.md §2).
+ * Room tickets for the P2P pilot (docs/inprogress/PLAN_P2P_PILOT.md §2).
  *
  * The socket server cannot ask Strapi who is in a rikma — it has no access to
  * it, on purpose. So this app, which can, checks membership and hands the

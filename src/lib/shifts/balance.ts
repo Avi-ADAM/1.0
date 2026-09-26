@@ -1,5 +1,5 @@
 /**
- * balance — fairness across cycles (docs/PLAN_SHIFTS.md §6.5).
+ * balance — fairness across cycles (docs/inprogress/PLAN_SHIFTS.md §6.5).
  *
  * One cycle's quotas are fair to that cycle only. What stops the same person
  * from being "number one" every week is the carry-over: in each closed cycle,

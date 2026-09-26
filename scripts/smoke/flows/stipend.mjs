@@ -1,5 +1,5 @@
 /**
- * Subsistence stipend between two real members (docs/PLAN_STIPEND.md).
+ * Subsistence stipend between two real members (docs/done/PLAN_STIPEND.md).
  *
  *   node scripts/smoke/flows/two-member.mjs --yes   # once, builds the pair
  *   node scripts/smoke/flows/stipend.mjs --yes

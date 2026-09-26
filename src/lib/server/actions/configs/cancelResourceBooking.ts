@@ -1,5 +1,5 @@
 /**
- * Action: withdraw a resource booking (docs/PLAN_RESOURCE_CALENDAR.md §4).
+ * Action: withdraw a resource booking (docs/inprogress/PLAN_RESOURCE_CALENDAR.md §4).
  *
  * Withdrawing your own claim is not a rejection of anyone — it is the one
  * "no" the consent model has always allowed, because it is about your own

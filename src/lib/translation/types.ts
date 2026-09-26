@@ -1,5 +1,5 @@
 /**
- * Shared types for UGC (T3) translation — see `docs/PLAN_UGC_TRANSLATION.md`.
+ * Shared types for UGC (T3) translation — see `docs/inprogress/PLAN_UGC_TRANSLATION.md`.
  *
  * T1 (UI chrome, `$t()`) and T2 (the shared catalog, Strapi `localizations`)
  * are unaffected by anything in this folder. These types describe only the

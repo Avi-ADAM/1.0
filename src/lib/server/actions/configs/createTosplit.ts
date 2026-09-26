@@ -43,7 +43,7 @@ export const createTosplitConfig: ActionConfig = {
         // member holds the money and owes it to nobody), and in any rikma where
         // the sales happen to land on the right people. Rejecting it left solo
         // rikmas unable to ever close a split, with the sale stuck in
-        // "pending distribution" forever. See docs/QA_SOLO_RIKMA_2026-08.md B1.
+        // "pending distribution" forever. See docs/inprogress/QA_SOLO_RIKMA_2026-08.md B1.
         if (!Array.isArray(value.halukas)) {
           return false;
         }

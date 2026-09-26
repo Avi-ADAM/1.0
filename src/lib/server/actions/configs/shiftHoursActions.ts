@@ -1,5 +1,5 @@
 /**
- * Shifts and hours (docs/PLAN_SHIFTS.md §10). A shift is never hours by
+ * Shifts and hours (docs/inprogress/PLAN_SHIFTS.md §10). A shift is never hours by
  * itself: approved hours are what equity and the stipend are built on, and
  * booking them from a calendar would be exactly the typed-in hours the rikma
  * never signed. So the shift only *offers*:

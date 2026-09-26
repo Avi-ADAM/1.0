@@ -589,6 +589,9 @@ function seedSpec(row: any): Record<string, unknown> {
     if (row.kindOf) spec.kindOf = row.kindOf;
     if (row.price != null) spec.price = row.price;
     if (row.quantity != null) spec.quantity = row.quantity;
+    // How the concierge will find the product once it exists (rikma import).
+    if (row.kind === 'product' && row.keywords?.length) spec.keywords = row.keywords;
+    if (row.kind === 'product' && row.categories?.length) spec.categories = row.categories;
   }
   return spec;
 }

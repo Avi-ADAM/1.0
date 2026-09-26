@@ -1,6 +1,6 @@
 /**
  * Binding the funder a rikma recruited through an open resource request
- * (docs/PLAN_STIPEND.md §12.2, §13).
+ * (docs/done/PLAN_STIPEND.md §12.2, §13).
  *
  * `publishStipendFundingRequest` posts "we need someone to fund our members"
  * as an ordinary `open-mashaabim` with `source: stipend`. Everything after

@@ -1,7 +1,7 @@
 /**
  * Site Share — type definitions.
  *
- * See docs/PLAN_SITE_SHARE.md. The site (the "main rikma" / platform project)
+ * See docs/done/PLAN_SITE_SHARE.md. The site (the "main rikma" / platform project)
  * participates in transactions as a service provider and receives a *suggested*
  * share, woven into the existing Tosplit/Haluka/Hervachti mechanism.
  *

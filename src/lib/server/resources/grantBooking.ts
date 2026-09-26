@@ -1,6 +1,6 @@
 /**
  * Turning an approved resource grant into a ledger row
- * (docs/PLAN_RESOURCE_CALENDAR.md §4).
+ * (docs/inprogress/PLAN_RESOURCE_CALENDAR.md §4).
  *
  * This is the fix for §0.2 bug 4: today, only a *recurring* resource gets a
  * live record (`Mashabetahalich`). A `rent` leaves nothing but a `Rikmash`

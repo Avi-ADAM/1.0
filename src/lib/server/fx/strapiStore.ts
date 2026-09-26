@@ -1,5 +1,5 @@
 /**
- * The `fx-rate` collection as an `FxStore` (docs/PLAN_MULTI_CURRENCY.md D-C5).
+ * The `fx-rate` collection as an `FxStore` (docs/done/PLAN_MULTI_CURRENCY.md D-C5).
  *
  * Service token only: the table is not member data, no user writes it, and a
  * client has no reason to reach it except through `/api/fx`. Needs the

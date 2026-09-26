@@ -7,6 +7,7 @@
   import Mobile from '$lib/components/front/mobile.svelte';
   import { userName } from '$lib/stores/store.js';
   import Amana1 from '$lib/components/main/amana.svelte';
+  import AgentSignup from '$lib/components/main/AgentSignup.svelte';
   import { regHelper } from '$lib/stores/regHelper.js';
   import { onMount } from 'svelte';
   import { email } from '$lib/components/registration/email.js';
@@ -14,12 +15,15 @@
   import { fpval } from '$lib/components/registration/fpval.js';
   import { t, isRtl } from '$lib/translations';
 
-  /** @type {{ data: { concierge?: boolean } }} */
+  /** @type {{ data: { concierge?: boolean, agent?: { token: string, prefill: any } | null } }} */
   let { data } = $props();
 
   let user = 0;
 
   onMount(async () => {
+    // The agent screen is its own flow: none of the "you already started"
+    // redirects below apply to someone arriving with a prepared signup.
+    if (data.agent) return;
     if (document.cookie) {
       const unt = document.cookie
         .split('; ')
@@ -169,7 +173,9 @@ regHelperL = 0;
   <!--{#if user > 0}
 { goto("/lev", )}
 {:else}-->
-  {#if regHelperL == 0}
+  {#if data.agent}
+    <AgentSignup token={data.agent.token} prefill={data.agent.prefill} />
+  {:else if regHelperL == 0}
     <Amana1 />
   {:else if regHelperL == -1}
     <Mobile />

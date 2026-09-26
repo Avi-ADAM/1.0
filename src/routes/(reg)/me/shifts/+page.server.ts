@@ -4,7 +4,7 @@ import { shiftsMode } from '$lib/server/shifts/mode.js';
 import { loadMyAssignments, loadPlanLabels } from '$lib/server/shifts/store.js';
 
 /**
- * /me/shifts — "my coming shifts", across every rikma (docs/PLAN_SHIFTS.md §9.3).
+ * /me/shifts — "my coming shifts", across every rikma (docs/inprogress/PLAN_SHIFTS.md §9.3).
  *
  * Read with the member's own JWT; the user id comes from the signed session,
  * never the URL. A read failure renders as a message, never a 500 — the rest

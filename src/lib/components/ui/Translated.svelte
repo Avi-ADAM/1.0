@@ -2,7 +2,7 @@
   Translated — render user-written text in the reader's language, and say so.
 
   This is the whole visible surface of the UGC translation feature (§4.2 of
-  docs/PLAN_UGC_TRANSLATION.md). The convention it implements is the one every
+  docs/inprogress/PLAN_UGC_TRANSLATION.md). The convention it implements is the one every
   large platform converged on, because it is honest about provenance and it is
   cheap:
 

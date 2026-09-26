@@ -1,6 +1,6 @@
 /**
  * The reader's currency and today's rates, for every component on the page
- * (docs/PLAN_MULTI_CURRENCY.md D-C6, D-C9).
+ * (docs/done/PLAN_MULTI_CURRENCY.md D-C6, D-C9).
  *
  * Context, not a module store: on the server a module-level store is shared by
  * every concurrent request, and one visitor's currency would leak into

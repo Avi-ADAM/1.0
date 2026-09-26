@@ -1,5 +1,5 @@
 /**
- * The backfill driver (§8 of docs/PLAN_UGC_TRANSLATION.md).
+ * The backfill driver (§8 of docs/inprogress/PLAN_UGC_TRANSLATION.md).
  *
  *   npx tsx src/lib/jobs/backfill-translations.ts --status        what's left, what it'd cost
  *   npx tsx src/lib/jobs/backfill-translations.ts --dry           decide out loud, spend nothing

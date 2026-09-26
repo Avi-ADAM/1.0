@@ -166,7 +166,7 @@ const PRE_GUARDS = {
     );
   },
 
-  // The rikma's shared library (docs/PLAN_RIKMA_SHARED_INFO.md §5): contracts,
+  // The rikma's shared library (docs/inprogress/PLAN_RIKMA_SHARED_INFO.md §5): contracts,
   // scans, internal links. Partnership-internal by definition, so members-only
   // on the same lookup as the calendar above.
   '325projectSpaceDocs': async (ctx) => {

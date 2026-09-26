@@ -107,7 +107,8 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
     location_hint = null,
     recipeMissions = [],
     recipeResources = [],
-    discoveryKeywords = null
+    discoveryKeywords = null,
+    categoryIds = []
   } = params as {
     projectId: string;
     name: string;
@@ -132,6 +133,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
     recipeMissions?: RecipeMissionInput[];
     recipeResources?: RecipeResourceInput[];
     discoveryKeywords?: string | null;
+    categoryIds?: string[];
   };
 
   const now = new Date().toISOString();
@@ -267,6 +269,19 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
       );
     } catch (err) {
       console.warn('[createComplexMatanot] discovery keywords not saved:', err);
+    }
+  }
+
+  // Its broad domains (existing Category rows, resolved by the import) — what
+  // matchRatson compares with a wish's own categories. Same best-effort write.
+  const categories = Array.isArray(categoryIds)
+    ? [...new Set(categoryIds.map(String).filter((id) => /^\d+$/.test(id)))].slice(0, 5)
+    : [];
+  if (categories.length) {
+    try {
+      await strapi.execute('375setMatanotCategories', { id: matanotId, categories }, undefined, context.fetch);
+    } catch (err) {
+      console.warn('[createComplexMatanot] categories not saved:', err);
     }
   }
 
@@ -434,7 +449,8 @@ export const createComplexMatanotConfig: ActionConfig = {
     location_hint: { type: 'string', required: false },
     recipeMissions: { type: 'array', required: false },
     recipeResources: { type: 'array', required: false },
-    discoveryKeywords: { type: 'string', required: false, description: 'Comma-separated synonyms / need-terms for concierge discovery (rikma import)' }
+    discoveryKeywords: { type: 'string', required: false, description: 'Comma-separated synonyms / need-terms for concierge discovery (rikma import)' },
+    categoryIds: { type: 'array', required: false, description: "Category ids (default locale) — the product's broad domains (rikma import)" }
   },
   authRules: [
     { type: 'jwt', errorMessage: 'Must be logged in to create a product' },

@@ -1,5 +1,5 @@
 <script>
-  // The "connect your AI agent" guide (docs/PLAN_MCP_SKILL.md).
+  // The "connect your AI agent" guide (docs/done/PLAN_MCP_SKILL.md).
   //
   // Two audiences on one page: someone who has never heard of MCP and needs to
   // know what they are switching on, and someone who just wants the command.

@@ -112,7 +112,7 @@ describe('cycleWindow', () => {
   });
 });
 
-// ── Regressions from the live run of 2026-09-02 (docs/FIXES.md) ─────────────
+// ── Regressions from the live run of 2026-09-02 (docs/inprogress/FIXES.md) ─────────────
 
 describe('computeStipendCycle — hours another pledge already metered', () => {
   it('does not pay twice for hours a second pledge already covered', () => {

@@ -25,6 +25,7 @@ import {
   type MissionRequirements,
   type UserCapabilities
 } from './scoring';
+import { normalizeResourceNode } from '$lib/resources/bookingView';
 import { sendNewSuggestionEmails, type SuggestionRecipient } from './notify';
 import { isLocationCompatible, type GeoLocation } from './geo';
 import { isWithinSendWindow, underDailyCap, capWindowStartIso } from './emailPolicy';
@@ -282,7 +283,7 @@ export async function matchOpenMashaabimToUsers(
           requestEnd: attrs.sqadualedf,
           offerStart: sp.attributes?.sdate,
           offerEnd: sp.attributes?.fdate,
-          resource: { kindOf: sp.attributes?.kindOf, hm: sp.attributes?.hm }
+          resource: normalizeResourceNode(sp)
         });
         if (!best || fit > best.fit) best = { sp, fit };
       }

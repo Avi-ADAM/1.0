@@ -1,5 +1,5 @@
 /**
- * Render tests for the shift grids (docs/PLAN_SHIFTS.md §9.2).
+ * Render tests for the shift grids (docs/inprogress/PLAN_SHIFTS.md §9.2).
  *
  * The availability grid is where a member gives consent (§1.1), so what it
  * sends matters more than how it looks: one tap must send exactly the next

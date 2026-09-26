@@ -131,7 +131,7 @@
         // mission done. Only the hours this completion adds — the accumulated
         // rows from the timer saves are still on the books and still counted,
         // so writing the running total here counted the whole history twice in
-        // every percentage the rikma has (docs/FIXES.md §5). Same rule as
+        // every percentage the rikma has (docs/inprogress/FIXES.md §5). Same rule as
         // closeFiniapruval.ts, which is the explicit-vote twin of this path.
         finnishedMissionMutation = `
           createFinnishedMission(data: {

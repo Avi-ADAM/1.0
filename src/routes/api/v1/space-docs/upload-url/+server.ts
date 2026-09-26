@@ -7,7 +7,7 @@ import { checkUpload } from '$lib/uploads/policy.js';
 
 /**
  * POST /api/v1/space-docs/upload-url — a one-object upload ticket
- * (docs/PLAN_RIKMA_SHARED_INFO.md §6 stage 2).
+ * (docs/inprogress/PLAN_RIKMA_SHARED_INFO.md §6 stage 2).
  *
  * Body: `{ projectId, fileName, mime, size }`. Answers with a key under the
  * rikma's own prefix and a PUT URL signed for exactly that key and that

@@ -1,6 +1,6 @@
 /**
  * The rikma's shared library — create, edit and archive
- * (docs/PLAN_RIKMA_SHARED_INFO.md §3.1, §5, §6 stage 1).
+ * (docs/inprogress/PLAN_RIKMA_SHARED_INFO.md §3.1, §5, §6 stage 1).
  *
  * Three actions over one collection, `space-doc`: a row is either an uploaded
  * **file**, an uploaded **image**, or a **link** to something that lives

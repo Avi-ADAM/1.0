@@ -1,6 +1,6 @@
 /**
  * availability — the single source of truth for "is this resource free?"
- * (docs/PLAN_RESOURCE_CALENDAR.md §3).
+ * (docs/inprogress/PLAN_RESOURCE_CALENDAR.md §3).
  *
  * Pure and deterministic, so the same answer is produced by the action that
  * opens a hold, by the calendar that paints the month, and by the matching

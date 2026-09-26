@@ -45,6 +45,10 @@
       "resource": "Recurso",
       "product": "Producto",
       "note": "Nota"
-    }
+    },
+    "createAll": "Crearlo todo en una pantalla ({{count}})",
+    "createAllBusy": "Preparando…",
+    "createAllHelp": "Los productos, misiones y recursos del tablero en una sola pantalla de revisión: marca qué crear y créalo con un clic.",
+    "createAllError": "No pudimos preparar la pantalla de revisión. Inténtalo de nuevo en un momento."
   }
 }

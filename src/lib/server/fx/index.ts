@@ -1,5 +1,5 @@
 /**
- * Server entry point for exchange rates (docs/PLAN_MULTI_CURRENCY.md §4).
+ * Server entry point for exchange rates (docs/done/PLAN_MULTI_CURRENCY.md §4).
  * `serverRates()` is what loaders and actions call; the pieces behind it are
  * pure enough to test with fakes (`rates.ts`, `providers.ts`).
  */

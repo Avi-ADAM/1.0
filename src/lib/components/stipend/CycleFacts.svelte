@@ -9,7 +9,7 @@
    * nothing else. The recipient was asked to confirm ₪2,100 with no way to see
    * which mission it answered or which month it covered, and the sentence
    * "confirming updates the shares" never said by how much
-   * (docs/FIXES.md §12, §13).
+   * (docs/inprogress/FIXES.md §12, §13).
    *
    * One component, so the funder's card and the recipient's card can never
    * describe the same cycle differently.

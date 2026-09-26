@@ -6,7 +6,7 @@
    * `computeMissionEquity` module and the rikma summary is fetched (once per
    * rikma) through `projectValueStore`.
    *
-   * See docs/PLAN_MISSION_EQUITY_PREVIEW.md §4. Fails silent — if the summary
+   * See docs/done/PLAN_MISSION_EQUITY_PREVIEW.md §4. Fails silent — if the summary
    * query errors or the viewer lacks read access, the widget renders nothing so
    * a host card never breaks.
    */

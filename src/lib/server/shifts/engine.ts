@@ -1,5 +1,5 @@
 /**
- * The roster engine (docs/PLAN_SHIFTS.md §7): what moves a cycle from
+ * The roster engine (docs/inprogress/PLAN_SHIFTS.md §7): what moves a cycle from
  * "members are declaring" to "the roster is final".
  *
  *   tickPlan      — the cron, hourly: materialize the pattern over the horizon,

@@ -1,6 +1,6 @@
 /**
  * A per-caller rolling-window limiter for `/api/translate/warm` (§5.3 of
- * docs/PLAN_UGC_TRANSLATION.md).
+ * docs/inprogress/PLAN_UGC_TRANSLATION.md).
  *
  * The governor bounds what the *site* may spend in a day. This bounds what one
  * *caller* may spend in a minute, and the two answer different questions: the

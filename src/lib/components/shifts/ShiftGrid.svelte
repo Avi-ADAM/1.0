@@ -1,6 +1,6 @@
 <script lang="ts">
   /**
-   * The shared shift grid (docs/PLAN_SHIFTS.md §5, §9.2): one column per day
+   * The shared shift grid (docs/inprogress/PLAN_SHIFTS.md §5, §9.2): one column per day
    * of a cycle, each day's shifts stacked in it.
    *
    * Built here rather than on @event-calendar on purpose (§5.2): a shift is a

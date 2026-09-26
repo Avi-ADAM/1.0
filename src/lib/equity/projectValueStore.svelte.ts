@@ -3,7 +3,7 @@
  * `getProjectValueSummary` qid, so that N equity previews from the same rikma
  * (several lev cards rendering together) fire a *single* network call.
  *
- * See docs/PLAN_MISSION_EQUITY_PREVIEW.md §3.2.
+ * See docs/done/PLAN_MISSION_EQUITY_PREVIEW.md §3.2.
  */
 
 import { sendToSer } from '$lib/send/sendToSer.js';

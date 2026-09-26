@@ -8,6 +8,7 @@
    * crtask.svelte / ResourceCreator.svelte), where the user reviews and
    * approves it. Only then does the parent call `markPlanItemCreated`.
    */
+  import { goto } from '$app/navigation';
   import { lang } from '$lib/stores/lang.js';
   import { t } from '$lib/translations';
   import { executeAction } from '$lib/client/actionClient';
@@ -102,6 +103,43 @@
 
   const dismiss = (item) => patchItem(item, { status: 'dismissed' });
   const restore = (item) => patchItem(item, { status: 'proposed' });
+
+  /**
+   * Rows the one review screen can create together (PLAN_AI_SIGNUP_CONCIERGE
+   * §4.5): products, missions and resources not yet created or set aside. Acts
+   * still open in their own form — they hang on a running mission.
+   */
+  const IMPORTABLE_KINDS = new Set(['product', 'mission', 'resource']);
+  let importableCount = $derived(
+    items.filter(
+      (item) =>
+        IMPORTABLE_KINDS.has(item.attributes?.kind) &&
+        ['proposed', 'accepted'].includes(item.attributes?.status ?? 'proposed')
+    ).length
+  );
+  let importing = $state(false);
+  let importError = $state('');
+
+  /** Hand the board's open rows to the review screen; nothing is created here. */
+  async function createAll() {
+    if (importing) return;
+    importing = true;
+    importError = '';
+    try {
+      const res = await executeAction(
+        'importPlanBoardRows',
+        { projectId: String(projectId), boardId: String(board.id) },
+        { showErrorToast: false }
+      );
+      if (res.success && res.data?.reviewPath) {
+        await goto(res.data.reviewPath);
+        return;
+      }
+      importError = res?.error?.message || $t('planning.board.createAllError');
+    } finally {
+      importing = false;
+    }
+  }
 </script>
 
 <!-- The board floats on the planning panel's ramp, which never darkens — so no
@@ -132,6 +170,18 @@
             <li>{hint.text}</li>
           {/each}
         </ul>
+      </div>
+    {/if}
+
+    {#if importableCount >= 2}
+      <div class="mb-3 flex flex-wrap items-center gap-2 rounded-xl border border-barbi/30 bg-white/70 p-3">
+        <Button onClick={createAll} disabled={importing}>
+          {importing ? $t('planning.board.createAllBusy') : $t('planning.board.createAll', { count: importableCount })}
+        </Button>
+        <span class="text-xs text-[color:var(--ramp-ink,#16131b)]">{$t('planning.board.createAllHelp')}</span>
+        {#if importError}
+          <span class="text-xs text-red-800" role="alert">{importError}</span>
+        {/if}
       </div>
     {/if}
 

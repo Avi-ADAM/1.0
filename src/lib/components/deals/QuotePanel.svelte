@@ -1,7 +1,7 @@
 <script lang="ts">
   /**
    * Price negotiation on a product request — both sides see the same panel
-   * (docs/PLAN_CONCIERGE_LOCAL_PROVIDERS.md §6). The rules are
+   * (docs/inprogress/PLAN_CONCIERGE_LOCAL_PROVIDERS.md §6). The rules are
    * src/lib/sheirut/quoteState.ts; this only shows them and calls the actions.
    *
    * Seller: an open price asks for a quote; any version the customer put on the

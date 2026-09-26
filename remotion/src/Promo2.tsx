@@ -4,7 +4,7 @@
  * סרטון סיור מלא בתהליך: הרשמה → רקמה → משימות → מו"מ → אשרור → מוצרים → חלוקה
  * ~42 שניות @ 30fps
  *
- * להחלפת Placeholder בנכסים אמיתיים — ראו docs/REMOTION_PROMO2_PLAN.md
+ * להחלפת Placeholder בנכסים אמיתיים — ראו docs/done/REMOTION_PROMO2_PLAN.md
  */
 import React from 'react';
 import {AbsoluteFill, Audio, staticFile} from 'remotion';

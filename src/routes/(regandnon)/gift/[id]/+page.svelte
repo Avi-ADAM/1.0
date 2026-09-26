@@ -28,7 +28,7 @@
   let quantity = $state(1);
   // Priced by quote (a grocery basket): the buyer may leave the price empty
   // and describe what she needs — the seller names the price on the request
-  // (docs/PLAN_CONCIERGE_LOCAL_PROVIDERS.md §6).
+  // (docs/inprogress/PLAN_CONCIERGE_LOCAL_PROVIDERS.md §6).
   const byQuote = data.alld?.pricingMode === 'quote';
   let price = $state(byQuote ? null : data.alld?.price || 0);
   let orderNote = $state('');

@@ -1,6 +1,6 @@
 # Space Sync — שכבת הדאטהבייס המבוזר (S2a), מדריך הפעלה
 
-> מימוש שלב **S2a** מ-[PLAN_serverless_p2p_data.md](./PLAN_serverless_p2p_data.md) §3 ו-§12:
+> מימוש שלב **S2a** מ-[PLAN_serverless_p2p_data.md](./inprogress/PLAN_serverless_p2p_data.md) §3 ו-§12:
 > relay מוצפן-בעתיד + פרוטוקול סנכרון heads/diff. רץ **במקביל** למערכת הקיימת
 > (Strapi/GraphQL) ולא נוגע בה — בדיוק כמו שלב ה-shadow של תכנית ההסכמות.
 
@@ -120,4 +120,4 @@ await replica.publishSealed(userId, {
 ## מה הלאה
 
 ההמשך המלא, כולל תור משימות מפורט, אינווריאנטים שאסור לשבור ומלכודות
-סביבה — ב-[HANDOFF_DISTRIBUTED_DB.md](./HANDOFF_DISTRIBUTED_DB.md).
+סביבה — ב-[HANDOFF_DISTRIBUTED_DB.md](./inprogress/HANDOFF_DISTRIBUTED_DB.md).

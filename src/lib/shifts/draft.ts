@@ -1,6 +1,6 @@
 /**
  * draftRoster — who comes to which shift, and who is next in line
- * (docs/PLAN_SHIFTS.md §6.3). The heart of the shift system.
+ * (docs/inprogress/PLAN_SHIFTS.md §6.3). The heart of the shift system.
  *
  * Rules this function never breaks, whatever the input:
  *

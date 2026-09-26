@@ -16,7 +16,7 @@
   onMount(async () => {
     try {
       const res = await sendToSer({ id: voteId }, 'getVote', null, null, false, fetch);
-      vote = res?.data?.vot?.data;
+      vote = res?.data?.vote?.data;
       if (vote) {
         moachStore.updateEntity(projectId, voteId, vote);
       }
@@ -25,13 +25,16 @@
     }
   });
 
+  // `what` on a Vote is the member's stance (Boolean), not a text title.
+  let stance = $derived(vote ? $t(vote.attributes.what ? 'moach.vote.voteYes' : 'moach.vote.voteNo') : '');
+
   let jsonLd = $derived(vote ? {
     "@context": "https://schema.org",
     "@type": "MoachEntity",
     "entityType": "vote",
     "id": voteId,
     "projectId": projectId,
-    "title": vote.attributes.what,
+    "title": stance,
     "status": "open",
     "availableActions": [
       { "id": "vote-yes", "label": $t('moach.vote.voteYes'), "method": "POST", "actionKey": "voteYes" },
@@ -42,8 +45,8 @@
 
 <svelte:head>
   {#if vote}
-    <title>{vote.attributes.what} - Vote</title>
-    <meta name="moach:entity-type" content="vot" />
+    <title>{stance} - Vote</title>
+    <meta name="moach:entity-type" content="vote" />
     <meta name="moach:entity-id" content={voteId} />
     <meta name="moach:project-id" content={projectId} />
     <script type="application/ld+json">
@@ -60,7 +63,7 @@
       <nav class="text-sm text-gray-500 mb-2">
         Moach > {projectId} > Votes
       </nav>
-      <h1 class="text-2xl font-bold text-gray-900">{vote.attributes.what}</h1>
+      <h1 class="text-2xl font-bold text-gray-900">{stance}</h1>
     </header>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">

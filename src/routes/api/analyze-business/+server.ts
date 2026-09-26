@@ -1,8 +1,12 @@
 // POST /api/analyze-business
 // Body: { url: string } OR { text: string }, plus optional { lang, withPlan }
-// Returns: { ok, name, desc, details, vals[], plan } — the pre-fill payload for
-// /me?action=createproject, and the starter planning boards the member will
-// review row by row after approving the rikma (PLAN_ONBOARDING Track B).
+// Returns: { ok, name, desc, details, vals[], plan, blueprint } — the pre-fill
+// payload for /me?action=createproject, the starter planning boards the member
+// will review row by row after approving the rikma (PLAN_ONBOARDING Track B),
+// and the same draft as a rikma blueprint. The onboarding screen hands the
+// blueprint to `proposeRikmaBlueprint` so everything is reviewed and created on
+// one screen (PLAN_AI_SIGNUP_CONCIERGE §4.3); it is null when the plan has no
+// product, mission or resource row.
 //
 // Two model calls, deliberately separate: the project fields are the critical
 // path the member is waiting for, and a failed plan draft must not cost them
@@ -14,7 +18,8 @@ import type { RequestHandler } from '@sveltejs/kit';
 import { Agent } from '@mastra/core/agent';
 import { createGoogleModel } from '../../../mastra/lib/createModel';
 import { fetchSiteSummary } from '$lib/server/planning/siteContext.js';
-import { generateSeedPlan, countSeedItems } from '$lib/server/planning/seedPlan.js';
+import { generateSeedPlan, countSeedItems, type SeedBoard } from '$lib/server/planning/seedPlan.js';
+import { seedPlanToBlueprint } from '$lib/assistant/fromSeedPlan.js';
 
 const MIN_TEXT = 50;
 /** Enough of a landing page for both the extraction and the plan to be specific. */
@@ -185,11 +190,15 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
     }
   }
 
+  // The same draft as a rikma blueprint, for the one review screen.
+  const blueprint = plan ? seedPlanToBlueprint(extracted, plan.boards as SeedBoard[], { sourceUrl }) : null;
+
   return json({
     ok: true,
     lang,
     ...extracted,
     plan,
+    blueprint,
     planBoardCount: plan?.boards.length ?? 0,
     planItemCount
   });

@@ -1,4 +1,4 @@
-// Daily digest queries (docs/PLAN_DAILY_DIGEST.md §3.5). Spread into `qids` in
+// Daily digest queries (docs/inprogress/PLAN_DAILY_DIGEST.md §3.5). Spread into `qids` in
 // qids.js; kept dependency-free for the same reason qids.js is (the scripts
 // import it under plain node).
 //

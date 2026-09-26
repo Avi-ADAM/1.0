@@ -1,7 +1,7 @@
 # src-tauri — מעטפת המובייל
 
 מעטפת Tauri v2 שאורזת את `www.1lev1.com` לאפליקציית אנדרואיד (ובהמשך iOS).
-התכנית המלאה נמצאת ב-[`../docs/PLAN_TAURI_MOBILE.md`](../docs/PLAN_TAURI_MOBILE.md).
+התכנית המלאה נמצאת ב-[`../docs/inprogress/PLAN_TAURI_MOBILE.md`](../docs/inprogress/PLAN_TAURI_MOBILE.md).
 המסמך הזה מסביר רק את מה שלא מובן מאליו כשפותחים את התיקייה.
 
 ## הרצה

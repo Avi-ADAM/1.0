@@ -1,6 +1,6 @@
 /**
  * `setRikmaCurrency` — choose the currency a rikma counts in
- * (docs/PLAN_MULTI_CURRENCY.md D-C8).
+ * (docs/done/PLAN_MULTI_CURRENCY.md D-C8).
  *
  * Deliberately **not** part of `updateProjectDetails`: the other fields there
  * are text, and a wrong one is a typo. This one re-denominates every number in

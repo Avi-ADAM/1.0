@@ -1,5 +1,5 @@
 /**
- * Action: markStipendTransferSent (docs/PLAN_STIPEND.md §6).
+ * Action: markStipendTransferSent (docs/done/PLAN_STIPEND.md §6).
  *
  * The second half of a cycle the funder closed before the money moved.
  * `settleStipendCycle({ transferred: false })` fixed the amount — derived from

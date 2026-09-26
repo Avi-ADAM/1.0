@@ -1,5 +1,5 @@
 /**
- * One storage interface, two drivers (docs/PLAN_RIKMA_SHARED_INFO.md §6 stage 2).
+ * One storage interface, two drivers (docs/inprogress/PLAN_RIKMA_SHARED_INFO.md §6 stage 2).
  *
  * - **local** (`SPACE_DOCS_DIR`) — a private folder on the API host. No third
  *   party, no account, no card. This is the default choice.

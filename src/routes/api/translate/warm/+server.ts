@@ -1,6 +1,6 @@
 /**
  * `POST /api/translate/warm` — fill cache misses for a reader who is on the
- * page right now (§4.1, §5 of docs/PLAN_UGC_TRANSLATION.md).
+ * page right now (§4.1, §5 of docs/inprogress/PLAN_UGC_TRANSLATION.md).
  *
  * The read path never waits on this. A loader renders the author's own words
  * and hands the client its miss list; the client posts the list here,

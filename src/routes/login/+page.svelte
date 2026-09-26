@@ -247,7 +247,14 @@
     type="button"
     class="auth-secondary"
     onclick={() =>
-      goto(`/${data?.from ? `?from=${encodeURIComponent(data.from)}` : ``}`)}
+      goto(
+        // Signing up from an agent's connect window (OAuth): the agreement
+        // remembers where to come back, and the email confirmation returns
+        // there (PLAN_AI_SIGNUP_CONCIERGE §5.2).
+        data?.from?.startsWith('/mcp-connect')
+          ? `/hascama?next=${encodeURIComponent(data.from)}`
+          : `/${data?.from ? `?from=${encodeURIComponent(data.from)}` : ``}`
+      )}
   >
     {$t('auth.login.signupLink')}
   </button>

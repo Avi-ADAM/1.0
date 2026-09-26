@@ -1,6 +1,6 @@
 /**
  * settings — the timing of a shift plan and its roster cycles
- * (docs/PLAN_SHIFTS.md §3.7, §7).
+ * (docs/inprogress/PLAN_SHIFTS.md §3.7, §7).
  *
  * Every timing field on `shift-plan` is nullable on purpose: NULL inherits the
  * rikma's default on `Project`, and a NULL there falls back to the constants

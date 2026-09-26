@@ -1,6 +1,6 @@
 /**
  * quota — how many "number one" places each member gets in a cycle
- * (docs/PLAN_SHIFTS.md §6.2).
+ * (docs/inprogress/PLAN_SHIFTS.md §6.2).
  *
  * The rule, in the sentence the UI shows: **everyone gets the same number,
  * except where their own commitment caps them lower or floors them higher.**

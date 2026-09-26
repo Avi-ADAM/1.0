@@ -2,7 +2,7 @@
  * Coverage test for the /api/send permission manifest.
  *
  * Fails when qids.js and qidsAccess.js drift apart, so adding a new qid
- * forces a conscious classification (see docs/PLAN_API_PERMISSIONS.md).
+ * forces a conscious classification (see docs/done/PLAN_API_PERMISSIONS.md).
  */
 
 import { describe, it, expect } from 'vitest';

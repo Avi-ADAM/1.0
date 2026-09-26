@@ -1,5 +1,5 @@
 /**
- * Planning the M2 backfill (docs/PLAN_RESOURCE_CALENDAR.md §8).
+ * Planning the M2 backfill (docs/inprogress/PLAN_RESOURCE_CALENDAR.md §8).
  *
  * Every grant that ever went out already left a row — a `Rikmash` archive, and
  * for a recurring resource a live `Mashabetahalich` beside it. The ledger was

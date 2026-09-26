@@ -1,6 +1,6 @@
 /**
  * Validation of machine-translation output (§5.5 of
- * docs/PLAN_UGC_TRANSLATION.md).
+ * docs/inprogress/PLAN_UGC_TRANSLATION.md).
  *
  * **A model response is untrusted input.** It is the one place in this system
  * where text nobody wrote and nobody reviewed is about to be stored under a

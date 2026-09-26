@@ -164,7 +164,7 @@ const finalizeJoinAcceptanceHandler: ActionExecutionHandler = async (params, con
 
   // A mission created for several people (`howMeny`) does not close on the
   // first person to join: the need is still on the table, and so are the other
-  // candidacies (docs/PLAN_SHIFTS.md §2). Read before the mutation, because
+  // candidacies (docs/inprogress/PLAN_SHIFTS.md §2). Read before the mutation, because
   // afterwards this acceptance is already part of the count.
   const headcount = await acceptanceEffect(strapi, context, openMid);
 
@@ -310,7 +310,7 @@ const finalizeJoinAcceptanceHandler: ActionExecutionHandler = async (params, con
   // actually full — archive the other candidates' asks. While seats remain,
   // those candidacies are still live proposals on a need that still exists;
   // archiving them would silently withdraw people who never withdrew
-  // (docs/PLAN_SHIFTS.md §2.2). Runs for BOTH variants — a single-member
+  // (docs/inprogress/PLAN_SHIFTS.md §2.2). Runs for BOTH variants — a single-member
   // (solo) project still needs sibling asks archived once it closes.
   const otherAsks: any[] = openMissionAttrs.asks?.data || [];
   const siblingAsks = otherAsks.filter((a) => String(a.id) !== String(askId));

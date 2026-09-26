@@ -1,6 +1,6 @@
 /**
  * What the backfill walks, and why exactly that (§15.3.2 of
- * docs/PLAN_UGC_TRANSLATION.md).
+ * docs/inprogress/PLAN_UGC_TRANSLATION.md).
  *
  * §8.2 ranked "public / SEO surfaces" second. P3 promotes it to first and
  * *defines* it, because "the strings a guest can reach" is not a guess: it is

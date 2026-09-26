@@ -1,6 +1,6 @@
 <!--
   MoneyInput — an amount and the currency it is typed in
-  (docs/PLAN_MULTI_CURRENCY.md §1.1: "you write in your currency").
+  (docs/done/PLAN_MULTI_CURRENCY.md §1.1: "you write in your currency").
 
   The currency defaults to the writer's own. When it differs from the rikma's,
   a line under the field says what the rikma will record, at today's rate —

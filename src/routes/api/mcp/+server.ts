@@ -22,7 +22,7 @@ import { z } from 'zod';
 import { wrapMcpTool } from '$lib/server/mcp/guard';
 import { MCP_TOOL_MANIFEST, tierAllowed, entryEnabled } from '$lib/server/mcp/toolManifest';
 import { MCP_INSTRUCTIONS, mcpInstructions } from '$lib/server/mcp/instructions';
-import { assistantMcpEnabled } from '../../../mastra/tools/assistantTools';
+import { assistantMcpEnabled, makePrepareSignupTool } from '../../../mastra/tools/assistantTools';
 import { normalizeApiKeyScopes } from '$lib/server/apiKeys';
 
 // --- Public Tools for Unauthenticated Users ---
@@ -138,7 +138,7 @@ function keyOps(user: any): string[] {
 }
 
 // Process incoming MCP requests, mapping SvelteKit structures to fetch-to-node for Mastra Serverless HTTP
-async function handleMcpRequest(request: Request, url: URL, svelteFetch: typeof fetch): Promise<Response> {
+async function handleMcpRequest(request: Request, url: URL, svelteFetch: typeof fetch, clientIp = ''): Promise<Response> {
     // 1. Extract API Key from Authorization Header (Optional for public info)
     const authHeader = request.headers.get('Authorization');
     let user = null;
@@ -244,6 +244,13 @@ async function handleMcpRequest(request: Request, url: URL, svelteFetch: typeof 
                 howToConnect,
                 createNewApiKey
             };
+            // Someone without an account, talking to their agent: the agent can
+            // prepare the signup — one prefilled screen the person signs
+            // themselves (PLAN_AI_SIGNUP_CONCIERGE §5.1). Built per request so
+            // its rate limit knows the caller's address.
+            if (assistantMcpEnabled()) {
+                toolsToExpose.prepareSignup = makePrepareSignupTool(clientIp, svelteFetch);
+            }
         }
     }
 
@@ -266,7 +273,7 @@ async function handleMcpRequest(request: Request, url: URL, svelteFetch: typeof 
                 ? undefined
                 : user
                     ? mcpInstructions({ rikmaImport: assistantMcpEnabled() })
-                    : MCP_INSTRUCTIONS,
+                    : mcpInstructions({ rikmaImport: false, publicSignup: assistantMcpEnabled() }),
             agents: agentsToExpose,
             workflows: workflowsToExpose,
             tools: toolsToExpose
@@ -328,13 +335,22 @@ async function handleMcpRequest(request: Request, url: URL, svelteFetch: typeof 
 }
 
 // We expose both GET mapping and POST mapping requests directly connecting to the new MCP Server
-export const GET: RequestHandler = async ({ request, url, fetch }) => {
-    return handleMcpRequest(request, url, fetch);
+export const GET: RequestHandler = async ({ request, url, fetch, getClientAddress }) => {
+    return handleMcpRequest(request, url, fetch, safeAddress(getClientAddress));
 };
 
-export const POST: RequestHandler = async ({ request, url, fetch }) => {
-    return handleMcpRequest(request, url, fetch);
+export const POST: RequestHandler = async ({ request, url, fetch, getClientAddress }) => {
+    return handleMcpRequest(request, url, fetch, safeAddress(getClientAddress));
 };
+
+/** getClientAddress throws where the adapter cannot tell; the limiter then buckets by 'unknown'. */
+function safeAddress(get: () => string): string {
+    try {
+        return get();
+    } catch {
+        return '';
+    }
+}
 
 export const OPTIONS: RequestHandler = async () => {
     return new Response(null, {

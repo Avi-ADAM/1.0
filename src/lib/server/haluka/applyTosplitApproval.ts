@@ -6,7 +6,7 @@
  * with nobody objecting (the timegrama finalizer). Those must not be able to
  * produce different outcomes, so both call this — the same rule
  * `applyStandingVersion` follows for archive proposals and `applyStandingStipend`
- * for stipends (docs/PLAN_TIMEGRAMA.md §6, rule 7).
+ * for stipends (docs/inprogress/PLAN_TIMEGRAMA.md §6, rule 7).
  *
  * What "applied" means, in order:
  *   1. the Tosplit is marked `finished` and its votes recorded;

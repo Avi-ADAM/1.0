@@ -2,7 +2,7 @@
  * Shared negotiation gate for open-offer candidacy (Ask / Askm).
  *
  * The auto-approval decision for the 4 candidacy paths (see
- * docs/PLAN_NEGOTIATION_CANDIDATES.md §A) is derived purely from the rounds
+ * docs/done/PLAN_NEGOTIATION_CANDIDATES.md §A) is derived purely from the rounds
  * (Negopendmission / NegoMash) plus the entity's vots — there are no scalar
  * negotiation-state fields. This module is the single source of truth for that
  * derivation, used by both cron finalizers (ask.svelte / askm.svelte) and,

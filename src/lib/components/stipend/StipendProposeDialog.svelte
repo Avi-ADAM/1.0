@@ -1,7 +1,7 @@
 <script>
   import { useFormatMoney } from '$lib/money/context.svelte';
   /**
-   * The dialog behind every "מלגת קיום" button (docs/PLAN_STIPEND.md §8).
+   * The dialog behind every "מלגת קיום" button (docs/done/PLAN_STIPEND.md §8).
    *
    * One component, three entry points, because the plan's model is one
    * mechanism with parameters rather than four separate flows:

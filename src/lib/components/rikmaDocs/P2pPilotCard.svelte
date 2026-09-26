@@ -1,6 +1,6 @@
 <script>
   /**
-   * The P2P pilot's consent and status card (docs/PLAN_P2P_PILOT.md §2).
+   * The P2P pilot's consent and status card (docs/inprogress/PLAN_P2P_PILOT.md §2).
    *
    * Opt-in per device, because joining costs the member something real: their
    * upload bandwidth, some browser storage, and — with plain STUN — their

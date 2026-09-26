@@ -1,6 +1,6 @@
 /**
  * The dials of the UGC translation write path (§5.2 of
- * docs/PLAN_UGC_TRANSLATION.md) — read from the environment, in one place.
+ * docs/inprogress/PLAN_UGC_TRANSLATION.md) — read from the environment, in one place.
  *
  * Two rules this file exists to enforce:
  *

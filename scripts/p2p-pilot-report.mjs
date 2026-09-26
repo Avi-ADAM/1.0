@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Turn the P2P pilot's telemetry into the numbers docs/PLAN_P2P_PILOT.md §3
+ * Turn the P2P pilot's telemetry into the numbers docs/inprogress/PLAN_P2P_PILOT.md §3
  * decides on.
  *
  *   node scripts/p2p-pilot-report.mjs <file> [--json]

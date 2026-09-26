@@ -1,5 +1,5 @@
 /**
- * Action: proposeStipendProgram (docs/PLAN_STIPEND.md §4).
+ * Action: proposeStipendProgram (docs/done/PLAN_STIPEND.md §4).
  *
  * The rikma-wide half. A program is what makes a *diluting* stipend possible:
  * the rikma agrees once, in principle, to a closed budget and a cost-sharing
@@ -135,7 +135,7 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
   }
 
   // A program carries a concrete pledge underneath it, so it can create the
-  // same double-metering a second bare pledge would (docs/FIXES.md §2). Same
+  // same double-metering a second bare pledge would (docs/inprogress/FIXES.md §2). Same
   // rule, checked in the same place in the flow.
   if (recipientId) {
     const live = await fetchProjectPledges(exec, projectId, ['proposed', 'active']).catch(() => []);

@@ -1,6 +1,6 @@
 /**
  * Money inside a server-written sentence — a notification body, a Decision's
- * name, an email line (docs/PLAN_MULTI_CURRENCY.md C7).
+ * name, an email line (docs/done/PLAN_MULTI_CURRENCY.md C7).
  *
  * These strings are built per recipient language, so they cannot go through
  * `$t()` or `<Money>`. What they need is the same two facts every rendered

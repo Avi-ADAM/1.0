@@ -1,6 +1,6 @@
 /**
  * The `assistant-session` row: load, create, save with a version check
- * (docs/PLAN_AI_SIGNUP_CONCIERGE.md §3.3).
+ * (docs/inprogress/PLAN_AI_SIGNUP_CONCIERGE.md §3.3).
  *
  * Every read and write goes through the service token (qids 363–366 are
  * serviceAdmin-only) — the callers are the assistant actions, which decide
@@ -24,6 +24,8 @@ export interface SessionRow {
   projectId: string | null;
   projectName: string | null;
   ratsonId: string | null;
+  /** The signatory row a pending (agent-prepared) session is claimed through (§5.4). */
+  chezinId: string | null;
   startedVia: AssistantVia;
   lang: string | null;
   sourceText: string | null;
@@ -31,6 +33,8 @@ export interface SessionRow {
   revisions: Revision[];
   version: number;
   updatedAt: string | null;
+  claimExpiresAt: string | null;
+  shareExpiresAt: string | null;
 }
 
 const EMPTY_STATE: AssistantState = { items: [] };
@@ -57,13 +61,16 @@ export function rowFromNode(node: any): SessionRow | null {
     projectId: relId(a.project),
     projectName: a.project?.data?.attributes?.projectName ?? null,
     ratsonId: relId(a.ratson),
+    chezinId: relId(a.chezin),
     startedVia: a.startedVia ?? 'site',
     lang: a.lang ?? null,
     sourceText: a.sourceText ?? null,
     state: asState(a.state),
     revisions: Array.isArray(a.revisions) ? a.revisions : [],
     version: Number(a.version ?? 0),
-    updatedAt: a.updatedAt ?? null
+    updatedAt: a.updatedAt ?? null,
+    claimExpiresAt: a.claimExpiresAt ?? null,
+    shareExpiresAt: a.shareExpiresAt ?? null
   };
 }
 
@@ -89,8 +96,12 @@ export async function findLatestSession(
 export async function createSession(
   strapi: StrapiLike,
   input: {
-    userId: string;
+    /** null only for a `pending` session an agent prepared before signup (§5.1). */
+    userId: string | null;
     kind: AssistantKind;
+    status?: SessionStatus;
+    claimEmail?: string | null;
+    claimExpiresAt?: string | null;
     state: AssistantState;
     startedVia: AssistantVia;
     lang?: string;
@@ -102,9 +113,9 @@ export async function createSession(
   fetchFn?: typeof fetch
 ): Promise<SessionRow> {
   const data: Record<string, unknown> = {
-    user: String(input.userId),
+    ...(input.userId ? { user: String(input.userId) } : {}),
     kind: input.kind,
-    status: 'active',
+    status: input.status ?? 'active',
     startedVia: input.startedVia,
     state: input.state,
     revisions: input.revisions ?? [],
@@ -114,6 +125,8 @@ export async function createSession(
   if (input.projectId) data.project = String(input.projectId);
   if (input.ratsonId) data.ratson = String(input.ratsonId);
   if (input.sourceText) data.sourceText = input.sourceText.slice(0, 20000);
+  if (input.claimEmail) data.claimEmail = input.claimEmail.slice(0, 200);
+  if (input.claimExpiresAt) data.claimExpiresAt = input.claimExpiresAt;
 
   const res = await strapi.execute('363createAssistantSession', { data }, undefined, fetchFn);
   const row = rowFromNode(res?.data?.createAssistantSession?.data);
@@ -140,7 +153,16 @@ export async function saveSession(
     state?: AssistantState;
     revision?: Omit<Revision, 'v'>;
     expectedVersion?: number;
-    patch?: { status?: SessionStatus; projectId?: string; appliedAt?: string };
+    patch?: {
+      status?: SessionStatus;
+      projectId?: string;
+      appliedAt?: string;
+      /** The claim (§5.4): the session becomes this user's. */
+      userId?: string;
+      ratsonId?: string;
+      /** The signatory row of the agent-prepared signup (§5.4). */
+      chezinId?: string;
+    };
   },
   fetchFn?: typeof fetch
 ): Promise<SaveResult> {
@@ -161,11 +183,66 @@ export async function saveSession(
   if (change.patch?.status) data.status = change.patch.status;
   if (change.patch?.projectId) data.project = String(change.patch.projectId);
   if (change.patch?.appliedAt) data.appliedAt = change.patch.appliedAt;
+  if (change.patch?.userId) data.user = String(change.patch.userId);
+  if (change.patch?.ratsonId) data.ratson = String(change.patch.ratsonId);
+  if (change.patch?.chezinId) data.chezin = String(change.patch.chezinId);
 
   const res = await strapi.execute('365updateAssistantSession', { id: row.id, data }, undefined, fetchFn);
   const saved = rowFromNode(res?.data?.updateAssistantSession?.data);
   if (!saved) throw new Error('Could not save the assistant session');
   return { ok: true, row: saved };
+}
+
+/**
+ * Set or clear the preview link (§4.4). Not a revision and no version bump:
+ * sharing does not change the list, and an agent holding the current version
+ * must not be told "it changed meanwhile" because someone made a link.
+ */
+export async function setShare(
+  strapi: StrapiLike,
+  id: string,
+  share: { key: string; expiresAt: string } | null,
+  fetchFn?: typeof fetch
+): Promise<void> {
+  await strapi.execute(
+    '365updateAssistantSession',
+    { id: String(id), data: share ? { shareKey: share.key, shareExpiresAt: share.expiresAt } : { shareKey: null, shareExpiresAt: null } },
+    undefined,
+    fetchFn
+  );
+}
+
+/**
+ * The pending sessions an agent prepared for this signatory, not yet expired —
+ * what a new account claims (§5.4). By the chezin row, never by email alone:
+ * text someone else prepared with your address does not become yours.
+ */
+export async function findPendingByChezin(
+  strapi: StrapiLike,
+  chezinId: string,
+  now: Date = new Date(),
+  fetchFn?: typeof fetch
+): Promise<SessionRow[]> {
+  const res = await strapi.execute('367findPendingAssistantByChezin', { cid: String(chezinId) }, undefined, fetchFn);
+  return (res?.data?.assistantSessions?.data ?? [])
+    .map(rowFromNode)
+    .filter((r: SessionRow | null): r is SessionRow => !!r && r.status === 'pending' && !r.userId)
+    .filter((r: SessionRow) => !r.claimExpiresAt || new Date(r.claimExpiresAt).getTime() > now.getTime());
+}
+
+/** A live preview link → its session, or null (unknown, expired, not a rikma). */
+export async function loadByShareKey(
+  strapi: StrapiLike,
+  key: string,
+  now: Date = new Date(),
+  fetchFn?: typeof fetch
+): Promise<SessionRow | null> {
+  if (!/^[A-Za-z0-9_-]{20,64}$/.test(key)) return null;
+  const res = await strapi.execute('368getAssistantByShareKey', { k: key }, undefined, fetchFn);
+  const row = rowFromNode(res?.data?.assistantSessions?.data?.[0]);
+  if (!row || row.kind !== 'rikma') return null;
+  if (!row.shareExpiresAt || new Date(row.shareExpiresAt).getTime() <= now.getTime()) return null;
+  return row;
 }
 
 /**

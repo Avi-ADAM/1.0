@@ -3,7 +3,7 @@
  * rikma will this mission represent". Pure & deterministic so it can run on the
  * client (lev cards, creation form) and be unit-tested with fixture payloads.
  *
- * See docs/PLAN_MISSION_EQUITY_PREVIEW.md §2. The "current value" scenario must
+ * See docs/done/PLAN_MISSION_EQUITY_PREVIEW.md §2. The "current value" scenario must
  * reproduce the split-page formula exactly:
  *   rikma current value = Σ finnished_missions.total + Σ rikmashes.total
  */

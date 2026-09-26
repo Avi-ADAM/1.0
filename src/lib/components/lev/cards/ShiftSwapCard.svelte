@@ -1,6 +1,6 @@
 <script>
   /**
-   * A shift swap waiting on my answer (docs/PLAN_SHIFTS.md §1.2).
+   * A shift swap waiting on my answer (docs/inprogress/PLAN_SHIFTS.md §1.2).
    *
    * Approve · counter · (my own offer:) withdraw. There is no "reject": a swap
    * nobody approves simply lapses at its deadline and the roster stays as it

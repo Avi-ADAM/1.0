@@ -1,5 +1,5 @@
 /**
- * The translation engine adapter (§5.1–5.2 of docs/PLAN_UGC_TRANSLATION.md).
+ * The translation engine adapter (§5.1–5.2 of docs/inprogress/PLAN_UGC_TRANSLATION.md).
  *
  * **One request fills all five locales.** The free tier's binding constraint is
  * requests per minute and per day, not tokens, so translating N strings into

@@ -1,6 +1,6 @@
 /**
  * Signed one-object tickets for the **local** storage driver
- * (docs/PLAN_RIKMA_SHARED_INFO.md §6 stage 2).
+ * (docs/inprogress/PLAN_RIKMA_SHARED_INFO.md §6 stage 2).
  *
  * R2 has presigned URLs; a folder on our own VPS does not, so this is the
  * equivalent: a short-lived HMAC that says "this exact object key, this

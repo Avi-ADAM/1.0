@@ -1,6 +1,6 @@
 /**
  * Turning one engine answer into cache rows (§5.1 of
- * docs/PLAN_UGC_TRANSLATION.md).
+ * docs/inprogress/PLAN_UGC_TRANSLATION.md).
  *
  * Sits between `gemini.ts` (which asks) and `cacheTranslations` (which stores),
  * and owns the two decisions neither of them should:

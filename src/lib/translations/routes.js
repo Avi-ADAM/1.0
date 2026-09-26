@@ -64,7 +64,9 @@ export const ROUTED = {
     planning: at(/\/moach\/[^/]+\/create/),
     // The rikma-import review screen (PLAN_AI_SIGNUP_CONCIERGE §4.5): a new
     // rikma at /moach/import/…, an existing one at /moach/<id>/import/….
-    rikmaImport: at(/\/moach\/(?:[^/]+\/)?import\//),
+    rikmaImport: at(/\/moach\/(?:[^/]+\/)?import\//, '/preview/rikma'),
+    // The profile / wish list panel (PLAN_AI_SIGNUP_CONCIERGE §6, §7).
+    assistant: at('/onboard/assistant', '/concierge'),
     // The rikma's API page — one route, one namespace, nowhere else.
     rikmaApi: at(/\/moach\/[^/]+\/api/),
     // The rikma's code tab, plus the GitHub account card on the settings page.
@@ -76,7 +78,7 @@ export const ROUTED = {
     mcp: at('/me'),
     // Archive/edit proposals surface as lev cards and on the rikma's object pages.
     archive: at('/lev', /\/moach\/[^/]+/),
-    // Shifts (docs/PLAN_SHIFTS.md): the rikma's shifts tab and plan form under
+    // Shifts (docs/inprogress/PLAN_SHIFTS.md): the rikma's shifts tab and plan form under
     // /moach, the member's own shifts under /me, the heart's shift cards, and
     // the shift commitment a candidate states on a public mission page. The
     // last two carry the mission form in spec/publish mode, where the plan

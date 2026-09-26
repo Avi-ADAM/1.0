@@ -68,7 +68,7 @@ describe('BlueprintReview', () => {
     // Untick the mission: it will be kept as a proposal, not created.
     await fireEvent.click(getAllByRole('checkbox')[2]);
 
-    await fireEvent.click(getByRole('button'));
+    await fireEvent.click(getByRole('button', { name: /rikmaImport.submit/ }));
 
     expect(executeAction).toHaveBeenCalledTimes(1);
     const [key, params] = executeAction.mock.calls[0];
@@ -90,7 +90,7 @@ describe('BlueprintReview', () => {
     executeAction.mockResolvedValue({ success: true, data: { conflict: true } });
     const onConflict = vi.fn();
     const { getByRole, queryByText } = render(BlueprintReview, { props: { session, onConflict } });
-    await fireEvent.click(getByRole('button'));
+    await fireEvent.click(getByRole('button', { name: /rikmaImport.submit/ }));
     expect(onConflict).toHaveBeenCalled();
     expect(queryByText('rikmaImport.result.title')).toBeNull();
   });
@@ -99,7 +99,20 @@ describe('BlueprintReview', () => {
     executeAction.mockResolvedValue({ success: true, data: { created: [], failed: [], invites: [] } });
     const { getByDisplayValue, getByRole } = render(BlueprintReview, { props: { session } });
     await fireEvent.input(getByDisplayValue('180'), { target: { value: '' } });
-    await fireEvent.click(getByRole('button'));
+    await fireEvent.click(getByRole('button', { name: /rikmaImport.submit/ }));
     expect(executeAction.mock.calls[0][1].ops).toEqual([{ op: 'setSpec', key: 'i1', spec: { price: null, pricingMode: 'quote' } }]);
+  });
+
+  it('the owner flips who does a row; flipping back sends nothing', async () => {
+    executeAction.mockResolvedValue({ success: true, data: { created: [], failed: [], invites: [] } });
+    const { getByRole } = render(BlueprintReview, { props: { session } });
+    const holder = () => getByRole('button', { name: /rikmaImport\.holder\.toggle/ });
+    // The created resource shows its holder but cannot be flipped.
+    expect(holder().textContent).toContain('rikmaImport.holder.me');
+
+    await fireEvent.click(holder());
+    expect(holder().textContent).toContain('rikmaImport.holder.open');
+    await fireEvent.click(getByRole('button', { name: /rikmaImport\.submit/ }));
+    expect(executeAction.mock.calls[0][1].ops).toEqual([{ op: 'setSpec', key: 'i3', spec: { holder: 'open' } }]);
   });
 });

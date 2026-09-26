@@ -7,7 +7,7 @@ import { decideServe } from '$lib/server/spaceDocs/serve.js';
 
 /**
  * GET /api/v1/space-docs/:id/file — open one library entry
- * (docs/PLAN_RIKMA_SHARED_INFO.md §6 stage 2).
+ * (docs/inprogress/PLAN_RIKMA_SHARED_INFO.md §6 stage 2).
  *
  * The only door to a file in the private bucket. Checks that the caller —
  * from the signed JWT, `locals.uid` — is a member of the rikma that owns the
@@ -21,7 +21,7 @@ import { decideServe } from '$lib/server/spaceDocs/serve.js';
  * api.1lev1.com. `Cache-Control: no-store` so no proxy keeps the redirect.
  *
  * `?format=json` answers `{ url }` instead of redirecting — for the P2P pilot
- * (docs/PLAN_P2P_PILOT.md), which reads the bytes in JS so it can check their
+ * (docs/inprogress/PLAN_P2P_PILOT.md), which reads the bytes in JS so it can check their
  * sha256 and cache them. Same checks, same five-minute URL.
  */
 export const GET: RequestHandler = async ({ params, url, locals, fetch, setHeaders }) => {

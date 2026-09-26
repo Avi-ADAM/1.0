@@ -1,6 +1,6 @@
 /**
  * A file-backed store for the governor's day counter (§5.3 of
- * docs/PLAN_UGC_TRANSLATION.md).
+ * docs/inprogress/PLAN_UGC_TRANSLATION.md).
  *
  * Opt-in through `TRANSLATE_STATE_DIR`, and off by default. A serverless
  * deploy has nowhere honest to keep this, and a governor that *believes* it

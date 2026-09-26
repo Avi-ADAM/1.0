@@ -1,5 +1,5 @@
 /**
- * The booking ledger's transport layer (docs/PLAN_RESOURCE_CALENDAR.md §4).
+ * The booking ledger's transport layer (docs/inprogress/PLAN_RESOURCE_CALENDAR.md §4).
  *
  * Every write to `resource-booking` goes through here, for one reason: this
  * collection is being introduced *underneath* flows that already work. A vote

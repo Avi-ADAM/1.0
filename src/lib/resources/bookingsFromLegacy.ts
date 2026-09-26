@@ -1,6 +1,6 @@
 /**
  * Reading occupancy out of the rows that exist *today*
- * (docs/PLAN_RESOURCE_CALENDAR.md §8, milestone M2).
+ * (docs/inprogress/PLAN_RESOURCE_CALENDAR.md §8, milestone M2).
  *
  * The plan's `resource-booking` collection does not exist yet, but the
  * information mostly does — scattered across two shapes that were never meant

@@ -1,6 +1,6 @@
 /**
  * The terms a stipend funding request is published with
- * (docs/PLAN_STIPEND.md §12.2, `publishStipendFundingRequest`).
+ * (docs/done/PLAN_STIPEND.md §12.2, `publishStipendFundingRequest`).
  *
  * An open-mashaabim states its money in three separate places, and they mean
  * three different things:

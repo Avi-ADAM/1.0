@@ -3,7 +3,7 @@
  * onboarding → a profile that produces match suggestions.
  *
  * This is the path every member walks exactly once, which is precisely why it
- * rots unnoticed — nobody on the team signs up again. docs/QA_NEW_USER_WALKTHROUGH_2026-08.md
+ * rots unnoticed — nobody on the team signs up again. docs/done/QA_NEW_USER_WALKTHROUGH_2026-08.md
  * found nine defects along it, three of them severe, and this flow is the
  * regression net for all nine.
  *

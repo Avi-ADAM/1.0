@@ -532,7 +532,7 @@ export interface StipendTransferData {
  *
  * The funder always had this number: it is the pay card. The person actually
  * living on the money had no screen showing it anywhere, in the one feature
- * whose entire point is that they can count on it (docs/FIXES.md §10).
+ * whose entire point is that they can count on it (docs/inprogress/FIXES.md §10).
  *
  * Nothing here is actionable, and that is honest — the next move is the
  * funder's. The card exists so the recipient can see the month adding up

@@ -1,7 +1,7 @@
 <script lang="ts">
   /**
    * /me/shifts — every coming shift of mine, from every rikma, in one list
-   * (docs/PLAN_SHIFTS.md §9.3). Each row says whether I am coming or waiting
+   * (docs/inprogress/PLAN_SHIFTS.md §9.3). Each row says whether I am coming or waiting
    * in line, and leads to that rikma's roster, where swaps and availability live.
    */
   import { t, locale } from '$lib/translations';

@@ -1,5 +1,5 @@
 /**
- * The P2P pilot for one rikma's library (docs/PLAN_P2P_PILOT.md).
+ * The P2P pilot for one rikma's library (docs/inprogress/PLAN_P2P_PILOT.md).
  *
  * One instance per open docs tab. It
  *  - joins the rikma's signaling room with a ticket (membership checked by the

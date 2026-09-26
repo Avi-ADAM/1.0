@@ -1,6 +1,6 @@
 /**
  * Apply an assistant's ops to a session state — the only way a list changes
- * (docs/PLAN_AI_SIGNUP_CONCIERGE.md §3.2).
+ * (docs/inprogress/PLAN_AI_SIGNUP_CONCIERGE.md §3.2).
  *
  * The model, the outside agent and the site's chips all speak in ops; none of
  * them ever sends back a rewritten list. That is what keeps a hallucinated or

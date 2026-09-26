@@ -1,6 +1,6 @@
 /**
  * Rikma blueprint — a rikma, its products, missions, resources and partners,
- * before any of it exists (docs/PLAN_AI_SIGNUP_CONCIERGE.md §4.2).
+ * before any of it exists (docs/inprogress/PLAN_AI_SIGNUP_CONCIERGE.md §4.2).
  *
  * The same shape serves three tracks: a business being imported (the products
  * are what matter — that is how the concierge finds it), an existing
@@ -56,6 +56,11 @@ export const BlueprintProductSchema = z.object({
   isOnline: z.boolean().optional(),
   /** Synonyms and the needs it answers — what a wish would say, not the product's name. */
   keywords: z.array(text(60)).max(15).optional(),
+  /**
+   * 1-3 broad domains ("events", "food"). Linked to the platform's existing
+   * `Category` rows by name; the concierge compares them with a wish's own.
+   */
+  categories: z.array(text(40)).max(3).optional(),
   /** Missions / resources (by ref) that make one unit of this product. */
   recipe: z
     .object({
@@ -223,6 +228,7 @@ export function blueprintToState(
       unlimited: p.unlimited,
       isOnline: p.isOnline,
       keywords: p.keywords?.filter(Boolean),
+      categories: p.categories?.filter(Boolean),
       recipe:
         recipeMissions.length || recipeResources.length
           ? { missionKeys: recipeMissions, resourceKeys: recipeResources }

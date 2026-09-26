@@ -1,5 +1,5 @@
 /**
- * Writing the *proposed* stipend rows (docs/PLAN_STIPEND.md §5).
+ * Writing the *proposed* stipend rows (docs/done/PLAN_STIPEND.md §5).
  *
  * A pledge row is born with the proposal, not with its approval: both parties
  * and the moach tab can then see the exact terms while they are still being

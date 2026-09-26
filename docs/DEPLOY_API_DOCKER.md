@@ -1,6 +1,6 @@
 # פריסת אינסטנס ה-API של SvelteKit ב-Docker (על ה-VPS, לצד Strapi)
 
-> משלים את `docs/PLAN_PROXY_SECURITY.md` שלב 3 (סעיפים 5 ו-8.9): הפרונט נשאר
+> משלים את `docs/done/PLAN_PROXY_SECURITY.md` שלב 3 (סעיפים 5 ו-8.9): הפרונט נשאר
 > ב-Vercel (`ADAPTER=vercel`), ואינסטנס נוסף של אותו קוד — עם **adapter-node** —
 > רץ על ה-VPS של Strapi ומשמש כשרת הפרוקסי (`/api/send`, `/api/action`,
 > `/api/upload`, `/api/auth`). Strapi נעול ל-127.0.0.1 / רשת docker פנימית.

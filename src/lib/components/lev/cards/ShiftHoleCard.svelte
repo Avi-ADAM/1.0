@@ -1,7 +1,7 @@
 <script>
   /**
    * "Nobody is covering Tuesday 11:00–15:00" — the hole card
-   * (docs/PLAN_SHIFTS.md §7.1, §14 #7).
+   * (docs/inprogress/PLAN_SHIFTS.md §7.1, §14 #7).
    *
    * Two ways out, and either one closes the card:
    *   · "I'll take it" — allowed even beyond my agreed maximum: a person may

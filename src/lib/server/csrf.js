@@ -8,7 +8,7 @@
 // `application/x-www-form-urlencoded`, and a server-to-server call has no
 // Origin). With the built-in check on, claude.ai's code exchange at /oauth/token
 // got `403 Cross-site POST form submissions are forbidden` after the user had
-// already approved — see docs/PLAN_MCP_OAUTH.md.
+// already approved — see docs/done/PLAN_MCP_OAUTH.md.
 //
 // svelte.config.js sets `trustedOrigins: ['*']` to turn the built-in check off;
 // `csrfRejection()` below reproduces it byte for byte for everything else.

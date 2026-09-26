@@ -1,6 +1,6 @@
 <script module>
   /**
-   * New-service maturation on silence (docs/PLAN_TIMEGRAMA.md, phase 4.3).
+   * New-service maturation on silence (docs/inprogress/PLAN_TIMEGRAMA.md, phase 4.3).
    *
    * `addSheirut` writes the `Sheirut` immediately but leaves it unapproved, and
    * opens a `sheirutpend` for the rikma to answer, with a clock on it. Nothing
@@ -80,7 +80,7 @@
       const sheirut = a.sheirut?.data;
       if (!sheirut) {
         // A customer's product request, not a service proposal: its clock is
-        // the price quote's (docs/PLAN_CONCIERGE_LOCAL_PROVIDERS.md §6).
+        // the price quote's (docs/inprogress/PLAN_CONCIERGE_LOCAL_PROVIDERS.md §6).
         return QuoteSilence(id, taid);
       }
       if (sheirut.attributes?.archived === true) {

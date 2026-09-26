@@ -9,7 +9,7 @@ import { redirect } from '@sveltejs/kit';
  *
  * 308 rather than 302: the move is permanent and the method must be preserved.
  *
- * See docs/PLAN_LEV_COINS.md §6.1.
+ * See docs/inprogress/PLAN_LEV_COINS.md §6.1.
  */
 export function load() {
   redirect(308, '/lev');

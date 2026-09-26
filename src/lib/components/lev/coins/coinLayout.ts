@@ -22,7 +22,7 @@
  *
  * Nothing here is reactive and nothing here touches the DOM: it is a pure
  * module so `coinLayout.test.ts` can assert the packing properties directly.
- * See docs/PLAN_LEV_COINS.md §Stage 1.
+ * See docs/inprogress/PLAN_LEV_COINS.md §Stage 1.
  */
 
 import { rowTimegrama, rowIsActionable } from '../cards/cardKinds.js';

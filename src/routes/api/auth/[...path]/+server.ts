@@ -31,7 +31,12 @@ const ALLOWED: Record<string, AuthAction> = {
   'change-password': { requiresAuth: true, setsSession: true },
   'forgot-password': { requiresAuth: false, setsSession: false },
   'reset-password': { requiresAuth: false, setsSession: true },
-  'send-email-confirmation': { requiresAuth: false, setsSession: false }
+  'send-email-confirmation': { requiresAuth: false, setsSession: false },
+  // Confirm + sign in from the confirmation mail's "continue" button
+  // (PLAN_AI_SIGNUP_CONCIERGE §5.5). A custom route in 1.0b's users-permissions
+  // extension; single-use like the stock confirmation, POST so mail scanners
+  // (which GET every link) cannot spend it.
+  'email-confirmation-login': { requiresAuth: false, setsSession: true }
 };
 
 /**

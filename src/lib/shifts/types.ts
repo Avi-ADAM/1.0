@@ -1,5 +1,5 @@
 /**
- * Shared shapes for the shift modules (docs/PLAN_SHIFTS.md §3, §6).
+ * Shared shapes for the shift modules (docs/inprogress/PLAN_SHIFTS.md §3, §6).
  *
  * Everything in src/lib/shifts is pure: these types describe plain data the
  * server loaders and actions hand in, never Strapi payloads. Keeping the

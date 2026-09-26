@@ -1,6 +1,6 @@
 /**
  * `GET /api/cron/translate-backfill` — the backfill worker (§8, §15 of
- * docs/PLAN_UGC_TRANSLATION.md).
+ * docs/inprogress/PLAN_UGC_TRANSLATION.md).
  *
  * This is the phase the whole feature was justified by. §1 opens on a Spanish
  * speaker landing on `/availableMission` and reading a wall of Hebrew — and

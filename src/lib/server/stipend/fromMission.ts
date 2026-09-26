@@ -1,6 +1,6 @@
 /**
  * A mission that came with its own stipend need, becoming a real pledge
- * (docs/PLAN_STIPEND.md §13).
+ * (docs/done/PLAN_STIPEND.md §13).
  *
  * When a mission is proposed, its author can attach "and it wants ₪X an hour of
  * living money, carried like this". The rikma then answers **one** question:

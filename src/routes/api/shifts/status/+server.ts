@@ -1,5 +1,5 @@
 /**
- * Is the shift system on? (docs/PLAN_SHIFTS.md §11)
+ * Is the shift system on? (docs/inprogress/PLAN_SHIFTS.md §11)
  *
  * The mission form asks before offering a staffing plan: with SHIFTS=off the
  * server ignores a plan entirely, and a form that silently does nothing is

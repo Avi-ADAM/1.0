@@ -1,5 +1,5 @@
 /**
- * Today's reference rates, server-side (docs/PLAN_MULTI_CURRENCY.md D-C5/D-C6).
+ * Today's reference rates, server-side (docs/done/PLAN_MULTI_CURRENCY.md D-C5/D-C6).
  *
  *   memory (6h)  →  Strapi `fx-rate` row for today  →  providers  →  last known row
  *

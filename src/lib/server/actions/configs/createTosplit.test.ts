@@ -11,7 +11,7 @@ import { approveHalukaConfig } from './approveHaluka';
  *
  * Requiring at least one transfer left solo rikmas unable to ever close a
  * split — every sale stayed "pending distribution" forever
- * (docs/QA_SOLO_RIKMA_2026-08.md B1).
+ * (docs/inprogress/QA_SOLO_RIKMA_2026-08.md B1).
  */
 const validate = (value: unknown) =>
   (createTosplitConfig.paramSchema!.data as any).validate(value) as boolean;

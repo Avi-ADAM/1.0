@@ -1,6 +1,6 @@
 /**
  * The date-overlap line on a lev resource suggestion
- * (docs/PLAN_RESOURCE_CALENDAR.md §6.4).
+ * (docs/inprogress/PLAN_RESOURCE_CALENDAR.md §6.4).
  *
  * The matcher already decided whether to suggest at all (§7); this is only
  * about telling the holder *why*, in a form they can act on: "they asked for

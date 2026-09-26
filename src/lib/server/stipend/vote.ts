@@ -1,5 +1,5 @@
 /**
- * Signing a stipend proposal (docs/PLAN_STIPEND.md §5, super-principles).
+ * Signing a stipend proposal (docs/done/PLAN_STIPEND.md §5, super-principles).
  *
  * A vote belongs to a *round*: signing round 2 says nothing about round 1, and
  * only the standing round can mature. There is no "no" — a member who does not

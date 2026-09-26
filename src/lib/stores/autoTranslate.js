@@ -1,5 +1,5 @@
 /**
- * The reader's UGC-translation preference (§4.4 of docs/PLAN_UGC_TRANSLATION.md).
+ * The reader's UGC-translation preference (§4.4 of docs/inprogress/PLAN_UGC_TRANSLATION.md).
  *
  *   off      — never look anything up. The read path skips its query entirely,
  *              so this costs a reader who does not want translation *nothing*,

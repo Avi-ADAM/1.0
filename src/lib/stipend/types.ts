@@ -1,5 +1,5 @@
 /**
- * Shared shapes for the subsistence stipend (docs/PLAN_STIPEND.md).
+ * Shared shapes for the subsistence stipend (docs/done/PLAN_STIPEND.md).
  *
  * A stipend is one partner paying another a monthly amount computed from the
  * hours they contributed, at a rate far *below* the market rate written on the

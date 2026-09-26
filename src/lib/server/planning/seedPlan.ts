@@ -76,7 +76,9 @@ Return ONLY valid JSON - no markdown, no code fences, no commentary. Start with
           "valph": 0,
           "kindOf": "...",
           "price": 0,
-          "quantity": 0
+          "quantity": 0,
+          "keywords": ["..."],
+          "categories": ["..."]
         }
       ]
     }
@@ -92,7 +94,11 @@ Rules for this first plan:
   source text actually says about this business.
 - If the business clearly sells or offers something, ONE board must be about
   that, and it must contain "product" rows for what is being sold - with a
-  price only when the source states one.
+  price only when the source states one. Every "product" row carries
+  "keywords" (4-10 words a CUSTOMER would use for the need it answers -
+  synonyms, occasions, the problem it solves - not its own name) and
+  "categories" (1-3 broad domains such as "events", "food"). This is how the
+  platform's concierge finds the business, so be concrete.
 - Include at least a few "resource" rows if the business obviously needs
   equipment, a space, or money to operate. Do not invent amounts.
 - "act" rows are for the small first steps that need no hour accounting

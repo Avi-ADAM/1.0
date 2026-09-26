@@ -28,7 +28,7 @@
 
 <script lang="ts">
   /**
-   * "This mission has to be staffed at these hours" (docs/PLAN_SHIFTS.md §9.5).
+   * "This mission has to be staffed at these hours" (docs/inprogress/PLAN_SHIFTS.md §9.5).
    *
    * Replaces the seven-column table that used to sit in the mission form and
    * was never sent anywhere. One row per day (so it works on a phone), each

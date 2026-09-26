@@ -1,6 +1,6 @@
 <script>
   /**
-   * "The cycle of 4–10 Oct is open: when can you come?" (docs/PLAN_SHIFTS.md §7, §9.4)
+   * "The cycle of 4–10 Oct is open: when can you come?" (docs/inprogress/PLAN_SHIFTS.md §7, §9.4)
    *
    * An invitation, not a demand: answering is the consent the roster is built
    * from (§1.1), and "can't" is a full answer. The card leads to the member's

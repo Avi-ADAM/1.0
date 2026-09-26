@@ -1,5 +1,5 @@
 /**
- * The promise `<Money>` makes (docs/PLAN_MULTI_CURRENCY.md §1.3) is the same
+ * The promise `<Money>` makes (docs/done/PLAN_MULTI_CURRENCY.md §1.3) is the same
  * one `<Translated>` makes for words, so it is tested the same way: a reader
  * always sees their own currency when there is a rate, a converted number
  * always says it is converted, the amount as stored is always reachable, and

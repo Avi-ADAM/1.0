@@ -1,6 +1,6 @@
 /**
  * Operational endpoint for the resource-booking rollout
- * (docs/PLAN_RESOURCE_CALENDAR.md §8) — the two steps between
+ * (docs/inprogress/PLAN_RESOURCE_CALENDAR.md §8) — the two steps between
  * `RESOURCE_BOOKINGS=shadow` and `RESOURCE_BOOKINGS=enforce`:
  *
  *   GET /api/resource-bookings?op=compare            what the two gates say

@@ -23,7 +23,7 @@ SvelteKit + Svelte 5 app, npm, Node 22.
 | `npx vitest run -t "name"` | Run tests matching a name. |
 | `npm run types:update` | Regenerate GraphQL types after schema changes (`codegen` + `types:extract`). |
 | `npm run validate:qids` | Validate every qid in `qids.js` against the Strapi schema. |
-| `npm run check:proxy` | Proxy-security lint (see `docs/PLAN_PROXY_SECURITY.md`). |
+| `npm run check:proxy` | Proxy-security lint (see `docs/done/PLAN_PROXY_SECURITY.md`). |
 | `npm run check:i18n` | Verifies every `$t('ns.…')` is reachable on the routes that use it (see i18n section). |
 | `npm run check:script` | Flags words that mix alphabets (a Cyrillic `г` inside a Hebrew word, …). |
 | `npm run check:translatable` | Verifies the UGC translation manifest (`src/lib/translation/fields.js`) against the generated Strapi schema. |
@@ -31,6 +31,12 @@ SvelteKit + Svelte 5 app, npm, Node 22.
 Tests are colocated (`*.test.ts` / `*.integration.test.ts` / `*.pbt.test.ts`
 property-based via fast-check) and run on the `happy-dom`/`jsdom` environment.
 There is no separate lint script — `npm run check` is the gate.
+
+**Plans live in `docs/`, sorted by implementation state** — `docs/done/`,
+`docs/inprogress/` (partly built, or built and awaiting deploy), `docs/tbd/`;
+evergreen how-to guides stay at `docs/` root. `docs/README.md` is the index. A
+new plan starts in `tbd/`; when its state changes, `git mv` it and update every
+`docs/<folder>/NAME.md` reference to it.
 
 ## Architecture — request & data flow
 
@@ -59,7 +65,7 @@ const result = await actionService.executeAction('actionKey', params, context);
 ```
 
 **Authorization is two-layered** (`src/lib/server/authz/`, see
-`docs/PLAN_API_PERMISSIONS.md`):
+`docs/done/PLAN_API_PERMISSIONS.md`):
 - **Static** — principal-kind × operation, answered synchronously from manifests
   (`qidsAccess.js` for qids, `ActionConfig.access` for actions). Gated by
   `AUTHZ_MODE` env: `off` / `log` (shadow-only) / `enforce` (**default** — an
@@ -152,7 +158,7 @@ as garbage and reorders the RTL run, and no other check sees it —
 and descriptions, mission `descrip`, bios, product names — is a separate layer
 with its own machinery in `src/lib/translation/` (pure) and
 `src/lib/server/translation/` (the cache read, the engine, the governor, the
-backfill). See `docs/PLAN_UGC_TRANSLATION.md`; P0–P3 are in and P4 covers
+backfill). See `docs/inprogress/PLAN_UGC_TRANSLATION.md`; P0–P3 are in and P4 covers
 the public directories and their entity pages (missions, resources, rikmot,
 products). A page reads its loader's payload through `pageTranslations`
 (`src/lib/translation/pageTranslations.svelte.ts`) — never by hand.
@@ -232,8 +238,8 @@ name in user-facing text, in all five locales — the transliteration:
 Site-share = the platform (1lev1) taking part in a rikma's profit split as a
 service-providing partner. Key locations:
 
-- **Plans:** `docs/PLAN_SITE_SHARE.md`, `docs/PLAN_SITE_SHARE_PER_MEMBER.md`,
-  `docs/PLAN_MOACH_SITE_SHARE_DISPLAY.md`.
+- **Plans:** `docs/done/PLAN_SITE_SHARE.md`, `docs/done/PLAN_SITE_SHARE_PER_MEMBER.md`,
+  `docs/done/PLAN_MOACH_SITE_SHARE_DISPLAY.md`.
 - **Math (pure, tested):** `src/lib/revenue/` — `computeSiteShare.ts`,
   `buildSiteShareLines.ts`, `parseSiteShareNote.ts`.
 - **Server actions:** `src/lib/server/actions/configs/` (`createPlatformSale.ts`,
@@ -272,7 +278,7 @@ them. Change them only deliberately.
 
 ## Sale holder consent (`kind: 'saleClaim'`)
 
-See `docs/PLAN_sale_holder_consent.md`. Reporting a sale where the money is held
+See `docs/done/PLAN_sale_holder_consent.md`. Reporting a sale where the money is held
 by someone else is a claim about that person's financial state and needs their
 consent: it opens a bilateral `saleClaim` Decision (`holderStatus:'open'`) that
 matures by mutual agreement, a matured counter round, or restime silence. "Money
@@ -282,7 +288,7 @@ A sale is counted in balances/tosplits only when **effective**
 
 ## Object archival & edit (`kind: 'archiveObject' | 'editObject'`)
 
-See `docs/PLAN_OBJECT_ARCHIVAL.md`. Removing or changing a rikma object
+See `docs/done/PLAN_OBJECT_ARCHIVAL.md`. Removing or changing a rikma object
 (open/in-progress mission, open/in-progress resource, product) goes through the
 same consent flow its creation did. **Never reuse `archived` for this** — it
 already means "taken/assigned" on an open mission and "vote closed" on
@@ -314,7 +320,7 @@ respond.
 
 ## Subsistence stipend (`kind: 'stipendPledge' | 'stipendProgram'`)
 
-See `docs/PLAN_STIPEND.md`. One partner funds another's living costs at a rate
+See `docs/done/PLAN_STIPEND.md`. One partner funds another's living costs at a rate
 **below** the mission's market rate; the market rate still buys the equity. The
 whole model is `(k − α)·P`, and `src/lib/stipend/computeStipendEquity.ts` is its
 single source of truth — never recompute it at a call site.
@@ -353,7 +359,7 @@ partner.
 
 ## Match suggestions (lev recommendations)
 
-See `docs/PLAN_MATCH_SUGGESTIONS.md`. Lev mission/resource suggestions are
+See `docs/done/PLAN_MATCH_SUGGESTIONS.md`. Lev mission/resource suggestions are
 **precomputed server-side** into the Strapi `match-suggestion` collection by
 `src/lib/server/matching/` (triggered from the actions that create open
 missions / open mashaabims and from profile updates), including "new

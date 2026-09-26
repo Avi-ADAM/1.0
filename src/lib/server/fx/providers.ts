@@ -1,5 +1,5 @@
 /**
- * Free, keyless reference-rate providers (docs/PLAN_MULTI_CURRENCY.md D-C4).
+ * Free, keyless reference-rate providers (docs/done/PLAN_MULTI_CURRENCY.md D-C4).
  *
  * All three publish once a day, which is all a "representative rate" needs —
  * nobody here trades on the minute. They are tried in order; each returns a

@@ -411,6 +411,32 @@
       "title": "Un momento, estamos abriendo tu cuenta…",
       "hint": "Si esta pantalla no cambia en unos segundos, continúa desde aquí:",
       "link": "Continuar al registro"
+    },
+    "agent": {
+      "banner": "Tu asistente completó estos datos - revísalos antes de firmar.",
+      "intent": {
+        "join": "Después de confirmar tu correo seguiremos a tu perfil, con lo que le contaste a tu asistente.",
+        "business": "Después de confirmar tu correo llegarás directo a la pantalla que crea el negocio y los productos que preparó tu asistente.",
+        "partnership": "Después de confirmar tu correo llegarás directo a la pantalla que crea la sociedad que preparó tu asistente.",
+        "idea": "Después de confirmar tu correo llegarás directo a la pantalla que crea la rikma a partir de tu idea.",
+        "order": "Después de confirmar tu correo llegarás directo al borrador de tu deseo."
+      },
+      "password": "Contraseña",
+      "password2": "Repite la contraseña",
+      "passwordRule": "Al menos 8 caracteres y una letra mayúscula en inglés",
+      "submit": "Firmar y registrarme",
+      "sending": "Registrando…",
+      "fine": "Tu asistente solo completó los datos. La firma, la contraseña y la confirmación del correo son solo tuyas.",
+      "errors": {
+        "fields": "Completa un nombre y un correo válido.",
+        "countries": "Elige al menos un lugar del mundo.",
+        "agreement": "Para continuar, firma el acuerdo.",
+        "weak": "La contraseña necesita al menos 8 caracteres y una letra mayúscula en inglés.",
+        "mismatch": "Las dos contraseñas no coinciden.",
+        "expired": "El enlace caducó. Puedes registrarte como siempre o pedirle a tu asistente un enlace nuevo.",
+        "rate-limited": "Demasiados intentos. Vuelve a intentarlo en unos minutos.",
+        "failed": "Algo salió mal. Inténtalo de nuevo en un momento."
+      }
     }
   },
   "setitle": "Creando una nueva realidad, juntos",

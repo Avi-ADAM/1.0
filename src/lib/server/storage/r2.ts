@@ -1,6 +1,6 @@
 /**
  * The private **S3-compatible** bucket behind a rikma's shared library
- * (docs/PLAN_RIKMA_SHARED_INFO.md §6 stage 2).
+ * (docs/inprogress/PLAN_RIKMA_SHARED_INFO.md §6 stage 2).
  *
  * Cloudflare R2 (`R2_*`) or anything else that speaks S3 — MinIO, Garage,
  * Backblaze — through `S3_ENDPOINT`/`S3_REGION`. Only the endpoint and the

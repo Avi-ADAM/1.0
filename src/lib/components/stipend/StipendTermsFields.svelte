@@ -2,7 +2,7 @@
   import { useFormatMoney } from '$lib/money/context.svelte';
   /**
    * The three parameters of a subsistence stipend, in one place
-   * (docs/PLAN_STIPEND.md §1).
+   * (docs/done/PLAN_STIPEND.md §1).
    *
    * Shared by every surface that proposes or counters one — the propose dialog,
    * the negotiation drawer, the moach tab — so the vocabulary a member learns

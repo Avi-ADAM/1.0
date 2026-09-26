@@ -1,6 +1,6 @@
 /**
  * headcount — "how many people does this open mission still need?"
- * (docs/PLAN_SHIFTS.md §2).
+ * (docs/inprogress/PLAN_SHIFTS.md §2).
  *
  * `OpenMission.howMeny` has been in the schema — and written by the pendm
  * finalizer — since long before anything read it. Both acceptance finalizers

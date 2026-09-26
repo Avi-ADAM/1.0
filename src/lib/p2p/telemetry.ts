@@ -1,6 +1,6 @@
 /**
  * One line per open attempt — the pilot's actual product
- * (docs/PLAN_P2P_PILOT.md §3).
+ * (docs/inprogress/PLAN_P2P_PILOT.md §3).
  *
  * Shared by the browser (which builds the line) and the server (which refuses
  * anything that is not exactly this shape before writing it). Deliberately

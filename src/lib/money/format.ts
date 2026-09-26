@@ -1,5 +1,5 @@
 /**
- * Money as text, in the reader's language (docs/PLAN_MULTI_CURRENCY.md §1.3).
+ * Money as text, in the reader's language (docs/done/PLAN_MULTI_CURRENCY.md §1.3).
  *
  * `Intl.NumberFormat` owns the symbol, its side, the grouping and the digits
  * for every (locale, currency) pair, so nothing here knows that ₪ follows the

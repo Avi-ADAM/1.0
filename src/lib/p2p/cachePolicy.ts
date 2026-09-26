@@ -1,5 +1,5 @@
 /**
- * Which cached files to drop to make room (docs/PLAN_P2P_PILOT.md §4).
+ * Which cached files to drop to make room (docs/inprogress/PLAN_P2P_PILOT.md §4).
  *
  * The cache is what a device seeds from, and it lives in the member's own
  * browser storage — so it has a hard cap the member can see, and it evicts

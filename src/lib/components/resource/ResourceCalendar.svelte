@@ -13,7 +13,7 @@
   import '@event-calendar/core/index.css';
 
   /**
-   * The resource calendar (docs/PLAN_RESOURCE_CALENDAR.md §6.1) — one component
+   * The resource calendar (docs/inprogress/PLAN_RESOURCE_CALENDAR.md §6.1) — one component
    * behind the personal calendar, the rikma calendar, and the single-resource
    * view.
    *

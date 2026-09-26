@@ -15,7 +15,7 @@
  *      Sp is the per-owner instance with `panui` (free) — so we look up free Sp
  *      rows and surface their owners (`202findAvailableSp`).
  *
- * Location (docs/PLAN_CONCIERGE_LOCAL_PROVIDERS.md): when the wish has a
+ * Location (docs/inprogress/PLAN_CONCIERGE_LOCAL_PROVIDERS.md): when the wish has a
  * place, providers whose area does not reach it are dropped and the rest are
  * ordered nearest first, each carrying `distanceKm`. Online / unlocated
  * providers are kept, after the located ones. With no place, nothing changes.

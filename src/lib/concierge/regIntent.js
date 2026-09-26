@@ -95,3 +95,25 @@ export function hasConciergeIntentCookie(cookieString) {
     .split('; ')
     .some((c) => c === `${REG_INTENT_COOKIE}=${CONCIERGE_INTENT}`);
 }
+
+/**
+ * "An agent prepared this signup" (PLAN_AI_SIGNUP_CONCIERGE §5.1): after the
+ * email confirmation the person continues at /assistant/continue, which claims
+ * what the conversation prepared and lands them in it. Set by the agent signup
+ * screen in the browser it ran in; another device finds the prepared session
+ * through /onboard instead (the claim is by the signatory row, not the cookie).
+ */
+export const AGENT_INTENT = 'agent';
+export const AGENT_LANDING = '/assistant/continue';
+
+/** @param {string | null | undefined} value */
+export function isAgentIntent(value) {
+  return value === AGENT_INTENT;
+}
+
+/**
+ * Where to return after the email confirmation when the signup started inside
+ * an agent's OAuth window (/login → /hascama?next=…, PLAN_AI_SIGNUP_CONCIERGE
+ * §5.2). httpOnly; set only to a path of ours (safeRedirectTarget).
+ */
+export const REG_NEXT_COOKIE = 'reg_next';

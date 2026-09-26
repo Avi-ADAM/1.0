@@ -310,7 +310,7 @@ export const processedStipendConfirmations: Readable<DisplayItem[]> = derived(
  * to-do — the next move is the funder's — so it sits in the OTHER band rather
  * than competing with cards that need an answer. It is here at all because the
  * number existed only on the funder's pay card, and the person living on the
- * money had no screen showing it (docs/FIXES.md §10).
+ * money had no screen showing it (docs/inprogress/FIXES.md §10).
  */
 export const processedStipendAccruals: Readable<DisplayItem[]> = derived(
   [stipendAccrualsStore, projectsStore],

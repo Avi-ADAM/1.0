@@ -5,6 +5,14 @@ import { actionViaProxy } from '$lib/server/actionViaProxy.js';
 import { enrichWish, placeKey, EMPTY_ENRICHMENT, type WishEnrichment } from '$lib/server/ai/enrichWish';
 import { extractWish, type WishExtraction } from '$lib/server/ai/extractWish';
 import { GEMINI_API_KEY } from '$env/static/private';
+import { externalConfig } from '$lib/server/concierge/externalConfig';
+import {
+  DISABLED_PANEL,
+  externalPanel,
+  needsOf,
+  proposalsFromLoader,
+  type ExternalPanel
+} from '$lib/server/concierge/externalView';
 import type { PageServerLoad } from './$types';
 
 export type WishForumMessage = {
@@ -365,5 +373,22 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
     }
   }
 
-  return { wish, proposals, loadOk, uid, isOwner, enrichment, forumMessages, missionTemplates };
+  // ── Outside offers for the rows nothing inside answers
+  //    (docs/inprogress/PLAN_CONCIERGE_EXTERNAL_SOURCES.md). Read-only here: the
+  //    search itself is the `fetchExternalOffers` action, called by the page.
+  let external: ExternalPanel = DISABLED_PANEL;
+  if (wish && isOwner && hasNeeds) {
+    const cfg = externalConfig();
+    external = externalPanel({
+      enabled: cfg.enabled,
+      ttlHours: cfg.ttlHours,
+      needs: needsOf(wish.extractedMissions, wish.extractedResources),
+      enrichment,
+      proposals: proposalsFromLoader(proposals),
+      place: wishPlace,
+      aiMetaExternal: wish.aiMeta?.external
+    });
+  }
+
+  return { wish, proposals, loadOk, uid, isOwner, enrichment, forumMessages, missionTemplates, external };
 };

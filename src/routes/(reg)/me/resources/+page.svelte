@@ -7,7 +7,7 @@
 
   /**
    * "My resource calendar" — when each resource is taken, and by whom
-   * (docs/PLAN_RESOURCE_CALENDAR.md §6.2).
+   * (docs/inprogress/PLAN_RESOURCE_CALENDAR.md §6.2).
    *
    * Reached from the resources category on the profile, either as the whole
    * calendar or, with `?sp=<id>`, focused on one resource.

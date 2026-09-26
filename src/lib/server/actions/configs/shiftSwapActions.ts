@@ -1,5 +1,5 @@
 /**
- * Shift swaps (docs/PLAN_SHIFTS.md §1.2, §7 step 3) — the counter to a place in
+ * Shift swaps (docs/inprogress/PLAN_SHIFTS.md §1.2, §7 step 3) — the counter to a place in
  * the roster. Bilateral: only the two members sign; nobody else is affected,
  * so nobody else is asked.
  *

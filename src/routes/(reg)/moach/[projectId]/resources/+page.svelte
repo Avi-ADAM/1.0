@@ -5,7 +5,7 @@
   import { CalendarDays } from '@lucide/svelte';
 
   /**
-   * The rikma's resource calendar (docs/PLAN_RESOURCE_CALENDAR.md §6.3).
+   * The rikma's resource calendar (docs/inprogress/PLAN_RESOURCE_CALENDAR.md §6.3).
    *
    * Same component as the personal calendar, different perspective: rows name
    * the member supplying each resource, and `concierge` rows are what the rikma

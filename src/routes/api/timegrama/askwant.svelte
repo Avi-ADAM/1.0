@@ -1,6 +1,6 @@
 <script module>
   /**
-   * Join-a-service maturation (docs/PLAN_TIMEGRAMA.md, D2 + phase 4.4).
+   * Join-a-service maturation (docs/inprogress/PLAN_TIMEGRAMA.md, D2 + phase 4.4).
    *
    * `sheirutShow` lets someone ask to receive a rikma's service. The request is
    * an `askwant` with a clock on it, and the clock had no finalizer — so the
@@ -22,7 +22,7 @@
    * an askwant. Until one exists every clock here ends in "no member approval",
    * which is the correct answer to a request nobody could answer — but it means
    * the requester hears nothing. That reminder is tracked separately in
-   * docs/TIMEGRAMA_REMINDERS.md.
+   * docs/tbd/TIMEGRAMA_REMINDERS.md.
    */
   import { strapiClient as strapi } from '$lib/server/actions';
   import { approveAskwant, sheirutGate } from '$lib/server/sheirut/approveSheirutRequests';

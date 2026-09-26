@@ -546,9 +546,7 @@ const qids_base = {
                         descrip   missionName 
                             } }}
        }
-`, '14changeOnline': `mutation ChangeOnline($id: ID!, $online: Boolean) {
-   UpdatePgishauser(id: $id, data: {online: $online}) {data{id attributes{ online}}}
-}`,
+`,
   "15createPgishauser": `mutation CreatePgishauser($id: ID!) {
   createPgishauser(data: {users_permissions_user: $id}) {data{id}}
 }`, '16createPgisha': `mutation CreatePgisha($ids: [ID],$name: String, $desc: String,$pendIds:[ID]) {
@@ -1578,7 +1576,7 @@ const qids_base = {
       $positionId: ID!,
       $issueId: ID,
       $body: String!,
-      $stanceValue: Int,
+      $stanceValue: Float,
       $origin: ENUM_CLAUSE_ORIGIN,
       $authorExternalId: String,
       $authorType: ENUM_CLAUSE_AUTHORTYPE,
@@ -1608,7 +1606,7 @@ const qids_base = {
     mutation UpdateClause(
       $id: ID!,
       $body: String,
-      $stanceValue: Int,
+      $stanceValue: Float,
       $issueId: ID,
       $confirmedByAuthor: Boolean
     ) {
@@ -2027,7 +2025,8 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
     }
   }`,
 
-  "65checkSheirutpendRequester": `query CheckSheirutpendRequester($uid: ID!, $sheirutpendId: ID!) {
+  // Returns the requester; the caller compares it to the session uid itself.
+  "65checkSheirutpendRequester": `query CheckSheirutpendRequester($sheirutpendId: ID!) {
     sheirutpend(id: $sheirutpendId) {
       data {
         id
@@ -2793,14 +2792,6 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
       start: $start,
       finish: $finish
     }) {
-      data {
-        id
-      }
-    }
-  }`,
-
-  "78archiveMultipleAsks": `mutation ArchiveMultipleAsks($askIds: [ID]!) {
-    updateAsks(ids: $askIds, data: { archived: true }) {
       data {
         id
       }
@@ -6351,7 +6342,7 @@ ${STIPEND_DECISION_FIELDS}
       }
     }
   }`,
-  // How many seats this open mission still has (docs/PLAN_SHIFTS.md §2).
+  // How many seats this open mission still has (docs/inprogress/PLAN_SHIFTS.md §2).
   // `mesimabetahaliches` carries `lifecycle` and `finnished` because a seat is
   // freed by a member leaving, not only by the mission being deleted; `asks`
   // carries `archived` so the shortfall ("seats nobody is even applying for")
@@ -7527,64 +7518,6 @@ ${STIPEND_DECISION_FIELDS}
     }
   }`,
 
-  '133queryComplexMatanot': `query QueryComplexMatanot($id: ID!) {
-    matanot(id: $id) {
-      data {
-        id
-        attributes {
-          name desc price quant kindOf
-          pricingMode marginPct estimatedPrice currency
-          status_of_voting appruved
-          pic { data { attributes { url formats } } }
-          projectcreates { data { id attributes { projectName } } }
-          process {
-            data {
-              id
-              attributes {
-                forums { data { id attributes { subject spec } } }
-              }
-            }
-          }
-          matanot_recipe_missions {
-            data {
-              id
-              attributes {
-                hoursPerUnit unitsPerProduct ratePerHour mode notes
-                pendm { data { id attributes { name descrip } } }
-                mesimabetahalich {
-                  data {
-                    id
-                    attributes { name howmanyhoursalready hoursassinged status }
-                  }
-                }
-                partof { data { id } }
-              }
-            }
-          }
-          matanot_recipe_resources {
-            data {
-              id
-              attributes {
-                quantityPerUnit pricePerUnit kindOf mode notes
-                pmash { data { id attributes { name } } }
-                mashabetahalich {
-                  data {
-                    id
-                    attributes { name 
-                        pricePerUnit
-                        kindOf
-                        descrip
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }`,
-
   '134updateMatanotStatus': `mutation UpdateMatanotStatus(
     $id: ID!,
     $status_of_voting: ENUM_MATANOT_STATUS_OF_VOTING,
@@ -8091,6 +8024,7 @@ ${STIPEND_DECISION_FIELDS}
         id
         attributes {
           name
+          discoveryKeywords
           price
           estimatedPrice
           pricingMode
@@ -9201,7 +9135,10 @@ export const moachQids = {
             id attributes {
               name descrip noofhours perhour sqadualed createdAt
               pendm { data { id } }
-              asks { data { id attributes { username } } }
+              asks { data { id attributes {
+                users_permissions_user { data { id attributes { username } } }
+                forums { data { id } }
+              } } }
               tafkidims { data { id attributes { roleDescription localizations @include(if: $withLoc) { data { attributes { roleDescription } } } } } }
             }
           } }
@@ -9222,7 +9159,7 @@ export const moachQids = {
             id attributes {
               name kindOf hm descrip price easy spnot sqadualed sqadualedf
               pmash { data { id attributes { name } } }
-              askms { data { id attributes { name } } }
+              askms { data { id attributes { users_permissions_user { data { id attributes { username } } } } } }
               maap { data { id attributes { name archived } } }
               rikmashes { data { id attributes { name kindOf total hm price } } }
             }
@@ -9608,7 +9545,7 @@ export const moachQids = {
     }
   }`,
   // Lightweight rikma-value summary for the mission-equity preview
-  // (docs/PLAN_MISSION_EQUITY_PREVIEW.md §3.1). Fetches only the numbers the
+  // (docs/done/PLAN_MISSION_EQUITY_PREVIEW.md §3.1). Fetches only the numbers the
   // equity math needs. finnished_missions is left UNFILTERED to match
   // getProjectFinancials / the split page. Every collection carries
   // pagination:{ limit:-1 } — Strapi's default page size is 10, which would
@@ -9683,23 +9620,6 @@ export const moachQids = {
             pagination: { limit: -1 }
           ) {
             data { id attributes { total } }
-          }
-        }
-      }
-    }
-  }`,
-  'getProjectProcesses': `query GetProjectProcesses($pid: ID!) {
-    project(id: $pid) {
-      data {
-        attributes {
-          projectName
-          processes {
-            data {
-              id
-              attributes {
-                name descrip createdAt
-              }
-            }
           }
         }
       }
@@ -9988,12 +9908,13 @@ export const moachQids = {
       }
     }
   }`,
+  // A single Vote row: one member's stance (`what` is the yes/no Boolean).
   'getVote': `query GetVote($id: ID!) {
-    vot(id: $id) {
+    vote(id: $id) {
       data {
         id
         attributes {
-          what why zman order
+          what why order createdAt
           users_permissions_user { data { id attributes { username } } }
         }
       }
@@ -12717,8 +12638,9 @@ ${STIPEND_DECISION_FIELDS}
     matanots(
       filters: { and: [ { archived: { eq: false }
         status_of_voting: { eq: "active" }
-        name: { containsi: $q }
-        or: [{ hideFromDiscovery: { eq: false } }, { hideFromDiscovery: { null: true } }] }, ${NOT_ARCHIVED} ] }
+        or: [{ hideFromDiscovery: { eq: false } }, { hideFromDiscovery: { null: true } }] },
+        { or: [{ name: { containsi: $q } }, { discoveryKeywords: { containsi: $q } }] },
+        ${NOT_ARCHIVED} ] }
       pagination: { limit: $limit }
     ) {
       data {
@@ -12887,9 +12809,10 @@ ${STIPEND_DECISION_FIELDS}
   // Atomic-activation deal (PLAN_SHARED_PURCHASE §7.2): a per-member Sheirutpend
   // on the supplier's rikma, tagged with the maagad_offer. conditional=false =
   // live deal (created only at activation, so no orphan pends on unsign/expire).
+  // Sheirutpend has no draft&publish, so there is no publishedAt to set.
   '235crMaagadSheirutpend': `mutation CrMaagadSheirutpend(
     $project: ID!, $userId: ID!, $maagadOffer: ID!,
-    $price: Float, $quant: Float, $total: Float, $publishedAt: DateTime
+    $price: Float, $quant: Float, $total: Float
   ) {
     createSheirutpend(data: {
       project: $project,
@@ -12897,8 +12820,7 @@ ${STIPEND_DECISION_FIELDS}
       maagad_offer: $maagadOffer,
       conditional: false,
       appruved: false,
-      price: $price, quant: $quant, total: $total,
-      publishedAt: $publishedAt
+      price: $price, quant: $quant, total: $total
     }) {
       data { id attributes { price total conditional } }
     }
@@ -13281,7 +13203,7 @@ ${STIPEND_DECISION_FIELDS}
   }`,
 
   // Resource occupancy for one holder — the data behind the personal calendar
-  // (docs/PLAN_RESOURCE_CALENDAR.md §6.2).
+  // (docs/inprogress/PLAN_RESOURCE_CALENDAR.md §6.2).
   //
   // Until the `resource-booking` collection exists, "when is this taken" is
   // reconstructed from the two rows that already record it: the live engine
@@ -13317,7 +13239,7 @@ ${STIPEND_DECISION_FIELDS}
     }
   }`,
 
-  // The rikma's side of the same picture (docs/PLAN_RESOURCE_CALENDAR.md §6.3):
+  // The rikma's side of the same picture (docs/inprogress/PLAN_RESOURCE_CALENDAR.md §6.3):
   // what it holds and until when, plus what it has committed to supply outward.
   // Those two directions have never been on one screen, which is how a rikma
   // sells the same week twice without noticing.
@@ -13440,44 +13362,6 @@ ${STIPEND_DECISION_FIELDS}
           data { id attributes { missionName } }
         }
       } }
-    }
-  }`,
-
-  '272myOfferingsCounts': `query MyOfferingsCounts($uid: ID!) {
-    products: matanots(
-      filters: { and: [ { projectcreates: { user_1s: { id: { eq: $uid } } }, archived: { ne: true } }, ${NOT_ARCHIVED} ] }
-      pagination: { limit: 1 }
-    ) { meta { pagination { total } } }
-    offers: missionOffers(
-      filters: { users_permissions_user: { id: { eq: $uid } }, archived: { ne: true }, active: { eq: true } }
-      pagination: { limit: 1 }
-    ) { meta { pagination { total } } }
-    doing: mesimabetahaliches(
-      filters: { and: [ { users_permissions_user: { id: { eq: $uid } }, finnished: { ne: true }, archived: { ne: true } }, ${NOT_ARCHIVED} ] }
-      pagination: { limit: 1 }
-    ) { meta { pagination { total } } }
-    done: finnishedMissions(
-      filters: { users_permissions_user: { id: { eq: $uid } } }
-      pagination: { limit: 1 }
-    ) { meta { pagination { total } } }
-  }`,
-
-  '273myMissionsFull': `query MyMissionsFull($uid: ID!) {
-    doing: mesimabetahaliches(
-      filters: { and: [ { users_permissions_user: { id: { eq: $uid } }, finnished: { ne: true }, archived: { ne: true } }, ${NOT_ARCHIVED} ] }
-      pagination: { limit: 100 }
-      sort: "createdAt:desc"
-    ) {
-      data { id attributes {
-        name hoursassinged howmanyhoursalready
-        project { data { id attributes { projectName } } }
-      } }
-    }
-    done: finnishedMissions(
-      filters: { users_permissions_user: { id: { eq: $uid } } }
-      pagination: { limit: 300 }
-    ) {
-      data { id attributes { missionName } }
     }
   }`,
 
@@ -14795,7 +14679,8 @@ ${STIPEND_DECISION_FIELDS}
               mashaabim { data { id } }
               # The holder's own offer window + kind, so the date gate can tell
               # "available in April" from "stopped offering this in 2024".
-              kindOf sdate fdate hm panui
+              # Sp spells its per-unit quantity "unit", not "hm".
+              kindOf availability capacity unit sdate fdate panui
             } }
           }
         }
@@ -15474,7 +15359,7 @@ ${STIPEND_DECISION_FIELDS}
 
 
   // ── TIMEGRAMA phase 4.3 / 4.4 — sheirutpend + askwant ────────────────────
-  // docs/PLAN_TIMEGRAMA.md. Both kinds had a clock and no finalizer; these are
+  // docs/inprogress/PLAN_TIMEGRAMA.md. Both kinds had a clock and no finalizer; these are
   // the reads/writes those finalizers and their client Actions need.
 
   /**
@@ -15512,7 +15397,7 @@ ${STIPEND_DECISION_FIELDS}
   }`,
 
   /**
-   * Price quotes on a product request (docs/PLAN_CONCIERGE_LOCAL_PROVIDERS.md
+   * Price quotes on a product request (docs/inprogress/PLAN_CONCIERGE_LOCAL_PROVIDERS.md
    * §6): the request, its `sheirutnego` rounds and the votes on them — what
    * src/lib/sheirut/quoteState.ts needs to say whose turn it is.
    */
@@ -15995,7 +15880,7 @@ ${STIPEND_DECISION_FIELDS}
   }`,
 
   // The rikma's shared library — documents, images and links
-  // (docs/PLAN_RIKMA_SHARED_INFO.md §3.1, stage 1).
+  // (docs/inprogress/PLAN_RIKMA_SHARED_INFO.md §3.1, stage 1).
   //
   // Members-only: a project id proves nothing about the caller, so this qid
   // carries a PRE guard in guards.js exactly like 310projectResourceOccupancy.

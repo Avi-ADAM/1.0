@@ -1,6 +1,6 @@
 /**
  * Action: open a hold on a resource for a date range
- * (docs/PLAN_RESOURCE_CALENDAR.md §4).
+ * (docs/inprogress/PLAN_RESOURCE_CALENDAR.md §4).
  *
  * A hold takes capacity while a vote runs, so two rikmot cannot each be told
  * the projector is theirs. It expires on its own — nobody has to remember to

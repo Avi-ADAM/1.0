@@ -131,6 +131,8 @@
           )}{/if}
       </button>
     </div>
+    <!-- The same profile as a living list, in words (PLAN_AI_SIGNUP_CONCIERGE §6). -->
+    <a href="/onboard/assistant" class="assistant-link">{$t('onboard.provider.assistantLink')}</a>
   </div>
 </ScreenFrame>
 
@@ -191,6 +193,11 @@
     gap: 8px;
     margin-top: 6px;
     align-items: center;
+  }
+  .assistant-link {
+    font-size: 12.5px;
+    color: #574010;
+    text-decoration: underline;
   }
   .spin {
     display: inline-block;

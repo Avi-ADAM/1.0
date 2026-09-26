@@ -5,7 +5,7 @@ import { iceServers, mintTicket, p2pTicketSecret } from '$lib/server/p2p/ticket.
 
 /**
  * POST /api/v1/p2p/ticket — a seat in one rikma's P2P room
- * (docs/PLAN_P2P_PILOT.md §2).
+ * (docs/inprogress/PLAN_P2P_PILOT.md §2).
  *
  * Body `{ projectId }`. Checks membership against the signed JWT
  * (`locals.uid`), then answers with a signed ticket the socket server accepts

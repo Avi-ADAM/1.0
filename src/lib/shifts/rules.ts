@@ -1,6 +1,6 @@
 /**
  * Standing rules — "I'm never in on Fridays", "Sunday mornings are mine"
- * (docs/PLAN_SHIFTS.md §3.3, P10).
+ * (docs/inprogress/PLAN_SHIFTS.md §3.3, P10).
  *
  * A rule is a standing declaration: the same consent a tap on the grid gives
  * (§1.1), said once for every shift it matches instead of shift by shift. So

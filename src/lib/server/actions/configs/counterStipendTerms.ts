@@ -1,5 +1,5 @@
 /**
- * Action: counterStipendTerms (docs/PLAN_STIPEND.md §5, super-principles).
+ * Action: counterStipendTerms (docs/done/PLAN_STIPEND.md §5, super-principles).
  *
  * The move that exists instead of a "no" button. Nobody rejects a stipend —
  * they put different terms on the table: a lower rate, a smaller budget, a

@@ -19,7 +19,7 @@ import { ensureCandidacyTimegrama } from '../../nego/timegrama.js';
  * standing claim is a counter-proposal, not a door slammed shut.
  *
  * TODO (consent redesign — see AGENTS.md "Consent & decisions" and
- * docs/PLAN_NEGOTIATION_CANDIDATES.md): this action is a stepping stone. A bare
+ * docs/done/PLAN_NEGOTIATION_CANDIDATES.md): this action is a stepping stone. A bare
  * `what:false` still only says "not these terms" without saying which terms
  * would do, so it stalls the candidacy until somebody else moves. The intended
  * end state has NO plain negative vote at all on a candidacy:

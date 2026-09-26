@@ -1,0 +1,52 @@
+{
+  "profileTitle": "Mi perfil, en conversación",
+  "profileSub": "Lo que ya está en tu perfil aparece con ✓. Di con palabras qué cambiar, o toca un elemento. \"Ahora no\" no borra nada - puedes recuperarlo.",
+  "backToOnboarding": "Volver a la bienvenida",
+  "wishLauncher": "Afinar con Lev",
+  "error": "Algo salió mal. Inténtalo de nuevo en un momento.",
+  "conflict": "La lista cambió mientras tanto (quizá desde tu asistente) - esta es la versión actual.",
+  "updatedElsewhere": "La lista se actualizó en otro lugar - esta es la versión actual.",
+  "viaAgent": "También actualizado desde Claude",
+  "groups": {
+    "skills": "Habilidades",
+    "roles": "Roles",
+    "methods": "Formas de trabajar",
+    "vallues": "Valores",
+    "resources": "Mis recursos",
+    "wishMissions": "Misiones",
+    "wishResources": "Recursos"
+  },
+  "locked": "Un proveedor respondió",
+  "lockedHint": "Cambiar esta fila es una conversación con quien respondió - en la página del deseo.",
+  "restore": "Recuperar",
+  "keep": "Correcto",
+  "notNow": "Ahora no",
+  "add": "Añadir",
+  "addPlaceholder": "Añadir…",
+  "sayLabel": "¿Qué cambiar?",
+  "sayPlaceholder": "p. ej.: \"el diseño está bien, quita Excel, añade fotografía\"",
+  "working": "Trabajando en ello…",
+  "send": "Actualizar",
+  "undo": "Deshacer el último cambio",
+  "apply": {
+    "profile": "Guardar en mi perfil",
+    "wish": "Guardar en el deseo"
+  },
+  "saved": {
+    "profile": "Guardado en tu perfil. Tus sugerencias en la página Lev se están actualizando.",
+    "wish": "Guardado en el deseo."
+  },
+  "nothingToSave": "No hay cambios que guardar.",
+  "keptAnswered": "{{count}} filas que marcaste \"ahora no\" se quedaron, porque un proveedor respondió una fila posterior.",
+  "publishOnSite": "Publicar a la comunidad es el botón de publicar del deseo.",
+  "offers": {
+    "title": "Misiones abiertas que encajan contigo"
+  },
+  "nearby": {
+    "title": "Rikmas cercanas a ti",
+    "sub": "Aún no tienen una misión abierta que encaje - pero puedes ofrecerte, y la rikma decide.",
+    "values": "Valores compartidos: {{names}}",
+    "skills": "Ya hay allí: {{names}}",
+    "offerMyself": "Ofrecerme"
+  }
+}

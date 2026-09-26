@@ -145,7 +145,7 @@ const finalizeAskAcceptanceHandler: ActionExecutionHandler = async (params, cont
   const actsFragment = 'acts { data { id } }';
 
   // A service mission asked for several people stays open until it has them
-  // (docs/PLAN_SHIFTS.md §2). Read before the mutation — afterwards this
+  // (docs/inprogress/PLAN_SHIFTS.md §2). Read before the mutation — afterwards this
   // acceptance is already part of the count.
   const headcount = await acceptanceEffect(strapi, context, openMid);
 
@@ -260,7 +260,7 @@ const finalizeAskAcceptanceHandler: ActionExecutionHandler = async (params, cont
 
   // Spin up the Monter for a recurring service, and archive the losing
   // candidacies once — and only once — the mission is actually full
-  // (docs/PLAN_SHIFTS.md §2.2).
+  // (docs/inprogress/PLAN_SHIFTS.md §2.2).
   //
   // The Monter is now sent on its own rather than riding the first archive
   // iteration: it used to be skipped entirely whenever there was exactly one

@@ -19,7 +19,8 @@
   "holder": {
     "me": "Lo hago yo",
     "open": "Buscamos a alguien",
-    "partner": "Lo aporta: {{name}}"
+    "partner": "Lo aporta: {{name}}",
+    "toggle": "Haz clic para cambiar entre \"Lo hago yo\" y \"Buscamos a alguien\" (buscamos = los miembros afines reciben un correo)"
   },
   "row": {
     "name": "Nombre",
@@ -30,7 +31,9 @@
     "price": "Precio",
     "priceOnRequest": "A consultar",
     "keywords": "Palabras con las que te buscarán",
-    "keywordsHint": "Separadas por comas: cómo describiría un cliente su necesidad, no el nombre del producto. Así te encuentra el conserje."
+    "keywordsHint": "Separadas por comas: cómo describiría un cliente su necesidad, no el nombre del producto. Así te encuentra el conserje.",
+    "categories": "Ámbitos",
+    "categoriesHint": "Hasta 3, separados por comas (p. ej.: eventos, comida). Se vinculan a los ámbitos que ya existen en el sitio; el conserje los compara con cada deseo."
   },
   "partner": {
     "noEmail": "Sin correo"
@@ -54,5 +57,27 @@
     "pendingVote": "{{name}} será invitado/a cuando la rikma apruebe la misión.",
     "noEmail": "No se indicó el correo de {{name}}, así que no se envió invitación.",
     "other": "La invitación a {{name}} no se envió."
+  },
+  "preview": {
+    "title": "Vista previa",
+    "banner": "Vista previa - todavía no se ha creado nada. Así se verá la rikma en 1lev1.",
+    "until": "El enlace funciona hasta el {{date}}",
+    "about": "Sobre la rikma",
+    "values": "Valores",
+    "founder": "Quien la funda",
+    "lookingFor": "Buscamos a alguien",
+    "split": "Cómo se forman las partes - un ejemplo",
+    "splitNote": "Según el valor que aporta cada parte: horas × tarifa, y los recursos a su precio. Solo ilustrativo - el reparto real se acuerda entre todos.",
+    "openReal": "Ir a la rikma",
+    "ownerHint": "La rikma aún no se ha creado. Quien la preparó la crea con un clic en la pantalla de revisión.",
+    "joinCta": "Unirse a 1lev1"
+  },
+  "share": {
+    "button": "Enlace de vista previa para socios",
+    "making": "Preparando el enlace…",
+    "ready": "Este es el enlace - quien lo recibe puede ver, no editar. Funciona {{days}} días; un enlace nuevo anula el anterior.",
+    "copy": "Copiar",
+    "copied": "Copiado",
+    "error": "No pudimos crear el enlace. Inténtalo de nuevo."
   }
 }

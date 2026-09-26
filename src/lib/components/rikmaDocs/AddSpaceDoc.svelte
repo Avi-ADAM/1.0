@@ -1,7 +1,7 @@
 <script>
   /**
    * Add one entry to the rikma's shared library
-   * (docs/PLAN_RIKMA_SHARED_INFO.md §5, §6).
+   * (docs/inprogress/PLAN_RIKMA_SHARED_INFO.md §5, §6).
    *
    * Two upload paths, chosen by the server (`upload.mode`), and the form is
    * the same for both:
@@ -133,7 +133,7 @@
     try {
       // The file's content address, recorded on the row: every later copy of
       // it — from a partner's browser, from this device's cache — is checked
-      // against it (docs/PLAN_P2P_PILOT.md). Computed before the upload so a
+      // against it (docs/inprogress/PLAN_P2P_PILOT.md). Computed before the upload so a
       // hashing failure costs nothing.
       const sha256 = kind === 'link' ? null : await sha256Hex(picked);
       const stored =

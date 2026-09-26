@@ -1,5 +1,5 @@
 /**
- * What travels over one DataChannel in the P2P pilot (docs/PLAN_P2P_PILOT.md §1).
+ * What travels over one DataChannel in the P2P pilot (docs/inprogress/PLAN_P2P_PILOT.md §1).
  *
  * One channel carries one file. Control messages are JSON strings; the file
  * itself is binary messages in order (the channel is ordered + reliable, so

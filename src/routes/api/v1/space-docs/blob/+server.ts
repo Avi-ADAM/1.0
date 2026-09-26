@@ -6,7 +6,7 @@ import { readObject, saveObject, statObject } from '$lib/server/storage/local.js
 import { safeKeyName } from '$lib/server/storage/r2.js';
 
 /**
- * The local storage driver's door (docs/PLAN_RIKMA_SHARED_INFO.md §6 stage 2).
+ * The local storage driver's door (docs/inprogress/PLAN_RIKMA_SHARED_INFO.md §6 stage 2).
  *
  * What a presigned R2 URL is for the bucket, this endpoint is for the folder
  * on our own disk:

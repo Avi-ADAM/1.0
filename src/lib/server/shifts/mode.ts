@@ -1,5 +1,5 @@
 /**
- * The shift system's rollout switch (docs/PLAN_SHIFTS.md §11).
+ * The shift system's rollout switch (docs/inprogress/PLAN_SHIFTS.md §11).
  *
  *   off     (default) — nothing is read or written; the shifts page says the
  *                       feature is not on yet. Today's behaviour, exactly.

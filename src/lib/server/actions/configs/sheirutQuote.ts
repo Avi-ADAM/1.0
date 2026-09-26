@@ -1,5 +1,5 @@
 /**
- * Price quotes on a product request — docs/PLAN_CONCIERGE_LOCAL_PROVIDERS.md §6.
+ * Price quotes on a product request — docs/inprogress/PLAN_CONCIERGE_LOCAL_PROVIDERS.md §6.
  *
  * A grocery basket has no catalogue price: the customer asks ("2 cola, yellow
  * cheese", and a sum if she has one in mind — she does not have to), the shop

@@ -1,5 +1,5 @@
 /**
- * Resource availability — shared types (docs/PLAN_RESOURCE_CALENDAR.md §2, §3).
+ * Resource availability — shared types (docs/inprogress/PLAN_RESOURCE_CALENDAR.md §2, §3).
  *
  * These describe the *booking ledger*: the one place a date range on a resource
  * is recorded, whoever the counterparty is (rikma, concierge customer, or the

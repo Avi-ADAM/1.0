@@ -1,6 +1,6 @@
 /**
  * The read half of the UGC translation cache (§4.1 of
- * docs/PLAN_UGC_TRANSLATION.md). **Read only** — the write half
+ * docs/inprogress/PLAN_UGC_TRANSLATION.md). **Read only** — the write half
  * (`cacheTranslations`, the Gemini adapter, the governor) is P2 and does not
  * exist yet. Nothing in this file can spend a request.
  *
@@ -12,7 +12,7 @@
  * /availableMission cannot burn a day's quota.
  *
  * Until the Strapi `text-translation` collection exists (see
- * docs/STRAPI_TEXT_TRANSLATION_SETUP.md), every call here fails soft and
+ * docs/done/STRAPI_TEXT_TRANSLATION_SETUP.md), every call here fails soft and
  * returns "all misses" — which is exactly today's behaviour, in every language.
  */
 
@@ -45,7 +45,7 @@ function warnOnce(err: unknown) {
     console.warn(
         '[translation] cache read failed — rendering source text. ' +
             'This is expected until the Strapi `text-translation` collection and its ' +
-            'two permission grants exist (docs/STRAPI_TEXT_TRANSLATION_SETUP.md).',
+            'two permission grants exist (docs/done/STRAPI_TEXT_TRANSLATION_SETUP.md).',
         err instanceof Error ? err.message : err
     );
 }

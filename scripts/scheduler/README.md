@@ -9,6 +9,8 @@ until this existed both ran only when somebody remembered to call them:
 | `monthi` | `GET /api/monthi` | once a calendar month, from the 1st at 03:00 | files each month's hours from the timers and resets the counter; opens recurring resource and standing-order cycles |
 | `maagad` | `GET /api/cron/maagad` | daily at 04:00 | clusters open wishes into demand pools, expires stale offers |
 | `translate-backfill` | `GET /api/cron/translate-backfill` | daily at 05:00 | fills the UGC translation cache out of a free quota, so a guest reads a translated page on their **first** load |
+| `shifts` | `GET /api/cron/shifts` | every hour | materializes shifts, opens declaration cycles, publishes drafts, closes rosters — answers `skipped` while `SHIFTS=off` |
+| `assistant-cleanup` | `GET /api/cron/assistant-cleanup` | daily at 06:00 | deletes agent-prepared signups nobody claimed within 14 days |
 
 Every job is safe to run more often than needed: `timegrama` skips clocks that
 have not arrived, `monthi` writes only what actually changed, `maagad` refuses
@@ -87,7 +89,7 @@ node scheduler.mjs --run monthi --dry
 ```
 
 `--dry` is dry for every job. `monthi` and `translate-backfill` run against
-`?dry=1`; `timegrama` and `maagad` have no preview mode, so they are logged and
+`?dry=1`; `timegrama`, `maagad`, `shifts` and `assistant-cleanup` have no preview mode, so they are logged and
 **not called** rather than quietly matured for real. And a dry run never marks a month closed, so previewing
 the close cannot make the real one skip itself.
 
@@ -108,10 +110,12 @@ Environment variables win over the `.env` file; the `.env` file is found at
 | `SCHEDULER_MAAGAD_HOUR` | `4` | earliest the daily batch may run |
 | `SCHEDULER_BACKFILL_HOUR` | `5` | earliest the translation backfill may run |
 | `SCHEDULER_BACKFILL_TIMEOUT_SECONDS` | `900` | it walks a corpus page and may wait on a rate-limited model |
+| `SCHEDULER_SHIFTS_MINUTES` | `60` | shift-engine interval |
+| `SCHEDULER_ASSISTANT_CLEANUP_HOUR` | `6` | earliest the signup cleanup may run |
 | `SCHEDULER_FAILURE_BACKOFF_MINUTES` | `15` | how long a failed job waits before it is tried again |
 | `SCHEDULER_ALERT_AFTER_FAILURES` | `3` | consecutive failures before a Telegram alert |
 | `ADMINMONTHER` | — | **required by `monthi`** — sent as `x-monthi-key` |
-| `CRON_SECRET` | — | sent to `/api/cron/maagad` and `/api/cron/translate-backfill` when they ask for it |
+| `CRON_SECRET` | — | sent to every `/api/cron/*` job when it asks for it |
 | `TELEGRAM_BOT_TOKEN` / `TELEGRAM_CHAT_ID` | — | optional; without them, alerts are simply not sent |
 
 `monthi` holds itself back rather than failing when `ADMINMONTHER` is missing —

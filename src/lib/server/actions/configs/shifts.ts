@@ -1,5 +1,5 @@
 /**
- * Every shift action, in one list (docs/PLAN_SHIFTS.md §8).
+ * Every shift action, in one list (docs/inprogress/PLAN_SHIFTS.md §8).
  *
  * Registered together from index.ts so adding a shift action touches this
  * file and its own, never the shared registration list.

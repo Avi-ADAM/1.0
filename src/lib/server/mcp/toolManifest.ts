@@ -67,6 +67,11 @@ import {
   getAssistantTool,
   setAssistantItemsTool,
   undoAssistantTool,
+  shareRikmaPreviewTool,
+  startAssistantTool,
+  reviseAssistantTool,
+  applyAssistantTool,
+  dismissOfferTool,
   assistantMcpEnabled
 } from '../../../mastra/tools/assistantTools';
 import {
@@ -121,6 +126,13 @@ export const MCP_TOOL_MANIFEST: Record<string, McpManifestEntry> = {
   getAssistantTool: { tool: getAssistantTool, tier: 'read', enabled: assistantMcpEnabled },
   setAssistantItemsTool: { tool: setAssistantItemsTool, tier: 'prepare', enabled: assistantMcpEnabled },
   undoAssistantTool: { tool: undoAssistantTool, tier: 'prepare', enabled: assistantMcpEnabled },
+  shareRikmaPreviewTool: { tool: shareRikmaPreviewTool, tier: 'prepare', enabled: assistantMcpEnabled },
+  // Profile / wish lists (§6, §7): the person's own profile and draft, saved
+  // from the chat by decision §0.1; reading a text or revising runs a model.
+  startAssistantTool: { tool: startAssistantTool, tier: 'selfWrite', ai: true, enabled: assistantMcpEnabled },
+  reviseAssistantTool: { tool: reviseAssistantTool, tier: 'selfWrite', ai: true, enabled: assistantMcpEnabled },
+  applyAssistantTool: { tool: applyAssistantTool, tier: 'selfWrite', enabled: assistantMcpEnabled },
+  dismissOfferTool: { tool: dismissOfferTool, tier: 'selfWrite', enabled: assistantMcpEnabled },
 
   // --- conversations (M4). A forum belongs to a mission/decision/haluka, not to
   // a rikma, so the rikma gate lives inside the tools (forumAllowedByKey) and the

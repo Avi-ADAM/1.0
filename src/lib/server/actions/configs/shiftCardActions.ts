@@ -1,5 +1,5 @@
 /**
- * The shift actions behind the heart's cards (docs/PLAN_SHIFTS.md §7, §7.1, §7.2).
+ * The shift actions behind the heart's cards (docs/inprogress/PLAN_SHIFTS.md §7, §7.1, §7.2).
  *
  *   getShiftWork          — which cards I have (declare / my draft / holes)
  *   releaseShiftAssignment — I cannot come after all. Never blocked, never

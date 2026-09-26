@@ -13,7 +13,7 @@
  * The last two terms of `hours` and of `amount` are the ones that keep the
  * model honest when more than one stipend exists at once: hours the rikma
  * approved are finite, and the equity they bought cannot be given away twice
- * (docs/FIXES.md §2).
+ * (docs/inprogress/FIXES.md §2).
  */
 
 import type { PartialStipendTerms } from './types.js';
@@ -53,7 +53,7 @@ export interface CycleInput {
    *
    * Approved hours are a finite thing: the rikma signed them once. Each pledge
    * used to know only its own `lastSettledAt`, so two pledges covering the same
-   * person each paid for the same hours from scratch (docs/FIXES.md §2).
+   * person each paid for the same hours from scratch (docs/inprogress/FIXES.md §2).
    */
   hoursAlreadyMetered?: number | null;
   /**
@@ -160,7 +160,7 @@ export function computeStipendCycle(input: CycleInput): CycleResult {
  * who settles on the 1st of the next month — the way people actually pay — saw
  * an empty card, and hours approved late in a settled month fell into a gap
  * between the watermark and the next window and were never paid at all
- * (docs/FIXES.md §3, §6).
+ * (docs/inprogress/FIXES.md §3, §6).
  *
  * So the origin is the **watermark**: everything approved since the last
  * settlement, never anything from before the pledge itself began. The monthly

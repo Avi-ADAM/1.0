@@ -117,7 +117,7 @@ export const POST: RequestHandler = async ({ request }) => {
       token_type: 'Bearer',
       scope: 'mcp'
       // No expires_in and no refresh_token: an api-key lives until the user
-      // revokes it in Settings → API keys. See docs/PLAN_MCP_OAUTH.md.
+      // revokes it in Settings → API keys. See docs/done/PLAN_MCP_OAUTH.md.
     },
     { headers: NO_STORE }
   );

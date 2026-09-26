@@ -1,5 +1,5 @@
 /**
- * The shadow comparison (docs/PLAN_RESOURCE_CALENDAR.md §8, milestone M3).
+ * The shadow comparison (docs/inprogress/PLAN_RESOURCE_CALENDAR.md §8, milestone M3).
  *
  * `RESOURCE_BOOKINGS=shadow` exists so that the two answers to "is this
  * resource available?" can be put side by side before either one is trusted:

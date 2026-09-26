@@ -1,6 +1,6 @@
 /**
  * Run a rikma blueprint — the "create" button of the review screen
- * (docs/PLAN_AI_SIGNUP_CONCIERGE.md §4.5).
+ * (docs/inprogress/PLAN_AI_SIGNUP_CONCIERGE.md §4.5).
  *
  * The plan (order, params) is decided purely in $lib/assistant/materializePlan;
  * this file only executes it, through the actions the site's own forms run, so
@@ -41,6 +41,11 @@ export interface MaterializeDeps {
   resolveMissionVocab: (
     item: AssistantItem
   ) => Promise<{ skillIds?: string[]; roleIds?: string[]; workwayIds?: string[] } | undefined>;
+  /**
+   * A product's domain names → Category ids, creating the ones no row has yet.
+   * Optional and best-effort: a product without categories is still a product.
+   */
+  resolveCategories?: (names: string[]) => Promise<string[]>;
   /** Members of an existing rikma before the run. */
   memberCount: (projectId: string) => Promise<number>;
   projectName: (projectId: string) => Promise<string>;
@@ -153,7 +158,14 @@ export async function runMaterialization(
       const item = byKey.get(step.key)!;
       const missions = step.missionKeys.map((k) => byKey.get(k)!).filter(Boolean);
       const resources = step.resourceKeys.map((k) => byKey.get(k)!).filter(Boolean);
-      const r = await deps.runAction('createComplexMatanot', productParams(item, { missions, resources }, state, pctx));
+      const names = Array.isArray(item.spec?.categories)
+        ? (item.spec!.categories as unknown[]).filter((c): c is string => typeof c === 'string')
+        : [];
+      const categoryIds = names.length && deps.resolveCategories ? await deps.resolveCategories(names).catch(() => []) : [];
+      const r = await deps.runAction(
+        'createComplexMatanot',
+        productParams(item, { missions, resources }, state, { ...pctx, categories: { [item.key]: categoryIds } })
+      );
       const id = r?.data?.matanotId;
       if (r?.success && id) {
         mark(item, 'matanot', String(id));

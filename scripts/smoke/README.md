@@ -6,7 +6,7 @@ It exists because a whole class of bugs in this app is invisible to `vitest`:
 a qid that only 403s in production, a GraphQL mutation that only fails when a
 description contains a quote, a button that swallows its own error. Those need
 a browser, a session and the real backend. Everything found in
-`docs/QA_SOLO_RIKMA_2026-08.md` came from this harness.
+`docs/inprogress/QA_SOLO_RIKMA_2026-08.md` came from this harness.
 
 ## Setup
 
@@ -103,7 +103,7 @@ This sweep only reads.
 
 Each of these writes to the live database and requires `--yes`, so it cannot
 happen by accident. Nothing is cleaned up afterwards — the app has no delete for
-most of these objects yet (see `docs/PLAN_OBJECT_ARCHIVAL.md`).
+most of these objects yet (see `docs/done/PLAN_OBJECT_ARCHIVAL.md`).
 
 ### `solo-money` — the money loop
 
@@ -114,7 +114,7 @@ node scripts/smoke/flows/solo-money.mjs --yes
 Walks a one-member rikma from nothing to a closed profit split — rikma → mission
 → take it → finish it → resource → approve it → product → sale → split —
 asserting at each step. It is the regression path for the two blockers in
-`docs/QA_SOLO_RIKMA_2026-08.md`: the GraphQL escaping bug in `applyToMission` (a
+`docs/inprogress/QA_SOLO_RIKMA_2026-08.md`: the GraphQL escaping bug in `applyToMission` (a
 mission with a rich-text description used to 500) and the empty-`halukas`
 rejection that made a solo split impossible.
 
@@ -159,7 +159,7 @@ side.
 node scripts/smoke/flows/archive-object.mjs --yes
 ```
 
-Walks `docs/PLAN_OBJECT_ARCHIVAL.md` end to end with two real members: a new
+Walks `docs/done/PLAN_OBJECT_ARCHIVAL.md` end to end with two real members: a new
 mission (which in a rikma of two is itself a vote), an archive proposal that
 must come back as a Decision rather than a done deed, the card the other member
 sees, a counter in `keep` mode, and the maturation that leaves the object
@@ -172,7 +172,7 @@ counter and **no** reject — a reject button here would be the bug.
 node scripts/smoke/flows/stipend.mjs --yes
 ```
 
-The rule from `docs/PLAN_STIPEND.md`: while the rikma's total value does not
+The rule from `docs/done/PLAN_STIPEND.md`: while the rikma's total value does not
 move the pledge is bilateral, and the moment it grows it needs a rikma-wide
 programme with a closed budget. Step 4 is the one worth having — the same form,
 one slider moved from "the recipient bears it" to "the rikma bears it", must
@@ -195,7 +195,7 @@ node scripts/smoke/flows/signup.mjs --confirm '<link from the email>'
 Walks `/hascama` → `/signup` → email confirmation → `/login` → onboarding → a
 profile that produces match suggestions. This is the path every member walks
 exactly once, which is why it rots unnoticed: nobody on the team signs up again.
-`docs/QA_NEW_USER_WALKTHROUGH_2026-08.md` found nine defects along it, three of
+`docs/done/QA_NEW_USER_WALKTHROUGH_2026-08.md` found nine defects along it, three of
 them severe, and the flow asserts all nine — each step names the finding it
 guards.
 

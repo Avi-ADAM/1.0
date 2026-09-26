@@ -10,7 +10,7 @@
  * the same principal, runs the same static authorization and the same
  * entity-level guards a browser request would get.
  *
- * See docs/PLAN_PROXY_SECURITY.md §11 and $lib/server/ssrApiBase.js.
+ * See docs/done/PLAN_PROXY_SECURITY.md §11 and $lib/server/ssrApiBase.js.
  */
 
 /**

@@ -1,7 +1,7 @@
 <script>
   /**
    * One entry of the rikma's shared library, with its inline edit
-   * (docs/PLAN_RIKMA_SHARED_INFO.md §5).
+   * (docs/inprogress/PLAN_RIKMA_SHARED_INFO.md §5).
    *
    * Hierarchy, top to bottom: the kind (a tinted tile, so a list of twenty
    * reads at a glance as "documents here, links there"), the name (the one
@@ -21,7 +21,7 @@
   import { formatSize } from '$lib/spaceDocs/spaceDocs.js';
   import { saveBlob } from '$lib/p2p/pilot.svelte.js';
 
-  /** `pilot` — the rikma's P2P session (docs/PLAN_P2P_PILOT.md), or null. */
+  /** `pilot` — the rikma's P2P session (docs/inprogress/PLAN_P2P_PILOT.md), or null. */
   let { doc, projectId, pilot = null, onChanged } = $props();
 
   // Through the pilot only when this device joined and the row carries the

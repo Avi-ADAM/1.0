@@ -20,7 +20,7 @@ const REGISTRY_API_KEY =
 const REGISTRY_LANG = 'he';
 
 // The store lives in ./lib/storage so chat Memory (agents) and the Mastra
-// instance share one pool — see docs/PLAN_MASTRA_STORAGE.md.
+// instance share one pool — see docs/done/PLAN_MASTRA_STORAGE.md.
 export const mastra = new Mastra({
   workflows: { chatWorkflow, 'analyze-cv': analyzeCvWorkflow },
   agents: {

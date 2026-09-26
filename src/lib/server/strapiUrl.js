@@ -9,7 +9,7 @@ import { env } from '$env/dynamic/private';
  *    internal docker network (`http://strapi-blue:1337`) without a rebuild.
  * 2. Build-time `VITE_URL` — dev / legacy fallback (public Strapi).
  *
- * See docs/PLAN_PROXY_SECURITY.md §5 (the VITE_URL trap) and
+ * See docs/done/PLAN_PROXY_SECURITY.md §5 (the VITE_URL trap) and
  * docs/DEPLOY_API_DOCKER.md.
  */
 export const STRAPI_URL = (env.STRAPI_URL || import.meta.env.VITE_URL || 'http://127.0.0.1:1337').replace(/\/+$/, '');

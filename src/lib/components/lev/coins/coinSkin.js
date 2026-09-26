@@ -18,7 +18,7 @@
  * Stage 7 deletes those branches these URLs are all that survives of them, and
  * they live here rather than in twelve 3,000-line files.
  *
- * @see docs/PLAN_LEV_COINS.md
+ * @see docs/inprogress/PLAN_LEV_COINS.md
  */
 
 const ART = 'https://res.cloudinary.com/love1/image/upload';

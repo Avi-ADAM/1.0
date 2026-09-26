@@ -1,5 +1,5 @@
 /**
- * The guest demand log (§15.3 of docs/PLAN_UGC_TRANSLATION.md) — the piece
+ * The guest demand log (§15.3 of docs/inprogress/PLAN_UGC_TRANSLATION.md) — the piece
  * without which the backfill's priority queue is blind to exactly the readers
  * P3 exists for.
  *

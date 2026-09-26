@@ -2,7 +2,7 @@
   // Quorum — standalone landing for the demand-side wedge (maagad + concierge).
   // Deliberately self-contained (local copy, local scene, no app stores beyond
   // locale) so the whole folder can move to the thin repo when it gets its own
-  // domain. See docs/PLAN_MARKETING_GLOBAL.md §10.
+  // domain. See docs/tbd/PLAN_MARKETING_GLOBAL.md §10.
   import { onMount } from 'svelte';
   import { Canvas } from '@threlte/core';
   import { locale } from '$lib/translations';

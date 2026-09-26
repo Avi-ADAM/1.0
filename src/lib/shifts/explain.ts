@@ -1,5 +1,5 @@
 /**
- * explain — every placement is said in words (docs/PLAN_SHIFTS.md §1.5, §6.6).
+ * explain — every placement is said in words (docs/inprogress/PLAN_SHIFTS.md §1.5, §6.6).
  *
  * Without a manager and without a majority, the only thing that holds a
  * roster is that everyone can see why it came out the way it did. These map

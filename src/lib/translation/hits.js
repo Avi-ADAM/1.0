@@ -1,6 +1,6 @@
 /**
  * What counts as *a translation to tell the reader about* (§9.1, §15.3 of
- * docs/PLAN_UGC_TRANSLATION.md).
+ * docs/inprogress/PLAN_UGC_TRANSLATION.md).
  *
  * The cache deliberately stores **identity rows**: when the detected source
  * language is already the reader's language, a row is written with

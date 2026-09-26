@@ -1,7 +1,7 @@
 /**
  * Guardrail: prevent new direct-to-Strapi GraphQL calls from client code.
  *
- * See docs/PLAN_PROXY_SECURITY.md §3.4. Once Strapi is locked to localhost,
+ * See docs/done/PLAN_PROXY_SECURITY.md §3.4. Once Strapi is locked to localhost,
  * any client (.svelte) component that calls Strapi's /graphql directly (via
  * VITE_URL or a baseUrl) will break — and until then it leaks the data path
  * around the vetted /api/send proxy. This script fails CI when a NEW offender
@@ -70,6 +70,54 @@ if (fixedButStillListed.length) {
 	console.error('   scripts/check-proxy-security.mjs:');
 	for (const f of fixedButStillListed) console.error(`   ${f}`);
 	console.error('');
+}
+
+// ── www loaders of the assistant flow may only call /api ────────────────────
+//
+// docs/inprogress/PLAN_AI_SIGNUP_CONCIERGE.md §1.2: www runs on Vercel and has no path to
+// Strapi, so a `+page.server` there that imports the assistant's server side,
+// the Strapi client, STRAPI_URL or the action service works in dev and fails in
+// production. These routes must go through fetch('/api/…') instead.
+const WWW_ONLY_ROUTES = [
+	'src/routes/hascama',
+	'src/routes/confirm-email',
+	'src/routes/(reg)/onboard/+page.server.ts',
+	'src/routes/(reg)/onboard/assistant',
+	'src/routes/(reg)/assistant',
+	'src/routes/(reg)/moach/import',
+	'src/routes/(reg)/moach/[projectId]/import',
+	'src/routes/(regandnon)/preview'
+];
+const SERVER_ONLY_IMPORT =
+	/from\s+['"](?:\$lib\/server\/assistant\/[^'"]*|\$lib\/server\/actions\/index(?:\.js)?|\$lib\/server\/actions\/StrapiClient(?:\.js)?|\$lib\/server\/strapiUrl(?:\.js)?)['"]/;
+
+/** Every +page.server / +layout.server file under a path (or the file itself). */
+function serverLoaders(path, out = []) {
+	let st;
+	try {
+		st = statSync(path);
+	} catch {
+		return out;
+	}
+	if (st.isFile()) return /\+(page|layout)\.server\.(js|ts)$/.test(path) ? [...out, path] : out;
+	for (const name of readdirSync(path)) serverLoaders(join(path, name), out);
+	return out;
+}
+
+const wwwOffenders = [];
+for (const route of WWW_ONLY_ROUTES) {
+	for (const file of serverLoaders(join(ROOT, route))) {
+		if (SERVER_ONLY_IMPORT.test(readFileSync(file, 'utf8'))) {
+			wwwOffenders.push(relative(ROOT, file).split('\\').join('/'));
+		}
+	}
+}
+if (wwwOffenders.length) {
+	failed = true;
+	console.error('\n❌ A www loader of the assistant flow imports server-only code:');
+	for (const f of wwwOffenders) console.error(`   ${f}`);
+	console.error("\n   On www (Vercel) it has no Strapi. Call fetch('/api/…') instead —");
+	console.error('   see docs/inprogress/PLAN_AI_SIGNUP_CONCIERGE.md §1.2.\n');
 }
 
 if (failed) process.exit(1);

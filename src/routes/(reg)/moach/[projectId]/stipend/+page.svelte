@@ -2,7 +2,7 @@
   import { useFormatMoney } from '$lib/money/context.svelte';
   import Money from '$lib/components/money/Money.svelte';
   /**
-   * The rikma's subsistence-stipend tab (docs/PLAN_STIPEND.md §8).
+   * The rikma's subsistence-stipend tab (docs/done/PLAN_STIPEND.md §8).
    *
    * What it has to show, and why each part is not optional:
    *   - the programmes and what is **left** of their budgets, because the
@@ -248,7 +248,7 @@
       Pledges — the answer to "who is funding whom, for what, and where does it
       stand right now". The old row said only rate/mode/status/paid-so-far,
       which left the two questions people actually ask unanswered: what work is
-      this for, and what is owed that has not arrived yet (docs/FIXES.md §14).
+      this for, and what is owed that has not arrived yet (docs/inprogress/FIXES.md §14).
     -->
     <section class="block {SURFACE} p-4">
       <h2 class="block-title {TITLE}">{$t('stipend.tab.pledges')}</h2>
@@ -352,7 +352,7 @@
     <!--
       The cycle ledger. `payments` was fetched by getStipendOverview from the
       first day and never rendered, so "how much did this person receive, and
-      for what" had no screen anywhere in the product (docs/FIXES.md §11).
+      for what" had no screen anywhere in the product (docs/inprogress/FIXES.md §11).
       Every row is one month of one stipend, with what it did to the books.
     -->
     <section class="block {SURFACE} p-4">

@@ -262,7 +262,7 @@ io.on('connection', (socket) => {
   
   registerCommonHandlers(socket);
   // P2P pilot signaling — registered members only, never meeting guests
-  // (1.0main docs/PLAN_P2P_PILOT.md). Inert until P2P_TICKET_SECRET is set.
+  // (1.0main docs/inprogress/PLAN_P2P_PILOT.md). Inert until P2P_TICKET_SECRET is set.
   registerP2pHandlers(io, socket);
 });
 

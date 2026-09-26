@@ -1,6 +1,6 @@
 /**
  * What the shift system asks of one member right now — the heart's shift
- * cards (docs/PLAN_SHIFTS.md §7, §7.1, §9.4). Pure: the server hands in what it
+ * cards (docs/inprogress/PLAN_SHIFTS.md §7, §7.1, §9.4). Pure: the server hands in what it
  * read, this decides which cards exist.
  *
  *   declare — a cycle is open for declarations and I have shifts I have not

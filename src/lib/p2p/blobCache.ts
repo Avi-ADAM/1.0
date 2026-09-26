@@ -1,5 +1,5 @@
 /**
- * This device's cache of library files, by sha256 (docs/PLAN_P2P_PILOT.md §1).
+ * This device's cache of library files, by sha256 (docs/inprogress/PLAN_P2P_PILOT.md §1).
  *
  * Two jobs: open a file instantly (and offline) the second time, and be what
  * this device seeds to other members. Only bytes that passed hash verification

@@ -4,7 +4,7 @@
 > derives from the **signed** JWT (`src/lib/server/identity.js`). The `id`
 > cookie is written `httpOnly:false` for the UI, so any caller can set it to
 > any value; reading it on the server is a vulnerability, not a shortcut.
-> See docs/PLAN_PROXY_SECURITY.md §14.1.
+> See docs/done/PLAN_PROXY_SECURITY.md §14.1.
 
 This guide shows you how to integrate migration metrics tracking into your existing code during the QIDS to Action System migration.
 

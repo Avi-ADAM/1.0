@@ -54,4 +54,4 @@ automatically on first render.
 
 This project lives alongside the main 1💗1 SvelteKit app but is **independent**
 (its own `package.json`). The plan and storyboard are in
-[`../docs/REMOTION_PROMO_PLAN.md`](../docs/REMOTION_PROMO_PLAN.md).
+[`../docs/done/REMOTION_PROMO_PLAN.md`](../docs/done/REMOTION_PROMO_PLAN.md).

@@ -1,6 +1,6 @@
 /**
  * Server side of price quotes on a product request (Sheirutpend) —
- * docs/PLAN_CONCIERGE_LOCAL_PROVIDERS.md §6. The rules live in
+ * docs/inprogress/PLAN_CONCIERGE_LOCAL_PROVIDERS.md §6. The rules live in
  * src/lib/sheirut/quoteState.ts; this module reads and writes.
  *
  * Writes run on the service token. Every caller (the quote actions, the

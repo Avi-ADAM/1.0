@@ -1,6 +1,6 @@
 /**
  * pattern — from "the rikma needs someone here on these hours" to concrete
- * shifts (docs/PLAN_SHIFTS.md §3.6, §6.1).
+ * shifts (docs/inprogress/PLAN_SHIFTS.md §3.6, §6.1).
  *
  * Wall-clock times are converted with @internationalized/date in the plan's
  * own time zone, never with `new Date(x + n * 60_000)`: on a daylight-saving

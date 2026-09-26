@@ -56,4 +56,18 @@ describe('matchRatson scoreCandidate', () => {
     expect(food.catScore).toBe(1);
     expect(food.score).toBeGreaterThan(plain.score);
   });
+
+  it("reaches a need through the product's discovery keywords when its name does not", () => {
+    const place = { location: { ...TIBERIAS, radius: 15 } };
+    const nameOnly = { ...cand('סל פירות וירקות', place) };
+    expect(scoreCandidate(nameOnly, wish)).toBeNull();
+
+    const withWords = { ...nameOnly, keywords: 'משלוח עד הבית, מצרכים, קניות לשבוע' };
+    const s = scoreCandidate(withWords, wish)!;
+    expect(s.need.name).toBe('משלוח מצרכים עד הבית');
+
+    // The same words in the name still rank above keywords alone.
+    const named = scoreCandidate(cand('משלוח עד הבית, מצרכים, קניות לשבוע', place), wish)!;
+    expect(named.textScore).toBeGreaterThan(s.textScore);
+  });
 });

@@ -11,7 +11,7 @@
  * assignee's name without the assignee ever agreeing: the creator's own opening
  * vote was enough to satisfy the count.
  *
- * The rule (docs/PLAN_NEGOTIATION_CANDIDATES.md §A.1, project super-principles):
+ * The rule (docs/done/PLAN_NEGOTIATION_CANDIDATES.md §A.1, project super-principles):
  * nothing is registered under a person's name without their consent. For an
  * assigned offer the taker never applied, so silence is NOT consent — only an
  * explicit yes at the current round (or their own counter round) is.

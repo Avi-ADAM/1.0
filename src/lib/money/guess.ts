@@ -1,6 +1,6 @@
 /**
  * A first guess at a visitor's currency, before they have chosen one
- * (docs/PLAN_MULTI_CURRENCY.md D-C9).
+ * (docs/done/PLAN_MULTI_CURRENCY.md D-C9).
  *
  * Only the *region* of an `Accept-Language` tag says anything about money —
  * `en-GB` is pounds, `en` alone is anywhere. A tag with no region falls

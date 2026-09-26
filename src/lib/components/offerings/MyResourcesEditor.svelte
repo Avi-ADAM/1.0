@@ -26,7 +26,7 @@
    * without one is invisible to every rikma looking for it.
    *
    * Occupancy comes from the shared availability engine
-   * (docs/PLAN_RESOURCE_CALENDAR.md §1, §3): "free" is *computed* from the
+   * (docs/inprogress/PLAN_RESOURCE_CALENDAR.md §1, §3): "free" is *computed* from the
    * booking ledger, never read off `Sp.panui` — which is only a server-written
    * cache and, before that plan, never came back to true. Until the
    * `resource-booking` collection exists, `bookingsFromLegacy` reconstructs the

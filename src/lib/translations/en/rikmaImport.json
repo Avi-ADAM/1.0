@@ -19,7 +19,8 @@
   "holder": {
     "me": "I do this",
     "open": "Looking for someone",
-    "partner": "Brought by: {{name}}"
+    "partner": "Brought by: {{name}}",
+    "toggle": "Click to switch between \"I do this\" and \"Looking for someone\" (looking = matching members get an email)"
   },
   "row": {
     "name": "Name",
@@ -30,7 +31,9 @@
     "price": "Price",
     "priceOnRequest": "On request",
     "keywords": "Words people will search for",
-    "keywordsHint": "Comma-separated - how a customer would describe the need, not the product's name. This is how the concierge finds you."
+    "keywordsHint": "Comma-separated - how a customer would describe the need, not the product's name. This is how the concierge finds you.",
+    "categories": "Domains",
+    "categoriesHint": "Up to 3, comma-separated (e.g. events, food). Linked to the domains that already exist on the site; the concierge compares them with every wish."
   },
   "partner": {
     "noEmail": "No email"
@@ -54,5 +57,27 @@
     "pendingVote": "{{name}} will be invited once the rikma approves the mission.",
     "noEmail": "No email was given for {{name}}, so no invitation was sent.",
     "other": "The invitation to {{name}} was not sent."
+  },
+  "preview": {
+    "title": "Preview",
+    "banner": "Preview - nothing has been created yet. This is how the rikma will look on 1lev1.",
+    "until": "The link works until {{date}}",
+    "about": "About the rikma",
+    "values": "Values",
+    "founder": "The founder",
+    "lookingFor": "Looking for someone",
+    "split": "How the shares form - an example",
+    "splitNote": "By the value each side brings: hours × rate, and resources at their price. An illustration only - the real split is agreed together.",
+    "openReal": "Go to the rikma",
+    "ownerHint": "The rikma has not been created yet. Whoever drafted it creates it with one click on the review screen.",
+    "joinCta": "Join 1lev1"
+  },
+  "share": {
+    "button": "Preview link for partners",
+    "making": "Making a link…",
+    "ready": "Here is the link - whoever gets it can see, not edit. It works for {{days}} days; a new link cancels the previous one.",
+    "copy": "Copy",
+    "copied": "Copied",
+    "error": "We couldn't make a link. Try again."
   }
 }

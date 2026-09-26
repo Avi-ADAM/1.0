@@ -1,5 +1,5 @@
 /**
- * The quota governor (§5.3 of docs/PLAN_UGC_TRANSLATION.md) — the only thing
+ * The quota governor (§5.3 of docs/inprogress/PLAN_UGC_TRANSLATION.md) — the only thing
  * in the system allowed to say "yes, spend a request".
  *
  * The cost constraint is the design constraint, so this is where it lives, in

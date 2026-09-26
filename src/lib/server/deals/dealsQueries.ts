@@ -135,7 +135,7 @@ function mapSheirutpend(node: any, projectId?: string, projectName?: string): Pe
 /**
  * Every read here goes through the vetted /api/send proxy — the session comes
  * from the cookie the proxy already holds, so these functions never handle a
- * JWT and never address Strapi. See docs/PLAN_PROXY_SECURITY.md §11.
+ * JWT and never address Strapi. See docs/done/PLAN_PROXY_SECURITY.md §11.
  */
 async function gql<T = any>(
   fetchFn: typeof fetch,

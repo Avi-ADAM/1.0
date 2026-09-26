@@ -1,6 +1,6 @@
 /**
  * "I write in my currency; the rikma counts in its own" — the write half of
- * docs/PLAN_MULTI_CURRENCY.md (D-C2, C5).
+ * docs/done/PLAN_MULTI_CURRENCY.md (D-C2, C5).
  *
  * An action that stores money takes an optional `entryCurrency` param beside
  * its amounts. Absent, or equal to the rikma's currency ⇒ nothing changes: the

@@ -1,5 +1,5 @@
 /**
- * Reading the stipend world back out of Strapi (docs/PLAN_STIPEND.md).
+ * Reading the stipend world back out of Strapi (docs/done/PLAN_STIPEND.md).
  *
  * Everything here speaks the injected `Exec` from the archival module, so the
  * same code runs from an action (caller's JWT) and from the timegrama cron
@@ -278,7 +278,7 @@ export interface StipendPledgeRow {
    * The same missions with their names. Every screen that asks a person to pay
    * or to confirm has to be able to say **what work** the money is for; the
    * cards could only show an amount, so the recipient was signing for ₪2,100
-   * with no way to tell which mission it answered (docs/FIXES.md §12).
+   * with no way to tell which mission it answered (docs/inprogress/FIXES.md §12).
    */
   missions: Array<{ id: string; name: string }>;
   /**
@@ -391,7 +391,7 @@ export interface ApprovedHoursRow {
  * row's `createdAt` is frozen at the first save it ever received while its
  * `noofhours` keeps growing. Windowing on it meant that after the first
  * settlement every later hour was invisible — the recipient worked and was
- * never paid again (docs/FIXES.md §3).
+ * never paid again (docs/inprogress/FIXES.md §3).
  *
  * A finiapruval is one approval event: written once, `archived: true` the
  * moment it closes, never rewritten. `archived` is exactly "approved" — a NO
@@ -447,7 +447,7 @@ export async function fetchApprovedHours(
  * covering the same person each metered the same approved hours from scratch:
  * live, four active pledges offered the funder four payment cards for the same
  * 5.01 hours, and confirming them drove the recipient's own equity negative
- * (docs/FIXES.md §2). Hours are a finite thing the rikma approved once; this is
+ * (docs/inprogress/FIXES.md §2). Hours are a finite thing the rikma approved once; this is
  * what makes them finite in the ledger too.
  */
 export async function fetchMeteredHours(
@@ -485,7 +485,7 @@ export async function fetchMeteredHours(
  * It is the ceiling on how much equity a stipend may ever take off them: the
  * `stipendRate ≤ perhour` guard bounds one pledge's rate, but nothing bounded
  * the *sum* of α·P across pledges and cycles, and a recipient ended a live run
- * at −2.25% of their own rikma (docs/FIXES.md §2).
+ * at −2.25% of their own rikma (docs/inprogress/FIXES.md §2).
  */
 export async function fetchRecipientContribution(
   exec: Exec,

@@ -1,5 +1,5 @@
 /**
- * Signaling for the P2P pilot (1.0main docs/PLAN_P2P_PILOT.md).
+ * Signaling for the P2P pilot (1.0main docs/inprogress/PLAN_P2P_PILOT.md).
  *
  * This server never sees a file byte. It only lets two members of the same
  * rikma find each other and swap WebRTC offers/answers/ICE candidates; the

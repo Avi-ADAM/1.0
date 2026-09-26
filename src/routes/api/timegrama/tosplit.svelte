@@ -1,6 +1,6 @@
 <script module>
   /**
-   * Profit-split maturation on silence (docs/PLAN_TIMEGRAMA.md, D5).
+   * Profit-split maturation on silence (docs/inprogress/PLAN_TIMEGRAMA.md, D5).
    *
    * A `tosplit` proposes how a rikma's earnings divide. It has always had a
    * timegrama — the clock was created, shown on the lev card, and counted

@@ -5,7 +5,7 @@
  * authenticated it); an operation string is WHAT is being attempted:
  * `send:<qid>` for /api/send or `action:<actionKey>` for /api/action.
  *
- * See docs/PLAN_API_PERMISSIONS.md.
+ * See docs/done/PLAN_API_PERMISSIONS.md.
  */
 
 export type PrincipalKind =

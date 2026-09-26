@@ -1,5 +1,5 @@
 /**
- * The backfill worker's core (§8 and §15 of docs/PLAN_UGC_TRANSLATION.md).
+ * The backfill worker's core (§8 and §15 of docs/inprogress/PLAN_UGC_TRANSLATION.md).
  *
  * **What this is for, in one sentence.** A guest cannot fill the cache and
  * never will — they have no account, so they get `onDemand`, and only `always`

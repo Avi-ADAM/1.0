@@ -3,7 +3,7 @@ import { bookingsFromLegacy, resourcesFromSps } from '$lib/resources/bookingsFro
 
 /**
  * /me/resources — the holder's resource calendar
- * (docs/PLAN_RESOURCE_CALENDAR.md §6.2).
+ * (docs/inprogress/PLAN_RESOURCE_CALENDAR.md §6.2).
  *
  * Occupancy is reconstructed server-side from the rows that already record it
  * (`Mashabetahalich` engines + `Rikmash` grant archives) so the page shows real

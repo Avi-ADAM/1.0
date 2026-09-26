@@ -1,7 +1,7 @@
 <script lang="ts">
   /**
    * "When can I come?" — a member's own declarations for one cycle
-   * (docs/PLAN_SHIFTS.md §3.3, §9.2).
+   * (docs/inprogress/PLAN_SHIFTS.md §3.3, §9.2).
    *
    * Each tap moves a shift one step round want → can → ifNeeded → cannot, and
    * is saved at once (optimistically; reverted with a message if the save

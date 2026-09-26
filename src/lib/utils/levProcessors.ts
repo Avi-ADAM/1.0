@@ -2574,7 +2574,7 @@ export function processStipendTransfers(
  * *below* the action bands rather than competing with cards that need an
  * answer. It is here at all because the recipient had no way to see the month
  * adding up — the funder's pay card carried the only copy of this number
- * (docs/FIXES.md §10).
+ * (docs/inprogress/FIXES.md §10).
  *
  * Keyed on the cycle window, so a new month is a new card and a settled one
  * disappears on the next load.

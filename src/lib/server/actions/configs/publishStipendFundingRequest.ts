@@ -1,5 +1,5 @@
 /**
- * Action: publishStipendFundingRequest (docs/PLAN_STIPEND.md §12.2).
+ * Action: publishStipendFundingRequest (docs/done/PLAN_STIPEND.md §12.2).
  *
  * The open question the plan leaves for later, answered the way the rest of the
  * system already answers "we need something we do not have": publish it as an

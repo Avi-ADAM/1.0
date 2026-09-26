@@ -1,6 +1,6 @@
 /**
  * setShiftRules — a member's standing rules on one mission ("never Fridays",
- * "Sunday mornings: want"). docs/PLAN_SHIFTS.md P10, src/lib/shifts/rules.ts.
+ * "Sunday mornings: want"). docs/inprogress/PLAN_SHIFTS.md P10, src/lib/shifts/rules.ts.
  *
  * A rule is the member's own consent, said once for many shifts — so only the
  * member sets it, on their own seat, and nobody votes on it. That is the

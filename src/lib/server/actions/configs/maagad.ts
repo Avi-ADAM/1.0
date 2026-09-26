@@ -590,7 +590,6 @@ async function activateOffer(
 
   const activatedUserIds: string[] = [];
   let dealsCreated = 0;
-  const nowStr = nowIso();
   for (const m of signedMembers) {
     const uid = m?.attributes?.user?.data?.id;
 
@@ -609,8 +608,7 @@ async function activateOffer(
             maagadOffer: offerId,
             price: finalPrice,
             quant: 1,
-            total: finalPrice,
-            publishedAt: nowStr
+            total: finalPrice
           },
           context.jwt,
           context.fetch

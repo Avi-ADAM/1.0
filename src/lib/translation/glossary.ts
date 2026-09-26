@@ -1,6 +1,6 @@
 /**
  * The glossary — the thing that makes machine translation of this site not
- * embarrassing (§6 of docs/PLAN_UGC_TRANSLATION.md).
+ * embarrassing (§6 of docs/inprogress/PLAN_UGC_TRANSLATION.md).
  *
  * Left to itself, a translator turns **רקמה** into *tissue*, **מוח** into
  * *brain*, **לב** into *heart* and **חלוקה** into *division*. Those are the

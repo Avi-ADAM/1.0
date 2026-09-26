@@ -76,8 +76,6 @@ export const qidsAccess = {
   '325projectSpaceDocs': { allow: ['user', 'serviceAdmin'] }, // members only — PRE guard in guards.js
   '326spaceDocForServe': { allow: ['serviceAdmin'] }, // any doc id → the serve endpoint decides membership against locals.uid
   '278myMissionsViaUser': { allow: ['user', 'serviceAdmin'] },
-  '272myOfferingsCounts': { allow: ['serviceAdmin'] }, // unreferenced in codebase (2026-07-18) — tightened to serviceAdmin-only
-  '273myMissionsFull': { allow: ['serviceAdmin'] }, // unreferenced in codebase (2026-07-18) — tightened to serviceAdmin-only
   '274getProjectMembers': { allow: ['user', 'serviceAdmin'] },
   '275myRikmasLite': { allow: ['user', 'serviceAdmin'] },
   '271findMissionOffersByText': { allow: ['serviceAdmin'] }, // server-only callers
@@ -159,7 +157,6 @@ export const qidsAccess = {
   '11saveTimer': { allow: ['user', 'serviceAdmin'] },
   '12mission': { allow: ['user', 'serviceAdmin'] },
   '13missionById': { allow: ['serviceAdmin'] }, // server-only callers
-  '14changeOnline': { allow: ['user', 'serviceAdmin'] }, // meeting qid — magik-meetings surface
   '15createPgishauser': { allow: ['user', 'serviceAdmin'] }, // meeting qid — magik-meetings surface
   '16createPgisha': { allow: ['user', 'serviceAdmin'] }, // meeting qid — magik-meetings surface
   '17getUsers': { allow: ['user', 'serviceAdmin'] },
@@ -263,7 +260,6 @@ export const qidsAccess = {
   '75createWelcomeTop': { allow: ['user', 'serviceAdmin'] },
   '76archiveAsk': { allow: ['user', 'serviceAdmin'] },
   '77createMonter': { allow: ['user', 'serviceAdmin'] },
-  '78archiveMultipleAsks': { allow: ['serviceAdmin'] }, // unreferenced in codebase (2026-07-18) — tightened to serviceAdmin-only
   '79approveTosplit': { allow: ['user', 'serviceAdmin'] },
   '173getTosplitForFinalize': { allow: ['serviceAdmin'] }, // cron-side read only (timegrama finalizer)
   '72getSheirutpendById': { allow: ['user', 'serviceAdmin'] },
@@ -374,7 +370,6 @@ export const qidsAccess = {
   '130deleteMatanotRecipeResource': { allow: ['serviceAdmin'] }, // unreferenced in codebase (2026-07-18) — tightened to serviceAdmin-only
   '131createSheirutFulfillment': { allow: ['serviceAdmin'] }, // unreferenced in codebase (2026-07-18) — tightened to serviceAdmin-only
   '132updateSheirutFulfillment': { allow: ['serviceAdmin'] }, // unreferenced in codebase (2026-07-18) — tightened to serviceAdmin-only
-  '133queryComplexMatanot': { allow: ['serviceAdmin'] }, // unreferenced in codebase (2026-07-18) — tightened to serviceAdmin-only
   '134updateMatanotStatus': { allow: ['serviceAdmin'] }, // unreferenced in codebase (2026-07-18) — tightened to serviceAdmin-only
   '135approveMatanot': { allow: ['user', 'serviceAdmin'] },
   '136createMatanot': { allow: ['user', 'serviceAdmin'] },
@@ -463,7 +458,6 @@ export const qidsAccess = {
   'getProjectFinancials': { allow: ['user', 'serviceAdmin'] },
   'getProjectValueSummary': { allow: ['user', 'serviceAdmin'] }, // mission-equity preview; serviceAdmin path serves the public availableMission page
   'getMemberValueTotal': { allow: ['user', 'serviceAdmin'] }, // "my share" numerator for the stipend dilution line
-  'getProjectProcesses': { allow: ['serviceAdmin'] }, // unreferenced in codebase (2026-07-18) — tightened to serviceAdmin-only
   'getProjectVotes': { allow: ['user', 'serviceAdmin'] },
   'getOpenVoteCounts': { allow: ['user', 'serviceAdmin'] },
   'getOpenWishCounts': { allow: ['user', 'serviceAdmin'] },
@@ -506,7 +500,7 @@ export const qidsAccess = {
   'getUserSpsAvailable': { allow: ['user', 'serviceAdmin'] },
 
   // ─── Manually classified (added after the script's last run — see
-  //     docs/PLAN_API_PERMISSIONS.md §2 "נשאר לביקורת ידנית") ──────────
+  //     docs/done/PLAN_API_PERMISSIONS.md §2 "נשאר לביקורת ידנית") ──────────
 
   // hub/+page.server.ts: svc = !uid — same public/registered split as the
   // qids below; aggregate counts only, nothing per-user or sensitive.
@@ -596,7 +590,7 @@ export const qidsAccess = {
   // this act, and the mutation moves a chore under a mission.
   '294linkActToMission': { allow: ['serviceAdmin'] },
 
-  // TIMEGRAMA phase 4.3/4.4 (docs/PLAN_TIMEGRAMA.md). Every one of these is
+  // TIMEGRAMA phase 4.3/4.4 (docs/inprogress/PLAN_TIMEGRAMA.md). Every one of these is
   // reached only through an Action (`proposeSheirut`, `requestSheirutJoin`)
   // or through the cron's finalizers — never from a client. /api/send has no
   // way to tell whether a given caller may approve a service or subscribe a
@@ -661,6 +655,17 @@ export const qidsAccess = {
   '364getAssistantSession': { allow: ['serviceAdmin'] },
   '365updateAssistantSession': { allow: ['serviceAdmin'] },
   '366findMyAssistantSessions': { allow: ['serviceAdmin'] },
+  '367findPendingAssistantByChezin': { allow: ['serviceAdmin'] },
+  '368getAssistantByShareKey': { allow: ['serviceAdmin'] },
+  '369listExpiredPendingAssistant': { allow: ['serviceAdmin'] },
+  '380deleteAssistantSession': { allow: ['serviceAdmin'] },
+  '378getChezinForClaim': { allow: ['serviceAdmin'] },
+  // Profile sessions (§6): read / write the caller's own profile, with the
+  // user id bound by the action — never a client param.
+  '381getUserProfileForAssistant': { allow: ['serviceAdmin'] },
+  '382projectsForNearby': { allow: ['serviceAdmin'] },
+  '383setUserProfileRelations': { allow: ['serviceAdmin'] },
+  '379getUserChezin': { allow: ['serviceAdmin'] },
   // Exact-email lookup for a partner named in a rikma import. Returns contact
   // fields, so it must never be widened beyond the materialize step.
   '370findUserForInvite': { allow: ['serviceAdmin'] },
@@ -668,4 +673,13 @@ export const qidsAccess = {
   // to `user` it would let anyone rewrite any product's keywords via /api/send.
   '371setMatanotDiscoveryKeywords': { allow: ['serviceAdmin'] },
   '372assistantProjectContext': { allow: ['serviceAdmin'] },
+  // Product domains for a rikma import: minting a Category is a vocabulary
+  // write, and setting one is the same product write as 371.
+  '373listCategories': { allow: ['serviceAdmin'] },
+  '374createCategory': { allow: ['serviceAdmin'] },
+  '375setMatanotCategories': { allow: ['serviceAdmin'] },
+  // A new supplier meets open wishes (offerNewProductsToWishes): reads every
+  // open wish's needs and place, so never a user's own query.
+  '376listOpenWishesForMatching': { allow: ['serviceAdmin'] },
+  '377matanotsForWishOffer': { allow: ['serviceAdmin'] },
 };

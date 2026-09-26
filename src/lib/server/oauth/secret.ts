@@ -56,6 +56,15 @@ export function codeEncryptionKey(): Buffer {
   return derive('1lev1-oauth-code-v1');
 }
 
+/**
+ * AES-256-GCM key for the agent-prepared signup link (/hascama?agent=,
+ * PLAN_AI_SIGNUP_CONCIERGE §5.6). Its own label, so a signup token can never be
+ * replayed as an authorization code or the other way round.
+ */
+export function agentSignupKey(): Buffer {
+  return derive('1lev1-agent-signup-v1');
+}
+
 export function b64url(buf: Buffer | string): string {
   return Buffer.from(buf).toString('base64url');
 }

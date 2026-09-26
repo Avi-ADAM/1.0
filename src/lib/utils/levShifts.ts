@@ -1,5 +1,5 @@
 /**
- * The heart's shift cards (docs/PLAN_SHIFTS.md §9.4): store, processor and
+ * The heart's shift cards (docs/inprogress/PLAN_SHIFTS.md §9.4): store, processor and
  * derived feed, in one module.
  *
  * The data does not come through the main user query — the shift collections

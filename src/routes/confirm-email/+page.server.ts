@@ -1,10 +1,14 @@
 import { redirect, fail } from '@sveltejs/kit';
 import { signupCookieOptions } from '$lib/server/signupCookies.js';
 import {
+  AGENT_LANDING,
   CONCIERGE_LANDING,
+  isAgentIntent,
   isConciergeIntent,
-  REG_INTENT_COOKIE
+  REG_INTENT_COOKIE,
+  REG_NEXT_COOKIE
 } from '$lib/concierge/regIntent.js';
+import type { Cookies } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 
 /**
@@ -44,67 +48,128 @@ function emailFromLink(url: URL): string {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(raw) ? raw.toLowerCase() : '';
 }
 
-export const load: PageServerLoad = async ({ url, cookies, fetch }) => {
-  const token = url.searchParams.get('confirmation');
-  const email = emailFromLink(url) || (cookies.get('email') ?? '');
-
-  if (!token) {
-    return { state: 'missing' as const, email };
+/** Where a confirmed signup continues (see regIntent.js). */
+function nextFor(cookies: Cookies): string {
+  // A customer who registered to order something skips the onboarding — the
+  // roles/skills/CV steps are for joining rikmas — and continues to their wish.
+  // An agent-prepared signup continues into what the conversation prepared
+  // (PLAN_AI_SIGNUP_CONCIERGE §5.1).
+  // Signed up from an agent's OAuth window: back to its consent page (§5.2).
+  // The signed request there lives 15 minutes; if it ran out, that page says
+  // "go back to your agent and press Connect — you are signed in now".
+  const back = cookies.get(REG_NEXT_COOKIE);
+  if (back && back.startsWith('/') && !back.startsWith('//')) {
+    cookies.delete(REG_NEXT_COOKIE, { path: '/' });
+    return back;
   }
+  const intent = cookies.get(REG_INTENT_COOKIE);
+  return isAgentIntent(intent) ? AGENT_LANDING : isConciergeIntent(intent) ? CONCIERGE_LANDING : '/onboard';
+}
 
-  let status: number;
+function loginFor(next: string): string {
+  return next === '/onboard' ? '/login?confirmed=1' : `/login?confirmed=1&from=${encodeURIComponent(next)}`;
+}
+
+/** The session cookies, exactly as the /signup action sets them. */
+function setSession(cookies: Cookies, jwt: string, user: { id?: unknown; name?: string; username?: string; email?: string } | undefined) {
+  const isProduction = import.meta.env.PROD;
+  const opts = {
+    path: '/',
+    expires: new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
+    secure: isProduction,
+    sameSite: (isProduction ? 'none' : 'lax') as 'none' | 'lax',
+    domain: isProduction ? '.1lev1.com' : undefined
+  };
+  cookies.set('jwt', jwt, { ...opts, httpOnly: true });
+  if (user?.id != null) cookies.set('id', String(user.id), { ...opts, httpOnly: false });
+  const un = user?.name || user?.username;
+  if (un) cookies.set('un', String(un), { ...opts, httpOnly: false });
+  cookies.set('when', Date.now().toString(), { ...opts, httpOnly: false });
+}
+
+/**
+ * The stock confirmation (GET, no session). Kept as the fallback for when the
+ * sign-in route is not deployed on Strapi yet.
+ */
+async function confirmOnly(fetchFn: typeof fetch, token: string): Promise<'ok' | 'spent' | 'error'> {
   try {
     // The proxy is the one that talks to Strapi, and it does not follow the
     // 302 a good token produces — that target is not ours to render, and a 404
     // there would look like a failed confirmation. It reports Strapi's status
     // back in the body; its own status is only about the hop.
-    const res = await fetch(`${CONFIRM_ENDPOINT}?confirmation=${encodeURIComponent(token)}`);
+    const res = await fetchFn(`${CONFIRM_ENDPOINT}?confirmation=${encodeURIComponent(token)}`);
+    let status: number;
     if (!res.ok) {
       status = res.status;
     } else {
       const body = (await res.json().catch(() => ({}))) as { status?: number };
       status = typeof body.status === 'number' ? body.status : 200;
     }
+    // `redirect: 'manual'` yields either the 3xx itself or an opaque redirect
+    // (status 0), depending on the fetch implementation. Both mean success; only
+    // a 4xx/5xx is a real failure.
+    return status >= 400 ? 'spent' : 'ok';
   } catch (e) {
     console.error('[confirm-email] Strapi confirmation request failed:', e);
-    return { state: 'error' as const, email };
+    return 'error';
   }
+}
 
-  // `redirect: 'manual'` yields either the 3xx itself or an opaque redirect
-  // (status 0), depending on the fetch implementation. Both mean success; only
-  // a 4xx/5xx is a real failure.
-  if (status >= 400) {
-    return { state: 'spent' as const, email };
-  }
-
-  // Confirmed. Remember the address so the login form can prefill it — only on
-  // this branch, where a valid single-use token proves the visitor holds the
-  // mailbox. Doing it earlier would let any URL seed someone else's address.
-  if (email) {
-    cookies.set('email', email, { ...signupCookieOptions(url), httpOnly: false });
-  }
-
-  // A customer who registered to order something skips the onboarding — the
-  // roles/skills/CV steps are for joining rikmas — and continues to their wish
-  // (see $lib/concierge/regIntent.js). Only in this browser: the cookie and
-  // the wish draft both live here.
-  const next = isConciergeIntent(cookies.get(REG_INTENT_COOKIE))
-    ? CONCIERGE_LANDING
-    : '/onboard';
-
-  // Strapi's endpoint returns no JWT, so a session can only be continued, not
-  // created: same browser as the signup → straight on, otherwise log in with
-  // the password just chosen.
-  if (cookies.get('jwt')) throw redirect(303, next);
-  throw redirect(
-    303,
-    next === '/onboard'
-      ? '/login?confirmed=1'
-      : `/login?confirmed=1&from=${encodeURIComponent(next)}`
-  );
+/**
+ * Opening the link does NOT confirm anything any more: mail clients and
+ * antivirus scanners fetch every link in a message, and the token is
+ * single-use, so a GET that spends it was spending it for the scanner. The page
+ * shows one "continue" button; its POST confirms and signs the person in
+ * (PLAN_AI_SIGNUP_CONCIERGE §5.5), so they land in their first step without
+ * typing the password they chose minutes ago — also on another device.
+ */
+export const load: PageServerLoad = async ({ url, cookies }) => {
+  const token = url.searchParams.get('confirmation');
+  const email = emailFromLink(url) || (cookies.get('email') ?? '');
+  if (!token) return { state: 'missing' as const, email, confirmation: '' };
+  return { state: 'ready' as const, email, confirmation: token };
 };
 
 export const actions: Actions = {
+  continue: async ({ request, cookies, fetch, url }) => {
+    const data = await request.formData();
+    const token = String(data.get('confirmation') || '');
+    const email = String(data.get('email') || '').trim().toLowerCase();
+    if (!token) return fail(400, { state: 'missing' as const });
+    const next = nextFor(cookies);
+
+    // 1. Confirm and sign in (the 1.0b route, through the auth proxy; as an
+    //    internal caller this action gets the jwt in the body and sets it).
+    let res: Response | null = null;
+    try {
+      res = await fetch('/api/auth/email-confirmation-login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ confirmation: token })
+      });
+    } catch (e) {
+      console.error('[confirm-email] sign-in request failed:', e);
+    }
+    if (res?.ok) {
+      const body = (await res.json().catch(() => ({}))) as { jwt?: string; user?: any };
+      if (body.jwt) {
+        setSession(cookies, body.jwt, body.user);
+        if (body.user?.email) cookies.set('email', String(body.user.email), { ...signupCookieOptions(url), httpOnly: false });
+        throw redirect(303, next);
+      }
+    }
+    if (res && res.status === 400) return fail(400, { state: 'spent' as const });
+
+    // 2. The route is not there (yet): the stock confirmation, then log in.
+    const outcome = await confirmOnly(fetch, token);
+    if (outcome !== 'ok') return fail(outcome === 'spent' ? 400 : 502, { state: outcome });
+    // Remember the address so the login form can prefill it — only here, where
+    // a valid single-use token proves the visitor holds the mailbox.
+    if (email) cookies.set('email', email, { ...signupCookieOptions(url), httpOnly: false });
+    if (cookies.get('jwt')) throw redirect(303, next);
+    throw redirect(303, loginFor(next));
+  },
+
   resend: async ({ request, cookies, fetch }) => {
     const data = await request.formData();
     const email = String(data.get('email') || cookies.get('email') || '')

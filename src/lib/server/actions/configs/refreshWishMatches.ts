@@ -1,5 +1,5 @@
 /**
- * Refresh Wish Matches — docs/PLAN_CONCIERGE_LOCAL_PROVIDERS.md
+ * Refresh Wish Matches — docs/inprogress/PLAN_CONCIERGE_LOCAL_PROVIDERS.md
  *
  * Re-grounds a published wish in what the platform offers *now*, for where
  * the wish *is*:

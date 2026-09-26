@@ -238,7 +238,7 @@
                 {:else}
                   {#each chain.askms as askm (askm.id)}
                     <div class="askm-item" role="listitem">
-                      <span class="askm-name">{askm.attributes?.name ?? askm.id}</span>
+                      <span class="askm-name">{askm.attributes?.users_permissions_user?.data?.attributes?.username ?? askm.id}</span>
                     </div>
                   {/each}
                 {/if}

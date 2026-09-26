@@ -1,6 +1,6 @@
 /**
  * computeStipendEquity — the single source of truth for `(k − α)·P`
- * (docs/PLAN_STIPEND.md §1, §2, §5).
+ * (docs/done/PLAN_STIPEND.md §1, §2, §5).
  *
  * Pure and deterministic, so the same numbers are produced by the action that
  * writes the ledger row, by the card that asks the recipient to sign, and by

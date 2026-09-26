@@ -7,7 +7,7 @@
 > mechanical, not archaeology.
 >
 > Running example below: a **wish invitation** card (`requestSuggestion` Track B
-> — see [PLAN_CONCIERGE.md §5.2](../PLAN_CONCIERGE.md)). Its `ani` id is
+> — see [PLAN_CONCIERGE.md §5.2](./done/PLAN_CONCIERGE.md)). Its `ani` id is
 > `wishInvite`. Substitute your own type/fields.
 
 ## The data flow, end to end

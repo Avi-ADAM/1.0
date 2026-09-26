@@ -155,3 +155,30 @@ describe('runMaterialization — an existing rikma', () => {
     expect(blueprint).toEqual(snapshot);
   });
 });
+
+describe('runMaterialization — how the concierge will find a product', () => {
+  const shop: AssistantState = {
+    fields: { track: 'business', name: 'השקד' },
+    items: [
+      row({ key: 'i1', group: 'products', label: 'מגש בוקר', spec: { price: 90, keywords: ['בראנץ׳', 'הפתעה ליום הולדת'], categories: ['אוכל', 'אירועים'] } }),
+      row({ key: 'i2', group: 'products', label: 'עוגה' })
+    ]
+  };
+
+  it('sends the keywords and the resolved Category ids with the product', async () => {
+    const resolveCategories = vi.fn(async (names: string[]) => names.map((n) => (n === 'אוכל' ? '3' : '8')));
+    const { deps, calls } = fakeDeps({ resolveCategories });
+    await runMaterialization(shop, ['i1', 'i2'], { projectId: '12', userId: '5' }, deps);
+
+    expect(resolveCategories).toHaveBeenCalledTimes(1);
+    expect(calls[0].params).toMatchObject({ discoveryKeywords: 'בראנץ׳, הפתעה ליום הולדת', categoryIds: ['3', '8'] });
+    expect(calls[1].params).not.toHaveProperty('categoryIds');
+  });
+
+  it('a failing category lookup costs the categories, not the product', async () => {
+    const { deps, calls } = fakeDeps({ resolveCategories: vi.fn(async () => Promise.reject(new Error('down'))) });
+    const out = await runMaterialization(shop, ['i1'], { projectId: '12', userId: '5' }, deps);
+    expect(out.failed).toEqual([]);
+    expect(calls[0].params).not.toHaveProperty('categoryIds');
+  });
+});

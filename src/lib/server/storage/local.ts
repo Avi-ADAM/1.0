@@ -1,6 +1,6 @@
 /**
  * The local storage driver: a private folder on the API host
- * (docs/PLAN_RIKMA_SHARED_INFO.md §6 stage 2).
+ * (docs/inprogress/PLAN_RIKMA_SHARED_INFO.md §6 stage 2).
  *
  * Same job as `r2.ts`, no third party and no credit card: the bytes live in a
  * directory that nginx never serves, and the only way in or out is a signed

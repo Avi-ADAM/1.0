@@ -1,6 +1,6 @@
 <script>
   /**
-   * "The draft is out — this is where you are, and why" (docs/PLAN_SHIFTS.md §7).
+   * "The draft is out — this is where you are, and why" (docs/inprogress/PLAN_SHIFTS.md §7).
    *
    * Every place carries its reason (§1.5). The only action is "I can't make
    * this one after all" — a release, never a veto on the roster (§1.2): the

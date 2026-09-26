@@ -2,7 +2,7 @@
   import { useFormatMoney } from '$lib/money/context.svelte';
   /**
    * "This mission also wants a subsistence stipend" — stated while the mission
-   * is being written (docs/PLAN_STIPEND.md §13).
+   * is being written (docs/done/PLAN_STIPEND.md §13).
    *
    * Asking here rather than in a separate negotiation afterwards is what makes
    * the dilution answerable at all: the rikma is already voting on hours × rate,

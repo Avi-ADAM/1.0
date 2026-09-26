@@ -13,8 +13,8 @@
    * user-facing layout.
    *
    * Source of truth for the sections below:
-   *   docs/MOACH_AI_AGENT_GUIDE.md, docs/PLAN_API_PERMISSIONS.md,
-   *   docs/PLAN_sale_holder_consent.md, src/lib/server/actions/.
+   *   docs/MOACH_AI_AGENT_GUIDE.md, docs/done/PLAN_API_PERMISSIONS.md,
+   *   docs/done/PLAN_sale_holder_consent.md, src/lib/server/actions/.
    */
 
   const terminology = [

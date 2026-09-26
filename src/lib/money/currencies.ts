@@ -1,5 +1,5 @@
 /**
- * The currencies a member can write in and read in (docs/PLAN_MULTI_CURRENCY.md D-C1).
+ * The currencies a member can write in and read in (docs/done/PLAN_MULTI_CURRENCY.md D-C1).
  *
  * A currency is its ISO-4217 code and nothing else — the symbol and the name
  * come from `Intl` in the reader's own language, so there is no table of

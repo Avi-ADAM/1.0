@@ -1,6 +1,6 @@
 <script>
   /**
-   * A shift and its hours (docs/PLAN_SHIFTS.md §10) — two moments, one card:
+   * A shift and its hours (docs/inprogress/PLAN_SHIFTS.md §10) — two moments, one card:
    *
    *   shiftStarting — "your shift starts at 08:00": start the mission's
    *                   ordinary timer, exactly as the timer dial would.

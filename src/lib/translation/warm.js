@@ -1,5 +1,5 @@
 /**
- * The client half of the on-demand fill (§4.1 of docs/PLAN_UGC_TRANSLATION.md).
+ * The client half of the on-demand fill (§4.1 of docs/inprogress/PLAN_UGC_TRANSLATION.md).
  *
  * A loader renders the author's own words for every miss and hands the page the
  * missed strings. This posts them once, in the background, and resolves with

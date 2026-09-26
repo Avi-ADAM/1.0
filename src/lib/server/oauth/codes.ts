@@ -8,7 +8,7 @@
 // On the single `sveltekit-api` container that is exact; across replicas a code
 // could be spent once per replica inside its 60s TTL. Redemption still requires
 // the PKCE verifier, so this is a corner to close before scaling out, not an
-// open door. See docs/PLAN_MCP_OAUTH.md.
+// open door. See docs/done/PLAN_MCP_OAUTH.md.
 
 import crypto from 'crypto';
 import { codeEncryptionKey, b64url, fromB64url } from './secret.js';

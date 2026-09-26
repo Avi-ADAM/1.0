@@ -9,6 +9,7 @@
   import { showFoot } from '$lib/stores/showFoot.js';
   import { t, locale } from '$lib/translations';
   import { stashSeedPlan } from '$lib/onboard/seedPlanHandoff.js';
+  import { openBusinessImport } from '$lib/onboard/businessImport.js';
 
   onMount(() => showFoot.set(false));
   onDestroy(() => showFoot.set(true));
@@ -51,6 +52,12 @@
       }
       sessionStorage.setItem('onboard.businessResult', JSON.stringify(body));
       sessionStorage.setItem('onboard.businessSource', 'describe');
+      // With a plan: the whole draft on one review screen, created in one click.
+      const importPath = withPlan ? await openBusinessImport(body, text.trim()) : null;
+      if (importPath) {
+        goto(importPath);
+        return;
+      }
       // The boards wait here until the rikma is actually approved and created.
       stashSeedPlan(body?.plan, 'describe');
       toMeWithPrefill(body);

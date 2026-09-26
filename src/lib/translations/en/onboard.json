@@ -188,7 +188,8 @@
       "title": "Provider profile · 1💗1",
       "back": "← Back to review",
       "skip": "Skip ahead"
-    }
+    },
+    "assistantLink": "Already have a profile? Refine it in conversation →"
   },
   "actions": {
     "skip": "Skip · I'll choose later",

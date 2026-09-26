@@ -11,7 +11,7 @@
    * Colour: one accent (orange) for the reader's own slice, and an ordinal blue
    * ramp for the rest of the rikma, darkest = already earned → lightest = merely
    * open. Both ramps are validated for CVD separation and for the light and dark
-   * surfaces separately; see docs/PLAN_MISSION_EQUITY_PREVIEW.md §4.1.
+   * surfaces separately; see docs/done/PLAN_MISSION_EQUITY_PREVIEW.md §4.1.
    */
   import { isRtl } from '$lib/translations';
 

@@ -1,5 +1,5 @@
 /**
- * Swapping a shift between two members (docs/PLAN_SHIFTS.md §1.2, §7 step 3).
+ * Swapping a shift between two members (docs/inprogress/PLAN_SHIFTS.md §1.2, §7 step 3).
  *
  * A swap is the counter to a place in the roster: not "I refuse", but "you
  * take my Tuesday — and, if you like, I take your Thursday". It is bilateral:

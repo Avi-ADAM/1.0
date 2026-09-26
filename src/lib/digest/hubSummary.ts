@@ -1,6 +1,6 @@
 /**
  * The hub's "what is waiting for me" calculation — shared by the hub page and
- * the daily digest (docs/PLAN_DAILY_DIGEST.md §1.1, G4).
+ * the daily digest (docs/inprogress/PLAN_DAILY_DIGEST.md §1.1, G4).
  *
  * It used to be a private function inside `hub/+page.server.ts`. The digest
  * needs exactly the same answer, and two copies of "which votes are still

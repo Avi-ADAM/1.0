@@ -1,5 +1,5 @@
 /**
- * The shared shape of an assistant session (docs/PLAN_AI_SIGNUP_CONCIERGE.md §3).
+ * The shared shape of an assistant session (docs/inprogress/PLAN_AI_SIGNUP_CONCIERGE.md §3).
  *
  * One `assistant-session` row holds one living list — a member's profile
  * suggestions, a rikma blueprint, or a wish breakdown — and both the site chat

@@ -1,5 +1,5 @@
 /**
- * Action: getStipendWork (docs/PLAN_STIPEND.md §8).
+ * Action: getStipendWork (docs/done/PLAN_STIPEND.md §8).
  *
  * Everything about stipends that is waiting for *me*, in one read:
  *
@@ -163,7 +163,7 @@ const handler: ActionExecutionHandler = async (_params, context) => {
       cycleEnd: window.cycleEnd,
       // What the money is *for*, and what it does to the books. Both were
       // missing from the card, so the funder was asked to pay an amount with
-      // no mission attached to it (docs/FIXES.md §12, §13).
+      // no mission attached to it (docs/inprogress/FIXES.md §12, §13).
       missionNames: (pledge.missions ?? []).map((m: any) => m.name).filter(Boolean),
       // The missions with their ids, so the card can *link* to the work rather
       // than only name it: a funder asked to pay for "פיתוח האתר" could not get
@@ -179,7 +179,7 @@ const handler: ActionExecutionHandler = async (_params, context) => {
    * The recipient's side of the same question: **what have I earned that
    * nobody has paid me yet.** The funder had this number all along (it is the
    * pay card); the person actually waiting for the money had no screen showing
-   * it anywhere (docs/FIXES.md §10). Same window, same pure function — so the
+   * it anywhere (docs/inprogress/FIXES.md §10). Same window, same pure function — so the
    * two sides can never read different numbers off the same hours.
    */
   const accruals: Array<Record<string, unknown>> = [];
@@ -252,7 +252,7 @@ const handler: ActionExecutionHandler = async (_params, context) => {
       // The mission the hours were worked on, and the exact equity the
       // confirmation moves. Confirming is the one act in this whole feature
       // that changes a percentage, and the card used to say so without saying
-      // by how much (docs/FIXES.md §12, §13).
+      // by how much (docs/inprogress/FIXES.md §12, §13).
       missionNames: (a.stipend_pledge?.data?.attributes?.mesimabetahaliches?.data ?? [])
         .map((m: any) => String(m.attributes?.name ?? ''))
         .filter(Boolean),

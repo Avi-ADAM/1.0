@@ -2,7 +2,7 @@
   import { useFormatMoney } from '$lib/money/context.svelte';
   import Money from '$lib/components/money/Money.svelte';
   /**
-   * "Find someone to fund our members" (docs/PLAN_STIPEND.md §12.2).
+   * "Find someone to fund our members" (docs/done/PLAN_STIPEND.md §12.2).
    *
    * A rikma whose income is two years away usually has no member who can
    * carry anyone. Rather than inventing a donor mechanism, the need goes out

@@ -1,5 +1,5 @@
 /**
- * Rikma import over MCP — the supply side (docs/PLAN_AI_SIGNUP_CONCIERGE.md §4, §10).
+ * Rikma import over MCP — the supply side (docs/inprogress/PLAN_AI_SIGNUP_CONCIERGE.md §4, §10).
  *
  * The agent (Claude) already read the business's site or heard the person
  * describe their partnership or idea. These tools let it hand that over as a
@@ -58,7 +58,9 @@ export const proposeRikmaBlueprintTool = createTool({
     'partners. Build it yourself from the site you read or from the conversation:\n' +
     '- products FIRST: every distinct thing they sell is a product, with its price when it is stated (do not invent ' +
     'prices - leave price out and ask), and `keywords`: the words a customer would use for the need it answers, ' +
-    'not the product name (a "brunch tray" answers "catering", "breakfast for guests").\n' +
+    'not the product name (a "brunch tray" answers "catering", "breakfast for guests"), and `categories`: 1-3 broad ' +
+    'domains ("events", "food") - they are linked to the platform\'s existing categories, which the concierge compares ' +
+    'with every wish.\n' +
     '- missions and resources only when they make a product (put their refs in the product recipe) or when someone ' +
     'is still needed (holder "open"). holder "me" = the person you are talking to does it; "partner" + partnerRef = ' +
     'a partner listed in `partners`.\n' +
@@ -107,7 +109,7 @@ const OpSchema = z.object({
     .describe('add: which list.'),
   label: z.string().optional().describe('add / rename.'),
   why: z.string().optional(),
-  spec: z.record(z.string(), z.any()).optional().describe('add / setSpec: e.g. { price, kindOf, keywords, hours, holder }. null removes a key.'),
+  spec: z.record(z.string(), z.any()).optional().describe('add / setSpec: e.g. { price, kindOf, keywords, categories, hours, holder }. null removes a key.'),
   productKey: z.string().optional().describe('link: the product.'),
   missionKeys: z.array(z.string()).optional().describe('link: missions that make one unit.'),
   resourceKeys: z.array(z.string()).optional().describe('link: resources that make one unit.'),
@@ -133,6 +135,122 @@ export const setAssistantItemsTool = createTool({
   }),
   execute: async (input) => run('setAssistantItems', { ...input, via: 'agent' })
 });
+
+export const shareRikmaPreviewTool = createTool({
+  id: 'shareRikmaPreview',
+  description:
+    'Make a read-only link that shows how the drafted rikma would look on 1lev1 - its products, missions, ' +
+    'resources, who brings what and an example of how shares form - for the person to send to their partners ' +
+    '(no account needed to view; nothing is created). Valid 30 days; calling again replaces the old link, and ' +
+    'revoke:true ends it.',
+  inputSchema: z.object({
+    sessionId: z.string(),
+    revoke: z.boolean().optional()
+  }),
+  execute: async (input) => run('shareRikmaPreview', input)
+});
+
+// ── Profile and wish lists (§6, §7) ─────────────────────────────────────────
+
+export const startAssistantTool = createTool({
+  id: 'startAssistant',
+  description:
+    "Open the person's living list of (a) their PROFILE - skills, roles, ways of working, values, resources they own " +
+    "- seeded from what is on it now, plus what `text` says about them (pass what they told you); or (b) a WISH - " +
+    'pass ratsonId (from listMyWishesTool), or `text` to start a new draft wish from their words. Returns the rows ' +
+    'with keys. Then refine with setAssistantItems (your own ops - preferred) or reviseAssistant (their words), and ' +
+    'save with applyAssistant. A rikma is not started here: use proposeRikmaBlueprint.',
+  inputSchema: z.object({
+    kind: z.enum(['profile', 'wish']),
+    text: z.string().max(8000).optional(),
+    ratsonId: z.string().optional()
+  }),
+  execute: async (input) => run('startAssistantSession', { ...input, via: 'agent' })
+});
+
+export const reviseAssistantTool = createTool({
+  id: 'reviseAssistant',
+  description:
+    "Change a list with the person's own words (\"that's right, drop the second, add photography\") - the platform " +
+    'turns them into ops. Prefer setAssistantItems when you can name the ops yourself; this one runs a model.',
+  inputSchema: z.object({
+    sessionId: z.string(),
+    expectedVersion: z.number().int(),
+    instruction: z.string().min(1).max(2000)
+  }),
+  execute: async (input) => run('reviseAssistantSession', { ...input, via: 'agent' })
+});
+
+export const applyAssistantTool = createTool({
+  id: 'applyAssistant',
+  description:
+    'Save a list: a PROFILE is saved to their profile right away (what they set aside leaves it; resources are only ' +
+    'added). A WISH: its own rows are saved - a draft stays a draft (publishing is theirs, on the site: siteUrl), ' +
+    'and rows a supplier already answered are never changed here. A RIKMA is never created here - you get the ' +
+    'reviewUrl to give them.',
+  inputSchema: z.object({ sessionId: z.string(), expectedVersion: z.number().int() }),
+  execute: async (input) => run('applyAssistantSession', { ...input, via: 'agent' })
+});
+
+export const dismissOfferTool = createTool({
+  id: 'dismissOffer',
+  description:
+    'The person says an open mission suggested to them is not relevant: it stops being suggested to them. A filter ' +
+    'for them only - nobody is told no.',
+  inputSchema: z.object({ openMissionId: z.string() }),
+  execute: async ({ openMissionId }) => run('declineOpenMission', { openMissionId })
+});
+
+/**
+ * The one tool an agent has before its person has an account (§5.1). Public,
+ * so no model call, a size cap, and a per-address + daily limit.
+ */
+export function makePrepareSignupTool(clientIp: string, fetchFn: typeof fetch) {
+  return createTool({
+    id: 'prepareSignup',
+    description:
+      'For someone who has NO 1lev1 account yet: prepare their signup from what you already know, so joining is one ' +
+      'screen - the agreement prefilled with their name, email and countries, and the password on the same screen. ' +
+      'intent: "business" (add their business so the concierge finds and orders from it), "partnership" (see an ' +
+      'existing partnership on 1lev1), "idea" (break an idea down and recruit partners) - for these three send the ' +
+      'rikma blueprint you built (the same shape as proposeRikmaBlueprint takes: fields, products first, missions, ' +
+      'resources, partners) and you also get a previewUrl showing how it would look; "join" (join rikmas - pass ' +
+      'aboutText: who they are, what they do); "order" (they want something made or arranged - pass wishText). ' +
+      'You cannot sign, set a password or confirm the email for them, and nothing is created until they do. Give ' +
+      'them signupUrl (valid 24h). After they confirm their email they land straight in what you prepared.',
+    inputSchema: z.object({
+      name: z.string().min(1).max(80),
+      email: z.string().email(),
+      countries: z.array(z.string()).max(5).optional().describe('Country names in English, e.g. ["Israel"].'),
+      lang: z.enum(['he', 'en', 'ar', 'ru', 'es']).optional(),
+      intent: z.enum(['join', 'business', 'partnership', 'idea', 'order']),
+      aboutText: z.string().max(8000).optional(),
+      wishText: z.string().max(4000).optional(),
+      blueprint: BlueprintInputSchema.optional()
+    }),
+    execute: async (input) => {
+      const [{ takePrepare }, { prepareSignup }, { strapiClient }] = await Promise.all([
+        import('../../lib/server/assistant/publicQuota.js'),
+        import('../../lib/server/assistant/prepareSignup.js'),
+        import('../../lib/server/actions/index.js')
+      ]);
+      const quota = takePrepare(clientIp);
+      if (!quota.ok) return { success: false, message: `Too many signups prepared from here - try again in ${quota.retryAfterSeconds}s.` };
+      try {
+        const r = await prepareSignup(input, { strapi: strapiClient, fetch: fetchFn });
+        return {
+          success: true,
+          ...r,
+          next:
+            'Give the person signupUrl' + (r.previewUrl ? ' (and previewUrl, to see it first)' : '') +
+            '. They sign and choose a password there, then confirm by email.'
+        };
+      } catch (e) {
+        return { success: false, message: e instanceof Error ? e.message : 'Could not prepare the signup.' };
+      }
+    }
+  });
+}
 
 export const undoAssistantTool = createTool({
   id: 'undoAssistant',

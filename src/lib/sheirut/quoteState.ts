@@ -1,6 +1,6 @@
 /**
  * Price quotes on a service request (Sheirutpend) — pure, no I/O.
- * docs/PLAN_CONCIERGE_LOCAL_PROVIDERS.md §6.
+ * docs/inprogress/PLAN_CONCIERGE_LOCAL_PROVIDERS.md §6.
  *
  * A request can arrive with a price (the product's, or what the customer typed
  * on /gift) or with none at all — `price: null`, "priced by quote": a grocery

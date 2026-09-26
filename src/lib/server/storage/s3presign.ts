@@ -1,6 +1,6 @@
 /**
  * AWS Signature V4 **query-string presigning** — the one piece of S3 this app
- * needs, for Cloudflare R2 (docs/PLAN_RIKMA_SHARED_INFO.md §6 stage 2).
+ * needs, for Cloudflare R2 (docs/inprogress/PLAN_RIKMA_SHARED_INFO.md §6 stage 2).
  *
  * Why hand-rolled: the whole feature is "hand a browser a URL that works for a
  * few minutes". The AWS SDK is ~a megabyte of dependency for one HMAC chain,

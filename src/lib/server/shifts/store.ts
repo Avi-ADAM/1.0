@@ -1,6 +1,6 @@
 /**
  * The shift store — every read and write against the five shift collections
- * (docs/PLAN_SHIFTS.md §3), in one place.
+ * (docs/inprogress/PLAN_SHIFTS.md §3), in one place.
  *
  * Raw GraphQL documents rather than `qids.js`, the same choice as
  * `resources/bookingStore.ts`: `npm run validate:qids` checks every mutation

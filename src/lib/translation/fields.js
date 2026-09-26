@@ -1,6 +1,6 @@
 /**
  * The translatable-field manifest — the single source of truth for *what*
- * user-written text may be translated (§3 of docs/PLAN_UGC_TRANSLATION.md).
+ * user-written text may be translated (§3 of docs/inprogress/PLAN_UGC_TRANSLATION.md).
  *
  * Three consumers read this one table:
  *   1. the runtime collector (`collect.ts`) — what a loader hands to the cache;

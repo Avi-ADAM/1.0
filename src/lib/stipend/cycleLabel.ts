@@ -4,7 +4,7 @@
  * The pay and confirm cards showed an amount and a number of hours with no
  * period attached, so a recipient was asked to confirm ₪2,100 with no way to
  * tell **which month** it answered — and a funder settling two cycles in a row
- * saw two identical-looking cards (docs/FIXES.md §12).
+ * saw two identical-looking cards (docs/inprogress/FIXES.md §12).
  *
  * A stipend window is usually a whole calendar month, and then the month's own
  * name is the clearest thing to say. It stops being a whole month exactly when

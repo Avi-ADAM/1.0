@@ -1,6 +1,6 @@
 /**
  * Who may open a library entry, and where to send them
- * (docs/PLAN_RIKMA_SHARED_INFO.md §6 stage 2).
+ * (docs/inprogress/PLAN_RIKMA_SHARED_INFO.md §6 stage 2).
  *
  * Pure decision over qid 326's row and the verified caller id, so the rules —
  * the part that has to be right — are tested without an HTTP stack. The

@@ -6,7 +6,7 @@ import { env } from '$env/dynamic/private';
  * The app is served from Vercel, but Strapi lives behind the SvelteKit API
  * instance on the VPS. As long as an SSR load talks to Strapi itself, Strapi
  * has to stay reachable from the public internet and can never be locked to
- * loopback (see docs/PLAN_PROXY_SECURITY.md §5, §9.5).
+ * loopback (see docs/done/PLAN_PROXY_SECURITY.md §5, §9.5).
  *
  * So SSR goes through the same front door the browser uses. A load calls the
  * relative `/api/send`; `handleFetch` re-points that at `SSR_API_BASE`

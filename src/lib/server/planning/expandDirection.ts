@@ -252,9 +252,11 @@ export function toExpandedItem(row: PlannedRow, order: number): ExpandedItem {
       ? { ...base, skills: row.skills, roles: row.roles, workways: row.workways, nhours: row.nhours, valph: row.valph }
       : row.kind === 'act'
         ? { ...base, assigneeKind: row.assigneeKind, assigneeName: row.assigneeName, missionName: row.missionName }
-        : row.kind === 'resource' || row.kind === 'product'
-          ? { ...base, kindOf: row.kindOf, price: row.price, quantity: row.quantity }
-          : base;
+        : row.kind === 'product'
+          ? { ...base, kindOf: row.kindOf, price: row.price, quantity: row.quantity, keywords: row.keywords, categories: row.categories }
+          : row.kind === 'resource'
+            ? { ...base, kindOf: row.kindOf, price: row.price, quantity: row.quantity }
+            : base;
 
   return {
     kind: row.kind,

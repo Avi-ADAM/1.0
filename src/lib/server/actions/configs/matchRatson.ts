@@ -1,6 +1,6 @@
 /**
  * Match Ratson (Wish) Action — PLAN_CONCIERGE §3.4 / §6,
- * docs/PLAN_CONCIERGE_LOCAL_PROVIDERS.md
+ * docs/inprogress/PLAN_CONCIERGE_LOCAL_PROVIDERS.md
  *
  * Runs after a wish is published (and on demand from /concierge/[id]):
  *   1. Load the Ratson — its extracted needs, AI category labels, values and
@@ -42,7 +42,9 @@ export const W = {
   proximity: 0.2
 } as const;
 
-const THRESHOLD = 0.25;
+export const THRESHOLD = 0.25;
+/** A need met only by a product's discovery keywords, not its name. */
+export const KEYWORD_WEIGHT = 0.85;
 const TOP_K = 12;
 
 function jaccard(a: string[], b: string[]): number {
@@ -82,6 +84,8 @@ export interface ScoredCandidate {
 export function scoreCandidate(
   cand: {
     name: string;
+    /** `matanot.discoveryKeywords`, comma-separated. */
+    keywords?: string | null;
     place: ReturnType<typeof productPlace>;
     categoryIds: string[];
     categoryNames: string[];
@@ -95,7 +99,15 @@ export function scoreCandidate(
     vallues: string[];
   }
 ): ScoredCandidate | null {
-  const best = bestNeedFor(wish.needs, cand.name);
+  // The product's own name first; its discovery keywords (how customers say
+  // the need — a rikma import writes them) reach wishes the name never would,
+  // at a small discount so a real name match still ranks above.
+  const byName = bestNeedFor(wish.needs, cand.name);
+  const byWords = cand.keywords ? bestNeedFor(wish.needs, cand.keywords) : null;
+  const best =
+    byWords && (!byName || byWords.score * KEYWORD_WEIGHT > byName.score)
+      ? { need: byWords.need, score: byWords.score * KEYWORD_WEIGHT }
+      : byName;
   if (!best) return null;
   if (!reachFor(cand.place, wish.place).ok) return null;
   const textScore = best.score;
@@ -110,9 +122,99 @@ export function scoreCandidate(
   return { need: best.need, score, textScore, catScore, valScore, proxScore };
 }
 
-type CandidateMatanot = {
+export type WishFacts = Parameters<typeof scoreCandidate>[1];
+
+/**
+ * What matching needs from a saved wish: its plan rows as needs, its place, its
+ * category labels (the AI's, and any linked Category) and its values. Shared
+ * with offerNewProductsToWishes so a new supplier is scored exactly like a
+ * wish's own matching run.
+ */
+export function wishFactsOf(ratAttrs: any): WishFacts {
+  const aiMeta = ratAttrs?.ai_meta && typeof ratAttrs.ai_meta === 'object' ? ratAttrs.ai_meta : {};
+  return {
+    needs: [
+      ...(ratAttrs?.extracted_missions ?? []).map((m: any, idx: number) => ({
+        name: String(m?.name ?? ''),
+        isResource: false,
+        idx
+      })),
+      ...(ratAttrs?.extracted_resources ?? []).map((r: any, idx: number) => ({
+        name: String(r?.name ?? ''),
+        isResource: true,
+        idx
+      }))
+    ].filter((n: WishNeed) => n.name.trim().length > 0),
+    place: {
+      lat: ratAttrs?.lat ?? null,
+      lng: ratAttrs?.lng ?? null,
+      radius: ratAttrs?.radius ?? null,
+      isOnline: !!ratAttrs?.isOnline
+    } as WishPlace,
+    categoryIds: (ratAttrs?.categories?.data ?? []).map((c: any) => String(c.id)),
+    categoryLabels: [
+      ...(Array.isArray(aiMeta.categories) ? aiMeta.categories : []),
+      ...(ratAttrs?.categories?.data ?? []).map((c: any) => c?.attributes?.name)
+    ].filter((l: unknown): l is string => typeof l === 'string' && l.trim().length > 0),
+    vallues: (ratAttrs?.vallues?.data ?? []).map((v: any) => String(v.id))
+  };
+}
+
+/** A matanot node (qid 110 / 377) as a matching candidate. */
+export function candidateOf(n: any): CandidateMatanot {
+  const a = n?.attributes ?? {};
+  const proj = a.projectcreates?.data?.[0];
+  return {
+    id: String(n.id),
+    name: a.name ?? '',
+    keywords: typeof a.discoveryKeywords === 'string' ? a.discoveryKeywords : null,
+    price: typeof a.price === 'number' ? a.price : null,
+    estimatedPrice: typeof a.estimatedPrice === 'number' ? a.estimatedPrice : null,
+    pricingMode: a.pricingMode ?? null,
+    place: productPlace(a),
+    categoryIds: (a.categories?.data ?? []).map((c: any) => String(c.id)),
+    categoryNames: (a.categories?.data ?? [])
+      .map((c: any) => c?.attributes?.name)
+      .filter((x: unknown): x is string => typeof x === 'string'),
+    projectId: proj?.id ? String(proj.id) : null,
+    projectVallues: (proj?.attributes?.vallues?.data ?? []).map((v: any) => String(v.id))
+  };
+}
+
+/**
+ * The automatic proposal a matched product makes on a wish: on the plan row it
+ * answers, so /concierge/[id] shows it there with "✓ אני בוחרת".
+ */
+export function autoProposalVars(
+  ratsonId: string,
+  cand: Pick<CandidateMatanot, 'id' | 'projectId' | 'pricingMode' | 'price' | 'estimatedPrice'> & ScoredCandidate,
+  publishedAt: string
+): Record<string, unknown> {
+  // Priced by quote: no number to propose — the shop names it on the request.
+  const totalPrice = cand.pricingMode === 'quote' ? null : (cand.estimatedPrice ?? cand.price ?? 0);
+  return {
+    ratson: ratsonId,
+    kind: 'existing_matanot',
+    status_proposal: 'suggested',
+    matanot: cand.id,
+    project: cand.projectId,
+    total_price: totalPrice,
+    match_score: cand.score,
+    auto_generated: true,
+    covered_missions: cand.need.isResource
+      ? []
+      : [{ extracted_mission_idx: String(cand.need.idx), hours: null, price: totalPrice }],
+    covered_resources: cand.need.isResource
+      ? [{ extracted_resource_idx: String(cand.need.idx), quantity: null, price: totalPrice }]
+      : [],
+    publishedAt
+  };
+}
+
+export type CandidateMatanot = {
   id: string;
   name: string;
+  keywords: string | null;
   price: number | null;
   estimatedPrice: number | null;
   pricingMode: string | null;
@@ -156,33 +258,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
     throw new Error('Only the ratson owner may run matching on it');
   }
 
-  const aiMeta = ratAttrs.ai_meta && typeof ratAttrs.ai_meta === 'object' ? ratAttrs.ai_meta : {};
-  const wishFacts = {
-    needs: [
-      ...(ratAttrs.extracted_missions ?? []).map((m: any, idx: number) => ({
-        name: String(m?.name ?? ''),
-        isResource: false,
-        idx
-      })),
-      ...(ratAttrs.extracted_resources ?? []).map((r: any, idx: number) => ({
-        name: String(r?.name ?? ''),
-        isResource: true,
-        idx
-      }))
-    ].filter((n: WishNeed) => n.name.trim().length > 0),
-    place: {
-      lat: ratAttrs.lat ?? null,
-      lng: ratAttrs.lng ?? null,
-      radius: ratAttrs.radius ?? null,
-      isOnline: !!ratAttrs.isOnline
-    } as WishPlace,
-    categoryIds: (ratAttrs.categories?.data ?? []).map((c: any) => String(c.id)),
-    categoryLabels: [
-      ...(Array.isArray(aiMeta.categories) ? aiMeta.categories : []),
-      ...(ratAttrs.categories?.data ?? []).map((c: any) => c?.attributes?.name)
-    ].filter((l: unknown): l is string => typeof l === 'string' && l.trim().length > 0),
-    vallues: (ratAttrs.vallues?.data ?? []).map((v: any) => String(v.id))
-  };
+  const wishFacts = wishFactsOf(ratAttrs);
 
   // Index existing proposals by matanot id so we don't duplicate — including
   // ones she dismissed: a declined product is not offered again.
@@ -204,24 +280,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
         context.fetch
       );
       const nodes = candRes?.data?.matanots?.data ?? [];
-      candidates = nodes.map((n: any) => {
-        const a = n.attributes ?? {};
-        const proj = a.projectcreates?.data?.[0];
-        return {
-          id: String(n.id),
-          name: a.name ?? '',
-          price: typeof a.price === 'number' ? a.price : null,
-          estimatedPrice: typeof a.estimatedPrice === 'number' ? a.estimatedPrice : null,
-          pricingMode: a.pricingMode ?? null,
-          place: productPlace(a),
-          categoryIds: (a.categories?.data ?? []).map((c: any) => String(c.id)),
-          categoryNames: (a.categories?.data ?? [])
-            .map((c: any) => c?.attributes?.name)
-            .filter((x: unknown): x is string => typeof x === 'string'),
-          projectId: proj?.id ? String(proj.id) : null,
-          projectVallues: (proj?.attributes?.vallues?.data ?? []).map((v: any) => String(v.id))
-        };
-      });
+      candidates = nodes.map(candidateOf);
     } catch (err) {
       console.warn('[matchRatson] candidate fetch failed:', err);
     }
@@ -242,28 +301,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
   const createdProposalIds: string[] = [];
   for (const cand of scored) {
     try {
-      // Priced by quote: no number to propose — the shop names it on the request.
-      const totalPrice =
-        cand.pricingMode === 'quote' ? null : (cand.estimatedPrice ?? cand.price ?? 0);
-      const proposalVars: Record<string, unknown> = {
-        ratson: ratsonId,
-        kind: 'existing_matanot',
-        status_proposal: 'suggested',
-        matanot: cand.id,
-        project: cand.projectId,
-        total_price: totalPrice,
-        match_score: cand.score,
-        auto_generated: true,
-        // The plan row this product answers — /concierge/[id] renders the
-        // proposal there, with the accept/dismiss buttons.
-        covered_missions: cand.need.isResource
-          ? []
-          : [{ extracted_mission_idx: String(cand.need.idx), hours: null, price: totalPrice }],
-        covered_resources: cand.need.isResource
-          ? [{ extracted_resource_idx: String(cand.need.idx), quantity: null, price: totalPrice }]
-          : [],
-        publishedAt: startedAt
-      };
+      const proposalVars = autoProposalVars(ratsonId, cand, startedAt);
       const r = await strapi.execute(
         '101createRatsonProposal',
         proposalVars,

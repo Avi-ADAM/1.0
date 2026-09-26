@@ -1,5 +1,5 @@
 /**
- * Action: the resource came back (docs/PLAN_RESOURCE_CALENDAR.md §4).
+ * Action: the resource came back (docs/inprogress/PLAN_RESOURCE_CALENDAR.md §4).
  *
  * This is the missing half of today's behaviour. `voteOnMaap` sets
  * `Sp.panui = false` when a resource goes out, and **nothing anywhere sets it

@@ -6,7 +6,7 @@
    * happens when you touch one**. Everything else was moved out —
    *
    * - placement and urgency ordering are `coins/coinLayout.ts`, a pure module
-   *   with its own tests (§Stage 1 of docs/PLAN_LEV_COINS.md);
+   *   with its own tests (§Stage 1 of docs/inprogress/PLAN_LEV_COINS.md);
    * - a coin's face is `coins/LevCoin.svelte`, driven entirely by `cardKinds`
    *   metadata, so it is uniform across all 23 kinds the heart can render;
    * - the expanded card is `LevSheet.svelte`, the same one the list view uses.
@@ -617,7 +617,7 @@
     <!-- The "פיזור מחדש" button that used to sit here recomputed the
          positions. Placement is deterministic now — recomputing produces the
          identical field — so the button had nothing left to do. Stage 6 of
-         docs/PLAN_LEV_COINS.md puts the zoom controls in its place. -->
+         docs/inprogress/PLAN_LEV_COINS.md puts the zoom controls in its place. -->
   </div>
 
   <!-- Two gradients for the whole field. The original coins defined one
@@ -746,7 +746,7 @@
     /* Placed by `left`/`top` from `slotStyle()`. Moving the whole field onto a
        single composited transform, so panning and zooming cost one layer
        instead of n repositioned elements, is Stage 6 of
-       docs/PLAN_LEV_COINS.md. */
+       docs/inprogress/PLAN_LEV_COINS.md. */
   }
 
   /* The pop: the coin's ghost, left behind for as long as the animation runs.

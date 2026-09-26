@@ -1,7 +1,7 @@
 <script>
   /**
    * The one prefilled approval screen of a rikma import
-   * (docs/PLAN_AI_SIGNUP_CONCIERGE.md §4.5).
+   * (docs/inprogress/PLAN_AI_SIGNUP_CONCIERGE.md §4.5).
    *
    * An agent (or the site) drafted the rikma — products first — into an
    * assistant session. Nothing exists yet. Here the owner sees every row, fixes
@@ -46,7 +46,7 @@
 
   // Initial values only: the page remounts this screen when the draft's version changes.
   let selected = $state(untrack(() => initialSelection(session.items)));
-  /** @type {Record<string, { label?: string, price?: string, keywords?: string }>} */
+  /** @type {Record<string, { label?: string, price?: string, keywords?: string, categories?: string, holder?: string }>} */
   let edits = $state({});
   let rikmaName = $state(untrack(() => String(session.fields?.name ?? '')));
   let busy = $state(false);
@@ -79,8 +79,13 @@
     return keys.map((k) => byKey.get(k)?.label).filter(Boolean);
   }
 
+  /** Who does it once created — the owner's flip on this screen wins over the draft. */
+  function holderOf(/** @type {Row} */ row) {
+    return edits[row.key]?.holder ?? row.spec?.holder ?? 'open';
+  }
+
   function holderText(/** @type {Row} */ row) {
-    const h = row.spec?.holder;
+    const h = holderOf(row);
     if (h === 'me') return $t('rikmaImport.holder.me');
     if (h === 'partner') {
       const partner = byKey.get(row.spec?.partnerKey);
@@ -90,9 +95,16 @@
   }
 
   /** Record one inline fix; a fresh object each time so the edit stays reactive. */
-  function setEdit(/** @type {string} */ key, /** @type {'label'|'price'|'keywords'} */ field, /** @type {string} */ value) {
+  function setEdit(/** @type {string} */ key, /** @type {'label'|'price'|'keywords'|'categories'|'holder'} */ field, /** @type {string} */ value) {
     edits[key] = { ...(edits[key] ?? {}), [field]: value };
   }
+
+  /** "a, b ,, c" → ['a', 'b', 'c'] */
+  const splitList = (/** @type {string} */ s) =>
+    s
+      .split(',')
+      .map((w) => w.trim())
+      .filter(Boolean);
 
   /** The owner's inline fixes, as the same ops an agent would send. */
   function buildOps() {
@@ -116,12 +128,14 @@
         else if (row.group === 'products') spec.pricingMode = spec.price === null ? 'quote' : 'fixed';
       }
       if (e.keywords !== undefined) {
-        const words = e.keywords
-          .split(',')
-          .map((w) => w.trim())
-          .filter(Boolean);
+        const words = splitList(e.keywords);
         spec.keywords = words.length ? words : null;
       }
+      if (e.categories !== undefined) {
+        const domains = splitList(e.categories).slice(0, 3);
+        spec.categories = domains.length ? domains : null;
+      }
+      if (e.holder !== undefined && e.holder !== (row.spec?.holder ?? 'open')) spec.holder = e.holder;
       if (Object.keys(spec).length) ops.push({ op: 'setSpec', key, spec });
     }
     return ops;
@@ -155,6 +169,32 @@
     result = res.data;
   }
 
+  // ── A read-only link for partners (§4.4) ──
+  let sharing = $state(false);
+  let shareUrl = $state('');
+  let shareError = $state('');
+  let copied = $state(false);
+
+  async function makeShareLink() {
+    if (sharing) return;
+    sharing = true;
+    shareError = '';
+    copied = false;
+    const res = await executeAction('shareRikmaPreview', { sessionId: session.sessionId }, { showErrorToast: false });
+    sharing = false;
+    if (res?.success && res.data?.previewUrl) shareUrl = res.data.previewUrl;
+    else shareError = $t('rikmaImport.share.error');
+  }
+
+  async function copyShareLink() {
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      copied = true;
+    } catch {
+      copied = false;
+    }
+  }
+
   /** @param {{ key: string, result: string }} inv */
   function inviteText(inv) {
     const name = byKey.get(inv.key)?.label ?? '';
@@ -176,6 +216,24 @@
         ? $t('rikmaImport.subtitleNew')
         : $t('rikmaImport.subtitleExisting', { name: session.projectName ?? '' })}
     </p>
+    {#if isNew && !result}
+      <div class="flex flex-col gap-1 text-sm">
+        {#if shareUrl}
+          <p>{$t('rikmaImport.share.ready', { days: 30 })}</p>
+          <div class="flex flex-wrap items-center gap-2">
+            <code class="text-xs break-all rounded bg-white/80 border border-barbi/30 p-1" dir="ltr">{shareUrl}</code>
+            <button type="button" class="underline" onclick={copyShareLink}>
+              {copied ? $t('rikmaImport.share.copied') : $t('rikmaImport.share.copy')}
+            </button>
+          </div>
+        {:else}
+          <button type="button" class="self-start underline" disabled={sharing} onclick={makeShareLink}>
+            {sharing ? $t('rikmaImport.share.making') : $t('rikmaImport.share.button')}
+          </button>
+        {/if}
+        {#if shareError}<p class="text-red-800" role="alert">{shareError}</p>{/if}
+      </div>
+    {/if}
   </header>
 
   {#if isNew}
@@ -231,8 +289,20 @@
                 {#if row.status === 'dropped' && !done}
                   <span class="px-2 py-0.5 rounded-full bg-gray-100 border border-gray-300">{$t('rikmaImport.row.notNow')}</span>
                 {/if}
-                {#if group === 'rikmaMissions' || group === 'rikmaResources'}
+                {#if (group === 'rikmaMissions' || group === 'rikmaResources') && (done || holderOf(row) === 'partner')}
                   <span class="px-2 py-0.5 rounded-full bg-barbi/10">{holderText(row)}</span>
+                {:else if group === 'rikmaMissions' || group === 'rikmaResources'}
+                  <!-- "Looking for someone" emails every matching member once created, so it is the owner's choice. -->
+                  <button
+                    type="button"
+                    class="px-2 py-0.5 rounded-full bg-barbi/10 border border-barbi/30 hover:bg-barbi/20"
+                    title={$t('rikmaImport.holder.toggle')}
+                    aria-label="{holderText(row)} · {$t('rikmaImport.holder.toggle')}"
+                    disabled={!!result}
+                    onclick={() => setEdit(row.key, 'holder', holderOf(row) === 'me' ? 'open' : 'me')}
+                  >
+                    {holderText(row)} ⇄
+                  </button>
                 {/if}
                 {#if inside}
                   <span class="px-2 py-0.5 rounded-full bg-blue-50 border border-blue-200">{$t('rikmaImport.row.partOf', { name: inside })}</span>
@@ -272,6 +342,16 @@
                     oninput={(e) => setEdit(row.key, 'keywords', e.currentTarget.value)}
                   />
                   <span class="text-xs">{$t('rikmaImport.row.keywordsHint')}</span>
+                </label>
+                <label class="flex flex-col gap-1 text-sm">
+                  <span>{$t('rikmaImport.row.categories')}</span>
+                  <input
+                    class="rounded-lg border border-barbi/30 p-1 bg-white/80"
+                    value={edits[row.key]?.categories ?? (row.spec?.categories ?? []).join(', ')}
+                    disabled={!!result}
+                    oninput={(e) => setEdit(row.key, 'categories', e.currentTarget.value)}
+                  />
+                  <span class="text-xs">{$t('rikmaImport.row.categoriesHint')}</span>
                 </label>
               {/if}
             </div>

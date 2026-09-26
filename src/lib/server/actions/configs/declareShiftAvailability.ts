@@ -1,6 +1,6 @@
 /**
  * Action: a member states whether they can come to one shift
- * (docs/PLAN_SHIFTS.md §3.3, §7).
+ * (docs/inprogress/PLAN_SHIFTS.md §3.3, §7).
  *
  * This statement *is* the consent (§1.1): the draft only ever places someone
  * in a shift they declared want / can / ifNeeded for. So two things are held

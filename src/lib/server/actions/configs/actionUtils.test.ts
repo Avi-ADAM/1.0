@@ -6,7 +6,7 @@ import { gqlString } from './actionUtils';
  * query text. Rich-text descriptions always carry `style="text-align: right;"`,
  * and one unescaped `"` turned the whole mutation into a syntax error — which
  * is why taking a mission with a description 500'd every time
- * (docs/QA_SOLO_RIKMA_2026-08.md B2).
+ * (docs/inprogress/QA_SOLO_RIKMA_2026-08.md B2).
  */
 describe('gqlString', () => {
   it('escapes the quotes that rich-text descriptions always contain', () => {

@@ -1,7 +1,7 @@
 <script>
   /**
    * The rikma's shared library — documents, images and links
-   * (docs/PLAN_RIKMA_SHARED_INFO.md §5).
+   * (docs/inprogress/PLAN_RIKMA_SHARED_INFO.md §5).
    *
    * Three kinds on one shelf, because that is how a partnership actually holds
    * its material: a signed lease, a photo of the delivery, and a link to the
@@ -49,7 +49,7 @@
   // promises that picking "links" shows every link the rikma has.
   let showDrive = $derived(Boolean(data.drivelink) && (filter === 'all' || filter === 'link'));
 
-  // The P2P pilot (docs/PLAN_P2P_PILOT.md) — one session per rikma, torn down
+  // The P2P pilot (docs/inprogress/PLAN_P2P_PILOT.md) — one session per rikma, torn down
   // on leave. Only the project id is tracked: `start()` reads the opt-in, and
   // flipping it must not tear the session down and rebuild it.
   let pilot = $derived(new RikmaP2p(String(data.projectId)));

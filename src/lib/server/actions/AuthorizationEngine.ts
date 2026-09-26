@@ -328,7 +328,7 @@ export class AuthorizationEngine {
     try {
       const result = await this.strapiClient.execute(
         '65checkSheirutpendRequester',
-        { uid: userId, sheirutpendId: String(sheirutpendId) },
+        { sheirutpendId: String(sheirutpendId) },
         context.jwt,
         context.fetch
       );

@@ -1,6 +1,6 @@
 /**
  * Action: confirm a hold, releasing the holds it collides with
- * (docs/PLAN_RESOURCE_CALENDAR.md §4, §9.3).
+ * (docs/inprogress/PLAN_RESOURCE_CALENDAR.md §4, §9.3).
  *
  * This is the decision point the whole ledger exists for. Two rikmot can both
  * hold the same week — deliberately, because "first click wins" would be a

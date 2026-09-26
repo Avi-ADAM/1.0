@@ -1,5 +1,5 @@
 /**
- * Opening and reading a stipend Decision (docs/PLAN_STIPEND.md §5).
+ * Opening and reading a stipend Decision (docs/done/PLAN_STIPEND.md §5).
  *
  * No new voting model: a stipend proposal is a `Decision` with a new `kind` and
  * a new round component (`negostip`), exactly as `archiveObject` did. What

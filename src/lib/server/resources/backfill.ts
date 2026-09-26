@@ -1,6 +1,6 @@
 /**
  * The M2 backfill and the M3 shadow comparison, as one runnable pair
- * (docs/PLAN_RESOURCE_CALENDAR.md §8).
+ * (docs/inprogress/PLAN_RESOURCE_CALENDAR.md §8).
  *
  * The rollout the plan describes is three moves, in this order and no other:
  *

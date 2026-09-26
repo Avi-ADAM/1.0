@@ -57,7 +57,7 @@ export interface StandingRound {
   transferToId?: string | null;
   effectiveFrom?: string | null;
   /**
-   * Shift terms (docs/PLAN_SHIFTS.md §3.8, §13.6). The commitment is a term
+   * Shift terms (docs/inprogress/PLAN_SHIFTS.md §3.8, §13.6). The commitment is a term
    * of a mission in progress, the headcount a term of an open mission — and
    * both change the way hours and rate do: by this vote. Only ever set while
    * SHIFTS is on, i.e. after the schema that holds them is deployed.

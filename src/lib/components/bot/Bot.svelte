@@ -187,7 +187,7 @@
         class="absolute sm:bottom-20 bottom-5 {$locale == 'he' ||
         $locale == 'ar'
           ? 'left-3'
-          : 'right-3'} sm:w-80 sm:h-96 h-[75vh] w-[75vw] bg-gold shadow-teal-500 rounded-xl shadow-2xl flex flex-col overflow-hidden"
+          : 'right-3'} bot-panel sm:w-80 w-[75vw] bg-gold shadow-teal-500 rounded-xl shadow-2xl flex flex-col overflow-hidden"
       >
         <div
           class="p-4 bg-liteGoldTobr shadow-lg flex justify-between items-center"
@@ -387,6 +387,27 @@
 <DemoRequest bind:open={demoOpen} source="bot" />
 
 <style>
+  /* The panel grows up from the trigger, so a fixed 75vh put its top — and the
+     close button — under a sticky page header whenever the rail sat high (the
+     homepage lifts it to 8rem above its CTA row) or the phone was short. The
+     cap keeps the top below a 68px header (fpage's .hm-header, z-index 600)
+     plus a gap. dvh, not vh: on mobile vh is the toolbar-hidden height, which
+     is taller than what is actually on screen. */
+  .bot-panel {
+    --bot-top-clear: calc(68px + 0.75rem + env(safe-area-inset-top, 0px));
+    height: 75vh;
+    height: 75dvh;
+    max-height: calc(100vh - var(--rail-bottom, 5rem) - 1.25rem - var(--bot-top-clear));
+    max-height: calc(100dvh - var(--rail-bottom, 5rem) - 1.25rem - var(--bot-top-clear));
+  }
+  @media (min-width: 640px) {
+    /* sm: the trigger sits at bottom-12 and the panel at bottom-20 above it. */
+    .bot-panel {
+      height: 24rem;
+      max-height: calc(100vh - 8rem - var(--bot-top-clear));
+      max-height: calc(100dvh - 8rem - var(--bot-top-clear));
+    }
+  }
   .chat {
     display: flex;
     margin-bottom: 0.5rem;

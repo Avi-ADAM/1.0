@@ -3,7 +3,7 @@
  *
  * `/api/upload` (the Strapi → Cloudinary proxy, 15 MB, used by profile photos
  * and every stage-1 document) and `/api/v1/space-docs/upload-url` (direct to
- * the private R2 bucket, stage 2 of docs/PLAN_RIKMA_SHARED_INFO.md) used to be
+ * the private R2 bucket, stage 2 of docs/inprogress/PLAN_RIKMA_SHARED_INFO.md) used to be
  * one list that only the proxy knew. Two copies of a whitelist drift, and the
  * one that drifts looser is the one nobody notices — so it lives here, and the
  * browser imports it too to refuse a file before it has spent the upload.

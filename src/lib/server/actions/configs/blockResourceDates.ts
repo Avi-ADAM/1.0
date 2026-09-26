@@ -1,6 +1,6 @@
 /**
  * Action: the holder blocks their own resource's dates
- * (docs/PLAN_RESOURCE_CALENDAR.md §2.1, §4).
+ * (docs/inprogress/PLAN_RESOURCE_CALENDAR.md §2.1, §4).
  *
  * "The van is in the garage 15–17 April" is a **sovereign self-report**, the
  * same shape as `holderStatus: 'self'` on a sale: it is about the holder's own

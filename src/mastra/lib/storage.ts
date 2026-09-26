@@ -13,7 +13,7 @@ export const isPersistentStore = MASTRA_DB_URL !== ':memory:';
 
 // A `postgres://` / `postgresql://` URL selects the Postgres store; anything
 // else stays on libSQL (`:memory:`, `file:…`, Turso). See
-// docs/PLAN_MASTRA_STORAGE.md — the VPS runs a dedicated `postgres` container
+// docs/done/PLAN_MASTRA_STORAGE.md — the VPS runs a dedicated `postgres` container
 // on the app-network, so the URL there is postgres://…@postgres:5432/mastra.
 // The pool is deliberately small: that container is capped at
 // max_connections=25 and shares 1.9GB of RAM with Strapi, nginx and this app.

@@ -6,7 +6,7 @@ import { mastraStorage, isPersistentStore } from './storage';
  * Structured working memory for the site chat — PLAN_AI_ERA stage 1, item 4.
  *
  * Two different things are persisted per user, both in the Mastra Postgres
- * container (docs/PLAN_MASTRA_STORAGE.md):
+ * container (docs/done/PLAN_MASTRA_STORAGE.md):
  *
  * 1. **Message history** — thread-scoped, the last `lastMessages` turns are
  *    replayed automatically. Replaces the client-side `history` array, which

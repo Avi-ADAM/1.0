@@ -1,7 +1,7 @@
 /**
  * Candidacy timegrama lifecycle for open-offer negotiation (Ask / Askm).
  *
- * Per docs/PLAN_NEGOTIATION_CANDIDATES.md §A.1, the deadline timegrama is NOT
+ * Per docs/done/PLAN_NEGOTIATION_CANDIDATES.md §A.1, the deadline timegrama is NOT
  * created when an external candidate first applies/proposes — it is created when
  * a rikma member first engages (a favorable vote or a counter), and reset when a
  * counter opens a fresh response window. This helper centralizes that so the

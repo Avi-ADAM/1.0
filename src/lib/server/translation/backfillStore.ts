@@ -1,5 +1,5 @@
 /**
- * The backfill cursor on disk (§8.1 of docs/PLAN_UGC_TRANSLATION.md).
+ * The backfill cursor on disk (§8.1 of docs/inprogress/PLAN_UGC_TRANSLATION.md).
  *
  * `.translate-state/cursor.json`, in the same directory as the governor's day
  * counter, and in the same spirit as `.embed-cache/` next to

@@ -1,6 +1,6 @@
 /**
  * The rikma's shared library — pure shaping for the `space-doc` rows
- * (docs/PLAN_RIKMA_SHARED_INFO.md §3.1, §5).
+ * (docs/inprogress/PLAN_RIKMA_SHARED_INFO.md §3.1, §5).
  *
  * Kept free of Svelte and of `fetch` so the grouping and the "is this link
  * safe to render" question are testable on their own — the second one in

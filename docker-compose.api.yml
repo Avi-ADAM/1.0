@@ -20,7 +20,7 @@
 #
 # Strapi stays bound to 127.0.0.1 / the internal docker network — only this
 # service and Nginx (TLS -> 127.0.0.1:3000) are reachable from outside.
-# See docs/PLAN_PROXY_SECURITY.md stage 3 and docs/DEPLOY_API_DOCKER.md.
+# See docs/done/PLAN_PROXY_SECURITY.md stage 3 and docs/DEPLOY_API_DOCKER.md.
 
 services:
   sveltekit-api:
@@ -52,6 +52,11 @@ services:
       # /api/v1/space-docs/blob. Unset it and the library falls back to the
       # old Strapi/Cloudinary upload (public by URL).
       - SPACE_DOCS_DIR=${SPACE_DOCS_DIR:-/data/space-docs}
+      # UGC translation state (docs/inprogress/PLAN_UGC_TRANSLATION.md §13):
+      # the backfill cursor, the governor's daily quota counter and the guest
+      # demand log. In the container's own filesystem every deploy would wipe
+      # them — the backfill restarting from page 1 and the day's quota forgotten.
+      - TRANSLATE_STATE_DIR=${TRANSLATE_STATE_DIR:-/data/translate-state}
     # /etc/docker/daemon.json sets the same caps globally, but only for
     # containers created AFTER a daemon restart — declaring it here means the
     # rotation is real from the next `up -d`, with no daemon bounce.
@@ -65,6 +70,7 @@ services:
       # image rebuilds and blue/green flips, and `docker run --rm -v` can copy
       # it out for a backup without touching the container.
       - space-docs:/data/space-docs
+      - translate-state:/data/translate-state
     ports:
       # loopback only — Nginx terminates TLS and proxies to 127.0.0.1:3000
       - "127.0.0.1:3000:3000"
@@ -77,7 +83,7 @@ services:
     networks:
       - app-network
 
-  # ---- Mastra persistence (docs/PLAN_MASTRA_STORAGE.md) ----
+  # ---- Mastra persistence (docs/done/PLAN_MASTRA_STORAGE.md) ----
   # Strapi's Postgres is a managed Aiven service, NOT a container here, so
   # Mastra gets its own local instance. Never published to a host port: only
   # containers on app-network can reach it, as `postgres:5432`.
@@ -190,12 +196,14 @@ services:
       - app-network
 
 volumes:
-  # The rikma libraries' files (docs/PLAN_RIKMA_SHARED_INFO.md stage 2).
+  # The rikma libraries' files (docs/inprogress/PLAN_RIKMA_SHARED_INFO.md stage 2).
   # Back this up: unlike everything else on this box it is not derivable from
   # Strapi — losing it loses members' documents.
   #   docker run --rm -v api_space-docs:/d -v "$PWD":/b alpine \
   #     tar czf /b/space-docs-$(date +%F).tgz -C /d .
   space-docs:
+  # Derivable (a lost cursor only restarts the walk), so no backup needed.
+  translate-state:
   mastra-pgdata:
   vector-data:
   # What has already run — the record that stops a month being closed twice and

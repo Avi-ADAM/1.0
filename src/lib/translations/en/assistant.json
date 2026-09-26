@@ -1,0 +1,52 @@
+{
+  "profileTitle": "My profile, as a conversation",
+  "profileSub": "What is already on your profile is marked ✓. Say what to change in words, or tap an item. \"Not now\" deletes nothing - you can bring it back.",
+  "backToOnboarding": "Back to onboarding",
+  "wishLauncher": "Refine with Lev",
+  "error": "Something went wrong. Try again in a moment.",
+  "conflict": "The list changed meanwhile (maybe through your assistant) - this is the latest version.",
+  "updatedElsewhere": "The list was updated elsewhere - this is the latest version.",
+  "viaAgent": "Also updated through Claude",
+  "groups": {
+    "skills": "Skills",
+    "roles": "Roles",
+    "methods": "Ways of working",
+    "vallues": "Values",
+    "resources": "My resources",
+    "wishMissions": "Missions",
+    "wishResources": "Resources"
+  },
+  "locked": "A supplier answered",
+  "lockedHint": "Changing this row is a conversation with whoever answered - on the wish page.",
+  "restore": "Bring back",
+  "keep": "Right",
+  "notNow": "Not now",
+  "add": "Add",
+  "addPlaceholder": "Add…",
+  "sayLabel": "What should change?",
+  "sayPlaceholder": "e.g. \"design is right, drop Excel, add photography\"",
+  "working": "Working on it…",
+  "send": "Update",
+  "undo": "Undo the last change",
+  "apply": {
+    "profile": "Save to my profile",
+    "wish": "Save to the wish"
+  },
+  "saved": {
+    "profile": "Saved to your profile. Your suggestions on the Lev page are updating.",
+    "wish": "Saved to the wish."
+  },
+  "nothingToSave": "Nothing changed to save.",
+  "keptAnswered": "{{count}} rows you marked \"not now\" stayed, because a supplier answered a row after them.",
+  "publishOnSite": "Publishing to the community is the wish's publish button.",
+  "offers": {
+    "title": "Open missions that fit you"
+  },
+  "nearby": {
+    "title": "Rikmas close to you",
+    "sub": "They have no open mission that fits yet - but you can offer yourself, and the rikma decides.",
+    "values": "Shared values: {{names}}",
+    "skills": "Already there: {{names}}",
+    "offerMyself": "Offer myself"
+  }
+}

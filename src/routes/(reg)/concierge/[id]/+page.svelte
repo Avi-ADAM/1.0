@@ -1,15 +1,17 @@
 <script>
   import Money from '$lib/components/money/Money.svelte';
   import '$lib/styles/concierge.css';
-  import { goto } from '$app/navigation';
+  import { goto, invalidateAll } from '$app/navigation';
+  import WishAssistantLauncher from '$lib/components/assistant/WishAssistantLauncher.svelte';
   import { uPic } from '$lib/stores/uPic.js';
   import RichText from '$lib/celim/ui/richText.svelte';
   import Mission from '$lib/components/prPr/mission.svelte';
   import ResourceCreator from '$lib/components/resource/ResourceCreator.svelte';
   import { toast } from 'svelte-sonner';
   import { t } from '$lib/translations';
+  import ExternalOfferCard from '$lib/components/concierge/ExternalOfferCard.svelte';
 
-  /** @type {{ data: { wish: any | null; proposals: any[]; loadOk: boolean; uid?: string; isOwner: boolean; enrichment?: any; forumMessages?: any[]; missionTemplates?: any[] } }} */
+  /** @type {{ data: { wish: any | null; proposals: any[]; loadOk: boolean; uid?: string; isOwner: boolean; enrichment?: any; forumMessages?: any[]; missionTemplates?: any[]; external?: any } }} */
   let { data } = $props();
 
 
@@ -816,6 +818,126 @@
     }
   }
 
+  /* ── Outside offers for rows nothing inside answers
+   * (docs/inprogress/PLAN_CONCIERGE_EXTERNAL_SOURCES.md §5.1). The loader says which
+   * rows are gaps and hands over a saved run; the search itself is the
+   * `fetchExternalOffers` action — run once on its own when this wish was
+   * never searched, and again only from the button. ── */
+  const EXT = $derived(
+    data?.external ?? { enabled: false, gaps: {}, offers: [], fetchedAt: null, stale: false, never: true }
+  );
+  const EXT_GAP_COUNT = $derived(Object.keys(EXT.gaps ?? {}).length);
+  /** Offers found by a search on this page; null = use what the loader saved. */
+  let extFound = $state(/** @type {any[] | null} */ (null));
+  let extDismissed = $state(/** @type {Record<string, boolean>} */ ({}));
+  let extBusy = $state(false);
+  let extFetchedAt = $state(/** @type {string | null} */ (null));
+  let extRowBusy = $state(/** @type {Record<string, 'note' | 'dismiss' | null>} */ ({}));
+  let extAutoRan = false;
+  const EXT_OFFERS = $derived(
+    (extFound ?? EXT.offers ?? []).filter((o) => !extDismissed[o.id])
+  );
+  const EXT_SHOWN_AT = $derived(extFetchedAt ?? EXT.fetchedAt ?? null);
+
+  function rowKey(need) {
+    return `${need.isResource ? 'r' : 'm'}:${need.idx}`;
+  }
+  function extOffersFor(need) {
+    const key = rowKey(need);
+    return EXT_OFFERS.filter((o) => o.matchedNeed?.key === key);
+  }
+
+  /** @type {Record<string, string>} */
+  const EXT_STATUS_MSG = {
+    too_soon: 'concierge.ext_too_soon',
+    quota: 'concierge.ext_quota',
+    error: 'concierge.ext_error',
+    no_provider: 'concierge.ext_no_provider'
+  };
+
+  async function fetchExternal(force = false) {
+    if (!wishId || extBusy) return;
+    extBusy = true;
+    try {
+      const res = await fetch('/api/action', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          actionKey: 'fetchExternalOffers',
+          params: { ratsonId: String(wishId), force }
+        })
+      });
+      const out = await res.json();
+      if (!out?.success) throw new Error(out?.error || 'failed');
+      const d = out.data ?? {};
+      if (Array.isArray(d.offers)) extFound = d.offers;
+      if (d.fetchedAt) extFetchedAt = d.fetchedAt;
+      if (d.status === 'ok') {
+        const n = d.offers?.length ?? 0;
+        if (force || n > 0) {
+          toast.success(n > 0 ? $t('concierge.ext_found', { count: n }) : $t('concierge.ext_none'));
+        }
+      } else if (EXT_STATUS_MSG[d.status] && (force || d.status !== 'no_provider')) {
+        toast.message($t(EXT_STATUS_MSG[d.status]));
+      }
+    } catch (err) {
+      console.error('[concierge/[id]] fetchExternalOffers failed:', err);
+      if (force) toast.error($t('concierge.ext_error'));
+    } finally {
+      extBusy = false;
+    }
+  }
+
+  $effect(() => {
+    if (extAutoRan || !isOwner || !HAS_REAL) return;
+    if (!EXT.enabled || !EXT.never || EXT_GAP_COUNT === 0) return;
+    extAutoRan = true;
+    fetchExternal(false);
+  });
+
+  async function dismissExternal(offer) {
+    if (!wishId || extRowBusy[offer.id]) return;
+    extRowBusy = { ...extRowBusy, [offer.id]: 'dismiss' };
+    try {
+      const res = await fetch('/api/action', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          actionKey: 'dismissExternalOffer',
+          params: { ratsonId: String(wishId), offerId: offer.id }
+        })
+      });
+      const out = await res.json();
+      if (!out?.success) throw new Error(out?.error || 'failed');
+      extDismissed = { ...extDismissed, [offer.id]: true };
+      toast.success($t('concierge.ext_dismissed'));
+    } catch (err) {
+      console.error('[concierge/[id]] dismissExternalOffer failed:', err);
+      toast.error(err instanceof Error ? err.message : 'אירעה שגיאה');
+    } finally {
+      extRowBusy = { ...extRowBusy, [offer.id]: null };
+    }
+  }
+
+  /** "📌" — the link and title land in the row's notes, where she keeps them. */
+  async function saveExternalNote(row, offer) {
+    if (!wishId || extRowBusy[offer.id]) return;
+    extRowBusy = { ...extRowBusy, [offer.id]: 'note' };
+    try {
+      const { missions, resources } = currentExtractionPayload();
+      const list = row.need.isResource ? resources : missions;
+      const item = list[row.need.idx];
+      if (!item) throw new Error('row not found');
+      const line = `🔗 ${offer.title} — ${offer.url}`;
+      item.notes = item.notes ? `${item.notes}\n${line}` : line;
+      await persistExtraction(missions, resources, $t('concierge.ext_saved_note'));
+    } catch (err) {
+      console.error('[concierge/[id]] save external note failed:', err);
+      toast.error(err instanceof Error ? err.message : 'אירעה שגיאה');
+      extRowBusy = { ...extRowBusy, [offer.id]: null };
+    }
+  }
+
   /* ── Customer builds the plan freely (PLAN_CONCIERGE §0.1): add a mission /
    * define a resource with NO specific provider — an unassigned BOM slot for
    * cost estimate; a provider can be assigned later. ── */
@@ -1541,6 +1663,10 @@
                 style="padding:8px 14px;font-size:13px"
                 onclick={startEdit}>✎ ערכי פירוק</button
               >
+              {#if wishId}
+                <!-- The same list the owner's agent edits (PLAN_AI_SIGNUP_CONCIERGE §7.3). -->
+                <WishAssistantLauncher ratsonId={String(wishId)} onApplied={() => invalidateAll()} />
+              {/if}
             {/if}
             {#if extractionApproved}
               <span class="sbadge ready">אושר על־ידי הלקוחה</span>
@@ -1711,6 +1837,31 @@
                 onclick={refreshMatches}
                 >{refreshBusy ? '⏳ מחפשת…' : '🔎 חפשי שוב התאמות'}</button
               >
+              {#if EXT.enabled && EXT_GAP_COUNT > 0}
+                <button
+                  class="btn-ghost"
+                  style="padding:8px 14px;font-size:12px"
+                  disabled={extBusy}
+                  onclick={() => fetchExternal(!EXT.never || !!extFound)}
+                  >{extBusy
+                    ? `⏳ ${$t('concierge.ext_searching')}`
+                    : EXT.never && !extFound
+                      ? $t('concierge.ext_fetch')
+                      : $t('concierge.ext_refetch')}</button
+                >
+              {/if}
+            </div>
+          {/if}
+
+          {#if EXT.enabled && EXT_GAP_COUNT > 0 && (EXT_OFFERS.length > 0 || extBusy || EXT.stale)}
+            <div class="ext-note">
+              <div class="ext-note-h">✶ {$t('concierge.ext_title')}</div>
+              <div class="ext-note-b">{$t('concierge.ext_disclaimer')}</div>
+              {#if extBusy}
+                <div class="ext-note-s">⏳ {$t('concierge.ext_searching')}</div>
+              {:else if EXT.stale && !extFound}
+                <div class="ext-note-s">{$t('concierge.ext_stale')}</div>
+              {/if}
             </div>
           {/if}
 
@@ -2043,6 +2194,29 @@
                   </div>
                 {/each}
               </div>
+              {#if EXT.enabled && EXT.gaps?.[rowKey(row.need)]}
+                {@const ext = extOffersFor(row.need)}
+                {#if ext.length > 0}
+                  <details class="ext-sec">
+                    <summary>{$t('concierge.ext_section', { count: ext.length })}</summary>
+                    {#if EXT.gaps[rowKey(row.need)] === 'weak'}
+                      <div class="ext-weak">{$t('concierge.ext_weak_hint')}</div>
+                    {/if}
+                    <div class="ext-list">
+                      {#each ext as o (o.id)}
+                        <ExternalOfferCard
+                          offer={o}
+                          canAct={isOwner}
+                          busy={extRowBusy[o.id] ?? null}
+                          noteSaved={String(row.need.notes || '').includes(o.url)}
+                          onSaveNote={(offer) => saveExternalNote(row, offer)}
+                          onDismiss={dismissExternal}
+                        />
+                      {/each}
+                    </div>
+                  </details>
+                {/if}
+              {/if}
             </div>
           {/each}
 
@@ -3781,6 +3955,76 @@
       rgb(var(--cg-fg-rgb) / calc(0.012 * var(--cg-fg-k))) 0 8px,
       transparent 8px 16px
     );
+  }
+
+  /* ── Outside offers (PLAN_CONCIERGE_EXTERNAL_SOURCES §5.1) — always after,
+   * and quieter than, what the community offers. ── */
+  .ext-note {
+    margin-bottom: 14px;
+    padding: 10px 14px;
+    border: 1px dashed rgb(var(--cg-fg-rgb) / calc(0.12 * var(--cg-fg-k)));
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .ext-note-h {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--cg-muted);
+  }
+  .ext-note-b,
+  .ext-note-s {
+    font-family: 'Bellefair', serif;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--cg-muted);
+  }
+  .ext-note-s {
+    color: var(--cg-ink2);
+  }
+  .ext-sec {
+    margin-top: 10px;
+  }
+  .ext-sec > summary {
+    cursor: pointer;
+    list-style: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--cg-muted);
+    padding: 4px 10px;
+    border-radius: 999px;
+    border: 1px dashed rgb(var(--cg-fg-rgb) / calc(0.14 * var(--cg-fg-k)));
+  }
+  .ext-sec > summary::-webkit-details-marker {
+    display: none;
+  }
+  /* +/− rather than an arrow: reads the same in RTL and LTR. */
+  .ext-sec > summary::before {
+    content: '+';
+    font-weight: 700;
+  }
+  .ext-sec[open] > summary::before {
+    content: '−';
+  }
+  .ext-sec > summary:hover {
+    color: var(--cg-ink);
+  }
+  .ext-weak {
+    margin-top: 8px;
+    font-family: 'Bellefair', serif;
+    font-size: 12px;
+    color: var(--cg-muted);
+  }
+  .ext-list {
+    margin-top: 8px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 8px;
   }
 
   /* ── Suggestion cards (real members / free resources for an open need) ── */

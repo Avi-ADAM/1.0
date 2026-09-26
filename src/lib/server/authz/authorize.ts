@@ -23,7 +23,7 @@
  * API-key traffic is ALWAYS enforced regardless of mode: that path was
  * deny-by-default before this layer existed, so shadow mode would loosen it.
  *
- * See docs/PLAN_API_PERMISSIONS.md.
+ * See docs/done/PLAN_API_PERMISSIONS.md.
  */
 
 import { env } from '$env/dynamic/private';

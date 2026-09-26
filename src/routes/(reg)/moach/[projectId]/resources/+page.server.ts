@@ -3,7 +3,7 @@ import { bookingsFromLegacy } from '$lib/resources/bookingsFromLegacy.js';
 import type { PageServerLoad } from './$types';
 
 /**
- * The rikma's resource calendar (docs/PLAN_RESOURCE_CALENDAR.md §6.3).
+ * The rikma's resource calendar (docs/inprogress/PLAN_RESOURCE_CALENDAR.md §6.3).
  *
  * Two directions on one screen: what the rikma is holding and until when, and
  * what it has committed to supply outward to customers. Those have never been

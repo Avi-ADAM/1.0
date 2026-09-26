@@ -15,7 +15,7 @@ export type MatchResult = {
 
 // סף matching — אפשר לכוונן אחרי שרואים תוצאות אמיתיות
 //
-// כיול מול פרופיל אמיתי (docs/QA_NEW_USER_WALKTHROUGH_2026-08.md, סעיף 2):
+// כיול מול פרופיל אמיתי (docs/done/QA_NEW_USER_WALKTHROUGH_2026-08.md, סעיף 2):
 // MATCH=0.88 דייק — כל מה שנכנס אליו היה נכון (JavaScript→"ג'אווה סקריפט",
 // Svelte→"סוולט"). SUGGESTION=0.72 לעומת זאת החזיר מועמדים רחוקים:
 // JavaScript→React, "בדיקות אוטומטיות"→"תיקון מחשבים", "גמישות"→"יצירתיות".
