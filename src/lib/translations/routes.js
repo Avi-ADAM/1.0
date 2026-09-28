@@ -78,7 +78,8 @@ export const ROUTED = {
     rikmaDocs: at(/\/moach\/[^/]+\/docs/),
     // The "connect your AI agent" guide, plus the banner that points at it from
     // the settings page — both live under /me, so one gate covers them.
-    mcp: at('/me'),
+    // Plus its public copy at /mcp — the connector's documentation URL.
+    mcp: at('/me', '/mcp'),
     // T9 social recovery: the settings page under /me (plus the banner on the
     // settings page and on /me/devices), and the banner on onboarding's last step.
     recovery: at('/me', '/onboard'),

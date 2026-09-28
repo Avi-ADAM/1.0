@@ -40,7 +40,8 @@ export function authorizationServerMetadata(url: URL) {
     // client_secret. See oauth/clients.ts → clientSecretFor().
     token_endpoint_auth_methods_supported: ['none', 'client_secret_post', 'client_secret_basic'],
     scopes_supported: ['mcp'],
-    service_documentation: 'https://1lev1.com/mcp-connect'
+    // The public guide + tool reference; /mcp-connect is only the consent screen.
+    service_documentation: 'https://1lev1.com/mcp'
   };
 }
 

@@ -31,7 +31,6 @@ import { getSitePagesTool } from '../../../mastra/tools/siteNavigationTool';
 import { navigateToPageTool } from '../../../mastra/tools/navigateToPageTool';
 import { findMissionTool } from '../../../mastra/tools/findMissionTool';
 import { findUserProjectsTool } from '../../../mastra/tools/findUserProjectsTool';
-import { getPageContextTool } from '../../../mastra/tools/pageContextTool';
 import { createProjectTool } from '../../../mastra/tools/createProjectTool';
 import { createTaskTool } from '../../../mastra/tools/createTaskTool';
 import { getProjectMembersTool } from '../../../mastra/tools/getProjectMembersTool';
@@ -93,6 +92,21 @@ export interface McpManifestEntry extends McpToolPolicy {
   pure?: true;
   /** Can remove or overwrite something the caller already had, not only add. */
   destructive?: true;
+  /**
+   * What an outside agent reads instead of the tool's own description. For the
+   * tools the in-app bot shares, whose wording assumes the bot sits inside the
+   * page ("the current page the user is on").
+   */
+  description?: string;
+}
+
+/** Public reference for every tool, generated from this manifest (src/routes/mcp). */
+export const MCP_DOCS_URL = 'https://1lev1.com/mcp';
+
+/** The description an MCP client sees: the tool's own words, then its entry in the public reference. */
+export function mcpDescription(name: string, entry: Pick<McpManifestEntry, 'tool' | 'description'>): string {
+  const base = (entry.description ?? entry.tool.description ?? '').trim();
+  return `${base} Docs: ${MCP_DOCS_URL}#${name}`;
 }
 
 /** MCP tool annotations (spec 2025-03-26): what a client shows and when it asks before calling. */
@@ -180,13 +194,24 @@ export const MCP_TOOL_MANIFEST: Record<string, McpManifestEntry> = {
   openRikmaConversationTool: { tool: openRikmaConversationTool, title: "Open the rikma conversation", tier: 'communicate', project: 'member' },
 
   getSitePagesTool: { tool: getSitePagesTool, title: "List site pages", tier: 'read' },
-  getPageContextTool: { tool: getPageContextTool, title: "Get page context", tier: 'read' },
+  // getPageContextTool is deliberately absent: its table (src/lib/bot/pageContexts.js)
+  // knows three pages, in Hebrew, and answers every other path with a placeholder.
+  // It stays for the in-app bot; an outside agent gets getSitePagesTool instead.
 
   // --- processes (M6). What a rikma is pursuing before it is a mission yet.
   listRikmaProcessesTool: { tool: listRikmaProcessesTool, title: "List rikma processes", tier: 'read', project: 'member' },
 
   // --- prepare ---
-  navigateToPageTool: { tool: navigateToPageTool, title: "Link to a site page", pure: true, tier: 'prepare' },
+  navigateToPageTool: {
+    tool: navigateToPageTool,
+    title: "Link to a site page",
+    description:
+      'Turn a 1lev1.com page into a link to give the user - it does not open anything by itself. Pass the path ' +
+      '(e.g. "/lev", or "/moach/<projectId>" with idPr) and a short name for it; the result carries the path to put ' +
+      'after https://1lev1.com. getSitePagesTool lists the valid paths.',
+    pure: true,
+    tier: 'prepare'
+  },
   createProjectTool: { tool: createProjectTool, title: "Prepare a new rikma", pure: true, tier: 'prepare' }, // returns a prefilled URL; the human creates it
   prepareMissionTool: { tool: prepareMissionTool, title: "Prepare a mission", pure: true, tier: 'prepare', project: 'member' },
   planProjectWorkTool: { tool: planProjectWorkTool, title: "Plan rikma work from an idea", tier: 'prepare', project: 'member', ai: true },

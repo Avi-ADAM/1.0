@@ -59,5 +59,51 @@
   "security3": "To disconnect completely, this command removes the server and the skill from every agent.",
   "security4": "That command only cleans up your local configs — the key itself stays valid. To invalidate it, run the connect command again and approve: it replaces the previous key.",
   "copy": "Copy",
-  "copied": "Copied"
+  "copied": "Copied",
+  "ref": {
+    "metaTitle": "1lev1 for AI assistants - connect and tool reference",
+    "metaDescription": "Connect Claude, ChatGPT or any MCP client to your 1lev1 account, and see every tool the connector exposes: what it does, what it may change, and what it needs.",
+    "eyebrow": "For AI assistants",
+    "title": "Tool reference",
+    "intro": "Every tool the connector gives a signed-in account, read from the server itself - so this list is always the one your assistant gets. Tool descriptions are what the assistant reads, so they stay in English.",
+    "privacy": "How the connector handles your information",
+    "jump": "Jump to",
+    "inputs": "Inputs",
+    "noInputs": "No inputs.",
+    "required": "required",
+    "optional": "optional",
+    "badge": {
+      "readOnly": "Read-only",
+      "writes": "Changes data",
+      "destructive": "Can overwrite",
+      "members": "Rikma members only",
+      "scope": "Needs the {{scope}} scope"
+    },
+    "tier": {
+      "read": {
+        "name": "Read",
+        "desc": "Reads only. Returns what you could see on the site yourself."
+      },
+      "prepare": {
+        "name": "Prepare",
+        "desc": "Returns a link or a proposal, or saves a draft that binds nobody. People approve on the site."
+      },
+      "selfWrite": {
+        "name": "Your own records",
+        "desc": "Changes only your own records - your timers, your profile, your drafts."
+      },
+      "consentWrite": {
+        "name": "Waits for consent",
+        "desc": "Lands something on another member that still waits for that member's approval."
+      },
+      "communicate": {
+        "name": "Communicate",
+        "desc": "Visible to others under your name, and binds nobody."
+      },
+      "sharedWrite": {
+        "name": "Shared write",
+        "desc": "Creates obligations for other people. Off unless the key was granted the mcp:write scope."
+      }
+    }
+  }
 }

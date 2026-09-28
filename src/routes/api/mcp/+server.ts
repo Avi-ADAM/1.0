@@ -20,12 +20,22 @@ import { createTool } from '@mastra/core/tools';
 import { z } from 'zod';
 
 import { wrapMcpTool } from '$lib/server/mcp/guard';
-import { MCP_TOOL_MANIFEST, tierAllowed, entryEnabled, mcpAnnotations } from '$lib/server/mcp/toolManifest';
+import {
+    MCP_TOOL_MANIFEST,
+    MCP_DOCS_URL,
+    tierAllowed,
+    entryEnabled,
+    mcpAnnotations,
+    mcpDescription
+} from '$lib/server/mcp/toolManifest';
 import { MCP_INSTRUCTIONS, mcpInstructions } from '$lib/server/mcp/instructions';
 import { assistantMcpEnabled, makePrepareSignupTool } from '../../../mastra/tools/assistantTools';
 import { normalizeApiKeyScopes } from '$lib/server/apiKeys';
 
 // --- Public Tools for Unauthenticated Users ---
+
+/** Where the public tools point: the connect section of the tool reference. */
+const CONNECT_DOCS = ` Docs: ${MCP_DOCS_URL}#connect`;
 
 /** Annotations for the public tools: none of them touches any record. */
 const readOnly = (title: string) => ({
@@ -34,7 +44,7 @@ const readOnly = (title: string) => ({
 
 const getPlatformInfo = createTool({
     id: 'getPlatformInfo',
-    description: 'Get general information about the 1lev1 platform, its goals, and features.',
+    description: 'Get general information about the 1lev1 platform, its goals, and features.' + CONNECT_DOCS,
     inputSchema: z.object({}),
     ...readOnly('About 1lev1'),
     execute: async () => {
@@ -48,7 +58,7 @@ const getPlatformInfo = createTool({
 
 const howToConnect = createTool({
     id: 'howToConnect',
-    description: 'Instructions on how to register, login and get an API key for full MCP access.',
+    description: 'Instructions on how to register, login and get an API key for full MCP access.' + CONNECT_DOCS,
     inputSchema: z.object({}),
     ...readOnly('How to connect'),
     execute: async () => {
@@ -80,7 +90,7 @@ const createNewApiKey = createTool({
     description:
         'Get a NEW 1lev1 API key: the exact command to run (npx 1lev1-mcp) and the ' +
         'approval URL. Also lists the stale config entries that must be deleted first, ' +
-        'otherwise the new key is shadowed and nothing changes after a restart.',
+        'otherwise the new key is shadowed and nothing changes after a restart.' + CONNECT_DOCS,
     inputSchema: z.object({}),
     ...readOnly('Get a new API key'),
     execute: async () => {
@@ -117,7 +127,7 @@ function makeFixRejectedApiKeyTool(reason: 'malformed' | 'unknown' | 'revoked') 
             `STOP — the 1lev1 API key this client sent was REJECTED (${reason}). You are ` +
             'NOT connected to the user\'s account and no mission, timer or project tool is ' +
             'available. This is NOT the same as an unregistered user, so do not simply tell ' +
-            'them to sign up. Call this tool for the repair steps and relay them.',
+            'them to sign up. Call this tool for the repair steps and relay them.' + CONNECT_DOCS,
         inputSchema: z.object({}),
         ...readOnly('Fix a rejected API key'),
         execute: async () => repairPlan(reason)
@@ -134,7 +144,10 @@ function makeFixRejectedApiKeyTool(reason: 'malformed' | 'unknown' | 'revoked') 
 const WRAPPED_TOOLS: Record<string, any> = Object.fromEntries(
     Object.entries(MCP_TOOL_MANIFEST).map(([name, entry]) => [
         name,
-        wrapMcpTool(entry.tool, entry, { ...mcpAnnotations(entry) })
+        wrapMcpTool(entry.tool, entry, {
+            description: mcpDescription(name, entry),
+            annotations: { ...mcpAnnotations(entry) }
+        })
     ])
 );
 

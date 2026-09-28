@@ -86,7 +86,8 @@ const PAGES = [
   { path: '/flexible-work', lastmod: '2026-09-05T00:00:00+00:00', priority: '0.85', changefreq: 'monthly' },
   // The concierge, for customers who come to order something made for them.
   { path: '/made-for-you', lastmod: '2026-09-23T00:00:00+00:00', priority: '0.85', changefreq: 'monthly' },
-  { path: '/privacy', lastmod: '2026-09-27T00:00:00+00:00', priority: '0.30', changefreq: 'yearly' },
+  { path: '/mcp', lastmod: '2026-09-28T00:00:00+00:00', priority: '0.60', changefreq: 'monthly' },
+  { path: '/privacy',lastmod: '2026-09-27T00:00:00+00:00', priority: '0.30', changefreq: 'yearly' },
 
   // Entry points into the product
   { path: '/wish/new', lastmod: '2026-08-13T00:00:00+00:00', priority: '0.85', changefreq: 'monthly' },

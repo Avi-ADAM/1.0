@@ -3,7 +3,14 @@
  * CI failure instead of a production IDOR — the reason the manifest exists.
  */
 import { describe, expect, it } from 'vitest';
-import { MCP_TOOL_MANIFEST, tierAllowed, MCP_WRITE_SCOPE, mcpAnnotations } from './toolManifest';
+import {
+  MCP_TOOL_MANIFEST,
+  MCP_DOCS_URL,
+  tierAllowed,
+  MCP_WRITE_SCOPE,
+  mcpAnnotations,
+  mcpDescription
+} from './toolManifest';
 
 const TIERS = ['read', 'prepare', 'selfWrite', 'consentWrite', 'communicate', 'sharedWrite'];
 
@@ -79,6 +86,16 @@ describe('MCP tool manifest', () => {
     expect(mcpAnnotations(MCP_TOOL_MANIFEST.timerActionTool).readOnlyHint).toBe(false);
     expect(mcpAnnotations(MCP_TOOL_MANIFEST.createPlanBoardTool).readOnlyHint).toBe(false);
     expect(mcpAnnotations(MCP_TOOL_MANIFEST.applyAssistantTool).destructiveHint).toBe(true);
+  });
+
+  it('every MCP description ends with its own anchor in the public reference', () => {
+    for (const [name, entry] of entries) {
+      const d = mcpDescription(name, entry);
+      expect(d.endsWith(` Docs: ${MCP_DOCS_URL}#${name}`), `${name}: docs link`).toBe(true);
+      expect(d.length, `${name}: empty description`).toBeGreaterThan(` Docs: ${MCP_DOCS_URL}#${name}`.length + 20);
+    }
+    // The in-app bot's wording ("navigate") must not reach an outside agent.
+    expect(mcpDescription('navigateToPageTool', MCP_TOOL_MANIFEST.navigateToPageTool)).toContain('does not open anything');
   });
 
   it('the tools that call a model are in the ai bucket', () => {

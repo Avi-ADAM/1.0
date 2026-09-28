@@ -59,5 +59,51 @@
   "security3": "Para desconectarte del todo, este comando elimina el servidor y la skill de todos los agentes.",
   "security4": "Ese comando sólo limpia tus configuraciones locales — la clave sigue siendo válida. Para invalidarla, vuelve a ejecutar el comando de conexión y aprueba: reemplaza la clave anterior.",
   "copy": "Copiar",
-  "copied": "Copiado"
+  "copied": "Copiado",
+  "ref": {
+    "metaTitle": "1lev1 para asistentes de IA - conexión y referencia de herramientas",
+    "metaDescription": "Conecta Claude, ChatGPT o cualquier cliente MCP a tu cuenta de 1lev1, y consulta cada herramienta del conector: qué hace, qué puede cambiar y qué necesita.",
+    "eyebrow": "Para asistentes de IA",
+    "title": "Referencia de herramientas",
+    "intro": "Todas las herramientas que el conector da a una cuenta con sesión iniciada, tal como las devuelve el propio servidor - así que esta lista es siempre la que recibe tu asistente. Las descripciones son lo que lee el asistente, por eso siguen en inglés.",
+    "privacy": "Cómo trata el conector tu información",
+    "jump": "Ir a",
+    "inputs": "Entradas",
+    "noInputs": "Sin entradas.",
+    "required": "obligatorio",
+    "optional": "opcional",
+    "badge": {
+      "readOnly": "Solo lectura",
+      "writes": "Cambia datos",
+      "destructive": "Puede sobrescribir",
+      "members": "Solo miembros de la rikma",
+      "scope": "Necesita el permiso {{scope}}"
+    },
+    "tier": {
+      "read": {
+        "name": "Lectura",
+        "desc": "Solo lee. Devuelve lo que tú mismo verías en el sitio."
+      },
+      "prepare": {
+        "name": "Preparar",
+        "desc": "Devuelve un enlace o una propuesta, o guarda un borrador que no obliga a nadie. Las personas aprueban en el sitio."
+      },
+      "selfWrite": {
+        "name": "Tus registros",
+        "desc": "Cambia solo tus propios registros - tus temporizadores, tu perfil, tus borradores."
+      },
+      "consentWrite": {
+        "name": "Espera consentimiento",
+        "desc": "Deja algo a otro miembro, y queda esperando su aprobación."
+      },
+      "communicate": {
+        "name": "Comunicar",
+        "desc": "Visible para otros en tu nombre, y no obliga a nadie."
+      },
+      "sharedWrite": {
+        "name": "Escritura compartida",
+        "desc": "Crea obligaciones para otras personas. Desactivado salvo que la clave tenga el permiso mcp:write."
+      }
+    }
+  }
 }

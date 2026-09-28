@@ -207,15 +207,17 @@ async function checkPolicy(policy: McpToolPolicy, input: any): Promise<any> {
 export function wrapMcpTool<T extends { id: string }>(
   tool: T,
   policy: McpToolPolicy,
-  annotations?: Record<string, unknown>
+  /** What the MCP client sees, when it differs from the tool itself (see toolManifest). */
+  face: { description?: string; annotations?: Record<string, unknown> } = {}
 ): T {
   const inner = tool as any;
   const bucket = bucketFor(policy);
   const audited = policy.tier !== 'read' && policy.tier !== 'prepare';
+  const annotations = face.annotations;
 
   return createTool({
     id: inner.id,
-    description: inner.description,
+    description: face.description ?? inner.description,
     inputSchema: inner.inputSchema,
     ...(annotations ? { mcp: { annotations } } : {}),
     execute: async (input: any, context: any) => {
