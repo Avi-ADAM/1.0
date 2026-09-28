@@ -21,6 +21,7 @@ import {
   loadPeriods,
   loadWindow,
   setAskCommitment,
+  setPendmPlan,
   syncShifts,
   upsertDeclaration
 } from './store';
@@ -219,3 +220,47 @@ describe('the shift commitment (PLAN_SHIFTS §3.8)', () => {
     assertWellFormed(calls);
   });
 });
+
+describe('setPendmPlan — a negotiation round moves the proposal\'s staffing hours', () => {
+  const pattern = { version: 1 as const, days: [{ dow: 2, windows: [{ start: '08:00', end: '12:00', need: 2 }] }] };
+  const planNode = (archived: boolean) => ({ id: '7', attributes: { name: 'x', pattern: { version: 1, days: [] }, status: 'paused', archived } });
+
+  it('edits the paused plan in place, and revives one a round had turned off', async () => {
+    const { exec, calls } = fake([[/shiftPlans\(/, () => ({ shiftPlans: { data: [planNode(true)] } })]]);
+    expect(await setPendmPlan(exec, { pendmId: '55', projectId: '3', enabled: true, pattern })).toEqual({ planId: '7' });
+    const find = calls.find((c) => /shiftPlans\(/.test(c.query))!;
+    expect(find.query).not.toMatch(/archived: \{/); // the turned-off plan must be found too
+    const update = calls.find((c) => /updateShiftPlan/.test(c.query))!;
+    expect(update.variables).toEqual({ id: '7', data: { pattern, status: 'paused', archived: false } });
+    expect(calls.some((c) => /createShiftPlan/.test(c.query))).toBe(false);
+    assertWellFormed(calls);
+  });
+
+  it('adds a paused plan to a proposal that had none', async () => {
+    const { exec, calls } = fake([
+      [/shiftPlans\(/, () => ({ shiftPlans: { data: [] } })],
+      [/pendm\(id/, () => ({ pendm: { data: { id: '55', attributes: { name: 'Front desk', mission: { data: { id: '9' } } } } } })],
+      [/createShiftPlan/, () => ({ createShiftPlan: { data: { id: '8', attributes: {} } } })]
+    ]);
+    expect(await setPendmPlan(exec, { pendmId: '55', projectId: '3', enabled: true, pattern })).toEqual({ planId: '8' });
+    const create = calls.find((c) => /createShiftPlan/.test(c.query))!;
+    expect(create.variables!.data).toMatchObject({ project: '3', mission: '9', name: 'Front desk', pattern, pendm: '55', status: 'paused', archived: false });
+    assertWellFormed(calls);
+  });
+
+  it('archives — never deletes — the plan when the round drops the staffing', async () => {
+    const { exec, calls } = fake([[/shiftPlans\(/, () => ({ shiftPlans: { data: [planNode(false)] } })]]);
+    expect(await setPendmPlan(exec, { pendmId: '55', projectId: '3', enabled: false })).toEqual({ planId: null });
+    const update = calls.find((c) => /updateShiftPlan/.test(c.query))!;
+    expect(update.variables).toEqual({ id: '7', data: { archived: true } });
+    assertWellFormed(calls);
+  });
+
+  it('a turned-off plan does not go live when the proposal matures', async () => {
+    const { exec, calls } = fake([[/shiftPlans\(/, () => ({ shiftPlans: { data: [] } })]]);
+    expect(await activatePlanForPendm(exec, '55', '99')).toEqual([]);
+    expect(calls[0].query).toMatch(/archived: \{ null: true \}/);
+    assertWellFormed(calls);
+  });
+});
+

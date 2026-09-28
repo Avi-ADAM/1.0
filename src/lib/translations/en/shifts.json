@@ -267,5 +267,20 @@
     "counterSame": "A new proposal must change something — or approve it as it is",
     "badAnswer": "Unknown answer",
     "saveFailed": "Saving failed. Please try again."
+  },
+  "pendm": {
+    "badge": "Shift mission",
+    "need": "{{count}} people needed",
+    "needOne": "One person needed",
+    "hoursTitle": "Staffing hours approved together with the mission",
+    "atOnce": "{{count}} at once",
+    "week": "week {{count}}",
+    "exceptions": "plus {{count}} dates with different hours",
+    "perPerson": "per person",
+    "changed": "Staffing hours changed in negotiation",
+    "previousTitle": "The staffing hours before the last round",
+    "previousOff": "Before the last round this was not a shift mission.",
+    "negoEditHint": "You can change the staffing days and hours here, add them or remove them. Like any other change to the proposal, it opens a new voting round.",
+    "negoLoading": "Loading the staffing hours…"
   }
 }

@@ -387,6 +387,12 @@ export function processPends(
       workways: applyLocalization(pend.workways),
       vallues: applyLocalization(pend.vallues),
 
+      // The cards read camelCase `isKavua`; the store keeps Strapi's `iskvua`
+      // (a negotiation patches that one), so derive it here on every pass.
+      isKavua: pend.iskvua === true,
+      howMeny: Math.max(1, Math.floor(Number(pend.howMeny) || 1)),
+      isshift: pend.isshift === true,
+
       sqadualed: pend.sqadualed || null,
       dates: pend.dates || null
     };

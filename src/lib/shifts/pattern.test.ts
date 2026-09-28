@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { materialize, shiftHours, suggestHeadcount, validatePattern, weeklyStaffedHours } from './pattern';
+import { canonicalPattern, isStaffable, materialize, samePattern, shiftHours, suggestHeadcount, validatePattern, weeklyStaffedHours } from './pattern';
 import type { ShiftPattern } from './types';
 
 const TZ = 'Asia/Jerusalem';
@@ -166,5 +166,50 @@ describe('weeklyStaffedHours / suggestHeadcount', () => {
     );
     // Sunday night: 4h × 2 every week; Monday of week 1: 2h once per two weeks.
     expect(weeklyStaffedHours(q)).toBe(8 + 1);
+  });
+});
+
+describe('canonicalPattern / samePattern / isStaffable', () => {
+  const a: ShiftPattern = {
+    version: 1,
+    days: [
+      { dow: 3, windows: [{ start: '14:00', end: '18:00', need: 1 }, { start: '08:00', end: '12:00', need: 2 }] },
+      { dow: 1, windows: [] },
+      { dow: 0, windows: [{ start: '09:00', end: '13:00', need: 1, tafkidimId: null }] }
+    ]
+  };
+
+  it('ignores the order of days and windows, empty days and absent roles', () => {
+    const b: ShiftPattern = {
+      version: 1,
+      days: [
+        { dow: 0, windows: [{ start: '09:00', end: '13:00', need: 1 }] },
+        { dow: 3, windows: [{ start: '08:00', end: '12:00', need: 2 }, { start: '14:00', end: '18:00', need: 1 }] }
+      ]
+    };
+    expect(samePattern(a, b)).toBe(true);
+    expect(canonicalPattern(a).days.map((d) => d.dow)).toEqual([0, 3]);
+  });
+
+  it('sees a changed hour, a changed headcount and a removed day', () => {
+    const later = structuredClone(a);
+    later.days[0].windows[0].end = '19:00';
+    expect(samePattern(a, later)).toBe(false);
+    const more = structuredClone(a);
+    more.days[0].windows[1].need = 3;
+    expect(samePattern(a, more)).toBe(false);
+    expect(samePattern(a, { version: 1, days: [a.days[0]] })).toBe(false);
+  });
+
+  it('treats a missing pattern as an empty one', () => {
+    expect(samePattern(null, { version: 1, days: [] })).toBe(true);
+    expect(samePattern(null, a)).toBe(false);
+  });
+
+  it('only a valid pattern with a staffed window can be saved', () => {
+    expect(isStaffable(a)).toBe(true);
+    expect(isStaffable({ version: 1, days: [{ dow: 2, windows: [] }] })).toBe(false);
+    expect(isStaffable({ version: 1, days: [{ dow: 2, windows: [{ start: '9', end: '12:00', need: 1 }] }] })).toBe(false);
+    expect(isStaffable(null)).toBe(false);
   });
 });

@@ -24,6 +24,7 @@ import {
   loadAssignment,
   loadCommitments,
   loadPeriod,
+  loadPlanForPendm,
   loadShift,
   loadWindow,
   markPeriodReopened,
@@ -49,6 +50,68 @@ export const getShiftWorkConfig: ActionConfig = {
   graphqlOperation: getShiftWork,
   paramSchema: {},
   authRules: [{ type: 'jwt' }],
+  updateStrategy: { type: 'none' }
+};
+
+// ── getPendmShiftPlan ────────────────────────────────────────────────────────
+
+// The staffing hours a mission proposal carries, for the vote card and the
+// negotiation form: members approve them in the same vote as the mission, so
+// they must be able to see them there. Read-only; the pattern only.
+const getPendmShiftPlan: ActionExecutionHandler = async (params, context) => {
+  if (!shiftsEnabled()) return { data: { plan: null }, updateStrategy: { type: 'none' } };
+  const plan = await loadPlanForPendm(asUser(context), String(params.pendmId));
+  // A plan hangs on its own rikma; never answer for another one's proposal.
+  if (!plan || (plan.projectId && plan.projectId !== String(params.projectId))) {
+    return { data: { plan: null }, updateStrategy: { type: 'none' } };
+  }
+  return {
+    data: {
+      plan: { id: plan.id, pattern: plan.pattern, timezone: plan.timezone, cycleDays: plan.cycleDays },
+      previous: await previousShiftTerms(context, String(params.pendmId))
+    },
+    updateStrategy: { type: 'none' }
+  };
+};
+
+/**
+ * The hours as they stood before the latest round that changed them, from the
+ * round's snapshot (`negopendmission.shiftPattern`). Best effort: a Strapi
+ * without that field yet answers with an error, which only means "no history".
+ */
+async function previousShiftTerms(context: any, pendmId: string) {
+  try {
+    const res = await asUser(context)(
+      `query ($id: ID!) { negopendmissions(filters: { pendm: { id: { eq: $id } } }, sort: "createdAt:desc", pagination: { limit: 50 }) {
+        data { id attributes { createdAt shiftPattern } } } }`,
+      { id: pendmId }
+    );
+    if (res?.errors?.length) return null;
+    const hit = (res?.data?.negopendmissions?.data ?? []).find((n: any) => n?.attributes?.shiftPattern != null);
+    if (!hit) return null;
+    const sp = hit.attributes.shiftPattern;
+    return { enabled: sp.enabled === true, pattern: sp.enabled === true ? (sp.pattern ?? null) : null, at: hit.attributes.createdAt ?? null };
+  } catch {
+    return null;
+  }
+}
+
+export const getPendmShiftPlanConfig: ActionConfig = {
+  key: 'getPendmShiftPlan',
+  description: 'The staffing pattern a mission proposal (pendm) carries, shown on its vote card and in its negotiation.',
+  graphqlOperation: getPendmShiftPlan,
+  paramSchema: {
+    pendmId: { type: 'string', required: true, description: 'The mission proposal (pendm) id' },
+    projectId: { type: 'string', required: true, description: 'The rikma the proposal belongs to (membership check)' }
+  },
+  authRules: [
+    { type: 'jwt' },
+    {
+      type: 'projectMember',
+      config: { projectIdParam: 'projectId' },
+      errorMessage: 'Must be a project member to see a proposal'
+    }
+  ],
   updateStrategy: { type: 'none' }
 };
 

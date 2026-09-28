@@ -1,5 +1,10 @@
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { calcDeadlineMs, normalizeLocationInput, extractRelationId } from './actionUtils.js';
+import { shiftsEnabled } from '$lib/server/shifts/mode.js';
+import { asService, asUser } from '$lib/server/shifts/exec.js';
+import { loadPlanForPendm, setPendmPlan } from '$lib/server/shifts/store.js';
+import { canonicalPattern, isStaffable, samePattern } from '$lib/shifts/pattern.js';
+import type { ShiftPattern } from '$lib/shifts/types.js';
 
 interface NewAct {
   shem: string;
@@ -7,6 +12,33 @@ interface NewAct {
   link?: string | null;
   dateS?: string | null;
   dateF?: string | null;
+}
+
+/** The staffing a round proposes, or had before it (PLAN_SHIFTS §13.6). */
+interface ShiftTerms {
+  enabled: boolean;
+  pattern: ShiftPattern | null;
+}
+
+/**
+ * The staffing hours are a term of a mission proposal like hours and rate, so
+ * a round may change them. What they were is read from the plan itself, never
+ * taken from the client; a round that leaves them as they were changes nothing.
+ * Returns null when there is nothing to do — not a proposal, SHIFTS off, or
+ * the same hours — and throws on hours that cannot be staffed, before any write.
+ */
+async function shiftChangeOf(params: Record<string, any>, context: any): Promise<{ next: ShiftTerms; before: ShiftTerms } | null> {
+  const raw = params.newValues?.shiftPlan;
+  if (params.isAsk !== 0 || raw == null || !shiftsEnabled()) return null;
+  const next: ShiftTerms = { enabled: raw.enabled === true, pattern: raw.enabled === true ? (raw.pattern ?? null) : null };
+  if (next.enabled && !isStaffable(next.pattern)) {
+    throw new Error('Invalid shift pattern: fix the staffing hours or turn them off');
+  }
+  const plan = await loadPlanForPendm(asUser(context), String(params.pendId));
+  const before: ShiftTerms = { enabled: !!plan, pattern: plan?.pattern ?? null };
+  if (before.enabled === next.enabled && (!next.enabled || samePattern(before.pattern, next.pattern))) return null;
+  if (next.pattern) next.pattern = canonicalPattern(next.pattern);
+  return { next, before };
 }
 
 interface UserVote {
@@ -24,6 +56,9 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
 
   const x = calcDeadlineMs(params.restime ?? 'feh');
   const deadline = new Date(Date.now() + x).toISOString();
+
+  // 0. Staffing hours — checked before anything is written.
+  const shiftChange = await shiftChangeOf(params, context);
 
   // 1. Create new acts server-side
   const newActIds: string[] = [];
@@ -74,7 +109,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
   // 3. Create negopendmission snapshot (stores original values before this negotiation)
   const orig = params.originalValues ?? {};
   const origLoc = normalizeLocationInput(orig.location);
-  await strapi.execute('negoCreateNegopendmission', {
+  const snapshot = await strapi.execute('negoCreateNegopendmission', {
     publishedAt: nowISO,
     userId,
     pendm: params.isAsk === 0 ? params.pendId : null,
@@ -83,6 +118,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
     isMonth: orig.isMonth ?? null,
     noofhours: orig.noofhours ?? null,
     perhour: orig.perhour ?? null,
+    howMany: orig.howMany ?? null,
     hearotMeyuchadot: orig.hearotMeyuchadot ?? null,
     descrip: orig.descrip ?? null,
     name: orig.name ?? null,
@@ -96,6 +132,22 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
     // ([ComponentNewLocationInput]) and Strapi rejects an explicit `null`.
     ...(origLoc ? { location: [origLoc] } : {}),
   }, context.jwt, context.fetch);
+
+  // 3b. The hours as they stood before this round, so voters can see what the
+  //     round changed. Its own write, and allowed to fail: a Strapi that does
+  //     not have `negopendmission.shiftPattern` yet must not cost the round.
+  const snapshotId = snapshot?.data?.createNegopendmission?.data?.id;
+  if (shiftChange && snapshotId) {
+    try {
+      const res = await asService(context.fetch ?? fetch)(
+        `mutation ($id: ID!, $data: NegopendmissionInput!) { updateNegopendmission(id: $id, data: $data) { data { id } } }`,
+        { id: String(snapshotId), data: { shiftPattern: shiftChange.before } }
+      );
+      if (res?.errors?.length) throw new Error(JSON.stringify(res.errors).slice(0, 300));
+    } catch (e) {
+      console.warn('[submitNegoMission] previous staffing hours not recorded:', e);
+    }
+  }
 
   // 4. Build updated users array (existing + new vote from current user)
   const existingUsers = ((params.users ?? []) as UserVote[]).map((u) => {
@@ -134,6 +186,10 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
   if (nv.sqadualed   != null) entityData.sqadualed           = nv.sqadualed;
   if (nv.dates       != null) entityData.dates               = nv.dates;
   if (nv.iskvua      != null) entityData.iskvua              = nv.iskvua;
+  // Headcount (PLAN_SHIFTS §2) is a term of the proposal like hours and rate.
+  // Only the pendm carries it: a candidate's round is always one person.
+  const need = nv.howMeny != null ? Math.floor(Number(nv.howMeny)) : NaN;
+  if (params.isAsk === 0 && need >= 1) entityData.howMeny = need;
   if (nv.location    != null) {
     const loc = normalizeLocationInput(nv.location);
     if (loc) entityData.location = loc;
@@ -141,6 +197,17 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
   if (finalActIds.length > 0 || params.actsChanged) entityData.acts = finalActIds;
 
   if (params.isAsk === 0) {
+    // The paused plan follows the round; `isshift` goes with the rest of it.
+    if (shiftChange) {
+      await setPendmPlan(asUser(context), {
+        pendmId: String(params.pendId),
+        projectId: String(params.projectId),
+        enabled: shiftChange.next.enabled,
+        pattern: shiftChange.next.pattern
+      });
+      entityData.isshift = shiftChange.next.enabled;
+    }
+
     // Pendm path: update users + nego component
     entityData.users = allUsers;
     entityData.nego = [{ ide: parseInt(String(userId), 10) }];
@@ -165,6 +232,8 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
     if (nv.sqadualed        != null) patch.sqadualed        = nv.sqadualed;
     if (nv.dates            != null) patch.dates            = nv.dates;
     if (nv.iskvua           != null) patch.iskvua           = nv.iskvua;
+    if (entityData.howMeny  != null) patch.howMeny          = entityData.howMeny;
+    if (entityData.isshift  != null) patch.isshift          = entityData.isshift;
     if (entityData.location != null) patch.location         = entityData.location;
 
     // Negotiator's vote in the Strapi-nested shape processPends/mergeVote expect.
@@ -177,7 +246,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
     };
 
     return {
-      data: { id: String(params.pendId), patch, newVote: strapiVote },
+      data: { id: String(params.pendId), patch, newVote: strapiVote, shiftsChanged: !!shiftChange },
       updateStrategy: { type: 'partialUpdate', config: { dataKeys: ['pends'] } },
     };
   }
@@ -236,7 +305,7 @@ export const submitNegoMissionConfig: ActionConfig = {
     restime:         { type: 'string',  required: false, description: 'Project restime: feh|sth|nsh|sevend' },
     isOriginal:      { type: 'boolean', required: false, description: 'True if this is the first negotiation (stepState === 2)' },
     ordern:          { type: 'number',  required: false, description: 'Current order index (new vote gets ordern+1)' },
-    newValues:       { type: 'object',  required: false, description: 'Changed field values (new values to apply)' },
+    newValues:       { type: 'object',  required: false, description: 'Changed field values (new values to apply). On a pendm, `howMeny` and `shiftPlan: { enabled, pattern }` are terms too (docs/inprogress/PLAN_SHIFTS.md §13.6)' },
     originalValues:  { type: 'object',  required: false, description: 'Original values before the change (for snapshot)' },
     newActs:         { type: 'array',   required: false, description: 'New acts to create: [{shem, des?, link?, dateS?, dateF?}]' },
     existingActsIds: { type: 'array',   required: false, description: 'IDs of kept existing acts' },

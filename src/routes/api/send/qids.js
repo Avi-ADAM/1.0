@@ -5636,6 +5636,8 @@ ${STIPEND_DECISION_FIELDS}
                     name
                     createdAt
                     iskvua
+                    howMeny
+                    isshift
                     hearotMeyuchadot
                     descrip
                     noofhours
@@ -5684,6 +5686,7 @@ ${STIPEND_DECISION_FIELDS}
                           date
                           dates
                           isMonth
+                          howMany
                           location {
                             location_mode
                             lat
@@ -8639,7 +8642,7 @@ ${STIPEND_DECISION_FIELDS}
     $publishedAt: DateTime!, $userId: ID!,
     $pendm: ID, $open_mission: ID,
     $isOriginal: Boolean, $isMonth: Boolean,
-    $noofhours: Float, $perhour: Float,
+    $noofhours: Float, $perhour: Float, $howMany: Long,
     $hearotMeyuchadot: String, $descrip: String, $name: String,
     $skills: [ID], $tafkidims: [ID], $work_ways: [ID],
     $sqadualed: DateTime, $dates: DateTime, $acts: [ID],
@@ -8654,6 +8657,7 @@ ${STIPEND_DECISION_FIELDS}
       isMonth: $isMonth
       noofhours: $noofhours
       perhour: $perhour
+      howMany: $howMany
       hearotMeyuchadot: $hearotMeyuchadot
       descrip: $descrip
       name: $name
@@ -9704,6 +9708,7 @@ export const moachQids = {
         attributes {
           project { data { id } }
           name createdAt iskvua hearotMeyuchadot descrip noofhours perhour sqadualed privatlinks publicklinks dates
+          howMeny isshift
           location { location_mode lat lng radius location_hint }
           rishon { data { id } }
           mission { data { id } }
@@ -9715,7 +9720,7 @@ export const moachQids = {
           work_ways { data { id attributes { workWayName localizations { data { attributes { workWayName } } } } } }
           negopendmissions(sort: "ordern:desc") {
             data { id attributes {
-              name hearotMeyuchadot descrip createdAt ordern proposedBy noofhours perhour isOriginal date dates isMonth
+              name hearotMeyuchadot descrip createdAt ordern proposedBy noofhours perhour isOriginal date dates isMonth howMany
               location { location_mode lat lng radius location_hint }
               users_permissions_user { data { id attributes { username } } }
               skills { data { id attributes { skillName localizations { data { attributes { skillName } } } } } }
@@ -11576,6 +11581,8 @@ ${STIPEND_DECISION_FIELDS}
                     name
                     createdAt
                     iskvua
+                    howMeny
+                    isshift
                     hearotMeyuchadot
                     descrip
                     noofhours
@@ -11624,6 +11631,7 @@ ${STIPEND_DECISION_FIELDS}
                           date
                           dates
                           isMonth
+                          howMany
                           location {
                             location_mode
                             lat

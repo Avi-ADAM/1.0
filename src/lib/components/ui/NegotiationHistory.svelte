@@ -18,6 +18,7 @@
    * @property {string} [projectId] - Project ID for user data lookup
    * @property {any} [location] - Original location object
    * @property {boolean} [isCandidateFlow] - When true the nego rounds are candidate proposals; swap old/new direction
+   * @property {number} [howMeny] - Current headcount of a mission proposal (PLAN_SHIFTS §2)
    */
 
   /** @type {Props} */
@@ -31,7 +32,8 @@
     acts,
     projectId,
     location = null,
-    isCandidateFlow = false
+    isCandidateFlow = false,
+    howMeny = null
   } = $props();
 
   function locationSummary(loc) {
@@ -115,6 +117,14 @@
                 label={$t('common.perhourLabel')}
                 oldValue={old_perhour}
                 newValue={new_perhour}
+              />
+            {/if}
+
+            {#if !isCandidateFlow && howMeny != null && attrs.howMany != null && +attrs.howMany !== +howMeny}
+              <ComparisonDisplay
+                label={$t('mission.form.headcountLabel')}
+                oldValue={String(attrs.howMany)}
+                newValue={String(howMeny)}
               />
             {/if}
 

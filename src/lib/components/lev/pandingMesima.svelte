@@ -48,6 +48,8 @@
    * @property {any} privatlinks
    * @property {any} mdate
    * @property {boolean} [isKavua]
+   * @property {number} [howMeny] - how many people the mission needs (PLAN_SHIFTS §2)
+   * @property {boolean} [isshift] - the proposal carries a staffing plan
    * @property {any} mdates
    * @property {any} timegramaDate
    * @property {any} timegramaId
@@ -101,6 +103,8 @@
     privatlinks,
     mdate,
     isKavua = false,
+    howMeny = 1,
+    isshift = false,
     mdates,
     timegramaDate,
     timegramaId,
@@ -633,6 +637,8 @@
               {mdate}
               {mdates}
               {isKavua}
+              {howMeny}
+              {isshift}
               {publicklinks}
               {privatlinks}
               {location}
@@ -949,6 +955,9 @@
                 {workways}
                 {low}
                 {isKavua}
+                {howMeny}
+                {isshift}
+                {pendId}
                 {noofhours}
                 {perhour}
                 {hearotMeyuchadot}
@@ -996,6 +1005,9 @@
     {workways}
     {low}
     {isKavua}
+    {howMeny}
+    {isshift}
+    {pendId}
     {noofhours}
     {perhour}
     {hearotMeyuchadot}

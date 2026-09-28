@@ -29,7 +29,7 @@ import {
   type ShiftPlanView,
   type ShiftView
 } from './read.js';
-import type { ShiftInstance, Stance } from '$lib/shifts/types.js';
+import type { ShiftInstance, ShiftPattern, Stance } from '$lib/shifts/types.js';
 import type { CycleWindow } from '$lib/shifts/settings.js';
 import type { ProjectTiming } from '$lib/shifts/settings.js';
 
@@ -58,6 +58,76 @@ export async function loadProjectPlans(exec: ShiftExec, projectId: string): Prom
     { pid: projectId }
   );
   return nodes(d?.shiftPlans).map(toPlan);
+}
+
+/** A plan a negotiation took off a proposal is archived, not deleted; NULL = legacy = live. */
+const NOT_ARCHIVED = `or: [{ archived: { null: true } }, { archived: { eq: false } }]`;
+
+/**
+ * The plan waiting, paused, on a mission proposal — what the rikma is voting
+ * on together with the mission (§13.6). The newest one wins if a proposal was
+ * ever given two. `includeArchived` also finds one a negotiation turned off,
+ * so turning it back on revives it instead of stacking a second plan.
+ */
+export async function loadPlanForPendm(
+  exec: ShiftExec,
+  pendmId: string,
+  opts: { includeArchived?: boolean } = {}
+): Promise<ShiftPlanView | null> {
+  const d = await run(
+    exec,
+    `query ($id: ID!) { shiftPlans(filters: { pendm: { id: { eq: $id } }${opts.includeArchived ? '' : `, ${NOT_ARCHIVED}`} },
+      pagination: { limit: 1 }, sort: "createdAt:desc") {
+      data { id attributes { ${PLAN_FIELDS} } } } }`,
+    'loadPlanForPendm',
+    { id: pendmId }
+  );
+  const n = nodes(d?.shiftPlans)[0];
+  return n ? toPlan(n) : null;
+}
+
+export interface PendmPlanChange {
+  pendmId: string;
+  projectId: string;
+  /** Staffed or not, as the negotiated round now says. */
+  enabled: boolean;
+  /** Required when `enabled`; the caller has checked it with `isStaffable`. */
+  pattern?: ShiftPattern | null;
+}
+
+/**
+ * A negotiation round changed the staffing hours of a proposal (§13.6): the
+ * hours are a term like hours and rate, so the paused plan follows the round.
+ * Edit it, add one to a proposal that had none, or archive it when the round
+ * says the mission needs no staffing — the pendm's `isshift` is the caller's
+ * to write, in the same update as the rest of the round.
+ */
+export async function setPendmPlan(exec: ShiftExec, change: PendmPlanChange): Promise<{ planId: string | null }> {
+  const current = await loadPlanForPendm(exec, change.pendmId, { includeArchived: true });
+  if (!change.enabled) {
+    if (current && !current.archived) await updatePlan(exec, current.id, { archived: true });
+    return { planId: null };
+  }
+  if (current) {
+    await updatePlan(exec, current.id, { pattern: change.pattern, archived: false, status: 'paused' });
+    return { planId: current.id };
+  }
+  const d = await run(
+    exec,
+    `query ($id: ID!) { pendm(id: $id) { data { id attributes { name mission { data { id } } } } } }`,
+    'setPendmPlan:pendm',
+    { id: change.pendmId }
+  );
+  const a = d?.pendm?.data?.attributes ?? {};
+  const plan = await createPlan(exec, {
+    projectId: change.projectId,
+    missionId: a.mission?.data?.id ? String(a.mission.data.id) : undefined,
+    name: String(a.name ?? ''),
+    pattern: change.pattern,
+    pendmId: change.pendmId,
+    status: 'paused'
+  });
+  return { planId: plan.id };
 }
 
 export interface PlanContext {
@@ -177,7 +247,7 @@ export async function createPlan(
 export async function activatePlanForPendm(exec: ShiftExec, pendmId: string, openMissionId: string): Promise<string[]> {
   const d = await run(
     exec,
-    `query ($id: ID!) { shiftPlans(filters: { pendm: { id: { eq: $id } } }, pagination: { limit: 10 }) { data { id } } }`,
+    `query ($id: ID!) { shiftPlans(filters: { pendm: { id: { eq: $id } }, ${NOT_ARCHIVED} }, pagination: { limit: 10 }) { data { id } } }`,
     'activatePlanForPendm:find',
     { id: pendmId }
   );

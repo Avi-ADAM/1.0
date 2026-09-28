@@ -267,5 +267,20 @@
     "counterSame": "Una nueva propuesta debe cambiar algo — o apruébala tal cual",
     "badAnswer": "Respuesta desconocida",
     "saveFailed": "No se pudo guardar. Inténtalo de nuevo."
+  },
+  "pendm": {
+    "badge": "Misión por turnos",
+    "need": "Se necesitan {{count}} personas",
+    "needOne": "Se necesita una persona",
+    "hoursTitle": "Horario de cobertura que se aprueba junto con la misión",
+    "atOnce": "{{count}} a la vez",
+    "week": "semana {{count}}",
+    "exceptions": "y {{count}} fechas con otro horario",
+    "perPerson": "por persona",
+    "changed": "El horario de cobertura cambió en la negociación",
+    "previousTitle": "El horario de cobertura antes de la última ronda",
+    "previousOff": "Antes de la última ronda no era una misión por turnos.",
+    "negoEditHint": "Aquí puedes cambiar los días y horas de cobertura, añadirlos o quitarlos. Como cualquier otro cambio en la propuesta, abre una nueva ronda de votación.",
+    "negoLoading": "Cargando el horario de cobertura…"
   }
 }

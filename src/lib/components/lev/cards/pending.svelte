@@ -17,6 +17,8 @@
   import VoteStatusDisplay from './VoteStatusDisplay.svelte';
   import LocationView from '$lib/components/location/LocationView.svelte';
   import { getProjectData } from '$lib/stores/projectStore';
+  import EquityPreview from '$lib/components/equity/EquityPreview.svelte';
+  import PendmStaffing from '$lib/components/shifts/PendmStaffing.svelte';
 
   /**
    * @typedef {Object} Props
@@ -48,6 +50,9 @@
    * @property {(payload: { alr: any, y: string }) => void} [onDecline]
    * @property {(payload: { alr: any, y: string }) => void} [onNego]
    * @property {() => void} [onTochat]
+   * @property {any} [pendId] - the proposal, for its staffing plan
+   * @property {number} [howMeny] - how many people the mission needs (PLAN_SHIFTS §2)
+   * @property {boolean} [isshift] - the proposal carries a staffing plan
    */
 
   let {
@@ -89,8 +94,16 @@
     users = [],
     projectId,
     activeOrder = 0,
-    onProj
+    onProj,
+    pendId = null,
+    howMeny = 1,
+    isshift = false
   } = $props();
+  // `noofhours` is per person (PLAN_SHIFTS §2.5): the rikma commits to it once
+  // for every seat, and that is the value the vote approves.
+  let seats = $derived(Math.max(1, Math.floor(Number(howMeny) || 1)));
+  let perPerson = $derived((Number(noofhours) || 0) * (Number(perhour) || 0));
+  let rikmaValue = $derived(perPerson * seats);
   let user_1s = $derived.by(() => {
     return getProjectData(projectId, 'us') || [];
   });
@@ -244,14 +257,43 @@
             onmouseleave={() => hover('0')}
           >
             <span
-              >{(noofhours * perhour).toLocaleString('en-US', {
+              >{perPerson.toLocaleString('en-US', {
                 maximumFractionDigits: 2
               })}
+              {seats > 1 ? $trans('shifts.pendm.perPerson') : ''}
               {isKavua ? $trans('lev.cards.common.perMonth') : ''}</span
             >
           </div>
         </div>
+        {#if seats > 1}
+          <p
+            class="mt-2 text-center text-sm sm:text-base font-bold text-blue-700 dark:text-blue-300"
+          >
+            {$trans('mission.form.rikmaTotal', {
+              count: seats,
+              value: perPerson.toLocaleString('en-US', { maximumFractionDigits: 2 }),
+              total: rikmaValue.toLocaleString('en-US', { maximumFractionDigits: 2 })
+            })}
+          </p>
+        {/if}
       </div>
+
+      <!-- כמה אנשים ובאילו שעות — מאושרים באותה הצבעה (PLAN_SHIFTS §2, §13.6) -->
+      <PendmStaffing {pendId} {projectId} {howMeny} {isshift} />
+
+      <!-- כמה מהרקמה תהיה שווה המשימה. הצעה (pendm) עוד לא נמצאת ב-open_missions,
+           ולכן alreadyCountedIn="none". הערך הוא של כל המושבים יחד. -->
+      {#if projectId && rikmaValue > 0}
+        <EquityPreview
+          {projectId}
+          missionValue={rikmaValue}
+          monthlyValue={isKavua ? rikmaValue : null}
+          alreadyCountedIn="none"
+          titleKey="equity.missionShareAtCreation"
+          compact={isMobileOrTablet()}
+          onHover={hover}
+        />
+      {/if}
 
       <!-- תאריכים מתוכננים -->
       {#if sqadualed || dates}
@@ -388,6 +430,7 @@
         openmissionName={name}
         {noofhours}
         {perhour}
+        howMeny={seats}
         missionDetails={descrip}
         {hearotMeyuchadot}
         {acts}

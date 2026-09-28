@@ -217,3 +217,46 @@ export function suggestHeadcount(pattern: ShiftPattern, hoursPerPerson: number):
   if (!(hoursPerPerson > 0) || hours <= 0) return 1;
   return Math.max(1, Math.ceil(hours / hoursPerPerson - 1e-9));
 }
+
+/**
+ * A pattern in one canonical shape, so two that mean the same hours compare
+ * equal: days sorted by week then weekday, windows by start, empty days and
+ * absent optional fields dropped. The negotiation uses it to tell "the hours
+ * changed" (a new term on the table, a new vote round) from "the form was
+ * opened and closed" (nothing to vote on).
+ */
+export function canonicalPattern(pattern: ShiftPattern | null | undefined): ShiftPattern {
+  const win = (w: ShiftWindow): ShiftWindow => ({
+    start: w.start,
+    end: w.end,
+    need: Number(w.need),
+    ...(w.tafkidimId ? { tafkidimId: String(w.tafkidimId) } : {})
+  });
+  const byStart = (a: ShiftWindow, b: ShiftWindow) =>
+    a.start.localeCompare(b.start) || (a.tafkidimId ?? '').localeCompare(b.tafkidimId ?? '');
+  const days = (pattern?.days ?? [])
+    .filter((d) => (d?.windows ?? []).length > 0)
+    .map((d) => ({ dow: d.dow, ...(d.week != null ? { week: d.week } : {}), windows: d.windows.map(win).sort(byStart) }))
+    .sort((a, b) => (a.week ?? -1) - (b.week ?? -1) || a.dow - b.dow);
+  const exceptions = (pattern?.exceptions ?? [])
+    .map((x) => ({ date: x.date, windows: (x.windows ?? []).map(win).sort(byStart) }))
+    .sort((a, b) => a.date.localeCompare(b.date));
+  const weeks = pattern?.weeks ?? 1;
+  return {
+    version: 1,
+    ...(weeks > 1 ? { weeks } : {}),
+    ...(weeks > 1 && pattern?.anchor ? { anchor: pattern.anchor } : {}),
+    days,
+    ...(exceptions.length ? { exceptions } : {})
+  };
+}
+
+/** Do two patterns ask for the same staffing? Order and empty days do not count. */
+export function samePattern(a: ShiftPattern | null | undefined, b: ShiftPattern | null | undefined): boolean {
+  return JSON.stringify(canonicalPattern(a)) === JSON.stringify(canonicalPattern(b));
+}
+
+/** Can this pattern be saved as a plan — valid, and at least one staffed window? */
+export function isStaffable(pattern: ShiftPattern | null | undefined): boolean {
+  return !!pattern && validatePattern(pattern).length === 0 && (pattern.days ?? []).some((d) => (d.windows ?? []).length > 0);
+}

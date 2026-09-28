@@ -9,6 +9,7 @@ import type { ActionConfig } from '../types.js';
 import { declareShiftAvailabilityConfig } from './declareShiftAvailability.js';
 import {
   claimShiftHoleConfig,
+  getPendmShiftPlanConfig,
   getShiftWorkConfig,
   releaseShiftAssignmentConfig,
   reopenForShiftHoleConfig
@@ -20,6 +21,7 @@ import { setShiftRulesConfig } from './shiftRulesActions.js';
 export const shiftActionConfigs: ActionConfig[] = [
   declareShiftAvailabilityConfig,
   getShiftWorkConfig,
+  getPendmShiftPlanConfig,
   releaseShiftAssignmentConfig,
   claimShiftHoleConfig,
   reopenForShiftHoleConfig,

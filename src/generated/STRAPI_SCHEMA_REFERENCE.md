@@ -1,6 +1,6 @@
 # Strapi GraphQL Schema Reference
 > Auto-generated from `src/generated/graphql.ts`
-> Last updated: 2026-09-24
+> Last updated: 2026-09-28
 > Source: `codegen.ts` → `http://localhost:1337/graphql`
 
 This file provides a compact reference of all types available from the Strapi backend.
@@ -23,7 +23,7 @@ import type { StrapiEntity, StrapiCollection, StrapiMedia } from '$lib/types/str
 
 ---
 
-## 🏗️ Content Type Entities (135)
+## 🏗️ Content Type Entities (133)
 
 These are the main content types in the Strapi backend.
 
@@ -256,26 +256,6 @@ These are the main content types in the Strapi backend.
 | `subjectId` | `Maybe<Scalars['String']['output']>` |
 | `subjectType` | `Maybe<Scalars['String']['output']>` |
 | `ts` | `Maybe<Scalars['Long']['output']>` |
-| `updatedAt` | `Maybe<Scalars['DateTime']['output']>` |
-
-### ContentReleasesRelease
-| Field | Type |
-|-------|------|
-| `actions` | `Maybe<ContentReleasesReleaseActionRelationResponseCollection>` |
-| `createdAt` | `Maybe<Scalars['DateTime']['output']>` |
-| `name` | `Scalars['String']['output']` |
-| `releasedAt` | `Maybe<Scalars['DateTime']['output']>` |
-| `updatedAt` | `Maybe<Scalars['DateTime']['output']>` |
-
-### ContentReleasesReleaseAction
-| Field | Type |
-|-------|------|
-| `contentType` | `Scalars['String']['output']` |
-| `createdAt` | `Maybe<Scalars['DateTime']['output']>` |
-| `entry` | `Maybe<GenericMorph>` |
-| `locale` | `Maybe<Scalars['String']['output']>` |
-| `release` | `Maybe<ContentReleasesReleaseEntityResponse>` |
-| `type` | `Enum_Contentreleasesreleaseaction_Type` |
 | `updatedAt` | `Maybe<Scalars['DateTime']['output']>` |
 
 ### ConventionText
@@ -1164,8 +1144,6 @@ These are the main content types in the Strapi backend.
 | `createChezinLocalization` | `Maybe<ChezinEntityResponse>` |
 | `createClause` | `Maybe<ClauseEntityResponse>` |
 | `createConsentEvent` | `Maybe<ConsentEventEntityResponse>` |
-| `createContentReleasesRelease` | `Maybe<ContentReleasesReleaseEntityResponse>` |
-| `createContentReleasesReleaseAction` | `Maybe<ContentReleasesReleaseActionEntityResponse>` |
 | `createConventionText` | `Maybe<ConventionTextEntityResponse>` |
 | `createConventionTextLocalization` | `Maybe<ConventionTextEntityResponse>` |
 | `createCuntry` | `Maybe<CuntryEntityResponse>` |
@@ -1313,8 +1291,6 @@ These are the main content types in the Strapi backend.
 | `deleteChezin` | `Maybe<ChezinEntityResponse>` |
 | `deleteClause` | `Maybe<ClauseEntityResponse>` |
 | `deleteConsentEvent` | `Maybe<ConsentEventEntityResponse>` |
-| `deleteContentReleasesRelease` | `Maybe<ContentReleasesReleaseEntityResponse>` |
-| `deleteContentReleasesReleaseAction` | `Maybe<ContentReleasesReleaseActionEntityResponse>` |
 | `deleteConventionText` | `Maybe<ConventionTextEntityResponse>` |
 | `deleteCuntry` | `Maybe<CuntryEntityResponse>` |
 | `deleteDea` | `Maybe<DeaEntityResponse>` |
@@ -1441,8 +1417,6 @@ These are the main content types in the Strapi backend.
 | `updateChezin` | `Maybe<ChezinEntityResponse>` |
 | `updateClause` | `Maybe<ClauseEntityResponse>` |
 | `updateConsentEvent` | `Maybe<ConsentEventEntityResponse>` |
-| `updateContentReleasesRelease` | `Maybe<ContentReleasesReleaseEntityResponse>` |
-| `updateContentReleasesReleaseAction` | `Maybe<ContentReleasesReleaseActionEntityResponse>` |
 | `updateConventionText` | `Maybe<ConventionTextEntityResponse>` |
 | `updateCuntry` | `Maybe<CuntryEntityResponse>` |
 | `updateDea` | `Maybe<DeaEntityResponse>` |
@@ -1634,6 +1608,7 @@ These are the main content types in the Strapi backend.
 | `perhour` | `Maybe<Scalars['Float']['output']>` |
 | `proposedBy` | `Maybe<Enum_Negopendmission_Proposedby>` |
 | `publishedAt` | `Maybe<Scalars['DateTime']['output']>` |
+| `shiftPattern` | `Maybe<Scalars['JSON']['output']>` |
 | `shiftsMax` | `Maybe<Scalars['Int']['output']>` |
 | `shiftsMin` | `Maybe<Scalars['Int']['output']>` |
 | `skills` | `Maybe<SkillRelationResponseCollection>` |
@@ -2231,10 +2206,6 @@ These are the main content types in the Strapi backend.
 | `clauses` | `Maybe<ClauseEntityResponseCollection>` |
 | `consentEvent` | `Maybe<ConsentEventEntityResponse>` |
 | `consentEvents` | `Maybe<ConsentEventEntityResponseCollection>` |
-| `contentReleasesRelease` | `Maybe<ContentReleasesReleaseEntityResponse>` |
-| `contentReleasesReleaseAction` | `Maybe<ContentReleasesReleaseActionEntityResponse>` |
-| `contentReleasesReleaseActions` | `Maybe<ContentReleasesReleaseActionEntityResponseCollection>` |
-| `contentReleasesReleases` | `Maybe<ContentReleasesReleaseEntityResponseCollection>` |
 | `conventionText` | `Maybe<ConventionTextEntityResponse>` |
 | `conventionTexts` | `Maybe<ConventionTextEntityResponseCollection>` |
 | `cuntries` | `Maybe<CuntryEntityResponseCollection>` |
@@ -4774,7 +4745,7 @@ These are Strapi components (reusable field groups).
 
 ---
 
-## 📝 Input Types (133)
+## 📝 Input Types (131)
 
 Used for creating/updating content.
 
@@ -5004,21 +4975,6 @@ Used for creating/updating content.
 | `subjectId` | `InputMaybe<Scalars['String']['input']>` |
 | `subjectType` | `InputMaybe<Scalars['String']['input']>` |
 | `ts` | `InputMaybe<Scalars['Long']['input']>` |
-
-### ContentReleasesReleaseActionInput
-| Field | Type |
-|-------|------|
-| `contentType` | `InputMaybe<Scalars['String']['input']>` |
-| `locale` | `InputMaybe<Scalars['String']['input']>` |
-| `release` | `InputMaybe<Scalars['ID']['input']>` |
-| `type` | `InputMaybe<Enum_Contentreleasesreleaseaction_Type>` |
-
-### ContentReleasesReleaseInput
-| Field | Type |
-|-------|------|
-| `actions` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
-| `name` | `InputMaybe<Scalars['String']['input']>` |
-| `releasedAt` | `InputMaybe<Scalars['DateTime']['input']>` |
 
 ### ConventionTextInput
 | Field | Type |
@@ -6046,6 +6002,7 @@ Used for creating/updating content.
 | `perhour` | `InputMaybe<Scalars['Float']['input']>` |
 | `proposedBy` | `InputMaybe<Enum_Negopendmission_Proposedby>` |
 | `publishedAt` | `InputMaybe<Scalars['DateTime']['input']>` |
+| `shiftPattern` | `InputMaybe<Scalars['JSON']['input']>` |
 | `shiftsMax` | `InputMaybe<Scalars['Int']['input']>` |
 | `shiftsMin` | `InputMaybe<Scalars['Int']['input']>` |
 | `skills` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
@@ -7647,12 +7604,12 @@ Used for creating/updating content.
 
 ---
 
-## 🔍 Filter Input Types (122)
+## 🔍 Filter Input Types (120)
 
 Used for querying/filtering content. Each content type has a corresponding filter input.
 
 <details>
-<summary>Click to expand all 122 filter types</summary>
+<summary>Click to expand all 120 filter types</summary>
 
 #### ActFiltersInput
 Fields: `and`, `createdAt`, `dateF`, `dateS`, `des`, `externalId`, `forums`, `hashivut`, `id`, `isAssigned`, `link`, `locale`, `localizations`, `mesimabetahaliches`, `my`, `myIshur`, `naasa`, `negopendmissions`, `not`, `open_mission`, `or`, `partofs`, `pendm`, `project`, `publishedAt`, `shem`, `source`, `status`, `tafkidims`, `taskdis`, `timegrama`, `timers`, `updatedAt`, `userAndIshur`, `vali`, `valiIshur`
@@ -7692,12 +7649,6 @@ Fields: `and`, `authorExternalId`, `authorType`, `body`, `confirmedByAuthor`, `c
 
 #### ConsentEventFiltersInput
 Fields: `action`, `actor`, `and`, `createdAt`, `eventId`, `id`, `not`, `or`, `payload`, `stateRoot`, `subjectId`, `subjectType`, `ts`, `updatedAt`
-
-#### ContentReleasesReleaseActionFiltersInput
-Fields: `and`, `contentType`, `createdAt`, `id`, `locale`, `not`, `or`, `release`, `type`, `updatedAt`
-
-#### ContentReleasesReleaseFiltersInput
-Fields: `actions`, `and`, `createdAt`, `id`, `name`, `not`, `or`, `releasedAt`, `updatedAt`
 
 #### ConventionTextFiltersInput
 Fields: `and`, `conventionText`, `createdAt`, `id`, `locale`, `localizations`, `not`, `or`, `publishedAt`, `type`, `updatedAt`
@@ -7823,7 +7774,7 @@ Fields: `acceptedAt`, `and`, `createdAt`, `decision`, `des`, `fixprice`, `id`, `
 Fields: `and`, `askm`, `createdAt`, `cycleSize`, `descrip`, `easy`, `hm`, `id`, `isOriginal`, `kindOf`, `linkto`, `location`, `name`, `not`, `open_mashaabim`, `or`, `ordern`, `pmash`, `price`, `proposedBy`, `publishedAt`, `recurring`, `spnot`, `sqadualed`, `sqadualedf`, `status`, `updatedAt`, `users`, `users_permissions_user`
 
 #### NegopendmissionFiltersInput
-Fields: `acts`, `and`, `ask`, `createdAt`, `date`, `dates`, `descrip`, `filds`, `hearotMeyuchadot`, `howMany`, `id`, `isMonth`, `isOriginal`, `isRishon`, `location`, `name`, `noofhours`, `not`, `open_mission`, `or`, `ordern`, `pendm`, `perhour`, `proposedBy`, `publishedAt`, `shiftsMax`, `shiftsMin`, `skills`, `status`, `tafkidims`, `total`, `updatedAt`, `users_permissions_user`, `vots`, `work_ways`
+Fields: `acts`, `and`, `ask`, `createdAt`, `date`, `dates`, `descrip`, `filds`, `hearotMeyuchadot`, `howMany`, `id`, `isMonth`, `isOriginal`, `isRishon`, `location`, `name`, `noofhours`, `not`, `open_mission`, `or`, `ordern`, `pendm`, `perhour`, `proposedBy`, `publishedAt`, `shiftPattern`, `shiftsMax`, `shiftsMin`, `skills`, `status`, `tafkidims`, `total`, `updatedAt`, `users_permissions_user`, `vots`, `work_ways`
 
 #### NegotiationFiltersInput
 Fields: `and`, `arguments`, `clauses`, `createdAt`, `createdByEmail`, `creator`, `cuntries`, `currentRound`, `description`, `id`, `isLocal`, `issues`, `maxRounds`, `not`, `or`, `ownerExternalId`, `participants`, `positions`, `publishedAt`, `resolution`, `scaleMax`, `scaleMin`, `shareToken`, `sourceId`, `sourceMeta`, `sourceType`, `status`, `topic`, `updatedAt`, `visibility`
@@ -8024,12 +7975,12 @@ Fields: `allSubmited`, `and`, `createdAt`, `done`, `id`, `mesimabetahalich`, `no
 
 ---
 
-## 📦 Entity Response Types (471)
+## 📦 Entity Response Types (464)
 
 Wrapper types for GraphQL responses.
 
 <details>
-<summary>Click to expand all 471 response types</summary>
+<summary>Click to expand all 464 response types</summary>
 
 - **ActEntity**: `attributes: Maybe<Act>`, `id: Maybe<Scalars['ID']['output']>`
 - **ActEntityResponse**: `data: Maybe<ActEntity>`
@@ -8081,13 +8032,6 @@ Wrapper types for GraphQL responses.
 - **ConsentEventEntity**: `attributes: Maybe<ConsentEvent>`, `id: Maybe<Scalars['ID']['output']>`
 - **ConsentEventEntityResponse**: `data: Maybe<ConsentEventEntity>`
 - **ConsentEventEntityResponseCollection**: `data: Array<ConsentEventEntity>`, `meta: ResponseCollectionMeta`
-- **ContentReleasesReleaseActionEntity**: `attributes: Maybe<ContentReleasesReleaseAction>`, `id: Maybe<Scalars['ID']['output']>`
-- **ContentReleasesReleaseActionEntityResponse**: `data: Maybe<ContentReleasesReleaseActionEntity>`
-- **ContentReleasesReleaseActionEntityResponseCollection**: `data: Array<ContentReleasesReleaseActionEntity>`, `meta: ResponseCollectionMeta`
-- **ContentReleasesReleaseActionRelationResponseCollection**: `data: Array<ContentReleasesReleaseActionEntity>`
-- **ContentReleasesReleaseEntity**: `attributes: Maybe<ContentReleasesRelease>`, `id: Maybe<Scalars['ID']['output']>`
-- **ContentReleasesReleaseEntityResponse**: `data: Maybe<ContentReleasesReleaseEntity>`
-- **ContentReleasesReleaseEntityResponseCollection**: `data: Array<ContentReleasesReleaseEntity>`, `meta: ResponseCollectionMeta`
 - **ConventionTextEntity**: `attributes: Maybe<ConventionText>`, `id: Maybe<Scalars['ID']['output']>`
 - **ConventionTextEntityResponse**: `data: Maybe<ConventionTextEntity>`
 - **ConventionTextEntityResponseCollection**: `data: Array<ConventionTextEntity>`, `meta: ResponseCollectionMeta`
@@ -8506,10 +8450,10 @@ Wrapper types for GraphQL responses.
 
 ---
 
-## 🔢 Enum Types (161)
+## 🔢 Enum Types (160)
 
 <details>
-<summary>Click to expand all 161 enum types</summary>
+<summary>Click to expand all 160 enum types</summary>
 
 - **Enum_Act_Hashivut**: 
 - **Enum_Act_Source**: 
@@ -8534,7 +8478,6 @@ Wrapper types for GraphQL responses.
 - **Enum_Componentnewnegom_Kindof**: 
 - **Enum_Componentnewwillingnessentries_Item_Kind**: 
 - **Enum_Componentprojectsnegom_Kindof**: 
-- **Enum_Contentreleasesreleaseaction_Type**: 
 - **Enum_Decision_Archscope**: 
 - **Enum_Decision_Archsource**: 
 - **Enum_Decision_Kind**: 
@@ -8687,7 +8630,7 @@ Wrapper types for GraphQL responses.
 ```
 src/
 ├── generated/
-│   ├── graphql.ts              # Auto-generated types (codegen) - 22634 lines
+│   ├── graphql.ts              # Auto-generated types (codegen) - 22462 lines
 │   ├── index.ts                # Re-export hub
 │   └── STRAPI_SCHEMA_REFERENCE.md  # This file (AI agent reference)
 ├── lib/

@@ -1262,6 +1262,27 @@ GraphQL החי.
 `check`, `check:i18n` (השער הורחב ל‑`/availableMission`, `/concierge`,
 `/onboard` — הטופס מיובא שם), `check:script`, `validate:qids` נקיים.
 
+**המשך (2026-09-28) — ההצבעה על ההצעה רואה את התכנית, והמשא ומתן פתוח לה.**
+כרטיס ההצבעה בלב ([`pending.svelte`](../../src/lib/components/lev/cards/pending.svelte))
+ועמוד ההצבעה במואץ' לא הציגו לא את `howMeny` ולא את `isshift` — השאילתות אפילו
+לא ביקשו אותם. עכשיו [`PendmStaffing`](../../src/lib/components/shifts/PendmStaffing.svelte)
+מציג "משימת משמרות", "דרושים N אנשים" ואת החלונות (נקראים בפעולה `getPendmShiftPlan`,
+חברי הרקמה בלבד), ו‑`EquityPreview` בכרטיס עצמו מחושב לכל המושבים (§2.5).
+ב‑[`negoM`](../../src/lib/components/prPr/negoM.svelte) שני התנאים נפתחו לקונטרה:
+- **`howMeny`** — שדה מספר רגיל; הסבב שומר את הקודם ב‑`negopendmission.howMany`.
+- **שעות האיוש** — `ShiftPlanForm` עצמו: לשנות, להוסיף למשימה שלא הייתה משמרות,
+  או לבטל. [`submitNegoMission`](../../src/lib/server/actions/configs/submitNegoMission.ts)
+  קורא את השעות הנוכחיות **מהתכנית**, לא מהלקוח; שעות זהות (`samePattern`, סדר וימים
+  ריקים לא נחשבים) לא פותחות סבב; שעות שאי אפשר לאייש נדחות לפני כל כתיבה.
+  [`setPendmPlan`](../../src/lib/server/shifts/store.ts) עורך את התכנית המושהית,
+  יוצר אחת אם לא הייתה, או **מארכב** אותה (ו‑`pendm.isshift` מתעדכן באותו עדכון);
+  `activatePlanForPendm` ו‑`loadPlanForPendm` מדלגים על תכנית מאורכבת, כך שתכנית
+  שסבב ביטל לא עולה לאוויר כשההצעה מאושרת.
+- הגרסה הקודמת נשמרת בשדה JSON חדש **`negopendmission.shiftPattern`** (1.0b)
+  כ‑`{ enabled, pattern }`, ומוצגת בכרטיס תחת "שעות האיוש שונו במשא ומתן".
+  הכתיבה והקריאה שלו סובלניות: Strapi שעוד לא קיבל את השדה פשוט לא יראה היסטוריה —
+  הסבב עצמו לא נכשל. אחרי הפריסה: `npm run types:update`.
+
 ### 13.7 סדר הפריסה — ה‑commit שדורש את 1.0b
 
 **עד 166.5 כולל, כל commit של המשמרות בטוח לפריסה בלי 1.0b:** כל קריאה או כתיבה

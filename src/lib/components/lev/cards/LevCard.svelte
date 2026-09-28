@@ -365,6 +365,8 @@
       location={buble.location}
       pendId={buble.pendId}
       isKavua={buble.isKavua}
+      howMeny={buble.howMeny}
+      isshift={buble.isshift}
       diun={buble.diun}
       acts={buble.acts}
       users={buble.users}

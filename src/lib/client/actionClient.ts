@@ -432,6 +432,7 @@ export type ActionKey =
   | 'setShiftPlanStatus'
   | 'releaseShiftAssignment'
   | 'getShiftWork'
+  | 'getPendmShiftPlan'
   | 'claimShiftHole'
   | 'reopenForShiftHole'
   | 'proposeShiftSwap'

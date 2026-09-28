@@ -22,6 +22,9 @@
   import { toIsoDateString } from '$lib/func/montsi.svelte';
   import { fetchBridgeResolution, openNegoBridge, readNegoBridgeReturn } from '$lib/func/negoBridge.js';
   import EquityPreview from '$lib/components/equity/EquityPreview.svelte';
+  import PendmStaffing, { loadPendmPlan, forgetPendmPlan } from '$lib/components/shifts/PendmStaffing.svelte';
+  import ShiftPlanForm, { emptyShiftPlan } from '$lib/components/shifts/ShiftPlanForm.svelte';
+  import { isStaffable, samePattern } from '$lib/shifts/pattern';
   /**
    * @typedef {Object} Props
    * @property {any} [negopendmissions]
@@ -54,6 +57,8 @@
    * @property {any} pendId
    * @property {any} [users]
    * @property {any} isKavua
+   * @property {number} [howMeny] - how many people the mission needs (PLAN_SHIFTS §2)
+   * @property {boolean} [isshift] - the proposal carries a staffing plan
    * @property {number} [oldide] - last tg id, if non 0
    * @property {any} timegramaId
    * @property {number} [ordern]
@@ -100,6 +105,8 @@
     pendId,
     users = [],
     isKavua,
+    howMeny = 1,
+    isshift = false,
     oldide = 0,
     timegramaId,
     ordern = 0,
@@ -170,6 +177,32 @@
   let privatlinks2 = $state(privatlinks);
   let noofhours2 = $state(noofhours);
   let perhour2 = $state(perhour);
+  // Headcount is a term of a mission *proposal* (pendm) like hours and rate.
+  // A candidate's round on an open mission is always one person, so there the
+  // field is neither shown nor sent.
+  const pendmFlow = !onSubmit && !isAsk;
+  const seats = Math.max(1, Math.floor(+howMeny || 1));
+  let seats2 = $state(Math.max(1, Math.floor(+howMeny || 1)));
+  const seatsNow = $derived(pendmFlow ? Math.max(1, Math.floor(+seats2 || 1)) : 1);
+
+  // The staffing hours are a term of the proposal too (PLAN_SHIFTS §13.6):
+  // the round may edit them, add them to a mission that had none, or drop
+  // them. Offered only while the shift system is on — with SHIFTS=off the
+  // server ignores a plan, and a form that silently does nothing is worse.
+  let shiftsOn = $state(false);
+  /** The hours as they stand — null until read (or when there are none). */
+  let shiftBefore = $state(/** @type {import('$lib/shifts/types').ShiftPattern | null} */ (null));
+  let shiftReady = $state(false);
+  // The hours could not be read: never offer a form that would send "none".
+  let shiftFailed = $state(false);
+  let shiftPlan2 = $state(emptyShiftPlan());
+  const shiftChanged = $derived(
+    pendmFlow &&
+      shiftsOn &&
+      shiftReady &&
+      (shiftPlan2.enabled !== !!isshift ||
+        (shiftPlan2.enabled && !samePattern(shiftBefore, shiftPlan2.pattern)))
+  );
   let myM;
   let done;
 
@@ -284,9 +317,17 @@
         { key: 'noofhours', label: 'כמות שעות', kind: 'number', original: noofhours || 0, proposed: noofhours2 || 0 },
         { key: 'perhour', label: 'שווי לשעה', kind: 'number', original: perhour || 0, proposed: perhour2 || 0 },
         { key: 'startDate', label: 'תאריך התחלה', kind: 'date', original: toIsoDateString(mdate) ?? null, proposed: toIsoDateString(mdate2) ?? null },
-        { key: 'finishDate', label: 'תאריך סיום', kind: 'date', original: toIsoDateString(mdates) ?? null, proposed: toIsoDateString(mdates2) ?? null }
+        { key: 'finishDate', label: 'תאריך סיום', kind: 'date', original: toIsoDateString(mdates) ?? null, proposed: toIsoDateString(mdates2) ?? null },
+        ...headcountBridgeField()
       ]
     });
+  }
+
+  /** @returns {import('$lib/func/negoBridge.js').BridgeField[]} */
+  function headcountBridgeField() {
+    return pendmFlow
+      ? [{ key: 'howMeny', label: 'כמה אנשים', kind: 'number', original: seats, proposed: seatsNow }]
+      : [];
   }
 
   // Prefill from a returned bridge agreement. Dates come back as ISO strings;
@@ -297,6 +338,7 @@
     if (v.descrip != null) descrip2 = String(v.descrip);
     if (v.noofhours != null) noofhours2 = +v.noofhours;
     if (v.perhour != null) perhour2 = +v.perhour;
+    if (v.howMeny != null && pendmFlow) seats2 = Math.max(1, Math.floor(+v.howMeny || 1));
     if (v.startDate != null) {
       const m = moment(v.startDate);
       if (m.isValid()) mdate2 = m.format('HH:mm DD/MM/YYYY');
@@ -348,6 +390,11 @@
   }
 
   async function increment() {
+    // Hours that cannot be staffed are caught here, before the loader hides the form.
+    if (shiftChanged && shiftPlan2.enabled && !isStaffable(shiftPlan2.pattern)) {
+      toast.warning($t('shifts.form.fixBeforeSend'));
+      return;
+    }
     onLoad?.();
 
     // Detect what changed and build newValues / originalValues
@@ -395,6 +442,19 @@
     if (perhour !== perhour2) {
       newValues.perhour = perhour2;
       originalValues.perhour = perhour;
+      hasChanges = true;
+    }
+    if (pendmFlow && seatsNow !== seats) {
+      newValues.howMeny = seatsNow;
+      originalValues.howMany = seats;
+      hasChanges = true;
+    }
+    if (shiftChanged) {
+      // What they were is read by the server from the plan itself.
+      newValues.shiftPlan = {
+        enabled: shiftPlan2.enabled,
+        pattern: shiftPlan2.enabled ? $state.snapshot(shiftPlan2.pattern) : null
+      };
       hasChanges = true;
     }
 
@@ -501,6 +561,7 @@
         // that would reset their scroll/swiper position.
         if ((isAsk ?? 0) === 0 && result.data?.id) {
           updatePendsStore(result.data);
+          if (result.data?.shiftsChanged) forgetPendmPlan(pendId);
         }
         toast.success($t('toasts.suc'));
         close();
@@ -514,6 +575,30 @@
     }
   }
   onMount(() => {
+    if (pendmFlow) {
+      fetch('/api/shifts/status')
+        .then((r) => (r.ok ? r.json() : null))
+        .then((d) => (shiftsOn = !!d && d.mode !== 'off'))
+        .catch(() => (shiftsOn = false));
+      const seed = (/** @type {any} */ pattern) => {
+        if (isshift && !pattern) {
+          shiftFailed = true;
+          return;
+        }
+        shiftBefore = pattern ?? null;
+        shiftPlan2 = {
+          ...emptyShiftPlan(),
+          enabled: !!isshift && !!pattern,
+          pattern: pattern ? structuredClone(pattern) : { version: 1, days: [] }
+        };
+        shiftReady = true;
+      };
+      if (isshift && pendId && projectId) {
+        loadPendmPlan(String(pendId), String(projectId)).then((p) => seed(p.pattern));
+      } else {
+        seed(null);
+      }
+    }
     applyBridgeReturn();
     isKavua2 = isKavua;
     // Seed the selectors from the mission's current relations. The shared vocab
@@ -630,15 +715,49 @@
     {#if onSubmit && candidateRound?.perhour != null && candidateRound.perhour !== perhour}
       <p class="text-xs text-barbi/70 px-2 -mt-1 mb-1 inline-flex items-center gap-1"><EntityIcon kind="idea" size={12} /> {$t('nego.cand.candidateProposed')} <strong>{candidateRound.perhour}</strong></p>
     {/if}
+    {#if pendmFlow}
+      <!-- כמה אנשים דרושים (PLAN_SHIFTS §2) — תנאי של ההצעה, כמו שעות ותעריף -->
+      <Number
+        old={negopendmissions.map((c) => c?.attributes?.howMany)}
+        number={seats}
+        bind:numberb={seats2}
+        lebel={$t('mission.form.headcountLabel')}
+      />
+      {#if shiftsOn}
+        <!-- שעות האיוש — תנאי של ההצעה, נפתחות למשא ומתן (PLAN_SHIFTS §13.6) -->
+        <div class="mx-2 my-2 space-y-2">
+          {#if isshift}
+            <PendmStaffing {pendId} {projectId} howMeny={seatsNow} {isshift} compact showHours={shiftFailed} />
+          {/if}
+          {#if shiftReady}
+            <p class="text-xs text-barbi/80 px-1">{$t('shifts.pendm.negoEditHint')}</p>
+            <ShiftPlanForm
+              bind:value={shiftPlan2}
+              onHeadcount={(n) => {
+                seats2 = n;
+              }}
+            />
+          {:else if !shiftFailed}
+            <p class="text-sm opacity-80">{$t('shifts.pendm.negoLoading')}</p>
+          {/if}
+        </div>
+      {:else if isshift}
+        <div class="mx-2 my-2">
+          <PendmStaffing {pendId} {projectId} howMeny={seatsNow} {isshift} compact />
+        </div>
+      {/if}
+    {/if}
     <!-- שווי צפוי ברקמה — תצוגה חיה של החלק שהמשימה תהווה לפי השעות/השווי
-         שמוקלדים כרגע. המשימה כבר קיימת ב-open_missions ⇒ alreadyCountedIn="pipeline". -->
+         שמוקלדים כרגע, לכל המושבים יחד (השעות הן לאדם, PLAN_SHIFTS §2.5).
+         הצעת משימה (pendm) עוד לא נמצאת ב-open_missions ⇒ "none"; סבב של
+         מועמד על משימה פתוחה כבר נספר שם ⇒ "pipeline". -->
     {#if projectId}
       <div class="mx-2 my-2">
         <EquityPreview
           {projectId}
-          missionValue={(+noofhours2 || 0) * (+perhour2 || 0)}
-          monthlyValue={isKavua2 ? (+noofhours2 || 0) * (+perhour2 || 0) : null}
-          alreadyCountedIn="pipeline"
+          missionValue={(+noofhours2 || 0) * (+perhour2 || 0) * seatsNow}
+          monthlyValue={isKavua2 ? (+noofhours2 || 0) * (+perhour2 || 0) * seatsNow : null}
+          alreadyCountedIn={pendmFlow ? 'none' : 'pipeline'}
           titleKey="equity.missionShareAtCreation"
         />
       </div>
@@ -700,6 +819,17 @@
       <div class="w-4/5 mx-auto">
         <Barb {datai} />
       </div>
+    {/if}
+    {#if seatsNow > 1}
+      <p class="text-sm font-semibold">
+        {$t('mission.form.rikmaTotal', {
+          count: seatsNow,
+          value: ((+noofhours2 || 0) * (+perhour2 || 0)).toLocaleString('en-US', { maximumFractionDigits: 2 }),
+          total: ((+noofhours2 || 0) * (+perhour2 || 0) * seatsNow).toLocaleString('en-US', {
+            maximumFractionDigits: 2
+          })
+        })}
+      </p>
     {/if}
   </div>
   <!---

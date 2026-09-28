@@ -70,6 +70,9 @@ export function extractPends(userData: any): PendMissionData[] {
         // Additional fields
         createdAt: pend.attributes.createdAt,
         iskvua: pend.attributes.iskvua || false,
+        // Headcount + staffing (PLAN_SHIFTS §2, §13.6) — terms the rikma votes on.
+        howMeny: pend.attributes.howMeny ?? null,
+        isshift: pend.attributes.isshift === true,
         hearotMeyuchadot: pend.attributes.hearotMeyuchadot || '',
         descrip: pend.attributes.descrip || '',
         noofhours: pend.attributes.noofhours || 0,
