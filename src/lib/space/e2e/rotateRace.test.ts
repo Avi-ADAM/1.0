@@ -20,6 +20,7 @@ import {
   epochKeysForOpen,
   detectRotateRaces,
   unwrapEpochKey,
+  compareIds,
   type EpochRecipient
 } from './epoch';
 import { sealEvent, openSealed, type SealedEnvelope } from './seal';
@@ -215,5 +216,33 @@ describe('T11 — concurrent rotate race, both arrival orders', () => {
     const skip = await signEv(dana, 'epoch.rotate', { type: 'space', id: SPACE },
       { epoch: 5, reason: 'manual', wraps: {} }, 300);
     expect(validateEpochRotate(SPACE, [sideD.rotate, sideA.rotate], skip).ok).toBe(false);
+  });
+});
+
+describe('T11 — one id order everywhere', () => {
+  // b64url ids where code-unit order and locale order disagree: 'B' (0x42)
+  // sorts before 'a' (0x61) by code unit, after it by most locales. The race
+  // test above only hit this when random ids happened to straddle case or
+  // '-'/'_' — the sealer (epochCandidates) and the fold (epochStateFromEvents)
+  // then named different winners.
+  const fake = (id: string): ConsentEvent => ({
+    v: 1, id, actor: 'x', device: 'd', action: 'epoch.rotate',
+    subject: { type: 'space', id: SPACE },
+    predicate: { epoch: 0, reason: 'manual', wraps: {} },
+    parents: [], ts: 1, nonce: 'n', sig: 's'
+  } as ConsentEvent);
+
+  it.each([
+    ['aZZ', 'BAA'],
+    ['_x', '-x'],
+    ['a-b', 'a_b'],
+    ['Zeta', 'alpha']
+  ])('%s vs %s: the fold, the candidates and the race report agree, in both orders', (x, y) => {
+    const expected = compareIds(x, y) < 0 ? x : y;
+    for (const events of [[fake(x), fake(y)], [fake(y), fake(x)]]) {
+      expect(epochStateFromEvents(events).byEpoch.get(0)!.id).toBe(expected);
+      expect(epochCandidates(events).get(0)![0].id).toBe(expected);
+      expect(detectRotateRaces(events)[0].winnerId).toBe(expected);
+    }
   });
 });

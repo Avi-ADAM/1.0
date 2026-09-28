@@ -19,6 +19,8 @@ export const GET: RequestHandler = async ({ params, cookies }) => {
       revokedReason: k.revokedReason ?? null,
       // T7: cert PRESENCE is public; the cert payload itself stays stripped.
       certified: Boolean(k.cert),
+      // T9b: registered through guardian recovery (who vouched stays server-side).
+      recovered: Boolean(k.recovery),
       addedAt: k.addedAt
     }))
   });

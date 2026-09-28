@@ -25,6 +25,9 @@ export const load: LayoutServerLoad = async ({ params, fetch }) => {
     projectId,
     projectBase: projectData.attributes,
     uid: String(me.id),
-    memberCount: members.length
+    memberCount: members.length,
+    // Members only ever see this (the 403 above): the vault's key guard needs
+    // the member set before it accepts any key event (PLAN_RIKMA_SHARED_INFO §3.2).
+    memberIds: members.map((u) => String(u.id))
   };
 };

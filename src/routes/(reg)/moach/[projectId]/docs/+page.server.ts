@@ -3,6 +3,7 @@ import { mediaUrl } from '$lib/utils/processLifecycle.js';
 import { normalizeSpaceDocs } from '$lib/spaceDocs/spaceDocs.js';
 import { maxUploadBytes, storageKind } from '$lib/server/storage/index.js';
 import { PROXY_MAX_BYTES } from '$lib/uploads/policy.js';
+import { env } from '$env/dynamic/private';
 import type { PageServerLoad } from './$types';
 
 /**
@@ -24,6 +25,10 @@ import type { PageServerLoad } from './$types';
 export const load: PageServerLoad = async ({ params, fetch }) => {
   const { projectId } = params;
 
+  // Stage 3 — the E2E vault (§3.2). Off until the product decision (stage 3
+  // step 4); a browser can still opt in with localStorage VAULT_ENABLED=1.
+  const vaultEnabled = env.VAULT_ENABLED === '1';
+
   // Which upload path this instance offers (stage 2). `direct` = private
   // storage (a folder on our own host, or an S3 bucket — the page cannot tell
   // and does not need to); `proxy` = the stage-1 Strapi upload, used wherever
@@ -41,7 +46,7 @@ export const load: PageServerLoad = async ({ params, fetch }) => {
     // not exist on the deployed schema hides itself (the `Sp.hm` incident).
     if (res?.errors?.length) {
       console.error('[moach/docs] shared library query rejected', res.errors);
-      return { projectId, upload, drivelink: '', docs: [], loadFailed: true };
+      return { projectId, upload, vaultEnabled, drivelink: '', docs: [], loadFailed: true };
     }
 
     const attributes = res?.data?.project?.data?.attributes ?? {};
@@ -49,6 +54,7 @@ export const load: PageServerLoad = async ({ params, fetch }) => {
     return {
       projectId,
       upload,
+      vaultEnabled,
       drivelink: String(attributes.drivelink ?? '').trim(),
       docs: normalizeSpaceDocs(attributes.space_docs?.data, mediaUrl),
       loadFailed: false
@@ -56,6 +62,6 @@ export const load: PageServerLoad = async ({ params, fetch }) => {
   } catch (e) {
     // An empty shelf the member can still upload to beats a 500 on the tab.
     console.error('[moach/docs] shared library load failed', e);
-    return { projectId, upload, drivelink: '', docs: [], loadFailed: true };
+    return { projectId, upload, vaultEnabled, drivelink: '', docs: [], loadFailed: true };
   }
 };

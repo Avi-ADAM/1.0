@@ -52,7 +52,7 @@
 |---|---|
 | PLAN_AI_SIGNUP_CONCIERGE | בנוי (M0–M13), ממתין ל-deploy ובדיקת עשן |
 | PLAN_SHIFTS | P1–P11 ב-commits, סכמת 1.0b ממתינה ל-deploy |
-| PLAN_RESOURCE_CALENDAR · PLAN_P2P_PILOT · PLAN_RIKMA_SHARED_INFO (שלב 2) | ממומשים, ממתינים ל-deploy |
+| PLAN_RESOURCE_CALENDAR · PLAN_P2P_PILOT · PLAN_RIKMA_SHARED_INFO (שלב 2) | ממומשים, ממתינים ל-deploy. שלב 3 של SHARED_INFO (כספת E2E ב-`vault:<pid>`) בנוי וכבוי מאחורי `VAULT_ENABLED` |
 | PLAN_CODE_RIKMA | S0–S4 חלקי, S6 חלקי |
 | PLAN_UGC_TRANSLATION | P4 (משטחים ציבוריים) |
 | PLAN_TIMEGRAMA | שלבים 0, 1, 4 הושלמו; השאר פתוח |
@@ -68,6 +68,8 @@
 | PLAN_TAURI_MOBILE | מעטפת לאתר החי; ה-SPA כמסלול המשך |
 | PLAN_AI_ERA | מסמך-על, חלקו בוצע |
 | HANDOFF_DISTRIBUTED_DB · PLAN_IMPLEMENTATION_ROADMAP · PLAN_user_sovereign_consent · PLAN_serverless_p2p_data · PLAN_rikma_as_state_machine · PLAN_restime_in_signed_chain | השכבה המבוזרת: S1 ו-S2a בנויים, S2b בשער החלטה |
+| PLAN_T9_SOCIAL_RECOVERY | T9a (`epoch.grant` + ריפוי) ו-T9b (אפוטרופסים, חלון מחאה 24ש', UI ב-`/me/settings/recovery`) בנויים, ממתינים לדיפלוי; T9c נדחה |
+| PLAN_STRAPI5_UPGRADE | P0 (4.26.2) מוכן ב-`1.0b`, ממתין ל-commit ו-deploy; P1 spikes פתוחים |
 | MIGRATION_TRACKING · PLAN_action_migration_vs_p2p | המיגרציה ל-Action System |
 | SPEC_CUSTOM_EMAIL | ה-`NotificationOrchestrator` קיים, חלק מהתבניות עוד נשלחות ישירות |
 | FIXES | קובץ ממצאים מתגלגל |

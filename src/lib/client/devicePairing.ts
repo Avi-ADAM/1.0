@@ -19,7 +19,7 @@ export type PairingResult<T = Record<string, unknown>> =
   | ({ ok: true; reason?: undefined } & T)
   | { ok: false; reason: string };
 
-function cookieUserId(): string | null {
+export function cookieUserId(): string | null {
   if (!browser) return null;
   return document.cookie
     .split('; ')

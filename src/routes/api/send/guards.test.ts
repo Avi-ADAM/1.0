@@ -236,15 +236,86 @@ describe('runSendGuards — UpdateClause', () => {
     expect((r as any).status).toBe(403);
   });
 
-  it('does not guard the JWT path (not isSer)', async () => {
+  function clauseBy(authorExternalId: unknown) {
+    return vi.fn().mockResolvedValue({
+      json: async () => ({ data: { clause: { data: { attributes: { authorExternalId } } } } })
+    });
+  }
+
+  it('lets the registered author edit body on the JWT path', async () => {
+    const fetchMock = clauseBy('12');
     await expect(
       runSendGuards({
         ...base,
         queId: 'UpdateClause',
         isSer: false,
-        keyValueObject: { body: 'x' }
+        callerId: '12',
+        keyValueObject: { body: 'x' },
+        variablesObject: { id: '10', body: 'x' },
+        fetch: fetchMock as any
       })
     ).resolves.toBeUndefined();
+    expect(fetchMock).toHaveBeenCalledOnce();
+  });
+
+  it('matches a numeric caller id against the stored string', async () => {
+    await expect(
+      runSendGuards({
+        ...base,
+        queId: 'UpdateClause',
+        isSer: false,
+        callerId: 12 as any,
+        keyValueObject: { body: 'x' },
+        variablesObject: { id: '10' },
+        fetch: clauseBy('12') as any
+      })
+    ).resolves.toBeUndefined();
+  });
+
+  it("blocks a registered user editing someone else's clause", async () => {
+    const r = await statusOf(() =>
+      runSendGuards({
+        ...base,
+        queId: 'UpdateClause',
+        isSer: false,
+        callerId: '12',
+        keyValueObject: { body: 'x' },
+        variablesObject: { id: '10' },
+        fetch: clauseBy('99') as any
+      })
+    );
+    expect(r.threw).toBe(true);
+    expect((r as any).status).toBe(403);
+  });
+
+  it('blocks editing a clause that has no recorded author', async () => {
+    const r = await statusOf(() =>
+      runSendGuards({
+        ...base,
+        queId: 'UpdateClause',
+        isSer: false,
+        callerId: '12',
+        keyValueObject: { stanceValue: 1 },
+        variablesObject: { id: '10' },
+        fetch: clauseBy(null) as any
+      })
+    );
+    expect(r.threw).toBe(true);
+    expect((r as any).status).toBe(403);
+  });
+
+  it('401s a JWT-path edit with no verified caller', async () => {
+    const r = await statusOf(() =>
+      runSendGuards({
+        ...base,
+        queId: 'UpdateClause',
+        isSer: false,
+        keyValueObject: { body: 'x' },
+        variablesObject: { id: '10' }
+      })
+    );
+    expect(r.threw).toBe(true);
+    expect((r as any).status).toBe(401);
   });
 });
 

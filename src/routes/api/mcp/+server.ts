@@ -20,17 +20,23 @@ import { createTool } from '@mastra/core/tools';
 import { z } from 'zod';
 
 import { wrapMcpTool } from '$lib/server/mcp/guard';
-import { MCP_TOOL_MANIFEST, tierAllowed, entryEnabled } from '$lib/server/mcp/toolManifest';
+import { MCP_TOOL_MANIFEST, tierAllowed, entryEnabled, mcpAnnotations } from '$lib/server/mcp/toolManifest';
 import { MCP_INSTRUCTIONS, mcpInstructions } from '$lib/server/mcp/instructions';
 import { assistantMcpEnabled, makePrepareSignupTool } from '../../../mastra/tools/assistantTools';
 import { normalizeApiKeyScopes } from '$lib/server/apiKeys';
 
 // --- Public Tools for Unauthenticated Users ---
 
+/** Annotations for the public tools: none of them touches any record. */
+const readOnly = (title: string) => ({
+    mcp: { annotations: mcpAnnotations({ tier: 'read', title }) }
+});
+
 const getPlatformInfo = createTool({
     id: 'getPlatformInfo',
     description: 'Get general information about the 1lev1 platform, its goals, and features.',
     inputSchema: z.object({}),
+    ...readOnly('About 1lev1'),
     execute: async () => {
         return {
             info: SITE_CONTEXT,
@@ -44,6 +50,7 @@ const howToConnect = createTool({
     id: 'howToConnect',
     description: 'Instructions on how to register, login and get an API key for full MCP access.',
     inputSchema: z.object({}),
+    ...readOnly('How to connect'),
     execute: async () => {
         return {
             steps: [
@@ -75,6 +82,7 @@ const createNewApiKey = createTool({
         'approval URL. Also lists the stale config entries that must be deleted first, ' +
         'otherwise the new key is shadowed and nothing changes after a restart.',
     inputSchema: z.object({}),
+    ...readOnly('Get a new API key'),
     execute: async () => {
         return {
             before_you_mint: SHADOWING_WARNING,
@@ -111,6 +119,7 @@ function makeFixRejectedApiKeyTool(reason: 'malformed' | 'unknown' | 'revoked') 
             'available. This is NOT the same as an unregistered user, so do not simply tell ' +
             'them to sign up. Call this tool for the repair steps and relay them.',
         inputSchema: z.object({}),
+        ...readOnly('Fix a rejected API key'),
         execute: async () => repairPlan(reason)
     });
 }
@@ -123,7 +132,10 @@ function makeFixRejectedApiKeyTool(reason: 'malformed' | 'unknown' | 'revoked') 
 // scope, membership, audit) all live in one place: $lib/server/mcp/toolManifest.
 // Wrapped once here; the wrappers read the caller from the per-request context.
 const WRAPPED_TOOLS: Record<string, any> = Object.fromEntries(
-    Object.entries(MCP_TOOL_MANIFEST).map(([name, entry]) => [name, wrapMcpTool(entry.tool, entry)])
+    Object.entries(MCP_TOOL_MANIFEST).map(([name, entry]) => [
+        name,
+        wrapMcpTool(entry.tool, entry, { ...mcpAnnotations(entry) })
+    ])
 );
 
 /** Reads the `ops` list off a verified key's scopes, if it has any. */

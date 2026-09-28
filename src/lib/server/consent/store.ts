@@ -32,6 +32,9 @@ export type StoredPubKey = {
   /** T7 — 'manual' = user revoked one device; 'reset' = chain reset revoked
    *  everything (cancellable during the cooldown, see devicePolicy.ts). */
   revokedReason?: 'manual' | 'reset';
+  /** T9b — this key was registered through guardian recovery. Lives in the
+   *  row's JSON payload, so it needs no Strapi column (schema freeze, R9). */
+  recovery?: { setId: string; vouchers: string[]; at: number };
   addedAt: number;
 };
 

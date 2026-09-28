@@ -14,6 +14,7 @@
     adoptFromProfile
   } from '$lib/stores/autoTranslate.js';
   import CurrencyPicker from '$lib/components/money/CurrencyPicker.svelte';
+  import RecoveryBanner from '$lib/components/recovery/RecoveryBanner.svelte';
   import { useMoney, setDisplayCurrency, adoptCurrencyFromProfile } from '$lib/money/context.svelte';
   import { formatMoney } from '$lib/money/format.js';
   let { data } = $props();
@@ -199,6 +200,10 @@
     >
       {$t('mcp.banner.cta')}
     </a>
+  </div>
+
+  <div class="mb-6">
+    <RecoveryBanner />
   </div>
 
   <div

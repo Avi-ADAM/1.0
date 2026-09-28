@@ -12,6 +12,7 @@
  */
 
 import { env } from '$env/dynamic/private';
+import { timingSafeEqual } from 'node:crypto';
 import { isInternalRequest } from '$lib/server/internalSecret.js';
 import { isMeetingsRequest } from '$lib/server/meetingsProxy.js';
 import type { Principal } from './types.js';
@@ -63,6 +64,31 @@ export function resolveSessionPrincipal(
   };
 }
 
+/** Length-safe constant-time comparison. */
+function secretsMatch(a: string, b: string): boolean {
+  const left = Buffer.from(a, 'utf8');
+  const right = Buffer.from(b, 'utf8');
+  // timingSafeEqual throws on a length mismatch, which would itself leak the
+  // length — compare against a same-length buffer and fold the real answer in.
+  if (left.length !== right.length) {
+    timingSafeEqual(left, left);
+    return false;
+  }
+  return timingSafeEqual(left, right);
+}
+
+/**
+ * @returns true when the request carries the consensus site's shared secret.
+ *   Always false when CONSENSUS_PROXY_SECRET is not configured.
+ */
+export function isConsensusRequest(request: Request): boolean {
+  const expected = normalizeSecret(env.CONSENSUS_PROXY_SECRET, 'CONSENSUS_PROXY_SECRET');
+  if (!expected) return false;
+  const incoming = normalizeSecret(request.headers.get(CONSENSUS_SECRET_HEADER));
+  if (!incoming) return false;
+  return secretsMatch(expected, incoming);
+}
+
 /**
  * Principal for a request that already proved it is server-originated
  * (isSer:true + valid x-internal-secret — the caller MUST have verified
@@ -72,9 +98,7 @@ export function resolveSessionPrincipal(
  * limited-scope consensus service; otherwise it is the admin service.
  */
 export function resolveServicePrincipal(request: Request): Principal {
-  const secret = normalizeSecret(env.CONSENSUS_PROXY_SECRET, 'CONSENSUS_PROXY_SECRET');
-  const incoming = request.headers.get(CONSENSUS_SECRET_HEADER);
-  if (secret && incoming === secret) {
+  if (isConsensusRequest(request)) {
     return { kind: 'serviceConsensus' };
   }
   return { kind: 'serviceAdmin' };
@@ -94,6 +118,15 @@ export function resolvePrincipal(opts: {
   const { request, cookies, isSerFlag, identity } = opts;
   if (isSerFlag === true && isInternalRequest(request)) {
     return resolveServicePrincipal(request);
+  }
+  // The consensus site (consensus1lev1) proving itself. It is a separate
+  // deployment, so it cannot carry x-internal-secret (derived from
+  // ADMINMONTHER, which it must never hold) — its charter and guest visitors
+  // have no jwt and arrive as isSer + x-consensus-secret alone. Recognized
+  // only as serviceConsensus, which qidsAccess pins to the consensus qids and
+  // /api/send pairs with the limited CONSENSUS_PUBLIC_TOKEN, never ADMINMONTHER.
+  if (isSerFlag === true && isConsensusRequest(request)) {
+    return { kind: 'serviceConsensus' };
   }
   // The meetings app proving itself. Checked before the cookie so a guest —
   // who has no cookie to fall back to — resolves to something other than

@@ -14,20 +14,29 @@
    * painted straight onto it is readable over half the page at best; the card
    * surface tokens resolve per theme and per mode and carry their own ink.
    *
-   * The vault (§3.2) is deliberately absent: passwords wait for the sealed
-   * space events, and the note at the bottom says so rather than leaving a
-   * member to guess and paste one into a note field.
+   * The vault (§3.2, stage 3) is its own E2E space and its own panel below
+   * the shelf. Until it is switched on (VAULT_ENABLED, or a browser's
+   * localStorage opt-in) the note at the bottom says passwords do not belong
+   * here, rather than leaving a member to paste one into a note field.
    */
   import { t, isRtl } from '$lib/translations';
   import { invalidateAll } from '$app/navigation';
-  import { untrack } from 'svelte';
+  import { untrack, onMount } from 'svelte';
   import P2pPilotCard from '$lib/components/rikmaDocs/P2pPilotCard.svelte';
   import { RikmaP2p } from '$lib/p2p/pilot.svelte.js';
   import AddSpaceDoc from '$lib/components/rikmaDocs/AddSpaceDoc.svelte';
   import SpaceDocRow from '$lib/components/rikmaDocs/SpaceDocRow.svelte';
+  import VaultPanel from '$lib/components/rikmaDocs/VaultPanel.svelte';
+  import { vaultOptIn } from '$lib/vault/vault.svelte';
   import { folderNames, groupByFolder } from '$lib/spaceDocs/spaceDocs.js';
 
   let { data } = $props();
+
+  // The vault needs the browser (IDB, WebCrypto) — decide after mount.
+  let vaultOn = $state(false);
+  onMount(() => {
+    vaultOn = Boolean(data.vaultEnabled) || vaultOptIn();
+  });
 
   const FILTERS = ['all', 'file', 'image', 'link'];
   let filter = $state('all');
@@ -155,7 +164,11 @@
       <P2pPilotCard {pilot} />
     {/if}
 
-    <p class="vault-note"><span aria-hidden="true">🔒</span> {$t('rikmaDocs.vaultNote')}</p>
+    {#if vaultOn && data.uid && data.memberIds?.length}
+      <VaultPanel projectId={String(data.projectId)} userId={data.uid} memberIds={data.memberIds} />
+    {:else}
+      <p class="vault-note"><span aria-hidden="true">🔒</span> {$t('rikmaDocs.vaultNote')}</p>
+    {/if}
   </div>
 </section>
 

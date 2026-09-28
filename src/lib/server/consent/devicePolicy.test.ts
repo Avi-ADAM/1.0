@@ -149,3 +149,61 @@ describe('judgeRegistration — chain reset', () => {
     expect(res).toMatchObject({ allow: true, status: 'reset_tofu' });
   });
 });
+
+describe('judgeRegistration — T9b guardian recovery', () => {
+  const vouched = (matured: boolean, readyAt = Date.now() + 5000) => async () => ({
+    ok: true as const, setId: 's', vouchers: ['g1', 'g2'], thresholdAt: readyAt - 1, readyAt, matured
+  });
+
+  it('a matured recovery registers even mid-reset and under enforcement', async () => {
+    const old = await makeIdentity('dana');
+    const fresh = await makeIdentity('dana');
+    const now = Date.now();
+    const res = await judgeRegistration({
+      existing: [storedKeyOf(old, { revokedAt: now - 1000, revokedReason: 'reset' })],
+      userId: 'dana', devicePubB64: fresh.devicePubB64,
+      cert: undefined, enforce: true, now, recovery: vouched(true)
+    });
+    expect(res).toMatchObject({ allow: true, status: 'recovered_by_guardians' });
+  });
+
+  it('inside the protest window the device waits, and is told how long', async () => {
+    const fresh = await makeIdentity('dana');
+    const now = Date.now();
+    const res = await judgeRegistration({
+      existing: [storedKeyOf(await makeIdentity('dana'))],
+      userId: 'dana', devicePubB64: fresh.devicePubB64,
+      cert: undefined, enforce: false, now, recovery: vouched(false, now + 5000)
+    });
+    expect(res).toMatchObject({ allow: false, status: 'recovery_pending', retryAfterMs: 5000 });
+  });
+
+  it('an explicit recovery without enough vouches is refused — shadow mode does not rescue it', async () => {
+    const fresh = await makeIdentity('dana');
+    const res = await judgeRegistration({
+      existing: [], userId: 'dana', devicePubB64: fresh.devicePubB64,
+      cert: undefined, enforce: false,
+      recovery: async () => ({ ok: false as const, reason: 'vouches_below_threshold:1/2' })
+    });
+    expect(res).toMatchObject({
+      allow: false, status: 'recovery_not_vouched', certReason: 'vouches_below_threshold:1/2'
+    });
+  });
+
+  it('RECOVERY_ENFORCE: a matured reset no longer TOFUs a user with guardians; shadow flags it', async () => {
+    const old = await makeIdentity('dana');
+    const fresh = await makeIdentity('dana');
+    const now = Date.now();
+    const base = {
+      existing: [storedKeyOf(old, { revokedAt: now - RESET_COOLDOWN_MS - 1000, revokedReason: 'reset' as const })],
+      userId: 'dana', devicePubB64: fresh.devicePubB64, cert: undefined, enforce: true, now,
+      hasGuardians: async () => true
+    };
+    expect(await judgeRegistration({ ...base, recoveryEnforce: true }))
+      .toMatchObject({ allow: false, status: 'reset_blocked_by_guardians' });
+    expect(await judgeRegistration({ ...base, recoveryEnforce: false }))
+      .toMatchObject({ allow: true, status: 'reset_tofu', guardiansShadow: true });
+    expect(await judgeRegistration({ ...base, hasGuardians: async () => false, recoveryEnforce: true }))
+      .toMatchObject({ allow: true, status: 'reset_tofu' });
+  });
+});

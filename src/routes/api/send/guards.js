@@ -178,41 +178,48 @@ const PRE_GUARDS = {
     );
   },
 
-  // UpdateClause ownership:
+  // UpdateClause ownership — every edit is the clause author's, on both paths:
   //   • body/issueId: registered (JWT) owner only — block the service path.
-  //   • other fields (stanceValue/confirmedByAuthor): service path allowed,
-  //     but only for the clause's own author (matched via __identity.externalId).
-  'UpdateClause': async ({ isSer, keyValueObject, variablesObject, identity, bearer1, ep, fetch: injected }) => {
+  //   • service path (stanceValue/confirmedByAuthor): matched via
+  //     __identity.externalId.
+  //   • JWT path: matched via the verified caller (locals.uid), which is what
+  //     authorIdentity.js stamps into authorExternalId on create. A clause
+  //     written before that stamp has no author and so is nobody's to edit.
+  'UpdateClause': async ({ isSer, keyValueObject, variablesObject, identity, callerId, bearer1, ep, fetch: injected }) => {
     if (isSer && (keyValueObject.body != null || keyValueObject.issueId != null)) {
       throw error(403, 'Forbidden: Service accounts cannot edit clause body or issueId');
     }
+    const clauseId = variablesObject.id;
+    if (!clauseId) throw error(400, 'Missing id for UpdateClause');
+    let ownerExternalId;
     if (isSer) {
-      const clauseId = variablesObject.id;
-      if (!clauseId) throw error(400, 'Missing id for UpdateClause');
-      const ownerExternalId = identity?.externalId;
+      ownerExternalId = identity?.externalId;
       if (!ownerExternalId) throw error(403, 'Forbidden: Missing __identity.externalId for UpdateClause');
+    } else {
+      ownerExternalId = callerId;
+      if (!ownerExternalId) throw error(401, 'Unauthorized: No caller id');
+    }
 
-      const doFetch = injected || fetch;
-      let fetchData;
-      try {
-        const fetchRes = await doFetch(ep, {
-          method: 'POST',
-          body: JSON.stringify({
-            // `clauseId` is client data: interpolated into the document, a quote
-            // in it would close the argument and the rest would parse as query.
-            query: `query ClauseAuthor($id: ID!) { clause(id: $id) { data { attributes { authorExternalId } } } }`,
-            variables: { id: clauseId }
-          }),
-          headers: { 'Content-Type': 'application/json', Authorization: bearer1 }
-        });
-        fetchData = await fetchRes.json();
-      } catch (e) {
-        throw error(500, `Failed to fetch clause for ownership check: ${e.message}`);
-      }
-      const clauseAuthor = fetchData.data?.clause?.data?.attributes?.authorExternalId;
-      if (clauseAuthor !== ownerExternalId) {
-        throw error(403, 'Forbidden: Not the clause author');
-      }
+    const doFetch = injected || fetch;
+    let fetchData;
+    try {
+      const fetchRes = await doFetch(ep, {
+        method: 'POST',
+        body: JSON.stringify({
+          // `clauseId` is client data: interpolated into the document, a quote
+          // in it would close the argument and the rest would parse as query.
+          query: `query ClauseAuthor($id: ID!) { clause(id: $id) { data { attributes { authorExternalId } } } }`,
+          variables: { id: clauseId }
+        }),
+        headers: { 'Content-Type': 'application/json', Authorization: bearer1 }
+      });
+      fetchData = await fetchRes.json();
+    } catch (e) {
+      throw error(500, `Failed to fetch clause for ownership check: ${e.message}`);
+    }
+    const clauseAuthor = fetchData.data?.clause?.data?.attributes?.authorExternalId;
+    if (clauseAuthor == null || String(clauseAuthor) !== String(ownerExternalId)) {
+      throw error(403, 'Forbidden: Not the clause author');
     }
   }
 };

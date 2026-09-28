@@ -61,6 +61,9 @@ export const ROUTED = {
     // The page behind the product - why consent is re-checked at every step.
     // One route, one namespace; the homepage teaser for it lives in `home`.
     why: at('/why'),
+    // The privacy policy - one route, one namespace. The menu link's label
+    // lives in `common` so it renders everywhere.
+    privacy: at('/privacy'),
     planning: at(/\/moach\/[^/]+\/create/),
     // The rikma-import review screen (PLAN_AI_SIGNUP_CONCIERGE §4.5): a new
     // rikma at /moach/import/…, an existing one at /moach/<id>/import/….
@@ -76,6 +79,11 @@ export const ROUTED = {
     // The "connect your AI agent" guide, plus the banner that points at it from
     // the settings page — both live under /me, so one gate covers them.
     mcp: at('/me'),
+    // T9 social recovery: the settings page under /me (plus the banner on the
+    // settings page and on /me/devices), and the banner on onboarding's last step.
+    recovery: at('/me', '/onboard'),
+    // /me/devices — T7 pairing, revocation, chain reset.
+    devices: at('/me/devices'),
     // Archive/edit proposals surface as lev cards and on the rikma's object pages.
     archive: at('/lev', /\/moach\/[^/]+/),
     // Shifts (docs/inprogress/PLAN_SHIFTS.md): the rikma's shifts tab and plan form under

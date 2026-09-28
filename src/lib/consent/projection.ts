@@ -1,5 +1,6 @@
 import type { ConsentEvent } from './event';
 import { dedupeKey } from './event';
+import { compareIds } from './ids';
 import { reducers } from './reducers';
 
 export type TosplitView = {
@@ -282,7 +283,9 @@ export function subjectKey(type: string, id: string): string {
   return `${type}:${id}`;
 }
 
-// Topological sort: parents before children. Ties broken by ts then id.
+// Topological sort: parents before children. Ties broken by ts then id, the
+// id by code units (compareIds) — never localeCompare, whose order moves with
+// the runtime locale (invariant 7).
 export function topoSort(events: ConsentEvent[]): ConsentEvent[] {
   const byId = new Map(events.map((e) => [e.id, e]));
   const indeg = new Map<string, number>();
@@ -294,7 +297,7 @@ export function topoSort(events: ConsentEvent[]): ConsentEvent[] {
   }
   const ready: ConsentEvent[] = events.filter((e) => (indeg.get(e.id) ?? 0) === 0);
   const sortReady = (arr: ConsentEvent[]) =>
-    arr.sort((a, b) => (a.ts - b.ts) || a.id.localeCompare(b.id));
+    arr.sort((a, b) => (a.ts - b.ts) || compareIds(a.id, b.id));
   sortReady(ready);
 
   const result: ConsentEvent[] = [];

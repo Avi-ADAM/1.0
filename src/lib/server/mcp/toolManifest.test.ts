@@ -3,7 +3,7 @@
  * CI failure instead of a production IDOR — the reason the manifest exists.
  */
 import { describe, expect, it } from 'vitest';
-import { MCP_TOOL_MANIFEST, tierAllowed, MCP_WRITE_SCOPE } from './toolManifest';
+import { MCP_TOOL_MANIFEST, tierAllowed, MCP_WRITE_SCOPE, mcpAnnotations } from './toolManifest';
 
 const TIERS = ['read', 'prepare', 'selfWrite', 'consentWrite', 'communicate', 'sharedWrite'];
 
@@ -57,6 +57,28 @@ describe('MCP tool manifest', () => {
       if (OWN_RECORD_ONLY.includes(name)) continue;
       expect(entry.project ?? entry.mission, `${name} writes without a project/mission guard`).toBeDefined();
     }
+  });
+
+  it('every entry has a unique title for the annotations', () => {
+    const titles = entries.map(([name, entry]) => {
+      expect(entry.title?.trim(), `${name}: title`).toBeTruthy();
+      return entry.title;
+    });
+    expect(new Set(titles).size).toBe(titles.length);
+  });
+
+  it('only reads and pure prepares claim to be read-only', () => {
+    for (const [name, entry] of entries) {
+      const a = mcpAnnotations(entry);
+      const expected = entry.tier === 'read' || (entry.tier === 'prepare' && entry.pure === true);
+      expect(a.readOnlyHint, `${name}: readOnlyHint`).toBe(expected);
+      expect(a.openWorldHint).toBe(false);
+      if (a.readOnlyHint) expect(a.destructiveHint, `${name}: read-only yet destructive`).toBe(false);
+      if (entry.pure) expect(entry.tier, `${name}: pure outside prepare`).toBe('prepare');
+    }
+    expect(mcpAnnotations(MCP_TOOL_MANIFEST.timerActionTool).readOnlyHint).toBe(false);
+    expect(mcpAnnotations(MCP_TOOL_MANIFEST.createPlanBoardTool).readOnlyHint).toBe(false);
+    expect(mcpAnnotations(MCP_TOOL_MANIFEST.applyAssistantTool).destructiveHint).toBe(true);
   });
 
   it('the tools that call a model are in the ai bucket', () => {

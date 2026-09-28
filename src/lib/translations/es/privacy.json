@@ -1,0 +1,93 @@
+{
+  "meta": {
+    "title": "Política de privacidad | 1lev1",
+    "description": "Qué información personal recoge 1lev1, para qué se usa, quién la ve y cómo ver, corregir o borrar la tuya - también cuando conectas un asistente de IA."
+  },
+  "hero": {
+    "eyebrow": "Política de privacidad",
+    "title": "Tu información, y lo que hacemos con ella",
+    "updated": "Última actualización: 27 de septiembre de 2026",
+    "lede": "1lev1 se basa en el consentimiento entre socios. La misma regla vale para tu información: se usa para que funcionen tus sociedades, la ven las personas con quienes trabajas, y no se vende."
+  },
+  "short": {
+    "title": "En pocas palabras",
+    "li1": "Recogemos lo que nos das para que funcionen tus rikmas, más el mínimo técnico para que el servicio funcione de forma segura.",
+    "li2": "Tus socios en una rikma ven lo que la sociedad necesita: tu nombre, perfil, aportes, horas, participaciones, votos y mensajes en esa rikma.",
+    "li3": "No vendemos información personal ni la usamos para publicidad.",
+    "li4": "Un asistente de IA que conectes actúa en tu nombre, solo con tus permisos, y puedes desconectarlo en cualquier momento.",
+    "li5": "Puedes pedir ver, corregir, exportar o borrar tu información: notifications@1lev1.com."
+  },
+  "who": {
+    "title": "Quiénes somos",
+    "p1": "1lev1 (1lev1.com) es una plataforma para sociedades basadas en el consentimiento, llamadas rikmas. Esta política cubre el sitio, sus aplicaciones, la API pública y el conector de 1lev1 para asistentes de IA (MCP).",
+    "p2": "Preguntas sobre esta política o sobre tu información: notifications@1lev1.com."
+  },
+  "collect": {
+    "title": "Qué recogemos",
+    "li1": "Datos de la cuenta: nombre, nombre de usuario, email, contraseña (nunca guardada de forma legible), país e idioma.",
+    "li2": "Tu perfil, en la medida en que lo completes: foto, habilidades, roles, formas de trabajar, valores, recursos que tienes y una breve biografía.",
+    "li3": "Lo que creas en la plataforma: rikmas, misiones, tareas, recursos, productos, votos, mensajes en conversaciones, deseos y archivos que subes a la biblioteca de una rikma.",
+    "li4": "Registros de trabajo y dinero: horas que registras con el temporizador y su aprobación, ventas, repartos de ganancias y participaciones. Son registros que compartes con tus socios.",
+    "li5": "Datos técnicos: dirección IP, tipo de navegador y dispositivo, y registros del servidor. Las visitas a las páginas se cuentan con estadísticas agregadas que no construyen un perfil tuyo.",
+    "li6": "Si los activas: un token de notificaciones push y las claves públicas de los dispositivos que vinculas a tu cuenta."
+  },
+  "agents": {
+    "title": "Asistentes de IA y la API",
+    "p1": "Puedes conectar un asistente de IA, como Claude, a tu cuenta mediante el conector de 1lev1 o una clave de API. Esto es lo que ocurre al hacerlo:",
+    "li1": "El asistente actúa en tu nombre, con los permisos de tu cuenta, restringidos al alcance de la clave si lo limitaste. Ve lo que tú verías en el sitio - nada más.",
+    "li2": "Recibimos las llamadas a herramientas que hace el asistente y lo que envía en ellas. No recibimos el resto de tu conversación con él.",
+    "li3": "Por cada cambio, ejecución de IA y llamada rechazada guardamos una línea de auditoría: qué clave, qué usuario, qué herramienta, qué rikma o misión, el resultado y la duración. Nunca el contenido de la llamada.",
+    "li4": "El asistente no puede aprobar votos, repartos de ganancias, ventas ni propuestas por ti. Todo lo que impone trabajo, dinero o una obligación a otro miembro sigue esperando a ese miembro.",
+    "li5": "Puedes desconectarlo en cualquier momento: Ajustes, Claves de API. La clave deja de funcionar al instante.",
+    "p2": "Lo que el proveedor de IA hace con tu conversación se rige por su propia política de privacidad, no por esta."
+  },
+  "use": {
+    "title": "Para qué la usamos",
+    "li1": "Hacer funcionar la plataforma: mostrar tus rikmas, calcular participaciones, llevar los procesos de consentimiento hasta el final y enviar las notificaciones y emails que pediste.",
+    "li2": "Sugerir misiones y recursos que encajan con tus habilidades. Estas coincidencias se calculan en nuestros servidores.",
+    "li3": "Traducción: el texto que escribieron los miembros puede traducirse automáticamente para lectores de otros idiomas. Una traducción siempre se indica como tal, y el original está a un toque.",
+    "li4": "Funciones de IA: cuando usas la planificación, el concierge, el asistente o la traducción, el texto correspondiente se envía a un proveedor de modelos de IA para producir el resultado.",
+    "li5": "Seguridad: prevenir abusos, limitar la frecuencia de llamadas e investigar errores.",
+    "p1": "No vendemos información personal, no la usamos para publicidad y no permitimos que los proveedores de abajo la usen para sus propios fines."
+  },
+  "share": {
+    "title": "Quién la ve",
+    "li1": "Tus socios en cada rikma ven lo que esa rikma necesita: tu nombre y perfil, tus aportes, horas, participaciones, votos y mensajes en ella.",
+    "li2": "Las páginas públicas - páginas de rikmas, misiones y recursos abiertos, perfiles públicos - las puede ver cualquiera, incluidos los buscadores. Lo que aparece en ellas es lo que elegiste publicar, tú o junto con tu rikma.",
+    "li3": "Proveedores que tratan información por encargo nuestro: alojamiento (Vercel, y nuestros propios servidores para la base de datos), envío de emails (Zoho), notificaciones push (Google Firebase Cloud Messaging), modelos de IA (Google Gemini y, en algunas funciones, Groq u OpenAI) y estadísticas agregadas del sitio (Vercel Analytics).",
+    "p1": "Algunos de estos proveedores tratan información fuera de tu país. Solo trabajamos con ellos en condiciones que la protegen."
+  },
+  "cookies": {
+    "title": "Cookies y almacenamiento local",
+    "p1": "Usamos las cookies que el servicio necesita: un token de sesión seguro, tu idioma y país, y los pasos del registro. No usamos cookies publicitarias ni cookies de seguimiento de terceros.",
+    "p2": "Algunas preferencias, como un modo de vista o un borrador sin guardar, se guardan en el almacenamiento local de tu navegador y no salen de él."
+  },
+  "keep": {
+    "title": "Cuánto tiempo la guardamos",
+    "p1": "Guardamos tu información mientras tu cuenta esté activa.",
+    "p2": "Los registros que pertenecen a una sociedad - horas, ventas, repartos de ganancias, votos - son también registros de tus socios, y sus participaciones se calculan a partir de ellos. Cuando te vas o borras tu cuenta pueden quedar en la historia de la rikma. Si lo pides, reemplazamos allí tu nombre por una etiqueta anónima.",
+    "p3": "Los registros del servidor se guardan durante un periodo limitado y luego se borran."
+  },
+  "security": {
+    "title": "Seguridad",
+    "p1": "Todo el tráfico va cifrado (HTTPS). Las contraseñas y las claves de API se guardan solo en forma de hash. El token de sesión no es legible por los scripts de la página, y la base de datos solo acepta solicitudes de nuestros propios servidores.",
+    "p2": "Ningún sistema es perfectamente seguro. Si una brecha afecta a tu información, te lo diremos."
+  },
+  "rights": {
+    "title": "Tus opciones y derechos",
+    "li1": "Ver y corregir tú mismo la mayor parte de tu información, en las páginas de perfil y ajustes.",
+    "li2": "Pedir una copia de tu información, o que se corrija o se borre.",
+    "li3": "Desconectar asistentes de IA y revocar claves de API en cualquier momento.",
+    "li4": "Desactivar las notificaciones y los emails que no quieras.",
+    "p1": "Escribe a notifications@1lev1.com y responderemos en un plazo de 30 días."
+  },
+  "changes": {
+    "title": "Cambios en esta política",
+    "p1": "Cuando cambiemos esta política actualizaremos la fecha de arriba. Si el cambio es importante, avisaremos a los miembros registrados antes de que entre en vigor."
+  },
+  "contact": {
+    "title": "Contacto",
+    "p1": "Preguntas, solicitudes y reclamaciones:",
+    "email": "notifications@1lev1.com"
+  }
+}

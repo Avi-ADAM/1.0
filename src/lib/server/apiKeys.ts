@@ -42,13 +42,12 @@ export function generateApiKey(userId: number): {
   hash: string;
   prefix: string;
 } {
-  console.log(userId);
   const userPart = encodeUserId(userId);
   const randPart = crypto.randomBytes(24).toString('hex');
   const raw      = `${KEY_PREFIX}${userPart}_${randPart}`;
   const hash     = hashKey(raw);
   const prefix   = raw.slice(-4);
-  console.log(raw, hash, prefix);
+  // Never log `raw`: only its HMAC is stored, and a log line would undo that.
   return { raw, hash, prefix };
 }
 

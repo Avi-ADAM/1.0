@@ -1,5 +1,6 @@
 import type { ConsentEvent } from '../event';
 import type { ProjectState, ForumView, MessageView } from '../projection';
+import { compareIds } from '../ids';
 
 /**
  * forum.create — a chat forum (S2b, T4; mirrors ensureVoteForum & friends).
@@ -59,7 +60,7 @@ export function messagePost(state: ProjectState, ev: ConsentEvent): ProjectState
   };
 
   const messages = [...forum.messages, msg].sort(
-    (a, b) => a.ts - b.ts || a.id.localeCompare(b.id)
+    (a, b) => a.ts - b.ts || compareIds(a.id, b.id)
   );
 
   const forums = new Map(state.forums);

@@ -1,5 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { project, topoSort } from './projection';
+import { compareIds } from './ids';
+import { canonicalBytesOfState } from './stateRoot';
 import type { ConsentEvent } from './event';
 
 function ev(partial: Partial<ConsentEvent> & { id: string; action: string; parents?: string[] }): ConsentEvent {
@@ -141,5 +143,84 @@ describe('project: commutativity under topo-sort', () => {
     const b = project([...events].reverse(), projectId);
     expect(a.members).toEqual(b.members);
     expect(a.tosplits.get('ts-1')!.approved).toBe(b.tosplits.get('ts-1')!.approved);
+  });
+});
+
+// Invariant 7: the same-ts tie-break must be a function of the ids alone.
+// Every pair below is ordered one way by code units and the other way by
+// localeCompare (case-insensitive primary level; '_' before '-'), so the old
+// `a.id.localeCompare(b.id)` tie-break folded them in a locale-chosen order.
+describe('project: same-ts tie-break is code-unit id order, never locale', () => {
+  const projectId = 'proj-1';
+  const PAIRS: Array<[string, string]> = [
+    ['aZZ', 'BAA'],
+    ['_x', '-x']
+  ];
+
+  it('the fixture pairs really do disagree between the two orders', () => {
+    for (const [x, y] of PAIRS) {
+      expect(Math.sign(x.localeCompare(y))).not.toBe(compareIds(x, y));
+    }
+  });
+
+  function amend(id: string, actor: string, value: string): ConsentEvent {
+    return ev({
+      id,
+      actor,
+      action: 'project.amend',
+      subject: { type: 'project', id: projectId },
+      predicate: { path: 'name', value },
+      ts: 100
+    });
+  }
+
+  it('topoSort puts the code-unit-lower id first', () => {
+    for (const [x, y] of PAIRS) {
+      const lo = compareIds(x, y) < 0 ? x : y;
+      const hi = lo === x ? y : x;
+      for (const input of [[amend(x, 'u1', x), amend(y, 'u2', y)], [amend(y, 'u2', y), amend(x, 'u1', x)]]) {
+        expect(topoSort(input).map((e) => e.id)).toEqual([lo, hi]);
+      }
+    }
+  });
+
+  it('last-write-wins settings: identical projection in both input orders, code-unit winner', () => {
+    for (const [x, y] of PAIRS) {
+      const events = [amend(x, 'u1', x), amend(y, 'u2', y)];
+      const a = project(events, projectId);
+      const b = project([...events].reverse(), projectId);
+      expect(canonicalBytesOfState(a)).toEqual(canonicalBytesOfState(b));
+      // folded last = the code-unit-higher id
+      expect(a.settings.get('name')).toBe(compareIds(x, y) > 0 ? x : y);
+    }
+  });
+
+  it('dedupe tie (same actor/subject/action, same ts): the code-unit-lower id survives', () => {
+    for (const [x, y] of PAIRS) {
+      const events = [amend(x, 'u1', x), amend(y, 'u1', y)];
+      const a = project(events, projectId);
+      const b = project([...events].reverse(), projectId);
+      expect(canonicalBytesOfState(a)).toEqual(canonicalBytesOfState(b));
+      expect(a.settings.get('name')).toBe(compareIds(x, y) < 0 ? x : y);
+    }
+  });
+
+  it('forum messages with the same ts are kept in code-unit id order', () => {
+    for (const [x, y] of PAIRS) {
+      const post = (msgId: string, evId: string, actor: string) =>
+        ev({
+          id: evId,
+          actor,
+          action: 'message.post',
+          subject: { type: 'message', id: msgId },
+          predicate: { forumId: 'f1', body: msgId },
+          ts: 100
+        });
+      const events = [post(x, 'e1', 'u1'), post(y, 'e2', 'u2')];
+      const a = project(events, projectId);
+      const b = project([...events].reverse(), projectId);
+      expect(canonicalBytesOfState(a)).toEqual(canonicalBytesOfState(b));
+      expect(a.forums.get('f1')!.messages.map((m) => m.id)).toEqual([x, y].sort(compareIds));
+    }
   });
 });

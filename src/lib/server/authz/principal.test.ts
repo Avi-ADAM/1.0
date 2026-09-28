@@ -13,7 +13,8 @@ vi.mock('$env/static/private', () => ({ ADMINMONTHER: 'test-admin-token' }));
 import {
   resolveSessionPrincipal,
   resolveServicePrincipal,
-  resolvePrincipal
+  resolvePrincipal,
+  isConsensusRequest
 } from './principal.js';
 
 // Mirror internalSecret.js derivation for the mocked ADMINMONTHER
@@ -64,6 +65,20 @@ describe('resolveServicePrincipal', () => {
     expect(
       resolveServicePrincipal(requestWith({ 'x-consensus-secret': 'wrong' })).kind
     ).toBe('serviceAdmin');
+  });
+});
+
+describe('isConsensusRequest', () => {
+  it('matches the configured secret, tolerating whitespace', () => {
+    expect(isConsensusRequest(requestWith({ 'x-consensus-secret': 'consensus-secret-value' }))).toBe(true);
+    expect(isConsensusRequest(requestWith({ 'x-consensus-secret': ' consensus-secret-value ' }))).toBe(true);
+  });
+
+  it('rejects a missing, empty, shorter or wrong header', () => {
+    expect(isConsensusRequest(requestWith())).toBe(false);
+    expect(isConsensusRequest(requestWith({ 'x-consensus-secret': '' }))).toBe(false);
+    expect(isConsensusRequest(requestWith({ 'x-consensus-secret': 'consensus' }))).toBe(false);
+    expect(isConsensusRequest(requestWith({ 'x-consensus-secret': 'consensus-secret-valuf' }))).toBe(false);
   });
 });
 
@@ -132,6 +147,69 @@ describe('resolvePrincipal', () => {
       isSerFlag: true
     });
     expect(p.kind).toBe('serviceAdmin');
+  });
+
+  it('treats isSer + a valid consensus secret as serviceConsensus without the internal secret', () => {
+    // Charter/guest visitors of the consensus site have no jwt; the proxy
+    // proves itself with x-consensus-secret alone.
+    const p = resolvePrincipal({
+      request: requestWith({ 'x-consensus-secret': 'consensus-secret-value' }),
+      cookies: cookiesOf({}),
+      isSerFlag: true
+    });
+    expect(p.kind).toBe('serviceConsensus');
+  });
+
+  it('never widens a consensus-secret call to serviceAdmin', () => {
+    const p = resolvePrincipal({
+      request: requestWith({ 'x-consensus-secret': 'consensus-secret-value' }),
+      cookies: cookiesOf({ jwt: 'x' }),
+      identity: { id: '12' },
+      isSerFlag: true
+    });
+    expect(p.kind).toBe('serviceConsensus');
+  });
+
+  it('keeps isSer + internal + consensus secrets as serviceConsensus', () => {
+    const p = resolvePrincipal({
+      request: requestWith({
+        'x-internal-secret': INTERNAL_SECRET,
+        'x-consensus-secret': 'consensus-secret-value'
+      }),
+      cookies: cookiesOf({}),
+      isSerFlag: true
+    });
+    expect(p.kind).toBe('serviceConsensus');
+  });
+
+  it('ignores a wrong consensus secret (falls back to the session)', () => {
+    expect(
+      resolvePrincipal({
+        request: requestWith({ 'x-consensus-secret': 'wrong' }),
+        cookies: cookiesOf({}),
+        isSerFlag: true
+      }).kind
+    ).toBe('anonymous');
+    expect(
+      resolvePrincipal({
+        request: requestWith({ 'x-consensus-secret': 'consensus-secret-valuE' }),
+        cookies: cookiesOf({ jwt: 'x' }),
+        identity: { id: '12' },
+        isSerFlag: true
+      }).kind
+    ).toBe('user');
+  });
+
+  it('does not treat the consensus secret as service without the isSer flag', () => {
+    // A registered user's call is forwarded with its jwt and isSer:false — it
+    // must stay that user, not become the service.
+    const p = resolvePrincipal({
+      request: requestWith({ 'x-consensus-secret': 'consensus-secret-value' }),
+      cookies: cookiesOf({ jwt: 'x' }),
+      identity: { id: '12' },
+      isSerFlag: false
+    });
+    expect(p).toMatchObject({ kind: 'user', userId: '12' });
   });
 
   it('prefers the meetings principal over a cookie that happens to be present', () => {

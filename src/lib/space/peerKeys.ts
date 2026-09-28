@@ -116,3 +116,33 @@ export async function fetchKemRecipients(userIds: string[]): Promise<{
   }
   return { recipients, missing };
 }
+
+/**
+ * T9a healing input: each member's full device history (revoked devices
+ * included — a lost phone is the proof its user was in an epoch) and their
+ * active KEM-capable devices. Feed to `replica.healEpochGrants`.
+ *
+ * Pre-S3 this trusts the server's key registry for "which devices are this
+ * user's", exactly like fetchKemRecipients does for rotations. Post-S3 the
+ * registry answer must be checked against the cert chain / recovery vouches.
+ */
+export async function fetchHealMembers(
+  userIds: string[]
+): Promise<Array<{ userId: string; devices: string[]; recipients: Array<{ device: string; kemPubSpkiB64: string }> }>> {
+  const out: Array<{ userId: string; devices: string[]; recipients: Array<{ device: string; kemPubSpkiB64: string }> }> = [];
+  for (const userId of userIds) {
+    const res = await fetch(`/api/consent/keys/${encodeURIComponent(userId)}`, { credentials: 'include' });
+    if (!res.ok) continue;
+    const body = await res.json();
+    const keys: Array<{ devicePubB64: string; revokedAt: number | null; kemPubSpkiB64: string | null }> =
+      body?.keys ?? [];
+    out.push({
+      userId,
+      devices: keys.map((k) => k.devicePubB64),
+      recipients: keys
+        .filter((k) => !k.revokedAt && typeof k.kemPubSpkiB64 === 'string' && k.kemPubSpkiB64)
+        .map((k) => ({ device: k.devicePubB64, kemPubSpkiB64: k.kemPubSpkiB64 as string }))
+    });
+  }
+  return out;
+}

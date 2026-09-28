@@ -1601,7 +1601,8 @@ const qids_base = {
 
   // arg: { id, body?, stanceValue?, issueId?, confirmedByAuthor?, __identity }
   // body/issueId: JWT-only (registered owner). stanceValue/confirmedByAuthor: author via service path.
-  // Server enforces ownership for service-path calls (pre-fetch check).
+  // Server enforces authorship on both paths (pre-fetch check in guards.js):
+  // __identity.externalId on the service path, locals.uid on the JWT path.
   'UpdateClause': `
     mutation UpdateClause(
       $id: ID!,

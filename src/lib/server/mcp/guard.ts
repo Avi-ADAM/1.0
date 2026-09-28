@@ -204,7 +204,11 @@ async function checkPolicy(policy: McpToolPolicy, input: any): Promise<any> {
  * refusal is not rejected as malformed output; the inner tool still validates
  * its own result.
  */
-export function wrapMcpTool<T extends { id: string }>(tool: T, policy: McpToolPolicy): T {
+export function wrapMcpTool<T extends { id: string }>(
+  tool: T,
+  policy: McpToolPolicy,
+  annotations?: Record<string, unknown>
+): T {
   const inner = tool as any;
   const bucket = bucketFor(policy);
   const audited = policy.tier !== 'read' && policy.tier !== 'prepare';
@@ -213,6 +217,7 @@ export function wrapMcpTool<T extends { id: string }>(tool: T, policy: McpToolPo
     id: inner.id,
     description: inner.description,
     inputSchema: inner.inputSchema,
+    ...(annotations ? { mcp: { annotations } } : {}),
     execute: async (input: any, context: any) => {
       const started = Date.now();
       const ctx = getMcpContext();

@@ -5,6 +5,7 @@
   import ScreenFrame from '$lib/components/onboard/ScreenFrame.svelte';
   import JourneyStrip from '$lib/components/onboard/JourneyStrip.svelte';
   import Plaque from '$lib/components/onboard/Plaque.svelte';
+  import RecoveryBanner from '$lib/components/recovery/RecoveryBanner.svelte';
   import { t } from '$lib/translations';
 
   let selected = $state(/** @type {'matches' | 'business' | 'supply'} */ ('matches'));
@@ -172,6 +173,11 @@
           'onboard.actions.continue'
         )}{/if}
     </button>
+
+    <!-- T9 guardians: a nudge, not a step (PLAN_T9_SOCIAL_RECOVERY §9). -->
+    <div class="recovery-nudge">
+      <RecoveryBanner />
+    </div>
   </div>
 </ScreenFrame>
 
@@ -243,6 +249,10 @@
     gap: 4px;
     margin-top: 8px;
     flex-wrap: wrap;
+  }
+  .recovery-nudge {
+    width: 100%;
+    margin-top: 6px;
   }
   .go-btn {
     margin-top: 8px;

@@ -218,6 +218,16 @@ export function makePrepareSignupTool(clientIp: string, fetchFn: typeof fetch) {
       'aboutText: who they are, what they do); "order" (they want something made or arranged - pass wishText). ' +
       'You cannot sign, set a password or confirm the email for them, and nothing is created until they do. Give ' +
       'them signupUrl (valid 24h). After they confirm their email they land straight in what you prepared.',
+    // Saves a pending signup (and a preview) that nobody is bound by until they sign.
+    mcp: {
+      annotations: {
+        title: 'Prepare a signup',
+        readOnlyHint: false,
+        destructiveHint: false,
+        idempotentHint: false,
+        openWorldHint: false
+      }
+    },
     inputSchema: z.object({
       name: z.string().min(1).max(80),
       email: z.string().email(),

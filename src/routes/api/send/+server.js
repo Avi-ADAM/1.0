@@ -8,9 +8,10 @@ import { STRAPI_URL } from '$lib/server/strapiUrl.js'
 const ep = STRAPI_URL + "/graphql"
 import { createHash } from 'node:crypto'
 import { isInternalRequest } from '$lib/server/internalSecret.js'
-import { resolvePrincipal } from '$lib/server/authz/principal.js'
+import { resolvePrincipal, isConsensusRequest } from '$lib/server/authz/principal.js'
 import { applyAuthz } from '$lib/server/authz/authorize.js'
 import { runSendGuards, filterSendResponse } from './guards.js'
+import { stampAuthor } from './authorIdentity.js'
 
 function normalizeSecret(value, name) {
 	let normalized = String(value ?? '').replace(/\s+/g, '');
@@ -44,9 +45,6 @@ const CONSENSUS_QIDS = new Set([
 	'ListArguments', 'CreateArgument', 'UpdateArgument', 'ListPlaces',
 	'ListIssues', 'ListClauses', 'CreateIssue', 'CreateClause', 'UpdateClause'
 ]);
-
-/** qids where server injects __identity → author fields before sending to Strapi */
-const IDENTITY_INJECT_QIDS = new Set(['41CreatePosition', 'CreateArgument', 'CreateClause']);
 
 /** qids where arg.support === true triggers server-side idempotent vote (read-then-write) */
 const VOTE_QIDS = new Set(['42UpdatePosition', 'UpdateArgument']);
@@ -89,10 +87,17 @@ export async function POST({ request, cookies, locals }) {
 	}
 
 	// ── Auth flags ───────────────────────────────────────────────────────────
-	// `isSer` grants the service/admin token, so it is honoured only when the
-	// request carries the internal secret (injected by handleFetch for genuine
-	// server-side calls). A client cannot forge it.
-	const isSer = (data.isSer === true) && isInternalRequest(request);
+	// `isSer` grants a service token, so it is honoured only when the request
+	// proves it is server-originated. Two proofs, neither forgeable by a client:
+	//   • the internal secret, injected by handleFetch for this app's own
+	//     server-side calls;
+	//   • the consensus site's shared secret — its charter/guest visitors have
+	//     no jwt, and a separate deployment cannot hold ADMINMONTHER. Only for a
+	//     consensus qid, which then rides CONSENSUS_PUBLIC_TOKEN (see
+	//     getServiceToken), never the admin token.
+	const isConsensusQid = queId && CONSENSUS_QIDS.has(queId);
+	const isSer = (data.isSer === true) &&
+		(isInternalRequest(request) || (Boolean(isConsensusQid) && isConsensusRequest(request)));
 	// Caller identity comes from the signed session token, resolved once per
 	// request in hooks.server.js (src/lib/server/identity.js). It used to be
 	// read straight off the `id` / `un` cookies, which /api/auth writes
@@ -102,17 +107,15 @@ export async function POST({ request, cookies, locals }) {
 	// against another.
 	const idL = locals.uid || undefined;
 	const un = locals.un || undefined;   // username — used as voter-id for JWT path
-	const isConsensusQid = queId && CONSENSUS_QIDS.has(queId);
 
 	// ── Security: validate consensus proxy secret for service calls ──────────
+	// Also covers an internal-secret caller running a consensus qid: the
+	// consensus token is only ever spent on behalf of the consensus site.
 	if (isSer && isConsensusQid) {
-		const consensusProxySecret = normalizeSecret(CONSENSUS_PROXY_SECRET, 'CONSENSUS_PROXY_SECRET');
-
-		if (!consensusProxySecret) {
+		if (!normalizeSecret(CONSENSUS_PROXY_SECRET, 'CONSENSUS_PROXY_SECRET')) {
 			throw error(500, 'Server misconfiguration: CONSENSUS_PROXY_SECRET not set');
 		}
-		const incoming = request.headers.get('x-consensus-secret');
-		if (incoming !== consensusProxySecret) {
+		if (!isConsensusRequest(request)) {
 			throw error(401, 'Unauthorized: Invalid consensus proxy secret');
 		}
 	}
@@ -170,14 +173,10 @@ export async function POST({ request, cookies, locals }) {
 		}
 	}
 
-	// ── Inject identity fields for author-creation qids ─────────────────────
-	// Server uses __identity as the authoritative source — never trust client-sent author fields.
-	if (isSer && identity && IDENTITY_INJECT_QIDS.has(queId)) {
-		if (identity.email) variablesObject.authorEmail = identity.email;
-		if (identity.externalId) variablesObject.authorExternalId = identity.externalId;
-		if (identity.type) variablesObject.authorType = identity.type;
-		if (identity.name) variablesObject.authorName = identity.name;
-	}
+	// ── Stamp the author on consensus creates ────────────────────────────────
+	// __identity on the service path, the verified session on the JWT path;
+	// client-sent author fields are never trusted. See authorIdentity.js.
+	stampAuthor({ queId, query, variablesObject, isSer, identity, callerId: idL, username: un });
 
 	const bearer1 = 'Bearer ' + jw;
 

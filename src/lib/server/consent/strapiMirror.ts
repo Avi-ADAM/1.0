@@ -160,8 +160,14 @@ function rowToKey(row: unknown): StoredPubKey | undefined {
   return payload && typeof payload === 'object' ? (payload as StoredPubKey) : undefined;
 }
 
+// The id a row is ADDRESSED by in `/api/<collection>/:id`. v4 routes take the
+// numeric id; v5 routes take `documentId` and ignore the numeric one
+// (PLAN_STRAPI5_UPGRADE §3). A v4 row has no documentId, so preferring it is
+// a no-op today and keeps revocation/reset/recovery writes (putKey → PUT)
+// working the day the backend flips — the adapter covers GraphQL, not this.
 function rowId(row: unknown): string | number | undefined {
-  return (row as { id?: string | number } | undefined)?.id;
+  const r = row as { id?: string | number; documentId?: string } | undefined;
+  return r?.documentId ?? r?.id;
 }
 
 // devicePubB64 is unique — v4 has no upsert, so a re-registered device 400s on

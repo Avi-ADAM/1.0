@@ -59,17 +59,22 @@ import { resolvePeerKey } from './peerKeys';
 import { ensureKemKeypair } from './e2e/kem';
 import {
   epochCandidates,
-  unwrapEpochKey,
+  unwrapEpochKeyWithGrants,
   detectRotateRaces,
   generateEpochKeyRaw,
   buildEpochPredicate,
+  buildEpochGrantPredicate,
   isEpochRotateEvent,
+  isKeyDistributionEvent,
+  coveredDevices,
+  planHealGrants,
   type EpochRecipient,
+  type HealMember,
   type EpochRotatePredicate,
   type RotateRace
 } from './e2e/epoch';
 import { sealEvent, openSealed, type SealedEnvelope } from './e2e/seal';
-import { validateEpochRotate } from './rotateGuard';
+import { validateKeyEvent, type KeyGuardContext } from './rotateGuard';
 
 export function spaceSyncEnabled(): boolean {
   return browser && localStorage.getItem('SPACE_SYNC_ENABLED') === '1';
@@ -87,18 +92,28 @@ export type SpaceReplica = ReturnType<typeof createSpaceReplica>;
 
 const replicas = new Map<string, SpaceReplica>();
 
+export type SpaceReplicaOptions = {
+  /**
+   * What the key guard cannot read from this space's own events — for a
+   * `vault:<id>` space, the parent rikma's active members. Read on every
+   * judgement, so it can follow the project replica as it syncs. A vault
+   * without it rejects every rotate/grant (fail closed).
+   */
+  guardContext?: () => KeyGuardContext;
+};
+
 /** One replica per spaceId per tab; callers share instances. */
-export function openSpace(spaceId: string): SpaceReplica {
+export function openSpace(spaceId: string, opts: SpaceReplicaOptions = {}): SpaceReplica {
   if (!isValidSpaceId(spaceId)) throw new Error(`bad spaceId: ${spaceId}`);
   let r = replicas.get(spaceId);
   if (!r) {
-    r = createSpaceReplica(spaceId);
+    r = createSpaceReplica(spaceId, opts);
     replicas.set(spaceId, r);
   }
   return r;
 }
 
-export function createSpaceReplica(spaceId: string) {
+export function createSpaceReplica(spaceId: string, opts: SpaceReplicaOptions = {}) {
   const state = $state({
     status: 'idle' as SpaceStatus,
     eventsById: new Map<string, ConsentEvent>(),
@@ -141,9 +156,17 @@ export function createSpaceReplica(spaceId: string) {
     const identity = await loadIdentity();
     if (!identity) return null;
     const kem = await ensureKemKeypair();
-    const raw = await unwrapEpochKey(rotateEv, identity.devicePubB64, kem.privateKey);
+    // T9a: the rotate's own wraps, else any epoch.grant that shared it with
+    // this device. Only hits are cached — a grant can arrive later.
+    const raw = await unwrapEpochKeyWithGrants(
+      state.eventsById.values(), rotateEv, identity.devicePubB64, kem.privateKey
+    );
     if (raw) keysByRotateId.set(rotateEv.id, raw);
     return raw;
+  }
+
+  function guardContext(): KeyGuardContext | undefined {
+    return opts.guardContext?.();
   }
 
   /**
@@ -193,10 +216,10 @@ export function createSpaceReplica(spaceId: string) {
   async function ingestAndLink(raw: unknown): Promise<ConsentEvent | null> {
     const res = await ingestEvent(raw, resolvePeerKey);
     if (!res.ok) return null;
-    // T5: an unauthorized epoch.rotate is rejected like a bad signature —
-    // not linked to the space, not applied. Membership + continuity are
-    // judged against the replica's current view of the space.
-    const guard = validateEpochRotate(spaceId, state.eventsById.values(), res.event);
+    // T5/T9a: an unauthorized epoch.rotate or epoch.grant is rejected like a
+    // bad signature — not linked to the space, not applied. Membership +
+    // continuity are judged against the replica's current view of the space.
+    const guard = validateKeyEvent(spaceId, state.eventsById.values(), res.event, guardContext());
     if (!guard.ok) return null;
     await idbSpaceLink(spaceId, res.event.id);
     addToState(res.event);
@@ -230,11 +253,25 @@ export function createSpaceReplica(spaceId: string) {
         }
 
         // Pass 1 — plaintext (includes epoch.rotate key distribution).
+        let newKeyMaterial = false;
         for (const env of page.events) {
-          if (env.event) await ingestAndLink(env.event);
+          if (!env.event) continue;
+          const known = state.eventsById.has(env.event.id);
+          const ev = await ingestAndLink(env.event);
+          if (ev && !known && isKeyDistributionEvent(ev)) newKeyMaterial = true;
+        }
+        // A rotate or grant that arrives AFTER the envelopes it unlocks (a new
+        // member, a recovered device — T9a) would otherwise be useless: the
+        // cursor already moved past those envelopes, and pass 2 below only
+        // sees this page. New key material ⇒ walk the sealed history again
+        // from 0; id dedupe makes the already-open ones free.
+        let sealedPage = page.events;
+        if (newKeyMaterial && since > 0) {
+          const full = await pullEvents(spaceId, 0);
+          if (full.ok) sealedPage = full.data.events;
         }
         // Pass 2 — sealed, now that any new rotate events are ingested.
-        for (const env of page.events) {
+        for (const env of sealedPage) {
           if (!env.sealed) continue;
           const opened = await openSealedEnvelope(env.sealed);
           if (opened) await ingestAndLink(opened);
@@ -245,10 +282,10 @@ export function createSpaceReplica(spaceId: string) {
         await idbPutCursor({ spaceId, epoch: page.epoch, seq: page.latestSeq });
 
         // Push what the relay lacks. In an E2E space only key-distribution
-        // events may travel in plaintext — everything else went (or must go)
-        // through publishSealed, so pushing it here would leak it.
+        // events (rotate, grant) may travel in plaintext — everything else
+        // went (or must go) through publishSealed, so pushing it would leak it.
         const pushable = isE2E()
-          ? [...state.eventsById.values()].filter(isEpochRotateEvent)
+          ? [...state.eventsById.values()].filter(isKeyDistributionEvent)
           : [...state.eventsById.values()];
         const missing = computeDiff(pushable, page.heads);
         if (missing.length > 0) {
@@ -307,16 +344,14 @@ export function createSpaceReplica(spaceId: string) {
       parents: partial.parents ?? computeHeads(state.eventsById.values())
     });
 
-    if (isE2E() && event.action !== ACTIONS.epochRotate) {
+    if (isE2E() && !isKeyDistributionEvent(event)) {
       return { ok: false, event, reason: 'space_is_e2e_use_publishSealed' };
     }
 
-    // T5: hold ourselves to the same rotate rules we enforce on peers —
-    // publishing an unauthorized rotate would just get dropped by everyone.
-    if (event.action === ACTIONS.epochRotate) {
-      const guard = validateEpochRotate(spaceId, state.eventsById.values(), event);
-      if (!guard.ok) return { ok: false, event, reason: guard.reason };
-    }
+    // T5/T9a: hold ourselves to the same key rules we enforce on peers —
+    // publishing an unauthorized rotate/grant would just get dropped by everyone.
+    const guard = validateKeyEvent(spaceId, state.eventsById.values(), event, guardContext());
+    if (!guard.ok) return { ok: false, event, reason: guard.reason };
 
     // Local-first: our own signed event is applied before any network I/O.
     await idbAdd('events', event);
@@ -334,10 +369,19 @@ export function createSpaceReplica(spaceId: string) {
     return { ok: true, event };
   }
 
-  /** E2E publish: sign inner → apply locally → seal → ship ciphertext. */
+  /**
+   * E2E publish: sign inner → apply locally → seal → ship ciphertext.
+   *
+   * `atomic`: ship FIRST and apply only once the relay took it. Sealed events
+   * are never re-offered by sync() (only key-distribution events travel in
+   * plaintext there), so a local-first write whose push failed would live on
+   * this device alone — for a vault secret that is a silent divergence
+   * between what this member sees and what everyone else does.
+   */
   async function publishSealed(
     userId: string,
-    partial: Omit<SignableEvent, 'actor' | 'parents'> & { parents?: string[] }
+    partial: Omit<SignableEvent, 'actor' | 'parents'> & { parents?: string[] },
+    opts: { atomic?: boolean } = {}
   ): Promise<{ ok: boolean; event: ConsentEvent; reason?: string }> {
     const identity = await ensureIdentity(userId);
     const event = await buildAndSignEvent(identity, {
@@ -350,15 +394,19 @@ export function createSpaceReplica(spaceId: string) {
     const raw = await ensureEpochKeyRaw(state.epoch);
     if (!raw) return { ok: false, event, reason: 'no_epoch_key_for_device' };
 
-    await idbAdd('events', event);
-    await idbSpaceLink(spaceId, event.id);
-    addToState(event);
+    const applyLocally = async () => {
+      await idbAdd('events', event);
+      await idbSpaceLink(spaceId, event.id);
+      addToState(event);
+    };
+    if (!opts.atomic) await applyLocally();
 
     const sealed = await sealEvent(identity, raw, spaceId, state.epoch, event);
     const pushed = await pushSealed(spaceId, [sealed]);
     if (!pushed.ok) return { ok: false, event, reason: pushed.reason };
     const mine = pushed.data.results.find((r) => r.id === sealed.id);
     if (mine && !mine.ok) return { ok: false, event, reason: mine.reason };
+    if (opts.atomic) await applyLocally();
     return { ok: true, event };
   }
 
@@ -388,6 +436,99 @@ export function createSpaceReplica(spaceId: string) {
     keysByRotateId.set(res.event.id, rawKey);
     // addToState (inside publish) already bumped state.epoch via the event.
     return { ok: res.ok, epoch: nextEpoch, reason: res.reason };
+  }
+
+  /**
+   * T9a — share keys this device already holds with more devices, without
+   * rotating: a new member, a newly paired device, or a device recovered
+   * through guardians (T9b). One epoch.grant per rotate event.
+   *
+   * `scope: 'current'` shares only the current epoch — the documented
+   * semantic for a NEW MEMBER (joining grants the present epoch's history).
+   * `scope: 'all'` shares every epoch this device can read — for a user's
+   * OWN new device, which should see the history that user was part of.
+   * Rotates this device cannot read are skipped; `skipped` counts them so the
+   * caller can ask another member to complete the grant.
+   */
+  async function grantEpochKeys(
+    userId: string,
+    recipients: EpochRecipient[],
+    scope: 'current' | 'all' = 'current'
+  ): Promise<{ ok: boolean; granted: number; skipped: number; reason?: string }> {
+    if (!isE2E()) return { ok: false, granted: 0, skipped: 0, reason: 'no_epoch_rotate_first' };
+    if (recipients.length === 0) return { ok: true, granted: 0, skipped: 0 };
+
+    const byEpoch = epochCandidates(state.eventsById.values());
+    const epochs = scope === 'current' ? [state.epoch] : [...byEpoch.keys()].sort((a, b) => a - b);
+    let granted = 0;
+    let skipped = 0;
+    for (const epoch of epochs) {
+      // Every candidate, not just the winner: race-window envelopes were
+      // sealed under the losers' keys and must stay readable (T11).
+      for (const rotateEv of byEpoch.get(epoch) ?? []) {
+        // Covered by the rotate OR an earlier grant — granting twice is noise.
+        const covered = coveredDevices(state.eventsById.values(), rotateEv);
+        const todo = recipients.filter((r) => !covered.has(r.device));
+        if (todo.length === 0) continue;
+        const raw = await keyForRotate(rotateEv);
+        if (!raw) {
+          skipped++;
+          continue;
+        }
+        const predicate = await buildEpochGrantPredicate(rotateEv, raw, todo);
+        const res = await publish(userId, {
+          action: ACTIONS.epochGrant,
+          subject: { type: 'space', id: spaceId },
+          predicate: predicate as unknown as Record<string, unknown>
+        });
+        if (!res.ok) return { ok: false, granted, skipped, reason: res.reason };
+        granted++;
+      }
+    }
+    return { ok: true, granted, skipped };
+  }
+
+  /**
+   * T9a healing (plan §8 steps 7–8): hand every member's newer devices the
+   * epoch keys that member could already read — a device recovered through
+   * guardians, a device paired later. `members` comes from the key registry
+   * (peerKeys.fetchHealMembers). Idempotent: covered devices are skipped, so
+   * calling it on every open of an E2E space is cheap and converges.
+   * Rotates this device cannot read are counted in `skipped`; another member
+   * who can will close them.
+   */
+  async function healEpochGrants(
+    userId: string,
+    members: HealMember[]
+  ): Promise<{ ok: boolean; granted: number; skipped: number; reason?: string }> {
+    if (!isE2E()) return { ok: true, granted: 0, skipped: 0 };
+    const plan = planHealGrants(state.eventsById.values(), members);
+    let granted = 0;
+    let skipped = 0;
+    for (const [rotateId, todo] of plan) {
+      const rotateEv = state.eventsById.get(rotateId);
+      if (!rotateEv) continue;
+      const raw = await keyForRotate(rotateEv);
+      if (!raw) {
+        skipped++;
+        continue;
+      }
+      const predicate = await buildEpochGrantPredicate(rotateEv, raw, todo);
+      const res = await publish(userId, {
+        action: ACTIONS.epochGrant,
+        subject: { type: 'space', id: spaceId },
+        predicate: predicate as unknown as Record<string, unknown>
+      });
+      if (!res.ok) return { ok: false, granted, skipped, reason: res.reason };
+      granted++;
+    }
+    return { ok: true, granted, skipped };
+  }
+
+  /** Can this device read (and seal under) the current epoch? False on a plaintext space. */
+  async function canReadCurrentEpoch(): Promise<boolean> {
+    if (!isE2E()) return false;
+    return (await ensureEpochKeyRaw(state.epoch)) !== null;
   }
 
   /** T11 — the rotate races visible in this replica (epochs with >1 rotate). */
@@ -535,6 +676,9 @@ export function createSpaceReplica(spaceId: string) {
     publish,
     publishSealed,
     rotateEpoch,
+    grantEpochKeys,
+    healEpochGrants,
+    canReadCurrentEpoch,
     rotateRaces,
     needsReRotate,
     pollAndSyncIfBehind,

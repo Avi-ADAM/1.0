@@ -1,7 +1,9 @@
 # שדרוג Strapi 4 → 5: האם צריך, איך, כמה, ומה יכול להשתבש
 
-> **סטטוס**: טיוטה לדיון, 2026-09-25. נמצאת זמנית בשורש הריפו (לא ב-`docs/`),
-> כי סוכן אחר מסווג כרגע את `docs/`. להעביר ידנית כשמתאים.
+> **סטטוס**: טיוטה לדיון, 2026-09-25. P0 מוכן ב-`1.0b` וממתין ל-commit ול-deploy.
+> הקובץ הועבר מהשורש ל-`docs/inprogress/` ב-27.9.2026.
+> **27.9.2026 — קשר ל-T9 ולכספת:** ראו §8.1. שניהם נבנו בלי collection חדש, ותיקון
+> ה-`documentId` במראת המפתחות כבר בוצע.
 >
 > **קהל**: מקבל ההחלטה, והסוכנים שיבצעו. כל מספר כאן נמדד בריפו ב-25.9.2026,
 > חוץ ממה שמסומן **[לאמת]**. אלה הנחות שבודקים ב-spikes של P1.
@@ -107,6 +109,11 @@
   `publishedAt` בעצמה (217 מופעים ב-`src/lib/server`). ⇒ **D&P לא משמש כפיצ'ר.**
   הוא רק "מס" על כל create.
 - כ-11 קריאות REST ישירות ל-`STRAPI_URL/api/…`, וכ-28 קבצים שנוגעים ב-`/api/auth|users|upload`.
+  **ביניהן המראות של השכבה המבוזרת** (`server/consent/strapiMirror.ts`,
+  `server/relay/sealedMirror.ts`). הן כותבות ל-`consent-events`, `user-keys`
+  ו-`sealed-envelopes` ב-REST בצורת v4. ה-PUT של `user-keys/:id` הוא הנתיב של
+  ביטול מכשיר, reset, מחאה ובעתיד שחזור (T9). **המתאם של P4 לא מכסה אותן, כי הוא
+  GraphQL.** ראו §8.1.
 
 ### צרכנים חיצוניים ל-Strapi
 - `magik-meetings`: fallback ישיר ל-`/graphql` ב-`src/lib/send/sendTo.svelte`.
@@ -230,6 +237,7 @@ client ──qid──► /api/send ──v4 GraphQL──► fetch-patch ──
 | S7 | פלאגינים: האם io עדיין בשימוש (הזמן-אמת עבר ל-`socket-server`)? fcm? | רשימה של מה משודרג ומה מוסר |
 | S8 | צרכנים חיצוניים: לוגים של nginx ל-`/graphql` לפי מקור; magik-meetings; consensus1lev1 | רשימת צרכנים ותכנית לכל אחד |
 | S9 | גרסת Postgres ב-Aiven; תוקף JWT קיים אחרי השדרוג | כן או לא |
+| S10 | **REST של המראות** מול v5: `filters[x][$eq]`, `pagination[limit]=-1` (maxLimit), יצירה כפולה על שדה unique (האם עדיין 400 עם "must be unique"?), `PUT /api/user-keys/:documentId` | רשימת תיקונים ל-`strapiMirror.ts` ול-`sealedMirror.ts`, או אישור שאין צורך |
 
 - **סוכן**: 8–10 סשנים, רובם במקביל. **✋ שער go/no-go** על בסיס מסמך ממצאים.
 
@@ -259,6 +267,8 @@ client ──qid──► /api/send ──v4 GraphQL──► fetch-patch ──
 - חיבור ב-fetch-patch של `hooks.server.js` מאחורי `STRAPI_API=5`. כשהדגל כבוי
   אין שום שינוי התנהגות.
 - REST: `/users/me`, auth ו-upload עוברים דרך header v4 או reshape.
+- REST של המראות (`consent-events`, `user-keys`, `sealed-envelopes`) לפי S10.
+  `rowId` כבר מעדיף `documentId` (27.9.2026), ו-`rowPayload` כבר סובלני לשורה שטוחה.
 - טסטים: golden לכל אחד מ-529 ה-qids (צורת קלט ופלט), property-based
   (fast-check) על `reshape`, ולוג שנכשל בקול על כל צורה לא מוכרת.
 - **סוכן**: 4–6 סשנים. זה הלב, ורוב ההשקעה צריכה להיות כאן. אפשר לחלק את ה-qids
@@ -270,6 +280,9 @@ client ──qid──► /api/send ──v4 GraphQL──► fetch-patch ──
   ו-timestamps של מיגרציה).
 - כתיבות: מריצים כל flow על שני ה-forks ומשווים את הקריאות שאחריו. בנוסף, טסט
   שמוודא ש**קבוצת ה-`id` המספריים זהה בדיוק** לפני המיגרציה ואחריה, בכל טבלה.
+- **המראות המבוזרות**: כל `payload` ב-`consent-event`, `user-key` ו-`sealed-envelope`
+  יוצא זהה בבייטים לפני ואחרי. אלה אירועים חתומים, ושינוי של תו אחד שובר חתימה.
+  flow מלא של reset ומחאה (PUT על `user-keys`) רץ על fork B.
 - `npm test`, `npm run check`, ו-e2e בדפדפן עם `claude_user_1/2` על ה-flows המרכזיים
   (lev, moach, חלוקה, מכירה, צ'אט, onboarding, concierge).
 - p95 latency מול v4. תקציב: עד +15% (המתאם ו-idmap).
@@ -353,6 +366,27 @@ i18n, המיגרציה עצמה), החלטות לגבי drafts ו-locales קיי
   שה-`id` המספרי של כל project ו-user יישאר זהה לתמיד. R2 הוא לא רק באג UI,
   אלא הפרה של אינווריאנט קריפטוגרפי.
 
+### 8.1 T9 (שחזור חברתי) והכספת — מה נבנה כך שלא יתנגש בשדרוג
+
+[PLAN_T9_SOCIAL_RECOVERY.md](./PLAN_T9_SOCIAL_RECOVERY.md) והכספת
+([PLAN_RIKMA_SHARED_INFO.md](./PLAN_RIKMA_SHARED_INFO.md) §3.2, space נפרד `vault:<pid>`)
+מתקדמים במקביל לשדרוג. כדי שזה יהיה בטוח:
+
+1. **אפס collections חדשים.** guardian sets, התחייבויות ו-`epoch.grant` הם
+   `consent-event`, ופריטי הכספת הם `sealed-envelope`. לכן אין התנגשות עם הקפאת
+   הסכמה ב-`1.0b` (R9) ואין עבודה נוספת למתאם.
+2. **יותר צרכנים ל-R2.** ה-id המספרי מופיע עכשיו גם ברשימות אפוטרופסים חתומות
+   (`guardians: ['42']`), ב-`subject.id` של התחייבות, וב-`vault:42`. ה-P5 מכסה את
+   זה דרך בדיקת ה-payloads (למעלה).
+3. **REST של המראות** (S10). התיקון היחיד שבוודאות נחוץ כבר נעשה: `rowId` מעדיף
+   `documentId`. בלעדיו ביטול מכשיר, reset ושחזור היו נשברים ביום המעבר בלי שום
+   שגיאה, כי המראה best-effort ונופלת בשקט ל-memory-only.
+4. **תזמון.** לא מדליקים `RECOVERY_ENFORCE` ולא פותחים את הכספת למשתמשים אמיתיים
+   בשבוע ה-cutover (P6), מאותה סיבה כמו genesis ו-S2b.
+5. **כיוון ההשפעה:** T9 **לא** חוסם את השדרוג, והשדרוג לא חוסם את הליבה של T9.
+   החיווט לשרת (נתיב `recovery` ב-`keys/register`) נוגע רק ב-`consentStore`,
+   שנשען על המראה, ולכן כדאי לסגור את S10 לפני שמדליקים אותו.
+
 ---
 
 ## 9. החלטות שנדרשות ממך
@@ -376,6 +410,7 @@ i18n, המיגרציה עצמה), החלטות לגבי drafts ו-locales קיי
 - האם ל-4.20 → 4.26.2 יש מיגרציות DB (משפיע על ה-rollback של P0).
 - גרסת Postgres ב-Aiven.
 - לאיזה Strapi `consensus1lev1` מתחבר.
+- REST של v5 למראות: `pagination[limit]=-1`, שגיאת unique, PUT לפי `documentId` (S10).
 
 ---
 
@@ -389,5 +424,7 @@ i18n, המיגרציה עצמה), החלטות לגבי drafts ו-locales קיי
 - [compat mode relations differ, #22322](https://github.com/strapi/strapi/issues/22322)
 - [media relations by documentId, #25060](https://github.com/strapi/strapi/issues/25060)
 - [Strapi 5 CLI installation requirements (Node 22/24/26, PG ≥14)](https://docs.strapi.io/cms/installation/cli)
-- בריפו: `docs/PLAN_serverless_p2p_data.md` §1–2, `docs/HANDOFF_DISTRIBUTED_DB.md` §1, §3,
-  `docs/PLAN_action_migration_vs_p2p.md`
+- בריפו: [PLAN_serverless_p2p_data.md](./PLAN_serverless_p2p_data.md) §1–2,
+  [HANDOFF_DISTRIBUTED_DB.md](./HANDOFF_DISTRIBUTED_DB.md) §1, §3,
+  [PLAN_action_migration_vs_p2p.md](./PLAN_action_migration_vs_p2p.md),
+  [PLAN_T9_SOCIAL_RECOVERY.md](./PLAN_T9_SOCIAL_RECOVERY.md)

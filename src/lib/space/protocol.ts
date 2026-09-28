@@ -27,6 +27,17 @@ export function spaceIdForProject(projectId: string): string {
   return `project:${projectId}`;
 }
 
+/**
+ * A rikma's password vault (PLAN_RIKMA_SHARED_INFO §3.2) — its OWN space,
+ * never the project space. A space turns E2E the moment it holds an
+ * epoch.rotate, and from then on refuses plaintext; opening the vault inside
+ * `project:<id>` would silently take the rikma's whole signed log dark with
+ * it. Membership is the parent rikma's (see rotateGuard).
+ */
+export function spaceIdForVault(projectId: string): string {
+  return `vault:${projectId}`;
+}
+
 /** Space ids travel in URLs and IDB keys — keep them boring. */
 export const SPACE_ID_RE = /^[A-Za-z0-9:_-]{1,80}$/;
 

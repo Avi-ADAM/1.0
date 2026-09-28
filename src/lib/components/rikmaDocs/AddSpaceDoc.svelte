@@ -181,13 +181,13 @@
 
   {#if kind === 'link'}
     <label class="field">
-      <span class="label">{$t('rikmaDocs.add.url')} <em>*</em></span>
+      <span class="sd-label">{$t('rikmaDocs.add.url')} <em>*</em></span>
       <input type="url" bind:value={url} placeholder="https://…" inputmode="url" dir="ltr" required />
       <small class="hint">{$t('rikmaDocs.add.urlHint')}</small>
     </label>
   {:else}
     <label class="field">
-      <span class="label">{$t('rikmaDocs.add.file')} <em>*</em></span>
+      <span class="sd-label">{$t('rikmaDocs.add.file')} <em>*</em></span>
       <span class="drop" class:has={picked}>
         <input type="file" bind:files {accept} required />
         <span class="drop-text">
@@ -210,23 +210,27 @@
 
   <div class="grid">
     <label class="field">
-      <span class="label">{$t('rikmaDocs.add.name')}</span>
-      <input type="text" bind:value={name} placeholder={picked?.name ?? ''} />
+      <span class="sd-label">{$t('rikmaDocs.add.name')}{#if kind === 'link'} <em>*</em>{/if}</span>
+      <input type="text" bind:value={name} placeholder={picked?.name ?? ''} required={kind === 'link'} />
+      {#if kind !== 'link'}
+        <small class="hint">{$t('rikmaDocs.add.nameHint')}</small>
+      {/if}
     </label>
     <label class="field">
-      <span class="label">{$t('rikmaDocs.add.folder')}</span>
+      <span class="sd-label">{$t('rikmaDocs.add.folder')}</span>
       <input
         type="text"
         bind:value={folder}
         list="rikma-docs-folders"
         placeholder={$t('rikmaDocs.add.folderPlaceholder')}
       />
+      <small class="hint">{$t('rikmaDocs.add.folderHint')}</small>
     </label>
   </div>
 
   <label class="field">
-    <span class="label">{$t('rikmaDocs.add.note')}</span>
-    <textarea bind:value={note} rows="2"></textarea>
+    <span class="sd-label">{$t('rikmaDocs.add.note')}</span>
+    <textarea bind:value={note} rows="2" placeholder={$t('rikmaDocs.add.notePlaceholder')}></textarea>
   </label>
 
   {#if busy && kind !== 'link' && upload.mode === 'direct'}
@@ -317,12 +321,12 @@
     flex-direction: column;
     gap: 0.3rem;
   }
-  .label {
+  .sd-label {
     font-size: 0.85rem;
     font-weight: 700;
     color: var(--surface-ink);
   }
-  .label em {
+  .sd-label em {
     color: var(--gold);
     font-style: normal;
   }

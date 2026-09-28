@@ -3,8 +3,9 @@ import { algoParams } from '$lib/crypto/algorithm';
 import { verifySignedObject, type PubKeyResolver } from '$lib/crypto/verify';
 import type { ConsentEvent } from '$lib/consent/event';
 import { hasCommitments, verifyCommitments } from '$lib/consent/commitment';
-import { consentStore } from './store';
+import { consentStore, type StoredPubKey } from './store';
 import { b64urlDecode } from '$lib/crypto/b64';
+import { setSignerAcceptable } from '$lib/consent/recovery';
 
 // SvelteKit server runs in Node; ensure crypto.subtle is available globally.
 // (Node 18+ exposes it; on older versions we'd fall back to webcrypto.subtle.)
@@ -18,7 +19,21 @@ export const resolveFromStore: PubKeyResolver = async (actor, devicePubB64) => {
   const stored = await consentStore.getKey(actor, devicePubB64);
   if (!stored) return null;
   if (stored.revokedAt) return null;
+  return importStoredKey(stored);
+};
 
+/**
+ * T9b — a guardian set outlives a LOST device but not a distrusted one
+ * (`setSignerAcceptable`): a key revoked by a chain reset or a completed
+ * recovery still signs for the set it signed while it was held.
+ */
+export const resolveSetSignerFromStore: PubKeyResolver = async (actor, devicePubB64) => {
+  const stored = await consentStore.getKey(actor, devicePubB64);
+  if (!stored || !setSignerAcceptable(stored)) return null;
+  return importStoredKey(stored);
+};
+
+async function importStoredKey(stored: StoredPubKey) {
   const spkiBytes = b64urlDecode(stored.pubSpkiB64);
   const params = algoParams(stored.algo) as AlgorithmIdentifier;
   const buf = spkiBytes.buffer.slice(
@@ -27,7 +42,7 @@ export const resolveFromStore: PubKeyResolver = async (actor, devicePubB64) => {
   ) as ArrayBuffer;
   const key = await subtle.importKey('spki', buf, params, true, ['verify']);
   return { key, algo: stored.algo };
-};
+}
 
 export async function verifyConsentEvent(ev: ConsentEvent) {
   const sig = await verifySignedObject(ev, resolveFromStore);

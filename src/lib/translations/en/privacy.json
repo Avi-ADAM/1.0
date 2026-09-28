@@ -1,0 +1,93 @@
+{
+  "meta": {
+    "title": "Privacy policy | 1lev1",
+    "description": "What personal information 1lev1 collects, what it is used for, who sees it, and how to see, correct or delete yours - including when you connect an AI assistant."
+  },
+  "hero": {
+    "eyebrow": "Privacy policy",
+    "title": "Your information, and what we do with it",
+    "updated": "Last updated: September 27, 2026",
+    "lede": "1lev1 is built on consent between partners. The same rule applies to your information: it is used to run your partnerships, it is shown to the people you work with, and it is not sold."
+  },
+  "short": {
+    "title": "In short",
+    "li1": "We collect what you give us to run your rikmas, plus the technical minimum to keep the service working and safe.",
+    "li2": "Your rikma partners see what a partnership needs: your name, profile, contributions, hours, shares, votes and messages in that rikma.",
+    "li3": "We do not sell personal information and we do not use it for advertising.",
+    "li4": "An AI assistant you connect acts as you, only with your permissions, and you can disconnect it at any time.",
+    "li5": "You can ask to see, correct, export or delete your information: notifications@1lev1.com."
+  },
+  "who": {
+    "title": "Who we are",
+    "p1": "1lev1 (1lev1.com) is a platform for consent-based partnerships, called rikmas. This policy covers the website, its apps, the public API and the 1lev1 connector for AI assistants (MCP).",
+    "p2": "Questions about this policy or your information go to notifications@1lev1.com."
+  },
+  "collect": {
+    "title": "What we collect",
+    "li1": "Account information: name, username, email, password (never stored in readable form), country and language.",
+    "li2": "Your profile, as far as you fill it in: photo, skills, roles, ways of working, values, resources you own, and a short bio.",
+    "li3": "What you create on the platform: rikmas, missions, tasks, resources, products, votes, conversation messages, wishes, and files you upload to a rikma's library.",
+    "li4": "Work and money records: hours you log with a timer, their approvals, sales, profit splits and shares. These are records you keep together with your partners.",
+    "li5": "Technical data: IP address, browser and device type, and server logs. Page visits are counted with aggregate analytics that do not build a profile of you.",
+    "li6": "If you turn them on: a push notification token, and the public keys of devices you pair with your account."
+  },
+  "agents": {
+    "title": "AI assistants and the API",
+    "p1": "You can connect an AI assistant, such as Claude, to your account through the 1lev1 connector or an API key. This is what happens when you do:",
+    "li1": "The assistant acts as you, with your account's permissions, narrowed by the key's scope if you limited it. It sees what you could see on the site - no more.",
+    "li2": "We receive the tool calls the assistant makes and what it sends in them. We do not receive the rest of your conversation with it.",
+    "li3": "For every change, AI run and refused call we keep an audit line: which key, which user, which tool, which rikma or mission, the outcome and the duration. Never the contents of the call.",
+    "li4": "The assistant cannot approve votes, profit splits, sales or proposals for you. Anything that lands work, money or an obligation on another member still waits for that member.",
+    "li5": "You can disconnect at any time: Settings, API keys. The key stops working immediately.",
+    "p2": "What the AI provider does with your conversation is governed by that provider's own privacy policy, not this one."
+  },
+  "use": {
+    "title": "What we use it for",
+    "li1": "Running the platform: showing your rikmas, computing shares, carrying consent processes to the end, and sending the notifications and emails you asked for.",
+    "li2": "Suggesting missions and resources that match your skills. These matches are computed on our servers.",
+    "li3": "Translation: text that members wrote may be machine-translated for readers of other languages. A translation is always labelled as one, and the original is one tap away.",
+    "li4": "AI features: when you use planning, the concierge, the assistant or translation, the relevant text is sent to an AI model provider to produce the result.",
+    "li5": "Security: preventing abuse, rate limits, and investigating errors.",
+    "p1": "We do not sell personal information, we do not use it for advertising, and we do not let the providers below use it for their own purposes."
+  },
+  "share": {
+    "title": "Who sees it",
+    "li1": "Your partners in each rikma see what that rikma needs: your name and profile, your contributions, hours, shares, votes and messages there.",
+    "li2": "Public pages - rikma pages, open missions and resources, public profiles - can be seen by anyone, including search engines. What appears there is what you or your rikma chose to publish.",
+    "li3": "Service providers that process information on our behalf: hosting (Vercel, and our own servers for the database), email delivery (Zoho), push notifications (Google Firebase Cloud Messaging), AI models (Google Gemini, and in some features Groq or OpenAI), and aggregate site analytics (Vercel Analytics).",
+    "p1": "Some of these providers process information outside your country. We use them only under terms that protect it."
+  },
+  "cookies": {
+    "title": "Cookies and local storage",
+    "p1": "We use the cookies the service needs: a secure sign-in token, your language and country, and the steps of signup. We do not use advertising cookies or third-party tracking cookies.",
+    "p2": "Some preferences, such as a view mode or an unsaved draft, are kept in your browser's local storage and never leave it."
+  },
+  "keep": {
+    "title": "How long we keep it",
+    "p1": "We keep your information as long as your account is active.",
+    "p2": "Records that belong to a partnership - hours, sales, profit splits, votes - are also your partners' records, and their shares are computed from them. After you leave or delete your account they may remain in the rikma's history. On request we replace your name there with an anonymous label.",
+    "p3": "Server logs are kept for a limited period and then deleted."
+  },
+  "security": {
+    "title": "Security",
+    "p1": "All traffic is encrypted (HTTPS). Passwords and API keys are stored only in hashed form. The sign-in token is not readable by scripts on the page, and the database accepts requests only from our own servers.",
+    "p2": "No system is perfectly secure. If a breach affects your information, we will tell you."
+  },
+  "rights": {
+    "title": "Your choices and rights",
+    "li1": "See and correct most of your information yourself, on your profile and settings pages.",
+    "li2": "Ask for a copy of your information, or for it to be corrected or deleted.",
+    "li3": "Disconnect AI assistants and revoke API keys at any time.",
+    "li4": "Turn off notifications and emails you do not want.",
+    "p1": "Write to notifications@1lev1.com and we will answer within 30 days."
+  },
+  "changes": {
+    "title": "Changes to this policy",
+    "p1": "When we change this policy we update the date at the top. If a change is significant, we will tell registered members before it takes effect."
+  },
+  "contact": {
+    "title": "Contact",
+    "p1": "Questions, requests and complaints:",
+    "email": "notifications@1lev1.com"
+  }
+}

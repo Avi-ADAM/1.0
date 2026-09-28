@@ -21,9 +21,19 @@
 //
 // Losing every device is NOT a permanent lockout while the server is still
 // an authority (pre-S3): the email-authenticated session can always request
-// a reset. After S3/E2E that guarantee moves to T9 (social recovery).
+// a reset. After S3/E2E that guarantee moves to T9 (social recovery):
+//   - recovery attempt        → the device asks explicitly (`recovery`
+//                               thunk); k guardian vouches + a quiet 24h
+//                               protest window register it with no cert and
+//                               no reset cooldown ('recovered_by_guardians').
+//                               The route then retires every other key.
+//   - reset while guardians   → under RECOVERY_ENFORCE a matured reset no
+//     are set                   longer TOFUs a user who named guardians: the
+//                               server may not overrule the people they
+//                               chose. In shadow it still TOFUs, and says so.
 
 import type { StoredPubKey } from './store';
+import type { RecoveryCheck } from '$lib/consent/recovery';
 import { verifyDeviceCert } from '$lib/crypto/deviceCert';
 import { resolveFromStore } from './verifyServerSide';
 
@@ -43,9 +53,15 @@ export type RegistrationDecision = {
     | 'reset_cooldown'       // rejected: protest window still open
     | 'device_revoked'       // rejected: this exact key was revoked
     | 'invalid_cert'         // rejected (enforcement)
-    | 'missing_cert';        // rejected (enforcement)
+    | 'missing_cert'         // rejected (enforcement)
+    | 'recovered_by_guardians'     // T9b: k vouches + protest window passed
+    | 'recovery_pending'           // rejected: protest window still open
+    | 'recovery_not_vouched'       // rejected: no (or not enough) live vouches
+    | 'reset_blocked_by_guardians';// rejected: RECOVERY_ENFORCE, user has guardians
   certReason?: string;
   retryAfterMs?: number;
+  /** T9 shadow telemetry: a reset TOFU'd a user who has guardians. */
+  guardiansShadow?: boolean;
 };
 
 export async function judgeRegistration(opts: {
@@ -55,9 +71,29 @@ export async function judgeRegistration(opts: {
   cert: unknown;
   enforce: boolean;
   now?: number;
+  /**
+   * T9b — set only when the device ASKS to register through recovery. The
+   * everyday login re-publish never pays for the event lookup.
+   */
+  recovery?: () => Promise<RecoveryCheck>;
+  /** T9b — does the user have a guardian set in force? Asked only on reset_tofu. */
+  hasGuardians?: () => Promise<boolean>;
+  /** RECOVERY_ENFORCE — guardians replace the server's reset authority. */
+  recoveryEnforce?: boolean;
 }): Promise<RegistrationDecision> {
   const { existing, userId, devicePubB64, cert, enforce } = opts;
   const now = opts.now ?? Date.now();
+
+  // An explicit recovery attempt is judged on the vouches alone: it is the
+  // path for a user whose keys are all lost, revoked, or mid-reset.
+  if (opts.recovery) {
+    const r = await opts.recovery();
+    if (r.ok && r.matured) return { allow: true, status: 'recovered_by_guardians' };
+    if (r.ok) {
+      return { allow: false, status: 'recovery_pending', retryAfterMs: r.readyAt - now };
+    }
+    return { allow: false, status: 'recovery_not_vouched', certReason: r.reason };
+  }
 
   const active = existing.filter((k) => !k.revokedAt);
   const same = existing.find((k) => k.devicePubB64 === devicePubB64);
@@ -86,7 +122,11 @@ export async function judgeRegistration(opts: {
   }
 
   if (existing.length === 0) return { allow: true, status: 'first_device_tofu' };
-  if (resetMatured) return { allow: true, status: 'reset_tofu' };
+  if (resetMatured) {
+    const guarded = opts.hasGuardians ? await opts.hasGuardians() : false;
+    if (guarded && opts.recoveryEnforce) return { allow: false, status: 'reset_blocked_by_guardians' };
+    return { allow: true, status: 'reset_tofu', guardiansShadow: guarded || undefined };
+  }
 
   // Subsequent device while active devices exist — the cert question.
   if (cert !== undefined && cert !== null) {

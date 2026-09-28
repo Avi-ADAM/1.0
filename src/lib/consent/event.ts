@@ -106,7 +106,36 @@ export const ACTIONS = {
   // wrapped to every member device (see $lib/space/e2e/epoch.ts). It has NO
   // reducer on purpose: epochs are transport-layer state, not ProjectState —
   // adding it to the projection would change stateRoot semantics.
-  epochRotate:     'epoch.rotate'
+  epochRotate:     'epoch.rotate',
+  // T9a — re-wrap an EXISTING epoch key to more devices (a new member, a
+  // newly paired device, a device recovered through guardians). Plaintext
+  // for the same reason as epoch.rotate, and reducer-less for the same
+  // reason: it moves keys, not ProjectState. See PLAN_T9_SOCIAL_RECOVERY §3.
+  epochGrant:      'epoch.grant',
+  // T9b — social recovery of a user's device chain. `recovery.guardians`
+  // is the user's signed guardian set; `recovery.vouch` is one guardian's
+  // signed statement that a NEW device belongs to that user. Both ride the
+  // existing consent-event mirror (subject {type:'user', id}) — no new
+  // Strapi collection. `recovery.protest` is the owner's objection, from a
+  // device they still hold, during the 24h protest window. See
+  // $lib/consent/recovery.ts.
+  recoveryGuardians: 'recovery.guardians',
+  recoveryVouch:     'recovery.vouch',
+  recoveryProtest:   'recovery.protest',
+  // Being a guardian is an obligation, so it waits for consent (decision
+  // 28.9.2026): the owner's `recovery.nominate` lands in the GUARDIAN's
+  // subject (their private inbox), the guardian answers with
+  // `recovery.accept` / `recovery.withdraw` in the owner's subject. Only an
+  // accepted guardian counts — toward a set taking effect and toward a vouch.
+  recoveryNominate:  'recovery.nominate',
+  recoveryAccept:    'recovery.accept',
+  recoveryWithdraw:  'recovery.withdraw',
+  // The rikma's password vault (PLAN_RIKMA_SHARED_INFO §3.2). Only ever
+  // SEALED, only in a `vault:<pid>` space, and reducer-less on purpose: the
+  // items are folded by $lib/vault/items.ts, never into ProjectState
+  // (invariant 2 — stateRoot must not change).
+  vaultSet:          'vault.set',
+  vaultRemove:       'vault.remove'
 } as const;
 
 export type ActionName = typeof ACTIONS[keyof typeof ACTIONS];
