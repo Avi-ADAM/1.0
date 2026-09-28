@@ -16,6 +16,7 @@
  */
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import { findOrCreateMissionTemplate } from '$lib/server/missions/missionTemplate.js';
 
 const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
   const { projectId, name, descrip, noofhours, perhour, hearotMeyuchadot } = params;
@@ -40,14 +41,13 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
 
   // 2. Mission entity — the candidate-authored template. Required because the
   //    acceptance finalizer creates the Mesimabetahalich against om.mission.
-  const missionRes = await strapi.execute(
-    '21createMission',
-    { missionName: name, descrip: descrip ?? null, skills: [], tafkidims: [], publishedAt: nowISO },
+  //    A name already in the catalogue reuses its template (missionName is unique).
+  const { id: missionId } = await findOrCreateMissionTemplate(
+    strapi,
+    { missionName: name, descrip: descrip ?? null, publishedAt: nowISO },
     context.jwt,
     context.fetch
   );
-  const missionId = missionRes?.data?.createMission?.data?.id;
-  if (!missionId) throw new Error('Failed to create Mission entity');
 
   // 3. OpenMission carrying the candidate's terms.
   let openMissionId: string | undefined;

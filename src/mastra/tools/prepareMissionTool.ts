@@ -24,6 +24,8 @@ export const prepareMissionTool = createTool({
     'Prepare the mission creation form and return a link that opens it pre-filled. ' +
     'Use this when the user should review and confirm the mission before it is published. ' +
     'A mission is for work that needs an implementer to be found. If a mission in progress already covers the work, create a task (act) on it with createTaskTool instead. ' +
+    'Check the rikma\'s open missions (getProjectDetailsTool) first: when one already covers the work, point the user to it rather than preparing a duplicate. ' +
+    'Mission names are also entries in a platform-wide catalogue where each name is unique; publishing a name that is already there reuses that catalogue entry automatically (the rikma\'s mission keeps its own description, hours and rate), so never rename a mission just to make it unique. ' +
     'Nothing is created yet: status is "prepared" until the user opens the link and publishes. ' +
     'Give the user `url` exactly as returned — do not decode, shorten or rebuild it. ' +
     'Requires a projectId - use findUserProjects first if not known.',

@@ -57,9 +57,28 @@ Their profile and their wishes, in conversation:
 export const PUBLIC_SIGNUP_INSTRUCTIONS = `
 
 Someone without a 1lev1 account yet:
-- If they want to join, add their business, show their partnership, recruit for an idea or order something, call prepareSignup with what you already know (for a business/partnership/idea, the rikma blueprint you built - products first). Give them the signupUrl: one screen where they check the details, sign the agreement and choose a password. After they confirm their email they land straight in what you prepared. Never claim they are registered until they say so.`;
+- Offer 1lev1 only when their own request is what it does - finding partners, turning a business or an idea into a partnership, or having something made through the concierge - never in an unrelated conversation.
+- If they want to join, add their business, show their partnership, recruit for an idea or order something: tell them what you will send, ask for the name and email to sign up with, and call prepareSignup (for a business/partnership/idea, with the rikma blueprint you built - products first). Give them the signupUrl: one screen where they check the details, sign the agreement and choose a password. After they confirm their email they land straight in what you prepared. Never claim they are registered until they say so.`;
 
-export function mcpInstructions(opts: { rikmaImport: boolean; publicSignup?: boolean }): string {
+/**
+ * Appended under lazy authentication (MCP_PUBLIC_MODE=lazy) before sign-in:
+ * the account tools are listed, and calling one is what asks the person to
+ * connect. Without this an agent sees tools it believes it cannot use.
+ */
+export const LAZY_SIGN_IN_INSTRUCTIONS = `
+
+Signing in:
+- This connection is not signed in to a 1lev1 account yet. getPlatformInfo works as is. The other tools act on the person's own account: when they ask for something that needs it, call the tool - they are asked to connect 1lev1 (sign in, or sign up in the same window) and the call continues once they do.`;
+
+export function mcpInstructions(opts: { rikmaImport: boolean; publicSignup?: boolean; lazySignIn?: boolean }): string {
+  if (opts.lazySignIn) {
+    return (
+      MCP_INSTRUCTIONS +
+      (opts.rikmaImport ? RIKMA_IMPORT_INSTRUCTIONS : '') +
+      LAZY_SIGN_IN_INSTRUCTIONS +
+      (opts.publicSignup ? PUBLIC_SIGNUP_INSTRUCTIONS : '')
+    );
+  }
   if (opts.publicSignup) return MCP_INSTRUCTIONS + PUBLIC_SIGNUP_INSTRUCTIONS;
   return opts.rikmaImport ? MCP_INSTRUCTIONS + RIKMA_IMPORT_INSTRUCTIONS : MCP_INSTRUCTIONS;
 }

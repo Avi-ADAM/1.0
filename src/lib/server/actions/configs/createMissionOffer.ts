@@ -17,6 +17,7 @@
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { screenLabel } from '../../vocab/moderation.js';
+import { findOrCreateMissionTemplate } from '$lib/server/missions/missionTemplate.js';
 
 const handler: ActionExecutionHandler = async (params, context, util) => {
   const { strapi } = util;
@@ -34,33 +35,11 @@ const handler: ActionExecutionHandler = async (params, context, util) => {
   }
 
   // ── 1. Resolve the mission template ──────────────────────────────────────
-  let missionId: string | null = params.missionId ? String(params.missionId) : null;
-  if (!missionId) {
-    const found = await strapi.execute('261findMissionByName', { name }, jwt, f);
-    missionId = found?.data?.missions?.data?.[0]?.id
-      ? String(found.data.missions.data[0].id)
-      : null;
-  }
-  if (!missionId) {
-    // Mint a minimal catalog template ("template by name only",
-    // PLAN_CONCIERGE §0.1) — same mutation createMissionTemplate rides.
-    const created = await strapi.execute(
-      '21createMission',
-      {
-        missionName: name,
-        descrip: params.descrip ?? null,
-        skills: [],
-        tafkidims: [],
-        publishedAt: new Date().toISOString()
-      },
-      jwt,
-      f
-    );
-    missionId = created?.data?.createMission?.data?.id
-      ? String(created.data.createMission.data.id)
-      : null;
-    if (!missionId) throw new Error('Failed to create mission template');
-  }
+  // Found by name, or a minimal catalog template minted ("template by name
+  // only", PLAN_CONCIERGE §0.1).
+  const missionId: string = params.missionId
+    ? String(params.missionId)
+    : (await findOrCreateMissionTemplate(strapi, { missionName: name, descrip: params.descrip ?? null }, jwt, f)).id;
 
   // ── 2. Create the offer ───────────────────────────────────────────────────
   const location = params.location

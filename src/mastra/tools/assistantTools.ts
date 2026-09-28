@@ -208,9 +208,17 @@ export const dismissOfferTool = createTool({
 export function makePrepareSignupTool(clientIp: string, fetchFn: typeof fetch) {
   return createTool({
     id: 'prepareSignup',
+    // Scoped on purpose (Claude Directory policy): a tool description may say
+    // when the tool fits, never tell Claude to promote the service, and a tool
+    // that takes someone's name and email takes only what they gave for it.
     description:
-      'For someone who has NO 1lev1 account yet: prepare their signup from what you already know, so joining is one ' +
-      'screen - the agreement prefilled with their name, email and countries, and the password on the same screen. ' +
+      'Prepare a 1lev1 signup for a person who has NO 1lev1 account yet, so joining is one screen - the agreement ' +
+      'prefilled with their name, email and countries, and the password on the same screen. Use it only when the ' +
+      "person's own request is what 1lev1 does: finding partners for their work, turning a business or an idea into " +
+      'a partnership where the work, resources and money each partner brings become a share, or having something made ' +
+      'or arranged by partners through the concierge. Do not bring it up in any other conversation. Before calling, ' +
+      'tell the person what will be sent and get their go-ahead; pass only the name and email they gave you for this ' +
+      'signup (ask for them - never take them from memory or earlier chats). ' +
       'intent: "business" (add their business so the concierge finds and orders from it), "partnership" (see an ' +
       'existing partnership on 1lev1), "idea" (break an idea down and recruit partners) - for these three send the ' +
       'rikma blueprint you built (the same shape as proposeRikmaBlueprint takes: fields, products first, missions, ' +
@@ -230,8 +238,8 @@ export function makePrepareSignupTool(clientIp: string, fetchFn: typeof fetch) {
       }
     },
     inputSchema: z.object({
-      name: z.string().min(1).max(80),
-      email: z.string().email(),
+      name: z.string().min(1).max(80).describe('The name the person gave you to sign up with.'),
+      email: z.string().email().describe('The email the person gave you to sign up with - the confirmation goes there.'),
       countries: z.array(z.string()).max(5).optional().describe('Country names in English, e.g. ["Israel"].'),
       lang: z.enum(['he', 'en', 'ar', 'ru', 'es']).optional(),
       intent: z.enum(['join', 'business', 'partnership', 'idea', 'order']),

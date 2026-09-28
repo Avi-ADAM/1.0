@@ -13,28 +13,22 @@
  */
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import { findOrCreateMissionTemplate } from '$lib/server/missions/missionTemplate.js';
 
 const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
   const { missionName, descrip = null, skillIds = [], roleIds = [] } = params;
 
-  const res = await strapi.execute(
-    '21createMission',
-    {
-      missionName,
-      descrip,
-      skills: skillIds,
-      tafkidims: roleIds,
-      publishedAt: new Date().toISOString(),
-    },
+  // missionName is unique in the catalogue: an existing name hands back its
+  // template (existed:true) instead of a Strapi "must be unique" error.
+  const { id, created } = await findOrCreateMissionTemplate(
+    strapi,
+    { missionName, descrip, skills: skillIds, tafkidims: roleIds },
     context.jwt,
     context.fetch,
   );
 
-  const id = res?.data?.createMission?.data?.id;
-  if (!id) throw new Error('Failed to create mission template');
-
   return {
-    data: { id, missionName },
+    data: { id, missionName, existed: !created },
     updateStrategy: { type: 'none' },
   };
 };

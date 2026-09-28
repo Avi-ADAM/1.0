@@ -10,7 +10,8 @@ import {
     MCP_ENDPOINT,
     type KeyVerdict
 } from '$lib/server/mcp/keyDiagnosis';
-import { oauthChallenge } from '$lib/server/oauth/challenge.js';
+import { oauthChallenge, lazyAuthEnabled, needsSignIn } from '$lib/server/oauth/challenge.js';
+import { signInListing } from '$lib/server/mcp/lazyListing';
 import { setMcpContext } from '$lib/server/mcpContext';
 import { toReqRes, toFetchResponse } from 'fetch-to-node';
 import { error } from '@sveltejs/kit';
@@ -151,6 +152,27 @@ const WRAPPED_TOOLS: Record<string, any> = Object.fromEntries(
     ])
 );
 
+/** What an anonymous caller may call under lazy auth; every other tools/call is the 401. */
+function lazyPublicToolNames(): Set<string> {
+    const names = new Set(['getPlatformInfo']);
+    if (assistantMcpEnabled()) names.add('prepareSignup');
+    return names;
+}
+
+/**
+ * The JSON-RPC body, read from a clone so the transport still gets the
+ * original stream. Unparseable ⇒ null, which calls no tool and so meets no
+ * gate — the transport answers it with its own parse error.
+ */
+async function peekJson(request: Request): Promise<unknown> {
+    if (request.method !== 'POST') return null;
+    try {
+        return await request.clone().json();
+    } catch {
+        return null;
+    }
+}
+
 /** Reads the `ops` list off a verified key's scopes, if it has any. */
 function keyOps(user: any): string[] {
     const raw = user?.scopes;
@@ -200,6 +222,8 @@ async function handleMcpRequest(request: Request, url: URL, svelteFetch: typeof 
     let agentsToExpose: any = {};
     let workflowsToExpose: any = {};
     let toolsToExpose: any = {};
+    // Lazy authentication for this (anonymous) caller — set below.
+    let lazy = false;
 
     if (user) {
         // --- AUTHENTICATED MODE ---
@@ -245,8 +269,21 @@ async function handleMcpRequest(request: Request, url: URL, svelteFetch: typeof 
         // connector stays silently anonymous — which is exactly how this went
         // unnoticed. `oauthChallenge` returns null while public mode is on, so
         // today's behaviour is unchanged until MCP_OAUTH_ENABLED is set.
-        const challenge = oauthChallenge(url);
-        if (challenge) return challenge;
+        //
+        // Lazy authentication (MCP_PUBLIC_MODE=lazy) moves that 401 from the
+        // connect to the first call that needs an account: a person with no
+        // account can still reach prepareSignup, and a member gets Claude's
+        // Connect card the moment they ask for their own data. A sent-but-dead
+        // token is always the 401 — that is how an expired OAuth token refreshes.
+        lazy = lazyAuthEnabled(url);
+        if (lazy) {
+            if (isRejected(verdict) || needsSignIn(await peekJson(request), lazyPublicToolNames())) {
+                return oauthChallenge(url, { force: true })!;
+            }
+        } else {
+            const challenge = oauthChallenge(url);
+            if (challenge) return challenge;
+        }
 
         if (isRejected(verdict)) {
             // --- REJECTED-KEY MODE ---
@@ -262,6 +299,15 @@ async function handleMcpRequest(request: Request, url: URL, svelteFetch: typeof 
                 createNewApiKey,
                 getPlatformInfo
             };
+        } else if (lazy) {
+            // --- LAZY-AUTH MODE (no token yet) ---
+            // The account tools are listed but gated above; the key-minting
+            // tools are left out — sign-in here is Claude's Connect card, not
+            // an npx command (they stay on ?public=1).
+            toolsToExpose = { getPlatformInfo, ...signInListing() };
+            if (assistantMcpEnabled()) {
+                toolsToExpose.prepareSignup = makePrepareSignupTool(clientIp, svelteFetch);
+            }
         } else {
             // --- UNAUTHENTICATED MODE (public probe) ---
             toolsToExpose = {
@@ -298,7 +344,9 @@ async function handleMcpRequest(request: Request, url: URL, svelteFetch: typeof 
                 ? undefined
                 : user
                     ? mcpInstructions({ rikmaImport: assistantMcpEnabled() })
-                    : mcpInstructions({ rikmaImport: false, publicSignup: assistantMcpEnabled() }),
+                    : lazy
+                        ? mcpInstructions({ rikmaImport: assistantMcpEnabled(), publicSignup: assistantMcpEnabled(), lazySignIn: true })
+                        : mcpInstructions({ rikmaImport: false, publicSignup: assistantMcpEnabled() }),
             agents: agentsToExpose,
             workflows: workflowsToExpose,
             tools: toolsToExpose

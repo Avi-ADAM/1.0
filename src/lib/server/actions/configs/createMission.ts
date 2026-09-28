@@ -41,6 +41,7 @@ import { validatePattern } from '$lib/shifts/pattern.js';
 import { shiftsEnabled } from '$lib/server/shifts/mode.js';
 import { asUser as asShiftUser } from '$lib/server/shifts/exec.js';
 import { createPlan } from '$lib/server/shifts/store.js';
+import { findOrCreateMissionTemplate } from '$lib/server/missions/missionTemplate.js';
 
 interface ChecklistItem {
   shem: string;
@@ -138,13 +139,15 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
     members.find((m) => String(m.id) === String(id))?.attributes?.username ?? '';
   const creatorName = memberName(userId);
 
-  // 2. Create the base Mission entity (if not editing an existing one)
+  // 2. The catalogue template. `missionName` is unique there, so a name that
+  //    already exists reuses its template instead of failing the whole publish.
   let missionId: string;
+  let templateCreated = false;
   if (existingMissionId) {
     missionId = String(existingMissionId);
   } else {
-    const missionRes = await strapi.execute(
-      '21createMission',
+    const template = await findOrCreateMissionTemplate(
+      strapi,
       {
         missionName,
         descrip: descrip ?? null,
@@ -155,8 +158,8 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
       context.jwt,
       context.fetch,
     );
-    missionId = missionRes?.data?.createMission?.data?.id;
-    if (!missionId) throw new Error('Failed to create Mission entity');
+    missionId = template.id;
+    templateCreated = template.created;
   }
 
   const locationInput = buildLocationInput(isOnline, lat, lng, radius, location_hint);
@@ -201,7 +204,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
       };
 
   // 2b. Fire-and-forget: create Strapi localizations for newly created Mission entries
-  if (!existingMissionId && missionId) {
+  if (templateCreated && missionId) {
     const sourceLocale = (context as any).lang ?? 'he';
     // Use the request-scoped fetch so the request carries auth cookies
     (context.fetch('/api/translations', {
@@ -651,7 +654,7 @@ export const createMissionConfig: ActionConfig = {
 
   paramSchema: {
     projectId:          { type: 'string',  required: true,  description: 'Project ID' },
-    existingMissionId:  { type: 'string',  required: false, description: 'Reuse existing Mission entity ID (edit mode)' },
+    existingMissionId:  { type: 'string',  required: false, description: 'Reuse existing Mission entity ID (edit mode). Without it, a catalogue template with the same missionName is reused; one is created only when the name is new' },
     missionName:        { type: 'string',  required: true,  description: 'Mission name' },
     descrip:            { type: 'string',  required: false, description: 'Rich-text description (HTML)' },
     skillIds:           { type: 'array',   required: false, description: 'Skill entity IDs' },
