@@ -210,8 +210,11 @@ vals[], location{lat,lng,radius,isOnline,hint}, currency, restime }` — בדי�
 - מוצג: המוצרים (כרטיסים כמו ב-`/gift`), המשימות הפתוחות, המשאבים, השותפים ומה כל
   אחד מביא, ודוגמת חלוקה (אותן פונקציות טהורות של
   [PLAN_MISSION_EQUITY_PREVIEW](../done/PLAN_MISSION_EQUITY_PREVIEW.md), לא חישוב חדש).
-- `shareKey` אקראי (שדה private), `shareExpiresAt` = 30 יום, `noindex`, סיבוב המפתח
-  מבטל את הקישור. מי שמקבל את הקישור רואה, לא עורך.
+- המפתח הוא `<sessionId>.<HMAC(sessionId | shareExpiresAt)>` (`assistant/shareKey.ts`): השורה
+  נטענת לפי id והחתימה נבדקת מול התפוגה השמורה בה. `shareExpiresAt` = 30 יום, `noindex`.
+  קישור חדש כותב תפוגה חדשה ולכן מבטל את הקודם; ביטול מאפס אותה. מי שמקבל את הקישור רואה, לא עורך.
+  (הגרסה הראשונה שמרה מפתח אקראי בשדה private `shareKey` וחיפשה לפיו — Strapi לא מסנן לפי
+  שדה private, וכל קישור החזיר 404. השדה נשאר בסכמה ומתאפס בכל כתיבה.)
 - כפתור בתחתית: "ככה? ליצירה" ← מסך האישור (§4.5), או ← הרשמה (§5) למי שאין חשבון.
 
 ### 4.5 מסך אישור אחד (ההחלטה: רקמה/משימה/מוצר ⇒ מסך ממולא מראש)
@@ -443,7 +446,7 @@ rate-limit לפי IP ומכסה יומית, בלי קריאת AI, שרטוט ≤
 | `version` | integer | §3.3 |
 | `claimEmail` | email, **private** | |
 | `claimExpiresAt` | datetime | |
-| `shareKey` | string, **private** | תצוגה מקדימה (§4.4) |
+| `shareKey` | string, **private** | לא בשימוש — מתאפס; ראו §4.4 |
 | `shareExpiresAt` | datetime | |
 | `appliedAt` | datetime | |
 
@@ -498,7 +501,7 @@ action, ובצדק): הם נתיבי `/api/assistant/*` ציבוריים, עם r
 
 `363createAssistantSession` · `364getAssistantSession` · `365updateAssistantSession` ·
 `366findMyAssistantSessions` · `367findPendingAssistantByChezin` ·
-`368getAssistantByShareKey` · `369deleteExpiredAssistantSessions` · עדכון
+~~`368getAssistantByShareKey`~~ (הוסר, §4.4) · `369deleteExpiredAssistantSessions` · עדכון
 `203findMatanotByText` (§4.6). אחר כך `npm run validate:qids`.
 
 ---

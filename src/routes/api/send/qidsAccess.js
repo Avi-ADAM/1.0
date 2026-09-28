@@ -656,7 +656,6 @@ export const qidsAccess = {
   '365updateAssistantSession': { allow: ['serviceAdmin'] },
   '366findMyAssistantSessions': { allow: ['serviceAdmin'] },
   '367findPendingAssistantByChezin': { allow: ['serviceAdmin'] },
-  '368getAssistantByShareKey': { allow: ['serviceAdmin'] },
   '369listExpiredPendingAssistant': { allow: ['serviceAdmin'] },
   '380deleteAssistantSession': { allow: ['serviceAdmin'] },
   '378getChezinForClaim': { allow: ['serviceAdmin'] },

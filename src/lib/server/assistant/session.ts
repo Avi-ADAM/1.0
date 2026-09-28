@@ -9,6 +9,7 @@
  */
 
 import { LIMITS, type AssistantKind, type AssistantState, type AssistantVia, type Revision } from '$lib/assistant/types.js';
+import { mintShareKey, shareKeyId, verifyShareKey } from './shareKey.js';
 
 export interface StrapiLike {
   execute: (qid: string, vars: Record<string, any>, jwt?: string, fetchFn?: typeof fetch) => Promise<any>;
@@ -194,22 +195,31 @@ export async function saveSession(
 }
 
 /**
- * Set or clear the preview link (§4.4). Not a revision and no version bump:
+ * Make or end the preview link (§4.4). Not a revision and no version bump:
  * sharing does not change the list, and an agent holding the current version
  * must not be told "it changed meanwhile" because someone made a link.
+ *
+ * Returns the new key (`null` when ending it), signed over the expiry Strapi
+ * saved rather than the one sent, so a store that rounds the date cannot leave
+ * a link that never verifies. A write that did not land throws instead of
+ * handing back a link to nothing. `shareKey` is cleared on every write: the
+ * random keys of the first format are never read again (see shareKey.ts).
  */
 export async function setShare(
   strapi: StrapiLike,
   id: string,
-  share: { key: string; expiresAt: string } | null,
+  share: { expiresAt: string } | null,
   fetchFn?: typeof fetch
-): Promise<void> {
-  await strapi.execute(
+): Promise<string | null> {
+  const res = await strapi.execute(
     '365updateAssistantSession',
-    { id: String(id), data: share ? { shareKey: share.key, shareExpiresAt: share.expiresAt } : { shareKey: null, shareExpiresAt: null } },
+    { id: String(id), data: { shareKey: null, shareExpiresAt: share ? share.expiresAt : null } },
     undefined,
     fetchFn
   );
+  const saved = rowFromNode(res?.data?.updateAssistantSession?.data);
+  if (!saved || (share && !saved.shareExpiresAt)) throw new Error('Could not save the preview link');
+  return share ? mintShareKey(saved.id, saved.shareExpiresAt!) : null;
 }
 
 /**
@@ -230,18 +240,22 @@ export async function findPendingByChezin(
     .filter((r: SessionRow) => !r.claimExpiresAt || new Date(r.claimExpiresAt).getTime() > now.getTime());
 }
 
-/** A live preview link → its session, or null (unknown, expired, not a rikma). */
+/**
+ * A live preview link → its session, or null (unknown, forged, replaced,
+ * expired, not a rikma). Loaded by the id in the key, then held to the
+ * signature — a malformed key never reaches Strapi.
+ */
 export async function loadByShareKey(
   strapi: StrapiLike,
   key: string,
   now: Date = new Date(),
   fetchFn?: typeof fetch
 ): Promise<SessionRow | null> {
-  if (!/^[A-Za-z0-9_-]{20,64}$/.test(key)) return null;
-  const res = await strapi.execute('368getAssistantByShareKey', { k: key }, undefined, fetchFn);
-  const row = rowFromNode(res?.data?.assistantSessions?.data?.[0]);
-  if (!row || row.kind !== 'rikma') return null;
-  if (!row.shareExpiresAt || new Date(row.shareExpiresAt).getTime() <= now.getTime()) return null;
+  const id = shareKeyId(key);
+  if (!id) return null;
+  const row = await loadSession(strapi, id, fetchFn);
+  if (!row || row.kind !== 'rikma' || !verifyShareKey(key, row)) return null;
+  if (new Date(row.shareExpiresAt!).getTime() <= now.getTime()) return null;
   return row;
 }
 

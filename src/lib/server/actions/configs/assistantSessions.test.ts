@@ -1,4 +1,11 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+// Preview links are signed with a key derived from OAUTH_SECRET, read through
+// $env/dynamic/private, which has no value under vitest.
+vi.mock('$env/dynamic/private', () => ({
+  env: { OAUTH_SECRET: 'test-secret-that-is-definitely-long-enough-0123456789' }
+}));
+
 import {
   claimAssistantSessionConfig,
   getAssistantSessionConfig,
@@ -89,10 +96,6 @@ function fakeStrapi() {
           return { data: { usersPermissionsUser: { data: { id: vars.uid, attributes: { chezin: { data: userChezin[vars.uid] ? { id: userChezin[vars.uid] } : null } } } } } };
         case '367findPendingAssistantByChezin': {
           const ids = [...rows.keys()].filter((id) => rows.get(id).chezin === vars.cid && rows.get(id).status === 'pending');
-          return { data: { assistantSessions: { data: ids.map(node) } } };
-        }
-        case '368getAssistantByShareKey': {
-          const ids = [...rows.keys()].filter((id) => rows.get(id).shareKey === vars.k);
           return { data: { assistantSessions: { data: ids.map(node) } } };
         }
         case '286getPlanBoard': {

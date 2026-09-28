@@ -123,13 +123,9 @@ export const assistantQids = {
     updateUsersPermissionsUser(id: $uid, data: $data) { data { id } }
   }`,
 
-  // A preview link (§4.4). shareKey is a private field — filterable, never
-  // returned — so the key itself never leaves the server in a read.
-  '368getAssistantByShareKey': `query GetAssistantByShareKey($k: String!) {
-    assistantSessions(filters: { shareKey: { eq: $k } }, pagination: { limit: 1 }) {
-      data { id attributes { ${SESSION_FIELDS} } }
-    }
-  }`,
+  // 368 (a preview link by shareKey) is gone: Strapi's content API does not
+  // filter on a private field, so it never found a row. A preview key is now
+  // signed and verified against the row loaded by id (assistant/shareKey.ts).
 
   // Discovery keywords a rikma import writes on the product it just created
   // (createComplexMatanot). Kept apart from 136createMatanot so the field is

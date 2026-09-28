@@ -6,6 +6,7 @@ vi.mock('$env/dynamic/private', () => ({
 
 import { prepareSignup, MAX_PUBLIC_ROWS } from './prepareSignup.js';
 import { openSignupToken } from './signupToken.js';
+import { loadByShareKey } from './session.js';
 
 function fakeStrapi() {
   const rows = new Map<string, any>();
@@ -20,6 +21,10 @@ function fakeStrapi() {
         const id = String(++n);
         rows.set(id, { ...vars.data });
         return { data: { createAssistantSession: { data: { id, attributes: { ...vars.data, user: { data: null } } } } } };
+      }
+      if (qid === '364getAssistantSession') {
+        const a = rows.get(vars.id);
+        return { data: { assistantSession: { data: a ? { id: vars.id, attributes: a } : null } } };
       }
       if (qid === '365updateAssistantSession') {
         rows.set(vars.id, { ...rows.get(vars.id), ...vars.data });
@@ -51,9 +56,13 @@ describe('prepareSignup', () => {
     expect(row.user).toBeUndefined();
     expect(row.claimExpiresAt).toBe('2026-10-09T10:00:00.000Z');
     expect(row.state.items.map((i: any) => i.label)).toEqual(['סדנה']);
-    expect(row.shareKey).toMatch(/^[A-Za-z0-9_-]{32}$/);
+    expect(row.shareKey).toBeNull();
+    expect(row.shareExpiresAt).toBe('2026-10-25T10:00:00.000Z');
 
-    expect(r.previewUrl).toBe(`https://www.1lev1.com/preview/rikma/${row.shareKey}`);
+    // The preview link opens this very row — loaded by id, held to its signature.
+    expect(r.previewUrl).toMatch(/^https:\/\/www\.1lev1\.com\/preview\/rikma\/1\.[A-Za-z0-9_-]{43}$/);
+    const found = await loadByShareKey(strapi, r.previewUrl!.split('/').pop()!, now);
+    expect(found?.id).toBe('1');
     const token = r.signupUrl.replace('https://www.1lev1.com/hascama?agent=', '');
     expect(openSignupToken(token, now.getTime())).toMatchObject({
       sid: '1',

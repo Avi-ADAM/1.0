@@ -102,9 +102,7 @@ export async function prepareSignup(
 
   let previewUrl: string | undefined;
   if (kind === 'rikma' && state.items.length) {
-    const { randomBytes } = await import('node:crypto');
-    const key = randomBytes(24).toString('base64url');
-    await setShare(deps.strapi, row.id, { key, expiresAt: new Date(now.getTime() + SHARE_DAYS * 86_400_000).toISOString() }, deps.fetch);
+    const key = await setShare(deps.strapi, row.id, { expiresAt: new Date(now.getTime() + SHARE_DAYS * 86_400_000).toISOString() }, deps.fetch);
     previewUrl = `${SITE}/preview/rikma/${key}`;
   }
 

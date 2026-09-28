@@ -65,6 +65,16 @@ export function agentSignupKey(): Buffer {
   return derive('1lev1-agent-signup-v1');
 }
 
+/**
+ * HMAC key for rikma preview links (/preview/rikma/<id>.<mac>,
+ * PLAN_AI_SIGNUP_CONCIERGE §4.4). The link is verified by signature, not looked
+ * up: Strapi will not filter on the private field a stored random key would
+ * need, so a lookup by key could never find the row.
+ */
+export function previewShareKey(): Buffer {
+  return derive('1lev1-rikma-preview-v1');
+}
+
 export function b64url(buf: Buffer | string): string {
   return Buffer.from(buf).toString('base64url');
 }

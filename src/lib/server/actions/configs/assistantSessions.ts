@@ -36,6 +36,7 @@ import {
   type SessionRow,
   type StrapiLike
 } from '$lib/server/assistant/session.js';
+import { nextShareExpiry } from '$lib/server/assistant/shareKey.js';
 
 const SITE = 'https://www.1lev1.com';
 
@@ -501,10 +502,8 @@ const shareHandler: ActionExecutionHandler = async (params, context, { strapi })
     await setShare(strapi, row.id, null, context.fetch);
     return { data: { previewUrl: null, expiresAt: null }, updateStrategy: { type: 'none' as const } };
   }
-  const { randomBytes } = await import('node:crypto');
-  const key = randomBytes(24).toString('base64url');
-  const expiresAt = new Date(Date.now() + SHARE_DAYS * 86_400_000).toISOString();
-  await setShare(strapi, row.id, { key, expiresAt }, context.fetch);
+  const expiresAt = nextShareExpiry(row.shareExpiresAt, new Date(), SHARE_DAYS);
+  const key = (await setShare(strapi, row.id, { expiresAt }, context.fetch))!;
   return { data: { previewUrl: previewUrl(key), expiresAt }, updateStrategy: { type: 'none' as const } };
 };
 
