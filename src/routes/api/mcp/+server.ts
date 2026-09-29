@@ -12,11 +12,10 @@ import {
 } from '$lib/server/mcp/keyDiagnosis';
 import { oauthChallenge, lazyAuthEnabled, needsSignIn } from '$lib/server/oauth/challenge.js';
 import { signInListing } from '$lib/server/mcp/lazyListing';
-import { setMcpContext } from '$lib/server/mcpContext';
+import { setMcpContext, getMcpContext } from '$lib/server/mcpContext';
 import { toReqRes, toFetchResponse } from 'fetch-to-node';
 import { error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { SITE_CONTEXT } from '$lib/bot/context';
 import { createTool } from '@mastra/core/tools';
 import { z } from 'zod';
 
@@ -29,8 +28,9 @@ import {
     mcpAnnotations,
     mcpDescription
 } from '$lib/server/mcp/toolManifest';
-import { MCP_INSTRUCTIONS, mcpInstructions } from '$lib/server/mcp/instructions';
-import { assistantMcpEnabled, makePrepareSignupTool } from '../../../mastra/tools/assistantTools';
+import { mcpInstructions } from '$lib/server/mcp/instructions';
+import { getPlatformInfoTool, noAccountTools, noAccountToolNames } from '$lib/server/mcp/publicTools';
+import { assistantMcpEnabled } from '../../../mastra/tools/assistantTools';
 import { normalizeApiKeyScopes } from '$lib/server/apiKeys';
 
 // --- Public Tools for Unauthenticated Users ---
@@ -43,19 +43,9 @@ const readOnly = (title: string) => ({
     mcp: { annotations: mcpAnnotations({ tier: 'read', title }) }
 });
 
-const getPlatformInfo = createTool({
-    id: 'getPlatformInfo',
-    description: 'Get general information about the 1lev1 platform, its goals, and features.' + CONNECT_DOCS,
-    inputSchema: z.object({}),
-    ...readOnly('About 1lev1'),
-    execute: async () => {
-        return {
-            info: SITE_CONTEXT,
-            howAgentsShouldWorkHere: MCP_INSTRUCTIONS,
-            message: "This is general information about the 1lev1 platform."
-        };
-    }
-});
+// getPlatformInfo and prepareSignup — the tools that need no account — live in
+// $lib/server/mcp/publicTools, shared with the /mcp reference page.
+const getPlatformInfo = getPlatformInfoTool;
 
 const howToConnect = createTool({
     id: 'howToConnect',
@@ -63,6 +53,19 @@ const howToConnect = createTool({
     inputSchema: z.object({}),
     ...readOnly('How to connect'),
     execute: async () => {
+        // The same tool is listed while signed in. Saying "unauthenticated" there
+        // sent claude.ai looking for a signup tool it is — rightly — not shown.
+        const userId = getMcpContext()?.userId;
+        if (userId) {
+            return {
+                already_connected: true,
+                connected_as_user_id: userId,
+                note:
+                    'This client is already signed in to a 1lev1 account, so every tool it needs is listed. ' +
+                    'prepareSignup is offered only to a client with no account; to try it, disconnect this ' +
+                    'connector (or use a client that has never connected) and ask again.'
+            };
+        }
         return {
             steps: [
                 "1. Run 'npx 1lev1-mcp' in your terminal. It opens 1lev1.com, you approve the connection, and it writes the key into your agent's config for you.",
@@ -152,12 +155,6 @@ const WRAPPED_TOOLS: Record<string, any> = Object.fromEntries(
     ])
 );
 
-/** What an anonymous caller may call under lazy auth; every other tools/call is the 401. */
-function lazyPublicToolNames(): Set<string> {
-    const names = new Set(['getPlatformInfo']);
-    if (assistantMcpEnabled()) names.add('prepareSignup');
-    return names;
-}
 
 /**
  * The JSON-RPC body, read from a clone so the transport still gets the
@@ -277,7 +274,7 @@ async function handleMcpRequest(request: Request, url: URL, svelteFetch: typeof 
         // token is always the 401 — that is how an expired OAuth token refreshes.
         lazy = lazyAuthEnabled(url);
         if (lazy) {
-            if (isRejected(verdict) || needsSignIn(await peekJson(request), lazyPublicToolNames())) {
+            if (isRejected(verdict) || needsSignIn(await peekJson(request), noAccountToolNames())) {
                 return oauthChallenge(url, { force: true })!;
             }
         } else {
@@ -304,24 +301,17 @@ async function handleMcpRequest(request: Request, url: URL, svelteFetch: typeof 
             // The account tools are listed but gated above; the key-minting
             // tools are left out — sign-in here is Claude's Connect card, not
             // an npx command (they stay on ?public=1).
-            toolsToExpose = { getPlatformInfo, ...signInListing() };
-            if (assistantMcpEnabled()) {
-                toolsToExpose.prepareSignup = makePrepareSignupTool(clientIp, svelteFetch);
-            }
+            toolsToExpose = { ...signInListing(), ...noAccountTools(clientIp, svelteFetch) };
         } else {
             // --- UNAUTHENTICATED MODE (public probe) ---
-            toolsToExpose = {
-                getPlatformInfo,
-                howToConnect,
-                createNewApiKey
-            };
             // Someone without an account, talking to their agent: the agent can
             // prepare the signup — one prefilled screen the person signs
-            // themselves (PLAN_AI_SIGNUP_CONCIERGE §5.1). Built per request so
-            // its rate limit knows the caller's address.
-            if (assistantMcpEnabled()) {
-                toolsToExpose.prepareSignup = makePrepareSignupTool(clientIp, svelteFetch);
-            }
+            // themselves (PLAN_AI_SIGNUP_CONCIERGE §5.1).
+            toolsToExpose = {
+                howToConnect,
+                createNewApiKey,
+                ...noAccountTools(clientIp, svelteFetch)
+            };
         }
     }
 

@@ -8,11 +8,38 @@ build
 # secrets — the .env is passed to the build as a BuildKit secret, never in the context
 .env
 .env.*
+*.key
+*.crt
 
 # unrelated sub-projects (deployed separately)
 android
 remotion
 socket-server
+# Tauri shell: target/ + gen/ are ~4GB of Rust artifacts. Streaming them into
+# the context at `COPY . .` crashed Docker Desktop's VM (rpc EOF) mid-build.
+src-tauri
+
+# agent / IDE / scratch dirs
+.agent
+.agents
+.claude
+.cline
+.codebuddy
+.codex
+.continue
+.cursor
+.idea
+.junie
+.mastra
+.vs
+.vscode
+brain
+outputs
+scratch
+scratch_edit.mjs
+new.svelte
+www.html
+1lev1 Onboarding Flow.html
 
 # dev / test noise
 .git

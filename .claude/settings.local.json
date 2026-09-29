@@ -124,7 +124,8 @@
       "Bash(npx svelte-kit *)",
       "PowerShell(npx vitest run src/lib/recurring/missionMonths.test.ts 2>&1 | Select-Object -Last 30)",
       "Read(//c/Users/babay/Documents/GitHub/106_ezrachi/**)",
-      "Bash(rm -rf src/routes/api/tickets/onelevone-webhook)"
+      "Bash(rm -rf src/routes/api/tickets/onelevone-webhook)",
+      "Bash(node \"C:/Users/babay/AppData/Local/Temp/claude/C--Users-babay-Documents-GitHub-1-0main/33b908b0-5532-4e86-8407-0684afcb8421/scratchpad/sharekey.mjs\" DD_O5sx49kUoh7De_K-v3UfoLtwERCHZ)"
     ],
     "additionalDirectories": [
       "c:\\Users\\babay\\Documents\\GitHub\\1.0main\\src\\routes\\deals\\request",

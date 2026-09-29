@@ -25,6 +25,11 @@ const config = {
         // against api.1lev1.com with same-site cookies — see PLAN_PROXY_SECURITY §9
         server: { allowedHosts: ['dev.1lev1.com'] }
       }),
+  build: {
+    // The per-chunk gzip report is pure log output, and on this many chunks it
+    // was the memory peak that got Docker's VM killed ("computing gzip size...").
+    reportCompressedSize: false
+  },
   resolve: {
     alias: {
       '$generated': path.resolve('./src/generated')

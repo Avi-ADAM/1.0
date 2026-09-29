@@ -80,6 +80,10 @@
       "scope": "Needs the {{scope}} scope"
     },
     "tier": {
+      "noAccount": {
+        "name": "No account needed",
+        "desc": "Answer before anyone signs in. prepareSignup saves a signup draft for someone with no account yet - their name, email and what they came for - that binds nobody until they sign it themselves, and expires after 14 days. Every other tool asks the person to sign in first."
+      },
       "read": {
         "name": "Read",
         "desc": "Reads only. Returns what you could see on the site yourself."

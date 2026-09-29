@@ -80,6 +80,10 @@
       "scope": "Necesita el permiso {{scope}}"
     },
     "tier": {
+      "noAccount": {
+        "name": "Sin cuenta",
+        "desc": "Responden antes de que nadie inicie sesión. prepareSignup guarda un borrador de registro para quien aún no tiene cuenta - su nombre, su correo y lo que busca - que no compromete a nadie hasta que esa persona lo firme, y caduca a los 14 días. Cualquier otra herramienta pide iniciar sesión primero."
+      },
       "read": {
         "name": "Lectura",
         "desc": "Solo lee. Devuelve lo que tú mismo verías en el sitio."
