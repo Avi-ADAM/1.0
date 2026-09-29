@@ -16,6 +16,13 @@
  *    just creates the product in status='voting' and uses the existing addVote on
  *    the main forum until the dedicated entity ships.
  *  - real Mesimabetahalich / Pmash creation per recipe row (M5/M6).
+ *
+ * A recipe line either proposes something new (a Pendm / Pmash, voted on with
+ * the product) or links to what the rikma already has: `mesimabetahalichId` /
+ * `mashabetahalichId` (in progress), or `openMissionId` / `openMashaabimId`
+ * (open). The caller creates those through createMission / createResource
+ * first — the rikma import does, in a one-member rikma — so this action never
+ * decides for the rikma what a vote would have.
  */
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
@@ -26,6 +33,8 @@ type RecipeMissionInput = {
   pendmId?: string | null;
   missionId?: string | null; // legacy UI alias for pendmId
   mesimabetahalichId?: string | null;
+  /** An open mission of this rikma the line stands for (already created). */
+  openMissionId?: string | null;
   name?: string;
   hoursPerUnit?: number;
   unitsPerProduct?: number;
@@ -34,11 +43,15 @@ type RecipeMissionInput = {
   assignedMemberId?: string | null;
   onlyPartOf?: boolean;
   notes?: string;
+  /** Recurring (monthly) mission — `iskvua` on the proposal. */
+  iskvua?: boolean;
 };
 
 type RecipeResourceInput = {
   pmashId?: string | null;
   mashabetahalichId?: string | null;
+  /** An open resource of this rikma the line stands for (already created). */
+  openMashaabimId?: string | null;
   name?: string;
   quantityPerUnit?: number;
   pricePerUnit?: number;
@@ -47,6 +60,16 @@ type RecipeResourceInput = {
   assignedMemberId?: string | null;
   onlyPartOf?: boolean;
   notes?: string;
+  /** A monthly / yearly expense that runs on — `recurring` on the proposal. */
+  recurring?: boolean;
+  cycleSize?: number;
+};
+
+const RECURRABLE_KINDOF = new Set(['monthly', 'yearly']);
+
+const idOf = (v: unknown): string | null => {
+  const s = v == null ? '' : String(v).trim();
+  return /^\d+$/.test(s) ? s : null;
 };
 
 const VALID_RESOURCE_KINDOF = new Set(['monthly', 'perUnit', 'rent', 'total', 'yearly']);
@@ -156,6 +179,32 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
   const memberCount =
     projectData?.data?.project?.data?.attributes?.user_1s?.data?.length ?? 1;
   const multiMember = memberCount > 1;
+
+  // Recipe lines that link to an open mission / resource: read each one before
+  // anything is written. It must be this rikma's — the link writes its
+  // proposal relation, which is one-to-one, so a foreign id would rewire
+  // another rikma's mission.
+  const openMissions = new Map<string, any>();
+  const openMashaabims = new Map<string, any>();
+  if (isComplex) {
+    const belongs = (attrs: any) => String(attrs?.project?.data?.id ?? '') === String(projectId);
+    for (const m of recipeMissions) {
+      const id = idOf(m.openMissionId);
+      if (!id || openMissions.has(id)) continue;
+      const res = await strapi.execute('384getRecipeOpenMission', { id }, context.jwt, context.fetch);
+      const attrs = res?.data?.openMission?.data?.attributes;
+      if (!attrs || !belongs(attrs)) throw new Error(`Open mission ${id} is not part of this rikma`);
+      openMissions.set(id, attrs);
+    }
+    for (const r of recipeResources) {
+      const id = idOf(r.openMashaabimId);
+      if (!id || openMashaabims.has(id)) continue;
+      const res = await strapi.execute('385getRecipeOpenMashaabim', { id }, context.jwt, context.fetch);
+      const attrs = res?.data?.openMashaabim?.data?.attributes;
+      if (!attrs || !belongs(attrs)) throw new Error(`Open resource ${id} is not part of this rikma`);
+      openMashaabims.set(id, attrs);
+    }
+  }
 
   // ── 1. Create process anchor (always, even simple products benefit from
   //       having a main forum once they ship) ────────────────────────────────
@@ -291,11 +340,47 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
 
   if (isComplex) {
     for (const m of recipeMissions) {
-      const missionMode = m.mode === 'consumeExisting' ? 'consumeExisting' : 'createNew';
+      const openMissionId = idOf(m.openMissionId);
+      const missionMode =
+        m.mode === 'consumeExisting' || openMissionId ? 'consumeExisting' : 'createNew';
       let pendmId: string | null = m.pendmId ?? m.missionId ?? null;
 
+      // An open mission already in the rikma → link the proposal it came from.
+      // One opened without a vote (a one-member rikma) has none, so its record
+      // is written in the shape voteOnPendm leaves on consensus: archived and
+      // pointing at the open mission. Nothing is put to a vote.
+      if (!pendmId && openMissionId && !m.mesimabetahalichId) {
+        const om = openMissions.get(openMissionId);
+        pendmId = om?.pendm?.data?.id ? String(om.pendm.data.id) : null;
+        if (!pendmId) {
+          try {
+            const anchorRes = await strapi.execute(
+              '137createPendmForRecipe',
+              {
+                name: om?.name || m.name || `${String(name).trim()} - mission`,
+                project: projectId,
+                perhour: Number(om?.perhour) || 0,
+                noofhours: Number(om?.noofhours) || 0,
+                descrip: om?.descrip || m.notes || '',
+                iskvua: om?.iskvua === true,
+                archived: true,
+                open_mission: openMissionId,
+                publishedAt: now
+              },
+              context.jwt,
+              context.fetch
+            );
+            pendmId = anchorRes?.data?.createPendm?.data?.id
+              ? String(anchorRes.data.createPendm.data.id)
+              : null;
+          } catch (err) {
+            console.warn('[createComplexMatanot] open-mission link failed:', err);
+          }
+        }
+      }
+
       // New mission → spawn a global Pendm so the recipe has something to link to.
-      if (!pendmId && missionMode === 'createNew' && !m.mesimabetahalichId) {
+      if (!pendmId && !openMissionId && missionMode === 'createNew' && !m.mesimabetahalichId) {
         try {
           const pendmVars: Record<string, unknown> = {
               name: m.name || `${String(name).trim()} - mission`,
@@ -307,6 +392,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
               publishedAt: now
             };
             if (m.assignedMemberId) pendmVars.rishon = m.assignedMemberId;
+            if (m.iskvua === true) pendmVars.iskvua = true;
           const pendmRes = await strapi.execute(
             '137createPendmForRecipe',
             pendmVars,
@@ -332,6 +418,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
       };
       if (pendmId) vars.pendm = pendmId;
       if (m.mesimabetahalichId) vars.mesimabetahalich = m.mesimabetahalichId;
+      if (m.assignedMemberId) vars.assignedMember = m.assignedMemberId;
       if (processId) vars.partof = processId;
 
       try {
@@ -349,12 +436,49 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
     }
 
     for (const r of recipeResources) {
-      const resourceMode = r.mode === 'consumeExisting' ? 'consumeExisting' : 'createNew';
-      const enumKindOf = mapResourceKindOf(r.kindOf);
+      const openMashaabimId = idOf(r.openMashaabimId);
+      const om = openMashaabimId ? openMashaabims.get(openMashaabimId) : null;
+      const resourceMode =
+        r.mode === 'consumeExisting' || openMashaabimId ? 'consumeExisting' : 'createNew';
+      // A linked open resource keeps its own terms (a monthly rent stays monthly).
+      const enumKindOf = mapResourceKindOf(om?.kindOf ?? r.kindOf);
       let pmashId: string | null = r.pmashId ?? null;
 
+      // An open resource already in the rikma → link its proposal, or write one
+      // in the shape voteOnPmash leaves on consensus (see the missions above).
+      if (!pmashId && openMashaabimId && !r.mashabetahalichId) {
+        pmashId = om?.pmash?.data?.id ? String(om.pmash.data.id) : null;
+        if (!pmashId) {
+          try {
+            const anchorRes = await strapi.execute(
+              '138createPmashForRecipe',
+              {
+                name: om?.name || r.name || `${String(name).trim()} - resource`,
+                project: projectId,
+                price: Number(om?.price) || 0,
+                easy: Number(om?.easy) || Number(om?.price) || 0,
+                hm: Number(om?.hm) || 1,
+                kindOf: enumKindOf || 'total',
+                descrip: om?.descrip || r.notes || '',
+                ...(om?.recurring === true ? { recurring: true, cycleSize: Number(om?.cycleSize) || 1 } : {}),
+                archived: true,
+                open_mashaabim: openMashaabimId,
+                publishedAt: now
+              },
+              context.jwt,
+              context.fetch
+            );
+            pmashId = anchorRes?.data?.createPmash?.data?.id
+              ? String(anchorRes.data.createPmash.data.id)
+              : null;
+          } catch (err) {
+            console.warn('[createComplexMatanot] open-resource link failed:', err);
+          }
+        }
+      }
+
       // New resource → spawn a Pmash template so the recipe has a link target.
-      if (!pmashId && resourceMode === 'createNew' && !r.mashabetahalichId) {
+      if (!pmashId && !openMashaabimId && resourceMode === 'createNew' && !r.mashabetahalichId) {
         try {
           const pmashVars: Record<string, unknown> = {
               name: r.name || `${String(name).trim()} - resource`,
@@ -366,7 +490,16 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
               descrip: r.notes || '',
               publishedAt: now
             };
-            if (r.assignedMemberId) pmashVars.selfProposalUser = r.assignedMemberId;
+            if (r.assignedMemberId) {
+              pmashVars.isSelfProposal = true;
+              pmashVars.selfProposalUser = r.assignedMemberId;
+            }
+            // A monthly / yearly expense that runs on stays recurring, so its
+            // approval builds the engine (resolveRecurringPlan).
+            if (r.recurring === true && enumKindOf && RECURRABLE_KINDOF.has(enumKindOf)) {
+              pmashVars.recurring = true;
+              pmashVars.cycleSize = Math.max(1, Math.floor(Number(r.cycleSize) || 1));
+            }
           const pmashRes = await strapi.execute(
             '138createPmashForRecipe',
             pmashVars,
@@ -392,6 +525,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
       if (enumKindOf) vars.kindOf = enumKindOf;
       if (pmashId) vars.pmash = pmashId;
       if (r.mashabetahalichId) vars.mashabetahalich = r.mashabetahalichId;
+      if (r.assignedMemberId) vars.assignedMember = r.assignedMemberId;
 
       try {
         const resp = await strapi.execute(

@@ -95,6 +95,20 @@ describe('BlueprintReview', () => {
     expect(queryByText('rikmaImport.result.title')).toBeNull();
   });
 
+  it('a monthly price says it is per month, and a recurring mission says it recurs', () => {
+    const monthly = {
+      ...session,
+      items: [
+        { key: 'r', group: 'rikmaResources', label: 'שכירות', status: 'proposed', spec: { holder: 'me', kindOf: 'monthly', price: 6000 } },
+        { key: 'x', group: 'rikmaResources', label: 'מקרר', status: 'proposed', spec: { kindOf: 'total', price: 3000 } },
+        { key: 'm', group: 'rikmaMissions', label: 'משמרות', status: 'proposed', spec: { holder: 'open', recurring: true } }
+      ]
+    };
+    const { getAllByText, getByText } = render(BlueprintReview, { props: { session: monthly } });
+    expect(getAllByText('rikmaImport.row.period.monthly')).toHaveLength(1);
+    expect(getByText('rikmaImport.row.recurring')).toBeTruthy();
+  });
+
   it('an emptied price means "on request"', async () => {
     executeAction.mockResolvedValue({ success: true, data: { created: [], failed: [], invites: [] } });
     const { getByDisplayValue, getByRole } = render(BlueprintReview, { props: { session } });

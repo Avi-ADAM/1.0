@@ -375,6 +375,8 @@ export const qidsAccess = {
   '136createMatanot': { allow: ['user', 'serviceAdmin'] },
   '137createPendmForRecipe': { allow: ['user', 'serviceAdmin'] },
   '138createPmashForRecipe': { allow: ['user', 'serviceAdmin'] },
+  '384getRecipeOpenMission': { allow: ['user', 'serviceAdmin'] },
+  '385getRecipeOpenMashaabim': { allow: ['user', 'serviceAdmin'] },
   '139createMesimabetahalich': { allow: ['user', 'serviceAdmin'] },
   '140createAct': { allow: ['user', 'serviceAdmin'] },
   '141createMaap': { allow: ['user', 'serviceAdmin'] },

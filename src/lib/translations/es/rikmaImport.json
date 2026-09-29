@@ -30,6 +30,14 @@
     "madeOf": "Compuesto de: {{names}}",
     "price": "Precio",
     "priceOnRequest": "A consultar",
+    "period": {
+      "monthly": "al mes",
+      "yearly": "al año",
+      "daily": "al día",
+      "perUnit": "por unidad",
+      "rent": "por el período de alquiler"
+    },
+    "recurring": "Cada mes",
     "keywords": "Palabras con las que te buscarán",
     "keywordsHint": "Separadas por comas: cómo describiría un cliente su necesidad, no el nombre del producto. Así te encuentra el conserje.",
     "categories": "Ámbitos",

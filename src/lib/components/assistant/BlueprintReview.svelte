@@ -94,6 +94,27 @@
     return $t('rikmaImport.holder.open');
   }
 
+  /**
+   * What the price is for — a monthly rent is typed per month, never as a
+   * total. Empty for a one-off price.
+   */
+  function periodText(/** @type {Row} */ row) {
+    switch (row.spec?.kindOf) {
+      case 'monthly':
+        return $t('rikmaImport.row.period.monthly');
+      case 'yearly':
+        return $t('rikmaImport.row.period.yearly');
+      case 'daily':
+        return $t('rikmaImport.row.period.daily');
+      case 'perUnit':
+        return $t('rikmaImport.row.period.perUnit');
+      case 'rent':
+        return $t('rikmaImport.row.period.rent');
+      default:
+        return '';
+    }
+  }
+
   /** Record one inline fix; a fresh object each time so the edit stays reactive. */
   function setEdit(/** @type {string} */ key, /** @type {'label'|'price'|'keywords'|'categories'|'holder'} */ field, /** @type {string} */ value) {
     edits[key] = { ...(edits[key] ?? {}), [field]: value };
@@ -319,6 +340,9 @@
                     {holderText(row)} ⇄
                   </button>
                 {/if}
+                {#if group === 'rikmaMissions' && row.spec?.recurring === true}
+                  <span class="px-2 py-0.5 rounded-full bg-surface2 border border-surfaceLine">{$t('rikmaImport.row.recurring')}</span>
+                {/if}
                 {#if inside}
                   <span class="px-2 py-0.5 rounded-full bg-blue-500/10 border border-blue-500/30">{$t('rikmaImport.row.partOf', { name: inside })}</span>
                 {/if}
@@ -344,6 +368,7 @@
                     oninput={(e) => setEdit(row.key, 'price', e.currentTarget.value)}
                   />
                   {#if session.fields?.currency}<span>{session.fields.currency}</span>{/if}
+                  {#if periodText(row)}<span class="font-semibold">{periodText(row)}</span>{/if}
                 </label>
               {/if}
 

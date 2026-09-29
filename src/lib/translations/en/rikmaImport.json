@@ -30,6 +30,14 @@
     "madeOf": "Made of: {{names}}",
     "price": "Price",
     "priceOnRequest": "On request",
+    "period": {
+      "monthly": "per month",
+      "yearly": "per year",
+      "daily": "per day",
+      "perUnit": "per unit",
+      "rent": "for the rental period"
+    },
+    "recurring": "Every month",
     "keywords": "Words people will search for",
     "keywordsHint": "Comma-separated - how a customer would describe the need, not the product's name. This is how the concierge finds you.",
     "categories": "Domains",

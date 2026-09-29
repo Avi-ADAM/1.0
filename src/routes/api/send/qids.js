@@ -7606,12 +7606,20 @@ ${STIPEND_DECISION_FIELDS}
     }
   }`,
 
+  // A recipe line's mission proposal. `rishon` = proposed for that member,
+  // `iskvua` = recurring. With `archived` + `open_mission` it is the record of
+  // a proposal that already became that open mission — the shape voteOnPendm
+  // leaves on consensus (createComplexMatanot, one-member rikma).
   '137createPendmForRecipe': `mutation CreatePendmForRecipe(
     $name: String,
     $project: ID,
     $perhour: Float,
     $noofhours: Float,
     $descrip: String,
+    $iskvua: Boolean,
+    $rishon: ID,
+    $archived: Boolean,
+    $open_mission: ID,
     $publishedAt: DateTime
   ) {
     createPendm(data: {
@@ -7621,12 +7629,19 @@ ${STIPEND_DECISION_FIELDS}
       perhour: $perhour,
       noofhours: $noofhours,
       descrip: $descrip,
+      iskvua: $iskvua,
+      rishon: $rishon,
+      archived: $archived,
+      open_mission: $open_mission,
       publishedAt: $publishedAt
     }) {
       data { id attributes { name isglobal perhour noofhours } }
     }
   }`,
 
+  // Same for a recipe line's resource: `recurring`/`cycleSize` keep a monthly
+  // or yearly expense recurring, `selfProposalUser` = the member who brings it,
+  // and `archived` + `open_mashaabim` = already that open resource.
   '138createPmashForRecipe': `mutation CreatePmashForRecipe(
     $name: String,
     $project: ID,
@@ -7635,6 +7650,12 @@ ${STIPEND_DECISION_FIELDS}
     $hm: Float,
     $kindOf: ENUM_PMASH_KINDOF,
     $descrip: String,
+    $recurring: Boolean,
+    $cycleSize: Int,
+    $isSelfProposal: Boolean,
+    $selfProposalUser: ID,
+    $archived: Boolean,
+    $open_mashaabim: ID,
     $publishedAt: DateTime
   ) {
     createPmash(data: {
@@ -7645,9 +7666,43 @@ ${STIPEND_DECISION_FIELDS}
       hm: $hm,
       kindOf: $kindOf,
       descrip: $descrip,
+      recurring: $recurring,
+      cycleSize: $cycleSize,
+      isSelfProposal: $isSelfProposal,
+      selfProposalUser: $selfProposalUser,
+      archived: $archived,
+      open_mashaabim: $open_mashaabim,
       publishedAt: $publishedAt
     }) {
       data { id attributes { name price hm kindOf } }
+    }
+  }`,
+
+  // An open mission / open resource a recipe line is about to link to
+  // (createComplexMatanot): whose rikma it is, and the proposal it came from.
+  '384getRecipeOpenMission': `query GetRecipeOpenMission($id: ID!) {
+    openMission(id: $id) {
+      data {
+        id
+        attributes {
+          name descrip noofhours perhour iskvua
+          project { data { id } }
+          pendm { data { id } }
+        }
+      }
+    }
+  }`,
+
+  '385getRecipeOpenMashaabim': `query GetRecipeOpenMashaabim($id: ID!) {
+    openMashaabim(id: $id) {
+      data {
+        id
+        attributes {
+          name descrip price easy hm kindOf recurring cycleSize
+          project { data { id } }
+          pmash { data { id } }
+        }
+      }
     }
   }`,
 

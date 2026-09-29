@@ -13,9 +13,16 @@
  *  - only rows the person ticked are created; dropped rows never are;
  *  - a row that already has `createdRef` is skipped, so a re-run after a
  *    failure continues instead of duplicating;
- *  - a mission or resource that is part of a ticked product's recipe is
- *    created as that product's bill-of-materials line, not a second time on
- *    its own;
+ *  - a mission or resource that is part of a ticked product's recipe is not
+ *    a step of its own — it belongs to that product. In a one-member rikma
+ *    nobody else is asked, so the executor first creates it exactly as a
+ *    standalone row (createMission / createResource: in progress for `me`,
+ *    open otherwise) and the product's bill-of-materials line links to it
+ *    (`productParams` reads its `createdRef`). With more members it is proposed
+ *    as the line itself and voted on with the product;
+ *  - a recurring mission stays recurring (`iskvua`) and a monthly / yearly
+ *    resource stays a per-period price that runs on (`recurring`), on either
+ *    path;
  *  - ticked-off rows that are not dropped become planning-board proposals
  *    (seedPlanBoards), so nothing the person did not explicitly refuse is lost —
  *    unless they came from a planning board (`spec.planItem`) and are still on it.
@@ -98,23 +105,23 @@ export function planMaterialization(
     else resources.push({ type: 'resource', key: it.key });
   }
 
-  // A partner is invited to what they bring — the standalone missions and
-  // resources created for them (open), not recipe lines.
+  // A partner is invited to what they bring — the rows created for them. A
+  // recipe row counts too: in a one-member rikma it is created open like any
+  // other, and with more members the executor finds it still a vote.
   const invites: MaterializeStep[] = [];
+  const buildKeys = [...missions, ...resources].map((s) => (s as { key: string }).key).concat([...inRecipe]);
   for (const it of state.items) {
     if (it.group !== 'partners' || !chosen.has(it.key)) continue;
-    const brings = (group: string, steps: MaterializeStep[]) =>
-      steps
-        .map((s) => (s as { key: string }).key)
-        .filter((k) => {
-          const row = byKey.get(k)!;
-          return row.group === group && row.spec?.partnerKey === it.key;
-        });
+    const brings = (group: string) =>
+      buildKeys.filter((k) => {
+        const row = byKey.get(k)!;
+        return row.group === group && row.spec?.partnerKey === it.key;
+      });
     invites.push({
       type: 'invite',
       key: it.key,
-      missionKeys: brings('rikmaMissions', missions),
-      resourceKeys: brings('rikmaResources', resources)
+      missionKeys: brings('rikmaMissions'),
+      resourceKeys: brings('rikmaResources')
     });
   }
 
@@ -154,7 +161,12 @@ export interface ParamContext {
   categories?: Record<string, string[]>;
   /** Vocabulary ids resolved per mission key (see resolveRowVocabulary). */
   vocab?: Record<string, { skillIds?: string[]; roleIds?: string[]; workwayIds?: string[] }>;
+  /** ISO time of the run — where a recurring resource starts. */
+  now?: string;
 }
+
+/** Resource kinds priced per period that run on (resolveRecurringPlan's RECURRABLE). */
+const PER_PERIOD = new Set(['monthly', 'yearly']);
 
 const num = (v: unknown): number | undefined =>
   typeof v === 'number' && Number.isFinite(v) ? v : undefined;
@@ -212,21 +224,61 @@ export function missionParams(item: AssistantItem, ctx: ParamContext): Record<st
 /**
  * createResource. Self-assignment is only offered by the form in a one-member
  * rikma (ResourceCreator's `isSingleUser`), so the same rule holds here.
+ *
+ * A monthly / yearly resource is a price per period with no end the blueprint
+ * knows of — the shop's rent, a subscription — so it is created recurring from
+ * today, the form's "recurring expense" (createResource refuses a fixed-term
+ * one without dates).
  */
 export function resourceParams(item: AssistantItem, ctx: ParamContext): Record<string, unknown> {
   const s = item.spec ?? {};
   const price = num(s.price) ?? 0;
   const mine = s.holder === 'me' && ctx.memberCount === 1;
+  const kindOf = str(s.kindOf) ?? 'total';
   return {
     projectId: ctx.projectId,
     name: item.label,
     ...(str(s.descrip) ? { description: str(s.descrip) } : {}),
     price,
     easy: price,
-    kindOf: str(s.kindOf) ?? 'total',
+    kindOf,
     hm: num(s.quantity) && num(s.quantity)! > 0 ? num(s.quantity) : 1,
+    ...(PER_PERIOD.has(kindOf) ? { recurring: true, startDate: ctx.now ?? new Date().toISOString() } : {}),
     ...(mine ? { isAssigned: true } : {})
   };
+}
+
+/**
+ * A recipe row's bill-of-materials link. A row that already exists (created
+ * on its own in a one-member rikma, or by an earlier run) is linked; one that
+ * does not is proposed as the line itself — createComplexMatanot's vote path.
+ */
+function recipeMissionLink(row: AssistantItem): Record<string, unknown> {
+  const ref = row.createdRef;
+  switch (ref?.type) {
+    case 'mesimabetahalich':
+      return { mode: 'consumeExisting', mesimabetahalichId: ref.id };
+    case 'openMission':
+      return { mode: 'consumeExisting', openMissionId: ref.id };
+    case 'pendm':
+      return { mode: 'createNew', pendmId: ref.id };
+    default:
+      return { mode: 'createNew', ...(row.spec?.recurring === true ? { iskvua: true } : {}) };
+  }
+}
+
+function recipeResourceLink(row: AssistantItem): Record<string, unknown> {
+  const ref = row.createdRef;
+  switch (ref?.type) {
+    case 'mashabetahalich':
+      return { mode: 'consumeExisting', mashabetahalichId: ref.id };
+    case 'openMashaabim':
+      return { mode: 'consumeExisting', openMashaabimId: ref.id };
+    case 'pmash':
+      return { mode: 'createNew', pmashId: ref.id };
+    default:
+      return { mode: 'createNew', ...(PER_PERIOD.has(str(row.spec?.kindOf) ?? '') ? { recurring: true } : {}) };
+  }
 }
 
 /**
@@ -273,8 +325,8 @@ export function productParams(
       unitsPerProduct: 1,
       ratePerHour: num(m.spec?.ratePerHour) ?? 0,
       notes: str(m.spec?.descrip) ?? '',
-      mode: 'createNew',
-      assignedMemberId: assignee(m)
+      assignedMemberId: assignee(m),
+      ...recipeMissionLink(m)
     })),
     recipeResources: recipe.resources.map((r) => ({
       name: r.label,
@@ -282,8 +334,8 @@ export function productParams(
       pricePerUnit: num(r.spec?.price) ?? 0,
       kindOf: str(r.spec?.kindOf) ?? 'total',
       notes: str(r.spec?.descrip) ?? '',
-      mode: 'createNew',
-      assignedMemberId: assignee(r)
+      assignedMemberId: assignee(r),
+      ...recipeResourceLink(r)
     }))
   };
 }

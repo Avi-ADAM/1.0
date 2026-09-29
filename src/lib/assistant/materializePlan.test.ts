@@ -72,6 +72,21 @@ describe('planMaterialization', () => {
     expect(plan.steps).toEqual([{ type: 'product', key: 'i1', missionKeys: [], resourceKeys: [] }]);
   });
 
+  it('a partner is also invited to the recipe rows they bring', () => {
+    const withPartnerLine: AssistantState = {
+      items: [
+        it_({ key: 'p', group: 'products', label: 'סל', spec: { recipe: { missionKeys: ['m'], resourceKeys: [] } } }),
+        it_({ key: 'm', group: 'rikmaMissions', label: 'משלוחים', spec: { holder: 'partner', partnerKey: 'd' } }),
+        it_({ key: 'd', group: 'partners', label: 'דנה', spec: { email: 'd@x.co' } })
+      ]
+    };
+    const plan = planMaterialization(withPartnerLine, ['p', 'm', 'd'], true);
+    expect(plan.steps).toEqual([
+      { type: 'product', key: 'p', missionKeys: ['m'], resourceKeys: [] },
+      { type: 'invite', key: 'd', missionKeys: ['m'], resourceKeys: [] }
+    ]);
+  });
+
   it('a recipe mission is standalone when its product was not ticked', () => {
     const plan = planMaterialization(state, ['i3'], true);
     expect(plan.steps[0]).toEqual({ type: 'mission', key: 'i3' });
@@ -132,8 +147,53 @@ describe('params — exactly what the existing actions receive', () => {
     });
     expect(p).not.toHaveProperty('fixedPrice');
     expect(p.recipeMissions).toEqual([
+      // Not created yet → proposed as the line itself (the executor creates it
+      // first in a one-member rikma; see materialize.test.ts).
       { name: 'הנחיה', hoursPerUnit: 3, unitsPerProduct: 1, ratePerHour: 120, notes: '', mode: 'createNew', assignedMemberId: '5' }
     ]);
+  });
+
+  it('a recipe row that already exists is linked, not proposed again', () => {
+    const made = (k: string, type: string, id: string) => ({ ...byKey(k), createdRef: { type, id } });
+    const inProgress = productParams(byKey('i1'), { missions: [made('i3', 'mesimabetahalich', '31')], resources: [made('i5', 'mashabetahalich', '51')] }, state, ctx);
+    expect(inProgress.recipeMissions).toEqual([expect.objectContaining({ mode: 'consumeExisting', mesimabetahalichId: '31' })]);
+    expect(inProgress.recipeResources).toEqual([expect.objectContaining({ mode: 'consumeExisting', mashabetahalichId: '51' })]);
+
+    const open = productParams(byKey('i1'), { missions: [made('i3', 'openMission', '32')], resources: [made('i5', 'openMashaabim', '52')] }, state, ctx);
+    expect(open.recipeMissions).toEqual([expect.objectContaining({ mode: 'consumeExisting', openMissionId: '32' })]);
+    expect(open.recipeResources).toEqual([expect.objectContaining({ mode: 'consumeExisting', openMashaabimId: '52' })]);
+
+    // Created on its own in a rikma with more members: its vote is the line's.
+    const voted = productParams(byKey('i1'), { missions: [made('i3', 'pendm', '33')], resources: [made('i5', 'pmash', '53')] }, state, ctx);
+    expect(voted.recipeMissions).toEqual([expect.objectContaining({ mode: 'createNew', pendmId: '33' })]);
+    expect(voted.recipeResources).toEqual([expect.objectContaining({ mode: 'createNew', pmashId: '53' })]);
+  });
+
+  it('a recurring mission and a monthly resource stay recurring on every path', () => {
+    const monthly: AssistantState = {
+      items: [
+        it_({ key: 'm', group: 'rikmaMissions', label: 'משמרות לילה', spec: { holder: 'open', hours: 120, recurring: true } }),
+        it_({ key: 'r', group: 'rikmaResources', label: 'שכירות', spec: { holder: 'me', kindOf: 'monthly', price: 6000 } }),
+        it_({ key: 'x', group: 'rikmaResources', label: 'מקרר', spec: { kindOf: 'total', price: 3000 } })
+      ]
+    };
+    const [m, r, x] = monthly.items;
+    const at = { ...ctx, now: '2026-09-29T00:00:00.000Z' };
+
+    expect(missionParams(m, at)).toMatchObject({ iskvua: true, nhours: 120 });
+    // Standalone: createResource needs a start for a monthly one; it runs on.
+    expect(resourceParams(r, at)).toMatchObject({ kindOf: 'monthly', price: 6000, recurring: true, startDate: '2026-09-29T00:00:00.000Z', isAssigned: true });
+    expect(resourceParams(x, at)).not.toHaveProperty('recurring');
+    expect(resourceParams(x, at)).not.toHaveProperty('startDate');
+
+    // Proposed inside a product (more members): the line carries the same.
+    const p = productParams(it_({ key: 'p', group: 'products', label: 'סל' }), { missions: [m], resources: [r, x] }, monthly, { ...at, memberCount: 3 });
+    expect(p.recipeMissions).toEqual([expect.objectContaining({ mode: 'createNew', iskvua: true, hoursPerUnit: 120 })]);
+    expect(p.recipeResources).toEqual([
+      expect.objectContaining({ mode: 'createNew', kindOf: 'monthly', pricePerUnit: 6000, recurring: true, assignedMemberId: '5' }),
+      expect.objectContaining({ mode: 'createNew', kindOf: 'total' })
+    ]);
+    expect((p.recipeResources as any[])[1]).not.toHaveProperty('recurring');
   });
 
   it('a simple product with a price is fixed; without one it is quote', () => {

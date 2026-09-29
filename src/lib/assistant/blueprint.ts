@@ -78,9 +78,10 @@ export const BlueprintMissionSchema = z.object({
   skills: z.array(text(60)).max(10).optional(),
   roles: z.array(text(60)).max(6).optional(),
   workways: z.array(text(60)).max(6).optional(),
-  hours: z.number().min(0).max(10_000).optional(),
+  /** Hours in total — or per month when `recurring`. */
+  hours: z.number().min(0).max(10_000).optional().describe('Hours in total, or per month when recurring'),
   ratePerHour: money.optional(),
-  recurring: z.boolean().optional(),
+  recurring: z.boolean().optional().describe('Ongoing work, every month'),
   /** me = the person importing does it · open = looking for someone · partner = see partnerRef */
   holder,
   partnerRef: ref.optional(),
@@ -91,8 +92,9 @@ export const BlueprintResourceSchema = z.object({
   ref: ref.optional(),
   name,
   descrip: text(2000).optional(),
-  kindOf: z.enum(RESOURCE_KINDOF).optional(),
-  price: money.optional(),
+  /** monthly / yearly = a running cost (rent, a subscription) whose `price` is per period. */
+  kindOf: z.enum(RESOURCE_KINDOF).optional().describe('monthly / yearly = a running cost (rent, subscription); price is then per month / year'),
+  price: money.optional().describe('Per month / year when kindOf is monthly / yearly, otherwise the whole price'),
   quantity: z.number().min(0).max(1_000_000).optional(),
   holder,
   partnerRef: ref.optional(),

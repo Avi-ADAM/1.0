@@ -227,6 +227,13 @@ vals[], location{lat,lng,radius,isOnline,hint}, currency, restime }` — בדי�
   כך כל ענף הסכמה נשמר (ברקמה מרובת חברים מוצר מורכב/משימה עוברים להצבעה כרגיל):
   1. `createWeave` (אם חדשה);
   2. כל מוצר מסומן ← `createComplexMatanot` (+ `discoveryKeywords`, מיקום);
+     **משימות/משאבים שבמתכון:** ברקמה של חבר אחד הם נוצרים קודם בדיוק כמו שורה עצמאית
+     (`createMission` / `createResource` — `me` ⇒ בתהליך, `open` ⇒ פתוחה) ושורת ה-BOM
+     מקושרת אליהם (`mesimabetahalichId` / `openMissionId` / `mashabetahalichId` /
+     `openMashaabimId`; לפתוחה נרשם pendm/pmash "מוכרע" — archived ומצביע עליה, הצורה
+     ש-voteOnPendm/voteOnPmash משאירים). ברקמה מרובת חברים הם מוצעים כשורות המוצר
+     ונכנסים להצבעה איתו. בשני המסלולים `recurring` נשמר כ-`iskvua`, ומשאב
+     `monthly`/`yearly` הוא מחיר לתקופה ונוצר חוזר (מסך האישור מציג "לחודש");
   3. משימות ← `createMission` (`holder:'me'` משויכת אליי, `open` ⇒ פתוחה);
   4. משאבים ← `createMashaabim` / `createMashaabimRequest`;
   5. שותפים ← הזמנה **בזרימה הרגילה**: המשימות/המשאבים שהשותף מביא נוצרים

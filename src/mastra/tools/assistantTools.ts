@@ -64,6 +64,9 @@ export const proposeRikmaBlueprintTool = createTool({
     '- missions and resources only when they make a product (put their refs in the product recipe) or when someone ' +
     'is still needed (holder "open"). holder "me" = the person you are talking to does it; "partner" + partnerRef = ' +
     'a partner listed in `partners`.\n' +
+    '- a running cost is priced per period, never as a total: rent or a subscription is a resource with ' +
+    'kindOf "monthly" (or "yearly") and its price per month; ongoing work every month is a mission with ' +
+    '`recurring: true` and `hours` per month.\n' +
     '- `why` on each row: one sentence of where it came from ("the site lists it at 180").\n' +
     'Pass projectId to add to a rikma the person is already a member of. ' +
     HOW_TO_PRESENT,

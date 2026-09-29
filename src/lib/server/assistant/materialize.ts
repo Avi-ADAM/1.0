@@ -115,6 +115,35 @@ export async function runMaterialization(
     memberCount = await deps.memberCount(projectId);
     projectName = (await deps.projectName(projectId)) || projectName;
   }
+  const now = new Date().toISOString();
+
+  // The standalone paths, shared with a one-member rikma's recipe rows.
+  const createMissionRow = async (item: AssistantItem, pctx: ParamContext): Promise<boolean> => {
+    const vocab = await deps.resolveMissionVocab(item);
+    const r = await deps.runAction('createMission', missionParams(item, { ...pctx, vocab: vocab ? { [item.key]: vocab } : {} }));
+    const id = r?.data?.createdEntityId;
+    if (r?.success && id) {
+      mark(item, String(r.data.createdEntityType ?? 'mission'), String(id));
+      return true;
+    }
+    outcome.failed.push({ key: item.key, message: errorText(r, 'Creating the mission failed') });
+    return false;
+  };
+  const createResourceRow = async (item: AssistantItem, pctx: ParamContext): Promise<boolean> => {
+    const r = await deps.runAction('createResource', resourceParams(item, pctx));
+    const id = r?.data?.id;
+    if (r?.success && id) {
+      // createResource opens the resource in a one-member rikma and puts it to
+      // a vote (pmash) otherwise — the same split the form has. A recurring one
+      // the founder brings runs at once, as a mashabetahalich.
+      if (memberCount > 1) mark(item, 'pmash', String(id));
+      else if (r.data.mashabetahalichId) mark(item, 'mashabetahalich', String(r.data.mashabetahalichId));
+      else mark(item, 'openMashaabim', String(id));
+      return true;
+    }
+    outcome.failed.push({ key: item.key, message: errorText(r, 'Creating the resource failed') });
+    return false;
+  };
 
   for (const step of plan.steps) {
     if (step.type === 'createRikma') {
@@ -137,27 +166,33 @@ export async function runMaterialization(
       outcome.failed.push({ key: 'rikma', message: 'No rikma to create into' });
       return outcome;
     }
-    const pctx: ParamContext = { projectId, userId: ctx.userId, memberCount };
+    const pctx: ParamContext = { projectId, userId: ctx.userId, memberCount, now };
 
     if (step.type === 'mission') {
-      const item = byKey.get(step.key)!;
-      const vocab = await deps.resolveMissionVocab(item);
-      const r = await deps.runAction('createMission', missionParams(item, { ...pctx, vocab: vocab ? { [item.key]: vocab } : {} }));
-      const id = r?.data?.createdEntityId;
-      if (r?.success && id) mark(item, String(r.data.createdEntityType ?? 'mission'), String(id));
-      else outcome.failed.push({ key: item.key, message: errorText(r, 'Creating the mission failed') });
+      await createMissionRow(byKey.get(step.key)!, pctx);
     } else if (step.type === 'resource') {
-      const item = byKey.get(step.key)!;
-      const r = await deps.runAction('createResource', resourceParams(item, pctx));
-      const id = r?.data?.id;
-      // createResource opens the resource in a one-member rikma and puts it to
-      // a vote (pmash) otherwise — the same split the form has.
-      if (r?.success && id) mark(item, memberCount > 1 ? 'pmash' : 'openMashaabim', String(id));
-      else outcome.failed.push({ key: item.key, message: errorText(r, 'Creating the resource failed') });
+      await createResourceRow(byKey.get(step.key)!, pctx);
     } else if (step.type === 'product') {
       const item = byKey.get(step.key)!;
       const missions = step.missionKeys.map((k) => byKey.get(k)!).filter(Boolean);
       const resources = step.resourceKeys.map((k) => byKey.get(k)!).filter(Boolean);
+
+      // One member: nobody else is asked, so the recipe rows are created as
+      // what they are — in progress for the founder, open otherwise — and the
+      // product's lines link to them. Proposing them inside the product would
+      // leave the founder with a vote per row. A row an earlier run created
+      // is reused; if one fails, the product waits for the re-run rather than
+      // proposing that row as a vote.
+      if (memberCount === 1) {
+        let ready = true;
+        for (const row of missions) if (!row.createdRef) ready = (await createMissionRow(row, pctx)) && ready;
+        for (const row of resources) if (!row.createdRef) ready = (await createResourceRow(row, pctx)) && ready;
+        if (!ready) {
+          outcome.failed.push({ key: item.key, message: 'Part of its recipe could not be created' });
+          await deps.saveProgress(state, projectId);
+          continue;
+        }
+      }
       const names = Array.isArray(item.spec?.categories)
         ? (item.spec!.categories as unknown[]).filter((c): c is string => typeof c === 'string')
         : [];
