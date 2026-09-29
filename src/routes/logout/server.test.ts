@@ -79,6 +79,13 @@ describe('GET /logout', () => {
     expect(run('https://www.1lev1.com/logout?to=/login').redirect?.location).toBe('/login');
   });
 
+  it('hands back to a sister site', () => {
+    const to = encodeURIComponent('https://consensus.1lev1.com/negotiation/5');
+    expect(run(`https://www.1lev1.com/logout?to=${to}`).redirect?.location).toBe(
+      'https://consensus.1lev1.com/negotiation/5'
+    );
+  });
+
   it('refuses an off-site ?to= (open redirect)', () => {
     expect(run('https://www.1lev1.com/logout?to=https://evil.example').redirect?.location).toBe('/');
     expect(run('https://www.1lev1.com/logout?to=//evil.example').redirect?.location).toBe('/');

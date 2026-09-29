@@ -42,7 +42,7 @@
 
 {#if pilot.status !== 'unavailable'}
   <section class="pilot" class:on={pilot.optedIn} aria-labelledby="p2p-pilot-title">
-    <div class="top">
+    <div class="pilot-top">
       <span class="badge">{$t('rikmaDocs.p2p.badge')}</span>
       <h3 id="p2p-pilot-title">{$t('rikmaDocs.p2p.title')}</h3>
       <button
@@ -103,7 +103,8 @@
     border-style: solid;
     border-color: rgb(16 185 129 / 0.55);
   }
-  .top {
+  /* Not `.top`: app.postcss has a global `.top { position: fixed }`. */
+  .pilot-top {
     display: flex;
     align-items: center;
     gap: 0.6rem;

@@ -202,6 +202,7 @@ export const qidsAccess = {
   'CreateClause': { allow: ['user', 'serviceConsensus'] }, // consensus
   'UpdateClause': { allow: ['user', 'serviceConsensus'] }, // consensus
   'ListPlaces': { allow: ['user', 'serviceConsensus'] }, // consensus
+  'ConsensusMyPlaces': { allow: ['user'] }, // consensus — own places, uid pinned in guards.js
   '43updateProfilePic': { allow: ['user', 'serviceAdmin'] },
   '44updateWelcomeCard': { allow: ['user', 'serviceAdmin'] },
   '45deleteMachshir': { allow: ['serviceAdmin'] }, // server-only callers

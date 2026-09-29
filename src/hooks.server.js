@@ -440,9 +440,16 @@ async function handleRequest({ event, resolve }) {
     const exp = oneYear.toUTCString();
 
     const headers = new Headers({ Location: '/signup' });
+    // Shared with the sister sub-domains (consensus.1lev1.com recognizes an
+    // agreement signatory by `fpval`), but only when really on 1lev1.com — on
+    // a preview host that domain would void the cookie. Same rule as
+    // signupCookieOptions.
+    const host = event.url.hostname;
+    const domainAttr = host === '1lev1.com' || host.endsWith('.1lev1.com') ? '; Domain=.1lev1.com' : '';
+    const secureAttr = event.url.protocol === 'https:' ? '; Secure' : '';
     const setCookie = (name, value) => {
       if (value == null || value === '') return;
-      headers.append('Set-Cookie', `${name}=${encodeURIComponent(value)}; Path=/; Expires=${exp}; SameSite=Lax`);
+      headers.append('Set-Cookie', `${name}=${encodeURIComponent(value)}; Path=/; Expires=${exp}; SameSite=Lax${domainAttr}${secureAttr}`);
     };
 
     const em = p.get('em');
@@ -455,7 +462,11 @@ async function handleRequest({ event, resolve }) {
     if (em) setCookie('email', em);
     if (un) setCookie('un', un);
     if (id) setCookie('fpval', id);
-    if (con) setCookie('contriesi', con);
+    if (con) {
+      setCookie('contriesi', con);
+      // The name /signup's load and action read the countries from.
+      setCookie('country', con);
+    }
 
     return pinTheme(new Response('Redirect', { status: 303, headers }));
   }

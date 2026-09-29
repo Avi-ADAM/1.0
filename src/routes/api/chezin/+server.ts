@@ -17,10 +17,17 @@ import type { RequestHandler } from './$types';
 import { sendToSer } from '$lib/send/sendToSer.js';
 import { signupCookieOptions } from '$lib/server/signupCookies.js';
 
+// Credentials are allowed so the signature cookies below (`fpval`, `un`,
+// `email`, `country` on .1lev1.com) are stored when the agreement site signs
+// with `credentials: 'include'`. That signature is how consensus.1lev1.com
+// recognizes a signatory, and /signup finds it already seated. The origin is
+// a fixed sister site, never echoed from the request.
 const corsHeaders = {
   'Access-Control-Allow-Origin': 'https://agreement.1lev1.com',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type'
+  'Access-Control-Allow-Headers': 'Content-Type',
+  'Access-Control-Allow-Credentials': 'true',
+  Vary: 'Origin'
 };
 
 export const POST: RequestHandler = async ({ request, fetch, cookies, url }) => {
@@ -48,8 +55,8 @@ export const POST: RequestHandler = async ({ request, fetch, cookies, url }) => 
     // Seat the /signup handshake from the server. A Set-Cookie survives where
     // the page's own document.cookie write does not (iOS Safari, in-app
     // browsers), and /signup's load redirects back to /hascama without
-    // `fpval`. Cross-origin callers (agreement.1lev1.com) simply won't store
-    // them — the response carries no Allow-Credentials — which is harmless.
+    // `fpval`. The agreement site (cross-origin, same site) stores them too
+    // when it calls with credentials — see corsHeaders.
     const chezinId = (result as any)?.data?.createChezin?.data?.id;
     if (chezinId) {
       const opts = signupCookieOptions(url);

@@ -109,6 +109,35 @@ describe('runSendGuards — 308myResourcesViaUser', () => {
   });
 });
 
+describe('runSendGuards — ConsensusMyPlaces', () => {
+  const q = { ...base, queId: 'ConsensusMyPlaces' };
+
+  it('allows reading your own places', async () => {
+    await expect(
+      runSendGuards({ ...q, callerId: '7', variablesObject: { uid: 7 } })
+    ).resolves.toBeUndefined();
+  });
+
+  it("blocks reading another user's places", async () => {
+    const r = await statusOf(() =>
+      runSendGuards({ ...q, callerId: '7', variablesObject: { uid: '8' } })
+    );
+    expect((r as any).status).toBe(403);
+  });
+
+  it('blocks the service path', async () => {
+    const r = await statusOf(() =>
+      runSendGuards({ ...q, isSer: true, callerId: undefined, variablesObject: { uid: '8' } })
+    );
+    expect((r as any).status).toBe(403);
+  });
+
+  it('requires a caller', async () => {
+    const r = await statusOf(() => runSendGuards({ ...q, variablesObject: { uid: '8' } }));
+    expect((r as any).status).toBe(401);
+  });
+});
+
 describe('runSendGuards — 170getMyCoMembers', () => {
   const q = { ...base, queId: '170getMyCoMembers' };
 

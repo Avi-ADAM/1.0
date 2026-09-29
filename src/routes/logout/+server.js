@@ -1,5 +1,6 @@
 import { redirect } from '@sveltejs/kit';
 import { AUTH_COOKIES, authCookieScopes } from '$lib/server/session.js';
+import { safeRedirectTarget } from '$lib/auth/redirectTarget.js';
 
 /**
  * Cookies dropped on an explicit sign-out.
@@ -62,11 +63,12 @@ export function POST({ cookies, url }) {
 
 /**
  * GET /logout — plain-link fallback (JS off, or a link from elsewhere).
- * Redirects home; `?to=` may name an in-app path such as `/login`.
+ * Redirects home; `?to=` may name an in-app path such as `/login`, or a page
+ * of a sister site (consensus.1lev1.com signs out through here, since the
+ * session cookies are this app's to clear). Filtered like /login's `from`.
  * @type {import('./$types').RequestHandler}
  */
 export function GET({ cookies, url }) {
   clearSession(cookies, url.hostname);
-  const to = url.searchParams.get('to');
-  throw redirect(303, to && to.startsWith('/') && !to.startsWith('//') ? to : '/');
+  throw redirect(303, safeRedirectTarget(url.searchParams.get('to'), '/'));
 }

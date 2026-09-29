@@ -43,7 +43,7 @@
     "@sveltejs/adapter-node": "^5.2.12",
     "@sveltejs/adapter-static": "^3.0.8",
     "@sveltejs/adapter-vercel": "^5.7.2",
-    "@sveltejs/kit": "^2.21.5",
+    "@sveltejs/kit": "^2.70.3",
     "@sveltejs/vite-plugin-svelte": "^5.1.0",
     "@tauri-apps/cli": "^2.9.6",
     "@testing-library/jest-dom": "^6.9.1",
@@ -63,7 +63,7 @@
     "patch-package": "^8.0.1",
     "postcss-load-config": "^6.0.1",
     "svead": "^0.0.4",
-    "svelte": "^5.34.6",
+    "svelte": "~5.56.10",
     "svelte-animated-headline": "^2.0.0",
     "svelte-calendar": "^3.1.6",
     "svelte-check": "^4.6.0",
@@ -76,7 +76,7 @@
     "typescript": "^5.5.4",
     "utf-8-validate": "^5.0.10",
     "vite-plugin-devtools-json": "^1.0.0",
-    "vitest": "^3.2.4"
+    "vitest": "^3.2.7"
   },
   "dependencies": {
     "@1lev1/svelte-share": "^0.0.9",
@@ -118,7 +118,7 @@
     "@tiptap/pm": "^2.6.6",
     "@tiptap/starter-kit": "^2.6.6",
     "@vercel/analytics": "^1.3.1",
-    "axios": "^1.7.7",
+    "axios": "^1.20.0",
     "bits-ui": "^2.8.11",
     "blueimp-canvas-to-blob": "^3.29.0",
     "buffer": "^6.0.3",
@@ -178,7 +178,7 @@
     "three": "^0.168.0",
     "topojson-client": "^3.1.0",
     "vaul-svelte": "^1.0.0-next.7",
-    "vite": "^6.3.5",
+    "vite": "^6.4.3",
     "web-push": "^3.6.7",
     "yootils": "^0.3.1",
     "yup": "^1.4.0"
@@ -188,5 +188,8 @@
     "singleQuote": true,
     "tabWidth": 2,
     "trailingComma": "none"
+  },
+  "overrides": {
+    "esrap": "2.2.12"
   }
 }

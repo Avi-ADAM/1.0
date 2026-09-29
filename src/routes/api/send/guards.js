@@ -144,6 +144,17 @@ const PRE_GUARDS = {
     }
   },
 
+  // The places a member belongs to, for the consensus site's local map. Their
+  // countries and their agreement signature are theirs alone, so `uid` is
+  // pinned to the caller — and there is no service path to leave open.
+  'ConsensusMyPlaces': ({ isSer, callerId, variablesObject }) => {
+    if (isSer) throw error(403, 'Forbidden: ConsensusMyPlaces runs on the caller session only');
+    if (!callerId) throw error(401, 'Unauthorized: No caller id');
+    if (String(variablesObject.uid) !== String(callerId)) {
+      throw error(403, 'Forbidden: Can only read your own places');
+    }
+  },
+
   // Editing a position (UpdatePosition without support:true) is registered-user
   // only. Votes (support:true) are handled earlier by the idempotent-vote path
   // and never reach here, so any service call at this point is a direct edit.

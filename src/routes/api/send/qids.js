@@ -1056,6 +1056,7 @@ const qids_base = {
                   aiMeta
                   author {
                     data {
+                      id
                       attributes {
                         username
                         email
@@ -1086,6 +1087,30 @@ const qids_base = {
                   username
                   email
                 }
+              }
+            }
+          }
+        }
+      }
+    }
+  `,
+
+  // arg: { uid } — pinned to the caller in guards.js. The consensus site's
+  // local map opens on the places a member belongs to: the countries on their
+  // account and the ones they picked when signing the agreement (their chezin).
+  // JWT path only: a charter signatory's countries come from the `country`
+  // cookie that /api/chezin leaves on .1lev1.com.
+  'ConsensusMyPlaces': `
+    query ConsensusMyPlaces($uid: ID!) {
+      usersPermissionsUser(id: $uid) {
+        data {
+          id
+          attributes {
+            cuntries { data { id attributes { name } } }
+            chezin {
+              data {
+                id
+                attributes { countries { data { id attributes { name } } } }
               }
             }
           }

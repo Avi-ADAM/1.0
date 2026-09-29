@@ -1,3 +1,4 @@
+import { redirect } from '@sveltejs/kit';
 import { DEFAULT_REDIRECT, safeRedirectTarget } from '$lib/auth/redirectTarget.js';
 import { signInHome } from '$lib/concierge/regIntent.js';
 
@@ -6,7 +7,18 @@ import { signInHome } from '$lib/concierge/regIntent.js';
  * user who just clicked the mail link only has to type the password. Read on
  * the server because the cookie may carry a `.1lev1.com` domain.
  */
-export async function load({ cookies }) {
+export async function load({ cookies, locals, url }) {
+    // Already signed in and sent here by a sister site (consensus.1lev1.com's
+    // "log in" button carries `?from=<the page you were on>`): there is nothing
+    // to type — go straight back. The session cookie is on .1lev1.com, so the
+    // sister site sees it the moment it loads. Only for an absolute sister url;
+    // an in-app `from` keeps the form (the expired-session flow relies on it).
+    if (locals.tok && !locals.sessionExpired) {
+        const from = safeRedirectTarget(url.searchParams.get('from'), '');
+        if (/^https?:\/\//i.test(from) && new URL(from).hostname !== url.hostname) {
+            redirect(303, from);
+        }
+    }
     return { prefillEmail: cookies.get('email') ?? '' };
 }
 
