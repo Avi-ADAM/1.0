@@ -29,7 +29,17 @@ export async function load({ url, cookies, fetch }) {
     try {
       const res = await fetch(`/api/assistant/signup-token?t=${encodeURIComponent(agentToken)}`);
       const body = res.ok ? await res.json() : null;
-      if (body?.ok) agent = { token: agentToken, prefill: body.prefill };
+      if (body?.ok) {
+        // Back from signing the extended agreement on agreement.1lev1.com:
+        // `full` is the row that signing made, `xn` the nonce this tab left
+        // with. Only shapes here — the screen matches the nonce against its
+        // own tab, and agent-sign checks the row itself.
+        const full = url.searchParams.get('full');
+        const xn = url.searchParams.get('xn');
+        const returned =
+          full && /^\d{1,12}$/.test(full) && xn && /^[A-Za-z0-9-]{8,64}$/.test(xn) ? { full, xn } : null;
+        agent = { token: agentToken, prefill: body.prefill, returned };
+      }
     } catch {
       agent = null;
     }

@@ -661,6 +661,7 @@ export const qidsAccess = {
   '369listExpiredPendingAssistant': { allow: ['serviceAdmin'] },
   '380deleteAssistantSession': { allow: ['serviceAdmin'] },
   '378getChezinForClaim': { allow: ['serviceAdmin'] },
+  '386getChezinForAgentSign': { allow: ['serviceAdmin'] },
   // Profile sessions (§6): read / write the caller's own profile, with the
   // user id bound by the action — never a client param.
   '381getUserProfileForAssistant': { allow: ['serviceAdmin'] },

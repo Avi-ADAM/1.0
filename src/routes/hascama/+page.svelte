@@ -15,7 +15,7 @@
   import { fpval } from '$lib/components/registration/fpval.js';
   import { t, isRtl } from '$lib/translations';
 
-  /** @type {{ data: { concierge?: boolean, agent?: { token: string, prefill: any } | null } }} */
+  /** @type {{ data: { concierge?: boolean, agent?: { token: string, prefill: any, returned: { full: string, xn: string } | null } | null } }} */
   let { data } = $props();
 
   let user = 0;
@@ -174,7 +174,7 @@ regHelperL = 0;
 { goto("/lev", )}
 {:else}-->
   {#if data.agent}
-    <AgentSignup token={data.agent.token} prefill={data.agent.prefill} />
+    <AgentSignup token={data.agent.token} prefill={data.agent.prefill} returned={data.agent.returned} />
   {:else if regHelperL == 0}
     <Amana1 />
   {:else if regHelperL == -1}

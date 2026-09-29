@@ -84,6 +84,17 @@ export const assistantQids = {
     chezin(id: $id) { data { id attributes { email createdAt } } }
   }`,
 
+  // The extended-agreement signature a person brings back to the agent screen
+  // from agreement.1lev1.com (§5.3): agent-sign checks it is fresh, theirs,
+  // really the extended one, and nobody's yet before it is used.
+  '386getChezinForAgentSign': `query GetChezinForAgentSign($id: ID!) {
+    chezin(id: $id) { data { id attributes {
+      email fullAgreement createdAt
+      users_permissions_user { data { id } }
+      assistant_sessions { data { id } }
+    } } }
+  }`,
+
   // The signatory row a signed-in user was created with (register sets it).
   '379getUserChezin': `query GetUserChezin($uid: ID!) {
     usersPermissionsUser(id: $uid) { data { id attributes { chezin { data { id } } } } }

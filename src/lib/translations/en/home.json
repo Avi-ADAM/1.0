@@ -434,7 +434,12 @@
         "mismatch": "The two passwords don't match.",
         "expired": "This link has expired. You can register as usual, or ask your assistant for a new link.",
         "rate-limited": "Too many attempts. Try again in a few minutes.",
-        "failed": "Something went wrong. Try again in a moment."
+        "failed": "Something went wrong. Try again in a moment.",
+        "extended": "We couldn't match your Extended Agreement signature to these details - the email has to be the one you signed with there. You can sign the Basic Agreement here instead, or sign the extended one again."
+      },
+      "extended": {
+        "optional": "Optional. The Extended Agreement opens on the agreement site; once you sign it there you'll come straight back here, with everything you filled in, to choose your password.",
+        "back": "You're back from the agreement site. All that's left is choosing a password."
       }
     }
   },

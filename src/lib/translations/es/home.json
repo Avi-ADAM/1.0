@@ -435,7 +435,12 @@
         "mismatch": "Las dos contraseñas no coinciden.",
         "expired": "El enlace caducó. Puedes registrarte como siempre o pedirle a tu asistente un enlace nuevo.",
         "rate-limited": "Demasiados intentos. Vuelve a intentarlo en unos minutos.",
-        "failed": "Algo salió mal. Inténtalo de nuevo en un momento."
+        "failed": "Algo salió mal. Inténtalo de nuevo en un momento.",
+        "extended": "No pudimos vincular tu firma del acuerdo ampliado con estos datos: el correo tiene que ser el mismo con el que firmaste allí. Puedes firmar aquí el acuerdo básico o volver a firmar el ampliado."
+      },
+      "extended": {
+        "optional": "Opcional. El acuerdo ampliado se abre en el sitio del acuerdo; en cuanto lo firmes allí volverás directamente aquí, con todo lo que completaste, solo para elegir tu contraseña.",
+        "back": "Volviste del sitio del acuerdo. Solo falta elegir tu contraseña."
       }
     }
   },

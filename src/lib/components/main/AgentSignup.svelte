@@ -14,20 +14,28 @@
    *
    * The name reaches this screen from a link someone else may have made, so it
    * is escaped before it goes into the agreement's HTML.
+   *
+   * The extended agreement is optional here as it is on the ordinary /hascama,
+   * and signed where it always is, on agreement.1lev1.com. The link carries a
+   * way back to this very screen (the same token, plus a nonce), and the
+   * agreement site returns with `full=<its signatory row>`. That row counts
+   * only in the tab that left for it — the nonce is kept in this tab's
+   * sessionStorage — so a link someone else builds with a row id in it signs
+   * nothing; agent-sign then checks the row itself (extendedSignature.ts).
    */
   import { t, locale } from '$lib/translations';
   import MultiSelect from 'svelte-multiselect';
   import { SIGNUP_COUNTRIES } from '$lib/data/signupCountries.js';
   import { AGENT_INTENT, REG_INTENT_COOKIE } from '$lib/concierge/regIntent.js';
-  import { tick, untrack } from 'svelte';
+  import { onMount, tick, untrack } from 'svelte';
 
   /**
    * @typedef {{ id: number, label: string, heb: string }} Country
    * @typedef {{ name: string, email: string, countries: Country[], intent: string, lang: string }} Prefill
    */
 
-  /** @type {{ token: string, prefill: Prefill }} */
-  let { token, prefill } = $props();
+  /** @type {{ token: string, prefill: Prefill, returned?: { full: string, xn: string } | null }} */
+  let { token, prefill, returned = null } = $props();
 
   const labelOf = (/** @type {{ label: string, heb: string }} */ c) => ($locale === 'he' ? c.heb : c.label);
 
@@ -41,6 +49,61 @@
   let password2 = $state('');
   let busy = $state(false);
   let error = $state('');
+
+  const EXTENDED_SITE = 'https://agreement.1lev1.com/hascama';
+  const EXTENDED_KEY = 'agentExtended';
+  // The row the extended signing made, once this tab is known to have left for it.
+  /** @type {string | null} */
+  let extendedId = $state(null);
+  // Minted in the browser only: the way back is built from this tab's origin.
+  let nonce = $state('');
+  const tokenTag = untrack(() => token.slice(-24));
+
+  onMount(() => {
+    nonce = globalThis.crypto?.randomUUID?.() ?? `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 12)}`;
+    if (!returned) return;
+    try {
+      const saved = JSON.parse(sessionStorage.getItem(EXTENDED_KEY) ?? 'null');
+      if (saved?.t !== tokenTag || saved?.n !== returned.xn) return;
+      extendedId = returned.full;
+      // What they had typed before leaving, not the agent's first draft.
+      if (typeof saved.name === 'string') name = saved.name;
+      if (typeof saved.email === 'string') email = saved.email;
+      if (Array.isArray(saved.selected)) selected = saved.selected.filter((/** @type {unknown} */ v) => typeof v === 'string');
+    } catch {
+      // No storage, no claim: the short agreement is still right here.
+    }
+  });
+
+  let extendedHref = $derived.by(() => {
+    if (!nonce) return EXTENDED_SITE;
+    const back = `${window.location.origin}/hascama?agent=${encodeURIComponent(token)}&xn=${nonce}`;
+    const q = new URLSearchParams({ return: back, lang: $locale });
+    if (name.trim()) q.set('name', name.trim());
+    if (email.trim()) q.set('email', email.trim());
+    if (selected.length) q.set('location', JSON.stringify(selected));
+    return `${EXTENDED_SITE}?${q}`;
+  });
+
+  function goToExtended(/** @type {MouseEvent} */ e) {
+    if (!nonce) return; // not hydrated yet: the plain link still opens the agreement
+    e.preventDefault();
+    try {
+      sessionStorage.setItem(EXTENDED_KEY, JSON.stringify({ t: tokenTag, n: nonce, name, email, selected: [...selected] }));
+    } catch {
+      // Without storage the way back is not accepted; they can still read it.
+    }
+    window.location.assign(extendedHref);
+  }
+
+  function forgetExtended() {
+    extendedId = null;
+    try {
+      sessionStorage.removeItem(EXTENDED_KEY);
+    } catch {
+      /* nothing kept */
+    }
+  }
 
   /** @type {HTMLFormElement | undefined} */
   let signupForm = $state();
@@ -65,7 +128,7 @@
     error = '';
     if (!name.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) return (error = $t('home.amana.agent.errors.fields'));
     if (!countryIds().length) return (error = $t('home.amana.errors.locationRequired'));
-    if (!agreed) return (error = $t('home.amana.agent.errors.agreement'));
+    if (!agreed && !extendedId) return (error = $t('home.amana.agent.errors.agreement'));
     if (!passwordOk) return (error = $t('home.amana.agent.errors.weak'));
     if (password !== password2) return (error = $t('home.amana.agent.errors.mismatch'));
 
@@ -75,17 +138,27 @@
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({ t: token, name: name.trim(), email: email.trim(), countries: countryIds(), agreed: true })
+        body: JSON.stringify({
+          t: token,
+          name: name.trim(),
+          email: email.trim(),
+          countries: countryIds(),
+          agreed: true,
+          ...(extendedId ? { fullChezin: extendedId } : {})
+        })
       });
       const body = await res.json().catch(() => ({}));
       if (!res.ok || !body?.ok) {
-        const reason = ['expired', 'fields', 'countries', 'agreement', 'rate-limited'].includes(body?.reason) ? body.reason : 'failed';
+        const reason = ['expired', 'fields', 'countries', 'agreement', 'extended', 'rate-limited'].includes(body?.reason) ? body.reason : 'failed';
+        // A signature that did not check out: back to the short agreement.
+        if (reason === 'extended') forgetExtended();
         error = $t(`home.amana.agent.errors.${reason}`);
         busy = false;
         return;
       }
       // After the email confirmation: continue into what was prepared.
       document.cookie = `${REG_INTENT_COOKIE}=${AGENT_INTENT}; path=/; max-age=${60 * 60 * 24 * 7}; samesite=lax`;
+      forgetExtended();
       fp = String(body.chezinId);
       con = (body.countries ?? countryIds()).join(',');
       // The ordinary signup action, as a real form post (its redirect is a page).
@@ -128,15 +201,33 @@
 
       <div class="agreement">
         <h2>{$t('home.amana.agreement.title')}</h2>
-        <p>
-          {@html $t('home.amana.agreement.basicText1', { name: safeName })}
-          <br />
-          {@html $t('home.amana.agreement.basicText2', { name: safeName })}
-        </p>
-        <label class="check">
-          <input type="checkbox" bind:checked={agreed} />
-          <span>{$t('home.amana.agreement.checkboxLabel')}</span>
-        </label>
+        {#if extendedId}
+          <p class="signed" role="status"><span aria-hidden="true">✓</span> {$t('home.amana.agreedFull')}</p>
+          <p class="ext-note">{$t('home.amana.agent.extended.back')}</p>
+        {:else}
+          <p>
+            {@html $t('home.amana.agreement.basicText1', { name: safeName })}
+            <br />
+            {@html $t('home.amana.agreement.basicText2', { name: safeName })}
+          </p>
+          <label class="check">
+            <input type="checkbox" bind:checked={agreed} />
+            <span>{$t('home.amana.agreement.checkboxLabel')}</span>
+          </label>
+
+          <div class="extended">
+            <strong class="ext-title">{$t('home.amana.agreement.infoTitle')}</strong>
+            <ul>
+              <li>{@html $t('home.amana.agreement.basicInfo')}</li>
+              <li>
+                <a href={extendedHref} onclick={goToExtended}>{@html $t('home.amana.agreement.fullAgreementLink')}</a
+                >{$t('home.amana.agreement.fullAgreementDesc')}
+              </li>
+            </ul>
+            <p class="ext-note">{$t('home.amana.agent.extended.optional')}</p>
+            <a class="ext-btn" href={extendedHref} onclick={goToExtended}>{$t('home.amana.agreement.fullButton')}</a>
+          </div>
+        {/if}
       </div>
 
       <label class="field">
@@ -238,6 +329,45 @@
     margin: 0 0 0.6rem;
     line-height: 1.6;
     font-size: 0.9rem;
+  }
+  .signed {
+    margin: 0 0 0.35rem;
+    font-weight: 700;
+    color: #5be2a9;
+  }
+  .extended {
+    margin-top: 0.8rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+    font-size: 0.85rem;
+  }
+  .ext-title {
+    color: #ffd700;
+  }
+  .extended ul {
+    margin: 0.35rem 0 0.5rem;
+    padding-inline-start: 1.2rem;
+    line-height: 1.55;
+  }
+  .extended a {
+    color: #ffd700;
+  }
+  .ext-note {
+    margin: 0 0 0.6rem;
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.8);
+  }
+  .ext-btn {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 215, 0, 0.6);
+    text-decoration: none;
+    font-weight: 600;
+  }
+  .ext-btn:hover,
+  .ext-btn:focus-visible {
+    background: rgba(255, 215, 0, 0.12);
   }
   .check {
     display: flex;
