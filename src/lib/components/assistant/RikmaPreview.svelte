@@ -8,7 +8,7 @@
    * panels, the same tiles — so a partner sees what they would really get, with
    * one banner that says none of it exists yet.
    */
-  import { t } from '$lib/translations';
+  import { t, locale } from '$lib/translations';
   import AuthorityBadge from '$lib/components/ui/AuthorityBadge.svelte';
   import Tile from '$lib/celim/tile.svelte';
 
@@ -39,10 +39,10 @@
 
   function money(/** @type {number} */ n) {
     const cur = view.currency ? ` ${view.currency}` : '';
-    return `${n.toLocaleString()}${cur}`;
+    return `${n.toLocaleString($locale || 'he')}${cur}`;
   }
 
-  let until = $derived(expiresAt ? new Date(expiresAt).toLocaleDateString() : '');
+  let until = $derived(expiresAt ? new Date(expiresAt).toLocaleDateString($locale || 'he') : '');
 </script>
 
 <div class="min-h-screen bg-gradient-to-br from-[#1a0515] via-[#2c0b1e] to-[#120f26] text-white overflow-x-hidden font-sans">
