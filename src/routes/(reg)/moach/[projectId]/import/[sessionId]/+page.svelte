@@ -20,7 +20,7 @@
 </svelte:head>
 
 {#if conflict}
-  <p class="mx-auto max-w-3xl mt-4 rounded-xl border border-amber-300 bg-amber-50 p-3 text-sm" role="status">
+  <p class="mx-auto max-w-3xl mt-4 rounded-xl border-2 border-amber-500 bg-surface text-surfaceInk p-3 text-sm text-start" role="status">
     {$t('rikmaImport.conflict')}
   </p>
 {/if}
