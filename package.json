@@ -190,5 +190,8 @@
   },
   "overrides": {
     "esrap": "2.2.12"
+  },
+  "resolutions": {
+    "esrap": "2.2.12"
   }
 }
