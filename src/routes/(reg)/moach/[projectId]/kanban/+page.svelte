@@ -5,7 +5,7 @@
   import { page } from '$app/state';
   import { sendToSer } from '$lib/send/sendToSer.js';
   import { onMount } from 'svelte';
-  import Lowding from '$lib/celim/lowding.svelte';
+  import Spinner from '$lib/celim/Spinner.svelte';
   import { lang } from '$lib/stores/lang.js';
 
   let projectId = $derived(page.params.projectId);
@@ -54,7 +54,7 @@
 <div class="kanban-page p-2">
   {#if loading && !missions}
     <div class="flex justify-center p-12">
-      <Lowding />
+      <Spinner />
     </div>
   {:else if missions}
     <Kanbanboard

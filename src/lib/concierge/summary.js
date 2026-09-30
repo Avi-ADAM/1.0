@@ -92,6 +92,26 @@ export function summarizeWishes(rows) {
 }
 
 /**
+ * What the bell lists: one row per sent wish that has offers waiting for the
+ * customer — the same offers the profile badge counts as `updates`, so the
+ * bell never shows news the badge does not (or the reverse).
+ *
+ * @param {any[]} nodes raw `106listMyRatsons` nodes
+ * @returns {{ id: string, name: string, count: number }[]}
+ */
+export function notificationItems(nodes) {
+  /** @type {{ id: string, name: string, count: number }[]} */
+  const items = [];
+  for (const n of nodes ?? []) {
+    const status = ratsonStatus(n?.attributes);
+    if (status === 'draft' || status === 'cancelled' || status === 'expired') continue;
+    const count = pendingProposalCount(n?.attributes);
+    if (count > 0) items.push({ id: String(n.id), name: n.attributes?.name || '', count });
+  }
+  return items;
+}
+
+/**
  * From the raw `106listMyRatsons` nodes.
  *
  * @param {any[]} nodes

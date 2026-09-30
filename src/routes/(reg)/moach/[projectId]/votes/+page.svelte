@@ -3,7 +3,7 @@
   import { lang } from '$lib/stores/lang.js';
   import { sendToSer } from '$lib/send/sendToSer.js';
   import { onMount, onDestroy } from 'svelte';
-  import Lowding from '$lib/celim/lowding.svelte';
+  import Spinner from '$lib/celim/Spinner.svelte';
   import { goto } from '$app/navigation';
   import { socketClient } from '$lib/stores/socketClient';
 
@@ -120,7 +120,7 @@
   <h1 class="text-2xl font-bold text-primary">{$trans('moach.votes.title')}</h1>
 
   {#if loading}
-    <div class="flex justify-center p-12"><Lowding /></div>
+    <div class="flex justify-center p-12"><Spinner /></div>
   {:else}
     <!-- Overview: counts per category, each jumps to its section -->
     {#if totalOpen > 0}

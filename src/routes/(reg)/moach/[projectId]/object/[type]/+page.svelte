@@ -13,7 +13,7 @@
   import { reconstructMissionChains, reconstructResourceChains } from '$lib/utils/reconstructChains.js';
   import { reconstructSaleChains } from '$lib/utils/processLifecycle';
   import { OBJECT_TYPES, listObjects } from '$lib/components/process/lifecycle/objectTypes.js';
-  import Lowding from '$lib/celim/lowding.svelte';
+  import Spinner from '$lib/celim/Spinner.svelte';
 
   let projectId = $derived(page.params.projectId);
   let type = $derived(page.params.type);
@@ -94,7 +94,7 @@
   </div>
 
   {#if loading}
-    <div class="oi-state"><Lowding /><p class="oi-state-sub">{$t('moach.objectList.loading')}</p></div>
+    <div class="oi-state"><Spinner /><p class="oi-state-sub">{$t('moach.objectList.loading')}</p></div>
   {:else if !config}
     <div class="oi-state"><p class="oi-state-title">{$t('moach.objectList.unknownType')}</p><code class="oi-id">{type}</code></div>
   {:else if loadError}

@@ -65,7 +65,7 @@
     where: 'חיפה והקריות',
     budget: '₪ 850–1,200',
     proposalsCount: 6,
-    accessNote: 'משאלה ציבורית · נראית לכל מבקרת/ת'
+    accessNote: 'משאלה ציבורית · נראית לכל מבקר/ת'
   };
 
   const MOCK_MISSIONS = [
@@ -95,7 +95,7 @@
           where: data.wish.locationHint || '',
           budget: fmtBudget(data.wish.totalBounti),
           proposalsCount: data.proposalsCount ?? 0,
-          accessNote: 'משאלה ציבורית · נראית לכל מבקרת/ת'
+          accessNote: 'משאלה ציבורית · נראית לכל מבקר/ת'
         }
       : MOCK_WISH
   );
@@ -128,7 +128,7 @@
     { avatar: 'נג', name: 'נועה גולן', role: 'ספא טבע', color: 'green' },
     { avatar: 'תל', name: 'תמר ל.', role: 'אמהות עוזרות', color: 'green' },
     { avatar: 'יכ', name: 'יואב כ.', role: 'Lift · הסעות', color: 'blue' },
-    { avatar: '+3', name: 'ועוד 3', role: 'בוחנות בימים אלה', color: 'gold' }
+    { avatar: '+3', name: 'ועוד 3', role: 'בבחינה בימים אלה', color: 'gold' }
   ];
 
   function discBorder(c) {
@@ -245,8 +245,8 @@
         <a href="/lev" class="btn-ghost btn-xs">הלב שלי</a>
         <a href="/deals" class="btn-ghost btn-xs hide-xs">עסקאות</a>
       {:else}
-        <a href="/login" class="btn-ghost btn-xs">התחברי</a>
-        <a href="/register" class="btn-ghost btn-xs hide-xs">הצטרפי</a>
+        <a href="/login" class="btn-ghost btn-xs">התחברות</a>
+        <a href="/register" class="btn-ghost btn-xs hide-xs">הצטרפות</a>
       {/if}
     </div>
   </header>
@@ -261,7 +261,7 @@
           <span class="code-lbl hide-xs">קוד משאלה</span>
           <code class="wish-code">{wish.code}</code>
           <button class="btn-ghost btn-xs" onclick={copyLink}>
-            {#if copied}✓ הועתק{:else}<EntityIcon kind="share" size={13} /> שתפי{/if}
+            {#if copied}✓ הועתק{:else}<EntityIcon kind="share" size={13} /> שיתוף{/if}
           </button>
         </div>
       </div>
@@ -315,14 +315,14 @@
           <div class="hero-cta-wrap">
             {#if isLoggedIn}
               {#if offerDone}
-                <span class="badge-open" style="font-size:13px">✓ ההצעה שלך נשלחה לבעלת המשאלה</span>
+                <span class="badge-open" style="font-size:13px">✓ ההצעה שלך נשלחה ליוצר/ת המשאלה</span>
               {:else if myProposals.length}
                 <button class="btn-jewel" onclick={() => (offerOpen = true)}><EntityIcon kind="offers" size={14} /> ההצעות שלי</button>
               {:else}
-                <button class="btn-jewel" onclick={() => (offerOpen = true)}><EntityIcon kind="support" size={14} /> אני יכולה לעזור</button>
+                <button class="btn-jewel" onclick={() => (offerOpen = true)}><EntityIcon kind="support" size={14} /> באפשרותי לעזור</button>
               {/if}
             {:else}
-              <a href={`/login?next=/wish/${wishId}`} class="btn-jewel"><EntityIcon kind="support" size={14} /> אני יכולה לעזור</a>
+              <a href={`/login?next=/wish/${wishId}`} class="btn-jewel"><EntityIcon kind="support" size={14} /> באפשרותי לעזור</a>
             {/if}
           </div>
         </div>
@@ -333,7 +333,7 @@
         <div class="extstrip-hdr">
           <img src="/botlogo.png" class="bot-av" alt="Lev" />
           <div class="ext-labels">
-            <div class="lev-title">Lev פירקה למענה</div>
+            <div class="lev-title">הפירוק של Lev למענה</div>
             <div class="lev-sub">
               ככה חילקנו את המשאלה עם {wish.author}. כל חלק יכול להיות מאוייש
               בנפרד.
@@ -381,7 +381,7 @@
             {/each}
           </div>
           <p class="panel-note">
-            כשתציעי עזרה - חשוב להגיד אם הערכים האלה משקפים גם אותך. זה מה
+            בעת הצעת עזרה - חשוב להגיד אם הערכים האלה משקפים גם אותך. זה מה
             שיעזור ל־{wish.author} לבחור.
           </p>
         </div>
@@ -408,7 +408,7 @@
             {/each}
           </div>
           <p class="panel-note">
-            יש מקום לעוד שותפה - במיוחד לחלקים שעדיין לא אוישו.
+            יש מקום לעוד שותף/ה - במיוחד לחלקים שעדיין לא אוישו.
           </p>
         </div>
       </div>
@@ -418,21 +418,22 @@
         <div class="invite-decor"></div>
         <div class="invite-body">
           <div class="invite-eyebrow">◈ ───── איך לעזור ───── ◈</div>
-          <h2 class="invite-h2">יש לך פיסה לתת? בואי נחבר.</h2>
+          <h2 class="invite-h2">יש לך פיסה לתת? בואו נחבר.</h2>
           <p class="invite-p">
-            פתחנו את המשאלה לקהילה כדי שהשותפות יגיעו ממקומות בלתי־צפויים. אם יש
-            לך זמן, מיומנות, מרחב או חיבור שיכול לעזור לחלק כלשהו - Lev תעזור לך
-            להציע בלי לחץ ובלי התחייבות. הסכמה תיווצר רק כש{wish.author} תאשר.
+            פתחנו את המשאלה לקהילה כדי שהעזרה תגיע ממקומות בלתי־צפויים. אם יש
+            לך זמן, מיומנות, מרחב או חיבור שיכול לעזור לחלק כלשהו - בעזרת Lev
+            אפשר להציע בלי לחץ ובלי התחייבות. הסכמה תיווצר רק לאחר אישור של
+            {wish.author}.
           </p>
           <div class="invite-cta">
             {#if isLoggedIn}
               {#if offerDone}
                 <span class="badge-open" style="font-size:13px">✓ ההצעה שלך נשלחה</span>
               {:else}
-                <button class="btn-jewel" onclick={() => (offerOpen = true)}><EntityIcon kind="support" size={14} /> אני יכולה לעזור</button>
+                <button class="btn-jewel" onclick={() => (offerOpen = true)}><EntityIcon kind="support" size={14} /> באפשרותי לעזור</button>
               {/if}
             {:else}
-              <a href={`/login?next=/wish/${wishId}`} class="btn-jewel"><EntityIcon kind="support" size={14} /> אני יכולה לעזור</a>
+              <a href={`/login?next=/wish/${wishId}`} class="btn-jewel"><EntityIcon kind="support" size={14} /> באפשרותי לעזור</a>
             {/if}
             <a href="/concierge" class="btn-ghost">משאלות אחרות בקהילה</a>
           </div>
@@ -488,7 +489,7 @@
         <div>
           <div class="privacy-title">{wish.accessNote}</div>
           <div class="privacy-sub">
-            רק בעלת המשאלה רואה את ההצעות שלך - בלי חשיפה לקהל. אם תרצי לכתוב,
+            רק יוצר/ת המשאלה רואה את ההצעות שלך - בלי חשיפה לקהל. אם ברצונך לכתוב,
             נצטרך התחברות קלה כדי שיהיה ל־{wish.author} עם מי לדבר.
           </div>
         </div>
@@ -506,9 +507,9 @@
       <button class="ofr-x" onclick={() => (offerOpen = false)} aria-label="סגירה">✕</button>
       <div class="ofr-head">
         <span class="ofr-gem"></span>
-        <h2 class="ofr-title">במה תוכלי לעזור?</h2>
+        <h2 class="ofr-title">במה ברצונך לעזור?</h2>
       </div>
-      <p class="ofr-intro">בחרי את המשימות והמשאבים שבהם תוכלי לסייע. בעלת המשאלה תקבל התראה ותוכל לשלוח לך פרטים נוספים.</p>
+      <p class="ofr-intro">אפשר לבחור את המשימות והמשאבים שבהם ברצונך לסייע. על ההצעה תישלח התראה, ופרטים נוספים יועברו אליך בהמשך.</p>
 
       {#if MISSIONS.length}
         <div class="ofr-section-lbl">✦ משימות</div>
@@ -547,7 +548,7 @@
           onclick={submitOffer}
           disabled={offerSubmitting || (!offerSelected.size && !offerResourceSelected.size)}
         >
-          {#if offerSubmitting}שולח…{:else}<EntityIcon kind="send" size={14} /> שלחי הצעה{/if}
+          {#if offerSubmitting}שולח…{:else}<EntityIcon kind="send" size={14} /> שליחת הצעה{/if}
         </button>
       </div>
     </div>

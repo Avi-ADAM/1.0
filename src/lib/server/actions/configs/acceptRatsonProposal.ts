@@ -385,7 +385,7 @@ export const acceptRatsonProposalConfig: ActionConfig = {
         ar: 'تمت الموافقة على العرض - مطلوبة موافقتك'
       },
       body: {
-        he: 'לקוחה בחרה במוצר שלך דרך הקונסיירז׳. יש להיכנס ל־Deals כדי לאשר את הבקשה.',
+        he: 'המוצר שלך נבחר דרך הקונסיירז׳. יש להיכנס ל־Deals כדי לאשר את הבקשה.',
         en: 'A customer chose your product through the concierge. Open Deals to approve the request.',
         ar: 'اختارت عميلة منتجك عبر الكونسيرج. افتح Deals للموافقة على الطلب.'
       }

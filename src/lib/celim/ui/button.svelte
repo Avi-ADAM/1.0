@@ -1,5 +1,5 @@
 <script>
-  import Lowding from '$lib/celim/lowding.svelte';
+  import Spinner from '$lib/celim/Spinner.svelte';
   import List from '../icons/list.svelte';
   import SucssesConf from '../sucssesConf.svelte';
   import Succses from '../icons/succses.svelte';
@@ -70,8 +70,8 @@ font-bold font-rubik {className}"
       {text}
     </h2>
     {#if loading}
-      <div class="w-8 h-8">
-        <Lowding color={hover ? 'var(--gold)' : 'var(--barbi-pink)'} />
+      <div class="w-8 h-8 grid place-items-center">
+        <Spinner size="sm" color={hover ? 'var(--gold)' : 'var(--barbi-pink)'} />
       </div>
     {/if}
     {#if success}

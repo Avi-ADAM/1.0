@@ -14,6 +14,7 @@
     uid: data.uid || undefined,
     un: data.un || undefined,
     welcome: data.welcome,
-    draft: data.draft
+    draft: data.draft,
+    bell: data.bell
   }}
 />

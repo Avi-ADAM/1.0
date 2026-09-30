@@ -15,7 +15,7 @@
   import { regHelper } from '../../stores/regHelper.js';
   import { show } from '../registration/store-show.js';
 
-  import { RingLoader } from 'svelte-loading-spinners';
+  import Spinner from '$lib/celim/Spinner.svelte';
   import { fly, fade } from 'svelte/transition';
   import Tikun from './tikunolam.svelte';
   import TRan from './translatehe.svelte';
@@ -401,7 +401,7 @@
           </div>
         {:else if a == 2}
           <div class="status-view loading">
-            <RingLoader size="100" color="#ff00ae" unit="px" duration="2s" />
+            <Spinner size="lg" />
             <h3>{$t('home.amana.status.loading')}</h3>
           </div>
         {:else if a == 3 || a == 5}
@@ -611,8 +611,7 @@
             </button>
           {:else}
             <div class="loading-container">
-              <RingLoader size="60" color="#ff00ae" unit="px" duration="1.5s"
-              ></RingLoader>
+              <Spinner size="lg" />
               <p>{$t('home.amana.common.justAMoment')}</p>
             </div>
           {/if}

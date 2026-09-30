@@ -5,7 +5,7 @@
   import { page } from '$app/state';
   import { goto } from '$app/navigation';
   import { toast } from 'svelte-sonner';
-  import { RingLoader } from 'svelte-loading-spinners';
+  import Spinner from '$lib/celim/Spinner.svelte';
 
   // Language stores
   import { lang, langUs, doesLang } from '$lib/stores/lang.js';
@@ -480,7 +480,7 @@
 
 {#if loading}
   <div class="loading-container">
-    <RingLoader size="60" color="#ff00ff" />
+    <Spinner size="lg" />
   </div>
 {:else if error}
   <div class="error-container">
@@ -521,7 +521,7 @@
           {:else if mode == 3}
             <Levchat />
           {:else if mode == 4}
-            <RingLoader size="260" color="#ff00ae" unit="px" duration="2s" />
+            <Spinner size="lg" />
           {:else if mode == 5}
             <Mesima missionId={eizeme} onProject={proj} />
           {/if}

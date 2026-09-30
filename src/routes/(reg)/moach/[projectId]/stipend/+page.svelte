@@ -22,7 +22,7 @@
   import { executeAction } from '$lib/client/actionClient';
   import { cycleLabel } from '$lib/stipend/cycleLabel.js';
   import { toast } from 'svelte-sonner';
-  import Lowding from '$lib/celim/lowding.svelte';
+  import Spinner from '$lib/celim/Spinner.svelte';
   import StipendButton from '$lib/components/stipend/StipendButton.svelte';
   import StipendFundingRequestDialog from '$lib/components/stipend/StipendFundingRequestDialog.svelte';
   // Every block here states its own ground and its own ink. The moach shell
@@ -126,7 +126,7 @@
 
 <div class="stipend-page" dir={$isRtl ? 'rtl' : 'ltr'}>
   {#if loading}
-    <div class="flex justify-center p-12"><Lowding /></div>
+    <div class="flex justify-center p-12"><Spinner /></div>
   {:else if overview}
     <header class="{SURFACE} flex flex-wrap items-start justify-between gap-3 p-4">
       <div>

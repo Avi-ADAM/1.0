@@ -1,9 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { summarizeRatsonNodes, summarizeWishes } from './summary.js';
+import { notificationItems, summarizeRatsonNodes, summarizeWishes } from './summary.js';
 
 const node = (id: string, status: string | null, proposals: string[] = [], fulfilled = false) => ({
   id,
   attributes: {
+    name: `wish ${id}`,
     status_ratson: status,
     fulfilled,
     ratson_proposals: {
@@ -68,5 +69,38 @@ describe('summarizeWishes', () => {
     const s = summarizeRatsonNodes([node('1', 'open', ['suggested']), node('2', 'open', ['viewed'])]);
     expect(s.updates).toBe(2);
     expect(s.updatesWishId).toBeNull();
+  });
+});
+
+describe('notificationItems', () => {
+  it('is empty when nothing waits for the customer', () => {
+    expect(notificationItems([])).toEqual([]);
+    expect(notificationItems([node('1', 'open'), node('2', 'open', ['accepted', 'rejected'])])).toEqual(
+      []
+    );
+  });
+
+  it('lists each wish with offers still waiting, with how many', () => {
+    expect(
+      notificationItems([
+        node('1', 'negotiating', ['suggested', 'viewed', 'accepted']),
+        node('2', 'open'),
+        node('3', 'open', ['suggested'])
+      ])
+    ).toEqual([
+      { id: '1', name: 'wish 1', count: 2 },
+      { id: '3', name: 'wish 3', count: 1 }
+    ]);
+  });
+
+  it('adds up to the same number the profile badge shows', () => {
+    const nodes = [
+      node('1', 'negotiating', ['suggested', 'viewed']),
+      node('2', 'draft', ['suggested']),
+      node('3', 'cancelled', ['suggested']),
+      node('4', 'open', ['viewed'])
+    ];
+    const total = notificationItems(nodes).reduce((s, i) => s + i.count, 0);
+    expect(total).toBe(summarizeRatsonNodes(nodes).updates);
   });
 });

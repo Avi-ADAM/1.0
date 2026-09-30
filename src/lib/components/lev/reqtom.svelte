@@ -11,7 +11,7 @@
   import Card from './cards/rektom.svelte';
   import { nowId } from '$lib/stores/pendMisMes';
   import { DialogContent, DialogOverlay } from 'svelte-accessible-dialog';
-  import { RingLoader } from 'svelte-loading-spinners';
+  import Spinner from '$lib/celim/Spinner.svelte';
   import Diun from './diun.svelte';
   import TimetToTimegrama from './cards/timetToTimegrama.svelte';
   const baseUrl = import.meta.env.VITE_URL;
@@ -542,7 +542,7 @@
             </svg>
           </button>
           {#if negotiationLoading}
-            <RingLoader size="260" color="#ff00ae" unit="px" duration="2s" />
+            <Spinner size="lg" />
           {:else}
             <Nego
               masaalr={false}
@@ -591,7 +591,7 @@
             </svg></button
           >
           {#if loading === true}
-            <RingLoader size="260" color="#ff00ae" unit="px" duration="2s" />
+            <Spinner size="lg" />
           {:else if diunm === true}
             <Diun
               onRect={afreact}

@@ -1,7 +1,7 @@
 <script>
   import { isRtl, t } from '$lib/translations';
   import { page } from '$app/state';
-  import Lowding from '$lib/celim/lowding.svelte';
+  import Spinner from '$lib/celim/Spinner.svelte';
   // Every per-kind card now lives behind <LevCard>, so the deck markup is a
   // single slide template instead of a 25-branch chain.
   import LevCard from './LevCard.svelte';
@@ -151,19 +151,22 @@
   }
   let filter = $state(false),
     filter2 = $state(false);
-    let filteredArr = $state(arr1); // Initialize with arr1
   let currentProjectIdFilter = $state(null);
 
-  // Effect to keep filteredArr in sync with arr1 or apply project filter
-  $effect(() => {
-    if (currentProjectIdFilter !== null) {
-      filteredArr = arr1.filter(
-        (item) => item.projectId && item.projectId === currentProjectIdFilter
-      );
-    } else {
-      filteredArr = arr1;
-    }
-  });
+  // arr1 narrowed to the project chip the member picked. A $derived, not a
+  // $state that an $effect copies arr1 into: the effect ran a render *after*
+  // arr1 changed, so the render that first mounted the deck (arr1 going from
+  // [] to the feed) still saw the old empty copy and built it with only the
+  // end-of-line slide. The browser snapped to that lone slide, and when the
+  // cards were inserted in front of it a moment later it stayed on it — the
+  // heart opened on "you're all caught up" instead of the first card.
+  let filteredArr = $derived(
+    currentProjectIdFilter === null
+      ? arr1
+      : arr1.filter(
+          (item) => item.projectId && item.projectId === currentProjectIdFilter
+        )
+  );
 
   // What actually becomes a slide. The milon gate used to live inside each
   // {:else if}, which meant a card-type filter changed the rendered slides
@@ -264,8 +267,23 @@
     });
   }
 
+  // The reader's own hand on the deck (a tap, a wheel turn, a key, an arrow
+  // button). Until then "where they are" is just where the page happened to
+  // open, which is the top of the feed — see `reanchor`. Plain variables: the
+  // markup never reads them.
+  let touched = false;
+  let pinTop = false;
+  // Did the deck have a card the last time the slide set changed? See `reanchor`.
+  let hadCards = false;
+
+  function touch() {
+    touched = true;
+    pinTop = false;
+  }
+
   /** @param {number} dir +1 = next card, -1 = previous, in reading order */
   function step(dir) {
+    touch();
     goTo(Math.min(Math.max(currentIndex + dir, 0), lastIndex));
   }
 
@@ -274,7 +292,10 @@
     if (deckEl && indexi != -1) {
       const target = indexi;
       indexi = -1;
-      untrack(() => goTo(target, 'auto'));
+      untrack(() => {
+        touch();
+        goTo(target, 'auto');
+      });
     }
   });
 
@@ -315,13 +336,37 @@
    * the position on mount (from sessionStorage) — see deckPosition.svelte.js.
    */
   function reanchor() {
+    if (!deckEl) return;
+    const count = visibleArr.length;
+    // The deck had nothing but the end-of-line slide until now (first paint, or
+    // the feed emptied and refilled). That slide was the only snap target, so
+    // the browser parked on it, and it keeps the snap on that element when the
+    // cards are inserted in front of it. Nobody chose to be there, so this is
+    // the one time the "parked on end-of-line" rule below must not apply.
+    const firstFill = !hadCards && count > 0;
+    hadCards = count > 0;
+
     const wanted = deckPosition.id;
-    if (!wanted || !deckEl) return;
-    // Parked on the end-of-line slide: that is where the reader chose to be,
-    // and `deckPosition` still holds the last card they passed. Leave them.
-    if (currentIndex >= visibleArr.length) return;
-    const idx = visibleArr.findIndex((b) => String(b.coinlapach) === wanted);
-    if (idx < 0) return; // that card left the feed — stay where we are
+    const indexOfWanted = () =>
+      wanted ? visibleArr.findIndex((b) => String(b.coinlapach) === wanted) : -1;
+    let idx;
+    if (firstFill) {
+      // Resume on the card the reader was on in this tab, else the top of the
+      // feed — and hold the top until they move, because the feed is still
+      // streaming in and more urgent cards can land in front of the first one.
+      idx = indexOfWanted();
+      pinTop = idx < 0 && !touched;
+      if (idx < 0) idx = 0;
+    } else if (pinTop) {
+      idx = 0;
+    } else {
+      if (!wanted) return;
+      // Parked on the end-of-line slide: that is where the reader chose to be,
+      // and `deckPosition` still holds the last card they passed. Leave them.
+      if (currentIndex >= count) return;
+      idx = indexOfWanted();
+      if (idx < 0) return; // that card left the feed — stay where we are
+    }
     const child = deckEl.children[idx];
     if (!(child instanceof HTMLElement)) return;
     // Already centred (the common case): touching the scroll offset here would
@@ -387,6 +432,7 @@
 
   /** @param {WheelEvent} e */
   function onWheel(e) {
+    touch();
     if (narrow || e.ctrlKey) return;
     const dy = e.deltaY;
     const dx = e.deltaX;
@@ -425,6 +471,7 @@
       tgt.closest('input, textarea, select, [contenteditable="true"]')
     )
       return;
+    touch();
     if (e.key === 'Home') {
       e.preventDefault();
       goTo(0);
@@ -690,6 +737,7 @@
         role="region"
         aria-label={$t('lev.cards.nav.heart')}
         onkeydown={onKeydown}
+        onpointerdown={touch}
       >
         {#each visibleArr as buble, i (buble.coinlapach)}
           <div class="deck-slide" data-idx={i} data-id={buble.coinlapach}>
@@ -725,7 +773,7 @@
   </div>
 {:else if low == true}
   <div class="body grid items-center justify-center">
-    <Lowding height="50vh" />
+    <Spinner size="lg" />
   </div>
 {:else}
   <div class="body flex flex-col items-center justify-center">

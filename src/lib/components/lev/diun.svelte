@@ -1,5 +1,5 @@
 ﻿<script>
-  import { BarLoader } from 'svelte-loading-spinners';
+  import Spinner from '$lib/celim/Spinner.svelte';
   import ChatMessage from '../../celim/messeges.svelte';
   import TodayDivider from '../../celim/todaydevider.svelte';
   import {
@@ -219,8 +219,7 @@
   >
     {#if loading == true}
       <div class="w-full flex items-center justify-center py-6">
-        <BarLoader size="120" color="#ff00ae" unit="px" duration="2s"
-        ></BarLoader>
+        <Spinner />
       </div>
     {/if}
 

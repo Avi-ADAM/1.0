@@ -351,6 +351,8 @@
   "no_wishes_sub": "Tell us what you'd like - and the concierge will get to work.",
   "no_wishes_has_drafts": "You have drafts waiting to be finished ({{count}}) →",
   "pending_offers": "{{count}} new",
+  "no_notifications": "No notifications right now",
+  "notif_untitled": "Untitled wish",
   "draft_continue": "Continue writing →",
   "ext_title": "Completed from the web",
   "ext_disclaimer": "For the parts nobody in the community covers yet, we also searched the web. This was collected automatically from search engines and may be inaccurate; any deal is made with the outside site, not through 1lev1.",

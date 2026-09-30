@@ -5,6 +5,7 @@ import { actionViaProxy } from '$lib/server/actionViaProxy.js';
 import { enrichWish, placeKey, EMPTY_ENRICHMENT, type WishEnrichment } from '$lib/server/ai/enrichWish';
 import { extractWish, type WishExtraction } from '$lib/server/ai/extractWish';
 import { GEMINI_API_KEY } from '$env/static/private';
+import { loadBell } from '$lib/server/concierge/bell';
 import { externalConfig } from '$lib/server/concierge/externalConfig';
 import {
   DISABLED_PANEL,
@@ -29,9 +30,9 @@ function shortCode(id: string | number): string {
 }
 
 function nameOf(user: any): string {
-  if (!user) return 'משתמשת';
+  if (!user) return 'משתמש/ת';
   const a = user.attributes || user;
-  return a.username || 'משתמשת';
+  return a.username || 'משתמש/ת';
 }
 
 function initials(name: string): string {
@@ -42,6 +43,9 @@ function initials(name: string): string {
 export const load: PageServerLoad = async ({ params, locals, fetch }) => {
   const uid = (locals as any)?.uid;
   const tok = (locals as any)?.tok;
+
+  // Started first, awaited last: it runs beside the slow work below.
+  const bellPending = loadBell(uid, fetch);
 
   let wish: any = null;
   let proposals: any[] = [];
@@ -130,7 +134,7 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
         const firstProposer = proposerUsers[0];
         const proposerName = firstProposer
           ? nameOf(firstProposer)
-          : (project?.attributes?.projectName || 'מציעה');
+          : (project?.attributes?.projectName || 'מציע/ה');
         return {
           id: p.id,
           kind: pa.kind || 'existing_matanot',
@@ -276,7 +280,7 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
       const msgs = res?.success ? res.data?.forum?.messages ?? [] : [];
       forumMessages = msgs.map((m: any) => ({
         id: String(m.id),
-        from: m.username || 'משתמשת',
+        from: m.username || 'משתמש/ת',
         text: m.message || '',
         sentByMe: !!m.sentByMe,
         ts: m.timestamp ?? null
@@ -390,5 +394,7 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
     });
   }
 
-  return { wish, proposals, loadOk, uid, isOwner, enrichment, forumMessages, missionTemplates, external };
+  const bell = await bellPending;
+
+  return { wish, proposals, loadOk, uid, isOwner, enrichment, forumMessages, missionTemplates, external, bell };
 };

@@ -3,6 +3,7 @@
   import { provideProjectCurrencies } from '$lib/money/context.svelte';
   import { t } from '$lib/translations';
   import { onMount } from 'svelte';
+  import { MediaQuery } from 'svelte/reactivity';
   import { page } from '$app/state';
   import { lang } from '$lib/stores/lang.js';
   import KpiBar from '$lib/components/hub/KpiBar.svelte';
@@ -39,6 +40,12 @@
   };
 
   let dir = $derived(($lang === 'he' || $lang === 'ar' ? 'rtl' : 'ltr') as 'rtl' | 'ltr');
+
+  // On a desktop the single phone column left most of the screen empty. From
+  // lg up the hub splits: what's on the member's table (status) in the main
+  // column, where to go next (actions) in a sticky side column. Below lg the
+  // order is the phone's, unchanged.
+  const wide = new MediaQuery('min-width: 1024px', false);
 
   function toFeedItems(topFive: any[]) {
     return topFive.map((f: any) => {
@@ -99,8 +106,8 @@
   <div class="glow pointer-events-none absolute inset-x-0 top-0 h-72" aria-hidden="true"></div>
 
   <main
-    class="relative mx-auto w-full max-w-md px-4 space-y-5
-           pt-[calc(env(safe-area-inset-top)+1.5rem)]
+    class="relative mx-auto w-full max-w-md lg:max-w-6xl px-4 lg:px-10 space-y-5 lg:space-y-7
+           pt-[calc(env(safe-area-inset-top)+1.5rem)] lg:pt-10
            pb-[calc(env(safe-area-inset-bottom)+6rem)]"
   >
     {#await data.streamed.summary}
@@ -114,35 +121,21 @@
           summary.kpi.activeSales ===
           0 && summary.topFive.length === 0}
 
-      <HubHeader username={summary.username} profilePic={summary.profilePic} />
-
-      {#if isNewUser}
+      {#snippet firstSteps()}
         <div class="stagger" style="--i:1">
           <FirstSteps username={summary.username} />
         </div>
-        <!-- No votes yet does not mean nothing to say: suggestions and
-             what's new can already be waiting -->
-        {#await data.streamed.brief then brief}
-          {#if brief}
-            <div class="stagger" style="--i:2">
-              <DailyBrief payload={brief.payload} failed={brief.failed} />
-            </div>
-          {/if}
-        {/await}
-        <!-- The public demand map is the recruitment engine — show a new user
-             what the community seeks and offers right now -->
-        {#await data.streamed.demand then demand}
-          <div class="stagger" style="--i:2">
-            <DemandMapTeaser {demand} />
-          </div>
-        {/await}
-      {:else}
+      {/snippet}
+
+      {#snippet urgent()}
         {#if summary.kpi.urgent > 0}
           <div class="stagger" style="--i:1">
             <UrgentVotePill count={summary.kpi.urgent} href="/lev?focus=votes" />
           </div>
         {/if}
+      {/snippet}
 
+      {#snippet kpi()}
         <div class="stagger" style="--i:2">
           <KpiBar
             votes={summary.kpi.votes}
@@ -152,27 +145,37 @@
             activeSales={summary.kpi.activeSales}
           />
         </div>
+      {/snippet}
 
-        <!-- The daily brief (PLAN_DAILY_DIGEST): the same payload the morning
-             digest is composed from. Streams in after the summary. -->
+      <!-- The daily brief (PLAN_DAILY_DIGEST): the same payload the morning
+           digest is composed from. Streams in after the summary. -->
+      {#snippet dailyBrief(i: number)}
         {#await data.streamed.brief then brief}
           {#if brief}
-            <div class="stagger" style="--i:3">
+            <div class="stagger" style="--i:{i}">
               <DailyBrief payload={brief.payload} failed={brief.failed} />
             </div>
           {/if}
         {/await}
+      {/snippet}
 
+      {#snippet cta()}
         <div class="stagger" style="--i:3">
           <CustomPurchaseCta />
         </div>
+      {/snippet}
 
+      <!-- The public demand map is the recruitment engine — a new user sees
+           what the community seeks and offers right now -->
+      {#snippet demandMap(i: number)}
         {#await data.streamed.demand then demand}
-          <div class="stagger" style="--i:4">
+          <div class="stagger" style="--i:{i}">
             <DemandMapTeaser {demand} />
           </div>
         {/await}
+      {/snippet}
 
+      {#snippet shortcutRow()}
         <section class="stagger" style="--i:4">
           <h2 class="section-title">{$t('hub.nav.shortcuts')}</h2>
           <div class="flex gap-3">
@@ -181,13 +184,57 @@
             {/each}
           </div>
         </section>
+      {/snippet}
 
+      {#snippet feed()}
         {#if summary.topFive.length > 0}
           <section class="stagger" style="--i:5">
             <h2 class="section-title">{$t('hub.nav.feed')}</h2>
             <ActionFeed items={toFeedItems(summary.topFive)} />
           </section>
         {/if}
+      {/snippet}
+
+      <HubHeader username={summary.username} profilePic={summary.profilePic} />
+
+      {#if wide.current}
+        <div class="hub-cols">
+          <div class="space-y-6 min-w-0">
+            {#if isNewUser}
+              {@render firstSteps()}
+            {:else}
+              {@render urgent()}
+              {@render kpi()}
+              {@render dailyBrief(3)}
+              {@render feed()}
+            {/if}
+          </div>
+          <aside class="hub-side space-y-6 min-w-0">
+            {#if isNewUser}
+              {@render dailyBrief(2)}
+            {:else}
+              {@render cta()}
+            {/if}
+            {@render demandMap(isNewUser ? 2 : 4)}
+            {#if !isNewUser}
+              {@render shortcutRow()}
+            {/if}
+          </aside>
+        </div>
+      {:else if isNewUser}
+        {@render firstSteps()}
+        <!-- No votes yet does not mean nothing to say: suggestions and
+             what's new can already be waiting -->
+        {@render dailyBrief(2)}
+        {@render demandMap(2)}
+      {:else}
+        {@render urgent()}
+        {@render kpi()}
+        {@render dailyBrief(3)}
+        {@render cta()}
+        {@render demandMap(4)}
+        {@render shortcutRow()}
+        {@render feed()}
       {/if}
     {:catch err}
       <p class="text-red-400 text-center p-8">שגיאה בטעינת הדף: {err.message}</p>
@@ -204,6 +251,18 @@
       rgba(179, 135, 40, 0.06) 38%,
       transparent 70%
     );
+  }
+
+  /* Desktop: status column + a narrower sticky actions column */
+  .hub-cols {
+    display: grid;
+    grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+    gap: 2rem;
+    align-items: start;
+  }
+  .hub-side {
+    position: sticky;
+    top: 1.5rem;
   }
 
   .section-title {

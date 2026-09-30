@@ -12,7 +12,7 @@
  *   4. Score: w·text + w·categories + w·values + w·proximity, and create a
  *      `ratson_proposal` above THRESHOLD (kind='existing_matanot',
  *      auto_generated=true, status='suggested') carrying `covered_*` for its
- *      need — the row then offers "✓ אני בוחרת" (acceptRatsonProposal →
+ *      need — the row then offers "✓ בחירה" (acceptRatsonProposal →
  *      Sheirutpend to the provider).
  *   5. Log a `ratson_match_job` and update `last_matched_at` +
  *      `fulfillment_score`.
@@ -183,7 +183,7 @@ export function candidateOf(n: any): CandidateMatanot {
 
 /**
  * The automatic proposal a matched product makes on a wish: on the plan row it
- * answers, so /concierge/[id] shows it there with "✓ אני בוחרת".
+ * answers, so /concierge/[id] shows it there with "✓ בחירה".
  */
 export function autoProposalVars(
   ratsonId: string,

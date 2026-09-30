@@ -4,7 +4,7 @@
   import { goto, invalidate } from '$app/navigation';
   import { onMount, onDestroy } from 'svelte';
   import { lang } from '$lib/stores/lang.js';
-  import { RingLoader } from 'svelte-loading-spinners';
+  import Spinner from '$lib/celim/Spinner.svelte';
   import Close from '$lib/celim/close.svelte';
   import RichText from '$lib/celim/ui/richText.svelte';
   import Tile from '$lib/celim/tile.svelte';
@@ -487,7 +487,7 @@
   <div
     class="h-screen w-screen flex items-center justify-center bg-gradient-to-br from-[#1a0515] via-[#2c0b1e] to-[#120f26]"
   >
-    <RingLoader size="200" color="#ff00ae" unit="px" duration="2s"></RingLoader>
+    <Spinner size="lg" />
   </div>
 {/if}
 

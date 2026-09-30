@@ -2,8 +2,7 @@
 import Tile from '$lib/celim/tile.svelte'
 import { lang } from '$lib/stores/lang.js'
 import { t } from '$lib/translations'
-  import { RingLoader
-} from 'svelte-loading-spinners';
+  import Spinner from '$lib/celim/Spinner.svelte';
 import { sendToSer } from '$lib/send/sendToSer.js';
 import RichText from '$lib/celim/ui/richText.svelte'
   let { missionId, onProject } = $props();
@@ -50,7 +49,7 @@ async function xyd () {
     let data = xyd();
 </script>
  {#await data}
- <RingLoader size="260" color="#ff00ae" unit="px" duration="2s"></RingLoader>
+ <Spinner size="lg" />
  {:then data}
 
 <div dir="rtl"  style="overflow-y:auto" class=" d mb-4 mt-8 bg-surface text-surfaceInk leading-normal w-full lg:w-full">

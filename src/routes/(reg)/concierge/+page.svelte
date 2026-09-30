@@ -5,8 +5,9 @@
   import { uPic } from '$lib/stores/uPic.js';
   import { t } from '$lib/translations';
   import { page } from '$app/state';
+  import ConciergeBell from '$lib/components/concierge/ConciergeBell.svelte';
 
-  /** @type {{ data: { mine: any[]; publicFeed: any[]; queryOk: { mine: boolean; public: boolean }; uid?: string; un?: string } }} */
+  /** @type {{ data: { mine: any[]; publicFeed: any[]; bell?: { id: string; name: string; count: number }[]; queryOk: { mine: boolean; public: boolean }; uid?: string; un?: string } }} */
   let { data } = $props();
   const fmtMoney = useFormatMoney();
 
@@ -64,7 +65,7 @@
     if (status === 'fulfilled') return 'המשאלה הוגשמה';
     if (status === 'negotiating')
       return hasProposals ? 'יש הצעות בתהליך הסכמה' : 'בהסכמה';
-    if (status === 'matching') return 'Lev מחפשת התאמות';
+    if (status === 'matching') return 'מתבצע חיפוש התאמות';
     if (status === 'open')
       return hasProposals ? 'יש הצעות חדשות' : 'פורסמה לקהילה';
     if (status === 'draft') return 'טיוטה - לא פורסמה';
@@ -143,7 +144,7 @@
       proposalsCount: 2,
       missionsCount: 1,
       resourcesCount: 2,
-      lastEvent: 'Lev מצאה 2 התאמות מ־1 רקמה',
+      lastEvent: 'נמצאו 2 התאמות מ־1 רקמה',
       lastEventTime: 'לפני 4 שעות',
       budget: '₪ 80–150',
       whenStr: 'שבוע הקרוב',
@@ -388,9 +389,7 @@
       <a href="/moach" class="nav-lnk">{$t('concierge.moach')}</a>
     </nav>
     <div class="hdr-right">
-      <button class="notif-btn" aria-label={$t('concierge.notifications')}
-        >🔔<span class="notif-pip"></span></button
-      >
+      <ConciergeBell items={data?.bell ?? []} />
       <button class="av-btn" onclick={() => goto('/me')}>
         {#if $uPic}
           <img src={$uPic} alt="פרופיל" class="av-img" />
@@ -1067,30 +1066,6 @@
     align-items: center;
     gap: 8px;
     flex-shrink: 0;
-  }
-  .notif-btn {
-    position: relative;
-    width: 34px;
-    height: 34px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 10px;
-    background: var(--cg-s2);
-    border: 1px solid rgb(var(--cg-fg-rgb) / calc(0.06 * var(--cg-fg-k)));
-    cursor: pointer;
-    font-size: 14px;
-    color: var(--cg-goldhi);
-  }
-  .notif-pip {
-    position: absolute;
-    top: 6px;
-    left: 6px;
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: var(--cg-pink);
-    box-shadow: 0 0 8px var(--cg-pink);
   }
   .av-btn {
     width: 34px;

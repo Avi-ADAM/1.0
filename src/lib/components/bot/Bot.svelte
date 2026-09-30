@@ -3,7 +3,7 @@
   import { t, locale, isRtl} from '$lib/translations';
   import { goto } from '$app/navigation';
   import { idPr } from '$lib/stores/idPr';
-  import { Circle3 } from 'svelte-loading-spinners';
+  import Spinner from '$lib/celim/Spinner.svelte';
   import { browser, dev } from '$app/environment';
   import { page } from '$app/stores';
   import { chatMessages } from '$lib/stores/chatStore';
@@ -315,7 +315,7 @@
               <div
                 class="chat-bubble bg-gradient-to-r from-gray-100 to-gray-50 text-gray-800 shadow-sm"
               >
-                <Circle3 />
+                <Spinner />
               </div>
             </div>
           {/if}

@@ -20,7 +20,7 @@
   import { OBJECT_TYPES, objectRef } from '$lib/components/process/lifecycle/objectTypes.js';
   import VoteRounds from '$lib/components/process/lifecycle/VoteRounds.svelte';
   import TimersPanel from '$lib/components/process/lifecycle/TimersPanel.svelte';
-  import Lowding from '$lib/celim/lowding.svelte';
+  import Spinner from '$lib/celim/Spinner.svelte';
   import RichText from '$lib/celim/ui/richText.svelte';
 
   let projectId = $derived(page.params.projectId);
@@ -183,7 +183,7 @@
   </div>
 
   {#if loading}
-    <div class="op-state"><Lowding /><p class="op-state-sub">{$t('moach.objectDetail.loading')}</p></div>
+    <div class="op-state"><Spinner /><p class="op-state-sub">{$t('moach.objectDetail.loading')}</p></div>
   {:else if !config}
     <div class="op-state">
       <p class="op-state-title">{$t('moach.objectDetail.unknownType')}</p>

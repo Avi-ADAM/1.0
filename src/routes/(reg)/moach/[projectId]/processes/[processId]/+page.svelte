@@ -23,7 +23,7 @@
   import { chainsForPartof, findChainByRef, reconstructSaleChains } from '$lib/utils/processLifecycle';
   import ProcessLifecycle from '$lib/components/process/lifecycle/ProcessLifecycle.svelte';
   import SaleLifecycle from '$lib/components/process/lifecycle/SaleLifecycle.svelte';
-  import Lowding from '$lib/celim/lowding.svelte';
+  import Spinner from '$lib/celim/Spinner.svelte';
 
   let projectId = $derived(page.params.projectId);
   let processId = $derived(page.params.processId);
@@ -135,7 +135,7 @@
   </div>
 
   {#if loading}
-    <div class="ppd-state"><Lowding /><p class="ppd-state-sub">{$t('moach.process.loading')}</p></div>
+    <div class="ppd-state"><Spinner /><p class="ppd-state-sub">{$t('moach.process.loading')}</p></div>
   {:else if loadError}
     <div class="ppd-state">
       <p class="ppd-state-title">{$t('moach.process.error')}</p>

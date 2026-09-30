@@ -9,7 +9,7 @@
     import { page } from '$app/state';
     import { lang } from '$lib/stores/lang.js';
     import { t } from '$lib/translations';
-    import { RingLoader } from 'svelte-loading-spinners';
+  import Spinner from '$lib/celim/Spinner.svelte';
     import { goto } from '$app/navigation';
     import { sendToSer } from '$lib/send/sendToSer.js';
     import { executeAction } from '$lib/client/actionClient';
@@ -283,7 +283,7 @@
 
 {#await data.alld}
     <div class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex align-middle content-center justify-center">
-        <RingLoader size="260" color="#ff00ae" unit="px" duration="2s" />
+        <Spinner size="lg" />
     </div>
 {:then a} 
     {#if data != null}
@@ -294,7 +294,7 @@
                 <DialogContent class="nego" aria-label="form">
                     <button onclick={closeNego} style="margin: 0 auto;" class="hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full" aria-label="סגירה">✕</button>
                     {#if negoLoading}
-                        <RingLoader size="200" color="#ff00ae" unit="px" duration="2s" />
+                        <Spinner size="lg" />
                     {:else if negoOpen && data.alld}
                         <Nego
                             onLoad={() => (negoLoading = true)}

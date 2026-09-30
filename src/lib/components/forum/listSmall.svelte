@@ -3,7 +3,7 @@
   import {isToday }from '$lib/func/uti/isToday.svelte';
    import { lang } from '$lib/stores/lang'
   import { isChatLoading, nowChatId } from '$lib/stores/pendMisMes';
-  import { Rainbow } from 'svelte-loading-spinners';
+  import Spinner from '$lib/celim/Spinner.svelte';
   import { quintOut } from 'svelte/easing';
   import { slide } from 'svelte/transition';
   import { goto } from '$app/navigation';
@@ -34,7 +34,7 @@
                 <div dir="{$isRtl ? 'rtl' : 'ltr'}" class="divide-y divide-gray-200">
                   {#if $isChatLoading}
                   <div class="w-full h-full flex justify-center align-middle items-center">
-                  <Rainbow />
+                  <Spinner />
                   </div>
                   {/if}
                   {#key chats}

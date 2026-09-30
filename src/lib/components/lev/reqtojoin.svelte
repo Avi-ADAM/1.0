@@ -609,7 +609,7 @@
   }
   import Card from './cards/reqtojoin.svelte';
   import { DialogContent, DialogOverlay } from 'svelte-accessible-dialog';
-  import { RingLoader } from 'svelte-loading-spinners';
+  import Spinner from '$lib/celim/Spinner.svelte';
   import { forumStore } from '$lib/stores/forumStore';
   import Diun from './diun.svelte';
   import TimetToTimegrama from './cards/timetToTimegrama.svelte';
@@ -670,8 +670,7 @@
       <DialogContent aria-label="form" class="nego d">
         <div dir="rtl" class="grid items-center justify-center text-center">
           {#if loading === true}
-            <RingLoader size="260" color="#ff00ae" unit="px" duration="2s"
-            ></RingLoader>
+            <Spinner size="lg" />
           {:else}
             <NegoM
               masaalr={false}
@@ -715,8 +714,7 @@
       <DialogContent class="chat d" aria-label="form">
         <div dir="rtl" class="grid items-center justify-center aling-center">
           {#if loading === true}
-            <RingLoader size="260" color="#ff00ae" unit="px" duration="2s"
-            ></RingLoader>
+            <Spinner size="lg" />
           {/if}
           <Diun
             onRect={afreact}

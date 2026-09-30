@@ -1,6 +1,6 @@
 <script>
   import { onMount } from 'svelte';
-  import { RingLoader } from 'svelte-loading-spinners';
+  import Spinner from '$lib/celim/Spinner.svelte';
   import { executeAction } from '$lib/client/actionClient';
   import { t, isRtl } from '$lib/translations';
 
@@ -325,7 +325,7 @@
         </button>
       {:else}
         <div class="flex justify-center py-1">
-          <RingLoader size="40" color="#ff00ae" unit="px" duration="2s"></RingLoader>
+          <Spinner />
         </div>
       {/if}
     </div>

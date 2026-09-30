@@ -6,7 +6,7 @@
   import NewOpn from '$lib/components/prPr/newOpn.svelte';
   import Finisin from '$lib/components/prPr/finisin.svelte';
   import ChooseM from '$lib/components/prPr/tasks/chooseM.svelte';
-  import Lowding from '$lib/celim/lowding.svelte';
+  import Spinner from '$lib/celim/Spinner.svelte';
 
   /**
    * @typedef {Object} Props
@@ -78,7 +78,7 @@
       <div class="p-2 md:p-6 mt-6 md:mt-2">
         {#if loading}
           <div class="flex justify-center py-12">
-            <Lowding />
+            <Spinner />
           </div>
         {:else if modal.kind === 'betha'}
           <Betaha who={modal.id} bmiData={getDataArray()} />

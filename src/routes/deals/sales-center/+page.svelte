@@ -5,7 +5,7 @@
   import SaleComponent from '$lib/components/sales/SaleComponent.svelte';
   import RecurringCycleCard from '$lib/components/sales/RecurringCycleCard.svelte';
   import CreateProductFlow from '$lib/components/offerings/CreateProductFlow.svelte';
-  import { RingLoader } from 'svelte-loading-spinners';
+  import Spinner from '$lib/celim/Spinner.svelte';
   import { toast } from 'svelte-sonner';
   import { invalidateAll } from '$app/navigation';
 
@@ -255,7 +255,7 @@
 
   {#if loading}
     <div class="state-block">
-      <RingLoader size="60" color="var(--gold)" />
+      <Spinner size="lg" color="var(--gold)" />
       <p class="loading-text">{$t('pages.salesCenter.loading')}</p>
     </div>
   {:else if error}

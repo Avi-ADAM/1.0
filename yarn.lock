@@ -11305,11 +11305,6 @@ svelte-gestures@^5.0.4:
   resolved "https://registry.npmjs.org/svelte-gestures/-/svelte-gestures-5.2.2.tgz"
   integrity sha512-Y+chXPaSx8OsPoFppUwPk8PJzgrZ7xoDJKXeiEc7JBqyKKzXer9hlf8F9O34eFuAWB4/WQEvccACvyBplESL7A==
 
-svelte-loading-spinners@^0.3.6:
-  version "0.3.6"
-  resolved "https://registry.npmjs.org/svelte-loading-spinners/-/svelte-loading-spinners-0.3.6.tgz"
-  integrity sha512-mthHQ2TwiwzTWzbFry3CBnVEfzqPOD9WkVw84OfSYzHRq6N9wgQ+yv37u81uPeuLU/ZOIPqhujpXquB1aol5ZQ==
-
 svelte-multiselect@^11.1.1:
   version "11.7.0"
   resolved "https://registry.npmjs.org/svelte-multiselect/-/svelte-multiselect-11.7.0.tgz"

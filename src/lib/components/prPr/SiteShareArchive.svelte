@@ -16,7 +16,7 @@
    */
   import { onMount } from 'svelte';
   import { executeAction } from '$lib/client/actionClient';
-  import Lowding from '$lib/celim/lowding.svelte';
+  import Spinner from '$lib/celim/Spinner.svelte';
 
   let { projectId } = $props();
 
@@ -51,7 +51,7 @@
 </script>
 
 {#if loading}
-  <div class="flex justify-center p-8"><Lowding /></div>
+  <div class="flex justify-center p-8"><Spinner /></div>
 {:else if hasData}
   <div dir={$isRtl ? 'rtl' : 'ltr'} class="space-y-6">
     <h2 class="text-xl font-bold text-primary">

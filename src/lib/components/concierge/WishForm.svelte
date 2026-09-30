@@ -4,6 +4,7 @@
   import Money from '$lib/components/money/Money.svelte';
   import { onMount, onDestroy, tick } from 'svelte';
   import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
+  import ConciergeBell from '$lib/components/concierge/ConciergeBell.svelte';
   import { fade } from 'svelte/transition';
   import '$lib/styles/concierge.css';
   import { goto, replaceState } from '$app/navigation';
@@ -26,7 +27,8 @@
    *     uid?: string;
    *     un?: string;
    *     welcome?: boolean;
-   *     draft?: import('../../../routes/(reg)/concierge/new/+page.server').ServerWishDraft | null
+   *     draft?: import('../../../routes/(reg)/concierge/new/+page.server').ServerWishDraft | null;
+   *     bell?: { id: string, name: string, count: number }[]
    *   },
    *   anon?: boolean
    * }}
@@ -1348,9 +1350,9 @@
           >{$t('concierge.new.register')}</button
         >
       {:else}
-        <button class="notif-btn" aria-label={$t('concierge.new.notifications')}
-          ><EntityIcon kind="notifications" size={16} /><span class="notif-pip"></span></button
-        >
+        <ConciergeBell items={data.bell ?? []}>
+          <EntityIcon kind="notifications" size={16} />
+        </ConciergeBell>
         <button class="av-btn" onclick={() => goto('/me')}>
           {#if $uPic}
             <img
@@ -2635,30 +2637,6 @@
   }
   .hdr-register:hover {
     transform: translateY(-1px);
-  }
-  .notif-btn {
-    position: relative;
-    width: 34px;
-    height: 34px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 10px;
-    background: var(--cg-s2);
-    border: 1px solid rgb(var(--cg-fg-rgb) / calc(0.06 * var(--cg-fg-k)));
-    cursor: pointer;
-    font-size: 14px;
-    color: var(--cg-goldhi);
-  }
-  .notif-pip {
-    position: absolute;
-    top: 6px;
-    left: 6px;
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: var(--cg-pink);
-    box-shadow: 0 0 8px var(--cg-pink);
   }
   .av-btn {
     width: 34px;

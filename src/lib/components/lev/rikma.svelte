@@ -5,8 +5,7 @@
   let { onUser, onMesima, projectId } = $props();
 import { lang } from '$lib/stores/lang.js'
 import { t } from '$lib/translations';
-  import { RingLoader
-} from 'svelte-loading-spinners';
+  import Spinner from '$lib/celim/Spinner.svelte';
   import RichText from '$lib/celim/ui/richText.svelte';
   import { sendToSer } from '$lib/send/sendToSer.js';
 let projectUsers =$state([]);
@@ -98,7 +97,7 @@ async function xyd () {
 
                      </script>
  {#await project}
- <RingLoader size="260" color="#ff00ae" unit="px" duration="2s"></RingLoader>
+ <Spinner size="lg" />
  {:then project}
 
 <div dir="rtl" >

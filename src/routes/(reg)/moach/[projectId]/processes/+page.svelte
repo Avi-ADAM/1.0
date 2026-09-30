@@ -12,7 +12,7 @@
   import { loadProjectProcesses } from '$lib/utils/processes';
   import ProcessBoard from '$lib/components/process/ProcessBoard.svelte';
   import { onMount } from 'svelte';
-  import Lowding from '$lib/celim/lowding.svelte';
+  import Spinner from '$lib/celim/Spinner.svelte';
   import { goto } from '$app/navigation';
 
   const moachStore = getMoachStore();
@@ -54,7 +54,7 @@
   </div>
 
   {#if loading}
-    <div class="flex justify-center p-12"><Lowding /></div>
+    <div class="flex justify-center p-12"><Spinner /></div>
   {:else if processes.length > 0}
     <ProcessBoard
       {processes}

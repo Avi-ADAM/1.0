@@ -10,7 +10,7 @@
   import { updatePendsStore } from '$lib/utils/levSocketHandler';
   import { idPr } from '../../stores/idPr.js';
   import Diun from './diun.svelte';
-  import { RingLoader } from 'svelte-loading-spinners';
+  import Spinner from '$lib/celim/Spinner.svelte';
   import Lowbtn from '$lib/celim/lowbtn.svelte';
   let dialogOpen = $state(false);
   /**
@@ -609,8 +609,7 @@
             </svg></button
           >
           {#if loading === true}
-            <RingLoader size="260" color="#ff00ae" unit="px" duration="2s"
-            ></RingLoader>
+            <Spinner size="lg" />
           {:else}
             <Nego
               {masaalr}
@@ -697,8 +696,7 @@
             </svg></button
           >
           {#if loading === true}
-            <RingLoader size="260" color="#ff00ae" unit="px" duration="2s"
-            ></RingLoader>
+            <Spinner size="lg" />
           {:else}
             <Diun
               onRect={afreact}

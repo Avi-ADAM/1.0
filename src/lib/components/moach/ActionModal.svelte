@@ -2,7 +2,7 @@
   import { isRtl } from '$lib/translations';
   import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
   import { lang } from '$lib/stores/lang.js';
-  import Lowding from '$lib/celim/lowding.svelte';
+  import Spinner from '$lib/celim/Spinner.svelte';
   import { t } from '$lib/translations';
 
   // Components for different states
@@ -56,11 +56,11 @@
       <div class="mt-4">
         {#if a == 1}
           <div class="flex justify-center p-8">
-            <Lowding />
+            <Spinner />
           </div>
         {:else if a == 2}
           <div class="flex justify-center p-8">
-            <Lowding />
+            <Spinner />
           </div>
         {:else if a == 3}
           <div class="text-center p-8">

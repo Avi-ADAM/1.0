@@ -8,7 +8,7 @@
   import { page } from '$app/state';
   import { sendToSer } from '$lib/send/sendToSer.js';
   import { onMount } from 'svelte';
-  import Lowding from '$lib/celim/lowding.svelte';
+  import Spinner from '$lib/celim/Spinner.svelte';
   import { lang } from '$lib/stores/lang.js';
 
   let projectId = $derived(page.params.projectId);
@@ -61,7 +61,7 @@
 <div class="sales-page px-0 py-4">
   {#if loading && !financials}
     <div class="flex justify-center p-12">
-      <Lowding />
+      <Spinner />
     </div>
   {:else if financials}
     <Hamatanot

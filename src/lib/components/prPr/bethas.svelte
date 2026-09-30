@@ -955,6 +955,7 @@
     transition: width 0.3s ease;
   }
   .pb-bar-text {
+    isolation: isolate;
     position: absolute;
     inset: 0;
     display: flex;
@@ -962,8 +963,22 @@
     justify-content: center;
     font-size: 0.68rem;
     font-weight: 700;
-    color: var(--pb-text);
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+    color: #f8fafc;
+    /* the fill is light gold, so the figure sits on its own dark chip and
+       reads the same over the fill, the track, and in every theme/mode */
+    text-shadow: none;
+  }
+  .pb-bar-text::before {
+    content: '';
+    position: absolute;
+    top: 2px;
+    bottom: 2px;
+    left: 50%;
+    width: 2.6rem;
+    transform: translateX(-50%);
+    border-radius: 9999px;
+    background: rgba(2, 6, 23, 0.82);
+    z-index: -1;
   }
 
   .pb-hours {

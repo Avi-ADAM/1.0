@@ -19,7 +19,7 @@
   import Cir from './graph/circle.svelte';
   let isOpen = $state(false);
   let a = $state(0);
-  import { RingLoader } from 'svelte-loading-spinners';
+  import Spinner from '$lib/celim/Spinner.svelte';
   import Close from '$lib/celim/close.svelte';
   import ShareButtons from '$lib/components/share/shareButtons/index.svelte';
   import { toast } from 'svelte-sonner';
@@ -601,8 +601,7 @@
           <div class="sp bg-gold">
             <h3 class="text-barbi">{$t('project.hamatanot.loading')}</h3>
             <br />
-            <RingLoader size="260" color="#ff00ae" unit="px" duration="2s"
-            ></RingLoader>
+            <Spinner size="lg" />
           </div>
         {:else if a == 3}
           <h1

@@ -1,6 +1,6 @@
 <script>
   import { onMount } from 'svelte';
-  import { RingLoader } from 'svelte-loading-spinners';
+  import Spinner from '$lib/celim/Spinner.svelte';
   import { executeAction } from '$lib/client/actionClient';
   import { sendToSer } from '$lib/send/sendToSer.js';
   import { t, isRtl, locale } from '$lib/translations';
@@ -473,7 +473,7 @@
 
     {#if loading}
       <div class="flex justify-center py-4">
-        <RingLoader size="40" color="#ff00ae" unit="px" duration="2s"></RingLoader>
+        <Spinner />
       </div>
     {:else if resources.length === 0}
       <p class="text-sm text-gray-500 dark:text-gray-400 text-center py-4">
@@ -523,7 +523,7 @@
           </div>
           <div class="shrink-0 flex items-center gap-1.5">
             {#if busyId === sp.id}
-              <RingLoader size="20" color="#ff00ae" unit="px" duration="2s"></RingLoader>
+              <Spinner size="xs" />
             {:else}
               {#if hasCalendar(sp)}
                 <!-- Only shown once the resource has dates on it: a member who

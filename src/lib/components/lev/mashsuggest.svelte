@@ -198,7 +198,7 @@
   import Nego from '../prPr/negoPend.svelte';
   import { executeAction } from '$lib/client/actionClient';
   import { DialogContent, DialogOverlay } from 'svelte-accessible-dialog';
-  import { RingLoader } from 'svelte-loading-spinners';
+  import Spinner from '$lib/celim/Spinner.svelte';
   import Diun from './diun.svelte';
   import { nowId } from '$lib/stores/pendMisMes.js';
   import { page } from '$app/state';
@@ -368,7 +368,7 @@
         >✕</button
       >
       {#if loading === true}
-        <RingLoader size="200" color="#ff00ae" unit="px" duration="2s" />
+        <Spinner size="lg" />
       {:else if masa === true}
         <Nego
           onLoad={() => (loading = true)}

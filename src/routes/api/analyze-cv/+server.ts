@@ -74,7 +74,7 @@ export const POST: RequestHandler = async ({ request, cookies, url }) => {
         };
     }
 
-    const OVERLOAD_MSG = 'שירותי ה-AI עמוסים כרגע. אנא נסי שוב בעוד כחצי דקה.';
+    const OVERLOAD_MSG = 'שירותי ה-AI עמוסים כרגע. אנא נסו שוב בעוד כחצי דקה.';
 
     function isOverloadError(e: unknown): boolean {
         if (!e || typeof e !== 'object') return false;

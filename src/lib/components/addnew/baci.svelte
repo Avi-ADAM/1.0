@@ -241,8 +241,7 @@ let suc = $state(false);
     // idPr was already set to the new weave id in sendPP().
     goto("/moach");
   };
-  import { RingLoader
-} from 'svelte-loading-spinners'
+  import Spinner from '$lib/celim/Spinner.svelte';
   import RichText from '$lib/celim/ui/richText.svelte';
   import { isMobileOrTablet } from '$lib/utilities/device.js';
   import MobileModal from '$lib/celim/ui/mobileModal.svelte';
@@ -292,7 +291,7 @@ let suc = $state(false);
           <div class="sp bg-gold">
             <h3 class="text-barbi">{$t('addnew.baci.om')}</h3>
           <br>
-         <RingLoader size="260" color="#ff00ae" unit="px" duration="2s"></RingLoader>
+         <Spinner size="lg" />
          </div> 
          {/if}
          </div>
@@ -466,7 +465,7 @@ let suc = $state(false);
     class="cen bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold p-4 rounded-full"
      onclick={sendP}
      name="addm">{$t('addnew.baci.cree')}</button>
-       {:else}  <RingLoader size="100" color="#ff00ae" unit="px" duration="2s"></RingLoader>
+       {:else}  <Spinner size="lg" />
 {/if}</div>
 {:else}
 <div class="aft">

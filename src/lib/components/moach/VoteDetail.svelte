@@ -60,7 +60,7 @@
   import DecisionMaking from '$lib/components/lev/decisionMaking.svelte';
   import ArchiveObjectCard from '$lib/components/lev/cards/ArchiveObjectCard.svelte';
   import StipendDecisionCard from '$lib/components/lev/cards/StipendDecisionCard.svelte';
-  import Lowding from '$lib/celim/lowding.svelte';
+  import Spinner from '$lib/celim/Spinner.svelte';
 
   let { kind, entity, projectId, projectBase, uid, backHref } = $props();
 
@@ -290,7 +290,7 @@
   {/if}
 
   {#if !browser || !mounted}
-    <div class="flex justify-center p-12"><Lowding /></div>
+    <div class="flex justify-center p-12"><Spinner /></div>
   {:else if closed}
     <div
       class="rounded-2xl bg-white dark:bg-gray-800 shadow-lg p-8 text-center space-y-4"

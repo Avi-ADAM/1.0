@@ -6,7 +6,7 @@
   import { getMoachStore } from '$lib/stores/moachStore.svelte.js';
   import { sendToSer } from '$lib/send/sendToSer.js';
   import { onMount } from 'svelte';
-  import Lowding from '$lib/celim/lowding.svelte';
+  import Spinner from '$lib/celim/Spinner.svelte';
 
   let projectId = $derived(page.params.projectId);
   let saleId = $derived(page.params.saleId);
@@ -63,7 +63,7 @@
 
 <div class="sale-entity-page space-y-6">
   {#if loading}
-    <div class="flex justify-center p-12"><Lowding /></div>
+    <div class="flex justify-center p-12"><Spinner /></div>
   {:else if sale}
     <header id="header" class="bg-white p-6 rounded-xl shadow-sm">
       <nav class="text-sm text-gray-500 mb-2">

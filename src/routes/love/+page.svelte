@@ -1,5 +1,5 @@
 ﻿<script>
-  import { RingLoader } from 'svelte-loading-spinners';
+  import Spinner from '$lib/celim/Spinner.svelte';
   import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
   import { lang } from '$lib/stores/lang.js';
   import { t, isRtl} from '$lib/translations';
@@ -95,7 +95,7 @@
   <div class="loading-container">
     <h3 class="text-barbi">{$t('love.loading')}</h3>
     <br />
-    <RingLoader size="260" color="#ff00ae" unit="px" duration="2s"></RingLoader>
+    <Spinner size="lg" />
   </div>
 {:then value}
   <div class="page-wrapper">

@@ -1,6 +1,6 @@
 <script>
   import { onMount } from 'svelte';
-  import { RingLoader } from 'svelte-loading-spinners';
+  import Spinner from '$lib/celim/Spinner.svelte';
   import { executeAction } from '$lib/client/actionClient';
   import { sendToSer } from '$lib/send/sendToSer.js';
   import { t, isRtl } from '$lib/translations';
@@ -103,7 +103,7 @@
 
     {#if loading}
       <div class="flex justify-center py-4">
-        <RingLoader size="40" color="#ff00ae" unit="px" duration="2s"></RingLoader>
+        <Spinner />
       </div>
     {:else if products.length === 0 && !composing}
       <p class="text-sm text-gray-500 dark:text-gray-400 text-center py-4">
@@ -133,7 +133,7 @@
           </div>
           <div class="shrink-0 flex items-center gap-1.5">
             {#if busyId === product.id}
-              <RingLoader size="20" color="#ff00ae" unit="px" duration="2s"></RingLoader>
+              <Spinner size="xs" />
             {:else}
               <a
                 class="text-xs px-2 py-1 rounded-full border border-gray-300 text-gray-600 dark:text-gray-300 hover:border-barbi hover:text-barbi transition-colors"

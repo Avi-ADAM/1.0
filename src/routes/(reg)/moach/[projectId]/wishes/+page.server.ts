@@ -3,9 +3,9 @@ import { stripHtml } from '$lib/utils/stripHtml';
 import type { PageServerLoad } from './$types';
 
 function nameOf(user: any): string {
-  if (!user) return 'משתמשת';
+  if (!user) return 'משתמש/ת';
   const a = user.attributes || user;
-  return a.username || 'משתמשת';
+  return a.username || 'משתמש/ת';
 }
 function initials(name: string): string {
   const parts = String(name || '').trim().split(/\s+/);

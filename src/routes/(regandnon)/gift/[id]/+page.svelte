@@ -6,7 +6,7 @@
   import { lang } from '$lib/stores/lang.js';
   import RichText from '$lib/celim/ui/richText.svelte';
   import ShareLink from '$lib/components/share/ShareLink.svelte';
-  import { RingLoader } from 'svelte-loading-spinners';
+  import Spinner from '$lib/celim/Spinner.svelte';
   import { goto } from '$app/navigation';
   import SaleComponent from '$lib/components/sales/SaleComponent.svelte';
   import { toast } from 'svelte-sonner';
@@ -558,7 +558,7 @@
   <div
     class="fixed inset-0 flex items-center justify-center bg-white/80 dark:bg-gray-900/80 z-50"
   >
-    <RingLoader size="120" color="#ff00ae" unit="px" duration="2s" />
+    <Spinner size="lg" />
   </div>
 {/if}
 

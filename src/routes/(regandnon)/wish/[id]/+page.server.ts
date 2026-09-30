@@ -8,9 +8,9 @@ function shortCode(id: string | number): string {
 }
 
 function nameOf(user: any): string {
-  if (!user) return 'משתמשת';
+  if (!user) return 'משתמש/ת';
   const a = user.attributes || user;
-  return a.username || 'משתמשת';
+  return a.username || 'משתמש/ת';
 }
 
 function initials(name: string): string {

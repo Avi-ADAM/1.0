@@ -2,7 +2,7 @@
   import { onMount } from 'svelte';
   import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
   import { goto } from '$app/navigation';
-  import { RingLoader } from 'svelte-loading-spinners';
+  import Spinner from '$lib/celim/Spinner.svelte';
   import { executeAction } from '$lib/client/actionClient';
   import { sendToSer } from '$lib/send/sendToSer.js';
   import { t, isRtl } from '$lib/translations';
@@ -318,7 +318,7 @@
 
         {#if saving}
           <div class="flex justify-center py-1">
-            <RingLoader size="32" color="#ff00ae" unit="px" duration="2s"></RingLoader>
+            <Spinner size="sm" />
           </div>
         {:else}
           <button

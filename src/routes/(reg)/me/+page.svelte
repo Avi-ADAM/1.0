@@ -5,7 +5,7 @@
   import { liUN } from '$lib/stores/liUN.js';
   import Arrow from '$lib/celim/icons/arrow.svelte';
   import Close from '$lib/celim/close.svelte';
-  import Lowding from '$lib/celim/lowding.svelte';
+  import Spinner from '$lib/celim/Spinner.svelte';
   import { TourItem } from 'svelte-tour';
   import { run } from 'svelte-tour';
   import { Tour } from 'svelte-tour';
@@ -345,7 +345,6 @@
     addSl5 = false;
   }
 
-  import { RingLoader } from 'svelte-loading-spinners';
   import { toast } from 'svelte-sonner';
   import { decodeProjectDraft, sanitizeProjectDraft } from '$lib/prefill/projectDraft';
   import CrNewProject from '$lib/celim/icons/crNewProject.svelte';
@@ -537,7 +536,7 @@
   </div>
 {:else if !meData}
   <div class="body button-gold grid items-center justify-center">
-    <Lowding height="30vh" />
+    <Spinner size="lg" />
   </div>
 {:else}
   <Dialog
@@ -590,8 +589,7 @@
             <div class="sp bg-gold">
               <h3 class="text-barbi">{$t('pages.me.om')}</h3>
               <br />
-              <RingLoader size="260" color="#ff00ae" unit="px" duration="2s"
-              ></RingLoader>
+              <Spinner size="lg" />
             </div>
           {/if}
         </div></DialogContent
@@ -607,8 +605,7 @@
     <div class="center-upload">
       <h3 class="text-barbi">{$t('pages.me.om')}</h3>
       <br />
-      <RingLoader size="40" color="#ff00ae" unit="px" duration="2s"
-      ></RingLoader>
+      <Spinner />
     </div>
   {/if}
   {#if addP == false}
@@ -904,7 +901,7 @@
                   {/each}
                 </div>
               {:else}
-                <Lowding height="50px" width="50px" />
+                <Spinner />
               {/if}
 
               <button
@@ -1260,6 +1257,14 @@
        order and hand the collage a scrollport back — see the note there. */
     overflow: hidden;
     overflow: clip;
+    /* `clip` (unlike `hidden`) does not form a block formatting context, so
+       the `my-2` on the first row inside (OfferingsBadges) collapsed straight
+       through this box and shoved the whole 100vh page 8px down. That made the
+       document taller than the viewport, which tripped mobileFooter's "page
+       fits" check and added --foot-pad on top: black bands above and below.
+       `flow-root` contains the margin. Only here, not on `.body` — the loading
+       branch puts `.grid` on that element and a scoped `display` would win. */
+    display: flow-root;
     background: radial-gradient(
       circle at bottom center,
       var(--gold) 0%,

@@ -1,5 +1,10 @@
 import { sendToSer } from '$lib/send/sendToSer.js';
-import { pendingProposalCount, ratsonStatus, summarizeRatsonNodes } from '$lib/concierge/summary.js';
+import {
+  notificationItems,
+  pendingProposalCount,
+  ratsonStatus,
+  summarizeRatsonNodes
+} from '$lib/concierge/summary.js';
 import type { PageServerLoad } from './$types';
 
 type RatsonCard = {
@@ -54,8 +59,8 @@ function excerpt(text: string | null, max = 180): string {
 
 function authorOf(usersData: any): { name: string; avatar: string } {
   const first = usersData?.[0]?.attributes;
-  if (!first) return { name: 'משתמשת', avatar: 'מש' };
-  const full = first.username || 'משתמשת';
+  if (!first) return { name: 'משתמש/ת', avatar: 'מש' };
+  const full = first.username || 'משתמש/ת';
   const parts = full.split(/\s+/);
   const avatar = (parts[0]?.[0] || '') + (parts[1]?.[0] || parts[0]?.[1] || '');
   return { name: full, avatar: avatar.slice(0, 2) || 'מש' };
@@ -103,6 +108,7 @@ export const load: PageServerLoad = async ({ locals, fetch }) => {
 
   let mine: RatsonCard[] = [];
   let summary = summarizeRatsonNodes([]);
+  let bell: ReturnType<typeof notificationItems> = [];
   let publicFeed: PublicRatsonCard[] = [];
   let queryOk = { mine: false, public: false };
 
@@ -112,6 +118,7 @@ export const load: PageServerLoad = async ({ locals, fetch }) => {
       const nodes = res?.data?.ratsons?.data ?? [];
       mine = nodes.map(mapRatsonCard);
       summary = summarizeRatsonNodes(nodes);
+      bell = notificationItems(nodes);
       queryOk.mine = true;
     } catch (e) {
       console.error('[concierge] 106listMyRatsons failed', e);
@@ -127,5 +134,5 @@ export const load: PageServerLoad = async ({ locals, fetch }) => {
     console.error('[concierge] 109listOpenRatsons failed', e);
   }
 
-  return { mine, publicFeed, queryOk, uid, summary };
+  return { mine, publicFeed, queryOk, uid, summary, bell };
 };

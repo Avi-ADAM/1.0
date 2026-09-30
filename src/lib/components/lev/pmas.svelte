@@ -3,7 +3,7 @@
   import Diun from './diun.svelte';
   import { Drawer } from 'vaul-svelte';
   import { executeAction } from '$lib/client/actionClient';
-  import { RingLoader } from 'svelte-loading-spinners';
+  import Spinner from '$lib/celim/Spinner.svelte';
   import Chaticon from '../../celim/chaticon.svelte';
   import { clickOutside } from './outsidclick.js';
   import { fly } from 'svelte/transition';
@@ -587,8 +587,7 @@ diunim = ` ${diu},`
           </svg></button
         >
         {#if loading === true}
-          <RingLoader size="260" color="#ff00ae" unit="px" duration="2s"
-          ></RingLoader>
+          <Spinner size="lg" />
           <!--   {:else if rect === true}
             <div class="text-center">
   <h1>  ניתן להגיב ולנמק מדוע 

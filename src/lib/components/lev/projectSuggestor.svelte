@@ -349,7 +349,7 @@
   import Cards from './cards/sugestmi.svelte';
   import { DialogContent, DialogOverlay } from 'svelte-accessible-dialog';
   import Diun from './diun.svelte';
-  import { RingLoader } from 'svelte-loading-spinners';
+  import Spinner from '$lib/celim/Spinner.svelte';
   import NegoM from '../prPr/negoM.svelte';
   let isOpen = $state(false),
     diunm = $state(false),
@@ -470,7 +470,7 @@
         >✕</button
       >
       {#if loading === true}
-        <RingLoader size="200" color="#ff00ae" unit="px" duration="2s" />
+        <Spinner size="lg" />
       {:else if negoOpen === true}
         <NegoM
           onLoad={() => (negoLoading = true)}

@@ -352,6 +352,8 @@
   "no_wishes_sub": "Cuéntanos qué quieres y el concierge se pondrá a trabajar.",
   "no_wishes_has_drafts": "Tienes borradores por terminar ({{count}}) →",
   "pending_offers": "{{count}} nuevas",
+  "no_notifications": "No hay notificaciones por ahora",
+  "notif_untitled": "Deseo sin título",
   "draft_continue": "Seguir escribiendo →",
   "ext_title": "Completado desde la web",
   "ext_disclaimer": "Para las partes que nadie de la comunidad cubre todavía, también buscamos en la web. La información se recopiló automáticamente de buscadores y puede ser inexacta; el acuerdo se cierra con el sitio externo, no a través de 1lev1.",

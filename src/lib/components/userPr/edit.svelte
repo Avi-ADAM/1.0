@@ -99,7 +99,7 @@ console.log("skillslist",skillslist);
     }
   }
 
-  import { RingLoader } from 'svelte-loading-spinners';
+  import Spinner from '$lib/celim/Spinner.svelte';
   let yy = $state(0);
   $effect(() => {
     console.log(yy, 'yy');
@@ -967,8 +967,7 @@ console.log("skillslist",skillslist);
     <div class="sp">
       <h3 class="text-barbi">{$t('pages.editPic.om')}</h3>
       <br />
-      <RingLoader size="260" color="#ff00ae" unit="px" duration="2s"
-      ></RingLoader>
+      <Spinner size="lg" />
     </div>
   {/if}
 {/if}

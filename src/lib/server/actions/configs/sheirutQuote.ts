@@ -180,7 +180,7 @@ export const acceptSheirutQuoteConfig: ActionConfig = {
   notification: {
     recipients: { type: 'specificUsers', config: { userIdsParam: 'recipientIds', excludeSender: true } },
     templates: {
-      title: { he: 'הלקוחה אישרה את המחיר', en: 'The customer accepted your price', ar: 'وافقت العميلة على السعر' },
+      title: { he: 'המחיר אושר על־ידי הלקוח/ה', en: 'The customer accepted your price', ar: 'وافقت العميلة على السعر' },
       body: {
         he: 'המחיר שהצעת אושר. אם יש ברקמה חברים נוספים — הם מאשרים עכשיו ב־Deals.',
         en: 'Your price was accepted. If the rikma has other members, they sign it now in Deals.',

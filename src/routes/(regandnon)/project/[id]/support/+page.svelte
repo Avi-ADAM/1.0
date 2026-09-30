@@ -7,7 +7,7 @@
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
   import { lang } from '$lib/stores/lang.js';
-  import { RingLoader } from 'svelte-loading-spinners';
+  import Spinner from '$lib/celim/Spinner.svelte';
   import RichText from '$lib/celim/ui/richText.svelte';
   import { invalidate } from '$app/navigation';
   import DonateDialog from '$lib/components/revenue/DonateDialog.svelte';
@@ -556,7 +556,7 @@
   </div>
 {:else}
   <div class="support-page h-screen w-screen flex items-center justify-center">
-    <RingLoader size="200" color="#ff00ae" unit="px" duration="2s"></RingLoader>
+    <Spinner size="lg" />
   </div>
 {/if}
 

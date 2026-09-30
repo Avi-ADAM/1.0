@@ -17,7 +17,7 @@
   import { onMount } from 'svelte';
   import { lang } from '$lib/stores/lang.js';
   import { executeAction } from '$lib/client/actionClient';
-  import Lowding from '$lib/celim/lowding.svelte';
+  import Spinner from '$lib/celim/Spinner.svelte';
   import SiteShareArchive from './SiteShareArchive.svelte';
 
   let { projectId } = $props();
@@ -66,7 +66,7 @@
 
 {#if loading}
   <section class="bg-white p-6 rounded-xl shadow-sm">
-    <div class="flex justify-center p-8"><Lowding /></div>
+    <div class="flex justify-center p-8"><Spinner /></div>
   </section>
 {:else}
   {#if hasSplits}

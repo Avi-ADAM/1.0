@@ -70,7 +70,7 @@ const handler: ActionExecutionHandler = async (params, context, util) => {
   const recipeResources: any[] = mAttrs.matanot_recipe_resources?.data ?? [];
   const allLines = [...recipeMissions, ...recipeResources];
   if (allLines.length === 0) {
-    throw new Error('אין חלקים בתכנית כדי לייצר - הוסיפי משימות/משאבים קודם');
+    throw new Error('אין חלקים בתכנית כדי לייצר - יש להוסיף משימות/משאבים קודם');
   }
 
   const unassigned = allLines.filter((l) => !l.attributes?.assignedMember?.data?.id);

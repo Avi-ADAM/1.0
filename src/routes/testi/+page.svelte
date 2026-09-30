@@ -2,7 +2,7 @@
   import { t } from '$lib/translations';
   import { goto } from "$app/navigation";
   import Arrow from "$lib/celim/icons/arrow.svelte";
-  import Lowding from "$lib/celim/lowding.svelte";
+  import Spinner from '$lib/celim/Spinner.svelte';
   import LoginT from "$lib/func/telegram/loginT.svelte";
 	import { Canvas } from '@threlte/core'
   import Scene from '$lib/components/main/1lev1.svelte'
@@ -120,7 +120,7 @@ function change(lan){
 			<span class="mx-2 mb-0.5"><Arrow back={$lang == "he" || $lang == "ar" ? false : true} height="32" color={"var(--gold)"} fill="var(--barbi-pink)"/></span>
 			{/if}
 			{#if loadinga == true}
-			<Lowding width="24px" height="24px"/>
+			<Spinner size="sm" />
 			{/if}
 			</button>
 			<button class="transition-all duration-300 text-barbi px-4 py-2 mx-2 my-4 text-2xl hover:text-slate-800 rounded-xl flex flex-row"onclick={()=>{goto(`${$lang == "he" ? "/hascama" : $lang == "ar" ? "/ar" : "/en"}`) 
@@ -131,7 +131,7 @@ function change(lan){
 			<span class="mx-2 mb-0.5"><Arrow back={$lang == "he"  || $lang == "ar" ? false : true} height="32" color={"var(--gold)"} fill="var(--barbi-pink)"/></span>
 			{/if}
 			{#if loading == true}
-			<Lowding width="24px" height="24px"/>
+			<Spinner size="sm" />
 			{/if}
 			</button>
 		</div>

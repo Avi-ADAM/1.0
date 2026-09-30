@@ -5,7 +5,7 @@
   import { page } from '$app/state';
   import { sendToSer } from '$lib/send/sendToSer.js';
   import { onMount } from 'svelte';
-  import Lowding from '$lib/celim/lowding.svelte';
+  import Spinner from '$lib/celim/Spinner.svelte';
   import { lang } from '$lib/stores/lang.js';
   import Fini from '$lib/components/prPr/fini.svelte';
   import SplitsArchive from '$lib/components/prPr/SplitsArchive.svelte';
@@ -53,7 +53,7 @@
 <div class="split-page space-y-8">
   {#if loading && !financials}
     <div class="flex justify-center p-12">
-      <Lowding />
+      <Spinner />
     </div>
   {:else if financials}
     <!-- T2 (HANDOFF_DISTRIBUTED_DB): local projection beside the GraphQL data,

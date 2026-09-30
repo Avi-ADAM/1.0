@@ -3,7 +3,7 @@
   import { AnimatedHeadline } from 'svelte-animated-headline';
   import { goto } from '$app/navigation';
   import Arrow from '$lib/celim/icons/arrow.svelte';
-  import Lowding from '$lib/celim/lowding.svelte';
+  import Spinner from '$lib/celim/Spinner.svelte';
   import Tile from '$lib/celim/tile.svelte';
   import { Canvas } from '@threlte/core';
   import Scene from '$lib/components/Scene.svelte';
@@ -686,7 +686,7 @@
           >
         {/if}
         {#if loadinga == true}
-          <Lowding width="24px" height="24px" />
+          <Spinner size="sm" />
         {/if}
       </button>
       <button
@@ -715,7 +715,7 @@
           >
         {/if}
         {#if loading == true}
-          <Lowding width="24px" height="24px" />
+          <Spinner size="sm" />
         {/if}
       </button>
     </div>

@@ -1,5 +1,5 @@
 <script>
-      import { RingLoader } from 'svelte-loading-spinners';
+  import Spinner from '$lib/celim/Spinner.svelte';
         import AddImg from '$lib/celim/icons/addImg.svelte';
   import UploadPic from '$lib/components/userPr/uploadPic.svelte';
         let pic = $state(false)
@@ -76,8 +76,7 @@ class="border flex flex-row border-barbi hover:border-gold bg-gradient-to-br fro
     <div class="sp bg-gold">
       <h3 class="text-barbi">{om}</h3>
       <br />
-      <RingLoader size="260" color="#ff00ae" unit="px" duration="2s"
-      ></RingLoader>
+      <Spinner size="lg" />
     </div>
   {/if}
 </div>

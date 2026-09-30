@@ -3,7 +3,7 @@
   import { t } from '$lib/translations';
   import Header from '$lib/components/header/header.svelte';
   import { lang } from '$lib/stores/lang.js';
-  import { RingLoader } from 'svelte-loading-spinners';
+  import Spinner from '$lib/celim/Spinner.svelte';
   import { executeAction } from '$lib/client/actionClient';
 
   let { data } = $props();
@@ -431,7 +431,7 @@
   </div>
 {:else}
   <div class="join-page h-screen w-screen flex items-center justify-center">
-    <RingLoader size="200" color="#ff00ae" unit="px" duration="2s"></RingLoader>
+    <Spinner size="lg" />
   </div>
 {/if}
 
