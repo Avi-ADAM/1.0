@@ -11,6 +11,9 @@
  *      the reused BOM activation hands each part to the right person.
  *   3. Create the **dedicated partner weave** — providers are members
  *      (`user_1s`); the customer is the *client* of the deal, NOT a member.
+ *      It gets a profile picture: the customer's pick (`profilePicId`), the
+ *      wish's own logo, or one made from the concierge medal + the product's
+ *      name (`rikmaPicture.ts`).
  *   4. Host the product on that weave and activate it.
  *   5. Open a Sheirutpend (client = wisher) and run the tested
  *      `createSheirutFromPending` flow → Sheirut + mesimabetahalich per provider
@@ -23,10 +26,12 @@
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { createSheirutFromPendingConfig } from './createSheirutFromPending.js';
+import { STRAPI_URL } from '$lib/server/strapiUrl.js';
+import { resolveRikmaPictureId } from '$lib/server/concierge/rikmaPicture.js';
 
 const handler: ActionExecutionHandler = async (params, context, util) => {
   const { strapi } = util;
-  const { ratsonId } = params as { ratsonId: string };
+  const { ratsonId, profilePicId } = params as { ratsonId: string; profilePicId?: string | null };
   if (!ratsonId) throw new Error('ratsonId is required');
 
   const now = new Date().toISOString();
@@ -46,6 +51,12 @@ const handler: ActionExecutionHandler = async (params, context, util) => {
   const isOwner = owners.some((o: any) => String(o.id) === String(context.userId));
   if (!isOwner) throw new Error('Only the wish owner may close the consent');
   const wisherId = String(owners[0].id);
+
+  // Idempotent: the wish is marked fulfilled only after the weave + Sheirut
+  // exist (step 8), so a second click must not mint a second partnership.
+  if (ratAttrs.status_ratson === 'fulfilled' || ratAttrs.fulfilled === true) {
+    throw new Error('ההסכמה כבר נסגרה - הרקמה והדיל כבר נוצרו. אפשר למצוא אותם ב"עסקאות".');
+  }
 
   const matanotId = ratAttrs.derivedComplexMatanot?.data?.id
     ? String(ratAttrs.derivedComplexMatanot.data.id)
@@ -125,6 +136,17 @@ const handler: ActionExecutionHandler = async (params, context, util) => {
   if (providers.length === 0) throw new Error('לא נמצאו ספקים מאושרים לתכנית');
 
   // ── 4. Create the dedicated partner weave (members = providers) ─────────────
+  // A face for it: the customer's pick, the wish's own logo, or the concierge
+  // medal over a word or two of the product. Best-effort — never blocks the weave.
+  const profilePic = await resolveRikmaPictureId({
+    chosenId: profilePicId,
+    wishLogoId: ratAttrs.logo?.data?.id ? String(ratAttrs.logo.data.id) : null,
+    wishName,
+    baseUrl: STRAPI_URL,
+    jwt: context.jwt,
+    fetch: context.fetch
+  });
+
   const weaveRes = await strapi.execute(
     '166crWishWeave',
     {
@@ -132,6 +154,7 @@ const handler: ActionExecutionHandler = async (params, context, util) => {
       projectName: `${wishName} - רקמה`,
       descripFor: `רקמת שותפים שנוצרה מהמשאלה "${wishName}".`,
       isOt: true,
+      ...(profilePic ? { profilePic } : {}),
       publishedAt: now
     },
     context.jwt,
@@ -146,7 +169,8 @@ const handler: ActionExecutionHandler = async (params, context, util) => {
   try {
     await strapi.execute(
       '167hostWishMatanot',
-      { id: matanotId, projectcreates: weaveId, publishedAt: now },
+      // Made for one customer: never in the public discovery, priced at the deal.
+      { id: matanotId, projectcreates: weaveId, publishedAt: now, price: total, hideFromDiscovery: true },
       context.jwt,
       context.fetch
     );
@@ -240,7 +264,12 @@ export const materializeWishConfig: ActionConfig = {
     'Close the wish consent: create the dedicated partner weave (providers=members, customer=client), host the composed product on it, and run createSheirutFromPending to produce the Sheirut + activate the BOM. Owner-only; requires every BOM slot assigned.',
   graphqlOperation: handler,
   paramSchema: {
-    ratsonId: { type: 'string', required: true }
+    ratsonId: { type: 'string', required: true },
+    profilePicId: {
+      type: 'string',
+      required: false,
+      description: "Strapi media id the customer chose for the new rikma (omit → the wish's logo, else a generated one)"
+    }
   },
   authRules: [{ type: 'jwt', errorMessage: 'Must be logged in to close a wish' }],
   notification: {

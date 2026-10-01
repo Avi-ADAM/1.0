@@ -74,6 +74,7 @@
 | SPEC_CUSTOM_EMAIL | ה-`NotificationOrchestrator` קיים, חלק מהתבניות עוד נשלחות ישירות |
 | FIXES | קובץ ממצאים מתגלגל |
 | PRODUCTION_READINESS_REVIEW · QA_SOLO_RIKMA_2026-08 | סקירות עם ממצאים פתוחים |
+| QA_CONCIERGE_E2E_2026-10 | תכנית בדיקה מקצה לקצה של הקונסיירז' לפני השקה + ממצאים (בריצה) |
 
 ## tbd/
 

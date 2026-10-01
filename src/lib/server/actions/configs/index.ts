@@ -50,6 +50,7 @@ import { createResourceAction } from './createResource.js';
 import { toggleMoneyReceiverConfig } from './toggleMoneyReceiver.js';
 import { createSheirutHalukaConfig } from './createSheirutHaluka.js';
 import { confirmSheirutHalukaConfig } from './confirmSheirutHaluka.js';
+import { updateSheirutConfig } from './updateSheirut.js';
 import { ensureHalukaForumConfig } from './ensureHalukaForum.js';
 import { forumReadActions } from './forum.js';
 import { createComplexMatanotConfig } from './createComplexMatanot.js';
@@ -280,6 +281,9 @@ export function registerAllActions(): void {
   registerAction(createSheirutHalukaConfig);
   registerAction(confirmSheirutHalukaConfig);
   registerAction(ensureHalukaForumConfig);
+
+  // Sheirut milestones: customer "got it" / receiver "money arrived"
+  registerAction(updateSheirutConfig);
 
   // Complex matanot (BOM products)
   registerAction(createComplexMatanotConfig);

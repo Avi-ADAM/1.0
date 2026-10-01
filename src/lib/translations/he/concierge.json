@@ -374,5 +374,15 @@
   "ext_no_provider": "החיפוש ברשת לא זמין כרגע",
   "ext_weak_hint": "יש גם הצעות מהקהילה למעלה",
   "ext_fetched_at": "נאסף ב-{{date}}",
-  "ext_stale": "התוצאות מהרשת התיישנו — כדאי לחפש שוב"
+  "ext_stale": "התוצאות מהרשת התיישנו — כדאי לחפש שוב",
+  "rikma_pic_title": "תמונה לרקמה",
+  "rikma_pic_hint": "לא חובה. אם לא תבחרו — ניצור תמונה עם סמל הקונסיירז׳ ושם המוצר.",
+  "rikma_pic_choose": "בחירת תמונה",
+  "rikma_pic_change": "החלפת תמונה",
+  "rikma_pic_remove": "הסרה",
+  "rikma_pic_uploading": "מעלה…",
+  "rikma_pic_error": "העלאת התמונה נכשלה. אפשר לנסות שוב או להמשיך בלעדיה.",
+  "consent_closed_btn": "✓ ההסכמה נסגרה",
+  "consent_closed_note": "נוצרו רקמה ודיל.",
+  "consent_closed_link": "לעסקה שלך ←"
 }

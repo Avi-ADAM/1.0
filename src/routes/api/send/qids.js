@@ -6735,6 +6735,11 @@ ${STIPEND_DECISION_FIELDS}
               }
             }
           }
+          # Hours already on their way to the rikma (see completeMission.ts):
+          # timer saves file their own rows / approvals, so completion must
+          # carry only what is left.
+          finnished_missions { data { id attributes { noofhours } } }
+          finiapruvals { data { id attributes { noofhours archived } } }
         }
       }
     }
@@ -7779,7 +7784,7 @@ ${STIPEND_DECISION_FIELDS}
           status_ratson
           fulfillment_score
           last_matched_at
-          logo { data { attributes { url formats } } }
+          logo { data { id attributes { url formats } } }
           users_permissions_users {
             data { id attributes { username } }
           }
@@ -8288,23 +8293,28 @@ ${STIPEND_DECISION_FIELDS}
    * with their assignedMember so the action can verify readiness + collect the
    * providers before producing the deal via the existing createSheirutFromPending.
    */
-  '166crWishWeave': `mutation CrWishWeave($members: [ID], $projectName: String!, $descripFor: String, $publishedAt: DateTime, $isOt: Boolean) {
+  '166crWishWeave': `mutation CrWishWeave($members: [ID], $projectName: String!, $descripFor: String, $publishedAt: DateTime, $isOt: Boolean, $profilePic: ID) {
     createProject(data: {
       user_1s: $members,
       projectName: $projectName,
       descripFor: $descripFor,
       isOt: $isOt,
+      profilePic: $profilePic,
       publishedAt: $publishedAt
     }) {
       data { id attributes { projectName } }
     }
   }`,
 
-  '167hostWishMatanot': `mutation HostWishMatanot($id: ID!, $projectcreates: ID!, $publishedAt: DateTime) {
+  // A wish's product is made for ONE customer, so it is hosted out of discovery
+  // and carries the agreed total as its price (not the 0 of the empty shell).
+  '167hostWishMatanot': `mutation HostWishMatanot($id: ID!, $projectcreates: ID!, $publishedAt: DateTime, $price: Float, $hideFromDiscovery: Boolean) {
     updateMatanot(id: $id, data: {
       projectcreates: [$projectcreates],
       status_of_voting: active,
-      publishedAt: $publishedAt
+      publishedAt: $publishedAt,
+      price: $price,
+      hideFromDiscovery: $hideFromDiscovery
     }) {
       data { id attributes { status_of_voting } }
     }

@@ -1,5 +1,6 @@
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { completeMissionConsentSpec } from '$lib/consent/specs/s2b';
+import { hoursStillToFile } from '$lib/server/timers/unfiledHours.js';
 
 /**
  * Calculate timegrama delay based on restime
@@ -48,7 +49,12 @@ const completeMissionHandler: ActionExecutionHandler = async (params, context, {
   const howmanyhoursalready = missionData.howmanyhoursalready ?? 0;
   const hoursassinged = missionData.hoursassinged ?? 0;
   const perhour = missionData.perhour ?? 0;
-  const finalHoursdon = hoursdon !== undefined ? Number(hoursdon) : howmanyhoursalready;
+  // The mission's running total is NOT what this completion files: every timer
+  // save already filed its own hours, and filing the total again approved and
+  // credited them twice (QA_CONCIERGE_E2E C-13). Carry only the remainder —
+  // usually zero, since completion is the claim "this is done".
+  const runningTotal = hoursdon !== undefined ? Number(hoursdon) : howmanyhoursalready;
+  const finalHoursdon = hoursStillToFile(runningTotal, missionData);
 
   // Extract project data
   const project = missionData.project?.data;
@@ -225,7 +231,8 @@ const completeMissionHandler: ActionExecutionHandler = async (params, context, {
       createdId,
       noofpu,
       projectId,
-      hoursdon: finalHoursdon
+      hoursdon: finalHoursdon,
+      runningTotal
     },
     updateStrategy: {
       type: 'partialUpdate',

@@ -374,5 +374,15 @@
   "ext_no_provider": "Web search is not available right now",
   "ext_weak_hint": "There are community offers above too",
   "ext_fetched_at": "Collected on {{date}}",
-  "ext_stale": "The web results are out of date — worth searching again"
+  "ext_stale": "The web results are out of date — worth searching again",
+  "rikma_pic_title": "Picture for the rikma",
+  "rikma_pic_hint": "Optional. If you skip it, we'll make one from the concierge badge and the name of what you ordered.",
+  "rikma_pic_choose": "Choose a picture",
+  "rikma_pic_change": "Change picture",
+  "rikma_pic_remove": "Remove",
+  "rikma_pic_uploading": "Uploading…",
+  "rikma_pic_error": "The picture could not be uploaded. You can try again or go on without it.",
+  "consent_closed_btn": "✓ Agreement closed",
+  "consent_closed_note": "A rikma and a deal were created.",
+  "consent_closed_link": "To your deal →"
 }

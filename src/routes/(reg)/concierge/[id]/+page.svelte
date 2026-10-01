@@ -1440,12 +1440,56 @@
   const acceptedProviderCount = $derived(
     (data?.proposals ?? []).filter((p) => p.status === 'accepted').length
   );
+  /* Once closed the wish is `fulfilled` and the deal exists — the button must
+   * not stay live (a second click would be rejected by the server anyway). */
+  const consentClosed = $derived(data?.wish?.status === 'fulfilled');
   const readyToClose = $derived(
-    isOwner && HAS_REAL && acceptedProviderCount > 0
+    isOwner && HAS_REAL && acceptedProviderCount > 0 && !consentClosed
   );
 
+  /* The customer's own picture for the rikma that closing opens. Optional —
+   * without one the server uses the wish's logo, else makes a concierge-medal
+   * picture from the product's name (materializeWish → rikmaPicture). */
+  let picId = $state('');
+  let picPreview = $state('');
+  let picBusy = $state(false);
+  let picError = $state('');
+
+  function clearPic() {
+    if (picPreview) URL.revokeObjectURL(picPreview);
+    picId = '';
+    picPreview = '';
+    picError = '';
+  }
+
+  async function onPickPic(e) {
+    const input = e.currentTarget;
+    const file = input.files?.[0];
+    input.value = ''; // picking the same file again must fire again
+    if (!file || picBusy) return;
+    picBusy = true;
+    picError = '';
+    try {
+      const body = new FormData();
+      body.append('files', file);
+      const res = await fetch('/api/upload', { method: 'POST', body });
+      if (!res.ok) throw new Error(`upload ${res.status}`);
+      const out = await res.json();
+      const id = out?.[0]?.id;
+      if (!id) throw new Error('upload returned no file');
+      if (picPreview) URL.revokeObjectURL(picPreview);
+      picId = String(id);
+      picPreview = URL.createObjectURL(file);
+    } catch (err) {
+      console.error('[concierge/[id]] rikma picture upload failed:', err);
+      picError = $t('concierge.rikma_pic_error');
+    } finally {
+      picBusy = false;
+    }
+  }
+
   async function closeConsent() {
-    if (!wishId || materializeBusy) return;
+    if (!wishId || materializeBusy || picBusy) return;
     materializeBusy = true;
     materializeError = '';
     try {
@@ -1454,11 +1498,11 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           actionKey: 'materializeWish',
-          params: { ratsonId: wishId }
+          params: { ratsonId: wishId, ...(picId ? { profilePicId: picId } : {}) }
         })
       });
       const out = await res.json();
-      if (!out?.success) throw new Error(out?.error || 'סגירת ההסכמה נכשלה');
+      if (!out?.success) throw new Error(out?.error?.message || 'סגירת ההסכמה נכשלה');
       toast.success('המעגל נסגר - נוצרה רקמת שותפים והדיל נפתח 💗');
       goto('/deals');
     } catch (err) {
@@ -2637,6 +2681,72 @@
                 ><Money amount={grandTotal} /></span
               >
             </div>
+            {#if isOwner && !consentClosed}
+              <div
+                style="margin-top:16px;padding:12px 14px;border:1px dashed rgb(var(--cg-gold-rgb) / .25);border-radius:12px;display:flex;gap:12px;align-items:center"
+              >
+                {#if picPreview}
+                  <img
+                    src={picPreview}
+                    alt=""
+                    style="width:56px;height:56px;border-radius:50%;object-fit:cover;border:1px solid rgb(var(--cg-gold-rgb) / .5);flex:none"
+                  />
+                {:else}
+                  <img
+                    src="/logo-concierge-medal.jpg"
+                    alt=""
+                    style="width:56px;height:56px;border-radius:50%;object-fit:cover;opacity:.7;flex:none"
+                  />
+                {/if}
+                <div style="flex:1;min-width:0">
+                  <div
+                    style="font-family:'Cinzel',serif;letter-spacing:.14em;font-size:11px;color:var(--cg-goldhi)"
+                  >
+                    {$t('concierge.rikma_pic_title')}
+                  </div>
+                  <div
+                    style="font-family:'Bellefair',serif;font-size:13px;color:var(--cg-muted);margin-top:3px"
+                  >
+                    {$t('concierge.rikma_pic_hint')}
+                  </div>
+                  {#if picError}
+                    <div
+                      style="font-family:'Bellefair',serif;font-size:13px;color:var(--cg-pink);margin-top:4px"
+                      role="alert"
+                    >
+                      {picError}
+                    </div>
+                  {/if}
+                </div>
+                <div style="display:flex;flex-direction:column;gap:6px;flex:none">
+                  <label
+                    class="btn-ghost"
+                    style="cursor:pointer;justify-content:center;opacity:{picBusy ? 0.5 : 1}"
+                  >
+                    {picBusy
+                      ? $t('concierge.rikma_pic_uploading')
+                      : picId
+                        ? $t('concierge.rikma_pic_change')
+                        : $t('concierge.rikma_pic_choose')}
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp"
+                      class="sr-only"
+                      disabled={picBusy || materializeBusy}
+                      onchange={onPickPic}
+                    />
+                  </label>
+                  {#if picId}
+                    <button
+                      class="btn-ghost"
+                      type="button"
+                      disabled={picBusy || materializeBusy}
+                      onclick={clearPic}>{$t('concierge.rikma_pic_remove')}</button
+                    >
+                  {/if}
+                </div>
+              </div>
+            {/if}
             <div style="display:flex;gap:10px;margin-top:16px">
               <button
                 class="btn-jewel"
@@ -2646,7 +2756,11 @@
                   : 0.5}"
                 disabled={!readyToClose || materializeBusy}
                 onclick={closeConsent}
-                >{materializeBusy ? '⏳ סגירה…' : '✓ סגירת ההסכמה'}</button
+                >{materializeBusy
+                  ? '⏳ סגירה…'
+                  : consentClosed
+                    ? $t('concierge.consent_closed_btn')
+                    : '✓ סגירת ההסכמה'}</button
               >
               <button
                 class="btn-ghost"
@@ -2665,6 +2779,9 @@
               <span>💗</span><span>
                 {#if !isOwner}
                   רק יוצר/ת המשאלה יכול/ה לסגור את ההסכמה.
+                {:else if consentClosed}
+                  {$t('concierge.consent_closed_note')}
+                  <a href="/deals">{$t('concierge.consent_closed_link')}</a>
                 {:else if !readyToClose}
                   כשכל החלקים יקבלו ספק מאושר - אפשר יהיה לסגור ולפתוח רקמת
                   שותפים.
@@ -3614,6 +3731,11 @@
     color: var(--cg-ink);
     border-color: rgb(var(--cg-gold-rgb) / 0.3);
     background: rgb(var(--cg-gold-rgb) / 0.04);
+  }
+  /* a file picker is a <label> around a visually-hidden input: show its focus */
+  .btn-ghost:focus-within {
+    outline: 2px solid var(--cg-goldhi);
+    outline-offset: 2px;
   }
   .btn-xs {
     padding: 7px 12px;

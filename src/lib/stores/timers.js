@@ -268,7 +268,7 @@ export async function fetchTimers(uid, fetch, options = {}) {
                             //rest of data:
                             missionName: t.attributes.name,
                             projectName: t.attributes.project?.data?.attributes?.projectName || 'No Project',
-                            src: t.attributes.project?.data?.attributes?.profilePic.data.attributes.url,
+                            src: t.attributes.project?.data?.attributes?.profilePic?.data?.attributes?.url,
                             projectId: t.attributes.project.data.id,
                             mId: t.id,
                             hoursAssigned: t.attributes.hoursassinged || 0,

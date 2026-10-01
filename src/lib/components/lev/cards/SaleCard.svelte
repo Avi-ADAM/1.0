@@ -163,7 +163,7 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           actionKey: 'updateSheirut',
-          payload: {
+          params: {
             id: buble.id,
             projectId: buble.projectId,
             moneyTransfered: true

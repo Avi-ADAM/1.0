@@ -375,5 +375,15 @@
   "ext_no_provider": "La búsqueda web no está disponible ahora",
   "ext_weak_hint": "También hay ofertas de la comunidad más arriba",
   "ext_fetched_at": "Recopilado el {{date}}",
-  "ext_stale": "Los resultados de la web están desactualizados — conviene buscar de nuevo"
+  "ext_stale": "Los resultados de la web están desactualizados — conviene buscar de nuevo",
+  "rikma_pic_title": "Imagen de la rikma",
+  "rikma_pic_hint": "Opcional. Si no eliges ninguna, haremos una con el emblema del concierge y el nombre de lo que pediste.",
+  "rikma_pic_choose": "Elegir una imagen",
+  "rikma_pic_change": "Cambiar imagen",
+  "rikma_pic_remove": "Quitar",
+  "rikma_pic_uploading": "Subiendo…",
+  "rikma_pic_error": "No se pudo subir la imagen. Puedes intentarlo de nuevo o continuar sin ella.",
+  "consent_closed_btn": "✓ Acuerdo cerrado",
+  "consent_closed_note": "Se crearon una rikma y un trato.",
+  "consent_closed_link": "A tu trato →"
 }
