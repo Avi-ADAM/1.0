@@ -7782,6 +7782,7 @@ ${STIPEND_DECISION_FIELDS}
           ai_meta
           pinecone_id
           status_ratson
+          createdAt
           fulfillment_score
           last_matched_at
           logo { data { id attributes { url formats } } }

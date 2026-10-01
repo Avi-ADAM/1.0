@@ -8,7 +8,7 @@
   import Mission from '$lib/components/prPr/mission.svelte';
   import ResourceCreator from '$lib/components/resource/ResourceCreator.svelte';
   import { toast } from 'svelte-sonner';
-  import { t } from '$lib/translations';
+  import { t, locale } from '$lib/translations';
   import ExternalOfferCard from '$lib/components/concierge/ExternalOfferCard.svelte';
   import ConciergeBell from '$lib/components/concierge/ConciergeBell.svelte';
 
@@ -16,187 +16,30 @@
   let { data } = $props();
 
 
-  /* ===== Mock fallback (§8 of PLAN_CONCIERGE) — used when wish not loaded yet ===== */
-  const MOCK_WISH_TEXT = 'אני רוצה לארגן יום חופש לאמא שלי';
-  const MOCK_WISH_LONG =
-    'אמא שלי מטפלת בילדים כל יום ובקרוב יום הולדתה. אני רוצה לתת לה יום שלם משוחרר - טיפול ספא, ארוחה טובה, מישהי שתשגיח על הילדים, ובן אדם שיבטיח שתגיע ותחזור בשלום. מבקשת לארגן את הכל מראש בלי שתעשה אפילו פנייה אחת.';
-  const MOCK_WISH_AVATAR = 'נב';
-  const MOCK_WISH_AUTHOR = 'נעה ב.';
-  const MOCK_WISH_CODE = 'R-7f3a91';
-
-  const MOCK_MISSIONS = [
-    { name: 'בייביסיטר', hours: 6, imp: 'must' },
-    { name: 'הסעה', hours: 2, imp: 'must' },
-    { name: 'טיפול ספא', hours: 2, imp: 'must' },
-    { name: 'הזמנת מסעדה', hours: 0.5, imp: 'nice' }
-  ];
-  const MOCK_RESOURCES = [
-    { name: 'מקום שקט וצמחי', qty: 1, imp: 'must' },
-    { name: 'ארוחה לשניים', qty: 2, imp: 'nice' },
-    { name: 'זר פרחים', qty: 1, imp: 'nice' }
-  ];
-
-  /* ===== Resolved (real if present, mock otherwise) ===== */
-  const WISH_TEXT = $derived(data?.wish?.name ?? MOCK_WISH_TEXT);
-  const WISH_LONG = $derived(data?.wish?.longDes ?? MOCK_WISH_LONG);
-  const WISH_AVATAR = $derived(data?.wish?.ownerAvatar ?? MOCK_WISH_AVATAR);
-  const WISH_AUTHOR = $derived(data?.wish?.ownerName ?? MOCK_WISH_AUTHOR);
-  const WISH_CODE = $derived(data?.wish?.code ?? MOCK_WISH_CODE);
+  /* ===== The wish, as loaded =====
+   * No demo content here: a wish that could not be loaded never reaches this
+   * page (the loader answers 404/503), and one with an empty breakdown shows
+   * an empty breakdown — never somebody else's invented plan (QA C-6). */
+  const WISH_TEXT = $derived(data?.wish?.name ?? '');
+  const WISH_LONG = $derived(data?.wish?.longDes ?? '');
+  const WISH_AVATAR = $derived(data?.wish?.ownerAvatar ?? '');
+  const WISH_AUTHOR = $derived(data?.wish?.ownerName ?? '');
+  const WISH_CODE = $derived(data?.wish?.code ?? '');
 
   const MISSIONS = $derived(
-    data?.wish?.extractedMissions?.length
-      ? data.wish.extractedMissions.map((m) => ({
-          name: m.name,
-          hours: m.hoursEst ?? 0,
-          imp: m.importance === 'must' ? 'must' : 'nice'
-        }))
-      : MOCK_MISSIONS
+    (data?.wish?.extractedMissions ?? []).map((m) => ({
+      name: m.name,
+      hours: m.hoursEst ?? 0,
+      imp: m.importance === 'must' ? 'must' : 'nice'
+    }))
   );
   const RESOURCES = $derived(
-    data?.wish?.extractedResources?.length
-      ? data.wish.extractedResources.map((r) => ({
-          name: r.name,
-          qty: r.quantityEst ?? 1,
-          imp: r.importance === 'must' ? 'must' : 'nice'
-        }))
-      : MOCK_RESOURCES
+    (data?.wish?.extractedResources ?? []).map((r) => ({
+      name: r.name,
+      qty: r.quantityEst ?? 1,
+      imp: r.importance === 'must' ? 'must' : 'nice'
+    }))
   );
-
-  /* ===== Mock fallbacks (used when no real proposals are loaded yet) ===== */
-  const MOCK_PLAN_ROWS = [
-    {
-      need: {
-        title: 'טיפול ספא 2 שעות',
-        detail:
-          'עיסוי גוף + פנים. עדיפות למטפלת אישה, אווירה שקטה, ללא מוזיקה רועשת.',
-        kind: 'משימה',
-        imp: 'must',
-        hours: 2,
-        bestPrice: 420
-      },
-      providers: [
-        {
-          name: 'נועה גולן',
-          project: 'ספא טבע · חיפה',
-          avatar: 'נג',
-          status: 'accepted',
-          score: 0.91,
-          hours: 2,
-          price: 420,
-          note: 'יש לי חלון פנוי ביום שישי 10:00. סוויטה הפרטית של עץ הזית.',
-          badges: ['פה אחד 5/5', '142 דילים', '6 ק״מ']
-        },
-        {
-          name: 'רני שני',
-          project: 'ספא הנמל',
-          avatar: 'רש',
-          status: 'matching',
-          score: 0.74,
-          hours: 2,
-          price: 510,
-          note: 'אני זמינה אבל רק בצהריים. אעדיף לתאם איתך ישירות.',
-          badges: ['חדשה ב־1💗1', '12 דילים']
-        }
-      ]
-    },
-    {
-      need: {
-        title: 'בייביסיטר 6 שעות',
-        detail: '2 ילדים, גילאי 4 ו־7. ארוחת צהריים והבאת/החזרת מהגן/בית הספר.',
-        kind: 'משימה',
-        imp: 'must',
-        hours: 6,
-        bestPrice: 360
-      },
-      providers: [
-        {
-          name: 'תמר ל.',
-          project: 'אמהות עוזרות זו לזו',
-          avatar: 'תל',
-          status: 'accepted',
-          score: 0.78,
-          hours: 6,
-          price: 360,
-          note: 'אני אמא לילד באותו גן. אקח את הילדים אליי הביתה, אהיה שמחה לעזור.',
-          badges: ['ערבות הדדית', '4 ילדים שלה', 'אישור הקהילה']
-        },
-        {
-          name: 'שני מ.',
-          project: 'אמהות עוזרות זו לזו',
-          avatar: 'שמ',
-          status: 'matching',
-          score: 0.65,
-          hours: 6,
-          price: 400,
-          note: 'אני מציעה להעביר אצלי בבית פעילות יצירה. מתאים גם לילדים שלא מכירים זה את זה.',
-          badges: ['ערבות הדדית', '12 ימים פעילים החודש']
-        }
-      ]
-    },
-    {
-      need: {
-        title: 'הסעה הלוך וחזור',
-        detail: 'מהבית בקרית מוצקין לספא בנשר, חזרה בשעה 13:00.',
-        kind: 'משימה',
-        imp: 'must',
-        hours: 2,
-        bestPrice: 110
-      },
-      providers: [
-        {
-          name: 'יואב כ.',
-          project: 'Lift · הסעות בקהילה',
-          avatar: 'יכ',
-          status: 'pending',
-          score: 0.72,
-          hours: 2,
-          price: 110,
-          note: 'אני שם ממילא בבוקר. אקח ואחזיר ללא תשלום נוסף - רק דלק.',
-          badges: ['פעמיים שותף מאחרת', 'דירוג 4.9']
-        }
-      ]
-    },
-    {
-      need: {
-        title: 'ארוחה לשניים במסעדה',
-        detail: 'מסעדה צמחונית קרובה. הזמנה ל־12:30, שלוש מנות.',
-        kind: 'משאב',
-        imp: 'nice',
-        hours: null,
-        bestPrice: 220
-      },
-      providers: []
-    }
-  ];
-
-  const MOCK_HARMONY = [
-    { id: 'me', label: 'נב', state: 'accepted', isOwner: true },
-    { id: 'spa', label: 'נג', state: 'accepted' },
-    { id: 'sit', label: 'תל', state: 'accepted' },
-    { id: 'lift', label: 'יכ', state: 'pending' }
-  ];
-
-  const MOCK_TOTAL_LINES = [
-    {
-      label: 'טיפול ספא',
-      provider: 'נועה גולן · ספא טבע',
-      price: 420,
-      status: 'accepted'
-    },
-    {
-      label: 'בייביסיטר 6 שעות',
-      provider: 'תמר ל. · אמהות עוזרות',
-      price: 360,
-      status: 'accepted'
-    },
-    {
-      label: 'הסעה הלוך וחזור',
-      provider: 'יואב כ. · Lift',
-      price: 110,
-      status: 'pending'
-    },
-    { label: 'ארוחה במסעדה', provider: null, price: 0, status: 'open' }
-  ];
 
   /* ===== Bridge real proposals + extracted_* → display shapes ===== */
   function proposalStatusToProviderStatus(s) {
@@ -376,22 +219,27 @@
     return lines.filter((l) => l.status !== 'rejected');
   }
 
-  /* ===== Resolved (real if proposals/extracted present, mock otherwise) ===== */
-  const HAS_REAL = $derived(
-    !!data?.wish &&
-      ((data.wish.extractedMissions?.length ?? 0) > 0 ||
-        (data.wish.extractedResources?.length ?? 0) > 0)
+  /* ===== Resolved from the wish and its proposals — nothing else ===== */
+  const HAS_PLAN = $derived(
+    (data?.wish?.extractedMissions?.length ?? 0) > 0 ||
+      (data?.wish?.extractedResources?.length ?? 0) > 0
   );
-  const PLAN_ROWS = $derived(
-    HAS_REAL ? buildPlanRows(data.wish, data.proposals ?? []) : MOCK_PLAN_ROWS
-  );
-  const HARMONY = $derived(
-    HAS_REAL ? buildHarmony(data.wish, data.proposals ?? []) : MOCK_HARMONY
-  );
-  const TOTAL_LINES = $derived(
-    HAS_REAL
-      ? buildTotalLines(data.wish, data.proposals ?? [])
-      : MOCK_TOTAL_LINES
+  const PLAN_ROWS = $derived(buildPlanRows(data?.wish, data?.proposals ?? []));
+  const HARMONY = $derived(buildHarmony(data?.wish, data?.proposals ?? []));
+  const TOTAL_LINES = $derived(buildTotalLines(data?.wish, data?.proposals ?? []));
+
+  /* Proposals the owner can still act on vs. ones that are over. The tabs, the
+   * counts beside them and the plan's own "N proposers" line all read these. */
+  const isClosedProposal = (p) => p.status === 'rejected' || p.status === 'expired';
+  const ACTIVE_PROPOSALS = $derived((data?.proposals ?? []).filter((p) => !isClosedProposal(p)));
+  const CLOSED_PROPOSALS = $derived((data?.proposals ?? []).filter(isClosedProposal));
+  /** Distinct proposers behind the active proposals (a project, else the first person). */
+  const PROPOSER_COUNT = $derived(
+    new Set(
+      ACTIVE_PROPOSALS.map(
+        (p) => p.proposerProject?.id ?? p.proposerUsers?.[0]?.id ?? `proposal-${p.id}`
+      )
+    ).size
   );
 
   /* ===== Live grounding (real members + free resources from the DB) ===== */
@@ -513,15 +361,18 @@
         text: 'הרקמות נסרקו לחיפוש התאמות.'
       });
     }
+    const parts =
+      (data?.wish?.extractedMissions?.length ?? 0) + (data?.wish?.extractedResources?.length ?? 0);
     items.push({
       color: 'pink',
-      time: '',
-      ts: 0,
-      text: `המשאלה פורסמה ופורקה ל־${(data?.wish?.extractedMissions?.length ?? 0) + (data?.wish?.extractedResources?.length ?? 0)} חלקים.`
+      time: relTime(data?.wish?.createdAt),
+      // the oldest event of the wish — it sorts last, where "published" belongs
+      ts: data?.wish?.createdAt ? +new Date(data.wish.createdAt) : 0,
+      text: parts > 0 ? `המשאלה פורסמה ופורקה ל־${parts} חלקים.` : 'המשאלה פורסמה.'
     });
     return items.sort((a, b) => b.ts - a.ts);
   });
-  const ACTIVITY_VIEW = $derived(HAS_REAL ? REAL_ACTIVITY : ACTIVITY);
+  const ACTIVITY_VIEW = $derived(REAL_ACTIVITY);
 
   /* ===== Extraction editing (review-stage corrections) ===== */
   let editing = $state(false);
@@ -892,7 +743,7 @@
   }
 
   $effect(() => {
-    if (extAutoRan || !isOwner || !HAS_REAL) return;
+    if (extAutoRan || !isOwner) return;
     if (!EXT.enabled || !EXT.never || EXT_GAP_COUNT === 0) return;
     extAutoRan = true;
     fetchExternal(false);
@@ -1352,36 +1203,6 @@
     return `לפני ${Math.round(diff / 86400)} ימים`;
   }
 
-  const ACTIVITY = [
-    {
-      color: 'gold',
-      time: 'עכשיו · 21:48',
-      text: 'התכנית 75% מורכבת. נשארה שורה אחת פתוחה (ארוחה).'
-    },
-    { color: 'green', time: 'לפני 15ד׳', text: 'הצעת ההשגחה של תמר ל. אושרה.' },
-    {
-      color: 'green',
-      time: 'לפני 28ד׳',
-      text: 'הזמן אושר על־ידי נועה גולן (ספא טבע).'
-    },
-    {
-      color: 'blue',
-      time: 'לפני 41ד׳',
-      text: 'התקבלה הצעה מיואב כ. (Lift) - ממתינה לתיאום שעה.'
-    },
-    {
-      color: 'pink',
-      time: 'לפני שעה',
-      text: 'נמצאו 6 התאמות מ־3 רקמות שונות.'
-    },
-    {
-      color: 'gold',
-      time: 'לפני 75ד׳',
-      text: 'המשאלה סוכמה ל־4 חלקים ואושרה.'
-    },
-    { color: 'pink', time: 'אתמול 21:14', text: 'פרסמת את המשאלה.' }
-  ];
-
   const STEPS = [
     { id: 0, en: 'WISH', he: 'משאלה' },
     { id: 1, en: 'UNDERSTAND', he: 'הבנה' },
@@ -1444,7 +1265,7 @@
    * not stay live (a second click would be rejected by the server anyway). */
   const consentClosed = $derived(data?.wish?.status === 'fulfilled');
   const readyToClose = $derived(
-    isOwner && HAS_REAL && acceptedProviderCount > 0 && !consentClosed
+    isOwner && acceptedProviderCount > 0 && !consentClosed
   );
 
   /* The customer's own picture for the rikma that closing opens. Optional —
@@ -1514,13 +1335,96 @@
     }
   }
 
+  /* ===== Hero facts: only what the wish actually carries ===== */
+  /** "3 hours ago" / "yesterday" in the reader's language — the runtime has the words. */
+  function whenAgo(iso) {
+    if (!iso) return '';
+    const ms = new Date(iso).getTime();
+    if (Number.isNaN(ms)) return '';
+    const rtf = new Intl.RelativeTimeFormat($locale || 'he', { numeric: 'auto' });
+    const secs = Math.round((ms - Date.now()) / 1000);
+    const abs = Math.abs(secs);
+    if (abs < 60) return rtf.format(0, 'second');
+    if (abs < 3600) return rtf.format(Math.round(secs / 60), 'minute');
+    if (abs < 86400) return rtf.format(Math.round(secs / 3600), 'hour');
+    if (abs < 86400 * 30) return rtf.format(Math.round(secs / 86400), 'day');
+    return new Date(ms).toLocaleDateString($locale || 'he', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    });
+  }
+  /** A calendar day as the wisher meant it (a bare date is local, not UTC midnight). */
+  function fmtDay(iso) {
+    if (!iso) return '';
+    const d = new Date(String(iso).length === 10 ? `${iso}T00:00:00` : iso);
+    if (Number.isNaN(d.getTime())) return '';
+    return d.toLocaleDateString($locale || 'he', {
+      day: 'numeric',
+      month: 'long',
+      ...(d.getFullYear() !== new Date().getFullYear() ? { year: 'numeric' } : {})
+    });
+  }
+  const WHEN_PUBLISHED = $derived(whenAgo(data?.wish?.createdAt));
+  const STATUS_KEYS = {
+    open: 'status_open',
+    matching: 'status_matching',
+    negotiating: 'status_negotiating',
+    fulfilled: 'status_fulfilled',
+    expired: 'status_expired',
+    cancelled: 'status_cancelled'
+  };
+  const WISH_STATUS = $derived(
+    $t(`concierge.${STATUS_KEYS[data?.wish?.status] ?? 'status_open'}`)
+  );
+  /** When / where / budget — a fact the wisher did not give is simply not shown. */
+  const HERO_METAS = $derived.by(() => {
+    const w = data?.wish;
+    if (!w) return [];
+    const out = [];
+    const a = fmtDay(w.startDate);
+    const b = fmtDay(w.finnishDate);
+    const when = a && b && a !== b ? `${a} → ${b}` : a || b;
+    if (when) out.push({ icon: '📅', label: $t('concierge.hero_when'), text: when });
+    const where = w.isOnline
+      ? $t('concierge.hero_online')
+      : w.locationHint
+        ? [w.locationHint, w.radius ? $t('concierge.hero_radius', { distance: w.radius }) : '']
+            .filter(Boolean)
+            .join(' · ')
+        : '';
+    if (where) out.push({ icon: '📍', label: $t('concierge.hero_where'), text: where });
+    if (typeof w.totalBounti === 'number' && w.totalBounti > 0) {
+      out.push({ icon: '💰', label: $t('concierge.hero_budget'), amount: w.totalBounti });
+    }
+    return out;
+  });
+
+  /* ===== The plan's tabs: really filter, really count ===== */
+  const TABS = $derived([
+    ['active', $t('concierge.tab_active', { count: ACTIVE_PROPOSALS.length })],
+    ['rejected', $t('concierge.tab_rejected', { count: CLOSED_PROPOSALS.length })]
+  ]);
+  /** The providers of a row that belong to the tab being looked at. */
+  const shownProviders = (row) =>
+    row.providers.filter((p) => (activeTab === 'rejected') === (p.status === 'rejected'));
+  const PLAN_TITLE = $derived(
+    PROPOSER_COUNT === 0
+      ? $t('concierge.plan_title_none')
+      : PROPOSER_COUNT === 1
+        ? $t('concierge.plan_title_one')
+        : $t('concierge.plan_title_n', { count: PROPOSER_COUNT })
+  );
+
   /* ===== Derived ===== */
   const grandTotal = $derived(TOTAL_LINES.reduce((s, l) => s + l.price, 0));
   const coveredPct = $derived(
-    Math.round(
-      (100 * TOTAL_LINES.filter((l) => l.status !== 'open').length) /
-        TOTAL_LINES.length
-    )
+    TOTAL_LINES.length === 0
+      ? 0
+      : Math.round(
+          (100 * TOTAL_LINES.filter((l) => l.status !== 'open').length) /
+            TOTAL_LINES.length
+        )
   );
   const acceptedCount = $derived(
     HARMONY.filter((p) => p.state === 'accepted').length
@@ -1630,7 +1534,6 @@
           <span class="code-lbl hide-xs">קוד משאלה</span>
           <code class="wish-code">{WISH_CODE}</code>
           <a href="/concierge/new" class="btn-ghost btn-xs">+ משאלה חדשה</a>
-          <button class="btn-ghost btn-xs hide-xs">📤 שיתוף</button>
         </div>
       </div>
 
@@ -1640,11 +1543,17 @@
           <div class="hero-av">{WISH_AVATAR}</div>
           <div class="hero-body">
             <div class="hero-meta">
-              <span class="badge-open">משאלה פתוחה</span>
-              <span class="dim">·</span>
-              <span class="muted">פורסמה אתמול 21:14</span>
+              <span class="badge-open">{WISH_STATUS}</span>
+              {#if WHEN_PUBLISHED}
+                <span class="dim">·</span>
+                <span class="muted"
+                  >{$t('concierge.hero_published', { when: WHEN_PUBLISHED })}</span
+                >
+              {/if}
               <span class="dim hide-xs">·</span>
-              <span class="muted hide-xs">מאת {WISH_AUTHOR}</span>
+              <span class="muted hide-xs"
+                >{$t('concierge.hero_by', { name: WISH_AUTHOR })}</span
+              >
             </div>
             <h1 class="hero-title">{WISH_TEXT}</h1>
             <div class="hero-long rich-wrap">
@@ -1657,20 +1566,23 @@
             </div>
           </div>
         </div>
-        <div class="hero-footer">
-          <div class="hero-metas">
-            {#each [['📅', 'ליום', 'ה׳, 19 ביוני · יום שישי'], ['📍', 'באזור', 'חיפה והקריות · 8 ק״מ'], ['💰', 'תקציב', '₪ 850–1,200']] as [icon, lbl, val] (lbl)}
-              <div class="metai">
-                <span class="mi-icon">{icon}</span>
-                <div>
-                  <div class="mi-lbl">{lbl}</div>
-                  <div class="mi-val">{val}</div>
+        {#if HERO_METAS.length > 0}
+          <div class="hero-footer">
+            <div class="hero-metas">
+              {#each HERO_METAS as meta (meta.label)}
+                <div class="metai">
+                  <span class="mi-icon">{meta.icon}</span>
+                  <div>
+                    <div class="mi-lbl">{meta.label}</div>
+                    <div class="mi-val">
+                      {#if meta.amount != null}<Money amount={meta.amount} />{:else}{meta.text}{/if}
+                    </div>
+                  </div>
                 </div>
-              </div>
-            {/each}
+              {/each}
+            </div>
           </div>
-          <button class="btn-ghost">עריכת משאלה ✎</button>
-        </div>
+        {/if}
       </div>
 
       <!-- EXTRACTION STRIP -->
@@ -1702,7 +1614,7 @@
               >
             </div>
           {:else}
-            {#if isOwner && HAS_REAL}
+            {#if isOwner}
               <button
                 class="btn-ghost"
                 style="padding:8px 14px;font-size:13px"
@@ -1812,6 +1724,9 @@
             <div>
               <div class="extcol-lbl">✦ משימות שזיהיתי</div>
               <div class="chips">
+                {#if MISSIONS.length === 0}<span class="muted"
+                    >{$t('concierge.breakdown_none')}</span
+                  >{/if}
                 {#each MISSIONS as m (m.name)}
                   <span class="chip {m.imp}">
                     <span class={gemCls(m.imp)} style="width:6px;height:6px"
@@ -1826,6 +1741,9 @@
             <div>
               <div class="extcol-lbl">◐ משאבים שזיהיתי</div>
               <div class="chips">
+                {#if RESOURCES.length === 0}<span class="muted"
+                    >{$t('concierge.breakdown_none')}</span
+                  >{/if}
                 {#each RESOURCES as r (r.name)}
                   <span class="chip {r.imp}">
                     <span class={gemCls(r.imp)} style="width:6px;height:6px"
@@ -1846,12 +1764,12 @@
         <main>
           <div class="section-label">
             <span class="lead"
-              ><span class="gem"></span>התכנית · 3 שותפויות מציעות יחד</span
+              ><span class="gem"></span>{PLAN_TITLE}</span
             >
           </div>
 
           <div class="tabs">
-            {#each [['active', 'הצעות פעילות · 6'], ['rejected', 'דחויות · 2'], ['archive', 'ארכיון']] as [key, lbl] (key)}
+            {#each TABS as [key, lbl] (key)}
               <button
                 class="tab {activeTab === key ? 'active' : ''}"
                 onclick={() => (activeTab = key)}>{lbl}</button
@@ -1859,7 +1777,7 @@
             {/each}
           </div>
 
-          {#if isOwner && HAS_REAL}
+          {#if isOwner}
             <div style="display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px">
               <button
                 class="btn-ghost"
@@ -1918,10 +1836,31 @@
             </div>
           {/if}
 
+          {#if PLAN_ROWS.length === 0}
+            <div class="no-prov">
+              <span style="font-size:20px;opacity:.4">✶</span>
+              <div
+                style="font-family:'Bellefair',serif;font-size:13px;color:var(--cg-muted)"
+              >
+                {$t('concierge.plan_empty')}
+              </div>
+            </div>
+          {:else if activeTab === 'rejected' && CLOSED_PROPOSALS.length === 0}
+            <div class="no-prov">
+              <div
+                style="font-family:'Bellefair',serif;font-size:13px;color:var(--cg-muted)"
+              >
+                {$t('concierge.tab_rejected_empty')}
+              </div>
+            </div>
+          {/if}
+
           {#each PLAN_ROWS as row, ri (row.need.title)}
             {@const met = row.providers.some(
               (p) => p.status === 'accepted' || p.status === 'pending'
             )}
+            {@const shown = shownProviders(row)}
+            {#if activeTab === 'active' || shown.length > 0}
             <div
               class="plan-row {met ? 'met' : ''}"
               style="animation-delay:{(ri + 2) * 0.08}s"
@@ -1949,7 +1888,7 @@
                       style="font-size:12px;color:var(--cg-goldhi)"
                       ><Money amount={row.need.bestPrice} /></span
                     >{/if}
-                  {#if isOwner && HAS_REAL}
+                  {#if isOwner}
                     <span class="need-tools">
                       <button
                         class="btn-ghost"
@@ -1984,10 +1923,10 @@
                 </div>
               </div>
               <div class="opt-grid">
-                {#if row.providers.length === 0}
-                  {@const sugP = HAS_REAL ? peopleForNeed(row.need) : []}
-                  {@const sugR = HAS_REAL ? resourcesForNeed(row.need) : []}
-                  {@const sugM = HAS_REAL ? productsForNeed(row.need) : []}
+                {#if activeTab === 'active' && shown.length === 0}
+                  {@const sugP = peopleForNeed(row.need)}
+                  {@const sugR = resourcesForNeed(row.need)}
+                  {@const sugM = productsForNeed(row.need)}
                   {#if sugP.length || sugR.length || sugM.length}
                     {@const invitable = row.need.isResource
                       ? sugR.filter((r) => r.ownerId).length
@@ -2141,19 +2080,23 @@
                       <div
                         style="font-family:'Bellefair',serif;font-size:13px;color:var(--cg-muted)"
                       >
-                        {HAS_REAL
-                          ? 'עוד לא נמצאו מתאימים לחלק הזה'
-                          : 'עוד לא נמצאה התאמה לחלק הזה'}
+                        עוד לא נמצאו מתאימים לחלק הזה
                       </div>
-                      <a
-                        href="/concierge/new"
-                        class="btn-ghost"
-                        style="padding:6px 14px;font-size:12px">הרחבת החיפוש</a
-                      >
+                      {#if isOwner}
+                        <button
+                          class="btn-ghost"
+                          style="padding:6px 14px;font-size:12px"
+                          disabled={refreshBusy}
+                          onclick={refreshMatches}
+                          >{refreshBusy
+                            ? '⏳'
+                            : $t('concierge.rematch_row')}</button
+                        >
+                      {/if}
                     </div>
                   {/if}
                 {/if}
-                {#each row.providers as p (p.proposalId ?? p.name)}
+                {#each shown as p (p.proposalId ?? p.name)}
                   <div class="pcard {p.status}">
                     <div class="pcard-top">
                       <div
@@ -2187,7 +2130,15 @@
                           >{#if p.price == null}לפי הצעת מחיר{:else}<Money amount={p.price} />{/if}</span
                         >
                       </div>
-                      {#if p.status === 'accepted' && p.kind === 'existing_matanot'}
+                      {#if p.status === 'rejected'}
+                        <span
+                          class="sbadge pending"
+                          style="padding:4px 10px;font-size:10px"
+                          >{p.rawStatus === 'expired'
+                            ? $t('concierge.prov_expired')
+                            : $t('concierge.prov_rejected')}</span
+                        >
+                      {:else if p.status === 'accepted' && p.kind === 'existing_matanot'}
                         <span
                           class="sbadge pending"
                           style="padding:4px 10px;font-size:10px"
@@ -2228,12 +2179,6 @@
                           class="sbadge pending"
                           style="padding:4px 10px;font-size:10px">בבחינה</span
                         >
-                      {:else}
-                        <button
-                          class="btn-ghost"
-                          style="padding:6px 14px;font-size:12px"
-                          >שליחת הזמנה</button
-                        >
                       {/if}
                     </div>
                   </div>
@@ -2263,9 +2208,10 @@
                 {/if}
               {/if}
             </div>
+            {/if}
           {/each}
 
-          {#if HAS_REAL}
+          {#if HAS_PLAN}
             {#if inviteError}<div
                 style="margin-bottom:10px;padding:9px 13px;background:rgb(var(--cg-pink-rgb) / .06);border:1px solid rgb(var(--cg-pink-rgb) / .3);border-radius:10px;font-family:'Bellefair',serif;font-size:13px;color:var(--cg-pink)"
               >
@@ -2584,7 +2530,12 @@
             <div
               style="margin-top:16px;font-family:'Bellefair',serif;font-size:12px;color:var(--cg-muted);line-height:1.55"
             >
-              כשארבעת הצדדים מאשרים - התכנית סגורה והקשת תיהפך זהובה.
+              {$t(
+                HARMONY.length > 1
+                  ? 'concierge.harmony_hint'
+                  : 'concierge.harmony_hint_alone',
+                { count: HARMONY.length }
+              )}
             </div>
           </div>
 
@@ -2762,11 +2713,13 @@
                     ? $t('concierge.consent_closed_btn')
                     : '✓ סגירת ההסכמה'}</button
               >
-              <button
-                class="btn-ghost"
-                style="flex:1"
-                disabled={materializeBusy}>שליחה לדיון</button
-              >
+              {#if data?.wish?.chatForumId}
+                <a
+                  class="btn-ghost"
+                  style="flex:1;justify-content:center"
+                  href={`/forum/${data.wish.chatForumId}`}>{$t('concierge.to_discussion')}</a
+                >
+              {/if}
             </div>
             {#if materializeError}
               <div

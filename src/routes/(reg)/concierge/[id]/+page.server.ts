@@ -1,6 +1,6 @@
 import { sendToSer } from '$lib/send/sendToSer.js';
 import { matbeaCode } from '$lib/money/resolve.js';
-import { redirect } from '@sveltejs/kit';
+import { error, redirect } from '@sveltejs/kit';
 import { actionViaProxy } from '$lib/server/actionViaProxy.js';
 import { enrichWish, placeKey, EMPTY_ENRICHMENT, type WishEnrichment } from '$lib/server/ai/enrichWish';
 import { extractWish, type WishExtraction } from '$lib/server/ai/extractWish';
@@ -50,6 +50,9 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
   let wish: any = null;
   let proposals: any[] = [];
   let loadOk = false;
+  // "Not found" and "could not ask" are different answers — the page must never
+  // fill the gap with a demo wish (QA_CONCIERGE_E2E C-6).
+  let loadFailed = false;
 
   try {
     const res: any = await sendToSer(
@@ -60,6 +63,10 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
       false,
       fetch
     );
+
+    // A GraphQL error comes back as a value, not a throw: no `data` at all means
+    // we could not ask, which is not the same as "there is no such wish".
+    if (!res?.data) loadFailed = true;
 
     const node = res?.data?.ratson?.data;
     if (node) {
@@ -77,6 +84,7 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
         fulfilled: !!a.fulfilled,
         fulfillmentScore: typeof a.fulfillment_score === 'number' ? a.fulfillment_score : null,
         lastMatchedAt: a.last_matched_at ?? null,
+        createdAt: a.createdAt ?? null,
         startDate: a.startDate ?? null,
         finnishDate: a.finnishDate ?? null,
         totalBounti: typeof a.totalbounti === 'number' ? a.totalbounti : null,
@@ -174,7 +182,15 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
       loadOk = true;
     }
   } catch (e) {
+    loadFailed = true;
     console.error('[concierge/:id] 105queryRatsonWithProposals failed', e);
+  }
+
+  if (!wish) {
+    throw error(
+      loadFailed ? 503 : 404,
+      loadFailed ? 'לא הצלחנו לטעון את המשאלה עכשיו. אפשר לנסות שוב בעוד רגע.' : 'המשאלה לא נמצאה.'
+    );
   }
 
   const isOwner = wish ? wish.owners.some((o: any) => String(o.id) === String(uid)) : false;
@@ -192,10 +208,10 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
   // ── Auto-extract on load ──────────────────────────────────────────────────
   //    A wish that loaded without a structured breakdown (created outside
   //    /concierge/new, or where the live extraction never ran) would otherwise
-  //    fall through to the client's design-mock. Run the same Gemini extraction
-  //    here, persist it, and continue with real data so the page never shows
-  //    demo content for a real wish. Owner-only (we're past the non-owner
-  //    redirect) and best-effort — a failure just leaves the panel empty.
+  //    open on an empty plan. Run the same Gemini extraction here, persist it,
+  //    and continue with real data. Owner-only (we're past the non-owner
+  //    redirect) and best-effort — a failure just leaves the panel empty (the
+  //    page shows its empty state; it has no demo content to fall back on).
   if (
     isOwner &&
     wish &&
