@@ -516,7 +516,17 @@
     "whyHeading": "Explica por qué, por favor",
     "taskNotCompleted": "¿Por qué no se completó la tarea?",
     "offerRejected": "Explica por qué rechazas esta oferta",
-    "addHours": "Añadir horas"
+    "addHours": "Añadir horas",
+    "counterHeading": "Contrapropuesta",
+    "counterHint": "No hay un «no» rotundo: propón la versión que firmarías. Los demás la aprueban o proponen otra, y el reloj de respuesta empieza de nuevo.",
+    "counterHours": "¿Cuántas horas, en tu opinión?",
+    "counterNote": "Tu motivo",
+    "counterNotePh": "¿Por qué esta versión? (mínimo 8 caracteres)",
+    "counterSend": "Enviar la propuesta",
+    "counterSent": "Propuesta enviada. Se pedirá a los demás que la aprueben.",
+    "counterError": "No se pudo enviar la propuesta",
+    "counterLine": "Se propusieron {{to}} h en lugar de {{from}}: {{note}}",
+    "counterRound": "Ronda {{round}}"
   },
   "weget": {
     "howMuchSpentThisMonth": "¿Cuánto gastaste este mes?",

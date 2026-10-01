@@ -515,7 +515,17 @@
     "whyHeading": "يرجى التعليل",
     "taskNotCompleted": "لماذا لم تكتمل المهمة؟",
     "offerRejected": "يرجى تعليل سبب رفض العرض",
-    "addHours": "أضف ساعات"
+    "addHours": "أضف ساعات",
+    "counterHeading": "اقتراح مضاد",
+    "counterHint": "لا يوجد «لا» قاطعة: اقترحوا النسخة التي توقّعون عليها. يوافق الآخرون عليها أو يقترحون غيرها، وتبدأ ساعة الرد من جديد.",
+    "counterHours": "كم ساعة برأيكم؟",
+    "counterNote": "السبب",
+    "counterNotePh": "لماذا هذه النسخة؟ (8 أحرف على الأقل)",
+    "counterSend": "إرسال الاقتراح",
+    "counterSent": "أُرسل الاقتراح. سيُطلب من الآخرين الموافقة عليه.",
+    "counterError": "تعذّر إرسال الاقتراح",
+    "counterLine": "اقتُرحت {{to}} ساعات بدلاً من {{from}}: {{note}}",
+    "counterRound": "الجولة {{round}}"
   },
   "weget": {
     "howMuchSpentThisMonth": "كم أنفقت هذا الشهر؟",

@@ -8,6 +8,8 @@
   import { idPr } from './../../stores/idPr.js';
   import Lowbtn from '$lib/celim/lowbtn.svelte';
   import { t } from '$lib/translations';
+  import { toast } from 'svelte-sonner';
+  import { refuseCounter } from '$lib/finiapruval/rounds.js';
   let dialogOpen = $state(false);
   let resP = [];
   let lang;
@@ -62,6 +64,8 @@
    * @property {any} noofusersNo
    * @property {any} timegramaDate
    * @property {any} timegramaId
+   * @property {number} [round] - The negotiation round the claim is on (0 = as first filed)
+   * @property {{ round: number, userId: string | null, from: number, to: number, note: string }[]} [counters] - Every counter so far, oldest first
    * @property {boolean} [already]
    * @property {string} [stylef]
    * @property {any} askId
@@ -119,6 +123,8 @@
     noofusersNo,
     timegramaDate,
     timegramaId,
+    round = 0,
+    counters = [],
     already = $bindable(false),
     stylef = '24px',
     askId,
@@ -245,35 +251,63 @@
     }
   }
 
+  /* ── The way to disagree: a counter, never a veto ───────────────────────────
+   * A finish approval is signed by every member. One who does not accept it does
+   * not "reject" — there is no absolute no — they propose the version they would
+   * sign: other hours, with the reason. The claim goes to the next round, the
+   * others are asked again and the restime clock starts over
+   * (src/lib/finiapruval/rounds.ts, action `counterFiniapruval`). */
+  let isOpen = $state(false);
+  let counterHours = $state(0);
+  let counterNote = $state('');
+  let counterBusy = $state(false);
+  let counterError = $state('');
+  const counterRefusal = $derived(refuseCounter(nhours, counterHours, counterNote));
+
   function ask() {
-    already = true;
-    masa = true;
-    no = false;
+    counterHours = Number(nhours) || 0;
+    counterNote = '';
+    counterError = '';
     isOpen = true;
   }
 
-  async function decline() {
-    already = true;
-    const result = await callCloseFiniapruval(false, whyy);
-    if (result?.data?.success) {
+  async function sendCounter() {
+    if (counterBusy || counterRefusal) return;
+    counterBusy = true;
+    counterError = '';
+    try {
+      const res = await fetch('/api/action', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          actionKey: 'counterFiniapruval',
+          params: {
+            finiapruvalId: String(askId),
+            projectId: String(projectId),
+            hours: Number(counterHours),
+            note: counterNote.trim()
+          }
+        })
+      });
+      const data = await res.json();
+      if (!data?.success) {
+        throw new Error(data?.error?.message || $t('lev.fiappru.counterError'));
+      }
+      already = true;
       isOpen = false;
+      toast.success($t('lev.fiappru.counterSent'));
+      // The proposer has answered — their card leaves, exactly as after approving.
       onDecline?.({ ani: 'fini', coinlapach });
+    } catch (e) {
+      console.error('counterFiniapruval failed', e);
+      counterError = e instanceof Error ? e.message : $t('lev.fiappru.counterError');
+    } finally {
+      counterBusy = false;
     }
   }
-  function open() {
-    masa = false;
-    no = true;
-    isOpen = true;
-    console.log('if another uprove explain why you decline');
-  }
-  let isOpen = $state(false);
-  let whyy = $state(' ');
-  let no = $state();
-  let masa = $state();
   function close() {
     isOpen = false;
-    no = false;
-    masa = false;
+    counterError = '';
   }
 
   let w = $state(0);
@@ -349,27 +383,42 @@
             />
           </svg></button
         >
-        {#if no === true}
-          <h1 style="font-size:2em;">{$t('lev.fiappru.whyHeading')}</h1>
+        <h1 style="font-size:1.6em;">{$t('lev.fiappru.counterHeading')}</h1>
+        <p style="font-size:0.7em;max-width:30ch;text-align:center;margin:6px 0 12px">
+          {$t('lev.fiappru.counterHint')}
+        </p>
+        <label style="font-size:0.7em;display:flex;flex-direction:column;gap:4px;width:100%">
+          {$t('lev.fiappru.counterHours')}
           <input
-            minlength="26"
-            type="text"
-            bind:value={whyy}
-            placeholder={$t('lev.fiappru.taskNotCompleted')}
+            type="number"
+            min="0"
+            step="0.25"
+            bind:value={counterHours}
+            disabled={counterBusy}
           />
-          <br />
-          <button class="add" disabled={whyy.length < 26} onclick={decline}
-            >{$t('lev.cards.confirmApprove')}</button
-          >
-        {:else if masa === true}
-          <input
-            minlength="26"
-            type="text"
-            bind:value={whyy}
-            placeholder={$t('lev.fiappru.offerRejected')}
-          />
-          <input type="number" placeholder={$t('lev.fiappru.addHours')} />
+        </label>
+        <label
+          style="font-size:0.7em;display:flex;flex-direction:column;gap:4px;width:100%;margin-top:8px"
+        >
+          {$t('lev.fiappru.counterNote')}
+          <textarea
+            rows="3"
+            bind:value={counterNote}
+            placeholder={$t('lev.fiappru.counterNotePh')}
+            disabled={counterBusy}
+          ></textarea>
+        </label>
+        {#if counterError}
+          <p role="alert" style="font-size:0.7em;color:var(--barbi-pink);margin:8px 0 0">
+            {counterError}
+          </p>
         {/if}
+        <br />
+        <button
+          class="add"
+          disabled={counterBusy || !!counterRefusal}
+          onclick={sendCounter}>{$t('lev.fiappru.counterSend')}</button
+        >
       </div>
     </DialogContent>
   </div>
@@ -619,14 +668,15 @@
                   /></svg
                 ></button
               >
-              <!--   <button on:click= {ask} style="margin: 0;" class = "btn" name="negotiate"><i class="far fa-comments"></i></button>-->
+              <!-- The answer to a claim you do not accept is a counter, not a veto. -->
               <button
-                onmouseenter={() => hover(' התנגדות')}
+                onmouseenter={() => hover($t('common.nego'))}
                 onmouseleave={() => hover('0')}
-                onclick={open}
+                onclick={ask}
                 style="margin: 0;"
                 class="btn gb"
-                name="decline"
+                name="negotiate"
+                aria-label={$t('lev.fiappru.counterHeading')}
                 ><svg
                   xmlns="http://www.w3.org/2000/svg"
                   xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -662,7 +712,10 @@
             <div class="swiper-slidec mx-auto">
               <Cards
                 onAgree={agree}
-                onDecline={decline}
+                onNego={ask}
+                noDecline
+                activeOrder={round}
+                {counters}
                 onHover={hoverc}
                 {why}
                 {useraplyname}
@@ -693,7 +746,10 @@
 {:else}
   <Cards
     onAgree={agree}
-    onDecline={decline}
+    onNego={ask}
+    noDecline
+    activeOrder={round}
+    {counters}
     onHover={hoverc}
     {isVisible}
     {why}

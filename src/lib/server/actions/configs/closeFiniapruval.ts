@@ -1,4 +1,5 @@
 import type { ActionConfig } from '../types.js';
+import { allSigned, roundOf, standingOrder, voterId } from '$lib/finiapruval/rounds.js';
 import {
     pickRateRow,
     resolveRate,
@@ -24,27 +25,52 @@ export const closeFiniapruvalConfig: ActionConfig = {
 
         if (fa.archived) return { success: true, alreadyArchived: true };
 
-        // Build updated vots array (existing + new vote)
+        const mba = fa.mesimabetahalich?.data;
+        const mbaa = mba?.attributes;
+        const memberIds: string[] = (mbaa?.project?.data?.attributes?.user_1s?.data ?? []).map((u: any) => String(u.id));
+
+        // `projectId` comes from the client; the approval's own rikma is what counts.
+        if (memberIds.length > 0 && !memberIds.includes(String(context.userId))) {
+            throw new Error('You must be a member of this rikma to vote on its approvals');
+        }
+
+        // Build updated vots array (existing + new vote). A vote is cast on the
+        // version now on the table — the standing round (src/lib/finiapruval/rounds.ts)
+        // — and every earlier vote is carried over whole: its round, reason and time
+        // used to be dropped here, which would erase the negotiation.
         const existingVots = fa.vots ?? [];
-        const allVots = [
-            ...existingVots.map((v: any) => ({
+        const standing = standingOrder(existingVots);
+        const me = String(context.userId);
+        const kept = existingVots
+            // re-voting on the standing version replaces your own earlier answer to it
+            .filter((v: any) => !(voterId(v) === me && roundOf(v) === standing))
+            .map((v: any) => ({
                 what: v.what,
-                users_permissions_user: v.users_permissions_user?.data?.id,
-                ...(v.why ? { why: v.why } : {})
-            })),
+                users_permissions_user: voterId(v),
+                ...(v.why ? { why: v.why } : {}),
+                ...(v.order != null ? { order: v.order } : {}),
+                ...(v.ide != null ? { ide: v.ide } : {}),
+                ...(v.zman ? { zman: v.zman } : {})
+            }));
+        const allVots = [
+            ...kept,
             {
                 what: vote === true,
                 users_permissions_user: context.userId,
+                ide: parseInt(me, 10),
+                zman: now.toISOString(),
+                order: standing,
                 ...(why ? { why } : {})
             }
         ];
 
-        const mba = fa.mesimabetahalich?.data;
-        const mbaa = mba?.attributes;
-        const totalUsers = mbaa?.project?.data?.attributes?.user_1s?.data?.length ?? 1;
-        const yesCount = allVots.filter((v: any) => v.what === true).length;
-        const hasNo = allVots.some((v: any) => v.what === false);
-        const allVotedYes = !hasNo && yesCount >= totalUsers;
+        // Closed only when every member has signed the version on the table. A rikma
+        // whose member list could not be read falls back to the old head count.
+        const allVotedYes =
+            memberIds.length > 0
+                ? allSigned(allVots, memberIds)
+                : !allVots.some((v: any) => v.what === false) &&
+                  allVots.filter((v: any) => v.what === true).length >= 1;
 
         if (!allVotedYes) {
             // Just record the vote, not yet closing

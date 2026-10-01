@@ -364,6 +364,7 @@ export type ActionKey =
   | 'updateTask'
   | 'createMission'
   | 'completeMission'
+  | 'counterFiniapruval'
   | 'createHaluka'
   | 'createTosplit'
   | 'approveHaluka'

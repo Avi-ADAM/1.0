@@ -37,6 +37,7 @@ import { ensureProcessForumConfig } from './ensureProcessForum.js';
 import { ensureProjectForumConfig } from './ensureProjectForum.js';
 import { ensureStageForumConfig } from './ensureStageForum.js';
 import { closeFiniapruvalConfig } from './closeFiniapruval.js';
+import { counterFiniapruvalConfig } from './counterFiniapruval.js';
 import { updateProjectDetailsConfig } from './updateProjectDetails.js';
 import { setRikmaCurrencyConfig } from './setRikmaCurrency.js';
 import { completeMissionConfig } from './completeMission.js';
@@ -263,6 +264,8 @@ export function registerAllActions(): void {
 
   // Finiapruval voting and closing
   registerAction(closeFiniapruvalConfig);
+  // …and the way to disagree with one: a counter, never a veto
+  registerAction(counterFiniapruvalConfig);
   registerAction(updateProjectDetailsConfig);
   registerAction(setRikmaCurrencyConfig);
 
@@ -564,6 +567,7 @@ export {
   ensureSheirutpendForumConfig,
   ensureRatsonProposalForumConfig,
   closeFiniapruvalConfig,
+  counterFiniapruvalConfig,
   updateProjectDetailsConfig,
   setRikmaCurrencyConfig,
   createProcessConfig,

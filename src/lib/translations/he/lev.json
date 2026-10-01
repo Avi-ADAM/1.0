@@ -515,7 +515,17 @@
     "whyHeading": "יש לנמק מדוע",
     "taskNotCompleted": "מדוע המשימה לא הושלמה",
     "offerRejected": "יש לנמק מדוע ההצעה נדחית על ידך",
-    "addHours": "הוסף שעות"
+    "addHours": "הוסף שעות",
+    "counterHeading": "הצעה נגדית",
+    "counterHint": "אין התנגדות מוחלטת: מציעים גרסה שהיית חותם עליה. שאר החברים יאשרו אותה או יציעו אחרת, ושעון התגובה מתחיל מחדש.",
+    "counterHours": "כמה שעות לדעתך?",
+    "counterNote": "הנימוק",
+    "counterNotePh": "למה הגרסה הזו? (לפחות 8 תווים)",
+    "counterSend": "שליחת ההצעה",
+    "counterSent": "ההצעה נשלחה. שאר החברים יתבקשו לאשר אותה.",
+    "counterError": "לא הצלחנו לשלוח את ההצעה",
+    "counterLine": "הוצעו {{to}} שע׳ במקום {{from}}: {{note}}",
+    "counterRound": "סבב {{round}}"
   },
   "weget": {
     "howMuchSpentThisMonth": "כמה הוצאת החודש?",

@@ -30,6 +30,7 @@ import { applyLocalization } from './localizationUtils';
 import { checkStb, checkHst, txx, letters } from '$lib/utils/levDataProcessors.js';
 import { normalizeSaveLinks } from '$lib/timers/saveLinks';
 import { readSaveFiles } from '$lib/timers/saveFiles';
+import { counterHistory, standingOrder, standingVotes, voterId } from '$lib/finiapruval/rounds';
 
 
 /**
@@ -519,10 +520,17 @@ export function processFiapp(
     let whyno: string[] = [];
     let whyes: string[] = [];
 
+    // Only the version on the table counts (src/lib/finiapruval/rounds.ts): after a
+    // counter, a member who signed the old hours has not signed the new ones, and
+    // must see the buttons again. Earlier rounds are history, shown by `counters`.
+    const round = standingOrder(users);
+    const standing = standingVotes(users);
+
     // Process votes
-    for (const u of users) {
-      if (u.users_permissions_user?.data?.id) {
-        uids.push(u.users_permissions_user.data.id);
+    for (const u of standing) {
+      const voter = voterId(u);
+      if (voter) {
+        uids.push(voter);
       }
 
       if (u.what === true) {
@@ -535,17 +543,17 @@ export function processFiapp(
     }
 
     // Check if I voted
-    if (myid && uids.includes(myid)) {
+    if (myid && uids.includes(String(myid))) {
       already = true;
       // Find my position
-      const myVote = users.find((u: any) => u.users_permissions_user?.data?.id === myid);
+      const myVote = standing.find((u: any) => voterId(u) === String(myid));
       if (myVote) {
         mypos = myVote.what;
       }
     }
 
     const memberCount = projectInfo.noof || 0;
-    const noofusersWaiting = memberCount - users.length;
+    const noofusersWaiting = memberCount - standing.length;
 
     // Priority calc
     const basePriority = votePriority(already);
@@ -634,6 +642,9 @@ export function processFiapp(
       whyno,
       whyes,
       noofusersWaiting,
+      // The negotiation: which round the claim is on, and every counter so far.
+      round,
+      counters: counterHistory(users),
 
       // Pass through all other fields from raw data
       ...approval

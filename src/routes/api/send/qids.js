@@ -5634,6 +5634,7 @@ ${STIPEND_DECISION_FIELDS}
                     vots {
                       what
                       why
+                      order
                       id
                       users_permissions_user {
                         data {
@@ -6988,6 +6989,19 @@ ${STIPEND_DECISION_FIELDS}
     }
   }`,
 
+  // A counter on a finish approval: the new standing version (hours) and the votes
+  // with the proposer's yes at the next round — one write, so nobody ever reads the
+  // new hours against the old signatures. Server-only (the action checks who may).
+  '386counterFiniapruval': `mutation CounterFiniapruval(
+    $id: ID!,
+    $vots: [ComponentProjectsVotsInput],
+    $noofhours: Float
+  ) {
+    updateFiniapruval(id: $id, data: { vots: $vots, noofhours: $noofhours }) {
+      data { id attributes { noofhours } }
+    }
+  }`,
+
   '119createFinnishedMissionFinal': `mutation CreateFinnishedMissionFinal(
     $missionName: String,
     $why: String,
@@ -7031,7 +7045,10 @@ ${STIPEND_DECISION_FIELDS}
           month
           # The rate these hours were worked at, stamped when they were saved.
           perhour
-          vots { what users_permissions_user { data { id } } }
+          # order is the negotiation round (src/lib/finiapruval/rounds.ts); why
+          # and zman must be read back too, or rewriting the votes erases them.
+          vots { what why order ide zman users_permissions_user { data { id } } }
+          timegrama { data { id } }
           mesimabetahalich {
             data {
               id
@@ -7046,7 +7063,7 @@ ${STIPEND_DECISION_FIELDS}
               }
             }
           }
-          project { data { id } }
+          project { data { id attributes { restime projectName } } }
           users_permissions_user { data { id } }
           what { data { id } }
           timer { data { id attributes { rate } } }

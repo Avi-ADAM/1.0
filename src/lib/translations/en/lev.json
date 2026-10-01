@@ -515,7 +515,17 @@
     "whyHeading": "Please explain why",
     "taskNotCompleted": "Why wasn't the task completed?",
     "offerRejected": "Please explain why you are rejecting this offer",
-    "addHours": "Add hours"
+    "addHours": "Add hours",
+    "counterHeading": "Counter-proposal",
+    "counterHint": "There is no flat \"no\": propose the version you would sign. The others approve it or propose another, and the response clock starts over.",
+    "counterHours": "How many hours, in your view?",
+    "counterNote": "Your reason",
+    "counterNotePh": "Why this version? (at least 8 characters)",
+    "counterSend": "Send the proposal",
+    "counterSent": "Proposal sent. The others will be asked to approve it.",
+    "counterError": "Could not send the proposal",
+    "counterLine": "{{to}} h proposed instead of {{from}}: {{note}}",
+    "counterRound": "Round {{round}}"
   },
   "weget": {
     "howMuchSpentThisMonth": "How much did you spend this month?",

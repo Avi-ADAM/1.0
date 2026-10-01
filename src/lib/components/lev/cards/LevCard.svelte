@@ -444,6 +444,8 @@
       {low}
       timegramaId={buble.timegramaId}
       timegramaDate={buble.timegramaDate}
+      round={buble.round}
+      counters={buble.counters}
       isVisible={isVisible}
       coinlapach={buble.coinlapach}
       mId={buble.mId}

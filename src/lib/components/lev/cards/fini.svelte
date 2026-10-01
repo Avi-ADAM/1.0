@@ -46,6 +46,9 @@
    * @property {(payload: { alr: any, y: string }) => void} [onDecline] - Callback for decline event
    * @property {(payload: { alr: any, y: string }) => void} [onNego] - Callback for nego event
    * @property {() => void} [onTochat] - Callback for tochat event
+   * @property {number} [activeOrder] - The negotiation round the votes are read at (0 = as first filed)
+   * @property {boolean} [noDecline] - Hide the flat "no": a finish approval is answered by approving or by a counter (src/lib/finiapruval/rounds.ts)
+   * @property {{ round: number, userId: string | null, from: number, to: number, note: string }[]} [counters] - The negotiation so far, oldest first
    */
 
   /** @type {Props} */
@@ -77,6 +80,8 @@
     onDecline,
     onNego,
     onTochat,
+    noDecline = false,
+    counters = [],
 
     // Props מודרניים
     glowColor = 'teal',
@@ -104,6 +109,11 @@
   }
   function tochat() {
     onTochat?.();
+  }
+  /** Who proposed a counter, by the name the rikma knows them by. */
+  function proposerName(userId) {
+    const u = (user_1s ?? []).find((m) => String(m.id) === String(userId));
+    return u?.attributes?.username ?? '';
   }
 
 </script>
@@ -220,6 +230,28 @@
         })}
       </div>
     </div>
+
+    <!-- The negotiation so far: every counter, oldest first. There is no flat
+         "no" on a finish approval — a member who disagrees proposes the version
+         they would sign, and the claim goes round until all sign the same one. -->
+    {#if counters.length > 0}
+      <div
+        class="flex flex-col gap-2 p-3 rounded-xl border border-yellow-200 dark:border-yellow-900/40 bg-yellow-50 dark:bg-yellow-900/10"
+      >
+        <span
+          class="text-xs font-bold text-yellow-700 dark:text-yellow-500"
+          >⇄ {$t('lev.fiappru.counterRound', { round: counters[counters.length - 1].round })}</span
+        >
+        {#each counters as c (c.round)}
+          <p class="text-sm text-gray-700 dark:text-gray-300 m-0">
+            {#if proposerName(c.userId)}<b>{proposerName(c.userId)}</b> · {/if}{$t(
+              'lev.fiappru.counterLine',
+              { to: c.to, from: c.from, note: c.note }
+            )}
+          </p>
+        {/each}
+      </div>
+    {/if}
 
     <!-- פרטי משימה -->
     {#if missionDetails !== null && missionDetails !== 'null' && missionDetails !== 'undefined' && missionDetails !== undefined}
@@ -435,14 +467,16 @@
   >
     {#if !low}
       {#if already === false && allr === false}
-        <button
-          class="flex-1 py-2 bg-white dark:bg-gray-800 border-2 border-red-500 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 font-bold rounded-xl transition-all flex justify-center items-center"
-          onmouseenter={() => hover($t('lev.cards.confirmDecline'))}
-          onmouseleave={() => hover('0')}
-          onclick={() => decline('f')}
-        >
-          <No class="w-6 h-6" />
-        </button>
+        {#if !noDecline}
+          <button
+            class="flex-1 py-2 bg-white dark:bg-gray-800 border-2 border-red-500 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 font-bold rounded-xl transition-all flex justify-center items-center"
+            onmouseenter={() => hover($t('lev.cards.confirmDecline'))}
+            onmouseleave={() => hover('0')}
+            onclick={() => decline('f')}
+          >
+            <No class="w-6 h-6" />
+          </button>
+        {/if}
 
         <button
           class="flex-1 py-2 bg-white dark:bg-gray-800 border-2 border-yellow-500 text-yellow-600 dark:text-yellow-500 hover:bg-yellow-50 dark:hover:bg-yellow-900/20 font-bold rounded-xl transition-all flex justify-center items-center"

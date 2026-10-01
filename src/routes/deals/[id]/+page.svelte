@@ -12,6 +12,7 @@
   import ForumPanel from '$lib/components/deals/ForumPanel.svelte';
   import PartiesPanel from '$lib/components/deals/PartiesPanel.svelte';
   import { saleToDealDetail } from '$lib/services/dealsService';
+  import { t } from '$lib/translations';
 
   let { data } = $props();
 
@@ -71,8 +72,45 @@
     }
   }
 
+  /** Run an action; the handler's own answer, or a thrown error with the server's words. */
+  async function runAction(actionKey: string, params: Record<string, unknown>) {
+    const res = await fetch('/api/action', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ actionKey, params })
+    });
+    const out = await res.json();
+    if (!out?.success) throw new Error(out?.error?.message || `${actionKey} failed`);
+    return out.data;
+  }
+
+  /** The deal's own conversation: made on first use, then written to. */
+  async function sendMessage(text: string) {
+    if (!deal) throw new Error('no deal');
+    const raw = ((deal as any).raw ?? {}) as { projectId?: unknown; forumId?: unknown };
+    const projectId = String(raw.projectId ?? '');
+    let forumId = Number(raw.forumId) > 0 ? String(raw.forumId) : null;
+    if (!forumId) {
+      const ensured = await runAction('ensureSheirutForum', { projectId, sheirutId: deal.sheirutId });
+      forumId = ensured?.forumId ? String(ensured.forumId) : null;
+    }
+    if (!forumId) throw new Error('no forum');
+    await runAction('createChatMessage', { forumId, message: text });
+    await invalidateAll();
+  }
+
+  let forumPanel: ReturnType<typeof ForumPanel> | undefined = $state();
+
+  /**
+   * There is no flat "no" on this platform: someone who does not accept what is
+   * put in front of them says what is wrong and the other side answers or
+   * proposes another version (QA C-15). So "reject" opens the conversation — the
+   * deal's chat, with somewhere to write — instead of pointing at a chat that had
+   * none.
+   */
   async function handleReject(_id: string) {
-    toast.info('לפתיחת דיון, השתמש בצ׳אט עם הצד השני');
+    toast.info($t('deals.rejectToChat'));
+    forumPanel?.focus();
   }
 </script>
 
@@ -153,7 +191,7 @@
         </div>
 
         <div class="anim anim-d4">
-          <ForumPanel messages={deal.messages} />
+          <ForumPanel bind:this={forumPanel} messages={deal.messages} onSend={sendMessage} />
         </div>
       </div>
 

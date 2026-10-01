@@ -522,6 +522,7 @@ export const qidsAccess = {
   // action via StrapiClient, which checks rikma membership / personal-product
   // ownership first). A client must never flip another seller's flag.
   '285setMatanotDiscovery': { allow: ['serviceAdmin'] },
+  '386counterFiniapruval': { allow: ['serviceAdmin'] }, // server-only: counterFiniapruval checks membership + turn
 
   // matching/engine.ts: always run through StrapiClient with the admin
   // token, never with a user JWT — writes suggestion data for *other* users.

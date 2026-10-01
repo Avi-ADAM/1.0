@@ -127,5 +127,9 @@
     "error": "Algo salió mal",
     "approveBlockedOpen": "Primero indiquen un precio",
     "approveBlockedCustomer": "Esperando que la clienta responda a su precio"
-  }
+  },
+  "chatPlaceholder": "Escribe a la otra parte: qué no cuadra, o qué versión aceptarían todos",
+  "chatSend": "Enviar",
+  "chatError": "No se envió el mensaje. Puedes intentarlo de nuevo.",
+  "rejectToChat": "No hace falta rechazar: escribe aquí lo que no cuadra y la otra parte podrá responder o proponer otra versión."
 }

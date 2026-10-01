@@ -126,5 +126,9 @@
     "error": "Something went wrong",
     "approveBlockedOpen": "Name a price first",
     "approveBlockedCustomer": "Waiting for the customer to answer your price"
-  }
+  },
+  "chatPlaceholder": "Write to the other side — what does not sit right, or what version you could all agree on",
+  "chatSend": "Send",
+  "chatError": "The message was not sent. You can try again.",
+  "rejectToChat": "No need to reject — write here what does not sit right, and the other side can reply or propose another version."
 }

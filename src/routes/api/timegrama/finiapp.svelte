@@ -5,6 +5,7 @@
   // Server-only secret — this module is imported only by timegrama/+server.js.
   import { ADMINMONTHER } from '$env/static/private';
   import { pickRateRow, resolveRate, rowRate } from '$lib/timers/rate.js';
+  import { standingVotes } from '$lib/finiapruval/rounds.js';
 
   // Free-text the user typed (`why`, `missname`) goes into an inline mutation
   // string, so it has to be escaped. An unescaped quote or newline breaks the
@@ -35,7 +36,7 @@
     const qu = `{ finiapruval(id: ${id}) { data { id attributes {
       archived isTimerSave noofhours missname why iskvua month perhour
       timer { data { id attributes { rate } } }
-      vots { what users_permissions_user { data { id } } }
+      vots { what order users_permissions_user { data { id } } }
       mesimabetahalich { data { id attributes {
         perhour totalHoursSaved
         mission { data { id } }
@@ -60,12 +61,15 @@
       // how tg#127 sat in the queue for 522 days.
       if (fa.archived) return markDone(taid, `finiapruval ${id} already archived`);
 
-      // Check that all votes are yes (auto-close: no new vote added, just trigger deadline)
+      // Silence matures the version on the table — the standing round. A counter
+      // (src/lib/finiapruval/rounds.ts) moves the claim to a newer round with a
+      // fresh clock, so a "no" cast on an older version is history and blocks
+      // nothing; only an objection on the standing version itself still does.
       const vots = fa.vots ?? [];
-      const hasNo = vots.some(v => v.what === false);
+      const hasNo = standingVotes(vots).some(v => v.what === false);
       if (hasNo) {
         // An objection is an answer, and the window it had is over. The clock
-        // has nothing more to do; resuming the discussion opens a fresh one.
+        // has nothing more to do; a counter on top of it opens a fresh one.
         return markDone(taid, `finiapruval ${id} has a negative vote`);
       }
 
