@@ -32,7 +32,7 @@
     "android:install": "node scripts/android-install.mjs"
   },
   "engines": {
-    "node": "22.x"
+    "node": "24.x"
   },
   "devDependencies": {
     "@event-calendar/core": "^3.4.0",

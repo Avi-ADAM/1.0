@@ -9,7 +9,7 @@ if (process.env.ADAPTER === 'vercel') {
   config = {
     kit: {
       adapter: vercel({
-        runtime: 'nodejs20.x'
+        runtime: 'nodejs24.x'
       }),
       // The cross-site form check lives in hooks.server.js ($lib/server/csrf.js)
       // so /oauth/token can be exempt — kit's own check has no per-route escape.
