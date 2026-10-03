@@ -17,10 +17,29 @@
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { normalizeLocationInput } from './actionUtils.js';
 import { ensureCandidacyTimegrama } from '../../nego/timegrama.js';
+import { createVolunteerProposal } from '$lib/server/wish/volunteerProposal.js';
 
-export const openMissionProposalHandler: ActionExecutionHandler = async (params, context, { strapi }) => {
-  const { openMissionId, projectId } = params;
+export const openMissionProposalHandler: ActionExecutionHandler = async (params, context, { strapi, notifier }) => {
+  const { openMissionId } = params;
+  // No rikma = no id. A client that stringified a missing one ("undefined", "null") means the same.
+  const projectId = [undefined, null, "", "undefined", "null"].includes(params.projectId) ? null : params.projectId;
   const newValues = (params.newValues ?? {}) as Record<string, any>;
+
+  // A mission a wish published to the community has no rikma behind it — there are no
+  // members to ask for, and no Ask/vote flow to enter (C-9: this used to ask Strapi
+  // for the members of project "" and die). The volunteer's terms go to the wisher as
+  // a proposal she approves or negotiates.
+  if (!projectId) {
+    return createVolunteerProposal(strapi, context, notifier, {
+      openMissionId: String(openMissionId),
+      params,
+      terms: {
+        hours: newValues.noofhours,
+        ratePerHour: newValues.perhour,
+        note: newValues.hearotMeyuchadot ?? newValues.descrip
+      }
+    });
+  }
 
   const now = new Date();
   const nowISO = now.toISOString();
@@ -127,7 +146,7 @@ export const proposeOnOpenMissionConfig: ActionConfig = {
 
   paramSchema: {
     openMissionId: { type: 'string', required: true, description: 'ID of the open mission' },
-    projectId: { type: 'string', required: true, description: 'Project (rikma) ID' },
+    projectId: { type: 'string', required: false, description: 'Project (rikma) ID — omitted for a mission a wish published to the community (no rikma)' },
     newValues: {
       type: 'object',
       required: false,

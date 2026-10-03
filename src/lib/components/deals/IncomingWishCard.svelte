@@ -19,6 +19,8 @@
     hours: wish.slotHours ?? null,
     price: wish.slotPrice ?? null
   });
+  // Whose move the terms are in, and what was said (C-9).
+  const negotiation = $derived(wish.negotiation ?? null);
 
   function openOffer() {
     showOffer = true;
@@ -121,6 +123,7 @@
     proposalId={wish.proposalId}
     ratsonId={wish.ratsonId}
     item={offerItem}
+    {negotiation}
     onClose={() => (showOffer = false)}
     {onDone}
   />

@@ -27,6 +27,9 @@ import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { requestWishMissionConfig } from './requestWishMission.js';
 import { openingPrice, plainExcerpt } from '$lib/sheirut/quoteState';
 import { loadQuote, postToRequestChat } from '../../sheirut/quote.js';
+import { acceptWishOfferConfig } from './acceptWishOffer.js';
+import { isTurnOf, standing } from '$lib/wish/proposalRounds.js';
+import { coveredVersion } from '$lib/server/wish/proposal.js';
 
 const ACCEPTABLE_FROM_STATUSES = new Set(['suggested', 'viewed']);
 
@@ -74,9 +77,42 @@ const handler: ActionExecutionHandler = async (params, context, util) => {
   }
   const wisherUserId = String(owners[0].id);
 
+  // ── Terms are negotiable (C-9): approving means approving the version on the table
+  // `counterRatsonProposal` leaves there. Two shapes of proposal carry no product
+  // for the wisher to open a Sheirutpend on — an invitation she authored a slot
+  // for, and a volunteer's offer on a published need — and approving *those* is
+  // `acceptWishOffer`'s job when it is the provider's move (an invited provider
+  // approving; a volunteer approving the wisher's counter) or when the wisher
+  // approves an invited provider's counter. Only the volunteer's offer is closed
+  // here, by the wisher, below.
+  const openMissionRef = pa.open_mission?.data?.id ? String(pa.open_mission.data.id) : null;
+  const proposerIds = (pa.proposer_users?.data ?? []).map((u: any) => String(u.id));
+  const callerIsProvider = proposerIds.includes(String(context.userId));
+  const isSlotProposal = !matanotId && !projectId;
+  if (isSlotProposal && !openMissionRef) {
+    return (acceptWishOfferConfig.graphqlOperation as ActionExecutionHandler)(params, context, util) as any;
+  }
+  if (isSlotProposal && openMissionRef && callerIsProvider) {
+    return (acceptWishOfferConfig.graphqlOperation as ActionExecutionHandler)(params, context, util) as any;
+  }
+
   // Authorization sanity: only the wisher (or an owner) can accept on her own ratson.
   if (String(context.userId) !== wisherUserId) {
     throw new Error('Only the ratson owner may accept its proposals');
+  }
+
+  // …and only the version the volunteer put on the table: if the wisher countered,
+  // she waits for the volunteer's answer rather than approving her own terms.
+  if (isSlotProposal && openMissionRef) {
+    const ref = {
+      wisherIds: owners.map((o: any) => String(o.id)),
+      proposerIds,
+      openedBy: 'provider' as const
+    };
+    const st = standing(ref, pa.ratson_willingness_entry ?? [], coveredVersion(pa).version);
+    if (!isTurnOf('wisher', st)) {
+      throw new Error("You countered the volunteer's terms — it is their turn to answer");
+    }
   }
 
   const now = new Date().toISOString();

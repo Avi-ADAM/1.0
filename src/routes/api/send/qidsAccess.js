@@ -523,6 +523,7 @@ export const qidsAccess = {
   // ownership first). A client must never flip another seller's flag.
   '285setMatanotDiscovery': { allow: ['serviceAdmin'] },
   '386counterFiniapruval': { allow: ['serviceAdmin'] }, // server-only: counterFiniapruval checks membership + turn
+  '387counterRatsonProposal': { allow: ['serviceAdmin'] }, // server-only: counterRatsonProposal checks party + turn
 
   // matching/engine.ts: always run through StrapiClient with the admin
   // token, never with a user JWT — writes suggestion data for *other* users.

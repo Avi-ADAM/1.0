@@ -18,7 +18,7 @@ export const customizeOpenMissionConfig: ActionConfig = {
 
   paramSchema: {
     openMissionId: { type: 'string', required: true },
-    projectId: { type: 'string', required: true },
+    projectId: { type: 'string', required: false },
     newValues: {
       type: 'object',
       required: false,

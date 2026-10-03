@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { fireEvent, render } from '@testing-library/svelte';
+import { fireEvent, render, waitFor } from '@testing-library/svelte';
 import { tick } from 'svelte';
 import { readable } from 'svelte/store';
 import he from '$lib/translations/he/concierge.json';
@@ -237,5 +237,112 @@ describe('/concierge/[id] — the wish’s own facts, never a demo', () => {
   it('“send to discussion” goes to the wish chat, and is absent when there is none', () => {
     expect(mount({ wish: wish({ chatForumId: '77' }) }).container.querySelector('a[href="/forum/77"]')).not.toBeNull();
     expect(textOf()).not.toContain('שליחה לדיון');
+  });
+});
+
+
+/* ───────────────────────────── C-9: negotiating a proposal's terms ───────────── */
+
+const negotiation = (over: Record<string, unknown> = {}) => ({
+  canCounter: true,
+  round: 1,
+  signedBy: 'provider',
+  yourTurn: true,
+  amount: 6,
+  price: 680,
+  counters: [
+    { round: 1, by: 'provider', amount: 6, price: 680, note: 'השולחן דורש שעתיים נוספות' }
+  ],
+  ...over
+});
+const countered = (over: Record<string, unknown> = {}, who = 'דנה') => ({
+  ...proposal('1', 'suggested', 0, who),
+  negotiation: negotiation(over)
+});
+
+describe('/concierge/[id] — negotiating a provider’s terms (C-9)', () => {
+  it('shows what the provider put on the table, with the reason', () => {
+    const view = mount({ proposals: [countered()] });
+    expect(cards(view)).toContain('השולחן דורש שעתיים נוספות');
+    expect(cards(view)).toContain('6');
+    expect(cards(view)).toContain('680');
+  });
+
+  it('answers a counter with approve or counter back — and keeps the old buttons for a first offer', () => {
+    const view = mount({ proposals: [countered()] });
+    const text = cards(view);
+    expect(text).toContain('✓ אישור הגרסה');
+    expect(text).toContain('הצעה נגדית');
+
+    const first = mount({ proposals: [{ ...proposal('2', 'suggested', 1, 'רון'), negotiation: negotiation({ round: 0, counters: [], signedBy: 'provider' }) }] });
+    expect(cards(first)).toContain('✓ בחירה');
+    expect(cards(first)).toContain('הצעה נגדית');
+  });
+
+  it('when she put terms on the table herself it waits for the provider — no approving her own terms', () => {
+    const view = mount({
+      proposals: [countered({ yourTurn: false, signedBy: 'wisher', counters: [{ round: 1, by: 'wisher', amount: 5, price: 640, note: 'התקציב מאפשר חמש שעות' }] })]
+    });
+    const text = cards(view);
+    expect(text).toContain('ממתין/ה לתשובת הספק/ית');
+    expect(text).not.toContain('✓ אישור הגרסה');
+    expect(text).not.toContain('✓ בחירה');
+    expect(text).toContain('התקציב מאפשר חמש שעות');
+  });
+
+  it('a proposal with a product behind it has no counter button — that one is priced by quote', () => {
+    const view = mount({ proposals: [countered({ canCounter: false })] });
+    expect(cards(view)).not.toContain('הצעה נגדית');
+  });
+
+  it('the counter form is prefilled with the terms and will not send nothing or a bare number', async () => {
+    const view = mount({ proposals: [countered()] });
+    const open = [...view.container.querySelectorAll('.pcard button')].find((b) => b.textContent?.includes('הצעה נגדית')) as HTMLElement;
+    await fireEvent.click(open);
+    await tick();
+
+    const [hours, price] = [...view.container.querySelectorAll('.neg-form input[type="number"]')] as HTMLInputElement[];
+    expect(Number(hours.value)).toBe(6);
+    expect(Number(price.value)).toBe(680);
+    const send = view.container.querySelector('.neg-form button[type="submit"]') as HTMLButtonElement;
+    expect(send.disabled).toBe(true);
+
+    await fireEvent.input(price, { target: { value: '640' } });
+    await tick();
+    expect(send.disabled).toBe(true); // a number with no reason is a veto in disguise
+
+    await fireEvent.input(view.container.querySelector('.neg-form textarea') as HTMLTextAreaElement, {
+      target: { value: 'התקציב מאפשר רק שש מאות וארבעים' }
+    });
+    await tick();
+    expect(send.disabled).toBe(false);
+  });
+
+  it('sends the counter through counterRatsonProposal', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({ json: async () => ({ success: true }) });
+    vi.stubGlobal('fetch', fetchMock);
+    const reload = vi.fn();
+    Object.defineProperty(window, 'location', { configurable: true, value: { ...window.location, reload } });
+
+    const view = mount({ proposals: [countered()] });
+    await fireEvent.click(
+      [...view.container.querySelectorAll('.pcard button')].find((b) => b.textContent?.includes('הצעה נגדית')) as HTMLElement
+    );
+    await tick();
+    const [, priceInput] = [...view.container.querySelectorAll('.neg-form input[type="number"]')] as HTMLInputElement[];
+    await fireEvent.input(priceInput, { target: { value: '640' } });
+    await fireEvent.input(view.container.querySelector('.neg-form textarea') as HTMLTextAreaElement, {
+      target: { value: 'התקציב מאפשר רק שש מאות וארבעים' }
+    });
+    await tick();
+    await fireEvent.submit(view.container.querySelector('.neg-form') as HTMLFormElement);
+
+    await waitFor(() => expect(fetchMock).toHaveBeenCalled());
+    const [, init] = fetchMock.mock.calls[0];
+    expect(JSON.parse(init.body)).toEqual({
+      actionKey: 'counterRatsonProposal',
+      params: { proposalId: '1', ratsonId: '16', hours: 6, price: 640, note: 'התקציב מאפשר רק שש מאות וארבעים' }
+    });
+    await waitFor(() => expect(reload).toHaveBeenCalled());
   });
 });

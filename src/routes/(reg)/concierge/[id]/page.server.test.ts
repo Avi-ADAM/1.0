@@ -38,7 +38,7 @@ const event = (uid = '5') =>
     fetch: (() => {}) as unknown as typeof fetch
   }) as any;
 
-const wishNode = (over: Record<string, unknown> = {}) => ({
+const wishNode = (over: Record<string, unknown> = {}, proposals: any[] = []) => ({
   data: {
     ratson: {
       data: {
@@ -54,7 +54,7 @@ const wishNode = (over: Record<string, unknown> = {}) => ({
         }
       }
     },
-    ratsonProposals: { data: [] }
+    ratsonProposals: { data: proposals }
   }
 });
 
@@ -89,5 +89,58 @@ describe('/concierge/[id] loader — never a demo wish', () => {
   it('a stranger is still sent to the public view', async () => {
     sendToSer.mockResolvedValue(wishNode());
     await expect(load(event('999'))).rejects.toMatchObject({ status: 302, location: '/wish/16' });
+  });
+});
+
+
+describe('/concierge/[id] loader — the terms negotiation, from the wisher’s side (C-9)', () => {
+  const proposal = (over: Record<string, unknown> = {}) => ({
+    id: '77',
+    attributes: {
+      status_proposal: 'suggested',
+      kind: 'partial',
+      total_price: 680,
+      proposer_users: { data: [{ id: '20', attributes: { username: 'דנה' } }] },
+      covered_missions: [{ id: 'c1', extracted_mission_idx: '55', hours: 6, price: 680 }],
+      covered_resources: [],
+      ratson_willingness_entry: [
+        {
+          user: { data: { id: '20' } },
+          agree: false,
+          note: 'השולחן דורש שעתיים נוספות',
+          willingHours: 6,
+          willingAmount: 680
+        }
+      ],
+      ...over
+    }
+  });
+
+  it('hands each proposal its negotiation: whose move, the terms on the table, what was said', async () => {
+    sendToSer.mockResolvedValue(wishNode({}, [proposal()]));
+    const out: any = await load(event());
+    expect(out.proposals[0].negotiation).toMatchObject({
+      canCounter: true,
+      round: 1,
+      signedBy: 'provider',
+      yourTurn: true,
+      amount: 6,
+      price: 680
+    });
+    expect(out.proposals[0].negotiation.counters[0].note).toBe('השולחן דורש שעתיים נוספות');
+  });
+
+  it('after she countered it is the provider’s move', async () => {
+    sendToSer.mockResolvedValue(
+      wishNode({}, [
+        proposal({
+          ratson_willingness_entry: [
+            { user: { data: { id: '5' } }, agree: false, note: 'התקציב מאפשר חמש שעות', willingHours: 5, willingAmount: 640 }
+          ]
+        })
+      ])
+    );
+    const out: any = await load(event());
+    expect(out.proposals[0].negotiation).toMatchObject({ signedBy: 'wisher', yourTurn: false });
   });
 });

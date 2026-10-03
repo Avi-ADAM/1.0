@@ -16,6 +16,9 @@
   import { lang } from '$lib/stores/lang.js';
   import { executeAction } from '$lib/client/actionClient';
   import { toast } from 'svelte-sonner';
+  // `t` below is this component's own dictionary; the shared translations are `tr`.
+  import { t as tr } from '$lib/translations';
+  import { refuseCounter } from '$lib/wish/proposalRounds';
 
   type WishItem = {
     kind: 'mission' | 'resource';
@@ -24,24 +27,87 @@
     price?: number | null;
   };
 
+  /** The terms negotiation from the provider's side (src/lib/server/wish/negotiationView.ts). */
+  type Negotiation = {
+    canCounter: boolean;
+    round: number;
+    yourTurn: boolean;
+    amount: number | null;
+    price: number | null;
+    counters: { round: number; by: 'wisher' | 'provider'; amount: number | null; price: number | null; note: string }[];
+  };
+
   let {
     proposalId,
     ratsonId,
     item,
+    negotiation = null,
     onClose,
     onDone
   }: {
     proposalId: string;
     ratsonId: string;
     item: WishItem;
+    negotiation?: Negotiation | null;
     onClose?: () => void;
     onDone?: (result: { accepted: boolean }) => void;
   } = $props();
 
-  type Step = 'view' | 'submitting' | 'done' | 'error';
+  type Step = 'view' | 'counter' | 'submitting' | 'done' | 'countered' | 'error';
   let step = $state<Step>('view');
   let errorMsg = $state('');
   let declining = $state(false);
+
+  // It is the provider's move unless they signed last (they countered, or it is
+  // their own volunteer offer): then they wait for the wisher.
+  const myTurn = $derived(negotiation ? negotiation.yourTurn : true);
+  const canCounter = $derived(negotiation ? negotiation.canCounter : true);
+  const lastNote = $derived(negotiation?.counters.at(-1)?.note ?? '');
+
+  /* ── The counter: the way to say "not on these terms" (QA C-9) ── */
+  let counterHours = $state<number | string>('');
+  let counterPrice = $state<number | string>('');
+  let counterNote = $state('');
+  let counterBusy = $state(false);
+  const counterRefusal = $derived(
+    refuseCounter(
+      { amount: item.hours ?? null, price: item.price ?? null },
+      {
+        amount: counterHours === '' ? undefined : counterHours,
+        price: counterPrice === '' ? undefined : counterPrice
+      },
+      counterNote
+    )
+  );
+
+  function openCounter() {
+    counterHours = item.hours ?? '';
+    counterPrice = item.price ?? '';
+    counterNote = '';
+    errorMsg = '';
+    step = 'counter';
+  }
+
+  async function sendCounter() {
+    if (counterBusy || counterRefusal) return;
+    counterBusy = true;
+    errorMsg = '';
+    try {
+      const res = await executeAction('counterRatsonProposal' as any, {
+        proposalId,
+        ratsonId,
+        ...(counterHours !== '' ? { hours: Number(counterHours) } : {}),
+        ...(counterPrice !== '' ? { price: Number(counterPrice) } : {}),
+        note: counterNote.trim()
+      });
+      if (!res?.success) throw new Error(res?.error?.message || 'failed');
+      step = 'countered';
+    } catch (e) {
+      errorMsg = e instanceof Error ? e.message : $tr('deals.negError');
+    } finally {
+      counterBusy = false;
+    }
+  }
 
   const T = {
     he: {
@@ -52,15 +118,13 @@
       budget: 'תקציב',
       full: 'לתמונה המלאה',
       approve: 'אני בפנים - אישור השמה',
-      negotiate: 'מו״מ (בקרוב)',
       decline: 'לא מתאים לי',
       submitting: 'אישור ההשמה…',
       doneTitle: 'אישרת את ההשמה',
       doneBody: 'נכנסת כספק/ית למשימה. נשלחה התראה ליוזמ/ת המשאלה. הרקמה תיווצר כשכל המקומות יתמלאו.',
       close: 'סגירה',
       errTitle: 'משהו השתבש',
-      retry: 'נסו שוב',
-      soon: 'מו״מ ייושם בהמשך'
+      retry: 'נסו שוב'
     },
     en: {
       titleM: 'A task offer for you',
@@ -70,15 +134,13 @@
       budget: 'Budget',
       full: 'Full picture',
       approve: "I'm in - approve placement",
-      negotiate: 'Negotiate (soon)',
       decline: 'Not for me',
       submitting: 'Approving your placement…',
       doneTitle: 'Placement approved',
       doneBody: "You joined the task as provider. The wisher was notified. The weave is created once all slots are filled.",
       close: 'Close',
       errTitle: 'Something went wrong',
-      retry: 'Try again',
-      soon: 'Negotiation is coming later'
+      retry: 'Try again'
     }
   } as const;
   const t = $derived($lang === 'en' ? T.en : T.he);
@@ -135,12 +197,93 @@
         </div>
       </div>
 
-      <div class="ofr-actions">
-        <a class="ofr-btn ofr-btn--ghost" href={wishHref}>{t.full}</a>
-        <button class="ofr-btn ofr-btn--primary" onclick={approve}>{t.approve}</button>
-      </div>
-      <button class="ofr-nego" onclick={() => toast(t.soon)} type="button">{t.negotiate}</button>
+      {#if negotiation && negotiation.counters.length > 0}
+        <!-- What was said so far: there is no flat "no" here, the terms go round. -->
+        <div class="ofr-neg-log">
+          {#each negotiation.counters as c (c.round)}
+            <p>
+              ⇄ {c.amount ?? '—'}{item.kind === 'mission' ? ` ${t.hours}` : ' ×'}
+              · {c.price ?? '—'}
+              {#if c.note}— {c.note}{/if}
+            </p>
+          {/each}
+        </div>
+      {/if}
+
+      {#if myTurn}
+        <div class="ofr-actions">
+          <a class="ofr-btn ofr-btn--ghost" href={wishHref}>{t.full}</a>
+          <button class="ofr-btn ofr-btn--primary" onclick={approve}>
+            {negotiation && negotiation.round > 0 ? $tr('deals.negApproveTheirs') : t.approve}
+          </button>
+        </div>
+        {#if canCounter}
+          <button class="ofr-nego" onclick={openCounter} type="button">⇄ {$tr('deals.negTitle')}</button>
+        {/if}
+      {:else}
+        <!-- They signed last (their own counter, or their own volunteer offer): the
+             wisher answers. -->
+        <p class="ofr-waiting">{$tr('deals.negWaiting')}</p>
+        {#if lastNote}<p class="ofr-waiting-note">“{lastNote}”</p>{/if}
+        <div class="ofr-actions">
+          <a class="ofr-btn ofr-btn--ghost" href={wishHref}>{t.full}</a>
+        </div>
+      {/if}
       <button class="ofr-decline" onclick={decline} disabled={declining}>{t.decline}</button>
+
+    {:else if step === 'counter'}
+      <p class="ofr-intro">{$tr('deals.negHint')}</p>
+      <form
+        class="ofr-form"
+        onsubmit={(e) => {
+          e.preventDefault();
+          sendCounter();
+        }}
+      >
+        <div class="ofr-offer-name">{item.name}</div>
+        <div class="ofr-fields">
+          <label>
+            {item.kind === 'resource' ? $tr('deals.negQty') : $tr('deals.negHours')}
+            <input type="number" min="0" step="0.25" bind:value={counterHours} disabled={counterBusy} />
+          </label>
+          <label>
+            {$tr('deals.negPrice')}
+            <input type="number" min="0" step="1" bind:value={counterPrice} disabled={counterBusy} />
+          </label>
+        </div>
+        <label>
+          {$tr('deals.negNote')}
+          <textarea
+            rows="3"
+            bind:value={counterNote}
+            placeholder={$tr('deals.negNotePh')}
+            disabled={counterBusy}
+          ></textarea>
+        </label>
+        {#if errorMsg}<p class="ofr-form-error" role="alert">{errorMsg}</p>{/if}
+        <div class="ofr-actions">
+          <button type="button" class="ofr-btn ofr-btn--ghost" disabled={counterBusy} onclick={() => (step = 'view')}>
+            {$tr('deals.negBack')}
+          </button>
+          <button type="submit" class="ofr-btn ofr-btn--primary" disabled={counterBusy || !!counterRefusal}>
+            {counterBusy ? '…' : $tr('deals.negSend')}
+          </button>
+        </div>
+      </form>
+
+    {:else if step === 'countered'}
+      <div class="ofr-done">
+        <div class="ofr-done-icon"><EntityIcon kind="done" size={40} /></div>
+        <h3 class="ofr-done-title">{$tr('deals.negSentTitle')}</h3>
+        <p class="ofr-done-body">{$tr('deals.negSentBody')}</p>
+        <button
+          class="ofr-btn ofr-btn--primary"
+          onclick={() => {
+            onDone?.({ accepted: false });
+            onClose?.();
+          }}>{t.close}</button
+        >
+      </div>
 
     {:else if step === 'submitting'}
       <div class="ofr-state">{t.submitting}</div>
@@ -259,6 +402,34 @@
     cursor: pointer;
   }
   .ofr-decline:hover { color: var(--tm, #9a8f80); }
+
+  /* the terms negotiation (C-9) */
+  .ofr-neg-log {
+    margin: 0 0 12px;
+    padding: 10px 12px;
+    border: 1px dashed var(--border, #2a241c);
+    border-radius: 10px;
+  }
+  .ofr-neg-log p { margin: 0; font-size: 12.5px; line-height: 1.55; color: var(--tm, #9a8f80); }
+  .ofr-waiting { margin: 0 0 6px; font-size: 13.5px; color: var(--gold-l, #e8d59a); }
+  .ofr-waiting-note { margin: 0 0 12px; font-size: 12.5px; color: var(--tm, #9a8f80); font-style: italic; }
+  .ofr-form { display: flex; flex-direction: column; gap: 10px; }
+  .ofr-fields { display: flex; gap: 10px; }
+  .ofr-fields label { flex: 1; }
+  .ofr-form label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--tm, #9a8f80); }
+  .ofr-form input,
+  .ofr-form textarea {
+    background: var(--s2, #1b1711);
+    color: var(--text, #f1e9d8);
+    border: 1px solid var(--border, #2a241c);
+    border-radius: 8px;
+    padding: 8px 10px;
+    font: inherit;
+    font-size: 14px;
+  }
+  .ofr-form input:focus-visible,
+  .ofr-form textarea:focus-visible { outline: 2px solid var(--gold-l, #e8d59a); outline-offset: 1px; }
+  .ofr-form-error { margin: 0; font-size: 12.5px; color: var(--pink-l, #ff7aa8); }
   .ofr-state { text-align: center; padding: 28px 12px; color: var(--tm, #9a8f80); font-size: 14px; }
   .ofr-done { text-align: center; padding: 14px 6px; }
   .ofr-done-icon { font-size: 38px; margin-bottom: 8px; }

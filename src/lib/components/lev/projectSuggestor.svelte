@@ -202,13 +202,15 @@
       action = 'proposeOnOpenMission';
       params = {
         openMissionId: String(oid),
-        projectId: String(projectId),
+        // A mission a wish published to the community has no rikma: leave the key out
+        // (String(undefined) would send the word "undefined" as a project id).
+        ...(projectId ? { projectId: String(projectId) } : {}),
         newValues,
         originalValues
       };
     }
     const result = await executeAction(action, params);
-    if (!result.success) throw new Error(result.error || `${action} failed`);
+    if (!result.success) throw new Error(result.error?.message || `${action} failed`);
     already = true;
     askedarr.push(String(oid));
     less(oid);

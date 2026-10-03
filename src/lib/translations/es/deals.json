@@ -131,5 +131,19 @@
   "chatPlaceholder": "Escribe a la otra parte: qué no cuadra, o qué versión aceptarían todos",
   "chatSend": "Enviar",
   "chatError": "No se envió el mensaje. Puedes intentarlo de nuevo.",
-  "rejectToChat": "No hace falta rechazar: escribe aquí lo que no cuadra y la otra parte podrá responder o proponer otra versión."
+  "rejectToChat": "No hace falta rechazar: escribe aquí lo que no cuadra y la otra parte podrá responder o proponer otra versión.",
+  "negTitle": "Contrapropuesta",
+  "negHint": "No hace falta rechazar: propón condiciones con las que podrías estar de acuerdo. Quien hizo el deseo las aprueba o propone otras.",
+  "negHours": "Horas",
+  "negQty": "Cantidad",
+  "negPrice": "Precio",
+  "negNote": "Tu motivo",
+  "negNotePh": "¿Por qué estas condiciones? (mínimo 8 caracteres)",
+  "negSend": "Enviar la propuesta",
+  "negBack": "Volver",
+  "negSentTitle": "Propuesta enviada",
+  "negSentBody": "Quien hizo el deseo aprobará tus condiciones o propondrá otras. Recibirás un aviso.",
+  "negWaiting": "Tu propuesta fue enviada: esperando la respuesta",
+  "negApproveTheirs": "Cuenta conmigo: aprobar estas condiciones",
+  "negError": "No se pudo enviar la propuesta"
 }

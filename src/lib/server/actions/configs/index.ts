@@ -88,6 +88,7 @@ import { cacheTranslationsConfig } from './cacheTranslations.js';
 import { requestSuggestionConfig } from './requestSuggestion.js';
 import { requestWishMissionConfig } from './requestWishMission.js';
 import { requestWishResourceConfig } from './requestWishResource.js';
+import { counterRatsonProposalConfig } from './counterRatsonProposal.js';
 import { acceptWishOfferConfig } from './acceptWishOffer.js';
 import { declineWishOfferConfig } from './declineWishOffer.js';
 import { materializeWishConfig } from './materializeWish.js';
@@ -380,6 +381,8 @@ export function registerAllActions(): void {
   registerAction(requestWishMissionConfig);
   registerAction(requestWishResourceConfig);
   registerAction(acceptWishOfferConfig);
+  // …and the way to say "not on these terms": a counter, never a veto
+  registerAction(counterRatsonProposalConfig);
   registerAction(declineWishOfferConfig);
   registerAction(materializeWishConfig);
   registerAction(publishWishNeedToCommunityConfig);

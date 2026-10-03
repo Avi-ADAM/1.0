@@ -130,5 +130,19 @@
   "chatPlaceholder": "Write to the other side — what does not sit right, or what version you could all agree on",
   "chatSend": "Send",
   "chatError": "The message was not sent. You can try again.",
-  "rejectToChat": "No need to reject — write here what does not sit right, and the other side can reply or propose another version."
+  "rejectToChat": "No need to reject — write here what does not sit right, and the other side can reply or propose another version.",
+  "negTitle": "Counter-proposal",
+  "negHint": "No need to reject: propose terms you could agree on. The wisher approves them or proposes others.",
+  "negHours": "Hours",
+  "negQty": "Quantity",
+  "negPrice": "Price",
+  "negNote": "Your reason",
+  "negNotePh": "Why these terms? (at least 8 characters)",
+  "negSend": "Send the proposal",
+  "negBack": "Back",
+  "negSentTitle": "Proposal sent",
+  "negSentBody": "The wisher will approve your terms or propose others. You will be notified.",
+  "negWaiting": "Your proposal was sent — waiting for the wisher’s answer",
+  "negApproveTheirs": "I'm in - approve these terms",
+  "negError": "Could not send the proposal"
 }

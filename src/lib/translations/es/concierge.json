@@ -412,5 +412,21 @@
   "rematch_row": "Buscar de nuevo",
   "harmony_hint": "Cuando las {{count}} partes estén de acuerdo, el plan se cierra y el arco se vuelve dorado.",
   "harmony_hint_alone": "Cuando se aprueben las propuestas, el plan se cierra y el arco se vuelve dorado.",
-  "to_discussion": "Enviar a discusión"
+  "to_discussion": "Enviar a discusión",
+  "neg_counter": "Contrapropuesta",
+  "neg_approve": "✓ Aprobar estas condiciones",
+  "neg_waiting": "Esperando la respuesta del proveedor",
+  "neg_you": "Tú",
+  "neg_hours_unit": "h",
+  "neg_qty_unit": "uds",
+  "neg_hours": "Horas",
+  "neg_qty": "Cantidad",
+  "neg_price": "Precio",
+  "neg_note": "Tu motivo",
+  "neg_note_ph": "¿Por qué estas condiciones? (mínimo 8 caracteres)",
+  "neg_hint": "No hace falta rechazar: propón condiciones con las que podrías estar de acuerdo. La otra parte las aprueba o propone otras.",
+  "neg_send": "Enviar la propuesta",
+  "neg_cancel": "Cancelar",
+  "neg_sent": "Propuesta enviada",
+  "neg_error": "No se pudo enviar la propuesta"
 }

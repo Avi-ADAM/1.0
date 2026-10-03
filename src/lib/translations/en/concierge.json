@@ -411,5 +411,21 @@
   "rematch_row": "Search again",
   "harmony_hint": "When all {{count}} parties agree, the plan is closed and the arc turns gold.",
   "harmony_hint_alone": "When the proposals are approved, the plan closes and the arc turns gold.",
-  "to_discussion": "Send to discussion"
+  "to_discussion": "Send to discussion",
+  "neg_counter": "Counter-proposal",
+  "neg_approve": "✓ Approve these terms",
+  "neg_waiting": "Waiting for the provider’s answer",
+  "neg_you": "You",
+  "neg_hours_unit": "h",
+  "neg_qty_unit": "pcs",
+  "neg_hours": "Hours",
+  "neg_qty": "Quantity",
+  "neg_price": "Price",
+  "neg_note": "Your reason",
+  "neg_note_ph": "Why these terms? (at least 8 characters)",
+  "neg_hint": "No need to reject: propose terms you could agree on. The other side approves them or proposes others.",
+  "neg_send": "Send the proposal",
+  "neg_cancel": "Cancel",
+  "neg_sent": "Proposal sent",
+  "neg_error": "Could not send the proposal"
 }

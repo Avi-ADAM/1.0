@@ -7859,6 +7859,19 @@ ${STIPEND_DECISION_FIELDS}
           open_mission { data { id } }
           covered_missions { id extracted_mission_idx hours price }
           covered_resources { id extracted_resource_idx quantity price }
+          # The signatures on the versions of this proposal — the negotiation
+          # (src/lib/wish/proposalRounds.ts).
+          ratson_willingness_entry {
+            id
+            user { data { id } }
+            item_kind
+            item_idx
+            agree
+            note
+            submittedAt
+            willingHours
+            willingAmount
+          }
         }
       }
     }
@@ -8211,8 +8224,24 @@ ${STIPEND_DECISION_FIELDS}
           total_price
           createdAt
           forum { data { id } }
+          open_mission { data { id } }
+          matanot { data { id } }
+          project { data { id } }
           covered_missions { id extracted_mission_idx hours price }
           covered_resources { id extracted_resource_idx quantity price }
+          # The signatures on the versions of this proposal — whose move it is
+          # (src/lib/wish/proposalRounds.ts).
+          ratson_willingness_entry {
+            id
+            user { data { id } }
+            item_kind
+            item_idx
+            agree
+            note
+            submittedAt
+            willingHours
+            willingAmount
+          }
           ratson {
             data {
               id
@@ -8529,6 +8558,29 @@ ${STIPEND_DECISION_FIELDS}
   '172resolveSkillsByName': `query ResolveSkillsByName($names: [String]) {
     skills(filters: { skillName: { in: $names } }, pagination: { limit: 50 }) {
       data { id attributes { skillName } }
+    }
+  }`,
+
+  // A counter on a wish proposal: the new standing version (the covered slot and the
+  // total) and the signature log, in one write — so nobody ever reads the new terms
+  // against the old signatures. Server-only (the action checks whose turn it is).
+  '387counterRatsonProposal': `mutation CounterRatsonProposal(
+    $id: ID!,
+    $total_price: Float,
+    $covered_missions: [ComponentNewCoveredMissionsInput],
+    $covered_resources: [ComponentNewCoveredResourcesInput],
+    $ratson_willingness_entry: [ComponentNewWillingnessEntriesInput]
+  ) {
+    updateRatsonProposal(
+      id: $id,
+      data: {
+        total_price: $total_price,
+        covered_missions: $covered_missions,
+        covered_resources: $covered_resources,
+        ratson_willingness_entry: $ratson_willingness_entry
+      }
+    ) {
+      data { id attributes { total_price status_proposal } }
     }
   }`,
 

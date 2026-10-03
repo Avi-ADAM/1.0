@@ -2,6 +2,7 @@ import type { SaleData } from '$lib/stores/levStores';
 import { mapSaleData } from '$lib/utils/levDataExtractors';
 import { stripHtml } from '$lib/utils/stripHtml';
 import { sendViaProxy } from '$lib/server/sendViaProxy.js';
+import { negotiationView, type NegotiationView } from '$lib/server/wish/negotiationView.js';
 
 export interface PendingRequestData {
   id: string;
@@ -55,11 +56,13 @@ export interface IncomingWishInvitation {
   /** The authored slot the provider would fill (from the proposal's covered_*). */
   slotHours?: number | null;
   slotPrice?: number | null;
+  /** The terms negotiation, from the provider's side: whose move it is, and what was said (C-9). */
+  negotiation?: NegotiationView | null;
   values: string[];
   categories: string[];
 }
 
-function mapWishInvitation(node: any): IncomingWishInvitation | null {
+function mapWishInvitation(node: any, viewerId?: string): IncomingWishInvitation | null {
   const pa = node?.attributes ?? {};
   const ratNode = pa.ratson?.data;
   if (!ratNode) return null;
@@ -83,6 +86,15 @@ function mapWishInvitation(node: any): IncomingWishInvitation | null {
     wisherName: wisher?.attributes?.username || '',
     wisherPic: wisher?.attributes?.profilePic?.data?.attributes?.url || undefined,
     chatForumId: ra.chat_forum?.data?.id ? String(ra.chat_forum.data.id) : undefined,
+    negotiation: negotiationView(
+      pa,
+      {
+        wisherIds: (ra.users_permissions_users?.data ?? []).map((u: any) => String(u.id)),
+        // the list is filtered to proposals the viewer is a proposer of
+        proposerIds: viewerId ? [String(viewerId)] : []
+      },
+      'provider'
+    ),
     slotHours: typeof slotM?.hours === 'number' ? slotM.hours : null,
     slotPrice:
       typeof slotM?.price === 'number'
@@ -213,7 +225,7 @@ export async function fetchWishInvitationsForUser(
     const data = await gql(fetchFn, '111listMyWishInvitations', { uid: userId, limit: 60 });
     const nodes = data?.ratsonProposals?.data ?? [];
     return nodes
-      .map(mapWishInvitation)
+      .map((n: any) => mapWishInvitation(n, userId))
       .filter((x: IncomingWishInvitation | null): x is IncomingWishInvitation => x !== null);
   } catch (e) {
     console.error('[deals] fetchWishInvitationsForUser failed (non-fatal):', e);

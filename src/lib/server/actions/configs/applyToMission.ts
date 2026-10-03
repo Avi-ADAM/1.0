@@ -4,6 +4,7 @@ import { touchDormancy } from '$lib/server/archive/dormancyClock.js';
 import { execFromContext } from '$lib/server/archive/exec.js';
 import { carryStipendToMission } from '$lib/server/stipend/fromMission.js';
 import { gqlString } from './actionUtils.js';
+import { createVolunteerProposal } from '$lib/server/wish/volunteerProposal.js';
 import { shiftsEnabled } from '$lib/server/shifts/mode.js';
 import { asUser as asShiftUser } from '$lib/server/shifts/exec.js';
 import { setAskCommitment, setMissionCommitment } from '$lib/server/shifts/store.js';
@@ -27,160 +28,12 @@ const applyToMissionHandler: ActionExecutionHandler = async (params, context, { 
   const nowISO = now.toISOString();
 
   // ── CONCIERGE CASE: source='concierge' open missions have no project ────────
-  // When a user volunteers for a community-published wish need (created via
-  // publishWishNeedToCommunity), the open mission has no project attached.
-  // Instead of going through the Ask/project-vote flow, we create a volunteer
-  // ratsonProposal on the linked wish — same shape as offerWishHelp (a
-  // kind=custom_offer offer with the applicant as proposer_user). Linking it to
-  // the source extracted need via covered_missions is what makes it surface
-  // under the right plan row on /concierge/[id]; we also notify the wish owner
-  // (socket + email + push) so it shows up as a reaction in their lev/Concierge.
+  // A community member taking a wish need published by `publishWishNeedToCommunity`
+  // puts a proposal in front of the wisher instead of going through the rikma's
+  // Ask/vote flow (there is no rikma) — see `createVolunteerProposal`, which the
+  // "customize" path (`proposeOnOpenMission`) shares.
   if (!projectId) {
-    // Load the open mission to get the linked ratson + its published name/rate
-    const omRes = await strapi.execute(
-      '51GetOpenMissionById',
-      { id: openMissionId },
-      context.jwt,
-      context.fetch
-    );
-    const omAttrs = omRes?.data?.openMission?.data?.attributes;
-    if (!omAttrs) throw new Error('OpenMission not found');
-
-    const ratsonId = omAttrs.ratson?.data?.id ? String(omAttrs.ratson.data.id) : null;
-    if (!ratsonId) {
-      throw new Error('This mission has no project and no linked wish - cannot apply');
-    }
-
-    // Load the wish so we can (a) link this offer to the exact extracted need it
-    // was published from, and (b) notify the wish owner.
-    const ratRes = await strapi.execute(
-      '105queryRatsonWithProposals',
-      { id: ratsonId },
-      context.jwt,
-      context.fetch
-    );
-    const ratAttrs = ratRes?.data?.ratson?.data?.attributes ?? {};
-    const ownerIds: string[] = (ratAttrs.users_permissions_users?.data ?? []).map((o: any) =>
-      String(o.id)
-    );
-
-    // Resolve which extracted need this open mission was published from. Prefer
-    // the STABLE extracted-component id persisted on the open mission at publish
-    // time (`extractedKey`) — robust against the owner later renaming/reordering
-    // needs. The /concierge/[id] matcher accepts either the array index OR the
-    // component id as `extracted_mission_idx`. Best-effort read: the field may not
-    // be live in Strapi yet, so we fall back to matching by name → array index.
-    let extractedKey: string | null = null;
-    try {
-      const kRes = await strapi.execute(
-        'getOpenMissionExtractedKey',
-        { id: openMissionId },
-        context.jwt,
-        context.fetch
-      );
-      const raw = kRes?.data?.openMission?.data?.attributes?.extractedKey;
-      extractedKey = raw != null && String(raw) !== '' ? String(raw) : null;
-    } catch (e) {
-      console.warn('[applyToMission] extractedKey read failed (field may not be live yet):', e);
-    }
-
-    const extractedMissions: any[] = ratAttrs.extracted_missions ?? [];
-    const omName = String(omAttrs.name ?? '').trim();
-    const matchedIdx = omName
-      ? extractedMissions.findIndex((m: any) => String(m?.name ?? '').trim() === omName)
-      : -1;
-
-    // Value written into covered_missions: the stable component id when we have
-    // it, otherwise the matched array index (legacy/name-match path). If neither
-    // resolves we still create the offer; it just won't auto-attach to a row.
-    const coveredIdxValue =
-      extractedKey != null ? extractedKey : matchedIdx >= 0 ? String(matchedIdx) : null;
-
-    const price = (omAttrs.noofhours ?? 0) * (omAttrs.perhour ?? 0);
-    const coveredMissions =
-      coveredIdxValue != null
-        ? [{ extracted_mission_idx: coveredIdxValue, hours: omAttrs.noofhours ?? null, price }]
-        : [];
-
-    // Create the volunteer offer. `open_mission` is what marks this as a
-    // community-published volunteer (vs a plain offerWishHelp self-offer).
-    const propRes = await strapi.execute(
-      '101createRatsonProposal',
-      {
-        ratson: ratsonId,
-        kind: 'custom_offer',
-        status_proposal: 'suggested',
-        proposer_users: [String(context.userId)],
-        total_price: price,
-        auto_generated: false,
-        open_mission: String(openMissionId),
-        covered_missions: coveredMissions,
-        publishedAt: nowISO
-      },
-      context.jwt,
-      context.fetch
-    );
-    const proposalId = propRes?.data?.createRatsonProposal?.data?.id
-      ? String(propRes.data.createRatsonProposal.data.id)
-      : null;
-    if (!proposalId) throw new Error('Failed to create volunteer proposal for wish');
-
-    // Update user.askeds so the UI can reflect "already applied"
-    const askedsRes = await strapi.execute(
-      '80usersPermissionsUserWithAskeds',
-      { id: context.userId },
-      context.jwt,
-      context.fetch
-    );
-    const existingIds: string[] =
-      askedsRes?.data?.usersPermissionsUser?.data?.attributes?.askeds?.data?.map(
-        (a: any) => String(a.id)
-      ) ?? [];
-    const newAskedIds = [...existingIds, String(openMissionId)];
-    await strapi.execute(
-      '81updateAskeds',
-      { userId: context.userId, askedsList: newAskedIds },
-      context.jwt,
-      context.fetch
-    );
-
-    // Notify the wish owner(s). The action-level `notification` config targets
-    // projectMembers and yields nobody here (no project), so we dispatch an
-    // explicit owner notification with the channels the wisher needs. Fire and
-    // forget — a notification failure must not fail the application.
-    if (notifier && ownerIds.length) {
-      notifier
-        .notify(
-          {
-            recipients: { type: 'specificUsers', config: { userIdsParam: 'recipientIds' } },
-            templates: {
-              title: {
-                he: 'מתנדב/ת חדש/ה למשאלה שלך',
-                en: 'New volunteer for your wish',
-                ar: 'متطوّع جديد لأمنيتك'
-              },
-              body: {
-                he: 'מישהו מהקהילה הציע לבצע משימה שפרסמת. אפשר להיכנס ל־Concierge כדי לאשר.',
-                en: 'Someone from the community offered to do a task you published. Open Concierge to approve.',
-                ar: 'عرض أحد أفراد المجتمع تنفيذ مهمة نشرتها. افتح Concierge للموافقة.'
-              }
-            },
-            channels: ['socket', 'email', 'push'],
-            metadata: { priority: 'high', type: 'ratsonProposal', url: `/concierge/${ratsonId}` }
-          },
-          params,
-          { recipientIds: ownerIds, data: { proposalId, ratsonId, openMissionId } },
-          context
-        )
-        .catch((e: unknown) =>
-          console.warn('[applyToMission] concierge owner notification failed (non-fatal):', e)
-        );
-    }
-
-    return {
-      data: { proposalId, ratsonId, openMissionId, concierge: true, coveredIdx: matchedIdx },
-      updateStrategy: { type: 'none' },
-    };
+    return createVolunteerProposal(strapi, context, notifier, { openMissionId, params });
   }
 
   // Fetch project members + restime in one call

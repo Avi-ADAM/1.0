@@ -6,6 +6,7 @@ import { enrichWish, placeKey, EMPTY_ENRICHMENT, type WishEnrichment } from '$li
 import { extractWish, type WishExtraction } from '$lib/server/ai/extractWish';
 import { GEMINI_API_KEY } from '$env/static/private';
 import { loadBell } from '$lib/server/concierge/bell';
+import { negotiationView } from '$lib/server/wish/negotiationView';
 import { externalConfig } from '$lib/server/concierge/externalConfig';
 import {
   DISABLED_PANEL,
@@ -161,6 +162,15 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
             ? { id: pa.matanot.data.id, name: pa.matanot.data.attributes?.name }
             : null,
           forumId: pa.forum?.data?.id ?? null,
+          // The terms negotiation from her side (C-9): whose move it is and what was said.
+          negotiation: negotiationView(
+            pa,
+            {
+              wisherIds: owners.map((o: any) => String(o.id)),
+              proposerIds: proposerUsers.map((u: any) => String(u.id))
+            },
+            'wisher'
+          ),
           negoIds: (pa.negos?.data ?? []).map((n: any) => n.id),
           currencyName: pa.matbea?.data?.attributes?.name ?? null,
           currencySymbol: pa.matbea?.data?.attributes?.simbol ?? '₪',
