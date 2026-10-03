@@ -7,10 +7,13 @@
  * one path to a placement whoever it was that approved. The silent side is the one
  * whose move it was: the other side signed last.
  *
- *   invitation        → `acceptWishOffer`, as the silent party (provider approving
- *                       the wisher's slot / wisher approving the provider's counter);
+ * Only once the two sides are talking (`silenceApplies`: at least one counter). A
+ * first-contact proposal — the invitation, the volunteer's offer — carries no clock.
+ *
+ *   invitation        → `acceptWishOffer`, as the silent party (the wisher approving
+ *                       the provider's counter / the provider approving the wisher's);
  *   volunteer, silent wisher    → `acceptRatsonProposal` as the wisher, which builds
- *                       the slot and assigns the volunteer;
+ *                       the slot and assigns the volunteer (the volunteer's counter);
  *   volunteer, silent provider  → the provider's approval of the wisher's counter,
  *                       then the wisher's own close — she already put those terms on
  *                       the table, and nobody has to click twice for a silence.
@@ -24,7 +27,7 @@
  */
 
 import { otherParty } from '$lib/wish/proposalRounds.js';
-import { lastSignedAt, proposalDeadline } from '$lib/wish/restime.js';
+import { lastSignedAt, proposalDeadline, silenceApplies } from '$lib/wish/restime.js';
 import { readWishRestime } from './clock.js';
 import { loadWishProposal } from './proposal.js';
 
@@ -67,6 +70,9 @@ export async function matureWishProposal(proposalId: string, taid: string, deps:
   const status = String(p.attrs.status_proposal ?? 'suggested');
   if (!OPEN_PROPOSAL.has(status)) return close(`proposal ${status}`);
   if (!p.path || !p.slot) return close('not negotiated here');
+  // First contact has no clock: until someone counters, neither side has been talking
+  // and silence binds nobody. (Nothing arms such a clock; this closes a stray one.)
+  if (!silenceApplies(p.standing.round)) return close('first contact');
 
   // The clock that fired may be stale: a counter since then, or a longer pace chosen.
   // The deadline is always the last signature plus the wish's pace as it is now.

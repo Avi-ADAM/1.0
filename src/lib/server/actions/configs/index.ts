@@ -90,6 +90,7 @@ import { requestWishMissionConfig } from './requestWishMission.js';
 import { requestWishResourceConfig } from './requestWishResource.js';
 import { counterRatsonProposalConfig } from './counterRatsonProposal.js';
 import { setWishRestimeConfig } from './setWishRestime.js';
+import { hideRatsonProposalConfig } from './hideRatsonProposal.js';
 import { acceptWishOfferConfig } from './acceptWishOffer.js';
 import { declineWishOfferConfig } from './declineWishOffer.js';
 import { materializeWishConfig } from './materializeWish.js';
@@ -386,6 +387,7 @@ export function registerAllActions(): void {
   registerAction(counterRatsonProposalConfig);
   // the wish's own pace — how long the other side has before silence answers for them
   registerAction(setWishRestimeConfig);
+  registerAction(hideRatsonProposalConfig);
   registerAction(declineWishOfferConfig);
   registerAction(materializeWishConfig);
   registerAction(publishWishNeedToCommunityConfig);

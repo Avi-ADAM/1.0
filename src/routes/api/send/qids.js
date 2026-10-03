@@ -2655,6 +2655,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
           ushar
           isSiteShare
           recive_project { data { id } }
+          sheirut { data { id } }
         }
       }
     }
@@ -8617,6 +8618,81 @@ ${STIPEND_DECISION_FIELDS}
   '392getOpenMissionArchived': `query GetOpenMissionArchived($id: ID!) {
     openMission(id: $id) {
       data { id attributes { archived } }
+    }
+  }`,
+
+  // "Hide" instead of "reject" (C-10): the wisher stops seeing a proposal; the provider is
+  // told nothing, because nothing was decided. A separate qid on purpose — a field the
+  // backend does not know yet would break qid 105 and the whole heart if it sat inside them.
+  '393hideRatsonProposal': `mutation HideRatsonProposal($id: ID!, $hidden: Boolean) {
+    updateRatsonProposal(id: $id, data: { hidden_by_wisher: $hidden }) {
+      data { id attributes { hidden_by_wisher } }
+    }
+  }`,
+
+  // The money loop of a wish deal (C-17): what a completed customer payment needs to know
+  // about its sheirut — the rikma, the product, whether it came from a wish (the product's
+  // own `ratson`), what the deal costs and what has already been recorded against it.
+  '395sheirutPaymentContext': `query SheirutPaymentContext($id: ID!) {
+    sheirut(id: $id) {
+      data {
+        id
+        attributes {
+          total
+          quant
+          project { data { id } }
+          matanot { data { id attributes { ratson { data { id } } } } }
+          users_permissions_users { data { id } }
+          sales { data { id attributes { in externalId } } }
+        }
+      }
+    }
+  }`,
+
+  // The customer's payment, recorded as the rikma's income held by whoever received it. Both
+  // sides have attested the money moved (she sent, they received), so the holder claim is
+  // already `confirmed` — no second consent round. The split mechanism takes it from here.
+  '396createSheirutPaymentSale': `mutation CreateSheirutPaymentSale(
+    $project: ID!,
+    $matanot: ID!,
+    $holder: ID!,
+    $customer: ID,
+    $reporter: ID,
+    $sheirut: ID!,
+    $in: Float!,
+    $unit: Float!,
+    $date: DateTime!,
+    $externalId: String
+  ) {
+    createSale(data: {
+      project: $project,
+      matanot: $matanot,
+      users_permissions_user: $holder,
+      customer: $customer,
+      reporter: $reporter,
+      sheiruts: [$sheirut],
+      in: $in,
+      unit: $unit,
+      date: $date,
+      publishedAt: $date,
+      holderStatus: confirmed,
+      externalId: $externalId
+    }) {
+      data { id attributes { in } }
+    }
+  }`,
+
+  // The proposals the caller (idL, replaced with the signed-in user) has hidden on her own
+  // wishes — a best-effort read: before 1.0b is deployed it errors and nothing is hidden.
+  '394hiddenWishProposals': `query HiddenWishProposals($idL: ID!) {
+    ratsonProposals(
+      filters: { and: [
+        { hidden_by_wisher: { eq: true } },
+        { ratson: { users_permissions_users: { id: { eq: $idL } } } }
+      ] }
+      pagination: { limit: 200 }
+    ) {
+      data { id }
     }
   }`,
 

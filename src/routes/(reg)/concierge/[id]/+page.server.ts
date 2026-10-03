@@ -148,7 +148,20 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
       }
       wish.restime = restime;
 
-      const propsNodes = res?.data?.ratsonProposals?.data ?? [];
+      // What the owner chose to hide (C-10) — her own view only, and read on its own for the
+      // same reason as the pace: a backend without the field answers with an error, which
+      // means "nothing is hidden", never a broken page.
+      let hiddenIds = new Set<string>();
+      if (owners.some((o: any) => String(o.id) === String(uid))) {
+        try {
+          const hr: any = await sendToSer({ idL: uid }, '394hiddenWishProposals', 0, 0, false, fetch);
+          hiddenIds = new Set((hr?.data?.ratsonProposals?.data ?? []).map((h: any) => String(h.id)));
+        } catch {
+          /* nothing hidden */
+        }
+      }
+
+      const propsNodes = (res?.data?.ratsonProposals?.data ?? []).filter((p: any) => !hiddenIds.has(String(p.id)));
       proposals = propsNodes.map((p: any) => {
         const pa = p.attributes || {};
         const proposerUsers = pa.proposer_users?.data ?? [];

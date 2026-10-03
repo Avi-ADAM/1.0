@@ -32,6 +32,7 @@ import { isTurnOf } from '$lib/wish/proposalRounds.js';
 import { entryInput, loadWishProposal, requireParty } from '$lib/server/wish/proposal.js';
 import { syncSlotToVersion } from '$lib/server/wish/placement.js';
 import { armProposalClock } from '$lib/server/wish/clock.js';
+import { silenceApplies } from '$lib/wish/restime.js';
 
 /** What the wish chat says when silence, not a person, approved the terms. */
 const AUTO_CHAT = 'התנאים שהוצעו אושרו אוטומטית — הצד השני לא השיב בזמן שנקבע למשאלה.';
@@ -144,9 +145,10 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
     );
     await say(auto ? AUTO_CHAT : 'אישרתי את הגרסה שהוצעה למשימה.');
     await tellSilent('provider');
-    // The turn is the wisher's now (she closes the placement) — her clock starts. A silence
-    // that is already approving goes straight on to close it, so no new clock is armed.
-    if (!auto) await armProposalClock(strapi, context, { proposalId: String(proposalId), ratsonId: String(ratsonId) });
+    // The turn is the wisher's now (she closes the placement) — her clock starts, since the
+    // two sides are talking (a counter is on the table). A silence that is already
+    // approving goes straight on to close it, so no new clock is armed.
+    if (!auto && silenceApplies(p.standing.round)) await armProposalClock(strapi, context, { proposalId: String(proposalId), ratsonId: String(ratsonId) });
     await tell(
       p.wisherIds.filter((id) => id !== me),
       { he: 'המתנדב/ת אישר/ה את הגרסה שלך', en: 'The volunteer approved your version', ar: 'وافق المتطوّع على نسختك' },

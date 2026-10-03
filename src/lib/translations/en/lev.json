@@ -284,6 +284,10 @@
       "processing": "Processing...",
       "accepted": "Volunteer accepted 💗",
       "rejected": "Offer rejected",
+      "hide": "Hide",
+      "hidden": "Proposal hidden",
+      "hideHint": "This proposal will no longer show here; the provider is told nothing",
+      "hideError": "A proposal already under negotiation cannot be hidden — approve it or put other terms on the table",
       "error": "Action failed"
     },
     "common": {

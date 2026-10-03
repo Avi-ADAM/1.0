@@ -12,9 +12,10 @@
  * other side's move: approve it (acceptWishOffer / acceptRatsonProposal) or counter
  * back. Rules: `$lib/wish/proposalRounds`.
  *
- * A counter restarts the silence clock: the other side has the wish's pace (48 h unless
- * its owner chose otherwise) to answer before silence approves for them
- * (`$lib/server/wish/clock`, `matureProposal`).
+ * A counter starts (and every later one restarts) the silence clock — silence only
+ * counts once the two sides are talking, never at first contact: the other side has
+ * the wish's pace (48 h unless its owner chose otherwise) to answer before silence
+ * approves for them (`$lib/server/wish/clock`, `matureProposal`).
  */
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';

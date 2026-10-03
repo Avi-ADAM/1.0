@@ -529,6 +529,10 @@ export const qidsAccess = {
   '390createTimegramaForRatsonProposal': { allow: ['serviceAdmin'] }, // server-only: the actions that sign a version arm the clock
   '391ratsonOfProposal': { allow: ['serviceAdmin'] }, // the silence cron
   '392getOpenMissionArchived': { allow: ['serviceAdmin'] }, // the silence cron
+  '393hideRatsonProposal': { allow: ['serviceAdmin'] }, // server-only: hideRatsonProposal checks the owner and that nothing is being negotiated
+  '394hiddenWishProposals': { allow: ['user', 'serviceAdmin'] }, // $idL is the signed-in user — only her own hidden rows
+  '395sheirutPaymentContext': { allow: ['serviceAdmin'] }, // server-only: confirmSheirutHaluka, once both sides confirmed
+  '396createSheirutPaymentSale': { allow: ['serviceAdmin'] }, // server-only: writes the rikma's income — never from a browser
 
   // matching/engine.ts: always run through StrapiClient with the admin
   // token, never with a user JWT — writes suggestion data for *other* users.

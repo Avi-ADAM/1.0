@@ -2509,6 +2509,7 @@ These are the main content types in the Strapi backend.
 | Field | Type |
 |-------|------|
 | `auto_generated` | `Maybe<Scalars['Boolean']['output']>` |
+| `hidden_by_wisher` | `Maybe<Scalars['Boolean']['output']>` |
 | `covered_missions` | `Maybe<Array<Maybe<ComponentNewCoveredMissions>>>` |
 | `covered_resources` | `Maybe<Array<Maybe<ComponentNewCoveredResources>>>` |
 | `createdAt` | `Maybe<Scalars['DateTime']['output']>` |
@@ -6598,6 +6599,7 @@ Used for creating/updating content.
 | Field | Type |
 |-------|------|
 | `auto_generated` | `InputMaybe<Scalars['Boolean']['input']>` |
+| `hidden_by_wisher` | `InputMaybe<Scalars['Boolean']['input']>` |
 | `covered_missions` | `InputMaybe<Array<InputMaybe<ComponentNewCoveredMissionsInput>>>` |
 | `covered_resources` | `InputMaybe<Array<InputMaybe<ComponentNewCoveredResourcesInput>>>` |
 | `entryCurrency` | `InputMaybe<Scalars['String']['input']>` |
@@ -7834,7 +7836,7 @@ Fields: `access_mode`, `age_group`, `aggregation_opt_out`, `ai_meta`, `allowJoin
 Fields: `and`, `createdAt`, `error`, `finished_at`, `id`, `mode`, `not`, `or`, `proposals_created`, `publishedAt`, `ratson`, `started_at`, `updatedAt`
 
 #### RatsonProposalFiltersInput
-Fields: `and`, `auto_generated`, `covered_missions`, `covered_resources`, `createdAt`, `entryCurrency`, `entryRate`, `final_breakdown`, `forum`, `id`, `kind`, `matanot`, `matbea`, `match_score`, `negos`, `not`, `open_mashaabims`, `open_mission`, `or`, `project`, `proposer_users`, `publishedAt`, `ratson`, `ratson_willingness_entry`, `sheirutpends`, `status_proposal`, `tosplits`, `total_price`, `updatedAt`, `votes`
+Fields: `and`, `auto_generated`, `covered_missions`, `covered_resources`, `createdAt`, `entryCurrency`, `entryRate`, `final_breakdown`, `forum`, `hidden_by_wisher`, `id`, `kind`, `matanot`, `matbea`, `match_score`, `negos`, `not`, `open_mashaabims`, `open_mission`, `or`, `project`, `proposer_users`, `publishedAt`, `ratson`, `ratson_willingness_entry`, `sheirutpends`, `status_proposal`, `tosplits`, `total_price`, `updatedAt`, `votes`
 
 #### RatsonShareFiltersInput
 Fields: `and`, `createdAt`, `halukas`, `id`, `joinedAt`, `leftAt`, `matbea`, `maxContribution`, `not`, `notificationsOn`, `or`, `publishedAt`, `ratson`, `role`, `status_share`, `updatedAt`, `users_permissions_user`

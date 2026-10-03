@@ -1,4 +1,5 @@
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import { recordWishPaymentSale } from '$lib/server/sheirut/paymentSale.js';
 
 // The platform (1💗1) product that site-share income is recorded against.
 // Hardcoded for now per spec (PLAN_SITE_SHARE_PER_MEMBER §5) — to be made
@@ -6,6 +7,10 @@ import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 const SITE_SHARE_PRODUCT_ID = '13';
 
 /**
+ * A customer's payment for a deal is recorded too, as the rikma's income held by whoever
+ * received it, once both sides confirmed (C-17 — `$lib/server/sheirut/paymentSale`), so the
+ * rikma's split mechanism sees it.
+ *
  * When a site-share transfer is fully confirmed (sender sent + receiver got)
  * we record the income as a Sale in the platform rikma, in the RECEIVER's name,
  * against the platform product. Best-effort: a failure here must not roll back
@@ -66,6 +71,8 @@ const confirmSheirutHalukaHandler: ActionExecutionHandler = async (params, conte
     ? String(haluka.recive_project.data.id)
     : null;
   const amount = Number(haluka.amount) || 0;
+  // A customer's payment for a deal (as opposed to a site-share or a stipend transfer).
+  const sheirutId = haluka.sheirut?.data?.id ? String(haluka.sheirut.data.id) : null;
 
   if (role === 'sender') {
     if (String(userId) !== senderId) {
@@ -91,6 +98,8 @@ const confirmSheirutHalukaHandler: ActionExecutionHandler = async (params, conte
         amount,
         halukaId: String(halukaId),
       });
+    } else if (nowComplete && !isSiteShare && sheirutId) {
+      saleId = (await recordWishPaymentSale(strapi, context, { sheirutId, halukaId: String(halukaId), senderId, receiverId, amount })).saleId;
     }
     return { confirmed: true, role: 'sender', halukaId, complete: nowComplete, saleId };
   } else {
@@ -117,6 +126,8 @@ const confirmSheirutHalukaHandler: ActionExecutionHandler = async (params, conte
         amount,
         halukaId: String(halukaId),
       });
+    } else if (nowComplete && !isSiteShare && sheirutId) {
+      saleId = (await recordWishPaymentSale(strapi, context, { sheirutId, halukaId: String(halukaId), senderId, receiverId, amount })).saleId;
     }
     return { confirmed: true, role: 'receiver', halukaId, complete: nowComplete, saleId };
   }

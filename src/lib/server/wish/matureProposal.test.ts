@@ -108,9 +108,29 @@ function setup(o: Opts = {}) {
   return { deps, calls, actions, closed, armed };
 }
 
-describe('the silence of a wish proposal', () => {
-  it('an invitation the invited provider ignored: the wisher’s slot is approved for them', async () => {
+/** The provider put other terms on the table 60 h ago — the two sides are talking. */
+const providerCounter = () => [entry(PROVIDER, 6, 680, hoursAgo(60))];
+/** The wisher did, 60 h ago. */
+const wisherCounter = () => [entry(WISHER, 5, 640, hoursAgo(60))];
+
+describe('first contact has no clock — silence only counts once the two sides are talking', () => {
+  it('an invitation nobody answered, however old, is not approved for the invited provider', async () => {
     const w = setup(); // opened 72 h ago, 48 h pace, nobody answered
+    expect(await matureWishProposal('77', 'T1', w.deps)).toBe('closed:first contact');
+    expect(w.actions).toEqual([]);
+    expect(w.closed).toEqual(['T1']); // a stray clock is closed, not left running
+  });
+
+  it('a volunteer’s offer the wisher never answered does not take on an obligation for her', async () => {
+    const w = setup({ openMission: true });
+    expect(await matureWishProposal('77', 'T1', w.deps)).toBe('closed:first contact');
+    expect(w.actions).toEqual([]);
+  });
+});
+
+describe('the silence of a wish proposal', () => {
+  it('a wisher’s counter the invited provider ignored: approved for them', async () => {
+    const w = setup({ entries: wisherCounter() });
     expect(await matureWishProposal('77', 'T1', w.deps)).toBe('matured');
     expect(w.actions).toEqual([
       { key: 'acceptWishOffer', params: { proposalId: '77', ratsonId: '16', viaSilence: true }, userId: PROVIDER }
@@ -119,15 +139,15 @@ describe('the silence of a wish proposal', () => {
   });
 
   it('a provider’s counter the wisher ignored: approved for the wisher', async () => {
-    const w = setup({ entries: [entry(PROVIDER, 6, 680, hoursAgo(60))] });
+    const w = setup({ entries: providerCounter() });
     expect(await matureWishProposal('77', 'T1', w.deps)).toBe('matured');
     expect(w.actions).toEqual([
       { key: 'acceptWishOffer', params: { proposalId: '77', ratsonId: '16', viaSilence: true }, userId: WISHER }
     ]);
   });
 
-  it('a volunteer’s offer the wisher ignored: her silence closes it — the slot is built', async () => {
-    const w = setup({ openMission: true });
+  it('a volunteer’s counter the wisher ignored: her silence closes it — the slot is built', async () => {
+    const w = setup({ openMission: true, entries: providerCounter() });
     expect(await matureWishProposal('77', 'T1', w.deps)).toBe('matured');
     expect(w.actions.map((a) => [a.key, a.userId])).toEqual([['acceptRatsonProposal', WISHER]]);
   });
@@ -145,7 +165,7 @@ describe('the silence of a wish proposal', () => {
 
 describe('not yet — the pace of the wish decides', () => {
   it('a clock that fired before the deadline is re-armed for the deadline, and this one closed', async () => {
-    const w = setup({ createdAt: hoursAgo(10) });
+    const w = setup({ entries: [entry(PROVIDER, 6, 680, hoursAgo(10))] });
     expect(await matureWishProposal('77', 'T1', w.deps)).toBe('rearmed');
     expect(w.actions).toEqual([]);
     expect(w.armed).toEqual([{ proposalId: '77', at: new Date(NOW.getTime() + 38 * 3600_000).toISOString() }]);
@@ -160,21 +180,21 @@ describe('not yet — the pace of the wish decides', () => {
   });
 
   it('a wish with its own, longer pace is not matured at 48 h', async () => {
-    const w = setup({ restime: 'sevend' }); // 72 h in, a week to answer
+    const w = setup({ restime: 'sevend', entries: [entry(PROVIDER, 6, 680, hoursAgo(72))] }); // 72 h in, a week to answer
     expect(await matureWishProposal('77', 'T1', w.deps)).toBe('rearmed');
     expect(w.actions).toEqual([]);
     expect(w.armed[0].at).toBe(new Date(NOW.getTime() + 96 * 3600_000).toISOString());
   });
 
   it('with no pace on the wish at all (before the field exists) it is the 48 h default', async () => {
-    const w = setup({ restime: null });
+    const w = setup({ restime: null, entries: [entry(PROVIDER, 6, 680, hoursAgo(72))] });
     expect(await matureWishProposal('77', 'T1', w.deps)).toBe('matured');
   });
 });
 
 describe('what silence never does', () => {
   it('builds a second slot for a need someone else already took — the offer lapses instead', async () => {
-    const w = setup({ openMission: true, needTaken: true });
+    const w = setup({ openMission: true, needTaken: true, entries: providerCounter() });
     expect(await matureWishProposal('77', 'T1', w.deps)).toBe('closed:the need was taken');
     expect(w.actions).toEqual([]);
     const lapsed = w.calls.find((c) => c.qid === '102updateRatsonProposal')!;
@@ -199,7 +219,7 @@ describe('what silence never does', () => {
   });
 
   it('leaves the clock open when the approval itself fails — the next run tries again', async () => {
-    const w = setup();
+    const w = setup({ entries: providerCounter() });
     (w.deps.runAction as any).mockResolvedValueOnce({ success: false, error: { message: 'boom' } });
     vi.spyOn(console, 'error').mockImplementation(() => {});
     expect(await matureWishProposal('77', 'T1', w.deps)).toBe('retry');

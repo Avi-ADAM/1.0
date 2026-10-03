@@ -12,7 +12,7 @@ import {
   type ProposalRef,
   type WillingnessEntry
 } from '$lib/wish/proposalRounds.js';
-import { lastSignedAt, proposalDeadline } from '$lib/wish/restime.js';
+import { lastSignedAt, proposalDeadline, silenceApplies } from '$lib/wish/restime.js';
 import { coveredVersion } from './proposal.js';
 
 export interface NegotiationView {
@@ -29,7 +29,8 @@ export interface NegotiationView {
   price: number | null;
   /**
    * When silence answers for whoever's move it is (ISO) — the last signature plus the
-   * wish's pace. Null when the proposal is no longer open or the time is unknown.
+   * wish's pace. Null at first contact (no counter yet: silence binds nobody), when
+   * the proposal is no longer open, or when the time is unknown.
    */
   deadlineAt: string | null;
   /** The negotiation so far, oldest first. */
@@ -73,9 +74,10 @@ export function negotiationView(
     yourTurn: isTurnOf(viewer, st),
     amount: version.amount,
     price: version.price,
-    deadlineAt: OPEN.has(attrs?.status_proposal ?? 'suggested')
-      ? proposalDeadline(lastSignedAt(entries, attrs?.createdAt), restime)
-      : null,
+    deadlineAt:
+      OPEN.has(attrs?.status_proposal ?? 'suggested') && silenceApplies(st.round)
+        ? proposalDeadline(lastSignedAt(entries, attrs?.createdAt), restime)
+        : null,
     counters: st.counters.map((c) => ({
       round: c.round,
       by: c.by,

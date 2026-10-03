@@ -9,13 +9,15 @@
  * Clocks already running follow the new pace — a proposal whose version was signed
  * yesterday is due at "signature + new pace", not at the date it happened to be armed
  * for. (The timegrama run re-arms one that fires early anyway; this only makes a
- * shortened pace take effect on time.)
+ * shortened pace take effect on time.) A first-contact proposal has no clock to move:
+ * silence starts with the first counter.
  */
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { proposalPath } from '$lib/wish/proposalRounds.js';
-import { WISH_RESTIME_VALUES, lastSignedAt, proposalDeadline } from '$lib/wish/restime.js';
+import { WISH_RESTIME_VALUES, lastSignedAt, proposalDeadline, silenceApplies } from '$lib/wish/restime.js';
 import { armProposalClock, writeWishRestime } from '$lib/server/wish/clock.js';
+import { negotiationView } from '$lib/server/wish/negotiationView.js';
 
 const OPEN = new Set(['suggested', 'viewed']);
 
@@ -46,6 +48,10 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
       hasOpenMission: !!a.open_mission?.data?.id
     });
     if (!path) continue;
+    // Only proposals the two sides are already talking about have a clock to move.
+    const proposerIds = (a.proposer_users?.data ?? []).map((u: any) => String(u.id));
+    const view = negotiationView(a, { wisherIds: owners, proposerIds }, 'wisher');
+    if (!view || !silenceApplies(view.round)) continue;
     const due = proposalDeadline(lastSignedAt(a.ratson_willingness_entry, a.createdAt), value);
     if (!due) continue;
     const at = new Date(Math.max(now, Date.parse(due))).toISOString();

@@ -15,13 +15,27 @@ const hoursAgo = (h: number) => new Date(Date.now() - h * 3600_000).toISOString(
 
 function world(opts: { writeFails?: boolean } = {}) {
   const calls: { qid: string; vars: any }[] = [];
+  // The provider (20) put other terms on the table `h` hours ago — the two sides are talking.
+  const talking = (h: number) => [
+    {
+      user: { data: { id: '20' } },
+      agree: false,
+      note: 'השולחן דורש שעתיים נוספות',
+      submittedAt: hoursAgo(h),
+      willingHours: 6,
+      willingAmount: 680
+    }
+  ];
   const proposal = (id: string, over: Record<string, unknown> = {}) => ({
     id,
     attributes: {
       kind: 'existing_project',
       status_proposal: 'suggested',
-      createdAt: hoursAgo(24),
-      ratson_willingness_entry: [],
+      createdAt: hoursAgo(300),
+      proposer_users: { data: [{ id: '20' }] },
+      covered_missions: [{ extracted_mission_idx: '55', hours: 6, price: 680 }],
+      covered_resources: [],
+      ratson_willingness_entry: talking(24),
       matanot: { data: null },
       project: { data: null },
       open_mission: { data: null },
@@ -37,11 +51,12 @@ function world(opts: { writeFails?: boolean } = {}) {
             ratson: { data: { id: '16', attributes: { users_permissions_users: { data: [{ id: OWNER }] } } } },
             ratsonProposals: {
               data: [
-                proposal('1'), // an open invitation
-                proposal('2', { createdAt: hoursAgo(200) }), // overdue even at a week
+                proposal('1'), // an invitation being negotiated: the provider countered 24 h ago
+                proposal('2', { ratson_willingness_entry: talking(200) }), // overdue even at a week
                 proposal('3', { status_proposal: 'accepted' }), // answered
                 proposal('4', { matanot: { data: { id: '9' } } }), // priced by quote, not on this clock
-                proposal('5', { kind: 'custom_offer' }) // a plain self-offer
+                proposal('5', { kind: 'custom_offer' }), // a plain self-offer
+                proposal('6', { ratson_willingness_entry: [] }) // first contact: nobody countered, no clock
               ]
             }
           }
@@ -73,10 +88,11 @@ describe('setWishRestime — the pace of one wish', () => {
     const w = world();
     const out: any = await go(w, { ratsonId: '16', restime: 'sevend' });
     const armed = w.calls.filter((c) => c.qid === '390createTimegramaForRatsonProposal').map((c) => c.vars.ratson_proposal);
-    expect(armed.sort()).toEqual(['1', '2']); // not the accepted one, the product one, or the self-offer
+    // not the accepted one, the product one, the self-offer — nor the one nobody has countered yet
+    expect(armed.sort()).toEqual(['1', '2']);
     expect(out.data.rearmed).toBe(2);
 
-    // proposal 1 was opened 24 h ago: a week from then, i.e. 144 h from now
+    // proposal 1 was last signed 24 h ago: a week from then, i.e. 144 h from now
     const one = w.calls.find((c) => c.qid === '390createTimegramaForRatsonProposal' && c.vars.ratson_proposal === '1')!;
     const fromNow = Date.parse(one.vars.date) - Date.now();
     expect(fromNow).toBeGreaterThan(143.9 * 3600_000);

@@ -69,7 +69,10 @@
     }
   }
 
-  async function handleAction(action: 'accept' | 'reject') {
+  // There is no flat "no" to a stranger's offer (C-10): the wisher approves it, or hides
+  // it — which decides nothing and tells the volunteer nothing. Once she has put terms of
+  // her own on the table it is being negotiated, and hiding is refused.
+  async function handleAction(action: 'accept' | 'hide') {
     if (isProcessing) return;
     isProcessing = true;
     try {
@@ -77,7 +80,7 @@
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          actionKey: action === 'accept' ? 'acceptRatsonProposal' : 'rejectRatsonProposal',
+          actionKey: action === 'accept' ? 'acceptRatsonProposal' : 'hideRatsonProposal',
           params: {
             proposalId: String(buble.id),
             ratsonId: String(buble.ratsonId)
@@ -87,11 +90,11 @@
       const result = await response.json();
       if (!result.success) throw new Error(result.error?.message || 'Failed');
 
-      toast.success(action === 'accept' ? $t('lev.cards.wishOffer.accepted') : $t('lev.cards.wishOffer.rejected'));
+      toast.success(action === 'accept' ? $t('lev.cards.wishOffer.accepted') : $t('lev.cards.wishOffer.hidden'));
       dropOffer();
     } catch (err) {
       console.error(err);
-      toast.error($t('lev.cards.wishOffer.error'));
+      toast.error($t(action === 'hide' ? 'lev.cards.wishOffer.hideError' : 'lev.cards.wishOffer.error'));
     } finally {
       isProcessing = false;
     }
@@ -183,14 +186,15 @@
     </button>
     <button
       type="button"
-      class="flex-1 py-3 bg-white dark:bg-gray-800 border-2 border-red-400 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 font-bold rounded-xl transition-all disabled:opacity-50"
+      class="flex-1 py-3 bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/40 font-bold rounded-xl transition-all disabled:opacity-50"
+      title={$t('lev.cards.wishOffer.hideHint')}
       onclick={(e) => {
         e.stopPropagation();
-        handleAction('reject');
+        handleAction('hide');
       }}
       disabled={isProcessing}
     >
-      {isProcessing ? $t('lev.cards.wishOffer.processing') : $t('lev.cards.wishOffer.reject')}
+      {isProcessing ? $t('lev.cards.wishOffer.processing') : $t('lev.cards.wishOffer.hide')}
     </button>
     <button
       type="button"

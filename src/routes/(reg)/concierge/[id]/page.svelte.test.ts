@@ -402,3 +402,147 @@ describe('/concierge/[id] — the pace of the wish', () => {
     expect(cards(view)).not.toContain('יאושרו אוטומטית');
   });
 });
+
+/* ───────────── C-10: hide, not reject ───────────── */
+
+describe('/concierge/[id] — a first offer can be hidden, never rejected (C-10)', () => {
+  const firstContact = (id = '2') => ({
+    ...proposal(id, 'suggested', 1, 'רון'),
+    negotiation: negotiation({ round: 0, counters: [], signedBy: 'provider', deadlineAt: null })
+  });
+  const hideButton = (view: ReturnType<typeof mount>) =>
+    [...view.container.querySelectorAll('.pcard button')].find((b) => b.textContent?.trim() === 'הסתר') as HTMLElement | undefined;
+
+  it('offers hide on a proposal nobody has countered — and no flat refusal', () => {
+    const view = mount({ proposals: [firstContact()] });
+    expect(hideButton(view)).toBeTruthy();
+    expect(cards(view)).not.toContain('דחייה');
+  });
+
+  it('a proposal with no negotiation view at all (a product, a self-offer) is hidden the same way', () => {
+    const view = mount({ proposals: [proposal('2', 'suggested', 1, 'רון')] });
+    expect(hideButton(view)).toBeTruthy();
+  });
+
+  it('once the two sides are talking there is nothing to hide: approve, or counter', () => {
+    const view = mount({ proposals: [countered()] });
+    expect(hideButton(view)).toBeUndefined();
+    expect(cards(view)).not.toContain('דחייה');
+    expect(cards(view)).toContain('הצעה נגדית');
+  });
+
+  it('a first-contact proposal carries no deadline — silence binds nobody there', () => {
+    const view = mount({ proposals: [firstContact()] });
+    expect(cards(view)).not.toContain('יאושרו אוטומטית');
+  });
+
+  it('hiding goes through hideRatsonProposal, and decides nothing', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({ json: async () => ({ success: true }) });
+    vi.stubGlobal('fetch', fetchMock);
+    const reload = vi.fn();
+    Object.defineProperty(window, 'location', { configurable: true, value: { ...window.location, reload } });
+
+    const view = mount({ proposals: [firstContact('2')] });
+    await fireEvent.click(hideButton(view) as HTMLElement);
+
+    await waitFor(() => expect(fetchMock).toHaveBeenCalled());
+    expect(JSON.parse(fetchMock.mock.calls[0][1].body)).toEqual({
+      actionKey: 'hideRatsonProposal',
+      params: { proposalId: '2', ratsonId: '16' }
+    });
+    await waitFor(() => expect(reload).toHaveBeenCalled());
+  });
+
+  it('a closed proposal can be hidden too — it is only clutter by then', () => {
+    const view = mount({ proposals: [proposal('3', 'rejected', 0, 'גיל')] });
+    // the closed ones are on the declined tab
+    const tab = [...view.container.querySelectorAll('button.tab')].find((b) => b.textContent?.includes('נדחו')) as HTMLElement;
+    tab.click();
+    return tick().then(() => expect(hideButton(view)).toBeTruthy());
+  });
+});
+
+/* ───────────── C-19: closing the consent with parts that have no provider ───────────── */
+
+describe('/concierge/[id] — closing the consent with gaps (C-19)', () => {
+  const closeBtn = (view: ReturnType<typeof mount>) =>
+    [...view.container.querySelectorAll('button')].find((b) => b.textContent?.includes('סגירת ההסכמה')) as HTMLButtonElement;
+  const btnWith = (view: ReturnType<typeof mount>, text: string) =>
+    [...view.container.querySelectorAll('button')].find((b) => b.textContent?.includes(text)) as HTMLButtonElement | undefined;
+
+  function setupFetch() {
+    const fetchMock = vi.fn().mockResolvedValue({ json: async () => ({ success: true }) });
+    vi.stubGlobal('fetch', fetchMock);
+    return fetchMock;
+  }
+
+  // one of the wish's two parts has an approved provider, the other none
+  const gap = () => mount({ proposals: [proposal('1', 'accepted', 0, 'דנה')] });
+
+  it('asks before closing when a part has no approved provider — and says which, and which was a must', async () => {
+    const fetchMock = setupFetch();
+    const view = gap();
+    await fireEvent.click(closeBtn(view));
+    await tick();
+
+    const dialog = view.container.querySelector('.close-gaps') as HTMLElement;
+    expect(dialog).toBeTruthy();
+    expect(dialog.textContent).toContain('ל-1 חלקים עוד אין ספק מאושר');
+    expect(dialog.textContent).toContain('הרכבת מחשב'); // the part with no provider
+    expect(dialog.textContent).not.toContain('נגרות'); // the covered one is not listed
+    expect(dialog.textContent).toContain('סימנת 1 מהם כ״חובה״');
+    expect(fetchMock).not.toHaveBeenCalled(); // nothing was closed by that click
+  });
+
+  it('“close anyway” closes it, through materializeWish', async () => {
+    const fetchMock = setupFetch();
+    const view = gap();
+    await fireEvent.click(closeBtn(view));
+    await tick();
+    await fireEvent.click(btnWith(view, 'סגירה בכל זאת') as HTMLElement);
+
+    await waitFor(() => expect(fetchMock).toHaveBeenCalled());
+    expect(JSON.parse(fetchMock.mock.calls[0][1].body)).toMatchObject({
+      actionKey: 'materializeWish',
+      params: { ratsonId: '16' }
+    });
+  });
+
+  it('“back to the plan” closes nothing and the question goes away', async () => {
+    const fetchMock = setupFetch();
+    const view = gap();
+    await fireEvent.click(closeBtn(view));
+    await tick();
+    await fireEvent.click(btnWith(view, 'חזרה לתכנית') as HTMLElement);
+    await tick();
+    expect(view.container.querySelector('.close-gaps')).toBeNull();
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it('a wish whose every part has a provider closes at once — nothing to warn about', async () => {
+    const fetchMock = setupFetch();
+    const view = mount({ proposals: [proposal('1', 'accepted', 0, 'דנה'), proposal('2', 'accepted', 1, 'רון')] });
+    await fireEvent.click(closeBtn(view));
+    await waitFor(() => expect(fetchMock).toHaveBeenCalled());
+    expect(view.container.querySelector('.close-gaps')).toBeNull();
+    expect(JSON.parse(fetchMock.mock.calls[0][1].body).actionKey).toBe('materializeWish');
+  });
+
+  it('a part that is only a "nice to have" is listed but not counted as a must', async () => {
+    setupFetch();
+    const view = mount({
+      wish: wish({
+        extractedMissions: [
+          { id: 'm1', name: 'נגרות', hoursEst: 4, importance: 'must', notes: '', linkedMissions: [] },
+          { id: 'm2', name: 'הרכבת מחשב', hoursEst: 2, importance: 'nice', notes: '', linkedMissions: [] }
+        ]
+      }),
+      proposals: [proposal('1', 'accepted', 0, 'דנה')]
+    });
+    await fireEvent.click(closeBtn(view));
+    await tick();
+    const dialog = view.container.querySelector('.close-gaps') as HTMLElement;
+    expect(dialog.textContent).toContain('הרכבת מחשב');
+    expect(dialog.textContent).not.toContain('כ״חובה״');
+  });
+});

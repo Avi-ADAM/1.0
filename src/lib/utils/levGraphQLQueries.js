@@ -174,6 +174,29 @@ export async function fetchResourceMatchSuggestions(idL) {
 }
 
 /**
+ * The ids of the wish proposals the current user has hidden on her own wishes (C-10).
+ * Best-effort by design: a backend that does not have the `hidden_by_wisher` field yet
+ * answers with an error, which callers read as "nothing is hidden".
+ *
+ * @param {string | number} idL - The user ID (replaced with the cookie user on the server)
+ * @returns {Promise<string[]>}
+ */
+export async function fetchHiddenWishProposalIds(idL) {
+  try {
+    const response = await fetch('/api/send', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ data: { queId: '394hiddenWishProposals', arg: { idL } } })
+    });
+    if (!response.ok) return [];
+    const res = await response.json();
+    return (res?.data?.ratsonProposals?.data ?? []).map((/** @type {any} */ p) => String(p.id));
+  } catch {
+    return [];
+  }
+}
+
+/**
  * Fetch a single quantum slice of lev data.
  *
  * Uses the mini-userData envelope pattern: every slice query returns

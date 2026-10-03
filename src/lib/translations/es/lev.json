@@ -285,6 +285,10 @@
       "processing": "Procesando...",
       "accepted": "Voluntario aceptado 💗",
       "rejected": "Oferta rechazada",
+      "hide": "Ocultar",
+      "hidden": "Propuesta oculta",
+      "hideHint": "Esta propuesta ya no se mostrará aquí; quien la hizo no recibe ningún aviso",
+      "hideError": "No se puede ocultar una propuesta que ya se está negociando: apruébala o propón otras condiciones",
       "error": "Error al realizar la acción"
     },
     "common": {

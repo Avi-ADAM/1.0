@@ -1,10 +1,11 @@
 /**
  * The silence clock of a wish proposal (QA_CONCIERGE_E2E C-9).
  *
- * Every time a version is put on the table — a proposal opened, a counter made, a
- * counter approved by the side that still needs the other to close it — the other
- * side has the wish's pace (`restime`, 48 h unless its owner chose otherwise) to
- * answer. A timegrama with `whatami: 'ratson_proposal'` carries it; the timegrama
+ * Once the two sides are talking (`silenceApplies`: at least one counter) every time a
+ * version is put on the table — a counter made, a counter approved by the side that
+ * still needs the other to close it — the other side has the wish's pace (`restime`,
+ * 48 h unless its owner chose otherwise) to answer. A proposal nobody has countered yet
+ * is first contact and has no clock. A timegrama with `whatami: 'ratson_proposal'` carries it; the timegrama
  * cron matures it (`matureProposal.ts`) by approving the version for whoever stayed
  * silent. A new clock re-points the proposal's one-to-one `timegrama` relation, so
  * the old one is left orphaned and the dispatcher closes it as "target deleted".

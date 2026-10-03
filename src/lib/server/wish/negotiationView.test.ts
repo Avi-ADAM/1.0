@@ -60,21 +60,39 @@ describe('negotiationView — what a card is told, from one side', () => {
     expect(negotiationView(attrs({ kind: 'custom_offer' }), parties, 'provider')).toBeNull();
   });
 
-  it('tells when silence answers: the last signature plus the wish’s pace — 48 h unless it chose otherwise', () => {
+  it('first contact has no deadline: nobody has countered, so silence binds nobody', () => {
     const opened = attrs({ createdAt: '2026-10-01T10:00:00.000Z' });
-    expect(negotiationView(opened, parties, 'provider')!.deadlineAt).toBe('2026-10-03T10:00:00.000Z');
-    expect(negotiationView(opened, parties, 'provider', 'sevend')!.deadlineAt).toBe('2026-10-08T10:00:00.000Z');
+    expect(negotiationView(opened, parties, 'provider')!.deadlineAt).toBeNull();
+    const volunteer = attrs({ kind: 'custom_offer', open_mission: { data: { id: '9' } }, createdAt: '2026-10-01T10:00:00.000Z' });
+    expect(negotiationView(volunteer, parties, 'wisher')!.deadlineAt).toBeNull();
+  });
 
-    // a counter restarts it
+  it('once the two sides are talking, tells when silence answers: the last signature plus the wish’s pace — 48 h unless it chose otherwise', () => {
     const countered = attrs({
       createdAt: '2026-10-01T10:00:00.000Z',
       ratson_willingness_entry: [{ ...counter('20', 6, 680, 'x x x x x x x x'), submittedAt: '2026-10-02T09:00:00.000Z' }]
     });
     expect(negotiationView(countered, parties, 'wisher')!.deadlineAt).toBe('2026-10-04T09:00:00.000Z');
+    expect(negotiationView(countered, parties, 'wisher', 'sevend')!.deadlineAt).toBe('2026-10-09T09:00:00.000Z');
+
+    // another counter restarts it
+    const again = attrs({
+      createdAt: '2026-10-01T10:00:00.000Z',
+      ratson_willingness_entry: [
+        { ...counter('20', 6, 680, 'x x x x x x x x'), submittedAt: '2026-10-02T09:00:00.000Z' },
+        { ...counter('10', 5, 640, 'y y y y y y y y'), submittedAt: '2026-10-03T20:00:00.000Z' }
+      ]
+    });
+    expect(negotiationView(again, parties, 'provider')!.deadlineAt).toBe('2026-10-05T20:00:00.000Z');
   });
 
   it('has no deadline once the proposal is closed', () => {
-    expect(negotiationView(attrs({ status_proposal: 'accepted', createdAt: '2026-10-01T10:00:00.000Z' }), parties, 'provider')!.deadlineAt).toBeNull();
+    const closed = attrs({
+      status_proposal: 'accepted',
+      createdAt: '2026-10-01T10:00:00.000Z',
+      ratson_willingness_entry: [{ ...counter('20', 6, 680, 'x x x x x x x x'), submittedAt: '2026-10-02T09:00:00.000Z' }]
+    });
+    expect(negotiationView(closed, parties, 'provider')!.deadlineAt).toBeNull();
   });
 
   it('says nothing for a proposal that covers no single slot', () => {

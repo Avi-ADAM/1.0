@@ -13,6 +13,15 @@
  * cards (the deadline they show) read the same numbers from here.
  */
 
+/**
+ * Silence is consent only **once the two sides are talking** — never at first contact.
+ * A proposal nobody has answered yet (the invitation the wisher sent, the offer a
+ * volunteer made) has no clock: no one is bound by a message they may not have read.
+ * The clock starts with the first counter, because that is the moment both sides have
+ * put something on the table and a version exists that each has taken part in.
+ */
+export const silenceApplies = (round: number): boolean => round >= 1;
+
 export const WISH_RESTIME_VALUES = ['feh', 'sth', 'nsh', 'sevend'] as const;
 export type WishRestime = (typeof WISH_RESTIME_VALUES)[number];
 

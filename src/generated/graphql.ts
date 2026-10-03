@@ -16614,6 +16614,7 @@ export type RatsonMatchJobRelationResponseCollection = {
 export type RatsonProposal = {
   __typename?: 'RatsonProposal';
   auto_generated?: Maybe<Scalars['Boolean']['output']>;
+  hidden_by_wisher?: Maybe<Scalars['Boolean']['output']>;
   covered_missions?: Maybe<Array<Maybe<ComponentNewCoveredMissions>>>;
   covered_resources?: Maybe<Array<Maybe<ComponentNewCoveredResources>>>;
   createdAt?: Maybe<Scalars['DateTime']['output']>;
@@ -16728,6 +16729,7 @@ export type RatsonProposalEntityResponseCollection = {
 export type RatsonProposalFiltersInput = {
   and?: InputMaybe<Array<InputMaybe<RatsonProposalFiltersInput>>>;
   auto_generated?: InputMaybe<BooleanFilterInput>;
+  hidden_by_wisher?: InputMaybe<BooleanFilterInput>;
   covered_missions?: InputMaybe<ComponentNewCoveredMissionsFiltersInput>;
   covered_resources?: InputMaybe<ComponentNewCoveredResourcesFiltersInput>;
   createdAt?: InputMaybe<DateTimeFilterInput>;
@@ -16761,6 +16763,7 @@ export type RatsonProposalFiltersInput = {
 
 export type RatsonProposalInput = {
   auto_generated?: InputMaybe<Scalars['Boolean']['input']>;
+  hidden_by_wisher?: InputMaybe<Scalars['Boolean']['input']>;
   covered_missions?: InputMaybe<Array<InputMaybe<ComponentNewCoveredMissionsInput>>>;
   covered_resources?: InputMaybe<Array<InputMaybe<ComponentNewCoveredResourcesInput>>>;
   entryCurrency?: InputMaybe<Scalars['String']['input']>;

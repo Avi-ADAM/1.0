@@ -203,6 +203,7 @@
         : null;
       lines.push({
         label: item.name,
+        imp: item.importance === 'must' ? 'must' : 'nice',
         provider: matching
           ? `${matching.proposerName}${matching.proposerProject?.name ? ' · ' + matching.proposerProject.name : ''}`
           : null,
@@ -1217,7 +1218,7 @@
   let activeTab = $state('active');
   let extractionApproved = $state(true);
   let proposalBusy = $state(
-    /** @type {Record<string, 'accepting' | 'rejecting' | null>} */ ({})
+    /** @type {Record<string, 'accepting' | 'hiding' | null>} */ ({})
   );
   let proposalError = $state('');
   const isOwner = $derived(!!data?.isOwner);
@@ -1228,7 +1229,7 @@
     proposalBusy = {
       ...proposalBusy,
       [proposalId]:
-        actionKey === 'acceptRatsonProposal' ? 'accepting' : 'rejecting'
+        actionKey === 'acceptRatsonProposal' ? 'accepting' : 'hiding'
     };
     proposalError = '';
     try {
@@ -1241,7 +1242,7 @@
         })
       });
       const out = await res.json();
-      if (!out?.success) throw new Error(out?.error || 'הפעולה נכשלה');
+      if (!out?.success) throw new Error(out?.error?.message || out?.error || 'הפעולה נכשלה');
       // Soft refresh — reload the page to pick up new server state.
       window.location.reload();
     } catch (err) {
@@ -1252,7 +1253,10 @@
     }
   }
   const acceptProposal = (id) => callProposalAction('acceptRatsonProposal', id);
-  const rejectProposal = (id) => callProposalAction('rejectRatsonProposal', id);
+  // There is no flat "no" to a stranger's proposal (C-10): a first-contact one can only be
+  // hidden — nothing is decided and the provider is told nothing. One being negotiated is
+  // answered with an approval or a counter instead.
+  const hideProposal = (id) => callProposalAction('hideRatsonProposal', id);
 
   /* ===== The pace of the wish (QA C-9) =====
    * Silence is consent, at the pace of the wish: when the other side of a proposal does not
@@ -1386,6 +1390,19 @@
     isOwner && acceptedProviderCount > 0 && !consentClosed
   );
 
+  /* Closing opens the rikma and the deal with the parts that have an approved provider —
+   * the others are left out. Closing while some have none is allowed (it is her wish), but
+   * never silently (C-19): she is told which, and which of them she marked as a must, and
+   * confirms. */
+  const UNFILLED = $derived(TOTAL_LINES.filter((l) => l.status !== 'accepted'));
+  const UNFILLED_MUST = $derived(UNFILLED.filter((l) => l.imp === 'must'));
+  let confirmingClose = $state(false);
+  function askToClose() {
+    if (!readyToClose || materializeBusy) return;
+    if (UNFILLED.length > 0) confirmingClose = true;
+    else closeConsent();
+  }
+
   /* The customer's own picture for the rikma that closing opens. Optional —
    * without one the server uses the wish's logo, else makes a concierge-medal
    * picture from the product's name (materializeWish → rikmaPicture). */
@@ -1429,6 +1446,7 @@
 
   async function closeConsent() {
     if (!wishId || materializeBusy || picBusy) return;
+    confirmingClose = false;
     materializeBusy = true;
     materializeError = '';
     try {
@@ -2273,6 +2291,16 @@
                             ? $t('concierge.prov_expired')
                             : $t('concierge.prov_rejected')}</span
                         >
+                        {#if p.proposalId && isOwner}
+                          <button
+                            class="btn-ghost"
+                            style="padding:4px 10px;font-size:11px"
+                            title={$t('concierge.hide_hint')}
+                            disabled={!!proposalBusy[p.proposalId]}
+                            onclick={() => hideProposal(p.proposalId)}
+                            >{proposalBusy[p.proposalId] === 'hiding' ? '⏳' : $t('concierge.hide')}</button
+                          >
+                        {/if}
                       {:else if p.status === 'accepted' && p.kind === 'existing_matanot'}
                         <span
                           class="sbadge pending"
@@ -2320,13 +2348,16 @@
                                 >⇄ {$t('concierge.neg_counter')}</button
                               >
                             {/if}
-                            <button
-                              class="btn-ghost"
-                              style="padding:6px 12px;font-size:12px"
-                              disabled={!!busy}
-                              onclick={() => rejectProposal(p.proposalId)}
-                              >{busy === 'rejecting' ? '⏳' : 'דחייה'}</button
-                            >
+                            {#if !p.negotiation || p.negotiation.round === 0}
+                              <button
+                                class="btn-ghost"
+                                style="padding:6px 12px;font-size:12px"
+                                title={$t('concierge.hide_hint')}
+                                disabled={!!busy}
+                                onclick={() => hideProposal(p.proposalId)}
+                                >{busy === 'hiding' ? '⏳' : $t('concierge.hide')}</button
+                              >
+                            {/if}
                           </div>
                         {/if}
                       {:else if p.proposalId}
@@ -2958,7 +2989,7 @@
                   ? 1
                   : 0.5}"
                 disabled={!readyToClose || materializeBusy}
-                onclick={closeConsent}
+                onclick={askToClose}
                 >{materializeBusy
                   ? '⏳ סגירה…'
                   : consentClosed
@@ -2973,6 +3004,43 @@
                 >
               {/if}
             </div>
+            {#if confirmingClose}
+              <div class="close-gaps" role="alertdialog" aria-labelledby="close-gaps-title">
+                <div id="close-gaps-title" class="close-gaps-title">
+                  {$t('concierge.consent_gaps_title', { count: UNFILLED.length })}
+                </div>
+                {#if UNFILLED_MUST.length > 0}
+                  <div class="close-gaps-must">
+                    {$t('concierge.consent_gaps_must', { count: UNFILLED_MUST.length })}
+                  </div>
+                {/if}
+                <ul class="close-gaps-list">
+                  {#each UNFILLED as line (line.label)}
+                    <li>
+                      {line.label}
+                      {#if line.imp === 'must'}<span class="chip must">{$t('concierge.consent_gaps_chip')}</span>{/if}
+                    </li>
+                  {/each}
+                </ul>
+                <div class="close-gaps-note">{$t('concierge.consent_gaps_note')}</div>
+                <div style="display:flex;gap:8px;margin-top:10px">
+                  <button
+                    type="button"
+                    class="btn-ghost"
+                    style="flex:1;justify-content:center"
+                    onclick={() => (confirmingClose = false)}
+                    >{$t('concierge.consent_gaps_back')}</button
+                  >
+                  <button
+                    type="button"
+                    class="btn-jewel"
+                    style="flex:1;justify-content:center"
+                    disabled={materializeBusy}
+                    onclick={closeConsent}>{$t('concierge.consent_gaps_confirm')}</button
+                  >
+                </div>
+              </div>
+            {/if}
             {#if materializeError}
               <div
                 style="margin-top:10px;padding:9px 13px;background:rgb(var(--cg-pink-rgb) / .06);border:1px solid rgb(var(--cg-pink-rgb) / .3);border-radius:10px;font-family:'Bellefair',serif;font-size:13px;color:var(--cg-pink)"
@@ -3978,6 +4046,36 @@
     margin: 8px 0 0;
     font-family: 'Bellefair', serif;
     font-size: 12px;
+    color: var(--cg-muted);
+  }
+
+  /* closing the consent while some parts have no approved provider (C-19) */
+  .close-gaps {
+    margin-top: 12px;
+    padding: 12px 14px;
+    border: 1px solid rgb(var(--cg-gold-rgb) / 0.4);
+    border-radius: 12px;
+    background: rgb(var(--cg-gold-rgb) / 0.06);
+    font-family: 'Bellefair', serif;
+    color: var(--cg-ink);
+  }
+  .close-gaps-title {
+    font-size: 15px;
+    color: var(--cg-goldhi);
+  }
+  .close-gaps-must {
+    margin-top: 4px;
+    font-size: 13px;
+    color: var(--cg-pink);
+  }
+  .close-gaps-list {
+    margin: 8px 0 0;
+    padding-inline-start: 18px;
+    font-size: 14px;
+  }
+  .close-gaps-note {
+    margin-top: 8px;
+    font-size: 13px;
     color: var(--cg-muted);
   }
 

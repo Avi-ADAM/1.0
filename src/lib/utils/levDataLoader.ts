@@ -64,7 +64,12 @@ import {
   extractPurchases,
   extractWishOffers
 } from './levDataExtractors';
-import { fetchMainUserData, fetchMatchSuggestions, fetchResourceMatchSuggestions } from './levGraphQLQueries';
+import {
+  fetchMainUserData,
+  fetchMatchSuggestions,
+  fetchResourceMatchSuggestions,
+  fetchHiddenWishProposalIds
+} from './levGraphQLQueries';
 import { executeAction } from '$lib/client/actionClient';
 import { resolvePlatformIdentity } from '$lib/stores/platformStore';
 
@@ -191,6 +196,7 @@ async function doInitializeLevData(
         freshData.data.usersPermissionsUser.data,
         userId
       );
+      await dropHiddenWishOffers(userId);
 
       console.log('💾 [levDataLoader] Saving new snapshot');
       saveCurrentSnapshot();
@@ -541,6 +547,18 @@ export function clearAllData(): void {
  * Falls back to whatever populateStores already put in the stores on any
  * failure — never throws.
  */
+async function dropHiddenWishOffers(userId: string | number) {
+  // The wisher hid these (C-10) — they stay out of her heart. Read on its own so the main
+  // user query never carries a field the backend may not have yet; never throws.
+  try {
+    const hidden = new Set(await fetchHiddenWishProposalIds(userId));
+    if (hidden.size === 0) return;
+    wishOffersStore.update((curr) => curr.filter((o) => !hidden.has(String(o.id))));
+  } catch (err) {
+    console.warn('⚠️ [levDataLoader] Could not read hidden wish offers', err);
+  }
+}
+
 async function loadSuggestionsFromMatchRecords(userData: any, userId: string | number) {
   let missionRecords: any[] = [];
   let resourceRecords: any[] = [];

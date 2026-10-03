@@ -5,8 +5,17 @@ import {
   normalizeRestime,
   proposalDeadline,
   restimeHours,
-  restimeMs
+  restimeMs,
+  silenceApplies
 } from './restime.js';
+
+describe('when silence starts to count', () => {
+  it('never at first contact — only once the two sides are talking (a counter exists)', () => {
+    expect(silenceApplies(0)).toBe(false); // the invitation / the volunteer's offer, unanswered
+    expect(silenceApplies(1)).toBe(true);
+    expect(silenceApplies(4)).toBe(true);
+  });
+});
 
 describe('the pace of a wish', () => {
   it('is 48 hours unless its owner chose otherwise', () => {
