@@ -14,8 +14,10 @@ const executeAction = vi.fn();
 vi.mock('$lib/client/actionClient', () => ({ executeAction: (...a: unknown[]) => executeAction(...a) }));
 vi.mock('svelte-sonner', () => ({ toast: Object.assign(vi.fn(), { success: vi.fn(), error: vi.fn() }) }));
 vi.mock('$lib/translations', () => ({
-  t: readable((key: string) => key),
-  isRtl: readable(true)
+  // a key, and the values it was given — so a formatted date is visible to the test
+  t: readable((key: string, vars?: Record<string, unknown>) => (vars ? `${key} ${JSON.stringify(vars)}` : key)),
+  isRtl: readable(true),
+  locale: readable('en')
 }));
 vi.mock('$lib/stores/lang.js', () => ({ lang: readable('he') }));
 vi.mock('$lib/components/money/Money.svelte', () => ({ default: () => {} }));
@@ -112,6 +114,39 @@ describe('AcceptWishOffer — the counter', () => {
 
     await waitFor(() => expect(baseElement.querySelector('[role="alert"]')?.textContent).toContain('other side'));
     expect(baseElement.querySelector('textarea')).toBeTruthy();
+  });
+});
+
+describe('AcceptWishOffer — when silence answers', () => {
+  const base = {
+    canCounter: true,
+    round: 0,
+    yourTurn: true,
+    amount: 4,
+    price: 600,
+    counters: [],
+    deadlineAt: '2026-10-12T14:30:00.000Z'
+  };
+
+  it('tells the provider how long they have, in their language’s own words', () => {
+    const { baseElement } = render(AcceptWishOffer as any, { props: props({ negotiation: base }) });
+    expect(baseElement.textContent).toContain('deals.negDeadlineYou');
+    expect(baseElement.textContent).toContain('Oct'); // formatted by the runtime in the reader's language, not left as an ISO string
+  });
+
+  it('when it is the wisher’s move it says so instead', () => {
+    const { baseElement } = render(AcceptWishOffer as any, {
+      props: props({ negotiation: { ...base, yourTurn: false } })
+    });
+    expect(baseElement.textContent).toContain('deals.negDeadlineThem');
+    expect(baseElement.textContent).not.toContain('deals.negDeadlineYou');
+  });
+
+  it('says nothing when there is no deadline', () => {
+    const { baseElement } = render(AcceptWishOffer as any, {
+      props: props({ negotiation: { ...base, deadlineAt: null } })
+    });
+    expect(baseElement.textContent).not.toContain('negDeadline');
   });
 });
 

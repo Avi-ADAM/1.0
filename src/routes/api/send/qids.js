@@ -8584,6 +8584,42 @@ ${STIPEND_DECISION_FIELDS}
     }
   }`,
 
+  // The wish's own pace — how long the other side has before silence answers for them.
+  // Read and written on their own, never inside qid 105: Ratson.restime exists only once
+  // 1.0b is deployed, and a field the backend does not know would fail the whole wish page
+  // rather than just this lookup (callers fall back to the 48 h default).
+  '388getRatsonRestime': `query GetRatsonRestime($id: ID!) {
+    ratson(id: $id) {
+      data { id attributes { restime } }
+    }
+  }`,
+
+  '389setRatsonRestime': `mutation SetRatsonRestime($id: ID!, $restime: ENUM_RATSON_RESTIME) {
+    updateRatson(id: $id, data: { restime: $restime }) {
+      data { id attributes { restime } }
+    }
+  }`,
+
+  // The silence clock of a wish proposal. The whatami is the relation's own name —
+  // the timegrama dispatcher reads attributes[whatami] — exactly as for roster_period.
+  '390createTimegramaForRatsonProposal': `mutation CreateTimegramaForRatsonProposal($date: DateTime, $ratson_proposal: ID) {
+    createTimegrama(data: { date: $date, whatami: "ratson_proposal", ratson_proposal: $ratson_proposal, done: false }) {
+      data { id }
+    }
+  }`,
+
+  '391ratsonOfProposal': `query RatsonOfProposal($id: ID!) {
+    ratsonProposal(id: $id) {
+      data { id attributes { status_proposal ratson { data { id } } } }
+    }
+  }`,
+
+  '392getOpenMissionArchived': `query GetOpenMissionArchived($id: ID!) {
+    openMission(id: $id) {
+      data { id attributes { archived } }
+    }
+  }`,
+
   '112commitWishWillingness': `mutation CommitWishWillingness(
     $id: ID!,
     $status_proposal: ENUM_RATSONPROPOSAL_STATUS_PROPOSAL,

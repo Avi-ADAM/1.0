@@ -524,6 +524,11 @@ export const qidsAccess = {
   '285setMatanotDiscovery': { allow: ['serviceAdmin'] },
   '386counterFiniapruval': { allow: ['serviceAdmin'] }, // server-only: counterFiniapruval checks membership + turn
   '387counterRatsonProposal': { allow: ['serviceAdmin'] }, // server-only: counterRatsonProposal checks party + turn
+  '388getRatsonRestime': { allow: ['user', 'serviceAdmin'] }, // the wish's pace — read by whoever sees its proposals
+  '389setRatsonRestime': { allow: ['serviceAdmin'] }, // server-only: setWishRestime checks the owner
+  '390createTimegramaForRatsonProposal': { allow: ['serviceAdmin'] }, // server-only: the actions that sign a version arm the clock
+  '391ratsonOfProposal': { allow: ['serviceAdmin'] }, // the silence cron
+  '392getOpenMissionArchived': { allow: ['serviceAdmin'] }, // the silence cron
 
   // matching/engine.ts: always run through StrapiClient with the admin
   // token, never with a user JWT — writes suggestion data for *other* users.

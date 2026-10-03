@@ -25,6 +25,8 @@ import { Tosplit } from './tosplit.svelte';
 import { Maap } from './maap.svelte';
 import { Sheirutpend } from './sheirutpend.svelte';
 import { Askwant } from './askwant.svelte';
+import { WishProposal } from './wishProposal';
+import { wishClockEnabled } from '$lib/server/wish/mode.js';
 import { matureRosterPeriod } from '$lib/server/shifts/engine.js';
 import { asService } from '$lib/server/shifts/exec.js';
 import { shiftsEnabled, shiftsMode } from '$lib/server/shifts/mode.js';
@@ -57,7 +59,10 @@ const HANDLED_KINDS = new Set([
   // A roster cycle's objection window has run out (docs/inprogress/PLAN_SHIFTS.md §7).
   // The whatami is the relation's own name — the dispatcher reads
   // `attributes[whatami]` — so it is `roster_period`, not `rosterPeriod`.
-  'roster_period'
+  'roster_period',
+  // A wish proposal's terms nobody answered within the wish's pace (QA C-9). Like
+  // roster_period, the relation only exists once 1.0b is deployed — see wishClockEnabled.
+  'ratson_proposal'
 ]);
 
 /**
@@ -104,7 +109,13 @@ const RELATION_FIELDS = [
  * ever switched after the deploy.
  */
 function relationFields() {
-  return shiftsEnabled() ? [...RELATION_FIELDS, 'roster_period'] : RELATION_FIELDS;
+  // Each optional relation only joins the query once its schema is live: one unknown field
+  // would fail the whole query and stop every consent clock on the platform.
+  return [
+    ...RELATION_FIELDS,
+    ...(shiftsEnabled() ? ['roster_period'] : []),
+    ...(wishClockEnabled() ? ['ratson_proposal'] : [])
+  ];
 }
 
 /** Close a clock. Every "we are not acting on this" path ends here. */
@@ -175,6 +186,10 @@ async function x(id, kind, taid, fetch) {
     // Someone asked to receive a service. Matures only once a member said yes
     // (PLAN_TIMEGRAMA D2).
     await Askwant(id, taid);
+  } else if (kind == 'ratson_proposal') {
+    // The terms of a wish proposal nobody answered within the wish's pace: the version on
+    // the table is approved for the side that stayed silent (C-9).
+    await WishProposal(id, taid, fetch);
   }
 }
 
@@ -216,6 +231,11 @@ export async function GET({ fetch }) {
       // below would read it as a deleted target and close a live clock. Leave
       // it standing instead: when shifts come back on, it matures as normal.
       if (kind === 'roster_period' && !shiftsEnabled()) {
+        stats.waiting++;
+        continue;
+      }
+      // Same for the wish clock: its relation is not in the query while WISH_CLOCK is off.
+      if (kind === 'ratson_proposal' && !wishClockEnabled()) {
         stats.waiting++;
         continue;
       }

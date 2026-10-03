@@ -12,7 +12,12 @@
  * This used to live inline in `applyToMission`, which is the only path that handled
  * a rikma-less mission; the "customize" path (`proposeOnOpenMission`) did not and
  * died asking Strapi for the members of project "" (C-9). Both now come here.
+ *
+ * The wisher's time to answer starts when the offer is put in front of her (the wish's
+ * pace, 48 h unless its owner chose otherwise — `$lib/server/wish/clock`).
  */
+
+import { armProposalClock } from './clock.js';
 
 type Strapi = { execute: (qid: string, vars: any, jwt: string, fetch: any) => Promise<any> };
 type Ctx = { userId: string; jwt: string; fetch: any };
@@ -151,6 +156,9 @@ export async function createVolunteerProposal(
       console.warn('[volunteerProposal] could not log the volunteer’s own terms (non-fatal):', e);
     }
   }
+
+  // The wisher's time to answer starts now.
+  await armProposalClock(strapi, context, { proposalId, ratsonId });
 
   // Update user.askeds so the UI can reflect "already applied"
   const askedsRes = await strapi.execute('80usersPermissionsUserWithAskeds', { id: context.userId }, context.jwt, context.fetch);

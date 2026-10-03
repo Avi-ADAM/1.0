@@ -346,3 +346,59 @@ describe('/concierge/[id] — negotiating a provider’s terms (C-9)', () => {
     await waitFor(() => expect(reload).toHaveBeenCalled());
   });
 });
+
+/* ───────────── C-9: the pace of the wish — silence is consent ───────────── */
+
+describe('/concierge/[id] — the pace of the wish', () => {
+  it('shows the owner the pace — 48 hours unless they chose another — and offers the four a rikma does', () => {
+    const view = mount();
+    const select = view.container.querySelector('#pace-sel') as HTMLSelectElement;
+    expect(select).toBeTruthy();
+    expect(select.value).toBe('feh');
+    expect([...select.options].map((o) => o.value)).toEqual(['feh', 'sth', 'nsh', 'sevend']);
+    expect(view.container.textContent).toContain('שתיקה היא הסכמה');
+  });
+
+  it('shows the pace the wish already has', () => {
+    const view = mount({ wish: wish({ restime: 'sevend' }) });
+    expect((view.container.querySelector('#pace-sel') as HTMLSelectElement).value).toBe('sevend');
+  });
+
+  it('is the owner’s to change — nobody else is offered it', () => {
+    const view = mount({ isOwner: false });
+    expect(view.container.querySelector('#pace-sel')).toBeNull();
+  });
+
+  it('changing it goes through setWishRestime', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({ json: async () => ({ success: true }) });
+    vi.stubGlobal('fetch', fetchMock);
+    const reload = vi.fn();
+    Object.defineProperty(window, 'location', { configurable: true, value: { ...window.location, reload } });
+
+    const view = mount();
+    const select = view.container.querySelector('#pace-sel') as HTMLSelectElement;
+    await fireEvent.change(select, { target: { value: 'sth' } });
+
+    await waitFor(() => expect(fetchMock).toHaveBeenCalled());
+    expect(JSON.parse(fetchMock.mock.calls[0][1].body)).toEqual({
+      actionKey: 'setWishRestime',
+      params: { ratsonId: '16', restime: 'sth' }
+    });
+    await waitFor(() => expect(reload).toHaveBeenCalled());
+  });
+
+  it('says on a provider’s card when silence will answer — to whoever’s move it is, and to the one waiting', () => {
+    const when = '2026-10-12T14:30:00.000Z';
+    const mine = mount({ proposals: [countered({ deadlineAt: when })] });
+    expect(cards(mine)).toContain('יש לך עד');
+    expect(cards(mine)).toContain('יאושרו אוטומטית');
+
+    const theirs = mount({ proposals: [countered({ deadlineAt: when, yourTurn: false, signedBy: 'wisher' })] });
+    expect(cards(theirs)).toContain('הצד השני יכול להשיב עד');
+  });
+
+  it('shows no deadline once a proposal is closed', () => {
+    const view = mount({ proposals: [countered({ deadlineAt: null, canCounter: false })] });
+    expect(cards(view)).not.toContain('יאושרו אוטומטית');
+  });
+});

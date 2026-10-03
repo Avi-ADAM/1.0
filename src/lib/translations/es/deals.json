@@ -145,5 +145,7 @@
   "negSentBody": "Quien hizo el deseo aprobará tus condiciones o propondrá otras. Recibirás un aviso.",
   "negWaiting": "Tu propuesta fue enviada: esperando la respuesta",
   "negApproveTheirs": "Cuenta conmigo: aprobar estas condiciones",
-  "negError": "No se pudo enviar la propuesta"
+  "negError": "No se pudo enviar la propuesta",
+  "negDeadlineYou": "Tienes hasta el {{when}} para responder; sin respuesta, las condiciones sobre la mesa se aprueban automáticamente",
+  "negDeadlineThem": "Quien hizo el deseo puede responder hasta el {{when}}; sin respuesta, las condiciones se aprueban automáticamente"
 }

@@ -427,5 +427,22 @@
   "neg_send": "Send the proposal",
   "neg_cancel": "Cancel",
   "neg_sent": "Proposal sent",
-  "neg_error": "Could not send the proposal"
+  "neg_error": "Could not send the proposal",
+  "adv_title": "Advanced settings",
+  "adv_pace_title": "Response pace for proposals",
+  "adv_pace_feh": "48 hours (default)",
+  "adv_pace_sth": "72 hours",
+  "adv_pace_nsh": "96 hours",
+  "adv_pace_sevend": "One week",
+  "adv_pace_hint": "Silence is consent: if the other side does not answer a proposal within this time, the terms on the table are approved automatically. Every counter-proposal restarts the clock. You can change it after publishing too.",
+  "pace_title": "Response pace for proposals",
+  "pace_feh": "48 hours (default)",
+  "pace_sth": "72 hours",
+  "pace_nsh": "96 hours",
+  "pace_sevend": "One week",
+  "pace_hint": "Silence is consent: if the other side does not answer the terms on the table within this time, they are approved automatically. Every counter-proposal restarts the clock.",
+  "pace_saved": "Pace updated",
+  "pace_error": "Could not update the pace",
+  "neg_deadline_you": "You have until {{when}} to answer — without an answer the terms on the table are approved automatically",
+  "neg_deadline_them": "The other side can answer until {{when}}; without an answer the terms on the table are approved automatically"
 }

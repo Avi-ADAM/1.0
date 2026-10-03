@@ -19,6 +19,8 @@
  */
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import { WISH_RESTIME_DEFAULT, normalizeRestime } from '$lib/wish/restime.js';
+import { writeWishRestime } from '$lib/server/wish/clock.js';
 
 type ExtractedMissionInput = {
   name: string;
@@ -96,8 +98,11 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
     maxJoiners = null,
     joinDeadline = null,
     extracted_missions = [],
-    extracted_resources = []
+    extracted_resources = [],
+    restime = null
   } = params as {
+    /** The advanced setting: how long the other side has to answer proposals (default 48 h). */
+    restime?: string | null;
     name: string;
     desc?: string;
     longDes?: string;
@@ -213,6 +218,16 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
     throw new Error('Failed to create ratson');
   }
 
+  // The wish's own pace, when the owner chose one other than the default. Best-effort: a wish
+  // without it simply runs at 48 h, and it can be set again from the wish page.
+  if (restime && normalizeRestime(restime) !== WISH_RESTIME_DEFAULT) {
+    try {
+      await writeWishRestime(strapi, context, ratsonId, restime);
+    } catch (err) {
+      console.warn('[createRatson] could not set the wish pace (non-fatal):', err);
+    }
+  }
+
   // ── 2. Create process anchor + chat forum (best-effort) ──────────────────
   let processId: string | null = null;
   let chatForumId: string | null = null;
@@ -313,6 +328,7 @@ export const createRatsonConfig: ActionConfig = {
     minJoiners: { type: 'number', required: false },
     maxJoiners: { type: 'number', required: false },
     joinDeadline: { type: 'string', required: false },
+    restime: { type: 'string', required: false, description: 'How long the other side has to answer proposals: feh (48 h, default) | sth | nsh | sevend' },
     extracted_missions: { type: 'array', required: false },
     extracted_resources: { type: 'array', required: false }
   },

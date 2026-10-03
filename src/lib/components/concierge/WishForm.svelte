@@ -146,6 +146,10 @@
       if (typeof d.whoCanOffer === 'boolean') whoCanOffer = d.whoCanOffer;
       if (d.whoCanSee) whoCanSee = d.whoCanSee;
       if (d.invitePartners) invitePartners = d.invitePartners;
+      if (PACE_OPTIONS.includes(d.restime)) {
+        restime = d.restime;
+        restimeTouched = true;
+      }
       if (d.joinKind) joinKind = d.joinKind;
       if (typeof d.minJoiners === 'number') minJoiners = d.minJoiners;
       if (typeof d.maxJoiners === 'number') maxJoiners = d.maxJoiners;
@@ -495,6 +499,12 @@
   let whoCanOffer = $state(true); // → allowJoin
   let whoCanSee = $state('personal'); // → access_mode
   let invitePartners = $state('lev'); // UI-only for now (no Ratson field)
+  /* Advanced: how long the other side has to answer a proposal before silence answers for
+     them — the wish's own pace. 48 h (feh) unless the owner chooses another of the four a
+     rikma offers. It is only sent when chosen, so a saved draft keeps what it has. */
+  const PACE_OPTIONS = ['feh', 'sth', 'nsh', 'sevend'];
+  let restime = $state('feh'); // → Ratson.restime
+  let restimeTouched = $state(false);
   let joinKind = $state('solo'); // → Ratson.joinKind (solo = today's behaviour)
   let minJoiners = $state(/** @type {number|null} */ (2));
   let maxJoiners = $state(/** @type {number|null} */ (null));
@@ -876,6 +886,7 @@
       whoCanOffer,
       whoCanSee,
       invitePartners,
+      restime: restimeTouched ? restime : undefined,
       joinKind,
       minJoiners,
       maxJoiners,
@@ -977,7 +988,9 @@
           : null,
       extracted_missions: extractedMissionsParam,
       extracted_resources: extractedResourcesParam,
-      ai_meta: aiMeta
+      ai_meta: aiMeta,
+      // the wish's pace, only when the owner chose one
+      ...(restimeTouched || restime !== 'feh' ? { restime } : {})
     };
   }
 
@@ -1619,6 +1632,24 @@
               </button>
             {/each}
           </div>
+
+          <!-- ADVANCED -->
+          <details class="advanced">
+            <summary>{$t('concierge.adv_title')}</summary>
+            <label class="field adv-field">
+              <span class="field-lbl">{$t('concierge.adv_pace_title')}</span>
+              <select
+                class="adv-select"
+                bind:value={restime}
+                onchange={() => (restimeTouched = true)}
+              >
+                {#each PACE_OPTIONS as v (v)}
+                  <option value={v}>{$t(`concierge.adv_pace_${v}`)}</option>
+                {/each}
+              </select>
+              <span class="adv-hint">{$t('concierge.adv_pace_hint')}</span>
+            </label>
+          </details>
 
           <!-- VALUES -->
           <div class="subsection">{$t('concierge.new.sectionValues')}</div>
@@ -3402,6 +3433,51 @@
     flex-direction: column;
     gap: 6px;
   }
+  /* advanced settings — closed by default, below the practical details */
+  .advanced {
+    margin: 14px 0 0;
+    border: 1px dashed rgb(var(--cg-gold-rgb) / 0.22);
+    border-radius: 12px;
+    padding: 4px 14px;
+  }
+  .advanced > summary {
+    cursor: pointer;
+    padding: 10px 0;
+    font-family: 'Bellefair', serif;
+    font-size: 14px;
+    color: var(--cg-muted);
+  }
+  .advanced[open] > summary {
+    color: var(--cg-goldhi);
+  }
+  .adv-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding-bottom: 12px;
+  }
+  .adv-select {
+    background: var(--cg-s1);
+    color: var(--cg-ink);
+    border: 1px solid rgb(var(--cg-gold-rgb) / 0.25);
+    border-radius: 10px;
+    padding: 8px 10px;
+    font: inherit;
+    font-size: 14px;
+    max-width: 320px;
+  }
+  .adv-select:focus-visible,
+  .advanced > summary:focus-visible {
+    outline: 2px solid var(--cg-goldhi);
+    outline-offset: 2px;
+  }
+  .adv-hint {
+    font-family: 'Bellefair', serif;
+    font-size: 12.5px;
+    line-height: 1.55;
+    color: var(--cg-muted);
+  }
+
   .field-lbl {
     font-family: 'Cinzel', serif;
     font-size: 10px;

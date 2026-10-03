@@ -57,6 +57,32 @@ export interface ProposalRef {
   openedBy: Party;
 }
 
+/**
+ * The two shapes of proposal whose terms are negotiated, and the only two the accept
+ * paths can close:
+ *  - `invite`: the wisher authored a slot and invited a provider (kind
+ *    `existing_project` / `partial`; `covered_*` carries the slot's recipe-line id);
+ *  - `volunteer`: a community member took a need the wish published
+ *    (`open_mission` set).
+ * Everything else is something else: a product proposal (a matanot or a project
+ * behind it) is priced by quote on its service request, and a plain self-offer
+ * (`custom_offer` with no open mission) names a need by *position*, which nothing
+ * can close yet — neither is negotiated here.
+ */
+export type ProposalPath = 'invite' | 'volunteer';
+
+export function proposalPath(p: {
+  kind?: string | null;
+  hasMatanot: boolean;
+  hasProject: boolean;
+  hasOpenMission: boolean;
+}): ProposalPath | null {
+  if (p.hasMatanot || p.hasProject) return null;
+  if (p.hasOpenMission) return 'volunteer';
+  if (p.kind === 'existing_project' || p.kind === 'partial') return 'invite';
+  return null;
+}
+
 /** Who an entry's author is, whichever shape the user arrived in. */
 export function entryUserId(e: WillingnessEntry): string | null {
   const u: any = e.user;

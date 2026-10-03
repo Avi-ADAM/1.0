@@ -4,6 +4,7 @@ import { negotiationView } from './negotiationView';
 const parties = { wisherIds: ['10'], proposerIds: ['20'] };
 
 const attrs = (over: Record<string, any> = {}) => ({
+  kind: 'existing_project',
   status_proposal: 'suggested',
   total_price: 600,
   covered_missions: [{ extracted_mission_idx: '55', hours: 4, price: 600 }],
@@ -27,7 +28,7 @@ describe('negotiationView — what a card is told, from one side', () => {
   });
 
   it('a volunteer’s offer: the volunteer signed it, so it is the wisher’s move', () => {
-    const volunteer = attrs({ open_mission: { data: { id: '9' } } });
+    const volunteer = attrs({ kind: 'custom_offer', open_mission: { data: { id: '9' } } });
     expect(negotiationView(volunteer, parties, 'wisher')).toMatchObject({ yourTurn: true, signedBy: 'provider' });
     expect(negotiationView(volunteer, parties, 'provider')).toMatchObject({ yourTurn: false });
   });
@@ -48,9 +49,32 @@ describe('negotiationView — what a card is told, from one side', () => {
     expect(negotiationView(r, parties, 'provider')).toMatchObject({ amount: 2, price: 90 });
   });
 
-  it('is not negotiable once closed, or when a product stands behind it', () => {
+  it('is not open for a counter once closed', () => {
     expect(negotiationView(attrs({ status_proposal: 'accepted' }), parties, 'provider')!.canCounter).toBe(false);
-    expect(negotiationView(attrs({ matanot: { data: { id: '4' } } }), parties, 'provider')!.canCounter).toBe(false);
+  });
+
+  it('says nothing for the shapes that are not negotiated here: a product, a project, a plain self-offer', () => {
+    expect(negotiationView(attrs({ matanot: { data: { id: '4' } } }), parties, 'provider')).toBeNull();
+    expect(negotiationView(attrs({ project: { data: { id: '5' } } }), parties, 'provider')).toBeNull();
+    // a provider's own offer names a need by position, which nothing can close yet
+    expect(negotiationView(attrs({ kind: 'custom_offer' }), parties, 'provider')).toBeNull();
+  });
+
+  it('tells when silence answers: the last signature plus the wish’s pace — 48 h unless it chose otherwise', () => {
+    const opened = attrs({ createdAt: '2026-10-01T10:00:00.000Z' });
+    expect(negotiationView(opened, parties, 'provider')!.deadlineAt).toBe('2026-10-03T10:00:00.000Z');
+    expect(negotiationView(opened, parties, 'provider', 'sevend')!.deadlineAt).toBe('2026-10-08T10:00:00.000Z');
+
+    // a counter restarts it
+    const countered = attrs({
+      createdAt: '2026-10-01T10:00:00.000Z',
+      ratson_willingness_entry: [{ ...counter('20', 6, 680, 'x x x x x x x x'), submittedAt: '2026-10-02T09:00:00.000Z' }]
+    });
+    expect(negotiationView(countered, parties, 'wisher')!.deadlineAt).toBe('2026-10-04T09:00:00.000Z');
+  });
+
+  it('has no deadline once the proposal is closed', () => {
+    expect(negotiationView(attrs({ status_proposal: 'accepted', createdAt: '2026-10-01T10:00:00.000Z' }), parties, 'provider')!.deadlineAt).toBeNull();
   });
 
   it('says nothing for a proposal that covers no single slot', () => {

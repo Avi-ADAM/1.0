@@ -4,6 +4,7 @@ import {
   isTurnOf,
   otherParty,
   partyOf,
+  proposalPath,
   refuseCounter,
   resolveVersion,
   sameVersion,
@@ -50,6 +51,35 @@ describe('who is who', () => {
     expect(partyOf(invited, PROVIDER)).toBe('provider');
     expect(partyOf(invited, '99')).toBeNull();
     expect(otherParty('wisher')).toBe('provider');
+  });
+});
+
+describe('proposalPath — which proposals are negotiated here', () => {
+  const p = (over: Record<string, unknown> = {}) => ({
+    kind: 'existing_project',
+    hasMatanot: false,
+    hasProject: false,
+    hasOpenMission: false,
+    ...over
+  });
+
+  it('an invitation the wisher authored (person or resource)', () => {
+    expect(proposalPath(p())).toBe('invite');
+    expect(proposalPath(p({ kind: 'partial' }))).toBe('invite');
+  });
+
+  it('a volunteer on a need the wish published', () => {
+    expect(proposalPath(p({ kind: 'custom_offer', hasOpenMission: true }))).toBe('volunteer');
+  });
+
+  it('not a product or project proposal — those are priced by quote on their own request', () => {
+    expect(proposalPath(p({ hasMatanot: true }))).toBeNull();
+    expect(proposalPath(p({ hasProject: true }))).toBeNull();
+    expect(proposalPath(p({ kind: 'custom_offer', hasOpenMission: true, hasProject: true }))).toBeNull();
+  });
+
+  it('not a plain self-offer — it names a need by position, which nothing can close', () => {
+    expect(proposalPath(p({ kind: 'custom_offer' }))).toBeNull();
   });
 });
 

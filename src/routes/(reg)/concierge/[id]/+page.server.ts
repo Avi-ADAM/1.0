@@ -7,6 +7,7 @@ import { extractWish, type WishExtraction } from '$lib/server/ai/extractWish';
 import { GEMINI_API_KEY } from '$env/static/private';
 import { loadBell } from '$lib/server/concierge/bell';
 import { negotiationView } from '$lib/server/wish/negotiationView';
+import { normalizeRestime } from '$lib/wish/restime';
 import { externalConfig } from '$lib/server/concierge/externalConfig';
 import {
   DISABLED_PANEL,
@@ -135,6 +136,18 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
           : null,
       };
 
+      // The wish's own pace — how long the other side has before silence answers for them.
+      // Read on its own: the field only exists once 1.0b is deployed, and a failed read must
+      // never take the page down (the default is 48 h).
+      let restime = normalizeRestime(undefined);
+      try {
+        const rr: any = await sendToSer({ id: params.id }, '388getRatsonRestime', 0, 0, false, fetch);
+        restime = normalizeRestime(rr?.data?.ratson?.data?.attributes?.restime);
+      } catch {
+        /* the default */
+      }
+      wish.restime = restime;
+
       const propsNodes = res?.data?.ratsonProposals?.data ?? [];
       proposals = propsNodes.map((p: any) => {
         const pa = p.attributes || {};
@@ -169,7 +182,8 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
               wisherIds: owners.map((o: any) => String(o.id)),
               proposerIds: proposerUsers.map((u: any) => String(u.id))
             },
-            'wisher'
+            'wisher',
+            restime
           ),
           negoIds: (pa.negos?.data ?? []).map((n: any) => n.id),
           currencyName: pa.matbea?.data?.attributes?.name ?? null,

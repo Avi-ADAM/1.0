@@ -1254,6 +1254,49 @@
   const acceptProposal = (id) => callProposalAction('acceptRatsonProposal', id);
   const rejectProposal = (id) => callProposalAction('rejectRatsonProposal', id);
 
+  /* ===== The pace of the wish (QA C-9) =====
+   * Silence is consent, at the pace of the wish: when the other side of a proposal does not
+   * answer within this time, the version on the table is approved for them. 48 hours unless
+   * the owner chose another of the four a rikma offers. */
+  const PACE = ['feh', 'sth', 'nsh', 'sevend'];
+  let paceBusy = $state(false);
+
+  async function changePace(e) {
+    const next = e.currentTarget.value;
+    if (!wishId || paceBusy || next === (data?.wish?.restime ?? 'feh')) return;
+    paceBusy = true;
+    try {
+      const res = await fetch('/api/action', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ actionKey: 'setWishRestime', params: { ratsonId: String(wishId), restime: next } })
+      });
+      const out = await res.json();
+      if (!out?.success) throw new Error(out?.error?.message || $t('concierge.pace_error'));
+      toast.success($t('concierge.pace_saved'));
+      window.location.reload();
+    } catch (err) {
+      console.error('[concierge/[id]] setWishRestime failed:', err);
+      toast.error(err instanceof Error ? err.message : $t('concierge.pace_error'));
+      e.currentTarget.value = data?.wish?.restime ?? 'feh'; // the page still says what is true
+    } finally {
+      paceBusy = false;
+    }
+  }
+
+  /** "Sat, 12 Oct, 14:30" in the reader's language — the runtime has the words. */
+  function fmtDeadline(iso) {
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return '';
+    return d.toLocaleString($locale || 'he', {
+      weekday: 'short',
+      day: 'numeric',
+      month: 'short',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  }
+
   /* ===== Counter on a proposal's terms (QA C-9) =====
    * There is no flat "no": terms she cannot take are answered with the terms she
    * could — hours and price, with the reason. The provider approves them or
@@ -1843,6 +1886,23 @@
             >
           </div>
 
+          {#if isOwner}
+            <div class="pace">
+              <label for="pace-sel">{$t('concierge.pace_title')}</label>
+              <select
+                id="pace-sel"
+                value={data?.wish?.restime ?? 'feh'}
+                onchange={changePace}
+                disabled={paceBusy}
+              >
+                {#each PACE as v (v)}
+                  <option value={v}>{$t(`concierge.pace_${v}`)}</option>
+                {/each}
+              </select>
+              <small>{$t('concierge.pace_hint')}</small>
+            </div>
+          {/if}
+
           <div class="tabs">
             {#each TABS as [key, lbl] (key)}
               <button
@@ -2299,6 +2359,17 @@
                           </p>
                         {/each}
                       </div>
+                    {/if}
+
+                    {#if p.negotiation?.canCounter && p.negotiation.deadlineAt}
+                      <p class="neg-deadline">
+                        {$t(
+                          p.negotiation.yourTurn
+                            ? 'concierge.neg_deadline_you'
+                            : 'concierge.neg_deadline_them',
+                          { when: fmtDeadline(p.negotiation.deadlineAt) }
+                        )}
+                      </p>
                     {/if}
 
                     {#if counterFor === p.proposalId}
@@ -3870,6 +3941,44 @@
   .btn-ghost:focus-within {
     outline: 2px solid var(--cg-goldhi);
     outline-offset: 2px;
+  }
+
+  /* the wish's pace — owner only, above the plan's tabs (C-9) */
+  .pace {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 12px;
+    margin: 0 0 14px;
+    padding: 10px 14px;
+    border: 1px dashed rgb(var(--cg-gold-rgb) / 0.2);
+    border-radius: 12px;
+    font-family: 'Bellefair', serif;
+    font-size: 13px;
+    color: var(--cg-muted);
+  }
+  .pace select {
+    background: var(--cg-s1);
+    color: var(--cg-ink);
+    border: 1px solid rgb(var(--cg-gold-rgb) / 0.25);
+    border-radius: 8px;
+    padding: 5px 8px;
+    font: inherit;
+  }
+  .pace select:focus-visible {
+    outline: 2px solid var(--cg-goldhi);
+    outline-offset: 1px;
+  }
+  .pace small {
+    flex-basis: 100%;
+    font-size: 12px;
+    line-height: 1.55;
+  }
+  .neg-deadline {
+    margin: 8px 0 0;
+    font-family: 'Bellefair', serif;
+    font-size: 12px;
+    color: var(--cg-muted);
   }
 
   /* the terms negotiation on a provider's card (C-9) */

@@ -26,6 +26,12 @@ function world(
     price?: number;
     status?: string;
     twoSlots?: boolean;
+    /** Override the proposal kind (a plain self-offer is 'custom_offer' with no open mission). */
+    kind?: string;
+    /** The wish's own pace; omit for a wish that predates the field. */
+    restime?: string;
+    /** Make arming the silence clock fail (the backend is not deployed yet). */
+    clockFails?: boolean;
   } = {}
 ) {
   const db = {
@@ -37,6 +43,7 @@ function world(
     pendm: { noofhours: 4, perhour: 150 } as Record<string, any>,
     assigned: null as string | null,
     chat: [] as string[],
+    clocks: [] as { date: string; ratson_proposal: string }[],
     calls: [] as { qid: string; vars: any }[]
   };
   if (opts.twoSlots) db.covered.push({ extracted_mission_idx: '56', hours: 1, price: 100 });
@@ -67,6 +74,8 @@ function world(
                     id: '77',
                     attributes: {
                       status_proposal: db.status,
+                      // an invitation the wisher authored, or a volunteer's offer on a published need
+                      kind: opts.kind ?? (opts.openedBy === 'provider' ? 'custom_offer' : 'existing_project'),
                       total_price: db.total,
                       proposer_users: { data: [{ id: PROVIDER }] },
                       open_mission: { data: opts.openedBy === 'provider' ? { id: '9' } : null },
@@ -116,6 +125,12 @@ function world(
         case '1chatsend':
           db.chat.push(vars.mes);
           return { data: {} };
+        case '388getRatsonRestime':
+          return { data: { ratson: { data: { attributes: { restime: opts.restime ?? null } } } } };
+        case '390createTimegramaForRatsonProposal':
+          if (opts.clockFails) return { errors: [{ message: 'Unknown field ratson_proposal' }] };
+          db.clocks.push(vars);
+          return { data: { createTimegrama: { data: { id: 'T9' } } } };
         default:
           return { data: {} };
       }
@@ -150,6 +165,34 @@ const entry = (user: string, hours: number, amount: number, agree: boolean, note
 describe('counterRatsonProposal — not on these terms, but on these', () => {
   beforeEach(() => {
     vi.spyOn(console, 'warn').mockImplementation(() => {});
+  });
+
+  it('restarts the silence clock: the other side has the wish’s pace — 48 h by default', async () => {
+    const w = world();
+    const before = Date.now();
+    await asCounter(w, PROVIDER, { price: 500, note: 'אני נותן הנחה על החומרים' });
+    expect(w.db.clocks).toHaveLength(1);
+    expect(w.db.clocks[0].ratson_proposal).toBe('77');
+    const due = Date.parse(w.db.clocks[0].date) - before;
+    expect(due).toBeGreaterThan(47.9 * 3600_000);
+    expect(due).toBeLessThan(48.1 * 3600_000);
+  });
+
+  it('uses the wish’s own pace when its owner chose another', async () => {
+    const w = world({ restime: 'sevend' });
+    const before = Date.now();
+    await asCounter(w, PROVIDER, { price: 500, note: 'אני נותן הנחה על החומרים' });
+    const due = Date.parse(w.db.clocks[0].date) - before;
+    expect(due).toBeGreaterThan(167.9 * 3600_000);
+    expect(due).toBeLessThan(168.1 * 3600_000);
+  });
+
+  it('a counter never fails because the clock could not be armed (1.0b not deployed yet)', async () => {
+    const w = world({ clockFails: true });
+    const out: any = await asCounter(w, PROVIDER, { price: 500, note: 'אני נותן הנחה על החומרים' });
+    expect(out.success).toBe(true);
+    expect(w.db.covered[0].price).toBe(500);
+    expect(w.db.clocks).toEqual([]);
   });
 
   it('the provider answers the wisher’s slot with other hours and price — and the reason', async () => {
@@ -207,7 +250,25 @@ describe('counterRatsonProposal — not on these terms, but on these', () => {
 
   it('is only for a proposal that is still open, and has one slot', async () => {
     await expect(asCounter(world({ status: 'accepted' }), PROVIDER, { price: 500 })).rejects.toThrow(/already 'accepted'/);
-    await expect(asCounter(world({ twoSlots: true }), PROVIDER, { price: 500 })).rejects.toThrow(/single task or resource/);
+    await expect(asCounter(world({ twoSlots: true }), PROVIDER, { price: 500 })).rejects.toThrow(/invitation to a slot/);
+  });
+});
+
+describe('a plain self-offer is not negotiated here', () => {
+  beforeEach(() => {
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+  });
+
+  // offerWishHelp: a provider offers on the wish itself, naming a need by its position —
+  // nothing can close that yet, so a negotiation on it would be a dead end.
+  it('refuses a counter, an approval, and leaves acceptRatsonProposal’s own answer alone', async () => {
+    const w = world({ kind: 'custom_offer' });
+    await expect(asCounter(w, PROVIDER, { price: 500 })).rejects.toThrow(/invitation to a slot/);
+    await expect(asApprove(w, WISHER)).rejects.toThrow(/no slot to fill/);
+    await expect(acceptProposal({ proposalId: '77', ratsonId: '16' }, ctx(WISHER), util(w))).rejects.toThrow(
+      /no matanot/
+    );
+    expect(w.db.assigned).toBeNull();
   });
 });
 
@@ -265,6 +326,31 @@ describe('acceptWishOffer — approving the version on the table', () => {
     await expect(asApprove(w, PROVIDER)).rejects.toThrow(/already stand behind/);
     expect(w.db.assigned).toBeNull();
     expect(w.db.status).toBe('suggested');
+  });
+
+  it('approving by silence says so in the chat, and tells the side that was silent', async () => {
+    const w = world();
+    await approve({ proposalId: '77', ratsonId: '16', viaSilence: true }, ctx(PROVIDER), util(w));
+    expect(w.db.chat.at(-1)).toContain('אושרו אוטומטית');
+    expect(w.db.chat.at(-1)).not.toContain('אישרתי'); // no words put in the silent person's mouth
+    expect(w.db.assigned).toBe(PROVIDER);
+    // both sides are told: the silent one what their silence did, the other that it is settled
+    const told = w.notifier.notify.mock.calls.map((c: any) => c[2].recipientIds);
+    expect(told).toContainEqual([PROVIDER]);
+    expect(told).toContainEqual([WISHER]);
+    const silentTitle = (w.notifier.notify.mock.calls.find((c: any) => c[2].recipientIds[0] === PROVIDER) as any)[0].templates.title.he;
+    expect(silentTitle).toContain('בשתיקה');
+  });
+
+  it('a volunteer’s approval of her counter hands her the clock — unless silence is already closing it', async () => {
+    const entries = [entry(WISHER, 5, 640, false, 'התקציב מאפשר חמש שעות')];
+    const a = world({ openedBy: 'provider', hours: 5, price: 640, entries });
+    await asApprove(a, PROVIDER);
+    expect(a.db.clocks).toHaveLength(1); // the wisher now has the pace to close it
+
+    const b = world({ openedBy: 'provider', hours: 5, price: 640, entries });
+    await approve({ proposalId: '77', ratsonId: '16', viaSilence: true }, ctx(PROVIDER), util(b));
+    expect(b.db.clocks).toEqual([]); // the clock's own run goes straight on to close it
   });
 
   it('a stranger cannot approve, and an approved placement cannot be approved twice', async () => {

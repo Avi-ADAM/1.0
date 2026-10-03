@@ -12,8 +12,9 @@
  * other side's move: approve it (acceptWishOffer / acceptRatsonProposal) or counter
  * back. Rules: `$lib/wish/proposalRounds`.
  *
- * There is no restime clock here: a wish has no rikma yet, so there is no rikma
- * pace for silence to mature at. The proposal stays open until someone answers.
+ * A counter restarts the silence clock: the other side has the wish's pace (48 h unless
+ * its owner chose otherwise) to answer before silence approves for them
+ * (`$lib/server/wish/clock`, `matureProposal`).
  */
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
@@ -27,6 +28,7 @@ import {
   type CounterRefusal
 } from '$lib/wish/proposalRounds.js';
 import { entryInput, loadWishProposal, requireParty } from '$lib/server/wish/proposal.js';
+import { armProposalClock } from '$lib/server/wish/clock.js';
 
 const NEGOTIABLE_FROM = new Set(['suggested', 'viewed']);
 
@@ -55,7 +57,9 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
   if (!NEGOTIABLE_FROM.has(status)) {
     throw new Error(`This proposal is already '${status}' — it can no longer be negotiated`);
   }
-  if (!p.slot) throw new Error('Only a proposal that covers a single task or resource can be negotiated here');
+  if (!p.slot || !p.path) {
+    throw new Error('Only an invitation to a slot, or a volunteer offer on a published need, can be negotiated here');
+  }
 
   // Your move only if the other side signed last.
   if (!isTurnOf(party, p.standing)) {
@@ -105,6 +109,9 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
   if (!written || written.errors) {
     throw new Error(`counterRatsonProposal failed: ${JSON.stringify(written?.errors ?? 'Unknown')}`);
   }
+
+  // The other side's time to answer starts now (the wish's pace, 48 h unless its owner chose otherwise).
+  await armProposalClock(strapi, context, { proposalId: String(proposalId), ratsonId: String(ratsonId) });
 
   // The other side: the ball is theirs.
   const toParty = otherParty(party);

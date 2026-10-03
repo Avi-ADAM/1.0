@@ -6,7 +6,9 @@
 
 import {
   partyOf,
+  proposalPath,
   standing,
+  type ProposalPath,
   type Party,
   type ProposalRef,
   type Standing,
@@ -27,6 +29,8 @@ export interface WishProposal {
   attrs: any;
   wisherIds: string[];
   proposerIds: string[];
+  /** Which negotiable shape this is — null for a proposal that is not negotiated here. */
+  path: ProposalPath | null;
   ref: ProposalRef;
   /** The one slot it covers — null when it covers none or several (not negotiable here). */
   slot: { kind: SlotKind; idx: string | null } | null;
@@ -85,7 +89,13 @@ export async function loadWishProposal(
   // A volunteer from the community feed opened the proposal on the published need
   // (`open_mission`); an invited provider was put there by the wisher, who authored
   // the slot. That decides who has implicitly signed the first version.
-  const openedBy: Party = attrs.open_mission?.data?.id ? 'provider' : 'wisher';
+  const path = proposalPath({
+    kind: attrs.kind,
+    hasMatanot: !!attrs.matanot?.data?.id,
+    hasProject: !!attrs.project?.data?.id,
+    hasOpenMission: !!attrs.open_mission?.data?.id
+  });
+  const openedBy: Party = path === 'volunteer' ? 'provider' : 'wisher';
   const ref: ProposalRef = { wisherIds, proposerIds, openedBy };
 
   const { slot, version } = coveredVersion(attrs);
@@ -98,6 +108,7 @@ export async function loadWishProposal(
     attrs,
     wisherIds,
     proposerIds,
+    path,
     ref,
     slot,
     version,

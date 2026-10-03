@@ -13,6 +13,7 @@
  */
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import { armProposalClock } from '$lib/server/wish/clock.js';
 
 const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
   const {
@@ -173,6 +174,8 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
       ? String(propRes.data.createRatsonProposal.data.id)
       : null;
     if (!proposalId) throw new Error('Failed to create the invitation');
+    // The invited provider's time to answer starts now (the wish's pace, 48 h by default).
+    await armProposalClock(strapi, context, { proposalId, ratsonId: String(ratsonId) });
   }
 
   return {

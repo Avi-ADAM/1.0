@@ -3,6 +3,7 @@ import { mapSaleData } from '$lib/utils/levDataExtractors';
 import { stripHtml } from '$lib/utils/stripHtml';
 import { sendViaProxy } from '$lib/server/sendViaProxy.js';
 import { negotiationView, type NegotiationView } from '$lib/server/wish/negotiationView.js';
+import { normalizeRestime } from '$lib/wish/restime.js';
 
 export interface PendingRequestData {
   id: string;
@@ -62,7 +63,7 @@ export interface IncomingWishInvitation {
   categories: string[];
 }
 
-function mapWishInvitation(node: any, viewerId?: string): IncomingWishInvitation | null {
+function mapWishInvitation(node: any, viewerId?: string, restime?: string): IncomingWishInvitation | null {
   const pa = node?.attributes ?? {};
   const ratNode = pa.ratson?.data;
   if (!ratNode) return null;
@@ -93,7 +94,8 @@ function mapWishInvitation(node: any, viewerId?: string): IncomingWishInvitation
         // the list is filtered to proposals the viewer is a proposer of
         proposerIds: viewerId ? [String(viewerId)] : []
       },
-      'provider'
+      'provider',
+      restime
     ),
     slotHours: typeof slotM?.hours === 'number' ? slotM.hours : null,
     slotPrice:
@@ -224,8 +226,28 @@ export async function fetchWishInvitationsForUser(
   try {
     const data = await gql(fetchFn, '111listMyWishInvitations', { uid: userId, limit: 60 });
     const nodes = data?.ratsonProposals?.data ?? [];
+
+    // The pace of each wish the viewer was invited to (48 h unless its owner chose otherwise).
+    // One small read per wish, each allowed to fail: the field exists only once 1.0b is deployed.
+    const wishIds: string[] = [
+      ...new Set<string>(
+        nodes.map((n: any) => n?.attributes?.ratson?.data?.id).filter(Boolean).map(String)
+      )
+    ];
+    const paces = new Map<string, string>();
+    await Promise.all(
+      wishIds.map(async (id) => {
+        try {
+          const r = await gql(fetchFn, '388getRatsonRestime', { id });
+          paces.set(id, normalizeRestime(r?.ratson?.data?.attributes?.restime));
+        } catch {
+          /* the default */
+        }
+      })
+    );
+
     return nodes
-      .map((n: any) => mapWishInvitation(n, userId))
+      .map((n: any) => mapWishInvitation(n, userId, paces.get(String(n?.attributes?.ratson?.data?.id))))
       .filter((x: IncomingWishInvitation | null): x is IncomingWishInvitation => x !== null);
   } catch (e) {
     console.error('[deals] fetchWishInvitationsForUser failed (non-fatal):', e);

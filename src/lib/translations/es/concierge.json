@@ -428,5 +428,22 @@
   "neg_send": "Enviar la propuesta",
   "neg_cancel": "Cancelar",
   "neg_sent": "Propuesta enviada",
-  "neg_error": "No se pudo enviar la propuesta"
+  "neg_error": "No se pudo enviar la propuesta",
+  "adv_title": "Ajustes avanzados",
+  "adv_pace_title": "Ritmo de respuesta a las propuestas",
+  "adv_pace_feh": "48 horas (por defecto)",
+  "adv_pace_sth": "72 horas",
+  "adv_pace_nsh": "96 horas",
+  "adv_pace_sevend": "Una semana",
+  "adv_pace_hint": "El silencio es consentimiento: si la otra parte no responde a una propuesta en este tiempo, las condiciones sobre la mesa se aprueban automáticamente. Cada contrapropuesta reinicia el reloj. También puedes cambiarlo tras publicar.",
+  "pace_title": "Ritmo de respuesta a las propuestas",
+  "pace_feh": "48 horas (por defecto)",
+  "pace_sth": "72 horas",
+  "pace_nsh": "96 horas",
+  "pace_sevend": "Una semana",
+  "pace_hint": "El silencio es consentimiento: si la otra parte no responde a las condiciones sobre la mesa en este tiempo, se aprueban automáticamente. Cada contrapropuesta reinicia el reloj.",
+  "pace_saved": "Ritmo actualizado",
+  "pace_error": "No se pudo actualizar el ritmo",
+  "neg_deadline_you": "Tienes hasta el {{when}} para responder; sin respuesta, las condiciones sobre la mesa se aprueban automáticamente",
+  "neg_deadline_them": "La otra parte puede responder hasta el {{when}}; sin respuesta, las condiciones sobre la mesa se aprueban automáticamente"
 }

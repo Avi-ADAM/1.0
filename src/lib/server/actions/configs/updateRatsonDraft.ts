@@ -17,6 +17,7 @@
  */
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import { writeWishRestime } from '$lib/server/wish/clock.js';
 
 const VALID_ACCESS = new Set(['personal', 'free_threshold', 'pay_to_access']);
 
@@ -85,6 +86,16 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
 
   await strapi.execute('100updateRatson', vars, context.jwt, context.fetch);
 
+  // The advanced setting — how long the other side has to answer proposals. Best-effort: the
+  // wish runs at 48 h without it, and the owner can set it again from the wish page.
+  if (typeof p.restime === 'string' && p.restime) {
+    try {
+      await writeWishRestime(strapi, context, ratsonId, p.restime);
+    } catch (err) {
+      console.warn('[updateRatsonDraft] could not set the wish pace (non-fatal):', err);
+    }
+  }
+
   return {
     success: true,
     ratsonId,
@@ -115,6 +126,7 @@ export const updateRatsonDraftConfig: ActionConfig = {
     radius: { type: 'number', required: false },
     location_hint: { type: 'string', required: false },
     ai_meta: { type: 'object', required: false },
+    restime: { type: 'string', required: false, description: 'How long the other side has to answer proposals: feh (48 h, default) | sth | nsh | sevend' },
     extracted_missions: { type: 'array', required: false },
     extracted_resources: { type: 'array', required: false }
   },

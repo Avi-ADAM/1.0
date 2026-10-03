@@ -28,14 +28,20 @@ import { requestWishMissionConfig } from './requestWishMission.js';
 import { openingPrice, plainExcerpt } from '$lib/sheirut/quoteState';
 import { loadQuote, postToRequestChat } from '../../sheirut/quote.js';
 import { acceptWishOfferConfig } from './acceptWishOffer.js';
-import { isTurnOf, standing } from '$lib/wish/proposalRounds.js';
+import { isTurnOf, proposalPath, standing } from '$lib/wish/proposalRounds.js';
 import { coveredVersion } from '$lib/server/wish/proposal.js';
 
 const ACCEPTABLE_FROM_STATUSES = new Set(['suggested', 'viewed']);
 
 const handler: ActionExecutionHandler = async (params, context, util) => {
   const { strapi } = util;
-  const { proposalId, note } = params as { proposalId: string; note?: string };
+  const { proposalId, note, viaSilence } = params as {
+    proposalId: string;
+    note?: string;
+    /** Set by the silence clock: the wisher stayed silent, so the volunteer's terms are approved by default (C-9). */
+    viaSilence?: boolean;
+  };
+  const auto = viaSilence === true;
   if (!proposalId) throw new Error('proposalId is required');
 
   const ratsonId = (params as any).ratsonId;
@@ -88,11 +94,17 @@ const handler: ActionExecutionHandler = async (params, context, util) => {
   const openMissionRef = pa.open_mission?.data?.id ? String(pa.open_mission.data.id) : null;
   const proposerIds = (pa.proposer_users?.data ?? []).map((u: any) => String(u.id));
   const callerIsProvider = proposerIds.includes(String(context.userId));
-  const isSlotProposal = !matanotId && !projectId;
-  if (isSlotProposal && !openMissionRef) {
+  const slotPath = proposalPath({
+    kind: pa.kind,
+    hasMatanot: !!matanotId,
+    hasProject: !!projectId,
+    hasOpenMission: !!openMissionRef
+  });
+  const isSlotProposal = slotPath !== null;
+  if (slotPath === 'invite') {
     return (acceptWishOfferConfig.graphqlOperation as ActionExecutionHandler)(params, context, util) as any;
   }
-  if (isSlotProposal && openMissionRef && callerIsProvider) {
+  if (slotPath === 'volunteer' && callerIsProvider) {
     return (acceptWishOfferConfig.graphqlOperation as ActionExecutionHandler)(params, context, util) as any;
   }
 
@@ -103,7 +115,7 @@ const handler: ActionExecutionHandler = async (params, context, util) => {
 
   // …and only the version the volunteer put on the table: if the wisher countered,
   // she waits for the volunteer's answer rather than approving her own terms.
-  if (isSlotProposal && openMissionRef) {
+  if (slotPath === 'volunteer') {
     const ref = {
       wisherIds: owners.map((o: any) => String(o.id)),
       proposerIds,
@@ -212,9 +224,11 @@ const handler: ActionExecutionHandler = async (params, context, util) => {
             fidn: parseInt(String(chatForumId), 10),
             idL: context.userId,
             da: now,
-            mes: note
-              ? `בחרתי מתנדב/ת למשימה "${missionName}". ${note}`
-              : `בחרתי מתנדב/ת למשימה "${missionName}".`
+            mes: auto
+              ? `הצעת המתנדב/ת למשימה "${missionName}" אושרה אוטומטית — לא נענתה בזמן שנקבע למשאלה.`
+              : note
+                ? `בחרתי מתנדב/ת למשימה "${missionName}". ${note}`
+                : `בחרתי מתנדב/ת למשימה "${missionName}".`
           },
           context.jwt,
           context.fetch
@@ -254,6 +268,30 @@ const handler: ActionExecutionHandler = async (params, context, util) => {
         .catch((e: unknown) =>
           console.warn('[acceptRatsonProposal] volunteer notification failed (non-fatal):', e)
         );
+    }
+
+    // When silence chose, the wisher is told what her silence did.
+    if (auto && util.notifier) {
+      util.notifier
+        .notify(
+          {
+            recipients: { type: 'specificUsers', config: { userIdsParam: 'recipientIds' } },
+            templates: {
+              title: { he: 'הצעה אושרה בשתיקה', en: 'An offer was approved by silence', ar: 'تمت الموافقة على عرض بالصمت' },
+              body: {
+                he: `לא השבת להצעת מתנדב/ת למשימה "${missionName}" בזמן שנקבע למשאלה, ולכן היא אושרה אוטומטית.`,
+                en: `You did not answer a volunteer's offer for "${missionName}" within the pace set for the wish, so it was approved automatically.`,
+                ar: `لم تردّوا على عرض متطوّع لمهمة "${missionName}" ضمن الوقت المحدد للأمنية، لذلك تمت الموافقة عليه تلقائياً.`
+              }
+            },
+            channels: ['socket', 'push'],
+            metadata: { priority: 'high', type: 'ratsonProposal', url: `/concierge/${ratsonId}` }
+          },
+          params,
+          { recipientIds: [String(context.userId)], data: { proposalId, ratsonId } },
+          context
+        )
+        .catch((e: unknown) => console.warn('[acceptRatsonProposal] silence notification failed (non-fatal):', e));
     }
 
     return {
@@ -398,7 +436,8 @@ export const acceptRatsonProposalConfig: ActionConfig = {
   paramSchema: {
     proposalId: { type: 'string', required: true },
     ratsonId: { type: 'string', required: true },
-    note: { type: 'string', required: false }
+    note: { type: 'string', required: false },
+    viaSilence: { type: 'boolean', required: false, description: 'Set by the silence clock when the silent wisher approves by default' }
   },
   authRules: [{ type: 'jwt', errorMessage: 'Must be logged in to accept a proposal' }],
   notification: {

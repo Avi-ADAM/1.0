@@ -3858,6 +3858,13 @@ export enum Enum_Ratson_Partialconsensusfallback {
   WillingnessPricing = 'willingness_pricing'
 }
 
+export enum Enum_Ratson_Restime {
+  Feh = 'feh',
+  Nsh = 'nsh',
+  Sevend = 'sevend',
+  Sth = 'sth'
+}
+
 export enum Enum_Ratson_Share_Status {
   Cancelled = 'cancelled',
   Completed = 'completed',
@@ -16222,6 +16229,7 @@ export type Ratson = {
   ratson_match_jobs?: Maybe<RatsonMatchJobRelationResponseCollection>;
   ratson_proposals?: Maybe<RatsonProposalRelationResponseCollection>;
   ratson_shares?: Maybe<RatsonShareRelationResponseCollection>;
+  restime?: Maybe<Enum_Ratson_Restime>;
   share_status?: Maybe<Enum_Ratson_Share_Status>;
   sheiruts?: Maybe<SheirutRelationResponseCollection>;
   startDate?: Maybe<Scalars['DateTime']['output']>;
@@ -16462,6 +16470,7 @@ export type RatsonFiltersInput = {
   ratson_match_jobs?: InputMaybe<RatsonMatchJobFiltersInput>;
   ratson_proposals?: InputMaybe<RatsonProposalFiltersInput>;
   ratson_shares?: InputMaybe<RatsonShareFiltersInput>;
+  restime?: InputMaybe<StringFilterInput>;
   share_status?: InputMaybe<StringFilterInput>;
   sheiruts?: InputMaybe<SheirutFiltersInput>;
   startDate?: InputMaybe<DateTimeFilterInput>;
@@ -16528,6 +16537,7 @@ export type RatsonInput = {
   ratson_match_jobs?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   ratson_proposals?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   ratson_shares?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  restime?: InputMaybe<Enum_Ratson_Restime>;
   share_status?: InputMaybe<Enum_Ratson_Share_Status>;
   sheiruts?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   startDate?: InputMaybe<Scalars['DateTime']['input']>;
@@ -16625,6 +16635,7 @@ export type RatsonProposal = {
   ratson_willingness_entry?: Maybe<Array<Maybe<ComponentNewWillingnessEntries>>>;
   sheirutpends?: Maybe<SheirutpendRelationResponseCollection>;
   status_proposal?: Maybe<Enum_Ratsonproposal_Status_Proposal>;
+  timegrama?: Maybe<TimegramaEntityResponse>;
   tosplits?: Maybe<TosplitRelationResponseCollection>;
   total_price?: Maybe<Scalars['Float']['output']>;
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
@@ -16741,6 +16752,7 @@ export type RatsonProposalFiltersInput = {
   ratson_willingness_entry?: InputMaybe<ComponentNewWillingnessEntriesFiltersInput>;
   sheirutpends?: InputMaybe<SheirutpendFiltersInput>;
   status_proposal?: InputMaybe<StringFilterInput>;
+  timegrama?: InputMaybe<TimegramaFiltersInput>;
   tosplits?: InputMaybe<TosplitFiltersInput>;
   total_price?: InputMaybe<FloatFilterInput>;
   updatedAt?: InputMaybe<DateTimeFilterInput>;
@@ -16769,6 +16781,7 @@ export type RatsonProposalInput = {
   ratson_willingness_entry?: InputMaybe<Array<InputMaybe<ComponentNewWillingnessEntriesInput>>>;
   sheirutpends?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   status_proposal?: InputMaybe<Enum_Ratsonproposal_Status_Proposal>;
+  timegrama?: InputMaybe<Scalars['ID']['input']>;
   tosplits?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   total_price?: InputMaybe<Scalars['Float']['input']>;
   votes?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
@@ -19904,6 +19917,7 @@ export type Timegrama = {
   open_mission?: Maybe<OpenMissionEntityResponse>;
   pendm?: Maybe<PendmEntityResponse>;
   pmash?: Maybe<PmashEntityResponse>;
+  ratson_proposal?: Maybe<RatsonProposalEntityResponse>;
   roster_period?: Maybe<RosterPeriodEntityResponse>;
   sheirutpend?: Maybe<SheirutpendEntityResponse>;
   stipend_payment?: Maybe<StipendPaymentEntityResponse>;
@@ -19954,6 +19968,7 @@ export type TimegramaFiltersInput = {
   or?: InputMaybe<Array<InputMaybe<TimegramaFiltersInput>>>;
   pendm?: InputMaybe<PendmFiltersInput>;
   pmash?: InputMaybe<PmashFiltersInput>;
+  ratson_proposal?: InputMaybe<RatsonProposalFiltersInput>;
   roster_period?: InputMaybe<RosterPeriodFiltersInput>;
   sheirutpend?: InputMaybe<SheirutpendFiltersInput>;
   stipend_payment?: InputMaybe<StipendPaymentFiltersInput>;
@@ -19982,6 +19997,7 @@ export type TimegramaInput = {
   open_mission?: InputMaybe<Scalars['ID']['input']>;
   pendm?: InputMaybe<Scalars['ID']['input']>;
   pmash?: InputMaybe<Scalars['ID']['input']>;
+  ratson_proposal?: InputMaybe<Scalars['ID']['input']>;
   roster_period?: InputMaybe<Scalars['ID']['input']>;
   sheirutpend?: InputMaybe<Scalars['ID']['input']>;
   stipend_payment?: InputMaybe<Scalars['ID']['input']>;

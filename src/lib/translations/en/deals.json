@@ -144,5 +144,7 @@
   "negSentBody": "The wisher will approve your terms or propose others. You will be notified.",
   "negWaiting": "Your proposal was sent — waiting for the wisher’s answer",
   "negApproveTheirs": "I'm in - approve these terms",
-  "negError": "Could not send the proposal"
+  "negError": "Could not send the proposal",
+  "negDeadlineYou": "You have until {{when}} to answer — without an answer the terms on the table are approved automatically",
+  "negDeadlineThem": "The wisher can answer until {{when}}; without an answer the terms on the table are approved automatically"
 }

@@ -31,9 +31,19 @@ import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { isTurnOf } from '$lib/wish/proposalRounds.js';
 import { entryInput, loadWishProposal, requireParty } from '$lib/server/wish/proposal.js';
 import { syncSlotToVersion } from '$lib/server/wish/placement.js';
+import { armProposalClock } from '$lib/server/wish/clock.js';
+
+/** What the wish chat says when silence, not a person, approved the terms. */
+const AUTO_CHAT = 'התנאים שהוצעו אושרו אוטומטית — הצד השני לא השיב בזמן שנקבע למשאלה.';
 
 const handler: ActionExecutionHandler = async (params, context, { strapi, notifier }) => {
-  const { proposalId, ratsonId } = params as { proposalId: string; ratsonId: string };
+  const { proposalId, ratsonId, viaSilence } = params as {
+    proposalId: string;
+    ratsonId: string;
+    /** Set by the silence clock: the side that stayed silent is approving by default (C-9). */
+    viaSilence?: boolean;
+  };
+  const auto = viaSilence === true;
 
   if (!proposalId) throw new Error('proposalId is required');
   if (!ratsonId) throw new Error('ratsonId is required');
@@ -49,7 +59,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
   if (status !== 'suggested' && status !== 'viewed') {
     throw new Error(`This proposal is '${status}' and can no longer be approved`);
   }
-  if (!p.slot) throw new Error('This invitation has no slot to fill (missing recipe reference)');
+  if (!p.slot || !p.path) throw new Error('This invitation has no slot to fill (missing recipe reference)');
 
   // Your move only if the other side signed last.
   if (!isTurnOf(party, p.standing)) {
@@ -104,10 +114,25 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
     }
   };
 
+  /** When silence approved, the silent side is told what their silence did. */
+  const tellSilent = async (party: 'wisher' | 'provider') => {
+    if (!auto) return;
+    await tell(
+      [me],
+      { he: 'התנאים אושרו בשתיקה', en: 'The terms were approved by silence', ar: 'تمت الموافقة على الشروط بالصمت' },
+      {
+        he: 'לא השבת בזמן שנקבע למשאלה, ולכן התנאים שהוצעו אושרו אוטומטית.',
+        en: 'You did not answer within the pace set for the wish, so the proposed terms were approved automatically.',
+        ar: 'لم تردّوا ضمن الوقت المحدد للأمنية، لذلك تمت الموافقة على الشروط المقترحة تلقائياً.'
+      },
+      party === 'wisher' ? `/concierge/${ratsonId}` : '/deals'
+    );
+  };
+
   // ── A volunteer approving the wisher's counter: sign, and hand it back ──────
   // The slot is built by the wisher's own accept (it needs her authority), so this
   // only records that the volunteer stands behind her version.
-  if (p.ref.openedBy === 'provider') {
+  if (p.path === 'volunteer') {
     if (party !== 'provider') {
       throw new Error("A volunteer's offer is closed by the wisher's own accept, not from here");
     }
@@ -117,7 +142,11 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
       context.jwt,
       context.fetch
     );
-    await say('אישרתי את הגרסה שהוצעה למשימה.');
+    await say(auto ? AUTO_CHAT : 'אישרתי את הגרסה שהוצעה למשימה.');
+    await tellSilent('provider');
+    // The turn is the wisher's now (she closes the placement) — her clock starts. A silence
+    // that is already approving goes straight on to close it, so no new clock is armed.
+    if (!auto) await armProposalClock(strapi, context, { proposalId: String(proposalId), ratsonId: String(ratsonId) });
     await tell(
       p.wisherIds.filter((id) => id !== me),
       { he: 'המתנדב/ת אישר/ה את הגרסה שלך', en: 'The volunteer approved your version', ar: 'وافق المتطوّع على نسختك' },
@@ -180,7 +209,8 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
 
   // 4. Seed the wish chat + tell the other side.
   if (party === 'provider') {
-    await say('אישרתי את ההשמה שלי למשימה במשאלה.');
+    await say(auto ? AUTO_CHAT : 'אישרתי את ההשמה שלי למשימה במשאלה.');
+    await tellSilent('provider');
     await tell(
       p.wisherIds.filter((id) => id !== me),
       {
@@ -196,7 +226,8 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
       `/concierge/${ratsonId}`
     );
   } else {
-    await say('אישרתי את הגרסה שהוצעה — ההשמה נסגרה.');
+    await say(auto ? AUTO_CHAT : 'אישרתי את הגרסה שהוצעה — ההשמה נסגרה.');
+    await tellSilent('wisher');
     await tell(
       p.proposerIds.filter((id) => id !== me),
       {
@@ -233,7 +264,8 @@ export const acceptWishOfferConfig: ActionConfig = {
   graphqlOperation: handler,
   paramSchema: {
     proposalId: { type: 'string', required: true },
-    ratsonId: { type: 'string', required: true }
+    ratsonId: { type: 'string', required: true },
+    viaSilence: { type: 'boolean', required: false, description: 'Set by the silence clock when the silent side approves by default' }
   },
   authRules: [{ type: 'jwt', errorMessage: 'Must be logged in to approve a placement' }],
   updateStrategy: { type: 'none' }

@@ -17,7 +17,7 @@
   import { executeAction } from '$lib/client/actionClient';
   import { toast } from 'svelte-sonner';
   // `t` below is this component's own dictionary; the shared translations are `tr`.
-  import { t as tr } from '$lib/translations';
+  import { t as tr, locale } from '$lib/translations';
   import { refuseCounter } from '$lib/wish/proposalRounds';
 
   type WishItem = {
@@ -29,6 +29,8 @@
 
   /** The terms negotiation from the provider's side (src/lib/server/wish/negotiationView.ts). */
   type Negotiation = {
+    /** When silence answers for whoever's move it is (ISO) — null once the proposal is closed. */
+    deadlineAt?: string | null;
     canCounter: boolean;
     round: number;
     yourTurn: boolean;
@@ -63,6 +65,20 @@
   const myTurn = $derived(negotiation ? negotiation.yourTurn : true);
   const canCounter = $derived(negotiation ? negotiation.canCounter : true);
   const lastNote = $derived(negotiation?.counters.at(-1)?.note ?? '');
+
+  /** "Sat, 12 Oct, 14:30" in the reader's language — the runtime has the words. */
+  const deadlineText = $derived.by(() => {
+    const iso = negotiation?.deadlineAt;
+    const d = iso ? new Date(iso) : null;
+    if (!d || Number.isNaN(d.getTime())) return '';
+    return d.toLocaleString($locale || 'he', {
+      weekday: 'short',
+      day: 'numeric',
+      month: 'short',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  });
 
   /* ── The counter: the way to say "not on these terms" (QA C-9) ── */
   let counterHours = $state<number | string>('');
@@ -208,6 +224,13 @@
             </p>
           {/each}
         </div>
+      {/if}
+
+      {#if deadlineText}
+        <!-- Silence is consent, at the pace of the wish: say when it answers. -->
+        <p class="ofr-deadline">
+          {$tr(myTurn ? 'deals.negDeadlineYou' : 'deals.negDeadlineThem', { when: deadlineText })}
+        </p>
       {/if}
 
       {#if myTurn}
@@ -411,6 +434,7 @@
     border-radius: 10px;
   }
   .ofr-neg-log p { margin: 0; font-size: 12.5px; line-height: 1.55; color: var(--tm, #9a8f80); }
+  .ofr-deadline { margin: 0 0 12px; font-size: 12.5px; line-height: 1.5; color: var(--tm, #9a8f80); }
   .ofr-waiting { margin: 0 0 6px; font-size: 13.5px; color: var(--gold-l, #e8d59a); }
   .ofr-waiting-note { margin: 0 0 12px; font-size: 12.5px; color: var(--tm, #9a8f80); font-style: italic; }
   .ofr-form { display: flex; flex-direction: column; gap: 10px; }

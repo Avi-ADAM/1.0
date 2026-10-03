@@ -2479,6 +2479,7 @@ These are the main content types in the Strapi backend.
 | `ratson_match_jobs` | `Maybe<RatsonMatchJobRelationResponseCollection>` |
 | `ratson_proposals` | `Maybe<RatsonProposalRelationResponseCollection>` |
 | `ratson_shares` | `Maybe<RatsonShareRelationResponseCollection>` |
+| `restime` | `Maybe<Enum_Ratson_Restime>` |
 | `share_status` | `Maybe<Enum_Ratson_Share_Status>` |
 | `sheiruts` | `Maybe<SheirutRelationResponseCollection>` |
 | `startDate` | `Maybe<Scalars['DateTime']['output']>` |
@@ -2529,6 +2530,7 @@ These are the main content types in the Strapi backend.
 | `ratson_willingness_entry` | `Maybe<Array<Maybe<ComponentNewWillingnessEntries>>>` |
 | `sheirutpends` | `Maybe<SheirutpendRelationResponseCollection>` |
 | `status_proposal` | `Maybe<Enum_Ratsonproposal_Status_Proposal>` |
+| `timegrama` | `Maybe<TimegramaEntityResponse>` |
 | `tosplits` | `Maybe<TosplitRelationResponseCollection>` |
 | `total_price` | `Maybe<Scalars['Float']['output']>` |
 | `updatedAt` | `Maybe<Scalars['DateTime']['output']>` |
@@ -3204,6 +3206,7 @@ These are the main content types in the Strapi backend.
 | `open_mission` | `Maybe<OpenMissionEntityResponse>` |
 | `pendm` | `Maybe<PendmEntityResponse>` |
 | `pmash` | `Maybe<PmashEntityResponse>` |
+| `ratson_proposal` | `Maybe<RatsonProposalEntityResponse>` |
 | `roster_period` | `Maybe<RosterPeriodEntityResponse>` |
 | `sheirutpend` | `Maybe<SheirutpendEntityResponse>` |
 | `stipend_payment` | `Maybe<StipendPaymentEntityResponse>` |
