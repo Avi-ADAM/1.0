@@ -15,7 +15,9 @@
     "done": "done",
     "saved": "saved successfully",
     "oneMonent": "one moment please",
-    "editTimer": "edit Timer"
+    "editTimer": "edit Timer",
+    "timerRunning": "The timer is still running. Stop and save it before submitting the mission.",
+    "noHours": "No hours have been saved for this mission yet. Run the timer (or edit it) and save, then submit."
   },
   "cards": {
     "approve": "I want",
@@ -187,7 +189,12 @@
         "sellerConfirmedMoney": "Recipient confirmed receipt",
         "coordinatingWith": "Coordinating with:"
       },
-      "myPurchase": "MY PURCHASE"
+      "myPurchase": "MY PURCHASE",
+      "confirmTitle": "Confirm the transfer",
+      "confirmTo": "Transfer to {{name}}:",
+      "confirmHint": "The money itself moves between you, outside the site. Here you record who you paid, and {{name}} confirms when it arrives.",
+      "confirmYes": "Yes, I'm transferring",
+      "confirmBack": "Back"
     },
     "dowegeot": {
       "head": "Approval of receiving a resource successfully",
@@ -363,7 +370,8 @@
       "withdrawSelfNomination": "Withdraw your self-nomination - the mission you authored closes entirely"
     },
     "wishApplied": "Your offer was sent successfully",
-    "toProfile": "to the profile page"
+    "toProfile": "to the profile page",
+    "awaitingClient": "Your vote is recorded. This part belongs to a customer's deal, so it goes through only once she approves too."
   },
   "taskApproval": {
     "approve": "Approve",
@@ -771,7 +779,10 @@
     "missionDetails": "Mission details",
     "requestedRole": "Requested role",
     "iWant": "Yes, I want",
-    "notForMe": "Not for me"
+    "notForMe": "Not for me",
+    "wishSuggestion": "An offer to do part of a customer's wish",
+    "chatOnWish": "Chat with the wish's owner",
+    "partOfWish": "Part of the wish:"
   },
   "list": {
     "count": "{{count}} items",
@@ -779,6 +790,7 @@
     "toList": "Compact view",
     "toCards": "Cards view",
     "toCoins": "Coins view",
+    "toNotices": "Notices view",
     "switchLabel": "Choose view",
     "time": {
       "over": "Time is up",
@@ -810,7 +822,7 @@
       "archObject": "Item removal",
       "stipend": "Subsistence stipend",
       "hachla": "Decision",
-      "wishoffer": "Volunteer offer",
+      "wishoffer": "Offer on a wish",
       "sitesharepay": "Site-share payment",
       "stipendpay": "Stipend payment",
       "stipendconfirm": "Stipend received",
@@ -860,7 +872,9 @@
       "sheirutpends": "New product or service",
       "saleClaim": "Sale holder consent",
       "saleClaimSub": "Who holds the money",
-      "generic": "A decision awaiting your signature"
+      "generic": "A decision awaiting your signature",
+      "address": "A new address for the rikma",
+      "look": "A new look for the public page"
     },
     "sub": {
       "stipendFrom": "Funded by {{name}}",

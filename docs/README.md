@@ -52,6 +52,7 @@
 |---|---|
 | PLAN_AI_SIGNUP_CONCIERGE | בנוי (M0–M13), ממתין ל-deploy ובדיקת עשן |
 | PLAN_SHIFTS | P1–P11 ב-commits, סכמת 1.0b ממתינה ל-deploy |
+| PLAN_RIKMA_SUBDOMAINS | S0 (כתובת `/r/<slug>`) ו-S1 (מראה מובנה לדף הציבורי + עורך ב-`/moach/<id>/look`) בנויים, ממתינים ל-deploy של 1.0b (שדות בלבד, בלי הרשאות חדשות); S2 סאב-דומיין, S3–S4 פתוחים |
 | PLAN_RESOURCE_CALENDAR · PLAN_P2P_PILOT · PLAN_RIKMA_SHARED_INFO (שלב 2) | ממומשים, ממתינים ל-deploy. שלב 3 של SHARED_INFO (כספת E2E ב-`vault:<pid>`) בנוי וכבוי מאחורי `VAULT_ENABLED` |
 | PLAN_CODE_RIKMA | S0–S4 חלקי, S6 חלקי |
 | PLAN_UGC_TRANSLATION | P4 (משטחים ציבוריים) |
@@ -67,7 +68,8 @@
 | PLAN_SHARED_PURCHASE | ה-maagad בנוי, הצעות-סף עוד לא |
 | PLAN_TAURI_MOBILE | מעטפת לאתר החי; ה-SPA כמסלול המשך |
 | PLAN_AI_ERA | מסמך-על, חלקו בוצע |
-| HANDOFF_DISTRIBUTED_DB · PLAN_IMPLEMENTATION_ROADMAP · PLAN_user_sovereign_consent · PLAN_serverless_p2p_data · PLAN_rikma_as_state_machine · PLAN_restime_in_signed_chain | השכבה המבוזרת: S1 ו-S2a בנויים, S2b בשער החלטה |
+| **PLAN_DISTRIBUTED_EXECUTION** | **נקודת הכניסה לשכבה המבוזרת**: תור משימות מסודר (S2b חי, הקשחת פורמט, עמידות קוונטית, Tauri, Rust) + פרוטוקול לסוכן — "קרא ופעל לפי §0, תקדם את המשימה הבאה" |
+| HANDOFF_DISTRIBUTED_DB · PLAN_IMPLEMENTATION_ROADMAP · PLAN_user_sovereign_consent · PLAN_serverless_p2p_data · PLAN_rikma_as_state_machine · PLAN_restime_in_signed_chain | השכבה המבוזרת: S1 ו-S2a בנויים, S2b בשער החלטה. ליבת Rust/WASM: R0 (מפרט + vectors) בנוי; R1/R2 מתוזמנים ל-SPA של Tauri ול-S3b (HANDOFF §8) |
 | PLAN_T9_SOCIAL_RECOVERY | T9a (`epoch.grant` + ריפוי) ו-T9b (אפוטרופסים, חלון מחאה 24ש', UI ב-`/me/settings/recovery`) בנויים, ממתינים לדיפלוי; T9c נדחה |
 | PLAN_STRAPI5_UPGRADE | P0 (4.26.2) מוכן ב-`1.0b`, ממתין ל-commit ו-deploy; P1 spikes פתוחים |
 | MIGRATION_TRACKING · PLAN_action_migration_vs_p2p | המיגרציה ל-Action System |
@@ -75,6 +77,8 @@
 | FIXES | קובץ ממצאים מתגלגל |
 | PRODUCTION_READINESS_REVIEW · QA_SOLO_RIKMA_2026-08 | סקירות עם ממצאים פתוחים |
 | QA_CONCIERGE_E2E_2026-10 | תכנית בדיקה מקצה לקצה של הקונסיירז' לפני השקה + ממצאים (בריצה) |
+| PLAN_DIRECT_OFFER | הצעה אישית (ספק כותב משאלה בשם לקוחה, והיא מקבלת אותה בקישור) + איחוד מסכי גיבוש · אישור · ביצוע. P1 (רצועת שלבי העסקה בשלושת המסכים) בנוי; P2+ ממתינים לסכמה ב-1.0b |
+| PLAN_SMART_NOTICES | התראות חכמות: שלבים 0–5 בנויים (שרת, משפטים, פעמוני קונסיירז' ו-deals, hub, תצוגת התראות בלב); ההסתרה ממתינה לדיפלוי 1.0b + הרשאות; שלב 6 (ערוצים) ו-7 פתוחים |
 
 ## tbd/
 
@@ -82,11 +86,13 @@
 |---|---|
 | PLAN_DEADLOCK_PREVENTION | livelock במו"מ + נקודות הסכמה |
 | PLAN_MONEY_RAILS | מסילות תשלום (ריבוי מטבעות כבר יצא ממנו ל-done) |
+| PLAN_SHARE_BASIS_HOURS_VS_PRICE | שווי שותפות: שעות שאושרו מול המחיר שסוכם (QA C-14). החלטת ביניים: לפי שעות; מוצע `valueBasis` לכל משימה |
 | PLAN_VOLUNTEER_RIKMA | טיוטה |
 | PLAN_central_rikma_definition · PLAN_concierge_in_p2p | קונספטואליים, ההמשך של השכבה המבוזרת |
 | TIMEGRAMA_REMINDERS | תזכורות R1–R4 |
 | SPEC_VOTING_SYSTEM | הוחלף בפועל במודל ה-`Decision` |
 | SPEC_SOCKET_REALTIME | presence ואירועי UI חי |
+| PLAN_REALTIME_MIGRATION · REALTIME_TRACKING | מיפוי סוקט (2026-10-08): 45% מה-actions שקטים, 17% ממוקדים; scopes במקום updateStrategy, ratchet test, R0–R6 |
 | IMPROVEMENT_POINTS | רשימת שיפורים ישנה |
 | PLAN_MARKETING_GLOBAL · PLAN_X_ORGANIC · PLAN_VIDEO_OPENMONTAGE · homepage_&_seo_raw_ideas | שיווק ורעיונות |
 
@@ -95,3 +101,8 @@
 AGENT_ACTION_MIGRATION_GUIDE · CARD_MODERNIZATION_GUIDE · LEV_CARD_CONVENTIONS ·
 HOWTO_ADD_LEV_OBJECT · HOWTO_LEV_QUANTUM_LOADING · HOWTO_SPACE_SYNC ·
 MOACH_AI_AGENT_GUIDE · DEPLOY_API_DOCKER · GITHUB_APP_SETUP
+
+**מפרטים נורמטיביים** — SPEC_CONSENT_FORMAT: פורמט הבייטים החתום של השכבה
+המבוזרת (JSON קנוני, חתימות, projection, state root, הצפנה). החוזה עצמו הוא
+ה-vectors ב-[`spec/consent-v1/`](../spec/consent-v1), שכל מימוש (היום TS, בעתיד
+ליבת Rust/WASM) חייב לשחזר; `npm run vectors:consent` מייצר אותם מחדש.

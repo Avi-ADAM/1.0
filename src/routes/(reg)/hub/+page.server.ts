@@ -2,6 +2,10 @@ import { sendToSer } from '$lib/send/sendToSer.js';
 import { emptyHubSummary, processHubSummary, type HubSummary } from '$lib/digest/hubSummary.js';
 import type { DigestPayload } from '$lib/digest/compose.js';
 import { composeFromReads, startDigestReads } from '$lib/server/digest/collect.js';
+import { loadWishNotices } from '$lib/server/concierge/notices';
+import { loadDealNotices } from '$lib/server/deal/dealNotices';
+import { EMPTY_PREFS, loadNoticePrefs, type NoticePrefs } from '$lib/server/notices/prefs';
+import type { Notice } from '$lib/notices';
 import type { PageServerLoad } from './$types';
 
 // The vote calculation lives in $lib/digest/hubSummary.ts now — the daily
@@ -19,6 +23,20 @@ export type HubPageSummary = Omit<HubSummary, 'feed' | 'projectIds'>;
 export interface HubBrief {
   payload: DigestPayload;
   failed: string[];
+}
+
+/**
+ * What waits for the member outside the heart (docs/inprogress/PLAN_SMART_NOTICES.md
+ * §6.3): the concierge's proposals and the deals' signatures, already as
+ * notices, plus her notice preferences. The heart's own notices are built in
+ * the browser from the heart's data, which the hub warms anyway. `null` for a
+ * list means it could not be read — the page then says nothing about it rather
+ * than claiming it is empty.
+ */
+export interface HubNotices {
+  wish: Notice[] | null;
+  deal: Notice[] | null;
+  prefs: NoticePrefs;
 }
 
 /**
@@ -85,7 +103,8 @@ export const load: PageServerLoad = async ({ locals, fetch }) => {
       streamed: {
         summary: Promise.resolve(toPageSummary(emptyHubSummary())),
         demand,
-        brief: Promise.resolve(null as HubBrief | null)
+        brief: Promise.resolve(null as HubBrief | null),
+        notices: Promise.resolve(null as HubNotices | null)
       }
     };
   }
@@ -104,5 +123,20 @@ export const load: PageServerLoad = async ({ locals, fetch }) => {
     .then(() => composeFromReads(uid, startDigestReads(uid, { fetch, door: 'session' }, hubRaw)))
     .then((c) => ({ payload: c.payload, failed: Object.keys(c.failed) }));
 
-  return { streamed: { summary, demand, brief } };
+  // Behind the summary too, for the same reason as the brief: these are several
+  // reads (wishes, a few deals each), and the hub's own numbers come first.
+  const notices: Promise<HubNotices | null> = hubRaw
+    .catch(() => null)
+    .then(() => {
+      const prefsPending = loadNoticePrefs(uid, fetch);
+      return Promise.all([
+        loadWishNotices(uid, fetch, prefsPending),
+        loadDealNotices(uid, fetch, prefsPending),
+        prefsPending
+      ]);
+    })
+    .then(([wish, deal, prefs]) => ({ wish, deal, prefs: prefs ?? EMPTY_PREFS }))
+    .catch(() => null);
+
+  return { streamed: { summary, demand, brief, notices } };
 };

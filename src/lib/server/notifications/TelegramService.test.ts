@@ -137,13 +137,13 @@ describe('TelegramService', () => {
       expect(thirdCall.message).toBe('محتوى عربي');
     });
 
-    it('should fall back to context language for unsupported user language', async () => {
+    it("writes to a reader in an untemplated locale in English, not in the sender's language", async () => {
       const recipients: UserProfile[] = [
         {
           id: '1',
-          username: 'french_user',
-          email: 'french@example.com',
-          lang: 'fr', // Not supported
+          username: 'russian_user',
+          email: 'ru@example.com',
+          lang: 'ru', // a platform locale the {he, en, ar} templates don't cover
           telegramId: '123456789',
           machshirs: []
         }
@@ -154,10 +154,12 @@ describe('TelegramService', () => {
         body: { he: 'תוכן', en: 'Content' }
       };
 
+      // The sender writes in Hebrew — that must not decide the reader's language.
       await telegramService.sendBulk(recipients, notification, mockContext);
 
       const call = JSON.parse(mockFetch.mock.calls[0][1].body);
-      expect(call.lang).toBe('he'); // Falls back to context language
+      expect(call.lang).toBe('en');
+      expect(call.det).toBe('Title');
     });
 
     it('should include metadata URL in Telegram message', async () => {
@@ -385,13 +387,13 @@ describe('TelegramService', () => {
       expect(call.lang).toBe('en'); // Uses user's language, not context
     });
 
-    it('should default to Hebrew when both user and context languages are unsupported', async () => {
+    it('should use English when the reader has no template and the context is unsupported too', async () => {
       const recipients: UserProfile[] = [
         {
           id: '1',
           username: 'user',
           email: 'user@example.com',
-          lang: 'fr', // Unsupported
+          lang: 'es', // No template
           telegramId: '123456789',
           machshirs: []
         }
@@ -407,7 +409,7 @@ describe('TelegramService', () => {
       await telegramService.sendBulk(recipients, notification, unsupportedContext);
 
       const call = JSON.parse(mockFetch.mock.calls[0][1].body);
-      expect(call.lang).toBe('he'); // Defaults to Hebrew
+      expect(call.lang).toBe('en');
     });
   });
 });

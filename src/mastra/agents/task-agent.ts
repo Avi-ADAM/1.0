@@ -1,12 +1,5 @@
 import { Agent } from '@mastra/core/agent';
-import {
-  createGoogleModel,
-  createGroqModel,
-  createNvidiaModel,
-  hasGroqModelConfig,
-  hasNvidiaModelConfig,
-  hasGoogleModelConfig
-} from '../lib/createModel';
+import { createModelChain } from '../lib/createModel';
 import { findUserProjectsTool } from '../tools/findUserProjectsTool';
 import { getProjectMembersTool } from '../tools/getProjectMembersTool';
 import { getMemberMissionsTool } from '../tools/getMemberMissionsTool';
@@ -21,14 +14,7 @@ import { getChatMemory, workingMemoryInstructions } from '../lib/chatMemory';
  * language ("create a task X in project Y for Dana" / "…for the design role").
  */
 export function createTaskAgent(apiKey: string, language: string = 'he', userId: string) {
-  const model = (() => {
-    if (hasGoogleModelConfig(apiKey)) {
-      return createGoogleModel(apiKey, 'gemini-3-flash-preview', { thinkingBudget: 0 });
-    }
-    if (hasGroqModelConfig()) return createGroqModel();
-    if (hasNvidiaModelConfig(apiKey)) return createNvidiaModel(apiKey);
-    return createGoogleModel(apiKey, 'gemini-flash-lite-latest');
-  })();
+  const model = createModelChain(apiKey);
 
   const instructions = `
 You help users of the 1💗1 (1lev1.com) platform create tasks (called "מטלה" / "Act") inside their projects.

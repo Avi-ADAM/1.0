@@ -116,6 +116,8 @@
   } = $props();
   let decisionCurrentValue = $state('');
   let decisionNewValue = $state('');
+  let decisionLook = $state(null);
+  let decisionPreviewHref = $state('');
 
   onMount(async () => {
     console.log('HACHLATA!!!');
@@ -144,6 +146,12 @@
           }
           decisionCurrentValue = currentValue ?? '';
           decisionNewValue = newValue ?? '';
+          // PLAN_RIKMA_SUBDOMAINS: the rikma's address / public look.
+          if (kind === 'address' || kind === 'look') {
+            openmissionName = $t(`rikmaLook.card.${kind}Title`);
+            decisionLook = result.data.look ?? null;
+            decisionPreviewHref = result.data.previewHref ?? '';
+          }
         }
       } catch (e) {
         console.warn('getDecisionDetails failed:', e);
@@ -1372,6 +1380,8 @@
                 {onProj}
                 currentValue={decisionCurrentValue}
                 newValue={decisionNewValue}
+                lookProposal={decisionLook}
+                previewHref={decisionPreviewHref}
               />
             </div>
           </Drawer.Content>
@@ -1408,6 +1418,8 @@
     {noofusersNo}
     currentValue={decisionCurrentValue}
     newValue={decisionNewValue}
+    lookProposal={decisionLook}
+    previewHref={decisionPreviewHref}
   />
 {/if}
 

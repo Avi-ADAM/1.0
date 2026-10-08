@@ -21,6 +21,7 @@
     "types:extract": "node scripts/extract-graphql-types.mjs",
     "types:update": "npm run codegen && npm run types:extract",
     "validate:qids": "node scripts/validate-qids.mjs",
+    "vectors:consent": "node scripts/gen-consent-vectors.mjs",
     "check:proxy": "node scripts/check-proxy-security.mjs",
     "check:i18n": "node scripts/check-i18n-routes.mjs",
     "check:script": "node scripts/check-mixed-script.mjs",

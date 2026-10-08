@@ -15,7 +15,7 @@
   import { idPr } from '../../stores/idPr.js';
   import { onMount } from 'svelte';
   import Lowbtn from '$lib/celim/lowbtn.svelte';
-  import { timers, updateTimers, lockTimerForEdit } from '$lib/stores/timers.js';
+  import { timers, updateTimers, lockTimerForEdit, fetchTimers } from '$lib/stores/timers.js';
   import { startTimer } from '$lib/func/timers.js';
   import { stopTimer } from '$lib/func/timers.js';
   /**
@@ -104,7 +104,7 @@
   // All timer state is DERIVED from the store (same model as timer.svelte).
   // No local clock, no parallel mutable state — so remote socket updates from
   // other devices/tabs reflect here immediately and the animation can't desync.
-  let storeTimer = $derived($timers?.find((t) => t.mId == mId));
+  let storeTimer = $derived($timers?.find((t) => String(t.mId) === String(mId)));
   let isRunning = $derived(!!storeTimer?.running);
   let activeTimerData = $derived(
     storeTimer?.attributes?.activeTimer?.data?.attributes
@@ -151,10 +151,13 @@
   });
 
   // Helper: write a timer update back to the global store (optimistic + result).
+  // Ids compare as strings: the store holds GraphQL ids (strings) and the card may
+  // get a number — a strict === matched nothing, so a started timer showed only
+  // after a reload (QA_CONCIERGE_E2E C-12).
   function updateStore(isRun, res = null) {
     updateTimers(
       $timers.map((t) =>
-        t.mId === mId
+        String(t.mId) === String(mId)
           ? {
               ...t,
               running: isRun,
@@ -315,6 +318,11 @@
         false
       );
       if (result) updateStore(true, result);
+      // A mission that became "in progress" after the store was loaded is not in
+      // it at all, so the update above had nothing to land on (C-12): reload it.
+      if (!$timers.some((t) => String(t.mId) === String(mId))) {
+        await fetchTimers(page.data.uid, fetch);
+      }
     } catch (e) {
       error1 = e;
       updateStore(false); // revert
@@ -367,17 +375,15 @@
   let transitioned;
 
   function done() {
-    if (
-      hoursdon == 0 ||
-      hoursdon == undefined ||
-      hoursdon == null ||
-      $timers.find((t) => t.mId === mId)?.attributes?.activeTimer?.data != null
-    ) {
-      console.log(
-        hoursdon,
-        $timers.find((t) => t.mId === mId)?.attributes?.activeTimer?.data
-      );
-      toast.warning('יש זמן טיימר שלא נשמר. יש לשמור או לאפס לפני הגשה.');
+    // Two different reasons not to submit yet, and each gets its own words: a
+    // running timer has hours that are not saved; zero hours means nothing was
+    // logged at all (QA_CONCIERGE_E2E C-11 — the old text blamed a timer either way).
+    if ($timers.find((t) => String(t.mId) === String(mId))?.attributes?.activeTimer?.data != null) {
+      toast.warning($t('lev.missionInProgress.timerRunning'));
+      return;
+    }
+    if (!hoursdon) {
+      toast.warning($t('lev.missionInProgress.noHours'));
       return;
     }
     already = true;
@@ -457,7 +463,12 @@
       console.log('completeMission action result', result);
 
       if (!result.success) {
-        throw new Error(result.error?.message || 'Action failed');
+        // A database failure is reported by the server in English and says nothing
+        // the member can act on (QA C-22) — they get the localized message; the
+        // details stay in the console. A validation message is the action's own words.
+        const raw = result.error?.code === 'STRAPI_ERROR' ? '' : result.error?.message;
+        console.error('[completeMission]', result.error);
+        throw new Error(raw || $t('lev.missionInProgress.error'));
       }
 
       isOpen = false;
@@ -466,7 +477,8 @@
       error1 = e;
       console.log(error1);
       isOpen = true;
-      activE = error1?.message ?? error1;
+      activE =
+        e instanceof TypeError ? $t('lev.missionInProgress.error') : (error1?.message ?? error1);
       butt = false;
       already = false;
     }
@@ -715,7 +727,7 @@
       if (donenow !== undefined) {
         updateTimers(
           $timers.map((t) =>
-            t.mId === mId
+            String(t.mId) === String(mId)
               ? {
                   ...t,
                   attributes: {

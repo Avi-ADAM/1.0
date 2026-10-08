@@ -8,7 +8,7 @@ vi.mock('$lib/server/mission/resolveMissionSpec.js', () => ({
 const { POST } = await import('./+server');
 
 function cat(resolved: { id: string; name: string }[] = []) {
-  return { ids: resolved.map((r) => r.id), resolved, suggestions: [], newlyCreated: [] };
+  return { ids: resolved.map((r) => r.id), resolved, suggestions: [], newlyCreated: [], unresolved: [] };
 }
 
 /** Minimal RequestEvent stand-in — the handler only uses these three. */

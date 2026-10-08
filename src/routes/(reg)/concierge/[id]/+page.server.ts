@@ -6,6 +6,7 @@ import { enrichWish, placeKey, EMPTY_ENRICHMENT, type WishEnrichment } from '$li
 import { extractWish, type WishExtraction } from '$lib/server/ai/extractWish';
 import { GEMINI_API_KEY } from '$env/static/private';
 import { loadBell } from '$lib/server/concierge/bell';
+import { loadWishNotices } from '$lib/server/concierge/notices';
 import { negotiationView } from '$lib/server/wish/negotiationView';
 import { normalizeRestime } from '$lib/wish/restime';
 import { externalConfig } from '$lib/server/concierge/externalConfig';
@@ -17,6 +18,12 @@ import {
   type ExternalPanel
 } from '$lib/server/concierge/externalView';
 import type { PageServerLoad } from './$types';
+import { wishGaps } from '$lib/wish/gaps';
+import { lineNames } from '$lib/wish/lineNames';
+import { readDealStages } from '$lib/server/deal/dealChain';
+import { sendViaProxy } from '$lib/server/sendViaProxy.js';
+
+type PublishedNeed = { name: string; extractedKey: string | null };
 
 export type WishForumMessage = {
   id: string;
@@ -48,6 +55,7 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
 
   // Started first, awaited last: it runs beside the slow work below.
   const bellPending = loadBell(uid, fetch);
+  const noticesPending = loadWishNotices(uid, fetch);
 
   let wish: any = null;
   let proposals: any[] = [];
@@ -55,6 +63,8 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
   // "Not found" and "could not ask" are different answers — the page must never
   // fill the gap with a demo wish (QA_CONCIERGE_E2E C-6).
   let loadFailed = false;
+  /** The raw qid-105 answer, for the gaps below (proposals with their covered slots). */
+  let rawRatson: any = null;
 
   try {
     const res: any = await sendToSer(
@@ -71,6 +81,7 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
     if (!res?.data) loadFailed = true;
 
     const node = res?.data?.ratson?.data;
+    rawRatson = res?.data ?? null;
     if (node) {
       const a = node.attributes || {};
       const owners = a.users_permissions_users?.data ?? [];
@@ -83,6 +94,12 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
         desc: a.desc || '',
         longDes: a.longDes || a.desc || '',
         status: a.status_ratson || (a.fulfilled ? 'fulfilled' : 'open'),
+        // The terms as last edited (PLAN_DIRECT_OFFER §4.3) — every proposal's
+        // signatures are read against it.
+        termsDigest: a.terms_digest ?? null,
+        // A direct offer (PLAN_DIRECT_OFFER): who wrote it for her, and when she took it.
+        offeredBy: a.offered_by?.data ? { id: String(a.offered_by.data.id), name: a.offered_by.data.attributes?.username ?? '' } : null,
+        claimedAt: a.claimed_at ?? null,
         fulfilled: !!a.fulfilled,
         fulfillmentScore: typeof a.fulfillment_score === 'number' ? a.fulfillment_score : null,
         lastMatchedAt: a.last_matched_at ?? null,
@@ -196,7 +213,8 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
               proposerIds: proposerUsers.map((u: any) => String(u.id))
             },
             'wisher',
-            restime
+            restime,
+            wish?.termsDigest ?? null
           ),
           negoIds: (pa.negos?.data ?? []).map((n: any) => n.id),
           currencyName: pa.matbea?.data?.attributes?.name ?? null,
@@ -241,6 +259,14 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
   if (wish && wish.status === 'draft') {
     throw redirect(302, `/concierge/new?draft=${params.id}`);
   }
+
+  // The deal's stages (PLAN_DIRECT_OFFER P1): the requests and deals this wish
+  // became, one tap away. Read while the rest loads; owner-only, like the page.
+  const stagesP = readDealStages(
+    (qid, vars) => sendViaProxy(fetch as any, qid, vars, { isSer: true }),
+    { kind: 'wish', id: String(params.id) },
+    'concierge/:id'
+  );
 
   // ── Auto-extract on load ──────────────────────────────────────────────────
   //    A wish that loaded without a structured breakdown (created outside
@@ -448,6 +474,59 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
   }
 
   const bell = await bellPending;
+  const notices = await noticesPending;
 
-  return { wish, proposals, loadOk, uid, isOwner, enrichment, forumMessages, missionTemplates, external, bell };
+  // The parts still without a provider, exactly as closing will see them (QA C-19):
+  // the same `wishGaps` the server runs, over the proposals *and* the product's BOM
+  // lines — an invited supplier who holds a line is not a gap, which the page alone
+  // could not know. Owner-only, open wish only, best-effort (null → the page's own count).
+  let gaps: Array<{ label: string; imp: 'must' | 'nice' }> | null = null;
+  // Which part of the plan each product line is, by name ($lib/wish/lineNames): an
+  // invitation proposal points at its line, and the page puts it on that part's row.
+  let partLines: Record<string, string[]> | null = null;
+  const productId = rawRatson?.ratson?.data?.attributes?.derivedComplexMatanot?.data?.id;
+  if (wish && isOwner && !wish.fulfilled && productId) {
+    try {
+      const rec: any = await sendToSer({ id: String(productId) }, '168wishRecipeForMaterialize', 0, 0, false, fetch);
+      const m = rec?.data?.matanot?.data?.attributes;
+      if (m) {
+        partLines = lineNames(m);
+        const ra = rawRatson?.ratson?.data?.attributes ?? {};
+        gaps = wishGaps({
+          extractedMissions: ra.extracted_missions,
+          extractedResources: ra.extracted_resources,
+          proposals: rawRatson?.ratsonProposals?.data ?? [],
+          recipeMissions: m.matanot_recipe_missions?.data ?? [],
+          recipeResources: m.matanot_recipe_resources?.data ?? []
+        }).map((g) => ({ label: g.name, imp: g.isMust ? 'must' : 'nice' }));
+      }
+    } catch {
+      /* the page counts by itself */
+    }
+  }
+
+  // The needs this wish already published to the community (QA C-10): the row shows
+  // "published" after a reload too, instead of offering a second publish that opened
+  // a duplicate open mission. Owner-only and best-effort — the action itself refuses
+  // a duplicate either way.
+  let published: { missions: PublishedNeed[]; resources: PublishedNeed[] } = { missions: [], resources: [] };
+  if (wish && isOwner) {
+    try {
+      const pr: any = await sendToSer({ ratson: String(params.id) }, '416wishPublishedNeeds', 0, 0, true, fetch);
+      const pick = (n: any): PublishedNeed => ({
+        name: String(n?.attributes?.name ?? ''),
+        extractedKey: n?.attributes?.extractedKey != null ? String(n.attributes.extractedKey) : null
+      });
+      published = {
+        missions: (pr?.data?.openMissions?.data ?? []).map(pick),
+        resources: (pr?.data?.openMashaabims?.data ?? []).map(pick)
+      };
+    } catch {
+      /* the buttons stay; the server still refuses a duplicate */
+    }
+  }
+
+  const stages = await stagesP;
+
+  return { wish, proposals, loadOk, uid, isOwner, enrichment, forumMessages, missionTemplates, external, bell, notices, published, gaps, stages, partLines };
 };

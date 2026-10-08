@@ -28,7 +28,8 @@
    *     un?: string;
    *     welcome?: boolean;
    *     draft?: import('../../../routes/(reg)/concierge/new/+page.server').ServerWishDraft | null;
-   *     bell?: { id: string, name: string, count: number }[]
+   *     bell?: { id: string, name: string, count: number }[],
+   *     notices?: import('$lib/notices').Notice[] | null
    *   },
    *   anon?: boolean
    * }}
@@ -63,6 +64,16 @@
     if (!anon) {
       if (data.draft) applyServerDraft(data.draft);
       else resumeGuestDraft();
+    } else {
+      // A guest who saved ("kept in this browser") or went to sign up and came
+      // back first finds her wish where she left it (QA C-3). Only the fields:
+      // nothing is sent or saved for a guest, and the draft stays in place for
+      // the signed-in visit that does send it.
+      const d = readGuestDraft();
+      if (d) {
+        restoreDraftFields(d);
+        restoredGuestDraft = true;
+      }
     }
     // `?seed=gift` — an idea picked on /made-for-you. Never over a draft.
     const seedKey = new URLSearchParams(window.location.search).get('seed');
@@ -1363,7 +1374,7 @@
           >{$t('concierge.new.register')}</button
         >
       {:else}
-        <ConciergeBell items={data.bell ?? []}>
+        <ConciergeBell items={data.bell ?? []} notices={data.notices ?? null}>
           <EntityIcon kind="notifications" size={16} />
         </ConciergeBell>
         <button class="av-btn" onclick={() => goto('/me')}>

@@ -28,6 +28,7 @@ import { computeHeadcount } from '$lib/missions/headcount.js';
 import { assessMembership, endMembership } from './membership.js';
 import { flushHoursBeforeRateChange, type FlushResult } from '../timers/flushRateChange.js';
 import { pickRateRow, rowRate } from '$lib/timers/rate.js';
+import { roundHours, workValue } from '$lib/timers/precision.js';
 import {
   notifyRenegotiatedCandidates,
   readOfferSnapshot,
@@ -210,14 +211,16 @@ async function flushRateEra(
 async function creditHours(
   exec: Exec,
   target: ArchiveTarget,
-  hours: number,
+  rawHours: number,
   why: string,
   onMissionId?: string | null,
 ): Promise<{ finnishedMissionId?: string; hoursCredited: number }> {
+  // Whole minutes, priced to the agora ($lib/timers/precision.ts).
+  const hours = roundHours(rawHours);
   if (!(hours > 0)) return { hoursCredited: 0 };
 
   const perhour = target.perhour ?? 0;
-  const total = hours * perhour;
+  const total = workValue(hours, perhour);
   const nowISO = new Date().toISOString();
 
   // Transfer: the hours land on another in-progress mission, always as a new
@@ -235,12 +238,12 @@ async function creditHours(
       'credit:read',
     );
     const prev = Number(cur?.finnishedMission?.data?.attributes?.noofhours ?? 0);
-    const grown = prev + hours;
+    const grown = roundHours(prev + hours);
     await run(
       exec,
       `mutation { updateFinnishedMission(id: ${gqlStr(existingRow.id)}, data: { ${fields(
         numField('noofhours', grown),
-        numField('total', grown * rowRate(existingRow, perhour)),
+        numField('total', workValue(grown, rowRate(existingRow, perhour))),
       )} }) { data { id } } }`,
       'credit:grow',
     );

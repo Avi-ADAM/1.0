@@ -203,9 +203,11 @@ export async function resolveSessionIdentity({ jwt, fetch: injected } = {}) {
  * @param {string} jwt
  * @param {string} key
  * @param {typeof globalThis.fetch} [injected]
+ * @param {() => void} [onUnreachable]  told when the answer is null only because
+ *   Strapi could not be asked — "we could not check", not "no session".
  * @returns {Promise<SessionIdentity | null>}
  */
-async function verifyAgainstStrapi(jwt, key, injected) {
+async function verifyAgainstStrapi(jwt, key, injected, onUnreachable) {
   // Step 1 — local signature check, when this instance holds Strapi's secret.
   const secret = String(env.JWT_SECRET ?? '').trim();
   /** @type {string | null} */
@@ -246,6 +248,7 @@ async function verifyAgainstStrapi(jwt, key, injected) {
     writeCache(key, identity, NEGATIVE_TTL_MS);
     return identity;
   }
+  onUnreachable?.();
   return null;
 }
 
@@ -280,7 +283,13 @@ export async function resolveEventIdentity(event) {
   } catch {
     proxied = false;
   }
-  if (!proxied) return verifyAgainstStrapi(jwt, key);
+  // "No session" and "could not check the session" both come back as null, but
+  // only the first may send a member to /login (QA_CONCIERGE_E2E C-4: a brief
+  // network blip signed a supplier out of /lev). The second is flagged here.
+  const unreachable = () => {
+    if (event.locals) event.locals.identityUnreachable = true;
+  };
+  if (!proxied) return verifyAgainstStrapi(jwt, key, undefined, unreachable);
 
   try {
     const res = await event.fetch('/api/whoami');
@@ -288,7 +297,10 @@ export async function resolveEventIdentity(event) {
       writeCache(key, null, NEGATIVE_TTL_MS);
       return null;
     }
-    if (!res.ok) return null; // upstream trouble — guest for this request only
+    if (!res.ok) {
+      unreachable();
+      return null; // upstream trouble — guest for this request only
+    }
     const body = await res.json();
     if (body?.id == null) {
       writeCache(key, null, NEGATIVE_TTL_MS);
@@ -303,6 +315,7 @@ export async function resolveEventIdentity(event) {
   } catch {
     // The API front is unreachable. Nothing on the page could have rendered
     // signed-in data anyway; do not cache the failure.
+    unreachable();
     return null;
   }
 }

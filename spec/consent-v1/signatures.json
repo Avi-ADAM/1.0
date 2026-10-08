@@ -1,0 +1,285 @@
+{
+  "format": "1lev1-consent-vectors",
+  "version": 1,
+  "file": "signatures",
+  "spec": "docs/SPEC_CONSENT_FORMAT.md",
+  "generator": "src/lib/consent/vectors/build.ts (npm run vectors:consent)",
+  "keyDerivation": "seed = SHA-256(UTF-8(\"1lev1-consent-v1/\" + label)); Ed25519 labels \"ed25519/<name>\", P-256 \"p256/<name>\", nonces \"nonce/<...>\" (first 16 bytes)",
+  "about": "Signed objects (SPEC_CONSENT_FORMAT §3). Resolve `device` against `keys`; every `valid` object must verify, every `invalid` one must fail with the given reason class. Ed25519 objects must also be reproduced byte-for-byte by re-signing their body.",
+  "rfc8032": {
+    "seedHex": "9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60",
+    "publicKeyHex": "d75a980182b10ab7d54bfed3c964073a0ee172f3daa62325af021a68f707511a",
+    "messageHex": "",
+    "signatureHex": "e5564300c360ac729086e2cc806e828a84877f1eb8e5d974d873e065224901555fb8821590a33bacc61e39701cf9b46bd25bf5f0595bbe24655141438e7a100b"
+  },
+  "keys": [
+    {
+      "label": "alice",
+      "alg": "Ed25519",
+      "seedHex": "572c909d09ee9b9972de6b847d6ce08bf296ef2ddd5650c6031bfae0a1b22f35",
+      "publicKeyHex": "c36685c93e577cbb0f0d5c5fa0440e092560975fd84b96a888af141888754536",
+      "spki": "MCowBQYDK2VwAyEAw2aFyT5XfLsPDVxfoEQOCSVgl1_YS5aoiK8UGIh1RTY"
+    },
+    {
+      "label": "bob",
+      "alg": "Ed25519",
+      "seedHex": "3b58a8f1daab3224d56e1b0814898472e99d474f215097faff0ae6c537ee7cbe",
+      "publicKeyHex": "e918cd6dedf3d01666b3932ccd9737e2db7ecbb111238fa807487a6974d11f2f",
+      "spki": "MCowBQYDK2VwAyEA6RjNbe3z0BZms5MszZc34tt-y7ERI4-oB0h6aXTRHy8"
+    },
+    {
+      "label": "carol",
+      "alg": "Ed25519",
+      "seedHex": "25975ccec01893091dfed1eb3094a3090c673a31d69a9d3bd7b696c5d654bdf2",
+      "publicKeyHex": "b2cb5db402b1eae35536472268beb72e1039d39365cf821cc155e014de064ac2",
+      "spki": "MCowBQYDK2VwAyEAsstdtAKx6uNVNkciaL63LhA505Nlz4IcwVXgFN4GSsI"
+    },
+    {
+      "label": "alice-phone",
+      "alg": "Ed25519",
+      "seedHex": "fd1039b7ef1efda8636fe71d5e0d49d90d48af3ccdaa3058fa178c702d37d3c6",
+      "publicKeyHex": "62948b5a2ccd1367ae45ae4330bf411c33e446ea5314751d1e63a60c289cbf8d",
+      "spki": "MCowBQYDK2VwAyEAYpSLWizNE2euRa5DML9BHDPkRupTFHUdHmOmDCicv40"
+    },
+    {
+      "label": "dave",
+      "alg": "ECDSA-P256",
+      "dHex": "66ba0aca8e5374b40eacf43b0fee3d855d6704bac0bd77daccf6f5b41eecacf6",
+      "spki": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEtUnRLd6lTaegci0W81V_1oqo1yRh5WmYaTNyTGYAm5cQvirNm3c9JJPWRm3Enxg-9UC16PjCHZV4CvO6eqdllw"
+    }
+  ],
+  "valid": [
+    {
+      "name": "minimal-object",
+      "alg": "Ed25519",
+      "object": {
+        "v": 1,
+        "actor": "u-alice",
+        "device": "MCowBQYDK2VwAyEAw2aFyT5XfLsPDVxfoEQOCSVgl1_YS5aoiK8UGIh1RTY",
+        "note": "שלום",
+        "n": 1.5,
+        "sig": "KQ0y1TfCjQWRfSvr5rxtfQ9X55ed5kjYknAkqeFTtzlUy5Obp9bmjs6OQu2zZpm3v8Eqz_gLmCEA98JJMK3IDg",
+        "id": "QPhlBEoa75yMNOTnPYWLhG075Cx_4r1QU79l5o438rM"
+      },
+      "canonicalBody": "{\"actor\":\"u-alice\",\"device\":\"MCowBQYDK2VwAyEAw2aFyT5XfLsPDVxfoEQOCSVgl1_YS5aoiK8UGIh1RTY\",\"n\":1.5,\"note\":\"שלום\",\"v\":1}",
+      "canonicalBodyWithSig": "{\"actor\":\"u-alice\",\"device\":\"MCowBQYDK2VwAyEAw2aFyT5XfLsPDVxfoEQOCSVgl1_YS5aoiK8UGIh1RTY\",\"n\":1.5,\"note\":\"שלום\",\"sig\":\"KQ0y1TfCjQWRfSvr5rxtfQ9X55ed5kjYknAkqeFTtzlUy5Obp9bmjs6OQu2zZpm3v8Eqz_gLmCEA98JJMK3IDg\",\"v\":1}"
+    },
+    {
+      "name": "consent-event",
+      "alg": "Ed25519",
+      "object": {
+        "v": 1,
+        "actor": "u-alice",
+        "device": "MCowBQYDK2VwAyEAw2aFyT5XfLsPDVxfoEQOCSVgl1_YS5aoiK8UGIh1RTY",
+        "action": "project.create",
+        "subject": {
+          "type": "project",
+          "id": "p-1"
+        },
+        "predicate": {
+          "settings": {
+            "name": "רקמת דוגמה",
+            "restime": 172800000
+          }
+        },
+        "parents": [],
+        "ts": 1760000000000,
+        "nonce": "XMK6B-fStuJgbsvL31dKkw",
+        "sig": "n9hWfP_oe581NpkQ2iOxYHVNSVdm3Hq6EyICW0Xbnz9RNm8484o9iPmBlmfiOAz74tFA0hH6Cb8Bl9H1murjCg",
+        "id": "w_BM3hWtYMOXEzupQWPZ0EXqeq4tvPIxP84qEaEh1EU"
+      },
+      "canonicalBody": "{\"action\":\"project.create\",\"actor\":\"u-alice\",\"device\":\"MCowBQYDK2VwAyEAw2aFyT5XfLsPDVxfoEQOCSVgl1_YS5aoiK8UGIh1RTY\",\"nonce\":\"XMK6B-fStuJgbsvL31dKkw\",\"parents\":[],\"predicate\":{\"settings\":{\"name\":\"רקמת דוגמה\",\"restime\":172800000}},\"subject\":{\"id\":\"p-1\",\"type\":\"project\"},\"ts\":1760000000000,\"v\":1}",
+      "canonicalBodyWithSig": "{\"action\":\"project.create\",\"actor\":\"u-alice\",\"device\":\"MCowBQYDK2VwAyEAw2aFyT5XfLsPDVxfoEQOCSVgl1_YS5aoiK8UGIh1RTY\",\"nonce\":\"XMK6B-fStuJgbsvL31dKkw\",\"parents\":[],\"predicate\":{\"settings\":{\"name\":\"רקמת דוגמה\",\"restime\":172800000}},\"sig\":\"n9hWfP_oe581NpkQ2iOxYHVNSVdm3Hq6EyICW0Xbnz9RNm8484o9iPmBlmfiOAz74tFA0hH6Cb8Bl9H1murjCg\",\"subject\":{\"id\":\"p-1\",\"type\":\"project\"},\"ts\":1760000000000,\"v\":1}"
+    },
+    {
+      "name": "device-cert",
+      "alg": "Ed25519",
+      "object": {
+        "v": 1,
+        "kind": "deviceCert",
+        "userId": "u-alice",
+        "devicePubKey": "MCowBQYDK2VwAyEAYpSLWizNE2euRa5DML9BHDPkRupTFHUdHmOmDCicv40",
+        "deviceLabel": "טלפון",
+        "capabilities": [
+          "sign"
+        ],
+        "notBefore": 1760000000000,
+        "parentDevicePubKey": "MCowBQYDK2VwAyEAw2aFyT5XfLsPDVxfoEQOCSVgl1_YS5aoiK8UGIh1RTY",
+        "actor": "u-alice",
+        "device": "MCowBQYDK2VwAyEAw2aFyT5XfLsPDVxfoEQOCSVgl1_YS5aoiK8UGIh1RTY",
+        "nonce": "3gBag8AJB_BW9Ual1SbB-w",
+        "sig": "MyHveszv4jS1YSxy007jKJJ48aTTY9aVNvfeKKw3xXdjd7hxKnGuIq4y2ewL8lzRF47MzUjaYRRWATjJV093Aw",
+        "id": "MoOQm0YVhuCudjxfDllGKS7VbGdVb4Sr-L0NQKZYI3k"
+      },
+      "canonicalBody": "{\"actor\":\"u-alice\",\"capabilities\":[\"sign\"],\"device\":\"MCowBQYDK2VwAyEAw2aFyT5XfLsPDVxfoEQOCSVgl1_YS5aoiK8UGIh1RTY\",\"deviceLabel\":\"טלפון\",\"devicePubKey\":\"MCowBQYDK2VwAyEAYpSLWizNE2euRa5DML9BHDPkRupTFHUdHmOmDCicv40\",\"kind\":\"deviceCert\",\"nonce\":\"3gBag8AJB_BW9Ual1SbB-w\",\"notBefore\":1760000000000,\"parentDevicePubKey\":\"MCowBQYDK2VwAyEAw2aFyT5XfLsPDVxfoEQOCSVgl1_YS5aoiK8UGIh1RTY\",\"userId\":\"u-alice\",\"v\":1}",
+      "canonicalBodyWithSig": "{\"actor\":\"u-alice\",\"capabilities\":[\"sign\"],\"device\":\"MCowBQYDK2VwAyEAw2aFyT5XfLsPDVxfoEQOCSVgl1_YS5aoiK8UGIh1RTY\",\"deviceLabel\":\"טלפון\",\"devicePubKey\":\"MCowBQYDK2VwAyEAYpSLWizNE2euRa5DML9BHDPkRupTFHUdHmOmDCicv40\",\"kind\":\"deviceCert\",\"nonce\":\"3gBag8AJB_BW9Ual1SbB-w\",\"notBefore\":1760000000000,\"parentDevicePubKey\":\"MCowBQYDK2VwAyEAw2aFyT5XfLsPDVxfoEQOCSVgl1_YS5aoiK8UGIh1RTY\",\"sig\":\"MyHveszv4jS1YSxy007jKJJ48aTTY9aVNvfeKKw3xXdjd7hxKnGuIq4y2ewL8lzRF47MzUjaYRRWATjJV093Aw\",\"userId\":\"u-alice\",\"v\":1}"
+    },
+    {
+      "name": "ecdsa-p256-event",
+      "alg": "ECDSA-P256",
+      "note": "Signature is frozen (ECDSA is randomized): verify only. IEEE P1363 r‖s, 64 bytes — not DER.",
+      "object": {
+        "v": 1,
+        "actor": "u-dave",
+        "device": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEtUnRLd6lTaegci0W81V_1oqo1yRh5WmYaTNyTGYAm5cQvirNm3c9JJPWRm3Enxg-9UC16PjCHZV4CvO6eqdllw",
+        "action": "project.join",
+        "subject": {
+          "type": "project",
+          "id": "p-1"
+        },
+        "parents": [],
+        "ts": 1760000000000,
+        "nonce": "7E1u7L61eLNmPWKsCvKvvQ",
+        "sig": "GOEaaGYMNRy_5hE8ACHElGk9c45L9uzuk6A3oDB7UJVq70M1RRZ8toO4RgAnusNIMeymLJGh4mg6G2pG6YrFgQ",
+        "id": "JPzu4XwoBfOi4P27eDLbl3M3OIeEwHD4F6dJ8Jgfadc"
+      },
+      "canonicalBody": "{\"action\":\"project.join\",\"actor\":\"u-dave\",\"device\":\"MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEtUnRLd6lTaegci0W81V_1oqo1yRh5WmYaTNyTGYAm5cQvirNm3c9JJPWRm3Enxg-9UC16PjCHZV4CvO6eqdllw\",\"nonce\":\"7E1u7L61eLNmPWKsCvKvvQ\",\"parents\":[],\"subject\":{\"id\":\"p-1\",\"type\":\"project\"},\"ts\":1760000000000,\"v\":1}",
+      "canonicalBodyWithSig": "{\"action\":\"project.join\",\"actor\":\"u-dave\",\"device\":\"MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEtUnRLd6lTaegci0W81V_1oqo1yRh5WmYaTNyTGYAm5cQvirNm3c9JJPWRm3Enxg-9UC16PjCHZV4CvO6eqdllw\",\"nonce\":\"7E1u7L61eLNmPWKsCvKvvQ\",\"parents\":[],\"sig\":\"GOEaaGYMNRy_5hE8ACHElGk9c45L9uzuk6A3oDB7UJVq70M1RRZ8toO4RgAnusNIMeymLJGh4mg6G2pG6YrFgQ\",\"subject\":{\"id\":\"p-1\",\"type\":\"project\"},\"ts\":1760000000000,\"v\":1}"
+    }
+  ],
+  "invalid": [
+    {
+      "name": "tampered-predicate",
+      "reason": "bad_signature",
+      "object": {
+        "v": 1,
+        "actor": "u-alice",
+        "device": "MCowBQYDK2VwAyEAw2aFyT5XfLsPDVxfoEQOCSVgl1_YS5aoiK8UGIh1RTY",
+        "action": "project.create",
+        "subject": {
+          "type": "project",
+          "id": "p-1"
+        },
+        "predicate": {
+          "settings": {
+            "name": "זיוף",
+            "restime": 172800000
+          }
+        },
+        "parents": [],
+        "ts": 1760000000000,
+        "nonce": "XMK6B-fStuJgbsvL31dKkw",
+        "sig": "n9hWfP_oe581NpkQ2iOxYHVNSVdm3Hq6EyICW0Xbnz9RNm8484o9iPmBlmfiOAz74tFA0hH6Cb8Bl9H1murjCg",
+        "id": "w_BM3hWtYMOXEzupQWPZ0EXqeq4tvPIxP84qEaEh1EU"
+      }
+    },
+    {
+      "name": "wrong-id",
+      "reason": "bad_id",
+      "object": {
+        "v": 1,
+        "actor": "u-alice",
+        "device": "MCowBQYDK2VwAyEAw2aFyT5XfLsPDVxfoEQOCSVgl1_YS5aoiK8UGIh1RTY",
+        "action": "project.create",
+        "subject": {
+          "type": "project",
+          "id": "p-1"
+        },
+        "predicate": {
+          "settings": {
+            "name": "רקמת דוגמה",
+            "restime": 172800000
+          }
+        },
+        "parents": [],
+        "ts": 1760000000000,
+        "nonce": "XMK6B-fStuJgbsvL31dKkw",
+        "sig": "n9hWfP_oe581NpkQ2iOxYHVNSVdm3Hq6EyICW0Xbnz9RNm8484o9iPmBlmfiOAz74tFA0hH6Cb8Bl9H1murjCg",
+        "id": "FjQNSSQU0bL2iLZblzmm_nmeCmf1T-vuCUT-7f9nmLI"
+      }
+    },
+    {
+      "name": "non-canonical-sig-encoding",
+      "reason": "bad_sig_encoding",
+      "note": "Decodes to the same 64 bytes under a lenient decoder; must still be rejected.",
+      "object": {
+        "v": 1,
+        "actor": "u-alice",
+        "device": "MCowBQYDK2VwAyEAw2aFyT5XfLsPDVxfoEQOCSVgl1_YS5aoiK8UGIh1RTY",
+        "action": "project.create",
+        "subject": {
+          "type": "project",
+          "id": "p-1"
+        },
+        "predicate": {
+          "settings": {
+            "name": "רקמת דוגמה",
+            "restime": 172800000
+          }
+        },
+        "parents": [],
+        "ts": 1760000000000,
+        "nonce": "XMK6B-fStuJgbsvL31dKkw",
+        "sig": "n9hWfP_oe581NpkQ2iOxYHVNSVdm3Hq6EyICW0Xbnz9RNm8484o9iPmBlmfiOAz74tFA0hH6Cb8Bl9H1murjCh",
+        "id": "w_BM3hWtYMOXEzupQWPZ0EXqeq4tvPIxP84qEaEh1EU"
+      }
+    },
+    {
+      "name": "unknown-device",
+      "reason": "unknown_or_revoked_device",
+      "object": {
+        "v": 1,
+        "actor": "u-alice",
+        "device": "MCowBQYDK2VwAyEA34lhIFJFg2KQcFKVLGSCHWTS9WZS7NPBm0kK52zMndk",
+        "action": "project.create",
+        "subject": {
+          "type": "project",
+          "id": "p-1"
+        },
+        "predicate": {
+          "settings": {
+            "name": "רקמת דוגמה",
+            "restime": 172800000
+          }
+        },
+        "parents": [],
+        "ts": 1760000000000,
+        "nonce": "XMK6B-fStuJgbsvL31dKkw",
+        "sig": "n9hWfP_oe581NpkQ2iOxYHVNSVdm3Hq6EyICW0Xbnz9RNm8484o9iPmBlmfiOAz74tFA0hH6Cb8Bl9H1murjCg",
+        "id": "w_BM3hWtYMOXEzupQWPZ0EXqeq4tvPIxP84qEaEh1EU"
+      }
+    },
+    {
+      "name": "signature-by-another-object",
+      "reason": "bad_signature",
+      "object": {
+        "v": 1,
+        "actor": "u-alice",
+        "device": "MCowBQYDK2VwAyEAw2aFyT5XfLsPDVxfoEQOCSVgl1_YS5aoiK8UGIh1RTY",
+        "note": "שלום",
+        "n": 1.5,
+        "sig": "MyHveszv4jS1YSxy007jKJJ48aTTY9aVNvfeKKw3xXdjd7hxKnGuIq4y2ewL8lzRF47MzUjaYRRWATjJV093Aw",
+        "id": "QPhlBEoa75yMNOTnPYWLhG075Cx_4r1QU79l5o438rM"
+      }
+    },
+    {
+      "name": "lone-surrogate-in-body",
+      "reason": "non_canonical_body",
+      "object": {
+        "v": 1,
+        "actor": "u-alice",
+        "device": "MCowBQYDK2VwAyEAw2aFyT5XfLsPDVxfoEQOCSVgl1_YS5aoiK8UGIh1RTY",
+        "note": "\ud800",
+        "n": 1.5,
+        "sig": "KQ0y1TfCjQWRfSvr5rxtfQ9X55ed5kjYknAkqeFTtzlUy5Obp9bmjs6OQu2zZpm3v8Eqz_gLmCEA98JJMK3IDg",
+        "id": "QPhlBEoa75yMNOTnPYWLhG075Cx_4r1QU79l5o438rM"
+      }
+    },
+    {
+      "name": "nfc-duplicate-keys-in-body",
+      "reason": "non_canonical_body",
+      "object": {
+        "v": 1,
+        "actor": "u-alice",
+        "device": "MCowBQYDK2VwAyEAw2aFyT5XfLsPDVxfoEQOCSVgl1_YS5aoiK8UGIh1RTY",
+        "note": {
+          "é": 1,
+          "é": 2
+        },
+        "n": 1.5,
+        "sig": "KQ0y1TfCjQWRfSvr5rxtfQ9X55ed5kjYknAkqeFTtzlUy5Obp9bmjs6OQu2zZpm3v8Eqz_gLmCEA98JJMK3IDg",
+        "id": "QPhlBEoa75yMNOTnPYWLhG075Cx_4r1QU79l5o438rM"
+      }
+    }
+  ]
+}

@@ -4,6 +4,7 @@ import { execFromContext } from '$lib/server/archive/exec.js';
 import { run } from '$lib/server/archive/gql.js';
 import { resolveRate } from '$lib/timers/rate.js';
 import { closeOpenIntervals, totalHours as hoursOfIntervals } from '$lib/timers/intervals.js';
+import { roundHours } from '$lib/timers/precision.js';
 import { serializeSaveLinks } from '$lib/timers/saveLinks.js';
 import { saveFileIds } from '$lib/timers/saveFiles.js';
 import { fileHours } from '$lib/server/timers/fileHours.js';
@@ -45,162 +46,189 @@ async function readTimer(
             fileIds: saveFileIds(a.saveFiles),
         };
     } catch (e) {
-        // Unreadable is not "already saved" — fall through to the legacy
-        // behaviour rather than dropping the member's hours on the floor.
-        console.warn('[timerSave] could not read the timer (non-fatal):', e);
-        return null;
+        // Unreadable is not "not saved yet". This used to fall through and
+        // file the client's hours — so under a flaky Strapi, the retry of a
+        // save whose first attempt had landed booked the same hours twice. The
+        // guard needs the read; nothing has been written at this point, so
+        // refusing loses nothing and the member's retry is safe.
+        console.warn('[timerSave] could not read the timer — refusing to save blind:', e);
+        throw new Error('Could not read the timer to save it — nothing was saved, please try again');
     }
+}
+
+/**
+ * Saves in progress, by timer id. The `saved` flag only guards a save that has
+ * already *finished*; a second request for the same timer arriving while the
+ * first is still filing (a retry after the client gave up on a slow answer)
+ * reads `saved: false` too. Per-process only — enough for the one Node server
+ * the app runs as, and harmless anywhere else.
+ */
+const savesInFlight = new Set<string>();
+
+async function saveTimerOnce(params: any, context: any, strapi: any) {
+    const mId = (params.missionId || params.mId)?.toString();
+    const now = new Date();
+
+    // The member's own account of what they did during this timer. It is
+    // written on the timer itself (shown in the moach process timeline) and
+    // carried into whatever the save produces — the approval vote or the
+    // finished-mission row — so the rikma reads it wherever the hours land.
+    const saveText: string = (params.saveText ?? '').toString().trim();
+
+    // The evidence that rides with the note. Links are re-normalized here
+    // rather than trusted: the dialog validates them so the member is told
+    // early, but a client can post whatever it likes, and these URLs are
+    // rendered as links other members click. Files were uploaded through
+    // /api/upload (which checks the JWT, the size and the MIME type) and
+    // arrive as Strapi media ids.
+    // A caller that says nothing about links/files (the bot, the MCP agent,
+    // an old client) must not clear what the member already attached, so
+    // absence and emptiness are told apart: only a caller that *sent* the
+    // field gets to replace it — including with nothing, which is how the
+    // dialog removes an attachment.
+    const sentLinks = params.saveLinks !== undefined && params.saveLinks !== null;
+    const sentFiles = Array.isArray(params.saveFiles);
+    // The acts these hours are attributed to follow the very same rule.
+    // `tasks: params.tasks || []` used to send an empty relation on every
+    // save that carried no list — and an empty relation *replaces*, so a
+    // save from the bot, the MCP agent or an old client silently unlinked
+    // every act the member had attached from the dialog beforehand.
+    const sentTasks = Array.isArray(params.tasks);
+    const saveLinks: string = sentLinks ? serializeSaveLinks(params.saveLinks) : '';
+    const saveFiles: string[] = sentFiles
+        ? params.saveFiles.map((id: any) => String(id)).filter(Boolean)
+        : [];
+
+    // Step 0: read the timer before touching it — its stamped rate, and
+    // whether it has already been saved.
+    const hasTimer = Boolean(params.timerId && params.timerId !== '0');
+    const timerBefore = hasTimer ? await readTimer(context, String(params.timerId)) : null;
+
+    if (timerBefore?.saved) {
+        console.log('[timerSave] timer already saved — refusing to book the same hours twice', {
+            timerId: params.timerId,
+            missionId: mId
+        });
+        return { success: true, missionId: mId, alreadySaved: true };
+    }
+
+    // The timer's own account of the work, closed. Saving used to write
+    // `isActive: false, saved: true` without touching the intervals, so a
+    // timer saved while it was still running kept an interval that nothing
+    // would ever close — invisible to `totalHours`, but measured up to *now*
+    // by every month-aware view, growing 24 hours a day. Closing it here is
+    // also what makes these hours claimable: an open interval is worth zero
+    // to the total the rikma is asked to sign.
+    const closedIntervals = closeOpenIntervals(timerBefore?.intervals ?? []);
+    const intervals = closedIntervals.intervals;
+    if (closedIntervals.closed) {
+        console.warn(
+            `[timerSave] closed ${closedIntervals.closed} open interval(s) on timer ${params.timerId} before saving`
+        );
+    }
+
+    // Step 1: Mark timer as saved, with its books closed.
+    if (hasTimer) {
+        await strapi.execute('34UpdateTimer', {
+            timerId: params.timerId,
+            isActive: false,
+            saved: true,
+            ...(sentTasks ? { tasks: params.tasks.map((id: any) => String(id)) } : {}),
+            ...(intervals.length
+                ? { timers: intervals, totalHours: hoursOfIntervals(intervals) }
+                : {}),
+            ...(saveText ? { saveText } : {}),
+            ...(sentLinks ? { saveLinks } : {}),
+            ...(sentFiles ? { saveFiles } : {})
+        }, context.jwt, context.fetch);
+    }
+
+    // Step 2: Fetch mission data to determine single vs multi-user flow
+    const missionRes = await strapi.execute('110getMissionForTimerSave', {
+        mId
+    }, context.jwt, context.fetch);
+
+    const missionData = missionRes?.data?.mesimabetahalich?.data;
+    if (!missionData) throw new Error(`Mission ${mId} not found`);
+
+    const at = missionData.attributes;
+
+    // What the rikma is asked to sign comes from the intervals on the
+    // server's own copy of the timer, not from a number the client sent:
+    // a counter that has drifted upward (a lap booked twice by a repeated
+    // stop) must not be able to buy equity the intervals cannot account for.
+    // A legacy timer with no interval components has nothing to derive from,
+    // so it keeps the client's figure.
+    const claimedHours: number = roundHours(params.sessionHoursTotal ?? params.totalHours ?? 0);
+    const derivedHours = intervals.length ? hoursOfIntervals(intervals) : null;
+    if (derivedHours !== null && Math.abs(derivedHours - claimedHours) > 0.01) {
+        console.warn('[timerSave] the claim disagrees with the intervals — filing the intervals', {
+            timerId: params.timerId,
+            claimed: claimedHours,
+            derived: derivedHours,
+            storedTotalHours: timerBefore?.totalHours
+        });
+    }
+    const sessionHoursTotal: number = derivedHours ?? claimedHours;
+    const newHowManyHours: number = params.howmanyhoursalready ?? (at.howmanyhoursalready ?? 0);
+
+    // What these hours are worth: the value stamped on the timer when the
+    // work started, not the mission's value now. Without this an approved
+    // `editObject` re-prices every hour ever logged (src/lib/timers/rate.ts).
+    const rate = resolveRate(timerBefore?.rate, at.perhour);
+
+    // The files this save is filed with: what the caller sent, or — when it
+    // said nothing — whatever is already on the timer, so an agent saving a
+    // timer a member attached files to still carries them to approval.
+    // Finiapruval and FinnishedMission both have a `what` media relation;
+    // neither has a column for links, so the links stay on the timer and
+    // the approval reads them through its `timer` relation.
+    const filesForRow: string[] = sentFiles ? saveFiles : (timerBefore?.fileIds ?? []);
+
+    // Step 3: Update mission monthly hours counter + clear activeTimer
+    await strapi.execute('112updateMissionMonthlyHours', {
+        id: mId,
+        howmanyhoursalready: newHowManyHours,
+        stname: params.stname || 'saved'
+    }, context.jwt, context.fetch);
+
+    // Step 4: file the hours — straight onto the mission for a rikma of
+    // one, otherwise as an approval the rikma signs (fileHours.ts).
+    const filed = await fileHours({
+        strapi,
+        context,
+        missionId: String(mId),
+        at,
+        hours: sessionHoursTotal,
+        rate,
+        saveText,
+        files: filesForRow,
+        intervals,
+        timerId: hasTimer ? String(params.timerId) : undefined,
+    });
+
+    // Logged hours mean the mission is alive (PLAN_OBJECT_ARCHIVAL).
+    await touchDormancy(execFromContext(context), String(mId)).catch(() => null);
+
+    // Where the hours went, so the page can show an approval now pending
+    // without a reload.
+    return { success: true, missionId: mId, filed: filed.filed };
 }
 
 export const timerSaveConfig: ActionConfig = {
     key: 'timerSave',
     description: 'Save a timer and commit hours to mission, routing through approval or direct save',
     graphqlOperation: async (params, context, { strapi }) => {
-        const mId = (params.missionId || params.mId)?.toString();
-        const now = new Date();
-
-        // The member's own account of what they did during this timer. It is
-        // written on the timer itself (shown in the moach process timeline) and
-        // carried into whatever the save produces — the approval vote or the
-        // finished-mission row — so the rikma reads it wherever the hours land.
-        const saveText: string = (params.saveText ?? '').toString().trim();
-
-        // The evidence that rides with the note. Links are re-normalized here
-        // rather than trusted: the dialog validates them so the member is told
-        // early, but a client can post whatever it likes, and these URLs are
-        // rendered as links other members click. Files were uploaded through
-        // /api/upload (which checks the JWT, the size and the MIME type) and
-        // arrive as Strapi media ids.
-        // A caller that says nothing about links/files (the bot, the MCP agent,
-        // an old client) must not clear what the member already attached, so
-        // absence and emptiness are told apart: only a caller that *sent* the
-        // field gets to replace it — including with nothing, which is how the
-        // dialog removes an attachment.
-        const sentLinks = params.saveLinks !== undefined && params.saveLinks !== null;
-        const sentFiles = Array.isArray(params.saveFiles);
-        // The acts these hours are attributed to follow the very same rule.
-        // `tasks: params.tasks || []` used to send an empty relation on every
-        // save that carried no list — and an empty relation *replaces*, so a
-        // save from the bot, the MCP agent or an old client silently unlinked
-        // every act the member had attached from the dialog beforehand.
-        const sentTasks = Array.isArray(params.tasks);
-        const saveLinks: string = sentLinks ? serializeSaveLinks(params.saveLinks) : '';
-        const saveFiles: string[] = sentFiles
-            ? params.saveFiles.map((id: any) => String(id)).filter(Boolean)
-            : [];
-
-        // Step 0: read the timer before touching it — its stamped rate, and
-        // whether it has already been saved.
-        const hasTimer = Boolean(params.timerId && params.timerId !== '0');
-        const timerBefore = hasTimer ? await readTimer(context, String(params.timerId)) : null;
-
-        if (timerBefore?.saved) {
-            console.log('[timerSave] timer already saved — refusing to book the same hours twice', {
-                timerId: params.timerId,
-                missionId: mId
-            });
-            return { success: true, missionId: mId, alreadySaved: true };
+        const timerKey = params.timerId && params.timerId !== '0' ? String(params.timerId) : null;
+        if (timerKey && savesInFlight.has(timerKey)) {
+            throw new Error('This timer is already being saved');
         }
-
-        // The timer's own account of the work, closed. Saving used to write
-        // `isActive: false, saved: true` without touching the intervals, so a
-        // timer saved while it was still running kept an interval that nothing
-        // would ever close — invisible to `totalHours`, but measured up to *now*
-        // by every month-aware view, growing 24 hours a day. Closing it here is
-        // also what makes these hours claimable: an open interval is worth zero
-        // to the total the rikma is asked to sign.
-        const closedIntervals = closeOpenIntervals(timerBefore?.intervals ?? []);
-        const intervals = closedIntervals.intervals;
-        if (closedIntervals.closed) {
-            console.warn(
-                `[timerSave] closed ${closedIntervals.closed} open interval(s) on timer ${params.timerId} before saving`
-            );
+        if (timerKey) savesInFlight.add(timerKey);
+        try {
+            return await saveTimerOnce(params, context, strapi);
+        } finally {
+            if (timerKey) savesInFlight.delete(timerKey);
         }
-
-        // Step 1: Mark timer as saved, with its books closed.
-        if (hasTimer) {
-            await strapi.execute('34UpdateTimer', {
-                timerId: params.timerId,
-                isActive: false,
-                saved: true,
-                ...(sentTasks ? { tasks: params.tasks.map((id: any) => String(id)) } : {}),
-                ...(intervals.length
-                    ? { timers: intervals, totalHours: hoursOfIntervals(intervals) }
-                    : {}),
-                ...(saveText ? { saveText } : {}),
-                ...(sentLinks ? { saveLinks } : {}),
-                ...(sentFiles ? { saveFiles } : {})
-            }, context.jwt, context.fetch);
-        }
-
-        // Step 2: Fetch mission data to determine single vs multi-user flow
-        const missionRes = await strapi.execute('110getMissionForTimerSave', {
-            mId
-        }, context.jwt, context.fetch);
-
-        const missionData = missionRes?.data?.mesimabetahalich?.data;
-        if (!missionData) throw new Error(`Mission ${mId} not found`);
-
-        const at = missionData.attributes;
-
-        // What the rikma is asked to sign comes from the intervals on the
-        // server's own copy of the timer, not from a number the client sent:
-        // a counter that has drifted upward (a lap booked twice by a repeated
-        // stop) must not be able to buy equity the intervals cannot account for.
-        // A legacy timer with no interval components has nothing to derive from,
-        // so it keeps the client's figure.
-        const claimedHours: number = params.sessionHoursTotal ?? params.totalHours ?? 0;
-        const derivedHours = intervals.length ? hoursOfIntervals(intervals) : null;
-        if (derivedHours !== null && Math.abs(derivedHours - claimedHours) > 0.01) {
-            console.warn('[timerSave] the claim disagrees with the intervals — filing the intervals', {
-                timerId: params.timerId,
-                claimed: claimedHours,
-                derived: derivedHours,
-                storedTotalHours: timerBefore?.totalHours
-            });
-        }
-        const sessionHoursTotal: number = derivedHours ?? claimedHours;
-        const newHowManyHours: number = params.howmanyhoursalready ?? (at.howmanyhoursalready ?? 0);
-
-        // What these hours are worth: the value stamped on the timer when the
-        // work started, not the mission's value now. Without this an approved
-        // `editObject` re-prices every hour ever logged (src/lib/timers/rate.ts).
-        const rate = resolveRate(timerBefore?.rate, at.perhour);
-
-        // The files this save is filed with: what the caller sent, or — when it
-        // said nothing — whatever is already on the timer, so an agent saving a
-        // timer a member attached files to still carries them to approval.
-        // Finiapruval and FinnishedMission both have a `what` media relation;
-        // neither has a column for links, so the links stay on the timer and
-        // the approval reads them through its `timer` relation.
-        const filesForRow: string[] = sentFiles ? saveFiles : (timerBefore?.fileIds ?? []);
-
-        // Step 3: Update mission monthly hours counter + clear activeTimer
-        await strapi.execute('112updateMissionMonthlyHours', {
-            id: mId,
-            howmanyhoursalready: newHowManyHours,
-            stname: params.stname || 'saved'
-        }, context.jwt, context.fetch);
-
-        // Step 4: file the hours — straight onto the mission for a rikma of
-        // one, otherwise as an approval the rikma signs (fileHours.ts).
-        await fileHours({
-            strapi,
-            context,
-            missionId: String(mId),
-            at,
-            hours: sessionHoursTotal,
-            rate,
-            saveText,
-            files: filesForRow,
-            intervals,
-            timerId: hasTimer ? String(params.timerId) : undefined,
-        });
-
-        // Logged hours mean the mission is alive (PLAN_OBJECT_ARCHIVAL).
-        await touchDormancy(execFromContext(context), String(mId)).catch(() => null);
-
-        return { success: true, missionId: mId };
     },
 
     paramSchema: {

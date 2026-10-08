@@ -23,7 +23,8 @@
 
   function statusText(m: Mission): string {
     switch (m.status) {
-      case 'done':           return $t('deals.missionPaid');
+      // Closed is not paid: a part is paid when its provider says so (C-19).
+      case 'done':           return m.paid ? $t('deals.missionPaid') : $t('deals.missionDone');
       case 'needs-approval': return $t('deals.missionNeedsApproval');
       case 'in-progress':    return Math.round((m.hoursDone / m.hours) * 100) + '%';
       default:               return '—';

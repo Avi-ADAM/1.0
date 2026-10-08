@@ -5,6 +5,7 @@ import {
   ratsonStatus,
   summarizeRatsonNodes
 } from '$lib/concierge/summary.js';
+import { loadWishNotices } from '$lib/server/concierge/notices';
 import type { PageServerLoad } from './$types';
 
 type RatsonCard = {
@@ -105,6 +106,8 @@ function mapPublicCard(node: any): PublicRatsonCard {
 
 export const load: PageServerLoad = async ({ locals, fetch }) => {
   const uid = (locals as any)?.uid;
+  // Started first, awaited last — beside the two reads below.
+  const noticesPending = loadWishNotices(uid, fetch);
 
   let mine: RatsonCard[] = [];
   let summary = summarizeRatsonNodes([]);
@@ -134,5 +137,5 @@ export const load: PageServerLoad = async ({ locals, fetch }) => {
     console.error('[concierge] 109listOpenRatsons failed', e);
   }
 
-  return { mine, publicFeed, queryOk, uid, summary, bell };
+  return { mine, publicFeed, queryOk, uid, summary, bell, notices: await noticesPending };
 };

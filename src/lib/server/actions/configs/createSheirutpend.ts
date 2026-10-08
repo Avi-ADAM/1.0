@@ -81,10 +81,9 @@ export const createSheirutpendConfig: ActionConfig = {
   },
 
   updateStrategy: {
-    type: 'partialUpdate',
+    type: 'refetchScope', // Re-read the slice: the raw result is not in the lev store's shape (REALTIME_TRACKING B1).
     config: {
-      dataKeys: ['sheirutpends'],
-      updateFunction: 'refreshSheirutpends'
+      dataKeys: ['sheirutpends']
     }
   }
 };

@@ -75,6 +75,22 @@ export function previewShareKey(): Buffer {
   return derive('1lev1-rikma-preview-v1');
 }
 
+/**
+ * HMAC key for direct-offer links (/offer/<id>.<mac>, PLAN_DIRECT_OFFER §6.1).
+ * Its own label, so a rikma preview key can never open an offer, or the other way round.
+ */
+export function directOfferLinkKey(): Buffer {
+  return derive('1lev1-direct-offer-link-v1');
+}
+
+/**
+ * HMAC key for the email an offer is locked to (PLAN_DIRECT_OFFER §6.2). The wish
+ * stores the HMAC, never the address: a private Strapi field could not be read back.
+ */
+export function directOfferEmailKey(): Buffer {
+  return derive('1lev1-direct-offer-email-v1');
+}
+
 export function b64url(buf: Buffer | string): string {
   return Buffer.from(buf).toString('base64url');
 }

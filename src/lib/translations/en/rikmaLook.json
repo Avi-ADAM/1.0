@@ -1,0 +1,278 @@
+{
+  "focus": {
+    "product": "Developing a product to sell",
+    "business": "Running a business",
+    "publicService": "A social service to the public",
+    "community": "A community around an idea",
+    "creative": "Creating together"
+  },
+  "reg": {
+    "amuta": "Nonprofit no.",
+    "company": "Company no.",
+    "osek": "Business no.",
+    "society": "Society no.",
+    "other": "Registration no."
+  },
+  "cta": {
+    "join": "Join us",
+    "support": "Support us",
+    "donate": "Donate",
+    "volunteer": "Volunteer",
+    "contact": "Contact us",
+    "shop": "Shop",
+    "book": "Book a meeting",
+    "website": "Visit our website",
+    "learnMore": "Learn more",
+    "subscribe": "Get updates"
+  },
+  "door": {
+    "donate": "Every donation goes straight to the work — and you can see where",
+    "volunteer": "A few hours or a single mission — on your own terms",
+    "contact": "Tell us what you need and we will get back to you",
+    "products": "What we make and sell",
+    "link": "More about us, on our site"
+  },
+  "card": {
+    "addressTitle": "A new address for the rikma",
+    "lookTitle": "A new look for the public page",
+    "preview": "See the page in the proposed look",
+    "backToClassic": "A proposal to return to the standard public page"
+  },
+  "page": {
+    "previewBanner": "Preview of a proposed look that has not been approved yet — only members of the rikma can see it.",
+    "previewBack": "The page as it is today",
+    "reports": "Reports & transparency",
+    "accessibility": "Accessibility statement",
+    "founded": "Since {{year}}",
+    "missionsEmpty": "No open missions right now — you can still offer yourself.",
+    "productDetails": "Details & purchase",
+    "contact": {
+      "email": "Email",
+      "phone": "Phone",
+      "address": "Address",
+      "hours": "Hours"
+    },
+    "heading": {
+      "impact": "Our impact",
+      "contact": "Contact us",
+      "missions": {
+        "product": "Looking for partners to build it",
+        "business": "Looking for partners",
+        "publicService": "Volunteering and open missions",
+        "community": "Open Missions",
+        "creative": "Looking for partners to create with"
+      },
+      "partners": {
+        "product": "Partners and first customers",
+        "business": "Clients and partners",
+        "publicService": "Partners and supporters",
+        "community": "Partners",
+        "creative": "Partners and supporters"
+      }
+    }
+  },
+  "editor": {
+    "title": "Address & look",
+    "intro": "How {{name}} looks to the world: a short address, and on top of the real public pages — a line, colours, doors and order. Every change goes to the members for approval.",
+    "notReady": "Addresses and looks are not active on the server yet. You can design and preview, but saving is not possible yet.",
+    "openProposals": "Waiting for the members:",
+    "openAddress": "New address: {{address}}",
+    "openLook": "A new look for the public page",
+    "toLev": "Approve in your heart",
+    "remove": "Remove",
+    "address": {
+      "title": "The rikma’s address",
+      "desc": "A short address that is easy to remember, say on the phone and print. Latin letters, digits and hyphens.",
+      "current": "Current address:",
+      "label": "Address",
+      "propose": "Propose to the rikma",
+      "save": "Save address",
+      "status": {
+        "checking": "Checking…",
+        "available": "Available ✓",
+        "mine": "Already yours",
+        "current": "This is the current address",
+        "taken": "Taken — try another name",
+        "pending": "Another rikma has already proposed it and is waiting for approval",
+        "unknown": "Could not check — try again in a moment",
+        "empty": "Type an address",
+        "tooShort": "At least 3 characters",
+        "tooLong": "Up to 40 characters",
+        "chars": "Only Latin letters, digits and hyphens",
+        "edgeHyphen": "No hyphen at the start or end",
+        "doubleHyphen": "No two hyphens in a row",
+        "digitsOnly": "Needs letters too, not only digits",
+        "reserved": "This name is reserved for the platform",
+        "review": "A name like this (bank, payment, a known brand…) needs approval from the 1lev1 team — write to us"
+      }
+    },
+    "focus": {
+      "title": "What do you do together?",
+      "desc": "Every rikma is a rikma — here you say what you do together. It decides which doors appear under the seal and the order of the sections. Colours, texts and images you already chose are kept.",
+      "hint": {
+        "product": "What we build, who builds it, how to join the build",
+        "business": "What we sell and how to reach us",
+        "publicService": "Who we help, what we have done, how to donate or volunteer",
+        "community": "The page as it is today: support and join",
+        "creative": "Art, content or knowledge — what we made and who makes it"
+      }
+    },
+    "profile": {
+      "title": "Under the seal",
+      "desc": "The round seal with the rikma’s picture and name always stays — it is what shows this is a rikma on 1lev1. Under it you can add a line and registration details.",
+      "tagline": "Tagline",
+      "taglineHint": "One sentence that says what you do.",
+      "regKind": "Registration",
+      "founded": "Year founded",
+      "donationNote": "Note next to the donate button",
+      "donationNoteHint": "For example: \"Donations are tax-deductible.\""
+    },
+    "reg": {
+      "none": "No registration number",
+      "amuta": "Registered nonprofit",
+      "company": "Company",
+      "osek": "Licensed or exempt business",
+      "society": "Registered society",
+      "other": "Other registration"
+    },
+    "cta": {
+      "title": "The two doors",
+      "desc": "Under the seal there are two doors. Unchanged they are “Support the work” and “Become a part”. Here you choose where each one leads and what it says.",
+      "primary": "First door (main colour)",
+      "secondary": "Second door (second colour)",
+      "addSecondary": "Add a second door",
+      "removeSecondary": "Remove the second door",
+      "kind": "Where it leads",
+      "label": "What it says",
+      "url": "Link address"
+    },
+    "ctaKind": {
+      "support": "The support & transparency page",
+      "join": "The join page",
+      "donate": "Donation",
+      "volunteer": "Volunteering (the join page)",
+      "contact": "Contact details on the page",
+      "products": "The products on the page",
+      "link": "External link"
+    },
+    "style": {
+      "title": "Colours, type and corners",
+      "desc": "Unchanged, the pages keep the platform’s gold and pink. A colour of your own replaces them on every page — the main one, join and support — and lightly tints the dark background.",
+      "gold": "Main colour (instead of gold)",
+      "pink": "Second colour (instead of pink)",
+      "goldOwn": "Pick your own colour instead of gold",
+      "goldBack": "Back to gold",
+      "pinkOwn": "Pick your own colour instead of pink",
+      "pinkBack": "Back to pink",
+      "palette": "Suggested colours",
+      "inkNote": "The pages are dark, so where the colour is text we lighten it until it reads:",
+      "font": "Font",
+      "headingFont": "Heading font",
+      "corners": "Corners"
+    },
+    "font": {
+      "default": "The site’s font",
+      "rubik": "Rubik",
+      "heebo": "Heebo",
+      "assistant": "Assistant",
+      "noto": "Noto (Hebrew, Arabic, Latin)",
+      "frank": "Frank Ruhl (serif)",
+      "secular": "Secular One (headings)"
+    },
+    "corners": {
+      "round": "Round (as today)",
+      "soft": "Soft",
+      "sharp": "Sharp"
+    },
+    "media": {
+      "title": "Background photo",
+      "coverHint": "A wide photo shown dimmed behind the seal. At least 1600 pixels.",
+      "upload": "Upload",
+      "uploading": "Uploading…",
+      "remove": "Remove",
+      "focusX": "Horizontal focus",
+      "focusY": "Vertical focus",
+      "badType": "Only PNG, JPG, WebP or GIF images can be uploaded.",
+      "failed": "The upload failed, please try again."
+    },
+    "stats": {
+      "title": "Numbers",
+      "desc": "Up to four numbers that show what you have done together.",
+      "value": "Number",
+      "label": "What it counts",
+      "add": "Add a number"
+    },
+    "partners": {
+      "desc": "Supporters, partners or clients — up to 12, with a link if there is one.",
+      "name": "Name",
+      "url": "Link",
+      "add": "Add"
+    },
+    "contact": {
+      "title": "Contact & links"
+    },
+    "links": {
+      "booking": "Booking link",
+      "bookingHint": "Calendly, Google Calendar, etc.",
+      "donate": "Your donation page",
+      "donateHint": "If you have a donation page of your own, a “donate” door leads there. Without it — to the rikma’s support page.",
+      "reports": "Reports & transparency",
+      "reportsHint": "Financial reports, GuideStar, etc.",
+      "accessibility": "Accessibility statement",
+      "accessibilityHint": "A link to your accessibility statement."
+    },
+    "blocks": {
+      "title": "Order of the sections",
+      "desc": "What appears on the main page, and in what order. A section with nothing in it is not shown. Values and missions that follow each other sit side by side.",
+      "up": "Move up",
+      "down": "Move down"
+    },
+    "block": {
+      "impact": "Numbers",
+      "about": "Who we are",
+      "team": "The team",
+      "values": "Values",
+      "missions": "Open missions",
+      "products": "Products",
+      "partners": "Partners & supporters",
+      "contact": "Contact"
+    },
+    "issues": {
+      "primaryLinkMissing": "The first door needs a link address.",
+      "secondaryLinkMissing": "The second door needs a link address."
+    },
+    "preview": {
+      "title": "Preview",
+      "page": "Page",
+      "pages": {
+        "main": "Main page",
+        "join": "Join",
+        "support": "Support"
+      },
+      "theme": "Style",
+      "personal": "Personal",
+      "business": "Business",
+      "scheme": "Display mode",
+      "light": "Light",
+      "dark": "Dark",
+      "width": "Width",
+      "desktop": "Desktop",
+      "mobile": "Mobile",
+      "note": "These are the pages themselves, as someone outside the rikma sees them. Changes show at once, and you can click the doors to move between pages.",
+      "loading": "Loading the page…"
+    },
+    "submit": {
+      "propose": "Propose to the rikma",
+      "save": "Save",
+      "clear": "Back to the standard page",
+      "busy": "Sending…"
+    },
+    "result": {
+      "applied": "Updated.",
+      "proposed": "The proposal is open in the members’ hearts. If nobody responds by the end of the rikma’s response time, it is approved.",
+      "unchanged": "Nothing changed.",
+      "failed": "Could not save.",
+      "view": "View"
+    }
+  }
+}

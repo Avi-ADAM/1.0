@@ -169,7 +169,7 @@ u = 'lev.page.diamondsHint'
    * @property {(payload: { data: any }) => void} [onShowonly] - a diamond picked one kind
    * @property {() => void} [onShowall] - a diamond cleared the filter
    * @property {(payload: { id: any }) => void} [onHover]
-   * @property {(view: 'list' | 'cards' | 'coins') => void} [onView]
+   * @property {(view: 'list' | 'notices' | 'cards' | 'coins') => void} [onView]
    */
 
   /** @type {Props} */

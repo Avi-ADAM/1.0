@@ -1,0 +1,152 @@
+{
+  "entry": {
+    "deals": "Direct offers",
+    "salesCenter": "Direct offer to a customer",
+    "dealsHint": "An offer straight to someone who approached you, by link"
+  },
+  "wish": {
+    "banner": "An offer from {{name}}"
+  },
+  "page": {
+    "titleSuffix": "A direct offer",
+    "from": "{{name}} prepared an offer for you",
+    "when": "When",
+    "where": "Where",
+    "online": "Remotely (online)",
+    "parts": "What it includes",
+    "hours": "{{count}} hours",
+    "qty": "× {{count}}",
+    "total": "Total",
+    "nextTitle": "What happens once you take it",
+    "next1": "The offer becomes your wish. You can change its description, dates and place, and add parts that are missing.",
+    "next2": "On each part you can approve what {{name}} proposed, or propose another price or scope. You talk in the wish’s chat.",
+    "next3": "Nothing is closed and nothing is paid until both sides sign the same version.",
+    "own": "This is your own offer. Send the link to the person it is for.",
+    "locked": "This offer was sent to a particular email address. To take it, sign in with that address’s account.",
+    "take": "Take the offer",
+    "signup": "Continue (short signup)",
+    "login": "I already have an account",
+    "signupHint": "Signing up is just accepting the terms. After confirming your email you come back here.",
+    "home": "Home",
+    "err": {
+      "SIGN_IN": "Sign in to take the offer.",
+      "FAILED": "We could not take the offer right now. Please try again in a moment.",
+      "OFFER_CLAIMED": "This offer was already taken.",
+      "OFFER_CLOSED": "This offer is closed.",
+      "OFFER_SELF": "This is your own offer. Send the link to the person it is for.",
+      "OFFER_EMAIL": "This offer was written for another email address. Sign in with the account it was sent to.",
+      "INVALID_LINK": "This link is no longer valid.",
+      "EXPIRED_LINK": "This link has expired.",
+      "NOT_FOUND": "The offer was not found."
+    },
+    "state": {
+      "invalid": {
+        "title": "This link is not valid",
+        "body": "It may have been replaced by a new link or closed. You can ask whoever sent it for a new one."
+      },
+      "unavailable": {
+        "title": "We could not load the offer",
+        "body": "Please try again in a moment."
+      },
+      "expired": {
+        "title": "This link has expired",
+        "body": "You can ask {{name}} for a new link."
+      },
+      "taken": {
+        "title": "This offer was already taken",
+        "body": "If it was you, sign in with the account that took it."
+      },
+      "closed": {
+        "title": "This offer is closed",
+        "body": "You can contact whoever sent it."
+      }
+    }
+  },
+  "list": {
+    "title": "Direct offers",
+    "back": "Back to deals",
+    "new": "New offer",
+    "intro": "Approached directly? Write an offer with what you will do and at what price, and send a link. Whoever takes it gets a wish of their own with every tool: chat, exact details, and negotiation on each part.",
+    "loadFailed": "We could not load your offers. Try refreshing.",
+    "empty": "You have not written any offers yet.",
+    "for": "For {{name}}",
+    "draft": "Draft",
+    "sent": "Link sent",
+    "claimed": "Taken {{when}}",
+    "closed": "Closed"
+  },
+  "compose": {
+    "title": "New direct offer",
+    "back": "My offers",
+    "intro": "Write the offer as you agreed it in person. After saving you get a link to send. Whoever takes it can change details and propose otherwise on each part.",
+    "forWhom": "Who it is for",
+    "recipient": "Name or short description",
+    "recipientHint": "Only you see this. For example: \"Dana, a website for the studio\".",
+    "email": "Email (optional)",
+    "emailHint": "If you fill it in, only the account with this email can take the offer. The address itself is not stored.",
+    "what": "What you offer",
+    "name": "Title",
+    "desc": "Description",
+    "start": "From",
+    "end": "Until",
+    "online": "Can be done remotely (online)",
+    "place": "Place",
+    "parts": "Parts and price",
+    "partsHint": "Each part is a task (hours × hourly rate) or a resource (quantity × unit price). Each part can be negotiated on its own.",
+    "missionName": "Task",
+    "hours": "Hours",
+    "rate": "Hourly rate",
+    "resourceName": "Resource",
+    "qty": "Quantity",
+    "unitPrice": "Unit price",
+    "remove": "Remove this part",
+    "addMission": "Task",
+    "addResource": "Resource",
+    "total": "Total",
+    "save": "Save the offer",
+    "saveHint": "Nothing is sent yet. You make the link on the next screen.",
+    "err": {
+      "recipient": "Say who the offer is for. Only you will see it.",
+      "title": "The offer needs a title.",
+      "none": "Add at least one part.",
+      "tooMany": "Too many parts in one offer.",
+      "name": "Every part needs a name.",
+      "duplicate": "Two parts of the same kind cannot share a name.",
+      "amount": "Hours, quantities and prices must be numbers, and a part cannot be empty.",
+      "failed": "We could not save the offer. Please try again."
+    }
+  },
+  "manage": {
+    "back": "My offers",
+    "shareText": "I prepared an offer for you: {{name}}",
+    "failed": "That did not work, please try again",
+    "copied": "Link copied",
+    "copyFailed": "Could not copy. You can select and copy it by hand.",
+    "saved": "Saved",
+    "linkTitle": "The link to the offer",
+    "linkHint": "Send the link any way you like. Whoever opens it sees the offer, and can take it after signing in.",
+    "copy": "Copy",
+    "whatsapp": "WhatsApp",
+    "linkMade": "The link is ready",
+    "linkReplaced": "A new link was made. The previous one no longer works.",
+    "linkClosed": "The link was closed",
+    "newLink": "New link",
+    "closeLink": "Close the link",
+    "newLinkHint": "A new link cancels the previous one. Closing cancels it without making a new one.",
+    "noLink": "There is no link yet. When you are ready, make one and send it.",
+    "makeLink": "Make a link",
+    "locked": "locked to a particular email",
+    "unlocked": "anyone holding the link can take it",
+    "emailReplaceHint": "A new email replaces the lock. Leaving it empty keeps it as it is.",
+    "save": "Save",
+    "unlock": "Remove the lock",
+    "unlockedToast": "The lock was removed",
+    "cancel": "Cancel",
+    "editRecipient": "Edit",
+    "claimedBody": "The offer was taken and is now the customer’s wish. Each part is discussed and negotiated from there. Your parts are waiting on the deals page.",
+    "toDeals": "To deals",
+    "toWish": "To the wish page",
+    "termsNote": "Until the offer is taken the details are yours: a change here needs nobody’s approval.",
+    "partsFixed": "To change the parts themselves, write a new offer. Once the offer is taken, each part is negotiated on its own."
+  }
+}

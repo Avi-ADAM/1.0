@@ -5,10 +5,10 @@
   import { isMobileOrTablet } from '$lib/utilities/device';
   import CardHeader from './CardHeader.svelte';
   import VoteStatusDisplay from './VoteStatusDisplay.svelte';
-  import SheirutHalukaCard from './SheirutHalukaCard.svelte';
-  import { idd } from '$lib/stores/idd.js';
-  import { forum, username } from '$lib/stores/pendMisMes.js';
-  import { uPic } from '$lib/stores/uPic.js';
+  import CustomerPayment from './CustomerPayment.svelte';
+  import { forum } from '$lib/stores/pendMisMes.js';
+  import Money from '$lib/components/money/Money.svelte';
+  import type { DealDue } from '$lib/sheirut/dealDue';
 
   let {
     buble,
@@ -96,7 +96,32 @@
 
 
   let isProcessing = $state(false);
-  let showSellerSelect = $state(false);
+
+  /**
+   * A wish deal is paid by the hours its rikma approved, capped at the price agreed per
+   * part (QA_CONCIERGE_E2E C-14) — the same hours the partners' shares follow. The server
+   * decides the amount; the card shows it and opens the payment only once it is final.
+   * null = not a wish deal (paid at its agreed total, as before) or not known yet.
+   */
+  let due = $state<DealDue | null>(null);
+  $effect(() => {
+    const id = buble.id;
+    if (!id) return;
+    let alive = true;
+    fetch('/api/action', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ actionKey: 'getDealDue', params: { sheirutId: String(id) } })
+    })
+      .then((r) => r.json())
+      .then((out) => {
+        if (alive && out?.success) due = out.data?.due ?? null;
+      })
+      .catch((e) => console.warn('[CustomerSaleCard] could not read what the deal owes:', e));
+    return () => {
+      alive = false;
+    };
+  });
 
   async function handleConfirmReceipt() {
     if (isProcessing || buble.iGotIt) return;
@@ -129,47 +154,6 @@
     }
   }
 
-  async function handleConfirmTransfer(receiverId: string) {
-    if (isProcessing || buble.iTransferMoney) return;
-
-    isProcessing = true;
-    try {
-      const response = await fetch('/api/action', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          actionKey: 'createSheirutHaluka',
-          params: {
-            sheirutId: String(buble.id),
-            projectId: String(buble.projectId),
-            receiverId,
-            amount: buble.total ?? buble.price ?? 0
-          }
-        })
-      });
-
-      const result = await response.json();
-      if (!result.success) throw new Error(result.error?.message || 'Failed');
-
-      buble.iTransferMoney = true;
-      buble.halukaId = String(result.data?.halukaId);
-      buble.halukaForumId = null;
-      buble.senderconf = false;
-      buble.halukaConfirmed = false;
-      const selectedReceiver = buble.iCanGetMonay?.find((m: any) => String(m.id) === String(receiverId));
-      if (selectedReceiver) {
-        buble.iTransferedTo = selectedReceiver;
-      }
-      showSellerSelect = false;
-      toast.success($t('lev.cards.customerSale.successTransfer'));
-    } catch (err) {
-      console.error(err);
-      toast.error($t('lev.cards.customerSale.error'));
-    } finally {
-      isProcessing = false;
-    }
-  }
-
   // Members for weFinnish display: sellers (flat→Strapi format) + customer
   const weFinnishMembers = $derived.by(() => {
     const sellers = (buble.members || []).map((m: any) => ({
@@ -186,13 +170,17 @@
         profilePic: { data: { attributes: { url: buble.customerSrc || null } } }
       }
     };
-    return [...sellers, customer];
+    const all = [...sellers, customer];
+    return all.filter((m, i) => m?.id != null && all.findIndex((x) => String(x?.id) === String(m.id)) === i);
   });
 
   // Votes for weFinnish display: actual votes + synthetic customer vote when iGotIt
+  // (once — QA C-22)
   const weFinnishVotes = $derived.by(() => {
     const votes = [...(buble.weFinnish || [])];
-    if (buble.iGotIt) {
+    const mine = (v: any) =>
+      String(v?.users_permissions_user?.data?.id ?? v?.users_permissions_user ?? '') === String(buble.customerId);
+    if (buble.iGotIt && !votes.some(mine)) {
       votes.push({
         id: 'customer-iGotIt',
         what: true,
@@ -395,70 +383,45 @@
       </div>
     </div>
 
-    <!-- Money Transfer Selection -->
-    {#if !buble.iTransferMoney}
+    <!-- What the deal costs by the approved hours (wish deals, C-14) -->
+    {#if due}
       <div
-        class="bg-indigo-50 dark:bg-indigo-900/20 p-3 rounded-xl border border-indigo-200 dark:border-indigo-700"
+        class="bg-amber-50 dark:bg-amber-900/20 p-3 rounded-xl border border-amber-200 dark:border-amber-700 space-y-2"
       >
-        <div
-          class="text-[10px] text-indigo-700 dark:text-indigo-400 uppercase font-semibold mb-2"
-        >
-          {$t('lev.cards.customerSale.selectSeller')}
+        <div class="flex items-baseline justify-between gap-2">
+          <span class="text-[10px] text-amber-800 dark:text-amber-300 uppercase font-bold"
+            >{$t('deals.due.heroLabel')}</span
+          >
+          <span class="text-lg font-black text-amber-900 dark:text-amber-200"
+            ><Money amount={due.due} /></span
+          >
         </div>
-        <div class="flex flex-wrap gap-2">
-          {#each buble.iCanGetMonay || [] as member}
-            <button
-              class="flex items-center gap-2 p-2 rounded-lg bg-white dark:bg-gray-800 border border-indigo-200 dark:border-indigo-700 hover:border-indigo-500 transition-all text-xs"
-              onclick={() => handleConfirmTransfer(member.id)}
-              disabled={isProcessing}
-            >
-              {#if member.profilePic}
-                <img
-                  src={member.profilePic}
-                  alt={member.username}
-                  class="w-6 h-6 rounded-full object-cover"
-                />
-              {:else}
-                <div
-                  class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold"
-                >
-                  {member.username?.charAt(0)}
-                </div>
-              {/if}
-              <span>{member.username}</span>
-            </button>
-          {:else}
-            <div class="flex items-center justify-between w-full gap-2">
-              <span class="text-xs text-gray-500 dark:text-gray-400 italic">
-                {$t('lev.cards.customerSale.noReceivers')}
-              </span>
-              <button
-                class="text-xs font-semibold text-indigo-600 dark:text-indigo-400 underline underline-offset-2 hover:text-indigo-800 transition-colors shrink-0"
-                onclick={handleOpenChat}
+        <p class="text-xs text-amber-900 dark:text-amber-200 leading-snug">{$t('deals.due.explain')}</p>
+        <ul class="space-y-1">
+          {#each due.lines as line (line.key)}
+            <li class="flex items-baseline justify-between gap-2 text-xs text-gray-800 dark:text-gray-200">
+              <span class="truncate"
+                >{line.name}{#if line.providerName}<span class="text-gray-500 dark:text-gray-400">
+                    · {line.providerName}</span
+                  >{/if}</span
               >
-                {$t('lev.cards.customerSale.askInChat')}
-              </button>
-            </div>
+              <span class="shrink-0 font-semibold"
+                ><Money amount={line.due} />
+                <span class="font-normal text-gray-500 dark:text-gray-400"
+                  >/ <Money amount={line.cap} /></span
+                ></span
+              >
+            </li>
           {/each}
-        </div>
+        </ul>
+        <p class="text-[11px] text-amber-800 dark:text-amber-300">
+          {due.final ? $t('deals.due.final') : $t('deals.due.running')}
+        </p>
       </div>
-    {:else if buble.halukaId}
-      <SheirutHalukaCard
-        halukaId={String(buble.halukaId)}
-        senderId={String($idd)}
-        receiverId={String(buble.iTransferedTo?.id ?? '')}
-        senderName={$username}
-        receiverName={buble.iTransferedTo?.username ?? ''}
-        senderPic={$uPic}
-        receiverPic={buble.iTransferedTo?.profilePic}
-        amount={buble.total ?? buble.price}
-        bind:forumId={buble.halukaForumId}
-        bind:senderconf={buble.senderconf}
-        bind:confirmed={buble.halukaConfirmed}
-        myId={String($idd)}
-        projectId={String(buble.projectId)}
-      />
     {/if}
+
+    <!-- Money Transfer — the same flow the deal page opens (CustomerPayment) -->
+    <CustomerPayment {buble} {due} onAskChat={handleOpenChat} />
   </div>
 
   <!-- Seller delivery claims status -->

@@ -109,5 +109,10 @@
   "githubPull": "PR",
   "githubMerged": "Fusionado",
   "githubClosed": "Cerrado",
-  "githubNoMatch": "Ningún issue o PR coincide."
+  "githubNoMatch": "Ningún issue o PR coincide.",
+  "addManually": "Registrar horas a mano",
+  "manualEntryError": "No se pudo abrir el registro manual. No se guardó nada y no se inició ningún temporizador.",
+  "manualEntryRetry": "Reintentar",
+  "manualEntryOpening": "Abriendo…",
+  "saving": "Guardando…"
 }

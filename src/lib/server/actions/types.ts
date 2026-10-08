@@ -6,6 +6,8 @@
  * and notification types.
  */
 
+import type { IntentSource } from '../notifications/intent';
+
 // ============================================================================
 // Action Configuration Types
 // ============================================================================
@@ -231,8 +233,19 @@ export interface NotificationConfig {
   /** Notification content templates (multilingual) */
   templates: NotificationTemplates;
 
-  /** Which channels to use for notifications */
-  channels: NotificationChannel[];
+  /**
+   * What the notification asks of its reader — the channels follow from it
+   * (`src/lib/server/notifications/intent.ts`). A function when it depends on
+   * the run (a plain vote is `ambient`, a counter in that vote is `consent`).
+   */
+  intent?: IntentSource;
+
+  /**
+   * Legacy: an explicit channel list. Ignored when `intent` is set. Being
+   * replaced action by action (docs/tbd/PLAN_REALTIME_MIGRATION.md §6) — the
+   * notifications contract test holds the list of files that still use it.
+   */
+  channels?: NotificationChannel[];
 
   /** Email template component name (optional, defaults to 'SimpleNuti') */
   emailTemplate?: string;
@@ -334,8 +347,14 @@ export interface NotificationMetadata {
  * Client-side update strategy configuration
  */
 export interface UpdateStrategy {
-  /** Type of update strategy */
-  type: 'fullRefresh' | 'partialUpdate' | 'optimistic' | 'none';
+  /**
+   * Type of update strategy. `refetchScope` re-reads lev slices
+   * (`config.dataKeys` = keys of levSliceRegistry, `config.projectId` narrows
+   * it to one rikma) on the lev pages of everyone the action's socket
+   * notification reaches — how a vote one member casts shows up on the cards
+   * the others have open, instead of their stale copy being signed later.
+   */
+  type: 'fullRefresh' | 'partialUpdate' | 'refetchScope' | 'optimistic' | 'none';
 
   /** Configuration for the update strategy */
   config?: UpdateStrategyConfig;

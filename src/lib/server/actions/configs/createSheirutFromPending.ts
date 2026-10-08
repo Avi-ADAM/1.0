@@ -32,11 +32,14 @@ const createSheirutFromPendingHandler: ActionExecutionHandler = async (params, c
         archived: false, // Service is active
 
         // Mapping other fields if present in pending or default
-        name: spData.matanots?.data?.[0]?.attributes?.name || "Service Request",
-        descrip: spData.matanots?.data?.[0]?.attributes?.desc || "Generated from pending request",
+        // No placeholder text: whatever lands here is shown to the customer and the
+        // providers on the deal page (QA C-21 — they read "Generated from pending request").
+        name: spData.matanots?.data?.[0]?.attributes?.name || "",
+        descrip: spData.matanots?.data?.[0]?.attributes?.desc || "",
 
-        // Defaults for missing fields
-        oneTime: spData.oneTime ?? false,
+        // Defaults for missing fields. A caller that knows the deal is paid once (a
+        // wish deal) says so, so the record agrees with the "one-time payment" label.
+        oneTime: typeof params.oneTime === 'boolean' ? params.oneTime : (spData.oneTime ?? false),
         equaliSplited: spData.equaliSplited ?? false,
 
         // Map additional fields if available in sheirutpend
@@ -174,7 +177,8 @@ export const createSheirutFromPendingConfig: ActionConfig = {
         sheirutpendId: { type: 'string', required: true },
         projectId: { type: 'string', required: true },
         clientId: { type: 'string', required: false },
-        recipientIds: { type: 'array', required: true }
+        recipientIds: { type: 'array', required: true },
+        oneTime: { type: 'boolean', required: false }
     },
     authRules: [{ type: 'jwt', errorMessage: 'Auth required' }],
     notification: {

@@ -19,6 +19,7 @@
 import { dateField, fields, gqlStr, numField, run, strField, type Exec } from '../archive/gql.js';
 import { calcDeadlineMs } from '../actions/configs/actionUtils.js';
 import { hoursInMonth } from '$lib/recurring/missionMonths.js';
+import { roundHours, workValue } from '$lib/timers/precision.js';
 import { pickRateRow, resolveRate, rowRate, segmentHours, type RateRow } from '$lib/timers/rate.js';
 
 export interface FlushResult {
@@ -113,7 +114,8 @@ export async function flushHoursBeforeRateChange(
 
     // `totalHours` is written by timerStop and is authoritative when it is
     // ahead; the segments cover the stretch since the last stop.
-    const hours = Math.max(Number(ta.totalHours ?? 0), segmentHours(segments, now));
+    // Whole minutes, like every filed hour ($lib/timers/precision.ts).
+    const hours = roundHours(Math.max(Number(ta.totalHours ?? 0), segmentHours(segments, now)));
     if (!(hours > 0)) return { flushed: false };
 
     const rate = resolveRate(ta.rate, at.perhour);
@@ -238,12 +240,12 @@ async function creditDirectly(
 
   let id: string | undefined;
   if (target) {
-    const grown = target.noofhours + hours;
+    const grown = roundHours(target.noofhours + hours);
     await run(
       exec,
       `mutation { updateFinnishedMission(id: ${gqlStr(target.id)}, data: { ${fields(
         numField('noofhours', grown),
-        numField('total', grown * rowRate(target, rate)),
+        numField('total', workValue(grown, rowRate(target, rate))),
       )} }) { data { id } } }`,
       'flushRate:growRow',
     );
@@ -259,7 +261,7 @@ async function creditDirectly(
         projectId ? strField('project', projectId) : null,
         ownerId ? strField('users_permissions_user', ownerId) : null,
         numField('perhour', rate),
-        numField('total', hours * rate),
+        numField('total', workValue(hours, rate)),
         strField('why', why),
         dateField('publishedAt', nowISO),
         'isNotFinished: true',

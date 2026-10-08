@@ -35,6 +35,11 @@ export interface NegotiationView {
   deadlineAt: string | null;
   /** The negotiation so far, oldest first. */
   counters: { round: number; by: Party; amount: number | null; price: number | null; note: string }[];
+  /**
+   * The wisher changed the wish's terms (description, place, dates) since the last
+   * signature — "changed since you signed" (PLAN_DIRECT_OFFER §4.3).
+   */
+  termsChanged: boolean;
 }
 
 const OPEN = new Set(['suggested', 'viewed']);
@@ -48,7 +53,9 @@ export function negotiationView(
   parties: { wisherIds: string[]; proposerIds: string[] },
   viewer: Party,
   /** The wish's pace (`restime`); omit for the 48 h default. */
-  restime?: unknown
+  restime?: unknown,
+  /** The wish's stored terms digest (`Ratson.terms_digest`); omit and no signature is stale. */
+  termsDigest?: string | null
 ): NegotiationView | null {
   const { slot, version } = coveredVersion(attrs);
   const path = proposalPath({
@@ -65,7 +72,7 @@ export function negotiationView(
     openedBy: path === 'volunteer' ? 'provider' : 'wisher'
   };
   const entries: WillingnessEntry[] = attrs?.ratson_willingness_entry ?? [];
-  const st = standing(ref, entries, version);
+  const st = standing(ref, entries, version, termsDigest);
 
   return {
     canCounter: OPEN.has(attrs?.status_proposal ?? 'suggested'),
@@ -84,6 +91,7 @@ export function negotiationView(
       amount: c.version.amount,
       price: c.version.price,
       note: c.note
-    }))
+    })),
+    termsChanged: st.termsChanged
   };
 }

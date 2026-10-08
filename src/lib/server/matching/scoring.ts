@@ -1,17 +1,27 @@
 /**
  * Pure scoring logic for match suggestions.
  *
- * Closed-form equivalent of the legacy lev-page algorithm
+ * The raw score grew out of the legacy lev-page algorithm
  * (extractSuggestions + calculateScore in src/lib/utils/):
- * there, a mission first seen via a matching role got base 1, via a matching
- * skill base 2, then +1 per additional matching role and +2 per additional
- * matching skill, plus work-way adjustments and penalties for requirements
- * the user lacks. Summed up that is exactly:
  *
- *   score = matchedRoles + 2·matchedSkills + wwAdjustment
- *           − 2·missingSkills − missingRoles
+ *   raw = matchedRoles + 2·matchedSkills + wwAdjustment
+ *         − 2·missingSkills − missingRoles
  *
- * which is what this module computes directly from the two ID sets.
+ * Two departures from it, both because the legacy rule hid a need from exactly
+ * the professionals it was written for (2026-10-07: a carpenter and a computer
+ * technician never saw the concierge missions "build a wooden table" / "assemble
+ * a desktop PC", each scoring −1…−3 from one held skill against one AI-attached
+ * role and an onsite work way):
+ *
+ *  1. A held skill always qualifies. Penalties still order the list, but they
+ *     never push a skill match below MIN_SUGGESTION_SCORE. A match on roles
+ *     alone keeps the old rule (raw ≥ MIN_SUGGESTION_SCORE), and with neither
+ *     a skill nor a role in common nothing qualifies.
+ *  2. Work ways are a soft signal: any mismatch costs −1 in total, not −2 per
+ *     mission work way.
+ *
+ * `score` (what is stored, an Int) is the clamped value; `rawScore` is kept
+ * for ordering among the clamped ones.
  *
  * The resource side adds one more dimension — `computeDateFit` at the bottom —
  * which the mission scoring above deliberately does not touch.
@@ -42,7 +52,12 @@ export interface UserCapabilities {
 }
 
 export interface MatchResult {
+  /** Whether this mission should be suggested to this user at all. */
+  qualifies: boolean;
+  /** Stored score: `rawScore`, lifted to MIN_SUGGESTION_SCORE for a skill match. */
   score: number;
+  /** Unclamped score — the tie-breaker among clamped skill matches. */
+  rawScore: number;
   matchedSkills: string[];
   matchedRoles: string[];
   matchedWorkWays: string[];
@@ -61,49 +76,91 @@ function difference(a: string[], b: string[]): string[] {
 }
 
 /**
- * Work-way adjustment, identical to the legacy calculateScore work-way block
- * (with the base folded out):
- *  - user has no work ways        → 0
- *  - some match, none mismatch    → +matches
- *  - some match, some mismatch    → matches − mismatches
- *  - none match, some mismatch    → −2·mismatches
+ * Work-way adjustment — a rank signal, not a filter:
+ *  - user has no work ways → 0
+ *  - otherwise             → +matches, and −1 once if any mission work way
+ *                            is not among the user's
  */
 function workWayAdjustment(missionWW: string[], userWW: string[]): number {
   if (userWW.length === 0) return 0;
-  const matches = intersect(missionWW, userWW);
-  const mismatches = difference(missionWW, userWW);
-  if (matches.length > 0 && mismatches.length === 0) return matches.length;
-  if (matches.length > 0 && mismatches.length > 0) return matches.length - mismatches.length;
-  if (matches.length === 0 && mismatches.length > 0) return -2 * mismatches.length;
-  return 0;
+  const matches = intersect(missionWW, userWW).length;
+  const mismatches = difference(missionWW, userWW).length;
+  return matches - (mismatches > 0 ? 1 : 0);
 }
 
 /**
  * Score a mission for a user. Returns the score plus the matched/missing ID
  * sets (persisted as `matchedOn` so the UI can explain why it matched).
+ *
+ * Both engine paths — a new mission fanned out to users, and a user's
+ * profile/backfill scan over open missions — call this with an `unheld` set
+ * (see `computeUnheld`), so the two can never disagree about a pair.
  */
 export function computeMissionMatchScore(
   mission: MissionRequirements,
-  user: UserCapabilities
+  user: UserCapabilities,
+  /**
+   * Requirements nobody in the candidate pool holds. Missing one of those says
+   * nothing about this user — everyone misses it — so it is not penalised
+   * (QA_CONCIERGE_E2E C-8: four skills the AI had just coined took the one real
+   * carpenter from +2 to −6, and the need reached nobody, silently).
+   */
+  unheld: { skills?: string[]; roles?: string[] } = {}
 ): MatchResult {
   const matchedRoles = intersect(mission.roles, user.roles);
   const matchedSkills = intersect(mission.skills, user.skills);
   const matchedWorkWays = intersect(mission.workWays, user.workWays);
-  const missingSkills = difference(mission.skills, user.skills);
-  const missingRoles = difference(mission.roles, user.roles);
+  const missingSkills = difference(difference(mission.skills, user.skills), unheld.skills ?? []);
+  const missingRoles = difference(difference(mission.roles, user.roles), unheld.roles ?? []);
 
-  const score =
+  const rawScore =
     matchedRoles.length +
     2 * matchedSkills.length +
     workWayAdjustment(mission.workWays, user.workWays) -
     2 * missingSkills.length -
     missingRoles.length;
 
-  return { score, matchedSkills, matchedRoles, matchedWorkWays, missingSkills, missingRoles };
+  // Work ways alone never qualify a mission: there must be a skill or a role in common.
+  const skillMatch = matchedSkills.length > 0;
+  const qualifies = skillMatch || (matchedRoles.length > 0 && rawScore >= MIN_SUGGESTION_SCORE);
+  const score = skillMatch ? Math.max(rawScore, MIN_SUGGESTION_SCORE) : rawScore;
+
+  return {
+    qualifies,
+    score,
+    rawScore,
+    matchedSkills,
+    matchedRoles,
+    matchedWorkWays,
+    missingSkills,
+    missingRoles
+  };
 }
 
 /** A suggestion is only worth storing (and mailing about) above this. */
 export const MIN_SUGGESTION_SCORE = 1;
+
+/**
+ * Requirements that nobody in `pool` holds. Missing one of those says nothing
+ * about a particular user — everyone misses it — so `computeMissionMatchScore`
+ * does not penalise it (QA_CONCIERGE_E2E C-8).
+ */
+export function computeUnheld(
+  required: { skills: string[]; roles: string[] },
+  pool: Array<{ skills: string[]; roles: string[] }>
+): { skills: string[]; roles: string[] } {
+  const heldSkills = new Set(pool.flatMap((u) => u.skills.map(String)));
+  const heldRoles = new Set(pool.flatMap((u) => u.roles.map(String)));
+  return {
+    skills: required.skills.filter((s) => !heldSkills.has(String(s))),
+    roles: required.roles.filter((r) => !heldRoles.has(String(r)))
+  };
+}
+
+/** Qualifying matches first by stored score, then by the unclamped one. */
+export function compareMatches(a: MatchResult, b: MatchResult): number {
+  return b.score - a.score || b.rawScore - a.rawScore;
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Date fit — the resource side (docs/inprogress/PLAN_RESOURCE_CALENDAR.md §7)

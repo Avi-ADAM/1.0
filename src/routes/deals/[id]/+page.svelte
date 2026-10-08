@@ -7,11 +7,21 @@
   import MissionList from '$lib/components/deals/MissionList.svelte';
   import ResourcePanel from '$lib/components/deals/ResourcePanel.svelte';
   import CostPanel from '$lib/components/deals/CostPanel.svelte';
+  import DealDuePanel from '$lib/components/deals/DealDuePanel.svelte';
+  import DealEditsPanel from '$lib/components/deals/DealEditsPanel.svelte';
+  import DealOffersPanel from '$lib/components/deals/DealOffersPanel.svelte';
+  import DealPartsPanel from '$lib/components/deals/DealPartsPanel.svelte';
+  import type { DealCandidacyView } from '$lib/sheirut/dealOffers';
   import ApprovalPanel from '$lib/components/deals/ApprovalPanel.svelte';
   import DealTimeline from '$lib/components/deals/DealTimeline.svelte';
   import ForumPanel from '$lib/components/deals/ForumPanel.svelte';
   import PartiesPanel from '$lib/components/deals/PartiesPanel.svelte';
+  import DealStages from '$lib/components/deals/DealStages.svelte';
+  import CustomerPayment from '$lib/components/lev/cards/CustomerPayment.svelte';
+  import { paymentState } from '$lib/sheirut/paymentState';
   import { saleToDealDetail } from '$lib/services/dealsService';
+  import { missionsFromDue, missionCounts, workProgressPct } from '$lib/sheirut/dealProgress';
+  import { displayHours } from '$lib/timers/precision';
   import { t } from '$lib/translations';
 
   let { data } = $props();
@@ -19,6 +29,28 @@
   const sale = $derived(data.sale);
   const kind = $derived(data.kind);
   const deal = $derived(sale && kind ? saleToDealDetail(sale, kind) : null);
+  // A wish deal is billed by the hours its rikma approved, capped per part (C-14), and is
+  // paid part by part as each provider confirms theirs (C-19) — every number on the page
+  // reads `due` (`computeDealDue`), the same fact the status and the parts panel show.
+  const due = $derived(data.due ?? null);
+  const totalCost = $derived(due ? due.due : (deal?.totalCost ?? 0));
+  const paid = $derived(due ? due.paid : (deal?.paid ?? 0));
+  const costBreakdown = $derived(
+    due
+      ? {
+          missions: due.lines.filter((l) => l.kind === 'mission').reduce((s, l) => s + l.due, 0),
+          resources: due.lines.filter((l) => l.kind === 'resource').reduce((s, l) => s + l.due, 0)
+        }
+      : (deal?.costBreakdown ?? { missions: 0, resources: 0 })
+  );
+
+  // "Next payment" opens the lev purchase card's own flow (CustomerPayment) — on a copy
+  // it may record the transfer on, refreshed whenever the page reloads the deal.
+  let payDeal = $state<any>(null);
+  $effect.pre(() => {
+    payDeal = sale ? { ...sale } : null;
+  });
+  const pay = $derived(sale ? paymentState(sale, due, kind === 'purchase') : null);
 
   const pendingCost = $derived(
     deal ? deal.pendingApprovals.reduce((sum, a) => sum + a.cost, 0) : 0
@@ -108,6 +140,100 @@
    * deal's chat, with somewhere to write — instead of pointing at a chat that had
    * none.
    */
+  /* QA C-19 — the parts of the deal still open in its rikma: the customer signs each
+   * candidacy (it is added to what she pays); and "paid" waits for every provider to
+   * confirm receiving their part in full. */
+  const offers = $derived(data.offers ?? null);
+
+  // The work itself (QA C-21): a wish deal's parts are its due lines, and the
+  // providers' own notes come with the page. Other deals keep what they had.
+  const missionList = $derived(due ? missionsFromDue(due) : (deal?.missionList ?? []));
+  const missions = $derived(due ? missionCounts(missionList) : (deal?.missions ?? { done: 0, inProgress: 0, total: 0 }));
+  const hours = $derived(
+    due
+      ? {
+          done: displayHours(missionList.reduce((s, m) => s + m.hoursDone, 0)),
+          total: displayHours(missionList.reduce((s, m) => s + m.hours, 0))
+        }
+      : (deal?.hours ?? { done: 0, total: 0 })
+  );
+  const progressPct = $derived(
+    (due && workProgressPct(missionList)) ?? deal?.progressPct ?? 0
+  );
+  const updates = $derived(data.updates ?? []);
+  const fmtDay = (iso: string | null) => {
+    if (!iso) return '';
+    const d = new Date(iso);
+    return Number.isNaN(d.getTime()) ? '' : d.toLocaleDateString();
+  };
+  const parts = $derived(data.parts ?? null);
+  let signingId: string | null = $state(null);
+  let confirmingPart = $state(false);
+
+  async function signOffer(c: DealCandidacyView) {
+    if (signingId) return;
+    signingId = c.side + c.id;
+    try {
+      await runAction('signDealOffer', { side: c.side, id: c.id });
+      toast.success($t('deals.offers.signedToast'));
+      await invalidateAll();
+    } catch (err) {
+      console.error(err);
+      toast.error($t('deals.offers.error'));
+    } finally {
+      signingId = null;
+    }
+  }
+
+  async function confirmMyPart() {
+    if (!deal || confirmingPart) return;
+    confirmingPart = true;
+    try {
+      await runAction('confirmDealPartReceived', { sheirutId: deal.sheirutId });
+      toast.success($t('deals.parts.confirmedToast'));
+      await invalidateAll();
+    } catch (err) {
+      console.error(err);
+      toast.error($t('deals.parts.error'));
+    } finally {
+      confirmingPart = false;
+    }
+  }
+
+  /** C-14: requests for more hours on the deal's parts — the customer approves or counters. */
+  const edits = $derived(data.edits ?? []);
+  let editBusy = $state(false);
+
+  async function signEdit(decisionId: string) {
+    if (editBusy) return;
+    editBusy = true;
+    try {
+      const out = await runAction('signDealEdit', { decisionId });
+      toast.success(out?.consensus ? $t('deals.edit.appliedToast') : $t('deals.edit.signedToast'));
+      await invalidateAll();
+    } catch (err) {
+      console.error(err);
+      toast.error($t('deals.edit.error'));
+    } finally {
+      editBusy = false;
+    }
+  }
+
+  async function counterEdit(decisionId: string, terms: { hours: number | null; rate: number | null; why: string }) {
+    if (editBusy) return;
+    editBusy = true;
+    try {
+      await runAction('counterDealEdit', { decisionId, ...terms });
+      toast.success($t('deals.edit.counteredToast'));
+      await invalidateAll();
+    } catch (err) {
+      console.error(err);
+      toast.error($t('deals.edit.error'));
+    } finally {
+      editBusy = false;
+    }
+  }
+
   async function handleReject(_id: string) {
     toast.info($t('deals.rejectToChat'));
     forumPanel?.focus();
@@ -131,6 +257,7 @@
       </div>
     </div>
   {:else}
+    <DealStages stages={data.stages ?? []} />
     <div class="hero anim anim-d1">
       <div class="hero-icon" style="background:{deal.iconBg}">{deal.icon}</div>
       <div class="hero-info">
@@ -149,15 +276,15 @@
       </div>
       <div class="hero-stats">
         <div class="hs">
-          <div class="hs-v gold"><Money amount={deal.totalCost} /></div>
-          <div class="hs-l">עלות כוללת</div>
+          <div class="hs-v gold"><Money amount={totalCost} /></div>
+          <div class="hs-l">{due ? $t('deals.due.heroLabel') : 'עלות כוללת'}</div>
         </div>
         <div class="hs">
-          <div class="hs-v" style="color:#4ade80"><Money amount={deal.paid} /></div>
+          <div class="hs-v" style="color:#4ade80"><Money amount={paid} /></div>
           <div class="hs-l">שולם</div>
         </div>
         <div class="hs">
-          <div class="hs-v">{deal.progressPct}%</div>
+          <div class="hs-v">{progressPct}%</div>
           <div class="hs-l">התקדמות</div>
         </div>
         {#if deal.pendingApprovals.length > 0}
@@ -171,17 +298,36 @@
 
     <div class="detail-grid">
       <div class="col-left">
-        {#if deal.missions.total > 0}
+        {#if missions.total > 0}
           <div class="anim anim-d2">
-            <Panel title="משימות" actionLabel="הצג הכל →">
+            <Panel title={$t('deals.progress.missions')}>
               <DonutChart
-                done={deal.missions.done}
-                inProgress={deal.missions.inProgress}
-                total={deal.missions.total}
-                hoursDone={deal.hours.done}
-                hoursTotal={deal.hours.total}
+                done={missions.done}
+                inProgress={missions.inProgress}
+                total={missions.total}
+                hoursDone={hours.done}
+                hoursTotal={hours.total}
               />
-              <MissionList missions={deal.missionList} />
+              <MissionList missions={missionList} />
+            </Panel>
+          </div>
+        {/if}
+
+        {#if updates.length > 0}
+          <div class="anim anim-d2">
+            <Panel title={$t('deals.progress.updates')}>
+              <ul class="upd-list">
+                {#each updates as u (u.id)}
+                  <li class="upd">
+                    <div class="upd-head">
+                      <strong>{u.who}</strong>
+                      {#if u.missionName}<span class="upd-mission">· {u.missionName}</span>{/if}
+                      <span class="upd-when">{fmtDay(u.at)}</span>
+                    </div>
+                    <p class="upd-text">{u.text}</p>
+                  </li>
+                {/each}
+              </ul>
             </Panel>
           </div>
         {/if}
@@ -196,13 +342,63 @@
       </div>
 
       <div class="col-right">
+        {#if due}
+          <div class="anim anim-d2">
+            <DealDuePanel {due} />
+          </div>
+        {/if}
+
+        {#if edits.length > 0}
+          <div class="anim anim-d2">
+            <DealEditsPanel
+              {edits}
+              isCustomer={kind === 'purchase'}
+              busy={editBusy}
+              onSign={signEdit}
+              onCounter={counterEdit}
+            />
+          </div>
+        {/if}
+
+        {#if offers}
+          <div class="anim anim-d2">
+            <DealOffersPanel
+              view={offers}
+              isCustomer={kind === 'purchase'}
+              busyId={signingId}
+              onSign={signOffer}
+              onTalk={() => forumPanel?.focus()}
+            />
+          </div>
+        {/if}
+
+        {#if parts}
+          <div class="anim anim-d2">
+            <DealPartsPanel {parts} viewerId={data.viewerId} busy={confirmingPart} onConfirm={confirmMyPart} />
+          </div>
+        {/if}
+
         <div class="anim anim-d2">
           <CostPanel
-            totalCost={deal.totalCost}
-            paid={deal.paid}
-            costBreakdown={deal.costBreakdown}
+            {totalCost}
+            {paid}
+            {costBreakdown}
             {pendingCost}
-          />
+            remaining={due ? due.remaining : null}
+            inTransit={due ? due.inTransit : 0}
+            {pay}
+          >
+            {#snippet payment()}
+              {#if payDeal}<CustomerPayment
+                buble={payDeal}
+                {due}
+                myId={data.viewerId}
+                myName={data.viewerName}
+                onAskChat={() => forumPanel?.focus()}
+                onSent={() => invalidateAll()}
+              />{/if}
+            {/snippet}
+          </CostPanel>
         </div>
 
         {#if deal.pendingApprovals.length > 0}
@@ -231,6 +427,13 @@
 </main>
 
 <style>
+  .upd-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+  .upd { padding: 10px 12px; background: var(--s2); border: 1px solid var(--border); border-radius: 10px; }
+  .upd-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px; font-size: 12px; color: var(--gold-l); }
+  .upd-mission { color: var(--gold); }
+  .upd-when { margin-inline-start: auto; color: var(--gold); font-size: 11px; }
+  .upd-text { margin: 6px 0 0; font-size: 13px; line-height: 1.5; color: var(--text, #f3efe6); white-space: pre-wrap; }
+
   .back-btn {
     display: inline-flex;
     align-items: center;

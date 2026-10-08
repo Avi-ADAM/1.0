@@ -21,6 +21,7 @@
   import { t, isRtl } from '$lib/translations';
   import { timers, updateTimers, lockTimerForEdit } from '$lib/stores/timers.js';
   import { startTimer, stopTimer } from '$lib/func/timers.js';
+  import { hasUnsavedTime as hasUnsavedTimeOf } from '$lib/timers/afterSave';
   import TimerDialogs from '$lib/components/timers/TimerDialogs.svelte';
   import { executeAction } from '$lib/client/actionClient';
   import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
@@ -94,9 +95,14 @@
   let activeTimerData = $derived(storeTimer?.attributes?.activeTimer?.data?.attributes);
   let storeTotalHours = $derived(activeTimerData?.totalHours || 0);
   let storeTimers = $derived(activeTimerData?.timers || []);
-  let hasUnsavedTime = $derived(
-    !activeTimerData?.saved && (storeTimers.length > 0 || storeTotalHours > 0)
-  );
+  let hasUnsavedTime = $derived(hasUnsavedTimeOf(activeTimerData));
+
+  // A save on this page that filed its hours as an approval. The host's
+  // `pendingApproval` comes from the page load and does not know about it, so
+  // "finish" kept offering itself — and with the store still holding the
+  // saved intervals, it reopened the save dialog instead.
+  let hoursAwaitingApproval = $state(false);
+  let isPending = $derived(pendingApproval || hoursAwaitingApproval);
 
   // The clock is defined by two primitives — the running segment's start and
   // the accumulated base — so a store refresh that doesn't move either leaves
@@ -285,6 +291,14 @@
    * would simply be lost from the approved hours.
    */
   function openFinish() {
+    if (isPending) {
+      toast.info(
+        hoursAwaitingApproval && !pendingApproval
+          ? $t('moach.progress.hoursAwaitingApprovalHint')
+          : $t('moach.progress.awaitingApprovalHint')
+      );
+      return;
+    }
     if (isRunning) {
       toast.warning($t('moach.progress.stopTimerFirst'));
       return;
@@ -369,7 +383,8 @@
     bind:elapsedTime
     bind:selectedTasks
     bind:taskSearchTerm
-    onUpdateTimer={({ timer: updated, running, hoursdon }) => {
+    onUpdateTimer={({ timer: updated, running, hoursdon, filed }) => {
+      if (filed === 'approval') hoursAwaitingApproval = true;
       if (updated) {
         updateStore(running, updated);
       } else {
@@ -431,8 +446,13 @@
       <span class="mc-label">{$t('moach.progress.updateStatus')}</span>
     </button>
 
-    {#if pendingApproval}
-      <span class="mc-pending" title={$t('moach.progress.awaitingApprovalHint')}>
+    {#if isPending}
+      <span
+        class="mc-pending"
+        title={hoursAwaitingApproval && !pendingApproval
+          ? $t('moach.progress.hoursAwaitingApprovalHint')
+          : $t('moach.progress.awaitingApprovalHint')}
+      >
         ⏳ {$t('moach.progress.awaitingApproval')}
       </span>
     {:else}

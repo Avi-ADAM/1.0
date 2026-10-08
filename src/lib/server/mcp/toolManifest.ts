@@ -28,6 +28,7 @@ import {
   getMissionStatsTool
 } from '../../../mastra/tools/missionTimers';
 import { getSitePagesTool } from '../../../mastra/tools/siteNavigationTool';
+import { getMyUpdatesTool } from '../../../mastra/tools/myUpdatesTool';
 import { navigateToPageTool } from '../../../mastra/tools/navigateToPageTool';
 import { findMissionTool } from '../../../mastra/tools/findMissionTool';
 import { findUserProjectsTool } from '../../../mastra/tools/findUserProjectsTool';
@@ -164,6 +165,9 @@ export const MCP_TOOL_MANIFEST: Record<string, McpManifestEntry> = {
   listMyWishesTool: { tool: listMyWishesTool, title: "List my wishes", tier: 'read' },
   getWishDetailsTool: { tool: getWishDetailsTool, title: "Get wish details", tier: 'read' },
   listMyWishOffersTool: { tool: listMyWishOffersTool, title: "List offers on my wishes", tier: 'read' },
+  // What waits for the user, as ready sentences (PLAN_SMART_NOTICES §6.6). A key limited to
+  // some rikmas sees only their items: `waiting` rows carry projectId (wish/deal rows have none).
+  getMyUpdatesTool: { tool: getMyUpdatesTool, title: "What's waiting for me", tier: 'read', project: 'scope', scopedOutput: ['waiting'] },
   // Behind CONCIERGE_MCP_WRITE: one run costs Gemini tokens, the other writes a row.
   previewWishTool: { tool: previewWishTool, title: "Preview a wish breakdown", tier: 'read', ai: true, enabled: conciergeWriteEnabled },
   draftWishTool: { tool: draftWishTool, title: "Save a draft wish", tier: 'selfWrite', enabled: conciergeWriteEnabled },

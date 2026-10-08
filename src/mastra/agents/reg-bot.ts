@@ -17,9 +17,10 @@ import { getMemberMissionsTool } from '../tools/getMemberMissionsTool';
 import { findUserProjectsTool } from '../tools/findUserProjectsTool';
 import { getPageContextTool } from '../tools/pageContextTool';
 import { getProjectContextTool } from '../tools/getProjectContextTool';
+import { getMyUpdatesTool } from '../tools/myUpdatesTool';
 import { planProjectWorkTool, scanProjectDirectionsTool } from '../tools/planningTools';
 import { SITE_CONTEXT } from '../../lib/bot/context.js';
-import { createGoogleModel, createGroqModel, createNvidiaModel, hasGroqModelConfig, hasNvidiaModelConfig, hasGoogleModelConfig } from '../lib/createModel';
+import { createModelChain } from '../lib/createModel';
 
 export const createEnhancedBotAgent = (
   apiKey: string,
@@ -53,6 +54,7 @@ Core workflows:
 - Mission details: listUserMissionsTool / getMissionDetailsTool
 - Mission statistics: getMissionStatsTool
 - Project navigation: findUserProjectsTool -> navigateToPageTool
+- What's new / what is waiting for me / what is happening in rikma X (as ready sentences): getMyUpdatesTool (rikma=<name> when one is named) -> relay the sentences, say which ones silence approves and when
 - What's happening in a project (open missions, your tasks, members, values): getProjectContextTool(projectId)
 - "What should we do next?" (open-ended, no specific goal): scanProjectDirectionsTool(projectId) -> relay the directions with their rationale
 - "We want to achieve X" (a concrete brief): planProjectWorkTool(projectId, text) -> relay the reviewUrl
@@ -74,23 +76,7 @@ Behavior rules:
 - If multiple mission matches exist, present choices instead of guessing.
 - If the request is ambiguous, ask a short clarification question.
 `,
-    model: (() => {
-      const models = [];
-      
-      // Priority order: Google Flash (thinkingBudget=0) > Google Flash Lite > Groq > NVIDIA
-      if (hasGoogleModelConfig(apiKey)) {
-        models.push({ model: createGoogleModel(apiKey, 'gemini-3-flash-preview', { thinkingBudget: 0 }), maxRetries: 2 });
-        models.push({ model: createGoogleModel(apiKey, 'gemini-flash-lite-latest'), maxRetries: 2 });
-      }
-      if (hasGroqModelConfig()) {
-        models.push({ model: createGroqModel(), maxRetries: 2 });
-      }
-      if (hasNvidiaModelConfig(apiKey)) {
-        models.push({ model: createNvidiaModel(apiKey), maxRetries: 1 });
-      }
-      
-      return models.length > 0 ? models : [{ model: createGoogleModel(apiKey, 'gemini-3-flash-preview', { thinkingBudget: 0 }), maxRetries: 2 }];
-    })(),
+    model: createModelChain(apiKey),
     tools: {
       getMissionDetailsTool,
       listUserMissionsTool,
@@ -108,6 +94,7 @@ Behavior rules:
       findUserProjectsTool,
       getPageContextTool,
       getProjectContextTool,
+      getMyUpdatesTool,
       planProjectWorkTool,
       scanProjectDirectionsTool
     }

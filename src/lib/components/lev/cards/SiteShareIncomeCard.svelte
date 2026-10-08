@@ -45,7 +45,7 @@
     Array.isArray(buble.transferHalukas) ? buble.transferHalukas : []
   );
   const settledCount = $derived(
-    transfers.filter((h: any) => h.senderconf && h.confirmed).length
+    transfers.filter((h: any) => h.confirmed).length
   );
 
   async function handleToggleReceiver() {

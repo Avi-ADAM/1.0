@@ -10,6 +10,8 @@
   // Language stores
   import { lang, langUs, doesLang } from '$lib/stores/lang.js';
   import { locale, t } from '$lib/translations';
+  import { sendToSer } from '$lib/send/sendToSer.js';
+  import { readNoticePrefs } from '$lib/notices';
 
   // New architecture imports
   import { finalSwiperArray, mergedFeed } from '$lib/stores/levDerived';
@@ -80,6 +82,12 @@
 
   // Subscribe to view mode
   let cards = $state(true);
+
+  // What the member hid from her notices (PLAN_SMART_NOTICES §4) — read once,
+  // for the notices view. A backend without the collections, or any failure,
+  // reads as "nothing hidden".
+  /** @type {import('$lib/notices').NoticeDismissal[]} */
+  let noticeDismissals = $state([]);
 
   // Focused view (?focus= deep-link from hub): show only these ani values.
   // Kept as a view-level filter so the background full load can complete the
@@ -337,6 +345,13 @@
 
     // Check authentication (uid is provided by server if session is valid)
     if (!page.data.uid) {
+      // A network blip while checking the session is not a sign-out (QA C-4):
+      // say so and offer a retry instead of throwing the member to /login.
+      if (page.data.identityUnreachable) {
+        error = $t('common.sessionCheckFailed');
+        loading = false;
+        return;
+      }
       goto('/login?from=lev');
       return;
     }
@@ -360,6 +375,11 @@
     // Side channels that don't depend on the lev dataset — start them right
     // away instead of after the (potentially long) data load. The timers store
     // and socket upserts populate reactively whenever they arrive.
+    sendToSer({ idL: page.data.uid }, '423myNoticePrefs', 0, 0, false, fetch)
+      .then((res) => {
+        if (!res?.errors?.length) noticeDismissals = readNoticePrefs(res).dismissals;
+      })
+      .catch(() => {});
     fetchTimers(page.data.uid, fetch).catch((e) =>
       console.warn('[lev] fetchTimers failed:', e?.message)
     );
@@ -484,7 +504,8 @@
   </div>
 {:else if error}
   <div class="error-container">
-    <p>Error: {error}</p>
+    <p>{error}</p>
+    <button type="button" onclick={() => location.reload()}>{$t('common.retry')}</button>
   </div>
 {:else}
   <!-- Dialog Overlay -->
@@ -549,8 +570,10 @@
   
   <!-- Main Content -->
   <Tooltip title={u} ispic={true}>
-    {#if $levView === 'list'}
+    {#if $levView === 'list' || $levView === 'notices'}
       <Levlist
+        variant={$levView === 'notices' ? 'notices' : 'rows'}
+        dismissals={noticeDismissals}
         low={false}
         arr1={displayItems}
         milon={$milon}

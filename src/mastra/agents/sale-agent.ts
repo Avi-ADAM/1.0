@@ -1,10 +1,5 @@
 import { Agent } from '@mastra/core/agent';
-import {
-  createGoogleModel,
-  createGroqModel,
-  hasGoogleModelConfig,
-  hasGroqModelConfig
-} from '../lib/createModel';
+import { createModelChain } from '../lib/createModel';
 import { saleActionTool } from '../tools/saleActionTool';
 import { getChatMemory, workingMemoryInstructions } from '../lib/chatMemory';
 
@@ -53,18 +48,7 @@ export function createSaleAgent(apiKey: string, language: string = 'he', userId:
     name: 'SaleAgent',
     instructions: buildSystemPrompt(language, userId) + workingMemoryInstructions(language),
     memory: getChatMemory(),
-    model: (() => {
-      if (hasGoogleModelConfig(apiKey)) {
-        return [
-          { model: createGoogleModel(apiKey, 'gemini-3-flash-preview', { thinkingBudget: 0 }), maxRetries: 2 },
-          { model: createGoogleModel(apiKey, 'gemini-flash-lite-latest'), maxRetries: 2 }
-        ];
-      }
-      if (hasGroqModelConfig()) {
-        return [{ model: createGroqModel(), maxRetries: 2 }];
-      }
-      return [{ model: createGoogleModel(apiKey, 'gemini-3-flash-preview', { thinkingBudget: 0 }), maxRetries: 2 }];
-    })(),
+    model: createModelChain(apiKey),
     tools: { saleActionTool }
   });
 }

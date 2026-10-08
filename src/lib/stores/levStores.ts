@@ -690,7 +690,8 @@ export const isCardsView: Writable<boolean> = writable(true);
  * canvas. The pair `isCardsView` above only ever knew about the last two, so it
  * is kept in sync from here for the pages that still read it.
  */
-export type LevView = 'list' | 'cards' | 'coins';
+/** `notices`: the list, one sentence per item (docs/inprogress/PLAN_SMART_NOTICES.md §6.4). */
+export type LevView = 'list' | 'notices' | 'cards' | 'coins';
 
 const LEV_VIEW_KEY = 'lev:view';
 
@@ -712,7 +713,7 @@ function initialLevView(): LevView {
   if (typeof window === 'undefined') return 'coins';
   try {
     const saved = window.localStorage.getItem(LEV_VIEW_KEY);
-    if (saved === 'list' || saved === 'cards' || saved === 'coins') return saved;
+    if (saved === 'list' || saved === 'notices' || saved === 'cards' || saved === 'coins') return saved;
   } catch {
     /* private mode / disabled storage — fall through to the default */
   }

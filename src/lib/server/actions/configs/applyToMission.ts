@@ -8,6 +8,7 @@ import { createVolunteerProposal } from '$lib/server/wish/volunteerProposal.js';
 import { shiftsEnabled } from '$lib/server/shifts/mode.js';
 import { asUser as asShiftUser } from '$lib/server/shifts/exec.js';
 import { setAskCommitment, setMissionCommitment } from '$lib/server/shifts/store.js';
+import { loadOfferDeal, notifyDealClients } from '$lib/server/deal/offerDeal.js';
 
 /**
  * "I can do only 2 shifts a week" / "I want up to 7" (PLAN_SHIFTS §3.8): a
@@ -62,7 +63,14 @@ const applyToMissionHandler: ActionExecutionHandler = async (params, context, { 
   // (the voter can never see it to approve). Skip the Ask entirely and create
   // a Mesimabetahalich (mission-in-progress) directly — mirroring what
   // finalizeJoinAcceptance does for the 'solo' variant.
-  const isSolo = memberIds.length === 1 && memberIds[0] === String(context.userId);
+  // A gap of a customer's deal (QA C-19): she pays for whoever takes it, so it is never
+  // taken without her signature — not even by the only member of the rikma.
+  const dealGap = await loadOfferDeal(
+    (qid, vars) => strapi.execute(qid, vars, context.jwt, context.fetch),
+    'mission',
+    String(openMissionId)
+  );
+  const isSolo = memberIds.length === 1 && memberIds[0] === String(context.userId) && !dealGap;
 
   if (isSolo) {
     // 1. Fetch OpenMission details (name, mission link, hours, acts, etc.)
@@ -273,6 +281,8 @@ const applyToMissionHandler: ActionExecutionHandler = async (params, context, { 
   );
   const askId = askRes?.data?.createAsk?.data?.id;
   if (!askId) throw new Error('Failed to create Ask');
+
+  if (dealGap) await notifyDealClients(notifier, context, dealGap, null);
 
   // Stated on the request; the acceptance copies it onto the assignment.
   const commitment = statedCommitment(params);

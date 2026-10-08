@@ -1,3 +1,4 @@
+import { loadOfferDeal, notifyDealClients } from '$lib/server/deal/offerDeal.js';
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import {
   resolveOpenMashaabimName,
@@ -16,7 +17,7 @@ function buildRequesterVote(userId: string, at: Date) {
   };
 }
 
-const createMashaabimRequestHandler: ActionExecutionHandler = async (params, context, { strapi }) => {
+const createMashaabimRequestHandler: ActionExecutionHandler = async (params, context, { strapi, notifier }) => {
   const {
     openMashaabimId,
     projectId,
@@ -39,7 +40,14 @@ const createMashaabimRequestHandler: ActionExecutionHandler = async (params, con
     (projectAttrs?.user_1s?.data || []).map((m: any) => String(m.id));
   const restime: string = projectAttrs?.restime ?? '';
   const isProjectMember = memberIds.includes(requesterId);
-  const isSoloMemberProject = isProjectMember && memberIds.length === 1;
+  // A gap of a customer's deal is never taken without her signature (QA C-19), so
+  // even a one-member rikma goes through a candidacy she can sign.
+  const dealGap = await loadOfferDeal(
+    (qid, vars) => strapi.execute(qid, vars, context.jwt, context.fetch),
+    'resource',
+    String(openMashaabimId)
+  );
+  const isSoloMemberProject = isProjectMember && memberIds.length === 1 && !dealGap;
 
   // Step 2: create Askm
   const askmVariables: Record<string, unknown> = {
@@ -65,6 +73,7 @@ const createMashaabimRequestHandler: ActionExecutionHandler = async (params, con
   );
 
   const askmId = askmRes?.data?.createAskm?.data?.id;
+  if (askmId && dealGap) await notifyDealClients(notifier, context, dealGap, null);
   if (!askmId) throw new Error('Failed to create Askm');
 
   await strapi.execute(

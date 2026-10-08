@@ -1,5 +1,6 @@
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
-import { normId } from '../../nego/negoGate.js';
+import { evaluateCandidacyVote, assertStandingRound } from '../../nego/candidacyVote.js';
+import { ActionError } from '../errors.js';
 import { ensureCandidacyTimegrama } from '../../nego/timegrama.js';
 
 /**
@@ -34,35 +35,29 @@ import { ensureCandidacyTimegrama } from '../../nego/timegrama.js';
  * panel instead of calling this, and this action stays only for legacy rows.
  */
 const voteOnAskmHandler: ActionExecutionHandler = async (params, context, { strapi }) => {
-  const { askmId, what, order = 0, existingVotes = [] } = params;
-
-  const me = String(context.userId);
-  const voteOrder = Number(order) || 0;
+  // `order` and `existingVotes` are still accepted from older cards and ignored:
+  // the round is the standing one and the list is the DB's (nego/candidacyVote.ts).
+  // The card's copy used to be written back whole — deleting any vote cast since
+  // it loaded — at whatever round the card said.
+  const { askmId, projectId, what, expectRound } = params;
   const voteWhat = what === true;
 
-  // Merge over the votes the card already has, dropping my own row at this
-  // round so changing my mind (yes → no) replaces it instead of double-counting.
-  const kept = (existingVotes as any[])
-    .map((v: any) => ({
-      what: v?.what ?? true,
-      order: Number(v?.order ?? 0),
-      users_permissions_user: normId(v?.users_permissions_user),
-    }))
-    .filter((v) => v.users_permissions_user !== '')
-    .filter((v) => !(v.users_permissions_user === me && v.order === voteOrder));
+  const read: any = await strapi.execute('getAskmForFinalize', { id: String(askmId) }, context.jwt, context.fetch);
+  const attrs = read?.data?.askm?.data?.attributes;
+  if (!attrs) throw new Error(`Askm ${askmId} could not be loaded - vote not recorded`);
+  if (attrs.archived === true) {
+    throw new ActionError('ALREADY_RESOLVED', `Askm ${askmId} was already resolved`);
+  }
+  const askmProject = attrs.project?.data?.id;
+  if (askmProject != null && String(askmProject) !== String(projectId)) {
+    throw new ActionError('FORBIDDEN', `Askm ${askmId} does not belong to project ${projectId}`);
+  }
 
-  const allVots = [...kept, { what: voteWhat, order: voteOrder, users_permissions_user: me }].map(
-    (v) => ({
-      what: v.what,
-      order: v.order,
-      users_permissions_user: v.users_permissions_user,
-      ide: Number.isNaN(parseInt(v.users_permissions_user, 10))
-        ? null
-        : parseInt(v.users_permissions_user, 10),
-    })
-  );
+  const vote = evaluateCandidacyVote({ attrs, side: 'askm', callerId: context.userId, what: voteWhat });
+  assertStandingRound(expectRound, vote.L);
+  const voteOrder = vote.L;
 
-  await strapi.execute('133addVoteToAskm', { id: askmId, vots: allVots }, context.jwt, context.fetch);
+  await strapi.execute('133addVoteToAskm', { id: askmId, vots: vote.vots }, context.jwt, context.fetch);
 
   // A yes keeps the auto-approval clock running (same as the `partial` branch of
   // finalizeAskmAcceptance). A no deliberately does not start one: silence must
@@ -74,7 +69,8 @@ const voteOnAskmHandler: ActionExecutionHandler = async (params, context, { stra
 
   return {
     data: { askmId, what: voteWhat, order: voteOrder },
-    updateStrategy: { type: 'none' },
+    // The other members' askm cards re-read their slice (socket → levSocketHandler).
+    updateStrategy: { type: 'refetchScope', config: { dataKeys: ['askedResources'], projectId: String(projectId) } },
   };
 };
 
@@ -88,7 +84,8 @@ export const voteOnAskmConfig: ActionConfig = {
     askmId: { type: 'string', required: true },
     projectId: { type: 'string', required: true },
     what: { type: 'boolean', required: true },
-    order: { type: 'number', required: false },
+    order: { type: 'number', required: false }, // ignored — the server takes the standing round
+    expectRound: { type: 'number', required: false },
     existingVotes: { type: 'array', required: false },
   },
 

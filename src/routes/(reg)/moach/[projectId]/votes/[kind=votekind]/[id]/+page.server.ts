@@ -1,4 +1,5 @@
 import { sendToSer } from '$lib/send/sendToSer.js';
+import { backendUnavailable, hasNoAnswer } from '$lib/server/sendReply.js';
 import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 
@@ -30,8 +31,10 @@ export const load: PageServerLoad = async ({ params, fetch }) => {
     id: string;
   };
 
-  const res = await sendToSer({ eid: id }, QID[kind], null, null, false, fetch);
-  const entity = res?.data?.[ROOT[kind]]?.data ?? null;
+  const res: any = await sendToSer({ eid: id }, QID[kind], null, null, false, fetch);
+  // A timeout is not a missing vote — an email link must not say the vote is gone.
+  if (hasNoAnswer(res)) backendUnavailable();
+  const entity = res.data[ROOT[kind]]?.data ?? null;
 
   if (!entity) throw error(404, 'Vote not found');
 

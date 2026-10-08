@@ -11,9 +11,11 @@
     updateTimer,
     saveTimer,
     recalculateMissionHours,
-    calculateTotalHours
+    calculateTotalHours,
+    createManualTimer
   } from '$lib/func/timers.js';
-  import { timers, updateTimers, lockTimerForEdit, unlockTimerForEdit } from '$lib/stores/timers';
+  import { timers, updateTimers, lockTimerForEdit, unlockTimerForEdit, fetchTimers } from '$lib/stores/timers';
+  import { withoutSavedTimer } from '$lib/timers/afterSave';
   import {
     normalizeSaveLink,
     normalizeSaveLinks,
@@ -38,7 +40,9 @@
    * @property {string} [elapsedTime]
    * @property {any} [selectedTasks]
    * @property {string} [taskSearchTerm]
-   * @property {(payload: { timer: any, running: boolean, hoursdon?: any }) => void} [onUpdateTimer]
+   * @property {(payload: { timer: any, running: boolean, hoursdon?: any, saved?: boolean, filed?: 'approval'|'finnishedMission' }) => void} [onUpdateTimer]
+   *   `saved` marks a successful save (the timer is gone from the mission);
+   *   `filed: 'approval'` means the hours now wait for the rikma to sign them.
    */
 
   /** @type {Props} */
@@ -351,6 +355,54 @@
     });
   }
 
+  /**
+   * A mission with no timer yet had no way to log hours at all — "no times to
+   * manage" and nothing else (QA_CONCIERGE_E2E C-12). Open an empty, stopped
+   * timer so the interval editor appears and the member types the hours they
+   * worked.
+   *
+   * The server creates it in one write. It used to be a start and then a stop
+   * from here, and when the stop was lost to a slow Strapi the button sat on
+   * "⏳" while a real timer ran on the server — twenty minutes later those
+   * minutes were on the mission. A failure or a timeout now says so and offers
+   * a retry, which is safe: the server hands back the timer if the first
+   * attempt landed after all.
+   */
+  let creatingManual = $state(false);
+  let manualFailed = $state(false);
+  async function startManualEntry() {
+    if (creatingManual || !timer?.mId) return;
+    creatingManual = true;
+    manualFailed = false;
+    const uid = String(page.data?.uid ?? '');
+    try {
+      const created = await createManualTimer(timer.mId, uid, timer.projectId, fetch);
+      if (!created) throw new Error('no timer came back');
+      // Show the editor at once, then let the server's copy replace it.
+      updateTimers(
+        $timers.map((x) =>
+          String(x.mId) === String(timer.mId)
+            ? {
+                ...x,
+                running: false,
+                attributes: {
+                  ...x.attributes,
+                  activeTimer: { ...x.attributes?.activeTimer, data: created, isActive: false }
+                }
+              }
+            : x
+        )
+      );
+      await fetchTimers(uid, fetch, { isRemoteUpdate: true });
+    } catch (e) {
+      console.error('[TimerDialogs] could not open a timer for manual entry', e);
+      manualFailed = true;
+      toast.error($t('timers.manualEntryError'));
+    } finally {
+      creatingManual = false;
+    }
+  }
+
   function handleSaveTimer() {
     showSaveDialog = false;
     showClearDialog = false;
@@ -359,11 +411,25 @@
     lockThis();
   }
 
+  // One save at a time: a second click while the first is filing used to send
+  // a second save that read `saved: false` too.
+  let saving = $state(false);
+
   async function handleSaveTimerFinal() {
+    if (saving) return;
     if (!timer?.attributes?.activeTimer?.data) {
       console.error('אין טיימר פעיל לשמור');
       return;
     }
+    saving = true;
+    try {
+      await saveFinal();
+    } finally {
+      saving = false;
+    }
+  }
+
+  async function saveFinal() {
 
     // Always an array: the list the member is looking at *is* their answer, so
     // unticking everything has to reach the server as "no acts" rather than as
@@ -388,11 +454,20 @@
       // neither the timer nor the mission, so read both defensively. The
       // `refresh: true` unlock below is what brings the real state back.
       const hoursdon = result?.mission?.attributes?.howmanyhoursalready;
+      const missionId = timer.mId;
       onUpdateTimer?.({
         timer: result?.timer ?? null,
         running: false,
+        saved: true,
+        ...(result?.filed ? { filed: result.filed } : {}),
         ...(hoursdon !== undefined ? { hoursdon } : {})
       });
+
+      // The server has marked the timer saved and taken it off the mission.
+      // Say the same in the store now, rather than wait for a refresh: a
+      // "finish mission" on the same page used to find the saved intervals
+      // still there, call them unsaved and offer to save them a second time.
+      updateTimers(withoutSavedTimer($timers, missionId));
 
       showSaveFinal = false;
       showSaveDialog = false;
@@ -400,7 +475,9 @@
       saveText = '';
       saveTextTouched = false;
       resetEvidence();
-      unlockThis();
+      if (missionId != null) unlockTimerForEdit(missionId);
+      const uid = page.data?.uid;
+      if (uid) fetchTimers(String(uid), fetch, { isRemoteUpdate: true });
 
       toast.success($t('timers.saveSuccess'));
     } else {
@@ -549,6 +626,18 @@
           </div>
         {:else}
           <p class="no-timers">{$t('timers.noTimes')}</p>
+          {#if timer?.mId}
+            {#if manualFailed && !creatingManual}
+              <p class="manual-error" role="alert">{$t('timers.manualEntryError')}</p>
+            {/if}
+            <button class="save-btn" onclick={startManualEntry} disabled={creatingManual} aria-busy={creatingManual}>
+              {creatingManual
+                ? $t('timers.manualEntryOpening')
+                : manualFailed
+                  ? $t('timers.manualEntryRetry')
+                  : $t('timers.addManually')}
+            </button>
+          {/if}
         {/if}
       </div>
     </DialogContent>
@@ -778,9 +867,10 @@
           <button
             class="px-4 py-2 rounded font-bold text-black bg-gradient-to-r from-green-400 to-blue-400 transform transition-transform hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed"
             onclick={handleSaveTimerFinal}
-            disabled={elapsedTime === '00:00:00' && dialogEdit != true}
+            disabled={saving || (elapsedTime === '00:00:00' && dialogEdit != true)}
+            aria-busy={saving}
           >
-            {$t('timers.saveTimerBtn')}
+            {saving ? $t('timers.saving') : $t('timers.saveTimerBtn')}
           </button>
           {#if filteredTasks.length > 0}
             <button
@@ -1062,10 +1152,15 @@
     color: #ff8fb1;
   }
 
-  .save-evi-error {
+  .save-evi-error,
+  .manual-error {
     margin: 0;
     font-size: 0.78rem;
     color: #ffb4c6;
+  }
+
+  .manual-error {
+    margin-bottom: 0.5rem;
   }
 
   .save-btn {
@@ -1277,7 +1372,8 @@
     color: var(--goldink);
   }
   :global(html.business) .save-evi-drop:hover,
-  :global(html.business) .save-evi-error {
+  :global(html.business) .save-evi-error,
+  :global(html.business) .manual-error {
     color: var(--destructive);
   }
 

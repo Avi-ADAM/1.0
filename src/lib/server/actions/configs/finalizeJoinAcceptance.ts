@@ -2,6 +2,8 @@ import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { EmailService } from '../../notifications/EmailService.js';
 import { STRAPI_URL } from '$lib/server/strapiUrl.js';
 import { evaluateAskAcceptance } from '$lib/server/nego/askAcceptance.js';
+import { assertStandingRound } from '$lib/server/nego/candidacyVote.js';
+import { ActionError } from '../errors.js';
 import { ensureCandidacyTimegrama } from '../../nego/timegrama.js';
 import { resolveAcceptedActs } from '../helpers/roundActs.js';
 import { touchDormancy } from '$lib/server/archive/dormancyClock.js';
@@ -12,6 +14,10 @@ import { shiftsEnabled } from '$lib/server/shifts/mode.js';
 import { asUser as asShiftUser } from '$lib/server/shifts/exec.js';
 import { commitmentForAsk, setMissionCommitment } from '$lib/server/shifts/store.js';
 import { gqlString } from './actionUtils.js';
+import { loadCandidacyDeal, fillOfferIntoDeal } from '$lib/server/deal/offerDeal.js';
+
+/** A wish need may carry no mission template; never write the string "undefined" as a relation. */
+const hasMissionTemplate = (id: unknown) => id != null && id !== '' && id !== 'undefined' && id !== 'null';
 
 function formatVotesForInline(votes: any[]): string {
   if (!Array.isArray(votes) || votes.length === 0) return '';
@@ -54,16 +60,15 @@ const finalizeJoinAcceptanceHandler: ActionExecutionHandler = async (params, con
     sqedualed,
     deadline,
     timegramaId,
-    existingMemberIds = [],  // project.user_1s ids BEFORE acceptance
+    existingMemberIds: clientMemberIds = [],  // the card's project.user_1s — a fallback only
     projectName = '',
     projectSrc = '',
+    expectRound,
   } = params;
 
   const voterUserId = context.userId;
   const d = new Date();
   const now = d.toISOString();
-
-  const newnew = !existingMemberIds.map(String).includes(String(acceptedUserId));
 
   // Filled from the server's authoritative vote rows once the gate has run.
   let votesStr = '';
@@ -98,6 +103,11 @@ const finalizeJoinAcceptanceHandler: ActionExecutionHandler = async (params, con
   }
   if (!askAttributes) throw new Error(`Ask ${askId} could not be loaded - acceptance aborted`);
 
+  // A gap of a customer's deal (QA C-19): she pays for whatever this ends on, so she
+  // signs it too. A read error throws — it must not pass for "nobody pays".
+  const run = (qid: string, vars: Record<string, unknown>) => strapi.execute(qid, vars, context.jwt, context.fetch);
+  const offerDeal = await loadCandidacyDeal(run, 'ask', String(askId));
+
   // ── Consent gate ──────────────────────────────────────────────────────────
   // The same bilateral rule the timegrama finalizer applies at restime: an
   // ASSIGNED offer (open_mission.isRishon — a member created the mission on
@@ -107,11 +117,20 @@ const finalizeJoinAcceptanceHandler: ActionExecutionHandler = async (params, con
     askAttributes,
     callerId: context.userId,
     acceptedUserId,
+    clientIds: offerDeal?.clientIds ?? [],
     now: d,
   });
+  if (check.reason !== 'archived') assertStandingRound(expectRound, check.L);
+
+  // The member list is the DB's, not the card's: `user_1s` below is written as a
+  // whole list, so a card loaded before somebody else joined would remove them.
+  const existingMemberIds: string[] = check.memberIds.length
+    ? check.memberIds
+    : (clientMemberIds as unknown[]).map(String);
+  const newnew = !existingMemberIds.includes(String(acceptedUserId));
 
   if (!check.allowed) {
-    if (check.reason === 'awaitingAssigneeConsent') {
+    if (check.reason === 'awaitingAssigneeConsent' || check.reason === 'awaitingClientConsent') {
       // Not a failure: the approving member's yes is real and must be kept.
       // Store it at the current round and leave the Ask open — the assignee
       // still has until the timegrama expires to agree, counter or talk.
@@ -127,16 +146,35 @@ const finalizeJoinAcceptanceHandler: ActionExecutionHandler = async (params, con
         data: {
           askId: String(askId),
           materialized: false,
-          pending: 'assigneeConsent',
+          pending: check.reason === 'awaitingClientConsent' ? 'clientConsent' : 'assigneeConsent',
           takerId: check.takerId,
         },
         updateStrategy: { type: 'fullRefresh' },
       };
     }
     if (check.reason === 'archived') {
-      throw new Error(`Ask ${askId} was already resolved`);
+      throw new ActionError('ALREADY_RESOLVED', `Ask ${askId} was already resolved`);
     }
     throw new Error(`acceptedUserId ${acceptedUserId} is not the candidate of ask ${askId}`);
+  }
+
+  // `variant: 'allVoted'` is the card's count of a list it loaded earlier. The
+  // rikma has decided only when every member has said yes to the standing
+  // terms; until then this yes is a vote like any other, and the rest of the
+  // rikma keeps its restime (silence still completes it, via the timegrama).
+  if (!check.allMembersYes) {
+    await strapi.execute('120addVoteToAsk', { askId: String(askId), vots: check.vots }, context.jwt, context.fetch);
+    await ensureCandidacyTimegrama(strapi, context, { side: 'ask', id: String(askId) });
+    return {
+      data: {
+        askId: String(askId),
+        materialized: false,
+        pending: 'members',
+        membersPending: check.membersPending,
+        takerId: check.takerId,
+      },
+      updateStrategy: { type: 'fullRefresh' },
+    };
   }
 
   // Persist the server's own view of the votes (DB rows + this approver's yes
@@ -196,7 +234,7 @@ const finalizeJoinAcceptanceHandler: ActionExecutionHandler = async (params, con
   const mainMutation = `mutation {
     createMesimabetahalich(data: {
       project: "${projectId}",
-      mission: "${missId}",
+      ${hasMissionTemplate(missId) ? `mission: "${missId}",` : ''}
       hearotMeyuchadot: ${gqlString(fHearot)},
       name: ${gqlString(fName)},
       descrip: ${gqlString(fDescrip)},
@@ -238,6 +276,16 @@ const finalizeJoinAcceptanceHandler: ActionExecutionHandler = async (params, con
   }
 
   const chiluzh = responseData.data?.createMesimabetahalich?.data?.id;
+
+  // The customer's deal takes the line at the terms everyone signed (QA C-19).
+  if (offerDeal && chiluzh) {
+    await fillOfferIntoDeal(run, offerDeal, {
+      takerId: String(acceptedUserId),
+      amount: Number(fHours) || 0,
+      unitPrice: Number(fPer) || 0,
+      mesimabetahalichId: String(chiluzh),
+    });
+  }
   // Start the dormancy clock: from here on, silence has a deadline
   // (PLAN_OBJECT_ARCHIVAL). Best-effort — a missing clock only means
   // the mission is never asked about, not a failed assignment.
@@ -442,7 +490,8 @@ export const finalizeJoinAcceptanceConfig: ActionConfig = {
       description: '"solo" for single-member project, "allVoted" when all members have voted yes'
     },
     projectId: { type: 'string', required: true },
-    missId: { type: 'string', required: true },
+    // Optional: a need published from a wish often has no mission template (QA C-19).
+    missId: { type: 'string', required: false },
     openMid: { type: 'string', required: true },
     askId: { type: 'string', required: true },
     acceptedUserId: { type: 'string', required: true },
@@ -461,6 +510,9 @@ export const finalizeJoinAcceptanceConfig: ActionConfig = {
     timegramaId: { type: 'string', required: false },
     existingMemberIds: { type: 'array', required: true },
     existingVotes: { type: 'array', required: false },
+    // The round the caller was shown; when it is no longer the standing one the
+    // action refuses with ROUND_MOVED instead of signing newer terms.
+    expectRound: { type: 'number', required: false },
     projectName: { type: 'string', required: false },
     projectSrc: { type: 'string', required: false },
   },

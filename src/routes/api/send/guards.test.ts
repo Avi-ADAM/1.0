@@ -180,6 +180,55 @@ describe('runSendGuards — 170getMyCoMembers', () => {
   });
 });
 
+// Same pin as the guards above, on the variable each qid actually takes.
+for (const [queId, variable] of [
+  ['8getMissionsOnProgress', 'id'],
+  ['64getUserProjectList', 'uid'],
+  ['saleCenterUserProducts', 'uid']
+] as const) {
+  describe(`runSendGuards — ${queId}`, () => {
+    const q = { ...base, queId };
+
+    it('allows reading your own', async () => {
+      await expect(
+        runSendGuards({ ...q, callerId: '7', variablesObject: { [variable]: '7' } })
+      ).resolves.toBeUndefined();
+    });
+
+    it('tolerates a numeric id against a string caller id', async () => {
+      await expect(
+        runSendGuards({ ...q, callerId: '7', variablesObject: { [variable]: 7 } })
+      ).resolves.toBeUndefined();
+    });
+
+    it("blocks reading another user's", async () => {
+      const r = await statusOf(() =>
+        runSendGuards({ ...q, callerId: '7', variablesObject: { [variable]: '8' } })
+      );
+      expect(r.threw).toBe(true);
+      expect((r as any).status).toBe(403);
+    });
+
+    it('blocks an omitted id', async () => {
+      const r = await statusOf(() => runSendGuards({ ...q, callerId: '7', variablesObject: {} }));
+      expect(r.threw).toBe(true);
+      expect((r as any).status).toBe(403);
+    });
+
+    it('401s when there is no caller id', async () => {
+      const r = await statusOf(() => runSendGuards({ ...q, variablesObject: { [variable]: '7' } }));
+      expect(r.threw).toBe(true);
+      expect((r as any).status).toBe(401);
+    });
+
+    it('does not pin the service path', async () => {
+      await expect(
+        runSendGuards({ ...q, isSer: true, variablesObject: { [variable]: '8' } })
+      ).resolves.toBeUndefined();
+    });
+  });
+}
+
 describe('runSendGuards — 42UpdatePosition', () => {
   it('blocks a service edit (isSer, support !== true)', async () => {
     const r = await statusOf(() =>
@@ -345,6 +394,145 @@ describe('runSendGuards — UpdateClause', () => {
     );
     expect(r.threw).toBe(true);
     expect((r as any).status).toBe(401);
+  });
+});
+
+/**
+ * A Strapi double for the bridge guards: answers each lookup by the field the
+ * query asks for. `rows` maps a field (pmash, openMission, negotiation, …) to
+ * its `data`; anything unlisted comes back as a missing row.
+ */
+function strapiRows(rows: Record<string, any>) {
+  return vi.fn().mockImplementation(async (_ep: string, opts: any) => {
+    const { query } = JSON.parse(opts.body);
+    const field = Object.keys(rows).find((f) => new RegExp(`\\{ ${f}\\(id`).test(query));
+    return { json: async () => ({ data: { [field ?? 'none']: { data: field ? rows[field] : null } } }) };
+  });
+}
+
+const memberOf = (...ids: string[]) => ({
+  id: '42',
+  attributes: { project: { data: { id: '5', attributes: { user_1s: { data: ids.map((id) => ({ id })) } } } } }
+});
+
+for (const queId of ['GetNegotiationBySource', 'GetNegotiationResolutionBySource']) {
+  describe(`runSendGuards — ${queId}`, () => {
+    const q = { ...base, queId };
+
+    it('lets a member of the source rikma find the discussion', async () => {
+      const fetchMock = strapiRows({ pmash: memberOf('7') });
+      await expect(
+        runSendGuards({
+          ...q,
+          callerId: '7',
+          variablesObject: { sourceType: 'pmash', sourceId: '42' },
+          fetch: fetchMock as any
+        })
+      ).resolves.toBeUndefined();
+    });
+
+    it('accepts the open listing a card may also negotiate (openMission)', async () => {
+      const fetchMock = strapiRows({ openMission: memberOf('7') });
+      await expect(
+        runSendGuards({
+          ...q,
+          callerId: '7',
+          variablesObject: { sourceType: 'mission', sourceId: '42' },
+          fetch: fetchMock as any
+        })
+      ).resolves.toBeUndefined();
+    });
+
+    it('blocks a logged-in user outside the source rikma', async () => {
+      const fetchMock = strapiRows({ tosplit: memberOf('8', '9') });
+      const r = await statusOf(() =>
+        runSendGuards({
+          ...q,
+          callerId: '7',
+          variablesObject: { sourceType: 'tosplit', sourceId: '42' },
+          fetch: fetchMock as any
+        })
+      );
+      expect(r).toMatchObject({ threw: true, status: 403 });
+    });
+
+    it('blocks an unknown source type without a lookup', async () => {
+      const fetchMock = strapiRows({});
+      const r = await statusOf(() =>
+        runSendGuards({
+          ...q,
+          callerId: '7',
+          variablesObject: { sourceType: 'project', sourceId: '42' },
+          fetch: fetchMock as any
+        })
+      );
+      expect(r).toMatchObject({ threw: true, status: 403 });
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+
+    it('401s without a caller id', async () => {
+      const r = await statusOf(() =>
+        runSendGuards({ ...q, variablesObject: { sourceType: 'pmash', sourceId: '42' } })
+      );
+      expect(r).toMatchObject({ threw: true, status: 401 });
+    });
+  });
+}
+
+describe('runSendGuards — 43SetNegotiationResolution', () => {
+  const q = { ...base, queId: '43SetNegotiationResolution' };
+  const negotiation = { attributes: { sourceType: 'tosplit', sourceId: '42' } };
+  const resolution = { v: 1, sourceType: 'tosplit', sourceId: '42', values: {} };
+
+  it('lets a member of the source rikma sign', async () => {
+    const fetchMock = strapiRows({ negotiation, tosplit: memberOf('7') });
+    await expect(
+      runSendGuards({
+        ...q,
+        callerId: '7',
+        variablesObject: { id: '3', resolution, status: 'completed' },
+        fetch: fetchMock as any
+      })
+    ).resolves.toBeUndefined();
+  });
+
+  it('blocks a non-member from signing', async () => {
+    const fetchMock = strapiRows({ negotiation, tosplit: memberOf('8') });
+    const r = await statusOf(() =>
+      runSendGuards({
+        ...q,
+        callerId: '7',
+        variablesObject: { id: '3', resolution, status: 'completed' },
+        fetch: fetchMock as any
+      })
+    );
+    expect(r).toMatchObject({ threw: true, status: 403 });
+  });
+
+  it('rejects a resolution that names another source', async () => {
+    const fetchMock = strapiRows({ negotiation, tosplit: memberOf('7') });
+    const r = await statusOf(() =>
+      runSendGuards({
+        ...q,
+        callerId: '7',
+        variablesObject: { id: '3', resolution: { ...resolution, sourceId: '99' } },
+        fetch: fetchMock as any
+      })
+    );
+    expect(r).toMatchObject({ threw: true, status: 400 });
+  });
+
+  it('refuses a negotiation that was not bridged', async () => {
+    const fetchMock = strapiRows({ negotiation: { attributes: {} } });
+    const r = await statusOf(() =>
+      runSendGuards({
+        ...q,
+        callerId: '7',
+        variablesObject: { id: '3', resolution },
+        fetch: fetchMock as any
+      })
+    );
+    expect(r).toMatchObject({ threw: true, status: 403 });
   });
 });
 

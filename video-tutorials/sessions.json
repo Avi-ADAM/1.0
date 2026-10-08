@@ -1,0 +1,29 @@
+{
+  "$comment": "One browser identity per role. Each gets its own *.localhost host so the host-only dev `jwt` cookie keeps all of them signed in at once (Chromium resolves *.localhost to loopback). Passwords are never stored here — `npm run login -- <session>` opens a window, a human signs in, and the cookies are saved to .auth/<session>.json (gitignored).",
+  "port": 5173,
+  "sessions": {
+    "guest": {
+      "host": "guest.localhost",
+      "anonymous": true,
+      "label": "אורחת — בלי חשבון"
+    },
+    "customer": {
+      "host": "customer.localhost",
+      "envUser": "claude_user_3",
+      "userId": 261,
+      "label": "לקוחה בדיקה 3 — הלקוחה של הקונסיירז'"
+    },
+    "sup1": {
+      "host": "sup1.localhost",
+      "envUser": "claude_user_1",
+      "userId": 256,
+      "label": "קלוד בודק — ספק (תיקון מחשבים, React)"
+    },
+    "sup2": {
+      "host": "sup2.localhost",
+      "envUser": "claude_user_2",
+      "userId": 258,
+      "label": "קלוד בודק 2 — ספק (נגרות)"
+    }
+  }
+}

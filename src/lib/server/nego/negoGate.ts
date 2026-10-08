@@ -48,6 +48,14 @@ export interface NegoGateInput {
    * under their name without an explicit yes (or their own counter round).
    */
   takerApplied?: boolean;
+  /**
+   * The customers who pay for this offer, when it fills a BOM line of a product a
+   * customer bought (`$lib/server/deal/offerDeal`, QA C-19). Each must have said yes
+   * at the standing round: whatever the candidacy ends on is added to what she pays,
+   * and nothing is charged to a person without her consent. Silence is not her yes —
+   * the same rule as an assigned taker's. Empty / absent for every ordinary offer.
+   */
+  clientIds?: Array<string | number>;
 }
 
 export interface NegoGateResult {
@@ -58,6 +66,10 @@ export interface NegoGateResult {
   hasPMyes: boolean;
   hasNo: boolean;
   takerYes: boolean;
+  /** Every customer of the deal signed the standing round (true when there is none). */
+  clientYes: boolean;
+  /** Customers who have not signed the standing round yet. */
+  clientsPending: string[];
 }
 
 /** Normalize a user reference (id | {id} | {data:{id}}) to a string id. */
@@ -73,6 +85,7 @@ export function computeNegoGate({
   takerId,
   memberIds = [],
   takerApplied = true,
+  clientIds = [],
 }: NegoGateInput): NegoGateResult {
   const members = new Set((memberIds || []).map((m) => normId(m)).filter(Boolean));
   const tid = normId(takerId);
@@ -102,12 +115,21 @@ export function computeNegoGate({
     latest?.proposedBy === 'candidate' ||
     votesAtL.some((v) => v?.what === true && normId(v?.users_permissions_user) === tid);
 
+  // Each paying customer signs the standing round explicitly; a counter (a new
+  // round) asks her again, exactly as it asks the members.
+  const clientsPending = [...new Set((clientIds || []).map((c) => normId(c)).filter(Boolean))].filter(
+    (c) => !votesAtL.some((v) => v?.what === true && normId(v?.users_permissions_user) === c)
+  );
+  const clientYes = clientsPending.length === 0;
+
   return {
-    approvable: hasPMyes && takerYes && !hasNo,
+    approvable: hasPMyes && takerYes && clientYes && !hasNo,
     L,
     latestProposedBy: latest?.proposedBy ?? null,
     hasPMyes,
     hasNo,
     takerYes,
+    clientYes,
+    clientsPending,
   };
 }

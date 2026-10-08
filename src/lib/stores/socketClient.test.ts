@@ -61,6 +61,24 @@ describe('Socket Client Store', () => {
     expect(io).toHaveBeenCalled();
   });
 
+  it('keeps a live socket when the same user connects again (B11)', async () => {
+    const { socketClient } = await import('./socketClient');
+    const { io } = await import('socket.io-client');
+    const live = { on: vi.fn(), emit: vi.fn(), disconnect: vi.fn(), connected: true, io: { on: vi.fn() } };
+    vi.mocked(io).mockReturnValueOnce(live as any);
+
+    socketClient.disconnect();
+    socketClient.connect('user123');
+    socketClient.connect('user123'); // a layout's onMount, after the root layout
+    expect(io).toHaveBeenCalledTimes(1);
+    expect(live.disconnect).not.toHaveBeenCalled();
+
+    socketClient.connect('user456'); // a different user does get a fresh socket
+    expect(io).toHaveBeenCalledTimes(2);
+    expect(live.disconnect).toHaveBeenCalled();
+    socketClient.disconnect();
+  });
+
   it('should allow registering notification listeners', async () => {
     const { socketClient } = await import('./socketClient');
     

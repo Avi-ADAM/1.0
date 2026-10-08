@@ -19,9 +19,10 @@
  */
 
 import {
+  compareMatches,
   computeDateFit,
   computeMissionMatchScore,
-  MIN_SUGGESTION_SCORE,
+  computeUnheld,
   type MissionRequirements,
   type UserCapabilities
 } from './scoring';
@@ -47,6 +48,13 @@ export interface MatchDeps {
 
 const ids = (rel: any): string[] => (rel?.data ?? []).map((x: any) => String(x.id));
 const oneId = (rel: any): string | null => (rel?.data?.id != null ? String(rel.data.id) : null);
+
+/** A user node's capabilities, as the scorer reads them. */
+const capsOf = (attrs: any): UserCapabilities => ({
+  skills: ids(attrs?.skills),
+  roles: ids(attrs?.tafkidims),
+  workWays: ids(attrs?.work_ways)
+});
 
 /** Normalize a user's repeatable `location` component (array, object or null). */
 function userLocations(attrs: any): GeoLocation[] {
@@ -148,6 +156,11 @@ export async function matchOpenMissionToUsers(
     });
     const candidates: any[] = candRes?.data?.usersPermissionsUsers?.data ?? [];
 
+    // What nobody among the candidates holds is not held against any of them (C-8).
+    // The candidates are exactly the users holding any requirement, so this is
+    // "held by nobody on the platform" — the same pool the backfill path builds.
+    const unheld = computeUnheld(mission, candidates.map((u) => capsOf(u.attributes)));
+
     const alreadySuggested = new Set(
       (attrs.match_suggestions?.data ?? [])
         .map((s: any) => oneId(s.attributes?.user))
@@ -165,16 +178,9 @@ export async function matchOpenMissionToUsers(
         // physical mission → user must be within reach (see geo.ts rules)
         return isLocationCompatible(attrs.location, userLocations(u.attributes));
       })
-      .map((u) => {
-        const caps: UserCapabilities = {
-          skills: ids(u.attributes?.skills),
-          roles: ids(u.attributes?.tafkidims),
-          workWays: ids(u.attributes?.work_ways)
-        };
-        return { user: u, match: computeMissionMatchScore(mission, caps) };
-      })
-      .filter((s) => s.match.score >= MIN_SUGGESTION_SCORE)
-      .sort((a, b) => b.match.score - a.match.score)
+      .map((u) => ({ user: u, match: computeMissionMatchScore(mission, capsOf(u.attributes), unheld) }))
+      .filter((s) => s.match.qualifies)
+      .sort((a, b) => compareMatches(a.match, b.match))
       .slice(0, MAX_SUGGESTIONS_PER_EVENT);
 
     // Email policy: only inside the local send window, and only for users
@@ -376,6 +382,40 @@ export async function matchOpenMashaabimToUsers(
 // User profile changed (or lev backfill) → find missions/resources for them
 // ─────────────────────────────────────────────────────────────────────────────
 
+/**
+ * The candidate pool for the user→missions direction: everyone holding any
+ * requirement this user lacks across `missions`. Only a lacking requirement
+ * can be penalised, and a requirement nobody holds must not be — the same
+ * C-8 rule `matchOpenMissionToUsers` applies through its own candidate list,
+ * so a pair scores the same whichever event reaches it first.
+ *
+ * `null` when the pool cannot be read: the scorer then penalises every
+ * missing requirement (the stricter reading) rather than none of them.
+ */
+async function holdersOfLacking(
+  deps: MatchDeps,
+  missions: MissionRequirements[],
+  caps: UserCapabilities
+): Promise<UserCapabilities[] | null> {
+  const mySkills = new Set(caps.skills);
+  const myRoles = new Set(caps.roles);
+  const skillIds = [...new Set(missions.flatMap((m) => m.skills))].filter((s) => !mySkills.has(s));
+  const roleIds = [...new Set(missions.flatMap((m) => m.roles))].filter((r) => !myRoles.has(r));
+  if (skillIds.length === 0 && roleIds.length === 0) return [];
+  try {
+    const res = await deps.strapi.execute('201matchCandidateUsers', {
+      skillIds,
+      roleIds,
+      limit: MAX_CANDIDATES
+    });
+    const users: any[] = res?.data?.usersPermissionsUsers?.data ?? [];
+    return users.map((u) => capsOf(u.attributes));
+  } catch (err) {
+    console.warn('[matching] could not read the holder pool; penalising every missing requirement', err);
+    return null;
+  }
+}
+
 export async function matchUserToOpenEntities(
   userId: string,
   source: SuggestionSource,
@@ -389,11 +429,7 @@ export async function matchUserToOpenEntities(
     const uAttrs = user?.attributes;
     if (!uAttrs) return { createdMissions, createdResources };
 
-    const caps: UserCapabilities = {
-      skills: ids(uAttrs.skills),
-      roles: ids(uAttrs.tafkidims),
-      workWays: ids(uAttrs.work_ways)
-    };
+    const caps = capsOf(uAttrs);
 
     const existing: any[] = uAttrs.match_suggestions?.data ?? [];
     const existingMissionIds = new Set(
@@ -415,7 +451,7 @@ export async function matchUserToOpenEntities(
       });
       const missions: any[] = omRes?.data?.openMissions?.data ?? [];
 
-      const scored = missions
+      const fresh = missions
         .filter((m) => {
           const mid = String(m.id);
           if (existingMissionIds.has(mid) || declinedIds.has(mid) || askedIds.has(mid)) return false;
@@ -423,18 +459,23 @@ export async function matchUserToOpenEntities(
         })
         .map((m) => ({
           mission: m,
-          match: computeMissionMatchScore(
-            {
-              id: String(m.id),
-              skills: ids(m.attributes?.skills),
-              roles: ids(m.attributes?.tafkidims),
-              workWays: ids(m.attributes?.work_ways)
-            },
-            caps
-          )
+          req: {
+            id: String(m.id),
+            skills: ids(m.attributes?.skills),
+            roles: ids(m.attributes?.tafkidims),
+            workWays: ids(m.attributes?.work_ways)
+          } as MissionRequirements
+        }));
+
+      const pool = await holdersOfLacking(deps, fresh.map((f) => f.req), caps);
+
+      const scored = fresh
+        .map(({ mission, req }) => ({
+          mission,
+          match: computeMissionMatchScore(req, caps, pool ? computeUnheld(req, pool) : {})
         }))
-        .filter((s) => s.match.score >= MIN_SUGGESTION_SCORE)
-        .sort((a, b) => b.match.score - a.match.score)
+        .filter((s) => s.match.qualifies)
+        .sort((a, b) => compareMatches(a.match, b.match))
         .slice(0, MAX_SUGGESTIONS_PER_EVENT);
 
       await inBatches(scored, CREATE_CONCURRENCY, async ({ mission, match }) => {

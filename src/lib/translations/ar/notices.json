@@ -1,0 +1,81 @@
+{
+  "hub": {
+    "vote": "{{kind}}: «{{what}}» في الريكما «{{rikma}}»",
+    "voteUntitled": "{{kind}} في الريكما «{{rikma}}»"
+  },
+  "bell": {
+    "title": "الإشعارات",
+    "empty": "لا توجد إشعارات حاليًا",
+    "pendingOffers": "{{count}} جديدة",
+    "untitled": "أمنية بلا عنوان"
+  },
+  "ui": {
+    "more": "{{count}} أخرى",
+    "expand": "فتح",
+    "clock": "دون ردّ، يُعتمد تلقائيًا: {{when}}",
+    "approve": "اعتماد",
+    "approving": "جارٍ الإرسال…",
+    "signed": "تم التوقيع ✓ — بانتظار البقية",
+    "moved": "تغيّرت الشروط منذ ذلك الحين — النسخة الجديدة عند الفتح",
+    "failed": "لم يتم الاعتماد. يمكن الفتح والمحاولة من هناك.",
+    "hide": "إخفاء",
+    "hideClock": "الإخفاء لا يوقف الساعة: دون ردّ، يُعتمد تلقائيًا: {{when}}.",
+    "hideConfirm": "إخفاء على أي حال",
+    "hideCancel": "إلغاء",
+    "showHidden": "عرض المخفية ({{count}})",
+    "unhide": "إرجاع"
+  },
+  "wish": {
+    "someNeed": "حاجة في الأمنية",
+    "product": "عرض من {{who}}: «{{product}}» للأمنية «{{wish}}»",
+    "offer": "عرض من {{who}} لـ«{{item}}» في الأمنية «{{wish}}»",
+    "counter": "عرض مضاد من {{who}} على «{{item}}» في الأمنية «{{wish}}»",
+    "counterAnon": "عرض مضاد على «{{item}}» في الأمنية «{{wish}}»",
+    "invite": "دعوة من {{who}}: «{{item}}» في الأمنية «{{wish}}»",
+    "inviteAnon": "دعوة: «{{item}}» في الأمنية «{{wish}}»"
+  },
+  "deal": {
+    "somePart": "جزء من الصفقة",
+    "offer": "عرض من {{who}} لتولّي «{{item}}» في الصفقة «{{deal}}» — بانتظار توقيعك",
+    "edit": "طلب من {{who}} لتعديل «{{item}}» في الصفقة «{{deal}}»",
+    "editAnon": "طلب لتعديل «{{item}}» في الصفقة «{{deal}}»",
+    "due": "مستحق الدفع في الصفقة «{{deal}}»",
+    "part": "تأكيد استلام الدفعة عن جزئك في الصفقة «{{deal}}»"
+  },
+  "lev": {
+    "someItem": "عنصر في الريكما",
+    "someWish": "أمنية",
+    "pends": "اقتراح مهمة جديدة «{{item}}» في الريكما «{{rikma}}»",
+    "pmashes": "اقتراح مورد جديد «{{item}}» في الريكما «{{rikma}}»",
+    "askedcoin": "طلب من {{who}} للانضمام إلى المهمة «{{item}}» في الريكما «{{rikma}}»",
+    "askedcoinAnon": "طلب للانضمام إلى المهمة «{{item}}» في الريكما «{{rikma}}»",
+    "askedm": "عرض من {{who}} لتوفير «{{item}}» للريكما «{{rikma}}»",
+    "askedmAnon": "عرض لتوفير «{{item}}» للريكما «{{rikma}}»",
+    "fiapp": "تقرير من {{who}} عن إنجاز «{{item}}» في الريكما «{{rikma}}»",
+    "fiappAnon": "تقرير عن إنجاز «{{item}}» في الريكما «{{rikma}}»",
+    "wegets": "تقرير من {{who}} عن تسليم «{{item}}» للريكما «{{rikma}}»",
+    "wegetsAnon": "تقرير عن تسليم «{{item}}» للريكما «{{rikma}}»",
+    "wishoffer": "عرض من {{who}} لـ«{{item}}» في الأمنية «{{wish}}»",
+    "wishofferAnon": "عرض لـ«{{item}}» في الأمنية «{{wish}}»",
+    "saleClaim": "إبلاغ عن بيع «{{item}}» في الريكما «{{rikma}}» — حسب الإبلاغ، المبلغ لديك",
+    "decision": "قرار في الريكما «{{rikma}}»: {{what}}",
+    "archive": "اقتراح من {{who}} لإزالة «{{item}}» من الريكما «{{rikma}}»",
+    "archiveAnon": "اقتراح لإزالة «{{item}}» من الريكما «{{rikma}}»",
+    "release": "اقتراح من {{who}} لتحرير «{{item}}» في الريكما «{{rikma}}»",
+    "releaseAnon": "اقتراح لتحرير «{{item}}» في الريكما «{{rikma}}»",
+    "addHours": "طلب من {{who}} لإضافة {{count}} ساعات إلى «{{item}}» في الريكما «{{rikma}}»",
+    "addHoursAnon": "طلب لإضافة {{count}} ساعات إلى «{{item}}» في الريكما «{{rikma}}»",
+    "addHoursOne": "طلب من {{who}} لإضافة ساعة واحدة إلى «{{item}}» في الريكما «{{rikma}}»",
+    "addHoursOneAnon": "طلب لإضافة ساعة واحدة إلى «{{item}}» في الريكما «{{rikma}}»",
+    "removeHours": "طلب من {{who}} لتقليص {{count}} ساعات من «{{item}}» في الريكما «{{rikma}}»",
+    "removeHoursAnon": "طلب لتقليص {{count}} ساعات من «{{item}}» في الريكما «{{rikma}}»",
+    "removeHoursOne": "طلب من {{who}} لتقليص ساعة واحدة من «{{item}}» في الريكما «{{rikma}}»",
+    "removeHoursOneAnon": "طلب لتقليص ساعة واحدة من «{{item}}» في الريكما «{{rikma}}»",
+    "edit": "طلب من {{who}} لتعديل «{{item}}» في الريكما «{{rikma}}»",
+    "editAnon": "طلب لتعديل «{{item}}» في الريكما «{{rikma}}»",
+    "fallback": "{{kind}}: {{what}}"
+  },
+  "term": {
+    "raise": "+{{value}}"
+  }
+}

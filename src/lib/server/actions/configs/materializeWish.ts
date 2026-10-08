@@ -18,7 +18,10 @@
  *   5. Open a Sheirutpend (client = wisher) and run the tested
  *      `createSheirutFromPending` flow → Sheirut + mesimabetahalich per provider
  *      + maap per resource → surfaces in /deals/[id].
- *   6. Mark the wish fulfilled.
+ *   6. Optionally (`openGaps`), open the parts nobody took as open missions / resources
+ *      in the rikma — unassigned lines of the deal, co-signed by the customer when taken
+ *      (QA C-19, `$lib/server/wish/openGaps`).
+ *   7. Mark the wish fulfilled.
  *
  * Owner-only. Hard-guards readiness server-side (the UI only enables the button
  * once providers have accepted, but the action is the source of truth).
@@ -28,10 +31,15 @@ import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { createSheirutFromPendingConfig } from './createSheirutFromPending.js';
 import { STRAPI_URL } from '$lib/server/strapiUrl.js';
 import { resolveRikmaPictureId } from '$lib/server/concierge/rikmaPicture.js';
+import { openWishGaps, type OpenGapsResult } from '$lib/server/wish/openGaps.js';
 
 const handler: ActionExecutionHandler = async (params, context, util) => {
   const { strapi } = util;
-  const { ratsonId, profilePicId } = params as { ratsonId: string; profilePicId?: string | null };
+  const { ratsonId, profilePicId, openGaps = false } = params as {
+    ratsonId: string;
+    profilePicId?: string | null;
+    openGaps?: boolean;
+  };
   if (!ratsonId) throw new Error('ratsonId is required');
 
   const now = new Date().toISOString();
@@ -205,7 +213,7 @@ const handler: ActionExecutionHandler = async (params, context, util) => {
   let serviceId: string | null = null;
   try {
     const out = await (createSheirutFromPendingConfig.graphqlOperation as ActionExecutionHandler)(
-      { sheirutpendId, projectId: weaveId, clientId: wisherId, recipientIds: providers },
+      { sheirutpendId, projectId: weaveId, clientId: wisherId, recipientIds: providers, oneTime: true },
       context,
       util
     );
@@ -213,6 +221,24 @@ const handler: ActionExecutionHandler = async (params, context, util) => {
   } catch (e) {
     console.error('[materializeWish] createSheirutFromPending failed:', e);
     throw new Error('הרקמה נוצרה אך פתיחת הדיל נכשלה - אפשר לנסות שוב מתוך הדילים');
+  }
+
+  // ── 7b. The parts nobody took go on in the rikma, when she chose so (C-19) ──
+  let gaps: OpenGapsResult | null = null;
+  if (openGaps === true) {
+    try {
+      gaps = await openWishGaps(strapi, context, {
+        ratsonId: String(ratsonId),
+        ratAttrs,
+        proposals: ratRes?.data?.ratsonProposals?.data ?? [],
+        recipeMissions,
+        recipeResources,
+        matanotId,
+        weaveId
+      });
+    } catch (e) {
+      console.error('[materializeWish] opening the remaining parts failed (the deal stands):', e);
+    }
   }
 
   // ── 8. Mark the wish fulfilled ─────────────────────────────────────────────
@@ -251,7 +277,9 @@ const handler: ActionExecutionHandler = async (params, context, util) => {
       matanotId,
       sheirutpendId,
       serviceId,
-      providerCount: providers.length
+      providerCount: providers.length,
+      gapsOpened: gaps ? gaps.opened + gaps.moved : 0,
+      gapsFailed: gaps?.failed ?? 0
     },
     recipientIds: providers,
     updateStrategy: { type: 'none' as const }
@@ -265,6 +293,11 @@ export const materializeWishConfig: ActionConfig = {
   graphqlOperation: handler,
   paramSchema: {
     ratsonId: { type: 'string', required: true },
+    openGaps: {
+      type: 'boolean',
+      required: false,
+      description: 'Open the parts nobody took as open missions / resources in the new rikma (QA C-19)'
+    },
     profilePicId: {
       type: 'string',
       required: false,

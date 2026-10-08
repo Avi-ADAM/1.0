@@ -664,6 +664,10 @@
       stipendMode={buble.stipendMode ?? 'equity'}
       stipendFunderName={buble.stipendFunderName ?? ''}
       selfNomination={buble.source === 'selfNomination'}
+      wishName={buble.ratsonId || buble.source === 'concierge' ? (buble.ratsonName ?? '') : null}
+      isMonthly={buble.iskvua != null
+        ? buble.iskvua === true
+        : !(buble.ratsonId || buble.source === 'concierge')}
       cards="true"
     />
 {:else if buble.ani === 'huca' && milon.pmashs == true}

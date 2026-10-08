@@ -1,0 +1,81 @@
+{
+  "hub": {
+    "vote": "{{kind}}: \"{{what}}\" ברקמה \"{{rikma}}\"",
+    "voteUntitled": "{{kind}} ברקמה \"{{rikma}}\""
+  },
+  "bell": {
+    "title": "התראות",
+    "empty": "אין התראות כרגע",
+    "pendingOffers": "{{count}} חדשות",
+    "untitled": "משאלה ללא שם"
+  },
+  "ui": {
+    "more": "עוד {{count}}",
+    "expand": "הרחבה",
+    "clock": "ללא תגובה — יאושר אוטומטית: {{when}}",
+    "approve": "אישור",
+    "approving": "שולח…",
+    "signed": "נחתם ✓ — מחכה לשאר",
+    "moved": "התנאים השתנו מאז — כדאי לפתוח ולראות את הגרסה החדשה",
+    "failed": "האישור לא עבר. אפשר לפתוח ולנסות משם.",
+    "hide": "הסתרה",
+    "hideClock": "ההסתרה לא עוצרת את השעון: ללא תגובה, זה יאושר אוטומטית: {{when}}.",
+    "hideConfirm": "להסתיר בכל זאת",
+    "hideCancel": "ביטול",
+    "showHidden": "הצגת מוסתרות ({{count}})",
+    "unhide": "החזרה"
+  },
+  "wish": {
+    "someNeed": "צורך במשאלה",
+    "product": "הצעה מאת {{who}}: \"{{product}}\" למשאלה \"{{wish}}\"",
+    "offer": "הצעה מאת {{who}} ל\"{{item}}\" במשאלה \"{{wish}}\"",
+    "counter": "הצעה נגדית מאת {{who}} על \"{{item}}\" במשאלה \"{{wish}}\"",
+    "counterAnon": "הצעה נגדית על \"{{item}}\" במשאלה \"{{wish}}\"",
+    "invite": "הזמנה מאת {{who}}: \"{{item}}\" במשאלה \"{{wish}}\"",
+    "inviteAnon": "הזמנה: \"{{item}}\" במשאלה \"{{wish}}\""
+  },
+  "deal": {
+    "somePart": "חלק בעסקה",
+    "offer": "הצעה מאת {{who}} לקחת את \"{{item}}\" בעסקה \"{{deal}}\" — מחכה לחתימתך",
+    "edit": "בקשה מאת {{who}} לשנות את \"{{item}}\" בעסקה \"{{deal}}\"",
+    "editAnon": "בקשה לשנות את \"{{item}}\" בעסקה \"{{deal}}\"",
+    "due": "לתשלום בעסקה \"{{deal}}\"",
+    "part": "אישור קבלת התשלום על החלק שלך בעסקה \"{{deal}}\""
+  },
+  "lev": {
+    "someItem": "פריט ברקמה",
+    "someWish": "משאלה",
+    "pends": "הצעה למשימה חדשה \"{{item}}\" ברקמה \"{{rikma}}\"",
+    "pmashes": "הצעה למשאב חדש \"{{item}}\" ברקמה \"{{rikma}}\"",
+    "askedcoin": "בקשה מאת {{who}} להצטרף למשימה \"{{item}}\" ברקמה \"{{rikma}}\"",
+    "askedcoinAnon": "בקשה להצטרף למשימה \"{{item}}\" ברקמה \"{{rikma}}\"",
+    "askedm": "הצעה מאת {{who}} לספק את \"{{item}}\" לרקמה \"{{rikma}}\"",
+    "askedmAnon": "הצעה לספק את \"{{item}}\" לרקמה \"{{rikma}}\"",
+    "fiapp": "דיווח מאת {{who}} על סיום \"{{item}}\" ברקמה \"{{rikma}}\"",
+    "fiappAnon": "דיווח על סיום \"{{item}}\" ברקמה \"{{rikma}}\"",
+    "wegets": "דיווח מאת {{who}} על מסירת \"{{item}}\" ברקמה \"{{rikma}}\"",
+    "wegetsAnon": "דיווח על מסירת \"{{item}}\" ברקמה \"{{rikma}}\"",
+    "wishoffer": "הצעה מאת {{who}} ל\"{{item}}\" במשאלה \"{{wish}}\"",
+    "wishofferAnon": "הצעה ל\"{{item}}\" במשאלה \"{{wish}}\"",
+    "saleClaim": "דיווח על מכירה של \"{{item}}\" ברקמה \"{{rikma}}\" — לפי הדיווח, הכסף אצלך",
+    "decision": "החלטה ברקמה \"{{rikma}}\": {{what}}",
+    "archive": "הצעה מאת {{who}} להסיר את \"{{item}}\" מהרקמה \"{{rikma}}\"",
+    "archiveAnon": "הצעה להסיר את \"{{item}}\" מהרקמה \"{{rikma}}\"",
+    "release": "הצעה מאת {{who}} לשחרר את \"{{item}}\" ברקמה \"{{rikma}}\"",
+    "releaseAnon": "הצעה לשחרר את \"{{item}}\" ברקמה \"{{rikma}}\"",
+    "addHours": "בקשה מאת {{who}} להוסיף {{count}} שעות ל\"{{item}}\" ברקמה \"{{rikma}}\"",
+    "addHoursAnon": "בקשה להוסיף {{count}} שעות ל\"{{item}}\" ברקמה \"{{rikma}}\"",
+    "addHoursOne": "בקשה מאת {{who}} להוסיף שעה ל\"{{item}}\" ברקמה \"{{rikma}}\"",
+    "addHoursOneAnon": "בקשה להוסיף שעה ל\"{{item}}\" ברקמה \"{{rikma}}\"",
+    "removeHours": "בקשה מאת {{who}} להוריד {{count}} שעות מ\"{{item}}\" ברקמה \"{{rikma}}\"",
+    "removeHoursAnon": "בקשה להוריד {{count}} שעות מ\"{{item}}\" ברקמה \"{{rikma}}\"",
+    "removeHoursOne": "בקשה מאת {{who}} להוריד שעה מ\"{{item}}\" ברקמה \"{{rikma}}\"",
+    "removeHoursOneAnon": "בקשה להוריד שעה מ\"{{item}}\" ברקמה \"{{rikma}}\"",
+    "edit": "בקשה מאת {{who}} לשנות את \"{{item}}\" ברקמה \"{{rikma}}\"",
+    "editAnon": "בקשה לשנות את \"{{item}}\" ברקמה \"{{rikma}}\"",
+    "fallback": "{{kind}}: {{what}}"
+  },
+  "term": {
+    "raise": "תוספת {{value}}"
+  }
+}

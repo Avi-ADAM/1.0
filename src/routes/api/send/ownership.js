@@ -164,7 +164,10 @@ export const OWNERSHIP = {
     open: 'Consensus site. Authorship is `authorExternalId`, not a Strapi user; the vote path and the UpdateClause guard already check it.'
   },
   argument: { open: 'Consensus site — see `position`.' },
-  clause: { open: 'Consensus site — `UpdateClause` in guards.js checks authorExternalId directly.' }
+  clause: { open: 'Consensus site — `UpdateClause` in guards.js checks authorExternalId directly.' },
+  negotiation: {
+    open: 'Consensus bridge — the row has no owner relation (the consensus site creates it without `creator`); `43SetNegotiationResolution` in guards.js checks membership against the negotiation\'s source object instead.'
+  }
 };
 
 // ── Query building ─────────────────────────────────────────────────────────

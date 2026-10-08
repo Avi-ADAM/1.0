@@ -92,11 +92,16 @@ const ENTITIES: Record<string, string> = {
   '&nbsp;': ' '
 };
 
-/** Markup out, entities decoded, whitespace collapsed. */
+/**
+ * Entities decoded, markup out, whitespace collapsed. Decoding comes first:
+ * snippets often arrive escaped, and `&lt;b&gt;` decoded after the strip would
+ * put the tag back. Only a `<` followed by a letter, `/` or `!` opens a tag, so
+ * a decoded `a &lt; b &gt; c` survives as text.
+ */
 export function plainText(s: unknown): string {
   return String(s ?? '')
-    .replace(/<[^>]*>/g, ' ')
     .replace(/&(?:amp|lt|gt|quot|#39|apos|nbsp);/g, (m) => ENTITIES[m] ?? m)
+    .replace(/<[a-z!/][^>]*>/gi, ' ')
     .replace(/[\u0000-\u001f\u007f]/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();

@@ -1,12 +1,5 @@
 import { Agent } from '@mastra/core/agent';
-import {
-  createGoogleModel,
-  createGroqModel,
-  createNvidiaModel,
-  hasGoogleModelConfig,
-  hasGroqModelConfig,
-  hasNvidiaModelConfig
-} from '../lib/createModel';
+import { createModelChain } from '../lib/createModel';
 import { createProjectTool } from '../tools/createProjectTool';
 
 export function createIntentAgent(apiKey?: string, language: string = 'he') {
@@ -26,7 +19,7 @@ const systemPrompt =
 
 החזר תמיד JSON בפורמט הבא:
 {
-  "type": "timer|navigation|general|report|sale|task",
+  "type": "timer|navigation|general|report|sale|task|updates",
   "confidence": 0.0-1.0,
   "details": {
     "action": "start|stop|pause|resume|create|delete|navigate|help|confirm|deny|bug|feature|partnership|contact",
@@ -41,6 +34,7 @@ const systemPrompt =
 - general: עזרה כללית, שאלות, הסברים, ופעולות יצירה כמו יצירת פרויקטים חדשים
 - report: דיווח על תקלה/באג, הצעת פיצ'ר חדש, פנייה לשותפות, יצירת קשר עם צוות האתר
 - sale: דיווח מכירה של מוצר/מתנה מפרויקט (מכירה, ריפורט מכירה, מכרתי, דיווח על תשלום)
+- updates: מה חדש ומה ממתין למשתמש - "מה חדש היום", "מה ממתין לי", "על מה אני צריך לענות", "מה קורה ברקמה X", "יש משהו בשבילי?". שאלה על המצב, לא בקשה ליצור או לשנות משהו.
 - task: יצירת מטלה (Act) בתוך פרויקט, למשל "צור מטלה", "פתח מטלה חדשה בפרויקט X", "תוסיף מטלה לדנה", "מטלה עבור תפקיד העיצוב". שים לב: מטלה שונה מטיימר וממשימה בתהליך - זו יצירת פריט עבודה חדש עבור אדם או תפקיד.
 
 **טיפול באישורים והכחשות:**
@@ -67,6 +61,9 @@ const systemPrompt =
 הודעה ללא הקשר: "רוצה לדווח מכירה" -> {"type": "sale", "confidence": 0.95, "details": {"action": "create", "target": null, "context": "report_sale"}}
 הודעה ללא הקשר: "מכרתי מתנה" -> {"type": "sale", "confidence": 0.9, "details": {"action": "create", "target": null, "context": "report_sale"}}
 הודעה ללא הקשר: "דיווח על מכירה" -> {"type": "sale", "confidence": 0.95, "details": {"action": "create", "target": null, "context": "report_sale"}}
+הודעה ללא הקשר: "מה חדש היום?" -> {"type": "updates", "confidence": 0.95, "details": {"action": "list", "target": null, "context": "whats_new"}}
+הודעה ללא הקשר: "מה ממתין לי?" -> {"type": "updates", "confidence": 0.95, "details": {"action": "list", "target": null, "context": "waiting_for_me"}}
+הודעה ללא הקשר: "מה קורה ברקמה גפן?" -> {"type": "updates", "confidence": 0.9, "details": {"action": "list", "target": "גפן", "context": "rikma_updates"}}
 הודעה ללא הקשר: "צור מטלה לבדוק את העיצוב בפרויקט האתר" -> {"type": "task", "confidence": 0.95, "details": {"action": "create", "target": "לבדוק את העיצוב", "context": "create_task"}}
 הודעה ללא הקשר: "תוסיף מטלה לדנה בפרויקט השיווק" -> {"type": "task", "confidence": 0.9, "details": {"action": "create", "target": null, "context": "create_task"}}
 הודעה ללא הקשר: "פתח מטלה עבור תפקיד המפתחים" -> {"type": "task", "confidence": 0.9, "details": {"action": "create", "target": null, "context": "create_task"}}
@@ -90,7 +87,7 @@ You are an intent analysis agent. Your task is to analyze the user's message and
 
 Always return JSON in this format:
 {
-  "type": "timer|navigation|general|report|sale|task",
+  "type": "timer|navigation|general|report|sale|task|updates",
   "confidence": 0.0-1.0,
   "details": {
     "action": "start|stop|pause|resume|create|delete|navigate|help|confirm|deny|bug|feature|partnership|contact",
@@ -105,6 +102,7 @@ Intent types:
 - general: General help, questions, explanations, and creation actions like creating new projects
 - report: Reporting a bug/issue, suggesting a feature, partnership inquiry, or contacting the site team
 - sale: Reporting a sale of a product/gift from a project (sold something, report sale, sold a package)
+- updates: What is new for the user and what waits for them - "what's new today", "what is waiting for me", "what do I need to answer", "what is happening in rikma X", "anything for me?". A question about their state, not a request to create or change something.
 - task: Creating a task (Act) inside a project, e.g. "create a task", "add a task in project X", "add a task for Dana", "open a task for the design role". Note: a task is distinct from a timer or an in-progress mission - it is a new work item for a person or a role.
 
 **Handling confirmations and denials:**
@@ -130,6 +128,9 @@ No context: "I'm interested in a partnership" -> {"type": "report", "confidence"
 No context: "I want to contact the team" -> {"type": "report", "confidence": 0.85, "details": {"action": "contact", "target": null, "context": "contact_team"}}
 No context: "I want to report a sale" -> {"type": "sale", "confidence": 0.95, "details": {"action": "create", "target": null, "context": "report_sale"}}
 No context: "I sold a package" -> {"type": "sale", "confidence": 0.9, "details": {"action": "create", "target": null, "context": "report_sale"}}
+No context: "what's new today?" -> {"type": "updates", "confidence": 0.95, "details": {"action": "list", "target": null, "context": "whats_new"}}
+No context: "what is waiting for me?" -> {"type": "updates", "confidence": 0.95, "details": {"action": "list", "target": null, "context": "waiting_for_me"}}
+No context: "what's happening in the Gefen rikma?" -> {"type": "updates", "confidence": 0.9, "details": {"action": "list", "target": "Gefen", "context": "rikma_updates"}}
 No context: "create a task to review the design in the website project" -> {"type": "task", "confidence": 0.95, "details": {"action": "create", "target": "review the design", "context": "create_task"}}
 No context: "add a task for Dana in the marketing project" -> {"type": "task", "confidence": 0.9, "details": {"action": "create", "target": null, "context": "create_task"}}
 No context: "open a task for the developers role" -> {"type": "task", "confidence": 0.9, "details": {"action": "create", "target": null, "context": "create_task"}}
@@ -148,31 +149,6 @@ No context: "open a task for the developers role" -> {"type": "task", "confidenc
     tools: {
       createProjectTool
     },
-    model: (() => {
-      // Priority order: Google Flash → Google Flash Lite → Groq → NVIDIA (last resort)
-      if (hasGoogleModelConfig(apiKey)) {
-        try {
-          console.log('[IntentAgent] Using Google gemini-3-flash-preview (thinkingBudget=0)');
-          return createGoogleModel(apiKey, 'gemini-3-flash-preview', { thinkingBudget: 0 });
-        } catch (e) {
-          console.warn('[IntentAgent] Google Flash failed, trying Flash Lite...', e);
-          try {
-            console.log('[IntentAgent] Using Google gemini-flash-lite-latest');
-            return createGoogleModel(apiKey, 'gemini-flash-lite-latest');
-          } catch (e2) {
-            console.warn('[IntentAgent] Google Flash Lite also failed', e2);
-          }
-        }
-      }
-      if (hasGroqModelConfig()) {
-        console.log('[IntentAgent] Using Groq model');
-        return createGroqModel();
-      }
-      if (hasNvidiaModelConfig(apiKey)) {
-        console.log('[IntentAgent] Using NVIDIA model (last resort)');
-        return createNvidiaModel(apiKey, 'nvidia/minimaxai/minimax-m2.7');
-      }
-      throw new Error('No AI model provider configured. Please set at least one API key: GEMINI_API_KEY, GROQ_API_KEY, or NVIDIA_API_KEY');
-    })()
+    model: createModelChain(apiKey, { nvidiaModel: 'nvidia/minimaxai/minimax-m2.7' })
   });
 }

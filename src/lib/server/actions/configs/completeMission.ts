@@ -1,6 +1,7 @@
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { completeMissionConsentSpec } from '$lib/consent/specs/s2b';
 import { hoursStillToFile } from '$lib/server/timers/unfiledHours.js';
+import { roundHours, workValue } from '$lib/timers/precision.js';
 
 /**
  * Calculate timegrama delay based on restime
@@ -54,7 +55,7 @@ const completeMissionHandler: ActionExecutionHandler = async (params, context, {
   // credited them twice (QA_CONCIERGE_E2E C-13). Carry only the remainder —
   // usually zero, since completion is the claim "this is done".
   const runningTotal = hoursdon !== undefined ? Number(hoursdon) : howmanyhoursalready;
-  const finalHoursdon = hoursStillToFile(runningTotal, missionData);
+  const finalHoursdon = roundHours(hoursStillToFile(runningTotal, missionData));
 
   // Extract project data
   const project = missionData.project?.data;
@@ -102,7 +103,7 @@ const completeMissionHandler: ActionExecutionHandler = async (params, context, {
       noofhours: finalHoursdon,
       mesimabetahalich: missionId,
       perhour,
-      total: perhour * finalHoursdon,
+      total: workValue(finalHoursdon, perhour),
       project: projectId,
       descrip: missionDetails ?? '',
       users_permissions_user: userId,

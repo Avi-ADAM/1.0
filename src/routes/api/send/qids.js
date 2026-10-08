@@ -16,6 +16,38 @@ import { assistantQids } from './qidsAssistant.js';
 const NOT_ARCHIVED = `{ or: [{ lifecycle: { null: true } }, { lifecycle: { ne: "archived" } }] }`;
 
 /**
+ * The deal an open offer belongs to (QA C-19, `$lib/server/deal/offerDeal`): offer →
+ * its spec (pendm / pmash) → the BOM line on that spec → the product → the deals sold
+ * of it, each with its customers. Product-scoped, so a rikma selling several products
+ * to several customers asks each offer's own customers. Read by `readOfferDeal`.
+ */
+const OFFER_DEAL_SALES = `sheiruts(pagination: { limit: 50 }) { data { id attributes {
+            archived quant total
+            project { data { id } }
+            users_permissions_users { data { id } }
+          } } }`;
+const OFFER_DEAL_MISSION = `
+      name noofhours perhour archived
+      project { data { id } }
+      pendm { data { id attributes {
+        matanot_recipe_missions { data { id attributes {
+          hoursPerUnit ratePerHour unitsPerProduct
+          assignedMember { data { id } }
+          matanot { data { id attributes { name ${OFFER_DEAL_SALES} } } }
+        } } }
+      } } }`;
+const OFFER_DEAL_RESOURCE = `
+      name hm price archived
+      project { data { id } }
+      pmash { data { id attributes {
+        matanot_recipe_resources { data { id attributes {
+          quantityPerUnit pricePerUnit
+          assignedMember { data { id } }
+          matanot { data { id attributes { name ${OFFER_DEAL_SALES} } } }
+        } } }
+      } } }`;
+
+/**
  * The archive/edit half of a Decision (PLAN_OBJECT_ARCHIVAL).
  *
  * `buildArchiveDecisionView` returns null — and the lev extractor then drops
@@ -861,6 +893,33 @@ const qids_base = {
               isActive: true,
               totalHours: 0,
               timers: [{ start: $start }]
+            }
+          ) {
+            data {
+              id
+              attributes {
+              start totalHours rate timers{start stop} acts{data{id}} isActive saved
+              }
+            }
+          }
+        }
+      `,
+  // A timer for hours typed in by hand: created already stopped and empty, in
+  // one write. It used to be a `33CreateTimer` + stop pair, and when the stop
+  // was lost to a flaky Strapi the "manual" timer was left running for real.
+  '33CreateManualTimer': `
+        mutation CreateManualTimer($missionId: ID!, $start: DateTime!, $userId: ID!, $projectId: ID!, $rate: Float) {
+          createTimer(
+            data: {
+              activeMesimabetahalich: $missionId,
+              mesimabetahalich: $missionId,
+              users_permissions_user: $userId,
+              project: $projectId,
+              start: $start,
+              rate: $rate,
+              isActive: false,
+              totalHours: 0,
+              timers: []
             }
           ) {
             data {
@@ -7829,6 +7888,14 @@ ${STIPEND_DECISION_FIELDS}
             notes
             mashaabims { data { id attributes { name } } }
           }
+          # The wish's terms as signed: the stored digest, and the place, which with
+          # the fields above is everything the digest is made of
+          # (src/lib/wish/termsDigest.ts, PLAN_DIRECT_OFFER §4.3).
+          terms_digest
+          location { lat lng radius location_hint }
+          # A direct offer: who wrote it for her, and when she took it (PLAN_DIRECT_OFFER).
+          offered_by { data { id attributes { username } } }
+          claimed_at
           chat_forum { data { id } }
           process { data { id } }
           derivedComplexMatanot { data { id attributes { name } } }
@@ -7872,6 +7939,7 @@ ${STIPEND_DECISION_FIELDS}
             submittedAt
             willingHours
             willingAmount
+            termsDigest
           }
         }
       }
@@ -8242,6 +8310,7 @@ ${STIPEND_DECISION_FIELDS}
             submittedAt
             willingHours
             willingAmount
+            termsDigest
           }
           ratson {
             data {
@@ -8254,6 +8323,7 @@ ${STIPEND_DECISION_FIELDS}
                 startDate
                 finnishDate
                 totalbounti
+                terms_digest
                 chat_forum { data { id } }
                 users_permissions_users {
                   data {
@@ -8682,6 +8752,139 @@ ${STIPEND_DECISION_FIELDS}
     }
   }`,
 
+  // What the customer of a wish deal owes (C-14, $lib/sheirut/dealDue): the price she agreed
+  // per BOM line (the ceiling), the missions the deal made in its rikma with what the rikma
+  // approved on each (the bill), and what she has sent / what was recorded so far. Read by
+  // createSheirutHaluka and the payment record on the server, and by the deal page as its
+  // customer or member (the page checks the role, as with 124sheirutForDeal).
+  '397sheirutDealDue': `query SheirutDealDue($id: ID!) {
+    sheirut(id: $id) {
+      data {
+        id
+        attributes {
+          total
+          quant
+          moneyTransfered
+          iGotMoney { id iGotMoney users_permissions_user { data { id } } }
+          users_permissions_users { data { id } }
+          halukas(pagination: { limit: -1 }) { data { id attributes { amount senderconf confirmed usersend { data { id } } userrecive { data { id } } } } }
+          sales(pagination: { limit: -1 }) { data { id attributes { in externalId } } }
+          matanot {
+            data {
+              id
+              attributes {
+                name
+                ratson { data { id } }
+                matanot_recipe_missions(pagination: { limit: -1 }) {
+                  data {
+                    id
+                    attributes {
+                      hoursPerUnit
+                      unitsPerProduct
+                      ratePerHour
+                      mode
+                      notes
+                      assignedMember { data { id attributes { username } } }
+                      pendm { data { id attributes { name rishon { data { id } } } } }
+                      mesimabetahalich { data { id } }
+                    }
+                  }
+                }
+                matanot_recipe_resources(pagination: { limit: -1 }) {
+                  data {
+                    id
+                    attributes {
+                      quantityPerUnit
+                      pricePerUnit
+                      mode
+                      notes
+                      assignedMember { data { id attributes { username } } }
+                      pmash { data { id attributes { name } } }
+                    }
+                  }
+                }
+              }
+            }
+          }
+          project {
+            data {
+              id
+              attributes {
+                user_1s { data { id } }
+                mesimabetahaliches(pagination: { limit: -1 }) {
+                  data {
+                    id
+                    attributes {
+                      name
+                      hoursassinged
+                      perhour
+                      finnished
+                      lifecycle
+                      users_permissions_user { data { id attributes { username } } }
+                      finnished_missions(pagination: { limit: -1 }) { data { id attributes { noofhours total } } }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }`,
+
+  // More hours on a part of a wish deal (C-14, $lib/server/sheirut/dealEdit): the deals a
+  // mission's rikma sold — each read with 397 to find the one whose BOM line the mission
+  // carries. Server-only: the archive vote and the silence clock ask it.
+  '398missionDeals': `query MissionDeals($id: ID!) {
+    mesimabetahalich(id: $id) {
+      data {
+        id
+        attributes {
+          project { data { id attributes {
+            sheiruts(filters: { archived: { ne: true } }, pagination: { limit: -1 }) {
+              data { id attributes { matanot { data { id attributes { ratson { data { id } } } } } } }
+            }
+          } } }
+        }
+      }
+    }
+  }`,
+
+  // A part's new terms, once the rikma and the customer signed them: its ceiling follows.
+  '399updateDealLineTerms': `mutation UpdateDealLineTerms($id: ID!, $hoursPerUnit: Float, $ratePerHour: Float) {
+    updateMatanotRecipeMission(id: $id, data: { hoursPerUnit: $hoursPerUnit, ratePerHour: $ratePerHour, unitsPerProduct: 1 }) {
+      data { id attributes { hoursPerUnit ratePerHour } }
+    }
+  }`,
+
+  // The open requests for more hours on a deal's missions — the deal page lists them for
+  // its customer to sign or counter (the page checks the role, as with 124).
+  '400dealEdits': `query DealEdits($missions: [ID]) {
+    decisions(
+      filters: { and: [
+        { kind: { in: ["editObject", "archiveObject"] } },
+        { archived: { eq: false } },
+        { archMesimabetahalich: { id: { in: $missions } } }
+      ] }
+      pagination: { limit: 50 }
+    ) {
+      data {
+        id
+        attributes {
+          kind
+          decisionName
+          archWhy
+          archMesimabetahalich { data { id } }
+          vots { what order zman users_permissions_user { data { id } } }
+          negoarch { ordern mode why zman hm price proposedBy { data { id attributes { username } } } }
+          timegrama { data { id attributes { date done } } }
+          projects { data { id attributes { user_1s { data { id } } } } }
+        }
+      }
+    }
+  }`,
+
   // The proposals the caller (idL, replaced with the signed-in user) has hidden on her own
   // wishes — a best-effort read: before 1.0b is deployed it errors and nothing is hidden.
   '394hiddenWishProposals': `query HiddenWishProposals($idL: ID!) {
@@ -9050,6 +9253,287 @@ ${STIPEND_DECISION_FIELDS}
   // existing downstream materialization picks up the agreed values.
   'applyRoundToOpenMashaabim': `mutation ApplyRoundToOpenMashaabim($id: ID!, $data: OpenMashaabimInput!) {
     updateOpenMashaabim(id: $id, data: $data) { data { id } }
+  }`,
+
+  // ─── A customer's deal and the parts still open in it (QA C-19) ───
+  // Server reads of the deal behind an offer / a candidacy — the customers who co-sign it.
+  '410openMissionDeal': `query OpenMissionDeal($id: ID!) {
+    openMission(id: $id) { data { id attributes { ${OFFER_DEAL_MISSION} } } }
+  }`,
+  '411openMashaabimDeal': `query OpenMashaabimDeal($id: ID!) {
+    openMashaabim(id: $id) { data { id attributes { ${OFFER_DEAL_RESOURCE} } } }
+  }`,
+  '412askOfferDeal': `query AskOfferDeal($id: ID!) {
+    ask(id: $id) { data { id attributes {
+      open_mission { data { id attributes { ${OFFER_DEAL_MISSION} } } }
+    } } }
+  }`,
+  '413askmOfferDeal': `query AskmOfferDeal($id: ID!) {
+    askm(id: $id) { data { id attributes {
+      open_mashaabim { data { id attributes { ${OFFER_DEAL_RESOURCE} } } }
+    } } }
+  }`,
+  // A gap was taken: the BOM line gets its provider and the terms everyone signed.
+  '414fillRecipeMission': `mutation FillRecipeMission($id: ID!, $data: MatanotRecipeMissionInput!) {
+    updateMatanotRecipeMission(id: $id, data: $data) { data { id } }
+  }`,
+  '415fillRecipeResource': `mutation FillRecipeResource($id: ID!, $data: MatanotRecipeResourceInput!) {
+    updateMatanotRecipeResource(id: $id, data: $data) { data { id } }
+  }`,
+  // The needs a wisher already published to the community — closing the wish moves the
+  // ones nobody took into the new rikma instead of leaving them orphaned.
+  '416wishPublishedNeeds': `query WishPublishedNeeds($ratson: ID!) {
+    openMissions(
+      filters: { ratson: { id: { eq: $ratson } }, archived: { eq: false }, project: { id: { null: true } } }
+      pagination: { limit: 100 }
+    ) { data { id attributes { name extractedKey noofhours perhour } } }
+    openMashaabims(
+      filters: { ratson: { id: { eq: $ratson } }, archived: { eq: false }, project: { id: { null: true } } }
+      pagination: { limit: 100 }
+    ) { data { id attributes { name extractedKey hm price } } }
+  }`,
+  // The deal page: the parts of the deal still open in the rikma and the candidacies on
+  // them, with who has signed the standing round. The page checks the role, as with 124.
+  '417dealOpenOffers': `query DealOpenOffers($id: ID!) {
+    sheirut(id: $id) { data { id attributes {
+      users_permissions_users { data { id } }
+      project { data { id attributes { user_1s { data { id attributes { username } } } } } }
+      matanot { data { id attributes {
+        matanot_recipe_missions(pagination: { limit: 100 }) { data { id attributes {
+          assignedMember { data { id } }
+          pendm { data { id attributes { open_mission { data { id attributes {
+            name noofhours perhour archived
+            asks(filters: { archived: { eq: false } }) { data { id attributes {
+              users_permissions_user { data { id attributes { username profilePic { data { attributes { url } } } } } }
+              vots { what order users_permissions_user { data { id } } }
+              negopendmissions(sort: "ordern:desc") { data { attributes { ordern proposedBy noofhours perhour } } }
+            } } }
+          } } } } } }
+        } } }
+        matanot_recipe_resources(pagination: { limit: 100 }) { data { id attributes {
+          assignedMember { data { id } }
+          pmash { data { id attributes { open_mashaabim { data { id attributes {
+            name hm price archived
+            askms(filters: { archived: { eq: false } }) { data { id attributes {
+              users_permissions_user { data { id attributes { username profilePic { data { attributes { url } } } } } }
+              vots { what order users_permissions_user { data { id } } }
+              nego_mashes(sort: "ordern:desc") { data { attributes { ordern proposedBy hm price } } }
+            } } }
+          } } } } } }
+        } } }
+      } } }
+    } } }
+  }`,
+  // Who among the deal's providers has confirmed receiving their part in full — "paid"
+  // waits for all of them (C-19).
+  '418dealPartsReceived': `query DealPartsReceived($id: ID!) {
+    sheirut(id: $id) { data { id attributes {
+      total moneyTransfered iTransferMoney
+      iGotMoney { id iGotMoney users_permissions_user { data { id } } }
+      users_permissions_users { data { id } }
+      project { data { id } }
+    } } }
+  }`,
+  // The providers' own account of the work on a deal's missions — the note they wrote
+  // when saving a timer (QA C-21). Server-only: the deal page reads it after it has
+  // checked that the viewer is a party to the deal.
+  '420dealProgressUpdates': `query DealProgressUpdates($missions: [ID]) {
+    timers(
+      filters: { mesimabetahalich: { id: { in: $missions } }, saveText: { notNull: true } }
+      sort: "updatedAt:desc"
+      pagination: { limit: 30 }
+    ) { data { id attributes {
+      saveText totalHours updatedAt
+      users_permissions_user { data { id attributes { username } } }
+      mesimabetahalich { data { id attributes { name } } }
+    } } }
+  }`,
+
+  // The concierge bell's notices (docs/inprogress/PLAN_SMART_NOTICES.md): every proposal
+  // still open for an answer where the signed-in user is one of the two sides —
+  // the wish's owner (`asWisher`) or a proposer (`asProvider`). Whose move it is,
+  // and on what terms, is derived from these fields by `negotiationView`, exactly
+  // as the wish page does. `$idL` is rebound to the session's user by /api/send.
+  '421myWishNotices': `query MyWishNotices($idL: ID!) {
+    asWisher: ratsonProposals(
+      filters: { and: [
+        { status_proposal: { in: ["suggested", "viewed"] } },
+        { ratson: { users_permissions_users: { id: { eq: $idL } } } }
+      ] }
+      sort: "createdAt:desc"
+      pagination: { limit: 100 }
+    ) { data { id attributes {
+      kind status_proposal total_price createdAt
+      proposer_users { data { id attributes { username } } }
+      project { data { id attributes { projectName } } }
+      matanot { data { id attributes { name } } }
+      open_mission { data { id attributes { name } } }
+      covered_missions { id extracted_mission_idx hours price }
+      covered_resources { id extracted_resource_idx quantity price }
+      ratson_willingness_entry { id user { data { id } } agree note submittedAt willingHours willingAmount termsDigest }
+      ratson { data { id attributes {
+        name status_ratson terms_digest
+        users_permissions_users { data { id attributes { username } } }
+        extracted_missions { id name }
+        extracted_resources { id name }
+      } } }
+    } } }
+    asProvider: ratsonProposals(
+      filters: { and: [
+        { status_proposal: { in: ["suggested", "viewed"] } },
+        { proposer_users: { id: { eq: $idL } } }
+      ] }
+      sort: "createdAt:desc"
+      pagination: { limit: 100 }
+    ) { data { id attributes {
+      kind status_proposal total_price createdAt
+      proposer_users { data { id attributes { username } } }
+      project { data { id attributes { projectName } } }
+      matanot { data { id attributes { name } } }
+      open_mission { data { id attributes { name } } }
+      covered_missions { id extracted_mission_idx hours price }
+      covered_resources { id extracted_resource_idx quantity price }
+      ratson_willingness_entry { id user { data { id } } agree note submittedAt willingHours willingAmount termsDigest }
+      ratson { data { id attributes {
+        name status_ratson terms_digest
+        users_permissions_users { data { id attributes { username } } }
+        extracted_missions { id name }
+        extracted_resources { id name }
+      } } }
+    } } }
+  }`,
+
+  // What the signed-in user hid from her notices, and her notice preferences
+  // (PLAN_SMART_NOTICES §4.1; collections api::notice-dismissal / notice-pref, 1.0b).
+  // A backend without the collections answers with an error — callers read that as
+  // "nothing hidden, default preferences".
+  '423myNoticePrefs': `query MyNoticePrefs($idL: ID!) {
+    noticeDismissals(
+      filters: { users_permissions_user: { id: { eq: $idL } } }
+      pagination: { limit: 500 }
+    ) { data { id attributes { noticeKey until } } }
+    noticePrefs(
+      filters: { users_permissions_user: { id: { eq: $idL } } }
+      sort: "id:asc"
+      pagination: { limit: 1 }
+    ) { data { id attributes { milon mutedProjects lastSeenAt } } }
+  }`,
+  '424createNoticeDismissal': `mutation CreateNoticeDismissal($data: NoticeDismissalInput!) {
+    createNoticeDismissal(data: $data) { data { id } }
+  }`,
+  '425deleteNoticeDismissal': `mutation DeleteNoticeDismissal($id: ID!) {
+    deleteNoticeDismissal(id: $id) { data { id } }
+  }`,
+  '426createNoticePref': `mutation CreateNoticePref($data: NoticePrefInput!) {
+    createNoticePref(data: $data) { data { id } }
+  }`,
+  '427updateNoticePref': `mutation UpdateNoticePref($id: ID!, $data: NoticePrefInput!) {
+    updateNoticePref(id: $id, data: $data) { data { id } }
+  }`,
+
+  // The pace (restime) of several wishes at once, for the bell's silence deadlines.
+  // Read on its own, like 388: a backend without the field answers with an error,
+  // and that must cost the bell its deadlines (the 48 h default), never its rows.
+  '422wishRestimes': `query WishRestimes($ids: [ID]) {
+    ratsons(filters: { id: { in: $ids } }, pagination: { limit: 100 }) {
+      data { id attributes { restime } }
+    }
+  }`,
+
+  // One deal, its stages: the wish it was shaped in, the request that was approved,
+  // the deal being carried out (docs/inprogress/PLAN_DIRECT_OFFER.md §7.2, P1). Ids and states
+  // only — each stage's own page decides who may open it. Server-only: the pages read
+  // them after checking the viewer is a party, like 420.
+  // A published wish's terms, changed by its owner — and the digest every signature on
+  // it is read against (updateWishTerms, PLAN_DIRECT_OFFER §4.3). `data` rather than
+  // one variable per field: the place is a component, and 100 cannot write it.
+  '431updateWishTerms': `mutation UpdateWishTerms($id: ID!, $data: RatsonInput!) {
+    updateRatson(id: $id, data: $data) { data { id attributes { terms_digest } } }
+  }`,
+
+  // ─── Direct offers (docs/inprogress/PLAN_DIRECT_OFFER.md P3–P4) ───
+  // A wish the provider drafts for a customer, who claims it through a signed link.
+  // All server-only: the actions check who may do what, and the preview page checks
+  // the link's signature before it reads anything. No `matbea` anywhere — the service
+  // token cannot read it, and one forbidden relation fails the whole query.
+  '432createDirectOffer': `mutation CreateDirectOffer($data: RatsonInput!) {
+    createRatson(data: $data) { data { id } }
+  }`,
+  '433directOfferById': `query DirectOfferById($id: ID!) {
+    ratson(id: $id) { data { id attributes {
+      name desc longDes startDate finnishDate isOnline lat lng radius location_hint
+      status_ratson fulfilled terms_digest createdAt
+      offer_recipient_hint offer_email_lock offer_link_at offer_expires_at claimed_at
+      offered_by { data { id attributes { username profilePic { data { attributes { url formats } } } } } }
+      offered_by_project { data { id attributes { projectName } } }
+      users_permissions_users { data { id } }
+      extracted_missions { id name hoursEst importance notes }
+      extracted_resources { id name quantityEst importance notes }
+      chat_forum { data { id } }
+      process { data { id } }
+      derivedComplexMatanot { data { id attributes {
+        matanot_recipe_missions(pagination: { limit: 50 }) { data { id attributes {
+          notes hoursPerUnit ratePerHour assignedMember { data { id } }
+        } } }
+        matanot_recipe_resources(pagination: { limit: 50 }) { data { id attributes {
+          notes quantityPerUnit pricePerUnit assignedMember { data { id } }
+        } } }
+      } } }
+    } } }
+    ratsonProposals(filters: { ratson: { id: { eq: $id } } }, pagination: { limit: 50 }) {
+      data { id attributes {
+        kind status_proposal total_price
+        proposer_users { data { id } }
+        covered_missions { extracted_mission_idx hours price }
+        covered_resources { extracted_resource_idx quantity price }
+      } }
+    }
+  }`,
+  '434updateDirectOffer': `mutation UpdateDirectOffer($id: ID!, $data: RatsonInput!) {
+    updateRatson(id: $id, data: $data) { data { id } }
+  }`,
+  '435myDirectOffers': `query MyDirectOffers($uid: ID!) {
+    ratsons(
+      filters: { offered_by: { id: { eq: $uid } } }
+      sort: ["createdAt:desc"]
+      pagination: { limit: 60 }
+    ) { data { id attributes {
+      name status_ratson fulfilled createdAt claimed_at offer_link_at offer_recipient_hint
+      users_permissions_users { data { id attributes { username } } }
+    } } }
+  }`,
+  // The email of an account, by the id from the signed JWT — to check an offer's
+  // email lock against the address the account really has, not the 'email' cookie.
+  '436accountEmail': `query AccountEmail($id: ID!) {
+    usersPermissionsUser(id: $id) { data { id attributes { email } } }
+  }`,
+
+  '428dealChainFromSheirut': `query DealChainFromSheirut($id: ID!) {
+    sheirut(id: $id) { data { id attributes {
+      moneyTransfered
+      sheirutpend { data { id } }
+      source_proposals { data { id } }
+      matanot { data { id attributes { ratson { data { id } } } } }
+    } } }
+  }`,
+  '429dealChainFromSheirutpend': `query DealChainFromSheirutpend($id: ID!) {
+    sheirutpend(id: $id) { data { id attributes {
+      sheirut { data { id attributes { moneyTransfered } } }
+      ratson_proposal { data { id attributes { ratson { data { id } } } } }
+      matanots { data { id attributes { ratson { data { id } } } } }
+    } } }
+  }`,
+  '430dealChainFromRatson': `query DealChainFromRatson($id: ID!) {
+    ratson(id: $id) { data { id attributes {
+      status_ratson fulfilled
+      sheiruts(pagination: { limit: 50 }) { data { id attributes { moneyTransfered } } }
+      derivedComplexMatanot { data { id attributes {
+        sheirutpends(pagination: { limit: 50 }) { data { id attributes { sheirut { data { id attributes { moneyTransfered } } } } } }
+      } } }
+      ratson_proposals(pagination: { limit: 100 }) { data { id attributes {
+        sheirutpends(pagination: { limit: 50 }) { data { id attributes { sheirut { data { id attributes { moneyTransfered } } } } } }
+      } } }
+    } } }
   }`,
 
   // ─── Open-mission (openMission) candidate negotiation ───
@@ -10302,6 +10786,88 @@ export const moachQids = {
     }) {
       data { id }
     }
+  }`,
+
+  // ── Rikma address & look (docs/inprogress/PLAN_RIKMA_SUBDOMAINS.md S0/S1) ──────────
+  // Kept apart from 49GetProjectById / createProjectDecision / 159getDecisionForVote
+  // on purpose: until 1.0b has Project.slug/formerSlugs/look and Decision.newSlug/
+  // newLook, selecting them fails — here it fails in isolation (callers treat it
+  // as "no address, classic look") instead of breaking every rikma page and vote.
+  'rikmaIdentityByProject': `query RikmaIdentityByProject($id: ID!) {
+    project(id: $id) { data { id attributes { slug formerSlugs look } } }
+  }`,
+  'rikmaProjectBySlug': `query RikmaProjectBySlug($slug: String!) {
+    projects(filters: { slug: { eq: $slug } }, pagination: { limit: 2 }) {
+      data { id attributes { slug } }
+    }
+  }`,
+  // $token is " <slug> " — formerSlugs is space-delimited with a space at each end.
+  'rikmaProjectByFormerSlug': `query RikmaProjectByFormerSlug($token: String!) {
+    projects(filters: { formerSlugs: { contains: $token } }, pagination: { limit: 2 }) {
+      data { id attributes { slug } }
+    }
+  }`,
+  // Open = archived null or false (a bare \`ne: true\` would drop the NULL rows).
+  'rikmaOpenAddressProposals': `query RikmaOpenAddressProposals($slug: String!) {
+    decisions(
+      filters: {
+        kind: { eq: "address" }
+        newSlug: { eq: $slug }
+        or: [{ archived: { null: true } }, { archived: { eq: false } }]
+      }
+      pagination: { limit: 5 }
+    ) {
+      data { id attributes { projects { data { id } } } }
+    }
+  }`,
+  'rikmaOpenIdentityDecisions': `query RikmaOpenIdentityDecisions($pid: ID!) {
+    decisions(
+      filters: {
+        projects: { id: { eq: $pid } }
+        kind: { in: ["address", "look"] }
+        or: [{ archived: { null: true } }, { archived: { eq: false } }]
+      }
+      sort: ["createdAt:desc"]
+      pagination: { limit: 10 }
+    ) {
+      data { id attributes { kind newSlug createdAt } }
+    }
+  }`,
+  'rikmaIdentityDecision': `query RikmaIdentityDecision($id: ID!) {
+    decision(id: $id) {
+      data { id attributes { kind archived newSlug newLook projects { data { id } } } }
+    }
+  }`,
+  // A variable left out of the call leaves its field untouched, so one mutation
+  // serves "new address", "new look" and "back to the classic page" (look: null).
+  'rikmaUpdateIdentity': `mutation RikmaUpdateIdentity($id: ID!, $slug: String, $formerSlugs: String, $look: JSON) {
+    updateProject(id: $id, data: { slug: $slug, formerSlugs: $formerSlugs, look: $look }) {
+      data { id attributes { slug formerSlugs look } }
+    }
+  }`,
+  'rikmaCreateIdentityDecision': `mutation RikmaCreateIdentityDecision(
+    $projectIds: [ID]
+    $publishedAt: DateTime
+    $decisionName: String
+    $kind: ENUM_DECISION_KIND
+    $newSlug: String
+    $newLook: JSON
+    $vots: [ComponentProjectsVotsInput]
+  ) {
+    createDecision(data: {
+      projects: $projectIds
+      publishedAt: $publishedAt
+      decisionName: $decisionName
+      kind: $kind
+      newSlug: $newSlug
+      newLook: $newLook
+      vots: $vots
+    }) {
+      data { id }
+    }
+  }`,
+  'rikmaUploadFile': `query RikmaUploadFile($id: ID!) {
+    uploadFile(id: $id) { data { id attributes { url mime } } }
   }`,
   '103getForumThreadById': `query GetForumThreadById($forumId: ID!) {
     forum(id: $forumId) {
@@ -14902,6 +15468,7 @@ ${STIPEND_DECISION_FIELDS}
           { tafkidims: { id: { in: $roleIds } } }
         ] }, ${NOT_ARCHIVED} ] }
       pagination: { limit: $limit }
+      sort: ["createdAt:desc"]
     ) {
       data {
         id
@@ -15050,6 +15617,7 @@ ${STIPEND_DECISION_FIELDS}
                 stipendFunder { data { id attributes { username } } }
                 dates
                 sqadualed
+                iskvua
                 source
                 ratson { data { id attributes { name } } }
                 maagad { data { id attributes { name } } }
@@ -16295,3 +16863,12 @@ ${STIPEND_DECISION_FIELDS}
 // the session-bound `$idL`, so the digest counts votes exactly as the hub does
 // (PLAN_DAILY_DIGEST §1.1). serviceAdmin only; see qidsDigest.js.
 qids['347digestHubSummaryFor'] = serviceTwin(qids['85levHubSummary'], 'DigestHubSummaryFor');
+
+// What waits for a user, read for an external MCP key (getMyUpdates,
+// PLAN_SMART_NOTICES §6.6): there is no session behind such a call, and
+// /api/send rebinds `$idL` to the session even on the service token — so the
+// same queries with `$uid`. serviceAdmin only; the tool passes the key owner.
+qids['428myWishNoticesFor'] = serviceTwin(qids['421myWishNotices'], 'MyWishNoticesFor');
+qids['429hiddenWishProposalsFor'] = serviceTwin(qids['394hiddenWishProposals'], 'HiddenWishProposalsFor');
+qids['430myNoticePrefsFor'] = serviceTwin(qids['423myNoticePrefs'], 'MyNoticePrefsFor');
+qids['431dealsForUserFor'] = serviceTwin(qids['123dealsForUser'], 'DealsForUserFor');

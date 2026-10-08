@@ -166,5 +166,7 @@
     "userProfileTitle": "{{name}} profile | 1💗1"
   },
   "publicLinks": "Public links",
-  "assignToMe": "assign to me"
+  "assignToMe": "assign to me",
+  "sessionCheckFailed": "We couldn't check your session just now — probably a brief network problem. You're still signed in; please try again.",
+  "retry": "Try again"
 }

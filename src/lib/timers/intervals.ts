@@ -11,6 +11,8 @@
  * running — it counts toward nothing until it is stopped.
  */
 
+import { hoursOfMs } from './precision.js';
+
 export interface Interval {
 	start: string;
 	stop?: string | null;
@@ -38,11 +40,13 @@ export function intervalMs(iv: Interval, now: number = Date.now()): number {
 }
 
 /**
- * Hours across every **closed** interval.
+ * Hours across every **closed** interval, to the nearest whole minute.
  *
  * Deliberately ignores the running one: `totalHours` on the timer is the figure
  * that later becomes the member's claim for approval, and a number that grows
- * while nobody is looking cannot be claimed.
+ * while nobody is looking cannot be claimed. The seconds go for the same reason
+ * (`./precision.ts`): 21m04s is a claim of 21 minutes, not of 0.3511 hours that
+ * later reads as twenty agorot "above the agreed price".
  */
 export function totalHours(intervals: Interval[] | null | undefined): number {
 	if (!Array.isArray(intervals)) return 0;
@@ -50,7 +54,7 @@ export function totalHours(intervals: Interval[] | null | undefined): number {
 	for (const iv of intervals) {
 		if (iv?.start && iv?.stop) ms += intervalMs(iv);
 	}
-	return ms / HOUR_MS;
+	return hoursOfMs(ms);
 }
 
 /** `true` while the interval has a start and no stop. */

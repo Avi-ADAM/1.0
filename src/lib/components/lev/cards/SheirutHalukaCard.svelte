@@ -99,10 +99,11 @@
   let isOpeningChat = $state(false);
 
 
-  const isComplete = $derived(senderconf && confirmed);
+  // The receiver's word settles a transfer on its own — money that arrived was sent.
+  const isComplete = $derived(confirmed);
 
   async function handleConfirmSent() {
-    if (isProcessing || senderconf) return;
+    if (isProcessing || senderconf || confirmed) return;
     isProcessing = true;
     try {
       if (onSenderConfirm) {
@@ -144,7 +145,8 @@
         const ok = await onReceiverConfirm();
         if (ok) {
           confirmed = true;
-          if (senderconf) oncomplete?.();
+          senderconf = true;
+          oncomplete?.();
         }
         return;
       }
@@ -161,8 +163,9 @@
       const result = await res.json();
       if (!result.success) throw new Error(result.error?.message || 'Failed');
       confirmed = true;
+      senderconf = true;
       toast.success($t('lev.cards.sheirutHaluka.receiverConfirmed'));
-      if (senderconf) oncomplete?.();
+      oncomplete?.();
     } catch (err) {
       console.error(err);
       toast.error($t('lev.cards.sheirutHaluka.error'));
@@ -277,7 +280,7 @@
       >
         {senderName}
       </div>
-      {#if senderconf}
+      {#if senderconf || confirmed}
         <span class="text-[9px] text-green-600 dark:text-green-400 font-bold"
           >✓</span
         >
@@ -387,7 +390,7 @@
       </button>
 
       <!-- Sender confirm button -->
-      {#if isSender && !senderconf}
+      {#if isSender && !senderconf && !confirmed}
         <button
           class="flex-1 py-1.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-xs font-bold rounded-lg hover:shadow-md transition-all disabled:opacity-50"
           onclick={handleConfirmSent}

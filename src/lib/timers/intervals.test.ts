@@ -28,6 +28,19 @@ describe('totalHours', () => {
 		).toBeCloseTo(2.5);
 	});
 
+	it('counts whole minutes — the seconds are not a claim (QA C-14, deal 9)', () => {
+		const at = (h: number, m = 0, s = 0) => new Date(Date.UTC(2026, 0, 10, h, m, s)).toISOString();
+		expect(
+			totalHours([
+				{ start: at(0), stop: at(8) },
+				{ start: at(9), stop: at(15, 39) },
+				{ start: at(16), stop: at(16, 21, 4) }
+			])
+		).toBe(15);
+		expect(totalHours([{ start: at(9), stop: at(9, 0, 29) }])).toBe(0);
+		expect(totalHours([{ start: at(9), stop: at(9, 0, 30) }])).toBe(0.016667);
+	});
+
 	it('ignores a running interval — the figure is what can be claimed', () => {
 		expect(totalHours([{ start: iso(9), stop: iso(10) }, { start: iso(23) }])).toBeCloseTo(1);
 	});

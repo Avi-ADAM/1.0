@@ -286,6 +286,20 @@ is with me" is a sovereign self-report (`holderStatus:'self'`), final immediatel
 A sale is counted in balances/tosplits only when **effective**
 (`holderStatus` is `self`, `confirmed`, or null-legacy) — never while `open`.
 
+## A customer's deal: she co-signs what she pays for
+
+See `docs/inprogress/QA_CONCIERGE_E2E_2026-10.md` C-19. A part of a deal still open in
+its rikma is an **unassigned BOM line of the deal's product** with an open mission /
+resource on it. Whoever takes it is added to what the customer pays, so its candidacy
+(Ask/Askm) needs **every customer of that deal** to say yes to the standing round
+(`computeNegoGate.clientIds`, resolved by `$lib/server/deal/offerDeal`). Silence is
+not her yes. The link is **product-scoped, never rikma-scoped** (offer → spec → BOM
+line → product → its sheiruts → their customers), so a rikma selling several
+products to several customers needs no new model. A wish deal reads **paid**
+(`moneyTransfered`) only when every provider (BOM line holder) has confirmed receiving
+their part in full (`Sheirut.iGotMoney`, `$lib/sheirut/partsReceived`). The customer's
+payment covering what she owes moves only `iTransferMoney`.
+
 ## Object archival & edit (`kind: 'archiveObject' | 'editObject'`)
 
 See `docs/done/PLAN_OBJECT_ARCHIVAL.md`. Removing or changing a rikma object
@@ -366,3 +380,8 @@ missions / open mashaabims and from profile updates), including "new
 suggestion" emails. The lev page reads them via qid `209levMatchSuggestions` —
 do **not** reintroduce client-side matching over per-skill `open_missions`
 pulls in query 83.
+
+**A held skill always qualifies.** Missing roles/skills and work-way mismatch
+only *rank* a suggestion (`computeMissionMatchScore` → `qualifies`), and both
+engine directions score through the same function with the same `unheld` rule —
+a penalty that can hide a need from the professional it is for is the bug.

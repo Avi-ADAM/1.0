@@ -69,6 +69,9 @@ function mapWishInvitation(node: any, viewerId?: string, restime?: string): Inco
   if (!ratNode) return null;
   const ra = ratNode.attributes ?? {};
   const wisher = ra.users_permissions_users?.data?.[0];
+  // A wish with nobody behind it yet is a direct offer still in its provider's hands
+  // (PLAN_DIRECT_OFFER): their own signed parts, not an invitation to anyone.
+  if (!wisher) return null;
   const slotM = (pa.covered_missions ?? [])[0];
   const slotR = (pa.covered_resources ?? [])[0];
 
@@ -95,7 +98,8 @@ function mapWishInvitation(node: any, viewerId?: string, restime?: string): Inco
         proposerIds: viewerId ? [String(viewerId)] : []
       },
       'provider',
-      restime
+      restime,
+      ra.terms_digest ?? null
     ),
     slotHours: typeof slotM?.hours === 'number' ? slotM.hours : null,
     slotPrice:
@@ -253,6 +257,48 @@ export async function fetchWishInvitationsForUser(
     console.error('[deals] fetchWishInvitationsForUser failed (non-fatal):', e);
     return [];
   }
+}
+
+/** A deal as the bell needs it: which one, what it is, and which side the user is on. */
+export interface ActiveDealRef {
+  sheirutId: string;
+  name: string;
+  side: 'buy' | 'sale';
+  createdAt: string | null;
+}
+
+/**
+ * The user's active deals, both sides — the same `123dealsForUser` read and the same
+ * "active" rule as `fetchDealsForUser`, without its wish-invitation and rikma reads.
+ * For the deals bell (docs/inprogress/PLAN_SMART_NOTICES.md).
+ */
+export async function fetchActiveDealRefs(
+  fetchFn: typeof fetch,
+  userId: string,
+  /** `service`: an external MCP key — the `$uid` twin on the service token (qid 431). */
+  door: 'session' | 'service' = 'session'
+): Promise<ActiveDealRef[]> {
+  const data =
+    door === 'service'
+      ? await sendViaProxy(fetchFn as any, '431dealsForUserFor', { uid: userId }, { isSer: true })
+      : await gql(fetchFn, '123dealsForUser', { idL: userId });
+  const userData = data?.usersPermissionsUser?.data;
+  const out: ActiveDealRef[] = [];
+  const add = (sheirut: any, side: 'buy' | 'sale') => {
+    const a = sheirut?.attributes;
+    if (!sheirut?.id || !isActiveSheirut(a)) return;
+    out.push({
+      sheirutId: String(sheirut.id),
+      name: a?.matanot?.data?.attributes?.name ?? a?.name ?? '',
+      side,
+      createdAt: a?.createdAt ?? null
+    });
+  };
+  for (const s of userData?.attributes?.sheiruts?.data ?? []) add(s, 'buy');
+  for (const project of userData?.attributes?.projects_1s?.data ?? []) {
+    for (const s of project?.attributes?.sheiruts?.data ?? []) add(s, 'sale');
+  }
+  return out;
 }
 
 export async function fetchDealsForUser(

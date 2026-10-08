@@ -12,7 +12,17 @@ const TTL = {
   entity:      15_000       // 15 sec for single entity pages
 };
 
+/** The query each live-refreshable section is read with — the same ones the tabs use. */
+const SECTION_QIDS = {
+  missions: 'getProjectMissions',
+  financials: 'getProjectFinancials'
+};
+const REFRESH_DEBOUNCE_MS = 300;
+
 export function createMoachStore() {
+  /** @type {Map<string, ReturnType<typeof setTimeout>>} */
+  const pendingRefresh = new Map();
+
   let state = $state({
     projects: {},   // { [projectId]: { base, missions, financials, entities: {}, _ts: { base: Date, ... } } }
     currentId: null,
@@ -71,6 +81,35 @@ export function createMoachStore() {
         delete state.projects[pid]._ts[type];
         persist();
       }
+    },
+
+    /**
+     * Mark a section stale and, when this rikma already holds it, read it
+     * again now. The tabs read the section through `$derived`, so the open
+     * page updates in place — `invalidate` alone only helped the *next* visit
+     * (REALTIME_TRACKING B4). Bursts (a round of votes) collapse into one read.
+     * `base` is not read here: it comes from the layout load (`moachBaseKey`).
+     */
+    refresh(pid, section) {
+      this.invalidate(pid, section);
+      const qid = SECTION_QIDS[section];
+      if (!browser || !qid || !state.projects[pid]?.[section]) return;
+
+      const key = `${pid}:${section}`;
+      clearTimeout(pendingRefresh.get(key));
+      pendingRefresh.set(
+        key,
+        setTimeout(async () => {
+          pendingRefresh.delete(key);
+          try {
+            const res = await sendToSer({ pid }, qid, null, null, false, fetch);
+            const attrs = res?.data?.project?.data?.attributes;
+            if (attrs) this.updateProjectData(pid, section, attrs);
+          } catch (e) {
+            console.error(`[moachStore] refresh ${section} failed`, e);
+          }
+        }, REFRESH_DEBOUNCE_MS)
+      );
     },
 
     async refreshBase(pid, fetch) {

@@ -7,6 +7,7 @@
 
 import type { ActionContext } from '../actions/types';
 import type { UserProfile, NotificationData } from './NotificationOrchestrator';
+import { recipientTemplateLang } from './intent';
 
 export class EmailService {
   /**
@@ -74,8 +75,8 @@ export class EmailService {
     templateData?: Record<string, any>
   ): Promise<void> {
     try {
-      // Determine language - use user's language if it's supported, otherwise fall back to context language
-      const lang = this.selectLanguage(user.lang, context.lang);
+      // The recipient's language, never the sender's (see recipientTemplateLang)
+      const lang = recipientTemplateLang(user.lang);
 
       // Render the email template
       const emailHtml = await render(template, {
@@ -143,24 +144,6 @@ export class EmailService {
     }
   }
 
-  /**
-   * Select appropriate language for the user
-   * Uses user's language if supported, otherwise falls back to context language
-   */
-  private selectLanguage(userLang: string, contextLang: string): string {
-    const supportedLanguages = ['he', 'en', 'ar'];
-    
-    if (supportedLanguages.includes(userLang)) {
-      return userLang;
-    }
-    
-    if (supportedLanguages.includes(contextLang)) {
-      return contextLang;
-    }
-    
-    // Default to Hebrew
-    return 'he';
-  }
 
   /**
    * Generate plain text version of the email

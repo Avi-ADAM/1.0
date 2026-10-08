@@ -21,6 +21,7 @@
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { calcDeadlineMs } from './actionUtils.js';
+import { roundHours } from '$lib/timers/precision.js';
 import {
   encodeCounter,
   hasSigned,
@@ -69,7 +70,8 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
   const current = Number(fa.noofhours ?? 0);
   const refusal = refuseCounter(current, hours, note);
   if (refusal) throw new Error(REFUSALS[refusal]);
-  const newHours = Number(hours);
+  // Counted in whole minutes, like every other filed hour ($lib/timers/precision.ts).
+  const newHours = roundHours(hours);
 
   const newOrder = standingOrder(vots) + 1;
   const proposerVote = {

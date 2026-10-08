@@ -126,8 +126,11 @@ async function confirmOnly(fetchFn: typeof fetch, token: string): Promise<'ok' |
 export const load: PageServerLoad = async ({ url, cookies }) => {
   const token = url.searchParams.get('confirmation');
   const email = emailFromLink(url) || (cookies.get('email') ?? '');
-  if (!token) return { state: 'missing' as const, email, confirmation: '' };
-  return { state: 'ready' as const, email, confirmation: token };
+  // The concierge track counts three steps, and this is its third (QA C-5): the
+  // strip must not fall back to the onboarding's "step 2" after "step 3 of 3".
+  const concierge = isConciergeIntent(cookies.get(REG_INTENT_COOKIE));
+  if (!token) return { state: 'missing' as const, email, confirmation: '', concierge };
+  return { state: 'ready' as const, email, confirmation: token, concierge };
 };
 
 export const actions: Actions = {
@@ -140,15 +143,21 @@ export const actions: Actions = {
 
     // 1. Confirm and sign in (the 1.0b route, through the auth proxy; as an
     //    internal caller this action gets the jwt in the body and sets it).
+    //    A network failure or a 5xx is tried once more: it says nothing about the
+    //    token, and the fallback below would spend it (QA C-4).
     let res: Response | null = null;
-    try {
-      res = await fetch('/api/auth/email-confirmation-login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ confirmation: token })
-      });
-    } catch (e) {
-      console.error('[confirm-email] sign-in request failed:', e);
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        res = await fetch('/api/auth/email-confirmation-login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ confirmation: token })
+        });
+      } catch (e) {
+        res = null;
+        console.error('[confirm-email] sign-in request failed:', e);
+      }
+      if (res && res.status < 500) break;
     }
     if (res?.ok) {
       const body = (await res.json().catch(() => ({}))) as { jwt?: string; user?: any };
@@ -159,6 +168,15 @@ export const actions: Actions = {
       }
     }
     if (res && res.status === 400) return fail(400, { state: 'spent' as const });
+
+    // Only a route that is not there falls back to the stock confirmation. Anything
+    // else — no answer, a 5xx — leaves the single-use token untouched, so the
+    // person can press "try again" and still be signed in without a password
+    // (QA C-4: a connect timeout used to confirm-only, spend the token, and send
+    // them to /login).
+    if (!res || (res.status !== 404 && res.status !== 405)) {
+      return fail(502, { state: 'error' as const });
+    }
 
     // 2. The route is not there (yet): the stock confirmation, then log in.
     const outcome = await confirmOnly(fetch, token);

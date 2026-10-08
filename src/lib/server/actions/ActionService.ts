@@ -14,9 +14,9 @@
 
 import type {
   ActionContext,
-  ActionResult,
-  ActionError as ActionErrorType
+  ActionResult
 } from './types.js';
+import { ActionError } from './errors.js';
 import { actionRegistry } from './registry.js';
 import { ValidationEngine } from './ValidationEngine.js';
 import { AuthorizationEngine } from './AuthorizationEngine.js';
@@ -27,29 +27,21 @@ import { createLogger } from '../log.js';
 // Import to trigger action registration
 import './configs/index.js';
 
-/**
- * Custom error class for action execution errors
- */
-export class ActionError extends Error {
-  constructor(
-    public code: string,
-    message: string,
-    public details?: any
-  ) {
-    super(message);
-    this.name = 'ActionError';
-  }
+/** Custom error class for action execution errors — see ./errors.ts. */
+export { ActionError };
 
-  /**
-   * Convert to ActionErrorType for response
-   */
-  toErrorObject(): ActionErrorType {
-    return {
-      code: this.code,
-      message: this.message,
-      details: this.details
-    };
-  }
+/**
+ * The result the notifier sees, carrying the strategy the initiator gets.
+ *
+ * The socket payload takes its `updateStrategy` from the result it is handed,
+ * so a strategy declared only on the config — not returned by the handler —
+ * used to reach the initiating tab and nobody else (REALTIME_TRACKING B1).
+ * Only a plain-object result is extended; anything else goes through as is.
+ */
+export function withUpdateStrategy(result: unknown, strategy: ActionResult['updateStrategy']): unknown {
+  if (!strategy || !result || typeof result !== 'object' || Array.isArray(result)) return result;
+  if ((result as any).updateStrategy) return result;
+  return { ...(result as Record<string, unknown>), updateStrategy: strategy };
 }
 
 /**
@@ -239,7 +231,7 @@ export class ActionService {
         this.notifier.notify(
           config.notification,
           params,
-          strapiResult,
+          withUpdateStrategy(strapiResult, finalUpdateStrategy),
           context
         ).catch(err => {
           // Log notification errors but don't fail the action

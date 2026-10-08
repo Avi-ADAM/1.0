@@ -17,12 +17,13 @@ import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import type { HoursOutcome, RoundMode, StandingRound } from '$lib/server/archive/apply.js';
 import { execFromContext } from '$lib/server/archive/exec.js';
 import { counterObjectChange } from '$lib/server/archive/vote.js';
+import { dealSignersFor, notifyDealClientsOfEdit, type DealSigners } from '$lib/server/sheirut/dealEdit.js';
 
 const MODES: readonly RoundMode[] = ['archive', 'keep'];
 const OUTCOMES: readonly HoursOutcome[] = ['credit', 'waive', 'transfer', 'endOfCycle'];
 const KIND_OFS = ['total', 'monthly', 'yearly', 'perUnit', 'rent'];
 
-const handler: ActionExecutionHandler = async (params, context, { notifier }) => {
+const handler: ActionExecutionHandler = async (params, context, { notifier, strapi }) => {
   const decisionId = String(params.decisionId ?? '');
   if (!decisionId) throw new Error('decisionId is required');
 
@@ -57,11 +58,20 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
   };
 
   const exec = execFromContext(context);
+  const run = (qid: string, vars: Record<string, unknown>) => strapi.execute(qid, vars, context.jwt, context.fetch);
   const result = await counterObjectChange(exec, {
     decisionId,
     userId: String(context.userId),
     round,
+    extraFor: dealSignersFor(run),
   });
+
+  // A version that raises a part of a customer's deal waits for her signature: tell her
+  // (C-14, $lib/server/sheirut/dealEdit). Her own counters go through counterDealEdit.
+  const signers = result.extra as DealSigners | null;
+  if (signers?.deal && signers.needed({ ...result.standing, ordern: result.order, proposedById: null, zman: null })) {
+    await notifyDealClientsOfEdit(notifier, context, signers.deal, result.standing);
+  }
 
   if (notifier && params.projectId) {
     notifier
@@ -98,7 +108,7 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
   }
 
   return {
-    data: { ...result, mode },
+    data: { decisionId: result.decisionId, order: result.order, deadline: result.deadline, mode },
     updateStrategy: { type: 'fullRefresh' as const },
   };
 };

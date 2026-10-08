@@ -194,7 +194,7 @@ export async function runRevise(input: {
   lang: string;
 }): Promise<{ ops: unknown[]; say: string; questions: string[] }> {
   const { system, user } = buildRevisePrompt(input);
-  const [{ Agent }, { createGoogleModel }] = await Promise.all([
+  const [{ Agent }, { createModelChain }] = await Promise.all([
     import('@mastra/core/agent'),
     import('../../../mastra/lib/createModel')
   ]);
@@ -202,7 +202,7 @@ export async function runRevise(input: {
     id: 'AssistantReviser',
     name: 'AssistantReviser',
     instructions: system,
-    model: createGoogleModel(undefined, 'gemini-3-flash-preview', { thinkingBudget: 0 })
+    model: createModelChain()
   });
   const result = await agent.generate([{ role: 'user', content: user }]);
   return parseReviseReply(result.text ?? '');

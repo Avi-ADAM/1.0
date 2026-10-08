@@ -10,6 +10,7 @@
   import { strapiClient as strapi } from '$lib/server/actions';
   import { runResourceAskmAcceptance } from '$lib/server/actions/helpers/runResourceAskmAcceptance';
   import { computeNegoGate, normId } from '$lib/server/nego/negoGate';
+  import { loadCandidacyDeal } from '$lib/server/deal/offerDeal';
 
   export async function Askm(id, taid) {
     console.log(id, taid, 'askm finalizer started');
@@ -46,7 +47,10 @@
       const spId = attrs.sp?.data?.id;
       const name = attrs.open_mashaabim?.data?.attributes?.name ?? '';
 
-      const gate = computeNegoGate({ rounds, vots, takerId, memberIds });
+      // A gap of a customer's deal: she signs what she pays for (QA C-19). A read
+      // error throws — the clock is retried, never matured without her.
+      const offerDeal = await loadCandidacyDeal((qid, vars) => strapi.execute(qid, vars), 'askm', String(id));
+      const gate = computeNegoGate({ rounds, vots, takerId, memberIds, clientIds: offerDeal?.clientIds ?? [] });
       if (!gate.approvable) {
         // Not agreed by both sides yet (e.g. a project counter awaiting the
         // candidate's consent, or a candidate counter awaiting a member's yes).

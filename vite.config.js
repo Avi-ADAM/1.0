@@ -60,7 +60,13 @@ const config = {
       'd3-scale',
       'd3-shape',
       'layercake',
-      'topojson-client'
+      'topojson-client',
+      // Found only when /hascama first renders the 3D globe. Discovered that late,
+      // Vite re-optimizes mid-session and the page ends up with two copies of a
+      // chunk — threlte's interactivity() then calls getContext outside a
+      // component and the client-side hop from /wish/new dies (QA C-2). Bundled
+      // up front, there is nothing left to discover.
+      'three'
     ]
   },
   plugins: [/*sentrySvelteKit({

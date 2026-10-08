@@ -285,12 +285,14 @@ export async function fetchTimers(uid, fetch, options = {}) {
                 }
             } else {
                 console.error('Invalid API response:', res);
-                updateTimers([]); // Ensure timers is an empty array on error
+                // A background refresh that fails keeps what the page already
+                // shows — emptying it hid every timer control on a flaky Strapi.
+                if (!isRemoteUpdate) updateTimers([]);
             }
         })
         .catch((error) => {
             console.error('Error fetching timers:', error);
-            updateTimers([]); //[]; //  Ensure timers is an empty array on error
+            if (!isRemoteUpdate) updateTimers([]);
         });
 }
 

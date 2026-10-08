@@ -72,13 +72,24 @@ describe('findUserProjectsTool identity handling', () => {
     expect(queriedUserId()).toBe(42);
   });
 
-  it('lets the internal bot act for the user it already authenticated via JWT', async () => {
+  it('refuses a foreign userId on the internal bot too', async () => {
+    // There the value comes from the LLM, so a prompt injection could name
+    // another member; the bot only ever reads the user it authenticated.
     getMcpContext.mockReturnValue({ userId: '42', fetchInstance: vi.fn(), isInternalBot: true });
 
     const res = await run({ userId: '99' });
 
-    expect(res.success).toBe(true);
-    expect(queriedUserId()).toBe(99);
+    expect(res.success).toBe(false);
+    expect(res.projects).toEqual([]);
+    expect(sendToSer).not.toHaveBeenCalled();
+  });
+
+  it('lets the internal bot read its own user, named or omitted', async () => {
+    getMcpContext.mockReturnValue({ userId: '42', fetchInstance: vi.fn(), isInternalBot: true });
+
+    expect((await run({ userId: '42' })).success).toBe(true);
+    expect((await run({})).success).toBe(true);
+    expect(sendToSer.mock.calls.map((c) => c[2])).toEqual([42, 42]);
   });
 
   it('fails closed when there is no context at all', async () => {
@@ -111,6 +122,13 @@ describe('findUserProjectsTool ordering and paging', () => {
     expect(res.projects[0].createdAt).toBe('2026-09-14T08:00:00.000Z');
     expect(res.total).toBe(2);
     expect(res.hasMore).toBe(false);
+  });
+
+  it('a name query cannot reach rikmot outside a scoped key', async () => {
+    // The search used to filter the unscoped list, so `query` undid scopes.projects.
+    getMcpContext.mockReturnValue({ userId: '42', fetchInstance: vi.fn(), keyProjects: ['43'] });
+    const res = await run({ query: 'freemeet' });
+    expect(res.projects.map((p: any) => p.id)).toEqual(['43']);
   });
 
   it('pages with limit/offset and says where the next page starts', async () => {

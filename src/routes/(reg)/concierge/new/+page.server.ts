@@ -1,5 +1,6 @@
 import { sendToSer } from '$lib/send/sendToSer.js';
 import { loadBell } from '$lib/server/concierge/bell';
+import { loadWishNotices } from '$lib/server/concierge/notices';
 import {
   clearConciergeIntent,
   isConciergeIntent,
@@ -108,12 +109,14 @@ export const load: PageServerLoad = async ({ cookies, url, locals, fetch }) => {
 
   const uid = (locals as any)?.uid;
   const bellPending = loadBell(uid, fetch);
+  const noticesPending = loadWishNotices(uid, fetch);
   const draftId = url.searchParams.get('draft');
   const draft = draftId && uid ? await loadDraft(draftId, String(uid), fetch) : null;
 
   return {
     welcome: arrivedFromSignup || url.searchParams.get('welcome') === '1',
     draft,
-    bell: await bellPending
+    bell: await bellPending,
+    notices: await noticesPending
   };
 };

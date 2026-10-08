@@ -3,8 +3,12 @@
   // Server-only secret — this module is imported only by timegrama/+server.js.
   import { ADMINMONTHER } from '$env/static/private';
   import { execFromAdmin } from '$lib/server/archive/exec.js';
-  import { fetchObjectChangeDecision } from '$lib/server/archive/read.js';
+  import { fetchObjectChangeDecision, standingOrder, standingRound } from '$lib/server/archive/read.js';
   import { applyStandingVersion } from '$lib/server/archive/vote.js';
+  import { strapiClient } from '$lib/server/actions';
+  import { applyIdentityDecision } from '$lib/server/rikmaIdentity/identity.js';
+  import { dealSignersFor } from '$lib/server/sheirut/dealEdit.js';
+  import { clientsPendingOn } from '$lib/sheirut/dealEdit.js';
   import {
     applyStandingStipend,
     fetchStipendDecision,
@@ -80,6 +84,21 @@
           }, codeLicenseSince: ${gqlStr(new Date().toISOString())} }) { data { id } } }`,
           ADMINMONTHER
         );
+      }
+    } else if (a.kind === 'address' || a.kind === 'look') {
+      // PLAN_RIKMA_SUBDOMAINS — same applier as the unanimous-vote path in
+      // voteOnDecision, so silence and consent cannot diverge. An address taken
+      // meanwhile is refused there; the decision still closes below (a retry
+      // would only fail again), and the members propose another.
+      const run = (qid, vars) => strapiClient.execute(qid, vars);
+      try {
+        await applyIdentityDecision({ read: run, write: run }, String(decisionId), String(projectId));
+      } catch (e) {
+        console.error('[timegrama/decision] identity proposal matured but was not applied:', {
+          decisionId,
+          kind: a.kind,
+          error: e
+        });
       }
     } else if (a.kind === 'vallueadd' || a.kind === 'vallueles') {
       const projRes = await SendToAdmin(
@@ -167,8 +186,41 @@
           console.warn(`[timegrama/decision] archive decision ${id} could not be read`);
           return markDone();
         }
+
+        // A version that raises a part of a customer's deal needs her signature: the
+        // members' silence is theirs, hers is not (C-14, $lib/server/sheirut/dealEdit — the
+        // same rule as a stipend's funder below). Without it the clock simply ends and the
+        // version waits for her; once she signs, it applies. A deal that cannot be read must
+        // not pass for "no customer", so the clock stays open and the next run retries.
+        let extra = null;
+        try {
+          extra = await dealSignersFor((qid, vars) => strapiClient.execute(qid, vars))(decision);
+        } catch (e) {
+          console.error('[timegrama/decision] could not read the deal behind this proposal — clock left OPEN for retry:', {
+            decisionId: id,
+            error: e
+          });
+          return;
+        }
+        const round = standingRound(decision);
+        if (
+          extra &&
+          extra.needed(round) &&
+          clientsPendingOn(decision.vots, standingOrder(decision), extra.ids).length > 0
+        ) {
+          console.log('[timegrama/decision] the rikma matured on silence; the version waits for the customer', {
+            decisionId: id
+          });
+          return markDone();
+        }
+
         try {
           const applied = await applyStandingVersion(exec, decision);
+          if (extra?.onApplied) {
+            await extra.onApplied(round).catch((e) =>
+              console.error('[timegrama/decision] applied, but the deal did not follow:', { decisionId: id, error: e })
+            );
+          }
           console.log('[timegrama/decision] archive proposal matured on silence', {
             decisionId: id,
             lifecycle: applied.lifecycle,

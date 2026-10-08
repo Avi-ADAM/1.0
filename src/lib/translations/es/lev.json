@@ -16,7 +16,9 @@
     "done": "hecho",
     "saved": "guardado correctamente",
     "oneMonent": "un momento, por favor",
-    "editTimer": "editar temporizador"
+    "editTimer": "editar temporizador",
+    "timerRunning": "El temporizador sigue en marcha. Detenlo y guárdalo antes de entregar la misión.",
+    "noHours": "Aún no se guardaron horas para esta misión. Usa el temporizador (o edítalo), guarda y luego entrégala."
   },
   "cards": {
     "approve": "Lo quiero",
@@ -188,7 +190,12 @@
         "sellerConfirmedMoney": "El receptor confirmó la recepción del dinero",
         "coordinatingWith": "Coordinando con:"
       },
-      "myPurchase": "MI COMPRA"
+      "myPurchase": "MI COMPRA",
+      "confirmTitle": "Confirmar la transferencia",
+      "confirmTo": "Transferir a {{name}}:",
+      "confirmHint": "El dinero en sí pasa entre ustedes, fuera del sitio. Aquí registras a quién pagaste, y {{name}} confirma cuando llegue.",
+      "confirmYes": "Sí, transfiero",
+      "confirmBack": "Volver"
     },
     "dowegeot": {
       "head": "Confirmación de recepción exitosa de un recurso",
@@ -364,7 +371,8 @@
       "withdrawSelfNomination": "Retirar tu autopostulación: la misión que creaste se cerrará por completo"
     },
     "wishApplied": "Tu oferta se envió con éxito",
-    "toProfile": "a la página de perfil"
+    "toProfile": "a la página de perfil",
+    "awaitingClient": "Tu voto quedó registrado. Esta parte es del trato de una clienta, así que solo entra cuando ella también lo apruebe."
   },
   "taskApproval": {
     "approve": "Aprobar",
@@ -772,7 +780,10 @@
     "missionDetails": "Detalles de la misión",
     "requestedRole": "Rol solicitado",
     "iWant": "Sí, quiero",
-    "notForMe": "No es para mí"
+    "notForMe": "No es para mí",
+    "wishSuggestion": "Una oferta para hacer parte del deseo de una clienta",
+    "chatOnWish": "Chat con la dueña del deseo",
+    "partOfWish": "Parte del deseo:"
   },
   "list": {
     "count": "{{count}} elementos",
@@ -780,6 +791,7 @@
     "toList": "Vista compacta",
     "toCards": "Vista de tarjetas",
     "toCoins": "Vista de monedas",
+    "toNotices": "Vista de avisos",
     "switchLabel": "Elegir vista",
     "time": {
       "over": "Se acabó el tiempo",
@@ -811,7 +823,7 @@
       "archObject": "Retirada de elemento",
       "stipend": "Beca de subsistencia",
       "hachla": "Decisión",
-      "wishoffer": "Oferta de voluntariado",
+      "wishoffer": "Oferta para un deseo",
       "sitesharepay": "Pago de la parte del sitio",
       "stipendpay": "Pago de beca",
       "stipendconfirm": "Beca recibida",
@@ -861,7 +873,9 @@
       "sheirutpends": "Nuevo producto o servicio",
       "saleClaim": "Consentimiento del receptor",
       "saleClaimSub": "Quién tiene el dinero",
-      "generic": "Una decisión espera tu firma"
+      "generic": "Una decisión espera tu firma",
+      "address": "Nueva dirección para la rikma",
+      "look": "Nuevo aspecto para la página pública"
     },
     "sub": {
       "stipendFrom": "Financiado por {{name}}",

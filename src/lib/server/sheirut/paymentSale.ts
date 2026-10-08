@@ -18,12 +18,15 @@
  *  - Idempotent: the haluka's id is the Sale's `externalId` (its idempotency key, as for the
  *    external Sales API) — a second completion of the same haluka records nothing, and the
  *    note stays free for the people who read the sales table.
- *  - The deal reads "paid" (`iTransferMoney` / `moneyTransfered`) once the recorded income
- *    covers its total — so paying each provider their part, one transfer at a time, would
- *    read "paid" only when the last one lands.
+ *  - Once the recorded income covers what she owes, her side is done (`iTransferMoney`). The
+ *    deal reads "paid" (`moneyTransfered`) only when every provider has also confirmed
+ *    receiving their part in full (C-19, `$lib/server/deal/partsReceived`).
  *  - Best-effort: the money already moved, so a failure here is logged and returned, never
  *    thrown — it must not undo the confirmation.
  */
+
+import { loadDealDue, PAYMENT_KEY_PREFIX } from './dealDue.js';
+import { settleCoveredPayment } from '$lib/server/deal/partsReceived.js';
 
 type Strapi = { execute: (qid: string, vars: any, jwt: string, fetch: any) => Promise<any> };
 type Ctx = { jwt: string; fetch: any };
@@ -46,7 +49,7 @@ export interface PaymentSaleResult {
   paid?: boolean;
 }
 
-const key = (halukaId: string) => `sheirut-payment:haluka:${halukaId}`;
+const key = (halukaId: string) => `${PAYMENT_KEY_PREFIX}haluka:${halukaId}`;
 
 export async function recordWishPaymentSale(
   strapi: Strapi,
@@ -97,20 +100,29 @@ export async function recordWishPaymentSale(
       return { saleId: null, skipped: 'failed' };
     }
 
-    // The deal reads paid once what is recorded covers what it costs.
+    // The deal reads paid once what is recorded covers what it costs — and what a wish deal
+    // costs is the hours the rikma approved, capped at the price agreed (C-14,
+    // `./dealDue`), known once every line is closed. If that cannot be read, the agreed
+    // total is the fallback, as before.
     const recorded = sales.reduce((sum, s) => sum + (Number(s.attributes?.in) || 0), 0) + Number(args.amount);
     const total = Number(sh.total) || 0;
-    const paid = total <= 0 || recorded >= total - 0.005;
+    let paid = total <= 0 || recorded >= total - 0.005;
+    try {
+      const owed = await loadDealDue((qid, vars) => strapi.execute(qid, vars, context.jwt, context.fetch), args.sheirutId);
+      if (owed) paid = owed.final && owed.recorded >= owed.due - 0.005;
+    } catch (err) {
+      console.warn('[paymentSale] could not read what the deal owes; judging by its agreed total:', err);
+    }
+    // Covered is her side done (`iTransferMoney`). "Paid" waits for every provider to confirm
+    // receiving their part in full (C-19, `$lib/sheirut/partsReceived`).
     if (paid) {
       try {
-        await strapi.execute(
-          '213updateSheirut',
-          { id: String(args.sheirutId), data: { iTransferMoney: true, moneyTransfered: true } },
-          context.jwt,
-          context.fetch
-        );
+        paid = (
+          await settleCoveredPayment((qid, vars) => strapi.execute(qid, vars, context.jwt, context.fetch), args.sheirutId)
+        ).paid;
       } catch (err) {
         console.error('[paymentSale] the income is recorded but the deal flags did not move:', err);
+        paid = false;
       }
     }
     return { saleId, paid };

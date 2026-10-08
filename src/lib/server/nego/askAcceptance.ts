@@ -20,26 +20,15 @@
  * its attributes in, so this stays unit-testable.
  */
 
-import { computeNegoGate, normId, type NegoGateResult } from './negoGate';
+import { type NegoGateResult } from './negoGate';
+import {
+  evaluateCandidacyVote,
+  type CandidacyVoteRow,
+  type NormalizedVote
+} from './candidacyVote';
 
-export interface AskVoteRow {
-  what?: boolean | null;
-  why?: string | null;
-  zman?: string | null;
-  ide?: number | string | null;
-  order?: number | null;
-  users_permissions_user?: unknown;
-}
-
-/** A vote row normalized for persisting back through `120addVoteToAsk`. */
-export interface NormalizedVote {
-  what: boolean;
-  users_permissions_user: string;
-  order: number;
-  ide: number | null;
-  zman: string;
-  why?: string;
-}
+export type AskVoteRow = CandidacyVoteRow;
+export type { NormalizedVote };
 
 export type AskAcceptanceReason =
   | 'ok'
@@ -52,7 +41,13 @@ export type AskAcceptanceReason =
    * assignee never answered, or a project round (counter / terms edit) they
    * have yet to accept. Record the vote, don't materialize.
    */
-  | 'awaitingAssigneeConsent';
+  | 'awaitingAssigneeConsent'
+  /**
+   * The offer fills a line of a product a customer bought, and she has not signed the
+   * standing round (QA C-19, `$lib/server/deal/offerDeal`). Record the vote, don't
+   * materialize: what it ends on is added to what she pays.
+   */
+  | 'awaitingClientConsent';
 
 export interface AskAcceptanceResult {
   /** May the Mesimabetahalich be created right now? */
@@ -70,6 +65,18 @@ export interface AskAcceptanceResult {
    * current round — persist these instead of trusting the client's array.
    */
   vots: NormalizedVote[];
+  /**
+   * Every member other than the candidate has said yes to the standing round
+   * (see `evaluateCandidacyVote`). Deliberately *not* part of `allowed`:
+   * `allowed` is the bilateral gate — may this be registered under the
+   * candidate's name at all — and `signDealOffer` reads it that way. Whether the
+   * rikma is done deciding *now*, rather than at restime, is this field, and the
+   * finalize actions check both.
+   */
+  allMembersYes: boolean;
+  membersPending: string[];
+  /** The rikma's members as the DB has them now (empty when the read lacked them). */
+  memberIds: string[];
 }
 
 export interface AskAcceptanceInput {
@@ -79,72 +86,34 @@ export interface AskAcceptanceInput {
   callerId: string | number;
   /** The user the client wants the mission registered under, when supplied. */
   acceptedUserId?: string | number | null;
+  /** The deal's customers who must also sign (`OfferDeal.clientIds`); empty for ordinary offers. */
+  clientIds?: Array<string | number>;
   /** Injectable clock (tests). */
   now?: Date;
-}
-
-function normalizeVote(v: AskVoteRow, fallbackZman: string): NormalizedVote {
-  const uid = normId(v?.users_permissions_user);
-  const ideRaw = v?.ide ?? uid;
-  const ide = Number.parseInt(String(ideRaw), 10);
-  const row: NormalizedVote = {
-    what: v?.what === true,
-    users_permissions_user: uid,
-    order: Number(v?.order ?? 0),
-    ide: Number.isNaN(ide) ? null : ide,
-    zman: v?.zman ?? fallbackZman,
-  };
-  if (v?.why) row.why = v.why;
-  return row;
 }
 
 export function evaluateAskAcceptance({
   askAttributes,
   callerId,
   acceptedUserId = null,
+  clientIds = [],
   now = new Date(),
 }: AskAcceptanceInput): AskAcceptanceResult {
   const attrs = askAttributes ?? {};
-  const nowISO = now.toISOString();
 
-  const takerId = normId(attrs.users_permissions_user);
-  const memberIds: string[] = (attrs.project?.data?.attributes?.user_1s?.data ?? []).map((m: any) =>
-    String(m.id)
-  );
-  const rounds = (attrs.negopendmissions?.data ?? []).map((r: any) => ({
-    ordern: r?.attributes?.ordern,
-    proposedBy: r?.attributes?.proposedBy,
-  }));
-  const L = rounds.reduce((max: number, r: any) => Math.max(max, Number(r?.ordern ?? 0)), 0);
-
-  // The approver's yes is part of this very request — count it, and replace any
-  // earlier vote of theirs in the same round (a vote change, not a second vote).
-  const caller = String(callerId);
-  const dbVots: NormalizedVote[] = (attrs.vots ?? [])
-    .map((v: AskVoteRow) => normalizeVote(v, nowISO))
-    // A row without a user can't be re-serialized into the vots component.
-    .filter((v: NormalizedVote) => v.users_permissions_user !== '');
-  const vots: NormalizedVote[] = [
-    ...dbVots.filter((v) => !(v.users_permissions_user === caller && v.order === L)),
-    {
-      what: true,
-      users_permissions_user: caller,
-      order: L,
-      ide: Number.isNaN(Number.parseInt(caller, 10)) ? null : Number.parseInt(caller, 10),
-      zman: nowISO,
-    },
-  ];
-
+  // The approver's yes is part of this very request — counted, at the standing
+  // round, over the DB's rows (see evaluateCandidacyVote).
   const assignedOffer = attrs.open_mission?.data?.attributes?.isRishon === true;
-  const gate = computeNegoGate({
-    rounds,
-    vots,
-    takerId,
-    memberIds,
+  const { takerId, L, gate, vots, allMembersYes, membersPending, memberIds } = evaluateCandidacyVote({
+    attrs,
+    side: 'ask',
+    callerId,
+    clientIds,
     takerApplied: !assignedOffer,
+    now,
   });
 
-  const base = { assignedOffer, takerId, L, gate, vots };
+  const base = { assignedOffer, takerId, L, gate, vots, allMembersYes, membersPending, memberIds };
 
   if (attrs.archived === true) {
     return { allowed: false, reason: 'archived', ...base };
@@ -163,6 +132,9 @@ export function evaluateAskAcceptance({
   // candidate never saw. This is the same bar the timegrama finalizer applies.
   if (!gate.takerYes) {
     return { allowed: false, reason: 'awaitingAssigneeConsent', ...base };
+  }
+  if (!gate.clientYes) {
+    return { allowed: false, reason: 'awaitingClientConsent', ...base };
   }
 
   return { allowed: true, reason: 'ok', ...base };

@@ -12,6 +12,7 @@ import { resolvePrincipal, isConsensusRequest } from '$lib/server/authz/principa
 import { applyAuthz } from '$lib/server/authz/authorize.js'
 import { runSendGuards, filterSendResponse } from './guards.js'
 import { stampAuthor } from './authorIdentity.js'
+import { fetchWithConnectRetry } from '$lib/server/connectRetry.js'
 
 function normalizeSecret(value, name) {
 	let normalized = String(value ?? '').replace(/\s+/g, '');
@@ -267,16 +268,23 @@ export async function POST({ request, cookies, locals }) {
 	const fetchStartedAt = Date.now();
 
 	try {
-		const res = await fetch(ep, {
-			method: 'POST',
-			credentials: 'include',
-			body: JSON.stringify({ query, variables: variablesObject || {} }),
-			headers: {
-				'Content-Type': 'application/json',
-				Authorization: bearer1
+		// One more try when the connection never opened — nothing was sent, so it is safe
+		// even for a mutation (src/lib/server/connectRetry.js).
+		const res = await fetchWithConnectRetry(
+			fetch,
+			ep,
+			{
+				method: 'POST',
+				credentials: 'include',
+				body: JSON.stringify({ query, variables: variablesObject || {} }),
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: bearer1
+				},
+				signal: controller.signal
 			},
-			signal: controller.signal
-		});
+			{ onRetry: (err) => console.warn(`[${queId}] Strapi connect failed (${err?.cause?.code ?? err?.code}) — retrying once`) }
+		);
 
 		clearTimeout(timeoutId);
 		const elapsedMs = Date.now() - fetchStartedAt;

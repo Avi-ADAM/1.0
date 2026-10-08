@@ -13,6 +13,7 @@
   import CustomPurchaseCta from '$lib/components/hub/CustomPurchaseCta.svelte';
   import DemandMapTeaser from '$lib/components/hub/DemandMapTeaser.svelte';
   import ActionFeed from '$lib/components/hub/ActionFeed.svelte';
+  import HubNotices from '$lib/components/hub/HubNotices.svelte';
   import HubSkeleton from '$lib/components/hub/HubSkeleton.svelte';
   import FirstSteps from '$lib/components/hub/FirstSteps.svelte';
   import DailyBrief from '$lib/components/hub/DailyBrief.svelte';
@@ -186,13 +187,22 @@
         </section>
       {/snippet}
 
-      {#snippet feed()}
-        {#if summary.topFive.length > 0}
-          <section class="stagger" style="--i:5">
-            <h2 class="section-title">{$t('hub.nav.feed')}</h2>
-            <ActionFeed items={toFeedItems(summary.topFive)} />
-          </section>
-        {/if}
+      <!-- What waits for the member, said as sentences (PLAN_SMART_NOTICES §6.3):
+           the heart, the concierge and the deals in one list. The old feed stands
+           in until the heart's items have loaded. -->
+      {#snippet feed(i: number)}
+        <section class="stagger" style="--i:{i}">
+          <HubNotices pending={data.streamed.notices}>
+            {#snippet header()}
+              <h2 class="section-title">{$t('hub.nav.feed')}</h2>
+            {/snippet}
+            {#snippet fallback()}
+              {#if summary.topFive.length > 0}
+                <ActionFeed items={toFeedItems(summary.topFive)} />
+              {/if}
+            {/snippet}
+          </HubNotices>
+        </section>
       {/snippet}
 
       <HubHeader username={summary.username} profilePic={summary.profilePic} />
@@ -202,11 +212,13 @@
           <div class="space-y-6 min-w-0">
             {#if isNewUser}
               {@render firstSteps()}
+              <!-- A concierge customer can be "new" here and still have offers waiting. -->
+              {@render feed(2)}
             {:else}
               {@render urgent()}
               {@render kpi()}
-              {@render dailyBrief(3)}
-              {@render feed()}
+              {@render feed(3)}
+              {@render dailyBrief(4)}
             {/if}
           </div>
           <aside class="hub-side space-y-6 min-w-0">
@@ -223,6 +235,7 @@
         </div>
       {:else if isNewUser}
         {@render firstSteps()}
+        {@render feed(2)}
         <!-- No votes yet does not mean nothing to say: suggestions and
              what's new can already be waiting -->
         {@render dailyBrief(2)}
@@ -230,11 +243,11 @@
       {:else}
         {@render urgent()}
         {@render kpi()}
-        {@render dailyBrief(3)}
+        {@render feed(3)}
+        {@render dailyBrief(4)}
         {@render cta()}
         {@render demandMap(4)}
         {@render shortcutRow()}
-        {@render feed()}
       {/if}
     {:catch err}
       <p class="text-red-400 text-center p-8">שגיאה בטעינת הדף: {err.message}</p>

@@ -5,10 +5,13 @@ import { createUnregisteredBotAgent } from '../../../mastra/agents/nonreg-bot.ts
 import { DEFAULT_AGENT_MAX_STEPS } from '../../../mastra/lib/agent-response.ts';
 import { GEMINI_API_KEY } from '$env/static/private';
 import { setMcpContext, clearMcpContext } from '$lib/server/mcpContext';
+import { resolveChatIdentity } from '$lib/server/chatIdentity';
 
-export async function POST({ request, fetch, cookies }) {
+export async function POST({ request, fetch, locals }) {
   const { action, payload, user } = await request.json();
   const lang = user?.lang || 'he';
+  // Identity is the signed session only, never the body's `user.id`.
+  const { userId } = resolveChatIdentity(locals, user?.id);
 
   await locale.set(lang);
   await loadTranslations(lang);
@@ -44,14 +47,14 @@ export async function POST({ request, fetch, cookies }) {
     }
 
     // Handle registered user interactions
-    if (!user?.id) {
+    if (!userId) {
       return json({ error: t.get('bot.unauthorized') }, { status: 401 });
     }
 
     const registeredAgent = createEnhancedBotAgent(
       GEMINI_API_KEY,
       lang,
-      user.id
+      userId
     );
 
     // Build conversation history
@@ -67,9 +70,12 @@ export async function POST({ request, fetch, cookies }) {
     });
 
     // Set per-request context for tools to access
+    // The session door: tools read through /api/send as the cookie user rather
+    // than through the service token.
     setMcpContext({
       fetchInstance: fetch,
-      userId: user.id
+      userId,
+      isInternalBot: true
     });
 
     // Execute the agent with access to tools

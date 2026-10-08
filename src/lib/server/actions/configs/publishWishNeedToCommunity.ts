@@ -17,7 +17,9 @@
  */
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import { ActionError } from '../errors.js';
 import { matchOpenMissionToUsers, matchOpenMashaabimToUsers } from '$lib/server/matching/engine';
+import { resolveMissionSpec } from '$lib/server/mission/resolveMissionSpec.js';
 
 const RESOURCE_KINDOF = new Set(['monthly', 'perUnit', 'rent', 'total', 'yearly']);
 function mapKindOf(raw?: string | null): string {
@@ -55,6 +57,11 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
     // volunteer's proposal binds to the exact need regardless of later renames.
     extractedKey = null,
     skillNames = [],
+    // Catalogue ids the form already resolved (QA C-8): roles and work ways were
+    // never sent, so a need reached people by skill alone.
+    skillIds: givenSkillIds = [],
+    roleIds = [],
+    workwayIds = [],
     pendmId = null,
     pmashId = null,
     missionTemplateId = null,
@@ -85,6 +92,9 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
     isMust?: boolean;
     extractedKey?: string | null;
     skillNames?: string[];
+    skillIds?: string[];
+    roleIds?: string[];
+    workwayIds?: string[];
     pendmId?: string | null;
     pmashId?: string | null;
     missionTemplateId?: string | null;
@@ -141,24 +151,37 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
   }
   const location = Object.keys(loc).length ? loc : null;
 
+  // ── Already published? (QA C-10) ──────────────────────────────────────────
+  // A second press — a reload brought the button back — opened a second open
+  // mission for the same need, and a second fan-out of suggestions and mails.
+  // The same need (by its extracted id, else by name) is answered with the row
+  // that is already out there.
+  const existing = await findPublishedNeed(strapi, context, ratsonId, kind, extractedKey, name);
+  if (existing) {
+    return {
+      data: {
+        success: true,
+        ratsonId: String(ratsonId),
+        kind,
+        alreadyPublished: true,
+        ...(kind === 'mission' ? { openMissionId: existing } : { openMashaabimId: existing })
+      },
+      updateStrategy: { type: 'none' as const }
+    };
+  }
+
   // ── Mission ────────────────────────────────────────────────────────────────
   if (kind === 'mission') {
     // Resolve skill names → ids so the open mission carries matching dimensions
-    // (this is what makes it surface in matching users' suggestion feed).
-    let skillIds: string[] = [];
-    if (Array.isArray(skillNames) && skillNames.length) {
-      try {
-        const sRes = await strapi.execute(
-          '172resolveSkillsByName',
-          { names: skillNames },
-          context.jwt,
-          context.fetch
-        );
-        skillIds = (sRes?.data?.skills?.data ?? []).map((s: any) => String(s.id));
-      } catch (e) {
-        console.warn('[publishWishNeedToCommunity] skill resolve failed (non-fatal):', e);
-      }
-    }
+    // (this is what makes it surface in matching users' suggestion feed). Throws
+    // rather than publish a skill-less mission nobody will ever be matched to.
+    const idList = (v: unknown) => (Array.isArray(v) ? v.map(String).filter((x) => /^\d+$/.test(x)) : []);
+    const skills = await resolveNeedSkills(strapi, context, {
+      names: Array.isArray(skillNames) ? skillNames : [],
+      givenIds: idList(givenSkillIds),
+      missionName: name
+    });
+    const skillIds = skills.ids;
 
     const omRes = await strapi.execute(
       '169crWishOpenMission',
@@ -173,8 +196,8 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
         pendm: pendmId || null,
         mission: missionTemplateId || null,
         skills: skillIds,
-        tafkidims: [],
-        work_ways: [],
+        tafkidims: idList(roleIds),
+        work_ways: idList(workwayIds),
         // Branded as Concierge by the `source` enum (and the `ratson` relation).
         source: 'concierge',
         location,
@@ -193,14 +216,26 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
     await seedChat(strapi, context, ratAttrs, name);
 
     // Tag matching community members with a suggestion + email.
-    await matchOpenMissionToUsers(openMissionId, 'missionCreated', {
+    const matched = await matchOpenMissionToUsers(openMissionId, 'missionCreated', {
       strapi,
       fetch: context.fetch,
       lang: context.lang
     });
 
     return {
-      data: { success: true, ratsonId: String(ratsonId), kind, openMissionId, skillsMatched: skillIds.length },
+      data: {
+        success: true,
+        ratsonId: String(ratsonId),
+        kind,
+        openMissionId,
+        skillsMatched: skillIds.length,
+        // What the wisher is shown in the publish modal: the skills the mission
+        // really carries (canonical names, `created` for a new catalogue entry)
+        // and the ones that could not be attached at all.
+        skills: skills.attached,
+        skillsMissing: skills.missing,
+        usersMatched: matched?.created ?? 0
+      },
       updateStrategy: { type: 'none' as const }
     };
   }
@@ -247,17 +282,168 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
   await seedChat(strapi, context, ratAttrs, name);
 
   // Tag users who offer this resource with a suggestion + email.
-  await matchOpenMashaabimToUsers(openMashaabimId, 'resourceCreated', {
+  const matched = await matchOpenMashaabimToUsers(openMashaabimId, 'resourceCreated', {
     strapi,
     fetch: context.fetch,
     lang: context.lang
   });
 
   return {
-    data: { success: true, ratsonId: String(ratsonId), kind, openMashaabimId },
+    data: {
+      success: true,
+      ratsonId: String(ratsonId),
+      kind,
+      openMashaabimId,
+      // A resource is matched by its catalogue template, as a mission is by its
+      // skills: without one nobody holding the resource is ever told, so the
+      // modal says so instead of reporting a plain success.
+      templateId: mashaabimTemplateId ? String(mashaabimTemplateId) : null,
+      usersMatched: matched?.created ?? 0
+    },
     updateStrategy: { type: 'none' as const }
   };
 };
+
+// ── Skill resolution ─────────────────────────────────────────────────────────
+
+/**
+ * Extra attempts on top of StrapiClient's own read retry (~0.7s of backoff),
+ * which the 2026-10-07 outage outlasted — open mission 286 went out with none
+ * of its five skills and matched nobody.
+ */
+export const READ_RETRY_DELAYS_MS = [1000, 3000];
+
+async function retryRead<T>(label: string, read: () => Promise<T>): Promise<T> {
+  let lastErr: unknown;
+  for (let attempt = 0; attempt <= READ_RETRY_DELAYS_MS.length; attempt++) {
+    try {
+      return await read();
+    } catch (e) {
+      lastErr = e;
+      if (attempt === READ_RETRY_DELAYS_MS.length) break;
+      console.warn(`[publishWishNeedToCommunity] ${label} failed (attempt ${attempt + 1}), retrying:`, e);
+      await new Promise((r) => setTimeout(r, READ_RETRY_DELAYS_MS[attempt]));
+    }
+  }
+  throw lastErr;
+}
+
+export interface AttachedSkill {
+  id: string;
+  name: string;
+  /** Not in the catalogue before this publish — created now, in the default locale. */
+  created?: boolean;
+}
+
+/**
+ * Skill names (the AI's suggestions, or the chips the wisher kept) → ids.
+ *
+ * 1. Exact name lookup (`172resolveSkillsByName`), retried — it is a read.
+ *    A lookup that still fails is `SKILLS_UNAVAILABLE`: nothing was written yet,
+ *    so the client simply offers to try again.
+ * 2. Names the catalogue does not hold go through `resolveMissionSpec` — the same
+ *    path the mission form uses: a vector match catches a different spelling,
+ *    and what is really new is created via /api/vocab/create (default locale,
+ *    moderated, `createdBy: 'ai'`).
+ * 3. Whatever is still without an entry is returned as `missing`. If that leaves
+ *    the mission with no skill at all it is `SKILLS_NOT_ATTACHED` — never a
+ *    silent skill-less publish.
+ */
+export async function resolveNeedSkills(
+  strapi: any,
+  context: any,
+  { names, givenIds, missionName }: { names: unknown[]; givenIds: string[]; missionName: string }
+): Promise<{ ids: string[]; attached: AttachedSkill[]; missing: string[] }> {
+  const wanted: string[] = [];
+  const seen = new Set<string>();
+  for (const raw of names) {
+    const n = String(raw ?? '').trim();
+    const key = n.toLowerCase();
+    if (!n || seen.has(key)) continue;
+    seen.add(key);
+    wanted.push(n);
+  }
+  if (wanted.length === 0) return { ids: [...new Set(givenIds)], attached: [], missing: [] };
+
+  let rows: any[];
+  try {
+    rows = await retryRead('skill lookup', async () => {
+      const res = await strapi.execute('172resolveSkillsByName', { names: wanted }, context.jwt, context.fetch);
+      const list = res?.data?.skills?.data;
+      // No list at all is a failed read, not "none of these exist".
+      if (!Array.isArray(list)) throw new Error('172resolveSkillsByName returned no skills list');
+      return list;
+    });
+  } catch (e) {
+    console.error('[publishWishNeedToCommunity] skill lookup failed after retries:', e);
+    throw new ActionError('SKILLS_UNAVAILABLE', 'Could not read the skill catalogue; nothing was published', {
+      skills: wanted
+    });
+  }
+
+  const attached: AttachedSkill[] = [];
+  const found = new Set<string>();
+  for (const row of rows) {
+    const label = String(row?.attributes?.skillName ?? '').trim();
+    if (row?.id == null || !label) continue;
+    found.add(label.toLowerCase());
+    attached.push({ id: String(row.id), name: label });
+  }
+
+  const rest = wanted.filter((n) => !found.has(n.toLowerCase()));
+  let missing: string[] = [];
+  if (rest.length) {
+    try {
+      const lang = context.lang === 'en' || context.lang === 'ar' ? context.lang : 'he';
+      const r = await resolveMissionSpec({ name: missionName, skills: rest, lang }, context.fetch);
+      for (const t of r.skills.resolved) {
+        attached.push(t.created ? { id: t.id, name: t.name, created: true } : { id: t.id, name: t.name });
+      }
+      missing = r.skills.unresolved;
+    } catch (e) {
+      console.warn('[publishWishNeedToCommunity] creating new skills failed:', e);
+      missing = rest;
+    }
+  }
+
+  const unique = attached.filter((t, i) => attached.findIndex((o) => o.id === t.id) === i);
+  const ids = [...new Set([...givenIds, ...unique.map((t) => t.id)])];
+  if (ids.length === 0) {
+    throw new ActionError('SKILLS_NOT_ATTACHED', 'None of the skills could be attached; nothing was published', {
+      skills: missing
+    });
+  }
+  return { ids, attached: unique, missing };
+}
+
+/**
+ * The open mission / mashaabim this wish already published for the same need, or
+ * null. Best-effort: a failed read publishes (the pre-check never blocks a publish).
+ */
+async function findPublishedNeed(
+  strapi: any,
+  context: any,
+  ratsonId: string,
+  kind: 'mission' | 'resource',
+  extractedKey: string | null,
+  name: string
+): Promise<string | null> {
+  try {
+    const res = await retryRead<any>('published-need check', () =>
+      strapi.execute('416wishPublishedNeeds', { ratson: String(ratsonId) }, context.jwt, context.fetch)
+    );
+    const list: any[] = (kind === 'mission' ? res?.data?.openMissions?.data : res?.data?.openMashaabims?.data) ?? [];
+    const norm = (s: unknown) => String(s ?? '').trim().toLowerCase();
+    const hit =
+      (extractedKey != null && String(extractedKey) !== ''
+        ? list.find((n) => String(n?.attributes?.extractedKey ?? '') === String(extractedKey))
+        : null) ?? list.find((n) => norm(n?.attributes?.name) === norm(name));
+    return hit?.id != null ? String(hit.id) : null;
+  } catch (e) {
+    console.warn('[publishWishNeedToCommunity] could not check for an earlier publish:', e);
+    return null;
+  }
+}
 
 /**
  * Persist the stable extracted-need id onto the freshly published open mission /
@@ -335,6 +521,9 @@ export const publishWishNeedToCommunityConfig: ActionConfig = {
     isMust: { type: 'boolean', required: false },
     extractedKey: { type: 'string', required: false },
     skillNames: { type: 'array', required: false },
+    skillIds: { type: 'array', required: false },
+    roleIds: { type: 'array', required: false },
+    workwayIds: { type: 'array', required: false },
     pendmId: { type: 'string', required: false },
     pmashId: { type: 'string', required: false },
     missionTemplateId: { type: 'string', required: false },

@@ -1,0 +1,152 @@
+{
+  "entry": {
+    "deals": "Ofertas personales",
+    "salesCenter": "Oferta personal a un cliente",
+    "dealsHint": "Una oferta directa, con un enlace, para quien te contactó"
+  },
+  "wish": {
+    "banner": "Una oferta de {{name}}"
+  },
+  "page": {
+    "titleSuffix": "Oferta personal",
+    "from": "{{name}} preparó una oferta para ti",
+    "when": "Cuándo",
+    "where": "Dónde",
+    "online": "A distancia (en línea)",
+    "parts": "Qué incluye",
+    "hours": "{{count}} horas",
+    "qty": "× {{count}}",
+    "total": "Total",
+    "nextTitle": "Qué pasa cuando aceptas la oferta",
+    "next1": "La oferta se convierte en tu deseo. Puedes cambiar la descripción, las fechas y el lugar, y añadir las partes que falten.",
+    "next2": "En cada parte puedes aprobar lo que propuso {{name}}, o proponer otro precio u otro alcance. Se habla en el chat del deseo.",
+    "next3": "Nada se cierra y nada se paga hasta que ambas partes firmen la misma versión.",
+    "own": "Esta es tu propia oferta. Envía el enlace a la persona a quien va dirigida.",
+    "locked": "Esta oferta se envió a una dirección de correo concreta. Para aceptarla, entra con la cuenta de esa dirección.",
+    "take": "Aceptar la oferta",
+    "signup": "Continuar (registro corto)",
+    "login": "Ya tengo una cuenta",
+    "signupHint": "Registrarse es solo aceptar las condiciones. Después de confirmar tu correo vuelves aquí.",
+    "home": "Inicio",
+    "err": {
+      "SIGN_IN": "Entra en tu cuenta para aceptar la oferta.",
+      "FAILED": "No pudimos aceptar la oferta ahora. Inténtalo de nuevo en un momento.",
+      "OFFER_CLAIMED": "Esta oferta ya fue aceptada.",
+      "OFFER_CLOSED": "Esta oferta está cerrada.",
+      "OFFER_SELF": "Esta es tu propia oferta. Envía el enlace a la persona a quien va dirigida.",
+      "OFFER_EMAIL": "Esta oferta se escribió para otra dirección de correo. Entra con la cuenta a la que se envió.",
+      "INVALID_LINK": "Este enlace ya no es válido.",
+      "EXPIRED_LINK": "Este enlace ha caducado.",
+      "NOT_FOUND": "No se encontró la oferta."
+    },
+    "state": {
+      "invalid": {
+        "title": "El enlace no es válido",
+        "body": "Puede que se haya sustituido por uno nuevo o que se haya cerrado. Puedes pedir un enlace nuevo a quien te lo envió."
+      },
+      "unavailable": {
+        "title": "No pudimos cargar la oferta",
+        "body": "Inténtalo de nuevo en un momento."
+      },
+      "expired": {
+        "title": "El enlace ha caducado",
+        "body": "Puedes pedirle a {{name}} un enlace nuevo."
+      },
+      "taken": {
+        "title": "Esta oferta ya fue aceptada",
+        "body": "Si fuiste tú, entra con la cuenta que la aceptó."
+      },
+      "closed": {
+        "title": "Esta oferta está cerrada",
+        "body": "Puedes contactar con quien la envió."
+      }
+    }
+  },
+  "list": {
+    "title": "Ofertas personales",
+    "back": "Volver a los acuerdos",
+    "new": "Nueva oferta",
+    "intro": "¿Te contactaron directamente? Escribe una oferta con lo que harás y a qué precio, y envía un enlace. Quien la acepte recibe un deseo propio con todas las herramientas: chat, detalles exactos y negociación de cada parte.",
+    "loadFailed": "No pudimos cargar tus ofertas. Prueba a recargar.",
+    "empty": "Todavía no has escrito ninguna oferta.",
+    "for": "Para {{name}}",
+    "draft": "Borrador",
+    "sent": "Enlace enviado",
+    "claimed": "Aceptada {{when}}",
+    "closed": "Cerrada"
+  },
+  "compose": {
+    "title": "Nueva oferta personal",
+    "back": "Mis ofertas",
+    "intro": "Escribe la oferta tal como la acordasteis de palabra. Al guardar recibirás un enlace para enviar. Quien la acepte podrá cambiar detalles y proponer otra cosa en cada parte.",
+    "forWhom": "Para quién es la oferta",
+    "recipient": "Nombre o descripción breve",
+    "recipientHint": "Solo tú ves esto. Por ejemplo: \"Dana, una web para el estudio\".",
+    "email": "Correo (opcional)",
+    "emailHint": "Si lo rellenas, solo la cuenta con este correo podrá aceptar la oferta. La dirección en sí no se guarda.",
+    "what": "Qué ofreces",
+    "name": "Título",
+    "desc": "Descripción",
+    "start": "Desde",
+    "end": "Hasta",
+    "online": "Se puede hacer a distancia (en línea)",
+    "place": "Lugar",
+    "parts": "Partes y precio",
+    "partsHint": "Cada parte es una tarea (horas × precio por hora) o un recurso (cantidad × precio por unidad). Cada parte se puede negociar por separado.",
+    "missionName": "Tarea",
+    "hours": "Horas",
+    "rate": "Precio por hora",
+    "resourceName": "Recurso",
+    "qty": "Cantidad",
+    "unitPrice": "Precio por unidad",
+    "remove": "Quitar esta parte",
+    "addMission": "Tarea",
+    "addResource": "Recurso",
+    "total": "Total",
+    "save": "Guardar la oferta",
+    "saveHint": "Todavía no se envía nada. El enlace se crea en la pantalla siguiente.",
+    "err": {
+      "recipient": "Indica para quién es la oferta. Solo tú lo verás.",
+      "title": "La oferta necesita un título.",
+      "none": "Añade al menos una parte.",
+      "tooMany": "Demasiadas partes en una sola oferta.",
+      "name": "Cada parte necesita un nombre.",
+      "duplicate": "Dos partes del mismo tipo no pueden tener el mismo nombre.",
+      "amount": "Las horas, cantidades y precios deben ser números, y una parte no puede estar vacía.",
+      "failed": "No pudimos guardar la oferta. Inténtalo de nuevo."
+    }
+  },
+  "manage": {
+    "back": "Mis ofertas",
+    "shareText": "Te preparé una oferta: {{name}}",
+    "failed": "No funcionó, inténtalo de nuevo",
+    "copied": "Enlace copiado",
+    "copyFailed": "No se pudo copiar. Puedes seleccionarlo y copiarlo a mano.",
+    "saved": "Guardado",
+    "linkTitle": "El enlace a la oferta",
+    "linkHint": "Envía el enlace como prefieras. Quien lo abra verá la oferta y podrá aceptarla después de entrar en su cuenta.",
+    "copy": "Copiar",
+    "whatsapp": "WhatsApp",
+    "linkMade": "El enlace está listo",
+    "linkReplaced": "Se creó un enlace nuevo. El anterior ya no funciona.",
+    "linkClosed": "El enlace se cerró",
+    "newLink": "Enlace nuevo",
+    "closeLink": "Cerrar el enlace",
+    "newLinkHint": "Un enlace nuevo anula el anterior. Cerrarlo lo anula sin crear uno nuevo.",
+    "noLink": "Todavía no hay enlace. Cuando estés listo, créalo y envíalo.",
+    "makeLink": "Crear enlace",
+    "locked": "vinculada a un correo concreto",
+    "unlocked": "cualquiera con el enlace puede aceptarla",
+    "emailReplaceHint": "Un correo nuevo sustituye el vínculo. Dejarlo vacío no lo cambia.",
+    "save": "Guardar",
+    "unlock": "Quitar el vínculo",
+    "unlockedToast": "Se quitó el vínculo",
+    "cancel": "Cancelar",
+    "editRecipient": "Editar",
+    "claimedBody": "La oferta fue aceptada y ahora es el deseo del cliente. Cada parte se habla y se negocia desde allí. Tus partes esperan en la página de acuerdos.",
+    "toDeals": "A los acuerdos",
+    "toWish": "A la página del deseo",
+    "termsNote": "Mientras la oferta no sea aceptada, los detalles son tuyos: un cambio aquí no necesita la aprobación de nadie.",
+    "partsFixed": "Para cambiar las partes en sí, escribe una oferta nueva. Una vez aceptada, cada parte se negocia por separado."
+  }
+}

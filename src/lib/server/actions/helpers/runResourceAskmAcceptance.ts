@@ -8,6 +8,7 @@ import { bestEffort } from '$lib/server/resources/bookingStore.js';
 import { openGrantBooking } from '$lib/server/resources/grantBooking.js';
 import { execFromContext } from '$lib/server/archive/exec.js';
 import { bindStipendFunder, readStipendRequest } from '$lib/server/stipend/bindFunder.js';
+import { loadOfferDeal, fillOfferIntoDeal } from '$lib/server/deal/offerDeal.js';
 
 type StrapiExecutor = {
   execute: (
@@ -32,20 +33,41 @@ export type RunResourceAskmAcceptanceParams = {
   missionName: string;
   /** User who offered the resource (SP owner / askm requester). */
   acceptedUserId: string;
+  /** The rikma's members before this acceptance — pass the DB's list, it is written back whole. */
   existingMemberIds: string[];
+  /**
+   * The askm's vots to archive with. finalizeAskmAcceptance passes the DB's rows
+   * with the approver's yes already merged at the standing round
+   * (nego/candidacyVote.ts); rows keep their `order`.
+   */
   existingVotes?: unknown[];
   /** When Askm was created with archived=true + vots already set. */
   skipAskmArchive?: boolean;
 };
 
+/**
+ * Rows as the vots component takes them. `order` (and ide/zman/why) used to be
+ * dropped here, so archiving rewrote every vote of a renegotiated askm onto
+ * round 0 — the record of who signed which version was lost at the moment it
+ * mattered most.
+ */
 function normalizeVotes(existingVotes: unknown[]) {
-  return existingVotes.map((v: any) => ({
-    what: v.what ?? true,
-    users_permissions_user:
-      v.users_permissions_user?.data?.id ??
-      v.users_permissions_user?.id ??
-      v.users_permissions_user,
-  }));
+  return existingVotes.map((v: any) => {
+    const row: Record<string, unknown> = {
+      what: v.what ?? true,
+      users_permissions_user:
+        v.users_permissions_user?.data?.id ??
+        v.users_permissions_user?.id ??
+        v.users_permissions_user,
+      order: Number(v.order ?? 0),
+    };
+    if (v.ide != null && !Number.isNaN(Number.parseInt(String(v.ide), 10))) {
+      row.ide = Number.parseInt(String(v.ide), 10);
+    }
+    if (v.zman) row.zman = v.zman;
+    if (v.why) row.why = v.why;
+    return row;
+  });
 }
 
 /**
@@ -255,6 +277,15 @@ export async function runResourceAskmAcceptance(
     /* negotiated terms are best-effort; baseline materialization still works */
   }
 
+  // A gap of a customer's deal (QA C-19) — read after the agreed round was written onto
+  // the open resource, so its hm/price are the terms everyone signed. The gate that let
+  // this run already required the customer's yes; this read only feeds the deal.
+  const run = (qid: string, vars: Record<string, unknown>) => strapi.execute(qid, vars, jwt, fetchFn);
+  const offerDeal = await loadOfferDeal(run, 'resource', String(openMashaabimId)).catch((e: unknown) => {
+    console.error('runResourceAskmAcceptance: could not read the deal of the resource', e);
+    return null;
+  });
+
   const maapRes: any = await strapi.execute(
     '141createMaap',
     {
@@ -270,6 +301,14 @@ export async function runResourceAskmAcceptance(
     fetchFn
   );
   const maapId = maapRes?.data?.createMaap?.data?.id;
+
+  if (offerDeal && maapId) {
+    await fillOfferIntoDeal(run, offerDeal, {
+      takerId: String(acceptedUserId),
+      amount: offerDeal.offerAmount,
+      unitPrice: offerDeal.offerUnitPrice,
+    });
+  }
 
   const archiveRes: any = await strapi.execute(
     '131archiveOpenMashaabim',
@@ -371,10 +410,16 @@ export async function runResourceAskmAcceptance(
 
   if (!skipAskmArchive) {
     const existingVots = normalizeVotes(existingVotes);
-    const allVots = [
-      ...existingVots,
-      { what: true, users_permissions_user: String(context.userId) },
-    ];
+    // The approver's yes, unless it is already in the list (finalizeAskmAcceptance
+    // merges it at the standing round before calling) — a second row would count twice.
+    const me = String(context.userId);
+    const standing = existingVots.reduce((mx, v) => Math.max(mx, Number(v.order ?? 0)), 0);
+    const hasMine = existingVots.some(
+      (v) => String(v.users_permissions_user) === me && Number(v.order ?? 0) === standing && v.what === true
+    );
+    const allVots = hasMine
+      ? existingVots
+      : [...existingVots, { what: true, users_permissions_user: me, order: standing }];
     await strapi.execute(
       '132archiveAskmWithVotes',
       { id: askmId, vots: allVots },

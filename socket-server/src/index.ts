@@ -15,6 +15,7 @@ import { verifyToken, extractToken } from './auth.js';
 import { SessionManager } from './session-manager.js';
 import { verifyInviteToken, meetingRoom } from './guest-invite.js';
 import { registerP2pHandlers } from './p2p.js';
+import { checkInternalRequest, isInternalAuthConfigured } from './internal-auth.js';
 import type { AuthData, NotificationPayload, BroadcastRequest, SocketData } from './types.js';
 
 // Load environment variables
@@ -305,6 +306,20 @@ httpServer.on('request', async (req, res) => {
     return;
   }
   
+  // Server-to-server endpoints. This host is public (browsers open their
+  // sockets through it), so the caller must prove it is the SvelteKit server
+  // before it may push anything to anyone - see internal-auth.ts.
+  if (req.method === 'POST' && (req.url === '/broadcast' || req.url === '/space-changed')) {
+    const auth = checkInternalRequest(req);
+    if (!auth.ok) {
+      console.warn(`[HTTP] Refused ${req.url} (${auth.status}) from ${req.headers['x-real-ip'] ?? req.socket.remoteAddress}`);
+      res.writeHead(auth.status, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: auth.error }));
+      req.resume();
+      return;
+    }
+  }
+
   // Broadcast endpoint
   if (req.method === 'POST' && req.url === '/broadcast') {
     let body = '';
@@ -440,6 +455,9 @@ httpServer.listen(PORT, () => {
   console.log(`Health check: http://localhost:${PORT}/health`);
   console.log(`Stats: http://localhost:${PORT}/stats`);
   console.log(`Broadcast: POST http://localhost:${PORT}/broadcast`);
+  if (!isInternalAuthConfigured()) {
+    console.warn('[Server] SOCKET_BROADCAST_SECRET is not set - /broadcast and /space-changed will refuse every request');
+  }
   console.log('='.repeat(60));
 });
 

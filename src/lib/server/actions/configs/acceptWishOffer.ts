@@ -29,10 +29,11 @@
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { isTurnOf } from '$lib/wish/proposalRounds.js';
-import { entryInput, loadWishProposal, requireParty } from '$lib/server/wish/proposal.js';
+import { assertTermsSeen, entryInput, loadWishProposal, requireParty } from '$lib/server/wish/proposal.js';
 import { syncSlotToVersion } from '$lib/server/wish/placement.js';
 import { armProposalClock } from '$lib/server/wish/clock.js';
 import { silenceApplies } from '$lib/wish/restime.js';
+import { assertStandingRound } from '$lib/server/nego/candidacyVote.js';
 
 /** What the wish chat says when silence, not a person, approved the terms. */
 const AUTO_CHAT = 'התנאים שהוצעו אושרו אוטומטית — הצד השני לא השיב בזמן שנקבע למשאלה.';
@@ -62,6 +63,12 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
   }
   if (!p.slot || !p.path) throw new Error('This invitation has no slot to fill (missing recipe reference)');
 
+  // Signed from a notice: refuse terms that moved since they were shown (a counter
+  // in between is still "your move", but on different figures). PLAN_SMART_NOTICES §3.3.
+  assertStandingRound((params as any).expectRound, p.standing.round);
+  // …and a change of the wish's terms is not a round (PLAN_DIRECT_OFFER §4.3).
+  assertTermsSeen(params as any, p);
+
   // Your move only if the other side signed last.
   if (!isTurnOf(party, p.standing)) {
     throw new Error("You already stand behind the current terms — it is the other side's turn");
@@ -77,7 +84,9 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
     agree: true,
     submittedAt: now,
     ...(version.amount != null ? { willingHours: version.amount } : {}),
-    ...(version.price != null ? { willingAmount: version.price } : {})
+    ...(version.price != null ? { willingAmount: version.price } : {}),
+    // The wish's terms this approval stands behind (PLAN_DIRECT_OFFER §4.3).
+    termsDigest: p.signDigest
   };
   const log = [...p.entries.map(entryInput), approval];
 
@@ -267,7 +276,10 @@ export const acceptWishOfferConfig: ActionConfig = {
   paramSchema: {
     proposalId: { type: 'string', required: true },
     ratsonId: { type: 'string', required: true },
-    viaSilence: { type: 'boolean', required: false, description: 'Set by the silence clock when the silent side approves by default' }
+    viaSilence: { type: 'boolean', required: false, description: 'Set by the silence clock when the silent side approves by default' },
+    // The round a notice showed; ROUND_MOVED instead of signing newer terms (PLAN_SMART_NOTICES §3.3).
+    expectRound: { type: 'number', required: false },
+    expectTerms: { type: 'string', required: false },
   },
   authRules: [{ type: 'jwt', errorMessage: 'Must be logged in to approve a placement' }],
   updateStrategy: { type: 'none' }

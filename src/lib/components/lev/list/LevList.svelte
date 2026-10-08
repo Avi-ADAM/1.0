@@ -20,6 +20,8 @@
   import Filter from '../cards/filter.svelte';
   import FilterIcon from '$lib/celim/icons/filterIcon.svelte';
   import LevViewSwitch from '../LevViewSwitch.svelte';
+  import NoticeRow from '$lib/components/notices/NoticeRow.svelte';
+  import { applyDismissals, groupNotices, levNotices } from '$lib/notices';
   import '../cards/stylec.css';
 
   /**
@@ -36,7 +38,10 @@
    * @property {(payload: any) => void} [onStart] - a card finished with itself
    * @property {(payload: any) => void} [onShowonly] - filter panel selection
    * @property {() => void} [onShowall] - clear filters
-   * @property {(view: 'list' | 'cards' | 'coins') => void} [onView] - leave the list
+   * @property {(view: 'list' | 'notices' | 'cards' | 'coins') => void} [onView] - leave the list
+   * @property {'rows' | 'notices'} [variant] - condensed cards, or one sentence per item
+   *   (docs/inprogress/PLAN_SMART_NOTICES.md §6.4) — same items, same filter, same sheet
+   * @property {import('$lib/notices').NoticeDismissal[]} [dismissals] - what the member hid
    * @property {any[]} [uniqueProjects]
    * @property {Record<string, number>} [counts] - per-milon-key counts for the filter panel
    */
@@ -57,10 +62,46 @@
     onShowall,
     onView,
     uniqueProjects = [],
-    counts = {}
+    counts = {},
+    variant = 'rows',
+    dismissals = []
   } = $props();
 
   let rows = $derived(arr1.filter((item) => isCardVisible(item, milon)));
+
+  // ── the notices variant ──────────────────────────────────────────────────
+  // What she hid or restored in this visit, by key — kept apart from the
+  // derived list, which the feed re-emits on every socket message and clock tick.
+  /** @type {Record<string, boolean>} */
+  let overrides = $state({});
+  let showHidden = $state(false);
+  let notices = $derived(
+    variant === 'notices'
+      ? groupNotices(
+          applyDismissals(levNotices(rows), dismissals).map((n) =>
+            n.key in overrides ? { ...n, hidden: overrides[n.key] } : n
+          )
+        )
+      : []
+  );
+  let visibleNotices = $derived(notices.filter((n) => !n.hidden));
+  let hiddenNotices = $derived(notices.filter((n) => n.hidden));
+
+  /** @param {import('$lib/notices').Notice} n @param {boolean} hidden */
+  function markNotice(n, hidden) {
+    const next = { ...overrides };
+    for (const key of n.groupKeys ?? [n.key]) next[key] = hidden;
+    overrides = next;
+  }
+
+  /** "Expand" on the heart opens the item's own card, in place. */
+  /** @param {import('$lib/notices').Notice} n */
+  function expandNotice(n) {
+    if (n.expand.kind !== 'lev') return;
+    const want = n.expand.coinlapach;
+    const item = rows.find((r) => String(r.coinlapach) === want);
+    if (item) openRow(item);
+  }
 
   // The open card is tracked by id, not by object: the feed hands out a fresh
   // array on every socket message and clock-driven re-emit, so holding the item
@@ -123,7 +164,9 @@
 
 <div class="lev-list-root" dir={$isRtl ? 'rtl' : 'ltr'}>
   <header class="bar">
-    <span class="count">{$t('lev.list.count', { count: rows.length })}</span>
+    <span class="count"
+      >{$t('lev.list.count', { count: variant === 'notices' ? visibleNotices.length : rows.length })}</span
+    >
 
     <div class="bar-actions">
       <button
@@ -149,7 +192,7 @@
 
       <LevViewSwitch
         compact
-        value="list"
+        value={variant === 'notices' ? 'notices' : 'list'}
         onChange={(v) => onView?.(v)}
       />
     </div>
@@ -190,7 +233,27 @@
     </div>
   {/if}
 
-  {#if rows.length === 0}
+  {#if variant === 'notices'}
+    {#if visibleNotices.length === 0 && hiddenNotices.length === 0}
+      <p class="empty">{$t('lev.cards.nav.nothing')}</p>
+    {:else}
+      <div class="notice-scroller">
+        {#each visibleNotices as notice (notice.key)}
+          <NoticeRow {notice} onexpand={expandNotice} onhidden={(n) => markNotice(n, true)} />
+        {/each}
+        {#if hiddenNotices.length > 0}
+          <button type="button" class="hidden-toggle" aria-expanded={showHidden} onclick={() => (showHidden = !showHidden)}>
+            {$t('notices.ui.showHidden', { count: hiddenNotices.length })}
+          </button>
+          {#if showHidden}
+            {#each hiddenNotices as notice (notice.key)}
+              <NoticeRow {notice} onrestored={(n) => markNotice(n, false)} />
+            {/each}
+          {/if}
+        {/if}
+      </div>
+    {/if}
+  {:else if rows.length === 0}
     <p class="empty">{$t('lev.cards.nav.nothing')}</p>
   {:else}
     <div class="scroller" bind:this={scroller}>
@@ -308,6 +371,31 @@
     content-visibility: auto;
     contain-intrinsic-size: auto var(--lev-row-h);
     flex: none;
+  }
+
+  /* Notices take the height their sentence needs — no fixed row box here. */
+  .notice-scroller {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    padding: 0.6rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .hidden-toggle {
+    align-self: flex-start;
+    min-height: 36px;
+    padding: 4px 6px;
+    border: 0;
+    background: none;
+    font: inherit;
+    font-size: 13px;
+    color: #6b7280;
+    text-decoration: underline;
+    cursor: pointer;
   }
 
   .empty {

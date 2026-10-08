@@ -31,6 +31,7 @@ vi.mock('$lib/server/archive/exec.js', () => ({ execFromContext: () => vi.fn() }
 vi.mock('$lib/server/archive/dormancyClock.js', () => ({ touchDormancy: vi.fn(async () => null) }));
 
 import { timerSaveConfig } from './timerSave.js';
+import { run } from '$lib/server/archive/gql.js';
 
 const handler = timerSaveConfig.graphqlOperation as (
   params: Record<string, any>,
@@ -126,5 +127,55 @@ describe('timerSave — the note and the evidence follow the same rule', () => {
     const vars = timerWriteVars(strapi);
     expect(vars.saveText).toBe('closed the card');
     expect(vars.saveLinks).toBe('https://1lev1.com/pr/1');
+  });
+});
+
+/** Every qid the save sent that writes something. */
+function writes(strapi: { execute: ReturnType<typeof vi.fn> }) {
+  return strapi.execute.mock.calls.map((c) => c[0]).filter((qid: string) => qid !== '110getMissionForTimerSave');
+}
+
+describe('timerSave — the same hours are never filed twice', () => {
+  it('refuses a timer that is already saved, and writes nothing', async () => {
+    vi.mocked(run).mockResolvedValueOnce({
+      timer: { data: { attributes: { rate: 100, saved: true, totalHours: 2, timers: [], saveFiles: { data: [] } } } }
+    });
+    const strapi = fakeStrapi();
+    const res = await handler({ ...baseParams }, context, { strapi });
+    expect(res).toMatchObject({ success: true, alreadySaved: true });
+    expect(writes(strapi)).toEqual([]);
+  });
+
+  it('refuses to save blind when the timer cannot be read (a retry under a flaky Strapi)', async () => {
+    vi.mocked(run).mockRejectedValueOnce(new Error('ETIMEDOUT'));
+    const strapi = fakeStrapi();
+    await expect(handler({ ...baseParams }, context, { strapi })).rejects.toThrow(/nothing was saved/);
+    expect(strapi.execute).not.toHaveBeenCalled();
+  });
+
+  it('refuses a second save of the same timer while the first is still filing', async () => {
+    let release!: () => void;
+    const gate = new Promise<void>((r) => (release = r));
+    const slow = fakeStrapi();
+    slow.execute.mockImplementation(async (qid: string) => {
+      if (qid === '34UpdateTimer') await gate;
+      if (qid === '110getMissionForTimerSave') return missionResponse;
+      return { data: {} };
+    });
+    const first = handler({ ...baseParams }, context, { strapi: slow });
+
+    const retry = fakeStrapi();
+    await expect(handler({ ...baseParams }, context, { strapi: retry })).rejects.toThrow(/already being saved/);
+    expect(retry.execute).not.toHaveBeenCalled();
+
+    release();
+    await expect(first).resolves.toMatchObject({ success: true });
+    // …and once it is done, the timer is free again (the next save reads `saved`).
+    await expect(handler({ ...baseParams }, context, { strapi: fakeStrapi() })).resolves.toMatchObject({ success: true });
+  });
+
+  it('says where the hours went', async () => {
+    const res = await handler({ ...baseParams }, context, { strapi: fakeStrapi() });
+    expect(res).toMatchObject({ success: true, missionId: '42', filed: 'finnishedMission' });
   });
 });

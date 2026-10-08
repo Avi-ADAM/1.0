@@ -108,5 +108,10 @@
   "githubPull": "PR",
   "githubMerged": "Слит",
   "githubClosed": "Закрыт",
-  "githubNoMatch": "Нет подходящих issue или PR."
+  "githubNoMatch": "Нет подходящих issue или PR.",
+  "addManually": "Ввести часы вручную",
+  "manualEntryError": "Не удалось открыть ручной ввод. Ничего не сохранено, таймер не запущен.",
+  "manualEntryRetry": "Повторить",
+  "manualEntryOpening": "Открываем…",
+  "saving": "Сохраняем…"
 }

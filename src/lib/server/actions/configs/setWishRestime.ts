@@ -50,7 +50,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
     if (!path) continue;
     // Only proposals the two sides are already talking about have a clock to move.
     const proposerIds = (a.proposer_users?.data ?? []).map((u: any) => String(u.id));
-    const view = negotiationView(a, { wisherIds: owners, proposerIds }, 'wisher');
+    const view = negotiationView(a, { wisherIds: owners, proposerIds }, 'wisher', undefined, node.attributes?.terms_digest ?? null);
     if (!view || !silenceApplies(view.round)) continue;
     const due = proposalDeadline(lastSignedAt(a.ratson_willingness_entry, a.createdAt), value);
     if (!due) continue;

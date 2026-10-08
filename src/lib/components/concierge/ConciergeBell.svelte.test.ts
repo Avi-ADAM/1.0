@@ -27,7 +27,7 @@ describe('ConciergeBell — nothing waiting', () => {
     expect(queryByRole('region')).toBeNull();
 
     await fireEvent.click(getByRole('button'));
-    expect(getByText('concierge.no_notifications')).toBeTruthy();
+    expect(getByText('notices.bell.empty')).toBeTruthy();
     expect(container.querySelector('a')).toBeNull();
   });
 
@@ -35,7 +35,7 @@ describe('ConciergeBell — nothing waiting', () => {
     const { container, getByRole, getByText } = bell(undefined);
     expect(container.querySelector('.notif-pip')).toBeNull();
     await fireEvent.click(getByRole('button'));
-    expect(getByText('concierge.no_notifications')).toBeTruthy();
+    expect(getByText('notices.bell.empty')).toBeTruthy();
   });
 });
 
@@ -53,9 +53,9 @@ describe('ConciergeBell — offers waiting', () => {
     const links = [...container.querySelectorAll('a')];
     expect(links.map((a) => a.getAttribute('href'))).toEqual(['/concierge/7', '/concierge/9']);
     expect(getByText('A day off for mum')).toBeTruthy();
-    expect(getByText('concierge.pending_offers:2')).toBeTruthy();
+    expect(getByText('notices.bell.pendingOffers:2')).toBeTruthy();
     // A wish with no name still gets a row a customer can recognise as a wish.
-    expect(getByText('concierge.notif_untitled')).toBeTruthy();
+    expect(getByText('notices.bell.untitled')).toBeTruthy();
     expect(container.querySelector('.bell-empty')).toBeNull();
   });
 });
@@ -93,5 +93,156 @@ describe('ConciergeBell — closing', () => {
     expect(btn.getAttribute('aria-expanded')).toBe('false');
     await fireEvent.click(btn);
     expect(btn.getAttribute('aria-expanded')).toBe('true');
+  });
+});
+
+// ── notices (docs/inprogress/PLAN_SMART_NOTICES.md, stage 2) ────────────────────────
+
+import { wishNotice } from '$lib/notices';
+
+const offer = wishNotice(
+  {
+    viewer: 'wisher',
+    wish: { id: '7', name: 'Kitchen' },
+    proposal: {
+      id: '70',
+      status: 'suggested',
+      proposerName: 'Avi',
+      itemName: 'Plumbing',
+      itemKind: 'mission',
+      negotiation: { round: 0, yourTurn: true, amount: 6, price: 400, deadlineAt: null }
+    }
+  },
+  Date.parse('2026-10-05T10:00:00.000Z')
+)!;
+
+const withNotices = (notices: any, items?: { id: string; name: string; count: number }[]) =>
+  render(ConciergeBell, { props: { items, notices } });
+
+describe('ConciergeBell — notices', () => {
+  it('says each waiting thing as a sentence, with its terms and an expand into the wish', async () => {
+    const { container, getByRole, getByText } = withNotices([offer]);
+    expect(container.querySelector('.notif-pip')).not.toBeNull();
+
+    await fireEvent.click(getByRole('button'));
+    // People's words arrive wrapped in direction isolates (render.ts); compare without them.
+    expect(getByText((text) => text.replace(/[\u2068\u2069]/g, '') === 'notices.wish.offer:Avi,Plumbing,Kitchen')).toBeTruthy();
+    expect(getByText('lev.list.fact.hours:6')).toBeTruthy();
+    expect(getByText('lev.list.fact.price:400')).toBeTruthy();
+    const link = container.querySelector('a')!;
+    expect(link.getAttribute('href')).toBe('/concierge/7#proposal-70');
+    expect(link.textContent).toBe('notices.ui.expand');
+  });
+
+  it('an empty list means nothing waits — no dot, even when the old counts say otherwise', async () => {
+    // A countered proposal still counts as "pending" for the wish, but the move is
+    // the other side's: the bell must not call the customer for it.
+    const { container, getByRole, getByText } = withNotices([], [{ id: '7', name: 'Kitchen', count: 1 }]);
+    expect(container.querySelector('.notif-pip')).toBeNull();
+    await fireEvent.click(getByRole('button'));
+    expect(getByText('notices.bell.empty')).toBeTruthy();
+  });
+
+  it('notices that could not be read (null) fall back to the per-wish counts', async () => {
+    const { container, getByRole } = withNotices(null, [{ id: '7', name: 'Kitchen', count: 2 }]);
+    expect(container.querySelector('.notif-pip')).not.toBeNull();
+    await fireEvent.click(getByRole('button'));
+    expect(container.querySelector('a')!.getAttribute('href')).toBe('/concierge/7');
+  });
+
+  it('following a notice closes the panel', async () => {
+    const { container, getByRole, queryByRole } = withNotices([offer]);
+    await fireEvent.click(getByRole('button'));
+    const link = container.querySelector('a')!;
+    link.addEventListener('click', (e) => e.preventDefault());
+    await fireEvent.click(link);
+    expect(queryByRole('region')).toBeNull();
+  });
+});
+
+// ── approve and hide (PLAN_SMART_NOTICES stage 3) ────────────────────────────
+
+const { executeAction } = vi.hoisted(() => ({ executeAction: vi.fn() }));
+vi.mock('$lib/client/actionClient', () => ({ executeAction }));
+vi.mock('$app/navigation', () => ({ invalidateAll: vi.fn() }));
+
+const counter = wishNotice(
+  {
+    viewer: 'wisher',
+    wish: { id: '7', name: 'Kitchen' },
+    proposal: {
+      id: '71',
+      status: 'suggested',
+      proposerName: 'Avi',
+      itemName: 'Plumbing',
+      itemKind: 'mission',
+      negotiation: {
+        round: 1,
+        yourTurn: true,
+        amount: 8,
+        price: 520,
+        deadlineAt: '2026-10-07T12:00:00.000Z',
+        counters: [{ by: 'provider', note: 'More pipes' }]
+      }
+    }
+  },
+  Date.parse('2026-10-05T10:00:00.000Z')
+)!;
+
+const openBell = async (notices: any) => {
+  const r = render(ConciergeBell, { props: { items: [], notices } });
+  await fireEvent.click(r.container.querySelector('.notif-btn')!);
+  return r;
+};
+
+describe('ConciergeBell — approve from the notice', () => {
+  it('approve is the secondary action: it signs exactly what the notice shows, round included', async () => {
+    executeAction.mockResolvedValueOnce({ success: true, data: {} });
+    const { container, findByText } = await openBell([counter]);
+    const approve = container.querySelector('.nr-approve') as HTMLButtonElement;
+    expect(approve.textContent?.trim()).toBe('notices.ui.approve');
+    await fireEvent.click(approve);
+    expect(executeAction).toHaveBeenCalledWith(
+      'acceptRatsonProposal',
+      { proposalId: '71', ratsonId: '7', expectRound: 1 },
+      { showErrorToast: false }
+    );
+    expect(await findByText('notices.ui.signed')).toBeTruthy();
+    expect(container.querySelector('.nr-approve')).toBeNull();
+  });
+
+  it('says the terms moved instead of signing newer ones', async () => {
+    executeAction.mockResolvedValueOnce({ success: false, error: { code: 'ROUND_MOVED', message: 'moved' } });
+    const { container, findByText } = await openBell([counter]);
+    await fireEvent.click(container.querySelector('.nr-approve')!);
+    expect(await findByText('notices.ui.moved')).toBeTruthy();
+  });
+});
+
+describe('ConciergeBell — hide is not reject', () => {
+  it('warns that the clock keeps running before hiding a notice with a clock', async () => {
+    executeAction.mockReset();
+    executeAction.mockResolvedValue({ success: true, data: {} });
+    const { container, findByRole, getByText } = await openBell([counter]);
+    await fireEvent.click(container.querySelector('.nr-hide')!);
+    // Nothing hidden yet — first the warning.
+    expect(executeAction).not.toHaveBeenCalled();
+    expect((await findByRole('alert')).textContent).toContain('notices.ui.hideClock');
+
+    await fireEvent.click(getByText('notices.ui.hideConfirm'));
+    expect(executeAction).toHaveBeenCalledWith('dismissNotice', { noticeKey: 'wish:71:v1' });
+  });
+
+  it('a hidden notice leaves the list and the dot, and comes back from "show hidden"', async () => {
+    const { container, getByText, findByText } = await openBell([{ ...counter, hidden: true }]);
+    expect(container.querySelector('.notif-pip')).toBeNull();
+    expect(getByText('notices.bell.empty')).toBeTruthy();
+
+    executeAction.mockResolvedValueOnce({ success: true, data: {} });
+    await fireEvent.click(getByText('notices.ui.showHidden:1'));
+    await fireEvent.click(getByText('notices.ui.unhide'));
+    expect(executeAction).toHaveBeenCalledWith('restoreNotice', { noticeKey: 'wish:71:v1' });
+    await findByText('notices.ui.approve');
+    expect(container.querySelector('.notif-pip')).not.toBeNull();
   });
 });

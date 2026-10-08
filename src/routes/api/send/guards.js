@@ -18,7 +18,7 @@
 
 import { error } from '@sveltejs/kit';
 import { targetsOf, componentListsOf } from './qidTargets.js';
-import { enforceOwnership } from './ownership.js';
+import { enforceOwnership, OWNERSHIP, buildOwnershipQuery, collectPrincipals } from './ownership.js';
 import { enforceVoteIntegrity } from './voteIntegrity.js';
 
 /**
@@ -92,6 +92,81 @@ async function requireProjectMember(ctx, label, denial) {
   }
 }
 
+/**
+ * A self-only read: on the JWT path the user-id variable must be the verified
+ * caller. Service calls legitimately read on a member's behalf and pass.
+ *
+ * @param {string} variable  the qid's user-id variable (`uid`, `id`, …)
+ * @param {string} denial    the 403 message
+ * @returns {(ctx: SendGuardContext) => void}
+ */
+function pinToCaller(variable, denial) {
+  return ({ isSer, callerId, variablesObject }) => {
+    if (isSer) return;
+    if (!callerId) throw error(401, 'Unauthorized: No caller id');
+    if (String(variablesObject[variable]) !== String(callerId)) throw error(403, denial);
+  };
+}
+
+/**
+ * The rows a consensus-bridge `sourceType` can name. One negotiation card
+ * serves both a pending proposal and an open listing (negoPend under pmas and
+ * under the open-resource pages; negoM under pandingMesima and under the
+ * open-mission pages), so a type maps to every entity its `sourceId` may be.
+ */
+const BRIDGE_SOURCES = {
+  pmash: ['pmash', 'openMashaabim'],
+  mission: ['pendm', 'openMission'],
+  tosplit: ['tosplit']
+};
+
+/**
+ * Throw unless the caller is a party to the main-app object a bridged
+ * negotiation mediates: named on the row or a member of its rikma, by the
+ * same ownership rules the generic write guard uses.
+ *
+ * @param {SendGuardContext} ctx
+ * @param {unknown} sourceType
+ * @param {unknown} sourceId
+ */
+async function requireBridgeSourceParty(ctx, sourceType, sourceId) {
+  const { callerId, bearer1, ep, fetch: injected } = ctx;
+  if (!callerId) throw error(401, 'Unauthorized: No caller id');
+  const entities = BRIDGE_SOURCES[/** @type {keyof typeof BRIDGE_SOURCES} */ (String(sourceType))];
+  if (!entities || sourceId == null || sourceId === '') {
+    throw error(403, 'Forbidden: Unknown negotiation source');
+  }
+
+  const doFetch = injected || fetch;
+  for (const field of entities) {
+    const rule = OWNERSHIP[field];
+    let body;
+    try {
+      const res = await doFetch(ep, {
+        method: 'POST',
+        body: JSON.stringify({ query: buildOwnershipQuery(field, rule), variables: { id: String(sourceId) } }),
+        headers: { 'Content-Type': 'application/json', Authorization: bearer1 }
+      });
+      body = await res.json();
+    } catch (e) {
+      throw error(503, `Could not verify the negotiation source: ${e.message}`);
+    }
+    const row = body?.data?.[field]?.data;
+    if (row && collectPrincipals(row.attributes, row.id, rule).has(String(callerId))) return;
+  }
+  throw error(403, 'Forbidden: Not a party to this negotiation source');
+}
+
+/**
+ * A bridge lookup by `(sourceType, sourceId)`: only a party to the source
+ * object may find its discussion or read its signed resolution.
+ * @param {SendGuardContext} ctx
+ */
+async function bridgeSourceRead(ctx) {
+  if (ctx.isSer) return;
+  await requireBridgeSourceParty(ctx, ctx.variablesObject.sourceType, ctx.variablesObject.sourceId);
+}
+
 /** @type {Record<string, (ctx: SendGuardContext) => void | Promise<void>>} */
 const PRE_GUARDS = {
   // Co-member lookup is self-only on the JWT path. The qid takes `uid` from the
@@ -154,6 +229,20 @@ const PRE_GUARDS = {
       throw error(403, 'Forbidden: Can only read your own places');
     }
   },
+
+  // A member's missions in progress, with every timer and interval — what they
+  // work on, in which rikma, and when. The qid takes `id` from the client; every
+  // JWT caller (the timers store, the chat's timer editor, the internal bot)
+  // asks for its own, and the bots that act for a member use the service path.
+  '8getMissionsOnProgress': pinToCaller('id', 'Forbidden: Can only read your own missions in progress'),
+
+  // Which rikmot a member belongs to. Every JWT caller (the moach index, the
+  // internal bot's findUserProjects) asks for itself, so `uid` is pinned.
+  '64getUserProjectList': pinToCaller('uid', 'Forbidden: Can only list your own rikmot'),
+
+  // The sales center: products across the member's rikmot, their co-members and
+  // open sale claims. Only ever read for the signed-in seller.
+  'saleCenterUserProducts': pinToCaller('uid', 'Forbidden: Can only read your own sales center'),
 
   // Editing a position (UpdatePosition without support:true) is registered-user
   // only. Votes (support:true) are handled earlier by the idempotent-vote path
@@ -232,6 +321,60 @@ const PRE_GUARDS = {
     if (clauseAuthor == null || String(clauseAuthor) !== String(ownerExternalId)) {
       throw error(403, 'Forbidden: Not the clause author');
     }
+  },
+
+  // Consensus bridge (consensus1lev1 docs/main-repo-bridge-spec.md and
+  // main-repo-return-spec.md). Called from the consensus repo on the caller's
+  // own JWT, so membership is checked here, against the source object.
+  'GetNegotiationBySource': bridgeSourceRead,
+  'GetNegotiationResolutionBySource': bridgeSourceRead,
+
+  // Signing the bridge decision. The negotiation's own source decides who may
+  // sign — never the client's `resolution` blob, which must name that same
+  // source, since the source card reads it back by (sourceType, sourceId).
+  '43SetNegotiationResolution': async (ctx) => {
+    if (ctx.isSer) return;
+    const { variablesObject, bearer1, ep, fetch: injected } = ctx;
+    const id = variablesObject.id;
+    if (!id) throw error(400, 'Missing id for 43SetNegotiationResolution');
+
+    const doFetch = injected || fetch;
+    let body;
+    try {
+      const res = await doFetch(ep, {
+        method: 'POST',
+        body: JSON.stringify({
+          query: `query NegotiationSource($id: ID!) { negotiation(id: $id) { data { attributes { sourceType sourceId } } } }`,
+          variables: { id: String(id) }
+        }),
+        headers: { 'Content-Type': 'application/json', Authorization: bearer1 }
+      });
+      body = await res.json();
+    } catch (e) {
+      throw error(503, `Could not read the negotiation source: ${e.message}`);
+    }
+    const source = body?.data?.negotiation?.data?.attributes;
+    if (!source?.sourceType || !source?.sourceId) {
+      throw error(403, 'Forbidden: Only a bridged negotiation carries a resolution');
+    }
+
+    let resolution = variablesObject.resolution;
+    if (typeof resolution === 'string') {
+      try {
+        resolution = JSON.parse(resolution);
+      } catch {
+        throw error(400, 'Malformed resolution');
+      }
+    }
+    if (
+      resolution != null &&
+      (String(resolution.sourceType) !== String(source.sourceType) ||
+        String(resolution.sourceId) !== String(source.sourceId))
+    ) {
+      throw error(400, 'Resolution does not match the negotiation source');
+    }
+
+    await requireBridgeSourceParty(ctx, source.sourceType, source.sourceId);
   }
 };
 

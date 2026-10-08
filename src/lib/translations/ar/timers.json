@@ -108,5 +108,10 @@
   "githubPull": "PR",
   "githubMerged": "مدموج",
   "githubClosed": "مغلق",
-  "githubNoMatch": "لا يوجد issue أو PR مطابق."
+  "githubNoMatch": "لا يوجد issue أو PR مطابق.",
+  "addManually": "إدخال الساعات يدويًا",
+  "manualEntryError": "تعذّر فتح الإدخال اليدوي. لم يُحفظ شيء ولم يبدأ أي مؤقت.",
+  "manualEntryRetry": "إعادة المحاولة",
+  "manualEntryOpening": "جارٍ الفتح…",
+  "saving": "جارٍ الحفظ…"
 }

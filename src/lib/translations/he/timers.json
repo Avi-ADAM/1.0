@@ -108,5 +108,10 @@
   "githubPull": "PR",
   "githubMerged": "מוזג",
   "githubClosed": "נסגר",
-  "githubNoMatch": "אין issue או PR שמתאימים לחיפוש."
+  "githubNoMatch": "אין issue או PR שמתאימים לחיפוש.",
+  "addManually": "הזנת שעות ידנית",
+  "manualEntryError": "לא הצלחנו לפתוח הזנת שעות. דבר לא נשמר ושום טיימר לא הופעל.",
+  "manualEntryRetry": "לנסות שוב",
+  "manualEntryOpening": "פותח…",
+  "saving": "שומר…"
 }

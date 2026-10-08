@@ -1,0 +1,111 @@
+{
+  "format": "1lev1-consent-vectors",
+  "version": 1,
+  "file": "canonical",
+  "spec": "docs/SPEC_CONSENT_FORMAT.md",
+  "generator": "src/lib/consent/vectors/build.ts (npm run vectors:consent)",
+  "keyDerivation": "seed = SHA-256(UTF-8(\"1lev1-consent-v1/\" + label)); Ed25519 labels \"ed25519/<name>\", P-256 \"p256/<name>\", nonces \"nonce/<...>\" (first 16 bytes)",
+  "about": "Canonical JSON (SPEC_CONSENT_FORMAT §2). Parse `input` as JSON text, canonicalize, compare to `canonical`; sha256 is b64url(SHA-256(UTF-8(canonical))). Every `rejects` entry must fail (at parse or at canonicalization).",
+  "cases": [
+    {
+      "name": "key-order-basic",
+      "input": "{\"b\":1,\"a\":2}",
+      "canonical": "{\"a\":2,\"b\":1}",
+      "sha256": "02JqwwqH5vemQoIzs8aCmZdoZfpVCOQmfFQVx2r3p3I"
+    },
+    {
+      "name": "key-order-utf16-not-utf8",
+      "note": "U+1F600 is the surrogate pair D83D DE00, which sorts BEFORE U+E000 in UTF-16; in UTF-8 byte order it would sort after.",
+      "input": "{\"\":1,\"😀\":2}",
+      "canonical": "{\"😀\":2,\"\":1}",
+      "sha256": "KMldG7siCSIzB-YvSJAg6Pngz6Fq3y2vbYgSeh6N0io"
+    },
+    {
+      "name": "key-order-case-digits-empty",
+      "note": "Plain code-unit order: no numeric ordering of integer-like keys, uppercase before lowercase.",
+      "input": "{\"a\":1,\"B\":2,\"10\":3,\"9\":4,\"\":5}",
+      "canonical": "{\"\":5,\"10\":3,\"9\":4,\"B\":2,\"a\":1}",
+      "sha256": "206foN03FLeQU4mBk2xbV9qiW0dVrtVvSEQYioHbUGg"
+    },
+    {
+      "name": "whitespace-removed",
+      "input": "{ \"a\" : [ 1 , 2 ] ,\n \"b\" : { } }",
+      "canonical": "{\"a\":[1,2],\"b\":{}}",
+      "sha256": "jFR8znzLG4k1lHnAtxoKS2Ks_FSisngP00qut1-eRLc"
+    },
+    {
+      "name": "array-order-preserved",
+      "input": "[3,1,2]",
+      "canonical": "[3,1,2]",
+      "sha256": "Ub2nq05Ecmzecfy25LUVNXBZu2tt1RRtH8UPc_EWeMY"
+    },
+    {
+      "name": "nested",
+      "input": "{\"z\":{\"y\":[{\"b\":null,\"a\":true}],\"x\":false}}",
+      "canonical": "{\"z\":{\"x\":false,\"y\":[{\"a\":true,\"b\":null}]}}",
+      "sha256": "aFDtSnhxkO0Pf0LIZXnbCk9rgXULtH8TA_NerT5IbMc"
+    },
+    {
+      "name": "numbers-ecmascript",
+      "note": "Every number is an IEEE-754 double, printed by ECMAScript Number::toString. 9007199254740993 is not representable and parses to ...992 — a parser that keeps exact integers (serde_json u64) is non-conformant.",
+      "input": "[0,-0,1,-1,1.5,0.1,1e21,1e20,1e-7,1e-6,5e-324,1.7976931348623157e308,9007199254740993,0.30000000000000004,123456789012345680000,100,1E2]",
+      "canonical": "[0,0,1,-1,1.5,0.1,1e+21,100000000000000000000,1e-7,0.000001,5e-324,1.7976931348623157e+308,9007199254740992,0.30000000000000004,123456789012345680000,100,100]",
+      "sha256": "yL7dy9U2hGWTsQg5XjNiiVo8w7pmakMZB8A1_p5tlbM"
+    },
+    {
+      "name": "string-escapes",
+      "note": "Only \" \\ and U+0000–U+001F are escaped (short forms for \\b \\t \\n \\f \\r, lowercase \\u00xx otherwise). \"/\", DEL and U+2028 are emitted raw.",
+      "input": "\"\\u0000\\u0007\\b\\t\\n\\f\\r\\u001f\\\"\\\\\\/\\u007f é\"",
+      "canonical": "\"\\u0000\\u0007\\b\\t\\n\\f\\r\\u001f\\\"\\\\/ é\"",
+      "sha256": "sw76uPpCCjWQBNfv1b04VxWe--EpC2JfX6sRmEKVqfA"
+    },
+    {
+      "name": "nfc-string",
+      "note": "e + U+0301 COMBINING ACUTE becomes U+00E9 (ours — RFC 8785 has no normalization step).",
+      "input": "\"café\"",
+      "canonical": "\"café\"",
+      "sha256": "KDgP64ck1mm8jUz1taW7GtvcYbgevQbz-rxWe087D8U"
+    },
+    {
+      "name": "nfc-key-sorted-after-normalization",
+      "note": "The key is normalized to U+00E9 first and THEN sorted, so it lands after \"f\".",
+      "input": "{\"é\":1,\"f\":2}",
+      "canonical": "{\"f\":2,\"é\":1}",
+      "sha256": "cNPCeshZI0yBvP0BdcQAdI3YZw7By4mauMba2wdIiII"
+    },
+    {
+      "name": "hebrew-and-emoji",
+      "input": "{\"name\":\"רקמה 🎨\",\"n\":[]}",
+      "canonical": "{\"n\":[],\"name\":\"רקמה 🎨\"}",
+      "sha256": "8wqp5IOj0LcWerayQQxVPHfkKWm5VIZ2uYW42yhUHUs"
+    },
+    {
+      "name": "unicode-escapes-resolved",
+      "input": "\"רקמה\"",
+      "canonical": "\"רקמה\"",
+      "sha256": "rN3QsAwWI3R1yoFcLXT-bRjbjexuUVYw6tNpQWHJWKw"
+    }
+  ],
+  "rejects": [
+    {
+      "name": "lone-high-surrogate",
+      "note": "Not representable in strict UTF-8.",
+      "input": "\"\\ud800\""
+    },
+    {
+      "name": "lone-low-surrogate-in-key",
+      "note": "Keys are held to the same rule.",
+      "input": "{\"\\udc00\":1}"
+    },
+    {
+      "name": "nfc-duplicate-keys",
+      "note": "U+00E9 and e+U+0301 normalize to the same key.",
+      "input": "{\"é\":1,\"é\":2}"
+    },
+    {
+      "name": "non-finite-number",
+      "note": "1e400 overflows to Infinity.",
+      "input": "1e400"
+    }
+  ]
+}

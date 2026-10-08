@@ -1,0 +1,15 @@
+{
+  "name": "1lev1-video-tutorials",
+  "private": true,
+  "type": "module",
+  "description": "Replayable Playwright recordings of 1lev1 flows, for tutorial/promo videos (rendered with OpenMontage).",
+  "scripts": {
+    "login": "node login.mjs",
+    "record": "node record.mjs",
+    "inspect": "node inspect.mjs",
+    "action": "node action.mjs"
+  },
+  "devDependencies": {
+    "playwright": "^1.63.0"
+  }
+}

@@ -167,5 +167,7 @@
     "userProfileTitle": "Perfil de {{name}} | 1💗1"
   },
   "publicLinks": "Enlaces públicos",
-  "assignToMe": "Lo hago yo"
+  "assignToMe": "Lo hago yo",
+  "sessionCheckFailed": "No pudimos comprobar tu sesión ahora mismo — probablemente un fallo breve de red. Sigues conectado; inténtalo de nuevo.",
+  "retry": "Intentar de nuevo"
 }

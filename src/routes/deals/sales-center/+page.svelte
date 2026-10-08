@@ -209,9 +209,13 @@
       <h1 class="page-title">{$t('pages.salesCenter.title')}</h1>
       <p class="page-sub">{$t('pages.salesCenter.subtitle')}</p>
     </div>
-    <button class="new-btn" onclick={() => (creatingProduct = true)}>
-      <EntityIcon kind="add" size={15} /> {$t('pages.salesCenter.newProduct')}
-    </button>
+    <div class="top-actions">
+      <!-- A product for anyone, or a wish for one person (PLAN_DIRECT_OFFER). -->
+      <a class="new-btn new-btn--ghost" href="/deals/offers/new">{$t('directOffer.entry.salesCenter')}</a>
+      <button class="new-btn" onclick={() => (creatingProduct = true)}>
+        <EntityIcon kind="add" size={15} /> {$t('pages.salesCenter.newProduct')}
+      </button>
+    </div>
   </div>
 
   {#if openSaleClaims.length > 0}
@@ -462,6 +466,15 @@
   .new-btn:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+  }
+  .top-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .new-btn--ghost {
+    background: transparent;
+    text-decoration: none;
   }
 
   /* ── Claims banner ── */

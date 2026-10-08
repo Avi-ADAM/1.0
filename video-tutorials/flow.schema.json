@@ -1,0 +1,373 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "1lev1 recorded flow",
+  "description": "A replayable screen-recording script. One scene = one clip, recorded in a fresh browser of its session. See README.md.",
+  "type": "object",
+  "required": [
+    "id",
+    "title",
+    "scenes"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "kebab-case; names the out/<id>/ folder"
+    },
+    "title": {
+      "type": "string"
+    },
+    "audience": {
+      "type": "string"
+    },
+    "language": {
+      "type": "string"
+    },
+    "capture": {
+      "enum": [
+        "screencast",
+        "video"
+      ]
+    },
+    "timeout": {
+      "type": "number",
+      "description": "default per-step timeout, ms"
+    },
+    "defaults": {
+      "type": "object",
+      "properties": {
+        "viewport": {
+          "$ref": "#/$defs/viewport"
+        },
+        "scale": {
+          "type": "number",
+          "description": "output = viewport × scale (CSS zoom). 1280×720 × 1.5 = 1920×1080 with laptop layout"
+        },
+        "pace": {
+          "type": "number",
+          "description": "multiplies every pause; 1.3 = calmer"
+        },
+        "fps": {
+          "type": "number"
+        },
+        "css": {
+          "type": "string",
+          "description": "extra CSS injected into every page (e.g. hide a floating widget)"
+        },
+        "localStorage": {
+          "type": "object",
+          "additionalProperties": { "type": "string" },
+          "description": "localStorage items set before the site loads (a dismissed guide, the heart view a member picked)"
+        }
+      }
+    },
+    "vars": {
+      "type": "object",
+      "description": "${name} substitutions; ${RUN} is this run's stamp. save steps add more."
+    },
+    "warmup": {
+      "type": "array",
+      "description": "pages reached by clicking (not goto) to pre-compile in vite dev",
+      "items": {
+        "oneOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "session": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "scenes": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/scene"
+      }
+    }
+  },
+  "$defs": {
+    "viewport": {
+      "type": "object",
+      "required": [
+        "width",
+        "height"
+      ],
+      "properties": {
+        "width": {
+          "type": "number"
+        },
+        "height": {
+          "type": "number"
+        }
+      }
+    },
+    "scene": {
+      "type": "object",
+      "required": [
+        "id",
+        "session"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "chapter": {
+          "type": "string",
+          "description": "chapter marker / on-screen section title"
+        },
+        "session": {
+          "type": "string",
+          "description": "a key of sessions.json"
+        },
+        "narration": {
+          "type": "string",
+          "description": "voice-over for this scene; the edit fits the clip to it"
+        },
+        "record": {
+          "type": "boolean",
+          "description": "false = backstage: run the steps, film nothing"
+        },
+        "todo": {
+          "type": "string",
+          "description": "unfinished; skipped by record unless --dry"
+        },
+        "viewport": {
+          "$ref": "#/$defs/viewport"
+        },
+        "scale": {
+          "type": "number"
+        },
+        "pace": {
+          "type": "number"
+        },
+        "css": {
+          "type": "string"
+        },
+        "lead": {
+          "type": "number",
+          "description": "ms of still screen before the first step"
+        },
+        "tail": {
+          "type": "number",
+          "description": "ms of still screen after the last step"
+        },
+        "timeout": {
+          "type": "number"
+        },
+        "setup": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/step"
+          },
+          "description": "runs before the camera rolls"
+        },
+        "steps": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/step"
+          }
+        }
+      }
+    },
+    "target": {
+      "description": "prefer role+name, then text/label/placeholder, then testid, css last",
+      "oneOf": [
+        {
+          "type": "string",
+          "description": "raw Playwright selector"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "role": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string",
+              "description": "\"/regex/i\" allowed"
+            },
+            "level": {
+              "type": "number"
+            },
+            "text": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string"
+            },
+            "placeholder": {
+              "type": "string"
+            },
+            "testid": {
+              "type": "string"
+            },
+            "css": {
+              "type": "string"
+            },
+            "exact": {
+              "type": "boolean"
+            },
+            "hasText": {
+              "type": "string"
+            },
+            "nth": {
+              "type": "number"
+            },
+            "last": {
+              "type": "boolean"
+            },
+            "within": {
+              "$ref": "#/$defs/target"
+            },
+            "any": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/target"
+              },
+              "description": "first alternative that becomes visible"
+            }
+          }
+        }
+      ]
+    },
+    "step": {
+      "type": "object",
+      "required": [
+        "do"
+      ],
+      "properties": {
+        "do": {
+          "enum": [
+            "goto",
+            "reload",
+            "click",
+            "hover",
+            "check",
+            "type",
+            "fill",
+            "select",
+            "upload",
+            "press",
+            "scroll",
+            "wait",
+            "waitFor",
+            "waitForUrl",
+            "highlight",
+            "save",
+            "assert",
+            "screenshot",
+            "mark"
+          ]
+        },
+        "target": {
+          "$ref": "#/$defs/target"
+        },
+        "url": {
+          "type": "string"
+        },
+        "text": {
+          "type": "string"
+        },
+        "key": {
+          "type": "string"
+        },
+        "match": {
+          "type": "string",
+          "description": "waitForUrl regex"
+        },
+        "ms": {
+          "type": "number"
+        },
+        "y": {
+          "type": "number"
+        },
+        "block": {
+          "enum": [
+            "start",
+            "center",
+            "end",
+            "nearest"
+          ]
+        },
+        "delay": {
+          "type": "number",
+          "description": "type: ms per character"
+        },
+        "clear": {
+          "type": "boolean"
+        },
+        "value": {},
+        "label": {
+          "type": "string"
+        },
+        "files": {},
+        "as": {
+          "type": "string"
+        },
+        "fromUrl": {
+          "type": "string"
+        },
+        "fromText": {
+          "$ref": "#/$defs/target"
+        },
+        "fromAttr": {
+          "type": "object"
+        },
+        "regex": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "mark": {
+          "type": "string",
+          "description": "a named moment narration/captions can sync to"
+        },
+        "note": {
+          "type": "string"
+        },
+        "pause": {
+          "type": "number",
+          "description": "ms to hold after this step (overrides the default for its kind)"
+        },
+        "dwell": {
+          "type": "number",
+          "description": "ms the cursor rests on the target before acting"
+        },
+        "timeout": {
+          "type": "number"
+        },
+        "optional": {
+          "type": "boolean",
+          "description": "a failure skips the step instead of stopping the run"
+        },
+        "force": {
+          "type": "boolean"
+        },
+        "commits": {
+          "type": "boolean",
+          "description": "this step writes (publish, approve, pay) — a mid-take reload after it stops the run instead of retaking"
+        },
+        "navigates": {
+          "type": "boolean",
+          "description": "this click leaves the page with a full load, so a Vite reconnect is expected"
+        },
+        "acceptDialog": {
+          "type": "boolean",
+          "description": "click: accept the native confirm() it opens"
+        }
+      }
+    }
+  }
+}

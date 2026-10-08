@@ -22,6 +22,8 @@
  * the same turn rules from here.
  */
 
+import { signedUnderOtherTerms } from './termsDigest';
+
 export interface WillingnessEntry {
   /** Strapi shape `{ data: { id } }`, a bare id, or a populated `{ id }`. */
   user?: unknown;
@@ -32,6 +34,8 @@ export interface WillingnessEntry {
   willingAmount?: number | null;
   item_kind?: string | null;
   item_idx?: number | null;
+  /** The wish's terms when this was signed (`$lib/wish/termsDigest`); absent on older entries. */
+  termsDigest?: string | null;
 }
 
 /** The two parties of a proposal. */
@@ -154,7 +158,8 @@ function signatures(ref: ProposalRef, entries: WillingnessEntry[] | null | undef
             counter: e.agree === false,
             version: entryVersion(e),
             note: (e.note ?? '').trim(),
-            at: e.submittedAt ?? null
+            at: e.submittedAt ?? null,
+            digest: e.termsDigest ?? null
           }
         : null;
     })
@@ -170,23 +175,42 @@ export interface Standing {
   round: number;
   /** Every counter, oldest first — the negotiation as the card tells it. */
   counters: Round[];
+  /**
+   * The wisher changed the wish's terms (description, place, dates) after the last
+   * signature — PLAN_DIRECT_OFFER §4.3. That is her new version: she signed it by
+   * making it, and it is the provider's move.
+   */
+  termsChanged: boolean;
 }
 
 /**
  * Where the negotiation stands. `current` is the version the proposal carries now
  * (a counter rewrites it, so it is always the version on the table). Whoever wrote
  * the last entry signed it last; with no entries it is whoever opened the proposal.
+ *
+ * `termsDigest` is the wish's terms now (`Ratson.terms_digest`). When the last
+ * signature was made under other terms, the wisher has moved since, whoever signed
+ * last. Left out, or on entries from before the digests, nothing changes.
  */
-export function standing(ref: ProposalRef, entries: WillingnessEntry[] | null | undefined, current: Version): Standing {
+export function standing(
+  ref: ProposalRef,
+  entries: WillingnessEntry[] | null | undefined,
+  current: Version,
+  termsDigest?: string | null
+): Standing {
   let signedBy: Party = ref.openedBy;
+  let lastDigest: string | null = null;
   const counters: Round[] = [];
   for (const s of signatures(ref, entries)) {
     if (s.counter) {
       counters.push({ round: counters.length + 1, by: s.by, userId: s.userId, version: s.version, note: s.note, at: s.at });
     }
     signedBy = s.by;
+    lastDigest = s.digest;
   }
-  return { version: current, signedBy, round: counters.length, counters };
+  const termsChanged = signedUnderOtherTerms(lastDigest, termsDigest);
+  if (termsChanged) signedBy = 'wisher';
+  return { version: current, signedBy, round: counters.length, counters, termsChanged };
 }
 
 export const otherParty = (p: Party): Party => (p === 'wisher' ? 'provider' : 'wisher');

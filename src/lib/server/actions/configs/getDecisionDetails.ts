@@ -12,6 +12,9 @@
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { effectiveLicense, isDelayedLicense } from '$lib/codeLicense/codeLicense.js';
+import { readIdentity, type Run } from '$lib/server/rikmaIdentity/identity.js';
+import { displayAddress, rikmaPath } from '$lib/rikmaAddress/rikmaUrl.js';
+import { parseLook } from '$lib/rikmaLook/look.js';
 
 const RESTIME_LABELS: Record<string, { he: string; en: string }> = {
   feh:    { he: '48 שעות', en: '48 hours' },
@@ -31,6 +34,8 @@ const KIND_LABELS: Record<string, { he: string; en: string }> = {
   vallueles: { he: 'הסרת ערכים', en: 'Removing values' },
   pic:       { he: 'שינוי לוגו הפרויקט', en: 'Project logo change' },
   codeLicense: { he: 'שינוי רישיון הקוד', en: 'Code license change' },
+  address:   { he: 'כתובת חדשה לרקמה', en: 'A new address for the rikma' },
+  look:      { he: 'מראה חדש לדף הציבורי', en: 'A new look for the public page' },
 };
 
 const LICENSE_LABELS: Record<string, { he: string; en: string }> = {
@@ -66,6 +71,46 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
 
   const kind: string = decAttrs.kind ?? 'unknown';
   const fieldLabel = KIND_LABELS[kind] ?? { he: kind, en: kind };
+
+  // PLAN_RIKMA_SUBDOMAINS — read apart from 161, which does not select the
+  // new fields (and must keep working on a backend that lacks them).
+  const kindRes = kind === 'address' || kind === 'look'
+    ? await strapi.execute('rikmaIdentityDecision', { id: String(decisionId) }, undefined, context.fetch).catch(() => null)
+    : null;
+  const idDec = kindRes?.data?.decision?.data?.attributes;
+  const onThisRikma = (idDec?.projects?.data ?? []).some((p: any) => String(p.id) === String(projectId));
+  if (onThisRikma && (idDec.kind === 'address' || idDec.kind === 'look')) {
+    const read: Run = (qid, vars) => strapi.execute(qid, vars, undefined, context.fetch);
+    const current = await readIdentity(read, String(projectId));
+    const base = rikmaPath({ id: projectId, slug: current?.slug });
+    if (idDec.kind === 'address') {
+      return {
+        data: {
+          kind: 'address',
+          fieldLabel: KIND_LABELS.address,
+          currentValue: current?.slug ? displayAddress(current.slug) : '',
+          newValue: idDec.newSlug ? displayAddress(idDec.newSlug) : '',
+        },
+        updateStrategy: { type: 'none' },
+      };
+    }
+    const proposed = parseLook(idDec.newLook);
+    return {
+      data: {
+        kind: 'look',
+        fieldLabel: KIND_LABELS.look,
+        currentValue: '',
+        newValue: '',
+        look: proposed
+          ? { focus: proposed.focus, hue: proposed.style.hue, hue2: proposed.style.hue2, cover: proposed.media.cover?.url ?? null }
+          : null,
+        // The public page renders the proposal for members only (loadRikmaPage).
+        previewHref: `${base}?lookPreview=${encodeURIComponent(String(decisionId))}`,
+      },
+      updateStrategy: { type: 'none' },
+    };
+  }
+
 
   let currentValue = '';
   let newValue = '';

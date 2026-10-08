@@ -27,7 +27,8 @@
     "missionCompleted": "Mission completed and recorded in the rikma",
     "uploadFailed": "The file upload failed, please try again",
     "awaitingApproval": "awaiting approval",
-    "awaitingApprovalHint": "Already submitted and waiting for the rikma members to approve"
+    "awaitingApprovalHint": "Already submitted and waiting for the rikma members to approve",
+    "hoursAwaitingApprovalHint": "The saved hours are waiting for the rikma members to approve them"
   },
   "split": {
     "calc": "Split Calculator",
@@ -267,19 +268,26 @@
   },
   "tour": {
     "badge": "A rikma is a collaboration group - everyone contributes their skills and earns according to their contribution",
-    "members": "Rikma members - a pulsing green ring means a member is currently working for the rikma. Click a photo to visit their profile",
-    "tabsIntro": "The tabs are the management hub of the rikma - each tab shows a different aspect of the rikma",
-    "create": "📋 Create: add missions and request resources (money, gear, info) - for existing members or to find new partners. Every published mission or resource gets a unique shareable link with a beautiful page optimized for social networks and partner recruitment",
-    "progress": "🔄 Progress: list of all active missions - who is working on what and at which stage",
-    "acts": "✅ Acts & Tasks: manage small tasks - what is done, what is on the way",
-    "timers": "⏱️ Timers: see when each member was active for the project and what they worked on. When a member starts a timer, a green ring appears around their avatar above",
-    "wishes": "💌 Incoming Wishes: warm leads from concierge customers that your project is a match for - ready business opportunities",
-    "sales": "🛒 Sales & Products: Simple product = fixed price. Complex product = price shaped by missions, resources and decisions made together during the purchase process. Every product gets a beautiful shareable page optimized for social media and attracting customers",
-    "split": "💰 Split: revenue-split calculator - everyone gets paid according to their contribution",
-    "votes": "🗳️ Votes: decisions made through consensus - unique negotiation tools until everyone is genuinely happy with the outcome. Not majority vote, but real agreement from all rikma members",
-    "chains": "🔗 Chains: every mission and resource across its entire lifecycle - from the opening proposal through voting all the way to the archive. Full transparency and deep understanding of every project process",
-    "gantt": "📊 Gantt & Kanban: visual project management and timeline",
-    "helpBtn": "Show guide again"
+    "tools": "The rikma's tools:\n• Public profile - the page everyone sees\n• Address & look - the address and design of the public page\n• Edit details (the pencil) - name, description, links and rikma settings\nIf the rikma has social links (Discord, WhatsApp, website...), they appear here too",
+    "members": "Rikma members - a pulsing green ring around a photo means that partner is working for the rikma right now. Click a photo to open their profile",
+    "create": "➕ Create: add missions and request resources (money, gear, info) - for the current partners, or to find new ones. Every published mission or resource gets its own beautiful share page, made for social networks\n🤖 You can also let AI create missions automatically: write where you want the rikma to grow and it breaks that into missions, or let it scan the rikma and spot what it needs on its own. Nothing is created until you approve",
+    "nav": "The menu has six groups. Clicking a group opens a row of tabs under it, and the brain remembers which tab you were on in each group",
+    "group": {
+      "main": "🏠 Main\n• Main - the rikma at a glance\n• Shared info - the rikma's library: documents, files and links every partner needs",
+      "work": "🛠️ Work\n• Progress - the active missions: who is working on what, and at which stage\n• Acts - the small tasks inside the missions\n• Kanban and Gantt - visual management and timeline\n• Timers - when each partner worked and on what. A running timer = a green ring around their photo above\n• Shifts - staffing missions that need someone at fixed hours",
+      "flows": "🔗 Flows\n• Processes - things the rikma is pursuing that aren't a mission yet, each with its own conversation\n• Chains - every mission and resource across its whole life: from the proposal, through the vote, to the archive\n• API - outside systems that send work to the rikma\n• Code - the code repositories connected to the rikma",
+      "money": "💰 Money\n• Sales - products and reported sales. Simple product = fixed price, complex product = a price shaped together with the customer. Every product gets its own share page\n• Split - the revenue split: everyone gets paid according to what they contributed\n• Stipends - one partner funding another partner's living costs while they work",
+      "opps": "✨ Opportunities\n• Incoming wishes - warm leads from concierge customers the rikma is a match for\n• Open for partners - the missions and resources the rikma is still looking for\n• Resource calendar - what the rikma already holds, and until when\n• Demand map - what people around you are looking for and offering\nThe number on the group = wishes waiting for an answer",
+      "votes": "🗳️ Votes\n• Votes - decisions by agreement, not by majority: approve, talk it through, or make a counter-proposal until everyone signs the same version. Staying silent until the rikma's clock runs out counts as agreeing\n• Archive - everything already decided\nThe number on the group = open votes in the rikma"
+    },
+    "help": "That's it! You can come back to this guide any time with the ? button",
+    "helpBtn": "Show guide again",
+    "next": "Next",
+    "back": "Back",
+    "done": "Done",
+    "skip": "Skip",
+    "stepOf": "{{current}} of {{total}}",
+    "label": "Rikma brain guide"
   },
   "list": {
     "myProjects": "My rikmas",

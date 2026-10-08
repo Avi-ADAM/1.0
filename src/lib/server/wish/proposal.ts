@@ -15,6 +15,8 @@ import {
   type Version,
   type WillingnessEntry
 } from '$lib/wish/proposalRounds.js';
+import { termsDigest } from './termsDigest.js';
+import { ActionError } from '../actions/errors.js';
 
 type Strapi = { execute: (qid: string, vars: any, jwt: string, fetch: any) => Promise<any> };
 type Ctx = { userId: string; jwt: string; fetch: any };
@@ -38,7 +40,24 @@ export interface WishProposal {
   version: Version;
   entries: WillingnessEntry[];
   standing: Standing;
+  /**
+   * The digest of the wish's terms that a signature made now stands behind
+   * (PLAN_DIRECT_OFFER §4.3) — stamp it on every entry this action writes.
+   */
+  signDigest: string;
 }
+
+/**
+ * The digest a signature records: the wish's stored one, or — while nobody has
+ * edited its terms since digests began — the digest of the terms as they stand.
+ * `ratsonAttrs` must be qid 105's, which carries every field the digest is made of.
+ */
+export function signDigestOf(ratsonAttrs: any): string {
+  return ratsonAttrs?.terms_digest || termsDigest(ratsonAttrs ?? {});
+}
+
+/** The wish's terms now, for `standing`: only a stored digest can make a signature stale. */
+export const wishDigestOf = (ratsonAttrs: any): string | null => ratsonAttrs?.terms_digest || null;
 
 /** What the proposal currently says: hours (or quantity) and price of its one slot. */
 export function coveredVersion(attrs: any): { slot: WishProposal['slot']; version: Version } {
@@ -113,8 +132,27 @@ export async function loadWishProposal(
     slot,
     version,
     entries,
-    standing: standing(ref, entries, version)
+    standing: standing(ref, entries, version, wishDigestOf(ratsonAttrs)),
+    signDigest: signDigestOf(ratsonAttrs)
   };
+}
+
+/**
+ * An approval made from a notice (`expectRound` set) is pinned to the round it was
+ * shown at — but a change of the wish's terms is not a round. When the terms changed
+ * since the last signature, such an approval must also name the terms it saw
+ * (`expectTerms`), or it is refused like a moved round: nobody signs a deadline they
+ * were never shown. From the wish page itself (no `expectRound`) nothing changes.
+ */
+export function assertTermsSeen(params: { expectRound?: unknown; expectTerms?: unknown }, p: WishProposal): void {
+  const fromNotice = params.expectRound !== undefined && params.expectRound !== null && params.expectRound !== '';
+  if (!fromNotice || !p.standing.termsChanged) return;
+  if (params.expectTerms && String(params.expectTerms) === wishDigestOf(p.ratsonAttrs)) return;
+  throw new ActionError(
+    'ROUND_MOVED',
+    'The wish changed since you signed — open it to see the new terms',
+    { termsChanged: true }
+  );
 }
 
 /** Which party the caller is in this proposal — or throw. */
@@ -136,6 +174,9 @@ export function entryInput(e: WillingnessEntry) {
     ...(e.note ? { note: e.note } : {}),
     ...(e.submittedAt ? { submittedAt: e.submittedAt } : {}),
     ...(typeof e.willingHours === 'number' ? { willingHours: e.willingHours } : {}),
-    ...(typeof e.willingAmount === 'number' ? { willingAmount: e.willingAmount } : {})
+    ...(typeof e.willingAmount === 'number' ? { willingAmount: e.willingAmount } : {}),
+    // Every write rewrites the whole log: drop this and each new signature would
+    // erase the terms the earlier ones were made under.
+    ...(e.termsDigest ? { termsDigest: e.termsDigest } : {})
   };
 }

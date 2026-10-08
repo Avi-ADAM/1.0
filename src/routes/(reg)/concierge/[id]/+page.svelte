@@ -12,9 +12,32 @@
   import { refuseCounter as refuseProposalCounter } from '$lib/wish/proposalRounds';
   import ExternalOfferCard from '$lib/components/concierge/ExternalOfferCard.svelte';
   import ConciergeBell from '$lib/components/concierge/ConciergeBell.svelte';
+  import DealStages from '$lib/components/deals/DealStages.svelte';
+  import { lineIsPart } from '$lib/wish/lineNames';
+  import WishTermsEditor from '$lib/components/concierge/WishTermsEditor.svelte';
+  import { tick } from 'svelte';
+  import { page } from '$app/state';
 
-  /** @type {{ data: { wish: any | null; proposals: any[]; loadOk: boolean; uid?: string; isOwner: boolean; enrichment?: any; forumMessages?: any[]; missionTemplates?: any[]; external?: any; bell?: { id: string; name: string; count: number }[] } }} */
+  /** @type {{ data: { wish: any | null; proposals: any[]; loadOk: boolean; uid?: string; isOwner: boolean; enrichment?: any; forumMessages?: any[]; missionTemplates?: any[]; external?: any; bell?: { id: string; name: string; count: number }[]; notices?: import('$lib/notices').Notice[] | null; published?: { missions: { name: string; extractedKey: string | null }[]; resources: { name: string; extractedKey: string | null }[] }; gaps?: { label: string; imp: 'must' | 'nice' }[] | null; stages?: import('$lib/sheirut/dealChain').DealStageView[]; partLines?: Record<string, string[]> | null } }} */
   let { data } = $props();
+
+  // The bell's "expand" (docs/inprogress/PLAN_SMART_NOTICES.md) links to #proposal-<id>.
+  // The proposal cards render after SvelteKit's own scroll-to-hash has run, so
+  // the reader landed at the top with the card a screen and more below. Scroll
+  // once per hash, as soon as that card exists.
+  let scrolledToHash = '';
+  $effect(() => {
+    const hash = page.url.hash;
+    void data?.proposals;
+    if (!hash.startsWith('#proposal-') || scrolledToHash === hash) return;
+    tick().then(() => {
+      const el = document.getElementById(hash.slice(1));
+      if (!el) return;
+      scrolledToHash = hash;
+      const still = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+      el.scrollIntoView({ block: 'start', behavior: still ? 'auto' : 'smooth' });
+    });
+  });
 
 
   /* ===== The wish, as loaded =====
@@ -48,6 +71,20 @@
     if (s === 'rejected' || s === 'expired') return 'rejected';
     return 'matching';
   }
+  /**
+   * Does a proposal's covered line answer this part of the plan? By the part's position or
+   * id (what most proposals carry), or — for an invitation, which points at the product
+   * line it created — by the line's name (/wish/lineNames, PLAN_DIRECT_OFFER).
+   */
+  function coversPart(c, idx, item, isResource) {
+    const key = isResource ? c.extractedResourceIdx : c.extractedMissionIdx;
+    return (
+      String(key) === String(idx) ||
+      String(key) === String(item.id) ||
+      lineIsPart(data?.partLines, isResource ? 'r' : 'm', key, item.name)
+    );
+  }
+
   function buildPlanRows(wish, proposals) {
     if (!wish) return [];
     const rows = [];
@@ -58,26 +95,14 @@
           const list = isResource ? p.coveredResources : p.coveredMissions;
           if (!list?.length) return false;
           return list.some(
-            (c) =>
-              String(
-                isResource ? c.extractedResourceIdx : c.extractedMissionIdx
-              ) === String(idx) ||
-              String(
-                isResource ? c.extractedResourceIdx : c.extractedMissionIdx
-              ) === String(item.id)
+            (c) => coversPart(c, idx, item, isResource)
           );
         })
         .map((p) => {
           const line = (
             isResource ? p.coveredResources : p.coveredMissions
           ).find(
-            (c) =>
-              String(
-                isResource ? c.extractedResourceIdx : c.extractedMissionIdx
-              ) === String(idx) ||
-              String(
-                isResource ? c.extractedResourceIdx : c.extractedMissionIdx
-              ) === String(item.id)
+            (c) => coversPart(c, idx, item, isResource)
           );
           return {
             proposalId: p.id,
@@ -178,13 +203,7 @@
       const matching = proposals.find((p) => {
         const list = isResource ? p.coveredResources : p.coveredMissions;
         return list?.some(
-          (c) =>
-            String(
-              isResource ? c.extractedResourceIdx : c.extractedMissionIdx
-            ) === String(idx) ||
-            String(
-              isResource ? c.extractedResourceIdx : c.extractedMissionIdx
-            ) === String(item.id)
+          (c) => coversPart(c, idx, item, isResource)
         );
       });
       const line = matching
@@ -192,13 +211,7 @@
             ? matching.coveredResources
             : matching.coveredMissions
           ).find(
-            (c) =>
-              String(
-                isResource ? c.extractedResourceIdx : c.extractedMissionIdx
-              ) === String(idx) ||
-              String(
-                isResource ? c.extractedResourceIdx : c.extractedMissionIdx
-              ) === String(item.id)
+            (c) => coversPart(c, idx, item, isResource)
           )
         : null;
       lines.push({
@@ -1071,6 +1084,20 @@
   let publishBusy = $state(/** @type {Record<string, boolean>} */ ({}));
   let publishDone = $state(/** @type {Record<string, boolean>} */ ({}));
 
+  /** Already out in the community — from this visit, or from the server (QA C-10:
+   *  a local flag alone came back as a button after a reload, and a second press
+   *  opened a duplicate open mission). */
+  function isPublished(row) {
+    if (publishDone[row.need.title]) return true;
+    const list = row.need.isResource ? data?.published?.resources : data?.published?.missions;
+    if (!Array.isArray(list) || list.length === 0) return false;
+    const key = row.need.componentId != null ? String(row.need.componentId) : null;
+    const name = String(row.need.rawName ?? row.need.title ?? '').trim().toLowerCase();
+    return list.some(
+      (p) => (key && p.extractedKey === key) || (name && String(p.name ?? '').trim().toLowerCase() === name)
+    );
+  }
+
   const skillNames = $derived(
     (ENRICH.skills ?? [])
       .map((s) => (typeof s === 'string' ? s : s?.name || s?.skillName))
@@ -1094,12 +1121,37 @@
    * the open-mission matcher. */
   function publishNeed(row) {
     const key = row.need.title;
-    if (!wishId || publishBusy[key] || publishDone[key]) return;
+    if (!wishId || publishBusy[key] || isPublished(row)) return;
     if (row.need.isResource) {
       publishResourceTarget = row;
     } else {
       publishMissionTarget = row;
     }
+  }
+
+  /** What the last publish really attached, shown once the form has closed — the
+   *  skills (or the catalogue resource) the matcher will use, and anything that
+   *  could not be attached. A failed publish lands here too, with a retry when
+   *  trying again can help. @type {any} */
+  let publishResult = $state(null);
+
+  /** Action error code → what the wisher reads. Neither publishes anything. */
+  const PUBLISH_ERRORS = /** @type {Record<string, string>} */ ({
+    SKILLS_UNAVAILABLE: 'concierge.pub_skills_unavailable',
+    SKILLS_NOT_ATTACHED: 'concierge.pub_skills_not_attached'
+  });
+
+  /** POST the publish; resolves to the action's data, throws `{ code, message }`. */
+  async function postPublish(params) {
+    const res = await fetch('/api/action', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ actionKey: 'publishWishNeedToCommunity', params })
+    });
+    const out = await res.json().catch(() => null);
+    if (out?.success) return out.data ?? {};
+    const code = out?.error?.code ?? null;
+    throw Object.assign(new Error($t(PUBLISH_ERRORS[code] ?? 'concierge.pub_failed')), { code });
   }
 
   async function submitPublishMission(spec) {
@@ -1110,37 +1162,48 @@
     if (publishBusy[key] || publishDone[key]) return;
     publishBusy = { ...publishBusy, [key]: true };
     try {
-      const res = await fetch('/api/action', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          actionKey: 'publishWishNeedToCommunity',
-          params: {
-            ratsonId: wishId,
-            kind: 'mission',
-            name: spec?.name || row.need.rawName,
-            descrip: spec?.descrip || '',
-            hours: spec?.hours ?? row.need.hours ?? null,
-            perhour: spec?.ratePerHour ?? null,
-            isMust: row.need.imp === 'must',
-            extractedKey: row.need.componentId != null ? String(row.need.componentId) : null,
-            skillNames:
-              Array.isArray(spec?.skills) && spec.skills.length
-                ? spec.skills
-                : skillNames
-          }
-        })
+      const data = await postPublish({
+        ratsonId: wishId,
+        kind: 'mission',
+        name: spec?.name || row.need.rawName,
+        descrip: spec?.descrip || '',
+        hours: spec?.hours ?? row.need.hours ?? null,
+        perhour: spec?.ratePerHour ?? null,
+        isMust: row.need.imp === 'must',
+        extractedKey: row.need.componentId != null ? String(row.need.componentId) : null,
+        skillNames:
+          Array.isArray(spec?.skills) && spec.skills.length
+            ? spec.skills
+            : skillNames,
+        skillIds: Array.isArray(spec?.skillIds) ? spec.skillIds : [],
+        roleIds: Array.isArray(spec?.roleIds) ? spec.roleIds : [],
+        workwayIds: Array.isArray(spec?.workwayIds) ? spec.workwayIds : []
       });
-      const out = await res.json();
-      if (!out?.success) throw new Error(out?.error || 'הפרסום נכשל');
       publishDone = { ...publishDone, [key]: true };
-      toast.success('הצורך פורסם לקהילה - יופיע בלב של מי שמתאים 📣');
+      publishResult = { kind: 'mission', name: spec?.name || row.need.rawName, ...data };
     } catch (err) {
       console.error('[concierge/[id]] submitPublishMission failed:', err);
-      toast.error(err instanceof Error ? err.message : 'אירעה שגיאה');
+      // Nothing was published; the form's spec is kept so "try again" sends it
+      // as it was, without making the wisher fill the form a second time.
+      publishResult = {
+        kind: 'mission',
+        error: err instanceof Error ? err.message : $t('concierge.pub_failed'),
+        // The same skills again would fail the same way — back to the form instead.
+        retry: err?.code === 'SKILLS_NOT_ATTACHED' ? null : () => retryPublishMission(row, spec),
+        edit: () => {
+          publishResult = null;
+          publishMissionTarget = row;
+        }
+      };
     } finally {
       publishBusy = { ...publishBusy, [key]: false };
     }
+  }
+
+  function retryPublishMission(row, spec) {
+    publishResult = null;
+    publishMissionTarget = row;
+    submitPublishMission(spec);
   }
 
   async function submitPublishResource(payload) {
@@ -1151,43 +1214,42 @@
     if (publishBusy[key] || publishDone[key]) return;
     publishBusy = { ...publishBusy, [key]: true };
     try {
-      const res = await fetch('/api/action', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          actionKey: 'publishWishNeedToCommunity',
-          params: {
-            ratsonId: wishId,
-            kind: 'resource',
-            name: payload.name,
-            descrip: payload.descrip || '',
-            extractedKey: row.need.componentId != null ? String(row.need.componentId) : null,
-            price: payload.price ?? null,
-            easy: payload.easy ?? null,
-            quantity: payload.quantity ?? null,
-            kindOf: payload.kindOf ?? 'total',
-            recurring: payload.recurring ?? false,
-            linkto: payload.linkto || '',
-            spnot: payload.spnot || '',
-            mashaabimTemplateId: payload.mashaabimId ?? null,
-            startDate: payload.startDate ?? null,
-            endDate: payload.endDate ?? null,
-            isMust: row.need.imp === 'must',
-            isOnline: payload.isOnline ?? false,
-            lat: payload.lat ?? null,
-            lng: payload.lng ?? null,
-            radius: payload.radius ?? null,
-            location_hint: payload.location_hint ?? null
-          }
-        })
+      const data = await postPublish({
+        ratsonId: wishId,
+        kind: 'resource',
+        name: payload.name,
+        descrip: payload.descrip || '',
+        extractedKey: row.need.componentId != null ? String(row.need.componentId) : null,
+        price: payload.price ?? null,
+        easy: payload.easy ?? null,
+        quantity: payload.quantity ?? null,
+        kindOf: payload.kindOf ?? 'total',
+        recurring: payload.recurring ?? false,
+        linkto: payload.linkto || '',
+        spnot: payload.spnot || '',
+        mashaabimTemplateId: payload.mashaabimId ?? null,
+        startDate: payload.startDate ?? null,
+        endDate: payload.endDate ?? null,
+        isMust: row.need.imp === 'must',
+        isOnline: payload.isOnline ?? false,
+        lat: payload.lat ?? null,
+        lng: payload.lng ?? null,
+        radius: payload.radius ?? null,
+        location_hint: payload.location_hint ?? null
       });
-      const out = await res.json();
-      if (!out?.success) throw new Error(out?.error || 'הפרסום נכשל');
       publishDone = { ...publishDone, [key]: true };
-      toast.success('המשאב פורסם לקהילה - נציע אותו למי שמחזיק אותו 📣');
+      publishResult = { kind: 'resource', name: payload.name, ...data };
     } catch (err) {
       console.error('[concierge/[id]] submitPublishResource failed:', err);
-      toast.error(err instanceof Error ? err.message : 'אירעה שגיאה');
+      publishResult = {
+        kind: 'resource',
+        error: err instanceof Error ? err.message : $t('concierge.pub_failed'),
+        retry: () => {
+          publishResult = null;
+          publishResourceTarget = row;
+          submitPublishResource(payload);
+        }
+      };
     } finally {
       publishBusy = { ...publishBusy, [key]: false };
     }
@@ -1206,13 +1268,6 @@
     if (diff < 86400) return `לפני ${Math.round(diff / 3600)} שעות`;
     return `לפני ${Math.round(diff / 86400)} ימים`;
   }
-
-  const STEPS = [
-    { id: 0, en: 'WISH', he: 'משאלה' },
-    { id: 1, en: 'UNDERSTAND', he: 'הבנה' },
-    { id: 2, en: 'PROPOSALS', he: 'הצעות' },
-    { id: 3, en: 'CONSENT', he: 'הסכמה' }
-  ];
 
   /* ===== State ===== */
   let activeTab = $state('active');
@@ -1394,9 +1449,17 @@
    * the others are left out. Closing while some have none is allowed (it is her wish), but
    * never silently (C-19): she is told which, and which of them she marked as a must, and
    * confirms. */
-  const UNFILLED = $derived(TOTAL_LINES.filter((l) => l.status !== 'accepted'));
+  // The server's count when it has one: it also sees the BOM lines an invited
+  // supplier already holds (C-19). The page's own count otherwise.
+  const UNFILLED = $derived(
+    Array.isArray(data?.gaps) ? data.gaps : TOTAL_LINES.filter((l) => l.status !== 'accepted')
+  );
   const UNFILLED_MUST = $derived(UNFILLED.filter((l) => l.imp === 'must'));
   let confirmingClose = $state(false);
+  /* ...and they need not be dropped: each can go on in the new rikma as an open mission /
+   * resource, a part of this deal still to be taken. Whoever takes one is added to the
+   * deal, so she signs it then (C-19, materializeWish → openWishGaps). On by default. */
+  let openGaps = $state(true);
   function askToClose() {
     if (!readyToClose || materializeBusy) return;
     if (UNFILLED.length > 0) confirmingClose = true;
@@ -1455,7 +1518,11 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           actionKey: 'materializeWish',
-          params: { ratsonId: wishId, ...(picId ? { profilePicId: picId } : {}) }
+          params: {
+            ratsonId: wishId,
+            ...(picId ? { profilePicId: picId } : {}),
+            ...(UNFILLED.length > 0 && openGaps ? { openGaps: true } : {})
+          }
         })
       });
       const out = await res.json();
@@ -1637,7 +1704,7 @@
     </nav>
 
     <div class="hdr-right">
-      <ConciergeBell items={data?.bell ?? []} />
+      <ConciergeBell items={data?.bell ?? []} notices={data?.notices ?? null} />
       <button class="av-btn" onclick={() => goto('/me')}>
         {#if $uPic}
           <img src={$uPic} alt="פרופיל" class="av-img" />
@@ -1653,18 +1720,8 @@
     <div class="wrap">
       <!-- TOP BAR -->
       <div class="topbar anim">
-        <!-- Step dial -->
-        <div class="steps">
-          {#each STEPS as step, i (step.id)}
-            {@const st = i < 2 ? 'done' : i === 2 ? 'active' : ''}
-            <div class="step {st}">
-              <span class="step-dot">{st === 'done' ? '✓' : step.id + 1}</span>
-              <span class="step-en hide-xs">{step.en}</span>
-              <span class="step-he hide-xs">· {step.he}</span>
-            </div>
-            {#if i < STEPS.length - 1}<span class="step-sep"></span>{/if}
-          {/each}
-        </div>
+        <!-- The deal's stages: shaping (here) → approval → carrying out → closed (PLAN_DIRECT_OFFER P1) -->
+        <DealStages stages={data?.stages ?? []} variant="concierge" />
         <!-- Wish code + CTA -->
         <div class="topbar-right">
           <span class="code-lbl hide-xs">קוד משאלה</span>
@@ -1690,6 +1747,13 @@
               <span class="muted hide-xs"
                 >{$t('concierge.hero_by', { name: WISH_AUTHOR })}</span
               >
+              {#if data?.wish?.offeredBy}
+                <!-- A direct offer she took (PLAN_DIRECT_OFFER): whose terms she started from. -->
+                <span class="dim">·</span>
+                <span class="offer-from"
+                  >{$t('directOffer.wish.banner', { name: data.wish.offeredBy.name })}</span
+                >
+              {/if}
             </div>
             <h1 class="hero-title">{WISH_TEXT}</h1>
             <div class="hero-long rich-wrap">
@@ -1700,6 +1764,10 @@
                 sml={true}
               />
             </div>
+            {#if isOwner && data?.wish && !['fulfilled', 'cancelled', 'expired'].includes(data.wish.status)}
+              <!-- Changing the terms is part of the negotiation (PLAN_DIRECT_OFFER §4.3). -->
+              <WishTermsEditor wish={data.wish} />
+            {/if}
           </div>
         </div>
         {#if HERO_METAS.length > 0}
@@ -2056,7 +2124,7 @@
                         ]}
                         onclick={() => deleteNeed(row)}>✕ הסרה</button
                       >
-                      {#if publishDone[row.need.title]}
+                      {#if isPublished(row)}
                         <span style="font-size:11px;color:var(--cg-mint)"
                           >✓ פורסם לקהילה</span
                         >
@@ -2250,7 +2318,8 @@
                   {/if}
                 {/if}
                 {#each shown as p (p.proposalId ?? p.name)}
-                  <div class="pcard {p.status}">
+                  <!-- The bell's "expand" lands here (#proposal-<id>, PLAN_SMART_NOTICES). -->
+                  <div class="pcard {p.status}" id={p.proposalId ? `proposal-${p.proposalId}` : undefined}>
                     <div class="pcard-top">
                       <div
                         class="disc"
@@ -2319,12 +2388,17 @@
                         >
                       {:else if p.proposalId && isOwner}
                         {@const busy = proposalBusy[p.proposalId]}
-                        {#if p.negotiation && p.negotiation.round > 0 && !p.negotiation.yourTurn}
-                          <!-- She put terms on the table; it is the provider's move. -->
+                        {#if p.negotiation && (p.negotiation.round > 0 || p.negotiation.termsChanged) && !p.negotiation.yourTurn}
+                          <!-- She put terms on the table — a counter, or new details of the
+                               wish itself (PLAN_DIRECT_OFFER §4.3); it is the provider's move. -->
                           <span
                             class="sbadge pending"
                             style="padding:4px 10px;font-size:10px"
-                            >{$t('concierge.neg_waiting')}</span
+                            >{$t(
+                              p.negotiation.termsChanged
+                                ? 'concierge.neg_waiting_terms'
+                                : 'concierge.neg_waiting'
+                            )}</span
                           >
                         {:else}
                           <div style="display:flex;gap:6px">
@@ -3022,7 +3096,13 @@
                     </li>
                   {/each}
                 </ul>
-                <div class="close-gaps-note">{$t('concierge.consent_gaps_note')}</div>
+                <label class="close-gaps-open">
+                  <input type="checkbox" bind:checked={openGaps} />
+                  <span>{$t('concierge.consent_gaps_open')}</span>
+                </label>
+                <div class="close-gaps-note">
+                  {openGaps ? $t('concierge.consent_gaps_open_note') : $t('concierge.consent_gaps_note')}
+                </div>
                 <div style="display:flex;gap:8px;margin-top:10px">
                   <button
                     type="button"
@@ -3278,6 +3358,66 @@
         onPublish={submitPublishMission}
         onClose={() => (publishMissionTarget = null)}
       />
+    </div>
+  </div>
+{/if}
+
+{#if publishResult}
+  {@const r = publishResult}
+  <div class="spec-overlay" role="dialog" aria-modal="true" aria-labelledby="pub-res-title">
+    <div class="spec-card pub-res">
+      <div class="spec-head">
+        <span id="pub-res-title">
+          {r.error ? $t('concierge.pub_not_published') : $t('concierge.pub_result_title')}
+        </span>
+        <button class="spec-x" onclick={() => (publishResult = null)} aria-label={$t('concierge.pub_close')}>✕</button>
+      </div>
+
+      {#if r.error}
+        <p class="pub-res-line" role="alert">{r.error}</p>
+      {:else}
+        {#if r.name}<p class="pub-res-name">{r.name}</p>{/if}
+        {#if r.alreadyPublished}
+          <p class="pub-res-line">{$t('concierge.pub_already')}</p>
+        {:else if r.kind === 'mission'}
+          {#if r.skills?.length}
+            <p class="spec-hint">{$t('concierge.pub_result_skills')}</p>
+            <ul class="pub-res-chips">
+              {#each r.skills as s (s.id)}
+                <li class="pub-res-chip">
+                  {s.name}{#if s.created}<span class="pub-res-new">{$t('concierge.pub_result_new')}</span>{/if}
+                </li>
+              {/each}
+            </ul>
+          {:else if r.skillsMatched}
+            <p class="pub-res-line">{$t('concierge.pub_result_skill_count', { count: r.skillsMatched })}</p>
+          {/if}
+          {#if r.skillsMissing?.length}
+            <p class="pub-res-line pub-res-warn">
+              {$t('concierge.pub_result_missing', { names: r.skillsMissing.join(', ') })}
+            </p>
+          {/if}
+        {:else if !r.templateId}
+          <p class="pub-res-line pub-res-warn">{$t('concierge.pub_result_no_template')}</p>
+        {/if}
+        {#if !r.alreadyPublished}
+          <p class="pub-res-line">
+            {r.usersMatched > 0
+              ? $t('concierge.pub_result_matched', { count: r.usersMatched })
+              : $t('concierge.pub_result_matched_none')}
+          </p>
+        {/if}
+      {/if}
+
+      <div class="pub-res-actions">
+        {#if r.retry}
+          <button class="btn-jewel" onclick={r.retry}>{$t('concierge.pub_retry')}</button>
+        {/if}
+        {#if r.edit}
+          <button class="btn-ghost" onclick={r.edit}>{$t('concierge.pub_edit')}</button>
+        {/if}
+        <button class="btn-ghost" onclick={() => (publishResult = null)}>{$t('concierge.pub_close')}</button>
+      </div>
     </div>
   </div>
 {/if}
@@ -3582,6 +3722,10 @@
     align-items: center;
     flex-wrap: wrap;
   }
+  .offer-from {
+    color: var(--cg-goldhi);
+    font-size: 12px;
+  }
   .code-lbl {
     font-family: 'Bellefair', serif;
     font-size: 12px;
@@ -3596,69 +3740,6 @@
     border-radius: 6px;
     letter-spacing: 0.06em;
     border: 1px solid rgb(var(--cg-gold-rgb) / 0.2);
-  }
-
-  /* ── Steps ── */
-  .steps {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    flex-wrap: wrap;
-  }
-  .step {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    font-size: 11px;
-    color: var(--cg-dim);
-  }
-  .step-dot {
-    width: 22px;
-    height: 22px;
-    border-radius: 50%;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-family: 'Cinzel', serif;
-    font-weight: 700;
-    font-size: 10px;
-    background: rgb(var(--cg-fg-rgb) / calc(0.04 * var(--cg-fg-k)));
-    color: var(--cg-dim);
-    border: 1px solid rgb(var(--cg-fg-rgb) / calc(0.08 * var(--cg-fg-k)));
-    flex-shrink: 0;
-  }
-  .step.done .step-dot {
-    background: rgb(var(--cg-mint-rgb) / 0.12);
-    color: var(--cg-mint);
-    border-color: rgb(var(--cg-mint-rgb) / 0.4);
-  }
-  .step.done {
-    color: var(--cg-mint);
-  }
-  .step.active .step-dot {
-    background: linear-gradient(135deg, var(--cg-g-pinkd), var(--cg-g-pink));
-    color: var(--cg-on-cta);
-    border-color: rgb(var(--cg-pink-rgb) / 0.5);
-    box-shadow: 0 0 18px rgb(var(--cg-pink-rgb) / 0.5);
-  }
-  .step.active {
-    color: var(--cg-pink);
-  }
-  .step-en {
-    font-family: 'Cinzel', serif;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    font-size: 10px;
-  }
-  .step-he {
-    font-family: 'Bellefair', serif;
-    font-size: 12px;
-  }
-  .step-sep {
-    width: 22px;
-    height: 1px;
-    background: rgb(var(--cg-fg-rgb) / calc(0.08 * var(--cg-fg-k)));
-    flex-shrink: 0;
   }
 
   /* ── Wish hero ── */
@@ -4073,6 +4154,18 @@
     padding-inline-start: 18px;
     font-size: 14px;
   }
+  .close-gaps-open {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-top: 10px;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .close-gaps-open input {
+    margin-top: 3px;
+    accent-color: var(--cg-gold, currentColor);
+  }
   .close-gaps-note {
     margin-top: 8px;
     font-size: 13px;
@@ -4348,7 +4441,14 @@
     grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
     gap: 10px;
   }
+  /* Arriving from the bell (#proposal-<id>): clear the sticky header, and show
+     which of the cards it meant. */
+  .pcard:target {
+    outline: 2px solid var(--cg-goldhi);
+    outline-offset: 3px;
+  }
   .pcard {
+    scroll-margin-top: 90px;
     border: 1px solid rgb(var(--cg-fg-rgb) / calc(0.07 * var(--cg-fg-k)));
     background: linear-gradient(
       180deg,
@@ -4839,5 +4939,55 @@
     color: var(--cg-muted);
     line-height: 1.5;
     margin-bottom: 12px;
+  }
+
+  /* ── Publish result (what the matcher will use) ── */
+  .pub-res {
+    width: min(480px, 98vw);
+  }
+  .pub-res-name {
+    font-weight: 700;
+    color: var(--cg-ink-hi);
+    margin-bottom: 10px;
+  }
+  .pub-res-line {
+    font-size: 13.5px;
+    line-height: 1.55;
+    color: var(--cg-ink);
+    margin-bottom: 10px;
+  }
+  .pub-res-warn {
+    color: var(--cg-gold);
+  }
+  .pub-res-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 12px;
+    padding: 0;
+    list-style: none;
+  }
+  .pub-res-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 13px;
+    color: var(--cg-ink-hi);
+    background: rgb(var(--cg-mint-rgb) / 0.12);
+    border: 1px solid rgb(var(--cg-mint-rgb) / 0.35);
+  }
+  .pub-res-new {
+    font-size: 10.5px;
+    font-weight: 700;
+    color: var(--cg-mint);
+  }
+  .pub-res-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: flex-end;
+    margin-top: 6px;
   }
 </style>

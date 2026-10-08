@@ -36,10 +36,67 @@ async function currentMissionRate(context: any, missionId: string): Promise<numb
     }
 }
 
+/**
+ * Open a timer for hours the member types in by hand — stopped and empty, in
+ * one write (`33CreateManualTimer`).
+ *
+ * It used to be a start followed by a stop from the browser. When the stop was
+ * lost to a slow Strapi the page sat on "⏳" while a real timer ran on the
+ * server, and twenty minutes later those minutes were on the mission. One
+ * write cannot half-happen.
+ *
+ * Idempotent as well: a retry after a request that timed out on the client but
+ * landed on the server finds the unsaved timer already on the mission and
+ * hands it back rather than opening a second one. Unlike a running start, the
+ * mission read is not optional here — without it there is no way to tell a
+ * retry from a first attempt, nor whose mission this is.
+ */
+async function openManualTimer(params: any, context: any, strapi: any) {
+    const missionId = String(params.missionId);
+    const data = await run(
+        execFromContext(context),
+        `{ mesimabetahalich(id: "${missionId}") { data { attributes { perhour users_permissions_user { data { id } } activeTimer { data { id attributes { start totalHours rate timers { start stop } acts { data { id } } isActive saved } } } } } } }`,
+        'timerStart:manual',
+    );
+    const mission = data?.mesimabetahalich?.data?.attributes;
+    if (!mission) throw new Error(`Mission ${missionId} not found`);
+
+    // Only the member who carries the mission logs hours on it.
+    const ownerId = mission.users_permissions_user?.data?.id;
+    if (ownerId != null && context.userId != null && String(ownerId) !== String(context.userId)) {
+        throw new Error('Only the member carrying this mission can log hours on it');
+    }
+
+    const existing = mission.activeTimer?.data;
+    if (existing?.id && existing.attributes?.saved !== true) {
+        return { createTimer: { data: existing }, reused: true };
+    }
+
+    const rate = mission.perhour == null ? null : Number(mission.perhour);
+    return strapi.execute(
+        '33CreateManualTimer',
+        {
+            missionId,
+            projectId: String(params.projectId),
+            userId: String(params.userId),
+            start: new Date().toISOString(),
+            rate,
+        },
+        context.jwt,
+        context.fetch,
+    );
+}
+
 export const timerStartConfig: ActionConfig = {
     key: 'timerStart',
     description: 'Start or resume a timer for a mission',
     graphqlOperation: async (params, context, { strapi }) => {
+        // An empty timer is not activity yet — the hours typed into it are,
+        // and their save touches the dormancy clock (timerSave). Checked
+        // before anything is written, so a refused request writes nothing.
+        if (params.manual === true) {
+            return openManualTimer(params, context, strapi);
+        }
         // Starting a timer is the loudest signal of activity there is — push
         // the dormancy deadline out (PLAN_OBJECT_ARCHIVAL).
         if (params.missionId) {
@@ -105,6 +162,11 @@ export const timerStartConfig: ActionConfig = {
             type: 'number',
             required: false,
             description: 'Hourly value stamped on the timer — resolved server-side, ignored from the client'
+        },
+        manual: {
+            type: 'boolean',
+            required: false,
+            description: 'Open a stopped, empty timer for hours typed in by hand (reuses an unsaved one if the mission has it)'
         }
     },
 

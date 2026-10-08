@@ -2,6 +2,8 @@ import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { EmailService } from '../../notifications/EmailService.js';
 import { STRAPI_URL } from '$lib/server/strapiUrl.js';
 import { evaluateAskAcceptance } from '$lib/server/nego/askAcceptance.js';
+import { assertStandingRound } from '$lib/server/nego/candidacyVote.js';
+import { ActionError } from '../errors.js';
 import { ensureCandidacyTimegrama } from '../../nego/timegrama.js';
 import { resolveAcceptedActs } from '../helpers/roundActs.js';
 import { touchDormancy } from '$lib/server/archive/dormancyClock.js';
@@ -12,6 +14,10 @@ import { shiftsEnabled } from '$lib/server/shifts/mode.js';
 import { asUser as asShiftUser } from '$lib/server/shifts/exec.js';
 import { commitmentForAsk, setMissionCommitment } from '$lib/server/shifts/store.js';
 import { gqlString } from './actionUtils.js';
+import { loadCandidacyDeal, fillOfferIntoDeal } from '$lib/server/deal/offerDeal.js';
+
+/** A wish need may carry no mission template; never write the string "undefined" as a relation. */
+const hasMissionTemplate = (id: unknown) => id != null && id !== '' && id !== 'undefined' && id !== 'null';
 
 function formatVotesForInline(votes: any[]): string {
   if (!Array.isArray(votes) || votes.length === 0) return '';
@@ -53,6 +59,7 @@ const finalizeAskAcceptanceHandler: ActionExecutionHandler = async (params, cont
     deadline,
     projectName = '',
     projectSrc = '',
+    expectRound,
   } = params;
 
   const d = new Date();
@@ -83,16 +90,23 @@ const finalizeAskAcceptanceHandler: ActionExecutionHandler = async (params, cont
   }
   if (!askAttributes) throw new Error(`Ask ${askId} could not be loaded - acceptance aborted`);
 
+  // A gap of a customer's deal (QA C-19): she pays for whatever this ends on, so she
+  // signs it too. A read error throws — it must not pass for "nobody pays".
+  const run = (qid: string, vars: Record<string, unknown>) => strapi.execute(qid, vars, context.jwt, context.fetch);
+  const offerDeal = await loadCandidacyDeal(run, 'ask', String(askId));
+
   // Consent gate — see finalizeJoinAcceptance / askAcceptance.ts. An assigned
   // offer (open_mission.isRishon) never materializes without the assignee's yes.
   const check = evaluateAskAcceptance({
     askAttributes,
     callerId: context.userId,
     acceptedUserId,
+    clientIds: offerDeal?.clientIds ?? [],
     now: d,
   });
+  if (check.reason !== 'archived') assertStandingRound(expectRound, check.L);
   if (!check.allowed) {
-    if (check.reason === 'awaitingAssigneeConsent') {
+    if (check.reason === 'awaitingAssigneeConsent' || check.reason === 'awaitingClientConsent') {
       await strapi.execute(
         '120addVoteToAsk',
         { askId: String(askId), vots: check.vots },
@@ -104,16 +118,33 @@ const finalizeAskAcceptanceHandler: ActionExecutionHandler = async (params, cont
         data: {
           askId: String(askId),
           materialized: false,
-          pending: 'assigneeConsent',
+          pending: check.reason === 'awaitingClientConsent' ? 'clientConsent' : 'assigneeConsent',
           takerId: check.takerId,
         },
         updateStrategy: { type: 'fullRefresh' },
       };
     }
     if (check.reason === 'archived') {
-      throw new Error(`Ask ${askId} was already resolved`);
+      throw new ActionError('ALREADY_RESOLVED', `Ask ${askId} was already resolved`);
     }
     throw new Error(`acceptedUserId ${acceptedUserId} is not the candidate of ask ${askId}`);
+  }
+
+  // Not the card's count (`variant: 'allVoted'`): every member's yes to the
+  // standing terms, as the DB has them — see finalizeJoinAcceptance.
+  if (!check.allMembersYes) {
+    await strapi.execute('120addVoteToAsk', { askId: String(askId), vots: check.vots }, context.jwt, context.fetch);
+    await ensureCandidacyTimegrama(strapi, context, { side: 'ask', id: String(askId) });
+    return {
+      data: {
+        askId: String(askId),
+        materialized: false,
+        pending: 'members',
+        membersPending: check.membersPending,
+        takerId: check.takerId,
+      },
+      updateStrategy: { type: 'fullRefresh' },
+    };
   }
 
   {
@@ -159,7 +190,7 @@ const finalizeAskAcceptanceHandler: ActionExecutionHandler = async (params, cont
   const mainMutation = `mutation {
     createMesimabetahalich(data: {
       project: "${projectId}",
-      mission: "${missId}",
+      ${hasMissionTemplate(missId) ? `mission: "${missId}",` : ''}
       hearotMeyuchadot: ${gqlString(finalHearotMeyuchadot)},
       name: ${gqlString(finalName)},
       descrip: ${gqlString(finalMissionDetails)},
@@ -200,6 +231,16 @@ const finalizeAskAcceptanceHandler: ActionExecutionHandler = async (params, cont
   // Hand the accepted checklist to the new mission: the winning round's list
   // when it carries one, else the OpenMission baseline.
   const newMbId = responseData.data?.createMesimabetahalich?.data?.id;
+
+  // The customer's deal takes the line at the terms everyone signed (QA C-19).
+  if (offerDeal && newMbId) {
+    await fillOfferIntoDeal(run, offerDeal, {
+      takerId: String(acceptedUserId),
+      amount: Number(finalNhours) || 0,
+      unitPrice: Number(finalValph) || 0,
+      mesimabetahalichId: String(newMbId),
+    });
+  }
   // Start the dormancy clock: from here on, silence has a deadline
   // (PLAN_OBJECT_ARCHIVAL). Best-effort — a missing clock only means
   // the mission is never asked about, not a failed assignment.
@@ -372,7 +413,8 @@ export const finalizeAskAcceptanceConfig: ActionConfig = {
       description: '"solo" for single-member project, "allVoted" when all members have voted yes'
     },
     projectId: { type: 'string', required: true },
-    missId: { type: 'string', required: true },
+    // Optional: a need published from a wish often has no mission template (QA C-19).
+    missId: { type: 'string', required: false },
     openMid: { type: 'string', required: true },
     askId: { type: 'string', required: true },
     acceptedUserId: { type: 'string', required: true },
@@ -389,6 +431,8 @@ export const finalizeAskAcceptanceConfig: ActionConfig = {
     sqedualed: { type: 'string', required: false },
     deadline: { type: 'string', required: false },
     existingVotes: { type: 'array', required: false },
+    // See finalizeJoinAcceptance: refuse with ROUND_MOVED rather than sign newer terms.
+    expectRound: { type: 'number', required: false },
     projectName: { type: 'string', required: false },
     projectSrc: { type: 'string', required: false },
   },

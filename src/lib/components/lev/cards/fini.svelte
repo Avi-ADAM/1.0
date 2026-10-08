@@ -15,6 +15,7 @@
   import VoteStatusDisplay from './VoteStatusDisplay.svelte';
   import { getProjectData } from '$lib/stores/projectStore';
   import { saveLinkLabel } from '$lib/timers/saveLinks';
+  import { displayHours, workValue } from '$lib/timers/precision';
   import { mediaUrl } from '$lib/utils/processLifecycle';
 
   /**
@@ -210,7 +211,7 @@
                 `${$t('common.noofhours') || $t('common.hours')}`
               )}
             onmouseleave={() => hover('0')}
-            >{(nhours || 0).toLocaleString('en-US', {
+            >{displayHours(nhours).toLocaleString('en-US', {
               maximumFractionDigits: 2
             })}
             {$t('common.hours')}</span
@@ -225,7 +226,8 @@
         <span class="text-green-500 dark:text-green-400 text-sm font-normal"
           >=</span
         >
-        {((nhours || 0) * (valph || 0)).toLocaleString('en-US', {
+        <!-- whole minutes, priced to the agora: 15h00m04s is not "2,250.2" -->
+        {workValue(nhours, valph).toLocaleString('en-US', {
           maximumFractionDigits: 2
         })}
       </div>
@@ -473,6 +475,7 @@
             onmouseenter={() => hover($t('lev.cards.confirmDecline'))}
             onmouseleave={() => hover('0')}
             onclick={() => decline('f')}
+            aria-label={$t('lev.cards.confirmDecline')}
           >
             <No class="w-6 h-6" />
           </button>
@@ -483,6 +486,7 @@
           onmouseenter={() => hover(`${$t('common.nego')}`)}
           onmouseleave={() => hover('0')}
           onclick={() => nego('f')}
+          aria-label={$t('common.nego')}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -501,6 +505,7 @@
           onmouseenter={() => hover($t('common.approve'))}
           onmouseleave={() => hover('0')}
           onclick={() => agree('f')}
+          aria-label={$t('common.approve')}
         >
           <Lev class="w-6 h-6" />
         </button>

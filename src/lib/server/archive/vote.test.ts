@@ -9,6 +9,8 @@ interface Shape {
   kind?: 'archiveObject' | 'editObject';
   scope?: 'archive' | 'release';
   hours?: number;
+  /** The silence clock's date — 'x' (unreadable) means it never ran out. */
+  clock?: string;
 }
 
 /**
@@ -25,6 +27,7 @@ function fakeExec(shape: Shape = {}) {
     kind = 'archiveObject',
     scope = 'archive',
     hours = 0,
+    clock = 'x',
   } = shape;
 
   const exec = async (query: string) => {
@@ -47,7 +50,7 @@ function fakeExec(shape: Shape = {}) {
                 archMember: { data: null },
                 vots,
                 negoarch: rounds,
-                timegrama: { data: { id: '600', attributes: { date: 'x', done: false } } },
+                timegrama: { data: { id: '600', attributes: { date: clock, done: false } } },
                 projects: {
                   data: [
                     {
@@ -282,5 +285,88 @@ describe('the full ping-pong', () => {
     const [applied] = after.matching('updateMesimabetahalich');
     expect(applied).toContain('hoursassinged: 8');
     expect(applied).toContain('perhour: 60');
+  });
+});
+
+/**
+ * A part of a customer's deal (QA_CONCIERGE_E2E C-14): a version that raises what she pays
+ * also needs her signature. Her silence is not her yes; the members' still is theirs.
+ */
+describe('extra signers — a deal customer on a version that raises her part', () => {
+  const raise = [{ ordern: 1, mode: 'keep', hm: 15 }];
+  const applied: any[] = [];
+  const customer = (needed = true) => async () => ({
+    ids: ['9'],
+    needed: () => needed,
+    onApplied: async (round: any) => {
+      applied.push(round);
+    },
+  });
+
+  it('the members signing is not enough — it waits for her', async () => {
+    const s = fakeExec({ kind: 'editObject', members: ['1', '2'], rounds: raise });
+    const out = await signObjectChange(s.exec, '500', '2', customer());
+    expect(out.consensus).toBe(false);
+    expect(out.awaiting).toEqual(['9']);
+    expect(s.matching('updateMesimabetahalich')).toHaveLength(0);
+  });
+
+  it('her signature completes it, and the deal follows the applied version', async () => {
+    applied.length = 0;
+    const s = fakeExec({
+      kind: 'editObject',
+      members: ['1', '2'],
+      rounds: raise,
+      vots: [
+        { what: true, order: 1, users_permissions_user: { data: { id: '1' } } },
+        { what: true, order: 1, users_permissions_user: { data: { id: '2' } } },
+      ],
+    });
+    const out = await signObjectChange(s.exec, '500', '9', customer());
+    expect(out.consensus).toBe(true);
+    expect(s.matching('hoursassinged: 15')).toHaveLength(1);
+    expect(applied).toHaveLength(1);
+    expect(applied[0].hm).toBe(15);
+  });
+
+  it('her signature alone does not apply it while the members still have time', async () => {
+    const s = fakeExec({ kind: 'editObject', members: ['1', '2'], rounds: raise, clock: '2999-01-01T00:00:00Z' });
+    const out = await signObjectChange(s.exec, '500', '9', customer());
+    expect(out.consensus).toBe(false);
+    expect(out.awaiting).toEqual(['2']);
+  });
+
+  it('once the members’ clock ran out, their silence is theirs — her signature applies it', async () => {
+    const s = fakeExec({ kind: 'editObject', members: ['1', '2'], rounds: raise, clock: '2000-01-01T00:00:00Z' });
+    const out = await signObjectChange(s.exec, '500', '9', customer());
+    expect(out.consensus).toBe(true);
+    expect(s.matching('hoursassinged: 15')).toHaveLength(1);
+  });
+
+  it('a version that does not raise her part is the rikma’s alone', async () => {
+    const s = fakeExec({ kind: 'editObject', members: ['1', '2'], rounds: raise });
+    const out = await signObjectChange(s.exec, '500', '2', customer(false));
+    expect(out.consensus).toBe(true);
+  });
+
+  it('still refuses anyone who is neither a member nor her', async () => {
+    const s = fakeExec({ kind: 'editObject', rounds: raise });
+    await expect(signObjectChange(s.exec, '500', '8', customer())).rejects.toThrow(/member of the rikma/);
+  });
+
+  it('she may counter: her version opens the next round with her signature', async () => {
+    const s = fakeExec({ kind: 'editObject', members: ['1', '2'], rounds: raise });
+    const out = await counterObjectChange(s.exec, {
+      decisionId: '500',
+      userId: '9',
+      round: { mode: 'keep', hm: 12, why: 'two more hours are enough' },
+      extraFor: customer(),
+    });
+    expect(out.order).toBe(2);
+    expect(out.standing.hm).toBe(12);
+    expect(out.extra?.ids).toEqual(['9']);
+    const [write] = s.matching('negoarch:');
+    expect(write).toContain('ordern: 2');
+    expect(write).toContain('hm: 12');
   });
 });

@@ -5,14 +5,7 @@
 import { createWorkflow, createStep } from '@mastra/core/workflows';
 import { Agent } from '@mastra/core/agent';
 import { z } from 'zod';
-import {
-  createGoogleModel,
-  createGroqModel,
-  createNvidiaModel,
-  hasGoogleModelConfig,
-  hasGroqModelConfig,
-  hasNvidiaModelConfig
-} from '../lib/createModel';
+import { createModelChain } from '../lib/createModel';
 import { matchAllCategories } from '../../lib/embed/matcher';
 
 // Polyfill global DOM objects required by pdfjs-dist when running in serverless environments (like Vercel)
@@ -215,23 +208,9 @@ const analyzeWithGeminiStep = createStep({
     const primaryName = LANG_NAMES[lang];
     const others = (['he', 'en', 'ar'] as Lang[]).filter((l) => l !== lang);
 
-    // Multi-provider fallback: Mastra's Agent retries each model in order
-    // when one fails (e.g. Gemini 503 overload). Mirrors the chat agents in
-    // src/mastra/agents/*.
-    const models: Array<{ model: any; maxRetries: number }> = [];
-    if (hasGoogleModelConfig()) {
-      models.push({ model: createGoogleModel(undefined, 'gemini-3-flash-preview', { thinkingBudget: 0 }), maxRetries: 2 });
-      models.push({ model: createGoogleModel(undefined, 'gemini-flash-lite-latest'), maxRetries: 2 });
-    }
-    if (hasGroqModelConfig()) {
-      models.push({ model: createGroqModel(), maxRetries: 1 });
-    }
-    if (hasNvidiaModelConfig()) {
-      models.push({ model: createNvidiaModel(), maxRetries: 1 });
-    }
-    if (models.length === 0) {
-      throw new Error('No AI provider configured for CV extraction.');
-    }
+    // Multi-provider fallback: Mastra's Agent tries each model in order
+    // when one fails (e.g. Gemini 503 overload).
+    const models = createModelChain();
 
     const agent = new Agent({
       id: 'CvExtractor',

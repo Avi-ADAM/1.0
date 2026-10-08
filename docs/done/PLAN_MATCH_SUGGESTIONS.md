@@ -31,11 +31,18 @@ Inverse relations: `user.match_suggestions`, `open_mission.match_suggestions`,
 
 ### The engine — `src/lib/server/matching/`
 
-- **`scoring.ts`** — pure, tested. Closed-form equivalent of the legacy
-  algorithm: `score = roles + 2·skills + wwAdj − 2·missingSkills −
-  missingRoles` (parity proven in `scoring.test.ts` against
-  `suggestionMatchers.calculateScore`). Suggestions are only stored when
-  `score ≥ MIN_SUGGESTION_SCORE (1)`.
+- **`scoring.ts`** — pure, tested (unit + fast-check properties).
+  `raw = roles + 2·skills + wwAdj − 2·missingSkills − missingRoles`, grown
+  from the legacy `suggestionMatchers.calculateScore`. Since 2026-10-08 it
+  departs from it on purpose: **a held skill always qualifies** (penalties only
+  rank it; the stored Int `score` is lifted to `MIN_SUGGESTION_SCORE (1)`,
+  `rawScore` breaks ties), a role-only match still needs `raw ≥ 1`, and
+  **work ways are soft** — any mismatch costs −1 in total, not −2 per mission
+  work way. The old rule hid concierge missions 286/287 from the carpenter
+  and technician they were for (one held skill vs. an AI-attached role and an
+  onsite work way scored −1…−3). Requirements nobody holds (`computeUnheld`)
+  are not penalised in **either** direction — the user→missions scan builds
+  its pool from qid 201 over the requirements the user lacks.
 - **`engine.ts`** — the three flows (all run with the admin service token via
   `StrapiClient`, all swallow their own errors, capped at 50
   suggestions/event):
@@ -113,8 +120,13 @@ with no located points are **kept** (never silently hidden).
   asks/negotiation state from query 83, filters declined), and sets
   `suggestionsStore`. Query 84 enrichment is gone — 209 carries the full card
   payload.
-- **Lazy backfill:** if a user has zero stored rows but has skills/roles, the
-  loader fires `refreshMySuggestions` once and re-pulls.
+- **Per-visit refresh:** the loader fires `refreshMySuggestions` and re-pulls
+  when `shouldRefreshSuggestions` (`src/lib/utils/suggestionRefresh.ts`) says
+  so — at once while nothing is stored, otherwise at most every 6 h per user
+  (localStorage). It used to run only at zero rows, so a failed
+  `missionCreated` fan-out was never recovered for anyone who had a
+  suggestion. qid 203 sorts `createdAt:desc` so the newest missions survive
+  its 500 cap.
 
 ### QIDS added (`src/routes/api/send/qids.js`)
 

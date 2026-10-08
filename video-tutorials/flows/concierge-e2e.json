@@ -1,0 +1,2100 @@
+{
+  "$schema": "../flow.schema.json",
+  "id": "concierge-e2e",
+  "title": "הקונסיירז' מקצה לקצה — ממשאלה ועד עסקה שהושלמה",
+  "audience": "לקוחות חדשים (שימוש כהדרכה) + פרסומת לדף /made-for-you",
+  "language": "he",
+  "defaults": {
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "scale": 1.5,
+    "pace": 1
+  },
+  "vars": {
+    "wishTitle": "שולחן עבודה מעץ והרכבת מחשב לפינת העבודה (הדגמה ${RUN})",
+    "wishBody": "אני מקימה פינת עבודה בבית. צריך שולחן עץ בהתאמה אישית בגודל 140 על 70, ומחשב שולחני שירכיבו ויתקינו לי. עד סוף החודש, בתל אביב, תקציב בערך 3,000 שקל."
+  },
+  "warmup": [
+    {
+      "session": "guest",
+      "url": "/wish/new"
+    }
+  ],
+  "scenes": [
+    {
+      "id": "s01-landing",
+      "title": "מה זה הקונסיירז'",
+      "chapter": "פתיחה",
+      "session": "guest",
+      "narration": "צריכים משהו, ולא בא לכם לחפש ספקים, להשוות מחירים ולרדוף אחרי הצעות? בקונסיירז' של אחד-לב-אחד פשוט כותבים מה רוצים — והשאר קורה בהסכמה.",
+      "setup": [
+        {
+          "do": "goto",
+          "url": "/made-for-you"
+        }
+      ],
+      "steps": [
+        {
+          "do": "highlight",
+          "target": {
+            "role": "heading",
+            "level": 1,
+            "name": "/מה שתרצו/"
+          },
+          "ms": 1600,
+          "mark": "hero"
+        },
+        {
+          "do": "scroll",
+          "target": {
+            "role": "heading",
+            "level": 2,
+            "name": "איך זה עובד"
+          },
+          "block": "start"
+        },
+        {
+          "do": "wait",
+          "ms": 1800,
+          "mark": "how-it-works"
+        },
+        {
+          "do": "scroll",
+          "target": {
+            "role": "link",
+            "name": "ספרו לנו מה תרצו"
+          }
+        },
+        {
+          "do": "click",
+          "target": {
+            "role": "link",
+            "name": "ספרו לנו מה תרצו"
+          },
+          "mark": "cta"
+        },
+        {
+          "do": "waitForUrl",
+          "match": "/wish/new"
+        }
+      ]
+    },
+    {
+      "id": "s02-write-wish",
+      "title": "כותבים משאלה במילים שלכם",
+      "chapter": "1 · משאלה",
+      "session": "customer",
+      "narration": "כותבים במשפט אחד מה רוצים שיקרה, ומוסיפים פרטים כמו בהודעה לחבר. בזמן שאתם כותבים, לב — העוזר החכם — כבר מזהה משימות, משאבים ובעלי מקצוע, וממלא לבד מתי, איפה ובאיזה תקציב.",
+      "setup": [
+        {
+          "do": "goto",
+          "url": "/wish/new"
+        }
+      ],
+      "steps": [
+        {
+          "do": "type",
+          "target": {
+            "role": "textbox",
+            "name": "/במשפט אחד/"
+          },
+          "text": "${wishTitle}",
+          "mark": "title"
+        },
+        {
+          "do": "click",
+          "target": {
+            "css": "[contenteditable=true]"
+          }
+        },
+        {
+          "do": "type",
+          "target": {
+            "css": "[contenteditable=true]"
+          },
+          "text": "${wishBody}",
+          "delay": 22,
+          "mark": "body"
+        },
+        {
+          "do": "waitFor",
+          "target": {
+            "text": "/מה אני מזהה עד עכשיו/"
+          },
+          "timeout": 120000,
+          "mark": "lev-done",
+          "note": "AI extraction takes 30-50s on dev — the edit speeds this wait up"
+        },
+        {
+          "do": "highlight",
+          "target": {
+            "text": "/מה אני מזהה עד עכשיו/"
+          },
+          "ms": 1800,
+          "mark": "lev-analysis"
+        },
+        {
+          "do": "scroll",
+          "target": {
+            "text": "פרטים מעשיים"
+          },
+          "block": "start"
+        },
+        {
+          "do": "wait",
+          "ms": 2200,
+          "mark": "lev-filled-details",
+          "note": "Lev filled when/where/budget by itself"
+        },
+        {
+          "do": "scroll",
+          "target": {
+            "role": "button",
+            "name": "/^פרסום (המשאלה|ומעבר להצעות)/"
+          }
+        },
+        {
+          "do": "click",
+          "target": {
+            "role": "button",
+            "name": "/^פרסום (המשאלה|ומעבר להצעות)/"
+          },
+          "mark": "publish",
+          "commits": true
+        },
+        {
+          "do": "waitForUrl",
+          "match": "/concierge/\\d+",
+          "timeout": 180000
+        },
+        {
+          "do": "save",
+          "as": "wishId",
+          "fromUrl": "/concierge/(\\d+)"
+        }
+      ],
+      "timeout": 30000
+    },
+    {
+      "id": "s03a-edit-plan",
+      "title": "הבקשה מפורקת לחלקים — ואפשר לערוך",
+      "chapter": "2 · הבנה",
+      "session": "customer",
+      "narration": "המשאלה מתפרסמת, וכל חלק בה מקבל שורה משלו. אפשר לערוך את התכנית: כאן העץ והרכיבים כלולים בעבודה, אז מסירים אותם.",
+      "setup": [
+        {
+          "do": "goto",
+          "url": "/concierge/${wishId}"
+        }
+      ],
+      "steps": [
+        {
+          "do": "highlight",
+          "target": {
+            "text": "/משימות שזיהיתי/"
+          },
+          "ms": 2000,
+          "mark": "breakdown"
+        },
+        {
+          "do": "scroll",
+          "target": {
+            "css": ".plan-row",
+            "hasText": "שולחן עץ 140x70"
+          }
+        },
+        {
+          "do": "click",
+          "target": {
+            "within": {
+              "css": ".plan-row",
+              "hasText": "שולחן עץ 140x70"
+            },
+            "role": "button",
+            "name": "✕ הסרה"
+          },
+          "acceptDialog": true,
+          "navigates": true,
+          "commits": true,
+          "mark": "remove:שולחן עץ 140x70"
+        },
+        {
+          "do": "waitFor",
+          "target": {
+            "role": "heading",
+            "level": 1
+          },
+          "timeout": 180000
+        },
+        {
+          "do": "scroll",
+          "target": {
+            "css": ".plan-row",
+            "hasText": "רכיבי מחשב שולחני"
+          }
+        },
+        {
+          "do": "click",
+          "target": {
+            "within": {
+              "css": ".plan-row",
+              "hasText": "רכיבי מחשב שולחני"
+            },
+            "role": "button",
+            "name": "✕ הסרה"
+          },
+          "acceptDialog": true,
+          "navigates": true,
+          "commits": true,
+          "mark": "remove:רכיבי מחשב שולחני"
+        },
+        {
+          "do": "waitFor",
+          "target": {
+            "role": "heading",
+            "level": 1
+          },
+          "timeout": 180000
+        }
+      ],
+      "timeout": 60000
+    },
+    {
+      "id": "s03b-publish",
+      "title": "מפרסמים כל משימה לקהילה",
+      "chapter": "2 · הבנה",
+      "session": "customer",
+      "narration": "עכשיו מפרסמים כל משימה לקהילה. לב מציע כישורים, תפקיד ותמחור — מאשרים, והצורך מגיע ללב של מי שמתאים.",
+      "setup": [
+        {
+          "do": "goto",
+          "url": "/concierge/${wishId}"
+        }
+      ],
+      "steps": [
+        {
+          "do": "scroll",
+          "target": {
+            "css": ".plan-row",
+            "hasText": "בניית שולחן עץ"
+          }
+        },
+        {
+          "do": "click",
+          "target": {
+            "within": {
+              "css": ".plan-row",
+              "hasText": "בניית שולחן עץ"
+            },
+            "role": "button",
+            "name": "📣 פרסום לקהילה"
+          },
+          "mark": "publish-carpentry-open"
+        },
+        {
+          "do": "waitFor",
+          "target": {
+            "role": "dialog"
+          }
+        },
+        {
+          "do": "click",
+          "target": {
+            "within": {
+              "role": "dialog"
+            },
+            "role": "button",
+            "name": "✨ הצע עם AI"
+          }
+        },
+        {
+          "do": "waitFor",
+          "target": {
+            "within": {
+              "role": "dialog"
+            },
+            "role": "button",
+            "name": "החל הכל"
+          },
+          "timeout": 300000,
+          "note": "AI suggestion — sped up in the edit"
+        },
+        {
+          "do": "highlight",
+          "target": {
+            "within": {
+              "role": "dialog"
+            },
+            "text": "/שווי מוצע/"
+          },
+          "ms": 1800,
+          "mark": "publish-carpentry-ai"
+        },
+        {
+          "do": "click",
+          "target": {
+            "within": {
+              "role": "dialog"
+            },
+            "role": "button",
+            "name": "החל הכל"
+          }
+        },
+        {
+          "do": "click",
+          "target": {
+            "within": {
+              "role": "dialog"
+            },
+            "role": "button",
+            "name": "פרסום לקהילה",
+            "exact": true
+          },
+          "commits": true,
+          "mark": "publish-carpentry"
+        },
+        {
+          "do": "waitFor",
+          "target": {
+            "text": "/פורסם לקהילה/"
+          },
+          "timeout": 120000
+        },
+        {
+          "do": "scroll",
+          "target": {
+            "css": ".plan-row",
+            "hasText": "הרכבת מחשב שולחני"
+          }
+        },
+        {
+          "do": "click",
+          "target": {
+            "within": {
+              "css": ".plan-row",
+              "hasText": "הרכבת מחשב שולחני"
+            },
+            "role": "button",
+            "name": "📣 פרסום לקהילה"
+          },
+          "mark": "publish-computer-open"
+        },
+        {
+          "do": "waitFor",
+          "target": {
+            "role": "dialog"
+          }
+        },
+        {
+          "do": "click",
+          "target": {
+            "within": {
+              "role": "dialog"
+            },
+            "role": "button",
+            "name": "✨ הצע עם AI"
+          }
+        },
+        {
+          "do": "waitFor",
+          "target": {
+            "within": {
+              "role": "dialog"
+            },
+            "role": "button",
+            "name": "החל הכל"
+          },
+          "timeout": 300000,
+          "note": "AI suggestion — sped up in the edit"
+        },
+        {
+          "do": "highlight",
+          "target": {
+            "within": {
+              "role": "dialog"
+            },
+            "text": "/שווי מוצע/"
+          },
+          "ms": 1800,
+          "mark": "publish-computer-ai"
+        },
+        {
+          "do": "click",
+          "target": {
+            "within": {
+              "role": "dialog"
+            },
+            "role": "button",
+            "name": "החל הכל"
+          }
+        },
+        {
+          "do": "click",
+          "target": {
+            "within": {
+              "role": "dialog"
+            },
+            "role": "button",
+            "name": "פרסום לקהילה",
+            "exact": true
+          },
+          "commits": true,
+          "mark": "publish-computer"
+        },
+        {
+          "do": "waitFor",
+          "target": {
+            "text": "/פורסם לקהילה/"
+          },
+          "timeout": 120000
+        }
+      ],
+      "timeout": 60000
+    },
+    {
+      "id": "s04-supplier-applies",
+      "title": "ספקית רואה את הצורך ומציעה את עצמה",
+      "chapter": "3 · הצעות",
+      "session": "sup2",
+      "narration": "בעלת מקצוע שמתאימה לחלק מהמשאלה מקבלת כרטיס בלב שלה ומייל. היא יכולה להציע את עצמה כמו שזה, או להציע תנאים אחרים — שעות ומחיר — והלקוחה תענה.",
+      "setup": [
+        {
+          "do": "goto",
+          "url": "/lev"
+        },
+        {
+          "do": "waitFor",
+          "target": {
+            "role": "button",
+            "name": "/^הצעת משימה · בניית שולחן עץ/"
+          },
+          "timeout": 300000
+        },
+        {
+          "do": "wait",
+          "ms": 1500
+        }
+      ],
+      "steps": [
+        {
+          "do": "highlight",
+          "target": {
+            "role": "button",
+            "name": "/^הצעת משימה · בניית שולחן עץ/"
+          },
+          "ms": 1800,
+          "mark": "apply-table-coin"
+        },
+        {
+          "do": "click",
+          "target": {
+            "role": "button",
+            "name": "/^הצעת משימה · בניית שולחן עץ/"
+          },
+          "mark": "apply-table-open"
+        },
+        {
+          "do": "waitFor",
+          "target": {
+            "role": "button",
+            "name": "אני רוצה"
+          },
+          "timeout": 60000
+        },
+        {
+          "do": "wait",
+          "ms": 1200
+        },
+        {
+          "do": "highlight",
+          "target": {
+            "text": "/חלק מהמשאלה/"
+          },
+          "ms": 1600,
+          "mark": "apply-table-wish"
+        },
+        {
+          "do": "scroll",
+          "target": {
+            "role": "heading",
+            "name": "הכישורים הנדרשים:"
+          }
+        },
+        {
+          "do": "wait",
+          "ms": 2200
+        },
+        {
+          "do": "click",
+          "target": {
+            "role": "button",
+            "name": "אני רוצה"
+          },
+          "commits": true,
+          "mark": "apply-table-apply"
+        },
+        {
+          "do": "wait",
+          "ms": 3500
+        }
+      ]
+    },
+    {
+      "id": "s05-second-supplier",
+      "title": "(מאחורי הקלעים) ספק המחשבים מציע גם הוא",
+      "session": "sup1",
+      "record": false,
+      "setup": [
+        {
+          "do": "goto",
+          "url": "/lev"
+        },
+        {
+          "do": "waitFor",
+          "target": {
+            "role": "button",
+            "name": "/^הצעת משימה · הרכבת מחשב שולחני/"
+          },
+          "timeout": 300000
+        },
+        {
+          "do": "wait",
+          "ms": 1500
+        }
+      ],
+      "steps": [
+        {
+          "do": "highlight",
+          "target": {
+            "role": "button",
+            "name": "/^הצעת משימה · הרכבת מחשב שולחני/"
+          },
+          "ms": 1800,
+          "mark": "apply-computer-coin"
+        },
+        {
+          "do": "click",
+          "target": {
+            "role": "button",
+            "name": "/^הצעת משימה · הרכבת מחשב שולחני/"
+          },
+          "mark": "apply-computer-open"
+        },
+        {
+          "do": "waitFor",
+          "target": {
+            "role": "button",
+            "name": "אני רוצה"
+          },
+          "timeout": 60000
+        },
+        {
+          "do": "wait",
+          "ms": 1200
+        },
+        {
+          "do": "highlight",
+          "target": {
+            "text": "/חלק מהמשאלה/"
+          },
+          "ms": 1600,
+          "mark": "apply-computer-wish"
+        },
+        {
+          "do": "scroll",
+          "target": {
+            "role": "heading",
+            "name": "הכישורים הנדרשים:"
+          }
+        },
+        {
+          "do": "wait",
+          "ms": 2200
+        },
+        {
+          "do": "click",
+          "target": {
+            "role": "button",
+            "name": "אני רוצה"
+          },
+          "commits": true,
+          "mark": "apply-computer-apply"
+        },
+        {
+          "do": "wait",
+          "ms": 3500
+        }
+      ]
+    },
+    {
+      "id": "s06-customer-chooses",
+      "title": "הלקוחה משוחחת ומאשרת",
+      "chapter": "3 · הצעות",
+      "session": "customer",
+      "narration": "ההצעות מגיעות אליכם. אפשר לפתוח שיחה עם כל מציע לפני שמחליטים, לבקש שינוי, ולאשר רק את מה שמתאים. כאן אין 'לא' שסוגר דלת — יש שיחה, עד שמגיעים להסכמה.",
+      "setup": [
+        {
+          "do": "goto",
+          "url": "/concierge/${wishId}"
+        },
+        {
+          "do": "waitFor",
+          "target": {
+            "within": {
+              "css": ".plan-row",
+              "hasText": "בניית שולחן עץ"
+            },
+            "css": ".pcard",
+            "hasText": "קלוד בודק 2"
+          },
+          "timeout": 240000
+        },
+        {
+          "do": "wait",
+          "ms": 1000
+        }
+      ],
+      "steps": [
+        {
+          "do": "scroll",
+          "target": {
+            "css": ".plan-row",
+            "hasText": "בניית שולחן עץ"
+          }
+        },
+        {
+          "do": "highlight",
+          "target": {
+            "within": {
+              "css": ".plan-row",
+              "hasText": "בניית שולחן עץ"
+            },
+            "css": ".pcard",
+            "hasText": "קלוד בודק 2"
+          },
+          "ms": 2000,
+          "mark": "offer-table"
+        },
+        {
+          "do": "click",
+          "target": {
+            "within": {
+              "within": {
+                "css": ".plan-row",
+                "hasText": "בניית שולחן עץ"
+              },
+              "css": ".pcard",
+              "hasText": "קלוד בודק 2"
+            },
+            "role": "button",
+            "name": "/הצעה נגדית/"
+          },
+          "mark": "counter-open"
+        },
+        {
+          "do": "wait",
+          "ms": 900
+        },
+        {
+          "do": "highlight",
+          "target": {
+            "within": {
+              "css": ".plan-row",
+              "hasText": "בניית שולחן עץ"
+            },
+            "role": "spinbutton",
+            "name": "מחיר"
+          },
+          "ms": 1800,
+          "mark": "counter-form"
+        },
+        {
+          "do": "click",
+          "target": {
+            "within": {
+              "css": ".plan-row",
+              "hasText": "בניית שולחן עץ"
+            },
+            "role": "button",
+            "name": "ביטול",
+            "exact": true
+          }
+        },
+        {
+          "do": "wait",
+          "ms": 700
+        },
+        {
+          "do": "click",
+          "target": {
+            "within": {
+              "within": {
+                "css": ".plan-row",
+                "hasText": "בניית שולחן עץ"
+              },
+              "css": ".pcard",
+              "hasText": "קלוד בודק 2"
+            },
+            "role": "button",
+            "name": "/בחירה$/"
+          },
+          "commits": true,
+          "navigates": true,
+          "mark": "choose-table"
+        },
+        {
+          "do": "waitFor",
+          "target": {
+            "css": ".plan-row",
+            "hasText": "הרכבת מחשב שולחני"
+          },
+          "timeout": 240000
+        },
+        {
+          "do": "scroll",
+          "target": {
+            "css": ".plan-row",
+            "hasText": "הרכבת מחשב שולחני"
+          }
+        },
+        {
+          "do": "highlight",
+          "target": {
+            "within": {
+              "css": ".plan-row",
+              "hasText": "הרכבת מחשב שולחני"
+            },
+            "css": ".pcard",
+            "hasText": "קלוד בודק"
+          },
+          "ms": 1600,
+          "mark": "offer-computer"
+        },
+        {
+          "do": "click",
+          "target": {
+            "within": {
+              "within": {
+                "css": ".plan-row",
+                "hasText": "הרכבת מחשב שולחני"
+              },
+              "css": ".pcard",
+              "hasText": "קלוד בודק"
+            },
+            "role": "button",
+            "name": "/בחירה$/"
+          },
+          "commits": true,
+          "navigates": true,
+          "mark": "choose-computer"
+        },
+        {
+          "do": "waitFor",
+          "target": {
+            "css": ".plan-row",
+            "hasText": "הרכבת מחשב שולחני"
+          },
+          "timeout": 240000
+        },
+        {
+          "do": "scroll",
+          "target": {
+            "css": ".plan-row",
+            "hasText": "בניית שולחן עץ"
+          }
+        },
+        {
+          "do": "wait",
+          "ms": 2500
+        }
+      ]
+    },
+    {
+      "id": "s07-consent",
+      "title": "סוגרים הסכמה — ונוצרת רקמה",
+      "chapter": "4 · הסכמה",
+      "session": "customer",
+      "narration": "כשכל החלקים מאושרים, סוגרים את ההסכמה. ברגע הזה נוצרת רקמה — שותפות של כל מי שעובד על המשאלה שלכם — והעסקה עוברת לביצוע.",
+      "setup": [
+        {
+          "do": "goto",
+          "url": "/concierge/${wishId}"
+        },
+        {
+          "do": "waitFor",
+          "target": {
+            "role": "button",
+            "name": "/סגירת ההסכמה/"
+          },
+          "timeout": 240000
+        },
+        {
+          "do": "wait",
+          "ms": 1000
+        }
+      ],
+      "steps": [
+        {
+          "do": "scroll",
+          "target": {
+            "text": "/התכנית מתחברת/"
+          }
+        },
+        {
+          "do": "highlight",
+          "target": {
+            "text": "/התכנית מתחברת/"
+          },
+          "ms": 1800,
+          "mark": "plan-full"
+        },
+        {
+          "do": "scroll",
+          "target": {
+            "role": "button",
+            "name": "/סגירת ההסכמה/"
+          }
+        },
+        {
+          "do": "wait",
+          "ms": 600
+        },
+        {
+          "do": "click",
+          "target": {
+            "role": "button",
+            "name": "/סגירת ההסכמה/"
+          },
+          "commits": true,
+          "mark": "close-consent"
+        },
+        {
+          "do": "waitForUrl",
+          "match": "/deals",
+          "timeout": 240000,
+          "note": "materializeWish opens the rikma and the deal — sped up in the edit"
+        },
+        {
+          "do": "wait",
+          "ms": 3500
+        }
+      ]
+    },
+    {
+      "id": "s07b-ids",
+      "title": "מזהי הרקמה והמשימות",
+      "session": "sup2",
+      "record": false,
+      "todo": "save rikmaId / tableMissionId / pcMissionId from the new rikma (2026-10-07 run: 92 / 196 / 197, set by hand in current-vars.json)"
+    },
+    {
+      "id": "s08a-log-table",
+      "title": "רישום 15 שעות נגרות (מאחורי הקלעים)",
+      "session": "sup2",
+      "record": false,
+      "localStorage": {
+        "moachGuide_${rikmaId}": "done"
+      },
+      "setup": [
+        {
+          "do": "goto",
+          "url": "/moach/${rikmaId}/progress/${tableMissionId}"
+        },
+        {
+          "do": "waitFor",
+          "target": {
+            "any": [
+              {
+                "role": "button",
+                "name": "עצירת טיימר"
+              },
+              {
+                "role": "button",
+                "name": "שמירת הזמן"
+              },
+              {
+                "role": "button",
+                "name": "עריכת הטיימר"
+              }
+            ]
+          },
+          "timeout": 240000
+        }
+      ],
+      "steps": [
+        {
+          "do": "click",
+          "target": {
+            "any": [
+              {
+                "role": "button",
+                "name": "עצירת טיימר"
+              },
+              {
+                "role": "button",
+                "name": "שמירת הזמן"
+              },
+              {
+                "role": "button",
+                "name": "עריכת הטיימר"
+              }
+            ]
+          }
+        },
+        {
+          "do": "click",
+          "target": {
+            "any": [
+              {
+                "role": "button",
+                "name": "עריכת זמנים"
+              },
+              {
+                "role": "button",
+                "name": "הזנת שעות ידנית"
+              }
+            ]
+          }
+        },
+        {
+          "do": "wait",
+          "ms": 4000
+        },
+        {
+          "do": "click",
+          "target": {
+            "role": "button",
+            "name": "/הוספת קטע זמן/"
+          }
+        },
+        {
+          "do": "fill",
+          "target": {
+            "within": {
+              "role": "dialog"
+            },
+            "label": "התחלה"
+          },
+          "text": "2026-10-06T09:00"
+        },
+        {
+          "do": "fill",
+          "target": {
+            "within": {
+              "role": "dialog"
+            },
+            "label": "סיום"
+          },
+          "text": "2026-10-06T17:00"
+        },
+        {
+          "do": "click",
+          "target": {
+            "within": {
+              "role": "dialog"
+            },
+            "role": "button",
+            "name": "שמירה",
+            "exact": true
+          },
+          "commits": true
+        },
+        {
+          "do": "wait",
+          "ms": 2500
+        },
+        {
+          "do": "click",
+          "target": {
+            "role": "button",
+            "name": "/הוספת קטע זמן/"
+          }
+        },
+        {
+          "do": "fill",
+          "target": {
+            "within": {
+              "role": "dialog"
+            },
+            "label": "התחלה"
+          },
+          "text": "2026-10-07T08:00"
+        },
+        {
+          "do": "fill",
+          "target": {
+            "within": {
+              "role": "dialog"
+            },
+            "label": "סיום"
+          },
+          "text": "2026-10-07T15:00"
+        },
+        {
+          "do": "click",
+          "target": {
+            "within": {
+              "role": "dialog"
+            },
+            "role": "button",
+            "name": "שמירה",
+            "exact": true
+          },
+          "commits": true
+        },
+        {
+          "do": "wait",
+          "ms": 2500
+        }
+      ]
+    },
+    {
+      "id": "s08-execution",
+      "title": "הספקית עובדת ומדווחת התקדמות",
+      "chapter": "5 · ביצוע",
+      "session": "sup2",
+      "narration": "הספקים עובדים ומדווחים — טיימר על המשימה, ועדכון קצר על מה נעשה. הלקוחה רואה את ההתקדמות בדף העסקה, ויכולה לדבר עם הצוות בכל רגע.",
+      "setup": [
+        {
+          "do": "goto",
+          "url": "/moach/${rikmaId}/progress/${tableMissionId}"
+        },
+        {
+          "do": "waitFor",
+          "target": {
+            "role": "button",
+            "name": "שמירת הזמן"
+          },
+          "timeout": 240000
+        },
+        {
+          "do": "wait",
+          "ms": 1000
+        }
+      ],
+      "steps": [
+        {
+          "do": "scroll",
+          "target": {
+            "role": "heading",
+            "name": "פירוט הטיימרים"
+          },
+          "block": "start"
+        },
+        {
+          "do": "highlight",
+          "target": {
+            "role": "heading",
+            "name": "פירוט הטיימרים"
+          },
+          "ms": 2200,
+          "mark": "timer-log"
+        },
+        {
+          "do": "scroll",
+          "target": {
+            "role": "heading",
+            "name": "פעולות"
+          }
+        },
+        {
+          "do": "click",
+          "target": {
+            "role": "button",
+            "name": "שמירת הזמן"
+          },
+          "mark": "save-time"
+        },
+        {
+          "do": "click",
+          "target": {
+            "within": {
+              "role": "dialog"
+            },
+            "role": "button",
+            "name": "שמירת הטיימר"
+          }
+        },
+        {
+          "do": "type",
+          "target": {
+            "within": {
+              "role": "dialog"
+            },
+            "role": "textbox",
+            "name": "מה עשית בזמן הזה?"
+          },
+          "text": "חיתוך והדבקה של משטח האלון, שיוף ושתי שכבות לכה. הרגליים מוכנות להרכבה.",
+          "mark": "what-done"
+        },
+        {
+          "do": "click",
+          "target": {
+            "within": {
+              "role": "dialog"
+            },
+            "role": "button",
+            "name": "שמירת הטיימר"
+          },
+          "commits": true,
+          "mark": "time-saved"
+        },
+        {
+          "do": "wait",
+          "ms": 3000
+        }
+      ],
+      "note": "Saving the timer is the submission: in a rikma of 2+ members timerSave opens a finiapruval for the hours (fileHours.ts). The hours are logged backstage in s08a-log-hours.",
+      "localStorage": {
+        "moachGuide_${rikmaId}": "done"
+      }
+    },
+    {
+      "id": "s08b-log-pc",
+      "title": "רישום 2 שעות הרכבה",
+      "session": "sup1",
+      "record": false,
+      "localStorage": {
+        "moachGuide_${rikmaId}": "done"
+      },
+      "setup": [
+        {
+          "do": "goto",
+          "url": "/moach/${rikmaId}/progress/${pcMissionId}"
+        },
+        {
+          "do": "waitFor",
+          "target": {
+            "any": [
+              {
+                "role": "button",
+                "name": "עצירת טיימר"
+              },
+              {
+                "role": "button",
+                "name": "שמירת הזמן"
+              },
+              {
+                "role": "button",
+                "name": "עריכת הטיימר"
+              }
+            ]
+          },
+          "timeout": 240000
+        }
+      ],
+      "steps": [
+        {
+          "do": "click",
+          "target": {
+            "any": [
+              {
+                "role": "button",
+                "name": "עצירת טיימר"
+              },
+              {
+                "role": "button",
+                "name": "שמירת הזמן"
+              },
+              {
+                "role": "button",
+                "name": "עריכת הטיימר"
+              }
+            ]
+          }
+        },
+        {
+          "do": "click",
+          "target": {
+            "any": [
+              {
+                "role": "button",
+                "name": "עריכת זמנים"
+              },
+              {
+                "role": "button",
+                "name": "הזנת שעות ידנית"
+              }
+            ]
+          }
+        },
+        {
+          "do": "wait",
+          "ms": 4000
+        },
+        {
+          "do": "click",
+          "target": {
+            "role": "button",
+            "name": "/הוספת קטע זמן/"
+          }
+        },
+        {
+          "do": "fill",
+          "target": {
+            "within": {
+              "role": "dialog"
+            },
+            "label": "התחלה"
+          },
+          "text": "2026-10-07T10:00"
+        },
+        {
+          "do": "fill",
+          "target": {
+            "within": {
+              "role": "dialog"
+            },
+            "label": "סיום"
+          },
+          "text": "2026-10-07T12:00"
+        },
+        {
+          "do": "click",
+          "target": {
+            "within": {
+              "role": "dialog"
+            },
+            "role": "button",
+            "name": "שמירה",
+            "exact": true
+          },
+          "commits": true
+        },
+        {
+          "do": "wait",
+          "ms": 2500
+        }
+      ]
+    },
+    {
+      "id": "s08c-save-pc",
+      "title": "שמירת השעות — נפתח אישור הרקמה",
+      "session": "sup1",
+      "record": false,
+      "localStorage": {
+        "moachGuide_${rikmaId}": "done"
+      },
+      "setup": [
+        {
+          "do": "goto",
+          "url": "/moach/${rikmaId}/progress/${pcMissionId}"
+        },
+        {
+          "do": "waitFor",
+          "target": {
+            "role": "button",
+            "name": "שמירת הזמן"
+          },
+          "timeout": 240000
+        }
+      ],
+      "steps": [
+        {
+          "do": "click",
+          "target": {
+            "role": "button",
+            "name": "שמירת הזמן"
+          }
+        },
+        {
+          "do": "click",
+          "target": {
+            "within": {
+              "role": "dialog"
+            },
+            "role": "button",
+            "name": "שמירת הטיימר"
+          }
+        },
+        {
+          "do": "fill",
+          "target": {
+            "within": {
+              "role": "dialog"
+            },
+            "role": "textbox",
+            "name": "מה עשית בזמן הזה?"
+          },
+          "text": "הרכבת המחשב, התקנת מערכת ההפעלה ובדיקות. המחשב מחובר ועובד בפינת העבודה."
+        },
+        {
+          "do": "click",
+          "target": {
+            "within": {
+              "role": "dialog"
+            },
+            "role": "button",
+            "name": "שמירת הטיימר"
+          },
+          "commits": true
+        },
+        {
+          "do": "wait",
+          "ms": 8000
+        }
+      ]
+    },
+    {
+      "id": "s08d-approve-table-hours",
+      "title": "אישור בניית שולחן עץ",
+      "session": "sup1",
+      "record": false,
+      "localStorage": {
+        "lev:view": "list"
+      },
+      "setup": [
+        {
+          "do": "goto",
+          "url": "/lev"
+        },
+        {
+          "do": "waitFor",
+          "target": {
+            "role": "button",
+            "name": "אישור סיום · בניית שולחן עץ"
+          },
+          "timeout": 300000
+        }
+      ],
+      "steps": [
+        {
+          "do": "click",
+          "target": {
+            "role": "button",
+            "name": "אישור סיום · בניית שולחן עץ"
+          }
+        },
+        {
+          "do": "click",
+          "target": {
+            "role": "button",
+            "name": "אישור",
+            "exact": true
+          },
+          "commits": true
+        },
+        {
+          "do": "wait",
+          "ms": 15000,
+          "note": "closeFiniapruval takes up to ~14s"
+        }
+      ]
+    },
+    {
+      "id": "s08e-approve-pc-hours",
+      "title": "אישור הרכבת מחשב שולחני",
+      "session": "sup2",
+      "record": false,
+      "localStorage": {
+        "lev:view": "list"
+      },
+      "setup": [
+        {
+          "do": "goto",
+          "url": "/lev"
+        },
+        {
+          "do": "waitFor",
+          "target": {
+            "role": "button",
+            "name": "אישור סיום · הרכבת מחשב שולחני"
+          },
+          "timeout": 300000
+        }
+      ],
+      "steps": [
+        {
+          "do": "click",
+          "target": {
+            "role": "button",
+            "name": "אישור סיום · הרכבת מחשב שולחני"
+          }
+        },
+        {
+          "do": "click",
+          "target": {
+            "role": "button",
+            "name": "אישור",
+            "exact": true
+          },
+          "commits": true
+        },
+        {
+          "do": "wait",
+          "ms": 15000,
+          "note": "closeFiniapruval takes up to ~14s"
+        }
+      ]
+    },
+    {
+      "id": "s08f-finish-table",
+      "title": "סיום משימה",
+      "session": "sup2",
+      "record": false,
+      "localStorage": {
+        "moachGuide_${rikmaId}": "done"
+      },
+      "setup": [
+        {
+          "do": "goto",
+          "url": "/moach/${rikmaId}/progress/${tableMissionId}"
+        },
+        {
+          "do": "waitFor",
+          "target": {
+            "role": "button",
+            "name": "סיום משימה"
+          },
+          "timeout": 240000
+        }
+      ],
+      "steps": [
+        {
+          "do": "click",
+          "target": {
+            "role": "button",
+            "name": "סיום משימה"
+          }
+        },
+        {
+          "do": "fill",
+          "target": {
+            "within": {
+              "role": "dialog"
+            },
+            "role": "textbox",
+            "name": "/לתאר במילים את סיום המשימה/"
+          },
+          "text": "השולחן מוכן: 140×70, אלון מלא בגימור לכה. הובל והורכב בבית הלקוחה."
+        },
+        {
+          "do": "click",
+          "target": {
+            "within": {
+              "role": "dialog"
+            },
+            "role": "button",
+            "name": "שליחה לאישור"
+          },
+          "commits": true
+        },
+        {
+          "do": "wait",
+          "ms": 8000
+        }
+      ]
+    },
+    {
+      "id": "s08g-finish-pc",
+      "title": "סיום משימה",
+      "session": "sup1",
+      "record": false,
+      "localStorage": {
+        "moachGuide_${rikmaId}": "done"
+      },
+      "setup": [
+        {
+          "do": "goto",
+          "url": "/moach/${rikmaId}/progress/${pcMissionId}"
+        },
+        {
+          "do": "waitFor",
+          "target": {
+            "role": "button",
+            "name": "סיום משימה"
+          },
+          "timeout": 240000
+        }
+      ],
+      "steps": [
+        {
+          "do": "click",
+          "target": {
+            "role": "button",
+            "name": "סיום משימה"
+          }
+        },
+        {
+          "do": "fill",
+          "target": {
+            "within": {
+              "role": "dialog"
+            },
+            "role": "textbox",
+            "name": "/לתאר במילים את סיום המשימה/"
+          },
+          "text": "המחשב הורכב, מערכת ההפעלה הותקנה והכל נבדק. מחובר ועובד בפינת העבודה."
+        },
+        {
+          "do": "click",
+          "target": {
+            "within": {
+              "role": "dialog"
+            },
+            "role": "button",
+            "name": "שליחה לאישור"
+          },
+          "commits": true
+        },
+        {
+          "do": "wait",
+          "ms": 8000
+        }
+      ]
+    },
+    {
+      "id": "s08h-approve-table-finish",
+      "title": "אישור בניית שולחן עץ",
+      "session": "sup1",
+      "record": false,
+      "localStorage": {
+        "lev:view": "list"
+      },
+      "setup": [
+        {
+          "do": "goto",
+          "url": "/lev"
+        },
+        {
+          "do": "waitFor",
+          "target": {
+            "role": "button",
+            "name": "אישור סיום · בניית שולחן עץ"
+          },
+          "timeout": 300000
+        }
+      ],
+      "steps": [
+        {
+          "do": "click",
+          "target": {
+            "role": "button",
+            "name": "אישור סיום · בניית שולחן עץ"
+          }
+        },
+        {
+          "do": "click",
+          "target": {
+            "role": "button",
+            "name": "אישור",
+            "exact": true
+          },
+          "commits": true
+        },
+        {
+          "do": "wait",
+          "ms": 15000,
+          "note": "closeFiniapruval takes up to ~14s"
+        }
+      ]
+    },
+    {
+      "id": "s08i-approve-pc-finish",
+      "title": "אישור הרכבת מחשב שולחני",
+      "session": "sup2",
+      "record": false,
+      "localStorage": {
+        "lev:view": "list"
+      },
+      "setup": [
+        {
+          "do": "goto",
+          "url": "/lev"
+        },
+        {
+          "do": "waitFor",
+          "target": {
+            "role": "button",
+            "name": "אישור סיום · הרכבת מחשב שולחני"
+          },
+          "timeout": 300000
+        }
+      ],
+      "steps": [
+        {
+          "do": "click",
+          "target": {
+            "role": "button",
+            "name": "אישור סיום · הרכבת מחשב שולחני"
+          }
+        },
+        {
+          "do": "click",
+          "target": {
+            "role": "button",
+            "name": "אישור",
+            "exact": true
+          },
+          "commits": true
+        },
+        {
+          "do": "wait",
+          "ms": 15000,
+          "note": "closeFiniapruval takes up to ~14s"
+        }
+      ]
+    },
+    {
+      "id": "s08j-money-receiver",
+      "title": "הספק מוכן לקבל את התשלום",
+      "session": "sup2",
+      "record": false,
+      "localStorage": {
+        "lev:view": "list"
+      },
+      "setup": [
+        {
+          "do": "goto",
+          "url": "/lev"
+        },
+        {
+          "do": "waitFor",
+          "target": {
+            "role": "button",
+            "name": "/^מכירה · שולחן עבודה מעץ.*${RUN}/"
+          },
+          "timeout": 300000
+        }
+      ],
+      "steps": [
+        {
+          "do": "click",
+          "target": {
+            "role": "button",
+            "name": "/^מכירה · שולחן עבודה מעץ.*${RUN}/"
+          }
+        },
+        {
+          "do": "click",
+          "target": {
+            "role": "button",
+            "name": "הוסף אותי כמקבל כסף"
+          },
+          "commits": true
+        },
+        {
+          "do": "wait",
+          "ms": 8000
+        }
+      ]
+    },
+    {
+      "id": "s08k-delivered-table",
+      "title": "אישור מסירה",
+      "session": "sup2",
+      "record": false,
+      "localStorage": {
+        "lev:view": "list"
+      },
+      "setup": [
+        {
+          "do": "goto",
+          "url": "/lev"
+        },
+        {
+          "do": "waitFor",
+          "target": {
+            "role": "button",
+            "name": "/^מכירה · שולחן עבודה מעץ.*${RUN}/"
+          },
+          "timeout": 300000
+        }
+      ],
+      "steps": [
+        {
+          "do": "click",
+          "target": {
+            "role": "button",
+            "name": "/^מכירה · שולחן עבודה מעץ.*${RUN}/"
+          }
+        },
+        {
+          "do": "click",
+          "target": {
+            "role": "button",
+            "name": "אישור משלוח"
+          },
+          "commits": true
+        },
+        {
+          "do": "wait",
+          "ms": 8000
+        }
+      ]
+    },
+    {
+      "id": "s08l-delivered-pc",
+      "title": "אישור מסירה",
+      "session": "sup1",
+      "record": false,
+      "localStorage": {
+        "lev:view": "list"
+      },
+      "setup": [
+        {
+          "do": "goto",
+          "url": "/lev"
+        },
+        {
+          "do": "waitFor",
+          "target": {
+            "role": "button",
+            "name": "/^מכירה · שולחן עבודה מעץ.*${RUN}/"
+          },
+          "timeout": 300000
+        }
+      ],
+      "steps": [
+        {
+          "do": "click",
+          "target": {
+            "role": "button",
+            "name": "/^מכירה · שולחן עבודה מעץ.*${RUN}/"
+          }
+        },
+        {
+          "do": "click",
+          "target": {
+            "role": "button",
+            "name": "אישור משלוח"
+          },
+          "commits": true
+        },
+        {
+          "do": "wait",
+          "ms": 8000
+        }
+      ]
+    },
+    {
+      "id": "s09-delivery",
+      "title": "מסירה, תשלום וסגירה",
+      "chapter": "6 · סיום",
+      "session": "customer",
+      "narration": "בסוף, הספקים מאשרים מסירה, ואתם מאשרים שקיבלתם.",
+      "setup": [
+        {
+          "do": "goto",
+          "url": "/lev"
+        },
+        {
+          "do": "waitFor",
+          "target": {
+            "role": "button",
+            "name": "/^רכישה · שולחן עבודה מעץ.*${RUN}/"
+          },
+          "timeout": 300000
+        },
+        {
+          "do": "wait",
+          "ms": 1000
+        }
+      ],
+      "steps": [
+        {
+          "do": "highlight",
+          "target": {
+            "role": "button",
+            "name": "/^רכישה · שולחן עבודה מעץ.*${RUN}/"
+          },
+          "ms": 1600,
+          "mark": "purchase"
+        },
+        {
+          "do": "click",
+          "target": {
+            "role": "button",
+            "name": "/^רכישה · שולחן עבודה מעץ.*${RUN}/"
+          },
+          "mark": "purchase-open"
+        },
+        {
+          "do": "waitFor",
+          "target": {
+            "role": "button",
+            "name": "אישור קבלת מוצר"
+          },
+          "timeout": 60000
+        },
+        {
+          "do": "wait",
+          "ms": 1000
+        },
+        {
+          "do": "highlight",
+          "target": {
+            "text": "/כל חלקי העסקה הסתיימו/"
+          },
+          "ms": 2200,
+          "mark": "final-amount"
+        },
+        {
+          "do": "click",
+          "target": {
+            "role": "button",
+            "name": "אישור קבלת מוצר"
+          },
+          "commits": true,
+          "mark": "got-it"
+        },
+        {
+          "do": "wait",
+          "ms": 3000
+        }
+      ],
+      "note": "Backstage before it: both hour approvals, both finishes (completeMission + finiapruval), a money receiver and both delivery confirmations — see s08a…s08d.",
+      "localStorage": {
+        "lev:view": "list"
+      }
+    },
+    {
+      "id": "s09b-payment",
+      "title": "תשלום — והעסקה נסגרת",
+      "session": "customer",
+      "localStorage": {
+        "lev:view": "list"
+      },
+      "setup": [
+        {
+          "do": "goto",
+          "url": "/lev"
+        },
+        {
+          "do": "waitFor",
+          "target": {
+            "role": "button",
+            "name": "/^רכישה · שולחן עבודה מעץ.*${RUN}/"
+          },
+          "timeout": 300000
+        },
+        {
+          "do": "wait",
+          "ms": 1000
+        }
+      ],
+      "steps": [
+        {
+          "do": "highlight",
+          "target": {
+            "role": "button",
+            "name": "/^רכישה · שולחן עבודה מעץ.*${RUN}/"
+          },
+          "ms": 1600,
+          "mark": "purchase"
+        },
+        {
+          "do": "click",
+          "target": {
+            "role": "button",
+            "name": "/^רכישה · שולחן עבודה מעץ.*${RUN}/"
+          },
+          "mark": "purchase-open"
+        },
+        {
+          "do": "waitFor",
+          "target": {
+            "role": "button",
+            "name": "/קלוד בודק 2$/"
+          },
+          "timeout": 60000
+        },
+        {
+          "do": "wait",
+          "ms": 800
+        },
+        {
+          "do": "highlight",
+          "target": {
+            "text": "/לתשלום עכשיו/"
+          },
+          "ms": 1800,
+          "mark": "pay-now"
+        },
+        {
+          "do": "click",
+          "target": {
+            "role": "button",
+            "name": "/קלוד בודק 2$/"
+          },
+          "mark": "receiver"
+        },
+        {
+          "do": "highlight",
+          "target": {
+            "text": "/הכסף עצמו עובר ביניכם/"
+          },
+          "ms": 2400,
+          "mark": "off-site"
+        },
+        {
+          "do": "click",
+          "target": {
+            "role": "button",
+            "name": "כן, להעביר"
+          },
+          "commits": true,
+          "mark": "transfer"
+        },
+        {
+          "do": "wait",
+          "ms": 3500
+        }
+      ],
+      "narration": "מעבירים תשלום — וכל ספק מאשר שקיבל את חלקו."
+    },
+    {
+      "id": "s09b2-got-money-table",
+      "title": "קיבלתי את חלקי",
+      "session": "sup2",
+      "record": false,
+      "setup": [
+        {
+          "do": "goto",
+          "url": "/deals/${dealId}"
+        },
+        {
+          "do": "waitFor",
+          "target": {
+            "role": "button",
+            "name": "קיבלתי את חלקי במלואו"
+          },
+          "timeout": 240000
+        }
+      ],
+      "steps": [
+        {
+          "do": "click",
+          "target": {
+            "role": "button",
+            "name": "קיבלתי את חלקי במלואו"
+          },
+          "commits": true
+        },
+        {
+          "do": "wait",
+          "ms": 12000
+        }
+      ]
+    },
+    {
+      "id": "s09b3-got-money-pc",
+      "title": "קיבלתי את חלקי",
+      "session": "sup1",
+      "record": false,
+      "setup": [
+        {
+          "do": "goto",
+          "url": "/deals/${dealId}"
+        },
+        {
+          "do": "waitFor",
+          "target": {
+            "role": "button",
+            "name": "קיבלתי את חלקי במלואו"
+          },
+          "timeout": 240000
+        }
+      ],
+      "steps": [
+        {
+          "do": "click",
+          "target": {
+            "role": "button",
+            "name": "קיבלתי את חלקי במלואו"
+          },
+          "commits": true
+        },
+        {
+          "do": "wait",
+          "ms": 12000
+        }
+      ]
+    },
+    {
+      "id": "s09c-done",
+      "title": "העסקה הושלמה",
+      "session": "customer",
+      "narration": "העסקה מסומנת כהושלמה, והכל שקוף, מההתחלה ועד הסוף.",
+      "setup": [
+        {
+          "do": "goto",
+          "url": "/deals/${dealId}"
+        },
+        {
+          "do": "waitFor",
+          "target": {
+            "text": "/הושלם ✓/"
+          },
+          "timeout": 240000
+        },
+        {
+          "do": "wait",
+          "ms": 1000
+        }
+      ],
+      "steps": [
+        {
+          "do": "highlight",
+          "target": {
+            "text": "/הושלם ✓/"
+          },
+          "ms": 1800,
+          "mark": "completed"
+        },
+        {
+          "do": "scroll",
+          "target": {
+            "text": "/כל הספקים קיבלו את חלקם/"
+          }
+        },
+        {
+          "do": "highlight",
+          "target": {
+            "text": "/כל הספקים קיבלו את חלקם/"
+          },
+          "ms": 2400,
+          "mark": "all-paid"
+        },
+        {
+          "do": "wait",
+          "ms": 1500
+        }
+      ]
+    },
+    {
+      "id": "s10-outro",
+      "title": "סיום",
+      "chapter": "סיום",
+      "session": "guest",
+      "narration": "יש לכם משהו בראש? ספרו לנו. את השאר נבנה יחד — בהסכמה.",
+      "setup": [
+        {
+          "do": "goto",
+          "url": "/made-for-you"
+        }
+      ],
+      "steps": [
+        {
+          "do": "scroll",
+          "target": {
+            "role": "heading",
+            "level": 2,
+            "name": "יש לכם משהו בראש?"
+          }
+        },
+        {
+          "do": "highlight",
+          "target": {
+            "role": "link",
+            "name": "מתחילים"
+          },
+          "ms": 2000,
+          "mark": "final-cta"
+        }
+      ]
+    }
+  ]
+}

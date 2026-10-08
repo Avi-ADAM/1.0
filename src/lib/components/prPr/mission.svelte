@@ -731,6 +731,11 @@
         skills: element.selectedSkills ?? [],
         roles: element.selectedRoles ?? [],
         workways: element.selectedWorkways ?? [],
+        // The catalogue ids behind the chips, so a published need carries its roles
+        // and work ways too, not only skill names (QA C-8: they were dropped).
+        skillIds: find_skill_id(element.selectedSkills ?? []).map(String),
+        roleIds: find_role_id(element.selectedRoles ?? []).map(String),
+        workwayIds: find_workway_id(element.selectedWorkways ?? []).map(String),
         // Additive extras (PLAN_USER_OFFERINGS §3.4): the recognised template id
         // (hydrateFromMissionName stores it on element.id) and the location.
         // Existing spec consumers ignore unknown keys.

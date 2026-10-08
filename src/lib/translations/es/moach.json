@@ -27,7 +27,8 @@
     "missionCompleted": "Misión completada y registrada en la rikma",
     "uploadFailed": "La subida del archivo falló, inténtalo de nuevo",
     "awaitingApproval": "esperando aprobación",
-    "awaitingApprovalHint": "Ya enviada y esperando la aprobación de los miembros de la rikma"
+    "awaitingApprovalHint": "Ya enviada y esperando la aprobación de los miembros de la rikma",
+    "hoursAwaitingApprovalHint": "Las horas guardadas esperan la aprobación de los miembros de la rikma"
   },
   "split": {
     "calc": "Calculadora de reparto",
@@ -267,19 +268,26 @@
   },
   "tour": {
     "badge": "Una rikma es un grupo de colaboración: cada persona aporta sus habilidades y gana según su contribución",
-    "members": "Miembros de la rikma: un anillo verde que late significa que esa persona está trabajando ahora en el proyecto. Pulsa una foto para ver su perfil",
-    "tabsIntro": "Las pestañas son el centro de gestión de la rikma: cada una muestra un aspecto distinto del proyecto",
-    "create": "📋 Crear: crea misiones y solicita recursos (dinero, equipo, información), tanto para los miembros actuales como para encontrar nuevas personas socias. Cada misión o recurso publicado obtiene un enlace propio con una página cuidada, optimizada para redes sociales y para captar colaboradores",
-    "progress": "🔄 En curso: lista de todas las misiones activas: quién trabaja en qué y en qué fase",
-    "acts": "✅ Acciones y tareas: gestiona las tareas pequeñas: qué está hecho y qué está en camino",
-    "timers": "⏱️ Temporizadores: mira cuándo estuvo activa cada persona para el proyecto y en qué trabajó. Cuando alguien inicia un temporizador, aparece un anillo verde alrededor de su avatar arriba",
-    "wishes": "💌 Deseos entrantes: oportunidades cálidas de clientes del conserje a quienes les encaja tu proyecto: oportunidades de negocio listas",
-    "sales": "🛒 Ventas y productos: producto simple = precio fijo. Producto complejo = precio definido por misiones, recursos y decisiones tomadas en conjunto durante la compra. Cada producto tiene su propia página cuidada, optimizada para redes sociales y para atraer clientela",
-    "split": "💰 Reparto: calculadora de reparto de ingresos: cada persona cobra según su contribución",
-    "votes": "🗳️ Votaciones: las decisiones se toman por consenso, con herramientas de negociación propias hasta que el resultado convence de verdad a todo el mundo. No es mayoría, es acuerdo real de todos los miembros de la rikma",
-    "chains": "🔗 Cadenas: cada misión y recurso a lo largo de todo su ciclo de vida, desde la propuesta inicial y la votación hasta el archivo. Transparencia total y comprensión profunda de cada proceso del proyecto",
-    "gantt": "📊 Gantt y Kanban: gestión visual del proyecto y línea de tiempo",
-    "helpBtn": "Volver a mostrar la guía"
+    "tools": "Las herramientas de la rikma:\n• Página pública - lo que ve todo el mundo\n• Dirección y aspecto - la dirección y el diseño de la página pública\n• Editar los datos (el lápiz) - nombre, descripción, enlaces y ajustes de la rikma\nSi la rikma tiene enlaces a redes (Discord, WhatsApp, web...), aparecen aquí también",
+    "members": "Miembros de la rikma: un anillo verde que late alrededor de una foto significa que esa persona está trabajando ahora para la rikma. Pulsa una foto para ver su perfil",
+    "create": "➕ Crear: añade misiones y solicita recursos (dinero, equipo, información), para las personas socias actuales o para encontrar nuevas. Cada misión o recurso publicado tiene su propia página cuidada para compartir en redes sociales\n🤖 También puedes dejar que la IA cree misiones automáticamente: escribe hacia dónde quieres que crezca la rikma y ella lo divide en misiones, o deja que analice la rikma y detecte por sí sola lo que necesita. No se crea nada hasta que lo apruebes",
+    "nav": "El menú tiene seis grupos. Al pulsar un grupo se abre debajo una fila de pestañas, y el cerebro recuerda en qué pestaña estabas en cada grupo",
+    "group": {
+      "main": "🏠 Principal\n• Principal - la rikma de un vistazo\n• Info compartida - la biblioteca de la rikma: documentos, archivos y enlaces que necesita cada persona socia",
+      "work": "🛠️ Trabajo\n• Progreso - las misiones activas: quién trabaja en qué y en qué fase\n• Acciones - las tareas pequeñas dentro de las misiones\n• Kanban y Gantt - gestión visual y calendario\n• Temporizadores - cuándo trabajó cada persona y en qué. Un temporizador en marcha = un anillo verde alrededor de su foto arriba\n• Turnos - cubrir misiones que necesitan a alguien en horas fijas",
+      "flows": "🔗 Flujos\n• Procesos - cosas que la rikma impulsa y que aún no son una misión, cada una con su propia conversación\n• Cadenas - cada misión y recurso a lo largo de toda su vida: de la propuesta, pasando por la votación, hasta el archivo\n• API - sistemas externos que envían trabajo a la rikma\n• Código - los repositorios de código conectados a la rikma",
+      "money": "💰 Dinero\n• Ventas - los productos y las ventas registradas. Producto simple = precio fijo, producto complejo = un precio que se define junto con la clientela. Cada producto tiene su propia página para compartir\n• Reparto - el reparto de ingresos: cada persona cobra según lo que aportó\n• Becas - una persona socia financia el sustento de otra mientras trabaja",
+      "opps": "✨ Oportunidades\n• Deseos entrantes - oportunidades cálidas de clientes del conserje a quienes les encaja la rikma\n• Abierto a socios - las misiones y recursos que la rikma todavía busca\n• Calendario de recursos - lo que la rikma ya tiene y hasta cuándo\n• Mapa de demanda - lo que se busca y se ofrece a tu alrededor\nEl número en el grupo = deseos que esperan respuesta",
+      "votes": "🗳️ Votaciones\n• Votaciones - decisiones por acuerdo, no por mayoría: aprueba, conversa o haz una contrapropuesta hasta que todo el mundo firme la misma versión. Quien calla hasta que se acaba el plazo de la rikma, consiente\n• Archivo - todo lo ya decidido\nEl número en el grupo = votaciones abiertas en la rikma"
+    },
+    "help": "¡Eso es todo! Puedes volver a esta guía cuando quieras con el botón ?",
+    "helpBtn": "Volver a mostrar la guía",
+    "next": "Siguiente",
+    "back": "Atrás",
+    "done": "Listo",
+    "skip": "Saltar",
+    "stepOf": "{{current}} de {{total}}",
+    "label": "Guía del cerebro de la rikma"
   },
   "list": {
     "myProjects": "Mis rikmas",
@@ -291,8 +299,8 @@
     "showing": "Mostrando {{count}} de {{total}}"
   },
   "guide": {
-    "header": "Guía del cerebro de la rikmá",
-    "text": "¿Quieres un recorrido rápido por lo que puedes hacer en el cerebro de la rikmá?\n(Puedes reabrirlo con el botón ? de la cabecera)",
+    "header": "Guía del cerebro de la rikma",
+    "text": "¿Quieres un recorrido rápido por lo que puedes hacer en el cerebro de la rikma?\n(Puedes reabrirlo con el botón ? de la cabecera)",
     "yes": "Sí",
     "no": "No, gracias"
   },

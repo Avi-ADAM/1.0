@@ -13,7 +13,7 @@
  *
  * Two values everywhere (user decision):
  *  - committed = `des_status='decided' AND amount>0` (the obligation),
- *  - received  = the transfer Haluka is SETTLED (`senderconf && confirmed`).
+ *  - received  = the transfer Haluka is SETTLED (`confirmed` — the receiver's word settles it).
  *
  * 0/skip invariant (§5) holds for free: the query filters `des_status='decided'`
  * and we additionally drop `amount<=0`, so a skipped / 0 record never appears.
@@ -82,7 +82,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
     if (amount <= 0) continue; // 0/skip never counts (§5)
 
     const h = a.haluka?.data?.attributes ?? null;
-    const settled = !!h?.senderconf && !!h?.confirmed;
+    const settled = !!h?.confirmed;
     const transferAmount = h ? Number(h.amount) || amount : 0;
     const inTransit = !!h && !settled ? transferAmount : 0;
     const received = settled ? transferAmount : 0;

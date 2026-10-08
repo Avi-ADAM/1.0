@@ -8,6 +8,7 @@
   import CardHeader from './CardHeader.svelte';
   import VoteStatusDisplay from './VoteStatusDisplay.svelte';
   import SheirutHalukaCard from './SheirutHalukaCard.svelte';
+  import { idd } from '$lib/stores/idd.js';
 
   let {
     buble,
@@ -144,6 +145,13 @@
       const result = await response.json();
       if (!result.success) throw new Error(result.error?.message || 'Failed');
 
+      // Show my approval now, not after a reload (QA C-22: the card stayed on
+      // "not voted yet" with the button still there).
+      buble.alreadyVoted = true;
+      buble.weFinnish = [
+        ...(buble.weFinnish || []),
+        { what: true, order: 0, users_permissions_user: { data: { id: String($idd) } } }
+      ];
       toast.success($t('lev.cards.saleCard.deliveryConfirmed'));
     } catch (err) {
       console.error(err);
@@ -183,6 +191,10 @@
     }
   }
 
+  const voterId = (v: any) => String(v?.users_permissions_user?.data?.id ?? v?.users_permissions_user ?? '');
+  const uniqueById = (list: any[]) =>
+    list.filter((m, i) => m?.id != null && list.findIndex((x) => String(x?.id) === String(m.id)) === i);
+
   // Members list: project members (flat→Strapi format) + customer
   const weFinnishMembers = $derived.by(() => {
     const sellers = (buble.members || []).map((m: any) => ({
@@ -199,13 +211,14 @@
         profilePic: { data: { attributes: { url: buble.customerSrc || null } } }
       }
     };
-    return [...sellers, customer];
+    return uniqueById([...sellers, customer]);
   });
 
-  // Votes: actual weFinnish + synthetic vote for customer when iGotIt
+  // Votes: actual weFinnish + synthetic vote for customer when iGotIt — never
+  // twice for the same person (QA C-22: the customer showed up two times).
   const weFinnishVotes = $derived.by(() => {
     const votes = [...(buble.weFinnish || [])];
-    if (buble.iGotIt) {
+    if (buble.iGotIt && !votes.some((v: any) => voterId(v) === String(buble.customerId))) {
       votes.push({
         id: 'customer-iGotIt',
         what: true,

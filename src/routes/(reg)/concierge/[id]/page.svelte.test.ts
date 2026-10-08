@@ -546,3 +546,52 @@ describe('/concierge/[id] — closing the consent with gaps (C-19)', () => {
     expect(dialog.textContent).not.toContain('כ״חובה״');
   });
 });
+
+describe('/concierge/[id] — the deal’s stages (PLAN_DIRECT_OFFER P1)', () => {
+  it('heads the page with the real stages, not a dial stuck on "proposals"', async () => {
+    const { dealStages } = await import('$lib/sheirut/dealChain');
+    const stages = dealStages(
+      { wishId: '16', requests: [{ id: '5', dealId: '8' }], deals: [{ id: '8', closed: false }] },
+      { kind: 'wish', id: '16' }
+    );
+    const view = mount({ stages });
+    const nav = view.container.querySelector('nav.ds-concierge');
+    expect(nav).not.toBeNull();
+    const hrefs = [...nav!.querySelectorAll('a')].map((a) => a.getAttribute('href'));
+    expect(hrefs).toEqual(['/deals/request/5', '/deals/8']);
+    expect(nav!.querySelector('[aria-current="step"]')).not.toBeNull();
+    for (const old of ['UNDERSTAND', 'PROPOSALS', 'CONSENT']) expect(view.container.textContent).not.toContain(old);
+  });
+
+  it('a page loaded without stages shows no strip', () => {
+    expect(mount().container.querySelector('nav.ds')).toBeNull();
+  });
+});
+
+describe('/concierge/[id] — new details are a new version (PLAN_DIRECT_OFFER §4.3)', () => {
+  const heText = (k: string) => (he as Record<string, string>)[k];
+  const negotiation = (over: Record<string, unknown> = {}) => ({
+    canCounter: true,
+    round: 0,
+    signedBy: 'wisher',
+    yourTurn: false,
+    amount: 2,
+    price: 600,
+    deadlineAt: null,
+    counters: [],
+    termsChanged: true,
+    ...over
+  });
+
+  it('the owner can change the details of an open wish, and not of a fulfilled one', () => {
+    expect(mount().container.querySelector('.wt-open')).not.toBeNull();
+    expect(mount({ wish: wish({ status: 'fulfilled' }) }).container.querySelector('.wt-open')).toBeNull();
+    expect(mount({ isOwner: false }).container.querySelector('.wt-open')).toBeNull();
+  });
+
+  it('after she changed them, a signed proposal waits for the provider — not for her approval', () => {
+    const view = mount({ proposals: [{ ...proposal('1', 'suggested'), proposalId: '1', negotiation: negotiation() }] });
+    expect(view.container.textContent).toContain(heText('neg_waiting_terms'));
+    expect(view.container.textContent).not.toContain('✓ בחירה');
+  });
+});

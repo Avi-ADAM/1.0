@@ -23,17 +23,44 @@ import {
   signersOf,
   standingOrder,
   standingRound,
+  type ArchRound,
   type ObjectChangeDecision,
 } from './read.js';
 import { fetchTarget } from './targets.js';
+import { assertStandingRound } from '$lib/server/nego/candidacyVote.js';
 
 export interface VoteOutcome {
   decisionId: string;
   order: number;
   consensus: boolean;
   applied?: ApplyResult;
-  /** Members still owing an answer on the standing round. */
+  /** Members (and any extra signers) still owing an answer on the standing round. */
   awaiting: string[];
+}
+
+/**
+ * People outside the rikma whose signature a version may need — a deal's customer when the
+ * version raises what she pays (QA_CONCIERGE_E2E C-14, `$lib/server/sheirut/dealEdit`).
+ * The caller supplies them; this module knows nothing about deals.
+ *
+ * Their silence is never their yes. The members keep their own rule: once the clock of the
+ * version on the table ran out, their silence is theirs, and the extra signature is the
+ * last one missing.
+ */
+export interface ExtraSigners {
+  ids: string[];
+  /** Whether this version needs them at all. */
+  needed: (round: ArchRound) => boolean;
+  /** Runs after any version of this decision is applied (the deal follows the new terms). */
+  onApplied?: (round: ArchRound) => Promise<unknown>;
+}
+
+export type ExtraSignersFor = (decision: ObjectChangeDecision) => Promise<ExtraSigners | null>;
+
+/** The members' clock on the version on the table ran out (a counter resets it). */
+function clockRanOut(decision: ObjectChangeDecision, now = Date.now()): boolean {
+  const t = decision.timegramaDate ? Date.parse(decision.timegramaDate) : NaN;
+  return Number.isFinite(t) && t <= now;
 }
 
 /** Persist the Decision's full vote list (the component is replace-only). */
@@ -56,18 +83,23 @@ export async function signObjectChange(
   exec: Exec,
   decisionId: string,
   userId: string,
+  extraFor?: ExtraSignersFor,
+  /** The round the signer was shown (a notice); ROUND_MOVED if a counter replaced it since. */
+  expectRound?: unknown,
 ): Promise<VoteOutcome> {
   const decision = await fetchObjectChangeDecision(exec, decisionId);
   if (!decision) throw new Error(`Archive decision ${decisionId} not found`);
   if (decision.archived) throw new Error('This proposal is already resolved');
 
+  const extra = extraFor ? await extraFor(decision) : null;
   const uid = String(userId);
-  if (!decision.memberIds.includes(uid)) {
+  if (!decision.memberIds.includes(uid) && !extra?.ids.includes(uid)) {
     throw new Error('Only a member of the rikma may sign this proposal');
   }
 
   const order = standingOrder(decision);
-  if (!isMyTurn(decision, order, uid)) {
+  assertStandingRound(expectRound, order);
+  if (signersOf(decision, order).includes(uid)) {
     throw new Error('You already stand behind the current version');
   }
 
@@ -80,12 +112,24 @@ export async function signObjectChange(
   await writeVots(exec, decisionId, vots);
 
   const signed = new Set([...signersOf(decision, order), uid]);
-  const consensus = decision.memberIds.every((id) => signed.has(id));
-  const awaiting = decision.memberIds.filter((id) => !signed.has(id));
+  const round = standingRound(decision);
+  const needed = extra && extra.needed(round) ? extra.ids : [];
+  const membersSigned = decision.memberIds.every((id) => signed.has(id));
+  // Only when someone outside the rikma has to sign does an expired clock count here: the
+  // members' silence already matured, and the timegrama left the version open for them.
+  const membersOk = membersSigned || (needed.length > 0 && clockRanOut(decision));
+  const consensus = membersOk && needed.every((id) => signed.has(id));
+  const awaiting = [
+    ...(membersOk ? [] : decision.memberIds.filter((id) => !signed.has(id))),
+    ...needed.filter((id) => !signed.has(id)),
+  ];
 
   if (!consensus) return { decisionId, order, consensus: false, awaiting };
 
   const applied = await applyStandingVersion(exec, decision);
+  if (extra?.onApplied) {
+    await extra.onApplied(round).catch((e) => console.error('[archive] applied, but the follow-up failed:', e));
+  }
   return { decisionId, order, consensus: true, applied, awaiting: [] };
 }
 
@@ -121,6 +165,8 @@ export interface CounterInput {
   decisionId: string;
   userId: string;
   round: Omit<StandingRound, 'ordern'>;
+  /** Extra signers may counter too — a customer puts her own hours / rate on the table. */
+  extraFor?: ExtraSignersFor;
 }
 
 /**
@@ -133,19 +179,28 @@ export interface CounterInput {
  */
 export async function counterObjectChange(
   exec: Exec,
-  { decisionId, userId, round }: CounterInput,
-): Promise<{ decisionId: string; order: number; deadline: string | null }> {
+  { decisionId, userId, round, extraFor }: CounterInput,
+): Promise<{
+  decisionId: string;
+  order: number;
+  deadline: string | null;
+  /** The version now on the table, and who besides the members has to sign it. */
+  standing: StandingRound;
+  extra: ExtraSigners | null;
+  decision: ObjectChangeDecision;
+}> {
   const decision = await fetchObjectChangeDecision(exec, decisionId);
   if (!decision) throw new Error(`Archive decision ${decisionId} not found`);
   if (decision.archived) throw new Error('This proposal is already resolved');
 
+  const extra = extraFor ? await extraFor(decision) : null;
   const uid = String(userId);
-  if (!decision.memberIds.includes(uid)) {
+  if (!decision.memberIds.includes(uid) && !extra?.ids.includes(uid)) {
     throw new Error('Only a member of the rikma may counter this proposal');
   }
 
   const current = standingOrder(decision);
-  if (!isMyTurn(decision, current, uid)) {
+  if (signersOf(decision, current).includes(uid)) {
     throw new Error("It's not your turn - you already stand behind the current version");
   }
 
@@ -193,7 +248,7 @@ export async function counterObjectChange(
   );
 
   const deadline = await resetClock(exec, decision);
-  return { decisionId, order: newOrder, deadline };
+  return { decisionId, order: newOrder, deadline, standing: merged, extra, decision };
 }
 
 /**

@@ -59,6 +59,8 @@
    * @property {any} [myRound] - latest round terms on my application (my own counter-offer)
    * @property {any} order - Order data
    * @property {boolean} [selfNomination] - candidate-authored proposal (PLAN_SELF_NOMINATION)
+   * @property {string|null} [wishName] - the customer's wish this is part of (concierge), or null
+   * @property {boolean} [isMonthly] - recurring (paid per month) rather than one-off
    */
   /** @type {ComponentProps} */
   let {
@@ -117,7 +119,13 @@
     // Project-less sources (PLAN_HUB_LEV_DEMAND_SYNC r2): identity click goes
     // to the wish/maagad page; offerHref replaces the apply flow (maagad).
     sourceHref = null,
-    offerHref = null
+    offerHref = null,
+    // Part of a customer's wish (concierge), not a rikma looking for a partner
+    // (QA C-10): the card speaks of the wish, and says nothing about joining a
+    // rikma or about when it turns a profit. null for every rikma suggestion.
+    wishName = null,
+    // A one-off job is not paid "per month" (QA C-10).
+    isMonthly = true
   } = $props();
   let already = $state(false);
   let error1 = $state(null);
@@ -289,9 +297,11 @@
   import { EffectFlip, Navigation } from 'swiper';
   let u = '';
   let hovered = $state(false);
+  const restingHint = () =>
+    wishName != null ? $t('lev.suggestor.wishSuggestion') : $t('lev.suggestor.joinSuggestion');
   function hover(id) {
     if (id == '0') {
-      u = $t('lev.suggestor.joinSuggestion');
+      u = restingHint();
     } else {
       u = id;
     }
@@ -302,7 +312,7 @@
     if (hovered == false) {
       u = $t('lev.page.heartTitle');
     } else {
-      u = $t('lev.suggestor.joinSuggestion');
+      u = restingHint();
     }
     onHover?.({ id: u });
   }
@@ -342,7 +352,7 @@
   });
   function hoverc(event) {
     if (event == '0') {
-      u = $t('lev.suggestor.joinSuggestion');
+      u = restingHint();
     } else {
       u = event;
     }
@@ -501,7 +511,9 @@
         <Diun
           onRect={afreact}
           smalldes={projectName + '-' + missionName}
-          nameChatPartner={`${$t('lev.suggestor.chatOnJoining')} ${projectName}`}
+          nameChatPartner={wishName != null
+            ? $t('lev.suggestor.chatOnWish')
+            : `${$t('lev.suggestor.chatOnJoining')} ${projectName}`}
           mypos={true}
           rect={true}
           {clicked}
@@ -2939,6 +2951,8 @@
               {src}
               {workways}
               {timeToP}
+              {isMonthly}
+              {wishName}
               {noOfusers}
               {projectId}
               {selfNomination}
@@ -2988,6 +3002,8 @@
     {src}
     {workways}
     {timeToP}
+    {isMonthly}
+    {wishName}
     {projectId}
     {selfNomination}
     onWithdraw={withdrawSelfNom}

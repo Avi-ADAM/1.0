@@ -73,6 +73,15 @@
       </span>
       <span class="quick-arrow">←</span>
     </a>
+    <!-- Someone approached you directly: write them a wish (PLAN_DIRECT_OFFER). -->
+    <a href="/deals/offers" class="quick-card quick-card--gold">
+      <span class="quick-icon"><EntityIcon kind="add" size={20} /></span>
+      <span class="quick-body">
+        <span class="quick-title">{$t('directOffer.entry.deals')}</span>
+        <span class="quick-hint">{$t('directOffer.entry.dealsHint')}</span>
+      </span>
+      <span class="quick-arrow">←</span>
+    </a>
   </div>
 
   {#if customerCycles.length > 0}

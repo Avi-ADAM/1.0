@@ -7,6 +7,7 @@
 
 import type { ActionContext } from '../actions/types';
 import type { UserProfile, NotificationData } from './NotificationOrchestrator';
+import { recipientTemplateLang } from './intent';
 
 export class TelegramService {
   /**
@@ -64,8 +65,8 @@ export class TelegramService {
     context: ActionContext
   ): Promise<void> {
     try {
-      // Determine language - use user's language if it's supported, otherwise fall back to context language
-      const lang = this.selectLanguage(user.lang, context.lang);
+      // The recipient's language, never the sender's (see recipientTemplateLang)
+      const lang = recipientTemplateLang(user.lang);
 
       // Get the notification text in the appropriate language
       const title = notification.title[lang as 'he' | 'en' | 'ar'] || notification.title.he;
@@ -103,22 +104,4 @@ export class TelegramService {
     }
   }
 
-  /**
-   * Select appropriate language for the user
-   * Uses user's language if supported, otherwise falls back to context language
-   */
-  private selectLanguage(userLang: string, contextLang: string): string {
-    const supportedLanguages = ['he', 'en', 'ar'];
-    
-    if (supportedLanguages.includes(userLang)) {
-      return userLang;
-    }
-    
-    if (supportedLanguages.includes(contextLang)) {
-      return contextLang;
-    }
-    
-    // Default to Hebrew
-    return 'he';
-  }
 }

@@ -1,5 +1,5 @@
 import { Agent } from '@mastra/core/agent';
-import { createGoogleModel, createGroqModel, createNvidiaModel, hasGroqModelConfig, hasNvidiaModelConfig, hasGoogleModelConfig } from '../lib/createModel';
+import { createModelChain } from '../lib/createModel';
 import { getChatHistoryTool } from '../tools/getChatHistoryTool';
 import { getSitePagesTool } from '../tools/siteNavigationTool';
 import { delegateToAgentTool } from '../tools/delegateToAgentTool';
@@ -11,21 +11,7 @@ import { SITE_CONTEXT } from '../../lib/bot/context.js';
 import { getChatMemory, workingMemoryInstructions } from '../lib/chatMemory';
 
 export function createGeneralHelpAgent(apiKey: string, language: string = 'he') {
-  // Select model - priority order: Google Flash > Flash Lite > Groq > NVIDIA
-  let model;
-  if (hasGoogleModelConfig(apiKey)) {
-    console.log('[HelpAgent] Using Google gemini-3-flash-preview (thinkingBudget=0)');
-    model = createGoogleModel(apiKey, 'gemini-3-flash-preview', { thinkingBudget: 0 });
-  } else if (hasGroqModelConfig()) {
-    console.log('[HelpAgent] Using Groq model');
-    model = createGroqModel();
-  } else if (hasNvidiaModelConfig(apiKey)) {
-    console.log('[HelpAgent] Using NVIDIA model (last resort)');
-    model = createNvidiaModel(apiKey);
-  } else {
-    console.log('[HelpAgent] Using Google Flash Lite as fallback');
-    model = createGoogleModel(apiKey, 'gemini-flash-lite-latest');
-  }
+  const model = createModelChain(apiKey);
 
 	const systemPrompt = language === 'he'
 		? `

@@ -183,6 +183,31 @@ function skillNames(node: any): string[] {
     .filter((s: any): s is string => typeof s === 'string' && s.length > 0);
 }
 
+/**
+ * The single words of multi-word search terms, for a second people search when the
+ * whole terms found nobody (QA_CONCIERGE_E2E C-7). `201findUsersBySkill` matches
+ * `skillName containsi <term>`, so "טכנאי מחשבים" never finds a member whose skill
+ * is "תיקון מחשבים" — but "מחשבים" does. Words shorter than 3 letters, and the terms
+ * already searched whole, are left out.
+ */
+export function fallbackTokens(terms: string[], cap = 6): Array<{ token: string; term: string }> {
+  const searched = new Set(terms.map((t) => t.trim().toLowerCase()));
+  const out: Array<{ token: string; term: string }> = [];
+  const seen = new Set<string>();
+  for (const term of terms) {
+    const words = term.split(/[\s,/\-–·()]+/).map((w) => w.trim()).filter(Boolean);
+    if (words.length < 2) continue;
+    for (const w of words) {
+      const key = w.toLowerCase();
+      if (w.length < 3 || seen.has(key) || searched.has(key)) continue;
+      seen.add(key);
+      out.push({ token: w, term });
+      if (out.length >= cap) return out;
+    }
+  }
+  return out;
+}
+
 function dedupeCap(values: string[], cap: number): string[] {
   const out: string[] = [];
   const seen = new Set<string>();
@@ -211,6 +236,11 @@ export async function enrichWish(
 
   // ── 1. Normalise skills via vector (best-effort) ───────────────────────────
   const skillVec = await safeMatchCategory(skillTerms, 'skills');
+  if (skillTerms.length > 0 && !skillVec?.some((r) => r.existingLabel)) {
+    // Nothing snapped to a skill members actually hold — the people search below
+    // runs on the raw words, which is how C-7 found nobody. Say so in the log.
+    console.warn('[enrichWish] no skill normalised for', skillTerms, '— searching people by the raw terms');
+  }
   const normalisedSkills: NormalisedSkill[] = (skillVec ?? []).map((r) => ({
     term: r.input,
     canonical: r.existingLabel ?? null,
@@ -285,6 +315,46 @@ export async function enrichWish(
       person._matched.add(term);
     }
   });
+
+  // Nobody holds a skill containing any whole term: try their single words (C-7).
+  if (personById.size === 0 && peopleTerms.length > 0) {
+    const tokens = fallbackTokens(peopleTerms);
+    const tokenResults = await Promise.all(
+      tokens.map(({ token }) => sendQid(fetchFn, '201findUsersBySkill', { q: token, ...limitArg }))
+    );
+    tokenResults.forEach((data, i) => {
+      const term = tokens[i].term;
+      for (const node of data?.usersPermissionsUsers?.data ?? []) {
+        const id = String(node.id);
+        const a = node?.attributes ?? {};
+        const reach = reachForPerson(personPlaces(a), place);
+        if (!reach.ok) continue;
+        let person = personById.get(id);
+        if (!person) {
+          person = {
+            id,
+            username: a.username ?? '',
+            avatar:
+              a.profilePic?.data?.attributes?.url ??
+              a.profilePic?.data?.attributes?.formats?.thumbnail?.url ??
+              null,
+            skills: skillNames(node),
+            matchedSkills: [],
+            projects: (a.projects_1s?.data ?? [])
+              .map((p: any) => p?.attributes?.projectName)
+              .filter((p: any): p is string => typeof p === 'string'),
+            distanceKm: reach.distanceKm,
+            _matched: new Set<string>()
+          };
+          personById.set(id, person);
+        }
+        person._matched.add(term);
+      }
+    });
+    if (personById.size === 0) {
+      console.warn('[enrichWish] no member found for', peopleTerms, 'nor for their words', tokens.map((t) => t.token));
+    }
+  }
   // Most matched skills first; among equals, nearest first.
   const byFit = (a: SuggestedPerson, b: SuggestedPerson) =>
     b.matchedSkills.length - a.matchedSkills.length || byDistance(a, b);

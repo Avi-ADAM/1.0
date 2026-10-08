@@ -15,10 +15,14 @@ const url = fc.oneof(
   fc.string(),
   fc.constantFrom('', 'javascript:alert(1)', 'mailto:a@b.c', 'ftp://x.y', 'https://')
 );
+// Search snippets often arrive HTML-escaped; markup must not come back on decode.
+const escapedTag = fc
+  .tuple(fc.string(), fc.constantFrom('b', '/b', 'script', 'a href="x"'))
+  .map(([s, tag]) => `${s}&lt;${tag}&gt;${s}`);
 const raw = fc.record({
   url,
-  title: anyValue,
-  snippet: fc.oneof(anyValue, fc.string({ maxLength: 1000 }).map((s) => `<p>${s}</p>`)),
+  title: fc.oneof(anyValue, escapedTag),
+  snippet: fc.oneof(anyValue, escapedTag, fc.string({ maxLength: 1000 }).map((s) => `<p>${s}</p>`)),
   price: anyValue,
   currency: anyValue,
   locationLabel: anyValue
@@ -39,7 +43,10 @@ describe('normalizeResults — properties', () => {
           expect((o.locationLabel ?? '').length).toBeLessThanOrEqual(LIMITS.locationLabel);
           expect(/^https?:\/\//.test(o.url)).toBe(true);
           expect(o.domain.length).toBeGreaterThan(0);
-          expect(/<[a-z/][^>]*>/i.test(o.title + (o.snippet ?? ''))).toBe(false);
+          // Per field: title and snippet render in separate elements, so a
+          // stray "<" ending one and "A>" opening the other is never a tag.
+          expect(/<[a-z/][^>]*>/i.test(o.title)).toBe(false);
+          expect(/<[a-z/][^>]*>/i.test(o.snippet ?? '')).toBe(false);
           expect(o.price === null || (Number.isFinite(o.price) && o.price > 0)).toBe(true);
           expect(domains.has(o.domain)).toBe(false);
           domains.add(o.domain);

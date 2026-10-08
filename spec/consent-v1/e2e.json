@@ -1,0 +1,84 @@
+{
+  "format": "1lev1-consent-vectors",
+  "version": 1,
+  "file": "e2e",
+  "spec": "docs/SPEC_CONSENT_FORMAT.md",
+  "generator": "src/lib/consent/vectors/build.ts (npm run vectors:consent)",
+  "keyDerivation": "seed = SHA-256(UTF-8(\"1lev1-consent-v1/\" + label)); Ed25519 labels \"ed25519/<name>\", P-256 \"p256/<name>\", nonces \"nonce/<...>\" (first 16 bytes)",
+  "about": "Group encryption (SPEC_CONSENT_FORMAT §9). All binary fields b64url unless suffixed Hex.",
+  "epochKey": {
+    "rawHex": "5d5582d6654ba919140c7e8a30a1e67227621ecb7546fadf9dc5f8faa84aedd4",
+    "keyCommitment": {
+      "tag": "freemates-epoch-kc-v1",
+      "value": "9_L87YiyXJjqnkhdWCXhxuVGMneUJ7x7IQw_9b6vzu4",
+      "formula": "b64url(SHA-256(UTF-8(tag) ‖ rawKey))"
+    }
+  },
+  "sealed": {
+    "epochKeyHex": "5d5582d6654ba919140c7e8a30a1e67227621ecb7546fadf9dc5f8faa84aedd4",
+    "aad": "{\"actor\":\"u-alice\",\"device\":\"MCowBQYDK2VwAyEAw2aFyT5XfLsPDVxfoEQOCSVgl1_YS5aoiK8UGIh1RTY\",\"epoch\":0,\"kind\":\"sealed\",\"spaceId\":\"project:p-1\"}",
+    "plaintext": "{\"action\":\"project.create\",\"actor\":\"u-alice\",\"device\":\"MCowBQYDK2VwAyEAw2aFyT5XfLsPDVxfoEQOCSVgl1_YS5aoiK8UGIh1RTY\",\"id\":\"w_BM3hWtYMOXEzupQWPZ0EXqeq4tvPIxP84qEaEh1EU\",\"nonce\":\"XMK6B-fStuJgbsvL31dKkw\",\"parents\":[],\"predicate\":{\"settings\":{\"name\":\"רקמת דוגמה\",\"restime\":172800000}},\"sig\":\"n9hWfP_oe581NpkQ2iOxYHVNSVdm3Hq6EyICW0Xbnz9RNm8484o9iPmBlmfiOAz74tFA0hH6Cb8Bl9H1murjCg\",\"subject\":{\"id\":\"p-1\",\"type\":\"project\"},\"ts\":1760000000000,\"v\":1}",
+    "inner": {
+      "v": 1,
+      "actor": "u-alice",
+      "device": "MCowBQYDK2VwAyEAw2aFyT5XfLsPDVxfoEQOCSVgl1_YS5aoiK8UGIh1RTY",
+      "action": "project.create",
+      "subject": {
+        "type": "project",
+        "id": "p-1"
+      },
+      "predicate": {
+        "settings": {
+          "name": "רקמת דוגמה",
+          "restime": 172800000
+        }
+      },
+      "parents": [],
+      "ts": 1760000000000,
+      "nonce": "XMK6B-fStuJgbsvL31dKkw",
+      "sig": "n9hWfP_oe581NpkQ2iOxYHVNSVdm3Hq6EyICW0Xbnz9RNm8484o9iPmBlmfiOAz74tFA0hH6Cb8Bl9H1murjCg",
+      "id": "w_BM3hWtYMOXEzupQWPZ0EXqeq4tvPIxP84qEaEh1EU"
+    },
+    "envelope": {
+      "v": 1,
+      "kind": "sealed",
+      "actor": "u-alice",
+      "device": "MCowBQYDK2VwAyEAw2aFyT5XfLsPDVxfoEQOCSVgl1_YS5aoiK8UGIh1RTY",
+      "spaceId": "project:p-1",
+      "epoch": 0,
+      "iv": "2PvqrZpo_dce8Zaf",
+      "ct": "u0AQbYxrf4c_nhWQoG0G-VGinxvF_WbPMSKvKNqCwFXUW0593nlx0cTC8PyD2HYL43sJsFSZM0beOwaBoZpRZbz9bj9qdqmjsOg1bZIVlIQ7yp-ppl3BqCfta0Jb16JHGSJg6I7eCJ1ElC_QOfu8gDAHObzUBTdV54AL8U5EHy8P3ktFB45ROnb05HRX9TIPvqGQRg9uHtNlCtlAuY-E15ujV_L0zU8leJuIviErPA8De5UFrX7bPjFtTEpUgyLG_Xyy6PB_CMGp2VMbgwGxLbnSPd4Dp6vgmVgwzOIBj9kQz8VnR0VvfdQfHlwk5rYvfPtCATnARU9gLT2Rz-MYw37qMfNUM1jKONpDNu11TYJYW4LCqmKQwuhe2N-iyIPViirPqh2fNR3pnaUoaoa25yLpAzdRPt8LBqzdGsXganFMZzeI2R7jb41CHdAZC335Fbf6KZF-jmTAKhCLh4hrU4fkXObaH-3u1kVFT-_SDJFBs6-Mcsv3kiRNr5X_tFCI_xY-dosubG5d5FzbqT3fTJCDKSeMKD3wVNLc3yB2IrUs_gfiHPRFRhpzkd9vJuFq-fZJFkpVKPex2z8aLhA75IYC7dwn7WwifUh4Fz3zB1PQ",
+      "ts": 1760000060000,
+      "nonce": "FUTMeCkQboQLNRB2G2dXEg",
+      "sig": "SgeY5JeUPx1HAzDF6Tzg8hzkOzfaqbCz0UtYvK3HBbkUgGEMOK7c2ybOQjsAlgvGM5EprGYTcb0buWVMivEmDw",
+      "id": "ffFEyM6uuz4qjDCxKBUhXp_gWyY-uuc6K6TBaulKWvA"
+    },
+    "note": "AES-256-GCM, 12-byte IV, 16-byte tag appended to ct, AAD = UTF-8(aad). The outer envelope is a signed object (§3)."
+  },
+  "kemWrap": {
+    "recipient": {
+      "dHex": "d3aa40456858b3d8d3541820d548762000c71e5310716f50f6df0bbeca0b95ec",
+      "x": "RoCt6r7jPlSxh-m0nactpwxC6dfOJBli1JfdCdM0U-o",
+      "y": "RuaZzHH2fe7qusGJRQ4fgcdwJ9-M66qqi4b97KOgKRc",
+      "spki": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAERoCt6r7jPlSxh-m0nactpwxC6dfOJBli1JfdCdM0U-pG5pnMcfZ97uq6wYlFDh-Bx3An34zrqqqLhv3so6ApFw"
+    },
+    "ephemeral": {
+      "dHex": "a640fdeee8675ac6ea95185701a46368075aeef103e627287dd3a73d4c9c1319",
+      "spki": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEQweRoCDftQn677BN2IiQzkbdGRji0ay_fFTiUmTVA7Eg-hzMBn7bbMPG_ZUN6y25UVj42fjGZuCUc9L5hp-Srw"
+    },
+    "sharedSecretHex": "c6c9f597d9556bc1768cf974c04156aba70d4d11345d311084f9ac8aebd294b7",
+    "hkdf": {
+      "hash": "SHA-256",
+      "saltHex": "0000000000000000000000000000000000000000000000000000000000000000",
+      "info": "freemates-epoch-wrap-v1",
+      "lengthBits": 256
+    },
+    "kekHex": "933806d213552268da4ddd4e2db98f597327d2984d767caaabe931b20d868739",
+    "payloadHex": "5d5582d6654ba919140c7e8a30a1e67227621ecb7546fadf9dc5f8faa84aedd4",
+    "wrapped": {
+      "epk": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEQweRoCDftQn677BN2IiQzkbdGRji0ay_fFTiUmTVA7Eg-hzMBn7bbMPG_ZUN6y25UVj42fjGZuCUc9L5hp-Srw",
+      "iv": "aYHP2VrodqPQvRtw",
+      "ct": "qAOzzwRL_6cxWJi7fw2oebEoIOqNpHwQxJ3OYzgNxU4sMku_eyCRSv8NNcGBHWp0"
+    }
+  }
+}

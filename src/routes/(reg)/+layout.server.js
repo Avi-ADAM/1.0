@@ -23,6 +23,8 @@ export function load({ locals, url }) {
         tok: !!tok,
         from,
         un,
-        uid
+        uid,
+        // The session could not be checked this time (network) — not a sign-out.
+        identityUnreachable: !uid && locals.identityUnreachable === true
     };
 }

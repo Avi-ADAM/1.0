@@ -30,6 +30,7 @@ import { loadQuote, postToRequestChat } from '../../sheirut/quote.js';
 import { acceptWishOfferConfig } from './acceptWishOffer.js';
 import { isTurnOf, proposalPath, standing } from '$lib/wish/proposalRounds.js';
 import { coveredVersion } from '$lib/server/wish/proposal.js';
+import { assertStandingRound } from '$lib/server/nego/candidacyVote.js';
 
 const ACCEPTABLE_FROM_STATUSES = new Set(['suggested', 'viewed']);
 
@@ -121,9 +122,14 @@ const handler: ActionExecutionHandler = async (params, context, util) => {
       proposerIds,
       openedBy: 'provider' as const
     };
-    const st = standing(ref, pa.ratson_willingness_entry ?? [], coveredVersion(pa).version);
+    const st = standing(ref, pa.ratson_willingness_entry ?? [], coveredVersion(pa).version, ratsonAttrs.terms_digest ?? null);
+    assertStandingRound((params as any).expectRound, st.round);
     if (!isTurnOf('wisher', st)) {
-      throw new Error("You countered the volunteer's terms — it is their turn to answer");
+      throw new Error(
+        st.termsChanged
+          ? 'You changed the wish since the volunteer signed — it is their turn to answer the new terms'
+          : "You countered the volunteer's terms — it is their turn to answer"
+      );
     }
   }
 
@@ -437,7 +443,10 @@ export const acceptRatsonProposalConfig: ActionConfig = {
     proposalId: { type: 'string', required: true },
     ratsonId: { type: 'string', required: true },
     note: { type: 'string', required: false },
-    viaSilence: { type: 'boolean', required: false, description: 'Set by the silence clock when the silent wisher approves by default' }
+    viaSilence: { type: 'boolean', required: false, description: 'Set by the silence clock when the silent wisher approves by default' },
+    // The round a notice showed; ROUND_MOVED instead of signing newer terms (PLAN_SMART_NOTICES §3.3).
+    expectRound: { type: 'number', required: false },
+    expectTerms: { type: 'string', required: false },
   },
   authRules: [{ type: 'jwt', errorMessage: 'Must be logged in to accept a proposal' }],
   notification: {

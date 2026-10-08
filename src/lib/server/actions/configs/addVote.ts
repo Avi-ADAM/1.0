@@ -11,6 +11,8 @@ import type { ActionConfig, ActionExecutionHandler } from '../types';
 import { createSheirutFromPendingConfig } from './createSheirutFromPending';
 import { addVoteConsentSpec } from '$lib/consent/specs/addVote';
 import { ensureCandidacyTimegrama } from '../../nego/timegrama';
+import { evaluateCandidacyVote, assertStandingRound } from '../../nego/candidacyVote';
+import { ActionError } from '../errors.js';
 
 /**
  * Custom handler לבניית קומפוננטות ועדכון
@@ -33,38 +35,33 @@ const addVoteHandler: ActionExecutionHandler = async (params, context, util) => 
 
   // --- Logic for Ask (Component Based, 3+ members simple vote) ---
   if (type === 'ask') {
-    const { existingComponentData } = params;
-
+    // The card's `existingComponentData` is no longer read: the list is the
+    // DB's, and the yes goes on the standing round (see nego/candidacyVote.ts —
+    // the card's copy dropped other members' later votes, and the yes used to be
+    // written without an `order`, i.e. on round 0, where a renegotiated
+    // candidacy never counts it).
     const now = new Date();
-    const newVote = {
-      what: true,
-      users_permissions_user: userId,
-      ide: parseInt(String(userId), 10),
-      zman: now.toISOString()
-    };
+    const read = await strapi.execute('getAskNegoRounds', { id: String(id) }, context.jwt, context.fetch);
+    const attrs = read?.data?.ask?.data?.attributes;
+    if (!attrs) throw new Error(`Ask ${id} could not be loaded - vote not recorded`);
+    if (attrs.archived === true) {
+      throw new ActionError('ALREADY_RESOLVED', `Ask ${id} was already resolved`);
+    }
+    // projectMember is checked against `projectId`; the ask has to be that rikma's.
+    const askProject = attrs.project?.data?.id;
+    if (askProject != null && String(askProject) !== String(projectId)) {
+      throw new ActionError('FORBIDDEN', `Ask ${id} does not belong to project ${projectId}`);
+    }
+    const vote = evaluateCandidacyVote({
+      attrs,
+      side: 'ask',
+      callerId: userId,
+      takerApplied: attrs.open_mission?.data?.attributes?.isRishon !== true,
+      now
+    });
+    assertStandingRound(params.expectRound, vote.L);
 
-    const existingVots = Array.isArray(existingComponentData)
-      ? existingComponentData.map((v: any) => {
-          const raw = {
-            what: v.what ?? v.attributes?.what,
-            users_permissions_user:
-              v.users_permissions_user?.data?.id ??
-              v.users_permissions_user?.id ??
-              v.users_permissions_user,
-            ide: v.ide ?? v.attributes?.ide,
-            zman: v.zman ?? v.attributes?.zman,
-            order: v.order ?? v.attributes?.order ?? 0
-          };
-          if (raw.ide !== undefined && raw.ide !== null) {
-            raw.ide = parseInt(String(raw.ide), 10);
-          }
-          return raw;
-        })
-      : [];
-
-    const allVots = [...existingVots, newVote];
-
-    const result = await strapi.execute('120addVoteToAsk', { askId: id, vots: allVots }, context.jwt, context.fetch);
+    const result = await strapi.execute('120addVoteToAsk', { askId: id, vots: vote.vots }, context.jwt, context.fetch);
 
     if (!result || result.errors) {
       throw new Error(`AddVoteToAsk failed: ${JSON.stringify(result?.errors || 'Unknown error')}`);
@@ -80,11 +77,11 @@ const addVoteHandler: ActionExecutionHandler = async (params, context, util) => 
       users_permissions_user: { data: { id: String(userId) } },
       ide: parseInt(String(userId), 10),
       zman: now.toISOString(),
-      order: 0
+      order: vote.L
     };
 
     return {
-      data: { id, newVote: strapiVote },
+      data: { id, newVote: strapiVote, round: vote.L, allMembersYes: vote.allMembersYes },
       updateStrategy: {
         type: 'partialUpdate',
         config: {
@@ -445,6 +442,11 @@ export const addVoteConfig: ActionConfig = {
       type: 'string',
       required: true,
       description: 'ID of the item to vote on'
+    },
+    expectRound: {
+      type: 'number',
+      required: false,
+      description: 'type "ask": the round the caller was shown; ROUND_MOVED when it is no longer the standing one'
     },
     projectId: {
       type: 'string',

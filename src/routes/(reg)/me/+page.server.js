@@ -2,7 +2,8 @@ import { redirect } from '@sveltejs/kit';
 import { sendViaProxy } from '$lib/server/sendViaProxy.js';
 import { ssrApiBase } from '$lib/server/ssrApiBase.js';
 import { sendToSer } from '$lib/send/sendToSer.js';
-import { summarizeRatsonNodes } from '$lib/concierge/summary.js';
+import { summarizeRatsonNodes, withNoticeUpdates } from '$lib/concierge/summary.js';
+import { loadWishNotices } from '$lib/server/concierge/notices';
 
 const DEFAULT_PIC =
   'https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png';
@@ -54,6 +55,7 @@ export async function load({ locals, fetch, depends }) {
   // The concierge summary (drafts / on order / updates) rides alongside the
   // profile, not after it — and never fails the page: null just hides the
   // badge. See $lib/concierge/summary.js.
+  const noticesPromise = loadWishNotices(uid, fetch);
   const conciergePromise = sendToSer(
     { uid: String(uid) },
     '106listMyRatsons',
@@ -66,7 +68,10 @@ export async function load({ locals, fetch, depends }) {
     .catch((e) => {
       console.warn('me: concierge summary failed', e);
       return null;
-    });
+    })
+    // "Updates" counted as the bell counts them — whose move it is, not every
+    // open proposal (PLAN_SMART_NOTICES). Notices that fail keep the old count.
+    .then(async (summary) => withNoticeUpdates(summary, await noticesPromise));
 
   try {
     const [data, concierge] = await Promise.all([

@@ -193,3 +193,27 @@ describe('refuseCounter — a counter is a version you could sign, not a veto', 
     expect(resolveVersion(cur, { amount: 6, price: '700' })).toEqual(V(6, 700));
   });
 });
+
+describe('standing — a change of the wish’s terms is a new version (PLAN_DIRECT_OFFER §4.3)', () => {
+  const signed = (e: WillingnessEntry, termsDigest: string): WillingnessEntry => ({ ...e, termsDigest });
+
+  it('the provider signed, then the wisher moved the date: the provider’s move', () => {
+    const entries = [signed(approve(PROVIDER, 4, 600), 't1:A')];
+    expect(standing(volunteered, entries, V(4, 600), 't1:A')).toMatchObject({ signedBy: 'provider', termsChanged: false });
+    const s = standing(volunteered, entries, V(4, 600), 't1:B');
+    expect(s).toMatchObject({ signedBy: 'wisher', termsChanged: true });
+    expect(isTurnOf('provider', s)).toBe(true);
+    expect(isTurnOf('wisher', s)).toBe(false);
+  });
+
+  it('the provider signs the new terms: the change is closed, and it is the wisher who answers', () => {
+    const entries = [signed(approve(PROVIDER, 4, 600), 't1:A'), signed(approve(PROVIDER, 4, 600), 't1:B')];
+    expect(standing(volunteered, entries, V(4, 600), 't1:B')).toMatchObject({ signedBy: 'provider', termsChanged: false });
+  });
+
+  it('signatures from before the digests, and a wish with none, are never stale', () => {
+    expect(standing(volunteered, [approve(PROVIDER, 4, 600)], V(4, 600), 't1:B').termsChanged).toBe(false);
+    expect(standing(volunteered, [signed(approve(PROVIDER, 4, 600), 't1:A')], V(4, 600), null).termsChanged).toBe(false);
+    expect(standing(volunteered, [signed(approve(PROVIDER, 4, 600), 't1:A')], V(4, 600)).termsChanged).toBe(false);
+  });
+});

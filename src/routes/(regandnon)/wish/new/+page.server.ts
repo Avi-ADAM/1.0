@@ -1,4 +1,5 @@
 import { loadBell } from '$lib/server/concierge/bell';
+import { loadWishNotices } from '$lib/server/concierge/notices';
 import type { PageServerLoad } from './$types';
 
 // Public (guest-allowed) wish composer. No auth guard — a visitor can write
@@ -9,6 +10,6 @@ export const load: PageServerLoad = async ({ locals, fetch }) => {
   const uid = (locals as any)?.uid ?? null;
   const un = (locals as any)?.un ?? null;
   // A guest has no wishes, so no bell (the composer hides it for `anon`).
-  const bell = await loadBell(uid, fetch);
-  return { uid, un, bell };
+  const [bell, notices] = await Promise.all([loadBell(uid, fetch), loadWishNotices(uid, fetch)]);
+  return { uid, un, bell, notices };
 };

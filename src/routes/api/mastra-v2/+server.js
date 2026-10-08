@@ -5,10 +5,14 @@ import { mastra } from '../../../mastra';
 import { createUnregisteredBotAgent } from '../../../mastra/agents/nonreg-bot.js';
 import { DEFAULT_AGENT_MAX_STEPS } from '../../../mastra/lib/agent-response.js';
 import { setMcpContext } from '$lib/server/mcpContext';
+import { resolveChatIdentity } from '$lib/server/chatIdentity';
 
-export async function POST({ request, fetch }) {
+export async function POST({ request, fetch, locals }) {
   const { payload, user } = await request.json();
   const lang = user?.lang || 'he';
+  // Identity is the signed session only — the workflow's tools run with
+  // `isInternalBot: true`, so a body `user.id` would let anyone act as anyone.
+  const { userId } = resolveChatIdentity(locals, user?.id);
 
   // await locale.set(lang);
   // await loadTranslations(lang);
@@ -18,7 +22,7 @@ export async function POST({ request, fetch }) {
     console.log('📍 Current Page Path:', currentPath);
 
     // Check if user is registered (has an ID)
-    if (!user?.id) {
+    if (!userId) {
       console.log('🔓 Unregistered user detected, using nonreg-bot');
 
       // Use the unregistered bot agent directly
@@ -94,7 +98,8 @@ export async function POST({ request, fetch }) {
     console.log('🚀 Starting chat workflow for registered user');
     setMcpContext({
       fetchInstance: fetch,
-      userId: user.id.toString(),
+      userId,
+      isInternalBot: true,
       currentPath: currentPath
     });
     // Execute the workflow
@@ -104,7 +109,7 @@ export async function POST({ request, fetch }) {
       inputData: {
         message: payload.text,
         history: payload.history || [],
-        userId: user?.id.toString(),
+        userId,
         language: lang,
         apiKey: GEMINI_API_KEY,
         fetchInstance: fetch,
@@ -117,7 +122,7 @@ export async function POST({ request, fetch }) {
         inputData: {
           message: payload.text,
           history: payload.history || [],
-          userId: user?.id,
+          userId,
           language: lang,
           apiKey: GEMINI_API_KEY,
           fetchInstance: fetch,

@@ -7,6 +7,7 @@
   import { t } from '$lib/translations';
   import { fetchTimers, initialWebSocketForTimer } from '$lib/stores/timers.js';
   import { forum, isChatOpen, newChat, nowChatId } from '$lib/stores/pendMisMes.js';
+  import { sendToSer } from '$lib/send/sendToSer.js';
 
   let { data } = $props();
   const moachStore = getMoachStore();
@@ -25,6 +26,18 @@
   // the moach fills it, so this page loads it and listens for the socket
   // refresh that keeps other devices/tabs in step.
   onMount(() => {
+    // The server load swallows a Strapi timeout into `missions: null`, which
+    // left the board on "loading" for good. Ask again from here, the way the
+    // client-only tabs (kanban, gantt) always do.
+    if (!data.missions && !moachStore.isDataFresh(projectId, 'missions')) {
+      sendToSer({ pid: projectId }, 'getProjectMissions', null, null, false, fetch)
+        .then((res) => {
+          const attributes = res?.data?.project?.data?.attributes;
+          if (attributes) moachStore.updateProjectData(projectId, 'missions', attributes);
+        })
+        .catch((e) => console.warn('[progress] missions retry failed:', e?.message));
+    }
+
     const uid = page.data?.uid;
     if (!uid) return;
     fetchTimers(uid, fetch).catch((e) =>

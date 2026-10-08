@@ -17,6 +17,8 @@
   import DiscordIcon from '$lib/celim/icons/discord.svelte';
   import GithubIcon from '$lib/celim/icons/github.svelte';
   import WhatsappIcon from '$lib/celim/icons/whatsapp.svelte';
+  import RikmaSkin from '$lib/components/rikmaPublic/RikmaSkin.svelte';
+  import { lookFrame, shownLook } from '$lib/rikmaLook/frame.svelte';
 
   let { data } = $props();
   const fmtMoney = useFormatMoney();
@@ -24,7 +26,10 @@
   provideRikmaCurrency(() => data.projectData?.attributes?.currencyCode);
 
   let projectId = $derived(data.projectId);
-  let isRegisteredUser = $derived(data.isRegisteredUser);
+  // Inside the look editor's preview the page shows what a guest sees.
+  let isRegisteredUser = $derived(data.isRegisteredUser && !lookFrame.active);
+  /** @type {import('$lib/rikmaLook/look').RikmaLook | null} */
+  let look = $derived(shownLook(data.look ?? null));
   let project = $derived(data.projectData);
   let attrs = $derived(project?.attributes);
   let coverage = $derived(data.coverage);
@@ -162,6 +167,7 @@
   <Header />
 {/if}
 
+<RikmaSkin {look}>
 {#if !available}
   <!-- Gated off (or members-only for a guest): friendly, self-standing screen. -->
   <div class="support-page min-h-screen text-white font-sans flex items-center justify-center px-4">
@@ -215,8 +221,19 @@
           </p>
         {/if}
 
+        {#if look && ((look.profile.regKind !== 'none' && look.profile.legalId) || look.profile.founded)}
+          <p class="text-white/60 text-sm mb-2 flex flex-wrap justify-center gap-x-4">
+            {#if look.profile.regKind !== 'none' && look.profile.legalId}
+              <span dir="auto">{$t(`rikmaLook.reg.${look.profile.regKind}`)} {look.profile.legalId}</span>
+            {/if}
+            {#if look.profile.founded}
+              <span>{$t('rikmaLook.page.founded', { year: look.profile.founded })}</span>
+            {/if}
+          </p>
+        {/if}
+
         <p class="max-w-xl mx-auto text-lg text-white/80 mb-8">
-          {$t('pages.projectSupport.heroTagline')}
+          {look?.profile.tagline || $t('pages.projectSupport.heroTagline')}
         </p>
 
         <div class="flex flex-wrap justify-center gap-3 mb-7">
@@ -232,6 +249,9 @@
             >
           {/if}
         </div>
+        {#if look?.profile.donationNote}
+          <p class="max-w-xl mx-auto -mt-3 mb-6 text-sm text-white/65" dir="auto">{look.profile.donationNote}</p>
+        {/if}
 
         <!-- social + share -->
         <div class="flex justify-center items-center gap-3 text-sm">
@@ -548,6 +568,16 @@
         </div>
       </section>
 
+      {#if look?.links.reports || look?.links.accessibility}
+        <p class="text-center text-sm mb-4 flex justify-center gap-5">
+          {#if look.links.reports}
+            <a class="text-white/70 underline hover:text-gold" href={look.links.reports} target="_blank" rel="noopener noreferrer">{$t('rikmaLook.page.reports')}</a>
+          {/if}
+          {#if look.links.accessibility}
+            <a class="text-white/70 underline hover:text-gold" href={look.links.accessibility} target="_blank" rel="noopener noreferrer">{$t('rikmaLook.page.accessibility')}</a>
+          {/if}
+        </p>
+      {/if}
       <footer class="text-center text-white/40 text-sm">
         {$t('pages.projectSupport.poweredBy')}
         <a href="/" class="text-gold hover:text-white font-semibold">1💗1</a>
@@ -559,6 +589,7 @@
     <Spinner size="lg" />
   </div>
 {/if}
+</RikmaSkin>
 
 {#if available && project}
   <DonateDialog
@@ -584,9 +615,9 @@
     margin-top: 1rem;
     padding: 0.75rem 1.1rem;
     border-radius: 0.9rem;
-    background: rgba(255, 215, 0, 0.1);
-    border: 1px solid rgba(255, 215, 0, 0.3);
-    color: #ffe36e;
+    background: rgb(var(--pp-gold) / 0.1);
+    border: 1px solid rgb(var(--pp-gold) / 0.3);
+    color: rgb(var(--pp-gold-soft));
     font-size: 0.85rem;
   }
   .gate-banner a {
@@ -597,9 +628,9 @@
   }
   .support-page {
     background:
-      radial-gradient(1200px 500px at 80% -10%, rgba(255, 215, 0, 0.08), transparent 60%),
-      radial-gradient(1000px 600px at 10% 10%, rgba(255, 0, 174, 0.09), transparent 55%),
-      linear-gradient(160deg, #1a0515 0%, #2c0b1e 45%, #120f26 100%);
+      radial-gradient(1200px 500px at 80% -10%, rgb(var(--pp-gold) / 0.08), transparent 60%),
+      radial-gradient(1000px 600px at 10% 10%, rgb(var(--pp-barbi) / 0.09), transparent 55%),
+      linear-gradient(160deg, var(--pp-bg1) 0%, var(--pp-bg2) 45%, var(--pp-bg3) 100%);
     scroll-behavior: smooth;
   }
 
@@ -607,7 +638,7 @@
     position: absolute;
     inset: -4rem 0 auto 0;
     height: 22rem;
-    background: radial-gradient(600px 260px at 50% 0%, rgba(255, 215, 0, 0.12), transparent 70%);
+    background: radial-gradient(600px 260px at 50% 0%, rgb(var(--pp-gold) / 0.12), transparent 70%);
     pointer-events: none;
   }
 
@@ -616,15 +647,15 @@
     height: 9rem;
     border-radius: 9999px;
     padding: 4px;
-    background: conic-gradient(from 180deg, #ffd700, #ff00ae, #ffd700);
-    box-shadow: 0 0 45px rgba(255, 215, 0, 0.25);
+    background: conic-gradient(from 180deg, rgb(var(--pp-gold)), rgb(var(--pp-barbi)), rgb(var(--pp-gold)));
+    box-shadow: 0 0 45px rgb(var(--pp-gold) / 0.25);
   }
   .logo-ring img {
     width: 100%;
     height: 100%;
     border-radius: 9999px;
     object-fit: cover;
-    border: 3px solid #1a0515;
+    border: 3px solid var(--pp-bg1);
   }
 
   .glass {
@@ -634,24 +665,24 @@
     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.15);
   }
 
-  .text-gold { color: #ffd700; }
-  .text-barbi { color: #ff00ae; }
-  .border-t-gold { border-top-color: #ffd700; }
-  .border-t-barbi { border-top-color: #ff00ae; }
+  .text-gold { color: rgb(var(--pp-gold)); }
+  .text-barbi { color: rgb(var(--pp-barbi)); }
+  .border-t-gold { border-top-color: rgb(var(--pp-gold)); }
+  .border-t-barbi { border-top-color: rgb(var(--pp-barbi)); }
 
   .btn-primary {
     display: inline-block;
     padding: 0.8rem 2rem;
     border-radius: 9999px;
     font-weight: 700;
-    color: #000;
-    background: linear-gradient(120deg, #ffd700, #d4af37 55%, #b8860b);
-    box-shadow: 0 4px 20px rgba(255, 215, 0, 0.35);
+    color: rgb(var(--pp-on-gold));
+    background: linear-gradient(120deg, rgb(var(--pp-gold)), rgb(var(--pp-gold-2)) 55%, rgb(var(--pp-gold-3)));
+    box-shadow: 0 4px 20px rgb(var(--pp-gold) / 0.35);
     transition: transform 0.2s, box-shadow 0.2s;
   }
   .btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 26px rgba(255, 215, 0, 0.5);
+    box-shadow: 0 6px 26px rgb(var(--pp-gold) / 0.5);
   }
 
   .btn-secondary {
@@ -659,14 +690,14 @@
     padding: 0.8rem 2rem;
     border-radius: 9999px;
     font-weight: 700;
-    color: #fff;
-    background: linear-gradient(120deg, #ff00ae, #be185d);
-    box-shadow: 0 4px 20px rgba(255, 0, 174, 0.3);
+    color: rgb(var(--pp-on-barbi));
+    background: linear-gradient(120deg, rgb(var(--pp-barbi)), rgb(var(--pp-barbi-2)));
+    box-shadow: 0 4px 20px rgb(var(--pp-barbi) / 0.3);
     transition: transform 0.2s, box-shadow 0.2s;
   }
   .btn-secondary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 26px rgba(255, 0, 174, 0.5);
+    box-shadow: 0 6px 26px rgb(var(--pp-barbi) / 0.5);
   }
 
   .btn-ghost {
@@ -680,8 +711,8 @@
     transition: border-color 0.2s, background 0.2s;
   }
   .btn-ghost:hover {
-    border-color: #ffd700;
-    background: rgba(255, 215, 0, 0.08);
+    border-color: rgb(var(--pp-gold));
+    background: rgb(var(--pp-gold) / 0.08);
   }
 
   .social-dot {
@@ -697,14 +728,14 @@
     transition: all 0.2s;
   }
   .social-dot:hover {
-    background: rgba(255, 215, 0, 0.15);
+    background: rgb(var(--pp-gold) / 0.15);
     transform: scale(1.08);
   }
 
   .board-shimmer {
     position: absolute;
     inset: 0;
-    background: radial-gradient(500px 200px at 90% 0%, rgba(255, 215, 0, 0.07), transparent 70%);
+    background: radial-gradient(500px 200px at 90% 0%, rgb(var(--pp-gold) / 0.07), transparent 70%);
     pointer-events: none;
   }
 
@@ -740,8 +771,8 @@
   .coverage-fill {
     height: 100%;
     border-radius: 9999px;
-    background: linear-gradient(90deg, #b8860b, #ffd700 60%, #fff3b0);
-    box-shadow: 0 0 18px rgba(255, 215, 0, 0.5);
+    background: linear-gradient(90deg, rgb(var(--pp-gold-3)), rgb(var(--pp-gold)) 60%, #fff3b0);
+    box-shadow: 0 0 18px rgb(var(--pp-gold) / 0.5);
     transition: width 1s ease-out;
     min-width: 0.35rem;
   }
@@ -775,14 +806,14 @@
     border: 1px solid rgba(255, 255, 255, 0.12);
   }
   .chip-gold {
-    background: rgba(255, 215, 0, 0.12);
-    border-color: rgba(255, 215, 0, 0.35);
-    color: #ffe36e;
+    background: rgb(var(--pp-gold) / 0.12);
+    border-color: rgb(var(--pp-gold) / 0.35);
+    color: rgb(var(--pp-gold-soft));
   }
   .chip-pink {
-    background: rgba(255, 0, 174, 0.12);
-    border-color: rgba(255, 0, 174, 0.35);
-    color: #ff8ad8;
+    background: rgb(var(--pp-barbi) / 0.12);
+    border-color: rgb(var(--pp-barbi) / 0.35);
+    color: rgb(var(--pp-barbi-soft));
   }
 
   .badge {
@@ -798,9 +829,9 @@
     border: 1px solid rgba(34, 197, 94, 0.4);
   }
   .badge-waiting {
-    background: rgba(255, 215, 0, 0.1);
-    color: #ffe36e;
-    border: 1px solid rgba(255, 215, 0, 0.3);
+    background: rgb(var(--pp-gold) / 0.1);
+    color: rgb(var(--pp-gold-soft));
+    border: 1px solid rgb(var(--pp-gold) / 0.3);
   }
   .badge-muted {
     background: rgba(255, 255, 255, 0.08);
@@ -813,7 +844,7 @@
   }
   .mission-card:hover {
     transform: translateY(-3px);
-    border-color: rgba(255, 215, 0, 0.3);
+    border-color: rgb(var(--pp-gold) / 0.3);
   }
   .mission-funded {
     border-color: rgba(34, 197, 94, 0.35);
@@ -824,14 +855,14 @@
   }
   .product-card:hover {
     transform: translateY(-3px);
-    border-color: rgba(255, 0, 174, 0.4);
+    border-color: rgb(var(--pp-barbi) / 0.4);
   }
 
   .team-avatar {
     width: 3rem;
     height: 3rem;
     border-radius: 9999px;
-    border: 2px solid #ffd700;
+    border: 2px solid rgb(var(--pp-gold));
     padding: 2px;
     background: rgba(0, 0, 0, 0.5);
     overflow: hidden;
@@ -848,10 +879,10 @@
   }
 
   .join-card {
-    border: 1px solid rgba(255, 215, 0, 0.25);
+    border: 1px solid rgb(var(--pp-gold) / 0.25);
     background:
-      radial-gradient(400px 160px at 15% 100%, rgba(255, 0, 174, 0.1), transparent 70%),
-      radial-gradient(400px 160px at 85% 0%, rgba(255, 215, 0, 0.1), transparent 70%),
+      radial-gradient(400px 160px at 15% 100%, rgb(var(--pp-barbi) / 0.1), transparent 70%),
+      radial-gradient(400px 160px at 85% 0%, rgb(var(--pp-gold) / 0.1), transparent 70%),
       rgba(255, 255, 255, 0.04);
   }
 

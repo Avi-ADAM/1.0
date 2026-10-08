@@ -7,6 +7,7 @@
 
 import type { NotificationData, UserProfile } from './NotificationOrchestrator';
 import type { ActionContext } from '../actions/types';
+import { SOCKET_SERVER_URL, socketServerHeaders } from '../socketServer.js';
 
 export interface BroadcastRequest {
   userIds: string[];
@@ -27,8 +28,7 @@ export class SocketIOServer {
   private serverUrl: string;
 
   constructor(serverUrl?: string) {
-    // Use environment variable or default to 127.0.0.1 to avoid ECONNREFUSED on some systems
-    this.serverUrl = serverUrl || process.env.SOCKET_SERVER_URL || 'http://127.0.0.1:3001';
+    this.serverUrl = serverUrl || SOCKET_SERVER_URL;
   }
 
   /**
@@ -69,9 +69,7 @@ export class SocketIOServer {
 
       const response = await context.fetch(`${this.serverUrl}/broadcast`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: socketServerHeaders(),
         body: JSON.stringify(request)
       });
 

@@ -6,6 +6,7 @@
   import dayjs from 'dayjs';
   import { lang } from '$lib/stores/lang.js';
   import { t } from '$lib/translations';
+  import { toast } from 'svelte-sonner';
   import { clickOutside } from './outsidclick.js';
 
   import { fly } from 'svelte/transition';
@@ -316,6 +317,8 @@
         if (result.success) {
           // `materialized: false` = the bilateral gate parked the acceptance on
           // the assignee's answer; nothing was registered yet.
+          // The rikma said yes; a part of a customer's deal also waits for her (C-19).
+          if (result.data?.pending === 'clientConsent') toast.info($t('lev.cards.awaitingClient'));
           onAcsept?.({
             ani: 'asked',
             coinlapach: coinlapach,
@@ -358,6 +361,8 @@
         if (result.success) {
           // `materialized: false` = the bilateral gate parked the acceptance on
           // the assignee's answer; nothing was registered yet.
+          // The rikma said yes; a part of a customer's deal also waits for her (C-19).
+          if (result.data?.pending === 'clientConsent') toast.info($t('lev.cards.awaitingClient'));
           onAcsept?.({
             ani: 'asked',
             coinlapach: coinlapach,

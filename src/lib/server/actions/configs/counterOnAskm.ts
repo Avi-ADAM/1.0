@@ -10,6 +10,7 @@
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { normalizeLocationInput, extractRelationId } from './actionUtils.js';
 import { ensureCandidacyTimegrama } from '../../nego/timegrama.js';
+import { notifyDealClientsOfCounter } from '$lib/server/deal/offerDeal.js';
 
 interface UserVote {
   what: boolean;
@@ -19,7 +20,7 @@ interface UserVote {
   ide?: number;
 }
 
-const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
+const handler: ActionExecutionHandler = async (params, context, { strapi, notifier }) => {
   const { askmId, openMashaabimId, projectId } = params;
   const newValues = (params.newValues ?? {}) as Record<string, any>;
   const now = new Date();
@@ -97,6 +98,15 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
   const candId = params.candidateUserId != null ? String(params.candidateUserId) : null;
   const recipientIds = Array.from(
     new Set([...memberIds, candId].filter((u) => u && u !== userId))
+  );
+
+  // A part of a customer's deal: the new round needs her signature too (C-19).
+  await notifyDealClientsOfCounter(
+    (qid, vars) => strapi.execute(qid, vars, context.jwt, context.fetch),
+    notifier,
+    context,
+    'askm',
+    String(askmId)
   );
 
   return {

@@ -15,6 +15,7 @@
     un: data.un || undefined,
     welcome: data.welcome,
     draft: data.draft,
-    bell: data.bell
+    bell: data.bell,
+    notices: data.notices
   }}
 />

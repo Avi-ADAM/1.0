@@ -34,9 +34,11 @@ const approveHalukaHandler: ActionExecutionHandler = async (params, context, { s
 
   return {
     data: tosplitResult,
+    // The lev 'halukas' slice holds the tosplits; re-reading it drops the
+    // finished one from every member's heart (REALTIME_TRACKING B5).
     updateStrategy: {
-      type: 'partialUpdate',
-      config: { dataKeys: ['splits', 'tosplits', 'fils'] }
+      type: 'refetchScope',
+      config: { dataKeys: ['halukas'], projectId: String(params.projectId) }
     }
   };
 };
@@ -104,9 +106,11 @@ export const approveHalukaConfig: ActionConfig = {
   ],
 
   notification: {
+    // Was 'custom', which the orchestrator resolves to nobody: since the move
+    // off /api/approveHaluka no approved split reached anyone (REALTIME_TRACKING B5).
     recipients: {
-      type: 'custom',
-      config: { excludeSender: false }
+      type: 'projectMembers',
+      config: { projectIdParam: 'projectId', excludeSender: false }
     },
     templates: {
       title: { he: 'חלוקה אושרה!', en: 'Division Approved!', ar: 'تمت الموافقة على التقسيم!' },
@@ -122,7 +126,7 @@ export const approveHalukaConfig: ActionConfig = {
   },
 
   updateStrategy: {
-    type: 'partialUpdate',
-    config: { dataKeys: ['splits', 'tosplits', 'fils'] }
+    type: 'refetchScope',
+    config: { dataKeys: ['halukas'] }
   }
 };

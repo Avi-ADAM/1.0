@@ -1,5 +1,6 @@
 import { sendToSer } from '$lib/send/sendToSer.js';
 import { computeCoverage } from '$lib/revenue/computeCoverage';
+import { readRikmaIdentity } from '$lib/server/rikmaPublic/loadRikmaPage.js';
 
 /**
  * Public support / home page (PLAN_VOLUNTEER_RIKMA §3).
@@ -39,7 +40,12 @@ export const load = async ({ locals, params, fetch, depends }) => {
   const isRegisteredUser = tok !== false;
   depends(`project-support:${projectId}`);
 
-  const projectData = await fetchSupportData(projectId, tok, fetch);
+  const [projectData, identity] = await Promise.all([
+    fetchSupportData(projectId, tok, fetch),
+    // The rikma's look (PLAN_RIKMA_SUBDOMAINS S1) colours this page too.
+    readRikmaIdentity(projectId).catch(() => ({ look: null }))
+  ]);
+  const look = identity.look ?? null;
 
   const attrs = projectData?.attributes;
   const gate = attrs?.supportPage ?? 'off';
@@ -53,7 +59,7 @@ export const load = async ({ locals, params, fetch, depends }) => {
     (gate === 'members' && isRegisteredUser);
 
   if (!projectData || !attrs) {
-    return { projectId, lang: locals.lang, isRegisteredUser, gate, isMember, available: false, projectData: null, coverage: null };
+    return { projectId, lang: locals.lang, isRegisteredUser, gate, isMember, available: false, projectData: null, coverage: null, look };
   }
 
   if (!canView) {
@@ -73,7 +79,8 @@ export const load = async ({ locals, params, fetch, depends }) => {
           profilePic: attrs.profilePic ?? null
         }
       },
-      coverage: null
+      coverage: null,
+      look
     };
   }
 
@@ -132,6 +139,7 @@ export const load = async ({ locals, params, fetch, depends }) => {
     members,
     projectData,
     coverage,
-    stipendMissions
+    stipendMissions,
+    look
   };
 };

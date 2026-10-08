@@ -3,8 +3,11 @@ import { confirmSheirutHalukaConfig } from './confirmSheirutHaluka';
 import type { ActionExecutionHandler } from '../types';
 
 /**
- * QA_CONCIERGE_E2E C-17 — a customer's payment is recorded as the rikma's income at the
- * moment BOTH sides have confirmed it, once, whichever of them confirms last.
+ * QA_CONCIERGE_E2E C-17 — a customer's payment is recorded as the rikma's income once, at
+ * the moment it is settled. The receiver's word settles it on its own (money that arrived
+ * was sent); a sender's confirmation completes only a legacy transfer the receiver had
+ * already confirmed. On a wish deal the receipt is also the receiver's own part
+ * (`$lib/server/deal/dealMoney`), so the deal page never asks again.
  */
 
 const CUSTOMER = '261';
@@ -55,6 +58,51 @@ function world(h: { senderconf?: boolean; confirmed?: boolean; isSiteShare?: boo
               }
             }
           };
+        case '397sheirutDealDue':
+          return {
+            data: {
+              sheirut: {
+                data: {
+                  id: '8',
+                  attributes: {
+                    total: 1800,
+                    users_permissions_users: { data: [{ id: CUSTOMER }] },
+                    halukas: {
+                      data: [
+                        {
+                          id: '81',
+                          attributes: {
+                            amount: 1800,
+                            senderconf: !!h.senderconf,
+                            confirmed: !!h.confirmed,
+                            usersend: { data: { id: CUSTOMER } },
+                            userrecive: { data: { id: RECEIVER } }
+                          }
+                        }
+                      ]
+                    },
+                    sales: { data: [] },
+                    matanot: {
+                      data: {
+                        id: '48',
+                        attributes: {
+                          name: 'wish',
+                          ratson: { data: { id: '16' } },
+                          matanot_recipe_missions: {
+                            data: [{ id: '70', attributes: { hoursPerUnit: 1, ratePerHour: 1800, notes: 'a', assignedMember: { data: { id: RECEIVER, attributes: { username: 'Dana' } } } } }]
+                          },
+                          matanot_recipe_resources: { data: [] }
+                        }
+                      }
+                    },
+                    project: { data: { id: '91', attributes: { user_1s: { data: [{ id: RECEIVER }] }, mesimabetahaliches: { data: [] } } } }
+                  }
+                }
+              }
+            }
+          };
+        case '418dealPartsReceived':
+          return { data: { sheirut: { data: { id: '8', attributes: { moneyTransfered: false, iTransferMoney: true, iGotMoney: [] } } } } };
         case '396createSheirutPaymentSale':
           return { data: { createSale: { data: { id: '501', attributes: { in: 1800 } } } } };
         case '206createPlatformSale':
@@ -77,11 +125,13 @@ describe('confirmSheirutHaluka — the payment reaches the rikma', () => {
     vi.spyOn(console, 'error').mockImplementation(() => {});
   });
 
-  it('the receiver confirming last completes the pair and records the income', async () => {
+  it('the receiver confirming settles the transfer, records the income and marks their own part', async () => {
     const w = world({ senderconf: true });
     const out: any = await go(w, 'receiver', RECEIVER);
     expect(out).toMatchObject({ complete: true, saleId: '501' });
     expect(recorded(w)).toBe(true);
+    expect(w.calls.find((c) => c.qid === '71.6confirmHaluka')!.vars).toEqual({ id: '81', confirmed: true, senderconf: true });
+    expect(w.calls.find((c) => c.qid === '213updateSheirut')!.vars.data.iGotMoney).toEqual([{ iGotMoney: true, users_permissions_user: RECEIVER }]);
   });
 
   it('the customer confirming last does too', async () => {
@@ -90,17 +140,25 @@ describe('confirmSheirutHaluka — the payment reaches the rikma', () => {
     expect(out).toMatchObject({ complete: true, saleId: '501' });
   });
 
-  it('records nothing while only one side has confirmed', async () => {
+  it('the receiver does not wait for the sender: their word alone settles it', async () => {
     const w = world();
     const out: any = await go(w, 'receiver', RECEIVER);
+    expect(out).toMatchObject({ complete: true, saleId: '501' });
+    expect(w.calls.find((c) => c.qid === '71.6confirmHaluka')!.vars).toMatchObject({ confirmed: true, senderconf: true });
+  });
+
+  it('a sender alone settles nothing — only the receiver can say the money arrived', async () => {
+    const w = world();
+    const out: any = await go(w, 'sender', CUSTOMER);
     expect(out).toMatchObject({ complete: false, saleId: null });
     expect(recorded(w)).toBe(false);
   });
 
   it('records once: confirming again after the pair is complete adds nothing', async () => {
     const w = world({ senderconf: true, confirmed: true });
-    await go(w, 'receiver', RECEIVER);
+    const out: any = await go(w, 'receiver', RECEIVER);
     expect(recorded(w)).toBe(false);
+    expect(out.complete).toBe(false);
   });
 
   it('a site-share transfer keeps its own way of recording income', async () => {

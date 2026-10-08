@@ -7,7 +7,7 @@
   import { page } from '$app/state';
   import ConciergeBell from '$lib/components/concierge/ConciergeBell.svelte';
 
-  /** @type {{ data: { mine: any[]; publicFeed: any[]; bell?: { id: string; name: string; count: number }[]; queryOk: { mine: boolean; public: boolean }; uid?: string; un?: string } }} */
+  /** @type {{ data: { mine: any[]; publicFeed: any[]; bell?: { id: string; name: string; count: number }[]; notices?: import('$lib/notices').Notice[] | null; queryOk: { mine: boolean; public: boolean }; uid?: string; un?: string } }} */
   let { data } = $props();
   const fmtMoney = useFormatMoney();
 
@@ -389,7 +389,7 @@
       <a href="/moach" class="nav-lnk">{$t('concierge.moach')}</a>
     </nav>
     <div class="hdr-right">
-      <ConciergeBell items={data?.bell ?? []} />
+      <ConciergeBell items={data?.bell ?? []} notices={data?.notices ?? null} />
       <button class="av-btn" onclick={() => goto('/me')}>
         {#if $uPic}
           <img src={$uPic} alt="פרופיל" class="av-img" />

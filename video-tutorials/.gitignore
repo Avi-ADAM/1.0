@@ -1,0 +1,5 @@
+node_modules/
+# signed-in browser state (cookies incl. jwt) — never commit
+.auth/
+# recordings, frames, inspect dumps
+out/

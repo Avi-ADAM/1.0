@@ -7,6 +7,11 @@
   import { shiftsEnabled } from '$lib/server/shifts/mode.js';
   import { asService } from '$lib/server/shifts/exec.js';
   import { commitmentForAsk, setMissionCommitment } from '$lib/server/shifts/store.js';
+  import { strapiClient } from '$lib/server/actions';
+  import { loadCandidacyDeal, fillOfferIntoDeal } from '$lib/server/deal/offerDeal';
+
+  /** Admin qid runner for the deal of a candidacy (QA C-19). */
+  const runAdmin = (qid, vars) => strapiClient.execute(qid, vars);
 
   export async function Ask(id, taid, fetch) {
     console.log(id, taid, 'ask compo started');
@@ -63,7 +68,17 @@
       const omMeta = a.open_mission?.data?.attributes ?? null;
       const assignedOffer = omMeta?.isRishon === true;
 
-      const gate = computeNegoGate({ rounds, vots, takerId, memberIds, takerApplied: !assignedOffer });
+      // A gap of a customer's deal: she signs what she pays for (QA C-19). A read
+      // error throws into the catch below and the clock is retried, never matured blind.
+      const offerDeal = await loadCandidacyDeal(runAdmin, 'ask', String(id));
+      const gate = computeNegoGate({
+        rounds,
+        vots,
+        takerId,
+        memberIds,
+        takerApplied: !assignedOffer,
+        clientIds: offerDeal?.clientIds ?? [],
+      });
       if (!gate.approvable) {
         if (assignedOffer && !gate.takerYes) {
           // The invited member never consented within the restime: the mission
@@ -159,7 +174,7 @@
                 {
                   createMesimabetahalich(
       data: {project: "${projectId}",
-             mission:  "${om.mission.data.id}",
+             ${om.mission?.data?.id ? `mission: "${om.mission.data.id}",` : ''}
              hearotMeyuchadot: """${fHearot}""",
              name: """${fName}""",
              descrip: """${fDescrip}""",
@@ -202,6 +217,16 @@ updateOpenMission(
         return;
       }
       let chiluzh = res3.data.createMesimabetahalich.data.id;
+
+      // The customer's deal takes the line at the terms everyone signed (QA C-19).
+      if (offerDeal && chiluzh) {
+        await fillOfferIntoDeal(runAdmin, offerDeal, {
+          takerId: String(takerUser.id),
+          amount: Number(fHours) || 0,
+          unitPrice: Number(fPer) || 0,
+          mesimabetahalichId: String(chiluzh),
+        });
+      }
 
       // The shift commitment agreed on this candidacy moves onto the
       // assignment, like hours and rate (PLAN_SHIFTS §3.8).

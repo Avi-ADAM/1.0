@@ -41,6 +41,8 @@
    * @property {(payload: { x: any }) => void} [onHover]
    * @property {(payload: { alr: any }) => void} [onAgree]
    * @property {(payload: { alr: any }) => void} [onDecline]
+   * @property {{ focus: string, hue: string | null, hue2: string | null, cover: string | null } | null} [lookProposal]
+   * @property {string} [previewHref]
    */
 
   /** @type {Props} */
@@ -79,6 +81,10 @@
     currentValue = '',
     /** @type {string} proposed new value */
     newValue = '',
+    /** @type {{ focus: string, hue: string | null, hue2: string | null, cover: string | null } | null} kind 'look': the proposal at a glance */
+    lookProposal = null,
+    /** @type {string} kind 'look': the public page rendered in the proposed look (members only) */
+    previewHref = '',
   } = $props();
   const fmtMoney = useFormatMoney();
   let user_1s = $derived.by(() => {
@@ -445,6 +451,36 @@
             </div>
           {/if}
         </div>
+        {/if}
+      </div>
+    {:else if kind === 'look' && (lookProposal || previewHref)}
+      <!-- PLAN_RIKMA_SUBDOMAINS: a look is judged by looking at it. -->
+      <div class="space-y-3 bg-gray-50 dark:bg-gray-900/50 p-4 rounded-xl border border-gray-200 dark:border-gray-700">
+        {#if lookProposal}
+          <div class="flex items-center gap-3">
+            {#if lookProposal.cover}
+              <img src={lookProposal.cover} alt="" class="w-14 h-10 rounded-lg object-cover" />
+            {/if}
+            {#if lookProposal.hue}
+              <span class="w-8 h-8 rounded-full border border-black/10" style:background={lookProposal.hue}></span>
+            {/if}
+            {#if lookProposal.hue2}
+              <span class="w-8 h-8 rounded-full border border-black/10" style:background={lookProposal.hue2}></span>
+            {/if}
+            <span class="text-sm text-gray-700 dark:text-gray-200">{$t(`rikmaLook.focus.${lookProposal.focus}`)}</span>
+          </div>
+        {:else}
+          <p class="text-sm text-gray-700 dark:text-gray-200">{$t('rikmaLook.card.backToClassic')}</p>
+        {/if}
+        {#if previewHref}
+          <a
+            href={previewHref}
+            target="_blank"
+            rel="noopener"
+            class="inline-block text-sm font-semibold text-barbi dark:text-mpink underline"
+          >
+            {$t('rikmaLook.card.preview')}
+          </a>
         {/if}
       </div>
     {:else if kind !== 'sheirutpends' && kind !== 'pic' && (currentValue || newValue)}

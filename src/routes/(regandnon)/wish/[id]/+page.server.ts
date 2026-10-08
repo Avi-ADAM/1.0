@@ -61,7 +61,15 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
       if (isOwnerHere) {
         throw redirect(302, `/concierge/${params.id}`);
       }
-      throw error(403, 'משאלה זו אינה פתוחה לציבור');
+      // Private means "not public", not "not for the people working on it": a
+      // supplier who offered on it, was invited to it, or holds a part of it sees
+      // it (QA C-23). Everyone else is refused.
+      const isParty =
+        !!uid &&
+        (res?.data?.ratsonProposals?.data ?? []).some((p: any) =>
+          (p.attributes?.proposer_users?.data ?? []).some((u: any) => String(u.id) === String(uid))
+        );
+      if (!isParty) throw error(403, 'משאלה זו אינה פתוחה לציבור');
     }
 
     const owners = a.users_permissions_users?.data ?? [];

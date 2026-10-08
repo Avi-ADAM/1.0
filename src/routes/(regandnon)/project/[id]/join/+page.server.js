@@ -1,4 +1,5 @@
 import { sendToSer } from '$lib/send/sendToSer.js';
+import { readRikmaIdentity } from '$lib/server/rikmaPublic/loadRikmaPage.js';
 
 /**
  * Public join / self-nomination page (PLAN_SELF_NOMINATION §4, as a standalone
@@ -12,9 +13,10 @@ export const load = async ({ locals, params, fetch }) => {
   const tok = locals.tok;
   const isSer = tok === false;
 
-  const [projectRes, boardRes] = await Promise.allSettled([
+  const [projectRes, boardRes, identityRes] = await Promise.allSettled([
     sendToSer({ id: projectId }, '49GetProjectById', null, null, isSer, fetch),
-    sendToSer({ id: projectId }, '311projectOpenBoardPublic', null, null, isSer, fetch)
+    sendToSer({ id: projectId }, '311projectOpenBoardPublic', null, null, isSer, fetch),
+    readRikmaIdentity(projectId)
   ]);
 
   if (projectRes.status === 'rejected') {
@@ -39,6 +41,8 @@ export const load = async ({ locals, params, fetch }) => {
     // The board is a nice-to-have: an empty list must never keep the offer
     // form off the page.
     openMissions: boardAttrs?.open_missions?.data ?? [],
-    openResources: boardAttrs?.open_mashaabims?.data ?? []
+    openResources: boardAttrs?.open_mashaabims?.data ?? [],
+    // The rikma's look (PLAN_RIKMA_SUBDOMAINS S1) colours this page too.
+    look: identityRes.status === 'fulfilled' ? identityRes.value.look : null
   };
 };

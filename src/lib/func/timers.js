@@ -1,5 +1,6 @@
 import { sendToSer } from './../send/sendToSer.js';
 import { closeOpenIntervals } from '$lib/timers/intervals';
+import { hoursOfMs } from '$lib/timers/precision';
 import { serializeSaveLinks } from '$lib/timers/saveLinks';
 const browser = typeof window !== 'undefined';
 
@@ -21,12 +22,18 @@ function unwrapTimerResult(res) {
  * @param {string} actionType - 'timerStart', 'timerStop', or 'timerSave'
  * @param {Object} params - Action parameters
  * @param {Function} [fetchFn] - Optional fetch function
+ * @param {{ timeoutMs?: number }} [options] - `timeoutMs` gives up on an answer
+ *   that never comes, so the caller can show an error instead of a ⏳ that
+ *   spins forever. Only for actions that are safe to retry.
  * @returns {Promise<Object|null>} - The resulting data or null on failure
  */
-async function executeTimerAction(actionType, params, fetchFn = null) {
+async function executeTimerAction(actionType, params, fetchFn = null, options = {}) {
   // Only execute actions from browser context or if a fetch function is provided (server-side support)
   if (!browser && !fetchFn) return null;
-  
+
+  const controller = options.timeoutMs && typeof AbortController !== 'undefined' ? new AbortController() : null;
+  const timeout = controller ? setTimeout(() => controller.abort(), options.timeoutMs) : null;
+
   try {
     const useFetch = fetchFn || fetch;
 
@@ -52,9 +59,10 @@ async function executeTimerAction(actionType, params, fetchFn = null) {
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(bodyPayload)
+      body: JSON.stringify(bodyPayload),
+      ...(controller ? { signal: controller.signal } : {})
     });
-    
+
     if (response.ok) {
       const result = await response.json();
       console.log(`[Timers] ${actionType} executed successfully`, result);
@@ -67,7 +75,33 @@ async function executeTimerAction(actionType, params, fetchFn = null) {
   } catch (error) {
     console.error(`[Timers] Error executing ${actionType}:`, error);
     return null;
+  } finally {
+    if (timeout) clearTimeout(timeout);
   }
+}
+
+/**
+ * Open a timer for hours typed in by hand: stopped and empty, created by the
+ * server in one write (`timerStart` with `manual: true`). Retrying is safe — a
+ * mission that already has an unsaved timer gets that one back.
+ *
+ * @returns {Promise<Object|null>} the timer entity, or null when it failed or timed out
+ */
+export async function createManualTimer(missionID, uId, pId, fetch, options = {}) {
+  const res = await executeTimerAction(
+    'timerStart',
+    {
+      missionId: String(missionID),
+      projectId: String(pId),
+      userId: String(uId),
+      manual: true,
+      isSer: false
+    },
+    fetch,
+    { timeoutMs: options.timeoutMs ?? 20000 }
+  );
+  const timer = unwrapTimerResult(res);
+  return timer?.id ? timer : null;
 }
 
 // Function to start (or resume) the timer for a mission
@@ -260,7 +294,9 @@ export async function saveTimer(timer, missionID, fetch, isSer = false, tasks = 
       isSer: isSer
     };
 
-    return await executeTimerAction('timerSave', params, fetch);
+    // Retry-safe since timerSave refuses a timer that is saved or still being
+    // saved, so a save that never answers can be given up on.
+    return await executeTimerAction('timerSave', params, fetch, { timeoutMs: 60000 });
   } catch (error) {
     console.error("Error in saveTimer:", error);
     return null;
@@ -313,7 +349,8 @@ export function calculateTotalHours(timers) {
       }
     }
   }
-  return totalMilliseconds / 1000 / 60 / 60;
+  // Whole minutes, like the server's own count ($lib/timers/precision.ts).
+  return hoursOfMs(totalMilliseconds);
 }
 
 /**

@@ -112,6 +112,31 @@ export function notificationItems(nodes) {
 }
 
 /**
+ * "Updates" as the bell counts them (docs/inprogress/PLAN_SMART_NOTICES.md): the
+ * proposals whose move is the customer's and that she has not hidden — not
+ * every proposal still open. A proposal she countered waits on the provider;
+ * the bell is silent about it, and the badge must not call her for it either.
+ *
+ * `notices` null = they could not be read: the count stays as it was, rather
+ * than claiming nothing waits.
+ *
+ * @param {ConciergeSummary | null} summary
+ * @param {import('$lib/notices').Notice[] | null} notices
+ * @returns {ConciergeSummary | null}
+ */
+export function withNoticeUpdates(summary, notices) {
+  if (!summary || !notices) return summary;
+  const waiting = notices.filter((n) => n.source === 'wish' && !n.hidden);
+  const wishIds = [...new Set(waiting.map((n) => n.where?.id).filter(Boolean))];
+  return {
+    ...summary,
+    updates: waiting.length,
+    total: summary.drafts + summary.ordered + waiting.length,
+    updatesWishId: wishIds.length === 1 ? String(wishIds[0]) : null
+  };
+}
+
+/**
  * From the raw `106listMyRatsons` nodes.
  *
  * @param {any[]} nodes

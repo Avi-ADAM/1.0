@@ -1,7 +1,9 @@
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import { loadDealDue } from '$lib/server/sheirut/dealDue.js';
 
 const createSheirutHalukaHandler: ActionExecutionHandler = async (params, context, { strapi }) => {
-  const { sheirutId, projectId, receiverId, amount } = params;
+  const { sheirutId, projectId, receiverId } = params;
+  let { amount } = params;
   const { userId } = context;
   const now = new Date().toISOString();
 
@@ -9,10 +11,31 @@ const createSheirutHalukaHandler: ActionExecutionHandler = async (params, contex
     throw new Error('Cannot transfer money to yourself');
   }
 
+  // A wish deal costs the hours its rikma approved, never above the price agreed per line
+  // (QA_CONCIERGE_E2E C-14, $lib/sheirut/dealDue) — the same hours the partners' shares
+  // follow, so the split hands each of them exactly what was approved on their work. The
+  // amount is the server's, not the browser's, and it exists only once every part of the
+  // deal is closed: before that nobody knows it.
+  const owed = await loadDealDue((qid, vars) => strapi.execute(qid, vars, context.jwt, context.fetch), String(sheirutId));
+  if (owed) {
+    if (!owed.final) {
+      throw new Error(
+        'This deal is paid by the hours its rikma approves — the amount is known once every part of it is finished'
+      );
+    }
+    if (!(owed.remaining > 0)) {
+      throw new Error('Nothing is left to pay on this deal');
+    }
+    amount = owed.remaining;
+  }
+
   const halukaData: Record<string, any> = {
     usersend: String(userId),
     userrecive: String(receiverId),
     ushar: true,
+    // "Yes, transfer" is the customer saying she sent it — she is not asked again. The
+    // transfer is settled by the receiver's word alone ($lib/server/deal/dealMoney).
+    senderconf: true,
     sheirut: String(sheirutId),
     publishedAt: now
   };
@@ -41,7 +64,8 @@ const createSheirutHalukaHandler: ActionExecutionHandler = async (params, contex
     halukaId,
     sheirutId,
     receiverId,
-    projectId
+    projectId,
+    amount: halukaData.amount ?? null
   };
 };
 
@@ -54,7 +78,11 @@ export const createSheirutHalukaConfig: ActionConfig = {
     sheirutId: { type: 'string', required: true, description: 'Sheirut ID' },
     projectId: { type: 'string', required: true, description: 'Project ID' },
     receiverId: { type: 'string', required: true, description: 'User ID of the money recipient' },
-    amount: { type: 'number', required: false, description: 'Amount transferred' }
+    amount: {
+      type: 'number',
+      required: false,
+      description: 'Amount transferred — ignored for a wish deal, whose amount is the approved hours (C-14)'
+    }
   },
 
   authRules: [

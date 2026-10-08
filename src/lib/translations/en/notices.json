@@ -1,0 +1,81 @@
+{
+  "hub": {
+    "vote": "{{kind}}: \"{{what}}\" in the rikma \"{{rikma}}\"",
+    "voteUntitled": "{{kind}} in the rikma \"{{rikma}}\""
+  },
+  "bell": {
+    "title": "Notifications",
+    "empty": "No notifications right now",
+    "pendingOffers": "{{count}} new",
+    "untitled": "Untitled wish"
+  },
+  "ui": {
+    "more": "{{count}} more",
+    "expand": "Open",
+    "clock": "No answer — approved automatically: {{when}}",
+    "approve": "Approve",
+    "approving": "Sending…",
+    "signed": "Signed ✓ — waiting for the others",
+    "moved": "The terms changed since — open it to see the new version",
+    "failed": "The approval didn't go through. Open it and try from there.",
+    "hide": "Hide",
+    "hideClock": "Hiding does not stop the clock: with no answer, this is approved automatically: {{when}}.",
+    "hideConfirm": "Hide anyway",
+    "hideCancel": "Cancel",
+    "showHidden": "Show hidden ({{count}})",
+    "unhide": "Restore"
+  },
+  "wish": {
+    "someNeed": "a need on the wish",
+    "product": "Offer from {{who}}: \"{{product}}\" for the wish \"{{wish}}\"",
+    "offer": "Offer from {{who}} for \"{{item}}\" on the wish \"{{wish}}\"",
+    "counter": "Counter-offer from {{who}} on \"{{item}}\" in the wish \"{{wish}}\"",
+    "counterAnon": "Counter-offer on \"{{item}}\" in the wish \"{{wish}}\"",
+    "invite": "Invitation from {{who}}: \"{{item}}\" on the wish \"{{wish}}\"",
+    "inviteAnon": "Invitation: \"{{item}}\" on the wish \"{{wish}}\""
+  },
+  "deal": {
+    "somePart": "a part of the deal",
+    "offer": "Offer from {{who}} to take \"{{item}}\" in the deal \"{{deal}}\" — awaiting your signature",
+    "edit": "Request from {{who}} to change \"{{item}}\" in the deal \"{{deal}}\"",
+    "editAnon": "Request to change \"{{item}}\" in the deal \"{{deal}}\"",
+    "due": "Due on the deal \"{{deal}}\"",
+    "part": "Confirm receiving the payment for your part of the deal \"{{deal}}\""
+  },
+  "lev": {
+    "someItem": "an item in the rikma",
+    "someWish": "a wish",
+    "pends": "Proposal for a new mission \"{{item}}\" in the rikma \"{{rikma}}\"",
+    "pmashes": "Proposal for a new resource \"{{item}}\" in the rikma \"{{rikma}}\"",
+    "askedcoin": "Request from {{who}} to join the mission \"{{item}}\" in the rikma \"{{rikma}}\"",
+    "askedcoinAnon": "Request to join the mission \"{{item}}\" in the rikma \"{{rikma}}\"",
+    "askedm": "Offer from {{who}} to provide \"{{item}}\" to the rikma \"{{rikma}}\"",
+    "askedmAnon": "Offer to provide \"{{item}}\" to the rikma \"{{rikma}}\"",
+    "fiapp": "Report from {{who}}: \"{{item}}\" is done, in the rikma \"{{rikma}}\"",
+    "fiappAnon": "Report: \"{{item}}\" is done, in the rikma \"{{rikma}}\"",
+    "wegets": "Report from {{who}}: \"{{item}}\" delivered to the rikma \"{{rikma}}\"",
+    "wegetsAnon": "Report: \"{{item}}\" delivered to the rikma \"{{rikma}}\"",
+    "wishoffer": "Offer from {{who}} for \"{{item}}\" on the wish \"{{wish}}\"",
+    "wishofferAnon": "Offer for \"{{item}}\" on the wish \"{{wish}}\"",
+    "saleClaim": "Sale reported of \"{{item}}\" in the rikma \"{{rikma}}\" — the report says the money is with you",
+    "decision": "Decision in the rikma \"{{rikma}}\": {{what}}",
+    "archive": "Proposal from {{who}} to remove \"{{item}}\" from the rikma \"{{rikma}}\"",
+    "archiveAnon": "Proposal to remove \"{{item}}\" from the rikma \"{{rikma}}\"",
+    "release": "Proposal from {{who}} to release \"{{item}}\" in the rikma \"{{rikma}}\"",
+    "releaseAnon": "Proposal to release \"{{item}}\" in the rikma \"{{rikma}}\"",
+    "addHours": "Request from {{who}} to add {{count}} hours to \"{{item}}\" in the rikma \"{{rikma}}\"",
+    "addHoursAnon": "Request to add {{count}} hours to \"{{item}}\" in the rikma \"{{rikma}}\"",
+    "addHoursOne": "Request from {{who}} to add one hour to \"{{item}}\" in the rikma \"{{rikma}}\"",
+    "addHoursOneAnon": "Request to add one hour to \"{{item}}\" in the rikma \"{{rikma}}\"",
+    "removeHours": "Request from {{who}} to cut {{count}} hours from \"{{item}}\" in the rikma \"{{rikma}}\"",
+    "removeHoursAnon": "Request to cut {{count}} hours from \"{{item}}\" in the rikma \"{{rikma}}\"",
+    "removeHoursOne": "Request from {{who}} to cut one hour from \"{{item}}\" in the rikma \"{{rikma}}\"",
+    "removeHoursOneAnon": "Request to cut one hour from \"{{item}}\" in the rikma \"{{rikma}}\"",
+    "edit": "Request from {{who}} to change \"{{item}}\" in the rikma \"{{rikma}}\"",
+    "editAnon": "Request to change \"{{item}}\" in the rikma \"{{rikma}}\"",
+    "fallback": "{{kind}}: {{what}}"
+  },
+  "term": {
+    "raise": "+{{value}}"
+  }
+}

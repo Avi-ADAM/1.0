@@ -1,12 +1,5 @@
 import { Agent } from '@mastra/core/agent';
-import {
-  createGoogleModel,
-  createGroqModel,
-  createNvidiaModel,
-  hasGroqModelConfig,
-  hasNvidiaModelConfig,
-  hasGoogleModelConfig
-} from '../lib/createModel';
+import { createModelChain } from '../lib/createModel';
 import { getChatMemory, workingMemoryInstructions } from '../lib/chatMemory';
 import {
   getMissionDetailsTool,
@@ -152,23 +145,7 @@ export function createTimerAgent(
     name: 'AdvancedTimerAgent',
     instructions: buildSystemPrompt(language, userId) + workingMemoryInstructions(language),
     memory: getChatMemory(),
-    model: (() => {
-      const models = [];
-      
-      // Priority order: Google Flash (thinkingBudget=0) > Google Flash Lite > Groq > NVIDIA
-      if (hasGoogleModelConfig(apiKey)) {
-        models.push({ model: createGoogleModel(apiKey, 'gemini-3-flash-preview', { thinkingBudget: 0 }), maxRetries: 2 });
-        models.push({ model: createGoogleModel(apiKey, 'gemini-flash-lite-latest'), maxRetries: 2 });
-      }
-      if (hasGroqModelConfig()) {
-        models.push({ model: createGroqModel(), maxRetries: 2 });
-      }
-      if (hasNvidiaModelConfig(apiKey)) {
-        models.push({ model: createNvidiaModel(apiKey), maxRetries: 1 });
-      }
-      
-      return models.length > 0 ? models : [{ model: createGoogleModel(apiKey, 'gemini-3-flash-preview', { thinkingBudget: 0 }), maxRetries: 2 }];
-    })(),
+    model: createModelChain(apiKey),
     tools: {
       getMissionDetailsTool,
       listUserMissionsTool,

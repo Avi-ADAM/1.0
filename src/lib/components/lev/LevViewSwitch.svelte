@@ -1,6 +1,7 @@
 <script>
   /**
-   * LevViewSwitch — one control for the heart's three layouts.
+   * LevViewSwitch — one control for the heart's layouts (four, since the
+   * notices view: one sentence per item, docs/inprogress/PLAN_SMART_NOTICES.md §6.4).
    *
    * The heart has had three views since the list landed, but only two of them
    * were ever in a switch: `celim/switch.svelte` is a two-position toggle whose
@@ -16,8 +17,8 @@
 
   /**
    * @typedef {Object} Props
-   * @property {'list' | 'cards' | 'coins'} value - the view showing now
-   * @property {(view: 'list' | 'cards' | 'coins') => void} [onChange]
+   * @property {'list' | 'notices' | 'cards' | 'coins'} value - the view showing now
+   * @property {(view: 'list' | 'notices' | 'cards' | 'coins') => void} [onChange]
    * @property {boolean} [compact] - tighter, for the phone header bar
    */
 
@@ -26,13 +27,14 @@
 
   const VIEWS = /** @type {const} */ ([
     { id: 'list', labelKey: 'lev.list.toList' },
+    { id: 'notices', labelKey: 'lev.list.toNotices' },
     { id: 'cards', labelKey: 'lev.list.toCards' },
     { id: 'coins', labelKey: 'lev.list.toCoins' }
   ]);
 
   const uid = `levview-${Math.random().toString(36).slice(2, 8)}`;
 
-  /** @param {'list' | 'cards' | 'coins'} id */
+  /** @param {'list' | 'notices' | 'cards' | 'coins'} id */
   function pick(id) {
     if (id === value) return;
     onChange?.(id);
@@ -64,6 +66,17 @@
             stroke="currentColor"
             stroke-width="2"
             stroke-linecap="round"
+          />
+        </svg>
+      {:else if view.id === 'notices'}
+        <!-- A speech line: one sentence per item. -->
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path
+            d="M4 5h16v10H9l-5 4z"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linejoin="round"
           />
         </svg>
       {:else if view.id === 'cards'}

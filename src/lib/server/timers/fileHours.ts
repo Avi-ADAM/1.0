@@ -17,6 +17,7 @@ import { calcDeadlineMs } from '$lib/server/actions/configs/actionUtils.js';
 import { pickRateRow, rowRate, type RateRow } from '$lib/timers/rate.js';
 import { saveFileIds } from '$lib/timers/saveFiles.js';
 import { workMonthOf } from '$lib/recurring/missionMonths.js';
+import { roundHours, workValue } from '$lib/timers/precision.js';
 
 /**
  * `why` on Finiapruval and FinnishedMission is a Strapi `string` — a 255-char
@@ -74,7 +75,9 @@ export interface FileHoursArgs {
 export type FileHoursResult = { filed: 'finnishedMission' } | { filed: 'approval'; finiapruvalId: string | null };
 
 export async function fileHours(args: FileHoursArgs): Promise<FileHoursResult> {
-  const { strapi, context, missionId: mId, at, hours, rate, saveText, files, intervals, timerId } = args;
+  const { strapi, context, missionId: mId, at, rate, saveText, files, intervals, timerId } = args;
+  // Whole minutes, priced to the agora ($lib/timers/precision.ts) — whatever the caller sent.
+  const hours = roundHours(args.hours);
   const now = new Date();
   const userCount = at.project?.data?.attributes?.user_1s?.data?.length ?? 1;
 
@@ -90,7 +93,7 @@ export async function fileHours(args: FileHoursArgs): Promise<FileHoursResult> {
       : null;
 
     if (existingFm && targetRow) {
-      const newHours = (existingFm.attributes.noofhours ?? 0) + hours;
+      const newHours = roundHours((existingFm.attributes.noofhours ?? 0) + hours);
       // The row accumulates sessions, so the notes accumulate too — one line
       // per save, oldest first, rather than the last one winning.
       const prevWhy: string = (existingFm.attributes.why ?? '').toString();
@@ -110,7 +113,7 @@ export async function fileHours(args: FileHoursArgs): Promise<FileHoursResult> {
         {
           id: existingFm.id,
           noofhours: newHours,
-          total: newHours * rowRate(targetRow, rate),
+          total: workValue(newHours, rowRate(targetRow, rate)),
           ...(mergedWhy ? { why: clampWhy(mergedWhy) } : {}),
           ...(mergedFiles ? { what: mergedFiles } : {})
         },
@@ -129,7 +132,7 @@ export async function fileHours(args: FileHoursArgs): Promise<FileHoursResult> {
           publishedAt: now.toISOString(),
           users_permissions_user: at.users_permissions_user?.data?.id,
           perhour: rate,
-          total: hours * rate,
+          total: workValue(hours, rate),
           why: saveText ? clampWhy(saveText) : 'timer save',
           ...(files.length ? { what: files } : {})
         },
@@ -140,7 +143,7 @@ export async function fileHours(args: FileHoursArgs): Promise<FileHoursResult> {
 
     await strapi.execute(
       '115updateMissionTotalHoursSaved',
-      { id: mId, totalHoursSaved: (at.totalHoursSaved ?? 0) + hours },
+      { id: mId, totalHoursSaved: roundHours((at.totalHoursSaved ?? 0) + hours) },
       context.jwt,
       context.fetch
     );

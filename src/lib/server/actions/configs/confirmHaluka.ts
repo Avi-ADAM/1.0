@@ -102,10 +102,11 @@ const confirmHalukaHandler: ActionExecutionHandler = async (params, context, { s
       }
     }
 
-    // Mark this Haluka as confirmed by the receiver
+    // Mark this Haluka as confirmed by the receiver — and as sent: money that arrived was
+    // sent, so a reader that waits for both flags never waits on the sender after this.
     const updateRes = await strapi.execute(
       '71.6confirmHaluka',
-      { id: halukaId, confirmed: true },
+      { id: halukaId, confirmed: true, senderconf: true },
       context.jwt,
       context.fetch,
     );

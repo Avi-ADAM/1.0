@@ -19,6 +19,8 @@ import { openObjectChangeDecision } from '$lib/server/archive/decision.js';
 import { execFromContext } from '$lib/server/archive/exec.js';
 import { shiftsEnabled } from '$lib/server/shifts/mode.js';
 import { fetchTarget, TARGET_KINDS, type TargetKind } from '$lib/server/archive/targets.js';
+import { loadMissionDeal, notifyDealClientsOfEdit, syncDealLine } from '$lib/server/sheirut/dealEdit.js';
+import { raisesPart } from '$lib/sheirut/dealEdit.js';
 
 const KIND_OFS = ['total', 'monthly', 'yearly', 'perUnit', 'rent', 'unlimited', 'daily'];
 
@@ -69,7 +71,7 @@ function hasAnyChange(round: StandingRound): boolean {
   );
 }
 
-const handler: ActionExecutionHandler = async (params, context, { notifier }) => {
+const handler: ActionExecutionHandler = async (params, context, { notifier, strapi }) => {
   const targetKind = String(params.targetKind ?? '') as TargetKind;
   const targetId = String(params.targetId ?? '');
   const why = params.why ? String(params.why).trim() : '';
@@ -97,8 +99,15 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
 
   const otherMembers = target.memberIds.filter((id) => id !== userId);
 
-  // A rikma of one is unanimous by definition.
-  if (otherMembers.length === 0) {
+  // A part of a customer's deal: a version that costs her more than she agreed waits for
+  // her signature too, and whatever is applied, the deal follows (C-14,
+  // $lib/server/sheirut/dealEdit). Her silence is not her yes.
+  const run = (qid: string, vars: Record<string, unknown>) => strapi.execute(qid, vars, context.jwt, context.fetch);
+  const deal = target.kind === 'missionInProgress' ? await loadMissionDeal(run, target.id) : null;
+  const needsCustomer = !!deal && raisesPart(round, deal);
+
+  // A rikma of one is unanimous by definition — unless the customer has to sign.
+  if (otherMembers.length === 0 && !needsCustomer) {
     const result = await applyObjectChange(exec, {
       target,
       round,
@@ -107,6 +116,11 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
       actorId: userId,
       fetchFn: context.fetch,
     });
+    if (deal) {
+      await syncDealLine(run, deal, round).catch((e: unknown) =>
+        console.error('[proposeObjectEdit] applied, but the deal did not follow:', e),
+      );
+    }
     return {
       data: { ...result, immediate: true, decisionId: null },
       updateStrategy: { type: 'fullRefresh' as const },
@@ -127,6 +141,8 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
   await setLifecycle(exec, target.kind, target.id, 'archiveProposed').catch((e: unknown) =>
     console.warn('[proposeObjectEdit] marking archiveProposed failed (non-fatal):', e),
   );
+
+  if (deal && needsCustomer) await notifyDealClientsOfEdit(notifier, context, deal, round);
 
   if (notifier && target.projectId) {
     const lang = (context.lang === 'he' ? 'he' : 'en') as 'he' | 'en';

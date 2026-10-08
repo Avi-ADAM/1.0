@@ -60,7 +60,7 @@
    * @property {string | null} [soleKey] - the kind currently shown alone, if any
    * @property {(key: string) => void} [onPick] - a stud was clicked
    * @property {(payload: { id: any }) => void} [onHover]
-   * @property {(view: 'list' | 'cards' | 'coins') => void} [onView]
+   * @property {(view: 'list' | 'notices' | 'cards' | 'coins') => void} [onView]
    */
 
   /** @type {Props} */

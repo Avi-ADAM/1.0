@@ -6,6 +6,7 @@ import { createNavigationAgent } from '../agents/navigation-agent';
 import { createGeneralHelpAgent } from '../agents/help-agent';
 import { createSaleAgent } from '../agents/sale-agent';
 import { createTaskAgent } from '../agents/task-agent';
+import { createUpdatesAgent } from '../agents/updates-agent';
 import {
   DEFAULT_AGENT_MAX_STEPS,
   getAgentReply
@@ -45,7 +46,7 @@ async function buildProjectContextPreamble(
 }
 
 interface IntentResult {
-  type: 'timer' | 'navigation' | 'general' | 'report' | 'sale' | 'task';
+  type: 'timer' | 'navigation' | 'general' | 'report' | 'sale' | 'task' | 'updates';
   confidence: number;
   details: {
     action?: string;
@@ -75,6 +76,24 @@ const intentDetailsSchema = z.object({
   target: z.string().optional().nullable(),
   context: z.string().optional().nullable()
 });
+
+/** Phrases that mean "what's new / what waits for me", for when the intent agent's answer cannot be parsed. */
+const UPDATES_HINTS = [
+  'מה חדש',
+  'מה ממתין',
+  'מה מחכה',
+  'מה קורה ב',
+  'ממתין לי',
+  'מחכה לי',
+  "what's new",
+  'whats new',
+  'what is new',
+  'waiting for me',
+  'what is happening',
+  'qué hay de nuevo',
+  'что нового',
+  'ما الجديد'
+];
 
 function normalizeIntent(intent: IntentResult): IntentResult {
   return {
@@ -111,7 +130,7 @@ const analyzeIntent = createStep({
     currentPath: z.string().optional(),
     threadKey: z.string().optional(),
     intent: z.object({
-      type: z.enum(['timer', 'navigation', 'general', 'report', 'sale', 'task']),
+      type: z.enum(['timer', 'navigation', 'general', 'report', 'sale', 'task', 'updates']),
       confidence: z.number(),
       details: intentDetailsSchema
     })
@@ -199,6 +218,13 @@ const analyzeIntent = createStep({
             context: 'fallback_parsing'
           }
         });
+      } else if (UPDATES_HINTS.some((h) => messageText.includes(h))) {
+        // "What's new / what is waiting for me" (PLAN_SMART_NOTICES §6.6).
+        intent = normalizeIntent({
+          type: 'updates' as const,
+          confidence: 0.7,
+          details: { action: 'list', target: null, context: 'fallback_parsing' }
+        });
       } else if (messageText.includes('מכירה') || messageText.includes('מכרתי') || messageText.includes('sale')) {
         intent = normalizeIntent({
           type: 'sale' as const,
@@ -245,7 +271,7 @@ const routeToAgent = createStep({
     currentPath: z.string().optional(),
     threadKey: z.string().optional(),
     intent: z.object({
-      type: z.enum(['timer', 'navigation', 'general', 'report', 'sale', 'task']),
+      type: z.enum(['timer', 'navigation', 'general', 'report', 'sale', 'task', 'updates']),
       confidence: z.number(),
       details: intentDetailsSchema
     })
@@ -254,7 +280,7 @@ const routeToAgent = createStep({
     agentResult: z.any(),
     agentType: z.string(),
     intent: z.object({
-      type: z.enum(['timer', 'navigation', 'general', 'report', 'sale', 'task']),
+      type: z.enum(['timer', 'navigation', 'general', 'report', 'sale', 'task', 'updates']),
       confidence: z.number(),
       details: intentDetailsSchema
     })
@@ -317,6 +343,17 @@ const routeToAgent = createStep({
         } else {
           agent = createSaleAgent(apiKey, language, userId);
           agentType = 'sale';
+        }
+        break;
+
+      case 'updates':
+        // What waits for the member — there is nothing to tell a guest.
+        if (!userId) {
+          agent = createGeneralHelpAgent(apiKey, language);
+          agentType = 'general';
+        } else {
+          agent = createUpdatesAgent(apiKey, language, userId);
+          agentType = 'updates';
         }
         break;
 
@@ -455,7 +492,7 @@ const processResponse = createStep({
     agentResult: z.any(),
     agentType: z.string(),
     intent: z.object({
-      type: z.enum(['timer', 'navigation', 'general', 'report', 'sale', 'task']),
+      type: z.enum(['timer', 'navigation', 'general', 'report', 'sale', 'task', 'updates']),
       confidence: z.number(),
       details: intentDetailsSchema
     })

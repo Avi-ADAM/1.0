@@ -9,6 +9,7 @@
   import { forum, nowChatId, isChatOpen, initialForum } from '$lib/stores/pendMisMes.js';
   import { addVote, rejectSheirutpend } from '$lib/client/actionClient';
   import QuotePanel from '$lib/components/deals/QuotePanel.svelte';
+  import DealStages from '$lib/components/deals/DealStages.svelte';
   import { t } from '$lib/translations';
   import { providerCanApprove } from '$lib/sheirut/quoteState';
 
@@ -172,13 +173,17 @@
 <main class="page-wrap" dir="rtl">
   <button class="back-btn" onclick={() => goto('/deals')}>← חזרה לעסקאות</button>
 
+  <DealStages stages={data.stages ?? []} />
+
   <div class="hero">
     {#if data.projectPic}
       <img src={data.projectPic} alt={data.projectName} class="proj-pic" />
     {/if}
     <div>
       <div class="pending-badge">
-        {#if data.kind === 'buy'}
+        {#if data.dealId}
+          ✓ {$t('deals.requestSettled.badge')}
+        {:else if data.kind === 'buy'}
           <EntityIcon kind="waiting" size={14} /> ממתינה לאישור המוכר
         {:else if localAlreadyVoted && data.memberCount === 1}
           ✓ אושרה
@@ -193,7 +198,7 @@
     </div>
   </div>
 
-  {#if quote}
+  {#if quote && !data.dealId}
     <QuotePanel
       sheirutpendId={String(data.id)}
       side={quote.side}
@@ -268,7 +273,16 @@
         </div>
       </div>
 
-      {#if data.kind === 'buy'}
+      {#if data.dealId}
+        <!-- Settled: the request became a deal. Nothing here waits for anyone. -->
+        <div class="status-box settled">
+          <div class="status-icon">✓</div>
+          <div class="status-text">
+            {$t('deals.requestSettled.text')}
+            <a class="deal-link" href="/deals/{data.dealId}">{$t('deals.requestSettled.open')} ←</a>
+          </div>
+        </div>
+      {:else if data.kind === 'buy'}
         <div class="status-box">
           <div class="status-icon"><EntityIcon kind="waiting" size={20} /></div>
           <div class="status-text">
@@ -479,6 +493,18 @@
   }
   .status-icon { font-size: 22px; flex-shrink: 0; }
   .status-text { font-size: 13px; color: var(--tm); line-height: 1.6; }
+  .status-box.settled { border-color: var(--border-g); }
+  .status-box.settled .status-icon { color: var(--gold-l); }
+  .status-box.settled .status-text { color: var(--text); }
+  .deal-link {
+    display: inline-block;
+    margin-top: 6px;
+    color: var(--gold-l);
+    font-weight: 700;
+    text-decoration: none;
+  }
+  .deal-link:hover,
+  .deal-link:focus-visible { text-decoration: underline; text-underline-offset: 3px; }
 
   .bom-section {
     background: var(--s1);

@@ -15,6 +15,7 @@ import { EmailService } from './EmailService';
 import { TelegramService } from './TelegramService';
 import { PushService } from './PushService';
 import { SocketIOServer } from './SocketIOServer';
+import { resolveChannels } from './intent';
 
 export interface UserProfile {
   id: string;
@@ -140,11 +141,18 @@ export class NotificationOrchestrator {
         data: actionResult?.data
       };
 
-      // 4. Send via all configured channels (in parallel)
+      // 4. Send via the channels the intent asks for (in parallel)
+      const channels = resolveChannels(config, actionParams, actionResult);
       const promises: Promise<void>[] = [];
 
+      // Nobody is pushed, telegrammed or emailed about what they did
+      // themselves, whatever `excludeSender` says — that flag is about the
+      // socket (and also drops the sender's other devices there).
+      const externalRecipients = filteredRecipients.filter(
+        u => String(u.id) !== String(context.userId)
+      );
 
-      if (config.channels.includes('socket')) {
+      if (channels.includes('socket')) {
         promises.push(
           this.socketIOServer.broadcastToUsers(
             filteredRecipients,
@@ -157,10 +165,10 @@ export class NotificationOrchestrator {
         );
       }
 
-      if (config.channels.includes('email')) {
+      if (channels.includes('email') && externalRecipients.length) {
         promises.push(
           this.emailService.sendBulk(
-            filteredRecipients,
+            externalRecipients,
             notificationData,
             config.emailTemplate || 'SimpleNuti',
             context,
@@ -169,20 +177,20 @@ export class NotificationOrchestrator {
         );
       }
 
-      if (config.channels.includes('telegram')) {
+      if (channels.includes('telegram') && externalRecipients.length) {
         promises.push(
           this.telegramService.sendBulk(
-            filteredRecipients,
+            externalRecipients,
             notificationData,
             context
           )
         );
       }
 
-      if (config.channels.includes('push')) {
+      if (channels.includes('push') && externalRecipients.length) {
         promises.push(
           this.pushService.sendBulk(
-            filteredRecipients,
+            externalRecipients,
             notificationData,
             context
           )
@@ -192,12 +200,12 @@ export class NotificationOrchestrator {
       // Wait for all notifications (but don't fail if some fail)
       const results = await Promise.allSettled(promises);
 
-      // Log any failures
+      // Log any failures — names in the same order the promises were pushed
       const channelNames: string[] = [];
-      if (config.channels.includes('socket')) channelNames.push('socket');
-      if (config.channels.includes('email')) channelNames.push('email');
-      if (config.channels.includes('telegram')) channelNames.push('telegram');
-      if (config.channels.includes('push')) channelNames.push('push');
+      if (channels.includes('socket')) channelNames.push('socket');
+      if (channels.includes('email') && externalRecipients.length) channelNames.push('email');
+      if (channels.includes('telegram') && externalRecipients.length) channelNames.push('telegram');
+      if (channels.includes('push') && externalRecipients.length) channelNames.push('push');
 
       results.forEach((result, index) => {
         if (result.status === 'rejected') {

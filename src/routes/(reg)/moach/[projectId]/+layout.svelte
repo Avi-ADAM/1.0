@@ -1,8 +1,14 @@
 <script>
   import { isRtl, t } from '$lib/translations';
   import { page, navigating } from '$app/state';
-  import { goto } from '$app/navigation';
+  import { goto, invalidate } from '$app/navigation';
   import { idPr } from '$lib/stores/idPr.js';
+  import {
+    sectionsForNotification,
+    notificationProjectId,
+    moachBaseKey,
+    VOTE_TYPES
+  } from '$lib/stores/moachRealtime.js';
   import AuthorityBadge from '$lib/components/ui/AuthorityBadge.svelte';
   import RikmaRepoLink from '$lib/components/ui/RikmaRepoLink.svelte';
   import RikmaLicenseBadge from '$lib/components/ui/RikmaLicenseBadge.svelte';
@@ -17,7 +23,7 @@
   import TaskModal from '$lib/components/prPr/tasks/taskModal.svelte';
   import { untrack } from 'svelte';
   import { socketClient } from '$lib/stores/socketClient';
-  import { TourItem, run } from 'svelte-tour';
+  import MoachTour from '$lib/components/moach/MoachTour.svelte';
   import Dialog from '$lib/celim/ui/dialog.svelte';
   import { sendToSer } from '$lib/send/sendToSer.js';
   import { browser } from '$app/environment';
@@ -92,10 +98,10 @@
   }
 
   let showGuideDialog = $state(false);
-
+  let tourOpen = $state(false);
 
   function startGuide() {
-    run();
+    tourOpen = true;
   }
   let projectBase = $derived(data.projectBase);
   let currentPath = $derived(page.url.pathname);
@@ -132,29 +138,19 @@
 
       // Ignore notifications that belong to a different project (the socket
       // delivers events for every project the user is a member of).
-      const notifProjectId =
-        notification.actionParams?.projectId || notification.data?.projectId;
-      if (notifProjectId && String(notifProjectId) !== String(projectId)) return;
+      const notifProjectId = notificationProjectId(notification);
+      if (notifProjectId && notifProjectId !== String(projectId)) return;
 
-      // If notification implies data change, invalidate store cache
-      // type could be 'mission', 'base', 'financials' etc depending on backend payload
       const type = notification.metadata?.type || notification.data?.type;
+      const sections = sectionsForNotification(type);
+      if (type && VOTE_TYPES.includes(type)) loadVoteCount();
 
-      // Vote notifications (incl. consensus, which may create a mission/resource
-      // or change project details) touch several cached sections.
-      const VOTE_TYPES = ['pendmVote', 'pmashVote', 'maapVote', 'decisionVote', 'voteUpdate'];
-
-      if (type && VOTE_TYPES.includes(type)) {
-        moachStore.invalidate(projectId, 'base');
-        moachStore.invalidate(projectId, 'missions');
-        moachStore.invalidate(projectId, 'financials');
-        loadVoteCount();
-      } else if (type) {
-        moachStore.invalidate(projectId, type);
-      } else {
-        // Broad invalidation if type unknown
-        moachStore.invalidate(projectId, 'base');
-        moachStore.invalidate(projectId, 'missions');
+      // A notification that does not name its rikma only marks the cache
+      // stale; one about this rikma re-reads what the open tab shows.
+      for (const section of sections) {
+        if (!notifProjectId) moachStore.invalidate(projectId, section);
+        else if (section === 'base') invalidate(moachBaseKey(projectId));
+        else moachStore.refresh(projectId, section);
       }
     });
   });
@@ -186,6 +182,18 @@
     // still looking for, the other is what it already holds and until when.
     { id: 'opps', label: 'opps', tabs: ['wishes', 'open', 'resources', 'demand'] },
     { id: 'votes', label: 'votes', tabs: ['votes', 'archive'] }
+  ];
+
+  // The first-visit guide walks the header and then the menu above, group by
+  // group — a new group needs a `moach.tour.group.<id>` text in every locale.
+  const tourSteps = [
+    { id: 'badge', key: 'moach.tour.badge' },
+    { id: 'tools', key: 'moach.tour.tools' },
+    { id: 'members', key: 'moach.tour.members' },
+    { id: 'create', key: 'moach.tour.create' },
+    { id: 'nav', key: 'moach.tour.nav' },
+    ...groups.map((g) => ({ id: `group-${g.id}`, key: `moach.tour.group.${g.id}` })),
+    { id: 'help', key: 'moach.tour.help' }
   ];
 
   // /moach/{projectId}/{tab}[/...] — 'splits/[splitId]' belongs to the split tab
@@ -256,6 +264,7 @@
       localStorage.setItem(`moachGuide_${projectId}`, 'done');
     }}
   />
+  <MoachTour steps={tourSteps} bind:open={tourOpen} />
   <div
     class="moach-layout min-h-screen text-barbi text-center overflow-y-auto scroll-smooth"
   >
@@ -280,20 +289,22 @@
             <span class="text-sm font-medium hidden sm:inline">{$t('moach.layout.back')}</span>
           </button>
 
-          <TourItem message={$t('moach.tour.badge')}>
+          <div data-moach-tour="badge">
             <AuthorityBadge
               logoSrc={getImageUrl(projectBase.profilePic?.data?.attributes?.url)}
               projectName={projectBase.projectName}
               memberCount={projectBase.user_1s?.data?.length || 0}
               size={200}
             />
-          </TourItem>
+          </div>
 
           <!-- Help button - top right -->
           <button
             class="absolute right-0 sm:right-4 top-0 flex items-center justify-center w-8 h-8 rounded-full border border-gold text-gold hover:bg-gold hover:text-barbi transition-colors font-bold text-sm"
-            onclick={() => { localStorage.removeItem(`moachGuide_${projectId}`); startGuide(); }}
+            onclick={startGuide}
             title={$t('moach.tour.helpBtn')}
+            aria-label={$t('moach.tour.helpBtn')}
+            data-moach-tour="help"
           >?</button>
         </div>
 
@@ -308,7 +319,7 @@
           </div>
         {/if}
 
-        <div class="flex flex-row items-center justify-center gap-2">
+        <div class="flex flex-row items-center justify-center gap-2" data-moach-tour="tools">
           {#if projectBase.discordlink}
             <a
               href={projectBase.discordlink}
@@ -411,6 +422,18 @@
             <Pub />
           </button>
           <button
+            onclick={() => goto(`/moach/${projectId}/look`)}
+            class="p-2 hover:bg-white rounded-full transition-colors text-barbi"
+            title={$t('rikmaLook.editor.title')}
+            aria-label={$t('rikmaLook.editor.title')}
+          >
+            <!-- palette: the rikma's address & public look (PLAN_RIKMA_SUBDOMAINS) -->
+            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 22a10 10 0 1 1 10-10c0 2.8-2.2 4-4 4h-2a2 2 0 0 0-1.5 3.3A1.6 1.6 0 0 1 12 22z" />
+              <circle cx="7.5" cy="10.5" r="1.2" /><circle cx="12" cy="7.5" r="1.2" /><circle cx="16.5" cy="10.5" r="1.2" />
+            </svg>
+          </button>
+          <button
             onclick={() => goto(`/moach/${projectId}/edit`)}
             class="p-2 hover:bg-mturk rounded-full transition-colors text-gold"
             title={$t('moach.layout.editDetails')}
@@ -430,10 +453,10 @@
         </div>
 
         <!-- Member Avatars with Timer Indicators -->
-        <TourItem message={$t('moach.tour.members')}>
         <div
           class="flex items-center justify-center py-2"
           dir={$isRtl ? 'rtl' : 'ltr'}
+          data-moach-tour="members"
         >
           <div class="flex -space-x-2">
             {#each projectBase.user_1s?.data || [] as user (user.id)}
@@ -474,27 +497,15 @@
             {/each}
           </div>
         </div>
-        </TourItem>
-
-        <!-- Tour anchors — invisible spans that drive next/next over the nav -->
-        <div class="tour-anchors-row" aria-hidden="true">
-          <TourItem message={$t('moach.tour.tabsIntro')}><span class="tour-anchor"></span></TourItem>
-          <TourItem message={$t('moach.tour.create')}><span class="tour-anchor"></span></TourItem>
-          <TourItem message={$t('moach.tour.progress')}><span class="tour-anchor"></span></TourItem>
-          <TourItem message={$t('moach.tour.acts')}><span class="tour-anchor"></span></TourItem>
-          <TourItem message={$t('moach.tour.timers')}><span class="tour-anchor"></span></TourItem>
-          <TourItem message={$t('moach.tour.wishes')}><span class="tour-anchor"></span></TourItem>
-          <TourItem message={$t('moach.tour.sales')}><span class="tour-anchor"></span></TourItem>
-          <TourItem message={$t('moach.tour.split')}><span class="tour-anchor"></span></TourItem>
-          <TourItem message={$t('moach.tour.votes')}><span class="tour-anchor"></span></TourItem>
-          <TourItem message={$t('moach.tour.chains')}><span class="tour-anchor"></span></TourItem>
-          <TourItem message={$t('moach.tour.gantt')}><span class="tour-anchor"></span></TourItem>
-        </div>
 
         <!-- Navigation: primary groups row + contextual sub-tabs row -->
         <div class="overflow-x-auto pt-2" dir={$isRtl ? 'rtl' : 'ltr'}>
-          <nav class="flex w-max mx-auto items-center gap-1 sm:gap-2 border-b border-slate-500/60 px-2">
+          <nav
+            class="flex w-max mx-auto items-center gap-1 sm:gap-2 border-b border-slate-500/60 px-2"
+            data-moach-tour="nav"
+          >
             <a
+              data-moach-tour="create"
               href="/moach/{projectId}/create"
               class="flex items-center gap-1 my-1 px-4 py-1.5 rounded-full bg-gold text-slate-900 font-bold text-sm sm:text-base hover:bg-barbi hover:text-gold transition-colors whitespace-nowrap
               {activeTabId === 'create' ? 'ring-2 ring-white' : ''}
@@ -508,6 +519,7 @@
               {@const badge =
                 group.id === 'votes' ? voteCount : group.id === 'opps' ? wishCount : 0}
               <a
+                data-moach-tour="group-{group.id}"
                 href={groupHref(group)}
                 class="relative px-3 sm:px-4 py-2 text-sm sm:text-lg font-bold whitespace-nowrap border-b-2 transition-colors
                 {isGroupActive
@@ -591,18 +603,4 @@
     height: 24px;
   }
 
-  .tour-anchors-row {
-    display: flex;
-    justify-content: center;
-    gap: 0;
-    height: 0;
-    overflow: visible;
-  }
-
-  .tour-anchor {
-    display: inline-block;
-    width: 1px;
-    height: 1px;
-    pointer-events: none;
-  }
 </style>

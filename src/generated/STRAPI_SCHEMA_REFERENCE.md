@@ -1,6 +1,6 @@
 # Strapi GraphQL Schema Reference
 > Auto-generated from `src/generated/graphql.ts`
-> Last updated: 2026-09-28
+> Last updated: 2026-10-06
 > Source: `codegen.ts` → `http://localhost:1337/graphql`
 
 This file provides a compact reference of all types available from the Strapi backend.
@@ -23,7 +23,7 @@ import type { StrapiEntity, StrapiCollection, StrapiMedia } from '$lib/types/str
 
 ---
 
-## 🏗️ Content Type Entities (133)
+## 🏗️ Content Type Entities (135)
 
 These are the main content types in the Strapi backend.
 
@@ -341,6 +341,8 @@ These are the main content types in the Strapi backend.
 | `newDormancyDays` | `Maybe<Scalars['Int']['output']>` |
 | `newFlink` | `Maybe<Scalars['String']['output']>` |
 | `newHours` | `Maybe<Scalars['Int']['output']>` |
+| `newLook` | `Maybe<Scalars['JSON']['output']>` |
+| `newSlug` | `Maybe<Scalars['String']['output']>` |
 | `newWlink` | `Maybe<Scalars['String']['output']>` |
 | `newname` | `Maybe<Scalars['String']['output']>` |
 | `newpic` | `Maybe<UploadFileEntityResponse>` |
@@ -1197,6 +1199,8 @@ These are the main content types in the Strapi backend.
 | `createNegoMash` | `Maybe<NegoMashEntityResponse>` |
 | `createNegopendmission` | `Maybe<NegopendmissionEntityResponse>` |
 | `createNegotiation` | `Maybe<NegotiationEntityResponse>` |
+| `createNoticeDismissal` | `Maybe<NoticeDismissalEntityResponse>` |
+| `createNoticePref` | `Maybe<NoticePrefEntityResponse>` |
 | `createOpenMashaabim` | `Maybe<OpenMashaabimEntityResponse>` |
 | `createOpenMashaabimLocalization` | `Maybe<OpenMashaabimEntityResponse>` |
 | `createOpenMission` | `Maybe<OpenMissionEntityResponse>` |
@@ -1333,6 +1337,8 @@ These are the main content types in the Strapi backend.
 | `deleteNegoMash` | `Maybe<NegoMashEntityResponse>` |
 | `deleteNegopendmission` | `Maybe<NegopendmissionEntityResponse>` |
 | `deleteNegotiation` | `Maybe<NegotiationEntityResponse>` |
+| `deleteNoticeDismissal` | `Maybe<NoticeDismissalEntityResponse>` |
+| `deleteNoticePref` | `Maybe<NoticePrefEntityResponse>` |
 | `deleteOpenMashaabim` | `Maybe<OpenMashaabimEntityResponse>` |
 | `deleteOpenMission` | `Maybe<OpenMissionEntityResponse>` |
 | `deletePartof` | `Maybe<PartofEntityResponse>` |
@@ -1460,6 +1466,8 @@ These are the main content types in the Strapi backend.
 | `updateNegoMash` | `Maybe<NegoMashEntityResponse>` |
 | `updateNegopendmission` | `Maybe<NegopendmissionEntityResponse>` |
 | `updateNegotiation` | `Maybe<NegotiationEntityResponse>` |
+| `updateNoticeDismissal` | `Maybe<NoticeDismissalEntityResponse>` |
+| `updateNoticePref` | `Maybe<NoticePrefEntityResponse>` |
 | `updateOpenMashaabim` | `Maybe<OpenMashaabimEntityResponse>` |
 | `updateOpenMission` | `Maybe<OpenMissionEntityResponse>` |
 | `updatePartof` | `Maybe<PartofEntityResponse>` |
@@ -1649,6 +1657,25 @@ These are the main content types in the Strapi backend.
 | `topic` | `Maybe<Scalars['String']['output']>` |
 | `updatedAt` | `Maybe<Scalars['DateTime']['output']>` |
 | `visibility` | `Maybe<Enum_Negotiation_Visibility>` |
+
+### NoticeDismissal
+| Field | Type |
+|-------|------|
+| `createdAt` | `Maybe<Scalars['DateTime']['output']>` |
+| `noticeKey` | `Scalars['String']['output']` |
+| `until` | `Maybe<Scalars['DateTime']['output']>` |
+| `updatedAt` | `Maybe<Scalars['DateTime']['output']>` |
+| `users_permissions_user` | `Maybe<UsersPermissionsUserEntityResponse>` |
+
+### NoticePref
+| Field | Type |
+|-------|------|
+| `createdAt` | `Maybe<Scalars['DateTime']['output']>` |
+| `lastSeenAt` | `Maybe<Scalars['DateTime']['output']>` |
+| `milon` | `Maybe<Scalars['JSON']['output']>` |
+| `mutedProjects` | `Maybe<Scalars['JSON']['output']>` |
+| `updatedAt` | `Maybe<Scalars['DateTime']['output']>` |
+| `users_permissions_user` | `Maybe<UsersPermissionsUserEntityResponse>` |
 
 ### OpenMashaabim
 | Field | Type |
@@ -2020,6 +2047,7 @@ These are the main content types in the Strapi backend.
 | `finnishedM72HForDecline` | `Maybe<Scalars['Boolean']['output']>` |
 | `finnishedMAllApruve` | `Maybe<Scalars['Boolean']['output']>` |
 | `finnished_missions` | `Maybe<FinnishedMissionRelationResponseCollection>` |
+| `formerSlugs` | `Maybe<Scalars['String']['output']>` |
 | `forums` | `Maybe<ForumRelationResponseCollection>` |
 | `githublink` | `Maybe<Scalars['String']['output']>` |
 | `haamadapruvs` | `Maybe<HaamadapruvRelationResponseCollection>` |
@@ -2035,6 +2063,7 @@ These are the main content types in the Strapi backend.
 | `locale` | `Maybe<Scalars['String']['output']>` |
 | `localizations` | `Maybe<ProjectRelationResponseCollection>` |
 | `location` | `Maybe<ComponentNewLocation>` |
+| `look` | `Maybe<Scalars['JSON']['output']>` |
 | `maaps` | `Maybe<MaapRelationResponseCollection>` |
 | `machshirs` | `Maybe<MachshirRelationResponseCollection>` |
 | `mashaabims` | `Maybe<MashaabimRelationResponseCollection>` |
@@ -2059,6 +2088,7 @@ These are the main content types in the Strapi backend.
 | `publicDescription` | `Maybe<Scalars['String']['output']>` |
 | `publishedAt` | `Maybe<Scalars['DateTime']['output']>` |
 | `ratson_proposals` | `Maybe<RatsonProposalRelationResponseCollection>` |
+| `ratsons_offered` | `Maybe<RatsonRelationResponseCollection>` |
 | `resource_bookings` | `Maybe<ResourceBookingRelationResponseCollection>` |
 | `restime` | `Maybe<Enum_Project_Restime>` |
 | `rikmashes` | `Maybe<RikmashRelationResponseCollection>` |
@@ -2072,6 +2102,7 @@ These are the main content types in the Strapi backend.
 | `shiftDraftWindowHours` | `Maybe<Scalars['Int']['output']>` |
 | `shift_plans` | `Maybe<ShiftPlanRelationResponseCollection>` |
 | `site_share_contributions` | `Maybe<SiteShareContributionRelationResponseCollection>` |
+| `slug` | `Maybe<Scalars['String']['output']>` |
 | `space_docs` | `Maybe<SpaceDocRelationResponseCollection>` |
 | `spirit` | `Maybe<Enum_Project_Spirit>` |
 | `sps` | `Maybe<SpRelationResponseCollection>` |
@@ -2293,6 +2324,10 @@ These are the main content types in the Strapi backend.
 | `negos` | `Maybe<NegoEntityResponseCollection>` |
 | `negotiation` | `Maybe<NegotiationEntityResponse>` |
 | `negotiations` | `Maybe<NegotiationEntityResponseCollection>` |
+| `noticeDismissal` | `Maybe<NoticeDismissalEntityResponse>` |
+| `noticeDismissals` | `Maybe<NoticeDismissalEntityResponseCollection>` |
+| `noticePref` | `Maybe<NoticePrefEntityResponse>` |
+| `noticePrefs` | `Maybe<NoticePrefEntityResponseCollection>` |
 | `openMashaabim` | `Maybe<OpenMashaabimEntityResponse>` |
 | `openMashaabims` | `Maybe<OpenMashaabimEntityResponseCollection>` |
 | `openMission` | `Maybe<OpenMissionEntityResponse>` |
@@ -2433,6 +2468,7 @@ These are the main content types in the Strapi backend.
 | `bounti` | `Maybe<Scalars['Boolean']['output']>` |
 | `categories` | `Maybe<CategoryRelationResponseCollection>` |
 | `chat_forum` | `Maybe<ForumEntityResponse>` |
+| `claimed_at` | `Maybe<Scalars['DateTime']['output']>` |
 | `consensusRule` | `Maybe<Enum_Ratson_Consensusrule>` |
 | `createdAt` | `Maybe<Scalars['DateTime']['output']>` |
 | `derivedComplexMatanot` | `Maybe<MatanotEntityResponse>` |
@@ -2468,6 +2504,12 @@ These are the main content types in the Strapi backend.
 | `minJoiners` | `Maybe<Scalars['Int']['output']>` |
 | `missions` | `Maybe<MissionRelationResponseCollection>` |
 | `name` | `Maybe<Scalars['String']['output']>` |
+| `offer_email_lock` | `Maybe<Scalars['String']['output']>` |
+| `offer_expires_at` | `Maybe<Scalars['DateTime']['output']>` |
+| `offer_link_at` | `Maybe<Scalars['DateTime']['output']>` |
+| `offer_recipient_hint` | `Maybe<Scalars['String']['output']>` |
+| `offered_by` | `Maybe<UsersPermissionsUserEntityResponse>` |
+| `offered_by_project` | `Maybe<ProjectEntityResponse>` |
 | `open_mashaabims` | `Maybe<OpenMashaabimRelationResponseCollection>` |
 | `open_missions` | `Maybe<OpenMissionRelationResponseCollection>` |
 | `partialConsensusFallback` | `Maybe<Enum_Ratson_Partialconsensusfallback>` |
@@ -2485,6 +2527,7 @@ These are the main content types in the Strapi backend.
 | `startDate` | `Maybe<Scalars['DateTime']['output']>` |
 | `status_ratson` | `Maybe<Enum_Ratson_Status_Ratson>` |
 | `sub_category` | `Maybe<Scalars['String']['output']>` |
+| `terms_digest` | `Maybe<Scalars['String']['output']>` |
 | `totalbounti` | `Maybe<Scalars['Float']['output']>` |
 | `updatedAt` | `Maybe<Scalars['DateTime']['output']>` |
 | `users_permissions_users` | `Maybe<UsersPermissionsUserRelationResponseCollection>` |
@@ -2509,7 +2552,6 @@ These are the main content types in the Strapi backend.
 | Field | Type |
 |-------|------|
 | `auto_generated` | `Maybe<Scalars['Boolean']['output']>` |
-| `hidden_by_wisher` | `Maybe<Scalars['Boolean']['output']>` |
 | `covered_missions` | `Maybe<Array<Maybe<ComponentNewCoveredMissions>>>` |
 | `covered_resources` | `Maybe<Array<Maybe<ComponentNewCoveredResources>>>` |
 | `createdAt` | `Maybe<Scalars['DateTime']['output']>` |
@@ -2517,6 +2559,7 @@ These are the main content types in the Strapi backend.
 | `entryRate` | `Maybe<Scalars['Float']['output']>` |
 | `final_breakdown` | `Maybe<Scalars['JSON']['output']>` |
 | `forum` | `Maybe<ForumEntityResponse>` |
+| `hidden_by_wisher` | `Maybe<Scalars['Boolean']['output']>` |
 | `kind` | `Maybe<Enum_Ratsonproposal_Kind>` |
 | `matanot` | `Maybe<MatanotEntityResponse>` |
 | `matbea` | `Maybe<MatbeaEntityResponse>` |
@@ -3498,6 +3541,7 @@ These are the main content types in the Strapi backend.
 | `ratson_proposals` | `Maybe<RatsonProposalRelationResponseCollection>` |
 | `ratson_shares` | `Maybe<RatsonShareRelationResponseCollection>` |
 | `ratsons` | `Maybe<RatsonRelationResponseCollection>` |
+| `ratsons_offered` | `Maybe<RatsonRelationResponseCollection>` |
 | `resource_bookings` | `Maybe<ResourceBookingRelationResponseCollection>` |
 | `rikmashes` | `Maybe<RikmashRelationResponseCollection>` |
 | `rishonvesopen` | `Maybe<OpenMissionRelationResponseCollection>` |
@@ -4283,6 +4327,7 @@ These are Strapi components (reusable field groups).
 | `item_kind` | `Maybe<Enum_Componentnewwillingnessentries_Item_Kind>` |
 | `note` | `Maybe<Scalars['String']['output']>` |
 | `submittedAt` | `Maybe<Scalars['DateTime']['output']>` |
+| `termsDigest` | `Maybe<Scalars['String']['output']>` |
 | `user` | `Maybe<UsersPermissionsUserEntityResponse>` |
 | `willingAmount` | `Maybe<Scalars['Float']['output']>` |
 | `willingHours` | `Maybe<Scalars['Float']['output']>` |
@@ -4298,6 +4343,7 @@ These are Strapi components (reusable field groups).
 | `note` | `InputMaybe<StringFilterInput>` |
 | `or` | `InputMaybe<Array<InputMaybe<ComponentNewWillingnessEntriesFiltersInput>>>` |
 | `submittedAt` | `InputMaybe<DateTimeFilterInput>` |
+| `termsDigest` | `InputMaybe<StringFilterInput>` |
 | `user` | `InputMaybe<UsersPermissionsUserFiltersInput>` |
 | `willingAmount` | `InputMaybe<FloatFilterInput>` |
 | `willingHours` | `InputMaybe<FloatFilterInput>` |
@@ -4311,6 +4357,7 @@ These are Strapi components (reusable field groups).
 | `item_kind` | `InputMaybe<Enum_Componentnewwillingnessentries_Item_Kind>` |
 | `note` | `InputMaybe<Scalars['String']['input']>` |
 | `submittedAt` | `InputMaybe<Scalars['DateTime']['input']>` |
+| `termsDigest` | `InputMaybe<Scalars['String']['input']>` |
 | `user` | `InputMaybe<Scalars['ID']['input']>` |
 | `willingAmount` | `InputMaybe<Scalars['Float']['input']>` |
 | `willingHours` | `InputMaybe<Scalars['Float']['input']>` |
@@ -4749,7 +4796,7 @@ These are Strapi components (reusable field groups).
 
 ---
 
-## 📝 Input Types (131)
+## 📝 Input Types (133)
 
 Used for creating/updating content.
 
@@ -5102,6 +5149,8 @@ Used for creating/updating content.
 | `newDormancyDays` | `InputMaybe<Scalars['Int']['input']>` |
 | `newFlink` | `InputMaybe<Scalars['String']['input']>` |
 | `newHours` | `InputMaybe<Scalars['Int']['input']>` |
+| `newLook` | `InputMaybe<Scalars['JSON']['input']>` |
+| `newSlug` | `InputMaybe<Scalars['String']['input']>` |
 | `newWlink` | `InputMaybe<Scalars['String']['input']>` |
 | `newname` | `InputMaybe<Scalars['String']['input']>` |
 | `newpic` | `InputMaybe<Scalars['ID']['input']>` |
@@ -6045,6 +6094,21 @@ Used for creating/updating content.
 | `topic` | `InputMaybe<Scalars['String']['input']>` |
 | `visibility` | `InputMaybe<Enum_Negotiation_Visibility>` |
 
+### NoticeDismissalInput
+| Field | Type |
+|-------|------|
+| `noticeKey` | `InputMaybe<Scalars['String']['input']>` |
+| `until` | `InputMaybe<Scalars['DateTime']['input']>` |
+| `users_permissions_user` | `InputMaybe<Scalars['ID']['input']>` |
+
+### NoticePrefInput
+| Field | Type |
+|-------|------|
+| `lastSeenAt` | `InputMaybe<Scalars['DateTime']['input']>` |
+| `milon` | `InputMaybe<Scalars['JSON']['input']>` |
+| `mutedProjects` | `InputMaybe<Scalars['JSON']['input']>` |
+| `users_permissions_user` | `InputMaybe<Scalars['ID']['input']>` |
+
 ### OpenMashaabimInput
 | Field | Type |
 |-------|------|
@@ -6372,6 +6436,7 @@ Used for creating/updating content.
 | `finnishedM72HForDecline` | `InputMaybe<Scalars['Boolean']['input']>` |
 | `finnishedMAllApruve` | `InputMaybe<Scalars['Boolean']['input']>` |
 | `finnished_missions` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
+| `formerSlugs` | `InputMaybe<Scalars['String']['input']>` |
 | `forums` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `githublink` | `InputMaybe<Scalars['String']['input']>` |
 | `haamadapruvs` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
@@ -6385,6 +6450,7 @@ Used for creating/updating content.
 | `joinPolicy` | `InputMaybe<Enum_Project_Joinpolicy>` |
 | `linkToWebsite` | `InputMaybe<Scalars['String']['input']>` |
 | `location` | `InputMaybe<ComponentNewLocationInput>` |
+| `look` | `InputMaybe<Scalars['JSON']['input']>` |
 | `maaps` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `machshirs` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `mashaabims` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
@@ -6409,6 +6475,7 @@ Used for creating/updating content.
 | `publicDescription` | `InputMaybe<Scalars['String']['input']>` |
 | `publishedAt` | `InputMaybe<Scalars['DateTime']['input']>` |
 | `ratson_proposals` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
+| `ratsons_offered` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `resource_bookings` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `restime` | `InputMaybe<Enum_Project_Restime>` |
 | `rikmashes` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
@@ -6422,6 +6489,7 @@ Used for creating/updating content.
 | `shiftDraftWindowHours` | `InputMaybe<Scalars['Int']['input']>` |
 | `shift_plans` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `site_share_contributions` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
+| `slug` | `InputMaybe<Scalars['String']['input']>` |
 | `space_docs` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `spirit` | `InputMaybe<Enum_Project_Spirit>` |
 | `sps` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
@@ -6530,6 +6598,7 @@ Used for creating/updating content.
 | `bounti` | `InputMaybe<Scalars['Boolean']['input']>` |
 | `categories` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `chat_forum` | `InputMaybe<Scalars['ID']['input']>` |
+| `claimed_at` | `InputMaybe<Scalars['DateTime']['input']>` |
 | `consensusRule` | `InputMaybe<Enum_Ratson_Consensusrule>` |
 | `derivedComplexMatanot` | `InputMaybe<Scalars['ID']['input']>` |
 | `desc` | `InputMaybe<Scalars['String']['input']>` |
@@ -6562,6 +6631,12 @@ Used for creating/updating content.
 | `minJoiners` | `InputMaybe<Scalars['Int']['input']>` |
 | `missions` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `name` | `InputMaybe<Scalars['String']['input']>` |
+| `offer_email_lock` | `InputMaybe<Scalars['String']['input']>` |
+| `offer_expires_at` | `InputMaybe<Scalars['DateTime']['input']>` |
+| `offer_link_at` | `InputMaybe<Scalars['DateTime']['input']>` |
+| `offer_recipient_hint` | `InputMaybe<Scalars['String']['input']>` |
+| `offered_by` | `InputMaybe<Scalars['ID']['input']>` |
+| `offered_by_project` | `InputMaybe<Scalars['ID']['input']>` |
 | `open_mashaabims` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `open_missions` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `partialConsensusFallback` | `InputMaybe<Enum_Ratson_Partialconsensusfallback>` |
@@ -6573,11 +6648,13 @@ Used for creating/updating content.
 | `ratson_match_jobs` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `ratson_proposals` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `ratson_shares` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
+| `restime` | `InputMaybe<Enum_Ratson_Restime>` |
 | `share_status` | `InputMaybe<Enum_Ratson_Share_Status>` |
 | `sheiruts` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `startDate` | `InputMaybe<Scalars['DateTime']['input']>` |
 | `status_ratson` | `InputMaybe<Enum_Ratson_Status_Ratson>` |
 | `sub_category` | `InputMaybe<Scalars['String']['input']>` |
+| `terms_digest` | `InputMaybe<Scalars['String']['input']>` |
 | `totalbounti` | `InputMaybe<Scalars['Float']['input']>` |
 | `users_permissions_users` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `vallues` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
@@ -6599,13 +6676,13 @@ Used for creating/updating content.
 | Field | Type |
 |-------|------|
 | `auto_generated` | `InputMaybe<Scalars['Boolean']['input']>` |
-| `hidden_by_wisher` | `InputMaybe<Scalars['Boolean']['input']>` |
 | `covered_missions` | `InputMaybe<Array<InputMaybe<ComponentNewCoveredMissionsInput>>>` |
 | `covered_resources` | `InputMaybe<Array<InputMaybe<ComponentNewCoveredResourcesInput>>>` |
 | `entryCurrency` | `InputMaybe<Scalars['String']['input']>` |
 | `entryRate` | `InputMaybe<Scalars['Float']['input']>` |
 | `final_breakdown` | `InputMaybe<Scalars['JSON']['input']>` |
 | `forum` | `InputMaybe<Scalars['ID']['input']>` |
+| `hidden_by_wisher` | `InputMaybe<Scalars['Boolean']['input']>` |
 | `kind` | `InputMaybe<Enum_Ratsonproposal_Kind>` |
 | `matanot` | `InputMaybe<Scalars['ID']['input']>` |
 | `matbea` | `InputMaybe<Scalars['ID']['input']>` |
@@ -6620,6 +6697,7 @@ Used for creating/updating content.
 | `ratson_willingness_entry` | `InputMaybe<Array<InputMaybe<ComponentNewWillingnessEntriesInput>>>` |
 | `sheirutpends` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `status_proposal` | `InputMaybe<Enum_Ratsonproposal_Status_Proposal>` |
+| `timegrama` | `InputMaybe<Scalars['ID']['input']>` |
 | `tosplits` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `total_price` | `InputMaybe<Scalars['Float']['input']>` |
 | `votes` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
@@ -7242,6 +7320,7 @@ Used for creating/updating content.
 | `open_mission` | `InputMaybe<Scalars['ID']['input']>` |
 | `pendm` | `InputMaybe<Scalars['ID']['input']>` |
 | `pmash` | `InputMaybe<Scalars['ID']['input']>` |
+| `ratson_proposal` | `InputMaybe<Scalars['ID']['input']>` |
 | `roster_period` | `InputMaybe<Scalars['ID']['input']>` |
 | `sheirutpend` | `InputMaybe<Scalars['ID']['input']>` |
 | `stipend_payment` | `InputMaybe<Scalars['ID']['input']>` |
@@ -7477,6 +7556,7 @@ Used for creating/updating content.
 | `ratson_proposals` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `ratson_shares` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `ratsons` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
+| `ratsons_offered` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `resetPasswordToken` | `InputMaybe<Scalars['String']['input']>` |
 | `resource_bookings` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `rikmashes` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
@@ -7609,12 +7689,12 @@ Used for creating/updating content.
 
 ---
 
-## 🔍 Filter Input Types (120)
+## 🔍 Filter Input Types (122)
 
 Used for querying/filtering content. Each content type has a corresponding filter input.
 
 <details>
-<summary>Click to expand all 120 filter types</summary>
+<summary>Click to expand all 122 filter types</summary>
 
 #### ActFiltersInput
 Fields: `and`, `createdAt`, `dateF`, `dateS`, `des`, `externalId`, `forums`, `hashivut`, `id`, `isAssigned`, `link`, `locale`, `localizations`, `mesimabetahaliches`, `my`, `myIshur`, `naasa`, `negopendmissions`, `not`, `open_mission`, `or`, `partofs`, `pendm`, `project`, `publishedAt`, `shem`, `source`, `status`, `tafkidims`, `taskdis`, `timegrama`, `timers`, `updatedAt`, `userAndIshur`, `vali`, `valiIshur`
@@ -7668,7 +7748,7 @@ Fields: `and`, `createdAt`, `desc`, `head`, `id`, `not`, `or`, `publishedAt`, `s
 Fields: `and`, `costumers`, `createdAt`, `id`, `not`, `or`, `publishedAt`, `salers`, `updatedAt`
 
 #### DecisionFiltersInput
-Fields: `and`, `archEndsMembership`, `archMashabetahalich`, `archMatanot`, `archMember`, `archMesimabetahalich`, `archOpenMashaabim`, `archOpenMission`, `archScope`, `archSource`, `archWhy`, `archived`, `createdAt`, `decisionName`, `discord`, `drive`, `forums`, `github`, `id`, `kind`, `matanot`, `moreHours`, `negoarch`, `negodes`, `negom`, `negos`, `negostip`, `newCodeLicense`, `newCodeLicenseYears`, `newDormancyDays`, `newFlink`, `newHours`, `newWlink`, `newname`, `newprides`, `newpubdes`, `not`, `or`, `projects`, `publishedAt`, `sale`, `stipFunder`, `stipRecipient`, `stipendPledge`, `stipendProgram`, `swapDeadline`, `swapFrom`, `swapGive`, `swapPlan`, `swapSilence`, `swapStatus`, `swapTake`, `swapTo`, `targetKind`, `timegrama`, `timtoM`, `twitter`, `updatedAt`, `valluesadd`, `valluesles`, `votes`, `vots`, `whatsapp`
+Fields: `and`, `archEndsMembership`, `archMashabetahalich`, `archMatanot`, `archMember`, `archMesimabetahalich`, `archOpenMashaabim`, `archOpenMission`, `archScope`, `archSource`, `archWhy`, `archived`, `createdAt`, `decisionName`, `discord`, `drive`, `forums`, `github`, `id`, `kind`, `matanot`, `moreHours`, `negoarch`, `negodes`, `negom`, `negos`, `negostip`, `newCodeLicense`, `newCodeLicenseYears`, `newDormancyDays`, `newFlink`, `newHours`, `newLook`, `newSlug`, `newWlink`, `newname`, `newprides`, `newpubdes`, `not`, `or`, `projects`, `publishedAt`, `sale`, `stipFunder`, `stipRecipient`, `stipendPledge`, `stipendProgram`, `swapDeadline`, `swapFrom`, `swapGive`, `swapPlan`, `swapSilence`, `swapStatus`, `swapTake`, `swapTo`, `targetKind`, `timegrama`, `timtoM`, `twitter`, `updatedAt`, `valluesadd`, `valluesles`, `votes`, `vots`, `whatsapp`
 
 #### DeffinitionFiltersInput
 Fields: `and`, `countries`, `createdAt`, `deffinitionName`, `free_people`, `id`, `locale`, `localizations`, `not`, `or`, `projects`, `publishedAt`, `updatedAt`
@@ -7784,6 +7864,12 @@ Fields: `acts`, `and`, `ask`, `createdAt`, `date`, `dates`, `descrip`, `filds`, 
 #### NegotiationFiltersInput
 Fields: `and`, `arguments`, `clauses`, `createdAt`, `createdByEmail`, `creator`, `cuntries`, `currentRound`, `description`, `id`, `isLocal`, `issues`, `maxRounds`, `not`, `or`, `ownerExternalId`, `participants`, `positions`, `publishedAt`, `resolution`, `scaleMax`, `scaleMin`, `shareToken`, `sourceId`, `sourceMeta`, `sourceType`, `status`, `topic`, `updatedAt`, `visibility`
 
+#### NoticeDismissalFiltersInput
+Fields: `and`, `createdAt`, `id`, `not`, `noticeKey`, `or`, `until`, `updatedAt`, `users_permissions_user`
+
+#### NoticePrefFiltersInput
+Fields: `and`, `createdAt`, `id`, `lastSeenAt`, `milon`, `mutedProjects`, `not`, `or`, `updatedAt`, `users_permissions_user`
+
 #### OpenMashaabimFiltersInput
 Fields: `and`, `archiveEffectiveFrom`, `archive_decisions`, `archived`, `askms`, `createdAt`, `cycleSize`, `declinedsps`, `descrip`, `dormancyDays`, `easy`, `entryCurrency`, `entryRate`, `extractedKey`, `haamadapruvs`, `haamadas`, `hm`, `howMeny`, `id`, `isMust`, `isYesod`, `kindOf`, `lifecycle`, `linkto`, `locale`, `localizations`, `location`, `maagad`, `maap`, `mashaabim`, `match_suggestions`, `name`, `nego_mashes`, `not`, `or`, `partofs`, `pmash`, `price`, `project`, `publishedAt`, `ratson`, `ratson_proposal`, `recurring`, `rikmashes`, `source`, `splited`, `spnot`, `sps`, `sqadualed`, `sqadualedf`, `stipend_program`, `timegrama`, `updatedAt`, `users`
 
@@ -7815,7 +7901,7 @@ Fields: `and`, `archived`, `askm`, `createdAt`, `cycleSize`, `descrip`, `diun`, 
 Fields: `aiMeta`, `and`, `arguments`, `author`, `authorEmail`, `authorExternalId`, `authorType`, `clauses`, `createdAt`, `description`, `heading`, `id`, `intensity`, `isAnchor`, `kind`, `location`, `negotiation`, `not`, `or`, `order`, `pole`, `publishedAt`, `relativePlacement`, `selfPlacement`, `tags`, `updatedAt`, `voters`, `votes`
 
 #### ProjectFiltersInput
-Fields: `acts`, `addHoursManualy`, `and`, `api_keys`, `askms`, `asks`, `askwants`, `assistant_sessions`, `city`, `codeLicense`, `codeLicenseOpenYears`, `codeLicenseSince`, `countries`, `createdAt`, `currencyCode`, `deals`, `decisions`, `deffinitions`, `descripFor`, `discordlink`, `dormancyDays`, `drivelink`, `fblink`, `finiapruvals`, `finnishedM72HForDecline`, `finnishedMAllApruve`, `finnished_missions`, `forums`, `githublink`, `haamadapruvs`, `haamadas`, `halukas`, `halukas_recive`, `id`, `isMachzikim`, `isMachzikimPublik`, `isOt`, `isPlatform`, `joinPolicy`, `linkToWebsite`, `locale`, `localizations`, `location`, `maaps`, `machshirs`, `mashaabims`, `mashabetahaliches`, `matanotofs`, `mesimabetahaliches`, `missions`, `newMeMissionOuto72ho`, `newOpenMissionAllApruve`, `newOpenMotoAfter72hoursWithnono`, `newmeOpenAllapruve`, `not`, `open_mashaabims`, `open_missions`, `or`, `pendms`, `pledges`, `pmashes`, `projectName`, `project_plan_boards`, `project_repos`, `publicDescription`, `publishedAt`, `ratson_proposals`, `resource_bookings`, `restime`, `rikmashes`, `sales`, `sales_source`, `sheirutpends`, `sheiruts`, `sheiruts_sourced`, `shiftCloseOffsetHours`, `shiftCycleDays`, `shiftDraftWindowHours`, `shift_plans`, `site_share_contributions`, `space_docs`, `spirit`, `sps`, `stipendDefaultCostShare`, `stipendDefaultRate`, `stipendPolicy`, `stipend_payments`, `stipend_pledges`, `stipend_programs`, `supportPage`, `tafkidims`, `timeToP`, `timerOnlyTOrAlsoManuallyF`, `timers`, `tosplits`, `totalinyearone`, `totalinyearsec`, `totalmaxyearone`, `totalmaxyearsec`, `totalminyearone`, `totalminyearsec`, `twiterlink`, `updatedAt`, `user_1s`, `usersOfP`, `vallues`, `watsapplink`, `welcom_tops`, `work_ways`, `zohars`
+Fields: `acts`, `addHoursManualy`, `and`, `api_keys`, `askms`, `asks`, `askwants`, `assistant_sessions`, `city`, `codeLicense`, `codeLicenseOpenYears`, `codeLicenseSince`, `countries`, `createdAt`, `currencyCode`, `deals`, `decisions`, `deffinitions`, `descripFor`, `discordlink`, `dormancyDays`, `drivelink`, `fblink`, `finiapruvals`, `finnishedM72HForDecline`, `finnishedMAllApruve`, `finnished_missions`, `formerSlugs`, `forums`, `githublink`, `haamadapruvs`, `haamadas`, `halukas`, `halukas_recive`, `id`, `isMachzikim`, `isMachzikimPublik`, `isOt`, `isPlatform`, `joinPolicy`, `linkToWebsite`, `locale`, `localizations`, `location`, `look`, `maaps`, `machshirs`, `mashaabims`, `mashabetahaliches`, `matanotofs`, `mesimabetahaliches`, `missions`, `newMeMissionOuto72ho`, `newOpenMissionAllApruve`, `newOpenMotoAfter72hoursWithnono`, `newmeOpenAllapruve`, `not`, `open_mashaabims`, `open_missions`, `or`, `pendms`, `pledges`, `pmashes`, `projectName`, `project_plan_boards`, `project_repos`, `publicDescription`, `publishedAt`, `ratson_proposals`, `ratsons_offered`, `resource_bookings`, `restime`, `rikmashes`, `sales`, `sales_source`, `sheirutpends`, `sheiruts`, `sheiruts_sourced`, `shiftCloseOffsetHours`, `shiftCycleDays`, `shiftDraftWindowHours`, `shift_plans`, `site_share_contributions`, `slug`, `space_docs`, `spirit`, `sps`, `stipendDefaultCostShare`, `stipendDefaultRate`, `stipendPolicy`, `stipend_payments`, `stipend_pledges`, `stipend_programs`, `supportPage`, `tafkidims`, `timeToP`, `timerOnlyTOrAlsoManuallyF`, `timers`, `tosplits`, `totalinyearone`, `totalinyearsec`, `totalmaxyearone`, `totalmaxyearsec`, `totalminyearone`, `totalminyearsec`, `twiterlink`, `updatedAt`, `user_1s`, `usersOfP`, `vallues`, `watsapplink`, `welcom_tops`, `work_ways`, `zohars`
 
 #### ProjectPlanBoardFiltersInput
 Fields: `ai_meta`, `and`, `createdAt`, `creator`, `descrip`, `expandedAt`, `forums`, `id`, `items`, `not`, `or`, `order`, `origin`, `project`, `publishedAt`, `rationale`, `revisionNote`, `sourceText`, `status`, `title`, `updatedAt`
@@ -7830,13 +7916,13 @@ Fields: `and`, `connectedBy`, `createdAt`, `defaultBranch`, `id`, `installationI
 Fields: `ai_meta`, `and`, `archived`, `avg_rating`, `bio_raw`, `createdAt`, `display_name`, `id`, `lat`, `lng`, `location`, `not`, `or`, `owner_id`, `owner_type`, `pinecone_id`, `publishedAt`, `radius_km`, `updatedAt`
 
 #### RatsonFiltersInput
-Fields: `access_mode`, `age_group`, `aggregation_opt_out`, `ai_meta`, `allowJoin`, `and`, `assistant_sessions`, `bounti`, `categories`, `chat_forum`, `consensusRule`, `createdAt`, `derivedComplexMatanot`, `desc`, `entryCurrency`, `entryRate`, `extracted_missions`, `extracted_resources`, `finnishDate`, `frequency`, `fulfilled`, `fulfillment_score`, `id`, `isOnline`, `joinDeadline`, `joinKind`, `language`, `last_matched_at`, `lat`, `link`, `lng`, `locale`, `localizations`, `location`, `location_hint`, `lockedAt`, `longDes`, `maagad`, `mashaabims`, `matanots`, `matanots_offered`, `maxJoiners`, `minJoiners`, `missions`, `name`, `not`, `open_mashaabims`, `open_missions`, `or`, `partialConsensusFallback`, `pinecone_id`, `process`, `publishedAt`, `radius`, `ratson_match_jobs`, `ratson_proposals`, `ratson_shares`, `share_status`, `sheiruts`, `startDate`, `status_ratson`, `sub_category`, `totalbounti`, `updatedAt`, `users_permissions_users`, `vallues`, `votes`, `willingnessModel`
+Fields: `access_mode`, `age_group`, `aggregation_opt_out`, `ai_meta`, `allowJoin`, `and`, `assistant_sessions`, `bounti`, `categories`, `chat_forum`, `claimed_at`, `consensusRule`, `createdAt`, `derivedComplexMatanot`, `desc`, `entryCurrency`, `entryRate`, `extracted_missions`, `extracted_resources`, `finnishDate`, `frequency`, `fulfilled`, `fulfillment_score`, `id`, `isOnline`, `joinDeadline`, `joinKind`, `language`, `last_matched_at`, `lat`, `link`, `lng`, `locale`, `localizations`, `location`, `location_hint`, `lockedAt`, `longDes`, `maagad`, `mashaabims`, `matanots`, `matanots_offered`, `maxJoiners`, `minJoiners`, `missions`, `name`, `not`, `offer_email_lock`, `offer_expires_at`, `offer_link_at`, `offer_recipient_hint`, `offered_by`, `offered_by_project`, `open_mashaabims`, `open_missions`, `or`, `partialConsensusFallback`, `pinecone_id`, `process`, `publishedAt`, `radius`, `ratson_match_jobs`, `ratson_proposals`, `ratson_shares`, `restime`, `share_status`, `sheiruts`, `startDate`, `status_ratson`, `sub_category`, `terms_digest`, `totalbounti`, `updatedAt`, `users_permissions_users`, `vallues`, `votes`, `willingnessModel`
 
 #### RatsonMatchJobFiltersInput
 Fields: `and`, `createdAt`, `error`, `finished_at`, `id`, `mode`, `not`, `or`, `proposals_created`, `publishedAt`, `ratson`, `started_at`, `updatedAt`
 
 #### RatsonProposalFiltersInput
-Fields: `and`, `auto_generated`, `covered_missions`, `covered_resources`, `createdAt`, `entryCurrency`, `entryRate`, `final_breakdown`, `forum`, `hidden_by_wisher`, `id`, `kind`, `matanot`, `matbea`, `match_score`, `negos`, `not`, `open_mashaabims`, `open_mission`, `or`, `project`, `proposer_users`, `publishedAt`, `ratson`, `ratson_willingness_entry`, `sheirutpends`, `status_proposal`, `tosplits`, `total_price`, `updatedAt`, `votes`
+Fields: `and`, `auto_generated`, `covered_missions`, `covered_resources`, `createdAt`, `entryCurrency`, `entryRate`, `final_breakdown`, `forum`, `hidden_by_wisher`, `id`, `kind`, `matanot`, `matbea`, `match_score`, `negos`, `not`, `open_mashaabims`, `open_mission`, `or`, `project`, `proposer_users`, `publishedAt`, `ratson`, `ratson_willingness_entry`, `sheirutpends`, `status_proposal`, `timegrama`, `tosplits`, `total_price`, `updatedAt`, `votes`
 
 #### RatsonShareFiltersInput
 Fields: `and`, `createdAt`, `halukas`, `id`, `joinedAt`, `leftAt`, `matbea`, `maxContribution`, `not`, `notificationsOn`, `or`, `publishedAt`, `ratson`, `role`, `status_share`, `updatedAt`, `users_permissions_user`
@@ -7926,7 +8012,7 @@ Fields: `and`, `createdAt`, `engine`, `firstSeenOn`, `hash`, `hits`, `id`, `key`
 Fields: `amort`, `amortf`, `amorth`, `amorts`, `amortt`, `and`, `createdAt`, `email`, `id`, `locale`, `localizations`, `more`, `name`, `not`, `notes`, `or`, `publishedAt`, `updatedAt`
 
 #### TimegramaFiltersInput
-Fields: `act`, `actt`, `and`, `ask`, `askm`, `askwant`, `createdAt`, `date`, `decision`, `done`, `finiapruval`, `id`, `maap`, `mashabetahalich`, `matanot`, `matanotpend`, `mesimabetahalich`, `not`, `open_mashaabim`, `open_mission`, `or`, `pendm`, `pmash`, `roster_period`, `sheirutpend`, `stipend_payment`, `timer`, `tosplit`, `updatedAt`, `whatami`
+Fields: `act`, `actt`, `and`, `ask`, `askm`, `askwant`, `createdAt`, `date`, `decision`, `done`, `finiapruval`, `id`, `maap`, `mashabetahalich`, `matanot`, `matanotpend`, `mesimabetahalich`, `not`, `open_mashaabim`, `open_mission`, `or`, `pendm`, `pmash`, `ratson_proposal`, `roster_period`, `sheirutpend`, `stipend_payment`, `timer`, `tosplit`, `updatedAt`, `whatami`
 
 #### TimerFiltersInput
 Fields: `activeMesimabetahalich`, `acts`, `and`, `appruved`, `createdAt`, `finiapruvals`, `finnish`, `forApruve`, `id`, `isActive`, `locale`, `localizations`, `mashabetahalich`, `mesimabetahalich`, `not`, `or`, `project`, `rate`, `saveLinks`, `saveText`, `saved`, `start`, `timegrama`, `timers`, `totalHours`, `updatedAt`, `users_permissions_user`, `votes`
@@ -7953,7 +8039,7 @@ Fields: `action`, `and`, `createdAt`, `id`, `not`, `or`, `role`, `updatedAt`
 Fields: `and`, `createdAt`, `description`, `id`, `name`, `not`, `or`, `permissions`, `type`, `updatedAt`, `users`
 
 #### UsersPermissionsUserFiltersInput
-Fields: `acts`, `actsVali`, `and`, `api_keys`, `arr1`, `arrdate`, `askeds`, `askms`, `asks`, `askwants`, `assistant_sessions`, `autoTranslate`, `auto_created_via`, `availability_pref`, `bio`, `blocked`, `chezin`, `city`, `confirmationToken`, `confirmed`, `createdAt`, `cuntries`, `currency`, `cv_extracted_at`, `cv_extraction`, `deals`, `declined`, `declinedByP`, `declinedm`, `device_token`, `discordlink`, `email`, `fblink`, `filtertags`, `finiapruvals`, `finnished_missions`, `forum_last_seens`, `frd`, `free_person`, `githubId`, `githubLinkedAt`, `githubLogin`, `githublink`, `haamadas`, `halukasend`, `halukasres`, `haskama`, `haskamac`, `haskamaz`, `hatzaas`, `hervachti`, `iGotMOneyForSheirut`, `id`, `isSigned`, `lang`, `lat`, `levManualAlready`, `lng`, `location`, `machshirs`, `mashaabims`, `mashabetahaliches`, `matanot_recipe_missions`, `matanot_recipe_resources`, `match_suggestions`, `mesimabetahaliches`, `messages`, `mission_offers`, `missions_i_can_do`, `moachManualAlready`, `nego_mashes`, `negopendmissions`, `negotiations`, `negotiationsIparticipante`, `noMail`, `noMoachGuide`, `noOfHoursProject1`, `not`, `onboarding_status`, `onboarding_track`, `open_missions`, `or`, `owned_matanots`, `password`, `pendms`, `pendmsforme`, `personal_project`, `pgishas`, `pgishasPendStrat`, `pgishauserpends`, `pgishausers`, `pledges`, `pmashes`, `positionsAuthor`, `preferCards`, `pricing_pref`, `profilManualAlready`, `project_plan_boards`, `projects_1s`, `provider`, `radius`, `ratson_proposals`, `ratson_shares`, `ratsons`, `resetPasswordToken`, `resource_bookings`, `rikmashes`, `rishonvesopen`, `role`, `sales`, `sales_as_customer`, `sales_reported`, `sheirutnegos`, `sheirutpends`, `sheiruts`, `sheiruts_iCanGetMonay`, `shekelsPerHoureProject1`, `site_share_contributions`, `skills`, `socketId`, `sphmin`, `sps`, `stipend_payments_funded`, `stipend_payments_received`, `stipend_pledges_funded`, `stipend_pledges_received`, `stipend_programs_funded`, `tafkidims`, `telegramId`, `timeForVid`, `timers`, `twiterlink`, `updatedAt`, `username`, `vallues`, `videoval`, `votes`, `wants`, `welcom_tops`, `work_ways`, `zohars`
+Fields: `acts`, `actsVali`, `and`, `api_keys`, `arr1`, `arrdate`, `askeds`, `askms`, `asks`, `askwants`, `assistant_sessions`, `autoTranslate`, `auto_created_via`, `availability_pref`, `bio`, `blocked`, `chezin`, `city`, `confirmationToken`, `confirmed`, `createdAt`, `cuntries`, `currency`, `cv_extracted_at`, `cv_extraction`, `deals`, `declined`, `declinedByP`, `declinedm`, `device_token`, `discordlink`, `email`, `fblink`, `filtertags`, `finiapruvals`, `finnished_missions`, `forum_last_seens`, `frd`, `free_person`, `githubId`, `githubLinkedAt`, `githubLogin`, `githublink`, `haamadas`, `halukasend`, `halukasres`, `haskama`, `haskamac`, `haskamaz`, `hatzaas`, `hervachti`, `iGotMOneyForSheirut`, `id`, `isSigned`, `lang`, `lat`, `levManualAlready`, `lng`, `location`, `machshirs`, `mashaabims`, `mashabetahaliches`, `matanot_recipe_missions`, `matanot_recipe_resources`, `match_suggestions`, `mesimabetahaliches`, `messages`, `mission_offers`, `missions_i_can_do`, `moachManualAlready`, `nego_mashes`, `negopendmissions`, `negotiations`, `negotiationsIparticipante`, `noMail`, `noMoachGuide`, `noOfHoursProject1`, `not`, `onboarding_status`, `onboarding_track`, `open_missions`, `or`, `owned_matanots`, `password`, `pendms`, `pendmsforme`, `personal_project`, `pgishas`, `pgishasPendStrat`, `pgishauserpends`, `pgishausers`, `pledges`, `pmashes`, `positionsAuthor`, `preferCards`, `pricing_pref`, `profilManualAlready`, `project_plan_boards`, `projects_1s`, `provider`, `radius`, `ratson_proposals`, `ratson_shares`, `ratsons`, `ratsons_offered`, `resetPasswordToken`, `resource_bookings`, `rikmashes`, `rishonvesopen`, `role`, `sales`, `sales_as_customer`, `sales_reported`, `sheirutnegos`, `sheirutpends`, `sheiruts`, `sheiruts_iCanGetMonay`, `shekelsPerHoureProject1`, `site_share_contributions`, `skills`, `socketId`, `sphmin`, `sps`, `stipend_payments_funded`, `stipend_payments_received`, `stipend_pledges_funded`, `stipend_pledges_received`, `stipend_programs_funded`, `tafkidims`, `telegramId`, `timeForVid`, `timers`, `twiterlink`, `updatedAt`, `username`, `vallues`, `videoval`, `votes`, `wants`, `welcom_tops`, `work_ways`, `zohars`
 
 #### VallueFiltersInput
 Fields: `and`, `createdAt`, `decisions`, `decisionsles`, `descrip`, `id`, `locale`, `localizations`, `not`, `open_missions`, `or`, `pendms`, `projects`, `publishedAt`, `ratsons`, `updatedAt`, `users`, `valueName`
@@ -7980,12 +8066,12 @@ Fields: `allSubmited`, `and`, `createdAt`, `done`, `id`, `mesimabetahalich`, `no
 
 ---
 
-## 📦 Entity Response Types (464)
+## 📦 Entity Response Types (470)
 
 Wrapper types for GraphQL responses.
 
 <details>
-<summary>Click to expand all 464 response types</summary>
+<summary>Click to expand all 470 response types</summary>
 
 - **ActEntity**: `attributes: Maybe<Act>`, `id: Maybe<Scalars['ID']['output']>`
 - **ActEntityResponse**: `data: Maybe<ActEntity>`
@@ -8203,6 +8289,12 @@ Wrapper types for GraphQL responses.
 - **NegotiationEntityResponse**: `data: Maybe<NegotiationEntity>`
 - **NegotiationEntityResponseCollection**: `data: Array<NegotiationEntity>`, `meta: ResponseCollectionMeta`
 - **NegotiationRelationResponseCollection**: `data: Array<NegotiationEntity>`
+- **NoticeDismissalEntity**: `attributes: Maybe<NoticeDismissal>`, `id: Maybe<Scalars['ID']['output']>`
+- **NoticeDismissalEntityResponse**: `data: Maybe<NoticeDismissalEntity>`
+- **NoticeDismissalEntityResponseCollection**: `data: Array<NoticeDismissalEntity>`, `meta: ResponseCollectionMeta`
+- **NoticePrefEntity**: `attributes: Maybe<NoticePref>`, `id: Maybe<Scalars['ID']['output']>`
+- **NoticePrefEntityResponse**: `data: Maybe<NoticePrefEntity>`
+- **NoticePrefEntityResponseCollection**: `data: Array<NoticePrefEntity>`, `meta: ResponseCollectionMeta`
 - **OpenMashaabimEntity**: `attributes: Maybe<OpenMashaabim>`, `id: Maybe<Scalars['ID']['output']>`
 - **OpenMashaabimEntityResponse**: `data: Maybe<OpenMashaabimEntity>`
 - **OpenMashaabimEntityResponseCollection**: `data: Array<OpenMashaabimEntity>`, `meta: ResponseCollectionMeta`
@@ -8455,10 +8547,10 @@ Wrapper types for GraphQL responses.
 
 ---
 
-## 🔢 Enum Types (160)
+## 🔢 Enum Types (161)
 
 <details>
-<summary>Click to expand all 160 enum types</summary>
+<summary>Click to expand all 161 enum types</summary>
 
 - **Enum_Act_Hashivut**: 
 - **Enum_Act_Source**: 
@@ -8567,6 +8659,7 @@ Wrapper types for GraphQL responses.
 - **Enum_Ratson_Consensusrule**: 
 - **Enum_Ratson_Joinkind**: 
 - **Enum_Ratson_Partialconsensusfallback**: 
+- **Enum_Ratson_Restime**: 
 - **Enum_Ratson_Share_Status**: 
 - **Enum_Ratson_Status_Ratson**: 
 - **Enum_Ratson_Willingnessmodel**: 
@@ -8635,7 +8728,7 @@ Wrapper types for GraphQL responses.
 ```
 src/
 ├── generated/
-│   ├── graphql.ts              # Auto-generated types (codegen) - 22462 lines
+│   ├── graphql.ts              # Auto-generated types (codegen) - 22704 lines
 │   ├── index.ts                # Re-export hub
 │   └── STRAPI_SCHEMA_REFERENCE.md  # This file (AI agent reference)
 ├── lib/

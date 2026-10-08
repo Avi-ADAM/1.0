@@ -657,6 +657,7 @@
                 style="margin: 0;"
                 class="btn ga"
                 name="requestToJoin"
+                aria-label={$t('common.approve')}
                 ><svg
                   xmlns="http://www.w3.org/2000/svg"
                   xmlns:xlink="http://www.w3.org/1999/xlink"

@@ -320,7 +320,10 @@ const FIELD_DECISIONS = new Set([
   'vallueadd',
   'vallueles',
   'pic',
-  'codeLicense'
+  'codeLicense',
+  // PLAN_RIKMA_SUBDOMAINS
+  'address',
+  'look'
 ]);
 
 /**

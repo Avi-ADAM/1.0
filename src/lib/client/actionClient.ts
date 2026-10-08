@@ -49,10 +49,11 @@ export interface ActionResponse<T = any> {
     details?: any;
   };
   updateStrategy?: {
-    type: 'fullRefresh' | 'partialUpdate' | 'optimistic' | 'none';
+    type: 'fullRefresh' | 'partialUpdate' | 'refetchScope' | 'optimistic' | 'none';
     config?: {
       dataKeys?: string[];
       updateFunction?: string;
+      projectId?: string;
     };
   };
 }
@@ -381,6 +382,8 @@ export type ActionKey =
   | 'ensureProcessForum'
   | 'ensureStageForum'
   | 'updateProjectDetails'
+  | 'proposeRikmaIdentity'
+  | 'checkRikmaSlug'
   | 'createResource'
   | 'setRikmaCurrency'
   | 'submitNegoMission'
@@ -452,6 +455,9 @@ export type ActionKey =
   | 'finalizeJoinAcceptance'
   | 'finalizeAskmAcceptance'
   | 'voteOnAskm'
+  | 'dismissNotice'
+  | 'restoreNotice'
+  | 'saveNoticePrefs'
   | 'dismissSelfNomination'
   | 'declineAskmRequest'
   | 'createSale'
@@ -885,6 +891,12 @@ async function executeUpdateStrategy(
         } else {
           console.warn('[ActionClient] No update function specified for optimistic strategy');
         }
+        break;
+
+      case 'refetchScope':
+        // Lev slices, not page loads: the lev page's socket listener
+        // (levSocketHandler) re-reads them for every member the action's
+        // notification reaches. The acting card has already updated itself.
         break;
 
       case 'none':

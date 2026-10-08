@@ -7,6 +7,7 @@
  */
 
 import { getConciergeAgent } from './conciergeAgent';
+import { hasMixedScript } from '$lib/translation/mixedScript.js';
 
 export interface WishItem {
   name: string;
@@ -104,6 +105,21 @@ export function coerceJson(raw: string): unknown {
   }
 }
 
+/**
+ * The model now and then writes a word in two alphabets — two Hebrew letters and
+ * two Arabic ones for "carpenter" (QA_CONCIERGE_E2E C-1). Such a string is garbage
+ * to the reader and, as a skill, goes on into the people search and the community
+ * fan-out (C-7, C-8). It cannot be repaired from here, so it is dropped: the
+ * extraction runs again on the next pause in typing, and a missing suggestion costs
+ * less than a wrong one. Same rule as `npm run check:script`
+ * (`$lib/translation/mixedScript`).
+ */
+export function isCleanText(s: string): boolean {
+  if (!hasMixedScript(s)) return true;
+  console.warn('[extractWish] dropped a mixed-script string from the model:', s);
+  return false;
+}
+
 function asImp(v: unknown): 'must' | 'nice' {
   return v === 'must' ? 'must' : 'nice';
 }
@@ -119,7 +135,7 @@ function normItems(arr: unknown, max: number): WishItem[] {
           ? (it as any).name
           : '';
     const clean = name.trim();
-    if (clean) out.push({ name: clean, imp: asImp((it as any)?.imp) });
+    if (clean && isCleanText(clean)) out.push({ name: clean, imp: asImp((it as any)?.imp) });
     if (out.length >= max) break;
   }
   return out;
@@ -132,7 +148,7 @@ function normStrings(arr: unknown, max: number): string[] {
   for (const it of arr) {
     const s = (typeof it === 'string' ? it : (it as any)?.name ?? '').trim();
     const key = s.toLowerCase();
-    if (s && !seen.has(key)) {
+    if (s && !seen.has(key) && isCleanText(s)) {
       seen.add(key);
       out.push(s);
     }
@@ -146,7 +162,7 @@ function normHints(arr: unknown, max: number): WishHint[] {
   const out: WishHint[] = [];
   for (const it of arr) {
     const text = (typeof it === 'string' ? it : (it as any)?.text ?? '').trim();
-    if (!text) continue;
+    if (!text || !isCleanText(text)) continue;
     const kind = (it as any)?.kind === 'question' ? 'question' : 'suggestion';
     out.push({ kind, text });
     if (out.length >= max) break;
@@ -235,7 +251,7 @@ export async function extractWish(
     skills: normStrings(parsed.skills, 6).map((name) => ({ name })),
     categories: normStrings(parsed.categories, 3),
     titleSuggestion:
-      typeof parsed.titleSuggestion === 'string'
+      typeof parsed.titleSuggestion === 'string' && isCleanText(parsed.titleSuggestion)
         ? parsed.titleSuggestion.trim().slice(0, 120)
         : '',
     hints: normHints(parsed.hints, 3),

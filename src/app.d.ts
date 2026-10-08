@@ -26,6 +26,12 @@ declare global {
       uid: string | false;
       /** Signed-in username, from the same verified source as `uid`. */
       un: string | false;
+      /**
+       * A JWT was present but nobody could be asked whose it is (network /
+       * upstream failure), so `uid` is false for this request only. Not a
+       * signed-out visitor: pages should offer a retry, not /login (QA C-4).
+       */
+      identityUnreachable?: boolean;
       /** Signed-in email, or false. */
       email: string | false;
       /**
@@ -53,8 +59,12 @@ declare global {
     /** Shape returned by `handleError` in hooks.server.js / hooks.client.js. */
     interface Error {
       message: string;
-      /** `auth` = sign-in problem (expired/misaligned token); `server` = anything else. */
-      code?: 'auth' | 'server';
+      /**
+       * `auth` = sign-in problem (expired/misaligned token); `unreachable` = the
+       * backend did not answer (a load's 503 — never a 404, see
+       * $lib/server/sendReply.js); `server` = anything else.
+       */
+      code?: 'auth' | 'server' | 'unreachable';
       /** Path (without the leading slash) the visitor was trying to reach. */
       from?: string;
       sessionExpired?: boolean;

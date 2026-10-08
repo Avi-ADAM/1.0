@@ -12,6 +12,7 @@
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { normalizeLocationInput, extractRelationId } from './actionUtils.js';
 import { cancelCandidacyTimegrama } from '../../nego/timegrama.js';
+import { notifyDealClientsOfCounter } from '$lib/server/deal/offerDeal.js';
 
 interface UserVote {
   what: boolean;
@@ -21,7 +22,7 @@ interface UserVote {
   ide?: number;
 }
 
-const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
+const handler: ActionExecutionHandler = async (params, context, { strapi, notifier }) => {
   const { askmId, openMashaabimId } = params;
   const newValues = (params.newValues ?? {}) as Record<string, any>;
   const now = new Date();
@@ -83,6 +84,15 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
 
   // Candidate took the turn back → stop the clock; a member vote restarts it.
   await cancelCandidacyTimegrama(strapi, context, 'askm', String(askmId));
+
+  // A part of a customer's deal: the new round needs her signature too (C-19).
+  await notifyDealClientsOfCounter(
+    (qid, vars) => strapi.execute(qid, vars, context.jwt, context.fetch),
+    notifier,
+    context,
+    'askm',
+    String(askmId)
+  );
 
   return { data: { askmId, ordern: nextOrder }, updateStrategy: { type: 'none' } };
 };

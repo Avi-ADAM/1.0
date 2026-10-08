@@ -17,6 +17,7 @@
  * `proposeOnOpenMashaabim` and `customizeOpenMashaabim` share this handler.
  */
 
+import { loadOfferDeal, notifyDealClients } from '$lib/server/deal/offerDeal.js';
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { normalizeLocationInput } from './actionUtils.js';
 import {
@@ -38,7 +39,7 @@ function buildRequesterVote(userId: string, at: Date) {
   };
 }
 
-export const openMashaabimProposalHandler: ActionExecutionHandler = async (params, context, { strapi }) => {
+export const openMashaabimProposalHandler: ActionExecutionHandler = async (params, context, { strapi, notifier }) => {
   const { openMashaabimId, projectId, spId, missionName: missionNameParam } = params;
   const newValues = (params.newValues ?? {}) as Record<string, any>;
 
@@ -56,7 +57,14 @@ export const openMashaabimProposalHandler: ActionExecutionHandler = async (param
   const projectAttrs = (projectRes as any)?.data?.project?.data?.attributes;
   const memberIds: string[] = (projectAttrs?.user_1s?.data || []).map((m: any) => String(m.id));
   const isMember = memberIds.includes(requesterId);
-  const isSolo = isMember && memberIds.length === 1;
+  // A gap of a customer's deal is never taken without her signature (QA C-19), so
+  // even a one-member rikma goes through a candidacy she can sign.
+  const dealGap = await loadOfferDeal(
+    (qid, vars) => strapi.execute(qid, vars, context.jwt, context.fetch),
+    'resource',
+    String(openMashaabimId)
+  );
+  const isSolo = isMember && memberIds.length === 1 && !dealGap;
   const proposedBy = isMember ? 'project' : 'candidate';
 
   // 2. Create the Askm with the requester's round-0 vote. (Solo member → archived,
@@ -77,6 +85,7 @@ export const openMashaabimProposalHandler: ActionExecutionHandler = async (param
   );
   const askmId = (askmRes as any)?.data?.createAskm?.data?.id;
   if (!askmId) throw new Error('Failed to create Askm');
+  if (askmId && dealGap) await notifyDealClients(notifier, context, dealGap, null);
 
   // 3. Proposed terms as a NegoMash round (proposedBy by membership). OpenMashaabim untouched.
   const loc = normalizeLocationInput(newValues.location);

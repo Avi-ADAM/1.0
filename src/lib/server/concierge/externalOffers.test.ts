@@ -75,6 +75,11 @@ describe('text helpers', () => {
   it('plainText strips markup and decodes entities', () => {
     expect(plainText('<b>Tom&amp;Co</b>\n  studio')).toBe('Tom&Co studio');
   });
+  it('plainText does not bring escaped markup back on decode', () => {
+    expect(plainText('&lt;b&gt;bold&lt;/b&gt;')).toBe('bold');
+    expect(plainText('<a&gt;x')).toBe('x');
+    expect(plainText('1 &lt; 2 and 3 &gt; 2')).toBe('1 < 2 and 3 > 2');
+  });
   it('clip respects the limit and marks the cut', () => {
     const s = clip('a'.repeat(300), 200);
     expect(s.length).toBeLessThanOrEqual(200);
@@ -141,6 +146,29 @@ describe('normalizeResults', () => {
     expect(o.currency).toBeNull();
     expect(o.id).toBe(offerIdOf('https://x.com'));
     expect(o.matchedNeed).toEqual(need);
+  });
+
+  // fast-check counterexample, seed -1487419114,
+  // path "229:1:1:1:1:1:1:1:11:9:11:10:10:10:7:10:11:10:18:15:15:15:15:15" (2026-10-06):
+  // the property used to test title + snippet joined, which reads as "<A>".
+  it('keeps a stray "<" or ">" as text — each field is markup-free on its own', () => {
+    const [o] = normalizeResults(
+      [{ url: 'http://a.aa', title: '<', snippet: 'A>', price: 0, currency: '', locationLabel: 0 } as any],
+      { provider: 'gemini', need: { key: 'm:0', kind: 'mission', name: 'צלם' } }
+    );
+    expect(o.title).toBe('<');
+    expect(o.snippet).toBe('A>');
+    expect(o.price).toBeNull();
+    expect(o.locationLabel).toBe('0');
+  });
+
+  it('strips markup that arrives HTML-escaped', () => {
+    const [o] = normalizeResults(
+      [{ url: 'https://x.com', title: '&lt;b&gt;צלם&lt;/b&gt;', snippet: '&lt;script&gt;x&lt;/script&gt; ok' }],
+      { provider: 'gemini', need }
+    );
+    expect(o.title).toBe('צלם');
+    expect(o.snippet).toBe('x ok');
   });
 
   it('ranks what names the need first', () => {

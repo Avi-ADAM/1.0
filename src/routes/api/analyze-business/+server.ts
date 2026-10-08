@@ -16,7 +16,7 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from '@sveltejs/kit';
 import { Agent } from '@mastra/core/agent';
-import { createGoogleModel } from '../../../mastra/lib/createModel';
+import { createModelChain } from '../../../mastra/lib/createModel';
 import { fetchSiteSummary } from '$lib/server/planning/siteContext.js';
 import { generateSeedPlan, countSeedItems, type SeedBoard } from '$lib/server/planning/seedPlan.js';
 import { seedPlanToBlueprint } from '$lib/assistant/fromSeedPlan.js';
@@ -82,7 +82,7 @@ function makeAgent(id: string, instructions: string): Agent {
     id,
     name: id,
     instructions,
-    model: createGoogleModel(undefined, 'gemini-3-flash-preview', { thinkingBudget: 0 })
+    model: createModelChain()
   });
 }
 

@@ -1,8 +1,30 @@
 <script lang="ts">
   import { page } from '$app/stores';
   import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
-  ;
+  import ConciergeBell from '$lib/components/concierge/ConciergeBell.svelte';
+  // Tokens only (:root + html.* blocks) — the bell paints from them.
+  import '$lib/styles/concierge.css';
   import { t } from '$lib/translations';
+  import type { Notice } from '$lib/notices';
+
+  // The deals bell (docs/inprogress/PLAN_SMART_NOTICES.md §6.2). The layout streams
+  // `dealNotices` as a promise. It is resolved into state here rather than read
+  // with {#await}: an approval reloads the layout, which hands a *new* promise
+  // to the same block, and an {#await} whose input changes late renders into a
+  // dead subtree. `undefined` = not here yet, so no bell flashes "nothing".
+  let dealNotices: Notice[] | null | undefined = $state(undefined);
+  $effect(() => {
+    const pending = $page.data?.dealNotices as Promise<Notice[] | null> | undefined;
+    if (!pending || typeof (pending as any).then !== 'function') return;
+    let live = true;
+    pending.then(
+      (list) => live && (dealNotices = list),
+      () => live && (dealNotices = null)
+    );
+    return () => {
+      live = false;
+    };
+  });
 
   const user = $derived($page.data.user || $page.data);
   const userName = $derived(user?.username || user?.un || $t('header.guest'));
@@ -35,11 +57,11 @@
   <div class="right">
     <!-- TODO: re-enable once the premium tier has real meaning -->
     <!-- <div class="badge">{$t('header.premiumBadge')}</div> -->
-    <!-- TODO: re-enable once the notifications button actually does something -->
-    <!-- <button class="notif" aria-label={$t('header.notifications')}>
-      <EntityIcon kind="notifications" size={18} />
-      <div class="notif-dot"></div>
-    </button> -->
+    {#if dealNotices !== undefined}
+      <ConciergeBell items={[]} notices={dealNotices}>
+        <EntityIcon kind="notifications" size={18} />
+      </ConciergeBell>
+    {/if}
     <button class="avatar" title={userName} aria-label={$t('header.profile')}>
       {#if profilePic}
         <img src={profilePic} alt={userName} class="avatar-img" />
@@ -126,34 +148,6 @@
     padding: 4px 14px;
     font-size: 12px;
     font-weight: 600;
-  }
-
-  .notif {
-    position: relative;
-    width: 36px;
-    height: 36px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 10px;
-    background: var(--s2);
-    border: 1px solid var(--border);
-    cursor: pointer;
-    transition: border-color 0.2s;
-    font-size: 15px;
-  }
-  .notif:hover {
-    border-color: var(--border-g);
-  }
-  .notif-dot {
-    position: absolute;
-    top: 7px;
-    right: 7px;
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: var(--pink-l);
-    box-shadow: 0 0 8px var(--pink-l);
   }
 
   .avatar {

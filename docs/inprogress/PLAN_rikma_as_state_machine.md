@@ -69,6 +69,15 @@ hash של הסריאליזציה הקנונית שלו (Merkle root על המב�
 proposals וכו') מצריכים החלטה איך הם נכנסים ל-root — אבל זו עבודת מנואל,
 לא ארכיטקטונית.
 
+> **⚠ התגלה באוקטובר 2026, בבניית ה-test vectors** (SPEC_CONSENT_FORMAT §7.3,
+> O-3): "כל אירוע יקבע את ה-state-root שלו" **לא אפשרי היום להצבעות**.
+> ה-reducers של `tosplit.vote`, ההצבעות דרך `stageVote` ו-`decision.vote`
+> הגנרי כותבים `eventId: ev.id` לתוך ה-state — וה-id הוא hash שכולל את
+> החתימה, שחותמת על ה-`stateRoot`. מעגל. כרגע אף יצרן לא פולט `stateRoot`
+> על אירוע בודד (רק snapshots, שמוחרגים מה-root), כך שזה לא באג פעיל; לפני
+> שמפעילים התחייבויות על הצבעות: להוציא את `eventId` מ-`normalizeState`
+> (STATE_ROOT v3), או להגדיר root עם placeholder ל-id של האירוע עצמו.
+
 ---
 
 ## 3. השווי היחסי = projection על Merkle tree

@@ -72,6 +72,7 @@ import {
 } from './levGraphQLQueries';
 import { executeAction } from '$lib/client/actionClient';
 import { resolvePlatformIdentity } from '$lib/stores/platformStore';
+import { readLastRefresh, shouldRefreshSuggestions, writeLastRefresh } from './suggestionRefresh';
 
 // Single in-flight full load, keyed by user id — lets concurrent callers
 // (hub prefetch, lev page, focus-path background refresh) share one query 83.
@@ -540,9 +541,9 @@ export function clearAllData(): void {
 
 /**
  * Load mission + resource suggestions from the precomputed match-suggestion
- * collection (qids 209 / 212) and set both stores. If the user has no stored
- * rows yet (accounts that predate the collection), trigger a one-time
- * server-side backfill via the refreshMySuggestions action, then re-pull.
+ * collection (qids 209 / 212) and set both stores, then — when
+ * `shouldRefreshSuggestions` says it is due — rescan via the
+ * refreshMySuggestions action and re-pull if it created anything.
  *
  * Falls back to whatever populateStores already put in the stores on any
  * failure — never throws.
@@ -580,30 +581,7 @@ async function loadSuggestionsFromMatchRecords(userData: any, userId: string | n
     }
   };
 
-  try {
-    await pullBoth();
-
-    if (missionRecords.length === 0 && resourceRecords.length === 0) {
-      const hasCaps =
-        (userData?.attributes?.skills?.data?.length || 0) > 0 ||
-        (userData?.attributes?.tafkidims?.data?.length || 0) > 0 ||
-        (userData?.attributes?.sps?.data?.length || 0) > 0;
-
-      if (hasCaps) {
-        console.log('🌐 [levDataLoader] No stored suggestions - running one-time backfill');
-        try {
-          const refresh = await executeAction('refreshMySuggestions', {});
-          const created =
-            (refresh?.data?.createdMissions || 0) + (refresh?.data?.createdResources || 0);
-          if (refresh?.success && created > 0) {
-            await pullBoth();
-          }
-        } catch (err) {
-          console.warn('⚠️ [levDataLoader] Suggestion backfill failed', err);
-        }
-      }
-    }
-
+  const publish = () => {
     if (missionFetchOk) {
       const suggestions = buildSuggestionsFromMatchRecords(missionRecords, userData);
       suggestionsStore.set(suggestions);
@@ -613,6 +591,45 @@ async function loadSuggestionsFromMatchRecords(userData: any, userId: string | n
       const resourceSuggestions = buildResourceSuggestionsFromMatchRecords(resourceRecords, userData);
       resourceSuggestionsStore.set(resourceSuggestions);
       console.log(`✅ [levDataLoader] Resource suggestions loaded from match records (${resourceSuggestions.length} items)`);
+    }
+  };
+
+  try {
+    await pullBoth();
+    publish();
+
+    // Rescan open missions/resources for this user — at once while nothing is
+    // stored, otherwise at most every few hours — so a mission whose
+    // 'missionCreated' fan-out failed still reaches the people it fits.
+    const hasCaps =
+      (userData?.attributes?.skills?.data?.length || 0) > 0 ||
+      (userData?.attributes?.tafkidims?.data?.length || 0) > 0 ||
+      (userData?.attributes?.sps?.data?.length || 0) > 0;
+    const nowMs = Date.now();
+    const refreshDue =
+      missionFetchOk &&
+      resourceFetchOk &&
+      shouldRefreshSuggestions({
+        hasCaps,
+        hasRecords: missionRecords.length > 0 || resourceRecords.length > 0,
+        lastRunMs: readLastRefresh(userId),
+        nowMs
+      });
+
+    if (refreshDue) {
+      console.log('🌐 [levDataLoader] Refreshing match suggestions');
+      try {
+        const refresh = await executeAction('refreshMySuggestions', {});
+        if (refresh?.success) writeLastRefresh(userId, nowMs);
+        const created =
+          (refresh?.data?.createdMissions || 0) + (refresh?.data?.createdResources || 0);
+        if (refresh?.success && created > 0) {
+          await pullBoth();
+          publish();
+        }
+      } catch (err) {
+        console.warn('⚠️ [levDataLoader] Suggestion refresh failed', err);
+      }
     }
   } catch (err) {
     console.warn('⚠️ [levDataLoader] Failed to load match suggestions - keeping fallback', err);

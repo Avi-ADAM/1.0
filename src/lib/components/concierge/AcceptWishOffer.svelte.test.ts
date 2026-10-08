@@ -189,3 +189,28 @@ describe('AcceptWishOffer — whose move it is', () => {
     expect(button(baseElement, 'deals.negTitle')).toBeTruthy();
   });
 });
+
+describe('AcceptWishOffer — the wish changed since you signed (PLAN_DIRECT_OFFER §4.3)', () => {
+  const changed = {
+    canCounter: true,
+    round: 0,
+    yourTurn: true,
+    amount: 4,
+    price: 600,
+    counters: [],
+    termsChanged: true
+  };
+
+  it('says so, links to the new details, and asks for an approval of them', () => {
+    const { baseElement } = render(AcceptWishOffer as any, { props: props({ negotiation: changed }) });
+    const note = baseElement.querySelector('.ofr-changed');
+    expect(note?.textContent).toContain('deals.negTermsChanged');
+    expect(note?.querySelector('a')?.getAttribute('href')).toBe('/wish/16');
+    expect(baseElement.querySelector('.ofr-btn--primary')?.textContent).toContain('deals.negApproveNewTerms');
+  });
+
+  it('nothing of the kind while the terms stand', () => {
+    const { baseElement } = render(AcceptWishOffer as any, { props: props({ negotiation: { ...changed, termsChanged: false } }) });
+    expect(baseElement.querySelector('.ofr-changed')).toBeNull();
+  });
+});

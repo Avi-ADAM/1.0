@@ -1,5 +1,6 @@
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { recordWishPaymentSale } from '$lib/server/sheirut/paymentSale.js';
+import { NotADealReceiverError, receiveDealMoney } from '$lib/server/deal/dealMoney.js';
 
 // The platform (1💗1) product that site-share income is recorded against.
 // Hardcoded for now per spec (PLAN_SITE_SHARE_PER_MEMBER §5) — to be made
@@ -106,19 +107,45 @@ const confirmSheirutHalukaHandler: ActionExecutionHandler = async (params, conte
     if (String(userId) !== receiverId) {
       throw new Error('Only the receiver can confirm receiving');
     }
+    // The receiver's word settles the transfer on its own: money that arrived was sent, so
+    // `senderconf` goes with it and the sender is never asked to confirm it again.
+    const nowComplete = haluka.confirmed !== true;
+    let saleId: string | null = null;
+
+    // A customer's payment on a wish deal is one fact with the deal page's "I received my
+    // part" — the same write (`$lib/server/deal/dealMoney`), so neither card asks again.
+    if (!isSiteShare && sheirutId) {
+      try {
+        let recorded: string | null = null;
+        await receiveDealMoney(
+          (qid, vars) => strapi.execute(qid, vars, context.jwt, context.fetch),
+          sheirutId,
+          String(userId),
+          {
+            recordSale: async (t) => {
+              recorded = (await recordWishPaymentSale(strapi, context, {
+                sheirutId, halukaId: t.id, senderId: String(t.senderId ?? senderId), receiverId, amount: t.amount
+              })).saleId ?? recorded;
+            }
+          }
+        );
+        return { confirmed: true, role: 'receiver', halukaId, complete: nowComplete, saleId: recorded };
+      } catch (err) {
+        // Not a wish deal: the transfer is confirmed on its own, below.
+        if (!(err instanceof NotADealReceiverError)) throw err;
+      }
+    }
+
     const updateRes = await strapi.execute(
       '71.6confirmHaluka',
-      { id: halukaId, confirmed: true },
+      { id: halukaId, confirmed: true, senderconf: true },
       context.jwt,
       context.fetch
     );
     if (updateRes?.errors) {
       throw new Error(`Failed to confirm: ${JSON.stringify(updateRes.errors)}`);
     }
-    // This confirmation completes the pair iff the sender already confirmed
-    // AND the receiver hadn't already confirmed (so the sale fires exactly once).
-    let saleId: string | null = null;
-    const nowComplete = haluka.senderconf === true && haluka.confirmed !== true;
+    // Fires exactly once: only the confirmation that settles the transfer records it.
     if (nowComplete && isSiteShare && reciveProjectId) {
       saleId = await recordSiteShareSale(strapi, context, {
         reciveProjectId,
@@ -126,8 +153,6 @@ const confirmSheirutHalukaHandler: ActionExecutionHandler = async (params, conte
         amount,
         halukaId: String(halukaId),
       });
-    } else if (nowComplete && !isSiteShare && sheirutId) {
-      saleId = (await recordWishPaymentSale(strapi, context, { sheirutId, halukaId: String(halukaId), senderId, receiverId, amount })).saleId;
     }
     return { confirmed: true, role: 'receiver', halukaId, complete: nowComplete, saleId };
   }

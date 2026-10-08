@@ -1,4 +1,5 @@
 import type { ActionConfig } from '../types.js';
+import { roundHours, workValue } from '$lib/timers/precision.js';
 import { allSigned, roundOf, standingOrder, voterId } from '$lib/finiapruval/rounds.js';
 import {
     pickRateRow,
@@ -83,7 +84,9 @@ export const closeFiniapruvalConfig: ActionConfig = {
 
         // All voted yes — close based on type
         const isTimerSave: boolean = fa.isTimerSave === true;
-        const noofhours: number = fa.noofhours ?? 0;
+        // Whole minutes, priced to the agora ($lib/timers/precision.ts); an approval
+        // filed before that rule still carries its seconds.
+        const noofhours: number = roundHours(fa.noofhours ?? 0);
 
         // The rate these hours were *worked* at, in the order the stamp was
         // copied: the approval carries it, the timer carries it, and only a
@@ -110,11 +113,11 @@ export const closeFiniapruvalConfig: ActionConfig = {
                 : null;
 
             if (existingFm && targetRow) {
-                const newHours = (existingFm.attributes.noofhours ?? 0) + noofhours;
+                const newHours = roundHours((existingFm.attributes.noofhours ?? 0) + noofhours);
                 await strapi.execute('114updateFinnishedMissionHours', {
                     id: existingFm.id,
                     noofhours: newHours,
-                    total: newHours * rowRate(targetRow, perhour)
+                    total: workValue(newHours, rowRate(targetRow, perhour))
                 }, context.jwt, context.fetch);
             } else {
                 await strapi.execute('113createFinnishedMissionForTimerSave', {
@@ -126,14 +129,14 @@ export const closeFiniapruvalConfig: ActionConfig = {
                     publishedAt: now.toISOString(),
                     users_permissions_user: fa.users_permissions_user?.data?.id,
                     perhour,
-                    total: noofhours * perhour,
+                    total: workValue(noofhours, perhour),
                     why: fa.why ?? 'timer save'
                 }, context.jwt, context.fetch);
             }
 
             await strapi.execute('115updateMissionTotalHoursSaved', {
                 id: mba?.id,
-                totalHoursSaved: (mbaa?.totalHoursSaved ?? 0) + noofhours
+                totalHoursSaved: roundHours((mbaa?.totalHoursSaved ?? 0) + noofhours)
             }, context.jwt, context.fetch);
 
         } else {
@@ -159,7 +162,7 @@ export const closeFiniapruvalConfig: ActionConfig = {
                 noofhours,
                 mesimabetahalich: mba?.id,
                 perhour,
-                total: noofhours * perhour,
+                total: workValue(noofhours, perhour),
                 project: fa.project?.data?.id,
                 mission: mbaa?.mission?.data?.id,
                 users_permissions_user: fa.users_permissions_user?.data?.id,
@@ -222,7 +225,7 @@ export const closeFiniapruvalConfig: ActionConfig = {
     },
 
     updateStrategy: {
-        type: 'partialUpdate',
-        config: { dataKeys: ['finiapruvals', 'missions'], updateFunction: 'refreshFiniapruvals' }
+        type: 'refetchScope', // Re-read the slice: the raw result is not in the lev store's shape (REALTIME_TRACKING B1).
+        config: { dataKeys: ['fiapp', 'mtaha'] }
     }
 };

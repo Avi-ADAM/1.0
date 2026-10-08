@@ -1,4 +1,5 @@
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import { confirmPartReceived, loadParts } from '$lib/server/deal/partsReceived.js';
 
 /**
  * The two Sheirut flags a deal's status is derived from (`dealsService.ts`):
@@ -35,6 +36,18 @@ const updateSheirutHandler: ActionExecutionHandler = async (params, context, { s
   }
 
   if (moneyTransfered === true) {
+    // A wish deal is paid when every provider has their part (QA C-19): "the money
+    // arrived" is the caller's own confirmation, and the deal flag follows the last one.
+    const run = (qid: string, vars: Record<string, unknown>) => strapi.execute(qid, vars, context.jwt, context.fetch);
+    if (await loadParts(run, String(id))) {
+      if (iGotIt === true) throw new Error('updateSheirut: confirm receipt and payment separately on a wish deal');
+      const { state, becamePaid } = await confirmPartReceived(run, String(id), userId);
+      return {
+        data: { id: String(id), partReceived: true, paid: state.allConfirmed, becamePaid, pending: state.pending },
+        updateStrategy: { type: 'none' as const }
+      };
+    }
+
     const res = await strapi.execute('2cGetMoneyReceivers', { id: String(id) }, context.jwt, context.fetch);
     const receivers: { id: string }[] = res?.data?.sheirut?.data?.attributes?.iCanGetMonay?.data ?? [];
     if (!receivers.some((r) => String(r.id) === userId)) {

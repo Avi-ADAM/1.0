@@ -38,7 +38,7 @@ const handler: ActionExecutionHandler = async (_params, context, { strapi }) => 
     const ha = haluka?.attributes ?? null;
     const transferSenderconf = !!ha?.senderconf;
     const transferConfirmed = !!ha?.confirmed;
-    if (haluka?.id && transferSenderconf && transferConfirmed) continue; // settled
+    if (haluka?.id && transferConfirmed) continue; // settled — the receiver's word settles it
 
     const sheirut = a.sheirut?.data ?? null;
     const volunteers = (sheirut?.attributes?.iCanGetMonay?.data ?? []).map((u: any) => ({

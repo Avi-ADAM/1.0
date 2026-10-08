@@ -84,11 +84,12 @@ export const findUserProjectsTool = createTool({
       const isServerRequest = !globalContext.isInternalBot;
       const ctxUserId = globalContext.userId;
 
-      // External (API-key) requests run against the service token, so an
-      // arbitrary `userId` here would happily list somebody else's rikmot.
-      // Such a caller is only ever allowed to read the identity its key was
-      // verified as; the internal bot, already JWT-authenticated, may pass one.
-      if (!globalContext.isInternalBot && userId && String(userId) !== String(ctxUserId)) {
+      // A caller only ever reads the identity it was verified as. External
+      // (API-key) requests run against the service token, so a foreign
+      // `userId` would list somebody else's rikmot outright; on the internal
+      // bot the value comes from the LLM, and a prompt injection in anything
+      // the model read could name another member. Same rule on both paths.
+      if (userId && String(userId) !== String(ctxUserId)) {
         return {
           projects: [],
           success: false,
@@ -98,7 +99,7 @@ export const findUserProjectsTool = createTool({
 
       // Omitting userId is the normal case for an external client: it has no
       // way to know its own Strapi id.
-      const effectiveUserId = globalContext.isInternalBot ? (userId ?? ctxUserId) : ctxUserId;
+      const effectiveUserId = ctxUserId;
 
       if (!effectiveUserId || !fetchInstance) {
         return {
@@ -114,7 +115,7 @@ export const findUserProjectsTool = createTool({
       let matching = globalContext.isInternalBot ? projects : filterToKeyProjects(projects, globalContext.keyProjects);
       if (query && query.trim()) {
         const searchTerm = query.toLowerCase().trim();
-        matching = projects.filter((project) => project.name.toLowerCase().includes(searchTerm));
+        matching = matching.filter((project) => project.name.toLowerCase().includes(searchTerm));
       }
       matching = sortNewestFirst(matching);
 

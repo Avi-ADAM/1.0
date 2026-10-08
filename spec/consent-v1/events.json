@@ -1,0 +1,1695 @@
+{
+  "format": "1lev1-consent-vectors",
+  "version": 1,
+  "file": "events",
+  "spec": "docs/SPEC_CONSENT_FORMAT.md",
+  "generator": "src/lib/consent/vectors/build.ts (npm run vectors:consent)",
+  "keyDerivation": "seed = SHA-256(UTF-8(\"1lev1-consent-v1/\" + label)); Ed25519 labels \"ed25519/<name>\", P-256 \"p256/<name>\", nonces \"nonce/<...>\" (first 16 bytes)",
+  "about": "Projection + state root (SPEC_CONSENT_FORMAT §5–§8). Verify every event (§3), fold them in any input order, and reproduce `expect`. `steps[i].rootAfter` is the root after folding applied[0..i] — use it to find the first divergence.",
+  "stateRootVersion": 2,
+  "scenarios": [
+    {
+      "name": "rikma-lifecycle",
+      "description": "Three members, one of every category-A entity, ties, a merge, a branch, dedupe, redaction, money as strings, an action with no reducer, and a final event that commits to its parent and resulting state roots.",
+      "projectId": "p-1",
+      "labels": {
+        "w_BM3hWtYMOXEzupQWPZ0EXqeq4tvPIxP84qEaEh1EU": "s01",
+        "fB3xVGDhw1GxkRY-z1Kk78n78Bx6mtKD2VVHVJWndGo": "s02",
+        "0NEpXW0AnoUNUWFF3rrT2NdeMeFoN3__SeCiXhudUqY": "s03",
+        "1aiVvx_2_rpe36hsaueAL2pA1jgUgWO29UMMO1AJKFI": "s04",
+        "13qLLEjIAJraYoNabh0oTaHnq2e_XjouNqpKj_T5l6s": "s05",
+        "_mn8-FWryWXpVpzOFbW67iuTXtoAnf1dWq1NScYicAk": "s06",
+        "N0hES3s2DOxyELjK1AhKNGzoR4CT9QhBwYKI51cjAxU": "s07",
+        "0N7GqTlsmkoyyqWj48Tv4BTDDXjCJk2J1T6wLvbLPg0": "s08",
+        "exKobANf0me_A3nFGuBodgIaXjrOCZpXxvIFA8OkDdI": "s09",
+        "aoCkaPm_dXJlqZ9Fkkh_bcGOdvcmVRZ_gM1EUJsSiZ4": "s10",
+        "mw59o5dFRk66QSGjht0jV4MEu8GHIRHvL5BeolwH8yo": "s11",
+        "BCqnxBhlLxuNr-Q90pZAzUVSrnkv71yVkcMYopluiS0": "s12",
+        "fUVjNn5rMZ7zJ-A4yeXYLFmoSVz0WtWlTu65l5RTOsU": "s13",
+        "wP-mH-ED_WbQTObSvAcyBh1sYZTE_rvpYQZXq4tCbeo": "s14",
+        "5hNAyZqbsVLmcFiFgSXiASffwBkwagTuxIfMStPyGeY": "s15",
+        "_qSpPEi6gNksxmBgQGsa-il8hu2JpHhQVUww2if2REg": "s16",
+        "uMxvU88B8HTvNvUFPy_MEOlkMETeu_GgraWuDt6XpmE": "s17",
+        "WE0XWOtCzQiZ2TckIkI0TxYGJFdvf6jvLYAHrNezkzQ": "s18",
+        "DIlb3bD1OB7ESs_Pv1qJZnzod0NpETNLU50UmenaTZI": "s19",
+        "SMxfcS-d3F8_5dy4f2Lvwdt5mDJGi7xyU6M4ekM59Pw": "s20",
+        "Zs7oZj8jFvO9NkLq0KBrmH0S9hJLAvT9d6pBrBQvzfo": "s21",
+        "dQGd8a-VZZIiGR_IxCJ0fu7DXGjhMTNsTiRsy51i2bA": "s22",
+        "OkKQpolPR2oA-dHn8ZFoQlUd-OBMXtvSdLC564qBvQI": "s23",
+        "WkGs03XuH5hlhANxXWhX94qysK8jN-NCuH-eTnhBYLE": "s24",
+        "Z3q1w3BVeQ_nXAPbKjAuE0G4CCq_XS_wXvCtUcS5a2w": "s25",
+        "J4e9ZPU-t-V-dCM3vHH6Lf9Yh5kDLQ8c4qR_j82I7dU": "s26",
+        "8VVPMyFtIm-jKMB4OkQU7rB4spm6oK9Dd1vSjWGmSVM": "s27",
+        "HmKVR1DSulR6LPshT2--ehaFi7ZB8tiKWDsrRPZt2vk": "s28",
+        "714N_lDXpO62kl3I6RMfas34J70PdOGim9LZbJZqyD8": "s29",
+        "fATUiNw5zzNkhb7lourd5odvejgaDFP5-dga7jh07rA": "s30",
+        "tbfz1Y7pWuHJoAZet6oeEXvYjHGPmr5rGeXMfY0Y7WA": "s31",
+        "3ue9rb0uJtK8zpQ_Iem6Ma0Vp0hQDuHMKpenOJsqbGg": "s32",
+        "d8pqRXthskmQhY3_ODudsOkHx5EawkLxgjxvBzCPnoU": "s33",
+        "uyrzZtIqFvKKNrem_4z6bNeMUnz2JmCSkZ80OVi82Mo": "s34"
+      },
+      "events": [
+        {
+          "v": 1,
+          "actor": "u-alice",
+          "device": "MCowBQYDK2VwAyEAw2aFyT5XfLsPDVxfoEQOCSVgl1_YS5aoiK8UGIh1RTY",
+          "action": "project.create",
+          "subject": {
+            "type": "project",
+            "id": "p-1"
+          },
+          "predicate": {
+            "settings": {
+              "name": "רקמת דוגמה",
+              "restime": 172800000
+            }
+          },
+          "parents": [],
+          "ts": 1760000000000,
+          "nonce": "XMK6B-fStuJgbsvL31dKkw",
+          "sig": "n9hWfP_oe581NpkQ2iOxYHVNSVdm3Hq6EyICW0Xbnz9RNm8484o9iPmBlmfiOAz74tFA0hH6Cb8Bl9H1murjCg",
+          "id": "w_BM3hWtYMOXEzupQWPZ0EXqeq4tvPIxP84qEaEh1EU"
+        },
+        {
+          "v": 1,
+          "actor": "u-bob",
+          "device": "MCowBQYDK2VwAyEA6RjNbe3z0BZms5MszZc34tt-y7ERI4-oB0h6aXTRHy8",
+          "action": "project.join",
+          "subject": {
+            "type": "project",
+            "id": "p-1"
+          },
+          "parents": [
+            "w_BM3hWtYMOXEzupQWPZ0EXqeq4tvPIxP84qEaEh1EU"
+          ],
+          "ts": 1760000001000,
+          "nonce": "jPBctQH1ZlnI1d93WCXAaA",
+          "sig": "6Z7KKptuzljO0kwDG4LfB0rmmQO8WJbywYfU7s-4BJ3KxZ5bZEOoTzq8ugZg5AYh13o-dFSTjN5Y4dRLcx_4Bg",
+          "id": "fB3xVGDhw1GxkRY-z1Kk78n78Bx6mtKD2VVHVJWndGo"
+        },
+        {
+          "v": 1,
+          "actor": "u-carol",
+          "device": "MCowBQYDK2VwAyEAsstdtAKx6uNVNkciaL63LhA505Nlz4IcwVXgFN4GSsI",
+          "action": "project.join",
+          "subject": {
+            "type": "project",
+            "id": "p-1"
+          },
+          "parents": [
+            "w_BM3hWtYMOXEzupQWPZ0EXqeq4tvPIxP84qEaEh1EU"
+          ],
+          "ts": 1760000001000,
+          "nonce": "uQVCErhYwFWbgdq94TuoTg",
+          "sig": "ff9TaCcGcShoFv3q60p3mrDZJlgs7XD0DD41URfO2p9N29nK6qXJDxwl6rIQ6rtiNoTX0qPD4WOYYlWtH5nMAA",
+          "id": "0NEpXW0AnoUNUWFF3rrT2NdeMeFoN3__SeCiXhudUqY"
+        },
+        {
+          "v": 1,
+          "actor": "u-alice",
+          "device": "MCowBQYDK2VwAyEAw2aFyT5XfLsPDVxfoEQOCSVgl1_YS5aoiK8UGIh1RTY",
+          "action": "mission.create",
+          "subject": {
+            "type": "mission",
+            "id": "m-1"
+          },
+          "predicate": {
+            "name": "עיצוב לוגו 🎨",
+            "hours": 12.5,
+            "perhour": 80,
+            "stageIds": [
+              "pendm-7"
+            ]
+          },
+          "parents": [
+            "fB3xVGDhw1GxkRY-z1Kk78n78Bx6mtKD2VVHVJWndGo",
+            "0NEpXW0AnoUNUWFF3rrT2NdeMeFoN3__SeCiXhudUqY"
+          ],
+          "ts": 1760000010000,
+          "nonce": "IluBnGHyOsUjONrgd-S1Dg",
+          "sig": "fjI65Eghj1JiAqiHkVBs5zx8B2uIRckBcImFhaoOonRlO1HvtXvq82hIA_kCLLHYm3MDPizjtqOEzZ-Axc7fCw",
+          "id": "1aiVvx_2_rpe36hsaueAL2pA1jgUgWO29UMMO1AJKFI"
+        },
+        {
+          "v": 1,
+          "actor": "u-alice",
+          "device": "MCowBQYDK2VwAyEAw2aFyT5XfLsPDVxfoEQOCSVgl1_YS5aoiK8UGIh1RTY",
+          "action": "pendm.vote",
+          "subject": {
+            "type": "pendm",
+            "id": "pendm-7"
+          },
+          "predicate": {
+            "what": true,
+            "order": 1
+          },
+          "parents": [
+            "1aiVvx_2_rpe36hsaueAL2pA1jgUgWO29UMMO1AJKFI"
+          ],
+          "ts": 1760000020000,
+          "nonce": "E3_WlouwyN4ovrIyH6O_Ww",
+          "sig": "SmExSmvObNbnfOuIpMyC3VWq0r3SHK6zHoO6KoYBMSskLsWxtDkS-KWHfMWeB-_p2nmc8Muc5tn86q0OuzVoDQ",
+          "id": "13qLLEjIAJraYoNabh0oTaHnq2e_XjouNqpKj_T5l6s"
+        },
+        {
+          "v": 1,
+          "actor": "u-bob",
+          "device": "MCowBQYDK2VwAyEA6RjNbe3z0BZms5MszZc34tt-y7ERI4-oB0h6aXTRHy8",
+          "action": "pendm.vote",
+          "subject": {
+            "type": "pendm",
+            "id": "pendm-7"
+          },
+          "predicate": {
+            "what": true,
+            "order": 1
+          },
+          "parents": [
+            "13qLLEjIAJraYoNabh0oTaHnq2e_XjouNqpKj_T5l6s"
+          ],
+          "ts": 1760000021000,
+          "nonce": "GrM23vG6kS9VzAtiYcrXhQ",
+          "sig": "-IXYIzaekOB-9GqTO7wvcZW9WwqkhmH0EuwmpJv-lXZn0baVbMfWFyrASkwVGtlpX2RgEEl5qiEMnQA4NI46BQ",
+          "id": "_mn8-FWryWXpVpzOFbW67iuTXtoAnf1dWq1NScYicAk"
+        },
+        {
+          "v": 1,
+          "actor": "u-carol",
+          "device": "MCowBQYDK2VwAyEAsstdtAKx6uNVNkciaL63LhA505Nlz4IcwVXgFN4GSsI",
+          "action": "pendm.vote",
+          "subject": {
+            "type": "pendm",
+            "id": "pendm-7"
+          },
+          "predicate": {
+            "what": "false",
+            "order": 1
+          },
+          "parents": [
+            "_mn8-FWryWXpVpzOFbW67iuTXtoAnf1dWq1NScYicAk"
+          ],
+          "ts": 1760000022000,
+          "nonce": "iT9xqZg7pcrQJBnRH5JVyg",
+          "sig": "eX6UgZvqaz7HMZ1IToQ_bgu8dOTlkQ7Ab2OBM5hoRHreLoPPqJAQYKCw13pRCFRPnnIn2HYV6m2qt6Z0whwoDg",
+          "id": "N0hES3s2DOxyELjK1AhKNGzoR4CT9QhBwYKI51cjAxU"
+        },
+        {
+          "v": 1,
+          "actor": "u-bob",
+          "device": "MCowBQYDK2VwAyEA6RjNbe3z0BZms5MszZc34tt-y7ERI4-oB0h6aXTRHy8",
+          "action": "time.tick",
+          "subject": {
+            "type": "mission",
+            "id": "m-1"
+          },
+          "predicate": {
+            "op": "start"
+          },
+          "parents": [
+            "N0hES3s2DOxyELjK1AhKNGzoR4CT9QhBwYKI51cjAxU"
+          ],
+          "ts": 1760000030000,
+          "nonce": "HdydRxlA0mGUdgCoUG4O3g",
+          "sig": "ijN-U22OujMURRq9L4OXuLWwa5WuxvyVXumUn-NzV40UEyUluTB2GSuDrF3G1ke6L3WyzTZdmh7M4pgwBQ8NCA",
+          "id": "0N7GqTlsmkoyyqWj48Tv4BTDDXjCJk2J1T6wLvbLPg0"
+        },
+        {
+          "v": 1,
+          "actor": "u-bob",
+          "device": "MCowBQYDK2VwAyEA6RjNbe3z0BZms5MszZc34tt-y7ERI4-oB0h6aXTRHy8",
+          "action": "time.tick",
+          "subject": {
+            "type": "mission",
+            "id": "m-1"
+          },
+          "predicate": {
+            "op": "stop",
+            "sessionMs": 5400000
+          },
+          "parents": [
+            "0N7GqTlsmkoyyqWj48Tv4BTDDXjCJk2J1T6wLvbLPg0"
+          ],
+          "ts": 1760005430000,
+          "nonce": "4Ij3qnAP1F5Sx0N8ejXW6Q",
+          "sig": "MJlK-efEQ8xnIE7i45Ul7JCZIJtakeszsRrYs8tL08WuTgYH8SdJvytWwrt8O9bYraYhCvKSqcH5UJLpm6xwDw",
+          "id": "exKobANf0me_A3nFGuBodgIaXjrOCZpXxvIFA8OkDdI"
+        },
+        {
+          "v": 1,
+          "actor": "u-bob",
+          "device": "MCowBQYDK2VwAyEA6RjNbe3z0BZms5MszZc34tt-y7ERI4-oB0h6aXTRHy8",
+          "action": "mission.complete",
+          "subject": {
+            "type": "mission",
+            "id": "m-1"
+          },
+          "predicate": {
+            "hoursDone": 12.5,
+            "why": "נמסר ללקוחה"
+          },
+          "parents": [
+            "exKobANf0me_A3nFGuBodgIaXjrOCZpXxvIFA8OkDdI"
+          ],
+          "ts": 1760006000000,
+          "nonce": "FhzKPoSvOMUxYWwkZhDX1g",
+          "sig": "2eSdZ1X9Ma7LftX8ixcYn2JoWFqjLq5UK75NV3bJqcFIBe6qwqGxcUC5F9iLznrPZibxUiA_3c_6ZQRKrnSnAg",
+          "id": "aoCkaPm_dXJlqZ9Fkkh_bcGOdvcmVRZ_gM1EUJsSiZ4"
+        },
+        {
+          "v": 1,
+          "actor": "u-bob",
+          "device": "MCowBQYDK2VwAyEA6RjNbe3z0BZms5MszZc34tt-y7ERI4-oB0h6aXTRHy8",
+          "action": "payload.redact",
+          "subject": {
+            "type": "mission",
+            "id": "m-1"
+          },
+          "predicate": {},
+          "parents": [
+            "aoCkaPm_dXJlqZ9Fkkh_bcGOdvcmVRZ_gM1EUJsSiZ4"
+          ],
+          "ts": 1760006100000,
+          "nonce": "lw5LNQpxiUkXRINTiKE-Cw",
+          "sig": "Ep3tFQdNTqhIvJizIGy6DvxE2sKyNuSlIMBXi5iH6werMfCvomC8fLBC6_HHR5lAmh5nvmQ5FX9BJ7C7d9qLBA",
+          "id": "mw59o5dFRk66QSGjht0jV4MEu8GHIRHvL5BeolwH8yo"
+        },
+        {
+          "v": 1,
+          "actor": "u-alice",
+          "device": "MCowBQYDK2VwAyEAw2aFyT5XfLsPDVxfoEQOCSVgl1_YS5aoiK8UGIh1RTY",
+          "action": "mission.approve",
+          "subject": {
+            "type": "mission",
+            "id": "m-1"
+          },
+          "predicate": {
+            "payee": "u-bob",
+            "amount": {
+              "amount": "100000",
+              "code": "ILS"
+            }
+          },
+          "parents": [
+            "mw59o5dFRk66QSGjht0jV4MEu8GHIRHvL5BeolwH8yo"
+          ],
+          "ts": 1760007000000,
+          "nonce": "sNSP-vs2B9f-y723tAD1AA",
+          "sig": "ECdQsuZ-hFNXQmb-5VNXS3ooeVRoL8fwqKPzwd8nTOr4yvSC1LbAclVcRP80OmY_ZMwZqFj0ZRvPDdyGVnqHCw",
+          "id": "BCqnxBhlLxuNr-Q90pZAzUVSrnkv71yVkcMYopluiS0"
+        },
+        {
+          "v": 1,
+          "actor": "u-alice",
+          "device": "MCowBQYDK2VwAyEAw2aFyT5XfLsPDVxfoEQOCSVgl1_YS5aoiK8UGIh1RTY",
+          "action": "forum.create",
+          "subject": {
+            "type": "forum",
+            "id": "f-1"
+          },
+          "predicate": {
+            "kind": "mission"
+          },
+          "parents": [
+            "BCqnxBhlLxuNr-Q90pZAzUVSrnkv71yVkcMYopluiS0"
+          ],
+          "ts": 1760007100000,
+          "nonce": "G36KJV5-TdvcajNjvbIoKA",
+          "sig": "mOECQrjf8BI31R6SWunCJvsJpjm4-C6tfdafRj63PA4SriSjsfXUqST1lRUjgV7cZlEjSdJRM5cAffstFyoYAg",
+          "id": "fUVjNn5rMZ7zJ-A4yeXYLFmoSVz0WtWlTu65l5RTOsU"
+        },
+        {
+          "v": 1,
+          "actor": "u-bob",
+          "device": "MCowBQYDK2VwAyEA6RjNbe3z0BZms5MszZc34tt-y7ERI4-oB0h6aXTRHy8",
+          "action": "message.post",
+          "subject": {
+            "type": "message",
+            "id": "msg-2"
+          },
+          "predicate": {
+            "forumId": "f-1",
+            "body": "שלום 👋 café"
+          },
+          "parents": [
+            "fUVjNn5rMZ7zJ-A4yeXYLFmoSVz0WtWlTu65l5RTOsU"
+          ],
+          "ts": 1760007200000,
+          "nonce": "qBdwZYmEAuUHAtneY1PafQ",
+          "sig": "ErWaC-aArRCFfbPrGebhBPmBzmjx1J7YFSOI8KNaaCP9hj2Z-OikzwwUTutwt_qzw5CTXRRQgj2s6KmD_9tuBQ",
+          "id": "wP-mH-ED_WbQTObSvAcyBh1sYZTE_rvpYQZXq4tCbeo"
+        },
+        {
+          "v": 1,
+          "actor": "u-carol",
+          "device": "MCowBQYDK2VwAyEAsstdtAKx6uNVNkciaL63LhA505Nlz4IcwVXgFN4GSsI",
+          "action": "message.post",
+          "subject": {
+            "type": "message",
+            "id": "msg-1"
+          },
+          "predicate": {
+            "forumId": "f-1",
+            "body": "תודה!"
+          },
+          "parents": [
+            "fUVjNn5rMZ7zJ-A4yeXYLFmoSVz0WtWlTu65l5RTOsU"
+          ],
+          "ts": 1760007200000,
+          "nonce": "GRK9DnZ0f1lRG-Ecgb3Jfw",
+          "sig": "ZP-0tZZ70cddxfVWV3g99ycPiwJyrRu7slM4JHH6pgX9uYNMHao11yE2gaP2720gOXnojXhCc1ZI7Pk3Cox2Dw",
+          "id": "5hNAyZqbsVLmcFiFgSXiASffwBkwagTuxIfMStPyGeY"
+        },
+        {
+          "v": 1,
+          "actor": "u-carol",
+          "device": "MCowBQYDK2VwAyEAsstdtAKx6uNVNkciaL63LhA505Nlz4IcwVXgFN4GSsI",
+          "action": "payload.redact",
+          "subject": {
+            "type": "message",
+            "id": "msg-1"
+          },
+          "predicate": {},
+          "parents": [
+            "wP-mH-ED_WbQTObSvAcyBh1sYZTE_rvpYQZXq4tCbeo",
+            "5hNAyZqbsVLmcFiFgSXiASffwBkwagTuxIfMStPyGeY"
+          ],
+          "ts": 1760007300000,
+          "nonce": "onWTpOKYDZUG4DBrKKgHdQ",
+          "sig": "Zt_4WzpuY9wTKH84iLKw4Z2PlHvonH25vrx_xLG8V4KzkJBbfFN5i8aFeFUkxnlLwyl0joPzFa7HQM_ochNDBQ",
+          "id": "_qSpPEi6gNksxmBgQGsa-il8hu2JpHhQVUww2if2REg"
+        },
+        {
+          "v": 1,
+          "actor": "u-alice",
+          "device": "MCowBQYDK2VwAyEAw2aFyT5XfLsPDVxfoEQOCSVgl1_YS5aoiK8UGIh1RTY",
+          "action": "sale.record",
+          "subject": {
+            "type": "sale",
+            "id": "s-1"
+          },
+          "predicate": {
+            "holder": "u-bob",
+            "holderStatus": "open",
+            "decisionId": "d-1",
+            "total": 350,
+            "quantity": 1,
+            "kindOf": "logo",
+            "saleDate": "2026-10-01"
+          },
+          "parents": [
+            "_qSpPEi6gNksxmBgQGsa-il8hu2JpHhQVUww2if2REg"
+          ],
+          "ts": 1760008000000,
+          "nonce": "btpeuGdJ1SrqWqVROwnksQ",
+          "sig": "TyJgNvRdr_iv9zs1_HeKkBVZiXZXiI_jn7gI4OSnLsNDRSFCg5Pb8D3GkCfBSyv8dfMATzp-iHvUOBpjmO1kDg",
+          "id": "uMxvU88B8HTvNvUFPy_MEOlkMETeu_GgraWuDt6XpmE"
+        },
+        {
+          "v": 1,
+          "actor": "u-alice",
+          "device": "MCowBQYDK2VwAyEAw2aFyT5XfLsPDVxfoEQOCSVgl1_YS5aoiK8UGIh1RTY",
+          "action": "decision.create",
+          "subject": {
+            "type": "decision",
+            "id": "d-1"
+          },
+          "predicate": {
+            "kind": "saleClaim",
+            "ref": "s-1"
+          },
+          "parents": [
+            "uMxvU88B8HTvNvUFPy_MEOlkMETeu_GgraWuDt6XpmE"
+          ],
+          "ts": 1760008000001,
+          "nonce": "WOkFknmK0mU6jrZ7cspFHQ",
+          "sig": "0tBFxpyK8OAgPx4g3QqqsiCn24650-wfimyupxWHHj7Ux0fSkfqw0bxw-fWyvHwn2YvL4MAu9s9MoLTenOkOBg",
+          "id": "WE0XWOtCzQiZ2TckIkI0TxYGJFdvf6jvLYAHrNezkzQ"
+        },
+        {
+          "v": 1,
+          "actor": "u-bob",
+          "device": "MCowBQYDK2VwAyEA6RjNbe3z0BZms5MszZc34tt-y7ERI4-oB0h6aXTRHy8",
+          "action": "proposal.counter",
+          "subject": {
+            "type": "decision",
+            "id": "d-1"
+          },
+          "predicate": {
+            "order": 2,
+            "total": 300
+          },
+          "parents": [
+            "WE0XWOtCzQiZ2TckIkI0TxYGJFdvf6jvLYAHrNezkzQ"
+          ],
+          "ts": 1760008100000,
+          "nonce": "AaShP9vp5Z4yiXapr4_BAg",
+          "sig": "qrLh85pRq5wulidNQG8PIhuNc0q81S8ywzVIsicNoSYkDcFleQqK4Au9aHe2mo_iYpaq4qats0b6FvSXgg47Dg",
+          "id": "DIlb3bD1OB7ESs_Pv1qJZnzod0NpETNLU50UmenaTZI"
+        },
+        {
+          "v": 1,
+          "actor": "u-alice",
+          "device": "MCowBQYDK2VwAyEAw2aFyT5XfLsPDVxfoEQOCSVgl1_YS5aoiK8UGIh1RTY",
+          "action": "decision.vote",
+          "subject": {
+            "type": "decision",
+            "id": "d-1"
+          },
+          "predicate": {
+            "what": true,
+            "order": 2
+          },
+          "parents": [
+            "DIlb3bD1OB7ESs_Pv1qJZnzod0NpETNLU50UmenaTZI"
+          ],
+          "ts": 1760008200000,
+          "nonce": "4xScKGiUJh13NrDQdrgv7w",
+          "sig": "oDJVCwScqxLEJqJHRsSPXNG6KtnHUs8tVpJ9wh7RwS_0ZRlyniuymfxmGU1bNXA7f71eOOi2CG1eXc5zVk_fBw",
+          "id": "SMxfcS-d3F8_5dy4f2Lvwdt5mDJGi7xyU6M4ekM59Pw"
+        },
+        {
+          "v": 1,
+          "actor": "u-alice",
+          "device": "MCowBQYDK2VwAyEAw2aFyT5XfLsPDVxfoEQOCSVgl1_YS5aoiK8UGIh1RTY",
+          "action": "tosplit.create",
+          "subject": {
+            "type": "tosplit",
+            "id": "ts-1"
+          },
+          "predicate": {
+            "total": {
+              "amount": "35000",
+              "code": "ILS"
+            }
+          },
+          "parents": [
+            "SMxfcS-d3F8_5dy4f2Lvwdt5mDJGi7xyU6M4ekM59Pw"
+          ],
+          "ts": 1760009000000,
+          "nonce": "jPtAMmzHMJ641KHDKGzxpw",
+          "sig": "fVwkIq8SxFZOM0-sGM9LFSph2e_gwsndGg2FhQI842FCtWkecoUyWq-jKXROufxb2QNFLM4gcBDwwC3-_HQXAw",
+          "id": "Zs7oZj8jFvO9NkLq0KBrmH0S9hJLAvT9d6pBrBQvzfo"
+        },
+        {
+          "v": 1,
+          "actor": "u-alice",
+          "device": "MCowBQYDK2VwAyEAw2aFyT5XfLsPDVxfoEQOCSVgl1_YS5aoiK8UGIh1RTY",
+          "action": "tosplit.vote",
+          "subject": {
+            "type": "tosplit",
+            "id": "ts-1"
+          },
+          "predicate": {
+            "what": false
+          },
+          "parents": [
+            "Zs7oZj8jFvO9NkLq0KBrmH0S9hJLAvT9d6pBrBQvzfo"
+          ],
+          "ts": 1760009100000,
+          "nonce": "CtsRPTgEjVGfL49fPDRteQ",
+          "sig": "v6-xh73acQVYIJS-OO5qnBv07fDm-8Jdf285nmYTEE9IMp5PyFlNz2eMsDgMfniiZbtzAMWDkJXFDoAQDOW_BQ",
+          "id": "dQGd8a-VZZIiGR_IxCJ0fu7DXGjhMTNsTiRsy51i2bA"
+        },
+        {
+          "v": 1,
+          "actor": "u-alice",
+          "device": "MCowBQYDK2VwAyEAw2aFyT5XfLsPDVxfoEQOCSVgl1_YS5aoiK8UGIh1RTY",
+          "action": "tosplit.vote",
+          "subject": {
+            "type": "tosplit",
+            "id": "ts-1"
+          },
+          "predicate": {
+            "what": true
+          },
+          "parents": [
+            "dQGd8a-VZZIiGR_IxCJ0fu7DXGjhMTNsTiRsy51i2bA"
+          ],
+          "ts": 1760009200000,
+          "nonce": "EHspdD9z8cV1N8kwJBjYsg",
+          "sig": "6Iz5wH7xOPwxRWg0sujEKgxhs67xs1cFYIFAyZ1kwIAzq66ChJ09h4KRp-akELzXk3ju34IlgvXxNE656i3DBg",
+          "id": "OkKQpolPR2oA-dHn8ZFoQlUd-OBMXtvSdLC564qBvQI"
+        },
+        {
+          "v": 1,
+          "actor": "u-bob",
+          "device": "MCowBQYDK2VwAyEA6RjNbe3z0BZms5MszZc34tt-y7ERI4-oB0h6aXTRHy8",
+          "action": "tosplit.vote",
+          "subject": {
+            "type": "tosplit",
+            "id": "ts-1"
+          },
+          "predicate": {
+            "what": true
+          },
+          "parents": [
+            "OkKQpolPR2oA-dHn8ZFoQlUd-OBMXtvSdLC564qBvQI"
+          ],
+          "ts": 1760009300000,
+          "nonce": "gYu8FWowFBOpq73BbJJqkA",
+          "sig": "rk0tZA9RqrkAsWDZMfjsAfdcJk-oU9KxgvnOrOpN50RHF7n62TmUbsRivq4rXHDzCahq2ZEQp8bJI6A-sT9aBQ",
+          "id": "WkGs03XuH5hlhANxXWhX94qysK8jN-NCuH-eTnhBYLE"
+        },
+        {
+          "v": 1,
+          "actor": "u-carol",
+          "device": "MCowBQYDK2VwAyEAsstdtAKx6uNVNkciaL63LhA505Nlz4IcwVXgFN4GSsI",
+          "action": "tosplit.vote",
+          "subject": {
+            "type": "tosplit",
+            "id": "ts-1"
+          },
+          "predicate": {
+            "what": 1
+          },
+          "parents": [
+            "WkGs03XuH5hlhANxXWhX94qysK8jN-NCuH-eTnhBYLE"
+          ],
+          "ts": 1760009400000,
+          "nonce": "RGgzayqdaT3jiUABZzqzXQ",
+          "sig": "HcPNMfFgVy79rT0J2Krugpd2uPdfBIN-rGfYOIuzII0nHTrCyFJKklpmJ7V3KEgD3euyYhTdd2M8fhAhjPXdCQ",
+          "id": "Z3q1w3BVeQ_nXAPbKjAuE0G4CCq_XS_wXvCtUcS5a2w"
+        },
+        {
+          "v": 1,
+          "actor": "u-alice",
+          "device": "MCowBQYDK2VwAyEAw2aFyT5XfLsPDVxfoEQOCSVgl1_YS5aoiK8UGIh1RTY",
+          "action": "haluka.create",
+          "subject": {
+            "type": "haluka",
+            "id": "h-1"
+          },
+          "predicate": {
+            "from": "u-alice",
+            "to": "u-bob",
+            "tosplitId": "ts-1",
+            "amount": 120.5,
+            "code": "ILS"
+          },
+          "parents": [
+            "Z3q1w3BVeQ_nXAPbKjAuE0G4CCq_XS_wXvCtUcS5a2w"
+          ],
+          "ts": 1760010000000,
+          "nonce": "WoXu5CdGffhu5DW108r0Iw",
+          "sig": "adBRNnnBU0evJ3DyZDjmt8iypjkip2EqCgVYCRejoPLJT4fwNUv_kCadmgj4X1z9hwhIoae5bmXXd6BimijABw",
+          "id": "J4e9ZPU-t-V-dCM3vHH6Lf9Yh5kDLQ8c4qR_j82I7dU"
+        },
+        {
+          "v": 1,
+          "actor": "u-alice",
+          "device": "MCowBQYDK2VwAyEAw2aFyT5XfLsPDVxfoEQOCSVgl1_YS5aoiK8UGIh1RTY",
+          "action": "haluka.approve",
+          "subject": {
+            "type": "haluka",
+            "id": "h-1"
+          },
+          "predicate": {
+            "hervachDeltas": [
+              {
+                "member": "u-alice",
+                "amount": {
+                  "amount": "-12050",
+                  "code": "ILS"
+                }
+              },
+              {
+                "member": "u-carol",
+                "amount": {
+                  "amount": " 12050 ",
+                  "code": "ILS"
+                }
+              },
+              {
+                "member": "u-bob",
+                "amount": {
+                  "amount": "12.5",
+                  "code": "ILS"
+                }
+              }
+            ]
+          },
+          "parents": [
+            "J4e9ZPU-t-V-dCM3vHH6Lf9Yh5kDLQ8c4qR_j82I7dU"
+          ],
+          "ts": 1760010100000,
+          "nonce": "fyeHDb7kdYfiP8VeBJ64IA",
+          "sig": "yE1WaeUpXh0bdJ9PQn6lp6CkOWB-YecgLutfkFUD3KlhcQaRDHJ_1WHCISwLqzFEmk5DkezNUy_yaqBXwu7qBw",
+          "id": "8VVPMyFtIm-jKMB4OkQU7rB4spm6oK9Dd1vSjWGmSVM"
+        },
+        {
+          "v": 1,
+          "actor": "u-bob",
+          "device": "MCowBQYDK2VwAyEA6RjNbe3z0BZms5MszZc34tt-y7ERI4-oB0h6aXTRHy8",
+          "action": "haluka.confirm",
+          "subject": {
+            "type": "haluka",
+            "id": "h-1"
+          },
+          "predicate": {},
+          "parents": [
+            "8VVPMyFtIm-jKMB4OkQU7rB4spm6oK9Dd1vSjWGmSVM"
+          ],
+          "ts": 1760010200000,
+          "nonce": "vEk5gyDIUHrRzlMSt0k61A",
+          "sig": "HhoYti8iH4U8wbqXSa3im5Nmy-qdvTat_frXljDcR0DQ05hd_g4yLPK1E83EcFyFtQ0McMxkOfztCmUNewaKAA",
+          "id": "HmKVR1DSulR6LPshT2--ehaFi7ZB8tiKWDsrRPZt2vk"
+        },
+        {
+          "v": 1,
+          "actor": "u-carol",
+          "device": "MCowBQYDK2VwAyEAsstdtAKx6uNVNkciaL63LhA505Nlz4IcwVXgFN4GSsI",
+          "action": "member.away",
+          "subject": {
+            "type": "user",
+            "id": "u-carol"
+          },
+          "predicate": {
+            "until": 1761000000000
+          },
+          "parents": [
+            "HmKVR1DSulR6LPshT2--ehaFi7ZB8tiKWDsrRPZt2vk"
+          ],
+          "ts": 1760011000000,
+          "nonce": "Nu0_yDYfi9bM-Da2JXO5Kg",
+          "sig": "bLNf6nqluHvQ5NtS81i6YqkIzNXMiDjq1fGnFVzrfbabjEgMhxr81qX7SpBR9_Zm8fokNUeGrmkupJW6t6CRAA",
+          "id": "714N_lDXpO62kl3I6RMfas34J70PdOGim9LZbJZqyD8"
+        },
+        {
+          "v": 1,
+          "actor": "u-alice",
+          "device": "MCowBQYDK2VwAyEAw2aFyT5XfLsPDVxfoEQOCSVgl1_YS5aoiK8UGIh1RTY",
+          "action": "project.amend",
+          "subject": {
+            "type": "project",
+            "id": "p-1"
+          },
+          "predicate": {
+            "path": "restime",
+            "value": 86400000
+          },
+          "parents": [
+            "714N_lDXpO62kl3I6RMfas34J70PdOGim9LZbJZqyD8"
+          ],
+          "ts": 1760012000000,
+          "nonce": "ALNlp-i99mbNTUpxe5sAPw",
+          "sig": "nRPk3ZC25X0sxNjllG7uC4CghpRti-VdX3knTnzF502pv5GWvOe6IFdJK3aWiNJnhSaVUrgsO44NJrkwhryyAA",
+          "id": "fATUiNw5zzNkhb7lourd5odvejgaDFP5-dga7jh07rA"
+        },
+        {
+          "v": 1,
+          "actor": "u-bob",
+          "device": "MCowBQYDK2VwAyEA6RjNbe3z0BZms5MszZc34tt-y7ERI4-oB0h6aXTRHy8",
+          "action": "pgisha.create",
+          "subject": {
+            "type": "pgisha",
+            "id": "g-1"
+          },
+          "predicate": {
+            "date": "2026-11-01",
+            "name": "פגישת צוות"
+          },
+          "parents": [
+            "fATUiNw5zzNkhb7lourd5odvejgaDFP5-dga7jh07rA"
+          ],
+          "ts": 1760013000000,
+          "nonce": "kEA_Wyl9_J0r2EzdE9_QCQ",
+          "sig": "zz8EufH_oG7N7yE1kZBppJqG5VyXMjibqR2-3WKFlQOpVt0ff3cFomYtjkglSc6_v0NTUtOtY7smUGBDUTtOCg",
+          "id": "tbfz1Y7pWuHJoAZet6oeEXvYjHGPmr5rGeXMfY0Y7WA"
+        },
+        {
+          "v": 1,
+          "actor": "u-carol",
+          "device": "MCowBQYDK2VwAyEAsstdtAKx6uNVNkciaL63LhA505Nlz4IcwVXgFN4GSsI",
+          "action": "pgisha.approve",
+          "subject": {
+            "type": "pgisha",
+            "id": "g-1"
+          },
+          "predicate": {},
+          "parents": [
+            "tbfz1Y7pWuHJoAZet6oeEXvYjHGPmr5rGeXMfY0Y7WA"
+          ],
+          "ts": 1760013100000,
+          "nonce": "ua_-f8zLITg3EsDFROfuEg",
+          "sig": "3SQS1vcVxGM8Sem1W6mtNHx15Svsu9SML1JrQ0doiaYfSWXH_5TcraBLMnPduR1s-UgWnIMi15p5WwN9bPAtCQ",
+          "id": "3ue9rb0uJtK8zpQ_Iem6Ma0Vp0hQDuHMKpenOJsqbGg"
+        },
+        {
+          "v": 1,
+          "actor": "u-alice",
+          "device": "MCowBQYDK2VwAyEAw2aFyT5XfLsPDVxfoEQOCSVgl1_YS5aoiK8UGIh1RTY",
+          "action": "epoch.grant",
+          "subject": {
+            "type": "space",
+            "id": "project:p-1"
+          },
+          "predicate": {
+            "epoch": 0,
+            "wraps": {}
+          },
+          "parents": [
+            "tbfz1Y7pWuHJoAZet6oeEXvYjHGPmr5rGeXMfY0Y7WA"
+          ],
+          "ts": 1760013200000,
+          "nonce": "CS6nwkU7mvkaYWSMlUMXMQ",
+          "sig": "ynffx6zzrZw-PGTRfjtvzXoCJpM9N27p9pSt66KtmI1-N5j6g8ekEmXauY50RDzMTH4ZQpCfywWQzPVYeWCuCQ",
+          "id": "d8pqRXthskmQhY3_ODudsOkHx5EawkLxgjxvBzCPnoU"
+        },
+        {
+          "v": 1,
+          "actor": "u-bob",
+          "device": "MCowBQYDK2VwAyEA6RjNbe3z0BZms5MszZc34tt-y7ERI4-oB0h6aXTRHy8",
+          "action": "member.away",
+          "subject": {
+            "type": "user",
+            "id": "u-bob"
+          },
+          "predicate": {
+            "until": 1760900000000
+          },
+          "parents": [
+            "3ue9rb0uJtK8zpQ_Iem6Ma0Vp0hQDuHMKpenOJsqbGg",
+            "d8pqRXthskmQhY3_ODudsOkHx5EawkLxgjxvBzCPnoU"
+          ],
+          "ts": 1760014000000,
+          "nonce": "vvljtvZLUMoKWOChgcYuGw",
+          "parentStateRoots": [
+            "0OkVl98XCClIL3AamU2Sv6vpETabZCEWD3yaofFbG3w",
+            "n8Lc7_a4SR-sCLw1fdxAQ0aKwBzIzODqARNLfpxJk34"
+          ],
+          "stateRoot": "XEJVwFz_fhe4pM_F4NCT8AiBOJN4rFIiM_oG-4CrYOg",
+          "sig": "PgdEVnD2u_fvjrXNoBoXc5NVhJkvnWf6Om-ByUNbP8TST584wskHcwBG92IY_0aL_APlv1vDjCUWym4S3IO1BQ",
+          "id": "uyrzZtIqFvKKNrem_4z6bNeMUnz2JmCSkZ80OVi82Mo"
+        }
+      ],
+      "expect": {
+        "topoOrder": [
+          "w_BM3hWtYMOXEzupQWPZ0EXqeq4tvPIxP84qEaEh1EU",
+          "0NEpXW0AnoUNUWFF3rrT2NdeMeFoN3__SeCiXhudUqY",
+          "fB3xVGDhw1GxkRY-z1Kk78n78Bx6mtKD2VVHVJWndGo",
+          "1aiVvx_2_rpe36hsaueAL2pA1jgUgWO29UMMO1AJKFI",
+          "13qLLEjIAJraYoNabh0oTaHnq2e_XjouNqpKj_T5l6s",
+          "_mn8-FWryWXpVpzOFbW67iuTXtoAnf1dWq1NScYicAk",
+          "N0hES3s2DOxyELjK1AhKNGzoR4CT9QhBwYKI51cjAxU",
+          "0N7GqTlsmkoyyqWj48Tv4BTDDXjCJk2J1T6wLvbLPg0",
+          "exKobANf0me_A3nFGuBodgIaXjrOCZpXxvIFA8OkDdI",
+          "aoCkaPm_dXJlqZ9Fkkh_bcGOdvcmVRZ_gM1EUJsSiZ4",
+          "mw59o5dFRk66QSGjht0jV4MEu8GHIRHvL5BeolwH8yo",
+          "BCqnxBhlLxuNr-Q90pZAzUVSrnkv71yVkcMYopluiS0",
+          "fUVjNn5rMZ7zJ-A4yeXYLFmoSVz0WtWlTu65l5RTOsU",
+          "5hNAyZqbsVLmcFiFgSXiASffwBkwagTuxIfMStPyGeY",
+          "wP-mH-ED_WbQTObSvAcyBh1sYZTE_rvpYQZXq4tCbeo",
+          "_qSpPEi6gNksxmBgQGsa-il8hu2JpHhQVUww2if2REg",
+          "uMxvU88B8HTvNvUFPy_MEOlkMETeu_GgraWuDt6XpmE",
+          "WE0XWOtCzQiZ2TckIkI0TxYGJFdvf6jvLYAHrNezkzQ",
+          "DIlb3bD1OB7ESs_Pv1qJZnzod0NpETNLU50UmenaTZI",
+          "SMxfcS-d3F8_5dy4f2Lvwdt5mDJGi7xyU6M4ekM59Pw",
+          "Zs7oZj8jFvO9NkLq0KBrmH0S9hJLAvT9d6pBrBQvzfo",
+          "dQGd8a-VZZIiGR_IxCJ0fu7DXGjhMTNsTiRsy51i2bA",
+          "OkKQpolPR2oA-dHn8ZFoQlUd-OBMXtvSdLC564qBvQI",
+          "WkGs03XuH5hlhANxXWhX94qysK8jN-NCuH-eTnhBYLE",
+          "Z3q1w3BVeQ_nXAPbKjAuE0G4CCq_XS_wXvCtUcS5a2w",
+          "J4e9ZPU-t-V-dCM3vHH6Lf9Yh5kDLQ8c4qR_j82I7dU",
+          "8VVPMyFtIm-jKMB4OkQU7rB4spm6oK9Dd1vSjWGmSVM",
+          "HmKVR1DSulR6LPshT2--ehaFi7ZB8tiKWDsrRPZt2vk",
+          "714N_lDXpO62kl3I6RMfas34J70PdOGim9LZbJZqyD8",
+          "fATUiNw5zzNkhb7lourd5odvejgaDFP5-dga7jh07rA",
+          "tbfz1Y7pWuHJoAZet6oeEXvYjHGPmr5rGeXMfY0Y7WA",
+          "3ue9rb0uJtK8zpQ_Iem6Ma0Vp0hQDuHMKpenOJsqbGg",
+          "d8pqRXthskmQhY3_ODudsOkHx5EawkLxgjxvBzCPnoU",
+          "uyrzZtIqFvKKNrem_4z6bNeMUnz2JmCSkZ80OVi82Mo"
+        ],
+        "dedupeKeys": {
+          "w_BM3hWtYMOXEzupQWPZ0EXqeq4tvPIxP84qEaEh1EU": "u-alice|project:p-1|project.create|0",
+          "fB3xVGDhw1GxkRY-z1Kk78n78Bx6mtKD2VVHVJWndGo": "u-bob|project:p-1|project.join|0",
+          "0NEpXW0AnoUNUWFF3rrT2NdeMeFoN3__SeCiXhudUqY": "u-carol|project:p-1|project.join|0",
+          "1aiVvx_2_rpe36hsaueAL2pA1jgUgWO29UMMO1AJKFI": "u-alice|mission:m-1|mission.create|0",
+          "13qLLEjIAJraYoNabh0oTaHnq2e_XjouNqpKj_T5l6s": "u-alice|pendm:pendm-7|pendm.vote|1",
+          "_mn8-FWryWXpVpzOFbW67iuTXtoAnf1dWq1NScYicAk": "u-bob|pendm:pendm-7|pendm.vote|1",
+          "N0hES3s2DOxyELjK1AhKNGzoR4CT9QhBwYKI51cjAxU": "u-carol|pendm:pendm-7|pendm.vote|1",
+          "0N7GqTlsmkoyyqWj48Tv4BTDDXjCJk2J1T6wLvbLPg0": "u-bob|mission:m-1|time.tick|0",
+          "exKobANf0me_A3nFGuBodgIaXjrOCZpXxvIFA8OkDdI": "u-bob|mission:m-1|time.tick|0",
+          "aoCkaPm_dXJlqZ9Fkkh_bcGOdvcmVRZ_gM1EUJsSiZ4": "u-bob|mission:m-1|mission.complete|0",
+          "mw59o5dFRk66QSGjht0jV4MEu8GHIRHvL5BeolwH8yo": "u-bob|mission:m-1|payload.redact|0",
+          "BCqnxBhlLxuNr-Q90pZAzUVSrnkv71yVkcMYopluiS0": "u-alice|mission:m-1|mission.approve|0",
+          "fUVjNn5rMZ7zJ-A4yeXYLFmoSVz0WtWlTu65l5RTOsU": "u-alice|forum:f-1|forum.create|0",
+          "wP-mH-ED_WbQTObSvAcyBh1sYZTE_rvpYQZXq4tCbeo": "u-bob|message:msg-2|message.post|0",
+          "5hNAyZqbsVLmcFiFgSXiASffwBkwagTuxIfMStPyGeY": "u-carol|message:msg-1|message.post|0",
+          "_qSpPEi6gNksxmBgQGsa-il8hu2JpHhQVUww2if2REg": "u-carol|message:msg-1|payload.redact|0",
+          "uMxvU88B8HTvNvUFPy_MEOlkMETeu_GgraWuDt6XpmE": "u-alice|sale:s-1|sale.record|0",
+          "WE0XWOtCzQiZ2TckIkI0TxYGJFdvf6jvLYAHrNezkzQ": "u-alice|decision:d-1|decision.create|0",
+          "DIlb3bD1OB7ESs_Pv1qJZnzod0NpETNLU50UmenaTZI": "u-bob|decision:d-1|proposal.counter|2",
+          "SMxfcS-d3F8_5dy4f2Lvwdt5mDJGi7xyU6M4ekM59Pw": "u-alice|decision:d-1|decision.vote|2",
+          "Zs7oZj8jFvO9NkLq0KBrmH0S9hJLAvT9d6pBrBQvzfo": "u-alice|tosplit:ts-1|tosplit.create|0",
+          "dQGd8a-VZZIiGR_IxCJ0fu7DXGjhMTNsTiRsy51i2bA": "u-alice|tosplit:ts-1|tosplit.vote|0",
+          "OkKQpolPR2oA-dHn8ZFoQlUd-OBMXtvSdLC564qBvQI": "u-alice|tosplit:ts-1|tosplit.vote|0",
+          "WkGs03XuH5hlhANxXWhX94qysK8jN-NCuH-eTnhBYLE": "u-bob|tosplit:ts-1|tosplit.vote|0",
+          "Z3q1w3BVeQ_nXAPbKjAuE0G4CCq_XS_wXvCtUcS5a2w": "u-carol|tosplit:ts-1|tosplit.vote|0",
+          "J4e9ZPU-t-V-dCM3vHH6Lf9Yh5kDLQ8c4qR_j82I7dU": "u-alice|haluka:h-1|haluka.create|0",
+          "8VVPMyFtIm-jKMB4OkQU7rB4spm6oK9Dd1vSjWGmSVM": "u-alice|haluka:h-1|haluka.approve|0",
+          "HmKVR1DSulR6LPshT2--ehaFi7ZB8tiKWDsrRPZt2vk": "u-bob|haluka:h-1|haluka.confirm|0",
+          "714N_lDXpO62kl3I6RMfas34J70PdOGim9LZbJZqyD8": "u-carol|user:u-carol|member.away|0",
+          "fATUiNw5zzNkhb7lourd5odvejgaDFP5-dga7jh07rA": "u-alice|project:p-1|project.amend|0",
+          "tbfz1Y7pWuHJoAZet6oeEXvYjHGPmr5rGeXMfY0Y7WA": "u-bob|pgisha:g-1|pgisha.create|0",
+          "3ue9rb0uJtK8zpQ_Iem6Ma0Vp0hQDuHMKpenOJsqbGg": "u-carol|pgisha:g-1|pgisha.approve|0",
+          "d8pqRXthskmQhY3_ODudsOkHx5EawkLxgjxvBzCPnoU": "u-alice|space:project:p-1|epoch.grant|0",
+          "uyrzZtIqFvKKNrem_4z6bNeMUnz2JmCSkZ80OVi82Mo": "u-bob|user:u-bob|member.away|0"
+        },
+        "applied": [
+          "w_BM3hWtYMOXEzupQWPZ0EXqeq4tvPIxP84qEaEh1EU",
+          "0NEpXW0AnoUNUWFF3rrT2NdeMeFoN3__SeCiXhudUqY",
+          "fB3xVGDhw1GxkRY-z1Kk78n78Bx6mtKD2VVHVJWndGo",
+          "1aiVvx_2_rpe36hsaueAL2pA1jgUgWO29UMMO1AJKFI",
+          "13qLLEjIAJraYoNabh0oTaHnq2e_XjouNqpKj_T5l6s",
+          "_mn8-FWryWXpVpzOFbW67iuTXtoAnf1dWq1NScYicAk",
+          "N0hES3s2DOxyELjK1AhKNGzoR4CT9QhBwYKI51cjAxU",
+          "exKobANf0me_A3nFGuBodgIaXjrOCZpXxvIFA8OkDdI",
+          "aoCkaPm_dXJlqZ9Fkkh_bcGOdvcmVRZ_gM1EUJsSiZ4",
+          "mw59o5dFRk66QSGjht0jV4MEu8GHIRHvL5BeolwH8yo",
+          "BCqnxBhlLxuNr-Q90pZAzUVSrnkv71yVkcMYopluiS0",
+          "fUVjNn5rMZ7zJ-A4yeXYLFmoSVz0WtWlTu65l5RTOsU",
+          "5hNAyZqbsVLmcFiFgSXiASffwBkwagTuxIfMStPyGeY",
+          "wP-mH-ED_WbQTObSvAcyBh1sYZTE_rvpYQZXq4tCbeo",
+          "_qSpPEi6gNksxmBgQGsa-il8hu2JpHhQVUww2if2REg",
+          "uMxvU88B8HTvNvUFPy_MEOlkMETeu_GgraWuDt6XpmE",
+          "WE0XWOtCzQiZ2TckIkI0TxYGJFdvf6jvLYAHrNezkzQ",
+          "DIlb3bD1OB7ESs_Pv1qJZnzod0NpETNLU50UmenaTZI",
+          "SMxfcS-d3F8_5dy4f2Lvwdt5mDJGi7xyU6M4ekM59Pw",
+          "Zs7oZj8jFvO9NkLq0KBrmH0S9hJLAvT9d6pBrBQvzfo",
+          "OkKQpolPR2oA-dHn8ZFoQlUd-OBMXtvSdLC564qBvQI",
+          "WkGs03XuH5hlhANxXWhX94qysK8jN-NCuH-eTnhBYLE",
+          "Z3q1w3BVeQ_nXAPbKjAuE0G4CCq_XS_wXvCtUcS5a2w",
+          "J4e9ZPU-t-V-dCM3vHH6Lf9Yh5kDLQ8c4qR_j82I7dU",
+          "8VVPMyFtIm-jKMB4OkQU7rB4spm6oK9Dd1vSjWGmSVM",
+          "HmKVR1DSulR6LPshT2--ehaFi7ZB8tiKWDsrRPZt2vk",
+          "714N_lDXpO62kl3I6RMfas34J70PdOGim9LZbJZqyD8",
+          "fATUiNw5zzNkhb7lourd5odvejgaDFP5-dga7jh07rA",
+          "tbfz1Y7pWuHJoAZet6oeEXvYjHGPmr5rGeXMfY0Y7WA",
+          "3ue9rb0uJtK8zpQ_Iem6Ma0Vp0hQDuHMKpenOJsqbGg",
+          "d8pqRXthskmQhY3_ODudsOkHx5EawkLxgjxvBzCPnoU",
+          "uyrzZtIqFvKKNrem_4z6bNeMUnz2JmCSkZ80OVi82Mo"
+        ],
+        "heads": [
+          "uyrzZtIqFvKKNrem_4z6bNeMUnz2JmCSkZ80OVi82Mo"
+        ],
+        "steps": [
+          {
+            "id": "w_BM3hWtYMOXEzupQWPZ0EXqeq4tvPIxP84qEaEh1EU",
+            "label": "s01",
+            "rootAfter": "OfTXgYtkkdn9eJaJtJTIKTgqOfNVHL6jlzltCptuT1U"
+          },
+          {
+            "id": "0NEpXW0AnoUNUWFF3rrT2NdeMeFoN3__SeCiXhudUqY",
+            "label": "s03",
+            "rootAfter": "lOj4wLzX7eRzLEMqaBLr9iOtY6c5PiQQROdWK4iWZoM"
+          },
+          {
+            "id": "fB3xVGDhw1GxkRY-z1Kk78n78Bx6mtKD2VVHVJWndGo",
+            "label": "s02",
+            "rootAfter": "5jV16x6001YY8CgqWcB3-Z0iwXhw_5akCTsTWl-XE-E"
+          },
+          {
+            "id": "1aiVvx_2_rpe36hsaueAL2pA1jgUgWO29UMMO1AJKFI",
+            "label": "s04",
+            "rootAfter": "Ng01SYJEQKc_6jsycn4Gdk4XpknbYom7OOrkJHu9scw"
+          },
+          {
+            "id": "13qLLEjIAJraYoNabh0oTaHnq2e_XjouNqpKj_T5l6s",
+            "label": "s05",
+            "rootAfter": "9ADnz4U0BdsS1Fni0rQL4sI4I4OuupzxB9a1dpdYJF8"
+          },
+          {
+            "id": "_mn8-FWryWXpVpzOFbW67iuTXtoAnf1dWq1NScYicAk",
+            "label": "s06",
+            "rootAfter": "oRi35wTzm7U2qkfTaNaqmz7OvMonYs97Vr_E8dOPF3c"
+          },
+          {
+            "id": "N0hES3s2DOxyELjK1AhKNGzoR4CT9QhBwYKI51cjAxU",
+            "label": "s07",
+            "rootAfter": "qtfsIO95a8sO1N42ygIS17DIK6OU3Se8kiJN0F8ZtGo"
+          },
+          {
+            "id": "exKobANf0me_A3nFGuBodgIaXjrOCZpXxvIFA8OkDdI",
+            "label": "s09",
+            "rootAfter": "KYHJQY24bIKCJyJBCO4eL-dyHvzdekh9fbVPozZDFzk"
+          },
+          {
+            "id": "aoCkaPm_dXJlqZ9Fkkh_bcGOdvcmVRZ_gM1EUJsSiZ4",
+            "label": "s10",
+            "rootAfter": "eLyGhF9KebfFtcK1o7niK1zYfU4ZLwfGwrvAGC4k_CQ"
+          },
+          {
+            "id": "mw59o5dFRk66QSGjht0jV4MEu8GHIRHvL5BeolwH8yo",
+            "label": "s11",
+            "rootAfter": "csgfEAFYOSRo2OdzGRxSx0s5Zd1SALI42QifPj14voE"
+          },
+          {
+            "id": "BCqnxBhlLxuNr-Q90pZAzUVSrnkv71yVkcMYopluiS0",
+            "label": "s12",
+            "rootAfter": "tfshIshrTZL6Dcv-7Itxq_G931DO7u0d8CWp3-k4kGU"
+          },
+          {
+            "id": "fUVjNn5rMZ7zJ-A4yeXYLFmoSVz0WtWlTu65l5RTOsU",
+            "label": "s13",
+            "rootAfter": "ROzLTI7-9ku3fnoINcgK6ia0nP4nQYE7bZaFnMhri98"
+          },
+          {
+            "id": "5hNAyZqbsVLmcFiFgSXiASffwBkwagTuxIfMStPyGeY",
+            "label": "s15",
+            "rootAfter": "K-Jy9DURmt2H8q40RUodVHJhOU7-NSiRrKPz3DRpmHo"
+          },
+          {
+            "id": "wP-mH-ED_WbQTObSvAcyBh1sYZTE_rvpYQZXq4tCbeo",
+            "label": "s14",
+            "rootAfter": "23hPNlI7EEXIptjXfiGllI13r_bvBHpoq1G2ufYY5q0"
+          },
+          {
+            "id": "_qSpPEi6gNksxmBgQGsa-il8hu2JpHhQVUww2if2REg",
+            "label": "s16",
+            "rootAfter": "H17jCN1GBuyNbj2mLQ0K0bAiSnI_yNV3kKtqPov3_do"
+          },
+          {
+            "id": "uMxvU88B8HTvNvUFPy_MEOlkMETeu_GgraWuDt6XpmE",
+            "label": "s17",
+            "rootAfter": "8y2NMpDl_EbZpf39gSsq1JU8F7BWzFpwZVifUmlg6bo"
+          },
+          {
+            "id": "WE0XWOtCzQiZ2TckIkI0TxYGJFdvf6jvLYAHrNezkzQ",
+            "label": "s18",
+            "rootAfter": "10ZJ_tzbxlPeM2FlpHVNCwQzVsf8eAwBCmM4CNz5jS8"
+          },
+          {
+            "id": "DIlb3bD1OB7ESs_Pv1qJZnzod0NpETNLU50UmenaTZI",
+            "label": "s19",
+            "rootAfter": "_yCVR2yigHxiOmgJAkdto2ZZ5S72iFU72mt1U5SSH7s"
+          },
+          {
+            "id": "SMxfcS-d3F8_5dy4f2Lvwdt5mDJGi7xyU6M4ekM59Pw",
+            "label": "s20",
+            "rootAfter": "uGJOIuCSJHrIRJ2AshmsB7BvMRDRh_NsCVz6gtLp668"
+          },
+          {
+            "id": "Zs7oZj8jFvO9NkLq0KBrmH0S9hJLAvT9d6pBrBQvzfo",
+            "label": "s21",
+            "rootAfter": "qbd-w1oRrtsim7FzcZ21wx3ts9_g8O46yv-PwpLW7QU"
+          },
+          {
+            "id": "OkKQpolPR2oA-dHn8ZFoQlUd-OBMXtvSdLC564qBvQI",
+            "label": "s23",
+            "rootAfter": "LG4AZbWh31joVZt5c_lcu6QpSC5a5Pp3qlUhw7uRktQ"
+          },
+          {
+            "id": "WkGs03XuH5hlhANxXWhX94qysK8jN-NCuH-eTnhBYLE",
+            "label": "s24",
+            "rootAfter": "NebFM5wHzxMMrU0V3HSE5o8gFB5QHsx4NSgLQvBpq4k"
+          },
+          {
+            "id": "Z3q1w3BVeQ_nXAPbKjAuE0G4CCq_XS_wXvCtUcS5a2w",
+            "label": "s25",
+            "rootAfter": "RXsNA5AIEN7eIRguICgKP_tnoIIObiBdO9A9E3LrsQk"
+          },
+          {
+            "id": "J4e9ZPU-t-V-dCM3vHH6Lf9Yh5kDLQ8c4qR_j82I7dU",
+            "label": "s26",
+            "rootAfter": "lPnqNNyxO8bpyLvmbNFIBMNB5HUUxN7WflHiSgOytxs"
+          },
+          {
+            "id": "8VVPMyFtIm-jKMB4OkQU7rB4spm6oK9Dd1vSjWGmSVM",
+            "label": "s27",
+            "rootAfter": "LoX1h9qp5g6-LD1SWkn1LrzNWR7QnSmzAcXeanrvpxE"
+          },
+          {
+            "id": "HmKVR1DSulR6LPshT2--ehaFi7ZB8tiKWDsrRPZt2vk",
+            "label": "s28",
+            "rootAfter": "Iy6Z6W9RrHlEzTmty-zNYRTG3YCdVs1va2EST_EOFJA"
+          },
+          {
+            "id": "714N_lDXpO62kl3I6RMfas34J70PdOGim9LZbJZqyD8",
+            "label": "s29",
+            "rootAfter": "b8XzJ8EEWe1FkFPw_78VJEJbHaPjVyYtIY2RwEwfVSE"
+          },
+          {
+            "id": "fATUiNw5zzNkhb7lourd5odvejgaDFP5-dga7jh07rA",
+            "label": "s30",
+            "rootAfter": "6XF1OyeMCZmW2FZG9i1yBQSCVPgVw5QCkLScABZvwxs"
+          },
+          {
+            "id": "tbfz1Y7pWuHJoAZet6oeEXvYjHGPmr5rGeXMfY0Y7WA",
+            "label": "s31",
+            "rootAfter": "E2cSJu1Q6W8rWZ1x-pTr2Nl-4uB98du32LE39-cBBJ4"
+          },
+          {
+            "id": "3ue9rb0uJtK8zpQ_Iem6Ma0Vp0hQDuHMKpenOJsqbGg",
+            "label": "s32",
+            "rootAfter": "0OkVl98XCClIL3AamU2Sv6vpETabZCEWD3yaofFbG3w"
+          },
+          {
+            "id": "d8pqRXthskmQhY3_ODudsOkHx5EawkLxgjxvBzCPnoU",
+            "label": "s33",
+            "rootAfter": "3LSL4lOES4O_ZCD7JrA-qnj3hsYFIiwOXbUBCBPyO3M"
+          },
+          {
+            "id": "uyrzZtIqFvKKNrem_4z6bNeMUnz2JmCSkZ80OVi82Mo",
+            "label": "s34",
+            "rootAfter": "XEJVwFz_fhe4pM_F4NCT8AiBOJN4rFIiM_oG-4CrYOg"
+          }
+        ],
+        "normalizedState": {
+          "v": 2,
+          "projectId": "p-1",
+          "asOf": 1760014000000,
+          "members": [
+            "u-alice",
+            "u-bob",
+            "u-carol"
+          ],
+          "balances": [
+            [
+              "u-alice",
+              "-12050"
+            ],
+            [
+              "u-bob",
+              "100000"
+            ],
+            [
+              "u-carol",
+              "12050"
+            ]
+          ],
+          "tosplits": [
+            [
+              "ts-1",
+              {
+                "id": "ts-1",
+                "createdBy": "u-alice",
+                "createdAt": 1760009000000,
+                "predicate": {
+                  "total": {
+                    "amount": "35000",
+                    "code": "ILS"
+                  }
+                },
+                "approved": true,
+                "votes": [
+                  [
+                    "u-alice",
+                    {
+                      "what": true,
+                      "ts": 1760009200000,
+                      "eventId": "OkKQpolPR2oA-dHn8ZFoQlUd-OBMXtvSdLC564qBvQI"
+                    }
+                  ],
+                  [
+                    "u-bob",
+                    {
+                      "what": true,
+                      "ts": 1760009300000,
+                      "eventId": "WkGs03XuH5hlhANxXWhX94qysK8jN-NCuH-eTnhBYLE"
+                    }
+                  ],
+                  [
+                    "u-carol",
+                    {
+                      "what": true,
+                      "ts": 1760009400000,
+                      "eventId": "Z3q1w3BVeQ_nXAPbKjAuE0G4CCq_XS_wXvCtUcS5a2w"
+                    }
+                  ]
+                ]
+              }
+            ]
+          ],
+          "rounds": [
+            [
+              "decision:d-1",
+              {
+                "current": 1,
+                "start": 1760008100000
+              }
+            ],
+            [
+              "tosplit:ts-1",
+              {
+                "current": 0,
+                "start": 1760009000000
+              }
+            ]
+          ],
+          "sales": [
+            [
+              "s-1",
+              {
+                "id": "s-1",
+                "reporterId": "u-alice",
+                "holderId": "u-bob",
+                "status": "confirmed",
+                "decisionId": "d-1",
+                "confirmedBy": "vote",
+                "version": {
+                  "total": 350,
+                  "quantity": 1,
+                  "kindOf": "logo",
+                  "saleDate": "2026-10-01"
+                }
+              }
+            ]
+          ],
+          "saleClaims": [
+            [
+              "d-1",
+              {
+                "decisionId": "d-1",
+                "saleId": "s-1",
+                "holderId": "u-bob",
+                "reporterId": "u-alice",
+                "standingOrder": 2,
+                "signers": [
+                  "u-alice",
+                  "u-bob"
+                ],
+                "closed": {
+                  "decidedAt": 1760008200000,
+                  "by": "vote"
+                }
+              }
+            ]
+          ],
+          "missions": [
+            [
+              "m-1",
+              {
+                "id": "m-1",
+                "createdBy": "u-alice",
+                "createdAt": 1760000010000,
+                "name": "עיצוב לוגו 🎨",
+                "hours": 12.5,
+                "perhour": 80,
+                "stageIds": [
+                  "pendm-7"
+                ],
+                "state": "approved",
+                "completion": {
+                  "by": "u-bob",
+                  "ts": 1760006000000,
+                  "hoursDone": 12.5,
+                  "redacted": true
+                },
+                "approval": {
+                  "by": "u-alice",
+                  "ts": 1760007000000
+                }
+              }
+            ]
+          ],
+          "halukas": [
+            [
+              "h-1",
+              {
+                "id": "h-1",
+                "from": "u-alice",
+                "to": "u-bob",
+                "tosplitId": "ts-1",
+                "amount": 120.5,
+                "code": "ILS",
+                "status": "confirmed"
+              }
+            ]
+          ],
+          "decisions": [
+            [
+              "d-1",
+              {
+                "id": "d-1",
+                "createdBy": "u-alice",
+                "createdAt": 1760008000001,
+                "kind": "saleClaim",
+                "ref": "s-1"
+              }
+            ]
+          ],
+          "stageVotes": [
+            [
+              "pendm:pendm-7",
+              {
+                "subjectType": "pendm",
+                "subjectId": "pendm-7",
+                "approved": true,
+                "votes": [
+                  [
+                    "u-alice",
+                    {
+                      "what": true,
+                      "ts": 1760000020000,
+                      "eventId": "13qLLEjIAJraYoNabh0oTaHnq2e_XjouNqpKj_T5l6s",
+                      "order": 1
+                    }
+                  ],
+                  [
+                    "u-bob",
+                    {
+                      "what": true,
+                      "ts": 1760000021000,
+                      "eventId": "_mn8-FWryWXpVpzOFbW67iuTXtoAnf1dWq1NScYicAk",
+                      "order": 1
+                    }
+                  ],
+                  [
+                    "u-carol",
+                    {
+                      "what": true,
+                      "ts": 1760000022000,
+                      "eventId": "N0hES3s2DOxyELjK1AhKNGzoR4CT9QhBwYKI51cjAxU",
+                      "order": 1
+                    }
+                  ]
+                ]
+              }
+            ]
+          ],
+          "timers": [
+            [
+              "m-1",
+              {
+                "id": "m-1",
+                "totalMs": 5400000
+              }
+            ]
+          ],
+          "forums": [
+            [
+              "f-1",
+              {
+                "id": "f-1",
+                "createdBy": "u-alice",
+                "createdAt": 1760007100000,
+                "kind": "mission",
+                "messages": [
+                  {
+                    "id": "msg-1",
+                    "by": "u-carol",
+                    "ts": 1760007200000,
+                    "redacted": true
+                  },
+                  {
+                    "id": "msg-2",
+                    "by": "u-bob",
+                    "ts": 1760007200000,
+                    "body": "שלום 👋 café"
+                  }
+                ]
+              }
+            ]
+          ],
+          "meetings": [
+            [
+              "g-1",
+              {
+                "id": "g-1",
+                "createdBy": "u-bob",
+                "createdAt": 1760013000000,
+                "date": "2026-11-01",
+                "name": "פגישת צוות",
+                "approvals": [
+                  "u-bob",
+                  "u-carol"
+                ]
+              }
+            ]
+          ],
+          "away": [
+            [
+              "u-bob",
+              {
+                "since": 1760014000000,
+                "until": 1760900000000
+              }
+            ],
+            [
+              "u-carol",
+              {
+                "since": 1760011000000,
+                "until": 1761000000000
+              }
+            ]
+          ],
+          "settings": [
+            [
+              "name",
+              "רקמת דוגמה"
+            ],
+            [
+              "restime",
+              86400000
+            ]
+          ]
+        },
+        "stateRoot": "XEJVwFz_fhe4pM_F4NCT8AiBOJN4rFIiM_oG-4CrYOg"
+      }
+    },
+    {
+      "name": "dedupe-tostring-and-dangling",
+      "description": "order 1 and order \"1\" are the SAME dedupe key (ECMAScript ToString); a dangling parent is ignored for ordering; equal ts ties break by id. No members, so votes approve only if every recorded vote is yes.",
+      "projectId": null,
+      "labels": {
+        "yjL-PPXJ3avn3AZ9yykWFTNXcHvvcQcx03obUpTuNQA": "b01",
+        "AKIs5og_n0YqgOGisx5XA2--rDveYpmiIs-o_Z5WvX0": "b02",
+        "eU5l7KrPoR4-TgLeS8fzOcgLgdhGLwPSRVKkx_0I3bk": "b03",
+        "NApA4Ay9AmH7jy84jEq1Vf30UPndstradZE3scqNQuM": "b04"
+      },
+      "events": [
+        {
+          "v": 1,
+          "actor": "u-alice",
+          "device": "MCowBQYDK2VwAyEAw2aFyT5XfLsPDVxfoEQOCSVgl1_YS5aoiK8UGIh1RTY",
+          "action": "decision.vote",
+          "subject": {
+            "type": "decision",
+            "id": "d-9"
+          },
+          "predicate": {
+            "what": true,
+            "order": 1
+          },
+          "parents": [],
+          "ts": 1760000001000,
+          "nonce": "9mw9hUKJtZZBLVG48LkXjw",
+          "sig": "aDEPL7fc3_G2Vvc47SZcQeijNvPGkGDj6oR5jshAqlDKTrOToOmBf5pxbD4CjA51jzEd5mzTp0Dbhjiu8LrpAw",
+          "id": "yjL-PPXJ3avn3AZ9yykWFTNXcHvvcQcx03obUpTuNQA"
+        },
+        {
+          "v": 1,
+          "actor": "u-alice",
+          "device": "MCowBQYDK2VwAyEAw2aFyT5XfLsPDVxfoEQOCSVgl1_YS5aoiK8UGIh1RTY",
+          "action": "decision.vote",
+          "subject": {
+            "type": "decision",
+            "id": "d-9"
+          },
+          "predicate": {
+            "what": false,
+            "order": "1"
+          },
+          "parents": [
+            "yjL-PPXJ3avn3AZ9yykWFTNXcHvvcQcx03obUpTuNQA"
+          ],
+          "ts": 1760000002000,
+          "nonce": "Ehbl5jhKsyNuOLvJLH5Y_g",
+          "sig": "qclDtfRxm193QavwKWPmtDFQTd0xSSBOPQZUR0MGNQcyW8mGgJwMYpJvWYeB96V20GpXKuUC2NviDpwrk0fJDg",
+          "id": "AKIs5og_n0YqgOGisx5XA2--rDveYpmiIs-o_Z5WvX0"
+        },
+        {
+          "v": 1,
+          "actor": "u-bob",
+          "device": "MCowBQYDK2VwAyEA6RjNbe3z0BZms5MszZc34tt-y7ERI4-oB0h6aXTRHy8",
+          "action": "decision.vote",
+          "subject": {
+            "type": "decision",
+            "id": "d-9"
+          },
+          "predicate": {
+            "what": true
+          },
+          "parents": [
+            "missing-parent-id"
+          ],
+          "ts": 1760000000500,
+          "nonce": "yhteWtbKU9i57IXnrzuj3w",
+          "sig": "-TubWoQG4GbhpjMXE1PNjHGe34iZn9u3AWZ6tQTAPhwksEC6Myp78T_VQ1Jyp8IUZEifuLfOoy0TZ6y6aPMjCg",
+          "id": "eU5l7KrPoR4-TgLeS8fzOcgLgdhGLwPSRVKkx_0I3bk"
+        },
+        {
+          "v": 1,
+          "actor": "u-carol",
+          "device": "MCowBQYDK2VwAyEAsstdtAKx6uNVNkciaL63LhA505Nlz4IcwVXgFN4GSsI",
+          "action": "decision.vote",
+          "subject": {
+            "type": "decision",
+            "id": "d-9"
+          },
+          "predicate": {
+            "what": true,
+            "order": 1
+          },
+          "parents": [],
+          "ts": 1760000002000,
+          "nonce": "S5k6nPqosaMd7sdIOM0OfA",
+          "sig": "ZLgb-QUPWv8xdx4dMBsFTRP8GMsfXs1oYvPNxURh3YYJi1ZL_LH04rRZWfMn8LAAoIvuOQ8C2V-GQVXNMbluAA",
+          "id": "NApA4Ay9AmH7jy84jEq1Vf30UPndstradZE3scqNQuM"
+        }
+      ],
+      "expect": {
+        "topoOrder": [
+          "eU5l7KrPoR4-TgLeS8fzOcgLgdhGLwPSRVKkx_0I3bk",
+          "yjL-PPXJ3avn3AZ9yykWFTNXcHvvcQcx03obUpTuNQA",
+          "AKIs5og_n0YqgOGisx5XA2--rDveYpmiIs-o_Z5WvX0",
+          "NApA4Ay9AmH7jy84jEq1Vf30UPndstradZE3scqNQuM"
+        ],
+        "dedupeKeys": {
+          "yjL-PPXJ3avn3AZ9yykWFTNXcHvvcQcx03obUpTuNQA": "u-alice|decision:d-9|decision.vote|1",
+          "AKIs5og_n0YqgOGisx5XA2--rDveYpmiIs-o_Z5WvX0": "u-alice|decision:d-9|decision.vote|1",
+          "eU5l7KrPoR4-TgLeS8fzOcgLgdhGLwPSRVKkx_0I3bk": "u-bob|decision:d-9|decision.vote|0",
+          "NApA4Ay9AmH7jy84jEq1Vf30UPndstradZE3scqNQuM": "u-carol|decision:d-9|decision.vote|1"
+        },
+        "applied": [
+          "eU5l7KrPoR4-TgLeS8fzOcgLgdhGLwPSRVKkx_0I3bk",
+          "AKIs5og_n0YqgOGisx5XA2--rDveYpmiIs-o_Z5WvX0",
+          "NApA4Ay9AmH7jy84jEq1Vf30UPndstradZE3scqNQuM"
+        ],
+        "heads": [
+          "AKIs5og_n0YqgOGisx5XA2--rDveYpmiIs-o_Z5WvX0",
+          "NApA4Ay9AmH7jy84jEq1Vf30UPndstradZE3scqNQuM",
+          "eU5l7KrPoR4-TgLeS8fzOcgLgdhGLwPSRVKkx_0I3bk"
+        ],
+        "steps": [
+          {
+            "id": "eU5l7KrPoR4-TgLeS8fzOcgLgdhGLwPSRVKkx_0I3bk",
+            "label": "b03",
+            "rootAfter": "llGPIu223FUHifeXAI1ITU8YZq9s2iwQIJNyi7xafF8"
+          },
+          {
+            "id": "AKIs5og_n0YqgOGisx5XA2--rDveYpmiIs-o_Z5WvX0",
+            "label": "b02",
+            "rootAfter": "m-IX51AtRZh05TgeY-DAD4QlpEZRFCBrWxqLHIn-LEw"
+          },
+          {
+            "id": "NApA4Ay9AmH7jy84jEq1Vf30UPndstradZE3scqNQuM",
+            "label": "b04",
+            "rootAfter": "4xQG47URVipNp8KHcH4kYtNHdUgZRqQrxHxX9OsRaKI"
+          }
+        ],
+        "normalizedState": {
+          "v": 2,
+          "projectId": null,
+          "asOf": 1760000002000,
+          "members": [],
+          "balances": [],
+          "tosplits": [],
+          "rounds": [],
+          "sales": [],
+          "saleClaims": [],
+          "missions": [],
+          "halukas": [],
+          "decisions": [],
+          "stageVotes": [
+            [
+              "decision:d-9",
+              {
+                "subjectType": "decision",
+                "subjectId": "d-9",
+                "approved": false,
+                "votes": [
+                  [
+                    "u-alice",
+                    {
+                      "what": false,
+                      "ts": 1760000002000,
+                      "eventId": "AKIs5og_n0YqgOGisx5XA2--rDveYpmiIs-o_Z5WvX0",
+                      "order": 0
+                    }
+                  ],
+                  [
+                    "u-bob",
+                    {
+                      "what": true,
+                      "ts": 1760000000500,
+                      "eventId": "eU5l7KrPoR4-TgLeS8fzOcgLgdhGLwPSRVKkx_0I3bk",
+                      "order": 0
+                    }
+                  ],
+                  [
+                    "u-carol",
+                    {
+                      "what": true,
+                      "ts": 1760000002000,
+                      "eventId": "NApA4Ay9AmH7jy84jEq1Vf30UPndstradZE3scqNQuM",
+                      "order": 1
+                    }
+                  ]
+                ]
+              }
+            ]
+          ],
+          "timers": [],
+          "forums": [],
+          "meetings": [],
+          "away": [],
+          "settings": []
+        },
+        "stateRoot": "4xQG47URVipNp8KHcH4kYtNHdUgZRqQrxHxX9OsRaKI"
+      }
+    },
+    {
+      "name": "genesis-snapshot",
+      "description": "T6 migration: a parentless snapshot.commit with upTo:\"genesis\" carries a normalized state inline; members and balances merge into the fold, the snapshot mark itself stays out of the state root.",
+      "projectId": "p-2",
+      "labels": {
+        "iGqiSt4Xnw_k0c7e-7bIzhEJHJ3-_iH4o_2sbknXk4o": "c01",
+        "jZ3cCAEMYpz4WOQEjhiiRs3n7HW2W9TSizhtgToGAhY": "c02"
+      },
+      "events": [
+        {
+          "v": 1,
+          "actor": "u-alice",
+          "device": "MCowBQYDK2VwAyEAw2aFyT5XfLsPDVxfoEQOCSVgl1_YS5aoiK8UGIh1RTY",
+          "action": "snapshot.commit",
+          "subject": {
+            "type": "project",
+            "id": "p-2"
+          },
+          "predicate": {
+            "upTo": "genesis",
+            "stateRoot": "AE7kIn--ucuvWA15dtFJmhg6FFIwbeg8oXUbh3CJF4s",
+            "state": {
+              "v": 2,
+              "projectId": "p-2",
+              "asOf": 1759999999999,
+              "members": [
+                "u-alice",
+                "u-bob"
+              ],
+              "balances": [
+                [
+                  "u-alice",
+                  "250000"
+                ],
+                [
+                  "u-bob",
+                  "-1"
+                ]
+              ],
+              "tosplits": [],
+              "rounds": [],
+              "sales": [],
+              "saleClaims": [],
+              "missions": [],
+              "halukas": [],
+              "decisions": [],
+              "stageVotes": [],
+              "timers": [],
+              "forums": [],
+              "meetings": [],
+              "away": [],
+              "settings": [
+                [
+                  "name",
+                  "רקמה מיובאת"
+                ]
+              ]
+            }
+          },
+          "parents": [],
+          "ts": 1760000000000,
+          "nonce": "8z2aguxPnqiNgklUCdPbrQ",
+          "sig": "7aADvp-ZR3HHHVyTdd2XWqvTSLNrEyK3T7CRHnGLRFrr6luOCm1FKIyB4msg9YopUlCgRTQ9xwtuZbuEoYr0Dg",
+          "id": "iGqiSt4Xnw_k0c7e-7bIzhEJHJ3-_iH4o_2sbknXk4o"
+        },
+        {
+          "v": 1,
+          "actor": "u-carol",
+          "device": "MCowBQYDK2VwAyEAsstdtAKx6uNVNkciaL63LhA505Nlz4IcwVXgFN4GSsI",
+          "action": "project.join",
+          "subject": {
+            "type": "project",
+            "id": "p-2"
+          },
+          "parents": [
+            "iGqiSt4Xnw_k0c7e-7bIzhEJHJ3-_iH4o_2sbknXk4o"
+          ],
+          "ts": 1760000005000,
+          "nonce": "Vpk5nQG7R1_KztzE69oULA",
+          "sig": "x2DiVyjjupw0CegoSJOs2DSKfs8C_IVTk6GXzQMqA-TrlEWy5d6oHhuzmkxmxXohuEH-ineO70u86h67yw_LBg",
+          "id": "jZ3cCAEMYpz4WOQEjhiiRs3n7HW2W9TSizhtgToGAhY"
+        }
+      ],
+      "expect": {
+        "topoOrder": [
+          "iGqiSt4Xnw_k0c7e-7bIzhEJHJ3-_iH4o_2sbknXk4o",
+          "jZ3cCAEMYpz4WOQEjhiiRs3n7HW2W9TSizhtgToGAhY"
+        ],
+        "dedupeKeys": {
+          "iGqiSt4Xnw_k0c7e-7bIzhEJHJ3-_iH4o_2sbknXk4o": "u-alice|project:p-2|snapshot.commit|0",
+          "jZ3cCAEMYpz4WOQEjhiiRs3n7HW2W9TSizhtgToGAhY": "u-carol|project:p-2|project.join|0"
+        },
+        "applied": [
+          "iGqiSt4Xnw_k0c7e-7bIzhEJHJ3-_iH4o_2sbknXk4o",
+          "jZ3cCAEMYpz4WOQEjhiiRs3n7HW2W9TSizhtgToGAhY"
+        ],
+        "heads": [
+          "jZ3cCAEMYpz4WOQEjhiiRs3n7HW2W9TSizhtgToGAhY"
+        ],
+        "steps": [
+          {
+            "id": "iGqiSt4Xnw_k0c7e-7bIzhEJHJ3-_iH4o_2sbknXk4o",
+            "label": "c01",
+            "rootAfter": "y7aTwVcFDE5Pg-v0OVXPBGyEbuo4JCqTl4XYH6SoA9U"
+          },
+          {
+            "id": "jZ3cCAEMYpz4WOQEjhiiRs3n7HW2W9TSizhtgToGAhY",
+            "label": "c02",
+            "rootAfter": "mNbD99L2DrbKI7zlvDAo0BrzaUMSX-8YW8bGqusEzs0"
+          }
+        ],
+        "normalizedState": {
+          "v": 2,
+          "projectId": "p-2",
+          "asOf": 1760000005000,
+          "members": [
+            "u-alice",
+            "u-bob",
+            "u-carol"
+          ],
+          "balances": [
+            [
+              "u-alice",
+              "250000"
+            ],
+            [
+              "u-bob",
+              "-1"
+            ]
+          ],
+          "tosplits": [],
+          "rounds": [],
+          "sales": [],
+          "saleClaims": [],
+          "missions": [],
+          "halukas": [],
+          "decisions": [],
+          "stageVotes": [],
+          "timers": [],
+          "forums": [],
+          "meetings": [],
+          "away": [],
+          "settings": [
+            [
+              "name",
+              "רקמה מיובאת"
+            ]
+          ]
+        },
+        "stateRoot": "mNbD99L2DrbKI7zlvDAo0BrzaUMSX-8YW8bGqusEzs0"
+      }
+    }
+  ]
+}

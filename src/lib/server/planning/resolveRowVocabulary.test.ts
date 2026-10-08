@@ -12,7 +12,7 @@ vi.mock('../mission/resolveMissionSpec.js', () => ({
 const { resolveRowVocabulary } = await import('./expandDirection');
 
 function cat(resolved: { id: string; name: string }[]) {
-  return { ids: resolved.map((r) => r.id), resolved, suggestions: [], newlyCreated: [] };
+  return { ids: resolved.map((r) => r.id), resolved, suggestions: [], newlyCreated: [], unresolved: [] };
 }
 
 function resolution(over: Partial<ResolvedMissionSpec> = {}): ResolvedMissionSpec {

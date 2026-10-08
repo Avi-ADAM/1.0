@@ -6,6 +6,7 @@ import { createUnregisteredBotAgent } from '../../../mastra/agents/nonreg-bot.js
 import { t } from '$lib/translations';
 import { sendToSer } from '$lib/send/sendToSer.js';
 import { setMcpContext, clearMcpContext } from '$lib/server/mcpContext';
+import { resolveChatIdentity } from '$lib/server/chatIdentity';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': 'https://www.1lev1.com',
@@ -19,11 +20,14 @@ const corsHeaders = {
  * Used by the expanded /chat page for rich, tool-capable conversations.
  * Supports both registered (workflow) and unregistered (direct agent) users.
  */
-export const POST: RequestHandler = async ({ request, fetch, cookies }) => {
+export const POST: RequestHandler = async ({ request, fetch, locals }) => {
   const body = await request.json();
-  console.log('📥 Chat API:', body.userId ? `user=${body.userId}` : 'unregistered', `lang=${body.lang || body.user?.lang || 'he'}`);
   // ── Flexible Payload Parsing (Supports both /chat and legacy /mastra-v2 formats) ──
-  const userId = body.userId || body.user?.id;
+  // Identity is the signed session only. The tools below run with
+  // `isInternalBot: true` (ownership checks relaxed, actions under the admin
+  // token), so a body `userId` would let any caller act as any member.
+  const { userId } = resolveChatIdentity(locals, body.userId || body.user?.id);
+  console.log('📥 Chat API:', userId ? `user=${userId}` : 'unregistered', `lang=${body.lang || body.user?.lang || 'he'}`);
   const lang = body.lang || body.user?.lang || 'he';
   const currentPath = body.currentPath || body.payload?.currentPath || '/';
   // Conversation id minted by the client (chatStore) and reset when the user

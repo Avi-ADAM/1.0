@@ -12,7 +12,7 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { Agent } from '@mastra/core/agent';
-import { createGoogleModel } from '../../../../mastra/lib/createModel';
+import { createModelChain } from '../../../../mastra/lib/createModel';
 
 type Lang = 'he' | 'en' | 'ar';
 const VALID_LANGS = new Set<Lang>(['he', 'en', 'ar']);
@@ -33,7 +33,7 @@ function makeAgent() {
     name: 'MissionDescriptionEditor',
     instructions:
       'You improve and translate mission descriptions. Return only the requested output - no extra commentary.',
-    model: createGoogleModel(undefined, 'gemini-3-flash-preview', { thinkingBudget: 0 })
+    model: createModelChain()
   });
 }
 

@@ -16,7 +16,7 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { Agent } from '@mastra/core/agent';
-import { createGoogleModel } from '../../../../mastra/lib/createModel';
+import { createModelChain } from '../../../../mastra/lib/createModel';
 import { matchAllCategories } from '$lib/embed/matcher.js';
 import { sendToSer } from '$lib/send/sendToSer.js';
 import {
@@ -65,7 +65,7 @@ async function extractWithGemini(
     name: 'MissionExtractor',
     instructions:
       'You extract mission metadata from a name and description. Return JSON only - no explanations, no markdown fences.',
-    model: createGoogleModel(undefined, 'gemini-3-flash-preview', { thinkingBudget: 0 })
+    model: createModelChain()
   });
 
   const langName = LANG_NAMES[lang];

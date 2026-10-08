@@ -54,6 +54,8 @@ export interface ResolvedTerm {
   id: string;
   /** The CANONICAL label — the catalogue's spelling, not what the model wrote. */
   name: string;
+  /** Set when this resolver created the entry just now (it was not in the catalogue). */
+  created?: true;
 }
 
 export interface ResolvedCategory {
@@ -71,6 +73,11 @@ export interface ResolvedCategory {
   resolved: ResolvedTerm[];
   suggestions: MatchResult[];   // similarity 0.72–0.88 — show to user
   newlyCreated: string[];       // names that were created (got new IDs)
+  /**
+   * Inputs that ended with no entry at all — creation failed or was flagged by
+   * moderation. A caller that must not lose a term silently reads this.
+   */
+  unresolved: string[];
 }
 
 export interface ResolvedMissionSpec {
@@ -171,13 +178,14 @@ async function resolveCategory(
   fetchFn: typeof fetch
 ): Promise<ResolvedCategory> {
   if (!inputs || inputs.length === 0) {
-    return { ids: [], resolved: [], suggestions: [], newlyCreated: [] };
+    return { ids: [], resolved: [], suggestions: [], newlyCreated: [], unresolved: [] };
   }
 
   const results = await safeMatchCategory(inputs, namespace);
   const resolved: ResolvedTerm[] = [];
   const suggestions: MatchResult[] = [];
   const newlyCreated: string[] = [];
+  const unresolved: string[] = [];
 
   const toProcess = results ?? inputs.map((input) => ({ input, status: 'new' as const }));
 
@@ -191,15 +199,19 @@ async function resolveCategory(
       // something useful, but flag it as a suggestion for review
       if (r.existingId) {
         resolved.push({ id: r.existingId, name: r.existingLabel || r.input });
+      } else {
+        unresolved.push(r.input);
       }
     } else {
       // 'new' — create it
       const created = await createVocabEntry(fetchFn, namespace, r.input, lang);
       if (created) {
-        resolved.push({ id: created.id, name: created.name });
+        resolved.push({ id: created.id, name: created.name, created: true });
         newlyCreated.push(r.input);
+      } else {
+        // Best-effort here; the caller decides whether a lost term matters.
+        unresolved.push(r.input);
       }
-      // If creation fails: silently skip (best-effort)
     }
   }
 
@@ -216,7 +228,8 @@ async function resolveCategory(
     ids: unique.map((t) => t.id),
     resolved: unique,
     suggestions,
-    newlyCreated
+    newlyCreated,
+    unresolved
   };
 }
 

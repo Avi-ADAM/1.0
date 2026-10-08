@@ -17,6 +17,8 @@
  * the first counter (`$lib/wish/restime` `silenceApplies`).
  */
 
+import { signDigestOf } from './proposal.js';
+
 type Strapi = { execute: (qid: string, vars: any, jwt: string, fetch: any) => Promise<any> };
 type Ctx = { userId: string; jwt: string; fetch: any };
 
@@ -143,7 +145,8 @@ export async function createVolunteerProposal(
               note: String(args.terms?.note ?? '').trim() || undefined,
               submittedAt: nowISO,
               willingHours: hours,
-              willingAmount: price
+              willingAmount: price,
+              termsDigest: signDigestOf(ratAttrs)
             }
           ]
         },

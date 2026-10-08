@@ -39,6 +39,8 @@ import { ensureStageForumConfig } from './ensureStageForum.js';
 import { closeFiniapruvalConfig } from './closeFiniapruval.js';
 import { counterFiniapruvalConfig } from './counterFiniapruval.js';
 import { updateProjectDetailsConfig } from './updateProjectDetails.js';
+import { proposeRikmaIdentityConfig } from './proposeRikmaIdentity.js';
+import { checkRikmaSlugConfig } from './checkRikmaSlug.js';
 import { setRikmaCurrencyConfig } from './setRikmaCurrency.js';
 import { completeMissionConfig } from './completeMission.js';
 import { chatActions } from './chat.js';
@@ -50,6 +52,9 @@ import { linkActToMissionAction } from './linkActToMission.js';
 import { createResourceAction } from './createResource.js';
 import { toggleMoneyReceiverConfig } from './toggleMoneyReceiver.js';
 import { createSheirutHalukaConfig } from './createSheirutHaluka.js';
+import { getDealDueConfig } from './getDealDue.js';
+import { signDealEditConfig } from './signDealEdit.js';
+import { counterDealEditConfig } from './counterDealEdit.js';
 import { confirmSheirutHalukaConfig } from './confirmSheirutHaluka.js';
 import { updateSheirutConfig } from './updateSheirut.js';
 import { ensureHalukaForumConfig } from './ensureHalukaForum.js';
@@ -90,10 +95,21 @@ import { requestWishMissionConfig } from './requestWishMission.js';
 import { requestWishResourceConfig } from './requestWishResource.js';
 import { counterRatsonProposalConfig } from './counterRatsonProposal.js';
 import { setWishRestimeConfig } from './setWishRestime.js';
+import { updateWishTermsConfig } from './updateWishTerms.js';
+import { draftDirectOfferConfig } from './draftDirectOffer.js';
+import {
+  claimDirectOfferConfig,
+  issueDirectOfferLinkConfig,
+  revokeDirectOfferLinkConfig,
+  updateDirectOfferConfig
+} from './directOffer.js';
 import { hideRatsonProposalConfig } from './hideRatsonProposal.js';
+import { dismissNoticeConfig, restoreNoticeConfig, saveNoticePrefsConfig } from './noticePrefs.js';
 import { acceptWishOfferConfig } from './acceptWishOffer.js';
 import { declineWishOfferConfig } from './declineWishOffer.js';
 import { materializeWishConfig } from './materializeWish.js';
+import { signDealOfferConfig } from './signDealOffer.js';
+import { confirmDealPartReceivedConfig } from './confirmDealPartReceived.js';
 import { publishWishNeedToCommunityConfig } from './publishWishNeedToCommunity.js';
 import { finalizeAskAcceptanceConfig } from './finalizeAskAcceptance.js';
 import { finalizeJoinAcceptanceConfig } from './finalizeJoinAcceptance.js';
@@ -270,6 +286,8 @@ export function registerAllActions(): void {
   // …and the way to disagree with one: a counter, never a veto
   registerAction(counterFiniapruvalConfig);
   registerAction(updateProjectDetailsConfig);
+  registerAction(proposeRikmaIdentityConfig);
+  registerAction(checkRikmaSlugConfig);
   registerAction(setRikmaCurrencyConfig);
 
   // Chat actions
@@ -285,6 +303,9 @@ export function registerAllActions(): void {
 
   // Sheirut haluka (money transfer tracking)
   registerAction(createSheirutHalukaConfig);
+  registerAction(getDealDueConfig);
+  registerAction(signDealEditConfig);
+  registerAction(counterDealEditConfig);
   registerAction(confirmSheirutHalukaConfig);
   registerAction(ensureHalukaForumConfig);
 
@@ -387,9 +408,23 @@ export function registerAllActions(): void {
   registerAction(counterRatsonProposalConfig);
   // the wish's own pace — how long the other side has before silence answers for them
   registerAction(setWishRestimeConfig);
+  registerAction(updateWishTermsConfig);
+  // Direct offers (PLAN_DIRECT_OFFER P3–P4)
+  registerAction(draftDirectOfferConfig);
+  registerAction(updateDirectOfferConfig);
+  registerAction(issueDirectOfferLinkConfig);
+  registerAction(revokeDirectOfferLinkConfig);
+  registerAction(claimDirectOfferConfig);
   registerAction(hideRatsonProposalConfig);
+  // Smart notices (PLAN_SMART_NOTICES §4): the viewer's own hidden notices and preferences
+  registerAction(dismissNoticeConfig);
+  registerAction(restoreNoticeConfig);
+  registerAction(saveNoticePrefsConfig);
   registerAction(declineWishOfferConfig);
   registerAction(materializeWishConfig);
+  // QA C-19: the customer co-signs the open parts of her deal; "paid" waits for every provider
+  registerAction(signDealOfferConfig);
+  registerAction(confirmDealPartReceivedConfig);
   registerAction(publishWishNeedToCommunityConfig);
   registerAction(offerWishHelpConfig);
   registerAction(offerNewProductsToWishesConfig);
@@ -577,6 +612,8 @@ export {
   closeFiniapruvalConfig,
   counterFiniapruvalConfig,
   updateProjectDetailsConfig,
+  proposeRikmaIdentityConfig,
+  checkRikmaSlugConfig,
   setRikmaCurrencyConfig,
   createProcessConfig,
   attachEntityToProcessConfig,

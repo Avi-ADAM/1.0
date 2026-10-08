@@ -1,0 +1,50 @@
+{
+  "id": "smoke",
+  "title": "בדיקת מקליט",
+  "scenes": [
+    {
+      "id": "landing",
+      "session": "guest",
+      "setup": [
+        {
+          "do": "goto",
+          "url": "/made-for-you"
+        }
+      ],
+      "steps": [
+        {
+          "do": "highlight",
+          "target": {
+            "role": "heading",
+            "level": 1,
+            "name": "/מה שתרצו/"
+          },
+          "ms": 1400
+        },
+        {
+          "do": "click",
+          "target": {
+            "role": "link",
+            "name": "ספרו לנו מה תרצו"
+          },
+          "mark": "cta"
+        },
+        {
+          "do": "waitForUrl",
+          "match": "/wish/new"
+        },
+        {
+          "do": "type",
+          "target": {
+            "role": "textbox",
+            "name": "/במשפט אחד/"
+          },
+          "text": "שולחן עבודה מעץ בהתאמה אישית"
+        }
+      ]
+    }
+  ],
+  "warmup": [
+    "/wish/new"
+  ]
+}

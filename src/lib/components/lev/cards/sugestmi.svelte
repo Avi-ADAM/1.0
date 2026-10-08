@@ -50,6 +50,8 @@
     totalinyearone = 600,
     totalinyearsec = 1000,
     isMonthly = true,
+    /** The customer's wish this is a part of (concierge), or null. */
+    wishName = null,
     alreadyi = false,
     hearotMeyuchadot,
     already = $bindable(),
@@ -345,6 +347,13 @@
       />
     {/if}
 
+    <!-- חלק ממשאלה של לקוחה: היא משלמת על העבודה, אין "צפי רווח" של רקמה (QA C-10) -->
+    {#if wishName != null}
+      <div class="text-sm text-gray-700 dark:text-gray-300">
+        <span class="font-semibold">{$t('lev.suggestor.partOfWish')}</span>
+        {wishName}
+      </div>
+    {:else}
     <!-- תגית צפי רווח -->
     <div
       class="inline-block px-4 py-2 bg-gradient-to-r from-yellow-100 to-yellow-50 dark:from-yellow-900/40 dark:to-yellow-800/20 border border-yellow-300 dark:border-yellow-700 text-yellow-800 dark:text-yellow-400 rounded-full text-sm md:text-base font-bold shadow-sm"
@@ -360,6 +369,7 @@
       {:else if timeToP == 'never'}{$t('lev.income.none')}
       {/if}
     </div>
+    {/if}
 
     <!-- פרטי משימה והערות (RichText) -->
     <div class="space-y-4 text-gray-700 dark:text-gray-300">

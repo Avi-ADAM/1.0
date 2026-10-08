@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('./conciergeAgent', () => ({ getConciergeAgent: vi.fn() }));
 
-import { normDetails, EMPTY_DETAILS } from './extractWish';
+import { normDetails, EMPTY_DETAILS, isCleanText } from './extractWish';
 
 const TODAY = '2026-09-24';
 
@@ -54,5 +54,21 @@ describe('normDetails', () => {
     expect(normDetails({ groupKind: 'solo' }, TODAY).groupKind).toBe('');
     expect(normDetails({ online: 'yes' }, TODAY).online).toBeNull();
     expect(normDetails({ online: false }, TODAY).online).toBe(false);
+  });
+});
+
+describe('isCleanText (QA C-1)', () => {
+  // Assembled from escapes so `npm run check:script` does not report this file.
+  const mixed = 'נג' + 'ار'; // two Hebrew letters + two Arabic ones
+
+  it('keeps single-alphabet text, Hebrew with a Latin brand included', () => {
+    expect(isCleanText('נגרות')).toBe(true);
+    expect(isCleanText('תיקון מחשבים')).toBe(true);
+    expect(isCleanText('התקנת Windows')).toBe(true);
+  });
+
+  it('drops a word written in two alphabets', () => {
+    expect(isCleanText(mixed)).toBe(false);
+    expect(isCleanText(`שולחן ${mixed}`)).toBe(false);
   });
 });

@@ -122,6 +122,50 @@ export function createGoogleModel(
   return google(modelId, providerOptions ? { providerOptions } : undefined);
 }
 
+/**
+ * The Gemini models an agent walks through, in order. The primary is the
+ * strongest; it is also the one Google most often answers with
+ * 503 "This model is currently experiencing high demand". The second is a
+ * different model family, so it is rarely overloaded at the same moment —
+ * measured on 2026-10-06/07: while 3-flash-preview returned 503, 3.1-flash-lite
+ * answered in ~1s and called tools correctly.
+ */
+export const CHAT_GEMINI_MODELS = ['gemini-3-flash-preview', 'gemini-3.1-flash-lite', 'gemini-flash-lite-latest'] as const;
+
+type ModelChain = Array<{ model: ReturnType<typeof createGoogleModel>; maxRetries: number }>;
+
+/**
+ * An ordered fallback chain for a Mastra `Agent`'s `model`. Mastra moves to the
+ * next entry when a call fails, so a busy model costs one quick retry, not the
+ * user's answer.
+ *
+ * Pass the chain, never a single model: creating a model never throws — only
+ * calling it does — so a `try/catch` around `createGoogleModel` falls back
+ * from nothing.
+ */
+export function createModelChain(
+  apiKey?: string,
+  options: { nvidiaModel?: string } = {}
+): ModelChain {
+  const chain: ModelChain = [];
+  if (hasGoogleModelConfig(apiKey)) {
+    // One retry each: a 503 comes back fast, and the next model is the better retry.
+    for (const id of CHAT_GEMINI_MODELS) {
+      chain.push({ model: createGoogleModel(apiKey, id, { thinkingBudget: 0 }), maxRetries: 1 });
+    }
+  }
+  if (hasGroqModelConfig()) {
+    chain.push({ model: createGroqModel() as any, maxRetries: 1 });
+  }
+  if (hasNvidiaModelConfig(apiKey)) {
+    chain.push({ model: createNvidiaModel(apiKey, options.nvidiaModel) as any, maxRetries: 1 });
+  }
+  if (chain.length === 0) {
+    throw new Error('No AI model provider configured. Set GEMINI_API_KEY, GROQ_API_KEY or NVIDIA_API_KEY.');
+  }
+  return chain;
+}
+
 export function createGroqModel(
   apiKey?: string,
   modelId: string = 'llama-3.3-70b-versatile'

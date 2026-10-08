@@ -112,9 +112,9 @@ export const createTosplitConfig: ActionConfig = {
   },
   
   updateStrategy: {
-    type: 'partialUpdate',
+    type: 'refetchScope', // Re-read the slice: the raw result is not in the lev store's shape (REALTIME_TRACKING B1).
     config: {
-      dataKeys: ['tosplits', 'halukas', 'splits']
+      dataKeys: ['halukas'] // the lev 'halukas' slice holds the tosplits
     }
   }
 };

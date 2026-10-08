@@ -43,7 +43,11 @@
 
 <ScreenFrame>
   {#snippet journey()}
-    <JourneyStrip stepIdx={2} totalSteps={6} label={$t('auth.confirm.step')} />
+    {#if data.concierge}
+      <JourneyStrip stepIdx={3} totalSteps={3} label={$t('auth.confirm.stepConcierge')} />
+    {:else}
+      <JourneyStrip stepIdx={2} totalSteps={6} label={$t('auth.confirm.step')} />
+    {/if}
   {/snippet}
 
   <div class="content" in:scale={{ duration: 600, opacity: 0.5, start: 0.96, easing: quintOut }}>
@@ -53,13 +57,18 @@
 
     <div class="tile-info">{body}</div>
 
-    {#if pageState === 'ready'}
-      <!-- A real POST, not a link: only a person presses it (see the loader). -->
+    {#if pageState === 'ready' || (pageState === 'error' && data.confirmation)}
+      <!-- A real POST, not a link: only a person presses it (see the loader).
+           After a failed attempt the token is still unspent, so it is offered again. -->
       <form method="POST" action="?/continue" onsubmit={() => (continuing = true)}>
         <input type="hidden" name="confirmation" value={data.confirmation} />
         <input type="hidden" name="email" value={data.email} />
         <button class="btn btn-key" type="submit" disabled={continuing}>
-          {continuing ? $t('auth.confirm.continuing') : $t('auth.confirm.continue')}
+          {continuing
+            ? $t('auth.confirm.continuing')
+            : pageState === 'error'
+              ? $t('auth.confirm.retry')
+              : $t('auth.confirm.continue')}
         </button>
       </form>
     {:else}

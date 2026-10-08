@@ -4,21 +4,40 @@
   import { t } from '$lib/translations';
   import { lang } from '$lib/stores/lang.js';
   import type { CostBreakdown } from '$lib/types';
+  import type { Snippet } from 'svelte';
+  import type { PaymentState } from '$lib/sheirut/paymentState';
 
   let {
     totalCost,
     paid,
     costBreakdown,
     pendingCost = 0,
+    remaining: owed = null,
+    inTransit = 0,
+    pay = null,
+    payment = undefined,
   }: {
     totalCost:     number;
     paid:          number;
     costBreakdown: CostBreakdown;
     pendingCost?:  number;
+    /** What is still to be sent, when the deal knows it (a wish deal, C-14/C-19). */
+    remaining?:    number | null;
+    /** Sent but not confirmed by the providers yet (C-19) — neither paid nor owed. */
+    inTransit?:    number;
+    /** Where the payment stands for the viewer (`paymentState`); null = no payment row. */
+    pay?:          PaymentState | null;
+    /** The customer's payment flow itself (CustomerPayment), opened by the button. */
+    payment?:      Snippet;
   } = $props();
 
-  const remaining = $derived(totalCost - paid);
-  const paidPct   = $derived(Math.round((paid / totalCost) * 100));
+  let payOpen = $state(false);
+  // The flow follows the transfer it opened (`sent`); nothing to open once it is paid.
+  const canOpen = $derived((pay === 'open' || pay === 'sent') && !!payment);
+
+  const remaining = $derived(owed ?? Math.max(0, totalCost - paid));
+  // A deal paid by approved hours can owe 0 before any hour is approved (C-14).
+  const paidPct   = $derived(totalCost > 0 ? Math.min(100, Math.round((paid / totalCost) * 100)) : 0);
 </script>
 
 <Panel title={$t('deals.costsTitle')}>
@@ -45,6 +64,12 @@
       <span class="l">{$t('deals.paidSoFar')}</span>
       <span class="v paid"><Money amount={paid} /></span>
     </div>
+    {#if inTransit > 0}
+      <div class="row">
+        <span class="l">{$t('deals.inTransit')}</span>
+        <span class="v approval"><Money amount={inTransit} /></span>
+      </div>
+    {/if}
     <div class="row">
       <span class="l">{$t('deals.remaining')}</span>
       <span class="v pending"><Money amount={remaining} /></span>
@@ -68,8 +93,24 @@
     </div>
   </div>
 
-  <!-- Pay CTA -->
-  <button class="pay-btn">{$t('deals.nextPayment')}</button>
+  <!-- Pay CTA — only as open as the payment itself (CustomerPayment / paymentState) -->
+  {#if canOpen}
+    <button class="pay-btn" aria-expanded={payOpen} onclick={() => (payOpen = !payOpen)}>
+      {payOpen ? $t('deals.pay.hide') : pay === 'sent' ? $t('deals.pay.track') : $t('deals.nextPayment')}
+    </button>
+    {#if payOpen}
+      <div class="pay-flow">{@render payment?.()}</div>
+    {/if}
+  {:else if pay === 'notYet'}
+    <button class="pay-btn" disabled aria-describedby="pay-note">{$t('deals.pay.closed')}</button>
+    <p class="pay-note" id="pay-note">{$t('deals.due.payWhenFinal')}</p>
+  {:else if pay === 'nothingLeft'}
+    <p class="pay-note done">{$t('deals.due.nothingLeft')}</p>
+  {:else if pay === 'paid'}
+    <p class="pay-note done">{$t('deals.pay.paidNote')}</p>
+  {:else if pay === 'supplier'}
+    <p class="pay-note">{$t('deals.pay.supplierNote')}</p>
+  {/if}
 </Panel>
 
 <style>
@@ -139,8 +180,22 @@
     box-shadow: 0 4px 20px rgba(200, 21, 95, 0.35);
     transition: all 0.2s;
   }
-  .pay-btn:hover {
+  .pay-btn:hover:not(:disabled) {
     transform: translateY(-1px);
     box-shadow: 0 6px 26px rgba(200, 21, 95, 0.5);
   }
+  .pay-btn:disabled {
+    background: var(--s3);
+    color: var(--tm);
+    box-shadow: none;
+    cursor: not-allowed;
+  }
+  .pay-flow { margin-top: 14px; }
+  .pay-note {
+    margin: 14px 0 0;
+    font-size: 12px;
+    line-height: 1.55;
+    color: var(--gold-l);
+  }
+  .pay-note.done { color: #4ade80; }
 </style>

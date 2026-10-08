@@ -164,6 +164,10 @@ function createSocketClient() {
           }
           break;
 
+        case 'refetchScope':
+          // Lev slices — handled by the lev page's own listener (levSocketHandler).
+          break;
+
         case 'none':
           // No update needed
           break;
@@ -202,6 +206,13 @@ function createSocketClient() {
     if (!userId) {
       console.error('[SocketClient] Missing userId');
       update(state => ({ ...state, error: 'Missing user ID' }));
+      return;
+    }
+
+    // The root layout connects once; the moach and forum layouts call connect()
+    // again on mount. Tearing down a live socket of the same user there dropped
+    // whatever arrived during the reconnect (REALTIME_TRACKING B11).
+    if (socket && currentUserId === userId && (socket.connected || socket.active)) {
       return;
     }
 

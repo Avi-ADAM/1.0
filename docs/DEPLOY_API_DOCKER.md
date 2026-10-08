@@ -256,6 +256,11 @@ curl -s -H "Authorization: Bearer $AXIOM_TOKEN" https://api.axiom.co/v2/datasets
 - ל-`.env` שבשרת יש להוסיף גם `SOCKET_SERVER_URL=http://unified-action-socket-server:3001`
   (ברירת המחדל `localhost:3001` לא מגיעה לקונטיינר ה-socket) ואופציונלית `REND_URL`
   (יעד `api/pingrama`; ברירת מחדל `https://api.1lev1.com/` — החליף את rend.1lev1.com).
+- **`SOCKET_BROADCAST_SECRET` חובה** — אותו ערך כאן, ב-Vercel וב-`.env` של
+  `socket-server` (ה-compose שלו מעביר אותו לקונטיינר). `/broadcast` ו-`/space-changed`
+  יושבים על socket.1lev1.com הציבורי; בלי הכותרת `x-socket-secret` הם מחזירים 401,
+  ובלי הסוד בשרת הסוקט — 503 לכל בקשה (realtime נופל ל-polling). ראו
+  `socket-server/src/internal-auth.ts`.
 - ה-runtime env (`/opt/1lev1/api/.env`) נטען דרך `env_file` של ה-compose —
   זמין ל-`$env/dynamic/private` בלי rebuild.
 - `ORIGIN` חובה ל-adapter-node (בדיקות origin/CSRF מאחורי proxy).

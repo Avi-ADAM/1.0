@@ -7,7 +7,6 @@
   import ForumInboxList from '$lib/components/forum/ForumInboxList.svelte';
   import { socketClient } from '$lib/stores/socketClient';
   import { forumStore } from '$lib/stores/forumStore';
-  import { registerUpdateStrategies } from '$lib/client/updateStrategies';
 
   type ForumSummary = {
     id: string;
@@ -115,7 +114,6 @@
   });
 
   onMount(() => {
-    registerUpdateStrategies();
     seedForums();
     showBlockedNotice();
     socketClient.connect(data.uid);

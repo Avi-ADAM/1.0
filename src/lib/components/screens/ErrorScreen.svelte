@@ -19,7 +19,7 @@
    * @typedef {Object} Props
    * @property {string} [message]
    * @property {number|string} [status]
-   * @property {'auth'|'server'} [code]
+   * @property {'auth'|'server'|'unreachable'} [code]
    * @property {string} [from]
    */
 
@@ -37,8 +37,17 @@
   );
   let loginHref = $derived(`/login?from=${encodeURIComponent(target)}&expired=1`);
 
+  // A signed-in visitor refused a page is not "signed out": the page says it is
+  // closed to them, in the server's own words (QA C-23 — a private wish told a
+  // logged-in supplier their session had expired).
+  let signedIn = $derived(!!(page.data?.loggedIn || page.data?.uid));
+  let isForbidden = $derived(status == 403 && signedIn && code !== 'auth');
   // 401/403 are auth by definition; `code` covers everything hooks classified.
-  let isAuth = $derived(code === 'auth' || status == 401 || status == 403);
+  let isAuth = $derived(!isForbidden && (code === 'auth' || status == 401 || status == 403));
+  // The backend did not answer (a load's 503, $lib/server/sendReply.js). The
+  // page exists and the session is fine, so this is no place to offer sign-in:
+  // the one useful thing is to try again.
+  let isUnreachable = $derived(!isForbidden && !isAuth && (code === 'unreachable' || status == 503 || status == 504));
 
   function retry() {
     location.reload();
@@ -55,13 +64,21 @@
     <h1 class="text-barbi text-4xl font-bold">{status}</h1>
 
     <h2 class="text-barbi mt-3 text-2xl">
-      {isAuth
-        ? tf('auth.errorScreen.authTitle', 'ההתחברות שלך פגה')
-        : tf('auth.errorScreen.serverTitle', 'משהו השתבש אצלנו')}
+      {isForbidden
+        ? tf('auth.errorScreen.forbiddenTitle', 'הדף הזה לא פתוח עבורך')
+        : isUnreachable
+          ? tf('auth.errorScreen.unreachableTitle', 'השרת לא ענה בזמן')
+          : isAuth
+          ? tf('auth.errorScreen.authTitle', 'ההתחברות שלך פגה')
+          : tf('auth.errorScreen.serverTitle', 'משהו השתבש אצלנו')}
     </h2>
 
     <p class="text-gold mt-3 text-lg">
-      {isAuth
+      {isForbidden
+        ? message || tf('auth.errorScreen.forbiddenBody', 'למי שפתח/ה אותו יש החלטה מי רואה אותו.')
+        : isUnreachable
+        ? tf('auth.errorScreen.unreachableBody', 'הדף קיים, אבל השרת שמאחוריו לא הגיב הפעם. כדאי לנסות שוב בעוד רגע.')
+        : isAuth
         ? tf(
             'auth.errorScreen.authBody',
             'לא הצלחנו לזהות אותך. אם לא ביקרת כאן זמן מה, ההתחברות כנראה פגה - כניסה מחדש תחזיר אותך בדיוק לאן שרצית להגיע.'
@@ -69,7 +86,7 @@
         : tf('auth.errorScreen.serverBody', 'לא הצלחנו לטעון את הדף.')}
     </p>
 
-    {#if !isAuth}
+    {#if !isAuth && !isForbidden && !isUnreachable}
       <!-- Even a genuine server error is most often a dead session downstream,
            so the sign-in route stays offered — just phrased as a possibility. -->
       <p class="text-tm mt-2 text-sm">
@@ -81,6 +98,7 @@
     {/if}
 
     <div class="mt-8 flex flex-wrap justify-center gap-3">
+      {#if !isForbidden && !isUnreachable}
       <a
         href={loginHref}
         class="button-perl text-barbi hover:text-black border border-gold px-5 py-3 text-xl font-bold"
@@ -91,6 +109,7 @@
         class="text-gold hover:text-barbi hover:border-barbi border border-gold rounded px-5 py-3 text-xl"
         >{tf('auth.errorScreen.signup', 'הרשמה')}</a
       >
+      {/if}
       <button
         onclick={retry}
         class="text-gold hover:text-barbi hover:border-barbi border border-gold rounded px-5 py-3 text-xl"
@@ -103,7 +122,7 @@
       >
     </div>
 
-    <p class="text-tm mt-8 text-xs">{message}</p>
+    {#if !isForbidden}<p class="text-tm mt-8 text-xs">{message}</p>{/if}
     <p class="text-tm mt-1 text-xs">
       {tf(
         'common.misc.genericError',

@@ -22,8 +22,10 @@
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { execFromContext } from '$lib/server/archive/exec.js';
 import { signObjectChange } from '$lib/server/archive/vote.js';
+import { dealSignersFor } from '$lib/server/sheirut/dealEdit.js';
 import { signStipend } from '$lib/server/stipend/vote.js';
 import { normalizeLicenseChange } from '$lib/codeLicense/codeLicense.js';
+import { applyIdentityDecision } from '$lib/server/rikmaIdentity/identity.js';
 import { calcDeadlineMs } from './actionUtils.js';
 import {
   fetchSaleClaim,
@@ -177,10 +179,18 @@ async function handleObjectChangeVote(
   params: Record<string, any>,
   context: any,
   notifier: any,
+  strapi: any,
 ) {
   const decisionId = String(params.decisionId);
   const exec = execFromContext(context);
-  const outcome = await signObjectChange(exec, decisionId, String(context.userId));
+  // A version that raises a part of a customer's deal also waits for her signature, and
+  // once applied the deal follows it (C-14, $lib/server/sheirut/dealEdit).
+  const outcome = await signObjectChange(
+    exec,
+    decisionId,
+    String(context.userId),
+    dealSignersFor((qid, vars) => strapi.execute(qid, vars, context.jwt, context.fetch)),
+  );
 
   if (notifier && params.projectId) {
     const applied = outcome.applied;
@@ -309,7 +319,7 @@ const voteOnDecisionHandler: ActionExecutionHandler = async (params, context, { 
   // Archive/edit proposals vote per *round*, not once per decision — the
   // question is which version you stand behind, and a counter opens a new one.
   if (kind === 'archiveObject' || kind === 'editObject') {
-    return handleObjectChangeVote(params, context, notifier);
+    return handleObjectChangeVote(params, context, notifier, strapi);
   }
 
   // Stipend proposals vote per round too, and their signer set depends on
@@ -463,6 +473,23 @@ const voteOnDecisionHandler: ActionExecutionHandler = async (params, context, { 
           context.jwt,
           context.fetch,
         );
+      }
+    } else if (kind === 'address' || kind === 'look') {
+      // PLAN_RIKMA_SUBDOMAINS — the same applier the restime-silence path uses,
+      // which re-validates the address (it may have been taken meanwhile) and
+      // the look. A refusal leaves the decision closed and unapplied; the
+      // members propose again.
+      try {
+        await applyIdentityDecision(
+          {
+            read: (qid, vars) => strapi.execute(qid, vars, undefined, context.fetch),
+            write: (qid, vars) => strapi.execute(qid, vars, context.jwt, context.fetch),
+          },
+          String(decisionId),
+          String(projectId),
+        );
+      } catch (e) {
+        console.error('[voteOnDecision:identity] approved but not applied:', { decisionId, kind, error: e });
       }
     } else if (kind === 'vallueadd' || kind === 'vallueles') {
       // Fetch current project vallue IDs

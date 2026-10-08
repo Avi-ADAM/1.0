@@ -93,7 +93,9 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
     note: String(note).trim(),
     submittedAt: now,
     ...(next.amount != null ? { willingHours: next.amount } : {}),
-    ...(next.price != null ? { willingAmount: next.price } : {})
+    ...(next.price != null ? { willingAmount: next.price } : {}),
+    // A counter is signed under the wish's terms as they stand (PLAN_DIRECT_OFFER §4.3).
+    termsDigest: p.signDigest
   };
 
   const written = await strapi.execute(

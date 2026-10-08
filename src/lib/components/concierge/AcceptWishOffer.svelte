@@ -37,6 +37,8 @@
     amount: number | null;
     price: number | null;
     counters: { round: number; by: 'wisher' | 'provider'; amount: number | null; price: number | null; note: string }[];
+    /** The wisher changed the wish's details since the last signature (PLAN_DIRECT_OFFER §4.3). */
+    termsChanged?: boolean;
   };
 
   let {
@@ -213,6 +215,14 @@
         </div>
       </div>
 
+      {#if negotiation?.termsChanged}
+        <!-- New details of the wish are a new version: read them before you sign again. -->
+        <p class="ofr-changed" role="status">
+          {$tr('deals.negTermsChanged')}
+          <a href={wishHref}>{$tr('deals.negTermsChangedLink')}</a>
+        </p>
+      {/if}
+
       {#if negotiation && negotiation.counters.length > 0}
         <!-- What was said so far: there is no flat "no" here, the terms go round. -->
         <div class="ofr-neg-log">
@@ -237,7 +247,11 @@
         <div class="ofr-actions">
           <a class="ofr-btn ofr-btn--ghost" href={wishHref}>{t.full}</a>
           <button class="ofr-btn ofr-btn--primary" onclick={approve}>
-            {negotiation && negotiation.round > 0 ? $tr('deals.negApproveTheirs') : t.approve}
+            {negotiation?.termsChanged
+              ? $tr('deals.negApproveNewTerms')
+              : negotiation && negotiation.round > 0
+                ? $tr('deals.negApproveTheirs')
+                : t.approve}
           </button>
         </div>
         {#if canCounter}
@@ -436,6 +450,16 @@
   .ofr-neg-log p { margin: 0; font-size: 12.5px; line-height: 1.55; color: var(--tm, #9a8f80); }
   .ofr-deadline { margin: 0 0 12px; font-size: 12.5px; line-height: 1.5; color: var(--tm, #9a8f80); }
   .ofr-waiting { margin: 0 0 6px; font-size: 13.5px; color: var(--gold-l, #e8d59a); }
+  .ofr-changed {
+    margin: 0 0 12px;
+    padding: 10px 12px;
+    border: 1px solid var(--border-g, rgba(200, 150, 12, 0.22));
+    border-radius: 10px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--gold-l, #e8d59a);
+  }
+  .ofr-changed a { color: inherit; font-weight: 700; text-underline-offset: 3px; }
   .ofr-waiting-note { margin: 0 0 12px; font-size: 12.5px; color: var(--tm, #9a8f80); font-style: italic; }
   .ofr-form { display: flex; flex-direction: column; gap: 10px; }
   .ofr-fields { display: flex; gap: 10px; }

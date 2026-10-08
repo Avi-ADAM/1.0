@@ -8,7 +8,7 @@
 // Best-effort: a down socket server degrades realtime to polling, never
 // blocks or fails a push.
 
-const SOCKET_SERVER_URL = process.env.SOCKET_SERVER_URL || 'http://127.0.0.1:3001';
+import { SOCKET_SERVER_URL, socketServerHeaders } from '$lib/server/socketServer.js';
 
 let warned = false;
 
@@ -17,7 +17,7 @@ export function notifySpaceChanged(spaceId: string): void {
   const timer = setTimeout(() => controller.abort(), 3000);
   fetch(`${SOCKET_SERVER_URL}/space-changed`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: socketServerHeaders(),
     body: JSON.stringify({ spaceId }),
     signal: controller.signal
   })

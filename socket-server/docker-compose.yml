@@ -11,6 +11,12 @@ services:
       - PORT=3001
       - CLIENT_URL=${CLIENT_URL:-http://localhost:5173}
       - JWT_SECRET=${JWT_SECRET}
+      # Shared with the main app; without it /broadcast and /space-changed refuse everything.
+      - SOCKET_BROADCAST_SECRET=${SOCKET_BROADCAST_SECRET}
+      # Only the variables listed here reach the container - the image carries
+      # no .env. Both fail closed when empty: no guest sockets / no P2P rooms.
+      - GUEST_INVITE_SECRET=${GUEST_INVITE_SECRET}
+      - P2P_TICKET_SECRET=${P2P_TICKET_SECRET}
       - NODE_ENV=${NODE_ENV:-production}
     healthcheck:
       test: ["CMD", "node", "-e", "require('http').get('http://localhost:3001/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]

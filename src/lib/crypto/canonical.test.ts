@@ -53,4 +53,22 @@ describe('canonicalize', () => {
       { numRuns: 100 }
     );
   });
+
+  // SPEC_CONSENT_FORMAT §2 — the rules a second implementation must share.
+  // The full set lives in spec/consent-v1/canonical.json.
+  it('sorts keys by UTF-16 code units, not UTF-8 bytes', () => {
+    expect(canonicalize({ '': 1, '\u{1F600}': 2 })).toBe('{"\u{1F600}":2,"":1}');
+  });
+
+  it('sorts keys after NFC normalization and refuses keys that collide under it', () => {
+    expect(canonicalize({ 'é': 1, f: 2 })).toBe('{"f":2,"é":1}');
+    expect(() => canonicalize({ 'é': 1, 'é': 2 })).toThrow(/duplicate key/);
+  });
+
+  it('refuses lone surrogates in strings and keys, accepts paired ones', () => {
+    expect(() => canonicalize('\ud800')).toThrow(/lone surrogate/);
+    expect(() => canonicalize('a\udc00')).toThrow(/lone surrogate/);
+    expect(() => canonicalize({ '\ud83d': 1 })).toThrow(/lone surrogate/);
+    expect(canonicalize('😀')).toBe('"\u{1F600}"');
+  });
 });

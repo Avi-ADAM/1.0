@@ -1,5 +1,20 @@
 /**
  * Action Configuration: Approve a resource-share request (Askm)
+ *
+ * The server decides — from the askm as the DB holds it — whether this yes
+ * completes the rikma's agreement, never the card. `variant` is still accepted
+ * and means only "the card thinks so" (`'partial'` = it does not):
+ *
+ *   - the yes is merged over the DB's vots at the standing round
+ *     (nego/candidacyVote.ts) — the card's `existingVotes` is not written back,
+ *     because it dropped every vote cast since it loaded and every row's `order`;
+ *   - materialization needs the candidate's yes to the standing round, every
+ *     paying customer's (QA C-19), and every other member's — `allVoted` used to
+ *     be the card's arithmetic (`noofpu === noofusersOk`), taken on trust;
+ *   - short of that the yes is recorded and the restime clock runs, so silence
+ *     still completes it (api/timegrama/askm);
+ *   - the other members' askm cards re-read their slice through the socket
+ *     (`refetchScope`), so nobody signs a stale copy of these terms.
  */
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
@@ -8,191 +23,134 @@ import {
   activateRecurringEngine,
 } from '../helpers/runResourceAskmAcceptance.js';
 import { ensureCandidacyTimegrama } from '../../nego/timegrama.js';
-import { computeNegoGate, normId } from '../../nego/negoGate.js';
-
-/**
- * Does this Askm still owe the offerer's yes on the standing round?
- *
- * Returns null when it may be materialized (the ordinary case: a bare
- * application, or a round the candidate authored/signed), and otherwise the
- * vote array to persist instead — the approver's yes at the standing round,
- * merged over the DB's own rows rather than the client's.
- *
- * Read failures return null: an unreachable Askm must not block an approval
- * that was legitimate before this check existed.
- */
-async function awaitingCandidateConsent(
-  strapi: { execute: (q: string, v: Record<string, unknown>, jwt?: string, f?: typeof globalThis.fetch) => Promise<any> },
-  context: { userId: string | number; jwt?: string; fetch?: typeof globalThis.fetch },
-  askmId: string
-): Promise<{ L: number; vots: Array<Record<string, unknown>> } | null> {
-  let attrs: any = null;
-  try {
-    const res: any = await strapi.execute('getAskmForFinalize', { id: askmId }, context.jwt, context.fetch);
-    attrs = res?.data?.askm?.data?.attributes ?? null;
-  } catch (e) {
-    console.warn('[finalizeAskmAcceptance] consent check could not read the askm:', e);
-    return null;
-  }
-  if (!attrs) return null;
-
-  const rounds = (attrs.nego_mashes?.data ?? []).map((r: any) => ({
-    ordern: r?.attributes?.ordern,
-    proposedBy: r?.attributes?.proposedBy,
-  }));
-  const L = rounds.reduce((max: number, r: any) => Math.max(max, Number(r?.ordern ?? 0)), 0);
-  const dbVots = (attrs.vots ?? [])
-    .map((v: any) => ({
-      what: v?.what !== false,
-      order: Number(v?.order ?? 0),
-      users_permissions_user: normId(v?.users_permissions_user),
-    }))
-    .filter((v: any) => v.users_permissions_user !== '');
-
-  const caller = String(context.userId);
-  const merged = [
-    ...dbVots.filter((v: any) => !(v.users_permissions_user === caller && v.order === L)),
-    { what: true, order: L, users_permissions_user: caller },
-  ];
-
-  const gate = computeNegoGate({
-    rounds,
-    vots: merged,
-    takerId: normId(attrs.users_permissions_user),
-    memberIds: (attrs.project?.data?.attributes?.user_1s?.data ?? []).map((m: any) => String(m.id)),
-  });
-  if (gate.takerYes) return null;
-
-  return {
-    L,
-    vots: merged.map((v: any) => ({
-      what: v.what,
-      order: v.order,
-      users_permissions_user: v.users_permissions_user,
-      ide: Number.isNaN(parseInt(v.users_permissions_user, 10))
-        ? null
-        : parseInt(v.users_permissions_user, 10),
-    })),
-  };
-}
+import { evaluateCandidacyVote, assertStandingRound } from '../../nego/candidacyVote.js';
+import { loadCandidacyDeal } from '$lib/server/deal/offerDeal.js';
+import { ActionError } from '../errors.js';
 
 const finalizeAskmAcceptanceHandler: ActionExecutionHandler = async (params, context, { strapi }) => {
   const {
-    variant,           // 'solo' | 'allVoted' | 'partial'
+    variant,           // 'solo' | 'allVoted' | 'partial' — the card's guess, see above
     openMashaabimId,
     isSelfProposal = false,
-    pmashId,           // present when isSelfProposal=true; Askm has pmash relation instead of open_mashaabim
     askmId,
     projectId,
     spId,
     missionName,
     acceptedUserId,
-    existingMemberIds = [],
-    existingVotes = [],
-    isFirstVote = false,
+    existingMemberIds: clientMemberIds = [],
+    expectRound,
   } = params;
 
   const now = new Date();
+  const run = (qid: string, vars: Record<string, unknown>) =>
+    strapi.execute(qid, vars, context.jwt, context.fetch);
 
-  if (variant === 'partial') {
-    const existingVots = (existingVotes as any[]).map((v: any) => ({
-      what: v.what ?? true,
-      users_permissions_user:
-        v.users_permissions_user?.data?.id ?? v.users_permissions_user?.id ?? v.users_permissions_user,
-    }));
-    const allVots = [...existingVots, { what: true, users_permissions_user: context.userId }];
-
-    await strapi.execute('133addVoteToAskm', { id: askmId, vots: allVots }, context.jwt, context.fetch);
-
-    // A rikma member has engaged → ensure the auto-approval clock is running
-    // (deferred from the external candidate's proposal; also recreates one that a
-    // candidate-counter cancelled). isFirstVote retained for back-compat callers.
-    void isFirstVote;
-    await ensureCandidacyTimegrama(strapi, context, { side: 'askm', id: String(askmId) });
-
-    return { data: { askmId }, updateStrategy: { type: 'none' } };
+  const read: any = await run('getAskmForFinalize', { id: String(askmId) });
+  const attrs = read?.data?.askm?.data?.attributes;
+  if (!attrs) throw new Error(`Askm ${askmId} could not be loaded - acceptance aborted`);
+  if (attrs.archived === true) {
+    throw new ActionError('ALREADY_RESOLVED', `Askm ${askmId} was already resolved`);
+  }
+  const askmProject = attrs.project?.data?.id;
+  if (askmProject != null && String(askmProject) !== String(projectId)) {
+    throw new ActionError('FORBIDDEN', `Askm ${askmId} does not belong to project ${projectId}`);
   }
 
-  // Bilateral gate — the resource-side twin of `evaluateAskAcceptance`, and of
-  // what askm.svelte already enforces when the clock runs out. Nothing is
-  // registered under the offerer's name while a project-side round is standing
-  // unanswered: a counter, or the round an `editObject` sends to pending
-  // candidacies when the rikma changes the terms they offered against
-  // (src/lib/server/archive/pendingOffers.ts). Without this the silence path is
-  // protected and a member pressing approve is not.
-  const pending = await awaitingCandidateConsent(strapi, context, String(askmId));
-  if (pending) {
-    await strapi.execute(
-      '133addVoteToAskm',
-      { id: askmId, vots: pending.vots },
-      context.jwt,
-      context.fetch
-    );
+  // A gap of a customer's deal (QA C-19): she pays for whatever this ends on, so
+  // she signs it too. A read error throws — it must not pass for "nobody pays".
+  const offerDeal = await loadCandidacyDeal(run, 'askm', String(askmId));
+  const vote = evaluateCandidacyVote({
+    attrs,
+    side: 'askm',
+    callerId: context.userId,
+    clientIds: offerDeal?.clientIds ?? [],
+    now,
+  });
+  assertStandingRound(expectRound, vote.L);
+
+  if (acceptedUserId != null && vote.takerId && String(acceptedUserId) !== vote.takerId) {
+    throw new Error(`acceptedUserId ${acceptedUserId} is not the candidate of askm ${askmId}`);
+  }
+
+  const refetch = {
+    type: 'refetchScope' as const,
+    config: { dataKeys: ['askedResources'], projectId: String(projectId) },
+  };
+
+  // What materializing needs, from the DB first. A `partial` call from the card
+  // carries none of it, and the card's copy may be stale anyway.
+  const omId = attrs.open_mashaabim?.data?.id ? String(attrs.open_mashaabim.data.id) : null;
+  const selfProposal = !omId && isSelfProposal === true;
+  const canMaterialize = !!omId || selfProposal;
+
+  const ready = vote.gate.takerYes && vote.gate.clientYes && vote.allMembersYes;
+  if (!ready || !canMaterialize) {
+    await run('133addVoteToAskm', { id: askmId, vots: vote.vots });
     await ensureCandidacyTimegrama(strapi, context, { side: 'askm', id: String(askmId) });
     return {
-      data: { askmId, materialized: false, pending: 'candidateConsent', ordern: pending.L },
-      updateStrategy: { type: 'none' },
+      data: {
+        askmId,
+        materialized: false,
+        pending: !vote.gate.takerYes
+          ? 'candidateConsent'
+          : !vote.gate.clientYes
+            ? 'clientConsent'
+            : !vote.allMembersYes
+              ? 'members'
+              : null,
+        membersPending: vote.membersPending,
+        ordern: vote.L,
+        variant,
+      },
+      updateStrategy: refetch,
     };
   }
 
-  const canSkipOm = isSelfProposal === true;
-  if (!canSkipOm && !openMashaabimId) {
-    throw new Error('openMashaabimId is required for non-self-proposal Askm acceptance');
-  }
+  const takerId = vote.takerId || String(acceptedUserId ?? '');
+  const memberIds = vote.memberIds.length ? vote.memberIds : (clientMemberIds as unknown[]).map(String);
 
-  if (!canSkipOm) {
+  if (omId) {
     await runResourceAskmAcceptance(strapi, context, {
       askmId: String(askmId),
-      openMashaabimId: String(openMashaabimId),
+      openMashaabimId: omId,
       projectId: String(projectId),
-      spId: String(spId),
-      missionName: String(missionName ?? ''),
-      acceptedUserId: String(acceptedUserId),
-      existingMemberIds: (existingMemberIds as string[]).map(String),
-      existingVotes: existingVotes as unknown[],
+      spId: String(attrs.sp?.data?.id ?? spId ?? ''),
+      missionName: String(missionName || attrs.open_mashaabim?.data?.attributes?.name || ''),
+      acceptedUserId: takerId,
+      existingMemberIds: memberIds,
+      existingVotes: vote.vots,
     });
   } else {
     // isSelfProposal + pmash — OM/Maap path differs; keep inline until migrated
-    const maapRes: any = await strapi.execute(
-      '141createMaap',
-      {
-        data: {
-          project: projectId,
-          name: missionName,
-          sp: spId,
-          publishedAt: now.toISOString(),
-        },
+    const maapRes: any = await run('141createMaap', {
+      data: {
+        project: projectId,
+        name: missionName,
+        sp: attrs.sp?.data?.id ?? spId,
+        publishedAt: now.toISOString(),
       },
-      context.jwt,
-      context.fetch
-    );
+    });
 
     // Recurring expense? Activate the draft engine and make this Maap cycle #1.
     await activateRecurringEngine(strapi, context, {
       projectId: String(projectId),
       resourceName: String(missionName ?? ''),
-      acceptedUserId: String(acceptedUserId),
+      acceptedUserId: takerId,
       maapId: maapRes?.data?.createMaap?.data?.id,
     });
 
-    const existingVots = (existingVotes as any[]).map((v: any) => ({
-      what: v.what ?? true,
-      users_permissions_user:
-        v.users_permissions_user?.data?.id ?? v.users_permissions_user?.id ?? v.users_permissions_user,
-    }));
-    const allVots = [...existingVots, { what: true, users_permissions_user: context.userId }];
-    await strapi.execute('132archiveAskmWithVotes', { id: askmId, vots: allVots }, context.jwt, context.fetch);
+    await run('132archiveAskmWithVotes', { id: askmId, vots: vote.vots });
   }
 
   return {
-    data: { askmId, openMashaabimId },
-    updateStrategy: { type: 'none' },
+    data: { askmId, openMashaabimId: omId, materialized: true },
+    updateStrategy: refetch,
   };
 };
 
 export const finalizeAskmAcceptanceConfig: ActionConfig = {
   key: 'finalizeAskmAcceptance',
-  description: 'Approve a resource-share request (Askm): creates Maap, archives OpenMashaabim + Askm, optionally onboards new member. For partial votes, just adds the vote.',
+  description: 'Approve a resource-share request (Askm): creates Maap, archives OpenMashaabim + Askm, optionally onboards new member. The server decides from the DB whether every member, the offerer and any paying customer agreed; otherwise it records the vote at the standing round.',
   graphqlOperation: finalizeAskmAcceptanceHandler,
 
   paramSchema: {
@@ -208,6 +166,8 @@ export const finalizeAskmAcceptanceConfig: ActionConfig = {
     existingMemberIds: { type: 'array', required: false },
     existingVotes: { type: 'array', required: false },
     isFirstVote: { type: 'boolean', required: false },
+    // The round the caller was shown; ROUND_MOVED when it is no longer the standing one.
+    expectRound: { type: 'number', required: false },
   },
 
   authRules: [

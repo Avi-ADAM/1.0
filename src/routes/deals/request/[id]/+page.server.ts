@@ -2,6 +2,7 @@ import { redirect, error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { sendViaProxy } from '$lib/server/sendViaProxy.js';
 import { actionViaProxy } from '$lib/server/actionViaProxy.js';
+import { readDealStages } from '$lib/server/deal/dealChain';
 
 export const load: PageServerLoad = async ({ locals, params, fetch }) => {
   const tok = (locals as any).tok as string | undefined;
@@ -25,6 +26,14 @@ export const load: PageServerLoad = async ({ locals, params, fetch }) => {
     const isProjectMember = members.some((u: any) => String(u.id) === String(uid));
 
     if (!isOwner && !isProjectMember) throw error(403, 'Not authorized');
+
+    // The deal's stages (PLAN_DIRECT_OFFER P1): the wish this request came from and
+    // the deal it became — on the service token, now that the viewer is a party.
+    const stagesP = readDealStages(
+      (qid, vars) => sendViaProxy(fetch as any, qid, vars, { isSer: true }),
+      { kind: 'request', id: params.id },
+      'deals/request'
+    );
 
     const votes = attrs.votes?.data ?? [];
     // Counted per round once prices are negotiated: a yes to an earlier price
@@ -86,7 +95,12 @@ export const load: PageServerLoad = async ({ locals, params, fetch }) => {
       votes: attrs.votes?.data ?? [],
       createdAt: attrs.createdAt || null,
       forumId: attrs.forum?.data?.id || null,
-      quote
+      // The deal this request became. Set ⇒ the request is settled: nothing is waiting
+      // for anyone's approval, whether it matured by votes, by silence or by a wish's
+      // closing (materializeWish settles it with no votes at all).
+      dealId: attrs.sheirut?.data?.id ? String(attrs.sheirut.data.id) : null,
+      quote,
+      stages: await stagesP
     };
   } catch (e: any) {
     if (e?.status) throw e;

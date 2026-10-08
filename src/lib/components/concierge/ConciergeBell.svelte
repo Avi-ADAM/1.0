@@ -1,29 +1,61 @@
 <script>
   import { t } from '$lib/translations';
+  import NoticeRow from '$lib/components/notices/NoticeRow.svelte';
+  import { invalidateAll } from '$app/navigation';
 
   /**
    * The concierge header's bell: opens a small panel of what is waiting for
-   * the customer — one row per wish that has offers still unanswered, each a
-   * link to that wish — or says there is nothing. The dot on the bell shows
-   * only while there is something to open.
+   * the customer, or says there is nothing. The dot on the bell shows only
+   * while there is something to open.
    *
-   * The rows come from `notificationItems` in $lib/concierge/summary.js, the
-   * same offers the profile badge counts as "updates".
+   * Two shapes of content, newest first:
+   *   - `notices` (docs/inprogress/PLAN_SMART_NOTICES.md) — one sentence per proposal
+   *     whose move is the viewer's, as wisher or as provider, with its terms
+   *     and an "expand" into the wish. `[]` means nothing waits for her.
+   *   - `items` — one row per wish with unanswered offers and a count
+   *     (`notificationItems` in $lib/concierge/summary.js). Shown only when the
+   *     notices could not be read (`null` / absent): we then still know *that*
+   *     offers wait, just not what they say.
    *
    * The bell's glyph is 🔔 unless the caller passes its own as children.
    *
    * @type {{
    *   items?: { id: string, name: string, count: number }[],
+   *   notices?: import('$lib/notices').Notice[] | null,
    *   children?: import('svelte').Snippet
    * }}
    */
-  let { items = [], children } = $props();
+  let { items = [], notices = null, children } = $props();
 
   let open = $state(false);
   /** @type {HTMLElement | undefined} */
   let root = $state();
 
+  // The server's list, which hiding/restoring then edits in place. A writable
+  // $derived: a fresh load (new `notices`) replaces the local edits.
+  /** @type {import('$lib/notices').Notice[] | null} */
+  let list = $derived(notices);
+  let showHidden = $state(false);
+
+  const visible = $derived((list ?? []).filter((n) => !n.hidden));
+  const hiddenOnes = $derived((list ?? []).filter((n) => n.hidden));
   const total = $derived(items.reduce((sum, i) => sum + i.count, 0));
+  // What she hid is not news: the dot counts only what still asks for her.
+  const hasNews = $derived(list ? visible.length > 0 : total > 0);
+
+  /** @param {import('$lib/notices').Notice} n @param {boolean} hidden */
+  function mark(n, hidden) {
+    list = (list ?? []).map((x) => (x.key === n.key ? { ...x, hidden } : x));
+  }
+
+  // After a signature the row says "signed" for a moment, then the page reloads
+  // its data — the proposal's own status on the page has moved too.
+  /** @type {ReturnType<typeof setTimeout> | undefined} */
+  let refresh;
+  function afterApproved() {
+    clearTimeout(refresh);
+    refresh = setTimeout(() => invalidateAll(), 2500);
+  }
 
   /** @param {MouseEvent} e */
   function onWindowClick(e) {
@@ -41,26 +73,55 @@
   <button
     type="button"
     class="notif-btn"
-    aria-label={$t('concierge.notifications')}
+    aria-label={$t('notices.bell.title')}
     aria-haspopup="true"
     aria-expanded={open}
     onclick={() => (open = !open)}
   >
-    {#if children}{@render children()}{:else}🔔{/if}{#if total > 0}<span class="notif-pip"></span>{/if}
+    {#if children}{@render children()}{:else}🔔{/if}{#if hasNews}<span class="notif-pip"></span>{/if}
   </button>
 
   {#if open}
-    <div class="bell-panel" role="region" aria-label={$t('concierge.notifications')}>
-      <div class="bell-title">{$t('concierge.notifications')}</div>
-      {#if items.length === 0}
-        <p class="bell-empty">{$t('concierge.no_notifications')}</p>
+    <div class="bell-panel" role="region" aria-label={$t('notices.bell.title')}>
+      <div class="bell-title">{$t('notices.bell.title')}</div>
+      {#if list}
+        {#if visible.length === 0}
+          <p class="bell-empty">{$t('notices.bell.empty')}</p>
+        {:else}
+          <ul class="bell-list">
+            {#each visible as notice (notice.key)}
+              <li>
+                <NoticeRow
+                  {notice}
+                  onfollow={() => (open = false)}
+                  onapproved={afterApproved}
+                  onhidden={(n) => mark(n, true)}
+                />
+              </li>
+            {/each}
+          </ul>
+        {/if}
+        {#if hiddenOnes.length}
+          <button type="button" class="bell-hidden-toggle" aria-expanded={showHidden} onclick={() => (showHidden = !showHidden)}>
+            {$t('notices.ui.showHidden', { count: hiddenOnes.length })}
+          </button>
+          {#if showHidden}
+            <ul class="bell-list">
+              {#each hiddenOnes as notice (notice.key)}
+                <li><NoticeRow {notice} onrestored={(n) => mark(n, false)} /></li>
+              {/each}
+            </ul>
+          {/if}
+        {/if}
+      {:else if items.length === 0}
+        <p class="bell-empty">{$t('notices.bell.empty')}</p>
       {:else}
         <ul class="bell-list">
           {#each items as item (item.id)}
             <li>
               <a href="/concierge/{item.id}" class="bell-row" onclick={() => (open = false)}>
-                <span class="bell-name">{item.name || $t('concierge.notif_untitled')}</span>
-                <span class="bell-count">{$t('concierge.pending_offers', { count: item.count })}</span>
+                <span class="bell-name">{item.name || $t('notices.bell.untitled')}</span>
+                <span class="bell-count">{$t('notices.bell.pendingOffers', { count: item.count })}</span>
               </a>
             </li>
           {/each}
@@ -169,6 +230,20 @@
     color: #fff;
     font-size: 11px;
     font-weight: 700;
+  }
+  .bell-hidden-toggle {
+    display: block;
+    width: 100%;
+    margin: 8px 0 4px;
+    padding: 6px 4px;
+    border: 0;
+    background: none;
+    font: inherit;
+    font-size: 12px;
+    color: var(--cg-muted);
+    text-align: start;
+    text-decoration: underline;
+    cursor: pointer;
   }
   @media (prefers-reduced-motion: reduce) {
     .bell-row {

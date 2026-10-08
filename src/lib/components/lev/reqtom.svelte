@@ -1,6 +1,7 @@
 <script>
   import { lang } from '$lib/stores/lang.js';
   import { t } from '$lib/translations';
+  import { toast } from 'svelte-sonner';
   import { ProgressBar } from 'progressbar-svelte';
   import { goto } from '$app/navigation';
   import Chaticon from '../../celim/chaticon.svelte';
@@ -363,6 +364,8 @@
         if (result.success) {
           // `materialized: false` = the bilateral gate parked the acceptance on
           // the candidate's answer; nothing was registered yet.
+          // The rikma said yes; a part of a customer's deal also waits for her (C-19).
+          if (result.data?.pending === 'clientConsent') toast.info($t('lev.cards.awaitingClient'));
           onAcsept?.({
             ani: 'askedma',
             coinlapach,
@@ -384,8 +387,10 @@
           isFirstVote: isFirst,
         });
         if (result.success) {
-          // Vote recorded only — the other members still have to answer.
-          onAcsept?.({ ani: 'askedma', coinlapach, finalized: false });
+          // Usually a vote only. But the server counts from the DB, not from
+          // this card: if everyone else said yes since it loaded, this was the
+          // last yes and the resource is now registered.
+          onAcsept?.({ ani: 'askedma', coinlapach, finalized: result.data?.materialized === true });
         } else {
           error1 = result.error;
         }

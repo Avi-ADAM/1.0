@@ -183,7 +183,7 @@ function validateActionConfig(config: ActionConfig): void {
       );
     }
 
-    if (!['fullRefresh', 'partialUpdate', 'optimistic', 'none'].includes(config.updateStrategy.type)) {
+    if (!['fullRefresh', 'partialUpdate', 'refetchScope', 'optimistic', 'none'].includes(config.updateStrategy.type)) {
       throw new Error(
         `Action "${config.key}": Invalid update strategy type "${config.updateStrategy.type}"`
       );

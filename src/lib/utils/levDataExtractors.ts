@@ -594,6 +594,8 @@ export function buildSuggestionsFromMatchRecords(
         mission.attributes?.stipendFunder?.data?.attributes?.username || '',
       sqadualed: mission.attributes?.sqadualed || '',
       dates: mission.attributes?.dates || '',
+      // Recurring (monthly) or one-off; undefined when the query did not ask.
+      iskvua: mission.attributes?.iskvua ?? null,
 
       acts: mission.attributes?.acts || { data: [] },
 

@@ -5,11 +5,16 @@
   import { lang } from '$lib/stores/lang.js';
   import Spinner from '$lib/celim/Spinner.svelte';
   import { executeAction } from '$lib/client/actionClient';
+  import RikmaSkin from '$lib/components/rikmaPublic/RikmaSkin.svelte';
+  import { lookFrame, shownLook } from '$lib/rikmaLook/frame.svelte';
 
   let { data } = $props();
 
   let projectId = $derived(data.projectId);
-  let isRegisteredUser = $derived(data.isRegisteredUser);
+  // Inside the look editor's preview the page shows what a guest sees.
+  let isRegisteredUser = $derived(data.isRegisteredUser && !lookFrame.active);
+  /** @type {import('$lib/rikmaLook/look').RikmaLook | null} */
+  let look = $derived(shownLook(data.look ?? null));
   let project = $derived(data.projectData);
   let attrs = $derived(project?.attributes);
 
@@ -25,7 +30,8 @@
 
   let isMember = $derived(
     Boolean(
-      data.uid &&
+      !lookFrame.active &&
+        data.uid &&
         (attrs?.user_1s?.data || []).some((u) => String(u.id) === String(data.uid))
     )
   );
@@ -160,6 +166,7 @@
   <Header />
 {/if}
 
+<RikmaSkin {look}>
 {#if project}
   <div class="join-page min-h-screen text-white font-sans overflow-x-hidden">
     <div {dir} class="max-w-3xl mx-auto px-4 pb-24 pt-12">
@@ -434,13 +441,14 @@
     <Spinner size="lg" />
   </div>
 {/if}
+</RikmaSkin>
 
 <style>
   .join-page {
     background:
-      radial-gradient(1000px 400px at 85% -5%, rgba(255, 0, 174, 0.09), transparent 60%),
-      radial-gradient(900px 500px at 5% 15%, rgba(255, 215, 0, 0.07), transparent 55%),
-      linear-gradient(160deg, #1a0515 0%, #2c0b1e 45%, #120f26 100%);
+      radial-gradient(1000px 400px at 85% -5%, rgb(var(--pp-barbi) / 0.09), transparent 60%),
+      radial-gradient(900px 500px at 5% 15%, rgb(var(--pp-gold) / 0.07), transparent 55%),
+      linear-gradient(160deg, var(--pp-bg1) 0%, var(--pp-bg2) 45%, var(--pp-bg3) 100%);
   }
 
   .glass {
@@ -450,8 +458,8 @@
     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.15);
   }
 
-  .text-gold { color: #ffd700; }
-  .ring-gold\/70 { --tw-ring-color: rgba(255, 215, 0, 0.7); }
+  .text-gold { color: rgb(var(--pp-gold)); }
+  .ring-gold\/70 { --tw-ring-color: rgb(var(--pp-gold) / 0.7); }
 
   .chip {
     display: inline-flex;
@@ -473,8 +481,8 @@
     transition: border-color 0.2s, background 0.2s, transform 0.2s;
   }
   .open-item:hover {
-    border-color: rgba(255, 215, 0, 0.5);
-    background: rgba(255, 215, 0, 0.06);
+    border-color: rgb(var(--pp-gold) / 0.5);
+    background: rgb(var(--pp-gold) / 0.06);
     transform: translateY(-2px);
   }
   .open-name {
@@ -501,9 +509,9 @@
   }
 
   .chip-gold {
-    background: rgba(255, 215, 0, 0.12);
-    border-color: rgba(255, 215, 0, 0.35);
-    color: #ffe36e;
+    background: rgb(var(--pp-gold) / 0.12);
+    border-color: rgb(var(--pp-gold) / 0.35);
+    color: rgb(var(--pp-gold-soft));
   }
 
   .btn-primary {
@@ -511,17 +519,17 @@
     padding: 0.8rem 2rem;
     border-radius: 9999px;
     font-weight: 700;
-    color: #000;
+    color: rgb(var(--pp-on-gold));
     text-align: center;
-    background: linear-gradient(120deg, #ffd700, #d4af37 55%, #b8860b);
-    box-shadow: 0 4px 20px rgba(255, 215, 0, 0.35);
+    background: linear-gradient(120deg, rgb(var(--pp-gold)), rgb(var(--pp-gold-2)) 55%, rgb(var(--pp-gold-3)));
+    box-shadow: 0 4px 20px rgb(var(--pp-gold) / 0.35);
     transition: transform 0.2s, box-shadow 0.2s;
     border: none;
     cursor: pointer;
   }
   .btn-primary:hover:not(:disabled) {
     transform: translateY(-2px);
-    box-shadow: 0 6px 26px rgba(255, 215, 0, 0.5);
+    box-shadow: 0 6px 26px rgb(var(--pp-gold) / 0.5);
   }
 
   .btn-ghost {
@@ -535,8 +543,8 @@
     transition: border-color 0.2s, background 0.2s;
   }
   .btn-ghost:hover {
-    border-color: #ffd700;
-    background: rgba(255, 215, 0, 0.08);
+    border-color: rgb(var(--pp-gold));
+    background: rgb(var(--pp-gold) / 0.08);
   }
 
   .kind-tab {
@@ -557,10 +565,10 @@
     text-decoration: none;
   }
   .kind-active {
-    color: #000;
-    background: linear-gradient(120deg, #ffd700, #d4af37);
+    color: rgb(var(--pp-on-gold));
+    background: linear-gradient(120deg, rgb(var(--pp-gold)), rgb(var(--pp-gold-2)));
     border-color: transparent;
-    box-shadow: 0 4px 16px rgba(255, 215, 0, 0.3);
+    box-shadow: 0 4px 16px rgb(var(--pp-gold) / 0.3);
   }
 
   .field {
@@ -588,7 +596,7 @@
   .field input:focus,
   .field textarea:focus,
   .field select:focus {
-    border-color: rgba(255, 215, 0, 0.6);
+    border-color: rgb(var(--pp-gold) / 0.6);
   }
   .field input:disabled,
   .field textarea:disabled,

@@ -21,6 +21,11 @@ export const qidsAccess = {
   '345digestWhatsNewFor': { allow: ['serviceAdmin'] },
   '346digestAudience': { allow: ['serviceAdmin'] },
   '347digestHubSummaryFor': { allow: ['serviceAdmin'] },
+  // getMyUpdates (MCP, no session): the `$uid` twins of 421/394/423/123 — serviceAdmin only.
+  '428myWishNoticesFor': { allow: ['serviceAdmin'] },
+  '429hiddenWishProposalsFor': { allow: ['serviceAdmin'] },
+  '430myNoticePrefsFor': { allow: ['serviceAdmin'] },
+  '431dealsForUserFor': { allow: ['serviceAdmin'] },
   '87levSliceSheirutp': { allow: ['user', 'serviceAdmin'] },
   '87levSliceSales': { allow: ['user', 'serviceAdmin'] },
   '87levSliceFiapp': { allow: ['user', 'serviceAdmin'] },
@@ -179,6 +184,7 @@ export const qidsAccess = {
   '31updateTask': { allow: ['user', 'serviceAdmin'] },
   '32createTimeGrama': { allow: ['user', 'serviceAdmin'] },
   '33CreateTimer': { allow: ['user', 'serviceAdmin'] },
+  '33CreateManualTimer': { allow: ['user', 'serviceAdmin'] },
   '34UpdateTimer': { allow: ['user', 'serviceAdmin'] },
   '35updateTimeGrama': { allow: ['user', 'serviceAdmin'] },
   '36getMissionTimer': { allow: ['user', 'serviceAdmin'] },
@@ -495,6 +501,19 @@ export const qidsAccess = {
   'githubCreateClaimTimer': { allow: ['serviceAdmin'] },
   'badgeProject': { allow: ['serviceAdmin'] },
   'createProjectDecision': { allow: ['user', 'serviceAdmin'] },
+  // Rikma address & look (PLAN_RIKMA_SUBDOMAINS). The address and the look are
+  // what the public page shows anyway, so reading them is open; everything that
+  // writes, or that sees another rikma's open proposals, runs only server-side
+  // (proposeRikmaIdentity / $lib/server/rikmaIdentity).
+  'rikmaIdentityByProject': { allow: ['user', 'serviceAdmin'] },
+  'rikmaProjectBySlug': { allow: ['user', 'serviceAdmin'] },
+  'rikmaProjectByFormerSlug': { allow: ['user', 'serviceAdmin'] },
+  'rikmaOpenAddressProposals': { allow: ['serviceAdmin'] }, // server-only: availability check
+  'rikmaOpenIdentityDecisions': { allow: ['serviceAdmin'] }, // server-only: the look editor's loader, after the moach membership check
+  'rikmaIdentityDecision': { allow: ['serviceAdmin'] }, // server-only: apply + look preview (member-checked)
+  'rikmaUpdateIdentity': { allow: ['serviceAdmin'] }, // server-only: applyRikmaIdentity re-validates the slug and the look
+  'rikmaCreateIdentityDecision': { allow: ['serviceAdmin'] }, // server-only: proposeRikmaIdentity
+  'rikmaUploadFile': { allow: ['serviceAdmin'] }, // server-only: resolveLookImages re-reads url + mime by id
   '103getForumThreadById': { allow: ['user', 'serviceAdmin'] },
   '105getForumSummaryById': { allow: ['user', 'serviceAdmin'] },
   '104getUserForumSources': { allow: ['user', 'serviceAdmin'] },
@@ -533,6 +552,39 @@ export const qidsAccess = {
   '394hiddenWishProposals': { allow: ['user', 'serviceAdmin'] }, // $idL is the signed-in user — only her own hidden rows
   '395sheirutPaymentContext': { allow: ['serviceAdmin'] }, // server-only: confirmSheirutHaluka, once both sides confirmed
   '396createSheirutPaymentSale': { allow: ['serviceAdmin'] }, // server-only: writes the rikma's income — never from a browser
+  // QA C-19 — a customer's deal and its open parts (410–418)
+  '410openMissionDeal': { allow: ['serviceAdmin'] }, // server-only: who co-signs an offer (negoGate.clientIds)
+  '411openMashaabimDeal': { allow: ['serviceAdmin'] },
+  '412askOfferDeal': { allow: ['serviceAdmin'] },
+  '413askmOfferDeal': { allow: ['serviceAdmin'] },
+  '414fillRecipeMission': { allow: ['serviceAdmin'] }, // server-only: a taken gap joins the deal — never from a browser
+  '415fillRecipeResource': { allow: ['serviceAdmin'] },
+  '416wishPublishedNeeds': { allow: ['serviceAdmin'] }, // server-only: materializeWish moves orphaned needs into the rikma
+  '417dealOpenOffers': { allow: ['user', 'serviceAdmin'] }, // read: the deal page checks the role, like 124
+  '418dealPartsReceived': { allow: ['user', 'serviceAdmin'] }, // read: the deal page checks the role, like 124
+  '420dealProgressUpdates': { allow: ['serviceAdmin'] }, // server-only: the deal page reads it after checking the viewer is a party (C-21)
+  '421myWishNotices': { allow: ['user', 'serviceAdmin'] }, // $idL is the signed-in user — only proposals she is a side of
+  '422wishRestimes': { allow: ['user', 'serviceAdmin'] }, // the wishes' pace — read by whoever sees their proposals, like 388
+  '423myNoticePrefs': { allow: ['user', 'serviceAdmin'] }, // $idL is the signed-in user — only her own rows
+  '424createNoticeDismissal': { allow: ['serviceAdmin'] }, // server-only: dismissNotice writes it for context.userId
+  '425deleteNoticeDismissal': { allow: ['serviceAdmin'] }, // server-only: restoreNotice deletes only rows it read as the caller's
+  '426createNoticePref': { allow: ['serviceAdmin'] }, // server-only: saveNoticePrefs
+  '427updateNoticePref': { allow: ['serviceAdmin'] }, // server-only: saveNoticePrefs, on the caller's own row
+  '428dealChainFromSheirut': { allow: ['serviceAdmin'] }, // server-only: a deal's stages, read after the page checked the viewer is a party (PLAN_DIRECT_OFFER P1)
+  '429dealChainFromSheirutpend': { allow: ['serviceAdmin'] },
+  '430dealChainFromRatson': { allow: ['serviceAdmin'] },
+  '431updateWishTerms': { allow: ['serviceAdmin'] }, // server-only: updateWishTerms, after checking the caller owns the wish
+  // Direct offers (PLAN_DIRECT_OFFER P3–P4): every one server-only. The actions check
+  // authorship / the claim; /offer/[key] checks the link's signature before it reads.
+  '432createDirectOffer': { allow: ['serviceAdmin'] },
+  '433directOfferById': { allow: ['serviceAdmin'] },
+  '434updateDirectOffer': { allow: ['serviceAdmin'] },
+  '435myDirectOffers': { allow: ['serviceAdmin'] },
+  '436accountEmail': { allow: ['serviceAdmin'] }, // an email, never to a browser
+  '397sheirutDealDue': { allow: ['user', 'serviceAdmin'] }, // read: what a wish deal's customer owes (C-14); the deal page checks the role, like 124
+  '398missionDeals': { allow: ['serviceAdmin'] }, // server-only: which deal a mission is a part of (archive vote + silence clock)
+  '399updateDealLineTerms': { allow: ['serviceAdmin'] }, // server-only: a part's ceiling follows terms the customer signed — never from a browser
+  '400dealEdits': { allow: ['user', 'serviceAdmin'] }, // read: open requests for more hours on a deal; the deal page checks the role, like 124
 
   // matching/engine.ts: always run through StrapiClient with the admin
   // token, never with a user JWT — writes suggestion data for *other* users.

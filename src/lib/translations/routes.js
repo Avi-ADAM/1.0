@@ -28,7 +28,8 @@ const at = (...paths) =>
 export const ROUTED = {
     onboard: at('/onboard'),
     tasks: at('/myacts', /\/moach\/[^/]+\/acts/),
-    deals: at('/deals', '/lev'),
+    // /concierge: the deal's stage strip (DealStages) heads the wish page too.
+    deals: at('/deals', '/lev', '/concierge'),
     negotiation: at('/negotiation'),
     guide: at('/guid'),
     faq: at('/faq'),
@@ -36,8 +37,16 @@ export const ROUTED = {
     countries: at('/love'),
     me: at('/me'),
     demand: at('/demand', '/lev', '/maagad', /\/moach\/[^/]+\/demand/),
-    discover: at('/demand', '/project', '/gift', '/availableMission', '/availiableResorce'),
-    concierge: at('/concierge', '/wish'),
+    discover: at('/demand', '/project', '/r/', '/gift', '/availableMission', '/availiableResorce'),
+    // /deals/offers: the offer's terms are edited with the wish's own editor (WishTermsEditor).
+    concierge: at('/concierge', '/wish', '/deals/offers'),
+    // Direct offers (PLAN_DIRECT_OFFER): the provider's pages under /deals, the link's own
+    // page, and the wish page's "an offer from …" line.
+    directOffer: at('/deals', '/offer', '/concierge'),
+    // Smart notices (docs/inprogress/PLAN_SMART_NOTICES.md): the bells of the concierge
+    // and deals first, then the hub and the heart. Their figures render through
+    // `lev.list.fact.*`, which loads everywhere.
+    notices: at('/concierge', '/wish', '/deals', '/hub', '/lev'),
     // The concierge landing page for customers, plus the short registration
     // track it opens: the agreement's "one step only" ribbon and the signup
     // and check-email screens' three-step wording (see regIntent.js).
@@ -87,6 +96,10 @@ export const ROUTED = {
     devices: at('/me/devices'),
     // Archive/edit proposals surface as lev cards and on the rikma's object pages.
     archive: at('/lev', /\/moach\/[^/]+/),
+    // A rikma's address & public look (PLAN_RIKMA_SUBDOMAINS): its public page at
+    // /project/<id> and /r/<slug>, the editor under /moach, and the heart's
+    // address/look decision cards.
+    rikmaLook: at('/lev', /\/moach\/[^/]+/, '/project', '/r/'),
     // Shifts (docs/inprogress/PLAN_SHIFTS.md): the rikma's shifts tab and plan form under
     // /moach, the member's own shifts under /me, the heart's shift cards, and
     // the shift commitment a candidate states on a public mission page. The

@@ -108,5 +108,10 @@
   "githubPull": "PR",
   "githubMerged": "Merged",
   "githubClosed": "Closed",
-  "githubNoMatch": "No issue or PR matches."
+  "githubNoMatch": "No issue or PR matches.",
+  "addManually": "Log hours manually",
+  "manualEntryError": "Couldn't open manual entry. Nothing was saved and no timer was started.",
+  "manualEntryRetry": "Try again",
+  "manualEntryOpening": "Opening…",
+  "saving": "Saving…"
 }
