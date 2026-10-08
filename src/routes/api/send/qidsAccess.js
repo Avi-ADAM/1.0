@@ -195,8 +195,8 @@ export const qidsAccess = {
   '41CreatePosition': { allow: ['user', 'serviceConsensus'] }, // consensus
   '42UpdatePosition': { allow: ['user', 'serviceConsensus'] }, // consensus
   'GetNegotiationByToken': { allow: ['user', 'serviceConsensus'] }, // consensus
-  'GetNegotiationBySource': { allow: ['serviceAdmin'] }, // unreferenced in codebase (2026-07-18) — tightened to serviceAdmin-only
-  '43SetNegotiationResolution': { allow: ['serviceAdmin'] }, // unreferenced in codebase (2026-07-18) — tightened to serviceAdmin-only
+  'GetNegotiationBySource': { allow: ['user'] }, // consensus bridge — party to the source only (guards.js)
+  '43SetNegotiationResolution': { allow: ['user'] }, // consensus bridge — party to the source only (guards.js)
   'GetNegotiationResolutionBySource': { allow: ['user', 'serviceAdmin'] },
   'ListLocalNegotiations': { allow: ['user', 'serviceConsensus'] }, // consensus
   'ListArguments': { allow: ['user', 'serviceConsensus'] }, // consensus
