@@ -16,7 +16,7 @@
  */
 
 import nodemailer from 'nodemailer';
-import { ZOHO } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 
 const FROM = 'notifications@1lev1.com';
 
@@ -28,7 +28,7 @@ export function getTransporter() {
       host: 'smtp.zoho.com',
       secure: true,
       port: 465,
-      auth: { user: FROM, pass: ZOHO },
+      auth: { user: FROM, pass: env.ZOHO || process.env.ZOHO },
       pool: true,
       maxConnections: 1,
       maxMessages: 50,
