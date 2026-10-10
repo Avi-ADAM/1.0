@@ -34,6 +34,7 @@ import { syncSlotToVersion } from '$lib/server/wish/placement.js';
 import { armProposalClock } from '$lib/server/wish/clock.js';
 import { silenceApplies } from '$lib/wish/restime.js';
 import { assertStandingRound } from '$lib/server/nego/candidacyVote.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 /** What the wish chat says when silence, not a person, approved the terms. */
 const AUTO_CHAT = 'התנאים שהוצעו אושרו אוטומטית — הצד השני לא השיב בזמן שנקבע למשאלה.';
@@ -290,5 +291,10 @@ export const acceptWishOfferConfig: ActionConfig = {
     expectTerms: { type: 'string', required: false },
   },
   authRules: [{ type: 'jwt', errorMessage: 'Must be logged in to approve a placement' }],
-  updateStrategy: { type: 'none' }
+  updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (p) =>
+      scopeList([scope('wish', p.ratsonId)]),
+  },
 };

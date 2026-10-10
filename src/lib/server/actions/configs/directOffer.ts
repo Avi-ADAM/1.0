@@ -18,6 +18,7 @@ import { checkOfferKey, emailLock, emailMayClaim, mintOfferKey, nextLinkAt, offe
 import { termsDigest } from '$lib/server/wish/termsDigest.js';
 import { entryInput } from '$lib/server/wish/proposal.js';
 import { termsPatch } from './updateWishTerms.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 type Strapi = { execute: (qid: string, vars: any, jwt?: string, fetch?: any) => Promise<any> };
 
@@ -93,7 +94,12 @@ export const updateDirectOfferConfig: ActionConfig = {
     recipientEmail: { type: 'string', required: false, description: 'Empty string removes the lock' }
   },
   authRules: [{ type: 'jwt', errorMessage: 'Must be logged in to change an offer' }],
-  updateStrategy: { type: 'none' }
+  updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (p) =>
+      scopeList([scope('wish', p.ratsonId)]),
+  },
 };
 
 // ── issue / revoke the link ──────────────────────────────────────────────────
@@ -113,7 +119,12 @@ export const issueDirectOfferLinkConfig: ActionConfig = {
   graphqlOperation: issue,
   paramSchema: { ratsonId: { type: 'string', required: true } },
   authRules: [{ type: 'jwt', errorMessage: 'Must be logged in' }],
-  updateStrategy: { type: 'none' }
+  updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (p) =>
+      scopeList([scope('wish', p.ratsonId)]),
+  },
 };
 
 const revoke: ActionExecutionHandler = async (params, context, { strapi }) => {
@@ -129,7 +140,12 @@ export const revokeDirectOfferLinkConfig: ActionConfig = {
   graphqlOperation: revoke,
   paramSchema: { ratsonId: { type: 'string', required: true } },
   authRules: [{ type: 'jwt', errorMessage: 'Must be logged in' }],
-  updateStrategy: { type: 'none' }
+  updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (p) =>
+      scopeList([scope('wish', p.ratsonId)]),
+  },
 };
 
 // ── claimDirectOffer ─────────────────────────────────────────────────────────
@@ -218,5 +234,10 @@ export const claimDirectOfferConfig: ActionConfig = {
   graphqlOperation: claim,
   paramSchema: { key: { type: 'string', required: true } },
   authRules: [{ type: 'jwt', errorMessage: 'Sign in to take the offer' }],
-  updateStrategy: { type: 'none' }
+  updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (_p, r) =>
+      scopeList([scope('wish', r?.data?.ratsonId)]),
+  },
 };

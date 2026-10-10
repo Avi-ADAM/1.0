@@ -1,4 +1,5 @@
 import type { ActionConfig } from '../types';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 export const rejectSheirutpendConfig: ActionConfig = {
     key: 'rejectSheirutpend',
@@ -62,5 +63,10 @@ export const rejectSheirutpendConfig: ActionConfig = {
         config: {
             dataKeys: ['sheirutpends']
         }
-    }
+    },
+
+  realtime: {
+    scopes: (p) =>
+      scopeList([scope('project', p.projectId), scope('deal', p.id)]),
+  },
 };

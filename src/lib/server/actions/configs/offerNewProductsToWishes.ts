@@ -15,6 +15,7 @@
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { autoProposalVars, candidateOf, THRESHOLD, wishFactsOf } from './matchRatson.js';
 import { pickWishOffers, type OpenWish } from '../../concierge/newProductWishes.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
   const projectId = String(params.projectId ?? '');
@@ -107,5 +108,11 @@ export const offerNewProductsToWishesConfig: ActionConfig = {
     intent: 'personal',
     metadata: { priority: 'normal', type: 'ratsonProposal', url: '/concierge' }
   },
-  updateStrategy: { type: 'none' }
+  updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (p) =>
+      scopeList([scope('project', p.projectId), ...((p.matanotIds ?? []) as unknown[]).map((id) => scope('product', id as string))]),
+    partiesFrom: (_p, r) => r?.recipientIds ?? [],
+  },
 };

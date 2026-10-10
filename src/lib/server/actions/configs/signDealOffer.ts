@@ -23,6 +23,7 @@ import { evaluateAskAcceptance } from '$lib/server/nego/askAcceptance.js';
 import { computeNegoGate, normId } from '$lib/server/nego/negoGate.js';
 import { ensureCandidacyTimegrama } from '$lib/server/nego/timegrama.js';
 import { assertStandingRound } from '$lib/server/nego/candidacyVote.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
   const side = params.side === 'askm' ? 'askm' : params.side === 'ask' ? 'ask' : null;
@@ -135,5 +136,11 @@ export const signDealOfferConfig: ActionConfig = {
     intent: 'personal',
     metadata: { type: 'dealOfferSigned', url: 'lev' }
   },
-  updateStrategy: { type: 'none' }
+  updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (p, r) =>
+      scopeList([scope('project', r?.data?.projectId), scope('deal', p.id), scope('deal', r?.data?.offerId)]),
+    partiesFrom: (_p, r) => r?.recipientIds ?? [],
+  },
 };

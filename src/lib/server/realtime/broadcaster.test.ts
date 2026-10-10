@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { createRealtimeBroadcaster } from './broadcaster';
+import { createRealtimeBroadcaster, wishPartiesOf } from './broadcaster';
 import type { ActionContext, RealtimeConfig } from '../actions/types';
 
 const ctx = (over: Partial<ActionContext> = {}): ActionContext => ({
@@ -59,6 +59,34 @@ describe('realtime broadcaster', () => {
     };
     await rt.publish('counterOnAsk', config, { candidateId: 9 }, {}, ctx());
     expect((send.mock.calls[0] as any[])[0].sort()).toEqual(['1', '2', '9']);
+  });
+
+  it('a wish reaches its wishers and proposers, looked up by scope — no rikma involved', async () => {
+    const send = vi.fn(async () => ({}));
+    const membersOf = vi.fn(async () => [] as string[]);
+    const partiesOf = vi.fn(async (s: string) => (s === 'wish:7' ? ['1', '20', '30'] : []));
+    const rt = createRealtimeBroadcaster({ send, membersOf, partiesOf });
+    await rt.publish('counterRatsonProposal', { scopes: () => ['wish:7'] }, {}, {}, ctx());
+    expect(partiesOf).toHaveBeenCalledWith('wish:7', expect.anything());
+    expect(membersOf).not.toHaveBeenCalled();
+    expect((send.mock.calls[0] as any[])[0].sort()).toEqual(['1', '20', '30']);
+  });
+
+  it('wishPartiesOf reads the owners and every proposer of the wish', async () => {
+    const execute = vi.fn(async () => ({
+      data: {
+        ratson: { data: { attributes: { users_permissions_users: { data: [{ id: 5 }] } } } },
+        ratsonProposals: {
+          data: [
+            { attributes: { proposer_users: { data: [{ id: 8 }] } } },
+            { attributes: { proposer_users: { data: [{ id: 9 }, { id: 5 }] } } }
+          ]
+        }
+      }
+    }));
+    expect((await wishPartiesOf({ execute }, 'wish:3', ctx())).sort()).toEqual(['5', '8', '9']);
+    expect(execute).toHaveBeenCalledWith('105queryRatsonWithProposals', { id: '3' }, undefined, expect.anything());
+    expect(await wishPartiesOf({ execute }, 'deal:3', ctx())).toEqual([]);
   });
 
   it('no project scope ⇒ only the actor’s own tabs and devices', async () => {

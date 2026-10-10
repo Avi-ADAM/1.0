@@ -50,7 +50,7 @@ function getActionService(): ActionService {
       notifier,
       undefined,
       // Without it no browser-run action published realtime (docs/inprogress/PLAN_REALTIME_MIGRATION.md).
-      realtimeFor(notifier)
+      realtimeFor(notifier, strapiClient)
     );
   }
 

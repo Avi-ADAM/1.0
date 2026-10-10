@@ -20,6 +20,7 @@ import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { cleanLines, missionPrice, offerTotal, resourcePrice, type MissionLine, type ResourceLine } from '$lib/offer/directOffer.js';
 import { termsDigest } from '$lib/server/wish/termsDigest.js';
 import { emailLock } from '$lib/server/offer/offerKey.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 type Strapi = { execute: (qid: string, vars: any, jwt?: string, fetch?: any) => Promise<any> };
 type Ctx = { userId: string; jwt: string; fetch: any };
@@ -296,5 +297,10 @@ export const draftDirectOfferConfig: ActionConfig = {
     resources: { type: 'array', required: false, description: '[{ name, quantity, unitPrice, notes? }]' }
   },
   authRules: [{ type: 'jwt', errorMessage: 'Must be logged in to write an offer' }],
-  updateStrategy: { type: 'none' }
+  updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (_p, r) =>
+      scopeList([scope('wish', r?.data?.ratsonId), scope('product', r?.data?.matanotId)]),
+  },
 };

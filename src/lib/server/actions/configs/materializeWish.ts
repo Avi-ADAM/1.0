@@ -32,6 +32,7 @@ import { createSheirutFromPendingConfig } from './createSheirutFromPending.js';
 import { STRAPI_URL } from '$lib/server/strapiUrl.js';
 import { resolveRikmaPictureId } from '$lib/server/concierge/rikmaPicture.js';
 import { openWishGaps, type OpenGapsResult } from '$lib/server/wish/openGaps.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 const handler: ActionExecutionHandler = async (params, context, util) => {
   const { strapi } = util;
@@ -326,5 +327,16 @@ export const materializeWishConfig: ActionConfig = {
     intent: 'personal',
     metadata: { priority: 'high', type: 'sheirutCreated', url: '/deals' }
   },
-  updateStrategy: { type: 'none' }
+  updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (p, r) =>
+      scopeList([
+        scope('wish', p.ratsonId),
+        scope('project', r?.data?.weaveId),
+        scope('product', r?.data?.matanotId),
+        scope('deal', r?.data?.sheirutpendId),
+        scope('deal', r?.data?.serviceId),
+      ]),
+  },
 };

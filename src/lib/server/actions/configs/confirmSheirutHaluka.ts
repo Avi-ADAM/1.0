@@ -1,6 +1,7 @@
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { recordWishPaymentSale } from '$lib/server/sheirut/paymentSale.js';
 import { NotADealReceiverError, receiveDealMoney } from '$lib/server/deal/dealMoney.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 // The platform (1💗1) product that site-share income is recorded against.
 // Hardcoded for now per spec (PLAN_SITE_SHARE_PER_MEMBER §5) — to be made
@@ -184,5 +185,12 @@ export const confirmSheirutHalukaConfig: ActionConfig = {
     intent: 'personal',
     metadata: { priority: 'normal', type: 'dealPaid', url: '/deals' }
   },
-  updateStrategy: { type: 'none' }
+  updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (p) =>
+      scopeList([scope('split', p.halukaId)]),
+    audience: 'parties',
+    partiesFrom: (_p, r) => r?.recipientIds ?? [],
+  },
 };

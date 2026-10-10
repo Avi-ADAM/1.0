@@ -30,6 +30,7 @@ import {
   type StrapiLike
 } from '../../sheirut/quote.js';
 import { createSheirutFromPendingConfig } from './createSheirutFromPending.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 const fmtAmount = (n: number) =>
   Number.isInteger(n) ? String(n) : n.toFixed(2).replace(/\.?0+$/, '');
@@ -128,7 +129,14 @@ export const quoteSheirutpendConfig: ActionConfig = {
     emailTemplate: 'SimpleNuti',
     metadata: { priority: 'high', type: 'sheirutUpdate', url: '/deals/request/{{sheirutpendId}}' }
   },
-  updateStrategy: { type: 'none' }
+  updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (p, r) =>
+      scopeList([scope('deal', p.sheirutpendId), scope('deal', r?.data?.serviceId)]),
+    audience: 'parties',
+    partiesFrom: (_p, r) => r?.recipientIds ?? [],
+  },
 };
 
 // ── acceptSheirutQuote ───────────────────────────────────────────────────────
@@ -193,7 +201,14 @@ export const acceptSheirutQuoteConfig: ActionConfig = {
     emailTemplate: 'SimpleNuti',
     metadata: { priority: 'high', type: 'sheirutUpdate', url: '/deals/request/{{sheirutpendId}}' }
   },
-  updateStrategy: { type: 'none' }
+  updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (p, r) =>
+      scopeList([scope('deal', p.sheirutpendId), scope('deal', r?.data?.serviceId)]),
+    audience: 'parties',
+    partiesFrom: (_p, r) => r?.recipientIds ?? [],
+  },
 };
 
 // ── getSheirutpendQuote ──────────────────────────────────────────────────────
@@ -245,5 +260,12 @@ export const noteSheirutpendConfig: ActionConfig = {
     text: { type: 'string', required: true }
   },
   authRules: [{ type: 'jwt', errorMessage: 'Must be logged in' }],
-  updateStrategy: { type: 'none' }
+  updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (p) =>
+      scopeList([scope('deal', p.sheirutpendId)]),
+    audience: 'parties',
+    partiesFrom: (_p, r) => r?.recipientIds ?? [],
+  },
 };

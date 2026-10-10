@@ -1,4 +1,5 @@
 import type { ActionConfig } from '../types';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 export const approveSheirutpendConfig: ActionConfig = {
     key: 'approveSheirutpend',
@@ -69,5 +70,10 @@ export const approveSheirutpendConfig: ActionConfig = {
     // But usually, it's safer to have it in the config if it's always the same
     // However, the current action system uses the raw data passed to the mutation.
     // I'll assume the client passes the data or I'll implement a middleware if needed.
-    // Actually, I can just use a specific mutation if I want it fixed.
+    // Actually, I can just use a specific mutation if I want it fixed.,
+
+  realtime: {
+    scopes: (p) =>
+      scopeList([scope('project', p.projectId), scope('deal', p.id)]),
+  },
 };

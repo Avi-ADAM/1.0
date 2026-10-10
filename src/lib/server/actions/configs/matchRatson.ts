@@ -34,6 +34,7 @@ import {
   type WishNeed,
   type WishPlace
 } from '../../concierge/localMatch.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 export const W = {
   text: 0.45,
@@ -386,5 +387,10 @@ export const matchRatsonConfig: ActionConfig = {
     threshold: { type: 'number', required: false },
     limit: { type: 'number', required: false }
   },
-  authRules: [{ type: 'jwt', errorMessage: 'Must be logged in to run matching' }]
+  authRules: [{ type: 'jwt', errorMessage: 'Must be logged in to run matching' }],
+
+  realtime: {
+    scopes: (p) =>
+      scopeList([scope('wish', p.ratsonId)]),
+  },
 };

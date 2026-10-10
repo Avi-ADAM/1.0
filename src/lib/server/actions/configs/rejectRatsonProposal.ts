@@ -11,6 +11,7 @@
  */
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 const REJECTABLE_FROM_STATUSES = new Set(['suggested', 'viewed']);
 
@@ -71,5 +72,10 @@ export const rejectRatsonProposalConfig: ActionConfig = {
     ratsonId: { type: 'string', required: true },
     note: { type: 'string', required: false }
   },
-  authRules: [{ type: 'jwt', errorMessage: 'Must be logged in to reject a proposal' }]
+  authRules: [{ type: 'jwt', errorMessage: 'Must be logged in to reject a proposal' }],
+
+  realtime: {
+    scopes: (p) =>
+      scopeList([scope('wish', p.ratsonId)]),
+  },
 };

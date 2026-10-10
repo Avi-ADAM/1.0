@@ -1,5 +1,6 @@
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { confirmPartReceived, loadParts } from '$lib/server/deal/partsReceived.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 /**
  * The two Sheirut flags a deal's status is derived from (`dealsService.ts`):
@@ -82,5 +83,10 @@ export const updateSheirutConfig: ActionConfig = {
 
   authRules: [{ type: 'jwt', errorMessage: 'Must be authenticated' }],
 
-  updateStrategy: { type: 'none' }
+  updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (p) =>
+      scopeList([scope('project', p.projectId), scope('deal', p.id)]),
+  },
 };

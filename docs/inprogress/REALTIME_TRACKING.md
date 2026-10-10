@@ -42,7 +42,7 @@
 | socket-server — בקשת polling אחת (`/socket.io/?transport=polling`) הפילה את התהליך (`ERR_HTTP_HEADERS_SENT`): ה-handler של ה-HTTP נרשם אחרי socket.io וענה 404 על הנתיב שלו | [x] 2026-10-09 — `socket-server/src/socket-path.ts` + בדיקה; נפרס, 3 בקשות polling בפרודקשן = 200 בלי restart. `deploy-socket.ps1` מוודא את הקובץ בכל פריסה |
 | socket-server — `event` / `rt:changed` בפרודקשן | [x] 2026-10-09 — `deploy-socket.ps1` (פריסה ראשונה מעץ העבודה, `7049d4e3-dirty`); `/health` ציבורי תקין, `/broadcast` בלי סוד 401, `:rollback` שמור |
 | R3 — דפים, גל 1 | [~] 2026-10-10 — כל הדפים מחוברים חוץ מ-`negotiation/[id]` (נדחה); 12 נבדקו חי בהזרקה ל-bus. פתוח: `/lev`, `VoteDetail`, deals/wish/concierge בשני דפדפנים — כשה-actions שלהם יפרסמו (R4). המאזינים הישנים נשארים עד R6 |
-| R4 — actions לפי תחום | [~] 2026-10-11 — **vote + archive: 34 actions** מצהירים `realtime` (נשארו: `archiveSpaceDoc` — ערוץ `space:changed` משלו; `proposeRikmaBlueprint` — עוד אין רקמה). נבדק בשני דפדפנים (256 ↔ 258, החלטה 78 על משימה 191): הצעת עריכה → הצעה נגדית → אישור, כל צד רואה את הסבב של השני בלי טעינת דף, והשם חזר למקור. `partiesFrom` מצטרף עכשיו גם לקהל `project` (מועמד שעוד אינו חבר). הבדיקה מצאה באג קודם ב-`VoteDetail` — ראו B12. — פיילוט `updateMissionStatus` **נבדק בשני דפדפנים 2026-10-10** (256 → 258, רקמה 87, משימה 191): `rt:changed` הגיע ל-258 עם `project:87`, `mission:191` ו-`originClientId` של הטאב השני; ה-bus מסר אחרי ~0.5ש׳; מתאם moach שלח **בקשה אחת** (`getProjectMissions` של 87), בלי טעינת דף; שינוי שאף מסך לא מקשיב לו — אפס בקשות; ההד של הטאב המקורי מסונן. הבדיקה מצאה באג: `/api/action` בנה `ActionService` משלו בלי broadcaster — אף פעולה מהדפדפן לא פרסמה. תוקן (`realtimeFor(notifier)` משותף ל-`/api/action` ול-`actions/index.ts`) |
+| R4 — actions לפי תחום | [~] 2026-10-11 — **wish + deal: 39 actions** (2026-10-11; נשארו `clusterRatsons` — תחום maagad, `materializeRikmaBlueprint` — עוזר ההרשמה). משאלה אינה שייכת לרקמה, אז ה-broadcaster מוצא את הקהל שלה בעצמו: `wish:<id>` ⇒ בעלי המשאלה וכל המציעים (`partiesOf` → `105queryRatsonWithProposals` בטוקן השירות). עסקה ⇒ `project` + הצדדים שה-handler מחזיר. **נבדק בשלושה דפדפנים 2026-10-11** (משאלה 18: הבעלים 261 משנה קצב, ו-256 ו-258, המציעים, רואים את דף המשאלה נטען מחדש בלי רענון; הקצב הוחזר ל-`feh`). הבדיקה מצאה שטוקן השירות לבדו לא קורא את הצדדים של משאלה (השינוי הגיע רק למבצע) — `wishPartiesOf` שואל עכשיו גם עם ה-JWT של המבצע ומאחד. — **vote + archive: 34 actions** מצהירים `realtime` (נשארו: `archiveSpaceDoc` — ערוץ `space:changed` משלו; `proposeRikmaBlueprint` — עוד אין רקמה). נבדק בשני דפדפנים (256 ↔ 258, החלטה 78 על משימה 191): הצעת עריכה → הצעה נגדית → אישור, כל צד רואה את הסבב של השני בלי טעינת דף, והשם חזר למקור. `partiesFrom` מצטרף עכשיו גם לקהל `project` (מועמד שעוד אינו חבר). הבדיקה מצאה באג קודם ב-`VoteDetail` — ראו B12. — פיילוט `updateMissionStatus` **נבדק בשני דפדפנים 2026-10-10** (256 → 258, רקמה 87, משימה 191): `rt:changed` הגיע ל-258 עם `project:87`, `mission:191` ו-`originClientId` של הטאב השני; ה-bus מסר אחרי ~0.5ש׳; מתאם moach שלח **בקשה אחת** (`getProjectMissions` של 87), בלי טעינת דף; שינוי שאף מסך לא מקשיב לו — אפס בקשות; ההד של הטאב המקורי מסונן. הבדיקה מצאה באג: `/api/action` בנה `ActionService` משלו בלי broadcaster — אף פעולה מהדפדפן לא פרסמה. תוקן (`realtimeFor(notifier)` משותף ל-`/api/action` ול-`actions/index.ts`) |
 | R5 — דפים, גל 2 + timegrama + הסרת `invalidate(() => true)` | [ ] |
 | R6 — ניקוי מאזינים ישנים | [ ] |
 
@@ -281,54 +281,54 @@ inline מהקובץ עצמו ומה-helpers (`deal/offerDeal.ts`, `sheirut/dealE
 
 | action | file | socket today | recipients | effect for others | metadata.type → who reacts | ערוצים היום | intent יעד | target scopes | status |
 |---|---|---|---|---|---|---|---|---|---|
-| `acceptRatsonProposal` | acceptRatsonProposal | config | specificUsers (−me) | toast | ratsonProposal → moach(lazy)<br>sheirutUpdate → moach(lazy) | intent ✓ | C |  | [ ] |
-| `acceptWishOffer` | acceptWishOffer | inline |  | toast | ratsonProposal → moach(lazy) | intent ✓ | P·C |  | [ ] |
+| `acceptRatsonProposal` | acceptRatsonProposal | config | specificUsers (−me) | toast | ratsonProposal → moach(lazy)<br>sheirutUpdate → moach(lazy) | intent ✓ | C | `wish` (← בעלי המשאלה והמציעים, `partiesOf`) | [x] 2026-10-11 — עוד לא נבדק בשני דפדפנים |
+| `acceptWishOffer` | acceptWishOffer | inline |  | toast | ratsonProposal → moach(lazy) | intent ✓ | P·C | `wish` (← בעלי המשאלה והמציעים, `partiesOf`) | [x] 2026-10-11 — עוד לא נבדק בשני דפדפנים |
 | `clusterRatsons` | maagad | none |  | — | maagad | — | — |  | [ ] |
-| `counterRatsonProposal` | counterRatsonProposal | none |  | — | ratsonProposal | intent ✓ | C |  | [ ] |
-| `createRatson` | createRatson | none |  | — |  | — | — |  | [ ] |
-| `declineWishOffer` | declineWishOffer | config | specificUsers | toast | ratsonProposal → moach(lazy) | intent ✓ | P |  | [ ] |
-| `hideRatsonProposal` | hideRatsonProposal | none |  | — |  | — | — |  | [ ] |
-| `matchRatson` | matchRatson | none |  | — |  | — | — |  | [ ] |
+| `counterRatsonProposal` | counterRatsonProposal | none |  | — | ratsonProposal | intent ✓ | C | `wish` (← בעלי המשאלה והמציעים, `partiesOf`) | [x] 2026-10-11 — עוד לא נבדק בשני דפדפנים |
+| `createRatson` | createRatson | none |  | — |  | — | — | `wish` (החדשה) | [x] 2026-10-11 — עוד לא נבדק בשני דפדפנים |
+| `declineWishOffer` | declineWishOffer | config | specificUsers | toast | ratsonProposal → moach(lazy) | intent ✓ | P | `wish` (← בעלי המשאלה והמציעים, `partiesOf`) | [x] 2026-10-11 — עוד לא נבדק בשני דפדפנים |
+| `hideRatsonProposal` | hideRatsonProposal | none |  | — |  | — | — | `wish` (← בעלי המשאלה והמציעים, `partiesOf`) | [x] 2026-10-11 — עוד לא נבדק בשני דפדפנים |
+| `matchRatson` | matchRatson | none |  | — |  | — | — | `wish` (← בעלי המשאלה והמציעים, `partiesOf`) | [x] 2026-10-11 — עוד לא נבדק בשני דפדפנים |
 | `materializeRikmaBlueprint` | assistantSessions | none |  | — |  | — | — |  | [ ] |
-| `materializeWish` | materializeWish | config | specificUsers | toast | sheirutCreated → moach(lazy) | intent ✓ | P |  | [ ] |
-| `offerNewProductsToWishes` | offerNewProductsToWishes | config | specificUsers | toast | ratsonProposal → moach(lazy) | intent ✓ | P |  | [ ] |
-| `offerWishHelp` | offerWishHelp | config | specificUsers | toast | ratsonProposal → moach(lazy) | intent ✓ | C |  | [ ] |
-| `publishWishNeedToCommunity` | publishWishNeedToCommunity | none |  | — |  | — | — |  | [ ] |
-| `refreshWishMatches` | refreshWishMatches | none |  | — |  | — | — |  | [ ] |
-| `rejectRatsonProposal` | rejectRatsonProposal | none |  | — |  | — ⚠ | A |  | [ ] |
-| `requestWishMission` | requestWishMission | config | specificUsers | toast | ratsonProposal → moach(lazy) | intent ✓ | C |  | [ ] |
-| `requestWishResource` | requestWishResource | config | specificUsers | toast | ratsonProposal → moach(lazy) | intent ✓ | C |  | [ ] |
-| `setWishRestime` | setWishRestime | none |  | — |  | — ⚠ | P |  | [ ] |
-| `updateRatsonDraft` | updateRatsonDraft | none |  | — |  | — | — |  | [ ] |
-| `updateRatsonExtraction` | updateRatsonExtraction | none |  | — |  | — | — |  | [ ] |
-| `updateWishTerms` | updateWishTerms | none |  | — |  | — ⚠ | P |  | [ ] |
+| `materializeWish` | materializeWish | config | specificUsers | toast | sheirutCreated → moach(lazy) | intent ✓ | P | `wish`, `project` (הרקמה שנוצרה), `product`, `deal` ×2 | [x] 2026-10-11 — עוד לא נבדק בשני דפדפנים |
+| `offerNewProductsToWishes` | offerNewProductsToWishes | config | specificUsers | toast | ratsonProposal → moach(lazy) | intent ✓ | P | `project`, `product` · +`recipientIds` | [x] 2026-10-11 — עוד לא נבדק בשני דפדפנים |
+| `offerWishHelp` | offerWishHelp | config | specificUsers | toast | ratsonProposal → moach(lazy) | intent ✓ | C | `wish` (← בעלי המשאלה והמציעים, `partiesOf`) | [x] 2026-10-11 — עוד לא נבדק בשני דפדפנים |
+| `publishWishNeedToCommunity` | publishWishNeedToCommunity | none |  | — |  | — | — | `wish` (← בעלי המשאלה והמציעים, `partiesOf`) | [x] 2026-10-11 — עוד לא נבדק בשני דפדפנים |
+| `refreshWishMatches` | refreshWishMatches | none |  | — |  | — | — | `wish` (← בעלי המשאלה והמציעים, `partiesOf`) | [x] 2026-10-11 — עוד לא נבדק בשני דפדפנים |
+| `rejectRatsonProposal` | rejectRatsonProposal | none |  | — |  | — ⚠ | A | `wish` (← בעלי המשאלה והמציעים, `partiesOf`) | [x] 2026-10-11 — עוד לא נבדק בשני דפדפנים |
+| `requestWishMission` | requestWishMission | config | specificUsers | toast | ratsonProposal → moach(lazy) | intent ✓ | C | `wish` (← בעלי המשאלה והמציעים, `partiesOf`) | [x] 2026-10-11 — עוד לא נבדק בשני דפדפנים |
+| `requestWishResource` | requestWishResource | config | specificUsers | toast | ratsonProposal → moach(lazy) | intent ✓ | C | `wish` (← בעלי המשאלה והמציעים, `partiesOf`) | [x] 2026-10-11 — עוד לא נבדק בשני דפדפנים |
+| `setWishRestime` | setWishRestime | none |  | — |  | — ⚠ | P | `wish` (← בעלי המשאלה והמציעים, `partiesOf`) | [x] 2026-10-11 — נבדק בשלושה דפדפנים |
+| `updateRatsonDraft` | updateRatsonDraft | none |  | — |  | — | — | `wish` (← בעלי המשאלה והמציעים, `partiesOf`) | [x] 2026-10-11 — עוד לא נבדק בשני דפדפנים |
+| `updateRatsonExtraction` | updateRatsonExtraction | none |  | — |  | — | — | `wish` (← בעלי המשאלה והמציעים, `partiesOf`) | [x] 2026-10-11 — עוד לא נבדק בשני דפדפנים |
+| `updateWishTerms` | updateWishTerms | none |  | — |  | — ⚠ | P | `wish` (← בעלי המשאלה והמציעים, `partiesOf`) | [x] 2026-10-11 — עוד לא נבדק בשני דפדפנים |
 
 ### deal — 22 actions (live 2 · full 0 · toast 13 · silent 5 · read-only 2)
 
 | action | file | socket today | recipients | effect for others | metadata.type → who reacts | ערוצים היום | intent יעד | target scopes | status |
 |---|---|---|---|---|---|---|---|---|---|
-| `acceptSheirutQuote` | sheirutQuote | config | specificUsers (−me) | toast | sheirutUpdate → moach(lazy) | intent ✓ | P |  | [ ] |
-| `approveSheirutpend` | approveSheirutpend | config | specificUsers | toast ⚠cfgUS lost | sheirutUpdate → moach(lazy) | intent ✓ (N13) | P |  | [ ] |
-| `claimDirectOffer` | directOffer | inline |  | toast | directOffer → moach(lazy) | intent ✓ | P |  | [ ] |
-| `confirmDealPartReceived` | confirmDealPartReceived | config | specificUsers | toast | dealPaid → moach(lazy) | intent ✓ | P |  | [ ] |
-| `confirmSheirutHaluka` | confirmSheirutHaluka | none |  | — |  | intent ✓ | P |  | [ ] |
-| `counterDealEdit` | counterDealEdit | inline |  | toast | voteUpdate → votes+rikma+moach(lazy) | intent ✓ | C |  | [ ] |
-| `createSheirutHaluka` | createSheirutHaluka | none |  | — |  | intent ✓ | C |  | [ ] |
-| `createSheirutpend` | createSheirutpend | config | projectMembers (−me) | toast ⚠cfgUS lost | sheirutUpdate → moach(lazy) | intent ✓ | C |  | [ ] |
-| `draftDirectOffer` | draftDirectOffer | none |  | — |  | — | — |  | [ ] |
+| `acceptSheirutQuote` | sheirutQuote | config | specificUsers (−me) | toast | sheirutUpdate → moach(lazy) | intent ✓ | P | `deal` (הבקשה + השירות שנוצר) · parties: `recipientIds` | [x] 2026-10-11 — עוד לא נבדק בשני דפדפנים |
+| `approveSheirutpend` | approveSheirutpend | config | specificUsers | toast ⚠cfgUS lost | sheirutUpdate → moach(lazy) | intent ✓ (N13) | P | `project`, `deal` | [x] 2026-10-11 — עוד לא נבדק בשני דפדפנים |
+| `claimDirectOffer` | directOffer | inline |  | toast | directOffer → moach(lazy) | intent ✓ | P | `wish` (← בעלי המשאלה והמציעים, `partiesOf`) | [x] 2026-10-11 — עוד לא נבדק בשני דפדפנים |
+| `confirmDealPartReceived` | confirmDealPartReceived | config | specificUsers | toast | dealPaid → moach(lazy) | intent ✓ | P | `deal` · parties: כל הלקוחות והספקים (`partyIds`) | [x] 2026-10-11 — עוד לא נבדק בשני דפדפנים |
+| `confirmSheirutHaluka` | confirmSheirutHaluka | none |  | — |  | intent ✓ | P | `split` · parties: `recipientIds` | [x] 2026-10-11 — עוד לא נבדק בשני דפדפנים |
+| `counterDealEdit` | counterDealEdit | inline |  | toast | voteUpdate → votes+rikma+moach(lazy) | intent ✓ | C | `project`, `decision:decision`, `deal`, `mission` · +הלקוחות | [x] 2026-10-11 — עוד לא נבדק בשני דפדפנים |
+| `createSheirutHaluka` | createSheirutHaluka | none |  | — |  | intent ✓ | C | `project`, `deal`, `split` · +המקבל | [x] 2026-10-11 — עוד לא נבדק בשני דפדפנים |
+| `createSheirutpend` | createSheirutpend | config | projectMembers (−me) | toast ⚠cfgUS lost | sheirutUpdate → moach(lazy) | intent ✓ | C | `project`, `deal` | [x] 2026-10-11 — עוד לא נבדק בשני דפדפנים |
+| `draftDirectOffer` | draftDirectOffer | none |  | — |  | — | — | `wish`, `product` | [x] 2026-10-11 — עוד לא נבדק בשני דפדפנים |
 | `getDealDue` | getDealDue | read-only |  |  |  |  |  |  | n/a |
 | `getSheirutpendQuote` | sheirutQuote | read-only |  |  | sheirutUpdate |  |  |  | n/a |
-| `issueDirectOfferLink` | directOffer | inline |  | toast | directOffer → moach(lazy) | — | — |  | [ ] |
-| `noteSheirutpend` | sheirutQuote | none |  | — | sheirutUpdate | — ⚠ | P |  | [ ] |
-| `proposeSheirut` | proposeSheirut | config | projectMembers (−me) | partial(lev) | sheirutUpdate → moach(lazy) | intent ✓ | C |  | [ ] |
-| `quoteSheirutpend` | sheirutQuote | config | specificUsers (−me) | toast | sheirutUpdate → moach(lazy) | intent ✓ | C |  | [ ] |
-| `rejectSheirutpend` | rejectSheirutpend | config | specificUsers | toast ⚠cfgUS lost | sheirutUpdate → moach(lazy) | intent ✓ (N13) | P |  | [ ] |
-| `requestSheirutJoin` | requestSheirutJoin | config | projectMembers (−me) | partial(lev) | sheirutUpdate → moach(lazy) | intent ✓ | C |  | [ ] |
-| `revokeDirectOfferLink` | directOffer | inline |  | toast | directOffer → moach(lazy) | — | — |  | [ ] |
-| `signDealEdit` | signDealEdit | inline |  | toast | voteUpdate → votes+rikma+moach(lazy) | intent ✓ | A·O |  | [ ] |
-| `signDealOffer` | signDealOffer | config | specificUsers | toast | dealOfferSigned → moach(lazy) | intent ✓ | P |  | [ ] |
-| `updateDirectOffer` | directOffer | inline |  | toast | directOffer → moach(lazy) | — | — |  | [ ] |
-| `updateSheirut` | updateSheirut | none |  | — |  | — ⚠ | P |  | [ ] |
+| `issueDirectOfferLink` | directOffer | inline |  | toast | directOffer → moach(lazy) | — | — | `wish` (← בעלי המשאלה והמציעים, `partiesOf`) | [x] 2026-10-11 — עוד לא נבדק בשני דפדפנים |
+| `noteSheirutpend` | sheirutQuote | none |  | — | sheirutUpdate | — ⚠ | P | `deal` · parties: `recipientIds` | [x] 2026-10-11 — עוד לא נבדק בשני דפדפנים |
+| `proposeSheirut` | proposeSheirut | config | projectMembers (−me) | partial(lev) | sheirutUpdate → moach(lazy) | intent ✓ | C | `project`, `deal` | [x] 2026-10-11 — עוד לא נבדק בשני דפדפנים |
+| `quoteSheirutpend` | sheirutQuote | config | specificUsers (−me) | toast | sheirutUpdate → moach(lazy) | intent ✓ | C | `deal` (הבקשה + השירות שנוצר) · parties: `recipientIds` | [x] 2026-10-11 — עוד לא נבדק בשני דפדפנים |
+| `rejectSheirutpend` | rejectSheirutpend | config | specificUsers | toast ⚠cfgUS lost | sheirutUpdate → moach(lazy) | intent ✓ (N13) | P | `project`, `deal` | [x] 2026-10-11 — עוד לא נבדק בשני דפדפנים |
+| `requestSheirutJoin` | requestSheirutJoin | config | projectMembers (−me) | partial(lev) | sheirutUpdate → moach(lazy) | intent ✓ | C | `project`, `deal` | [x] 2026-10-11 — עוד לא נבדק בשני דפדפנים |
+| `revokeDirectOfferLink` | directOffer | inline |  | toast | directOffer → moach(lazy) | — | — | `wish` (← בעלי המשאלה והמציעים, `partiesOf`) | [x] 2026-10-11 — עוד לא נבדק בשני דפדפנים |
+| `signDealEdit` | signDealEdit | inline |  | toast | voteUpdate → votes+rikma+moach(lazy) | intent ✓ | A·O | `project`, `decision:decision`, `deal`, `mission` · +הלקוחות | [x] 2026-10-11 — עוד לא נבדק בשני דפדפנים |
+| `signDealOffer` | signDealOffer | config | specificUsers | toast | dealOfferSigned → moach(lazy) | intent ✓ | P | `project`, `deal` ×2 · parties: `recipientIds` | [x] 2026-10-11 — עוד לא נבדק בשני דפדפנים |
+| `updateDirectOffer` | directOffer | inline |  | toast | directOffer → moach(lazy) | — | — | `wish` (← בעלי המשאלה והמציעים, `partiesOf`) | [x] 2026-10-11 — עוד לא נבדק בשני דפדפנים |
+| `updateSheirut` | updateSheirut | none |  | — |  | — ⚠ | P | `project`, `deal` | [x] 2026-10-11 — עוד לא נבדק בשני דפדפנים |
 
 ### money — 23 actions (live 2 · full 0 · toast 7 · silent 7 · read-only 7)
 

@@ -20,6 +20,7 @@ import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { ActionError } from '../errors.js';
 import { matchOpenMissionToUsers, matchOpenMashaabimToUsers } from '$lib/server/matching/engine';
 import { resolveMissionSpec } from '$lib/server/mission/resolveMissionSpec.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 const RESOURCE_KINDOF = new Set(['monthly', 'perUnit', 'rent', 'total', 'yearly']);
 function mapKindOf(raw?: string | null): string {
@@ -535,5 +536,10 @@ export const publishWishNeedToCommunityConfig: ActionConfig = {
     location_hint: { type: 'string', required: false }
   },
   authRules: [{ type: 'jwt', errorMessage: 'Must be logged in to publish a need' }],
-  updateStrategy: { type: 'none' }
+  updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (p) =>
+      scopeList([scope('wish', p.ratsonId)]),
+  },
 };

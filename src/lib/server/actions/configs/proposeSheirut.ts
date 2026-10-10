@@ -23,6 +23,7 @@
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { restimeToMs } from './saleClaimShared.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 const proposeSheirutHandler: ActionExecutionHandler = async (params, context, util) => {
   const { projectId, name, descrip, oneTime, equaliSplited } = params;
@@ -171,5 +172,10 @@ export const proposeSheirutConfig: ActionConfig = {
     intent: 'consent',
     emailTemplate: 'SimpleNuti',
     metadata: { type: 'sheirutUpdate', url: 'lev', priority: 'high' }
-  }
+  },
+
+  realtime: {
+    scopes: (p, r) =>
+      scopeList([scope('project', p.projectId), scope('deal', r?.data?.sheirutId)]),
+  },
 };

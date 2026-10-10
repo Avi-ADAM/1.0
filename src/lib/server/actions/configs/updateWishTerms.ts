@@ -28,6 +28,7 @@ import { armProposalClock } from '$lib/server/wish/clock.js';
 import { negotiationView } from '$lib/server/wish/negotiationView.js';
 import { signDigestOf } from '$lib/server/wish/proposal.js';
 import { termsDigest } from '$lib/server/wish/termsDigest.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 const OPEN = new Set(['suggested', 'viewed']);
 const CLOSED = new Set(['draft', 'fulfilled', 'cancelled', 'expired']);
@@ -147,5 +148,10 @@ export const updateWishTermsConfig: ActionConfig = {
     location_hint: { type: 'string', required: false }
   },
   authRules: [{ type: 'jwt', errorMessage: 'Must be logged in to change a wish' }],
-  updateStrategy: { type: 'none' }
+  updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (p) =>
+      scopeList([scope('wish', p.ratsonId)]),
+  },
 };

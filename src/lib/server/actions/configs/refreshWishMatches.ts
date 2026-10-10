@@ -21,6 +21,7 @@ import { enrichWish, placeKey } from '../../ai/enrichWish.js';
 import type { WishExtraction } from '../../ai/extractWish.js';
 import type { WishPlace } from '../../concierge/localMatch.js';
 import { matchRatsonConfig } from './matchRatson.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 /** The place a wish row describes, in the shape enrichWish filters by. */
 export function wishPlaceOf(attrs: any): WishPlace {
@@ -117,5 +118,10 @@ export const refreshWishMatchesConfig: ActionConfig = {
     rematch: { type: 'boolean', required: false }
   },
   authRules: [{ type: 'jwt', errorMessage: 'Must be logged in to refresh matches' }],
-  updateStrategy: { type: 'none' }
+  updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (p) =>
+      scopeList([scope('wish', p.ratsonId)]),
+  },
 };

@@ -94,7 +94,7 @@ const validator = new ValidationEngine();
 export const authorizer = new AuthorizationEngine(strapiClient);
 const notifier = new NotificationOrchestrator(strapiClient);
 // Screens, not people (docs/inprogress/PLAN_REALTIME_MIGRATION.md §3.3).
-const realtime = realtimeFor(notifier);
+const realtime = realtimeFor(notifier, strapiClient);
 
 export const actionService = new ActionService(
   validator,

@@ -16,6 +16,7 @@ import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { execFromContext } from '$lib/server/archive/exec.js';
 import { signObjectChange } from '$lib/server/archive/vote.js';
 import { dealSignersFor, type DealSigners } from '$lib/server/sheirut/dealEdit.js';
+import { scope, decisionScope, scopeList } from '$lib/realtime/scopes.js';
 
 const handler: ActionExecutionHandler = async (params, context, { strapi, notifier }) => {
   const decisionId = String(params.decisionId ?? '');
@@ -67,7 +68,17 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
   }
 
   return {
-    data: { decisionId, order: outcome.order, consensus: outcome.consensus, awaiting: outcome.awaiting },
+    data: {
+      decisionId,
+      order: outcome.order,
+      consensus: outcome.consensus,
+      awaiting: outcome.awaiting,
+      // Where the screens are (realtime): the rikma, the deal, its mission and customers.
+      projectId: deal?.projectId ?? null,
+      sheirutId: deal?.sheirutId ?? null,
+      missionId: deal?.missionId ?? null,
+      clientIds: deal?.clientIds ?? []
+    },
     updateStrategy: { type: 'none' as const }
   };
 };
@@ -82,5 +93,16 @@ export const signDealEditConfig: ActionConfig = {
     expectRound: { type: 'number', required: false, description: 'The round a notice showed; ROUND_MOVED when a counter replaced it' }
   },
   authRules: [{ type: 'jwt', errorMessage: 'Must be logged in' }],
-  updateStrategy: { type: 'none' }
+  updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (p, r) =>
+      scopeList([
+        scope('project', r?.data?.projectId),
+        decisionScope('decision', p.decisionId),
+        scope('deal', r?.data?.sheirutId),
+        scope('mission', r?.data?.missionId),
+      ]),
+    partiesFrom: (_p, r) => r?.data?.clientIds ?? [],
+  },
 };

@@ -13,6 +13,7 @@
  */
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
   const {
@@ -231,5 +232,10 @@ export const requestWishResourceConfig: ActionConfig = {
     emailTemplate: 'SimpleNuti',
     metadata: { priority: 'high', type: 'ratsonProposal', url: '/deals' }
   },
-  updateStrategy: { type: 'none' }
+  updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (p) =>
+      scopeList([scope('wish', p.ratsonId)]),
+  },
 };

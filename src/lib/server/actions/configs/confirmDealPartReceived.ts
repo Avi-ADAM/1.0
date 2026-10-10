@@ -13,6 +13,7 @@
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { receiveDealMoney } from '$lib/server/deal/dealMoney.js';
 import { recordWishPaymentSale } from '$lib/server/sheirut/paymentSale.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
   const sheirutId = params.sheirutId != null ? String(params.sheirutId) : '';
@@ -48,7 +49,9 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
       pending: state.pending,
       paid: state.allConfirmed,
       becamePaid,
-      transfersSettled: transfers.map((t) => t.id)
+      transfersSettled: transfers.map((t) => t.id),
+      // Whose deal screens follow it (realtime) — everyone on it, paid or not.
+      partyIds: [...new Set([...state.customerIds, ...state.parts.map((p) => p.providerId)])].filter(Boolean)
     },
     // Only the moment the deal becomes paid is news to anyone else.
     recipientIds: becamePaid
@@ -85,5 +88,12 @@ export const confirmDealPartReceivedConfig: ActionConfig = {
     intent: 'personal',
     metadata: { type: 'dealPaid', url: '/deals' }
   },
-  updateStrategy: { type: 'none' }
+  updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (p) =>
+      scopeList([scope('deal', p.sheirutId)]),
+    audience: 'parties',
+    partiesFrom: (_p, r) => r?.data?.partyIds ?? [],
+  },
 };

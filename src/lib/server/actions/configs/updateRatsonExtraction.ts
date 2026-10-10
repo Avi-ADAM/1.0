@@ -11,6 +11,7 @@
  */
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 type ExtractedMissionInput = {
   name: string;
@@ -103,5 +104,10 @@ export const updateRatsonExtractionConfig: ActionConfig = {
     extracted_missions: { type: 'array', required: false },
     extracted_resources: { type: 'array', required: false }
   },
-  authRules: [{ type: 'jwt', errorMessage: 'Must be logged in to edit a wish' }]
+  authRules: [{ type: 'jwt', errorMessage: 'Must be logged in to edit a wish' }],
+
+  realtime: {
+    scopes: (p) =>
+      scopeList([scope('wish', p.ratsonId)]),
+  },
 };

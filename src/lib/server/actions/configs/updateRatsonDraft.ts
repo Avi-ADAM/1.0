@@ -18,6 +18,7 @@
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { writeWishRestime } from '$lib/server/wish/clock.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 const VALID_ACCESS = new Set(['personal', 'free_threshold', 'pay_to_access']);
 
@@ -130,5 +131,10 @@ export const updateRatsonDraftConfig: ActionConfig = {
     extracted_missions: { type: 'array', required: false },
     extracted_resources: { type: 'array', required: false }
   },
-  authRules: [{ type: 'jwt', errorMessage: 'Must be logged in to edit a wish' }]
+  authRules: [{ type: 'jwt', errorMessage: 'Must be logged in to edit a wish' }],
+
+  realtime: {
+    scopes: (p) =>
+      scopeList([scope('wish', p.ratsonId)]),
+  },
 };

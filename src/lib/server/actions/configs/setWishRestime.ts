@@ -18,6 +18,7 @@ import { proposalPath } from '$lib/wish/proposalRounds.js';
 import { WISH_RESTIME_VALUES, lastSignedAt, proposalDeadline, silenceApplies } from '$lib/wish/restime.js';
 import { armProposalClock, writeWishRestime } from '$lib/server/wish/clock.js';
 import { negotiationView } from '$lib/server/wish/negotiationView.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 const OPEN = new Set(['suggested', 'viewed']);
 
@@ -75,5 +76,10 @@ export const setWishRestimeConfig: ActionConfig = {
     restime: { type: 'string', required: true, description: 'feh (48 h) | sth (72 h) | nsh (96 h) | sevend (a week)' }
   },
   authRules: [{ type: 'jwt', errorMessage: 'Must be logged in to change the pace of a wish' }],
-  updateStrategy: { type: 'none' }
+  updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (p) =>
+      scopeList([scope('wish', p.ratsonId)]),
+  },
 };

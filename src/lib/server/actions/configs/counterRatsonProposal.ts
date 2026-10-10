@@ -30,6 +30,7 @@ import {
 } from '$lib/wish/proposalRounds.js';
 import { entryInput, loadWishProposal, requireParty } from '$lib/server/wish/proposal.js';
 import { armProposalClock } from '$lib/server/wish/clock.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 const NEGOTIABLE_FROM = new Set(['suggested', 'viewed']);
 
@@ -181,5 +182,10 @@ export const counterRatsonProposalConfig: ActionConfig = {
     note: { type: 'string', required: true, description: 'Why — shown to the other side' }
   },
   authRules: [{ type: 'jwt', errorMessage: 'Must be logged in to negotiate a proposal' }],
-  updateStrategy: { type: 'none' }
+  updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (p) =>
+      scopeList([scope('wish', p.ratsonId)]),
+  },
 };

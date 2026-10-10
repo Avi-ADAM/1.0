@@ -21,6 +21,7 @@
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { WISH_RESTIME_DEFAULT, normalizeRestime } from '$lib/wish/restime.js';
 import { writeWishRestime } from '$lib/server/wish/clock.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 type ExtractedMissionInput = {
   name: string;
@@ -332,5 +333,10 @@ export const createRatsonConfig: ActionConfig = {
     extracted_missions: { type: 'array', required: false },
     extracted_resources: { type: 'array', required: false }
   },
-  authRules: [{ type: 'jwt', errorMessage: 'Must be logged in to create a wish' }]
+  authRules: [{ type: 'jwt', errorMessage: 'Must be logged in to create a wish' }],
+
+  realtime: {
+    scopes: (_p, r) =>
+      scopeList([scope('wish', r?.ratsonId)]),
+  },
 };

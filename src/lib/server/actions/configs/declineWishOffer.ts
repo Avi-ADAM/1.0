@@ -10,6 +10,7 @@
  */
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
   const { proposalId, ratsonId, reason = '' } = params as {
@@ -94,5 +95,10 @@ export const declineWishOfferConfig: ActionConfig = {
     intent: 'personal',
     metadata: { priority: 'normal', type: 'ratsonProposal', url: '/concierge/{{ratsonId}}' }
   },
-  updateStrategy: { type: 'none' }
+  updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (p) =>
+      scopeList([scope('wish', p.ratsonId)]),
+  },
 };

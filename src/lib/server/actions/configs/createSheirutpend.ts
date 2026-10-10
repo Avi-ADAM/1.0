@@ -6,6 +6,7 @@
  */
 
 import type { ActionConfig } from '../types';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 export const createSheirutpendConfig: ActionConfig = {
   key: 'createSheirutpend',
@@ -86,5 +87,10 @@ export const createSheirutpendConfig: ActionConfig = {
     config: {
       dataKeys: ['sheirutpends']
     }
-  }
+  },
+
+  realtime: {
+    scopes: (p, r) =>
+      scopeList([scope('project', p.project), scope('deal', r?.data?.createSheirutpend?.data?.id)]),
+  },
 };

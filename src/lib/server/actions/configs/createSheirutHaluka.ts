@@ -1,5 +1,6 @@
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { loadDealDue } from '$lib/server/sheirut/dealDue.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 const createSheirutHalukaHandler: ActionExecutionHandler = async (params, context, { strapi }) => {
   const { sheirutId, projectId, receiverId } = params;
@@ -118,5 +119,11 @@ export const createSheirutHalukaConfig: ActionConfig = {
 
   updateStrategy: {
     type: 'none'
-  }
+  },
+
+  realtime: {
+    scopes: (p, r) =>
+      scopeList([scope('project', p.projectId), scope('deal', p.sheirutId), scope('split', r?.halukaId)]),
+    partiesFrom: (p) => [p.receiverId],
+  },
 };

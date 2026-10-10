@@ -31,6 +31,7 @@ import { acceptWishOfferConfig } from './acceptWishOffer.js';
 import { isTurnOf, proposalPath, standing } from '$lib/wish/proposalRounds.js';
 import { coveredVersion } from '$lib/server/wish/proposal.js';
 import { assertStandingRound } from '$lib/server/nego/candidacyVote.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 const ACCEPTABLE_FROM_STATUSES = new Set(['suggested', 'viewed']);
 
@@ -483,5 +484,10 @@ export const acceptRatsonProposalConfig: ActionConfig = {
       type: 'sheirutUpdate',
       url: '/deals'
     }
-  }
+  },
+
+  realtime: {
+    scopes: (p) =>
+      scopeList([scope('wish', p.ratsonId)]),
+  },
 };

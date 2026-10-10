@@ -22,6 +22,7 @@
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { loadWishProposal } from '$lib/server/wish/proposal.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 const OPEN = new Set(['suggested', 'viewed']);
 const CLOSED = new Set(['rejected', 'expired']);
@@ -74,5 +75,10 @@ export const hideRatsonProposalConfig: ActionConfig = {
     ratsonId: { type: 'string', required: true }
   },
   authRules: [{ type: 'jwt', errorMessage: 'Must be logged in to hide a proposal' }],
-  updateStrategy: { type: 'none' }
+  updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (p) =>
+      scopeList([scope('wish', p.ratsonId)]),
+  },
 };
