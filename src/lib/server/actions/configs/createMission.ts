@@ -42,6 +42,7 @@ import { shiftsEnabled } from '$lib/server/shifts/mode.js';
 import { asUser as asShiftUser } from '$lib/server/shifts/exec.js';
 import { createPlan } from '$lib/server/shifts/store.js';
 import { findOrCreateMissionTemplate } from '$lib/server/missions/missionTemplate.js';
+import { scope, decisionScope, scopeList } from '$lib/realtime/scopes.js';
 
 interface ChecklistItem {
   shem: string;
@@ -482,7 +483,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
                 en: `${creatorName} proposed the mission "${missionName}" in the "${projectName}" rikma. During the ${restimeEn} response window you can approve, open a discussion or counter with your own refined version - the proposal is yours to shape, and the last version on the table is auto-approved when time runs out. Tap to vote.`,
               },
             },
-            channels: ['socket', 'push', 'email'],
+            intent: 'consent',
             emailTemplate: 'PendJustCreated',
             emailTemplateData: {
               un: creatorName,
@@ -524,7 +525,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
                 en: `A new mission was born in "${projectName}" - "${missionName}" - and ${creatorName} picked you for it. Nothing happens without your consent: the mission is registered under your name only once you approve. You have ${restimeEn} to approve, refine the terms with a counter-offer or open a discussion; if you don't respond in time the offer opens up to everyone and the rikma looks for someone else. Tap to see the full details and vote.`,
               },
             },
-            channels: ['socket', 'push', 'email'],
+            intent: 'consent',
             emailTemplate: 'MissionInvite',
             emailTemplateData: {
               un: creatorName,
@@ -579,7 +580,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
             {
               recipients: { type: 'specificUsers', config: { userIdsParam: 'recipients' } },
               templates: memberTemplates,
-              channels: ['socket', 'push', 'email'],
+              intent: 'consent',
               emailTemplate: 'PendJustCreated',
               emailTemplateData: {
                 un: creatorName,
@@ -700,4 +701,14 @@ export const createMissionConfig: ActionConfig = {
   // member notice) — no static notification config here to avoid doubles.
 
   updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (p, r) =>
+      scopeList([
+        scope('project', p.projectId),
+        r?.data?.createdEntityType === 'pendm'
+          ? decisionScope('pendm', r?.data?.createdEntityId)
+          : scope('mission', r?.data?.createdEntityId),
+      ]),
+  },
 };

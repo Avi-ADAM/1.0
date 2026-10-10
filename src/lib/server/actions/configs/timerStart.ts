@@ -11,6 +11,7 @@ import type { ActionConfig } from '../types.js';
 import { touchDormancy } from '$lib/server/archive/dormancyClock.js';
 import { execFromContext } from '$lib/server/archive/exec.js';
 import { run } from '$lib/server/archive/gql.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 /**
  * The mission's hourly value right now — stamped onto the timer at creation so
@@ -204,7 +205,7 @@ export const timerStartConfig: ActionConfig = {
                 ar: 'بدأ المؤقت للمهمة بنجاح'
             }
         },
-        channels: ['socket'],
+        intent: 'ambient',
         metadata: {
             priority: 'normal',
             type: 'timerUpdate',
@@ -219,5 +220,11 @@ export const timerStartConfig: ActionConfig = {
             dataKeys: ['timers'],
             updateFunction: 'refreshTimers'
         }
-    }
+    },
+
+    realtime: {
+        scopes: (p, _r, ctx) =>
+            scopeList([scope('timer', ctx.userId), scope('mission', p.missionId)]),
+        audience: 'self',
+    },
 };

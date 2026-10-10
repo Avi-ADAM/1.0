@@ -6,6 +6,7 @@
  */
 
 import type { ActionConfig } from '../types.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 export const timerLogUpdateConfig: ActionConfig = {
     key: 'timerLogUpdate',
@@ -102,7 +103,7 @@ export const timerLogUpdateConfig: ActionConfig = {
                 ar: 'تم تحديث فترات المؤقت أو المهام بنجاح'
             }
         },
-        channels: ['socket'],
+        intent: 'ambient',
         metadata: {
             priority: 'low',
             type: 'timerEdit',
@@ -117,5 +118,11 @@ export const timerLogUpdateConfig: ActionConfig = {
             dataKeys: ['timers', 'acts'],
             updateFunction: 'refreshTimers'
         }
-    }
+    },
+
+    realtime: {
+        scopes: (_p, _r, ctx) =>
+            scopeList([scope('timer', ctx.userId)]),
+        audience: 'self',
+    },
 };

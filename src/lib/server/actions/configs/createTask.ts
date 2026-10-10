@@ -6,6 +6,7 @@
  */
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 /**
  * Resolve the users who should be notified when a task is assigned to a role.
@@ -262,13 +263,16 @@ export const createTaskAction: ActionConfig = {
         en: 'A new task was added for you: "{{name}}"'
       }
     },
-    // All channels — each is delivered only where the recipient has it set up
-    // (linked Telegram, email, push subscription), so the assignee is reached
-    // everywhere available.
-    channels: ['socket', 'push', 'email', 'telegram'],
+    // The assignee's acceptance is awaited (myIshur), so reach them everywhere.
+    intent: 'consent',
     metadata: {
       priority: 'normal',
       url: '/lev?project={{projectId}}'
     }
-  }
+  },
+
+  realtime: {
+    scopes: (p, r) =>
+      scopeList([scope('project', p.projectId), scope('act', r?.id), scope('mission', p.missionId)]),
+  },
 };

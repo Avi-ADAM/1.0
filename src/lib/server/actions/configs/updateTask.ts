@@ -11,6 +11,7 @@
  */
 
 import type { ActionConfig } from '../types.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 export const updateTaskAction: ActionConfig = {
   key: 'updateTask',
@@ -111,5 +112,14 @@ export const updateTaskAction: ActionConfig = {
     config: {
       dataKeys: ['tasks'] // task update — handled by levSocketHandler + component subscription
     }
-  }
+  },
+
+  realtime: {
+    scopes: (p) =>
+      scopeList([
+        scope('project', p.projectId),
+        scope('act', p.id),
+        ...((p.mesimabetahaliches ?? []) as unknown[]).map((id) => scope('mission', id as string)),
+      ]),
+  },
 };

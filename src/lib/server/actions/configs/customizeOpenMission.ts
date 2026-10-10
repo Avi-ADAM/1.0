@@ -9,6 +9,7 @@
 
 import type { ActionConfig } from '../types.js';
 import { openMissionProposalHandler } from './proposeOnOpenMission.js';
+import { scope, decisionScope, scopeList } from '$lib/realtime/scopes.js';
 
 export const customizeOpenMissionConfig: ActionConfig = {
   key: 'customizeOpenMission',
@@ -34,9 +35,14 @@ export const customizeOpenMissionConfig: ActionConfig = {
       title: { he: 'התאמה אישית למשימה', en: 'Customized mission terms' },
       body: { he: 'חבר רקמה לקח משימה בתנאים מותאמים', en: 'A member took a mission on customized terms' },
     },
-    channels: ['socket'],
+    intent: 'consent',
     metadata: { type: 'missionApplication', url: 'lev' },
   },
 
   updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (p, r) =>
+      scopeList([scope('project', p.projectId), scope('mission', p.openMissionId), decisionScope('ask', r?.data?.askId)]),
+  },
 };

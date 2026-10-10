@@ -14,6 +14,7 @@
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { findOrCreateMissionTemplate } from '$lib/server/missions/missionTemplate.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
   const { missionName, descrip = null, skillIds = [], roleIds = [] } = params;
@@ -48,4 +49,10 @@ export const createMissionTemplateConfig: ActionConfig = {
   authRules: [{ type: 'jwt', errorMessage: 'You must be logged in to create a mission' }],
 
   updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (_p, _r, ctx) =>
+      scopeList([scope('user', ctx.userId)]),
+    audience: 'self',
+  },
 };

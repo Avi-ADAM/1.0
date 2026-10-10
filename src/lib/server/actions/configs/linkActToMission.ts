@@ -17,6 +17,7 @@
  */
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import { scope, decisionScope, scopeList } from '$lib/realtime/scopes.js';
 
 /** What `createMission` reports → the `Act` relation that holds it. */
 const RELATION_BY_TYPE: Record<string, 'pendm' | 'openMission' | 'mesimabetahaliches'> = {
@@ -147,7 +148,10 @@ export const linkActToMissionAction: ActionConfig = {
         ar: 'أصبحت المهمة "{{actName}}" مهمة يمكن الانضمام إليها'
       }
     },
-    channels: ['socket', 'push'],
+    // The whole rikma hears that one of its acts became a mission. When it
+    // became a pendm, createMission already asked every member for consent;
+    // this notice must not ask a second time.
+    intent: 'outcome',
     metadata: {
       priority: 'normal',
       url: '/moach/{{projectId}}/acts'
@@ -159,5 +163,15 @@ export const linkActToMissionAction: ActionConfig = {
     config: {
       dataKeys: ['tasks']
     }
-  }
+  },
+
+  realtime: {
+    scopes: (p) =>
+      scopeList([
+        scope('project', p.projectId),
+        scope('act', p.actId),
+        // A pendm is the rikma's vote on the new mission, not a mission yet.
+        p.missionType === 'pendm' ? decisionScope('pendm', p.missionId) : scope('mission', p.missionId),
+      ]),
+  },
 };

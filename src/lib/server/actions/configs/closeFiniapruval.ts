@@ -8,6 +8,7 @@ import {
     rowRate,
     type RateRow,
 } from '$lib/timers/rate.js';
+import { scope, decisionScope, scopeList } from '$lib/realtime/scopes.js';
 
 export const closeFiniapruvalConfig: ActionConfig = {
     key: 'closeFiniapruval',
@@ -225,12 +226,17 @@ export const closeFiniapruvalConfig: ActionConfig = {
             title: { he: 'הצבעה על אישור', en: 'Approval Vote', ar: 'تصويت على الموافقة' },
             body: { he: 'הצבעה חדשה התקבלה', en: 'A new vote was received', ar: 'تم استلام تصويت جديد' }
         },
-        channels: ['socket', 'push'],
+        intent: 'outcome',
         metadata: { priority: 'normal', type: 'finiapruvalVote', url: '/lev?project={{projectId}}' }
     },
 
     updateStrategy: {
         type: 'refetchScope', // Re-read the slice: the raw result is not in the lev store's shape (REALTIME_TRACKING B1).
         config: { dataKeys: ['fiapp', 'mtaha'] }
-    }
+    },
+
+    realtime: {
+        scopes: (p) =>
+            scopeList([scope('project', p.projectId), decisionScope('finiapruval', p.finiapruvalId)]),
+    },
 };

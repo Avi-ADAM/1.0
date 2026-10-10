@@ -20,6 +20,7 @@
  */
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 const updateMissionTimerStateHandler: ActionExecutionHandler = async (params, context, { strapi }) => {
   const { mId, projectId, hoursdon } = params;
@@ -93,9 +94,14 @@ export const updateMissionTimerStateConfig: ActionConfig = {
       title: { he: 'עדכון טיימר משימה', en: 'Mission timer updated' },
       body: { he: 'הטיימר של המשימה עודכן', en: 'Mission timer was updated' },
     },
-    channels: ['socket'],
+    intent: 'ambient',
     metadata: { type: 'timerState', url: 'lev' },
   },
 
   updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (p) =>
+      scopeList([scope('project', p.projectId), scope('mission', p.mId)]),
+  },
 };

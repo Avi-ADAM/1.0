@@ -3,6 +3,7 @@ import { completeMissionConsentSpec } from '$lib/consent/specs/s2b';
 import { hoursStillToFile } from '$lib/server/timers/unfiledHours.js';
 import { roundHours, workValue } from '$lib/timers/precision.js';
 import { isFinishApproval } from '$lib/finiapruval/kind.js';
+import { scope, decisionScope, scopeList } from '$lib/realtime/scopes.js';
 
 /**
  * Calculate timegrama delay based on restime
@@ -223,7 +224,8 @@ const completeMissionHandler: ActionExecutionHandler = async (params, context, {
                 en: `Mission "${missionName}" in project "${projectName}" has been completed and is awaiting your approval. You have ${deadline.en} to review the submission and approve or dispute it.`
               }
             },
-            channels: ['socket', 'email', 'push'],
+            // The finish waits for the rikma's approval, with a silence clock.
+            intent: 'consent',
             metadata: {
               type: 'finiappmi',
               url: `/lev?project=${projectId}`,
@@ -303,5 +305,14 @@ export const completeMissionConfig: ActionConfig = {
     config: {
       dataKeys: ['arr1']
     }
-  }
+  },
+
+  realtime: {
+    scopes: (p, r) =>
+      scopeList([
+        scope('project', r?.data?.projectId),
+        scope('mission', p.missionId),
+        decisionScope('finiapruval', r?.data?.createdType === 'finiapruval' ? r?.data?.createdId : null),
+      ]),
+  },
 };

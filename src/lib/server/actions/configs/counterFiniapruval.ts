@@ -32,6 +32,7 @@ import {
   MAX_COUNTER_HOURS,
   MIN_COUNTER_NOTE
 } from '$lib/finiapruval/rounds.js';
+import { scope, decisionScope, scopeList } from '$lib/realtime/scopes.js';
 
 const REFUSALS = {
   hours: `Hours must be a number between 0 and ${MAX_COUNTER_HOURS}`,
@@ -149,7 +150,8 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
               ar: `اقتُرحت ${newHours} ساعات بدلاً من ${current}: ${String(note).trim()} — يمكنكم الموافقة أو اقتراح نسخة أخرى أو النقاش. أُعيد ضبط ساعة الرد.`
             }
           },
-          channels: ['socket', 'push'],
+          // A counter resets the clock and waits for an answer.
+          intent: 'consent',
           metadata: {
             type: 'finiapruvalCounter',
             url: `/lev?project=${projectId}`,
@@ -191,5 +193,10 @@ export const counterFiniapruvalConfig: ActionConfig = {
       errorMessage: 'You must be a member of this rikma to negotiate its approvals'
     }
   ],
-  updateStrategy: { type: 'none' }
+  updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (p) =>
+      scopeList([scope('project', p.projectId), decisionScope('finiapruval', p.finiapruvalId)]),
+  },
 };

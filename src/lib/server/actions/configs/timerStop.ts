@@ -8,6 +8,7 @@
  */
 
 import type { ActionConfig } from '../types.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 export const timerStopConfig: ActionConfig = {
     key: 'timerStop',
@@ -96,7 +97,7 @@ export const timerStopConfig: ActionConfig = {
                 ar: 'تم إيقاف المؤقت للمهمة'
             }
         },
-        channels: ['socket'],
+        intent: 'ambient',
         metadata: {
             priority: 'normal',
             type: 'timerUpdate',
@@ -111,5 +112,11 @@ export const timerStopConfig: ActionConfig = {
             dataKeys: ['timers'],
             updateFunction: 'refreshTimers'
         }
-    }
+    },
+
+    realtime: {
+        scopes: (_p, _r, ctx) =>
+            scopeList([scope('timer', ctx.userId)]),
+        audience: 'self',
+    },
 };

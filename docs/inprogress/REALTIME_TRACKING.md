@@ -21,12 +21,12 @@
 | … ⚪ / 🔴 / 🟠 (לא מתעדכנים בזמן אמת) | 62 | 57 |
 | `invalidate(() => true)` בלקוח | קיים | קיים |
 | **התראות לבני אדם** (§6 בתכנית) | | |
-| actions שהערוצים שלהם חסרים מול ה-intent היעד (⚠) | 106 | 62 |
-| … מתוכם `consent` — מחכים לתשובה של מישהו, וזה לא יוצא מהאתר | 55 | 27 |
-| … טלגרם חסר | 86 | 47 |
-| actions ששולחים יותר מהיעד (✂ — מייל נשאר למי שאין ערוץ אחר) | 10 | 5 |
-| קבצים שבוחרים ערוצים ביד (`LEGACY_CHANNEL_LISTS`) | 109 | 54 |
-| actions שעברו ל-`intent` | 0 | 54 |
+| actions שהערוצים שלהם חסרים מול ה-intent היעד (⚠) | 106 | 57 |
+| … מתוכם `consent` — מחכים לתשובה של מישהו, וזה לא יוצא מהאתר | 55 | 22 |
+| … טלגרם חסר | 86 | 42 |
+| actions ששולחים יותר מהיעד (✂ — מייל נשאר למי שאין ערוץ אחר) | 10 | 2 |
+| קבצים שבוחרים ערוצים ביד (`LEGACY_CHANNEL_LISTS`) | 109 | 42 |
+| actions שעברו ל-`intent` | 0 | 66 |
 
 ## שלבים
 
@@ -42,7 +42,7 @@
 | socket-server — בקשת polling אחת (`/socket.io/?transport=polling`) הפילה את התהליך (`ERR_HTTP_HEADERS_SENT`): ה-handler של ה-HTTP נרשם אחרי socket.io וענה 404 על הנתיב שלו | [x] 2026-10-09 — `socket-server/src/socket-path.ts` + בדיקה; נפרס, 3 בקשות polling בפרודקשן = 200 בלי restart. `deploy-socket.ps1` מוודא את הקובץ בכל פריסה |
 | socket-server — `event` / `rt:changed` בפרודקשן | [x] 2026-10-09 — `deploy-socket.ps1` (פריסה ראשונה מעץ העבודה, `7049d4e3-dirty`); `/health` ציבורי תקין, `/broadcast` בלי סוד 401, `:rollback` שמור |
 | R3 — דפים, גל 1 | [~] 2026-10-10 — כל הדפים מחוברים חוץ מ-`negotiation/[id]` (נדחה); 12 נבדקו חי בהזרקה ל-bus. פתוח: `/lev`, `VoteDetail`, deals/wish/concierge בשני דפדפנים — כשה-actions שלהם יפרסמו (R4). המאזינים הישנים נשארים עד R6 |
-| R4 — actions לפי תחום | [~] 2026-10-11 — **wish + deal: 39 actions** (2026-10-11; נשארו `clusterRatsons` — תחום maagad, `materializeRikmaBlueprint` — עוזר ההרשמה). משאלה אינה שייכת לרקמה, אז ה-broadcaster מוצא את הקהל שלה בעצמו: `wish:<id>` ⇒ בעלי המשאלה וכל המציעים (`partiesOf` → `105queryRatsonWithProposals` בטוקן השירות). עסקה ⇒ `project` + הצדדים שה-handler מחזיר. **נבדק בשלושה דפדפנים 2026-10-11** (משאלה 18: הבעלים 261 משנה קצב, ו-256 ו-258, המציעים, רואים את דף המשאלה נטען מחדש בלי רענון; הקצב הוחזר ל-`feh`). הבדיקה מצאה שטוקן השירות לבדו לא קורא את הצדדים של משאלה (השינוי הגיע רק למבצע) — `wishPartiesOf` שואל עכשיו גם עם ה-JWT של המבצע ומאחד. — **vote + archive: 34 actions** מצהירים `realtime` (נשארו: `archiveSpaceDoc` — ערוץ `space:changed` משלו; `proposeRikmaBlueprint` — עוד אין רקמה). נבדק בשני דפדפנים (256 ↔ 258, החלטה 78 על משימה 191): הצעת עריכה → הצעה נגדית → אישור, כל צד רואה את הסבב של השני בלי טעינת דף, והשם חזר למקור. `partiesFrom` מצטרף עכשיו גם לקהל `project` (מועמד שעוד אינו חבר). הבדיקה מצאה באג קודם ב-`VoteDetail` — ראו B12. — פיילוט `updateMissionStatus` **נבדק בשני דפדפנים 2026-10-10** (256 → 258, רקמה 87, משימה 191): `rt:changed` הגיע ל-258 עם `project:87`, `mission:191` ו-`originClientId` של הטאב השני; ה-bus מסר אחרי ~0.5ש׳; מתאם moach שלח **בקשה אחת** (`getProjectMissions` של 87), בלי טעינת דף; שינוי שאף מסך לא מקשיב לו — אפס בקשות; ההד של הטאב המקורי מסונן. הבדיקה מצאה באג: `/api/action` בנה `ActionService` משלו בלי broadcaster — אף פעולה מהדפדפן לא פרסמה. תוקן (`realtimeFor(notifier)` משותף ל-`/api/action` ול-`actions/index.ts`) |
+| R4 — actions לפי תחום | [~] 2026-10-11 — **mission / act / timer: 16 actions** (2026-10-11). משימות ומטלות ⇒ `project` + `mission:<id>` / `act:<id>`; אישורי סיום ⇒ `decision:finiapruval`. טיימר רץ הוא עניין של מי שמחזיק בו: `timerStart/Stop/LogUpdate` ⇒ `timer:<uid>` ל-`self` בלבד, ורק `timerSave` (השעות נכנסות למשימה) הולך לרקמה. ההצעות המקצועיות האישיות והקטלוג ⇒ `user:<me>` ל-`self`. **נבדק בשני דפדפנים** (256 → 258, רקמה 87): `createTask` — מטלה 134 הופיעה בטבלת המטלות של 258 בלי טעינת דף; `updateTask` — הסטטוס עבר ל"ממתין לאישרור" וחזר. `__data.json` נטען פעמיים ב-`updateTask`: פעם מ-`rt:changed` ופעם מהמאזין הישן של ה-layout, שמקבל את ההתראה ל-projectMembers — צפוי עד R6. הטיימרים לא נבדקו חי: לדף `/timers` עוד אין מאזין `timer:*` (הוא נשען על `timers.js`), אז היום רק מתאם moach (`timer` ⇒ missions) צורך אותם. ההתראות לבני אדם עברו ל-`intent` ב-11 מהקבצים: אישורי סיום, `completeMission`, `createMission` ו-`customizeOpenMission` ⇒ `consent` (מוסיף טלגרם, ובחלקם מייל); `createTask` ⇒ `consent` ולא `personal` — המבצע מתבקש לאשר (`myIshur`), אז אין ✂; `timerSave` ⇒ `consent` כשנפתח אישור שעות, אחרת `outcome`; הטיימרים ⇒ `ambient` (כמו היום). `linkActToMission` ⇒ `outcome`: מטלה שהופכת למשימה היא החלטה של כל הרקמה, אז הפוש נשאר (כשנוצרה pendm, `createMission` כבר ביקש הסכמה מכל חבר); ה-scope שלה הוא `decision:pendm` כשזו הצבעה. `updateTask` נשאר עם `channels` עד שה-intent שלו ייקבע מתוך מה שהפעולה עושה. **הסיווג בעמודת ה-intent היעד נוצר אוטומטית על ידי סוכן אחר — הצעה לבדיקה, לא החלטה; לא מורידים ערוץ על סמך הטבלה** (המשתמש, 2026-10-11). — **wish + deal: 39 actions** (2026-10-11; נשארו `clusterRatsons` — תחום maagad, `materializeRikmaBlueprint` — עוזר ההרשמה). משאלה אינה שייכת לרקמה, אז ה-broadcaster מוצא את הקהל שלה בעצמו: `wish:<id>` ⇒ בעלי המשאלה וכל המציעים (`partiesOf` → `105queryRatsonWithProposals` בטוקן השירות). עסקה ⇒ `project` + הצדדים שה-handler מחזיר. **נבדק בשלושה דפדפנים 2026-10-11** (משאלה 18: הבעלים 261 משנה קצב, ו-256 ו-258, המציעים, רואים את דף המשאלה נטען מחדש בלי רענון; הקצב הוחזר ל-`feh`). הבדיקה מצאה שטוקן השירות לבדו לא קורא את הצדדים של משאלה (השינוי הגיע רק למבצע) — `wishPartiesOf` שואל עכשיו גם עם ה-JWT של המבצע ומאחד. — **vote + archive: 34 actions** מצהירים `realtime` (נשארו: `archiveSpaceDoc` — ערוץ `space:changed` משלו; `proposeRikmaBlueprint` — עוד אין רקמה). נבדק בשני דפדפנים (256 ↔ 258, החלטה 78 על משימה 191): הצעת עריכה → הצעה נגדית → אישור, כל צד רואה את הסבב של השני בלי טעינת דף, והשם חזר למקור. `partiesFrom` מצטרף עכשיו גם לקהל `project` (מועמד שעוד אינו חבר). הבדיקה מצאה באג קודם ב-`VoteDetail` — ראו B12. — פיילוט `updateMissionStatus` **נבדק בשני דפדפנים 2026-10-10** (256 → 258, רקמה 87, משימה 191): `rt:changed` הגיע ל-258 עם `project:87`, `mission:191` ו-`originClientId` של הטאב השני; ה-bus מסר אחרי ~0.5ש׳; מתאם moach שלח **בקשה אחת** (`getProjectMissions` של 87), בלי טעינת דף; שינוי שאף מסך לא מקשיב לו — אפס בקשות; ההד של הטאב המקורי מסונן. הבדיקה מצאה באג: `/api/action` בנה `ActionService` משלו בלי broadcaster — אף פעולה מהדפדפן לא פרסמה. תוקן (`realtimeFor(notifier)` משותף ל-`/api/action` ול-`actions/index.ts`) |
 | R5 — דפים, גל 2 + timegrama + הסרת `invalidate(() => true)` | [ ] |
 | R6 — ניקוי מאזינים ישנים | [ ] |
 
@@ -239,11 +239,11 @@ inline מהקובץ עצמו ומה-helpers (`deal/offerDeal.ts`, `sheirut/dealE
 
 | action | file | socket today | recipients | effect for others | metadata.type → who reacts | ערוצים היום | intent יעד | target scopes | status |
 |---|---|---|---|---|---|---|---|---|---|
-| `timerLogUpdate` | timerLogUpdate | config | specificUsers | toast ⚠cfgUS lost | timerEdit → timers-store | S | A |  | [ ] |
-| `timerSave` | timerSave | config | projectMembers | toast ⚠cfgUS lost | timerUpdate → timers-store | SP ⚠ | C |  | [ ] |
-| `timerStart` | timerStart | config | specificUsers | toast ⚠cfgUS lost | timerUpdate → timers-store | S | — |  | [ ] |
-| `timerStop` | timerStop | config | specificUsers | toast ⚠cfgUS lost | timerUpdate → timers-store | S | — |  | [ ] |
-| `updateMissionTimerState` | updateMissionTimerState | config | projectMembers (−me) | toast | timerState → timers-store | S | A |  | [ ] |
+| `timerLogUpdate` | timerLogUpdate | config | specificUsers | toast ⚠cfgUS lost | timerEdit → timers-store | intent ✓ | A | `timer:<uid>` · self | [x] 2026-10-11 — עוד לא נבדק בשני דפדפנים |
+| `timerSave` | timerSave | config | projectMembers | toast ⚠cfgUS lost | timerUpdate → timers-store | intent ✓ | O·C | `project`, `mission`, `timer:<uid>` | [x] 2026-10-11 — עוד לא נבדק בשני דפדפנים |
+| `timerStart` | timerStart | config | specificUsers | toast ⚠cfgUS lost | timerUpdate → timers-store | intent ✓ | A | `timer:<uid>`, `mission` · self | [x] 2026-10-11 — עוד לא נבדק בשני דפדפנים |
+| `timerStop` | timerStop | config | specificUsers | toast ⚠cfgUS lost | timerUpdate → timers-store | intent ✓ | A | `timer:<uid>` · self | [x] 2026-10-11 — עוד לא נבדק בשני דפדפנים |
+| `updateMissionTimerState` | updateMissionTimerState | config | projectMembers (−me) | toast | timerState → timers-store | intent ✓ | A | `project`, `mission` | [x] 2026-10-11 — עוד לא נבדק בשני דפדפנים |
 
 ### meeting — 6 actions (live 0 · full 0 · toast 6 · silent 0 · read-only 0)
 
@@ -462,19 +462,19 @@ inline מהקובץ עצמו ומה-helpers (`deal/offerDeal.ts`, `sheirut/dealE
 
 | action | file | socket today | recipients | effect for others | metadata.type → who reacts | ערוצים היום | intent יעד | target scopes | status |
 |---|---|---|---|---|---|---|---|---|---|
-| `closeFiniapruval` | closeFiniapruval | config | projectMembers | toast ⚠cfgUS lost | finiapruvalVote → moach(lazy) | SP | O |  | [ ] |
-| `completeMission` | completeMission | inline |  | partial(lev) | finiappmi → moach(lazy) | SPE ⚠ | C |  | [ ] |
-| `counterFiniapruval` | counterFiniapruval | inline |  | toast | finiapruvalCounter → moach(lazy) | SP ⚠ | C |  | [ ] |
-| `createMission` | createMission | inline |  | toast | voteUpdate → votes+rikma+moach(lazy) | SPE ⚠ | C |  | [ ] |
-| `createMissionOffer` | createMissionOffer | none |  | — |  | — | — |  | [ ] |
-| `createMissionTemplate` | createMissionTemplate | none |  | — |  | — | — |  | [ ] |
-| `createTask` | createTask | config | specificUsers (−me) | toast |  | SPTE ✂ | P |  | [ ] |
-| `customizeOpenMission` | customizeOpenMission | config | specificUsers | toast | missionApplication → moach(lazy) | S ⚠ | C |  | [ ] |
+| `closeFiniapruval` | closeFiniapruval | config | projectMembers | toast ⚠cfgUS lost | finiapruvalVote → moach(lazy) | intent ✓ | O | `project`, `decision:finiapruval` | [x] 2026-10-11 — עוד לא נבדק בשני דפדפנים |
+| `completeMission` | completeMission | inline |  | partial(lev) | finiappmi → moach(lazy) | intent ✓ | C | `project`, `mission`, `decision:finiapruval` (כשנפתח אישור) | [x] 2026-10-11 — עוד לא נבדק בשני דפדפנים |
+| `counterFiniapruval` | counterFiniapruval | inline |  | toast | finiapruvalCounter → moach(lazy) | intent ✓ | C | `project`, `decision:finiapruval` | [x] 2026-10-11 — עוד לא נבדק בשני דפדפנים |
+| `createMission` | createMission | inline |  | toast | voteUpdate → votes+rikma+moach(lazy) | intent ✓ | C | `project`, `mission` / `decision:pendm` (לפי מה שנוצר) | [x] 2026-10-11 — עוד לא נבדק בשני דפדפנים |
+| `createMissionOffer` | createMissionOffer | none |  | — |  | — | — | `user:<me>` · self | [x] 2026-10-11 — עוד לא נבדק בשני דפדפנים |
+| `createMissionTemplate` | createMissionTemplate | none |  | — |  | — | — | `user:<me>` · self | [x] 2026-10-11 — עוד לא נבדק בשני דפדפנים |
+| `createTask` | createTask | config | specificUsers (−me) | toast |  | intent ✓ | C | `project`, `act`, `mission` | [x] 2026-10-11 — נבדק בשני דפדפנים (256 → 258, רקמה 87, מטלה 134) |
+| `customizeOpenMission` | customizeOpenMission | config | specificUsers | toast | missionApplication → moach(lazy) | intent ✓ | C | `project`, `mission`, `decision:ask` (כמו `proposeOnOpenMission`) | [x] 2026-10-11 — עוד לא נבדק בשני דפדפנים |
 | `getMissionForEdit` | getMissionForEdit | read-only |  |  |  |  |  |  | n/a |
-| `linkActToMission` | linkActToMission | config | projectMembers (−me) | toast ⚠cfgUS lost |  | SP ✂ | A |  | [ ] |
-| `updateMissionOffer` | updateMissionOffer | none |  | — |  | — | — |  | [ ] |
+| `linkActToMission` | linkActToMission | config | projectMembers (−me) | toast ⚠cfgUS lost |  | intent ✓ | O | `project`, `act`, `mission` / `decision:pendm` | [x] 2026-10-11 — עוד לא נבדק בשני דפדפנים |
+| `updateMissionOffer` | updateMissionOffer | none |  | — |  | — | — | `user:<me>` · self | [x] 2026-10-11 — עוד לא נבדק בשני דפדפנים |
 | `updateMissionStatus` | updateMissionStatus | config | projectMembers (−me) | toast | missionStatus → moach(lazy) | intent ✓ | A | `project:<pid>`, `mission:<mId>` | [x] 2026-10-10 — נבדק בשני דפדפנים (לא נדחף) |
-| `updateTask` | example | config | projectMembers (−me) | toast ⚠cfgUS lost |  | SP ✂ | A |  | [ ] |
+| `updateTask` | example | config | projectMembers (−me) | toast ⚠cfgUS lost |  | SP | ? (לא `A` — לא מורידים פוש) | `project`, `act`, `mission` ×N | [x] 2026-10-11 — נבדק בשני דפדפנים (256 → 258, רקמה 87, מטלה 134) |
 
 ### resource — 13 actions (live 1 · full 1 · toast 3 · silent 8 · read-only 0)
 

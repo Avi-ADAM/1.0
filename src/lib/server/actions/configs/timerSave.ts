@@ -8,6 +8,7 @@ import { roundHours } from '$lib/timers/precision.js';
 import { serializeSaveLinks } from '$lib/timers/saveLinks.js';
 import { saveFileIds } from '$lib/timers/saveFiles.js';
 import { fileHours } from '$lib/server/timers/fileHours.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 /**
  * The timer as the server sees it, read before anything is written to it.
@@ -267,12 +268,18 @@ export const timerSaveConfig: ActionConfig = {
             title: { he: 'טיימר נשמר', en: 'Timer Saved', ar: 'تم حفظ المؤقت' },
             body: { he: 'השעות נוספו למשימה בהצלחה', en: 'Hours have been added to the mission', ar: 'تمت إضافة الساعات إلى المهمة' }
         },
-        channels: ['socket', 'push'],
+        // An approval waits for the rikma's answer; a direct save is a result.
+        intent: (_p, r) => (r?.filed === 'approval' ? 'consent' : 'outcome'),
         metadata: { priority: 'normal', type: 'timerUpdate', url: '/lev?project={{projectId}}', originClientId: '{{originClientId}}' }
     },
 
     updateStrategy: {
         type: 'partialUpdate',
         config: { dataKeys: ['timers', 'missions'], updateFunction: 'refreshTimers' }
-    }
+    },
+
+    realtime: {
+        scopes: (p, r, ctx) =>
+            scopeList([scope('project', p.projectId), scope('mission', r?.missionId ?? p.missionId ?? p.mId), scope('timer', ctx.userId)]),
+    },
 };
