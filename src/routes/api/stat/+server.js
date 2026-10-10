@@ -1,5 +1,5 @@
 import { json, error } from '@sveltejs/kit';
-import { ADMINMONTHER } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 
 import { STRAPI_GRAPHQL as EP } from '$lib/server/strapiUrl.js';
 
@@ -25,7 +25,7 @@ const QUERY = `query GetSiteStats {
 }`;
 
 export async function GET() {
-  const token = normalizeToken(ADMINMONTHER);
+  const token = normalizeToken(env.ADMINMONTHER);
   if (!token) throw error(500, 'Server misconfiguration: ADMINMONTHER not set');
 
   let res;

@@ -210,7 +210,16 @@
     "customerPaid": "El pago del cliente fue enviado — esperando la confirmación de los proveedores",
     "allPaid": "Cada proveedor recibió su parte — el trato está pagado ✓",
     "confirmedToast": "Quedó registrado que recibiste tu parte",
-    "error": "La confirmación no se registró"
+    "error": "La confirmación no se registró",
+    "viaSplitTitle": "La parte llega por el reparto de la rikma",
+    "viaSplitExplain": "El pago del cliente llegó a un miembro de la rikma, y el reparto de la rikma lleva a cada proveedor su parte. Cada transferencia es entre dos personas, con su propia conversación. Cuando quien recibe confirma que la transferencia llegó, eso también confirma que recibió su parte del trato.",
+    "transferFrom": "de {{name}}",
+    "transferArrived": "Llegó ✓",
+    "transferWaiting": "En camino",
+    "receivedFrom": "La recibí de {{name}}",
+    "sentTo": "La envié a {{name}}",
+    "transferConfirmedToast": "Registrado: la transferencia te llegó",
+    "transferSentToast": "Registrado: enviaste la transferencia"
   },
   "edit": {
     "title": "Solicitudes de más horas",

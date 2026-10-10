@@ -111,7 +111,7 @@ export const sendAskMessageConfig: ActionConfig = {
                 ar: '{{senderName}} أرسل رسالة: {{content}}'
             }
         },
-        channels: ['socket', 'email', 'telegram', 'push'],
+        intent: 'personal',
         metadata: {
             priority: 'normal',
             type: 'askMessage',

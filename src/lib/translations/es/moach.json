@@ -28,7 +28,12 @@
     "uploadFailed": "La subida del archivo falló, inténtalo de nuevo",
     "awaitingApproval": "esperando aprobación",
     "awaitingApprovalHint": "Ya enviada y esperando la aprobación de los miembros de la rikma",
-    "hoursAwaitingApprovalHint": "Las horas guardadas esperan la aprobación de los miembros de la rikma"
+    "hoursAwaitingApprovalHint": "Las horas guardadas esperan la aprobación de los miembros de la rikma",
+    "awaitingSection": "Esperando aprobación de cierre",
+    "awaitingSectionHint": "Estas misiones se entregaron como terminadas y esperan los votos de cierre de los miembros de la rikma. Hasta que cierre la votación no tienen temporizador, actualización de estado ni propuesta de cambio.",
+    "awaitingStrip": "Entregada como terminada — esperando los votos de los miembros de la rikma",
+    "goVote": "Ir a la votación",
+    "seeVotes": "Quién ya votó"
   },
   "split": {
     "calc": "Calculadora de reparto",
@@ -67,7 +72,9 @@
     "missionProposals": "Propuestas de misiones",
     "votes": "votos",
     "toVote": "Votar",
-    "noneOpen": "No hay votaciones abiertas ahora mismo 🎉"
+    "noneOpen": "No hay votaciones abiertas ahora mismo 🎉",
+    "finishApprovals": "Aprobaciones de cierre y horas",
+    "hoursApproval": "aprobación de horas"
   },
   "main": {
     "vap": "Valores del proyecto"

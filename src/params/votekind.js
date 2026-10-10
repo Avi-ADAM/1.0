@@ -6,6 +6,7 @@
  *   - `pendm`  → a pending mission proposal
  *   - `ask`    → a candidate's join request to an open mission
  *   - `askm`   → a candidate/self resource-join request (open mashaabim / pmash)
+ *   - `fini`   → a finish approval (finiapruval): a holder's "I finished"
  *
  * Kept deliberately route-agnostic so that if we ever extract a standalone
  * vote page outside /moach (e.g. a public `/vote/[kind]/[id]`), it can reuse
@@ -21,6 +22,7 @@ export function match(param) {
     param === 'ask' ||
     param === 'askm' ||
     param === 'tosplit' ||
-    param === 'decision'
+    param === 'decision' ||
+    param === 'fini'
   );
 }

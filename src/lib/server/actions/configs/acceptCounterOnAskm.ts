@@ -76,7 +76,7 @@ export const acceptCounterOnAskmConfig: ActionConfig = {
       title: { he: 'המועמד אישר את ההצעה', en: 'Candidate accepted the proposal' },
       body: { he: 'המועמד אישר את הצעת הביניים למשאב', en: 'The candidate accepted the intermediate resource proposal' },
     },
-    channels: ['socket'],
+    intent: 'outcome',
     metadata: { type: 'base', url: 'lev' },
   },
 

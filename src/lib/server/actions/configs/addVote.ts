@@ -261,12 +261,29 @@ const addVoteHandler: ActionExecutionHandler = async (params, context, util) => 
         const recipientIds = Array.from(new Set([...memberIds, String(clientId)])).filter(Boolean);
 
         console.log('[Consensus] Triggering createSheirutFromPending...');
-        return await handler({
+        const created = await handler({
           sheirutpendId: id,
           projectId: projectId,
           clientId: clientId,
           recipientIds: recipientIds
         }, context, util);
+
+        // The handler runs outside ActionService, so its own notification never
+        // fired: the customer whose request this was heard nothing. The members
+        // hear it through this action's notification (an outcome).
+        const customerId = clientId ? String(clientId) : null;
+        const notice = createSheirutFromPendingConfig.notification;
+        if (notice && util.notifier && customerId && !memberIds.includes(customerId)) {
+          util.notifier
+            .notify(
+              notice,
+              { recipientIds: [customerId], projectId },
+              created,
+              context
+            )
+            .catch((e: unknown) => console.warn('[addVote] customer approval notice failed:', e));
+        }
+        return created;
 
       } catch (err) {
         console.error('[Consensus] Auto-creation failed:', err);
@@ -509,7 +526,9 @@ export const addVoteConfig: ActionConfig = {
         ar: 'صوت مستخدم على عنصر في المشروع'
       }
     },
-    channels: ['socket'],
+    // A plain vote stays on the site. The one branch that matures here — a
+    // service request every member signed — becomes a sheirut: an outcome.
+    intent: (_params, result) => (result?.data?.serviceId ? 'outcome' : 'ambient'),
     metadata: {
       type: 'voteUpdate',
       url: 'lev'

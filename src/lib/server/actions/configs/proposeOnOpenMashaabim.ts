@@ -199,7 +199,7 @@ export const proposeOnOpenMashaabimConfig: ActionConfig = {
         en: 'A candidate submitted revised terms for a resource',
       },
     },
-    channels: ['socket'],
+    intent: 'consent',
     metadata: { type: 'mashaabimRequest', url: 'lev' },
   },
 

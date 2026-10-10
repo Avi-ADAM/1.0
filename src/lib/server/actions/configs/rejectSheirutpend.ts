@@ -50,7 +50,7 @@ export const rejectSheirutpendConfig: ActionConfig = {
                 ar: 'تم رفض طلب المنتج/الخدمة الخاص بك'
             }
         },
-        channels: ['socket', 'push'],
+        intent: 'personal',
         metadata: {
             type: 'sheirutUpdate',
             url: 'lev'

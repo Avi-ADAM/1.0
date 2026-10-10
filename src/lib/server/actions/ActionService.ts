@@ -23,6 +23,7 @@ import { AuthorizationEngine } from './AuthorizationEngine.js';
 import { StrapiClient } from './StrapiClient.js';
 import { migrationMetrics } from '../metrics/MigrationMetrics.js';
 import { createLogger } from '../log.js';
+import type { RealtimeBroadcaster } from '../realtime/broadcaster.js';
 
 // Import to trigger action registration
 import './configs/index.js';
@@ -108,7 +109,8 @@ export class ActionService {
     private authorizer: AuthorizationEngine,
     private strapiClient: StrapiClient,
     private notifier?: INotificationOrchestrator,
-    logger?: ILogger
+    logger?: ILogger,
+    private realtime?: RealtimeBroadcaster
   ) {
     this.logger = logger || new ActionLogger();
   }
@@ -243,6 +245,21 @@ export class ActionService {
         });
 
         this.logger.debug('Notifications triggered', { actionKey });
+      }
+
+      // Step 5a: Realtime — what changed, for every screen that shows it.
+      // Independent of `notification` (that one talks to people) and published
+      // on every success; fire-and-forget like the notifications.
+      if (config.realtime && this.realtime) {
+        const realtimeResult = withUpdateStrategy(strapiResult, finalUpdateStrategy);
+        Promise.resolve()
+          .then(() => this.realtime!.publish(actionKey, config.realtime!, params, realtimeResult, context))
+          .catch(err => {
+            this.logger.warn('Realtime publish error', {
+              actionKey,
+              error: err instanceof Error ? err.message : String(err)
+            });
+          });
       }
 
       // Step 5b: Mirrored-task sync (PLAN_EXTERNAL_TASKS_API).

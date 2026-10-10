@@ -21,12 +21,16 @@
  *  - Once the recorded income covers what she owes, her side is done (`iTransferMoney`). The
  *    deal reads "paid" (`moneyTransfered`) only when every provider has also confirmed
  *    receiving their part in full (C-19, `$lib/server/deal/partsReceived`).
+ *  - A provider who already confirmed receiving their part (the receiver handed it over
+ *    before this was recorded) holds it: their part is carved out of this Sale into one
+ *    held by them (`$lib/sheirut/splitCarriage`), so the split never asks it again.
  *  - Best-effort: the money already moved, so a failure here is logged and returned, never
  *    thrown — it must not undo the confirmation.
  */
 
 import { loadDealDue, PAYMENT_KEY_PREFIX } from './dealDue.js';
-import { settleCoveredPayment } from '$lib/server/deal/partsReceived.js';
+import { loadParts, settleCoveredPayment } from '$lib/server/deal/partsReceived.js';
+import { carveConfirmedParts } from '$lib/server/deal/splitCarriage.js';
 
 type Strapi = { execute: (qid: string, vars: any, jwt: string, fetch: any) => Promise<any> };
 type Ctx = { jwt: string; fetch: any };
@@ -100,6 +104,14 @@ export async function recordWishPaymentSale(
       return { saleId: null, skipped: 'failed' };
     }
 
+    const run = (qid: string, vars: Record<string, unknown>) => strapi.execute(qid, vars, context.jwt, context.fetch);
+    try {
+      const parts = await loadParts(run, args.sheirutId);
+      if (parts) await carveConfirmedParts(run, args.sheirutId, parts, now);
+    } catch (err) {
+      console.error('[paymentSale] the income is recorded but a part already handed over was not carved out:', err);
+    }
+
     // The deal reads paid once what is recorded covers what it costs — and what a wish deal
     // costs is the hours the rikma approved, capped at the price agreed (C-14,
     // `./dealDue`), known once every line is closed. If that cannot be read, the agreed
@@ -108,7 +120,7 @@ export async function recordWishPaymentSale(
     const total = Number(sh.total) || 0;
     let paid = total <= 0 || recorded >= total - 0.005;
     try {
-      const owed = await loadDealDue((qid, vars) => strapi.execute(qid, vars, context.jwt, context.fetch), args.sheirutId);
+      const owed = await loadDealDue(run, args.sheirutId);
       if (owed) paid = owed.final && owed.recorded >= owed.due - 0.005;
     } catch (err) {
       console.warn('[paymentSale] could not read what the deal owes; judging by its agreed total:', err);
@@ -118,7 +130,7 @@ export async function recordWishPaymentSale(
     if (paid) {
       try {
         paid = (
-          await settleCoveredPayment((qid, vars) => strapi.execute(qid, vars, context.jwt, context.fetch), args.sheirutId)
+          await settleCoveredPayment(run, args.sheirutId)
         ).paid;
       } catch (err) {
         console.error('[paymentSale] the income is recorded but the deal flags did not move:', err);

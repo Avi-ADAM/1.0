@@ -82,7 +82,7 @@ export const confirmDealPartReceivedConfig: ActionConfig = {
         ar: 'أكّد جميع المزوّدين أنهم استلموا حصتهم كاملة.'
       }
     },
-    channels: ['socket', 'push'],
+    intent: 'personal',
     metadata: { type: 'dealPaid', url: '/deals' }
   },
   updateStrategy: { type: 'none' }

@@ -186,8 +186,9 @@ export const submitNegoMaapConfig: ActionConfig = {
       title: { he: 'הצעת סכום חדשה למשאב חודשי', en: 'New monthly amount proposed' },
       body: { he: 'חבר צוות הציע סכום אחר למחזור החודשי - נדרש אישור מחדש', en: 'A member proposed a different monthly amount - re-approval needed' },
     },
-    channels: ['socket', 'push', 'email'],
-    metadata: { type: 'maapNego', url: 'lev' },
+    // A counter opens a new round and resets the clock for every member.
+    intent: 'consent',
+    metadata: { type: 'maapNego', url: '/moach/{{projectId}}/votes' },
   },
 
   updateStrategy: { type: 'none' },

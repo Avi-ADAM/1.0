@@ -10,12 +10,12 @@
    */
   import { SendToAdmin } from '$lib/server/sendToAdmin.js';
   // Server-only secret — this module is imported only by timegrama/+server.js.
-  import { ADMINMONTHER } from '$env/static/private';
+  import { env } from '$env/dynamic/private';
   import { execFromAdmin } from '$lib/server/archive/exec.js';
   import { openDormancyProposal } from '$lib/server/archive/dormancyClock.js';
 
   export async function Dormancy(id, taid) {
-    const exec = execFromAdmin(SendToAdmin, ADMINMONTHER);
+    const exec = execFromAdmin(SendToAdmin, env.ADMINMONTHER);
 
     try {
       const outcome = await openDormancyProposal(exec, String(id));
@@ -29,7 +29,7 @@
     try {
       await SendToAdmin(
         `mutation { updateTimegrama(id: ${taid}, data: { done: true }) { data { id } } }`,
-        ADMINMONTHER
+        env.ADMINMONTHER
       );
     } catch (e) {
       console.error('[timegrama/dormancy] markDone failed:', e);

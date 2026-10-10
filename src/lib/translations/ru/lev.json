@@ -940,5 +940,21 @@
       "plate": "Читаемый вид",
       "classic": "Классический вид"
     }
+  },
+  "when": {
+    "at": {
+      "weekday": "в {{time}}",
+      "date": "{{time}}"
+    },
+    "askedcoin": "Отправлена {{time}}",
+    "askedm": "Отправлена {{time}}",
+    "pends": "Предложена {{time}}",
+    "pmashes": "Предложен {{time}}",
+    "wegets": "Отправлена {{time}}",
+    "hachla": "Открыто {{time}}",
+    "archObject": "Предложено {{time}}",
+    "stipend": "Открыто {{time}}",
+    "sheirutp": "Отправлена {{time}}",
+    "wishoffer": "Подано {{time}}"
   }
 }

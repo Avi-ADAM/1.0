@@ -8,9 +8,10 @@
 
 import { buildDealLines, computeDealDue, type DealDue } from '$lib/sheirut/dealDue.js';
 import { readPartEntries } from '$lib/sheirut/partsReceived.js';
+import { PAYMENT_KEY_PREFIX } from '$lib/sheirut/splitCarriage.js';
 
 /** Every customer payment's `Sale.externalId` starts with this (`./paymentSale`). */
-export const PAYMENT_KEY_PREFIX = 'sheirut-payment:';
+export { PAYMENT_KEY_PREFIX };
 
 /** Runs one qid — `strapi.execute` in an action, the /api/send proxy in a page load. */
 export type QidRunner = (qid: string, vars: Record<string, unknown>) => Promise<any>;

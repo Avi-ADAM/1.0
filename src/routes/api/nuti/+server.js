@@ -1,6 +1,7 @@
 import { render } from 'svelty-email';
 import PendJustCreated from '$lib/components/mail/pendJustCreated.svelte';
 import { sendMailSafe } from '$lib/server/mailer.js';
+import { rejectUnlessInternal } from '$lib/server/internalOnly.js';
 
 async function sendMail(
   restime,
@@ -84,6 +85,10 @@ function getUnById(array, id) {
   return foundObject.attributes ? foundObject.attributes.username : foundObject.username;
 }
 export async function POST({ request }) {
+  // Mails every address in the body's `pu` — server callers only.
+  const refused = rejectUnlessInternal(request, 'api/nuti');
+  if (refused) return refused;
+
   const data = await request.json();
     console.log("Form submitted a"); 
   const pn = data.pn;

@@ -44,6 +44,7 @@
   import ShiftHoleCard from './ShiftHoleCard.svelte';
   import ShiftSwapCard from './ShiftSwapCard.svelte';
   import ShiftHoursCard from './ShiftHoursCard.svelte';
+  import { setLevItem } from '../levItemContext.js';
 
   /**
    * @typedef {Object} Props
@@ -84,6 +85,10 @@
   const user = (e) => onUser?.(e);
   const delo = (e) => onCoinLapach?.(e);
   const chat = (e) => onChat?.(e);
+
+  // CardHeader reads the item from here to show when it arrived, instead of
+  // every card below forwarding one more prop (see levItemContext.js).
+  setLevItem(() => buble);
 </script>
 
 {#if buble.ani === 'haluk' && milon.desi == true}

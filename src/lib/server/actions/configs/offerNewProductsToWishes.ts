@@ -104,7 +104,7 @@ export const offerNewProductsToWishesConfig: ActionConfig = {
         ar: 'نشاط تجاري انضم للتو إلى 1lev1 يقدّم ما يناسب أمنيتك. افتح Concierge لتراه.'
       }
     },
-    channels: ['socket', 'push'],
+    intent: 'personal',
     metadata: { priority: 'normal', type: 'ratsonProposal', url: '/concierge' }
   },
   updateStrategy: { type: 'none' }

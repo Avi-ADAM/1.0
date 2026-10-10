@@ -1,10 +1,12 @@
-// Read the key via SvelteKit's static-private env, NOT process.env — `.env`
-// values are not injected into process.env in the SvelteKit runtime, so the
-// raw process.env lookup resolved to '' and every embed call 403'd
-// ("unregistered caller"). See commit 137.3; reverting that broke matching.
-import { GEMINI_API_KEY as KEY_PRIORITY, GOOGLE_API as KEY_BACKUP } from '$env/static/private';
+// Read the key via SvelteKit's dynamic-private env, NOT process.env — `.env`
+// values are not injected into process.env under `vite dev`, so the raw
+// process.env lookup resolved to '' and every embed call 403'd ("unregistered
+// caller"); see commit 137.3. Not $env/static/private either: that bakes the
+// value of the BUILD machine's .env into the image, and the Docker server's
+// own .env is then ignored (how mail went silent for two months, 170.1).
+import { env } from '$env/dynamic/private';
 
-const GEMINI_API_KEY = KEY_PRIORITY || KEY_BACKUP || '';
+const GEMINI_API_KEY = env.GEMINI_API_KEY || env.GOOGLE_API || '';
 
 const GEMINI_MODEL = 'gemini-embedding-2-preview';
 const GEMINI_BASE = 'https://generativelanguage.googleapis.com/v1beta';

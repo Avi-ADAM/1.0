@@ -6,6 +6,7 @@
  */
 
 import type { ActionConfig } from './types.js';
+import { NOTIFICATION_INTENTS } from '../notifications/intent.js';
 
 /**
  * Global registry of all actions
@@ -160,13 +161,21 @@ function validateActionConfig(config: ActionConfig): void {
       );
     }
 
-    if (!Array.isArray(notif.channels) || notif.channels.length === 0) {
+    // `intent` decides the channels (notifications/intent.ts); a legacy config
+    // still lists them itself.
+    if (notif.intent !== undefined) {
+      if (typeof notif.intent !== 'function' && !(NOTIFICATION_INTENTS as readonly string[]).includes(notif.intent)) {
+        throw new Error(
+          `Action "${config.key}": Invalid notification intent "${String(notif.intent)}"`
+        );
+      }
+    } else if (!Array.isArray(notif.channels) || notif.channels.length === 0) {
       throw new Error(
-        `Action "${config.key}": Notification must have at least one channel`
+        `Action "${config.key}": Notification must have an intent or at least one channel`
       );
     }
 
-    for (const channel of notif.channels) {
+    for (const channel of notif.channels ?? []) {
       if (!['socket', 'email', 'telegram', 'push'].includes(channel)) {
         throw new Error(
           `Action "${config.key}": Invalid notification channel "${channel}"`

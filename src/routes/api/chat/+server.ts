@@ -1,4 +1,4 @@
-import { GEMINI_API_KEY } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 import { mastra } from '../../../mastra';
@@ -76,7 +76,7 @@ export const POST: RequestHandler = async ({ request, fetch, locals }) => {
         currentPath,
         lang,
       });
-      const nonregAgent = createUnregisteredBotAgent(GEMINI_API_KEY, lang);
+      const nonregAgent = createUnregisteredBotAgent(env.GEMINI_API_KEY, lang);
 
       const agentMessages = [];
       // Include recent history for context (last 10 messages)
@@ -158,7 +158,7 @@ export const POST: RequestHandler = async ({ request, fetch, locals }) => {
         history: history.slice(0, -1),
         userId: userId?.toString() || 'anonymous',
         language: lang,
-        apiKey: GEMINI_API_KEY,
+        apiKey: env.GEMINI_API_KEY,
         fetchInstance: fetch,
         currentPath,
         threadKey

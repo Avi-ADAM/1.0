@@ -206,7 +206,7 @@ export async function createVolunteerProposal(
                   ar: 'عرض أحد أفراد المجتمع تنفيذ مهمة نشرتها. افتح Concierge للموافقة.'
                 }
           },
-          channels: ['socket', 'email', 'push'],
+          intent: 'consent',
           metadata: { priority: 'high', type: 'ratsonProposal', url: `/concierge/${ratsonId}` }
         },
         params,

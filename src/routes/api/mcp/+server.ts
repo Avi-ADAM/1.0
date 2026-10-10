@@ -74,6 +74,11 @@ const howToConnect = createTool({
                 "4. Add it to your MCP client headers: { 'Authorization': 'Bearer YOUR_KEY' }",
                 `5. The endpoint is ${MCP_ENDPOINT}`
             ],
+            // claude.ai / the Claude app: this opens the add-connector dialog
+            // already filled in — no key, no config file, no terminal.
+            claude_ai_one_click:
+                'https://claude.ai/customize/connectors?modal=add-custom-connector' +
+                `&connectorName=1lev1&connectorUrl=${encodeURIComponent(MCP_ENDPOINT)}`,
             // Said here too, not only in the rejected-key path: someone who is
             // reconnecting a client that already has an entry is one restart away
             // from the same silent shadowing loop.

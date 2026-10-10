@@ -15,7 +15,7 @@ import { EmailService } from './EmailService';
 import { TelegramService } from './TelegramService';
 import { PushService } from './PushService';
 import { SocketIOServer } from './SocketIOServer';
-import { resolveChannels } from './intent';
+import { resolveChannels, emailRecipients } from './intent';
 
 export interface UserProfile {
   id: string;
@@ -151,6 +151,9 @@ export class NotificationOrchestrator {
       const externalRecipients = filteredRecipients.filter(
         u => String(u.id) !== String(context.userId)
       );
+      // Email goes to everyone only when the intent asks for it; otherwise to
+      // whoever this notification would not reach on push or telegram.
+      const emailTo = emailRecipients(externalRecipients, channels);
 
       if (channels.includes('socket')) {
         promises.push(
@@ -165,10 +168,10 @@ export class NotificationOrchestrator {
         );
       }
 
-      if (channels.includes('email') && externalRecipients.length) {
+      if (emailTo.length) {
         promises.push(
           this.emailService.sendBulk(
-            externalRecipients,
+            emailTo,
             notificationData,
             config.emailTemplate || 'SimpleNuti',
             context,
@@ -203,7 +206,7 @@ export class NotificationOrchestrator {
       // Log any failures — names in the same order the promises were pushed
       const channelNames: string[] = [];
       if (channels.includes('socket')) channelNames.push('socket');
-      if (channels.includes('email') && externalRecipients.length) channelNames.push('email');
+      if (emailTo.length) channelNames.push('email');
       if (channels.includes('telegram') && externalRecipients.length) channelNames.push('telegram');
       if (channels.includes('push') && externalRecipients.length) channelNames.push('push');
 
@@ -274,11 +277,15 @@ export class NotificationOrchestrator {
               .filter(id => id && String(id).trim() !== '')
               .map(id => this.getUserProfile(String(id), context))
           );
-          const results = profiles.filter((p): p is UserProfile => p !== null);
-          if (results.length > 0) return results;
+          // A list — even an empty one — is the answer: `[]` means nobody.
+          // Falling through to the rikma turned "nobody" into "everyone" (N4,
+          // docs/inprogress/REALTIME_TRACKING.md), which for a consent notice is an
+          // email to the whole rikma.
+          return profiles.filter((p): p is UserProfile => p !== null);
         }
 
-        // Fallback to project members filtering (legacy behavior)
+        // No list at all: the legacy fallback to the rikma's members, which a
+        // few configs rely on (acceptRatsonProposal reads projectId off the result).
         const projectIdForSpecific = rule.config?.projectIdParam || 'projectId';
         const projectIdValue =
           this.getNestedValue(params, projectIdForSpecific) ||
@@ -386,6 +393,11 @@ export class NotificationOrchestrator {
   /**
    * Get project members with caching
    */
+  /** Member ids of a rikma, through the same cache — the realtime audience. */
+  async projectMemberIds(projectId: string, context: ActionContext): Promise<string[]> {
+    return (await this.getProjectMembers(projectId, context)).map(u => String(u.id));
+  }
+
   private async getProjectMembers(
     projectId: string,
     context: ActionContext

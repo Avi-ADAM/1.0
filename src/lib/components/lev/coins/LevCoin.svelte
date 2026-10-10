@@ -34,13 +34,14 @@
    */
   import { t } from '$lib/translations';
   import { lang } from '$lib/stores/lang.js';
-  import { msLeft } from '$lib/stores/clock.svelte';
+  import { msLeft, clock } from '$lib/stores/clock.svelte';
   import {
     kindAccent,
     rowContent,
     rowCtaKey,
     rowTimegrama,
-    rowIsActionable
+    rowIsActionable,
+    whenLabel
   } from '../cards/cardKinds.js';
   import { coinArc } from './coinArc.js';
   import {
@@ -185,8 +186,14 @@
    * tabindex and no label at all — so it says the whole sentence: what kind of
    * thing this is, which one, how long is left, and what it wants.
    */
+  // No room on the face for "sent 12 min ago" — it goes in the spoken label
+  // and the tooltip; the opened sheet shows it in the card header.
+  let when = $derived(
+    whenLabel(item, { now: clock.minutes, locale: $lang, t: $t })
+  );
+
   let label = $derived(
-    [kindLabel, title, item.projectName, countdown, actionable ? cta : null]
+    [kindLabel, title, item.projectName, when?.text, countdown, actionable ? cta : null]
       .filter(Boolean)
       .join(' · ')
   );
@@ -204,6 +211,7 @@
   style:--arc={arcPct}
   style:--face={classic ? `url(${face})` : 'none'}
   aria-label={label}
+  title={when ? `${when.sentence} · ${when.full}` : undefined}
   onclick={onOpen}
 >
   <!-- The project logo. On the plate it is the coin's face at watermark

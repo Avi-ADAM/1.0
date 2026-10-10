@@ -744,7 +744,12 @@ export async function executeAction<K extends ActionKey>(
     const response = await fetchFn('/api/action', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        // This tab's id (set by socketClient): realtime changes carry it back
+        // so this tab skips its own echo and the user's other tabs still update.
+        ...(browser && (window as any).__timerClientId
+          ? { 'x-client-id': String((window as any).__timerClientId) }
+          : {})
       },
       body: JSON.stringify({
         actionKey,

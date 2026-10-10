@@ -42,6 +42,14 @@ export interface ActionConfig {
   /** Notification configuration (optional) */
   notification?: NotificationConfig;
 
+  /**
+   * What this action changed, for every screen that shows it — separate from
+   * `notification`, which talks to people (docs/inprogress/PLAN_REALTIME_MIGRATION.md §3).
+   * Published on every success; the realtime contract test requires it of
+   * every writing action not on its legacy list.
+   */
+  realtime?: RealtimeConfig;
+
   /** Update strategy for client-side updates (optional) */
   updateStrategy?: UpdateStrategy;
 
@@ -242,7 +250,7 @@ export interface NotificationConfig {
 
   /**
    * Legacy: an explicit channel list. Ignored when `intent` is set. Being
-   * replaced action by action (docs/tbd/PLAN_REALTIME_MIGRATION.md §6) — the
+   * replaced action by action (docs/inprogress/PLAN_REALTIME_MIGRATION.md §6) — the
    * notifications contract test holds the list of files that still use it.
    */
   channels?: NotificationChannel[];
@@ -393,6 +401,31 @@ export interface ActionContext {
 
   /** Fetch function for making HTTP requests */
   fetch: typeof globalThis.fetch;
+
+  /**
+   * The browser tab that ran the action (`x-client-id`). Realtime changes
+   * carry it so that tab skips its own echo while the user's other tabs and
+   * devices still update. Absent for server-side and API-key callers.
+   */
+  clientId?: string;
+}
+
+/**
+ * Who sees an action's change on their screens.
+ * - `project` — every member of each `project:<pid>` among the scopes (the
+ *   default when there is one);
+ * - `parties` — `partiesFrom`, for bilateral flows (a sale claim, a deal, a wish);
+ * - `self` — only the actor's own tabs and devices (the default otherwise).
+ * The actor is always included: their other devices need it too.
+ */
+export type RealtimeAudience = 'project' | 'parties' | 'self';
+
+export interface RealtimeConfig {
+  /** Scopes from `$lib/realtime/scopes` — build them with `scope()` / `scopeList()`. */
+  scopes: (params: Record<string, any>, result: any, context: ActionContext) => string[];
+  audience?: RealtimeAudience;
+  /** For `parties`: the user ids beside the actor. */
+  partiesFrom?: (params: Record<string, any>, result: any) => Array<string | number | null | undefined>;
 }
 
 /**

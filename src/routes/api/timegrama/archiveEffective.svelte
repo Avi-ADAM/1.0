@@ -9,7 +9,7 @@
    */
   import { SendToAdmin } from '$lib/server/sendToAdmin.js';
   // Server-only secret — this module is imported only by timegrama/+server.js.
-  import { ADMINMONTHER } from '$env/static/private';
+  import { env } from '$env/dynamic/private';
 
   const MUTATION = {
     mashabetahalich: 'updateMashabetahalich',
@@ -28,7 +28,7 @@
         const q = `{ ${whatami}(id: ${id}) { data { id attributes {
           lifecycle archiveEffectiveFrom
         } } } }`;
-        const res = await SendToAdmin(q, ADMINMONTHER);
+        const res = await SendToAdmin(q, env.ADMINMONTHER);
         const a = res?.data?.[whatami]?.data?.attributes;
 
         if (!a) {
@@ -41,7 +41,7 @@
         } else {
           await SendToAdmin(
             `mutation { ${mutation}(id: ${id}, data: { lifecycle: archived }) { data { id } } }`,
-            ADMINMONTHER
+            env.ADMINMONTHER
           );
           console.log(`[timegrama/archiveEffective] ${whatami} ${id} archived at end of cycle`);
         }
@@ -53,7 +53,7 @@
     try {
       await SendToAdmin(
         `mutation { updateTimegrama(id: ${taid}, data: { done: true }) { data { id } } }`,
-        ADMINMONTHER
+        env.ADMINMONTHER
       );
     } catch (e) {
       console.error('[timegrama/archiveEffective] markDone failed:', e);

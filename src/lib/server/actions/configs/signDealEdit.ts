@@ -55,8 +55,9 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
                   en: `The customer signed the version of "${deal.missionName}". It applies once the rikma approves it or its clock runs out.`
                 }
               },
-          channels: ['socket', 'push'],
-          metadata: { type: 'voteUpdate', url: 'lev', priority: 'normal' }
+          // Her signature on a round already on the table stays on the site; applying it is an outcome.
+          intent: outcome.consensus ? 'outcome' : 'ambient',
+          metadata: { type: 'voteUpdate', url: `/moach/${deal.projectId}/votes/decision/${decisionId}`, priority: 'normal' }
         },
         { projectId: deal.projectId },
         { projectId: deal.projectId, decisionId },

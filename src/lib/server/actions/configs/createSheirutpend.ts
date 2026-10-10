@@ -70,7 +70,8 @@ export const createSheirutpendConfig: ActionConfig = {
         ar: 'تم إنشاء طلب خدمة جديد للمشروع {{project.name}}'
       }
     },
-    channels: ['socket', 'email', 'telegram', 'push'],
+    // The rikma's approval is awaited.
+    intent: 'consent',
     emailTemplate: 'SimpleNuti',
     metadata: {
       icon: 'https://res.cloudinary.com/love1/image/upload/v1645647192/apple-touch-icon_irclue.png',

@@ -1,4 +1,4 @@
-import { TELEGRAM_BOT_TOKEN_NEW } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 
 export const POST = async ({ request }) => {
     console.log("tryng", request.body)
@@ -42,7 +42,7 @@ export const POST = async ({ request }) => {
 
      //getNutifiction => check for id and email and username alse ask for email and if exsist send to login with explanation how to reg
     // %0A is url encoded '\n' which is used for new line. 
-    const Token = TELEGRAM_BOT_TOKEN_NEW;
+    const Token = env.TELEGRAM_BOT_TOKEN_NEW;
     const chatId = data.message.from.id
     console.log(chatId)
     const dat = {

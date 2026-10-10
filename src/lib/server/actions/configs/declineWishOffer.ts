@@ -91,7 +91,7 @@ export const declineWishOfferConfig: ActionConfig = {
         ar: 'اختار مزوّد مدعوّ عدم الانضمام. يمكنك دعوة شخص آخر.'
       }
     },
-    channels: ['socket', 'push'],
+    intent: 'personal',
     metadata: { priority: 'normal', type: 'ratsonProposal', url: '/concierge/{{ratsonId}}' }
   },
   updateStrategy: { type: 'none' }

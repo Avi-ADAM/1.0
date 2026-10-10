@@ -55,6 +55,7 @@ import { AuthorizationEngine } from './AuthorizationEngine.js';
 import { StrapiClient } from './StrapiClient.js';
 import { ActionService } from './ActionService.js';
 import { NotificationOrchestrator } from '$lib/server/notifications/NotificationOrchestrator.js';
+import { realtimeFor } from '$lib/server/realtime/broadcaster.js';
 
 import { STRAPI_GRAPHQL as STRAPI_ENDPOINT } from '$lib/server/strapiUrl.js';
 import { env as privateEnv } from '$env/dynamic/private';
@@ -92,10 +93,14 @@ const validator = new ValidationEngine();
 // through the full execute pipeline.
 export const authorizer = new AuthorizationEngine(strapiClient);
 const notifier = new NotificationOrchestrator(strapiClient);
+// Screens, not people (docs/inprogress/PLAN_REALTIME_MIGRATION.md §3.3).
+const realtime = realtimeFor(notifier);
 
 export const actionService = new ActionService(
   validator,
   authorizer,
   strapiClient,
-  notifier
+  notifier,
+  undefined,
+  realtime
 );

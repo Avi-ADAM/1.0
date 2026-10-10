@@ -197,7 +197,7 @@ const claim: ActionExecutionHandler = async (params, context, { strapi, notifier
               ar: `"${view.name}" أصبحت الآن أمنية الزبون. يمكن مناقشة كل جزء هناك.`
             }
           },
-          channels: ['socket', 'push'],
+          intent: 'personal',
           metadata: { priority: 'high', type: 'directOffer', url: `/deals/offers/${id}` }
         },
         params,

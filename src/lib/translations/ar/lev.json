@@ -940,5 +940,21 @@
       "plate": "وجه واضح",
       "classic": "وجه كلاسيكي"
     }
+  },
+  "when": {
+    "at": {
+      "weekday": "يوم {{time}}",
+      "date": "في {{time}}"
+    },
+    "askedcoin": "أُرسل {{time}}",
+    "askedm": "أُرسل {{time}}",
+    "pends": "اقتُرحت {{time}}",
+    "pmashes": "اقتُرح {{time}}",
+    "wegets": "أُرسل {{time}}",
+    "hachla": "فُتح {{time}}",
+    "archObject": "اقتُرح {{time}}",
+    "stipend": "فُتح {{time}}",
+    "sheirutp": "أُرسل {{time}}",
+    "wishoffer": "قُدّم {{time}}"
   }
 }

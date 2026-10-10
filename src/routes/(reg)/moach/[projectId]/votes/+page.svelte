@@ -6,6 +6,8 @@
   import Spinner from '$lib/celim/Spinner.svelte';
   import { goto } from '$app/navigation';
   import { socketClient } from '$lib/stores/socketClient';
+  import { standingVotes } from '$lib/finiapruval/rounds';
+  import { isHoursApproval } from '$lib/finiapruval/kind';
 
   let projectId = $derived(page.params.projectId);
   let votesData = $state(null);
@@ -36,7 +38,15 @@
   }
 
   // Realtime: refresh the open-votes list whenever a vote lands for this project.
-  const VOTE_TYPES = ['pendmVote', 'pmashVote', 'maapVote', 'decisionVote', 'voteUpdate'];
+  const VOTE_TYPES = [
+    'pendmVote',
+    'pmashVote',
+    'maapVote',
+    'decisionVote',
+    'voteUpdate',
+    'finiapruvalVote',
+    'finiapruvalCounter'
+  ];
   let socketUnsub;
 
   onMount(() => {
@@ -99,6 +109,18 @@
     );
   }
 
+  // Finish approvals: a holder pressed "finished" and every member signs. Only
+  // the standing round counts — after a counter, earlier signatures are history
+  // (src/lib/finiapruval/rounds.ts).
+  let finiList = $derived(votesData?.finiapruvals?.data ?? []);
+  function finiName(fini) {
+    const a = fini?.attributes ?? {};
+    const who = a.users_permissions_user?.data?.attributes?.username;
+    // A timer save / a month's hours ride the same model — say which it is.
+    const what = isHoursApproval(a) ? $trans('moach.votes.hoursApproval') : null;
+    return [a.missname || '—', who, what].filter(Boolean).join(' · ');
+  }
+
   // Overview: count of open items awaiting a vote, per category. Each tile
   // jumps to its section below, where every item links to its focused page.
   let summary = $derived([
@@ -107,7 +129,8 @@
     { key: 'split', label: $trans('moach.votes.splitVotes'), count: votesData?.tosplits?.data?.length ?? 0, anchor: '#sec-split', color: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
     { key: 'decision', label: $trans('moach.votes.decisionVotes'), count: votesData?.decisions?.data?.length ?? 0, anchor: '#sec-decision', color: 'bg-violet-50 text-violet-700 border-violet-200' },
     { key: 'join', label: $trans('moach.votes.joinVotes'), count: joinList.length, anchor: '#sec-join', color: 'bg-amber-50 text-amber-700 border-amber-200' },
-    { key: 'askm', label: $trans('moach.votes.resourceJoinVotes'), count: askmList.length, anchor: '#sec-askm', color: 'bg-rose-50 text-rose-700 border-rose-200' }
+    { key: 'askm', label: $trans('moach.votes.resourceJoinVotes'), count: askmList.length, anchor: '#sec-askm', color: 'bg-rose-50 text-rose-700 border-rose-200' },
+    { key: 'fini', label: $trans('moach.votes.finishApprovals'), count: finiList.length, anchor: '#sec-fini', color: 'bg-pink-50 text-pink-700 border-pink-200' }
   ]);
   let totalOpen = $derived(summary.reduce((s, c) => s + c.count, 0));
 </script>
@@ -124,7 +147,7 @@
   {:else}
     <!-- Overview: counts per category, each jumps to its section -->
     {#if totalOpen > 0}
-      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-3">
         {#each summary as cat (cat.key)}
           <a
             href={cat.count > 0 ? cat.anchor : undefined}
@@ -234,6 +257,26 @@
               <span class="font-medium">{ask.missionName}</span>
               <span class="text-xs bg-amber-100 text-amber-700 px-2 py-1 rounded shrink-0"
                 >{$trans('moach.votes.toVote')} · {ask.attributes?.vots?.length || 0} {$trans('moach.votes.votes')}</span
+              >
+            </button>
+          {/each}
+        </div>
+      </section>
+    {/if}
+
+    <!-- Finish approvals (finiapruvals) → focused finish-vote page -->
+    {#if finiList.length > 0}
+      <section id="sec-fini" class="bg-white p-6 rounded-xl shadow-sm scroll-mt-24">
+        <h2 class="text-lg font-bold mb-4">{$trans('moach.votes.finishApprovals')}</h2>
+        <div class="space-y-4">
+          {#each finiList as fini (fini.id)}
+            <button
+              onclick={() => goto(`/moach/${projectId}/votes/fini/${fini.id}`)}
+              class="w-full text-start p-4 border rounded-lg hover:bg-gray-50 flex justify-between items-center gap-3"
+            >
+              <span class="font-medium">{finiName(fini)}</span>
+              <span class="text-xs bg-pink-100 text-pink-700 px-2 py-1 rounded shrink-0"
+                >{$trans('moach.votes.toVote')} · {standingVotes(fini.attributes?.vots).length} {$trans('moach.votes.votes')}</span
               >
             </button>
           {/each}

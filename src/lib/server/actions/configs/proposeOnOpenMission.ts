@@ -174,7 +174,7 @@ export const proposeOnOpenMissionConfig: ActionConfig = {
         en: 'A candidate submitted revised terms for a mission',
       },
     },
-    channels: ['socket'],
+    intent: 'consent',
     metadata: { type: 'missionApplication', url: 'lev' },
   },
 

@@ -167,7 +167,8 @@ export async function notifyDealClientsOfEdit(
             es: `En «${name}» se piden hasta ${more} más de lo acordado. Sin tu firma no se suma a tu cuenta. Apruébalo, propón otras horas u otra tarifa, o conversa en la página del trato.`
           }
         },
-        channels: ['socket', 'email', 'push'],
+        // Her signature is awaited — her silence is not her yes.
+        intent: 'consent',
         metadata: { type: 'dealEditToSign', url: `/deals/${deal.sheirutId}`, priority: 'high' }
       },
       { recipients, projectId: deal.projectId },

@@ -9,7 +9,7 @@ import {
   toTaskStatusView,
   TASKS_CREATE_SCOPE
 } from '$lib/server/tasksApi';
-import { ADMINMONTHER } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 
 /**
  * POST /api/v1/tasks — External Tasks API (PLAN_EXTERNAL_TASKS_API).
@@ -25,7 +25,7 @@ import { ADMINMONTHER } from '$env/static/private';
  * to one rikma, and nobody is committed to any of it without accepting first.
  */
 
-const ADMIN_TOKEN = ADMINMONTHER.replace(/\s+/g, '').replace(/^ADMINMONTHER=/, '');
+const ADMIN_TOKEN = (env.ADMINMONTHER ?? '').replace(/\s+/g, '').replace(/^ADMINMONTHER=/, '');
 
 // ─── Basic in-memory per-key rate limiting ──────────────────────────────────
 // A ticket desk fires once per ticket; 60/min is generous, and it bounds the

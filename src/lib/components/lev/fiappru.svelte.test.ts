@@ -143,7 +143,7 @@ describe('fiappru — disagreeing is a counter, never a veto', () => {
       actionKey: 'counterFiniapruval',
       params: { finiapruvalId: '77', projectId: '5', hours: 3, note: 'שלוש שעות זה מה שראיתי' }
     });
-    await waitFor(() => expect(onDecline).toHaveBeenCalledWith({ ani: 'fini', coinlapach: 'fiapp-77' }));
+    await waitFor(() => expect(onDecline).toHaveBeenCalledWith({ ani: 'fini', coinlapach: 'fiapp-77', finalized: false }));
     expect(toast.success).toHaveBeenCalled();
   });
 

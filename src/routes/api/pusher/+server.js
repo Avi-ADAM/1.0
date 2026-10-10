@@ -1,5 +1,5 @@
 import webPush from "web-push";
-import { publicKey, privateKey, URL } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 
 export async function POST({ request, fetch }) {
   const datam = await request.json();
@@ -9,9 +9,9 @@ export async function POST({ request, fetch }) {
   const machshirId = datam.machshirId;
   console.log(jsoni)
   webPush.setVapidDetails(
-    URL || import.meta.env.VITE_URL,
-    publicKey,
-    privateKey
+    env.URL || import.meta.env.VITE_URL,
+    env.publicKey,
+    env.privateKey
   );
   let data = {
     message: messege,

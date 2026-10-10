@@ -29,7 +29,7 @@
 
 import { objToString } from '$lib/func/objToString.svelte';
 import { SendToAdmin } from '$lib/server/sendToAdmin.js';
-import { ADMINMONTHER } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 import { normalizeRows, reconcileMonter } from '$lib/recurring/missionMonths.js';
 
 const PAGE_SIZE = 100;
@@ -67,7 +67,7 @@ async function fetchMissions({ ids, includeFinished, start, limit }) {
       meta { pagination { total } }
     }
   }`;
-  const res = await SendToAdmin(que, ADMINMONTHER);
+  const res = await SendToAdmin(que, env.ADMINMONTHER);
   if (res?.errors) throw new Error(JSON.stringify(res.errors));
   return {
     missions: res?.data?.mesimabetahaliches?.data ?? [],
@@ -95,7 +95,7 @@ async function fetchSegmentsFor(missionIds) {
       } }
     }
   }`;
-  const res = await SendToAdmin(que, ADMINMONTHER);
+  const res = await SendToAdmin(que, env.ADMINMONTHER);
   if (res?.errors) throw new Error(JSON.stringify(res.errors));
 
   for (const row of res?.data?.timers?.data ?? []) {
@@ -111,7 +111,7 @@ export async function GET({ url, request }) {
   // Header first: a query string ends up in nginx access logs and browser
   // history, so prefer `-H "x-fixer-key: …"` where the caller can send one.
   const key = request.headers.get('x-fixer-key') || url.searchParams.get('key') || '';
-  if (!secretMatches(key, ADMINMONTHER)) {
+  if (!secretMatches(key, env.ADMINMONTHER)) {
     return json({ error: 'forbidden' }, 403);
   }
 
@@ -197,7 +197,7 @@ export async function GET({ url, request }) {
                 howmanyhoursalready: ${counter}
               }) { data { id } }
             }`;
-            const res = await SendToAdmin(mutation, ADMINMONTHER);
+            const res = await SendToAdmin(mutation, env.ADMINMONTHER);
             if (!res?.data?.updateMesimabetahalich?.data) {
               report.errors.push({ id, error: JSON.stringify(res?.errors ?? res) });
               continue;

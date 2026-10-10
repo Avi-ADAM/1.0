@@ -483,3 +483,43 @@ describe('ActionService', () => {
     });
   });
 });
+
+describe('ActionService — realtime publish', () => {
+  const ctx: ActionContext = { userId: '1', jwt: 'j', lang: 'he', fetch: global.fetch, clientId: 'tab-a' };
+
+  function service(publish = vi.fn().mockResolvedValue({ scopes: [], userIds: [] })) {
+    clearRegistry();
+    const strapi = new StrapiClient();
+    vi.spyOn(strapi, 'execute').mockResolvedValue({ data: { id: '7' } });
+    const s = new ActionService(new ValidationEngine(), new AuthorizationEngine(strapi), strapi, mockNotifier, mockLogger, {
+      publish
+    });
+    return { s, publish };
+  }
+
+  it('publishes the declared scopes on success, with the result and the origin tab', async () => {
+    const { s, publish } = service();
+    const realtime = { scopes: (p: any) => [`project:${p.projectId}`] };
+    registerAction({ key: 'rtAction', description: 'd', graphqlOperation: 'q', paramSchema: {}, authRules: [], realtime });
+
+    const r = await s.executeAction('rtAction', { projectId: '12' }, ctx);
+    expect(r.success).toBe(true);
+    await new Promise((res) => setTimeout(res, 0));
+    expect(publish).toHaveBeenCalledWith('rtAction', realtime, { projectId: '12' }, expect.anything(), ctx);
+  });
+
+  it('a failing publish never fails the action', async () => {
+    const { s } = service(vi.fn().mockRejectedValue(new Error('socket down')));
+    registerAction({ key: 'rtAction2', description: 'd', graphqlOperation: 'q', paramSchema: {}, authRules: [], realtime: { scopes: () => ['user:1'] } });
+    const r = await s.executeAction('rtAction2', {}, ctx);
+    expect(r.success).toBe(true);
+  });
+
+  it('an action without realtime publishes nothing', async () => {
+    const { s, publish } = service();
+    registerAction({ key: 'plain', description: 'd', graphqlOperation: 'q', paramSchema: {}, authRules: [] });
+    await s.executeAction('plain', {}, ctx);
+    await new Promise((res) => setTimeout(res, 0));
+    expect(publish).not.toHaveBeenCalled();
+  });
+});

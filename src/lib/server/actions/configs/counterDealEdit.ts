@@ -79,8 +79,9 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
               en: `For "${deal.missionName}": ${h} hours × ${r}. The clock reset — approve, propose again, or talk it over.`
             }
           },
-          channels: ['socket', 'push'],
-          metadata: { type: 'voteUpdate', url: 'lev', priority: 'high' }
+          // A counter opens a new round and resets the clock for every member.
+          intent: 'consent',
+          metadata: { type: 'voteUpdate', url: `/moach/${deal.projectId}/votes/decision/${decisionId}`, priority: 'high' }
         },
         { projectId: deal.projectId },
         { projectId: deal.projectId, decisionId },

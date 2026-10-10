@@ -33,7 +33,6 @@ import { env } from '$env/dynamic/private';
 // Telegram today, and a var that only exists at build time would read back
 // empty through the dynamic module — turning the notification into a silent
 // no-op, which is the one failure mode this whole endpoint exists to avoid.
-import { NEW_TELEGRAM } from '$env/static/private';
 import { STRAPI_URL } from '$lib/server/strapiUrl.js';
 import { createDemoTasks, centralRikmaId } from '$lib/server/demo/centralRikmaTasks.js';
 import { createDemoMeeting } from '$lib/server/demo/demoMeeting.js';
@@ -135,13 +134,13 @@ async function notifyOwner(
   title: string,
   message: string
 ): Promise<void> {
-  if (!NEW_TELEGRAM) return;
+  if (!env.NEW_TELEGRAM) return;
   await fetchFn('/api/ste', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       isNew: true,
-      chat_id: NEW_TELEGRAM,
+      chat_id: env.NEW_TELEGRAM,
       det: title,
       message,
       // The button lands on the heart page, where the two new tasks are waiting.

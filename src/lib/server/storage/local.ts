@@ -21,7 +21,6 @@ import { mkdir, rename, rm, stat, statfs } from 'node:fs/promises';
 import { dirname, join, resolve, sep } from 'node:path';
 import { pipeline } from 'node:stream/promises';
 import { Readable, Transform } from 'node:stream';
-import { ADMINMONTHER } from '$env/static/private';
 
 export interface LocalConfig {
   dir: string;
@@ -44,7 +43,7 @@ export function localConfig(): LocalConfig | null {
  * Same derivation idea as `internalSecret.js`.
  */
 export function blobSecret(): string | null {
-  const base = (ADMINMONTHER || '').trim();
+  const base = (env.ADMINMONTHER || '').trim();
   if (!base) return null;
   return createHash('sha256').update(`${base}:space-docs-blob:v1`).digest('hex');
 }

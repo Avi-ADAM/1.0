@@ -102,7 +102,7 @@ const confirmSheirutHalukaHandler: ActionExecutionHandler = async (params, conte
     } else if (nowComplete && !isSiteShare && sheirutId) {
       saleId = (await recordWishPaymentSale(strapi, context, { sheirutId, halukaId: String(halukaId), senderId, receiverId, amount })).saleId;
     }
-    return { confirmed: true, role: 'sender', halukaId, complete: nowComplete, saleId };
+    return { confirmed: true, role: 'sender', halukaId, complete: nowComplete, saleId, recipientIds: [] };
   } else {
     if (String(userId) !== receiverId) {
       throw new Error('Only the receiver can confirm receiving');
@@ -111,6 +111,8 @@ const confirmSheirutHalukaHandler: ActionExecutionHandler = async (params, conte
     // `senderconf` goes with it and the sender is never asked to confirm it again.
     const nowComplete = haluka.confirmed !== true;
     let saleId: string | null = null;
+    // The sender hears that it arrived — once, when this confirmation settles it.
+    const recipientIds = nowComplete && haluka.usersend?.data?.id ? [senderId] : [];
 
     // A customer's payment on a wish deal is one fact with the deal page's "I received my
     // part" — the same write (`$lib/server/deal/dealMoney`), so neither card asks again.
@@ -129,7 +131,7 @@ const confirmSheirutHalukaHandler: ActionExecutionHandler = async (params, conte
             }
           }
         );
-        return { confirmed: true, role: 'receiver', halukaId, complete: nowComplete, saleId: recorded };
+        return { confirmed: true, role: 'receiver', halukaId, complete: nowComplete, saleId: recorded, recipientIds };
       } catch (err) {
         // Not a wish deal: the transfer is confirmed on its own, below.
         if (!(err instanceof NotADealReceiverError)) throw err;
@@ -154,7 +156,7 @@ const confirmSheirutHalukaHandler: ActionExecutionHandler = async (params, conte
         halukaId: String(halukaId),
       });
     }
-    return { confirmed: true, role: 'receiver', halukaId, complete: nowComplete, saleId };
+    return { confirmed: true, role: 'receiver', halukaId, complete: nowComplete, saleId, recipientIds };
   }
 };
 
@@ -169,5 +171,18 @@ export const confirmSheirutHalukaConfig: ActionConfig = {
   authRules: [
     { type: 'jwt', errorMessage: 'Must be authenticated' }
   ],
+  notification: {
+    recipients: { type: 'specificUsers', config: { userIdsParam: 'recipientIds' } },
+    templates: {
+      title: { he: 'התשלום שלך התקבל', en: 'Your payment was received', ar: 'تم استلام دفعتك' },
+      body: {
+        he: 'המקבל/ת אישר/ה שהכסף הגיע.',
+        en: 'The receiver confirmed the money arrived.',
+        ar: 'أكّد المستلم وصول المبلغ.'
+      }
+    },
+    intent: 'personal',
+    metadata: { priority: 'normal', type: 'dealPaid', url: '/deals' }
+  },
   updateStrategy: { type: 'none' }
 };

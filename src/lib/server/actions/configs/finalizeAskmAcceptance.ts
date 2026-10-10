@@ -185,7 +185,7 @@ export const finalizeAskmAcceptanceConfig: ActionConfig = {
       title: { he: 'בקשת משאב אושרה', en: 'Resource request approved' },
       body: { he: 'בקשת שיתוף משאב אושרה', en: 'A resource sharing request was approved' },
     },
-    channels: ['socket'],
+    intent: 'outcome',
     metadata: { type: 'askmAccepted', url: 'lev' },
   },
 

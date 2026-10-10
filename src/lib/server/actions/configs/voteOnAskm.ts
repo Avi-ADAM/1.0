@@ -111,8 +111,9 @@ export const voteOnAskmConfig: ActionConfig = {
         ar: 'صوت أحد الأعضاء على طلب مشاركة مورد',
       },
     },
-    channels: ['socket'],
-    metadata: { type: 'voteUpdate', url: 'lev' },
+    // Never resolves the askm (finalizeAskmAcceptance does) — activity only.
+    intent: 'ambient',
+    metadata: { type: 'voteUpdate', url: '/moach/{{projectId}}/votes/askm/{{askmId}}' },
   },
 
   updateStrategy: { type: 'none' },

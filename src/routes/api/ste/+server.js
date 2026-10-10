@@ -1,5 +1,5 @@
 import { Telegraf, Markup } from 'telegraf';
-import { TELEGRAM_BOT_TOKEN_NEW, NEW_TELEGRAM } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 
 export const POST = async ({ request }) => {
   console.log('tryng', request.body);
@@ -25,9 +25,9 @@ export const POST = async ({ request }) => {
      ${action} %0A 
      ${det}`;
   // %0A is url encoded '\n' which is used for new line.
-  const Token = TELEGRAM_BOT_TOKEN_NEW
+  const Token = env.TELEGRAM_BOT_TOKEN_NEW
    
-  const chatId = isNew ? chat_id : NEW_TELEGRAM;
+  const chatId = isNew ? chat_id : env.NEW_TELEGRAM;
  if(isNew != true){
     const url = `https://api.telegram.org/bot${Token}/sendMessage?chat_id=${chatId}&text=${botMessage}`;  
   const res = await fetch(url);

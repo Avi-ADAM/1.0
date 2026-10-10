@@ -50,7 +50,7 @@ export const approveSheirutpendConfig: ActionConfig = {
                 ar: 'لقد تمت الموافقة على طلب المنتج/الخدمة الخاص بك'
             }
         },
-        channels: ['socket', 'push'],
+        intent: 'personal',
         metadata: {
             type: 'sheirutUpdate',
             url: 'lev'

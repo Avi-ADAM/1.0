@@ -13,7 +13,7 @@
 // handleFetch, so a client cannot forge it. We send a hash of the secret,
 // never the secret itself.
 
-import { ADMINMONTHER } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 import { createHash } from 'node:crypto';
 
 export const INTERNAL_HEADER = 'x-internal-secret';
@@ -30,7 +30,7 @@ function normalize(value) {
  */
 export function getInternalSecret() {
 	if (cached) return cached;
-	const base = normalize(ADMINMONTHER);
+	const base = normalize(env.ADMINMONTHER);
 	if (!base) throw new Error('ADMINMONTHER env var is not set; internal secret unavailable');
 	cached = createHash('sha256').update(`${base}:internal-proxy:v1`).digest('hex');
 	return cached;

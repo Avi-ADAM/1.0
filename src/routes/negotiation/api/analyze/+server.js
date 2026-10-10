@@ -2,7 +2,7 @@
 // AI endpoint — powered by Groq (free credits, fast inference)
 
 import { json } from '@sveltejs/kit';
-import { GROQ_API_KEY } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 
 const GROQ_API = 'https://api.groq.com/openai/v1/chat/completions';
 
@@ -14,7 +14,7 @@ async function callGroq(systemPrompt, userMessage) {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${GROQ_API_KEY}`
+      'Authorization': `Bearer ${env.GROQ_API_KEY}`
     },
     body: JSON.stringify({
       model: MODEL,

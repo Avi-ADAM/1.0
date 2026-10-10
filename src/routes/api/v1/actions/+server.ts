@@ -4,10 +4,10 @@ import { resolveApiKeyPrincipal } from '$lib/server/authz/principal.js';
 import { applyAuthz } from '$lib/server/authz/authorize.js';
 import { actionService } from '$lib/server/actions/index.js';
 import type { ActionContext } from '$lib/server/actions/types.js';
-import { ADMINMONTHER } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 
 // Admin token for Strapi bypass (internal use)
-const ADMIN_TOKEN = ADMINMONTHER.replace(/\s+/g, '').replace(/^ADMINMONTHER=/, '');
+const ADMIN_TOKEN = (env.ADMINMONTHER ?? '').replace(/\s+/g, '').replace(/^ADMINMONTHER=/, '');
 
 /**
  * POST /api/v1/actions

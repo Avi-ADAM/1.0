@@ -38,6 +38,7 @@ onMessage(messaging, (payload) => {
   // it from any page — a lev card, the moach, the bot, a notification link.
   import TimeEditorDialog from '$lib/components/timers/TimeEditorDialog.svelte';
   import { socketClient } from '$lib/stores/socketClient';
+  import { realtimeBus } from '$lib/realtime/bus.svelte';
   import { patchUser } from '$lib/stores/userStore.js';
   import { toast } from 'svelte-sonner';
   import { addMes } from '$lib/stores/pendMisMes.js';
@@ -178,6 +179,9 @@ onMessage(messaging, (payload) => {
 
       // Connect - will read JWT from cookie automatically
       socketClient.connect(data.id);
+      // Screens follow what actions change (`rt:changed`), apart from the
+      // notifications below (docs/inprogress/PLAN_REALTIME_MIGRATION.md §3.4).
+      realtimeBus.start();
 
       // Listen for notifications
       const unsubscribe = socketClient.onNotification((notification) => {

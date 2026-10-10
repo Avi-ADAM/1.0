@@ -21,7 +21,10 @@ export interface NotificationPayload {
 
 export interface BroadcastRequest {
   userIds: string[];
+  /** The payload — for `rt:changed`, `{ scopes, actionKey, originClientId?, at }`. */
   notification: NotificationPayload;
+  /** `notification` when absent; see broadcast-event.ts. */
+  event?: string;
   /**
    * Meetings whose guest rooms should also receive this notification.
    *

@@ -209,7 +209,16 @@
     "customerPaid": "The customer's payment was sent — waiting for the providers to confirm",
     "allPaid": "Every provider received their part — the deal is paid ✓",
     "confirmedToast": "Recorded that you received your part",
-    "error": "The confirmation was not recorded"
+    "error": "The confirmation was not recorded",
+    "viaSplitTitle": "The part comes through the rikma's split",
+    "viaSplitExplain": "The customer's payment reached one member of the rikma, and the rikma's split moves each provider their part. Each transfer is between two people, with its own conversation. When the receiver confirms a transfer arrived, that is also their confirmation that their part of the deal was received.",
+    "transferFrom": "from {{name}}",
+    "transferArrived": "Arrived ✓",
+    "transferWaiting": "On its way",
+    "receivedFrom": "I received it from {{name}}",
+    "sentTo": "I sent it to {{name}}",
+    "transferConfirmedToast": "Recorded: the transfer reached you",
+    "transferSentToast": "Recorded: you sent the transfer"
   },
   "edit": {
     "title": "Requests for more hours",

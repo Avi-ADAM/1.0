@@ -5,7 +5,6 @@ import { join } from 'node:path';
 
 const { env } = vi.hoisted(() => ({ env: {} as Record<string, string> }));
 vi.mock('$env/dynamic/private', () => ({ env }));
-vi.mock('$env/static/private', () => ({ ADMINMONTHER: 'test-admin-token' }));
 
 import { mintBlobToken, readBlobToken } from './blobToken.js';
 import { blobSecret, localConfig, objectPath, readObject, saveObject, statObject } from './local.js';
@@ -24,6 +23,7 @@ const stream = (bytes: Uint8Array) =>
 
 beforeEach(() => {
   for (const k of Object.keys(env)) delete env[k];
+  env.ADMINMONTHER = 'test-admin-token';
 });
 
 describe('blob tickets', () => {

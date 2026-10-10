@@ -34,7 +34,7 @@ import { shiftsEnabled, shiftsMode } from '$lib/server/shifts/mode.js';
 //מעביר ראשון ראשון ברסק , אם מישהו ביקש מחכים למענה בעניינו ורק לאחר שיש כן 1 לפחות או לא 1 לפחות  ניתן לקבלו או לא 1 לפחות וניתן להציע לאנשים נוספים, בקשה של הקודם כאשר יש לא נשארת אך ניתן להוסיף עוד סקשות
 import { SendToAdmin } from '$lib/server/sendToAdmin.js';
 // Server-only secret — never exposed to the client bundle (no VITE_ prefix).
-import { ADMINMONTHER } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 
 /**
  * Kinds that already have a finalizer below. Everything the codebase creates
@@ -123,7 +123,7 @@ async function markDone(taid, why) {
   try {
     await SendToAdmin(
       `mutation { updateTimegrama(id: ${taid}, data: { done: true }) { data { id } } }`,
-      ADMINMONTHER
+      env.ADMINMONTHER
     );
     console.log(`[timegrama] closed #${taid} — ${why}`);
   } catch (e) {
@@ -215,7 +215,7 @@ export async function GET({ fetch }) {
   const stats = { seen: 0, ran: 0, scheduled: 0, closed: 0, waiting: 0 };
 
   try {
-    const res = await SendToAdmin(qu, ADMINMONTHER);
+    const res = await SendToAdmin(qu, env.ADMINMONTHER);
     const all = res?.data?.timegramas?.data ?? [];
     stats.seen = all.length;
 

@@ -23,6 +23,8 @@
   import TaskModal from '$lib/components/prPr/tasks/taskModal.svelte';
   import { untrack } from 'svelte';
   import { socketClient } from '$lib/stores/socketClient';
+  import { realtimeBus } from '$lib/realtime/bus.svelte';
+  import { connectMoachRealtime } from '$lib/realtime/adapters/moach';
   import MoachTour from '$lib/components/moach/MoachTour.svelte';
   import Dialog from '$lib/celim/ui/dialog.svelte';
   import { sendToSer } from '$lib/send/sendToSer.js';
@@ -67,6 +69,7 @@
         (a?.tosplits?.data?.length ?? 0) +
         (a?.decisions?.data?.length ?? 0) +
         (a?.askms?.data?.length ?? 0) +
+        (a?.finiapruvals?.data?.length ?? 0) +
         askCount;
     } catch (e) {
       console.error('[MoachLayout] vote count failed', e);
@@ -120,6 +123,20 @@
       fetchProjectTimers(projectId, fetch);
     }
   });
+  // What actions declare they changed (`realtime` scopes) about this rikma
+  // re-reads what its tabs show. Re-subscribes when the layout moves to another
+  // rikma. The notification listener below stays until R6, for actions that
+  // have not moved yet (docs/inprogress/PLAN_REALTIME_MIGRATION.md §3.4).
+  $effect(() => {
+    const pid = projectId;
+    if (!browser || !pid) return;
+    return connectMoachRealtime(realtimeBus, pid, {
+      refresh: (id, section) => moachStore.refresh(id, section),
+      refreshBase: (id) => invalidate(moachBaseKey(id)),
+      onVotes: () => loadVoteCount()
+    });
+  });
+
   onMount(() => {
     const guideKey = `moachGuide_${projectId}`;
     if (!localStorage.getItem(guideKey)) {

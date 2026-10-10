@@ -344,7 +344,7 @@ export const applyToMissionConfig: ActionConfig = {
       title: { he: 'בקשה לביצוע משימה', en: 'Mission application' },
       body: { he: 'יש בקשה חדשה לביצוע משימה בפרויקט', en: 'A new mission application was submitted' },
     },
-    channels: ['socket'],
+    intent: 'consent',
     metadata: { type: 'missionApplication', url: 'lev' },
   },
 

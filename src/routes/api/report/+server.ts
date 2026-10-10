@@ -13,11 +13,12 @@
  *   - lang:        Short text
  *   - status:      Enumeration ['new', 'in_review', 'resolved']  default 'new'
  */
-import { TELEGRAM_BOT_TOKEN_NEW, NEW_TELEGRAM, ADMINMONTHER } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 import { STRAPI_URL } from '$lib/server/strapiUrl.js';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { mirrorSiteReport } from '$lib/server/siteReportMirror.js';
+import { resolveConfirmationTarget, type ConfirmationTarget } from '$lib/server/reportConfirmation.js';
 
 const TYPE_LABELS: Record<string, { emoji: string; he: string; en: string }> = {
   bug:         { emoji: '🐛', he: 'תקלה',     en: 'Bug Report' },
@@ -29,7 +30,7 @@ const TYPE_LABELS: Record<string, { emoji: string; he: string; en: string }> = {
 // The raw env value can carry whitespace and a `ADMINMONTHER=` prefix. The
 // Strapi REST call below has always passed it through untouched, so that stays
 // as it is; the action system needs the clean token, same as /api/v1/*.
-const ADMIN_TOKEN = ADMINMONTHER.replace(/\s+/g, '').replace(/^ADMINMONTHER=/, '');
+const ADMIN_TOKEN = (env.ADMINMONTHER ?? '').replace(/\s+/g, '').replace(/^ADMINMONTHER=/, '');
 
 /** Subject line of the confirmation, in the reporter's own language. */
 const CONFIRM_SUBJECT: Record<string, string> = {
@@ -43,17 +44,11 @@ const CONFIRM_SUBJECT: Record<string, string> = {
 /**
  * Close the loop with the person who wrote to us, when they chose to leave an
  * address. Best-effort: a bounced confirmation must not fail a report that was
- * already saved.
+ * already saved. Who receives it and what it may quote is decided by
+ * resolveConfirmationTarget — never by the request body directly.
  */
 async function sendConfirmation(
-  args: {
-    type: string;
-    description: string;
-    userName?: string | null;
-    userEmail: string;
-    userId?: string | null;
-    lang: string;
-  },
+  args: { type: string; lang: string; target: ConfirmationTarget },
   fetchFn: typeof globalThis.fetch,
   origin: string,
 ) {
@@ -63,7 +58,7 @@ async function sendConfirmation(
       '$lib/components/mail/siteReportReceived.svelte'
     );
 
-    const isGuest = !args.userId;
+    const { target } = args;
     const lang = ['he', 'en', 'ar', 'ru', 'es'].includes(args.lang) ? args.lang : 'he';
 
     // svelty-email 0.1.1 exports `render(component, props)`. Some older call
@@ -71,11 +66,11 @@ async function sendConfirmation(
     // component with every prop undefined — do not copy them.
     const emailHtml = await render(SiteReportReceived, {
       type: args.type,
-      description: args.description,
-      username: args.userName ?? '',
-      isGuest,
+      description: target.description,
+      username: target.username,
+      isGuest: target.isGuest,
       // A guest has nowhere to "go back" to yet, so the button invites them in.
-      link: isGuest ? `${origin}/signup` : `${origin}/lev`,
+      link: target.isGuest ? `${origin}/signup` : `${origin}/lev`,
       previewText: CONFIRM_SUBJECT[lang],
       lang,
     });
@@ -84,7 +79,7 @@ async function sendConfirmation(
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        email: args.userEmail,
+        email: target.to,
         emailHtml,
         previewText: CONFIRM_SUBJECT[lang],
       }),
@@ -99,7 +94,13 @@ async function sendConfirmation(
 // stamps the x-strapi-gate secret by patching the GLOBAL fetch, and the Strapi
 // save below has always relied on that. The event-scoped fetch is bound
 // separately, for the relative /api/sendMail call and for the action system.
-export const POST: RequestHandler = async ({ request, fetch: eventFetch, url }) => {
+export const POST: RequestHandler = async ({
+  request,
+  fetch: eventFetch,
+  url,
+  locals,
+  getClientAddress,
+}) => {
   const { type, description, page, userId, userName, userEmail, lang } = await request.json();
 
   if (!description?.trim()) {
@@ -115,7 +116,7 @@ export const POST: RequestHandler = async ({ request, fetch: eventFetch, url }) 
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${ADMINMONTHER}`,
+        Authorization: `Bearer ${env.ADMINMONTHER}`,
       },
       body: JSON.stringify({
         data: {
@@ -165,19 +166,25 @@ export const POST: RequestHandler = async ({ request, fetch: eventFetch, url }) 
     );
   }
 
-  if (userEmail?.trim()) {
+  // The body's userEmail asks for an answer; it does not pick the inbox for a
+  // signed-in reporter, and a guest's answer quotes nothing they wrote
+  // (PLAN_PROXY_SECURITY §14.5). The body's userId is only a label for the row
+  // above — the session is locals.uid, from the signed JWT.
+  if (typeof userEmail === 'string' && userEmail.trim()) {
+    let ip = 'unknown';
+    try {
+      ip = getClientAddress();
+    } catch {
+      // No client address behind some adapters — one shared bucket then.
+    }
     sideErrands.push(
-      sendConfirmation(
-        {
-          type,
-          description,
-          userName,
-          userEmail: userEmail.trim(),
-          userId,
-          lang: lang || 'he',
-        },
-        eventFetch,
-        url.origin,
+      resolveConfirmationTarget(
+        { uid: locals.uid, requestedEmail: userEmail, description, ip },
+        { adminToken: ADMIN_TOKEN, fetch },
+      ).then((target) =>
+        target
+          ? sendConfirmation({ type, lang: lang || 'he', target }, eventFetch, url.origin)
+          : undefined,
       ),
     );
   }
@@ -204,12 +211,12 @@ export const POST: RequestHandler = async ({ request, fetch: eventFetch, url }) 
       description,
     ].filter((l) => l !== null).join('\n');
 
-    const telegramUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN_NEW}/sendMessage`;
+    const telegramUrl = `https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN_NEW}/sendMessage`;
     await fetch(telegramUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        chat_id: NEW_TELEGRAM,
+        chat_id: env.NEW_TELEGRAM,
         text: msgParts,
         parse_mode: 'Markdown',
       }),

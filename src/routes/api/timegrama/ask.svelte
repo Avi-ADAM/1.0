@@ -1,7 +1,7 @@
 <script module>
   import { SendToAdmin } from '$lib/server/sendToAdmin.js';
   // Server-only secret — this module is imported only by timegrama/+server.js.
-  import { ADMINMONTHER } from '$env/static/private';
+  import { env } from '$env/dynamic/private';
   import { computeNegoGate, normId } from '$lib/server/nego/negoGate';
   import { acceptanceEffectAsAdmin } from '$lib/server/missions/headcountGate';
   import { shiftsEnabled } from '$lib/server/shifts/mode.js';
@@ -34,7 +34,7 @@
 }}}
  }`;
     try {
-      let res = await SendToAdmin(qu, ADMINMONTHER).then((res) => (res = res));
+      let res = await SendToAdmin(qu, env.ADMINMONTHER).then((res) => (res = res));
       // The candidacy is gone. Nothing to mature, and no later run will change
       // that — tg#192 sat here for 286 days.
       if (res.data == null || res.data.ask?.data == null) {
@@ -96,7 +96,7 @@
               data: { archived: true }
             ){data{id}}
           }`;
-          await SendToAdmin(reopen, ADMINMONTHER).catch((e) => console.error(e));
+          await SendToAdmin(reopen, env.ADMINMONTHER).catch((e) => console.error(e));
           await markDone(taid);
           return;
         }
@@ -119,7 +119,7 @@
        acts{data{id}}}}}
         }}}
          }`;
-      let res2 = await SendToAdmin(qua, ADMINMONTHER).then((res2) => (res2 = res2));
+      let res2 = await SendToAdmin(qua, env.ADMINMONTHER).then((res2) => (res2 = res2));
       if (res2.data == null) {
         console.warn(`ask finalizer: ask ${id} open_mission read returned nothing`);
         return markDone(taid);
@@ -169,7 +169,7 @@
       // A mission for several people stays open — and the other candidacies
       // stay valid — until its last seat is taken (PLAN_SHIFTS §2). The two
       // action finalizers learned this in P1; silence approves candidacies too.
-      const headcount = await acceptanceEffectAsAdmin((q) => SendToAdmin(q, ADMINMONTHER), omId);
+      const headcount = await acceptanceEffectAsAdmin((q) => SendToAdmin(q, env.ADMINMONTHER), omId);
       let qub = `mutation
                 {
                   createMesimabetahalich(
@@ -205,7 +205,7 @@ updateOpenMission(
 
 }
 `;
-      let res3 = await SendToAdmin(qub, ADMINMONTHER).then((res3) => (res3 = res3));
+      let res3 = await SendToAdmin(qub, env.ADMINMONTHER).then((res3) => (res3 = res3));
       if (res3.data == null) {
         // Deliberately NOT closed. Unlike the reads above, this is the write
         // that performs the maturation: both sides agreed and the mission is
@@ -253,7 +253,7 @@ updateOpenMission(
               }
             ){data{id}}
             }`;
-        await SendToAdmin(monti, ADMINMONTHER).catch((e) => console.error(e));
+        await SendToAdmin(monti, env.ADMINMONTHER).catch((e) => console.error(e));
       }
 
       // Onboarding email to a freshly-joined (non-member) candidate.
@@ -305,7 +305,7 @@ updateOpenMission(
             data: { isAssigned: true, myIshur: true, mesimabetahaliches: [${chiluzh}] }
           ){data{id}}
         }`;
-        await SendToAdmin(assign, ADMINMONTHER).catch((e) => console.error(e));
+        await SendToAdmin(assign, env.ADMINMONTHER).catch((e) => console.error(e));
       }
 
       // Archive the other (losing) candidates' asks on this mission.
@@ -320,7 +320,7 @@ updateOpenMission(
                             }
                         ){data{id}}
                           }`;
-          await SendToAdmin(nextquery, ADMINMONTHER).catch((e) => console.error(e));
+          await SendToAdmin(nextquery, env.ADMINMONTHER).catch((e) => console.error(e));
         }
       }
 
@@ -342,7 +342,7 @@ updateOpenMission(
              }
             }`;
     try {
-      await SendToAdmin(que4, ADMINMONTHER);
+      await SendToAdmin(que4, env.ADMINMONTHER);
     } catch (e) {
       console.error(e);
     }

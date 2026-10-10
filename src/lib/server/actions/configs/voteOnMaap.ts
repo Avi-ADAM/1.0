@@ -18,6 +18,7 @@
  */
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import { voteIntent } from '../../notifications/intent.js';
 import { STRAPI_URL } from '$lib/server/strapiUrl.js';
 import { gqlString } from './actionUtils.js';
 import { settleCycleMaap } from '$lib/server/recurring/settleCycleMaap';
@@ -159,7 +160,9 @@ async function handleCycleMaapVote(
     if (hasAmount || isResponsible) data.quantityDelivered = spend;
     await strapi.execute('mrUpdateCycleMaap', { id: askId, data }, context.jwt, context.fetch);
     return {
-      data: { askId, consensus: false },
+      // The responsible member's first report is what the rest of the rikma
+      // now has to approve — the month's round opens here.
+      data: { askId, consensus: false, opensRound: !alreadyReported },
       updateStrategy: { type: 'partialUpdate', config: { dataKeys: ['wegets'] } },
     };
   }
@@ -432,8 +435,10 @@ export const voteOnMaapConfig: ActionConfig = {
       title: { he: 'הצבעה על בקשת משאב', en: 'Resource application vote' },
       body: { he: 'חבר צוות הצביע על בקשת קבלת משאב', en: 'A team member voted on a resource application' },
     },
-    channels: ['socket'],
-    metadata: { type: 'maapVote', url: 'lev' },
+    // A plain vote stays on the site; a month's first report asks the rikma to
+    // approve it; consensus is an outcome.
+    intent: voteIntent,
+    metadata: { type: 'maapVote', url: '/moach/{{projectId}}/votes' },
   },
 
   updateStrategy: { type: 'none' },

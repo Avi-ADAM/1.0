@@ -12,6 +12,11 @@
   const MARKETPLACE_CMD = '/plugin marketplace add Avi-ADAM/1lev1-agent';
   const INSTALL_CMD = '/plugin install 1lev1@1lev1';
   const ENDPOINT = 'https://api.1lev1.com/api/mcp';
+  // claude.ai opens its "Add custom connector" dialog with both fields filled
+  // from these params, so the user only presses Add → Connect.
+  const CLAUDE_CONNECTOR_URL =
+    'https://claude.ai/customize/connectors?modal=add-custom-connector' +
+    `&connectorName=1lev1&connectorUrl=${encodeURIComponent(ENDPOINT)}`;
 
   const MANUAL_SNIPPET = `{
   "mcpServers": {
@@ -29,7 +34,7 @@ bearer_token_env_var = "LEV1_API_KEY"`;
 
   const EXAMPLE_KEYS = ['ex1', 'ex2', 'ex3', 'ex4', 'ex5', 'ex6'];
   const BOUNDARY_KEYS = ['boundary1', 'boundary2', 'boundary3', 'boundary4'];
-  const CONNECTOR_STEPS = ['step1', 'step2', 'step3', 'step4'];
+  const CONNECTOR_STEPS = ['step1', 'step2', 'step3'];
   // Each entry is a label (the agent) and the one line that says what to do
   // there. Kept as a list rather than prose because people scan this section
   // looking for their own tool, not reading it.
@@ -78,11 +83,16 @@ bearer_token_env_var = "LEV1_API_KEY"`;
   <section id="connector">
     <h3>{$t('mcp.connectorTitle')}</h3>
     <p class="body">{$t('mcp.connectorBody')}</p>
+    <a class="add-btn" href={CLAUDE_CONNECTOR_URL} target="_blank" rel="noopener noreferrer">
+      {$t('mcp.connectorButton')}
+    </a>
     <ol class="steps">
       {#each CONNECTOR_STEPS as key (key)}
         <li>{$t(`mcp.connector_${key}`)}</li>
       {/each}
     </ol>
+    <!-- The manual path stays: the Claude phone app may not take the link. -->
+    <p class="hint">{$t('mcp.connectorManual')}</p>
     <p class="label">{$t('mcp.endpointLabel')}</p>
     <div class="cmd">
       <code>{ENDPOINT}</code>
@@ -281,6 +291,24 @@ bearer_token_env_var = "LEV1_API_KEY"`;
   .cmd button:hover,
   .snippet button:hover {
     background: rgba(212, 175, 55, 0.12);
+  }
+
+  .add-btn {
+    align-self: flex-start;
+    background: var(--gold, #d4af37);
+    color: #1a1406;
+    font-weight: 800;
+    font-size: 0.95rem;
+    border-radius: 0.6rem;
+    padding: 0.6rem 1.1rem;
+    text-decoration: none;
+  }
+  .add-btn:hover {
+    filter: brightness(1.08);
+  }
+  .add-btn:focus-visible {
+    outline: 2px solid var(--goldink, #8a6a15);
+    outline-offset: 2px;
   }
 
   .snippet {

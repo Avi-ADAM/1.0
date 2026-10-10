@@ -45,7 +45,30 @@ export interface DisplayItem {
   projectId: string;     // Project ID
   projectName: string;   // Project name
   src: string;           // Project image URL
+  when?: ItemWhen;       // When this item reached me (PLAN_LEV_TIMESTAMPS)
   [key: string]: any;    // Additional type-specific fields
+}
+
+/**
+ * The moment an item reached the user — a request sent, a mission proposed, a
+ * decision opened. Read by `rowWhen`/`whenLabel` in cardKinds.js.
+ */
+export interface ItemWhen {
+  at: string; // ISO
+}
+
+/**
+ * `when` for a DisplayItem, or undefined when the source has no usable date.
+ *
+ * Never falls back to "now": several message builders in this file do
+ * `new Date(x || new Date())`, which is harmless for sorting a chat but would
+ * make a card claim it arrived this minute. A missing date shows nothing.
+ */
+export function itemWhen(at: unknown): ItemWhen | undefined {
+  if (typeof at !== 'string' && typeof at !== 'number' && !(at instanceof Date)) return undefined;
+  if (at === '') return undefined;
+  const d = at instanceof Date ? at : new Date(at);
+  return Number.isFinite(d.getTime()) ? { at: d.toISOString() } : undefined;
 }
 
 /**
@@ -395,7 +418,8 @@ export function processPends(
       isshift: pend.isshift === true,
 
       sqadualed: pend.sqadualed || null,
-      dates: pend.dates || null
+      dates: pend.dates || null,
+      when: itemWhen(pend.createdAt)
     };
   });
 }
@@ -995,7 +1019,8 @@ export function processAsked(
       chat: ask.chat,
 
       // Raw data fallback
-      ...ask
+      ...ask,
+      when: itemWhen(ask.createdAt)
     };
   });
 }
@@ -1105,7 +1130,8 @@ export function processAskedResources(
 
 
       // Pass through (src excluded to preserve the fallback computed above)
-      ...passThrough
+      ...passThrough,
+      when: itemWhen(res.createdAt)
     };
   });
 }
@@ -1622,7 +1648,8 @@ export function processPmashes(
       created_at: pmash.createdAt,
 
       // Pass through all other fields from raw data
-      ...pmashRest
+      ...pmashRest,
+      when: itemWhen(pmash.createdAt)
     };
   });
 }
@@ -1780,7 +1807,8 @@ export function processWegets(
       responsibleUserId: weget.responsibleUserId,
       timegramaId: weget.timegramaId,
       timegramaDate: weget.timegramaDate,
-      timegramaDone: weget.timegramaDone
+      timegramaDone: weget.timegramaDone,
+      when: itemWhen(weget.createdAt)
     };
   });
 }
@@ -2110,7 +2138,10 @@ export function processDecisions(
       noofusersOk,
       noofusersNo,
       noofusersWaiting,
-      messege
+      messege,
+      // Before `...decision` in every branch below, and the decision carries no
+      // `when` of its own, so this survives the spread.
+      when: itemWhen(decision.createdAt)
     };
 
     // Specific mapping based on Type
@@ -2328,7 +2359,8 @@ export function processProductRequests(
       messege, // For chat icon history if needed
 
       // Request-specific fields
-      ...request
+      ...request,
+      when: itemWhen(request.createdAt)
     };
   });
 }
@@ -2741,7 +2773,8 @@ export function processWishOffers(
     src: offer.ratsonLogo || offer.volunteerSrc || '',
 
     // Pass through all wish-offer fields (ratsonId, volunteer, missionName, …)
-    ...offer
+    ...offer,
+    when: itemWhen(offer.createdAt)
   }));
 }
 

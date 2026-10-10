@@ -51,6 +51,7 @@
 | מסמך | מה נשאר |
 |---|---|
 | PLAN_AI_SIGNUP_CONCIERGE | בנוי (M0–M13), ממתין ל-deploy ובדיקת עשן |
+| PLAN_LEV_TIMESTAMPS | T1–T2 בנויים (`formatWhen` + `<When>`, `when` על 10 סוגים שהתאריך כבר מגיע אליהם); T3 שאילתות לסוגים החסרים, T4 סבב אחרון, T5 מיון — פתוחים |
 | PLAN_SHIFTS | P1–P11 ב-commits, סכמת 1.0b ממתינה ל-deploy |
 | PLAN_RIKMA_SUBDOMAINS | S0 (כתובת `/r/<slug>`) ו-S1 (מראה מובנה לדף הציבורי + עורך ב-`/moach/<id>/look`) בנויים, ממתינים ל-deploy של 1.0b (שדות בלבד, בלי הרשאות חדשות); S2 סאב-דומיין, S3–S4 פתוחים |
 | PLAN_RESOURCE_CALENDAR · PLAN_P2P_PILOT · PLAN_RIKMA_SHARED_INFO (שלב 2) | ממומשים, ממתינים ל-deploy. שלב 3 של SHARED_INFO (כספת E2E ב-`vault:<pid>`) בנוי וכבוי מאחורי `VAULT_ENABLED` |
@@ -78,6 +79,7 @@
 | PRODUCTION_READINESS_REVIEW · QA_SOLO_RIKMA_2026-08 | סקירות עם ממצאים פתוחים |
 | QA_CONCIERGE_E2E_2026-10 | תכנית בדיקה מקצה לקצה של הקונסיירז' לפני השקה + ממצאים (בריצה) |
 | PLAN_DIRECT_OFFER | הצעה אישית (ספק כותב משאלה בשם לקוחה, והיא מקבלת אותה בקישור) + איחוד מסכי גיבוש · אישור · ביצוע. P1 (רצועת שלבי העסקה בשלושת המסכים) בנוי; P2+ ממתינים לסכמה ב-1.0b |
+| PLAN_REALTIME_MIGRATION · REALTIME_TRACKING | כל שינוי מגיע לכל מסך שמציג אותו + לאן התראה לבני אדם יוצאת (`intent`). R0, R1 (החוזה: scopes, broadcaster, ratchet), R2 (bus + מתאמי kit/lev/moach בלקוח) ו-N0–N1 (vote, archive, ask, wish, deal) בנויים; R3 (דפים) הבא |
 | PLAN_SMART_NOTICES | התראות חכמות: שלבים 0–5 בנויים (שרת, משפטים, פעמוני קונסיירז' ו-deals, hub, תצוגת התראות בלב); ההסתרה ממתינה לדיפלוי 1.0b + הרשאות; שלב 6 (ערוצים) ו-7 פתוחים |
 
 ## tbd/
@@ -92,7 +94,6 @@
 | TIMEGRAMA_REMINDERS | תזכורות R1–R4 |
 | SPEC_VOTING_SYSTEM | הוחלף בפועל במודל ה-`Decision` |
 | SPEC_SOCKET_REALTIME | presence ואירועי UI חי |
-| PLAN_REALTIME_MIGRATION · REALTIME_TRACKING | מיפוי סוקט (2026-10-08): 45% מה-actions שקטים, 17% ממוקדים; scopes במקום updateStrategy, ratchet test, R0–R6 |
 | IMPROVEMENT_POINTS | רשימת שיפורים ישנה |
 | PLAN_MARKETING_GLOBAL · PLAN_X_ORGANIC · PLAN_VIDEO_OPENMONTAGE · homepage_&_seo_raw_ideas | שיווק ורעיונות |
 

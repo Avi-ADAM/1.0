@@ -1,4 +1,5 @@
 import { sendMailSafe } from '$lib/server/mailer.js';
+import { rejectUnlessInternal } from '$lib/server/internalOnly.js';
 
 // Callers disagree on the shape: svelty-email's render() returns { html, text },
 // and some routes forward the whole object while others forward just `html`.
@@ -8,7 +9,12 @@ function normalizeBody(emailHtml, emailText) {
   return { html: emailHtml?.html, text: emailHtml?.text ?? emailText };
 }
 
+// Any recipient, any HTML, sent as notifications@ — so only this server may
+// ask. Every caller is server code on the SvelteKit fetch ($lib/server/internalOnly.js).
 export async function POST({ request }) {
+  const refused = rejectUnlessInternal(request, 'api/sendMail');
+  if (refused) return refused;
+
   const data = await request.json();
   const email = data.email;
   const previewText = data.previewText;

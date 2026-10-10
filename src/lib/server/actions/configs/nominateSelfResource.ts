@@ -147,7 +147,7 @@ export const nominateSelfResourceConfig: ActionConfig = {
         ar: 'وصل ترشيح ذاتي جديد - مورد بشروط المرشّح. افتحوا ليف للرد.',
       },
     },
-    channels: ['socket', 'email', 'push'],
+    intent: 'consent',
     metadata: { type: 'selfNomination', url: 'lev', priority: 'high' },
   },
 

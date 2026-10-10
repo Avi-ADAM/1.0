@@ -125,7 +125,8 @@ export const dismissSelfNominationConfig: ActionConfig = {
         ar: 'تم إغلاق الترشيح الذاتي. شكرًا على المبادرة - يمكنكم المتابعة والاقتراح مجددًا مستقبلاً 💗',
       },
     },
-    channels: ['socket', 'email', 'push'],
+    // The proposal was closed — about them, nothing awaits their answer.
+    intent: 'personal',
     metadata: { type: 'selfNomination', url: 'lev' },
   },
 

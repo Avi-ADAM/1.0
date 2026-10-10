@@ -170,6 +170,11 @@ repeated above the action bar on mobile, see `SaleCard`) and `actions`.
 `onProjectClick` already `stopPropagation`s, so tapping the logo navigates
 without toggling scroll mode.
 
+Inside a `<LevCard>` the header also shows **when the item reached the user**
+("נשלחה לפני 12 דק׳") under the title — nothing to wire: LevCard publishes the
+item through `levItemContext.js` and CardHeader renders `<When>` when the item
+has a `when`. See `docs/inprogress/PLAN_LEV_TIMESTAMPS.md`.
+
 ## 8. Overlays must portal
 
 A transformed ancestor is a containing block, so `position: fixed` inside one

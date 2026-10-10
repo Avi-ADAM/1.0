@@ -15,7 +15,7 @@ const runStart = vi.fn(async () => ({ status: 'success', result: { reply: 'ok' }
 const getWorkflow = vi.fn(() => ({ createRun: async () => ({ start: runStart, resume: runStart }) }));
 const nonregGenerate = vi.fn(async () => ({ text: 'hi guest', response: { messages: [] } }));
 
-vi.mock('$env/static/private', () => ({ GEMINI_API_KEY: 'test' }));
+vi.mock('$env/dynamic/private', () => ({ env: { GEMINI_API_KEY: 'test' } }));
 vi.mock('$lib/translations', () => ({ t: { get: (k: string) => k } }));
 vi.mock('$lib/send/sendToSer.js', () => ({ sendToSer: (...a: unknown[]) => sendToSer(...a) }));
 vi.mock('$lib/server/mcpContext', () => ({

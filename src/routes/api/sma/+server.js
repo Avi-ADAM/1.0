@@ -2,6 +2,7 @@ import { render } from 'svelty-email';
 
 import MailExept from '$lib/components/mail/mail.svelte';
 import MailNoReg from '$lib/components/mail/nonreg.svelte';
+import { rejectUnlessInternal } from '$lib/server/internalOnly.js';
 
 const getPreviewText = (lang, projectName, missionName) => {
 	if (lang === 'he') {
@@ -11,6 +12,12 @@ const getPreviewText = (lang, projectName, missionName) => {
 };
 
 export async function POST({ request, fetch }) {
+	// Mails any address a template with the caller's words (and, for
+	// `nonreg`, the caller's link) through /api/sendMail — which this
+	// endpoint's own fetch would stamp internal. Server callers only.
+	const refused = rejectUnlessInternal(request, 'api/sma');
+	if (refused) return refused;
+
 	const data = await request.json()
   //  console.log("Form submitted a"); kind
   

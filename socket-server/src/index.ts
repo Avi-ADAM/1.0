@@ -16,6 +16,8 @@ import { SessionManager } from './session-manager.js';
 import { verifyInviteToken, meetingRoom } from './guest-invite.js';
 import { registerP2pHandlers } from './p2p.js';
 import { checkInternalRequest, isInternalAuthConfigured } from './internal-auth.js';
+import { resolveBroadcastEvent } from './broadcast-event.js';
+import { isSocketIoRequest } from './socket-path.js';
 import type { AuthData, NotificationPayload, BroadcastRequest, SocketData } from './types.js';
 
 // Load environment variables
@@ -273,6 +275,9 @@ io.on('connection', (socket) => {
  * This is called by the Action System to send notifications to users
  */
 httpServer.on('request', async (req, res) => {
+  // socket.io answers its own path; writing here too crashed the process (socket-path.ts).
+  if (isSocketIoRequest(req.url)) return;
+
   // Enable CORS for HTTP requests
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
@@ -332,6 +337,13 @@ httpServer.on('request', async (req, res) => {
       try {
         const data: BroadcastRequest = JSON.parse(body);
         const { userIds, notification, meetingIds } = data;
+        const event = resolveBroadcastEvent(data.event);
+
+        if (!event) {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'unknown event' }));
+          return;
+        }
         
         if (!userIds || !Array.isArray(userIds)) {
           res.writeHead(400, { 'Content-Type': 'application/json' });
@@ -359,7 +371,7 @@ httpServer.on('request', async (req, res) => {
             
             // Send to all sockets for this user
             for (const socketId of socketIds) {
-              io.to(socketId).emit('notification', notification);
+              io.to(socketId).emit(event, notification);
             }
             
             console.log(`[Broadcast] Sent notification to user ${userId} (${socketIds.length} socket(s))`);
@@ -377,7 +389,7 @@ httpServer.on('request', async (req, res) => {
           for (const meetingId of meetingIds) {
             if (meetingId == null) continue;
             const room = meetingRoom(String(meetingId));
-            io.to(room).emit('notification', notification);
+            io.to(room).emit(event, notification);
             guestRooms++;
             console.log(`[Broadcast] Sent notification to guest room ${room}`);
           }

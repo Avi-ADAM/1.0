@@ -146,7 +146,7 @@ export const nominateSelfMissionConfig: ActionConfig = {
         ar: 'وصل ترشيح ذاتي جديد - مهمة بشروط المرشّح. افتحوا ليف للرد.',
       },
     },
-    channels: ['socket', 'email', 'push'],
+    intent: 'consent',
     metadata: { type: 'selfNomination', url: 'lev', priority: 'high' },
   },
 

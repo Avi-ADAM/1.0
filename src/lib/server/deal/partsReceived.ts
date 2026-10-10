@@ -9,6 +9,8 @@
 
 import { loadDealDue, type QidRunner } from '$lib/server/sheirut/dealDue.js';
 import { ActionError } from '$lib/server/actions/errors.js';
+import { loadDealCarriage } from './splitCarriage.js';
+import { isPaymentKey, NO_CARRIAGE, partViaSplit, receivedViaSplit, transfersTo, type DealCarriage } from '$lib/sheirut/splitCarriage.js';
 import {
   partsState,
   providerParts,
@@ -25,6 +27,8 @@ export interface LoadedParts extends PartsState {
   customerIds: string[];
   moneyTransfered: boolean;
   iTransferMoney: boolean;
+  /** How the rikma's split carries the payment (`$lib/sheirut/splitCarriage`). */
+  carriage: DealCarriage;
 }
 
 const root = (res: any) => res?.data?.sheirut ?? res?.sheirut;
@@ -33,17 +37,29 @@ const root = (res: any) => res?.data?.sheirut ?? res?.sheirut;
 export async function loadParts(run: QidRunner, sheirutId: string): Promise<LoadedParts | null> {
   const due = await loadDealDue(run, sheirutId);
   if (!due) return null;
-  const res = await run('418dealPartsReceived', { id: String(sheirutId) });
+  const [res, carriage] = await Promise.all([
+    run('418dealPartsReceived', { id: String(sheirutId) }),
+    loadDealCarriage(run, sheirutId).catch((err) => {
+      console.warn('[partsReceived] could not read how the split carries the deal:', err);
+      return NO_CARRIAGE;
+    })
+  ]);
   if (res?.errors?.length) throw new Error(`Could not read the deal's confirmations: ${JSON.stringify(res.errors).slice(0, 300)}`);
   const sh = root(res)?.data?.attributes ?? {};
-  const entries = readPartEntries(sh.iGotMoney);
+  const parts = providerParts(due.lines);
+  // A part that arrived through the split is received: confirming its transfer was the
+  // provider's own confirmation (`$lib/sheirut/splitCarriage`). Written with the next write.
+  const entries = parts
+    .filter((p) => receivedViaSplit(carriage, p.providerId))
+    .reduce((acc, p) => (acc.some((e) => e.userId === p.providerId && e.iGotMoney) ? acc : withPartReceived(acc, p.providerId)), readPartEntries(sh.iGotMoney));
   return {
-    ...partsState(providerParts(due.lines), entries),
+    ...partsState(parts, entries),
     sheirutId: String(sheirutId),
     entries,
     customerIds: due.customerIds,
     moneyTransfered: sh.moneyTransfered === true,
-    iTransferMoney: sh.iTransferMoney === true
+    iTransferMoney: sh.iTransferMoney === true,
+    carriage
   };
 }
 
@@ -67,6 +83,15 @@ export async function confirmPartReceived(
   const mine = before.parts.find((p) => p.providerId === String(userId));
   if (!mine) {
     throw new Error('Only a provider of this deal can confirm receiving their part');
+  }
+  // Her part travels through the rikma's split: it is received on its transfers — "I received
+  // ₪X from Y", each with its own chat with Y — never on a second, generic button.
+  if (partViaSplit(before.carriage, String(userId)) && !receivedViaSplit(before.carriage, String(userId))) {
+    throw new ActionError('PART_VIA_SPLIT', "Your part comes through the rikma's split — confirm each transfer you received", {
+      transfers: transfersTo(before.carriage, String(userId))
+        .filter((t) => !t.confirmed)
+        .map((t) => ({ id: t.id, amount: t.amount, senderId: t.senderId, senderName: t.senderName }))
+    });
   }
   if (expectAmount != null && expectAmount !== '') {
     const expected = Number(expectAmount);
@@ -108,4 +133,37 @@ export async function settleCoveredPayment(run: QidRunner, sheirutId: string): P
   });
   if (res?.errors?.length) throw new Error(JSON.stringify(res.errors).slice(0, 300));
   return { paid };
+}
+
+/**
+ * A split transfer was confirmed by its receiver (`confirmHaluka`, kind 'receive'). For
+ * every deal whose payment that split carries and of which the receiver is a provider, once
+ * every split transfer to them on it has arrived, their part is received — the same fact,
+ * so the deal never asks them again (`$lib/sheirut/splitCarriage`).
+ */
+export async function settlePartsFromSplit(
+  run: QidRunner,
+  tosplitId: string,
+  userId: string
+): Promise<{ sheirutId: string; becamePaid: boolean; state: LoadedParts }[]> {
+  const res = await run('439tosplitDeals', { id: String(tosplitId) });
+  if (res?.errors?.length) throw new Error(`Could not read the split's deals: ${JSON.stringify(res.errors).slice(0, 300)}`);
+  const sales = (res?.data?.tosplit ?? res?.tosplit)?.data?.attributes?.sales?.data ?? [];
+  const deals = new Set<string>();
+  for (const s of sales) {
+    if (!isPaymentKey(s?.attributes?.externalId)) continue;
+    for (const d of s?.attributes?.sheiruts?.data ?? []) deals.add(String(d.id));
+  }
+
+  const me = String(userId);
+  const out: { sheirutId: string; becamePaid: boolean; state: LoadedParts }[] = [];
+  for (const sheirutId of deals) {
+    const parts = await loadParts(run, sheirutId);
+    if (!parts || !parts.parts.some((p) => p.providerId === me)) continue;
+    if (!receivedViaSplit(parts.carriage, me)) continue;
+    // Written even when already derived: it persists the fact, and "paid" with it.
+    const { state, becamePaid } = await confirmPartReceived(run, sheirutId, me);
+    out.push({ sheirutId, becamePaid, state });
+  }
+  return out;
 }

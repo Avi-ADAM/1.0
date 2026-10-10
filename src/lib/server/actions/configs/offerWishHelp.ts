@@ -125,7 +125,8 @@ export const offerWishHelpConfig: ActionConfig = {
         ar: 'قدّم أحدهم عرضًا للمساعدة في أمنيتك. افتح Concierge للمراجعة.'
       }
     },
-    channels: ['socket', 'push'],
+    // An offer on her wish waits for her answer.
+    intent: 'consent',
     metadata: { priority: 'normal', type: 'ratsonProposal', url: '/concierge' }
   },
   updateStrategy: { type: 'none' }

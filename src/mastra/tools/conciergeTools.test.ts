@@ -227,7 +227,7 @@ describe('P4 — write half', () => {
   vi.doMock('../../lib/server/actions/index.js', () => ({ actionService: { executeAction } }));
   vi.doMock('../../lib/server/adminToken.js', () => ({ normalizeAdminToken: (t: any) => t ?? 'admin', adminToken: () => 'admin' }));
   vi.doMock('../../lib/server/ai/extractWish', () => ({ extractWish: (...a: any[]) => extractWish(...a) }));
-  vi.doMock('$env/static/private', () => ({ GEMINI_API_KEY: 'test-key' }));
+  vi.doMock('$env/dynamic/private', () => ({ env: { GEMINI_API_KEY: 'test-key' } }));
 
   beforeEach(() => {
     executeAction.mockReset();

@@ -19,6 +19,8 @@
  * exactly this and that nothing wrote until now.
  */
 
+import type { SplitTransfer } from './splitCarriage.js';
+
 export interface PartLineLike {
   providerId: string | null;
   providerName?: string | null;
@@ -54,6 +56,13 @@ export interface PartsState {
 export interface PartsView extends PartsState {
   /** The customer's side is done — her payments cover what she owes (`iTransferMoney`). */
   customerPaid: boolean;
+  /**
+   * The rikma's split transfers that bring the providers their part (`./splitCarriage`),
+   * shown pair by pair — "I received ₪X from Y", each with its own chat.
+   */
+  transfers?: SplitTransfer[];
+  /** Providers whose part travels through the split: asked on those transfers, never on the deal's button. */
+  viaSplit?: string[];
 }
 
 const r2 = (n: number) => Math.round(n * 100) / 100;

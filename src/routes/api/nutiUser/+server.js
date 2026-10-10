@@ -7,9 +7,15 @@ import { pusherer } from '$lib/func/pusherer.svelte'
 import { sendBolkTelegram } from '$lib/func/telegram/sendBolkTelegram.svelte';
 import { sendToSer } from '$lib/send/sendToSer.js';
 import { render } from 'svelty-email';
+import { rejectUnlessInternal } from '$lib/server/internalOnly.js';
 
 //b sendMessages
 export async function POST({request, cookies, fetch, locals}){
+  // Mail, push and Telegram to any user, with the caller's own words — server
+  // callers only (timegrama's stipend maturation is the one today).
+  const refused = rejectUnlessInternal(request, 'api/nutiUser');
+  if (refused) return refused;
+
   const da = await request.json();
   const uid = da.uid || 0;
   const title = da.title || { he: '', en: '' };

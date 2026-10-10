@@ -17,7 +17,7 @@ vi.mock('$lib/server/ai/enrichWish', () => ({
   EMPTY_ENRICHMENT: { skills: [], missions: [], people: [], resources: [], products: [] }
 }));
 vi.mock('$lib/server/ai/extractWish', () => ({ extractWish: vi.fn() }));
-vi.mock('$env/static/private', () => ({ GEMINI_API_KEY: 'test' }));
+vi.mock('$env/dynamic/private', () => ({ env: { GEMINI_API_KEY: 'test' } }));
 vi.mock('$lib/server/concierge/bell', () => ({ loadBell: async () => [] }));
 vi.mock('$lib/server/concierge/externalConfig', () => ({
   externalConfig: () => ({ enabled: false, ttlHours: 24 })

@@ -10,7 +10,7 @@
  * call this too — with a tighter per-minute allowance, keyed by IP.
  */
 
-import { GEMINI_API_KEY } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { rephraseWish } from '$lib/server/ai/rephraseWish';
@@ -38,7 +38,7 @@ export const POST: RequestHandler = async ({ request, locals, getClientAddress }
   }
 
   try {
-    return json({ text: await rephraseWish(title, text, GEMINI_API_KEY) });
+    return json({ text: await rephraseWish(title, text, env.GEMINI_API_KEY) });
   } catch (err) {
     console.error('[concierge-rephrase] failed:', err);
     return json({ text: '', reason: 'failed' });

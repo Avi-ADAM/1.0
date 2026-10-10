@@ -535,7 +535,7 @@ export const finalizeJoinAcceptanceConfig: ActionConfig = {
       title: { he: 'חבר חדש הצטרף לפרויקט', en: 'New member joined the project' },
       body: { he: 'משימה חדשה נוצרה לחבר צוות', en: 'A new mission was created for a team member' }
     },
-    channels: ['socket'],
+    intent: 'outcome',
     metadata: { type: 'missionCreated', url: 'lev' }
   },
 

@@ -20,6 +20,8 @@ interface Opts {
   owed?: { lines: Array<{ cap: number; approved: number; closed: boolean }>; recorded?: number };
   /** Answer qid 418: the providers (user ids) who confirmed receiving their part (C-19). */
   confirmedBy?: string[];
+  /** Answer qid 437: the payment Sales on the deal now (who holds each), none taken by a split. */
+  carriage?: { id: string; in: number; holder: string; externalId: string }[];
 }
 
 /** A qid-397 answer: one BOM line + one mission per entry, each held by its own provider. */
@@ -125,6 +127,13 @@ function world(o: Opts = {}) {
             }
           }
         };
+      }
+      if (qid === '437dealSplitCarriage' && o.carriage) {
+        const sales = o.carriage.map((c) => ({
+          id: c.id,
+          attributes: { in: c.in, externalId: c.externalId, splited: false, users_permissions_user: { data: { id: c.holder } }, tosplits: { data: [] } }
+        }));
+        return { data: { sheirut: { data: { id: '8', attributes: { sales: { data: sales } } } } } };
       }
       if (qid === '396createSheirutPaymentSale') {
         return o.createFails ? { errors: [{ message: 'boom' }] } : { data: { createSale: { data: { id: '501', attributes: { in: vars.in } } } } };
@@ -264,5 +273,24 @@ describe('the customer’s payment becomes the rikma’s income', () => {
     });
     // The Sale stands; the deal is not reported paid when its flags did not move.
     expect(await go(w)).toEqual({ saleId: '501', paid: false });
+  });
+
+  it('a provider who confirmed their part before the payment was recorded holds it — it is carved out, never a split debt', async () => {
+    // Provider 1 (600) already got their part from provider 2, who received the customer's 1,800.
+    const lines = [
+      { cap: 600, approved: 600, closed: true },
+      { cap: 1200, approved: 1200, closed: true }
+    ];
+    const w = world({
+      owed: { lines },
+      confirmedBy: ['1'],
+      carriage: [{ id: '501', in: 1800, holder: '2', externalId: 'sheirut-payment:haluka:81' }]
+    });
+    await go(w, { receiverId: '2' });
+    const created = w.calls.filter((c) => c.qid === '396createSheirutPaymentSale').map((c) => c.vars);
+    expect(created).toHaveLength(2);
+    expect(created[0]).toMatchObject({ holder: '2', in: 1800, externalId: 'sheirut-payment:haluka:81' });
+    expect(created[1]).toMatchObject({ holder: '1', in: 600, unit: 0, externalId: 'sheirut-payment:haluka:81:part:1' });
+    expect(w.calls.find((c) => c.qid === '438reduceDealPaymentSale')!.vars).toEqual({ id: '501', in: 1200 });
   });
 });

@@ -164,6 +164,15 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
         });
         followUpDecisionId = opened.decisionId;
         await setProposedLifecycle(exec, openTarget.kind, openTarget.id);
+        // This opens a proposal like any other, and silence approves it too.
+        notifyArchiveProposal(notifier, context, {
+          projectId: openTarget.projectId,
+          decisionId: opened.decisionId,
+          name: openTarget.name,
+          why: why || null,
+          restime: openTarget.projectRestime,
+          recipients: otherMembers,
+        });
       }
     }
 
@@ -199,32 +208,16 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
 
   await setProposedLifecycle(exec, target.kind, target.id);
 
-  if (notifier && target.projectId) {
-    const lang = (context.lang === 'he' ? 'he' : 'en') as 'he' | 'en';
-    const window = restimeLabel(target.projectRestime, lang);
-    notifier
-      .notify(
-        {
-          recipients: { type: 'specificUsers', config: { userIdsParam: 'recipients' } },
-          templates: {
-            title: {
-              he: `הצעה ${scope === 'release' ? 'לשחרור' : 'לארכוב'}: ${target.name}`,
-              en: `Proposal to ${scope === 'release' ? 'release' : 'archive'}: ${target.name}`,
-            },
-            body: {
-              he: `${why || 'ללא נימוק'}${membership.isLastTie ? ' · שימו לב: זו המשימה היחידה של החבר ברקמה ולא נצברו בה שעות, ולכן אישור ההצעה יסיים גם את חברותו ברקמה.' : ''} - אפשר לאשר, להציע נוסחה חליפית או לפתוח שיחה. ללא תגובה תוך ${restimeLabel(target.projectRestime, 'he')} ההצעה תאושר מעצמה.`,
-              en: `${why || 'No reason given'}${membership.isLastTie ? ' · Note: this is the member’s only commitment here and nothing accrued, so approving also ends their membership of the rikma.' : ''} - approve, propose different terms, or open a discussion. With no response within ${window} it is approved on its own.`,
-            },
-          },
-          channels: ['socket', 'push'],
-          metadata: { type: 'voteUpdate', url: 'lev', priority: 'high' },
-        },
-        { recipients: otherMembers, projectId: target.projectId },
-        { projectId: target.projectId, decisionId: opened.decisionId },
-        context,
-      )
-      .catch((e: unknown) => console.warn('[proposeObjectArchive] notification failed:', e));
-  }
+  notifyArchiveProposal(notifier, context, {
+    projectId: target.projectId,
+    decisionId: opened.decisionId,
+    name: target.name,
+    why: why || null,
+    restime: target.projectRestime,
+    recipients: otherMembers,
+    scope,
+    endsMembership: membership.isLastTie,
+  });
 
   return {
     data: {
@@ -242,6 +235,55 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
     updateStrategy: { type: 'fullRefresh' as const },
   };
 };
+
+/**
+ * Tell the other members a removal is on the table. Silence approves it, so it
+ * goes out as `consent` — every member has to hear that the clock is running.
+ */
+function notifyArchiveProposal(
+  notifier: any,
+  context: any,
+  p: {
+    projectId: string | null | undefined;
+    decisionId: string;
+    name: string;
+    why: string | null;
+    restime: string | null | undefined;
+    recipients: string[];
+    scope?: string;
+    endsMembership?: boolean;
+  },
+) {
+  // An empty list would fall back to the whole rikma (N4).
+  if (!notifier || !p.projectId || p.recipients.length === 0) return;
+  const release = p.scope === 'release';
+  notifier
+    .notify(
+      {
+        recipients: { type: 'specificUsers', config: { userIdsParam: 'recipients' } },
+        templates: {
+          title: {
+            he: `הצעה ${release ? 'לשחרור' : 'לארכוב'}: ${p.name}`,
+            en: `Proposal to ${release ? 'release' : 'archive'}: ${p.name}`,
+          },
+          body: {
+            he: `${p.why || 'ללא נימוק'}${p.endsMembership ? ' · שימו לב: זו המשימה היחידה של החבר ברקמה ולא נצברו בה שעות, ולכן אישור ההצעה יסיים גם את חברותו ברקמה.' : ''} - אפשר לאשר, להציע נוסחה חליפית או לפתוח שיחה. ללא תגובה תוך ${restimeLabel(p.restime, 'he')} ההצעה תאושר מעצמה.`,
+            en: `${p.why || 'No reason given'}${p.endsMembership ? ' · Note: this is the member’s only commitment here and nothing accrued, so approving also ends their membership of the rikma.' : ''} - approve, propose different terms, or open a discussion. With no response within ${restimeLabel(p.restime, 'en')} it is approved on its own.`,
+          },
+        },
+        intent: 'consent',
+        metadata: {
+          type: 'voteUpdate',
+          url: `/moach/${p.projectId}/votes/decision/${p.decisionId}`,
+          priority: 'high',
+        },
+      },
+      { recipients: p.recipients, projectId: p.projectId },
+      { projectId: p.projectId, decisionId: p.decisionId },
+      context,
+    )
+    .catch((e: unknown) => console.warn('[proposeObjectArchive] notification failed:', e));
+}
 
 /**
  * Mark the object as "under discussion" — it stays fully usable meanwhile;

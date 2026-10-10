@@ -18,6 +18,8 @@
   import { isCardsView, projectFilter, levView, milon } from '$lib/stores/levStores';
   import { initializeLevData, hasValidSnapshot } from '$lib/utils/levDataLoader';
   import { setupSocketListeners } from '$lib/utils/levSocketHandler';
+  import { realtimeBus } from '$lib/realtime/bus.svelte';
+  import { connectLevRealtime } from '$lib/realtime/adapters/lev';
   import { loadLevSlice } from '$lib/utils/levSliceLoader';
   import {
     sliceKeysForFocus,
@@ -75,6 +77,7 @@
   let loading = $state(true);
   let error = $state(null);
   let unsubscribeSocket = null;
+  let unsubscribeRealtime = null;
   let timerCleanup = null;
 
   // Subscribe to finalSwiperArray from new architecture
@@ -385,6 +388,9 @@
     );
     timerCleanup = initialWebSocketForTimer(page.data.uid, fetch);
     unsubscribeSocket = setupSocketListeners(page.data.uid, '', data.lang);
+    // Scopes an action declared (`realtime`) re-read the slices they touch.
+    // The listener above stays until R6, for actions that have not moved yet.
+    unsubscribeRealtime = connectLevRealtime(realtimeBus, page.data.uid, data.lang);
     loadSiteSharePayables();
     loadOpenSiteShareDecisions();
     loadStipendWork();
@@ -484,6 +490,7 @@
     if (unsubscribeSocket) {
       unsubscribeSocket();
     }
+    unsubscribeRealtime?.();
     // Clean up timer listener
     if (timerCleanup) {
       timerCleanup();

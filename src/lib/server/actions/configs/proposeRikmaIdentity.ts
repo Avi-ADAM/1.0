@@ -154,8 +154,10 @@ export const proposeRikmaIdentityConfig: ActionConfig = {
         ar: 'اقترح أحد الأعضاء عنوانًا أو مظهرًا جديدًا للصفحة العامة — شاهده ووافق عليه في القلب'
       }
     },
-    channels: ['socket'],
-    metadata: { type: 'base', url: 'lev' }
+    // Opening a proposal asks every other member; applied directly (a rikma of
+    // one) or unchanged, there is nobody to ask.
+    intent: (_params, result) => (result?.data?.decisions?.length ? 'consent' : 'ambient'),
+    metadata: { type: 'base', url: '/moach/{{projectId}}/votes' }
   },
 
   updateStrategy: { type: 'none' }

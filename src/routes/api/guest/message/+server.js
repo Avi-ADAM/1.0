@@ -26,11 +26,11 @@ import { StrapiClient } from '$lib/server/actions/StrapiClient.js';
 import { NotificationOrchestrator } from '$lib/server/notifications/NotificationOrchestrator.js';
 import { isMeetingsRequest } from '$lib/server/meetingsProxy.js';
 import { verifyInviteToken } from '$lib/server/guestInvite.js';
-import { ADMINMONTHER } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 import { STRAPI_URL } from '$lib/server/strapiUrl.js';
 
 const STRAPI_ENDPOINT = STRAPI_URL + '/graphql';
-const ADMIN_TOKEN = String(ADMINMONTHER ?? '')
+const ADMIN_TOKEN = String(env.ADMINMONTHER ?? '')
 	.replace(/\s+/g, '')
 	.replace(/^ADMINMONTHER=/, '');
 

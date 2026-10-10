@@ -222,7 +222,8 @@ export const requestWishMissionConfig: ActionConfig = {
       }
     },
     // A direct request to one provider — same channels as requestSuggestion.
-    channels: ['socket', 'email', 'telegram', 'push'],
+    // A request to the provider: their answer is awaited.
+    intent: 'consent',
     emailTemplate: 'SimpleNuti',
     metadata: { priority: 'high', type: 'ratsonProposal', url: '/deals' }
   },

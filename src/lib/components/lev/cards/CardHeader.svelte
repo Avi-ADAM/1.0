@@ -3,6 +3,8 @@
   import { lang } from '$lib/stores/lang.js';
   import { isMobileOrTablet } from '$lib/utilities/device';
   import type { Snippet } from 'svelte';
+  import When from '../When.svelte';
+  import { getLevItem } from '../levItemContext.js';
 
   interface Props {
     logoSrc?: string;
@@ -27,6 +29,11 @@
     actions,
     voteSummary
   }: Props = $props();
+
+  // The item this header belongs to, when rendered inside a LevCard — for the
+  // "sent 12 min ago" line under the title. Outside a LevCard it is null.
+  const levItem = getLevItem();
+  let item = $derived(levItem?.item ?? null);
 
   // ניווט לפרויקט בלחיצה על הלוגו/שם הפרויקט (במקום כפתור נפרד)
   function goToProject(e: Event) {
@@ -84,6 +91,12 @@
       >
         {cardTitle}
       </div>
+      {#if item}
+        <When
+          {item}
+          class="mt-0.5 text-xs sm:text-sm font-medium text-barbi dark:text-barbi opacity-80"
+        />
+      {/if}
     </div>
   {/snippet}
 

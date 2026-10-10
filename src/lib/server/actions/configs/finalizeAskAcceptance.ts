@@ -455,7 +455,7 @@ export const finalizeAskAcceptanceConfig: ActionConfig = {
       title: { he: 'בקשת שירות אושרה', en: 'Service request accepted' },
       body: { he: 'לקוח חדש מצטרף לשירות', en: 'A new client joined a service mission' }
     },
-    channels: ['socket'],
+    intent: 'outcome',
     metadata: { type: 'missionCreated', url: 'lev' }
   },
 

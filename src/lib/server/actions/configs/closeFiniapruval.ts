@@ -1,6 +1,7 @@
 import type { ActionConfig } from '../types.js';
 import { roundHours, workValue } from '$lib/timers/precision.js';
 import { allSigned, roundOf, standingOrder, voterId } from '$lib/finiapruval/rounds.js';
+import { isHoursApproval } from '$lib/finiapruval/kind.js';
 import {
     pickRateRow,
     resolveRate,
@@ -82,8 +83,12 @@ export const closeFiniapruvalConfig: ActionConfig = {
             return { success: true, closed: false };
         }
 
-        // All voted yes — close based on type
-        const isTimerSave: boolean = fa.isTimerSave === true;
+        // All voted yes — close based on type. Hours (a timer save, a month)
+        // bank on the mission and leave it running; only a finish approval
+        // closes it. An hours approval filed before `isTimerSave` existed is
+        // still hours ($lib/finiapruval/kind.ts) — reading it as a finish would
+        // end a running mission.
+        const isTimerSave: boolean = isHoursApproval(fa);
         // Whole minutes, priced to the agora ($lib/timers/precision.ts); an approval
         // filed before that rule still carries its seconds.
         const noofhours: number = roundHours(fa.noofhours ?? 0);

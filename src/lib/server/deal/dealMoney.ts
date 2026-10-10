@@ -22,6 +22,8 @@
 import { loadDealDue, type DealTransfer, type QidRunner } from '$lib/server/sheirut/dealDue.js';
 import { providerParts } from '$lib/sheirut/partsReceived.js';
 import { confirmPartReceived, type LoadedParts } from './partsReceived.js';
+import { carveConfirmedParts } from './splitCarriage.js';
+import { ActionError } from '$lib/server/actions/errors.js';
 
 export interface ReceiveDealMoneyOptions {
   /** The part amount a notice showed the provider (AMOUNT_MOVED when it changed since). */
@@ -61,7 +63,16 @@ export async function receiveDealMoney(
   }
 
   // The part first: it is the one that can refuse (AMOUNT_MOVED, before anything is written).
-  const part = isProvider ? await confirmPartReceived(run, String(sheirutId), me, opts.expectAmount) : null;
+  // A part that travels through the rikma's split is received on its split transfers
+  // (PART_VIA_SPLIT): the deal page refuses, the customer's transfer card still settles hers.
+  let part: ReceiveDealMoneyResult['part'] = null;
+  if (isProvider) {
+    try {
+      part = await confirmPartReceived(run, String(sheirutId), me, opts.expectAmount);
+    } catch (err) {
+      if (opts.requireProvider || !(err instanceof ActionError && err.code === 'PART_VIA_SPLIT')) throw err;
+    }
+  }
 
   const settled: DealTransfer[] = [];
   for (const t of pending) {
@@ -71,6 +82,14 @@ export async function receiveDealMoney(
     settled.push(done);
     // Best-effort, like the confirmation it follows: the money already moved.
     await opts.recordSale?.(done).catch((err) => console.error('[dealMoney] payment sale failed:', err));
+  }
+
+  // The part she now holds is carved out of the receiver's payment Sale, so the split never
+  // moves it again (`$lib/sheirut/splitCarriage`). Best-effort: her word is already written.
+  if (part) {
+    await carveConfirmedParts(run, String(sheirutId), part.state).catch((err) =>
+      console.error('[dealMoney] could not carve the part out of the payment:', err)
+    );
   }
 
   return { transfers: settled, part };

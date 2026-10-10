@@ -71,8 +71,8 @@
    * @property {any} askId
    * @property {any} users
    * @property {boolean} [cards]
-   * @property {(payload: { ani: string, coinlapach: any }) => void} [onAcsept]
-   * @property {(payload: { ani: string, coinlapach: any }) => void} [onDecline]
+   * @property {(payload: { ani: string, coinlapach: any, finalized?: boolean }) => void} [onAcsept]
+   * @property {(payload: { ani: string, coinlapach: any, finalized?: boolean }) => void} [onDecline]
    * @property {(payload: { id: string }) => void} [onHover]
    * @property {() => void} [onModal]
    * @property {(payload: { id: any }) => void} [onUser]
@@ -247,7 +247,7 @@
 
     const result = await callCloseFiniapruval(true, undefined);
     if (result?.data?.success) {
-      onAcsept?.({ ani: 'fini', coinlapach });
+      onAcsept?.({ ani: 'fini', coinlapach, finalized: result.data?.closed === true });
     }
   }
 
@@ -297,7 +297,7 @@
       isOpen = false;
       toast.success($t('lev.fiappru.counterSent'));
       // The proposer has answered — their card leaves, exactly as after approving.
-      onDecline?.({ ani: 'fini', coinlapach });
+      onDecline?.({ ani: 'fini', coinlapach, finalized: false });
     } catch (e) {
       console.error('counterFiniapruval failed', e);
       counterError = e instanceof Error ? e.message : $t('lev.fiappru.counterError');

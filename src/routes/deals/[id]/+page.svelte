@@ -18,6 +18,9 @@
   import PartiesPanel from '$lib/components/deals/PartiesPanel.svelte';
   import DealStages from '$lib/components/deals/DealStages.svelte';
   import CustomerPayment from '$lib/components/lev/cards/CustomerPayment.svelte';
+  import ChatSmall from '$lib/components/footer/chatSmall.svelte';
+  import { isChatOpen } from '$lib/stores/pendMisMes.js';
+  import type { SplitTransfer } from '$lib/sheirut/splitCarriage';
   import { paymentState } from '$lib/sheirut/paymentState';
   import { saleToDealDetail } from '$lib/services/dealsService';
   import { missionsFromDue, missionCounts, workProgressPct } from '$lib/sheirut/dealProgress';
@@ -182,6 +185,23 @@
       toast.error($t('deals.offers.error'));
     } finally {
       signingId = null;
+    }
+  }
+
+  /**
+   * A split transfer carrying this deal's money — the same write as its card in the rikma's
+   * split (`confirmHaluka`), so a receiver's confirmation is also their part of the deal.
+   */
+  async function confirmTransfer(tr: SplitTransfer, kind: 'send' | 'receive'): Promise<boolean> {
+    try {
+      await runAction('confirmHaluka', { halukaId: tr.id, projectId: String(tr.projectId ?? ''), kind });
+      toast.success($t(kind === 'receive' ? 'deals.parts.transferConfirmedToast' : 'deals.parts.transferSentToast'));
+      await invalidateAll();
+      return true;
+    } catch (err) {
+      console.error(err);
+      toast.error($t('deals.parts.error'));
+      return false;
     }
   }
 
@@ -374,7 +394,13 @@
 
         {#if parts}
           <div class="anim anim-d2">
-            <DealPartsPanel {parts} viewerId={data.viewerId} busy={confirmingPart} onConfirm={confirmMyPart} />
+            <DealPartsPanel
+              {parts}
+              viewerId={data.viewerId}
+              busy={confirmingPart}
+              onConfirm={confirmMyPart}
+              onTransfer={confirmTransfer}
+            />
           </div>
         {/if}
 
@@ -426,7 +452,45 @@
   {/if}
 </main>
 
+<!-- A split transfer's own conversation, between its two people (DealPartsPanel). -->
+{#if $isChatOpen}
+  <div class="chat-overlay">
+    <button class="chat-overlay-close" onclick={() => isChatOpen.set(false)}>✕</button>
+    <ChatSmall un={data.viewerName ?? ''} />
+  </div>
+{/if}
+
 <style>
+  .chat-overlay {
+    position: fixed;
+    bottom: 24px;
+    inset-inline-end: 24px;
+    width: min(340px, calc(100vw - 32px));
+    height: min(500px, calc(100vh - 48px));
+    background: var(--s1, #fff);
+    border: 1px solid var(--border, #e5e7eb);
+    border-radius: 16px;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.18);
+    z-index: 1000;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .chat-overlay-close {
+    position: absolute;
+    top: 8px;
+    inset-inline-start: 8px;
+    background: none;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    color: var(--tm, #6b7280);
+    z-index: 1;
+    padding: 4px 8px;
+    border-radius: 6px;
+    line-height: 1;
+  }
+
   .upd-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
   .upd { padding: 10px 12px; background: var(--s2); border: 1px solid var(--border); border-radius: 10px; }
   .upd-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px; font-size: 12px; color: var(--gold-l); }

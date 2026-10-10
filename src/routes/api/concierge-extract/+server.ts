@@ -20,7 +20,7 @@
  * typing) to keep the keystroke-debounced path cheap.
  */
 
-import { GEMINI_API_KEY } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import {
@@ -93,7 +93,7 @@ export const POST: RequestHandler = async ({ request, fetch }) => {
   let extraction: WishExtraction;
   const t0 = Date.now();
   try {
-    extraction = await extractWish(text, GEMINI_API_KEY);
+    extraction = await extractWish(text, env.GEMINI_API_KEY);
     console.log(
       `[concierge-extract] ✓ extracted in ${Date.now() - t0}ms - ` +
         `missions:${extraction.missions.length} resources:${extraction.resources.length} ` +

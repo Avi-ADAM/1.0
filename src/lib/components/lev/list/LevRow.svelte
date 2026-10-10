@@ -39,6 +39,7 @@
     rowTimegrama,
     rowIsActionable
   } from '../cards/cardKinds.js';
+  import When from '../When.svelte';
 
   /**
    * @typedef {Object} Props
@@ -193,6 +194,13 @@
   <footer class="foot">
     <span class="who">
       <span class="project" dir="auto">{item.projectName ?? ''}</span>
+      <!-- When it arrived — the phrase alone, the sentence is in its tooltip.
+           Down here, not in the head: the head's clock is the deadline, and
+           "3 hours ago" beside "2 days left" would read as one number. -->
+      {#if item.when}
+        <span class="dot" aria-hidden="true">·</span>
+        <When {item} bare class="when" />
+      {/if}
       {#if hasTally}
         <span class="tally">
           <span class="ok">{ok}</span><span class="sep">/</span><span
@@ -580,6 +588,16 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+
+  /* The rikma's name ellipsises to make room; the time stays whole — a
+     half-cut "לפני 1…" is worse than a shorter rikma name. */
+  .dot {
+    flex: none;
+    opacity: 0.5;
+  }
+  .who :global(.when) {
+    flex: none;
   }
 
   .tally {

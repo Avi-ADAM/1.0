@@ -2,11 +2,11 @@
 import { Telegraf } from 'telegraf';
 import { Markup } from 'telegraf';
 
-import { TELEGRAM_BOT_TOKEN_NEW } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 
 let appIds = [];
 //token new
-const Token = TELEGRAM_BOT_TOKEN_NEW;
+const Token = env.TELEGRAM_BOT_TOKEN_NEW;
 const bot = new Telegraf(Token);
 
 bot.start((ctx) => {

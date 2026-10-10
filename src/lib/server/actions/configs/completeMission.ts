@@ -2,6 +2,7 @@ import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { completeMissionConsentSpec } from '$lib/consent/specs/s2b';
 import { hoursStillToFile } from '$lib/server/timers/unfiledHours.js';
 import { roundHours, workValue } from '$lib/timers/precision.js';
+import { isFinishApproval } from '$lib/finiapruval/kind.js';
 
 /**
  * Calculate timegrama delay based on restime
@@ -83,6 +84,21 @@ const completeMissionHandler: ActionExecutionHandler = async (params, context, {
   const hasWhat = what && String(what).length > 0;
   if (!hasWhy && !hasWhat) {
     throw new Error('Missing required proof: please upload a file or describe completion');
+  }
+
+  // 2b. Validation: one finish per mission. A finished mission has nothing left
+  // to finish, and a finish already on the table is answered by voting on it.
+  // Without this a second submission wrote `finnished: false` back over a
+  // mission whose finish had already been approved (mission 187, 2026-09-01) —
+  // it reappeared on the in-progress board with its work already credited.
+  if (missionData.finnished === true) {
+    throw new Error('This mission is already finished');
+  }
+  const openFinish = (missionData.finiapruvals?.data ?? []).some(
+    (f: any) => f?.attributes?.archived !== true && isFinishApproval(f?.attributes)
+  );
+  if (openFinish) {
+    throw new Error('A finish approval for this mission is already waiting for the rikma');
   }
 
   // 3. Validation: timer must not be running

@@ -3,9 +3,8 @@ import { mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-const { env } = vi.hoisted(() => ({ env: {} as Record<string, string> }));
+const { env } = vi.hoisted(() => ({ env: { ADMINMONTHER: 'test-admin-token' } as Record<string, string> }));
 vi.mock('$env/dynamic/private', () => ({ env }));
-vi.mock('$env/static/private', () => ({ ADMINMONTHER: 'test-admin-token' }));
 
 import { GET, HEAD, PUT } from './+server.js';
 import { mintBlobToken } from '$lib/server/storage/blobToken.js';

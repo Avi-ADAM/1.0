@@ -1,6 +1,6 @@
 import { json } from '@sveltejs/kit';
 import { t } from '$lib/translations';
-import { GEMINI_API_KEY } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 import { mastra } from '../../../mastra';
 import { createUnregisteredBotAgent } from '../../../mastra/agents/nonreg-bot.js';
 import { DEFAULT_AGENT_MAX_STEPS } from '../../../mastra/lib/agent-response.js';
@@ -27,7 +27,7 @@ export async function POST({ request, fetch, locals }) {
 
       // Use the unregistered bot agent directly
       const nonregAgent = createUnregisteredBotAgent(
-        GEMINI_API_KEY,
+        env.GEMINI_API_KEY,
         lang
       );
 
@@ -111,7 +111,7 @@ export async function POST({ request, fetch, locals }) {
         history: payload.history || [],
         userId,
         language: lang,
-        apiKey: GEMINI_API_KEY,
+        apiKey: env.GEMINI_API_KEY,
         fetchInstance: fetch,
         currentPath: currentPath
       }
@@ -124,7 +124,7 @@ export async function POST({ request, fetch, locals }) {
           history: payload.history || [],
           userId,
           language: lang,
-          apiKey: GEMINI_API_KEY,
+          apiKey: env.GEMINI_API_KEY,
           fetchInstance: fetch,
           currentPath: currentPath
         }

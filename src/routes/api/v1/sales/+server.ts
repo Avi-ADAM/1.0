@@ -4,7 +4,7 @@ import { verifyApiKeyDetailed, assertScope, touchLastUsed } from '$lib/server/ap
 import { actionService, strapiClient } from '$lib/server/actions/index.js';
 import type { ActionContext } from '$lib/server/actions/types.js';
 import { validateSalesPayload, buildCreateSaleParams, SALES_SCOPE } from '$lib/server/salesApi';
-import { ADMINMONTHER } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 
 /**
  * POST /api/v1/sales — External Sales Reporting API (PLAN_EXTERNAL_SALES_API).
@@ -21,7 +21,7 @@ import { ADMINMONTHER } from '$env/static/private';
  */
 
 // Admin token for Strapi bypass (internal use) — same handling as v1/actions.
-const ADMIN_TOKEN = ADMINMONTHER.replace(/\s+/g, '').replace(/^ADMINMONTHER=/, '');
+const ADMIN_TOKEN = (env.ADMINMONTHER ?? '').replace(/\s+/g, '').replace(/^ADMINMONTHER=/, '');
 
 // ─── Basic in-memory per-key rate limiting ──────────────────────────────────
 // Payment gateways fire once per order; 60/min is generous. This is a first

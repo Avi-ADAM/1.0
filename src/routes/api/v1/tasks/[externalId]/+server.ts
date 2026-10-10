@@ -3,7 +3,7 @@ import type { RequestHandler } from './$types';
 import { verifyApiKeyDetailed, assertScope, touchLastUsed } from '$lib/server/apiKeys';
 import { strapiClient } from '$lib/server/actions/index.js';
 import { toTaskStatusView, TASKS_READ_SCOPE } from '$lib/server/tasksApi';
-import { ADMINMONTHER } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 
 /**
  * GET /api/v1/tasks/{externalId} — status pull for the External Tasks API.
@@ -14,7 +14,7 @@ import { ADMINMONTHER } from '$env/static/private';
  * is also what stops a key from being used to probe other rikmot.
  */
 
-const ADMIN_TOKEN = ADMINMONTHER.replace(/\s+/g, '').replace(/^ADMINMONTHER=/, '');
+const ADMIN_TOKEN = (env.ADMINMONTHER ?? '').replace(/\s+/g, '').replace(/^ADMINMONTHER=/, '');
 
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',

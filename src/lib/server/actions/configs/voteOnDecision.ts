@@ -20,6 +20,7 @@
  */
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import { voteIntent, type NotificationIntent } from '../../notifications/intent.js';
 import { execFromContext } from '$lib/server/archive/exec.js';
 import { signObjectChange } from '$lib/server/archive/vote.js';
 import { dealSignersFor } from '$lib/server/sheirut/dealEdit.js';
@@ -35,6 +36,9 @@ import {
   normalizeVots,
   type SaleClaim
 } from './saleClaimShared.js';
+
+/** Kinds whose branch notifies its own audience. */
+const INLINE_NOTICE_KINDS = new Set(['saleClaim', 'archiveObject', 'editObject', 'stipendProgram', 'stipendPledge']);
 
 /**
  * saleClaim agree() branch (PLAN_sale_holder_consent — phase 2).
@@ -149,7 +153,8 @@ async function handleSaleClaimVote(
               en: `The money-holder report was confirmed by both parties${order > 1 ? ' (updated version)' : ''}.`,
             },
           },
-          channels: ['socket', 'push'],
+          // Bilateral: the two parties' own result, nothing awaited.
+          intent: 'personal',
           metadata: { type: 'saleClaimConfirmed', url: 'lev', priority: 'normal' },
         },
         { recipients: [claim.holderId, claim.reporterId], projectId: params.projectId, decisionId },
@@ -192,7 +197,9 @@ async function handleObjectChangeVote(
     dealSignersFor((qid, vars) => strapi.execute(qid, vars, context.jwt, context.fetch)),
   );
 
-  if (notifier && params.projectId) {
+  // An empty `awaiting` must not reach specificUsers — it falls back to the
+  // whole rikma (N4).
+  if (notifier && params.projectId && (outcome.consensus || outcome.awaiting?.length)) {
     const applied = outcome.applied;
     const endedFor = applied?.membershipEnded?.userId;
     const recipients = outcome.consensus
@@ -223,8 +230,10 @@ async function handleObjectChangeVote(
                   en: 'Another member signed the standing version - yours is still open.',
                 },
           },
-          channels: ['socket'],
-          metadata: { type: 'voteUpdate', url: 'lev' },
+          // The round's opening already reached every channel; a co-signature
+          // stays on the site. Applying it changes the rikma for everyone.
+          intent: outcome.consensus ? 'outcome' : 'ambient',
+          metadata: { type: 'voteUpdate', url: `/moach/${params.projectId}/votes/decision/${decisionId}` },
         },
         { recipients, projectId: params.projectId },
         { projectId: params.projectId, decisionId },
@@ -262,7 +271,7 @@ async function handleStipendVote(
   const exec = execFromContext(context);
   const outcome = await signStipend(exec, decisionId, String(context.userId));
 
-  if (notifier && params.projectId) {
+  if (notifier && params.projectId && (outcome.consensus || outcome.awaiting?.length)) {
     notifier
       .notify(
         {
@@ -283,8 +292,8 @@ async function handleStipendVote(
                   en: 'Another party signed the version on the table — yours is still open.',
                 },
           },
-          channels: ['socket'],
-          metadata: { type: 'voteUpdate', url: 'lev' },
+          intent: outcome.consensus ? 'outcome' : 'ambient',
+          metadata: { type: 'voteUpdate', url: `/moach/${params.projectId}/votes/decision/${decisionId}` },
         },
         { recipients: outcome.consensus ? undefined : outcome.awaiting, projectId: params.projectId },
         { projectId: params.projectId, decisionId },
@@ -637,8 +646,12 @@ export const voteOnDecisionConfig: ActionConfig = {
       title: { he: 'הצבעה על החלטת פרויקט', en: 'Project decision vote' },
       body: { he: 'חבר הצביע על שינוי בפרויקט', en: 'A member voted on a project change' },
     },
-    channels: ['socket'],
-    metadata: { type: 'decisionVote', url: 'lev' },
+    // saleClaim / archive / edit / stipend votes tell their own audience inline
+    // (a sale claim is bilateral, never the whole rikma) — here they only move
+    // screens. Every other kind: a plain vote stays on the site, maturing is an outcome.
+    intent: (params, result): NotificationIntent =>
+      INLINE_NOTICE_KINDS.has(String(params.kind)) ? 'ambient' : voteIntent(params, result),
+    metadata: { type: 'decisionVote', url: '/moach/{{projectId}}/votes/decision/{{decisionId}}' },
   },
 
   updateStrategy: { type: 'none' },

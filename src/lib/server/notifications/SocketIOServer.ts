@@ -11,7 +11,14 @@ import { SOCKET_SERVER_URL, socketServerHeaders } from '../socketServer.js';
 
 export interface BroadcastRequest {
   userIds: string[];
-  notification: NotificationData;
+  /** The payload — a human notification, or a realtime change when `event` says so. */
+  notification: NotificationData | Record<string, unknown>;
+  /**
+   * Socket event to emit (`notification` when absent). `rt:changed` carries
+   * screen invalidations (docs/inprogress/PLAN_REALTIME_MIGRATION.md §3.3); a socket
+   * server older than that ignores the field and emits `notification`.
+   */
+  event?: 'notification' | 'rt:changed';
   /** Meetings whose guest rooms should also receive this - see below. */
   meetingIds?: string[];
 }
@@ -41,9 +48,10 @@ export class SocketIOServer {
    */
   async broadcast(
     userIds: string[],
-    notification: NotificationData,
+    notification: NotificationData | Record<string, unknown>,
     context: ActionContext,
-    meetingIds: string[] = []
+    meetingIds: string[] = [],
+    event: BroadcastRequest['event'] = 'notification'
   ): Promise<BroadcastResponse> {
     try {
       if ((!userIds || userIds.length === 0) && meetingIds.length === 0) {
@@ -59,6 +67,7 @@ export class SocketIOServer {
       const request: BroadcastRequest = {
         userIds,
         notification,
+        ...(event !== 'notification' && { event }),
         ...(meetingIds.length > 0 && { meetingIds })
       };
 

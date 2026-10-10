@@ -28,7 +28,12 @@
     "uploadFailed": "The file upload failed, please try again",
     "awaitingApproval": "awaiting approval",
     "awaitingApprovalHint": "Already submitted and waiting for the rikma members to approve",
-    "hoursAwaitingApprovalHint": "The saved hours are waiting for the rikma members to approve them"
+    "hoursAwaitingApprovalHint": "The saved hours are waiting for the rikma members to approve them",
+    "awaitingSection": "Awaiting finish approval",
+    "awaitingSectionHint": "These missions were submitted as finished and are waiting for the rikma members’ finish votes. Until the vote closes they have no timer, status update or change proposal.",
+    "awaitingStrip": "Submitted as finished — waiting for the rikma members’ votes",
+    "goVote": "Go to the vote",
+    "seeVotes": "Who has voted"
   },
   "split": {
     "calc": "Split Calculator",
@@ -67,7 +72,9 @@
     "missionProposals": "Mission proposals",
     "votes": "votes",
     "toVote": "Vote",
-    "noneOpen": "No open votes right now 🎉"
+    "noneOpen": "No open votes right now 🎉",
+    "finishApprovals": "Finish & hours approvals",
+    "hoursApproval": "hours approval"
   },
   "main": {
     "vap": "Project Values"

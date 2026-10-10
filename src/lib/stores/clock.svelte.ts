@@ -18,6 +18,8 @@
  * - {@link clock.seconds} only changes when the wall-clock second changes, so a
  *   card showing `hh:mm:ss` is not woken ten times a second for a digit that
  *   cannot move.
+ * - {@link clock.minutes} only changes on the minute — for "12 min. ago"
+ *   phrases (`$lib/time/formatWhen`), which cannot move faster than that.
  *
  * Both are plain `$state`, so a consumer is a one-line `$derived` and Svelte
  * skips the ones whose value did not change. The interval is suspended while
@@ -31,6 +33,7 @@ const TICK_MS = 100;
 
 let tenthsNow = $state(Date.now());
 let secondsNow = $state(Math.floor(Date.now() / 1000) * 1000);
+let minutesNow = $state(Math.floor(Date.now() / 60_000) * 60_000);
 
 let handle: ReturnType<typeof setInterval> | null = null;
 
@@ -41,6 +44,8 @@ function tick() {
   // write would still be a no-op for Svelte, but this keeps the intent explicit.
   const second = Math.floor(now / 1000) * 1000;
   if (second !== secondsNow) secondsNow = second;
+  const minute = Math.floor(now / 60_000) * 60_000;
+  if (minute !== minutesNow) minutesNow = minute;
 }
 
 function start() {
@@ -76,6 +81,10 @@ export const clock = {
   /** `Date.now()` floored to the second. For countdowns showing `hh:mm:ss`. */
   get seconds() {
     return secondsNow;
+  },
+  /** `Date.now()` floored to the minute. For "how long ago" phrases. */
+  get minutes() {
+    return minutesNow;
   }
 };
 

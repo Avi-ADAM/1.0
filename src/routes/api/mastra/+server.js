@@ -3,7 +3,7 @@ import { t, locale, loadTranslations } from '$lib/translations';
 import { createEnhancedBotAgent } from '../../../mastra/agents/reg-bot.ts';
 import { createUnregisteredBotAgent } from '../../../mastra/agents/nonreg-bot.ts';
 import { DEFAULT_AGENT_MAX_STEPS } from '../../../mastra/lib/agent-response.ts';
-import { GEMINI_API_KEY } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 import { setMcpContext, clearMcpContext } from '$lib/server/mcpContext';
 import { resolveChatIdentity } from '$lib/server/chatIdentity';
 
@@ -20,7 +20,7 @@ export async function POST({ request, fetch, locals }) {
     // Handle unregistered user queries
     if (action === 'ask') {
       const unregisteredAgent = createUnregisteredBotAgent(
-        GEMINI_API_KEY,
+        env.GEMINI_API_KEY,
         lang
       );
 
@@ -52,7 +52,7 @@ export async function POST({ request, fetch, locals }) {
     }
 
     const registeredAgent = createEnhancedBotAgent(
-      GEMINI_API_KEY,
+      env.GEMINI_API_KEY,
       lang,
       userId
     );

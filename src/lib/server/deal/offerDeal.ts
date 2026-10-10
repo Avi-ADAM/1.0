@@ -246,7 +246,7 @@ export async function notifyDealClientsOfCounter(
             es: `Se propuso una nueva versión para «${deal.offerName}». Lo que se acuerde se suma a tu trato, así que esta versión también necesita tu firma: apruébala o conversa en la página del trato.`
           }
         },
-        channels: ['socket', 'push'],
+        intent: 'consent',
         metadata: { type: 'dealOfferToSign', url: `/deals/${deal.sales[0]?.sheirutId ?? ''}`, priority: 'high' }
       },
       { recipients, projectId: deal.projectId },
@@ -292,7 +292,7 @@ export async function notifyDealClients(
             es: `${who ? who + ' se ofreció' : 'Hay una oferta'} para tomar «${deal.offerName}». Lo que se acuerde se suma a tu trato, así que también hace falta tu firma: apruébalo o conversa en la página del trato.`
           }
         },
-        channels: ['socket', 'push'],
+        intent: 'consent',
         metadata: { type: 'dealOfferToSign', url: `/deals/${deal.sales[0]?.sheirutId ?? ''}`, priority: 'high' }
       },
       { recipients, projectId: deal.projectId },

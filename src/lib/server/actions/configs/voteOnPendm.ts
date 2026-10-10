@@ -16,6 +16,7 @@
  */
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import { voteIntent } from '../../notifications/intent.js';
 import { matchOpenMissionToUsers } from '$lib/server/matching/engine';
 import { STRAPI_URL } from '$lib/server/strapiUrl.js';
 import { ensureCandidacyTimegrama } from '../../nego/timegrama.js';
@@ -292,7 +293,7 @@ const voteOnPendmHandler: ActionExecutionHandler = async (params, context, { str
                     en: "The rikma approved the proposal and offered it to you. Nothing is registered under your name without your consent - approve, refine the terms with a counter-offer or open a discussion.",
                   },
                 },
-                channels: ['socket', 'push', 'email'],
+                intent: 'consent',
                 metadata: {
                   type: 'voteUpdate',
                   url: voteUrl(projectId, 'ask', String(askId)),
@@ -394,8 +395,9 @@ export const voteOnPendmConfig: ActionConfig = {
       title: { he: 'הצבעה על הצעת משימה', en: 'Mission proposal vote' },
       body: { he: 'חבר צוות הצביע על הצעת משימה', en: 'A team member voted on a mission proposal' },
     },
-    channels: ['socket'],
-    metadata: { type: 'pendmVote', url: 'lev' },
+    // A plain vote stays on the site; maturing (or an all-no) is an outcome.
+    intent: voteIntent,
+    metadata: { type: 'pendmVote', url: '/moach/{{projectId}}/votes/pendm/{{pendId}}' },
   },
 
   updateStrategy: { type: 'none' },

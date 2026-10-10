@@ -132,7 +132,7 @@ export const signDealOfferConfig: ActionConfig = {
         ar: 'وافقت الزبونة على ترشيح لجزء مفتوح من صفقتها. حين يوقّع الجميع يُسجَّل وتكبر الصفقة وفق ذلك.'
       }
     },
-    channels: ['socket'],
+    intent: 'personal',
     metadata: { type: 'dealOfferSigned', url: 'lev' }
   },
   updateStrategy: { type: 'none' }

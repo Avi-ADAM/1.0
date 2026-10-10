@@ -126,7 +126,9 @@ export function dealNotices(input: DealNoticeInput, now: number = Date.now()): N
 
   // ── A provider: has the money for your part arrived? Asked once she has paid. ──
   const parts = input.parts;
-  if (parts && parts.customerPaid && parts.pending.map(String).includes(me)) {
+  // Not when her part travels through the rikma's split: its transfer card asks her, once,
+  // "I received ₪X from Y" (`$lib/sheirut/splitCarriage`).
+  if (parts && parts.customerPaid && parts.pending.map(String).includes(me) && !(parts.viaSplit ?? []).map(String).includes(me)) {
     const mine = parts.parts.find((p) => String(p.providerId) === me);
     const list = terms(term('amount', mine?.due));
     out.push({

@@ -124,7 +124,7 @@ export const candidateCounterOnAskmConfig: ActionConfig = {
       title: { he: 'הצעה נגדית מהמועמד', en: 'Counter from the candidate' },
       body: { he: 'המועמד הגיש הצעה נגדית למשאב', en: 'The candidate submitted a counter for the resource' },
     },
-    channels: ['socket'],
+    intent: 'consent',
     metadata: { type: 'base', url: 'lev' },
   },
 

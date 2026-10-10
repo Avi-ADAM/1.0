@@ -1,7 +1,7 @@
 <script module>
   import { SendToAdmin } from '$lib/server/sendToAdmin.js';
   // Server-only secret — this module is imported only by timegrama/+server.js.
-  import { ADMINMONTHER } from '$env/static/private';
+  import { env } from '$env/dynamic/private';
   import { execFromAdmin } from '$lib/server/archive/exec.js';
   import { fetchObjectChangeDecision, standingOrder, standingRound } from '$lib/server/archive/read.js';
   import { applyStandingVersion } from '$lib/server/archive/vote.js';
@@ -39,39 +39,39 @@
       if (picId) {
         await SendToAdmin(
           `mutation { updateProject(id: ${projectId}, data: { profilePic: ${picId} }) { data { id } } }`,
-          ADMINMONTHER
+          env.ADMINMONTHER
         );
       }
     } else if (a.kind === 'name' && a.newname) {
       await SendToAdmin(
         `mutation { updateProject(id: ${projectId}, data: { projectName: ${gqlStr(a.newname)} }) { data { id } } }`,
-        ADMINMONTHER
+        env.ADMINMONTHER
       );
     } else if (a.kind === 'pubdes') {
       await SendToAdmin(
         `mutation { updateProject(id: ${projectId}, data: { publicDescription: ${gqlStr(a.newpubdes)} }) { data { id } } }`,
-        ADMINMONTHER
+        env.ADMINMONTHER
       );
     } else if (a.kind === 'prides') {
       await SendToAdmin(
         `mutation { updateProject(id: ${projectId}, data: { descripFor: ${gqlStr(a.newprides)} }) { data { id } } }`,
-        ADMINMONTHER
+        env.ADMINMONTHER
       );
     } else if (a.kind === 'newFlink') {
       await SendToAdmin(
         `mutation { updateProject(id: ${projectId}, data: { fblink: ${gqlStr(a.newFlink)} }) { data { id } } }`,
-        ADMINMONTHER
+        env.ADMINMONTHER
       );
     } else if (a.kind === 'newWlink') {
       await SendToAdmin(
         `mutation { updateProject(id: ${projectId}, data: { linkToWebsite: ${gqlStr(a.newWlink)} }) { data { id } } }`,
-        ADMINMONTHER
+        env.ADMINMONTHER
       );
     } else if (a.kind === 'timtoM' && a.timtoM) {
       // restime is an ENUM_PROJECT_RESTIME — must stay an unquoted literal.
       await SendToAdmin(
         `mutation { updateProject(id: ${projectId}, data: { restime: ${a.timtoM} }) { data { id } } }`,
-        ADMINMONTHER
+        env.ADMINMONTHER
       );
     } else if (a.kind === 'codeLicense') {
       // codeLicense is an enum written as an unquoted literal, so the stored
@@ -82,7 +82,7 @@
           `mutation { updateProject(id: ${projectId}, data: { codeLicense: ${next.license}, codeLicenseOpenYears: ${
             next.openYears ?? 'null'
           }, codeLicenseSince: ${gqlStr(new Date().toISOString())} }) { data { id } } }`,
-          ADMINMONTHER
+          env.ADMINMONTHER
         );
       }
     } else if (a.kind === 'address' || a.kind === 'look') {
@@ -103,7 +103,7 @@
     } else if (a.kind === 'vallueadd' || a.kind === 'vallueles') {
       const projRes = await SendToAdmin(
         `{ project(id: ${projectId}) { data { attributes { vallues { data { id } } } } } }`,
-        ADMINMONTHER
+        env.ADMINMONTHER
       );
       const currentIds = (projRes?.data?.project?.data?.attributes?.vallues?.data ?? []).map((v) =>
         String(v.id)
@@ -120,13 +120,13 @@
         `mutation { updateProject(id: ${projectId}, data: { vallues: [${newIds
           .map((vid) => `"${vid}"`)
           .join(', ')}] }) { data { id } } }`,
-        ADMINMONTHER
+        env.ADMINMONTHER
       );
     }
 
     await SendToAdmin(
       `mutation { updateDecision(id: ${decisionId}, data: { archived: true }) { data { id } } }`,
-      ADMINMONTHER
+      env.ADMINMONTHER
     );
   }
 
@@ -135,7 +135,7 @@
       try {
         await SendToAdmin(
           `mutation { updateTimegrama(id: ${taid}, data: { done: true }) { data { id } } }`,
-          ADMINMONTHER
+          env.ADMINMONTHER
         );
       } catch (e) {
         console.error('[timegrama/decision] markDone failed:', e);
@@ -166,7 +166,7 @@
           valluesles { data { id } }
         } } }
       }`;
-      const res = await SendToAdmin(q, ADMINMONTHER);
+      const res = await SendToAdmin(q, env.ADMINMONTHER);
       const d = res?.data?.decision?.data;
       if (!d) {
         console.warn(`[timegrama/decision] decision ${id} not found`);
@@ -180,7 +180,7 @@
       // cannot produce different outcomes. Whatever version is on the table
       // when the clock runs out is the one that takes effect.
       if (a.kind === 'archiveObject' || a.kind === 'editObject') {
-        const exec = execFromAdmin(SendToAdmin, ADMINMONTHER);
+        const exec = execFromAdmin(SendToAdmin, env.ADMINMONTHER);
         const decision = await fetchObjectChangeDecision(exec, String(id));
         if (!decision) {
           console.warn(`[timegrama/decision] archive decision ${id} could not be read`);
@@ -252,7 +252,7 @@
       // they have not signed, the clock simply ends — the proposal stays open,
       // waiting for an explicit signature that only they can give.
       if (a.kind === 'stipendProgram' || a.kind === 'stipendPledge') {
-        const exec = execFromAdmin(SendToAdmin, ADMINMONTHER);
+        const exec = execFromAdmin(SendToAdmin, env.ADMINMONTHER);
         const decision = await fetchStipendDecision(exec, String(id));
         if (!decision) {
           console.warn(`[timegrama/decision] stipend decision ${id} could not be read`);
@@ -351,7 +351,7 @@
 
       await SendToAdmin(
         `mutation { updateSale(id: ${sale.id}, data: { ${parts.join(', ')} }) { data { id } } }`,
-        ADMINMONTHER
+        env.ADMINMONTHER
       );
 
       // Reconcile inventory if the matured quantity differs from what was reserved.
@@ -363,7 +363,7 @@
         try {
           await SendToAdmin(
             `mutation { updateMatanot(id: ${matanot.id}, data: { quant: ${adjusted} }) { data { id } } }`,
-            ADMINMONTHER
+            env.ADMINMONTHER
           );
         } catch (e) {
           console.error('[timegrama/decision] inventory delta failed:', e);
@@ -373,7 +373,7 @@
       // Archive the Decision.
       await SendToAdmin(
         `mutation { updateDecision(id: ${id}, data: { archived: true }) { data { id } } }`,
-        ADMINMONTHER
+        env.ADMINMONTHER
       );
 
       await markDone();

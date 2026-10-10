@@ -241,7 +241,7 @@
       onmouseleave={() => hover('0')}
     >
       <span class="text-gray-500 dark:text-gray-400">{heading}</span>
-      <span class="text-gold font-bold">{formatSharePct(current?.sharePct ?? 0)}</span>
+      <span class="text-goldink font-bold">{formatSharePct(current?.sharePct ?? 0)}</span>
     </button>
   {:else}
     <div
@@ -270,7 +270,7 @@
           onmouseleave={() => hover('0')}
         >
           <span class="text-gray-700 dark:text-gray-200">{$t('equity.baselineCurrent')}</span>
-          <span class="font-bold text-gold">{formatSharePct(current.sharePct)}</span>
+          <span class="font-bold text-goldink">{formatSharePct(current.sharePct)}</span>
           <span class="text-xs text-gray-400 dark:text-gray-500">({detail(current)})</span>
           {#if monthly(current)}
             <span class="text-xs text-emerald-600 dark:text-emerald-400">
@@ -354,7 +354,7 @@
               }}
             >
               <span class="text-gray-700 dark:text-gray-200">{horizonLabel(h.months)}</span>
-              <span class="font-bold text-gold">{formatSharePct(h.sharePct)}</span>
+              <span class="font-bold text-goldink">{formatSharePct(h.sharePct)}</span>
               <span class="text-xs text-gray-400 dark:text-gray-500">({horizonDetail(h)})</span>
               {#if monthly(h)}
                 <span class="text-xs text-emerald-600 dark:text-emerald-400">{monthly(h)}</span>
@@ -373,7 +373,7 @@
         <div class="pt-2 mt-1 border-t border-gray-200 dark:border-slate-600">
           <button
             type="button"
-            class="flex items-center gap-1.5 text-xs font-bold text-gray-500 dark:text-gray-400 hover:text-gold"
+            class="flex items-center gap-1.5 text-xs font-bold text-gray-500 dark:text-gray-400 hover:text-goldink"
             aria-expanded={chartOpen}
             onclick={(e) => {
               e.stopPropagation();

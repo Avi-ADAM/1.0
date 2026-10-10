@@ -11,6 +11,8 @@
  * slide or an empty row.
  */
 
+import { formatWhen } from '$lib/time/formatWhen';
+
 /**
  * `ani` → the milon key that gates it. Absent from the map means "no gate":
  * the money/consent cards added later (site-share, stipend, wishoffer) were
@@ -236,6 +238,71 @@ export function rowFacts(item) {
  */
 export function rowTimegrama(item) {
   return item?.timegramaDate ?? item?.timeGramaDate ?? null;
+}
+
+/**
+ * The other end of the clock: when this item reached me — a request sent, a
+ * mission published, a decision opened (PLAN_LEV_TIMESTAMPS). Processors set
+ * `when` through `itemWhen()` in levProcessors; this is the one reader, so the
+ * card, the row and the coin cannot disagree.
+ *
+ * @returns {{ at: string } | null}
+ */
+export function rowWhen(item) {
+  return item?.when?.at ? item.when : null;
+}
+
+/**
+ * Kinds whose processor sets `when`, each with a `lev.when.<ani>` sentence in
+ * every locale. The sentence is per *kind*, not per verb, because the verb
+ * agrees with the card's noun: a mission פורסמה, a resource פורסם.
+ *
+ * Adding a kind here without its translation fails `cardKinds.test.ts`.
+ */
+export const WHEN_KINDS = [
+  'askedcoin',
+  'askedm',
+  'pends',
+  'pmashes',
+  'wegets',
+  'hachla',
+  'archObject',
+  'stipend',
+  'sheirutp',
+  'wishoffer'
+];
+
+/**
+ * The sentence for an item's `when`, or null when it has none.
+ *
+ * Pure: the caller passes the clock (`clock.minutes`), the locale (`$lang`) and
+ * the translator (`$t`), so a row, a coin label and a card header all read the
+ * same way. With `bare` the verb is dropped — a list row has room for "לפני 12
+ * דק׳" next to the rikma's name, not for a whole sentence; `full` still carries
+ * the sentence for its tooltip.
+ *
+ * @param {any} item
+ * @param {{ now: number, locale: string, t: (key: string, params?: any) => string, bare?: boolean }} opts
+ * @returns {{ text: string, sentence: string, full: string, iso: string } | null}
+ */
+export function whenLabel(item, { now, locale, t, bare = false }) {
+  const when = rowWhen(item);
+  if (!when) return null;
+  const parts = formatWhen(when.at, now, locale);
+  if (!parts) return null;
+
+  // "נשלחה לפני 12 דק׳" but "נשלחה ב־6 באוק׳": an absolute moment needs the
+  // locale's preposition, a relative one already reads as a phrase.
+  const phrase =
+    parts.mode === 'relative' ? parts.short : t(`lev.when.at.${parts.mode}`, { time: parts.short });
+  const key = WHEN_KINDS.includes(item.ani) ? `lev.when.${item.ani}` : null;
+  const sentence = key ? t(key, { time: phrase }) : parts.short;
+  return {
+    text: bare ? parts.short : sentence,
+    sentence,
+    full: parts.full,
+    iso: parts.iso
+  };
 }
 
 /**

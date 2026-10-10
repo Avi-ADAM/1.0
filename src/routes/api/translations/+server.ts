@@ -11,7 +11,6 @@
 
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { STRAPI_TOKEN, GROQ_API_KEY } from '$env/static/private';
 import { env } from '$env/dynamic/private';
 
 // ─── CONFIG ────────────────────────────────────────────────────────────────────
@@ -28,7 +27,7 @@ async function strapiFetch(path: string, options: RequestInit = {}) {
     ...options,
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${STRAPI_TOKEN}`,
+      Authorization: `Bearer ${env.STRAPI_TOKEN}`,
       ...(options.headers ?? {}),
     },
   });
@@ -63,13 +62,12 @@ async function translateWithGroq(
   console.log(`[Groq] Translating: ${text}`);
   console.log(`[Groq] Target locale: ${targetLocale}`);
   console.log(`[Groq] Target language name: ${targetLanguageName}`);
-  console.log(`[Groq] API Key: ${GROQ_API_KEY}`);
   console.log(`[Groq] Model: ${GROQ_MODEL}`);
   const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${GROQ_API_KEY}`,
+      Authorization: `Bearer ${env.GROQ_API_KEY}`,
     },
     body: JSON.stringify({
       model: GROQ_MODEL,

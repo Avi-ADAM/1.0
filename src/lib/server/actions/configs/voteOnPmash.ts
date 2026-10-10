@@ -16,6 +16,7 @@
  */
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import { voteIntent } from '../../notifications/intent.js';
 import { matchOpenMashaabimToUsers } from '$lib/server/matching/engine';
 import { STRAPI_URL } from '$lib/server/strapiUrl.js';
 import { gqlString } from './actionUtils.js';
@@ -270,8 +271,9 @@ export const voteOnPmashConfig: ActionConfig = {
       title: { he: 'הצבעה על הצעת משאב', en: 'Resource proposal vote' },
       body: { he: 'חבר צוות הצביע על הצעת משאב', en: 'A team member voted on a resource proposal' },
     },
-    channels: ['socket'],
-    metadata: { type: 'pmashVote', url: 'lev' },
+    // A plain vote stays on the site; maturing (or an all-no) is an outcome.
+    intent: voteIntent,
+    metadata: { type: 'pmashVote', url: '/moach/{{projectId}}/votes/pmash/{{pmashId}}' },
   },
 
   updateStrategy: { type: 'none' },

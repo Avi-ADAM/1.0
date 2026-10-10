@@ -13,7 +13,7 @@
 | | פתיחה (2026-10-08) | עכשיו |
 |---|---:|---:|
 | actions כותבים | 209 | 209 |
-| … מצהירים `realtime.scopes` | 0 | 0 |
+| … מצהירים `realtime.scopes` (`LEGACY_NO_REALTIME` ב-`realtime.contract.test.ts`) | 0 | 1 |
 | … שקטים לגמרי (אין אירוע סוקט) | 95 | 95 |
 | … `fullRefresh` משודר | 21 | 21 |
 | דפים שמציגים נתונים משותפים | 76 | 76 |
@@ -21,22 +21,28 @@
 | … ⚪ / 🔴 / 🟠 (לא מתעדכנים בזמן אמת) | 62 | 57 |
 | `invalidate(() => true)` בלקוח | קיים | קיים |
 | **התראות לבני אדם** (§6 בתכנית) | | |
-| actions שהערוצים שלהם חסרים מול ה-intent היעד (⚠) | 106 | 106 |
-| … מתוכם `consent` — מחכים לתשובה של מישהו, וזה לא יוצא מהאתר | 55 | 55 |
-| … טלגרם חסר | 86 | 86 |
-| actions ששולחים יותר מהיעד (✂ — הכרעה, לא תיקון אוטומטי) | 10 | 10 |
-| קבצים שבוחרים ערוצים ביד (`LEGACY_CHANNEL_LISTS`) | 109 | 109 |
+| actions שהערוצים שלהם חסרים מול ה-intent היעד (⚠) | 106 | 62 |
+| … מתוכם `consent` — מחכים לתשובה של מישהו, וזה לא יוצא מהאתר | 55 | 27 |
+| … טלגרם חסר | 86 | 47 |
+| actions ששולחים יותר מהיעד (✂ — מייל נשאר למי שאין ערוץ אחר) | 10 | 5 |
+| קבצים שבוחרים ערוצים ביד (`LEGACY_CHANNEL_LISTS`) | 109 | 54 |
+| actions שעברו ל-`intent` | 0 | 54 |
 
 ## שלבים
 
 | שלב | סטטוס |
 |---|---|
 | R0 — תיקוני B1, B4, B5, B6, B10, B11 | [x] 2026-10-08 — קוד ובדיקות יחידה; הבדיקה הידנית בשני דפדפנים עוד פתוחה |
+| N1-ask — משפחת ה-ask (בקשות הצטרפות, מועמדות, מו"מ עליה, ההכרעה) עברה ל-`intent` + מייל כגיבוי (N10) | [x] 2026-10-08 — 17 actions + `deal/offerDeal` (חתימת הלקוחה, C-19) + `wish/volunteerProposal`; ה-scopes שלהם עוד ב-R4 |
+| N1-vote — הצבעות, מו"מ על הצעות, ארכוב/עריכה, כתובת/מראה הרקמה עברו ל-`intent`; `voteIntent` (consent כשסבב **נפתח**, לא על כל חתימה) | [x] 2026-10-08 — 14 actions + `createSheirutFromPending` (helper); ה-scopes שלהם עוד ב-R4 |
+| N1-wish+deal — wish (הצעות, מו"מ, השמה, הזמנות) ו-deal (בקשות מוצר, מחיר, עסקה, תשלום) עברו ל-`intent` | [x] 2026-10-08 — 24 actions + `sheirut/dealEdit`; `createSheirutHaluka` ו-`confirmSheirutHaluka` קיבלו התראה (לא הייתה) |
 | N0 — `intent` → ערוצים (`notifications/intent.ts`), ה-ratchet `channels.contract.test.ts`, N1, N2 | [x] 2026-10-08 — קוד ובדיקות יחידה; אף action עוד לא עבר ל-`intent` |
-| R1 — חוזה (scopes, `ActionConfig.realtime`, broadcaster, `x-client-id`, socket-server `event`, ratchet test) | [ ] |
-| R2 — bus + מתאמי kit / lev / moach + `useRealtime` + resync | [ ] |
+| R1 — חוזה (scopes, `ActionConfig.realtime`, broadcaster, `x-client-id`, socket-server `event`, ratchet test) | [x] 2026-10-08 — `src/lib/realtime/scopes.ts`, `src/lib/server/realtime/broadcaster.ts`, `ActionService` שלב 5a, `x-client-id` ב-`actionClient` → `ActionContext.clientId`, `socket-server` `event` (`broadcast-event.ts`), `realtime.contract.test.ts` (209 ב-legacy, 31 `READ_ONLY`). אף action עוד לא מצהיר, אז שום דבר לא משודר עדיין. **לפרוס את socket-server לפני ה-action הראשון שמצהיר `realtime`** — שרת ישן יפלוט את השינוי כ-`notification` |
+| R2 — bus + מתאמי kit / lev / moach + `useRealtime` + resync | [x] 2026-10-08 — `src/lib/realtime/bus.ts` (factory: echo לפי `originClientId`, חלון 250ms, כל subscriber מקבל רק את השינויים שלו אחד-אחד, resync אחרי חיבור **חוזר** בלבד), `bus.svelte.ts` (`realtimeBus` + `useRealtime`), `routing.ts` (scope → `depends` / slices של הלב / sections של moach), `adapters/lev.ts` + `adapters/moach.ts`. מחובר: ה-layout הראשי (`start`), `/lev`, `moach/[pid]/+layout`. `depends.contract.test.ts` — כל `depends('rt:…')` / `rtKey` / `useRealtime` בקוד הוא pattern שה-bus יודע להתאים. המאזינים הישנים נשארים עד R6 |
+| socket-server — בקשת polling אחת (`/socket.io/?transport=polling`) הפילה את התהליך (`ERR_HTTP_HEADERS_SENT`): ה-handler של ה-HTTP נרשם אחרי socket.io וענה 404 על הנתיב שלו | [x] 2026-10-09 — `socket-server/src/socket-path.ts` + בדיקה; נפרס, 3 בקשות polling בפרודקשן = 200 בלי restart. `deploy-socket.ps1` מוודא את הקובץ בכל פריסה |
+| socket-server — `event` / `rt:changed` בפרודקשן | [x] 2026-10-09 — `deploy-socket.ps1` (פריסה ראשונה מעץ העבודה, `7049d4e3-dirty`); `/health` ציבורי תקין, `/broadcast` בלי סוד 401, `:rollback` שמור |
 | R3 — דפים, גל 1 | [ ] |
-| R4 — actions לפי תחום | [ ] |
+| R4 — actions לפי תחום | [ ] — פיילוט `updateMissionStatus` **נבדק בשני דפדפנים 2026-10-10** (256 → 258, רקמה 87, משימה 191): `rt:changed` הגיע ל-258 עם `project:87`, `mission:191` ו-`originClientId` של הטאב השני; ה-bus מסר אחרי ~0.5ש׳; מתאם moach שלח **בקשה אחת** (`getProjectMissions` של 87), בלי טעינת דף; שינוי שאף מסך לא מקשיב לו — אפס בקשות; ההד של הטאב המקורי מסונן. הבדיקה מצאה באג: `/api/action` בנה `ActionService` משלו בלי broadcaster — אף פעולה מהדפדפן לא פרסמה. תוקן (`realtimeFor(notifier)` משותף ל-`/api/action` ול-`actions/index.ts`) |
 | R5 — דפים, גל 2 + timegrama + הסרת `invalidate(() => true)` | [ ] |
 | R6 — ניקוי מאזינים ישנים | [ ] |
 
@@ -50,8 +56,8 @@
 | B4 | `moachStore.invalidate` עצל — הדף הפתוח לא מתעדכן | [x] 2026-10-08 — `moachStore.refresh` קורא מחדש `missions`/`financials` (debounce 300ms) כשהרקמה כבר מחזיקה אותם; `base` דרך `depends(moachBaseKey)` ב-layout load. המיפוי סוג→section ב-`moachRealtime.js` (עם בדיקות). אירוע בלי projectId עדיין רק מסמן stale. |
 | B5 | `approveHaluka` עם `recipients: custom` ⇒ אין נמענים | [x] 2026-10-08 — אומת: `HalukaNotificationService` משמש רק את `/api/approveHaluka` הישן, שאף לקוח לא קורא לו. עכשיו `projectMembers` (socket/email/telegram/push), ו-`refetchScope` על `halukas` עם projectId. ה-endpoint הישן והשירות **נמחקו** (2026-10-08) — ה-endpoint גם אישר כל tosplit/haluka עם הצבעות שהקורא המציא, בלי בדיקת חברות. |
 | B6 | `task-updated` / `timer-updated` בלי מאזינים | [x] 2026-10-08 — כל `updateStrategies.ts` היה מת: הפונקציות שנרשמו לא מוזכרות באף config, ואלה שמוזכרות (`refreshTimers`, `appendVote`, …) לא נרשמו מעולם. נמחק יחד עם הדוגמה והקריאה ב-forum layout. |
-| B7 | אין resync אחרי ניתוק | [ ] |
-| B8 | echo: רק טיימרים מסננים לפי `originClientId` | [ ] |
+| B7 | אין resync אחרי ניתוק: מה שנשלח בזמן שהסוקט נפל — אבד. | [x] 2026-10-08 (ל-`rt:changed`) — אחרי חיבור חוזר: כל `depends('rt:…')` רץ שוב, הלב טוען מלא פעם אחת, moach קורא את שלושת ה-sections. התראות `notification` שהוחמצו לא חוזרות — זה לא תפקידן |
+| B8 | echo: רק טיימרים מסננים לפי `originClientId` | [~] 2026-10-08 — `rt:changed` מסונן לפי הטאב (`x-client-id`), והמכשירים האחרים של אותו משתמש מקבלים. `notification` עוד לא — R6 |
 | B9 | timegrama ו-`/api/send` כותבים בלי סוקט | [ ] |
 | B10 | דפי בדיקה ציבוריים: `test-socket`, `test-lev-socket`, `test-migration` | [x] 2026-10-08 — נמחקו |
 | B11 | `socketClient.connect()` מפיל ובונה מחדש socket חי; ה-layouts של moach ושל forum קוראים לו בכל כניסה ⇒ אירועים אובדים בזמן החיבור מחדש | [x] 2026-10-08 — אותו משתמש עם socket מחובר/פעיל ⇒ no-op (בדיקה ב-`socketClient.test.ts`) |
@@ -66,11 +72,16 @@ inline מהקובץ עצמו ומה-helpers (`deal/offerDeal.ts`, `sheirut/dealE
 | N1 | נמען ב-ru/es מקבל פוש/טלגרם/מייל בשפת **השולח** (`selectLanguage` נפל ל-`context.lang`, ומשם לעברית) | [x] 2026-10-08 — `recipientTemplateLang`: השפה של הנמען; בלי תבנית לשפה שלו ⇒ אנגלית. שלושת השירותים + בדיקות. |
 | N2 | מי שביצע את הפעולה מקבל פוש/טלגרם/מייל על עצמו בכל config בלי `excludeSender` (`addVote`, `timerSave`, `voteOn*`, `applyToMission`, …) | [x] 2026-10-08 — ה-orchestrator מסנן את היוזם מהערוצים החיצוניים תמיד; ה-socket לא השתנה (B8 / R1 מטפלים בו). |
 | N3 | הערוצים נבחרים ביד בכל קובץ ⇒ 55 בקשות `consent` לא יוצאות מהאתר במלואן: `addVote` / `voteOn*` / `submitNego*` / `proposeRikmaIdentity` — socket בלבד; `counterOnAsk(m)`, `proposeObjectArchive`, `proposeStipend*`, `createSale` (תביעה על כסף של מישהו אחר), חתימת הלקוחה בעסקה (C-19) — בלי טלגרם ומייל. שתיקה של מי שלא שמע היא לא הסכמה. | [ ] R4, action אחרי action |
-| N4 | `specificUsers` בלי `userIds` (ריק / לא נמצא ב-result) נופל ל**כל חברי הרקמה** — הרחבה שקטה. עם `consent` זה מייל לכל הרקמה. | [ ] לבדוק בכל action שעובר ל-`intent`; בסוף R4 — להסיר את ה-fallback |
+| N4 | `specificUsers` בלי `userIds` (ריק / לא נמצא ב-result) נופל ל**כל חברי הרקמה** — הרחבה שקטה. עם `consent` זה מייל לכל הרקמה. | [~] 2026-10-08 — רשימה **ריקה** (`[]`) היא "אף אחד" (בדיקה ב-`intent.test.ts`). רשימה **חסרה** עדיין נופלת לרקמה — `acceptRatsonProposal` נשען על זה, וגם `approve/rejectSheirutpend` (N13). בסוף R4 — להסיר |
 | N5 | הבשלה בשתיקה (timegrama) לא מודיעה לאף אחד — הצד השני של B9 | [ ] R5, יחד עם ה-scopes של timegrama |
 | N6 | התבניות הן `{he, en, ar}` בלבד ⇒ ru/es קוראים אנגלית (N1). התיקון המלא הוא `notification.notice` של [`PLAN_SMART_NOTICES`](../inprogress/PLAN_SMART_NOTICES.md) שלב 6 — **לא** להוסיף es/ru ידנית ל-140 תבניות | [ ] SMART_NOTICES שלב 6 |
 | N7 | נתיבי התראה ישנים: `/api/nutiUser`, `/api/nutifyPm`, `nutifyUser.svelte`, `pusherer.svelte`, `bolkMail.svelte` (`HalukaNotificationService` נמחק 2026-10-08, ראו B5) — כמעט מתים (רק `timegrama/stipendPayment.svelte` קורא ל-`nutiUser`) | [ ] R6 |
 | N8 | `declineMissionRequest` / `declineAskmRequest` הם וטו ("אין לא מוחלט") ושקטים — המבקש לא שומע כלום. היעד `personal` רק מבטיח שישמע; להפוך אותם להצעה נגדית/הסתרה — תכנית נפרדת | [ ] |
+| N11 | בקשת שירות שכל החברים אישרו (`addVote` → `createSheirutFromPending`) — **הלקוחה לא שמעה כלום**: ה-handler רץ ישירות, לא דרך `ActionService`, אז ה-notification שלו לא נשלח מעולם. אותו דבר ב-`materializeWish` | [x] 2026-10-08 ב-`addVote` (`personal` ללקוחה כשהיא לא חברה ברקמה). `materializeWish` — עם משפחת ה-wish |
+| N12 | `proposeObjectArchive` עם `alsoProposeArchive` פותח הצעת ארכוב שנייה בשקט; `proposeObjectEdit` והצבעות archive/stipend עם רשימת נמענים ריקה נופלים לכל הרקמה (N4) | [x] 2026-10-08 — ההצעה הנוספת מודיעה (`consent`), ורשימה ריקה לא נשלחת |
+| N13 | `approveSheirutpend` / `rejectSheirutpend`: `userIdsParam: 'requesterId'` שאף לקוח לא שולח, וה-mutation `73updateSheirutpend` מחזיר רק `id` ⇒ ההודעה "בקשתך אושרה/נדחתה" הולכת **לחברי הרקמה**, לא למבקש. בנוסף `rejectSheirutpend` שולח `{id, projectId}` ל-mutation שדורש `$data` — כנראה נכשל תמיד; וזה וטו ("אין לא מוחלט") | [ ] תכנית נפרדת — handler שקורא את המבקש, והחלפת הדחייה בהסתרה/הצעה נגדית |
+| N14 | `createSheirutHaluka`: הלקוחה מדווחת "העברתי", וההעברה נסגרת **רק** במילה של המקבל — אבל המקבל לא שמע על זה | [x] 2026-10-08 — `consent` למקבל; `confirmSheirutHaluka` מודיע לשולח שהתקבל (`personal`) |
+| N10 | מי שאין לו פוש ולא טלגרם לא שמע כלום על כל מה שאינו `consent` | [x] 2026-10-08 — `emailRecipients`: `personal` / `outcome` (וגם רשימות legacy עם push/telegram בלי email) שולחים מייל למי שההתראה לא מגיעה אליו בערוץ אחר. `ambient` נשאר באתר. |
 | N9 | `mutedProjects` (SMART_NOTICES) עוד לא נקרא ב-orchestrator. כשייבנה: השתקה מורידה ערוצים חיצוניים ל-`ambient`/`outcome`/`personal`; האם אפשר להשתיק `consent` — הכרעה (שתיקה היא הסכמה אומרת שלא) | [ ] |
 
 ---
@@ -173,11 +184,11 @@ inline מהקובץ עצמו ומה-helpers (`deal/offerDeal.ts`, `sheirut/dealE
   הסוג נאסף ברמת הקובץ, כך שבקבצים עם כמה actions (`maagad`, `shiftCardActions`, …) הוא עשוי
   להופיע גם ב-action שלא שולח אותו.
 - **ערוצים היום** — הערוצים שה-action שולח בהם התראה לבני אדם: `S` socket · `P` push · `T` telegram ·
-  `E` email · `—` אין. ⚠ = חסר ערוץ שה-intent היעד דורש. ✂ = שולח **יותר** מהיעד — זו הכרעה
-  (הורדת ערוץ), לא תיקון אוטומטי; ב-`directOffer` הערוצים נאספו ברמת הקובץ, ייתכן שרק `claimDirectOffer` שולח.
+  `E` email · `—` אין. ⚠ = חסר ערוץ שה-intent היעד דורש. ✂ = שולח מייל לכולם, והיעד שולח מייל רק למי
+  שאין לו פוש/טלגרם (N10); ב-`directOffer` הערוצים נאספו ברמת הקובץ, ייתכן שרק `claimDirectOffer` שולח.
 - **intent יעד** — `C` consent · `P` personal · `O` outcome · `A` ambient · `—` בלי התראה לבני אדם (רק
   realtime). `A·C·O` = תלוי בריצה: הצבעה רגילה `A`, הצעה נגדית `C`, הבשלה `O` — `intent` כפונקציה.
-  הסיווג הוא הצעה מהמיפוי; **לאמת אותו כשעורכים את הקובץ** (§6 בתכנית).
+  `intent ✓` = הקובץ כבר עבר (ההתראה בלבד — ה-scopes שלו עוד ב-R4). הסיווג הוא הצעה מהמיפוי; **לאמת אותו כשעורכים את הקובץ** (§6 בתכנית).
 - **status** — `[ ]` / `[x] YYYY-MM-DD <sha>` / `n/a` (קריאה בלבד) / `פטור` (פרטי לגמרי — טיוטה
   של משתמש אחד; מצהיר `audience: 'self'` כדי שהמכשירים האחרים שלו יתעדכנו, או נשאר ב-allowlist
   עם נימוק).
@@ -263,29 +274,29 @@ inline מהקובץ עצמו ומה-helpers (`deal/offerDeal.ts`, `sheirut/dealE
 | `ensureVoteForum` | ensureVoteForum | read-only |  |  |  |  |  |  | n/a |
 | `getForumThread` | forum | read-only |  |  |  |  |  |  | n/a |
 | `getUserForums` | forum | read-only |  |  |  |  |  |  | n/a |
-| `sendAskMessage` | sendAskMessage | config | askParticipants (−me) | toast ⚠cfgUS lost | askMessage → header-chat | SPTE ✂ | P |  | [ ] |
+| `sendAskMessage` | sendAskMessage | config | askParticipants (−me) | toast ⚠cfgUS lost | askMessage → header-chat | intent ✓ | P |  | [ ] |
 
 ### wish — 21 actions (live 0 · full 0 · toast 8 · silent 13 · read-only 0)
 
 | action | file | socket today | recipients | effect for others | metadata.type → who reacts | ערוצים היום | intent יעד | target scopes | status |
 |---|---|---|---|---|---|---|---|---|---|
-| `acceptRatsonProposal` | acceptRatsonProposal | config | specificUsers (−me) | toast | ratsonProposal → moach(lazy)<br>sheirutUpdate → moach(lazy) | SPTE | C |  | [ ] |
-| `acceptWishOffer` | acceptWishOffer | inline |  | toast | ratsonProposal → moach(lazy) | SP ⚠ | P |  | [ ] |
+| `acceptRatsonProposal` | acceptRatsonProposal | config | specificUsers (−me) | toast | ratsonProposal → moach(lazy)<br>sheirutUpdate → moach(lazy) | intent ✓ | C |  | [ ] |
+| `acceptWishOffer` | acceptWishOffer | inline |  | toast | ratsonProposal → moach(lazy) | intent ✓ | P·C |  | [ ] |
 | `clusterRatsons` | maagad | none |  | — | maagad | — | — |  | [ ] |
-| `counterRatsonProposal` | counterRatsonProposal | none |  | — | ratsonProposal | SPE ⚠ | C |  | [ ] |
+| `counterRatsonProposal` | counterRatsonProposal | none |  | — | ratsonProposal | intent ✓ | C |  | [ ] |
 | `createRatson` | createRatson | none |  | — |  | — | — |  | [ ] |
-| `declineWishOffer` | declineWishOffer | config | specificUsers | toast | ratsonProposal → moach(lazy) | SP ⚠ | P |  | [ ] |
+| `declineWishOffer` | declineWishOffer | config | specificUsers | toast | ratsonProposal → moach(lazy) | intent ✓ | P |  | [ ] |
 | `hideRatsonProposal` | hideRatsonProposal | none |  | — |  | — | — |  | [ ] |
 | `matchRatson` | matchRatson | none |  | — |  | — | — |  | [ ] |
 | `materializeRikmaBlueprint` | assistantSessions | none |  | — |  | — | — |  | [ ] |
-| `materializeWish` | materializeWish | config | specificUsers | toast | sheirutCreated → moach(lazy) | SP ⚠ | P |  | [ ] |
-| `offerNewProductsToWishes` | offerNewProductsToWishes | config | specificUsers | toast | ratsonProposal → moach(lazy) | SP ⚠ | P |  | [ ] |
-| `offerWishHelp` | offerWishHelp | config | specificUsers | toast | ratsonProposal → moach(lazy) | SP ⚠ | C |  | [ ] |
+| `materializeWish` | materializeWish | config | specificUsers | toast | sheirutCreated → moach(lazy) | intent ✓ | P |  | [ ] |
+| `offerNewProductsToWishes` | offerNewProductsToWishes | config | specificUsers | toast | ratsonProposal → moach(lazy) | intent ✓ | P |  | [ ] |
+| `offerWishHelp` | offerWishHelp | config | specificUsers | toast | ratsonProposal → moach(lazy) | intent ✓ | C |  | [ ] |
 | `publishWishNeedToCommunity` | publishWishNeedToCommunity | none |  | — |  | — | — |  | [ ] |
 | `refreshWishMatches` | refreshWishMatches | none |  | — |  | — | — |  | [ ] |
 | `rejectRatsonProposal` | rejectRatsonProposal | none |  | — |  | — ⚠ | A |  | [ ] |
-| `requestWishMission` | requestWishMission | config | specificUsers | toast | ratsonProposal → moach(lazy) | SPTE | C |  | [ ] |
-| `requestWishResource` | requestWishResource | config | specificUsers | toast | ratsonProposal → moach(lazy) | SPTE | C |  | [ ] |
+| `requestWishMission` | requestWishMission | config | specificUsers | toast | ratsonProposal → moach(lazy) | intent ✓ | C |  | [ ] |
+| `requestWishResource` | requestWishResource | config | specificUsers | toast | ratsonProposal → moach(lazy) | intent ✓ | C |  | [ ] |
 | `setWishRestime` | setWishRestime | none |  | — |  | — ⚠ | P |  | [ ] |
 | `updateRatsonDraft` | updateRatsonDraft | none |  | — |  | — | — |  | [ ] |
 | `updateRatsonExtraction` | updateRatsonExtraction | none |  | — |  | — | — |  | [ ] |
@@ -295,27 +306,27 @@ inline מהקובץ עצמו ומה-helpers (`deal/offerDeal.ts`, `sheirut/dealE
 
 | action | file | socket today | recipients | effect for others | metadata.type → who reacts | ערוצים היום | intent יעד | target scopes | status |
 |---|---|---|---|---|---|---|---|---|---|
-| `acceptSheirutQuote` | sheirutQuote | config | specificUsers (−me) | toast | sheirutUpdate → moach(lazy) | SPTE ✂ | P |  | [ ] |
-| `approveSheirutpend` | approveSheirutpend | config | specificUsers | toast ⚠cfgUS lost | sheirutUpdate → moach(lazy) | SP ⚠ | P |  | [ ] |
-| `claimDirectOffer` | directOffer | inline |  | toast | directOffer → moach(lazy) | SP ⚠ | P |  | [ ] |
-| `confirmDealPartReceived` | confirmDealPartReceived | config | specificUsers | toast | dealPaid → moach(lazy) | SP ⚠ | P |  | [ ] |
-| `confirmSheirutHaluka` | confirmSheirutHaluka | none |  | — |  | — ⚠ | P |  | [ ] |
-| `counterDealEdit` | counterDealEdit | inline |  | toast | voteUpdate → votes+rikma+moach(lazy) | SPE ⚠ | C |  | [ ] |
-| `createSheirutHaluka` | createSheirutHaluka | none |  | — |  | — ⚠ | C |  | [ ] |
-| `createSheirutpend` | createSheirutpend | config | projectMembers (−me) | toast ⚠cfgUS lost | sheirutUpdate → moach(lazy) | SPTE | C |  | [ ] |
+| `acceptSheirutQuote` | sheirutQuote | config | specificUsers (−me) | toast | sheirutUpdate → moach(lazy) | intent ✓ | P |  | [ ] |
+| `approveSheirutpend` | approveSheirutpend | config | specificUsers | toast ⚠cfgUS lost | sheirutUpdate → moach(lazy) | intent ✓ (N13) | P |  | [ ] |
+| `claimDirectOffer` | directOffer | inline |  | toast | directOffer → moach(lazy) | intent ✓ | P |  | [ ] |
+| `confirmDealPartReceived` | confirmDealPartReceived | config | specificUsers | toast | dealPaid → moach(lazy) | intent ✓ | P |  | [ ] |
+| `confirmSheirutHaluka` | confirmSheirutHaluka | none |  | — |  | intent ✓ | P |  | [ ] |
+| `counterDealEdit` | counterDealEdit | inline |  | toast | voteUpdate → votes+rikma+moach(lazy) | intent ✓ | C |  | [ ] |
+| `createSheirutHaluka` | createSheirutHaluka | none |  | — |  | intent ✓ | C |  | [ ] |
+| `createSheirutpend` | createSheirutpend | config | projectMembers (−me) | toast ⚠cfgUS lost | sheirutUpdate → moach(lazy) | intent ✓ | C |  | [ ] |
 | `draftDirectOffer` | draftDirectOffer | none |  | — |  | — | — |  | [ ] |
 | `getDealDue` | getDealDue | read-only |  |  |  |  |  |  | n/a |
 | `getSheirutpendQuote` | sheirutQuote | read-only |  |  | sheirutUpdate |  |  |  | n/a |
-| `issueDirectOfferLink` | directOffer | inline |  | toast | directOffer → moach(lazy) | SP ✂ | — |  | [ ] |
+| `issueDirectOfferLink` | directOffer | inline |  | toast | directOffer → moach(lazy) | — | — |  | [ ] |
 | `noteSheirutpend` | sheirutQuote | none |  | — | sheirutUpdate | — ⚠ | P |  | [ ] |
-| `proposeSheirut` | proposeSheirut | config | projectMembers (−me) | partial(lev) | sheirutUpdate → moach(lazy) | SPTE | C |  | [ ] |
-| `quoteSheirutpend` | sheirutQuote | config | specificUsers (−me) | toast | sheirutUpdate → moach(lazy) | SPTE | C |  | [ ] |
-| `rejectSheirutpend` | rejectSheirutpend | config | specificUsers | toast ⚠cfgUS lost | sheirutUpdate → moach(lazy) | SP ⚠ | P |  | [ ] |
-| `requestSheirutJoin` | requestSheirutJoin | config | projectMembers (−me) | partial(lev) | sheirutUpdate → moach(lazy) | SPTE | C |  | [ ] |
-| `revokeDirectOfferLink` | directOffer | inline |  | toast | directOffer → moach(lazy) | SP ✂ | — |  | [ ] |
-| `signDealEdit` | signDealEdit | inline |  | toast | voteUpdate → votes+rikma+moach(lazy) | SPE ⚠ | C·O |  | [ ] |
-| `signDealOffer` | signDealOffer | config | specificUsers | toast | dealOfferSigned → moach(lazy) | S ⚠ | P |  | [ ] |
-| `updateDirectOffer` | directOffer | inline |  | toast | directOffer → moach(lazy) | SP ✂ | — |  | [ ] |
+| `proposeSheirut` | proposeSheirut | config | projectMembers (−me) | partial(lev) | sheirutUpdate → moach(lazy) | intent ✓ | C |  | [ ] |
+| `quoteSheirutpend` | sheirutQuote | config | specificUsers (−me) | toast | sheirutUpdate → moach(lazy) | intent ✓ | C |  | [ ] |
+| `rejectSheirutpend` | rejectSheirutpend | config | specificUsers | toast ⚠cfgUS lost | sheirutUpdate → moach(lazy) | intent ✓ (N13) | P |  | [ ] |
+| `requestSheirutJoin` | requestSheirutJoin | config | projectMembers (−me) | partial(lev) | sheirutUpdate → moach(lazy) | intent ✓ | C |  | [ ] |
+| `revokeDirectOfferLink` | directOffer | inline |  | toast | directOffer → moach(lazy) | — | — |  | [ ] |
+| `signDealEdit` | signDealEdit | inline |  | toast | voteUpdate → votes+rikma+moach(lazy) | intent ✓ | A·O |  | [ ] |
+| `signDealOffer` | signDealOffer | config | specificUsers | toast | dealOfferSigned → moach(lazy) | intent ✓ | P |  | [ ] |
+| `updateDirectOffer` | directOffer | inline |  | toast | directOffer → moach(lazy) | — | — |  | [ ] |
 | `updateSheirut` | updateSheirut | none |  | — |  | — ⚠ | P |  | [ ] |
 
 ### money — 23 actions (live 2 · full 0 · toast 7 · silent 7 · read-only 7)
@@ -383,10 +394,10 @@ inline מהקובץ עצמו ומה-helpers (`deal/offerDeal.ts`, `sheirut/dealE
 | `archivePersonalMatanot` | archivePersonalMatanot | none |  | — |  | — | — |  | [ ] |
 | `archiveSpaceDoc` | spaceDocs | none |  | — |  | — ⚠ | A |  | [ ] |
 | `archiveUserResource` | archiveUserResource | config | specificUsers | partial(lev) | profile → userStore | S | — |  | [ ] |
-| `counterObjectChange` | counterObjectChange | inline |  | full | voteUpdate → votes+rikma+moach(lazy) | SPE ⚠ | C |  | [ ] |
+| `counterObjectChange` | counterObjectChange | inline |  | full | voteUpdate → votes+rikma+moach(lazy) | intent ✓ | C |  | [ ] |
 | `previewArchiveMembership` | previewArchiveMembership | read-only |  |  |  |  |  |  | n/a |
-| `proposeObjectArchive` | proposeObjectArchive | inline |  | full | voteUpdate → votes+rikma+moach(lazy) | SP ⚠ | C |  | [ ] |
-| `proposeObjectEdit` | proposeObjectEdit | inline |  | full | voteUpdate → votes+rikma+moach(lazy) | SPE ⚠ | C |  | [ ] |
+| `proposeObjectArchive` | proposeObjectArchive | inline |  | full | voteUpdate → votes+rikma+moach(lazy) | intent ✓ | C |  | [ ] |
+| `proposeObjectEdit` | proposeObjectEdit | inline |  | full | voteUpdate → votes+rikma+moach(lazy) | intent ✓ | C |  | [ ] |
 
 ### maagad — 8 actions (live 0 · full 0 · toast 3 · silent 5 · read-only 0)
 
@@ -414,37 +425,37 @@ inline מהקובץ עצמו ומה-helpers (`deal/offerDeal.ts`, `sheirut/dealE
 
 | action | file | socket today | recipients | effect for others | metadata.type → who reacts | ערוצים היום | intent יעד | target scopes | status |
 |---|---|---|---|---|---|---|---|---|---|
-| `acceptCounterOnAsk` | acceptCounterOnAsk | config | projectMembers (−me) | toast | base → moach(lazy) | S ⚠ | O |  | [ ] |
-| `acceptCounterOnAskm` | acceptCounterOnAskm | config | projectMembers (−me) | toast | base → moach(lazy) | S ⚠ | O |  | [ ] |
-| `addVote` | addVote | config | projectMembers | partial(lev) | voteUpdate → votes+rikma+moach(lazy) | S ⚠ | A·C·O |  | [ ] |
-| `applyToMission` | applyToMission | config | projectMembers | toast | missionApplication → moach(lazy) | SPE ⚠ | C |  | [ ] |
-| `candidateCounterOnAsk` | candidateCounterOnAsk | config | projectMembers (−me) | toast | base → moach(lazy) | SP ⚠ | C |  | [ ] |
-| `candidateCounterOnAskm` | candidateCounterOnAskm | config | projectMembers (−me) | toast | base → moach(lazy) | SP ⚠ | C |  | [ ] |
-| `counterOnAsk` | counterOnAsk | config | specificUsers | toast | base → moach(lazy) | SP ⚠ | C |  | [ ] |
-| `counterOnAskm` | counterOnAskm | config | specificUsers | toast | base → moach(lazy) | SP ⚠ | C |  | [ ] |
+| `acceptCounterOnAsk` | acceptCounterOnAsk | config | projectMembers (−me) | toast | base → moach(lazy) | intent ✓ | O |  | [ ] |
+| `acceptCounterOnAskm` | acceptCounterOnAskm | config | projectMembers (−me) | toast | base → moach(lazy) | intent ✓ | O |  | [ ] |
+| `addVote` | addVote | config | projectMembers | partial(lev) | voteUpdate → votes+rikma+moach(lazy) | intent ✓ | A·O |  | [ ] |
+| `applyToMission` | applyToMission | config | projectMembers | toast | missionApplication → moach(lazy) | intent ✓ | C |  | [ ] |
+| `candidateCounterOnAsk` | candidateCounterOnAsk | config | projectMembers (−me) | toast | base → moach(lazy) | intent ✓ | C |  | [ ] |
+| `candidateCounterOnAskm` | candidateCounterOnAskm | config | projectMembers (−me) | toast | base → moach(lazy) | intent ✓ | C |  | [ ] |
+| `counterOnAsk` | counterOnAsk | config | specificUsers | toast | base → moach(lazy) | intent ✓ | C |  | [ ] |
+| `counterOnAskm` | counterOnAskm | config | specificUsers | toast | base → moach(lazy) | intent ✓ | C |  | [ ] |
 | `declineAskmRequest` | declineAskmRequest | none |  | — |  | — ⚠ | P |  | [ ] |
 | `declineMissionRequest` | declineMissionRequest | none |  | — |  | — ⚠ | P |  | [ ] |
 | `declineOpenMission` | declineOpenMission | none |  | — |  | — | — |  | [ ] |
 | `declineSpForMashaabim` | declineSpForMashaabim | none |  | — |  | — | — |  | [ ] |
-| `dismissSelfNomination` | dismissSelfNomination | config | specificUsers | toast | selfNomination → moach(lazy) | SPE ⚠ | P |  | [ ] |
-| `finalizeAskAcceptance` | finalizeAskAcceptance | config | projectMembers | full | missionCreated → moach(lazy) | S ⚠ | O |  | [ ] |
-| `finalizeAskmAcceptance` | finalizeAskmAcceptance | config | projectMembers | refetch(lev) | askmAccepted → moach(lazy) | S ⚠ | O |  | [ ] |
-| `finalizeJoinAcceptance` | finalizeJoinAcceptance | config | projectMembers | full | missionCreated → moach(lazy) | S ⚠ | O |  | [ ] |
+| `dismissSelfNomination` | dismissSelfNomination | config | specificUsers | toast | selfNomination → moach(lazy) | intent ✓ | P |  | [ ] |
+| `finalizeAskAcceptance` | finalizeAskAcceptance | config | projectMembers | full | missionCreated → moach(lazy) | intent ✓ | O |  | [ ] |
+| `finalizeAskmAcceptance` | finalizeAskmAcceptance | config | projectMembers | refetch(lev) | askmAccepted → moach(lazy) | intent ✓ | O |  | [ ] |
+| `finalizeJoinAcceptance` | finalizeJoinAcceptance | config | projectMembers | full | missionCreated → moach(lazy) | intent ✓ | O |  | [ ] |
 | `getDecisionDetails` | getDecisionDetails | read-only |  |  |  |  |  |  | n/a |
-| `nominateSelfMission` | nominateSelfMission | config | projectMembers | toast | selfNomination → moach(lazy) | SPE ⚠ | C |  | [ ] |
-| `nominateSelfResource` | nominateSelfResource | config | projectMembers | toast | selfNomination → moach(lazy) | SPE ⚠ | C |  | [ ] |
-| `proposeOnOpenMashaabim` | proposeOnOpenMashaabim | config | specificUsers | toast | mashaabimRequest → moach(lazy) | S ⚠ | C |  | [ ] |
-| `proposeOnOpenMission` | proposeOnOpenMission | config | specificUsers | toast | missionApplication → moach(lazy) | SPE ⚠ | C |  | [ ] |
+| `nominateSelfMission` | nominateSelfMission | config | projectMembers | toast | selfNomination → moach(lazy) | intent ✓ | C |  | [ ] |
+| `nominateSelfResource` | nominateSelfResource | config | projectMembers | toast | selfNomination → moach(lazy) | intent ✓ | C |  | [ ] |
+| `proposeOnOpenMashaabim` | proposeOnOpenMashaabim | config | specificUsers | toast | mashaabimRequest → moach(lazy) | intent ✓ | C |  | [ ] |
+| `proposeOnOpenMission` | proposeOnOpenMission | config | specificUsers | toast | missionApplication → moach(lazy) | intent ✓ | C |  | [ ] |
 | `proposeRikmaBlueprint` | assistantSessions | none |  | — |  | — | — |  | [ ] |
-| `proposeRikmaIdentity` | proposeRikmaIdentity | config | projectMembers (−me) | full | base → moach(lazy) | S ⚠ | C |  | [ ] |
-| `submitNegoMaap` | submitNegoMaap | config | projectMembers (−me) | full | maapNego → moach(lazy) | SPE ⚠ | C |  | [ ] |
-| `submitNegoMash` | submitNegoMash | config | projectMembers (−me) | partial(lev) | base → moach(lazy) | S ⚠ | C |  | [ ] |
-| `submitNegoMission` | submitNegoMission | config | projectMembers (−me) | partial(lev) | base → moach(lazy) | S ⚠ | C |  | [ ] |
-| `voteOnAskm` | voteOnAskm | config | projectMembers (−me) | refetch(lev) | voteUpdate → votes+rikma+moach(lazy) | S ⚠ | A·C·O |  | [ ] |
-| `voteOnDecision` | voteOnDecision | config | projectMembers | partial(lev) | saleClaimConfirmed → moach(lazy)<br>voteUpdate → votes+rikma+moach(lazy)<br>decisionVote → votes+rikma+moach(lazy) | SPE ⚠ | A·C·O |  | [ ] |
-| `voteOnMaap` | voteOnMaap | config | projectMembers | partial(lev) | maapVote → votes+rikma+moach(lazy) | S ⚠ | A·C·O |  | [ ] |
-| `voteOnPendm` | voteOnPendm | config | projectMembers | partial(lev) | voteUpdate → votes+rikma+moach(lazy)<br>pendmVote → votes+rikma+moach(lazy) | SPE ⚠ | A·C·O |  | [ ] |
-| `voteOnPmash` | voteOnPmash | config | projectMembers | partial(lev) | pmashVote → votes+rikma+moach(lazy) | S ⚠ | A·C·O |  | [ ] |
+| `proposeRikmaIdentity` | proposeRikmaIdentity | config | projectMembers (−me) | full | base → moach(lazy) | intent ✓ | C |  | [ ] |
+| `submitNegoMaap` | submitNegoMaap | config | projectMembers (−me) | full | maapNego → moach(lazy) | intent ✓ | C |  | [ ] |
+| `submitNegoMash` | submitNegoMash | config | projectMembers (−me) | partial(lev) | base → moach(lazy) | intent ✓ | C |  | [ ] |
+| `submitNegoMission` | submitNegoMission | config | projectMembers (−me) | partial(lev) | base → moach(lazy) | intent ✓ | C |  | [ ] |
+| `voteOnAskm` | voteOnAskm | config | projectMembers (−me) | refetch(lev) | voteUpdate → votes+rikma+moach(lazy) | intent ✓ | A |  | [ ] |
+| `voteOnDecision` | voteOnDecision | config | projectMembers | partial(lev) | saleClaimConfirmed → moach(lazy)<br>voteUpdate → votes+rikma+moach(lazy)<br>decisionVote → votes+rikma+moach(lazy) | intent ✓ | A·O |  | [ ] |
+| `voteOnMaap` | voteOnMaap | config | projectMembers | partial(lev) | maapVote → votes+rikma+moach(lazy) | intent ✓ | A·C·O |  | [ ] |
+| `voteOnPendm` | voteOnPendm | config | projectMembers | partial(lev) | voteUpdate → votes+rikma+moach(lazy)<br>pendmVote → votes+rikma+moach(lazy) | intent ✓ | A·O |  | [ ] |
+| `voteOnPmash` | voteOnPmash | config | projectMembers | partial(lev) | pmashVote → votes+rikma+moach(lazy) | intent ✓ | A·O |  | [ ] |
 
 ### mission — 13 actions (live 1 · full 0 · toast 8 · silent 3 · read-only 1)
 
@@ -461,7 +472,7 @@ inline מהקובץ עצמו ומה-helpers (`deal/offerDeal.ts`, `sheirut/dealE
 | `getMissionForEdit` | getMissionForEdit | read-only |  |  |  |  |  |  | n/a |
 | `linkActToMission` | linkActToMission | config | projectMembers (−me) | toast ⚠cfgUS lost |  | SP ✂ | A |  | [ ] |
 | `updateMissionOffer` | updateMissionOffer | none |  | — |  | — | — |  | [ ] |
-| `updateMissionStatus` | updateMissionStatus | config | projectMembers (−me) | toast | missionStatus → moach(lazy) | S | A |  | [ ] |
+| `updateMissionStatus` | updateMissionStatus | config | projectMembers (−me) | toast | missionStatus → moach(lazy) | intent ✓ | A | `project:<pid>`, `mission:<mId>` | [x] 2026-10-10 — נבדק בשני דפדפנים (לא נדחף) |
 | `updateTask` | example | config | projectMembers (−me) | toast ⚠cfgUS lost |  | SP ✂ | A |  | [ ] |
 
 ### resource — 13 actions (live 1 · full 1 · toast 3 · silent 8 · read-only 0)
@@ -472,7 +483,7 @@ inline מהקובץ עצמו ומה-helpers (`deal/offerDeal.ts`, `sheirut/dealE
 | `cancelResourceBooking` | cancelResourceBooking | none |  | — |  | — ⚠ | P |  | [ ] |
 | `confirmResourceBooking` | confirmResourceBooking | none |  | — |  | — ⚠ | P |  | [ ] |
 | `createMashaabim` | createMashaabim | none |  | — |  | — | — |  | [ ] |
-| `createMashaabimRequest` | createMashaabimRequest | config | specificUsers | toast | mashaabimRequest → moach(lazy) | SP ⚠ | C |  | [ ] |
+| `createMashaabimRequest` | createMashaabimRequest | config | specificUsers | toast | mashaabimRequest → moach(lazy) | intent ✓ | C |  | [ ] |
 | `createResource` | createResource | inline |  | toast | voteUpdate → votes+rikma+moach(lazy) | SPE ⚠ | C |  | [ ] |
 | `createResourceBooking` | createResourceBooking | none |  | — |  | — ⚠ | C |  | [ ] |
 | `createResourceRequest` | createResourceRequest | none |  | — |  | — ⚠ | C |  | [ ] |

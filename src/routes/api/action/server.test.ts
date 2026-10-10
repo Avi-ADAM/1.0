@@ -12,8 +12,8 @@ import type { ActionConfig } from '$lib/server/actions/types.js';
 
 // Mock environment variables
 vi.stubEnv('VITE_URL', 'http://localhost:1337');
-// ADMINMONTHER is now a server-only secret read via $env/static/private (no VITE_ prefix).
-vi.mock('$env/static/private', () => ({ ADMINMONTHER: 'test-admin-token', STRAPI_URL: 'http://localhost:1337' }));
+// ADMINMONTHER is now a server-only secret read at runtime via $env/dynamic/private (no VITE_ prefix).
+vi.mock('$env/dynamic/private', () => ({ env: { ADMINMONTHER: 'test-admin-token', STRAPI_URL: 'http://localhost:1337' } }));
 
 // Mock the QIDS module
 vi.mock('../../../routes/api/send/qids.js', () => ({

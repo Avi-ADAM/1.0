@@ -167,7 +167,8 @@ export const proposeSheirutConfig: ActionConfig = {
         ar: 'اقترح أحد الأعضاء خدمة جديدة. في حال عدم الرد قبل انتهاء المهلة، تتم الموافقة عليها.'
       }
     },
-    channels: ['socket', 'email', 'telegram', 'push'],
+    // The rikma's approval is awaited.
+    intent: 'consent',
     emailTemplate: 'SimpleNuti',
     metadata: { type: 'sheirutUpdate', url: 'lev', priority: 'high' }
   }

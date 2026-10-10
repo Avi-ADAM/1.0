@@ -332,8 +332,9 @@ export const submitNegoMissionConfig: ActionConfig = {
       title: { he: 'הצעת משא ומתן חדשה', en: 'New negotiation proposal' },
       body:  { he: 'הוגשה הצעה למשא ומתן על משימה', en: 'A negotiation proposal was submitted for a mission' },
     },
-    channels: ['socket'],
-    metadata: { type: 'base', url: 'lev' },
+    // A counter opens a new round and resets the clock for every member.
+    intent: 'consent',
+    metadata: { type: 'base', url: '/moach/{{projectId}}/votes' },
   },
 
   updateStrategy: { type: 'none' },

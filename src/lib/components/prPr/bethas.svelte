@@ -35,6 +35,7 @@
   import { buildMonthlyLedger, segmentsFromTimers } from '$lib/recurring/missionMonths.js';
   import { htmlExcerpt } from '$lib/text/htmlExcerpt';
   import { commitmentOf } from '$lib/shifts/commitment';
+  import { isFinishApproval } from '$lib/finiapruval/kind';
 
   /**
    * @typedef {Object} Props
@@ -181,13 +182,40 @@
     return Number(m.attributes?.status) || 0;
   }
 
-  /** A finish approval already on the table — no second submission from here. */
-  function isPending(m) {
-    if (submitted[String(m.id)]) return true;
-    return (m.attributes?.finiapruvals?.data ?? []).some(
-      (f) => f.attributes?.archived !== true
+  /**
+   * The *finish* approval on the table, if any. A Finiapruval is also how a
+   * timer save / a month's hours ask for approval (`isTimerSave`) — those leave
+   * the mission running, so they never count as "finished" here.
+   */
+  function openFiniOf(m) {
+    return (
+      (m.attributes?.finiapruvals?.data ?? []).find(
+        (f) => f.attributes?.archived !== true && isFinishApproval(f.attributes)
+      ) ?? null
     );
   }
+
+  /** Any approval already on the table — no second submission from here. */
+  function isPending(m) {
+    if (submitted[String(m.id)]) return true;
+    return (m.attributes?.finiapruvals?.data ?? []).some((f) => f.attributes?.archived !== true);
+  }
+
+  /** The holder pressed "finished" and the rikma is voting on it. */
+  function isAwaitingFinish(m) {
+    return !!submitted[String(m.id)] || openFiniOf(m) != null;
+  }
+
+  // A mission whose holder pressed "finished" is out of work and into the
+  // rikma's finish vote (finiapruval): no timer, no status, no edit/archive
+  // proposal — the only thing left on it is a vote (moach votes, kind `fini`). It
+  // used to sit among the live rows with a "timer loading…" that never loads,
+  // so those rows go to the bottom of the board, folded away by default. Hours
+  // waiting for approval (a timer save, a month) stay where they are: the
+  // mission is still running.
+  let activeRows = $derived(ordered.filter((m) => !isAwaitingFinish(m)));
+  let awaitingRows = $derived(ordered.filter(isAwaitingFinish));
+  let showAwaiting = $state(false);
 
   // ── Live monthly hours ──────────────────────────────────────────────────────
   // `howmanyhoursalready` is a month-less counter that only moves when a timer
@@ -384,23 +412,69 @@
   {:else}
     <!-- Column headings: a real table reading on a wide screen, and nothing at
          all on a narrow one, where each row stacks with its own labels. -->
-    <div class="pb-colheads" class:no-equity={!projectId} aria-hidden="true">
-      <span>{$t('mission.bethas.missionName')}</span>
-      <span>{$t('mission.bethas.by')}</span>
-      <span>{$t('project.bethas.pro')}</span>
-      <span>{$t('project.bethas.hd')}</span>
-      {#if projectId}<span>{$t('equity.yourShareIfDone')}</span>{/if}
-      <span>{$t('project.bethas.ro')}</span>
-      <span class="pb-col-end">{$t('project.bethas.acts')}</span>
-    </div>
+    {#if activeRows.length || showAwaiting}
+      <div class="pb-colheads" class:no-equity={!projectId} aria-hidden="true">
+        <span>{$t('mission.bethas.missionName')}</span>
+        <span>{$t('mission.bethas.by')}</span>
+        <span>{$t('project.bethas.pro')}</span>
+        <span>{$t('project.bethas.hd')}</span>
+        {#if projectId}<span>{$t('equity.yourShareIfDone')}</span>{/if}
+        <span>{$t('project.bethas.ro')}</span>
+        <span class="pb-col-end">{$t('project.bethas.acts')}</span>
+      </div>
+    {/if}
 
-    <ul class="pb-rows">
-      {#each ordered as m (m.id)}
+    {#if activeRows.length}
+      <ul class="pb-rows">
+        {#each activeRows as m (m.id)}
+          {@render missionRow(m, false)}
+        {/each}
+      </ul>
+    {/if}
+
+    {#if awaitingRows.length}
+      <div class="pb-awaiting">
+        <button
+          type="button"
+          class="pb-awaiting-toggle"
+          aria-expanded={showAwaiting}
+          onclick={() => (showAwaiting = !showAwaiting)}
+        >
+          <span aria-hidden="true">⏳</span>
+          <span>{$t('moach.progress.awaitingSection')}</span>
+          <span class="pb-count">{awaitingRows.length}</span>
+          <svg class="pb-awaiting-chev" class:rotated={showAwaiting} viewBox="0 0 10 6" aria-hidden="true">
+            <path
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              fill="none"
+              d="m1 1 4 4 4-4"
+            />
+          </svg>
+        </button>
+        {#if showAwaiting}
+          <div transition:slide={{ duration: 220, easing: quintOut }}>
+            <p class="pb-awaiting-hint">{$t('moach.progress.awaitingSectionHint')}</p>
+            <ul class="pb-rows">
+              {#each awaitingRows as m (m.id)}
+                {@render missionRow(m, true)}
+              {/each}
+            </ul>
+          </div>
+        {/if}
+      </div>
+    {/if}
+  {/if}
+</section>
+
+{#snippet missionRow(m, awaiting)}
         {@const ledger = ledgerOf(m)}
         {@const mine = isMine(m)}
         {@const open = !!openRows[String(m.id)]}
         {@const acts = m.attributes?.acts?.data ?? []}
-        <li class="pb-row" class:mine class:open>
+        <li class="pb-row" class:mine class:open class:awaiting>
           <div class="pb-grid" class:no-equity={!projectId}>
             <!-- name -->
             <div class="pb-cell pb-cell-name">
@@ -514,17 +588,19 @@
                   />
                 </svg>
               </button>
-              <button
-                type="button"
-                class="pb-icon"
-                onclick={() => openTaskDialog(m.id)}
-                title={$t('moach.progress.addTask')}
-                aria-label={$t('moach.progress.addTask')}
-              >
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
-                </svg>
-              </button>
+              {#if !awaiting}
+                <button
+                  type="button"
+                  class="pb-icon"
+                  onclick={() => openTaskDialog(m.id)}
+                  title={$t('moach.progress.addTask')}
+                  aria-label={$t('moach.progress.addTask')}
+                >
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+                  </svg>
+                </button>
+              {/if}
               <button
                 type="button"
                 class="pb-icon pb-expand"
@@ -554,7 +630,27 @@
                buttons on someone else's mission — opening one is a rikma-wide
                consensus matter, not a privilege of the owner
                (PLAN_OBJECT_ARCHIVAL). -->
-          {#if projectId}
+          {#if projectId && awaiting}
+            {@const fini = openFiniOf(m)}
+            <!-- Nothing left to run on it: the finish vote is the whole story.
+                 Chat stays (a question is always allowed); the vote is cast on
+                 the moach's own vote page, and its object page shows who voted.
+                 A finish submitted from this page a moment ago has no approval
+                 id yet, so it goes to the votes overview instead. -->
+            <div class="pb-mine-bar pb-await-bar">
+              <span class="pb-await-text">⏳ {$t('moach.progress.awaitingStrip')}</span>
+              <a
+                class="pb-panel-link"
+                href={fini ? `/moach/${projectId}/votes/fini/${fini.id}` : `/moach/${projectId}/votes#sec-fini`}
+                >{$t('moach.progress.goVote')}</a
+              >
+              {#if fini}
+                <a class="pb-panel-link" href="/moach/{projectId}/object/finiapruval/{fini.id}">
+                  {$t('moach.progress.seeVotes')}
+                </a>
+              {/if}
+            </div>
+          {:else if projectId}
             <div class="pb-mine-bar">
               <MissionControls
                 missionId={m.id}
@@ -612,9 +708,11 @@
                   {:else}
                     <p class="pb-panel-empty">{$t('moach.progress.noTasks')}</p>
                   {/if}
-                  <button type="button" class="pb-chip pb-chip-add" onclick={() => openTaskDialog(m.id)}>
-                    + {$t('moach.progress.addTask')}
-                  </button>
+                  {#if !awaiting}
+                    <button type="button" class="pb-chip pb-chip-add" onclick={() => openTaskDialog(m.id)}>
+                      + {$t('moach.progress.addTask')}
+                    </button>
+                  {/if}
                 </div>
 
                 <div class="pb-panel-block">
@@ -643,10 +741,7 @@
             </div>
           {/if}
         </li>
-      {/each}
-    </ul>
-  {/if}
-</section>
+{/snippet}
 
 <style>
   /* The board lives inside the moach shell (dark slate radial gradient), so it
@@ -1060,6 +1155,64 @@
     padding: 0.5rem 0.9rem 0.7rem;
     border-top: 1px dashed rgba(238, 232, 170, 0.28);
     background: rgba(238, 232, 170, 0.05);
+  }
+
+  /* ── awaiting finish approval: folded at the bottom ─────────────────────── */
+  .pb-awaiting {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 0.4rem;
+    padding-top: 0.75rem;
+    border-top: 1px dashed var(--pb-border);
+  }
+  .pb-awaiting-toggle {
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border-radius: 9999px;
+    border: 1px solid rgba(255, 0, 146, 0.4);
+    background: rgba(255, 0, 146, 0.1);
+    padding: 0.3rem 0.85rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #ff9ad5;
+    cursor: pointer;
+    transition: background 0.12s, border-color 0.12s;
+  }
+  .pb-awaiting-toggle:hover {
+    border-color: #ff9ad5;
+    background: rgba(255, 0, 146, 0.18);
+  }
+  .pb-awaiting-chev {
+    width: 11px;
+    height: 11px;
+    transition: transform 0.16s ease;
+  }
+  .pb-awaiting-chev.rotated {
+    transform: rotate(180deg);
+  }
+  .pb-awaiting-hint {
+    margin: 0 0 0.5rem;
+    font-size: 0.75rem;
+    color: var(--pb-text-3);
+  }
+  .pb-row.awaiting {
+    opacity: 0.88;
+  }
+  .pb-await-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem 0.9rem;
+    border-top-color: rgba(255, 0, 146, 0.3);
+    background: rgba(255, 0, 146, 0.06);
+  }
+  .pb-await-text {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #ff9ad5;
   }
 
   /* ── expanded panel ─────────────────────────────────────────────────────── */

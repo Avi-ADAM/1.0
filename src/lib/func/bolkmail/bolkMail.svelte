@@ -7,6 +7,8 @@
      * @param {object} title  {"he","ר","en":"r"}
      * @param {object} body  {"he","ר","en":"r"} 
      * @param {string} mainlang  "he" "en"
+     * @param {typeof fetch} fetch  the SvelteKit *server* fetch — /api/sendMail
+     *   answers only to this server ($lib/server/internalOnly.js)
     */
     export async function sendBolkMail(emails = [],myid = 0,title = {"he":"","en":""},body = {"he":"","en":""},mainlang = "he",fetch){
       console.log(emails,"12 sendBolkMail") 

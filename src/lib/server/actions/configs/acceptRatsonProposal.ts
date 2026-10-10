@@ -263,7 +263,8 @@ const handler: ActionExecutionHandler = async (params, context, util) => {
                 ar: `تم اختيارك لتنفيذ "${missionName}".`
               }
             },
-            channels: ['socket', 'email', 'telegram', 'push'],
+            // About them; nothing waits on their answer.
+            intent: 'personal',
             emailTemplate: 'SimpleNuti',
             metadata: { priority: 'high', type: 'ratsonProposal', url: `/concierge/${ratsonId}` }
           },
@@ -290,7 +291,7 @@ const handler: ActionExecutionHandler = async (params, context, util) => {
                 ar: `لم تردّوا على عرض متطوّع لمهمة "${missionName}" ضمن الوقت المحدد للأمنية، لذلك تمت الموافقة عليه تلقائياً.`
               }
             },
-            channels: ['socket', 'push'],
+            intent: 'personal',
             metadata: { priority: 'high', type: 'ratsonProposal', url: `/concierge/${ratsonId}` }
           },
           params,
@@ -474,7 +475,8 @@ export const acceptRatsonProposalConfig: ActionConfig = {
         ar: 'اختارت عميلة منتجك عبر الكونسيرج. افتح Deals للموافقة على الطلب.'
       }
     },
-    channels: ['socket', 'email', 'telegram', 'push'],
+    // The provider's approval is awaited.
+    intent: 'consent',
     emailTemplate: 'SimpleNuti',
     metadata: {
       priority: 'high',

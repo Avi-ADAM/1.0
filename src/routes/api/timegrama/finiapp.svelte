@@ -3,9 +3,10 @@
 
   import { SendToAdmin } from '$lib/server/sendToAdmin.js';
   // Server-only secret — this module is imported only by timegrama/+server.js.
-  import { ADMINMONTHER } from '$env/static/private';
+  import { env } from '$env/dynamic/private';
   import { pickRateRow, resolveRate, rowRate } from '$lib/timers/rate.js';
   import { standingVotes } from '$lib/finiapruval/rounds.js';
+  import { isHoursApproval } from '$lib/finiapruval/kind.js';
 
   // Free-text the user typed (`why`, `missname`) goes into an inline mutation
   // string, so it has to be escaped. An unescaped quote or newline breaks the
@@ -20,7 +21,7 @@
     try {
       await SendToAdmin(
         `mutation { updateTimegrama(id: ${taid}, data: { done: true }) { data { id } } }`,
-        ADMINMONTHER
+        env.ADMINMONTHER
       );
       console.log(`[timegrama/finiapp] closed #${taid} — ${why}`);
     } catch (e) {
@@ -51,7 +52,7 @@
     }}}}`;
 
     try {
-      const res = await SendToAdmin(qu, ADMINMONTHER);
+      const res = await SendToAdmin(qu, env.ADMINMONTHER);
       if (!res?.data?.finiapruval?.data) return markDone(taid, `finiapruval ${id} not found`);
 
       const fini = res.data.finiapruval.data;
@@ -73,7 +74,10 @@
         return markDone(taid, `finiapruval ${id} has a negative vote`);
       }
 
-      const isTimerSave = fa.isTimerSave === true;
+      // Hours (a timer save, a month) bank and leave the mission running; only a
+      // finish approval closes it. An hours approval from before `isTimerSave`
+      // existed is still hours ($lib/finiapruval/kind.ts).
+      const isTimerSave = isHoursApproval(fa);
       const mba = fa.mesimabetahalich.data;
       const mbaa = mba.attributes;
       const noofhours = fa.noofhours ?? 0;
@@ -132,7 +136,10 @@
         }
       } else {
         // Mission completion: create the final FinnishedMission + mark the
-        // mission done. Only the hours this completion adds — the accumulated
+        // mission done — `finnished: true` is what takes it off every board.
+        // The maturation before 140.2 (2026-05-07) created the row and archived
+        // the approval but never set it, so those missions stayed "in progress"
+        // with their finish already approved. Only the hours this completion adds — the accumulated
         // rows from the timer saves are still on the books and still counted,
         // so writing the running total here counted the whole history twice in
         // every percentage the rikma has (docs/inprogress/FIXES.md §5). Same rule as
@@ -152,7 +159,7 @@
             finiapruvals: "${id}",
             publishedAt: "${d.toISOString()}"
           }) { data { id } }
-          updateMesimabetahalich(id: "${mba.id}", data: { finnished: true }) { data { id } }
+          updateMesimabetahalich(id: "${mba.id}", data: { finnished: true, forappruval: false }) { data { id } }
         `;
       }
 
@@ -162,7 +169,7 @@
         updateTimegrama(id: ${taid}, data: { done: true }) { data { id } }
       }`;
 
-      const res2 = await SendToAdmin(closeMutation, ADMINMONTHER);
+      const res2 = await SendToAdmin(closeMutation, env.ADMINMONTHER);
       console.log('finiapp close result', res2);
       if (res2?.data) return 'sucsses' + id;
 

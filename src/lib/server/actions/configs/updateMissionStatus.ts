@@ -10,6 +10,7 @@
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { touchDormancy } from '$lib/server/archive/dormancyClock.js';
 import { execFromContext } from '$lib/server/archive/exec.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 const updateMissionStatusHandler: ActionExecutionHandler = async (params, context, { strapi }) => {
   const { mId, projectId, status } = params;
@@ -62,8 +63,15 @@ export const updateMissionStatusConfig: ActionConfig = {
       title: { he: 'עדכון התקדמות משימה', en: 'Mission progress updated' },
       body: { he: 'אחוז התקדמות המשימה עודכן', en: 'Mission progress percentage was updated' },
     },
-    channels: ['socket'],
+    // Activity in a rikma they belong to — the screens follow through `realtime`.
+    intent: 'ambient',
     metadata: { type: 'missionStatus', url: 'lev' },
+  },
+
+  // The first action on realtime scopes (docs/inprogress/PLAN_REALTIME_MIGRATION.md):
+  // the heart page re-reads its mission slices, the rikma tabs their `missions`.
+  realtime: {
+    scopes: (params) => scopeList([scope('project', params.projectId), scope('mission', params.mId)]),
   },
 
   updateStrategy: { type: 'none' },

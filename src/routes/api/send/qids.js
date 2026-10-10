@@ -6800,7 +6800,11 @@ ${STIPEND_DECISION_FIELDS}
           # timer saves file their own rows / approvals, so completion must
           # carry only what is left.
           finnished_missions { data { id attributes { noofhours } } }
-          finiapruvals { data { id attributes { noofhours archived } } }
+          # isTimerSave/iskvua/month/timer tell an hours approval from a finish
+          # one ($lib/finiapruval/kind.ts): a second finish on top of an open
+          # one, or on a finished mission, is refused.
+          finiapruvals { data { id attributes { noofhours archived isTimerSave iskvua month timer { data { id } } } } }
+          finnished
         }
       }
     }
@@ -9508,6 +9512,38 @@ ${STIPEND_DECISION_FIELDS}
     usersPermissionsUser(id: $id) { data { id attributes { email } } }
   }`,
 
+  // A wish deal's payment as the rikma carries it on ($lib/sheirut/splitCarriage): the
+  // payment Sales (who holds each, whether a split took it) and the split transfers of every
+  // split that took one — the way a provider's part reaches them when one receiver got it all.
+  '437dealSplitCarriage': `query DealSplitCarriage($id: ID!) {
+    sheirut(id: $id) { data { id attributes {
+      sales(pagination: { limit: -1 }) { data { id attributes {
+        in externalId splited
+        users_permissions_user { data { id } }
+        tosplits(pagination: { limit: -1 }) { data { id attributes {
+          project { data { id } }
+          halukas(pagination: { limit: -1 }) { data { id attributes {
+            amount confirmed senderconf
+            usersend { data { id attributes { username } } }
+            userrecive { data { id attributes { username } } }
+            forum { data { id } }
+          } } }
+        } } }
+      } } }
+    } } }
+  }`,
+  // Part of a deal payment that a provider already holds (they confirmed receiving it before
+  // any split took the payment): the receiver's Sale shrinks by it — a new Sale holds it.
+  '438reduceDealPaymentSale': `mutation ReduceDealPaymentSale($id: ID!, $in: Float!) {
+    updateSale(id: $id, data: { in: $in }) { data { id attributes { in } } }
+  }`,
+  // Which deals a split carries: its sales' deals (a payment Sale names its sheirut).
+  '439tosplitDeals': `query TosplitDeals($id: ID!) {
+    tosplit(id: $id) { data { id attributes {
+      sales(pagination: { limit: -1 }) { data { id attributes { externalId sheiruts { data { id } } } } }
+    } } }
+  }`,
+
   '428dealChainFromSheirut': `query DealChainFromSheirut($id: ID!) {
     sheirut(id: $id) { data { id attributes {
       moneyTransfered
@@ -10155,7 +10191,7 @@ export const moachQids = {
                 monter { monthStart hours isDone hoursDone }
                 forums { data { id } }
                 open_missions { data { id attributes { isshift } } }
-                finiapruvals { data { id attributes { missname archived } } }
+                finiapruvals { data { id attributes { missname archived isTimerSave iskvua month timer { data { id } } } } }
                 tafkidims { data { id attributes { roleDescription localizations { data { attributes { roleDescription } } } } } }
                 acts { data { id attributes {
                   shem dateS hashivut naasa des dateF myIshur valiIshur status
@@ -10396,6 +10432,10 @@ export const moachQids = {
           decisions(filters: { archived: { eq: false } }) {
             data { id attributes { kind newname decisionName vots { what users_permissions_user { data { id } } } } }
           }
+          # Finish approvals (and hours approvals, isTimerSave): every member signs.
+          finiapruvals(filters: { archived: { eq: false } }) {
+            data { id attributes { missname noofhours isTimerSave iskvua month timer { data { id } } vots { what order users_permissions_user { data { id } } } users_permissions_user { data { id attributes { username } } } } }
+          }
           open_missions(filters: { and: [ { archived: { eq: false } }, ${NOT_ARCHIVED} ] }) {
             data {
               id
@@ -10435,6 +10475,7 @@ export const moachQids = {
           tosplits(filters: { finished: { eq: false } }) { data { id } }
           decisions(filters: { archived: { eq: false } }) { data { id } }
           askms(filters: { archived: { eq: false } }) { data { id } }
+          finiapruvals(filters: { archived: { eq: false } }) { data { id } }
           open_missions(filters: { and: [ { archived: { eq: false } }, ${NOT_ARCHIVED} ] }) {
             data { id attributes { asks(filters: { archived: { eq: false } }) { data { id } } } }
           }
@@ -10642,6 +10683,33 @@ export const moachQids = {
     }
   }`,
 
+  // Finish approval (finiapruval) vote page — one mission's "I finished" claim.
+  // Field selection mirrors the lev `finiapruvals` block so extractFiapp /
+  // processFiapp consume it unchanged; project{id} is for the cross-project
+  // guard, `archived` lets the page show a closed vote as closed.
+  'getFiniapruvalForVote': `query GetFiniapruvalForVote($eid: ID!) {
+    finiapruval(id: $eid) {
+      data {
+        id
+        attributes {
+          archived
+          project { data { id } }
+          timegrama { data { id attributes { date } } }
+          missname
+          noofhours
+          why
+          what { data { id attributes { url name mime formats } } }
+          timer { data { id attributes { saveLinks saveText } } }
+          mesimabetahalich {
+            data { id attributes { perhour hearotMeyuchadot descrip mission { data { id } } } }
+          }
+          vots { what why order id users_permissions_user { data { id } } }
+          users_permissions_user { data { id } }
+        }
+      }
+    }
+  }`,
+
   // The mission's own page (moach/[projectId]/progress/[missionId]) — the same
   // picture the progress board row carries, plus the parts the board leaves
   // out: the notes, the roles, the links, the dates and the monthly ledger.
@@ -10665,7 +10733,7 @@ export const moachQids = {
           acts { data { id attributes { shem des naasa status myIshur valiIshur dateS dateF
             my { data { id attributes { username profilePic { data { attributes { url } } } } } }
           } } }
-          finiapruvals { data { id attributes { missname archived } } }
+          finiapruvals { data { id attributes { missname archived isTimerSave iskvua month timer { data { id } } } } }
         }
       }
     }

@@ -151,7 +151,7 @@ export const counterOnAskmConfig: ActionConfig = {
       title: { he: 'הצעת ביניים למשאב', en: 'Intermediate proposal for a resource' },
       body: { he: 'הוגשה הצעת ביניים על משאב ברקמה', en: 'An intermediate proposal was submitted for a resource' },
     },
-    channels: ['socket'],
+    intent: 'consent',
     metadata: { type: 'base', url: 'lev' },
   },
 

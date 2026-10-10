@@ -4,7 +4,7 @@ import { error, redirect } from '@sveltejs/kit';
 import { actionViaProxy } from '$lib/server/actionViaProxy.js';
 import { enrichWish, placeKey, EMPTY_ENRICHMENT, type WishEnrichment } from '$lib/server/ai/enrichWish';
 import { extractWish, type WishExtraction } from '$lib/server/ai/extractWish';
-import { GEMINI_API_KEY } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 import { loadBell } from '$lib/server/concierge/bell';
 import { loadWishNotices } from '$lib/server/concierge/notices';
 import { negotiationView } from '$lib/server/wish/negotiationView';
@@ -284,7 +284,7 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
     const wishText = String(wish.longDes || wish.desc || '').trim();
     if (wishText.length >= 20) {
       try {
-        const extraction = await extractWish(wishText, GEMINI_API_KEY);
+        const extraction = await extractWish(wishText, env.GEMINI_API_KEY);
         if (extraction.missions.length > 0 || extraction.resources.length > 0) {
           // Reflect immediately in the shapes the page renders this load.
           wish.extractedMissions = extraction.missions.map((m) => ({

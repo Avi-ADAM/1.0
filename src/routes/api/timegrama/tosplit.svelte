@@ -34,14 +34,14 @@
   import { applyTosplitApproval, hervachDeltasFrom } from '$lib/server/haluka/applyTosplitApproval';
   import { SendToAdmin } from '$lib/server/sendToAdmin.js';
   // Server-only secret — this module is imported only by timegrama/+server.js.
-  import { ADMINMONTHER } from '$env/static/private';
+  import { env } from '$env/dynamic/private';
 
   /** Close the clock. Every path that decides not to act ends here. */
   async function markDone(taid, why) {
     try {
       await SendToAdmin(
         `mutation { updateTimegrama(id: ${taid}, data: { done: true }) { data { id } } }`,
-        ADMINMONTHER
+        env.ADMINMONTHER
       );
       console.log(`[timegrama/tosplit] closed #${taid} — ${why}`);
     } catch (e) {

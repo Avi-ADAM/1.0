@@ -144,8 +144,9 @@ const handler: ActionExecutionHandler = async (params, context, { notifier, stra
 
   if (deal && needsCustomer) await notifyDealClientsOfEdit(notifier, context, deal, round);
 
-  if (notifier && target.projectId) {
-    const lang = (context.lang === 'he' ? 'he' : 'en') as 'he' | 'en';
+  // Only the customer may be left to sign — an empty list would fall back to
+  // the whole rikma (N4).
+  if (notifier && target.projectId && otherMembers.length) {
     notifier
       .notify(
         {
@@ -157,11 +158,16 @@ const handler: ActionExecutionHandler = async (params, context, { notifier, stra
             },
             body: {
               he: `${why || 'ללא נימוק'} - האובייקט נשאר, רק הפרטים משתנים. אפשר לאשר, להציע נוסחה אחרת או לפתוח שיחה.`,
-              en: `${why || 'No reason given'} - the object stays, only its terms change. Approve, propose different terms, or open a discussion. No response within ${restimeLabel(target.projectRestime, lang)} approves it.`,
+              en: `${why || 'No reason given'} - the object stays, only its terms change. Approve, propose different terms, or open a discussion. No response within ${restimeLabel(target.projectRestime, 'en')} approves it.`,
             },
           },
-          channels: ['socket', 'push'],
-          metadata: { type: 'voteUpdate', url: 'lev', priority: 'high' },
+          // Silence approves it — every member has to hear that the clock is running.
+          intent: 'consent',
+          metadata: {
+            type: 'voteUpdate',
+            url: `/moach/${target.projectId}/votes/decision/${opened.decisionId}`,
+            priority: 'high',
+          },
         },
         { recipients: otherMembers, projectId: target.projectId },
         { projectId: target.projectId, decisionId: opened.decisionId },

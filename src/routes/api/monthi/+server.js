@@ -6,7 +6,7 @@ import { objToString } from '$lib/func/objToString.svelte';
 import { SendToAdmin } from '$lib/server/sendToAdmin.js';
 import { sendToSer } from '$lib/send/sendToSer.js';
 // Server-only secret — never exposed to the client bundle (no VITE_ prefix).
-import { ADMINMONTHER } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 import { cycleWindow } from '$lib/recurring/recurringPlan.js';
 import { monthKeyOf, normalizeRows, reconcileMonter } from '$lib/recurring/missionMonths.js';
 
@@ -68,7 +68,7 @@ async function writeAdmin(mutation, label, dry) {
       }
     };
   }
-  return SendToAdmin(mutation, ADMINMONTHER);
+  return SendToAdmin(mutation, env.ADMINMONTHER);
 }
 
 // Render the activation email and post it to the existing sendMail endpoint.
@@ -136,7 +136,7 @@ export async function GET({ fetch, url, request }) {
   // always asked for this key; monthi never did. Send it as `x-monthi-key`
   // where possible; `?key=` is the fallback for a plain scheduler.
   const key = request?.headers?.get('x-monthi-key') ?? url?.searchParams?.get('key') ?? '';
-  if (!secretMatches(key, ADMINMONTHER)) {
+  if (!secretMatches(key, env.ADMINMONTHER)) {
     return new Response(JSON.stringify({ error: 'Unauthorized' }), {
       status: 401,
       headers: { 'Content-Type': 'application/json' }
@@ -161,7 +161,7 @@ export async function GET({ fetch, url, request }) {
   }`;
 
   try {
-    const res = await SendToAdmin(que, ADMINMONTHER);
+    const res = await SendToAdmin(que, env.ADMINMONTHER);
     if (!res?.data) return new Response(JSON.stringify(suc));
 
     for (const element of res.data.mesimabetahaliches.data) {
@@ -183,7 +183,7 @@ export async function GET({ fetch, url, request }) {
       }`;
 
       try {
-        const resi = await SendToAdmin(que2, ADMINMONTHER);
+        const resi = await SendToAdmin(que2, env.ADMINMONTHER);
         if (!resi?.data?.mesimabetahalich?.data) continue;
 
         const at = resi.data.mesimabetahalich.data.attributes;
@@ -372,7 +372,7 @@ async function runRecurringResources(fetchFn, dry) {
 
   let list;
   try {
-    list = await SendToAdmin(listQue, ADMINMONTHER);
+    list = await SendToAdmin(listQue, env.ADMINMONTHER);
   } catch (e) {
     console.error('monthi: failed to list recurring resources', e);
     return opened;

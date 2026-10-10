@@ -138,7 +138,8 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
               ar: `المقترح: ${what} (ساعات / سعر). ${text} — يمكنكم الموافقة أو اقتراح شروط أخرى أو النقاش.`
             }
           },
-          channels: toParty === 'wisher' ? ['socket', 'email', 'push'] : ['socket', 'push'],
+          // The other side's clock starts now — on both sides alike.
+          intent: 'consent',
           metadata: {
             type: 'ratsonProposal',
             priority: 'high',

@@ -78,6 +78,11 @@ import from `levStores`.
   `votePriority(already, votesCast)`), `coinlapach` (unique, e.g. `` `wishInvite-${item.id}` ``),
   and `projectId`. Spread `...projectInfo` from `createProjectInfo(projectId)` for
   name/pic, and `...item` last for passthrough.
+- Set `when: itemWhen(item.createdAt)` (after the passthrough spread) — the
+  moment it reached the user, shown in the card header, the list row and the
+  coin. Then add the `ani` to `WHEN_KINDS` in `cardKinds.js` and a
+  `lev.when.<ani>` sentence in all five `lev.json` files; the verb agrees with
+  the card's noun (משימה פורסמה / משאב פורסם). Never fall back to `new Date()`.
 - Add `processX` to the `mergeAndSort` call (see step 8).
 
 ### 6. Derived store — `src/lib/stores/levDerived.ts`

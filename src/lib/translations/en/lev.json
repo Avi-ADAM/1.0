@@ -940,5 +940,21 @@
       "plate": "Readable face",
       "classic": "Classic face"
     }
+  },
+  "when": {
+    "at": {
+      "weekday": "on {{time}}",
+      "date": "on {{time}}"
+    },
+    "askedcoin": "Sent {{time}}",
+    "askedm": "Sent {{time}}",
+    "pends": "Proposed {{time}}",
+    "pmashes": "Proposed {{time}}",
+    "wegets": "Sent {{time}}",
+    "hachla": "Opened {{time}}",
+    "archObject": "Proposed {{time}}",
+    "stipend": "Opened {{time}}",
+    "sheirutp": "Sent {{time}}",
+    "wishoffer": "Submitted {{time}}"
   }
 }

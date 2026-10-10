@@ -5,6 +5,10 @@
 	// task in the platform's own rikma, with a person's consent attached — not a
 	// message in a void.
 	//
+	// `description` and `username` arrive empty for a guest: a guest's address
+	// is whatever they typed, so nothing they wrote may ride along to it
+	// ($lib/server/reportConfirmation.ts). Keep the template readable without them.
+	//
 	// The multi-locale objects here are the allowed kind: they are indexed by the
 	// RECIPIENT's language, which $t() cannot express from the server. They are
 	// kept free of prop interpolation so the tables stay static and the copy that

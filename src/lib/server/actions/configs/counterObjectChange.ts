@@ -97,8 +97,13 @@ const handler: ActionExecutionHandler = async (params, context, { notifier, stra
                     en: 'A member refined the removal terms. The clock reset - approve, refine again, or open a discussion.',
                   },
           },
-          channels: ['socket', 'push'],
-          metadata: { type: 'voteUpdate', url: 'lev', priority: 'high' },
+          // A counter opens a new round and resets the clock for every member.
+          intent: 'consent',
+          metadata: {
+            type: 'voteUpdate',
+            url: `/moach/${params.projectId}/votes/decision/${decisionId}`,
+            priority: 'high',
+          },
         },
         { projectId: params.projectId },
         { projectId: params.projectId, decisionId },

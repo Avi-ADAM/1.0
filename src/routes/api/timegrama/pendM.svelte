@@ -1,7 +1,7 @@
 <script module>
      import { SendToAdmin } from '$lib/server/sendToAdmin.js';
      // Server-only secret — this module is imported only by timegrama/+server.js.
-     import { ADMINMONTHER } from '$env/static/private';
+     import { env } from '$env/dynamic/private';
      import { strapiClient } from '$lib/server/actions/index.js';
      import { matchOpenMashaabimToUsers } from '$lib/server/matching/engine';
 
@@ -10,7 +10,7 @@ async function markDone(taid, why) {
   try {
     await SendToAdmin(
       `mutation { updateTimegrama(id: ${taid}, data: { done: true }) { data { id } } }`,
-      ADMINMONTHER
+      env.ADMINMONTHER
     );
     console.log(`[timegrama/pendM] closed #${taid} — ${why}`);
   } catch (e) {
@@ -30,7 +30,7 @@ export async function PendM(id,taid,fetchFn){
 }}} 
  }`;
     try {
-      let res = await SendToAdmin(qu, ADMINMONTHER).then((res) => (res = res));
+      let res = await SendToAdmin(qu, env.ADMINMONTHER).then((res) => (res = res));
       console.log(res);
       if (res.data == null) return markDone(taid, `pmash ${id}: empty response`);
       {
@@ -51,7 +51,7 @@ export async function PendM(id,taid,fetchFn){
   }}}
                 }`
  try {
-      let res2 = await SendToAdmin(qua, ADMINMONTHER).then((res2) => (res2 = res2));
+      let res2 = await SendToAdmin(qua, env.ADMINMONTHER).then((res2) => (res2 = res2));
       console.log(res2);
       if (res2.data != null) {
         console.log(res2.data,"res2 data")
@@ -90,7 +90,7 @@ export async function PendM(id,taid,fetchFn){
  } `   
  console.log(qub)
      try {
-      let res3 = await SendToAdmin(qub, ADMINMONTHER).then((res3) => (res3 = res3));
+      let res3 = await SendToAdmin(qub, env.ADMINMONTHER).then((res3) => (res3 = res3));
       console.log(res3,"res3",id,taid)      
       if (res3.data != null) {
               console.log(res3.data,"res3 data")
@@ -117,7 +117,7 @@ export async function PendM(id,taid,fetchFn){
             }
               `
                try {
-      let res4 = await SendToAdmin(que4, ADMINMONTHER).then((res4) => (res4 = res4));
+      let res4 = await SendToAdmin(que4, env.ADMINMONTHER).then((res4) => (res4 = res4));
             if (res4.data != null) {
               console.log("succses",id," ",res4.data )
               return "sucsses" + id

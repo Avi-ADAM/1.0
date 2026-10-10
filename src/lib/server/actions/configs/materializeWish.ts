@@ -318,11 +318,12 @@ export const materializeWishConfig: ActionConfig = {
       },
       body: {
         he: 'נוצרה רקמת שותפים והדיל נפתח - אפשר להתחיל לעבוד.',
-        en: 'A partner weave was created and the deal opened - you can start working.',
-        ar: 'تم إنشاء نسيج شركاء وفُتحت الصفقة - يمكنكم البدء.'
+        en: 'A partner rikma was created and the deal opened - you can start working.',
+        ar: 'تم إنشاء ريكما شركاء وفُتحت الصفقة - يمكنكم البدء.'
       }
     },
-    channels: ['socket', 'push'],
+    // Each provider is now a partner of the new rikma — about them, nothing awaited.
+    intent: 'personal',
     metadata: { priority: 'high', type: 'sheirutCreated', url: '/deals' }
   },
   updateStrategy: { type: 'none' }

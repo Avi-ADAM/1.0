@@ -13,7 +13,7 @@
    */
   import { SendToAdmin } from '$lib/server/sendToAdmin.js';
   // Server-only secret — this module is imported only by timegrama/+server.js.
-  import { ADMINMONTHER } from '$env/static/private';
+  import { env } from '$env/dynamic/private';
 
   /**
    * Tell both sides that the clock did it.
@@ -42,7 +42,7 @@
       try {
         await SendToAdmin(
           `mutation { updateTimegrama(id: ${taid}, data: { done: true }) { data { id } } }`,
-          ADMINMONTHER
+          env.ADMINMONTHER
         );
       } catch (e) {
         console.error('[timegrama/stipendPayment] markDone failed:', e);
@@ -58,7 +58,7 @@
           recipient { data { id } }
           project { data { id attributes { projectName } } }
         } } } }`,
-        ADMINMONTHER
+        env.ADMINMONTHER
       );
       const payment = res?.data?.stipendPayment?.data;
       if (!payment) {
@@ -74,14 +74,14 @@
         `mutation { updateStipendPayment(id: ${id}, data: {
           status: confirmed, confirmedBy: silence, confirmedAt: "${now}"
         }) { data { id } } }`,
-        ADMINMONTHER
+        env.ADMINMONTHER
       );
 
       const halukaId = a.haluka?.data?.id;
       if (halukaId) {
         await SendToAdmin(
           `mutation { updateHaluka(id: ${halukaId}, data: { confirmed: true }) { data { id } } }`,
-          ADMINMONTHER
+          env.ADMINMONTHER
         ).catch((e) =>
           console.warn('[timegrama/stipendPayment] haluka confirmation failed (non-fatal):', e)
         );

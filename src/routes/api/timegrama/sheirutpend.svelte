@@ -29,14 +29,14 @@
   import { silenceOutcome } from '$lib/sheirut/quoteState';
   import { settleQuote } from '$lib/server/actions/configs/sheirutQuote';
   // Server-only secret — this module is imported only by timegrama/+server.js.
-  import { ADMINMONTHER } from '$env/static/private';
+  import { env } from '$env/dynamic/private';
 
   /** Close the clock. Every path that decides not to act ends here. */
   async function markDone(taid, why) {
     try {
       await SendToAdmin(
         `mutation { updateTimegrama(id: ${taid}, data: { done: true }) { data { id } } }`,
-        ADMINMONTHER
+        env.ADMINMONTHER
       );
       console.log(`[timegrama/sheirutpend] closed #${taid} — ${why}`);
     } catch (e) {

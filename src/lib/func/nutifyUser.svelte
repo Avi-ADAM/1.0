@@ -5,6 +5,8 @@
    * @param {object} title  {"he","ר","en":"r"}
    * @param {object} body  {"he","ר","en":"r"}
    * @param {string} mainlang  "he" "en"
+   * @param {typeof fetch} fetch  the SvelteKit *server* fetch — /api/nutiUser
+   *   answers only to this server ($lib/server/internalOnly.js)
    */
   export async function nutifyUser(
     id = 0,

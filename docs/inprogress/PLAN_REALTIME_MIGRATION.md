@@ -1,7 +1,7 @@
 # תכנית — מיגרציית Real-Time: כל שינוי מגיע לכל מסך שמציג אותו
 
-> **מצב:** תכנון (2026-10-08). קובץ המעקב: [`REALTIME_TRACKING.md`](./REALTIME_TRACKING.md).
-> **קשור:** [`SPEC_SOCKET_REALTIME.md`](./SPEC_SOCKET_REALTIME.md) (presence / typing / עריכה
+> **מצב:** בביצוע — R0, R1, R2 ו-N0–N1 בנויים (2026-10-08); R3 (דפים) הבא, ואיתו ה-actions הראשונים ב-R4. קובץ המעקב: [`REALTIME_TRACKING.md`](./REALTIME_TRACKING.md).
+> **קשור:** [`SPEC_SOCKET_REALTIME.md`](../tbd/SPEC_SOCKET_REALTIME.md) (presence / typing / עריכה
 > במקביל — **מחוץ** לתכנית הזאת, ראו R6), [`../inprogress/MIGRATION_TRACKING.md`](../inprogress/MIGRATION_TRACKING.md)
 > (כתיבות שעדיין עוקפות את ה-Action System — הן בלתי נראות לסוקט בכלל),
 > [`../inprogress/PLAN_TIMEGRAMA.md`](../inprogress/PLAN_TIMEGRAMA.md) (הבשלה בשתיקה רצה מחוץ ל-Action System),
@@ -172,6 +172,11 @@ realtime?: {
 - **socket-server:** `/broadcast` מקבל `event` אופציונלי (ברירת מחדל `notification`) ושולח
   `rt:changed`. תואם אחורה; **לפרוס את socket-server לפני האפליקציה.**
 - `actionClient` שולח header `x-client-id: CLIENT_ID`; `/api/action` מכניס אותו ל-`ActionContext`.
+- **נבנה (R1, 2026-10-08):** `src/lib/realtime/scopes.ts` (אוצר, `scope()` / `decisionScope()` / `scopeList()`,
+  `scopeMatches` עם `*`, `rtKey`, `RT_EVENT`), `src/lib/server/realtime/broadcaster.ts` (קהל: `project` / `parties` /
+  `self`, היוזם תמיד בפנים), `ActionService` שלב 5a, `NotificationOrchestrator.projectMemberIds` (אותו מטמון),
+  `socket-server/src/broadcast-event.ts` (רשימה סגורה: `notification` / `rt:changed`). כתיבות ישירות ל-`/api/action`
+  שלא דרך `actionClient` לא שולחות `x-client-id` — הטאב שלהן יקבל את ה-echo של עצמו (רענון מיותר אחד, לא באג).
 - `updateStrategy` נשאר **לטאב שהפעיל את ה-action בלבד** (התשובה של `/api/action`). הוא לא
   משודר יותר לאחרים — את זה עושים ה-scopes.
 
@@ -193,6 +198,18 @@ realtime?: {
 
 4. **resync:** ב-`onReady` אחרי ניתוק — `invalidate` לכל ה-scopes שמישהו רשום אליהם, פעם אחת (B7).
 
+**נבנה (R2, 2026-10-08):** `src/lib/realtime/bus.ts` (factory בלי SvelteKit — נבדק עם socket מדומה) +
+`bus.svelte.ts` (`realtimeBus`, `useRealtime`). הטבלה בין scope למסך היא `routing.ts`, במקום אחד:
+`rtDependencyMatches` (kit), `levSlicesForScopes` (הלב), `moachSectionsForChange` (moach). שתי החלטות:
+- **שינויים לא מתמזגים** לפני שהם מגיעים ל-subscriber. batch יכול להחזיק שינויים של שתי רקמות, ו-`mission:7` שייך
+  לרקמה שלו — moach קורא כל שינוי לבד מול ה-`project:<pid>` שלו.
+- **resync רק אחרי חיבור חוזר**, לא בחיבור הראשון (`onReady` נקרא גם אז). הלב עושה טעינה מלאה אחת, moach קורא את
+  שלושת ה-sections, וכל `depends('rt:…')` רץ שוב.
+
+ה-slices של הלב בלי qid (`pmashes`, `asked`, `welcome`, `transfers`) נופלים לטעינה מלאה — כמו `refetchScope` היום.
+מה שהלב לא מציג (`project` לבד, `wish`, `forum`, `meeting`, `user`, …) לא מזיז אותו בכלל. `npm run check:realtime`
+נבנה כבדיקה (`depends.contract.test.ts`) ולא כסקריפט — הוא צריך את `isScopePattern` מה-TS.
+
 ### 3.5 אכיפה — ratchet, כמו ה-ownership guard של `/api/send`
 
 `src/lib/server/actions/realtime.contract.test.ts`:
@@ -204,7 +221,12 @@ realtime?: {
 - action חדש בלי `realtime` ⇒ CI אדום. כך המצב לא מתדרדר בזמן שהמיגרציה רצה.
 - ה-scopes שחוזרים חייבים להתאים לאוצר (`isKnownScope`).
 
-`npm run check:realtime` (סקריפט קטן): כל `depends('rt:…')` משתמש ב-entity מהאוצר, וכל scope
+**נבנה (R1, 2026-10-08):** `realtime.contract.test.ts` עם `LEGACY_NO_REALTIME` (209) ו-`READ_ONLY` (31 —
+`get*` / `load*` / `ensure*` / `check*` / `preview*`). action קריאה-בלבד חדש נכנס ל-`READ_ONLY` במפורש; זו טענה
+שנבדקת בקוד-ריוויו, לא ניחוש לפי שם. ה-scopes עצמם נבדקים בזמן ריצה — ה-broadcaster משמיט scope שאינו
+באוצר ומזהיר (`isKnownScope`), כי אין דרך כללית לקרוא ל-`scopes()` בלי params אמיתיים.
+
+`npm run check:realtime` (סקריפט קטן, R2): כל `depends('rt:…')` משתמש ב-entity מהאוצר, וכל scope
 באוצר נצרך לפחות במקום אחד (אחרת אף מסך לא מקשיב לו).
 
 ---
@@ -270,16 +292,30 @@ config מצהיר **מה ההתראה מבקשת מהקורא**, והערוצי�
 | intent | מה מבקשים מהקורא | ערוצים | דוגמאות |
 |---|---|---|---|
 | `consent` | מחכים לתשובה שלו — לחתום, לאשר, להציע נגד, לקבל בקשה. כמעט תמיד רץ נגדו שעון שתיקה | socket push telegram email | הצבעה חדשה, הצעה נגדית, תביעת מכירה, שעות לאישור, בקשה לספק |
-| `personal` | עליו או אליו, ושום דבר לא מחכה (אושר, שולם, הודעה בצ'אט, מטלה שהוטלה עליו) | socket push telegram | `approveSheirutpend`, `createChatMessage`, `createTask` |
-| `outcome` | תוצאה ברמת הרקמה שמשנה אחוזים / כסף / חברות | socket push | הבשלת הצבעה, חבר הצטרף, חלוקה אושרה |
+| `personal` | עליו או אליו, ושום דבר לא מחכה (אושר, שולם, הודעה בצ'אט, מטלה שהוטלה עליו) | socket push telegram (+מייל למי שאין לו אף אחד מהם) | `approveSheirutpend`, `createChatMessage`, `createTask` |
+| `outcome` | תוצאה ברמת הרקמה שמשנה אחוזים / כסף / חברות | socket push (+מייל למי שאין לו פוש) | הבשלת הצבעה, חבר הצטרף, חלוקה אושרה |
 | `ambient` | פעילות ברקמה שהוא חבר בה | socket | טיימר, עדכון סטטוס, תגובה בדיון |
 
 **למה ככה:** שתיקה היא הסכמה — אז מה שמחכה לתשובה חייב להגיע לכל ערוץ שהאדם הגדיר, אחרת
 השתיקה שלו היא אי-ידיעה. כל ערוץ מסנן לבד (אין `telegramId` / אין מכשיר / `noMail` ⇒ מדלגים),
-אז "ארבעה ערוצים" = "כל מה שהוא הגדיר". מייל הוא הערוץ היחיד שיש לכולם, ולכן הוא שמור ל-`consent`.
+אז "ארבעה ערוצים" = "כל מה שהוא הגדיר". מייל הוא הערוץ היחיד שיש לכולם: `consent` שולח מייל
+לכולם, ו-`personal` / `outcome` שולחים מייל **למי שההתראה לא מגיעה אליו בערוץ אחר** (`emailRecipients`,
+הוכרע 2026-10-08) — כך אף אחד לא נשאר בלי לשמוע, ומי שיש לו אפליקציה או בוט לא מקבל גם מייל. זה חל
+גם על רשימות legacy (push/telegram בלי email). רק `ambient` לא יוצא מהאתר.
+
+**בקשת הצטרפות היא `consent` תמיד** — רקמה יכולה לחכות חודשים למישהו שירצה להצטרף. כל משפחת ה-ask
+(`applyToMission`, `proposeOnOpen*`, `nominateSelf*`, `createMashaabimRequest`, `requestSheirutJoin`, ההצעות הנגדיות
+משני הצדדים, וחתימת הלקוחה ב-`deal/offerDeal`) כבר עברה; ההכרעה (`acceptCounterOnAsk*`, `finalize*Acceptance`) — `outcome`.
 
 `intent` יכול להיות פונקציה של הריצה — הצבעה רגילה `ambient`, הצבעה שהיא הצעה נגדית (מאפסת את
 השעון לאחרים) `consent`, הבשלה `outcome`.
+
+**`consent` יוצא כשסבב נפתח, לא על כל חתימה** (הוכרע 2026-10-08, `voteIntent` ב-`intent.ts`). הצעה או
+הצעה נגדית מתחילות או מאפסות את שעון השתיקה — אז הן מגיעות לכל ערוץ. חתימה של חבר נוסף על הגרסה
+שכבר על השולחן לא מאפסת כלום, וההודעה על פתיחת הסבב כבר הגיעה לכל ערוץ — אז היא נשארת באתר
+(`ambient`), גם כשהיא אומרת "נותרה תגובתך". אחרת ברקמה של עשרה מי שמגיע אחרון מקבל תשעה מיילים
+על אותו סבב. handler שמחזיר `data.opensRound: true` אומר שההצבעה הזאת פתחה סבב (כמו הדיווח הראשון של
+מחזור חודשי ב-`voteOnMaap`); `data.consensus` / `data.archived` ⇒ `outcome`.
 
 ### 6.3 מה כבר נבנה (N0, 2026-10-08)
 
@@ -292,13 +328,20 @@ config מצהיר **מה ההתראה מבקשת מהקורא**, והערוצי�
   `channels: [...]` ⇒ CI אדום; קובץ שעבר ל-`intent` ונשאר ברשימה ⇒ CI אדום.
 - `intent.test.ts` — הדרגות, intent כפונקציה, ה-orchestrator לא שולח ליוזם החוצה.
 
-**שום action עוד לא עבר** — ההתנהגות של כל config נשארה כפי שהייתה, חוץ מ-N1 ו-N2.
+אחר כך באותו יום: משפחת ה-ask עברה ל-`intent` (17 actions + שני helpers), נוסף מייל כגיבוי (N10), וה-registry
+מקבל config עם `intent` בלי `channels` (קודם הוא זרק "must have at least one channel" — config כזה לא היה נרשם
+בכלל). שאר ה-configs שולחים כמו קודם, ועוד מייל למי שאין לו פוש/טלגרם.
+
+אחריה משפחת ה-vote + archive (N1-vote): `addVote`, `voteOn*`, `submitNego*`, `proposeRikmaIdentity`,
+`dismissSelfNomination`, `proposeObjectArchive` / `proposeObjectEdit` / `counterObjectChange`. ה-deep-link של
+כולן הוא דף ההצבעה (`/moach/<pid>/votes/<kind>/<id>`, או `/moach/<pid>/votes` כשה-kind לא ידוע מראש).
+בדרך נמצא N11 — הלקוחה של בקשת שירות שאושרה פה אחד לא שמעה על זה כלום.
 
 ### 6.4 בכל קובץ שנפתח ב-R4 — צ'קליסט
 
 1. **intent:** להחליף `channels: [...]` ב-`intent` לפי §6.2. לאמת את ההצעה בעמודה "intent יעד" —
-   היא נגזרה מהמיפוי, לא מקריאת כל handler. ⚠ = יעלה ערוץ; ✂ = יוריד ערוץ — **לשאול לפני שמורידים**
-   (בעיקר מייל בצ'אט, ב-`createTask`, ב-`approveHaluka`, ב-`acceptSheirutQuote`).
+   היא נגזרה מהמיפוי, לא מקריאת כל handler. ⚠ = יעלה ערוץ; ✂ = מייל שהיום יוצא לכולם יצא רק למי שאין לו ערוץ אחר
+   (צ'אט, `createTask`, `approveHaluka`, `acceptSheirutQuote`) — זה הכלל שהוכרע, לא צריך לשאול שוב.
 2. **נמענים:** בדיוק מי שהתשובה שלו מחכה (ל-bilateral — שני הצדדים, לא כל הרקמה). `specificUsers`
    חייב `userIds` שבאמת נמצאים ב-params / result — אחרת הוא נופל לכל הרקמה בשקט (N4).
 3. **`metadata.url`:** deep-link לעמוד שבו עונים (פוש וטלגרם בלעדיו נוחתים ב-`/lev`). נתיב, לא URL מלא.

@@ -12,7 +12,7 @@ const notifyMock = vi.fn();
 const isMeetingsRequestMock = vi.fn();
 const verifyInviteTokenMock = vi.fn();
 
-vi.mock('$env/static/private', () => ({ ADMINMONTHER: 'test-admin-token' }));
+vi.mock('$env/dynamic/private', () => ({ env: { ADMINMONTHER: 'test-admin-token' } }));
 vi.mock('$lib/server/strapiUrl.js', () => ({
   STRAPI_URL: 'http://strapi.test',
   STRAPI_GRAPHQL: 'http://strapi.test/graphql'

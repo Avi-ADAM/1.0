@@ -941,5 +941,21 @@
       "plate": "Cara legible",
       "classic": "Cara clásica"
     }
+  },
+  "when": {
+    "at": {
+      "weekday": "el {{time}}",
+      "date": "el {{time}}"
+    },
+    "askedcoin": "Enviada {{time}}",
+    "askedm": "Enviada {{time}}",
+    "pends": "Propuesta {{time}}",
+    "pmashes": "Propuesto {{time}}",
+    "wegets": "Enviada {{time}}",
+    "hachla": "Abierta {{time}}",
+    "archObject": "Propuesta {{time}}",
+    "stipend": "Abierta {{time}}",
+    "sheirutp": "Enviada {{time}}",
+    "wishoffer": "Presentada {{time}}"
   }
 }

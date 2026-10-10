@@ -400,11 +400,11 @@ export const previewWishTool = createTool({
     if (!ctx?.userId) return { success: false, message: 'Not authenticated.' };
     try {
       // Imported lazily: this pulls in the model client and its env.
-      const [{ extractWish }, { GEMINI_API_KEY }] = await Promise.all([
+      const [{ extractWish }, { env }] = await Promise.all([
         import('../../lib/server/ai/extractWish'),
-        import('$env/static/private')
+        import('$env/dynamic/private')
       ]);
-      const extraction = await extractWish(wishText, GEMINI_API_KEY);
+      const extraction = await extractWish(wishText, env.GEMINI_API_KEY);
       return {
         success: true,
         note: 'Nothing was saved. Confirm the breakdown with the user, then call draftWish.',

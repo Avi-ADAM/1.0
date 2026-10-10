@@ -6,9 +6,12 @@ import { describe, it, expect, vi } from 'vitest';
 import { createHash } from 'node:crypto';
 
 vi.mock('$env/dynamic/private', () => ({
-  env: { CONSENSUS_PROXY_SECRET: 'consensus-secret-value', MEETINGS_PROXY_SECRET: 'meetings-secret-value' }
+  env: {
+    ADMINMONTHER: 'test-admin-token',
+    CONSENSUS_PROXY_SECRET: 'consensus-secret-value',
+    MEETINGS_PROXY_SECRET: 'meetings-secret-value'
+  }
 }));
-vi.mock('$env/static/private', () => ({ ADMINMONTHER: 'test-admin-token' }));
 
 import {
   resolveSessionPrincipal,

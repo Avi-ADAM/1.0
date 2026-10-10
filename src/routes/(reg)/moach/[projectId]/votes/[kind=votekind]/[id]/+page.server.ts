@@ -13,7 +13,8 @@ const QID: Record<string, string> = {
   ask: 'getAskForVote',
   askm: 'getAskmForVote',
   tosplit: 'getTosplitForVote',
-  decision: '159getDecisionForVote'
+  decision: '159getDecisionForVote',
+  fini: 'getFiniapruvalForVote'
 };
 const ROOT: Record<string, string> = {
   pmash: 'pmash',
@@ -21,13 +22,14 @@ const ROOT: Record<string, string> = {
   ask: 'ask',
   askm: 'askm',
   tosplit: 'tosplit',
-  decision: 'decision'
+  decision: 'decision',
+  fini: 'finiapruval'
 };
 
 export const load: PageServerLoad = async ({ params, fetch }) => {
   const { projectId, kind, id } = params as {
     projectId: string;
-    kind: 'pmash' | 'pendm' | 'ask' | 'askm' | 'tosplit' | 'decision';
+    kind: 'pmash' | 'pendm' | 'ask' | 'askm' | 'tosplit' | 'decision' | 'fini';
     id: string;
   };
 

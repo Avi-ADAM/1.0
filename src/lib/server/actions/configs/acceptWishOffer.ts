@@ -105,14 +105,20 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
       /* best-effort */
     }
   };
-  const tell = async (toIds: string[], title: any, body: any, url: string) => {
+  const tell = async (
+    toIds: string[],
+    title: any,
+    body: any,
+    url: string,
+    intent: 'consent' | 'personal' = 'personal'
+  ) => {
     if (!notifier || toIds.length === 0) return;
     try {
       await notifier.notify(
         {
           recipients: { type: 'specificUsers', config: { userIdsParam: 'recipientIds' } },
           templates: { title, body },
-          channels: ['socket', 'push'],
+          intent,
           metadata: { priority: 'high', type: 'ratsonProposal', url }
         },
         params,
@@ -166,7 +172,9 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
         en: 'You can close the placement.',
         ar: 'يمكنك إغلاق التعيين.'
       },
-      `/concierge/${ratsonId}`
+      `/concierge/${ratsonId}`,
+      // Her clock started — the placement waits on her.
+      'consent'
     );
     return {
       data: { success: true, ratsonId: String(ratsonId), proposalId: String(proposalId), finalized: false },

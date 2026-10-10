@@ -475,6 +475,7 @@ export const qidsAccess = {
   'getAskForVote': { allow: ['user', 'serviceAdmin'] },
   'getAskmForVote': { allow: ['user', 'serviceAdmin'] },
   'getTosplitForVote': { allow: ['user', 'serviceAdmin'] },
+  'getFiniapruvalForVote': { allow: ['user', 'serviceAdmin'] },
   'getMissionInProgress': { allow: ['user', 'serviceAdmin'] },
   'getVote': { allow: ['user', 'serviceAdmin'] },
   'getAct': { allow: ['user', 'serviceAdmin'] },
@@ -581,6 +582,10 @@ export const qidsAccess = {
   '434updateDirectOffer': { allow: ['serviceAdmin'] },
   '435myDirectOffers': { allow: ['serviceAdmin'] },
   '436accountEmail': { allow: ['serviceAdmin'] }, // an email, never to a browser
+  // A deal's payment as the rikma's split carries it ($lib/server/deal/splitCarriage).
+  '437dealSplitCarriage': { allow: ['user', 'serviceAdmin'] }, // read: the deal page checks the role, like 124
+  '438reduceDealPaymentSale': { allow: ['serviceAdmin'] }, // server-only: carving a part a provider already holds — never from a browser
+  '439tosplitDeals': { allow: ['serviceAdmin'] }, // server-only: confirmHaluka, which deals a split carries
   '397sheirutDealDue': { allow: ['user', 'serviceAdmin'] }, // read: what a wish deal's customer owes (C-14); the deal page checks the role, like 124
   '398missionDeals': { allow: ['serviceAdmin'] }, // server-only: which deal a mission is a part of (archive vote + silence clock)
   '399updateDealLineTerms': { allow: ['serviceAdmin'] }, // server-only: a part's ceiling follows terms the customer signed — never from a browser

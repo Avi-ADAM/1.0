@@ -1,5 +1,25 @@
 # Socket.IO Server - Deployment Guide
 
+## פריסה מהמחשב המקומי — `deploy-socket.ps1` (הדרך הרגילה)
+
+מהשורש של הריפו (ליד `deploy-api.ps1`):
+
+```powershell
+.\deploy-socket.ps1 -Check      # בדיקות + tsc + אריזה, בלי לשלוח כלום (ושומר את הסקריפט שירוץ בשרת לעיון)
+.\deploy-socket.ps1             # פריסה: בדיקות → scp → build בשרת → החלפת הקונטיינר → health → אימות
+.\deploy-socket.ps1 -Rollback   # חזרה ל-image שרץ לפני הפריסה האחרונה
+```
+
+- נשלח **עץ העבודה** של `socket-server/`, לא מה שב-git — כך אפשר לפרוס את השרת **לפני** push ל-main
+  (כל push פורס את האפליקציה ב-Vercel, והאפליקציה לא אמורה להסתמך על יכולת שעוד לא בשרת).
+- בשרת: `/home/ubuntu/socket/deploy/app`. ה-clone הישן `/home/ubuntu/socket/1.0/socket-server` לא נוגעים בו;
+  ה-`.env` שלו מועתק **פעם אחת**, בתוך השרת, בפריסה הראשונה. הסקריפט לא מעלה, לא מדפיס ולא דורס `.env`.
+- אותו פרויקט compose (`socket-server`) ואותו קונטיינר (`unified-action-socket-server`, פורט 3001, רשת
+  `app_app-network`) — nginx של socket.1lev1.com לא משתנה.
+- ה-build רץ בשרת (tsc בלבד, בלי vite — לא ה-OOM של `deploy-api.ps1`). הקונטיינר הישן נמחק לפני `up`
+  בגלל באג ה-recreate של compose v1. לקוחות מתחברים מחדש לבד, וה-bus עושה resync.
+- אחרי ה-health check הסקריפט מוודא שהקונטיינר שרץ מכיל את מה שנשלח (`$Expect` בסקריפט — היום `rt:changed`).
+
 מדריך להתקנה והפעלה של שרת ה-Socket.IO על שרת ייעודי.
 
 ## דרישות מערכת

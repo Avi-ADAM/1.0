@@ -182,7 +182,7 @@ export const createMashaabimRequestConfig: ActionConfig = {
       title: { he: 'בקשה למשאב', en: 'Resource request' },
       body: { he: `יש בקשה חדשה למשאב בפרויקט`, en: 'A new resource request was submitted' },
     },
-    channels: ['socket'],
+    intent: 'consent',
     metadata: { type: 'mashaabimRequest', url: 'lev' },
   },
 

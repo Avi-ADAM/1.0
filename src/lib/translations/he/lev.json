@@ -940,5 +940,21 @@
       "plate": "מטבע קריא",
       "classic": "מטבע קלאסי"
     }
+  },
+  "when": {
+    "at": {
+      "weekday": "ב{{time}}",
+      "date": "ב־{{time}}"
+    },
+    "askedcoin": "נשלחה {{time}}",
+    "askedm": "נשלחה {{time}}",
+    "pends": "הוצעה {{time}}",
+    "pmashes": "הוצע {{time}}",
+    "wegets": "נשלחה {{time}}",
+    "hachla": "נפתחה {{time}}",
+    "archObject": "הוצעה {{time}}",
+    "stipend": "נפתחה {{time}}",
+    "sheirutp": "נשלחה {{time}}",
+    "wishoffer": "הוגשה {{time}}"
   }
 }

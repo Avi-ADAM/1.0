@@ -4,7 +4,7 @@
  * wires it to the live Strapi, the service identity and the clock rows.
  */
 
-import { ADMINMONTHER } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 import { SendToAdmin } from '$lib/server/sendToAdmin.js';
 import { actionService, strapiClient } from '$lib/server/actions/index.js';
 import { adminToken, serviceContext } from '$lib/server/github/service.js';
@@ -22,7 +22,7 @@ export async function WishProposal(id: string | number, taid: string | number, f
         return { success: !!res.success, error: (res as any).error };
       },
       closeClock: async (t) => {
-        await SendToAdmin(`mutation { updateTimegrama(id: ${t}, data: { done: true }) { data { id } } }`, ADMINMONTHER);
+        await SendToAdmin(`mutation { updateTimegrama(id: ${t}, data: { done: true }) { data { id } } }`, env.ADMINMONTHER);
       },
       armClock: async (proposalId, at) => {
         // an exact moment: the wish's pace was already applied by the caller

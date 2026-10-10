@@ -3,7 +3,7 @@
 import { qids } from './qids.js'
 import { validateAllQids, validateQuery } from './qidsValidator.js'
 import { json, error } from '@sveltejs/kit'
-import { ADMINMONTHER, CONSENSUS_PUBLIC_TOKEN, CONSENSUS_PROXY_SECRET } from '$env/static/private'
+import { env } from '$env/dynamic/private';
 import { STRAPI_URL } from '$lib/server/strapiUrl.js'
 const ep = STRAPI_URL + "/graphql"
 import { createHash } from 'node:crypto'
@@ -34,8 +34,8 @@ function fingerprintSecret(value) {
 
 function getServiceToken(isConsensusQid) {
 	return isConsensusQid
-		? normalizeSecret(CONSENSUS_PUBLIC_TOKEN, 'CONSENSUS_PUBLIC_TOKEN')
-		: normalizeSecret(ADMINMONTHER, 'ADMINMONTHER');
+		? normalizeSecret(env.CONSENSUS_PUBLIC_TOKEN, 'CONSENSUS_PUBLIC_TOKEN')
+		: normalizeSecret(env.ADMINMONTHER, 'ADMINMONTHER');
 }
 
 // ── Consensus qid registry ─────────────────────────────────────────────────
@@ -113,7 +113,7 @@ export async function POST({ request, cookies, locals }) {
 	// Also covers an internal-secret caller running a consensus qid: the
 	// consensus token is only ever spent on behalf of the consensus site.
 	if (isSer && isConsensusQid) {
-		if (!normalizeSecret(CONSENSUS_PROXY_SECRET, 'CONSENSUS_PROXY_SECRET')) {
+		if (!normalizeSecret(env.CONSENSUS_PROXY_SECRET, 'CONSENSUS_PROXY_SECRET')) {
 			throw error(500, 'Server misconfiguration: CONSENSUS_PROXY_SECRET not set');
 		}
 		if (!isConsensusRequest(request)) {

@@ -241,11 +241,11 @@ const translations = {
     } // Add other EN translations if needed
 };
 
-import { TELEGRAM_BOT_TOKEN_NEW, GEMINI_API_KEY, ADMINMONTHER } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 
 // --- הגדרות ומשתנים גלובליים ---
-const Token = TELEGRAM_BOT_TOKEN_NEW;
-const geminiApiKey = GEMINI_API_KEY;
+const Token = env.TELEGRAM_BOT_TOKEN_NEW;
+const geminiApiKey = env.GEMINI_API_KEY;
 
 if (!Token) throw new Error("Telegram Bot Token not found!");
 if (!geminiApiKey) throw new Error("Gemini API Key not found!");
@@ -1805,7 +1805,7 @@ async function finalizeTask(ctx, uid, lang, fetch) {
 
         const result = await actionService.executeAction('createTask', params, {
             userId: String(uid),
-            jwt: normalizeAdminToken(ADMINMONTHER),
+            jwt: normalizeAdminToken(env.ADMINMONTHER),
             lang,
             fetch
         });
@@ -2098,7 +2098,7 @@ async function setMeetingAvailability(uid, status, meetingId, lang, fetch) {
     if (meetingId) params.meetingId = meetingId;
     return actionService.executeAction('toggleOnline', params, {
         userId: String(uid),
-        jwt: normalizeAdminToken(ADMINMONTHER),
+        jwt: normalizeAdminToken(env.ADMINMONTHER),
         lang,
         fetch
     });

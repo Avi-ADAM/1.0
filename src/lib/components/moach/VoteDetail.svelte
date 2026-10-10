@@ -5,6 +5,7 @@
    *   - pendm → pending mission proposal    (PendingM / pandingMesima)
    *   - ask   → candidate join request      (Reqtojoin)
    *   - askm  → candidate/self resource join (Reqtom)
+ *   - fini  → finish approval, a holder's "I finished" (Fiappru)
    *
    * Reuses the exact lev pipeline AND its shared stores so that:
    *   - the card's optimistic vote is reflected immediately (buttons hide,
@@ -32,6 +33,7 @@
     askedResourcesStore,
     halukasStore,
     decisionsStore,
+    fiappStore,
     projectsStore
   } from '$lib/stores/levStores';
   import { isChatOpen, nowChatId } from '$lib/stores/pendMisMes.js';
@@ -41,7 +43,8 @@
     processedAsked,
     processedAskedResources,
     processedHalukas,
-    processedDecisions
+    processedDecisions,
+    processedFiapp
   } from '$lib/stores/levDerived';
   import {
     extractProjects,
@@ -50,13 +53,15 @@
     extractAsked,
     extractAskedResources,
     extractHalukas,
-    extractDecisions
+    extractDecisions,
+    extractFiapp
   } from '$lib/utils/levDataExtractors';
   import PendingM from '$lib/components/lev/pandingMesima.svelte';
   import PendingMa from '$lib/components/lev/pmas.svelte';
   import Reqtojoin from '$lib/components/lev/reqtojoin.svelte';
   import Reqtom from '$lib/components/lev/reqtom.svelte';
   import Halukaask from '$lib/components/lev/halukaask.svelte';
+  import Fiappru from '$lib/components/lev/fiappru.svelte';
   import DecisionMaking from '$lib/components/lev/decisionMaking.svelte';
   import ArchiveObjectCard from '$lib/components/lev/cards/ArchiveObjectCard.svelte';
   import StipendDecisionCard from '$lib/components/lev/cards/StipendDecisionCard.svelte';
@@ -66,7 +71,15 @@
 
   // Detail page is always interactive (never the dimmed "low" coin variant).
   const low = false;
-  const VOTE_TYPES = ['pendmVote', 'pmashVote', 'maapVote', 'decisionVote', 'voteUpdate'];
+  const VOTE_TYPES = [
+    'pendmVote',
+    'pmashVote',
+    'maapVote',
+    'decisionVote',
+    'voteUpdate',
+    'finiapruvalVote',
+    'finiapruvalCounter'
+  ];
 
   // Per-kind wiring. Keep these maps the single source of truth so adding a
   // future vote type is one entry each.
@@ -76,13 +89,14 @@
     ask: 'getAskForVote',
     askm: 'getAskmForVote',
     tosplit: 'getTosplitForVote',
-    decision: '159getDecisionForVote'
+    decision: '159getDecisionForVote',
+    fini: 'getFiniapruvalForVote'
   };
-  const ROOT_MAP = { pmash: 'pmash', pendm: 'pendm', ask: 'ask', askm: 'askm', tosplit: 'tosplit', decision: 'decision' };
-  const COLLECTION_MAP = { pmash: 'pmashes', pendm: 'pendms', ask: 'asks', askm: 'askms', tosplit: 'tosplits', decision: 'decisions' };
+  const ROOT_MAP = { pmash: 'pmash', pendm: 'pendm', ask: 'ask', askm: 'askm', tosplit: 'tosplit', decision: 'decision', fini: 'finiapruval' };
+  const COLLECTION_MAP = { pmash: 'pmashes', pendm: 'pendms', ask: 'asks', askm: 'askms', tosplit: 'tosplits', decision: 'decisions', fini: 'finiapruvals' };
   // Field on the processed item that carries the entity id (so the buble lookup
   // can match this vote): missions/resources expose `pendId`, asks expose `askId`.
-  const MATCH_KEY = { pmash: 'pendId', pendm: 'pendId', ask: 'askId', askm: 'askId', tosplit: 'pendId', decision: 'pendId' };
+  const MATCH_KEY = { pmash: 'pendId', pendm: 'pendId', ask: 'askId', askm: 'askId', tosplit: 'pendId', decision: 'pendId', fini: 'askId' };
 
   // Derived from props so SPA navigation between votes (same route, new params)
   // re-resolves them instead of keeping the first vote's values.
@@ -115,6 +129,12 @@
   // refetch passes a fresh entity here.
   function seedFromEntity(ent) {
     if (!ent) return;
+    // A finish approval stays readable after it closes (archived), unlike the
+    // proposals the other kinds fetch — a closed one is over, not missing.
+    if (kind === 'fini' && ent.attributes?.archived === true) {
+      closedFor = String(ent.id);
+      return;
+    }
     const collectionKey = COLLECTION_MAP[kind];
     const userData = {
       id: String(uid),
@@ -166,6 +186,9 @@
       // opened the proposal). The card turns read-only on its own.
       const [item] = extractDecisions(userData, { includeNotMyTurn: true });
       if (item) decisionsStore.update((cur) => upsertById(cur, item));
+    } else if (kind === 'fini') {
+      const [item] = extractFiapp(userData);
+      if (item) fiappStore.update((cur) => upsertById(cur, item));
     }
   }
 
@@ -199,7 +222,9 @@
               ? $processedHalukas
               : kind === 'decision'
                 ? $processedDecisions
-                : $processedAskedResources;
+                : kind === 'fini'
+                  ? $processedFiapp
+                  : $processedAskedResources;
     const key = MATCH_KEY[kind];
     return list.find((b) => String(b[key]) === entityId) ?? null;
   });
@@ -505,6 +530,62 @@
         noofusersWaiting={buble.noofusersWaiting}
         already={buble.already}
         users={buble.users}
+      />
+    </div>
+  {:else if kind === 'fini'}
+    <!-- Finish approval: the same card the heart shows. Agreeing signs the
+         standing round; disagreeing is a counter with other hours, never a
+         veto (src/lib/finiapruval/rounds.ts). -->
+    <div class="vote-card-wrap mx-auto">
+      <Fiappru
+        cards={true}
+        {low}
+        isVisible={true}
+        onAcsept={onResolved}
+        onDecline={onResolved}
+        onHover={hover}
+        onProj={proj}
+        onUser={user}
+        timegramaId={buble.timegramaId}
+        timegramaDate={buble.timegramaDate}
+        round={buble.round}
+        counters={buble.counters}
+        coinlapach={buble.coinlapach}
+        mId={buble.mId}
+        noofusersWaiting={buble.noofusersWaiting}
+        uids={buble.uids}
+        what={buble.what}
+        noofusersOk={buble.noofusersOk}
+        noofusersNo={buble.noofusersNo}
+        already={buble.already}
+        users={buble.users}
+        askId={buble.askId}
+        projectName={buble.projectName}
+        useraplyname={buble.username}
+        userId={buble.uid}
+        missionDetails={buble.descrip}
+        src={buble.src}
+        src2={buble.src2}
+        why={buble.why}
+        whatt={buble.whatt}
+        evidenceFiles={buble.evidenceFiles}
+        evidenceLinks={buble.evidenceLinks}
+        missionBName={buble.openName}
+        name={buble.name}
+        projectId={buble.projectId}
+        noofpu={buble.noof}
+        publicklinks={buble.publicklinks}
+        privatlinks={buble.privatlinks}
+        hearotMeyuchadot={buble.hearotMeyuchadot}
+        valph={buble.perhour}
+        nhours={buble.nhours}
+        deadline={buble.deadline}
+        missId={buble.missId}
+        id={buble.id}
+        openMid={buble.omid}
+        stylef={buble.stylef}
+        st={buble.st}
+        declined={buble.decid}
       />
     </div>
   {:else if kind === 'decision' && buble.ani === 'archObject'}

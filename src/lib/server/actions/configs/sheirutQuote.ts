@@ -123,9 +123,10 @@ export const quoteSheirutpendConfig: ActionConfig = {
         ar: 'يوجد سعر جديد في الطلب. وافق أو تحدّث أو اقترح غيره. دون رد في الوقت المحدد، تتم الموافقة عليه.'
       }
     },
-    channels: ['socket', 'email', 'telegram', 'push'],
+    // A price version opens a round with a fresh clock.
+    intent: 'consent',
     emailTemplate: 'SimpleNuti',
-    metadata: { priority: 'high', type: 'sheirutUpdate', url: 'deals/request/{{sheirutpendId}}' }
+    metadata: { priority: 'high', type: 'sheirutUpdate', url: '/deals/request/{{sheirutpendId}}' }
   },
   updateStrategy: { type: 'none' }
 };
@@ -187,9 +188,10 @@ export const acceptSheirutQuoteConfig: ActionConfig = {
         ar: 'تمت الموافقة على سعرك. إن كان في الريكما أعضاء آخرون فهم يوقّعون الآن في Deals.'
       }
     },
-    channels: ['socket', 'email', 'telegram', 'push'],
+    // Their price was accepted — about them; the rikma's own signatures follow on the request.
+    intent: 'personal',
     emailTemplate: 'SimpleNuti',
-    metadata: { priority: 'high', type: 'sheirutUpdate', url: 'deals/request/{{sheirutpendId}}' }
+    metadata: { priority: 'high', type: 'sheirutUpdate', url: '/deals/request/{{sheirutpendId}}' }
   },
   updateStrategy: { type: 'none' }
 };

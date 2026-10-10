@@ -16,6 +16,7 @@ import { readDealOffers } from '$lib/server/deal/dealOffers';
 import type { DealOffersView } from '$lib/sheirut/dealOffers';
 import { loadParts } from '$lib/server/deal/partsReceived';
 import type { PartsView } from '$lib/sheirut/partsReceived';
+import { partViaSplit, providerTransfers } from '$lib/sheirut/splitCarriage';
 
 export interface DealPieces {
   due: LoadedDealDue | null;
@@ -46,7 +47,15 @@ export async function readDealPieces(run: QidRunner, sheirutId: string, viewerId
     loadParts(run, sheirutId)
       .then((p): PartsView | null =>
         p
-          ? { parts: p.parts, confirmed: p.confirmed, pending: p.pending, allConfirmed: p.allConfirmed, customerPaid: p.iTransferMoney }
+          ? {
+              parts: p.parts,
+              confirmed: p.confirmed,
+              pending: p.pending,
+              allConfirmed: p.allConfirmed,
+              customerPaid: p.iTransferMoney,
+              transfers: providerTransfers(p.carriage, p.parts),
+              viaSplit: p.parts.filter((x) => partViaSplit(p.carriage, x.providerId)).map((x) => x.providerId)
+            }
           : null
       )
       .catch(warn("the providers' confirmations"))

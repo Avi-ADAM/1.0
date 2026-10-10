@@ -65,7 +65,9 @@ const createSheirutHalukaHandler: ActionExecutionHandler = async (params, contex
     sheirutId,
     receiverId,
     projectId,
-    amount: halukaData.amount ?? null
+    amount: halukaData.amount ?? null,
+    // Whose word settles the transfer — they are asked to confirm it.
+    recipientIds: [String(receiverId)]
   };
 };
 
@@ -93,6 +95,26 @@ export const createSheirutHalukaConfig: ActionConfig = {
       errorMessage: 'Must be a customer of this sheirut'
     }
   ],
+
+  // The transfer is settled by the receiver's word alone ($lib/server/deal/dealMoney), so
+  // the receiver has to hear that one is waiting for it.
+  notification: {
+    recipients: { type: 'specificUsers', config: { userIdsParam: 'recipientIds' } },
+    templates: {
+      title: {
+        he: 'דווח על תשלום אליך',
+        en: 'A payment to you was reported',
+        ar: 'تم الإبلاغ عن دفعة لك'
+      },
+      body: {
+        he: 'הלקוח/ה דיווח/ה שהעביר/ה לך תשלום על העסקה. אפשר לאשר בעמוד העסקה שהכסף הגיע.',
+        en: 'The customer reported paying you for the deal. Confirm on the deal page that the money arrived.',
+        ar: 'أبلغ العميل أنه دفع لك مقابل الصفقة. أكّد في صفحة الصفقة وصول المبلغ.'
+      }
+    },
+    intent: 'consent',
+    metadata: { priority: 'high', type: 'dealPaid', url: '/deals/{{sheirutId}}' }
+  },
 
   updateStrategy: {
     type: 'none'

@@ -17,10 +17,11 @@ import { ValidationEngine } from '$lib/server/actions/ValidationEngine.js';
 import { AuthorizationEngine } from '$lib/server/actions/AuthorizationEngine.js';
 import { StrapiClient } from '$lib/server/actions/StrapiClient.js';
 import { NotificationOrchestrator } from '$lib/server/notifications/NotificationOrchestrator.js';
+import { realtimeFor } from '$lib/server/realtime/broadcaster.js';
 import type { ActionContext } from '$lib/server/actions/types.js';
 // Import action configurations to register them
 import '$lib/server/actions/configs/index.js';
-import { ADMINMONTHER } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 import { STRAPI_URL } from '$lib/server/strapiUrl.js';
 import { isInternalRequest } from '$lib/server/internalSecret.js';
 import { resolvePrincipal } from '$lib/server/authz/principal.js';
@@ -29,8 +30,8 @@ import { getAction } from '$lib/server/actions/registry.js';
 
 // Environment variables
 const STRAPI_ENDPOINT = STRAPI_URL + '/graphql';
-if (!ADMINMONTHER) throw new Error('ADMINMONTHER env var is not set');
-const ADMIN_TOKEN = ADMINMONTHER.replace(/\s+/g, '').replace(/^ADMINMONTHER=/, '');
+if (!env.ADMINMONTHER) throw new Error('ADMINMONTHER env var is not set');
+const ADMIN_TOKEN = env.ADMINMONTHER.replace(/\s+/g, '').replace(/^ADMINMONTHER=/, '');
 
 // Initialize services (singleton pattern)
 let actionService: ActionService | null = null;
@@ -46,7 +47,10 @@ function getActionService(): ActionService {
       validator,
       authorizer,
       strapiClient,
-      notifier
+      notifier,
+      undefined,
+      // Without it no browser-run action published realtime (docs/inprogress/PLAN_REALTIME_MIGRATION.md).
+      realtimeFor(notifier)
     );
   }
 
@@ -123,11 +127,17 @@ export const POST: RequestHandler = async ({ request, cookies, fetch, locals }) 
     }
 
     // Build action context
+    // The tab that sent this (actionClient's x-client-id) — only a plain token,
+    // since it is echoed to every member's socket.
+    const rawClientId = request.headers.get('x-client-id') ?? '';
+    const clientId = /^[A-Za-z0-9_-]{1,64}$/.test(rawClientId) ? rawClientId : undefined;
+
     const context: ActionContext = {
       userId,
       jwt,
       lang,
-      fetch
+      fetch,
+      ...(clientId ? { clientId } : {})
     };
 
     // Execute action

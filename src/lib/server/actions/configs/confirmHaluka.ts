@@ -17,9 +17,16 @@
  *
  * Returns: { consensus: boolean } — true when the receiver confirmed and all
  *   sibling Halukas were already confirmed (hervachti was distributed).
+ *
+ * A split that carries a wish deal's payment is how that deal's providers get their part
+ * when one member received all of it. Receiving such a transfer IS receiving the part: once
+ * every split transfer to a provider on that deal has arrived, their part of the deal is
+ * marked received (`Sheirut.iGotMoney`) and the deal page never asks them again
+ * (`$lib/sheirut/splitCarriage`). Returned as `dealParts`.
  */
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import { settlePartsFromSplit } from '$lib/server/deal/partsReceived.js';
 
 const confirmHalukaHandler: ActionExecutionHandler = async (params, context, { strapi }) => {
   const { halukaId, projectId, kind } = params;
@@ -112,8 +119,23 @@ const confirmHalukaHandler: ActionExecutionHandler = async (params, context, { s
     );
     if (updateRes?.errors) throw new Error(`Failed to confirm: ${JSON.stringify(updateRes.errors)}`);
 
+    // The same fact on the deals this split carries. Best-effort: the money arrived either way.
+    let dealParts: { sheirutId: string; paid: boolean; becamePaid: boolean }[] = [];
+    if (tosplit?.id) {
+      try {
+        const settled = await settlePartsFromSplit(
+          (qid, vars) => strapi.execute(qid, vars, context.jwt, context.fetch),
+          String(tosplit.id),
+          String(userId)
+        );
+        dealParts = settled.map((d) => ({ sheirutId: d.sheirutId, paid: d.state.allConfirmed, becamePaid: d.becamePaid }));
+      } catch (err) {
+        console.error('[confirmHaluka] the transfer is confirmed but the deal parts it carries did not follow:', err);
+      }
+    }
+
     return {
-      data: { consensus: allSP, halukaId },
+      data: { consensus: allSP, halukaId, dealParts },
       updateStrategy: { type: 'none' },
     };
   } else {

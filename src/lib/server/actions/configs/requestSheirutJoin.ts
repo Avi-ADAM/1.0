@@ -103,7 +103,7 @@ export const requestSheirutJoinConfig: ActionConfig = {
         ar: 'وصل طلب للحصول على إحدى خدماتكم. من دون موافقة أحد الأعضاء لن تتم الموافقة تلقائيًا.'
       }
     },
-    channels: ['socket', 'email', 'telegram', 'push'],
+    intent: 'consent',
     emailTemplate: 'SimpleNuti',
     metadata: { type: 'sheirutUpdate', url: 'lev', priority: 'high' }
   }

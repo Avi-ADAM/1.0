@@ -2,7 +2,7 @@
   import { sanitizeUserInput } from '$lib/func/uti/sanitizeUserInput.svelte';
      import { SendToAdmin } from '$lib/server/sendToAdmin.js';
   // Server-only secret — this module is imported only by timegrama/+server.js.
-  import { ADMINMONTHER } from '$env/static/private';
+  import { env } from '$env/dynamic/private';
   import { strapiClient } from '$lib/server/actions/index.js';
   import { matchOpenMissionToUsers } from '$lib/server/matching/engine';
   import { calcDeadlineMs } from '$lib/server/actions/configs/actionUtils.js';
@@ -23,7 +23,7 @@ export async function Pend(id,taid,fetchFn){
   }}}
     }`;
     try {
-      let res = await SendToAdmin(qu, ADMINMONTHER).then((res) => (res = res));
+      let res = await SendToAdmin(qu, env.ADMINMONTHER).then((res) => (res = res));
       console.log(res,"pend first res", id);
       if (res.data != null) {
         console.log(res.data,"pend first res data");
@@ -58,7 +58,7 @@ export async function Pend(id,taid,fetchFn){
                 }`
                 console.log("we go second pend", id)
  try {
-      let res2 = await SendToAdmin(qua, ADMINMONTHER).then((res2) => (res2 = res2));
+      let res2 = await SendToAdmin(qua, env.ADMINMONTHER).then((res2) => (res2 = res2));
       console.log(res2,"pend  res2");
       if (res2.data != null) {
         console.log(res2.data,"pend  res2 data");
@@ -106,7 +106,7 @@ export async function Pend(id,taid,fetchFn){
  } `
  console.log(qub,"queri2")
      try {
-      let res3 = await SendToAdmin(qub, ADMINMONTHER).then((res3) => (res3 = res3));
+      let res3 = await SendToAdmin(qub, env.ADMINMONTHER).then((res3) => (res3 = res3));
       console.log(res3,"pend res3 ",res?.errors?.locations)
       if (res3.data != null) {
               console.log(res3.data,"pend res3 data ,pend line 83 ")
@@ -202,7 +202,7 @@ async function offerToAssignee({ openMissionId, projectId, assigneeId, restime, 
         vots: [${vots}]
       }) {data{id}}
     }`;
-    const res = await SendToAdmin(que, ADMINMONTHER);
+    const res = await SendToAdmin(que, env.ADMINMONTHER);
     const askId = res?.data?.createAsk?.data?.id;
     if (!askId) return;
 
@@ -210,7 +210,7 @@ async function offerToAssignee({ openMissionId, projectId, assigneeId, restime, 
       `mutation {
         createTimegrama(data: { date: "${deadline}", whatami: "ask", ask: "${askId}" }) {data{id}}
       }`,
-      ADMINMONTHER
+      env.ADMINMONTHER
     );
   } catch (e) {
     console.error('pend: failed to open the assignee candidacy', e);
@@ -223,7 +223,7 @@ async function markDone(taid) {
       `mutation {
         updateTimegrama(id: ${taid} data: { done: true }) {data{id}}
       }`,
-      ADMINMONTHER
+      env.ADMINMONTHER
     );
   } catch (e) {
     console.error(e);

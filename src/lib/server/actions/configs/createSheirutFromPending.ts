@@ -72,14 +72,16 @@ const createSheirutFromPendingHandler: ActionExecutionHandler = async (params, c
             const existingMesima = attrs.mesimabetahalich?.data;
             const pendm = attrs.pendm?.data;
             let mesimaId: string | null = existingMesima?.id ? String(existingMesima.id) : null;
+            // The seller (rishon on pendm) who committed to doing this mission, not
+            // the client (buyer) who ordered the product. Read by the reminder act
+            // below too — declared inside the `if` it was a ReferenceError there, and
+            // the catch hid that the reminder was never created.
+            const sellerId = pendm?.attributes?.rishon?.data?.id
+                ? String(pendm.attributes.rishon.data.id)
+                : context.userId;
 
             if (!mesimaId && attrs.mode !== 'consumeExisting') {
                 try {
-                    // Assign to the seller (rishon on pendm) who committed to doing this mission,
-                    // not the client (buyer) who ordered the product.
-                    const sellerId = pendm?.attributes?.rishon?.data?.id
-                        ? String(pendm.attributes.rishon.data.id)
-                        : context.userId;
                     const mesData: Record<string, unknown> = {
                         project: projectId,
                         name: pendm?.attributes?.name || attrs.notes || `${matanot.name} - משימה`,
@@ -201,7 +203,8 @@ export const createSheirutFromPendingConfig: ActionConfig = {
                 ar: 'تم إنشاء خدمة جديدة بعد الموافقة على الطلب'
             }
         },
-        channels: ['socket', 'email', 'telegram', 'push'],
+        // Her request was approved; nothing waits on her.
+        intent: 'personal',
         metadata: {
             type: 'sheirutCreated',
             url: 'lev'
