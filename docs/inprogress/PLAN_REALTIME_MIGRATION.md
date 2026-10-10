@@ -1,6 +1,6 @@
 # תכנית — מיגרציית Real-Time: כל שינוי מגיע לכל מסך שמציג אותו
 
-> **מצב:** בביצוע — R0, R1, R2 ו-N0–N1 בנויים (2026-10-08); R3 (דפי גל 1) מחובר ונבדק בהזרקה ל-bus (2026-10-10); הבא: actions ב-R4. קובץ המעקב: [`REALTIME_TRACKING.md`](./REALTIME_TRACKING.md).
+> **מצב:** בביצוע — R0, R1, R2 ו-N0–N1 בנויים (2026-10-08); R3 (דפי גל 1) מחובר ונבדק בהזרקה ל-bus (2026-10-10); R4 vote + archive (34 actions) בנוי ונבדק בשני דפדפנים (2026-10-11); הבא: wish + deal. קובץ המעקב: [`REALTIME_TRACKING.md`](./REALTIME_TRACKING.md).
 > **קשור:** [`SPEC_SOCKET_REALTIME.md`](../tbd/SPEC_SOCKET_REALTIME.md) (presence / typing / עריכה
 > במקביל — **מחוץ** לתכנית הזאת, ראו R6), [`../inprogress/MIGRATION_TRACKING.md`](../inprogress/MIGRATION_TRACKING.md)
 > (כתיבות שעדיין עוקפות את ה-Action System — הן בלתי נראות לסוקט בכלל),

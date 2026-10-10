@@ -15,6 +15,7 @@ import { asUser as asShiftUser } from '$lib/server/shifts/exec.js';
 import { commitmentForAsk, setMissionCommitment } from '$lib/server/shifts/store.js';
 import { gqlString } from './actionUtils.js';
 import { loadCandidacyDeal, fillOfferIntoDeal } from '$lib/server/deal/offerDeal.js';
+import { scope, decisionScope, scopeList } from '$lib/realtime/scopes.js';
 
 /** A wish need may carry no mission template; never write the string "undefined" as a relation. */
 const hasMissionTemplate = (id: unknown) => id != null && id !== '' && id !== 'undefined' && id !== 'null';
@@ -539,5 +540,11 @@ export const finalizeJoinAcceptanceConfig: ActionConfig = {
     metadata: { type: 'missionCreated', url: 'lev' }
   },
 
-  updateStrategy: { type: 'none' }
+  updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (p) =>
+      scopeList([scope('project', p.projectId), decisionScope('ask', p.askId), scope('mission', p.openMid), scope('mission', p.missId)]),
+    partiesFrom: (p) => [p.acceptedUserId],
+  },
 };

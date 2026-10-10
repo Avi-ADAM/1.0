@@ -1,4 +1,5 @@
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import { scope, decisionScope, scopeList } from '$lib/realtime/scopes.js';
 
 const declineAskmRequestHandler: ActionExecutionHandler = async (params, context, { strapi }) => {
   const { askmId, existingVotes = [] } = params;
@@ -39,4 +40,9 @@ export const declineAskmRequestConfig: ActionConfig = {
   ],
 
   updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (p) =>
+      scopeList([scope('project', p.projectId), decisionScope('askm', p.askmId)]),
+  },
 };

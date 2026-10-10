@@ -1,5 +1,6 @@
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { calcDeadlineMs, normalizeLocationInput, extractRelationId } from './actionUtils.js';
+import { scope, decisionScope, scopeList } from '$lib/realtime/scopes.js';
 
 interface UserVote {
   what: boolean;
@@ -172,4 +173,9 @@ export const submitNegoMashConfig: ActionConfig = {
   },
 
   updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (p) =>
+      scopeList([scope('project', p.projectId), decisionScope('pmash', p.pmashId)]),
+  },
 };

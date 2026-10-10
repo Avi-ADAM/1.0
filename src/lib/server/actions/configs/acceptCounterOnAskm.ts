@@ -9,6 +9,7 @@
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { extractRelationId } from './actionUtils.js';
 import { ensureCandidacyTimegrama } from '../../nego/timegrama.js';
+import { scope, decisionScope, scopeList } from '$lib/realtime/scopes.js';
 
 interface UserVote {
   what: boolean;
@@ -81,4 +82,9 @@ export const acceptCounterOnAskmConfig: ActionConfig = {
   },
 
   updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (p) =>
+      scopeList([scope('project', p.projectId), decisionScope('askm', p.askmId)]),
+  },
 };

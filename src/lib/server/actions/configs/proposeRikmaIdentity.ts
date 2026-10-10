@@ -23,6 +23,7 @@ import {
   type Run
 } from '$lib/server/rikmaIdentity/identity.js';
 import { sameLook, type RikmaLook } from '$lib/rikmaLook/look.js';
+import { scope, decisionScope, scopeList } from '$lib/realtime/scopes.js';
 
 const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
   const projectId = String(params.projectId);
@@ -160,5 +161,10 @@ export const proposeRikmaIdentityConfig: ActionConfig = {
     metadata: { type: 'base', url: '/moach/{{projectId}}/votes' }
   },
 
-  updateStrategy: { type: 'none' }
+  updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (p, r) =>
+      scopeList([scope('project', p.projectId), ...(r?.data?.decisions ?? []).map((d: { id: string }) => decisionScope('decision', d.id))]),
+  },
 };

@@ -25,6 +25,7 @@ import { settleCycleMaap } from '$lib/server/recurring/settleCycleMaap';
 import { bestEffort } from '$lib/server/resources/bookingStore.js';
 import { openGrantBooking } from '$lib/server/resources/grantBooking.js';
 import { execFromContext } from '$lib/server/archive/exec.js';
+import { scope, decisionScope, scopeList } from '$lib/realtime/scopes.js';
 
 function normalizeVote(v: any): Record<string, any> {
   const uid =
@@ -442,4 +443,9 @@ export const voteOnMaapConfig: ActionConfig = {
   },
 
   updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (p) =>
+      scopeList([scope('project', p.projectId), decisionScope('maap', p.askId)]),
+  },
 };

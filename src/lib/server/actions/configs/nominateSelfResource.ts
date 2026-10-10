@@ -13,6 +13,7 @@
  */
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import { scope, decisionScope, scopeList } from '$lib/realtime/scopes.js';
 
 const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
   const { projectId, name, descrip, spnot, price, hm, kindOf, recurring, spId: spIdParam } = params;
@@ -152,4 +153,9 @@ export const nominateSelfResourceConfig: ActionConfig = {
   },
 
   updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (p, r) =>
+      scopeList([scope('project', p.projectId), scope('resource', r?.data?.openMashaabimId), decisionScope('askm', r?.data?.askmId)]),
+  },
 };

@@ -36,6 +36,7 @@ import {
   normalizeVots,
   type SaleClaim
 } from './saleClaimShared.js';
+import { scope, decisionScope, scopeList } from '$lib/realtime/scopes.js';
 
 /** Kinds whose branch notifies its own audience. */
 const INLINE_NOTICE_KINDS = new Set(['saleClaim', 'archiveObject', 'editObject', 'stipendProgram', 'stipendPledge']);
@@ -655,4 +656,9 @@ export const voteOnDecisionConfig: ActionConfig = {
   },
 
   updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (p) =>
+      scopeList([scope('project', p.projectId), decisionScope('decision', p.decisionId)]),
+  },
 };

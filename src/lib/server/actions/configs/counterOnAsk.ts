@@ -11,6 +11,7 @@ import { normalizeLocationInput, extractRelationId } from './actionUtils.js';
 import { buildRoundActs } from '../helpers/roundActs.js';
 import { ensureCandidacyTimegrama } from '../../nego/timegrama.js';
 import { notifyDealClientsOfCounter } from '$lib/server/deal/offerDeal.js';
+import { scope, decisionScope, scopeList } from '$lib/realtime/scopes.js';
 
 interface UserVote {
   what: boolean;
@@ -168,4 +169,10 @@ export const counterOnAskConfig: ActionConfig = {
   },
 
   updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (p) =>
+      scopeList([scope('project', p.projectId), decisionScope('ask', p.askId), scope('mission', p.openMissionId)]),
+    partiesFrom: (p) => [p.candidateUserId],
+  },
 };

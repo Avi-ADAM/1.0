@@ -1,5 +1,6 @@
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { dismissSuggestion } from '$lib/server/matching/engine';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 const declineOpenMissionHandler: ActionExecutionHandler = async (params, context, { strapi }) => {
   const { openMissionId, existingDeclinedIds = [] } = params;
@@ -37,4 +38,10 @@ export const declineOpenMissionConfig: ActionConfig = {
 
   authRules: [{ type: 'jwt' }],
   updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (p) =>
+      scopeList([scope('mission', p.openMissionId)]),
+    audience: 'self',
+  },
 };

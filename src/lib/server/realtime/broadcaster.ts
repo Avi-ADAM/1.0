@@ -51,7 +51,11 @@ export async function resolveAudience(
   if (audience === 'project') {
     const lists = await Promise.all(projects.map((pid) => membersOf(pid, context).catch(() => [] as string[])));
     for (const list of lists) for (const id of list) if (idOf(id)) ids.add(String(id));
-  } else if (audience === 'parties') {
+  }
+  // The people a change is about who may not be members — a candidate, a
+  // customer, the other side of a claim. With 'parties' they are the whole
+  // audience; with 'project' they are added to it.
+  if (audience !== 'self') {
     for (const id of config.partiesFrom?.(params, result) ?? []) {
       const s = idOf(id);
       if (s) ids.add(s);

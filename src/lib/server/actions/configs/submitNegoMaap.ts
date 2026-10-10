@@ -19,6 +19,7 @@ import { rikmaMoneyText } from '$lib/server/money/notifyMoney.js';
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { calcDeadlineMs } from './actionUtils.js';
+import { scope, decisionScope, scopeList } from '$lib/realtime/scopes.js';
 
 function normalizeVote(v: any): Record<string, any> {
   const uid =
@@ -192,4 +193,9 @@ export const submitNegoMaapConfig: ActionConfig = {
   },
 
   updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (p) =>
+      scopeList([scope('project', p.projectId), decisionScope('maap', p.askId)]),
+  },
 };

@@ -1,4 +1,5 @@
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 const declineMissionRequestHandler: ActionExecutionHandler = async (params, context, { strapi }) => {
   const { openMissionId, declinedUserId } = params;
@@ -37,4 +38,10 @@ export const declineMissionRequestConfig: ActionConfig = {
   ],
 
   updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (p) =>
+      scopeList([scope('project', p.projectId), scope('mission', p.openMissionId)]),
+    partiesFrom: (p) => [p.declinedUserId],
+  },
 };

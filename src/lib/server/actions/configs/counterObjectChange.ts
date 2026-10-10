@@ -18,6 +18,7 @@ import type { HoursOutcome, RoundMode, StandingRound } from '$lib/server/archive
 import { execFromContext } from '$lib/server/archive/exec.js';
 import { counterObjectChange } from '$lib/server/archive/vote.js';
 import { dealSignersFor, notifyDealClientsOfEdit, type DealSigners } from '$lib/server/sheirut/dealEdit.js';
+import { scope, decisionScope, scopeList } from '$lib/realtime/scopes.js';
 
 const MODES: readonly RoundMode[] = ['archive', 'keep'];
 const OUTCOMES: readonly HoursOutcome[] = ['credit', 'waive', 'transfer', 'endOfCycle'];
@@ -146,4 +147,9 @@ export const counterObjectChangeConfig: ActionConfig = {
   ],
 
   updateStrategy: { type: 'fullRefresh' },
+
+  realtime: {
+    scopes: (p) =>
+      scopeList([scope('project', p.projectId), decisionScope('decision', p.decisionId)]),
+  },
 };

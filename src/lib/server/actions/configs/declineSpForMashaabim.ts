@@ -11,6 +11,7 @@
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { dismissSuggestion } from '$lib/server/matching/engine';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 const declineSpForMashaabimHandler: ActionExecutionHandler = async (
   params,
@@ -62,4 +63,9 @@ export const declineSpForMashaabimConfig: ActionConfig = {
   ],
 
   updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (p) =>
+      scopeList([scope('project', p.projectId), scope('resource', p.openMashaabimId)]),
+  },
 };

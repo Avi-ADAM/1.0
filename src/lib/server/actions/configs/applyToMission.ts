@@ -9,6 +9,7 @@ import { shiftsEnabled } from '$lib/server/shifts/mode.js';
 import { asUser as asShiftUser } from '$lib/server/shifts/exec.js';
 import { setAskCommitment, setMissionCommitment } from '$lib/server/shifts/store.js';
 import { loadOfferDeal, notifyDealClients } from '$lib/server/deal/offerDeal.js';
+import { scope, decisionScope, scopeList } from '$lib/realtime/scopes.js';
 
 /**
  * "I can do only 2 shifts a week" / "I want up to 7" (PLAN_SHIFTS §3.8): a
@@ -349,4 +350,9 @@ export const applyToMissionConfig: ActionConfig = {
   },
 
   updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (p, r) =>
+      scopeList([scope('project', p.projectId), scope('mission', p.openMissionId), decisionScope('ask', r?.data?.askId), scope('mission', r?.data?.mesimabetahalichId)]),
+  },
 };

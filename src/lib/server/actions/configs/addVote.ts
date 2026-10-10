@@ -13,6 +13,21 @@ import { addVoteConsentSpec } from '$lib/consent/specs/addVote';
 import { ensureCandidacyTimegrama } from '../../nego/timegrama';
 import { evaluateCandidacyVote, assertStandingRound } from '../../nego/candidacyVote';
 import { ActionError } from '../errors.js';
+import { scope, decisionScope, scopeList } from '$lib/realtime/scopes.js';
+
+/** addVote's `type` names the record voted on; this is its scope. */
+function addVoteScope(type: unknown, id: unknown): string | null {
+  const v = id as string | number | null | undefined;
+  switch (type) {
+    case 'pend': return decisionScope('pendm', v);
+    case 'ask': return decisionScope('ask', v);
+    case 'decision': return decisionScope('decision', v);
+    case 'weFinnish': return decisionScope('finiapruval', v);
+    case 'tosplit': return decisionScope('tosplit', v);
+    case 'sheirutpend': return scope('deal', v);
+    default: return null;
+  }
+}
 
 /**
  * Custom handler לבניית קומפוננטות ועדכון
@@ -539,5 +554,10 @@ export const addVoteConfig: ActionConfig = {
 
   // Phase 1 shadow signing — shared spec, identical on client + server.
   // See src/lib/consent/specs/addVote.ts.
-  consentSpec: addVoteConsentSpec
+  consentSpec: addVoteConsentSpec,
+
+  realtime: {
+    scopes: (p, r) =>
+      scopeList([scope('project', p.projectId), addVoteScope(p.type, p.id), scope('deal', r?.data?.serviceId)]),
+  },
 };

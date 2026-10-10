@@ -1,5 +1,6 @@
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { STRAPI_GRAPHQL } from '$lib/server/strapiUrl.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 /**
  * Archive (soft-delete) one of the current user's personal resources (Sp).
@@ -77,5 +78,11 @@ export const archiveUserResourceConfig: ActionConfig = {
     channels: ['socket'],
     metadata: { type: 'profile', url: 'me' }
   },
-  updateStrategy: { type: 'partialUpdate', config: { dataKeys: ['app:meProfile'] } }
+  updateStrategy: { type: 'partialUpdate', config: { dataKeys: ['app:meProfile'] } },
+
+  realtime: {
+    scopes: (_p, _r, ctx) =>
+      scopeList([scope('user', ctx.userId)]),
+    audience: 'self',
+  },
 };

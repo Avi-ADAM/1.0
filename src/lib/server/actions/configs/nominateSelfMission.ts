@@ -17,6 +17,7 @@
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { findOrCreateMissionTemplate } from '$lib/server/missions/missionTemplate.js';
+import { scope, decisionScope, scopeList } from '$lib/realtime/scopes.js';
 
 const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
   const { projectId, name, descrip, noofhours, perhour, hearotMeyuchadot } = params;
@@ -151,4 +152,9 @@ export const nominateSelfMissionConfig: ActionConfig = {
   },
 
   updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (p, r) =>
+      scopeList([scope('project', p.projectId), scope('mission', r?.data?.openMissionId), decisionScope('ask', r?.data?.askId)]),
+  },
 };

@@ -51,6 +51,16 @@ describe('realtime broadcaster', () => {
     expect((send.mock.calls[0] as any[])[0].sort()).toEqual(['1', '4']);
   });
 
+  it('project + partiesFrom: the members and the candidate who is not one yet', async () => {
+    const { rt, send } = setup({ '12': ['1', '2'] });
+    const config: RealtimeConfig = {
+      scopes: () => ['project:12', 'decision:ask:5'],
+      partiesFrom: (p) => [p.candidateId]
+    };
+    await rt.publish('counterOnAsk', config, { candidateId: 9 }, {}, ctx());
+    expect((send.mock.calls[0] as any[])[0].sort()).toEqual(['1', '2', '9']);
+  });
+
   it('no project scope ⇒ only the actor’s own tabs and devices', async () => {
     const { rt, send } = setup();
     await rt.publish('updateUserBasic', { scopes: () => ['user:1'] }, {}, {}, ctx());

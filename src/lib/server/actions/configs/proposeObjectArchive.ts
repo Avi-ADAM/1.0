@@ -32,6 +32,8 @@ import { execFromContext } from '$lib/server/archive/exec.js';
 import { fetchTarget, TARGET_META, TARGET_KINDS, type TargetKind } from '$lib/server/archive/targets.js';
 import { assessMembership } from '$lib/server/archive/membership.js';
 import { effectiveDormancyDays, hasAccruedValue, isDormant } from '$lib/archive/dormancy.js';
+import { scope, decisionScope, scopeList } from '$lib/realtime/scopes.js';
+import { objectScope } from '../../realtime/objectScope.js';
 
 const OUTCOMES: readonly HoursOutcome[] = ['credit', 'waive', 'transfer', 'endOfCycle'];
 
@@ -179,6 +181,7 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
     return {
       data: {
         ...result,
+        projectId: target.projectId,
         immediate: true,
         dormant,
         decisionId: null,
@@ -221,6 +224,7 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
 
   return {
     data: {
+      projectId: target.projectId,
       decisionId: opened.decisionId,
       timegramaId: opened.timegramaId,
       deadline: opened.deadline,
@@ -316,4 +320,14 @@ export const proposeObjectArchiveConfig: ActionConfig = {
   authRules: [{ type: 'jwt', errorMessage: 'Must be logged in to propose archiving an object' }],
 
   updateStrategy: { type: 'fullRefresh' },
+
+  realtime: {
+    scopes: (p, r) =>
+      scopeList([
+        scope('project', r?.data?.projectId),
+        decisionScope('decision', r?.data?.decisionId),
+        decisionScope('decision', r?.data?.followUpDecisionId),
+        objectScope(p.targetKind, p.targetId),
+      ]),
+  },
 };

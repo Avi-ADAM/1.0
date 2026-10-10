@@ -11,6 +11,7 @@ import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { normalizeLocationInput, extractRelationId } from './actionUtils.js';
 import { ensureCandidacyTimegrama } from '../../nego/timegrama.js';
 import { notifyDealClientsOfCounter } from '$lib/server/deal/offerDeal.js';
+import { scope, decisionScope, scopeList } from '$lib/realtime/scopes.js';
 
 interface UserVote {
   what: boolean;
@@ -156,4 +157,10 @@ export const counterOnAskmConfig: ActionConfig = {
   },
 
   updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (p) =>
+      scopeList([scope('project', p.projectId), decisionScope('askm', p.askmId), scope('resource', p.openMashaabimId)]),
+    partiesFrom: (p) => [p.candidateUserId],
+  },
 };

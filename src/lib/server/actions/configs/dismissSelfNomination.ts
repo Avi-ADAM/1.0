@@ -18,6 +18,7 @@
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { cancelCandidacyTimegrama } from '../../nego/timegrama';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
   const { side, id, mode = 'dismiss' } = params;
@@ -90,6 +91,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
       id: String(entity.id),
       side,
       mode,
+      projectId: attrs.project?.data?.id ?? null,
       projectName: attrs.project?.data?.attributes?.projectName ?? '',
     },
     recipientIds,
@@ -131,4 +133,9 @@ export const dismissSelfNominationConfig: ActionConfig = {
   },
 
   updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (p, r) =>
+      scopeList([scope('project', r?.data?.projectId), scope(p.side === 'mission' ? 'mission' : 'resource', p.id)]),
+  },
 };

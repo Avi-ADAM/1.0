@@ -2,6 +2,7 @@ import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { evaluateCandidacyVote, assertStandingRound } from '../../nego/candidacyVote.js';
 import { ActionError } from '../errors.js';
 import { ensureCandidacyTimegrama } from '../../nego/timegrama.js';
+import { scope, decisionScope, scopeList } from '$lib/realtime/scopes.js';
 
 /**
  * Record ONE rikma member's vote on a resource-share candidacy (Askm) without
@@ -117,4 +118,9 @@ export const voteOnAskmConfig: ActionConfig = {
   },
 
   updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (p) =>
+      scopeList([scope('project', p.projectId), decisionScope('askm', p.askmId)]),
+  },
 };

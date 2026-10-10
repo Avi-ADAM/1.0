@@ -26,6 +26,7 @@ import { ensureCandidacyTimegrama } from '../../nego/timegrama.js';
 import { evaluateCandidacyVote, assertStandingRound } from '../../nego/candidacyVote.js';
 import { loadCandidacyDeal } from '$lib/server/deal/offerDeal.js';
 import { ActionError } from '../errors.js';
+import { scope, decisionScope, scopeList } from '$lib/realtime/scopes.js';
 
 const finalizeAskmAcceptanceHandler: ActionExecutionHandler = async (params, context, { strapi }) => {
   const {
@@ -190,4 +191,10 @@ export const finalizeAskmAcceptanceConfig: ActionConfig = {
   },
 
   updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (p, r) =>
+      scopeList([scope('project', p.projectId), decisionScope('askm', p.askmId), scope('resource', p.openMashaabimId ?? r?.data?.openMashaabimId)]),
+    partiesFrom: (p) => [p.acceptedUserId],
+  },
 };

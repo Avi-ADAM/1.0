@@ -21,6 +21,8 @@ import { shiftsEnabled } from '$lib/server/shifts/mode.js';
 import { fetchTarget, TARGET_KINDS, type TargetKind } from '$lib/server/archive/targets.js';
 import { loadMissionDeal, notifyDealClientsOfEdit, syncDealLine } from '$lib/server/sheirut/dealEdit.js';
 import { raisesPart } from '$lib/sheirut/dealEdit.js';
+import { scope, decisionScope, scopeList } from '$lib/realtime/scopes.js';
+import { objectScope } from '../../realtime/objectScope.js';
 
 const KIND_OFS = ['total', 'monthly', 'yearly', 'perUnit', 'rent', 'unlimited', 'daily'];
 
@@ -122,7 +124,7 @@ const handler: ActionExecutionHandler = async (params, context, { notifier, stra
       );
     }
     return {
-      data: { ...result, immediate: true, decisionId: null },
+      data: { ...result, projectId: target.projectId, immediate: true, decisionId: null },
       updateStrategy: { type: 'fullRefresh' as const },
     };
   }
@@ -178,6 +180,7 @@ const handler: ActionExecutionHandler = async (params, context, { notifier, stra
 
   return {
     data: {
+      projectId: target.projectId,
       decisionId: opened.decisionId,
       timegramaId: opened.timegramaId,
       deadline: opened.deadline,
@@ -205,4 +208,9 @@ export const proposeObjectEditConfig: ActionConfig = {
   authRules: [{ type: 'jwt', errorMessage: 'Must be logged in to propose a change' }],
 
   updateStrategy: { type: 'fullRefresh' },
+
+  realtime: {
+    scopes: (p, r) =>
+      scopeList([scope('project', r?.data?.projectId), decisionScope('decision', r?.data?.decisionId), objectScope(p.targetKind, p.targetId)]),
+  },
 };

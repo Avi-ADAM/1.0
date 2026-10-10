@@ -18,6 +18,7 @@ import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { normalizeLocationInput } from './actionUtils.js';
 import { ensureCandidacyTimegrama } from '../../nego/timegrama.js';
 import { createVolunteerProposal } from '$lib/server/wish/volunteerProposal.js';
+import { scope, decisionScope, scopeList } from '$lib/realtime/scopes.js';
 
 export const openMissionProposalHandler: ActionExecutionHandler = async (params, context, { strapi, notifier }) => {
   const { openMissionId } = params;
@@ -179,4 +180,9 @@ export const proposeOnOpenMissionConfig: ActionConfig = {
   },
 
   updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (p, r) =>
+      scopeList([scope('project', p.projectId), scope('mission', p.openMissionId), decisionScope('ask', r?.data?.askId)]),
+  },
 };

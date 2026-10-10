@@ -414,7 +414,7 @@ export interface ActionContext {
  * Who sees an action's change on their screens.
  * - `project` — every member of each `project:<pid>` among the scopes (the
  *   default when there is one);
- * - `parties` — `partiesFrom`, for bilateral flows (a sale claim, a deal, a wish);
+ * - `parties` — only `partiesFrom`, for bilateral flows (a sale claim, a deal, a wish);
  * - `self` — only the actor's own tabs and devices (the default otherwise).
  * The actor is always included: their other devices need it too.
  */
@@ -424,7 +424,11 @@ export interface RealtimeConfig {
   /** Scopes from `$lib/realtime/scopes` — build them with `scope()` / `scopeList()`. */
   scopes: (params: Record<string, any>, result: any, context: ActionContext) => string[];
   audience?: RealtimeAudience;
-  /** For `parties`: the user ids beside the actor. */
+  /**
+   * The user ids the change is about beside the actor — the whole audience for
+   * `parties`, added to the members for `project` (a candidate or a customer who
+   * is not a member yet).
+   */
   partiesFrom?: (params: Record<string, any>, result: any) => Array<string | number | null | undefined>;
 }
 

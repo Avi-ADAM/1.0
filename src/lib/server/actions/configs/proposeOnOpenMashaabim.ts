@@ -25,6 +25,7 @@ import {
   runResourceAskmAcceptance,
 } from '../helpers/runResourceAskmAcceptance.js';
 import { ensureCandidacyTimegrama } from '../../nego/timegrama.js';
+import { scope, decisionScope, scopeList } from '$lib/realtime/scopes.js';
 
 /** Requester's own "in favor" vote on the round (round 0). */
 function buildRequesterVote(userId: string, at: Date) {
@@ -204,4 +205,9 @@ export const proposeOnOpenMashaabimConfig: ActionConfig = {
   },
 
   updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (p, r) =>
+      scopeList([scope('project', p.projectId), scope('resource', p.openMashaabimId), decisionScope('askm', r?.data?.askmId)]),
+  },
 };

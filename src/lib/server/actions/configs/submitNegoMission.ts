@@ -5,6 +5,7 @@ import { asService, asUser } from '$lib/server/shifts/exec.js';
 import { loadPlanForPendm, setPendmPlan } from '$lib/server/shifts/store.js';
 import { canonicalPattern, isStaffable, samePattern } from '$lib/shifts/pattern.js';
 import type { ShiftPattern } from '$lib/shifts/types.js';
+import { scope, decisionScope, scopeList } from '$lib/realtime/scopes.js';
 
 interface NewAct {
   shem: string;
@@ -338,4 +339,11 @@ export const submitNegoMissionConfig: ActionConfig = {
   },
 
   updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (p) =>
+      scopeList(Number(p.isAsk) === 0
+        ? [scope('project', p.projectId), decisionScope('pendm', p.pendId)]
+        : [scope('project', p.projectId), decisionScope('ask', p.isAsk), scope('mission', p.pendId)]),
+  },
 };

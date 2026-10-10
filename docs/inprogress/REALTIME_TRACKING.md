@@ -42,7 +42,7 @@
 | socket-server — בקשת polling אחת (`/socket.io/?transport=polling`) הפילה את התהליך (`ERR_HTTP_HEADERS_SENT`): ה-handler של ה-HTTP נרשם אחרי socket.io וענה 404 על הנתיב שלו | [x] 2026-10-09 — `socket-server/src/socket-path.ts` + בדיקה; נפרס, 3 בקשות polling בפרודקשן = 200 בלי restart. `deploy-socket.ps1` מוודא את הקובץ בכל פריסה |
 | socket-server — `event` / `rt:changed` בפרודקשן | [x] 2026-10-09 — `deploy-socket.ps1` (פריסה ראשונה מעץ העבודה, `7049d4e3-dirty`); `/health` ציבורי תקין, `/broadcast` בלי סוד 401, `:rollback` שמור |
 | R3 — דפים, גל 1 | [~] 2026-10-10 — כל הדפים מחוברים חוץ מ-`negotiation/[id]` (נדחה); 12 נבדקו חי בהזרקה ל-bus. פתוח: `/lev`, `VoteDetail`, deals/wish/concierge בשני דפדפנים — כשה-actions שלהם יפרסמו (R4). המאזינים הישנים נשארים עד R6 |
-| R4 — actions לפי תחום | [ ] — פיילוט `updateMissionStatus` **נבדק בשני דפדפנים 2026-10-10** (256 → 258, רקמה 87, משימה 191): `rt:changed` הגיע ל-258 עם `project:87`, `mission:191` ו-`originClientId` של הטאב השני; ה-bus מסר אחרי ~0.5ש׳; מתאם moach שלח **בקשה אחת** (`getProjectMissions` של 87), בלי טעינת דף; שינוי שאף מסך לא מקשיב לו — אפס בקשות; ההד של הטאב המקורי מסונן. הבדיקה מצאה באג: `/api/action` בנה `ActionService` משלו בלי broadcaster — אף פעולה מהדפדפן לא פרסמה. תוקן (`realtimeFor(notifier)` משותף ל-`/api/action` ול-`actions/index.ts`) |
+| R4 — actions לפי תחום | [~] 2026-10-11 — **vote + archive: 34 actions** מצהירים `realtime` (נשארו: `archiveSpaceDoc` — ערוץ `space:changed` משלו; `proposeRikmaBlueprint` — עוד אין רקמה). נבדק בשני דפדפנים (256 ↔ 258, החלטה 78 על משימה 191): הצעת עריכה → הצעה נגדית → אישור, כל צד רואה את הסבב של השני בלי טעינת דף, והשם חזר למקור. `partiesFrom` מצטרף עכשיו גם לקהל `project` (מועמד שעוד אינו חבר). הבדיקה מצאה באג קודם ב-`VoteDetail` — ראו B12. — פיילוט `updateMissionStatus` **נבדק בשני דפדפנים 2026-10-10** (256 → 258, רקמה 87, משימה 191): `rt:changed` הגיע ל-258 עם `project:87`, `mission:191` ו-`originClientId` של הטאב השני; ה-bus מסר אחרי ~0.5ש׳; מתאם moach שלח **בקשה אחת** (`getProjectMissions` של 87), בלי טעינת דף; שינוי שאף מסך לא מקשיב לו — אפס בקשות; ההד של הטאב המקורי מסונן. הבדיקה מצאה באג: `/api/action` בנה `ActionService` משלו בלי broadcaster — אף פעולה מהדפדפן לא פרסמה. תוקן (`realtimeFor(notifier)` משותף ל-`/api/action` ול-`actions/index.ts`) |
 | R5 — דפים, גל 2 + timegrama + הסרת `invalidate(() => true)` | [ ] |
 | R6 — ניקוי מאזינים ישנים | [ ] |
 
@@ -61,6 +61,7 @@
 | B9 | timegrama ו-`/api/send` כותבים בלי סוקט | [ ] |
 | B10 | דפי בדיקה ציבוריים: `test-socket`, `test-lev-socket`, `test-migration` | [x] 2026-10-08 — נמחקו |
 | B11 | `socketClient.connect()` מפיל ובונה מחדש socket חי; ה-layouts של moach ושל forum קוראים לו בכל כניסה ⇒ אירועים אובדים בזמן החיבור מחדש | [x] 2026-10-08 — אותו משתמש עם socket מחובר/פעיל ⇒ no-op (בדיקה ב-`socketClient.test.ts`) |
+| B12 | `VoteDetail` (עמוד הצבעה בודדת): ה-`$effect` שזורע את ה-stores קרא גם את `projectBase`, אז כל ריצה חוזרת של ה-layout (הצבעה אחרת ברקמה, המאזין הישן או מתאם moach) זרעה מחדש את העותק מהטעינה הראשונה מעל מה ש-`refetch()` קרא — סבב נגדי של חבר אחר "קפץ" חזרה לסבב הקודם. פגע גם במאזין הישן, לא רק ב-realtime | [x] 2026-10-11 — ה-effect עוקב רק אחרי `entity` (`untrack`) |
 
 ### התראות לבני אדם — באגים מהמיפוי
 
@@ -391,13 +392,13 @@ inline מהקובץ עצמו ומה-helpers (`deal/offerDeal.ts`, `sheirut/dealE
 
 | action | file | socket today | recipients | effect for others | metadata.type → who reacts | ערוצים היום | intent יעד | target scopes | status |
 |---|---|---|---|---|---|---|---|---|---|
-| `archivePersonalMatanot` | archivePersonalMatanot | none |  | — |  | — | — |  | [ ] |
+| `archivePersonalMatanot` | archivePersonalMatanot | none |  | — |  | — | — | `product` · self | [x] 2026-10-11 |
 | `archiveSpaceDoc` | spaceDocs | none |  | — |  | — ⚠ | A |  | [ ] |
-| `archiveUserResource` | archiveUserResource | config | specificUsers | partial(lev) | profile → userStore | S | — |  | [ ] |
-| `counterObjectChange` | counterObjectChange | inline |  | full | voteUpdate → votes+rikma+moach(lazy) | intent ✓ | C |  | [ ] |
+| `archiveUserResource` | archiveUserResource | config | specificUsers | partial(lev) | profile → userStore | S | — | `user:<me>` · self | [x] 2026-10-11 |
+| `counterObjectChange` | counterObjectChange | inline |  | full | voteUpdate → votes+rikma+moach(lazy) | intent ✓ | C | `project`, `decision:decision` | [x] 2026-10-11 — נבדק בשני דפדפנים |
 | `previewArchiveMembership` | previewArchiveMembership | read-only |  |  |  |  |  |  | n/a |
-| `proposeObjectArchive` | proposeObjectArchive | inline |  | full | voteUpdate → votes+rikma+moach(lazy) | intent ✓ | C |  | [ ] |
-| `proposeObjectEdit` | proposeObjectEdit | inline |  | full | voteUpdate → votes+rikma+moach(lazy) | intent ✓ | C |  | [ ] |
+| `proposeObjectArchive` | proposeObjectArchive | inline |  | full | voteUpdate → votes+rikma+moach(lazy) | intent ✓ | C | `project`, `decision:decision` (+ ההמשך), האובייקט | [x] 2026-10-11 |
+| `proposeObjectEdit` | proposeObjectEdit | inline |  | full | voteUpdate → votes+rikma+moach(lazy) | intent ✓ | C | `project`, `decision:decision`, האובייקט | [x] 2026-10-11 — נבדק בשני דפדפנים |
 
 ### maagad — 8 actions (live 0 · full 0 · toast 3 · silent 5 · read-only 0)
 
@@ -425,37 +426,37 @@ inline מהקובץ עצמו ומה-helpers (`deal/offerDeal.ts`, `sheirut/dealE
 
 | action | file | socket today | recipients | effect for others | metadata.type → who reacts | ערוצים היום | intent יעד | target scopes | status |
 |---|---|---|---|---|---|---|---|---|---|
-| `acceptCounterOnAsk` | acceptCounterOnAsk | config | projectMembers (−me) | toast | base → moach(lazy) | intent ✓ | O |  | [ ] |
-| `acceptCounterOnAskm` | acceptCounterOnAskm | config | projectMembers (−me) | toast | base → moach(lazy) | intent ✓ | O |  | [ ] |
-| `addVote` | addVote | config | projectMembers | partial(lev) | voteUpdate → votes+rikma+moach(lazy) | intent ✓ | A·O |  | [ ] |
-| `applyToMission` | applyToMission | config | projectMembers | toast | missionApplication → moach(lazy) | intent ✓ | C |  | [ ] |
-| `candidateCounterOnAsk` | candidateCounterOnAsk | config | projectMembers (−me) | toast | base → moach(lazy) | intent ✓ | C |  | [ ] |
-| `candidateCounterOnAskm` | candidateCounterOnAskm | config | projectMembers (−me) | toast | base → moach(lazy) | intent ✓ | C |  | [ ] |
-| `counterOnAsk` | counterOnAsk | config | specificUsers | toast | base → moach(lazy) | intent ✓ | C |  | [ ] |
-| `counterOnAskm` | counterOnAskm | config | specificUsers | toast | base → moach(lazy) | intent ✓ | C |  | [ ] |
-| `declineAskmRequest` | declineAskmRequest | none |  | — |  | — ⚠ | P |  | [ ] |
-| `declineMissionRequest` | declineMissionRequest | none |  | — |  | — ⚠ | P |  | [ ] |
-| `declineOpenMission` | declineOpenMission | none |  | — |  | — | — |  | [ ] |
-| `declineSpForMashaabim` | declineSpForMashaabim | none |  | — |  | — | — |  | [ ] |
-| `dismissSelfNomination` | dismissSelfNomination | config | specificUsers | toast | selfNomination → moach(lazy) | intent ✓ | P |  | [ ] |
-| `finalizeAskAcceptance` | finalizeAskAcceptance | config | projectMembers | full | missionCreated → moach(lazy) | intent ✓ | O |  | [ ] |
-| `finalizeAskmAcceptance` | finalizeAskmAcceptance | config | projectMembers | refetch(lev) | askmAccepted → moach(lazy) | intent ✓ | O |  | [ ] |
-| `finalizeJoinAcceptance` | finalizeJoinAcceptance | config | projectMembers | full | missionCreated → moach(lazy) | intent ✓ | O |  | [ ] |
+| `acceptCounterOnAsk` | acceptCounterOnAsk | config | projectMembers (−me) | toast | base → moach(lazy) | intent ✓ | O | `project`, `decision:ask` | [x] 2026-10-11 |
+| `acceptCounterOnAskm` | acceptCounterOnAskm | config | projectMembers (−me) | toast | base → moach(lazy) | intent ✓ | O | `project`, `decision:askm` | [x] 2026-10-11 |
+| `addVote` | addVote | config | projectMembers | partial(lev) | voteUpdate → votes+rikma+moach(lazy) | intent ✓ | A·O | `project`, לפי `type` (`decision:*` / `deal`), `deal` (נוצר) | [x] 2026-10-11 |
+| `applyToMission` | applyToMission | config | projectMembers | toast | missionApplication → moach(lazy) | intent ✓ | C | `project` (אם יש), `mission`, `decision:ask` | [x] 2026-10-11 |
+| `candidateCounterOnAsk` | candidateCounterOnAsk | config | projectMembers (−me) | toast | base → moach(lazy) | intent ✓ | C | `project`, `decision:ask`, `mission` | [x] 2026-10-11 |
+| `candidateCounterOnAskm` | candidateCounterOnAskm | config | projectMembers (−me) | toast | base → moach(lazy) | intent ✓ | C | `project`, `decision:askm`, `resource` | [x] 2026-10-11 |
+| `counterOnAsk` | counterOnAsk | config | specificUsers | toast | base → moach(lazy) | intent ✓ | C | `project`, `decision:ask`, `mission` · +המועמד | [x] 2026-10-11 |
+| `counterOnAskm` | counterOnAskm | config | specificUsers | toast | base → moach(lazy) | intent ✓ | C | `project`, `decision:askm`, `resource` · +המועמד | [x] 2026-10-11 |
+| `declineAskmRequest` | declineAskmRequest | none |  | — |  | — ⚠ | P | `project`, `decision:askm` | [x] 2026-10-11 |
+| `declineMissionRequest` | declineMissionRequest | none |  | — |  | — ⚠ | P | `project`, `mission` · +המועמד | [x] 2026-10-11 |
+| `declineOpenMission` | declineOpenMission | none |  | — |  | — | — | `mission` · self | [x] 2026-10-11 |
+| `declineSpForMashaabim` | declineSpForMashaabim | none |  | — |  | — | — | `project`, `resource` | [x] 2026-10-11 |
+| `dismissSelfNomination` | dismissSelfNomination | config | specificUsers | toast | selfNomination → moach(lazy) | intent ✓ | P | `project`, `mission` / `resource` | [x] 2026-10-11 |
+| `finalizeAskAcceptance` | finalizeAskAcceptance | config | projectMembers | full | missionCreated → moach(lazy) | intent ✓ | O | `project`, `decision:ask`, `mission` · +המתקבל | [x] 2026-10-11 |
+| `finalizeAskmAcceptance` | finalizeAskmAcceptance | config | projectMembers | refetch(lev) | askmAccepted → moach(lazy) | intent ✓ | O | `project`, `decision:askm`, `resource` · +המתקבל | [x] 2026-10-11 |
+| `finalizeJoinAcceptance` | finalizeJoinAcceptance | config | projectMembers | full | missionCreated → moach(lazy) | intent ✓ | O | `project`, `decision:ask`, `mission` · +המתקבל | [x] 2026-10-11 |
 | `getDecisionDetails` | getDecisionDetails | read-only |  |  |  |  |  |  | n/a |
-| `nominateSelfMission` | nominateSelfMission | config | projectMembers | toast | selfNomination → moach(lazy) | intent ✓ | C |  | [ ] |
-| `nominateSelfResource` | nominateSelfResource | config | projectMembers | toast | selfNomination → moach(lazy) | intent ✓ | C |  | [ ] |
-| `proposeOnOpenMashaabim` | proposeOnOpenMashaabim | config | specificUsers | toast | mashaabimRequest → moach(lazy) | intent ✓ | C |  | [ ] |
-| `proposeOnOpenMission` | proposeOnOpenMission | config | specificUsers | toast | missionApplication → moach(lazy) | intent ✓ | C |  | [ ] |
+| `nominateSelfMission` | nominateSelfMission | config | projectMembers | toast | selfNomination → moach(lazy) | intent ✓ | C | `project`, `mission`, `decision:ask` | [x] 2026-10-11 |
+| `nominateSelfResource` | nominateSelfResource | config | projectMembers | toast | selfNomination → moach(lazy) | intent ✓ | C | `project`, `resource`, `decision:askm` | [x] 2026-10-11 |
+| `proposeOnOpenMashaabim` | proposeOnOpenMashaabim | config | specificUsers | toast | mashaabimRequest → moach(lazy) | intent ✓ | C | `project`, `resource`, `decision:askm` | [x] 2026-10-11 |
+| `proposeOnOpenMission` | proposeOnOpenMission | config | specificUsers | toast | missionApplication → moach(lazy) | intent ✓ | C | `project` (אם יש), `mission`, `decision:ask` | [x] 2026-10-11 |
 | `proposeRikmaBlueprint` | assistantSessions | none |  | — |  | — | — |  | [ ] |
-| `proposeRikmaIdentity` | proposeRikmaIdentity | config | projectMembers (−me) | full | base → moach(lazy) | intent ✓ | C |  | [ ] |
-| `submitNegoMaap` | submitNegoMaap | config | projectMembers (−me) | full | maapNego → moach(lazy) | intent ✓ | C |  | [ ] |
-| `submitNegoMash` | submitNegoMash | config | projectMembers (−me) | partial(lev) | base → moach(lazy) | intent ✓ | C |  | [ ] |
-| `submitNegoMission` | submitNegoMission | config | projectMembers (−me) | partial(lev) | base → moach(lazy) | intent ✓ | C |  | [ ] |
-| `voteOnAskm` | voteOnAskm | config | projectMembers (−me) | refetch(lev) | voteUpdate → votes+rikma+moach(lazy) | intent ✓ | A |  | [ ] |
-| `voteOnDecision` | voteOnDecision | config | projectMembers | partial(lev) | saleClaimConfirmed → moach(lazy)<br>voteUpdate → votes+rikma+moach(lazy)<br>decisionVote → votes+rikma+moach(lazy) | intent ✓ | A·O |  | [ ] |
-| `voteOnMaap` | voteOnMaap | config | projectMembers | partial(lev) | maapVote → votes+rikma+moach(lazy) | intent ✓ | A·C·O |  | [ ] |
-| `voteOnPendm` | voteOnPendm | config | projectMembers | partial(lev) | voteUpdate → votes+rikma+moach(lazy)<br>pendmVote → votes+rikma+moach(lazy) | intent ✓ | A·O |  | [ ] |
-| `voteOnPmash` | voteOnPmash | config | projectMembers | partial(lev) | pmashVote → votes+rikma+moach(lazy) | intent ✓ | A·O |  | [ ] |
+| `proposeRikmaIdentity` | proposeRikmaIdentity | config | projectMembers (−me) | full | base → moach(lazy) | intent ✓ | C | `project`, `decision:decision` לכל החלטה שנפתחה | [x] 2026-10-11 |
+| `submitNegoMaap` | submitNegoMaap | config | projectMembers (−me) | full | maapNego → moach(lazy) | intent ✓ | C | `project`, `decision:maap` | [x] 2026-10-11 |
+| `submitNegoMash` | submitNegoMash | config | projectMembers (−me) | partial(lev) | base → moach(lazy) | intent ✓ | C | `project`, `decision:pmash` | [x] 2026-10-11 |
+| `submitNegoMission` | submitNegoMission | config | projectMembers (−me) | partial(lev) | base → moach(lazy) | intent ✓ | C | `project`, `decision:pendm` או `decision:ask` + `mission` | [x] 2026-10-11 |
+| `voteOnAskm` | voteOnAskm | config | projectMembers (−me) | refetch(lev) | voteUpdate → votes+rikma+moach(lazy) | intent ✓ | A | `project`, `decision:askm` | [x] 2026-10-11 |
+| `voteOnDecision` | voteOnDecision | config | projectMembers | partial(lev) | saleClaimConfirmed → moach(lazy)<br>voteUpdate → votes+rikma+moach(lazy)<br>decisionVote → votes+rikma+moach(lazy) | intent ✓ | A·O | `project`, `decision:decision` | [x] 2026-10-11 — נבדק בשני דפדפנים |
+| `voteOnMaap` | voteOnMaap | config | projectMembers | partial(lev) | maapVote → votes+rikma+moach(lazy) | intent ✓ | A·C·O | `project`, `decision:maap` | [x] 2026-10-11 |
+| `voteOnPendm` | voteOnPendm | config | projectMembers | partial(lev) | voteUpdate → votes+rikma+moach(lazy)<br>pendmVote → votes+rikma+moach(lazy) | intent ✓ | A·O | `project`, `decision:pendm`, `mission` (נוצרה) | [x] 2026-10-11 |
+| `voteOnPmash` | voteOnPmash | config | projectMembers | partial(lev) | pmashVote → votes+rikma+moach(lazy) | intent ✓ | A·O | `project`, `decision:pmash` | [x] 2026-10-11 |
 
 ### mission — 13 actions (live 1 · full 0 · toast 8 · silent 3 · read-only 1)
 

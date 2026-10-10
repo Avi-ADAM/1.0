@@ -20,6 +20,7 @@ import { voteIntent } from '../../notifications/intent.js';
 import { matchOpenMashaabimToUsers } from '$lib/server/matching/engine';
 import { STRAPI_URL } from '$lib/server/strapiUrl.js';
 import { gqlString } from './actionUtils.js';
+import { scope, decisionScope, scopeList } from '$lib/realtime/scopes.js';
 
 function normalizeVote(v: any): Record<string, any> {
   const uid =
@@ -277,4 +278,9 @@ export const voteOnPmashConfig: ActionConfig = {
   },
 
   updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (p) =>
+      scopeList([scope('project', p.projectId), decisionScope('pmash', p.pmashId)]),
+  },
 };

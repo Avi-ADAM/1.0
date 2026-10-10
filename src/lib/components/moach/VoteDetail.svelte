@@ -19,7 +19,7 @@
    * Self-contained on purpose: a future standalone /vote/[kind]/[id] outside
    * moach can render this component as-is, passing the same props.
    */
-  import { onMount, onDestroy } from 'svelte';
+  import { onMount, onDestroy, untrack } from 'svelte';
   import { browser } from '$app/environment';
   import { goto } from '$app/navigation';
   import { isRtl, t } from '$lib/translations';
@@ -233,9 +233,13 @@
   // (Re)seed whenever the target entity changes — covers the initial load and
   // SPA navigation between vote pages without a remount. Reset the terminal
   // state so a freshly opened vote isn't shown as closed.
+  // Only `entity` is tracked: seeding reads `projectBase` too, and a layout
+  // re-run (a vote elsewhere in the rikma) would otherwise re-seed this page's
+  // first-load copy over what refetch() just read — the round a member had
+  // countered snapped back to the previous one.
   $effect(() => {
-    void entity;
-    seedFromEntity(entity);
+    const ent = entity;
+    untrack(() => seedFromEntity(ent));
   });
 
   let socketUnsub;

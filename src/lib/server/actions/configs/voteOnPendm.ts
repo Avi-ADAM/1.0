@@ -25,6 +25,7 @@ import { normalizeNeed } from '$lib/missions/headcount.js';
 import { shiftsEnabled } from '$lib/server/shifts/mode.js';
 import { asUser as asShiftUser } from '$lib/server/shifts/exec.js';
 import { activatePlanForPendm } from '$lib/server/shifts/store.js';
+import { scope, decisionScope, scopeList } from '$lib/realtime/scopes.js';
 
 // Helper: normalise a vote component row to a plain object for GraphQL variables
 function normalizeVote(v: any): Record<string, any> {
@@ -401,4 +402,9 @@ export const voteOnPendmConfig: ActionConfig = {
   },
 
   updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (p, r) =>
+      scopeList([scope('project', p.projectId), decisionScope('pendm', p.pendId), scope('mission', r?.data?.openMissionId)]),
+  },
 };
