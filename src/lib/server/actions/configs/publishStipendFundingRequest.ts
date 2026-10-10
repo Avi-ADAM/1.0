@@ -25,6 +25,7 @@ import { dateField, enumField, fields, gqlStr, numField, run, strField } from '$
 import { fetchProgram, fetchProjectContext } from '$lib/server/stipend/read.js';
 import { matchOpenMashaabimToUsers } from '$lib/server/matching/engine.js';
 import { resolveFundingRequestTerms } from '$lib/stipend/fundingRequestTerms.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 const KIND_OFS = ['total', 'perUnit', 'rent', 'monthly', 'yearly'] as const;
 
@@ -142,7 +143,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
   }
 
   return {
-    data: { openMashaabimId, programId, monthly, months, total, suggested },
+    data: { openMashaabimId, programId, monthly, months, total, suggested, projectId: program.projectId },
     updateStrategy: { type: 'fullRefresh' as const }
   };
 };
@@ -168,5 +169,10 @@ export const publishStipendFundingRequestConfig: ActionConfig = {
 
   authRules: [{ type: 'jwt', errorMessage: 'Must be logged in to publish a funding request' }],
 
-  updateStrategy: { type: 'fullRefresh' }
+  updateStrategy: { type: 'fullRefresh' },
+
+  realtime: {
+    scopes: (p, r) =>
+      scopeList([scope('project', r?.data?.projectId), scope('stipend', p.programId), scope('resource', r?.data?.openMashaabimId)]),
+  },
 };

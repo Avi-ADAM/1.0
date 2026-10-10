@@ -17,6 +17,7 @@ import { shiftError } from '$lib/shifts/errors.js';
 import { asUser, run } from '$lib/server/shifts/exec.js';
 import { shiftsEnabled } from '$lib/server/shifts/mode.js';
 import { normalizeRules, validateRules, type StandingRule } from '$lib/shifts/rules.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 const setShiftRules: ActionExecutionHandler = async (params, context) => {
   if (!shiftsEnabled()) return { data: { skipped: true, reason: 'SHIFTS is off' }, updateStrategy: { type: 'none' } };
@@ -56,5 +57,11 @@ export const setShiftRulesConfig: ActionConfig = {
     rules: { type: 'array', required: true, description: 'Ordered rules: { days: 0-6[], from?: "HH:MM", to?: "HH:MM", stance } — first match wins; [] clears' }
   },
   authRules: [{ type: 'jwt' }],
-  updateStrategy: { type: 'none' }
+  updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (p) =>
+      scopeList([scope('mission', p.mesimabetahalichId)]),
+    audience: 'self',
+  },
 };

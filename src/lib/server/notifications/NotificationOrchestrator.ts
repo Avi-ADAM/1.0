@@ -261,7 +261,11 @@ export class NotificationOrchestrator {
     switch (rule.type) {
       case 'projectMembers':
         const projectIdParam = rule.config?.projectIdParam || 'projectId';
-        const projectId = this.getNestedValue(params, projectIdParam);
+        // An action whose rikma is resolved by the handler (not passed in)
+        // names it on the result, as `specificUsers` below already allows.
+        const projectId =
+          this.getNestedValue(params, projectIdParam) ||
+          (actionResult ? this.getNestedValue(actionResult, projectIdParam) : undefined);
         return await this.getProjectMembers(projectId, context);
 
       case 'specificUsers':

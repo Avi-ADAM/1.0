@@ -22,6 +22,7 @@ import {
 import { normalizeTerms, validateStipendTerms } from '$lib/stipend/computeStipendEquity.js';
 import { fetchProjectContext } from '$lib/server/stipend/read.js';
 import { moneyTextFor } from '$lib/server/money/notifyMoney.js';
+import { scope, decisionScope, scopeList } from '$lib/realtime/scopes.js';
 
 const handler: ActionExecutionHandler = async (params, context, { notifier }) => {
   const decisionId = String(params.decisionId ?? '');
@@ -105,7 +106,8 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
               en: `Different terms are on the table: ${money(terms.stipendRate, 'en')} per hour${terms.totalCap ? `, cap ${money(terms.totalCap, 'en')}` : ''}. The new version is the one being decided.`
             }
           },
-          channels: ['socket', 'push'],
+          // A counter resets the clock and waits for an answer.
+          intent: 'consent',
           metadata: { type: 'voteUpdate', url: 'lev', priority: 'high' }
         },
         { recipients: others, projectId: decision.projectId },
@@ -116,7 +118,7 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
   }
 
   return {
-    data: { decisionId, ordern: result.ordern, deadline: result.deadline, terms },
+    data: { decisionId, ordern: result.ordern, deadline: result.deadline, terms, projectId: decision.projectId ?? null },
     updateStrategy: { type: 'fullRefresh' as const }
   };
 };
@@ -141,5 +143,10 @@ export const counterStipendTermsConfig: ActionConfig = {
 
   authRules: [{ type: 'jwt', errorMessage: 'Must be logged in to counter a stipend proposal' }],
 
-  updateStrategy: { type: 'fullRefresh' }
+  updateStrategy: { type: 'fullRefresh' },
+
+  realtime: {
+    scopes: (p, r) =>
+      scopeList([scope('project', r?.data?.projectId), decisionScope('decision', p.decisionId)]),
+  },
 };

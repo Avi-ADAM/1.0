@@ -35,7 +35,8 @@ const event = (uid = '5') =>
   ({
     params: { id: '16' },
     locals: { uid, tok: 'jwt' },
-    fetch: (() => {}) as unknown as typeof fetch
+    fetch: (() => {}) as unknown as typeof fetch,
+    depends: () => {}
   }) as any;
 
 const wishNode = (over: Record<string, unknown> = {}, proposals: any[] = []) => ({

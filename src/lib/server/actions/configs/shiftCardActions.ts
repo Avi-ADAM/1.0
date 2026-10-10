@@ -33,6 +33,7 @@ import {
   upsertDeclaration
 } from '$lib/server/shifts/store.js';
 import { coverageOf, nextInLine } from '$lib/shifts/coverage.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 const skipped = (why: string) => ({ data: { skipped: true, reason: why }, updateStrategy: { type: 'none' as const } });
 
@@ -157,7 +158,8 @@ const releaseShiftAssignment: ActionExecutionHandler = async (params, context, {
               en: 'Someone released a shift you were in line for. If you can come, you can take it from the heart in one tap.'
             }
           },
-          channels: ['socket', 'push'],
+          // The next in line is invited to take the place; nothing runs against them.
+          intent: 'personal',
           metadata: { type: 'shiftCall', url: 'lev', priority: 'high' }
         },
         { recipients: [calledUserId], projectId: a.projectId },
@@ -167,7 +169,7 @@ const releaseShiftAssignment: ActionExecutionHandler = async (params, context, {
       .catch((e: unknown) => console.warn('[releaseShiftAssignment] call notification failed:', e));
   }
 
-  return { data: { released: true, calledUserId }, updateStrategy: { type: 'fullRefresh' } };
+  return { data: { released: true, calledUserId, projectId: a.projectId ?? null, shiftId: a.shift.id }, updateStrategy: { type: 'fullRefresh' } };
 };
 
 export const releaseShiftAssignmentConfig: ActionConfig = {
@@ -179,7 +181,12 @@ export const releaseShiftAssignmentConfig: ActionConfig = {
     reason: { type: 'string', required: false, description: 'Optional note for the rikma' }
   },
   authRules: [{ type: 'jwt' }],
-  updateStrategy: { type: 'fullRefresh' }
+  updateStrategy: { type: 'fullRefresh' },
+
+  realtime: {
+    scopes: (_p, r) =>
+      scopeList([scope('project', r?.data?.projectId), scope('shift', r?.data?.shiftId)]),
+  },
 };
 
 // ── claimShiftHole ───────────────────────────────────────────────────────────
@@ -243,7 +250,7 @@ const claimShiftHole: ActionExecutionHandler = async (params, context) => {
     mesimabetahalichId: me.mesimabetahalichId,
     coveredForId: released?.id ?? null
   });
-  return { data: { claimed: true, assignmentId: assignment.id }, updateStrategy: { type: 'fullRefresh' } };
+  return { data: { claimed: true, assignmentId: assignment.id, projectId: ctx.projectId, shiftId: shift.id }, updateStrategy: { type: 'fullRefresh' } };
 };
 
 export const claimShiftHoleConfig: ActionConfig = {
@@ -252,7 +259,12 @@ export const claimShiftHoleConfig: ActionConfig = {
   graphqlOperation: claimShiftHole,
   paramSchema: { shiftId: { type: 'string', required: true, description: 'The short shift' } },
   authRules: [{ type: 'jwt' }],
-  updateStrategy: { type: 'fullRefresh' }
+  updateStrategy: { type: 'fullRefresh' },
+
+  realtime: {
+    scopes: (_p, r) =>
+      scopeList([scope('project', r?.data?.projectId), scope('shift', r?.data?.shiftId)]),
+  },
 };
 
 // ── reopenForShiftHole ───────────────────────────────────────────────────────
@@ -274,7 +286,7 @@ const reopenForShiftHole: ActionExecutionHandler = async (params, context) => {
 
   const { howMeny } = await recruitOneMore(exec, openMissionId);
   await markPeriodReopened(exec, period, new Date().toISOString());
-  return { data: { reopened: true, howMeny, openMissionId }, updateStrategy: { type: 'fullRefresh' } };
+  return { data: { reopened: true, howMeny, openMissionId, projectId: shiftCtx?.projectId ?? null }, updateStrategy: { type: 'fullRefresh' } };
 };
 
 export const reopenForShiftHoleConfig: ActionConfig = {
@@ -287,7 +299,8 @@ export const reopenForShiftHoleConfig: ActionConfig = {
   },
   authRules: [{ type: 'jwt' }],
   notification: {
-    recipients: { type: 'projectMembers', config: { projectIdParam: 'projectId' } },
+    // The rikma is read off the result: no param carries it, so this used to reach nobody.
+    recipients: { type: 'projectMembers', config: { projectIdParam: 'data.projectId' } },
     templates: {
       title: { he: 'המשימה נפתחת למועמד נוסף', en: 'The mission is open to one more candidate' },
       body: {
@@ -295,8 +308,14 @@ export const reopenForShiftHoleConfig: ActionConfig = {
         en: 'The shift cycle has holes nobody can cover, so the mission is back on the open board to recruit one more person.'
       }
     },
-    channels: ['socket'],
+    // Activity in the rikma, as today.
+    intent: 'ambient',
     metadata: { type: 'shiftReopen', url: 'lev' }
   },
-  updateStrategy: { type: 'fullRefresh' }
+  updateStrategy: { type: 'fullRefresh' },
+
+  realtime: {
+    scopes: (p, r) =>
+      scopeList([scope('project', r?.data?.projectId), scope('shift', p.shiftId), scope('mission', r?.data?.openMissionId)]),
+  },
 };

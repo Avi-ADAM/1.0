@@ -21,6 +21,7 @@ import { shiftError } from '$lib/shifts/errors.js';
 import { asUser, run } from '$lib/server/shifts/exec.js';
 import { shiftsLive } from '$lib/server/shifts/mode.js';
 import { loadAssignment, updateAssignment } from '$lib/server/shifts/store.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 const skipped = (why: string) => ({ data: { skipped: true, reason: why }, updateStrategy: { type: 'none' as const } });
 
@@ -63,7 +64,13 @@ export const linkShiftTimerConfig: ActionConfig = {
   graphqlOperation: linkShiftTimer,
   paramSchema: { assignmentId: { type: 'string', required: true, description: 'My shift place' } },
   authRules: [{ type: 'jwt' }],
-  updateStrategy: { type: 'none' }
+  updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (_p, _r, ctx) =>
+      scopeList([scope('timer', ctx.userId)]),
+    audience: 'self',
+  },
 };
 
 // ── logShiftHours ────────────────────────────────────────────────────────────
@@ -137,7 +144,7 @@ const logShiftHours: ActionExecutionHandler = async (params, context) => {
   );
   if (!saved?.success) throw new Error(saved?.error?.message ?? 'Saving the hours failed');
   await updateAssignment(exec, a.id, { state: 'done' });
-  return { data: { logged: true, timerId, hours }, updateStrategy: { type: 'fullRefresh' } };
+  return { data: { logged: true, timerId, hours, projectId, missionId: a.mesimabetahalichId }, updateStrategy: { type: 'fullRefresh' } };
 };
 
 export const logShiftHoursConfig: ActionConfig = {
@@ -150,5 +157,10 @@ export const logShiftHoursConfig: ActionConfig = {
     note: { type: 'string', required: false, description: 'What was done — carried to the approval like a timer note' }
   },
   authRules: [{ type: 'jwt' }],
-  updateStrategy: { type: 'fullRefresh' }
+  updateStrategy: { type: 'fullRefresh' },
+
+  realtime: {
+    scopes: (_p, r, ctx) =>
+      scopeList([scope('project', r?.data?.projectId), scope('mission', r?.data?.missionId), scope('timer', ctx.userId)]),
+  },
 };

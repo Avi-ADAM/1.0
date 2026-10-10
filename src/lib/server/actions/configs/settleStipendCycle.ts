@@ -27,6 +27,7 @@ import {
   fetchProjectContext,
   fetchRecipientContribution
 } from '$lib/server/stipend/read.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 // `advance` stays in the Strapi enum (dropping a deployed enum value is a
 // migration, and rows may already carry it) but is no longer writable from
@@ -266,7 +267,8 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
                   en: `${cycle.hours} approved hours × ${money(pledge.terms.stipendRate, 'en')} = ${money(cycle.amount, 'en')}. The money has not gone out yet — a transfer card with a chat is open, so you can say where to send it.`
                 }
           },
-          channels: ['socket', 'push'],
+          // Sent: the recipient's receipt is awaited. Not yet: only news of the arrangement.
+          intent: transferred ? 'consent' : 'personal',
           metadata: { type: 'stipendPayment', url: 'lev', priority: 'high' }
         },
         { recipients: [pledge.recipientId], projectId: pledge.projectId },
@@ -289,7 +291,10 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
       cycleStart: from,
       cycleEnd: window.cycleEnd,
       equityCredit: lines.equityCredit,
-      equityDebit: lines.equityDebit
+      equityDebit: lines.equityDebit,
+      // Who else shows this (realtime audience).
+      projectId: pledge.projectId,
+      pledgeId
     },
     updateStrategy: { type: 'fullRefresh' as const }
   };
@@ -316,5 +321,10 @@ export const settleStipendCycleConfig: ActionConfig = {
 
   authRules: [{ type: 'jwt', errorMessage: 'Must be logged in to settle a stipend cycle' }],
 
-  updateStrategy: { type: 'fullRefresh' }
+  updateStrategy: { type: 'fullRefresh' },
+
+  realtime: {
+    scopes: (p, r) =>
+      scopeList([scope('project', r?.data?.projectId), scope('stipend', p.pledgeId), scope('split', r?.data?.halukaId)]),
+  },
 };

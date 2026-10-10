@@ -28,6 +28,7 @@ import {
 } from '$lib/server/stipend/read.js';
 import { validateStipendTerms, normalizeTerms } from '$lib/stipend/computeStipendEquity.js';
 import type { PartialStipendTerms } from '$lib/stipend/types.js';
+import { scope, decisionScope, scopeList } from '$lib/realtime/scopes.js';
 
 const SCOPES = ['allMissions', 'selectedMissions', 'singleMission'] as const;
 const RECOURSES = ['nonRecourse', 'personal'] as const;
@@ -261,7 +262,8 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
                 en: `${funderName} offers to fund you at ${money(terms.stipendRate, 'en')} per hour${missionEn}. The card shows what you receive and what it does to your share. Approve, open a discussion, or propose different terms — with no response within ${restimeLabel(project.restime, lang)} it is approved on its own.`
               }
             },
-            channels: ['socket', 'push'],
+            // The recipient is asked to accept the pledge.
+            intent: 'consent',
             metadata: { type: 'voteUpdate', url: 'lev', priority: 'high' }
           },
           { recipients: [recipientId], projectId },
@@ -286,7 +288,8 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
                 en: `It was proposed that you fund ${recipientName} at ${terms.stipendRate} per hour${missionEn}. This is a commitment to pay out of your own pocket: it cannot take effect without your explicit approval — silence will not approve it. Approve, open a discussion, or propose different terms.`
               }
             },
-            channels: ['socket', 'push', 'email'],
+            // The funder is asked to commit money of their own.
+            intent: 'consent',
             metadata: { type: 'voteUpdate', url: 'lev', priority: 'high' }
           },
           { recipients: [funderId], projectId },
@@ -350,5 +353,10 @@ export const proposeStipendPledgeConfig: ActionConfig = {
     }
   ],
 
-  updateStrategy: { type: 'fullRefresh' }
+  updateStrategy: { type: 'fullRefresh' },
+
+  realtime: {
+    scopes: (p, r) =>
+      scopeList([scope('project', p.projectId), scope('stipend', r?.data?.pledgeId), decisionScope('decision', r?.data?.decisionId)]),
+  },
 };

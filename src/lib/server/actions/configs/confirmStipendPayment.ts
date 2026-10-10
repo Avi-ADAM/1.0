@@ -19,6 +19,7 @@ import { dateField, fields, gqlStr, numField, run } from '$lib/server/archive/gq
 import { computeStipendEquity } from '$lib/stipend/computeStipendEquity.js';
 import { fetchPayment, fetchPledge, fetchProgram, fetchProjectContext } from '$lib/server/stipend/read.js';
 import { moneyTextFor } from '$lib/server/money/notifyMoney.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 const handler: ActionExecutionHandler = async (params, context, { notifier }) => {
   const paymentId = String(params.paymentId ?? '');
@@ -151,7 +152,8 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
                   en: `Receipt of ${money(received, 'en')} confirmed. The shares moved according to the pledge's terms.`
                 }
           },
-          channels: ['socket', 'push'],
+          // Tells the funder what arrived; a shortfall invites a resend, no clock.
+          intent: 'personal',
           metadata: { type: 'stipendPayment', url: 'lev', priority: 'normal' }
         },
         { recipients: [payment.funderId], projectId: payment.projectId },
@@ -168,7 +170,10 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
       shortfall,
       status: nothingArrived ? 'cancelled' : 'confirmed',
       equityCredit: lines.equityCredit,
-      equityDebit: lines.equityDebit
+      equityDebit: lines.equityDebit,
+      // Who else shows this (realtime audience).
+      projectId: payment.projectId ?? null,
+      pledgeId: payment.pledgeId ?? null
     },
     updateStrategy: { type: 'fullRefresh' as const }
   };
@@ -194,5 +199,10 @@ export const confirmStipendPaymentConfig: ActionConfig = {
   // recipient is a property of the record, not a client-supplied parameter.
   authRules: [{ type: 'jwt', errorMessage: 'Must be logged in to confirm a stipend payment' }],
 
-  updateStrategy: { type: 'fullRefresh' }
+  updateStrategy: { type: 'fullRefresh' },
+
+  realtime: {
+    scopes: (_p, r) =>
+      scopeList([scope('project', r?.data?.projectId), scope('stipend', r?.data?.pledgeId)]),
+  },
 };

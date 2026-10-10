@@ -41,6 +41,7 @@ import {
   validateStipendTerms
 } from '$lib/stipend/computeStipendEquity.js';
 import { applyStandingStipend, fetchStipendDecision } from '$lib/server/stipend/apply.js';
+import { scope, decisionScope, scopeList } from '$lib/realtime/scopes.js';
 
 // `advance` stays in the Strapi enum (dropping a deployed enum value is a
 // migration, and rows may already carry it) but is no longer writable from
@@ -361,7 +362,8 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
                 en: `${forWhomEn}: ${terms.stipendRate} per hour, ${budgetEn}. The card shows what happens to your share. Approve, discuss, or propose a different budget or cost split — with no response within ${restimeLabel(project.restime, lang)} it is approved on its own, unless the funder has yet to sign.`
               }
             },
-            channels: ['socket', 'push'],
+            // Every member votes on a program that dilutes them.
+            intent: 'consent',
             metadata: { type: 'voteUpdate', url: 'lev', priority: 'high' }
           },
           { recipients: votersOnly, projectId },
@@ -386,7 +388,8 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
                 en: `It was proposed that the rikma funds you at ${terms.stipendRate} per approved hour${missionEn}, ${budgetEn}. The card shows what you receive and what it does to your share. Approve, open a discussion, or propose different terms.`
               }
             },
-            channels: ['socket', 'push'],
+            // The recipient is asked to accept.
+            intent: 'consent',
             metadata: { type: 'voteUpdate', url: 'lev', priority: 'high' }
           },
           { recipients: [recipientId], projectId },
@@ -411,7 +414,8 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
                 en: `You have been proposed as the funder of ${recipientName ? recipientName + '’s' : 'a'} subsistence stipend${missionEn} at ${terms.stipendRate} per approved hour, ${budgetEn}. This is a commitment to pay out of your own pocket: it cannot take effect without your explicit approval, no matter who else stays silent. Approve, open a discussion, or propose different terms.`
               }
             },
-            channels: ['socket', 'push', 'email'],
+            // The funder is asked to commit money of their own.
+            intent: 'consent',
             metadata: { type: 'voteUpdate', url: 'lev', priority: 'high' }
           },
           { recipients: [funderId], projectId },
@@ -473,5 +477,10 @@ export const proposeStipendProgramConfig: ActionConfig = {
     }
   ],
 
-  updateStrategy: { type: 'fullRefresh' }
+  updateStrategy: { type: 'fullRefresh' },
+
+  realtime: {
+    scopes: (p, r) =>
+      scopeList([scope('project', p.projectId), scope('stipend', r?.data?.programId), decisionScope('decision', r?.data?.decisionId)]),
+  },
 };

@@ -13,12 +13,14 @@
  */
 
 import type { ActionConfig, ActionExecutionHandler, ActionContext } from '../types.js';
+import type { NotificationIntent } from '../../notifications/intent.js';
 import { shiftError } from '$lib/shifts/errors.js';
 import { asUser } from '$lib/server/shifts/exec.js';
 import { shiftsLive } from '$lib/server/shifts/mode.js';
 import { createSwap, loadOpenSwapsFor, loadSwap, updateSwap, type SwapView } from '$lib/server/shifts/store.js';
 import { applySwap, assertSwap, deadlineFor, loadSwapScene, silenceFor, SwapError, type SwapScene } from '$lib/server/shifts/swaps.js';
 import { swapTurn } from '$lib/shifts/swap.js';
+import { decisionScope, scopeList } from '$lib/realtime/scopes.js';
 
 const skipped = (why: string) => ({ data: { skipped: true, reason: why }, updateStrategy: { type: 'none' as const } });
 
@@ -34,7 +36,9 @@ function tell(
   recipient: string,
   projectId: string | null,
   title: { he: string; en: string },
-  body: { he: string; en: string }
+  body: { he: string; en: string },
+  // An offer or a counter waits on the other side (often with silence running); a result does not.
+  intent: NotificationIntent
 ) {
   if (!notifier) return;
   notifier
@@ -42,7 +46,7 @@ function tell(
       {
         recipients: { type: 'specificUsers', config: { userIdsParam: 'recipients' } },
         templates: { title, body },
-        channels: ['socket', 'push'],
+        intent,
         metadata: { type: 'shiftSwap', url: 'lev', priority: 'normal' }
       },
       { recipients: [recipient], projectId },
@@ -98,9 +102,10 @@ const proposeShiftSwap: ActionExecutionHandler = async (params, context, { notif
       : {
           he: 'חבר/ה ברקמה מבקש/ת להחליף איתך משמרת. ההחלפה תתבצע רק אם תאשר/י.',
           en: 'A member asks to swap a shift with you. It happens only if you approve.'
-        }
+        },
+    'consent'
   );
-  return { data: { swapId: swap.id, silence, deadline: swap.deadline }, updateStrategy: { type: 'fullRefresh' } };
+  return { data: { swapId: swap.id, silence, deadline: swap.deadline, projectId: scene.plan.project.id, ...parties }, updateStrategy: { type: 'fullRefresh' } };
 };
 
 export const proposeShiftSwapConfig: ActionConfig = {
@@ -113,7 +118,14 @@ export const proposeShiftSwapConfig: ActionConfig = {
     takeAssignmentId: { type: 'string', required: false, description: 'Their place I would take in exchange; omit for "just take mine"' }
   },
   authRules: [{ type: 'jwt' }],
-  updateStrategy: { type: 'fullRefresh' }
+  updateStrategy: { type: 'fullRefresh' },
+
+  realtime: {
+    scopes: (_p, r) =>
+      scopeList([decisionScope('decision', r?.data?.swapId)]),
+    audience: 'parties',
+    partiesFrom: (_p, r) => [r?.data?.fromUserId, r?.data?.toUserId],
+  },
 };
 
 // ── decideShiftSwap ──────────────────────────────────────────────────────────
@@ -136,7 +148,7 @@ const decideShiftSwap: ActionExecutionHandler = async (params, context, { notifi
   if (answer === 'withdraw') {
     if (uid !== swap.fromUserId) throw shiftError('onlyProposer');
     await updateSwap(exec, swap, { status: 'withdrawn' });
-    return { data: { status: 'withdrawn' }, updateStrategy: { type: 'fullRefresh' } };
+    return { data: { status: 'withdrawn', ...parties }, updateStrategy: { type: 'fullRefresh' } };
   }
 
   if (turn.waitingOn !== uid) throw shiftError('notYourTurn');
@@ -155,9 +167,10 @@ const decideShiftSwap: ActionExecutionHandler = async (params, context, { notifi
         : { he: 'החלפת המשמרת לא התאפשרה', en: 'The shift swap could not go ahead' },
       result.applied
         ? { he: 'הסידור עודכן בהתאם.', en: 'The roster has been updated.' }
-        : { he: 'הסידור השתנה בינתיים, ולכן ההחלפה לא בוצעה.', en: 'The roster changed in the meantime, so the swap was not made.' }
+        : { he: 'הסידור השתנה בינתיים, ולכן ההחלפה לא בוצעה.', en: 'The roster changed in the meantime, so the swap was not made.' },
+      'personal'
     );
-    return { data: { status: result.applied ? 'done' : 'lapsed', ...result }, updateStrategy: { type: 'fullRefresh' } };
+    return { data: { status: result.applied ? 'done' : 'lapsed', ...result, ...parties }, updateStrategy: { type: 'fullRefresh' } };
   }
 
   if (answer === 'counter') {
@@ -179,9 +192,10 @@ const decideShiftSwap: ActionExecutionHandler = async (params, context, { notifi
       other,
       scene.plan.project.id,
       { he: 'הוצעה גרסה אחרת להחלפת המשמרת', en: 'A different version of the shift swap was proposed' },
-      { he: 'אפשר לאשר, להציע גרסה אחרת או לשוחח.', en: 'You can approve, propose another version, or talk it over.' }
+      { he: 'אפשר לאשר, להציע גרסה אחרת או לשוחח.', en: 'You can approve, propose another version, or talk it over.' },
+      'consent'
     );
-    return { data: { status: 'open', round: turn.round + 1, silence }, updateStrategy: { type: 'fullRefresh' } };
+    return { data: { status: 'open', round: turn.round + 1, silence, ...parties }, updateStrategy: { type: 'fullRefresh' } };
   }
 
   throw shiftError('badAnswer');
@@ -197,5 +211,12 @@ export const decideShiftSwapConfig: ActionConfig = {
     takeAssignmentId: { type: 'string', required: false, description: 'For a counter: the place to ask for instead (omit = none)' }
   },
   authRules: [{ type: 'jwt' }],
-  updateStrategy: { type: 'fullRefresh' }
+  updateStrategy: { type: 'fullRefresh' },
+
+  realtime: {
+    scopes: (p) =>
+      scopeList([decisionScope('decision', p.decisionId)]),
+    audience: 'parties',
+    partiesFrom: (_p, r) => [r?.data?.fromUserId, r?.data?.toUserId],
+  },
 };

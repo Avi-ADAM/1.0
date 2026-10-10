@@ -24,6 +24,7 @@ import { asUser } from '$lib/server/shifts/exec.js';
 import { shiftsEnabled } from '$lib/server/shifts/mode.js';
 import { loadCommitments, loadShift, upsertDeclaration } from '$lib/server/shifts/store.js';
 import type { Stance } from '$lib/shifts/types.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 const STANCES: Stance[] = ['want', 'can', 'ifNeeded', 'cannot'];
 
@@ -63,7 +64,7 @@ const handler: ActionExecutionHandler = async (params, context) => {
     note: params.note === undefined ? undefined : String(params.note ?? '').slice(0, 500) || null
   });
 
-  return { data: { declaration }, updateStrategy: { type: 'none' } };
+  return { data: { declaration, projectId: ctx.projectId, shiftId: shift.id }, updateStrategy: { type: 'none' } };
 };
 
 export const declareShiftAvailabilityConfig: ActionConfig = {
@@ -86,5 +87,10 @@ export const declareShiftAvailabilityConfig: ActionConfig = {
 
   authRules: [{ type: 'jwt', errorMessage: 'Must be signed in to declare availability' }],
 
-  updateStrategy: { type: 'none' }
+  updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (p, r) =>
+      scopeList([scope('project', r?.data?.projectId), scope('shift', p.shiftId)]),
+  },
 };
