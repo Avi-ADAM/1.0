@@ -1,4 +1,5 @@
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 /**
  * A supporter's donation intent → the rikma's members (PLAN_VOLUNTEER_RIKMA §2.2).
@@ -105,7 +106,8 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
             en: `${donor} wants to donate to "${projectName}"${amountPart}${tail}. Coordinate receiving the money and record the donation so it counts toward coverage.`
           }
         },
-        channels: ['socket', 'push'],
+        // Addressed to the members: a donor waits to hear back, but no consent clock runs.
+        intent: 'personal',
         metadata: { type: 'donationRequest', url: `moach/${projectId}/sales`, projectName, priority: 'normal' }
       },
       { recipients: memberIds, projectId },
@@ -143,5 +145,10 @@ export const requestDonationConfig: ActionConfig = {
     }
   },
   authRules: [{ type: 'jwt', errorMessage: 'Must be logged in to request a donation' }],
-  updateStrategy: { type: 'none' }
+  updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (p) =>
+      scopeList([scope('project', p.projectId), scope('mission', p.openMissionId)]),
+  },
 };

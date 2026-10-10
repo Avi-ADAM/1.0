@@ -21,12 +21,12 @@
 | … ⚪ / 🔴 / 🟠 (לא מתעדכנים בזמן אמת) | 62 | 57 |
 | `invalidate(() => true)` בלקוח | קיים | קיים |
 | **התראות לבני אדם** (§6 בתכנית) | | |
-| actions שהערוצים שלהם חסרים מול ה-intent היעד (⚠) | 106 | 57 |
-| … מתוכם `consent` — מחכים לתשובה של מישהו, וזה לא יוצא מהאתר | 55 | 22 |
-| … טלגרם חסר | 86 | 42 |
-| actions ששולחים יותר מהיעד (✂ — מייל נשאר למי שאין ערוץ אחר) | 10 | 2 |
-| קבצים שבוחרים ערוצים ביד (`LEGACY_CHANNEL_LISTS`) | 109 | 42 |
-| actions שעברו ל-`intent` | 0 | 66 |
+| actions שהערוצים שלהם חסרים מול ה-intent היעד (⚠) | 106 | 50 |
+| … מתוכם `consent` — מחכים לתשובה של מישהו, וזה לא יוצא מהאתר | 55 | 16 |
+| … טלגרם חסר | 86 | 35 |
+| actions ששולחים יותר מהיעד (✂ — מייל נשאר למי שאין ערוץ אחר) | 10 | 1 |
+| קבצים שבוחרים ערוצים ביד (`LEGACY_CHANNEL_LISTS`) | 109 | 34 |
+| actions שעברו ל-`intent` | 0 | 74 |
 
 ## שלבים
 
@@ -42,7 +42,7 @@
 | socket-server — בקשת polling אחת (`/socket.io/?transport=polling`) הפילה את התהליך (`ERR_HTTP_HEADERS_SENT`): ה-handler של ה-HTTP נרשם אחרי socket.io וענה 404 על הנתיב שלו | [x] 2026-10-09 — `socket-server/src/socket-path.ts` + בדיקה; נפרס, 3 בקשות polling בפרודקשן = 200 בלי restart. `deploy-socket.ps1` מוודא את הקובץ בכל פריסה |
 | socket-server — `event` / `rt:changed` בפרודקשן | [x] 2026-10-09 — `deploy-socket.ps1` (פריסה ראשונה מעץ העבודה, `7049d4e3-dirty`); `/health` ציבורי תקין, `/broadcast` בלי סוד 401, `:rollback` שמור |
 | R3 — דפים, גל 1 | [~] 2026-10-10 — כל הדפים מחוברים חוץ מ-`negotiation/[id]` (נדחה); 12 נבדקו חי בהזרקה ל-bus. פתוח: `/lev`, `VoteDetail`, deals/wish/concierge בשני דפדפנים — כשה-actions שלהם יפרסמו (R4). המאזינים הישנים נשארים עד R6 |
-| R4 — actions לפי תחום | [~] 2026-10-11 — **mission / act / timer: 16 actions** (2026-10-11). משימות ומטלות ⇒ `project` + `mission:<id>` / `act:<id>`; אישורי סיום ⇒ `decision:finiapruval`. טיימר רץ הוא עניין של מי שמחזיק בו: `timerStart/Stop/LogUpdate` ⇒ `timer:<uid>` ל-`self` בלבד, ורק `timerSave` (השעות נכנסות למשימה) הולך לרקמה. ההצעות המקצועיות האישיות והקטלוג ⇒ `user:<me>` ל-`self`. **נבדק בשני דפדפנים** (256 → 258, רקמה 87): `createTask` — מטלה 134 הופיעה בטבלת המטלות של 258 בלי טעינת דף; `updateTask` — הסטטוס עבר ל"ממתין לאישרור" וחזר. `__data.json` נטען פעמיים ב-`updateTask`: פעם מ-`rt:changed` ופעם מהמאזין הישן של ה-layout, שמקבל את ההתראה ל-projectMembers — צפוי עד R6. הטיימרים לא נבדקו חי: לדף `/timers` עוד אין מאזין `timer:*` (הוא נשען על `timers.js`), אז היום רק מתאם moach (`timer` ⇒ missions) צורך אותם. ההתראות לבני אדם עברו ל-`intent` ב-11 מהקבצים: אישורי סיום, `completeMission`, `createMission` ו-`customizeOpenMission` ⇒ `consent` (מוסיף טלגרם, ובחלקם מייל); `createTask` ⇒ `consent` ולא `personal` — המבצע מתבקש לאשר (`myIshur`), אז אין ✂; `timerSave` ⇒ `consent` כשנפתח אישור שעות, אחרת `outcome`; הטיימרים ⇒ `ambient` (כמו היום). `linkActToMission` ⇒ `outcome`: מטלה שהופכת למשימה היא החלטה של כל הרקמה, אז הפוש נשאר (כשנוצרה pendm, `createMission` כבר ביקש הסכמה מכל חבר); ה-scope שלה הוא `decision:pendm` כשזו הצבעה. `updateTask` נשאר עם `channels` עד שה-intent שלו ייקבע מתוך מה שהפעולה עושה. **הסיווג בעמודת ה-intent היעד נוצר אוטומטית על ידי סוכן אחר — הצעה לבדיקה, לא החלטה; לא מורידים ערוץ על סמך הטבלה** (המשתמש, 2026-10-11). — **wish + deal: 39 actions** (2026-10-11; נשארו `clusterRatsons` — תחום maagad, `materializeRikmaBlueprint` — עוזר ההרשמה). משאלה אינה שייכת לרקמה, אז ה-broadcaster מוצא את הקהל שלה בעצמו: `wish:<id>` ⇒ בעלי המשאלה וכל המציעים (`partiesOf` → `105queryRatsonWithProposals` בטוקן השירות). עסקה ⇒ `project` + הצדדים שה-handler מחזיר. **נבדק בשלושה דפדפנים 2026-10-11** (משאלה 18: הבעלים 261 משנה קצב, ו-256 ו-258, המציעים, רואים את דף המשאלה נטען מחדש בלי רענון; הקצב הוחזר ל-`feh`). הבדיקה מצאה שטוקן השירות לבדו לא קורא את הצדדים של משאלה (השינוי הגיע רק למבצע) — `wishPartiesOf` שואל עכשיו גם עם ה-JWT של המבצע ומאחד. — **vote + archive: 34 actions** מצהירים `realtime` (נשארו: `archiveSpaceDoc` — ערוץ `space:changed` משלו; `proposeRikmaBlueprint` — עוד אין רקמה). נבדק בשני דפדפנים (256 ↔ 258, החלטה 78 על משימה 191): הצעת עריכה → הצעה נגדית → אישור, כל צד רואה את הסבב של השני בלי טעינת דף, והשם חזר למקור. `partiesFrom` מצטרף עכשיו גם לקהל `project` (מועמד שעוד אינו חבר). הבדיקה מצאה באג קודם ב-`VoteDetail` — ראו B12. — פיילוט `updateMissionStatus` **נבדק בשני דפדפנים 2026-10-10** (256 → 258, רקמה 87, משימה 191): `rt:changed` הגיע ל-258 עם `project:87`, `mission:191` ו-`originClientId` של הטאב השני; ה-bus מסר אחרי ~0.5ש׳; מתאם moach שלח **בקשה אחת** (`getProjectMissions` של 87), בלי טעינת דף; שינוי שאף מסך לא מקשיב לו — אפס בקשות; ההד של הטאב המקורי מסונן. הבדיקה מצאה באג: `/api/action` בנה `ActionService` משלו בלי broadcaster — אף פעולה מהדפדפן לא פרסמה. תוקן (`realtimeFor(notifier)` משותף ל-`/api/action` ול-`actions/index.ts`) |
+| R4 — actions לפי תחום | [~] 2026-10-11 — **money: 16 actions** (2026-10-11). מכירות, חלוקות ונתח האתר הם מצב של הרקמה (יתרות, tosplits) ⇒ קהל `project`; חלוקה = `decision:tosplit`, תשלום בודד = `split`, טענת מחזיק = `decision:decision`. לקוח של הוראת קבע ומקבל העברת נתח-אתר נוספים כצדדים — `reportRecurringSaleCycle` / `customerReportRecurringSaleCycle` מחזירים עכשיו `projectId` (ו-`customerId`), שלא היה להם. `toggleMoneyReceiver`: ה-`id` הוא עסקה (sheirut), לא משתמש. ההתראות של 8 קבצים עברו ל-`intent` מתוך קריאת הקוד: טענות מחזיק והצעות נגדיות ⇒ `consent`; אישור העברה (`confirmHaluka`) ⇒ `ambient` כמו היום; דיווח ללקוח ובקשת תרומה ⇒ `personal`. `approveHaluka` נשאר עם `channels` (ארבעה ערוצים לכולם) — `outcome` היה מוריד מייל וטלגרם. **לא נבדק חי**: כל פעולה כאן רושמת כסף אמיתי. — **mission / act / timer: 16 actions** (2026-10-11). משימות ומטלות ⇒ `project` + `mission:<id>` / `act:<id>`; אישורי סיום ⇒ `decision:finiapruval`. טיימר רץ הוא עניין של מי שמחזיק בו: `timerStart/Stop/LogUpdate` ⇒ `timer:<uid>` ל-`self` בלבד, ורק `timerSave` (השעות נכנסות למשימה) הולך לרקמה. ההצעות המקצועיות האישיות והקטלוג ⇒ `user:<me>` ל-`self`. **נבדק בשני דפדפנים** (256 → 258, רקמה 87): `createTask` — מטלה 134 הופיעה בטבלת המטלות של 258 בלי טעינת דף; `updateTask` — הסטטוס עבר ל"ממתין לאישרור" וחזר. `__data.json` נטען פעמיים ב-`updateTask`: פעם מ-`rt:changed` ופעם מהמאזין הישן של ה-layout, שמקבל את ההתראה ל-projectMembers — צפוי עד R6. הטיימרים לא נבדקו חי: לדף `/timers` עוד אין מאזין `timer:*` (הוא נשען על `timers.js`), אז היום רק מתאם moach (`timer` ⇒ missions) צורך אותם. ההתראות לבני אדם עברו ל-`intent` ב-11 מהקבצים: אישורי סיום, `completeMission`, `createMission` ו-`customizeOpenMission` ⇒ `consent` (מוסיף טלגרם, ובחלקם מייל); `createTask` ⇒ `consent` ולא `personal` — המבצע מתבקש לאשר (`myIshur`), אז אין ✂; `timerSave` ⇒ `consent` כשנפתח אישור שעות, אחרת `outcome`; הטיימרים ⇒ `ambient` (כמו היום). `linkActToMission` ⇒ `outcome`: מטלה שהופכת למשימה היא החלטה של כל הרקמה, אז הפוש נשאר (כשנוצרה pendm, `createMission` כבר ביקש הסכמה מכל חבר); ה-scope שלה הוא `decision:pendm` כשזו הצבעה. `updateTask` נשאר עם `channels` עד שה-intent שלו ייקבע מתוך מה שהפעולה עושה. **הסיווג בעמודת ה-intent היעד נוצר אוטומטית על ידי סוכן אחר — הצעה לבדיקה, לא החלטה; לא מורידים ערוץ על סמך הטבלה** (המשתמש, 2026-10-11). — **wish + deal: 39 actions** (2026-10-11; נשארו `clusterRatsons` — תחום maagad, `materializeRikmaBlueprint` — עוזר ההרשמה). משאלה אינה שייכת לרקמה, אז ה-broadcaster מוצא את הקהל שלה בעצמו: `wish:<id>` ⇒ בעלי המשאלה וכל המציעים (`partiesOf` → `105queryRatsonWithProposals` בטוקן השירות). עסקה ⇒ `project` + הצדדים שה-handler מחזיר. **נבדק בשלושה דפדפנים 2026-10-11** (משאלה 18: הבעלים 261 משנה קצב, ו-256 ו-258, המציעים, רואים את דף המשאלה נטען מחדש בלי רענון; הקצב הוחזר ל-`feh`). הבדיקה מצאה שטוקן השירות לבדו לא קורא את הצדדים של משאלה (השינוי הגיע רק למבצע) — `wishPartiesOf` שואל עכשיו גם עם ה-JWT של המבצע ומאחד. — **vote + archive: 34 actions** מצהירים `realtime` (נשארו: `archiveSpaceDoc` — ערוץ `space:changed` משלו; `proposeRikmaBlueprint` — עוד אין רקמה). נבדק בשני דפדפנים (256 ↔ 258, החלטה 78 על משימה 191): הצעת עריכה → הצעה נגדית → אישור, כל צד רואה את הסבב של השני בלי טעינת דף, והשם חזר למקור. `partiesFrom` מצטרף עכשיו גם לקהל `project` (מועמד שעוד אינו חבר). הבדיקה מצאה באג קודם ב-`VoteDetail` — ראו B12. — פיילוט `updateMissionStatus` **נבדק בשני דפדפנים 2026-10-10** (256 → 258, רקמה 87, משימה 191): `rt:changed` הגיע ל-258 עם `project:87`, `mission:191` ו-`originClientId` של הטאב השני; ה-bus מסר אחרי ~0.5ש׳; מתאם moach שלח **בקשה אחת** (`getProjectMissions` של 87), בלי טעינת דף; שינוי שאף מסך לא מקשיב לו — אפס בקשות; ההד של הטאב המקורי מסונן. הבדיקה מצאה באג: `/api/action` בנה `ActionService` משלו בלי broadcaster — אף פעולה מהדפדפן לא פרסמה. תוקן (`realtimeFor(notifier)` משותף ל-`/api/action` ול-`actions/index.ts`) |
 | R5 — דפים, גל 2 + timegrama + הסרת `invalidate(() => true)` | [ ] |
 | R6 — ניקוי מאזינים ישנים | [ ] |
 
@@ -334,17 +334,17 @@ inline מהקובץ עצמו ומה-helpers (`deal/offerDeal.ts`, `sheirut/dealE
 
 | action | file | socket today | recipients | effect for others | metadata.type → who reacts | ערוצים היום | intent יעד | target scopes | status |
 |---|---|---|---|---|---|---|---|---|---|
-| `approveHaluka` | approveHaluka | config | custom | partial(lev) |  | SPTE ✂ | O |  | [ ] |
-| `confirmHaluka` | confirmHaluka | config | projectMembers (−me) | toast | halukaConfirm → moach(lazy) | S ⚠ | P |  | [ ] |
-| `counterSaleClaim` | counterSaleClaim | inline |  | partial(lev) | saleClaimCounter → moach(lazy) | SP ⚠ | C |  | [ ] |
-| `createDonationSale` | createDonationSale | inline |  | toast | saleClaim → moach(lazy) | SP ⚠ | C |  | [ ] |
-| `createHaluka` | createHaluka | none |  | — |  | — ⚠ | C |  | [ ] |
-| `createPlatformSale` | createPlatformSale | none |  | — |  | — | — |  | [ ] |
-| `createSale` | createSale | inline |  | toast | saleClaim → moach(lazy) | SP ⚠ | C·O |  | [ ] |
-| `createSiteShareTransfer` | createSiteShareTransfer | none |  | — |  | — ⚠ | C |  | [ ] |
-| `createTosplit` | createTosplit | config | projectMembers (−me) | toast ⚠cfgUS lost |  | SPTE | C |  | [ ] |
-| `customerReportRecurringSaleCycle` | customerReportRecurringSaleCycle | inline |  | toast | recurringSaleCustomerReport → moach(lazy) | SPE ⚠ | C |  | [ ] |
-| `decideSiteShare` | decideSiteShare | none |  | — |  | — | — |  | [ ] |
+| `approveHaluka` | approveHaluka | config | custom | partial(lev) |  | SPTE ✂ | ? (לא `O` — מוריד מייל וטלגרם) | `project`, `decision:tosplit` | [x] 2026-10-11 — לא נבדק חי (כל פעולה כאן רושמת כסף אמיתי) |
+| `confirmHaluka` | confirmHaluka | config | projectMembers (−me) | toast | halukaConfirm → moach(lazy) | intent ✓ | A | `project`, `split`, `deal` ×N (חלקי עסקה ששולמו) | [x] 2026-10-11 — לא נבדק חי (כל פעולה כאן רושמת כסף אמיתי) |
+| `counterSaleClaim` | counterSaleClaim | inline |  | partial(lev) | saleClaimCounter → moach(lazy) | intent ✓ | C | `project`, `decision:decision` | [x] 2026-10-11 — לא נבדק חי (כל פעולה כאן רושמת כסף אמיתי) |
+| `createDonationSale` | createDonationSale | inline |  | toast | saleClaim → moach(lazy) | intent ✓ | C | `project`, `sale`, `decision:decision` | [x] 2026-10-11 — לא נבדק חי (כל פעולה כאן רושמת כסף אמיתי) |
+| `createHaluka` | createHaluka | none |  | — |  | — ⚠ | C | `project`, `split` | [x] 2026-10-11 — לא נבדק חי (כל פעולה כאן רושמת כסף אמיתי) |
+| `createPlatformSale` | createPlatformSale | none |  | — |  | — | — | `project` ×2 (הפלטפורמה + המקור), `sale` | [x] 2026-10-11 — לא נבדק חי (כל פעולה כאן רושמת כסף אמיתי) |
+| `createSale` | createSale | inline |  | toast | saleClaim → moach(lazy) | intent ✓ | C | `project`, `product`, `sale`, `decision:decision` (saleClaim), `deal` | [x] 2026-10-11 — לא נבדק חי (כל פעולה כאן רושמת כסף אמיתי) |
+| `createSiteShareTransfer` | createSiteShareTransfer | none |  | — |  | — ⚠ | C | `project`, `split` · +המקבל | [x] 2026-10-11 — לא נבדק חי (כל פעולה כאן רושמת כסף אמיתי) |
+| `createTosplit` | createTosplit | config | projectMembers (−me) | toast ⚠cfgUS lost |  | intent ✓ | C | `project`, `decision:tosplit` | [x] 2026-10-11 — לא נבדק חי (כל פעולה כאן רושמת כסף אמיתי) |
+| `customerReportRecurringSaleCycle` | customerReportRecurringSaleCycle | inline |  | toast | recurringSaleCustomerReport → moach(lazy) | intent ✓ | C | `project`, `sale` | [x] 2026-10-11 — לא נבדק חי (כל פעולה כאן רושמת כסף אמיתי) |
+| `decideSiteShare` | decideSiteShare | none |  | — |  | — | — | `project`, `decision:tosplit`, `deal` (שירות ההכנסה) | [x] 2026-10-11 — לא נבדק חי (כל פעולה כאן רושמת כסף אמיתי) |
 | `getOpenSiteShareDecisions` | getOpenSiteShareDecisions | read-only |  |  |  |  |  |  | n/a |
 | `getPlatformProject` | getPlatformProject | read-only |  |  |  |  |  |  | n/a |
 | `getRikmaSplitsArchive` | getRikmaSplitsArchive | read-only |  |  |  |  |  |  | n/a |
@@ -352,11 +352,11 @@ inline מהקובץ עצמו ומה-helpers (`deal/offerDeal.ts`, `sheirut/dealE
 | `getSiteShareArchive` | getSiteShareArchive | read-only |  |  |  |  |  |  | n/a |
 | `getSiteShareDecision` | getSiteShareDecision | read-only |  |  |  |  |  |  | n/a |
 | `getSiteSharePayables` | getSiteSharePayables | read-only |  |  |  |  |  |  | n/a |
-| `reportRecurringSaleCycle` | reportRecurringSaleCycle | inline |  | toast | recurringSaleCycle → moach(lazy) | SP ⚠ | C |  | [ ] |
-| `requestDonation` | requestDonation | inline |  | toast | donationRequest → moach(lazy) | SP ⚠ | C |  | [ ] |
-| `seedSiteShareDecisions` | seedSiteShareDecisions | none |  | — |  | — | — |  | [ ] |
-| `setRikmaCurrency` | setRikmaCurrency | none |  | — |  | — ⚠ | A |  | [ ] |
-| `toggleMoneyReceiver` | toggleMoneyReceiver | none |  | — |  | — ⚠ | A |  | [ ] |
+| `reportRecurringSaleCycle` | reportRecurringSaleCycle | inline |  | toast | recurringSaleCycle → moach(lazy) | intent ✓ | P | `project`, `sale` · +הלקוח | [x] 2026-10-11 — לא נבדק חי (כל פעולה כאן רושמת כסף אמיתי) |
+| `requestDonation` | requestDonation | inline |  | toast | donationRequest → moach(lazy) | intent ✓ | P | `project`, `mission` | [x] 2026-10-11 — לא נבדק חי (כל פעולה כאן רושמת כסף אמיתי) |
+| `seedSiteShareDecisions` | seedSiteShareDecisions | none |  | — |  | — | — | `project`, `decision:tosplit` | [x] 2026-10-11 — לא נבדק חי (כל פעולה כאן רושמת כסף אמיתי) |
+| `setRikmaCurrency` | setRikmaCurrency | none |  | — |  | — ⚠ | A | `project` | [x] 2026-10-11 — לא נבדק חי (כל פעולה כאן רושמת כסף אמיתי) |
+| `toggleMoneyReceiver` | toggleMoneyReceiver | none |  | — |  | — ⚠ | A | `project`, `deal` | [x] 2026-10-11 — לא נבדק חי (כל פעולה כאן רושמת כסף אמיתי) |
 
 ### stipend — 9 actions (live 0 · full 6 · toast 0 · silent 1 · read-only 2)
 

@@ -27,6 +27,7 @@
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { settlePartsFromSplit } from '$lib/server/deal/partsReceived.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 const confirmHalukaHandler: ActionExecutionHandler = async (params, context, { strapi }) => {
   const { halukaId, projectId, kind } = params;
@@ -177,9 +178,19 @@ export const confirmHalukaConfig: ActionConfig = {
       title: { he: 'אישור העברת כסף', en: 'Money transfer confirmed' },
       body: { he: 'העברת כסף אושרה', en: 'A money transfer was confirmed' },
     },
-    channels: ['socket'],
+    // Activity in the rikma: one side of a transfer said it went through.
+    intent: 'ambient',
     metadata: { type: 'halukaConfirm', url: 'lev' },
   },
 
   updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (p, r) =>
+      scopeList([
+        scope('project', p.projectId),
+        scope('split', p.halukaId),
+        ...((r?.data?.dealParts ?? []) as Array<{ sheirutId?: string }>).map((d) => scope('deal', d.sheirutId)),
+      ]),
+  },
 };

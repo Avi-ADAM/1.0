@@ -1,4 +1,5 @@
 import type { ActionConfig, ActionExecutionHandler } from '../types';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 const toggleMoneyReceiverHandler: ActionExecutionHandler = async (params, context, util) => {
   const { id, projectId, action } = params;
@@ -49,5 +50,10 @@ export const toggleMoneyReceiverConfig: ActionConfig = {
   authRules: [
     { type: 'jwt', errorMessage: 'Must be authenticated' },
     { type: 'projectMember', config: { projectIdParam: 'projectId' }, errorMessage: 'Must be a project member' }
-  ]
+  ],
+
+  realtime: {
+    // `id` is the deal (sheirut) whose money-receiver list changed.
+    scopes: (p) => scopeList([scope('project', p.projectId), scope('deal', p.id)]),
+  },
 };

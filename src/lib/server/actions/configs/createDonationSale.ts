@@ -2,6 +2,7 @@ import { rikmaCurrency } from '$lib/money/resolve.js';
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { buildDonationNote, type DonationVia } from '$lib/revenue/parseDonationNote';
 import { moneyTextFor } from '$lib/server/money/notifyMoney.js';
+import { scope, decisionScope, scopeList } from '$lib/realtime/scopes.js';
 
 /**
  * Record a donation (PLAN_VOLUNTEER_RIKMA §2.1).
@@ -170,7 +171,8 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
                 en: `It was reported that you received a ${money(amount, 'en')} donation${from ? ` from ${from}` : ''}. You can approve, refine (negotiate) or discuss. If you don't respond it is auto-approved after the rikma's response time.`
               }
             },
-            channels: ['socket', 'push'],
+            // The claimed holder's consent is awaited; silence confirms it.
+            intent: 'consent',
             metadata: { type: 'saleClaim', url: 'lev', projectName, priority: 'normal' }
           },
           { recipients: [holderId], projectId, saleId, decisionId },
@@ -210,5 +212,10 @@ export const createDonationSaleConfig: ActionConfig = {
     via: { type: 'string', required: false }
   },
   authRules: [{ type: 'jwt', errorMessage: 'Must be logged in to record a donation' }],
-  updateStrategy: { type: 'none' }
+  updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (p, r) =>
+      scopeList([scope('project', p.projectId), scope('sale', r?.data?.saleId), decisionScope('decision', r?.data?.decisionId)]),
+  },
 };

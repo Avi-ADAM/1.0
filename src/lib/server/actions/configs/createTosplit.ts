@@ -18,6 +18,7 @@
  */
 
 import type { ActionConfig } from '../types';
+import { scope, decisionScope, scopeList } from '$lib/realtime/scopes.js';
 
 export const createTosplitConfig: ActionConfig = {
   key: 'createTosplit',
@@ -100,7 +101,8 @@ export const createTosplitConfig: ActionConfig = {
       }
     },
     
-    channels: ['socket', 'email', 'telegram', 'push'],
+    // Every member is asked to vote on the split, against the rikma's clock.
+    intent: 'consent',
     
     emailTemplate: 'SimpleNuti',
     
@@ -116,5 +118,10 @@ export const createTosplitConfig: ActionConfig = {
     config: {
       dataKeys: ['halukas'] // the lev 'halukas' slice holds the tosplits
     }
-  }
+  },
+
+  realtime: {
+    scopes: (p, r) =>
+      scopeList([scope('project', p.data?.project), decisionScope('tosplit', r?.data?.createTosplit?.data?.id)]),
+  },
 };

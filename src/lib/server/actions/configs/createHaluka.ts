@@ -17,6 +17,7 @@
 
 import type { ActionConfig } from '../types';
 import { createHalukaConsentSpec } from '$lib/consent/specs/s2b';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 export const createHalukaConfig: ActionConfig = {
   key: 'createHaluka',
@@ -69,5 +70,10 @@ export const createHalukaConfig: ActionConfig = {
     config: {
       dataKeys: ['tosplits', 'halukas']
     }
-  }
+  },
+
+  realtime: {
+    scopes: (p, r) =>
+      scopeList([scope('project', p.data?.project), scope('split', r?.data?.createHaluka?.data?.id)]),
+  },
 };

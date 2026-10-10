@@ -18,6 +18,7 @@
  */
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import { scope, decisionScope, scopeList } from '$lib/realtime/scopes.js';
 
 type SeedMember = { userId: string; basisAmount?: number; proposedAmount?: number };
 
@@ -101,4 +102,9 @@ export const seedSiteShareDecisionsConfig: ActionConfig = {
     },
   ],
   updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (p) =>
+      scopeList([scope('project', p.projectId), decisionScope('tosplit', p.tosplitId)]),
+  },
 };

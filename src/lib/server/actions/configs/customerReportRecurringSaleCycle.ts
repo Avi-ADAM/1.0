@@ -20,6 +20,7 @@ import { rikmaMoneyText } from '$lib/server/money/notifyMoney.js';
  */
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 const handler: ActionExecutionHandler = async (params, context, { strapi, notifier }) => {
   const { cycleSaleId, amount } = params as { cycleSaleId: string; amount: number };
@@ -89,7 +90,8 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
               en: `${customerName} reported transferring ${money(transferred, 'en')} this month${productName ? ` for ${productName}` : ''}. Confirm receipt in the sales center.`
             }
           },
-          channels: ['socket', 'push', 'email'],
+          // The money holder is asked to confirm what the customer says arrived.
+          intent: 'consent',
           metadata: {
             type: 'recurringSaleCustomerReport',
             url: 'deals/sales-center',
@@ -107,7 +109,12 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
   }
 
   return {
-    data: { cycleSaleId: String(cycleSaleId), customerAmount: transferred },
+    data: {
+      cycleSaleId: String(cycleSaleId),
+      customerAmount: transferred,
+      // Who else shows this cycle: the selling rikma (realtime audience).
+      projectId: attrs.project?.data?.id != null ? String(attrs.project.data.id) : null
+    },
     updateStrategy: { type: 'none' }
   };
 };
@@ -127,5 +134,10 @@ export const customerReportRecurringSaleCycleConfig: ActionConfig = {
   // handler (the cycle's customer must be the caller).
   authRules: [{ type: 'jwt', errorMessage: 'Must be logged in to report a transfer' }],
 
-  updateStrategy: { type: 'none' }
+  updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (p, r) =>
+      scopeList([scope('project', r?.data?.projectId), scope('sale', p.cycleSaleId)]),
+  },
 };

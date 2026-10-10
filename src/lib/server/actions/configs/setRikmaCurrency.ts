@@ -20,6 +20,7 @@ import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { STRAPI_GRAPHQL } from '$lib/server/strapiUrl.js';
 import { normalizeCode } from '$lib/money/currencies.js';
 import { rikmaCurrency } from '$lib/money/resolve.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 async function gql(fetchFn: typeof fetch, jwt: string, query: string, variables: Record<string, unknown>) {
   const res = await fetchFn(STRAPI_GRAPHQL, {
@@ -124,5 +125,10 @@ export const setRikmaCurrencyConfig: ActionConfig = {
       config: { projectIdParam: 'projectId' },
       errorMessage: 'Only a member of the rikma can set its currency'
     }
-  ]
+  ],
+
+  realtime: {
+    scopes: (p) =>
+      scopeList([scope('project', p.projectId)]),
+  },
 };

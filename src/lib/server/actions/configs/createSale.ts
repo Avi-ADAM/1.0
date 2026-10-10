@@ -3,6 +3,7 @@ import { ENTRY_CURRENCY_PARAM, entryFields, normalizeEntry } from '$lib/server/m
 import { formatMoney } from '$lib/money/format.js';
 import { rikmaCurrency } from '$lib/money/resolve.js';
 import { createSaleConsentSpec } from '$lib/consent/specs/createSale';
+import { scope, decisionScope, scopeList } from '$lib/realtime/scopes.js';
 
 /**
  * Report a sale (PLAN_sale_holder_consent).
@@ -308,7 +309,8 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
                 en: `It was reported that you hold ${formatMoney(saleIn, entry.currency, 'en')} from the sale of ${productName}. You can approve, refine (negotiate) or discuss. If you don't respond it is auto-approved after the rikma's response time.`
               }
             },
-            channels: ['socket', 'push'],
+            // The claimed holder's consent is awaited; silence confirms it.
+            intent: 'consent',
             metadata: { type: 'saleClaim', url: 'lev', projectName, priority: 'normal' }
           },
           { recipients: [holderId], projectId, saleId, decisionId },
@@ -370,5 +372,16 @@ export const createSaleConfig: ActionConfig = {
   ],
   // Shadow-signed sale.record event mirrors the reporter's attestation
   // (Phase 1 — non-blocking; enforcement lands in phase 4).
-  consentSpec: createSaleConsentSpec
+  consentSpec: createSaleConsentSpec,
+
+  realtime: {
+    scopes: (p, r) =>
+      scopeList([
+        scope('project', p.projectId),
+        scope('product', p.productId),
+        scope('sale', r?.saleId),
+        decisionScope('decision', r?.decisionId),
+        scope('deal', r?.sheirutId),
+      ]),
+  },
 };

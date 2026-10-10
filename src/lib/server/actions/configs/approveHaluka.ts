@@ -13,6 +13,7 @@
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { applyTosplitApproval } from '$lib/server/haluka/applyTosplitApproval';
+import { scope, decisionScope, scopeList } from '$lib/realtime/scopes.js';
 
 const approveHalukaHandler: ActionExecutionHandler = async (params, context, { strapi }) => {
   const { tosplitId, userId, users = [], halukot = [], sales = [], hervachUpdates = [] } = params;
@@ -128,5 +129,10 @@ export const approveHalukaConfig: ActionConfig = {
   updateStrategy: {
     type: 'refetchScope',
     config: { dataKeys: ['halukas'] }
-  }
+  },
+
+  realtime: {
+    scopes: (p) =>
+      scopeList([scope('project', p.projectId), decisionScope('tosplit', p.tosplitId)]),
+  },
 };

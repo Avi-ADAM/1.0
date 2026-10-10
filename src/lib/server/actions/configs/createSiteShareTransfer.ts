@@ -17,6 +17,7 @@
  */
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
   const { contributionId, projectId, receiverId } = params as {
@@ -126,4 +127,10 @@ export const createSiteShareTransferConfig: ActionConfig = {
     },
   ],
   updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (p, r) =>
+      scopeList([scope('project', p.projectId), scope('split', r?.data?.halukaId)]),
+    partiesFrom: (p) => [p.receiverId],
+  },
 };

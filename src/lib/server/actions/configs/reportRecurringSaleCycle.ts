@@ -22,6 +22,7 @@ import { rikmaMoneyText } from '$lib/server/money/notifyMoney.js';
  */
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 const handler: ActionExecutionHandler = async (params, context, { strapi, notifier }) => {
   const { cycleSaleId, amount, note, closeEngine } = params as {
@@ -125,7 +126,8 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
               en: `${projectName}: ${money(reported, 'en')} received this month${productName ? ` for ${productName}` : ''} was recorded.`
             }
           },
-          channels: ['socket', 'push'],
+          // Tells the customer what was recorded; nothing waits on them.
+          intent: 'personal',
           metadata: { type: 'recurringSaleCycle', url: 'deals', projectName, priority: 'normal' }
         },
         { recipients: [String(customer.id)] },
@@ -142,7 +144,10 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
       cycleSaleId: String(cycleSaleId),
       amount: reported,
       receivedConfirmed: confirmsCustomer,
-      engineClosed
+      engineClosed,
+      // Who else shows this cycle: the rikma and the paying customer (realtime audience).
+      projectId: attrs.project?.data?.id != null ? String(attrs.project.data.id) : null,
+      customerId: customer?.id != null ? String(customer.id) : null
     },
     updateStrategy: { type: 'none' }
   };
@@ -165,5 +170,11 @@ export const reportRecurringSaleCycleConfig: ActionConfig = {
   // users_permissions_user must be the caller).
   authRules: [{ type: 'jwt', errorMessage: 'Must be logged in to report a monthly cycle' }],
 
-  updateStrategy: { type: 'none' }
+  updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (p, r) =>
+      scopeList([scope('project', r?.data?.projectId), scope('sale', p.cycleSaleId)]),
+    partiesFrom: (_p, r) => [r?.data?.customerId],
+  },
 };

@@ -23,6 +23,7 @@ import {
   type SaleClaim,
   type NegomRound,
 } from './saleClaimShared.js';
+import { scope, decisionScope, scopeList } from '$lib/realtime/scopes.js';
 
 const handler: ActionExecutionHandler = async (params, context, { strapi, notifier }) => {
   const { decisionId, projectId, newValues } = params as {
@@ -106,7 +107,8 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
               en: 'The other side proposed a more precise version. You can approve it, refine back, or discuss. The response clock was reset.',
             },
           },
-          channels: ['socket', 'push'],
+          // The other side's turn, and the response clock was reset.
+          intent: 'consent',
           metadata: { type: 'saleClaimCounter', url: 'lev', priority: 'normal' },
         },
         { recipients: [otherId], projectId, decisionId },
@@ -143,4 +145,9 @@ export const counterSaleClaimConfig: ActionConfig = {
     },
   ],
   consentSpec: proposalCounterConsentSpec,
+
+  realtime: {
+    scopes: (p) =>
+      scopeList([scope('project', p.projectId), decisionScope('decision', p.decisionId)]),
+  },
 };

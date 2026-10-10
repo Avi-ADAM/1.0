@@ -25,6 +25,7 @@ import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { computeSiteShare } from '$lib/revenue/computeSiteShare.js';
 import { DEFAULT_SITE_SHARE_CONFIG } from '$lib/revenue/config.js';
 import { ensurePlatformIncomeSheirut } from '$lib/server/revenue/siteShareIncome.js';
+import { scope, decisionScope, scopeList } from '$lib/realtime/scopes.js';
 
 const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
   const {
@@ -222,4 +223,9 @@ export const decideSiteShareConfig: ActionConfig = {
     },
   ],
   updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (p, r) =>
+      scopeList([scope('project', p.projectId), decisionScope('tosplit', p.tosplitId), scope('deal', r?.data?.incomeSheirutId)]),
+  },
 };

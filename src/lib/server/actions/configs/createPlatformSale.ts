@@ -1,4 +1,5 @@
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
   const {
@@ -78,4 +79,9 @@ export const createPlatformSaleConfig: ActionConfig = {
   },
   authRules: [{ type: 'jwt' }],
   updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (p, r) =>
+      scopeList([scope('project', p.projectId), scope('project', p.sourceProjectId), scope('sale', r?.data?.saleId)]),
+  },
 };
