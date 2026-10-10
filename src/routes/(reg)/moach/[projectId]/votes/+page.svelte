@@ -8,6 +8,8 @@
   import { socketClient } from '$lib/stores/socketClient';
   import { standingVotes } from '$lib/finiapruval/rounds';
   import { isHoursApproval } from '$lib/finiapruval/kind';
+  import { useRealtime } from '$lib/realtime/bus.svelte';
+  import { touchesVotes } from '$lib/realtime/routing';
 
   let projectId = $derived(page.params.projectId);
   let votesData = $state(null);
@@ -66,6 +68,15 @@
   });
 
   onDestroy(() => socketUnsub?.());
+
+  // What actions declare they changed: a vote of this rikma opened, moved or
+  // closed (PLAN_REALTIME_MIGRATION §3.4). The listener above stays until R6.
+  useRealtime(
+    () => [`project:${projectId}`],
+    (batch) => {
+      if (batch.resync || batch.changes.some((c) => touchesVotes(c, projectId))) loadVotes();
+    }
+  );
 
   import { t as trans } from '$lib/translations';
   function decisionLabel(decision) {

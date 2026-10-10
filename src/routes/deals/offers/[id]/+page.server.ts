@@ -12,8 +12,10 @@ import { sendViaProxy } from '$lib/server/sendViaProxy.js';
 import { offerView } from '$lib/offer/directOffer';
 import { mintOfferKey } from '$lib/server/offer/offerKey';
 import type { PageServerLoad } from './$types';
+import { rtKey } from '$lib/realtime/scopes';
 
-export const load: PageServerLoad = async ({ params, locals, fetch }) => {
+export const load: PageServerLoad = async ({ params, locals, fetch, depends }) => {
+  depends(rtKey(`deal:${params.id}`));
   const uid = String(locals.uid);
   let res: any;
   try {

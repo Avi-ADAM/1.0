@@ -10,6 +10,7 @@ import { strapiClient } from '$lib/server/actions';
 import { readIdentity } from '$lib/server/rikmaIdentity/identity.js';
 import { parseLook } from '$lib/rikmaLook/look.js';
 import { rikmaPath } from '$lib/rikmaAddress/rikmaUrl.js';
+import { rtKey } from '$lib/realtime/scopes';
 
 /** Service read — the address and the look are public, like the page itself. */
 const read = (/** @type {string} */ qid, /** @type {Record<string, unknown>} */ vars) =>
@@ -78,6 +79,8 @@ export async function loadRikmaPage({ projectId, identity, locals, fetch, cookie
   // Tag this load so a realtime vote/decision notification can re-run it
   // via invalidate(`project:${projectId}`) from the page.
   depends(`project:${projectId}`);
+  // …and so does anything an action says changed in this rikma (PLAN_REALTIME_MIGRATION §3.4).
+  depends(rtKey(`project:${projectId}`));
   const isRegisteredUser = tok != false;
 
   const [projectData, ident] = await Promise.all([

@@ -41,7 +41,7 @@
 | R2 — bus + מתאמי kit / lev / moach + `useRealtime` + resync | [x] 2026-10-08 — `src/lib/realtime/bus.ts` (factory: echo לפי `originClientId`, חלון 250ms, כל subscriber מקבל רק את השינויים שלו אחד-אחד, resync אחרי חיבור **חוזר** בלבד), `bus.svelte.ts` (`realtimeBus` + `useRealtime`), `routing.ts` (scope → `depends` / slices של הלב / sections של moach), `adapters/lev.ts` + `adapters/moach.ts`. מחובר: ה-layout הראשי (`start`), `/lev`, `moach/[pid]/+layout`. `depends.contract.test.ts` — כל `depends('rt:…')` / `rtKey` / `useRealtime` בקוד הוא pattern שה-bus יודע להתאים. המאזינים הישנים נשארים עד R6 |
 | socket-server — בקשת polling אחת (`/socket.io/?transport=polling`) הפילה את התהליך (`ERR_HTTP_HEADERS_SENT`): ה-handler של ה-HTTP נרשם אחרי socket.io וענה 404 על הנתיב שלו | [x] 2026-10-09 — `socket-server/src/socket-path.ts` + בדיקה; נפרס, 3 בקשות polling בפרודקשן = 200 בלי restart. `deploy-socket.ps1` מוודא את הקובץ בכל פריסה |
 | socket-server — `event` / `rt:changed` בפרודקשן | [x] 2026-10-09 — `deploy-socket.ps1` (פריסה ראשונה מעץ העבודה, `7049d4e3-dirty`); `/health` ציבורי תקין, `/broadcast` בלי סוד 401, `:rollback` שמור |
-| R3 — דפים, גל 1 | [ ] |
+| R3 — דפים, גל 1 | [~] 2026-10-10 — כל הדפים מחוברים חוץ מ-`negotiation/[id]` (נדחה); 12 נבדקו חי בהזרקה ל-bus. פתוח: `/lev`, `VoteDetail`, deals/wish/concierge בשני דפדפנים — כשה-actions שלהם יפרסמו (R4). המאזינים הישנים נשארים עד R6 |
 | R4 — actions לפי תחום | [ ] — פיילוט `updateMissionStatus` **נבדק בשני דפדפנים 2026-10-10** (256 → 258, רקמה 87, משימה 191): `rt:changed` הגיע ל-258 עם `project:87`, `mission:191` ו-`originClientId` של הטאב השני; ה-bus מסר אחרי ~0.5ש׳; מתאם moach שלח **בקשה אחת** (`getProjectMissions` של 87), בלי טעינת דף; שינוי שאף מסך לא מקשיב לו — אפס בקשות; ההד של הטאב המקורי מסונן. הבדיקה מצאה באג: `/api/action` בנה `ActionService` משלו בלי broadcaster — אף פעולה מהדפדפן לא פרסמה. תוקן (`realtimeFor(notifier)` משותף ל-`/api/action` ול-`actions/index.ts`) |
 | R5 — דפים, גל 2 + timegrama + הסרת `invalidate(() => true)` | [ ] |
 | R6 — ניקוי מאזינים ישנים | [ ] |
@@ -96,27 +96,27 @@ inline מהקובץ עצמו ומה-helpers (`deal/offerDeal.ts`, `sheirut/dealE
 
 | דף | מקור | היום | איך מגיב היום | scopes יעד | סטטוס |
 |---|---|---|---|---|---|
-| `/lev` | store | 🟢 | `levSocketHandler`: partial/refetch ממוקד; `fullRefresh` ⇒ `initializeLevData` מלא; טיימרים; צ'אט | `project:*`, `decision:*`, `mission:*`, `act:*`, `split:*`, `deal:*`, `wish:*`, `user:<me>` | [ ] |
-| `/hub` | load + lev stores | ⚪ | stores הלב מתעדכנים רק כש-`/lev` פתוח | כמו `/lev` (מתאם lev) | [ ] |
-| `moach/[pid]/main` | layout load | ⚪ | — | `project:<pid>` | [ ] |
-| `moach/[pid]/kanban` | moachStore | 🟢 (R0: section חי) | `moachStore.refresh('missions')` על כל הודעה של הרקמה | `project:<pid>`, `mission:*`, `act:*` → section `missions` | [ ] |
-| `moach/[pid]/gantt` | moachStore | 🟢 (R0: section חי) | כנ"ל | כמו kanban | [ ] |
-| `moach/[pid]/acts` | load + moachStore | 🟠 | stale בלבד | `act:*`, `mission:*` | [ ] |
-| `moach/[pid]/acts/[actId]` | moachStore | 🟠 | stale בלבד | `act:<id>` | [ ] |
-| `moach/[pid]/progress` | load + timers store | 🟢 (טיימרים + R0 missions) | `timers.js` לפי `timer*`; `refresh('missions')` | + `mission:*`, `act:*` | [ ] |
-| `moach/[pid]/progress/[missionId]` | load + timers store | 🟢 (טיימרים בלבד) | כנ"ל | + `mission:<id>`, `act:*` | [ ] |
-| `moach/[pid]/open` | load + moachStore | 🟠 | stale בלבד | `mission:*`, `resource:*` (פתוחים) | [ ] |
-| `moach/[pid]/sales` | moachStore | 🟢 (R0: section חי) | `refresh('financials')` רק על הצבעות / `financials` | `sale:*` → section `financials` | [ ] |
-| `moach/[pid]/split` | moachStore | 🟢 (R0: section חי) | כנ"ל | `split:*`, `sale:*` → `financials` | [ ] |
-| `moach/[pid]/votes` | onMount | 🟢 | `loadVotes()` על `VOTE_TYPES` | `decision:*` | [ ] |
-| `moach/[pid]/votes/[kind]/[id]` | load + `VoteDetail` | 🟢 | `refetch()` על `VOTE_TYPES` | `decision:<kind>:<id>` | [ ] |
-| `moach/[pid]/votes/[voteId]` | `VoteDetail` | 🟢 | כנ"ל | `decision:*:<id>` | [ ] |
-| `deals/[id]` | load | ⚪ | — | `deal:<id>` | [ ] |
-| `deals/offers/[id]` | load | ⚪ | — | `deal:<id>` | [ ] |
-| `wish/[id]` | load | ⚪ | — | `wish:<id>` | [ ] |
-| `concierge/[id]` | load | ⚪ | — | `wish:<id>` | [ ] |
-| `negotiation/[id]` | load | ⚪ | — | `decision:*:<id>` / `mission:<id>` | [ ] |
-| `project/[id]` · `r/[slug]` | load (`RikmaPage`) | 🟡 | `invalidate('project:<id>')` על `VOTE_TYPES` | `project:<pid>` | [ ] |
+| `/lev` | store | 🟢 | `levSocketHandler`: partial/refetch ממוקד; `fullRefresh` ⇒ `initializeLevData` מלא; טיימרים; צ'אט | `project:*`, `decision:*`, `mission:*`, `act:*`, `split:*`, `deal:*`, `wish:*`, `user:<me>` | [~] מתאם lev מחובר (R2); עוד לא נבדק חי |
+| `/hub` | load + lev stores | ⚪ | stores הלב מתעדכנים רק כש-`/lev` פתוח | כמו `/lev` (מתאם lev) | [x] 2026-10-10 — `depends` על `LEV_PATTERNS` + `wish:*` (קהל השינוי הוא חברי הרקמה, אז כל שינוי שמגיע נוגע למשתמש); נבדק חי 2026-10-10 (הזרקה ל-bus בטאב של 258): `wish` ⇒ `__data.json` אחד, `forum` ⇒ כלום |
+| `moach/[pid]/main` | layout load | ⚪ | — | `project:<pid>` | [x] 2026-10-10 — `base` דרך `moachBaseKey` (מתאם moach) |
+| `moach/[pid]/kanban` | moachStore | 🟢 (R0: section חי) | `moachStore.refresh('missions')` על כל הודעה של הרקמה | `project:<pid>`, `mission:*`, `act:*` → section `missions` | [x] 2026-10-10 — section `missions` (מתאם moach) |
+| `moach/[pid]/gantt` | moachStore | 🟢 (R0: section חי) | כנ"ל | כמו kanban | [x] 2026-10-10 — כמו kanban |
+| `moach/[pid]/acts` | load + moachStore | 🟠 | stale בלבד | `act:*`, `mission:*` | [x] 2026-10-10 — המטלות נקראות מ-`base`, אז `act` מנותב עכשיו גם ל-`base`; נבדק חי 2026-10-10 (הזרקה ל-bus בטאב של 258): `act` ⇒ layout `__data.json` + `getProjectMissions` |
+| `moach/[pid]/acts/[actId]` | moachStore | 🟠 | stale בלבד | `act:<id>` | [x] 2026-10-10 — `useRealtime(act:<id>)` ⇒ `getAct`; נבדק חי 2026-10-10 (הזרקה ל-bus בטאב של 258): מטלה אחרת ⇒ כלום |
+| `moach/[pid]/progress` | load + timers store | 🟢 (טיימרים + R0 missions) | `timers.js` לפי `timer*`; `refresh('missions')` | + `mission:*`, `act:*` | [x] 2026-10-10 — קורא `missions` מה-store |
+| `moach/[pid]/progress/[missionId]` | load + timers store | 🟢 (טיימרים בלבד) | כנ"ל | + `mission:<id>`, `act:*` | [x] 2026-10-10 — `depends(rt:mission:<id>)`; נבדק חי 2026-10-10 (הזרקה ל-bus בטאב של 258): רק ה-load של הדף (`invalidated=0`), משימה של רקמה אחרת ⇒ כלום |
+| `moach/[pid]/open` | load + moachStore | 🟠 | stale בלבד | `mission:*`, `resource:*` (פתוחים) | [x] 2026-10-10 — הלוח קרא מה-load בלבד ולא היה מתעדכן; עכשיו קורא מה-store אחרי שזרע אותו; נבדק חי 2026-10-10 (הזרקה ל-bus בטאב של 258): `mission` ⇒ `getProjectMissions` אחד, רקמה אחרת ⇒ כלום |
+| `moach/[pid]/sales` | moachStore | 🟢 (R0: section חי) | `refresh('financials')` רק על הצבעות / `financials` | `sale:*` → section `financials` | [x] 2026-10-10 — section `financials` (מתאם moach) |
+| `moach/[pid]/split` | moachStore | 🟢 (R0: section חי) | כנ"ל | `split:*`, `sale:*` → `financials` | [x] 2026-10-10 — כמו sales |
+| `moach/[pid]/votes` | onMount | 🟢 | `loadVotes()` על `VOTE_TYPES` | `decision:*` | [x] 2026-10-10 — `useRealtime(project:<pid>)` + `touchesVotes`; נבדק חי 2026-10-10 (הזרקה ל-bus בטאב של 258): הצבעה ⇒ `getProjectVotes` + התג, מכירה ⇒ כלום. המאזין הישן נשאר עד R6 |
+| `moach/[pid]/votes/[kind]/[id]` | load + `VoteDetail` | 🟢 | `refetch()` על `VOTE_TYPES` | `decision:<kind>:<id>` | [~] 2026-10-10 — `VoteDetail`: `useRealtime(decision:<kind>:<id>)` (`fini` ⇒ `finiapruval`); לא נבדק חי — צריך הצבעה פתוחה |
+| `moach/[pid]/votes/[voteId]` | `VoteDetail` | 🟢 | כנ"ל | `decision:*:<id>` | n/a — פתק הצבעה בודד (`Vote`), לא משתנה |
+| `deals/[id]` | load | ⚪ | — | `deal:<id>` | [~] 2026-10-10 — `depends(rt:deal:<id>)`; לא נבדק חי (אותו מנגנון כמו progress/[missionId]) |
+| `deals/offers/[id]` | load | ⚪ | — | `deal:<id>` | [~] 2026-10-10 — `depends(rt:deal:<id>)`; לא נבדק חי |
+| `wish/[id]` | load | ⚪ | — | `wish:<id>` | [~] 2026-10-10 — `depends(rt:wish:<id>)`; לא נבדק חי |
+| `concierge/[id]` | load | ⚪ | — | `wish:<id>` | [~] 2026-10-10 — `depends(rt:wish:<id>)`; לא נבדק חי |
+| `negotiation/[id]` | load | ⚪ | — | `decision:*:<id>` / `mission:<id>` | [ ] נדחה — `Negotiation` לא באוצר ה-scopes ונכתב דרך `/api/send`, לא דרך action; צריך קודם entity באוצר וכתיבה דרך action |
+| `project/[id]` · `r/[slug]` | load (`RikmaPage`) | 🟡 | `invalidate('project:<id>')` על `VOTE_TYPES` | `project:<pid>` | [x] 2026-10-10 — `loadRikmaPage`: `depends(rt:project:<pid>)`; נבדק חי 2026-10-10 (הזרקה ל-bus בטאב של 258): רקמה 87 ⇒ `__data.json` אחד, רקמה אחרת ⇒ כלום. המאזין הישן נשאר עד R6 |
 
 ### גל 2 (R5)
 

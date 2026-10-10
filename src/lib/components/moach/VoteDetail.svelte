@@ -25,6 +25,7 @@
   import { isRtl, t } from '$lib/translations';
   import { sendToSer } from '$lib/send/sendToSer.js';
   import { socketClient } from '$lib/stores/socketClient';
+  import { useRealtime } from '$lib/realtime/bus.svelte';
   import { projects } from '$lib/stores/projectStore.js';
   import {
     pendsStore,
@@ -254,6 +255,14 @@
     });
   });
   onDestroy(() => socketUnsub?.());
+
+  // What actions declare they changed: this very decision (PLAN_REALTIME_MIGRATION
+  // §3.4). The route's `fini` is the `finiapruval` decision kind. The listener
+  // above stays until R6.
+  useRealtime(
+    () => (entityId ? [`decision:${kind === 'fini' ? 'finiapruval' : kind}:${entityId}`] : []),
+    () => refetch()
+  );
 
   // Consensus / full-NO archive: the card bubbles this up. On a standalone page
   // there is no list to collapse into — flip to a terminal state.

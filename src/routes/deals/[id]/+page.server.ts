@@ -6,8 +6,11 @@ import { readDealStages } from '$lib/server/deal/dealChain';
 import type { DealStageView } from '$lib/sheirut/dealChain';
 import { readProgressUpdates, type DealProgressUpdate } from '$lib/sheirut/dealProgress';
 import type { PageServerLoad } from './$types';
+import { rtKey } from '$lib/realtime/scopes';
 
-export const load: PageServerLoad = async ({ params, locals, fetch }) => {
+export const load: PageServerLoad = async ({ params, locals, fetch, depends }) => {
+  // Runs again when an action says this deal changed (PLAN_REALTIME_MIGRATION §3.4).
+  depends(rtKey(`deal:${params.id}`));
   const tok = (locals as any).tok as string | undefined;
   const uid = (locals as any).uid as string | undefined;
   const un = (locals as any).un as string | undefined;

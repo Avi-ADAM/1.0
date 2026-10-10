@@ -7,6 +7,10 @@ import { loadDealNotices } from '$lib/server/deal/dealNotices';
 import { EMPTY_PREFS, loadNoticePrefs, type NoticePrefs } from '$lib/server/notices/prefs';
 import type { Notice } from '$lib/notices';
 import type { PageServerLoad } from './$types';
+import { rtKey } from '$lib/realtime/scopes';
+import { LEV_PATTERNS } from '$lib/realtime/routing';
+
+const HUB_PATTERNS = [...LEV_PATTERNS, 'wish:*'];
 
 // The vote calculation lives in $lib/digest/hubSummary.ts now — the daily
 // digest reads the same function (PLAN_DAILY_DIGEST §1.1).
@@ -94,7 +98,10 @@ function toPageSummary({ feed: _feed, projectIds: _pids, ...rest }: HubSummary):
   return rest;
 }
 
-export const load: PageServerLoad = async ({ locals, fetch }) => {
+export const load: PageServerLoad = async ({ locals, fetch, depends }) => {
+  // The hub summarises the heart page plus the wish/deal bells. A change only
+  // reaches the members it concerns, so any one of these is about this user.
+  for (const p of HUB_PATTERNS) depends(rtKey(p));
   const uid = locals.uid ?? '';
   const demand: Promise<HubDemandSummary> = loadDemandSummary(fetch, !uid);
 

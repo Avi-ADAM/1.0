@@ -1,6 +1,6 @@
 # תכנית — מיגרציית Real-Time: כל שינוי מגיע לכל מסך שמציג אותו
 
-> **מצב:** בביצוע — R0, R1, R2 ו-N0–N1 בנויים (2026-10-08); R3 (דפים) הבא, ואיתו ה-actions הראשונים ב-R4. קובץ המעקב: [`REALTIME_TRACKING.md`](./REALTIME_TRACKING.md).
+> **מצב:** בביצוע — R0, R1, R2 ו-N0–N1 בנויים (2026-10-08); R3 (דפי גל 1) מחובר ונבדק בהזרקה ל-bus (2026-10-10); הבא: actions ב-R4. קובץ המעקב: [`REALTIME_TRACKING.md`](./REALTIME_TRACKING.md).
 > **קשור:** [`SPEC_SOCKET_REALTIME.md`](../tbd/SPEC_SOCKET_REALTIME.md) (presence / typing / עריכה
 > במקביל — **מחוץ** לתכנית הזאת, ראו R6), [`../inprogress/MIGRATION_TRACKING.md`](../inprogress/MIGRATION_TRACKING.md)
 > (כתיבות שעדיין עוקפות את ה-Action System — הן בלתי נראות לסוקט בכלל),
@@ -246,6 +246,8 @@ realtime?: {
 | **R5** | דפים, גל 2 (השאר) + timegrama: maturation בשתיקה מפרסם scopes (B9). ואז **הסרת `invalidate(() => true)`** (B2) ו-`fullRefresh` המשודר. | כל דפי ה-⚪ מכוסים |
 | **R6** | ניקוי: ה-patchers של `partialUpdate` ב-`levSocketHandler`, `updateStrategies.ts`, רשימות `VOTE_TYPES` המקומיות, המאזין של `moach/+layout`. `metadata.type` נשאר רק ל-toast ולפגישה. | R5 |
 | *(נפרד)* | presence / typing / editing-lock / project rooms — `SPEC_SOCKET_REALTIME.md`. | R6 |
+
+**נבנה (R3, 2026-10-10):** דפי load מצהירים `depends(rtKey(…))` (`rtKey` מחזיר עכשיו טיפוס `rt:${string}`, כך שהוא מתאים לחתימה של `depends`); דפי `onMount` משתמשים ב-`useRealtime`; דפי moach שקוראים מה-store מקבלים את מתאם moach. שתי מסקנות: (1) לוח "פתוח לשותפים" קרא מה-load ולא מה-store, ולכן גם הרענון של `missions` לא היה מגיע אליו; (2) לשונית המטלות קוראת מ-`base`, אז `act` מנותב גם ל-`base`. `negotiation/[id]` נדחה: `Negotiation` לא באוצר ונכתב דרך `/api/send`. בבדיקה ידנית ב-vite dev — `import()` של `bus.svelte.ts` חייב את אותו `?t=` שהאפליקציה טענה, אחרת נוצר מופע שני של ה-bus ושום מתאם לא מקבל.
 
 **סדר ההסרה חשוב:** `invalidate(() => true)` הוא היום הדבר **היחיד** שמרענן את 39 דפי ה-⚪.
 להסיר אותו רק אחרי שכל דף ⚪ מכוסה ב-`depends('rt:…')` — אחרת דפים שמתעדכנים היום "במקרה"

@@ -6,6 +6,7 @@
   import { sendToSer } from '$lib/send/sendToSer.js';
   import { onMount } from 'svelte';
   import Spinner from '$lib/celim/Spinner.svelte';
+  import { useRealtime } from '$lib/realtime/bus.svelte';
 
   let projectId = $derived(page.params.projectId);
   let actId = $derived(page.params.actId);
@@ -13,7 +14,7 @@
   let act = $state(null);
   let loading = $state(true);
 
-  onMount(async () => {
+  async function loadAct() {
     try {
       const res = await sendToSer({ id: actId }, 'getAct', null, null, false, fetch);
       act = res?.data?.act?.data;
@@ -23,7 +24,11 @@
     } finally {
       loading = false;
     }
-  });
+  }
+
+  onMount(loadAct);
+  // Another member marked it done, edited or reassigned it (PLAN_REALTIME_MIGRATION §3.4).
+  useRealtime(() => [`act:${actId}`], () => loadAct());
 
   let jsonLd = $derived(act ? {
     "@context": "https://schema.org",

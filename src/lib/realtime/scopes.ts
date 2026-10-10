@@ -119,7 +119,7 @@ export function projectIdsOf(scopes: readonly string[]): string[] {
  * scope that changed.
  */
 export const RT_PREFIX = 'rt:';
-export const rtKey = (pattern: string): string => RT_PREFIX + pattern;
+export const rtKey = (pattern: string): `rt:${string}` => `rt:${pattern}`;
 
 /** The socket event that carries a change, apart from human notifications. */
 export const RT_EVENT = 'rt:changed' as const;

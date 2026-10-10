@@ -22,6 +22,7 @@ import { wishGaps } from '$lib/wish/gaps';
 import { lineNames } from '$lib/wish/lineNames';
 import { readDealStages } from '$lib/server/deal/dealChain';
 import { sendViaProxy } from '$lib/server/sendViaProxy.js';
+import { rtKey } from '$lib/realtime/scopes';
 
 type PublishedNeed = { name: string; extractedKey: string | null };
 
@@ -49,7 +50,9 @@ function initials(name: string): string {
   return ((parts[0]?.[0] || '') + (parts[1]?.[0] || parts[0]?.[1] || '')).slice(0, 2) || 'מש';
 }
 
-export const load: PageServerLoad = async ({ params, locals, fetch }) => {
+export const load: PageServerLoad = async ({ params, locals, fetch, depends }) => {
+  // Runs again when an action says this wish or its proposals changed.
+  depends(rtKey(`wish:${params.id}`));
   const uid = (locals as any)?.uid;
   const tok = (locals as any)?.tok;
 

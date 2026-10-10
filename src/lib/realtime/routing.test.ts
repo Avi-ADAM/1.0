@@ -47,6 +47,8 @@ describe('moachSectionsForChange — the rikma tabs', () => {
   it('maps entities to sections', () => {
     expect(moachSectionsForChange({ scopes: ['project:12', 'mission:1'] }, 12)).toEqual(['missions']);
     expect(moachSectionsForChange({ scopes: ['project:12', 'sale:1'] }, 12)).toEqual(['financials']);
+    // the acts tab lists them from the layout's base
+    expect(moachSectionsForChange({ scopes: ['project:12', 'act:1'] }, 12).sort()).toEqual(['base', 'missions']);
     expect(moachSectionsForChange({ scopes: ['project:12', 'decision:maap:1'] }, 12).sort()).toEqual(['financials', 'missions']);
   });
 

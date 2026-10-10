@@ -1,6 +1,7 @@
 import { sendToSer } from '$lib/send/sendToSer.js';
 import { error, redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
+import { rtKey } from '$lib/realtime/scopes';
 
 function shortCode(id: string | number): string {
   const s = String(id).padStart(6, '0');
@@ -18,7 +19,9 @@ function initials(name: string): string {
   return ((parts[0]?.[0] || '') + (parts[1]?.[0] || parts[0]?.[1] || '')).slice(0, 2) || 'מש';
 }
 
-export const load: PageServerLoad = async ({ params, locals, fetch }) => {
+export const load: PageServerLoad = async ({ params, locals, fetch, depends }) => {
+  // Runs again when an action says this wish or its proposals changed.
+  depends(rtKey(`wish:${params.id}`));
   const uid = (locals as any)?.uid ?? null;
 
   let wish: any = null;

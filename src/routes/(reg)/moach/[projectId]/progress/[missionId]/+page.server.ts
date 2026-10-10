@@ -1,5 +1,6 @@
 import { sendToSer } from '$lib/send/sendToSer.js';
 import type { PageServerLoad } from './$types';
+import { rtKey } from '$lib/realtime/scopes';
 
 /**
  * One in-progress mission, loaded server-side so the page has a real title and
@@ -11,7 +12,8 @@ import type { PageServerLoad } from './$types';
  * components — one query, not two, and no client round-trip before the hours
  * are on screen.
  */
-export const load: PageServerLoad = async ({ params, fetch }) => {
+export const load: PageServerLoad = async ({ params, fetch, depends }) => {
+  depends(rtKey(`mission:${params.missionId}`));
   const { missionId } = params;
 
   const [mission, timers] = await Promise.all([

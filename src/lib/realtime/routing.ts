@@ -71,7 +71,8 @@ export type MoachSection = 'base' | 'missions' | 'financials';
 
 const MOACH_BY_ENTITY: Record<string, MoachSection[]> = {
   mission: ['missions'],
-  act: ['missions'],
+  // The acts tab reads the rikma's acts from `base` (getProjectBaseInfoWithAuth).
+  act: ['missions', 'base'],
   resource: ['missions'],
   shift: ['missions'],
   process: ['missions'],
