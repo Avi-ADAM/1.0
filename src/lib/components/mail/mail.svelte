@@ -31,7 +31,8 @@ const msg2 = { "he": "לחיצה כדי לצפות בפרויקט: ", "en": "cli
     projectSrc = "https://res.cloudinary.com/love1/image/upload/v1645647192/apple-touch-icon_irclue.png",
     lang = "he"
   } = $props();
-const msgk = { "he": `בקשת השירות שלך אושרה! אתה כלקוח של הפרויקט ${projectName}`, "en": `Your service request was accepted! You are now a client of the project ${projectName}` }
+// Sent to whoever was accepted to take a mission — never a customer of a service.
+const msgk = { "he": `התקבלת לרקמה ${projectName} ויש לך משימה חדשה`, "en": `You've been accepted to the rikma ${projectName} and have a new mission` }
 const hallo = {"he":"!","en":"Hello, "}
 const shalom = {"he":" שלום","en":"!"}
 const mt = {"he":"!מזל טוב", "en": "Congratulations!" }

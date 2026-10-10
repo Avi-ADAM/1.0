@@ -131,6 +131,27 @@ async function markDone(taid, why) {
   }
 }
 
+/**
+ * Clocks this process already holds — a timer waiting for them, or a finalizer
+ * running on them right now. A run looks an hour ahead and the scheduler runs
+ * every 10 minutes, so without this a clock due in an hour got a fresh timer
+ * from each of six runs, all firing in the same millisecond: each read the
+ * candidacy as still open before any of them wrote, and tg#479 created six
+ * missions and sent six "you were accepted" emails (2026-10-10 04:05Z).
+ */
+const claimed = new Set();
+
+/** Run a clock's finalizer unless this process is already holding it. */
+async function runClaimed(id, kind, taid, fetch) {
+  try {
+    await x(id, kind, taid, fetch);
+  } finally {
+    // Released either way: a finalizer that left the clock open (a failed
+    // write it wants retried) must be picked up again by a later run.
+    claimed.delete(String(taid));
+  }
+}
+
 async function x(id, kind, taid, fetch) {
   if (kind == 'ask') {
     await Ask(id, taid, fetch);
@@ -212,7 +233,7 @@ export async function GET({ fetch }) {
  }
     `;
 
-  const stats = { seen: 0, ran: 0, scheduled: 0, closed: 0, waiting: 0 };
+  const stats = { seen: 0, ran: 0, scheduled: 0, held: 0, closed: 0, waiting: 0 };
 
   try {
     const res = await SendToAdmin(qu, env.ADMINMONTHER);
@@ -265,17 +286,26 @@ export async function GET({ fetch }) {
 
       const myid = relation.data.id;
 
+      // Already waiting on a timer from an earlier run, or running right now.
+      if (claimed.has(String(tgid))) {
+        stats.held++;
+        continue;
+      }
+      claimed.add(String(tgid));
+
       if (d >= dateof) {
         // Awaited: the response used to return before the handlers had run, so
         // a restart could cut one off between its first mutation and markDone.
         stats.ran++;
-        await x(myid, kind, tgid, fetch);
+        await runClaimed(myid, kind, tgid, fetch);
       } else {
         // Still in the future. Held in process memory for now — this goes away
         // with the move to our own timer (PLAN_TIMEGRAMA §4.6).
         stats.scheduled++;
         setTimeout(function () {
-          x(myid, kind, tgid, fetch);
+          runClaimed(myid, kind, tgid, fetch).catch((e) =>
+            console.error(`[timegrama] #${tgid} (${kind}) failed:`, e)
+          );
         }, dateof.getTime() - d.getTime());
       }
     }
@@ -285,7 +315,8 @@ export async function GET({ fetch }) {
 
   console.log(
     `[timegrama] run ${d.toISOString()} — seen ${stats.seen}, ran ${stats.ran}, ` +
-      `scheduled ${stats.scheduled}, closed ${stats.closed}, awaiting handler ${stats.waiting}`
+      `scheduled ${stats.scheduled}, already held ${stats.held}, closed ${stats.closed}, ` +
+      `awaiting handler ${stats.waiting}`
   );
 
   return new Response('Hello Cron!');

@@ -368,8 +368,8 @@ const finalizeAskAcceptanceHandler: ActionExecutionHandler = async (params, cont
           machshirs: attrs.machshirs?.data ?? [],
         }],
         {
-          title: { he: 'התקבלת לשירות', en: 'Your service request was accepted' },
-          body: { he: `שירות: ${openmissionName}`, en: `Service: ${openmissionName}` },
+          title: { he: 'התקבלת למשימה', en: 'You were accepted to a mission' },
+          body: { he: `משימה: ${finalName}`, en: `Mission: ${finalName}` },
         },
         'MissionAccepted',
         context,
@@ -377,7 +377,7 @@ const finalizeAskAcceptanceHandler: ActionExecutionHandler = async (params, cont
           user: acceptedUserName || attrs.username || '',
           projectName,
           projectSrc,
-          missionName: openmissionName,
+          missionName: finalName,
         }
       );
     }
@@ -452,8 +452,8 @@ export const finalizeAskAcceptanceConfig: ActionConfig = {
       config: { projectIdParam: 'projectId', excludeSender: false }
     },
     templates: {
-      title: { he: 'בקשת שירות אושרה', en: 'Service request accepted' },
-      body: { he: 'לקוח חדש מצטרף לשירות', en: 'A new client joined a service mission' }
+      title: { he: 'מועמדות למשימה אושרה', en: 'Mission candidacy accepted' },
+      body: { he: 'חבר/ה התקבל/ה לבצע משימה ברקמה', en: 'A partner was accepted to take on a mission' }
     },
     intent: 'outcome',
     metadata: { type: 'missionCreated', url: 'lev' }
