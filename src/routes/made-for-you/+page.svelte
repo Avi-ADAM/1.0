@@ -18,6 +18,9 @@
   import { t, isRtl } from '$lib/translations';
   import { breadcrumbs, faqPage, jsonLdBody } from '$lib/seo/jsonLd.js';
   import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
+  import VideoModal from '$lib/components/main/VideoModal.svelte';
+  import { lang } from '$lib/stores/lang';
+  import { VIDEO_CONCIERGE, videoFor } from '$lib/videos.js';
 
   let { data } = $props();
 
@@ -27,6 +30,11 @@
 
   /** @param {string} seed a WishForm seed key */
   const seedHref = (seed) => `${composer}?seed=${seed}`;
+
+  /* Two and a half minutes of the whole thing happening — offered to readers of the
+     language it is recorded in ($lib/videos.js). */
+  const video = $derived(videoFor(VIDEO_CONCIERGE, $lang));
+  let videoOpen = $state(false);
 
   const PROMISES = ['p1', 'p2', 'p3'];
   const STEPS = ['s1', 's2', 's3', 's4'];
@@ -103,6 +111,12 @@
       <div class="mfy-ctas">
         <a href={composer} class="mfy-btn">{$t('madeForYou.hero.cta')}</a>
         <a href="#how" class="mfy-link">{$t('madeForYou.hero.how')}</a>
+        {#if video}
+          <button type="button" class="mfy-link mfy-watch" onclick={() => (videoOpen = true)}>
+            <span aria-hidden="true">▶</span>
+            {$t('madeForYou.hero.watch')}
+          </button>
+        {/if}
       </div>
       <p class="mfy-note">{$t('madeForYou.hero.ctaNote')}</p>
     </div>
@@ -212,6 +226,15 @@
     <a href={composer} class="mfy-btn">{$t('madeForYou.final.cta')}</a>
   </section>
 </main>
+
+{#if video}
+  <VideoModal
+    bind:open={videoOpen}
+    videoId={video}
+    title={$t('madeForYou.hero.videoLabel')}
+    closeLabel={$t('madeForYou.hero.videoClose')}
+  />
+{/if}
 
 <style>
   .mfy {
@@ -365,6 +388,22 @@
     text-decoration: underline;
     text-decoration-color: var(--gold);
     text-underline-offset: 5px;
+  }
+  .mfy-watch {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 44px;
+    background: none;
+    border: 0;
+    padding: 0;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .mfy-watch:focus-visible {
+    outline: 2px solid var(--rose);
+    outline-offset: 3px;
   }
   .mfy-note {
     margin-top: 1rem !important;

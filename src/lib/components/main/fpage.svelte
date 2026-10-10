@@ -27,6 +27,7 @@
   import ProductPeek from '$lib/components/main/ProductPeek.svelte';
   import SplitCalculator from '$lib/components/main/SplitCalculator.svelte';
   import VideoModal from '$lib/components/main/VideoModal.svelte';
+  import { VIDEO_HOW_IT_WORKS, VIDEO_CONCIERGE, videoFor } from '$lib/videos.js';
   import DemoRequest from '$lib/components/main/DemoRequest.svelte';
   import MotionControl from '$lib/components/main/MotionControl.svelte';
   import AppearanceMenu from '$lib/components/footer/AppearanceMenu.svelte';
@@ -258,13 +259,12 @@
      Booking a personal demo is the third path beside login and signup. The
      recorded walkthrough is Hebrew-only for now, so elsewhere it is not
      offered. */
-  const VIDEO_HOW_IT_WORKS = 'l0d1yv6Qtz4';
   let demoOpen = $state(false);
   let videoOpen = $state(false);
   let videoId = $state('');
   let videoTitle = $state('');
   let watchRecorded = $derived(
-    $lang === 'he'
+    videoFor(VIDEO_HOW_IT_WORKS, $lang)
       ? () => {
           videoId = VIDEO_HOW_IT_WORKS;
           videoTitle = $t('home.videos.howItWorksLabel');
@@ -272,6 +272,15 @@
         }
       : null
   );
+  /* The concierge end to end (2:42), beside "more about the concierge" — for readers of
+     the language it is recorded in ($lib/videos.js). */
+  const conciergeVideo = $derived(videoFor(VIDEO_CONCIERGE, $lang));
+  function watchConcierge() {
+    if (!conciergeVideo) return;
+    videoId = conciergeVideo;
+    videoTitle = $t('home.videos.conciergeLabel');
+    videoOpen = true;
+  }
 
   onMount(() => {
     if (!statsLoaded) loadStats();
@@ -634,7 +643,15 @@
           <button type="submit" class="hm-btn hm-btn-primary">{$t('home.concierge.customerCta')}</button>
         </form>
         <p class="hm-flow">{$t('home.concierge.flow')}</p>
-        <a href="/made-for-you" class="hm-textlink">{$t('home.concierge.more')}</a>
+        <div class="hm-pill-row">
+          <a href="/made-for-you" class="hm-textlink">{$t('home.concierge.more')}</a>
+          {#if conciergeVideo}
+            <button type="button" class="hm-textlink hm-watch" onclick={watchConcierge}>
+              <span aria-hidden="true">▶</span>
+              {$t('home.videos.conciergeCta')}
+            </button>
+          {/if}
+        </div>
         <div class="hm-provider">
           <div>
             <b>{$t('home.concierge.providerTitle')}</b>
@@ -1150,6 +1167,15 @@
     color: var(--hm-goldink);
     text-decoration: underline;
     text-underline-offset: 4px;
+  }
+  /* a link-looking button: the text link's look, none of a button's chrome */
+  .hm .hm-watch {
+    gap: 6px;
+    background: none;
+    border: 0;
+    padding: 0;
+    font-family: inherit;
+    cursor: pointer;
   }
   .hm-pill-row {
     display: flex;

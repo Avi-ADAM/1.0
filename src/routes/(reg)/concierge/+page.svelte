@@ -6,9 +6,17 @@
   import { t } from '$lib/translations';
   import { page } from '$app/state';
   import ConciergeBell from '$lib/components/concierge/ConciergeBell.svelte';
+  import VideoModal from '$lib/components/main/VideoModal.svelte';
+  import { lang } from '$lib/stores/lang';
+  import { VIDEO_CONCIERGE, videoFor } from '$lib/videos.js';
 
   /** @type {{ data: { mine: any[]; publicFeed: any[]; bell?: { id: string; name: string; count: number }[]; notices?: import('$lib/notices').Notice[] | null; queryOk: { mine: boolean; public: boolean }; uid?: string; un?: string } }} */
   let { data } = $props();
+
+  /* Help where the work is: the whole concierge in two and a half minutes, for readers
+     of the language it is recorded in ($lib/videos.js). */
+  const helpVideo = $derived(videoFor(VIDEO_CONCIERGE, $lang));
+  let helpOpen = $state(false);
   const fmtMoney = useFormatMoney();
 
 
@@ -389,6 +397,15 @@
       <a href="/moach" class="nav-lnk">{$t('concierge.moach')}</a>
     </nav>
     <div class="hdr-right">
+      {#if helpVideo}
+        <button
+          type="button"
+          class="help-btn"
+          onclick={() => (helpOpen = true)}
+          aria-label={$t('concierge.help_video')}
+          title={$t('concierge.help_video')}>?</button
+        >
+      {/if}
       <ConciergeBell items={data?.bell ?? []} notices={data?.notices ?? null} />
       <button class="av-btn" onclick={() => goto('/me')}>
         {#if $uPic}
@@ -429,6 +446,12 @@
                 onclick={() => (activeTab = 'browse')}
                 >{$t('concierge.browse_btn')}</a
               >
+              {#if helpVideo}
+                <button type="button" class="btn-ghost" onclick={() => (helpOpen = true)}>
+                  <span class="play-ic" aria-hidden="true">▶</span>
+                  {$t('concierge.watch_btn')}
+                </button>
+              {/if}
             </div>
 
             <div class="seed-row">
@@ -877,6 +900,16 @@
 
 <!-- /cp -->
 
+
+{#if helpVideo}
+  <VideoModal
+    bind:open={helpOpen}
+    videoId={helpVideo}
+    title={$t('concierge.video_label')}
+    closeLabel={$t('concierge.video_close')}
+  />
+{/if}
+
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Bellefair&family=Cinzel:wght@400;600;700&family=Heebo:wght@300;400;500;600;700;800&display=swap');
 
@@ -1066,6 +1099,26 @@
     align-items: center;
     gap: 8px;
     flex-shrink: 0;
+  }
+  .play-ic {
+    margin-inline-end: 6px;
+  }
+  .help-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 2px solid var(--cg-gold);
+    background: transparent;
+    color: var(--cg-gold2);
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0;
+  }
+  .help-btn:hover,
+  .help-btn:focus-visible {
+    background: linear-gradient(135deg, var(--cg-g-s3), var(--cg-g-s4));
   }
   .av-btn {
     width: 34px;

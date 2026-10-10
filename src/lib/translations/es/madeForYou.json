@@ -10,7 +10,10 @@
     "sub": "Cuéntanos con tus palabras lo que necesitas: un regalo, una reforma, un evento, un servicio fijo. El concierge desglosa el pedido, encuentra a los profesionales adecuados y vuelve con un único plan, hecho a tu medida.",
     "cta": "Cuéntanos qué quieres",
     "ctaNote": "Puedes empezar a escribir sin registrarte · el pedido es gratis",
-    "how": "Cómo funciona"
+    "how": "Cómo funciona",
+    "watch": "Mira cómo funciona (2:42)",
+    "videoLabel": "Video: la conserjería — del deseo a un trato completado",
+    "videoClose": "Cerrar"
   },
   "card": {
     "label": "Nuevo pedido",

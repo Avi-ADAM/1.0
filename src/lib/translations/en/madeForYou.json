@@ -10,7 +10,10 @@
     "sub": "Tell us in your own words what you need - a gift, a renovation, an event, a regular service. The concierge breaks the request down, finds the right professionals and comes back with one plan, made entirely for you.",
     "cta": "Tell us what you'd like",
     "ctaNote": "Start writing without signing up · the request itself is free",
-    "how": "How it works"
+    "how": "How it works",
+    "watch": "Watch how it works (2:42)",
+    "videoLabel": "Video: the concierge — from a wish to a completed deal",
+    "videoClose": "Close"
   },
   "card": {
     "label": "New request",

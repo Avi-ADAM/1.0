@@ -890,6 +890,57 @@
       "todo": "save rikmaId / tableMissionId / pcMissionId from the new rikma (2026-10-07 run: 92 / 196 / 197, set by hand in current-vars.json)"
     },
     {
+      "id": "s08t-timer",
+      "title": "הטיימר רץ על המשימה",
+      "chapter": "5 · ביצוע",
+      "session": "sup2",
+      "narration": "הספקים עובדים ומדווחים — טיימר על המשימה,",
+      "note": "The dial shows only missions still in progress. In a full re-shoot this runs before the hours are logged, on the demo mission; on 2026-10-08 the demo mission was already finished, so the take used the QA mission still in progress. s08t2 clears the timer.",
+      "setup": [
+        {
+          "do": "goto",
+          "url": "/timers"
+        },
+        {
+          "do": "waitFor",
+          "target": {
+            "role": "button",
+            "name": "הפעל טיימר"
+          },
+          "timeout": 240000
+        },
+        {
+          "do": "wait",
+          "ms": 1200
+        }
+      ],
+      "steps": [
+        {
+          "do": "click",
+          "target": {
+            "role": "button",
+            "name": "הפעל טיימר"
+          },
+          "commits": true,
+          "mark": "timer-start"
+        },
+        {
+          "do": "wait",
+          "ms": 3200
+        }
+      ],
+      "zoom": {
+        "scale": 2.4,
+        "hold": true,
+        "box": {
+          "x": 1368,
+          "y": 444,
+          "w": 216,
+          "h": 216
+        }
+      }
+    },
+    {
       "id": "s08a-log-table",
       "title": "רישום 15 שעות נגרות (מאחורי הקלעים)",
       "session": "sup2",
@@ -1055,7 +1106,7 @@
       "title": "הספקית עובדת ומדווחת התקדמות",
       "chapter": "5 · ביצוע",
       "session": "sup2",
-      "narration": "הספקים עובדים ומדווחים — טיימר על המשימה, ועדכון קצר על מה נעשה. הלקוחה רואה את ההתקדמות בדף העסקה, ויכולה לדבר עם הצוות בכל רגע.",
+      "narration": "ועדכון קצר על מה נעשה. הלקוחה רואה את ההתקדמות בדף העסקה, ויכולה לדבר עם הצוות בכל רגע.",
       "setup": [
         {
           "do": "goto",
@@ -2096,5 +2147,9 @@
         }
       ]
     }
-  ]
+  ],
+  "pronunciation": {
+    "מזהה": "מְזַהֶה",
+    "כהושלמה": "כְּהֻשְׁלְמָה"
+  }
 }

@@ -486,5 +486,9 @@
   "terms_saved": "Detalles guardados",
   "terms_saved_reopened": "Detalles guardados · partes que esperan una nueva aprobación: {{count}}",
   "terms_error": "No se pudieron guardar los detalles, inténtalo de nuevo",
-  "neg_waiting_terms": "Los detalles cambiaron · esperando al proveedor"
+  "neg_waiting_terms": "Los detalles cambiaron · esperando al proveedor",
+  "watch_btn": "Cómo funciona — video",
+  "help_video": "Video tutorial: cómo funciona la conserjería",
+  "video_label": "Video: la conserjería — del deseo a un trato completado",
+  "video_close": "Cerrar"
 }

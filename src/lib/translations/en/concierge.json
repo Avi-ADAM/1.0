@@ -485,5 +485,9 @@
   "terms_saved": "Details saved",
   "terms_saved_reopened": "Details saved · parts waiting to be approved again: {{count}}",
   "terms_error": "Could not save the details, please try again",
-  "neg_waiting_terms": "Details changed · waiting for the provider"
+  "neg_waiting_terms": "Details changed · waiting for the provider",
+  "watch_btn": "How it works — video",
+  "help_video": "Tutorial video: how the concierge works",
+  "video_label": "Video: the concierge — from a wish to a completed deal",
+  "video_close": "Close"
 }
