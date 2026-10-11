@@ -225,9 +225,14 @@
     "successMulti": "השינויים הועלו להצבעה!",
     "successNoChange": "לא זוהו שינויים",
     "errorMsg": "שגיאה בשמירה, נסה שנית",
-    "multiUserNote": "פרויקט עם מספר חברים - השינויים יועלו להצבעה",
+    "multiUserNote": "רקמה עם כמה חברים — השינויים יעלו להצבעה",
     "addValue": "הוסף ערך",
-    "uploadPic": "תמונת פרופיל"
+    "uploadPic": "תמונת פרופיל",
+    "changedTitle": "השתנה בזמן שערכת",
+    "changedBody": "השדות האלה השתנו ברקמה, וגם בטופס שלך:",
+    "takeTheirs": "לטעון את הגרסה החדשה",
+    "keepMine": "להשאיר את שלי",
+    "updatedQuietly": "עודכן מהגרסה האחרונה: {{fields}}"
   },
   "finisin": {
     "title_single": "פעולה שבוצעה ואושרה",

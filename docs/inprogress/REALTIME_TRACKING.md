@@ -18,7 +18,7 @@
 | … `fullRefresh` משודר | 21 | 0 (לא מועבר לנמענים) |
 | דפים שמציגים נתונים משותפים | 76 | 76 |
 | … 🟢 ממוקד | 11 | 16 |
-| … ⚪ / 🔴 / 🟠 (לא מתעדכנים בזמן אמת) | 62 | 3 (edit, timers של הרקמה, create) — negotiation דולג: רפרנס בלבד |
+| … ⚪ / 🔴 / 🟠 (לא מתעדכנים בזמן אמת) | 62 | 2 (timers של הרקמה, create) — negotiation דולג: רפרנס בלבד |
 | `invalidate(() => true)` בלקוח | קיים | הוסר מהסוקט (נשאר רק כשהמבצע מריץ `fullRefresh` מהתוצאה שלו) |
 | מאזיני `notification` שמרעננים מסכים | 8 (R5) | 0 — נשארו רק מאזינים לבני אדם: הטוסט, שורת הצ'אט והפרופיל ב-layout הראשי, והפגישה (2026-10-11) |
 | `updateStrategy` משודר לנמענים | כל action עם התראה | 0 — רק הטאב המבצע מריץ אותו מהתשובה שלו (2026-10-11) |
@@ -150,7 +150,7 @@ inline מהקובץ עצמו ומה-helpers (`deal/offerDeal.ts`, `sheirut/dealE
 | `moach/[pid]/create` | moachStore | 🟠 | `project:<pid>` (רשימות הבחירה בטופס) | n/a — טופס; רשימות הבחירה נקראות בכניסה |
 | `moach/[pid]/stipend` | onMount | 🔴 | `stipend:*` | [x] 2026-10-11 — `useRealtime(stipend:*)` מסונן לרקמה; לא נבדק חי |
 | `moach/[pid]/object/[type]` · `object/[type]/[id]` | onMount | 🔴 | `mission:<id>` / `resource:<id>` / `product:<id>` | [x] 2026-10-11 — `useRealtime` על ישויות מחזור החיים, מסונן לרקמה; לא נבדק חי |
-| `moach/[pid]/edit` | onMount | 🔴 | `project:<pid>` (התראת "השתנה בזמן שערכת", לא רענון) | [ ] נדחה — לא רענון אלא התראת "השתנה בזמן שערכת"; צריך עיצוב |
+| `moach/[pid]/edit` | layout data | 🟢 | `project:<pid>` → `base` (התראת "השתנה בזמן שערכת", לא רענון) | [x] 2026-10-12 — מיזוג תלת-כיווני לפי שדות (`$lib/realtime/editMerge.ts`, טהור): כשמתאם moach קורא מחדש את `projectBase`, `EditProjectDetails` משווה אותו לגרסה שממנה הטופס התחיל — שדה שהחבר לא נגע בו מתעדכן בשקט (הודעת `updatedQuietly`), שדה ששני הצדדים שינו אחרת מוצג כקונפליקט עם "לטעון את הגרסה החדשה" / "להשאיר את שלי". נקבע לפי הנתונים ולא לפי אירועים — כמעט כל action ברקמה מפרסם `project:<pid>`. תיאור עשיר נבדק לפי טקסט (blocks מול HTML). נבדק ברכיב (`EditProjectDetails.svelte.test.ts`), לא בשני דפדפנים |
 | `moach/[pid]/resources` | load | ⚪ | `resource:*` | [x] 2026-10-11 — `depends(rt:resource:*)`; לא נבדק חי |
 | `moach/[pid]/shifts` | load | ⚪ | `shift:*` | [x] 2026-10-11 — `depends(rt:shift:*)`; לא נבדק חי |
 | `moach/[pid]/wishes` | load | ⚪ | `wish:*` | [x] 2026-10-11 — `depends(rt:wish:*)`; לא נבדק חי |

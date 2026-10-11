@@ -225,9 +225,14 @@
     "successMulti": "Changes submitted for voting!",
     "successNoChange": "No changes detected",
     "errorMsg": "Error saving, please try again",
-    "multiUserNote": "Multi-member project - changes will go to a vote",
+    "multiUserNote": "A rikma with several members — changes go to a vote",
     "addValue": "Add value",
-    "uploadPic": "Profile Picture"
+    "uploadPic": "Profile Picture",
+    "changedTitle": "Changed while you were editing",
+    "changedBody": "These fields changed in the rikma, and in your form too:",
+    "takeTheirs": "Load the new version",
+    "keepMine": "Keep mine",
+    "updatedQuietly": "Updated from the latest version: {{fields}}"
   },
   "finisin": {
     "title_single": "Completed & Approved Action",

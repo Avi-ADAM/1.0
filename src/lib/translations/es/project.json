@@ -226,9 +226,14 @@
     "successMulti": "¡Los cambios se enviaron a votación!",
     "successNoChange": "No se detectaron cambios",
     "errorMsg": "Error al guardar, inténtalo de nuevo",
-    "multiUserNote": "Proyecto con varios miembros: los cambios irán a votación",
+    "multiUserNote": "Una rikma con varios miembros: los cambios irán a votación",
     "addValue": "Añadir valor",
-    "uploadPic": "Imagen de perfil"
+    "uploadPic": "Imagen de perfil",
+    "changedTitle": "Cambió mientras editabas",
+    "changedBody": "Estos campos cambiaron en la rikma, y también en tu formulario:",
+    "takeTheirs": "Cargar la nueva versión",
+    "keepMine": "Mantener la mía",
+    "updatedQuietly": "Actualizado desde la última versión: {{fields}}"
   },
   "finisin": {
     "title_single": "Acción completada y aprobada",

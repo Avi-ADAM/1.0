@@ -7,7 +7,8 @@
   import { invalidateAll } from '$app/navigation';
   import MultiSelect from 'svelte-multiselect';
   import RichText from '$lib/celim/ui/richText.svelte';
-  import { onMount } from 'svelte';
+  import { onMount, untrack } from 'svelte';
+  import { mergeRemote, sameSet, sameText } from '$lib/realtime/editMerge';
   import Uplad from '$lib/components/userPr/uploadPic.svelte';
   import CurrencyPicker from '$lib/components/money/CurrencyPicker.svelte';
   import { DEFAULT_CURRENCY } from '$lib/money/currencies.js';
@@ -87,6 +88,130 @@
   }
 
   const isMultiUser = memberCount > 1;
+
+  // ── Changed while you were editing (PLAN_REALTIME_MIGRATION, $lib/realtime/editMerge)
+  // The rikma's details can change under the open form — another member's
+  // edit, or a details decision that matured. The moach realtime adapter
+  // re-reads `projectBase`; here it is merged into the form field by field:
+  // what the member did not touch follows quietly, what both sides changed is
+  // put to the member to choose.
+  const MERGE_FIELDS = [
+    { key: 'projectName' },
+    { key: 'publicDescription', eq: sameText },
+    { key: 'descripFor', eq: sameText },
+    { key: 'linkToWebsite' },
+    { key: 'githublink' },
+    { key: 'fblink' },
+    { key: 'discordlink' },
+    { key: 'drivelink' },
+    { key: 'twiterlink' },
+    { key: 'watsapplink' },
+    { key: 'restime' },
+    { key: 'codeLicense' },
+    { key: 'codeLicenseOpenYears' },
+    { key: 'vallues', eq: sameSet },
+    { key: 'pic' }
+  ];
+  const FIELD_LABEL = {
+    projectName: 'project.editDetails.name',
+    publicDescription: 'project.editDetails.pubDesc',
+    descripFor: 'project.editDetails.privDesc',
+    linkToWebsite: 'project.editDetails.website',
+    githublink: 'project.editDetails.github',
+    fblink: 'project.editDetails.facebook',
+    discordlink: 'project.editDetails.discord',
+    drivelink: 'project.editDetails.drive',
+    twiterlink: 'project.editDetails.twitter',
+    watsapplink: 'project.editDetails.whatsapp',
+    restime: 'project.editDetails.restime',
+    codeLicense: 'project.editDetails.codeLicense',
+    codeLicenseOpenYears: 'project.editDetails.codeLicenseYears',
+    vallues: 'project.editDetails.values',
+    pic: 'project.editDetails.uploadPic'
+  };
+  const fieldLabels = (keys) => keys.map((k) => $t(FIELD_LABEL[k])).join(', ');
+
+  /** The rikma's details, shaped like the form. */
+  function fromBase(pb) {
+    return {
+      projectName: pb?.projectName ?? '',
+      publicDescription: pb?.publicDescription ?? '',
+      descripFor: pb?.descripFor ?? '',
+      linkToWebsite: pb?.linkToWebsite ?? '',
+      githublink: pb?.githublink ?? '',
+      fblink: pb?.fblink ?? '',
+      discordlink: pb?.discordlink ?? '',
+      drivelink: pb?.drivelink ?? '',
+      twiterlink: pb?.twiterlink ?? '',
+      watsapplink: pb?.watsapplink ?? '',
+      restime: pb?.restime ?? 'feh',
+      codeLicense: effectiveLicense(pb?.codeLicense),
+      codeLicenseOpenYears: pb?.codeLicenseOpenYears ?? DEFAULT_OPEN_YEARS,
+      vallues: (pb?.vallues?.data ?? []).map(localizedVallueName),
+      pic: pb?.profilePic?.data?.attributes?.url ?? ''
+    };
+  }
+
+  /** What the form holds now. */
+  function current() {
+    return {
+      projectName, publicDescription, descripFor, linkToWebsite, githublink, fblink,
+      discordlink, drivelink, twiterlink, watsapplink, restime, codeLicense,
+      codeLicenseOpenYears, vallues: selectedVallueNames, pic: srcP
+    };
+  }
+
+  function setField(key, value) {
+    switch (key) {
+      case 'projectName': projectName = value ?? ''; break;
+      case 'publicDescription': publicDescription = value ?? ''; break;
+      case 'descripFor': descripFor = value ?? ''; break;
+      case 'linkToWebsite': linkToWebsite = value ?? ''; break;
+      case 'githublink': githublink = value ?? ''; break;
+      case 'fblink': fblink = value ?? ''; break;
+      case 'discordlink': discordlink = value ?? ''; break;
+      case 'drivelink': drivelink = value ?? ''; break;
+      case 'twiterlink': twiterlink = value ?? ''; break;
+      case 'watsapplink': watsapplink = value ?? ''; break;
+      case 'restime': restime = value ?? 'feh'; break;
+      case 'codeLicense': codeLicense = value; break;
+      case 'codeLicenseOpenYears': codeLicenseOpenYears = value ?? DEFAULT_OPEN_YEARS; break;
+      case 'vallues': selectedVallueNames = value ?? []; break;
+      case 'pic': srcP = value ?? ''; newPicId = null; break;
+    }
+  }
+
+  // The version the form is editing against. Plain, not reactive: it moves
+  // only when a newer version has been merged in.
+  let baseline = untrack(() => fromBase(projectBase));
+  let conflicts = $state([]);
+  let quietlyUpdated = $state([]);
+
+  // An effect, not a $derived: the fields are the member's to edit, and the
+  // merge needs history (`baseline`) — it writes a newer version *into* local
+  // state only where the member had not touched it.
+  $effect(() => {
+    const theirs = fromBase(projectBase);
+    untrack(() => {
+      const r = mergeRemote(baseline, current(), theirs, MERGE_FIELDS);
+      baseline = theirs;
+      const applied = Object.keys(r.apply);
+      for (const k of applied) setField(k, r.apply[k]);
+      if (applied.length) quietlyUpdated = applied;
+      if (r.conflicts.length) {
+        const fresh = new Set(r.conflicts.map((c) => c.key));
+        conflicts = [...conflicts.filter((c) => !fresh.has(c.key)), ...r.conflicts];
+      }
+    });
+  });
+
+  function takeTheirs() {
+    for (const c of conflicts) setField(c.key, c.theirs);
+    conflicts = [];
+  }
+  function keepMine() {
+    conflicts = [];
+  }
 
   /** @type {'rtl' | 'ltr'} */
   let dir = $derived($isRtl ? 'rtl' : 'ltr');
@@ -192,6 +317,26 @@
   {#if isMultiUser}
     <div class="bg-amber-50 border border-amber-300 text-amber-800 rounded-lg p-3 text-sm">
       {$t('project.editDetails.multiUserNote')}
+    </div>
+  {/if}
+
+  {#if conflicts.length}
+    <div class="bg-rose-50 border border-rose-300 text-rose-900 rounded-lg p-3 text-sm space-y-2" role="alert">
+      <p class="font-bold">{$t('project.editDetails.changedTitle')}</p>
+      <p>{$t('project.editDetails.changedBody')} {fieldLabels(conflicts.map((c) => c.key))}</p>
+      <div class="flex flex-wrap gap-2">
+        <button type="button" class="px-3 py-1 rounded-lg bg-rose-700 text-white font-semibold" onclick={takeTheirs}>
+          {$t('project.editDetails.takeTheirs')}
+        </button>
+        <button type="button" class="px-3 py-1 rounded-lg border border-rose-400 text-rose-900" onclick={keepMine}>
+          {$t('project.editDetails.keepMine')}
+        </button>
+      </div>
+    </div>
+  {:else if quietlyUpdated.length}
+    <div class="flex items-start justify-between gap-2 bg-sky-50 border border-sky-300 text-sky-900 rounded-lg p-3 text-sm" role="status">
+      <span>{$t('project.editDetails.updatedQuietly', { fields: fieldLabels(quietlyUpdated) })}</span>
+      <button type="button" class="font-bold leading-none" aria-label={$t('project.editDetails.cancel')} onclick={() => (quietlyUpdated = [])}>×</button>
     </div>
   {/if}
 
