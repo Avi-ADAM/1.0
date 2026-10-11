@@ -1,6 +1,7 @@
 import { sendToSer } from '$lib/send/sendToSer.js';
 import { bookingsFromLegacy } from '$lib/resources/bookingsFromLegacy.js';
 import type { PageServerLoad } from './$types';
+import { rtKey } from '$lib/realtime/scopes.js';
 
 /**
  * The rikma's resource calendar (docs/inprogress/PLAN_RESOURCE_CALENDAR.md §6.3).
@@ -13,7 +14,8 @@ import type { PageServerLoad } from './$types';
  * its own member guard as well, so a direct call to `/api/send` cannot read it
  * either.
  */
-export const load: PageServerLoad = async ({ params, fetch }) => {
+export const load: PageServerLoad = async ({ params, fetch, depends }) => {
+  depends(rtKey('resource:*'));
   const { projectId } = params;
 
   let bookings: ReturnType<typeof bookingsFromLegacy> = [];

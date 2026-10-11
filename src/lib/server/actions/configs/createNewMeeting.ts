@@ -1,5 +1,6 @@
 
 import type { ActionConfig } from '../types.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 export const createNewMeetingConfig: ActionConfig = {
     key: 'createNewMeeting',
@@ -103,7 +104,8 @@ export const createNewMeetingConfig: ActionConfig = {
                             en: bodyEn
                         }
                     },
-                    channels: ['socket', 'email', 'telegram', 'push'] as const,
+                    // An invitation each of them is asked to approve.
+                    intent: 'consent' as const,
                     metadata: {
                         priority: 'normal',
                         url: '/meeting/' + pgishaId,
@@ -144,5 +146,11 @@ export const createNewMeetingConfig: ActionConfig = {
         config: {
             // Trigger client update if needed
         }
-    }
+    },
+
+    realtime: {
+        scopes: (_p, r) =>
+            scopeList([scope('meeting', r?.data?.createPgisha?.data?.id)]),
+        partiesFrom: (p) => p.selected ?? [],
+    },
 };

@@ -22,6 +22,7 @@
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import type { ExpandedItem } from '../../planning/expandDirection.js';
 import { stripHtml } from '../../../utils/stripHtml.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 /**
  * The planning engines are loaded lazily, inside the handlers.
@@ -200,7 +201,12 @@ export const scanProjectDirectionsAction: ActionConfig = {
       config: { projectIdParam: 'projectId' },
       errorMessage: 'You must be a member of this project to scan it'
     }
-  ]
+  ],
+
+  realtime: {
+    scopes: (p, r) =>
+      scopeList([scope('project', p.projectId), ...(r?.boards ?? []).map((b: { id: string }) => scope('plan', b.id))]),
+  },
 };
 
 // ── Tier 2: expandPlanBoard ────────────────────────────────────────────────
@@ -289,7 +295,12 @@ export const expandPlanBoardAction: ActionConfig = {
       config: { projectIdParam: 'projectId' },
       errorMessage: 'You must be a member of this project to expand its planning boards'
     }
-  ]
+  ],
+
+  realtime: {
+    scopes: (p) =>
+      scopeList([scope('project', p.projectId), scope('plan', p.boardId)]),
+  },
 };
 
 // ── Free-text entry point ──────────────────────────────────────────────────
@@ -380,7 +391,12 @@ export const createPlanBoardFromTextAction: ActionConfig = {
       config: { projectIdParam: 'projectId' },
       errorMessage: 'You must be a member of this project to plan it'
     }
-  ]
+  ],
+
+  realtime: {
+    scopes: (p, r) =>
+      scopeList([scope('project', p.projectId), scope('plan', r?.boardId)]),
+  },
 };
 
 // ── Structured entry point: rows the caller already wrote ──────────────────
@@ -485,7 +501,12 @@ export const createPlanBoardFromItemsAction: ActionConfig = {
       config: { projectIdParam: 'projectId' },
       errorMessage: 'You must be a member of this project to plan it'
     }
-  ]
+  ],
+
+  realtime: {
+    scopes: (p, r) =>
+      scopeList([scope('project', p.projectId), scope('plan', r?.boardId)]),
+  },
 };
 
 // ── Onboarding: seed a brand-new rikma with its starter boards ──────────────
@@ -627,5 +648,10 @@ export const seedPlanBoardsAction: ActionConfig = {
       config: { projectIdParam: 'projectId' },
       errorMessage: 'You must be a member of this rikma to seed its planning boards'
     }
-  ]
+  ],
+
+  realtime: {
+    scopes: (p, r) =>
+      scopeList([scope('project', p.projectId), ...(r?.boardIds ?? []).map((id: string) => scope('plan', id))]),
+  },
 };

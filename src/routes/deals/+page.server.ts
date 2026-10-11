@@ -2,8 +2,10 @@ import { redirect, error } from '@sveltejs/kit';
 import { fetchDealsForUser } from '$lib/server/deals/dealsQueries';
 import { sendViaProxy } from '$lib/server/sendViaProxy.js';
 import type { PageServerLoad } from './$types';
+import { rtKey } from '$lib/realtime/scopes.js';
 
-export const load: PageServerLoad = async ({ locals, fetch }) => {
+export const load: PageServerLoad = async ({ locals, fetch, depends }) => {
+  depends(rtKey('deal:*'));
   const tok = (locals as any).tok as string | undefined;
   const uid = (locals as any).uid as string | undefined;
 

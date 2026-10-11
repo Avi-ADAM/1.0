@@ -37,6 +37,7 @@ import {
   type StrapiLike
 } from '$lib/server/assistant/session.js';
 import { nextShareExpiry } from '$lib/server/assistant/shareKey.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 const SITE = 'https://www.1lev1.com';
 
@@ -127,7 +128,13 @@ export const proposeRikmaBlueprintConfig: ActionConfig = {
     via: { type: 'string', required: false, description: "'site' | 'agent'" }
   },
   authRules: [{ type: 'jwt', errorMessage: 'Log in to import a rikma' }],
-  updateStrategy: { type: 'none' }
+  updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (_p, _r, ctx) =>
+      scopeList([scope('user', ctx.userId)]),
+    audience: 'self',
+  },
 };
 
 // ── getAssistantSession ─────────────────────────────────────────────────────
@@ -243,7 +250,13 @@ export const setAssistantItemsConfig: ActionConfig = {
     say: { type: 'string', required: false, description: 'What the assistant said back, for the transcript' }
   },
   authRules: [{ type: 'jwt' }],
-  updateStrategy: { type: 'none' }
+  updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (_p, _r, ctx) =>
+      scopeList([scope('user', ctx.userId)]),
+    audience: 'self',
+  },
 };
 
 // ── undoAssistantRevision ───────────────────────────────────────────────────
@@ -285,7 +298,13 @@ export const undoAssistantRevisionConfig: ActionConfig = {
     via: { type: 'string', required: false }
   },
   authRules: [{ type: 'jwt' }],
-  updateStrategy: { type: 'none' }
+  updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (_p, _r, ctx) =>
+      scopeList([scope('user', ctx.userId)]),
+    audience: 'self',
+  },
 };
 
 // ── materializeRikmaBlueprint ───────────────────────────────────────────────
@@ -478,7 +497,12 @@ export const materializeRikmaBlueprintConfig: ActionConfig = {
   // Deliberately NOT exposed to api keys: an agent prepares, the person creates.
   access: ['user'],
   authRules: [{ type: 'jwt', errorMessage: 'Log in to create the rikma' }],
-  updateStrategy: { type: 'fullRefresh' }
+  updateStrategy: { type: 'fullRefresh' },
+
+  realtime: {
+    scopes: (_p, r, ctx) =>
+      scopeList([scope('user', ctx.userId), scope('project', r?.data?.projectId)]),
+  },
 };
 
 // ── shareRikmaPreview ───────────────────────────────────────────────────────
@@ -517,7 +541,13 @@ export const shareRikmaPreviewConfig: ActionConfig = {
     revoke: { type: 'boolean', required: false }
   },
   authRules: [{ type: 'jwt' }],
-  updateStrategy: { type: 'none' }
+  updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (_p, _r, ctx) =>
+      scopeList([scope('user', ctx.userId)]),
+    audience: 'self',
+  },
 };
 
 // ── startAssistantSession (profile / wish) ─────────────────────────────────
@@ -628,7 +658,13 @@ export const startAssistantSessionConfig: ActionConfig = {
     via: { type: 'string', required: false }
   },
   authRules: [{ type: 'jwt' }],
-  updateStrategy: { type: 'none' }
+  updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (_p, _r, ctx) =>
+      scopeList([scope('user', ctx.userId)]),
+    audience: 'self',
+  },
 };
 
 // ── reviseAssistantSession ─────────────────────────────────────────────────
@@ -676,7 +712,13 @@ export const reviseAssistantSessionConfig: ActionConfig = {
     via: { type: 'string', required: false }
   },
   authRules: [{ type: 'jwt' }],
-  updateStrategy: { type: 'none' }
+  updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (_p, _r, ctx) =>
+      scopeList([scope('user', ctx.userId)]),
+    audience: 'self',
+  },
 };
 
 // ── applyAssistantSession ──────────────────────────────────────────────────
@@ -777,7 +819,13 @@ export const applyAssistantSessionConfig: ActionConfig = {
     via: { type: 'string', required: false }
   },
   authRules: [{ type: 'jwt' }],
-  updateStrategy: { type: 'none' }
+  updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (_p, _r, ctx) =>
+      scopeList([scope('user', ctx.userId)]),
+    audience: 'self',
+  },
 };
 
 // ── claimAssistantSession ───────────────────────────────────────────────────
@@ -843,7 +891,13 @@ export const claimAssistantSessionConfig: ActionConfig = {
   paramSchema: {},
   access: ['user'],
   authRules: [{ type: 'jwt' }],
-  updateStrategy: { type: 'none' }
+  updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (_p, _r, ctx) =>
+      scopeList([scope('user', ctx.userId)]),
+    audience: 'self',
+  },
 };
 
 // ── importPlanBoardRows ─────────────────────────────────────────────────────
@@ -912,7 +966,13 @@ export const importPlanBoardRowsConfig: ActionConfig = {
       errorMessage: 'You must be a member of this project to create from its planning boards'
     }
   ],
-  updateStrategy: { type: 'none' }
+  updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (_p, _r, ctx) =>
+      scopeList([scope('user', ctx.userId)]),
+    audience: 'self',
+  },
 };
 
 export const assistantActions: ActionConfig[] = [

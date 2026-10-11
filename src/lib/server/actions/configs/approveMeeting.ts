@@ -1,5 +1,6 @@
 
 import type { ActionConfig } from '../types.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 export const approveMeetingConfig: ActionConfig = {
     key: 'approveMeeting',
@@ -75,7 +76,8 @@ export const approveMeetingConfig: ActionConfig = {
                                     en: `Another participant approved the meeting: ${pgisha.name}`
                                 }
                             },
-                            channels: ['socket', 'push'],
+                            // Something happened in a meeting they are part of.
+                            intent: 'outcome',
                             metadata: {
                                 url: '/meeting/' + pgishaId,
                                 type: 'meetingUpdate',
@@ -143,5 +145,10 @@ export const approveMeetingConfig: ActionConfig = {
     updateStrategy: {
         type: 'partialUpdate',
         config: {}
-    }
+    },
+
+    realtime: {
+        scopes: (p) =>
+            scopeList([scope('meeting', p.pgishaId)]),
+    },
 };

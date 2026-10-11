@@ -141,6 +141,7 @@
           actionKey: 'sendMeetingMessage',
           params: {
             forumId: data.meeting?.forumId,
+            meetingId: data.meeting?.id,
             content: content
           }
         })

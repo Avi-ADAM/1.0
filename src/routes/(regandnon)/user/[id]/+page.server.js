@@ -1,5 +1,6 @@
 import { sendToSer } from '$lib/send/sendToSer.js';
 import { langAdjast } from '$lib/func/langAdjast.svelte';
+import { rtKey } from '$lib/realtime/scopes.js';
 
 
 async function awaitapi(userId, lang, tok, fetch) {
@@ -42,7 +43,8 @@ async function fetchStorefront(userId, tok, fetch) {
   }
 }
 
-export const load = async ({ locals, params, fetch }) => {
+export const load = async ({ locals, params, fetch, depends }) => {
+  depends(rtKey(`user:${params.id}`));
   const userId = params.id;
   const lang = locals.lang;
   const tok = locals.tok;

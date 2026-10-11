@@ -6,6 +6,8 @@
   import { sendToSer } from '$lib/send/sendToSer.js';
   import { onMount } from 'svelte';
   import Spinner from '$lib/celim/Spinner.svelte';
+  import { useRealtime } from '$lib/realtime/bus.svelte';
+  import { batchTouchesRikma } from '$lib/realtime/routing';
 
   let projectId = $derived(page.params.projectId);
   let splitId = $derived(page.params.splitId);
@@ -13,7 +15,7 @@
   let split = $state(null);
   let loading = $state(true);
 
-  onMount(async () => {
+  async function reload() {
     try {
       const res = await sendToSer({ id: splitId }, 'getProjectFinancials', null, null, false, fetch);
       split = res?.data?.project?.data?.attributes?.tosplits?.data?.find(s => s.id === splitId);
@@ -23,6 +25,13 @@
     } finally {
       loading = false;
     }
+  }
+
+  onMount(reload);
+
+  // Another member changed something this tab shows (docs/inprogress/PLAN_REALTIME_MIGRATION.md, R5).
+  useRealtime(['split:*', 'decision:tosplit:*'], (b) => {
+    if (batchTouchesRikma(b, projectId)) reload();
   });
 
   let jsonLd = $derived(split ? {

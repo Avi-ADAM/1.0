@@ -1,6 +1,6 @@
 # תכנית — מיגרציית Real-Time: כל שינוי מגיע לכל מסך שמציג אותו
 
-> **מצב:** בביצוע — R0, R1, R2 ו-N0–N1 בנויים (2026-10-08); R3 (דפי גל 1) מחובר ונבדק בהזרקה ל-bus (2026-10-10); R4 vote + archive (34 actions) בנוי ונבדק בשני דפדפנים (2026-10-11); הבא: wish + deal. קובץ המעקב: [`REALTIME_TRACKING.md`](./REALTIME_TRACKING.md).
+> **מצב:** בביצוע — R0, R1, R2 ו-N0–N1 בנויים (2026-10-08); R3 (דפי גל 1) מחובר ונבדק בהזרקה ל-bus (2026-10-10); R4 הושלם (2026-10-11) — כל ה-actions הכותבים מצהירים `realtime` ו-`LEGACY_NO_REALTIME` הוסר; נבדקו חי vote/archive, wish ו-createTask/updateTask; R5 בנוי (2026-10-11) — דפי גל 2 מחוברים, timegrama מפרסם הבשלות, `fullRefresh` לא משודר ו-`invalidate(() => true)` הוסר מהסוקט; נשארו `moach/[pid]/edit`, `negotiation/[id]` ו-`/api/send` (B9) ו-N5. הבא: R6 (ניקוי המאזינים הישנים). קובץ המעקב: [`REALTIME_TRACKING.md`](./REALTIME_TRACKING.md).
 > **קשור:** [`SPEC_SOCKET_REALTIME.md`](../tbd/SPEC_SOCKET_REALTIME.md) (presence / typing / עריכה
 > במקביל — **מחוץ** לתכנית הזאת, ראו R6), [`../inprogress/MIGRATION_TRACKING.md`](../inprogress/MIGRATION_TRACKING.md)
 > (כתיבות שעדיין עוקפות את ה-Action System — הן בלתי נראות לסוקט בכלל),
@@ -242,7 +242,7 @@ realtime?: {
 | **R1** | חוזה: `scopes.ts`, `ActionConfig.realtime`, `realtimeBroadcaster`, `x-client-id`, `event` ב-`/broadcast` (socket-server), ה-ratchet test. אף action עוד לא מצהיר — הכול ב-allowlist. | פריסת socket-server |
 | **R2** | לקוח: `bus.svelte.ts`, שלושת המתאמים, `useRealtime`, resync. בדיקות יחידה עם socket מדומה. | R1 |
 | **R3** | דפים, גל 1 — שיתופיים ושימושיים: `/lev`, `/hub`, `moach/[pid]/{main,kanban,gantt,acts,progress,sales,split,open,votes}`, `deals/[id]`, `wish/[id]`, `concierge/[id]`, `negotiation/[id]`, `project/[id]`. | R2 |
-| **R4** | actions לפי תחום — ובכל קובץ שנפתח גם ההתראות לבני אדם (§6.4), לפי סדר ההשפעה על משתמשים: **vote + archive** (זרימות הסכמה — "שתיקה היא הסכמה" דורשת שכולם יראו את הגרסה העומדת) → **wish + deal** (פינג-פונג מו"מ, QA C-9) → **mission / act / timer** → **money** → **stipend / shift** → **resource / product** → **process / maagad / user**. | R1 (וכדאי R3 לתחום) |
+| **R4** | actions לפי תחום — ובכל קובץ שנפתח גם ההתראות לבני אדם (§6.4), לפי סדר ההשפעה על משתמשים: **vote + archive** (זרימות הסכמה — "שתיקה היא הסכמה" דורשת שכולם יראו את הגרסה העומדת) → **wish + deal** (פינג-פונג מו"מ, QA C-9) → **mission / act / timer** → **money** → **stipend / shift** → **resource / product** → **process / maagad / user** → meeting / chat → planning / assistant / library. ✓ 2026-10-11 | R1 (וכדאי R3 לתחום) |
 | **R5** | דפים, גל 2 (השאר) + timegrama: maturation בשתיקה מפרסם scopes (B9). ואז **הסרת `invalidate(() => true)`** (B2) ו-`fullRefresh` המשודר. | כל דפי ה-⚪ מכוסים |
 | **R6** | ניקוי: ה-patchers של `partialUpdate` ב-`levSocketHandler`, `updateStrategies.ts`, רשימות `VOTE_TYPES` המקומיות, המאזין של `moach/+layout`. `metadata.type` נשאר רק ל-toast ולפגישה. | R5 |
 | *(נפרד)* | presence / typing / editing-lock / project rooms — `SPEC_SOCKET_REALTIME.md`. | R6 |

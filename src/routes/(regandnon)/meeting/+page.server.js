@@ -1,8 +1,11 @@
 
 import { sendToSer } from '$lib/send/sendToSer.js';
 import { redirect } from '@sveltejs/kit';
+import { rtKey } from '$lib/realtime/scopes.js';
 
-export async function load({ locals, fetch }) {
+export async function load({ locals, fetch, depends }) {
+  depends(rtKey('meeting:*'));
+  depends(rtKey('user:*'));
     if (!locals.uid) {
         // Since the user said "phase 2 we allow unregistered", 
         // for now we might want to just return empty or redirect. 

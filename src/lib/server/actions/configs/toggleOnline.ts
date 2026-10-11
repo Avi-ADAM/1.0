@@ -1,5 +1,6 @@
 
 import type { ActionConfig } from '../types.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 /**
  * Toggle user online availability status.
@@ -123,7 +124,7 @@ export const toggleOnlineConfig: ActionConfig = {
                                         : `${myName} is no longer available for: ${mName}`
                                 }
                             },
-                            channels: status ? ['socket', 'push'] : ['socket'],
+                            intent: status ? 'outcome' : 'ambient',
                             metadata: {
                                 url: '/meeting',
                                 type: 'userAvailability',
@@ -166,7 +167,7 @@ export const toggleOnlineConfig: ActionConfig = {
                                         en: `Everyone in "${mName}" is now available. Let's meet!`
                                     }
                                 },
-                                channels: ['socket', 'push'],
+                                intent: 'outcome',
                                 metadata: {
                                     url: '/meeting',
                                     type: 'meetingReady',
@@ -190,6 +191,10 @@ export const toggleOnlineConfig: ActionConfig = {
             success: true,
             status: status,
             meetingId: meetingId || 'global',
+            meetingIds: targets
+                .map((pu: any) => pu.attributes.pgishas?.data?.[0]?.id)
+                .filter((id: unknown) => id != null)
+                .map(String),
             updatedCount: targets.length,
             toast: status && notificationsSent.length > 0 ? {
                 type: 'success',
@@ -206,5 +211,10 @@ export const toggleOnlineConfig: ActionConfig = {
         meetingId: { type: 'string', required: false }
     },
     authRules: [{ type: 'jwt' }],
-    updateStrategy: { type: 'partialUpdate', config: {} }
+    updateStrategy: { type: 'partialUpdate', config: {} },
+
+    realtime: {
+        scopes: (_p, r, ctx) =>
+            scopeList([scope('user', ctx.userId), ...(r?.meetingIds ?? []).map((id: string) => scope('meeting', id))]),
+    },
 };

@@ -1,7 +1,9 @@
 import { sendToSer } from '$lib/send/sendToSer.js';
 import type { PageServerLoad } from './$types';
+import { rtKey } from '$lib/realtime/scopes.js';
 
-export const load: PageServerLoad = async ({ locals, fetch }) => {
+export const load: PageServerLoad = async ({ locals, fetch, depends }) => {
+  depends(rtKey('project:*'));
   const uid = locals.uid;
 
   let projects: { id: string; projectName: string; profilePic: string | null }[] = [];

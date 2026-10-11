@@ -19,6 +19,7 @@
  */
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 type PlanOrigin = 'quickScan' | 'freeText' | 'manual' | 'agent';
 type PlanBoardStatus = 'suggested' | 'active' | 'expanded' | 'archived';
@@ -128,7 +129,12 @@ export const createPlanBoardAction: ActionConfig = {
       config: { projectIdParam: 'projectId' },
       errorMessage: 'You must be a member of this project to create a planning board'
     }
-  ]
+  ],
+
+  realtime: {
+    scopes: (p, r) =>
+      scopeList([scope('project', p.projectId), scope('plan', r?.id)]),
+  },
 };
 
 // ── updatePlanBoard ────────────────────────────────────────────────────────
@@ -188,7 +194,12 @@ export const updatePlanBoardAction: ActionConfig = {
       config: { projectIdParam: 'projectId' },
       errorMessage: 'You must be a member of this project to change its planning boards'
     }
-  ]
+  ],
+
+  realtime: {
+    scopes: (p) =>
+      scopeList([scope('project', p.projectId), scope('plan', p.boardId)]),
+  },
 };
 
 // ── createPlanItem ─────────────────────────────────────────────────────────
@@ -258,7 +269,12 @@ export const createPlanItemAction: ActionConfig = {
       config: { projectIdParam: 'projectId' },
       errorMessage: 'You must be a member of this project to change its planning boards'
     }
-  ]
+  ],
+
+  realtime: {
+    scopes: (p) =>
+      scopeList([scope('project', p.projectId), scope('plan', p.boardId)]),
+  },
 };
 
 // ── updatePlanItem ─────────────────────────────────────────────────────────
@@ -334,7 +350,12 @@ export const updatePlanItemAction: ActionConfig = {
       config: { projectIdParam: 'projectId' },
       errorMessage: 'You must be a member of this project to change its planning boards'
     }
-  ]
+  ],
+
+  realtime: {
+    scopes: (p) =>
+      scopeList([scope('project', p.projectId), scope('plan', p.boardId)]),
+  },
 };
 
 // ── markPlanItemCreated ────────────────────────────────────────────────────
@@ -394,5 +415,10 @@ export const markPlanItemCreatedAction: ActionConfig = {
       config: { projectIdParam: 'projectId' },
       errorMessage: 'You must be a member of this project to change its planning boards'
     }
-  ]
+  ],
+
+  realtime: {
+    scopes: (p) =>
+      scopeList([scope('project', p.projectId), scope('plan', p.boardId)]),
+  },
 };

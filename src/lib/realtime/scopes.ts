@@ -29,7 +29,10 @@ export const SCOPE_ENTITIES = [
   'shift',
   'process',
   'maagad',
-  'user'
+  'user',
+  // A rikma's planning board (PlanBoards) and an entry in its shared library (/docs).
+  'plan',
+  'doc'
 ] as const;
 
 export type ScopeEntity = (typeof SCOPE_ENTITIES)[number];

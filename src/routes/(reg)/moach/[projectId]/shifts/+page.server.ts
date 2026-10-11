@@ -13,6 +13,7 @@ import {
 } from '$lib/server/shifts/store.js';
 import { planIsActive, type CommitmentView, type PeriodView, type ShiftPlanView } from '$lib/server/shifts/read.js';
 import { cycleContaining, cyclesBetween, resolveSettings, type CycleWindow, type ShiftSettings } from '$lib/shifts/settings.js';
+import { rtKey } from '$lib/realtime/scopes.js';
 
 /**
  * The rikma's shifts tab (docs/inprogress/PLAN_SHIFTS.md §9.3).
@@ -35,7 +36,8 @@ export interface PlanBlock {
   onMission: boolean;
 }
 
-export const load: PageServerLoad = async ({ params, locals, fetch }) => {
+export const load: PageServerLoad = async ({ params, locals, fetch, depends }) => {
+  depends(rtKey('shift:*'));
   const mode = shiftsMode();
   const now = new Date();
   const empty = { mode, now: now.toISOString(), plans: [] as PlanBlock[], window: { shifts: [], declarations: [], assignments: [] } as WindowData, swaps: [] as SwapView[], loadError: null as string | null };

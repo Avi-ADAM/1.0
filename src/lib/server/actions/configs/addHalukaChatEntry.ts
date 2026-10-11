@@ -12,6 +12,7 @@
  */
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 const addHalukaChatEntryHandler: ActionExecutionHandler = async (params, context, { strapi }) => {
   const { halukaId, projectId, text } = params;
@@ -96,9 +97,14 @@ export const addHalukaChatEntryConfig: ActionConfig = {
       title: { he: 'הודעה חדשה', en: 'New message' },
       body: { he: 'נשלחה הודעה בנוגע להעברת כסף', en: 'A message was sent about a money transfer' },
     },
-    channels: ['socket'],
+    intent: 'ambient',
     metadata: { type: 'halukaChatEntry', url: 'lev' },
   },
 
   updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (p) =>
+      scopeList([scope('project', p.projectId), scope('split', p.halukaId)]),
+  },
 };

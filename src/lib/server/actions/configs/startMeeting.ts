@@ -1,5 +1,6 @@
 
 import type { ActionConfig } from '../types.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 /**
  * Request to start a meeting - initiates the "ready check" phase
@@ -129,7 +130,8 @@ export const startMeetingConfig: ActionConfig = {
                             en: `${starterName} wants to start the meeting "${meetingName}". Click to join!`
                         }
                     },
-                    channels: ['socket', 'push'],
+                    // Someone wants to start now; the others confirm they are ready.
+                    intent: 'outcome',
                     metadata: {
                         url: '/meeting/' + meetingId,
                         type: 'meetingJoinRequest',
@@ -183,7 +185,12 @@ export const startMeetingConfig: ActionConfig = {
     updateStrategy: {
         type: 'partialUpdate',
         config: {}
-    }
+    },
+
+    realtime: {
+        scopes: (p) =>
+            scopeList([scope('meeting', p.meetingId)]),
+    },
 };
 
 // Helper function to check if all participants are ready

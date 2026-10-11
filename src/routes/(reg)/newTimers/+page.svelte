@@ -4,6 +4,7 @@
     import { fetchTimers , timers} from '$lib/stores/timers'
     import Timer from '$lib/components/timers/timer.svelte'
     import { lang } from '$lib/stores/lang.js'
+    import { useRealtime } from '$lib/realtime/bus.svelte';
 	let hoverText = '0';
 	let tx = $state(200);
 	$effect(() => {
@@ -47,6 +48,9 @@
             });
         });
 	});
+
+	// A timer of mine started, stopped or was saved on another device.
+	useRealtime(['timer:*'], () => fetchTimers(page.data.uid, fetch));
 
 	function project() {}
 	function linke() {}

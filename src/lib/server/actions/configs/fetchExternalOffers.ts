@@ -39,6 +39,7 @@ import { geminiGroundingProvider } from '../../concierge/searchProviders/gemini.
 import { externalConfig } from '../../concierge/externalConfig.js';
 import { RateLimiter } from '../../translation/rateLimit.js';
 import { wishPlaceOf } from './refreshWishMatches.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 const HOUR = 3_600_000;
 const DAY = 24 * HOUR;
@@ -218,7 +219,13 @@ export const dismissExternalOfferConfig: ActionConfig = {
     offerId: { type: 'string', required: true }
   },
   authRules: [{ type: 'jwt', errorMessage: 'Must be logged in' }],
-  updateStrategy: { type: 'none' }
+  updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (p) =>
+      scopeList([scope('wish', p.ratsonId)]),
+    audience: 'self',
+  },
 };
 
 /** Test seam: the limiters are process-wide. */

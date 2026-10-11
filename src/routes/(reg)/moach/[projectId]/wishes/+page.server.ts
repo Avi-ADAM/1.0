@@ -1,6 +1,7 @@
 import { sendToSer } from '$lib/send/sendToSer.js';
 import { stripHtml } from '$lib/utils/stripHtml';
 import type { PageServerLoad } from './$types';
+import { rtKey } from '$lib/realtime/scopes.js';
 
 function nameOf(user: any): string {
   if (!user) return 'משתמש/ת';
@@ -36,7 +37,8 @@ export type IncomingWishProposal = {
   categories: string[];
 };
 
-export const load: PageServerLoad = async ({ params, fetch }) => {
+export const load: PageServerLoad = async ({ params, fetch, depends }) => {
+  depends(rtKey('wish:*'));
   const projectId = params.projectId;
   let proposals: IncomingWishProposal[] = [];
   let loadOk = false;

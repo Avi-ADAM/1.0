@@ -6,6 +6,7 @@
 
 import { sendViaProxy } from '$lib/server/sendViaProxy.js';
 import type { PageServerLoad } from './$types';
+import { rtKey } from '$lib/realtime/scopes.js';
 
 export type OfferListItem = {
   id: string;
@@ -18,7 +19,8 @@ export type OfferListItem = {
   linkIssued: boolean;
 };
 
-export const load: PageServerLoad = async ({ locals, fetch }) => {
+export const load: PageServerLoad = async ({ locals, fetch, depends }) => {
+  depends(rtKey('deal:*'));
   const uid = String(locals.uid);
   let offers: OfferListItem[] = [];
   let loadOk = true;

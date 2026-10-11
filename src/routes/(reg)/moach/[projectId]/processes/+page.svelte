@@ -14,6 +14,8 @@
   import { onMount } from 'svelte';
   import Spinner from '$lib/celim/Spinner.svelte';
   import { goto } from '$app/navigation';
+  import { useRealtime } from '$lib/realtime/bus.svelte';
+  import { batchTouchesRikma } from '$lib/realtime/routing';
 
   const moachStore = getMoachStore();
   let projectId = $derived(page.params.projectId);
@@ -21,7 +23,7 @@
   let processes = $state([]);
   let loading = $state(true);
 
-  onMount(async () => {
+  async function reload() {
     try {
       processes = await loadProjectProcesses(projectId, fetch);
     } catch (e) {
@@ -29,6 +31,13 @@
     } finally {
       loading = false;
     }
+  }
+
+  onMount(reload);
+
+  // Another member changed something this tab shows (docs/inprogress/PLAN_REALTIME_MIGRATION.md, R5).
+  useRealtime(['process:*', 'mission:*', 'resource:*'], (b) => {
+    if (batchTouchesRikma(b, projectId)) reload();
   });
 
   // Quick access to the per-type object indexes (object/[type]) — every

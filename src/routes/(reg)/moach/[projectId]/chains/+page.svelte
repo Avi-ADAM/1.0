@@ -18,8 +18,9 @@
 
   let { data } = $props();
 
+  // Every run of the load replaces it — it re-runs when a resource or mission of this rikma changes.
   $effect(() => {
-    if (data.chainsServerData && !projectData?.chainsExtra) {
+    if (data.chainsServerData) {
       moachStore.updateProjectData(projectId, 'chainsExtra', data.chainsServerData);
     }
   });

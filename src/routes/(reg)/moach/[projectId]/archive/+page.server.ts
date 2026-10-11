@@ -1,5 +1,6 @@
 import { sendToSer } from '$lib/send/sendToSer.js';
 import type { PageServerLoad } from './$types';
+import { rtKey } from '$lib/realtime/scopes.js';
 
 /**
  * The rikma's archive (PLAN_OBJECT_ARCHIVAL — phase 3).
@@ -9,7 +10,10 @@ import type { PageServerLoad } from './$types';
  * one query in the codebase that asks *for* `lifecycle: archived` instead of
  * filtering it out.
  */
-export const load: PageServerLoad = async ({ params, fetch }) => {
+export const load: PageServerLoad = async ({ params, fetch, depends }) => {
+  depends(rtKey('mission:*'));
+  depends(rtKey('resource:*'));
+  depends(rtKey('product:*'));
   const { projectId } = params;
 
   const res = (await sendToSer(

@@ -1,7 +1,10 @@
 import { loadDiscoveryMapData } from '$lib/server/map/loadMapData.js';
 import type { PageServerLoad } from './$types';
+import { rtKey } from '$lib/realtime/scopes.js';
 
-export const load: PageServerLoad = async ({ locals, fetch }) => {
+export const load: PageServerLoad = async ({ locals, fetch, depends }) => {
+  depends(rtKey('mission:*'));
+  depends(rtKey('resource:*'));
   // Public page: anonymous visitors have no JWT cookie, so — like the other
   // (regandnon) pages (e.g. availableMission) — anonymous reads go through the
   // service token (isSer = !isReg). This uses the internal-secret-authenticated

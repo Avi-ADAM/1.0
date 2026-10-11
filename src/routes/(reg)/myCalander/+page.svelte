@@ -4,6 +4,7 @@
     import TimersCalendar from '$lib/components/timers/TimersCalendar.svelte';
     import {onMount} from 'svelte'
     import { lang } from '$lib/stores/lang.js';
+    import { useRealtime } from '$lib/realtime/bus.svelte';
   let { data } = $props();
     // קריאה לשרת לקבלת הנתונים
     let timersData = $state(null);
@@ -11,14 +12,17 @@
     let isLoading = $state(true);
 
     // טען את הנתונים מהשרת
-    async function loadTimers() {
-      isLoading = true;
+    async function loadTimers(silent = false) {
+      if (!silent) isLoading = true;
       // הקריאה שלך ל-GraphQL
       timersData = await sendToSer( { id: userId },'37getUserTimers',userId,null,false,fetch);
       isLoading = false;
     }
 
-    onMount(loadTimers);
+    onMount(() => loadTimers());
+
+    // A timer of mine changed on another device.
+    useRealtime(['timer:*'], () => loadTimers(true));
   </script>
 
 <svelte:head>

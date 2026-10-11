@@ -3,8 +3,10 @@ import type { PageServerLoad } from './$types';
 import { sendViaProxy } from '$lib/server/sendViaProxy.js';
 import { actionViaProxy } from '$lib/server/actionViaProxy.js';
 import { readDealStages } from '$lib/server/deal/dealChain';
+import { rtKey } from '$lib/realtime/scopes.js';
 
-export const load: PageServerLoad = async ({ locals, params, fetch }) => {
+export const load: PageServerLoad = async ({ locals, params, fetch, depends }) => {
+  depends(rtKey(`deal:${params.id}`));
   const tok = (locals as any).tok as string | undefined;
   const uid = (locals as any).uid as string | undefined;
 

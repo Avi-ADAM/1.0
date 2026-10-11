@@ -1,6 +1,7 @@
 import { sendToSer } from '$lib/send/sendToSer.js';
 import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
+import { rtKey } from '$lib/realtime/scopes.js';
 
 /**
  * Public maagad (demand pool) page — PLAN_DISCOVERY_MAP M2,
@@ -11,7 +12,8 @@ import type { PageServerLoad } from './$types';
  * `first_name` / `full` visibility. The caller's own membership is returned
  * so the UI can render join/leave/sign states.
  */
-export const load: PageServerLoad = async ({ params, locals, fetch }) => {
+export const load: PageServerLoad = async ({ params, locals, fetch, depends }) => {
+  depends(rtKey(`maagad:${params.id}`));
   const uid = (locals as any)?.uid ?? null;
 
   // Public page: anonymous visitors read via the service token (no Strapi

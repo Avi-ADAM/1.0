@@ -4,17 +4,15 @@
   import { fetchMyActs } from '$lib/utils/levGraphQLQueries';
   import MyActs from '$lib/components/prPr/tasks/Myacts.svelte';
   import { lang } from '$lib/stores/lang.js';
+  import { useRealtime } from '$lib/realtime/bus.svelte';
 
   let { data } = $props();
-  onMount(async () => {
-    // 1. Check if we already have data in either store
-    if ($mtahaStore.length > 0 || $myActsStore.length > 0) {
-      return;
-    }
+  /** True once this page read the acts itself — then they are fresher than the heart page's copy. */
+  let refetched = $state(false);
 
-    // 2. Fetch data if empty
+  async function loadMyActs() {
     const userId = data.uid || $userStore?.id;
-    if (!userId) return;
+    if (!userId) return false;
 
     try {
       const res = await fetchMyActs(userId);
@@ -23,15 +21,32 @@
           ?.data;
       if (fetchedMesimot) {
         myActsStore.set(fetchedMesimot);
+        return true;
       }
     } catch (err) {
       console.error('Failed to fetch my acts:', err);
     }
+    return false;
+  }
+
+  onMount(async () => {
+    // 1. Check if we already have data in either store
+    if ($mtahaStore.length > 0 || $myActsStore.length > 0) {
+      return;
+    }
+
+    // 2. Fetch data if empty
+    await loadMyActs();
   });
 
-  // Priority: mtahaStore (processed) > myActsStore (raw)
+  // An act or a mission of mine changed — by another member, or on another device.
+  useRealtime(['act:*', 'mission:*'], async () => {
+    if (await loadMyActs()) refetched = true;
+  });
+
+  // Priority: mtahaStore (processed) > myActsStore (raw) — until this page re-read them.
   const mesimotToDisplay = $derived(
-    $mtahaStore.length > 0 ? $mtahaStore : $myActsStore
+    !refetched && $mtahaStore.length > 0 ? $mtahaStore : $myActsStore
   );
 </script>
 

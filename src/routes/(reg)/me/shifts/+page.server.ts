@@ -2,6 +2,7 @@ import type { PageServerLoad } from './$types';
 import { asUser } from '$lib/server/shifts/exec.js';
 import { shiftsMode } from '$lib/server/shifts/mode.js';
 import { loadMyAssignments, loadPlanLabels } from '$lib/server/shifts/store.js';
+import { rtKey } from '$lib/realtime/scopes.js';
 
 /**
  * /me/shifts — "my coming shifts", across every rikma (docs/inprogress/PLAN_SHIFTS.md §9.3).
@@ -25,7 +26,9 @@ export interface MyShiftRow {
   timeZone: string;
 }
 
-export const load: PageServerLoad = async ({ locals, fetch }) => {
+export const load: PageServerLoad = async ({ locals, fetch, depends }) => {
+  depends(rtKey('user:*'));
+  depends(rtKey('shift:*'));
   const mode = shiftsMode();
   const now = new Date().toISOString();
   const empty = { mode, now, rows: [] as MyShiftRow[], loadError: null as string | null };

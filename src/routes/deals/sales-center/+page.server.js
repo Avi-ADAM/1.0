@@ -1,6 +1,9 @@
 import { sendViaProxy } from '$lib/server/sendViaProxy.js';
+import { rtKey } from '$lib/realtime/scopes.js';
 
-export async function load({ locals, fetch }) {
+export async function load({ locals, fetch, depends }) {
+  depends(rtKey('sale:*'));
+  depends(rtKey('deal:*'));
   const uid = locals.uid;
   const lang = locals.lang;
 

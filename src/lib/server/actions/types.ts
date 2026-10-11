@@ -286,7 +286,10 @@ export interface RecipientRuleConfig {
   /** Parameter name containing array of user IDs */
   userIdsParam?: string;
 
-  /** Parameter name containing forum ID (for meeting participants) */
+  /** Parameter name containing the meeting (pgisha) ID (for meeting participants) */
+  meetingIdParam?: string;
+
+  /** Parameter name containing forum ID */
   forumIdParam?: string;
 
   /** Parameter name containing ask ID (for ask participants) */

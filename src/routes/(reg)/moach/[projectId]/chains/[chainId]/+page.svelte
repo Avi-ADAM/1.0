@@ -9,6 +9,8 @@
   import ResourceChainRow from '$lib/components/process/chain/ResourceChainRow.svelte';
   import { toast } from 'svelte-sonner';
   import { sendToSer } from '$lib/send/sendToSer.js';
+  import { useRealtime } from '$lib/realtime/bus.svelte';
+  import { batchTouchesRikma } from '$lib/realtime/routing';
 
   // ---------------------------------------------------------------------------
   // Route param
@@ -93,8 +95,13 @@
     loadProjectData(projectId);
   });
 
-  async function loadProjectData(projectId) {
-    loading   = true;
+  // Another member changed something this tab shows (docs/inprogress/PLAN_REALTIME_MIGRATION.md, R5).
+  useRealtime(['mission:*', 'resource:*', 'act:*'], (b) => {
+    if (batchTouchesRikma(b, projectId)) loadProjectData(projectId, true);
+  });
+
+  async function loadProjectData(projectId, silent = false) {
+    if (!silent) loading = true;
     loadError = null;
 
     try {

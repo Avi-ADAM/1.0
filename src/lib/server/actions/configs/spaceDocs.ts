@@ -37,6 +37,7 @@ import { enumField, fields, numField, run, strField, gqlStr } from '$lib/server/
 import { confirmStored, isProjectKey, storageKind } from '$lib/server/storage/index.js';
 import { ALLOWED_MIME } from '$lib/uploads/policy.js';
 import { isSha256Hex } from '$lib/p2p/hash.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 const KINDS = ['file', 'image', 'link'] as const;
 type DocKind = (typeof KINDS)[number];
@@ -210,7 +211,12 @@ export const createSpaceDocConfig: ActionConfig = {
   ],
 
   access: ['user', 'serviceAdmin'],
-  updateStrategy: { type: 'fullRefresh' }
+  updateStrategy: { type: 'fullRefresh' },
+
+  realtime: {
+    scopes: (p, r) =>
+      scopeList([scope('project', p.projectId), scope('doc', r?.data?.spaceDocId)]),
+  },
 };
 
 // ─── update ────────────────────────────────────────────────────────────────
@@ -274,7 +280,12 @@ export const updateSpaceDocConfig: ActionConfig = {
   ],
 
   access: ['user', 'serviceAdmin'],
-  updateStrategy: { type: 'fullRefresh' }
+  updateStrategy: { type: 'fullRefresh' },
+
+  realtime: {
+    scopes: (p) =>
+      scopeList([scope('project', p.projectId), scope('doc', p.docId)]),
+  },
 };
 
 // ─── archive ───────────────────────────────────────────────────────────────
@@ -322,5 +333,10 @@ export const archiveSpaceDocConfig: ActionConfig = {
   ],
 
   access: ['user', 'serviceAdmin'],
-  updateStrategy: { type: 'fullRefresh' }
+  updateStrategy: { type: 'fullRefresh' },
+
+  realtime: {
+    scopes: (p) =>
+      scopeList([scope('project', p.projectId), scope('doc', p.docId)]),
+  },
 };

@@ -1,5 +1,6 @@
 import { sendToSer } from '$lib/send/sendToSer.js';
 import { sendViaProxy } from '$lib/server/sendViaProxy.js';
+import { rtKey } from '$lib/realtime/scopes.js';
 
 async function fetchPendingForMatanot(fetchFn, uid, matId) {
   try {
@@ -10,7 +11,8 @@ async function fetchPendingForMatanot(fetchFn, uid, matId) {
   }
 }
 
-export async function load({ locals, params, fetch }) {
+export async function load({ locals, params, fetch, depends }) {
+  depends(rtKey(`product:${params.id}`));
   const mId = params.id;
   const lang = locals.lang;
   const tok = locals.tok;

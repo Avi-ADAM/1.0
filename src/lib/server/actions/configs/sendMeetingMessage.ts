@@ -1,5 +1,6 @@
 
 import type { ActionConfig } from '../types.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 export const sendMeetingMessageConfig: ActionConfig = {
     key: 'sendMeetingMessage',
@@ -47,6 +48,8 @@ export const sendMeetingMessageConfig: ActionConfig = {
     },
     paramSchema: {
         forumId: { type: 'string', required: true },
+        // The meeting whose chat this is. The forum id alone cannot name its participants.
+        meetingId: { type: 'string', required: false },
         content: { type: 'string', required: true }
     },
     authRules: [
@@ -56,7 +59,7 @@ export const sendMeetingMessageConfig: ActionConfig = {
         recipients: {
             type: 'meetingParticipants',
             config: {
-                forumIdParam: 'forumId',
+                meetingIdParam: 'meetingId',
                 excludeSender: true
             }
         },
@@ -72,7 +75,7 @@ export const sendMeetingMessageConfig: ActionConfig = {
                 ar: '{{senderName}} أرسل رسالة: {{content}}'
             }
         },
-        channels: ['socket'],
+        intent: 'ambient',
         metadata: {
             priority: 'normal',
             type: 'meetingMessage',
@@ -83,5 +86,10 @@ export const sendMeetingMessageConfig: ActionConfig = {
     updateStrategy: {
         type: 'partialUpdate',
         config: {}
-    }
+    },
+
+    realtime: {
+        scopes: (p) =>
+            scopeList([scope('meeting', p.meetingId), scope('forum', p.forumId)]),
+    },
 };

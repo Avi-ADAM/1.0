@@ -1,4 +1,5 @@
 import type { ActionConfig } from '../types.js';
+import { scope, decisionScope, scopeList } from '$lib/realtime/scopes.js';
 
 export const sendAskMessageConfig: ActionConfig = {
     key: 'sendAskMessage',
@@ -122,5 +123,11 @@ export const sendAskMessageConfig: ActionConfig = {
     updateStrategy: {
         type: 'partialUpdate',
         config: {}
-    }
+    },
+
+    realtime: {
+        scopes: (p, r) =>
+            scopeList([scope('project', r?.projectId), decisionScope('ask', p.askId), scope('forum', r?.forumId)]),
+        partiesFrom: (_p, r) => [r?.askerId],
+    },
 };

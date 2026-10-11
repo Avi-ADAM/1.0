@@ -2,6 +2,7 @@ import { matbeaCode, rikmaCurrency } from '$lib/money/resolve.js';
 import { redirect } from '@sveltejs/kit';
 import { sendViaProxy } from '$lib/server/sendViaProxy.js';
 import { buildIncomeSeries } from '$lib/income/buildIncomeSeries.js';
+import { rtKey } from '$lib/realtime/scopes.js';
 
 /**
  * /me/income — "how much have I actually earned here".
@@ -53,6 +54,9 @@ function toWorkLog(node) {
 }
 
 export async function load({ locals, fetch, depends }) {
+  depends(rtKey('user:*'));
+  depends(rtKey('split:*'));
+  depends(rtKey('sale:*'));
   // A confirmed haluka or a new split changes this page, and both already
   // invalidate the profile key from the socket layer.
   depends('app:meProfile');

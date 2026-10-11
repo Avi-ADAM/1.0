@@ -6,6 +6,7 @@ import {
 } from '$lib/server/map/normalizeMapItems.js';
 import type { MapItem } from '$lib/map/discoveryTypes';
 import type { PageServerLoad } from './$types';
+import { rtKey } from '$lib/realtime/scopes.js';
 
 /**
  * Supplier-facing demand discovery for one project — PLAN_DISCOVERY_MAP M3,
@@ -23,7 +24,9 @@ function nodesOf(result: PromiseSettledResult<any>, key: string): any[] {
   return result.value?.data?.[key]?.data ?? [];
 }
 
-export const load: PageServerLoad = async ({ params, fetch }) => {
+export const load: PageServerLoad = async ({ params, fetch, depends }) => {
+  depends(rtKey('mission:*'));
+  depends(rtKey('resource:*'));
   const projectId = params.projectId;
 
   const [projRes, wishesRes, maagadimRes] = await Promise.allSettled([

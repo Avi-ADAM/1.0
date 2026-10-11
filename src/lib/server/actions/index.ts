@@ -95,6 +95,8 @@ export const authorizer = new AuthorizationEngine(strapiClient);
 const notifier = new NotificationOrchestrator(strapiClient);
 // Screens, not people (docs/inprogress/PLAN_REALTIME_MIGRATION.md §3.3).
 const realtime = realtimeFor(notifier, strapiClient);
+/** The same broadcaster, for server code that writes outside an action (timegrama, B9). */
+export const realtimeBroadcaster = realtime;
 
 export const actionService = new ActionService(
   validator,

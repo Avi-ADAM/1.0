@@ -3,11 +3,20 @@
   import { getMoachStore } from '$lib/stores/moachStore.svelte.js';
   import { page } from '$app/state';
   import { lang } from '$lib/stores/lang.js';
+  import { useRealtime } from '$lib/realtime/bus.svelte';
+  import { batchTouchesRikma } from '$lib/realtime/routing';
+  import { invalidate } from '$app/navigation';
+  import { moachBaseKey } from '$lib/stores/moachRealtime.js';
 
   const moachStore = getMoachStore();
 
   let projectId = $derived(page.params.projectId);
   let projectBase = $derived(moachStore.state.projects[projectId]?.base);
+
+  // Another member changed something this tab shows (docs/inprogress/PLAN_REALTIME_MIGRATION.md, R5).
+  useRealtime(['deal:*'], (b) => {
+    if (batchTouchesRikma(b, projectId)) invalidate(moachBaseKey(projectId));
+  });
 
   // Note: Tab 6 was commented out in the monolith, but structure is here for restoration.
 </script>

@@ -7,6 +7,7 @@ import { sendToSer } from '$lib/send/sendToSer.js';
 import { langAdjast } from '$lib/func/langAdjast.svelte';
 import { isAuthFailure } from '$lib/server/session.js';
 import { translateSurface, missionDetailGroups } from '$lib/server/translation/surfaces.js';
+import { rtKey } from '$lib/realtime/scopes.js';
 
 /**
  * One read of the mission, either as the visitor (JWT) or as the service.
@@ -135,6 +136,7 @@ async function awaitapi(mId, lang, tok, fetch) {
  * @param {string} params.params.id - Mission ID from URL
  * @param {typeof globalThis.fetch} params.fetch - SvelteKit fetch function
  * @param {import('@sveltejs/kit').Cookies} params.cookies - carries the reader's `autoTranslate` preference
+ * @param {(...deps: `${string}:${string}`[]) => void} params.depends - re-run when the mission changes
  *
  * @returns {Promise<{
  *   uid: string,
@@ -156,7 +158,8 @@ async function awaitapi(mId, lang, tok, fetch) {
  * // data.alld contains the mission information
  * // data.uid contains the user ID
  */
-export async function load({ locals, params, fetch, cookies }) {
+export async function load({ locals, params, fetch, cookies, depends }) {
+  depends(rtKey(`mission:${params.id}`));
   /** @type {string} */
   const mId = params.id;
 

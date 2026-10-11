@@ -129,15 +129,23 @@ export class NotificationOrchestrator {
         });
       }
 
+      // A broadcast `fullRefresh` re-ran every load of whatever page each recipient
+      // had open (B2). Screens now follow the action's `rt:changed` scopes, so it is
+      // not forwarded — the actor's own tab still applies it from its own result.
+      const forwarded =
+        actionResult?.updateStrategy?.type === 'fullRefresh'
+          ? { ...actionResult, updateStrategy: undefined }
+          : actionResult;
+
       const notificationData: any = {
         title,
         body,
         metadata,
         actionParams,
-        actionResult,
+        actionResult: forwarded,
         initiatorId: context.userId,
         // Flatten for client-side handlers that expect these at top level
-        updateStrategy: actionResult?.updateStrategy,
+        updateStrategy: forwarded?.updateStrategy,
         data: actionResult?.data
       };
 
@@ -313,9 +321,9 @@ export class NotificationOrchestrator {
         return [];
 
       case 'meetingParticipants':
-        const forumIdParam = rule.config?.forumIdParam || 'forumId';
-        const forumId = this.getNestedValue(params, forumIdParam);
-        return await this.getMeetingParticipants(forumId, context);
+        const meetingIdParam = rule.config?.meetingIdParam || 'meetingId';
+        const meetingId = this.getNestedValue(params, meetingIdParam);
+        return await this.getMeetingParticipants(meetingId, context);
 
       case 'askParticipants':
         const askIdParam = rule.config?.askIdParam || 'askId';
@@ -455,11 +463,11 @@ export class NotificationOrchestrator {
    * Get meeting participants from forum ID
    */
   private async getMeetingParticipants(
-    forumId: string,
+    meetingId: string,
     context: ActionContext
   ): Promise<UserProfile[]> {
-    if (!forumId) {
-      console.warn('No forumId provided for getMeetingParticipants');
+    if (!meetingId) {
+      console.warn('No meetingId provided for getMeetingParticipants');
       return [];
     }
 
@@ -467,13 +475,13 @@ export class NotificationOrchestrator {
       // Get meeting details to find participants
       const result = await this.strapiClient.execute(
         '59GetMeetingDetails',
-        { id: forumId }, // This might need adjustment based on the actual query structure
+        { id: meetingId },
         context.jwt
       );
 
       const meeting = result?.data?.pgisha?.data;
       if (!meeting) {
-        console.warn(`Meeting with forum ${forumId} not found`);
+        console.warn(`Meeting ${meetingId} not found`);
         return [];
       }
 
@@ -486,7 +494,7 @@ export class NotificationOrchestrator {
 
       return profiles.filter((p): p is UserProfile => p !== null);
     } catch (error) {
-      console.error(`Error fetching meeting participants for forum ${forumId}:`, error);
+      console.error(`Error fetching participants of meeting ${meetingId}:`, error);
       return [];
     }
   }

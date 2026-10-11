@@ -1,8 +1,10 @@
 import { redirect } from '@sveltejs/kit';
 import { actionViaProxy } from '$lib/server/actionViaProxy.js';
 import type { PageServerLoad } from './$types';
+import { rtKey } from '$lib/realtime/scopes.js';
 
 export const load: PageServerLoad = async ({ params, locals, fetch, depends }) => {
+  depends(rtKey(`forum:${params.forumId}`));
   depends(`app:forum:${params.forumId}`);
 
   if (!locals.uid || !locals.tok) {

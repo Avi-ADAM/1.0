@@ -7,6 +7,7 @@ import {
 } from '$lib/concierge/summary.js';
 import { loadWishNotices } from '$lib/server/concierge/notices';
 import type { PageServerLoad } from './$types';
+import { rtKey } from '$lib/realtime/scopes.js';
 
 type RatsonCard = {
   id: string;
@@ -104,7 +105,8 @@ function mapPublicCard(node: any): PublicRatsonCard {
   };
 }
 
-export const load: PageServerLoad = async ({ locals, fetch }) => {
+export const load: PageServerLoad = async ({ locals, fetch, depends }) => {
+  depends(rtKey('wish:*'));
   const uid = (locals as any)?.uid;
   // Started first, awaited last — beside the two reads below.
   const noticesPending = loadWishNotices(uid, fetch);

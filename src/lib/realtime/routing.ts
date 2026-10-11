@@ -81,7 +81,10 @@ const MOACH_BY_ENTITY: Record<string, MoachSection[]> = {
   split: ['financials'],
   deal: ['financials'],
   product: ['financials'],
-  stipend: ['financials']
+  stipend: ['financials'],
+  // Their screens listen for themselves; no cached moach section shows them.
+  plan: [],
+  doc: []
 };
 
 const MOACH_BY_DECISION_KIND: Record<string, MoachSection[]> = {
@@ -106,15 +109,30 @@ export function moachSectionsForChange(change: Pick<RealtimeChange, 'scopes'>, p
   const scopes = change.scopes ?? [];
   if (!projectIdsOf(scopes).includes(String(pid))) return [];
   const out = new Set<MoachSection>();
+  let placed = false;
   for (const s of scopes) {
     const [entity, a] = s.split(':');
     if (entity === 'project') continue;
     const sections = entity === 'decision' ? MOACH_BY_DECISION_KIND[a] : MOACH_BY_ENTITY[entity];
+    if (sections) placed = true;
     for (const sec of sections ?? []) out.add(sec);
   }
-  // The rikma itself changed and nothing more specific was said.
-  if (out.size === 0) out.add('base');
+  // The rikma itself changed and nothing more specific was said. (A scope placed
+  // deliberately nowhere — a plan, a doc — said something: refresh nothing.)
+  if (out.size === 0 && !placed) out.add('base');
   return [...out];
+}
+
+/**
+ * Should a screen of rikma `pid` re-read? — a change in this batch was about that
+ * rikma, or the socket came back after a gap. Patterns like `sale:*` match every
+ * rikma the member belongs to; this keeps a tab to its own.
+ */
+export function batchTouchesRikma(
+  batch: { resync: boolean; changes: Pick<RealtimeChange, 'scopes'>[] },
+  pid: string | number
+): boolean {
+  return batch.resync || batch.changes.some((c) => projectIdsOf(c.scopes ?? []).includes(String(pid)));
 }
 
 /** Did this change open, move or close a vote of rikma `pid`? (the votes badge) */

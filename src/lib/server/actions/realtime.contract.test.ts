@@ -3,11 +3,11 @@
  * docs/inprogress/PLAN_REALTIME_MIGRATION.md §3.5), so every screen that shows it can
  * follow without a reload.
  *
- * LEGACY_NO_REALTIME is every writing action that does not yet. It only
- * shrinks: a new action without `realtime` fails, and a listed action that
- * declares it fails too — take it off the list in the same change (and mark it
- * in docs/inprogress/REALTIME_TRACKING.md). READ_ONLY actions change nothing anyone
- * else sees; adding one there is a claim, so keep it honest.
+ * Every writing action declares it. The legacy allowlist emptied with R4
+ * (2026-10-11) and is gone, so a new action without `realtime` fails. READ_ONLY
+ * actions change nothing anyone else sees; adding one there is a claim, so keep
+ * it honest. An action that writes but leaves nothing for an open screen to
+ * follow says so: `realtime: { scopes: () => [] }` and a comment why.
  */
 
 import { describe, it, expect } from 'vitest';
@@ -51,59 +51,14 @@ const READ_ONLY = new Set([
   'previewArchiveMembership',
 ]);
 
-const LEGACY_NO_REALTIME = new Set([
-  'addAskChatEntry',
-  'addAskmChatEntry',
-  'addDiunEntry',
-  'addHalukaChatEntry',
-  'applyAssistantSession',
-  'approveMeeting',
-  'archiveSpaceDoc',
-  'cacheTranslations',
-  'claimAssistantSession',
-  'createChatMessage',
-  'createNewMeeting',
-  'createPlanBoard',
-  'createPlanBoardFromItems',
-  'createPlanBoardFromText',
-  'createPlanItem',
-  'createSpaceDoc',
-  'dismissExternalOffer',
-  'expandPlanBoard',
-  'importPlanBoardRows',
-  'joinMeeting',
-  'markPlanItemCreated',
-  'materializeRikmaBlueprint',
-  'proposeRikmaBlueprint',
-  'reviseAssistantSession',
-  'scanProjectDirections',
-  'seedPlanBoards',
-  'sendAskMessage',
-  'sendMeetingMessage',
-  'setAssistantItems',
-  'shareRikmaPreview',
-  'startAssistantSession',
-  'startMeeting',
-  'toggleOnline',
-  'undoAssistantRevision',
-  'updatePlanBoard',
-  'updatePlanItem',
-  'updateSpaceDoc',
-]);
-
 const all = [...actionRegistry.values()];
 
 describe('every writing action publishes what it changed', () => {
   it('no new writing action without realtime', () => {
     const fresh = all
-      .filter((c) => !c.realtime && !READ_ONLY.has(c.key) && !LEGACY_NO_REALTIME.has(c.key))
+      .filter((c) => !c.realtime && !READ_ONLY.has(c.key))
       .map((c) => c.key);
     expect(fresh, 'declare realtime.scopes (or, if it changes nothing shared, add it to READ_ONLY)').toEqual([]);
-  });
-
-  it('an action that declares realtime is off the legacy list', () => {
-    const done = all.filter((c) => c.realtime && LEGACY_NO_REALTIME.has(c.key)).map((c) => c.key);
-    expect(done, 'remove these from LEGACY_NO_REALTIME').toEqual([]);
   });
 
   it('a read-only action declares nothing', () => {
@@ -111,9 +66,9 @@ describe('every writing action publishes what it changed', () => {
     expect(odd, 'an action that publishes changes is not read-only').toEqual([]);
   });
 
-  it('both lists name only registered actions', () => {
+  it('READ_ONLY names only registered actions', () => {
     const keys = new Set(all.map((c) => c.key));
-    const stale = [...READ_ONLY, ...LEGACY_NO_REALTIME].filter((k) => !keys.has(k));
+    const stale = [...READ_ONLY].filter((k) => !keys.has(k));
     expect(stale, 'remove actions that no longer exist').toEqual([]);
   });
 });

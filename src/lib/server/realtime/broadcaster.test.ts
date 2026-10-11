@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { createRealtimeBroadcaster, wishPartiesOf } from './broadcaster';
+import { createRealtimeBroadcaster, meetingPartiesOf, partiesOfScope, wishPartiesOf } from './broadcaster';
 import type { ActionContext, RealtimeConfig } from '../actions/types';
 
 const ctx = (over: Partial<ActionContext> = {}): ActionContext => ({
@@ -110,5 +110,31 @@ describe('realtime broadcaster', () => {
     const { rt, send } = setup();
     await rt.publish('x', { scopes: () => ['user:1'] }, {}, {}, ctx());
     expect((send.mock.calls[0] as any[])[1]).not.toHaveProperty('originClientId');
+  });
+
+  it('meetingPartiesOf reads every participant of the meeting', async () => {
+    const execute = async (qid: string) =>
+      qid === '63CheckMeetingReadyStatus'
+        ? {
+            data: {
+              pgisha: {
+                data: {
+                  attributes: {
+                    pgishausers: {
+                      data: [
+                        { attributes: { users_permissions_user: { data: { id: 4 } } } },
+                        { attributes: { users_permissions_user: { data: { id: 7 } } } },
+                        { attributes: { users_permissions_user: { data: null } } }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        : null;
+    expect((await meetingPartiesOf({ execute }, 'meeting:2', ctx())).sort()).toEqual(['4', '7']);
+    expect((await partiesOfScope({ execute }, 'meeting:2', ctx())).sort()).toEqual(['4', '7']);
+    expect(await meetingPartiesOf({ execute }, 'wish:2', ctx())).toEqual([]);
   });
 });

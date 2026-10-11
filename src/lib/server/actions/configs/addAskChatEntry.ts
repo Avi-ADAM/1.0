@@ -1,5 +1,6 @@
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { STRAPI_URL } from '$lib/server/strapiUrl.js';
+import { scope, decisionScope, scopeList } from '$lib/realtime/scopes.js';
 
 /**
  * Append a chat entry to an Ask record (PUT /api/asks/:id).
@@ -9,7 +10,7 @@ import { STRAPI_URL } from '$lib/server/strapiUrl.js';
  * new entry with the authenticated user, and saves back — so the JWT never
  * touches the client.
  */
-const addAskChatEntryHandler: ActionExecutionHandler = async (params, context) => {
+const addAskChatEntryHandler: ActionExecutionHandler = async (params, context, { strapi }) => {
   const { askId, why, what } = params;
   const strapiUrl = STRAPI_URL;
 
@@ -65,8 +66,15 @@ const addAskChatEntryHandler: ActionExecutionHandler = async (params, context) =
   const result = await putRes.json();
   const savedChat: any[] = result?.data?.attributes?.chat ?? [];
 
+  // Who else sees this chat: the rikma and the candidate. Best-effort — the
+  // entry is saved either way.
+  const who = await strapi.execute('65GetAskById', { id: String(askId) }, context.jwt, context.fetch).catch(() => null);
+  const askAttrs = who?.data?.ask?.data?.attributes;
+
   return {
     data: {
+      projectId: askAttrs?.project?.data?.id ?? null,
+      askerId: askAttrs?.users_permissions_user?.data?.id ?? null,
       chat: savedChat,
       lastId: savedChat.length > 0 ? savedChat[savedChat.length - 1].id : null,
     },
@@ -89,4 +97,10 @@ export const addAskChatEntryConfig: ActionConfig = {
   authRules: [{ type: 'jwt' }],
 
   updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (p, r) =>
+      scopeList([scope('project', r?.data?.projectId), decisionScope('ask', p.askId)]),
+    partiesFrom: (_p, r) => [r?.data?.askerId],
+  },
 };

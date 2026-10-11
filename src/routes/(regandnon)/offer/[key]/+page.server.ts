@@ -17,6 +17,7 @@ import { actionViaProxy } from '$lib/server/actionViaProxy.js';
 import { offerView } from '$lib/offer/directOffer';
 import { checkOfferKey, offerKeyId } from '$lib/server/offer/offerKey';
 import type { Actions, PageServerLoad } from './$types';
+import { rtKey } from '$lib/realtime/scopes.js';
 
 type Shown = {
   name: string;
@@ -31,7 +32,8 @@ type Shown = {
   total: number;
 };
 
-export const load: PageServerLoad = async ({ params, locals, fetch }) => {
+export const load: PageServerLoad = async ({ params, locals, fetch, depends }) => {
+  depends(rtKey('deal:*'));
   const uid = locals.uid ? String(locals.uid) : null;
   const key = String(params.key ?? '');
   const id = offerKeyId(key);

@@ -1,5 +1,6 @@
 import { sendToSer } from '$lib/send/sendToSer.js';
 import { bookingsFromLegacy, resourcesFromSps } from '$lib/resources/bookingsFromLegacy.js';
+import { rtKey } from '$lib/realtime/scopes.js';
 
 /**
  * /me/resources — the holder's resource calendar
@@ -13,7 +14,9 @@ import { bookingsFromLegacy, resourcesFromSps } from '$lib/resources/bookingsFro
  * Both loads are non-fatal: an empty calendar is a worse page, not a broken
  * one, and the profile it is reached from must not 500 because one query did.
  */
-export const load = async ({ locals, fetch, url }) => {
+export const load = async ({ locals, fetch, url, depends }) => {
+  depends(rtKey('user:*'));
+  depends(rtKey('resource:*'));
   const uid = locals.uid;
 
   let bookings = [];

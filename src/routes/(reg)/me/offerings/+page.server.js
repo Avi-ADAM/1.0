@@ -1,11 +1,14 @@
 import { sendToSer } from '$lib/send/sendToSer.js';
+import { rtKey } from '$lib/realtime/scopes.js';
 
 /**
  * /me/offerings — the expanded missions view behind the compact profile badge
  * (profile feedback 2026-07-13): priced offers (loaded client-side by the
  * editor) + missions in progress + completed missions with a rising ✓ count.
  */
-export const load = async ({ locals, fetch }) => {
+export const load = async ({ locals, fetch, depends }) => {
+  depends(rtKey('user:*'));
+  depends(rtKey('product:*'));
   const uid = locals.uid;
 
   let doing = [];

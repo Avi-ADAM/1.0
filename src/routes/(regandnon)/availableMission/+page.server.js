@@ -3,12 +3,14 @@ import { normalizeMissionCard } from '$lib/server/discovery/normalizeCards.js';
 import { normalizeOpenMission } from '$lib/server/map/normalizeMapItems.js';
 import { isHiddenProject } from '$lib/server/discovery/hiddenProjects.js';
 import { translateSurface, missionCardGroups } from '$lib/server/translation/surfaces.js';
+import { rtKey } from '$lib/realtime/scopes.js';
 
 // Public open-missions directory — same anonymous/service-token split as the
 // other (regandnon) discovery pages (see the note in demand/+page.server.ts).
 // QID 283 is a field superset of the map qid, so one query feeds both the
 // cards and the embedded-map items.
-export const load = async ({ locals, fetch, cookies }) => {
+export const load = async ({ locals, fetch, cookies, depends }) => {
+  depends(rtKey('mission:*'));
   const isReg = !!/** @type {any} */ (locals)?.uid;
 
   let missions = [];

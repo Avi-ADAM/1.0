@@ -33,6 +33,8 @@ import { shiftsEnabled, shiftsMode } from '$lib/server/shifts/mode.js';
 //ask need to creater 0on first vote or on request if the requester is project member4
 //מעביר ראשון ראשון ברסק , אם מישהו ביקש מחכים למענה בעניינו ורק לאחר שיש כן 1 לפחות או לא 1 לפחות  ניתן לקבלו או לא 1 לפחות וניתן להציע לאנשים נוספים, בקשה של הקודם כאשר יש לא נשארת אך ניתן להוסיף עוד סקשות
 import { SendToAdmin } from '$lib/server/sendToAdmin.js';
+import { realtimeBroadcaster } from '$lib/server/actions/index.js';
+import { maturedScopes, relationSelection } from '$lib/server/realtime/timegramaScopes';
 // Server-only secret — never exposed to the client bundle (no VITE_ prefix).
 import { env } from '$env/dynamic/private';
 
@@ -141,10 +143,31 @@ async function markDone(taid, why) {
  */
 const claimed = new Set();
 
+/**
+ * Tell the screens of the clock's rikma (or wish) that it ran (B9). The handlers
+ * write outside the Action System, so without this a silence maturation reached
+ * nobody until their next reload. Fire-and-forget, like every realtime publish.
+ */
+async function publishMatured(kind, scopes, fetch) {
+  if (!scopes?.length) return;
+  try {
+    await realtimeBroadcaster.publish(
+      `timegrama:${kind}`,
+      { scopes: () => scopes },
+      {},
+      null,
+      { jwt: '', fetch, userId: '', lang: 'he' }
+    );
+  } catch (e) {
+    console.warn(`[timegrama] realtime publish for ${kind} failed:`, e);
+  }
+}
+
 /** Run a clock's finalizer unless this process is already holding it. */
-async function runClaimed(id, kind, taid, fetch) {
+async function runClaimed(id, kind, taid, fetch, scopes = []) {
   try {
     await x(id, kind, taid, fetch);
+    await publishMatured(kind, scopes, fetch);
   } finally {
     // Released either way: a finalizer that left the clock open (a failed
     // write it wants retried) must be picked up again by a later run.
@@ -221,14 +244,15 @@ export async function GET({ fetch }) {
   // Explicit pagination and sort: without them Strapi returns one default-sized
   // page of an unbounded, unordered set, so once the backlog outgrows that page
   // the newest clocks simply stop being seen. Oldest first, so the queue drains.
-  const qu = `{
+  /** `select` maps a relation field to its GraphQL selection. */
+  const queryWith = (select) => `{
   timegramas (
     filters: { done: { ne: true }, date: { lte: "${oneHourFromNow.toISOString()}" } }
     sort: "date:asc"
     pagination: { limit: 500 }
   ) {data{ id attributes{
     whatami date
-    ${relationFields().map((f) => `${f}{data{id}}`).join('\n    ')}
+    ${relationFields().map(select).join('\n    ')}
 }}}
  }
     `;
@@ -236,7 +260,14 @@ export async function GET({ fetch }) {
   const stats = { seen: 0, ran: 0, scheduled: 0, held: 0, closed: 0, waiting: 0 };
 
   try {
-    const res = await SendToAdmin(qu, env.ADMINMONTHER);
+    // The rikma of each target rides along so a maturation can be published (B9).
+    // That richer read must never cost the clock itself: if it is refused, read the
+    // queue the old way and mature without publishing.
+    let res = await SendToAdmin(queryWith(relationSelection), env.ADMINMONTHER);
+    if (res?.errors?.length || !res?.data?.timegramas) {
+      console.warn('[timegrama] queue read with rikmas refused — falling back:', res?.errors?.[0]?.message);
+      res = await SendToAdmin(queryWith((f) => `${f}{data{id}}`), env.ADMINMONTHER);
+    }
     const all = res?.data?.timegramas?.data ?? [];
     stats.seen = all.length;
 
@@ -285,6 +316,7 @@ export async function GET({ fetch }) {
       }
 
       const myid = relation.data.id;
+      const scopes = maturedScopes(kind, relation.data);
 
       // Already waiting on a timer from an earlier run, or running right now.
       if (claimed.has(String(tgid))) {
@@ -297,13 +329,13 @@ export async function GET({ fetch }) {
         // Awaited: the response used to return before the handlers had run, so
         // a restart could cut one off between its first mutation and markDone.
         stats.ran++;
-        await runClaimed(myid, kind, tgid, fetch);
+        await runClaimed(myid, kind, tgid, fetch, scopes);
       } else {
         // Still in the future. Held in process memory for now — this goes away
         // with the move to our own timer (PLAN_TIMEGRAMA §4.6).
         stats.scheduled++;
         setTimeout(function () {
-          runClaimed(myid, kind, tgid, fetch).catch((e) =>
+          runClaimed(myid, kind, tgid, fetch, scopes).catch((e) =>
             console.error(`[timegrama] #${tgid} (${kind}) failed:`, e)
           );
         }, dateof.getTime() - d.getTime());

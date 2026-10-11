@@ -44,6 +44,8 @@
     BTN_PRIMARY,
     BTN_GHOST
   } from '$lib/components/stipend/ui.js';
+  import { useRealtime } from '$lib/realtime/bus.svelte';
+  import { batchTouchesRikma } from '$lib/realtime/routing';
 
   const BTN_SMALL = `${BTN_GHOST} px-3 py-1.5 text-xs font-bold flex items-center gap-1`;
 
@@ -70,6 +72,11 @@
   }
 
   onMount(load);
+
+  // Another member changed something this tab shows (docs/inprogress/PLAN_REALTIME_MIGRATION.md, R5).
+  useRealtime(['stipend:*'], (b) => {
+    if (batchTouchesRikma(b, projectId)) load();
+  });
 
   const members = $derived(overview?.members ?? []);
   const totals = $derived(overview?.totals ?? null);

@@ -22,6 +22,8 @@
   import TimersPanel from '$lib/components/process/lifecycle/TimersPanel.svelte';
   import Spinner from '$lib/celim/Spinner.svelte';
   import RichText from '$lib/celim/ui/richText.svelte';
+  import { useRealtime } from '$lib/realtime/bus.svelte';
+  import { batchTouchesRikma } from '$lib/realtime/routing';
 
   let projectId = $derived(page.params.projectId);
   let type = $derived(page.params.type);
@@ -32,7 +34,7 @@
   let loadError = $state(null);
   let attrsRoot = $state(null);
 
-  onMount(async () => {
+  async function reload() {
     try {
       const json = await sendToSer({ pid: projectId }, 'processLifecycleData', null, null, false, fetch);
       attrsRoot = json?.data?.project?.data?.attributes ?? null;
@@ -42,6 +44,13 @@
     } finally {
       loading = false;
     }
+  }
+
+  onMount(reload);
+
+  // Another member changed something this tab shows (docs/inprogress/PLAN_REALTIME_MIGRATION.md, R5).
+  useRealtime(['process:*', 'mission:*', 'resource:*', 'act:*', 'product:*', 'sale:*'], (b) => {
+    if (batchTouchesRikma(b, projectId)) reload();
   });
 
   let missionChains = $derived(

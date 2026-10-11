@@ -1,6 +1,7 @@
 import { sendToSer } from '$lib/send/sendToSer.js';
 import { computeCoverage } from '$lib/revenue/computeCoverage';
 import { readRikmaIdentity } from '$lib/server/rikmaPublic/loadRikmaPage.js';
+import { rtKey } from '$lib/realtime/scopes.js';
 
 /**
  * Public support / home page (PLAN_VOLUNTEER_RIKMA §3).
@@ -34,6 +35,7 @@ async function fetchSupportData(projectId, tok, fetch) {
 }
 
 export const load = async ({ locals, params, fetch, depends }) => {
+  depends(rtKey(`project:${params.id}`));
   const projectId = params.id;
   const tok = locals.tok;
   const uid = locals.uid ? String(locals.uid) : null;

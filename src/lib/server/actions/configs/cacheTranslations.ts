@@ -249,5 +249,8 @@ export const cacheTranslationsConfig: ActionConfig = {
     // file header. `authRules` is empty because there is no *entity* to own:
     // the cache belongs to the platform, not to a member.
     access: ['serviceAdmin'],
-    authRules: []
+    authRules: [],
+    // Publishes nothing, deliberately: the cache is content-addressed and read only
+    // when a page loads, so no open screen shows a row it did not have before.
+    realtime: { scopes: () => [] }
 };

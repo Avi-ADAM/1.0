@@ -1,8 +1,11 @@
 import { error } from '@sveltejs/kit';
 import { sendViaProxy } from '$lib/server/sendViaProxy.js';
+import { rtKey } from '$lib/realtime/scopes.js';
 
-export async function load({ params, cookies, fetch }) {
+export async function load({ params, cookies, fetch, depends }) {
   const projectId = params.projectId;
+  depends(rtKey('resource:*'));
+  depends(rtKey('mission:*'));
 
   // The proxy authenticates from the cookie itself; this only decides whether
   // there is any point in making the call.

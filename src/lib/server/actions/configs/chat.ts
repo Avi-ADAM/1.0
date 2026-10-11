@@ -3,6 +3,7 @@ import type { ActionConfig } from '../types.js';
 import { env } from '$env/dynamic/private';
 import { getForumEntity, normalizeForum, participantIdsForForum } from '../forumAccess.js';
 import { createChatMessageConsentSpec } from '$lib/consent/specs/s2b';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 export const chatActions: ActionConfig[] = [
     {
@@ -134,6 +135,13 @@ export const chatActions: ActionConfig[] = [
                 // This will be used by the frontend to know what to refresh
                 forumId: '{{forumId}}'
             }
+        },
+        // The forum's own participants — the same people the notice goes to. Never the
+        // whole rikma: a sale-claim or wish-offer thread is bilateral.
+        realtime: {
+            scopes: (p) => scopeList([scope('forum', p.forumId)]),
+            audience: 'parties',
+            partiesFrom: (_p, r) => r?.recipients ?? []
         }
     }
 ];

@@ -11,6 +11,7 @@
  */
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import { scope, decisionScope, scopeList } from '$lib/realtime/scopes.js';
 
 const addDiunEntryHandler: ActionExecutionHandler = async (params, context, { strapi }) => {
   const { entityType, entityId, projectId, what, why } = params;
@@ -125,9 +126,14 @@ export const addDiunEntryConfig: ActionConfig = {
       title: { he: 'תגובה חדשה בדיון', en: 'New discussion reply' },
       body: { he: 'חבר הוסיף תגובה לדיון', en: 'A team member replied in the discussion' },
     },
-    channels: ['socket'],
+    intent: 'ambient',
     metadata: { type: 'diunEntry', url: 'lev' },
   },
 
   updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (p) =>
+      scopeList([scope('project', p.projectId), decisionScope(p.entityType === 'pmash' ? 'pmash' : 'pendm', p.entityId)]),
+  },
 };

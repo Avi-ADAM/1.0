@@ -7,6 +7,8 @@
   import { sendToSer } from '$lib/send/sendToSer.js';
   import { onMount } from 'svelte';
   import Spinner from '$lib/celim/Spinner.svelte';
+  import { useRealtime } from '$lib/realtime/bus.svelte';
+  import { batchTouchesRikma } from '$lib/realtime/routing';
 
   let projectId = $derived(page.params.projectId);
   let saleId = $derived(page.params.saleId);
@@ -14,13 +16,20 @@
   let sale = $state(null);
   let loading = $state(true);
 
-  onMount(async () => {
+  async function reload() {
     try {
       const res = await sendToSer({ pid: projectId }, 'getProjectFinancials', null, null, false, fetch);
       sale = res?.data?.project?.data?.attributes?.sales?.data?.find(s => s.id === saleId);
     } finally {
       loading = false;
     }
+  }
+
+  onMount(reload);
+
+  // Another member changed something this tab shows (docs/inprogress/PLAN_REALTIME_MIGRATION.md, R5).
+  useRealtime(['sale:*'], (b) => {
+    if (batchTouchesRikma(b, projectId)) reload();
   });
 
   // Holder-consent status chip (PLAN_sale_holder_consent). null = legacy sale

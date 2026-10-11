@@ -1,7 +1,8 @@
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { STRAPI_URL } from '$lib/server/strapiUrl.js';
+import { scope, decisionScope, scopeList } from '$lib/realtime/scopes.js';
 
-const addAskmChatEntryHandler: ActionExecutionHandler = async (params, context) => {
+const addAskmChatEntryHandler: ActionExecutionHandler = async (params, context, { strapi }) => {
   const { askId, why } = params;
   const strapiUrl = STRAPI_URL;
 
@@ -57,8 +58,15 @@ const addAskmChatEntryHandler: ActionExecutionHandler = async (params, context) 
   const result = await putRes.json();
   const savedChat: any[] = result?.data?.attributes?.chat ?? [];
 
+  // Who else sees this chat: the rikma and the candidate. Best-effort — the
+  // entry is saved either way.
+  const who = await strapi.execute('getAskmForFinalize', { id: String(askId) }, context.jwt, context.fetch).catch(() => null);
+  const askmAttrs = who?.data?.askm?.data?.attributes;
+
   return {
     data: {
+      projectId: askmAttrs?.project?.data?.id ?? null,
+      askerId: askmAttrs?.users_permissions_user?.data?.id ?? null,
       chat: savedChat,
       lastId: savedChat.length > 0 ? savedChat[savedChat.length - 1].id : null,
     },
@@ -80,4 +88,10 @@ export const addAskmChatEntryConfig: ActionConfig = {
   authRules: [{ type: 'jwt' }],
 
   updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (p, r) =>
+      scopeList([scope('project', r?.data?.projectId), decisionScope('askm', p.askId)]),
+    partiesFrom: (_p, r) => [r?.data?.askerId],
+  },
 };

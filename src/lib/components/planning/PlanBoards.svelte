@@ -21,6 +21,8 @@
   import { executeAction } from '$lib/client/actionClient';
   import Button from '$lib/celim/ui/button.svelte';
   import PlanBoard from './PlanBoard.svelte';
+  import { useRealtime } from '$lib/realtime/bus.svelte';
+  import { batchTouchesRikma } from '$lib/realtime/routing';
 
   /**
    * @typedef {Object} Props
@@ -96,6 +98,11 @@
   }
 
   onMount(reload);
+
+  // Another member (or this member on another device) changed a board of this rikma.
+  useRealtime(['plan:*'], (batch) => {
+    if (batchTouchesRikma(batch, projectId)) reload();
+  });
 
   async function runScan() {
     if (scanning) return;

@@ -4,6 +4,7 @@ import { ssrApiBase } from '$lib/server/ssrApiBase.js';
 import { sendToSer } from '$lib/send/sendToSer.js';
 import { summarizeRatsonNodes, withNoticeUpdates } from '$lib/concierge/summary.js';
 import { loadWishNotices } from '$lib/server/concierge/notices';
+import { rtKey } from '$lib/realtime/scopes.js';
 
 const DEFAULT_PIC =
   'https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png';
@@ -39,6 +40,7 @@ function buildPics(profilePic) {
 }
 
 export async function load({ locals, fetch, depends }) {
+  depends(rtKey('user:*'));
   // Lets socket notifications / actions refresh just this page via
   // invalidate('app:meProfile') instead of a full reload.
   depends('app:meProfile');

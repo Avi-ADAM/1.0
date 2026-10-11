@@ -1,6 +1,7 @@
 import { sendToSer } from '$lib/send/sendToSer.js';
 import { isAuthFailure } from '$lib/server/session.js';
 import { translateSurface, resourceDetailGroups } from '$lib/server/translation/surfaces.js';
+import { rtKey } from '$lib/realtime/scopes.js';
 
 // The page resolves these with $t — the server has no per-request locale of
 // its own to render them in.
@@ -77,7 +78,8 @@ async function awaitapi(mId, lang, tok, fetch) {
   }
 }
 
-export async function load({ locals, params, fetch, cookies }) {
+export async function load({ locals, params, fetch, cookies, depends }) {
+  depends(rtKey(`resource:${params.id}`));
   const mId = params.id;
   const lang = locals.lang;
   const tok = locals.tok;

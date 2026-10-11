@@ -4,6 +4,7 @@ import { normalizeSpaceDocs } from '$lib/spaceDocs/spaceDocs.js';
 import { maxUploadBytes, storageKind } from '$lib/server/storage/index.js';
 import { PROXY_MAX_BYTES } from '$lib/uploads/policy.js';
 import { env } from '$env/dynamic/private';
+import { rtKey } from '$lib/realtime/scopes.js';
 import type { PageServerLoad } from './$types';
 
 /**
@@ -22,8 +23,11 @@ import type { PageServerLoad } from './$types';
  * The existing `Project.drivelink` rides along (§5): it is the rikma's Drive
  * link today, and the links list is exactly where a member looks for it.
  */
-export const load: PageServerLoad = async ({ params, fetch }) => {
+export const load: PageServerLoad = async ({ params, fetch, depends }) => {
   const { projectId } = params;
+  // A member added, edited or removed an entry (any rikma of theirs — a doc change
+  // reaches only members, and re-reading one shelf is cheap).
+  depends(rtKey('doc:*'));
 
   // Stage 3 — the E2E vault (§3.2). Off until the product decision (stage 3
   // step 4); a browser can still opt in with localStorage VAULT_ENABLED=1.

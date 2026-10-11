@@ -3,11 +3,13 @@ import { normalizeResourceCard } from '$lib/server/discovery/normalizeCards.js';
 import { normalizeOpenMashaabim } from '$lib/server/map/normalizeMapItems.js';
 import { isHiddenProject } from '$lib/server/discovery/hiddenProjects.js';
 import { translateSurface, resourceCardGroups } from '$lib/server/translation/surfaces.js';
+import { rtKey } from '$lib/realtime/scopes.js';
 
 // Public requested-resources directory — same anonymous/service-token split as
 // the other (regandnon) discovery pages (see demand/+page.server.ts). QID 284
 // is a field superset of the map qid, so one query feeds cards + map items.
-export const load = async ({ locals, fetch, cookies }) => {
+export const load = async ({ locals, fetch, cookies, depends }) => {
+  depends(rtKey('resource:*'));
   const isReg = !!/** @type {any} */ (locals)?.uid;
 
   let resources = [];

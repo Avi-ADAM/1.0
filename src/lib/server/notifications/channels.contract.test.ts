@@ -20,18 +20,13 @@ const SKIP = /\.test\.|\/examples\/|^src\/lib\/server\/notifications\//;
 const LITERAL = /\bchannels\s*:\s*(\[|[^,\n]*\?\s*\[)/;
 
 const LEGACY_CHANNEL_LISTS = new Set([
-  'src/lib/server/actions/configs/addDiunEntry.ts',
-  'src/lib/server/actions/configs/addHalukaChatEntry.ts',
   'src/lib/server/actions/configs/approveHaluka.ts',
   'src/lib/server/actions/configs/approveMeeting.ts',
   'src/lib/server/actions/configs/archiveUserResource.ts',
   'src/lib/server/actions/configs/chat.ts',
-  'src/lib/server/actions/configs/createNewMeeting.ts',
   'src/lib/server/actions/configs/example.ts',
   'src/lib/server/actions/configs/joinMeeting.ts',
-  'src/lib/server/actions/configs/sendMeetingMessage.ts',
   'src/lib/server/actions/configs/startMeeting.ts',
-  'src/lib/server/actions/configs/toggleOnline.ts',
   'src/lib/server/actions/configs/updateTask.ts',
   'src/routes/api/guest/message/+server.js',
 ]);

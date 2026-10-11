@@ -15,14 +15,15 @@ export interface RealtimeDeps {
   send: (userIds: string[], change: RealtimeChange, context: ActionContext) => Promise<unknown>;
   /**
    * The people a scope belongs to when no rikma holds it — a wish: its wishers and
-   * the providers who proposed on it. Asked only for PARTY_ENTITIES.
+   * the providers who proposed on it; a meeting: its participants. Asked only for
+   * PARTY_ENTITIES.
    */
   partiesOf?: (scope: string, context: ActionContext) => Promise<string[]>;
   warn?: (message: string) => void;
 }
 
 /** Entities whose screens belong to people outside any rikma; `partiesOf` resolves them. */
-export const PARTY_ENTITIES: ReadonlySet<string> = new Set(['wish']);
+export const PARTY_ENTITIES: ReadonlySet<string> = new Set(['wish', 'meeting']);
 const isPartyScope = (s: string) => PARTY_ENTITIES.has(s.split(':')[0]);
 
 export interface RealtimeBroadcaster {
@@ -133,7 +134,7 @@ export interface RealtimeNotifier {
 export function realtimeFor(notifier: RealtimeNotifier, strapi?: QidExecutor): RealtimeBroadcaster {
   return createRealtimeBroadcaster({
     membersOf: (pid, ctx) => notifier.projectMemberIds(pid, ctx),
-    partiesOf: strapi ? (s, ctx) => wishPartiesOf(strapi, s, ctx) : undefined,
+    partiesOf: strapi ? (s, ctx) => partiesOfScope(strapi, s, ctx) : undefined,
     send: (userIds, change, ctx) => notifier.getSocketIOServer().broadcast(userIds, { ...change }, ctx, [], RT_EVENT)
   });
 }
@@ -164,6 +165,31 @@ export async function wishPartiesOf(strapi: QidExecutor, s: string, context: Act
     }
   }
   return [...ids];
+}
+
+/**
+ * A meeting's participants (its pgishausers). Read on the actor's token and on the
+ * service token and united, for the same reason as a wish's parties.
+ */
+export async function meetingPartiesOf(strapi: QidExecutor, s: string, context: ActionContext): Promise<string[]> {
+  const [entity, id] = s.split(':');
+  if (entity !== 'meeting' || !id) return [];
+  const read = (jwt?: string) =>
+    strapi.execute('63CheckMeetingReadyStatus', { id }, jwt, context.fetch).catch(() => null);
+  const answers = await Promise.all([context.jwt ? read(context.jwt) : null, read(undefined)]);
+  const ids = new Set<string>();
+  for (const res of answers) {
+    for (const p of res?.data?.pgisha?.data?.attributes?.pgishausers?.data ?? []) {
+      const uid = p?.attributes?.users_permissions_user?.data?.id;
+      if (uid != null) ids.add(String(uid));
+    }
+  }
+  return [...ids];
+}
+
+/** The parties of any PARTY_ENTITIES scope. */
+export function partiesOfScope(strapi: QidExecutor, s: string, context: ActionContext): Promise<string[]> {
+  return s.startsWith('meeting:') ? meetingPartiesOf(strapi, s, context) : wishPartiesOf(strapi, s, context);
 }
 
 export { RT_EVENT };

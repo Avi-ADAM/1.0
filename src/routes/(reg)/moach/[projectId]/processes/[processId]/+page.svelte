@@ -24,6 +24,8 @@
   import ProcessLifecycle from '$lib/components/process/lifecycle/ProcessLifecycle.svelte';
   import SaleLifecycle from '$lib/components/process/lifecycle/SaleLifecycle.svelte';
   import Spinner from '$lib/celim/Spinner.svelte';
+  import { useRealtime } from '$lib/realtime/bus.svelte';
+  import { batchTouchesRikma } from '$lib/realtime/routing';
 
   let projectId = $derived(page.params.projectId);
   let processId = $derived(page.params.processId);
@@ -45,7 +47,7 @@
   let loadError = $state(null);
   let attrs = $state(null);
 
-  onMount(async () => {
+  async function reload() {
     try {
       const json = await sendToSer({ pid: projectId }, 'processLifecycleData', null, null, false, fetch);
       attrs = json?.data?.project?.data?.attributes ?? null;
@@ -55,6 +57,13 @@
     } finally {
       loading = false;
     }
+  }
+
+  onMount(reload);
+
+  // Another member changed something this tab shows (docs/inprogress/PLAN_REALTIME_MIGRATION.md, R5).
+  useRealtime(['process:*', 'mission:*', 'resource:*', 'act:*', 'product:*', 'sale:*'], (b) => {
+    if (batchTouchesRikma(b, projectId)) reload();
   });
 
   let missionChains = $derived(

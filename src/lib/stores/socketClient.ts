@@ -139,7 +139,8 @@ function createSocketClient() {
     try {
       switch (strategy.type) {
         case 'fullRefresh':
-          await invalidate(() => true);
+          // No longer re-runs every load (B2, R5): the server stopped forwarding it,
+          // and every screen follows the realtime bus (`rt:changed`) instead.
           break;
 
         case 'partialUpdate':

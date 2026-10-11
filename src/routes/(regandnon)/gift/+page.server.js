@@ -2,10 +2,12 @@ import { sendToSer } from '$lib/send/sendToSer.js';
 import { normalizeProductCard } from '$lib/server/discovery/normalizeCards.js';
 import { isHiddenProject } from '$lib/server/discovery/hiddenProjects.js';
 import { translateSurface, productCardGroups } from '$lib/server/translation/surfaces.js';
+import { rtKey } from '$lib/realtime/scopes.js';
 
 // Public products directory — same anonymous/service-token split as the other
 // (regandnon) discovery pages (see the note in demand/+page.server.ts).
-export const load = async ({ locals, fetch, cookies }) => {
+export const load = async ({ locals, fetch, cookies, depends }) => {
+  depends(rtKey('product:*'));
   const isReg = !!/** @type {any} */ (locals)?.uid;
 
   let products = [];

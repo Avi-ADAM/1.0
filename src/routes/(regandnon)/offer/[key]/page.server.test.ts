@@ -49,7 +49,7 @@ const offer = (over: Record<string, unknown> = {}) => ({
 });
 
 const run = (key: string, uid: string | false = false) =>
-  load({ params: { key }, locals: { uid } as any, fetch: (() => {}) as any } as any) as Promise<any>;
+  load({ params: { key }, locals: { uid } as any, fetch: (() => {}) as any, depends: () => {} } as any) as Promise<any>;
 
 describe('/offer/[key] load', () => {
   it('an open offer: what she needs to decide — and none of the provider’s notes', async () => {

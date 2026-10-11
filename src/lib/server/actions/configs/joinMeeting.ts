@@ -1,5 +1,6 @@
 
 import type { ActionConfig } from '../types.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 /**
  * Join a pending meeting - confirm readiness
@@ -112,7 +113,7 @@ export const joinMeetingConfig: ActionConfig = {
                             en: `${joinerName} is ready for "${meetingName}" (${readyCount}/${totalCount})`
                         }
                     },
-                    channels: ['socket'],
+                    intent: 'ambient',
                     metadata: {
                         type: 'participantReady',
                         meetingId: meetingId,
@@ -242,5 +243,10 @@ export const joinMeetingConfig: ActionConfig = {
     updateStrategy: {
         type: 'partialUpdate',
         config: {}
-    }
+    },
+
+    realtime: {
+        scopes: (p) =>
+            scopeList([scope('meeting', p.meetingId)]),
+    },
 };

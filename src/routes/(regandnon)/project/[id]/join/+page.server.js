@@ -1,5 +1,6 @@
 import { sendToSer } from '$lib/send/sendToSer.js';
 import { readRikmaIdentity } from '$lib/server/rikmaPublic/loadRikmaPage.js';
+import { rtKey } from '$lib/realtime/scopes.js';
 
 /**
  * Public join / self-nomination page (PLAN_SELF_NOMINATION §4, as a standalone
@@ -8,7 +9,8 @@ import { readRikmaIdentity } from '$lib/server/rikmaPublic/loadRikmaPage.js';
  * looking for — so a visitor can take an existing mission/resource instead of
  * only inventing an offer of their own.
  */
-export const load = async ({ locals, params, fetch }) => {
+export const load = async ({ locals, params, fetch, depends }) => {
+  depends(rtKey(`project:${params.id}`));
   const projectId = params.id;
   const tok = locals.tok;
   const isSer = tok === false;

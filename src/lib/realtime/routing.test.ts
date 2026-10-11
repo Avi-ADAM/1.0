@@ -56,6 +56,11 @@ describe('moachSectionsForChange — the rikma tabs', () => {
     expect(moachSectionsForChange({ scopes: ['project:12'] }, 12)).toEqual(['base']);
   });
 
+  it('a plan board or a library entry refreshes no cached section — their screens listen themselves', () => {
+    expect(moachSectionsForChange({ scopes: ['project:12', 'plan:4'] }, 12)).toEqual([]);
+    expect(moachSectionsForChange({ scopes: ['project:12', 'doc:9'] }, 12)).toEqual([]);
+  });
+
   it('every entity and decision kind is routed somewhere, or deliberately nowhere', () => {
     // A new entity must be placed here on purpose; the lev page ignores some, moach none.
     for (const e of SCOPE_ENTITIES) {
