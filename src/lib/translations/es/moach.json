@@ -373,5 +373,18 @@
     "seatsLeft": "quedan {{count}} plazas",
     "seatsLeftOne": "queda una plaza",
     "overfilled": "se unieron {{filled}} — más de las {{need}} previstas"
+  },
+  "presence": {
+    "region": "Quién está ahora en la rikma",
+    "here": "Aquí ahora",
+    "alone": "No hay otros miembros aquí ahora",
+    "more": "+{{count}}",
+    "hide": "Ocultarme",
+    "hideExplain": "Ocultarse funciona en ambos sentidos: los miembros no verán que estás aquí, y tú no verás quién está.",
+    "confirmHide": "Ocultar",
+    "cancel": "Cancelar",
+    "hiddenNote": "Tu presencia está desactivada, así que tampoco ves quién está aquí",
+    "show": "Activar",
+    "failed": "El cambio no se guardó, inténtalo de nuevo"
   }
 }

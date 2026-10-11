@@ -1,6 +1,6 @@
 import { error, json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { sendViaProxy } from '$lib/server/sendViaProxy.js';
+import { isRikmaMember } from '$lib/server/p2p/membership.js';
 import { iceServers, mintTicket, p2pTicketSecret } from '$lib/server/p2p/ticket.js';
 
 /**
@@ -28,15 +28,14 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
   const projectId = String(body?.projectId ?? '');
   if (!/^\d+$/.test(projectId)) throw error(400, 'Missing projectId');
 
-  let members: Array<{ id: string | number }> = [];
+  let member = false;
   try {
-    const data = await sendViaProxy(fetch, '274getProjectMembers', { pid: projectId }, { isSer: true });
-    members = data?.project?.data?.attributes?.user_1s?.data ?? [];
+    member = await isRikmaMember(fetch, projectId, String(locals.uid));
   } catch (e) {
     console.error('[p2p/ticket] membership lookup failed', e);
     throw error(502, 'Could not verify membership');
   }
-  if (!members.some((m) => String(m.id) === String(locals.uid))) {
+  if (!member) {
     throw error(403, 'Only members of this rikma can join its P2P room');
   }
 

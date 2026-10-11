@@ -83,6 +83,7 @@ export const qidsAccess = {
   '278myMissionsViaUser': { allow: ['user', 'serviceAdmin'] },
   '274getProjectMembers': { allow: ['user', 'serviceAdmin'] },
   '275myRikmasLite': { allow: ['user', 'serviceAdmin'] },
+  'presenceHiddenFor': { allow: ['serviceAdmin'] }, // `$uid` read by /api/v1/presence/ticket only
   '271findMissionOffersByText': { allow: ['serviceAdmin'] }, // server-only callers
   '270findMissionOffersByMission': { allow: ['user', 'serviceAdmin'] },
   '269mapProducts': { allow: ['user', 'serviceAdmin'] },

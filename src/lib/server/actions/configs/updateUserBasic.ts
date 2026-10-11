@@ -12,7 +12,7 @@ import { scope, scopeList } from '$lib/realtime/scopes.js';
  *
  * Client sends any subset of:
  *   { username, bio, frd, lang, autoTranslate, fblink, twiterlink,
- *     discordlink, githublink, preferCards, noMail, location }
+ *     discordlink, githublink, preferCards, noMail, hidePresence, location }
  *
  * `autoTranslate` is the UGC-translation preference (PLAN_UGC_TRANSLATION §4.4).
  * It lives in localStorage for the first paint and is mirrored here so it
@@ -100,6 +100,8 @@ const handler: ActionExecutionHandler = async (params, context) => {
 
   if (params.preferCards !== undefined) lines.push(`preferCards: ${!!params.preferCards}`);
   if (params.noMail !== undefined) lines.push(`noMail: ${!!params.noMail}`);
+  // "Who is here" in the moach: off = not seen and not seeing (/api/v1/presence/ticket).
+  if (params.hidePresence !== undefined) lines.push(`hidePresence: ${!!params.hidePresence}`);
 
   // location is a nested component — passed as a GraphQL variable rather than
   // interpolated, since it carries free-text (location_hint) and numbers.
@@ -129,7 +131,7 @@ const handler: ActionExecutionHandler = async (params, context) => {
         updateUsersPermissionsUser(id: ${userId}, data: { ${lines.join(', ')} }) {
           data {
             attributes {
-              username bio frd lang autoTranslate${params.currency !== undefined ? " currency" : ""} preferCards noMail
+              username bio frd lang autoTranslate${params.currency !== undefined ? " currency" : ""}${params.hidePresence !== undefined ? " hidePresence" : ""} preferCards noMail
               fblink twiterlink discordlink githublink
               location { location_mode lat lng radius location_hint }
             }
@@ -166,6 +168,7 @@ export const updateUserBasicConfig: ActionConfig = {
     githublink: { type: 'string', required: false },
     preferCards: { type: 'boolean', required: false },
     noMail: { type: 'boolean', required: false },
+    hidePresence: { type: 'boolean', required: false, description: 'Switch moach presence off (symmetric)' },
     location: {
       type: 'object',
       required: false,

@@ -1005,6 +1005,7 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
     arr1: Attribute.JSON;
     arrdate: Attribute.DateTime;
     noMail: Attribute.Boolean & Attribute.DefaultTo<false>;
+    hidePresence: Attribute.Boolean & Attribute.DefaultTo<false>;
     acts: Attribute.Relation<
       'plugin::users-permissions.user',
       'manyToMany',

@@ -373,5 +373,18 @@
     "seatsLeft": "{{count}} places left",
     "seatsLeftOne": "one place left",
     "overfilled": "{{filled}} joined — more than the {{need}} planned"
+  },
+  "presence": {
+    "region": "Who is in the rikma now",
+    "here": "Here now",
+    "alone": "No other members here right now",
+    "more": "+{{count}}",
+    "hide": "Hide me",
+    "hideExplain": "Hiding works both ways: members won't see that you're here, and you won't see who is.",
+    "confirmHide": "Hide",
+    "cancel": "Cancel",
+    "hiddenNote": "Your presence is off, so who is here isn't shown either",
+    "show": "Turn on",
+    "failed": "The change wasn't saved, try again"
   }
 }

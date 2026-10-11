@@ -15,6 +15,7 @@ import { verifyToken, extractToken } from './auth.js';
 import { SessionManager } from './session-manager.js';
 import { verifyInviteToken, meetingRoom } from './guest-invite.js';
 import { registerP2pHandlers } from './p2p.js';
+import { registerPresenceHandlers } from './presence.js';
 import { checkInternalRequest, isInternalAuthConfigured } from './internal-auth.js';
 import { resolveBroadcastEvent } from './broadcast-event.js';
 import { isSocketIoRequest } from './socket-path.js';
@@ -267,6 +268,8 @@ io.on('connection', (socket) => {
   // P2P pilot signaling — registered members only, never meeting guests
   // (1.0main docs/inprogress/PLAN_P2P_PILOT.md). Inert until P2P_TICKET_SECRET is set.
   registerP2pHandlers(io, socket);
+  // Who is in the rikma right now - same ticket, registered members only (presence.ts).
+  registerPresenceHandlers(io, socket);
 });
 
 

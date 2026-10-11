@@ -26,10 +26,15 @@ export interface P2pTicket {
   expiresAt: number;
 }
 
-function secret(): string | null {
+/**
+ * The rikma-room ticket secret. The same ticket ("U may sit in rikma P's room
+ * until T") also seats a member in the presence room (presence.ts).
+ */
+export function roomTicketSecret(): string | null {
   const raw = (process.env.P2P_TICKET_SECRET || '').trim();
   return raw.length >= 16 ? raw : null;
 }
+const secret = roomTicketSecret;
 
 export function verifyP2pTicket(ticket: unknown, key: string | null, now = Date.now()): P2pTicket | null {
   if (!key || typeof ticket !== 'string' || ticket.length > 1024) return null;

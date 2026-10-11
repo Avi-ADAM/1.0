@@ -20,6 +20,7 @@
   import { realtimeBus } from '$lib/realtime/bus.svelte';
   import { connectMoachRealtime } from '$lib/realtime/adapters/moach';
   import MoachTour from '$lib/components/moach/MoachTour.svelte';
+  import PresenceBar from '$lib/components/moach/PresenceBar.svelte';
   import Dialog from '$lib/celim/ui/dialog.svelte';
   import { sendToSer } from '$lib/send/sendToSer.js';
   import { browser } from '$app/environment';
@@ -287,6 +288,10 @@
             data-moach-tour="help"
           >?</button>
         </div>
+
+        {#key projectId}
+          <PresenceBar {projectId} uid={data.uid} members={projectBase.user_1s?.data ?? []} />
+        {/key}
 
         {#if projectBase.githublink || projectBase.codeLicense}
           <div class="flex flex-col items-center gap-2">
