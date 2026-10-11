@@ -179,8 +179,9 @@ onMessage(messaging, (payload) => {
 
       // Connect - will read JWT from cookie automatically
       socketClient.connect(data.id);
-      // Screens follow what actions change (`rt:changed`), apart from the
-      // notifications below (docs/inprogress/PLAN_REALTIME_MIGRATION.md §3.4).
+      // Screens follow what actions change (`rt:changed`); the notifications
+      // below are for people — the toast, chat lines and the profile patch
+      // (docs/inprogress/PLAN_REALTIME_MIGRATION.md §3.4).
       realtimeBus.start();
 
       // Listen for notifications
@@ -196,8 +197,7 @@ onMessage(messaging, (payload) => {
 
         // Profile changes (pic / basic info) made on any of the user's
         // devices: patch the shared userStore so every open page reflects it
-        // instantly. socketClient already invalidates 'app:meProfile' for a
-        // full refresh of the /me page itself.
+        // instantly. The /me pages re-run from the realtime `user:<me>` change.
         if (meta.type === 'profile' && notification.data?.attributes) {
           patchUser(notification.data.attributes);
         }

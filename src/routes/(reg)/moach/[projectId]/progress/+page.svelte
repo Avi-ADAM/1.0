@@ -5,7 +5,7 @@
   import { onMount, untrack } from 'svelte';
   import { lang } from '$lib/stores/lang.js';
   import { t } from '$lib/translations';
-  import { fetchTimers, initialWebSocketForTimer } from '$lib/stores/timers.js';
+  import { fetchTimers, listenForTimerChanges } from '$lib/stores/timers.js';
   import { forum, isChatOpen, newChat, nowChatId } from '$lib/stores/pendMisMes.js';
   import { sendToSer } from '$lib/send/sendToSer.js';
 
@@ -43,7 +43,7 @@
     fetchTimers(uid, fetch).catch((e) =>
       console.warn('[progress] fetchTimers failed:', e?.message)
     );
-    const stopListening = initialWebSocketForTimer(uid, fetch);
+    const stopListening = listenForTimerChanges(uid, fetch);
     return () => stopListening();
   });
 

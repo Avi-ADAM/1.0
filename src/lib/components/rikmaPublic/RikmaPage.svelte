@@ -1,14 +1,12 @@
 <script>
   import { t } from '$lib/translations';
   import Header from '$lib/components/header/header.svelte';
-  import { goto, invalidate } from '$app/navigation';
-  import { onMount, onDestroy } from 'svelte';
+  import { goto } from '$app/navigation';
   import { lang } from '$lib/stores/lang.js';
   import Spinner from '$lib/celim/Spinner.svelte';
   import Close from '$lib/celim/close.svelte';
   import RichText from '$lib/celim/ui/richText.svelte';
   import Tile from '$lib/celim/tile.svelte';
-  import { socketClient } from '$lib/stores/socketClient';
 
   import AuthorityBadge from '$lib/components/ui/AuthorityBadge.svelte';
   import DiscoveryNav from '$lib/components/discovery/DiscoveryNav.svelte';
@@ -36,7 +34,7 @@
    */
   let { data } = $props();
   // Derived so navigating between /project/A and /project/B (same component
-  // instance, reused by SvelteKit) keeps these — and the socket listener — current.
+  // instance, reused by SvelteKit) keeps these current.
   let projectId = $derived(data.projectId);
   let isRegisteredUser = $derived(data.isRegisteredUser);
   // Inside the look editor's preview the page shows what a guest sees.
@@ -45,7 +43,7 @@
   /** @type {import('$lib/rikmaLook/look').RikmaLook | null} */
   let look = $derived(shownLook(data.look ?? null));
 
-  // Derived from load data so a realtime invalidate(`project:${id}`) re-renders
+  // Derived from load data so a realtime `rt:project:<id>` re-run re-renders
   // the team, missions, logo, links and values (e.g. after a decision passes).
   let project = $derived(data.projectData);
   let projectUsers = $derived(project?.attributes?.user_1s?.data || []);
@@ -83,33 +81,6 @@
     }
     vallues = base;
   });
-
-  // Realtime: re-run the page load when a vote/decision lands for this project.
-  // Only registered users hold an authenticated socket connection.
-  const PROJECT_REFRESH_TYPES = [
-    'pendmVote',
-    'pmashVote',
-    'maapVote',
-    'decisionVote',
-    'voteUpdate'
-  ];
-  let socketUnsub;
-  onMount(() => {
-    if (!isRegisteredUser) return;
-    socketUnsub = socketClient.onNotification((/** @type {any} */ n) => {
-      const type = n?.metadata?.type || n?.data?.type;
-      const notifProjectId = n?.actionParams?.projectId || n?.data?.projectId;
-      if (
-        notifProjectId &&
-        String(notifProjectId) === String(projectId) &&
-        type &&
-        PROJECT_REFRESH_TYPES.includes(type)
-      ) {
-        invalidate(`project:${projectId}`);
-      }
-    });
-  });
-  onDestroy(() => socketUnsub?.());
 
   function us(x) {
     goto(`/user/${x}`);

@@ -129,11 +129,13 @@ export class NotificationOrchestrator {
         });
       }
 
-      // A broadcast `fullRefresh` re-ran every load of whatever page each recipient
-      // had open (B2). Screens now follow the action's `rt:changed` scopes, so it is
-      // not forwarded — the actor's own tab still applies it from its own result.
+      // A notification tells people; it does not refresh screens. Every screen
+      // follows the action's `rt:changed` scopes (PLAN_REALTIME_MIGRATION R6), and
+      // the update strategy is the actor's own tab's business — it applies it
+      // from its own result. A forwarded `fullRefresh` once re-ran every load of
+      // whatever page each recipient had open (B2).
       const forwarded =
-        actionResult?.updateStrategy?.type === 'fullRefresh'
+        actionResult && typeof actionResult === 'object' && 'updateStrategy' in actionResult
           ? { ...actionResult, updateStrategy: undefined }
           : actionResult;
 
@@ -144,8 +146,7 @@ export class NotificationOrchestrator {
         actionParams,
         actionResult: forwarded,
         initiatorId: context.userId,
-        // Flatten for client-side handlers that expect these at top level
-        updateStrategy: forwarded?.updateStrategy,
+        // Flattened for the client listeners that read it at the top level
         data: actionResult?.data
       };
 

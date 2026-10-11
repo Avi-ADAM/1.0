@@ -8,7 +8,7 @@
   // import { getAnalytics } from "firebase/analytics";
   import { initialForum, forum } from '$lib/stores/pendMisMes.js';
   import Foot from '$lib/components/footer/foot.svelte';
-  import { initialWebS } from '$lib/stores/pendMisMes.js';
+  import { listenForForumChanges } from '$lib/stores/pendMisMes.js';
   import { showFoot } from '$lib/stores/showFoot.js';
   import { initialWebSP } from '$lib/stores/pgishot.js';
 
@@ -41,8 +41,8 @@
       initialForum(true, [], data.uid);
       console.log(data.uid, $forum);
       // data.tok is now just a boolean login flag; the socket authenticates from
-      // the HttpOnly cookie, so no token is passed (these fns ignore arg 1).
-      initialWebS(null, data.uid);
+      // the HttpOnly cookie, so no token is passed (initialWebSP ignores arg 1).
+      listenForForumChanges(data.uid);
       initialWebSP(null, data.uid);
     } else {
       // jwt is httpOnly now; rely on server-provided token or 'when' cookie for auth flag

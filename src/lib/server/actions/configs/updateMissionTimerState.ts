@@ -101,7 +101,9 @@ export const updateMissionTimerStateConfig: ActionConfig = {
   updateStrategy: { type: 'none' },
 
   realtime: {
-    scopes: (p) =>
-      scopeList([scope('project', p.projectId), scope('mission', p.mId)]),
+    // The legacy fields belong to the mission holder's running timer (11saveTimer
+    // also nulls activeTimer), so their timers list re-reads too.
+    scopes: (p, _r, ctx) =>
+      scopeList([scope('project', p.projectId), scope('mission', p.mId), scope('timer', ctx.userId)]),
   },
 };

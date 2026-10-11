@@ -101,8 +101,8 @@ const voteOnPendmHandler: ActionExecutionHandler = async (params, context, { str
 
   const allVots = [...previousVotes, newVote];
 
-  // Vote in Strapi-nested shape, so receiving clients (levSocketHandler →
-  // pends store) can append it and let processPends() recompute the counts.
+  // Vote in Strapi-nested shape, so the voting card (levVotePatch → pends
+  // store) can append it and let processPends() recompute the counts.
   const strapiVote: Record<string, any> = {
     what: Boolean(what),
     users_permissions_user: { data: { id: strUserId } },

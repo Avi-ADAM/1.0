@@ -10,7 +10,7 @@
   import Nego from '../prPr/negoPend.svelte';
   import LocationView from '$lib/components/location/LocationView.svelte';
   import { goto, invalidate } from '$app/navigation';
-  import { updatePmashesStore } from '$lib/utils/levSocketHandler';
+  import { updatePmashesStore } from '$lib/utils/levVotePatch';
   import { idPr } from '../../stores/idPr.js';
   import moment from 'moment';
   import { ProgressBar } from 'progressbar-svelte';

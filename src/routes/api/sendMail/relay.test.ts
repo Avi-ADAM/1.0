@@ -3,7 +3,7 @@
  *
  * It took any recipient and any HTML and sent it as notifications@1lev1.com,
  * to anyone who POSTed. Zoho answers that kind of traffic by blocking the
- * whole account (`550 5.4.6`, see $lib/server/mailer.js). The nuti* and sma
+ * whole account (`550 5.4.6`, see $lib/server/mailer.js). The nuti and sma
  * endpoints were the same hole behind a template — and because they reach
  * /api/sendMail through the SvelteKit fetch, handleFetch stamped them as
  * internal on the way, so gating sendMail alone would not have closed it.
@@ -17,27 +17,15 @@ import { createHash } from 'node:crypto';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const sendMailSafe = vi.fn(async (_opts: unknown) => ({ ok: true }));
-const pusherer = vi.fn();
-const sendBolkTelegram = vi.fn();
-const sendBolkMail = vi.fn();
 
 vi.mock('$env/dynamic/private', () => ({ env: { ADMINMONTHER: 'test-admin-token' } }));
 vi.mock('$lib/server/mailer.js', () => ({
   sendMailSafe: (opts: unknown) => sendMailSafe(opts)
 }));
 vi.mock('svelty-email', () => ({ render: async () => ({ html: '<p>x</p>', text: 'x' }) }));
-vi.mock('$lib/func/pusherer.svelte', () => ({ pusherer: (...a: unknown[]) => pusherer(...a) }));
-vi.mock('$lib/func/telegram/sendBolkTelegram.svelte', () => ({
-  sendBolkTelegram: (...a: unknown[]) => sendBolkTelegram(...a)
-}));
-vi.mock('$lib/func/bolkmail/bolkMail.svelte', () => ({
-  sendBolkMail: (...a: unknown[]) => sendBolkMail(...a)
-}));
 
 const sendMailRoute = await import('./+server.js');
 const nutiRoute = await import('../nuti/+server.js');
-const nutiUserRoute = await import('../nutiUser/+server.js');
-const nutifyPmRoute = await import('../nutifyPm/+server.js');
 const smaRoute = await import('../sma/+server.js');
 
 // What handleFetch stamps — internalSecret.js's derivation for the mocked env.
@@ -68,9 +56,6 @@ beforeEach(() => {
   vi.spyOn(console, 'log').mockImplementation(() => {});
   vi.spyOn(console, 'warn').mockImplementation(() => {});
   sendMailSafe.mockClear();
-  pusherer.mockClear();
-  sendBolkTelegram.mockClear();
-  sendBolkMail.mockClear();
 });
 
 describe('/api/sendMail', () => {
@@ -136,8 +121,6 @@ describe('the templated relays in front of it', () => {
 
   it.each([
     ['/api/nuti', () => nutiRoute.POST, nutiBody],
-    ['/api/nutiUser', () => nutiUserRoute.POST, { uid: '2', title: { en: 'x' }, body: { en: 'y' } }],
-    ['/api/nutifyPm', () => nutifyPmRoute.POST, { pid: '1', title: { en: 'x' }, body: { en: 'y' } }],
     ['/api/sma', () => smaRoute.POST, smaBody]
   ])('%s refuses a request without the internal secret', async (path, handler, body) => {
     const ev = event(req(path, body));
@@ -145,9 +128,6 @@ describe('the templated relays in front of it', () => {
     expect(res.status).toBe(403);
     expect(sendMailSafe).not.toHaveBeenCalled();
     expect(ev.fetch).not.toHaveBeenCalled();
-    expect(pusherer).not.toHaveBeenCalled();
-    expect(sendBolkTelegram).not.toHaveBeenCalled();
-    expect(sendBolkMail).not.toHaveBeenCalled();
   });
 
   it('/api/nuti still mails the other members for the server', async () => {
@@ -218,8 +198,6 @@ describe('every mailing endpoint is gated or reviewed', () => {
     for (const rel of [
       'src/routes/api/sendMail/+server.js',
       'src/routes/api/nuti/+server.js',
-      'src/routes/api/nutiUser/+server.js',
-      'src/routes/api/nutifyPm/+server.js',
       'src/routes/api/sma/+server.js'
     ]) {
       expect(rel in REVIEWED_PUBLIC_MAILERS, rel).toBe(false);

@@ -18,7 +18,7 @@
   import ActsNego from '../conf/actsNego.svelte';
   import LocationNego from '../conf/locationNego.svelte';
   import { submitNegoMission } from '$lib/client/actionClient';
-  import { updatePendsStore } from '$lib/utils/levSocketHandler';
+  import { updatePendsStore } from '$lib/utils/levVotePatch';
   import { toIsoDateString } from '$lib/func/montsi.svelte';
   import { fetchBridgeResolution, openNegoBridge, readNegoBridgeReturn } from '$lib/func/negoBridge.js';
   import EquityPreview from '$lib/components/equity/EquityPreview.svelte';

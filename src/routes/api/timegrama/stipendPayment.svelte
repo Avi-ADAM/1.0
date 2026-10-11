@@ -12,6 +12,7 @@
    * before this ever runs.
    */
   import { SendToAdmin } from '$lib/server/sendToAdmin.js';
+  import { serverNotifier } from '$lib/server/actions/index.js';
   // Server-only secret — this module is imported only by timegrama/+server.js.
   import { env } from '$env/dynamic/private';
 
@@ -21,17 +22,29 @@
    * Silence maturation moved two people's percentages and told neither — the
    * explicit `confirmStipendPayment` notifies, this path did not, so the one
    * event that happens *without* anybody pressing anything was also the one
-   * nobody heard about (docs/inprogress/FIXES.md §8). `fetch` is SvelteKit's, so the
-   * relative call is stamped as internal by `handleFetch`.
+   * nobody heard about (docs/inprogress/FIXES.md §8). It goes through the same
+   * orchestrator as every action (`personal`: socket, push, telegram, and email
+   * to whoever has neither) — the hand-rolled /api/nutiUser path is gone (N7).
+   * `fetch` is SvelteKit's, so the email relay call is stamped as internal.
    */
-  async function announce(fetch, uid, title, body) {
+  async function announce(fetch, uid, projectId, title, body) {
     if (!fetch || !uid) return;
     try {
-      await fetch('/api/nutiUser', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ uid: String(uid), title, body })
-      });
+      await serverNotifier.notify(
+        {
+          recipients: { type: 'specificUsers', config: { userIdsParam: 'recipientIds' } },
+          templates: { title, body },
+          intent: 'personal',
+          metadata: {
+            priority: 'normal',
+            type: 'stipendPayment',
+            url: projectId ? `/moach/${projectId}/stipend` : '/lev'
+          }
+        },
+        {},
+        { recipientIds: [String(uid)] },
+        { userId: '', jwt: '', lang: 'he', fetch }
+      );
     } catch (e) {
       console.warn('[timegrama/stipendPayment] notification failed (non-fatal):', e);
     }
@@ -87,6 +100,7 @@
         );
       }
 
+      const projectId = a.project?.data?.id;
       const projectName = a.project?.data?.attributes?.projectName ?? '';
       const amount = Number(a.amount ?? 0);
       const moved = a.mode === 'equity' && Number(a.equityCredit ?? 0) > 0;
@@ -98,6 +112,7 @@
         announce(
           fetch,
           a.recipient?.data?.id,
+          projectId,
           { he: 'המלגה אושרה מעצמה', en: 'Your stipend was confirmed automatically' },
           {
             he: `לא הגיבו בזמן התגובה של ${projectName}, ולכן ₪${amount} נרשמו כהתקבלו.${tail.he} אם לא הגיע כסף — אפשר לומר את זה בקלף המלגה ולפתוח את המחזור מחדש.`,
@@ -107,6 +122,7 @@
         announce(
           fetch,
           a.funder?.data?.id,
+          projectId,
           { he: 'המלגה נרשמה כהתקבלה', en: 'Your stipend is recorded as received' },
           {
             he: `לא התקבלה תגובה בזמן, ולכן ₪${amount} ב${projectName} נסגרו כהתקבלו.${tail.he}`,

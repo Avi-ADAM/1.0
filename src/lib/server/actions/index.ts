@@ -93,6 +93,12 @@ const validator = new ValidationEngine();
 // through the full execute pipeline.
 export const authorizer = new AuthorizationEngine(strapiClient);
 const notifier = new NotificationOrchestrator(strapiClient);
+/**
+ * The same orchestrator, for server code that tells people about something it
+ * wrote outside an action (a timegrama maturation) — intent, channels, language
+ * and the email fallback all decided in one place (PLAN_REALTIME_MIGRATION §6, N7).
+ */
+export const serverNotifier = notifier;
 // Screens, not people (docs/inprogress/PLAN_REALTIME_MIGRATION.md §3.3).
 const realtime = realtimeFor(notifier, strapiClient);
 /** The same broadcaster, for server code that writes outside an action (timegrama, B9). */

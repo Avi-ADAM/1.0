@@ -7,7 +7,7 @@
   import Nego from '../prPr/negoM.svelte';
   import LocationView from '$lib/components/location/LocationView.svelte';
   import { goto, invalidate } from '$app/navigation';
-  import { updatePendsStore } from '$lib/utils/levSocketHandler';
+  import { updatePendsStore } from '$lib/utils/levVotePatch';
   import { idPr } from '../../stores/idPr.js';
   import Diun from './diun.svelte';
   import Spinner from '$lib/celim/Spinner.svelte';

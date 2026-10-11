@@ -76,10 +76,7 @@ async function previewLook(decisionId, projectId, projectData, uid) {
 export async function loadRikmaPage({ projectId, identity, locals, fetch, cookies, url, depends }) {
   const lang = locals.lang;
   const tok = locals.tok;
-  // Tag this load so a realtime vote/decision notification can re-run it
-  // via invalidate(`project:${projectId}`) from the page.
-  depends(`project:${projectId}`);
-  // …and so does anything an action says changed in this rikma (PLAN_REALTIME_MIGRATION §3.4).
+  // Re-runs when an action says something changed in this rikma (PLAN_REALTIME_MIGRATION §3.4).
   depends(rtKey(`project:${projectId}`));
   const isRegisteredUser = tok != false;
 

@@ -6,7 +6,7 @@
   import { lang } from '$lib/stores/lang.js';
   import {
     fetchTimers,
-    initialWebSocketForTimer,
+    listenForTimerChanges,
     cleanupTimerListener,
     timers
   } from '$lib/stores/timers';
@@ -68,7 +68,7 @@
       window.addEventListener('resize', onResize);
     });
     // Initialize the timer listener using the new socketClient-based approach
-    timerCleanup = initialWebSocketForTimer(
+    timerCleanup = listenForTimerChanges(
       page.data.uid,
       fetch
     );

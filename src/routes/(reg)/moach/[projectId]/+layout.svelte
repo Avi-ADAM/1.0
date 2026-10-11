@@ -3,12 +3,7 @@
   import { page, navigating } from '$app/state';
   import { goto, invalidate } from '$app/navigation';
   import { idPr } from '$lib/stores/idPr.js';
-  import {
-    sectionsForNotification,
-    notificationProjectId,
-    moachBaseKey,
-    VOTE_TYPES
-  } from '$lib/stores/moachRealtime.js';
+  import { moachBaseKey } from '$lib/stores/moachRealtime.js';
   import AuthorityBadge from '$lib/components/ui/AuthorityBadge.svelte';
   import RikmaRepoLink from '$lib/components/ui/RikmaRepoLink.svelte';
   import RikmaLicenseBadge from '$lib/components/ui/RikmaLicenseBadge.svelte';
@@ -17,12 +12,11 @@
     projectTimersStore,
     fetchProjectTimers
   } from '$lib/stores/projectTimers.js';
-  import { onMount, onDestroy } from 'svelte';
+  import { onMount } from 'svelte';
   import { setMoachStore } from '$lib/stores/moachStore.svelte.js';
   import MissionModal from '$lib/components/prPr/MissionModal.svelte';
   import TaskModal from '$lib/components/prPr/tasks/taskModal.svelte';
   import { untrack } from 'svelte';
-  import { socketClient } from '$lib/stores/socketClient';
   import { realtimeBus } from '$lib/realtime/bus.svelte';
   import { connectMoachRealtime } from '$lib/realtime/adapters/moach';
   import MoachTour from '$lib/components/moach/MoachTour.svelte';
@@ -35,7 +29,6 @@
   const moachStore = setMoachStore();
   // Every amount on this rikma's pages is stored in its currency (PLAN_MULTI_CURRENCY D-C2).
   provideRikmaCurrency(() => data?.projectBase?.currencyCode);
-  let socketUnsubscribe;
   let projectId = $derived(page.params.projectId);
 
   function getImageUrl(url) {
@@ -125,8 +118,7 @@
   });
   // What actions declare they changed (`realtime` scopes) about this rikma
   // re-reads what its tabs show. Re-subscribes when the layout moves to another
-  // rikma. The notification listener below stays until R6, for actions that
-  // have not moved yet (docs/inprogress/PLAN_REALTIME_MIGRATION.md §3.4).
+  // rikma (docs/inprogress/PLAN_REALTIME_MIGRATION.md §3.4).
   $effect(() => {
     const pid = projectId;
     if (!browser || !pid) return;
@@ -145,35 +137,6 @@
 
     loadVoteCount();
     loadWishCount();
-
-    // Socket integration for real-time invalidation
-    socketClient.connect(data.uid);
-    socketUnsubscribe = socketClient.onNotification((notification) => {
-      console.log('[MoachLayout] Socket notification:', notification);
-
-      if (!projectId) return;
-
-      // Ignore notifications that belong to a different project (the socket
-      // delivers events for every project the user is a member of).
-      const notifProjectId = notificationProjectId(notification);
-      if (notifProjectId && notifProjectId !== String(projectId)) return;
-
-      const type = notification.metadata?.type || notification.data?.type;
-      const sections = sectionsForNotification(type);
-      if (type && VOTE_TYPES.includes(type)) loadVoteCount();
-
-      // A notification that does not name its rikma only marks the cache
-      // stale; one about this rikma re-reads what the open tab shows.
-      for (const section of sections) {
-        if (!notifProjectId) moachStore.invalidate(projectId, section);
-        else if (section === 'base') invalidate(moachBaseKey(projectId));
-        else moachStore.refresh(projectId, section);
-      }
-    });
-  });
-
-  onDestroy(() => {
-    if (socketUnsubscribe) socketUnsubscribe();
   });
 
 

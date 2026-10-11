@@ -16,7 +16,7 @@
   import { lang } from '$lib/stores/lang.js';
   import { t, isRtl } from '$lib/translations';
   import { sendToSer } from '$lib/send/sendToSer.js';
-  import { fetchTimers, initialWebSocketForTimer } from '$lib/stores/timers.js';
+  import { fetchTimers, listenForTimerChanges } from '$lib/stores/timers.js';
   import { segmentsFromTimers } from '$lib/recurring/missionMonths.js';
   import RichText from '$lib/celim/ui/richText.svelte';
   import MonthlyHours from '$lib/components/mission/MonthlyHours.svelte';
@@ -108,7 +108,7 @@
     fetchTimers(id, fetch).catch((e) =>
       console.warn('[progress/mission] fetchTimers failed:', e?.message)
     );
-    const stopListening = initialWebSocketForTimer(id, fetch);
+    const stopListening = listenForTimerChanges(id, fetch);
     return () => stopListening();
   });
 

@@ -11,7 +11,8 @@
  * // Connect (usually in +layout.svelte after user is authenticated)
  * socketClient.connect(userId, jwt);
  * 
- * // Listen for notifications
+ * // Listen for notifications (toasts, chat, meetings — screens follow
+ * // `rt:changed` through $lib/realtime/bus.svelte.ts instead)
  * socketClient.onNotification((notification) => {
  *   console.log('Received notification:', notification);
  * });
@@ -24,7 +25,6 @@
 import { writable, get } from 'svelte/store';
 import { io, type Socket } from 'socket.io-client';
 import { browser } from '$app/environment';
-import { invalidate } from '$app/navigation';
 
 /**
  * Notification payload structure from the server
@@ -41,10 +41,6 @@ export interface NotificationPayload {
     type?: string;
   };
   data?: any;
-  updateStrategy?: {
-    type: string;
-    config?: any;
-  };
 }
 
 /**
@@ -127,59 +123,6 @@ function createSocketClient() {
   // the rooms it needs, since a new socket starts in none.
   const readyListeners = new Set<() => void>();
   let spaceChangedListeners: Array<(spaceId: string) => void> = [];
-
-  /**
-   * Handle update strategy from socket notification
-   */
-  async function handleUpdateStrategy(strategy: any, data: any): Promise<void> {
-    if (!browser || !strategy) return;
-
-    console.log('[SocketClient] Handling update strategy:', strategy.type);
-
-    try {
-      switch (strategy.type) {
-        case 'fullRefresh':
-          // No longer re-runs every load (B2, R5): the server stopped forwarding it,
-          // and every screen follows the realtime bus (`rt:changed`) instead.
-          break;
-
-        case 'partialUpdate':
-          if (strategy.config?.dataKeys) {
-            for (const key of strategy.config.dataKeys) {
-              await invalidate(key);
-            }
-          }
-          break;
-
-        case 'optimistic':
-          if (strategy.config?.updateFunction) {
-            // Try to get update function from window
-            const updateFn = (window as any).updateStrategies?.[strategy.config.updateFunction]
-              || (window as any)[strategy.config.updateFunction];
-
-            if (typeof updateFn === 'function') {
-              await updateFn(data, strategy.config);
-            } else {
-              console.warn('[SocketClient] Update function not found:', strategy.config.updateFunction);
-            }
-          }
-          break;
-
-        case 'refetchScope':
-          // Lev slices — handled by the lev page's own listener (levSocketHandler).
-          break;
-
-        case 'none':
-          // No update needed
-          break;
-
-        default:
-          console.warn('[SocketClient] Unknown update strategy:', strategy.type);
-      }
-    } catch (error) {
-      console.error('[SocketClient] Error executing update strategy:', error);
-    }
-  }
 
   /**
    * Connect to the Socket.IO server
@@ -317,19 +260,8 @@ function createSocketClient() {
     socket.on('notification', (notification: NotificationPayload) => {
       console.log('[SocketClient] Notification received:', notification);
 
-      // Extract update strategy and data (check both top-level and nested in actionResult)
-      const updateStrategy = (notification as any).updateStrategy || (notification as any).actionResult?.updateStrategy;
-      const data = (notification as any).data || (notification as any).actionResult?.data;
-
-      // Handle update strategy if present
-      if (updateStrategy) {
-        handleUpdateStrategy(updateStrategy, data)
-          .catch(error => {
-            console.error('[SocketClient] Error handling update strategy:', error);
-          });
-      }
-
-      // Call all registered listeners
+      // A notification is for people — the toast, chat and meeting listeners.
+      // Screens re-read from `rt:changed` ($lib/realtime/bus.ts), never from here.
       notificationListeners.forEach(listener => {
         try {
           listener(notification);

@@ -37,11 +37,13 @@ async function executeTimerAction(actionType, params, fetchFn = null, options = 
   try {
     const useFetch = fetchFn || fetch;
 
-    // Tag the action with this tab's client id (browser only) so the resulting
-    // socket notification can be ignored by the originating tab (echo-suppression).
-    // Server-side callers (Telegram bot) have no clientId, so all browsers sync.
-    if (browser && typeof window !== 'undefined' && window.__timerClientId) {
-      params = { ...params, originClientId: window.__timerClientId };
+    // Tag the action with this tab's client id (browser only) so the originating
+    // tab skips its own echo — the realtime change reads the header, the
+    // notification's metadata the param. Server-side callers (Telegram bot) have
+    // no clientId, so all browsers sync.
+    const clientId = browser && typeof window !== 'undefined' ? window.__timerClientId : undefined;
+    if (clientId) {
+      params = { ...params, originClientId: clientId };
     }
 
     const bodyPayload = {
@@ -57,7 +59,8 @@ async function executeTimerAction(actionType, params, fetchFn = null, options = 
     const response = await useFetch('/api/action', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        ...(clientId ? { 'x-client-id': String(clientId) } : {})
       },
       body: JSON.stringify(bodyPayload),
       ...(controller ? { signal: controller.signal } : {})

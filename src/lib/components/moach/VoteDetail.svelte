@@ -19,12 +19,11 @@
    * Self-contained on purpose: a future standalone /vote/[kind]/[id] outside
    * moach can render this component as-is, passing the same props.
    */
-  import { onMount, onDestroy, untrack } from 'svelte';
+  import { onMount, untrack } from 'svelte';
   import { browser } from '$app/environment';
   import { goto } from '$app/navigation';
   import { isRtl, t } from '$lib/translations';
   import { sendToSer } from '$lib/send/sendToSer.js';
-  import { socketClient } from '$lib/stores/socketClient';
   import { useRealtime } from '$lib/realtime/bus.svelte';
   import { projects } from '$lib/stores/projectStore.js';
   import {
@@ -72,15 +71,6 @@
 
   // Detail page is always interactive (never the dimmed "low" coin variant).
   const low = false;
-  const VOTE_TYPES = [
-    'pendmVote',
-    'pmashVote',
-    'maapVote',
-    'decisionVote',
-    'voteUpdate',
-    'finiapruvalVote',
-    'finiapruvalCounter'
-  ];
 
   // Per-kind wiring. Keep these maps the single source of truth so adding a
   // future vote type is one entry each.
@@ -242,27 +232,12 @@
     untrack(() => seedFromEntity(ent));
   });
 
-  let socketUnsub;
   onMount(() => {
     mounted = true;
-    socketUnsub = socketClient.onNotification((n) => {
-      const type = n?.metadata?.type || n?.data?.type;
-      const np = n?.actionParams?.projectId || n?.data?.projectId;
-      if (
-        np &&
-        String(np) === String(projectId) &&
-        type &&
-        VOTE_TYPES.includes(type)
-      ) {
-        refetch();
-      }
-    });
   });
-  onDestroy(() => socketUnsub?.());
 
   // What actions declare they changed: this very decision (PLAN_REALTIME_MIGRATION
-  // §3.4). The route's `fini` is the `finiapruval` decision kind. The listener
-  // above stays until R6.
+  // §3.4). The route's `fini` is the `finiapruval` decision kind.
   useRealtime(
     () => (entityId ? [`decision:${kind === 'fini' ? 'finiapruval' : kind}:${entityId}`] : []),
     () => refetch()

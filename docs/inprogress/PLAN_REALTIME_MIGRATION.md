@@ -1,6 +1,6 @@
 # תכנית — מיגרציית Real-Time: כל שינוי מגיע לכל מסך שמציג אותו
 
-> **מצב:** בביצוע — R0, R1, R2 ו-N0–N1 בנויים (2026-10-08); R3 (דפי גל 1) מחובר ונבדק בהזרקה ל-bus (2026-10-10); R4 הושלם (2026-10-11) — כל ה-actions הכותבים מצהירים `realtime` ו-`LEGACY_NO_REALTIME` הוסר; נבדקו חי vote/archive, wish ו-createTask/updateTask; R5 בנוי (2026-10-11) — דפי גל 2 מחוברים, timegrama מפרסם הבשלות, `fullRefresh` לא משודר ו-`invalidate(() => true)` הוסר מהסוקט; נשארו `moach/[pid]/edit`, `negotiation/[id]` ו-`/api/send` (B9) ו-N5. הבא: R6 (ניקוי המאזינים הישנים). קובץ המעקב: [`REALTIME_TRACKING.md`](./REALTIME_TRACKING.md).
+> **מצב:** בביצוע — R0, R1, R2 ו-N0–N1 בנויים (2026-10-08); R3 (דפי גל 1) מחובר ונבדק בהזרקה ל-bus (2026-10-10); R4 הושלם (2026-10-11) — כל ה-actions הכותבים מצהירים `realtime` ו-`LEGACY_NO_REALTIME` הוסר; נבדקו חי vote/archive, wish ו-createTask/updateTask; R5 בנוי (2026-10-11) — דפי גל 2 מחוברים, timegrama מפרסם הבשלות, `fullRefresh` לא משודר ו-`invalidate(() => true)` הוסר מהסוקט; R6 בנוי (2026-10-11) — המאזינים הישנים הוסרו, הטיימרים והצ'אט בלב עברו ל-bus, `updateStrategy` לא משודר יותר, ונתיבי ההתראה הישנים (N7) נמחקו; לא נבדק חי. נשארו: `moach/[pid]/edit`, `negotiation/[id]` ו-`/api/send` (B9), N5, ובדיקה חיה בשני דפדפנים של הטיימרים והצ'אט. קובץ המעקב: [`REALTIME_TRACKING.md`](./REALTIME_TRACKING.md).
 > **קשור:** [`SPEC_SOCKET_REALTIME.md`](../tbd/SPEC_SOCKET_REALTIME.md) (presence / typing / עריכה
 > במקביל — **מחוץ** לתכנית הזאת, ראו R6), [`../inprogress/MIGRATION_TRACKING.md`](../inprogress/MIGRATION_TRACKING.md)
 > (כתיבות שעדיין עוקפות את ה-Action System — הן בלתי נראות לסוקט בכלל),
@@ -244,10 +244,12 @@ realtime?: {
 | **R3** | דפים, גל 1 — שיתופיים ושימושיים: `/lev`, `/hub`, `moach/[pid]/{main,kanban,gantt,acts,progress,sales,split,open,votes}`, `deals/[id]`, `wish/[id]`, `concierge/[id]`, `negotiation/[id]`, `project/[id]`. | R2 |
 | **R4** | actions לפי תחום — ובכל קובץ שנפתח גם ההתראות לבני אדם (§6.4), לפי סדר ההשפעה על משתמשים: **vote + archive** (זרימות הסכמה — "שתיקה היא הסכמה" דורשת שכולם יראו את הגרסה העומדת) → **wish + deal** (פינג-פונג מו"מ, QA C-9) → **mission / act / timer** → **money** → **stipend / shift** → **resource / product** → **process / maagad / user** → meeting / chat → planning / assistant / library. ✓ 2026-10-11 | R1 (וכדאי R3 לתחום) |
 | **R5** | דפים, גל 2 (השאר) + timegrama: maturation בשתיקה מפרסם scopes (B9). ואז **הסרת `invalidate(() => true)`** (B2) ו-`fullRefresh` המשודר. | כל דפי ה-⚪ מכוסים |
-| **R6** | ניקוי: ה-patchers של `partialUpdate` ב-`levSocketHandler`, `updateStrategies.ts`, רשימות `VOTE_TYPES` המקומיות, המאזין של `moach/+layout`. `metadata.type` נשאר רק ל-toast ולפגישה. | R5 |
+| **R6** | ניקוי: ה-patchers של `partialUpdate` ב-`levSocketHandler`, `updateStrategies.ts`, רשימות `VOTE_TYPES` המקומיות, המאזין של `moach/+layout`. `metadata.type` נשאר רק ל-toast ולפגישה. ✓ 2026-10-11 | R5 |
 | *(נפרד)* | presence / typing / editing-lock / project rooms — `SPEC_SOCKET_REALTIME.md`. | R6 |
 
 **נבנה (R3, 2026-10-10):** דפי load מצהירים `depends(rtKey(…))` (`rtKey` מחזיר עכשיו טיפוס `rt:${string}`, כך שהוא מתאים לחתימה של `depends`); דפי `onMount` משתמשים ב-`useRealtime`; דפי moach שקוראים מה-store מקבלים את מתאם moach. שתי מסקנות: (1) לוח "פתוח לשותפים" קרא מה-load ולא מה-store, ולכן גם הרענון של `missions` לא היה מגיע אליו; (2) לשונית המטלות קוראת מ-`base`, אז `act` מנותב גם ל-`base`. `negotiation/[id]` נדחה: `Negotiation` לא באוצר ונכתב דרך `/api/send`. בבדיקה ידנית ב-vite dev — `import()` של `bus.svelte.ts` חייב את אותו `?t=` שהאפליקציה טענה, אחרת נוצר מופע שני של ה-bus ושום מתאם לא מקבל.
+
+**נבנה (R6, 2026-10-11):** כל מאזין `notification` שרענן מסך הוסר; מה שמרענן מסך עובר רק ב-`rt:changed`. שני מסלולים לא היו מכוסים ב-bus ועברו אליו: רשימת הטיימרים של המשתמש (`timer:<me>`, `$lib/stores/timers.js`) והצ'אט בקלפי הלב (`forum:*`, `$lib/stores/pendMisMes.js`). מה-`levSocketHandler` נשארו רק שני ה-patchers שהקלף המצביע מריץ על עצמו (`$lib/utils/levVotePatch.ts`) — עדכון אופטימי מקומי, לא סוקט. ה-orchestrator מנקה את `updateStrategy` מכל התראה, ו-`socketClient` לא מריץ אסטרטגיות. N7 נסגר: הבשלת מלגה בשתיקה מודיעה דרך `serverNotifier`, ה-orchestrator המשותף, שזמין לכל קוד שרת שכותב מחוץ ל-action — וזה המסלול ל-N5.
 
 **סדר ההסרה חשוב:** `invalidate(() => true)` הוא היום הדבר **היחיד** שמרענן את 39 דפי ה-⚪.
 להסיר אותו רק אחרי שכל דף ⚪ מכוסה ב-`depends('rt:…')` — אחרת דפים שמתעדכנים היום "במקרה"
@@ -357,5 +359,5 @@ config מצהיר **מה ההתראה מבקשת מהקורא**, והערוצי�
 
 - **N5** — הבשלה בשתיקה (timegrama) לא מודיעה לאף אחד. נכנס ל-R5 יחד עם ה-scopes של timegrama:
   ההבשלה מודיעה לצדדים (`outcome`, ול-bilateral `personal`).
-- **N7** — נתיבי ההתראה הישנים (`/api/nutiUser`, `/api/nutifyPm`, `HalukaNotificationService`, …) נמחקים ב-R6.
+- **N7** — נתיבי ההתראה הישנים (`/api/nutiUser`, `/api/nutifyPm`, `HalukaNotificationService`, …) נמחקים ב-R6. ✓ 2026-10-11
 - **N9** — השתקת רקמה: כשתיבנה, היא חלה על `ambient` / `outcome` / `personal`. השתקת `consent` — הכרעה פתוחה.

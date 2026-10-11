@@ -1,7 +1,6 @@
 import { sendToSer } from '$lib/send/sendToSer.js';
-import { io } from 'socket.io-client';
 import { get, writable } from 'svelte/store';
-import { socketClient } from '$lib/stores/socketClient';
+import { realtimeBus } from '$lib/realtime/bus.svelte';
 import { uPic } from '$lib/stores/uPic.js';
   const baseUrl = import.meta.env.VITE_URL
 
@@ -26,29 +25,31 @@ export const newChat = writable({
   id: 0,
   md: { mbId:0, pid:0}
 });
-export function initialWebS(token, id) {
-  console.log('🔌 [pendMisMes] Setting up unified chat notification listener', id);
-  
-  // Register notification listener for real-time chat updates
-  return socketClient.onNotification((notification) => {
-    // Check if it's a chat message notification
-    const n = notification;
-    const isChatMessage = 
-      n.actionKey === 'createChatMessage' || 
-      n.metadata?.type === 'chatMessage' ||
-      (n.updateStrategy && n.updateStrategy.config?.dataKeys?.includes('chat'));
+let forumUnsubscribe = null;
 
-    if (isChatMessage) {
-      const forumId = n.metadata?.forumId || 
-                     (n.updateStrategy && n.updateStrategy.config?.forumId);
-      
-      if (forumId) {
-        console.log('💬 [pendMisMes] Refreshing chat data for forum:', forumId);
-        // Targeted refresh for the specific forum
-        initialForum(false, [String(forumId)], id);
+/**
+ * Re-read the forums a chat message landed in. `createChatMessage` declares
+ * `forum:<id>` to the forum's participants (PLAN_REALTIME_MIGRATION R6); after
+ * the socket was down every forum is read again. Idempotent — both route-group
+ * layouts call it, and a second call replaces the first subscription.
+ */
+export function listenForForumChanges(id) {
+  forumUnsubscribe?.();
+  forumUnsubscribe = realtimeBus.subscribe(['forum:*'], async (batch) => {
+    if (batch.resync) {
+      await initialForum(true, [], id);
+      return;
+    }
+    const ids = new Set();
+    for (const change of batch.changes) {
+      for (const s of change.scopes) {
+        const [entity, fid] = s.split(':');
+        if (entity === 'forum' && fid) ids.add(fid);
       }
     }
+    if (ids.size) await initialForum(false, [...ids], id);
   });
+  return forumUnsubscribe;
 }
 export async function initialForum (all = false,ids = [],myId = 0){
   const idsToFetch = [];

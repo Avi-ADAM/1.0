@@ -1,11 +1,10 @@
 ﻿<script lang="ts">
   import { isRtl, t } from '$lib/translations';
   import { page } from '$app/state';
-  import { afterNavigate, invalidate } from '$app/navigation';
-  import { onDestroy, onMount } from 'svelte';
+  import { afterNavigate } from '$app/navigation';
+  import { onMount } from 'svelte';
   import { toast } from 'svelte-sonner';
   import ForumInboxList from '$lib/components/forum/ForumInboxList.svelte';
-  import { socketClient } from '$lib/stores/socketClient';
   import { forumStore } from '$lib/stores/forumStore';
 
   type ForumSummary = {
@@ -40,7 +39,6 @@
   } = $props();
 
   let query = $state('');
-  let socketUnsubscribe: (() => void) | null = null;
   let lastBlockedUrl = '';
 
   let selectedId = $derived(page.params.forumId ? String(page.params.forumId) : null);
@@ -116,24 +114,8 @@
   onMount(() => {
     seedForums();
     showBlockedNotice();
-    socketClient.connect(data.uid);
-    socketUnsubscribe = socketClient.onNotification((notification) => {
-      const forumId =
-        notification.metadata?.forumId ||
-        (notification.updateStrategy && notification.updateStrategy.config?.forumId);
-      const isChatMessage =
-        notification.actionKey === 'createChatMessage' ||
-        notification.metadata?.type === 'chatMessage';
-
-      if (isChatMessage) {
-        invalidate('app:forums');
-        if (forumId) invalidate(`app:forum:${forumId}`);
-      }
-    });
-  });
-
-  onDestroy(() => {
-    socketUnsubscribe?.();
+    // A new message re-runs the inbox and the open thread through their
+    // `depends(rt:forum:…)` (PLAN_REALTIME_MIGRATION R6) — nothing to listen to here.
   });
 </script>
 

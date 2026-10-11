@@ -679,7 +679,7 @@
   let msdonf = $derived(hoursdon * 3600000);
   // Local mutable copy of tasks for optimistic UI updates.
   // For the sender: tasks prop doesn't change (excludeSender:true) → optimistic update persists.
-  // For receivers: levSocketHandler updates mtahaStore → tasks prop changes → $effect syncs here.
+  // For receivers: the realtime bus re-reads the mtaha slice (act:<id>) → tasks prop changes → $effect syncs here.
   let localTasks = $state([...tasks]);
   $effect(() => {
     localTasks = [...tasks];

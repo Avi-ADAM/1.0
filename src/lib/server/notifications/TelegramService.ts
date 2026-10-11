@@ -2,7 +2,7 @@
  * TelegramService
  * 
  * Handles Telegram notification sending for the unified action system.
- * Integrates with existing sendBolkTelegram infrastructure.
+ * Posts to the bot relay (/api/ste) for each recipient with a telegramId.
  */
 
 import type { ActionContext } from '../actions/types';

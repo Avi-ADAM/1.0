@@ -70,7 +70,7 @@ const voteOnAskmHandler: ActionExecutionHandler = async (params, context, { stra
 
   return {
     data: { askmId, what: voteWhat, order: voteOrder },
-    // The other members' askm cards re-read their slice (socket → levSocketHandler).
+    // The other members' askm cards re-read their slice through realtime (decision:askm:<id>).
     updateStrategy: { type: 'refetchScope', config: { dataKeys: ['askedResources'], projectId: String(projectId) } },
   };
 };

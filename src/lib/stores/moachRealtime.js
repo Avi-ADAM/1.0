@@ -1,39 +1,9 @@
 /**
- * Which moach cache sections a socket notification touches.
+ * The dependency key the moach layout load declares — the moach realtime
+ * adapter invalidates it to re-read `base` (`$lib/realtime/adapters/moach.ts`).
  *
- * Interim mapping for REALTIME_TRACKING R0/B4: the moach layout used to pass
- * `metadata.type` straight to `moachStore.invalidate`, but most types
- * (`sheirutUpdate`, `ratsonProposal`, …) are not sections, so nothing happened
- * at all. R2 replaces this with scopes declared by the actions themselves.
+ * The notification-type mapping that lived here (`VOTE_TYPES`,
+ * `sectionsForNotification`) was the interim router of R0; the scopes the
+ * actions declare replaced it (PLAN_REALTIME_MIGRATION R6).
  */
-
-/** The sections `moachStore` caches per rikma. */
-export const MOACH_SECTIONS = /** @type {const} */ (['base', 'missions', 'financials']);
-
-/** Vote kinds — a consensus can create a mission/resource or change the rikma's details. */
-export const VOTE_TYPES = ['pendmVote', 'pmashVote', 'maapVote', 'decisionVote', 'voteUpdate'];
-
-/**
- * @param {string | null | undefined} type `metadata.type` (or `data.type`) of the notification
- * @returns {Array<'base' | 'missions' | 'financials'>}
- */
-export function sectionsForNotification(type) {
-  if (type && VOTE_TYPES.includes(type)) return ['base', 'missions', 'financials'];
-  if (type && /** @type {readonly string[]} */ (MOACH_SECTIONS).includes(type)) {
-    return [/** @type {'base' | 'missions' | 'financials'} */ (type)];
-  }
-  return ['base', 'missions'];
-}
-
-/**
- * The rikma a notification belongs to, or null when it does not say.
- * @param {any} notification
- * @returns {string | null}
- */
-export function notificationProjectId(notification) {
-  const pid = notification?.actionParams?.projectId ?? notification?.data?.projectId;
-  return pid == null || pid === '' ? null : String(pid);
-}
-
-/** The dependency key the moach layout load declares — invalidated to re-read `base`. */
 export const moachBaseKey = (/** @type {string | number} */ pid) => `app:moach:${pid}`;

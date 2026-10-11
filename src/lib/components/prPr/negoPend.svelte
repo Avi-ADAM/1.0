@@ -13,7 +13,7 @@
   import { toast } from 'svelte-sonner';
   import Rich from '../conf/rich.svelte';
   import { submitNegoMash } from '$lib/client/actionClient';
-  import { updatePmashesStore } from '$lib/utils/levSocketHandler';
+  import { updatePmashesStore } from '$lib/utils/levVotePatch';
   import { onMount } from 'svelte';
   import { fetchBridgeResolution, openNegoBridge, readNegoBridgeReturn } from '$lib/func/negoBridge.js';
 

@@ -2,12 +2,11 @@ import { browser } from '$app/environment';
 import { goto } from '$app/navigation';
 import { sendToSer } from '$lib/send/sendToSer.js';
 import { writable, get } from 'svelte/store';
-import { socketClient } from '$lib/stores/socketClient';
+import { realtimeBus } from '$lib/realtime/bus.svelte';
 
 let currentUid = null;
 let currentFetch = null;
-let fetchTimeout = null; // Add a variable to hold the timeout ID
-let timerUnsubscribe = null; // For unsubscribing from notifications
+let timerUnsubscribe = null; // The realtime subscription
 
 // ===== Edit Lock System =====
 // Prevents remote socket updates from overwriting locally-edited timers
@@ -58,77 +57,35 @@ export function isTimerLocked(missionId) {
 }
 
 /**
- * Initialize timer updates listener using the new socketClient.
- * This replaces the old WebSocket-based timer updates.
- * 
+ * Re-read this user's timers whenever any of their tabs or devices changes
+ * one. The timer actions declare `timer:<uid>` (PLAN_REALTIME_MIGRATION R6); the
+ * bus drops this tab's own echo, batches a burst into one change, and resyncs
+ * after the socket was down.
+ *
  * @param {string} id - User ID
  * @param {Function} fetch - Fetch function for making HTTP requests
  * @returns {Function} Unsubscribe function to stop listening
  */
-export function initialWebSocketForTimer(id, fetch) {
+export function listenForTimerChanges(id, fetch) {
     currentUid = id;
     currentFetch = fetch;
 
-    // Clean up any existing subscription
     if (timerUnsubscribe) {
         timerUnsubscribe();
         timerUnsubscribe = null;
     }
+    if (!browser || !id) return () => {};
 
-    console.log('[Timers] Initializing timer updates listener for user:', id);
-
-    // Subscribe to notifications from the new socketClient
-    timerUnsubscribe = socketClient.onNotification((notification) => {
-        console.log('[Timers] Received notification:', notification);
-
-        // Check if this is a timer-related notification.
-        // Covers all timer events: 'timerUpdate' (start/stop/save) and
-        // 'timerEdit' (log edits / clear / task changes). Previously only
-        // 'timerUpdate' was handled, so parallel time-edits never synced.
-        const meta = notification.metadata || {};
-        const notificationType = meta.type;
-        const isTimerNotification =
-            typeof notificationType === 'string' && notificationType.startsWith('timer');
-
-        if (isTimerNotification) {
-            // Skip our own echo: if this notification originated from this very
-            // browser tab, we already applied the change optimistically. Other
-            // devices/tabs of the same user have a different clientId and still sync.
-            const myClientId =
-                typeof window !== 'undefined' ? window.__timerClientId : undefined;
-            if (meta.originClientId && myClientId && meta.originClientId === myClientId) {
-                console.log('[Timers] Ignoring self-originated timer echo');
-                return;
-            }
-
-            console.log('[Timers] Timer update notification received:', notificationType);
-
-            // Debounce the fetchTimers call to prevent multiple rapid fetches
-            if (fetchTimeout) {
-                clearTimeout(fetchTimeout);
-            }
-
-            fetchTimeout = setTimeout(() => {
-                if (currentUid && currentFetch) {
-                    console.log('[Timers] Refreshing timers after notification');
-                    fetchTimers(currentUid, currentFetch, { isRemoteUpdate: true });
-                } else {
-                    console.error('[Timers] Cannot reload timers: uid or fetch not available.');
-                }
-                fetchTimeout = null;
-            }, 300);
+    timerUnsubscribe = realtimeBus.subscribe([`timer:${id}`], () => {
+        if (currentUid && currentFetch) {
+            fetchTimers(currentUid, currentFetch, { isRemoteUpdate: true });
         }
     });
 
-    // Return unsubscribe function for cleanup
     return () => {
         if (timerUnsubscribe) {
             timerUnsubscribe();
             timerUnsubscribe = null;
-        }
-        if (fetchTimeout) {
-            clearTimeout(fetchTimeout);
-            fetchTimeout = null;
         }
     };
 }
@@ -141,10 +98,6 @@ export function cleanupTimerListener() {
     if (timerUnsubscribe) {
         timerUnsubscribe();
         timerUnsubscribe = null;
-    }
-    if (fetchTimeout) {
-        clearTimeout(fetchTimeout);
-        fetchTimeout = null;
     }
     currentUid = null;
     currentFetch = null;

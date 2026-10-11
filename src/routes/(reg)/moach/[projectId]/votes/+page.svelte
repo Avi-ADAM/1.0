@@ -2,10 +2,9 @@
   import { page } from '$app/state';
   import { lang } from '$lib/stores/lang.js';
   import { sendToSer } from '$lib/send/sendToSer.js';
-  import { onMount, onDestroy } from 'svelte';
+  import { onMount } from 'svelte';
   import Spinner from '$lib/celim/Spinner.svelte';
   import { goto } from '$app/navigation';
-  import { socketClient } from '$lib/stores/socketClient';
   import { standingVotes } from '$lib/finiapruval/rounds';
   import { isHoursApproval } from '$lib/finiapruval/kind';
   import { useRealtime } from '$lib/realtime/bus.svelte';
@@ -39,38 +38,12 @@
     }
   }
 
-  // Realtime: refresh the open-votes list whenever a vote lands for this project.
-  const VOTE_TYPES = [
-    'pendmVote',
-    'pmashVote',
-    'maapVote',
-    'decisionVote',
-    'voteUpdate',
-    'finiapruvalVote',
-    'finiapruvalCounter'
-  ];
-  let socketUnsub;
-
   onMount(() => {
     loadVotes();
-    socketUnsub = socketClient.onNotification((n) => {
-      const type = n?.metadata?.type || n?.data?.type;
-      const notifProjectId = n?.actionParams?.projectId || n?.data?.projectId;
-      if (
-        notifProjectId &&
-        String(notifProjectId) === String(projectId) &&
-        type &&
-        VOTE_TYPES.includes(type)
-      ) {
-        loadVotes();
-      }
-    });
   });
 
-  onDestroy(() => socketUnsub?.());
-
   // What actions declare they changed: a vote of this rikma opened, moved or
-  // closed (PLAN_REALTIME_MIGRATION §3.4). The listener above stays until R6.
+  // closed (PLAN_REALTIME_MIGRATION §3.4).
   useRealtime(
     () => [`project:${projectId}`],
     (batch) => {

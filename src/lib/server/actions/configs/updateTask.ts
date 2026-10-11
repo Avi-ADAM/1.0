@@ -110,7 +110,7 @@ export const updateTaskAction: ActionConfig = {
   updateStrategy: {
     type: 'partialUpdate',
     config: {
-      dataKeys: ['tasks'] // task update — handled by levSocketHandler + component subscription
+      dataKeys: ['tasks'] // the acting tab; everyone else re-reads through realtime act:<id>
     }
   },
 

@@ -6,7 +6,7 @@ import type { LayoutServerLoad } from './$types';
 
 export const load: LayoutServerLoad = async ({ params, fetch, depends }) => {
   const { projectId } = params;
-  // The layout's socket listener re-reads `base` through this (moachRealtime.js).
+  // The moach realtime adapter re-reads `base` through this ($lib/realtime/adapters/moach.ts).
   depends(moachBaseKey(projectId));
 
   const res: any = await sendToSer({ pid: projectId }, 'getProjectBaseInfoWithAuth', 0, 0, false, fetch);

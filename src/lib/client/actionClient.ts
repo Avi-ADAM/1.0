@@ -899,9 +899,9 @@ async function executeUpdateStrategy(
         break;
 
       case 'refetchScope':
-        // Lev slices, not page loads: the lev page's socket listener
-        // (levSocketHandler) re-reads them for every member the action's
-        // notification reaches. The acting card has already updated itself.
+        // Lev slices, not page loads: every other screen re-reads them from
+        // the action's realtime scopes ($lib/realtime/adapters/lev.ts). The
+        // acting card has already updated itself.
         break;
 
       case 'none':
