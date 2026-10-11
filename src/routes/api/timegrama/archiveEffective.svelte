@@ -10,13 +10,21 @@
   import { SendToAdmin } from '$lib/server/sendToAdmin.js';
   // Server-only secret — this module is imported only by timegrama/+server.js.
   import { env } from '$env/dynamic/private';
+  import { tellMatured } from '$lib/server/notifications/matured';
+  import { archiveTookEffect } from '$lib/server/notifications/maturedNotices';
+
+  // The field on each target that names its rikma (STRAPI_SCHEMA_REFERENCE).
+  const PROJECT = {
+    mashabetahalich: 'project',
+    matanot: 'projectcreates'
+  };
 
   const MUTATION = {
     mashabetahalich: 'updateMashabetahalich',
     matanot: 'updateMatanot'
   };
 
-  export async function ArchiveEffective(id, taid, whatami) {
+  export async function ArchiveEffective(id, taid, whatami, fetch) {
     const mutation = MUTATION[whatami];
 
     try {
@@ -26,7 +34,8 @@
         // Re-read rather than trusting the schedule: during the cycle the rikma
         // may have countered with `keep`, which returns the object to active.
         const q = `{ ${whatami}(id: ${id}) { data { id attributes {
-          lifecycle archiveEffectiveFrom
+          lifecycle archiveEffectiveFrom name
+          ${PROJECT[whatami]} { data { id } }
         } } } }`;
         const res = await SendToAdmin(q, env.ADMINMONTHER);
         const a = res?.data?.[whatami]?.data?.attributes;
@@ -42,6 +51,16 @@
           await SendToAdmin(
             `mutation { ${mutation}(id: ${id}, data: { lifecycle: archived }) { data { id } } }`,
             env.ADMINMONTHER
+          );
+          // The date the rikma agreed to came — tell it (N5).
+          const rel = a[PROJECT[whatami]]?.data;
+          await tellMatured(
+            archiveTookEffect({
+              projectId: Array.isArray(rel) ? rel[0]?.id : rel?.id,
+              name: a.name ?? '',
+              kind: whatami
+            }),
+            fetch
           );
           console.log(`[timegrama/archiveEffective] ${whatami} ${id} archived at end of cycle`);
         }

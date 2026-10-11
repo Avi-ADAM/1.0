@@ -30,6 +30,8 @@
   import { SendToAdmin } from '$lib/server/sendToAdmin.js';
   // Server-only secret — this module is imported only by timegrama/+server.js.
   import { env } from '$env/dynamic/private';
+  import { tellMatured } from '$lib/server/notifications/matured';
+  import { askwantApproved } from '$lib/server/notifications/maturedNotices';
 
   /** Close the clock. Every path that decides not to act ends here. */
   async function markDone(taid, why) {
@@ -44,7 +46,7 @@
     }
   }
 
-  export async function Askwant(id, taid) {
+  export async function Askwant(id, taid, fetch) {
     try {
       const res = await strapi.execute('298getAskwantForFinalize', { id: String(id) });
       const row = res?.data?.askwant?.data;
@@ -101,6 +103,9 @@
         wantId,
         created
       });
+      // Silence completed it — tell the one who asked (N5). Not on a retry that
+      // found the subscription already written: they heard the first time.
+      if (created) await tellMatured(askwantApproved({ requesterId: askerId, name: sheirut.attributes?.name }), fetch);
       await markDone(taid, `askwant ${id} matured on silence`);
     } catch (e) {
       // Deliberately left open: this is the write that subscribes a person to a

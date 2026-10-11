@@ -13,13 +13,27 @@
   import { env } from '$env/dynamic/private';
   import { execFromAdmin } from '$lib/server/archive/exec.js';
   import { openDormancyProposal } from '$lib/server/archive/dormancyClock.js';
+  import { tellMatured } from '$lib/server/notifications/matured';
+  import { dormancyOpened } from '$lib/server/notifications/maturedNotices';
 
-  export async function Dormancy(id, taid) {
+  export async function Dormancy(id, taid, fetch) {
     const exec = execFromAdmin(SendToAdmin, env.ADMINMONTHER);
 
     try {
       const outcome = await openDormancyProposal(exec, String(id));
       console.log('[timegrama/dormancy] mission', id, outcome);
+      // A release proposal opened that waits on the assignee and the rikma (N5).
+      if (outcome.opened) {
+        await tellMatured(
+          dormancyOpened({
+            projectId: outcome.projectId,
+            decisionId: outcome.decisionId,
+            name: outcome.missionName ?? '',
+            ownerId: outcome.ownerId
+          }),
+          fetch
+        );
+      }
       // "active-after-all" re-armed its own clock inside openDormancyProposal,
       // so closing this firing is right in every branch.
     } catch (e) {

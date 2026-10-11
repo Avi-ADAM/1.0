@@ -9,6 +9,8 @@
   import { commitmentForAsk, setMissionCommitment } from '$lib/server/shifts/store.js';
   import { strapiClient } from '$lib/server/actions';
   import { loadCandidacyDeal, fillOfferIntoDeal } from '$lib/server/deal/offerDeal';
+  import { tellMatured } from '$lib/server/notifications/matured';
+  import { askAccepted, askOfferLapsed } from '$lib/server/notifications/maturedNotices';
 
   /** Admin qid runner for the deal of a candidacy (QA C-19). */
   const runAdmin = (qid, vars) => strapiClient.execute(qid, vars);
@@ -25,7 +27,7 @@
     vots{what order users_permissions_user {data {id}}}
     project{data{id attributes{ user_1s{data{id}}}}}
     users_permissions_user{data{id attributes{username}}}
-    open_mission{data{id attributes{isRishon rishon{data{id}}}}}
+    open_mission{data{id attributes{name isRishon rishon{data{id}}}}}
     negopendmissions(sort: "ordern:desc"){data{attributes{
       ordern proposedBy name descrip hearotMeyuchadot noofhours perhour date dates
       tafkidims{data{id}}
@@ -97,6 +99,15 @@
             ){data{id}}
           }`;
           await SendToAdmin(reopen, env.ADMINMONTHER).catch((e) => console.error(e));
+          // Their silence was not a yes — tell them so, and the rikma that it is free again (N5).
+          await tellMatured(
+            askOfferLapsed({
+              projectId: a.project?.data?.id,
+              name: omMeta?.name ?? '',
+              takerId
+            }),
+            fetch
+          );
           await markDone(taid);
           return;
         }
@@ -323,6 +334,17 @@ updateOpenMission(
           await SendToAdmin(nextquery, env.ADMINMONTHER).catch((e) => console.error(e));
         }
       }
+
+      // Silence did this — tell the rikma and the one it now belongs to (N5).
+      await tellMatured(
+        askAccepted({
+          projectId,
+          name: fName ?? '',
+          takerId: takerUser.id,
+          takerName: takerUser.attributes?.username
+        }),
+        fetch
+      );
 
       await markDone(taid);
       return 'sucsses' + id;

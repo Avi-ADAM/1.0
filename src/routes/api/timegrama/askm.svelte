@@ -11,8 +11,10 @@
   import { runResourceAskmAcceptance } from '$lib/server/actions/helpers/runResourceAskmAcceptance';
   import { computeNegoGate, normId } from '$lib/server/nego/negoGate';
   import { loadCandidacyDeal } from '$lib/server/deal/offerDeal';
+  import { tellMatured } from '$lib/server/notifications/matured';
+  import { askmAccepted } from '$lib/server/notifications/maturedNotices';
 
-  export async function Askm(id, taid) {
+  export async function Askm(id, taid, fetch) {
     console.log(id, taid, 'askm finalizer started');
 
     try {
@@ -92,6 +94,9 @@
       // Sibling candidates' askms on the same (now archived) resource are
       // archived inside runResourceAskmAcceptance (shared with the direct
       // member-approve path), so no separate sibling loop is needed here.
+
+      // Silence did this — tell the rikma and the one who brings it (N5).
+      await tellMatured(askmAccepted({ projectId, name, takerId }), fetch);
 
       await strapi.execute('mrSetTimegramaDone', { id: String(taid), done: true }).catch(() => null);
       console.log('askm finalizer: approved', id);

@@ -40,6 +40,8 @@
   import { SendToAdmin } from '$lib/server/sendToAdmin.js';
   // Server-only secret — this module is imported only by timegrama/+server.js.
   import { env } from '$env/dynamic/private';
+  import { tellMatured } from '$lib/server/notifications/matured';
+  import { maapSettled } from '$lib/server/notifications/maturedNotices';
 
   /** Close the clock. Every path that decides not to settle ends here. */
   async function markDone(taid, why) {
@@ -59,7 +61,7 @@
     return v == null ? null : String(v);
   };
 
-  export async function Maap(id, taid) {
+  export async function Maap(id, taid, fetch) {
     try {
       const res = await strapi.execute('151getMaapForVote', { id: String(id) });
       const maap = res?.data?.maap?.data;
@@ -150,6 +152,8 @@
         rikmashId,
         round
       });
+      // Silence did this — tell the rikma (N5).
+      await tellMatured(maapSettled({ projectId, name: attrs.name ?? mashAttrs.name ?? '' }), fetch);
       // settleCycleMaap closed the clock; this is the belt-and-braces for the
       // case where that one write failed.
       await markDone(taid, `maap ${id} settled on silence`);

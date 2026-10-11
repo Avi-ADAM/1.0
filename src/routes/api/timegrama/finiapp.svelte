@@ -7,6 +7,8 @@
   import { pickRateRow, resolveRate, rowRate } from '$lib/timers/rate.js';
   import { standingVotes } from '$lib/finiapruval/rounds.js';
   import { isHoursApproval } from '$lib/finiapruval/kind.js';
+  import { tellMatured } from '$lib/server/notifications/matured';
+  import { finiapprovalMatured } from '$lib/server/notifications/maturedNotices';
 
   // Free-text the user typed (`why`, `missname`) goes into an inline mutation
   // string, so it has to be escaped. An unescaped quote or newline breaks the
@@ -29,7 +31,7 @@
     }
   }
 
-  export async function finiapp(id, taid) {
+  export async function finiapp(id, taid, fetch) {
     console.log('finiapp auto-close', id);
     const d = new Date();
 
@@ -171,7 +173,14 @@
 
       const res2 = await SendToAdmin(closeMutation, env.ADMINMONTHER);
       console.log('finiapp close result', res2);
-      if (res2?.data) return 'sucsses' + id;
+      if (res2?.data) {
+        // Silence did this — tell the rikma, as the explicit vote does (N5).
+        await tellMatured(
+          finiapprovalMatured({ projectId, name: fa.missname ?? '', hours: noofhours, isHours: isTimerSave }),
+          fetch
+        );
+        return 'sucsses' + id;
+      }
 
     } catch (e) {
       console.error('finiapp error', e);

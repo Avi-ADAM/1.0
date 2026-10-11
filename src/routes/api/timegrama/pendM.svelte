@@ -4,6 +4,8 @@
      import { env } from '$env/dynamic/private';
      import { strapiClient } from '$lib/server/actions/index.js';
      import { matchOpenMashaabimToUsers } from '$lib/server/matching/engine';
+     import { tellMatured } from '$lib/server/notifications/matured';
+     import { pmashOpened } from '$lib/server/notifications/maturedNotices';
 
 /** Close the clock. Every path that decides not to act ends here. */
 async function markDone(taid, why) {
@@ -104,6 +106,15 @@ export async function PendM(id,taid,fetchFn){
                   fetch: fetchFn || fetch
                 });
               }
+
+              // Silence did this — tell the rikma (N5).
+              await tellMatured(
+                pmashOpened({
+                  projectId: res2.data.pmash.data.attributes.project.data.id,
+                  name: res2.data.pmash.data.attributes.name ?? ''
+                }),
+                fetchFn || fetch
+              );
 
               //update timegrama to done
               let que4 = `mutation { 

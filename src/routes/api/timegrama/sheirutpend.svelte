@@ -30,6 +30,8 @@
   import { settleQuote } from '$lib/server/actions/configs/sheirutQuote';
   // Server-only secret — this module is imported only by timegrama/+server.js.
   import { env } from '$env/dynamic/private';
+  import { tellMatured } from '$lib/server/notifications/matured';
+  import { quoteMatured, sheirutApproved } from '$lib/server/notifications/maturedNotices';
 
   /** Close the clock. Every path that decides not to act ends here. */
   async function markDone(taid, why) {
@@ -49,7 +51,7 @@
    * table stands unless someone objected to it. The original request alone
    * never matures — a shop is not bound by an order it never answered.
    */
-  async function QuoteSilence(id, taid) {
+  async function QuoteSilence(id, taid, fetch) {
     const q = await loadQuote(strapi, String(id));
     if (!q) return markDone(taid, `sheirutpend ${id} no longer exists`);
     if (q.closed) return markDone(taid, `sheirutpend ${id} already closed`);
@@ -57,6 +59,11 @@
     if (outcome.action === 'close') return markDone(taid, `sheirutpend ${id}: ${outcome.why}`);
     // Left open on failure (the catch in Sheirutpend): this is an agreement.
     await settleQuote(q, {}, { strapi });
+    // Silence did this — tell the customer and the rikma (N5).
+    await tellMatured(
+      quoteMatured({ projectId: q.projectId, productName: q.productName, customerId: q.customerId }),
+      fetch
+    );
     console.log('[timegrama/sheirutpend] quote matured on silence', {
       sheirutpendId: id,
       order: q.state.order,
@@ -65,7 +72,7 @@
     return markDone(taid, `sheirutpend ${id} quote round ${q.state.order} matured on silence`);
   }
 
-  export async function Sheirutpend(id, taid) {
+  export async function Sheirutpend(id, taid, fetch) {
     try {
       const res = await strapi.execute('295getSheirutpendForFinalize', { id: String(id) });
       const row = res?.data?.sheirutpend?.data;
@@ -81,7 +88,7 @@
       if (!sheirut) {
         // A customer's product request, not a service proposal: its clock is
         // the price quote's (docs/inprogress/PLAN_CONCIERGE_LOCAL_PROVIDERS.md §6).
-        return QuoteSilence(id, taid);
+        return QuoteSilence(id, taid, fetch);
       }
       if (sheirut.attributes?.archived === true) {
         return markDone(taid, `sheirutpend ${id}: sheirut ${sheirut.id} was archived`);
@@ -122,6 +129,11 @@
         sheirutId,
         name: sheirut.attributes?.name
       });
+      // Silence did this — tell the rikma (N5).
+      await tellMatured(
+        sheirutApproved({ projectId: a.project?.data?.id, name: sheirut.attributes?.name ?? '' }),
+        fetch
+      );
       await markDone(taid, `sheirutpend ${id} matured on silence`);
     } catch (e) {
       // Deliberately left open: this publishes a service the rikma agreed to.

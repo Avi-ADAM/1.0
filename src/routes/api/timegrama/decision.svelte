@@ -15,6 +15,15 @@
     funderHasSigned
   } from '$lib/server/stipend/apply.js';
   import { normalizeLicenseChange } from '$lib/codeLicense/codeLicense.js';
+  import { tellMatured } from '$lib/server/notifications/matured';
+  import {
+    decisionAwaitsCustomer,
+    objectChangeApplied,
+    rikmaDecisionApplied,
+    saleClaimMatured,
+    stipendApplied,
+    stipendAwaitsFunder
+  } from '$lib/server/notifications/maturedNotices';
 
   // GraphQL string-literal escaping for values interpolated into an inline
   // (non-parameterized) query — SendToAdmin takes a raw query string, no
@@ -130,7 +139,7 @@
     );
   }
 
-  export async function Decision(id, taid) {
+  export async function Decision(id, taid, fetch) {
     async function markDone() {
       try {
         await SendToAdmin(
@@ -145,10 +154,12 @@
     try {
       const q = `{
         decision(id: ${id}) { data { id attributes {
-          kind archived
+          kind archived decisionName
           negom { hm price kindOf sqadualed sqadualedf }
           sale { data { id attributes {
             in unit date startDate finishDate
+            users_permissions_user { data { id } }
+            reporter { data { id } }
             matanot { data { id attributes { quant } } }
           } } }
           projects { data { id } }
@@ -203,14 +214,21 @@
           return;
         }
         const round = standingRound(decision);
-        if (
-          extra &&
-          extra.needed(round) &&
-          clientsPendingOn(decision.vots, standingOrder(decision), extra.ids).length > 0
-        ) {
+        const pendingClients =
+          extra && extra.needed(round) ? clientsPendingOn(decision.vots, standingOrder(decision), extra.ids) : [];
+        if (pendingClients.length > 0) {
           console.log('[timegrama/decision] the rikma matured on silence; the version waits for the customer', {
             decisionId: id
           });
+          // The members' silence is done; hers is not consent — ask her (N5).
+          await tellMatured(
+            decisionAwaitsCustomer({
+              projectId: decision.projectId,
+              decisionName: decision.decisionName,
+              clientIds: pendingClients
+            }),
+            fetch
+          );
           return markDone();
         }
 
@@ -226,6 +244,17 @@
             lifecycle: applied.lifecycle,
             membershipEnded: applied.membershipEnded ?? null
           });
+          // Silence did this — tell the rikma, and whoever's membership ended with it (N5).
+          await tellMatured(
+            objectChangeApplied({
+              projectId: decision.projectId,
+              decisionId: id,
+              decisionName: decision.decisionName,
+              effectiveFrom: applied.effectiveFrom ?? null,
+              endedMemberId: applied.membershipEnded?.userId ?? null
+            }),
+            fetch
+          );
         } catch (e) {
           // Same rule as the stipend branch below: a proposal that failed to
           // apply is still standing, so the clock stays open and the next run
@@ -263,6 +292,15 @@
             '[timegrama/decision] stipend restime ran out but the funder never signed — left open',
             { decisionId: id, kind: a.kind, funderId: decision.funderId }
           );
+          // Everyone else's silence counted; the funder's would be paying by saying nothing (N5).
+          await tellMatured(
+            stipendAwaitsFunder({
+              projectId: decision.projectId,
+              decisionName: decision.decisionName,
+              funderId: decision.funderId
+            }),
+            fetch
+          );
           return markDone();
         }
         try {
@@ -273,6 +311,7 @@
             pledgeId: applied.pledgeId,
             programId: applied.programId
           });
+          await tellMatured(stipendApplied({ projectId: decision.projectId, decisionName: decision.decisionName }), fetch);
         } catch (e) {
           // Do **not** close the clock. A failed maturation is not "nothing to
           // act on" — it is a standing proposal that both sides agreed to and
@@ -303,6 +342,10 @@
         const hasNo = vots.some((v) => v.what === false);
         if (hasOk && !hasNo) {
           await applyDecisionKind(id, a);
+          await tellMatured(
+            rikmaDecisionApplied({ projectId: a.projects?.data?.[0]?.id, decisionId: id, decisionName: a.decisionName }),
+            fetch
+          );
         }
         return markDone();
       }
@@ -374,6 +417,16 @@
       await SendToAdmin(
         `mutation { updateDecision(id: ${id}, data: { archived: true }) { data { id } } }`,
         env.ADMINMONTHER
+      );
+
+      // A sale claim is bilateral: the reporter and the holder, nobody else (N5).
+      await tellMatured(
+        saleClaimMatured({
+          projectId: a.projects?.data?.[0]?.id,
+          holderId: sa.users_permissions_user?.data?.id,
+          reporterId: sa.reporter?.data?.id
+        }),
+        fetch
       );
 
       await markDone();

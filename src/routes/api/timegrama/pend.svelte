@@ -9,6 +9,8 @@
   import { shiftsEnabled } from '$lib/server/shifts/mode.js';
   import { asService } from '$lib/server/shifts/exec.js';
   import { activatePlanForPendm } from '$lib/server/shifts/store.js';
+  import { tellMatured } from '$lib/server/notifications/matured';
+  import { pendmOpened, pendmOfferedToAssignee } from '$lib/server/notifications/maturedNotices';
 //get by id
 //calculate votes
 //if no no create open mission
@@ -122,12 +124,13 @@ export async function Pend(id,taid,fetchFn){
                 );
               }
 
+              let offeredAskId = null;
               if (assigneeId != null) {
                 // Offer it to the assignee: an Ask carrying the rikma's yes
                 // votes, plus its own response window. Nothing is registered on
                 // their name until they agree (see nego/askAcceptance.ts).
                 if (newOpenMissionId) {
-                  await offerToAssignee({
+                  offeredAskId = await offerToAssignee({
                     openMissionId: newOpenMissionId,
                     projectId: res2.data.pendm.data.attributes.project.data.id,
                     assigneeId,
@@ -144,6 +147,18 @@ export async function Pend(id,taid,fetchFn){
                   fetch: fetchFn || fetch
                 });
               }
+
+              // Silence did this — tell the rikma, and the assignee whose answer it now waits for (N5).
+              const told = {
+                projectId: res2.data.pendm.data.attributes.project.data.id,
+                name: res2.data.pendm.data.attributes.name ?? ''
+              };
+              // The assignee hears of an offer only if one was actually opened.
+              const notices =
+                assigneeId != null
+                  ? pendmOfferedToAssignee({ ...told, assigneeId }).slice(0, offeredAskId ? 2 : 1)
+                  : pendmOpened(told);
+              await tellMatured(notices, fetchFn || fetch);
 
               //update timegrama to done
               await markDone(taid);
@@ -171,7 +186,8 @@ export async function Pend(id,taid,fetchFn){
  * an Ask seeded with the rikma's approving votes (so the members' side is
  * already on the table) and a fresh timegrama. The bilateral gate
  * (computeNegoGate with takerApplied:false) then holds it until the assignee
- * says yes, counters, or the window closes.
+ * says yes, counters, or the window closes. Returns the Ask's id, or null when
+ * none was opened.
  */
 async function offerToAssignee({ openMissionId, projectId, assigneeId, restime, votes, now }) {
   try {
@@ -204,7 +220,7 @@ async function offerToAssignee({ openMissionId, projectId, assigneeId, restime, 
     }`;
     const res = await SendToAdmin(que, env.ADMINMONTHER);
     const askId = res?.data?.createAsk?.data?.id;
-    if (!askId) return;
+    if (!askId) return null;
 
     await SendToAdmin(
       `mutation {
@@ -212,8 +228,10 @@ async function offerToAssignee({ openMissionId, projectId, assigneeId, restime, 
       }`,
       env.ADMINMONTHER
     );
+    return askId;
   } catch (e) {
     console.error('pend: failed to open the assignee candidacy', e);
+    return null;
   }
 }
 

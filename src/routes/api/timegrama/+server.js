@@ -35,6 +35,9 @@ import { shiftsEnabled, shiftsMode } from '$lib/server/shifts/mode.js';
 import { SendToAdmin } from '$lib/server/sendToAdmin.js';
 import { realtimeBroadcaster } from '$lib/server/actions/index.js';
 import { maturedScopes, relationSelection } from '$lib/server/realtime/timegramaScopes';
+import { projectIdsOf } from '$lib/realtime/scopes';
+import { tellMatured } from '$lib/server/notifications/matured';
+import { rosterClosed } from '$lib/server/notifications/maturedNotices';
 // Server-only secret — never exposed to the client bundle (no VITE_ prefix).
 import { env } from '$env/dynamic/private';
 
@@ -166,7 +169,7 @@ async function publishMatured(kind, scopes, fetch) {
 /** Run a clock's finalizer unless this process is already holding it. */
 async function runClaimed(id, kind, taid, fetch, scopes = []) {
   try {
-    await x(id, kind, taid, fetch);
+    await x(id, kind, taid, fetch, scopes);
     await publishMatured(kind, scopes, fetch);
   } finally {
     // Released either way: a finalizer that left the clock open (a failed
@@ -175,11 +178,14 @@ async function runClaimed(id, kind, taid, fetch, scopes = []) {
   }
 }
 
-async function x(id, kind, taid, fetch) {
+// Every finalizer gets `fetch`: a maturation tells the people it concerns
+// (N5, $lib/server/notifications/maturedNotices.ts), and the email fallback and
+// push go out through SvelteKit's fetch.
+async function x(id, kind, taid, fetch, scopes = []) {
   if (kind == 'ask') {
     await Ask(id, taid, fetch);
   } else if (kind == 'askm') {
-    await Askm(id, taid);
+    await Askm(id, taid, fetch);
   } else if (kind == 'pendm') {
     // fetch is passed through so the match-suggestion engine can
     // send "new suggestion" emails via the relative /api/sendMail.
@@ -187,17 +193,17 @@ async function x(id, kind, taid, fetch) {
   } else if (kind == 'pmash') {
     await PendM(id, taid, fetch);
   } else if (kind == 'finiapruval') {
-    await finiapp(id, taid);
+    await finiapp(id, taid, fetch);
   } else if (kind == 'decision') {
     // saleClaim silence-as-consent maturation (PLAN_sale_holder_consent)
-    await Decision(id, taid);
+    await Decision(id, taid, fetch);
   } else if (kind == 'mesimabetahalich') {
     // Dormancy clock (PLAN_OBJECT_ARCHIVAL): a mission nobody touched for
     // dormancyDays opens its own release proposal.
-    await Dormancy(id, taid);
+    await Dormancy(id, taid, fetch);
   } else if (kind == 'mashabetahalich' || kind == 'matanot') {
     // A recurring commitment archived "at end of cycle" — this is the day.
-    await ArchiveEffective(id, taid, kind);
+    await ArchiveEffective(id, taid, kind, fetch);
   } else if (kind == 'stipend_payment') {
     // "Did the stipend arrive?" — no answer within restime confirms it
     // (PLAN_STIPEND §6), which is what lets its equity lines count.
@@ -208,28 +214,30 @@ async function x(id, kind, taid, fetch) {
   } else if (kind == 'tosplit') {
     // A profit split nobody objected to within restime settles itself
     // (PLAN_TIMEGRAMA D5).
-    await Tosplit(id, taid);
+    await Tosplit(id, taid, fetch);
   } else if (kind == 'maap') {
     // A recurring month settles once the responsible member has signed it and
     // the rikma's restime has run out (PLAN_TIMEGRAMA D1).
-    await Maap(id, taid);
+    await Maap(id, taid, fetch);
   } else if (kind == 'sheirutpend') {
     // A proposed service nobody objected to joins the rikma's catalogue
     // (PLAN_TIMEGRAMA phase 4.3).
-    await Sheirutpend(id, taid);
+    await Sheirutpend(id, taid, fetch);
   } else if (kind == 'roster_period') {
     // The draft becomes the roster (PLAN_SHIFTS §7). Idempotent: the shifts
     // cron may have closed it already, and then this only closes the clock.
     try {
       const outcome = await matureRosterPeriod(String(id), { exec: asService(fetch), mode: shiftsMode() });
       if (outcome !== 'off') await markDone(taid, `roster period ${outcome}`);
+      // The roster's rikma rides in on the clock's scopes (B9).
+      if (outcome === 'closed') await tellMatured(rosterClosed({ projectId: projectIdsOf(scopes)[0] }), fetch);
     } catch (e) {
       console.error(`[timegrama] roster period #${id} failed:`, e);
     }
   } else if (kind == 'askwant') {
     // Someone asked to receive a service. Matures only once a member said yes
     // (PLAN_TIMEGRAMA D2).
-    await Askwant(id, taid);
+    await Askwant(id, taid, fetch);
   } else if (kind == 'ratson_proposal') {
     // The terms of a wish proposal nobody answered within the wish's pace: the version on
     // the table is approved for the side that stayed silent (C-9).

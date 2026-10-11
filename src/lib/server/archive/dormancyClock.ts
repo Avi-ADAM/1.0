@@ -84,6 +84,10 @@ export interface DormancyOutcome {
   opened: boolean;
   reason: string;
   decisionId?: string;
+  /** When a proposal opened: what the people it waits on need to be told (N5). */
+  projectId?: string | null;
+  missionName?: string;
+  ownerId?: string;
 }
 
 /**
@@ -145,5 +149,12 @@ export async function openDormancyProposal(
     'dormancy:mark',
   ).catch((e) => console.warn('[dormancy] marking archiveProposed failed (non-fatal):', e));
 
-  return { opened: true, reason: 'dormant', decisionId: opened.decisionId };
+  return {
+    opened: true,
+    reason: 'dormant',
+    decisionId: opened.decisionId,
+    projectId: target.projectId,
+    missionName: target.name,
+    ownerId: target.ownerId,
+  };
 }
