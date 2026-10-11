@@ -14,6 +14,7 @@ import {
   setBookingStatus,
   syncPanui
 } from '$lib/server/resources/bookingStore.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 const cancelResourceBookingHandler: ActionExecutionHandler = async (params, context) => {
   const { bookingId, spId, reason } = params;
@@ -44,5 +45,11 @@ export const cancelResourceBookingConfig: ActionConfig = {
     { type: 'jwt', errorMessage: 'Must be authenticated to cancel a resource booking' }
   ],
 
-  updateStrategy: { type: 'fullRefresh' }
+  updateStrategy: { type: 'fullRefresh' },
+
+  realtime: {
+    scopes: (p) =>
+      scopeList([scope('resource', p.spId)]),
+    audience: 'self',
+  },
 };

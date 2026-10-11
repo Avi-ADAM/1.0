@@ -10,6 +10,7 @@
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { bestEffort, releaseBookings } from '$lib/server/resources/bookingStore.js';
 import { execFromContext } from '$lib/server/archive/exec.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 const markResourceDoneHandler: ActionExecutionHandler = async (params, context, { strapi }) => {
   const { mashabetahalichId, spId, projectId } = params;
@@ -67,9 +68,15 @@ export const markResourceDoneConfig: ActionConfig = {
       title: { he: 'משאב חודשי הסתיים', en: 'Recurring resource closed', ar: 'تم إغلاق المورد المتكرر' },
       body: { he: 'משאב חודשי סומן כהושלם ונארכב', en: 'A recurring resource was marked done and archived', ar: '' },
     },
-    channels: ['socket'],
+    // Activity in the rikma, as today.
+    intent: 'ambient',
     metadata: { type: 'resourceDone', url: '/lev?project={{projectId}}' },
   },
 
   updateStrategy: { type: 'fullRefresh' },
+
+  realtime: {
+    scopes: (p) =>
+      scopeList([scope('project', p.projectId), scope('resource', p.mashabetahalichId)]),
+  },
 };

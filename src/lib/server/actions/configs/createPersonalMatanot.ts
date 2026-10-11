@@ -16,6 +16,7 @@
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { screenLabel } from '../../vocab/moderation.js';
 import { ensurePersonalRikmaFor } from './ensurePersonalRikma.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 const KINDS = ['total', 'monthly', 'yearly', 'daily', 'unlimited'] as const;
 
@@ -161,5 +162,10 @@ export const createPersonalMatanotConfig: ActionConfig = {
     newRikmaName: { type: 'string', required: false, description: 'Create a fresh rikma with this name to host the product' }
   },
   authRules: [{ type: 'jwt', errorMessage: 'Must be logged in' }],
-  updateStrategy: { type: 'none' }
+  updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (_p, r) =>
+      scopeList([scope('project', r?.data?.projectId), scope('product', r?.data?.matanotId)]),
+  },
 };

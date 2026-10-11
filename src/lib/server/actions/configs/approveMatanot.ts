@@ -7,6 +7,7 @@
  */
 
 import type { ActionConfig } from '../types.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 export const approveMatanotConfig: ActionConfig = {
   key: 'approveMatanot',
@@ -44,10 +45,16 @@ export const approveMatanotConfig: ActionConfig = {
         ar: 'المنتج متاح الآن للشراء'
       }
     },
-    channels: ['socket', 'push'],
+    // A rikma-wide result: the product is now on sale.
+    intent: 'outcome',
     metadata: {
       priority: 'normal',
       url: '/gift/{{id}}'
     }
-  }
+  },
+
+  realtime: {
+    scopes: (p) =>
+      scopeList([scope('project', p.projectId), scope('product', p.id)]),
+  },
 };

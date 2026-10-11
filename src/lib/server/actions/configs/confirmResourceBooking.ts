@@ -25,6 +25,7 @@ import {
   loadSpLedger
 } from '$lib/server/resources/bookingStore.js';
 import { freeWindows } from '$lib/resources/availability.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 const HORIZON_DAYS = 180;
 
@@ -73,5 +74,10 @@ export const confirmResourceBookingConfig: ActionConfig = {
     { type: 'jwt', errorMessage: 'Must be authenticated to confirm a resource booking' }
   ],
 
-  updateStrategy: { type: 'fullRefresh' }
+  updateStrategy: { type: 'fullRefresh' },
+
+  realtime: {
+    scopes: (p) =>
+      scopeList([scope('project', p.projectId), scope('resource', p.spId)]),
+  },
 };

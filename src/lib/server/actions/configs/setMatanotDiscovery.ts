@@ -1,4 +1,5 @@
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 /**
  * Hide / show a product in the public products directory (/gift).
@@ -91,5 +92,11 @@ export const setMatanotDiscoveryConfig: ActionConfig = {
     hideFromDiscovery: { type: 'boolean', required: true }
   },
   authRules: [{ type: 'jwt', errorMessage: 'Must be logged in' }],
-  updateStrategy: { type: 'none' }
+  updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (p, _r, ctx) =>
+      scopeList([scope('user', ctx.userId), scope('product', p.matanotId)]),
+    audience: 'self',
+  },
 };

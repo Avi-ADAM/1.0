@@ -19,6 +19,7 @@ import { resolveRecurringPlan, cycleWindowIso } from '$lib/recurring/recurringPl
 import { bestEffort } from '$lib/server/resources/bookingStore.js';
 import { openGrantBooking } from '$lib/server/resources/grantBooking.js';
 import { execFromContext } from '$lib/server/archive/exec.js';
+import { scope, decisionScope, scopeList } from '$lib/realtime/scopes.js';
 
 // ─── helpers ───────────────────────────────────────────────────────────────
 async function gql(
@@ -376,7 +377,7 @@ const createResourceHandler: ActionExecutionHandler = async (params, context, { 
     // cycle Maaps drive the card. It was already created archived (`archived:
     // isAssigned` above, and this branch only runs when isAssigned), so there is
     // nothing left to close.
-    return { ...createdRecord, mashabetahalichId, recurring: true };
+    return { ...createdRecord, createdKind: typeName, mashabetahalichId, recurring: true };
   }
 
   // ── 4. Self-assignment follow-up (single-user only) ─────────────────────
@@ -627,7 +628,8 @@ const createResourceHandler: ActionExecutionHandler = async (params, context, { 
             config: { projectIdParam: 'projectId', excludeSender: true },
           },
           templates: { title, body },
-          channels: ['socket', 'push', 'email'],
+          // Every member is asked to vote on the proposed resource, against the rikma's clock.
+          intent: 'consent',
           emailTemplate: 'PendJustCreated',
           emailTemplateData: {
             un: creatorName,
@@ -649,7 +651,8 @@ const createResourceHandler: ActionExecutionHandler = async (params, context, { 
       .catch((e: unknown) => console.warn('[createResource] pmash notification failed:', e));
   }
 
-  return createdRecord;
+  // `createdKind` says which entity `id` is — the realtime scopes need it.
+  return { ...createdRecord, createdKind: typeName };
 };
 
 export const createResourceAction: ActionConfig = {
@@ -792,5 +795,14 @@ export const createResourceAction: ActionConfig = {
   
   // Notifications are sent from the handler itself (case-specific: pmash vote
   // link + restime explanation, self-proposal variant) — no static config here
-  // to avoid doubles. Solo projects have nobody else to notify.
+  // to avoid doubles. Solo projects have nobody else to notify.,
+
+  realtime: {
+    scopes: (p, r) =>
+      scopeList([
+        scope('project', p.projectId),
+        r?.createdKind === 'Pmash' ? decisionScope('pmash', r?.id) : scope('resource', r?.id),
+        scope('resource', r?.mashabetahalichId),
+      ]),
+  },
 };

@@ -1,5 +1,6 @@
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { STRAPI_GRAPHQL } from '$lib/server/strapiUrl.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 const handler: ActionExecutionHandler = async (params, context) => {
   const { name, price, descrip, kindOf, linkto } = params;
@@ -45,5 +46,11 @@ export const createMashaabimConfig: ActionConfig = {
     linkto:  { type: 'string', required: false, description: 'Link to product details' }
   },
   authRules: [{ type: 'jwt', errorMessage: 'You must be logged in to create resources' }],
-  updateStrategy: { type: 'none' }
+  updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (_p, _r, ctx) =>
+      scopeList([scope('user', ctx.userId)]),
+    audience: 'self',
+  },
 };

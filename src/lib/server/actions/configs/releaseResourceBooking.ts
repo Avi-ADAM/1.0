@@ -13,6 +13,7 @@
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { execFromContext } from '$lib/server/archive/exec.js';
 import { bookingsEnabled, releaseBookings } from '$lib/server/resources/bookingStore.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 const releaseResourceBookingHandler: ActionExecutionHandler = async (params, context) => {
   const { spId, projectId } = params;
@@ -46,5 +47,10 @@ export const releaseResourceBookingConfig: ActionConfig = {
     { type: 'jwt', errorMessage: 'Must be authenticated to release a resource' }
   ],
 
-  updateStrategy: { type: 'fullRefresh' }
+  updateStrategy: { type: 'fullRefresh' },
+
+  realtime: {
+    scopes: (p) =>
+      scopeList([scope('project', p.projectId), scope('resource', p.spId)]),
+  },
 };

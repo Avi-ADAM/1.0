@@ -21,6 +21,7 @@ import {
   syncPanui
 } from '$lib/server/resources/bookingStore.js';
 import { capacityOf, roundToGranularity } from '$lib/resources/availability.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 const blockResourceDatesHandler: ActionExecutionHandler = async (params, context) => {
   const { spId, start, end, note } = params;
@@ -90,5 +91,11 @@ export const blockResourceDatesConfig: ActionConfig = {
     }
   ],
 
-  updateStrategy: { type: 'fullRefresh' }
+  updateStrategy: { type: 'fullRefresh' },
+
+  realtime: {
+    scopes: (p) =>
+      scopeList([scope('resource', p.spId)]),
+    audience: 'self',
+  },
 };

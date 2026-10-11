@@ -9,6 +9,7 @@
 
 import type { ActionConfig } from '../types.js';
 import { openMashaabimProposalHandler } from './proposeOnOpenMashaabim.js';
+import { scope, decisionScope, scopeList } from '$lib/realtime/scopes.js';
 
 export const customizeOpenMashaabimConfig: ActionConfig = {
   key: 'customizeOpenMashaabim',
@@ -36,9 +37,14 @@ export const customizeOpenMashaabimConfig: ActionConfig = {
       title: { he: 'התאמה אישית למשאב', en: 'Customized resource terms' },
       body: { he: 'חבר רקמה לקח משאב בתנאים מותאמים', en: 'A member took a resource on customized terms' },
     },
-    channels: ['socket'],
+    intent: 'consent',
     metadata: { type: 'mashaabimRequest', url: 'lev' },
   },
 
   updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (p, r) =>
+      scopeList([scope('project', p.projectId), scope('resource', p.openMashaabimId), decisionScope('askm', r?.data?.askmId)]),
+  },
 };

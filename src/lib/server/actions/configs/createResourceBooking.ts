@@ -23,6 +23,7 @@ import {
   loadSpLedger
 } from '$lib/server/resources/bookingStore.js';
 import { roundToGranularity } from '$lib/resources/availability.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 const createResourceBookingHandler: ActionExecutionHandler = async (params, context) => {
   const { spId, start, end, quantity, projectId, sheirutId, openMashaabimId, holdExpiresAt, note } =
@@ -100,5 +101,10 @@ export const createResourceBookingConfig: ActionConfig = {
     { type: 'jwt', errorMessage: 'Must be authenticated to hold a resource' }
   ],
 
-  updateStrategy: { type: 'fullRefresh' }
+  updateStrategy: { type: 'fullRefresh' },
+
+  realtime: {
+    scopes: (p) =>
+      scopeList([scope('project', p.projectId), scope('resource', p.spId), scope('resource', p.openMashaabimId), scope('deal', p.sheirutId)]),
+  },
 };

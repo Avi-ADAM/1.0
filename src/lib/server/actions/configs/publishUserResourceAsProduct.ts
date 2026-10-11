@@ -17,6 +17,7 @@
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { screenLabel } from '../../vocab/moderation.js';
 import { ensurePersonalRikmaFor } from './ensurePersonalRikma.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 const SCOPES = ['rikma', 'customers', 'both'] as const;
 type OfferScope = (typeof SCOPES)[number];
@@ -201,8 +202,15 @@ export const publishUserResourceAsProductConfig: ActionConfig = {
         ar: 'تم تحديث طريقة عرض موردك'
       }
     },
-    channels: ['socket'],
+    // The owner's own devices, as today.
+    intent: 'ambient',
     metadata: { type: 'profile', url: 'me' }
   },
-  updateStrategy: { type: 'partialUpdate', config: { dataKeys: ['app:meProfile'] } }
+  updateStrategy: { type: 'partialUpdate', config: { dataKeys: ['app:meProfile'] } },
+
+  realtime: {
+    scopes: (p, r, ctx) =>
+      scopeList([scope('user', ctx.userId), scope('resource', p.spId), scope('product', r?.data?.matanotId)]),
+    audience: 'self',
+  },
 };

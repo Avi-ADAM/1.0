@@ -4,6 +4,7 @@ import {
   resolveOpenMashaabimName,
   runResourceAskmAcceptance,
 } from '../helpers/runResourceAskmAcceptance.js';
+import { scope, decisionScope, scopeList } from '$lib/realtime/scopes.js';
 
 /** Initial "in favor" vote when the requester is already a project member (reqtom / availiableResorce pattern). */
 function buildRequesterVote(userId: string, at: Date) {
@@ -187,4 +188,9 @@ export const createMashaabimRequestConfig: ActionConfig = {
   },
 
   updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (p, r) =>
+      scopeList([scope('project', p.projectId), scope('resource', p.openMashaabimId), decisionScope('askm', r?.data?.askmId)]),
+  },
 };

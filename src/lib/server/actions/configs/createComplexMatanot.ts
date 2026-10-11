@@ -28,6 +28,7 @@
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { ENTRY_CURRENCY_PARAM, entryFields, normalizeEntry } from '$lib/server/money/normalizeEntry.js';
 import { roundTo } from '$lib/money/currencies.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 type RecipeMissionInput = {
   pendmId?: string | null;
@@ -614,10 +615,16 @@ export const createComplexMatanotConfig: ActionConfig = {
         ar: 'تم إنشاء منتج جديد "{{name}}"'
       }
     },
-    channels: ['socket', 'push'],
+    // Every other member is asked to vote on the new product.
+    intent: 'consent',
     metadata: {
       priority: 'normal',
       url: '/gift/{{matanotId}}'
     }
-  }
+  },
+
+  realtime: {
+    scopes: (p, r) =>
+      scopeList([scope('project', p.projectId), scope('product', r?.matanotId), scope('process', r?.processId)]),
+  },
 };

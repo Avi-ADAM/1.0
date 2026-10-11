@@ -1,5 +1,6 @@
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { STRAPI_GRAPHQL } from '$lib/server/strapiUrl.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 const handler: ActionExecutionHandler = async (params, context) => {
   const { mashaabimId, name, descrip, kindOf, hm, spnot, price, myp, linkto, sdate, fdate } = params;
@@ -61,5 +62,11 @@ export const createResourceRequestConfig: ActionConfig = {
     fdate:       { type: 'string',  required: false, description: 'End date (ISO)' }
   },
   authRules: [{ type: 'jwt', errorMessage: 'You must be logged in to create resources' }],
-  updateStrategy: { type: 'none' }
+  updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (_p, r, ctx) =>
+      scopeList([scope('user', ctx.userId), scope('resource', r?.id)]),
+    audience: 'self',
+  },
 };
