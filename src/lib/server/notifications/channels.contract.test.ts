@@ -28,17 +28,11 @@ const LEGACY_CHANNEL_LISTS = new Set([
   'src/lib/server/actions/configs/chat.ts',
   'src/lib/server/actions/configs/createNewMeeting.ts',
   'src/lib/server/actions/configs/example.ts',
-  'src/lib/server/actions/configs/githubActions.ts',
   'src/lib/server/actions/configs/joinMeeting.ts',
-  'src/lib/server/actions/configs/maagad.ts',
-  'src/lib/server/actions/configs/requestSuggestion.ts',
   'src/lib/server/actions/configs/sendMeetingMessage.ts',
   'src/lib/server/actions/configs/startMeeting.ts',
   'src/lib/server/actions/configs/toggleOnline.ts',
-  'src/lib/server/actions/configs/updateProjectDetails.ts',
   'src/lib/server/actions/configs/updateTask.ts',
-  'src/lib/server/actions/configs/updateUserBasic.ts',
-  'src/lib/server/actions/configs/updateUserProfilePic.ts',
   'src/routes/api/guest/message/+server.js',
 ]);
 

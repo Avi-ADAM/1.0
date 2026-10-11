@@ -1,4 +1,5 @@
 import type { ActionConfig } from '../types.js';
+import { scope, decisionScope, scopeList } from '$lib/realtime/scopes.js';
 
 function mappingSubject(
   entityType: string,
@@ -116,5 +117,20 @@ export const attachEntityToProcessConfig: ActionConfig = {
     config: {
       dataKeys: ['processes']
     }
-  }
+  },
+
+  realtime: {
+    scopes: (p) =>
+      scopeList([
+        scope('project', p.projectId),
+        scope('process', p.processId),
+        p.entityType === 'openMission' || p.entityType === 'mesimabetahalich'
+          ? scope('mission', p.entityId)
+          : p.entityType === 'openMashaabim'
+            ? scope('resource', p.entityId)
+            : p.entityType === 'maap' || p.entityType === 'pendm' || p.entityType === 'pmash'
+              ? decisionScope(p.entityType, p.entityId)
+              : null,
+      ]),
+  },
 };

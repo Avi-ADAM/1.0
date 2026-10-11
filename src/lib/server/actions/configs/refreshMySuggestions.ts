@@ -11,6 +11,7 @@
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { matchUserToOpenEntities } from '$lib/server/matching/engine';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 const handler: ActionExecutionHandler = async (_params, context, { strapi }) => {
   const result = await matchUserToOpenEntities(String(context.userId), 'backfill', {
@@ -31,5 +32,11 @@ export const refreshMySuggestionsConfig: ActionConfig = {
   graphqlOperation: handler,
   paramSchema: {},
   authRules: [{ type: 'jwt', errorMessage: 'You must be logged in to refresh suggestions' }],
-  updateStrategy: { type: 'none' }
+  updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (_p, _r, ctx) =>
+      scopeList([scope('user', ctx.userId)]),
+    audience: 'self',
+  },
 };

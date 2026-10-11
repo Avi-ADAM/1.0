@@ -24,6 +24,7 @@
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { openingPrice, plainExcerpt } from '$lib/sheirut/quoteState';
 import { loadQuote, postToRequestChat } from '../../sheirut/quote.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 type SuggestionKind = 'matanot' | 'person' | 'resource';
 
@@ -341,9 +342,15 @@ export const requestSuggestionConfig: ActionConfig = {
     // request from /gift (createSheirutpend), so it reaches the same channels.
     // Both tracks land on /deals: Track A as a pending request, Track B under
     // "wishes for you" — Lev shows neither to the provider.
-    channels: ['socket', 'email', 'telegram', 'push'],
+    intent: 'consent',
     emailTemplate: 'SimpleNuti',
     metadata: { priority: 'high', type: 'ratsonProposal', url: '/deals' }
   },
-  updateStrategy: { type: 'none' }
+  updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (p, r) =>
+      scopeList([scope('project', p.projectId), scope('wish', p.ratsonId), scope('deal', r?.data?.sheirutpendId)]),
+    partiesFrom: (p) => [p.targetUserId],
+  },
 };

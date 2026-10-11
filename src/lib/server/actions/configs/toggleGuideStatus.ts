@@ -1,5 +1,6 @@
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { STRAPI_GRAPHQL } from '$lib/server/strapiUrl.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 /**
  * Toggle the onboarding guide visibility for the current user.
@@ -45,5 +46,11 @@ export const toggleGuideStatusConfig: ActionConfig = {
     show: { type: 'boolean', required: true, description: 'true = resume guide, false = stop guide' }
   },
   authRules: [{ type: 'jwt', errorMessage: 'You must be logged in to change guide settings' }],
-  updateStrategy: { type: 'none' }
+  updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (_p, _r, ctx) =>
+      scopeList([scope('user', ctx.userId)]),
+    audience: 'self',
+  },
 };

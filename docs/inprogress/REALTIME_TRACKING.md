@@ -13,7 +13,7 @@
 | | פתיחה (2026-10-08) | עכשיו |
 |---|---:|---:|
 | actions כותבים | 209 | 209 |
-| … מצהירים `realtime.scopes` (`LEGACY_NO_REALTIME` ב-`realtime.contract.test.ts`) | 0 | 1 |
+| … מצהירים `realtime.scopes` (`LEGACY_NO_REALTIME` ב-`realtime.contract.test.ts`) | 0 | כולם חוץ מ-37 (שנשארו ברשימה) |
 | … שקטים לגמרי (אין אירוע סוקט) | 95 | 95 |
 | … `fullRefresh` משודר | 21 | 21 |
 | דפים שמציגים נתונים משותפים | 76 | 76 |
@@ -25,8 +25,8 @@
 | … מתוכם `consent` — מחכים לתשובה של מישהו, וזה לא יוצא מהאתר | 55 | 16 |
 | … טלגרם חסר | 86 | 35 |
 | actions ששולחים יותר מהיעד (✂ — מייל נשאר למי שאין ערוץ אחר) | 10 | 1 |
-| קבצים שבוחרים ערוצים ביד (`LEGACY_CHANNEL_LISTS`) | 109 | 20 |
-| actions שעברו ל-`intent` | 0 | 90 |
+| קבצים שבוחרים ערוצים ביד (`LEGACY_CHANNEL_LISTS`) | 109 | 14 |
+| actions שעברו ל-`intent` | 0 | 101 |
 
 ## שלבים
 
@@ -42,7 +42,7 @@
 | socket-server — בקשת polling אחת (`/socket.io/?transport=polling`) הפילה את התהליך (`ERR_HTTP_HEADERS_SENT`): ה-handler של ה-HTTP נרשם אחרי socket.io וענה 404 על הנתיב שלו | [x] 2026-10-09 — `socket-server/src/socket-path.ts` + בדיקה; נפרס, 3 בקשות polling בפרודקשן = 200 בלי restart. `deploy-socket.ps1` מוודא את הקובץ בכל פריסה |
 | socket-server — `event` / `rt:changed` בפרודקשן | [x] 2026-10-09 — `deploy-socket.ps1` (פריסה ראשונה מעץ העבודה, `7049d4e3-dirty`); `/health` ציבורי תקין, `/broadcast` בלי סוד 401, `:rollback` שמור |
 | R3 — דפים, גל 1 | [~] 2026-10-10 — כל הדפים מחוברים חוץ מ-`negotiation/[id]` (נדחה); 12 נבדקו חי בהזרקה ל-bus. פתוח: `/lev`, `VoteDetail`, deals/wish/concierge בשני דפדפנים — כשה-actions שלהם יפרסמו (R4). המאזינים הישנים נשארים עד R6 |
-| R4 — actions לפי תחום | [~] 2026-10-11 — **resource + product: 17 actions** (2026-10-11). משאבים ומוצרים של רקמה ⇒ קהל `project`; משאב אישי (`sp`) והיומן שלו ⇒ הרקמה כשהיא נקובה (הזמנה לרקמה), אחרת רק המכשירים של הבעלים. `resource:<id>` מכסה משאב פתוח, בתהליך ואישי, כמו בתחומים הקודמים. `createResource` מחזיר עכשיו `createdKind` (`Pmash` / `OpenMashaabim`), כי ה-id שהוא מחזיר יכול להיות הצבעה או משאב. התראות: 6 קבצים עברו ל-`intent` — הצעת משאב ומוצר חדש להצבעה ⇒ `consent`; מוצר שאושר ⇒ `outcome`; משאב חודשי שנסגר ועדכון פרסום ⇒ `ambient` כמו היום. **לא נבדק חי.** — **stipend + shift: 16 actions** (2026-10-11). רוב ה-handlers כאן מוצאים את הרקמה בעצמם (תשלום ← התחייבות ← רקמה, משמרת ← תוכנית ← רקמה) ולא קיבלו אותה כפרמטר — עכשיו הם מחזירים `projectId` (ובמלגה גם `pledgeId`), וה-scopes קוראים משם. מלגה = `stipend:<id>` + `decision:decision`; משמרת = `shift:<id>`; החלפת משמרת היא Decision בין שני חברים ⇒ `parties` (בלי `project` — אחרי החלפה שבוצעה הסידור של שאר החברים יתעדכן רק בפעולה הבאה, כי ה-handler לא יודע את הרקמה). התראות: 8 קבצים עברו ל-`intent` — הצעות והצעות נגדיות ⇒ `consent`; העברה שנשלחה ⇒ `consent` (אישור הקבלה הוא שמזיז אחוזים, ויש שעון); החלפת משמרת: הצעה/נגדית `consent`, התוצאה `personal` (`tell()` מקבל `intent`). נמצא B13. **לא נבדק חי.** — **money: 16 actions** (2026-10-11). מכירות, חלוקות ונתח האתר הם מצב של הרקמה (יתרות, tosplits) ⇒ קהל `project`; חלוקה = `decision:tosplit`, תשלום בודד = `split`, טענת מחזיק = `decision:decision`. לקוח של הוראת קבע ומקבל העברת נתח-אתר נוספים כצדדים — `reportRecurringSaleCycle` / `customerReportRecurringSaleCycle` מחזירים עכשיו `projectId` (ו-`customerId`), שלא היה להם. `toggleMoneyReceiver`: ה-`id` הוא עסקה (sheirut), לא משתמש. ההתראות של 8 קבצים עברו ל-`intent` מתוך קריאת הקוד: טענות מחזיק והצעות נגדיות ⇒ `consent`; אישור העברה (`confirmHaluka`) ⇒ `ambient` כמו היום; דיווח ללקוח ובקשת תרומה ⇒ `personal`. `approveHaluka` נשאר עם `channels` (ארבעה ערוצים לכולם) — `outcome` היה מוריד מייל וטלגרם. **לא נבדק חי**: כל פעולה כאן רושמת כסף אמיתי. — **mission / act / timer: 16 actions** (2026-10-11). משימות ומטלות ⇒ `project` + `mission:<id>` / `act:<id>`; אישורי סיום ⇒ `decision:finiapruval`. טיימר רץ הוא עניין של מי שמחזיק בו: `timerStart/Stop/LogUpdate` ⇒ `timer:<uid>` ל-`self` בלבד, ורק `timerSave` (השעות נכנסות למשימה) הולך לרקמה. ההצעות המקצועיות האישיות והקטלוג ⇒ `user:<me>` ל-`self`. **נבדק בשני דפדפנים** (256 → 258, רקמה 87): `createTask` — מטלה 134 הופיעה בטבלת המטלות של 258 בלי טעינת דף; `updateTask` — הסטטוס עבר ל"ממתין לאישרור" וחזר. `__data.json` נטען פעמיים ב-`updateTask`: פעם מ-`rt:changed` ופעם מהמאזין הישן של ה-layout, שמקבל את ההתראה ל-projectMembers — צפוי עד R6. הטיימרים לא נבדקו חי: לדף `/timers` עוד אין מאזין `timer:*` (הוא נשען על `timers.js`), אז היום רק מתאם moach (`timer` ⇒ missions) צורך אותם. ההתראות לבני אדם עברו ל-`intent` ב-11 מהקבצים: אישורי סיום, `completeMission`, `createMission` ו-`customizeOpenMission` ⇒ `consent` (מוסיף טלגרם, ובחלקם מייל); `createTask` ⇒ `consent` ולא `personal` — המבצע מתבקש לאשר (`myIshur`), אז אין ✂; `timerSave` ⇒ `consent` כשנפתח אישור שעות, אחרת `outcome`; הטיימרים ⇒ `ambient` (כמו היום). `linkActToMission` ⇒ `outcome`: מטלה שהופכת למשימה היא החלטה של כל הרקמה, אז הפוש נשאר (כשנוצרה pendm, `createMission` כבר ביקש הסכמה מכל חבר); ה-scope שלה הוא `decision:pendm` כשזו הצבעה. `updateTask` נשאר עם `channels` עד שה-intent שלו ייקבע מתוך מה שהפעולה עושה. **הסיווג בעמודת ה-intent היעד נוצר אוטומטית על ידי סוכן אחר — הצעה לבדיקה, לא החלטה; לא מורידים ערוץ על סמך הטבלה** (המשתמש, 2026-10-11). — **wish + deal: 39 actions** (2026-10-11; נשארו `clusterRatsons` — תחום maagad, `materializeRikmaBlueprint` — עוזר ההרשמה). משאלה אינה שייכת לרקמה, אז ה-broadcaster מוצא את הקהל שלה בעצמו: `wish:<id>` ⇒ בעלי המשאלה וכל המציעים (`partiesOf` → `105queryRatsonWithProposals` בטוקן השירות). עסקה ⇒ `project` + הצדדים שה-handler מחזיר. **נבדק בשלושה דפדפנים 2026-10-11** (משאלה 18: הבעלים 261 משנה קצב, ו-256 ו-258, המציעים, רואים את דף המשאלה נטען מחדש בלי רענון; הקצב הוחזר ל-`feh`). הבדיקה מצאה שטוקן השירות לבדו לא קורא את הצדדים של משאלה (השינוי הגיע רק למבצע) — `wishPartiesOf` שואל עכשיו גם עם ה-JWT של המבצע ומאחד. — **vote + archive: 34 actions** מצהירים `realtime` (נשארו: `archiveSpaceDoc` — ערוץ `space:changed` משלו; `proposeRikmaBlueprint` — עוד אין רקמה). נבדק בשני דפדפנים (256 ↔ 258, החלטה 78 על משימה 191): הצעת עריכה → הצעה נגדית → אישור, כל צד רואה את הסבב של השני בלי טעינת דף, והשם חזר למקור. `partiesFrom` מצטרף עכשיו גם לקהל `project` (מועמד שעוד אינו חבר). הבדיקה מצאה באג קודם ב-`VoteDetail` — ראו B12. — פיילוט `updateMissionStatus` **נבדק בשני דפדפנים 2026-10-10** (256 → 258, רקמה 87, משימה 191): `rt:changed` הגיע ל-258 עם `project:87`, `mission:191` ו-`originClientId` של הטאב השני; ה-bus מסר אחרי ~0.5ש׳; מתאם moach שלח **בקשה אחת** (`getProjectMissions` של 87), בלי טעינת דף; שינוי שאף מסך לא מקשיב לו — אפס בקשות; ההד של הטאב המקורי מסונן. הבדיקה מצאה באג: `/api/action` בנה `ActionService` משלו בלי broadcaster — אף פעולה מהדפדפן לא פרסמה. תוקן (`realtimeFor(notifier)` משותף ל-`/api/action` ול-`actions/index.ts`) |
+| R4 — actions לפי תחום | [~] 2026-10-11 — **maagad + process + rikma details + github + user: 34 actions** (2026-10-11). מאגד אינו רקמה ⇒ `maagad:<id>` עם קהל `parties`: החברים שעוד בו והספקים שההצעות שלהם עליו (ה-handlers כבר טוענים את המאגד, ועכשיו מחזירים `partyIds`); עזיבה נשארת שקטה (`self`, §2.1); אישור הסף מוסיף את רקמת הספק, שבה נוצרות העסקאות. תהליך = `process:<id>`; צירוף ישות לתהליך מוסיף גם את הישות. כל מה שאישי למשתמש (פרופיל, העדפות התראות, כרטיס ברוכים הבאים, הצעות) ⇒ `user:<me>` · self. `githubIssueClosed` ו-`githubWorkClaimable` לא כותבים כלום ⇒ READ_ONLY. התראות: 6 קבצים עברו ל-`intent` — הגשת שעות על PR ⇒ `consent` (כמו שמירת טיימר לאישור); פנייה מתוך משאלה ⇒ `consent` (כמו בקשת מוצר); הצעה במאגד, "הגעת לסף" לספק, issue שנסגר ועבודה לתביעה ⇒ `personal`; "יצאנו לדרך" ⇒ `outcome`; עדכון פרטי רקמה, ניתוק מאגר קוד ועדכון פרופיל ⇒ `ambient` כמו היום. נמצא B14. **לא נבדק חי.** — **resource + product: 17 actions** (2026-10-11). משאבים ומוצרים של רקמה ⇒ קהל `project`; משאב אישי (`sp`) והיומן שלו ⇒ הרקמה כשהיא נקובה (הזמנה לרקמה), אחרת רק המכשירים של הבעלים. `resource:<id>` מכסה משאב פתוח, בתהליך ואישי, כמו בתחומים הקודמים. `createResource` מחזיר עכשיו `createdKind` (`Pmash` / `OpenMashaabim`), כי ה-id שהוא מחזיר יכול להיות הצבעה או משאב. התראות: 6 קבצים עברו ל-`intent` — הצעת משאב ומוצר חדש להצבעה ⇒ `consent`; מוצר שאושר ⇒ `outcome`; משאב חודשי שנסגר ועדכון פרסום ⇒ `ambient` כמו היום. **לא נבדק חי.** — **stipend + shift: 16 actions** (2026-10-11). רוב ה-handlers כאן מוצאים את הרקמה בעצמם (תשלום ← התחייבות ← רקמה, משמרת ← תוכנית ← רקמה) ולא קיבלו אותה כפרמטר — עכשיו הם מחזירים `projectId` (ובמלגה גם `pledgeId`), וה-scopes קוראים משם. מלגה = `stipend:<id>` + `decision:decision`; משמרת = `shift:<id>`; החלפת משמרת היא Decision בין שני חברים ⇒ `parties` (בלי `project` — אחרי החלפה שבוצעה הסידור של שאר החברים יתעדכן רק בפעולה הבאה, כי ה-handler לא יודע את הרקמה). התראות: 8 קבצים עברו ל-`intent` — הצעות והצעות נגדיות ⇒ `consent`; העברה שנשלחה ⇒ `consent` (אישור הקבלה הוא שמזיז אחוזים, ויש שעון); החלפת משמרת: הצעה/נגדית `consent`, התוצאה `personal` (`tell()` מקבל `intent`). נמצא B13. **לא נבדק חי.** — **money: 16 actions** (2026-10-11). מכירות, חלוקות ונתח האתר הם מצב של הרקמה (יתרות, tosplits) ⇒ קהל `project`; חלוקה = `decision:tosplit`, תשלום בודד = `split`, טענת מחזיק = `decision:decision`. לקוח של הוראת קבע ומקבל העברת נתח-אתר נוספים כצדדים — `reportRecurringSaleCycle` / `customerReportRecurringSaleCycle` מחזירים עכשיו `projectId` (ו-`customerId`), שלא היה להם. `toggleMoneyReceiver`: ה-`id` הוא עסקה (sheirut), לא משתמש. ההתראות של 8 קבצים עברו ל-`intent` מתוך קריאת הקוד: טענות מחזיק והצעות נגדיות ⇒ `consent`; אישור העברה (`confirmHaluka`) ⇒ `ambient` כמו היום; דיווח ללקוח ובקשת תרומה ⇒ `personal`. `approveHaluka` נשאר עם `channels` (ארבעה ערוצים לכולם) — `outcome` היה מוריד מייל וטלגרם. **לא נבדק חי**: כל פעולה כאן רושמת כסף אמיתי. — **mission / act / timer: 16 actions** (2026-10-11). משימות ומטלות ⇒ `project` + `mission:<id>` / `act:<id>`; אישורי סיום ⇒ `decision:finiapruval`. טיימר רץ הוא עניין של מי שמחזיק בו: `timerStart/Stop/LogUpdate` ⇒ `timer:<uid>` ל-`self` בלבד, ורק `timerSave` (השעות נכנסות למשימה) הולך לרקמה. ההצעות המקצועיות האישיות והקטלוג ⇒ `user:<me>` ל-`self`. **נבדק בשני דפדפנים** (256 → 258, רקמה 87): `createTask` — מטלה 134 הופיעה בטבלת המטלות של 258 בלי טעינת דף; `updateTask` — הסטטוס עבר ל"ממתין לאישרור" וחזר. `__data.json` נטען פעמיים ב-`updateTask`: פעם מ-`rt:changed` ופעם מהמאזין הישן של ה-layout, שמקבל את ההתראה ל-projectMembers — צפוי עד R6. הטיימרים לא נבדקו חי: לדף `/timers` עוד אין מאזין `timer:*` (הוא נשען על `timers.js`), אז היום רק מתאם moach (`timer` ⇒ missions) צורך אותם. ההתראות לבני אדם עברו ל-`intent` ב-11 מהקבצים: אישורי סיום, `completeMission`, `createMission` ו-`customizeOpenMission` ⇒ `consent` (מוסיף טלגרם, ובחלקם מייל); `createTask` ⇒ `consent` ולא `personal` — המבצע מתבקש לאשר (`myIshur`), אז אין ✂; `timerSave` ⇒ `consent` כשנפתח אישור שעות, אחרת `outcome`; הטיימרים ⇒ `ambient` (כמו היום). `linkActToMission` ⇒ `outcome`: מטלה שהופכת למשימה היא החלטה של כל הרקמה, אז הפוש נשאר (כשנוצרה pendm, `createMission` כבר ביקש הסכמה מכל חבר); ה-scope שלה הוא `decision:pendm` כשזו הצבעה. `updateTask` נשאר עם `channels` עד שה-intent שלו ייקבע מתוך מה שהפעולה עושה. **הסיווג בעמודת ה-intent היעד נוצר אוטומטית על ידי סוכן אחר — הצעה לבדיקה, לא החלטה; לא מורידים ערוץ על סמך הטבלה** (המשתמש, 2026-10-11). — **wish + deal: 39 actions** (2026-10-11; נשארו `clusterRatsons` — תחום maagad, `materializeRikmaBlueprint` — עוזר ההרשמה). משאלה אינה שייכת לרקמה, אז ה-broadcaster מוצא את הקהל שלה בעצמו: `wish:<id>` ⇒ בעלי המשאלה וכל המציעים (`partiesOf` → `105queryRatsonWithProposals` בטוקן השירות). עסקה ⇒ `project` + הצדדים שה-handler מחזיר. **נבדק בשלושה דפדפנים 2026-10-11** (משאלה 18: הבעלים 261 משנה קצב, ו-256 ו-258, המציעים, רואים את דף המשאלה נטען מחדש בלי רענון; הקצב הוחזר ל-`feh`). הבדיקה מצאה שטוקן השירות לבדו לא קורא את הצדדים של משאלה (השינוי הגיע רק למבצע) — `wishPartiesOf` שואל עכשיו גם עם ה-JWT של המבצע ומאחד. — **vote + archive: 34 actions** מצהירים `realtime` (נשארו: `archiveSpaceDoc` — ערוץ `space:changed` משלו; `proposeRikmaBlueprint` — עוד אין רקמה). נבדק בשני דפדפנים (256 ↔ 258, החלטה 78 על משימה 191): הצעת עריכה → הצעה נגדית → אישור, כל צד רואה את הסבב של השני בלי טעינת דף, והשם חזר למקור. `partiesFrom` מצטרף עכשיו גם לקהל `project` (מועמד שעוד אינו חבר). הבדיקה מצאה באג קודם ב-`VoteDetail` — ראו B12. — פיילוט `updateMissionStatus` **נבדק בשני דפדפנים 2026-10-10** (256 → 258, רקמה 87, משימה 191): `rt:changed` הגיע ל-258 עם `project:87`, `mission:191` ו-`originClientId` של הטאב השני; ה-bus מסר אחרי ~0.5ש׳; מתאם moach שלח **בקשה אחת** (`getProjectMissions` של 87), בלי טעינת דף; שינוי שאף מסך לא מקשיב לו — אפס בקשות; ההד של הטאב המקורי מסונן. הבדיקה מצאה באג: `/api/action` בנה `ActionService` משלו בלי broadcaster — אף פעולה מהדפדפן לא פרסמה. תוקן (`realtimeFor(notifier)` משותף ל-`/api/action` ול-`actions/index.ts`) |
 | R5 — דפים, גל 2 + timegrama + הסרת `invalidate(() => true)` | [ ] |
 | R6 — ניקוי מאזינים ישנים | [ ] |
 
@@ -63,6 +63,7 @@
 | B11 | `socketClient.connect()` מפיל ובונה מחדש socket חי; ה-layouts של moach ושל forum קוראים לו בכל כניסה ⇒ אירועים אובדים בזמן החיבור מחדש | [x] 2026-10-08 — אותו משתמש עם socket מחובר/פעיל ⇒ no-op (בדיקה ב-`socketClient.test.ts`) |
 | B12 | `VoteDetail` (עמוד הצבעה בודדת): ה-`$effect` שזורע את ה-stores קרא גם את `projectBase`, אז כל ריצה חוזרת של ה-layout (הצבעה אחרת ברקמה, המאזין הישן או מתאם moach) זרעה מחדש את העותק מהטעינה הראשונה מעל מה ש-`refetch()` קרא — סבב נגדי של חבר אחר "קפץ" חזרה לסבב הקודם. פגע גם במאזין הישן, לא רק ב-realtime | [x] 2026-10-11 — ה-effect עוקב רק אחרי `entity` (`untrack`) |
 | B13 | `reopenForShiftHole` שלח את ההתראה ל-`projectMembers` לפי `projectIdParam: 'projectId'` — אבל אין לה פרמטר כזה (היא מקבלת `periodId` ו-`shiftId`), אז ההתראה "המשימה נפתחת למועמד נוסף" הגיעה לאף אחד. | [x] 2026-10-11 — ה-handler מחזיר `projectId`, ה-config קורא `data.projectId`, ו-`projectMembers` ב-`NotificationOrchestrator` נופל עכשיו לתוצאה כש-params לא מכיל את הרקמה (כמו ש-`specificUsers` כבר עשה). |
+| B14 | `updateProjectDetails` ברקמה של יותר מחבר אחד לא משנה כלום — הוא פותח הצבעה (`Decision`) לכל שדה שהשתנה, עם שעון. ההתראה היחידה לחברים היא "פרטי הפרויקט עודכנו", בסוקט בלבד: הטקסט לא נכון (שום דבר עוד לא עודכן) ואין פוש לבקשת הסכמה. | [ ] פתוח — ב-R4 נשאר `ambient` כמו היום (לא מוסיפים ערוצים להודעה שהטקסט שלה שגוי). התיקון: תבנית נפרדת למקרה ההצבעה ("הוצע שינוי בפרטי הרקמה — אפשר לאשר, לשוחח או להציע נגדית") ו-`intent` כפונקציה: `decisionsCreated ? 'consent' : 'ambient'`. |
 
 ### התראות לבני אדם — באגים מהמיפוי
 
@@ -202,36 +203,36 @@ inline מהקובץ עצמו ומה-helpers (`deal/offerDeal.ts`, `sheirut/dealE
 | action | file | socket today | recipients | effect for others | metadata.type → who reacts | ערוצים היום | intent יעד | target scopes | status |
 |---|---|---|---|---|---|---|---|---|---|
 | `applyAssistantSession` | assistantSessions | none |  | — |  | — | — |  | [ ] |
-| `attachEntityToProcess` | attachEntityToProcess | none |  | — |  | — ⚠ | A |  | [ ] |
+| `attachEntityToProcess` | attachEntityToProcess | none |  | — |  | — ⚠ | A | `project`, `process`, הישות (`mission` / `resource` / `decision:maap|pendm|pmash`) | [x] 2026-10-11 — לא נבדק חי |
 | `cacheTranslations` | cacheTranslations | none |  | — |  | — | — |  | [ ] |
 | `checkRikmaSlug` | checkRikmaSlug | read-only |  |  |  |  |  |  | n/a |
 | `claimAssistantSession` | assistantSessions | none |  | — |  | — | — |  | [ ] |
-| `claimGithubWork` | githubActions | config | projectMembers (−me) | toast | base → moach(lazy) | SP ⚠ | C |  | [ ] |
+| `claimGithubWork` | githubActions | config | projectMembers (−me) | toast | base → moach(lazy) | intent ✓ | C | `project`, `mission`, `timer:<uid>`, `decision:finiapruval` | [x] 2026-10-11 — לא נבדק חי |
 | `createPlanBoard` | planningBoards | none |  | — |  | — | — |  | [ ] |
 | `createPlanBoardFromItems` | planningRuns | none |  | — |  | — | — |  | [ ] |
 | `createPlanBoardFromText` | planningRuns | none |  | — |  | — | — |  | [ ] |
 | `createPlanItem` | planningBoards | none |  | — |  | — | — |  | [ ] |
-| `createProcess` | createProcess | none |  | — |  | — ⚠ | A |  | [ ] |
+| `createProcess` | createProcess | none |  | — |  | — ⚠ | A | `project`, `process` | [x] 2026-10-11 — לא נבדק חי |
 | `createSpaceDoc` | spaceDocs | none |  | — |  | — ⚠ | A |  | [ ] |
-| `createWeave` | createWeave | none |  | — |  | — | — |  | [ ] |
-| `createWorkWay` | createWorkWay | none |  | — |  | — | — |  | [ ] |
+| `createWeave` | createWeave | none |  | — |  | — | — | `project` (החדשה), `user:<me>` | [x] 2026-10-11 — לא נבדק חי |
+| `createWorkWay` | createWorkWay | none |  | — |  | — | — | `user:<me>` · self | [x] 2026-10-11 — לא נבדק חי |
 | `dismissExternalOffer` | fetchExternalOffers | none |  | — |  | — | — |  | [ ] |
 | `expandPlanBoard` | planningRuns | none |  | — |  | — | — |  | [ ] |
 | `fetchExternalOffers` | fetchExternalOffers | read-only |  |  |  |  |  |  | n/a |
 | `getAssistantSession` | assistantSessions | read-only |  |  |  |  |  |  | n/a |
-| `githubIssueClosed` | githubActions | config | specificUsers | toast | base → moach(lazy) | SP ⚠ | P |  | [ ] |
-| `githubWorkClaimable` | githubActions | config | specificUsers | toast | base → moach(lazy) | SP ⚠ | P |  | [ ] |
+| `githubIssueClosed` | githubActions | config | specificUsers | toast | base → moach(lazy) | intent ✓ | P | — | n/a — לא כותב כלום; קיים בשביל ההתראה (READ_ONLY) |
+| `githubWorkClaimable` | githubActions | config | specificUsers | toast | base → moach(lazy) | intent ✓ | P | — | n/a — לא כותב כלום; קיים בשביל ההתראה (READ_ONLY) |
 | `importPlanBoardRows` | assistantSessions | none |  | — |  | — | — |  | [ ] |
-| `linkGithubAccount` | githubActions | none |  | — | base | — | — |  | [ ] |
+| `linkGithubAccount` | githubActions | none |  | — | base | — | — | `user:<userId>` · parties: החבר | [x] 2026-10-11 — לא נבדק חי |
 | `markPlanItemCreated` | planningBoards | none |  | — |  | — | — |  | [ ] |
 | `reviseAssistantSession` | assistantSessions | none |  | — |  | — | — |  | [ ] |
 | `seedPlanBoards` | planningRuns | none |  | — |  | — | — |  | [ ] |
 | `setAssistantItems` | assistantSessions | none |  | — |  | — | — |  | [ ] |
-| `setGithubInstallationStatus` | githubActions | none |  | — | base | — | — |  | [ ] |
-| `setSupportPage` | setSupportPage | none |  | — |  | — ⚠ | A |  | [ ] |
+| `setGithubInstallationStatus` | githubActions | none |  | — | base | — | — | `project` לכל רקמה שמאגר שלה השתנה | [x] 2026-10-11 — לא נבדק חי |
+| `setSupportPage` | setSupportPage | none |  | — |  | — ⚠ | A | `project` | [x] 2026-10-11 — לא נבדק חי |
 | `startAssistantSession` | assistantSessions | none |  | — |  | — | — |  | [ ] |
 | `undoAssistantRevision` | assistantSessions | none |  | — |  | — | — |  | [ ] |
-| `unlinkGithubAccount` | githubActions | none |  | — | base | — | — |  | [ ] |
+| `unlinkGithubAccount` | githubActions | none |  | — | base | — | — | `user:<me>` · self | [x] 2026-10-11 — לא נבדק חי |
 | `updatePlanBoard` | planningBoards | none |  | — |  | — | — |  | [ ] |
 | `updatePlanItem` | planningBoards | none |  | — |  | — | — |  | [ ] |
 | `updateSpaceDoc` | spaceDocs | none |  | — |  | — | — |  | [ ] |
@@ -284,7 +285,7 @@ inline מהקובץ עצמו ומה-helpers (`deal/offerDeal.ts`, `sheirut/dealE
 |---|---|---|---|---|---|---|---|---|---|
 | `acceptRatsonProposal` | acceptRatsonProposal | config | specificUsers (−me) | toast | ratsonProposal → moach(lazy)<br>sheirutUpdate → moach(lazy) | intent ✓ | C | `wish` (← בעלי המשאלה והמציעים, `partiesOf`) | [x] 2026-10-11 — עוד לא נבדק בשני דפדפנים |
 | `acceptWishOffer` | acceptWishOffer | inline |  | toast | ratsonProposal → moach(lazy) | intent ✓ | P·C | `wish` (← בעלי המשאלה והמציעים, `partiesOf`) | [x] 2026-10-11 — עוד לא נבדק בשני דפדפנים |
-| `clusterRatsons` | maagad | none |  | — | maagad | — | — |  | [ ] |
+| `clusterRatsons` | maagad | none |  | — | maagad | — | — | `maagad` לכל מאגד שנוצר · parties: המוזמנים | [x] 2026-10-11 — לא נבדק חי |
 | `counterRatsonProposal` | counterRatsonProposal | none |  | — | ratsonProposal | intent ✓ | C | `wish` (← בעלי המשאלה והמציעים, `partiesOf`) | [x] 2026-10-11 — עוד לא נבדק בשני דפדפנים |
 | `createRatson` | createRatson | none |  | — |  | — | — | `wish` (החדשה) | [x] 2026-10-11 — עוד לא נבדק בשני דפדפנים |
 | `declineWishOffer` | declineWishOffer | config | specificUsers | toast | ratsonProposal → moach(lazy) | intent ✓ | P | `wish` (← בעלי המשאלה והמציעים, `partiesOf`) | [x] 2026-10-11 — עוד לא נבדק בשני דפדפנים |
@@ -405,23 +406,23 @@ inline מהקובץ עצמו ומה-helpers (`deal/offerDeal.ts`, `sheirut/dealE
 
 | action | file | socket today | recipients | effect for others | metadata.type → who reacts | ערוצים היום | intent יעד | target scopes | status |
 |---|---|---|---|---|---|---|---|---|---|
-| `confirmMaagadQuorum` | maagad | config | specificUsers (−me) | toast | maagad → moach(lazy) | SP | O |  | [ ] |
-| `createMaagadOffer` | maagad | config | specificUsers (−me) | toast | maagad → moach(lazy) | SP ⚠ | C |  | [ ] |
-| `expireMaagadOffers` | maagad | none |  | — | maagad | — ⚠ | P |  | [ ] |
-| `joinMaagad` | maagad | none |  | — | maagad | — ⚠ | A |  | [ ] |
-| `leaveMaagad` | maagad | none |  | — | maagad | — ⚠ | A |  | [ ] |
-| `openMaagad` | maagad | none |  | — | maagad | — | — |  | [ ] |
-| `signMaagadOffer` | maagad | config | specificUsers (−me) | toast | maagad → moach(lazy) | SP | O |  | [ ] |
-| `unsignMaagadOffer` | maagad | none |  | — | maagad | — ⚠ | A |  | [ ] |
+| `confirmMaagadQuorum` | maagad | config | specificUsers (−me) | toast | maagad → moach(lazy) | intent ✓ | O | `maagad`, `project` (רקמת הספק, שם נוצרות העסקאות) + חברי המאגד | [x] 2026-10-11 — לא נבדק חי |
+| `createMaagadOffer` | maagad | config | specificUsers (−me) | toast | maagad → moach(lazy) | intent ✓ | P | `maagad` · parties: חברי המאגד והספקים שלו | [x] 2026-10-11 — לא נבדק חי |
+| `expireMaagadOffers` | maagad | none |  | — | maagad | — ⚠ | P | `maagad` לכל הצעה שפגה · parties: החותמים והספק | [x] 2026-10-11 — לא נבדק חי |
+| `joinMaagad` | maagad | none |  | — | maagad | — ⚠ | A | `maagad` · parties: חברי המאגד והספקים שלו | [x] 2026-10-11 — לא נבדק חי |
+| `leaveMaagad` | maagad | none |  | — | maagad | — ⚠ | A | `maagad` · self (עזיבה שקטה, §2.1) | [x] 2026-10-11 — לא נבדק חי |
+| `openMaagad` | maagad | none |  | — | maagad | — | — | `maagad`, `user:<me>` · self | [x] 2026-10-11 — לא נבדק חי |
+| `signMaagadOffer` | maagad | config | specificUsers (−me) | toast | maagad → moach(lazy) | intent ✓ | P | `maagad` · parties: חברי המאגד והספקים שלו | [x] 2026-10-11 — לא נבדק חי |
+| `unsignMaagadOffer` | maagad | none |  | — | maagad | — ⚠ | A | `maagad` · parties: חברי המאגד והספקים שלו | [x] 2026-10-11 — לא נבדק חי |
 
 ### project — 4 actions (live 0 · full 2 · toast 0 · silent 2 · read-only 0)
 
 | action | file | socket today | recipients | effect for others | metadata.type → who reacts | ערוצים היום | intent יעד | target scopes | status |
 |---|---|---|---|---|---|---|---|---|---|
-| `disconnectProjectRepo` | githubActions | config | projectMembers (−me) | full | base → moach(lazy) | S | A |  | [ ] |
+| `disconnectProjectRepo` | githubActions | config | projectMembers (−me) | full | base → moach(lazy) | intent ✓ | A | `project` | [x] 2026-10-11 — לא נבדק חי |
 | `scanProjectDirections` | planningRuns | none |  | — |  | — | — |  | [ ] |
-| `syncProjectRepos` | githubActions | none |  | — | base | — | — |  | [ ] |
-| `updateProjectDetails` | updateProjectDetails | config | projectMembers (−me) | full | base → moach(lazy) | S | A |  | [ ] |
+| `syncProjectRepos` | githubActions | none |  | — | base | — | — | `project` | [x] 2026-10-11 — לא נבדק חי |
+| `updateProjectDetails` | updateProjectDetails | config | projectMembers (−me) | full | base → moach(lazy) | intent ✓ | A (ראו B14) | `project`, `decision:decision` לכל הצבעה שנפתחה | [x] 2026-10-11 — לא נבדק חי |
 
 ### vote — 31 actions (live 9 · full 4 · toast 12 · silent 5 · read-only 1)
 
@@ -509,17 +510,17 @@ inline מהקובץ עצמו ומה-helpers (`deal/offerDeal.ts`, `sheirut/dealE
 
 | action | file | socket today | recipients | effect for others | metadata.type → who reacts | ערוצים היום | intent יעד | target scopes | status |
 |---|---|---|---|---|---|---|---|---|---|
-| `dismissNotice` | noticePrefs | none |  | — |  | — | — |  | [ ] |
+| `dismissNotice` | noticePrefs | none |  | — |  | — | — | `user:<me>` · self | [x] 2026-10-11 — לא נבדק חי |
 | `ensurePersonalRikma` | ensurePersonalRikma | read-only |  |  |  |  |  |  | n/a |
-| `refreshMySuggestions` | refreshMySuggestions | none |  | — |  | — | — |  | [ ] |
-| `requestSuggestion` | requestSuggestion | config | specificUsers | toast | ratsonProposal → moach(lazy) | SPTE | C |  | [ ] |
-| `restoreNotice` | noticePrefs | none |  | — |  | — | — |  | [ ] |
-| `saveNoticePrefs` | noticePrefs | none |  | — |  | — | — |  | [ ] |
-| `toggleGuideStatus` | toggleGuideStatus | none |  | — |  | — | — |  | [ ] |
-| `updateUserBasic` | updateUserBasic | config | specificUsers | partial(lev) | profile → userStore | S | — |  | [ ] |
-| `updateUserProfilePic` | updateUserProfilePic | config | specificUsers | partial(lev) | profile → userStore | S | — |  | [ ] |
-| `updateUserRelation` | updateUserRelation | none |  | — |  | — | — |  | [ ] |
-| `updateWelcomeCard` | updateWelcomeCard | none |  | — |  | — | — |  | [ ] |
+| `refreshMySuggestions` | refreshMySuggestions | none |  | — |  | — | — | `user:<me>` · self | [x] 2026-10-11 — לא נבדק חי |
+| `requestSuggestion` | requestSuggestion | config | specificUsers | toast | ratsonProposal → moach(lazy) | intent ✓ | C | `project` (רקמת הספק), `wish`, `deal` · + המוזמן | [x] 2026-10-11 — לא נבדק חי |
+| `restoreNotice` | noticePrefs | none |  | — |  | — | — | `user:<me>` · self | [x] 2026-10-11 — לא נבדק חי |
+| `saveNoticePrefs` | noticePrefs | none |  | — |  | — | — | `user:<me>` · self | [x] 2026-10-11 — לא נבדק חי |
+| `toggleGuideStatus` | toggleGuideStatus | none |  | — |  | — | — | `user:<me>` · self | [x] 2026-10-11 — לא נבדק חי |
+| `updateUserBasic` | updateUserBasic | config | specificUsers | partial(lev) | profile → userStore | intent ✓ | A | `user:<me>` · self | [x] 2026-10-11 — לא נבדק חי |
+| `updateUserProfilePic` | updateUserProfilePic | config | specificUsers | partial(lev) | profile → userStore | intent ✓ | A | `user:<me>` · self | [x] 2026-10-11 — לא נבדק חי |
+| `updateUserRelation` | updateUserRelation | none |  | — |  | — | — | `user:<me>` · self | [x] 2026-10-11 — לא נבדק חי |
+| `updateWelcomeCard` | updateWelcomeCard | none |  | — |  | — | — | `user:<me>` · self | [x] 2026-10-11 — לא נבדק חי |
 
 ### other — 1 actions (live 0 · full 0 · toast 0 · silent 1 · read-only 0)
 

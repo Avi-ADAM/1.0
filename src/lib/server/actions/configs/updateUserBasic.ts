@@ -1,6 +1,7 @@
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { STRAPI_GRAPHQL } from '$lib/server/strapiUrl.js';
 import { normalizeCode } from '$lib/money/currencies.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 /**
  * Update the current user's basic profile fields and settings.
@@ -178,8 +179,15 @@ export const updateUserBasicConfig: ActionConfig = {
       title: { he: 'הפרופיל עודכן', en: 'Profile updated', ar: 'تم تحديث الملف الشخصي' },
       body: { he: 'פרטי הפרופיל שלך עודכנו', en: 'Your profile details were updated', ar: 'تم تحديث تفاصيل ملفك الشخصي' }
     },
-    channels: ['socket'],
+    // The member's own devices, so every open profile follows.
+    intent: 'ambient',
     metadata: { type: 'profile', url: 'me' }
   },
-  updateStrategy: { type: 'partialUpdate', config: { dataKeys: ['app:meProfile'] } }
+  updateStrategy: { type: 'partialUpdate', config: { dataKeys: ['app:meProfile'] } },
+
+  realtime: {
+    scopes: (_p, _r, ctx) =>
+      scopeList([scope('user', ctx.userId)]),
+    audience: 'self',
+  },
 };

@@ -9,6 +9,7 @@
  */
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
   const { workWayName } = params;
@@ -45,4 +46,10 @@ export const createWorkWayConfig: ActionConfig = {
   authRules: [{ type: 'jwt' }],
 
   updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (_p, _r, ctx) =>
+      scopeList([scope('user', ctx.userId)]),
+    audience: 'self',
+  },
 };

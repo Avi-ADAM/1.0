@@ -1,5 +1,6 @@
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { STRAPI_GRAPHQL } from '$lib/server/strapiUrl.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 /**
  * Set the profile picture of the current user.
@@ -55,8 +56,15 @@ export const updateUserProfilePicConfig: ActionConfig = {
       title: { he: 'תמונת הפרופיל עודכנה', en: 'Profile picture updated', ar: 'تم تحديث صورة الملف الشخصي' },
       body: { he: 'תמונת הפרופיל שלך עודכנה', en: 'Your profile picture was updated', ar: 'تم تحديث صورة ملفك الشخصي' }
     },
-    channels: ['socket'],
+    // The member's own devices, so every open profile follows.
+    intent: 'ambient',
     metadata: { type: 'profile', url: 'me' }
   },
-  updateStrategy: { type: 'partialUpdate', config: { dataKeys: ['app:meProfile'] } }
+  updateStrategy: { type: 'partialUpdate', config: { dataKeys: ['app:meProfile'] } },
+
+  realtime: {
+    scopes: (_p, _r, ctx) =>
+      scopeList([scope('user', ctx.userId)]),
+    audience: 'self',
+  },
 };

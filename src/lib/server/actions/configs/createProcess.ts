@@ -1,4 +1,5 @@
 import type { ActionConfig } from '../types.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 function buildProcessSubject(processId: string, name: string): string {
   return `PROCESS::${processId}::${name.trim()}`;
@@ -86,5 +87,10 @@ export const createProcessConfig: ActionConfig = {
     config: {
       dataKeys: ['processes']
     }
-  }
+  },
+
+  realtime: {
+    scopes: (p, r) =>
+      scopeList([scope('project', p.projectId), scope('process', r?.processId)]),
+  },
 };

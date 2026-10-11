@@ -13,6 +13,7 @@
 
 import { normalizeCode } from '$lib/money/currencies.js';
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 const handler: ActionExecutionHandler = async (params, context, util) => {
   const { strapi } = util;
@@ -121,5 +122,10 @@ export const createWeaveConfig: ActionConfig = {
     newVallueNames: { type: 'array', required: false }
   },
   authRules: [{ type: 'jwt', errorMessage: 'Must be logged in to create a weave' }],
-  updateStrategy: { type: 'none' }
+  updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (_p, r, ctx) =>
+      scopeList([scope('project', r?.data?.projectId), scope('user', ctx.userId)]),
+  },
 };

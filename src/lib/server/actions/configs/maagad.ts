@@ -30,6 +30,7 @@ import {
 } from '../../maagad/offerStateMachine.js';
 import { ensurePersonalRikmaFor } from './ensurePersonalRikma.js';
 import { clusterWishes, type ClusterWish } from '../../maagad/clustering.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 const VISIBILITIES = new Set(['anonymous', 'first_name', 'full']);
 const RECURRENCES = new Set(['one_time', 'weekly', 'biweekly', 'monthly']);
@@ -62,6 +63,25 @@ async function fetchMyMember(strapi: any, context: any, maagadId: string) {
     context.fetch
   );
   return res?.data?.maagadMembers?.data?.[0] ?? null;
+}
+
+/**
+ * Everyone whose pool screen shows this change: the members still in it, and the
+ * suppliers whose offers sit on it. Realtime only — a refresh signal, never a notice,
+ * so it says nothing about who did what (§2.1).
+ */
+function poolPartyIds(maagadNode: any): string[] {
+  const ids = new Set<string>();
+  for (const m of maagadNode?.attributes?.members?.data ?? []) {
+    if (m?.attributes?.status_member === 'left') continue;
+    const uid = m?.attributes?.user?.data?.id;
+    if (uid != null) ids.add(String(uid));
+  }
+  for (const o of maagadNode?.attributes?.offers?.data ?? []) {
+    const uid = o?.attributes?.proposer_user?.data?.id;
+    if (uid != null) ids.add(String(uid));
+  }
+  return [...ids];
 }
 
 function activeMemberCount(maagadNode: any): number {
@@ -211,7 +231,7 @@ const joinMaagadHandler: ActionExecutionHandler = async (params, context, { stra
     activeMemberCount(maagadNode) + (existing ? 1 : 1)
   );
 
-  return { data: { maagadId, memberId } };
+  return { data: { maagadId, memberId, partyIds: poolPartyIds(maagadNode) } };
 };
 
 // ── leaveMaagad ─────────────────────────────────────────────────────────────
@@ -355,7 +375,7 @@ const createMaagadOfferHandler: ActionExecutionHandler = async (params, context,
     : [];
 
   return {
-    data: { maagadId: targetMaagadId, offerId },
+    data: { maagadId: targetMaagadId, offerId, partyIds: poolPartyIds(maagadNode) },
     notifyUserIds
   };
 };
@@ -449,7 +469,7 @@ const signMaagadOfferHandler: ActionExecutionHandler = async (params, context, {
   // lands; the membership record already carries everything needed.
 
   return {
-    data: { maagadId, offerId, signedCount: newCount, quorumReached: quorum },
+    data: { maagadId, offerId, signedCount: newCount, quorumReached: quorum, partyIds: poolPartyIds(maagadNode) },
     notifyUserIds
   };
 };
@@ -498,7 +518,9 @@ const unsignMaagadOfferHandler: ActionExecutionHandler = async (params, context,
     context.fetch
   );
 
-  return { data: { maagadId, offerId, unsigned: true, signedCount: newCount } };
+  return {
+    data: { maagadId, offerId, unsigned: true, signedCount: newCount, partyIds: poolPartyIds(maagadNode) }
+  };
 };
 
 // ── confirmMaagadQuorum + activateMaagadOffer (§7.2) ────────────────────────
@@ -632,7 +654,7 @@ async function activateOffer(
     );
     if (uid) activatedUserIds.push(String(uid));
   }
-  return { activatedUserIds, dealsCreated, finalPrice };
+  return { activatedUserIds, dealsCreated, finalPrice, proposerProjectId };
 }
 
 const confirmMaagadQuorumHandler: ActionExecutionHandler = async (params, context, { strapi }) => {
@@ -656,7 +678,7 @@ const confirmMaagadQuorumHandler: ActionExecutionHandler = async (params, contex
   const check = canConfirm(offerStateFrom(oa));
   if (!check.ok) throw new Error(check.reason);
 
-  const { activatedUserIds, dealsCreated, finalPrice } = await activateOffer(
+  const { activatedUserIds, dealsCreated, finalPrice, proposerProjectId } = await activateOffer(
     strapi,
     context,
     maagadId,
@@ -671,7 +693,9 @@ const confirmMaagadQuorumHandler: ActionExecutionHandler = async (params, contex
       activated: true,
       activatedCount: activatedUserIds.length,
       dealsCreated,
-      finalPrice
+      finalPrice,
+      proposerProjectId,
+      partyIds: poolPartyIds(maagadNode)
     },
     notifyUserIds: activatedUserIds
   };
@@ -693,6 +717,8 @@ const expireMaagadOffersHandler: ActionExecutionHandler = async (_params, contex
   );
   const offers = res?.data?.maagadOffers?.data ?? [];
   const expired: string[] = [];
+  const maagadIds = new Set<string>();
+  const partyIds = new Set<string>();
   const nowMs = Date.now();
 
   for (const offer of offers) {
@@ -716,9 +742,20 @@ const expireMaagadOffersHandler: ActionExecutionHandler = async (_params, contex
       );
     }
     expired.push(String(offer.id));
+    if (oa.maagad?.data?.id != null) maagadIds.add(String(oa.maagad.data.id));
+    for (const uid of [oa.proposer_user?.data?.id, ...(oa.signed_members?.data ?? []).map((sm: any) => sm?.attributes?.user?.data?.id)]) {
+      if (uid != null) partyIds.add(String(uid));
+    }
   }
 
-  return { data: { expiredCount: expired.length, expiredOfferIds: expired } };
+  return {
+    data: {
+      expiredCount: expired.length,
+      expiredOfferIds: expired,
+      maagadIds: [...maagadIds],
+      partyIds: [...partyIds]
+    }
+  };
 };
 
 // ── clusterRatsons (§5 — auto-aggregation job) ──────────────────────────────
@@ -766,7 +803,7 @@ const clusterRatsonsHandler: ActionExecutionHandler = async (params, context, { 
     ...(typeof minClusterSize === 'number' ? { minClusterSize } : {})
   });
 
-  const created: Array<{ maagadId: string; size: number }> = [];
+  const created: Array<{ maagadId: string; size: number; invitedUserIds: string[] }> = [];
 
   for (const cluster of clusters) {
     const seed = cluster.members[0];
@@ -817,7 +854,7 @@ const clusterRatsonsHandler: ActionExecutionHandler = async (params, context, { 
         );
       }
     }
-    created.push({ maagadId, size: cluster.members.length });
+    created.push({ maagadId, size: cluster.members.length, invitedUserIds: [...invitedUserIds] });
   }
 
   return {
@@ -849,7 +886,11 @@ export const maagadActions: ActionConfig[] = [
       ratsonId: { type: 'string', required: false, description: 'The wish this pool grew from' },
       visibility: { type: 'string', required: false, description: 'anonymous | first_name | full' }
     },
-    authRules: [jwtRule]
+    authRules: [jwtRule],
+    realtime: {
+      scopes: (_p, r, ctx) => scopeList([scope('maagad', r?.data?.maagadId), scope('user', ctx.userId)]),
+      audience: 'self'
+    }
   },
   {
     key: 'joinMaagad',
@@ -860,7 +901,12 @@ export const maagadActions: ActionConfig[] = [
       ratsonId: { type: 'string', required: false, description: 'Own wish to link' },
       visibility: { type: 'string', required: false, description: 'anonymous | first_name | full' }
     },
-    authRules: [jwtRule]
+    authRules: [jwtRule],
+    realtime: {
+      scopes: (p) => scopeList([scope('maagad', p.maagadId)]),
+      audience: 'parties',
+      partiesFrom: (_p, r) => r?.data?.partyIds ?? []
+    }
   },
   {
     key: 'leaveMaagad',
@@ -869,7 +915,12 @@ export const maagadActions: ActionConfig[] = [
     paramSchema: {
       maagadId: { type: 'string', required: true, description: 'Pool to leave' }
     },
-    authRules: [jwtRule]
+    authRules: [jwtRule],
+    realtime: {
+      // Leaving is silent (§2.1): only the leaver's own screens follow.
+      scopes: (p) => scopeList([scope('maagad', p.maagadId)]),
+      audience: 'self'
+    }
   },
   {
     key: 'createMaagadOffer',
@@ -899,8 +950,14 @@ export const maagadActions: ActionConfig[] = [
         title: { he: 'הצעה חדשה במאגד שלך', en: 'New offer on your demand pool', ar: 'عرض جديد في تجمع الطلب الخاص بك' },
         body: { he: 'ספק הגיש הצעה לביקוש שהצטרפת אליו - כל חתימה היא אישית', en: 'A supplier made an offer on a demand you joined - every signature is personal', ar: 'قدّم مزوّد عرضًا على طلب انضممت إليه - كل توقيع شخصي' }
       },
-      channels: ['socket', 'push'],
+      // Addressed to each member: an offer they may sign before its deadline.
+      intent: 'personal',
       metadata: { type: 'maagad', url: 'maagad' }
+    },
+    realtime: {
+      scopes: (p, r) => scopeList([scope('maagad', r?.data?.maagadId ?? p.maagadId)]),
+      audience: 'parties',
+      partiesFrom: (_p, r) => r?.data?.partyIds ?? []
     }
   },
   {
@@ -920,8 +977,14 @@ export const maagadActions: ActionConfig[] = [
         title: { he: 'ההצעה שלך הגיעה לסף!', en: 'Your offer reached its quorum!', ar: 'وصل عرضك إلى الحد الأدنى!' },
         body: { he: 'מספיק חתומים - אשר סופית כדי להפעיל את העסקאות', en: 'Enough signatures - confirm to activate the deals', ar: 'توقيعات كافية - أكّد لتفعيل الصفقات' }
       },
-      channels: ['socket', 'push'],
+      // Addressed to the supplier: the quorum is in, and only they can confirm it.
+      intent: 'personal',
       metadata: { type: 'maagad', url: 'maagad' }
+    },
+    realtime: {
+      scopes: (p) => scopeList([scope('maagad', p.maagadId)]),
+      audience: 'parties',
+      partiesFrom: (_p, r) => r?.data?.partyIds ?? []
     }
   },
   {
@@ -932,7 +995,12 @@ export const maagadActions: ActionConfig[] = [
       maagadId: { type: 'string', required: true, description: 'The pool' },
       offerId: { type: 'string', required: true, description: 'The offer to unsign' }
     },
-    authRules: [jwtRule]
+    authRules: [jwtRule],
+    realtime: {
+      scopes: (p) => scopeList([scope('maagad', p.maagadId)]),
+      audience: 'parties',
+      partiesFrom: (_p, r) => r?.data?.partyIds ?? []
+    }
   },
   {
     key: 'confirmMaagadQuorum',
@@ -949,8 +1017,14 @@ export const maagadActions: ActionConfig[] = [
         title: { he: 'יצאנו לדרך!', en: "We're a go!", ar: 'انطلقنا!' },
         body: { he: 'ההצעה שחתמת עליה הופעלה - העסקה שלך יוצאת לפועל', en: 'The offer you signed is activated - your deal is going ahead', ar: 'العرض الذي وقّعت عليه مُفعّل - صفقتك تمضي قُدُمًا' }
       },
-      channels: ['socket', 'push'],
+      // The result for every signer: the deal goes ahead.
+      intent: 'outcome',
       metadata: { type: 'maagad', url: 'maagad' }
+    },
+    realtime: {
+      // The deals are minted in the supplier's rikma; the pool's people see it go active.
+      scopes: (p, r) => scopeList([scope('maagad', p.maagadId), scope('project', r?.data?.proposerProjectId)]),
+      partiesFrom: (_p, r) => r?.data?.partyIds ?? []
     }
   },
   {
@@ -958,7 +1032,12 @@ export const maagadActions: ActionConfig[] = [
     description: 'Batch: expire offers past their deadline; signers revert to interested (cron)',
     graphqlOperation: expireMaagadOffersHandler,
     paramSchema: {},
-    authRules: [jwtRule]
+    authRules: [jwtRule],
+    realtime: {
+      scopes: (_p, r) => scopeList((r?.data?.maagadIds ?? []).map((id: string) => scope('maagad', id))),
+      audience: 'parties',
+      partiesFrom: (_p, r) => r?.data?.partyIds ?? []
+    }
   },
   {
     key: 'clusterRatsons',
@@ -968,6 +1047,11 @@ export const maagadActions: ActionConfig[] = [
       simThreshold: { type: 'number', required: false, description: 'Override similarity threshold (0-1)' },
       minClusterSize: { type: 'number', required: false, description: 'Override minimum cluster size (default 3)' }
     },
-    authRules: [jwtRule]
+    authRules: [jwtRule],
+    realtime: {
+      scopes: (_p, r) => scopeList((r?.data?.pools ?? []).map((x: { maagadId: string }) => scope('maagad', x.maagadId))),
+      audience: 'parties',
+      partiesFrom: (_p, r) => (r?.data?.pools ?? []).flatMap((x: { invitedUserIds: string[] }) => x.invitedUserIds)
+    }
   }
 ];

@@ -14,6 +14,7 @@
  */
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 type Run = (qid: string, vars: Record<string, unknown>) => Promise<any>;
 
@@ -70,7 +71,13 @@ export const dismissNoticeConfig: ActionConfig = {
     until: { type: 'string', required: false, description: 'ISO date to hide until; omit to hide until the terms move' }
   },
   authRules: [{ type: 'jwt', errorMessage: 'Must be logged in to hide a notice' }],
-  updateStrategy: { type: 'none' }
+  updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (_p, _r, ctx) =>
+      scopeList([scope('user', ctx.userId)]),
+    audience: 'self',
+  },
 };
 
 // ── restoreNotice ──────────────────────────────────────────────────────────
@@ -93,7 +100,13 @@ export const restoreNoticeConfig: ActionConfig = {
     noticeKey: { type: 'string', required: true, description: 'Notice.key that was hidden' }
   },
   authRules: [{ type: 'jwt', errorMessage: 'Must be logged in to restore a notice' }],
-  updateStrategy: { type: 'none' }
+  updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (_p, _r, ctx) =>
+      scopeList([scope('user', ctx.userId)]),
+    audience: 'self',
+  },
 };
 
 // ── saveNoticePrefs ────────────────────────────────────────────────────────
@@ -142,5 +155,11 @@ export const saveNoticePrefsConfig: ActionConfig = {
     lastSeenAt: { type: 'string', required: false, description: 'ISO date the notices were last opened' }
   },
   authRules: [{ type: 'jwt', errorMessage: 'Must be logged in to save notice settings' }],
-  updateStrategy: { type: 'none' }
+  updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (_p, _r, ctx) =>
+      scopeList([scope('user', ctx.userId)]),
+    audience: 'self',
+  },
 };

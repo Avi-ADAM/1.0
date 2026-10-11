@@ -1,6 +1,7 @@
 import type { ActionConfig, ActionExecutionHandler } from '../types';
 import { calcDeadlineMs } from './actionUtils.js';
 import { licenseChanged, normalizeLicenseChange } from '$lib/codeLicense/codeLicense.js';
+import { scope, decisionScope, scopeList } from '$lib/realtime/scopes.js';
 
 const toVal = (v: string | undefined | null): string | null =>
   v && v.trim() !== '' ? v.trim() : null;
@@ -257,7 +258,16 @@ export const updateProjectDetailsConfig: ActionConfig = {
       title: { he: 'עדכון פרטי פרויקט', en: 'Project details updated', ar: 'تحديث تفاصيل المشروع' },
       body: { he: 'פרטי הפרויקט עודכנו', en: 'Project details have been updated', ar: 'تم تحديث تفاصيل المشروع' }
     },
-    channels: ['socket'],
+    // As today. (The vote case is B14 in REALTIME_TRACKING.)
+    intent: 'ambient',
     metadata: { type: 'base', url: 'lev' }
-  }
+  },
+
+  realtime: {
+    scopes: (p, r) =>
+      scopeList([
+        scope('project', p.projectId),
+        ...(r?.data?.decisions ?? []).map((d: { id: string }) => decisionScope('decision', d.id)),
+      ]),
+  },
 };

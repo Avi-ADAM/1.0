@@ -1,4 +1,5 @@
 import type { ActionConfig } from '../types.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 export const updateWelcomeCardConfig: ActionConfig = {
   key: 'updateWelcomeCard',
@@ -12,5 +13,11 @@ export const updateWelcomeCardConfig: ActionConfig = {
 
   authRules: [{ type: 'jwt' }],
 
-  updateStrategy: { type: 'none' }
+  updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (_p, _r, ctx) =>
+      scopeList([scope('user', ctx.userId)]),
+    audience: 'self',
+  },
 };

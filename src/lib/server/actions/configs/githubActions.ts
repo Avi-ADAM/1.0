@@ -23,6 +23,7 @@ import { env } from '$env/dynamic/private';
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { planRepoSync, toExistingRows, type RepoRowInput, type RepoStatus } from '$lib/server/github/repos.js';
 import { claimGithubWork, ClaimError } from '$lib/server/github/claim.js';
+import { scope, decisionScope, scopeList } from '$lib/realtime/scopes.js';
 
 const adminToken = () => (env.ADMINMONTHER ?? '').replace(/\s+/g, '').replace(/^ADMINMONTHER=/, '');
 
@@ -81,7 +82,14 @@ export const linkGithubAccountConfig: ActionConfig = {
     githubLogin: { type: 'string', required: true }
   },
   access: ['serviceAdmin'],
-  authRules: []
+  authRules: [],
+
+  realtime: {
+    scopes: (p) =>
+      scopeList([scope('user', p.userId)]),
+    audience: 'parties',
+    partiesFrom: (p) => [p.userId],
+  },
 };
 
 // ─── unlinkGithubAccount ────────────────────────────────────────────────────
@@ -102,7 +110,13 @@ export const unlinkGithubAccountConfig: ActionConfig = {
   graphqlOperation: unlinkGithubAccountHandler,
   paramSchema: {},
   access: ['user', 'serviceAdmin'],
-  authRules: [{ type: 'jwt', errorMessage: 'Must be authenticated' }]
+  authRules: [{ type: 'jwt', errorMessage: 'Must be authenticated' }],
+
+  realtime: {
+    scopes: (_p, _r, ctx) =>
+      scopeList([scope('user', ctx.userId)]),
+    audience: 'self',
+  },
 };
 
 // ─── syncProjectRepos ───────────────────────────────────────────────────────
@@ -163,7 +177,12 @@ export const syncProjectReposConfig: ActionConfig = {
     connectedBy: { type: 'string', required: false }
   },
   access: ['serviceAdmin'],
-  authRules: []
+  authRules: [],
+
+  realtime: {
+    scopes: (p) =>
+      scopeList([scope('project', p.projectId)]),
+  },
 };
 
 // ─── setGithubInstallationStatus ────────────────────────────────────────────
@@ -188,7 +207,8 @@ const setGithubInstallationStatusHandler: ActionExecutionHandler = async (params
   for (const r of rows) {
     await strapi.execute('githubUpdateProjectRepo', { id: r.id, status }, context.jwt, context.fetch);
   }
-  return { data: { changed: rows.length }, updateStrategy: { type: 'none' } };
+  const projectIds = [...new Set(rows.map((r) => r.projectId).filter((id): id is string => !!id))];
+  return { data: { changed: rows.length, projectIds }, updateStrategy: { type: 'none' } };
 };
 
 export const setGithubInstallationStatusConfig: ActionConfig = {
@@ -201,7 +221,12 @@ export const setGithubInstallationStatusConfig: ActionConfig = {
     repoIds: { type: 'array', required: false }
   },
   access: ['serviceAdmin'],
-  authRules: []
+  authRules: [],
+
+  realtime: {
+    scopes: (_p, r) =>
+      scopeList((r?.data?.projectIds ?? []).map((id: string) => scope('project', id))),
+  },
 };
 
 // ─── disconnectProjectRepo ──────────────────────────────────────────────────
@@ -241,9 +266,15 @@ export const disconnectProjectRepoConfig: ActionConfig = {
       title: { he: 'מאגר קוד נותק', en: 'Code repository disconnected' },
       body: { he: 'חבר ברקמה ניתק מאגר קוד מהרקמה', en: 'A member disconnected a code repository from the rikma' }
     },
-    channels: ['socket'],
+    // Activity in the rikma, as today.
+    intent: 'ambient',
     metadata: { type: 'base', url: 'moach' }
-  }
+  },
+
+  realtime: {
+    scopes: (p) =>
+      scopeList([scope('project', p.projectId)]),
+  },
 };
 
 // ─── githubIssueClosed (S3) ─────────────────────────────────────────────────
@@ -286,7 +317,8 @@ export const githubIssueClosedConfig: ActionConfig = {
         en: 'The issue behind "{{taskName}}" was closed. If the work is finished, the task can be marked done.'
       }
     },
-    channels: ['socket', 'push'],
+    // Addressed to the task's assignee: the task may be done.
+    intent: 'personal',
     metadata: { priority: 'normal', url: '/lev?project={{projectId}}' }
   }
 };
@@ -330,7 +362,8 @@ export const githubWorkClaimableConfig: ActionConfig = {
         en: 'Your work on {{label}} can be filed as hours for the rikma to approve, from the code tab.'
       }
     },
-    channels: ['socket', 'push'],
+    // Addressed to the member who did the work: it can be claimed.
+    intent: 'personal',
     metadata: { priority: 'normal', url: '/moach/{{projectId}}/code' }
   }
 };
@@ -390,7 +423,18 @@ export const claimGithubWorkConfig: ActionConfig = {
         en: 'A member filed hours for a GitHub PR or review. You can approve, discuss or counter.'
       }
     },
-    channels: ['socket', 'push'],
+    // Filed through the same approval as timer hours: every member is asked, against the clock.
+    intent: 'consent',
     metadata: { priority: 'normal', url: '/lev?project={{projectId}}' }
-  }
+  },
+
+  realtime: {
+    scopes: (p, r, ctx) =>
+      scopeList([
+        scope('project', p.projectId),
+        scope('mission', p.missionId),
+        scope('timer', ctx.userId),
+        r?.data?.filed === 'approval' ? decisionScope('finiapruval', r.data.finiapruvalId) : null,
+      ]),
+  },
 };

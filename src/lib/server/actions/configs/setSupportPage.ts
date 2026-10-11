@@ -1,4 +1,5 @@
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 /**
  * Flip the public support-page gate (PLAN_VOLUNTEER_RIKMA §7).
@@ -57,5 +58,10 @@ export const setSupportPageConfig: ActionConfig = {
       errorMessage: 'Only project members can change the support page'
     }
   ],
-  updateStrategy: { type: 'none' }
+  updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (p) =>
+      scopeList([scope('project', p.projectId)]),
+  },
 };

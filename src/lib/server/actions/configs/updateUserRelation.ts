@@ -1,6 +1,7 @@
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { matchUserToOpenEntities } from '$lib/server/matching/engine';
 import { STRAPI_GRAPHQL } from '$lib/server/strapiUrl.js';
+import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 const KISH_VALC: Record<string, string> = {
   skills:     'skillName',
@@ -69,5 +70,11 @@ export const updateUserRelationConfig: ActionConfig = {
     ids:  { type: 'array',  required: true,  description: 'Array of relation IDs to set' }
   },
   authRules: [{ type: 'jwt', errorMessage: 'You must be logged in to update your profile' }],
-  updateStrategy: { type: 'none' }
+  updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (_p, _r, ctx) =>
+      scopeList([scope('user', ctx.userId)]),
+    audience: 'self',
+  },
 };
