@@ -1,6 +1,6 @@
 ﻿<script>
   import { toast } from 'svelte-sonner';
-  import { sendToSer } from '$lib/send/sendToSer'; // adjust path
+  import { updateTask } from '$lib/client/actionClient';
   import { t, isRtl} from '$lib/translations';
   import { lang } from '$lib/stores/lang.js';
   // ─── Props ───────────────────────────────────────────────────────────────────
@@ -122,21 +122,18 @@
   }
 
   // ─── Actions ─────────────────────────────────────────────────────────────────
+  // Writes go through the action (updateTask): it checks membership in the
+  // task's rikma and tells the rikma's open screens (`act:<id>`).
+  const projectOf = (id) => String(allActs.find((a) => String(a.id) === String(id))?._projectId ?? '');
+
   async function busabe(id) {
     try {
-      const res = await sendToSer(
-        { id, naasa: true },
-        '62MarkActDone',
-        null,
-        null,
-        false,
-        fetch
-      );
-      if (res.data) {
+      const res = await updateTask({ id: String(id), projectId: projectOf(id), naasa: true });
+      if (res.success) {
         toast.success('✓ ' + $t('tasks.markDone'));
         confirmingDone = null;
       } else {
-        toast.warning('שגיאה');
+        toast.warning(res.error?.message || 'שגיאה');
       }
     } catch (e) {
       toast.warning(e.message);
@@ -145,15 +142,8 @@
 
   async function updStat(id, status) {
     try {
-      const res = await sendToSer(
-        { id, status },
-        '63SetActStatus',
-        null,
-        null,
-        false,
-        fetch
-      );
-      if (res.data) {
+      const res = await updateTask({ id: String(id), projectId: projectOf(id), status: Number(status) });
+      if (res.success) {
         toast.success($t('tasks.save') + ' ✓');
         const ep = { ...editingProgress };
         delete ep[id];

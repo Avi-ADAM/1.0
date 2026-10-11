@@ -147,7 +147,9 @@
         started: true,
         created: false,
         id: 0,
-        md: { mbId: 0, pid: $idPr }
+        // The real mission: its chat is created on it (ensureMissionForum checks
+        // the mission belongs to the rikma). mbId 0 left the forum unlinked.
+        md: { mbId: missionId ?? 0, pid: projectId ?? $idPr }
       });
       let tempF = $forum;
       tempF[-1] = {

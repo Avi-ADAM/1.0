@@ -82,7 +82,7 @@
       console.log(m);
       const forumRes = await createForum($newChat.md.pid, $newChat.md.mbId);
       if (forumRes != 'error') {
-        const forumId = forumRes.data.createForum.data.id;
+        const forumId = Number(forumRes);
         console.log($forum[forumId], '55');
         $forum[forumId] = $forum[-1];
         $forum[-1] = {

@@ -473,9 +473,11 @@ export async function handleClearAll(timer, fetch, isSer = false, projectId = ''
 }
 
 /**
- * Recalculates mission hours from historical timers
+ * Recalculates mission hours from historical timers. The write goes through
+ * updateMissionTimerState (membership checked, the rikma's screens told) —
+ * never straight through /api/send (PLAN_REALTIME_MIGRATION B9).
  */
-export async function recalculateMissionHours(missionId, fetch) {
+export async function recalculateMissionHours(missionId, fetch, projectId) {
   try {
     const res = await sendToSer({ missionId }, '88GetMissionTimersForRecalc', null, null, false, fetch);
     const data = res?.data;
@@ -501,12 +503,12 @@ export async function recalculateMissionHours(missionId, fetch) {
     const savedHours = totalSavedMilliseconds / 1000 / 60 / 60;
 
     if (data.mesimabetahalich?.data) {
-      await sendToSer({
-        mId: missionId,
-        howmanyhoursalready: savedHours,
-        stname: "recalculated",
-        x: 0,
-      }, '11saveTimer', null, null, false, fetch);
+      const saved = await executeTimerAction(
+        'updateMissionTimerState',
+        { mId: String(missionId), projectId: String(projectId ?? ''), hoursdon: savedHours },
+        fetch
+      );
+      if (saved == null) return null;
     }
 
     return { savedHours, unsavedHours: 0, totalHours: savedHours };

@@ -2,6 +2,8 @@
 
 > **עדכן מסמך זה** אחרי כל מיגרציה: שנה `[ ]` ל-`[x]` ורשום תאריך.
 >
+> **2026-10-12 — מצב אמיתי:** סריקה של כל mutation qid במחרוזת בקוד הלקוח מצאה שהשאריות האחרונות עברו ל-actions (`updateTask`, `ensureMissionForum`, `ensureHalukaForum`, `linkTelegram`, `updateMissionTimerState`, `createTosplit`, `updateTosplitProposal` — ראו `REALTIME_TRACKING.md` B9). הטבלאות כאן לא עודכנו שורה-שורה ועלולות להראות `[ ]` ישנים. **כתיבות שעדיין עוברות ב-`/api/send` מגיעות מריפואים אחרים:** `magik-meetings` (פגישות) ו-`consensus1lev1` (מו"מ) — לא למחוק את ה-qids שלהם.
+>
 > **עדיפות:** POST (כתיבה) > GET (קריאה).  
 > POST שעוקפים את המערכת = חוסר notifications, חוסר real-time, חוסר token security.  
 > GET שעוקפים = פחות קריטי, לטפל בסוף.

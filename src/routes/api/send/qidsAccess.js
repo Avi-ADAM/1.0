@@ -269,6 +269,7 @@ export const qidsAccess = {
   '77createMonter': { allow: ['user', 'serviceAdmin'] },
   '79approveTosplit': { allow: ['user', 'serviceAdmin'] },
   '173getTosplitForFinalize': { allow: ['serviceAdmin'] }, // cron-side read only (timegrama finalizer)
+  'getTosplitForUpdate': { allow: ['serviceAdmin'] }, // read by the updateTosplitProposal action only
   '72getSheirutpendById': { allow: ['user', 'serviceAdmin'] },
   '80updateSale': { allow: ['user', 'serviceAdmin'] },
   '81updateHaluka': { allow: ['user', 'serviceAdmin'] },

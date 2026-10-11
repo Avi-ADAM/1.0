@@ -491,7 +491,7 @@
       return;
     }
 
-    const result = await recalculateMissionHours(timer.mId, fetch);
+    const result = await recalculateMissionHours(timer.mId, fetch, timer.projectId);
 
     if (result) {
       const { savedHours } = result;

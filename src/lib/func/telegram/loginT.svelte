@@ -1,5 +1,5 @@
 <script>
-  import { sendToSer } from '$lib/send/sendToSer.js';
+  import { executeAction } from '$lib/client/actionClient';
 	import { onMount } from 'svelte';
 
 	/** @type {HTMLDivElement}*/
@@ -30,10 +30,12 @@
 		onAuth
 	} = $props();
 
-	function telegramCallback( user) {
-        console.log(user)
-        sendToSer({uid,telegramId:user.id.toString()},"6addTelegram",uid,null,false,fetch)
-		onAuth?.(user);
+	// Stored on the signed-in member's own row by the action — never a row the
+	// client names (`uid` stays a prop for the callers, unused here).
+	async function telegramCallback(user) {
+		const res = await executeAction('linkTelegram', { telegramId: String(user.id) });
+		if (res?.success) onAuth?.(user);
+		else console.error('[loginT] linking Telegram failed', res?.error);
 	}
 	function cleanStart() {
 		try {

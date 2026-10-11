@@ -2887,6 +2887,28 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
   // Everything the timegrama finalizer needs to mature a split on silence:
   // whether it already closed, who voted, the transfers, and the earnings rows
   // it has to turn into balance deltas.
+  // What editing a standing split proposal reconciles against — every transfer,
+  // the site-share legs included, with both ends and whether it was confirmed.
+  // Read by the updateTosplitProposal action only.
+  'getTosplitForUpdate': `query GetTosplitForUpdate($id: ID!) {
+    tosplit(id: $id) {
+      data { id attributes {
+        finished
+        project { data { id } }
+        sales { data { id } }
+        halukas { data { id attributes {
+          amount confirmed
+          usersend { data { id } }
+          userrecive { data { id } }
+        } } }
+        siteShareHalukas { data { id attributes {
+          amount confirmed
+          usersend { data { id } }
+          userrecive { data { id } }
+        } } }
+      } }
+    }
+  }`,
   '173getTosplitForFinalize': `query GetTosplitForFinalize($id: ID!) {
     tosplit(id: $id) {
       data { id attributes {

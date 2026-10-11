@@ -1,4 +1,7 @@
 // src/routes/negotiation/[id]/+page.server.js
+// NOT USED IN PRODUCTION — reference only. Negotiations run on the consensus
+// site (consensus.1lev1.com, reached through $lib/func/negoBridge.js); see the
+// note at the top of +page.svelte.
 import { sendToSer } from '$lib/send/sendToSer.js';
 
 export async function load({ params, fetch }) {

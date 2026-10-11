@@ -36,6 +36,9 @@ import { attachEntityToProcessConfig } from './attachEntityToProcess.js';
 import { ensureProcessForumConfig } from './ensureProcessForum.js';
 import { ensureProjectForumConfig } from './ensureProjectForum.js';
 import { ensureStageForumConfig } from './ensureStageForum.js';
+import { ensureMissionForumConfig } from './ensureMissionForum.js';
+import { linkTelegramConfig } from './linkTelegram.js';
+import { updateTosplitProposalConfig } from './updateTosplitProposal.js';
 import { closeFiniapruvalConfig } from './closeFiniapruval.js';
 import { counterFiniapruvalConfig } from './counterFiniapruval.js';
 import { updateProjectDetailsConfig } from './updateProjectDetails.js';
@@ -279,6 +282,9 @@ export function registerAllActions(): void {
   registerAction(ensureProcessForumConfig);
   registerAction(ensureProjectForumConfig);
   registerAction(ensureStageForumConfig);
+  registerAction(ensureMissionForumConfig);
+  registerAction(linkTelegramConfig);
+  registerAction(updateTosplitProposalConfig);
   registerAction(completeMissionConfig);
 
   // Finiapruval voting and closing
@@ -620,6 +626,9 @@ export {
   ensureProcessForumConfig,
   ensureProjectForumConfig,
   ensureStageForumConfig,
+  ensureMissionForumConfig,
+  linkTelegramConfig,
+  updateTosplitProposalConfig,
   completeMissionConfig,
   chatActions,
   maagadActions,

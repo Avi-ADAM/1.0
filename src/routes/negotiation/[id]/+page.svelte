@@ -1,5 +1,13 @@
 <!-- src/routes/negotiation/[id]/+page.svelte -->
 <!-- AI-First Negotiation Platform — Mobile-First, Hebrew RTL -->
+<!--
+  NOT USED IN PRODUCTION — kept as a reference only.
+  This route grew into the separate consensus site (consensus.1lev1.com), and
+  every negotiation runs there now: the app links out to it through
+  $lib/func/negoBridge.js (`/negotiation/bridge`, `/negotiation/<id>` on the
+  consensus host), never to this page. Do not wire new flows, realtime scopes or
+  notifications to it (docs/inprogress/REALTIME_TRACKING.md — skipped on purpose).
+-->
 
 <script>
   import { animate, signal, all } from '$lib/func/animation.ts';

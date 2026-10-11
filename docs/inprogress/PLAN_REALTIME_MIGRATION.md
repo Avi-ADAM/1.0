@@ -1,6 +1,6 @@
 # תכנית — מיגרציית Real-Time: כל שינוי מגיע לכל מסך שמציג אותו
 
-> **מצב:** בביצוע — R0, R1, R2 ו-N0–N1 בנויים (2026-10-08); R3 (דפי גל 1) מחובר ונבדק בהזרקה ל-bus (2026-10-10); R4 הושלם (2026-10-11) — כל ה-actions הכותבים מצהירים `realtime` ו-`LEGACY_NO_REALTIME` הוסר; נבדקו חי vote/archive, wish ו-createTask/updateTask; R5 בנוי (2026-10-11) — דפי גל 2 מחוברים, timegrama מפרסם הבשלות, `fullRefresh` לא משודר ו-`invalidate(() => true)` הוסר מהסוקט; R6 בנוי (2026-10-11) — המאזינים הישנים הוסרו, הטיימרים והצ'אט בלב עברו ל-bus, `updateStrategy` לא משודר יותר, ונתיבי ההתראה הישנים (N7) נמחקו; לא נבדק חי. נשארו: `moach/[pid]/edit`, `negotiation/[id]` ו-`/api/send` (B9), N5, ובדיקה חיה בשני דפדפנים של הטיימרים והצ'אט. קובץ המעקב: [`REALTIME_TRACKING.md`](./REALTIME_TRACKING.md).
+> **מצב:** בביצוע — R0, R1, R2 ו-N0–N1 בנויים (2026-10-08); R3 (דפי גל 1) מחובר ונבדק בהזרקה ל-bus (2026-10-10); R4 הושלם (2026-10-11) — כל ה-actions הכותבים מצהירים `realtime` ו-`LEGACY_NO_REALTIME` הוסר; נבדקו חי vote/archive, wish ו-createTask/updateTask; R5 בנוי (2026-10-11) — דפי גל 2 מחוברים, timegrama מפרסם הבשלות, `fullRefresh` לא משודר ו-`invalidate(() => true)` הוסר מהסוקט; R6 בנוי (2026-10-11) — המאזינים הישנים הוסרו, הטיימרים והצ'אט בלב עברו ל-bus, `updateStrategy` לא משודר יותר, ונתיבי ההתראה הישנים (N7) נמחקו; לא נבדק חי. N5 בנוי (2026-10-11) — כל הבשלה בשתיקה מודיעה לצדדים (`tellMatured` + `maturedNotices.ts`); לא נבדק חי. B9 סגור בתוך הריפו (2026-10-12) — הכתיבות שהלקוח שלח דרך `/api/send` עברו ל-actions; `negotiation/[id]` דולג (רפרנס, האתר הוא consensus). נשארו: `moach/[pid]/edit`, הכתיבות של `magik-meetings` ו-`consensus1lev1` דרך `/api/send` (בריפואים שלהם), ובדיקה חיה של הטיימרים, הצ'אט, ההודעות על הבשלה ועריכת חלוקה. קובץ המעקב: [`REALTIME_TRACKING.md`](./REALTIME_TRACKING.md).
 > **קשור:** [`SPEC_SOCKET_REALTIME.md`](../tbd/SPEC_SOCKET_REALTIME.md) (presence / typing / עריכה
 > במקביל — **מחוץ** לתכנית הזאת, ראו R6), [`../inprogress/MIGRATION_TRACKING.md`](../inprogress/MIGRATION_TRACKING.md)
 > (כתיבות שעדיין עוקפות את ה-Action System — הן בלתי נראות לסוקט בכלל),
@@ -358,6 +358,8 @@ config מצהיר **מה ההתראה מבקשת מהקורא**, והערוצי�
 ### 6.5 מחוץ ל-R4
 
 - **N5** — הבשלה בשתיקה (timegrama) לא מודיעה לאף אחד. נכנס ל-R5 יחד עם ה-scopes של timegrama:
-  ההבשלה מודיעה לצדדים (`outcome`, ול-bilateral `personal`).
+  ההבשלה מודיעה לצדדים (`outcome`, ול-bilateral `personal`). ✓ 2026-10-11 — וגם `consent` כשההבשלה
+  פותחת סבב שמחכה למי שהשתיקה שלו לא נספרת (מי שהמשימה הוצעה על שמו, הלקוחה, המממן, מחזיק משימה רדומה).
+  כל הנוסחים ב-`src/lib/server/notifications/maturedNotices.ts`; handler חדש של timegrama קורא ל-`tellMatured`.
 - **N7** — נתיבי ההתראה הישנים (`/api/nutiUser`, `/api/nutifyPm`, `HalukaNotificationService`, …) נמחקים ב-R6. ✓ 2026-10-11
 - **N9** — השתקת רקמה: כשתיבנה, היא חלה על `ambient` / `outcome` / `personal`. השתקת `consent` — הכרעה פתוחה.

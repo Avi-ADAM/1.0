@@ -16,7 +16,7 @@
    * rather than the raw qids proxy, so `updateTask`'s `projectMember` rule and
    * notification fan-out apply. (The assignee cell this replaced called
    * `sendToSer('31updateTask')` straight from the component, bypassing both;
-   * `/myacts` still marks tasks done through `62MarkActDone` the same way.)
+   * `/myacts` has since moved to `updateTask` too.)
    *
    * @typedef {Object} Props
    * @property {any} row - The act row.

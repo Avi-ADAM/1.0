@@ -75,3 +75,48 @@ describe('approveHaluka — finalizing a split', () => {
     ).toBe(true);
   });
 });
+
+describe('createTosplit — the writes that belong to the proposal (B9)', () => {
+  function strapiWith(members: string[], restime = 'feh') {
+    const calls: Array<[string, any]> = [];
+    const execute = async (qid: string, vars: any) => {
+      calls.push([qid, vars]);
+      if (qid === '70.5createTosplit') return { data: { createTosplit: { data: { id: '31' } } } };
+      if (qid === 'saleClaimProjectInfo')
+        return { data: { project: { data: { attributes: { restime, user_1s: { data: members.map((id) => ({ id })) } } } } } };
+      return { data: {} };
+    };
+    return { strapi: { execute }, calls };
+  }
+  const run = (strapi: any) =>
+    (createTosplitConfig.graphqlOperation as any)({ data: { ...base, halukas: [], sales: [104, 105] } }, { jwt: 'j', fetch: () => {} }, { strapi });
+
+  it('returns the raw qid result, so callers still read data.createTosplit.data.id', async () => {
+    const { strapi } = strapiWith(['1', '2']);
+    expect((await run(strapi)).data.createTosplit.data.id).toBe('31');
+  });
+
+  it('marks every sale pending on this proposal', async () => {
+    const { strapi, calls } = strapiWith(['1', '2']);
+    await run(strapi);
+    expect(calls.filter(([q]) => q === '71updateSaleSplited').map(([, v]) => v)).toEqual([
+      { id: '104', pending: true, tosplits: ['31'] },
+      { id: '105', pending: true, tosplits: ['31'] }
+    ]);
+  });
+
+  it("opens the rikma's silence clock", async () => {
+    const { strapi, calls } = strapiWith(['1', '2']);
+    const before = Date.now();
+    await run(strapi);
+    const clock = calls.find(([q]) => q === '32createTimeGrama')?.[1];
+    expect(clock).toMatchObject({ whatami: 'tosplit', tosplit: '31' });
+    expect(new Date(clock.date).getTime()).toBeGreaterThan(before);
+  });
+
+  it('opens no clock in a rikma of one — the creator already approved it', async () => {
+    const { strapi, calls } = strapiWith(['1']);
+    await run(strapi);
+    expect(calls.some(([q]) => q === '32createTimeGrama')).toBe(false);
+  });
+});

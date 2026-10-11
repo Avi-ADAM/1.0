@@ -5,8 +5,6 @@
   import pic from './../../celim/pic.js';
   import { idPr } from '../../stores/idPr.js';
   import { onMount } from 'svelte';
-  import { calcX } from '$lib/func/calcX.svelte';
-  import { sendToSer } from '$lib/send/sendToSer.js';
   import { executeAction } from '$lib/client/actionClient.js';
   import { computeSiteShare } from '$lib/revenue/computeSiteShare.js';
   import { SITE_SHARE_FLAGS, DEFAULT_SITE_SHARE_CONFIG } from '$lib/revenue/config.js';
@@ -249,105 +247,28 @@
       return;
     }
 
-    const cookieValueId = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('id='))
-      .split('=')[1];
-
-    let idL = cookieValueId;
     let d = new Date();
 
     try {
-      const existingHalukas = currentTosplit.attributes.halukas.data;
-
-      // Build current transfers list. Platform (site-share) transfers are tracked
-      // separately and must NOT enter the tosplit's gating `halukas` set (otherwise
-      // the platform member's confirmation would gate the partners, and the count
-      // mismatch with checkSplitChanges() — which also excludes them — falsely
-      // fires "split changed"). Mirrors ask(): platform legs stay out here.
-      const currentTransfers = [];
+      // The recomputed split, as transfers. Platform (site-share) legs are kept
+      // apart: they must NOT enter the tosplit's gating `halukas` set, or the
+      // platform member's confirmation would gate the partners (mirrors ask()).
+      const transfers = [];
+      const platformTransfers = [];
       for (let i = 0; i < ulist.length; i++) {
         if (ulist[i].noten > 0 && ulist[i].le) {
           for (let x = 0; x < ulist[i].le.length; x++) {
-            if (ulist[i].le[x].platform === true) continue;
-            currentTransfers.push({
-              from: ulist[i].uid,
-              to: ulist[i].le[x].leid,
+            const leg = {
+              from: String(ulist[i].uid),
+              to: String(ulist[i].le[x].leid),
               amount: parseFloat(ulist[i].le[x].cama.toFixed(2))
-            });
+            };
+            (ulist[i].le[x].platform === true ? platformTransfers : transfers).push(leg);
           }
         }
       }
 
-      let updatedHalukaIds = [];
-
-      // Process existing halukas
-      for (let existingHaluka of existingHalukas) {
-        const matchingTransfer = currentTransfers.find(
-          (transfer) =>
-            transfer.from == existingHaluka.attributes.usersend.data.id &&
-            transfer.to == existingHaluka.attributes.userrecive.data.id
-        );
-
-        if (matchingTransfer) {
-          // Update existing haluka if amount changed and not confirmed
-          if (
-            !existingHaluka.attributes.confirmed &&
-            Math.abs(
-              existingHaluka.attributes.amount - matchingTransfer.amount
-            ) > 0.01
-          ) {
-            await sendToSer(
-              {
-                id: existingHaluka.id,
-                amount: matchingTransfer.amount
-              },
-              '70updateHaluka',
-              null,
-              null,
-              false,
-              fetch
-            );
-          }
-          updatedHalukaIds.push(existingHaluka.id);
-
-          // Remove this transfer from currentTransfers as it's been handled
-          const index = currentTransfers.indexOf(matchingTransfer);
-          currentTransfers.splice(index, 1);
-        } else if (existingHaluka.attributes.confirmed) {
-          // Keep confirmed halukas even if they don't match current calculation
-          updatedHalukaIds.push(existingHaluka.id);
-        }
-        // If no matching transfer found and not confirmed, the haluka will be removed from tosplit relation
-        // (not deleted, just not included in the updated halukas array)
-      }
-
-      // Create new halukas for remaining transfers
-      for (let transfer of currentTransfers) {
-        const halukaData = {
-          project: $idPr,
-          usersend: transfer.from,
-          userrecive: transfer.to,
-          amount: transfer.amount,
-          matbea: '2',
-          confirmed: false,
-          publishedAt: d.toISOString()
-        };
-
-        const result = await sendToSer(
-          { data: halukaData },
-          '69createHaluka',
-          null,
-          null,
-          false,
-          fetch
-        );
-        if (result?.data?.createHaluka?.data?.id) {
-          updatedHalukaIds.push(result.data.createHaluka.data.id);
-        }
-      }
-
-      // Create new hervachti array
+      // Who earned what.
       let hervachtiArray = [];
       for (let c = 0; c < ulist.length; c++) {
         const amount = ulist[c].x;
@@ -362,139 +283,35 @@
         }
       }
 
-      // ── Site share (1💗1) on the UPDATE path ──────────────────────────────────
-      // Mirror ask(): the platform's service line is a real giver→platform Haluka,
-      // but it is NOT part of the gating `halukas` set — it's linked through the
-      // tosplit's `siteShareHalukas` (SET semantics, like `sales`). We reconcile the
-      // existing platform transfers against the freshly-computed ones so editing a
-      // proposal keeps the cross-rikma transfer accurate (update amount, add new,
-      // drop stale-unconfirmed) without proliferating duplicates.
-      let platformHalukaIds = [];
-      const existingPlatform = currentTosplit.attributes.siteShareHalukas?.data || [];
       const siteShareActive =
         SITE_SHARE_FLAGS.crossRikmaFields && platformInfo?.configured;
-      if (siteShareActive) {
-        // Current platform transfers from the recomputed split.
-        const platformNow = [];
-        for (let i = 0; i < ulist.length; i++) {
-          if (ulist[i].noten > 0 && ulist[i].le) {
-            for (let x = 0; x < ulist[i].le.length; x++) {
-              if (ulist[i].le[x].platform === true) {
-                platformNow.push({
-                  from: String(ulist[i].uid),
-                  to: String(ulist[i].le[x].leid),
-                  amount: parseFloat(ulist[i].le[x].cama.toFixed(2))
-                });
-              }
+
+      // The reconciliation — update, add, unlink transfers; re-link the sales and
+      // mark them pending — runs on the server, membership and the split's state
+      // checked there (updateTosplitProposal, PLAN_REALTIME_MIGRATION B9).
+      const res = await executeAction('updateTosplitProposal', {
+        tosplitId: String(currentTosplit.id),
+        projectId: String($idPr),
+        transfers,
+        hervachti: hervachtiArray,
+        newSaleIds: unsplitedSales.map((sale) => String(sale.id)),
+        siteShare: siteShareActive
+          ? {
+              active: true,
+              transfers: platformTransfers,
+              reciveProject: String(platformInfo.projectId),
+              proposedAmount: siteShareProposed,
+              adjustDirection: siteShareDirection,
+              adjustReason: siteShareReason || null
             }
-          }
-        }
-
-        const remaining = [...platformNow];
-        for (const ex of existingPlatform) {
-          const exFrom = String(ex.attributes.usersend?.data?.id ?? '');
-          const exTo = String(ex.attributes.userrecive?.data?.id ?? '');
-          const idx = remaining.findIndex((t) => t.from === exFrom && t.to === exTo);
-          if (idx !== -1) {
-            const m = remaining[idx];
-            if (
-              !ex.attributes.confirmed &&
-              Math.abs((ex.attributes.amount || 0) - m.amount) > 0.01
-            ) {
-              await sendToSer(
-                { id: ex.id, amount: m.amount },
-                '70updateHaluka',
-                null,
-                null,
-                false,
-                fetch
-              );
-            }
-            platformHalukaIds.push(ex.id);
-            remaining.splice(idx, 1);
-          } else if (ex.attributes.confirmed) {
-            // Keep confirmed transfers even if the recompute no longer produces them.
-            platformHalukaIds.push(ex.id);
-          }
-          // Unmatched & unconfirmed → omitted from platformHalukaIds → unlinked by
-          // the siteShareHalukas SET below (its source_tosplit is cleared).
-        }
-
-        // Brand-new platform transfers — tagged like ask(). The tosplit-side SET
-        // links them (source_tosplit), so it isn't passed here.
-        for (const t of remaining) {
-          const halukaData = {
-            project: $idPr,
-            usersend: t.from,
-            userrecive: t.to,
-            amount: t.amount,
-            matbea: '2',
-            confirmed: false,
-            publishedAt: d.toISOString(),
-            isSiteShare: true,
-            recive_project: String(platformInfo.projectId),
-            proposedAmount: siteShareProposed,
-            adjustDirection: siteShareDirection,
-            adjustReason: siteShareReason || null,
-            autoApproved: true
-          };
-          const res = await sendToSer(
-            { data: halukaData },
-            '69createHaluka',
-            null,
-            null,
-            false,
-            fetch
-          );
-          const id = res?.data?.createHaluka?.data?.id;
-          if (id) platformHalukaIds.push(id);
-        }
+          : { active: false }
+      });
+      if (!res?.success) {
+        console.error('Error updating tosplit:', res?.error);
+        return;
       }
-
-      // `68updateTosplit` writes `sales` as a SET (replace), and tosplit↔sale is
-      // manyToMany — so we must re-send the sales ALREADY linked to this tosplit
-      // together with the newly-unsplited ones, or the update would silently drop
-      // the originals and they'd resurface as phantom "new sales" on refresh.
-      const existingSaleIds = currentTosplit.attributes.sales?.data?.map(s => s.id) || [];
-      const salesIds = [...new Set([...existingSaleIds, ...unsplitedSales.map(sale => sale.id)])];
-
-      // Update the tosplit with new halukas, hervachti, sales and the site-share
-      // transfer links. Passthrough `data: TosplitInput!` (same proven shape as
-      // createTosplit) so siteShareHalukas flows even though the local generated
-      // schema is stale. siteShareHalukas is always sent (the sole caller) so its
-      // SET semantics link/unlink platform transfers cleanly without wiping.
-      await sendToSer(
-        {
-          id: currentTosplit.id,
-          data: {
-            halukas: updatedHalukaIds,
-            hervachti: hervachtiArray,
-            sales: salesIds,
-            ...(siteShareActive ? { siteShareHalukas: platformHalukaIds } : {})
-          }
-        },
-        '68updateTosplit',
-        null,
-        null,
-        false,
-        fetch
-      );
-
-      // Update each sale to mark as pending (not splited yet, waiting for votes)
-      for (let saleId of salesIds) {
-        await sendToSer(
-          {
-            id: saleId,
-            pending: true,
-            tosplits: [currentTosplit.id]
-          },
-          '71updateSaleSplited',
-          null,
-          null,
-          false,
-          fetch
-        );
-      }
+      const platformHalukaIds = res.data?.platformHalukaIds ?? [];
+      const hadPlatformBefore = res.data?.hadPlatformBefore === true;
 
       // Income Sale in the MAIN rikma (the platform earned this by providing its
       // service) — mirrors ask() step 2.5. We create it ONLY when site-share is
@@ -507,7 +324,7 @@
         SITE_SHARE_FLAGS.manualSplit &&
         platformInfo?.configured &&
         siteShareFinal > 0 &&
-        existingPlatform.length === 0 &&
+        !hadPlatformBefore &&
         platformHalukaIds.length > 0
       ) {
         const saleRes = await executeAction('createPlatformSale', {
@@ -527,7 +344,7 @@
       } else if (
         SITE_SHARE_FLAGS.manualSplit &&
         platformInfo?.configured &&
-        existingPlatform.length > 0
+        hadPlatformBefore
       ) {
         console.warn(
           '[SiteShare] update: existing site-share income Sale not adjusted',
@@ -773,21 +590,8 @@
         }
       }
 
-      // Step 5: Update each sale to mark as pending (waiting for votes)
-      for (let saleId of salesIds) {
-        await sendToSer(
-          {
-            id: saleId,
-            pending: true,
-            tosplits: [tosplitId]
-          },
-          '71updateSaleSplited',
-          null,
-          null,
-          false,
-          fetch
-        );
-      }
+      // Step 5 (marking the sales pending) and step 6 (the rikma's silence clock)
+      // now happen inside createTosplit, on the server (PLAN_REALTIME_MIGRATION B9).
 
       // Step 5.5 — SOLO RIKMA: the proposal is already unanimous.
       // The creator's `what:true` sits inside the tosplit we just created, and
@@ -833,18 +637,6 @@
         noofw = 0;
         return;
       }
-
-      // Step 6: Create timegrama for the tosplit
-      let x = calcX(restime);
-      let fd = new Date(Date.now() + x);
-      await sendToSer(
-        { whatami: 'tosplit', tosplit: tosplitId, date: fd },
-        '32createTimeGrama',
-        null,
-        null,
-        false,
-        fetch
-      );
 
       console.log('✅ Tosplit created successfully with automatic notifications!');
       toast.success(get(t)('mission.whowhat.splitCreated'));

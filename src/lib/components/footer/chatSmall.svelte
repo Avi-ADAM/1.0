@@ -86,15 +86,10 @@
       }
     } else {
       console.log(m);
-      // אם יש halukId, מעבירים אותו לפונקציה עם רשימת המשתתפים
-      const forumRes = await createForum(
-        $newChat.md.pid,
-        $newChat.md.mbId,
-        $newChat.md.halukId,
-        $newChat.md.participants
-      );
+      // A transfer's chat (halukId) or a mission's — the action checks who may open it.
+      const forumRes = await createForum($newChat.md.pid, $newChat.md.mbId, $newChat.md.halukId);
       if (forumRes != 'error') {
-        const forumId = forumRes.data.createForum.data.id;
+        const forumId = Number(forumRes);
         console.log($forum[forumId], '55');
         $forum[forumId] = $forum[-1];
         $forum[-1] = {

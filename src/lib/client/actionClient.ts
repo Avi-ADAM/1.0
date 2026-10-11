@@ -112,6 +112,12 @@ export interface UpdateTaskParams {
 
   /** Array of mission IDs associated with the task */
   mesimabetahaliches?: string[];
+
+  /** Mark the task as done */
+  naasa?: boolean;
+
+  /** Progress status (0–100) */
+  status?: number;
 }
 
 /**
@@ -368,6 +374,7 @@ export type ActionKey =
   | 'counterFiniapruval'
   | 'createHaluka'
   | 'createTosplit'
+  | 'updateTosplitProposal'
   | 'approveHaluka'
   | 'timerStart'
   | 'timerStop'
@@ -403,6 +410,9 @@ export type ActionKey =
   | 'getForumThread'
   | 'createChatMessage'
   | 'ensureVoteForum'
+  | 'ensureHalukaForum'
+  | 'ensureMissionForum'
+  | 'linkTelegram'
   | 'getPlatformProject'
   | 'createPlatformSale'
   | 'decideSiteShare'
