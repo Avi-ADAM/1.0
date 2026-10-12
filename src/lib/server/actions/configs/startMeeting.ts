@@ -257,7 +257,8 @@ async function startMeetingNow(
                         en: `The meeting "${meetingName}" is starting now! Everyone is ready.`
                     }
                 },
-                channels: ['socket', 'push', 'email'],
+                // The meeting is starting — to each participant, now.
+                intent: 'personal',
                 metadata: {
                     url: '/meeting/' + meetingId,
                     type: 'meetingStarted',

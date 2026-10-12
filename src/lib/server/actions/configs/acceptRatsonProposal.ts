@@ -453,13 +453,12 @@ export const acceptRatsonProposalConfig: ActionConfig = {
   authRules: [{ type: 'jwt', errorMessage: 'Must be logged in to accept a proposal' }],
   notification: {
     // The provider rikma comes from the *result* — the client sends only
-    // proposalId/ratsonId, so a `projectMembers` rule reading params.projectId
-    // resolved nobody and the provider never heard that she accepted.
-    // `specificUsers` with no ids falls back to projectIdParam on the result.
+    // proposalId/ratsonId; `projectMembers` reads projectId off the result
+    // when params have none. The paths that already told the volunteer return
+    // no projectId, so this one reaches nobody there.
     recipients: {
-      type: 'specificUsers',
+      type: 'projectMembers',
       config: {
-        userIdsParam: 'recipientIds',
         projectIdParam: 'projectId',
         excludeSender: true
       }

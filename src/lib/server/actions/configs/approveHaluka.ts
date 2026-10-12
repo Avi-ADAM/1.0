@@ -117,7 +117,8 @@ export const approveHalukaConfig: ActionConfig = {
       title: { he: 'חלוקה אושרה!', en: 'Division Approved!', ar: 'تمت الموافقة على التقسيم!' },
       body: { he: 'החלוקה אושרה על ידי כל המשתתפים', en: 'The division has been approved by all participants', ar: 'تمت الموافقة على التقسيم من قبل جميع المشاركين' }
     },
-    channels: ['socket', 'email', 'telegram', 'push'],
+    // A rikma-wide result on money: shares changed, nothing awaited from anyone.
+    intent: 'outcome',
     emailTemplate: 'HalukaApproved',
     metadata: {
       icon: 'https://res.cloudinary.com/love1/image/upload/v1645647192/apple-touch-icon_irclue.png',

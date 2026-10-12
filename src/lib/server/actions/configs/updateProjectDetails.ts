@@ -255,11 +255,28 @@ export const updateProjectDetailsConfig: ActionConfig = {
       config: { projectIdParam: 'projectId', excludeSender: true }
     },
     templates: {
-      title: { he: 'עדכון פרטי פרויקט', en: 'Project details updated', ar: 'تحديث تفاصيل المشروع' },
-      body: { he: 'פרטי הפרויקט עודכנו', en: 'Project details have been updated', ar: 'تم تحديث تفاصيل المشروع' }
+      title: { he: 'פרטי הרקמה עודכנו', en: 'Rikma details updated', ar: 'تم تحديث تفاصيل الريكما' },
+      body: { he: 'פרטי הרקמה עודכנו', en: 'The rikma details have been updated', ar: 'تم تحديث تفاصيل الريكما' }
     },
-    // As today. (The vote case is B14 in REALTIME_TRACKING.)
-    intent: 'ambient',
+    // In a rikma of several members nothing changed yet: each edited field
+    // opened a Decision with a silence clock (REALTIME_TRACKING B14). That is a
+    // request for consent, worded as one, on every channel.
+    templatesFor: (_p, r) =>
+      (r?.data?.decisionsCreated ?? 0) > 0
+        ? {
+            title: {
+              he: 'הוצע שינוי בפרטי הרקמה',
+              en: 'A change to the rikma details was proposed',
+              ar: 'تم اقتراح تغيير في تفاصيل الريكما'
+            },
+            body: {
+              he: 'אפשר לאשר, לשוחח או להציע נגדית. בלי תגובה עד שהשעון נגמר — השינוי מאושר.',
+              en: 'You can approve, discuss or counter-propose. With no response before the clock runs out, the change is approved.',
+              ar: 'يمكنك الموافقة أو النقاش أو تقديم اقتراح مضاد. إذا لم يكن هناك رد قبل انتهاء الوقت، يُعتمد التغيير.'
+            }
+          }
+        : undefined,
+    intent: (_p, r) => ((r?.data?.decisionsCreated ?? 0) > 0 ? 'consent' : 'ambient'),
     metadata: { type: 'base', url: 'lev' }
   },
 

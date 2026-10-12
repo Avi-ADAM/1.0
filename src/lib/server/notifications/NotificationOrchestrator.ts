@@ -90,7 +90,8 @@ export class NotificationOrchestrator {
         })
         : recipients;
 
-      console.log(`[NotificationOrchestrator] Recipients for ${config.templates.title.he}: ${filteredRecipients.length}`);
+      const templates = config.templatesFor?.(actionParams ?? {}, actionResult) ?? config.templates;
+      console.log(`[NotificationOrchestrator] Recipients for ${templates.title.he}: ${filteredRecipients.length}`);
 
       // A meeting notification has a second audience that never appears in
       // filteredRecipients: the guests watching that meeting, who have no
@@ -108,15 +109,15 @@ export class NotificationOrchestrator {
       const contextData = { actionParams, actionResult };
 
       const title = {
-        he: this.replacePlaceholders(config.templates.title.he, contextData),
-        en: this.replacePlaceholders(config.templates.title.en, contextData),
-        ar: config.templates.title.ar ? this.replacePlaceholders(config.templates.title.ar, contextData) : undefined
+        he: this.replacePlaceholders(templates.title.he, contextData),
+        en: this.replacePlaceholders(templates.title.en, contextData),
+        ar: templates.title.ar ? this.replacePlaceholders(templates.title.ar, contextData) : undefined
       };
 
       const body = {
-        he: this.replacePlaceholders(config.templates.body.he, contextData),
-        en: this.replacePlaceholders(config.templates.body.en, contextData),
-        ar: config.templates.body.ar ? this.replacePlaceholders(config.templates.body.ar, contextData) : undefined
+        he: this.replacePlaceholders(templates.body.he, contextData),
+        en: this.replacePlaceholders(templates.body.en, contextData),
+        ar: templates.body.ar ? this.replacePlaceholders(templates.body.ar, contextData) : undefined
       };
 
       // Process metadata values if they contain placeholders
@@ -279,9 +280,12 @@ export class NotificationOrchestrator {
 
       case 'specificUsers':
         const userIdsParam = rule.config?.userIdsParam || 'userIds';
-        const userIds =
+        const found =
           this.getNestedValue(params, userIdsParam) ||
           (actionResult ? this.getNestedValue(actionResult, userIdsParam) : undefined);
+        // A single id (`requesterId`) is a list of one.
+        const userIds =
+          typeof found === 'string' || typeof found === 'number' ? [found] : found;
 
         if (userIds && Array.isArray(userIds)) {
           // Fetch profiles for specific users directly
@@ -297,18 +301,10 @@ export class NotificationOrchestrator {
           return profiles.filter((p): p is UserProfile => p !== null);
         }
 
-        // No list at all: the legacy fallback to the rikma's members, which a
-        // few configs rely on (acceptRatsonProposal reads projectId off the result).
-        const projectIdForSpecific = rule.config?.projectIdParam || 'projectId';
-        const projectIdValue =
-          this.getNestedValue(params, projectIdForSpecific) ||
-          (actionResult ? this.getNestedValue(actionResult, projectIdForSpecific) : undefined);
-        if (projectIdValue) {
-          const allMembers = await this.getProjectMembers(projectIdValue, context);
-          return allMembers;
-        }
-
-        console.warn('No userIds or projectId provided for specificUsers recipient rule');
+        // No list at all is nobody too. It used to fall back to the rikma's
+        // members — "the requester" became "everyone" (N4/N13). A notification
+        // for the whole rikma says so: `projectMembers`.
+        console.warn(`[notifications] specificUsers: no "${userIdsParam}" on params or result — sent to nobody`);
         return [];
 
       case 'skillBased':

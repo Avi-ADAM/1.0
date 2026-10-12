@@ -178,4 +178,45 @@ describe('NotificationOrchestrator — the actor is never notified outside the s
     expect(sent.socket).toEqual([]);
     expect(sent.email).toEqual([]);
   });
+
+  it('a missing recipient list is nobody too — no fallback to the rikma (N4)', async () => {
+    const { orch, sent } = setup();
+    const members = vi.spyOn(orch as any, 'getProjectMembers');
+    await orch.notify(config(), { projectId: '12' }, { data: { projectId: '12' } }, context);
+    expect(members).not.toHaveBeenCalled();
+    expect(sent.socket).toEqual([]);
+  });
+
+  it('templatesFor words this run; undefined keeps the static templates (B14)', async () => {
+    const { orch } = setup();
+    const titles: string[] = [];
+    vi.spyOn(orch.getSocketIOServer(), 'broadcastToUsers').mockImplementation(async (_r: any, n: any) => {
+      titles.push(n.title.he);
+      return undefined as any;
+    });
+    const proposed = { title: { he: 'הוצע', en: 'proposed' }, body: { he: 'ב', en: 'b' } };
+    const c = config({ templatesFor: (_p, r) => (r?.data?.decisionsCreated ? proposed : undefined) });
+    await orch.notify(c, { userIds: ['2'] }, { data: { decisionsCreated: 2 } }, context);
+    await orch.notify(c, { userIds: ['2'] }, { data: {} }, context);
+    expect(titles).toEqual(['הוצע', 'כ']);
+  });
+
+  it('a single id is a list of one', async () => {
+    const { orch, sent } = setup();
+    await orch.notify(config({ recipients: { type: 'specificUsers', config: { userIdsParam: 'requesterId' } } }), { requesterId: '2' }, {}, context);
+    expect(sent.socket).toEqual([['2']]);
+  });
+});
+
+describe('updateProjectDetails (B14)', () => {
+  it('an edit that opened votes asks for consent, in words that say so; a direct edit stays ambient', async () => {
+    const { updateProjectDetailsConfig } = await import('../actions/configs/updateProjectDetails');
+    const n = updateProjectDetailsConfig.notification!;
+    const voted = { data: { decisionsCreated: 2 } };
+    const applied = { data: { projectName: 'x' } };
+    expect(resolveChannels(n, {}, voted)).toEqual(CHANNELS_BY_INTENT.consent);
+    expect(resolveChannels(n, {}, applied)).toEqual(CHANNELS_BY_INTENT.ambient);
+    expect(n.templatesFor!({}, voted)?.title.he).toContain('הוצע');
+    expect(n.templatesFor!({}, applied)).toBeUndefined();
+  });
 });

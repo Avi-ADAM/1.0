@@ -78,7 +78,7 @@ export const updateTaskAction: ActionConfig = {
         ar: 'تم تحديث المهمة {{taskName}} في المشروع'
       }
     },
-    channels: ['socket', 'push'],
+    intent: 'ambient',
     metadata: {
       priority: 'normal',
       url: '/project/{{projectId}}/task/{{taskId}}'
@@ -160,7 +160,7 @@ export const createMessageAction: ActionConfig = {
         ar: 'أرسل {{username}} رسالة جديدة'
       }
     },
-    channels: ['socket', 'push', 'email'],
+    intent: 'personal',
     metadata: {
       priority: 'normal',
       url: '/project/{{projectId}}/forum/{{forumId}}'
@@ -247,7 +247,7 @@ export const createHalukaAction: ActionConfig = {
         ar: 'لقد تلقيت توزيعًا جديدًا بمبلغ {{amount}}'
       }
     },
-    channels: ['socket', 'email', 'telegram', 'push'],
+    intent: 'personal',
     metadata: {
       priority: 'high',
       url: '/project/{{projectId}}/haluka/{{halukaId}}'

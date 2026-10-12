@@ -158,7 +158,7 @@ export async function POST({ request, fetch }) {
 						ar: `${displayName} أرسل رسالة: ${content}`
 					}
 				},
-				channels: ['socket'],
+				intent: 'ambient',
 				metadata: {
 					priority: 'normal',
 					type: 'meetingMessage',

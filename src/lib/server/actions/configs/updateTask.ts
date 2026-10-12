@@ -100,7 +100,8 @@ export const updateTaskAction: ActionConfig = {
         ar: 'تم تحديث مهمة في المشروع'
       }
     },
-    channels: ['socket', 'push'],
+    // Activity in the rikma; the open boards follow through `realtime`.
+    intent: 'ambient',
     metadata: {
       priority: 'normal',
       url: '/lev?project={{projectId}}'

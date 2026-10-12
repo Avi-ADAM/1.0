@@ -90,9 +90,9 @@ describe('updateTask Action Configuration', () => {
     expect(notification.templates.body.en).toBeTruthy();
     expect(notification.templates.body.ar).toBeTruthy();
     
-    // Channels
-    expect(notification.channels).toContain('socket');
-    expect(notification.channels).toContain('push');
+    // Channels come from the intent (notifications/intent.ts) — activity in the rikma
+    expect(notification.intent).toBe('ambient');
+    expect(notification.channels).toBeUndefined();
     
     // Metadata
     expect(notification.metadata?.priority).toBe('normal');

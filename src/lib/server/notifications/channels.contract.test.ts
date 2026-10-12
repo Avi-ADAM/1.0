@@ -19,17 +19,8 @@ const SKIP = /\.test\.|\/examples\/|^src\/lib\/server\/notifications\//;
 /** `channels: [` or `channels: cond ? [` — not `channels: decision.channels` (the digest's own field). */
 const LITERAL = /\bchannels\s*:\s*(\[|[^,\n]*\?\s*\[)/;
 
-const LEGACY_CHANNEL_LISTS = new Set([
-  'src/lib/server/actions/configs/approveHaluka.ts',
-  'src/lib/server/actions/configs/approveMeeting.ts',
-  'src/lib/server/actions/configs/archiveUserResource.ts',
-  'src/lib/server/actions/configs/chat.ts',
-  'src/lib/server/actions/configs/example.ts',
-  'src/lib/server/actions/configs/joinMeeting.ts',
-  'src/lib/server/actions/configs/startMeeting.ts',
-  'src/lib/server/actions/configs/updateTask.ts',
-  'src/routes/api/guest/message/+server.js',
-]);
+// Empty since 2026-10-12: every notification states its intent.
+const LEGACY_CHANNEL_LISTS = new Set<string>([]);
 
 function walk(dir: string, out: string[] = []): string[] {
   for (const name of readdirSync(dir)) {

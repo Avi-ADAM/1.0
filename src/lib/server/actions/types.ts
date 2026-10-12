@@ -242,6 +242,13 @@ export interface NotificationConfig {
   templates: NotificationTemplates;
 
   /**
+   * When the words depend on what the run did (an edit that applied vs. one
+   * that opened a vote), the templates for this run; `undefined` = `templates`.
+   * Pair it with an `intent` function so the channels follow the same fork.
+   */
+  templatesFor?: (params: Record<string, any>, result: any) => NotificationTemplates | undefined;
+
+  /**
    * What the notification asks of its reader — the channels follow from it
    * (`src/lib/server/notifications/intent.ts`). A function when it depends on
    * the run (a plain vote is `ambient`, a counter in that vote is `consent`).

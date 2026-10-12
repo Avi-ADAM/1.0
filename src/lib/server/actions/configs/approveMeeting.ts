@@ -115,7 +115,8 @@ export const approveMeetingConfig: ActionConfig = {
                                     en: `All participants approved the meeting: ${pgisha.name}. The meeting is set. Now, for every time you have available to join the meeting, you can update your status online on the site and we will find the most suitable time for the meeting.`
                                 }
                             },
-                            channels: ['socket', 'email', 'push'],
+                            // To each participant about their meeting; nothing waits on their answer.
+                            intent: 'personal',
                             metadata: {
                                 url: '/meeting/' + pgishaId,
                                 type: 'meetingConfirmed',

@@ -181,7 +181,8 @@ export const joinMeetingConfig: ActionConfig = {
                                 en: `Everyone is ready! The meeting "${meetingName}" is starting now!`
                             }
                         },
-                        channels: ['socket', 'push', 'email'],
+                        // The meeting is starting — to each participant, now.
+                        intent: 'personal',
                         metadata: {
                             url: '/meeting/' + meetingId,
                             type: 'meetingStarted',

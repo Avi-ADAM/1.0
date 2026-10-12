@@ -75,7 +75,8 @@ export const archiveUserResourceConfig: ActionConfig = {
       title: { he: 'משאב הוסר', en: 'Resource removed', ar: 'تمت إزالة المورد' },
       body: { he: 'משאב הוסר מהפרופיל שלך', en: 'A resource was removed from your profile', ar: 'تمت إزالة مورد من ملفك الشخصي' }
     },
-    channels: ['socket'],
+    // The member's own devices, so every open profile follows.
+    intent: 'ambient',
     metadata: { type: 'profile', url: 'me' }
   },
   updateStrategy: { type: 'partialUpdate', config: { dataKeys: ['app:meProfile'] } },

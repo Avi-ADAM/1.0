@@ -121,7 +121,8 @@ export const chatActions: ActionConfig[] = [
                     en: '{{username}}: {{message}}'
                 }
             },
-            channels: ['socket', 'push', 'email', 'telegram'],
+            // A message to them — reaches them off the site, but asks for no answer the clock counts.
+            intent: 'personal',
             metadata: {
                 priority: 'normal',
                 url: '/forum/{{forumId}}',
