@@ -9,6 +9,10 @@
  * (`guestInvite.ts` / `socket-server/src/guest-invite.ts`).
  *
  * Token:   base64url(JSON {v:1, u, p, exp}) + "." + base64url(HMAC-SHA256)
+ *          A forum ticket ("X is typing", socket-server/src/typing.ts) adds
+ *          `k: 'forum'` (p = the forum id) and `n`, the display name the room
+ *          will show — signed, so nobody types under someone else's name. A
+ *          ticket of one kind never opens a room of the other.
  * Secret:  P2P_TICKET_SECRET — must be the same value here and in socket-server.
  */
 
@@ -33,10 +37,24 @@ export function mintTicket(
   now = Date.now(),
   ttl = TICKET_TTL_MS
 ): { ticket: string; expiresAt: number } {
+  return mint({ u: String(uid), p: String(projectId) }, secret, now, ttl);
+}
+
+/** A seat in one forum's typing room, carrying the name the others will read. */
+export function mintForumTicket(
+  uid: string,
+  forumId: string,
+  name: string,
+  secret: string,
+  now = Date.now(),
+  ttl = TICKET_TTL_MS
+): { ticket: string; expiresAt: number } {
+  return mint({ k: 'forum', u: String(uid), p: String(forumId), n: String(name ?? '').slice(0, 60) }, secret, now, ttl);
+}
+
+function mint(fields: Record<string, string>, secret: string, now: number, ttl: number) {
   const expiresAt = now + ttl;
-  const payload = Buffer.from(JSON.stringify({ v: 1, u: String(uid), p: String(projectId), exp: expiresAt })).toString(
-    'base64url'
-  );
+  const payload = Buffer.from(JSON.stringify({ v: 1, ...fields, exp: expiresAt })).toString('base64url');
   return { ticket: `${payload}.${sign(payload, secret)}`, expiresAt };
 }
 
@@ -44,8 +62,9 @@ export function mintTicket(
 export function readTicket(
   ticket: string,
   secret: string,
-  now = Date.now()
-): { uid: string; projectId: string; expiresAt: number } | null {
+  now = Date.now(),
+  kind: 'rikma' | 'forum' = 'rikma'
+): { uid: string; projectId: string; expiresAt: number; name?: string } | null {
   const [payload, mac] = String(ticket).split('.');
   if (!payload || !mac) return null;
   const expected = Buffer.from(sign(payload, secret));
@@ -54,7 +73,9 @@ export function readTicket(
   try {
     const p = JSON.parse(Buffer.from(payload, 'base64url').toString('utf8'));
     if (p?.v !== 1 || !p.u || !p.p || !(Number(p.exp) > now)) return null;
-    return { uid: String(p.u), projectId: String(p.p), expiresAt: Number(p.exp) };
+    if ((p.k ?? 'rikma') !== kind) return null;
+    const out = { uid: String(p.u), projectId: String(p.p), expiresAt: Number(p.exp) };
+    return kind === 'forum' ? { ...out, name: String(p.n ?? '') } : out;
   } catch {
     return null;
   }

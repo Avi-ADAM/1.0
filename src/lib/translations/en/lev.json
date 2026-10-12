@@ -446,7 +446,9 @@
     "labelMoney": "Details to help complete the transfer (account number, transfer details, etc.)",
     "labelRejection": "Reason for rejection (minimum 27 characters)",
     "labelDiscussion": "Message - please refer to previous messages",
-    "labelForum": "Write a message..."
+    "labelForum": "Write a message...",
+    "typing": "{{names}} typing…",
+    "typingSomeone": "Someone is typing…"
   },
   "productRequest": {
     "request": "Request"

@@ -378,7 +378,7 @@
     "region": "Who is in the rikma now",
     "alone": "No other members here right now",
     "hide": "Hide me",
-    "hideExplain": "Hiding works both ways: members won't see that you're viewing, and you won't see who is. Work on a timer stays visible to everyone.",
+    "hideExplain": "Hiding works both ways: members won't see that you're viewing or typing in a chat, and you won't see who is. Work on a timer stays visible to everyone.",
     "confirmHide": "Hide",
     "cancel": "Cancel",
     "hiddenNote": "Your presence is off, so who is viewing isn't shown either",

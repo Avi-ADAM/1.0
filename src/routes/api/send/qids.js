@@ -14314,6 +14314,11 @@ ${STIPEND_DECISION_FIELDS}
   // Presence opt-out (moach "who is here"). A separate read on purpose: until the
   // `hidePresence` field is deployed it fails alone, and the ticket endpoint reads that as
   // "visible" (the default) instead of losing the membership check with it.
+  // The display name a forum typing ticket carries (getForumTypingTicket).
+  'typingNameFor': `query TypingNameFor($uid: ID!) {
+    usersPermissionsUser(id: $uid) { data { id attributes { username } } }
+  }`,
+
   'presenceHiddenFor': `query PresenceHiddenFor($uid: ID!) {
     usersPermissionsUser(id: $uid) { data { id attributes { hidePresence } } }
   }`,

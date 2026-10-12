@@ -24,6 +24,8 @@ export interface P2pTicket {
   uid: string;
   projectId: string;
   expiresAt: number;
+  /** Forum tickets only: the signed display name the typing room shows. */
+  name?: string;
 }
 
 /**
@@ -36,7 +38,17 @@ export function roomTicketSecret(): string | null {
 }
 const secret = roomTicketSecret;
 
-export function verifyP2pTicket(ticket: unknown, key: string | null, now = Date.now()): P2pTicket | null {
+/**
+ * A signed ticket of one kind. A rikma ticket carries no `k`; any other room
+ * kind names itself (`k: 'forum'`), so a forum ticket can never seat anyone in
+ * the rikma room that happens to share its number — and the other way round.
+ */
+export function verifyRoomTicket(
+  ticket: unknown,
+  key: string | null,
+  kind: 'rikma' | 'forum',
+  now = Date.now()
+): P2pTicket | null {
   if (!key || typeof ticket !== 'string' || ticket.length > 1024) return null;
   const [payload, mac] = ticket.split('.');
   if (!payload || !mac) return null;
@@ -46,10 +58,17 @@ export function verifyP2pTicket(ticket: unknown, key: string | null, now = Date.
   try {
     const p = JSON.parse(Buffer.from(payload, 'base64url').toString('utf8'));
     if (p?.v !== 1 || !p.u || !/^\d+$/.test(String(p.p)) || !(Number(p.exp) > now)) return null;
-    return { uid: String(p.u), projectId: String(p.p), expiresAt: Number(p.exp) };
+    if ((p.k ?? 'rikma') !== kind) return null;
+    const out: P2pTicket = { uid: String(p.u), projectId: String(p.p), expiresAt: Number(p.exp) };
+    if (kind === 'forum') out.name = typeof p.n === 'string' ? p.n.slice(0, 60) : '';
+    return out;
   } catch {
     return null;
   }
+}
+
+export function verifyP2pTicket(ticket: unknown, key: string | null, now = Date.now()): P2pTicket | null {
+  return verifyRoomTicket(ticket, key, 'rikma', now);
 }
 
 export const p2pRoom = (projectId: string) => `p2p:${projectId}`;

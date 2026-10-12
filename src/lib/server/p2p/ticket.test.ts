@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 const { env } = vi.hoisted(() => ({ env: {} as Record<string, string> }));
 vi.mock('$env/dynamic/private', () => ({ env }));
 
-import { DEFAULT_ICE_SERVERS, iceServers, mintTicket, p2pTicketSecret, readTicket } from './ticket.js';
+import { DEFAULT_ICE_SERVERS, iceServers, mintForumTicket, mintTicket, p2pTicketSecret, readTicket } from './ticket.js';
 
 const SECRET = 'a-long-enough-test-secret';
 
@@ -28,6 +28,14 @@ describe('tickets', () => {
     const forged = Buffer.from(JSON.stringify({ v: 1, u: '7', p: '99', exp: 6000 })).toString('base64url');
     expect(readTicket(`${forged}.${mac}`, SECRET, 2000)).toBeNull();
     expect(readTicket('garbage', SECRET, 2000)).toBeNull();
+  });
+
+  it('a forum ticket carries its name, and never reads as a rikma ticket (or back)', () => {
+    const forum = mintForumTicket('7', '82', 'Dana', SECRET, 1000, 5000).ticket;
+    const rikma = mintTicket('7', '82', SECRET, 1000, 5000).ticket;
+    expect(readTicket(forum, SECRET, 2000, 'forum')).toEqual({ uid: '7', projectId: '82', expiresAt: 6000, name: 'Dana' });
+    expect(readTicket(forum, SECRET, 2000)).toBeNull();
+    expect(readTicket(rikma, SECRET, 2000, 'forum')).toBeNull();
   });
 
   it('treats a missing or short secret as "pilot off"', () => {

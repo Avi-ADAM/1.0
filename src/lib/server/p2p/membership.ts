@@ -14,6 +14,16 @@ export async function isRikmaMember(fetch: FetchLike, projectId: string, uid: st
   return members.some((m) => String(m.id) === String(uid));
 }
 
+/** The name others will read beside "is typing"; '' when it cannot be read. */
+export async function displayName(fetch: FetchLike, uid: string): Promise<string> {
+  try {
+    const data = await sendViaProxy(fetch, 'typingNameFor', { uid }, { isSer: true });
+    return String(data?.usersPermissionsUser?.data?.attributes?.username ?? '');
+  } catch {
+    return '';
+  }
+}
+
 /**
  * Has the member switched presence off? Read separately and forgivingly: the
  * default is visible, and a failed read (the field not deployed yet, a hiccup)

@@ -447,7 +447,9 @@
     "labelMoney": "Datos para ayudar a completar la transferencia (número de cuenta, detalles de la transferencia, etc.)",
     "labelRejection": "Motivo del rechazo (mínimo 27 caracteres)",
     "labelDiscussion": "Mensaje - por favor, ten en cuenta los mensajes anteriores",
-    "labelForum": "Escribe un mensaje..."
+    "labelForum": "Escribe un mensaje...",
+    "typing": "{{names}} escribiendo…",
+    "typingSomeone": "Alguien está escribiendo…"
   },
   "productRequest": {
     "request": "Solicitar"

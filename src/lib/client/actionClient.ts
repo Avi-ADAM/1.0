@@ -413,6 +413,7 @@ export type ActionKey =
   | 'ensureHalukaForum'
   | 'ensureMissionForum'
   | 'linkTelegram'
+  | 'getForumTypingTicket'
   | 'getPlatformProject'
   | 'createPlatformSale'
   | 'decideSiteShare'

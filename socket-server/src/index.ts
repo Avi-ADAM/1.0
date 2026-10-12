@@ -16,6 +16,7 @@ import { SessionManager } from './session-manager.js';
 import { verifyInviteToken, meetingRoom } from './guest-invite.js';
 import { registerP2pHandlers } from './p2p.js';
 import { registerPresenceHandlers } from './presence.js';
+import { registerTypingHandlers } from './typing.js';
 import { checkInternalRequest, isInternalAuthConfigured } from './internal-auth.js';
 import { resolveBroadcastEvent } from './broadcast-event.js';
 import { isSocketIoRequest } from './socket-path.js';
@@ -270,6 +271,8 @@ io.on('connection', (socket) => {
   registerP2pHandlers(io, socket);
   // Who is in the rikma right now - same ticket, registered members only (presence.ts).
   registerPresenceHandlers(io, socket);
+  // "X is typing..." in a forum - forum ticket, registered members only (typing.ts).
+  registerTypingHandlers(io, socket);
 });
 
 

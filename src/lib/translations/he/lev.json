@@ -446,7 +446,9 @@
     "labelMoney": "פרטים שיעזרו לההעברה להתבצע (מספר חשבון, פרטי העברה וכו')",
     "labelRejection": "נימוק לדחייה (מינימום 27 תווים)",
     "labelDiscussion": "הודעה - נא להתייחס להודעות קודמות",
-    "labelForum": "כתוב הודעה..."
+    "labelForum": "כתוב הודעה...",
+    "typing": "{{names}} באמצע הקלדה…",
+    "typingSomeone": "מישהו באמצע הקלדה…"
   },
   "productRequest": {
     "request": "בקשה"

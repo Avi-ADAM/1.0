@@ -110,7 +110,7 @@ productAggregation), שקיפות מלאה (action registry, voting — `docs/tb
 **אינטגרציית MCP** (`/api/mcp`, `/mcp-connect`) — סוכנים חיצוניים מתפעלים את הרקמה; בוט טלגרם;
 אונבורדינג חכם (`analyze-cv`, `analyze-business`, embeddings Pinecone+Gemini).
 
-**3.4 שיתוף פעולה וזמן‑אמת:** צ'אט/פורומים, Socket.IO (`docs/tbd/SPEC_SOCKET_REALTIME.md`), התראות
+**3.4 שיתוף פעולה וזמן‑אמת:** צ'אט/פורומים, Socket.IO (`docs/inprogress/SPEC_SOCKET_REALTIME.md`), התראות
 רב‑ערוציות (Push/טלגרם/מייל), קונסיירז' (ר' §7), מו"מ מבוסס AI (`/negotiation`).
 
 **3.5 צמיחה ויראלית:** עמודים ציבוריים (`gift`, `wish`, `project`, `meeting`, `availableMission`,
@@ -416,7 +416,7 @@ mock/מתוכננת** (M3–M9 ב‑`PLAN_CONCIERGE.md`). לנסח הבטחה **
 
 ### 13.5 מסמכי מקור למיצוי תוכן
 `docs/done/PLAN_CONCIERGE.md`, `PLAN_CONCIERGE.md`, `PLAN_COMPLEX_PRODUCTS.md`,
-`docs/inprogress/PLAN_SHARED_PURCHASE.md`, `docs/tbd/SPEC_VOTING_SYSTEM.md`, `docs/tbd/SPEC_SOCKET_REALTIME.md`,
+`docs/inprogress/PLAN_SHARED_PURCHASE.md`, `docs/tbd/SPEC_VOTING_SYSTEM.md`, `docs/inprogress/SPEC_SOCKET_REALTIME.md`,
 `docs/done/PLAN_central_page.md`, `MOACH_*`.
 
 ---

@@ -446,7 +446,9 @@
     "labelMoney": "تفاصيل للمساعدة في إتمام التحويل (رقم الحساب، تفاصيل التحويل، إلخ)",
     "labelRejection": "سبب الرفض (27 حرفًا على الأقل)",
     "labelDiscussion": "رسالة - يرجى الرجوع إلى الرسائل السابقة",
-    "labelForum": "اكتب رسالة..."
+    "labelForum": "اكتب رسالة...",
+    "typing": "{{names}} يكتب الآن…",
+    "typingSomeone": "أحدهم يكتب الآن…"
   },
   "productRequest": {
     "request": "طلب"

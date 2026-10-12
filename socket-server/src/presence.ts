@@ -1,6 +1,6 @@
 /**
  * Who is in the rikma right now (1.0main docs/inprogress/PLAN_REALTIME_MIGRATION.md,
- * the separate realtime stage; docs/tbd/SPEC_SOCKET_REALTIME.md stage 2).
+ * the separate realtime stage; docs/inprogress/SPEC_SOCKET_REALTIME.md stage 2).
  *
  * A member's open moach tab sits in `rikma:<projectId>`. Everyone in the room
  * gets the room's roster — the user ids with at least one socket there — and

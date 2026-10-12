@@ -30,6 +30,7 @@ const READ_ONLY = new Set([
   'getDealDue',
   'getDecisionDetails',
   'getForumThread',
+  'getForumTypingTicket',
   'getMissionForEdit',
   'getOpenSiteShareDecisions',
   'getPendmShiftPlan',

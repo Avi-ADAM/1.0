@@ -7,7 +7,7 @@ BYO API key, סיכום יומי חכם והצעות פרואקטיביות.
 מסמכים קשורים: [`PLAN_MISSION_AI.md`](../done/PLAN_MISSION_AI.md),
 [`MOACH_AI_AGENT_GUIDE.md`](../MOACH_AI_AGENT_GUIDE.md),
 [`PLAN_CONCIERGE.md`](../done/PLAN_CONCIERGE.md),
-[`SPEC_SOCKET_REALTIME.md`](../tbd/SPEC_SOCKET_REALTIME.md).
+[`SPEC_SOCKET_REALTIME.md`](SPEC_SOCKET_REALTIME.md).
 
 ---
 

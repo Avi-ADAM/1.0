@@ -38,6 +38,7 @@ import { ensureProjectForumConfig } from './ensureProjectForum.js';
 import { ensureStageForumConfig } from './ensureStageForum.js';
 import { ensureMissionForumConfig } from './ensureMissionForum.js';
 import { linkTelegramConfig } from './linkTelegram.js';
+import { getForumTypingTicketConfig } from './getForumTypingTicket.js';
 import { updateTosplitProposalConfig } from './updateTosplitProposal.js';
 import { closeFiniapruvalConfig } from './closeFiniapruval.js';
 import { counterFiniapruvalConfig } from './counterFiniapruval.js';
@@ -284,6 +285,7 @@ export function registerAllActions(): void {
   registerAction(ensureStageForumConfig);
   registerAction(ensureMissionForumConfig);
   registerAction(linkTelegramConfig);
+  registerAction(getForumTypingTicketConfig);
   registerAction(updateTosplitProposalConfig);
   registerAction(completeMissionConfig);
 
@@ -628,6 +630,7 @@ export {
   ensureStageForumConfig,
   ensureMissionForumConfig,
   linkTelegramConfig,
+  getForumTypingTicketConfig,
   updateTosplitProposalConfig,
   completeMissionConfig,
   chatActions,

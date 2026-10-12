@@ -79,7 +79,8 @@
 | PRODUCTION_READINESS_REVIEW · QA_SOLO_RIKMA_2026-08 | סקירות עם ממצאים פתוחים |
 | QA_CONCIERGE_E2E_2026-10 | תכנית בדיקה מקצה לקצה של הקונסיירז' לפני השקה + ממצאים (בריצה) |
 | PLAN_DIRECT_OFFER | הצעה אישית (ספק כותב משאלה בשם לקוחה, והיא מקבלת אותה בקישור) + איחוד מסכי גיבוש · אישור · ביצוע. P1 (רצועת שלבי העסקה בשלושת המסכים) בנוי; P2+ ממתינים לסכמה ב-1.0b |
-| PLAN_REALTIME_MIGRATION · REALTIME_TRACKING | כל שינוי מגיע לכל מסך שמציג אותו + לאן התראה לבני אדם יוצאת (`intent`). R0–R6 בנויים (2026-10-11): כל action מצהיר scopes, כל הדפים מקשיבים ל-bus, המאזינים הישנים ונתיבי ההתראה הישנים (N7) הוסרו. N5 (הודעה על הבשלה בשתיקה) ו-B9 בתוך הריפו (כתיבות `/api/send` ⇒ actions) בנויים. נשארו הריפואים החיצוניים (magik-meetings, consensus1lev1) והבדיקה החיה |
+| PLAN_REALTIME_MIGRATION · REALTIME_TRACKING | כל שינוי מגיע לכל מסך שמציג אותו + לאן התראה לבני אדם יוצאת (`intent`). R0–R6 בנויים (2026-10-11): כל action מצהיר scopes, כל הדפים מקשיבים ל-bus, המאזינים הישנים ונתיבי ההתראה הישנים (N7) הוסרו. N5 (הודעה על הבשלה בשתיקה) ו-B9 בתוך הריפו (כתיבות `/api/send` ⇒ actions) בנויים. 2026-10-12: N3 (אין יותר ערוצים שנבחרים ביד), N4 (רשימת נמענים חסרה = אף אחד) ו-B14 סגורים. נשארו הריפואים החיצוניים (magik-meetings, consensus1lev1), הבדיקה החיה, ו-N6/N8/N9/N13 ששייכים לתכניות אחרות (SMART_NOTICES, "אין לא מוחלט") |
+| SPEC_SOCKET_REALTIME | presence / "מי עובד" / typing / "השתנה בזמן שערכת" — כל השלבים בנויים (2026-10-12), ממתין לפריסה: 1.0b (`User.hidePresence`) → socket-server → אפליקציה, ו-`P2P_TICKET_SECRET` בשני הצדדים |
 | PLAN_SMART_NOTICES | התראות חכמות: שלבים 0–5 בנויים (שרת, משפטים, פעמוני קונסיירז' ו-deals, hub, תצוגת התראות בלב); ההסתרה ממתינה לדיפלוי 1.0b + הרשאות; שלב 6 (ערוצים) ו-7 פתוחים |
 
 ## tbd/
@@ -93,7 +94,6 @@
 | PLAN_central_rikma_definition · PLAN_concierge_in_p2p | קונספטואליים, ההמשך של השכבה המבוזרת |
 | TIMEGRAMA_REMINDERS | תזכורות R1–R4 |
 | SPEC_VOTING_SYSTEM | הוחלף בפועל במודל ה-`Decision` |
-| SPEC_SOCKET_REALTIME | presence ואירועי UI חי |
 | IMPROVEMENT_POINTS | רשימת שיפורים ישנה |
 | PLAN_MARKETING_GLOBAL · PLAN_X_ORGANIC · PLAN_VIDEO_OPENMONTAGE · homepage_&_seo_raw_ideas | שיווק ורעיונות |
 

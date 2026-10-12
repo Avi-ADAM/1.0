@@ -18,6 +18,7 @@
   import { lang } from '$lib/stores/lang.js';
   import { t, isRtl} from '$lib/translations';
   import { onMount } from 'svelte';
+  import { ForumTyping } from '$lib/realtime/typing.svelte';
   let why = $state('');
   /**
    * @typedef {Object} Props
@@ -62,6 +63,29 @@
     onNo,
     onRect
   } = $props();
+  // "X is typing…" — forum chats only, where pendId is the forum id
+  // ($lib/realtime/typing.svelte.ts). Re-made when the chat moves to another forum.
+  /** @type {ForumTyping | null} */
+  let typing = $state(null);
+  $effect(() => {
+    const fid = (ani === 'forum' || ani === 'new-forum') && pendId ? String(pendId) : null;
+    if (!fid) return;
+    const tp = new ForumTyping(fid);
+    typing = tp;
+    const stop = tp.start();
+    return () => {
+      stop();
+      if (typing === tp) typing = null;
+    };
+  });
+  let typingNames = $derived(typing?.names ?? []);
+  let typingText = $derived(
+    typingNames.length === 0
+      ? ''
+      : typingNames.every((n) => n)
+        ? $t('lev.diun.typing', { names: typingNames.join(', ') })
+        : $t('lev.diun.typingSomeone')
+  );
   onMount(() => {
     console.log('diun mounted', ani);
     scrollToBottom(dow);
@@ -82,6 +106,7 @@
   );
   async function click() {
     if (why.length > 0) {
+      typing?.stopped();
       clicked = true;
       if (no == true) {
         if (why.length > 27) {
@@ -223,12 +248,17 @@
       </div>
     {/if}
 
+    {#if typingText}
+      <p class="dn-typing" aria-live="polite">{typingText}</p>
+    {/if}
     {#if rect == true || no == true}
       <div class="relative flex items-end gap-2 sm:gap-3">
         <div dir={$isRtl ? 'rtl' : 'ltr'} class="textinput flex-1">
           <textarea
             name="s"
             bind:value={why}
+            oninput={() => (why ? typing?.ping() : typing?.stopped())}
+            onblur={() => typing?.stopped()}
             minlength="26"
             placeholder={labelText}
             class="input text-base sm:text-lg text-white bg-gray-700/30 backdrop-blur-sm border border-gray-600/30 rounded-2xl px-3 sm:px-4 py-2.5 sm:py-3 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/50 focus:border-fuchsia-500/50 hover:border-gray-500/50 hover:bg-gray-700/40 resize-none transition-all duration-200 max-h-32"
@@ -266,6 +296,13 @@
 </div>
 
 <style>
+  .dn-typing {
+    margin: 0 0 0.35rem;
+    font-size: 0.75rem;
+    font-style: italic;
+    color: var(--gold-l, #f5e6b8);
+    opacity: 0.85;
+  }
   textarea {
     resize: none;
   }
