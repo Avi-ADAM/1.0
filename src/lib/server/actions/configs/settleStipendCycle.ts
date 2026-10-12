@@ -10,14 +10,17 @@
  * The row this writes is `sent`, never `confirmed`: the money has left, but
  * nothing has touched anyone's percentage yet. That happens only when the
  * recipient says it arrived (or stays silent for the rikma's restime).
+ *
+ * The one exception is the recipient closing the cycle themselves — "it
+ * arrived" from the accrued card. That receipt *is* the confirmation, so the
+ * row is written `confirmed` and no clock starts.
  */
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { execFromContext } from '$lib/server/archive/exec.js';
-import { calcDeadlineMs } from './actionUtils.js';
-import { dateField, enumField, fields, gqlStr, numField, run, strField } from '$lib/server/archive/gql.js';
+import { dateField, fields, gqlStr, numField, run } from '$lib/server/archive/gql.js';
 import { computeStipendCycle, cycleWindow, settlementFrom } from '$lib/stipend/computeStipendCycle.js';
-import { computeStipendEquity } from '$lib/stipend/computeStipendEquity.js';
+import { recordStipendPayment } from '$lib/server/stipend/recordPayment.js';
 import { moneyTextFor } from '$lib/server/money/notifyMoney.js';
 import {
   fetchApprovedHours,
@@ -28,11 +31,6 @@ import {
   fetchRecipientContribution
 } from '$lib/server/stipend/read.js';
 import { scope, scopeList } from '$lib/realtime/scopes.js';
-
-// `advance` stays in the Strapi enum (dropping a deployed enum value is a
-// migration, and rows may already carry it) but is no longer writable from
-// here — see src/lib/stipend/ADVANCE_MODE.md.
-const MODES = ['equity', 'gift'] as const;
 
 const handler: ActionExecutionHandler = async (params, context, { notifier }) => {
   const pledgeId = String(params.pledgeId ?? '');
@@ -46,8 +44,16 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
   if (pledge.status !== 'active') {
     throw new Error('Only an active stipend pays out — this one is ' + pledge.status);
   }
-  if (pledge.funderId !== userId) {
-    throw new Error('Only the funder settles a stipend cycle');
+  /**
+   * The recipient may close the cycle too — by saying the money arrived. Money
+   * that got there was sent, whether or not its sender ever came back to press
+   * "pay", and a recipient waiting on a funder who transferred and forgot had
+   * no way to close the matter. Their word moves only their own side: it is a
+   * receipt, so it is final at once and there is nothing for a clock to wait on.
+   */
+  const asRecipient = pledge.recipientId === userId && pledge.funderId !== userId;
+  if (pledge.funderId !== userId && !asRecipient) {
+    throw new Error('Only the funder settles a stipend cycle, or the recipient declares it arrived');
   }
   if (!pledge.projectId || !pledge.recipientId) {
     throw new Error('This pledge is missing its rikma or its recipient');
@@ -75,7 +81,7 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
     fetchRecipientContribution(exec, pledge.projectId, pledge.recipientId).catch(() => null)
   ]);
 
-  const cycle = computeStipendCycle({
+  const cycleInput = {
     terms: pledge.terms,
     approved,
     cycleStart: from,
@@ -85,7 +91,15 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
     missionIds: pledge.terms.scope === 'allMissions' ? null : pledge.missionIds,
     hoursAlreadyMetered: metered,
     equityHeadroom: ledger ? Math.max(0, ledger.contribution - ledger.equityDebited) : null
-  });
+  };
+  // Within the agreed monthly ceiling, and past it. The second is never the
+  // default: the ceiling is the term both signed, and what it holds back stays
+  // open (unmetered) rather than falling — the funder may choose to pay it now,
+  // and the recipient's receipt is still their yes.
+  const capped = computeStipendCycle(cycleInput);
+  const all = computeStipendCycle({ ...cycleInput, includeOverCap: true });
+  const includeOverCap = !asRecipient && params.includeOverCap === true && capped.overCap > 0;
+  const cycle = includeOverCap ? all : capped;
 
   if (cycle.amount <= 0) {
     return {
@@ -94,11 +108,29 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
     };
   }
 
+  // What the recipient says arrived — what is due unless they name another
+  // figure. Less leaves the rest of the hours owed; more than the ceiling is
+  // the funder having paid past it, which their own transfer already agreed
+  // to. More than the hours come to cannot have arrived *for these hours*.
+  let amount = cycle.amount;
+  let hours = cycle.paidHours;
+  if (asRecipient && params.receivedAmount != null && params.receivedAmount !== '') {
+    const received = Number(params.receivedAmount);
+    if (!Number.isFinite(received) || received <= 0) throw new Error('receivedAmount must be a positive number');
+    if (received > all.amount) {
+      throw new Error('More cannot have arrived than these hours come to — the rest belongs to its own cycle');
+    }
+    amount = Math.round(received * 100) / 100;
+    // Meter only the share of the hours this money paid for.
+    hours = Math.round(Math.min(all.paidHours, (all.paidHours * amount) / all.amount) * 100) / 100;
+  }
+  // Less than is due under the ceiling: the rest is still *this* window's.
+  const partial = amount < capped.amount;
+
   const project = await fetchProjectContext(exec, pledge.projectId);
   // Amounts are stored in the rikma's currency; the notice says them in it.
   const money = moneyTextFor(project?.currency ?? 'ILS');
   const nowISO = new Date().toISOString();
-  const lines = computeStipendEquity(cycle.amount, pledge.terms);
 
   /**
    * Did the money already move? Closing a cycle and transferring it are two
@@ -111,116 +143,33 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
    * settles the cycle at the derived amount and opens a transfer both sides
    * can see and talk in, with no clock running until the money actually goes.
    */
-  const transferred = params.transferred !== false;
+  const transferred = asRecipient || params.transferred !== false;
+  const overCapPaid = Math.max(0, Math.round((amount - capped.amount) * 100) / 100);
 
-  // The money leg. `senderconf` is the funder's own statement that they sent
-  // it; `confirmed` waits for the recipient, like every other Haluka.
-  const halukaData = fields(
-    strField('usersend', pledge.funderId),
-    strField('userrecive', pledge.recipientId),
-    numField('amount', cycle.amount),
-    strField('project', pledge.projectId),
-    pledge.matbeaId ? strField('matbea', pledge.matbeaId) : null,
-    transferred ? 'senderconf: true' : 'senderconf: false',
-    'confirmed: false',
-    'ushar: true',
-    dateField('publishedAt', nowISO)
-  );
-  const halukaRes = await run(
-    exec,
-    `mutation { createHaluka(data: { ${halukaData} }) { data { id } } }`,
-    'settle:createHaluka'
-  );
-  const halukaId = halukaRes?.createHaluka?.data?.id ? String(halukaRes.createHaluka.data.id) : null;
-
-  // The coordination channel. Created up front only when the money has *not*
-  // moved yet, because that is the case where the two of them still have
-  // something to arrange ("which account", "Tuesday") — and a chat that has to
-  // be created before it can be opened is a chat nobody opens.
-  let forumId: string | null = null;
-  if (!transferred && halukaId) {
-    const forumRes = await run(
-      exec,
-      `mutation { createForum(data: { ${fields(
-        strField('project', pledge.projectId),
-        strField('haluka', halukaId),
-        dateField('publishedAt', nowISO)
-      )} }) { data { id } } }`,
-      'settle:createForum'
-    ).catch((e) => {
-      console.warn('[settleStipendCycle] transfer chat creation failed (non-fatal):', e);
-      return null;
-    });
-    forumId = forumRes?.createForum?.data?.id ? String(forumRes.createForum.data.id) : null;
-  }
-
-  // The ledger row. equityCredit/equityDebit are written now but only *count*
-  // once status is `confirmed` — the same invariant a Sale has while its holder
-  // claim is still open.
-  const paymentRes = await run(
-    exec,
-    `mutation { createStipendPayment(data: { ${fields(
-      strField('project', pledge.projectId),
-      strField('stipend_pledge', pledgeId),
-      program ? strField('stipend_program', program.id) : null,
-      strField('funder', pledge.funderId),
-      strField('recipient', pledge.recipientId),
-      dateField('cycleStart', from),
-      dateField('cycleEnd', window.cycleEnd),
-      numField('hours', cycle.hours),
-      numField('stipendRate', pledge.terms.stipendRate),
-      numField('amount', cycle.amount),
-      numField('equityCredit', lines.equityCredit),
-      numField('equityDebit', lines.equityDebit),
-      enumField('mode', pledge.terms.mode, MODES),
-      numField('costShare', pledge.terms.costShare),
-      numField('equityMultiplier', pledge.terms.equityMultiplier),
-      transferred ? 'status: sent' : 'status: pending',
-      halukaId ? strField('haluka', halukaId) : null,
-      pledge.matbeaId ? strField('matbea', pledge.matbeaId) : null,
-      strField(
-        'note',
-        `stipend · ${cycle.hours}h × ${pledge.terms.stipendRate}${cycle.cappedBy ? ` · capped by ${cycle.cappedBy}` : ''}`
-      ),
-      dateField('publishedAt', nowISO)
-    )} }) { data { id } } }`,
-    'settle:createPayment'
-  );
-  const paymentId = paymentRes?.createStipendPayment?.data?.id
-    ? String(paymentRes.createStipendPayment.data.id)
-    : null;
-  if (!paymentId) throw new Error('Failed to record the stipend payment');
-
-  // Silence-as-consent on "did it arrive?": same pattern as a sale claim —
-  // no answer within the rikma's restime confirms the last version on the
-  // table, and "I got nothing" is a counter of amount 0, not a veto.
-  //
-  // A payment that has not been transferred yet gets **no** clock: silence
-  // cannot confirm the arrival of money nobody sent. The clock starts when the
-  // funder says it went out (`markStipendTransferSent`).
-  let timegramaId: string | null = null;
-  if (transferred) {
-    try {
-      const deadline = new Date(Date.now() + calcDeadlineMs(project?.restime ?? 'feh'));
-      const tg = await run(
-        exec,
-        `mutation { createTimegrama(data: { ${fields(
-          dateField('date', deadline),
-          strField('whatami', 'stipend_payment'),
-          strField('stipend_payment', paymentId),
-          'done: false'
-        )} }) { data { id } } }`,
-        'settle:timegrama'
-      );
-      timegramaId = tg?.createTimegrama?.data?.id ? String(tg.createTimegrama.data.id) : null;
-    } catch (e) {
-      console.warn('[settleStipendCycle] confirmation clock failed:', e);
-    }
-  }
+  const recorded = await recordStipendPayment(exec, {
+    pledge: { ...pledge, id: pledgeId },
+    program,
+    restime: project?.restime ?? null,
+    amount,
+    hours,
+    cycleStart: from,
+    cycleEnd: window.cycleEnd,
+    state: asRecipient ? 'confirmed' : transferred ? 'sent' : 'pending',
+    note: `stipend · ${hours}h × ${pledge.terms.stipendRate}${
+      cycle.cappedBy ? ` · capped by ${cycle.cappedBy}` : ''
+    }${overCapPaid > 0 ? ` · over the monthly ceiling by ${overCapPaid}` : ''}${
+      asRecipient ? ' · receipt declared by recipient' : ''
+    }`,
+    tag: 'settle'
+  });
+  const { paymentId, halukaId, forumId, timegramaId } = recorded;
+  const lines = recorded;
 
   // Move the pledge's own counters. `paidTotal` is what the next cycle's
   // remaining budget is measured against.
-  const newPaid = Math.round((pledge.paidTotal + cycle.amount) * 100) / 100;
+  const newPaid = Math.round((pledge.paidTotal + amount) * 100) / 100;
+  // A partial receipt leaves hours owed, so it cannot close the budget.
+  const exhausts = partial ? false : amount >= all.amount ? all.exhausts : capped.exhausts;
   await run(
     exec,
     `mutation { updateStipendPledge(id: ${gqlStr(pledgeId)}, data: { ${fields(
@@ -231,8 +180,13 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
       // and before the next window, and were never paid at all
       // (docs/inprogress/FIXES.md §3). `now` is also the honest statement of fact: this is
       // how far the books are settled.
-      dateField('lastSettledAt', nowISO),
-      cycle.exhausts ? 'status: exhausted' : null
+      //
+      // Not after a partial receipt: the hours it did not pay for are still
+      // owed, and the watermark moving past them would lose them. The payment
+      // row metered only its share (`hours`), so the next reading from the same
+      // origin finds exactly the rest.
+      partial ? null : dateField('lastSettledAt', nowISO),
+      exhausts ? 'status: exhausted' : null
     )} }) { data { id } } }`,
     'settle:updatePledge'
   );
@@ -241,14 +195,35 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
     await run(
       exec,
       `mutation { updateStipendProgram(id: ${gqlStr(program.id)}, data: { ${fields(
-        numField('spent', Math.round((program.spent + cycle.amount) * 100) / 100),
-        program.remainingCap != null && program.remainingCap - cycle.amount <= 0 ? 'status: exhausted' : null
+        numField('spent', Math.round((program.spent + amount) * 100) / 100),
+        program.remainingCap != null && program.remainingCap - amount <= 0 ? 'status: exhausted' : null
       )} }) { data { id } } }`,
       'settle:updateProgram'
     ).catch((e) => console.warn('[settleStipendCycle] program counter update failed:', e));
   }
 
-  if (notifier) {
+  if (notifier && asRecipient) {
+    // The funder learns the cycle is closed and what it did to the books.
+    notifier
+      .notify(
+        {
+          recipients: { type: 'specificUsers', config: { userIdsParam: 'recipients' } },
+          templates: {
+            title: { he: 'המלגה התקבלה', en: 'The stipend arrived' },
+            body: {
+              he: `המקבל/ת הצהיר/ה שקיבל/ה ${money(amount)} עבור ${hours} שעות שאושרו. המחזור נסגר והאחוזים עודכנו לפי תנאי המלגה.`,
+              en: `The recipient declared receiving ${money(amount, 'en')} for ${hours} approved hours. The cycle is closed and the shares moved according to the pledge's terms.`
+            }
+          },
+          intent: 'personal',
+          metadata: { type: 'stipendPayment', url: 'lev', priority: 'normal' }
+        },
+        { recipients: [pledge.funderId], projectId: pledge.projectId },
+        { projectId: pledge.projectId },
+        context
+      )
+      .catch((e: unknown) => console.warn('[settleStipendCycle] notification failed:', e));
+  } else if (notifier) {
     notifier
       .notify(
         {
@@ -259,12 +234,12 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
               : { he: 'מחזור המלגה נסגר — ההעברה בתיאום', en: 'Your stipend cycle closed — the transfer is being arranged' },
             body: transferred
               ? {
-                  he: `${cycle.hours} שעות שאושרו × ${money(pledge.terms.stipendRate)} = ${money(cycle.amount)}. אישור הקבלה הוא מה שמעדכן את האחוזים — בלעדיו כלום לא זז.`,
-                  en: `${cycle.hours} approved hours × ${money(pledge.terms.stipendRate, 'en')} = ${money(cycle.amount, 'en')}. Confirming it arrived is what updates the shares — until then nothing moves.`
+                  he: `${hours} שעות שאושרו × ${money(pledge.terms.stipendRate)} = ${money(amount)}. אישור הקבלה הוא מה שמעדכן את האחוזים — בלעדיו כלום לא זז.`,
+                  en: `${hours} approved hours × ${money(pledge.terms.stipendRate, 'en')} = ${money(amount, 'en')}. Confirming it arrived is what updates the shares — until then nothing moves.`
                 }
               : {
-                  he: `${cycle.hours} שעות שאושרו × ${money(pledge.terms.stipendRate)} = ${money(cycle.amount)}. הכסף עוד לא יצא — נפתח כרטיס העברה עם צ׳אט לתיאום, ואפשר לכתוב שם לאן להעביר.`,
-                  en: `${cycle.hours} approved hours × ${money(pledge.terms.stipendRate, 'en')} = ${money(cycle.amount, 'en')}. The money has not gone out yet — a transfer card with a chat is open, so you can say where to send it.`
+                  he: `${hours} שעות שאושרו × ${money(pledge.terms.stipendRate)} = ${money(amount)}. הכסף עוד לא יצא — נפתח כרטיס העברה עם צ׳אט לתיאום, ואפשר לכתוב שם לאן להעביר.`,
+                  en: `${hours} approved hours × ${money(pledge.terms.stipendRate, 'en')} = ${money(amount, 'en')}. The money has not gone out yet — a transfer card with a chat is open, so you can say where to send it.`
                 }
           },
           // Sent: the recipient's receipt is awaited. Not yet: only news of the arrangement.
@@ -286,8 +261,13 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
       forumId,
       timegramaId,
       transferred,
-      status: transferred ? 'sent' : 'pending',
+      status: asRecipient ? 'confirmed' : transferred ? 'sent' : 'pending',
       ...cycle,
+      amount,
+      hours,
+      exhausts,
+      // What the ceiling held back and nobody has decided on yet — still owed.
+      overCapOpen: Math.max(0, Math.round((all.amount - Math.max(amount, capped.amount)) * 100) / 100),
       cycleStart: from,
       cycleEnd: window.cycleEnd,
       equityCredit: lines.equityCredit,
@@ -303,7 +283,7 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
 export const settleStipendCycleConfig: ActionConfig = {
   key: 'settleStipendCycle',
   description:
-    'Close one stipend cycle: derive the amount from approved hours × the pledged rate (capped), create the Haluka and the stipend-payment ledger row, and start the recipient’s confirmation clock.',
+    'Close one stipend cycle: derive the amount from approved hours × the pledged rate (capped), create the Haluka and the stipend-payment ledger row, and start the recipient’s confirmation clock. Called by the recipient, it declares the money arrived: the row is confirmed at once and no clock runs.',
   graphqlOperation: handler,
 
   paramSchema: {
@@ -313,6 +293,18 @@ export const settleStipendCycleConfig: ActionConfig = {
       required: false,
       description:
         'Has the money already been transferred? true (default) marks it sent and starts the recipient’s confirmation clock; false settles the cycle as pending, opens a transfer chat and starts no clock.'
+    },
+    includeOverCap: {
+      type: 'boolean',
+      required: false,
+      description:
+        'Funder only: pay past the monthly ceiling too. Off by default — what the ceiling holds back is not lost, it stays open for both sides to decide on, and the recipient still confirms what arrives.'
+    },
+    receivedAmount: {
+      type: 'number',
+      required: false,
+      description:
+        'Recipient only: what actually arrived, when it differs from what is due — less leaves the rest of the hours owed, more (up to what the hours come to) means the funder paid past the monthly ceiling. Omit for "what is due".'
     },
     reference: { type: 'string', required: false, description: 'Any date inside the cycle (defaults to now)' },
     cycleStart: { type: 'string', required: false, description: 'Explicit window start' },

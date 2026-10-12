@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { computeStipendCycle, cycleWindow, settlementFrom } from './computeStipendCycle.js';
+import { capMonths, computeOverCapBalance, computeStipendCycle, cycleWindow, settlementFrom } from './computeStipendCycle.js';
 
 const terms = { mode: 'equity' as const, costShare: 1, equityMultiplier: 1, stipendRate: 50 };
 const cycleStart = '2026-03-01T00:00:00.000Z';
@@ -231,5 +231,154 @@ describe('settlementFrom', () => {
 
   it('falls back to the window when the pledge carries no dates', () => {
     expect(settlementFrom({ lastSettledAt: null, start: null }, cycleStart)).toBe(cycleStart);
+  });
+});
+
+describe('computeStipendCycle — a carried window is owed a ceiling per month', () => {
+  const capped = { ...terms, stipendRate: 60, monthlyCap: 2_400 };
+  // The live case: pledge from 29 Aug, nothing settled, read on 12 Oct.
+  const run = (asOf: string) =>
+    computeStipendCycle({
+      terms: capped,
+      cycleStart: '2026-08-29T00:00:00.000Z',
+      cycleEnd: '2026-10-31T23:59:59.999Z',
+      asOf,
+      approved: [{ hours: 84.9, approvedAt: '2026-10-05T10:00:00.000Z' }]
+    });
+
+  it('two months opened ⇒ two ceilings', () => {
+    const r = run('2026-10-12T09:00:00.000Z');
+    expect(r.gross).toBe(5_094);
+    expect(r.capMonths).toBe(2);
+    expect(r.amount).toBe(4_800);
+    expect(r.cappedBy).toBe('monthlyCap');
+  });
+
+  it('the third month opens on its anniversary, not on the calendar', () => {
+    expect(run('2026-10-28T23:00:00.000Z').capMonths).toBe(2);
+    const r = run('2026-10-29T00:00:00.000Z');
+    expect(r.capMonths).toBe(3);
+    expect(r.amount).toBe(5_094);
+    expect(r.cappedBy).toBeNull();
+  });
+
+  it('never counts past the end of the window', () => {
+    expect(run('2027-03-01T00:00:00.000Z').capMonths).toBe(3);
+  });
+
+  it('a window inside one month keeps one ceiling', () => {
+    const r = computeStipendCycle({
+      terms: capped,
+      cycleStart: '2026-10-01T00:00:00.000Z',
+      cycleEnd: '2026-10-31T23:59:59.999Z',
+      asOf: '2026-10-20T00:00:00.000Z',
+      approved: [{ hours: 84.9, approvedAt: '2026-10-05T10:00:00.000Z' }]
+    });
+    expect(r.capMonths).toBe(1);
+    expect(r.amount).toBe(2_400);
+  });
+});
+
+describe('capMonths', () => {
+  it('clamps a month-end start (31 Jan + 1 month = 28 Feb)', () => {
+    expect(capMonths('2026-01-31T00:00:00.000Z', '2026-02-27T23:00:00.000Z')).toBe(1);
+    expect(capMonths('2026-01-31T00:00:00.000Z', '2026-02-28T00:00:00.000Z')).toBe(2);
+  });
+
+  it('is 1 for an empty or broken window', () => {
+    expect(capMonths('2026-03-10T00:00:00.000Z', '2026-03-01T00:00:00.000Z')).toBe(1);
+    expect(capMonths('nonsense', '2026-03-01T00:00:00.000Z')).toBe(1);
+  });
+});
+
+describe('computeStipendCycle — what the ceiling holds back is not lost', () => {
+  const capped = { ...terms, stipendRate: 60, monthlyCap: 2_400 };
+  const base = {
+    terms: capped,
+    cycleStart: '2026-10-01T00:00:00.000Z',
+    cycleEnd: '2026-10-31T23:59:59.999Z',
+    asOf: '2026-10-20T00:00:00.000Z',
+    approved: [{ hours: 84.9, approvedAt: '2026-10-05T10:00:00.000Z' }]
+  };
+
+  it('pays to the ceiling, meters only the hours it paid for, and says what is left', () => {
+    const r = computeStipendCycle(base);
+    expect(r.amount).toBe(2_400);
+    expect(r.overCap).toBe(2_694);
+    expect(r.paidHours).toBe(40);
+  });
+
+  it('pays everything when the funder chose to — still inside the other limits', () => {
+    const all = computeStipendCycle({ ...base, includeOverCap: true });
+    expect(all.amount).toBe(5_094);
+    expect(all.overCap).toBe(0);
+    expect(all.paidHours).toBe(84.9);
+    expect(all.cappedBy).toBeNull();
+
+    const budget = computeStipendCycle({ ...base, includeOverCap: true, terms: { ...capped, totalCap: 3_000 } });
+    expect(budget.amount).toBe(3_000);
+    expect(budget.cappedBy).toBe('totalCap');
+    // A budget that ends consumes the hours with it, as before.
+    expect(budget.paidHours).toBe(84.9);
+  });
+
+  it('overCap is only what the monthly ceiling held back, not a budget limit', () => {
+    const r = computeStipendCycle({ ...base, terms: { ...capped, totalCap: 3_000 } });
+    expect(r.amount).toBe(2_400);
+    expect(r.overCap).toBe(600);
+  });
+});
+
+describe('computeOverCapBalance', () => {
+  const capped = { ...terms, stipendRate: 60, monthlyCap: 2_400 };
+  const approved = [
+    { hours: 84.9, approvedAt: '2026-09-20T10:00:00.000Z' },
+    { hours: 10, approvedAt: '2026-10-15T10:00:00.000Z' } // after the watermark: the open window's
+  ];
+
+  it('is the approved hours behind the watermark that no payment metered', () => {
+    const b = computeOverCapBalance({
+      terms: capped,
+      approved,
+      start: '2026-08-29T00:00:00.000Z',
+      watermark: '2026-10-01T09:00:00.000Z',
+      meteredBefore: 40,
+      asOf: '2026-10-20T00:00:00.000Z'
+    });
+    expect(b.hours).toBe(44.9);
+    expect(b.amount).toBe(2_694);
+    expect(b.cycleStart).toBe('2026-08-29T00:00:00.000Z');
+    expect(b.cycleEnd).toBe('2026-10-01T08:59:59.999Z');
+  });
+
+  it('is zero once a row metered them — paid or let go', () => {
+    const b = computeOverCapBalance({
+      terms: capped,
+      approved,
+      start: '2026-08-29T00:00:00.000Z',
+      watermark: '2026-10-01T09:00:00.000Z',
+      meteredBefore: 84.9
+    });
+    expect(b.hours).toBe(0);
+    expect(b.amount).toBe(0);
+  });
+
+  it('nothing settled yet ⇒ nothing behind a watermark', () => {
+    expect(
+      computeOverCapBalance({ terms: capped, approved, start: '2026-08-29T00:00:00.000Z', watermark: null, meteredBefore: 0 })
+        .hours
+    ).toBe(0);
+  });
+
+  it('a watermark still in the future is read as now', () => {
+    const b = computeOverCapBalance({
+      terms: capped,
+      approved,
+      start: '2026-08-29T00:00:00.000Z',
+      watermark: '2026-10-31T23:59:59.999Z',
+      meteredBefore: 0,
+      asOf: '2026-10-10T00:00:00.000Z'
+    });
+    expect(b.hours).toBe(84.9);
   });
 });

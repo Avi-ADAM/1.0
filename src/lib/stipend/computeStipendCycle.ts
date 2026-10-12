@@ -7,8 +7,18 @@
  * did not recognise, and there is no elegant way back.
  *
  *     hours  = approved in the window − hours other pledges already metered
- *     amount = min(hours × rate, monthlyCap, remaining totalCap, program cap,
- *                  the recipient's remaining equity ÷ α)
+ *     amount = min(hours × rate, monthlyCap × months, remaining totalCap,
+ *                  program cap, the recipient's remaining equity ÷ α)
+ *
+ * `months` is how many months the window has opened (see `capMonths`): a
+ * settlement that carries two unpaid months forward is owed two ceilings, not
+ * one.
+ *
+ * What the monthly ceiling holds back does not fall. It is `overCap`: the hours
+ * stay unmetered, and whether they are paid is the two sides' decision — the
+ * funder may choose to pay them, the recipient's receipt is still their yes
+ * (or a counter), and only the recipient can let them go
+ * (`computeOverCapBalance`).
  *
  * The last two terms of `hours` and of `amount` are the ones that keep the
  * model honest when more than one stipend exists at once: hours the rikma
@@ -65,6 +75,17 @@ export interface CycleInput {
    * Null = don't check (a gift, or the caller has no figure).
    */
   equityHeadroom?: number | null;
+  /**
+   * "Now", for counting how many months the window has opened. Defaults to the
+   * real clock; the window never counts past `cycleEnd`.
+   */
+  asOf?: string | Date | null;
+  /**
+   * Pay past the monthly ceiling too. Only ever true when the funder chose it
+   * (and the recipient's receipt is still awaited) — never a default: the
+   * ceiling is the agreed term, stepping over it is a new agreement.
+   */
+  includeOverCap?: boolean;
 }
 
 export interface CycleResult {
@@ -76,6 +97,15 @@ export interface CycleResult {
   amount: number;
   /** Which limit bit, when `amount < gross`. */
   cappedBy: 'monthlyCap' | 'totalCap' | 'programCap' | 'equityFloor' | null;
+  /** Months of monthly ceiling this window is owed (≥ 1). */
+  capMonths: number;
+  /**
+   * ₪ the monthly ceiling held back — and only it. Not lost: those hours stay
+   * unmetered, so they remain open for the two sides to decide on.
+   */
+  overCap: number;
+  /** Hours this payment pays for (≤ `hours`); the meter moves by this much. */
+  paidHours: number;
   /** ₪ left under the pledge's own totalCap after this payment. */
   remainingAfter: number | null;
   /** True when this payment exhausts the pledge — it closes itself (§6). */
@@ -86,6 +116,41 @@ function toTime(v: string | Date | null | undefined): number {
   if (v == null) return NaN;
   const d = v instanceof Date ? v : new Date(String(v));
   return d.getTime();
+}
+
+/** `ms` plus `n` calendar months, clamped to the target month's last day (Jan 31 + 1 → Feb 28). */
+function addMonthsUTC(ms: number, n: number): number {
+  const d = new Date(ms);
+  const y = d.getUTCFullYear();
+  const m = d.getUTCMonth() + n;
+  const lastDay = new Date(Date.UTC(y, m + 1, 0)).getUTCDate();
+  return Date.UTC(
+    y,
+    m,
+    Math.min(d.getUTCDate(), lastDay),
+    d.getUTCHours(),
+    d.getUTCMinutes(),
+    d.getUTCSeconds(),
+    d.getUTCMilliseconds()
+  );
+}
+
+/**
+ * How many monthly ceilings a window starting at `from` is owed by `until`:
+ * one for every month that has begun, counted from the window's own start.
+ *
+ * The ceiling is the funder's protection per month. Applying it once to a
+ * window that had carried two unpaid months forward (29 Aug → 12 Oct) paid one
+ * month's stipend for two months of approved work; counting calendar months
+ * touched would instead give a three-day August a full ceiling of its own.
+ */
+export function capMonths(from: string | Date, until: string | Date): number {
+  const a = toTime(from);
+  const b = toTime(until);
+  if (!Number.isFinite(a) || !Number.isFinite(b) || b <= a) return 1;
+  let n = 1;
+  while (n < 1200 && addMonthsUTC(a, n) <= b) n++;
+  return n;
 }
 
 export function computeStipendCycle(input: CycleInput): CycleResult {
@@ -118,10 +183,16 @@ export function computeStipendCycle(input: CycleInput): CycleResult {
 
   // Smallest binding limit wins, and we remember which one so the card can say
   // "this is the last cycle" rather than silently paying less than the hours.
+  //
+  // The monthly ceiling is applied last and on its own, because it is the one
+  // limit two people may agree to step over: what it holds back is not lost,
+  // it is `overCap` — hours left open for both of them to decide on.
   let amount = gross;
   let cappedBy: CycleResult['cappedBy'] = null;
   const limits: Array<[number, CycleResult['cappedBy']]> = [];
-  if (terms.monthlyCap != null) limits.push([terms.monthlyCap, 'monthlyCap']);
+  const asOf = input.asOf == null ? Date.now() : toTime(input.asOf);
+  const until = Number.isFinite(to) && (!Number.isFinite(asOf) || to < asOf) ? to : asOf;
+  const months = capMonths(input.cycleStart, new Date(until));
   if (totalRemaining != null) limits.push([totalRemaining, 'totalCap']);
   if (programRemaining != null) limits.push([programRemaining, 'programCap']);
   // The recipient's own equity can never go below zero: the debit is α·P, so
@@ -136,7 +207,28 @@ export function computeStipendCycle(input: CycleInput): CycleResult {
       cappedBy = name;
     }
   }
+  const beforeMonthly = round2(Math.max(0, amount));
+  const monthlyLimit = terms.monthlyCap == null ? null : round2(terms.monthlyCap * months);
+  let overCap = 0;
+  if (monthlyLimit != null && amount > monthlyLimit) {
+    if (input.includeOverCap) {
+      overCap = 0;
+    } else {
+      amount = monthlyLimit;
+      cappedBy = 'monthlyCap';
+      overCap = round2(beforeMonthly - monthlyLimit);
+    }
+  }
   amount = round2(Math.max(0, amount));
+
+  // The hours this payment actually pays for. Under the monthly ceiling that is
+  // only its share — the rest stay unmetered and so stay owed (`overCap`). A
+  // budget or equity-floor limit is different: the pledge cannot carry more,
+  // so those hours are consumed with it, as they always were.
+  const paidHours =
+    cappedBy === 'monthlyCap' && gross > 0 && amount < gross
+      ? round2(Math.min(hours, (hours * amount) / gross))
+      : hours;
 
   const remainingAfter = totalRemaining == null ? null : round2(Math.max(0, totalRemaining - amount));
 
@@ -145,11 +237,68 @@ export function computeStipendCycle(input: CycleInput): CycleResult {
     gross,
     amount,
     cappedBy: amount < gross ? cappedBy : null,
+    capMonths: months,
+    overCap,
+    paidHours,
     remainingAfter,
     exhausts:
       (remainingAfter != null && remainingAfter <= 0) ||
       (programRemaining != null && programRemaining - amount <= 0)
   };
+}
+
+export interface OverCapInput
+  extends Omit<CycleInput, 'cycleStart' | 'cycleEnd' | 'hoursAlreadyMetered' | 'includeOverCap'> {
+  /** The pledge's own start — nothing approved before it is ever its business. */
+  start: string | Date | null | undefined;
+  /** `lastSettledAt`: everything before it has been read by some settlement. */
+  watermark: string | Date | null | undefined;
+  /** Hours metered by payments whose cycle opened in [start, watermark). */
+  meteredBefore: number | null | undefined;
+}
+
+export interface OverCapBalance {
+  hours: number;
+  /** What paying them would cost, inside every limit except the monthly one. */
+  amount: number;
+  cappedBy: CycleResult['cappedBy'];
+  /** The stretch the balance covers, for the payment row that settles it. */
+  cycleStart: string | null;
+  cycleEnd: string | null;
+}
+
+/**
+ * Hours behind the watermark that were approved and never paid for — what the
+ * monthly ceiling held back in earlier settlements.
+ *
+ * Nothing stores this number. A settlement under the ceiling meters only the
+ * hours it paid for (`paidHours`), so the rest are simply approved hours no
+ * payment row has metered: `approved in [start, watermark) − metered there`.
+ * Paying them, or the recipient letting them go, writes a row that meters them,
+ * and the balance goes to zero by itself.
+ */
+export function computeOverCapBalance(input: OverCapInput): OverCapBalance {
+  const empty: OverCapBalance = { hours: 0, amount: 0, cappedBy: null, cycleStart: null, cycleEnd: null };
+  const startMs = toTime(input.start);
+  const asOf = input.asOf == null ? Date.now() : toTime(input.asOf);
+  let markMs = toTime(input.watermark);
+  if (!Number.isFinite(markMs)) return empty;
+  // An old row may carry a cycle *end* as its watermark — a date still ahead.
+  if (Number.isFinite(asOf) && markMs > asOf) markMs = asOf;
+  if (Number.isFinite(startMs) && markMs <= startMs) return empty;
+
+  const cycleStart = Number.isFinite(startMs) ? new Date(startMs).toISOString() : new Date(0).toISOString();
+  // Hours approved exactly at the watermark belong to the window after it.
+  const cycleEnd = new Date(markMs - 1).toISOString();
+  const r = computeStipendCycle({
+    ...input,
+    cycleStart,
+    cycleEnd,
+    hoursAlreadyMetered: input.meteredBefore,
+    includeOverCap: true
+  });
+  if (r.hours <= 0) return empty;
+  return { hours: r.hours, amount: r.amount, cappedBy: r.cappedBy, cycleStart, cycleEnd };
 }
 
 /**
@@ -164,7 +313,8 @@ export function computeStipendCycle(input: CycleInput): CycleResult {
  *
  * So the origin is the **watermark**: everything approved since the last
  * settlement, never anything from before the pledge itself began. The monthly
- * ceiling stays the funder's protection against a large carried-forward month.
+ * ceiling still bounds it — once for every month the carried window has opened
+ * (`capMonths`), so a late settlement is neither inflated nor cut to one month.
  */
 export function settlementFrom(
   pledge: { lastSettledAt?: string | null; start?: string | null },

@@ -57,6 +57,7 @@ export const qidsAccess = {
   '230updateMaagad': { allow: ['user', 'serviceAdmin'] },
   '232listExpiredOpenOffers': { allow: ['user', 'serviceAdmin'] },
   '231queryMyMaagadMember': { allow: ['user', 'serviceAdmin'] },
+  '440wishMaagadMembership': { allow: ['serviceAdmin'] }, // server-only: /concierge/[id] pool panel
   '233listOpenRatsonsForClustering': { allow: ['user', 'serviceAdmin'] },
   '234getProjectLocation': { allow: ['user', 'serviceAdmin'] },
   '250getUserPersonalProject': { allow: ['user', 'serviceAdmin'] },

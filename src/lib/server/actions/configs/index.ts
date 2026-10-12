@@ -226,6 +226,7 @@ import { proposeStipendPledgeConfig } from './proposeStipendPledge.js';
 import { proposeStipendProgramConfig } from './proposeStipendProgram.js';
 import { counterStipendTermsConfig } from './counterStipendTerms.js';
 import { settleStipendCycleConfig } from './settleStipendCycle.js';
+import { resolveStipendOverCapConfig } from './resolveStipendOverCap.js';
 import { confirmStipendPaymentConfig } from './confirmStipendPayment.js';
 import { markStipendTransferSentConfig } from './markStipendTransferSent.js';
 import { publishStipendFundingRequestConfig } from './publishStipendFundingRequest.js';
@@ -581,6 +582,7 @@ export function registerAllActions(): void {
   registerAction(proposeStipendProgramConfig);
   registerAction(counterStipendTermsConfig);
   registerAction(settleStipendCycleConfig);
+  registerAction(resolveStipendOverCapConfig);
   registerAction(confirmStipendPaymentConfig);
   registerAction(markStipendTransferSentConfig);
   registerAction(publishStipendFundingRequestConfig);

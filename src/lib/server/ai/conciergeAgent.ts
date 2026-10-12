@@ -42,7 +42,8 @@ Start with { and end with }. Exact shape:
     "place":    "..." | "",
     "online":   true | false | null,
     "groupKind": "group_purchase" | "group_trip" | "community_event" | "public_renovation" | "recurring_subscription" | ""
-  }
+  },
+  "volume": {"needsOthers": true | false, "minPeople": number | null, "why": "..."}
 }
 
 Field rules:
@@ -72,7 +73,23 @@ Field rules:
     physical place is required, null when not stated.
   - groupKind: only when the writer describes something OTHERS join —
     buying together, a shared trip, a community event, fixing a public space,
-    a recurring shared subscription. Otherwise "".
+    a recurring shared subscription. The text itself must name the others
+    ("we", "my neighbours", "together", "a group of us"). One person asking
+    for a service for herself is "" — even a weekly basket or a shuttle that
+    only runs for several customers; that judgement is "volume", below.
+- volume     = YOUR judgement, not a stated fact: can this wish only come true
+                when several customers want the same thing at once? Some things
+                a supplier opens only at volume — a weekly local produce basket,
+                a shuttle or minibus route, a class or workshop with a minimum,
+                buying in bulk, a group tour, a delivery route, a shared licence.
+  - needsOthers: true only for such a wish, even when the writer did not
+    mention other people. false for work done for one person (a renovation,
+    a wedding photographer, a lawyer, a custom piece), however expensive.
+  - minPeople: the usual minimum for a supplier to open it (2-500), or null
+    when you cannot tell.
+  - why: one short sentence telling her why others are needed, written in the
+    SAME language as the wish text (English wish → English sentence). "" when
+    needsOthers is false.
 
 General rules:
 - ALWAYS answer in the SAME language as the input.

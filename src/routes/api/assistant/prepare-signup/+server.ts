@@ -14,7 +14,7 @@ import { takePrepare } from '$lib/server/assistant/publicQuota.js';
 import { env } from '$env/dynamic/private';
 
 export const POST: RequestHandler = async ({ request, fetch, getClientAddress }) => {
-  if (env.ASSISTANT_MCP_ENABLED !== 'true') return json({ ok: false, reason: 'disabled' }, { status: 404 });
+  if (env.ASSISTANT_MCP_ENABLED === 'false') return json({ ok: false, reason: 'disabled' }, { status: 404 });
 
   const quota = takePrepare(getClientAddress());
   if (!quota.ok) {

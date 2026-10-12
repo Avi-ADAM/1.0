@@ -13686,7 +13686,8 @@ ${STIPEND_DECISION_FIELDS}
     ) {
       data { id attributes {
         name canonical_desc scope lat lng radius frequency status_maagad viability_hint
-        members(filters: { status_member: { in: ["interested", "signed", "active"] } }) { data { id } }
+        categories { data { id } }
+        members(filters: { status_member: { in: ["interested", "signed", "active"] } }, pagination: { limit: 500 }) { data { id } }
         offers(filters: { status_offer: { eq: "open" } }) {
           data { id attributes { title unit_price min_participants max_participants signed_count sign_deadline status_offer } }
         }
@@ -13700,13 +13701,14 @@ ${STIPEND_DECISION_FIELDS}
     $name: String, $canonical_desc: String, $scope: ENUM_MAAGAD_SCOPE,
     $lat: Float, $lng: Float, $radius: Long, $frequency: String,
     $status_maagad: ENUM_MAAGAD_STATUS_MAAGAD, $origin: ENUM_MAAGAD_ORIGIN,
-    $viability_hint: Int, $ratsons: [ID], $publishedAt: DateTime
+    $viability_hint: Int, $ratsons: [ID], $categories: [ID], $publishedAt: DateTime
   ) {
     createMaagad(data: {
       name: $name, canonical_desc: $canonical_desc, scope: $scope,
       lat: $lat, lng: $lng, radius: $radius, frequency: $frequency,
       status_maagad: $status_maagad, origin: $origin,
-      viability_hint: $viability_hint, ratsons: $ratsons, publishedAt: $publishedAt
+      viability_hint: $viability_hint, ratsons: $ratsons, categories: $categories,
+      publishedAt: $publishedAt
     }) {
       data { id attributes { name status_maagad origin scope } }
     }
@@ -13874,6 +13876,30 @@ ${STIPEND_DECISION_FIELDS}
         name isOnline lat lng radius frequency language
         categories { data { id } }
         users_permissions_users { data { id } }
+      } }
+    }
+  }`,
+
+  // The pools a wish sits in, or was invited to by clusterRatsons ('suggested').
+  // Read through maagad-member.ratson so a joined pool counts too (joinMaagad
+  // links the member, not Ratson.maagad), and only the owner's own rows — the
+  // member's ratson is not checked on write. Server-only: /concierge/[id] loader.
+  '440wishMaagadMembership': `query WishMaagadMembership($ratson: ID!, $uid: ID!) {
+    maagadMembers(
+      filters: {
+        ratson: { id: { eq: $ratson } }
+        user: { id: { eq: $uid } }
+        status_member: { in: ["suggested", "interested", "signed", "active"] }
+      }
+      pagination: { limit: 5 }
+      sort: "createdAt:desc"
+    ) {
+      data { id attributes {
+        status_member
+        maagad { data { id attributes {
+          name status_maagad
+          members(filters: { status_member: { in: ["interested", "signed", "active"] } }, pagination: { limit: 500 }) { data { id } }
+        } } }
       } }
     }
   }`,

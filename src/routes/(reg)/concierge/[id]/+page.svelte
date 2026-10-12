@@ -15,10 +15,11 @@
   import DealStages from '$lib/components/deals/DealStages.svelte';
   import { lineIsPart } from '$lib/wish/lineNames';
   import WishTermsEditor from '$lib/components/concierge/WishTermsEditor.svelte';
+  import WishPoolCard from '$lib/components/concierge/WishPoolCard.svelte';
   import { tick } from 'svelte';
   import { page } from '$app/state';
 
-  /** @type {{ data: { wish: any | null; proposals: any[]; loadOk: boolean; uid?: string; isOwner: boolean; enrichment?: any; forumMessages?: any[]; missionTemplates?: any[]; external?: any; bell?: { id: string; name: string; count: number }[]; notices?: import('$lib/notices').Notice[] | null; published?: { missions: { name: string; extractedKey: string | null }[]; resources: { name: string; extractedKey: string | null }[] }; gaps?: { label: string; imp: 'must' | 'nice' }[] | null; stages?: import('$lib/sheirut/dealChain').DealStageView[]; partLines?: Record<string, string[]> | null } }} */
+  /** @type {{ data: { wish: any | null; proposals: any[]; loadOk: boolean; uid?: string; isOwner: boolean; enrichment?: any; forumMessages?: any[]; missionTemplates?: any[]; external?: any; bell?: { id: string; name: string; count: number }[]; notices?: import('$lib/notices').Notice[] | null; published?: { missions: { name: string; extractedKey: string | null }[]; resources: { name: string; extractedKey: string | null }[] }; gaps?: { label: string; imp: 'must' | 'nice' }[] | null; stages?: import('$lib/sheirut/dealChain').DealStageView[]; partLines?: Record<string, string[]> | null; pool?: import('$lib/server/maagad/wishPool').WishPoolPanel | null } }} */
   let { data } = $props();
 
   // The bell's "expand" (docs/inprogress/PLAN_SMART_NOTICES.md) links to #proposal-<id>.
@@ -1987,6 +1988,10 @@
               </select>
               <small>{$t('concierge.pace_hint')}</small>
             </div>
+          {/if}
+
+          {#if isOwner && data?.pool && data?.wish}
+            <WishPoolCard pool={data.pool} wish={data.wish} />
           {/if}
 
           <div class="tabs">

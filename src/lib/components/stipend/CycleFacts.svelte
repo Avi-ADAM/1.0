@@ -30,6 +30,8 @@
    * @property {number} amount - what is actually due/sent
    * @property {number} [gross] - hours × rate before any cap
    * @property {string|null} [cappedBy] - monthlyCap | totalCap | programCap | equityFloor
+   * @property {number} [capMonths] - how many monthly ceilings the window is owed
+   * @property {number|null} [monthlyCap] - the pledge's ceiling for one month
    * @property {boolean} [exhausts] - this payment closes the budget
    * @property {string} [mode] - equity | gift
    * @property {number} [equityDebit] - ₪ of equity the recipient gives up
@@ -49,6 +51,8 @@
     amount = 0,
     gross = 0,
     cappedBy = null,
+    capMonths = 1,
+    monthlyCap = null,
     exhausts = false,
     mode = 'equity',
     equityDebit = 0,
@@ -115,10 +119,23 @@
     <span class="text-lg font-bold {ACCENT}">{money(amount)}</span>
   </div>
 
-  {#if cappedBy}
+  {#if cappedBy === 'monthlyCap' && capMonths > 1 && monthlyCap}
+    <!-- A carried window is owed one ceiling per month; say how many. -->
+    <p class="text-xs text-amber-700 dark:text-amber-300">
+      {$t('stipend.pay.capped.monthlyCapMonths', {
+        months: capMonths,
+        cap: money(monthlyCap),
+        count: fmtMoney(gross, null, { fraction: 'full' })
+      })}
+    </p>
+  {:else if cappedBy}
     <p class="text-xs text-amber-700 dark:text-amber-300">
       {$t(`stipend.pay.capped.${cappedBy}`, { count: fmtMoney(gross, null, { fraction: 'full' }) })}
     </p>
+  {/if}
+  {#if cappedBy === 'monthlyCap'}
+    <!-- What the ceiling holds back is not lost; it stays open for both sides. -->
+    <p class={MUTED}>{$t('stipend.pay.capped.overCapOpen')}</p>
   {/if}
   {#if exhausts}
     <p class="text-xs text-amber-700 dark:text-amber-300">{$t('stipend.pay.lastCycle')}</p>

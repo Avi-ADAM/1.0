@@ -190,6 +190,7 @@
       isFirst={isVisible}
       onProj={proj}
       onUser={user}
+      onDone={delo}
     />
 {:else if buble.ani === 'shiftDeclare'}
   <ShiftDeclareCard {buble} isFirst={isVisible} onProj={proj} />

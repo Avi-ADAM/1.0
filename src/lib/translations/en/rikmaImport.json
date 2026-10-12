@@ -87,5 +87,13 @@
     "copy": "Copy",
     "copied": "Copied",
     "error": "We couldn't make a link. Try again."
+  },
+  "receive": {
+    "title": "A rikma prepared for you",
+    "expired": "This link is no longer valid. Ask whoever prepared the rikma for a new one.",
+    "taken": "This rikma has already been handed over and is no longer waiting at this link.",
+    "otherAccount": "This rikma was prepared for {{email}}. To receive it, sign in to that address's account and open the link again.",
+    "unverified": "We could not check this link right now. Try again in a moment.",
+    "home": "To my heart"
   }
 }

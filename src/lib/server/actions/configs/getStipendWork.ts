@@ -25,6 +25,7 @@ import {
   fetchRecipientContribution,
   toPledge
 } from '$lib/server/stipend/read.js';
+import { readOverCapBalance } from '$lib/server/stipend/overCap.js';
 
 /**
  * A cycle that was settled before the money moved (`transferred: false`).
@@ -144,7 +145,14 @@ const handler: ActionExecutionHandler = async (_params, context) => {
       hoursAlreadyMetered: metered,
       equityHeadroom: ledger ? Math.max(0, ledger.contribution - ledger.equityDebited) : null
     });
-    if (cycle.amount <= 0) continue; // nothing approved this cycle — no card
+    // Hours the monthly ceiling held back in earlier settlements: not lost,
+    // open for both sides to decide on (resolveStipendOverCap).
+    const overCapBalance = await readOverCapBalance(exec, pledge, {
+      programRemaining: program?.remainingCap ?? null,
+      equityHeadroom: ledger ? Math.max(0, ledger.contribution - ledger.equityDebited) : null
+    }).catch(() => null);
+    // Nothing approved this cycle and nothing left open — no card.
+    if (cycle.amount <= 0 && !(overCapBalance && overCapBalance.amount > 0)) continue;
 
     const lines = computeStipendEquity(cycle.amount, pledge.terms);
     payables.push({
@@ -156,6 +164,15 @@ const handler: ActionExecutionHandler = async (_params, context) => {
       amount: cycle.amount,
       gross: cycle.gross,
       cappedBy: cycle.cappedBy,
+      capMonths: cycle.capMonths,
+      // This window: what the ceiling holds back if only the ceiling is paid.
+      overCap: cycle.overCap,
+      overCapHours: Math.round((cycle.hours - cycle.paidHours) * 100) / 100,
+      // Earlier windows: held back and still undecided.
+      overCapBalance: overCapBalance && overCapBalance.amount > 0
+        ? { hours: overCapBalance.hours, amount: overCapBalance.amount }
+        : null,
+      monthlyCap: pledge.terms.monthlyCap ?? null,
       exhausts: cycle.exhausts,
       stipendRate: pledge.terms.stipendRate,
       mode: pledge.terms.mode,
@@ -209,7 +226,11 @@ const handler: ActionExecutionHandler = async (_params, context) => {
       hoursAlreadyMetered: metered,
       equityHeadroom: ledger ? Math.max(0, ledger.contribution - ledger.equityDebited) : null
     });
-    if (cycle.amount <= 0) continue;
+    const overCapBalance = await readOverCapBalance(exec, pledge, {
+      programRemaining: program?.remainingCap ?? null,
+      equityHeadroom: ledger ? Math.max(0, ledger.contribution - ledger.equityDebited) : null
+    }).catch(() => null);
+    if (cycle.amount <= 0 && !(overCapBalance && overCapBalance.amount > 0)) continue;
 
     const lines = computeStipendEquity(cycle.amount, pledge.terms);
     accruals.push({
@@ -222,6 +243,15 @@ const handler: ActionExecutionHandler = async (_params, context) => {
       amount: cycle.amount,
       gross: cycle.gross,
       cappedBy: cycle.cappedBy,
+      capMonths: cycle.capMonths,
+      // This window: what the ceiling holds back if only the ceiling is paid.
+      overCap: cycle.overCap,
+      overCapHours: Math.round((cycle.hours - cycle.paidHours) * 100) / 100,
+      // Earlier windows: held back and still undecided.
+      overCapBalance: overCapBalance && overCapBalance.amount > 0
+        ? { hours: overCapBalance.hours, amount: overCapBalance.amount }
+        : null,
+      monthlyCap: pledge.terms.monthlyCap ?? null,
       stipendRate: pledge.terms.stipendRate,
       mode: pledge.terms.mode,
       cycleStart: from,

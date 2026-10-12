@@ -50,14 +50,27 @@ export function kindForIntent(intent: SignupIntent): AssistantKind {
 }
 
 export interface PrepareSignupResult {
-  signupUrl: string;
+  /** The signup screen — or, for a person who already has an account (§5.7), the page that hands the draft over. */
+  signupUrl?: string;
+  receiveUrl?: string;
   previewUrl?: string;
   expiresAt: string;
 }
 
+export interface PrepareSignupOptions {
+  /** How long the link lives; the public tool keeps the 24h default. */
+  tokenTtlMs?: number;
+  /**
+   * The person already has an account (§5.7): no signup — a link that hands the
+   * drafted rikma to that account once they open it signed in.
+   */
+  receive?: boolean;
+}
+
 export async function prepareSignup(
   raw: unknown,
-  deps: { strapi: StrapiLike; fetch?: typeof fetch; now?: Date }
+  deps: { strapi: StrapiLike; fetch?: typeof fetch; now?: Date },
+  opts: PrepareSignupOptions = {}
 ): Promise<PrepareSignupResult> {
   const parsed = PrepareSignupSchema.safeParse(raw);
   if (!parsed.success) {
@@ -67,6 +80,9 @@ export async function prepareSignup(
   const input = parsed.data;
   const now = deps.now ?? new Date();
   const kind = kindForIntent(input.intent);
+  if (opts.receive && (kind !== 'rikma' || input.blueprint === undefined)) {
+    throw new Error('Only a drafted rikma (intent business, partnership or idea, with a blueprint) can be prepared for someone who already has an account');
+  }
 
   let state: AssistantState = { items: [] };
   if (kind === 'rikma') {
@@ -106,6 +122,7 @@ export async function prepareSignup(
     previewUrl = `${SITE}/preview/rikma/${key}`;
   }
 
+  const ttl = opts.tokenTtlMs ?? SIGNUP_TOKEN_TTL_MS;
   const token = mintSignupToken(
     {
       sid: row.id,
@@ -115,12 +132,14 @@ export async function prepareSignup(
       intent: input.intent,
       lang: input.lang ?? 'he'
     },
-    now.getTime()
+    now.getTime(),
+    undefined,
+    ttl
   );
 
   return {
-    signupUrl: `${SITE}/hascama?agent=${token}`,
+    ...(opts.receive ? { receiveUrl: `${SITE}/assistant/receive/${token}` } : { signupUrl: `${SITE}/hascama?agent=${token}` }),
     ...(previewUrl ? { previewUrl } : {}),
-    expiresAt: new Date(now.getTime() + SIGNUP_TOKEN_TTL_MS).toISOString()
+    expiresAt: new Date(now.getTime() + ttl).toISOString()
   };
 }

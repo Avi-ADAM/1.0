@@ -900,6 +900,38 @@ export const claimAssistantSessionConfig: ActionConfig = {
   },
 };
 
+// ── receivePreparedRikma ────────────────────────────────────────────────────
+
+/**
+ * A rikma another member prepared for the caller (§5.7): the pending session
+ * the link names becomes theirs when their account's email is the one it was
+ * prepared for. Nothing is created — they land on the review screen.
+ */
+const receiveHandler: ActionExecutionHandler = async (params, context, { strapi }) => {
+  const { receivePreparedRikma } = await import('$lib/server/assistant/receive.js');
+  const received = await receivePreparedRikma(params.t, String(context.userId), { strapi, fetch: context.fetch });
+  return { data: { received }, updateStrategy: { type: 'none' as const } };
+};
+
+export const receivePreparedRikmaConfig: ActionConfig = {
+  key: 'receivePreparedRikma',
+  description:
+    'Open a rikma another member prepared for the caller: the drafted rikma becomes theirs (when their email is the one it was prepared for) and they get the review screen to create it from.',
+  graphqlOperation: receiveHandler,
+  paramSchema: {
+    t: { type: 'string', required: true, validate: (v) => typeof v === 'string' && v.length <= 4000, description: 'The token from the receive link' }
+  },
+  access: ['user'],
+  authRules: [{ type: 'jwt' }],
+  updateStrategy: { type: 'none' },
+
+  realtime: {
+    scopes: (_p, _r, ctx) =>
+      scopeList([scope('user', ctx.userId)]),
+    audience: 'self',
+  },
+};
+
 // ── importPlanBoardRows ─────────────────────────────────────────────────────
 
 /**
@@ -978,6 +1010,7 @@ export const importPlanBoardRowsConfig: ActionConfig = {
 export const assistantActions: ActionConfig[] = [
   importPlanBoardRowsConfig,
   claimAssistantSessionConfig,
+  receivePreparedRikmaConfig,
   startAssistantSessionConfig,
   reviseAssistantSessionConfig,
   applyAssistantSessionConfig,

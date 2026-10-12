@@ -64,6 +64,11 @@ function jaccard(a: Set<string>, b: Set<string>): number {
   return inter / (a.size + b.size - inter);
 }
 
+/** Name-token overlap in [0,1] — the part of `similarity` that needs no categories. */
+export function nameSimilarity(a: string, b: string): number {
+  return jaccard(tokenize(a), tokenize(b));
+}
+
 /**
  * Semantic similarity in [0,1]. Blends name-token Jaccard with category
  * overlap. Replace the body with Pinecone cosine when embeddings are wired —

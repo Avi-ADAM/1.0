@@ -28,6 +28,17 @@ export function takePrepare(ip: string): { ok: boolean; retryAfterSeconds?: numb
   return { ok: true };
 }
 
+/** A signed-in member's agent preparing signups for others (§5.7): keyed on the account, not the address. */
+export const PREPARE_FOR_PER_HOUR = 20;
+
+export function takePrepareFor(userId: string): { ok: boolean; retryAfterSeconds?: number } {
+  const a = perAddress.take(`prepareFor:${userId}`, PREPARE_FOR_PER_HOUR, HOUR);
+  if (!a.ok) return { ok: false, retryAfterSeconds: Math.ceil(a.retryAfterMs / 1000) };
+  const d = platform.take('prepare:all', PREPARE_PER_DAY, DAY);
+  if (!d.ok) return { ok: false, retryAfterSeconds: Math.ceil(d.retryAfterMs / 1000) };
+  return { ok: true };
+}
+
 /** One signature from the agent screen (a chezin row). */
 export function takeSign(ip: string): { ok: boolean; retryAfterSeconds?: number } {
   const a = perAddress.take(`sign:${callerKey(undefined, ip)}`, SIGN_PER_HOUR, HOUR);

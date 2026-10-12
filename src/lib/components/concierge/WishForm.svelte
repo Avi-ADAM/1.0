@@ -213,6 +213,8 @@
   let extractedSkills = $state(/** @type {{name:string}[]} */ ([]));
   let extractedCategories = $state(/** @type {string[]} */ ([]));
   let extractedHints = $state(/** @type {{kind:string,text:string}[]} */ ([]));
+  /** Lev judged the wish happens only when several customers want it at once. */
+  let extractedVolume = $state(/** @type {{minPeople:number|null,why:string}|null} */ (null));
   let matchedPeople = $state(
     /** @type {{id:string,username:string,avatar:string|null,matchedSkills:string[],projects:string[],distanceKm?:number|null}[]} */ ([])
   );
@@ -247,6 +249,7 @@
       extractedSkills = [];
       extractedCategories = [];
       extractedHints = [];
+      extractedVolume = null;
       matchedPeople = [];
       matchedMissions = [];
       matchedResources = [];
@@ -279,6 +282,7 @@
           extractedSkills = data.skills ?? [];
           extractedCategories = data.categories ?? [];
           extractedHints = data.hints ?? [];
+          extractedVolume = data.volume ?? null;
           matchedPeople = data.matches?.people ?? [];
           matchedMissions = data.matches?.missions ?? [];
           matchedResources = data.matches?.resources ?? [];
@@ -958,6 +962,8 @@
       categories: extractedCategories,
       suggestedPeople: matchedPeople.map((p) => p.id),
       matchedMissions: matchedMissions.map((m) => m.id),
+      // /concierge/[id] offers a demand pool on it (PLAN_SHARED_PURCHASE §5)
+      ...(extractedVolume ? { volume: extractedVolume } : {}),
       // Full, renderable match snapshot — /concierge/[id] reads this straight
       // from Strapi instead of re-running the analysis on every page load.
       enrichment: matchedEnrichment

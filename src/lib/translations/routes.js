@@ -76,7 +76,8 @@ export const ROUTED = {
     planning: at(/\/moach\/[^/]+\/create/),
     // The rikma-import review screen (PLAN_AI_SIGNUP_CONCIERGE §4.5): a new
     // rikma at /moach/import/…, an existing one at /moach/<id>/import/….
-    rikmaImport: at(/\/moach\/(?:[^/]+\/)?import\//, '/preview/rikma'),
+    // /assistant/receive: a rikma another member prepared for you (§5.7).
+    rikmaImport: at(/\/moach\/(?:[^/]+\/)?import\//, '/preview/rikma', '/assistant/receive'),
     // The profile / wish list panel (PLAN_AI_SIGNUP_CONCIERGE §6, §7).
     assistant: at('/onboard/assistant', '/concierge'),
     // The rikma's API page — one route, one namespace, nowhere else.

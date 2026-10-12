@@ -55,6 +55,9 @@ function buildResponse(
     // What the writer stated — dates, budget, place (+ its point), online,
     // group kind. The composer fills only the squares she has not set.
     details: { ...(extraction.details ?? EMPTY_DETAILS), geo },
+    // Lev's judgement that only several customers together make it happen —
+    // the review page offers a demand pool on it (PLAN_SHARED_PURCHASE §5).
+    volume: extraction.volume ?? null,
     // Back-compat fields (consumed by the existing Lev rail).
     missions: extraction.missions,
     resources: extraction.resources,

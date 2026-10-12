@@ -123,6 +123,7 @@ const openMaagadHandler: ActionExecutionHandler = async (params, context, { stra
     radius = null,
     frequency = null,
     ratsonId = null,
+    categoryIds = null,
     visibility = 'anonymous'
   } = params as Record<string, any>;
 
@@ -146,6 +147,8 @@ const openMaagadHandler: ActionExecutionHandler = async (params, context, { stra
       status_maagad: 'forming',
       origin: 'user_opened',
       ratsons: ratsonId ? [ratsonId] : null,
+      // The clustering gate needs a shared category to fold later wishes in.
+      categories: Array.isArray(categoryIds) && categoryIds.length ? categoryIds.map(String) : null,
       publishedAt: nowIso()
     },
     context.jwt,
@@ -824,6 +827,7 @@ const clusterRatsonsHandler: ActionExecutionHandler = async (params, context, { 
         // Simple heuristic until real viability estimation lands.
         viability_hint: Math.max(cluster.members.length * 2, 5),
         ratsons: cluster.members.map((m) => m.id),
+        categories: cluster.categoryIds.length ? cluster.categoryIds : null,
         publishedAt: nowIso()
       },
       context.jwt,
@@ -884,6 +888,7 @@ export const maagadActions: ActionConfig[] = [
       radius: { type: 'number', required: false, description: 'Coverage radius (km)' },
       frequency: { type: 'string', required: false, description: 'one_time | weekly | monthly...' },
       ratsonId: { type: 'string', required: false, description: 'The wish this pool grew from' },
+      categoryIds: { type: 'array', required: false, description: "The wish's category ids" },
       visibility: { type: 'string', required: false, description: 'anonymous | first_name | full' }
     },
     authRules: [jwtRule],

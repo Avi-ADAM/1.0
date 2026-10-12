@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('./conciergeAgent', () => ({ getConciergeAgent: vi.fn() }));
 
-import { normDetails, EMPTY_DETAILS, isCleanText } from './extractWish';
+import { normDetails, normVolume, EMPTY_DETAILS, isCleanText } from './extractWish';
 
 const TODAY = '2026-09-24';
 
@@ -70,5 +70,27 @@ describe('isCleanText (QA C-1)', () => {
   it('drops a word written in two alphabets', () => {
     expect(isCleanText(mixed)).toBe(false);
     expect(isCleanText(`שולחן ${mixed}`)).toBe(false);
+  });
+});
+
+describe('normVolume', () => {
+  it('is null unless the model said the wish needs others', () => {
+    expect(normVolume(null)).toBeNull();
+    expect(normVolume({ needsOthers: false, minPeople: 10, why: 'x' })).toBeNull();
+    expect(normVolume({ needsOthers: 'true' })).toBeNull();
+  });
+
+  it('keeps a sane minimum and the reason', () => {
+    expect(normVolume({ needsOthers: true, minPeople: 10, why: ' ספק פותח קו רק מ-10 נוסעים ' })).toEqual({
+      minPeople: 10,
+      why: 'ספק פותח קו רק מ-10 נוסעים'
+    });
+    expect(normVolume({ needsOthers: true, minPeople: '8' })).toEqual({ minPeople: 8, why: '' });
+  });
+
+  it('drops a minimum that is not a group', () => {
+    expect(normVolume({ needsOthers: true, minPeople: 1 })?.minPeople).toBeNull();
+    expect(normVolume({ needsOthers: true, minPeople: 9999 })?.minPeople).toBeNull();
+    expect(normVolume({ needsOthers: true, minPeople: null })?.minPeople).toBeNull();
   });
 });

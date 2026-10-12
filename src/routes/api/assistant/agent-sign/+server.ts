@@ -29,7 +29,7 @@ import { loadSession, saveSession } from '$lib/server/assistant/session.js';
 import { takeSign } from '$lib/server/assistant/publicQuota.js';
 import { countryIdsOf } from '$lib/data/signupCountries.js';
 import { signupCookieOptions } from '$lib/server/signupCookies.js';
-import { SIGNUP_TOKEN_TTL_MS } from '$lib/server/assistant/signupToken.js';
+import { issuedAt } from '$lib/server/assistant/signupToken.js';
 import { extendedIdOf, extendedRowOf, extendedSignatureFits } from '$lib/server/assistant/extendedSignature.js';
 
 export const POST: RequestHandler = async ({ request, fetch, cookies, url, getClientAddress }) => {
@@ -54,7 +54,7 @@ export const POST: RequestHandler = async ({ request, fetch, cookies, url, getCl
     const found = extendedId
       ? await strapiClient.execute('386getChezinForAgentSign', { id: extendedId }, undefined, fetch).catch(() => null)
       : null;
-    const notBefore = token.exp - SIGNUP_TOKEN_TTL_MS;
+    const notBefore = issuedAt(token);
     if (!extendedSignatureFits(extendedRowOf(found), { email, notBefore })) {
       return json({ ok: false, reason: 'extended' }, { status: 400 });
     }

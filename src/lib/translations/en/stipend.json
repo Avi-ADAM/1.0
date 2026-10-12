@@ -158,7 +158,9 @@
     "capped": {
       "monthlyCap": "Capped by the monthly ceiling (the hours came to {{count}})",
       "totalCap": "Capped by what is left of the pledge's budget (the hours came to {{count}})",
-      "programCap": "Capped by what is left of the programme's budget (the hours came to {{count}})"
+      "programCap": "Capped by what is left of the programme's budget (the hours came to {{count}})",
+      "monthlyCapMonths": "Capped by the monthly ceiling — {{months}} months × {{cap}} (the hours came to {{count}})",
+      "overCapOpen": "The hours over the ceiling are not erased — they stay open for both of you to decide."
     },
     "lastCycle": "This is the last cycle — the budget ends here",
     "modeNote": {
@@ -301,7 +303,17 @@
     "cardType": "Earned, not yet paid",
     "body": "{{name}} funds your subsistence stipend. This is what the current cycle has added up to, from approved hours.",
     "note": "The figure comes from hours the rikma approved and grows with every further approval. It is not final until it is sent.",
-    "waiting": "The ball is with {{name}} — when the stipend is sent, a card to confirm it arrived will appear here."
+    "waiting": "{{name}} has not marked the stipend as sent yet. If the money has already reached you, confirm it here — that closes the cycle.",
+    "iReceived": "I received the money",
+    "confirmAsk": "Confirm you received {{count}} from {{name}}?",
+    "confirmNote": "Confirming closes the cycle at once and moves the shares according to the pledge’s terms.",
+    "confirmYes": "Yes, I received it",
+    "back": "Back",
+    "otherAmount": "A different amount arrived",
+    "otherAmountLabel": "How much actually arrived?",
+    "otherAmountInvalid": "A positive amount, up to {{count}}",
+    "otherAmountRest": "The hours this amount did not cover stay owed to you in the next cycle.",
+    "received": "Receipt confirmed — the cycle is closed"
   },
   "transfer": {
     "cardType": "Stipend transfer to arrange",
@@ -314,5 +326,36 @@
     "recipientBody": "{{name}} closed the cycle, but the money has not gone out yet. Say here where to send it.",
     "iSentIt": "I sent it",
     "note": "Shares move only once the arrival is confirmed. Until then nothing moves."
+  },
+  "overCap": {
+    "title": "Over the ceiling — open to decide",
+    "body": "{{hours}} approved hours are left over the monthly ceiling ({{count}}). They have not been erased.",
+    "funderNote": "Paying them too is your choice, and {{name}} confirms what arrives — or says a different amount arrived. If not, they simply stay open.",
+    "recipientNote": "If {{name}} already paid for them, confirm it here. You can ask them to pay, or let the hours go — letting go is yours alone.",
+    "pay": "Pay them too ({{count}})",
+    "received": "I was paid for them",
+    "ask": "Ask {{name}} to pay",
+    "release": "Let them go",
+    "part": "Only part of it",
+    "partLabel": "How much?",
+    "confirmReceived": "Confirm you received {{count}} from {{name}} for the hours over the ceiling?",
+    "confirmRelease": "Let go of the {{hours}} hours over the ceiling?",
+    "releaseNote": "They close unpaid. No money moves and no share changes.",
+    "confirmYes": "Yes, confirm",
+    "nothingOpen": "There are no open hours over the ceiling any more",
+    "includeNow": "Also pay the {{hours}} hours over the ceiling (+{{count}})",
+    "includeNowOn": "This is beyond what was agreed — {{name}} confirming receipt is their agreement.",
+    "includeNowOff": "Without it they are not erased — they stay open for both of you to decide.",
+    "receivedPastCeiling": "That is more than the ceiling — meaning {{name}} paid the hours over it too.",
+    "done": {
+      "pay": "Recorded — {{name}} will confirm what arrives",
+      "received": "Receipt confirmed",
+      "release": "The hours were closed unpaid",
+      "ask": "The request was sent to {{name}}"
+    },
+    "titleWindow": "Hours over the ceiling this cycle",
+    "bodyWindow": "{{hours}} approved hours go past the ceiling ({{count}}). If they are not paid now they are not erased — they stay open for both of you to decide.",
+    "receivedWindow": "I was paid for them too",
+    "confirmReceivedWindow": "Confirm you received {{count}} from {{name}} — the whole cycle, including the hours over the ceiling?"
   }
 }

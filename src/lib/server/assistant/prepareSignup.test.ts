@@ -63,7 +63,7 @@ describe('prepareSignup', () => {
     expect(r.previewUrl).toMatch(/^https:\/\/www\.1lev1\.com\/preview\/rikma\/1\.[A-Za-z0-9_-]{43}$/);
     const found = await loadByShareKey(strapi, r.previewUrl!.split('/').pop()!, now);
     expect(found?.id).toBe('1');
-    const token = r.signupUrl.replace('https://www.1lev1.com/hascama?agent=', '');
+    const token = r.signupUrl!.replace('https://www.1lev1.com/hascama?agent=', '');
     expect(openSignupToken(token, now.getTime())).toMatchObject({
       sid: '1',
       name: 'דנה',

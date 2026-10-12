@@ -21,6 +21,15 @@ import { fetchPayment, fetchPledge, fetchProgram, fetchProjectContext } from '$l
 import { moneyTextFor } from '$lib/server/money/notifyMoney.js';
 import { scope, scopeList } from '$lib/realtime/scopes.js';
 
+/** Does a payment's cycle reach the pledge's watermark — is it the row that moved it? */
+function coversWatermark(cycleEnd: string | null, lastSettledAt: string | null): boolean {
+  if (!lastSettledAt) return true;
+  const end = cycleEnd ? new Date(cycleEnd).getTime() : NaN;
+  const mark = new Date(lastSettledAt).getTime();
+  if (!Number.isFinite(end) || !Number.isFinite(mark)) return true;
+  return end >= mark;
+}
+
 const handler: ActionExecutionHandler = async (params, context, { notifier }) => {
   const paymentId = String(params.paymentId ?? '');
   if (!paymentId) throw new Error('paymentId is required');
@@ -113,7 +122,15 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
         // Only for a *zero* arrival. A partial one did move money for these
         // hours; re-opening the window would let the whole cycle be metered a
         // second time, and the difference belongs in the next cycle instead.
-        nothingArrived ? dateField('lastSettledAt', payment.cycleStart) : null
+        //
+        // And only for the row that *holds* the watermark (its cycle reaches
+        // it). A payment for hours over the monthly ceiling sits behind the
+        // watermark; rolling back to its start would reopen the pledge's whole
+        // history as one window. Its hours need no rollback: a cancelled row
+        // meters nothing, so they are simply open again (`computeOverCapBalance`).
+        nothingArrived && coversWatermark(payment.cycleEnd, pledge.lastSettledAt)
+          ? dateField('lastSettledAt', payment.cycleStart)
+          : null
       )} }) { data { id } } }`,
       'confirmStipendPayment:refundPledge'
     ).catch((e) => console.warn('[confirmStipendPayment] pledge counter rollback failed:', e));

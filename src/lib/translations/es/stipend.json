@@ -158,7 +158,9 @@
     "capped": {
       "monthlyCap": "Limitado por el tope mensual (por horas serían {{count}})",
       "totalCap": "Limitado por lo que queda del presupuesto del compromiso (por horas serían {{count}})",
-      "programCap": "Limitado por lo que queda del presupuesto del programa (por horas serían {{count}})"
+      "programCap": "Limitado por lo que queda del presupuesto del programa (por horas serían {{count}})",
+      "monthlyCapMonths": "Limitado por el tope mensual — {{months}} meses × {{cap}} (por horas serían {{count}})",
+      "overCapOpen": "Las horas por encima del tope no se borran: quedan abiertas para que lo decidáis entre los dos."
     },
     "lastCycle": "Este es el último ciclo — el presupuesto termina aquí",
     "modeNote": {
@@ -301,7 +303,17 @@
     "cardType": "Devengado, aún sin pagar",
     "body": "{{name}} financia tu beca de subsistencia. Esto es lo que suma el ciclo actual, a partir de horas aprobadas.",
     "note": "La cifra sale solo de las horas que la rikma aprobó y crece con cada nueva aprobación. No es definitiva hasta que se envía.",
-    "waiting": "La pelota está en {{name}} — cuando se envíe la beca aparecerá aquí una tarjeta para confirmar la recepción."
+    "waiting": "{{name}} todavía no marcó la beca como enviada. Si el dinero ya te llegó, confírmalo aquí: eso cierra el ciclo.",
+    "iReceived": "Recibí el dinero",
+    "confirmAsk": "¿Confirmar que recibiste {{count}} de {{name}}?",
+    "confirmNote": "Confirmar cierra el ciclo enseguida y mueve las participaciones según las condiciones de la beca.",
+    "confirmYes": "Sí, lo recibí",
+    "back": "Volver",
+    "otherAmount": "Llegó otra cantidad",
+    "otherAmountLabel": "¿Cuánto llegó realmente?",
+    "otherAmountInvalid": "Una cantidad positiva, hasta {{count}}",
+    "otherAmountRest": "Las horas que esta cantidad no cubrió te siguen debiendo en el próximo ciclo.",
+    "received": "Recepción confirmada — el ciclo está cerrado"
   },
   "transfer": {
     "cardType": "Transferencia de la beca por coordinar",
@@ -314,5 +326,36 @@
     "recipientBody": "{{name}} cerró el ciclo, pero el dinero aún no ha salido. Escribe aquí a dónde enviarlo.",
     "iSentIt": "Ya lo envié",
     "note": "Los porcentajes solo se mueven tras confirmar la recepción. Hasta entonces nada se mueve."
+  },
+  "overCap": {
+    "title": "Por encima del tope — abierto a decidir",
+    "body": "Quedaron {{hours}} horas aprobadas por encima del tope mensual ({{count}}). No se borraron.",
+    "funderNote": "Pagarlas también es tu elección, y {{name}} confirma lo que llega, o indica que llegó otra cantidad. Si no, simplemente quedan abiertas.",
+    "recipientNote": "Si {{name}} ya las pagó, confírmalo aquí. Puedes pedirle que las pague, o renunciar a ellas: renunciar solo te corresponde a ti.",
+    "pay": "Pagarlas también ({{count}})",
+    "received": "Me las pagaron",
+    "ask": "Pedir a {{name}} que pague",
+    "release": "Renunciar a ellas",
+    "part": "Solo una parte",
+    "partLabel": "¿Cuánto?",
+    "confirmReceived": "¿Confirmar que recibiste {{count}} de {{name}} por las horas por encima del tope?",
+    "confirmRelease": "¿Renunciar a las {{hours}} horas por encima del tope?",
+    "releaseNote": "Se cierran sin pago. No se mueve dinero ni cambia ninguna participación.",
+    "confirmYes": "Sí, confirmar",
+    "nothingOpen": "Ya no hay horas abiertas por encima del tope",
+    "includeNow": "Pagar también las {{hours}} horas por encima del tope (+{{count}})",
+    "includeNowOn": "Esto va más allá de lo acordado: que {{name}} confirme la recepción es su acuerdo.",
+    "includeNowOff": "Sin esto no se borran: quedan abiertas para que lo decidáis entre los dos.",
+    "receivedPastCeiling": "Es más que el tope: o sea, {{name}} pagó también las horas por encima.",
+    "done": {
+      "pay": "Registrado — {{name}} confirmará lo que llegue",
+      "received": "Recepción confirmada",
+      "release": "Las horas se cerraron sin pago",
+      "ask": "La petición se envió a {{name}}"
+    },
+    "titleWindow": "Horas por encima del tope en este ciclo",
+    "bodyWindow": "{{hours}} horas aprobadas superan el tope ({{count}}). Si no se pagan ahora no se borran: quedan abiertas para que lo decidáis entre los dos.",
+    "receivedWindow": "También me las pagaron",
+    "confirmReceivedWindow": "¿Confirmar que recibiste {{count}} de {{name}}: todo el ciclo, incluidas las horas por encima del tope?"
   }
 }

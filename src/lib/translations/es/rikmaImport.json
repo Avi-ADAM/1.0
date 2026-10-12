@@ -87,5 +87,13 @@
     "copy": "Copiar",
     "copied": "Copiado",
     "error": "No pudimos crear el enlace. Inténtalo de nuevo."
+  },
+  "receive": {
+    "title": "Una rikma preparada para ti",
+    "expired": "Este enlace ya no es válido. Pide a quien preparó la rikma uno nuevo.",
+    "taken": "Esta rikma ya fue entregada y ya no espera en este enlace.",
+    "otherAccount": "Esta rikma se preparó para {{email}}. Para recibirla, inicia sesión con la cuenta de esa dirección y vuelve a abrir el enlace.",
+    "unverified": "No pudimos comprobar este enlace ahora. Inténtalo de nuevo en un momento.",
+    "home": "A mi corazón"
   }
 }

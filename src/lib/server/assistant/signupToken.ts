@@ -16,7 +16,13 @@
 import crypto from 'crypto';
 import { agentSignupKey, b64url, fromB64url } from '$lib/server/oauth/secret.js';
 
+/** A link the person's own agent made for them: they are in the conversation now. */
 export const SIGNUP_TOKEN_TTL_MS = 24 * 60 * 60 * 1000;
+/**
+ * A link a member prepared for someone else (§5.7): it waits in their inbox
+ * until they get to it — as long as the pending session it names lives.
+ */
+export const HANDOFF_TOKEN_TTL_MS = 14 * 24 * 60 * 60 * 1000;
 
 export const SIGNUP_INTENTS = ['join', 'business', 'partnership', 'idea', 'order'] as const;
 export type SignupIntent = (typeof SIGNUP_INTENTS)[number];
@@ -28,16 +34,19 @@ export interface SignupTokenPayload {
   countryIds: number[];
   intent: SignupIntent;
   lang: string;
+  /** Issued at, ms since epoch. Absent on tokens minted before it existed. */
+  iat?: number;
   /** Absolute expiry, ms since epoch. */
   exp: number;
 }
 
 export function mintSignupToken(
-  input: Omit<SignupTokenPayload, 'exp'>,
+  input: Omit<SignupTokenPayload, 'exp' | 'iat'>,
   now: number = Date.now(),
-  key: Buffer = agentSignupKey()
+  key: Buffer = agentSignupKey(),
+  ttlMs: number = SIGNUP_TOKEN_TTL_MS
 ): string {
-  const payload: SignupTokenPayload = { ...input, exp: now + SIGNUP_TOKEN_TTL_MS };
+  const payload: SignupTokenPayload = { ...input, iat: now, exp: now + ttlMs };
   const iv = crypto.randomBytes(12);
   const cipher = crypto.createCipheriv('aes-256-gcm', key, iv);
   const ct = Buffer.concat([cipher.update(Buffer.from(JSON.stringify(payload), 'utf8')), cipher.final()]);
@@ -49,6 +58,11 @@ export function mintSignupToken(
  * tampered, truncated, expired or from another key. One answer for all of
  * them: the page then shows the ordinary agreement, never an error.
  */
+/** When the token was made — what a signature must not predate. */
+export function issuedAt(p: SignupTokenPayload): number {
+  return typeof p.iat === 'number' ? p.iat : p.exp - SIGNUP_TOKEN_TTL_MS;
+}
+
 export function openSignupToken(
   token: unknown,
   now: number = Date.now(),

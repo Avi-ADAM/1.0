@@ -391,6 +391,33 @@ AES-256-GCM (מנגנון `codes.ts`, מפתח נגזר עם תווית אחרת
 `{ sid, name, email, countryIds, intent, lang, exp }`. `prepareSignup` ציבורי ⇒
 rate-limit לפי IP ומכסה יומית, בלי קריאת AI, שרטוט ≤ 60 שורות.
 
+### 5.7 חבר רשום מכין רקמה בשביל מישהו אחר (`prepareForSomeoneElse`)
+
+משווק (או כל חבר, או "שירות לקוחות" לחבר אחר) מקים עם ה-Claude שלו רקמה כמעט מוכנה,
+ומעביר קישור אחד. מה הקישור עושה תלוי בנמען:
+- **אין לו חשבון** ⇒ `signupUrl` — אותו `prepareSignup` בדיוק: אותו מסך, אותו claim לפי
+  ה-chezin, ונחיתה על הרקמה.
+- **יש לו חשבון** ⇒ `receiveUrl` = `/assistant/receive/<token>` (רק `business`/`partnership`/`idea`
+  עם שרטוט). פתוח כשהוא מחובר לחשבון **שהמייל שלו הוא המייל שאליו הוכן** ⇒ action
+  `receivePreparedRikma` (VPS, `server/assistant/receive.ts`) מעביר אליו את ה-session ונוחת
+  במסך האישור. חשבון אחר ⇒ "הוכנה בשביל d\*\*\*@x.co", בלי למסור כלום; כבר נמסרה ⇒ `taken`.
+  הטוקן בנתיב ולא ב-query, כי שומר ה-`(reg)` שולח אורח ל-`/login?from=<pathname>`.
+- הקישור חי **14 יום** (`HANDOFF_TOKEN_TTL_MS`, כמו ה-session), לא 24 שעות כמו `prepareSignup`
+  הציבורי. הטוקן נושא עכשיו `iat`, ו-`agent-sign` בודק חתימה מורחבת מולו (טוקן ישן בלי
+  `iat` ⇒ `exp − 24h`, כמו קודם).
+
+הטעות שצריך למנוע: חבר רשום שבנה רקמה **לעצמו** והגיע לכלי הזה בטעות — הטיוטה הייתה
+נתקעת מאחורי קישור שלא נועד לו, והרקמה שרצה לא הייתה בשום מקום. לכן:
+- `checkSignupRecipient` (`server/assistant/signupRecipient.ts`): המייל של הנמען אינו
+  המייל של החשבון המחובר (qid `436accountEmail`; אותיות קטנות, `+tag` לא נחשב), וחשבון
+  שנמצא לפי המייל (`171findUserByExact`) אינו המחובר עצמו ⇒ אחרת סירוב שמפנה ל-`proposeRikmaBlueprint`.
+  חשבון של מישהו אחר ⇒ `hasAccount` ומסלול הקבלה. בדיקה שנכשלה ⇒ סירוב (`unverified`).
+- שדה חובה `forSomeoneElse: true`, והתיאורים של שני הכלים ושל ההוראות מפנים זה לזה;
+  כשלא ברור של מי הרקמה — הסוכן שואל.
+- מכסה לפי החשבון (`takePrepareFor`, 20 לשעה) בתוך אותה תקרה יומית של 300.
+- לחבר המכין אין שום גישה למה שהנמען יוצר; לא נרשם מי הכין (ייחוס/עמלה — לא נדרש כרגע).
+- הכלי ברשימה גם לפני התחברות (lazy), כמו כל כלי מאומת — הרשימה לא משתנה אחרי connect.
+
 ---
 
 ## 6. אונבורדינג בשיחה (`kind:'profile'`)
@@ -526,11 +553,12 @@ action, ובצדק): הם נתיבי `/api/assistant/*` ציבוריים, עם r
 
 ---
 
-## 10. כלי MCP (מאחורי `ASSISTANT_MCP_ENABLED`)
+## 10. כלי MCP (פועלים כברירת מחדל; `ASSISTANT_MCP_ENABLED=false` מכבה)
 
 | כלי | tier | ai | מה |
 |---|---|---|---|
 | `prepareSignup` | ציבורי (לא-מאומת בלבד) | לא | §5.1 ← `signupUrl` (+ `previewUrl`) |
+| `prepareForSomeoneElse` | `prepare` | לא | §5.7 — חבר רשום בשביל אדם אחר: `signupUrl` למי שאין לו חשבון, `receiveUrl` למי שיש; 14 יום; מסרב למייל של המחובר |
 | `proposeRikmaBlueprint` | `prepare` | לא | **הכלי המרכזי לייבוא ספקים.** Claude שולח שרטוט מלא ← `{ sessionId, items, previewUrl, reviewUrl }` |
 | `startAssistant` | `selfWrite` | כן | כשהסוכן מעדיף שנפרק אנחנו (`profile`/`rikma` מ-`url`/`text`/`wish`) |
 | `getAssistant` | `read` | לא | ה-session הפעיל לפי `kind`: רשימה, שאלות, 5 רוויזיות, והצעות (§6.2) |
@@ -635,6 +663,7 @@ action, ובצדק): הם נתיבי `/api/assistant/*` ציבוריים, עם r
 | 2026-09-25 | **M12:** `/login` קורא גם `?redirect=` (מה ש-`/oauth/authorize` ו-`/mcp-connect` שולחים — **באג קיים**: אורח שהתחבר מחלון ה-OAuth נחת ב-`/onboard`) · "הרשמה" מחלון ה-OAuth ← `/hascama?next=` ← עוגייה `reg_next` ← `/confirm-email` חוזר לשם | |
 | 2026-09-25 | **M10–M11:** `startAssistantSession` / `reviseAssistantSession` (Gemini → ops דרך `applyOps`) / `applyAssistantSession` (פרופיל נשמר; משאלה — טיוטה נשארת טיוטה, בפורסמה רק השורות שלי + `refreshWishMatches`; שורה שספק ענה נעולה, ושורת "לא עכשיו" לפני שורה שנענתה נשארת כי הצעות מצביעות לפי מיקום) · הצעות: `match-suggestion` + `nearbyRikmas` (ערכים ×2 + כישורי חברים) · `AssistantPanel.svelte`, `/onboard/assistant`, "לדייק עם לב" ב-`/concierge/[id]` · כלי MCP `startAssistant`/`reviseAssistant`/`applyAssistant`/`dismissOffer` · עזרי האונבורדינג הוצאו ל-`server/onboard/profileWrites.ts` | `assistant/{profile,wish,revise}.ts`, `server/assistant/kinds.ts`, qids 381–383 |
 | 2026-09-25 | **M13:** `/api/cron/assistant-cleanup` (pending שפג) · שורת אנליטיקס `[assistant] materialize` · בדיקת `check:proxy` ל-loaders של www בזרימה | |
+| 2026-10-12 | **§5.7:** `prepareForSomeoneElse` — חבר רשום מכין רקמה לאדם אחר: הרשמה למי שחדש, `/assistant/receive/<token>` + `receivePreparedRikma` למי שרשום; קישור 14 יום (`iat` בטוקן); `checkSignupRecipient` מסרב למייל של המחובר; מכסה לפי חשבון · **המתג הפוך:** פועל כברירת מחדל, `ASSISTANT_MCP_ENABLED=false` מכבה | `server/assistant/{signupRecipient,receive}.ts` |
 
 ### 14.1 כדי להפעיל (סדר)
 
@@ -642,7 +671,7 @@ action, ובצדק): הם נתיבי `/api/assistant/*` ציבוריים, עם r
    `match-suggestion.source += 'invited'`. **לא** לסמן הרשאות Authenticated על `assistant-session` (§8.3).
 2. ✓ (2026-09-25) `npm run types:update` ב-`1.0`, ואז `npm run validate:qids` — עד השלב הזה qids 363–372 מתייחסים לשדות שעוד
    לא קיימים בסכמה שנוצרה, והאימות ידווח עליהם.
-3. `ASSISTANT_MCP_ENABLED=true` ב-env של ה-VPS (`api.1lev1.com`) — רק שם רץ ה-MCP (וגם `/api/assistant/prepare-signup`).
+3. ✓ (2026-10-12) כבר לא צריך להגדיר: הכלים פועלים כברירת מחדל. **מתג כיבוי:** `ASSISTANT_MCP_ENABLED=false` ב-env של ה-VPS (`api.1lev1.com`) — רק שם רץ ה-MCP (וגם `/api/assistant/prepare-signup`).
    `OAUTH_SECRET` (או `API_KEY_NONCE`) כבר קיים שם — ממנו נגזר מפתח טוקן ההרשמה.
 3a. **Deploy `1.0b` שוב** בשביל M8 (`strapi-server.js` של users-permissions). עד אז `/confirm-email` עובד במסלול הישן.
 3b. **תבנית המייל** (Strapi admin → Email templates → Email address confirmation) כבר מצביעה ל-`https://www.1lev1.com/confirm-email` — אין שינוי.

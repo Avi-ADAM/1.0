@@ -27,6 +27,7 @@
   import { stipendPayablesStore, stipendTransfersStore, userStore } from '$lib/stores/levStores';
   import CardHeader from './CardHeader.svelte';
   import CycleFacts from '$lib/components/stipend/CycleFacts.svelte';
+  import OverCapBalance from '$lib/components/stipend/OverCapBalance.svelte';
 
   let { buble, isFirst = false, onProj, onDone } = $props();
   const fmtMoney = useFormatMoney();
@@ -34,6 +35,26 @@
   let busy = $state(false);
   /** The "did you already transfer it?" step, between the button and the write. */
   let asking = $state(false);
+  /**
+   * Pay the hours past the monthly ceiling too. Off by default: the ceiling is
+   * the agreed term. Left off, those hours are not lost — they stay open on
+   * both cards (OverCapBalance) until the two of you decide.
+   */
+  let includeOverCap = $state(false);
+  const overCap = $derived(Number(buble.overCap ?? 0));
+  const due = $derived(Number(buble.amount ?? 0) + (includeOverCap ? overCap : 0));
+  const balance = $derived(buble.overCapBalance ?? null);
+
+  /** The open balance was decided on — drop it, and the card if nothing else is due. */
+  function balanceDone() {
+    const keep = Number(buble.amount ?? 0) > 0;
+    stipendPayablesStore.update((list) =>
+      keep
+        ? list.map((p) => (String(p.pledgeId) === String(buble.pledgeId) ? { ...p, overCapBalance: null } : p))
+        : list.filter((p) => String(p.pledgeId) !== String(buble.pledgeId))
+    );
+    if (!keep) onDone?.();
+  }
 
   function handleProjectClick() {
     if (onProj && buble.projectId) onProj({ id: buble.projectId });
@@ -46,7 +67,8 @@
     try {
       const res = await executeAction('settleStipendCycle', {
         pledgeId: String(buble.pledgeId),
-        transferred
+        transferred,
+        ...(includeOverCap && overCap > 0 ? { includeOverCap: true } : {})
       });
       if (res?.success === false) throw new Error(actionErrorText(res, $t('stipend.toast.error')));
       if (res?.data?.settled === false) {
@@ -73,7 +95,7 @@
               recipientId: buble.recipientId ?? null,
               recipientName: buble.recipientName ?? '',
               recipientPic: buble.recipientPic ?? null,
-              amount: Number(d.amount ?? buble.amount) || 0,
+              amount: Number(d.amount ?? due) || 0,
               hours: Number(d.hours ?? buble.hours) || 0,
               stipendRate: Number(buble.stipendRate) || 0,
               mode: buble.mode ?? 'equity',
@@ -124,7 +146,7 @@
     logoSrc={buble.src}
     projectName={buble.projectName}
     cardType={$t('stipend.pay.cardType')}
-    cardTitle={fmtMoney(Number(buble.amount), null, { fraction: 'full' })}
+    cardTitle={fmtMoney(Number(buble.amount) > 0 ? due : Number(balance?.amount ?? 0), null, { fraction: 'full' })}
     glowColor="teal"
     onProjectClick={handleProjectClick}
   />
@@ -132,6 +154,7 @@
   <div
     class="bg-white dark:bg-slate-800 transition-all-300 p-4 flex-1 overflow-y-auto flex flex-col gap-4"
   >
+    {#if Number(buble.amount) > 0}
     <p class="text-sm text-gray-700 dark:text-gray-300">
       {$t('stipend.pay.body', { name: buble.recipientName })}
     </p>
@@ -149,6 +172,8 @@
       amount={buble.amount}
       gross={buble.gross}
       cappedBy={buble.cappedBy}
+      capMonths={buble.capMonths ?? 1}
+      monthlyCap={buble.monthlyCap ?? null}
       exhausts={buble.exhausts}
       mode={buble.mode}
       equityCredit={buble.equityCredit}
@@ -158,7 +183,20 @@
     <p class="text-xs text-gray-600 dark:text-gray-300">
       {$t(`stipend.pay.modeNote.${buble.mode ?? 'equity'}`)}
     </p>
+    {/if}
+
+    {#if balance}
+      <OverCapBalance
+        pledgeId={buble.pledgeId}
+        side="funder"
+        {balance}
+        otherName={buble.recipientName}
+        onDone={balanceDone}
+      />
+    {/if}
   </div>
+
+  {#if Number(buble.amount) > 0}
 
   <div
     class="p-4 bg-gray-50 dark:bg-gray-900/50 border-t border-gray-100 dark:border-gray-700 flex flex-col gap-2"
@@ -169,6 +207,23 @@
         {$t('stipend.transfer.ask', { name: buble.recipientName })}
       </p>
       <p class="text-xs text-gray-600 dark:text-gray-300">{$t('stipend.transfer.askNote')}</p>
+      {#if overCap > 0}
+        <!-- Past the ceiling is a choice, never the default; unticked, the hours stay open. -->
+        <label class="flex items-start gap-2 text-xs text-gray-800 dark:text-gray-100">
+          <input type="checkbox" bind:checked={includeOverCap} class="mt-0.5" />
+          <span>
+            {$t('stipend.overCap.includeNow', {
+              hours: buble.overCapHours ?? 0,
+              count: fmtMoney(overCap, null, { fraction: 'full' })
+            })}
+            <span class="block text-gray-600 dark:text-gray-300">
+              {includeOverCap
+                ? $t('stipend.overCap.includeNowOn', { name: buble.recipientName })
+                : $t('stipend.overCap.includeNowOff')}
+            </span>
+          </span>
+        </label>
+      {/if}
       <div class="flex gap-2">
         <button
           type="button"
@@ -198,6 +253,7 @@
       </button>
     {/if}
   </div>
+  {/if}
 </div>
 
 <style>

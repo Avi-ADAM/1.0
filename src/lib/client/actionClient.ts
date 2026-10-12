@@ -497,6 +497,7 @@ export type ActionKey =
   | 'proposeStipendProgram'
   | 'counterStipendTerms'
   | 'settleStipendCycle'
+  | 'resolveStipendOverCap'
   | 'confirmStipendPayment'
   | 'markStipendTransferSent'
   | 'publishStipendFundingRequest'

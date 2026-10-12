@@ -8,9 +8,8 @@
  * review link. Creating happens there, by the person, in one click (§0.1):
  * no tool here creates a rikma, a product or a mission.
  *
- * Behind ASSISTANT_MCP_ENABLED (off by default), like CONCIERGE_MCP_WRITE:
- * turning it on in production is a deliberate act, and it needs the
- * `assistant-session` collection deployed first.
+ * On by default; ASSISTANT_MCP_ENABLED=false is the kill switch — it takes
+ * every tool here (and the public prepareSignup) off the MCP listing.
  */
 
 import { createTool } from '@mastra/core/tools';
@@ -20,7 +19,7 @@ import { getMcpContext } from '../../lib/server/mcpContext.js';
 import { BlueprintInputSchema } from '../../lib/assistant/blueprint.js';
 
 export function assistantMcpEnabled(): boolean {
-  return env.ASSISTANT_MCP_ENABLED === 'true';
+  return env.ASSISTANT_MCP_ENABLED !== 'false';
 }
 
 async function run(actionKey: string, params: Record<string, unknown>) {
@@ -69,6 +68,7 @@ export const proposeRikmaBlueprintTool = createTool({
     '`recurring: true` and `hours` per month.\n' +
     '- `why` on each row: one sentence of where it came from ("the site lists it at 180").\n' +
     'Pass projectId to add to a rikma the person is already a member of. ' +
+    'The draft is the user\'s own; a rikma prepared for another person is prepareForSomeoneElse. ' +
     HOW_TO_PRESENT,
   inputSchema: BlueprintInputSchema.extend({
     projectId: z.string().optional().describe('An existing rikma of the caller to import into (from findUserProjectsTool).'),
@@ -204,6 +204,17 @@ export const dismissOfferTool = createTool({
   execute: async ({ openMissionId }) => run('declineOpenMission', { openMissionId })
 });
 
+const SignupInputSchema = z.object({
+  name: z.string().min(1).max(80).describe('The name the person gave you to sign up with.'),
+  email: z.string().email().describe('The email the person gave you to sign up with - the confirmation goes there.'),
+  countries: z.array(z.string()).max(5).optional().describe('Country names in English, e.g. ["Israel"].'),
+  lang: z.enum(['he', 'en', 'ar', 'ru', 'es']).optional(),
+  intent: z.enum(['join', 'business', 'partnership', 'idea', 'order']),
+  aboutText: z.string().max(8000).optional(),
+  wishText: z.string().max(4000).optional(),
+  blueprint: BlueprintInputSchema.optional()
+});
+
 /**
  * The one tool an agent has before its person has an account (§5.1). Public,
  * so no model call, a size cap, and a per-address + daily limit.
@@ -240,16 +251,7 @@ export function makePrepareSignupTool(clientIp: string, fetchFn: typeof fetch) {
         openWorldHint: false
       }
     },
-    inputSchema: z.object({
-      name: z.string().min(1).max(80).describe('The name the person gave you to sign up with.'),
-      email: z.string().email().describe('The email the person gave you to sign up with - the confirmation goes there.'),
-      countries: z.array(z.string()).max(5).optional().describe('Country names in English, e.g. ["Israel"].'),
-      lang: z.enum(['he', 'en', 'ar', 'ru', 'es']).optional(),
-      intent: z.enum(['join', 'business', 'partnership', 'idea', 'order']),
-      aboutText: z.string().max(8000).optional(),
-      wishText: z.string().max(4000).optional(),
-      blueprint: BlueprintInputSchema.optional()
-    }),
+    inputSchema: SignupInputSchema,
     execute: async (input) => {
       const [{ takePrepare }, { prepareSignup }, { strapiClient }] = await Promise.all([
         import('../../lib/server/assistant/publicQuota.js'),
@@ -273,6 +275,74 @@ export function makePrepareSignupTool(clientIp: string, fetchFn: typeof fetch) {
     }
   });
 }
+
+/**
+ * A rikma (or a signup) prepared by a signed-in member for someone else (§5.7):
+ * a marketer setting up a new customer's business, or a member helping another
+ * member. checkSignupRecipient refuses the caller's own address, so a member
+ * who meant to build a rikma for themselves is sent to proposeRikmaBlueprint.
+ *
+ *   no account yet   → the signup link: they sign, choose the password and
+ *                      confirm the email, and land on the drafted rikma
+ *   has an account   → a receive link: opened signed in to the account with
+ *                      that email, it hands them the draft's review screen
+ *
+ * Either way the caller keeps no access to it, and nothing exists until the
+ * recipient creates it. The link lives 14 days — as long as the pending draft.
+ */
+export const prepareForSomeoneElseTool = createTool({
+  id: 'prepareForSomeoneElse',
+  description:
+    'Prepare a rikma on 1lev1 for ANOTHER person - not the user you are talking to - and get one link to give them: ' +
+    'for example the user markets 1lev1 and sets up a new customer\'s business, or helps another member get started. ' +
+    'NEVER use it for the user themselves; for their own business, partnership or idea use proposeRikmaBlueprint. ' +
+    'If it is not clear who the rikma is for, ask before calling. Pass that other person\'s name and email as the user ' +
+    'gave them for this, and the intent and blueprint exactly as prepareSignup takes them. If the person has no ' +
+    'account yet you get signupUrl: they sign, choose a password and confirm their email themselves, then land on the ' +
+    'prepared rikma (intent join/order also work here). If they already have an account you get receiveUrl ' +
+    '(intent business/partnership/idea with a blueprint only): opened while signed in to the account with that email, ' +
+    'it hands them the drafted rikma to review and create. Nothing is created until they do, and the user gets no ' +
+    'access to it. Refused when the email is the user\'s own. The link is valid 14 days; previewUrl shows the draft ' +
+    'to anyone with it.',
+  inputSchema: SignupInputSchema.extend({
+    forSomeoneElse: z
+      .literal(true)
+      .describe('Confirms the rikma is for another person, not the user you are talking to.')
+  }),
+  execute: async (input) => {
+    const ctx = getMcpContext();
+    if (!ctx?.userId || !ctx.fetchInstance) return { success: false, message: 'Not authenticated.' };
+    const [{ takePrepareFor }, { prepareSignup }, { checkSignupRecipient }, { HANDOFF_TOKEN_TTL_MS }, { strapiClient }] =
+      await Promise.all([
+        import('../../lib/server/assistant/publicQuota.js'),
+        import('../../lib/server/assistant/prepareSignup.js'),
+        import('../../lib/server/assistant/signupRecipient.js'),
+        import('../../lib/server/assistant/signupToken.js'),
+        import('../../lib/server/actions/index.js')
+      ]);
+    const deps = { strapi: strapiClient, fetch: ctx.fetchInstance };
+    const who = await checkSignupRecipient(input.email, String(ctx.userId), deps);
+    if ('reason' in who) return { success: false, reason: who.reason, message: who.message };
+    const quota = takePrepareFor(String(ctx.userId));
+    if (!quota.ok) return { success: false, message: `Too many prepared - try again in ${quota.retryAfterSeconds}s.` };
+    const { forSomeoneElse: _, ...signup } = input;
+    try {
+      const r = await prepareSignup(signup, deps, { tokenTtlMs: HANDOFF_TOKEN_TTL_MS, receive: who.hasAccount });
+      const pass = (r.previewUrl ? ' (and previewUrl, to see it first)' : '') + ' to pass on to ' + input.name + '. ';
+      return {
+        success: true,
+        ...r,
+        next: who.hasAccount
+          ? 'Give the user receiveUrl' + pass + input.name + ' already has a 1lev1 account: they open it signed in to ' +
+            'the account with this email and get the review screen, where they create the rikma with one click.'
+          : 'Give the user signupUrl' + pass + input.name + ' signs and chooses a password there, confirms by email ' +
+            'and lands on the prepared rikma.'
+      };
+    } catch (e) {
+      return { success: false, message: e instanceof Error ? e.message : 'Could not prepare it.' };
+    }
+  }
+});
 
 export const undoAssistantTool = createTool({
   id: 'undoAssistant',

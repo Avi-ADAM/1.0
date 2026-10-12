@@ -79,7 +79,8 @@ const handler: ActionExecutionHandler = async (params, context) => {
       const sent = payments
         .filter((p) => p.pledgeId === pledge.id && p.status === 'sent')
         .reduce((sum, p) => sum + p.amount, 0);
-      const confirmed = payments.filter((p) => p.pledgeId === pledge.id && p.status === 'confirmed');
+      // A release of over-cap hours is confirmed at amount 0 — it paid no cycle.
+      const confirmed = payments.filter((p) => p.pledgeId === pledge.id && p.status === 'confirmed' && p.amount > 0);
       const base = {
         pledgeId: pledge.id,
         awaitingConfirmation: round2(sent),

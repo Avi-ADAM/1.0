@@ -70,6 +70,7 @@ import {
   setAssistantItemsTool,
   undoAssistantTool,
   shareRikmaPreviewTool,
+  prepareForSomeoneElseTool,
   startAssistantTool,
   reviseAssistantTool,
   applyAssistantTool,
@@ -180,6 +181,9 @@ export const MCP_TOOL_MANIFEST: Record<string, McpManifestEntry> = {
   setAssistantItemsTool: { tool: setAssistantItemsTool, title: "Edit a draft list", tier: 'prepare', enabled: assistantMcpEnabled },
   undoAssistantTool: { tool: undoAssistantTool, title: "Undo a draft list change", tier: 'prepare', enabled: assistantMcpEnabled },
   shareRikmaPreviewTool: { tool: shareRikmaPreviewTool, title: "Share a rikma preview link", tier: 'prepare', enabled: assistantMcpEnabled },
+  // §5.7: a pending draft for another person, binding nobody until they create it -
+  // a signup link, or a receive link when they have an account. Refuses the caller's own email.
+  prepareForSomeoneElseTool: { tool: prepareForSomeoneElseTool, title: "Prepare a rikma for someone else", tier: 'prepare', enabled: assistantMcpEnabled },
   // Profile / wish lists (§6, §7): the person's own profile and draft, saved
   // from the chat by decision §0.1; reading a text or revising runs a model.
   startAssistantTool: { tool: startAssistantTool, title: "Start a profile or wish list", tier: 'selfWrite', ai: true, enabled: assistantMcpEnabled },

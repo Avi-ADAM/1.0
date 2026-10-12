@@ -454,13 +454,21 @@ export async function fetchMeteredHours(
   exec: Exec,
   projectId: string,
   recipientId: string,
-  from?: string | null
+  from?: string | null,
+  before?: string | null
 ): Promise<number> {
   // Only payments that metered hours **inside this window**. A payment whose
   // cycle opened before `from` was settling an earlier stretch of work — hours
   // this settlement is not reading either — so subtracting it would silently
   // eat the hours actually on the table.
-  const fromFilter = from ? `, cycleStart: { gte: ${gqlStr(from)} }` : '';
+  //
+  // `before` closes the window from above, for reading what was metered of the
+  // hours *behind* the watermark (the over-cap balance, `computeOverCapBalance`).
+  const bounds = [
+    from ? `gte: ${gqlStr(from)}` : null,
+    before ? `lt: ${gqlStr(before)}` : null
+  ].filter(Boolean);
+  const fromFilter = bounds.length ? `, cycleStart: { ${bounds.join(', ')} }` : '';
   const data = await run(
     exec,
     `{ stipendPayments(filters: {

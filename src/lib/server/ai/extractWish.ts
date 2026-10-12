@@ -56,6 +56,18 @@ export const EMPTY_DETAILS: WishDetails = {
   groupKind: ''
 };
 
+/**
+ * Lev's judgement that the wish only comes true at volume — a supplier opens a
+ * weekly basket or a minibus route only when enough people want it at once
+ * (PLAN_SHARED_PURCHASE Track B). Unlike `details` this is inferred, never
+ * stated, so nothing acts on it by itself: the review page offers the owner a
+ * demand pool and she decides.
+ */
+export interface WishVolume {
+  minPeople: number | null;
+  why: string;
+}
+
 export interface WishExtraction {
   missions: WishItem[];
   resources: WishItem[];
@@ -65,6 +77,8 @@ export interface WishExtraction {
   hints: WishHint[];
   /** Absent on extractions rebuilt from a saved wish (refreshWishMatches). */
   details?: WishDetails;
+  /** Set only when Lev judged the wish needs other customers to happen. */
+  volume?: WishVolume | null;
 }
 
 export const EMPTY_EXTRACTION: WishExtraction = {
@@ -216,6 +230,17 @@ export function normDetails(raw: unknown, today = israelDay()): WishDetails {
   };
 }
 
+/** `volume` as the model wrote it → a WishVolume, or null when not needed. */
+export function normVolume(raw: unknown): WishVolume | null {
+  const v = (raw && typeof raw === 'object' ? raw : {}) as Record<string, unknown>;
+  if (v.needsOthers !== true) return null;
+  const n = typeof v.minPeople === 'string' ? Number(v.minPeople) : v.minPeople;
+  const minPeople =
+    typeof n === 'number' && Number.isFinite(n) && n >= 2 && n <= 500 ? Math.round(n) : null;
+  const why = typeof v.why === 'string' ? v.why.trim().slice(0, 200) : '';
+  return { minPeople, why: why && isCleanText(why) ? why : '' };
+}
+
 /** Today as YYYY-MM-DD on the platform's clock. */
 function israelDay(now = new Date()): string {
   return now.toLocaleDateString('en-CA', { timeZone: 'Asia/Jerusalem' });
@@ -255,6 +280,7 @@ export async function extractWish(
         ? parsed.titleSuggestion.trim().slice(0, 120)
         : '',
     hints: normHints(parsed.hints, 3),
-    details: normDetails(parsed.details)
+    details: normDetails(parsed.details),
+    volume: normVolume(parsed.volume)
   };
 }

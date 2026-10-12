@@ -23,6 +23,7 @@ import { lineNames } from '$lib/wish/lineNames';
 import { readDealStages } from '$lib/server/deal/dealChain';
 import { sendViaProxy } from '$lib/server/sendViaProxy.js';
 import { rtKey } from '$lib/realtime/scopes';
+import { buildWishPoolPanel, volumeOf, type WishPoolPanel } from '$lib/server/maagad/wishPool';
 
 type PublishedNeed = { name: string; extractedKey: string | null };
 
@@ -310,7 +311,8 @@ export const load: PageServerLoad = async ({ params, locals, fetch, depends }) =
           // Carry inferred skills so the enrichment below can match people.
           wish.aiMeta = {
             ...(wish.aiMeta || {}),
-            skills: extraction.skills.map((s) => s.name)
+            skills: extraction.skills.map((s) => s.name),
+            ...(extraction.volume ? { volume: extraction.volume } : {})
           };
 
           // Persist so the next load is instant and the breakdown is editable.
@@ -529,7 +531,41 @@ export const load: PageServerLoad = async ({ params, locals, fetch, depends }) =
     }
   }
 
+  // The demand pool (PLAN_SHARED_PURCHASE §5): Lev judged this wish happens only
+  // when several customers want it at once, or the clustering job already invited
+  // it into one. The pool it is in, else the ones it could join or open — her
+  // taps, never a join made for her. Owner-only, best-effort.
+  let pool: WishPoolPanel | null = null;
+  if (wish && isOwner && uid) {
+    try {
+      const wantsPools = !!volumeOf(wish.aiMeta);
+      const [mr, pr]: any[] = await Promise.all([
+        sendToSer({ ratson: String(params.id), uid: String(uid) }, '440wishMaagadMembership', 0, 0, true, fetch),
+        wantsPools ? sendToSer({}, '223mapMaagadim', 0, 0, true, fetch) : null
+      ]);
+      pool = buildWishPoolPanel({
+        wish: {
+          id: String(wish.id),
+          name: wish.name,
+          status: wish.status,
+          fulfilled: wish.fulfilled,
+          isOnline: wish.isOnline,
+          lat: wish.lat,
+          lng: wish.lng,
+          radius: wish.radius,
+          frequency: rawRatson?.ratson?.data?.attributes?.frequency ?? null,
+          categoryIds: wish.categories.map((c: any) => String(c.id))
+        },
+        aiMeta: wish.aiMeta,
+        memberships: mr?.data?.maagadMembers?.data ?? [],
+        pools: pr?.data?.maagads?.data ?? []
+      });
+    } catch (e) {
+      console.warn('[concierge/:id] pool panel failed (non-fatal):', e);
+    }
+  }
+
   const stages = await stagesP;
 
-  return { wish, proposals, loadOk, uid, isOwner, enrichment, forumMessages, missionTemplates, external, bell, notices, published, gaps, stages, partLines };
+  return { wish, proposals, loadOk, uid, isOwner, enrichment, forumMessages, missionTemplates, external, bell, notices, published, gaps, stages, partLines, pool };
 };
