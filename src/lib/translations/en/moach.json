@@ -376,15 +376,16 @@
   },
   "presence": {
     "region": "Who is in the rikma now",
-    "here": "Here now",
     "alone": "No other members here right now",
-    "more": "+{{count}}",
     "hide": "Hide me",
-    "hideExplain": "Hiding works both ways: members won't see that you're here, and you won't see who is.",
+    "hideExplain": "Hiding works both ways: members won't see that you're viewing, and you won't see who is. Work on a timer stays visible to everyone.",
     "confirmHide": "Hide",
     "cancel": "Cancel",
-    "hiddenNote": "Your presence is off, so who is here isn't shown either",
+    "hiddenNote": "Your presence is off, so who is viewing isn't shown either",
     "show": "Turn on",
-    "failed": "The change wasn't saved, try again"
+    "failed": "The change wasn't saved, try again",
+    "viewing": "viewing the rikma now",
+    "viewersOne": "One member is viewing the rikma now",
+    "viewersMany": "{{count}} members are viewing the rikma now"
   }
 }

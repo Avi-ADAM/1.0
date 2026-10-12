@@ -376,15 +376,16 @@
   },
   "presence": {
     "region": "Quién está ahora en la rikma",
-    "here": "Aquí ahora",
     "alone": "No hay otros miembros aquí ahora",
-    "more": "+{{count}}",
     "hide": "Ocultarme",
-    "hideExplain": "Ocultarse funciona en ambos sentidos: los miembros no verán que estás aquí, y tú no verás quién está.",
+    "hideExplain": "Ocultarse funciona en ambos sentidos: los miembros no verán que estás mirando, y tú no verás quién mira. El trabajo con temporizador sigue visible para todos.",
     "confirmHide": "Ocultar",
     "cancel": "Cancelar",
-    "hiddenNote": "Tu presencia está desactivada, así que tampoco ves quién está aquí",
+    "hiddenNote": "Tu presencia está desactivada, así que tampoco ves quién está mirando",
     "show": "Activar",
-    "failed": "El cambio no se guardó, inténtalo de nuevo"
+    "failed": "El cambio no se guardó, inténtalo de nuevo",
+    "viewing": "viendo la rikma ahora",
+    "viewersOne": "Un miembro está viendo la rikma ahora",
+    "viewersMany": "{{count}} miembros están viendo la rikma ahora"
   }
 }

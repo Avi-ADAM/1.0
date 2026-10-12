@@ -21,6 +21,7 @@
   import { connectMoachRealtime } from '$lib/realtime/adapters/moach';
   import MoachTour from '$lib/components/moach/MoachTour.svelte';
   import PresenceBar from '$lib/components/moach/PresenceBar.svelte';
+  import { RikmaPresence } from '$lib/realtime/presence.svelte';
   import Dialog from '$lib/celim/ui/dialog.svelte';
   import { sendToSer } from '$lib/send/sendToSer.js';
   import { browser } from '$app/environment';
@@ -129,6 +130,34 @@
       onVotes: () => loadVoteCount()
     });
   });
+
+  // The green "working now" ring follows timers started and stopped by other
+  // members: every timer action publishes `timer:<uid>` + `project:<pid>`.
+  $effect(() => {
+    const pid = projectId;
+    if (!browser || !pid) return;
+    return realtimeBus.subscribe(['timer:*'], (batch) => {
+      if (batch.resync || batch.scopes.includes(`project:${pid}`)) fetchProjectTimers(pid, fetch);
+    });
+  });
+
+  // Who is viewing this rikma right now — one presence per rikma, re-made when
+  // the layout moves to another one. Shown as a mark on the member row below.
+  /** @type {RikmaPresence | null} */
+  let presence = $state(null);
+  $effect(() => {
+    const pid = projectId;
+    const uid = data.uid;
+    if (!browser || !pid || !uid) return;
+    const p = new RikmaPresence(pid, uid);
+    presence = p;
+    const stop = p.start();
+    return () => {
+      stop();
+      if (presence === p) presence = null;
+    };
+  });
+  let viewing = $derived(new Set(presence?.others ?? []));
 
   onMount(() => {
     const guideKey = `moachGuide_${projectId}`;
@@ -288,10 +317,6 @@
             data-moach-tour="help"
           >?</button>
         </div>
-
-        {#key projectId}
-          <PresenceBar {projectId} uid={data.uid} members={projectBase.user_1s?.data ?? []} />
-        {/key}
 
         {#if projectBase.githublink || projectBase.codeLicense}
           <div class="flex flex-col items-center gap-2">
@@ -453,12 +478,13 @@
                     ?.users_permissions_user?.data?.id == user.id &&
                   t.attributes?.isActive
               )}
+              {@const isViewing = viewing.has(String(user.id))}
               <button
                 onclick={() => goto(`/user/${user.id}`)}
                 class="relative transition-all duration-300 {hasActiveTimer
                   ? 'scale-110'
                   : ''}"
-                title={`${user.attributes.username}${hasActiveTimer ? ' ' + $t('moach.layout.activeNow') : ''}`}
+                title={`${user.attributes.username}${hasActiveTimer ? ' ' + $t('moach.layout.activeNow') : ''}${isViewing ? ' · ' + $t('moach.presence.viewing') : ''}`}
               >
                 <img
                   class="inline-block h-10 w-10 rounded-full ring-2 transition-all duration-300 {hasActiveTimer
@@ -468,6 +494,13 @@
                     'https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png'}
                   alt={user.attributes.username}
                 />
+                {#if isViewing}
+                  <!-- Viewing now (presence) — deliberately not green: green is a running timer. -->
+                  <span
+                    class="absolute -bottom-0.5 -left-0.5 h-3 w-3 rounded-full bg-sky-400 border-2 border-slate-900"
+                    aria-hidden="true"
+                  ></span>
+                {/if}
                 {#if hasActiveTimer}
                   <span class="absolute -top-1 -right-1 flex h-4 w-4">
                     <span
@@ -482,6 +515,9 @@
             {/each}
           </div>
         </div>
+        {#if presence}
+          <PresenceBar {presence} memberCount={projectBase.user_1s?.data?.length ?? 0} />
+        {/if}
 
         <!-- Navigation: primary groups row + contextual sub-tabs row -->
         <div class="overflow-x-auto pt-2" dir={$isRtl ? 'rtl' : 'ltr'}>

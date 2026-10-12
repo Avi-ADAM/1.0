@@ -1,48 +1,28 @@
 <script lang="ts">
   /**
-   * "Who is here" in the rikma's header ($lib/realtime/presence.svelte.ts).
-   * Visible to members by default; "hide me" is symmetric — whoever hides is
-   * not seen and does not see — so the hidden state shows no roster at all.
+   * The words under the rikma's member row ($lib/realtime/presence.svelte.ts).
+   * The faces themselves stay in that one row, with two different marks:
+   * a green ring = a timer running on this rikma's work (from the data,
+   * always visible — it is what the rikma counts), a small sky dot = viewing
+   * the rikma right now (presence). "Hide me" covers only the second, and is
+   * symmetric — whoever hides is not seen viewing and does not see who is.
    */
-  import { onMount } from 'svelte';
   import { t } from '$lib/translations';
-  import { RikmaPresence } from '$lib/realtime/presence.svelte';
-
-  type Member = {
-    id: string;
-    attributes?: {
-      username?: string;
-      profilePic?: { data?: { attributes?: { url?: string; formats?: { thumbnail?: { url?: string } } } } };
-    };
-  };
+  import type { RikmaPresence } from '$lib/realtime/presence.svelte';
 
   interface Props {
-    projectId: string;
-    uid: string;
-    members: Member[];
+    presence: RikmaPresence;
+    /** How many members the rikma has — alone, there is nobody to see. */
+    memberCount: number;
   }
 
-  let { projectId, uid, members }: Props = $props();
+  let { presence, memberCount }: Props = $props();
 
-  // One presence per rikma page: the layout re-keys this component on projectId.
-  // svelte-ignore state_referenced_locally
-  const presence = new RikmaPresence(projectId, uid);
-  onMount(() => presence.start());
-
-  const MAX_FACES = 5;
   let confirming = $state(false);
   let failed = $state(false);
 
-  const byId = $derived(new Map(members.map((m) => [String(m.id), m])));
-  const here = $derived(presence.others.map((id) => byId.get(id)).filter((m): m is Member => !!m));
-  const faces = $derived(here.slice(0, MAX_FACES));
-  const names = $derived(here.map((m) => m.attributes?.username ?? '').filter(Boolean).join(', '));
-
-  const pic = (m: Member) => {
-    const a = m.attributes?.profilePic?.data?.attributes;
-    return a?.formats?.thumbnail?.url ?? a?.url ?? null;
-  };
-  const initial = (m: Member) => (m.attributes?.username ?? '?').trim().charAt(0).toUpperCase();
+  const viewers = $derived(presence.others.length);
+  const shown = $derived(memberCount > 1 && presence.status !== 'off' && presence.status !== 'unavailable');
 
   async function toggle(hidden: boolean) {
     failed = false;
@@ -50,9 +30,6 @@
     failed = !ok;
     if (ok) confirming = false;
   }
-
-  // Alone in a rikma there is nobody to see or be seen by.
-  const shown = $derived(members.length > 1 && presence.status !== 'off' && presence.status !== 'unavailable');
 </script>
 
 {#if shown}
@@ -63,26 +40,14 @@
         {$t('moach.presence.show')}
       </button>
     {:else}
-      {#if here.length > 0}
-        <span class="pr-faces" aria-hidden="true">
-          {#each faces as m (m.id)}
-            {@const src = pic(m)}
-            <span class="pr-face" title={m.attributes?.username ?? ''}>
-              {#if src}<img {src} alt="" loading="lazy" />{:else}{initial(m)}{/if}
-              <span class="pr-dot"></span>
-            </span>
-          {/each}
-          {#if here.length > MAX_FACES}
-            <span class="pr-face pr-more">{$t('moach.presence.more', { count: here.length - MAX_FACES })}</span>
-          {/if}
-        </span>
-        <span class="pr-label" aria-live="polite">
-          <span class="pr-sr">{names}</span>
-          {$t('moach.presence.here')}
-        </span>
-      {:else}
-        <span class="pr-muted" aria-live="polite">{$t('moach.presence.alone')}</span>
-      {/if}
+      <span class="pr-muted" aria-live="polite">
+        {#if viewers > 0}
+          <span class="pr-dot" aria-hidden="true"></span>
+          {viewers === 1 ? $t('moach.presence.viewersOne') : $t('moach.presence.viewersMany', { count: viewers })}
+        {:else}
+          {$t('moach.presence.alone')}
+        {/if}
+      </span>
 
       {#if confirming}
         <span class="pr-confirm">
@@ -119,61 +84,20 @@
     font-size: 0.8rem;
     color: var(--gold-l, #f5e6b8);
   }
-  .pr-faces {
-    display: inline-flex;
-    flex-direction: row;
-  }
-  .pr-face {
-    position: relative;
+  .pr-muted {
     display: inline-flex;
     align-items: center;
-    justify-content: center;
-    width: 1.75rem;
-    height: 1.75rem;
-    margin-inline-start: -0.4rem;
-    border-radius: 9999px;
-    border: 2px solid var(--gold, #d4af37);
-    background: #2a1030;
+    gap: 0.35rem;
     color: var(--gold-l, #f5e6b8);
-    font-weight: 700;
-    font-size: 0.75rem;
+    opacity: 0.85;
   }
-  .pr-face:first-child {
-    margin-inline-start: 0;
-  }
-  .pr-face img {
-    width: 100%;
-    height: 100%;
-    border-radius: 9999px;
-    object-fit: cover;
-  }
+  /* Same mark as on the faces — the legend for it. */
   .pr-dot {
-    position: absolute;
-    bottom: -1px;
-    inset-inline-end: -1px;
+    display: inline-block;
     width: 0.55rem;
     height: 0.55rem;
     border-radius: 9999px;
-    background: #22c55e;
-    border: 1.5px solid #19031d;
-  }
-  .pr-more {
-    font-size: 0.65rem;
-  }
-  .pr-label {
-    font-weight: 600;
-  }
-  .pr-sr {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip: rect(0 0 0 0);
-    white-space: nowrap;
-  }
-  .pr-muted {
-    color: var(--gold-l, #f5e6b8);
-    opacity: 0.85;
+    background: #38bdf8;
   }
   .pr-confirm {
     display: inline-flex;
