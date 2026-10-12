@@ -21014,6 +21014,7 @@ export type UsersPermissionsUser = {
   haskamaz?: Maybe<Scalars['Long']['output']>;
   hatzaas?: Maybe<HatzaaRelationResponseCollection>;
   hervachti?: Maybe<Scalars['Float']['output']>;
+  hidePresence?: Maybe<Scalars['Boolean']['output']>;
   iGotMOneyForSheirut?: Maybe<SheirutRelationResponseCollection>;
   isSigned?: Maybe<Scalars['Boolean']['output']>;
   lang?: Maybe<Enum_Userspermissionsuser_Lang>;
@@ -21804,6 +21805,7 @@ export type UsersPermissionsUserFiltersInput = {
   haskamaz?: InputMaybe<LongFilterInput>;
   hatzaas?: InputMaybe<HatzaaFiltersInput>;
   hervachti?: InputMaybe<FloatFilterInput>;
+  hidePresence?: InputMaybe<BooleanFilterInput>;
   iGotMOneyForSheirut?: InputMaybe<SheirutFiltersInput>;
   id?: InputMaybe<IdFilterInput>;
   isSigned?: InputMaybe<BooleanFilterInput>;
@@ -21948,6 +21950,7 @@ export type UsersPermissionsUserInput = {
   haskamaz?: InputMaybe<Scalars['Long']['input']>;
   hatzaas?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   hervachti?: InputMaybe<Scalars['Float']['input']>;
+  hidePresence?: InputMaybe<Scalars['Boolean']['input']>;
   iGotMOneyForSheirut?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   isSigned?: InputMaybe<Scalars['Boolean']['input']>;
   lang?: InputMaybe<Enum_Userspermissionsuser_Lang>;
