@@ -76,6 +76,7 @@ const PAGES = [
   // they carry a noindex of their own so they stop borrowing the homepage's
   // title in search results.
   { path: '/why', lastmod: '2026-09-04T00:00:00+00:00', priority: '0.80', changefreq: 'monthly' },
+  { path: '/broken-deal', lastmod: '2026-10-13T00:00:00+00:00', priority: '0.80', changefreq: 'monthly' },
   { path: '/uses', lastmod: '2026-09-04T00:00:00+00:00', priority: '0.75', changefreq: 'monthly' },
   // One of the three audience tracks the homepage used to walk everyone
   // through in a single scroll. High priority: it is a landing page for its

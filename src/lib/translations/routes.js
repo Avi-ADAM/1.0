@@ -70,6 +70,8 @@ export const ROUTED = {
     // The page behind the product - why consent is re-checked at every step.
     // One route, one namespace; the homepage teaser for it lives in `home`.
     why: at('/why'),
+    // The long-form article "The deal that broke" - one route, one namespace.
+    brokenDeal: at('/broken-deal'),
     // The privacy policy - one route, one namespace. The menu link's label
     // lives in `common` so it renders everywhere.
     privacy: at('/privacy'),

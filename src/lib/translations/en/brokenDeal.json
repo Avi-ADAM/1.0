@@ -1,0 +1,138 @@
+{
+  "meta": {
+    "title": "The Deal That Broke · Why today's job market wears us out, and what a new social contract looks like | 1💗1",
+    "description": "Employment, freelancing, the gig economy - and a fourth model: the rikma, where every hour, euro or skill is recorded by consent and becomes a live share of the profits. An article about the deal that broke, and a small, reversible experiment.",
+    "shareText": "The deal that broke: why today's job market wears us out, and what a new social contract looks like"
+  },
+  "hero": {
+    "eyebrow": "◈ Essay · The future of work ◈",
+    "title": "The Deal That Broke",
+    "subtitle": "Why today's job market wears us out - and what a new social contract looks like",
+    "byline": "By the 1💗1 research & development team",
+    "readTime": "6 min read",
+    "artAlt": "A contract torn in two and stitched back together with a pink thread, a heart in the middle"
+  },
+  "intro": {
+    "kicker": "◈ Introduction",
+    "title": "A social contract that no longer holds",
+    "p1": "Every work regime in human society is, at heart, a social deal - fairer or less fair - in which a person gives up one resource (time, autonomy, obedience) to get something else in return (security, a wage, independence). In recent years, though, there is a growing sense that this basic deal has simply broken.",
+    "statValue": "1 in 5",
+    "statLabel": "employees worldwide feel truly engaged in their work. The rest do the minimum - or count the days.",
+    "statSource": "Gallup, State of the Global Workplace 2025",
+    "p2": "According to Gallup, only about a fifth of employees around the world feel engaged at work - a figure stuck at a long-running low. Meanwhile, hundreds of thousands of freelancers and self-employed people find themselves in an exhausting race against algorithms, runaway price competition and professional loneliness.",
+    "p3": "Are the existing models our fate? To see where we could go, it helps first to see where we stand."
+  },
+  "regimes": {
+    "kicker": "◈ Part one",
+    "title": "Four work regimes - from classic obedience to algorithmic control",
+    "lede": "Look at the modern job market and it falls into four main regimes. Each of them is a deal: what you give, what you get, who keeps the surplus - and who carries the risk.",
+    "labelGive": "You give",
+    "labelGet": "You get",
+    "labelSurplus": "Surplus goes to",
+    "labelRisk": "Risk falls on",
+    "r1": {
+      "name": "Employment",
+      "deal": "Obedience in exchange for security",
+      "body": "The employee accepts the organisation's hierarchy and the manager's authority, and in return gets a steady wage and social security. In Elizabeth Anderson's book \"Private Government\" the modern workplace is described as a system of broad authority that rarely shares power democratically. Employment gives stability - but the surplus the work creates stays almost entirely with the owners of capital.",
+      "give": "Time and obedience",
+      "get": "A wage and security",
+      "surplus": "The owners of capital",
+      "risk": "Mostly the employer"
+    },
+    "r2": {
+      "name": "Self-employment & freelancing",
+      "deal": "Freedom in exchange for risk - alone",
+      "body": "To escape the boss, many choose to work for themselves. The freelancer owns their output and enjoys autonomy, but carries 100% of the risk alone: financial, managerial, marketing, collections. And quite a few are in practice \"disguised freelancers\" - dependent on a single client, without an employee's rights.",
+      "give": "Security",
+      "get": "Freedom and ownership of the output",
+      "surplus": "The freelancer",
+      "risk": "The freelancer - all of it"
+    },
+    "r3": {
+      "name": "The gig economy",
+      "deal": "The invisible cage",
+      "body": "Digital matching platforms promised total flexibility and in practice built a patchwork of drawbacks: the legal status of a contractor, with no rights, alongside tight algorithmic control over pricing, ratings and how work is handed out. In the book Inside the Invisible Cage, Hatim A. Rahman calls this \"the invisible cage\" - the worker carries the risk, and the platform collects the fees.",
+      "give": "Time and availability",
+      "get": "Pay per task",
+      "surplus": "The platform",
+      "risk": "The worker"
+    },
+    "r4": {
+      "name": "The rikma",
+      "deal": "Dynamic ownership and shared risk",
+      "body": "A new institution: every contribution - hours of work, money, equipment or knowledge - is recorded with full consent and becomes a live, updating share of the venture's profits. Hierarchical authority gives way to mechanisms of consent and transparency, and the risk does not land on one person's shoulders - it is shared fairly among the partners.",
+      "give": "Hours, money, equipment or know-how",
+      "get": "A live share of the profits",
+      "surplus": "The partners, by contribution",
+      "risk": "Shared"
+    }
+  },
+  "mech": {
+    "kicker": "◈ Part two",
+    "title": "Three mechanisms that replace the boss",
+    "lede": "The change the rikma model brings is not a slogan about \"work without an employer\". It is a structural change along three axes.",
+    "m1": {
+      "title": "Dynamic ownership of the surplus",
+      "body": "In employment the surplus belongs to the employer; in the gig economy, to the platform. In a rikma, every hour or resource invested becomes a proportional share of ownership and profits, by a fairness you can measure."
+    },
+    "m2": {
+      "title": "A consent engine instead of authority",
+      "body": "Instead of orders from above, decisions rest on dynamic consent: \"good enough for now, safe enough to try\". Every proposal comes with a clock, and whoever has not responded when time runs out has agreed. Whoever disagrees does not veto: they propose a different version."
+    },
+    "m3": {
+      "title": "Direct commitment to the customer and the partners",
+      "body": "An employee answers to a manager. In a rikma, the customer's money flows straight to the partners who did the work - with no needless middlemen in between."
+    }
+  },
+  "kibbutz": {
+    "kicker": "◈ Part three",
+    "title": "Fairness, not ideology: why this isn't a kibbutz",
+    "p1": "Talk about partnership in Israel and many minds go straight to the kibbutz. But there is a critical difference.",
+    "p2": "The classic kibbutz rested on equal reward - \"to each according to their needs\" - with no direct link to how much each person contributed. Over the years that structure bred frustration around the \"free rider\" problem.",
+    "p3": "A rikma is not an enforced-equality model but a model of contributive justice. It does not promise an equal split in advance - it promises a precise return for what each person actually contributed. What's more, leaving is easy and cheap, and the shares earned for work already done stay with whoever did it.",
+    "colA": "The classic kibbutz",
+    "colB": "The rikma",
+    "a1": "Equal reward, regardless of contribution",
+    "a2": "\"To each according to their needs\"",
+    "a3": "Everything is shared - and leaving is heavy",
+    "b1": "Return according to actual contribution",
+    "b2": "Every contribution recorded by consent and measured",
+    "b3": "Easy exit - and the shares you earned stay yours"
+  },
+  "small": {
+    "kicker": "◈ Part four",
+    "title": "Not a dramatic revolution - a small, reversible experiment",
+    "p1": "One of the biggest obstacles to changing how we work is loss aversion: the fear of giving up what is familiar and safe for an unknown future. The pain of a loss is felt more strongly than the pleasure of a gain of the same size.",
+    "p2": "So the right way to start is not to quit or take wild risks. You can start small: a few hours a week, alongside the job you already have.",
+    "weekJob": "Your current job - it stays",
+    "weekRikma": "A few hours in a rikma",
+    "weekNote": "recorded as ownership, and they stay yours",
+    "quote": "No need to burn bridges. A few hours a week, recorded as ownership - and they stay yours.",
+    "p3": "Around a single customer request, a small group of professionals can come together, split the tasks by ability, and share the profits with fairness that is transparent and measurable."
+  },
+  "close": {
+    "title": "Want to see how it works in practice?",
+    "p1": "Join an existing rikma, start a new one, or simply become part of the 1💗1 community.",
+    "ctaJoin": "Rikmas looking for partners",
+    "ctaStart": "Start a new rikma",
+    "ctaWhy": "Why we are building this"
+  },
+  "share": {
+    "title": "Liked it? Share it",
+    "native": "Share",
+    "whatsapp": "WhatsApp",
+    "facebook": "Facebook",
+    "linkedin": "LinkedIn",
+    "x": "X",
+    "copy": "Copy link",
+    "copied": "Link copied ✓"
+  },
+  "sources": {
+    "title": "Sources",
+    "s1": "Gallup, State of the Global Workplace: 2025 Report.",
+    "s2": "Elizabeth Anderson, Private Government: How Employers Rule Our Lives (and Why We Don't Talk about It), Princeton University Press, 2017.",
+    "s3": "Hatim A. Rahman, Inside the Invisible Cage: How Algorithms Control Workers, University of California Press, 2024.",
+    "s4": "Daniel Kahneman & Amos Tversky, \"Prospect Theory: An Analysis of Decision under Risk\", Econometrica 47(2), 1979.",
+    "s5": "\"Good enough for now, safe enough to try\" - the consent decision principle of sociocracy."
+  }
+}

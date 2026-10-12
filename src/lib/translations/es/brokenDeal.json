@@ -1,0 +1,138 @@
+{
+  "meta": {
+    "title": "El trato que se rompió · Por qué el mercado laboral actual nos agota y cómo sería un nuevo contrato social | 1💗1",
+    "description": "Empleo, trabajo autónomo, economía de plataformas - y un cuarto modelo: la rikma, donde cada hora, euro o saber se registra por consentimiento y se convierte en una participación viva en los beneficios. Un artículo sobre el trato que se rompió y un experimento pequeño y reversible.",
+    "shareText": "El trato que se rompió: por qué el mercado laboral actual nos agota y cómo sería un nuevo contrato social"
+  },
+  "hero": {
+    "eyebrow": "◈ Artículo · El futuro del trabajo ◈",
+    "title": "El trato que se rompió",
+    "subtitle": "Por qué el mercado laboral actual nos agota - y cómo sería un nuevo contrato social",
+    "byline": "Por el equipo de investigación y desarrollo de 1💗1",
+    "readTime": "6 min de lectura",
+    "artAlt": "Un contrato roto en dos y vuelto a coser con un hilo rosa, con un corazón en el centro"
+  },
+  "intro": {
+    "kicker": "◈ Introducción",
+    "title": "Un contrato social que ya no se cumple",
+    "p1": "Todo régimen de trabajo en la sociedad humana es, en el fondo, un trato social - más o menos justo - en el que una persona renuncia a un recurso (tiempo, autonomía, obediencia) para recibir otra cosa a cambio (seguridad, salario, independencia). Pero en los últimos años crece la sensación de que ese trato básico, sencillamente, se ha roto.",
+    "statValue": "1 de cada 5",
+    "statLabel": "personas empleadas en el mundo se siente realmente comprometida con su trabajo. El resto hace lo mínimo - o cuenta los días.",
+    "statSource": "Gallup, State of the Global Workplace 2025",
+    "p2": "Según Gallup, solo alrededor de una quinta parte de las personas empleadas en el mundo se siente comprometida con su trabajo - una cifra estancada en un mínimo prolongado. Al mismo tiempo, cientos de miles de freelancers y autónomos se ven en una carrera agotadora contra algoritmos, una competencia de precios desbocada y la soledad profesional.",
+    "p3": "¿Son los modelos actuales un destino inevitable? Para entender hacia dónde podemos ir, conviene primero entender dónde estamos."
+  },
+  "regimes": {
+    "kicker": "◈ Primera parte",
+    "title": "Cuatro regímenes de trabajo - de la obediencia clásica al control algorítmico",
+    "lede": "Si miramos el mercado laboral moderno, podemos dividirlo en cuatro regímenes principales. Cada uno es un trato: qué das, qué recibes, quién se queda con el excedente - y sobre quién recae el riesgo.",
+    "labelGive": "Das",
+    "labelGet": "Recibes",
+    "labelSurplus": "El excedente va a",
+    "labelRisk": "El riesgo recae en",
+    "r1": {
+      "name": "Empleo asalariado",
+      "deal": "Obediencia a cambio de seguridad",
+      "body": "La persona empleada acepta la jerarquía de la organización y la autoridad de quien dirige, y a cambio recibe un salario fijo y protección social. En el libro \"Gobierno privado\" de Elizabeth Anderson, el lugar de trabajo moderno se describe como un sistema de amplia autoridad que rara vez comparte el poder de forma democrática. El empleo da estabilidad - pero el excedente que genera el trabajo se queda casi entero en manos de quienes poseen el capital.",
+      "give": "Tiempo y obediencia",
+      "get": "Salario y seguridad",
+      "surplus": "Quienes poseen el capital",
+      "risk": "Sobre todo la empresa"
+    },
+    "r2": {
+      "name": "Autónomos y freelance",
+      "deal": "Libertad a cambio de riesgo - en soledad",
+      "body": "Para escapar del jefe, muchas personas eligen trabajar por su cuenta. Quien trabaja como autónomo es dueño de su producto y disfruta de autonomía, pero carga en solitario con el 100% del riesgo: económico, de gestión, de marketing, de cobro. Y no pocos son en la práctica \"falsos autónomos\" - dependen de un único cliente, sin los derechos de un asalariado.",
+      "give": "Seguridad",
+      "get": "Libertad y propiedad del producto",
+      "surplus": "Quien trabaja por su cuenta",
+      "risk": "Quien trabaja por su cuenta - todo"
+    },
+    "r3": {
+      "name": "La economía de plataformas",
+      "deal": "La jaula invisible",
+      "body": "Las plataformas digitales de intermediación prometieron flexibilidad total y en la práctica crearon una mezcla de desventajas: el estatus legal de autónomo, sin derechos, junto a un estricto control algorítmico de precios, valoraciones y reparto del trabajo. En el libro Inside the Invisible Cage, Hatim A. Rahman lo llama \"la jaula invisible\" - quien trabaja carga con el riesgo y la plataforma se lleva las comisiones.",
+      "give": "Tiempo y disponibilidad",
+      "get": "Pago por tarea",
+      "surplus": "La plataforma",
+      "risk": "Quien trabaja"
+    },
+    "r4": {
+      "name": "La rikma",
+      "deal": "Propiedad dinámica y riesgo compartido",
+      "body": "Una institución nueva: cada aportación - horas de trabajo, dinero, equipo o conocimiento - se registra con pleno consentimiento y se convierte en un porcentaje vivo, que se actualiza, de los beneficios del proyecto. La autoridad jerárquica da paso a mecanismos de consentimiento y transparencia, y el riesgo no cae sobre los hombros de una sola persona - se reparte con justicia entre quienes se asocian.",
+      "give": "Horas, dinero, equipo o saber",
+      "get": "Un porcentaje vivo de los beneficios",
+      "surplus": "Las personas socias, según su aportación",
+      "risk": "Compartido"
+    }
+  },
+  "mech": {
+    "kicker": "◈ Segunda parte",
+    "title": "Tres mecanismos que sustituyen al jefe",
+    "lede": "El cambio que propone la rikma no es un eslogan de \"trabajo sin patrón\". Es un cambio estructural en tres ejes.",
+    "m1": {
+      "title": "Propiedad dinámica del excedente",
+      "body": "En el empleo el excedente pertenece a la empresa; en las plataformas, a la plataforma. En la rikma, cada hora o recurso invertido se convierte en una parte proporcional de la propiedad y de los beneficios, según una justicia que se puede medir."
+    },
+    "m2": {
+      "title": "Un motor de consentimiento en lugar de autoridad",
+      "body": "En vez de órdenes desde arriba, las decisiones se apoyan en un consentimiento dinámico: \"suficientemente bueno por ahora, suficientemente seguro para probar\". Cada propuesta llega con un reloj, y quien no ha respondido cuando se acaba el tiempo, ha consentido. Quien no está de acuerdo no veta: propone otra versión."
+    },
+    "m3": {
+      "title": "Compromiso directo con la clientela y las personas socias",
+      "body": "En el empleo, se responde ante quien dirige. En la rikma, el dinero de la clientela fluye directamente a las personas socias que hicieron el trabajo - sin intermediarios innecesarios."
+    }
+  },
+  "kibbutz": {
+    "kicker": "◈ Tercera parte",
+    "title": "Justicia, no ideología: por qué esto no es un kibutz",
+    "p1": "Cuando se habla de cooperación en Israel, mucha gente piensa enseguida en el kibutz. Pero hay una diferencia crucial.",
+    "p2": "El kibutz clásico se basaba en una retribución igualitaria - \"a cada cual según sus necesidades\" - sin relación directa con cuánto aportaba cada persona. Con los años, esa estructura generó frustración en torno al problema del \"polizón\".",
+    "p3": "La rikma no es un modelo de igualdad impuesta, sino de justicia contributiva. No promete un reparto igual por adelantado: promete una retribución precisa según lo que cada cual aportó de verdad. Además, salir es fácil y barato, y los porcentajes ganados por el trabajo ya hecho se quedan con quien lo hizo.",
+    "colA": "El kibutz clásico",
+    "colB": "La rikma",
+    "a1": "Retribución igual, sin importar la aportación",
+    "a2": "\"A cada cual según sus necesidades\"",
+    "a3": "Todo es común - y salir pesa",
+    "b1": "Retribución según la aportación real",
+    "b2": "Cada aportación se registra por consentimiento y se mide",
+    "b3": "Salida fácil - y los porcentajes ganados siguen siendo tuyos"
+  },
+  "small": {
+    "kicker": "◈ Cuarta parte",
+    "title": "No una revolución dramática - un experimento pequeño y reversible",
+    "p1": "Uno de los grandes obstáculos para cambiar la forma de trabajar es la aversión a la pérdida: el miedo a renunciar a lo conocido y seguro por un futuro incierto. El dolor de una pérdida se siente con más fuerza que el placer de una ganancia del mismo tamaño.",
+    "p2": "Por eso, la forma correcta de empezar no es dimitir ni asumir riesgos locos. Se puede empezar poco a poco: unas horas a la semana, junto al trabajo que ya tienes.",
+    "weekJob": "Tu trabajo actual - se queda",
+    "weekRikma": "Unas horas en una rikma",
+    "weekNote": "registradas como propiedad, y siguen siendo tuyas",
+    "quote": "No hace falta quemar las naves. Unas horas a la semana que se registran como propiedad - y siguen siendo tuyas.",
+    "p3": "En torno a un solo encargo de un cliente, un pequeño grupo de profesionales puede unirse, repartir las tareas según sus capacidades y compartir los beneficios con una justicia transparente y medible."
+  },
+  "close": {
+    "title": "¿Quieres ver cómo funciona en la práctica?",
+    "p1": "Únete a una rikma que ya existe, abre una nueva o, simplemente, forma parte de la comunidad de 1💗1.",
+    "ctaJoin": "Rikmas que buscan socios",
+    "ctaStart": "Abrir una rikma nueva",
+    "ctaWhy": "Por qué construimos esto"
+  },
+  "share": {
+    "title": "¿Te gustó? Compártelo",
+    "native": "Compartir",
+    "whatsapp": "WhatsApp",
+    "facebook": "Facebook",
+    "linkedin": "LinkedIn",
+    "x": "X",
+    "copy": "Copiar enlace",
+    "copied": "Enlace copiado ✓"
+  },
+  "sources": {
+    "title": "Fuentes",
+    "s1": "Gallup, State of the Global Workplace: 2025 Report.",
+    "s2": "Elizabeth Anderson, Private Government: How Employers Rule Our Lives (and Why We Don't Talk about It), Princeton University Press, 2017.",
+    "s3": "Hatim A. Rahman, Inside the Invisible Cage: How Algorithms Control Workers, University of California Press, 2024.",
+    "s4": "Daniel Kahneman & Amos Tversky, \"Prospect Theory: An Analysis of Decision under Risk\", Econometrica 47(2), 1979.",
+    "s5": "\"Good enough for now, safe enough to try\" - el principio de decisión por consentimiento de la sociocracia."
+  }
+}
