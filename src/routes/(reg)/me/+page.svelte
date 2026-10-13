@@ -63,6 +63,15 @@
   let error1 = null;
   let addpic = $state(0);
   let addP = $state(false);
+  /** The creation form was opened prefilled from an assistant draft. */
+  let baciDrafted = $state(false);
+  /** Leave the creation form — and drop ?action=createproject, or a refresh would reopen it. */
+  function closeCreate() {
+    addP = false;
+    if (page.url.searchParams.has('action')) {
+      goto('/me', { replaceState: true, noScroll: true, keepFocus: true });
+    }
+  }
   let st = $state(0);
   let stylef = $state('31px');
   let meData = $state(data.meData);
@@ -427,6 +436,7 @@
             timeToP: draft.profit ?? s.timeToP,
             ont: draft.ont ?? s.ont
           }));
+          baciDrafted = true;
         } else if (params.has('draft')) {
           // Opening an empty form as if it were the prepared one is exactly the
           // silent loss this replaced — say so.
@@ -925,14 +935,7 @@
       </div>
     </div>
   {:else if addP == true}
-    <button
-      title={$t('pages.me.cencel')}
-      onclick={() => (addP = false)}
-      style="margin: 0 auto;"
-      class=" hover:bg-barbi text-barbi hover:text-gold font-bold p-0.5 rounded-full"
-      ><Close /></button
-    >
-    <Addnew userName_value={meData.username} />
+    <Addnew userName_value={meData.username} drafted={baciDrafted} onBack={closeCreate} />
   {/if}
   <!-- המשימות שסיימתי-->
 {/if}
