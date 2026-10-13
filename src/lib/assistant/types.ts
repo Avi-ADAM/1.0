@@ -119,3 +119,11 @@ export const LIMITS = {
   opsPerCall: 60,
   revisions: 30
 } as const;
+
+/** `matanot.kindOf`. A per-person price is `total` with an unlimited quantity. */
+export const PRODUCT_KINDOF = ['total', 'unlimited', 'daily', 'monthly', 'yearly'] as const;
+/** What createResource / a recipe line accept. */
+export const RESOURCE_KINDOF = ['total', 'monthly', 'yearly', 'perUnit', 'rent'] as const;
+/** The rikma's consent clock, as the creation form (`baci.svelte`) offers it. */
+export const RESTIMES = ['feh', 'sth', 'nsh', 'sevend'] as const;
+export const DEFAULT_RESTIME = 'feh';

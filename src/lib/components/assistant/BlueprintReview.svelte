@@ -4,23 +4,34 @@
    * (docs/inprogress/PLAN_AI_SIGNUP_CONCIERGE.md §4.5).
    *
    * An agent (or the site) drafted the rikma — products first — into an
-   * assistant session. Nothing exists yet. Here the owner sees every row, fixes
-   * names, prices and search words in place, unticks what they do not want
-   * now, and creates the rest with ONE click. The click runs
-   * `materializeRikmaBlueprint`, which calls the same actions the forms do, so
-   * any vote a row needs in a rikma with several members still happens.
+   * assistant session. Nothing exists yet. Here the owner sees every row and
+   * every field exactly as it will be created, opens any row to its full detail
+   * (a mission's description, hours × rate, roles, skills…), fixes what is
+   * wrong, unticks what they do not want now, and creates the rest with ONE
+   * click. The click runs `materializeRikmaBlueprint`, which calls the same
+   * actions the forms do, so any vote a row needs in a rikma with several
+   * members still happens.
    *
-   * Inline edits travel as ops with the click, so the draft the agent sees
-   * afterwards is exactly what was created.
+   * Edits are the same ops an agent sends. "Save" writes them through
+   * `setAssistantItems` right away, so the agent the owner is talking to sees
+   * them; whatever is still unsaved travels with the click. Both carry the
+   * version this screen shows, so a draft changed meanwhile is a conflict, not
+   * an overwrite.
    */
   import { t } from '$lib/translations';
   import { executeAction } from '$lib/client/actionClient';
   import { untrack } from 'svelte';
   import Button from '$lib/celim/ui/button.svelte';
+  import BlueprintRowDetail from './BlueprintRowDetail.svelte';
+  import BlueprintRikmaFields from './BlueprintRikmaFields.svelte';
+  import { effectiveSpec, fieldOps, rowOps, rowValue } from '$lib/assistant/reviewEdits';
 
   /**
    * @typedef {{ key: string, group: string, label: string, status: string,
    *   why?: string, spec?: Record<string, any>, createdRef?: { type: string, id: string } }} Row
+   * @typedef {import('$lib/assistant/reviewEdits').RowEdit} RowEdit
+   * @typedef {import('$lib/assistant/reviewEdits').FieldEdits} FieldEdits
+   * @typedef {import('$lib/assistant/reviewEdits').Raw} Raw
    * @typedef {Object} Props
    * @property {{ sessionId: string, version: number, projectId: string|null, projectName: string|null,
    *   fields: Record<string, any>, items: Row[] }} session
@@ -44,28 +55,50 @@
     return sel;
   }
 
-  // Initial values only: the page remounts this screen when the draft's version changes.
+  // Initial values only: the page remounts this screen when the draft changes
+  // underneath it. A save from here moves `draft` forward in place.
+  /** @type {{ version: number, fields: Record<string, any>, items: Row[] }} */
+  let draft = $state.raw(
+    untrack(() => ({ version: session.version, fields: session.fields ?? {}, items: session.items }))
+  );
   let selected = $state(untrack(() => initialSelection(session.items)));
-  /** @type {Record<string, { label?: string, price?: string, keywords?: string, categories?: string, holder?: string }>} */
+  /** @type {Record<string, RowEdit>} */
   let edits = $state({});
-  let rikmaName = $state(untrack(() => String(session.fields?.name ?? '')));
+  /** @type {FieldEdits} */
+  let fieldEdits = $state({});
+  /** @type {Record<string, boolean>} */
+  let open = $state({});
   let busy = $state(false);
+  let saving = $state(false);
   let error = $state('');
+  /** @type {'' | 'saved' | 'partial'} */
+  let saveNote = $state('');
   /** @type {any} */
   let result = $state(null);
 
-  let byKey = $derived(new Map(session.items.map((row) => [row.key, row])));
+  /**
+   * The first HTML the rich editor reports for a description is the stored one
+   * in the editor's own normal form — not an edit. Kept per row and field for
+   * the life of the screen, so closing and reopening a row does not lose it.
+   * @type {Record<string, string>}
+   */
+  const htmlBase = {};
+
+  let byKey = $derived(new Map(draft.items.map((row) => [row.key, row])));
   let grouped = $derived(
-    GROUPS.map((group) => ({ group, rows: session.items.filter((row) => row.group === group) })).filter(
+    GROUPS.map((group) => ({ group, rows: draft.items.filter((row) => row.group === group) })).filter(
       (g) => g.rows.length
     )
   );
-  let selectedCount = $derived(session.items.filter((row) => selected[row.key] && !isDone(row)).length);
+  let selectedCount = $derived(draft.items.filter((row) => selected[row.key] && !isDone(row)).length);
   let isNew = $derived(!session.projectId);
+  let currency = $derived(String(draft.fields?.currency ?? '').toUpperCase());
+  let pending = $derived(buildOps());
+  let locked = $derived(!!result || busy || saving);
 
   /** The product a ticked recipe row will be created inside, if any. */
   function partOf(/** @type {Row} */ row) {
-    for (const p of session.items) {
+    for (const p of draft.items) {
       if (p.group !== 'products' || !selected[p.key]) continue;
       const r = p.spec?.recipe;
       if (r?.missionKeys?.includes(row.key) || r?.resourceKeys?.includes(row.key)) return p.label;
@@ -79,9 +112,16 @@
     return keys.map((k) => byKey.get(k)?.label).filter(Boolean);
   }
 
+  /** The rows a partner will hold. */
+  function bringsOf(/** @type {Row} */ partner) {
+    return draft.items
+      .filter((it) => it.spec?.holder === 'partner' && it.spec?.partnerKey === partner.key)
+      .map((it) => it.label);
+  }
+
   /** Who does it once created — the owner's flip on this screen wins over the draft. */
   function holderOf(/** @type {Row} */ row) {
-    return edits[row.key]?.holder ?? row.spec?.holder ?? 'open';
+    return edits[row.key]?.spec?.holder ?? row.spec?.holder ?? 'open';
   }
 
   function holderText(/** @type {Row} */ row) {
@@ -94,12 +134,14 @@
     return $t('rikmaImport.holder.open');
   }
 
+  const specOf = (/** @type {Row} */ row) => effectiveSpec(/** @type {any} */ (row), edits[row.key]);
+
   /**
    * What the price is for — a monthly rent is typed per month, never as a
    * total. Empty for a one-off price.
    */
   function periodText(/** @type {Row} */ row) {
-    switch (row.spec?.kindOf) {
+    switch (specOf(row).kindOf) {
       case 'monthly':
         return $t('rikmaImport.row.period.monthly');
       case 'yearly':
@@ -115,63 +157,100 @@
     }
   }
 
-  /** Record one inline fix; a fresh object each time so the edit stays reactive. */
-  function setEdit(/** @type {string} */ key, /** @type {'label'|'price'|'keywords'|'categories'|'holder'} */ field, /** @type {string} */ value) {
-    edits[key] = { ...(edits[key] ?? {}), [field]: value };
+  /** The closed row's one-line sum: hours × rate = value. */
+  function valueLine(/** @type {Row} */ row) {
+    const v = rowValue(row.group, specOf(row));
+    if (!v) return '';
+    const fmt = (/** @type {number} */ n) => n.toLocaleString(undefined, { maximumFractionDigits: 2 });
+    return $t('rikmaImport.row.calc', { left: fmt(v.left), right: fmt(v.right), value: fmt(v.value) });
   }
 
-  /** "a, b ,, c" → ['a', 'b', 'c'] */
-  const splitList = (/** @type {string} */ s) =>
-    s
-      .split(',')
-      .map((w) => w.trim())
-      .filter(Boolean);
+  /** Record one fix; a fresh object each time so the edit stays reactive. `undefined` takes it back. */
+  function setSpecEdit(/** @type {string} */ key, /** @type {string} */ field, /** @type {Raw | undefined} */ value) {
+    const spec = { ...(edits[key]?.spec ?? {}) };
+    if (value === undefined) delete spec[field];
+    else spec[field] = value;
+    edits[key] = { ...(edits[key] ?? {}), spec };
+    saveNote = '';
+  }
 
-  /** The owner's inline fixes, as the same ops an agent would send. */
+  function setLabel(/** @type {string} */ key, /** @type {string} */ value) {
+    edits[key] = { ...(edits[key] ?? {}), label: value };
+    saveNote = '';
+  }
+
+  /** The rich editor's report: its first one is the baseline, a return to it is no edit. */
+  function setHtml(/** @type {string} */ key, /** @type {string} */ field, /** @type {string} */ html) {
+    const id = `${key}.${field}`;
+    if (!(id in htmlBase)) {
+      htmlBase[id] = html;
+      return;
+    }
+    const current = edits[key]?.spec?.[field];
+    if (html === htmlBase[id]) {
+      if (current !== undefined) setSpecEdit(key, field, undefined);
+    } else if (current !== html) {
+      setSpecEdit(key, field, html);
+    }
+  }
+
+  function setField(/** @type {keyof FieldEdits} */ field, /** @type {string | boolean} */ value) {
+    fieldEdits = { ...fieldEdits, [field]: value };
+    saveNote = '';
+  }
+
+  /** The owner's fixes, as the same ops an agent would send. */
   function buildOps() {
     /** @type {any[]} */
-    const ops = [];
-    if (isNew && rikmaName.trim() && rikmaName.trim() !== String(session.fields?.name ?? '')) {
-      ops.push({ op: 'setField', field: 'name', value: rikmaName.trim() });
-    }
+    const ops = isNew ? fieldOps(draft.fields, fieldEdits) : [];
     for (const [key, e] of Object.entries(edits)) {
       const row = byKey.get(key);
       if (!row || isDone(row)) continue;
-      if (e.label !== undefined && e.label.trim() && e.label.trim() !== row.label) {
-        ops.push({ op: 'rename', key, label: e.label.trim() });
-      }
-      /** @type {Record<string, any>} */
-      const spec = {};
-      if (e.price !== undefined) {
-        const n = Number(String(e.price).replace(',', '.'));
-        spec.price = e.price.trim() === '' ? null : Number.isFinite(n) && n >= 0 ? n : undefined;
-        if (spec.price === undefined) delete spec.price;
-        else if (row.group === 'products') spec.pricingMode = spec.price === null ? 'quote' : 'fixed';
-      }
-      if (e.keywords !== undefined) {
-        const words = splitList(e.keywords);
-        spec.keywords = words.length ? words : null;
-      }
-      if (e.categories !== undefined) {
-        const domains = splitList(e.categories).slice(0, 3);
-        spec.categories = domains.length ? domains : null;
-      }
-      if (e.holder !== undefined && e.holder !== (row.spec?.holder ?? 'open')) spec.holder = e.holder;
-      if (Object.keys(spec).length) ops.push({ op: 'setSpec', key, spec });
+      ops.push(...rowOps(/** @type {any} */ (row), e));
     }
     return ops;
   }
 
+  /** Write the pending fixes into the draft now, where the agent reads it. */
+  async function save() {
+    if (locked || !pending.length) return;
+    saving = true;
+    error = '';
+    saveNote = '';
+    const res = await executeAction(
+      'setAssistantItems',
+      { sessionId: session.sessionId, expectedVersion: draft.version, ops: pending, via: 'site' },
+      { showErrorToast: false }
+    );
+    saving = false;
+    if (!res?.success) {
+      error = res?.error?.message || $t('rikmaImport.save.error');
+      return;
+    }
+    if (res.data?.conflict) {
+      await onConflict?.();
+      return;
+    }
+    draft = {
+      version: res.data.version ?? draft.version,
+      fields: res.data.fields ?? {},
+      items: res.data.items ?? draft.items
+    };
+    edits = {};
+    fieldEdits = {};
+    saveNote = res.data.rejected?.length ? 'partial' : 'saved';
+  }
+
   async function create() {
-    if (busy || selectedCount === 0) return;
+    if (locked || selectedCount === 0) return;
     busy = true;
     error = '';
     const res = await executeAction(
       'materializeRikmaBlueprint',
       {
         sessionId: session.sessionId,
-        expectedVersion: session.version,
-        selectedKeys: session.items.filter((row) => selected[row.key] && !isDone(row)).map((row) => row.key),
+        expectedVersion: draft.version,
+        selectedKeys: draft.items.filter((row) => selected[row.key] && !isDone(row)).map((row) => row.key),
         ops: buildOps(),
         via: 'site'
       },
@@ -243,8 +322,8 @@
   <header class="flex flex-col gap-1">
     <div class="flex flex-wrap items-center gap-2">
       <h1 class="text-2xl font-bold">{$t('rikmaImport.title')}</h1>
-      {#if session.fields?.track}
-        <span class="text-xs px-2 py-0.5 rounded-full bg-barbi/15">{$t(`rikmaImport.track.${session.fields.track}`)}</span>
+      {#if draft.fields?.track}
+        <span class="text-xs px-2 py-0.5 rounded-full bg-barbi/15">{$t(`rikmaImport.track.${draft.fields.track}`)}</span>
       {/if}
     </div>
     <p class="text-sm text-surfaceMuted">
@@ -273,13 +352,7 @@
   </header>
 
   {#if isNew}
-    <label class="flex flex-col gap-1 text-sm">
-      <span class="font-semibold">{$t('rikmaImport.field.name')}</span>
-      <input class="rounded-xl border border-barbi/40 p-2 bg-surface2 text-surfaceInk" bind:value={rikmaName} disabled={!!result} />
-    </label>
-    {#if session.fields?.publicDescription}
-      <p class="text-sm italic text-surfaceMuted">{session.fields.publicDescription}</p>
-    {/if}
+    <BlueprintRikmaFields fields={draft.fields} edits={fieldEdits} readonly={!!result} onField={setField} />
   {/if}
 
   {#each grouped as { group, rows } (group)}
@@ -289,6 +362,7 @@
         {#each rows as row (row.key)}
           {@const done = isDone(row)}
           {@const inside = !done && selected[row.key] ? partOf(row) : null}
+          {@const sum = valueLine(row)}
           <li
             class="rounded-xl border p-3 flex gap-3 {done
               ? 'border-green-500/50 bg-green-500/10'
@@ -313,7 +387,7 @@
                   aria-label={$t('rikmaImport.row.name')}
                   value={edits[row.key]?.label ?? row.label}
                   disabled={!!result}
-                  oninput={(e) => setEdit(row.key, 'label', e.currentTarget.value)}
+                  oninput={(e) => setLabel(row.key, e.currentTarget.value)}
                 />
               {/if}
 
@@ -335,12 +409,12 @@
                     title={$t('rikmaImport.holder.toggle')}
                     aria-label="{holderText(row)} · {$t('rikmaImport.holder.toggle')}"
                     disabled={!!result}
-                    onclick={() => setEdit(row.key, 'holder', holderOf(row) === 'me' ? 'open' : 'me')}
+                    onclick={() => setSpecEdit(row.key, 'holder', holderOf(row) === 'me' ? 'open' : 'me')}
                   >
                     {holderText(row)} ⇄
                   </button>
                 {/if}
-                {#if group === 'rikmaMissions' && row.spec?.recurring === true}
+                {#if group === 'rikmaMissions' && specOf(row).recurring === true}
                   <span class="px-2 py-0.5 rounded-full bg-surface2 border border-surfaceLine">{$t('rikmaImport.row.recurring')}</span>
                 {/if}
                 {#if inside}
@@ -352,7 +426,14 @@
                   </span>
                 {/if}
                 {#if group === 'partners'}
-                  <span>{row.spec?.email ?? $t('rikmaImport.partner.noEmail')}</span>
+                  <span dir="ltr">{specOf(row).email ?? $t('rikmaImport.partner.noEmail')}</span>
+                {/if}
+                {#if sum}
+                  <span class="px-2 py-0.5 rounded-full bg-gold/15 border border-gold/40 font-semibold" data-testid="row-sum">
+                    <span dir="ltr">{sum}</span>
+                    {currency}
+                    {#if group === 'rikmaMissions' && specOf(row).recurring === true}{$t('rikmaImport.row.period.monthly')}{/if}
+                  </span>
                 {/if}
               </div>
 
@@ -363,11 +444,11 @@
                     class="w-28 rounded-lg border border-barbi/30 p-1 bg-surface2 text-surfaceInk placeholder:text-surfaceMuted"
                     inputmode="decimal"
                     placeholder={$t('rikmaImport.row.priceOnRequest')}
-                    value={edits[row.key]?.price ?? (row.spec?.price ?? '')}
+                    value={edits[row.key]?.spec?.price ?? (row.spec?.price ?? '')}
                     disabled={!!result}
-                    oninput={(e) => setEdit(row.key, 'price', e.currentTarget.value)}
+                    oninput={(e) => setSpecEdit(row.key, 'price', e.currentTarget.value)}
                   />
-                  {#if session.fields?.currency}<span>{session.fields.currency}</span>{/if}
+                  {#if row.spec?.currency || currency}<span>{row.spec?.currency ?? currency}</span>{/if}
                   {#if periodText(row)}<span class="font-semibold">{periodText(row)}</span>{/if}
                 </label>
               {/if}
@@ -377,9 +458,9 @@
                   <span>{$t('rikmaImport.row.keywords')}</span>
                   <input
                     class="rounded-lg border border-barbi/30 p-1 bg-surface2 text-surfaceInk"
-                    value={edits[row.key]?.keywords ?? (row.spec?.keywords ?? []).join(', ')}
+                    value={edits[row.key]?.spec?.keywords ?? (row.spec?.keywords ?? []).join(', ')}
                     disabled={!!result}
-                    oninput={(e) => setEdit(row.key, 'keywords', e.currentTarget.value)}
+                    oninput={(e) => setSpecEdit(row.key, 'keywords', e.currentTarget.value)}
                   />
                   <span class="text-xs text-surfaceMuted">{$t('rikmaImport.row.keywordsHint')}</span>
                 </label>
@@ -387,12 +468,36 @@
                   <span>{$t('rikmaImport.row.categories')}</span>
                   <input
                     class="rounded-lg border border-barbi/30 p-1 bg-surface2 text-surfaceInk"
-                    value={edits[row.key]?.categories ?? (row.spec?.categories ?? []).join(', ')}
+                    value={edits[row.key]?.spec?.categories ?? (row.spec?.categories ?? []).join(', ')}
                     disabled={!!result}
-                    oninput={(e) => setEdit(row.key, 'categories', e.currentTarget.value)}
+                    oninput={(e) => setSpecEdit(row.key, 'categories', e.currentTarget.value)}
                   />
                   <span class="text-xs text-surfaceMuted">{$t('rikmaImport.row.categoriesHint')}</span>
                 </label>
+              {/if}
+
+              <button
+                type="button"
+                class="self-start text-sm underline text-surfaceInk"
+                aria-expanded={!!open[row.key]}
+                aria-controls="detail-{row.key}"
+                onclick={() => (open[row.key] = !open[row.key])}
+              >
+                {open[row.key] ? $t('rikmaImport.row.hideDetails') : $t('rikmaImport.row.details')}
+                <span aria-hidden="true">{open[row.key] ? '▴' : '▾'}</span>
+              </button>
+              {#if open[row.key]}
+                <div id="detail-{row.key}">
+                  <BlueprintRowDetail
+                    {row}
+                    edit={edits[row.key]}
+                    readonly={done || !!result}
+                    currency={row.spec?.currency ?? currency}
+                    brings={group === 'partners' ? bringsOf(row) : []}
+                    onSpec={(field, raw) => setSpecEdit(row.key, field, raw)}
+                    onHtml={(field, html) => setHtml(row.key, field, html)}
+                  />
+                </div>
               {/if}
             </div>
           </li>
@@ -436,17 +541,38 @@
       {/if}
     </div>
   {:else}
-    <footer class="sticky bottom-0 flex items-center justify-between gap-3 rounded-2xl border border-barbi/40 bg-surface p-3">
-      <span class="text-sm">{$t('rikmaImport.selectedCount', { count: selectedCount })}</span>
-      <!-- The label is inherited text on the gold ramp, which stays pale in every mode: --ramp-ink. -->
-      <Button
-        class="text-[color:var(--ramp-ink,#16131b)]"
-        onClick={create}
-        disabled={busy || selectedCount === 0}
-        loading={busy}
-      >
-        {busy ? $t('rikmaImport.creating') : $t('rikmaImport.submit', { count: selectedCount })}
-      </Button>
+    <footer class="sticky bottom-0 flex flex-col gap-2 rounded-2xl border border-barbi/40 bg-surface p-3">
+      {#if pending.length || saveNote}
+        <div class="flex flex-wrap items-center justify-between gap-2 text-sm" role="status">
+          {#if pending.length}
+            <span class="text-surfaceMuted">{$t('rikmaImport.save.pending', { count: pending.length })}</span>
+            <button
+              type="button"
+              class="rounded-full border border-barbi/50 px-3 py-1 font-semibold hover:bg-barbi/10 disabled:opacity-60"
+              disabled={locked}
+              onclick={save}
+            >
+              {saving ? $t('rikmaImport.save.saving') : $t('rikmaImport.save.button')}
+            </button>
+          {:else if saveNote === 'saved'}
+            <span class="text-green-700 dark:text-green-300">✓ {$t('rikmaImport.save.saved')}</span>
+          {:else if saveNote === 'partial'}
+            <span class="text-amber-700 dark:text-amber-300">{$t('rikmaImport.save.partial')}</span>
+          {/if}
+        </div>
+      {/if}
+      <div class="flex items-center justify-between gap-3">
+        <span class="text-sm">{$t('rikmaImport.selectedCount', { count: selectedCount })}</span>
+        <!-- The label is inherited text on the gold ramp, which stays pale in every mode: --ramp-ink. -->
+        <Button
+          class="text-[color:var(--ramp-ink,#16131b)]"
+          onClick={create}
+          disabled={locked || selectedCount === 0}
+          loading={busy}
+        >
+          {busy ? $t('rikmaImport.creating') : $t('rikmaImport.submit', { count: selectedCount })}
+        </Button>
+      </div>
     </footer>
   {/if}
 </section>

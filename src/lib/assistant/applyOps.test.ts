@@ -198,6 +198,20 @@ describe('setField', () => {
     expect(r.rejected[0].reason).toBe('unknownField');
   });
 
+  it('a website is an http(s) address, never a script', () => {
+    const r = applyOps(
+      { items: [] },
+      [
+        { op: 'setField', field: 'linkToWebsite', value: 'javascript:alert(1)' },
+        { op: 'setField', field: 'linkToWebsite', value: 42 },
+        { op: 'setField', field: 'linkToWebsite', value: 'https://shaked.co.il' }
+      ],
+      { kind: 'rikma' }
+    );
+    expect(r.rejected.map((x) => x.reason)).toEqual(['invalidValue', 'invalidValue']);
+    expect(r.state.fields).toEqual({ linkToWebsite: 'https://shaked.co.il' });
+  });
+
   it('a profile has no fields', () => {
     const r = applyOps(profile, [{ op: 'setField', field: 'name', value: 'x' }], { kind: 'profile' });
     expect(r.rejected[0].reason).toBe('unknownField');

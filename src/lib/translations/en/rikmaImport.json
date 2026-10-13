@@ -8,7 +8,23 @@
     "idea": "Idea"
   },
   "field": {
-    "name": "Rikma name"
+    "name": "Rikma name",
+    "heading": "The rikma itself",
+    "publicDescription": "About the rikma",
+    "descripFor": "Who we are looking for",
+    "linkToWebsite": "Website",
+    "linkInvalid": "An address starting with https:// or http://",
+    "vals": "Values",
+    "valsHint": "Up to 8, comma-separated.",
+    "place": "Place",
+    "pinned": "There is also a point on the map - it is kept as it is.",
+    "online": "Works online",
+    "currency": "Currency",
+    "currencyHint": "A 3-letter code (ILS, USD, EUR)",
+    "restime": "Consent time",
+    "restimeHint": "How long a proposal stays open before silence counts as agreement.",
+    "invalid": "This value is not valid",
+    "tooLong": "Too long"
   },
   "groups": {
     "products": "Products - what the rikma sells",
@@ -41,7 +57,33 @@
     "keywords": "Words people will search for",
     "keywordsHint": "Comma-separated - how a customer would describe the need, not the product's name. This is how the concierge finds you.",
     "categories": "Domains",
-    "categoriesHint": "Up to 3, comma-separated (e.g. events, food). Linked to the domains that already exist on the site; the concierge compares them with every wish."
+    "categoriesHint": "Up to 3, comma-separated (e.g. events, food). Linked to the domains that already exist on the site; the concierge compares them with every wish.",
+    "details": "All details",
+    "hideDetails": "Hide details",
+    "descrip": "Description",
+    "descripPlaceholder": "What needs doing, and how we know it is done",
+    "noDescrip": "No description",
+    "desc": "Product description",
+    "hours": "Hours (total)",
+    "hoursMonthly": "Hours per month",
+    "ratePerHour": "Rate per hour",
+    "recurringToggle": "Recurs every month",
+    "value": "Value",
+    "calc": "{{left}} × {{right}} = {{value}}",
+    "noValue": "The value is worked out once there are hours and a rate",
+    "roles": "Roles",
+    "skills": "Skills",
+    "workways": "Ways of working",
+    "listHint": "Comma-separated.",
+    "kindOfLabel": "The price is",
+    "quantity": "Quantity",
+    "quant": "Units for sale",
+    "unlimited": "Unlimited quantity",
+    "isOnline": "Online",
+    "email": "Email",
+    "brings": "Brings: {{names}}",
+    "invalid": "This value is not valid",
+    "tooLong": "Too long"
   },
   "partner": {
     "noEmail": "No email"
@@ -95,5 +137,28 @@
     "otherAccount": "This rikma was prepared for {{email}}. To receive it, sign in to that address's account and open the link again.",
     "unverified": "We could not check this link right now. Try again in a moment.",
     "home": "To my heart"
+  },
+  "kindOf": {
+    "total": "Total price",
+    "unlimited": "Per person, unlimited",
+    "daily": "Per day",
+    "monthly": "Per month",
+    "yearly": "Per year",
+    "perUnit": "Per unit",
+    "rent": "For the rental period"
+  },
+  "restime": {
+    "feh": "48 hours",
+    "sth": "72 hours",
+    "nsh": "96 hours",
+    "sevend": "A week"
+  },
+  "save": {
+    "pending": "{{count}} unsaved changes - they are also saved when you click \"Create\".",
+    "button": "Save changes",
+    "saving": "Saving…",
+    "saved": "Saved - your assistant sees the changes too.",
+    "partial": "Some changes were not accepted. Check the rows and try again.",
+    "error": "Saving failed. Try again in a moment."
   }
 }

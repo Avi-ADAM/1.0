@@ -323,6 +323,15 @@ export function applyOps(
           return reject(op, 'unknownField');
         }
         if (op.value !== null && !isJsonSafe(op.value)) return reject(op, 'invalidValue');
+        // Rendered as a link on the rikma page: http(s) only, as the blueprint
+        // schema demands of an agent's first draft.
+        if (
+          op.field === 'linkToWebsite' &&
+          op.value != null &&
+          (typeof op.value !== 'string' || op.value.length > 500 || !/^https?:\/\/\S+$/i.test(op.value.trim()))
+        ) {
+          return reject(op, 'invalidValue');
+        }
         if (op.value === null || op.value === undefined) delete fields[op.field];
         else fields[op.field] = op.value;
         return applied.push(op);

@@ -14,18 +14,21 @@
  */
 
 import { z } from 'zod';
-import { LIMITS, type AssistantItem, type AssistantState, type ItemOrigin } from './types.js';
+import {
+  LIMITS,
+  PRODUCT_KINDOF,
+  RESOURCE_KINDOF,
+  RESTIMES,
+  type AssistantItem,
+  type AssistantState,
+  type ItemOrigin
+} from './types.js';
 
 export const TRACKS = ['business', 'partnership', 'idea'] as const;
 export type Track = (typeof TRACKS)[number];
 
-/** `matanot.kindOf`. A per-person price is `total` with an unlimited quantity. */
-export const PRODUCT_KINDOF = ['total', 'unlimited', 'daily', 'monthly', 'yearly'] as const;
-/** What createResource / a recipe line accept. */
-export const RESOURCE_KINDOF = ['total', 'monthly', 'yearly', 'perUnit', 'rent'] as const;
-/** The rikma's consent clock, as the creation form (`baci.svelte`) offers it. */
-export const RESTIMES = ['feh', 'sth', 'nsh', 'sevend'] as const;
-export const DEFAULT_RESTIME = 'feh';
+// Shared with the review screen, which must not pull zod in.
+export { PRODUCT_KINDOF, RESOURCE_KINDOF, RESTIMES, DEFAULT_RESTIME } from './types.js';
 
 const text = (max: number) => z.string().trim().max(max);
 const name = z.string().trim().min(1).max(LIMITS.label);

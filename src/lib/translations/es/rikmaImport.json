@@ -8,7 +8,23 @@
     "idea": "Idea"
   },
   "field": {
-    "name": "Nombre de la rikma"
+    "name": "Nombre de la rikma",
+    "heading": "La rikma en sí",
+    "publicDescription": "Sobre la rikma",
+    "descripFor": "A quién buscamos",
+    "linkToWebsite": "Sitio web",
+    "linkInvalid": "Una dirección que empiece por https:// o http://",
+    "vals": "Valores",
+    "valsHint": "Hasta 8, separados por comas.",
+    "place": "Lugar",
+    "pinned": "También hay un punto en el mapa: se conserva tal cual.",
+    "online": "Funciona en línea",
+    "currency": "Moneda",
+    "currencyHint": "Un código de 3 letras (ILS, USD, EUR)",
+    "restime": "Tiempo de consentimiento",
+    "restimeHint": "Cuánto tiempo queda abierta una propuesta antes de que el silencio cuente como acuerdo.",
+    "invalid": "Este valor no es válido",
+    "tooLong": "Demasiado largo"
   },
   "groups": {
     "products": "Productos: lo que vende la rikma",
@@ -41,7 +57,33 @@
     "keywords": "Palabras con las que te buscarán",
     "keywordsHint": "Separadas por comas: cómo describiría un cliente su necesidad, no el nombre del producto. Así te encuentra el conserje.",
     "categories": "Ámbitos",
-    "categoriesHint": "Hasta 3, separados por comas (p. ej.: eventos, comida). Se vinculan a los ámbitos que ya existen en el sitio; el conserje los compara con cada deseo."
+    "categoriesHint": "Hasta 3, separados por comas (p. ej.: eventos, comida). Se vinculan a los ámbitos que ya existen en el sitio; el conserje los compara con cada deseo.",
+    "details": "Todos los detalles",
+    "hideDetails": "Ocultar detalles",
+    "descrip": "Descripción",
+    "descripPlaceholder": "Qué hay que hacer y cómo sabemos que está hecho",
+    "noDescrip": "Sin descripción",
+    "desc": "Descripción del producto",
+    "hours": "Horas (total)",
+    "hoursMonthly": "Horas al mes",
+    "ratePerHour": "Tarifa por hora",
+    "recurringToggle": "Se repite cada mes",
+    "value": "Valor",
+    "calc": "{{left}} × {{right}} = {{value}}",
+    "noValue": "El valor se calcula cuando hay horas y tarifa",
+    "roles": "Roles",
+    "skills": "Habilidades",
+    "workways": "Formas de trabajo",
+    "listHint": "Separados por comas.",
+    "kindOfLabel": "El precio es",
+    "quantity": "Cantidad",
+    "quant": "Unidades a la venta",
+    "unlimited": "Cantidad ilimitada",
+    "isOnline": "En línea",
+    "email": "Correo",
+    "brings": "Aporta: {{names}}",
+    "invalid": "Este valor no es válido",
+    "tooLong": "Demasiado largo"
   },
   "partner": {
     "noEmail": "Sin correo"
@@ -95,5 +137,28 @@
     "otherAccount": "Esta rikma se preparó para {{email}}. Para recibirla, inicia sesión con la cuenta de esa dirección y vuelve a abrir el enlace.",
     "unverified": "No pudimos comprobar este enlace ahora. Inténtalo de nuevo en un momento.",
     "home": "A mi corazón"
+  },
+  "kindOf": {
+    "total": "Precio total",
+    "unlimited": "Por persona, sin límite",
+    "daily": "Por día",
+    "monthly": "Por mes",
+    "yearly": "Por año",
+    "perUnit": "Por unidad",
+    "rent": "Por el período de alquiler"
+  },
+  "restime": {
+    "feh": "48 horas",
+    "sth": "72 horas",
+    "nsh": "96 horas",
+    "sevend": "Una semana"
+  },
+  "save": {
+    "pending": "{{count}} cambios sin guardar: también se guardan al pulsar «Crear».",
+    "button": "Guardar cambios",
+    "saving": "Guardando…",
+    "saved": "Guardado: tu asistente también ve los cambios.",
+    "partial": "Algunos cambios no se aceptaron. Revisa las filas e inténtalo de nuevo.",
+    "error": "No se pudo guardar. Inténtalo de nuevo en un momento."
   }
 }

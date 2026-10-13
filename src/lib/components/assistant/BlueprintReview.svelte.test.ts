@@ -11,8 +11,17 @@ import { readable } from 'svelte/store';
 vi.mock('$lib/translations', () => ({
   t: readable((key: string, payload?: Record<string, unknown>) =>
     payload ? `${key}:${Object.values(payload).join(',')}` : key
-  )
+  ),
+  // The rich editor that shows a description reads it.
+  isRtl: readable(true)
 }));
+
+// The editable description's formatting bubble pulls tippy.js, whose CJS build
+// does not load under vitest; the bubble is not what these tests are about.
+vi.mock('@tiptap/extension-bubble-menu', async () => {
+  const { Extension } = await import('@tiptap/core');
+  return { BubbleMenu: Extension.create({ name: 'bubbleMenu' }) };
+});
 
 const executeAction = vi.fn();
 vi.mock('$lib/client/actionClient', () => ({
@@ -44,9 +53,10 @@ describe('BlueprintReview', () => {
     const headings = getAllByRole('heading', { level: 2 })
       .filter((h) => !h.closest('button'))
       .map((h) => h.textContent);
-    expect(headings).toEqual(['rikmaImport.groups.products', 'rikmaImport.groups.rikmaMissions', 'rikmaImport.groups.rikmaResources']);
+    expect(headings).toEqual(['rikmaImport.field.heading', 'rikmaImport.groups.products', 'rikmaImport.groups.rikmaMissions', 'rikmaImport.groups.rikmaResources']);
 
-    const boxes = getAllByRole('checkbox') as HTMLInputElement[];
+    // The row boxes are the ones named after their row.
+    const boxes = (getAllByRole('checkbox') as HTMLInputElement[]).filter((b) => b.hasAttribute('aria-label'));
     expect(boxes.map((b) => [b.getAttribute('aria-label'), b.checked, b.disabled])).toEqual([
       ['סדנה', true, false],
       ['מגש', false, false],
@@ -60,13 +70,13 @@ describe('BlueprintReview', () => {
 
   it('creates only the ticked rows and sends inline fixes as ops', async () => {
     executeAction.mockResolvedValue({ success: true, data: { created: [{ key: 'i1' }], failed: [], invites: [], projectId: '77', proposals: { boards: 1 } } });
-    const { getAllByRole, getAllByLabelText, getByDisplayValue, findByText, getByRole } = render(BlueprintReview, { props: { session } });
+    const { getAllByLabelText, getByDisplayValue, findByText, getByRole } = render(BlueprintReview, { props: { session } });
 
     await fireEvent.input(getAllByLabelText('rikmaImport.row.name')[0], { target: { value: 'סדנת אפייה' } });
     await fireEvent.input(getByDisplayValue('180'), { target: { value: '200' } });
     await fireEvent.input(getByDisplayValue('אפייה'), { target: { value: 'אפייה, סדנה, baking' } });
     // Untick the mission: it will be kept as a proposal, not created.
-    await fireEvent.click(getAllByRole('checkbox')[2]);
+    await fireEvent.click(getByRole('checkbox', { name: 'הנחיה' }));
 
     await fireEvent.click(getByRole('button', { name: /rikmaImport.submit/ }));
 
@@ -130,3 +140,138 @@ describe('BlueprintReview', () => {
     expect(executeAction.mock.calls[0][1].ops).toEqual([{ op: 'setSpec', key: 'i3', spec: { holder: 'open' } }]);
   });
 });
+
+// Session 8 (2026-10-14): six missions whose description, hours and rate could
+// not be seen before creation, and rikma fields that surfaced only after it.
+describe('BlueprintReview — full detail before creation', () => {
+  const series = {
+    sessionId: '8',
+    version: 5,
+    projectId: null,
+    projectName: null,
+    fields: {
+      track: 'idea',
+      name: 'אני לא מסכים',
+      currency: 'ILS',
+      publicDescription: 'סדרה והפקה',
+      descripFor: 'במאית ותסריטאי',
+      linkToWebsite: 'https://example.org',
+      vals: ['כנות', 'הקשבה'],
+      restime: 'sth',
+      location: { hint: 'תל אביב', lat: 32.08, lng: 34.78 }
+    },
+    items: [
+      {
+        key: 'm1',
+        group: 'rikmaMissions',
+        label: 'כתיבת תסריט',
+        status: 'proposed',
+        spec: {
+          descrip: '<p>שלושה פרקים <strong>ראשונים</strong></p>',
+          hours: 40,
+          ratePerHour: 150,
+          roles: ['תסריטאי'],
+          skills: ['כתיבה'],
+          workways: ['מרחוק'],
+          holder: 'open'
+        }
+      },
+      { key: 'p1', group: 'partners', label: 'דנה', status: 'proposed', spec: { email: 'dana@example.org' } },
+      { key: 'm2', group: 'rikmaMissions', label: 'צילום', status: 'proposed', spec: { holder: 'partner', partnerKey: 'p1', hours: 10, ratePerHour: 200 } }
+    ]
+  };
+
+  it('shows every rikma field that createWeave will receive', () => {
+    const { getByDisplayValue, getByRole } = render(BlueprintReview, { props: { session: series } });
+    for (const v of ['אני לא מסכים', 'סדרה והפקה', 'במאית ותסריטאי', 'https://example.org', 'כנות, הקשבה', 'תל אביב', 'ILS']) {
+      expect(getByDisplayValue(v)).toBeTruthy();
+    }
+    expect((getByRole('combobox') as HTMLSelectElement).value).toBe('sth');
+  });
+
+  it('a mission row says hours × rate = value, and opens to its full detail', async () => {
+    const { getAllByTestId, getByRole, getByDisplayValue, getByTestId, getByText } = render(BlueprintReview, { props: { session: series } });
+    expect(getAllByTestId('row-sum')[0].textContent).toContain('rikmaImport.row.calc:40,150,6,000');
+
+    const toggle = detailsToggle(getByRole, 'כתיבת תסריט');
+    await fireEvent.click(toggle);
+    expect(toggle.getAttribute('aria-expanded')).toBe('true');
+    expect(getByTestId('row-detail')).toBeTruthy();
+    for (const v of ['40', '150', 'תסריטאי', 'כתיבה', 'מרחוק']) expect(getByDisplayValue(v)).toBeTruthy();
+    // The description renders as formatted text, not as its markup.
+    expect(getByText('ראשונים').tagName).toBe('STRONG');
+  });
+
+  it('edits in the detail travel as the same setSpec/setField ops', async () => {
+    executeAction.mockResolvedValue({ success: true, data: { created: [], failed: [], invites: [] } });
+    const { getByRole, getByDisplayValue, getByTestId } = render(BlueprintReview, { props: { session: series } });
+    await fireEvent.click(detailsToggle(getByRole, 'כתיבת תסריט'));
+    await fireEvent.input(getByDisplayValue('40'), { target: { value: '60' } });
+    await fireEvent.input(getByDisplayValue('כתיבה'), { target: { value: 'כתיבה, דרמה' } });
+    expect(getByTestId('row-value').textContent).toContain('rikmaImport.row.calc:60,150,9,000');
+    await fireEvent.input(getByDisplayValue('במאית ותסריטאי'), { target: { value: 'במאית' } });
+    // A script is not a website: left out of the ops, and said so.
+    await fireEvent.input(getByDisplayValue('https://example.org'), { target: { value: 'javascript:alert(1)' } });
+    expect(getByRole('alert').textContent).toContain('rikmaImport.field.linkInvalid');
+
+    await fireEvent.click(getByRole('button', { name: /rikmaImport\.submit/ }));
+    expect(executeAction.mock.calls[0][1].ops).toEqual([
+      { op: 'setField', field: 'descripFor', value: 'במאית' },
+      { op: 'setSpec', key: 'm1', spec: { hours: 60, skills: ['כתיבה', 'דרמה'] } }
+    ]);
+  });
+
+  it('a partner opens to the email and the rows they bring', async () => {
+    const { getByRole, getByDisplayValue, getByText } = render(BlueprintReview, { props: { session: series } });
+    await fireEvent.click(detailsToggle(getByRole, 'דנה'));
+    expect(getByDisplayValue('dana@example.org')).toBeTruthy();
+    expect(getByText('rikmaImport.row.brings:צילום')).toBeTruthy();
+  });
+
+  it('"save" writes the edits into the session now, and the click then carries the new version', async () => {
+    executeAction.mockResolvedValueOnce({
+      success: true,
+      data: { ...series, version: 6, fields: { ...series.fields, descripFor: 'במאית' }, applied: 1, rejected: [], conflict: false }
+    });
+    const { getByRole, getByDisplayValue, findByText } = render(BlueprintReview, { props: { session: series } });
+    await fireEvent.input(getByDisplayValue('במאית ותסריטאי'), { target: { value: 'במאית' } });
+    await fireEvent.click(getByRole('button', { name: 'rikmaImport.save.button' }));
+
+    expect(executeAction.mock.calls[0]).toEqual([
+      'setAssistantItems',
+      { sessionId: '8', expectedVersion: 5, ops: [{ op: 'setField', field: 'descripFor', value: 'במאית' }], via: 'site' },
+      { showErrorToast: false }
+    ]);
+    expect(await findByText(/rikmaImport\.save\.saved/)).toBeTruthy();
+
+    executeAction.mockResolvedValueOnce({ success: true, data: { created: [], failed: [], invites: [] } });
+    await fireEvent.click(getByRole('button', { name: /rikmaImport\.submit/ }));
+    expect(executeAction.mock.calls[1][1]).toMatchObject({ expectedVersion: 6, ops: [] });
+  });
+
+  it('a save that meets a newer draft hands back to the page', async () => {
+    executeAction.mockResolvedValue({ success: true, data: { ...series, version: 9, conflict: true } });
+    const onConflict = vi.fn();
+    const { getByRole, getByDisplayValue } = render(BlueprintReview, { props: { session: series, onConflict } });
+    await fireEvent.input(getByDisplayValue('במאית ותסריטאי'), { target: { value: 'במאית' } });
+    await fireEvent.click(getByRole('button', { name: 'rikmaImport.save.button' }));
+    expect(onConflict).toHaveBeenCalled();
+  });
+
+  it('a created row opens read-only', async () => {
+    const created = {
+      ...series,
+      items: [{ ...series.items[0], status: 'applied', createdRef: { type: 'mission', id: '3' } }]
+    };
+    const { getByRole, getByDisplayValue } = render(BlueprintReview, { props: { session: created } });
+    await fireEvent.click(getByRole('button', { name: /rikmaImport\.row\.details/ }));
+    expect((getByDisplayValue('40') as HTMLInputElement).disabled).toBe(true);
+  });
+});
+
+/** The "details" toggle of the row with this name. */
+function detailsToggle(getByRole: (role: string, o?: any) => HTMLElement, label: string): HTMLElement {
+  const box = getByRole('checkbox', { name: label });
+  const li = box.closest('li') as HTMLElement;
+  return li.querySelector('button[aria-expanded]') as HTMLElement;
+}
