@@ -187,7 +187,12 @@
     "locationDone": "Listo",
     "byQuote": "Precio según el pedido (presupuesto)",
     "byQuoteHint": "Para una cesta de compras o un servicio de precio variable: el cliente escribe lo que necesita y respondes con un precio. No hace falta cargar cada artículo.",
-    "priceFrom": "Precio base / envío (opcional)"
+    "priceFrom": "Precio base / envío (opcional)",
+    "curveTitle": "Precio por participante según el tamaño del grupo",
+    "curveHint": "El ahorro llega a las participantes: el precio es siempre el costo dividido por el número de participantes, más el margen.",
+    "curveN": "Participantes",
+    "curvePrice": "Precio por participante",
+    "curveRises": "La participante n.º {{count}} añade una unidad y el precio sube para todas."
   },
   "resources": {
     "title": "Mis recursos",

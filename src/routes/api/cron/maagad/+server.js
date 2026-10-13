@@ -4,9 +4,12 @@
  * Hit this on a schedule (e.g. the same cron service that pings /api/cron) to:
  *   1. clusterRatsons     — aggregate open, un-pooled wishes into demand pools
  *                           (the concierge → maagad link: Ratson IS the wish),
- *   2. expireMaagadOffers — expire offers past their sign deadline.
+ *   2. expireMaagadOffers — expire offers past their sign deadline,
+ *   3. settleDeparturePrices — re-price every live departure of a product, let
+ *                           lapsed price consents go, tell what moved
+ *                           (PLAN_POOL_PRODUCT §4.2).
  *
- * Both run through /api/action with `isSer:true`; handleFetch injects the
+ * All run through /api/action with `isSer:true`; handleFetch injects the
  * internal secret on this same-origin server-side fetch, so the action layer
  * uses the admin token. Optional guard: if CRON_SECRET is set, the request must
  * carry `?key=<CRON_SECRET>` (so a public URL can't trigger clustering).
@@ -48,10 +51,12 @@ export async function GET({ url, fetch }) {
 
   const cluster = await runAction(fetch, 'clusterRatsons', { userId });
   const expire = await runAction(fetch, 'expireMaagadOffers', { userId });
+  const settle = await runAction(fetch, 'settleDeparturePrices', { userId });
 
   return json({
     ranAt: new Date().toISOString(),
     clusterRatsons: cluster.ok ? cluster.body?.data : { error: cluster.body?.error },
-    expireMaagadOffers: expire.ok ? expire.body?.data : { error: expire.body?.error }
+    expireMaagadOffers: expire.ok ? expire.body?.data : { error: expire.body?.error },
+    settleDeparturePrices: settle.ok ? settle.body?.data : { error: settle.body?.error }
   });
 }

@@ -4,15 +4,15 @@ export function calcDeadlineMs(restime: string): number {
   return (RESTIME_HOURS[restime] ?? 48) * 3600000;
 }
 
-const RESTIME_LABEL: Record<string, { he: string; en: string }> = {
-  feh: { he: 'יומיים (48 שעות)', en: '48 hours' },
-  sth: { he: 'שלושה ימים (72 שעות)', en: '72 hours' },
-  nsh: { he: 'ארבעה ימים (96 שעות)', en: '96 hours' },
-  sevend: { he: 'שבוע', en: 'one week' }
+const RESTIME_LABEL: Record<string, { he: string; en: string; ar: string }> = {
+  feh: { he: 'יומיים (48 שעות)', en: '48 hours', ar: 'يومين (48 ساعة)' },
+  sth: { he: 'שלושה ימים (72 שעות)', en: '72 hours', ar: 'ثلاثة أيام (72 ساعة)' },
+  nsh: { he: 'ארבעה ימים (96 שעות)', en: '96 hours', ar: 'أربعة أيام (96 ساعة)' },
+  sevend: { he: 'שבוע', en: 'one week', ar: 'أسبوع' }
 };
 
 /** Human-readable duration of the rikma's response time (restime). */
-export function restimeLabel(restime: string | null | undefined, lang: 'he' | 'en'): string {
+export function restimeLabel(restime: string | null | undefined, lang: 'he' | 'en' | 'ar'): string {
   return (RESTIME_LABEL[restime ?? 'feh'] ?? RESTIME_LABEL.feh)[lang];
 }
 
@@ -24,7 +24,7 @@ export function restimeLabel(restime: string | null | undefined, lang: 'he' | 'e
  */
 export function voteUrl(
   projectId: string | number,
-  kind: 'pendm' | 'pmash' | 'ask' | 'askm' | 'tosplit' | 'decision',
+  kind: 'pendm' | 'pmash' | 'ask' | 'askm' | 'tosplit' | 'decision' | 'fini',
   id: string | number
 ): string {
   return `/moach/${projectId}/votes/${kind}/${id}`;

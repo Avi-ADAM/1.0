@@ -40,7 +40,8 @@
     "changePassword": "Сменить пароль",
     "sendOfferToProvider": "Отправить предложение поставщику",
     "publishToCommunity": "Опубликовать для сообщества",
-    "toProfile": "В мой профиль"
+    "toProfile": "В мой профиль",
+    "view": "Открыть"
   },
   "labels": {
     "location": "Местоположение",

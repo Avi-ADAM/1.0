@@ -194,6 +194,10 @@ export function extractFiapp(userData: any): ApprovalData[] {
         // for them) and copies its files onto `what` above — so the card needs
         // both sides to show the member's full account of the work.
         saveLinks: approval.attributes.timer?.data?.attributes?.saveLinks ?? '',
+        // The member's whole note (`why` is a 250-char copy of it) and every
+        // sitting the hours were measured from — what a voter signs against.
+        saveText: approval.attributes.timer?.data?.attributes?.saveText ?? '',
+        timerIntervals: approval.attributes.timer?.data?.attributes?.timers ?? [],
         vots: approval.attributes.vots || [],
         timegramaId: approval.attributes.timegrama?.data?.id,
         timegramaDate: approval.attributes.timegrama?.data?.attributes?.date,

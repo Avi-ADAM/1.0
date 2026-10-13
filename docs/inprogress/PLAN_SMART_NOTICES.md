@@ -393,7 +393,7 @@ notification: { notice: { ani: 'askedcoin', fromParams: … }, channels: ['push'
 | **3** ✅ | (בוצע, §7.4 — ממתין לפריסת 1.0b) **אישור + הסתרה + deals:** `expectRound` בפעולות של §3.3; `approveSpec.js` שגם הקלפים משתמשים בו; 1.0b: `notice-dismissal` + `notice-pref`; actions `dismissNotice`/`restoreNotice`/`saveNoticePrefs`; הפעמון ב-`AppHeader` חוזר לחיים. | `configs/*`, `notices/approveSpec.js`, `../1.0b/src/api/notice-*`, `AppHeader.svelte`, `deals/+layout.server.ts` | אותם params כמו הקלף; סבב ישן ⇒ `roundMoved`; QA C-19 |
 | **4** ✅ | (בוצע, §7.5) hub: `NoticeList` במקום `ActionFeed`, משלב לב + משאלות + עסקאות. | `hub/+page.svelte`, `components/notices/*` | וידוא בדפדפן, מצב כהה, דסקטופ |
 | **5** ✅ | (בוצע, §7.6 — בלי שמירת milon) `levView: 'notices'` בלב; `milon` נקרא מ-`notice-pref`. | `levStores.ts`, `LevViewSwitch.svelte`, `lev/+page.svelte` | `cards.svelte.test.ts` |
-| **6** | ערוצים: בונה המשפטים בשרת, `NotificationConfig.notice`, deep-link חתום, הבריף. | `server/notifications/*`, `digest/compose.ts` | מבחני orchestrator |
+| **6** ◐ | (בוצע חלקית, §7.8) ערוצים: המשפט בשרת בשפת הנמען, `NotificationConfig.subject` + שני קישורים (עמוד ההצבעה / הלב) בכל ערוץ. נשאר: deep-link חתום, הבריף, `tellMatured`. | `server/notifications/*`, `digest/compose.ts` | מבחני orchestrator |
 | **7** *(אופציונלי)* | תמצית AI להערות חופשיות, cached לפי hash, דרך ה-governor. | `server/notices/gist.ts` | אותו טקסט ⇒ קריאה אחת למודל |
 
 שלבים 1–2 לבד כבר נותנים פעמון קריא בקונסיירז', בלי שום שינוי בשרת או ב-Strapi.
@@ -676,6 +676,47 @@ experiencing high demand"` (פעמיים) — עומס אצל המודל, לפנ
 **פער קטן:** מפתח ההתראה של הצבעה מה-hub הוא `v0`, ושל אותו פריט בלב — הסבב האמיתי.
 הסתרה מתוך תצוגת ההתראות בלב (`…:v2`) לא תסתיר אותו בתשובת הכלי (`…:v0`). ליישר כשה-feed
 של 85 יכלול את הסבב.
+
+---
+
+### 7.8 שלב 6 — התראות מפורטות עם שני קישורים (2026-10-14)
+
+בקשת המשתמש: ההתראות שנשלחות (פוש, טלגרם, מייל, toast) היו שטוחות — "יש בקשה חדשה
+לביצוע משימה בפרויקט" + קישור ל-`lev` כללי. עכשיו התראה על הצבעה אומרת **מה** מחכה,
+באותו משפט של תצוגת ההתראות בלב, ונותנת **את שני המקומות** לענות בהם — והקורא בוחר.
+
+**איך זה בנוי:**
+
+| קובץ | מה |
+|---|---|
+| `src/lib/notices/links.ts` | `NoticeSubject` (`kind` · `id` · `projectId` · `ani?`), `noticeSubject()` סלחני ל-ids חסרים, `subjectLinks()` → `{ rikma: /moach/<pid>/votes/<kind>/<id>, lev: /lev?focus=<ani>&project=<pid> }`, `levFocusHref` (גם `lev.ts`/`hub.ts` עברו אליו — כתיב אחד לקישור הלב) |
+| `src/lib/notices/subject.ts` | `subjectNoticeFrom(kind, data)` — טהור: אותם מפתחות `notices.lev.*` ואותם מספרים `lev.list.fact.*` כמו `lev.ts`, מהקריאה של השרת במקום מהקלפים המעובדים. הסבב העומד (הנגדית האחרונה) קודם לתנאים המקוריים |
+| qid `460noticeSubject` | שאילתה קלה אחת לכל הסוגים (`@include(if: $isX)`) + שם הרקמה; serviceAdmin בלבד, רצה בטוקן השירות |
+| `src/lib/server/notices/subjectNotice.ts` | `loadSubjectNotice` (אף פעם לא זורק — כשל ⇒ התבנית נשארת), `subjectBodies` (המשפט + המספרים + "ללא תגובה — יאושר אוטומטית: …" ב**חמש** שפות, שעון `Asia/Jerusalem`), `notifyLinks` (עם תוויות בחמש שפות) |
+| `NotificationConfig.subject` + `subjectText` | ה-config אומר על איזו הצבעה ההתראה; `replace` (ברירת מחדל — המשפט במקום גוף שטוח) · `before` (המשפט ואז הגוף — נגדית עם "8 במקום 5" ונימוק) · `links` (הגוף נשאר, רק קישורים — גוף שנכתב לנמען, למשל מממן שהשתיקה שלו **לא** מאשרת) |
+| `NotificationOrchestrator` | רק כש-intent הוא `consent`/`review` (תוצאה היא על הצבעה שנגמרה — הדף שלה עלול לא להיות). הכותרת נשארת של ה-action |
+
+**הערוצים — בכל אחד שני כפתורים, הראשון ברירת המחדל (עמוד ההצבעה ברקמה):**
+- **טלגרם:** `buttons: [{text, path}]` ל-`/api/ste` — שורת כפתור לכל קישור, נתיבים באתר בלבד; הטקסט עובר escape ל-HTML (שם עם `<` היה מפיל את כל ההודעה); `ar` בלי תווית קיבל כפתור ריק — עכשיו נופל לאנגלית.
+- **פוש:** `actions` ב-payload; ה-service worker מציג אותם ופותח את מה שנלחץ. **תוקן בדרך:** `client.openWindow` על לקוח לא מוגדר — לחיצה על פוש כשאין לשונית פתוחה לא פתחה כלום.
+- **מייל:** `SimpleNuti` מקבל `links` — כפתור מלא + כפתור מתאר, הגוף שומר שורות (`pre-line`), וגרסת טקסט עם הקישורים. (`PendJustCreated`/`MissionInvite` לא השתנו — יש להם קישור משלהם.)
+- **toast באתר:** כותרת + תיאור, `action` = עמוד הרקמה, `cancel` = הלב. התוויות מגיעות מהשרת בכל השפות, כי ה-namespace `notices` לא נטען בכל עמוד. קישור legacy `'lev'` (בלי `/`) נפתר יחסית לעמוד הנוכחי — תוקן.
+- **שפת הנמען:** `textFor()` — השפה שלו אם יש (הגוף מהמשפטים מדבר חמש), אחרת כמו `recipientTemplateLang`. זה סוגר את N6 לכל התראה שיש לה `subject`.
+
+**מה מחובר (~35 configs):** ask — `applyToMission`, `candidateCounterOnAsk`, `customizeOpenMission`, `proposeOnOpenMission`, `nominateSelfMission`, `submitNegoMission` (ענף ask); askm — `candidateCounterOnAskm`, `createMashaabimRequest`, `customizeOpenMashaabim`, `proposeOnOpenMashaabim` (לא כש-`autoFinalized`), `nominateSelfResource`; pendm/pmash — `createMission` (ענף pend), `createResource`, `submitNegoMission`, `submitNegoMash`, `voteOnPendm`, `voteOnPmash`; maap — `submitNegoMaap`, `voteOnMaap` (הלב בלבד — אין עמוד הצבעה); fini — `timerSave` (review), `counterFiniapruval` (`before`); tosplit — `createTosplit`; החלטות — `proposeObjectArchive`/`proposeObjectEdit`/`counterObjectChange`/`counterDealEdit`/`counterSaleClaim` (`before`), `proposeRikmaIdentity`/`updateProjectDetails` (כשנפתחה החלטה אחת), `createSale`/`createDonationSale`/`proposeStipendPledge`/`proposeStipendProgram`/`counterStipendTerms` (`links`).
+
+**נשאר בכוונה בלי subject:** התראות למועמד/ת עצמו/ה (`counterOnAsk`, `counterOnAskm`) — מי שאינו חבר לא נכנס לעמוד ההצבעה, והשתיקה שלו לא מאשרת; ההזמנה האישית של `createMission` (5a/5b) — "בקשה מאת X" הייתה מתארת אותה לא נכון; `addVote` (אף פעם לא consent); משאלות ועסקאות — יש להן קישורים משלהן (`/concierge/…`, `/deals/…`).
+
+**"דיווח שעות" ≠ "דיווח על סיום":** `fiappHours` חדש — שמירת טיימר הייתה נקראת כ"סיום המשימה" (`isHoursApproval`). תצוגת ההתראות בלב עוד אומרת "סיום" גם על שעות — אין לה את הדגלים בפריט המעובד.
+
+**מבחנים:** `notices/subject.test.ts` (12), `server/notices/subjectNotice.test.ts` (8 — כולל orchestrator מקצה לקצה: גוף, קישורים, טוקן שירות, שלושת המצבים, outcome בלי subject, כשל קריאה). `validate:qids`, `check:i18n`, `check:script`, `check:proxy` עוברים.
+
+**לפני שזה עובד בפרודקשן:**
+1. `TelegramService` שולח ל-`https://www.1lev1.com/api/ste` — הכפתורים הכפולים מופיעים רק אחרי ש-`/api/ste` החדש נפרס ב-Vercel. עד אז: כפתור אחד, לעמוד ההצבעה.
+2. ה-service worker מתעדכן אצל משתמש בביקור הבא באתר.
+3. **לא אומת חי** — Strapi נעול (קריאה ישירה נגמרת ב-timeout); צריך שני חשבונות ב-Chrome: אחד מגיש מועמדות, השני רואה את ה-toast/פוש/טלגרם.
+
+**פתוח:** `tellMatured` (השעון שהבשיל) עוד בלי `subject`; העדפה שמורה "לאן לפתוח כברירת מחדל" (היום: עמוד הרקמה ראשון, הלב שני — בכל ערוץ שניהם); deep-link חתום `/n/<token>` ואישור מתוך הטלגרם — לא נעשו (§6.6).
 
 ---
 

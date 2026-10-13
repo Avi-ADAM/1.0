@@ -22,6 +22,7 @@ import {
 import { standingChanges } from '$lib/archive/decisionView';
 import { isUrgent } from '$lib/digest/hubSummary.js';
 import { k, terms, term, txt, type Notice, type NoticeTerm, type NoticeText } from './types';
+import { levFocusHref } from './links';
 
 type Built = { sentence: NoticeText; detail?: NoticeText | null; terms?: NoticeTerm[] };
 
@@ -219,7 +220,7 @@ export function levNotice(b: any, now: number = Date.now()): Notice | null {
       kind: 'lev',
       ani: b.ani,
       coinlapach: String(b.coinlapach ?? id),
-      href: `/lev?focus=${encodeURIComponent(b.ani)}${b.projectId ? `&project=${encodeURIComponent(String(b.projectId))}` : ''}`
+      href: levFocusHref(b.ani, b.projectId)
     },
     at: b.created_at ?? b.createdAt ?? null
   };

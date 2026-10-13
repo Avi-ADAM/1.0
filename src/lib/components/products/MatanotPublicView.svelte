@@ -2,9 +2,10 @@
   import { currencySymbol } from '$lib/money/format.js';
   import { useMoney, useRikmaCurrency } from '$lib/money/context.svelte';
   import Money from '$lib/components/money/Money.svelte';
-  import { isRtl } from '$lib/translations';
+  import { isRtl, t as translate } from '$lib/translations';
   import { lang } from '$lib/stores/lang.js';
   import RichText from '$lib/celim/ui/richText.svelte';
+  import { costAt, effectiveShape, hasGroupCurve, toBomLines, type CostShape } from '$lib/pooling/priceCurve';
 
   type RecipeMissionRow = {
     id: string;
@@ -14,6 +15,8 @@
       ratePerHour?: number;
       mode?: 'createNew' | 'consumeExisting';
       notes?: string | null;
+      costShape?: CostShape | null;
+      stepCapacity?: number | null;
       pendm?: { data?: { id: string; attributes: { name?: string; descrip?: string } } | null };
       mesimabetahalich?: { data?: { id: string; attributes: { name?: string; howmanyhoursalready?: number; hoursassinged?: number } } | null };
     };
@@ -27,6 +30,8 @@
       kindOf?: string | null;
       mode?: 'createNew' | 'consumeExisting' | 'reuseSp';
       notes?: string | null;
+      costShape?: CostShape | null;
+      stepCapacity?: number | null;
       pmash?: { data?: { id: string; attributes: { name?: string } } | null };
       mashabetahalich?: { data?: { id: string; attributes: { name?: string; pricePerUnit?: number; kindOf?: string | null; descrip?: string } } | null };
     };
@@ -63,21 +68,21 @@
   const missionRows = $derived(matanot.matanot_recipe_missions?.data ?? []);
   const resourceRows = $derived(matanot.matanot_recipe_resources?.data ?? []);
 
-  const subtotalMissions = $derived(
-    missionRows.reduce((s, m) => {
-      const a = m.attributes;
-      return (
-        s + (a.hoursPerUnit ?? 0) * (a.unitsPerProduct ?? 1) * (a.ratePerHour ?? 0)
-      );
-    }, 0)
+  // One unit bought directly is a group of one (PLAN_POOL_PRODUCT §3.2).
+  const bom = $derived(
+    toBomLines(
+      missionRows.map((m) => m.attributes),
+      resourceRows.map((r) => r.attributes)
+    )
   );
-  const subtotalResources = $derived(
-    resourceRows.reduce((s, r) => {
-      const a = r.attributes;
-      return s + (a.quantityPerUnit ?? 0) * (a.pricePerUnit ?? 0);
-    }, 0)
-  );
-  const bomSubtotal = $derived(subtotalMissions + subtotalResources);
+  const bomSubtotal = $derived(costAt(bom, 1));
+  // How each line behaves in a group — shown only when the product has a curve,
+  // so a plain product's table reads exactly as before.
+  const groupCurve = $derived(hasGroupCurve(bom));
+  function shapeTag(a: { costShape?: CostShape | null; stepCapacity?: number | null }) {
+    const { shape, k } = effectiveShape(a);
+    return shape === 'stepped' ? $translate('pooling.tag.stepped', { capacity: k }) : $translate(`pooling.tag.${shape}`);
+  }
 
   const t = $derived(
     $lang === 'he'
@@ -178,7 +183,7 @@
                   a.pendm?.data?.attributes?.name ??
                   '—'}
                 <tr>
-                  <td>{name}</td>
+                  <td>{name}{#if groupCurve}<span class="shape-tag">{shapeTag(a)}</span>{/if}</td>
                   <td>{a.hoursPerUnit ?? 0}</td>
                   <td>{a.unitsPerProduct ?? 1}</td>
                   <td>{a.ratePerHour ?? 0}</td>
@@ -210,7 +215,7 @@
                   a.pmash?.data?.attributes?.name ??
                   '—'}
                 <tr>
-                  <td>{name}</td>
+                  <td>{name}{#if groupCurve}<span class="shape-tag">{shapeTag(a)}</span>{/if}</td>
                   <td>{a.quantityPerUnit ?? 0}</td>
                   <td>{a.pricePerUnit ?? 0}</td>
                 </tr>
@@ -243,6 +248,16 @@
 </div>
 
 <style>
+  .shape-tag {
+    display: inline-block;
+    margin-inline-start: 6px;
+    padding: 0 6px;
+    border: 1px solid var(--border, #3b3540);
+    border-radius: 99px;
+    font-size: 0.7rem;
+    color: var(--gold-l, #f1c47a);
+    white-space: nowrap;
+  }
   .matanot-view {
     --gold: var(--gold, #d8a64b);
     --gold-l: var(--gold-l, #f1c47a);

@@ -12,6 +12,7 @@ export { dealNotices, type DealNoticeInput } from './deal';
 export { levNotice, levNotices } from './lev';
 export { resolveNoticeText, resolveTerm, formatDeadline, type Translate } from './render';
 export { EMPTY_PREFS, readNoticePrefs, type NoticePrefs } from './prefs';
+export * from './links';
 
 import type { Notice } from './types';
 

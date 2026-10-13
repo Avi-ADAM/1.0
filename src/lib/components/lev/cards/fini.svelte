@@ -17,6 +17,7 @@
   import { saveLinkLabel } from '$lib/timers/saveLinks';
   import { displayHours, workValue } from '$lib/timers/precision';
   import { mediaUrl } from '$lib/utils/processLifecycle';
+  import { hoursClock, sessionLabel } from '$lib/finiapruval/sessions';
 
   /**
    * @typedef {Object} Props
@@ -26,6 +27,8 @@
    * @property {any} whatt
    * @property {{id: string, url: string, name: string, size?: number}[]} [evidenceFiles] - files the member filed with these hours
    * @property {string[]} [evidenceLinks] - links the member filed with these hours
+   * @property {{start: string, stop: string, hours: number}[]} [sessions] - every sitting behind the hours ($lib/finiapruval/sessions)
+   * @property {string} [saveText] - the member's whole note; `why` is a 250-char copy of it
    * @property {any} timegramaDate
    * @property {any} src
    * @property {any} why
@@ -60,6 +63,8 @@
     whatt,
     evidenceFiles = [],
     evidenceLinks = [],
+    sessions = [],
+    saveText = '',
     timegramaDate,
     src,
     why,
@@ -111,6 +116,15 @@
   function tochat() {
     onTochat?.();
   }
+  const LOCALES = { he: 'he-IL', ar: 'ar', ru: 'ru-RU', es: 'es-ES' };
+  let locale = $derived(LOCALES[$lang] ?? 'en-GB');
+  let sessionsTotal = $derived(sessions.reduce((sum, s) => sum + s.hours, 0));
+  // The member's own account, whole: `why` is the 250-char copy the approval
+  // row can hold, the timer keeps the full note.
+  let note = $derived(
+    saveText && saveText.length >= String(why ?? '').length ? saveText : why
+  );
+
   /** Who proposed a counter, by the name the rikma knows them by. */
   function proposerName(userId) {
     const u = (user_1s ?? []).find((m) => String(m.id) === String(userId));
@@ -233,6 +247,30 @@
       </div>
     </div>
 
+    <!-- Every sitting the hours were measured from. A total alone cannot be
+         checked; "Tuesday 09:10–11:40" can — and a counter can point at it. -->
+    {#if sessions.length > 0}
+      <div
+        class="flex flex-col gap-1 p-3 rounded-xl border border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/40"
+      >
+        <div class="flex items-center justify-between gap-2">
+          <span class="text-xs font-bold text-gray-700 dark:text-gray-300"
+            >{$t('lev.fiappru.sessionsHeading')}</span
+          >
+          <span class="text-xs text-gray-500 dark:text-gray-400" dir="ltr"
+            >{$t('lev.fiappru.sessionsTotal', { total: hoursClock(sessionsTotal) })}</span
+          >
+        </div>
+        <ul class="m-0 p-0 list-none flex flex-col gap-0.5 max-h-40 overflow-y-auto">
+          {#each sessions as s, i (s.start + i)}
+            <li class="text-sm text-gray-700 dark:text-gray-300 tabular-nums">
+              {sessionLabel(s, locale)}
+            </li>
+          {/each}
+        </ul>
+      </div>
+    {/if}
+
     <!-- The negotiation so far: every counter, oldest first. There is no flat
          "no" on a finish approval — a member who disagrees proposes the version
          they would sign, and the claim goes round until all sign the same one. -->
@@ -245,10 +283,10 @@
           >⇄ {$t('lev.fiappru.counterRound', { round: counters[counters.length - 1].round })}</span
         >
         {#each counters as c (c.round)}
-          <p class="text-sm text-gray-700 dark:text-gray-300 m-0">
+          <p class="text-sm text-gray-700 dark:text-gray-300 m-0 whitespace-pre-line">
             {#if proposerName(c.userId)}<b>{proposerName(c.userId)}</b> · {/if}{$t(
               'lev.fiappru.counterLine',
-              { to: c.to, from: c.from, note: c.note }
+              { to: hoursClock(c.to), from: hoursClock(c.from), note: c.note }
             )}
           </p>
         {/each}
@@ -323,7 +361,12 @@
             onmouseenter={() => hover(`${$t('common.finalwords')}`)}
             onmouseleave={() => hover('0')}
           >
-            {why}
+            {#if sessions.length > 0}
+              <span class="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-1"
+                >{$t('lev.fiappru.savedNote')}</span
+              >
+            {/if}
+            <span class="whitespace-pre-line">{note}</span>
           </div>
         {/if}
       {/if}

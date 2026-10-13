@@ -17,6 +17,7 @@
  * Client only needs to send: { askId, projectId, what, why? }
  */
 
+import { noticeSubject } from '$lib/notices/links';
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { voteIntent } from '../../notifications/intent.js';
 import { STRAPI_URL } from '$lib/server/strapiUrl.js';
@@ -439,6 +440,7 @@ export const voteOnMaapConfig: ActionConfig = {
     // A plain vote stays on the site; a month's first report asks the rikma to
     // approve it; consensus is an outcome.
     intent: voteIntent,
+    subject: (p) => noticeSubject('maap', p.askId, p.projectId),
     metadata: { type: 'maapVote', url: '/moach/{{projectId}}/votes' },
   },
 

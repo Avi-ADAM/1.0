@@ -15,6 +15,7 @@
  * Client only needs to send: { pmashId, projectId, what, why? }
  */
 
+import { noticeSubject } from '$lib/notices/links';
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { voteIntent } from '../../notifications/intent.js';
 import { matchOpenMashaabimToUsers } from '$lib/server/matching/engine';
@@ -274,6 +275,7 @@ export const voteOnPmashConfig: ActionConfig = {
     },
     // A plain vote stays on the site; maturing (or an all-no) is an outcome.
     intent: voteIntent,
+    subject: (p) => noticeSubject('pmash', p.pmashId, p.projectId),
     metadata: { type: 'pmashVote', url: '/moach/{{projectId}}/votes/pmash/{{pmashId}}' },
   },
 

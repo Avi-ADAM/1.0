@@ -10,6 +10,7 @@
  *  - Pmash               → also creates Timegrama for deadline tracking
  */
 
+import { noticeSubject } from '$lib/notices/links';
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { matchOpenMashaabimToUsers } from '$lib/server/matching/engine';
 import { restimeLabel, voteUrl } from './actionUtils.js';
@@ -630,6 +631,7 @@ const createResourceHandler: ActionExecutionHandler = async (params, context, { 
           templates: { title, body },
           // Every member is asked to vote on the proposed resource, against the rikma's clock.
           intent: 'consent',
+          subject: () => noticeSubject('pmash', createdId, projectId),
           emailTemplate: 'PendJustCreated',
           emailTemplateData: {
             un: creatorName,

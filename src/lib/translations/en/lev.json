@@ -539,7 +539,13 @@
     "counterSent": "Proposal sent. The others will be asked to approve it.",
     "counterError": "Could not send the proposal",
     "counterLine": "{{to}} h proposed instead of {{from}}: {{note}}",
-    "counterRound": "Round {{round}}"
+    "counterRound": "Round {{round}}",
+    "sessionsHeading": "Timer sessions",
+    "sessionsTotal": "{{total}} hours in all",
+    "savedNote": "What was done in this time",
+    "counterQuote": "The note saved with the timer",
+    "counterSessions": "Mark the sessions you dispute — their hours come off your version and are listed in the reason. You can also set the hours by hand, lower or higher.",
+    "counterDisputed": "Disputed"
   },
   "weget": {
     "howMuchSpentThisMonth": "How much did you spend this month?",

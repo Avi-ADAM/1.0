@@ -29,6 +29,7 @@ import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { ENTRY_CURRENCY_PARAM, entryFields, normalizeEntry } from '$lib/server/money/normalizeEntry.js';
 import { roundTo } from '$lib/money/currencies.js';
 import { scope, scopeList } from '$lib/realtime/scopes.js';
+import { storedCostShape } from '$lib/pooling/priceCurve';
 
 type RecipeMissionInput = {
   pendmId?: string | null;
@@ -46,6 +47,9 @@ type RecipeMissionInput = {
   notes?: string;
   /** Recurring (monthly) mission — `iskvua` on the proposal. */
   iskvua?: boolean;
+  /** PLAN_POOL_PRODUCT §3.1 — perUnit (null) / shared / stepped. */
+  costShape?: string | null;
+  stepCapacity?: number | null;
 };
 
 type RecipeResourceInput = {
@@ -64,6 +68,9 @@ type RecipeResourceInput = {
   /** A monthly / yearly expense that runs on — `recurring` on the proposal. */
   recurring?: boolean;
   cycleSize?: number;
+  /** PLAN_POOL_PRODUCT §3.1 — perUnit (null) / shared / stepped. */
+  costShape?: string | null;
+  stepCapacity?: number | null;
 };
 
 const RECURRABLE_KINDOF = new Set(['monthly', 'yearly']);
@@ -339,6 +346,24 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
   const recipeMissionIds: string[] = [];
   const recipeResourceIds: string[] = [];
 
+  // How a line behaves in a group (PLAN_POOL_PRODUCT §3.1). perUnit writes
+  // nothing — null is legacy perUnit — so a plain product saves as it always
+  // did. Service token: the qids are serviceAdmin-only and the membership
+  // rule of this action already ran.
+  const saveCostShape = async (
+    qid: '441setRecipeMissionCostShape' | '442setRecipeResourceCostShape',
+    id: string,
+    line: { costShape?: string | null; stepCapacity?: number | null }
+  ) => {
+    const shape = storedCostShape(line);
+    if (!shape) return;
+    try {
+      await strapi.execute(qid, { id, ...shape }, undefined, context.fetch);
+    } catch (err) {
+      console.warn('[createComplexMatanot] cost shape not saved:', err);
+    }
+  };
+
   if (isComplex) {
     for (const m of recipeMissions) {
       const openMissionId = idOf(m.openMissionId);
@@ -430,7 +455,10 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
           context.fetch
         );
         const id = r?.data?.createMatanotRecipeMission?.data?.id;
-        if (id) recipeMissionIds.push(String(id));
+        if (id) {
+          recipeMissionIds.push(String(id));
+          await saveCostShape('441setRecipeMissionCostShape', String(id), m);
+        }
       } catch (err) {
         console.warn('[createComplexMatanot] recipeMission failed:', err);
       }
@@ -536,7 +564,10 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
           context.fetch
         );
         const id = resp?.data?.createMatanotRecipeResource?.data?.id;
-        if (id) recipeResourceIds.push(String(id));
+        if (id) {
+          recipeResourceIds.push(String(id));
+          await saveCostShape('442setRecipeResourceCostShape', String(id), r);
+        }
       } catch (err) {
         console.warn('[createComplexMatanot] recipeResource failed:', err);
       }

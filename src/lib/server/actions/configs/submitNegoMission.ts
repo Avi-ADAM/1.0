@@ -1,3 +1,4 @@
+import { noticeSubject } from '$lib/notices/links';
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { calcDeadlineMs, normalizeLocationInput, extractRelationId } from './actionUtils.js';
 import { shiftsEnabled } from '$lib/server/shifts/mode.js';
@@ -335,6 +336,7 @@ export const submitNegoMissionConfig: ActionConfig = {
     },
     // A counter opens a new round and resets the clock for every member.
     intent: 'consent',
+    subject: (p) => (Number(p.isAsk) === 0 ? noticeSubject('pendm', p.pendId, p.projectId) : noticeSubject('ask', p.isAsk, p.projectId)),
     metadata: { type: 'base', url: '/moach/{{projectId}}/votes' },
   },
 

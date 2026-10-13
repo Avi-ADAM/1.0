@@ -1,0 +1,40 @@
+{
+  "costShape": {
+    "label": "Cómo se reparte el costo en el grupo",
+    "perUnit": "Por participante",
+    "shared": "Compartido entre todas",
+    "stepped": "Una unidad por cada grupo de",
+    "stepCapacity": "Participantes por unidad",
+    "perUnitHint": "Cada participante necesita la suya, como un vuelo o una comida.",
+    "sharedHint": "Un solo costo para todo el grupo. Cuantas más se suman, menos paga cada una. Por ejemplo, la guía.",
+    "steppedHint": "Una unidad más por cada {{capacity}} participantes, como un autobús o una habitación."
+  },
+  "tag": {
+    "perUnit": "por participante",
+    "shared": "compartido entre todas",
+    "stepped": "una por cada {{capacity}}"
+  },
+  "departure": {
+    "now": "Ahora",
+    "ceiling": "Como máximo",
+    "dropAt": "Con {{count}} participantes",
+    "linesTitle": "De qué se compone el precio",
+    "note": "Aquí no se firma un precio. El precio cambia con el tamaño del grupo, y cada subida llega con un aviso. Hasta que el precio se fije se puede salir en cualquier momento, con reembolso completo. Nunca supera el tope sin un consentimiento explícito.",
+    "lockAt": "El precio se fija el {{date}}",
+    "fromProduct": "De un producto de una rikma",
+    "fixedPrice": "Precio fijo",
+    "pickProduct": "Elijan un producto",
+    "noProducts": "Tus rikmas todavía no tienen un producto compuesto activo.",
+    "priceDerived": "El precio sale del producto: el costo dividido por el número de participantes, más el margen de la rikma. No hay precio que escribir.",
+    "curveTitle": "Precio por participante según el tamaño del grupo",
+    "participants": "Participantes",
+    "pricePer": "Precio por participante",
+    "riseWarn": "La participante n.º {{count}} sube el precio para todas. Conviene fijar el máximo en el límite de un escalón.",
+    "ceilingShown": "El tope que verán quienes se sumen",
+    "consentTitle": "El precio pasó el tope que viste al sumarte",
+    "consentBody": "Para seguir, confirma antes del {{date}}. Sin tu sí sales — sin cargo y con reembolso completo.",
+    "consentNewCeiling": "El tope desde ahora",
+    "stay": "Sí, sigo",
+    "notForMe": "El precio no me conviene"
+  }
+}

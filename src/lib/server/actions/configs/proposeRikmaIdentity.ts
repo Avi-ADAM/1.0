@@ -12,6 +12,7 @@
  * Validation here is so the member hears "taken" now, not when the clock ends.
  */
 
+import { noticeSubject } from '$lib/notices/links';
 import type { ActionConfig, ActionExecutionHandler } from '../types';
 import { calcDeadlineMs } from './actionUtils.js';
 import {
@@ -158,6 +159,7 @@ export const proposeRikmaIdentityConfig: ActionConfig = {
     // Opening a proposal asks every other member; applied directly (a rikma of
     // one) or unchanged, there is nobody to ask.
     intent: (_params, result) => (result?.data?.decisions?.length ? 'consent' : 'ambient'),
+    subject: (p, r) => (r?.data?.decisions?.length === 1 ? noticeSubject('decision', r.data.decisions[0].id, p.projectId, 'hachla') : null),
     metadata: { type: 'base', url: '/moach/{{projectId}}/votes' }
   },
 

@@ -15,7 +15,15 @@ import { EmailService } from './EmailService';
 import { TelegramService } from './TelegramService';
 import { PushService } from './PushService';
 import { SocketIOServer } from './SocketIOServer';
-import { resolveChannels, emailRecipients } from './intent';
+import { resolveChannels, resolveIntent, deliveryPlan, textFor, type NotificationIntent } from './intent';
+import {
+  loadSubjectNotice,
+  subjectBodies,
+  notifyLinks,
+  linksFor,
+  type NotifyLink
+} from '../notices/subjectNotice';
+import type { NoticeSubject } from '$lib/notices/links';
 
 export interface UserProfile {
   id: string;
@@ -28,13 +36,19 @@ export interface UserProfile {
 }
 
 export interface NotificationData {
-  title: { he: string; en: string; ar?: string };
-  body: { he: string; en: string; ar?: string };
+  title: { he: string; en: string; ar?: string; ru?: string; es?: string };
+  body: { he: string; en: string; ar?: string; ru?: string; es?: string };
   metadata?: {
     icon?: string;
     url?: string;
     priority?: 'low' | 'normal' | 'high';
   };
+  /**
+   * Every place the reader can answer it, the default first — the rikma's vote
+   * page and the heart filtered to the item. Each channel offers all of them;
+   * empty when the notification is not about one vote (then `metadata.url`).
+   */
+  links?: NotifyLink[];
   actionParams?: Record<string, any>;
   actionResult?: any;
 }
@@ -107,6 +121,7 @@ export class NotificationOrchestrator {
 
       // 3. Prepare notification data
       const contextData = { actionParams, actionResult };
+      const intent = resolveIntent(config, actionParams, actionResult);
 
       const title = {
         he: this.replacePlaceholders(templates.title.he, contextData),
@@ -114,7 +129,7 @@ export class NotificationOrchestrator {
         ar: templates.title.ar ? this.replacePlaceholders(templates.title.ar, contextData) : undefined
       };
 
-      const body = {
+      let body: NotificationData['body'] = {
         he: this.replacePlaceholders(templates.body.he, contextData),
         en: this.replacePlaceholders(templates.body.en, contextData),
         ar: templates.body.ar ? this.replacePlaceholders(templates.body.ar, contextData) : undefined
@@ -128,6 +143,43 @@ export class NotificationOrchestrator {
             metadata[key] = this.replacePlaceholders(metadata[key], contextData);
           }
         });
+      }
+
+      // A notice about one rikma vote that waits for its reader says what
+      // waits, in each reader's language, with both places to answer it. The
+      // title stays the action's — it names the event ("a counter-proposal").
+      const subject = this.subjectOf(config, actionParams, actionResult, intent);
+      let links: NotifyLink[] = [];
+      if (subject) {
+        const mode = config.subjectText ?? 'replace';
+        // `links` keeps the action's own words — nothing to read, unless the
+        // heart link still needs to know which card a decision is.
+        const needsRead = mode !== 'links' || (subject.kind === 'decision' && !subject.ani);
+        // Only a decision's sentence names the actor (its proposer or counterer);
+        // every other kind names its party from the item itself.
+        const actor =
+          needsRead && mode !== 'links' && subject.kind === 'decision' && context.userId
+            ? await this.getUserProfile(String(context.userId), context)
+            : null;
+        const notice = needsRead
+          ? await loadSubjectNotice(subject, this.strapiClient, {
+              actorName: actor?.username,
+              fetch: context.fetch
+            })
+          : null;
+        if (notice && mode !== 'links') {
+          const said = subjectBodies(notice, { clock: true });
+          const own = body;
+          body = { ...body, ...said };
+          if (mode === 'before') {
+            for (const l of Object.keys(said) as (keyof typeof said)[]) {
+              const extra = textFor(own, l);
+              if (extra) body[l] = `${said[l]}\n\n${extra}`;
+            }
+          }
+        }
+        links = notifyLinks(linksFor(subject, notice));
+        if (links.length) metadata.url = links[0].href;
       }
 
       // A notification tells people; it does not refresh screens. Every screen
@@ -144,6 +196,7 @@ export class NotificationOrchestrator {
         title,
         body,
         metadata,
+        links,
         actionParams,
         actionResult: forwarded,
         initiatorId: context.userId,
@@ -161,9 +214,13 @@ export class NotificationOrchestrator {
       const externalRecipients = filteredRecipients.filter(
         u => String(u.id) !== String(context.userId)
       );
-      // Email goes to everyone only when the intent asks for it; otherwise to
-      // whoever this notification would not reach on push or telegram.
-      const emailTo = emailRecipients(externalRecipients, channels);
+      // Who hears it where off the site: email to everyone only when the
+      // intent asks for it, otherwise to whoever push/telegram would miss;
+      // a `review` reaches each person on exactly one channel.
+      const plan = deliveryPlan(externalRecipients, channels, intent);
+      const emailTo = plan.email;
+      const telegramTo = plan.telegram;
+      const pushTo = plan.push;
 
       if (channels.includes('socket')) {
         promises.push(
@@ -190,20 +247,20 @@ export class NotificationOrchestrator {
         );
       }
 
-      if (channels.includes('telegram') && externalRecipients.length) {
+      if (telegramTo.length) {
         promises.push(
           this.telegramService.sendBulk(
-            externalRecipients,
+            telegramTo,
             notificationData,
             context
           )
         );
       }
 
-      if (channels.includes('push') && externalRecipients.length) {
+      if (pushTo.length) {
         promises.push(
           this.pushService.sendBulk(
-            externalRecipients,
+            pushTo,
             notificationData,
             context
           )
@@ -217,8 +274,8 @@ export class NotificationOrchestrator {
       const channelNames: string[] = [];
       if (channels.includes('socket')) channelNames.push('socket');
       if (emailTo.length) channelNames.push('email');
-      if (channels.includes('telegram') && externalRecipients.length) channelNames.push('telegram');
-      if (channels.includes('push') && externalRecipients.length) channelNames.push('push');
+      if (telegramTo.length) channelNames.push('telegram');
+      if (pushTo.length) channelNames.push('push');
 
       results.forEach((result, index) => {
         if (result.status === 'rejected') {
@@ -228,6 +285,28 @@ export class NotificationOrchestrator {
     } catch (error) {
       console.error('Notification orchestration error:', error);
       // Don't throw - notifications should not block the main action
+    }
+  }
+
+  /**
+   * The vote a notification is about — only when it waits for its reader
+   * (`consent` / `review`). An outcome is about a vote that is over: its page
+   * may be gone, and "a request from Dana…" would describe it as still open.
+   * A config whose `subject` throws on an odd run is a notice without detail,
+   * never a lost notice.
+   */
+  private subjectOf(
+    config: NotificationConfig,
+    params: Record<string, any>,
+    result: any,
+    intent: NotificationIntent | undefined
+  ): NoticeSubject | null {
+    if (!config.subject || (intent !== 'consent' && intent !== 'review')) return null;
+    try {
+      return config.subject(params ?? {}, result) ?? null;
+    } catch (e) {
+      console.warn('[notifications] subject() failed (template kept):', e);
+      return null;
     }
   }
 

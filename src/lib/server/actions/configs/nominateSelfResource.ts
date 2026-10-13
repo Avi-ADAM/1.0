@@ -12,6 +12,7 @@
  * takes over unchanged.
  */
 
+import { noticeSubject } from '$lib/notices/links';
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { scope, decisionScope, scopeList } from '$lib/realtime/scopes.js';
 
@@ -149,6 +150,7 @@ export const nominateSelfResourceConfig: ActionConfig = {
       },
     },
     intent: 'consent',
+    subject: (p, r) => noticeSubject('askm', r?.data?.askmId, r?.data?.projectId ?? p.projectId),
     metadata: { type: 'selfNomination', url: 'lev', priority: 'high' },
   },
 

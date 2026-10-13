@@ -1012,3 +1012,51 @@ strapi-gate close
       ה-mailer מתזמן 20 לדקה, כך שגם הצפה של תבנית קבועה הייתה מעכבת כל התראה
       אמיתית. השמירה ב-Strapi, ה-mirror לרקמה המרכזית והטלגרם לא השתנו.
       בדיקות: `src/routes/api/report/server.test.ts`.
+
+### 14.6 ממסר טלגרם פתוח — **נסגר ✅ (2026-10-14)**
+
+- [x] **`/api/ste` עם `isNew` שלח כל HTML לכל `chat_id`, בלי שום אימות.** כל אחד
+      באינטרנט יכול היה לשלוח דרך הבוט של 1lev1 הודעה בכל נוסח לכל מי שאי-פעם
+      הפעיל את הבוט — פישינג בשם הפלטפורמה. הצורה הממוקדת (`isNew` או כל
+      `chat_id`, בכל איות של `isNew`) עונה עכשיו רק לשרת עצמו
+      (`rejectUnlessInternal`, כמו ב-14.5). `TelegramService` שולח ל-URL
+      המוחלט `https://www.1lev1.com/api/ste`, שמה-VPS הוא cross-origin ולכן
+      `handleFetch` לא מחתים אותו — הוא מצרף את `x-internal-secret` בעצמו.
+      `/api/demo` קורא ב-fetch יחסי ומוחתם בדרך. דורש ש-`ADMINMONTHER` יהיה זהה
+      ב-Vercel וב-VPS (כבר נדרש, §12א).
+- [x] **צורת הטלמטריה לבעלים (`name/action/det`) נשארת פתוחה לדפדפן**
+      (`baci`, `senError`, `hascama`, `give`) — היעד תמיד `env.NEW_TELEGRAM`
+      ולא מה שהקורא שלח. הטקסט נשלח כ-JSON body בלי `parse_mode` (לא משורשר
+      יותר לתוך ה-URL), כל שדה עד 1000 תווים, ו-rate limit בזיכרון: 20 ל-10 דקות
+      לכל IP ו-200 ל-10 דקות בסך הכל. קריאה פנימית (`vocab/create`) לא מוגבלת.
+      כשל מטלגרם מוחזר כ-502 במקום 200 שקט.
+- [x] **בדיקות:** `src/routes/api/ste/server.test.ts`, כולל guard שסורק כל
+      `.svelte` שקורא ל-`/api/ste` ומוודא שאינו שולח `chat_id`/`isNew`.
+- [x] **`/api/yy` (webhook ישן)** לקח את היעד מ-`message.from.id` שבגוף הבקשה
+      ואת השם מפרמטר ה-`/start` — גם הוא איפשר לשלוח לכל צ'אט, עם טקסט חלקי
+      בשליטת התוקף. **נמחק (2026-10-14):** אין לו קורא, לא בריפו הזה ולא
+      ב-`magik-meetings`, `consensus1lev1`, `1-1`, `1.0b` (grep), וה-webhook
+      הפעיל הוא `/api/newTelegram` (§12א). לפני ה-deploy לאשר ב-`getWebhookInfo`
+      שה-`url` אינו מסתיים ב-`/api/yy`. Guard:
+      `src/routes/api/newTelegram/webhooks.test.ts` — כל `+server` שקורא update
+      של טלגרם בודק את `X-Telegram-Bot-Api-Secret-Token`, או מופיע
+      ב-`REVIEWED_WEBHOOKS` עם הסיבה.
+- [x] **`/api/newTelegram` עצמו לא אימת שהבקשה באה מטלגרם** (נסגר בקוד 2026-10-14,
+      ה-rollout אצל המפעיל). כל אחד יכול היה לשלוח update מזויף עם ה-`chat.id` של
+      משתמש מקושר (`getUserInfo` ממפה אותו ל-`telegramId`), והבוט פעל בשמו (טיימרים,
+      רשימות דרך `isSer`). עכשיו ה-POST בודק את `X-Telegram-Bot-Api-Secret-Token`
+      מול `TELEGRAM_WEBHOOK_SECRET` (`$env/dynamic/private`) בהשוואה constant-time
+      (`src/lib/server/telegramWebhookAuth.js`), **לפני** שקורא את הגוף — אין
+      התאמה ⇒ 401, בלי `fetchUserData` ובלי `handleUpdate`. **מצב מעבר:** כל עוד
+      `TELEGRAM_WEBHOOK_SECRET` לא מוגדר ב-host, הכותרת לא נבדקת כלל (כמו קודם)
+      ו-warning אחד לכל תהליך מתועד בלוג. ברגע שהוא מוגדר — כותרת חסרה או שגויה
+      היא 401; אין מצב "כותרת אופציונלית", כי מזייף פשוט משמיט אותה.
+      **סדר ה-rollout (בלי השבתה):** (1) deploy של הקוד; (2) `setWebhook` עם
+      `secret_token` לאותו `url` — ה-hosts עדיין במצב מעבר ומקבלים; (3)
+      `TELEGRAM_WEBHOOK_SECRET` באותו ערך ב-Vercel (redeploy) **וגם** ב-VPS
+      (`.env` + יצירה מחדש של הקונטיינר); (4) `getWebhookInfo` — בלי
+      `last_error_message` של 401 ו-`pending_update_count` לא תופח. בסדר ההפוך
+      (env לפני `setWebhook`) הבוט עונה 401 עד שה-`setWebhook` רץ. אחרי שזה יציב
+      שווה להפוך "לא מוגדר" ל-fail-closed (503, כמו `checkCron({ required: true })`).
+      בדיקות: `src/routes/api/newTelegram/server.test.ts`; ה-guard ב-`webhooks.test.ts`
+      כבר לא מחריג אותו (`REVIEWED_WEBHOOKS` ריק).

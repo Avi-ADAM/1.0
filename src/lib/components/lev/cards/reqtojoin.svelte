@@ -46,6 +46,7 @@
    * @property {(alr: any) => void} [onNego]
    * @property {(() => void)} [onChat]
    * @property {(() => void)} [onProj]
+   * @property {(() => void)} [onUser] - opens the candidate's profile modal
    * @property {boolean} [isRishon]
    * @property {boolean} [negotiationMode]
    * @property {any[]} [negopendmissions]
@@ -90,6 +91,7 @@
     onNego,
     onChat,
     onProj,
+    onUser,
     isRishon = false,
     negotiationMode = false,
     negopendmissions = [],
@@ -202,9 +204,14 @@
     class="bg-white dark:bg-slate-800 transition-all-300 p-4 flex-1 overflow-y-auto d space-y-4"
   >
     <div class="space-y-3">
-      <!-- User Info -->
-      <div
-        class="flex items-center gap-3 bg-gray-50 dark:bg-gray-700/50 p-3 rounded-xl"
+      <!-- User Info — clicking opens the candidate's profile modal -->
+      <button
+        type="button"
+        class="flex items-center gap-3 w-full text-start bg-gray-50 dark:bg-gray-700/50 p-3 rounded-xl border-0 cursor-pointer group"
+        onclick={(e) => {
+          e.stopPropagation();
+          onUser?.();
+        }}
       >
         <img
           class="w-12 h-12 rounded-full object-cover border-2 border-barbi/20"
@@ -217,11 +224,11 @@
           <div class="text-[20px] text-gray-500 uppercase">
             {$trans('lev.reqtojoin.requester')}
           </div>
-          <div class="font-bold text-gray-800 dark:text-gray-200">
+          <div class="font-bold text-gray-800 dark:text-gray-200 group-hover:text-barbi underline-offset-2 group-hover:underline">
             {useraplyname}
           </div>
         </div>
-      </div>
+      </button>
 
       <!-- Candidate proposal banner — shown high up when there are negotiation rounds -->
       {#if !isRishon && negopendmissions.length > 0}

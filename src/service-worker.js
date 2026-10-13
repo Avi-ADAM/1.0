@@ -32,59 +32,60 @@ self.addEventListener('activate', (event) => {
 
   event.waitUntil(deleteOldCaches());
 });
+// A path on the site resolves against this worker's own origin, so the same
+// notification opens the right host in dev, preview and production.
+const siteUrl = (u) => {
+  try {
+    return new URL(u || '/lev', self.location.origin).href;
+  } catch {
+    return new URL('/lev', self.location.origin).href;
+  }
+};
+
 self.addEventListener('push', ev => {
   const data = ev.data.json();
-  console.log('Got push', data);
-  const url = data.message?.url || 'https://www.1lev1.com/lev';
-  console.log(url)
+  const message = data.message || {};
+  const url = siteUrl(message.url);
+  // One button per place to answer it (the rikma's vote page, the heart) — the
+  // reader picks; a tap on the notification itself opens the first.
+  const links = (Array.isArray(message.actions) ? message.actions : [])
+    .filter((a) => a && a.action && a.title && a.url)
+    .slice(0, 2);
+  const urls = Object.fromEntries(links.map((a) => [a.action, siteUrl(a.url)]));
   ev.waitUntil(
-    self.registration.showNotification(data.message.title, {
-      body: data.message.body,
-     
-      //  registration_ids: [$('.header-user-name').find('span').text()],
-      //ליצור בלינק פרמטר של אידי של הפוש ואז לעדכן כנקרא כשנלחץ
+    self.registration.showNotification(message.title, {
+      body: message.body,
       icon:
-        data.message.pic ??
+        message.pic ??
         'https://res.cloudinary.com/love1/image/upload/v1645647192/apple-touch-icon_irclue.png',
-        data: {
-          url: url, 
-          otherData: data.message.otherData // מידע נוסף שנרצה לשמור
+      data: {
+        url,
+        urls,
+        otherData: message.otherData // מידע נוסף שנרצה לשמור
       },
-      actions: [
-          { action: 'open_url', title: 'Open' }
-      ]
+      actions: links.length
+        ? links.map((a) => ({ action: a.action, title: a.title }))
+        : [{ action: 'open_url', title: 'Open' }]
     })
   );
-
 });
-self.addEventListener('notificationclick', function(event) {
-  const url = event.notification.data.url;
+
+self.addEventListener('notificationclick', function (event) {
+  const data = event.notification.data || {};
+  const url = (event.action && data.urls && data.urls[event.action]) || data.url || siteUrl('/lev');
 
   event.notification.close();
 
   event.waitUntil(
-      clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function(clientList) {
-          // בדוק אם יש כבר חלון פתוח של האתר
-          for (var i = 0; i < clientList.length; i++) {
-              var client = clientList[i];
-              if (client.url === url && 'focus' in client) {
-                  return client.focus();
-              }
-          }
-          // אם לא, פתח חלון חדש
-          if (client.openWindow) {
-              return client.openWindow(url);
-          }
-      }).then(() => {
-          // דוגמה להפעלת פונקציה לשינוי בלוקל סטורג' או ביצוע fetch
-          /*
-          localStorage.setItem('notification_clicked', 'true');
-          return fetch('/update', {
-              method: 'POST',
-              body: JSON.stringify({ clicked: true }),
-              headers: { 'Content-Type': 'application/json' }
-          });*/
-      })
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function (clientList) {
+      // A tab already on that page: bring it forward.
+      const same = clientList.find((c) => c.url === url && 'focus' in c);
+      if (same) return same.focus();
+      // Otherwise a new one — never by navigating a tab the member is using
+      // (a draft there would be lost). This is the global `clients`: a
+      // WindowClient has no openWindow, so a tap used to open nothing.
+      return clients.openWindow(url);
+    })
   );
 });
 

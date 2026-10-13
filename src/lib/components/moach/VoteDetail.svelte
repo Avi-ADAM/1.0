@@ -558,6 +558,8 @@
         whatt={buble.whatt}
         evidenceFiles={buble.evidenceFiles}
         evidenceLinks={buble.evidenceLinks}
+        sessions={buble.sessions}
+        saveText={buble.saveText}
         missionBName={buble.openName}
         name={buble.name}
         projectId={buble.projectId}

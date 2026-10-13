@@ -141,8 +141,6 @@ export const OWNERSHIP = {
     enforce: true,
     note: 'A suggestion is addressed to exactly one member; nobody else dismisses it.'
   },
-  maagadMember: { users: ['user'] },
-  maagadOffer: { users: ['proposer_user'], projects: ['proposer_project'] },
 
   // ── Meetings ─────────────────────────────────────────────────────────────
   pgisha: {
@@ -156,9 +154,6 @@ export const OWNERSHIP = {
   // ── Deliberately unowned, each with its reason ───────────────────────────
   timegrama: {
     open: 'A countdown carries no owner relation at all. It is reached through the object it times, and that object is guarded.'
-  },
-  maagad: {
-    open: 'A regional pool is public by construction — it has no member or project relation, and joining one is how you get in.'
   },
   position: {
     open: 'Consensus site. Authorship is `authorExternalId`, not a Strapi user; the vote path and the UpdateClause guard already check it.'

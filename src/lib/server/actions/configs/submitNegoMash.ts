@@ -1,3 +1,4 @@
+import { noticeSubject } from '$lib/notices/links';
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { calcDeadlineMs, normalizeLocationInput, extractRelationId } from './actionUtils.js';
 import { scope, decisionScope, scopeList } from '$lib/realtime/scopes.js';
@@ -169,6 +170,7 @@ export const submitNegoMashConfig: ActionConfig = {
     },
     // A counter opens a new round and resets the clock for every member.
     intent: 'consent',
+    subject: (p) => noticeSubject('pmash', p.pmashId, p.projectId),
     metadata: { type: 'base', url: '/moach/{{projectId}}/votes/pmash/{{pmashId}}' },
   },
 

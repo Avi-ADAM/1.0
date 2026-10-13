@@ -100,6 +100,10 @@ const handler: ActionExecutionHandler = async (params, context, { notifier, stra
           },
           // A counter opens a new round and resets the clock for every member.
           intent: 'consent',
+          subject: () => noticeSubject('decision', decisionId, params.projectId, 'archObject'),
+          // "A proposal to remove X" is wrong once the counter keeps it: then
+          // only the links, under this counter's own words.
+          subjectText: mode === 'keep' ? 'links' : 'before',
           metadata: {
             type: 'voteUpdate',
             url: `/moach/${params.projectId}/votes/decision/${decisionId}`,

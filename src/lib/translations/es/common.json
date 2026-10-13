@@ -41,7 +41,8 @@
     "changePassword": "Cambiar contraseña",
     "sendOfferToProvider": "Enviar oferta al proveedor",
     "publishToCommunity": "Publicar a la comunidad",
-    "toProfile": "A mi perfil"
+    "toProfile": "A mi perfil",
+    "view": "Ver"
   },
   "labels": {
     "location": "Ubicación",

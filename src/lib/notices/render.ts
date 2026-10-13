@@ -57,15 +57,21 @@ export function resolveTerm(term: NoticeTerm, t: Translate, lang: string): strin
  * When the silence clock completes it, in words a person can place: the
  * weekday and time within a week, the date beyond.
  */
-export function formatDeadline(iso: string | null | undefined, lang: string, now: number = Date.now()): string {
+export function formatDeadline(
+  iso: string | null | undefined,
+  lang: string,
+  now: number = Date.now(),
+  /** A server has no reader's zone of its own — pass the one to say it in. */
+  timeZone?: string
+): string {
   if (!iso) return '';
   const at = Date.parse(iso);
   if (!Number.isFinite(at)) return '';
   const withinWeek = at - now < 6 * 24 * 3600_000;
   try {
     return new Intl.DateTimeFormat(lang, withinWeek
-      ? { weekday: 'short', hour: '2-digit', minute: '2-digit' }
-      : { day: 'numeric', month: 'short' }).format(at);
+      ? { weekday: 'short', hour: '2-digit', minute: '2-digit', timeZone }
+      : { day: 'numeric', month: 'short', timeZone }).format(at);
   } catch {
     return new Date(at).toISOString().slice(0, 16).replace('T', ' ');
   }

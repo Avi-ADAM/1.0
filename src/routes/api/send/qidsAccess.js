@@ -26,6 +26,8 @@ export const qidsAccess = {
   '429hiddenWishProposalsFor': { allow: ['serviceAdmin'] },
   '430myNoticePrefsFor': { allow: ['serviceAdmin'] },
   '431dealsForUserFor': { allow: ['serviceAdmin'] },
+  // What a notification about one rikma vote says (subjectNotice.ts) — read by the orchestrator only.
+  '460noticeSubject': { allow: ['serviceAdmin'] },
   '87levSliceSheirutp': { allow: ['user', 'serviceAdmin'] },
   '87levSliceSales': { allow: ['user', 'serviceAdmin'] },
   '87levSliceFiapp': { allow: ['user', 'serviceAdmin'] },
@@ -47,16 +49,29 @@ export const qidsAccess = {
   '221mapOpenMissions': { allow: ['user', 'serviceAdmin'] },
   '222mapOpenMashaabims': { allow: ['user', 'serviceAdmin'] },
   '223mapMaagadim': { allow: ['user', 'serviceAdmin'] },
-  '224crMaagad': { allow: ['user', 'serviceAdmin'] },
-  '225crMaagadMember': { allow: ['user', 'serviceAdmin'] },
-  '226updateMaagadMember': { allow: ['user', 'serviceAdmin'] },
-  '235crMaagadSheirutpend': { allow: ['user', 'serviceAdmin'] },
-  '227crMaagadOffer': { allow: ['user', 'serviceAdmin'] },
-  '228updateMaagadOffer': { allow: ['user', 'serviceAdmin'] },
+  // Maagad writes run only inside the maagad actions (maagad.ts), under the
+  // service token — a direct /api/send call could fake a quorum or an activation.
+  '224crMaagad': { allow: ['serviceAdmin'] },
+  '225crMaagadMember': { allow: ['serviceAdmin'] },
+  '226updateMaagadMember': { allow: ['serviceAdmin'] },
+  '235crMaagadSheirutpend': { allow: ['serviceAdmin'] },
+  '227crMaagadOffer': { allow: ['serviceAdmin'] },
+  '228updateMaagadOffer': { allow: ['serviceAdmin'] },
   '229queryMaagadFull': { allow: ['user', 'serviceAdmin'] },
-  '230updateMaagad': { allow: ['user', 'serviceAdmin'] },
+  '230updateMaagad': { allow: ['serviceAdmin'] },
   '232listExpiredOpenOffers': { allow: ['user', 'serviceAdmin'] },
   '231queryMyMaagadMember': { allow: ['user', 'serviceAdmin'] },
+  // PLAN_POOL_PRODUCT §4 — departures. Pricing and a participant's ceiling are
+  // written only by the maagad actions, never by a client (see 445 in qids.js).
+  '443matanotForPoolOffer': { allow: ['serviceAdmin'] },
+  '444myPoolableProducts': { allow: ['serviceAdmin'] }, // $uid bound by the /maagad/[id] loader
+  '445setMaagadOfferPricing': { allow: ['serviceAdmin'] },
+  '446setMaagadMemberEnvelope': { allow: ['serviceAdmin'] },
+  // Each signer's ceiling and consent window — read only by the price settlement.
+  '447listLiveDepartures': { allow: ['serviceAdmin'] },
+  '448queryDeparture': { allow: ['serviceAdmin'] },
+  '449repriceDeparturePend': { allow: ['serviceAdmin'] },
+  '450archiveDeparturePend': { allow: ['serviceAdmin'] },
   '440wishMaagadMembership': { allow: ['serviceAdmin'] }, // server-only: /concierge/[id] pool panel
   '233listOpenRatsonsForClustering': { allow: ['user', 'serviceAdmin'] },
   '234getProjectLocation': { allow: ['user', 'serviceAdmin'] },
@@ -90,7 +105,7 @@ export const qidsAccess = {
   '270findMissionOffersByMission': { allow: ['user', 'serviceAdmin'] },
   '269mapProducts': { allow: ['user', 'serviceAdmin'] },
   '268getUserStorefront': { allow: ['serviceAdmin'] }, // server-only callers
-  '267setMaagadOfferProposerProject': { allow: ['user', 'serviceAdmin'] },
+  '267setMaagadOfferProposerProject': { allow: ['serviceAdmin'] }, // maagad.ts activateOffer only
   '266getMatanotSellerMeta': { allow: ['user', 'serviceAdmin'] },
   '257getSpForEditWithOffer': { allow: ['user', 'serviceAdmin'] },
   '256syncPersonalMatanotFromSp': { allow: ['user', 'serviceAdmin'] },
@@ -377,6 +392,9 @@ export const qidsAccess = {
   '126updateMatanotRecipeMission': { allow: ['serviceAdmin'] }, // unreferenced in codebase (2026-07-18) — tightened to serviceAdmin-only
   '127deleteMatanotRecipeMission': { allow: ['serviceAdmin'] }, // unreferenced in codebase (2026-07-18) — tightened to serviceAdmin-only
   '128createMatanotRecipeResource': { allow: ['user', 'serviceAdmin'] },
+  // PLAN_POOL_PRODUCT — written only by createComplexMatanot, after its membership rule.
+  '441setRecipeMissionCostShape': { allow: ['serviceAdmin'] },
+  '442setRecipeResourceCostShape': { allow: ['serviceAdmin'] },
   '129updateMatanotRecipeResource': { allow: ['serviceAdmin'] }, // unreferenced in codebase (2026-07-18) — tightened to serviceAdmin-only
   '130deleteMatanotRecipeResource': { allow: ['serviceAdmin'] }, // unreferenced in codebase (2026-07-18) — tightened to serviceAdmin-only
   '131createSheirutFulfillment': { allow: ['serviceAdmin'] }, // unreferenced in codebase (2026-07-18) — tightened to serviceAdmin-only

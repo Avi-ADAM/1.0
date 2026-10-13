@@ -1,3 +1,4 @@
+import { noticeSubject } from '$lib/notices/links';
 import { rikmaMoneyText } from '$lib/server/money/notifyMoney.js';
 /**
  * Action Configuration: Counter-offer on a recurring monthly cycle (Maap)
@@ -189,6 +190,7 @@ export const submitNegoMaapConfig: ActionConfig = {
     },
     // A counter opens a new round and resets the clock for every member.
     intent: 'consent',
+    subject: (p) => noticeSubject('maap', p.askId, p.projectId),
     metadata: { type: 'maapNego', url: '/moach/{{projectId}}/votes' },
   },
 

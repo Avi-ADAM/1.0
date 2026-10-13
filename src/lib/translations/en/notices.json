@@ -53,6 +53,8 @@
     "askedmAnon": "Offer to provide \"{{item}}\" to the rikma \"{{rikma}}\"",
     "fiapp": "Report from {{who}}: \"{{item}}\" is done, in the rikma \"{{rikma}}\"",
     "fiappAnon": "Report: \"{{item}}\" is done, in the rikma \"{{rikma}}\"",
+    "fiappHours": "Hours report from {{who}} on \"{{item}}\", in the rikma \"{{rikma}}\"",
+    "fiappHoursAnon": "Hours report on \"{{item}}\", in the rikma \"{{rikma}}\"",
     "wegets": "Report from {{who}}: \"{{item}}\" delivered to the rikma \"{{rikma}}\"",
     "wegetsAnon": "Report: \"{{item}}\" delivered to the rikma \"{{rikma}}\"",
     "wishoffer": "Offer from {{who}} for \"{{item}}\" on the wish \"{{wish}}\"",
@@ -73,9 +75,14 @@
     "removeHoursOneAnon": "Request to cut one hour from \"{{item}}\" in the rikma \"{{rikma}}\"",
     "edit": "Request from {{who}} to change \"{{item}}\" in the rikma \"{{rikma}}\"",
     "editAnon": "Request to change \"{{item}}\" in the rikma \"{{rikma}}\"",
+    "haluk": "Profit-split proposal \"{{item}}\" in the rikma \"{{rikma}}\"",
     "fallback": "{{kind}}: {{what}}"
   },
   "term": {
     "raise": "+{{value}}"
+  },
+  "notify": {
+    "openRikma": "Open in the rikma",
+    "openLev": "Open in the Heart"
   }
 }

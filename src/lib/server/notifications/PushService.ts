@@ -7,7 +7,7 @@
 
 import type { ActionContext } from '../actions/types';
 import type { UserProfile, NotificationData } from './NotificationOrchestrator';
-import { recipientTemplateLang } from './intent';
+import { textFor } from './intent';
 
 export class PushService {
   /**
@@ -65,16 +65,20 @@ export class PushService {
     context: ActionContext
   ): Promise<void> {
     try {
-      // The recipient's language, never the sender's (see recipientTemplateLang)
-      const lang = recipientTemplateLang(user.lang);
-
-      // Get the notification text in the appropriate language
-      const title = notification.title[lang as 'he' | 'en' | 'ar'] || notification.title.he;
-      const body = notification.body[lang as 'he' | 'en' | 'ar'] || notification.body.he;
+      // The recipient's language, never the sender's — and the body may speak
+      // theirs even where the templates do not (textFor).
+      const title = textFor(notification.title, user.lang);
+      const body = textFor(notification.body, user.lang);
+      // A button per place to answer it; the service worker opens the one tapped.
+      const actions = (notification.links ?? []).slice(0, 2).map((l) => ({
+        action: l.kind,
+        title: textFor(l.label, user.lang),
+        url: l.href
+      }));
 
       // Send to all devices for this user
-      const devicePromises = user.machshirs.map(machshir => 
-        this.sendToDevice(machshir, title, body, notification, context)
+      const devicePromises = user.machshirs.map(machshir =>
+        this.sendToDevice(machshir, title, body, notification, context, actions)
       );
 
       // Wait for all devices
@@ -101,7 +105,8 @@ export class PushService {
     title: string,
     body: string,
     notification: NotificationData,
-    context: ActionContext
+    context: ActionContext,
+    actions: { action: string; title: string; url: string }[] = []
   ): Promise<void> {
     // Check if device has the required jsoni field
     if (!machshir.attributes?.jsoni) {
@@ -118,7 +123,8 @@ export class PushService {
           url: notification.metadata?.url || 'https://www.1lev1.com/lev',
           body: body,
           pic: notification.metadata?.icon || 'https://res.cloudinary.com/love1/image/upload/v1645647192/apple-touch-icon_irclue.png',
-          title: title
+          title: title,
+          ...(actions.length ? { actions } : {})
         }
       };
 

@@ -186,7 +186,12 @@
     "locationDone": "Done",
     "byQuote": "Priced per order (quote)",
     "byQuoteHint": "For a shopping basket or a service whose price varies: the customer writes what they need and you answer with a price. No need to list every item.",
-    "priceFrom": "Base price / delivery fee (optional)"
+    "priceFrom": "Base price / delivery fee (optional)",
+    "curveTitle": "Price per participant by group size",
+    "curveHint": "The saving goes to the participants: the price is always the cost divided by the number of participants, plus the margin.",
+    "curveN": "Participants",
+    "curvePrice": "Price per participant",
+    "curveRises": "Participant {{count}} adds a unit, and the price goes up for everyone."
   },
   "resources": {
     "title": "My resources",

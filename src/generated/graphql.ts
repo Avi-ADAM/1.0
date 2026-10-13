@@ -1806,6 +1806,38 @@ export type ComponentNewWillingnessEntriesInput = {
   willingHours?: InputMaybe<Scalars['Float']['input']>;
 };
 
+export type ComponentProjectsAtCostEntry = {
+  __typename?: 'ComponentProjectsAtCostEntry';
+  amount?: Maybe<Scalars['Float']['output']>;
+  id: Scalars['ID']['output'];
+  receipt?: Maybe<UploadFileEntityResponse>;
+  recipeResource?: Maybe<MatanotRecipeResourceEntityResponse>;
+  reportedBy?: Maybe<UsersPermissionsUserEntityResponse>;
+  round?: Maybe<Scalars['Int']['output']>;
+  status?: Maybe<Enum_Componentprojectsatcostentry_Status>;
+};
+
+export type ComponentProjectsAtCostEntryFiltersInput = {
+  amount?: InputMaybe<FloatFilterInput>;
+  and?: InputMaybe<Array<InputMaybe<ComponentProjectsAtCostEntryFiltersInput>>>;
+  not?: InputMaybe<ComponentProjectsAtCostEntryFiltersInput>;
+  or?: InputMaybe<Array<InputMaybe<ComponentProjectsAtCostEntryFiltersInput>>>;
+  recipeResource?: InputMaybe<MatanotRecipeResourceFiltersInput>;
+  reportedBy?: InputMaybe<UsersPermissionsUserFiltersInput>;
+  round?: InputMaybe<IntFilterInput>;
+  status?: InputMaybe<StringFilterInput>;
+};
+
+export type ComponentProjectsAtCostEntryInput = {
+  amount?: InputMaybe<Scalars['Float']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  receipt?: InputMaybe<Scalars['ID']['input']>;
+  recipeResource?: InputMaybe<Scalars['ID']['input']>;
+  reportedBy?: InputMaybe<Scalars['ID']['input']>;
+  round?: InputMaybe<Scalars['Int']['input']>;
+  status?: InputMaybe<Enum_Componentprojectsatcostentry_Status>;
+};
+
 export type ComponentProjectsChatre = {
   __typename?: 'ComponentProjectsChatre';
   freetext?: Maybe<Scalars['String']['output']>;
@@ -3264,6 +3296,12 @@ export enum Enum_Componentnewwillingnessentries_Item_Kind {
   Proposal = 'proposal'
 }
 
+export enum Enum_Componentprojectsatcostentry_Status {
+  Agreed = 'agreed',
+  Countered = 'countered',
+  Reported = 'reported'
+}
+
 export enum Enum_Componentprojectsnegom_Kindof {
   Monthly = 'monthly',
   PerUnit = 'perUnit',
@@ -3370,13 +3408,19 @@ export enum Enum_Maagadmember_Status_Member {
   Interested = 'interested',
   Left = 'left',
   Signed = 'signed',
-  Suggested = 'suggested'
+  Suggested = 'suggested',
+  Waiting = 'waiting'
 }
 
 export enum Enum_Maagadmember_Visibility {
   Anonymous = 'anonymous',
   FirstName = 'first_name',
   Full = 'full'
+}
+
+export enum Enum_Maagadoffer_Below_Min_Mode {
+  Absorb = 'absorb',
+  Actual = 'actual'
 }
 
 export enum Enum_Maagadoffer_Recurrence {
@@ -3472,9 +3516,21 @@ export enum Enum_Matanotpend_Status_Pend {
   Rejected = 'rejected'
 }
 
+export enum Enum_Matanotrecipemission_Costshape {
+  PerUnit = 'perUnit',
+  Shared = 'shared',
+  Stepped = 'stepped'
+}
+
 export enum Enum_Matanotrecipemission_Mode {
   ConsumeExisting = 'consumeExisting',
   CreateNew = 'createNew'
+}
+
+export enum Enum_Matanotreciperesource_Costshape {
+  PerUnit = 'perUnit',
+  Shared = 'shared',
+  Stepped = 'stepped'
 }
 
 export enum Enum_Matanotreciperesource_Kindof {
@@ -3489,6 +3545,11 @@ export enum Enum_Matanotreciperesource_Mode {
   ConsumeExisting = 'consumeExisting',
   CreateNew = 'createNew',
   ReuseSp = 'reuseSp'
+}
+
+export enum Enum_Matanotreciperesource_Pricemode {
+  AtCost = 'atCost',
+  Fixed = 'fixed'
 }
 
 export enum Enum_Matanot_Kindof {
@@ -4916,7 +4977,7 @@ export type FxRateInput = {
   source?: InputMaybe<Scalars['String']['input']>;
 };
 
-export type GenericMorph = Act | Actt | ApiKey | Argument | Ask | Askm | Askwant | AssistantSession | Bakasha | Category | Chezin | Clause | ComponentDesisionEditPend | ComponentDesisionNegoarch | ComponentDesisionNegodes | ComponentDesisionNegom | ComponentDesisionNegostipend | ComponentNewCoveredMissions | ComponentNewCoveredResources | ComponentNewEdits | ComponentNewExtractedMissions | ComponentNewExtractedResources | ComponentNewLocation | ComponentNewMeeting | ComponentNewMonter | ComponentNewNego | ComponentNewNegom | ComponentNewSeen | ComponentNewTimes | ComponentNewUserAndIshur | ComponentNewWillingnessEntries | ComponentProjectsChatre | ComponentProjectsConsumedMashabetahalichDeliveries | ComponentProjectsConsumedMissionHours | ComponentProjectsConsumedOpenMu | ComponentProjectsDeliveries | ComponentProjectsHervachti | ComponentProjectsIGotMoney | ComponentProjectsMeeting | ComponentProjectsMonter | ComponentProjectsNegodes | ComponentProjectsNegom | ComponentProjectsPendmnego | ComponentProjectsShift | ComponentProjectsTaskdis | ComponentProjectsUsersOf | ComponentProjectsVots | ConsentEvent | ConventionText | Cuntry | Dea | Deal | Decision | Deffinition | DemoRequest | Filtertag | Finiapruval | FinnishedMission | Forum | ForumLastSeen | FxRate | Haamada | Haamadapruv | Haluka | Hatzaa | Hazbaah | I18NLocale | Issue | Maagad | MaagadMember | MaagadOffer | Maap | Machshir | Mashaabim | Mashabetahalich | Matanot | MatanotRecipeMission | MatanotRecipeResource | Matanotpend | Matbea | MatchSuggestion | Mesimabetahalich | Message | Mission | MissionOffer | Mode | Monter | Nego | NegoMash | Negopendmission | Negotiation | NoticeDismissal | NoticePref | OpenMashaabim | OpenMission | Partof | Pendm | Pgisha | Pgishauser | Pgishauserpend | Pledge | Pmash | Position | Project | ProjectPlanBoard | ProjectPlanItem | ProjectRepo | ProviderProfile | Ratson | RatsonMatchJob | RatsonProposal | RatsonShare | ResourceBooking | Richtext | Rikmash | RosterPeriod | Sale | SealedEnvelope | Seeder | Sheirut | SheirutFulfillment | Sheirutnego | Sheirutpend | Shift | ShiftAssignment | ShiftAvailability | ShiftPlan | Sidur | SiteReport | SiteShareContribution | Skill | Solution | Sp | SpaceDoc | StipendPayment | StipendPledge | StipendProgram | Tafkidim | TextTranslation | Tikunolam | Timegrama | Timer | Tosplit | Translate | UploadFile | UploadFolder | UserKey | UsersPermissionsPermission | UsersPermissionsRole | UsersPermissionsUser | Vallue | Vote | Want | WelcomTop | Whatandwhy | WorkWay | Yat | Zohar;
+export type GenericMorph = Act | Actt | ApiKey | Argument | Ask | Askm | Askwant | AssistantSession | Bakasha | Category | Chezin | Clause | ComponentDesisionEditPend | ComponentDesisionNegoarch | ComponentDesisionNegodes | ComponentDesisionNegom | ComponentDesisionNegostipend | ComponentNewCoveredMissions | ComponentNewCoveredResources | ComponentNewEdits | ComponentNewExtractedMissions | ComponentNewExtractedResources | ComponentNewLocation | ComponentNewMeeting | ComponentNewMonter | ComponentNewNego | ComponentNewNegom | ComponentNewSeen | ComponentNewTimes | ComponentNewUserAndIshur | ComponentNewWillingnessEntries | ComponentProjectsAtCostEntry | ComponentProjectsChatre | ComponentProjectsConsumedMashabetahalichDeliveries | ComponentProjectsConsumedMissionHours | ComponentProjectsConsumedOpenMu | ComponentProjectsDeliveries | ComponentProjectsHervachti | ComponentProjectsIGotMoney | ComponentProjectsMeeting | ComponentProjectsMonter | ComponentProjectsNegodes | ComponentProjectsNegom | ComponentProjectsPendmnego | ComponentProjectsShift | ComponentProjectsTaskdis | ComponentProjectsUsersOf | ComponentProjectsVots | ConsentEvent | ConventionText | Cuntry | Dea | Deal | Decision | Deffinition | DemoRequest | Filtertag | Finiapruval | FinnishedMission | Forum | ForumLastSeen | FxRate | Haamada | Haamadapruv | Haluka | Hatzaa | Hazbaah | I18NLocale | Issue | Maagad | MaagadMember | MaagadOffer | Maap | Machshir | Mashaabim | Mashabetahalich | Matanot | MatanotRecipeMission | MatanotRecipeResource | Matanotpend | Matbea | MatchSuggestion | Mesimabetahalich | Message | Mission | MissionOffer | Mode | Monter | Nego | NegoMash | Negopendmission | Negotiation | NoticeDismissal | NoticePref | OpenMashaabim | OpenMission | Partof | Pendm | Pgisha | Pgishauser | Pgishauserpend | Pledge | Pmash | Position | Project | ProjectPlanBoard | ProjectPlanItem | ProjectRepo | ProviderProfile | Ratson | RatsonMatchJob | RatsonProposal | RatsonShare | ResourceBooking | Richtext | Rikmash | RosterPeriod | Sale | SealedEnvelope | Seeder | Sheirut | SheirutFulfillment | Sheirutnego | Sheirutpend | Shift | ShiftAssignment | ShiftAvailability | ShiftPlan | Sidur | SiteReport | SiteShareContribution | Skill | Solution | Sp | SpaceDoc | StipendPayment | StipendPledge | StipendProgram | Tafkidim | TextTranslation | Tikunolam | Timegrama | Timer | Tosplit | Translate | UploadFile | UploadFolder | UserKey | UsersPermissionsPermission | UsersPermissionsRole | UsersPermissionsUser | Vallue | Vote | Want | WelcomTop | Whatandwhy | WorkWay | Yat | Zohar;
 
 export type Haamada = {
   __typename?: 'Haamada';
@@ -5680,20 +5741,27 @@ export type MaagadInput = {
 
 export type MaagadMember = {
   __typename?: 'MaagadMember';
+  amount_paid?: Maybe<Scalars['Float']['output']>;
+  atcost_ceiling?: Maybe<Scalars['Float']['output']>;
   createdAt?: Maybe<Scalars['DateTime']['output']>;
+  envelope_at_sign?: Maybe<Scalars['Float']['output']>;
   joinedAt?: Maybe<Scalars['DateTime']['output']>;
   leftAt?: Maybe<Scalars['DateTime']['output']>;
   maagad?: Maybe<MaagadEntityResponse>;
   options?: Maybe<Scalars['JSON']['output']>;
+  price_window_until?: Maybe<Scalars['DateTime']['output']>;
   publishedAt?: Maybe<Scalars['DateTime']['output']>;
   ratson?: Maybe<RatsonEntityResponse>;
+  refund_due?: Maybe<Scalars['Float']['output']>;
   sheirutpend?: Maybe<SheirutpendEntityResponse>;
   signedAt?: Maybe<Scalars['DateTime']['output']>;
   signed_offer?: Maybe<MaagadOfferEntityResponse>;
+  sponsor?: Maybe<Scalars['Boolean']['output']>;
   status_member?: Maybe<Enum_Maagadmember_Status_Member>;
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
   user?: Maybe<UsersPermissionsUserEntityResponse>;
   visibility?: Maybe<Enum_Maagadmember_Visibility>;
+  waitingSince?: Maybe<Scalars['DateTime']['output']>;
 };
 
 export type MaagadMemberEntity = {
@@ -5714,8 +5782,11 @@ export type MaagadMemberEntityResponseCollection = {
 };
 
 export type MaagadMemberFiltersInput = {
+  amount_paid?: InputMaybe<FloatFilterInput>;
   and?: InputMaybe<Array<InputMaybe<MaagadMemberFiltersInput>>>;
+  atcost_ceiling?: InputMaybe<FloatFilterInput>;
   createdAt?: InputMaybe<DateTimeFilterInput>;
+  envelope_at_sign?: InputMaybe<FloatFilterInput>;
   id?: InputMaybe<IdFilterInput>;
   joinedAt?: InputMaybe<DateTimeFilterInput>;
   leftAt?: InputMaybe<DateTimeFilterInput>;
@@ -5723,30 +5794,41 @@ export type MaagadMemberFiltersInput = {
   not?: InputMaybe<MaagadMemberFiltersInput>;
   options?: InputMaybe<JsonFilterInput>;
   or?: InputMaybe<Array<InputMaybe<MaagadMemberFiltersInput>>>;
+  price_window_until?: InputMaybe<DateTimeFilterInput>;
   publishedAt?: InputMaybe<DateTimeFilterInput>;
   ratson?: InputMaybe<RatsonFiltersInput>;
+  refund_due?: InputMaybe<FloatFilterInput>;
   sheirutpend?: InputMaybe<SheirutpendFiltersInput>;
   signedAt?: InputMaybe<DateTimeFilterInput>;
   signed_offer?: InputMaybe<MaagadOfferFiltersInput>;
+  sponsor?: InputMaybe<BooleanFilterInput>;
   status_member?: InputMaybe<StringFilterInput>;
   updatedAt?: InputMaybe<DateTimeFilterInput>;
   user?: InputMaybe<UsersPermissionsUserFiltersInput>;
   visibility?: InputMaybe<StringFilterInput>;
+  waitingSince?: InputMaybe<DateTimeFilterInput>;
 };
 
 export type MaagadMemberInput = {
+  amount_paid?: InputMaybe<Scalars['Float']['input']>;
+  atcost_ceiling?: InputMaybe<Scalars['Float']['input']>;
+  envelope_at_sign?: InputMaybe<Scalars['Float']['input']>;
   joinedAt?: InputMaybe<Scalars['DateTime']['input']>;
   leftAt?: InputMaybe<Scalars['DateTime']['input']>;
   maagad?: InputMaybe<Scalars['ID']['input']>;
   options?: InputMaybe<Scalars['JSON']['input']>;
+  price_window_until?: InputMaybe<Scalars['DateTime']['input']>;
   publishedAt?: InputMaybe<Scalars['DateTime']['input']>;
   ratson?: InputMaybe<Scalars['ID']['input']>;
+  refund_due?: InputMaybe<Scalars['Float']['input']>;
   sheirutpend?: InputMaybe<Scalars['ID']['input']>;
   signedAt?: InputMaybe<Scalars['DateTime']['input']>;
   signed_offer?: InputMaybe<Scalars['ID']['input']>;
+  sponsor?: InputMaybe<Scalars['Boolean']['input']>;
   status_member?: InputMaybe<Enum_Maagadmember_Status_Member>;
   user?: InputMaybe<Scalars['ID']['input']>;
   visibility?: InputMaybe<Enum_Maagadmember_Visibility>;
+  waitingSince?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 export type MaagadMemberRelationResponseCollection = {
@@ -5756,15 +5838,22 @@ export type MaagadMemberRelationResponseCollection = {
 
 export type MaagadOffer = {
   __typename?: 'MaagadOffer';
+  below_min_mode?: Maybe<Enum_Maagadoffer_Below_Min_Mode>;
   cancellation_terms?: Maybe<Scalars['String']['output']>;
   createdAt?: Maybe<Scalars['DateTime']['output']>;
   currency?: Maybe<MatbeaEntityResponse>;
   cycle_terms?: Maybe<Scalars['JSON']['output']>;
   description?: Maybe<Scalars['String']['output']>;
   maagad?: Maybe<MaagadEntityResponse>;
+  matanot?: Maybe<MatanotEntityResponse>;
   max_participants?: Maybe<Scalars['Int']['output']>;
   min_participants?: Maybe<Scalars['Int']['output']>;
   options?: Maybe<Scalars['JSON']['output']>;
+  price_announced?: Maybe<Scalars['Float']['output']>;
+  price_current?: Maybe<Scalars['Float']['output']>;
+  price_envelope?: Maybe<Scalars['Float']['output']>;
+  price_lock_at?: Maybe<Scalars['DateTime']['output']>;
+  price_notice_until?: Maybe<Scalars['DateTime']['output']>;
   price_tiers?: Maybe<Scalars['JSON']['output']>;
   proposer_project?: Maybe<ProjectEntityResponse>;
   proposer_user?: Maybe<UsersPermissionsUserEntityResponse>;
@@ -5806,6 +5895,7 @@ export type MaagadOfferEntityResponseCollection = {
 
 export type MaagadOfferFiltersInput = {
   and?: InputMaybe<Array<InputMaybe<MaagadOfferFiltersInput>>>;
+  below_min_mode?: InputMaybe<StringFilterInput>;
   cancellation_terms?: InputMaybe<StringFilterInput>;
   createdAt?: InputMaybe<DateTimeFilterInput>;
   currency?: InputMaybe<MatbeaFiltersInput>;
@@ -5813,11 +5903,17 @@ export type MaagadOfferFiltersInput = {
   description?: InputMaybe<StringFilterInput>;
   id?: InputMaybe<IdFilterInput>;
   maagad?: InputMaybe<MaagadFiltersInput>;
+  matanot?: InputMaybe<MatanotFiltersInput>;
   max_participants?: InputMaybe<IntFilterInput>;
   min_participants?: InputMaybe<IntFilterInput>;
   not?: InputMaybe<MaagadOfferFiltersInput>;
   options?: InputMaybe<JsonFilterInput>;
   or?: InputMaybe<Array<InputMaybe<MaagadOfferFiltersInput>>>;
+  price_announced?: InputMaybe<FloatFilterInput>;
+  price_current?: InputMaybe<FloatFilterInput>;
+  price_envelope?: InputMaybe<FloatFilterInput>;
+  price_lock_at?: InputMaybe<DateTimeFilterInput>;
+  price_notice_until?: InputMaybe<DateTimeFilterInput>;
   price_tiers?: InputMaybe<JsonFilterInput>;
   proposer_project?: InputMaybe<ProjectFiltersInput>;
   proposer_user?: InputMaybe<UsersPermissionsUserFiltersInput>;
@@ -5833,14 +5929,21 @@ export type MaagadOfferFiltersInput = {
 };
 
 export type MaagadOfferInput = {
+  below_min_mode?: InputMaybe<Enum_Maagadoffer_Below_Min_Mode>;
   cancellation_terms?: InputMaybe<Scalars['String']['input']>;
   currency?: InputMaybe<Scalars['ID']['input']>;
   cycle_terms?: InputMaybe<Scalars['JSON']['input']>;
   description?: InputMaybe<Scalars['String']['input']>;
   maagad?: InputMaybe<Scalars['ID']['input']>;
+  matanot?: InputMaybe<Scalars['ID']['input']>;
   max_participants?: InputMaybe<Scalars['Int']['input']>;
   min_participants?: InputMaybe<Scalars['Int']['input']>;
   options?: InputMaybe<Scalars['JSON']['input']>;
+  price_announced?: InputMaybe<Scalars['Float']['input']>;
+  price_current?: InputMaybe<Scalars['Float']['input']>;
+  price_envelope?: InputMaybe<Scalars['Float']['input']>;
+  price_lock_at?: InputMaybe<Scalars['DateTime']['input']>;
+  price_notice_until?: InputMaybe<Scalars['DateTime']['input']>;
   price_tiers?: InputMaybe<Scalars['JSON']['input']>;
   proposer_project?: InputMaybe<Scalars['ID']['input']>;
   proposer_user?: InputMaybe<Scalars['ID']['input']>;
@@ -6820,6 +6923,7 @@ export type MatanotInput = {
 export type MatanotRecipeMission = {
   __typename?: 'MatanotRecipeMission';
   assignedMember?: Maybe<UsersPermissionsUserEntityResponse>;
+  costShape?: Maybe<Enum_Matanotrecipemission_Costshape>;
   createdAt?: Maybe<Scalars['DateTime']['output']>;
   hoursPerUnit?: Maybe<Scalars['Float']['output']>;
   matanot?: Maybe<MatanotEntityResponse>;
@@ -6831,6 +6935,7 @@ export type MatanotRecipeMission = {
   pendm?: Maybe<PendmEntityResponse>;
   publishedAt?: Maybe<Scalars['DateTime']['output']>;
   ratePerHour?: Maybe<Scalars['Float']['output']>;
+  stepCapacity?: Maybe<Scalars['Int']['output']>;
   unitsPerProduct?: Maybe<Scalars['Float']['output']>;
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
 };
@@ -6855,6 +6960,7 @@ export type MatanotRecipeMissionEntityResponseCollection = {
 export type MatanotRecipeMissionFiltersInput = {
   and?: InputMaybe<Array<InputMaybe<MatanotRecipeMissionFiltersInput>>>;
   assignedMember?: InputMaybe<UsersPermissionsUserFiltersInput>;
+  costShape?: InputMaybe<StringFilterInput>;
   createdAt?: InputMaybe<DateTimeFilterInput>;
   hoursPerUnit?: InputMaybe<FloatFilterInput>;
   id?: InputMaybe<IdFilterInput>;
@@ -6869,12 +6975,14 @@ export type MatanotRecipeMissionFiltersInput = {
   pendm?: InputMaybe<PendmFiltersInput>;
   publishedAt?: InputMaybe<DateTimeFilterInput>;
   ratePerHour?: InputMaybe<FloatFilterInput>;
+  stepCapacity?: InputMaybe<IntFilterInput>;
   unitsPerProduct?: InputMaybe<FloatFilterInput>;
   updatedAt?: InputMaybe<DateTimeFilterInput>;
 };
 
 export type MatanotRecipeMissionInput = {
   assignedMember?: InputMaybe<Scalars['ID']['input']>;
+  costShape?: InputMaybe<Enum_Matanotrecipemission_Costshape>;
   hoursPerUnit?: InputMaybe<Scalars['Float']['input']>;
   matanot?: InputMaybe<Scalars['ID']['input']>;
   mesimabetahalich?: InputMaybe<Scalars['ID']['input']>;
@@ -6885,6 +6993,7 @@ export type MatanotRecipeMissionInput = {
   pendm?: InputMaybe<Scalars['ID']['input']>;
   publishedAt?: InputMaybe<Scalars['DateTime']['input']>;
   ratePerHour?: InputMaybe<Scalars['Float']['input']>;
+  stepCapacity?: InputMaybe<Scalars['Int']['input']>;
   unitsPerProduct?: InputMaybe<Scalars['Float']['input']>;
 };
 
@@ -6896,6 +7005,7 @@ export type MatanotRecipeMissionRelationResponseCollection = {
 export type MatanotRecipeResource = {
   __typename?: 'MatanotRecipeResource';
   assignedMember?: Maybe<UsersPermissionsUserEntityResponse>;
+  costShape?: Maybe<Enum_Matanotreciperesource_Costshape>;
   createdAt?: Maybe<Scalars['DateTime']['output']>;
   kindOf?: Maybe<Enum_Matanotreciperesource_Kindof>;
   mashabetahalich?: Maybe<MashabetahalichEntityResponse>;
@@ -6904,9 +7014,11 @@ export type MatanotRecipeResource = {
   nego?: Maybe<NegoEntityResponse>;
   notes?: Maybe<Scalars['String']['output']>;
   pmash?: Maybe<PmashEntityResponse>;
+  priceMode?: Maybe<Enum_Matanotreciperesource_Pricemode>;
   pricePerUnit?: Maybe<Scalars['Float']['output']>;
   publishedAt?: Maybe<Scalars['DateTime']['output']>;
   quantityPerUnit?: Maybe<Scalars['Float']['output']>;
+  stepCapacity?: Maybe<Scalars['Int']['output']>;
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
 };
 
@@ -6930,6 +7042,7 @@ export type MatanotRecipeResourceEntityResponseCollection = {
 export type MatanotRecipeResourceFiltersInput = {
   and?: InputMaybe<Array<InputMaybe<MatanotRecipeResourceFiltersInput>>>;
   assignedMember?: InputMaybe<UsersPermissionsUserFiltersInput>;
+  costShape?: InputMaybe<StringFilterInput>;
   createdAt?: InputMaybe<DateTimeFilterInput>;
   id?: InputMaybe<IdFilterInput>;
   kindOf?: InputMaybe<StringFilterInput>;
@@ -6941,14 +7054,17 @@ export type MatanotRecipeResourceFiltersInput = {
   notes?: InputMaybe<StringFilterInput>;
   or?: InputMaybe<Array<InputMaybe<MatanotRecipeResourceFiltersInput>>>;
   pmash?: InputMaybe<PmashFiltersInput>;
+  priceMode?: InputMaybe<StringFilterInput>;
   pricePerUnit?: InputMaybe<FloatFilterInput>;
   publishedAt?: InputMaybe<DateTimeFilterInput>;
   quantityPerUnit?: InputMaybe<FloatFilterInput>;
+  stepCapacity?: InputMaybe<IntFilterInput>;
   updatedAt?: InputMaybe<DateTimeFilterInput>;
 };
 
 export type MatanotRecipeResourceInput = {
   assignedMember?: InputMaybe<Scalars['ID']['input']>;
+  costShape?: InputMaybe<Enum_Matanotreciperesource_Costshape>;
   kindOf?: InputMaybe<Enum_Matanotreciperesource_Kindof>;
   mashabetahalich?: InputMaybe<Scalars['ID']['input']>;
   matanot?: InputMaybe<Scalars['ID']['input']>;
@@ -6956,9 +7072,11 @@ export type MatanotRecipeResourceInput = {
   nego?: InputMaybe<Scalars['ID']['input']>;
   notes?: InputMaybe<Scalars['String']['input']>;
   pmash?: InputMaybe<Scalars['ID']['input']>;
+  priceMode?: InputMaybe<Enum_Matanotreciperesource_Pricemode>;
   pricePerUnit?: InputMaybe<Scalars['Float']['input']>;
   publishedAt?: InputMaybe<Scalars['DateTime']['input']>;
   quantityPerUnit?: InputMaybe<Scalars['Float']['input']>;
+  stepCapacity?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type MatanotRecipeResourceRelationResponseCollection = {
@@ -18002,6 +18120,7 @@ export type SheirutFiltersInput = {
 export type SheirutFulfillment = {
   __typename?: 'SheirutFulfillment';
   agreedPrice?: Maybe<Scalars['Float']['output']>;
+  atCostEntries?: Maybe<Array<Maybe<ComponentProjectsAtCostEntry>>>;
   cmdm?: Maybe<Array<Maybe<ComponentProjectsConsumedMashabetahalichDeliveries>>>;
   consumedMissionHours?: Maybe<Array<Maybe<ComponentProjectsConsumedMissionHours>>>;
   consumedOpenMU?: Maybe<Array<Maybe<ComponentProjectsConsumedOpenMu>>>;
@@ -18009,13 +18128,22 @@ export type SheirutFulfillment = {
   createdMaaps?: Maybe<MaapEntityResponse>;
   createdMissions?: Maybe<MesimabetahalichEntityResponse>;
   createdPmashes?: Maybe<PmashEntityResponse>;
+  maagad_offer?: Maybe<MaagadOfferEntityResponse>;
   matanot?: Maybe<MatanotEntityResponse>;
+  participants?: Maybe<Scalars['Int']['output']>;
   process?: Maybe<PartofEntityResponse>;
   publishedAt?: Maybe<Scalars['DateTime']['output']>;
   quantity?: Maybe<Scalars['Float']['output']>;
   sheirut?: Maybe<SheirutEntityResponse>;
   status_process?: Maybe<Enum_Sheirutfulfillment_Status_Process>;
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
+};
+
+
+export type SheirutFulfillmentAtCostEntriesArgs = {
+  filters?: InputMaybe<ComponentProjectsAtCostEntryFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
 };
 
 
@@ -18059,6 +18187,7 @@ export type SheirutFulfillmentEntityResponseCollection = {
 export type SheirutFulfillmentFiltersInput = {
   agreedPrice?: InputMaybe<FloatFilterInput>;
   and?: InputMaybe<Array<InputMaybe<SheirutFulfillmentFiltersInput>>>;
+  atCostEntries?: InputMaybe<ComponentProjectsAtCostEntryFiltersInput>;
   cmdm?: InputMaybe<ComponentProjectsConsumedMashabetahalichDeliveriesFiltersInput>;
   consumedMissionHours?: InputMaybe<ComponentProjectsConsumedMissionHoursFiltersInput>;
   consumedOpenMU?: InputMaybe<ComponentProjectsConsumedOpenMuFiltersInput>;
@@ -18067,9 +18196,11 @@ export type SheirutFulfillmentFiltersInput = {
   createdMissions?: InputMaybe<MesimabetahalichFiltersInput>;
   createdPmashes?: InputMaybe<PmashFiltersInput>;
   id?: InputMaybe<IdFilterInput>;
+  maagad_offer?: InputMaybe<MaagadOfferFiltersInput>;
   matanot?: InputMaybe<MatanotFiltersInput>;
   not?: InputMaybe<SheirutFulfillmentFiltersInput>;
   or?: InputMaybe<Array<InputMaybe<SheirutFulfillmentFiltersInput>>>;
+  participants?: InputMaybe<IntFilterInput>;
   process?: InputMaybe<PartofFiltersInput>;
   publishedAt?: InputMaybe<DateTimeFilterInput>;
   quantity?: InputMaybe<FloatFilterInput>;
@@ -18080,13 +18211,16 @@ export type SheirutFulfillmentFiltersInput = {
 
 export type SheirutFulfillmentInput = {
   agreedPrice?: InputMaybe<Scalars['Float']['input']>;
+  atCostEntries?: InputMaybe<Array<InputMaybe<ComponentProjectsAtCostEntryInput>>>;
   cmdm?: InputMaybe<Array<InputMaybe<ComponentProjectsConsumedMashabetahalichDeliveriesInput>>>;
   consumedMissionHours?: InputMaybe<Array<InputMaybe<ComponentProjectsConsumedMissionHoursInput>>>;
   consumedOpenMU?: InputMaybe<Array<InputMaybe<ComponentProjectsConsumedOpenMuInput>>>;
   createdMaaps?: InputMaybe<Scalars['ID']['input']>;
   createdMissions?: InputMaybe<Scalars['ID']['input']>;
   createdPmashes?: InputMaybe<Scalars['ID']['input']>;
+  maagad_offer?: InputMaybe<Scalars['ID']['input']>;
   matanot?: InputMaybe<Scalars['ID']['input']>;
+  participants?: InputMaybe<Scalars['Int']['input']>;
   process?: InputMaybe<Scalars['ID']['input']>;
   publishedAt?: InputMaybe<Scalars['DateTime']['input']>;
   quantity?: InputMaybe<Scalars['Float']['input']>;
@@ -18226,6 +18360,7 @@ export type Sheirutpend = {
   archived?: Maybe<Scalars['Boolean']['output']>;
   conditional?: Maybe<Scalars['Boolean']['output']>;
   createdAt?: Maybe<Scalars['DateTime']['output']>;
+  departure_bom?: Maybe<Scalars['Boolean']['output']>;
   finnishDate?: Maybe<Scalars['DateTime']['output']>;
   forum?: Maybe<ForumEntityResponse>;
   locale?: Maybe<Scalars['String']['output']>;
@@ -18307,6 +18442,7 @@ export type SheirutpendFiltersInput = {
   archived?: InputMaybe<BooleanFilterInput>;
   conditional?: InputMaybe<BooleanFilterInput>;
   createdAt?: InputMaybe<DateTimeFilterInput>;
+  departure_bom?: InputMaybe<BooleanFilterInput>;
   finnishDate?: InputMaybe<DateTimeFilterInput>;
   forum?: InputMaybe<ForumFiltersInput>;
   id?: InputMaybe<IdFilterInput>;
@@ -18335,6 +18471,7 @@ export type SheirutpendInput = {
   appruved?: InputMaybe<Scalars['Boolean']['input']>;
   archived?: InputMaybe<Scalars['Boolean']['input']>;
   conditional?: InputMaybe<Scalars['Boolean']['input']>;
+  departure_bom?: InputMaybe<Scalars['Boolean']['input']>;
   finnishDate?: InputMaybe<Scalars['DateTime']['input']>;
   forum?: InputMaybe<Scalars['ID']['input']>;
   maagad_offer?: InputMaybe<Scalars['ID']['input']>;

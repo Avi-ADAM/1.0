@@ -17,6 +17,7 @@
  * `proposeOnOpenMashaabim` and `customizeOpenMashaabim` share this handler.
  */
 
+import { noticeSubject } from '$lib/notices/links';
 import { loadOfferDeal, notifyDealClients } from '$lib/server/deal/offerDeal.js';
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { normalizeLocationInput } from './actionUtils.js';
@@ -201,6 +202,7 @@ export const proposeOnOpenMashaabimConfig: ActionConfig = {
       },
     },
     intent: 'consent',
+    subject: (p, r) => (r?.data?.autoFinalized ? null : noticeSubject('askm', r?.data?.askmId, p.projectId)),
     metadata: { type: 'mashaabimRequest', url: 'lev' },
   },
 

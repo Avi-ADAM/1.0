@@ -7,6 +7,7 @@
  * outcome — the server decides from actual membership.
  */
 
+import { noticeSubject } from '$lib/notices/links';
 import type { ActionConfig } from '../types.js';
 import { openMissionProposalHandler } from './proposeOnOpenMission.js';
 import { scope, decisionScope, scopeList } from '$lib/realtime/scopes.js';
@@ -36,6 +37,7 @@ export const customizeOpenMissionConfig: ActionConfig = {
       body: { he: 'חבר רקמה לקח משימה בתנאים מותאמים', en: 'A member took a mission on customized terms' },
     },
     intent: 'consent',
+    subject: (p, r) => noticeSubject('ask', r?.data?.askId, p.projectId),
     metadata: { type: 'missionApplication', url: 'lev' },
   },
 

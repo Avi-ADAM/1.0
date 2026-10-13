@@ -1,3 +1,4 @@
+import { noticeSubject } from '$lib/notices/links';
 import { loadOfferDeal, notifyDealClients } from '$lib/server/deal/offerDeal.js';
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import {
@@ -184,6 +185,7 @@ export const createMashaabimRequestConfig: ActionConfig = {
       body: { he: `יש בקשה חדשה למשאב בפרויקט`, en: 'A new resource request was submitted' },
     },
     intent: 'consent',
+    subject: (p, r) => noticeSubject('askm', r?.data?.askmId, p.projectId),
     metadata: { type: 'mashaabimRequest', url: 'lev' },
   },
 

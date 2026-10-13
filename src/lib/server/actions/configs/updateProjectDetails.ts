@@ -1,3 +1,4 @@
+import { noticeSubject } from '$lib/notices/links';
 import type { ActionConfig, ActionExecutionHandler } from '../types';
 import { calcDeadlineMs } from './actionUtils.js';
 import { licenseChanged, normalizeLicenseChange } from '$lib/codeLicense/codeLicense.js';
@@ -277,7 +278,8 @@ export const updateProjectDetailsConfig: ActionConfig = {
           }
         : undefined,
     intent: (_p, r) => ((r?.data?.decisionsCreated ?? 0) > 0 ? 'consent' : 'ambient'),
-    metadata: { type: 'base', url: 'lev' }
+    subject: (p, r) => (r?.data?.decisions?.length === 1 ? noticeSubject('decision', r.data.decisions[0].id, p.projectId, 'hachla') : null),
+    metadata: { type: 'base', url: '/lev?focus=hachla&project={{projectId}}' }
   },
 
   realtime: {

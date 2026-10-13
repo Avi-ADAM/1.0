@@ -222,26 +222,34 @@ onMessage(messaging, (payload) => {
 
         // Get the message in the user's language
         const userLang = $locale || 'he';
-        const title =
-          notification.title[userLang] || notification.title.he || '';
-        const body = notification.body[userLang] || notification.body.he || '';
+        const pick = (s) => (s && (s[userLang] || s.en || s.he)) || '';
+        const title = pick(notification.title);
+        const body = pick(notification.body);
 
         // Display notification using toast (only if not from me)
         const isFromMe = notification.initiatorId === String(data.id);
 
         if (!isFromMe) {
-          toast.info(`${title}: ${body}`, {
-            duration: 5000,
-            action: notification.metadata?.url
-              ? {
-                  label: 'View',
-                  onClick: () => {
-                    if (notification.metadata?.url) {
-                      goto(notification.metadata.url);
-                    }
+          // A notice about one vote carries every place to answer it (the
+          // rikma's vote page, the heart filtered to it) — one button each, so
+          // the member picks. The words come labelled from the server.
+          const links = Array.isArray(notification.links) ? notification.links : [];
+          const button = (l) => ({ label: pick(l.label), onClick: () => goto(l.href) });
+          const url = notification.metadata?.url;
+          toast.info(title, {
+            description: body,
+            duration: links.length ? 10000 : 5000,
+            action: links[0]
+              ? button(links[0])
+              : url
+                ? {
+                    label: $t('common.buttons.view'),
+                    // A legacy url may be a bare segment ('lev'); from any page
+                    // other than / that would resolve relative to it.
+                    onClick: () => goto(String(url).startsWith('/') ? url : `/${url}`)
                   }
-                }
-              : undefined
+                : undefined,
+            cancel: links[1] ? button(links[1]) : undefined
           });
         }
       });

@@ -30,6 +30,7 @@
  * so the server doesn't need to look up names.
  */
 
+import { noticeSubject } from '$lib/notices/links';
 import { ENTRY_CURRENCY_PARAM, entryFields, normalizeEntry } from '$lib/server/money/normalizeEntry.js';
 import { rikmaCurrency } from '$lib/money/resolve.js';
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
@@ -484,6 +485,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
               },
             },
             intent: 'consent',
+            subject: () => noticeSubject('pendm', createdEntityId, projectId),
             emailTemplate: 'PendJustCreated',
             emailTemplateData: {
               un: creatorName,

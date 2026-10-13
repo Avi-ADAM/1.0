@@ -18,6 +18,11 @@
  * rikma (the offer's proposer_project), priced at the tier the reached count
  * unlocked. Deals are created only at activation, so unsigning/expiring before
  * then leaves no orphan pends. Recurring fulfilment (§7.5) is still future.
+ *
+ * Every maagad write (pool, member, offer, the activation pend) goes out under
+ * the service token: those qids are serviceAdmin-only in qidsAccess.js, so the
+ * checks in these handlers are the only way to change a status or a count.
+ * Reads still use the caller's jwt.
  */
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
@@ -31,6 +36,13 @@ import {
 import { ensurePersonalRikmaFor } from './ensurePersonalRikma.js';
 import { clusterWishes, type ClusterWish } from '../../maagad/clustering.js';
 import { scope, scopeList } from '$lib/realtime/scopes.js';
+import {
+  departureTerms,
+  isPoolableProduct,
+  linesFromMatanot,
+  tierPriceAt,
+  type DepartureTerms
+} from '$lib/pooling/departure';
 
 const VISIBILITIES = new Set(['anonymous', 'first_name', 'full']);
 const RECURRENCES = new Set(['one_time', 'weekly', 'biweekly', 'monthly']);
@@ -105,10 +117,71 @@ async function maybePromoteToVisible(
     await strapi.execute(
       '230updateMaagad',
       { id: maagadId, status_maagad: 'visible' },
-      context.jwt,
+      undefined,
       context.fetch
     );
   }
+}
+
+// ── departures: an offer made out of a rikma's product (PLAN_POOL_PRODUCT §4) ──
+
+/**
+ * Load the product, check the caller may offer it, and derive the departure's
+ * terms from its BOM. The price is never the client's: `unitPrice` and
+ * `priceTiers` sent with a product are ignored (§2).
+ */
+async function departureFromProduct(
+  strapi: any,
+  context: any,
+  matanotId: string,
+  proposerProjectId: string | null,
+  min: number,
+  max: number | null
+): Promise<{ projectId: string; terms: DepartureTerms; productName: string }> {
+  // Service token: 443 is serviceAdmin-only; the membership check is below.
+  const res = await strapi.execute('443matanotForPoolOffer', { id: matanotId }, undefined, context.fetch);
+  const node = res?.data?.matanot?.data;
+  if (!node) throw new Error(`product ${matanotId} not found`);
+  const a = node.attributes ?? {};
+  if (a.pricingMode !== 'estimated') {
+    throw new Error('only a composed product (with missions and resources) can open a departure');
+  }
+  if (!isPoolableProduct(a)) throw new Error('this product is not open for sale yet');
+  const mine = (a.projectcreates?.data ?? []).filter((p: any) =>
+    (p?.attributes?.user_1s?.data ?? []).some((u: any) => String(u?.id) === String(context.userId))
+  );
+  const rikma = proposerProjectId
+    ? mine.find((p: any) => String(p.id) === String(proposerProjectId))
+    : mine[0];
+  if (!rikma) throw new Error('only a member of the rikma that makes this product can offer it');
+
+  const terms = departureTerms(linesFromMatanot(a), Number(a.marginPct) || 0, min, max);
+  return { projectId: String(rikma.id), terms, productName: String(a.name ?? '') };
+}
+
+async function assertProjectMember(strapi: any, context: any, projectId: string) {
+  const res = await strapi.execute(
+    '65checkProjectMembership',
+    { uid: String(context.userId), projectId },
+    context.jwt,
+    context.fetch
+  );
+  const projects = res?.data?.usersPermissionsUser?.data?.attributes?.projects_1s?.data ?? [];
+  if (projects.length === 0) throw new Error('only a member of the rikma can make an offer in its name');
+}
+
+/** The price everyone pays at the offer's current size, or null for a plain offer. */
+function departurePriceNow(oa: any, signedCount: number): number | null {
+  if (!oa?.matanot?.data?.id) return null;
+  const min = Number(oa.min_participants) || 1;
+  return tierPriceAt(Array.isArray(oa.price_tiers) ? oa.price_tiers : null, Math.max(signedCount, min));
+}
+
+/** Keep a departure's displayed price in step with its size (service-only qid 445). */
+async function syncDeparturePrice(strapi: any, context: any, offerId: string, oa: any, signedCount: number) {
+  const priceNow = departurePriceNow(oa, signedCount);
+  if (priceNow == null) return;
+  await strapi.execute('445setMaagadOfferPricing', { id: offerId, price_current: priceNow }, undefined, context.fetch);
 }
 
 // ── openMaagad ──────────────────────────────────────────────────────────────
@@ -151,7 +224,7 @@ const openMaagadHandler: ActionExecutionHandler = async (params, context, { stra
       categories: Array.isArray(categoryIds) && categoryIds.length ? categoryIds.map(String) : null,
       publishedAt: nowIso()
     },
-    context.jwt,
+    undefined,
     context.fetch
   );
   const maagadId = created?.data?.createMaagad?.data?.id;
@@ -169,7 +242,7 @@ const openMaagadHandler: ActionExecutionHandler = async (params, context, { stra
       joinedAt: nowIso(),
       publishedAt: nowIso()
     },
-    context.jwt,
+    undefined,
     context.fetch
   );
 
@@ -204,7 +277,7 @@ const joinMaagadHandler: ActionExecutionHandler = async (params, context, { stra
     await strapi.execute(
       '226updateMaagadMember',
       { id: existing.id, status_member: 'interested', visibility: vis },
-      context.jwt,
+      undefined,
       context.fetch
     );
     memberId = existing.id;
@@ -220,7 +293,7 @@ const joinMaagadHandler: ActionExecutionHandler = async (params, context, { stra
         joinedAt: nowIso(),
         publishedAt: nowIso()
       },
-      context.jwt,
+      undefined,
       context.fetch
     );
     memberId = created?.data?.createMaagadMember?.data?.id;
@@ -255,7 +328,7 @@ const leaveMaagadHandler: ActionExecutionHandler = async (params, context, { str
   await strapi.execute(
     '226updateMaagadMember',
     { id: existing.id, status_member: 'left', leftAt: nowIso() },
-    context.jwt,
+    undefined,
     context.fetch
   );
   // Leaving is free and silent (§2.1) — no notifications to anyone.
@@ -280,21 +353,35 @@ const createMaagadOfferHandler: ActionExecutionHandler = async (params, context,
     cycleTerms = null,
     cancellationTerms = null,
     proposerProjectId = null,
+    // A departure of a rikma's product (PLAN_POOL_PRODUCT §4): the price is
+    // derived from its BOM, and unitPrice / priceTiers are ignored.
+    matanotId = null,
     // Track C: when there is no existing pool, the offer creates its wrapper.
     newMaagad = null
   } = params as Record<string, any>;
 
-  if (!title || !String(title).trim()) throw new Error('title is required');
   const min = Number(minParticipants);
   if (!Number.isInteger(min) || min < 2) throw new Error('min_participants must be an integer ≥ 2');
   const max = maxParticipants != null ? Number(maxParticipants) : null;
   if (max != null && max < min) throw new Error('max_participants must be ≥ min_participants');
-  const price = Number(unitPrice);
-  if (!Number.isFinite(price) || price < 0) throw new Error('unitPrice must be a non-negative number');
   if (!signDeadline || new Date(signDeadline).getTime() <= Date.now()) {
     throw new Error('sign_deadline must be in the future');
   }
   if (!RECURRENCES.has(recurrence)) throw new Error(`invalid recurrence: ${recurrence}`);
+
+  // Checked before anything is written, so a refused product leaves no pool behind.
+  const departure = matanotId
+    ? await departureFromProduct(strapi, context, String(matanotId), proposerProjectId, min, max)
+    : null;
+  // A plain offer in a rikma's name: the deals land in that rikma at activation,
+  // so only one of its members may make it (a departure was checked above).
+  if (!departure && proposerProjectId) {
+    await assertProjectMember(strapi, context, String(proposerProjectId));
+  }
+  const offerTitle = String(title ?? '').trim() || departure?.productName || '';
+  if (!offerTitle) throw new Error('title is required');
+  const price = departure ? departure.terms.priceCurrent : Number(unitPrice);
+  if (!Number.isFinite(price) || price < 0) throw new Error('unitPrice must be a non-negative number');
 
   let targetMaagadId = maagadId;
   let maagadNode: any = null;
@@ -324,7 +411,7 @@ const createMaagadOfferHandler: ActionExecutionHandler = async (params, context,
         origin: 'supplier_offer',
         publishedAt: nowIso()
       },
-      context.jwt,
+      undefined,
       context.fetch
     );
     targetMaagadId = created?.data?.createMaagad?.data?.id;
@@ -336,12 +423,12 @@ const createMaagadOfferHandler: ActionExecutionHandler = async (params, context,
     {
       maagad: targetMaagadId,
       proposer_user: context.userId,
-      proposer_project: proposerProjectId,
-      title: String(title).trim(),
+      proposer_project: departure ? departure.projectId : proposerProjectId,
+      title: offerTitle,
       description,
       unit_price: price,
       currency: currencyId,
-      price_tiers: priceTiers,
+      price_tiers: departure ? null : priceTiers,
       min_participants: min,
       max_participants: max,
       sign_deadline: signDeadline,
@@ -351,18 +438,37 @@ const createMaagadOfferHandler: ActionExecutionHandler = async (params, context,
       cancellation_terms: cancellationTerms,
       publishedAt: nowIso()
     },
-    context.jwt,
+    undefined,
     context.fetch
   );
   const offerId = offerRes?.data?.createMaagadOffer?.data?.id;
   if (!offerId) throw new Error('failed to create offer');
+
+  // The departure's derived terms, through the service-only qid (§4). The full
+  // curve rides in price_tiers so resolveTierPrice reads priceAt(n) exactly.
+  if (departure) {
+    await strapi.execute(
+      '445setMaagadOfferPricing',
+      {
+        id: offerId,
+        matanot: String(matanotId),
+        unit_price: departure.terms.priceCurrent,
+        price_tiers: departure.terms.tiers,
+        price_current: departure.terms.priceCurrent,
+        price_envelope: departure.terms.envelope,
+        price_lock_at: signDeadline
+      },
+      undefined,
+      context.fetch
+    );
+  }
 
   // Pool now carries a live offer.
   if (maagadNode && ['forming', 'visible', 'dormant'].includes(maagadNode.attributes?.status_maagad)) {
     await strapi.execute(
       '230updateMaagad',
       { id: targetMaagadId, status_maagad: 'offered' },
-      context.jwt,
+      undefined,
       context.fetch
     );
   }
@@ -378,7 +484,14 @@ const createMaagadOfferHandler: ActionExecutionHandler = async (params, context,
     : [];
 
   return {
-    data: { maagadId: targetMaagadId, offerId, partyIds: poolPartyIds(maagadNode) },
+    data: {
+      maagadId: targetMaagadId,
+      offerId,
+      partyIds: poolPartyIds(maagadNode),
+      ...(departure
+        ? { priceCurrent: departure.terms.priceCurrent, priceEnvelope: departure.terms.envelope }
+        : {})
+    },
     notifyUserIds
   };
 };
@@ -431,7 +544,7 @@ const signMaagadOfferHandler: ActionExecutionHandler = async (params, context, {
         joinedAt: nowIso(),
         publishedAt: nowIso()
       },
-      context.jwt,
+      undefined,
       context.fetch
     );
     member = { id: created?.data?.createMaagadMember?.data?.id, attributes: {} };
@@ -446,9 +559,20 @@ const signMaagadOfferHandler: ActionExecutionHandler = async (params, context, {
       options,
       signedAt: nowIso()
     },
-    context.jwt,
+    undefined,
     context.fetch
   );
+
+  // A departure: she joins under the ceiling she saw — her personal consent
+  // boundary, not a price (PLAN_POOL_PRODUCT §1ב, §4). Service-only qid 446.
+  if (oa.matanot?.data?.id && oa.price_envelope != null) {
+    await strapi.execute(
+      '446setMaagadMemberEnvelope',
+      { id: member.id, envelope_at_sign: Number(oa.price_envelope) },
+      undefined,
+      context.fetch
+    );
+  }
 
   const newCount = currentCount + 1;
   const quorum = newCount >= Number(oa.min_participants || Infinity);
@@ -459,9 +583,10 @@ const signMaagadOfferHandler: ActionExecutionHandler = async (params, context, {
       signed_count: newCount,
       status_offer: quorum ? 'quorum_reached' : 'open'
     },
-    context.jwt,
+    undefined,
     context.fetch
   );
+  await syncDeparturePrice(strapi, context, String(offerId), oa, newCount);
 
   // Quorum! The proposer confirms the final number (§7.2) — notify them.
   const notifyUserIds =
@@ -503,7 +628,7 @@ const unsignMaagadOfferHandler: ActionExecutionHandler = async (params, context,
   await strapi.execute(
     '226updateMaagadMember',
     { id: member.id, status_member: 'interested', signed_offer: null, signedAt: null },
-    context.jwt,
+    undefined,
     context.fetch
   );
 
@@ -517,9 +642,11 @@ const unsignMaagadOfferHandler: ActionExecutionHandler = async (params, context,
       signed_count: newCount,
       status_offer: droppedBelowMin ? 'open' : oa.status_offer
     },
-    context.jwt,
+    undefined,
     context.fetch
   );
+  // The repricing this leaves for the others (and their "not for me" window) is P3.
+  await syncDeparturePrice(strapi, context, String(offerId), oa, newCount);
 
   return {
     data: { maagadId, offerId, unsigned: true, signedCount: newCount, partyIds: poolPartyIds(maagadNode) }
@@ -579,7 +706,7 @@ async function activateOffer(
         await strapi.execute(
           '267setMaagadOfferProposerProject',
           { id: offerId, project: proposerProjectId },
-          context.jwt,
+          undefined,
           context.fetch
         );
       } catch (e) {
@@ -603,13 +730,13 @@ async function activateOffer(
   await strapi.execute(
     '228updateMaagadOffer',
     { id: offerId, status_offer: 'activated' },
-    context.jwt,
+    undefined,
     context.fetch
   );
   await strapi.execute(
     '230updateMaagad',
     { id: maagadId, status_maagad: 'active' },
-    context.jwt,
+    undefined,
     context.fetch
   );
 
@@ -635,7 +762,7 @@ async function activateOffer(
             quant: 1,
             total: finalPrice
           },
-          context.jwt,
+          undefined,
           context.fetch
         );
         sheirutpendId = pendRes?.data?.createSheirutpend?.data?.id ?? null;
@@ -652,7 +779,7 @@ async function activateOffer(
         status_member: 'active',
         ...(sheirutpendId ? { sheirutpend: sheirutpendId } : {})
       },
-      context.jwt,
+      undefined,
       context.fetch
     );
     if (uid) activatedUserIds.push(String(uid));
@@ -731,7 +858,7 @@ const expireMaagadOffersHandler: ActionExecutionHandler = async (_params, contex
     await strapi.execute(
       '228updateMaagadOffer',
       { id: offer.id, status_offer: 'expired' },
-      context.jwt,
+      undefined,
       context.fetch
     );
     // Signers of this offer revert to interested (their conditional deal, once
@@ -740,7 +867,7 @@ const expireMaagadOffersHandler: ActionExecutionHandler = async (_params, contex
       await strapi.execute(
         '226updateMaagadMember',
         { id: sm.id, status_member: 'interested', signed_offer: null, signedAt: null },
-        context.jwt,
+        undefined,
         context.fetch
       );
     }
@@ -830,7 +957,7 @@ const clusterRatsonsHandler: ActionExecutionHandler = async (params, context, { 
         categories: cluster.categoryIds.length ? cluster.categoryIds : null,
         publishedAt: nowIso()
       },
-      context.jwt,
+      undefined,
       context.fetch
     );
     const maagadId = createdMaagad?.data?.createMaagad?.data?.id;
@@ -853,7 +980,7 @@ const clusterRatsonsHandler: ActionExecutionHandler = async (params, context, { 
             joinedAt: nowIso(),
             publishedAt: nowIso()
           },
-          context.jwt,
+          undefined,
           context.fetch
         );
       }
@@ -934,9 +1061,10 @@ export const maagadActions: ActionConfig[] = [
     paramSchema: {
       maagadId: { type: 'string', required: false, description: 'Existing pool (omit with newMaagad for Track C)' },
       newMaagad: { type: 'object', required: false, description: 'Wrapper pool for a supplier-initiated offer: {name, scope, lat, lng, radius, frequency}' },
-      title: { type: 'string', required: true, description: 'What exactly is offered' },
+      title: { type: 'string', required: false, description: "What exactly is offered (defaults to the product's name for a departure)" },
       description: { type: 'string', required: false, description: 'Details of the offer' },
-      unitPrice: { type: 'number', required: true, description: 'Price per consumer (basket/seat/subscription)' },
+      matanotId: { type: 'string', required: false, description: "A rikma's composed product: the offer is a departure of it, priced from its BOM (PLAN_POOL_PRODUCT §4); unitPrice/priceTiers are then ignored" },
+      unitPrice: { type: 'number', required: false, description: 'Price per consumer (basket/seat/subscription) - required unless matanotId is given' },
       currencyId: { type: 'string', required: false, description: 'Matbea id' },
       priceTiers: { type: 'array', required: false, description: '[{min, price}] - the reached tier is billed to everyone' },
       minParticipants: { type: 'number', required: true, description: 'Quorum (≥2) - below it no deal happens' },

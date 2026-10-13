@@ -10,6 +10,7 @@
  * same write: proposing is agreeing.
  */
 
+import { noticeSubject } from '$lib/notices/links';
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { execFromContext } from '$lib/server/archive/exec.js';
 import { addStipendRound } from '$lib/server/stipend/decision.js';
@@ -108,6 +109,8 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
           },
           // A counter resets the clock and waits for an answer.
           intent: 'consent',
+          subject: () => noticeSubject('decision', decisionId, decision.projectId, 'stipend'),
+          subjectText: 'links',
           metadata: { type: 'voteUpdate', url: 'lev', priority: 'high' }
         },
         { recipients: others, projectId: decision.projectId },

@@ -11,6 +11,7 @@
 
 import type { HubFeedItem } from '$lib/digest/hubSummary.js';
 import { k, txt, type Notice } from './types';
+import { levFocusHref } from './links';
 
 export function hubFeedNotice(item: HubFeedItem): Notice {
   const what = txt(item.title);
@@ -37,7 +38,7 @@ export function hubFeedNotice(item: HubFeedItem): Notice {
       kind: 'lev',
       ani: item.type,
       coinlapach: String(item.id),
-      href: `/lev?focus=${encodeURIComponent(item.type)}${item.projectId ? `&project=${encodeURIComponent(String(item.projectId))}` : ''}`
+      href: levFocusHref(item.type, item.projectId)
     },
     at: item.createdAt
   };

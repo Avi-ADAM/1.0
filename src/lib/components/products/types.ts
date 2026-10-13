@@ -1,3 +1,5 @@
+import type { CostShape } from '$lib/pooling/priceCurve';
+
 export type PricingMode = 'fixed' | 'estimated' | 'quote';
 
 export type ComposeMode = 'simple' | 'complex';
@@ -40,6 +42,10 @@ export type RecipeMissionRow = {
   onlyPartOf: boolean; // mission stays inactive until product is purchased
   notes: string;
   extraDetails: MissionExtraDetails | null;
+  /** How the line behaves in a group (PLAN_POOL_PRODUCT §3.1); null = perUnit. */
+  costShape?: CostShape | null;
+  /** Participants per unit when costShape = stepped. */
+  stepCapacity?: number | null;
 };
 
 export type AvailableMission = {
@@ -155,6 +161,10 @@ export type RecipeResourceRow = {
   onlyPartOf: boolean;
   notes: string;
   extraDetails: ResourceExtraDetails | null;
+  /** How the line behaves in a group (PLAN_POOL_PRODUCT §3.1); null = perUnit. */
+  costShape?: CostShape | null;
+  /** Participants per unit when costShape = stepped. */
+  stepCapacity?: number | null;
 };
 
 export type ComposeProductPayload = {

@@ -1040,6 +1040,8 @@
                 onNego={toggleNegotiationMode}
                 onHover={() => hoverc()}
                 onChat={tochat}
+                onUser={() => onUser?.({ id: userId })}
+                onProj={() => onProj?.({ id: projectId })}
                 {low}
                 {skills}
                 {role}
@@ -1085,6 +1087,8 @@
     onNego={toggleNegotiationMode}
     onHover={hoverc}
     onChat={tochat}
+    onUser={() => onUser?.({ id: userId })}
+    onProj={() => onProj?.({ id: projectId })}
     {isVisible}
     {projectId}
     {sqedualed}

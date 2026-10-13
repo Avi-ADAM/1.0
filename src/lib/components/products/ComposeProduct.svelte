@@ -11,6 +11,7 @@
   import MissionPickerList from './MissionPickerList.svelte';
   import ResourcePickerList from './ResourcePickerList.svelte';
   import LocationPicker from '$lib/components/location/LocationPicker.svelte';
+  import { costAt, hasGroupCurve, priceAt, risingPoints, toBomLines } from '$lib/pooling/priceCurve';
   import type {
     ComposeMode,
     PricingMode,
@@ -155,22 +156,23 @@
     isComplex ? 'estimated' : byQuote ? 'quote' : 'fixed'
   );
 
-  const sumMissions = $derived(
-    recipeMissions.reduce(
-      (s, m) =>
-        s +
-        (m.hoursPerUnit || 0) * (m.unitsPerProduct || 1) * (m.ratePerHour || 0),
-      0
-    )
-  );
-  const sumResources = $derived(
-    recipeResources.reduce(
-      (s, r) => s + (r.quantityPerUnit || 0) * (r.pricePerUnit || 0),
-      0
-    )
-  );
-  const subTotal = $derived(sumMissions + sumResources);
-  const estimatedPrice = $derived(subTotal * (1 + marginPct / 100));
+  // Every price here comes from $lib/pooling/priceCurve (PLAN_POOL_PRODUCT §3.2).
+  // A direct purchase of one unit is a group of one: it pays every shared line.
+  const bom = $derived(toBomLines(recipeMissions, recipeResources));
+  const subTotal = $derived(costAt(bom, 1));
+  const estimatedPrice = $derived(priceAt(bom, 1, marginPct));
+  const groupCurve = $derived(hasGroupCurve(bom));
+  const CURVE_HORIZON = 50;
+  const firstRise = $derived(groupCurve ? risingPoints(bom, 1, CURVE_HORIZON, marginPct)[0] ?? null : null);
+  const curvePreview = $derived.by(() => {
+    if (!groupCurve) return [];
+    const ns = new Set([1, 2, 5, 10, 20, CURVE_HORIZON]);
+    if (firstRise) {
+      ns.add(firstRise.n - 1);
+      ns.add(firstRise.n);
+    }
+    return [...ns].sort((a, b) => a - b).map((n) => ({ n, price: priceAt(bom, n, marginPct) }));
+  });
   const openItems = $derived(
     recipeMissions.filter((m) => !m.assignedMemberId).length +
       recipeResources.filter((r) => !r.assignedMemberId).length
@@ -261,7 +263,9 @@
       mode: m.mode,
       assignedMemberId: m.assignedMemberId,
       onlyPartOf: m.onlyPartOf,
-      notes: m.notes
+      notes: m.notes,
+      costShape: m.costShape ?? null,
+      stepCapacity: m.costShape === 'stepped' ? m.stepCapacity ?? null : null
     };
   }
 
@@ -276,7 +280,9 @@
       mode: r.mode,
       assignedMemberId: r.assignedMemberId,
       onlyPartOf: r.onlyPartOf,
-      notes: r.notes
+      notes: r.notes,
+      costShape: r.costShape ?? null,
+      stepCapacity: r.costShape === 'stepped' ? r.stepCapacity ?? null : null
     };
   }
 
@@ -578,6 +584,31 @@
           <Money amount={estimatedPrice} {currency} />
         </strong>
       </div>
+      {#if groupCurve}
+        <div class="curve">
+          <div class="curve-title">{$t('offerings.compose.curveTitle')}</div>
+          <table class="curve-table">
+            <thead>
+              <tr>
+                <th scope="col">{$t('offerings.compose.curveN')}</th>
+                <th scope="col">{$t('offerings.compose.curvePrice')}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {#each curvePreview as p (p.n)}
+                <tr class:rise={firstRise?.n === p.n}>
+                  <td>{p.n}</td>
+                  <td><Money amount={p.price} {currency} /></td>
+                </tr>
+              {/each}
+            </tbody>
+          </table>
+          {#if firstRise}
+            <p class="curve-note rise-note">{$t('offerings.compose.curveRises', { count: firstRise.n })}</p>
+          {/if}
+          <p class="curve-note">{$t('offerings.compose.curveHint')}</p>
+        </div>
+      {/if}
       {#if openItems > 0}
         <div class="open-warn"><EntityIcon kind="urgent" size={13} /> {ui.openWarn} ({openItems})</div>
       {/if}
@@ -800,6 +831,48 @@
   .sum-row.total {
     font-size: 1.1rem;
     color: var(--gold);
+  }
+  .curve {
+    border-top: 1px solid var(--border);
+    padding-top: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .curve-title {
+    font-size: 0.85rem;
+    color: var(--gold-l);
+    font-weight: 600;
+  }
+  .curve-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+    color: var(--text);
+  }
+  .curve-table th {
+    text-align: start;
+    font-weight: 600;
+    color: var(--gold-l);
+    padding: 2px 4px;
+  }
+  .curve-table td {
+    padding: 2px 4px;
+    border-top: 1px solid var(--border);
+  }
+  .curve-table tr.rise td {
+    color: var(--pink-l, #ff5a99);
+  }
+  .curve-note {
+    margin: 0;
+    font-size: 0.75rem;
+    line-height: 1.45;
+    color: var(--text);
+    opacity: 0.85;
+  }
+  .rise-note {
+    color: var(--pink-l, #ff5a99);
+    opacity: 1;
   }
   .open-warn {
     font-size: 0.8rem;

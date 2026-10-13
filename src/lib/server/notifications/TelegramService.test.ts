@@ -5,9 +5,16 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { createHash } from 'node:crypto';
 import { TelegramService } from './TelegramService';
 import type { UserProfile, NotificationData } from './NotificationOrchestrator';
 import type { ActionContext } from '../actions/types';
+
+vi.mock('$env/dynamic/private', () => ({ env: { ADMINMONTHER: 'test-admin-token' } }));
+
+// What $lib/server/internalSecret.js derives for the mocked env: /api/ste sends
+// to a chosen chat only for a request carrying it.
+const INTERNAL = createHash('sha256').update('test-admin-token:internal-proxy:v1').digest('hex');
 
 describe('TelegramService', () => {
   let telegramService: TelegramService;
@@ -259,7 +266,7 @@ describe('TelegramService', () => {
         'https://www.1lev1.com/api/ste',
         expect.objectContaining({
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' }
+          headers: { 'Content-Type': 'application/json', 'x-internal-secret': INTERNAL }
         })
       );
     });

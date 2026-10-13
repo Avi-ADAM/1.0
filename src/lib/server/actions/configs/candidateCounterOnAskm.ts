@@ -9,6 +9,7 @@
  * proposal): this adds a round to the SAME ongoing Askm.
  */
 
+import { noticeSubject } from '$lib/notices/links';
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { normalizeLocationInput, extractRelationId } from './actionUtils.js';
 import { cancelCandidacyTimegrama } from '../../nego/timegrama.js';
@@ -126,6 +127,7 @@ export const candidateCounterOnAskmConfig: ActionConfig = {
       body: { he: 'המועמד הגיש הצעה נגדית למשאב', en: 'The candidate submitted a counter for the resource' },
     },
     intent: 'consent',
+    subject: (p) => noticeSubject('askm', p.askmId, p.projectId),
     metadata: { type: 'base', url: 'lev' },
   },
 

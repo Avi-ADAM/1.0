@@ -19,8 +19,9 @@
  * timegrama that matures a silent claim).
  */
 
+import { noticeSubject } from '$lib/notices/links';
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
-import { calcDeadlineMs } from './actionUtils.js';
+import { calcDeadlineMs, voteUrl } from './actionUtils.js';
 import { roundHours } from '$lib/timers/precision.js';
 import {
   encodeCounter,
@@ -152,9 +153,14 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
           },
           // A counter resets the clock and waits for an answer.
           intent: 'consent',
+          subject: () => noticeSubject('fini', finiapruvalId, projectId),
+          // "8 instead of 5" and the reason are this counter's own words.
+          subjectText: 'before',
           metadata: {
             type: 'finiapruvalCounter',
-            url: `/lev?project=${projectId}`,
+            // Straight to the approval's vote page, where the sessions and the
+            // whole negotiation are laid out.
+            url: voteUrl(projectId, 'fini', finiapruvalId),
             priority: 'normal'
           }
         },

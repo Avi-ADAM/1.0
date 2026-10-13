@@ -539,7 +539,13 @@
     "counterSent": "ההצעה נשלחה. שאר החברים יתבקשו לאשר אותה.",
     "counterError": "לא הצלחנו לשלוח את ההצעה",
     "counterLine": "הוצעו {{to}} שע׳ במקום {{from}}: {{note}}",
-    "counterRound": "סבב {{round}}"
+    "counterRound": "סבב {{round}}",
+    "sessionsHeading": "מקטעי הזמן של הטיימר",
+    "sessionsTotal": "סה״כ {{total}} שעות",
+    "savedNote": "מה נעשה בזמן הזה",
+    "counterQuote": "התיאור שנשמר עם הטיימר",
+    "counterSessions": "אפשר לסמן מקטעים שעליהם את/ה חולק/ת — השעות שלהם יירדו מההצעה ויופיעו בנימוק. אפשר גם לשנות את מספר השעות ידנית, למטה או למעלה.",
+    "counterDisputed": "במחלוקת"
   },
   "weget": {
     "howMuchSpentThisMonth": "כמה הוצאת החודש?",

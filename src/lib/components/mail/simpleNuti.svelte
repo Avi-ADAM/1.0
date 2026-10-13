@@ -19,6 +19,7 @@
 	 * @property {string} [username]
 	 * @property {any} [previewText]
 	 * @property {string} [lang]
+	 * @property {{ label: string, href: string }[]} [links] every place to answer it — one button each, the first the main one
 	 */
 
 	/** @type {Props} */
@@ -27,16 +28,18 @@
 		body = '',
 		username = "x",
 		previewText = {},
-		lang = "he"
+		lang = "he",
+		links = []
 	} = $props();
   
-    const headr = {"he":` שלום ${username}!`,"en":`hallo ${username}!`}
-    const tovo = {"he":"לצפיה באתר!","en":"see now!"}
+    const headr = {"he":` שלום ${username}!`,"en":`hallo ${username}!`,"ar":`مرحبًا ${username}!`}
+    const tovo = {"he":"לצפיה באתר!","en":"see now!","ar":"للمشاهدة في الموقع"}
     const src1 = "https://res.cloudinary.com/love1/image/upload/v1645647192/apple-touch-icon_irclue.png"
 	
         const slogen = {
             "he":"1💗1 - קשה לבד? קל ביחד!",
-            "en":"1💗1 we can together"
+            "en":"1💗1 we can together",
+            "ar":"1💗1 — صعب وحدك؟ سهل معًا!"
         }
 	const fontFamily =
 		'-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif';
@@ -94,9 +97,18 @@
 		color: '#EEE8AA',
 		fontSize: '18px',
 		textDecoration: 'none',
-		textAlign: 'center' ,
+		textAlign: /** @type {'center'} */ ('center'),
 		display: 'block',
 		width: '100%'
+	};
+
+	// The second way in, beside the main button — same width, outlined.
+	const buttonAlt = {
+		...button,
+		backgroundColor: '#ffffff',
+		color: '#FF0092',
+		border: '2px solid #FF0092',
+		marginTop: '12px'
 	};
 
 	const link = {
@@ -128,19 +140,25 @@
 <Html lang={lang}>
 	<Head />
 	<Preview preview={previewText[lang]} />
-	<Section style={main} dir={lang == "he" ? "rtl":"ltr"}>
+	<Section style={main} dir={lang == "he" || lang == "ar" ? "rtl":"ltr"}>
 		<Container style={container}>
 			<Img src={src1} width="30" height="30" alt="1💗1Logo" />
 		
-			<Heading style={heading}>{headr[lang]}</Heading>
+			<Heading style={heading}>{headr[lang] ?? headr.en}</Heading>
 			<Text style={review}>{head[lang]}</Text>
-            <Text style={paragraph}>{body[lang]}</Text>
+            <Text style={{ ...paragraph, whiteSpace: 'pre-line' }}>{body[lang]}</Text>
 
 			<Section style={{ padding: '16px 0 20px' }}>
-				<Button pY={19} style={button} href="https://www.1lev1.com/lev">{tovo[lang]}</Button>
+				{#if links.length}
+					{#each links as l, i}
+						<Button pY={19} style={i === 0 ? button : buttonAlt} href={l.href}>{l.label}</Button>
+					{/each}
+				{:else}
+					<Button pY={19} style={button} href="https://www.1lev1.com/lev">{tovo[lang] ?? tovo.en}</Button>
+				{/if}
 			</Section>		
 			<Hr style={hr} />
-			<Text style={footer}>{slogen[lang]}</Text>
+			<Text style={footer}>{slogen[lang] ?? slogen.en}</Text>
 		</Container>
 	</Section>
 </Html>

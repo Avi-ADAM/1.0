@@ -31,6 +31,7 @@ import { checkStb, checkHst, txx, letters } from '$lib/utils/levDataProcessors.j
 import { normalizeSaveLinks } from '$lib/timers/saveLinks';
 import { readSaveFiles } from '$lib/timers/saveFiles';
 import { counterHistory, standingOrder, standingVotes, voterId } from '$lib/finiapruval/rounds';
+import { claimSessions } from '$lib/finiapruval/sessions';
 
 
 /**
@@ -652,6 +653,9 @@ export function processFiapp(
       whattid,
       evidenceFiles,
       evidenceLinks,
+      // Every sitting behind the hours, and the member's whole note about them.
+      sessions: claimSessions(approval.timerIntervals),
+      saveText: approval.saveText || '',
       users,
 
       timegramaDate: approval.timegramaDate,

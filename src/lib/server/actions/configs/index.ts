@@ -50,6 +50,7 @@ import { completeMissionConfig } from './completeMission.js';
 import { chatActions } from './chat.js';
 import { assistantActions } from './assistantSessions.js';
 import { maagadActions } from './maagad.js';
+import { departurePricingActions } from './departurePricing.js';
 
 import { createTaskAction } from './createTask.js';
 import { linkActToMissionAction } from './linkActToMission.js';
@@ -305,6 +306,8 @@ export function registerAllActions(): void {
   // Assistant sessions — rikma import, living lists (PLAN_AI_SIGNUP_CONCIERGE)
   assistantActions.forEach(registerAction);
   maagadActions.forEach(registerAction);
+  // A departure's moving price (PLAN_POOL_PRODUCT §4.2)
+  departurePricingActions.forEach(registerAction);
   forumReadActions.forEach(registerAction);
 
   // Sheirut money receiver
@@ -637,6 +640,7 @@ export {
   completeMissionConfig,
   chatActions,
   maagadActions,
+  departurePricingActions,
   forumReadActions,
   createComplexMatanotConfig,
   approveMatanotConfig,

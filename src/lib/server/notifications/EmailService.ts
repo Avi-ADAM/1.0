@@ -7,7 +7,10 @@
 
 import type { ActionContext } from '../actions/types';
 import type { UserProfile, NotificationData } from './NotificationOrchestrator';
-import { recipientTemplateLang } from './intent';
+import { recipientTemplateLang, textFor } from './intent';
+
+/** Links in an email leave the site — they need the host. */
+const SITE = 'https://www.1lev1.com';
 
 export class EmailService {
   /**
@@ -75,16 +78,26 @@ export class EmailService {
     templateData?: Record<string, any>
   ): Promise<void> {
     try {
-      // The recipient's language, never the sender's (see recipientTemplateLang)
+      // The recipient's language, never the sender's (see recipientTemplateLang).
+      // The template's own words come in `lang`; the title and body may speak
+      // the reader's language even where the templates do not (textFor).
       const lang = recipientTemplateLang(user.lang);
+      const title = textFor(notification.title, user.lang);
+      const body = textFor(notification.body, user.lang);
+      // Every place to answer it, as buttons — the reader picks.
+      const links = (notification.links ?? []).map((l) => ({
+        label: textFor(l.label, user.lang),
+        href: `${SITE}${l.href}`
+      }));
 
       // Render the email template
       const emailHtml = await render(template, {
-        head: notification.title,
-        body: notification.body,
+        head: { ...notification.title, [lang]: title },
+        body: { ...notification.body, [lang]: body },
         username: user.username,
-        previewText: notification.title,
+        previewText: { ...notification.title, [lang]: title },
         lang,
+        ...(links.length ? { links } : {}),
         ...(templateData || {})
       });
 
@@ -92,8 +105,8 @@ export class EmailService {
       const emailData = {
         email: user.email,
         emailHtml,
-        previewText: notification.title[lang as 'he' | 'en' | 'ar'] || notification.title.he,
-        emailText: this.generatePlainText(notification, lang)
+        previewText: title,
+        emailText: [`${title}: ${body}`, ...links.map((l) => `${l.label}: ${l.href}`)].join('\n')
       };
 
       // Send via existing sendMail API
@@ -144,14 +157,4 @@ export class EmailService {
     }
   }
 
-
-  /**
-   * Generate plain text version of the email
-   */
-  private generatePlainText(notification: NotificationData, lang: string): string {
-    const title = notification.title[lang as 'he' | 'en' | 'ar'] || notification.title.he;
-    const body = notification.body[lang as 'he' | 'en' | 'ar'] || notification.body.he;
-    
-    return `${title}: ${body}`;
-  }
 }

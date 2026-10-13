@@ -53,6 +53,8 @@
     "askedmAnon": "Oferta para aportar «{{item}}» a la rikma «{{rikma}}»",
     "fiapp": "Informe de {{who}}: «{{item}}» terminado, en la rikma «{{rikma}}»",
     "fiappAnon": "Informe: «{{item}}» terminado, en la rikma «{{rikma}}»",
+    "fiappHours": "Informe de horas de {{who}} sobre «{{item}}», en la rikma «{{rikma}}»",
+    "fiappHoursAnon": "Informe de horas sobre «{{item}}», en la rikma «{{rikma}}»",
     "wegets": "Informe de {{who}}: entrega de «{{item}}» a la rikma «{{rikma}}»",
     "wegetsAnon": "Informe: entrega de «{{item}}» a la rikma «{{rikma}}»",
     "wishoffer": "Oferta de {{who}} para «{{item}}» en el deseo «{{wish}}»",
@@ -73,9 +75,14 @@
     "removeHoursOneAnon": "Solicitud para quitar una hora a «{{item}}» en la rikma «{{rikma}}»",
     "edit": "Solicitud de {{who}} para cambiar «{{item}}» en la rikma «{{rikma}}»",
     "editAnon": "Solicitud para cambiar «{{item}}» en la rikma «{{rikma}}»",
+    "haluk": "Propuesta de reparto de beneficios «{{item}}» en la rikma «{{rikma}}»",
     "fallback": "{{kind}}: {{what}}"
   },
   "term": {
     "raise": "+{{value}}"
+  },
+  "notify": {
+    "openRikma": "Abrir en la rikma",
+    "openLev": "Abrir en el Corazón"
   }
 }

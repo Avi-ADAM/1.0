@@ -2,6 +2,7 @@
   import Money from '$lib/components/money/Money.svelte';
   import { lang } from '$lib/stores/lang.js';
   import ResourceDetailsModal from './ResourceDetailsModal.svelte';
+  import CostShapePicker from './CostShapePicker.svelte';
   import type {
     RecipeResourceRow,
     AvailableResource,
@@ -169,7 +170,9 @@
         assignedMemberId: null,
         onlyPartOf: true,
         notes: '',
-        extraDetails: null
+        extraDetails: null,
+        costShape: null,
+        stepCapacity: null
       }
     ];
   }
@@ -366,6 +369,8 @@
           </select>
         </label>
       </div>
+
+      <CostShapePicker bind:costShape={r.costShape} bind:stepCapacity={r.stepCapacity} />
 
       {#if r.mode === 'createNew'}
         <label class="field">

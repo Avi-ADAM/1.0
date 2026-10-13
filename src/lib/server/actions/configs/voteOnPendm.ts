@@ -15,6 +15,7 @@
  * Client only needs to send: { pendId, projectId, what, why? }
  */
 
+import { noticeSubject } from '$lib/notices/links';
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { voteIntent } from '../../notifications/intent.js';
 import { matchOpenMissionToUsers } from '$lib/server/matching/engine';
@@ -398,6 +399,7 @@ export const voteOnPendmConfig: ActionConfig = {
     },
     // A plain vote stays on the site; maturing (or an all-no) is an outcome.
     intent: voteIntent,
+    subject: (p) => noticeSubject('pendm', p.pendId, p.projectId),
     metadata: { type: 'pendmVote', url: '/moach/{{projectId}}/votes/pendm/{{pendId}}' },
   },
 

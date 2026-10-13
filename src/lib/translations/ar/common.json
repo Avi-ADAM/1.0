@@ -40,7 +40,8 @@
     "changePassword": "تغيير كلمة المرور",
     "sendOfferToProvider": "إرسال عرض إلى المورّد",
     "publishToCommunity": "النشر للمجتمع",
-    "toProfile": "إلى ملفي الشخصي"
+    "toProfile": "إلى ملفي الشخصي",
+    "view": "عرض"
   },
   "labels": {
     "location": "الموقع",

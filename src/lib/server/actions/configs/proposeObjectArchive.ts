@@ -276,6 +276,9 @@ function notifyArchiveProposal(
           },
         },
         intent: 'consent',
+        subject: () => noticeSubject('decision', p.decisionId, p.projectId, 'archObject'),
+        // The reason and the membership warning are this proposal's own.
+        subjectText: 'before',
         metadata: {
           type: 'voteUpdate',
           url: `/moach/${p.projectId}/votes/decision/${p.decisionId}`,

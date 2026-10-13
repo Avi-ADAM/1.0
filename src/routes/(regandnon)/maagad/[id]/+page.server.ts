@@ -2,6 +2,12 @@ import { sendToSer } from '$lib/send/sendToSer.js';
 import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { rtKey } from '$lib/realtime/scopes.js';
+import {
+  linesFromMatanot,
+  poolableProductsFrom,
+  type DepartureLine,
+  type PoolableProduct
+} from '$lib/pooling/departure';
 
 /**
  * Public maagad (demand pool) page — PLAN_DISCOVERY_MAP M2,
@@ -69,10 +75,34 @@ export const load: PageServerLoad = async ({ params, locals, fetch, depends }) =
     }
   }
 
+  // A departure's lines, for the tags on its card (PLAN_POOL_PRODUCT §4). The
+  // price itself is read from the offer — the BOM is only what it is made of.
+  const departureLines = new Map<string, DepartureLine[]>();
+  await Promise.all(
+    [...new Set((a.offers?.data ?? []).map((o: any) => o?.attributes?.matanot?.data?.id).filter(Boolean))].map(
+      (mid: any) =>
+        sendToSer({ id: mid }, '443matanotForPoolOffer', 0, 0, true, fetch)
+          .then((r: any) => {
+            const attrs = r?.data?.matanot?.data?.attributes;
+            if (attrs) departureLines.set(String(mid), linesFromMatanot(attrs));
+          })
+          .catch((e: any) => console.warn('[maagad/:id] departure lines failed', mid, e))
+    )
+  );
+
   const offers = (a.offers?.data ?? []).map((o: any) => {
     const oa = o.attributes ?? {};
+    const matanotId = oa.matanot?.data?.id ? String(oa.matanot.data.id) : null;
     return {
       id: String(o.id),
+      // A departure (§4): the price moves with the group; never a signed number.
+      matanotId,
+      productName: oa.matanot?.data?.attributes?.name ?? null,
+      priceCurrent: oa.price_current ?? null,
+      priceEnvelope: oa.price_envelope ?? null,
+      priceLockAt: oa.price_lock_at ?? null,
+      currencyCode: oa.proposer_project?.data?.attributes?.currencyCode ?? null,
+      lines: matanotId ? (departureLines.get(matanotId) ?? []) : [],
       title: oa.title ?? '',
       description: oa.description ?? '',
       unitPrice: oa.unit_price ?? null,
@@ -147,9 +177,48 @@ export const load: PageServerLoad = async ({ params, locals, fetch, depends }) =
     missionOffers: [...offerByUserMission.values()].slice(0, 6)
   };
 
+  // The composed products of the viewer's rikmas — what the offer form can turn
+  // into a departure. Service token, uid from the signed cookie.
+  let myProducts: PoolableProduct[] = [];
+  if (uid) {
+    try {
+      const r: any = await sendToSer({ uid: String(uid) }, '444myPoolableProducts', 0, 0, true, fetch);
+      myProducts = poolableProductsFrom(r?.data?.usersPermissionsUser?.data?.attributes);
+    } catch (e) {
+      console.warn('[maagad/:id] my products failed', e);
+    }
+  }
+
+  // Her own standing in the departure she signed (PLAN_POOL_PRODUCT §4.2): the
+  // ceiling she agreed to, and — if a move passed it — until when her yes is
+  // asked. Read on the service token and only for her own row.
+  let myDeparture: { offerId: string; envelopeAtSign: number | null; consentUntil: string | null } | null = null;
+  const signedDeparture = my?.signedOfferId
+    ? offers.find((o: any) => o.id === my!.signedOfferId && o.matanotId)
+    : null;
+  if (uid && signedDeparture) {
+    try {
+      const r: any = await sendToSer({ id: signedDeparture.id }, '448queryDeparture', 0, 0, true, fetch);
+      const mine = (r?.data?.maagadOffer?.data?.attributes?.signed_members?.data ?? []).find(
+        (m: any) => String(m?.attributes?.user?.data?.id) === String(uid)
+      );
+      if (mine) {
+        myDeparture = {
+          offerId: signedDeparture.id,
+          envelopeAtSign: mine.attributes?.envelope_at_sign ?? null,
+          consentUntil: mine.attributes?.price_window_until ?? null
+        };
+      }
+    } catch (e) {
+      console.warn('[maagad/:id] my departure failed', e);
+    }
+  }
+
   return {
     uid,
     isLoggedIn: !!uid,
+    myProducts,
+    myDeparture,
     supplySuggestions,
     maagad: {
       id: String(node.id),

@@ -540,7 +540,13 @@
     "counterSent": "Propuesta enviada. Se pedirá a los demás que la aprueben.",
     "counterError": "No se pudo enviar la propuesta",
     "counterLine": "Se propusieron {{to}} h en lugar de {{from}}: {{note}}",
-    "counterRound": "Ronda {{round}}"
+    "counterRound": "Ronda {{round}}",
+    "sessionsHeading": "Sesiones del temporizador",
+    "sessionsTotal": "{{total}} horas en total",
+    "savedNote": "Qué se hizo en este tiempo",
+    "counterQuote": "La nota guardada con el temporizador",
+    "counterSessions": "Marca las sesiones que discutes: sus horas se restan de tu versión y aparecen en el motivo. También puedes fijar las horas a mano, más o menos.",
+    "counterDisputed": "En disputa"
   },
   "weget": {
     "howMuchSpentThisMonth": "¿Cuánto gastaste este mes?",

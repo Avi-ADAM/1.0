@@ -9,6 +9,7 @@
  * round to the SAME ongoing Ask.
  */
 
+import { noticeSubject } from '$lib/notices/links';
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { normalizeLocationInput, extractRelationId } from './actionUtils.js';
 import { buildRoundActs } from '../helpers/roundActs.js';
@@ -151,6 +152,7 @@ export const candidateCounterOnAskConfig: ActionConfig = {
       body: { he: 'המועמד הגיש הצעה נגדית למשימה', en: 'The candidate submitted a counter for the mission' },
     },
     intent: 'consent',
+    subject: (p) => noticeSubject('ask', p.askId, p.projectId),
     metadata: { type: 'base', url: 'lev' },
   },
 

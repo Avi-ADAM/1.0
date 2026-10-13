@@ -53,6 +53,8 @@
     "askedmAnon": "عرض لتوفير «{{item}}» للريكما «{{rikma}}»",
     "fiapp": "تقرير من {{who}} عن إنجاز «{{item}}» في الريكما «{{rikma}}»",
     "fiappAnon": "تقرير عن إنجاز «{{item}}» في الريكما «{{rikma}}»",
+    "fiappHours": "تقرير ساعات من {{who}} عن «{{item}}» في الريكما «{{rikma}}»",
+    "fiappHoursAnon": "تقرير ساعات عن «{{item}}» في الريكما «{{rikma}}»",
     "wegets": "تقرير من {{who}} عن تسليم «{{item}}» للريكما «{{rikma}}»",
     "wegetsAnon": "تقرير عن تسليم «{{item}}» للريكما «{{rikma}}»",
     "wishoffer": "عرض من {{who}} لـ«{{item}}» في الأمنية «{{wish}}»",
@@ -73,9 +75,14 @@
     "removeHoursOneAnon": "طلب لتقليص ساعة واحدة من «{{item}}» في الريكما «{{rikma}}»",
     "edit": "طلب من {{who}} لتعديل «{{item}}» في الريكما «{{rikma}}»",
     "editAnon": "طلب لتعديل «{{item}}» في الريكما «{{rikma}}»",
+    "haluk": "اقتراح تقسيم أرباح «{{item}}» في الريكما «{{rikma}}»",
     "fallback": "{{kind}}: {{what}}"
   },
   "term": {
     "raise": "+{{value}}"
+  },
+  "notify": {
+    "openRikma": "فتح في صفحة الريكما",
+    "openLev": "فتح في القلب"
   }
 }

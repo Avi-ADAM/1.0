@@ -1,0 +1,40 @@
+{
+  "costShape": {
+    "label": "How the cost is shared in a group",
+    "perUnit": "Per participant",
+    "shared": "Shared by everyone",
+    "stepped": "One unit per group of",
+    "stepCapacity": "Participants per unit",
+    "perUnitHint": "Each participant needs her own, like a flight or a meal.",
+    "sharedHint": "One cost for the whole group. The more people join, the less each pays. A guide, for example.",
+    "steppedHint": "Another unit for every {{capacity}} participants, like a bus or a room."
+  },
+  "tag": {
+    "perUnit": "per participant",
+    "shared": "shared by everyone",
+    "stepped": "one per {{capacity}}"
+  },
+  "departure": {
+    "now": "Now",
+    "ceiling": "At most",
+    "dropAt": "At {{count}} participants",
+    "linesTitle": "What the price is made of",
+    "note": "You don't sign a price here. The price moves with the size of the group, and every rise comes with a notice. Until the price locks you can leave at any moment, with a full refund. It never goes above the ceiling without your explicit consent.",
+    "lockAt": "The price locks on {{date}}",
+    "fromProduct": "From a rikma's product",
+    "fixedPrice": "Fixed price",
+    "pickProduct": "Choose a product",
+    "noProducts": "Your rikmas have no active composed product yet.",
+    "priceDerived": "The price comes from the product: the cost divided by the number of participants, plus the rikma's margin. There is no price to type.",
+    "curveTitle": "Price per participant by group size",
+    "participants": "Participants",
+    "pricePer": "Price per participant",
+    "riseWarn": "Participant {{count}} raises the price for everyone. Consider setting the maximum at a step boundary.",
+    "ceilingShown": "The ceiling joiners will see",
+    "consentTitle": "The price passed the ceiling you saw when you joined",
+    "consentBody": "To stay, confirm by {{date}}. Without a yes you leave — not charged, with a full refund.",
+    "consentNewCeiling": "The ceiling from now on",
+    "stay": "Yes, I stay",
+    "notForMe": "The price doesn't suit me"
+  }
+}

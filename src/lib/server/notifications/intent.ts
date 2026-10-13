@@ -15,18 +15,26 @@
  * | intent     | what it asks of the reader                                         | channels                                  |
  * |------------|--------------------------------------------------------------------|-------------------------------------------|
  * | `consent`  | their answer is awaited (sign, approve, counter, take a request)   | socket push telegram email                |
+ * | `review`   | a routine claim they may look at; silence is the expected answer   | socket + ONE of telegram / push / email   |
  * | `personal` | about them or to them, nothing awaited (accepted, paid, a message) | socket push telegram (+email if neither)  |
  * | `outcome`  | a rikma-wide result that changes shares, money or membership       | socket push (+email if no push)           |
  * | `ambient`  | activity in a rikma they belong to                                 | socket                                    |
+ *
+ * `review` is still a consent notice — a silence clock runs — so it must reach
+ * every member; it just does not need to reach them twice. A partner's saved
+ * timer is the case: it happens many times a week, and an email *and* a
+ * telegram for each one teaches people to ignore both (`deliveryPlan`).
  */
 
 import type { NotificationChannel } from '../actions/types';
 
-export const NOTIFICATION_INTENTS = ['consent', 'personal', 'outcome', 'ambient'] as const;
+export const NOTIFICATION_INTENTS = ['consent', 'review', 'personal', 'outcome', 'ambient'] as const;
 export type NotificationIntent = (typeof NOTIFICATION_INTENTS)[number];
 
+/** Channels that may carry the notice; for `review` each person gets only one of them (`deliveryPlan`). */
 export const CHANNELS_BY_INTENT: Readonly<Record<NotificationIntent, readonly NotificationChannel[]>> = {
   consent: ['socket', 'push', 'telegram', 'email'],
+  review: ['socket', 'push', 'telegram', 'email'],
   personal: ['socket', 'push', 'telegram'],
   outcome: ['socket', 'push'],
   ambient: ['socket']
@@ -44,13 +52,22 @@ export type IntentSource =
  * list; a config with neither falls back to socket only, which is what an
  * unconfigured notification has always meant in practice.
  */
+export function resolveIntent(
+  config: { intent?: IntentSource },
+  params: Record<string, any> = {},
+  result: any = undefined
+): NotificationIntent | undefined {
+  if (!config.intent) return undefined;
+  return typeof config.intent === 'function' ? config.intent(params, result) : config.intent;
+}
+
 export function resolveChannels(
   config: { intent?: IntentSource; channels?: readonly NotificationChannel[] },
   params: Record<string, any> = {},
   result: any = undefined
 ): NotificationChannel[] {
   if (config.intent) {
-    const intent = typeof config.intent === 'function' ? config.intent(params, result) : config.intent;
+    const intent = resolveIntent(config, params, result) as NotificationIntent;
     const channels = CHANNELS_BY_INTENT[intent];
     if (channels) return [...channels];
     console.warn(`[notifications] unknown intent "${String(intent)}" — sending on socket only`);
@@ -99,6 +116,41 @@ export function emailRecipients<U extends Reachable>(users: U[], channels: reado
   return users.filter((u) => !reachedElsewhere(u, channels));
 }
 
+export interface DeliveryPlan<U> {
+  telegram: U[];
+  push: U[];
+  email: U[];
+}
+
+/**
+ * Who is reached on which channel outside the site.
+ *
+ * Every intent but `review` sends each channel to everyone on it (email per
+ * `emailRecipients`). `review` gives each person exactly one: telegram if they
+ * connected the bot — something they set up on purpose and read as a message —
+ * else push if they have a live device, else email, which everybody has.
+ */
+export function deliveryPlan<U extends Reachable>(
+  users: U[],
+  channels: readonly NotificationChannel[],
+  intent?: NotificationIntent
+): DeliveryPlan<U> {
+  if (intent !== 'review') {
+    return {
+      telegram: channels.includes('telegram') ? users : [],
+      push: channels.includes('push') ? users : [],
+      email: emailRecipients(users, channels)
+    };
+  }
+  const plan: DeliveryPlan<U> = { telegram: [], push: [], email: [] };
+  for (const u of users) {
+    if (channels.includes('telegram') && reachedElsewhere(u, ['telegram'])) plan.telegram.push(u);
+    else if (channels.includes('push') && reachedElsewhere(u, ['push'])) plan.push.push(u);
+    else if (channels.includes('email')) plan.email.push(u);
+  }
+  return plan;
+}
+
 /** Languages the hard-coded `{he, en, ar}` templates are written in. */
 const TEMPLATE_LANGS = ['he', 'en', 'ar'] as const;
 type TemplateLang = (typeof TEMPLATE_LANGS)[number];
@@ -111,4 +163,18 @@ type TemplateLang = (typeof TEMPLATE_LANGS)[number];
 export function recipientTemplateLang(userLang: string | null | undefined): TemplateLang {
   if (!userLang) return 'he';
   return (TEMPLATE_LANGS as readonly string[]).includes(userLang) ? (userLang as TemplateLang) : 'en';
+}
+
+/**
+ * A recipient's string: in their own language when it is there — a body built
+ * from the notices' JSON speaks all five (`subject`) — else as the templates
+ * fall back (`recipientTemplateLang`), else English, else Hebrew.
+ */
+export function textFor(
+  strings: Partial<Record<string, string | undefined>> | null | undefined,
+  userLang: string | null | undefined
+): string {
+  if (!strings) return '';
+  const own = userLang ? strings[userLang] : undefined;
+  return own || strings[recipientTemplateLang(userLang)] || strings.en || strings.he || '';
 }

@@ -165,6 +165,9 @@ const handler: ActionExecutionHandler = async (params, context, { notifier, stra
           },
           // Silence approves it — every member has to hear that the clock is running.
           intent: 'consent',
+          subject: () => noticeSubject('decision', opened.decisionId, target.projectId, 'archObject'),
+          // The reason is this proposal's own.
+          subjectText: 'before',
           metadata: {
             type: 'voteUpdate',
             url: `/moach/${target.projectId}/votes/decision/${opened.decisionId}`,

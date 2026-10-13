@@ -7,6 +7,7 @@
  */
 
 import type { IntentSource } from '../notifications/intent';
+import type { NoticeSubject } from '$lib/notices/links';
 
 // ============================================================================
 // Action Configuration Types
@@ -262,6 +263,28 @@ export interface NotificationConfig {
    */
   channels?: NotificationChannel[];
 
+  /**
+   * The rikma vote this notification is about, when it is about one. For a
+   * `consent` / `review` notice the orchestrator then says what waits — who, for
+   * what, the figures, when silence completes it — in each reader's language,
+   * and offers both places to answer: the rikma's vote page and the heart
+   * filtered to it (`src/lib/server/notices/subjectNotice.ts`). Null on a run
+   * that has no such item; the templates then go out as they are.
+   */
+  subject?: (params: Record<string, any>, result: any) => NoticeSubject | null;
+
+  /**
+   * With a `subject`, what becomes of the action's own body:
+   * - `replace` (default) — the sentence takes its place; the body only said
+   *   "there is a request".
+   * - `before` — the sentence, then the body: the body says what the sentence
+   *   cannot (a counter's "8 instead of 5" and its reason).
+   * - `links` — the body stays as it is and only the links are added: it is
+   *   written for this reader, and may say what the generic sentence must not
+   *   (a funder's pledge does not pass by their silence).
+   */
+  subjectText?: 'replace' | 'before' | 'links';
+
   /** Email template component name (optional, defaults to 'SimpleNuti') */
   emailTemplate?: string;
 
@@ -330,6 +353,9 @@ export interface LanguageStrings {
   he: string;
   en: string;
   ar?: string;
+  /** Filled where the words come from the notices' JSON (`subject`), which speaks all five. */
+  ru?: string;
+  es?: string;
 }
 
 /**

@@ -61,6 +61,9 @@ function fakeStrapi({ members = 1, openMissions = {}, openMashaabims = {} }: {
         return { data: { createMatanotRecipeMission: { data: { id: String(++n) } } } };
       case '128createMatanotRecipeResource':
         return { data: { createMatanotRecipeResource: { data: { id: String(++n) } } } };
+      case '441setRecipeMissionCostShape':
+      case '442setRecipeResourceCostShape':
+        return {};
       default:
         throw new Error(`unexpected qid ${qid}`);
     }
@@ -153,5 +156,34 @@ describe('createComplexMatanot — recipe lines', () => {
       { strapi }
     );
     expect(varsOf('138createPmashForRecipe')[0]).not.toHaveProperty('recurring');
+  });
+  // PLAN_POOL_PRODUCT §3.1 — a line's group shape is stored apart from the line,
+  // and a plain perUnit line writes nothing new.
+  it('stores a shared / stepped shape and leaves a perUnit line untouched', async () => {
+    const { strapi, varsOf } = fakeStrapi({ members: 3 });
+    await handler(
+      {
+        ...base,
+        recipeMissions: [
+          { name: 'הדרכה', mode: 'createNew', hoursPerUnit: 80, ratePerHour: 150, costShape: 'shared' },
+          { name: 'צילום', mode: 'createNew', hoursPerUnit: 1, ratePerHour: 200 }
+        ],
+        recipeResources: [
+          { name: 'אוטובוס', kindOf: 'total', quantityPerUnit: 1, pricePerUnit: 15000, costShape: 'stepped', stepCapacity: 20 },
+          { name: 'חדר', kindOf: 'total', quantityPerUnit: 1, pricePerUnit: 3000, costShape: 'stepped', stepCapacity: null }
+        ]
+      },
+      context,
+      { strapi }
+    );
+    expect(varsOf('441setRecipeMissionCostShape')).toEqual([
+      expect.objectContaining({ costShape: 'shared', stepCapacity: null })
+    ]);
+    // a stepped line with no usable capacity is perUnit — nothing stored
+    expect(varsOf('442setRecipeResourceCostShape')).toEqual([
+      expect.objectContaining({ costShape: 'stepped', stepCapacity: 20 })
+    ]);
+    const shapedCall = strapi.execute.mock.calls.find(([q]) => q === '441setRecipeMissionCostShape');
+    expect((shapedCall as unknown[] | undefined)?.[2]).toBeUndefined(); // service token
   });
 });

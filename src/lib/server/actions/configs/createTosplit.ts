@@ -17,6 +17,7 @@
  * - Includes link to the lev page for voting
  */
 
+import { noticeSubject } from '$lib/notices/links';
 import type { ActionConfig, ActionExecutionHandler } from '../types';
 import { calcDeadlineMs } from './actionUtils.js';
 import { scope, decisionScope, scopeList } from '$lib/realtime/scopes.js';
@@ -158,6 +159,7 @@ export const createTosplitConfig: ActionConfig = {
     
     // Every member is asked to vote on the split, against the rikma's clock.
     intent: 'consent',
+    subject: (p, r) => noticeSubject('tosplit', r?.data?.createTosplit?.data?.id, p.data?.project),
     
     emailTemplate: 'SimpleNuti',
     

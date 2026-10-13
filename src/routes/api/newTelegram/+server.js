@@ -11,6 +11,7 @@ import {
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { actionService } from '$lib/server/actions/index.js';
 import { normalizeAdminToken } from '$lib/server/adminToken.js';
+import { checkTelegramWebhook } from '$lib/server/telegramWebhookAuth.js';
 // createServer is likely not needed when using SvelteKit endpoint for webhook
 // import { createServer } from 'https';
 
@@ -2559,6 +2560,15 @@ function alreadyHandled(updateId) {
 
 // --- SvelteKit POST Endpoint ---
 export async function POST({ request, fetch: svelteFetch }) {
+    // Only Telegram knows the secret_token given to setWebhook. Without this
+    // check anyone could post an update naming a member's chat id and the bot
+    // would act as that member (§14.6). Checked before the body is even read.
+    const auth = checkTelegramWebhook(request.headers.get('X-Telegram-Bot-Api-Secret-Token'));
+    if (!auth.ok) {
+        console.warn('[telegram] rejected an update without a valid X-Telegram-Bot-Api-Secret-Token');
+        return new Response('', { status: 401 });
+    }
+
     try {
         const data = await request.json();
         // console.log("Incoming Telegram Update:", JSON.stringify(data, null, 2));

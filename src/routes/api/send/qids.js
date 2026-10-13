@@ -16,6 +16,25 @@ import { assistantQids } from './qidsAssistant.js';
 const NOT_ARCHIVED = `{ or: [{ lifecycle: { null: true } }, { lifecycle: { ne: "archived" } }] }`;
 
 /**
+ * A departure as its price settlement reads it (PLAN_POOL_PRODUCT §4.2): the
+ * stored curve, what the participants were last told, and each signer's own
+ * ceiling. Shared by 447 (all live) and 448 (one).
+ */
+const DEPARTURE_FIELDS = `
+        title status_offer signed_count min_participants max_participants
+        sign_deadline price_lock_at unit_price price_tiers
+        price_current price_envelope price_announced price_notice_until
+        maagad { data { id } }
+        matanot { data { id } }
+        proposer_user { data { id } }
+        proposer_project { data { id attributes { restime currencyCode } } }
+        signed_members(pagination: { limit: 500 }) { data { id attributes {
+          status_member envelope_at_sign price_window_until
+          user { data { id } }
+          sheirutpend { data { id attributes { price archived } } }
+        } } }`;
+
+/**
  * The deal an open offer belongs to (QA C-19, `$lib/server/deal/offerDeal`): offer →
  * its spec (pendm / pmash) → the BOM line on that spec → the product → the deals sold
  * of it, each with its customers. Product-scoped, so a rikma selling several products
@@ -1825,7 +1844,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
             data {
               id
               attributes {
-                hoursPerUnit unitsPerProduct ratePerHour mode notes
+                hoursPerUnit unitsPerProduct ratePerHour costShape stepCapacity mode notes
                 pendm { data { id attributes { name descrip } } }
                 mesimabetahalich {
                   data {
@@ -1840,7 +1859,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
             data {
               id
               attributes {
-                quantityPerUnit pricePerUnit kindOf mode notes
+                quantityPerUnit pricePerUnit kindOf costShape stepCapacity mode notes
                 pmash { data { id attributes { name } } }
                 mashabetahalich {
                   data {
@@ -3037,6 +3056,8 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                       hoursPerUnit
                       unitsPerProduct
                       ratePerHour
+                      costShape
+                      stepCapacity
                       mode
                       notes
                       pendm { data { id attributes { name descrip noofhours perhour rishon { data { id } } mission { data { id } } } } }
@@ -3051,6 +3072,8 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                       quantityPerUnit
                       pricePerUnit
                       kindOf
+                      costShape
+                      stepCapacity
                       mode
                       notes
                       pmash { data { id attributes { name price hm kindOf descrip } } }
@@ -5695,6 +5718,8 @@ ${STIPEND_DECISION_FIELDS}
                         attributes {
                           saveLinks
                           saveText
+                          # every sitting behind the hours, so a voter sees when they were worked
+                          timers { start stop }
                         }
                       }
                     }
@@ -6929,13 +6954,14 @@ ${STIPEND_DECISION_FIELDS}
           totalHoursSaved
           iskvua
           hoursassinged
-          users_permissions_user { data { id } }
+          users_permissions_user { data { id attributes { username } } }
           mission { data { id } }
           project {
             data {
               id
               attributes {
                 restime
+                projectName
                 user_1s { data { id } }
               }
             }
@@ -7279,13 +7305,13 @@ ${STIPEND_DECISION_FIELDS}
                       name kindOf pricingMode estimatedPrice marginPct
                       pic { data { attributes { url } } }
                       matanot_recipe_missions {
-                        data { id attributes { hoursPerUnit unitsPerProduct ratePerHour mode notes
+                        data { id attributes { hoursPerUnit unitsPerProduct ratePerHour costShape stepCapacity mode notes
                           pendm { data { id attributes { name } } }
                           mesimabetahalich { data { id attributes { name } } }
                         } }
                       }
                       matanot_recipe_resources {
-                        data { id attributes { quantityPerUnit pricePerUnit kindOf mode notes
+                        data { id attributes { quantityPerUnit pricePerUnit kindOf costShape stepCapacity mode notes
                           pmash { data { id attributes { name } } }
                           mashabetahalich { data { id attributes { name pricePerUnit kindOf } } }
                         } }
@@ -7387,13 +7413,13 @@ ${STIPEND_DECISION_FIELDS}
                             name kindOf pricingMode estimatedPrice marginPct
                             pic { data { attributes { url } } }
                             matanot_recipe_missions {
-                              data { id attributes { hoursPerUnit unitsPerProduct ratePerHour mode notes
+                              data { id attributes { hoursPerUnit unitsPerProduct ratePerHour costShape stepCapacity mode notes
                                 pendm { data { id attributes { name } } }
                                 mesimabetahalich { data { id attributes { name } } }
                               } }
                             }
                             matanot_recipe_resources {
-                              data { id attributes { quantityPerUnit pricePerUnit kindOf mode notes
+                              data { id attributes { quantityPerUnit pricePerUnit kindOf costShape stepCapacity mode notes
                                 pmash { data { id attributes { name } } }
                                 mashabetahalich { data { id attributes { name pricePerUnit kindOf } } }
                               } }
@@ -7602,6 +7628,29 @@ ${STIPEND_DECISION_FIELDS}
       mashabetahalich: $mashabetahalich
     }) {
       data { id attributes { quantityPerUnit pricePerUnit mode } }
+    }
+  }`,
+
+  // PLAN_POOL_PRODUCT §3.1 — how a BOM line behaves in a group. Separate from
+  // 125/128 so a recipe line still saves while 1.0b lacks the fields; written
+  // only by createComplexMatanot, after its membership rule.
+  '441setRecipeMissionCostShape': `mutation SetRecipeMissionCostShape(
+    $id: ID!,
+    $costShape: ENUM_MATANOTRECIPEMISSION_COSTSHAPE,
+    $stepCapacity: Int
+  ) {
+    updateMatanotRecipeMission(id: $id, data: { costShape: $costShape, stepCapacity: $stepCapacity }) {
+      data { id attributes { costShape stepCapacity } }
+    }
+  }`,
+
+  '442setRecipeResourceCostShape': `mutation SetRecipeResourceCostShape(
+    $id: ID!,
+    $costShape: ENUM_MATANOTRECIPERESOURCE_COSTSHAPE,
+    $stepCapacity: Int
+  ) {
+    updateMatanotRecipeResource(id: $id, data: { costShape: $costShape, stepCapacity: $stepCapacity }) {
+      data { id attributes { costShape stepCapacity } }
     }
   }`,
 
@@ -10721,7 +10770,7 @@ export const moachQids = {
           noofhours
           why
           what { data { id attributes { url name mime formats } } }
-          timer { data { id attributes { saveLinks saveText } } }
+          timer { data { id attributes { saveLinks saveText timers { start stop } } } }
           mesimabetahalich {
             data { id attributes { perhour hearotMeyuchadot descrip mission { data { id } } } }
           }
@@ -10729,6 +10778,86 @@ export const moachQids = {
           users_permissions_user { data { id } }
         }
       }
+    }
+  }`,
+
+  // What a notification about one rikma vote says (PLAN_SMART_NOTICES §6.6,
+  // src/lib/server/notices/subjectNotice.ts): who asks, for what, the figures on
+  // the table, and when silence completes it. One query for every kind — the
+  // caller turns on exactly one `$is*` — with the rikma's name beside it. Light
+  // on purpose: the vote pages' own qids carry forums and chat this never needs.
+  // Server-only — the orchestrator runs it with the service token.
+  '460noticeSubject': `query NoticeSubject(
+    $pid: ID!, $id: ID!,
+    $isPendm: Boolean!, $isPmash: Boolean!, $isAsk: Boolean!, $isAskm: Boolean!,
+    $isFini: Boolean!, $isTosplit: Boolean!, $isDecision: Boolean!, $isMaap: Boolean!
+  ) {
+    project(id: $pid) { data { id attributes { projectName } } }
+    pendm(id: $id) @include(if: $isPendm) {
+      data { id attributes {
+        name noofhours perhour
+        timegrama { data { attributes { date } } }
+        negopendmissions(sort: "ordern:desc", pagination: { limit: 1 }) { data { attributes { name noofhours perhour } } }
+      } }
+    }
+    pmash(id: $id) @include(if: $isPmash) {
+      data { id attributes {
+        name hm price easy
+        timegrama { data { attributes { date } } }
+        nego_mashes(sort: "ordern:desc", pagination: { limit: 1 }) { data { attributes { name hm price easy } } }
+      } }
+    }
+    ask(id: $id) @include(if: $isAsk) {
+      data { id attributes {
+        users_permissions_user { data { id attributes { username } } }
+        timegrama { data { attributes { date } } }
+        open_mission { data { attributes { name noofhours perhour } } }
+        negopendmissions(sort: "ordern:desc", pagination: { limit: 1 }) { data { attributes { name noofhours perhour } } }
+      } }
+    }
+    askm(id: $id) @include(if: $isAskm) {
+      data { id attributes {
+        users_permissions_user { data { id attributes { username } } }
+        timegrama { data { attributes { date } } }
+        open_mashaabim { data { attributes { name hm price easy } } }
+        pmash { data { attributes { name hm price easy } } }
+        sp { data { attributes { name myp price } } }
+        nego_mashes(sort: "ordern:desc", pagination: { limit: 1 }) { data { attributes { name hm price easy } } }
+      } }
+    }
+    finiapruval(id: $id) @include(if: $isFini) {
+      data { id attributes {
+        missname noofhours perhour isTimerSave iskvua month
+        timer { data { id } }
+        users_permissions_user { data { id attributes { username } } }
+        timegrama { data { attributes { date } } }
+        mesimabetahalich { data { attributes { name perhour } } }
+      } }
+    }
+    tosplit(id: $id) @include(if: $isTosplit) {
+      data { id attributes {
+        name
+        timegrama { data { attributes { date } } }
+      } }
+    }
+    decision(id: $id) @include(if: $isDecision) {
+      data { id attributes {
+        kind decisionName newname archScope targetKind
+        timegrama { data { attributes { date } } }
+        archOpenMission { data { attributes { name } } }
+        archMesimabetahalich { data { attributes { name } } }
+        archOpenMashaabim { data { attributes { name } } }
+        archMashabetahalich { data { attributes { name } } }
+        archMatanot { data { attributes { name } } }
+      } }
+    }
+    maap(id: $id) @include(if: $isMaap) {
+      data { id attributes {
+        name quantityDelivered
+        timegrama { data { attributes { date } } }
+        mashabetahalich { data { attributes { name users_permissions_user { data { id attributes { username } } } } } }
+        pmash { data { attributes { name } } }
+      } }
     }
   }`,
 
@@ -12326,6 +12455,8 @@ export const qids = {
                         attributes {
                           saveLinks
                           saveText
+                          # every sitting behind the hours, so a voter sees when they were worked
+                          timers { start stop }
                         }
                       }
                     }
@@ -13814,11 +13945,128 @@ ${STIPEND_DECISION_FIELDS}
           title description unit_price price_tiers
           min_participants max_participants sign_deadline options
           recurrence cycle_terms cancellation_terms status_offer signed_count
+          price_current price_envelope price_lock_at
+          matanot { data { id attributes { name } } }
           currency { data { id attributes { name } } }
           proposer_user { data { id attributes { username } } }
-          proposer_project { data { id attributes { projectName profilePic { data { attributes { url } } } } } }
+          proposer_project { data { id attributes { projectName currencyCode profilePic { data { attributes { url } } } } } }
         } } }
       } }
+    }
+  }`,
+
+  // PLAN_POOL_PRODUCT §4 — a departure's product, as the server prices it: the
+  // recipe lines with their group shape, and the rikmas (with members) that may
+  // offer it. Service token; the action checks the caller is one of those members.
+  '443matanotForPoolOffer': `query MatanotForPoolOffer($id: ID!) {
+    matanot(id: $id) {
+      data { id attributes {
+        name pricingMode marginPct status_of_voting archived lifecycle
+        projectcreates { data { id attributes { projectName currencyCode user_1s { data { id } } } } }
+        matanot_recipe_missions(pagination: { limit: 100 }) { data { id attributes {
+          hoursPerUnit unitsPerProduct ratePerHour costShape stepCapacity
+          pendm { data { attributes { name } } }
+          mesimabetahalich { data { attributes { name } } }
+        } } }
+        matanot_recipe_resources(pagination: { limit: 100 }) { data { id attributes {
+          quantityPerUnit pricePerUnit costShape stepCapacity priceMode
+          pmash { data { attributes { name } } }
+          mashabetahalich { data { attributes { name } } }
+        } } }
+      } }
+    }
+  }`,
+
+  // The complex products of every rikma the user is in — what the offer form
+  // can turn into a departure. $uid, not $idL: /api/send rebinds $idL even on
+  // the service token.
+  '444myPoolableProducts': `query MyPoolableProducts($uid: ID!) {
+    usersPermissionsUser(id: $uid) {
+      data { id attributes {
+        projects_1s { data { id attributes {
+          projectName currencyCode
+          matanotofs(filters: { pricingMode: { eq: "estimated" } }) { data { id attributes {
+            name marginPct status_of_voting archived lifecycle
+            matanot_recipe_missions(pagination: { limit: 100 }) { data { id attributes {
+              hoursPerUnit unitsPerProduct ratePerHour costShape stepCapacity
+              pendm { data { attributes { name } } }
+              mesimabetahalich { data { attributes { name } } }
+            } } }
+            matanot_recipe_resources(pagination: { limit: 100 }) { data { id attributes {
+              quantityPerUnit pricePerUnit costShape stepCapacity priceMode
+              pmash { data { attributes { name } } }
+              mashabetahalich { data { attributes { name } } }
+            } } }
+          } } }
+        } } }
+      } }
+    }
+  }`,
+
+  // The derived price of a departure. Never on 227/228: those are open to the
+  // proposer through /api/send, and a price written there would skip the
+  // participants' consent window (§1ב). Written only by the maagad actions.
+  '445setMaagadOfferPricing': `mutation SetMaagadOfferPricing(
+    $id: ID!, $matanot: ID, $unit_price: Float, $price_tiers: JSON,
+    $price_current: Float, $price_envelope: Float, $price_lock_at: DateTime,
+    $price_announced: Float, $price_notice_until: DateTime
+  ) {
+    updateMaagadOffer(id: $id, data: {
+      matanot: $matanot, unit_price: $unit_price, price_tiers: $price_tiers,
+      price_current: $price_current, price_envelope: $price_envelope,
+      price_lock_at: $price_lock_at,
+      price_announced: $price_announced, price_notice_until: $price_notice_until
+    }) {
+      data { id attributes { price_current price_envelope } }
+    }
+  }`,
+
+  // The ceiling a participant saw when she joined — her personal consent
+  // boundary (§4) — and, while she is asked for a yes above it, until when.
+  // Service-only for the same reason as 445.
+  '446setMaagadMemberEnvelope': `mutation SetMaagadMemberEnvelope(
+    $id: ID!, $envelope_at_sign: Float, $price_window_until: DateTime
+  ) {
+    updateMaagadMember(id: $id, data: {
+      envelope_at_sign: $envelope_at_sign, price_window_until: $price_window_until
+    }) {
+      data { id attributes { envelope_at_sign price_window_until } }
+    }
+  }`,
+
+  // PLAN_POOL_PRODUCT §4.2 — the departures whose price can still move: an
+  // offer of a product, still gathering or activated. The lock is checked in
+  // code (a null price_lock_at falls back to sign_deadline).
+  '447listLiveDepartures': `query ListLiveDepartures {
+    maagadOffers(
+      filters: {
+        matanot: { id: { notNull: true } },
+        status_offer: { in: ["open", "quorum_reached", "activated"] }
+      },
+      pagination: { limit: 200 }
+    ) {
+      data { id attributes { ${DEPARTURE_FIELDS} } }
+    }
+  }`,
+
+  '448queryDeparture': `query QueryDeparture($id: ID!) {
+    maagadOffer(id: $id) {
+      data { id attributes { ${DEPARTURE_FIELDS} } }
+    }
+  }`,
+
+  // An activated departure's deals follow its price until the lock (§4.1), and
+  // the deal of someone who left before the lock is archived — nothing is
+  // closed yet (§1ב). Written only by the price settlement and the maagad actions.
+  '449repriceDeparturePend': `mutation RepriceDeparturePend($id: ID!, $price: Float, $total: Float) {
+    updateSheirutpend(id: $id, data: { price: $price, total: $total }) {
+      data { id attributes { price total } }
+    }
+  }`,
+
+  '450archiveDeparturePend': `mutation ArchiveDeparturePend($id: ID!) {
+    updateSheirutpend(id: $id, data: { archived: true }) {
+      data { id attributes { archived } }
     }
   }`,
 

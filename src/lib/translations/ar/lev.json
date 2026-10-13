@@ -539,7 +539,13 @@
     "counterSent": "أُرسل الاقتراح. سيُطلب من الآخرين الموافقة عليه.",
     "counterError": "تعذّر إرسال الاقتراح",
     "counterLine": "اقتُرحت {{to}} ساعات بدلاً من {{from}}: {{note}}",
-    "counterRound": "الجولة {{round}}"
+    "counterRound": "الجولة {{round}}",
+    "sessionsHeading": "جلسات المؤقت",
+    "sessionsTotal": "المجموع {{total}} ساعات",
+    "savedNote": "ما الذي أُنجز في هذا الوقت",
+    "counterQuote": "الوصف المحفوظ مع المؤقت",
+    "counterSessions": "حدِّد الجلسات التي تعترض عليها — تُطرح ساعاتها من نسختك وتُذكر في السبب. يمكنك أيضًا تعديل عدد الساعات يدويًا، أقل أو أكثر.",
+    "counterDisputed": "محل خلاف"
   },
   "weget": {
     "howMuchSpentThisMonth": "كم أنفقت هذا الشهر؟",

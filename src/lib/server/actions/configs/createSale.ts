@@ -1,3 +1,4 @@
+import { noticeSubject } from '$lib/notices/links';
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { ENTRY_CURRENCY_PARAM, entryFields, normalizeEntry } from '$lib/server/money/normalizeEntry.js';
 import { formatMoney } from '$lib/money/format.js';
@@ -311,6 +312,8 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
             },
             // The claimed holder's consent is awaited; silence confirms it.
             intent: 'consent',
+            subject: () => noticeSubject('decision', decisionId, projectId, 'hachla'),
+            subjectText: 'links',
             metadata: { type: 'saleClaim', url: 'lev', projectName, priority: 'normal' }
           },
           { recipients: [holderId], projectId, saleId, decisionId },

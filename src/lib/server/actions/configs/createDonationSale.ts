@@ -1,3 +1,4 @@
+import { noticeSubject } from '$lib/notices/links';
 import { rikmaCurrency } from '$lib/money/resolve.js';
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { buildDonationNote, type DonationVia } from '$lib/revenue/parseDonationNote';
@@ -173,6 +174,8 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
             },
             // The claimed holder's consent is awaited; silence confirms it.
             intent: 'consent',
+            subject: () => noticeSubject('decision', decisionId, projectId, 'hachla'),
+            subjectText: 'links',
             metadata: { type: 'saleClaim', url: 'lev', projectName, priority: 'normal' }
           },
           { recipients: [holderId], projectId, saleId, decisionId },

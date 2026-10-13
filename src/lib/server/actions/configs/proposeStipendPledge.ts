@@ -1,3 +1,4 @@
+import { noticeSubject } from '$lib/notices/links';
 import { moneyTextFor } from '$lib/server/money/notifyMoney.js';
 /**
  * Action: proposeStipendPledge (docs/done/PLAN_STIPEND.md §5).
@@ -264,6 +265,8 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
             },
             // The recipient is asked to accept the pledge.
             intent: 'consent',
+            subject: () => noticeSubject('decision', opened.decisionId, projectId, 'stipend'),
+            subjectText: 'links',
             metadata: { type: 'voteUpdate', url: 'lev', priority: 'high' }
           },
           { recipients: [recipientId], projectId },
@@ -290,6 +293,8 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
             },
             // The funder is asked to commit money of their own.
             intent: 'consent',
+            subject: () => noticeSubject('decision', opened.decisionId, projectId, 'stipend'),
+            subjectText: 'links',
             metadata: { type: 'voteUpdate', url: 'lev', priority: 'high' }
           },
           { recipients: [funderId], projectId },

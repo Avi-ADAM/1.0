@@ -14,6 +14,7 @@
  * `proposeOnOpenMission` and `customizeOpenMission` share this handler.
  */
 
+import { noticeSubject } from '$lib/notices/links';
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { normalizeLocationInput } from './actionUtils.js';
 import { ensureCandidacyTimegrama } from '../../nego/timegrama.js';
@@ -176,6 +177,7 @@ export const proposeOnOpenMissionConfig: ActionConfig = {
       },
     },
     intent: 'consent',
+    subject: (p, r) => noticeSubject('ask', r?.data?.askId, p.projectId),
     metadata: { type: 'missionApplication', url: 'lev' },
   },
 

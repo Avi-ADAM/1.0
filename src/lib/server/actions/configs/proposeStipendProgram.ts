@@ -23,6 +23,7 @@
  * possible, but it is the budget-first exception, not the shape to design for.
  */
 
+import { noticeSubject } from '$lib/notices/links';
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { restimeLabel } from './actionUtils.js';
 import { execFromContext } from '$lib/server/archive/exec.js';
@@ -364,6 +365,8 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
             },
             // Every member votes on a program that dilutes them.
             intent: 'consent',
+            subject: () => noticeSubject('decision', opened.decisionId, projectId, 'stipend'),
+            subjectText: 'links',
             metadata: { type: 'voteUpdate', url: 'lev', priority: 'high' }
           },
           { recipients: votersOnly, projectId },
@@ -390,6 +393,8 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
             },
             // The recipient is asked to accept.
             intent: 'consent',
+            subject: () => noticeSubject('decision', opened.decisionId, projectId, 'stipend'),
+            subjectText: 'links',
             metadata: { type: 'voteUpdate', url: 'lev', priority: 'high' }
           },
           { recipients: [recipientId], projectId },
@@ -416,6 +421,8 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
             },
             // The funder is asked to commit money of their own.
             intent: 'consent',
+            subject: () => noticeSubject('decision', opened.decisionId, projectId, 'stipend'),
+            subjectText: 'links',
             metadata: { type: 'voteUpdate', url: 'lev', priority: 'high' }
           },
           { recipients: [funderId], projectId },

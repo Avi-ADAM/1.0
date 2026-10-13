@@ -1,3 +1,4 @@
+import { noticeSubject } from '$lib/notices/links';
 import type { ActionConfig } from '../types.js';
 import { touchDormancy } from '$lib/server/archive/dormancyClock.js';
 import { execFromContext } from '$lib/server/archive/exec.js';
@@ -9,6 +10,8 @@ import { serializeSaveLinks } from '$lib/timers/saveLinks.js';
 import { saveFileIds } from '$lib/timers/saveFiles.js';
 import { fileHours } from '$lib/server/timers/fileHours.js';
 import { scope, scopeList } from '$lib/realtime/scopes.js';
+import { restimeLabel, voteUrl } from './actionUtils.js';
+import { hoursClock } from '$lib/finiapruval/sessions.js';
 
 /**
  * The timer as the server sees it, read before anything is written to it.
@@ -110,7 +113,7 @@ async function saveTimerOnce(params: any, context: any, strapi: any) {
             timerId: params.timerId,
             missionId: mId
         });
-        return { success: true, missionId: mId, alreadySaved: true };
+        return { success: true, missionId: mId, alreadySaved: true, voteUrl: `/lev?project=${params.projectId}` };
     }
 
     // The timer's own account of the work, closed. Saving used to write
@@ -212,8 +215,45 @@ async function saveTimerOnce(params: any, context: any, strapi: any) {
     await touchDormancy(execFromContext(context), String(mId)).catch(() => null);
 
     // Where the hours went, so the page can show an approval now pending
-    // without a reload.
-    return { success: true, missionId: mId, filed: filed.filed };
+    // without a reload — and what the rikma's notice says about them.
+    const projectId = String(at.project?.data?.id ?? params.projectId ?? '');
+    const finiapruvalId = filed.filed === 'approval' ? filed.finiapruvalId : null;
+    return {
+        success: true,
+        missionId: mId,
+        filed: filed.filed,
+        finiapruvalId,
+        hours: roundHours(sessionHoursTotal),
+        missionName: at.name ?? '',
+        saverName: at.users_permissions_user?.data?.attributes?.username ?? '',
+        restime: at.project?.data?.attributes?.restime ?? 'feh',
+        // The approval's own vote page in the rikma's brain; the heart when
+        // there is no approval to point at (a rikma of one, or a failed create).
+        voteUrl: finiapruvalId ? voteUrl(projectId, 'fini', finiapruvalId) : `/lev?project=${projectId}`,
+    };
+}
+
+/**
+ * The notice a partner's saved timer sends the rest of the rikma: who, how
+ * long, on what — and that it needs nothing from them. The hours stand on the
+ * vote page until the restime runs out, then they are approved by silence.
+ */
+export function timerSaveReviewTemplates(r: any) {
+    const h = hoursClock(r?.hours ?? 0);
+    const who = r?.saverName || '';
+    const mission = r?.missionName || '';
+    return {
+        title: {
+            he: `${who ? `טיימר של ${who} נשמר` : 'טיימר נשמר'} · ${h} שעות ממתינות לאישור`,
+            en: `${who ? `${who} saved a timer` : 'A timer was saved'} · ${h} hours await approval`,
+            ar: `${who ? `تم حفظ مؤقت ${who}` : 'تم حفظ مؤقت'} · ${h} ساعات بانتظار الموافقة`,
+        },
+        body: {
+            he: `במשימה "${mission}". בעמוד ההצבעה אפשר לראות את כל השעות והתיאור, ולאשר, לשוחח או להציע נגדית. ללא תגובה תוך ${restimeLabel(r?.restime, 'he')} השעות יאושרו מעצמן.`,
+            en: `On the mission "${mission}". The vote page shows every session and the description — approve, discuss or counter-propose. With no response within ${restimeLabel(r?.restime, 'en')} the hours are approved on their own.`,
+            ar: `في المهمة "${mission}". تعرض صفحة التصويت كل الجلسات والوصف — يمكنك الموافقة أو النقاش أو تقديم اقتراح مضاد. إذا لم يكن هناك رد خلال ${restimeLabel(r?.restime, 'ar')} تتم الموافقة على الساعات تلقائيًا.`,
+        },
+    };
 }
 
 export const timerSaveConfig: ActionConfig = {
@@ -264,13 +304,19 @@ export const timerSaveConfig: ActionConfig = {
             type: 'projectMembers',
             config: { projectIdParam: 'projectId', excludeSender: false }
         },
+        // A rikma of one: the hours are on the mission already, and the only
+        // recipient is the saver's own other tabs.
         templates: {
             title: { he: 'טיימר נשמר', en: 'Timer Saved', ar: 'تم حفظ المؤقت' },
             body: { he: 'השעות נוספו למשימה בהצלחה', en: 'Hours have been added to the mission', ar: 'تمت إضافة الساعات إلى المهمة' }
         },
-        // An approval waits for the rikma's answer; a direct save is a result.
-        intent: (_p, r) => (r?.filed === 'approval' ? 'consent' : 'outcome'),
-        metadata: { priority: 'normal', type: 'timerUpdate', url: '/lev?project={{projectId}}', originClientId: '{{originClientId}}' }
+        // Everyone else is asked to sign — worded as a request, not a result.
+        templatesFor: (_p, r) => (r?.filed === 'approval' ? timerSaveReviewTemplates(r) : undefined),
+        // A saved timer waits for the rikma, with a silence clock — but it is
+        // routine, many times a week: one channel per member, not all four.
+        intent: (_p, r) => (r?.filed === 'approval' ? 'review' : 'outcome'),
+        subject: (p, r) => noticeSubject('fini', r?.finiapruvalId, p.projectId),
+        metadata: { priority: 'normal', type: 'timerUpdate', url: '{{voteUrl}}', originClientId: '{{originClientId}}' }
     },
 
     updateStrategy: {

@@ -8,6 +8,7 @@
  * have not agreed to it yet; they sign, counter in turn, or let their silence mature it.
  */
 
+import { noticeSubject } from '$lib/notices/links';
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { execFromContext } from '$lib/server/archive/exec.js';
 import { fetchObjectChangeDecision, standingRound } from '$lib/server/archive/read.js';
@@ -82,6 +83,8 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
           },
           // A counter opens a new round and resets the clock for every member.
           intent: 'consent',
+          subject: () => noticeSubject('decision', decisionId, deal.projectId, 'archObject'),
+          subjectText: 'before',
           metadata: { type: 'voteUpdate', url: `/moach/${deal.projectId}/votes/decision/${decisionId}`, priority: 'high' }
         },
         { projectId: deal.projectId },

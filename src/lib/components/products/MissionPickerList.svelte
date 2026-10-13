@@ -2,6 +2,7 @@
   import Money from '$lib/components/money/Money.svelte';
   import { lang } from '$lib/stores/lang.js';
   import MissionDetailsModal from './MissionDetailsModal.svelte';
+  import CostShapePicker from './CostShapePicker.svelte';
   import type {
     RecipeMissionRow,
     AvailableMission,
@@ -112,7 +113,9 @@
         assignedMemberId: null,
         onlyPartOf: true,
         notes: '',
-        extraDetails: null
+        extraDetails: null,
+        costShape: null,
+        stepCapacity: null
       }
     ];
   }
@@ -337,6 +340,8 @@
           <input class="input" type="number" min="0" step="5" bind:value={r.ratePerHour} />
         </label>
       </div>
+
+      <CostShapePicker bind:costShape={r.costShape} bind:stepCapacity={r.stepCapacity} />
 
       {#if r.mode === 'createNew'}
         <label class="field">

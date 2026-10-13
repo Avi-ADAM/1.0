@@ -13,6 +13,7 @@
  * no absolute rejection (project super-principle).
  */
 
+import { noticeSubject } from '$lib/notices/links';
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { proposalCounterConsentSpec } from '$lib/consent/specs/counterSaleClaim';
 import {
@@ -109,6 +110,8 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
           },
           // The other side's turn, and the response clock was reset.
           intent: 'consent',
+          subject: () => noticeSubject('decision', decisionId, projectId, 'hachla'),
+          subjectText: 'before',
           metadata: { type: 'saleClaimCounter', url: 'lev', priority: 'normal' },
         },
         { recipients: [otherId], projectId, decisionId },

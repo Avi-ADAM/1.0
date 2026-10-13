@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { resolveChannels, recipientTemplateLang, emailRecipients, voteIntent, CHANNELS_BY_INTENT, NOTIFICATION_INTENTS } from './intent';
+import { resolveChannels, recipientTemplateLang, emailRecipients, deliveryPlan, voteIntent, CHANNELS_BY_INTENT, NOTIFICATION_INTENTS } from './intent';
 import type { NotificationIntent } from './intent';
 import { NotificationOrchestrator } from './NotificationOrchestrator';
 import type { NotificationConfig, ActionContext } from '../actions/types';
@@ -60,6 +60,27 @@ describe('emailRecipients — email for whoever has no other channel', () => {
 
   it('applies to legacy lists as well (push without email ⇒ email whoever has no device)', () => {
     expect(ids(emailRecipients([app, none], ['socket', 'push']))).toEqual(['none']);
+  });
+});
+
+describe('deliveryPlan — review reaches each person once', () => {
+  const app = { id: 'app', telegramId: '', machshirs: [{ attributes: { jsoni: '{}' } }] };
+  const bot = { id: 'bot', telegramId: 't9', machshirs: [] };
+  const both = { id: 'both', telegramId: 't8', machshirs: [{ attributes: { jsoni: '{}' } }] };
+  const none = { id: 'none', telegramId: '', machshirs: [] };
+  const ids = (us: { id: string }[]) => us.map((u) => u.id);
+
+  it('telegram first, then a live device, then email — never two', () => {
+    const plan = deliveryPlan([app, bot, both, none], resolveChannels({ intent: 'review' }), 'review');
+    expect(ids(plan.telegram)).toEqual(['bot', 'both']);
+    expect(ids(plan.push)).toEqual(['app']);
+    expect(ids(plan.email)).toEqual(['none']);
+  });
+
+  it('every other intent keeps sending each channel to everyone on it', () => {
+    const plan = deliveryPlan([bot, none], resolveChannels({ intent: 'consent' }), 'consent');
+    expect(ids(plan.telegram)).toEqual(['bot', 'none']);
+    expect(ids(plan.email)).toEqual(['bot', 'none']);
   });
 });
 
@@ -167,6 +188,15 @@ describe('NotificationOrchestrator — the actor is never notified outside the s
     await orch.notify(config({ intent: 'outcome' }), { userIds: ['2'] }, {}, context);
     expect(sent.push).toEqual([['2']]);
     expect(sent.telegram).toEqual([]);
+    expect(sent.email).toEqual([]);
+  });
+
+  it('a review reaches a member on telegram only, not telegram + push + email', async () => {
+    const { orch, sent } = setup();
+    await orch.notify(config({ intent: 'review' }), { userIds: ['1', '2'] }, {}, context);
+    expect(sent.socket).toEqual([['1', '2']]);
+    expect(sent.telegram).toEqual([['2']]);
+    expect(sent.push).toEqual([]);
     expect(sent.email).toEqual([]);
   });
 

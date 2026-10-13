@@ -15,6 +15,7 @@
  * Members are rejected: they have the moach (and the isRishon path).
  */
 
+import { noticeSubject } from '$lib/notices/links';
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { findOrCreateMissionTemplate } from '$lib/server/missions/missionTemplate.js';
 import { scope, decisionScope, scopeList } from '$lib/realtime/scopes.js';
@@ -148,6 +149,7 @@ export const nominateSelfMissionConfig: ActionConfig = {
       },
     },
     intent: 'consent',
+    subject: (p, r) => noticeSubject('ask', r?.data?.askId, r?.data?.projectId ?? p.projectId),
     metadata: { type: 'selfNomination', url: 'lev', priority: 'high' },
   },
 

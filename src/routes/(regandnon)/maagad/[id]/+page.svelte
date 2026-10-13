@@ -2,6 +2,7 @@
   import { invalidateAll } from '$app/navigation';
   import { page } from '$app/state';
   import MaagadOfferForm from '$lib/components/maagad/MaagadOfferForm.svelte';
+  import DepartureTerms from '$lib/components/maagad/DepartureTerms.svelte';
   import ShareLink from '$lib/components/share/ShareLink.svelte';
   import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
   import { t, isRtl } from '$lib/translations';
@@ -47,6 +48,13 @@
     runAction('signMaagadOffer', { maagadId: maagad.id, offerId });
   const unsign = (offerId: string) =>
     runAction('unsignMaagadOffer', { maagadId: maagad.id, offerId });
+  const confirmPrice = (offerId: string) => runAction('confirmDeparturePrice', { offerId });
+
+  /** A departure's lock: price_lock_at, else its sign deadline (§4.1). */
+  function lockedNow(offer: { priceLockAt?: string | null; deadline?: string | null }): boolean {
+    const at = offer.priceLockAt ?? offer.deadline;
+    return !!at && new Date(at).getTime() <= Date.now();
+  }
 
   function progressPct(count: number, target: number | null): number {
     if (!target || target <= 0) return 0;
@@ -158,6 +166,7 @@
     {#if showOfferForm}
       <MaagadOfferForm
         maagadId={maagad.id}
+        products={data.myProducts}
         onDone={async () => {
           showOfferForm = false;
           await invalidateAll();
@@ -182,8 +191,19 @@
         {#if offer.description}
           <p class="offer-desc">{offer.description}</p>
         {/if}
+        {#if offer.matanotId}
+          <DepartureTerms
+            tiers={offer.priceTiers}
+            envelope={offer.priceEnvelope}
+            signedCount={offer.signedCount}
+            min={offer.min ?? 1}
+            currency={offer.currencyCode}
+            lines={offer.lines}
+            lockAt={offer.priceLockAt}
+          />
+        {/if}
         <div class="offer-facts">
-          {#if offer.unitPrice != null}
+          {#if offer.unitPrice != null && !offer.matanotId}
             <span><EntityIcon kind="money" size={13} /> {offer.unitPrice}{offer.currency ? ` ${offer.currency}` : ''} {$t('demand.per_unit')}</span>
           {/if}
           {#if offer.deadline}
@@ -211,12 +231,29 @@
           </details>
         {/if}
 
+        {#if data.myDeparture?.offerId === offer.id && data.myDeparture.consentUntil}
+          <!-- A move passed her own ceiling: only her yes keeps her in (§4.2). -->
+          <div class="consent" role="status">
+            <strong>{$t('pooling.departure.consentTitle')}</strong>
+            <p>{$t('pooling.departure.consentBody', { date: fmtDate(data.myDeparture.consentUntil) })}</p>
+            <div class="consent-actions">
+              <button class="primary" onclick={() => confirmPrice(offer.id)} disabled={busy}>
+                {$t('pooling.departure.stay')}
+              </button>
+              <button class="ghost" onclick={() => unsign(offer.id)} disabled={busy}>
+                {$t('pooling.departure.notForMe')}
+              </button>
+            </div>
+          </div>
+        {/if}
+
         <div class="offer-actions">
           {#if !data.isLoggedIn}
             <a class="primary" href={loginHref}>{$t('demand.login_to_join')}</a>
           {:else if my?.signedOfferId === offer.id}
             <span class="joined"><EntityIcon kind="signed" size={13} /> {$t('demand.my_signed')}</span>
-            {#if offer.status !== 'activated'}
+            <!-- A departure stays open to leave until its lock, even once activated (§1ב). -->
+            {#if offer.status !== 'activated' || (offer.matanotId && !lockedNow(offer))}
               <button class="ghost" onclick={() => unsign(offer.id)} disabled={busy}>
                 {$t('demand.unsign')}
               </button>
@@ -502,6 +539,25 @@
     display: flex;
     align-items: center;
     gap: 0.6rem;
+    flex-wrap: wrap;
+  }
+  .consent {
+    border: 1px solid rgba(244, 114, 182, 0.55);
+    background: rgba(244, 114, 182, 0.08);
+    border-radius: 0.75rem;
+    padding: 0.6rem 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    font-size: 0.85rem;
+  }
+  .consent p {
+    margin: 0;
+    color: inherit;
+  }
+  .consent-actions {
+    display: flex;
+    gap: 0.5rem;
     flex-wrap: wrap;
   }
   .error {

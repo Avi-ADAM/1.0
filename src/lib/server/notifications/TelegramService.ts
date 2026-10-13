@@ -7,7 +7,10 @@
 
 import type { ActionContext } from '../actions/types';
 import type { UserProfile, NotificationData } from './NotificationOrchestrator';
-import { recipientTemplateLang } from './intent';
+import { recipientTemplateLang, textFor } from './intent';
+import { getInternalSecret, INTERNAL_HEADER } from '$lib/server/internalSecret.js';
+
+const escapeHtml = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
 export class TelegramService {
   /**
@@ -68,27 +71,39 @@ export class TelegramService {
       // The recipient's language, never the sender's (see recipientTemplateLang)
       const lang = recipientTemplateLang(user.lang);
 
-      // Get the notification text in the appropriate language
-      const title = notification.title[lang as 'he' | 'en' | 'ar'] || notification.title.he;
-      const body = notification.body[lang as 'he' | 'en' | 'ar'] || notification.body.he;
+      // Get the notification text in the appropriate language — the body may
+      // speak theirs even where the templates do not (textFor).
+      const title = textFor(notification.title, user.lang);
+      const body = textFor(notification.body, user.lang);
+
+      // /api/ste appends a path to 'https://www.1lev1.com/', so a config url
+      // written as a route ('/deals') would become '//deals'.
+      const path = (url: unknown) => String(url || 'lev').replace(/^\/+/, '') || 'lev';
 
       // Prepare Telegram message data
       const telegramData = {
         isNew: true,
         lang,
         chat_id: user.telegramId,
-        det: title,
-        message: body,
-        // /api/ste appends this to 'https://www.1lev1.com/', so a config url
-        // written as a route ('/deals') would become '//deals'.
-        urladd: String(notification.metadata?.url || 'lev').replace(/^\/+/, '') || 'lev'
+        // The relay sends HTML: a name with "<" or "&" in it would make
+        // Telegram refuse the whole message.
+        det: escapeHtml(title),
+        message: escapeHtml(body),
+        urladd: path(notification.metadata?.url),
+        // One button per place to answer it (the rikma's vote page, the heart),
+        // so the reader chooses; without links, the one `urladd` button.
+        buttons: (notification.links ?? []).map((l) => ({ text: textFor(l.label, user.lang), path: path(l.href) }))
       };
 
-      // Send via existing Telegram API
+      // The relay sends to a chosen chat only for this server. handleFetch
+      // stamps the internal secret on same-origin calls, and this one is an
+      // absolute www URL that is cross-origin from the VPS — so it carries the
+      // header itself.
       const response = await context.fetch('https://www.1lev1.com/api/ste', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          [INTERNAL_HEADER]: getInternalSecret(),
         },
         body: JSON.stringify(telegramData)
       });

@@ -40,7 +40,8 @@
     "changePassword": "Change password",
     "sendOfferToProvider": "Send offer to provider",
     "publishToCommunity": "Publish to community",
-    "toProfile": "To my profile"
+    "toProfile": "To my profile",
+    "view": "View"
   },
   "labels": {
     "location": "Location",

@@ -1,3 +1,4 @@
+import { noticeSubject } from '$lib/notices/links';
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { STRAPI_URL } from '$lib/server/strapiUrl.js';
 import { touchDormancy } from '$lib/server/archive/dormancyClock.js';
@@ -346,6 +347,7 @@ export const applyToMissionConfig: ActionConfig = {
       body: { he: 'יש בקשה חדשה לביצוע משימה בפרויקט', en: 'A new mission application was submitted' },
     },
     intent: 'consent',
+    subject: (p, r) => noticeSubject('ask', r?.data?.askId, p.projectId),
     metadata: { type: 'missionApplication', url: 'lev' },
   },
 
