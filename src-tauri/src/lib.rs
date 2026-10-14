@@ -9,7 +9,9 @@ pub fn run() {
 
     builder
         .setup(|app| {
-            // Debug builds only: routes Rust/WebView logs to `adb logcat`.
+            // Preserve the existing non-Windows/mobile debug logger. Windows
+            // installs its bounded file logger in desktop::setup, including release.
+            #[cfg(not(all(desktop, target_os = "windows")))]
             if cfg!(debug_assertions) {
                 app.handle().plugin(
                     tauri_plugin_log::Builder::default()

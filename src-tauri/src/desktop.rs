@@ -63,7 +63,28 @@ pub fn configure(builder: tauri::Builder<Wry>) -> tauri::Builder<Wry> {
         .plugin(tauri_plugin_updater::Builder::new().build())
 }
 
+fn startup_stage(stage: &str) {
+    log::info!("startup: {stage}");
+    // Preserve the last completed checkpoint even if the UI subsequently hangs.
+    log::logger().flush();
+}
+
 pub fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
+    use tauri_plugin_log::{RotationStrategy, Target, TargetKind};
+    app.handle().plugin(
+        tauri_plugin_log::Builder::new()
+            // Host diagnostics only: no WebView/JS forwarding or HTTP trace logs.
+            .level(log::LevelFilter::Off)
+            .level_for("app_lib", log::LevelFilter::Info)
+            .targets([Target::new(TargetKind::LogDir {
+                file_name: Some("desktop".into()),
+            })])
+            .max_file_size(1_000_000)
+            .rotation_strategy(RotationStrategy::KeepSome(3))
+            .build(),
+    )?;
+    log::info!("Windows desktop version {} (pid {})", app.package_info().version, std::process::id());
+    startup_stage("setup entered; file logging enabled");
     let navigation_app = app.handle().clone();
     let popup_app = app.handle().clone();
     let mut config = app.config().app.windows.iter()
@@ -72,7 +93,16 @@ pub fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
     // Start blank until the actual WebView2 UA has been read and extended.
     // A hardcoded Chrome UA would drift from the installed evergreen runtime.
     config.url = WebviewUrl::External(Url::parse("about:blank")?);
+    startup_stage("creating main window");
     let window = WebviewWindowBuilder::from_config(app, &config)?
+        .on_page_load(|_, payload| {
+            // Record only a category, never page paths, queries, fragments or cookies.
+            let category = if is_local(payload.url()) { "local shell" }
+                else if is_site(payload.url()) { "live site" }
+                else { "other" };
+            log::info!("page load {:?}: {category}", payload.event());
+            log::logger().flush();
+        })
         .on_navigation(move |url| {
             // This is top-level navigation, NOT an iframe/resource filter.
             // YouTube embeds therefore remain in the page.
@@ -136,9 +166,11 @@ pub fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
         })
         .build()?;
 
-    let ready_window = window.clone();
+    startup_stage("main window created");
     let version = app.package_info().version.to_string();
+    startup_stage("configuring WebView2 User-Agent");
     window.with_webview(move |webview| {
+        startup_stage("native WebView2 callback entered");
         use webview2_com::{Microsoft::Web::WebView2::Win32::ICoreWebView2Settings2, take_pwstr};
         use windows::core::{HSTRING, Interface, PWSTR};
         // All COM calls are on the WebView's UI thread; take_pwstr frees the
@@ -157,11 +189,17 @@ pub fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
         if let Err(error) = result {
             log::error!("Could not extend WebView2 User-Agent: {error}");
         }
-        if let Err(error) = ready_window.navigate(Url::parse(LOCAL_SHELL).expect("static shell URL")) {
-            log::error!("Could not load local shell: {error}");
-        }
+        startup_stage("native WebView2 callback returning");
     })?;
+    // setup runs on the UI thread, so with_webview finishes synchronously here.
+    // Never call a Tauri window/webview method INSIDE that callback: runtime-wry
+    // retains the dispatcher window_id mutex while calling it. Re-entering
+    // navigate locks the same non-reentrant mutex and freezes the UI (v0.1.0).
+    startup_stage("native callback returned; navigating to local shell");
+    window.navigate(Url::parse(LOCAL_SHELL)?)?;
+    startup_stage("local shell navigation submitted");
     start_updater(app.handle().clone())?;
+    startup_stage("setup complete");
     Ok(())
 }
 
@@ -192,6 +230,7 @@ fn start_updater(app: AppHandle) -> std::io::Result<()> {
 }
 
 async fn check_update(app: &AppHandle) -> Result<(), Box<dyn std::error::Error>> {
+    log::info!("updater: checking for an update");
     let Some(update) = app.updater_builder().timeout(Duration::from_secs(20)).build()?.check().await? else {
         return Ok(());
     };

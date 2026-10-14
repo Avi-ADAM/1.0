@@ -131,6 +131,33 @@ test('Retry after reconnection navigates to the live site without IPC', async ()
   assert.equal(events.online, connect);
 });
 
+test('Startup does not re-enter Tauri dispatch while with_webview holds its mutex', () => {
+  const source = read('src-tauri/src/desktop.rs');
+  const begin = source.indexOf('window.with_webview(move |webview| {');
+  const end = source.indexOf('\n    })?;', begin);
+  assert.ok(begin >= 0 && end > begin);
+  const callback = source.slice(begin, end);
+  assert.doesNotMatch(callback, /\b(?:window|ready_window|app)\.(?:navigate|url|show|set_title|set_focus|run_on_main_thread)\s*\(/);
+  assert.ok(callback.includes('settings.SetUserAgent'));
+  assert.ok(source.indexOf('window.navigate(Url::parse(LOCAL_SHELL)?)?;', end) > end);
+});
+
+test('Windows release logging is bounded, host-only, and installed before creating the window', () => {
+  const source = read('src-tauri/src/desktop.rs');
+  const setup = source.slice(source.indexOf('pub fn setup('), source.indexOf('let navigation_app'));
+  assert.ok(setup.includes('tauri_plugin_log::Builder::new()'));
+  assert.ok(setup.includes('TargetKind::LogDir'));
+  assert.ok(setup.includes('Some("desktop".into())'));
+  assert.ok(setup.includes('.max_file_size(1_000_000)'));
+  assert.ok(setup.includes('RotationStrategy::KeepSome(3)'));
+  assert.ok(setup.includes('.level(log::LevelFilter::Off)'));
+  assert.ok(setup.includes('.level_for("app_lib", log::LevelFilter::Info)'));
+  assert.ok(!setup.includes('debug_assertions'));
+  assert.ok(!source.includes('TargetKind::Webview'));
+  assert.ok(source.includes('startup_stage("setup complete")'));
+  assert.ok(read('src-tauri/src/lib.rs').includes('#[cfg(not(all(desktop, target_os = "windows")))]'));
+});
+
 test('Installer action explicitly uses the npm-installed CLI instead of auto-detecting Yarn', () => {
   const workflow = read('.github/workflows/desktop-windows.yml');
   const action = workflow.split('uses: tauri-apps/tauri-action@v0')[1]?.split('      - name:')[0];

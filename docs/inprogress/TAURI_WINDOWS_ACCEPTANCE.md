@@ -1,7 +1,8 @@
 # Windows Tauri — release runbook and acceptance evidence
 
-**Status: NOT ACCEPTED / blocked on installer release CI, website deployment
-configuration, and real Windows 10 + 11 testing.**
+**Status: NOT ACCEPTED / v0.1.0 installs but the owner reports a startup hang.
+The v0.1.1 startup fix and diagnostics require a new CI installer and real-machine
+retest. Website deployment and the remaining Windows 10 + 11 checks are pending.**
 
 Owner confirmed that the permanent signing keys already exist and will trigger
 installer CI, deploy the website environment variable, and test both Windows
@@ -14,8 +15,10 @@ Implementation is not evidence that an installer works. Never mark §10 of
 ## Constraints preserved
 
 - One `src-tauri`; identifier remains `world.onelev1.app`.
-- `gen/android`, the Android shell, the Android build scripts, and the base
-  Tauri configuration are not edited. Desktop plugins are target-scoped;
+- `gen/android`, the Android shell, and the Android build scripts are not
+  edited. The base Tauri config changes only its shared release version to
+  `0.1.1`; the identifier and mobile window settings remain unchanged.
+  Desktop plugins are target-scoped;
   native host registration and implementation are Windows/desktop-gated.
 - The app still loads the live website. No SPA build, auth API changes, remote
   capabilities, or frontend IPC permissions.
@@ -57,6 +60,56 @@ state). The single-instance plugin restores/focuses the existing window. A
 native updater thread checks on startup and every six hours, requests consent
 in Hebrew, saves window state, verifies/downloads the update, and restarts.
 No forced install happens after “not now”. Update failures leave the app usable.
+
+## Startup hang and logs (v0.1.0 → v0.1.1)
+
+The owner installed the v0.1.0 CI artifact successfully but reported that its
+first window remained unresponsive for several minutes. Windows version has
+not yet been supplied. This is a failed startup acceptance check, not a pass.
+The successful installer build/signature verification is run
+https://github.com/Avi-ADAM/1.0/actions/runs/38562811086 (commit `55a23dc`).
+
+In v0.1.0, logging was debug-only, so its Release installer does not produce
+application log files. For that build use **Event Viewer → Windows Logs →
+Application**, at the time of the hang: Application Hang (1002), Application
+Error (1000), Windows Error Reporting (1001). A hang may only be recorded after
+Windows detects it or the user closes the unresponsive application. Send only
+matching app events, redact personal paths, and do not upload a memory dump or
+the WebView profile (which can contain cookies and session data).
+
+Code inspection identified a startup deadlock: `with_webview` in runtime-wry
+2.11.5 executes synchronously on the UI thread while holding the dispatcher's
+`window_id` mutex. Calling `ready_window.navigate` inside that callback attempts
+to lock the same mutex again. v0.1.1 finishes the native User-Agent callback
+**before** calling `window.navigate`, outside the callback. The identifier,
+WebView profile path, keys, and remote IPC policy are unchanged. Confirmation
+that this resolves the user's observed hang still requires their retest.
+
+v0.1.1 also enables bounded Rust host logging in Windows Release builds before
+creating the window. Press Win+R and enter:
+
+```text
+%LOCALAPPDATA%\world.onelev1.app\logs
+```
+
+The current file is `desktop.log`, with up to three archived files, about 1 MB
+per file. Logging contains startup checkpoints, app version/process ID, native
+errors and page-load categories (`local shell`/`live site`), not page paths,
+queries or JavaScript console forwarding. Other libraries' HTTP/debug logging
+is disabled. Review errors for personal paths before sharing. To read the last
+100 lines without collecting the profile:
+
+```powershell
+Get-Content "$env:LOCALAPPDATA\world.onelev1.app\logs\desktop.log" -Tail 100
+```
+
+Expected checkpoints include `main window created`, `native WebView2 callback
+returning`, `native callback returned; navigating to local shell`, and `setup
+complete`. Missing/later checkpoints narrow down the hang. Keep old diagnostic
+files; do not delete the data/profile directory or uninstall to troubleshoot.
+After the new CI installer is built, close only the unresponsive 1lev1 process
+via Task Manager and install v0.1.1 over it. Do not claim this startup defect is
+fixed on Windows 10/11 until that CI build has actually been retested.
 
 ## One-time owner action: permanent updater key
 
