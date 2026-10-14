@@ -1,7 +1,12 @@
 # Windows Tauri — release runbook and acceptance evidence
 
-**Status: NOT ACCEPTED / blocked on signing-key provisioning, release CI dispatch,
-website deployment configuration, and real Windows 10 + 11 testing.**
+**Status: NOT ACCEPTED / blocked on installer release CI, website deployment
+configuration, and real Windows 10 + 11 testing.**
+
+Owner confirmed that the permanent signing keys already exist and will trigger
+installer CI, deploy the website environment variable, and test both Windows
+versions. Their values/configuration have not been inspected by this session;
+CI preflight remains the source of truth. Do not generate a replacement key.
 Implementation is not evidence that an installer works. Never mark §10 of
 [`PLAN_TAURI_WINDOWS.md`](../tbd/PLAN_TAURI_WINDOWS.md) complete from unit tests,
 `cargo check`, or a build alone.
@@ -208,8 +213,16 @@ acceptance criteria.
 - Actual Tauri CLI test-only signature verified successfully by the Node crypto
   verifier (not merely a mock signature).
 - `gen/android`, base `tauri.conf.json`, and the Android shell have no diff.
-- First CI run: https://github.com/Avi-ADAM/1.0/actions/runs/38553044826
-  (implementation validation, not a release/installer acceptance run).
+- Windows host compilation + 2 Rust policy tests and Android-target check passed:
+  https://github.com/Avi-ADAM/1.0/actions/runs/38553924878
+  (commit `67cb383bb10e0077e0cce6c53df7149180c35bcd`; 20 Node tests also passed).
+  This is implementation validation, not a release/installer acceptance run.
+- The CI-resolved Cargo.lock was imported in `ed84fff`; no existing dependency
+  version was removed or upgraded. Subsequent checks/builds use `--locked`.
+- The earlier run `38553044826` failed native compilation; the native dialog
+  API calls were corrected before the successful run. Build logs/artifact
+  downloads redirect to storage hosts unavailable in the agent's network;
+  compiler failures are now also surfaced as GitHub check annotations.
 
 **Completion remains blocked** until installer/public evidence and both real-OS
 acceptance records, including the update path and Android APK regression, exist.

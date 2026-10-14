@@ -28,8 +28,6 @@ concurrency:
 jobs:
   windows-check:
     if: inputs.verify_public != true
-    permissions:
-      contents: write # Bootstrap the dependency lock on this session branch only.
     runs-on: windows-latest
     timeout-minutes: 35
     steps:
@@ -48,39 +46,15 @@ jobs:
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force scratch | Out-Null
-          cargo test --manifest-path src-tauri/Cargo.toml --lib 2>&1 | Tee-Object -FilePath scratch/cargo-windows.log
+          cargo test --locked --manifest-path src-tauri/Cargo.toml --lib 2>&1 | Tee-Object -FilePath scratch/cargo-windows.log
           $code = $LASTEXITCODE
           if ($code -ne 0) {
             $tail = (Get-Content scratch/cargo-windows.log -Tail 100) -join "%0A"
             Write-Output "::error title=Windows compiler diagnostics::$tail"
           }
           exit $code
-      - name: Bootstrap resolved lockfile on the fixed work branch
-        if: always() && github.ref == 'refs/heads/arena/6127ca68-1-0'
-        shell: pwsh
-        run: |
-          git diff --quiet -- src-tauri/Cargo.lock
-          if ($LASTEXITCODE -eq 0) { exit 0 }
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add src-tauri/Cargo.lock
-          git commit -m "Lock Windows-only Tauri dependencies resolved by CI"
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          git push origin arena/6127ca68-1-0
       - name: Verify Android source is untouched by tooling
         run: git diff --exit-code -- src-tauri/gen/android
-      - name: Format native sources for review
-        if: always()
-        run: cargo fmt --manifest-path src-tauri/Cargo.toml
-      - name: Preserve resolved lockfile and native sources
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: desktop-native-review
-          path: |
-            src-tauri/Cargo.lock
-            src-tauri/src/desktop.rs
-          retention-days: 7
 
   android-check:
     if: inputs.verify_public != true
@@ -95,7 +69,7 @@ jobs:
         with:
           workspaces: src-tauri -> target
       - name: Check unchanged Android host (no init, no generated project edits)
-        run: cargo check --manifest-path src-tauri/Cargo.toml --target aarch64-linux-android
+        run: cargo check --locked --manifest-path src-tauri/Cargo.toml --target aarch64-linux-android
       - run: git diff --exit-code -- src-tauri/gen/android
 
   installers:
@@ -141,7 +115,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          args: --config scratch/desktop/signing.conf.json --target x86_64-pc-windows-msvc
+          args: --config scratch/desktop/signing.conf.json --target x86_64-pc-windows-msvc -- --locked
           tagName: ${{ env.DESKTOP_RELEASE_TAG }}
           releaseName: '1לב1 Windows v__VERSION__'
           releaseBody: |
