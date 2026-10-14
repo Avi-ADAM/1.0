@@ -1,0 +1,166 @@
+name: Windows desktop
+
+on:
+  push:
+    branches: [main, arena/6127ca68-1-0]
+    tags: ['desktop-v*']
+    paths:
+      - 'src-tauri/**'
+      - 'scripts/desktop/**'
+      - 'src/lib/download/**'
+      - '.github/workflows/desktop-windows.yml'
+      - 'package.json'
+      - 'package-lock.json'
+  workflow_dispatch:
+    inputs:
+      verify_public:
+        description: 'Only verify the published assets and live /download (after deployment)'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: desktop-windows-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  windows-check:
+    if: inputs.verify_public != true
+    runs-on: windows-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: node --test scripts/desktop/desktop.test.mjs
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri -> target
+      - name: Compile Windows host and test native policy
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force scratch | Out-Null
+          cargo test --locked --manifest-path src-tauri/Cargo.toml --lib 2>&1 | Tee-Object -FilePath scratch/cargo-windows.log
+          $code = $LASTEXITCODE
+          if ($code -ne 0) {
+            $tail = (Get-Content scratch/cargo-windows.log -Tail 100) -join "%0A"
+            Write-Output "::error title=Windows compiler diagnostics::$tail"
+          }
+          exit $code
+      - name: Verify Android source is untouched by tooling
+        run: git diff --exit-code -- src-tauri/gen/android
+
+  android-check:
+    if: inputs.verify_public != true
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-linux-android
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri -> target
+      - name: Check unchanged Android host (no init, no generated project edits)
+        run: cargo check --locked --manifest-path src-tauri/Cargo.toml --target aarch64-linux-android
+      - run: git diff --exit-code -- src-tauri/gen/android
+
+  installers:
+    # Pushes validate only. Publishing installers is an explicit dispatch/tag;
+    # the Release remains a DRAFT until real Windows acceptance is recorded.
+    if: inputs.verify_public != true && (github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/desktop-v'))
+    needs: [windows-check, android-check]
+    runs-on: windows-latest
+    timeout-minutes: 45
+    permissions:
+      contents: write
+    env:
+      TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+      TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+      TAURI_UPDATER_PUBLIC_KEY: ${{ vars.TAURI_UPDATER_PUBLIC_KEY || secrets.TAURI_UPDATER_PUBLIC_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Validate signing configuration before installing/building
+        shell: pwsh
+        run: |
+          $version = (Get-Content src-tauri/tauri.conf.json | ConvertFrom-Json).version
+          $tag = "desktop-v$version"
+          if ($env:GITHUB_REF_TYPE -eq 'tag') { $tag = $env:GITHUB_REF_NAME }
+          "DESKTOP_RELEASE_TAG=$tag" >> $env:GITHUB_ENV
+          $env:DESKTOP_RELEASE_TAG = $tag
+          node scripts/desktop/prepare-release.mjs
+      - name: Refuse to replace a published release or downgrade the version
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node scripts/desktop/assert-new-release.mjs
+      - run: npm ci --no-audit --no-fund
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri -> target
+      - name: Build updater-signed installers (no paid Authenticode signing)
+        id: tauri
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          # Both lockfiles exist; do not let the action auto-select Yarn.
+          # Use exactly the local Tauri CLI installed by npm ci, without downloads.
+          tauriScript: npx --no-install tauri
+          args: --config scratch/desktop/signing.conf.json --target x86_64-pc-windows-msvc -- --locked
+          tagName: ${{ env.DESKTOP_RELEASE_TAG }}
+          releaseName: '1לב1 Windows v__VERSION__'
+          releaseBody: |
+            גרסת Windows של 1לב1 — התקנה אישית, עברית ועדכונים אוטומטיים.
+            NSIS setup.exe הוא המתקין הראשי; MSI מיועד להתקנה מנוהלת.
+            המתקינים אינם חתומים ב-Authenticode; ייתכן שתופיע אזהרת SmartScreen.
+          releaseDraft: true
+          prerelease: false
+          includeUpdaterJson: true
+          updaterJsonPreferNsis: true
+      - name: Download and verify the actual CI Release assets
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release download $env:DESKTOP_RELEASE_TAG --dir scratch/desktop/release --repo $env:GITHUB_REPOSITORY
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node scripts/desktop/verify-release.mjs scratch/desktop/release
+      - name: Preserve installers, manifest, signatures and SHA256 evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-installers-${{ env.DESKTOP_RELEASE_TAG }}
+          path: scratch/desktop/release/
+          if-no-files-found: error
+          retention-days: 14
+      - run: git diff --exit-code -- src-tauri/gen/android
+
+  public-acceptance:
+    if: github.event_name == 'workflow_dispatch' && inputs.verify_public == true
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Verify public signatures, page version and stable redirects
+        env:
+          TAURI_UPDATER_PUBLIC_KEY: ${{ vars.TAURI_UPDATER_PUBLIC_KEY || secrets.TAURI_UPDATER_PUBLIC_KEY }}
+        run: node scripts/desktop/check-public-release.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: desktop-public-evidence
+          path: scratch/desktop/public-release/public-evidence.json
+          if-no-files-found: error
+          retention-days: 14

@@ -1,6 +1,6 @@
 [package]
 name = "app"
-version = "0.1.0"
+version = "0.1.2"
 description = "1lev1 mobile/desktop shell (Tauri v2)"
 edition = "2021"
 
@@ -13,11 +13,25 @@ crate-type = ["staticlib", "cdylib", "rlib"]
 tauri-build = { version = "2", features = [] }
 
 [dependencies]
-tauri = { version = "2", features = [] }
+tauri = { version = "~2.11.5", features = [] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 log = "0.4"
 tauri-plugin-log = "2"
+
+# Never resolved into the Android/iOS dependency graph.
+[target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
+tauri-plugin-window-state = "2"
+tauri-plugin-single-instance = "2"
+tauri-plugin-opener = "2"
+tauri-plugin-updater = "2"
+tauri-plugin-process = "2"
+tauri-plugin-dialog = "2"
+
+# Match the native COM ABI used by Tauri 2.11 / Wry 0.55.
+[target.'cfg(target_os = "windows")'.dependencies]
+webview2-com = "0.38"
+windows = "0.61"
 
 [profile.release]
 codegen-units = 1

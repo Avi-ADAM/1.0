@@ -1,0 +1,52 @@
+{
+  "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
+  "app": {
+    "windows": [
+      {
+        "label": "main",
+        "create": false,
+        "title": "1💗1",
+        "url": "windows.html",
+        "width": 1280,
+        "height": 820,
+        "minWidth": 380,
+        "minHeight": 600,
+        "center": true,
+        "resizable": true,
+        "fullscreen": false,
+        "dragDropEnabled": false
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; connect-src https://www.1lev1.com; img-src 'self' data:"
+    }
+  },
+  "bundle": {
+    "targets": ["nsis", "msi"],
+    "createUpdaterArtifacts": true,
+    "publisher": "1lev1",
+    "copyright": "Copyright © 2026 1lev1",
+    "shortDescription": "1לב1 — קהילה, משימות ועשייה משותפת",
+    "windows": {
+      "nsis": {
+        "installMode": "currentUser",
+        "languages": ["Hebrew", "English"],
+        "displayLanguageSelector": true
+      },
+      "webviewInstallMode": {
+        "type": "downloadBootstrapper"
+      }
+    }
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "",
+      "endpoints": [
+        "https://github.com/Avi-ADAM/1.0/releases/latest/download/latest.json"
+      ],
+      "windows": {
+        "installMode": "passive"
+      }
+    }
+  }
+}
