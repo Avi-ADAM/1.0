@@ -155,7 +155,6 @@
         class:rtl={isRTL && !needsManualRtl}
         class:animate-spin-slow={finalState.animate}
         dominant-baseline="middle"
-        style="transform-origin: center;"
       >
         <!--
            תיקון קריטי: startOffset="50%"
@@ -241,7 +240,14 @@
     font-size: var(--font-size);
     text-shadow: 0px 2px 4px rgba(0,0,0,0.8);
     letter-spacing: 1.5px;
+    /* Spin the ring text around the *centre of the viewBox* (100,100 of the
+       0 0 200 200 viewBox), not the element's own box. Safari/iOS mis-resolves
+       a keyword/percentage `transform-origin` on SVG elements (it falls back to
+       the element's bounding box or 0,0), so an animated long name would pivot
+       around the wrong point and fly outside the circle. Explicit user-space
+       px from the view-box origin is the cross-browser-safe value. */
     transform-box: view-box;
+    transform-origin: 100px 100px;
   }
 
   .curved-text.rtl { direction: rtl; }
