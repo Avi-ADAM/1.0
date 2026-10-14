@@ -100,5 +100,21 @@
   "lev_panel_close": "إغلاق",
   "hub_teaser_sub": "ما يبحث عنه الناس وما يعرضونه الآن - التجمّعات والريكمات معًا.",
   "hub_teaser_cta": "إلى خريطة الطلب",
-  "hub_items_active": "عناصر نشطة"
+  "hub_items_active": "عناصر نشطة",
+  "meta_title_suffix": "تجمّع طلب · 1💗1",
+  "meta_status_offer": "وقّع {{signed}} من أصل {{min}}",
+  "meta_status_members": "{{members}} أسر تبحث عن مورّد",
+  "meta_days_left": "بقي {{count}} أيام",
+  "share_nudge_title": "ينقص {{count}} ليحدث هذا",
+  "share_nudge_body": "كل توقيع يقرّب العرض من حدّه. أرسلوا الرابط لمن يريد هذا أيضاً — المعاينة تُظهر عدد الموقّعين.",
+  "share_joined_title": "انضممتم — كلما كبر التجمّع أسرع المورّدون بالعروض",
+  "share_joined_body": "شاركوه مع الجيران والأصدقاء الذين يبحثون عن الشيء نفسه. الانضمام غير ملزم — لا أحد يلتزم قبل التوقيع.",
+  "share_reached_title": "تم بلوغ الحد 🎉",
+  "share_reached_body": "وقّع {{signed}} وهذا يحدث. أخبروا من لم يلحق بعد — ومن سيسعده أن يسمع.",
+  "share_supplier_title": "لا مورّد بعد — هل تعرفون من يستطيع توفير ذلك؟",
+  "share_supplier_body": "{{members}} أسر تنتظر. أرسلوا الرابط لمورّد تعرفونه — العرض يسبق الملف الشخصي.",
+  "share_msg_nudge": "{{name}} — وقّع {{signed}} من أصل {{min}}، ينقص {{count}}. التوقيع فردي ويحدث فقط عند بلوغ الحد: {{url}}",
+  "share_msg_joined": "{{name}} — {{members}} أسر في التجمّع بالفعل، دون التزام حتى يأتي عرض جيد. تنضمون؟ {{url}}",
+  "share_msg_reached": "{{name}} — تم بلوغ الحد! وقّع {{signed}} وهذا يحدث: {{url}}",
+  "share_msg_supplier": "{{name}} — {{members}} أسر تبحث عن مورّد. هل يمكنكم توفير ذلك؟ قدّموا عرضاً هنا: {{url}}"
 }

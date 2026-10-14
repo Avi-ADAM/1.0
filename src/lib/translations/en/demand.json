@@ -100,5 +100,21 @@
   "lev_panel_close": "Close",
   "hub_teaser_sub": "What people seek and offer right now - pools and rikmas together.",
   "hub_teaser_cta": "To the demand map",
-  "hub_items_active": "active items"
+  "hub_items_active": "active items",
+  "meta_title_suffix": "Demand pool · 1💗1",
+  "meta_status_offer": "{{signed}} of {{min}} signed",
+  "meta_status_members": "{{members}} households looking for a supplier",
+  "meta_days_left": "{{count}} days left",
+  "share_nudge_title": "{{count}} more and this happens",
+  "share_nudge_body": "Every signature brings the offer closer to its threshold. Send the link to someone who would want this too — the preview already shows how many signed.",
+  "share_joined_title": "You're in — the bigger the pool, the sooner suppliers offer",
+  "share_joined_body": "Share it with neighbours and friends looking for the same thing. Joining is soft — nobody commits until they sign.",
+  "share_reached_title": "Threshold reached 🎉",
+  "share_reached_body": "{{signed}} signed and it's happening. Tell the ones who haven't yet — and the ones who'd love to hear.",
+  "share_supplier_title": "No supplier yet — know someone who could supply this?",
+  "share_supplier_body": "{{members}} households are waiting. Send the link to a supplier you know — the offer comes before the profile.",
+  "share_msg_nudge": "{{name}} — {{signed}} of {{min}} already signed, {{count}} more to go. You sign individually, and it only happens if the threshold is met: {{url}}",
+  "share_msg_joined": "{{name}} — {{members}} households are already in, no commitment until there's a good offer. Join? {{url}}",
+  "share_msg_reached": "{{name}} — threshold reached! {{signed}} signed and it's happening: {{url}}",
+  "share_msg_supplier": "{{name}} — {{members}} households are looking for a supplier. Can you supply this? Make an offer here: {{url}}"
 }

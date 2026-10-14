@@ -39,7 +39,13 @@
     "projects": "Descubre rikmas en 1💗1",
     "products": "Productos en 1💗1",
     "missions": "Misiones abiertas en 1💗1",
-    "resources": "Recursos buscados en 1💗1"
+    "resources": "Recursos buscados en 1💗1",
+    "whatsapp": "WhatsApp",
+    "telegram": "Telegram",
+    "copy": "Copiar mensaje",
+    "copied": "Copiado ✓",
+    "more": "Más…",
+    "dismiss": "Cerrar"
   },
   "richText": {
     "paragraph": "<p>Párrafo</p>",

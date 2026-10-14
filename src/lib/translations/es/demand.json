@@ -101,5 +101,21 @@
   "lev_panel_close": "Cerrar",
   "hub_teaser_sub": "Lo que la gente busca y ofrece ahora mismo: grupos y rikmas juntos.",
   "hub_teaser_cta": "Al mapa de demanda",
-  "hub_items_active": "elementos activos"
+  "hub_items_active": "elementos activos",
+  "meta_title_suffix": "Grupo de demanda · 1💗1",
+  "meta_status_offer": "{{signed}} de {{min}} firmaron",
+  "meta_status_members": "{{members}} hogares buscan proveedor",
+  "meta_days_left": "quedan {{count}} días",
+  "share_nudge_title": "Faltan {{count}} para que esto ocurra",
+  "share_nudge_body": "Cada firma acerca la oferta a su umbral. Envía el enlace a quien también lo querría — la vista previa ya muestra cuántos firmaron.",
+  "share_joined_title": "Ya estás dentro — cuanto más grande el grupo, antes llegan las ofertas",
+  "share_joined_body": "Compártelo con vecinos y amistades que buscan lo mismo. Unirse no compromete — nadie se obliga hasta firmar.",
+  "share_reached_title": "¡Umbral alcanzado! 🎉",
+  "share_reached_body": "{{signed}} firmaron y esto va a ocurrir. Avisa a quien aún no llegó — y a quien le alegrará saberlo.",
+  "share_supplier_title": "Aún no hay proveedor — ¿conoces a alguien que pueda ofrecerlo?",
+  "share_supplier_body": "{{members}} hogares esperan. Envía el enlace a un proveedor que conozcas — la oferta va antes que el perfil.",
+  "share_msg_nudge": "{{name}} — ya firmaron {{signed}} de {{min}}, faltan {{count}}. Se firma individualmente y solo ocurre si se alcanza el umbral: {{url}}",
+  "share_msg_joined": "{{name}} — {{members}} hogares ya están en el grupo, sin compromiso hasta que haya una buena oferta. ¿Te unes? {{url}}",
+  "share_msg_reached": "{{name}} — ¡umbral alcanzado! {{signed}} firmaron y esto va a ocurrir: {{url}}",
+  "share_msg_supplier": "{{name}} — {{members}} hogares buscan proveedor. ¿Puedes ofrecerlo? Presenta una oferta aquí: {{url}}"
 }

@@ -12,6 +12,8 @@
  *    "/", so a crawler only ever sees the homepage there.
  */
 
+import { loadDiscoveryMapData } from '$lib/server/map/loadMapData.js';
+
 const SITE = 'https://1lev1.com';
 const LOCALES = ['he', 'en', 'ar', 'ru', 'es'];
 
@@ -95,12 +97,62 @@ const PAGES = [
   { path: '/login', lastmod: '2026-08-13T00:00:00+00:00', priority: '0.50', changefreq: 'monthly', i18n: false }
 ];
 
-export async function GET() {
+/*
+ * 3. The objects people share — public wishes, demand pools and the open
+ *    missions/resources/products — are pages too, and the ones a search
+ *    engine is most likely to be asked about ("CSA box Haifa"). They come
+ *    from the same loader as the public /demand map, so the sitemap can
+ *    never name something the map would not show a guest: the loader reads
+ *    with the service token, applies the privacy normalizers, and leaves
+ *    out anything draft, personal or closed. Pools that are over are dropped
+ *    here as well — a share card of a closed pool is a dead end.
+ */
+const DEAD_POOL = new Set(['closed', 'dormant']);
+const LIVE_TTL_MS = 60 * 60 * 1000;
+/** @type {{ at: number, entries: string[] } | null} */
+let liveCache = null;
+
+/** `/wish/12` → `{ path, priority, changefreq }` rows, deduped by path. */
+function liveEntries(mapData) {
+  const today = new Date().toISOString().slice(0, 10) + 'T00:00:00+00:00';
+  /** @type {Map<string, { path: string, lastmod: string, priority: string, changefreq: string }>} */
+  const rows = new Map();
+  const add = (href, priority, changefreq) => {
+    if (!href || !href.startsWith('/') || rows.has(href)) return;
+    rows.set(href, { path: href, lastmod: today, priority, changefreq });
+  };
+  for (const w of mapData.wishes) add(w.href, '0.70', 'daily');
+  for (const m of mapData.maagadim) {
+    if (DEAD_POOL.has(String(m.meta?.status ?? ''))) continue;
+    add(m.href, '0.70', 'daily');
+  }
+  for (const x of [...mapData.missions, ...mapData.resources, ...mapData.products]) {
+    add(x.href, '0.50', 'weekly');
+  }
+  return [...rows.values()].map(urlEntry);
+}
+
+/** @param {typeof globalThis.fetch} fetch */
+async function liveSection(fetch) {
+  if (liveCache && Date.now() - liveCache.at < LIVE_TTL_MS) return liveCache.entries;
+  try {
+    const entries = liveEntries(await loadDiscoveryMapData(fetch, true));
+    liveCache = { at: Date.now(), entries };
+    return entries;
+  } catch {
+    // Strapi is down or the collections are missing in this deployment: the
+    // static pages are still a correct sitemap, just a shorter one.
+    return liveCache?.entries ?? [];
+  }
+}
+
+export async function GET({ fetch }) {
   const body = [
     '<?xml version="1.0" encoding="UTF-8"?>',
     '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"',
     '        xmlns:xhtml="http://www.w3.org/1999/xhtml">',
     ...PAGES.map(urlEntry),
+    ...(await liveSection(fetch)),
     '</urlset>'
   ].join('\n');
 

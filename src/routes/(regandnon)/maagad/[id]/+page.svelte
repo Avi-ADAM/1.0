@@ -4,9 +4,13 @@
   import MaagadOfferForm from '$lib/components/maagad/MaagadOfferForm.svelte';
   import DepartureTerms from '$lib/components/maagad/DepartureTerms.svelte';
   import ShareLink from '$lib/components/share/ShareLink.svelte';
+  import SharePrompt from '$lib/components/share/SharePrompt.svelte';
   import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
-  import { t, isRtl } from '$lib/translations';
-  import { Head } from 'svead';
+  import { t, isRtl, locale } from '$lib/translations';
+  import { Confetti } from 'svelte-confetti';
+  import { daysLeft, pickOffer } from '$lib/pooling/bestOffer';
+  import { jsonLdBody } from '$lib/seo/jsonLd.js';
+  import { askedLang, canonicalFor, maagadJsonLd, ogImageFor, oneLine } from '$lib/seo/shareMeta.js';
 
   let { data } = $props();
 
@@ -20,8 +24,42 @@
   let errorMsg = $state('');
   let showOfferForm = $state(false);
 
-  async function runAction(actionKey: string, params: Record<string, unknown>) {
-    if (busy) return;
+  /**
+   * The share moment (PLAN_MARKETING_GLOBAL §4, loop 1). `justDid` remembers
+   * what she did on *this* visit so the prompt can celebrate right after the
+   * click; `promptHidden` is her way of saying "not now" without leaving.
+   */
+  let justDid = $state<'' | 'joined' | 'signed'>('');
+  let promptHidden = $state(false);
+  // "Not now" holds for the tab, per pool; a new signature or join brings the
+  // prompt back, because the number it names has changed.
+  const promptKey = $derived(`1lev1:share-prompt:maagad:${maagad.id}`);
+  $effect(() => {
+    try {
+      promptHidden = sessionStorage.getItem(promptKey) === '1';
+    } catch {
+      promptHidden = false;
+    }
+  });
+  function hidePrompt() {
+    promptHidden = true;
+    try {
+      sessionStorage.setItem(promptKey, '1');
+    } catch {
+      // Private mode or storage disabled: the dismissal lasts for this render.
+    }
+  }
+  function showPrompt() {
+    promptHidden = false;
+    try {
+      sessionStorage.removeItem(promptKey);
+    } catch {
+      // see above
+    }
+  }
+
+  async function runAction(actionKey: string, params: Record<string, unknown>): Promise<boolean> {
+    if (busy) return false;
     busy = true;
     errorMsg = '';
     try {
@@ -35,17 +73,28 @@
         throw new Error(json?.error || json?.message || 'failed');
       }
       await invalidateAll();
+      return true;
     } catch (e: any) {
       errorMsg = e?.message || String(e);
+      return false;
     } finally {
       busy = false;
     }
   }
 
-  const join = () => runAction('joinMaagad', { maagadId: maagad.id });
+  const join = async () => {
+    if (await runAction('joinMaagad', { maagadId: maagad.id })) {
+      justDid = 'joined';
+      showPrompt();
+    }
+  };
   const leave = () => runAction('leaveMaagad', { maagadId: maagad.id });
-  const sign = (offerId: string) =>
-    runAction('signMaagadOffer', { maagadId: maagad.id, offerId });
+  const sign = async (offerId: string) => {
+    if (await runAction('signMaagadOffer', { maagadId: maagad.id, offerId })) {
+      justDid = 'signed';
+      showPrompt();
+    }
+  };
   const unsign = (offerId: string) =>
     runAction('unsignMaagadOffer', { maagadId: maagad.id, offerId });
   const confirmPrice = (offerId: string) => runAction('confirmDeparturePrice', { offerId });
@@ -71,13 +120,110 @@
   }
 
   const loginHref = $derived(`/login?redirect=${encodeURIComponent(page.url.pathname)}`);
+
+  // ── Share layer: what a link to this pool looks like before anyone clicks ──
+  // Canonical and card follow the *asked* language (bare path = Hebrew), never
+  // page.url's origin, so a preview is the same wherever the link was pasted.
+  const lang = $derived(askedLang(page.url));
+  const canonical = $derived(canonicalFor(`/maagad/${maagad.id}`, lang));
+  const best = $derived(pickOffer(maagad.offers as any[]) as (typeof maagad.offers)[number] | null);
+  const bestLeft = $derived(best ? daysLeft(best.deadline) : null);
+  const name = $derived(maagad.name || $t('demand.untitled'));
+  const statusLine = $derived(
+    best?.min
+      ? $t('demand.meta_status_offer', { signed: best.signedCount, min: best.min }) +
+          (bestLeft != null ? ` · ${$t('demand.meta_days_left', { count: bestLeft })}` : '')
+      : $t('demand.meta_status_members', { members: maagad.membersCount })
+  );
+  const pageTitle = $derived(`${name} · ${$t('demand.meta_title_suffix')}`);
+  const pageDesc = $derived(oneLine(`${statusLine}. ${maagad.desc || $t('demand.subtitle')}`, 200));
+  // The version token busts stale previews once the numbers move.
+  const ogImage = $derived(
+    ogImageFor(
+      'maagad',
+      maagad.id,
+      lang,
+      `${maagad.membersCount}-${best?.signedCount ?? 0}-${maagad.offers.length}-${best?.status ?? maagad.status}`
+    )
+  );
+  const ld = $derived(maagadJsonLd(maagad, canonical));
+
+  // ── Share moments: the prompt speaks to a participant, in her UI language ──
+  const shareUrl = $derived(canonicalFor(`/maagad/${maagad.id}`, $locale));
+  const mine = $derived(
+    my?.signedOfferId ? maagad.offers.find((o: any) => o.id === my.signedOfferId) ?? null : null
+  );
+  const mineMissing = $derived(mine ? Math.max(0, (mine.min ?? 0) - mine.signedCount) : 0);
+  const mineReached = $derived(
+    !!mine && (mine.status === 'quorum_reached' || mine.status === 'activated' || (mine.min > 0 && mineMissing === 0))
+  );
+  const prompt = $derived.by(() => {
+    if (promptHidden) return null;
+    if (mine) {
+      if (mineReached) {
+        return {
+          variant: 'celebrate' as const,
+          title: $t('demand.share_reached_title'),
+          body: $t('demand.share_reached_body', { signed: mine.signedCount }),
+          message: $t('demand.share_msg_reached', { name, signed: mine.signedCount, url: shareUrl })
+        };
+      }
+      return {
+        variant: 'nudge' as const,
+        title: $t('demand.share_nudge_title', { count: mineMissing }),
+        body: $t('demand.share_nudge_body'),
+        message: $t('demand.share_msg_nudge', {
+          name,
+          signed: mine.signedCount,
+          min: mine.min,
+          count: mineMissing,
+          url: shareUrl
+        })
+      };
+    }
+    if (isMember) {
+      const liveOffers = maagad.offers.some((o: any) => o.status === 'open' || o.status === 'quorum_reached');
+      if (!liveOffers) {
+        return {
+          variant: 'supplier' as const,
+          title: $t('demand.share_supplier_title'),
+          body: $t('demand.share_supplier_body', { members: maagad.membersCount }),
+          message: $t('demand.share_msg_supplier', { name, members: maagad.membersCount, url: shareUrl })
+        };
+      }
+      return {
+        variant: 'nudge' as const,
+        title: $t('demand.share_joined_title'),
+        body: $t('demand.share_joined_body'),
+        message: $t('demand.share_msg_joined', { name, members: maagad.membersCount, url: shareUrl })
+      };
+    }
+    return null;
+  });
+  const celebrate = $derived(justDid === 'signed' && mineReached);
 </script>
 
-<Head
-  url={page.url.href}
-  title={maagad.name || $t('demand.maagad_title')}
-  description={maagad.desc || $t('demand.subtitle')}
-/>
+<svelte:head>
+  <title>{pageTitle}</title>
+  <meta name="description" content={pageDesc} />
+  <link rel="canonical" href={canonical} />
+  <meta property="og:title" content={pageTitle} />
+  <meta property="og:description" content={pageDesc} />
+  <meta property="og:image" content={ogImage} />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content={`${name} — ${statusLine}`} />
+  <meta name="twitter:title" content={pageTitle} />
+  <meta name="twitter:description" content={pageDesc} />
+  <meta name="twitter:image" content={ogImage} />
+  {@html `<script type="application/ld+json">${jsonLdBody(ld)}<\/script>`}
+</svelte:head>
+
+{#if celebrate}
+  <div class="confetti-stage" aria-hidden="true">
+    <Confetti x={[-2.5, 2.5]} y={[0.25, 1.5]} delay={[0, 600]} amount={160} duration={4000} fallDistance="70vh" />
+  </div>
+{/if}
 
 <div class="maagad-page" dir={$isRtl ? 'rtl' : 'ltr'}>
   <header class="head">
@@ -150,6 +296,18 @@
       {/if}
       <span class="muted small">{$t('demand.join_note')}</span>
     </div>
+    {#if prompt && !mine}
+      <div class="moment">
+        <SharePrompt
+          url={shareUrl}
+          message={prompt.message}
+          title={prompt.title}
+          body={prompt.body}
+          variant={prompt.variant}
+          onDismiss={hidePrompt}
+        />
+      </div>
+    {/if}
   </section>
 
   <!-- Offers — each lives independently; the market decides (plan §2.5) -->
@@ -267,6 +425,18 @@
             {/if}
           {/if}
         </div>
+        {#if prompt && mine && mine.id === offer.id}
+          <div class="moment">
+            <SharePrompt
+              url={shareUrl}
+              message={prompt.message}
+              title={prompt.title}
+              body={prompt.body}
+              variant={prompt.variant}
+              onDismiss={hidePrompt}
+            />
+          </div>
+        {/if}
       </article>
     {/each}
   </section>
@@ -341,6 +511,21 @@
     flex-wrap: wrap;
     gap: 0.4rem;
     margin-top: 0.6rem;
+  }
+  .moment {
+    margin-top: 0.9rem;
+  }
+  .confetti-stage {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 50;
   }
   .share-row {
     display: flex;

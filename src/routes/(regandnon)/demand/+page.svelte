@@ -16,7 +16,7 @@
     type MapLayerId
   } from '$lib/map/discoveryTypes';
   import { t, isRtl } from '$lib/translations';
-  import { Head } from 'svead';
+  import { askedLang, canonicalFor } from '$lib/seo/shareMeta.js';
 
   let { data } = $props();
 
@@ -198,7 +198,15 @@
   }
 </script>
 
-<Head url={page.url.href} title={$t('demand.title')} description={$t('demand.subtitle')} />
+<svelte:head>
+  <title>{$t('demand.title')} · 1💗1</title>
+  <meta name="description" content={$t('demand.subtitle')} />
+  <link rel="canonical" href={canonicalFor('/demand', askedLang(page.url))} />
+  <meta property="og:title" content={`${$t('demand.title')} · 1💗1`} />
+  <meta property="og:description" content={$t('demand.subtitle')} />
+  <meta name="twitter:title" content={`${$t('demand.title')} · 1💗1`} />
+  <meta name="twitter:description" content={$t('demand.subtitle')} />
+</svelte:head>
 
 <div class="demand-page" dir={$isRtl ? 'rtl' : 'ltr'}>
   <header class="head">

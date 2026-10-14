@@ -100,5 +100,21 @@
   "lev_panel_close": "סגירה",
   "hub_teaser_sub": "מה מחפשים ומה מציעים עכשיו - מהמאגדים ומהרקמות יחד.",
   "hub_teaser_cta": "למפת הביקוש",
-  "hub_items_active": "פריטים פעילים"
+  "hub_items_active": "פריטים פעילים",
+  "meta_title_suffix": "מאגד ביקוש · 1💗1",
+  "meta_status_offer": "{{signed}} מתוך {{min}} חתמו",
+  "meta_status_members": "{{members}} משקי בית מחפשים ספק",
+  "meta_days_left": "נותרו {{count}} ימים",
+  "share_nudge_title": "חסרים עוד {{count}} כדי שזה יקרה",
+  "share_nudge_body": "כל חתימה מקרבת את ההצעה לסף. שלחו את הקישור למי שירצה את זה גם — התצוגה המקדימה כבר מראה כמה חתמו.",
+  "share_joined_title": "הצטרפת — ככל שהמאגד גדול יותר, ספקים מציעים מהר יותר",
+  "share_joined_body": "שתפו עם שכנים וחברים שמחפשים את אותו הדבר. הצטרפות היא רכה — אף אחד לא מתחייב עד שחותמים.",
+  "share_reached_title": "הסף הושג 🎉",
+  "share_reached_body": "{{signed}} חתמו וזה קורה. ספרו למי שעוד לא הספיק — ולמי שישמח לשמוע.",
+  "share_supplier_title": "עדיין אין ספק — מכירים מישהו שיכול לספק את זה?",
+  "share_supplier_body": "{{members}} משקי בית מחכים. שלחו את הקישור לספק שאתם מכירים — ההצעה קודמת לפרופיל.",
+  "share_msg_nudge": "{{name}} — {{signed}} מתוך {{min}} כבר חתמו, חסרים עוד {{count}}. חותמים אישית, וזה קורה רק אם מגיעים לסף: {{url}}",
+  "share_msg_joined": "{{name}} — {{members}} משקי בית כבר במאגד, בלי התחייבות עד שיש הצעה טובה. מצטרפים? {{url}}",
+  "share_msg_reached": "{{name}} — הסף הושג! {{signed}} חתמו וזה קורה: {{url}}",
+  "share_msg_supplier": "{{name}} — {{members}} משקי בית מחפשים ספק. אתם יכולים לספק את זה? אפשר להגיש הצעה כאן: {{url}}"
 }
