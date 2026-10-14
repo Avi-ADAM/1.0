@@ -1,0 +1,215 @@
+# Windows Tauri — release runbook and acceptance evidence
+
+**Status: NOT ACCEPTED / blocked on signing-key provisioning, release CI dispatch,
+website deployment configuration, and real Windows 10 + 11 testing.**
+Implementation is not evidence that an installer works. Never mark §10 of
+[`PLAN_TAURI_WINDOWS.md`](../tbd/PLAN_TAURI_WINDOWS.md) complete from unit tests,
+`cargo check`, or a build alone.
+
+## Constraints preserved
+
+- One `src-tauri`; identifier remains `world.onelev1.app`.
+- `gen/android`, the Android shell, the Android build scripts, and the base
+  Tauri configuration are not edited. Desktop plugins are target-scoped;
+  native host registration and implementation are Windows/desktop-gated.
+- The app still loads the live website. No SPA build, auth API changes, remote
+  capabilities, or frontend IPC permissions.
+- No certificate purchased, Authenticode signer configured, paid service
+  provisioned, or billing settings changed. The repository is public; the
+  workflow uses standard GitHub-hosted runners, not paid larger runners.
+- Updater signatures are **not** Windows Authenticode signatures. SmartScreen
+  can still warn. Azure Trusted Signing / OV remains an owner cost decision.
+
+## Implementation notes
+
+`tauri.windows.conf.json` replaces the complete window array; `create: false`
+lets Rust attach handlers **before** creating the sole `main` window. The
+initial `about:blank` is replaced with local `windows.html` after Rust reads
+WebView2's actual User-Agent and appends `1lev1-desktop/<package version>` via
+`ICoreWebView2Settings2`. There is deliberately no stale hardcoded Chromium
+`userAgent` in JSON. Tauri is pinned to the 2.11 minor line to match its native
+COM ABI. The mobile dependency versions in the lockfile must remain unchanged.
+
+`windows.html`/`windows.js` preserve the Hebrew offline screen and add a bounded,
+credential-free, no-cors connectivity probe, manual retry, and online retry.
+They are separate from `shell/index.html` to leave Android's existing assets
+and behavior untouched. This is startup recovery, **not** full offline support
+for the remote website or a guarantee against the network failing after a probe.
+
+Top-level navigation / new-window hooks allow the exact `1lev1.com` domain and
+its subdomains, redirect internal popups into `main`, and open external
+HTTP(S), `mailto:` and `tel:` links through Rust. Other custom schemes are denied.
+This is not an iframe/resource filter, so it does not block YouTube embeds.
+The opener plugin's default injected link interceptor is explicitly disabled:
+it would otherwise attempt frontend IPC from remote pages.
+
+Downloads go to the user's Downloads folder, with unique safe names to avoid
+silently replacing an earlier export. A Hebrew native completion dialog offers
+“show in folder”; downloaded files are never automatically executed.
+
+The window-state plugin persists size, position and maximized state (not hidden
+state). The single-instance plugin restores/focuses the existing window. A
+native updater thread checks on startup and every six hours, requests consent
+in Hebrew, saves window state, verifies/downloads the update, and restarts.
+No forced install happens after “not now”. Update failures leave the app usable.
+
+## One-time owner action: permanent updater key
+
+The session's GitHub integration returned HTTP 403 for Secrets/Variables access
+and Actions dispatch. This does **not** prove the secrets are absent. Reconnect
+GitHub in Arena with the relevant repository permissions, or do the following
+on the owner's trusted machine. Do not paste any private key, password, or
+GitHub credentials into chat.
+
+1. In a local checkout with `npm ci` already completed, generate **one permanent**
+   updater signing key outside the repository (PowerShell):
+
+   ```powershell
+   npx tauri signer generate --write-keys "$HOME\1lev1-updater.key"
+   ```
+
+   Choose a password at the interactive prompt. The `.pub` file is public. Keep
+   the private file and password in an encrypted backup **outside GitHub**.
+   Do not regenerate a key when retrying CI; losing/changing it strands existing
+   installations. If a production key already exists, use that key instead.
+
+2. With the owner's existing authenticated `gh` session:
+
+   ```powershell
+   Get-Content -Raw "$HOME\1lev1-updater.key" | gh secret set TAURI_SIGNING_PRIVATE_KEY --repo Avi-ADAM/1.0
+   gh secret set TAURI_SIGNING_PRIVATE_KEY_PASSWORD --repo Avi-ADAM/1.0
+   gh variable set TAURI_UPDATER_PUBLIC_KEY --repo Avi-ADAM/1.0 --body (Get-Content -Raw "$HOME\1lev1-updater.key.pub")
+   ```
+
+   The second command prompts for the signing-key password. GitHub **Secrets**
+   hold only the private key and password; the repository **Variable** holds
+   only the public `.pub` contents. No secret is written into this checkout.
+
+3. `prepare-release.mjs` validates the key format, immutable identifier, numeric
+   MSI-compatible version, matching release tag, and public manifest URL. It
+   writes only the public key into the ignored
+   `scratch/desktop/signing.conf.json` overlay (`plugins.updater.pubkey`). CI
+   passes this overlay to Tauri. The empty public-key slot in the checked-in
+   Windows config is **not a production key**: installer CI fails closed if
+   signing inputs are unavailable. Do not distribute an ad-hoc build that
+   bypasses this preflight.
+
+The workflow never creates signing keys automatically or uploads private keys
+as artifacts. Test keys used by Node tests exist in memory only and never
+enter an installer.
+
+## Build and publication
+
+The workflow is `.github/workflows/desktop-windows.yml`. Node 22 follows the
+Windows plan; the website's existing Node 24 engine setting is not changed
+(`npm ci` emits a warning, not an error).
+
+- Branch pushes run Windows native/unit tests and Android-target `cargo check`.
+- `workflow_dispatch` or `desktop-v<version>` builds NSIS + MSI with permanent
+  updater signatures and `latest.json`, using `tauri-apps/tauri-action@v0`.
+- The Windows config has no `beforeBuildCommand`; it bundles the local shell,
+  not SvelteKit.
+- Releases are created as **drafts**. The workflow downloads the actual Release
+  assets again and verifies signatures cryptographically using the configured
+  public key, sidecars, file magic, version, NSIS preference, and the existing
+  download-page parser. It uploads `ci-evidence.json` with the commit and SHA256
+  of each installer alongside the installers in a workflow artifact.
+- Never overwrite an already published version. Increment the shared
+  `src-tauri/tauri.conf.json` version (and package version in `Cargo.toml`), keep
+  the identifier and signing key, and use the corresponding new tag.
+
+Once Actions permission is available, run on the session branch:
+
+```sh
+gh workflow run desktop-windows.yml --ref arena/6127ca68-1-0
+```
+
+If GitHub refuses dispatch until the workflow exists on the default branch,
+merge the reviewed PR through the repository's normal approval process first.
+Do not move this session to another branch.
+
+Download the `windows-installers-desktop-v<version>` workflow artifact or the
+draft Release assets. On each test machine compare:
+
+```powershell
+Get-FileHash .\<the-CI-setup.exe> -Algorithm SHA256
+```
+
+against `ci-evidence.json`. Record the CI run URL, commit, filenames and hashes
+below. A locally rebuilt installer is **not** interchangeable evidence.
+
+After the baseline real-machine checks, the owner may publish the draft as the
+latest release. A draft cannot be fetched anonymously by either the updater or
+website. For the update acceptance check, publish the next patch version using
+the **same** key; declining and then accepting the update both need testing.
+Do not delete accepted releases or roll back their version numbers.
+
+## Website contract / public verification
+
+Set on the **existing website deployment**, then redeploy without changing its
+hosting plan:
+
+```dotenv
+DESKTOP_RELEASE_MANIFEST_URL=https://github.com/Avi-ADAM/1.0/releases/latest/download/latest.json
+```
+
+No website code change is necessary. `ANDROID_DOWNLOAD_URL` is unrelated and
+is left untouched. Until the release is public and this variable is deployed,
+“coming soon” is expected. Allow the existing 10-minute server cache to expire.
+Use `/download/windows` and `/download/windows-msi` in permanent links.
+
+After publication/deployment, dispatch the public-only check:
+
+```sh
+gh workflow run desktop-windows.yml --ref arena/6127ca68-1-0 -f verify_public=true
+```
+
+This downloads the public assets **without an Authorization header**, verifies
+both updater signatures and SHA256s, checks the live `/download` version/EXE
+link and both stable redirects, and uploads `desktop-public-evidence`. It does
+not build or publish another installer. Network access from this agent cannot
+reach `www.1lev1.com`, so use the hosted CI check or the owner's machine.
+
+## Acceptance record — no boxes pre-checked
+
+Fill **both** OS columns with PASS/FAIL, test date, tester, and evidence. Include
+the Windows build number, WebView2 version, and standard-user account status.
+CI Windows Server is not a substitute for Windows 10 and Windows 11.
+
+- Baseline release/tag: pending
+- Baseline CI run / commit: pending
+- NSIS filename / SHA256: pending
+- MSI filename / SHA256: pending
+- Update release/tag, CI run, hashes: pending
+- Public verification CI run / artifact: pending
+- Windows 10 build / WebView2 / tester: pending
+- Windows 11 build / WebView2 / tester: pending
+
+| Plan §10 | Windows 10 | Windows 11 | Evidence required |
+|---|---|---|---|
+| 1. Hebrew installation without admin/UAC; Start shortcut | PENDING | PENDING | Install the CI NSIS as a standard user; test with WebView2 installed and absent; record any bootstrapper elevation |
+| 2. Login, `/lev`, create task, chat, Kanban drag | PENDING | PENDING | Use an authorized test account/space; do not post test content to real users |
+| 3. Reopen: login persists; size/position restored | PENDING | PENDING | Close/reopen normally, after reboot, and with a previously connected monitor absent |
+| 4. Second icon launch focuses only one instance | PENDING | PENDING | Test minimized window and task manager process/window count |
+| 5. External link in default browser; embedded YouTube works | PENDING | PENDING | Include `_blank`, `window.open`, internal popup, mailto/tel; export/invoice download saved and shown |
+| 6. Offline startup and retry after network returns | PENDING | PENDING | Disconnect before launch; also simulate connected network without internet; reconnect and retry |
+| 7. Next patch detected and installed in-app | PENDING | PENDING | Published next patch, same key; Hebrew consent, decline first, accept on next check/relaunch; session persists |
+| 8. Public page/version/download and stable redirect | PENDING | PENDING | `desktop-public-evidence` for the actual release plus browser download/hash check |
+| 9. Android APK build unchanged | PENDING | PENDING | `npm run android:apk` on existing SDK/NDK environment; CI `cargo check` alone is not an APK test |
+
+Also test the MSI on a disposable managed machine; MSI is not the no-UAC promise
+made for the primary NSIS installer. Record failures instead of weakening the
+acceptance criteria.
+
+## Evidence available so far
+
+- Local `node --test scripts/desktop/desktop.test.mjs`: 20 passed.
+- Local `npx vitest run src/lib/download/release.test.ts`: 10 passed.
+- Actual Tauri CLI test-only signature verified successfully by the Node crypto
+  verifier (not merely a mock signature).
+- `gen/android`, base `tauri.conf.json`, and the Android shell have no diff.
+- First CI run: https://github.com/Avi-ADAM/1.0/actions/runs/38553044826
+  (implementation validation, not a release/installer acceptance run).
+
+**Completion remains blocked** until installer/public evidence and both real-OS
+acceptance records, including the update path and Android APK regression, exist.

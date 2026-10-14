@@ -1,8 +1,38 @@
-# src-tauri — מעטפת המובייל
+# src-tauri — מעטפת המובייל ו-Windows
 
-מעטפת Tauri v2 שאורזת את `www.1lev1.com` לאפליקציית אנדרואיד (ובהמשך iOS).
+מעטפת Tauri v2 שאורזת את `www.1lev1.com` לאפליקציית אנדרואיד ול-Windows (ובהמשך iOS).
 התכנית המלאה נמצאת ב-[`../docs/inprogress/PLAN_TAURI_MOBILE.md`](../docs/inprogress/PLAN_TAURI_MOBILE.md).
 המסמך הזה מסביר רק את מה שלא מובן מאליו כשפותחים את התיקייה.
+
+## Windows
+
+התכנית: [`PLAN_TAURI_WINDOWS.md`](../docs/tbd/PLAN_TAURI_WINDOWS.md).
+הוראות מפתחות, CI, פרסום ובדיקות הקבלה:
+[`TAURI_WINDOWS_ACCEPTANCE.md`](../docs/inprogress/TAURI_WINDOWS_ACCEPTANCE.md).
+**אין עדיין אישור קבלה על Windows 10/11 — לא להפיץ כגרסה שנבדקה.**
+
+- `tauri.windows.conf.json` ממוזג אוטומטית רק ב-Windows. החלון נוצר מ-Rust כדי
+  לחבר handlers לפני כל ניווט. `shell/windows.html` הוא מסך האופליין של Windows;
+  `shell/index.html` והקונפיגורציה של אנדרואיד לא השתנו.
+- UA נלקח מ-WebView2 בזמן ריצה ומקבל סיומת `1lev1-desktop/<version>`; לא מזייפים
+  גרסת Chromium קבועה. גודל/מיקום נשמרים, גרירת HTML5 נשארת פעילה, ומופע שני
+  מחזיר את החלון הקיים לקדמה.
+- opener / updater / dialog / process / window-state / single-instance רצים
+  מ-Rust בלבד. **אין הרשאות IPC לתוכן מרוחק.**
+- `.github/workflows/desktop-windows.yml` בודק Windows ויעד Android בדחיפה;
+  dispatch או tag בשם `desktop-v<version>` בונה NSIS/MSI ו-`latest.json` ב-Release
+  במצב draft. פרסום והתקנה אמיתית נדרשים לפני שאפשר לסמן קבלה.
+- מפתח העדכונים הפרטי וסיסמתו הם GitHub Secrets. `TAURI_UPDATER_PUBLIC_KEY` הוא
+  repository Variable **ציבורי** שמוזרק ב-CI ל-`plugins.updater.pubkey`. בלי
+  הגדרה תקינה בניית המתקינים נעצרת; לא מייצרים מפתח חד-פעמי לפרסום.
+- לא הוגדרה חתימת Authenticode בתשלום. SmartScreen עשוי להציג אזהרה.
+
+בדיקות שאפשר להריץ גם בלי Rust/Windows:
+
+```bash
+node --test scripts/desktop/desktop.test.mjs
+npx vitest run src/lib/download/release.test.ts
+```
 
 ## הרצה
 

@@ -117,8 +117,8 @@ pub fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
                         if let Some(path) = path {
                             let opener_app = app.clone();
                             app.dialog()
-                                .title("ההורדה הושלמה")
                                 .message(format!("הקובץ נשמר בתיקיית ההורדות:\n{}", path.display()))
+                                .title("ההורדה הושלמה")
                                 .buttons(MessageDialogButtons::OkCancelCustom("הצג בתיקייה".into(), "סגירה".into()))
                                 .show(move |reveal| {
                                     if reveal {
@@ -196,16 +196,16 @@ async fn check_update(app: &AppHandle) -> Result<(), Box<dyn std::error::Error>>
         return Ok(());
     };
     let accepted = app.dialog()
-        .title("עדכון 1לב1")
         .message(format!("יש גרסה חדשה ({}), להתקין ולהפעיל מחדש?\nשמרו את העבודה לפני ההתקנה.", update.version))
+        .title("עדכון 1לב1")
         .buttons(MessageDialogButtons::OkCancelCustom("התקנה והפעלה מחדש".into(), "לא עכשיו".into()))
         .blocking_show();
     if !accepted { return Ok(()); }
     // Windows installers may terminate this process before install returns.
     let _ = app.save_window_state(WINDOW_STATE);
     if let Err(error) = update.download_and_install(|_, _| {}, || {}).await {
-        app.dialog().title("עדכון 1לב1")
-            .message("העדכון לא הותקן. אפשר להמשיך לעבוד; ננסה שוב בהמשך.")
+        app.dialog().message("העדכון לא הותקן. אפשר להמשיך לעבוד; ננסה שוב בהמשך.")
+            .title("עדכון 1לב1")
             .show(|_| {});
         return Err(error.into());
     }

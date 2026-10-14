@@ -12,6 +12,11 @@ on:
       - 'package.json'
       - 'package-lock.json'
   workflow_dispatch:
+    inputs:
+      verify_public:
+        description: 'Only verify the published assets and live /download (after deployment)'
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -22,6 +27,9 @@ concurrency:
 
 jobs:
   windows-check:
+    if: inputs.verify_public != true
+    permissions:
+      contents: write # Bootstrap the dependency lock on this session branch only.
     runs-on: windows-latest
     timeout-minutes: 35
     steps:
@@ -37,7 +45,28 @@ jobs:
         with:
           workspaces: src-tauri -> target
       - name: Compile Windows host and test native policy
-        run: cargo test --manifest-path src-tauri/Cargo.toml --lib
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force scratch | Out-Null
+          cargo test --manifest-path src-tauri/Cargo.toml --lib 2>&1 | Tee-Object -FilePath scratch/cargo-windows.log
+          $code = $LASTEXITCODE
+          if ($code -ne 0) {
+            $tail = (Get-Content scratch/cargo-windows.log -Tail 100) -join "%0A"
+            Write-Output "::error title=Windows compiler diagnostics::$tail"
+          }
+          exit $code
+      - name: Bootstrap resolved lockfile on the fixed work branch
+        if: always() && github.ref == 'refs/heads/arena/6127ca68-1-0'
+        shell: pwsh
+        run: |
+          git diff --quiet -- src-tauri/Cargo.lock
+          if ($LASTEXITCODE -eq 0) { exit 0 }
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add src-tauri/Cargo.lock
+          git commit -m "Lock Windows-only Tauri dependencies resolved by CI"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          git push origin arena/6127ca68-1-0
       - name: Verify Android source is untouched by tooling
         run: git diff --exit-code -- src-tauri/gen/android
       - name: Format native sources for review
@@ -54,6 +83,7 @@ jobs:
           retention-days: 7
 
   android-check:
+    if: inputs.verify_public != true
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
@@ -71,7 +101,7 @@ jobs:
   installers:
     # Pushes validate only. Publishing installers is an explicit dispatch/tag;
     # the Release remains a DRAFT until real Windows acceptance is recorded.
-    if: github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/desktop-v')
+    if: inputs.verify_public != true && (github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/desktop-v'))
     needs: [windows-check, android-check]
     runs-on: windows-latest
     timeout-minutes: 45
@@ -96,6 +126,10 @@ jobs:
           "DESKTOP_RELEASE_TAG=$tag" >> $env:GITHUB_ENV
           $env:DESKTOP_RELEASE_TAG = $tag
           node scripts/desktop/prepare-release.mjs
+      - name: Refuse to replace a published release or downgrade the version
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node scripts/desktop/assert-new-release.mjs
       - run: npm ci --no-audit --no-fund
       - uses: dtolnay/rust-toolchain@stable
       - uses: swatinem/rust-cache@v2
@@ -133,3 +167,23 @@ jobs:
           if-no-files-found: error
           retention-days: 14
       - run: git diff --exit-code -- src-tauri/gen/android
+
+  public-acceptance:
+    if: github.event_name == 'workflow_dispatch' && inputs.verify_public == true
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Verify public signatures, page version and stable redirects
+        env:
+          TAURI_UPDATER_PUBLIC_KEY: ${{ vars.TAURI_UPDATER_PUBLIC_KEY }}
+        run: node scripts/desktop/check-public-release.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: desktop-public-evidence
+          path: scratch/desktop/public-release/public-evidence.json
+          if-no-files-found: error
+          retention-days: 14
