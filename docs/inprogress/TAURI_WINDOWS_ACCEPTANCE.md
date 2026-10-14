@@ -1,8 +1,21 @@
 # Windows Tauri — release runbook and acceptance evidence
 
-**Status: NOT ACCEPTED / v0.1.0 installs but the owner reports a startup hang.
-The v0.1.1 startup fix and diagnostics require a new CI installer and real-machine
-retest. Website deployment and the remaining Windows 10 + 11 checks are pending.**
+**Status: v0.1.2 published as the public Latest release with the owner's approval
+on 2026-10-14.** The owner confirmed that the startup fix works and reported that
+all their checks work well. Detailed per-OS §10 evidence, the website/public
+verification job, and the in-app update/Android APK records remain unrecorded;
+publication is not a claim that those individual checks were independently verified.
+
+Public release: https://github.com/Avi-ADAM/1.0/releases/tag/desktop-v0.1.2
+
+- Installer CI: https://github.com/Avi-ADAM/1.0/actions/runs/38574741215
+- Release source commit: `e61e3eabcd0077e6d0f022e7ca23891aa207905a` (window title `1💗1`).
+- Windows/Android checks, installer build, and actual-asset signature/manifest
+  verification all passed in that run.
+- Published at `2026-10-14T14:04:06Z`; an unauthenticated GitHub API request
+  confirmed v0.1.2 is Latest, non-draft and non-prerelease, with all five assets.
+  Public binary downloads and the live website were not re-tested by that API check.
+- v0.1.0 and v0.1.1 remain drafts. No old/known-broken build was published.
 
 Owner confirmed that the permanent signing keys already exist and will trigger
 installer CI, deploy the website environment variable, and test both Windows
@@ -17,7 +30,7 @@ Implementation is not evidence that an installer works. Never mark §10 of
 - One `src-tauri`; identifier remains `world.onelev1.app`.
 - `gen/android`, the Android shell, and the Android build scripts are not
   edited. The base Tauri config changes only its shared release version to
-  `0.1.1`; the identifier and mobile window settings remain unchanged.
+  `0.1.2`; the identifier and mobile window settings remain unchanged.
   Desktop plugins are target-scoped;
   native host registration and implementation are Windows/desktop-gated.
 - The app still loads the live website. No SPA build, auth API changes, remote
@@ -251,10 +264,10 @@ Fill **both** OS columns with PASS/FAIL, test date, tester, and evidence. Includ
 the Windows build number, WebView2 version, and standard-user account status.
 CI Windows Server is not a substitute for Windows 10 and Windows 11.
 
-- Baseline release/tag: pending
-- Baseline CI run / commit: pending
-- NSIS filename / SHA256: pending
-- MSI filename / SHA256: pending
+- Public baseline release/tag: `desktop-v0.1.2`
+- Baseline CI run / commit: `38574741215` / `e61e3eabcd0077e6d0f022e7ca23891aa207905a`
+- NSIS filename / SHA256: `1lev1_0.1.2_x64-setup.exe` / `347e435dadeb31777b61dc359f8f695568e7cbf94d2c4b4aa11dfc2f03f2ebcf`
+- MSI filename / SHA256: `1lev1_0.1.2_x64_en-US.msi` / `d2fdd7384feb355057e8cd1e917933113c31432f6f3eb6fb257c33e871ccd41a`
 - Update release/tag, CI run, hashes: pending
 - Public verification CI run / artifact: pending
 - Windows 10 build / WebView2 / tester: pending
@@ -278,11 +291,12 @@ acceptance criteria.
 
 ## Evidence available so far
 
-- Local `node --test scripts/desktop/desktop.test.mjs`: 20 passed.
+- Local `node --test scripts/desktop/desktop.test.mjs`: 24 passed for v0.1.2.
 - Local `npx vitest run src/lib/download/release.test.ts`: 10 passed.
 - Actual Tauri CLI test-only signature verified successfully by the Node crypto
   verifier (not merely a mock signature).
-- `gen/android`, base `tauri.conf.json`, and the Android shell have no diff.
+- `gen/android` and the Android shell have no diff; base `tauri.conf.json`
+  differs only in the shared release version.
 - Windows host compilation + 2 Rust policy tests and Android-target check passed:
   https://github.com/Avi-ADAM/1.0/actions/runs/38553924878
   (commit `67cb383bb10e0077e0cce6c53df7149180c35bcd`; 20 Node tests also passed).
@@ -294,5 +308,6 @@ acceptance criteria.
   downloads redirect to storage hosts unavailable in the agent's network;
   compiler failures are now also surfaced as GitHub check annotations.
 
-**Completion remains blocked** until installer/public evidence and both real-OS
-acceptance records, including the update path and Android APK regression, exist.
+**The release is public with the owner's approval.** Formal §10 evidence is
+still incomplete until the live website/public check and both real-OS acceptance
+records, including the update path and Android APK regression, are recorded.
