@@ -1,0 +1,95 @@
+{
+  "meta": {
+    "title": "Descargar la aplicación | 1lev1",
+    "description": "La aplicación de 1lev1 para Windows: una ventana propia para tus rikmas, misiones y decisiones, con la misma cuenta que en el sitio web. Descarga gratuita."
+  },
+  "hero": {
+    "eyebrow": "Descarga",
+    "title": "1lev1 como aplicación",
+    "lede": "Una ventana propia en la barra de tareas, sin buscar una pestaña en el navegador. La misma cuenta, las mismas rikmas y los mismos datos que en el sitio web."
+  },
+  "cta": {
+    "windows": "Descargar para Windows",
+    "version": "Versión {{version}}",
+    "released": "Publicada el {{date}}",
+    "requirements": "Windows 10 u 11, 64 bits",
+    "msi": "Instalador MSI (para instalaciones gestionadas)",
+    "androidPlay": "Descargar en Google Play",
+    "androidApk": "Descargar para Android (APK)",
+    "web": "Seguir en el sitio web"
+  },
+  "soon": {
+    "title": "La aplicación para Windows está en camino",
+    "body": "Todavía no hay una versión para descargar. Mientras tanto, todo lo que hará la aplicación ya está disponible en el sitio web."
+  },
+  "detected": {
+    "none": "Todavía no hay aplicación para {{os}}. Puedes usar 1lev1 en el navegador: allí está todo.",
+    "other": "Todavía no hay aplicación para este dispositivo. Puedes usar 1lev1 en el navegador: allí está todo."
+  },
+  "platforms": {
+    "title": "Todas las plataformas",
+    "windows": {
+      "name": "Windows",
+      "desc": "Una aplicación de escritorio que se actualiza sola."
+    },
+    "android": {
+      "name": "Android",
+      "desc": "Una aplicación para teléfono y tableta."
+    },
+    "mac": {
+      "name": "macOS",
+      "desc": "Prevista más adelante."
+    },
+    "linux": {
+      "name": "Linux",
+      "desc": "Prevista más adelante."
+    },
+    "ios": {
+      "name": "iPhone y iPad",
+      "desc": "Prevista más adelante."
+    },
+    "web": {
+      "name": "En el navegador",
+      "desc": "Sin instalar nada, desde cualquier dispositivo. También puedes añadirla a la pantalla de inicio desde el menú del navegador."
+    }
+  },
+  "status": {
+    "available": "Disponible",
+    "soon": "Próximamente",
+    "always": "Siempre disponible"
+  },
+  "action": {
+    "download": "Descargar",
+    "play": "Google Play",
+    "apk": "Descargar APK",
+    "open": "Abrir el sitio web"
+  },
+  "install": {
+    "title": "Instalar en Windows",
+    "s1": "Descarga el instalador con el botón de arriba.",
+    "s2": "Abre el archivo descargado. Se instala solo para tu usuario y no necesita permisos de administrador.",
+    "s3": "Al terminar, 1lev1 se abre sola y desde entonces aparece en el menú Inicio.",
+    "s4": "Inicia sesión con tu cuenta de siempre: no hace falta registrarse de nuevo.",
+    "smartscreen": "Si Windows muestra «Windows protegió su PC», haz clic en «Más información» y luego en «Ejecutar de todas formas». Ocurre con los programas nuevos que aún no tienen reputación ante Microsoft."
+  },
+  "what": {
+    "title": "Qué hace la aplicación, y qué no",
+    "p1": "La aplicación es una ventana dedicada a 1lev1: la misma cuenta, las mismas rikmas, las mismas misiones y decisiones que en el sitio web. Lo que haces en ella aparece al instante en el sitio y en tu teléfono, y al revés.",
+    "p2": "No accede a tus archivos ni recoge nada más allá de lo que recoge el propio sitio web.",
+    "p3": "Cuando sale una versión nueva, la aplicación ofrece actualizarse: no hace falta volver a esta página."
+  },
+  "notes": {
+    "title": "Novedades de la versión {{version}}"
+  },
+  "faq": {
+    "title": "Preguntas frecuentes",
+    "q1": "¿Necesito la aplicación?",
+    "a1": "No. Todo lo que hay en la aplicación está también en el sitio web, en cualquier navegador. La aplicación solo te ahorra el navegador y le da a 1lev1 un lugar propio en la barra de tareas.",
+    "q2": "¿Cuesta algo?",
+    "a2": "No. Descargarla y usarla es gratis.",
+    "q3": "¿Cómo la desinstalo?",
+    "a3": "Configuración → Aplicaciones → Aplicaciones instaladas → 1lev1 → Desinstalar. Tu cuenta y tus datos se quedan en el sitio web.",
+    "q4": "¿Cómo sé que el archivo es auténtico?",
+    "a4": "Descarga solo desde esta página, en 1lev1.com/download. Nunca enviamos instaladores por correo ni por chat."
+  }
+}

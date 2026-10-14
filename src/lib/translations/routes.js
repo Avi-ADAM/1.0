@@ -75,6 +75,8 @@ export const ROUTED = {
     // The privacy policy - one route, one namespace. The menu link's label
     // lives in `common` so it renders everywhere.
     privacy: at('/privacy'),
+    // The app download page and its stable /download/<platform> links.
+    download: at('/download'),
     planning: at(/\/moach\/[^/]+\/create/),
     // The rikma-import review screen (PLAN_AI_SIGNUP_CONCIERGE §4.5): a new
     // rikma at /moach/import/…, an existing one at /moach/<id>/import/….
