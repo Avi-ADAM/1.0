@@ -1,6 +1,13 @@
+#[cfg(all(desktop, target_os = "windows"))]
+mod desktop;
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    tauri::Builder::default()
+    let builder = tauri::Builder::default();
+    #[cfg(all(desktop, target_os = "windows"))]
+    let builder = desktop::configure(builder);
+
+    builder
         .setup(|app| {
             // Debug builds only: routes Rust/WebView logs to `adb logcat`.
             if cfg!(debug_assertions) {
@@ -10,6 +17,8 @@ pub fn run() {
                         .build(),
                 )?;
             }
+            #[cfg(all(desktop, target_os = "windows"))]
+            desktop::setup(app)?;
             Ok(())
         })
         .run(tauri::generate_context!())
