@@ -14,20 +14,17 @@
 # `npm prune --omit=dev` after `COPY . .`) made it a fresh layer on EVERY code
 # change — i.e. a full 240MB re-upload on each `docker push`. Now it is
 # "Layer already exists" unless the lockfile actually moved.
-FROM node:22-alpine AS prod-deps
+FROM node:24-alpine AS prod-deps
 
 WORKDIR /app
 
 COPY package*.json .npmrc ./
-# --ignore-scripts: the `postinstall` hook is `patch-package`, which is a
-# devDependency and therefore absent here (exit 127). Any patch-package patches
-# are applied in stage 1b, where the full `npm ci` runs — the runtime
-# node_modules never reads patch files directly.
+# Runtime dependencies do not need development/build lifecycle scripts.
 RUN --mount=type=cache,id=npm,target=/root/.npm \
     npm ci --omit=dev --ignore-scripts
 
 # ---- Stage 1b: build ----
-FROM node:22-alpine AS build
+FROM node:24-alpine AS build
 
 WORKDIR /app
 
@@ -46,7 +43,7 @@ RUN --mount=type=secret,id=envfile,target=/app/.env \
     NODE_OPTIONS=--max-old-space-size=8192 npm run build
 
 # ---- Stage 2: runtime ----
-FROM node:22-alpine
+FROM node:24-alpine
 
 WORKDIR /app
 
