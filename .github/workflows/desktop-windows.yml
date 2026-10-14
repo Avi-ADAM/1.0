@@ -115,6 +115,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
+          # Both lockfiles exist; do not let the action auto-select Yarn.
+          # Use exactly the local Tauri CLI installed by npm ci, without downloads.
+          tauriScript: npx --no-install tauri
           args: --config scratch/desktop/signing.conf.json --target x86_64-pc-windows-msvc -- --locked
           tagName: ${{ env.DESKTOP_RELEASE_TAG }}
           releaseName: '1לב1 Windows v__VERSION__'

@@ -118,7 +118,13 @@ run after the fix is pushed.
 
 The workflow is `.github/workflows/desktop-windows.yml`. Node 22 follows the
 Windows plan; the website's existing Node 24 engine setting is not changed
-(`npm ci` emits a warning, not an error).
+(`npm ci` emits a warning, not an error). The action explicitly sets
+`tauriScript: npx --no-install tauri`: otherwise the existing `yarn.lock` makes
+`tauri-action` select Yarn, whose strict Node engine check rejects Node 22.
+`--no-install` uses the CLI from `npm ci` without fetching a different version.
+Neither lockfile nor the website engine needs to change. The action's message
+"Couldn't parse --config flag as inline JSON" is expected for a config file
+path and is not the build failure.
 
 - Branch pushes run Windows native/unit tests and Android-target `cargo check`.
 - `workflow_dispatch` or `desktop-v<version>` builds NSIS + MSI with permanent

@@ -131,6 +131,15 @@ test('Retry after reconnection navigates to the live site without IPC', async ()
   assert.equal(events.online, connect);
 });
 
+test('Installer action explicitly uses the npm-installed CLI instead of auto-detecting Yarn', () => {
+  const workflow = read('.github/workflows/desktop-windows.yml');
+  const action = workflow.split('uses: tauri-apps/tauri-action@v0')[1]?.split('      - name:')[0];
+  assert.ok(action, 'Installer action must exist');
+  assert.match(action, /^          tauriScript: npx --no-install tauri$/m);
+  assert.match(action, /^          args: --config scratch\/desktop\/signing\.conf\.json --target x86_64-pc-windows-msvc -- --locked$/m);
+  assert.equal(json('package.json').engines.node, '24.x', 'The website Node engine must not be weakened for desktop CI');
+});
+
 test('Both installer and public verification jobs accept a public-key variable or secret', () => {
   const workflow = read('.github/workflows/desktop-windows.yml');
   const publicKeyInputs = [...workflow.matchAll(/TAURI_UPDATER_PUBLIC_KEY: (.+)/g)].map((match) => match[1]);
