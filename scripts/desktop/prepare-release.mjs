@@ -12,7 +12,8 @@ export function prepareRelease({ base, windows, publicKey, privateKey, tag }) {
   if (tag !== `desktop-v${base.version}`) throw new Error(`Tag must be desktop-v${base.version}`);
   if (!privateKey?.trim()) throw new Error('Missing TAURI_SIGNING_PRIVATE_KEY repository secret; do not generate a throwaway release key');
   const key = publicKey?.trim();
-  if (!key || !/^[A-Za-z0-9+/=]+$/.test(key)) throw new Error('Set TAURI_UPDATER_PUBLIC_KEY repository variable to the .pub file contents');
+  if (!key) throw new Error('Set TAURI_UPDATER_PUBLIC_KEY repository variable or secret to the .pub file contents');
+  if (!/^[A-Za-z0-9+/=]+$/.test(key)) throw new Error('TAURI_UPDATER_PUBLIC_KEY must contain the complete Tauri .pub file contents, without surrounding quotes or a file path');
   const decoded = Buffer.from(key, 'base64').toString('utf8').trim().split(/\r?\n/);
   const packet = Buffer.from(decoded[1] ?? '', 'base64');
   if (!decoded[0]?.startsWith('untrusted comment:') || packet.length !== 42 || packet.subarray(0, 2).toString() !== 'Ed') {

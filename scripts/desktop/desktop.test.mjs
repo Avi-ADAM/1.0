@@ -131,6 +131,14 @@ test('Retry after reconnection navigates to the live site without IPC', async ()
   assert.equal(events.online, connect);
 });
 
+test('Both installer and public verification jobs accept a public-key variable or secret', () => {
+  const workflow = read('.github/workflows/desktop-windows.yml');
+  const publicKeyInputs = [...workflow.matchAll(/TAURI_UPDATER_PUBLIC_KEY: (.+)/g)].map((match) => match[1]);
+  assert.deepEqual(publicKeyInputs, Array(2).fill('${{ vars.TAURI_UPDATER_PUBLIC_KEY || secrets.TAURI_UPDATER_PUBLIC_KEY }}'));
+  assert.ok(workflow.includes('TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}'));
+  assert.ok(workflow.includes('TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}'));
+});
+
 const valid = { base, windows, publicKey, privateKey: 'only-a-test-presence-marker', tag: `desktop-v${base.version}` };
 test('Release overlay contains only a validated public key, never secrets', () => {
   assert.deepEqual(prepareRelease(valid), { plugins: { updater: { pubkey: publicKey } } });

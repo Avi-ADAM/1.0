@@ -23,7 +23,8 @@
   dispatch או tag בשם `desktop-v<version>` בונה NSIS/MSI ו-`latest.json` ב-Release
   במצב draft. פרסום והתקנה אמיתית נדרשים לפני שאפשר לסמן קבלה.
 - מפתח העדכונים הפרטי וסיסמתו הם GitHub Secrets. `TAURI_UPDATER_PUBLIC_KEY` הוא
-  repository Variable **ציבורי** שמוזרק ב-CI ל-`plugins.updater.pubkey`. בלי
+  מפתח **ציבורי** שנקרא מ-Repository Variable, או מ-Repository Secret באותו שם
+  אם המשתנה אינו מוגדר. הוא מוזרק ב-CI ל-`plugins.updater.pubkey`. בלי
   הגדרה תקינה בניית המתקינים נעצרת; לא מייצרים מפתח חד-פעמי לפרסום.
 - לא הוגדרה חתימת Authenticode בתשלום. SmartScreen עשוי להציג אזהרה.
 

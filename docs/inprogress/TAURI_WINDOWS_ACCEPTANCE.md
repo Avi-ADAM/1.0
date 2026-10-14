@@ -87,8 +87,13 @@ GitHub credentials into chat.
    ```
 
    The second command prompts for the signing-key password. GitHub **Secrets**
-   hold only the private key and password; the repository **Variable** holds
-   only the public `.pub` contents. No secret is written into this checkout.
+   must hold the private key and password. The public `.pub` contents can be
+   stored either in a repository **Variable** or a repository **Secret** named
+   `TAURI_UPDATER_PUBLIC_KEY`. Both installer builds and public verification
+   prefer the Variable when nonempty, otherwise fall back to the Secret. The
+   owner currently stores all three values as Repository Secrets, which is
+   supported; no key needs to be moved or regenerated. Do not set conflicting
+   values in the two locations. No private key is written into this checkout.
 
 3. `prepare-release.mjs` validates the key format, immutable identifier, numeric
    MSI-compatible version, matching release tag, and public manifest URL. It
@@ -104,6 +109,12 @@ as artifacts. Test keys used by Node tests exist in memory only and never
 enter an installer.
 
 ## Build and publication
+
+After a workflow/code fix, trigger a **new** workflow dispatch on the work branch.
+“Re-run failed jobs” uses the original run's commit and will not pick up a newer
+workflow. Re-running is appropriate only for a secrets/variables-only fix with
+no code changes. In particular, the public-key Secret fallback requires a new
+run after the fix is pushed.
 
 The workflow is `.github/workflows/desktop-windows.yml`. Node 22 follows the
 Windows plan; the website's existing Node 24 engine setting is not changed
