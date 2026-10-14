@@ -1,0 +1,95 @@
+{
+  "meta": {
+    "title": "Download the app | 1lev1",
+    "description": "The 1lev1 app for Windows: a window of its own for your rikmas, missions and decisions, with the same account as the website. Free download."
+  },
+  "hero": {
+    "eyebrow": "Download",
+    "title": "1lev1 as an app",
+    "lede": "A window of its own on your taskbar, no hunting for a browser tab. The same account, the same rikmas and the same data as the website."
+  },
+  "cta": {
+    "windows": "Download for Windows",
+    "version": "Version {{version}}",
+    "released": "Released {{date}}",
+    "requirements": "Windows 10 or 11, 64-bit",
+    "msi": "MSI installer (for managed installs)",
+    "androidPlay": "Get it on Google Play",
+    "androidApk": "Download for Android (APK)",
+    "web": "Continue on the website"
+  },
+  "soon": {
+    "title": "The Windows app is on its way",
+    "body": "There is no version to download yet. Meanwhile, everything the app will do is already available on the website."
+  },
+  "detected": {
+    "none": "There is no app for {{os}} yet. You can use 1lev1 in your browser — everything is there.",
+    "other": "There is no app for this device yet. You can use 1lev1 in your browser — everything is there."
+  },
+  "platforms": {
+    "title": "All platforms",
+    "windows": {
+      "name": "Windows",
+      "desc": "A desktop app that keeps itself up to date."
+    },
+    "android": {
+      "name": "Android",
+      "desc": "An app for phones and tablets."
+    },
+    "mac": {
+      "name": "macOS",
+      "desc": "Planned."
+    },
+    "linux": {
+      "name": "Linux",
+      "desc": "Planned."
+    },
+    "ios": {
+      "name": "iPhone and iPad",
+      "desc": "Planned."
+    },
+    "web": {
+      "name": "In the browser",
+      "desc": "No install, from any device. You can also add it to your home screen from the browser menu."
+    }
+  },
+  "status": {
+    "available": "Available",
+    "soon": "Coming soon",
+    "always": "Always available"
+  },
+  "action": {
+    "download": "Download",
+    "play": "Google Play",
+    "apk": "Download APK",
+    "open": "Open the website"
+  },
+  "install": {
+    "title": "Installing on Windows",
+    "s1": "Download the installer with the button above.",
+    "s2": "Open the downloaded file. It installs for your user only and does not need administrator rights.",
+    "s3": "When it finishes, 1lev1 opens by itself and is in your Start menu from then on.",
+    "s4": "Sign in with your existing account — there is no need to register again.",
+    "smartscreen": "If Windows shows \"Windows protected your PC\", click \"More info\" and then \"Run anyway\". This happens to new programs that have not yet built a reputation with Microsoft."
+  },
+  "what": {
+    "title": "What the app does, and what it doesn't",
+    "p1": "The app is a dedicated window for 1lev1: the same account, the same rikmas, the same missions and decisions as the website. What you do in it shows up on the website and on your phone at once, and the other way round.",
+    "p2": "It does not access your files and collects nothing beyond what the website itself collects.",
+    "p3": "When a new version is out, the app offers to update — no need to come back to this page."
+  },
+  "notes": {
+    "title": "What's new in {{version}}"
+  },
+  "faq": {
+    "title": "Questions",
+    "q1": "Do I need the app?",
+    "a1": "No. Everything in the app is also on the website, in any browser. The app only saves you the browser and gives 1lev1 a place of its own on your taskbar.",
+    "q2": "Does it cost anything?",
+    "a2": "No. Downloading and using it is free.",
+    "q3": "How do I uninstall it?",
+    "a3": "Settings → Apps → Installed apps → 1lev1 → Uninstall. Your account and data stay on the website.",
+    "q4": "How do I know the file is genuine?",
+    "a4": "Download only from this page, at 1lev1.com/download. We never send installers by email or chat."
+  }
+}

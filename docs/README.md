@@ -88,6 +88,7 @@
 
 | מסמך | |
 |---|---|
+| PLAN_TAURI_WINDOWS | תוכנה ל-Windows מאותה מעטפת Tauri: חלון, אופליין, קישורים חיצוניים, updater, מתקין NSIS/MSI, CI. דף `/download` כבר בנוי ומחכה ל-`DESKTOP_RELEASE_MANIFEST_URL` |
 | PLAN_DEADLOCK_PREVENTION | livelock במו"מ + נקודות הסכמה |
 | PLAN_MONEY_RAILS | מסילות תשלום (ריבוי מטבעות כבר יצא ממנו ל-done) |
 | PLAN_SHARE_BASIS_HOURS_VS_PRICE | שווי שותפות: שעות שאושרו מול המחיר שסוכם (QA C-14). החלטת ביניים: לפי שעות; מוצע `valueBasis` לכל משימה |
