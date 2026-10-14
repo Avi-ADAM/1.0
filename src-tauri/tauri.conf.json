@@ -1,7 +1,7 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
   "productName": "1lev1",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "identifier": "world.onelev1.app",
   "build": {
     "frontendDist": "./shell"

@@ -57,6 +57,8 @@ test('Windows replaces the entire window array without losing the local URL or l
   assert.equal(merged.app.windows.length, 1);
   const w = merged.app.windows[0];
   assert.equal(w.label, 'main');
+  assert.equal(w.title, '1💗1');
+  assert.equal(base.app.windows[0].title, '1לב1', 'Windows branding must not change the Android title');
   assert.equal(w.url, 'windows.html');
   assert.equal(w.create, false);
   assert.deepEqual([w.width, w.height, w.minWidth, w.minHeight], [1280, 820, 380, 600]);
