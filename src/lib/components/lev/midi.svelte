@@ -199,10 +199,19 @@ u = 'lev.page.diamondsHint'
 </script>
 
 <style>
+    /* The view switch, centred on the heart's own axis.
+       It was parked with `left: calc(50% - 37px)` — half the width of the
+       two-position toggle that lived here before `LevViewSwitch` took its
+       place, and that toggle is gone. The four-view pill is about 125px wide,
+       so the old offset left its centre ~25px to the right of the name on the
+       plaque below, on every phone: the desktop rule that does centre it only
+       applies from 550px up (`@media` below). `translateX(-50%)` is that same
+       centring, now at every width. */
     .bg{
         position: absolute;
         top: calc(30% - 14px);
-        left: calc(50% - 37px);
+        left: 50%;
+        transform: translateX(-50%);
         font-size: 6px;
 
         border-radius: 50%;
