@@ -358,7 +358,25 @@
       "sub": "This is the request you wrote before signing up. In a moment you'll see the plan taking shape around it."
     },
     "levFilled": "Lev filled this in from what you wrote — you can change it",
-    "bodyPlaceholder": "Tell us in your own words what you need, for whom, when and where…"
+    "bodyPlaceholder": "Tell us in your own words what you need, for whom, when and where…",
+    "readiness": {
+      "title": "Ready to publish",
+      "ofRequired": "{{done}} of {{total}} required fields",
+      "aria": "Wish readiness for publishing",
+      "required": "Required",
+      "done": "Ready",
+      "moreChars": "{{remain}} more characters",
+      "ckTitle": "Wish title",
+      "ckTitleSub": "A short sentence describing the wish (at least 7 characters)",
+      "ckTitleReady": "Title is ready",
+      "ckBody": "Wish description",
+      "ckBodySub": "A few lines in your own words about what you need (at least 31 characters)",
+      "ckBodyReady": "Description is ready",
+      "needTitle": "A wish title is missing — add a short title above to enable publishing.",
+      "needMoreTitle": "The title is too short — add {{remain}} more characters to the title to enable publishing.",
+      "needBody": "A wish description is missing — write a few sentences about what you need to enable publishing.",
+      "needMoreBody": "The description is too short — add {{remain}} more characters to the description to enable publishing."
+    }
   },
   "no_wishes_found_title": "No wishes found",
   "proposals_so_far": "Proposals so far",

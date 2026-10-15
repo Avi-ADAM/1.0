@@ -88,6 +88,29 @@ describe('i18n loader table', () => {
       for (const s of ['wish', 'understand', 'proposals', 'consent']) {
         expect(tr(`concierge.new.steps.${s}`), `${l} step ${s}`).toBeTruthy();
       }
+      for (const r of [
+        'title',
+        'ofRequired',
+        'aria',
+        'required',
+        'done',
+        'moreChars',
+        'ckTitle',
+        'ckTitleSub',
+        'ckTitleReady',
+        'ckBody',
+        'ckBodySub',
+        'ckBodyReady',
+        'needTitle',
+        'needMoreTitle',
+        'needBody',
+        'needMoreBody'
+      ]) {
+        expect(
+          tr(`concierge.new.readiness.${r}`, { done: 1, total: 2, remain: 3 }),
+          `${l} readiness ${r}`
+        ).toBeTruthy();
+      }
     }
   });
 
