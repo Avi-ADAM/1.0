@@ -1,4 +1,6 @@
 <script>
+  import { hasRtl } from '$lib/utils/rtlTextPath.js';
+
  let mainG = "matrix(.38338 0 0 .4039 -156.16 -138.46)"
  let yahaMain ="matrix(.28338 0 0 .2939 -86.16 -18.46)"
   /**
@@ -90,6 +92,33 @@
     onHover,
     onDisp
   } = $props();
+
+  /**
+   * Whether the member's name reads right to left. It decides `direction` and
+   * `letter-spacing` on the plaque `<text>` below, and the second of those is
+   * the fix for "on iPhone the Hebrew name on the heart is written backwards".
+   *
+   * The name sits in the coin view's canvas, which is deliberately `dir="ltr"`
+   * (`#content-area` in newcoinui) because the field's geometry is
+   * left-to-right. WebKit lays SVG text out as one fragment *per character* as
+   * soon as the run carries a non-zero letter-spacing
+   * (`SVGTextLayoutEngine.cpp`, `applySpacingToNextCharacter`), and a fragment
+   * is painted by reading a visual character offset out of the logical string
+   * — which cannot survive the bidi reordering of an RTL run. The name comes
+   * out in memory order, i.e. reversed, and no `direction` and no
+   * `unicode-bidi` rescues it, because the defect is downstream of both.
+   * Chromium and Gecko keep the whole run in one fragment and reorder it
+   * correctly, which is why this was iPhone-only. (Independently isolated
+   * against WebKit in another project: tracking on an RTL script paints the
+   * string in logical order whatever the direction says.)
+   *
+   * So an RTL name gets no tracking, and a Latin one keeps the 1.6px the
+   * plaque was drawn with. `direction` itself is correctness rather than a
+   * workaround: the base direction of a Hebrew name *is* RTL, and stating it
+   * keeps a mixed Hebrew/Latin name — and the meaning of `text-anchor` — from
+   * being decided by the LTR canvas it is nested in.
+   */
+  const nameRtl = $derived(hasRtl(name));
 console.log(mashs)
 console.log(sml)
     </script>
@@ -3238,7 +3267,9 @@ License: https://creativecommons.org/licenses/by-sa/4.0</desc>
   <a  data-sveltekit-prefetch 
     href="/me" >
 <path d="m-24.698 44.139h20v1.219h-20v-1.219zm0-8.536 5 1.828 5-3.657 5 3.657 5-1.828v7.316h-20v-7.316z" fill="url(#levlevaw)" stroke="url(#levlevfb)" stroke-miterlimit="5" stroke-width=".57906px"/>
-<text transform="matrix(.075915 0 0 .081691 -14.883 40.747)" fill="#f5d0fe" font-family="Arial, sans-serif" font-size="28px" font-weight="700" letter-spacing="1.6px" text-anchor="middle" style="white-space:pre">{name}</text>
+<!-- The member's name. `direction` and `letter-spacing` are load-bearing
+     here — see `nameRtl` in the script block before touching either. -->
+<text transform="matrix(.075915 0 0 .081691 -14.883 40.747)" fill="#f5d0fe" font-family="Arial, sans-serif" font-size="28px" font-weight="700" letter-spacing={nameRtl ? 'normal' : '1.6px'} text-anchor="middle" style="white-space:pre" direction={nameRtl ? 'rtl' : 'ltr'}>{name}</text>
     </a>
 </g>
 {#if pmash > 0}
