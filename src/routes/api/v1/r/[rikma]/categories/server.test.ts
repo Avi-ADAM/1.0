@@ -3,8 +3,8 @@
  *
  * The guarantee this file is here for: a category is listed only if a product
  * the caller may see is behind it. A dead filter is a worse answer than a short
- * list, and an anonymous visitor must never learn from a count that a hidden
- * product exists.
+ * list, and an anonymous visitor must never learn from a count that a draft
+ * exists.
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
@@ -27,8 +27,6 @@ vi.mock('$lib/server/apiKeys.js', () => ({
 
 const { GET } = await import('./+server');
 const { clearQueryCache } = await import('$lib/server/apiPublic/cache.js');
-const { resetExposureCache } =
-  await import('$lib/server/apiPublic/exposure.js');
 const { resetRateLimits } = await import('$lib/server/apiPublic/http.js');
 
 const ROW = {
@@ -45,7 +43,7 @@ const ROWS = [
     id: '1',
     attributes: {
       name: 'סדנה',
-      appruved: true,
+      status_of_voting: 'active',
       categories: { data: [workshop] }
     }
   },
@@ -53,20 +51,32 @@ const ROWS = [
     id: '2',
     attributes: {
       name: 'סדנה שנייה',
-      appruved: true,
+      status_of_voting: 'active',
       categories: { data: [workshop, catering] }
     }
   }
 ];
 
-// Published, but the rikma kept it out of the discovery surfaces — so an
-// anonymous caller must not see its category either.
-const hiddenOnly = [
+// Still in its vote (`status_of_voting: 'voting'`) — a draft, so an anonymous
+// caller must not see its category either.
+const draftOnly = [
   {
     id: '3',
     attributes: {
-      name: 'סוד',
-      appruved: true,
+      name: 'בהצבעה',
+      status_of_voting: 'voting',
+      categories: { data: [catering] }
+    }
+  }
+];
+
+// Kept out of `/gift` only — the rikma's page lists it, so its category counts.
+const hiddenFromGiftOnly = [
+  {
+    id: '4',
+    attributes: {
+      name: 'לחברים',
+      status_of_voting: 'active',
       hideFromDiscovery: true,
       categories: { data: [catering] }
     }
@@ -89,12 +99,6 @@ function fakeStrapi(opts: { rows?: any[] } = {}) {
         };
       case 'rikmaApiRef':
         return { data: { project: { data: ROW } } };
-      case 'rikmaApiExposure':
-        throw {
-          getMessages: () => [
-            'Cannot query field "exposeToApi" on type "Project"'
-          ]
-        };
       case 'rikmaApiCategories':
         return { data: { matanots: { data: opts.rows ?? ROWS } } };
       default:
@@ -128,7 +132,6 @@ beforeEach(() => {
   mocks.execute.mockReset();
   mocks.verifyApiKeyDetailed.mockReset();
   clearQueryCache();
-  resetExposureCache();
   resetRateLimits();
   mocks.execute.mockImplementation(fakeStrapi());
 });
@@ -151,10 +154,16 @@ describe('GET /api/v1/r/{rikma}/categories', () => {
     expect(response.headers.get('ETag')).toBeTruthy();
   });
 
-  it('drops a category that only hidden products carry', async () => {
-    mocks.execute.mockImplementation(fakeStrapi({ rows: hiddenOnly }));
+  it('drops a category that only drafts carry', async () => {
+    mocks.execute.mockImplementation(fakeStrapi({ rows: draftOnly }));
     const body = await (await call('/api/v1/r/haohel/categories')).json();
     expect(body.data).toEqual([]);
+  });
+
+  it('counts a product hidden from /gift — the shop lists it (§4.3)', async () => {
+    mocks.execute.mockImplementation(fakeStrapi({ rows: hiddenFromGiftOnly }));
+    const body = await (await call('/api/v1/r/haohel/categories')).json();
+    expect(body.data.map((c: any) => c.id)).toEqual(['9']);
   });
 
   it('is cacheable per caller, never across callers', async () => {

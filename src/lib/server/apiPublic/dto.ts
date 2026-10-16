@@ -17,7 +17,9 @@
  *   2. **`status` is derived, never stored** (§4.3). Five flags exist —
  *      `appruved`, `archived`, `lifecycle`, `hideFromDiscovery`,
  *      `status_of_voting` — and a key holder cannot be asked to combine them.
- *      One vocabulary comes out: `draft | published | hidden | archived`.
+ *      One vocabulary comes out: `draft | published | archived`, derived from
+ *      `status_of_voting`/`lifecycle`/`archived` (never `appruved` — see
+ *      `productStatusOf`).
  *      The flags themselves never leave (a raw flag in the payload is exactly
  *      the leak that makes people hide products from us).
  *
@@ -33,15 +35,15 @@ import { excerptOf } from '$lib/server/discovery/normalizeCards.js';
 import { SITE_ORIGIN, rikmaPath } from '$lib/rikmaAddress/rikmaUrl.js';
 import { parseLook } from '$lib/rikmaLook/look.js';
 import { apiRikmaPath } from './rikmaPath.js';
+import { sanitizeDescriptionHtml } from './html.js';
 
 // ─── status ─────────────────────────────────────────────────────────────────
 
-export type ApiProductStatus = 'draft' | 'published' | 'hidden' | 'archived';
+export type ApiProductStatus = 'draft' | 'published' | 'archived';
 
 export const API_STATUSES: readonly ApiProductStatus[] = [
   'draft',
   'published',
-  'hidden',
   'archived'
 ];
 
@@ -52,54 +54,59 @@ export function isApiStatus(value: unknown): value is ApiProductStatus {
   );
 }
 
+/** `lifecycle` values that end an object — `released` is as final as `archived`. */
+const ENDED_LIFECYCLES = ['archived', 'released'];
+/** `status_of_voting` values of a product the rikma has not opened for sale yet. */
+const DRAFT_VOTING = ['draft', 'voting'];
+
 /**
- * The derived status of a product row.
+ * The derived status of a product row (PLAN §4.3, corrected — §12 #1).
  *
- * `archived` wins over everything: an archived product is not a draft, it is
- * gone from the shop. Then `appruved` (the rikma's own approval, `approveMatanot`)
- * gates everything: not approved = nobody outside the rikma sees it. Only then
- * does `hideFromDiscovery` separate `hidden` from `published`.
+ * The signal is `status_of_voting`, not `appruved`. Creation writes only
+ * `status_of_voting` (`'active'`, or `'voting'` for a complex product in a
+ * multi-member rikma — `createComplexMatanot`); `appruved` is written only by
+ * `approveMatanot`, which no screen calls, and Strapi defaults it to `false`.
+ * Reading `appruved` would turn every real product into a draft.
  *
- * `lifecycle` is a NEW field, so every row that predates the archival flow
- * carries NULL — and in SQL `lifecycle = 'archived'` is never true for those.
- * A null/absent `lifecycle` is therefore read as "not archived", the same
- * reasoning as the `NOT_ARCHIVED` guard in qids.js. `archiveProposed` is a
- * proposal, not an archive: the product stays visible until the decision
- * matures.
+ * `archived` wins over everything: an archived product is gone from the shop.
+ * `lifecycle` arrived with the archival flow, so legacy rows carry NULL — read
+ * as "active", the same reasoning as `NOT_ARCHIVED` in qids.js. `released` is
+ * terminal (as in `archive/membership.ts`); `archiveProposed` is a proposal,
+ * not an archive, and stays published until the decision matures.
+ *
+ * `hideFromDiscovery` is **not** a status. It takes a product out of the
+ * platform-wide directory (`/gift`) only — the product stays on its own page
+ * and on the rikma's page — so the rikma's shop lists it like any other.
  */
 export function productStatusOf(
   attrs: Record<string, any> | null | undefined
 ): ApiProductStatus {
   const a = attrs ?? {};
-  if (a.archived === true || a.lifecycle === 'archived') return 'archived';
-  if (a.appruved !== true) return 'draft';
-  return a.hideFromDiscovery === true ? 'hidden' : 'published';
+  if (
+    a.archived === true ||
+    ENDED_LIFECYCLES.includes(a.lifecycle) ||
+    a.status_of_voting === 'archived'
+  )
+    return 'archived';
+  if (DRAFT_VOTING.includes(a.status_of_voting)) return 'draft';
+  return 'published';
 }
 
-/** Who is asking, and what the rikma opened up. */
+/** Who is asking. */
 export interface ApiAccess {
   /** `anonymous` — no key; `key` — `products:read`; `draft` — also `products:read:draft`. */
   level: 'anonymous' | 'key' | 'draft';
-  /**
-   * The rikma opted in to listing its `hidden` products publicly
-   * (`Project.exposeToApi`, §4.3/§9.11). Absent field ⇒ false — an unknown
-   * flag must never widen what is public.
-   */
-  exposed: boolean;
 }
 
 /**
  * Every status this caller may ever see.
  *
- * The anonymous surface is *exactly* what `/gift` already lists — `published`
- * only — so opening the API cannot retroactively publish a product somebody
- * hid (§4.3, §6.2). `exposeToApi` widens that set to `hidden`; until a rikma
- * sets it, a hidden product is reachable only with a key scoped to that rikma,
- * which is the rikma reading its own data.
+ * The anonymous shop is what the rikma's public page already shows: its
+ * published products, `hideFromDiscovery` included (§4.3). A key may also ask
+ * for `archived` explicitly; only `products:read:draft` adds drafts.
  */
 export function visibleStatusesFor(access: ApiAccess): ApiProductStatus[] {
   const statuses: ApiProductStatus[] = ['published'];
-  if (access.level !== 'anonymous' || access.exposed) statuses.push('hidden');
   if (access.level !== 'anonymous') statuses.push('archived');
   if (access.level === 'draft') statuses.push('draft');
   return statuses;
@@ -120,29 +127,41 @@ export function canSeeStatus(
 // ─── status → Strapi filter fragments ───────────────────────────────────────
 
 /**
- * The `null` branches are not decoration. `hideFromDiscovery`, `archived` and
- * `lifecycle` are nullable on rows written before each flag existed, and in SQL
- * `field <> true` is NULL for those rows — the filter would silently drop every
- * legacy product. Same idiom as `NOT_ARCHIVED` in qids.js.
+ * The `null` branches are not decoration. `archived`, `lifecycle` and
+ * `status_of_voting` are nullable on rows written before each flag existed,
+ * and in SQL `field <> x` / `NOT IN` is NULL for those rows — the filter would
+ * silently drop every legacy product. Same idiom as `NOT_ARCHIVED` in qids.js.
  */
 const ARCHIVED_TRUE = {
-  or: [{ archived: { eq: true } }, { lifecycle: { eq: 'archived' } }]
+  or: [
+    { archived: { eq: true } },
+    { lifecycle: { in: ENDED_LIFECYCLES } },
+    { status_of_voting: { eq: 'archived' } }
+  ]
 };
 const NOT_ARCHIVED = {
   and: [
     { or: [{ archived: { eq: false } }, { archived: { null: true } }] },
-    { or: [{ lifecycle: { null: true } }, { lifecycle: { ne: 'archived' } }] }
+    {
+      or: [
+        { lifecycle: { null: true } },
+        { lifecycle: { notIn: ENDED_LIFECYCLES } }
+      ]
+    },
+    {
+      or: [
+        { status_of_voting: { null: true } },
+        { status_of_voting: { ne: 'archived' } }
+      ]
+    }
   ]
 };
-const HIDDEN = { hideFromDiscovery: { eq: true } };
-const NOT_HIDDEN = {
+const IS_DRAFT = { status_of_voting: { in: DRAFT_VOTING } };
+const NOT_DRAFT = {
   or: [
-    { hideFromDiscovery: { eq: false } },
-    { hideFromDiscovery: { null: true } }
+    { status_of_voting: { null: true } },
+    { status_of_voting: { notIn: DRAFT_VOTING } }
   ]
-};
-const NOT_APPROVED = {
-  or: [{ appruved: { eq: false } }, { appruved: { null: true } }]
 };
 
 /** One branch of the status filter, as GraphQL input. */
@@ -151,12 +170,10 @@ function statusBranch(status: ApiProductStatus): Record<string, unknown> {
     case 'archived':
       return ARCHIVED_TRUE;
     case 'draft':
-      return { and: [NOT_ARCHIVED, NOT_APPROVED] };
-    case 'hidden':
-      return { and: [NOT_ARCHIVED, { appruved: { eq: true } }, HIDDEN] };
+      return { and: [NOT_ARCHIVED, IS_DRAFT] };
     case 'published':
     default:
-      return { and: [NOT_ARCHIVED, { appruved: { eq: true } }, NOT_HIDDEN] };
+      return { and: [NOT_ARCHIVED, NOT_DRAFT] };
   }
 }
 
@@ -377,11 +394,14 @@ export function toApiProduct(
   const image = imageOf(a.pic);
   const id = String(node.id);
 
+  // Text comes from the sanitized HTML too, so a `<script>` body never
+  // surfaces as words in the plain-text field.
+  const descriptionHtml = sanitizeDescriptionHtml(a.desc);
   return {
     id,
     name: a.name,
-    descriptionHtml: str(a.desc),
-    descriptionText: excerptOf(a.desc),
+    descriptionHtml,
+    descriptionText: excerptOf(descriptionHtml),
     status: productStatusOf(a),
     price,
     currency: str(a.currency?.data?.attributes?.code),

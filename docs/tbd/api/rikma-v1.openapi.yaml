@@ -33,9 +33,9 @@
 #     (301 על שם קודם), 404 אחרת. אותו קוד — לא שכפול.
 #     ⚠ 301 רק ב-GET. POST (sales/tasks/orders) לעולם לא מופנה — איות שונה או
 #     שם קודם של רקמת המפתח מוגשים כרגיל + X-1lev1-Rikma-Canonical.
-#   • עם מפתח: הנתיב מושווה לזהות רקמת המפתח (id/slug/formerSlugs) *לפני*
-#     חיפוש; אי-התאמה או רקמה לא קיימת ⇒ 403 RIKMA_MISMATCH. מפתח ברמת משתמש
-#     (בלי רקמה) ⇒ 403 KEY_NOT_RIKMA_SCOPED. אנונימי לרקמה לא קיימת ⇒ 404.
+#   • רקמה שלא קיימת ⇒ 404 (קיום רקמה ציבורי ממילא). עם מפתח, רקמה קיימת
+#     שאינה רקמת המפתח ⇒ 403 RIKMA_MISMATCH. מפתח ברמת משתמש (בלי רקמה) ⇒
+#     403 KEY_NOT_SCOPED.
 #   • Cache-Control: public רק לבקשה אנונימית; עם מפתח ⇒ private, no-cache.
 #     תמיד Vary: Authorization, Origin.
 #   • חנות = דף הרקמה (כולל hideFromDiscovery); שוק = /gift (בלי). אין exposeToApi.
@@ -545,8 +545,8 @@ components:
       description: |
         מפתח `1lev1_...` עם scope `products:read` (ואופציונלית `products:read:draft`).
         המפתח מקובע לרקמה: פנייה לרקמה אחרת ⇒ 403 `RIKMA_MISMATCH`, גם אם בעליו חבר בשתיהן.
-        מפתח ברמת משתמש (בלי רקמה — מפתח פרופיל/MCP/OAuth) ⇒ 403 `KEY_NOT_RIKMA_SCOPED`,
-        גם ב-GET שעובד אנונימית. `/api/v1/me` מקבל אותו ומחזיר `rikma: null`.
+        מפתח ברמת משתמש (בלי רקמה — מפתח פרופיל/MCP/OAuth) ⇒ 403 `KEY_NOT_SCOPED`,
+        גם ב-GET שעובד אנונימית, וגם ב-`/api/v1/me`.
 
   parameters:
     Rikma:
@@ -557,8 +557,8 @@ components:
         slug או מזהה. slug מעדיף: הוא יציב (slug קודם לא משתחרר, `formerSlugs`) ונקרא.
         GET: איות שונה ⇒ 301 לגרסה המנורמלת; שם קודם ⇒ 301 לנוכחי.
         POST: אין הפניה — איות שונה/שם קודם של רקמת המפתח מוגשים כרגיל,
-        עם `X-1lev1-Rikma-Canonical`. עם מפתח, נתיב שאינו של רקמת המפתח
-        (או רקמה שלא קיימת) ⇒ 403 `RIKMA_MISMATCH` לפני כל חיפוש.
+        עם `X-1lev1-Rikma-Canonical`. רקמה שלא קיימת ⇒ 404; עם מפתח, רקמה
+        קיימת שאינה רקמת המפתח ⇒ 403 `RIKMA_MISMATCH`.
       schema: { type: string }
       examples:
         slug: { value: haohel }
@@ -619,7 +619,7 @@ components:
         application/json:
           schema: { $ref: '#/components/schemas/Error' }
     Forbidden:
-      description: scope חסר / Origin חסום / הרקמה בנתיב אינה הרקמה של המפתח (RIKMA_MISMATCH) / מפתח ברמת משתמש (KEY_NOT_RIKMA_SCOPED)
+      description: scope חסר / Origin חסום / הרקמה בנתיב אינה הרקמה של המפתח (RIKMA_MISMATCH) / מפתח ברמת משתמש (KEY_NOT_SCOPED)
       content:
         application/json:
           schema: { $ref: '#/components/schemas/Error' }
@@ -861,6 +861,24 @@ components:
           properties:
             code:
               type: string
-              enum: [BAD_REQUEST, UNAUTHORIZED, SCOPE_MISSING, ORIGIN_NOT_ALLOWED, RIKMA_MISMATCH, KEY_NOT_RIKMA_SCOPED, NOT_FOUND, RATE_LIMITED, UPSTREAM_ERROR]
+              enum:
+                - VALIDATION
+                - VALIDATION_FAILED
+                - INVALID_KEY
+                - KEY_REVOKED
+                - KEY_REQUIRED
+                - UNAUTHORIZED
+                - SCOPE_MISSING
+                - KEY_NOT_SCOPED
+                - ORIGIN_NOT_ALLOWED
+                - RIKMA_MISMATCH
+                - RIKMA_NOT_FOUND
+                - PRODUCT_NOT_FOUND
+                - NOT_FOUND
+                - RATE_LIMITED
+                - UPSTREAM_ERROR
+              description: |
+                הקודים שהמימוש מחזיר בפועל (`apiPublic/http.ts`, `query.ts`,
+                `writeApi.ts`). צרכן צריך לטפל גם בקוד שלא מוכר לו — הרשימה יכולה לגדול.
             message: { type: string }
             details: { type: object, additionalProperties: true }

@@ -663,7 +663,6 @@ export const qidsAccess = {
   'rikmaApiCategories': { allow: ['serviceAdmin'] },
   'rikmaApiRef': { allow: ['serviceAdmin'] },
   'rikmaApiProject': { allow: ['serviceAdmin'] },
-  'rikmaApiExposure': { allow: ['serviceAdmin'] },
   'rikmaApiUserName': { allow: ['serviceAdmin'] },
 
   // Site reports mirrored into the central rikma — same story, and a report

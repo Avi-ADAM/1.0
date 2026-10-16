@@ -32,7 +32,7 @@ const NOT_ARCHIVED = `{ or: [{ lifecycle: { null: true } }, { lifecycle: { ne: "
 const API_PRODUCT_ATTRS = `
         name desc price pricingMode quant kindOf origin locale
         createdAt updatedAt startDate finnishDate
-        appruved archived lifecycle hideFromDiscovery
+        status_of_voting archived lifecycle
         lat lng radius
         location { lat lng radius location_hint location_mode }
         pic { data { attributes { url alternativeText formats } } }
@@ -17326,14 +17326,6 @@ ${STIPEND_DECISION_FIELDS}
         look
       } }
     }
-  }`,
-
-  // `Project.exposeToApi` — the opt-in §4.3 requires, read defensively: the
-  // field arrives with 1.0b, and until then this query is expected to fail
-  // once and be latched off ($lib/server/apiPublic/exposure.ts). An absent
-  // flag must never widen the public surface.
-  'rikmaApiExposure': `query RikmaApiExposure($pid: ID!) {
-    project(id: $pid) { data { id attributes { exposeToApi } } }
   }`,
 
   // The key owner's display name, for GET /api/v1/me. Deliberately separate

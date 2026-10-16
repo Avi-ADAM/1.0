@@ -11,7 +11,6 @@ import {
 import { resolveRikmaFromPath } from '$lib/server/apiPublic/rikmaPath.js';
 import { parseCatalogQuery } from '$lib/server/apiPublic/query.js';
 import { projectFields } from '$lib/server/apiPublic/dto.js';
-import { readRikmaExposure } from '$lib/server/apiPublic/exposure.js';
 import {
   buildListBody,
   fetchProductPage,
@@ -32,7 +31,8 @@ import { isHiddenProject } from '$lib/server/discovery/hiddenProjects.js';
  *      address, 404 for a slug nobody has (the *same* resolution the page uses);
  *   3. key ↔ path agreement — `403 RIKMA_MISMATCH`, both sides independent;
  *   4. does that rikma exist — 404;
- *   5. what the caller may see — `exposeToApi` for the anonymous surface;
+ *   5. what the caller may see — published for anonymous, drafts only with
+ *      `products:read:draft` (`hideFromDiscovery` does not hide from the shop);
  *   6. only then the query itself.
  *
  * A rikma hidden from the discovery surfaces (a QA rikma) answers 404 to the
@@ -73,15 +73,7 @@ export const GET: RequestHandler = async ({ params, url, request, fetch }) => {
     return errorResponse(404, 'RIKMA_NOT_FOUND', 'No such rikma');
   }
 
-  // Only the public surface depends on the opt-in; a key already sees the
-  // rikma's hidden products as the rikma's own data (§5.1).
-  const access =
-    auth.kind === 'anonymous'
-      ? {
-          ...auth.access,
-          exposed: await readRikmaExposure(resolved.projectId, run)
-        }
-      : auth.access;
+  const { access } = auth;
 
   const parsed = parseCatalogQuery(url.searchParams, access);
   if (parsed.ok === false)

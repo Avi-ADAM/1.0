@@ -27,8 +27,6 @@ vi.mock('$lib/server/apiKeys.js', () => ({
 
 const { GET } = await import('./+server');
 const { clearQueryCache } = await import('$lib/server/apiPublic/cache.js');
-const { resetExposureCache } =
-  await import('$lib/server/apiPublic/exposure.js');
 const { resetRateLimits } = await import('$lib/server/apiPublic/http.js');
 
 // What is stored is JSON a member proposed; `parseLook` is the only way in,
@@ -67,7 +65,7 @@ function fakeStrapi(
       attributes: {
         name: 'סדנה',
         price: 320,
-        appruved: true,
+        status_of_voting: 'active',
         updatedAt: '2026-10-14T08:12:00.000Z'
       }
     }
@@ -82,12 +80,6 @@ function fakeStrapi(
         };
       case 'rikmaApiRef':
         return { data: { project: { data: ROW } } };
-      case 'rikmaApiExposure':
-        throw {
-          getMessages: () => [
-            'Cannot query field "exposeToApi" on type "Project"'
-          ]
-        };
       case 'rikmaApiProject':
         if (opts.profileFails) throw { getMessages: () => ['boom'] };
         return {
@@ -129,7 +121,6 @@ beforeEach(() => {
   mocks.execute.mockReset();
   mocks.verifyApiKeyDetailed.mockReset();
   clearQueryCache();
-  resetExposureCache();
   resetRateLimits();
   mocks.execute.mockImplementation(fakeStrapi());
 });

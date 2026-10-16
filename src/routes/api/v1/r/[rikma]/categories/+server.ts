@@ -8,7 +8,6 @@ import {
   preflightResponse
 } from '$lib/server/apiPublic/http.js';
 import { resolveRikmaFromPath } from '$lib/server/apiPublic/rikmaPath.js';
-import { readRikmaExposure } from '$lib/server/apiPublic/exposure.js';
 import {
   fetchCategories,
   fetchRikmaRef,
@@ -24,7 +23,7 @@ import { isHiddenProject } from '$lib/server/discovery/hiddenProjects.js';
  * category vocabulary is shared, and a shop filter that offers a category with
  * nothing behind it is a dead end. The counts are of the products *this caller*
  * may see, so a shop can render "סדנאות (12)" without a second request — and an
- * anonymous visitor is never told that a hidden product exists.
+ * anonymous visitor is never told that a draft exists.
  *
  * No query parameters today: categories are the rikma's navigation, not a
  * search surface. A `?q=`/facet API is P1 (§4.10).
@@ -63,13 +62,7 @@ export const GET: RequestHandler = async ({ params, url, request, fetch }) => {
     return errorResponse(404, 'RIKMA_NOT_FOUND', 'No such rikma');
   }
 
-  const access =
-    auth.kind === 'anonymous'
-      ? {
-          ...auth.access,
-          exposed: await readRikmaExposure(resolved.projectId, run)
-        }
-      : auth.access;
+  const { access } = auth;
 
   const data = await fetchCategories(run, {
     projectId: resolved.projectId,

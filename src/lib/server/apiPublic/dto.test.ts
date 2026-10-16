@@ -70,7 +70,7 @@ const MAXIMAL_ROW = {
     updatedAt: '2026-10-14T08:12:00.000Z',
     startDate: '2026-11-01T00:00:00.000Z',
     finnishDate: '2026-11-30T00:00:00.000Z',
-    appruved: true,
+    appruved: false,
     archived: false,
     lifecycle: 'active',
     hideFromDiscovery: false,
@@ -240,39 +240,48 @@ describe('toApiProduct — the whitelist', () => {
   });
 });
 
-describe('status derivation (§4.3)', () => {
-  it('reads the five flags as one word', () => {
+describe('status derivation (§4.3, corrected — §12 #1)', () => {
+  it('reads status_of_voting, lifecycle and archived as one word', () => {
     expect(
-      productStatusOf({ appruved: true, archived: false, lifecycle: 'active' })
+      productStatusOf({ status_of_voting: 'active', archived: false, lifecycle: 'active' })
     ).toBe('published');
-    expect(
-      productStatusOf({
-        appruved: true,
-        lifecycle: 'active',
-        hideFromDiscovery: true
-      })
-    ).toBe('hidden');
-    expect(productStatusOf({ appruved: false })).toBe('draft');
-    expect(productStatusOf({ appruved: true, lifecycle: 'archived' })).toBe(
-      'archived'
-    );
-    expect(productStatusOf({ appruved: true, archived: true })).toBe(
+    expect(productStatusOf({ status_of_voting: 'voting' })).toBe('draft');
+    expect(productStatusOf({ status_of_voting: 'draft' })).toBe('draft');
+    expect(productStatusOf({ status_of_voting: 'archived' })).toBe('archived');
+    expect(productStatusOf({ lifecycle: 'archived' })).toBe('archived');
+    expect(productStatusOf({ lifecycle: 'released' })).toBe('archived');
+    expect(productStatusOf({ archived: true, status_of_voting: 'active' })).toBe(
       'archived'
     );
   });
 
-  it('treats a NULL lifecycle as "not archived" — the legacy rows', () => {
-    // `lifecycle` is newer than most rows: a bare `=== 'archived'` check would
-    // hide every product that predates it.
-    expect(productStatusOf({ appruved: true, lifecycle: null })).toBe(
+  it('never reads appruved — creation leaves it false, and no screen sets it', () => {
+    // Strapi defaults `appruved` to false and only the unused `approveMatanot`
+    // writes it: gating on it made every real product a draft.
+    expect(productStatusOf({ status_of_voting: 'active', appruved: false })).toBe(
       'published'
     );
-    expect(productStatusOf({ appruved: true })).toBe('published');
+    expect(productStatusOf({ status_of_voting: 'voting', appruved: true })).toBe(
+      'draft'
+    );
+  });
+
+  it('treats NULL flags as the legacy defaults — published, not archived', () => {
+    // `lifecycle` and `status_of_voting` are newer than many rows: a bare
+    // equality check would hide every product that predates them.
+    expect(productStatusOf({ lifecycle: null, status_of_voting: null })).toBe(
+      'published'
+    );
+    expect(productStatusOf({})).toBe('published');
   });
 
   it('keeps a product visible while its archive is only proposed', () => {
+    expect(productStatusOf({ lifecycle: 'archiveProposed' })).toBe('published');
+  });
+
+  it('does not treat hideFromDiscovery as a status — the shop lists it (§4.3)', () => {
     expect(
-      productStatusOf({ appruved: true, lifecycle: 'archiveProposed' })
+      productStatusOf({ status_of_voting: 'active', hideFromDiscovery: true })
     ).toBe('published');
   });
 
@@ -284,7 +293,7 @@ describe('status derivation (§4.3)', () => {
           name: 'סל קניות',
           pricingMode: 'quote',
           price: 999,
-          appruved: true
+          status_of_voting: 'active'
         }
       },
       RIKMA_REF
@@ -295,23 +304,20 @@ describe('status derivation (§4.3)', () => {
 });
 
 describe('who sees what (§4.3, §6.2)', () => {
-  const anon: ApiAccess = { level: 'anonymous', exposed: false };
-  const anonExposed: ApiAccess = { level: 'anonymous', exposed: true };
-  const keyed: ApiAccess = { level: 'key', exposed: false };
-  const drafted: ApiAccess = { level: 'draft', exposed: false };
+  const anon: ApiAccess = { level: 'anonymous' };
+  const keyed: ApiAccess = { level: 'key' };
+  const drafted: ApiAccess = { level: 'draft' };
 
-  it('never lists a hidden product without the rikma’s opt-in', () => {
-    expect(canSeeStatus(anon, 'hidden')).toBe(false);
-    expect(canSeeStatus(anonExposed, 'hidden')).toBe(true);
-    expect(canSeeStatus(keyed, 'hidden')).toBe(true);
+  it('shows anonymous callers exactly what the rikma page shows: published', () => {
+    expect(visibleStatusesFor(anon)).toEqual(['published']);
   });
 
   it('keeps drafts and archives away from everyone who is not a key', () => {
-    expect(visibleStatusesFor(anon)).toEqual(['published']);
     expect(canSeeStatus(anon, 'draft')).toBe(false);
     expect(canSeeStatus(keyed, 'draft')).toBe(false);
     expect(canSeeStatus(drafted, 'draft')).toBe(true);
     expect(canSeeStatus(anon, 'archived')).toBe(false);
+    expect(canSeeStatus(keyed, 'archived')).toBe(true);
   });
 
   it('never lists an archived product in a default list, even for a draft key', () => {
@@ -319,18 +325,21 @@ describe('who sees what (§4.3, §6.2)', () => {
     expect(defaultListStatuses(drafted)).toContain('draft');
   });
 
-  it('knows its statuses', () => {
+  it('knows its statuses — and `hidden` is no longer one of them', () => {
     expect(isApiStatus('published')).toBe(true);
+    expect(isApiStatus('hidden')).toBe(false);
     expect(isApiStatus('deleted')).toBe(false);
   });
 });
 
 describe('statusFilterFor', () => {
   it('guards NULL columns so legacy rows are not silently dropped', () => {
-    const filter = statusFilterFor(['published']) as any;
-    const json = JSON.stringify(filter);
+    const json = JSON.stringify(statusFilterFor(['published']));
     expect(json).toContain('"null":true');
-    expect(json).toContain('appruved');
+    expect(json).toContain('status_of_voting');
+    expect(json).toContain('released');
+    expect(json).not.toContain('appruved');
+    expect(json).not.toContain('hideFromDiscovery');
   });
 
   it('answers null when the caller may see nothing', () => {
@@ -385,7 +394,6 @@ describe('a personal product is a person', () => {
       attributes: {
         name: 'שיעור פרטי',
         origin: 'personal',
-        appruved: true,
         owner_user: {
           data: {
             id: '9',
@@ -495,5 +503,22 @@ describe('toApiCategory', () => {
       name: 'סדנאות',
       productsCount: 3
     });
+  });
+});
+
+describe('descriptionHtml is rebuilt, never forwarded (§5.3, §12 #8)', () => {
+  it('keeps the formatting and drops what a consumer site would execute', () => {
+    const dto = toApiProduct(
+      {
+        id: '7',
+        attributes: {
+          name: 'סדנה',
+          desc: '<p class="x">שלוש <strong>שעות</strong></p><img src=x onerror=alert(1)><script>alert(1)</script>'
+        }
+      },
+      RIKMA_REF
+    )!;
+    expect(dto.descriptionHtml).toBe('<p>שלוש <strong>שעות</strong></p>');
+    expect(dto.descriptionText).toBe('שלוש שעות');
   });
 });

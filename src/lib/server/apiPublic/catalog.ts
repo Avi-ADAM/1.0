@@ -256,8 +256,8 @@ export async function fetchVisibleProductCount(
  *
  * The rows are re-checked in JS (`canSeeStatus`), exactly like the list: the
  * GraphQL filter is the first line, and a category counted from a row the
- * filter should have dropped would tell an anonymous visitor that a hidden
- * product exists — the number is the leak, not the product.
+ * filter should have dropped would tell an anonymous visitor that a draft
+ * exists — the number is the leak, not the product.
  */
 export async function fetchCategories(
   run: ApiRun,

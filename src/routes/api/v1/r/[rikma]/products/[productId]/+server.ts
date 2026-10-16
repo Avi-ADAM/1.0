@@ -9,7 +9,6 @@ import {
 } from '$lib/server/apiPublic/http.js';
 import { resolveRikmaFromPath } from '$lib/server/apiPublic/rikmaPath.js';
 import { projectFields, canSeeStatus } from '$lib/server/apiPublic/dto.js';
-import { readRikmaExposure } from '$lib/server/apiPublic/exposure.js';
 import {
   fetchProduct,
   fetchRikmaRef,
@@ -24,8 +23,8 @@ import { isHiddenProject } from '$lib/server/discovery/hiddenProjects.js';
  * Two refusals are deliberate and different (§5.0):
  *   - a product that exists but belongs to **another** rikma is a `404`, never
  *     a 403: whether that id exists elsewhere is not this rikma's business;
- *   - a product this caller may not *see* (a draft to an anonymous reader, a
- *     hidden one before `exposeToApi`) is also a `404`, for the same reason —
+ *   - a product this caller may not *see* (a draft or an archived product to
+ *     an anonymous reader) is also a `404`, for the same reason —
  *     the id's existence is not public knowledge.
  *
  * The product id is validated before it reaches the resolver, because the
@@ -75,13 +74,7 @@ export const GET: RequestHandler = async ({ params, url, request, fetch }) => {
     return errorResponse(404, 'RIKMA_NOT_FOUND', 'No such rikma');
   }
 
-  const access =
-    auth.kind === 'anonymous'
-      ? {
-          ...auth.access,
-          exposed: await readRikmaExposure(resolved.projectId, run)
-        }
-      : auth.access;
+  const { access } = auth;
 
   // `?fields=` is honoured on the detail route too: a client that renders a
   // card should not pay for the description it will not show.

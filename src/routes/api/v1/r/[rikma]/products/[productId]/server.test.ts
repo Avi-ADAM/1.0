@@ -24,8 +24,6 @@ vi.mock('$lib/server/apiKeys.js', () => ({
 
 const { GET } = await import('./+server');
 const { clearQueryCache } = await import('$lib/server/apiPublic/cache.js');
-const { resetExposureCache } =
-  await import('$lib/server/apiPublic/exposure.js');
 const { resetRateLimits } = await import('$lib/server/apiPublic/http.js');
 
 const RIKMA_ROW = {
@@ -40,7 +38,7 @@ const PRODUCT = {
     desc: '<p>שלוש שעות</p>',
     price: 320,
     quant: 6,
-    appruved: true,
+    status_of_voting: 'active',
     lifecycle: 'active',
     updatedAt: '2026-10-14T08:12:00.000Z'
   }
@@ -63,12 +61,6 @@ function fakeStrapi(rows: any[] = [PRODUCT]) {
         };
       case 'rikmaProjectByFormerSlug':
         return { data: { projects: { data: [] } } };
-      case 'rikmaApiExposure':
-        throw {
-          getMessages: () => [
-            'Cannot query field "exposeToApi" on type "Project"'
-          ]
-        };
       case 'rikmaApiRef':
         return {
           data: {
@@ -102,7 +94,6 @@ beforeEach(() => {
   mocks.execute.mockReset();
   mocks.verifyApiKeyDetailed.mockReset();
   clearQueryCache();
-  resetExposureCache();
   resetRateLimits();
   mocks.execute.mockImplementation(fakeStrapi());
 });
@@ -135,18 +126,32 @@ describe('GET /api/v1/r/{rikma}/products/{productId}', () => {
   it('answers 404 for a product this caller may not see', async () => {
     mocks.execute.mockImplementation(
       fakeStrapi([
-        { id: '1900', attributes: { name: 'טיוטה', appruved: false } }
+        { id: '1900', attributes: { name: 'טיוטה', status_of_voting: 'voting' } }
       ])
     );
     expect((await call('/api/v1/r/haohel/products/1900')).status).toBe(404);
   });
 
-  it('shows that same product to a key that may read its rikma', async () => {
+  it('shows a product hidden from /gift to anyone — its page is public (§4.3)', async () => {
+    mocks.execute.mockImplementation(
+      fakeStrapi([
+        {
+          id: '1901',
+          attributes: { name: 'מוסתר', status_of_voting: 'active', hideFromDiscovery: true }
+        }
+      ])
+    );
+    const response = await call('/api/v1/r/haohel/products/1901');
+    expect(response.status).toBe(200);
+    expect((await response.json()).data.status).toBe('published');
+  });
+
+  it('shows an archived product to a key that asks for its rikma', async () => {
     mocks.execute.mockImplementation(
       fakeStrapi([
         {
           id: '1900',
-          attributes: { name: 'מוסתר', appruved: true, hideFromDiscovery: true }
+          attributes: { name: 'בארכיון', status_of_voting: 'active', lifecycle: 'released' }
         }
       ])
     );
@@ -164,7 +169,7 @@ describe('GET /api/v1/r/{rikma}/products/{productId}', () => {
       Authorization: 'Bearer 1lev1_x'
     });
     expect(response.status).toBe(200);
-    expect((await response.json()).data.status).toBe('hidden');
+    expect((await response.json()).data.status).toBe('archived');
   });
 
   it('refuses a product id that is not one, before asking Strapi anything', async () => {

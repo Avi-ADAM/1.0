@@ -10,7 +10,6 @@ import {
 } from '$lib/server/apiPublic/http.js';
 import { resolveRikmaFromPath } from '$lib/server/apiPublic/rikmaPath.js';
 import { defaultListStatuses } from '$lib/server/apiPublic/dto.js';
-import { readRikmaExposure } from '$lib/server/apiPublic/exposure.js';
 import {
   buildRikmaBody,
   fetchRikmaProfile,
@@ -66,13 +65,7 @@ export const GET: RequestHandler = async ({ params, url, request, fetch }) => {
     return errorResponse(404, 'RIKMA_NOT_FOUND', 'No such rikma');
   }
 
-  const access =
-    auth.kind === 'anonymous'
-      ? {
-          ...auth.access,
-          exposed: await readRikmaExposure(resolved.projectId, run)
-        }
-      : auth.access;
+  const { access } = auth;
 
   let attrs: Record<string, any> | null = null;
   let productsCount: number | null = null;

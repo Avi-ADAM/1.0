@@ -5,7 +5,7 @@
  * and the refusals — the parts that only exist once the pieces are wired
  * together: a bad key never falls back to public, the path decides the tenant,
  * a foreign rikma is a 403 for a key but a 404 for the anonymous surface, a
- * hidden product cannot ride out on a filter mistake, and the second request
+ * draft cannot ride out on a filter mistake, and the second request
  * with the same `If-None-Match` costs nothing.
  */
 
@@ -30,15 +30,18 @@ vi.mock('$lib/server/apiKeys.js', () => ({
 
 const { GET } = await import('./+server');
 const { clearQueryCache } = await import('$lib/server/apiPublic/cache.js');
-const { resetExposureCache } =
-  await import('$lib/server/apiPublic/exposure.js');
 const { resetRateLimits } = await import('$lib/server/apiPublic/http.js');
 
 // ─── the fake Strapi ────────────────────────────────────────────────────────
 
 const RIKMA = { id: '57', slug: 'haohel' };
 
-/** A published product, and one hidden by `hideFromDiscovery`. */
+/**
+ * A published product; one hidden from `/gift` only (`hideFromDiscovery`),
+ * which the rikma's own page — and so its shop — still lists; and a product
+ * still in its vote (`status_of_voting: 'voting'`), which is a draft.
+ * `appruved` is false on purpose: Strapi's default, which nothing flips.
+ */
 const PUBLISHED = {
   id: '1842',
   attributes: {
@@ -48,7 +51,8 @@ const PUBLISHED = {
     quant: 6,
     kindOf: 'total',
     origin: 'project',
-    appruved: true,
+    appruved: false,
+    status_of_voting: 'active',
     archived: false,
     lifecycle: 'active',
     hideFromDiscovery: false,
@@ -57,15 +61,25 @@ const PUBLISHED = {
   }
 };
 
-const HIDDEN = {
+const HIDDEN_FROM_GIFT = {
   id: '1900',
   attributes: {
-    name: 'מתנה סודית',
+    name: 'מתנה לחברים',
     price: 50,
     quant: 1,
-    appruved: true,
+    status_of_voting: 'active',
     hideFromDiscovery: true,
     updatedAt: '2026-10-15T08:12:00.000Z'
+  }
+};
+
+const VOTING = {
+  id: '1950',
+  attributes: {
+    name: 'מוצר בהצבעה',
+    price: 70,
+    status_of_voting: 'voting',
+    updatedAt: '2026-10-15T09:12:00.000Z'
   }
 };
 
@@ -98,20 +112,12 @@ function fakeStrapi(
           vars.token.trim() === 'old-haohel' ? PROJECT_ROWS['57'] : null;
         return { data: { projects: { data: hit ? [hit] : [] } } };
       }
-      case 'rikmaApiExposure':
-        // Until 1.0b adds `Project.exposeToApi`, this is exactly what Strapi
-        // answers — and the api must treat it as "not exposed", not as an error.
-        throw {
-          getMessages: () => [
-            'Cannot query field "exposeToApi" on type "Project"'
-          ]
-        };
       case 'rikmaApiRef': {
         const hit = (opts.projects ?? PROJECT_ROWS)[String(vars.pid)];
         return { data: { project: hit ? { data: hit } : null } };
       }
       case 'rikmaApiProducts': {
-        const rows = opts.rows ?? [PUBLISHED, HIDDEN];
+        const rows = opts.rows ?? [PUBLISHED, HIDDEN_FROM_GIFT, VOTING];
         return {
           data: {
             matanots: {
@@ -178,7 +184,6 @@ beforeEach(() => {
   mocks.verifyApiKeyDetailed.mockReset();
   mocks.touchLastUsed.mockReset();
   clearQueryCache();
-  resetExposureCache();
   resetRateLimits();
   mocks.execute.mockImplementation(fakeStrapi());
 });
@@ -196,7 +201,7 @@ describe('GET /api/v1/r/{rikma}/products — anonymous', () => {
       slug: 'haohel',
       canonicalPath: '/api/v1/r/haohel'
     });
-    expect(body.data).toHaveLength(1);
+    expect(body.data).toHaveLength(2);
     expect(body.data[0]).toMatchObject({
       id: '1842',
       name: 'סדנת בישול ל-8',
@@ -206,7 +211,7 @@ describe('GET /api/v1/r/{rikma}/products — anonymous', () => {
     expect(body.meta.pagination).toEqual({
       page: 1,
       limit: 20,
-      total: 2,
+      total: 3,
       pages: 1
     });
     expect(body.links.self).toBe('/api/v1/r/haohel/products');
@@ -216,15 +221,35 @@ describe('GET /api/v1/r/{rikma}/products — anonymous', () => {
     expect(response.headers.get('X-1lev1-Api-Version')).toBeTruthy();
   });
 
-  it('never lists a hidden product while the rikma has not opted in (§6.2)', async () => {
+  it('lists a product hidden from /gift — the rikma page shows it too (§4.3)', async () => {
     const body = await (await call('/api/v1/r/haohel/products')).json();
-    expect(JSON.stringify(body)).not.toContain('מתנה סודית');
+    expect(body.data.map((p: any) => [p.id, p.status])).toEqual([
+      ['1842', 'published'],
+      ['1900', 'published']
+    ]);
+    expect(body.data[1]).not.toHaveProperty('hideFromDiscovery');
+  });
+
+  it('never lists a product still in its vote to an anonymous caller (§6.2)', async () => {
+    const body = await (await call('/api/v1/r/haohel/products')).json();
+    expect(JSON.stringify(body)).not.toContain('מוצר בהצבעה');
+  });
+
+  it('asks Strapi by status_of_voting, never by appruved', async () => {
+    await call('/api/v1/r/haohel/products');
+    const [, vars] = mocks.execute.mock.calls.find(
+      ([qid]: [string]) => qid === 'rikmaApiProducts'
+    )!;
+    const filters = JSON.stringify(vars.filters);
+    expect(filters).toContain('status_of_voting');
+    expect(filters).not.toContain('appruved');
+    expect(filters).not.toContain('hideFromDiscovery');
   });
 
   it('drops a row the filter should have excluded — the second line of defence', async () => {
     // A filter that is subtly wrong on a NULL column must become an empty slot,
     // not a leak: the projector's derived status is re-checked in JS.
-    mocks.execute.mockImplementation(fakeStrapi({ rows: [PUBLISHED, HIDDEN] }));
+    mocks.execute.mockImplementation(fakeStrapi({ rows: [PUBLISHED, VOTING] }));
     const body = await (
       await call('/api/v1/r/haohel/products?limit=50')
     ).json();
@@ -328,18 +353,19 @@ describe('a key is verified, never assumed', () => {
     expect((await response.json()).error.code).toBe('RIKMA_MISMATCH');
   });
 
-  it('shows a key its own rikma’s hidden products, and marks them hidden', async () => {
+  it('shows a products:read key the published catalog, still without drafts', async () => {
     mocks.verifyApiKeyDetailed.mockResolvedValue(key(['products:read']));
-    const body = await (
-      await call('/api/v1/r/haohel/products', {
-        Authorization: 'Bearer 1lev1_x'
-      })
-    ).json();
+    const response = await call('/api/v1/r/haohel/products', {
+      Authorization: 'Bearer 1lev1_x'
+    });
+    const body = await response.json();
     expect(body.data.map((p: any) => [p.id, p.status])).toEqual([
       ['1842', 'published'],
-      ['1900', 'hidden']
+      ['1900', 'published']
     ]);
-    expect(body.data[1]).not.toHaveProperty('hideFromDiscovery');
+    // A keyed answer is never cacheable by a shared cache (§4.5).
+    expect(response.headers.get('Cache-Control')).toMatch(/^private/);
+    expect(response.headers.get('Vary')).toContain('Authorization');
   });
 
   it('keeps drafts for the draft scope', async () => {
@@ -360,7 +386,7 @@ describe('a key is verified, never assumed', () => {
             id: '1901',
             attributes: {
               name: 'טיוטה',
-              appruved: false,
+              status_of_voting: 'voting',
               updatedAt: '2026-10-16T00:00:00.000Z'
             }
           }

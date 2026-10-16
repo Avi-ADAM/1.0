@@ -40,7 +40,7 @@
 
   "catalogTitle": "El catálogo de la rikma",
   "catalogSubtitle": "Los productos de la rikma están en su propia dirección: no hace falta arrastrar un parámetro rikma aparte.",
-  "catalogHint": "Sin clave solo recibes productos publicados e incluidos en el catálogo. Una clave con products:read añade productos ocultos, y products:read:draft añade borradores. Envía la clave solo desde tu servidor.",
+  "catalogHint": "Sin clave recibes todos los productos publicados de la rikma — los mismos que muestra su página pública, incluidos los ocultos del directorio de productos de la plataforma. Una clave con products:read añade más cuota y fields/updatedSince, y products:read:draft añade borradores. Envía la clave solo desde tu servidor.",
   "codeTitle": "El código",
   "createKeyFirst": "Crea una clave para que el código se genere con la clave real y no con un marcador.",
   "mission": "Vincular a una misión",

@@ -11,9 +11,9 @@ import {
 } from './query.js';
 import type { ApiAccess } from './dto.js';
 
-const anon: ApiAccess = { level: 'anonymous', exposed: false };
-const keyed: ApiAccess = { level: 'key', exposed: false };
-const drafted: ApiAccess = { level: 'draft', exposed: false };
+const anon: ApiAccess = { level: 'anonymous' };
+const keyed: ApiAccess = { level: 'key' };
+const drafted: ApiAccess = { level: 'draft' };
 
 const parse = (qs: string, access: ApiAccess = anon) =>
   parseCatalogQuery(new URLSearchParams(qs), access);
@@ -79,16 +79,17 @@ describe('status and draft need the right caller (§5.5)', () => {
   it('lets an anonymous caller ask for the public view only', () => {
     expect(ok('status=published').statuses).toEqual(['published']);
     expect(fail('status=draft').status).toBe(403);
-    expect(fail('status=hidden').status).toBe(403);
+    // `hidden` is no longer a status (§12 #2): an unknown value, so a 400.
+    expect(fail('status=hidden').status).toBe(400);
     expect(fail('status=archived').status).toBe(403);
     expect(fail('draft=true').status).toBe(403);
   });
 
-  it('lets a products:read key ask for published or hidden, not drafts', () => {
-    expect(ok('status=hidden', keyed).statuses).toEqual(['hidden']);
-    expect(ok('status=published,hidden', keyed).statuses).toEqual([
+  it('lets a products:read key ask for published or archived, not drafts', () => {
+    expect(ok('status=archived', keyed).statuses).toEqual(['archived']);
+    expect(ok('status=published,archived', keyed).statuses).toEqual([
       'published',
-      'hidden'
+      'archived'
     ]);
     expect(fail('status=draft', keyed).status).toBe(403);
     expect(fail('draft=true', keyed).code).toBe('SCOPE_MISSING');
@@ -97,7 +98,7 @@ describe('status and draft need the right caller (§5.5)', () => {
   it('lets a products:read:draft key see drafts', () => {
     expect(ok('status=draft', drafted).statuses).toEqual(['draft']);
     expect(ok('draft=true', drafted).statuses).toContain('draft');
-    expect(ok('', drafted).statuses).toEqual(['published', 'hidden', 'draft']);
+    expect(ok('', drafted).statuses).toEqual(['published', 'draft']);
   });
 
   it('never lists archived products by default, but can be asked for them', () => {
@@ -197,7 +198,8 @@ describe('buildCatalogFilters — tenant + visibility, composed once', () => {
       query.callerFilters
     ) as any;
     expect(filters.and[0]).toEqual({ projectcreates: { id: { eq: '57' } } });
-    expect(JSON.stringify(filters.and[1])).toContain('appruved');
+    expect(JSON.stringify(filters.and[1])).toContain('status_of_voting');
+    expect(JSON.stringify(filters.and[1])).not.toContain('appruved');
     expect(filters.and.length).toBe(4);
   });
 

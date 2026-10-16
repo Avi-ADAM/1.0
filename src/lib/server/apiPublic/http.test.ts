@@ -162,7 +162,7 @@ describe('assertTenant — two independent sources (§5.1)', () => {
         {
           kind: 'key',
           projectId: '57',
-          access: { level: 'key', exposed: false }
+          access: { level: 'key' }
         },
         '57'
       )
@@ -174,7 +174,7 @@ describe('assertTenant — two independent sources (§5.1)', () => {
       {
         kind: 'key',
         projectId: '57',
-        access: { level: 'key', exposed: false }
+        access: { level: 'key' }
       },
       '58'
     );
@@ -185,7 +185,7 @@ describe('assertTenant — two independent sources (§5.1)', () => {
   it('has nothing to check for an anonymous caller — the path is the tenant', () => {
     expect(
       assertTenant(
-        { kind: 'anonymous', access: { level: 'anonymous', exposed: false } },
+        { kind: 'anonymous', access: { level: 'anonymous' } },
         '57'
       )
     ).toBeNull();
@@ -231,12 +231,12 @@ describe('clientIpOf', () => {
 describe('respond — one shape for every read route', () => {
   const anon = {
     kind: 'anonymous' as const,
-    access: { level: 'anonymous' as const, exposed: false }
+    access: { level: 'anonymous' as const }
   };
   const keyedAuth = {
     kind: 'key' as const,
     projectId: '57',
-    access: { level: 'key' as const, exposed: false }
+    access: { level: 'key' as const }
   };
 
   it('stamps the version and the cache contract the caller earned', () => {

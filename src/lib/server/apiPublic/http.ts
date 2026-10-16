@@ -201,7 +201,7 @@ export async function authenticateRead(
       kind: 'ok',
       auth: {
         kind: 'anonymous',
-        access: { level: 'anonymous', exposed: false },
+        access: { level: 'anonymous' },
         quota: {
           limit: ANON_RATE_LIMIT,
           remaining: rate.remaining,
@@ -289,7 +289,7 @@ export async function authenticateRead(
       kind: 'key',
       key,
       projectId: String(key.project.id),
-      access: { level: hasDraft ? 'draft' : 'key', exposed: false },
+      access: { level: hasDraft ? 'draft' : 'key' },
       quota: {
         limit: KEY_RATE_LIMIT,
         remaining: rate.remaining,
