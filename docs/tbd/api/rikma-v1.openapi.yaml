@@ -31,6 +31,15 @@
 #     hideFromDiscovery, appruved, status_of_voting, formerSlugs.
 #   • פתרון הכתובת זהה לזה של הדף: slugFromPath (301 על איות), findBySlug
 #     (301 על שם קודם), 404 אחרת. אותו קוד — לא שכפול.
+#     ⚠ 301 רק ב-GET. POST (sales/tasks/orders) לעולם לא מופנה — איות שונה או
+#     שם קודם של רקמת המפתח מוגשים כרגיל + X-1lev1-Rikma-Canonical.
+#   • עם מפתח: הנתיב מושווה לזהות רקמת המפתח (id/slug/formerSlugs) *לפני*
+#     חיפוש; אי-התאמה או רקמה לא קיימת ⇒ 403 RIKMA_MISMATCH. מפתח ברמת משתמש
+#     (בלי רקמה) ⇒ 403 KEY_NOT_RIKMA_SCOPED. אנונימי לרקמה לא קיימת ⇒ 404.
+#   • Cache-Control: public רק לבקשה אנונימית; עם מפתח ⇒ private, no-cache.
+#     תמיד Vary: Authorization, Origin.
+#   • חנות = דף הרקמה (כולל hideFromDiscovery); שוק = /gift (בלי). אין exposeToApi.
+#   • יומן התיקונים: PLAN_HEADLESS_PRODUCTS_API.md §12.
 #
 # ── לשמור על מודעות (§11 במסמך) ────────────────────────────────────────────
 #   1. המחיר אינו סופי: pricingMode=quote ⇒ price=null; מוצר מורכב מתומחר לפי
@@ -164,13 +173,19 @@ paths:
             Cache-Control:
               schema: { type: string }
               example: public, s-maxage=60, stale-while-revalidate=300
+              description: |
+                `public, s-maxage=60, stale-while-revalidate=300` לבקשה אנונימית בלבד.
+                בקשה עם מפתח ⇒ `private, no-cache` (יכולה לכלול טיוטות).
+            Vary:
+              schema: { type: string }
+              example: Authorization, Origin
             ETag:
               schema: { type: string }
             X-1lev1-Api-Version:
               schema: { type: string }
             X-1lev1-Rikma-Canonical:
               schema: { type: string }
-              description: קיים רק אחרי 301 (איות שונה או שם קודם)
+              description: קיים כשהנתיב אינו הכתובת הקנונית (אחרי 301 ב-GET, או בהגשה ישירה ב-POST)
             RateLimit-Remaining:
               schema: { type: integer }
           content:
@@ -406,6 +421,8 @@ paths:
       description: |
         עדשה משנית. כאן `rikma` הוא **פילטר** (בתוצאה תמיד), כי האוסף על-רקמתי.
         אין לבנות על זה חנות של רקמה — לכך יש `/api/v1/r/{rikma}/products`.
+        ההבדל בתוכן: כאן מוחרגים מוצרים עם `hideFromDiscovery` (כמו `/gift`);
+        בחנות הם מופיעים (כמו דף הרקמה).
       parameters:
         - $ref: '#/components/parameters/RikmaFilter'
         - $ref: '#/components/parameters/Limit'
@@ -527,7 +544,9 @@ components:
       bearerFormat: 1lev1_api_key
       description: |
         מפתח `1lev1_...` עם scope `products:read` (ואופציונלית `products:read:draft`).
-        המפתח מקובע לרקמה: פנייה לרקמה אחרת ⇒ 403, גם אם בעליו חבר בשתיהן.
+        המפתח מקובע לרקמה: פנייה לרקמה אחרת ⇒ 403 `RIKMA_MISMATCH`, גם אם בעליו חבר בשתיהן.
+        מפתח ברמת משתמש (בלי רקמה — מפתח פרופיל/MCP/OAuth) ⇒ 403 `KEY_NOT_RIKMA_SCOPED`,
+        גם ב-GET שעובד אנונימית. `/api/v1/me` מקבל אותו ומחזיר `rikma: null`.
 
   parameters:
     Rikma:
@@ -536,7 +555,10 @@ components:
       required: true
       description: |
         slug או מזהה. slug מעדיף: הוא יציב (slug קודם לא משתחרר, `formerSlugs`) ונקרא.
-        איות שונה ⇒ 301 לגרסה המנורמלת; שם קודם ⇒ 301 לנוכחי.
+        GET: איות שונה ⇒ 301 לגרסה המנורמלת; שם קודם ⇒ 301 לנוכחי.
+        POST: אין הפניה — איות שונה/שם קודם של רקמת המפתח מוגשים כרגיל,
+        עם `X-1lev1-Rikma-Canonical`. עם מפתח, נתיב שאינו של רקמת המפתח
+        (או רקמה שלא קיימת) ⇒ 403 `RIKMA_MISMATCH` לפני כל חיפוש.
       schema: { type: string }
       examples:
         slug: { value: haohel }
@@ -570,7 +592,7 @@ components:
     Status:
       name: status
       in: query
-      schema: { type: string, enum: [published, hidden, draft, archived] }
+      schema: { type: string, enum: [published, draft, archived] }
       description: דורש מפתח; `draft` דורש scope `products:read:draft`
     UpdatedSince: { name: updatedSince, in: query, schema: { type: string, format: date-time } }
     Draft: { name: draft, in: query, schema: { type: boolean }, description: דורש scope `products:read:draft` }
@@ -597,7 +619,7 @@ components:
         application/json:
           schema: { $ref: '#/components/schemas/Error' }
     Forbidden:
-      description: scope חסר / Origin חסום / הרקמה בנתיב אינה הרקמה של המפתח
+      description: scope חסר / Origin חסום / הרקמה בנתיב אינה הרקמה של המפתח (RIKMA_MISMATCH) / מפתח ברמת משתמש (KEY_NOT_RIKMA_SCOPED)
       content:
         application/json:
           schema: { $ref: '#/components/schemas/Error' }
@@ -687,13 +709,15 @@ components:
       enum: [total, daily, monthly, yearly, unlimited]
     Status:
       type: string
-      enum: [draft, published, hidden, archived]
+      enum: [draft, published, archived]
       description: |
-        נגזר (בלי שינוי סכמה):
-        draft     = !appruved
-        published = appruved && !archived && lifecycle=active
-        hidden    = published && hideFromDiscovery
-        archived  = archived || lifecycle=archived
+        נגזר (בלי שינוי סכמה), עם מגיני NULL של מורשת. `appruved` אינו משתתף —
+        איש לא מדליק אותו (ראה המסמך §4.3, §12 #1).
+        archived  = archived=true || lifecycle in (archived, released) || status_of_voting=archived
+        draft     = !archived && status_of_voting in (draft, voting)
+        published = כל השאר: status_of_voting in (active, NULL) && lifecycle in (NULL, active, archiveProposed)
+        hideFromDiscovery אינו status: החנות מחזירה מוצרים כאלה (כמו דף הרקמה),
+        ו-/discover מחריג אותם (כמו /gift).
     Availability:
       type: object
       properties:
@@ -741,7 +765,14 @@ components:
       properties:
         id: { type: string }
         name: { type: string }
-        descriptionHtml: { type: string, nullable: true }
+        descriptionHtml:
+          type: string
+          nullable: true
+          description: |
+            נבנה בשרת מה-rich text (JSON) ע"י serializer עם whitelist תגיות
+            (p, br, strong, em, ul, ol, li, h2–h4, blockquote, a) ו-`href` בלבד
+            (http/https/mailto). אין HTML גולמי, `style`, `on*` או `javascript:`.
+            עדיין תוכן משתמש — `descriptionText` הוא ברירת המחדל המומלצת.
         descriptionText: { type: string, nullable: true }
         status: { $ref: '#/components/schemas/Status' }
         price:
@@ -834,6 +865,6 @@ components:
           properties:
             code:
               type: string
-              enum: [BAD_REQUEST, UNAUTHORIZED, SCOPE_MISSING, ORIGIN_NOT_ALLOWED, RIKMA_MISMATCH, NOT_FOUND, RATE_LIMITED, UPSTREAM_ERROR]
+              enum: [BAD_REQUEST, UNAUTHORIZED, SCOPE_MISSING, ORIGIN_NOT_ALLOWED, RIKMA_MISMATCH, KEY_NOT_RIKMA_SCOPED, NOT_FOUND, RATE_LIMITED, UPSTREAM_ERROR]
             message: { type: string }
             details: { type: object, additionalProperties: true }

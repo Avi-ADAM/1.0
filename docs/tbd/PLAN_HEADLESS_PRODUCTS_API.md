@@ -18,6 +18,12 @@
 > `quote`, צריכה בפועל) ומכירה מייצרת עבודה לחברי הרקמה — מתועדים ב-**§11**
 > כנספח מודעות בלבד. הם **אינם** דורשים דבר ב-Phase 0/1, אבל אסור לחוזה
 > להבטיח ללקוח הבטחות שהמודל עוד לא נותן.
+>
+> **סבב תיקונים 2026-10-16 (אחרי סקירה מול הקוד):** תשעה תיקונים — מיפוי
+> `status`, משמעות `hideFromDiscovery` (ובעקבותיו הסרת `exposeToApi`), מטמון
+> למפתחות, הפניות על כתיבה, מפתחות ברמת משתמש, תרגום, qids, HTML וסתירות
+> נתיבים. **סוכן שממשיך מכאן — קרא קודם את §12**: הוא אומר מה השתנה, למה,
+> ואילו הנחות קודמות במסמך כבר אינן תקפות.
 
 ---
 
@@ -42,7 +48,7 @@ endpoint שקריאה לו מחזירה קטלוג מוצרים. אתר של ר�
 |---|---|---|
 | 1 | `GET /api/v1/r/{rikma}/products` (+`/{id}`, קטגוריות, פרופיל רקמה, חיפוש, סינון, מיון, פאג'ינציה, `locale`, `fields`) | בלי זה אין headless. היום `/gift` שולף 200 מוצרים ומסנן **בדפדפן** |
 | 2 | scope לקריאה (`products:read`) + מפתחות פר-אתר (test/live, פקיעה, רוטציה) | הפאנל מוציא מפתחות ל-tasks ול-sales בלבד |
-| 3 | חוזה "פרסום": `status` אחד מוסכם + `?draft=` + תצוגה מקדימה מוחתמת | מוצר יכול להיות `appruved` אבל `hideFromDiscovery`, או `archived` אבל לא — ומפתח API לא יודע להבדיל |
+| 3 | חוזה "פרסום": `status` אחד מוסכם + `?draft=` + תצוגה מקדימה מוחתמת | המצב מפוזר על `status_of_voting`, `lifecycle`, `archived` ו-`hideFromDiscovery` (ו-`appruved` שאיש לא מדליק — §4.3), עם NULL-ים של מורשת — ומפתח API לא יודע להבדיל |
 | 4 | Webhooks למוצרים ולמכירות (`product.published`, `product.updated`, `sale.created`…) | אתר הלקוח לא יכול לבנות מחדש / לרענן cache כשמוצר משתנה |
 | 5 | חוזה caching ו-CDN (`Cache-Control`, `ETag`, `s-maxage`, purge) | חנות עם תנועה תפיל את Strapi — היום כל בקשה היא שאילתה |
 | 6 | תיעוד למפתחים: OpenAPI + דף `/docs/api` + SDK/Zod-types + סביבת בדיקה | יש snippets חכמים בפאנל, אבל אין חוזה מכונה שאיש חיצוני יכול לבנות מולו |
@@ -65,6 +71,8 @@ GET /api/v1/r/{rikma}/products      ← כך נראית החנות של רקמה
 `products:read` + `GET /api/v1/r/{rikma}/products` ו-`/api/v1/r/{rikma}/products/{id}`
 + projector ל-DTO ציבורי + `Cache-Control`/`ETag` + checkbox בפאנל המפתחות הקיים
 + snippet וסעיף תיעוד. **אין צורך בשינוי סכמה ב-Strapi למסלול הזה** — כל השדות קיימים.
+(זה נכון רק משום שאין `exposeToApi` — §4.3/§12. `expiresAt` ו-test/live של
+מפתחות **הם** שינוי סכמה ב-`1.0b`, ולכן הם מחוץ למסלול הקצר.)
 באותו חלון גם מיישרים את `sales`/`tasks` לכתובת הרקמה (§5.8) — כי הצרכנים
 בשליטתנו עכשיו, ולא תהיה הזדמנות זולה יותר.
 
@@ -114,6 +122,10 @@ GET /api/v1/r/{rikma}/products      ← כך נראית החנות של רקמה
   `archived` \| `released`), `status_of_voting` (`draft` \| `voting` \| `active` \| `archived`),
   `publishedAt` (הדגל של Strapi), `archiveEffectiveFrom`, `archive_decisions`,
   `decision`, `matanotpend`, `ratson*`, `timegrama`.
+  **בפועל:** היצירה קובעת רק `status_of_voting` (`'active'`, או `'voting'`
+  למוצר מורכב ברקמה מרובת חברים — `createComplexMatanot.ts:277`;
+  `createPersonalMatanot` ⇒ `'active'`). `appruved` נכתב רק ב-`approveMatanot`,
+  שאין לו אף קורא ב-UI — כלומר ברוב השורות הוא NULL. ראה §4.3.
 
 ### 2.2 ניהול מוצרים במוח
 
@@ -123,8 +135,8 @@ GET /api/v1/r/{rikma}/products      ← כך נראית החנות של רקמה
 | יצירת מוצר מורכב (מתכון) | `products/ComposeProduct.svelte` (904 שורות) + `MissionPickerList`/`ResourcePickerList` | בורר משימות/משאבים/חברים/תבניות |
 | יצירת מוצר אישי | `createPersonalMatanot`, `publishUserResourceAsProduct`, `offerings/CreateProductFlow.svelte` | שכבות "פרסום אישי / עסקה רקמתית" |
 | מסך המוצרים והמכירות | `(reg)/moach/[projectId]/sales` → `prPr/hamatanot.svelte` (1461 שורות) | רשימת מוצרים, כפתור discovery, רישום מכירה (`sell` → `createSale`), ייצוא CSV, גרפים |
-| אישור מוצר (MVP) | action `approveMatanot` | חבר רקמה בלבד; מהפך `status_of_voting='active'` + `appruved=true` |
-| הסתרה/discovery | action `setMatanotDiscovery` | toggle יחיד |
+| אישור מוצר (MVP) | action `approveMatanot` | חבר רקמה בלבד; מהפך `status_of_voting='active'` + `appruved=true`. **רשום ב-registry אך אין לו קורא ב-UI** — לכן `appruved` אינו אות אמין |
+| הסתרה/discovery | action `setMatanotDiscovery` | toggle יחיד. מוציא את המוצר **רק מספריית `/gift`** — הוא נשאר גלוי ב-`/gift/[id]`, בדף הרקמה ובזרימות המכירה (ההערה מעל qid `282discoverProducts`) |
 | עריכת מוצר **אחרי** יצירתו | action `proposeObjectEdit` (`targetKind:'matanot'`) | דרך Decision עם הצבעות ו-`restime` |
 | ארכוב מוצר | `proposeObjectArchive` + `archive/targets.ts` (`'matanot'` ב-`TARGET_KINDS`) | כולל ארכוב מתוזמן דרך `timegrama` |
 
@@ -282,9 +294,14 @@ sparse fieldsets ובחירת locale.
 - **פתרון הכתובת ב-route** לפי `(regandnon)/r/[slug]/+page.server.js` — בדיוק
   אותם כללים: `slugFromPath` (301 על איות שונה), `findBySlug` שמחזיר גם
   `former`, ו-404. אותו קוד, ולכן אי אפשר שדף ואותו API ייפתרו לשתי רקמות.
-- qids חדשים ב-`routes/api/send/qids.js` **append-only** (הקונבנציה):
-  `rikmaApiProducts`, `rikmaApiProduct`, `rikmaApiCategories`, `rikmaApiChanges`
-  (`npm run validate:qids`).
+- qids חדשים ב-`routes/api/send/qids.js` **append-only**, לפי הקונבנציה
+  **המספרית** (`<המספר הפנוי הבא><camelName>`, כמו `282discoverProducts`) —
+  למשל `3xxRikmaApiProducts`, `3xxRikmaApiProduct`, `3xxRikmaApiCategories`,
+  `3xxRikmaApiChanges`; המספר נקבע בזמן המימוש (`npm run validate:qids`).
+- **כל qid חדש מקבל שורה ב-`routes/api/send/qidsAccess.js`** (למשל
+  `{ allow: ['serviceAdmin'] }` — ה-route קורא בשם השירות, לא בשם הגולש).
+  `AUTHZ_MODE` הוא `enforce` כברירת מחדל, כך ש-qid בלי שורה ייחסם. להריץ גם
+  `npm run check:proxy`.
 - **Projector ציבורי** ב-`src/lib/server/apiPublic/` — להרחיב את התבנית של
   `discovery/normalizeCards.ts` ל-DTO מלא (ראה §5.3). זה המקום היחיד שקובע
   מה יוצא — לא ה-GraphQL.
@@ -317,25 +334,66 @@ sparse fieldsets ובחירת locale.
 תחילית/רקמת בדיקה, או דגל על הרשומה), ומכסה מדווחת. **אומדן:** 2–3 ימים
 (UI+שרת), בהנחה שסכמת `api-key` כבר נושאת `scopes` (היא נושאת).
 
+> **פיצול לפי שינוי סכמה:** הוספת `products:read` ל-`ALL_SCOPES` ול-
+> `GRANTABLE_SCOPES` היא **בלי** שינוי סכמה (scopes הוא JSON) ⇒ Phase 1.
+> `expiresAt` ו-test/live הם שדות חדשים בסכמת `api-key` ב-`1.0b` ⇒ Phase 2,
+> לא חוסמים את המסלול הקצר.
+>
+> **מפתחות ברמת משתמש קיימים.** `/api/api-keys` מפיק מפתח **בלי** `projectId`
+> כשהבקשה לא נושאת אחד (`userPr/editBasic.svelte`), ויש גם מפתחות MCP/OAuth.
+> אלה אינם מפתחות רקמה, ו-sales כבר דוחה אותם (`403 'API key is not scoped to
+> a rikma'`). הכלל ל-API הרקמה — §5.1.
+
 #### 4.3 חוזה "פרסום" אחד + preview
 
 **מה חסר:** מושג `status` מוסכם ל-DTO, פילטר `?status=`, `?draft=true` עם מפתח
 מורשה, ותצוגה מקדימה מוחתמת (טוקן קצר-חיים) שאפשר לשלוח למעצב או ללקוח.
 
-**ראיה:** חמישה דגלים מפוזרים — `appruved`, `status_of_voting`,
-`lifecycle`, `archived`, `hideFromDiscovery` — ונאכפים במקומות שונים
-(`NOT_ARCHIVED` ב-qids, `archived` ב-loader, `approveMatanot` ל-MVP).
+**ראיה:** הדגלים מפוזרים — `status_of_voting`, `lifecycle`, `archived`,
+`hideFromDiscovery`, ו-`appruved` — ונאכפים במקומות שונים (`NOT_ARCHIVED`
+ב-qids, `archived` ב-loader). **`appruved` אינו אות אמין:** רק `approveMatanot`
+כותב אותו, ואין לו קורא ב-UI; היצירה קובעת `status_of_voting` בלבד (§2.1).
 
-**מה לבנות (זול — בלי שינוי סכמה):** מיפוי נגזר ומתועד ב-projector:
-`draft` (לא `appruved`) / `published` (appruved ∧ לא archived ∧ lifecycle=active) /
-`hidden` (`hideFromDiscovery` — מפורסם אך לא בספריות) / `archived`.
+**מה לבנות (זול — בלי שינוי סכמה):** מיפוי נגזר ומתועד ב-projector, עם מגיני
+NULL של מורשת בכל ענף:
+
+| `status` ב-DTO | התנאי (על השורה ב-Strapi) |
+|---|---|
+| `archived` | `archived = true` **או** `lifecycle ∈ {'archived','released'}` **או** `status_of_voting = 'archived'` |
+| `draft` | לא archived, ו-`status_of_voting ∈ {'draft','voting'}` |
+| `published` | כל השאר: `status_of_voting ∈ {'active', NULL}` ו-`lifecycle ∈ {NULL,'active','archiveProposed'}` |
+
+- `lifecycle = NULL` הוא מורשת = `active` (CLAUDE.md) — פילטר תמיד
+  `or: [{lifecycle:{null:true}}, {lifecycle:{notIn:["archived","released"]}}]`,
+  אף פעם לא `ne`/`notIn` לבד. (`released` הוא מצב סופי — כך גם
+  `archive/membership.ts` `LIVE` ו-`dormancyClock.ts`; ה-`NOT_ARCHIVED` של qid 282
+  מחריג רק `archived`, והפער הזה לא מועתק ל-API.)
+- `archived = NULL` = לא בארכיון (אותו מגן כמו ב-qid 282).
+- `archiveProposed` נשאר **published**: הצעת הסרה פתוחה אינה הסרה, ו"שתיקה היא
+  הסכמה" עוד לא הבשילה.
+- **`appruved` אינו משתתף במיפוי.** אם בעתיד `approveMatanot` יחובר לזרימה, הוא
+  כבר כותב גם `status_of_voting='active'` — כלומר המיפוי לא ישתנה.
+- **`hideFromDiscovery` אינו status** — ראה להלן.
+
 פילטר `?status=` למפתחות; `?draft=true` דורש scope; preview = JWT קצר
 (`productId`,`rikmaId`,`exp`) שנבדק בכל בקשת מוצר בודד.
 **אומדן:** 3–5 ימים.
 
-> ⚠️ **נקודת בטיחות קריטית:** אסור ש"פתחנו API" יהפוך רטרואקטיבית מוצרים
-> שהוסתרו (`hideFromDiscovery`) לפומביים. המלצה: דגל מפורש `exposeToApi`
-> (ברירת מחדל **false** לשורות קיימות) + מסך "מה מפורסם ל-API" ברקמה. ראה §6.
+> ⚠️ **`hideFromDiscovery` — מה הוא באמת אומר (תוקן, §12):** הדגל מוציא מוצר
+> **רק מספריית `/gift`**. לפי ההערה מעל qid `282discoverProducts`, מוצר מוסתר
+> *"stays reachable everywhere else: /gift/[id], the project page and the sales
+> flows"* — כלומר הוא כבר פומבי היום, ב-HTML, בדף הרקמה.
+>
+> מכאן הכלל לשתי העדשות:
+> - **חנות** (`/api/v1/r/{rikma}/products`) — מחזירה מוצרים מוסתרים, בדיוק כמו
+>   דף הרקמה `/r/<slug>`. ה-JSON חושף את מה שה-HTML כבר חושף, לא יותר.
+> - **שוק** (`/api/v1/discover/products`) — מחריג אותם, בדיוק כמו `/gift`.
+>
+> לכן **אין `exposeToApi`** (הוצע בגרסה הקודמת ובוטל): הוא היה שינוי סכמה
+> שסותר את "אין שינוי סכמה במסלול הקצר", ועם ברירת מחדל `false` ה-API היה
+> חוזר ריק ביום ההשקה — בלי להגן על שום דבר שאינו פומבי כבר. אם יתברר שרקמות
+> משתמשות ב-`hideFromDiscovery` כ"לחברים בלבד" (ההערה ב-qid מזכירה מקרה כזה),
+> הפתרון הוא דגל פרטיות אמיתי שחל **גם על דף הרקמה** — החלטה נפרדת, §9.11.
 
 #### 4.4 Webhooks למוצרים ולמכירות
 
@@ -360,9 +418,23 @@ payload אחיד `{event, deliveryId, occurredAt, rikmaId, data:<DTO ציבור�
 ציבוריות; `/gift` הוא SSR בלי חוזה מטמון. הצרכן (Next/Astro/Vercel) ירצה
 `revalidateTag` — כלומר **תלוי ב-4.4**.
 
-**מה לבנות:** `public, s-maxage=60, stale-while-revalidate=300` על GET,
-`ETag = hash(id+updatedAt+locale)`, `304` על `If-None-Match`, מטמון-על בשרת,
-ותיעוד "איך מרעננים": webhook → purge/revalidate אצל הלקוח.
+**מה לבנות:**
+
+| סוג הבקשה | `Cache-Control` | למה |
+|---|---|---|
+| **אנונימית** (בלי `Authorization`) | `public, s-maxage=60, stale-while-revalidate=300` | אותו תוכן לכל גולש — בדיוק מה שדף הרקמה מציג |
+| **עם מפתח** (כל scope) | `private, no-cache` (מותר `ETag`/`304`) | תשובה עם מפתח יכולה לכלול טיוטות (`products:read:draft`), `fields`, `updatedSince` — אסור ש-CDN ישמור אותה ויגיש לגולש אנונימי |
+
+- תמיד `Vary: Authorization`; וכשה-CORS משקף Origin לפי `allowedOrigins` של
+  המפתח — גם `Vary: Origin`. בלי זה CDN עלול להגיש תשובה של מפתח אחד לאחר.
+- `ETag` למוצר בודד = `hash(id+updatedAt+locale)`; **לרשימה** =
+  `hash(rikmaId + query מנורמל + max(updatedAt) + total + locale)`.
+  `304` על `If-None-Match`.
+- **מטמון-על בשרת** ממופתח לפי `(rikmaId, query מנורמל, locale, מעמד-הקורא)`,
+  כאשר מעמד-הקורא ∈ `anon` / `key` / `key+draft`. **אף פעם** לא לחלוק רשומה בין
+  `key+draft` לאנונימי.
+- תיעוד "איך מרעננים": webhook → purge/revalidate אצל הלקוח.
+
 **אומדן:** 2–3 ימים.
 
 #### 4.6 תיעוד וחוזה מכונה למפתחים
@@ -410,6 +482,18 @@ changelog, Zod/TS types ל-DTO, וסביבת בדיקה (key + דאטה לדוג
   היום `formats` של Strapi ו-`picUrlOf` שמעדיף `small`. 3–5 ימים.
 - **`?locale=` ב-API:** לחבר ל-cache התרגום הקיים (`translation/store.ts`)
   ולהחזיר `{value, translated:true|false, sourceLocale}`. 2–4 ימים.
+  זה **משטח תרגום חדש**, ולפי CLAUDE.md (T3) הוא לא גמור כשה-route קורא מה-cache:
+  - `SurfaceKey` חדש (למשל `rikmaApiProducts`) + ערך ב-`TRANSLATE_SURFACES`;
+  - **שורה ב-`src/lib/server/translation/backfillSources.ts`** — בלעדיה אף אחד
+    לא ימלא את ה-cache, ויש בדיקה שנכשלת על `SurfaceKey` בלי walker;
+  - ה-walker חייב לגבב **בדיוק** את המחרוזת שה-API מחזיר (אותו flatten, אותו
+    קיצור) — הכי בטוח: walker ו-projector קוראים לאותה פונקציה. עדיף שזו תהיה
+    הפונקציה של דף הרקמה, כדי ששני המשטחים יחלקו שורות cache;
+  - `translated` נגזר **רק** מ-`isRealTranslation` (`src/lib/translation/hits.js`).
+    שורת `identity` (שפת המקור = שפת הקורא) היא hit אבל **לא** תרגום —
+    `!!hit.text` הוא הבאג.
+  - שים לב: היום `/gift/[id]` עדיין אינו משטח (`backfillSources.ts:196`, "the
+    product page is not a surface yet"), כך שתיאור מלא של מוצר בודד לא ממולא בשום מקום.
 - **היסטוריה/שחזור:** `GET /api/v1/r/{rikma}/products/{id}/history` מהצעות השינוי
   הקיימות (`archive/*`) — בלי סכמה חדשה; שחזור אמיתי ידרוש טבלת versions. 7–10 ימים.
 - **חיפוש ופאסטות:** `q` + facets על קטגוריה/מחיר/רקמה/מרחק (יש lat/lng/radius). 3–5 ימים.
@@ -470,10 +554,11 @@ Job מתוזמן ל"פרסום מתוזמן", import מוצרים (CSV/JSON), "�
 
 | מצב | התשובה | לפי |
 |---|---|---|
-| slug עם איות שונה (`/r/Bees`) | `301` ל-`/r/bees` | `(regandnon)/r/[slug]/+page.server.js` |
-| slug **קודם** של רקמה | `301` לכתובת הנוכחית + `X-1lev1-Rikma-Canonical` | `findBySlug` → `former` |
-| slug זר, ומפתח מקובע לרקמה אחרת | `403` (לא 404) — ה-tenant נאכף לפני החיפוש | §5.1 |
-| מפתח מקובע לרקמה 57, בקשה ל-`/r/other` | `403` | §5.1 |
+| **GET**, slug עם איות שונה (`/r/Bees`) | `301` ל-`/r/bees` | `(regandnon)/r/[slug]/+page.server.js` |
+| **GET**, slug **קודם** של רקמה | `301` לכתובת הנוכחית + `X-1lev1-Rikma-Canonical` | `findBySlug` → `former` |
+| **POST** (sales/tasks/orders), איות שונה או slug קודם **של רקמת המפתח** | **לא מפנים** — מגישים כרגיל, ומחזירים `X-1lev1-Rikma-Canonical` + `Link: <…>; rel="canonical"` | `301`/`302` הופכים POST ל-GET בדפדפנים וב-fetch, והגוף אובד. ה-tenant כבר ודאי מהמפתח, אז אין עמימות |
+| בקשה **עם מפתח**, והנתיב אינו אחד מהשמות של רקמת המפתח (id / slug / `formerSlugs`) | `403 RIKMA_MISMATCH` — **לפני** כל חיפוש של הנתיב, ולכן גם כשהרקמה בנתיב לא קיימת | כך התשובה לא מגלה אם רקמה קיימת. ההשוואה היא מול הזהות של רקמת המפתח (`readIdentity(key.project.id)`), לא מול `findBySlug(path)` |
+| בקשה **אנונימית** לרקמה שלא קיימת | `404` | הדף |
 | מוצר שקיים אבל לא שייך לרקמה בנתיב | `404` | §5.3 |
 | רקמה בלי slug | עובד דרך המזהה | `rikmaPath` |
 
@@ -481,16 +566,26 @@ Job מתוזמן ל"פרסום מתוזמן", import מוצרים (CSV/JSON), "�
 
 | Consumer | אימות | scope | הערות |
 |---|---|---|---|
-| אתר לקוח (ציבורי) | ללא | — | רק מוצרים `published`; DTO ציבורי; rate limit לפי IP; הרקמה מגיעה תמיד מהנתיב |
+| אתר לקוח (ציבורי) | ללא | — | רק מוצרים `published` (כולל `hideFromDiscovery` — כמו דף הרקמה, §4.3); DTO ציבורי; rate limit לפי IP; הרקמה מגיעה תמיד מהנתיב |
 | אתר לקוח (מורחב) | `Authorization: Bearer 1lev1_...` | `products:read` | quota גבוה, `updatedSince`, `fields`, bulk; הנתיב **חייב** להיות הרקמה של המפתח |
-| אתר לקוח (טיוטות) | אותו מפתח | `products:read:draft` | רואה `draft` + `hidden` |
+| אתר לקוח (טיוטות) | אותו מפתח | `products:read:draft` | רואה גם `draft` (`status_of_voting ∈ {draft, voting}`); תשובה `private` בלבד (§4.5) |
 | אינטגרציית מכירות | מפתח | `sales:report` | כמו היום |
 | סוכן/אוטומציה | MCP / key | `tasks:*` | כמו היום |
 
 **כלל ה-tenant (שני מקורות בלתי-תלויים):** `projectId` נגזר מהמפתח (כמו
 ב-sales/tasks) **וגם** מהנתיב. מפתח של רקמה שפונה לרקמה אחרת ⇒ `403` —
-גם אם המשתמש חבר בשתי הרקמות. מפתח ללא רקמה לא קיים בפועל: ה-UI מפיק מפתחות
-רק מתוך מוח של רקמה, ולכן "מפתח גלובלי" אינו מקרה שקיים.
+גם אם המשתמש חבר בשתי הרקמות.
+
+**מפתח ברמת משתמש (בלי רקמה) — כן קיים, והכלל מפורש (תוקן, §12):**
+`/api/api-keys` מפיק מפתח בלי `projectId` מדף הפרופיל (`userPr/editBasic.svelte`),
+ויש גם מפתחות MCP ו-OAuth. בכל `/api/v1/r/{rikma}/…`:
+- מפתח כזה ⇒ `403 KEY_NOT_RIKMA_SCOPED` עם הודעה מפורשת ("הוצא מפתח ברמת רקמה
+  במוח") — **גם** ב-GET שהיה עובד אנונימית. מי ששולח מפתח מצהיר על זהות; להוריד
+  אותו בשקט לאנונימי מסתיר באג אצל הלקוח (הוא יחשוב שיש לו quota וטיוטות).
+- אותו כלל כבר קיים ב-`sales/+server.ts` (`'API key is not scoped to a rikma'`) —
+  כאן הוא רק מוכלל ומקבל קוד שגיאה.
+- `GET /api/v1/me` **כן** מקבל מפתח משתמש ומחזיר `rikma:null` — כדי שהסוכן יבין
+  לבד למה הוא מקבל 403.
 
 **מוצר אישי (`origin:'personal'`) אינו חריג לכלל.** לפי PLAN_USER_OFFERINGS,
 מוצר של ספק יחיד מתארח על **רקמת הבית** שלו (רקמה רגילה לגמרי, שנוצרת בהסכמה
@@ -552,7 +647,7 @@ GET  /api/v1/r/{rikma}/tasks/{externalId}   ← היה /api/v1/tasks/{externalId
 
 | יוצא ל-API | נשאר פנימי (חובה) |
 |---|---|
-| `id`, `name`, `descriptionHtml`, `descriptionText`, `status` | `marginPct`, `estimatedPrice`, `maxsaleyear*`/`minsaleyear*` |
+| `id`, `name`, `descriptionHtml` (מחוטא — ראה להלן), `descriptionText`, `status` (`draft`\|`published`\|`archived`) | `marginPct`, `estimatedPrice`, `maxsaleyear*`/`minsaleyear*` |
 | `price`, `currency`, `pricingMode` (quote ⇒ `price:null`) | `entryCurrency`/`entryRate` (חישוב פנימי) |
 | `availability: {unlimited|quantity}` | **המתכון** `matanot_recipe_*` (שעות/תעריפים/חברים משויכים = עלות) |
 | `categories[]`, `images[] {url,width,height,alt}` | `tosplits`, `holderStatus`, `sale`/`sales` מצרפי, `monter` |
@@ -567,6 +662,19 @@ GET  /api/v1/r/{rikma}/tasks/{externalId}   ← היה /api/v1/tasks/{externalId
 >
 > `rikma.look` יוצא רק ב-`GET /api/v1/r/{rikma}` (פרופיל הרקמה), ולא בכל שורה
 > ברשימה — הוא זהה לכל השורות ומייקר את ה-payload.
+
+> **`descriptionHtml` — HTML שאנחנו מייצרים, לא שאנחנו מעבירים (תוקן, §12).**
+> `desc` הוא rich text ב-JSON. אתרי הלקוחות יעשו לו `innerHTML` /
+> `dangerouslySetInnerHTML`, ולכן כל מה שיוצא הוא משטח XSS אצלם:
+> - ה-HTML נבנה ע"י **serializer שלנו** מתוך ה-JSON, עם whitelist של תגיות
+>   (`p, br, strong, em, ul, ol, li, h2–h4, blockquote, a`) ו-whitelist של
+>   מאפיינים (`href` בלבד, `http(s):`/`mailto:` בלבד, ומוסיפים
+>   `rel="noopener nofollow ugc"`). אין העברה של HTML גולמי, אין `style`, אין
+>   `on*`, אין `javascript:`.
+> - בדיקת יחידה עם payload-ים זדוניים ידועים (תגית `script`, `img onerror`,
+>   `javascript:` ב-href) שחייבים לצאת נקיים.
+> - `descriptionText` (טקסט שטוח) הוא ברירת המחדל בתיעוד; ה-HTML מתועד כ"מחוטא
+>   אצלנו, אבל התייחס אליו כתוכן משתמש".
 
 ### 5.4 דוגמת תשובה — `GET /api/v1/r/haohel/products`
 
@@ -608,10 +716,12 @@ GET  /api/v1/r/{rikma}/tasks/{externalId}   ← היה /api/v1/tasks/{externalId
 הרקמה מופיעה **פעם אחת, בראש התשובה** — לא בכל שורה. `seller` נשאר פר-שורה,
 כי ברקמה עם מוכרים אישיים הוא באמת שונה משורה לשורה.
 
-כותרות בתשובה:
+כותרות בתשובה (לבקשה **אנונימית**; בקשה עם מפתח מקבלת
+`Cache-Control: private, no-cache` — §4.5):
 
 ```
 Cache-Control: public, s-maxage=60, stale-while-revalidate=300
+Vary: Authorization, Origin
 ETag: W/"rikma-57-6f3a…"
 X-1lev1-Api-Version: 2026-10-16
 X-1lev1-Rikma-Canonical: /api/v1/r/haohel        # רק כשהייתה הפניה/שם קודם
@@ -623,7 +733,8 @@ RateLimit-Remaining: 597
 
 כל הפרמטרים כאן משמשים לסינון *בתוך* הקטלוג של הרקמה שבנתיב. אין ביניהם
 `rikma` — הרקמה היא המשאב, לא פילטר (§5.0). ל-`/api/v1/discover/products`
-אותו סט **ועוד** `rikma` — שם הוא באמת פילטר, כי האוסף הוא על-רקמתי.
+אותו סט **ועוד** `rikma` — שם הוא באמת פילטר, כי האוסף הוא על-רקמתי. (וגם
+ההבדל היחיד בתוכן: `discover` מחריג `hideFromDiscovery`, החנות לא — §4.3.)
 
 | פרמטר | דוגמה | הערה |
 |---|---|---|
@@ -639,7 +750,7 @@ RateLimit-Remaining: 597
 | `locale`, `fallbackLocale` | `?locale=en` | דרך שכבת התרגום |
 | `fields` | `?fields=id,name,price,currency` | sparse fieldset |
 | `expand` | `?expand=categories` | ברירת מחדל: שטוח |
-| `status`, `updatedSince` | `?status=published&updatedSince=2026-10-01T00:00:00Z` | דורש מפתח |
+| `status`, `updatedSince` | `?status=published&updatedSince=2026-10-01T00:00:00Z` | דורש מפתח; `status` ∈ `published`\|`draft`\|`archived` (`draft` דורש `products:read:draft`) |
 | `draft` | `?draft=true` | דורש `products:read:draft` |
 
 ### 5.6 שגיאות (אחיד, כמו sales/tasks)
@@ -648,7 +759,8 @@ RateLimit-Remaining: 597
 { "error": { "code": "SCOPE_MISSING", "message": "API key is missing the \"products:read\" scope", "details": {} } }
 ```
 
-`400` ולידציה · `401` מפתח חסר/פגום · `403` scope/Origin/**רקמה לא תואמת** ·
+`400` ולידציה · `401` מפתח חסר/פגום · `403` scope/Origin/**רקמה לא תואמת**
+(`RIKMA_MISMATCH`)/**מפתח ברמת משתמש** (`KEY_NOT_RIKMA_SCOPED`) ·
 `404` מוצר לא נמצא או לא של הרקמה שבנתיב · `409` התנגשות `externalId`
 (ב-`orders` בלבד) · `429` + `Retry-After` · `5xx` כשל Strapi
 (עם `X-1lev1-Trace` לדיבוג).
@@ -710,7 +822,7 @@ SDK, ו-OAuth/MCP שמעגנים שני מודלים במקביל. כל שבוע
 |---|---|---|
 | 1 | **מיצוי handler משותף** | `src/lib/server/apiPublic/` — להוציא את הלוגיקה מ-`routes/api/v1/sales/+server.ts` ו-`routes/api/v1/tasks/*` למודולי handler (ולידציה + build + execute). **אפס שינוי התנהגות** — ואז כל נתיב, ישן וחדש, הוא 3–5 שורות wrapper סביב אותו handler. אסור שיהיו שני מימושים |
 | 2 | **הנתיבים החדשים** | `routes/api/v1/r/[rikma]/sales/+server.ts`, `.../tasks/+server.ts`, `.../tasks/[externalId]/+server.ts` |
-| 3 | **שני מקורות ל-tenant** | `resolveRikmaFromPath()` (Phase 0) מול `key.project` ⇒ שווים, אחרת `403`. מפתח בלי project ⇒ `403` עם הודעה מפורשת ("הוצא מפתח ברמת רקמה במוח") |
+| 3 | **שני מקורות ל-tenant** | הנתיב מושווה לזהות של `key.project` (id / slug / `formerSlugs`) ⇒ תואם, אחרת `403 RIKMA_MISMATCH` — **לפני** חיפוש הנתיב ולפני פענוח ה-payload. מפתח בלי project ⇒ `403 KEY_NOT_RIKMA_SCOPED` עם הודעה מפורשת ("הוצא מפתח ברמת רקמה במוח"). **אין הפניה (301) על POST**: איות שונה או slug קודם של רקמת המפתח מוגשים כרגיל עם `X-1lev1-Rikma-Canonical` (§5.0) |
 | 4 | **ה-snippets וה-prompts — הצעד החשוב ביותר** | `prPr/SalesApiIntegration.svelte` (שם יש היום `/api/v1/sales` בשלושה מקומות, כולל פרומפט הסוכן) ו-`prPr/api/RikmaApiPanel.svelte` (`/api/v1/tasks` בשלושה מקומות) — מעדכנים **מיד** ל-URL החדש, עם ה-slug האמיתי של הרקמה. זה המשטח שממנו נולדות כל האינטגרציות: בלי זה כל לקוח חדש ייטמע מפתח בכתובת שתיסגר |
 | 5 | **alias של מורשת** | הנתיבים הישנים נשארים כ-wrapper דק שמריץ את **אותו** handler, ומחזיר בכל תשובה `Deprecation: true`, `Sunset: <תאריך>`, `Link: </api/v1/r/{slug}/sales>; rel="successor-version"`, ורושם לוג `[api-legacy]` עם מפתח+רקמה+IP. **לא 301/308** — POST לא בהכרח מלווה redirect, וה-wrapper צריך להגיש בפועל |
 | 6 | **העברת הצרכנים** | רשימה קצרה (אינטגרציות שלנו). לכל אחד: diff של שורה + אימות בסביבה. אחרי ההעברה — לאמת אפס תעבורה ב-`[api-legacy]` למשך שבוע |
@@ -725,8 +837,11 @@ SDK, ו-OAuth/MCP שמעגנים שני מודלים במקביל. כל שבוע
 - **זהות מלאה בין הנתיבים**: אותו payload ⇒ אותם params בדיוק ל-`actionService`
   (assert על ה-params, לא על התשובה) — זה מה שמונע סטייה עתידית בין הישן לחדש.
 - alias מחזיר את כותרות ההתיישנות; אחרי הסגירה — `410` + `Link`.
-- `403` על אי-התאמת רקמה (גם כשהמפתח תקף), `403` על מפתח בלי project.
-- `404` על רקמה לא קיימת **לפני** כל פענוח payload.
+- `403 RIKMA_MISMATCH` על אי-התאמת רקמה (גם כשהמפתח תקף), **וגם** כשהרקמה
+  בנתיב לא קיימת כלל — לפני כל פענוח payload (בלי אורקל קיום).
+- `403 KEY_NOT_RIKMA_SCOPED` על מפתח בלי project.
+- POST לאיות שונה / slug קודם של רקמת המפתח ⇒ `201` (לא `301`) +
+  `X-1lev1-Rikma-Canonical`; המכירה נרשמת פעם אחת.
 - אין qid כפול, אין ולידציה כפולה, ואין ענף קוד שמטפל בישן בנפרד.
 
 **העדכון הדוקומנטרי הנלווה:** `PLAN_EXTERNAL_SALES_API` ו-`PLAN_EXTERNAL_TASKS_API`
@@ -741,9 +856,16 @@ SDK, ו-OAuth/MCP שמעגנים שני מודלים במקביל. כל שבוע
    הרקמה (שעות × תעריף, `stepCapacity`, `costShape`, `assignedMember`) —
    חשיפה שלו = חשיפת הרווח. גם `marginPct`/`estimatedPrice`/`maxsaleyear*`.
    ⇒ whitelist projector + בדיקת snapshot על ה-DTO (test שנכשל כששדה חדש נכנס).
-2. **"מוסתר מדיסקברי" ≠ "מותר ל-API".** `hideFromDiscovery` הוא דגל תצוגה.
-   פתיחת API חייבת **opt-in מפורש** (`exposeToApi`) + מסך "מה מפורסם", אחרת
-   אנחנו מפרסמים בשקט מוצרים שאנשים הסתירו.
+2. **ה-API לא יחשוף יותר ממה שה-HTML כבר חושף (תוקן, §12).** הכלל: עדשת
+   החנות = דף הרקמה, עדשת השוק = `/gift`. `hideFromDiscovery` מוציא רק מהספרייה
+   (מוצר מוסתר גלוי היום ב-`/gift/[id]` ובדף הרקמה), ולכן החנות מחזירה אותו
+   והשוק לא. **טיוטות** (`status_of_voting ∈ {draft, voting}`) לא יוצאות בלי
+   `products:read:draft`, ואז רק בתשובה `private`. בדיקת חוזה: לכל רקמה בבדיקה,
+   קבוצת ה-ids בחנות האנונימית == קבוצת המוצרים שדף הרקמה מציג.
+   (ההצעה הקודמת, `exposeToApi`, בוטלה — §4.3.)
+2א. **מטמון שמדליף טיוטות.** תשובה עם מפתח לעולם אינה `public` (§4.5), ומטמון
+   השרת לא חולק רשומות בין אנונימי למפתח-טיוטות.
+2ב. **XSS אצל הלקוח.** `descriptionHtml` נבנה ע"י serializer עם whitelist (§5.3).
 3. **מוצר אישי = אדם.** ב-`Seller` אסור לחשוף מייל/טלפון/מיקום מדויק מעבר
    למה ש-`/gift` מציג היום. וגם: `/api/v1/r/{homeRikma}/products` של רקמת-בית
    אישית חושף את **כל** המוצרים האישיים של אותו אדם — מותר (זו החנות שלו),
@@ -784,8 +906,11 @@ SDK, ו-OAuth/MCP שמעגנים שני מודלים במקביל. כל שבוע
 - [ ] `apiPublic/` — projector ציבורי + בדיקת whitelist (שלא נשפך `marginPct`/מתכון).
 - [ ] `resolveRikmaFromPath()` — פונקציה אחת שמאחדת את היגיון `(regandnon)/r/[slug]`
       (איות, `former`, 404) לשימוש גם ב-route של ה-API. **לא לשכפל.**
-- [ ] qids חדשים (append-only) + `npm run validate:qids`.
-- [ ] מיפוי `status` נגזר + `exposeToApi` (ברירת מחדל false).
+- [ ] qids חדשים (append-only, קידומת מספרית) + שורה לכל אחד ב-`qidsAccess.js`
+      + `npm run validate:qids` + `npm run check:proxy`.
+- [ ] מיפוי `status` נגזר מ-`status_of_voting`/`lifecycle`/`archived` עם מגיני NULL
+      (§4.3) — **לא** מ-`appruved`. בדיקת יחידה לכל שורה בטבלה, כולל NULL-ים.
+- [ ] serializer מחוטא ל-`descriptionHtml` + בדיקות payload זדוני (§5.3).
 - [ ] החלטות §9 סגורות.
 
 ### Phase 1 — API קריאה, רקמה-תחילה (שבוע–שבועיים, `1.0`)
@@ -794,9 +919,14 @@ SDK, ו-OAuth/MCP שמעגנים שני מודלים במקביל. כל שבוע
 - [ ] אכיפת tenant כפולה: מפתח ↔ נתיב ⇒ `403`; מוצר מחוץ לרקמה ⇒ `404`.
 - [ ] scope `products:read` + checkbox בפאנל + snippet שמציג את **הכתובת של
       הרקמה הזו** (אין placeholder של `rikma`).
-- [ ] caching: `Cache-Control`/`ETag`/מטמון-על; rate limit לפי IP למפתח-less.
-- [ ] בדיקות: 301 על איות/שם קודם, 403 על רקמה אחרת, 404 על מוצר זר,
-      404 על רקמה בלי slug ועם מזהה, whitelist, 304.
+- [ ] caching: `public` לאנונימי בלבד, `private, no-cache` לכל בקשה עם מפתח,
+      `Vary: Authorization, Origin`, `ETag`/מטמון-על לפי מעמד-קורא (§4.5);
+      rate limit לפי IP למפתח-less.
+- [ ] בדיקות: 301 על איות/שם קודם (GET), 403 על רקמה אחרת **ועל רקמה לא קיימת
+      עם מפתח**, 403 על מפתח ברמת משתמש, 404 על מוצר זר, 404 אנונימי על רקמה
+      לא קיימת, עבודה דרך מזהה לרקמה בלי slug, whitelist, 304, **מוצר עם
+      `hideFromDiscovery` מופיע בחנות ולא ב-discover**, **מוצר `voting` לא מופיע
+      בלי scope טיוטות**, **תשובה עם מפתח אינה `public`**.
 - [ ] **אין שינוי סכמה ב-`1.0b`** — זו הסיבה שזה השלב הראשון.
 
 ### Phase 1b — נדידת sales/tasks לכתובת הרקמה (§5.8)
@@ -816,11 +946,13 @@ SDK, ו-OAuth/MCP שמעגנים שני מודלים במקביל. כל שבוע
 - [ ] webhooks `product.*`/`sale.*` — ה-delivery target כבר פר-רקמה
       (`invalidateWebhookTargets(projectId)`), ולכן ה-payload נושא `rikma` ראשון.
 - [ ] delivery-log + "שלח שוב" בפאנל.
+- [ ] `expiresAt` + test/live למפתחות (שינוי סכמה ב-`1.0b`, §4.2).
 - [ ] דף `/docs/api` מ-OpenAPI + SDK דק + collection.
 - [ ] `updatedSince`/`changes` + `?draft` + preview token.
 
 ### Phase 3 — עומק קטלוג (2–4 שבועות, כולל `1.0b`)
-- [ ] `attributes` (סכמה מבוקרת פר-רקמה) + `availability` מחושב + `?locale=`.
+- [ ] `attributes` (סכמה מבוקרת פר-רקמה) + `availability` מחושב + `?locale=`
+      (כולל `SurfaceKey`, שורה ב-`backfillSources.ts`, `isRealTranslation` — §4.10).
 - [ ] `externalKey` לכתובת מוצר ידידותית (§9.10) — אופציונלי, לא חוסם.
 - [ ] מדיה: גדלים מפורשים + CDN + גלריה.
 - [ ] היסטוריית מוצר מ-Decisions; ואם צריך — טבלת versions + שחזור.
@@ -843,16 +975,17 @@ SDK, ו-OAuth/MCP שמעגנים שני מודלים במקביל. כל שבוע
 | 9.1 | API ציבורי לגמרי או מפתח לכולם? | **היברידי**: GET ציבורי ל-`/api/v1/r/{rikma}/products` עבור מוצרים `published` (כמו `/gift` היום, אחרת אין חנות אנונימית) עם rate limit לפי IP; מפתח ל-quota גבוה, `?fields`, `updatedSince`, `draft`, טיוטות וכל מה שאינו ציבורי |
 | 9.2 | האם לאפשר כתיבה ב-API? | **לא CRUD.** כתיבה = `proposeObjectEdit` (הצעה) או מוצר **אישי** בבעלות בעל המפתח בלבד. אחרת ההסכמה נעקפת |
 | 9.3 | וריאנטים? | להתחיל ב-`attributes` + `availability`; variants מלאים רק כשיש לקוח שדורש |
-| 9.4 | הזמנות? | לא סליקה. כן `POST /api/v1/orders` → `createSheirutpend` (עם `externalId`), אם יש ביקוש; אחרת להסתפק ב-`buyUrl` + `/api/v1/sales` |
+| 9.4 | הזמנות? | לא סליקה. כן `POST /api/v1/r/{rikma}/orders` → `createSheirutpend` (עם `externalId`), אם יש ביקוש; אחרת להסתפק ב-`buyUrl` + `/api/v1/r/{rikma}/sales` |
 | 9.5 | סמנטיקת locale | `?locale=` על בסיס מטמון התרגום הקיים + Strapi `localizations`; להחזיר `translated:true\|false` לכל מחרוזת, לא להתחזות לתרגום שאין |
 | 9.6 | מטבע בתשובה | להחזיר `price`+`currency` כמקור, ואופציונלית `converted {amount, currency, rate, asOf}` מ-`/api/fx`; לא להסתיר את המקור |
 | 9.7 | האם לחשוף מוצרים אישיים? | כן, באותו endpoint, עם `seller.type='person'` ורמה זהה למה ש-`/gift/[id]` חושף |
 | 9.8 | האם לחשוף את המתכון (BOM) כתוכן שיווקי? | לא אוטומטית. אם רקמה תרצה — שדה `includes` נפרד ורשות-פרסום, לא המתכון עם העלויות |
 | 9.9 | מי הבעלים של ה-contract? | OpenAPI כמקור אמת, נבדק ב-CI מול ה-projector; שינוי DTO ⇒ bump ל-`X-1lev1-Api-Version` |
 | 9.10 | איך נראית כתובת מוצר בודד? | היום רק מזהה מספרי (`/r/haohel/products/1842`). מזהה עובד אבל לא קריא ולא מוכן ל-SEO. **המלצה:** לא לגעת בשדה `name`/במערכת הכתובות של הרקמה; להוסיף `externalKey` אופציונלי שנבחר ע"י הרקמה (באותו אופן שבו נבחר slug לרקמה) ולחשוף `/r/{rikma}/products/{idOrKey}`. שינוי כתובת של מוצר **קיים** הוא שינוי במוצר ⇒ עובר בהסכמה (`proposeObjectEdit`), לא "שמור" |
-| 9.11 | מי רשאי לשנות את `exposeToApi` של רקמה? | לא טוגל אישי של מי שיצר את המוצר אלא **הגדרת רקמה** שנקבעת בהסכמה (Decision), כמו כתובת ומראה. פרטיות של מוצר בודד נשארת ב-`hideFromDiscovery` |
+| 9.11 | ~~מי רשאי לשנות את `exposeToApi`?~~ → **האם צריך מוצר "לחברים בלבד"?** (שונה, §12) | `exposeToApi` בוטל: ה-API מחזיר בדיוק מה שדף הרקמה מחזיר, ו-`hideFromDiscovery` מוציא רק מהשוק. אם יתברר שרקמות צריכות מוצר שלא יופיע **בשום** משטח ציבורי — זה דגל פרטיות חדש שחל על דף הרקמה, `/gift/[id]` וה-API יחד, לא דגל API נפרד. לא חוסם MVP |
 | 9.12 | **האם לשבור את `/api/v1/sales` ו-`/api/v1/tasks`?** | **כן — עכשיו.** יש שליטה מלאה במעט הצרכנים, כך שהמעבר הוא תחזוקה ולא אירוע חיצוני. **רק ה-URL משתנה**; payload/התנהגות זהים. alias עם `Deprecation`/`Sunset` ל-90 יום ⇒ `410 Gone`. הדחייה היחידה שמתקבלת היא "עד סוף Phase 1" — לא מעבר לזה, כי כל שבוע מוסיף snippets ותיעוד שנכתבים על הכתובת הישנה (§5.8) |
 | 9.13 | האם לסגור את `/api/v1/actions`? | **כן, יחד עם §5.8** — אחרי ש-`tasks` עומדת בפני עצמה אין לה תפקיד, ו-MCP מכסה סוכנים. יש לאמת אפס שימוש אמיתי לפני הסגירה |
+| 9.14 | מה קורה למפתח ברמת משתמש (בלי רקמה) ב-`/api/v1/r/{rikma}/…`? (נוסף, §12) | **`403 KEY_NOT_RIKMA_SCOPED`**, גם ב-GET שעובד אנונימית — מפתח שנשלח הוא הצהרת זהות, ולהוריד אותו בשקט לאנונימי מסתיר באג. `GET /api/v1/me` מקבל אותו ומחזיר `rikma:null` |
 
 ---
 
@@ -934,7 +1067,7 @@ SDK, ו-OAuth/MCP שמעגנים שני מודלים במקביל. כל שבוע
 | "משימה למשלוחן" | שורת מתכון של **משימה** ⇒ `Mesimabetahalich` + `Act` אישי לחבר שאחראי |
 | "הבקשה אושרה" ללקוח ולספקים | `notification` על `createSheirutFromPending` (`specificUsers`, מתוך `recipientIds`) |
 
-מכאן, למשמעות מול API: **`POST /api/v1/sales` (וגם "הזמנה" עתידית) איננו
+מכאן, למשמעות מול API: **`POST /api/v1/r/{rikma}/sales` (וגם "הזמנה" עתידית) איננו
 "רישום מכירה" — הוא טריגר לביצוע.** מי שמדווח מכירה מבחוץ צריך לדעת שמשהו
 מתחיל לקרות בתוך הרקמה, ומי שבונה סנכרון צריך להאזין לכך:
 
@@ -951,3 +1084,43 @@ SDK, ו-OAuth/MCP שמעגנים שני מודלים במקביל. כל שבוע
 זה לא חוסר — זו הסיבה ש-1lev1 לא זקוקה למנוע של חנות גנרי, ואין להכפיף את
 המודל לדרישות של אחד (§7). המודעות הזו היא בדיוק מה שמונע מאיתנו לכתוב חוזה
 שאומר "מחיר סופי" ומגלה אחר כך שהוא לא.
+
+---
+
+## 12. יומן תיקונים — מה שונה אחרי הסקירה מול הקוד (2026-10-16)
+
+> **לסוכן שממשיך מכאן:** הטבלה הזו היא המקור לשאלה "מה תקף". כל שורה אומרת
+> מה המסמך טען קודם, מה נכון בקוד (עם ראיה), ומה השתנה ואיפה. אם גרסה קודמת
+> של המסמך, טיוטת OpenAPI ישנה, או זיכרון משיחה קודמת אומרים אחרת — השורה כאן
+> גוברת. אל תחזיר אף אחת מההנחות שבעמודה "נטען קודם".
+
+### 12.1 התיקונים
+
+| # | חומרה | נטען קודם | מה נכון בקוד (ראיה) | מה השתנה במסמך |
+|---|---|---|---|---|
+| 1 | 🔴 | `status` נגזר מ-`appruved`: `draft = !appruved`, `published = appruved ∧ …` | `appruved` נכתב רק ב-`approveMatanot`, שרשום ב-`configs/index.ts` ואין לו קורא ב-UI. היצירה קובעת `status_of_voting` בלבד (`createComplexMatanot.ts:277` — `'active'`/`'voting'`; `createPersonalMatanot` — `'active'`). ⇒ לפי המיפוי הישן כמעט כל מוצר הוא טיוטה והחנות ריקה | מיפוי חדש מ-`status_of_voting` + `lifecycle` + `archived`, עם מגיני NULL; `released` נספר כ-archived; `archiveProposed` נשאר published. §2.1, §2.2, §4.3, §5.3, §5.5, Phase 0, OpenAPI `Status` |
+| 2 | 🔴 | `hideFromDiscovery` = "מוסתר"; ה-API יחשוף רטרואקטיבית מוצרים מוסתרים ⇒ צריך `exposeToApi` (ברירת מחדל false); `products:read:draft` רואה `draft + hidden` | ההערה מעל qid `282discoverProducts` (`qids.js` ~14725): מוצר מוסתר *"stays reachable everywhere else: /gift/[id], the project page and the sales flows"*. הדגל מוציא רק מהספרייה `/gift` | **`exposeToApi` בוטל.** חנות = דף הרקמה (כולל מוסתרים); שוק = `/gift` (בלי מוסתרים). `hidden` הוסר מ-enum ה-`status`. זה גם מבטל שתי סתירות: "אין שינוי סכמה" מול שדה חדש, ו-`exposeToApi` פר-מוצר (§4.3/§6) מול הגדרת רקמה (§9.11). §0, §4.3, §5.1, §5.5, §6.2, §9.11, Phase 0 |
+| 3 | 🔴 | `Cache-Control: public, s-maxage=60` על כל GET | תשובה עם מפתח יכולה לכלול טיוטות ו-`fields`; `allowedOrigins` משתנה לפי מפתח ⇒ CDN עלול להגיש טיוטה לאנונימי או תשובה של מפתח אחד לאחר | `public` לאנונימי בלבד; `private, no-cache` לכל בקשה עם מפתח; `Vary: Authorization, Origin`; ETag לרשימה מוגדר; מטמון שרת ממופתח לפי מעמד-קורא. §4.5, §5.4, §6.2א, Phase 1, OpenAPI |
+| 4 | 🔴 | `resolveRikmaFromPath` מחזיר `301` על איות/slug קודם — גם בנתיבי sales/tasks | `301`/`302` הופכים POST ל-GET (fetch ודפדפנים) והגוף אובד | **אין הפניה על POST.** איות/slug קודם של רקמת המפתח מוגשים כרגיל + `X-1lev1-Rikma-Canonical`. GET נשאר `301`. §5.0, §5.8 צעד 3 ובדיקות, OpenAPI `Rikma` |
+| 5 | 🟡 | "מפתח ללא רקמה לא קיים בפועל" (§5.1) | `/api/api-keys` מפיק מפתח בלי `projectId` (`userPr/editBasic.svelte`), ויש מפתחות MCP/OAuth. `sales/+server.ts` כבר דוחה (`'API key is not scoped to a rikma'`) | כלל מפורש: `403 KEY_NOT_RIKMA_SCOPED` בכל `/api/v1/r/{rikma}/…` גם ב-GET; `/api/v1/me` מחזיר `rikma:null`. §4.2, §5.1, §5.6, §9.14 (חדש) |
+| 6 | 🟡 | `?locale=` = "לחבר ל-cache התרגום" | CLAUDE.md T3: משטח חדש צריך `SurfaceKey` + שורה ב-`backfillSources.ts` (בדיקה נכשלת בלעדיה), hash זהה בייט-לבייט, ו-`isRealTranslation` (שורת `identity` אינה תרגום). `/gift/[id]` עדיין אינו משטח (`backfillSources.ts:196`) | נוספו כל הדרישות. §4.10, Phase 3 |
+| 7 | 🟡 | qids בשם `rikmaApiProducts` וכו'; אין אזכור להרשאה | הקונבנציה מספרית (`282discoverProducts`); כל qid צריך שורה ב-`qidsAccess.js`, ו-`AUTHZ_MODE=enforce` כברירת מחדל חוסם qid בלי שורה | שמות עם קידומת מספרית; שורה ב-`qidsAccess.js` + `check:proxy`. §4.1, Phase 0 |
+| 8 | 🟡 | `descriptionHtml` יוצא בלי הגדרה | `desc` הוא rich text ב-JSON; אתרי לקוחות יזריקו אותו כ-HTML ⇒ XSS | serializer שלנו עם whitelist תגיות/מאפיינים + בדיקות payload זדוני; `descriptionText` ברירת המחדל בתיעוד. §5.3, §6.2ב, Phase 0, OpenAPI |
+| 9 | ⚪ | (א) §9.4 `POST /api/v1/orders`; (ב) §11.ב `POST /api/v1/sales`; (ג) §5.0 "403 לפני החיפוש" מול §5.8 "404 לרקמה לא קיימת" | סתירות פנימיות | (א)+(ב) ⇒ `/api/v1/r/{rikma}/…`. (ג) הוכרע: **בקשה עם מפתח** — הנתיב מושווה לזהות של רקמת המפתח (id/slug/`formerSlugs`), ואי-התאמה **או** רקמה לא קיימת ⇒ `403 RIKMA_MISMATCH` לפני כל חיפוש (בלי אורקל קיום); **אנונימית** ⇒ `404`. §5.0, §5.6, §5.8, §9.4, §11.ב |
+
+### 12.2 מה **לא** השתנה (אומת מול הקוד ונשאר כמו שהוא)
+
+- שדות העריכה בהסכמה ל-`matanot` (`archive/apply.ts:166`): `name`, `desc`, `quant`, `price`, `startDate`, `finnishDate`.
+- `webhooks/dispatch.ts:28` — `WEBHOOK_ACTIONS = {createTask, updateTask}` בלבד.
+- `RikmaApiPanel.svelte:30` — `ALL_SCOPES = ['tasks:create','tasks:read','sales:report']`.
+- qid `282discoverProducts` — `pagination:{limit:200}`, סינון בדפדפן.
+- `/r/[slug]/+page.server.js` — `slugFromPath` (301 על איות), `findBySlug` → `former` (301), 404.
+- `sales/+server.ts` — `projectId` נגזר מהמפתח בלבד, ו-403 למפתח בלי רקמה.
+- העקרונות: הכתובת היא הרקמה; projector שבונה רשימה מפורשת של שדות (whitelist); אין CRUD; נדידת sales/tasks עם alias ⇒ `410`; §11 מודעות בלבד.
+
+### 12.3 השלכות על האומדנים
+
+- **Phase 0 קטן ב-~1 יום** (אין `exposeToApi`, אין מסך "מה מפורסם") וגדל ב-~1 יום
+  (serializer מחוטא + בדיקות מיפוי status). בסך הכול ללא שינוי: 2–3 ימים.
+- **המסלול הקצר נשאר בלי שינוי סכמה ב-`1.0b`** — עכשיו זה נכון באמת. `expiresAt`
+  ו-test/live עברו ל-Phase 2.
