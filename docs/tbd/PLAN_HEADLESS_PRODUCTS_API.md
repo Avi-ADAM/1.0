@@ -825,19 +825,32 @@ SDK, ו-OAuth/MCP שמעגנים שני מודלים במקביל. כל שבוע
 
 ### Phase 1b — נדידת sales/tasks לכתובת הרקמה (§5.8)
 
-> **טרם בוצע.** שובר כתובות קיימות, ולכן ממתין לאישור מפורש — למרות המלצת §9.12
-> לבצע עכשיו.
-> **נכנס ל-Phase 1, לא אחריו.** הסיבה: כל עוד ה-snippets מצביעים על הנתיב
-> הישן, כל אינטגרציה חדשה נולדת עם חוב. השליטה המלאה בצרכנים קיימת **עכשיו**.
+> **בוצע — 2026-10-16**, למעט שני סעיפים תפעוליים (העברת הצרכנים בפועל ומועד
+> הסרת ה-alias).
 
-- [ ] מיצוי handler משותף ל-`sales` ול-`tasks` ב-`apiPublic/` (אפס שינוי התנהגות).
-- [ ] `/api/v1/r/{rikma}/sales`, `/api/v1/r/{rikma}/tasks`, `.../tasks/{externalId}`.
-- [ ] אכיפת tenant כפולה + `403 RIKMA_MISMATCH`; מפתח בלי project ⇒ `403`.
-- [ ] עדכון ה-snippets/פרומפטים ב-`SalesApiIntegration.svelte` ו-`RikmaApiPanel.svelte`.
-- [ ] alias מורשת: `Deprecation`/`Sunset`/`Link` + לוג `[api-legacy]`; מוסר אחרי
+- [x] מיצוי handler משותף ל-`sales` ול-`tasks` ב-`apiPublic/` (אפס שינוי התנהגות).
+      `src/lib/server/apiPublic/writeApi.ts` — אימות, scopes, rate limit,
+      allow-list, ולידציה, אידמפוטנטיות ו-`actionService` במקום אחד; שלושת
+      ה-routes הישנים הם עוטף של שלוש שורות. אפס שינוי התנהגות, כולל צורת
+      הכשל: `sales` מחזיר 429 כגוף JSON, `tasks` זורק, ולסטטוס-GET מעולם לא
+      היה rate limit — וגם לא יהיה.
+- [x] `/api/v1/r/{rikma}/sales`, `/api/v1/r/{rikma}/tasks`, `.../tasks/{externalId}`.
+      ה-route פותר את הרקמה בדיוק כמו משטח הקריאה (`resolveRikmaFromPath` עם
+      `move: false`) ועונה **במקום**: אין 301 על POST, כי 301 עשוי להישלח מחדש
+      כ-GET ומכירה שלא דווחה אסור שתיראה כדווחה.
+- [x] אכיפת tenant כפולה + `403 RIKMA_MISMATCH`; מפתח בלי project ⇒ `403`.
+      `assertPathTenant` — 403 במעטפת של §5.6, לפני כל קריאה ל-action.
+- [x] עדכון ה-snippets/פרומפטים ב-`SalesApiIntegration.svelte` ו-`RikmaApiPanel.svelte`.
+      שניהם בונים את הכתובת מ-slug אמיתי של הרקמה (`rikmaSlug`), בלי placeholder.
+- [x] alias מורשת: `Deprecation`/`Sunset`/`Link` + לוג `[api-legacy]`; מוסר אחרי
       ההעברה, ולא יאוחר מ-90 יום ⇒ `410 Gone`.
-- [ ] העברת הצרכנים (diff של שורה) + אימות אפס תעבורה ב-`[api-legacy]`.
-- [ ] `GET /api/v1/me` כולל את הכתובות החדשות ב-`endpoints`.
+      `LEGACY_SUNSET` = 2027-01-14, וה-`Link` נושא את הכתובת **של המפתח הזה**
+      (`/api/v1/r/57/sales`), לא תבנית. הלוג נכתב פעם אחת לכל בקשה לכתובת הישנה.
+- [ ] העברת הצרכנים בפועל + אימות אפס תעבורה ב-`[api-legacy]`. תפעולי: הכתובות
+      החדשות מוכנות וה-snippets כבר מצביעות אליהן; ספירת הלוגים היא שתגיד מתי
+      מותר להסיר את שלושת ה-routes הישנים (2027-01-14).
+- [x] `GET /api/v1/me` כולל את הכתובות החדשות ב-`endpoints` (`sales`, `tasks`,
+      `task`).
 
 ### Phase 2 — עדכון בזמן אמת ללקוח (שבוע)
 - [ ] webhooks `product.*`/`sale.*` — ה-delivery target כבר פר-רקמה
@@ -876,6 +889,8 @@ SDK, ו-OAuth/MCP שמעגנים שני מודלים במקביל. כל שבוע
 | קריאות + בניית גופים | `src/lib/server/apiPublic/catalog.ts` |
 | חמשת ה-endpoints | `src/routes/api/v1/r/[rikma]/{+server.ts,products/+server.ts,products/[productId]/+server.ts,categories/+server.ts}`, `src/routes/api/v1/me/+server.ts` |
 | בדיקות ה-routes | `server.test.ts` בכל אחת מהתיקיות שלמעלה |
+| חצי הכתיבה (sales/tasks) — משותף לשני הכתובות | `src/lib/server/apiPublic/writeApi.ts` |
+| כתובות הכתיבה החדשות | `src/routes/api/v1/r/[rikma]/{sales,tasks,tasks/[externalId]}/+server.ts` |
 | ה-qids החדשים | `src/routes/api/send/qids.js` + `qidsAccess.js` (`serviceAdmin`) |
 | scope ביצירת מפתח | `src/routes/api/api-keys/+server.ts` |
 | צ'קבוקס + snippet של הכתובת | `src/lib/components/prPr/api/RikmaApiPanel.svelte`, `src/routes/(reg)/moach/[projectId]/api/+page.{server.ts,svelte}` |
@@ -885,10 +900,12 @@ SDK, ו-OAuth/MCP שמעגנים שני מודלים במקביל. כל שבוע
 
 ## 9. החלטות פתוחות (עם המלצה)
 
-> **נסגרו ב-2026-10-16** (Phase 0): כל ההמלצות בטבלה אומצו כהחלטות. 9.12–9.13
-> (מעבר sales/tasks ו-`/api/v1/actions`) ממתינות לביצוע ב-Phase 1b. 9.11 מומש
-> בינתיים לקריאה בלבד: `Project.exposeToApi` נקרא בצורה שמחזירה `false` כל עוד
-> השדה לא קיים ב-`1.0b`, ומי שישנה אותו יקבע בהסכמה כשהשדה ייווצר.
+> **נסגרו ב-2026-10-16** (Phase 0): כל ההמלצות בטבלה אומצו כהחלטות. 9.12 בוצע
+> ב-Phase 1b — הכתובות החדשות קיימות, הישנות נושאות `Deprecation`/`Sunset`,
+> וההסרה במועד ה-Sunset. 9.13 (סגירת `/api/v1/actions`) טרם בוצע: היא מותנית
+> באימות תפעולי שאין בו שימוש אמיתי, לא בבדיקה בקוד. 9.11 מומש לקריאה בלבד:
+> `Project.exposeToApi` נקרא כך שכל עוד השדה לא קיים ב-`1.0b` הוא `false`, ומי
+> שישנה אותו יקבע בהסכמה כשהשדה ייווצר.
 
 | # | שאלה | המלצה |
 |---|---|---|

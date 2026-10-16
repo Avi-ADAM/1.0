@@ -16,7 +16,15 @@
   let {
     /** @type {string} */ projectId,
     /** @type {Product[]} */ bmiData = [],
-    /** @type {Member[]} */ projectUsers = []
+    /** @type {Member[]} */ projectUsers = [],
+    /**
+     * The rikma's own address (PLAN_HEADLESS_PRODUCTS_API §5.8). The sales API
+     * now lives under it, so the snippets show `/api/v1/r/<slug>/sales` — a
+     * member copying their shop's own URL, not a template they must spell.
+     * Falls back to the numeric id, which is a legal address too.
+     * @type {string | null}
+     */
+    rikmaSlug = null
   } = $props();
 
   // The literal closing script tag, split so it can't terminate THIS
@@ -47,6 +55,10 @@
   // Value used inside snippets: the real key right after creation, otherwise a
   // placeholder the user replaces with the key they saved.
   const keyForSnippet = $derived(newRawKey || '{{API_KEY}}');
+  // §5.0: the address carries the rikma. The old /api/v1/sales still answers
+  // (with Deprecation/Sunset) but everything new is written against this one.
+  const salesPath = $derived(`/api/v1/r/${rikmaSlug || projectId}/sales`);
+  const salesUrl = $derived(`${apiBase}${salesPath}`);
   const productForSnippet = $derived(selectedProductId || '{{PRODUCT_ID}}');
   const holderForSnippet = $derived(selectedHolderId || '{{HOLDER_ID}}');
 
@@ -134,7 +146,7 @@
     [
       '<script>',
       '  // 1lev1 - automatic sale report. Run after a successful checkout.',
-      `  fetch('${apiBase}/api/v1/sales', {`,
+      `  fetch('${salesUrl}', {`,
       "    method: 'POST',",
       '    headers: {',
       "      'Content-Type': 'application/json',",
@@ -154,7 +166,7 @@
 
   const serverSnippet = $derived(
     [
-      `curl -X POST ${apiBase}/api/v1/sales \\`,
+      `curl -X POST ${salesUrl} \\`,
       `  -H "Authorization: Bearer ${keyForSnippet}" \\`,
       '  -H "Content-Type: application/json" \\',
       `  -d '{"productId":"${productForSnippet}","holderUserId":"${holderForSnippet}","amount":ORDER_TOTAL,"quantity":1,"externalId":"ORDER_ID"}'`
@@ -164,7 +176,7 @@
   const agentPrompt = $derived(
     `You are integrating my website with 1lev1's sales-reporting API. ` +
       `After every successful checkout/payment, send an HTTPS POST to ` +
-      `${apiBase}/api/v1/sales with header ` +
+      `${salesUrl} with header ` +
       `Authorization: Bearer ${keyForSnippet} and JSON body: ` +
       `productId (fixed: ${productForSnippet}), holderUserId (fixed: ` +
       `${holderForSnippet}), amount (the total paid, number), quantity ` +

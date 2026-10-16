@@ -70,6 +70,12 @@
   const keyForSnippet = $derived(newRawKey || '{{API_KEY}}');
   const missionForSnippet = $derived(selectedMissionId || '{{MISSION_ID}}');
 
+  const catalogPath = $derived(`/api/v1/r/${rikmaSlug || projectId}`);
+  const catalogAddress = $derived(`${apiBase}${catalogPath}`);
+  // The write half lives under the same prefix (§5.8): the old /api/v1/tasks
+  // still answers, with Deprecation/Sunset, but nothing new points at it.
+  const tasksUrl = $derived(`${catalogAddress}/tasks`);
+
   /** The assignment half of the body — a person, a role, or nobody. */
   const assignmentLines = $derived.by(() => {
     if (target === 'user') return [`  "assignedUserId": "${selectedUserId || '{{USER_ID}}'}",`];
@@ -93,7 +99,7 @@
 
   const serverSnippet = $derived(
     [
-      `curl -X POST ${apiBase}/api/v1/tasks \\`,
+      `curl -X POST ${tasksUrl} \\`,
       `  -H "Authorization: Bearer ${keyForSnippet}" \\`,
       '  -H "Content-Type: application/json" \\',
       `  -d '${bodyJson.replace(/\n\s*/g, ' ').replace(/'/g, "'\\''")}'`
@@ -104,7 +110,7 @@
     [
       '// Run this on YOUR server, after the item is created.',
       '// Keep the key in an env var — never ship it to the browser.',
-      `await fetch('${apiBase}/api/v1/tasks', {`,
+      `await fetch('${tasksUrl}', {`,
       "  method: 'POST',",
       '  headers: {',
       "    'Content-Type': 'application/json',",
@@ -158,8 +164,6 @@
   // ── The catalog (PLAN_HEADLESS_PRODUCTS_API) ──────────────────────────────
   // Built from the rikma's OWN address: the path carries the rikma (§5.0), so
   // there is nothing to explain and nothing to substitute.
-  const catalogPath = $derived(`/api/v1/r/${rikmaSlug || projectId}`);
-  const catalogAddress = $derived(`${apiBase}${catalogPath}`);
   const catalogKey = $derived(activeKeys.find((k) => k.scopes?.includes('products:read')) ?? null);
 
   const catalogSnippet = $derived(
@@ -183,7 +187,7 @@
       `system opens also becomes a task inside our rikma (project ${projectId}) and ` +
       `waits there for a human to accept it. ` +
       `After an item is created, send an HTTPS POST from MY SERVER (never the browser) to ` +
-      `${apiBase}/api/v1/tasks with header Authorization: Bearer <ONELEVONE_API_KEY from env> ` +
+      `${tasksUrl} with header Authorization: Bearer <ONELEVONE_API_KEY from env> ` +
       `and a JSON body: name (the title), description, link (back to the item), ` +
       `externalId (my own item id — required, it makes retries safe), ` +
       (selectedMissionId ? `missionId (fixed: "${selectedMissionId}"), ` : '') +

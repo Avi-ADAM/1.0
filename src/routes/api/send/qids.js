@@ -9955,6 +9955,7 @@ export const moachQids = {
       data {
         attributes {
           projectName
+          slug
           descripFor
           publicDescription
           profilePic { data { attributes { url formats } } }

@@ -109,6 +109,9 @@ describe('GET /api/v1/me', () => {
       products: '/api/v1/r/haohel/products',
       product: '/api/v1/r/haohel/products/{productId}',
       categories: '/api/v1/r/haohel/categories',
+      sales: '/api/v1/r/haohel/sales',
+      tasks: '/api/v1/r/haohel/tasks',
+      task: '/api/v1/r/haohel/tasks/{externalId}',
       me: '/api/v1/me'
     });
   });

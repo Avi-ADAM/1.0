@@ -69,6 +69,14 @@ export interface ResolveOptions {
   /** The path below the rikma: `/products`, `/products/1842`, `/categories`. */
   suffix?: string;
   /**
+   * Whether this surface is allowed to *move* the caller (a 301 to the
+   * canonical address). Reads say yes: the answer is cacheable and the URL
+   * should be too. Writes say no — a 301 may be replayed as a GET, and a POST
+   * that never happened is a sale that never happened — so a write is answered
+   * in place, under whichever rikma its path names.
+   */
+  move?: boolean;
+  /**
    * How *this surface* writes a rikma's address. The API default is
    * `/api/v1/r/<slug|id>`; the public page passes its own shape
    * (`/r/<slug>`, or `/project/<id>` for a rikma with no address yet). Only
@@ -85,11 +93,17 @@ export interface ResolveOptions {
 export async function resolveRikmaFromPath(
   raw: string,
   run: RikmaRun,
-  { search = '', suffix = '', address = defaultAddress }: ResolveOptions = {}
+  {
+    search = '',
+    suffix = '',
+    address = defaultAddress,
+    move = true
+  }: ResolveOptions = {}
 ): Promise<RikmaResolution> {
   const param = String(raw ?? '').trim();
   const tail = SUFFIX_SHAPE.test(suffix) ? suffix : '';
-  const move = (slug: string | null, projectId: string) =>
+  const canMove = move !== false;
+  const locationFor = (slug: string | null, projectId: string) =>
     `${address({ slug, projectId })}${tail}${search}`;
 
   // An id: 1–12 digits. `slugFromPath` refuses digit-only strings on purpose
@@ -108,10 +122,12 @@ export async function resolveRikmaFromPath(
   if (!slug) return { kind: 'notFound' };
 
   // One spelling per address: /r/Bees → /r/bees (the page's 301, ported).
-  if (slug !== param) {
+  // A surface that may not redirect continues in place, below: `slug` is
+  // already the canonical spelling of what the path asked for.
+  if (slug !== param && canMove) {
     return {
       kind: 'redirect',
-      location: move(slug, param),
+      location: locationFor(slug, param),
       canonicalPath: apiRikmaPath(slug),
       reason: 'spelling'
     };
@@ -122,11 +138,11 @@ export async function resolveRikmaFromPath(
 
   // An address the rikma used to have keeps reaching it — the link was printed
   // once and cannot be recalled.
-  if (hit.former) {
+  if (hit.former && canMove) {
     const target = hit.currentSlug ?? hit.projectId;
     return {
       kind: 'redirect',
-      location: move(hit.currentSlug, hit.projectId),
+      location: locationFor(hit.currentSlug, hit.projectId),
       canonicalPath: apiRikmaPath(target),
       reason: 'former'
     };

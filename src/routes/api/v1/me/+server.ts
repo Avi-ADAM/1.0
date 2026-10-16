@@ -88,6 +88,11 @@ export const GET: RequestHandler = async ({ request, fetch }) => {
         products: `${prefix}/products`,
         product: `${prefix}/products/{productId}`,
         categories: `${prefix}/categories`,
+        // The write half, now at the rikma's own address too (§5.8). An agent
+        // that starts at /me should never have to be told the legacy paths.
+        sales: `${prefix}/sales`,
+        tasks: `${prefix}/tasks`,
+        task: `${prefix}/tasks/{externalId}`,
         me: '/api/v1/me'
       }
     }
