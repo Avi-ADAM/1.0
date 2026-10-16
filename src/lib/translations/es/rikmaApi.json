@@ -12,6 +12,8 @@
   "scope_tasks_create": "Abrir tareas en la rikma",
   "scope_tasks_read": "Consultar qué pasó con una tarea abierta",
   "scope_sales_report": "Informar ventas",
+  "scope_products_read": "Leer el catálogo de la rikma",
+  "scope_products_read_draft": "Leer también productos aún no publicados",
   "callbackUrl": "Dirección de sincronización de vuelta (webhook)",
   "createKey": "Crear clave",
   "creating": "Creando…",
@@ -36,6 +38,9 @@
   "holder": "A cargo de",
   "you": "tú",
 
+  "catalogTitle": "El catálogo de la rikma",
+  "catalogSubtitle": "Los productos de la rikma están en su propia dirección: no hace falta arrastrar un parámetro rikma aparte.",
+  "catalogHint": "Sin clave solo recibes productos publicados e incluidos en el catálogo. Una clave con products:read añade productos ocultos, y products:read:draft añade borradores. Envía la clave solo desde tu servidor.",
   "codeTitle": "El código",
   "createKeyFirst": "Crea una clave para que el código se genere con la clave real y no con un marcador.",
   "mission": "Vincular a una misión",

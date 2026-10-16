@@ -16,6 +16,36 @@ import { assistantQids } from './qidsAssistant.js';
 const NOT_ARCHIVED = `{ or: [{ lifecycle: { null: true } }, { lifecycle: { ne: "archived" } }] }`;
 
 /**
+ * What the public read API reads from a product row (PLAN_HEADLESS_PRODUCTS_API).
+ *
+ * The list, the single-product and the categories queries all interpolate this
+ * one string, so a field can never appear in one and be missing in another —
+ * the DTO is built from exactly these attributes and nothing else.
+ *
+ * Note what is deliberately **absent**: `matanot_recipe_missions` /
+ * `matanot_recipe_resources` (the rikma's cost sheet), `marginPct`,
+ * `estimatedPrice`, `entryCurrency`/`entryRate`, `tosplits`, `holderStatus`,
+ * `ratson`/`nego`/`decision`/`timegrama`, `discoveryKeywords`. Reading a field
+ * the DTO does not carry is how it ends up leaking later; the projector's
+ * whitelist and its test are the other half of this decision.
+ */
+const API_PRODUCT_ATTRS = `
+        name desc price pricingMode quant kindOf origin locale
+        createdAt updatedAt startDate finnishDate
+        appruved archived lifecycle hideFromDiscovery
+        lat lng radius
+        location { lat lng radius location_hint location_mode }
+        pic { data { attributes { url alternativeText formats } } }
+        categories { data { id attributes { name } } }
+        currency { data { id attributes { code name } } }
+        owner_user { data { id attributes { username profilePic { data { attributes { url formats } } } } } }
+        projectcreates { data { id attributes {
+          projectName slug
+          location { lat lng radius location_hint location_mode }
+          profilePic { data { attributes { url formats } } }
+        } } }`;
+
+/**
  * A departure as its price settlement reads it (PLAN_POOL_PRODUCT §4.2): the
  * stored curve, what the participants were last told, and each signer's own
  * ceiling. Shared by 447 (all live) and 448 (one).
@@ -9925,6 +9955,7 @@ export const moachQids = {
       data {
         attributes {
           projectName
+          slug
           descripFor
           publicDescription
           profilePic { data { attributes { url formats } } }
@@ -17227,6 +17258,90 @@ ${STIPEND_DECISION_FIELDS}
         }
       }
     }
+  }`,
+
+  /* ─────────────────────────────────────────────────────────────────────
+   * Public read API — a rikma's catalog (PLAN_HEADLESS_PRODUCTS_API,
+   * Phase 0/1).
+   *
+   * Read exclusively by src/lib/server/apiPublic/* with the ADMIN token via
+   * strapiClient.execute — they never travel through /api/send, hence
+   * serviceAdmin-only in qidsAccess.
+   *
+   * The projection is NOT decided here. These queries fetch the raw row; the
+   * DTO is built by $lib/server/apiPublic/dto.ts, field by field, from a
+   * whitelist. That inversion is the whole point (§5.3): a new field on
+   * Matanot stays internal until the projector learns it on purpose, instead
+   * of appearing in a public payload the day it is added.
+   * ───────────────────────────────────────────────────────────────────── */
+
+  // The catalog of ONE rikma, filtered/sorted/paginated. The filter arrives as
+  // a variable (`MatanotFiltersInput`) because the tenant rule and the derived
+  // `status` rule are composed in one place in JS — three GraphQL strings that
+  // each spell the visibility rule is three chances to spell it differently.
+  // `meta.pagination` is what makes total/pages honest without a count query.
+  'rikmaApiProducts': `query RikmaApiProducts($filters: MatanotFiltersInput, $sort: [String], $page: Int, $pageSize: Int) {
+    matanots(filters: $filters, sort: $sort, pagination: { page: $page, pageSize: $pageSize }) {
+      data { id attributes { ${API_PRODUCT_ATTRS} } }
+      meta { pagination { page pageCount pageSize total } }
+    }
+  }`,
+
+  // One product **of this rikma**: the project filter is part of the query, so
+  // a product that belongs to another rikma returns no row at all — the 404
+  // for a foreign product is enforced here, not by a hopeful `if` afterwards.
+  'rikmaApiProduct': `query RikmaApiProduct($pid: ID!, $productId: ID!) {
+    matanots(
+      filters: { and: [ { id: { eq: $productId } }, { projectcreates: { id: { eq: $pid } } } ] }
+      pagination: { limit: 1 }
+    ) {
+      data { id attributes { ${API_PRODUCT_ATTRS} } }
+    }
+  }`,
+
+  // The categories that have products here, with those products' categories so
+  // the counts can be computed without one query per category. id-only rows:
+  // cheap enough to cache, and facets over a big shop are P1 (§4.10).
+  'rikmaApiCategories': `query RikmaApiCategories($filters: MatanotFiltersInput) {
+    matanots(filters: $filters, pagination: { limit: -1 }) {
+      data { id attributes { categories { data { id attributes { name } } } } }
+    }
+  }`,
+
+  // The rikma line every response starts with (id, slug, name). Also the
+  // existence check for an id-addressed request.
+  'rikmaApiRef': `query RikmaApiRef($pid: ID!) {
+    project(id: $pid) {
+      data { id attributes { projectName slug } }
+    }
+  }`,
+
+  // The profile (`GET /api/v1/r/{rikma}`) — includes `look`, which §5.3 keeps
+  // off the list responses because it is identical in every row.
+  'rikmaApiProject': `query RikmaApiProject($pid: ID!) {
+    project(id: $pid) {
+      data { id attributes {
+        projectName publicDescription descripFor city currencyCode supportPage
+        location { lat lng radius location_hint location_mode }
+        look
+      } }
+    }
+  }`,
+
+  // `Project.exposeToApi` — the opt-in §4.3 requires, read defensively: the
+  // field arrives with 1.0b, and until then this query is expected to fail
+  // once and be latched off ($lib/server/apiPublic/exposure.ts). An absent
+  // flag must never widen the public surface.
+  'rikmaApiExposure': `query RikmaApiExposure($pid: ID!) {
+    project(id: $pid) { data { id attributes { exposeToApi } } }
+  }`,
+
+  // The key owner's display name, for GET /api/v1/me. Deliberately separate
+  // from the api-key query in $lib/server/apiKeys.ts: that query fails closed
+  // (an unreadable field refuses every key on the deployment), and a missing
+  // display name must not do that.
+  'rikmaApiUserName': `query RikmaApiUserName($uid: ID!) {
+    usersPermissionsUser(id: $uid) { data { id attributes { username } } }
   }`,
 
   ...qids_base,

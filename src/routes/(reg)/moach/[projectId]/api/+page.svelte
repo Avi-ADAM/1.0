@@ -9,6 +9,7 @@
 
 <RikmaApiPanel
   projectId={data.projectId}
+  rikmaSlug={data.rikmaSlug ?? null}
   missions={data.missions ?? []}
   roles={data.roles ?? []}
   {members}
