@@ -29,14 +29,53 @@ import {
   type ApiProductStatus
 } from './dto.js';
 
-/** Sort keys the public catalog accepts, `-` = descending. */
-export const SORT_KEYS = ['price', 'createdAt', 'updatedAt', 'name'] as const;
+/**
+ * Sort keys the public catalog accepts, `-` = descending.
+ *
+ * `priceMax` is the "most expensive variant" column — the one a shop sorts by
+ * when it shows a range. Without the shop schema deployed it degrades to
+ * `price` (see `QueryCapabilities`), never to an error: a sort that used to
+ * work must not start answering 400 because a column is missing.
+ */
+export const SORT_KEYS = [
+  'price',
+  'priceMax',
+  'createdAt',
+  'updatedAt',
+  'name'
+] as const;
 
-/** Today `expand=rikma` is the only switch that adds anything: `seller`, `geo`,
- *  `images`, `dates` and `categories` are always inline, because a shop needs
- *  them and they are small (§5.4). Anything else is a 400 — a no-op parameter
- *  would let a client believe it asked for something it did not get. */
-export const EXPAND_KEYS = ['rikma'] as const;
+/** The logical sort key → the Strapi column it reads, per schema state. */
+export function sortColumnOf(key: string, shopSchema: boolean): string {
+  if (!shopSchema) return key === 'priceMax' ? 'price' : key;
+  if (key === 'price') return 'priceMin';
+  return key;
+}
+
+/**
+ * What the deployment can actually answer.
+ *
+ * `shopSchema` is true only once the shop collections/fields exist in Strapi
+ * (PLAN_SHOP_CUSTOMER_EXPERIENCE §6). While it is false, parameters that
+ * describe variants are answered honestly instead of being quietly ignored:
+ * `?hasVariants=true` matches nothing (there are no variants to match), price
+ * filters keep reading `price`, and `sort=price` keeps reading `price`.
+ */
+export interface QueryCapabilities {
+  shopSchema?: boolean;
+}
+
+/** An option key/value that may travel as `?option.<key>=<value>`. */
+const OPTION_KEY = /^[a-z][a-z0-9_-]{0,31}$/;
+const OPTION_VALUE = /^[a-z0-9][a-z0-9._-]{0,59}$/;
+
+/** `seller`, `geo`, `images`, `dates` and `categories` are always inline,
+ *  because a shop needs them and they are small (§5.4). `expand=rikma` adds the
+ *  rikma block, and `expand=variants` adds the variant rows — the one piece of
+ *  the payload that is big enough to be opt-in
+ *  (PLAN_SHOP_CUSTOMER_EXPERIENCE §4.2). Anything else is a 400 — a no-op
+ *  parameter would let a client believe it asked for something it did not get. */
+export const EXPAND_KEYS = ['rikma', 'variants'] as const;
 
 const KINDS = ['daily', 'monthly', 'yearly', 'total', 'unlimited'] as const;
 
@@ -63,6 +102,14 @@ export interface CatalogQuery {
   updatedSince: string | null;
   /** True when the caller explicitly asked for a status set (cache key + links). */
   explicitStatus: boolean;
+  /**
+   * The caller asked for something this deployment cannot have
+   * (`?hasVariants=true` before the shop schema exists). The honest answer is
+   * an empty list, and the caller answers it without asking Strapi a question
+   * whose answer is already known — the same idiom as `statusFilterFor()`
+   * returning `null`.
+   */
+  matchesNothing: boolean;
 }
 
 export type QueryError = {
@@ -109,8 +156,10 @@ function isoOf(raw: string | null): string | null | false {
  */
 export function parseCatalogQuery(
   params: URLSearchParams,
-  access: ApiAccess
+  access: ApiAccess,
+  caps: QueryCapabilities = {}
 ): QueryResult {
+  const shopSchema = caps.shopSchema === true;
   // ── pagination ────────────────────────────────────────────────────────────
   const rawLimit = intOf(params.get('limit'));
   if (
@@ -143,7 +192,10 @@ export function parseCatalogQuery(
           `sort must be one of ${SORT_KEYS.join(', ')} (prefix with "-" for descending)`
         );
       }
-      sort.push(`${desc ? '-' : ''}${key}`);
+      // Spell the column once, here: `price` means "the cheapest way in", and
+      // whether that lives on the product row or on a variant is a deployment
+      // fact, not a caller's problem.
+      sort.push(`${desc ? '-' : ''}${sortColumnOf(key, shopSchema)}`);
     }
   }
   if (!sort.length) sort.push('-updatedAt');
@@ -286,10 +338,41 @@ export function parseCatalogQuery(
   }
   // A `quote` product has no price at all, so any price filter excludes it —
   // correct, and worth knowing: `?minPrice=0` is not "everything".
-  if (minPrice !== null && minPrice.trim() !== '')
-    and.push({ price: { gte: Number(minPrice) } });
-  if (maxPrice !== null && maxPrice.trim() !== '')
-    and.push({ price: { lte: Number(maxPrice) } });
+  //
+  // With the shop schema, a price filter is a **range overlap**: a product
+  // whose variants span 280–420 is in `?maxPrice=300`, because a buyer can buy
+  // it for 280 (PLAN_SHOP_CUSTOMER_EXPERIENCE §5.2). The `null` branch keeps
+  // rows written before the shop columns existed from vanishing — the same
+  // idiom, and the same reason, as `NOT_ARCHIVED` in dto.ts.
+  // A row that predates the backfill has both derived columns empty, so the
+  // filter falls back to its own `price` for exactly those rows.
+  const legacyPriceBranch = (op: 'gte' | 'lte', value: number) => ({
+    and: [
+      { priceMin: { null: true } },
+      { priceMax: { null: true } },
+      { price: { [op]: value } }
+    ]
+  });
+  if (minPrice !== null && minPrice.trim() !== '') {
+    const value = Number(minPrice);
+    and.push(
+      shopSchema
+        ? {
+            or: [{ priceMax: { gte: value } }, legacyPriceBranch('gte', value)]
+          }
+        : { price: { gte: value } }
+    );
+  }
+  if (maxPrice !== null && maxPrice.trim() !== '') {
+    const value = Number(maxPrice);
+    and.push(
+      shopSchema
+        ? {
+            or: [{ priceMin: { lte: value } }, legacyPriceBranch('lte', value)]
+          }
+        : { price: { lte: value } }
+    );
+  }
 
   const currency = params.get('currency');
   if (currency !== null && currency.trim() !== '') {
@@ -300,7 +383,7 @@ export function parseCatalogQuery(
     and.push({ currency: { code: { eq: code } } });
   }
 
-  const available = params.get('available');
+  const available = params.get('available') ?? params.get('inStock');
   if (
     available !== null &&
     available !== '' &&
@@ -312,10 +395,108 @@ export function parseCatalogQuery(
   if (available === 'true') {
     // -1 = unlimited; `null` reads as 0 (out of stock) exactly as `/gift/[id]`
     // reads it, so it is not "available".
-    and.push({ or: [{ quant: { gt: 0 } }, { quant: { eq: -1 } }] });
+    //
+    // With the shop schema the question is about the product's total stock
+    // (`stockTotal`, summed over variants when there are any) — and a row that
+    // predates the backfill still answers from its own `quant`.
+    and.push(
+      shopSchema
+        ? {
+            or: [
+              { stockTotal: { gt: 0 } },
+              { stockTotal: { eq: -1 } },
+              {
+                and: [
+                  { stockTotal: { null: true } },
+                  { or: [{ quant: { gt: 0 } }, { quant: { eq: -1 } }] }
+                ]
+              }
+            ]
+          }
+        : { or: [{ quant: { gt: 0 } }, { quant: { eq: -1 } }] }
+    );
   }
   if (available === 'false') {
-    and.push({ or: [{ quant: { eq: 0 } }, { quant: { null: true } }] });
+    and.push(
+      shopSchema
+        ? {
+            or: [
+              { stockTotal: { eq: 0 } },
+              { stockTotal: { null: true }, quant: { eq: 0 } },
+              { stockTotal: { null: true }, quant: { null: true } }
+            ]
+          }
+        : { or: [{ quant: { eq: 0 } }, { quant: { null: true } }] }
+    );
+  }
+
+  const hasVariants = params.get('hasVariants');
+  if (
+    hasVariants !== null &&
+    hasVariants !== '' &&
+    hasVariants !== 'true' &&
+    hasVariants !== 'false'
+  ) {
+    return bad('hasVariants must be true or false');
+  }
+  let matchesNothing = false;
+  if (hasVariants === 'true') {
+    // Asking for variants on a deployment that has none is not an error — the
+    // truthful answer is "no products match", and this says so without a query.
+    if (shopSchema) and.push({ hasVariants: { eq: true } });
+    else matchesNothing = true;
+  }
+  if (hasVariants === 'false' && shopSchema) {
+    and.push({
+      or: [{ hasVariants: { eq: false } }, { hasVariants: { null: true } }]
+    });
+  }
+
+  // `?option.size=m` — the axis a buyer picks in the storefront (§5.2).
+  //
+  // Case is forgiven (`?option.Size=M` works: the value is normalized the same
+  // way the save normalizes it), but the character set is not: the filter is
+  // compared against the `axisKey` string, so a value that could carry the `|`
+  // or `:` delimiters is refused with a 400 rather than searched for.
+  const optionPairs: Array<{ key: string; value: string }> = [];
+  for (const [name, value] of params.entries()) {
+    if (!name.startsWith('option.')) continue;
+    const key = name.slice('option.'.length).trim().toLowerCase();
+    const val = value.trim().toLowerCase();
+    if (!OPTION_KEY.test(key) || !OPTION_VALUE.test(val)) {
+      return bad(
+        `option.${key} must be a key of a-z, digits, "_" or "-" and a value of a-z, digits, ".", "_" or "-", e.g. ?option.size=m`
+      );
+    }
+    optionPairs.push({ key, value: val });
+  }
+  if (optionPairs.length) {
+    if (!shopSchema) {
+      matchesNothing = true;
+    } else {
+      // One relation filter holding every requested pair, so "size M **and**
+      // colour red" means one variant carrying both — not one variant carrying
+      // each. `axisKey` is written as `|size:m|color:red|` exactly for this
+      // (`shop.ts` `axisKeyOf`).
+      and.push({
+        variants: {
+          and: [
+            ...optionPairs.map((p) => ({
+              axisKey: { contains: `|${p.key}:${p.value}|` }
+            })),
+            { active: { eq: true } }
+          ]
+        }
+      });
+    }
+  }
+
+  const sku = params.get('sku');
+  if (sku !== null && sku.trim() !== '') {
+    const value = sku.trim();
+    if (value.length > 64) return bad('sku must be at most 64 characters');
+    if (shopSchema) and.push({ variants: { sku: { eq: value } } });
+    else matchesNothing = true;
   }
 
   const kindOf = params.get('kindOf');
@@ -368,7 +549,8 @@ export function parseCatalogQuery(
       expand,
       locale: locale || null,
       updatedSince,
-      explicitStatus
+      explicitStatus,
+      matchesNothing
     }
   };
 }

@@ -664,6 +664,14 @@ export const qidsAccess = {
   'rikmaApiRef': { allow: ['serviceAdmin'] },
   'rikmaApiProject': { allow: ['serviceAdmin'] },
   'rikmaApiUserName': { allow: ['serviceAdmin'] },
+  // The shop layer (PLAN_SHOP_CUSTOMER_EXPERIENCE §6.8) — same reasoning as the
+  // read API above: reached only with the admin token by `apiPublic/*`, never
+  // through /api/send, so nobody's session may call them directly.
+  'rikmaApiShopSchema': { allow: ['serviceAdmin'] },
+  'rikmaApiShopAttrs': { allow: ['serviceAdmin'] },
+  'rikmaApiShopVariants': { allow: ['serviceAdmin'] },
+  'rikmaApiShopAxes': { allow: ['serviceAdmin'] },
+  'rikmaApiOptions': { allow: ['serviceAdmin'] },
 
   // Site reports mirrored into the central rikma — same story, and a report
   // carries the reporter's email, so it is never reachable with a user JWT.

@@ -207,3 +207,100 @@ describe('buildCatalogFilters — tenant + visibility, composed once', () => {
     expect(buildCatalogFilters('57', [], [])).toBeNull();
   });
 });
+
+// ─── the shop parameters (PLAN_SHOP_CUSTOMER_EXPERIENCE §5.2) ───────────────
+//
+// The interesting part is not the happy path but what happens *before* the
+// shop schema is deployed: `?hasVariants=true` must be an empty list, not a
+// GraphQL error and not a silent "here is everything".
+
+describe('shop parameters — without the shop schema', () => {
+  it('keeps `sort=price` on the product row and `priceMax` on price', () => {
+    expect(ok('sort=price').sort).toEqual(['price']);
+    expect(ok('sort=priceMax').sort).toEqual(['price']);
+    expect(ok('sort=-priceMax').sort).toEqual(['-price']);
+  });
+
+  it('filters the price on the product row', () => {
+    const query = ok('minPrice=100&maxPrice=300');
+    expect(JSON.stringify(query.callerFilters)).toContain('"price"');
+    expect(query.matchesNothing).toBe(false);
+  });
+
+  it('answers `?hasVariants=true` with "nothing matches" instead of a query', () => {
+    expect(ok('hasVariants=true').matchesNothing).toBe(true);
+    expect(ok('hasVariants=false').matchesNothing).toBe(false);
+  });
+
+  it('answers an option or SKU filter with "nothing matches" too', () => {
+    expect(ok('option.size=m').matchesNothing).toBe(true);
+    expect(ok('sku=KER-M').matchesNothing).toBe(true);
+  });
+
+  it('still refuses malformed parameters, schema or no schema', () => {
+    expect(fail('hasVariants=maybe').status).toBe(400);
+    expect(fail('option.2size=m').status).toBe(400);
+    // The delimiters of `axisKey` never reach the filter as a search term.
+    expect(fail('option.size=m|color:red').status).toBe(400);
+    expect(fail('sku=' + 'x'.repeat(65)).status).toBe(400);
+  });
+
+  it('accepts `inStock` as the same switch as `available`', () => {
+    expect(JSON.stringify(ok('inStock=true').callerFilters)).toContain(
+      '"quant"'
+    );
+    expect(fail('inStock=1').status).toBe(400);
+  });
+
+  it('expands variants only when asked', () => {
+    expect(ok('expand=variants').expand).toEqual(['variants']);
+    expect(fail('expand=skus').status).toBe(400);
+  });
+});
+
+describe('shop parameters — with the shop schema', () => {
+  const shop = (qs: string, access: ApiAccess = anon) => {
+    const result = parseCatalogQuery(new URLSearchParams(qs), access, {
+      shopSchema: true
+    });
+    if (result.ok !== true)
+      throw new Error(`expected ok, got ${JSON.stringify(result)}`);
+    return result.value;
+  };
+
+  it('sorts `price` by the cheapest variant', () => {
+    expect(shop('sort=price').sort).toEqual(['priceMin']);
+    expect(shop('sort=-priceMax,name').sort).toEqual(['-priceMax', 'name']);
+  });
+
+  it('reads a price filter as a range overlap, with a branch for legacy rows', () => {
+    const query = shop('minPrice=100&maxPrice=300');
+    const json = JSON.stringify(query.callerFilters);
+    expect(json).toContain('priceMax');
+    expect(json).toContain('priceMin');
+    // The row that predates the backfill still answers from its own `price`.
+    expect(json).toContain('"null":true');
+  });
+
+  it('asks the hasVariants question of the column', () => {
+    expect(JSON.stringify(shop('hasVariants=true').callerFilters)).toContain(
+      '"hasVariants"'
+    );
+    expect(shop('hasVariants=true').matchesNothing).toBe(false);
+  });
+
+  it('composes option pairs into one relation filter with the normalized key', () => {
+    const query = shop('option.size=m&option.color=red');
+    const filter = JSON.stringify(query.callerFilters);
+    expect(filter).toContain('|size:m|');
+    expect(filter).toContain('|color:red|');
+    // One filter node, so "M **and** red" cannot be read as two products.
+    expect(query.callerFilters.filter((f) => 'variants' in f)).toHaveLength(1);
+  });
+
+  it('reads `available` from the product stock total', () => {
+    const json = JSON.stringify(shop('available=true').callerFilters);
+    expect(json).toContain('stockTotal');
+    expect(json).toContain('-1');
+  });
+});

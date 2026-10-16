@@ -1,6 +1,10 @@
 # OpenAPI 3.1 — 1lev1 Rikma API (v1)
 #
-# DRAFT / הצעה בלבד — נכון ל-2026-10-16. רוב ה-endpoints במסמך הזה *אינם* ממומשים.
+# DRAFT / הצעה בלבד — נכון ל-2026-10-16.
+# **ממומש:** /me, /r/{rikma}, /r/{rikma}/products(+{productId}), /categories,
+#   /r/{rikma}/options, /r/{rikma}/{sales,tasks}, ו-legacy /sales,/tasks.
+# **טרם ממומש:** /orders (POST+GET — S3), /changes (Phase 2),
+#   /discover/products (Phase 3).
 # מלווה את docs/tbd/PLAN_HEADLESS_PRODUCTS_API.md ומשמש כמקור האמת לחוזה:
 # ממנו ייווצרו דף /docs/api, טיפוסי TypeScript ללקוח, ו-collection ל-Postman.
 #
@@ -41,6 +45,17 @@
 #   • חנות = דף הרקמה (כולל hideFromDiscovery); שוק = /gift (בלי). אין exposeToApi.
 #   • יומן התיקונים: PLAN_HEADLESS_PRODUCTS_API.md §12.
 #
+# ── v1.1 (וריאנטים, גלריה, אפשרויות, הזמנות) ──────────────────────────────
+# הצרכן של גרסה זו הוא חנות: הוא צריך לבחור מידה וצבע, לראות מחיר ומלאי
+# מתעדכנים, לקבל גלריה ולשלוח בקשת רכש. המקור: PLAN_SHOP_CUSTOMER_EXPERIENCE
+# (§5 לחוזה, §6 לסכמה ב-1.0b). שלוש הבטחות ששווה לבדוק:
+#   • תוספתי בלבד — `price` נשאר מחיר הבסיס, `quant` נשאר סמנטיקת המלאי,
+#     `images` היה מערך של תמונה אחת והוא נשאר מערך;
+#   • ה-DTO **מחשב** וריאנטים/זמינות מהשורות עצמן כשהועמסו, ונופל לשדות
+#     הנגזרים (`priceRange`, `availability`) כשלא — ולעולם לא ממציא מספר;
+#   • כל השדות החדשים ריקים כל עוד הסכמה לא נפרסה (הקוד מזהה זאת לבד),
+#     ולכן פריסת ה-API יכולה להקדים את פריסת Strapi.
+#
 # ── לשמור על מודעות (§11 במסמך) ────────────────────────────────────────────
 #   1. המחיר אינו סופי: pricingMode=quote ⇒ price=null; מוצר מורכב מתומחר לפי
 #      מתכון (hoursPerUnit/ratePerHour/costShape, priceMode=atCost) ולפי צריכה
@@ -53,7 +68,7 @@
 openapi: 3.1.0
 info:
   title: 1lev1 Rikma API
-  version: 1.0.0-draft
+  version: 1.1.0-draft
   description: |
     משטח ה-API של רקמה אחת: קריאת הקטלוג לשימוש באתר החיצוני שלה, דיווח
     מכירות ומטלות פנימה. ציבורי לקריאה של מוצרים `published`; מפתח API
@@ -156,6 +171,9 @@ paths:
         - $ref: '#/components/parameters/MaxPrice'
         - $ref: '#/components/parameters/Currency'
         - $ref: '#/components/parameters/Available'
+        - $ref: '#/components/parameters/HasVariants'
+        - $ref: '#/components/parameters/Sku'
+        - $ref: '#/components/parameters/OptionSize'
         - $ref: '#/components/parameters/KindOf'
         - $ref: '#/components/parameters/Lat'
         - $ref: '#/components/parameters/Lng'
@@ -213,7 +231,9 @@ paths:
         - $ref: '#/components/parameters/PreviewToken'
       responses:
         '200':
-          description: המוצר
+          description: |-
+            המוצר. כאן `variants[]` **תמיד** מלא (§5.1) — זה העמוד שהקונה בוחר
+            בו, וכל בחירה חייבת לעדכן מחיר, מלאי ותמונות בלי קריאה נוספת.
           content:
             application/json:
               schema:
@@ -246,6 +266,39 @@ paths:
                         id: { type: string }
                         name: { type: string }
                         productsCount: { type: integer }
+
+  /api/v1/r/{rikma}/options:
+    get:
+      tags: [shop]
+      summary: צירי האפשרויות של הרקמה — מה שהחנות מציירת כסרגל סינון
+      description: |-
+        ציר וערכיו, עם מספר המוצרים שהקורא **רשאי לראות** מאחורי כל ערך.
+        ערך עם `products: 0` אינו מוחזר (סינון שמוביל לחנות ריקה הוא סינון
+        שבור), וציר בלי ערכים אינו מוחזר. המונים נספרים משורות הווריאנטים —
+        אותו מקור שהסינון `?option.<key>=<value>` קורא ממנו — כך שהמספר
+        שהקונה רואה הוא המספר שהוא יקבל.
+        אין פרמטרים: זו ניווט, לא משטח חיפוש.
+      parameters:
+        - $ref: '#/components/parameters/Rikma'
+        - $ref: '#/components/parameters/Locale'
+      responses:
+        '200':
+          description: הצירים והערכים
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [rikma, options]
+                properties:
+                  rikma: { $ref: '#/components/schemas/RikmaRef' }
+                  options:
+                    type: array
+                    items: { $ref: '#/components/schemas/OptionAxis' }
+        '301': { $ref: '#/components/responses/MovedRikma' }
+        '304': { description: לא השתנה (If-None-Match) }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { description: אין רקמה כזו }
+        '429': { $ref: '#/components/responses/RateLimited' }
 
   /api/v1/r/{rikma}/changes:
     get:
@@ -286,7 +339,15 @@ paths:
   /api/v1/r/{rikma}/orders:
     post:
       tags: [shop]
-      summary: בקשת רכש (P1) — נוצרת Sheirutpend ברקמה, בלי סליקה
+      summary: בקשת רכש — כמה שורות, בלי סליקה (§5.4)
+      description: |-
+        זו "העגלה" שהחנות שולחת: שורות עם מוצר ווריאנט, פרטי קונה והעדפת
+        אספקה. הבקשה נולדת **בתוך** הרקמה — `order` + `order-line` ושרשור
+        `Sheirutpend` בצינור הקיים (צ'אט תמחור, אישור, ביצוע). אנחנו לא
+        סולקים: אין כרטיס, אין PSP.
+        אידמפוטנטיות: אותו `externalId` באותה רקמה ⇒ 200 עם `duplicated:true`
+        (רשתות שולחות retry).
+        אטומיות: שורה אחת עם בעיה ⇒ כל הבקשה נדחית, בלי חצי הזמנה.
       security:
         - apiKey: []
       parameters:
@@ -295,29 +356,74 @@ paths:
         required: true
         content:
           application/json:
-            schema:
-              type: object
-              required: [productId, externalId]
-              properties:
-                productId: { type: string }
-                externalId: { type: string, description: מזהה ההזמנה אצל הלקוח — אידמפוטנטיות }
-                quantity: { type: integer, default: 1 }
-                buyerName: { type: string }
-                buyerEmail: { type: string }
-                note: { type: string }
+            schema: { $ref: '#/components/schemas/OrderRequest' }
       responses:
         '201':
           description: הבקשה נוצרה
           content:
             application/json:
+              schema: { $ref: '#/components/schemas/OrderAccepted' }
+        '200':
+          description: "אותו `externalId` כבר נקלט — מוחזר הכרטיס הקיים עם `duplicated: true`"
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/OrderAccepted' }
+        '400':
+          description: ולידציה, כולל `QUANTITY_LIMIT` (מחוץ ל-`minOrder`/`maxOrder`)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404':
+          description: '`PRODUCT_NOT_FOUND` / `VARIANT_NOT_FOUND` — מוצר שאינו של הרקמה, טיוטה, וריאנט שאינו של המוצר או `active=false`'
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+        '409':
+          description: '`VARIANT_REQUIRED` (מוצר עם וריאנטים ושורה בלי `variantId`) או `OUT_OF_STOCK`'
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+
+  /api/v1/r/{rikma}/orders/{ref}:
+    get:
+      tags: [shop]
+      summary: מעקב בקשת רכש (scope orders:read)
+      parameters:
+        - $ref: '#/components/parameters/Rikma'
+        - name: ref
+          in: path
+          required: true
+          description: ה-`ref` שהוחזר ביצירה, למשל `57:web-8811`. ה-slug שבו אינו סוד ולא מזהה.
+          schema: { type: string }
+      responses:
+        '200':
+          description: מצב הבקשה
+          content:
+            application/json:
               schema:
                 type: object
                 properties:
-                  success: { type: boolean }
-                  orderId: { type: string }
-                  status: { type: string, enum: [pending, awaitingHolder, approved] }
-                  duplicated: { type: boolean }
-        '409': { description: externalId כבר דווח (מוחזר 200 עם duplicated=true בפועל) }
+                  ref: { type: string }
+                  status:
+                    type: string
+                    enum: [sent, seen, priced, accepted, declined, fulfilled, cancelled]
+                  total: { type: [number, 'null'], description: 'null = טרם תומחר' }
+                  currency: { type: [string, 'null'] }
+                  lines:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        productId: { type: string }
+                        variantId: { type: [string, 'null'] }
+                        quantity: { type: number }
+                        unitPrice: { type: [number, 'null'] }
+                        name: { type: [string, 'null'] }
+                  updatedAt: { type: string, format: date-time }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { description: אין בקשה כזו ברקמה הזו }
 
   /api/v1/r/{rikma}/sales:
     post:
@@ -544,6 +650,7 @@ components:
       bearerFormat: 1lev1_api_key
       description: |
         מפתח `1lev1_...` עם scope `products:read` (ואופציונלית `products:read:draft`).
+        `POST /orders` דורש `orders:create`; `GET /orders/{ref}` דורש `orders:read`.
         המפתח מקובע לרקמה: פנייה לרקמה אחרת ⇒ 403 `RIKMA_MISMATCH`, גם אם בעליו חבר בשתיהן.
         מפתח ברמת משתמש (בלי רקמה — מפתח פרופיל/MCP/OAuth) ⇒ 403 `KEY_NOT_SCOPED`,
         גם ב-GET שעובד אנונימית, וגם ב-`/api/v1/me`.
@@ -574,21 +681,73 @@ components:
       name: sort
       in: query
       schema: { type: string, default: '-updatedAt', example: '-updatedAt' }
-      description: אחד מ-`price`, `-price`, `createdAt`, `-createdAt`, `name`, `-updatedAt`
+      description: |-
+        אחד מ-`price`, `priceMax`, `createdAt`, `updatedAt`, `name`, עם `-`
+        לסדר יורד. `price` ממופה ל-`priceMin` (המחיר הזול ביותר של המוצר),
+        ולכן הוא נכון גם למוצר עם וריאנטים.
     Query: { name: q, in: query, schema: { type: string, maxLength: 100 } }
     Seller: { name: seller, in: query, schema: { type: string }, example: 'person:88' , description: 'person:<id> או rikma:<id>' }
     Category: { name: category, in: query, schema: { type: string }, description: id או שם; ניתן לחזור }
-    MinPrice: { name: minPrice, in: query, schema: { type: number } }
-    MaxPrice: { name: maxPrice, in: query, schema: { type: number } }
+    MinPrice:
+      name: minPrice
+      in: query
+      schema: { type: number }
+      description: |-
+        חפיפת טווחים, לא השוואה למחיר בודד: `minPrice` ⇒ `priceMax >= v`,
+        `maxPrice` ⇒ `priceMin <= v`. כך מוצר עם וריאנט ב-90 עונה ל-`maxPrice=100`
+        גם אם מחיר הבסיס שלו 300. שורה ישנה בלי נגזרים נבדקת מול `price`.
+    MaxPrice:
+      name: maxPrice
+      in: query
+      schema: { type: number }
+      description: ראו `minPrice` — אותה סמנטיקה מהצד השני.
     Currency: { name: currency, in: query, schema: { type: string }, example: ILS }
-    Available: { name: available, in: query, schema: { type: boolean } }
+    Available:
+      name: available
+      in: query
+      schema: { type: boolean }
+      description: |-
+        `true` = יש מלאי. נקרא מ-`stockTotal` (נגזר) כשהוא קיים, אחרת מ-`quant`;
+        `-1` הוא "ללא הגבלה" ולכן עונה `true`. `inStock` הוא אותו פרמטר בשם אחר.
+    HasVariants:
+      name: hasVariants
+      in: query
+      schema: { type: boolean }
+      description: |-
+        `true` = רק מוצרים עם וריאנטים. כל עוד סכמת החנות לא נפרסה, התשובה היא
+        רשימה ריקה (ולא 400) — "אין כאן מוצרים שעונים על זה", שזה נכון.
+    Sku:
+      name: sku
+      in: query
+      schema: { type: string, maxLength: 64 }
+      description: |-
+        מקט"ט מדויק. סינון על הווריאנטים ⇒ מחזיר את **המוצר** של אותו SKU
+        (צרכן שקורא `expand=variants` רואה איזו שורה תאמה). רשימה ריקה לפני
+        שהסכמה נפרסה — כמו `hasVariants`.
+    OptionSize:
+      name: option.size
+      in: query
+      schema: { type: string, pattern: '^[a-z0-9][a-z0-9._-]{0,59}$' }
+      description: |-
+        בחירת ציר: `?option.size=m`, `?option.color=red`. הערך מנורמל לאותיות
+        קטנות (כמו `axisKey` שנכתב בשמירה); ריבוי צירים ⇒ **אותו** וריאנט צריך
+        לשאת את כולם (`?option.size=m&option.color=red` = M **וגם** אדום).
+        תו `|` או `:` בערך ⇒ 400 (הם המפרידים של `axisKey`).
     KindOf: { name: kindOf, in: query, schema: { $ref: '#/components/schemas/KindOf' } }
     Lat: { name: lat, in: query, schema: { type: number } }
     Lng: { name: lng, in: query, schema: { type: number } }
     Radius: { name: radius, in: query, schema: { type: integer }, description: מטרים }
     Locale: { name: locale, in: query, schema: { type: string, enum: [he, en, ar, ru, es] } }
     Fields: { name: fields, in: query, schema: { type: string }, example: 'id,name,price,currency' }
-    Expand: { name: expand, in: query, schema: { type: string }, example: 'categories,rikma' }
+    Expand:
+      name: expand
+      in: query
+      schema: { type: string, enum: [rikma, variants] }
+      description: |-
+        `rikma` = בלוק הרקמה, `variants` = שורות הווריאנטים המלאות. הערכים
+        המוכרים הם בדיוק אלה; ערך אחר ⇒ 400 (ולא "התעלמנו בשקט").
+        `variants` ברשימה הוא אופציה כי 24 מוצרים × 12 וריאנטים הוא payload
+        שאיש לא ביקש; בפרט מוצר הוא תמיד מוחזר.
     Status:
       name: status
       in: query
@@ -790,7 +949,33 @@ components:
         # finalPrice, priceBreakdown, fulfillment{statusProcess, agreedPrice,
         # atCost}, priceValidUntil. אין לממש לפני החלטה; מתועד כאן כדי
         # שצרכן לא יניח שהמחיר תמיד סקלרי וסופי.
-        availability: { $ref: '#/components/schemas/Availability' }
+        availability:
+          allOf: [{ $ref: '#/components/schemas/Availability' }]
+          description: |-
+            כשהמוצר עם וריאנטים והווריאנטים הועמסו — זה הסכום של הפעילים,
+            ולכן `unlimited` כשאחד מהם ללא הגבלה. אחרת: `stockTotal` הנגזר,
+            ואם אין — `quant` (כמו היום).
+        priceRange:
+          anyOf: [{ $ref: '#/components/schemas/PriceRange' }, { type: 'null' }]
+        hasVariants:
+          type: boolean
+          description: 'Product-level flag; `variants[]` מלא רק בפרט או עם `expand=variants`'
+        variants:
+          type: array
+          items: { $ref: '#/components/schemas/Variant' }
+          description: ריק ברשימה אלא אם `expand=variants`; בפרט מוצר — תמיד
+        options:
+          type: array
+          items: { $ref: '#/components/schemas/Option' }
+          description: הצירים שהמוצר הזה משתמש בהם — מה שבורר הווריאנטים מצייר
+        unit: { type: [string, 'null'], example: ק"ג }
+        minOrder: { type: [number, 'null'] }
+        maxOrder: { type: [number, 'null'] }
+        leadTimeHours: { type: [integer, 'null'] }
+        delivery:
+          type: array
+          items: { $ref: '#/components/schemas/DeliveryOption' }
+        externalKey: { type: [string, 'null'], description: מזהה URL ידידותי (§9.10) }
         kindOf: { $ref: '#/components/schemas/KindOf' }
         categories:
           type: array
@@ -853,6 +1038,134 @@ components:
             self: { type: [string, 'null'] }
             next: { type: [string, 'null'] }
             prev: { type: [string, 'null'] }
+    # ── v1.1 — החנות ────────────────────────────────────────────────────
+    PriceRange:
+      type: object
+      required: [min, max]
+      properties:
+        min: { type: number }
+        max: { type: number }
+        currency: { type: [string, 'null'] }
+      description: |-
+        הטווח שהקונה יראה כ"החל מ-". מחושב מהשדות הנגזרים כשהווריאנטים לא
+        הועמסו, ומהשורות עצמן כשהם כן. `null` = אין מה להציג (מוצר `quote`,
+        או מוצר שיש לו וריאנטים שטרם תומחרו) — לא אפס.
+    OptionValue:
+      type: object
+      required: [value]
+      properties:
+        value: { type: string, description: 'המזהה שבסינון — תמיד אותיות קטנות' }
+        label: { type: [string, 'null'], description: 'ריק ⇒ הקונה רואה את ה-value' }
+        hex: { type: [string, 'null'], description: 'ריבוע צבע; נפסל אם אינו צבע חוקי' }
+        image: { anyOf: [{ $ref: '#/components/schemas/Image' }, { type: 'null' }] }
+    Option:
+      type: object
+      required: [key]
+      properties:
+        key: { type: string, example: size }
+        name: { type: [string, 'null'], example: מידה }
+        values:
+          type: array
+          items: { $ref: '#/components/schemas/OptionValue' }
+    OptionAxis:
+      allOf:
+        - $ref: '#/components/schemas/Option'
+        - type: object
+          properties:
+            values:
+              type: array
+              items:
+                allOf:
+                  - $ref: '#/components/schemas/OptionValue'
+                  - type: object
+                    properties:
+                      products:
+                        type: integer
+                        description: מספר המוצרים שהקורא רשאי לראות מאחורי הערך
+    VariantOption:
+      type: object
+      properties:
+        key: { type: string }
+        value: { type: string }
+        label: { type: [string, 'null'] }
+    Variant:
+      type: object
+      required: [id, availability]
+      properties:
+        id: { type: string }
+        sku: { type: [string, 'null'], example: KER-M-RED }
+        name: { type: [string, 'null'], description: '"M / אדום"; נגזר מהערכים כשלא הוזן' }
+        optionValues:
+          type: array
+          items: { $ref: '#/components/schemas/VariantOption' }
+        price:
+          type: [number, 'null']
+          description: |-
+            המחיר שהקונה משלם על הצירוף הזה. `null` ⇒ מחיר המוצר (המחיר
+            שנכתב כאן כברירת מחדל); ואם המוצר `pricingMode=quote` — `null`
+            הוא "המחיר ייקבע בהתאמה", כמו `price`.
+        compareAtPrice: { type: [number, 'null'], description: מחיר "לפני" — תצוגת מבצע }
+        availability: { $ref: '#/components/schemas/Availability' }
+        images:
+          type: array
+          items: { $ref: '#/components/schemas/Image' }
+          description: ריק ⇒ הגלריה של המוצר
+        active: { type: boolean, description: 'false ⇒ לא נבחר ולא נמכר (נשאר בהיסטוריה)' }
+        externalKey: { type: [string, 'null'], description: למזהה URL ידידותי }
+    DeliveryOption:
+      type: object
+      properties:
+        kind: { type: string, enum: [pickup, delivery, digital, contact] }
+        note: { type: [string, 'null'] }
+        fee: { type: [number, 'null'] }
+        currency: { type: [string, 'null'] }
+    OrderLine:
+      type: object
+      required: [productId, quantity]
+      properties:
+        productId: { type: string }
+        variantId: { type: string, description: 'חובה כשהמוצר עם וריאנטים — אחרת 409 VARIANT_REQUIRED' }
+        quantity: { type: number, minimum: 0 }
+        note: { type: string }
+    OrderRequest:
+      type: object
+      required: [lines]
+      properties:
+        externalId: { type: string, description: מזהה להזמנה הזו אצל הלקוח — אידמפוטנטיות }
+        lines:
+          type: array
+          items: { $ref: '#/components/schemas/OrderLine' }
+        buyer:
+          type: object
+          properties:
+            name: { type: string }
+            email: { type: string }
+            phone: { type: string, description: 'PII — לא נכתב ל-webhook ולא נחשף חזרה' }
+        delivery:
+          type: object
+          properties:
+            preference: { type: string, enum: [pickup, delivery, digital, contact] }
+            address: { type: object, additionalProperties: true }
+        note: { type: string }
+        requestedDate: { type: string, format: date-time }
+        locale: { type: string }
+    OrderAccepted:
+      type: object
+      properties:
+        success: { type: boolean }
+        ref: { type: string, description: '57:web-8811 — המזהה למעקב' }
+        status: { type: string, enum: [sent] }
+        duplicated: { type: boolean }
+        lines:
+          type: array
+          items:
+            type: object
+            properties:
+              productId: { type: string }
+              variantId: { type: [string, 'null'] }
+              quantity: { type: number }
+              unitPrice: { type: [number, 'null'], description: 'null = טרם תומחר' }
+
     Error:
       type: object
       properties:
@@ -874,6 +1187,10 @@ components:
                 - RIKMA_MISMATCH
                 - RIKMA_NOT_FOUND
                 - PRODUCT_NOT_FOUND
+                - VARIANT_REQUIRED
+                - VARIANT_NOT_FOUND
+                - OUT_OF_STOCK
+                - QUANTITY_LIMIT
                 - NOT_FOUND
                 - RATE_LIMITED
                 - UPSTREAM_ERROR

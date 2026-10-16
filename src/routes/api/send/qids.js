@@ -29,6 +29,18 @@ const NOT_ARCHIVED = `{ or: [{ lifecycle: { null: true } }, { lifecycle: { ne: "
  * the DTO does not carry is how it ends up leaking later; the projector's
  * whitelist and its test are the other half of this decision.
  */
+/**
+ * Bounds for the shop-layer queries (PLAN_SHOP_CUSTOMER_EXPERIENCE §6.8).
+ *
+ * `SHOP_ATTRS_LIMIT` matches the public API's page cap (§5.5): one page of
+ * products, whichever way it was reached. `SHOP_VARIANTS_LIMIT` is the
+ * deliberate ceiling on one variants fetch — a product with more SKUs than this
+ * is a catalogue that wants its own pagination, and today it would be a payload
+ * nobody asked for.
+ */
+const SHOP_ATTRS_LIMIT = 100;
+const SHOP_VARIANTS_LIMIT = 1000;
+
 const API_PRODUCT_ATTRS = `
         name desc price pricingMode quant kindOf origin locale
         createdAt updatedAt startDate finnishDate
@@ -17334,6 +17346,83 @@ ${STIPEND_DECISION_FIELDS}
   // display name must not do that.
   'rikmaApiUserName': `query RikmaApiUserName($uid: ID!) {
     usersPermissionsUser(id: $uid) { data { id attributes { username } } }
+  }`,
+
+  /* ─────────────────────────────────────────────────────────────────────
+   * The shop layer — variants, gallery, aggregates
+   * (PLAN_SHOP_CUSTOMER_EXPERIENCE §6.8).
+   *
+   * These are asked **separately** from `rikmaApiProducts` on purpose: they
+   * select columns that live in `1.0b`'s shop schema, and a GraphQL field
+   * that does not exist fails the whole query. Keeping them apart is what lets
+   * the API be deployed before the schema and serve exactly today's payload
+   * until the columns land (catalog.ts `shopSchemaLive`).
+   * ───────────────────────────────────────────────────────────────────── */
+
+  // Is the shop schema there? `hasVariants` is the cheapest field that exists
+  // if and only if the shop schema was deployed. One row is enough.
+  'rikmaApiShopSchema': `query RikmaApiShopSchema {
+    matanots(pagination: { limit: 1 }) { data { id attributes { hasVariants } } }
+  }`,
+
+  // Gallery, denormalized aggregates, options, unit, delivery — for the
+  // products of one page (or one product).
+  'rikmaApiShopAttrs': `query RikmaApiShopAttrs($pid: ID!, $ids: [ID]) {
+    matanots(
+      filters: { and: [ { projectcreates: { id: { eq: $pid } } }, { id: { in: $ids } } ] }
+      pagination: { limit: ${SHOP_ATTRS_LIMIT} }
+    ) {
+      data { id attributes {
+        hasVariants priceMin priceMax stockTotal variantAxes
+        unit minOrder maxOrder leadTimeHours attributes deliveryOptions externalKey
+        pics { data { attributes { url alternativeText formats } } }
+        options { data { id attributes {
+          key name position
+          values { value label position hex image { data { attributes { url alternativeText formats } } } }
+        } } }
+      } }
+    }
+  }`,
+
+  // The option vocabulary of one rikma (`GET /options`, §5.3): the axes the
+  // merchant declared, their values, and the display order. `image` and `hex`
+  // are what makes a swatch a swatch.
+  'rikmaApiOptions': `query RikmaApiOptions($pid: ID!) {
+    productOptions(
+      filters: { and: [ { project: { id: { eq: $pid } } }, { active: { eq: true } } ] }
+      pagination: { limit: ${SHOP_ATTRS_LIMIT} }
+    ) {
+      data { id attributes {
+        key name position
+        values { value label position hex image { data { attributes { url alternativeText formats } } } }
+      } }
+    }
+  }`,
+
+  // Per-product option pairs, through the product → variants relation. Used
+  // only to count "how many products have size M" for `GET /options`; the
+  // visibility filter is the same `MatanotFiltersInput` as the catalog, so a
+  // count cannot be counted from a draft.
+  'rikmaApiShopAxes': `query RikmaApiShopAxes($filters: MatanotFiltersInput) {
+    matanots(filters: $filters, pagination: { limit: ${SHOP_VARIANTS_LIMIT} }) {
+      data { id attributes { variants { data { id attributes { optionValues active } } } } }
+    }
+  }`,
+
+  // The variant rows themselves, grouped by product in JS. Asked only for a
+  // detail call or `?expand=variants` (§5.1/§4.2): a grid does not need
+  // twelve SKU rows per card.
+  'rikmaApiShopVariants': `query RikmaApiShopVariants($pid: ID!, $ids: [ID]) {
+    productVariants(
+      filters: { and: [ { project: { id: { eq: $pid } } }, { matanot: { id: { in: $ids } } } ] }
+      pagination: { limit: ${SHOP_VARIANTS_LIMIT} }
+    ) {
+      data { id attributes {
+        sku name axisKey optionValues price compareAtPrice quant active position externalKey
+        matanot { data { id } }
+        pics { data { attributes { url alternativeText formats } } }
+      } }
+    }
   }`,
 
   ...qids_base,

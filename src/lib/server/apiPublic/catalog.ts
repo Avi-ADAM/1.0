@@ -28,6 +28,7 @@ import {
   type ApiRikmaRef
 } from './dto.js';
 import { apiRikmaPath } from './rikmaPath.js';
+import { optionAxesOf, optionValuesOf } from './shop.js';
 
 export type ApiRun = (
   qid: string,
@@ -39,10 +40,14 @@ export function strapiRun(fetchFn?: typeof fetch): ApiRun {
   return (qid, vars) =>
     strapiClient.execute(qid, vars, undefined, fetchFn).catch((e) => {
       // One place to say which query failed; the route turns it into a 502.
-      console.error(
-        `[apiPublic] ${qid} failed:`,
-        e?.getMessages ? e.getMessages() : e
-      );
+      // The shop-schema probe is the one exception: until `1.0b` deploys the
+      // shop columns it is *expected* to fail on every pass, and `shopSchemaLive`
+      // is the one that decides whether that failure is worth a word (§6.8).
+      if (qid !== 'rikmaApiShopSchema')
+        console.error(
+          `[apiPublic] ${qid} failed:`,
+          e?.getMessages ? e.getMessages() : e
+        );
       throw e;
     });
 }
@@ -135,6 +140,152 @@ export async function fetchRikmaProfile(
   return res?.data?.project?.data?.attributes ?? null;
 }
 
+// ─── the shop schema ────────────────────────────────────────────────────────
+//
+// Variants, galleries and the denormalized aggregates are new columns in
+// Strapi (PLAN_SHOP_CUSTOMER_EXPERIENCE §6). Until they are deployed, asking
+// for them fails the *whole* GraphQL query — a field that does not exist is a
+// validation error, not an empty list. So the catalog asks a smaller question
+// first: "is the shop schema there?" — and answers every request in the
+// meantime with exactly the payload it served before variants were designed.
+//
+// The verdict is process state, deliberately: one tiny query per ten minutes,
+// and a deployment that adds the columns starts serving them without a restart
+// (the shorter retry on "not there yet").
+
+const SHOP_SCHEMA_TTL_MS = 10 * 60 * 1000;
+const SHOP_SCHEMA_RETRY_MS = 60 * 1000;
+
+let shopSchemaVerdict: { live: boolean; until: number } | null = null;
+
+/** Test seam — the verdict is process state tests must not inherit. */
+export function resetShopSchemaVerdict(): void {
+  shopSchemaVerdict = null;
+}
+
+function errorText(e: any): string {
+  return String(e?.getMessages ? e.getMessages().join(' ') : (e?.message ?? e));
+}
+
+/**
+ * Is the shop schema (variants / gallery / denormalized aggregates) readable?
+ *
+ * A field that does not exist and a Strapi that is briefly unhappy both land
+ * here as "not live" — the difference is only how long we believe it. A
+ * validation error means the schema is absent (check again in ten minutes); a
+ * network error means we do not know (check again in one minute).
+ */
+export async function shopSchemaLive(run: ApiRun): Promise<boolean> {
+  const now = Date.now();
+  if (shopSchemaVerdict && shopSchemaVerdict.until > now)
+    return shopSchemaVerdict.live;
+
+  let live = false;
+  let retryMs = SHOP_SCHEMA_RETRY_MS;
+  try {
+    const res = await run('rikmaApiShopSchema', {});
+    const attrs = res?.data?.matanots?.data?.[0]?.attributes;
+    // The field being *present* is the test — not its value: `false` on every
+    // row is a perfectly live schema.
+    live =
+      !!attrs && Object.prototype.hasOwnProperty.call(attrs, 'hasVariants');
+    retryMs = live ? SHOP_SCHEMA_TTL_MS : SHOP_SCHEMA_RETRY_MS;
+  } catch (e) {
+    const message = errorText(e);
+    // "The columns are not there yet" is the expected state during the rollout
+    // described in §6.8 — it is not a warning, it is a schedule. Anything else
+    // (a network failure, an unreadable deployment) *is* worth saying out loud.
+    const schemaMissing = /GRAPHQL_VALIDATION_FAILED|Cannot query field/i.test(
+      message
+    );
+    const qidMissing = /QUERY_NOT_FOUND|not found in QIDS/i.test(message);
+    retryMs = schemaMissing ? SHOP_SCHEMA_TTL_MS : SHOP_SCHEMA_RETRY_MS;
+    if (!schemaMissing && !qidMissing) {
+      console.warn(
+        '[apiPublic] the shop schema could not be checked — products answer without variants:',
+        message
+      );
+    }
+  }
+  shopSchemaVerdict = { live, until: now + retryMs };
+  return live;
+}
+
+/**
+ * The optional shop row of the products in this page: gallery, aggregates,
+ * options, unit, delivery. Keyed by product id.
+ *
+ * It is a *separate* query on purpose — the catalog query must keep working
+ * when these columns do not exist yet, and it must not grow a dependency on a
+ * schema that is deployed on a different day than the code.
+ */
+export async function fetchShopRows(
+  run: ApiRun,
+  args: { projectId: string; productIds: string[] }
+): Promise<Map<string, Record<string, any>>> {
+  if (!args.productIds.length) return new Map();
+  if (!(await shopSchemaLive(run))) return new Map();
+  try {
+    const res = await cachedRun(run, 'rikmaApiShopAttrs', {
+      pid: String(args.projectId),
+      ids: args.productIds
+    });
+    const rows: any[] = res?.data?.matanots?.data ?? [];
+    return new Map(
+      rows.map((row) => [
+        String(row.id),
+        (row.attributes ?? {}) as Record<string, any>
+      ])
+    );
+  } catch (e) {
+    console.warn(
+      '[apiPublic] shop attrs could not be read — falling back to the product row:',
+      errorText(e)
+    );
+    return new Map();
+  }
+}
+
+/**
+ * The variant rows of the products in this page, grouped by product id.
+ *
+ * Fetched only when the caller asked for them (`?expand=variants` on a list,
+ * always on the detail): a shop that renders cards does not need twelve rows
+ * of SKUs per card, and the aggregates it *does* need come from
+ * `fetchShopRows`.
+ */
+export async function fetchVariantRows(
+  run: ApiRun,
+  args: { projectId: string; productIds: string[] }
+): Promise<Map<string, any[]>> {
+  if (!args.productIds.length) return new Map();
+  if (!(await shopSchemaLive(run))) return new Map();
+  try {
+    const res = await cachedRun(run, 'rikmaApiShopVariants', {
+      pid: String(args.projectId),
+      ids: args.productIds
+    });
+    const rows: any[] = res?.data?.productVariants?.data ?? [];
+    const byProduct = new Map<string, any[]>();
+    for (const row of rows) {
+      // The relation is what groups them: a variant that cannot say which
+      // product it belongs to is dropped rather than guessed onto a row.
+      const pid = String(row?.attributes?.matanot?.data?.id ?? '');
+      if (!pid) continue;
+      const list = byProduct.get(pid) ?? [];
+      list.push(row);
+      byProduct.set(pid, list);
+    }
+    return byProduct;
+  } catch (e) {
+    console.warn(
+      '[apiPublic] variants could not be read — products answer without them:',
+      errorText(e)
+    );
+    return new Map();
+  }
+}
+
 // ─── products ───────────────────────────────────────────────────────────────
 
 export interface ProductPage {
@@ -177,6 +328,10 @@ export async function fetchProductPage(
   }
 ): Promise<ProductPage> {
   const { projectId, rikma, access, query } = args;
+  // Nothing this deployment could match (`?hasVariants=true` with no shop
+  // schema): the empty answer is known before any query is sent (§5.5).
+  if (query.matchesNothing) return { data: [], total: 0, pages: 0 };
+
   const filters = buildCatalogFilters(
     projectId,
     query.statuses,
@@ -192,8 +347,25 @@ export async function fetchProductPage(
   });
 
   const rows: any[] = res?.data?.matanots?.data ?? [];
+  const productIds = rows.map((node) => String(node.id));
+
+  // Two optional queries, both of which degrade to "no shop layer" rather than
+  // to an error: the aggregates/gallery block (always, when the schema exists)
+  // and the variant rows (only when they were asked for).
+  const shopRows = await fetchShopRows(run, { projectId, productIds });
+  const wantVariants = query.expand.includes('variants');
+  const variantRows = wantVariants
+    ? await fetchVariantRows(run, { projectId, productIds })
+    : null;
+
   const data = rows
-    .map((node) => toApiProduct(node, rikma))
+    .map((node) => {
+      const id = String(node.id);
+      return toApiProduct(node, rikma, {
+        attrs: shopRows.get(id) ?? null,
+        variants: variantRows ? (variantRows.get(id) ?? []) : undefined
+      });
+    })
     .filter((p): p is ApiProduct => p !== null)
     .filter((p) => canSeeStatus(access, p.status));
 
@@ -212,7 +384,24 @@ export async function fetchProduct(
   });
   const node = res?.data?.matanots?.data?.[0];
   if (!node) return null;
-  return toApiProduct(node, args.rikma);
+
+  // The detail call is where variants are always worth loading: it is the page
+  // a buyer chooses on, and the price/stock of the chosen combination has to be
+  // in the same response (§5.1).
+  const productIds = [String(node.id)];
+  const shopRows = await fetchShopRows(run, {
+    projectId: String(args.projectId),
+    productIds
+  });
+  const variantRows = await fetchVariantRows(run, {
+    projectId: String(args.projectId),
+    productIds
+  });
+
+  return toApiProduct(node, args.rikma, {
+    attrs: shopRows.get(productIds[0]) ?? null,
+    variants: variantRows.get(productIds[0]) ?? []
+  });
 }
 
 /** Counts of the visible products, for the profile's `productsCount`. */
@@ -239,7 +428,8 @@ export async function fetchVisibleProductCount(
       expand: [],
       locale: null,
       updatedSince: null,
-      explicitStatus: false
+      explicitStatus: false,
+      matchesNothing: false
     }
   });
   return page.total;
@@ -299,6 +489,63 @@ export async function fetchCategories(
     )
     .filter((c) => c.name)
     .sort((a, b) => (a.name ?? '').localeCompare(b.name ?? '', 'he'));
+}
+
+// ─── options ────────────────────────────────────────────────────────────────
+
+export interface OptionAxis {
+  key: string;
+  name: string | null;
+  values: Array<{ value: string; label: string | null; products: number }>;
+}
+
+/**
+ * The rikma's option axes with a count of visible products per value
+ * (`GET /options`, §5.3) — what a storefront renders as its filter bar.
+ *
+ * Two queries, and the second one is the interesting one: the counts come from
+ * the **variant rows themselves**, not from the denormalized `variantAxes`,
+ * because the value a shopper clicks must lead to the same set the
+ * `?option.<key>=<value>` filter returns. A count and a filter that disagree
+ * are worse than no count.
+ *
+ * Visibility is the catalog's own rule, twice: `buildCatalogFilters` in SQL and
+ * `canSeeStatus` in JS after it — a count is a leak if it is counted from a row
+ * the filter should have dropped (same reasoning as `fetchCategories`).
+ *
+ * No shop schema ⇒ no axes. An empty filter bar is the honest answer for a
+ * deployment that cannot answer the filter behind it.
+ */
+export async function fetchOptions(
+  run: ApiRun,
+  args: { projectId: string; access: ApiAccess }
+): Promise<OptionAxis[]> {
+  if (!(await shopSchemaLive(run))) return [];
+
+  const filters = buildCatalogFilters(
+    args.projectId,
+    defaultListStatuses(args.access),
+    []
+  );
+  if (!filters) return [];
+
+  const [axesRes, productsRes] = await Promise.all([
+    cachedRun(run, 'rikmaApiOptions', { pid: String(args.projectId) }),
+    cachedRun(run, 'rikmaApiShopAxes', { filters })
+  ]);
+
+  const products: Array<{
+    optionValues: Array<{ key: string; value: string }>;
+  }> = [];
+  for (const node of productsRes?.data?.matanots?.data ?? []) {
+    if (!canSeeStatus(args.access, productStatusOf(node?.attributes))) continue;
+    for (const variant of node?.attributes?.variants?.data ?? []) {
+      const optionValues = optionValuesOf(variant?.attributes);
+      if (optionValues.length) products.push({ optionValues });
+    }
+  }
+
+  return optionAxesOf(axesRes?.data?.productOptions?.data ?? [], products);
 }
 
 // ─── response bodies ────────────────────────────────────────────────────────

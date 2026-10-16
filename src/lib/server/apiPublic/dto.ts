@@ -36,6 +36,33 @@ import { SITE_ORIGIN, rikmaPath } from '$lib/rikmaAddress/rikmaUrl.js';
 import { parseLook } from '$lib/rikmaLook/look.js';
 import { apiRikmaPath } from './rikmaPath.js';
 import { sanitizeDescriptionHtml } from './html.js';
+import {
+  availabilityOf,
+  imageOf,
+  num,
+  str,
+  toApiShop,
+  type ApiAvailability,
+  type ApiDeliveryOption,
+  type ApiImage,
+  type ApiOption,
+  type ApiPriceRange,
+  type ApiShop,
+  type ApiVariant
+} from './shop.js';
+
+// The primitives the shop layer owns now that it also needs them. Re-exported
+// so every existing import of `imageOf` / `availabilityOf` keeps working —
+// `shop.ts` imports nothing from here, which is what keeps the graph acyclic.
+export { availabilityOf, imageOf, num, str };
+export type {
+  ApiAvailability,
+  ApiDeliveryOption,
+  ApiImage,
+  ApiOption,
+  ApiPriceRange,
+  ApiVariant
+};
 
 // ─── status ─────────────────────────────────────────────────────────────────
 
@@ -192,13 +219,6 @@ export function statusFilterFor(
 
 // ─── the DTO ────────────────────────────────────────────────────────────────
 
-export interface ApiImage {
-  url: string;
-  width: number | null;
-  height: number | null;
-  alt: string | null;
-}
-
 export interface ApiSeller {
   type: 'person' | 'rikma';
   id: string | null;
@@ -216,12 +236,6 @@ export interface ApiGeo {
   isOnline: boolean;
 }
 
-export interface ApiAvailability {
-  unlimited: boolean;
-  /** `null` iff `unlimited` — so a consumer cannot print "0 in stock" by accident. */
-  quantity: number | null;
-}
-
 export interface ApiProduct {
   id: string;
   name: string;
@@ -234,6 +248,7 @@ export interface ApiProduct {
   availability: ApiAvailability;
   kindOf: string | null;
   categories: Array<{ id: string; name: string }>;
+  /** The gallery, cover first. One image when the product has only `pic`. */
   images: ApiImage[];
   seller: ApiSeller;
   geo: ApiGeo;
@@ -247,6 +262,26 @@ export interface ApiProduct {
   url: string;
   /** Where a buyer acts (request/checkout). Null when nothing can be bought. */
   buyUrl: string | null;
+
+  // ─── the shop layer (PLAN_SHOP_CUSTOMER_EXPERIENCE §5.1) ─────────────────
+  /** `min`/`max` of the active variants, or the single price. `null` ⇒ quote. */
+  priceRange: ApiPriceRange | null;
+  /** True when the product has variant rows — including when they were not loaded. */
+  hasVariants: boolean;
+  /** The axes a buyer chooses from (size, colour…). Empty without variants. */
+  options: ApiOption[];
+  /** Only populated on the detail call or with `?expand=variants`. */
+  variants: ApiVariant[];
+  /** Sale unit: "יח'", "ק\"ג", "מקום". */
+  unit: string | null;
+  minOrder: number | null;
+  maxOrder: number | null;
+  leadTimeHours: number | null;
+  /** Controlled extras (§4.9) — scalars only, never HTML. */
+  attributes: Record<string, string | number | boolean> | null;
+  delivery: ApiDeliveryOption[];
+  /** The rikma's own key for this product's address (§9.10). */
+  externalKey: string | null;
 }
 
 export interface ApiRikmaRef {
@@ -275,39 +310,9 @@ export interface ApiCategory {
   productsCount: number | null;
 }
 
-function num(v: unknown): number | null {
-  const n = typeof v === 'string' ? Number(v) : (v as number);
-  return typeof n === 'number' && Number.isFinite(n) ? n : null;
-}
-
-function str(v: unknown): string | null {
-  return typeof v === 'string' && v.length ? v : null;
-}
-
 /** Join the platform origin with a path — `/gift/1842` ⇒ absolute. */
 function abs(path: string): string {
   return path.startsWith('http') ? path : `${SITE_ORIGIN}${path}`;
-}
-
-/**
- * One product photo, at the size the rest of the platform uses
- * (`picUrlOf` prefers `small`). A real media pipeline — several sizes, focal
- * point, CDN — is P1 (§4.10); until then one image per product, and the URL is
- * absolute because the consumer is another origin.
- */
-export function imageOf(pic: any): ApiImage | null {
-  const a = pic?.data?.attributes;
-  if (!a) return null;
-  const size =
-    a.formats?.small || a.formats?.medium || a.formats?.thumbnail || a;
-  const url = str(size.url) || str(a.url);
-  if (!url) return null;
-  return {
-    url: mediaUrl(url),
-    width: num(size.width),
-    height: num(size.height),
-    alt: str(a.alternativeText) || str(a.caption)
-  };
 }
 
 /** A seller's own picture — the personal-seller path passes `owner_user.picUrl`. */
@@ -351,18 +356,6 @@ export function sellerOf(
   };
 }
 
-/**
- * `quant` semantics come from the sale path, not from a guess: `-1` is
- * "unlimited" (`createSale` skips the decrement for it, `hamatanot.svelte`
- * prints "ללא הגבלה"), every other value is a count, and a missing value reads
- * as 0 — which is what `/gift/[id]` does (`data.alld?.quant || 0`).
- */
-export function availabilityOf(attrs: Record<string, any>): ApiAvailability {
-  const quant = num(attrs?.quant);
-  if (quant === -1) return { unlimited: true, quantity: null };
-  return { unlimited: false, quantity: quant === null ? 0 : quant };
-}
-
 function pricingModeOf(
   attrs: Record<string, any>
 ): 'fixed' | 'estimated' | 'quote' {
@@ -379,20 +372,41 @@ function pricingModeOf(
  */
 export function toApiProduct(
   node: { id: string | number; attributes?: Record<string, any> | null },
-  rikma: ApiRikmaRef
+  rikma: ApiRikmaRef,
+  /**
+   * The optional shop layer (PLAN_SHOP_CUSTOMER_EXPERIENCE §5.1).
+   *
+   * `attrs` is the row of the shop-attrs query (gallery, denormalized
+   * aggregates, options, unit, attributes, delivery) — absent while the shop
+   * schema is not deployed, which is the normal state today. `variants` are the
+   * raw `product-variant` rows, passed only when somebody actually asked for
+   * them (detail, or `?expand=variants`); `undefined` means "not loaded", and
+   * the difference matters: it is what lets `priceRange` answer `null` instead
+   * of understating the cheapest variant.
+   */
+  shop: {
+    attrs?: Record<string, any> | null;
+    variants?: any[] | null;
+  } = {}
 ): ApiProduct | null {
   const a = node?.attributes;
   if (!a || !str(a.name)) return null;
 
   const pricingMode = pricingModeOf(a);
   const price = pricingMode === 'quote' ? null : num(a.price);
+  const currency = str(a.currency?.data?.attributes?.code);
   const loc = resolveLocation(a.location, {
     lat: a.lat,
     lng: a.lng,
     radius: a.radius
   });
-  const image = imageOf(a.pic);
   const id = String(node.id);
+  const block: ApiShop = toApiShop(a, {
+    extra: shop.attrs ?? null,
+    variants: shop.variants ?? null,
+    price,
+    currency
+  });
 
   // Text comes from the sanitized HTML too, so a `<script>` body never
   // surfaces as words in the plain-text field.
@@ -404,14 +418,14 @@ export function toApiProduct(
     descriptionText: excerptOf(descriptionHtml),
     status: productStatusOf(a),
     price,
-    currency: str(a.currency?.data?.attributes?.code),
+    currency,
     pricingMode,
-    availability: availabilityOf(a),
+    availability: block.availability,
     kindOf: str(a.kindOf),
     categories: (a.categories?.data ?? [])
       .map((c: any) => ({ id: String(c.id), name: str(c?.attributes?.name) }))
       .filter((c: any) => c.name),
-    images: image ? [image] : [],
+    images: block.images,
     seller: sellerOf(a, rikma),
     geo: {
       lat: loc.lat,
@@ -429,7 +443,18 @@ export function toApiProduct(
     origin: str(a.origin),
     updatedAt: str(a.updatedAt),
     url: abs(`/gift/${id}`),
-    buyUrl: abs(`/gift/${id}`)
+    buyUrl: abs(`/gift/${id}`),
+    priceRange: block.priceRange,
+    hasVariants: block.hasVariants,
+    options: block.options,
+    variants: block.variants,
+    unit: block.unit,
+    minOrder: block.minOrder,
+    maxOrder: block.maxOrder,
+    leadTimeHours: block.leadTimeHours,
+    attributes: block.attributes,
+    delivery: block.delivery,
+    externalKey: block.externalKey
   };
 }
 
@@ -529,7 +554,20 @@ export const API_PRODUCT_FIELDS: readonly string[] = [
   'origin',
   'updatedAt',
   'url',
-  'buyUrl'
+  'buyUrl',
+  // the shop layer (§5.1). `?fields=priceRange.min` works like every other
+  // dotted path — see `API_PRODUCT_FIELD_SET`.
+  'priceRange',
+  'hasVariants',
+  'options',
+  'variants',
+  'unit',
+  'minOrder',
+  'maxOrder',
+  'leadTimeHours',
+  'attributes',
+  'delivery',
+  'externalKey'
 ];
 
 /**
@@ -566,18 +604,26 @@ export function projectFields<T extends Record<string, any>>(
 /** The field names a caller may ask for, as a `Set` for cheap validation. */
 export const API_PRODUCT_FIELD_SET = new Set<string>([
   ...API_PRODUCT_FIELDS,
-  ...['availability', 'categories', 'images', 'seller', 'geo', 'dates'].flatMap(
-    (block) =>
-      // The dotted forms a client may ask for. Kept explicit rather than derived:
-      // an accidental `geo.isOnline` typo should be a 400, not an empty object.
-      ({
-        availability: ['quantity', 'unlimited'],
-        categories: [],
-        images: [],
-        seller: ['type', 'id', 'name', 'url', 'picUrl'],
-        geo: ['lat', 'lng', 'radius', 'hint', 'isOnline'],
-        dates: ['startDate', 'finnishDate']
-      })[block].map((sub) => `${block}.${sub}` as string)
+  ...[
+    'availability',
+    'categories',
+    'images',
+    'seller',
+    'geo',
+    'dates',
+    'priceRange'
+  ].flatMap((block) =>
+    // The dotted forms a client may ask for. Kept explicit rather than derived:
+    // an accidental `geo.isOnline` typo should be a 400, not an empty object.
+    ({
+      availability: ['quantity', 'unlimited'],
+      categories: [],
+      images: [],
+      seller: ['type', 'id', 'name', 'url', 'picUrl'],
+      geo: ['lat', 'lng', 'radius', 'hint', 'isOnline'],
+      dates: ['startDate', 'finnishDate'],
+      priceRange: ['min', 'max', 'currency']
+    })[block].map((sub) => `${block}.${sub}` as string)
   )
 ]);
 
@@ -644,5 +690,20 @@ export const FORBIDDEN_DTO_KEYS: readonly string[] = [
   'users_permissions_user',
   'formerSlugs',
   'email',
-  'phoneNumber'
+  'phoneNumber',
+  // the shop's plumbing (PLAN_SHOP_CUSTOMER_EXPERIENCE §2.4/§6)
+  // The derived aggregates are written by the merchant save and read by the
+  // filters; the DTO carries `priceRange`/`availability` instead, computed.
+  // `pics`/`axisKey`/`optionValues` are raw shapes the projector renames, and
+  // `barcode`/`weightGrams` are logistics the buyer does not choose by.
+  'stockTotal',
+  'priceMin',
+  'priceMax',
+  'variantAxes',
+  'pics',
+  'deliveryOptions',
+  'axisKey',
+  'barcode',
+  'weightGrams',
+  'assignedMember'
 ];

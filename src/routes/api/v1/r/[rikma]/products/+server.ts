@@ -16,6 +16,7 @@ import {
   fetchProductPage,
   fetchRikmaRef,
   refOf,
+  shopSchemaLive,
   strapiRun
 } from '$lib/server/apiPublic/catalog.js';
 import { isHiddenProject } from '$lib/server/discovery/hiddenProjects.js';
@@ -75,7 +76,13 @@ export const GET: RequestHandler = async ({ params, url, request, fetch }) => {
 
   const { access } = auth;
 
-  const parsed = parseCatalogQuery(url.searchParams, access);
+  // What this deployment can answer (§5.2): with no shop schema, a price
+  // filter reads `price` and `?hasVariants=true` is an honest empty list —
+  // decided before the query, so no request ever depends on a column that is
+  // not there yet.
+  const caps = { shopSchema: await shopSchemaLive(run) };
+
+  const parsed = parseCatalogQuery(url.searchParams, access, caps);
   if (parsed.ok === false)
     return errorResponse(parsed.status, parsed.code, parsed.message);
   const query = parsed.value;
