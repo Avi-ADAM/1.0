@@ -652,6 +652,20 @@ export const qidsAccess = {
   'tasksApiActStatus': { allow: ['serviceAdmin'] },
   'tasksApiWebhookTargets': { allow: ['serviceAdmin'] },
 
+  // Public read API — a rikma's catalog (PLAN_HEADLESS_PRODUCTS_API, Phase 0/1):
+  // executed with the ADMIN_TOKEN through strapiClient by
+  // src/lib/server/apiPublic/*, never through /api/send. The endpoint does its
+  // own key verification + scope check (products:read), so an apiKey principal
+  // must NOT be able to reach these rows directly — `rikmaApiProducts` takes a
+  // raw filter, which is exactly what a scoped key is supposed to be saved from.
+  'rikmaApiProducts': { allow: ['serviceAdmin'] },
+  'rikmaApiProduct': { allow: ['serviceAdmin'] },
+  'rikmaApiCategories': { allow: ['serviceAdmin'] },
+  'rikmaApiRef': { allow: ['serviceAdmin'] },
+  'rikmaApiProject': { allow: ['serviceAdmin'] },
+  'rikmaApiExposure': { allow: ['serviceAdmin'] },
+  'rikmaApiUserName': { allow: ['serviceAdmin'] },
+
   // Site reports mirrored into the central rikma — same story, and a report
   // carries the reporter's email, so it is never reachable with a user JWT.
   'siteReportStatus': { allow: ['serviceAdmin'] },

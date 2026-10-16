@@ -18,8 +18,20 @@ const SALES_API_SCOPES = ['sales:report'];
  * Capabilities a rikma-scoped key may be granted. A key carries only what was
  * ticked, so a ticket-desk key can never file a sale and a shop key can never
  * put work on a member's plate.
+ *
+ * `products:read` is the catalog read scope (PLAN_HEADLESS_PRODUCTS_API §4.2);
+ * `products:read:draft` extends the *same* key to drafts, so it is normalized
+ * below to always arrive together with `products:read` — a key that can read
+ * drafts but not the catalog would be a key with no purpose, and the two scope
+ * checks in $lib/server/apiPublic/http.ts must not have to guess.
  */
-const GRANTABLE_SCOPES = ['sales:report', 'tasks:create', 'tasks:read'] as const;
+const GRANTABLE_SCOPES = [
+  'sales:report',
+  'tasks:create',
+  'tasks:read',
+  'products:read',
+  'products:read:draft'
+] as const;
 
 /** Callbacks must be absolute http(s) — a relative or exotic URL is a config bug. */
 function normalizeCallbackUrl(raw: unknown): string | null {
@@ -42,6 +54,11 @@ function normalizeScopes(raw: unknown): string[] {
   const unknown = scopes.find((s) => !GRANTABLE_SCOPES.includes(s as any));
   if (unknown) throw error(400, `Unknown scope "${unknown}"`);
   if (scopes.length === 0) throw error(400, 'At least one scope is required');
+  // Draft reading is a widening of the catalog read scope, never a scope on its
+  // own: tick the draft box and the read box is ticked with it.
+  if (scopes.includes('products:read:draft') && !scopes.includes('products:read')) {
+    scopes.unshift('products:read');
+  }
   return scopes;
 }
 

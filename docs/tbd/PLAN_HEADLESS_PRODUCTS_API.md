@@ -780,26 +780,53 @@ SDK, ו-OAuth/MCP שמעגנים שני מודלים במקביל. כל שבוע
 
 ## 8. תוכנית ביצוע מדורגת
 
+> **בוצע — 2026-10-16.** ראו את מפת הקבצים בסוף §8.
+
 ### Phase 0 — הכנה (2–3 ימים, ריפו `1.0` בלבד)
-- [ ] `apiPublic/` — projector ציבורי + בדיקת whitelist (שלא נשפך `marginPct`/מתכון).
-- [ ] `resolveRikmaFromPath()` — פונקציה אחת שמאחדת את היגיון `(regandnon)/r/[slug]`
+- [x] `apiPublic/` — projector ציבורי + בדיקת whitelist (שלא נשפך `marginPct`/מתכון).
+      `src/lib/server/apiPublic/dto.ts` + `dto.test.ts` (27 בדיקות; ה-walk על
+      `FORBIDDEN_DTO_KEYS` נכשל בכוונה כשמוסיפים שדה ל-DTO בלי לעדכן את הבדיקה).
+- [x] `resolveRikmaFromPath()` — פונקציה אחת שמאחדת את היגיון `(regandnon)/r/[slug]`
       (איות, `former`, 404) לשימוש גם ב-route של ה-API. **לא לשכפל.**
-- [ ] qids חדשים (append-only) + `npm run validate:qids`.
-- [ ] מיפוי `status` נגזר + `exposeToApi` (ברירת מחדל false).
-- [ ] החלטות §9 סגורות.
+      `src/lib/server/apiPublic/rikmaPath.ts`; גם `+page.server.js` של העמוד עבר
+      לקרוא לה (הפרמטר `address` הוא ההבדל היחיד בין המשטחים) — `rikmaPath.test.ts`.
+- [x] qids חדשים (append-only) + `npm run validate:qids`.
+      `rikmaApiProducts` / `rikmaApiProduct` / `rikmaApiCategories` / `rikmaApiRef` /
+      `rikmaApiProject` / `rikmaApiExposure` / `rikmaApiUserName`, כולם
+      `serviceAdmin` בלבד ב-`qidsAccess.js` (ה-route מאמת את המפתח בעצמו).
+- [x] מיפוי `status` נגזר + `exposeToApi` (ברירת מחדל false).
+      `productStatusOf`/`visibleStatusesFor`/`canSeeStatus` ב-`dto.ts`;
+      `exposure.ts` קורא `Project.exposeToApi` **בצורה הגנתית** — השדה עוד לא
+      קיים ב-`1.0b`, קריאה שנכשלת נועלת את הדגל על `false` ולא מרחיבה את המשטח
+      הציבורי.
+- [x] החלטות §9 סגורות — אומצו כפי שהומלץ (טבלה למטה).
 
 ### Phase 1 — API קריאה, רקמה-תחילה (שבוע–שבועיים, `1.0`)
-- [ ] `GET /api/v1/r/{rikma}` + `/products` + `/products/{id}` + `/categories`
+- [x] `GET /api/v1/r/{rikma}` + `/products` + `/products/{id}` + `/categories`
       + `GET /api/v1/me`.
-- [ ] אכיפת tenant כפולה: מפתח ↔ נתיב ⇒ `403`; מוצר מחוץ לרקמה ⇒ `404`.
-- [ ] scope `products:read` + checkbox בפאנל + snippet שמציג את **הכתובת של
+      חמישה routes תחת `src/routes/api/v1/`, כשכל הלוגיקה המשותפת ב-
+      `apiPublic/` (`http.ts` — אימות/tenant/מטמון/שגיאה; `catalog.ts` — הקריאות).
+- [x] אכיפת tenant כפולה: מפתח ↔ נתיב ⇒ `403`; מוצר מחוץ לרקמה ⇒ `404`.
+      `assertTenant` (`403 RIKMA_MISMATCH`) ו-`rikmaApiProduct` שמסנן לפי
+      הרקמה **בתוך השאילתה** — מוצר זר מחזיר אפס שורות, לא 403 שמסגיר שהוא קיים.
+- [x] scope `products:read` + checkbox בפאנל + snippet שמציג את **הכתובת של
       הרקמה הזו** (אין placeholder של `rikma`).
-- [ ] caching: `Cache-Control`/`ETag`/מטמון-על; rate limit לפי IP למפתח-less.
-- [ ] בדיקות: 301 על איות/שם קודם, 403 על רקמה אחרת, 404 על מוצר זר,
+      `GRANTABLE_SCOPES` ב-`api/api-keys` (כולל `products:read:draft`, שנדלק יחד
+      עם `products:read`); סעיף "הקטלוג" ב-`RikmaApiPanel.svelte` מציג
+      `/api/v1/r/<slug>` — ה-slug נטען ב-`+page.server.ts` של עמוד ה-API.
+- [x] caching: `Cache-Control`/`ETag`/מטמון-על; rate limit לפי IP למפתח-less.
+      `cache.ts` (45s, ≤200 רשומות, dedupe); `respond()` מייצר `ETag` + `304`;
+      `RateLimit-Limit/Remaining/Reset`; `X-1lev1-Trace` על 5xx.
+- [x] בדיקות: 301 על איות/שם קודם, 403 על רקמה אחרת, 404 על מוצר זר,
       404 על רקמה בלי slug ועם מזהה, whitelist, 304.
-- [ ] **אין שינוי סכמה ב-`1.0b`** — זו הסיבה שזה השלב הראשון.
+      131 בדיקות: 83 יחידה ב-`apiPublic/*.test.ts` ו-48 על ה-routes
+      (`server.test.ts` בכל תיקייה).
+- [x] **אין שינוי סכמה ב-`1.0b`** — זו הסיבה שזה השלב הראשון.
 
 ### Phase 1b — נדידת sales/tasks לכתובת הרקמה (§5.8)
+
+> **טרם בוצע.** שובר כתובות קיימות, ולכן ממתין לאישור מפורש — למרות המלצת §9.12
+> לבצע עכשיו.
 > **נכנס ל-Phase 1, לא אחריו.** הסיבה: כל עוד ה-snippets מצביעים על הנתיב
 > הישן, כל אינטגרציה חדשה נולדת עם חוב. השליטה המלאה בצרכנים קיימת **עכשיו**.
 
@@ -836,7 +863,32 @@ SDK, ו-OAuth/MCP שמעגנים שני מודלים במקביל. כל שבוע
 
 ---
 
+### מפת המימוש — Phase 0/1 (2026-10-16)
+
+| מה | איפה |
+|---|---|
+| Projector ציבורי, `status` נגזר, whitelist | `src/lib/server/apiPublic/dto.ts` (+ `dto.test.ts`) |
+| פרמטרים/ולידציה (§5.5) | `src/lib/server/apiPublic/query.ts` (+ `query.test.ts`) |
+| אימות, tenant, מטמון HTTP, שגיאות | `src/lib/server/apiPublic/http.ts` (+ `http.test.ts`) |
+| מטמון-על לשאילתות | `src/lib/server/apiPublic/cache.ts` |
+| `exposeToApi` | `src/lib/server/apiPublic/exposure.ts` |
+| פתרון כתובת → רקמה (גם לעמוד) | `src/lib/server/apiPublic/rikmaPath.ts` (+ `rikmaPath.test.ts`) |
+| קריאות + בניית גופים | `src/lib/server/apiPublic/catalog.ts` |
+| חמשת ה-endpoints | `src/routes/api/v1/r/[rikma]/{+server.ts,products/+server.ts,products/[productId]/+server.ts,categories/+server.ts}`, `src/routes/api/v1/me/+server.ts` |
+| בדיקות ה-routes | `server.test.ts` בכל אחת מהתיקיות שלמעלה |
+| ה-qids החדשים | `src/routes/api/send/qids.js` + `qidsAccess.js` (`serviceAdmin`) |
+| scope ביצירת מפתח | `src/routes/api/api-keys/+server.ts` |
+| צ'קבוקס + snippet של הכתובת | `src/lib/components/prPr/api/RikmaApiPanel.svelte`, `src/routes/(reg)/moach/[projectId]/api/+page.{server.ts,svelte}` |
+| מחרוזות | `src/lib/translations/{he,en,es,ar,ru}/rikmaApi.json` |
+
+---
+
 ## 9. החלטות פתוחות (עם המלצה)
+
+> **נסגרו ב-2026-10-16** (Phase 0): כל ההמלצות בטבלה אומצו כהחלטות. 9.12–9.13
+> (מעבר sales/tasks ו-`/api/v1/actions`) ממתינות לביצוע ב-Phase 1b. 9.11 מומש
+> בינתיים לקריאה בלבד: `Project.exposeToApi` נקרא בצורה שמחזירה `false` כל עוד
+> השדה לא קיים ב-`1.0b`, ומי שישנה אותו יקבע בהסכמה כשהשדה ייווצר.
 
 | # | שאלה | המלצה |
 |---|---|---|

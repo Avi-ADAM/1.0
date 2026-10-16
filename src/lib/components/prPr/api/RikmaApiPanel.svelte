@@ -24,10 +24,18 @@
     /** @type {string} */ projectId,
     /** @type {MissionRef[]} */ missions = [],
     /** @type {RoleRef[]} */ roles = [],
-    /** @type {Member[]} */ members = []
+    /** @type {Member[]} */ members = [],
+    /**
+     * The rikma's own address. Passed in from the page so the catalog snippet
+     * shows `/api/v1/r/<slug>/products` — the member is copying *their* shop's
+     * address, so a `{rikma}` placeholder would be exactly the confusion
+     * PLAN_HEADLESS_PRODUCTS_API §5.0 sets out to avoid.
+     * @type {string | null}
+     */
+    rikmaSlug = null
   } = $props();
 
-  const ALL_SCOPES = ['tasks:create', 'tasks:read', 'sales:report'];
+  const ALL_SCOPES = ['tasks:create', 'tasks:read', 'sales:report', 'products:read', 'products:read:draft'];
 
   /** @type {Array<{id: string, name: string, key_prefix: string, revoked: boolean, lastUsedAt: string|null, scopes: string[], callbackUrl: string|null}>} */
   let keys = $state([]);
@@ -145,6 +153,29 @@
 
   const snippet = $derived(
     activeTab === 'server' ? serverSnippet : activeTab === 'node' ? nodeSnippet : webhookSnippet
+  );
+
+  // ── The catalog (PLAN_HEADLESS_PRODUCTS_API) ──────────────────────────────
+  // Built from the rikma's OWN address: the path carries the rikma (§5.0), so
+  // there is nothing to explain and nothing to substitute.
+  const catalogPath = $derived(`/api/v1/r/${rikmaSlug || projectId}`);
+  const catalogAddress = $derived(`${apiBase}${catalogPath}`);
+  const catalogKey = $derived(activeKeys.find((k) => k.scopes?.includes('products:read')) ?? null);
+
+  const catalogSnippet = $derived(
+    [
+      '// The shop reads its own catalog. The rikma is the address, not a filter.',
+      `curl "${catalogAddress}/products?limit=20&sort=-updatedAt"`,
+      '',
+      '// With the key: hidden products too (and drafts, if the key carries',
+      '// products:read:draft). Never ship the key to the browser.',
+      `curl "${catalogAddress}/products?limit=20" \\`,
+      `  -H "Authorization: Bearer ${catalogKey ? '{{API_KEY}}' : '{{API_KEY}}'}"`,
+      '',
+      `// The shop itself: ${catalogAddress}`,
+      `// One product: ${catalogAddress}/products/{productId}`,
+      `// Categories with counts: ${catalogAddress}/categories`
+    ].join('\n')
   );
 
   const agentPrompt = $derived(
@@ -403,7 +434,28 @@
     </div>
   </section>
 
-  <!-- 2 ── The ids -->
+  <!-- 2 ── The catalog: the shop's own address (PLAN_HEADLESS_PRODUCTS_API §5.0) -->
+  <section>
+    <h3>{$t('rikmaApi.catalogTitle')}</h3>
+    <p class="muted">{$t('rikmaApi.catalogSubtitle')}</p>
+
+    <div class="code-block">
+      <button type="button" class="copy-btn" onclick={() => copy(catalogAddress, 'catalog')}>
+        {copiedWhat === 'catalog' ? $t('rikmaApi.copied') : $t('rikmaApi.copy')}
+      </button>
+      <pre><code>{catalogAddress}</code></pre>
+    </div>
+
+    <div class="code-block">
+      <button type="button" class="copy-btn" onclick={() => copy(catalogSnippet, 'catalogSnippet')}>
+        {copiedWhat === 'catalogSnippet' ? $t('rikmaApi.copied') : $t('rikmaApi.copy')}
+      </button>
+      <pre><code>{catalogSnippet}</code></pre>
+    </div>
+    <p class="hint">{$t('rikmaApi.catalogHint')}</p>
+  </section>
+
+  <!-- 3 ── The ids -->
   <section>
     <h3>{$t('rikmaApi.idsTitle')}</h3>
     <p class="muted">{$t('rikmaApi.idsSubtitle')}</p>
@@ -485,7 +537,7 @@
     </div>
   </section>
 
-  <!-- 3 ── Snippet builder -->
+  <!-- 4 ── Snippet builder -->
   <section>
     <h3>{$t('rikmaApi.codeTitle')}</h3>
     {#if !taskKey && !newRawKey}
@@ -565,7 +617,7 @@
     </div>
   </section>
 
-  <!-- 4 ── Field reference -->
+  <!-- 5 ── Field reference -->
   <section>
     <h3>{$t('rikmaApi.varsTitle')}</h3>
     <div class="table-scroll">
@@ -624,7 +676,7 @@
     <p class="hint">{$t('rikmaApi.varsNote')}</p>
   </section>
 
-  <!-- 5 ── Agent prompt -->
+  <!-- 6 ── Agent prompt -->
   <section>
     <h3>{$t('rikmaApi.agentTitle')}</h3>
     <p class="muted">{$t('rikmaApi.agentSubtitle')}</p>
