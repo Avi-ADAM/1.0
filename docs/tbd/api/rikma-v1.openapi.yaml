@@ -652,8 +652,8 @@ components:
         quantity: { type: integer, default: 1 }
         currency: { type: string, description: 'ISO; ברירת מחדל — מטבע הרקמה. המקור נשמר ב-entryCurrency/entryRate' }
         saleDate: { type: string, format: date-time, description: 'ברירת מחדל: now' }
-        startDate: { type: string, format: date-time, nullable: true, description: מנויים }
-        finishDate: { type: string, format: date-time, nullable: true, description: מנויים }
+        startDate: { type: [string, 'null'], format: date-time, description: מנויים }
+        finishDate: { type: [string, 'null'], format: date-time, description: מנויים }
         externalId: { type: string, description: מזהה ההזמנה אצל הלקוח — אידמפוטנטיות (retry של סליקה) }
         note: { type: string }
     SaleReported:
@@ -662,11 +662,10 @@ components:
       properties:
         success: { type: boolean }
         duplicated: { type: boolean }
-        saleId: { type: string, nullable: true }
+        saleId: { type: [string, 'null'] }
         holderStatus:
-          type: string
-          nullable: true
-          enum: [self, open, confirmed]
+          type: [string, 'null']
+          enum: [self, open, confirmed, null]
           description: '`open` = הדיווח ממתין להסכמת מחזיק הכסף (saleClaim). זו שקיפות, לא שגיאה'
     TaskDraft:
       type: object
@@ -683,15 +682,15 @@ components:
           items: { type: string }
           description: תפקידים המוכרים לרקמה; אחרת 404. נשלחו שניהם ⇒ ההשמה האישית גוברת
         urgency: { type: string, enum: [white, green, yellow, red], default: white }
-        dateS: { type: string, format: date-time, nullable: true }
-        dateF: { type: string, format: date-time, nullable: true }
+        dateS: { type: [string, 'null'], format: date-time }
+        dateF: { type: [string, 'null'], format: date-time }
     TaskStatus:
       type: object
       properties:
         success: { type: boolean }
         duplicated: { type: boolean }
         taskId: { type: string }
-        externalId: { type: string, nullable: true }
+        externalId: { type: [string, 'null'] }
         status:
           type: string
           enum: [awaitingConsent, open, accepted, done]
@@ -699,11 +698,10 @@ components:
             המצב מנקודת מבט הסנכרון. `awaitingConsent` = הושמה, טרם אושרה
             (myIshur:false) — האדם עדיין לא התחייב.
         assignee:
-          type: object
-          nullable: true
+          type: [object, 'null']
           properties:
             id: { type: string }
-            username: { type: string, nullable: true }
+            username: { type: [string, 'null'] }
     KindOf:
       type: string
       enum: [total, daily, monthly, yearly, unlimited]
@@ -722,42 +720,42 @@ components:
       type: object
       properties:
         unlimited: { type: boolean }
-        quantity: { type: integer, nullable: true }
+        quantity: { type: [integer, 'null'] }
       description: quantity = null כאשר unlimited=true
     Image:
       type: object
       required: [url]
       properties:
         url: { type: string, format: uri }
-        width: { type: integer, nullable: true }
-        height: { type: integer, nullable: true }
-        alt: { type: string, nullable: true }
+        width: { type: [integer, 'null'] }
+        height: { type: [integer, 'null'] }
+        alt: { type: [string, 'null'] }
     Seller:
       type: object
       properties:
         type: { type: string, enum: [person, rikma] }
         id: { type: string }
-        name: { type: string, nullable: true }
-        url: { type: string, nullable: true }
-        picUrl: { type: string, nullable: true }
+        name: { type: [string, 'null'] }
+        url: { type: [string, 'null'] }
+        picUrl: { type: [string, 'null'] }
     RikmaRef:
       type: object
       description: הרקמה כהפניה — מופיעה פעם אחת בראש התשובה, לא בכל שורה
       properties:
         id: { type: string }
-        slug: { type: string, nullable: true }
-        name: { type: string, nullable: true }
+        slug: { type: [string, 'null'] }
+        name: { type: [string, 'null'] }
         canonicalPath: { type: string, description: '/api/v1/r/haohel' }
     Rikma:
       allOf:
         - $ref: '#/components/schemas/RikmaRef'
         - type: object
           properties:
-            about: { type: string, nullable: true }
+            about: { type: [string, 'null'] }
             url: { type: string, description: הדף הציבורי — /r/haohel }
-            location: { type: object, additionalProperties: true, nullable: true }
-            look: { type: object, additionalProperties: true, nullable: true, description: פלטת המראה — כדי שאתר חיצוני ייראה אותו דבר }
-            supportPage: { type: string, enum: [off, on], nullable: true }
+            location: { type: [object, 'null'], additionalProperties: true }
+            look: { type: [object, 'null'], additionalProperties: true, description: פלטת המראה — כדי שאתר חיצוני ייראה אותו דבר }
+            supportPage: { type: [string, 'null'], enum: ['off', 'on', null] }
             productsCount: { type: integer }
     Product:
       type: object
@@ -766,24 +764,22 @@ components:
         id: { type: string }
         name: { type: string }
         descriptionHtml:
-          type: string
-          nullable: true
+          type: [string, 'null']
           description: |
             נבנה בשרת מה-rich text (JSON) ע"י serializer עם whitelist תגיות
             (p, br, strong, em, ul, ol, li, h2–h4, blockquote, a) ו-`href` בלבד
             (http/https/mailto). אין HTML גולמי, `style`, `on*` או `javascript:`.
             עדיין תוכן משתמש — `descriptionText` הוא ברירת המחדל המומלצת.
-        descriptionText: { type: string, nullable: true }
+        descriptionText: { type: [string, 'null'] }
         status: { $ref: '#/components/schemas/Status' }
         price:
-          type: number
-          nullable: true
+          type: [number, 'null']
           description: |
             מחיר מבוקש, כשהוא קיים. **אינו בהכרח המחיר הסופי** — ראה
             docs/tbd/PLAN_HEADLESS_PRODUCTS_API.md §11.א:
             pricingMode=fixed ⇒ סופי; estimated ⇒ הערכה; quote ⇒ null (בקשת הצעה).
             אסור להזרים שדה זה לסליקה כשהוא אינו fixed.
-        currency: { type: string, nullable: true }
+        currency: { type: [string, 'null'] }
         pricingMode:
           type: string
           enum: [fixed, estimated, quote]
@@ -810,26 +806,26 @@ components:
         geo:
           type: object
           properties:
-            lat: { type: number, nullable: true }
-            lng: { type: number, nullable: true }
-            radius: { type: integer, nullable: true }
-            hint: { type: string, nullable: true }
+            lat: { type: [number, 'null'] }
+            lng: { type: [number, 'null'] }
+            radius: { type: [integer, 'null'] }
+            hint: { type: [string, 'null'] }
             isOnline: { type: boolean }
         dates:
           type: object
           properties:
-            startDate: { type: string, format: date-time, nullable: true }
-            finnishDate: { type: string, format: date-time, nullable: true }
+            startDate: { type: [string, 'null'], format: date-time }
+            finnishDate: { type: [string, 'null'], format: date-time }
         attributes:
           type: object
           additionalProperties: true
           description: שדות מותאמים פר-רקמה (§4.9) — P2
-        locale: { type: string, nullable: true }
-        translated: { type: boolean, nullable: true }
+        locale: { type: [string, 'null'] }
+        translated: { type: [boolean, 'null'] }
         origin: { type: string, enum: [personal, project, wish] }
         updatedAt: { type: string, format: date-time }
         url: { type: string, description: הדף הציבורי — /gift/1842 }
-        buyUrl: { type: string, nullable: true }
+        buyUrl: { type: [string, 'null'] }
     Pagination:
       type: object
       properties:
@@ -854,9 +850,9 @@ components:
         links:
           type: object
           properties:
-            self: { type: string, nullable: true }
-            next: { type: string, nullable: true }
-            prev: { type: string, nullable: true }
+            self: { type: [string, 'null'] }
+            next: { type: [string, 'null'] }
+            prev: { type: [string, 'null'] }
     Error:
       type: object
       properties:
