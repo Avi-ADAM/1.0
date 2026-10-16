@@ -7,8 +7,8 @@
 //   syncSiteReportFromTask()  somebody accepts/finishes it → the report follows
 //
 // This is 1lev1 talking to itself, so it does NOT go out through
-// /api/v1/tasks and an API key — it calls the same `createTask` action that
-// endpoint calls, one layer down. The consent rule is identical either way:
+// /api/v1/r/{rikma}/tasks and an API key — it calls the same `createTask`
+// action that endpoint calls, one layer down. The consent rule is identical either way:
 // `myIshur:false` means the task is an offer until a member accepts it.
 //
 // Every function here is safe to call and forget. A report must be saved and
