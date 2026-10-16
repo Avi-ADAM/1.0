@@ -88,6 +88,7 @@
 
 | מסמך | |
 |---|---|
+| PLAN_HEADLESS_PRODUCTS_API | מוצרים כ-API: מה חסר כדי שרקמה תנהל קטלוג ותצרוך אותו מהאתר שלה (הכתובת היא הרקמה — `/api/v1/r/{rikma}/…`). השוואה ל-Payload CMS, פערים מדורגים (P0–P2), חוזה API מוצע, טיוטת [OpenAPI](./api/rikma-v1.openapi.yaml) לכל משטח הרקמה (כולל יישור sales/tasks לכתובת הרקמה, §5.8), ונספח §11: המחיר אינו סופי ומכירה מייצרת עבודה לחברי הרקמה (מודעות בלבד, לא חוסם MVP) |
 | PLAN_TAURI_WINDOWS | תוכנה ל-Windows מאותה מעטפת Tauri: חלון, אופליין, קישורים חיצוניים, updater, מתקין NSIS/MSI, CI. דף `/download` כבר בנוי ומחכה ל-`DESKTOP_RELEASE_MANIFEST_URL` |
 | PLAN_DEADLOCK_PREVENTION | livelock במו"מ + נקודות הסכמה |
 | PLAN_MONEY_RAILS | מסילות תשלום (ריבוי מטבעות כבר יצא ממנו ל-done) |

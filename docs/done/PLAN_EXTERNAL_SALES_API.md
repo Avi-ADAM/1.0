@@ -1,5 +1,11 @@
 # API דיווח מכירות ממערכות חיצוניות (External Sales Reporting API)
 
+> **⚠️ שינוי כתובת מתוכנן (2026-10-16):** ה-endpoint מתוכנן לעבור מ‑`/api/v1/sales`
+> ל‑**`/api/v1/r/{rikma}/sales`** — הכתובת הרקמה, כמו כל שאר משטח ה-API. ה-payload
+> וההתנהגות **זהים לחלוטין**; רק ה-URL משתנה. אל תעתיקו את הכתובת הישנה לאינטגרציה
+> חדשה. המסלול, חלון ההתיישנות (Deprecation/Sunset ⇒ 410) וה-alias:
+> [PLAN_HEADLESS_PRODUCTS_API §5.8](../tbd/PLAN_HEADLESS_PRODUCTS_API.md).
+
 > מסמך משלים בצד Strapi: `1.0b/docs/PLAN_EXTERNAL_SALES_API_BACKEND.md`
 > (שינויי הסכמה של `api-key` ו‑`sale`).
 
