@@ -1,6 +1,6 @@
 /**
  * The shop layer of the public catalog — variants, gallery, availability,
- * units and delivery (docs/tbd/PLAN_SHOP_CUSTOMER_EXPERIENCE.md §5.1).
+ * units and delivery (docs/inprogress/PLAN_SHOP_CUSTOMER_EXPERIENCE.md §5.1).
  *
  * Three rules hold this module together:
  *
