@@ -6,8 +6,11 @@
   import RichText from '$lib/celim/ui/richText.svelte';
   import { executeAction } from '$lib/client/actionClient';
   import { toast } from 'svelte-sonner';
-  import { t } from '$lib/translations';
+  import { t, locale } from '$lib/translations';
   import ShareLink from '$lib/components/share/ShareLink.svelte';
+  import SharePrompt from '$lib/components/share/SharePrompt.svelte';
+  import { jsonLdBody } from '$lib/seo/jsonLd.js';
+  import { askedLang, canonicalFor, ogImageFor, oneLine, wishJsonLd } from '$lib/seo/shareMeta.js';
 
   /** @type {{ data: { wish: any | null; proposalsCount: number; myProposals: any[]; uid: string | null; isLoggedIn: boolean; loadOk: boolean } }} */
   let { data } = $props();
@@ -145,16 +148,43 @@
     return imp === 'must' ? 'gem' : 'gem gem-gold';
   }
 
+  const wishId = $derived($page.params.id);
+
+  // ── Share layer ─────────────────────────────────────────────────────────────
+  // The canonical address and the card follow the language the *link* asked
+  // for (bare path = Hebrew); the host is always the public one, so a copied
+  // link never carries a preview host or the app's origin into a chat.
+  const lang = $derived(askedLang($page.url));
+  const canonical = $derived(canonicalFor(`/wish/${wishId}`, lang));
+  const fulfilled = $derived(data?.wish?.status === 'fulfilled');
+  const pageTitle = $derived(`${wish.title} · משאלה · 1💗1`);
+  const pageDesc = $derived(
+    oneLine(
+      `${wish.proposalsCount} הצעות · ${wish.when}${wish.where ? ` · ${wish.where}` : ''}. ${wish.long || 'משאלה פתוחה לקהילה ב-1💗1 — כל חלק יכול להיות מאויש בנפרד.'}`,
+      200
+    )
+  );
+  const ogImage = $derived(
+    ogImageFor('wish', wishId, lang, `${wish.proposalsCount}-${fulfilled ? 1 : 0}`)
+  );
+  const ld = $derived(data?.wish ? wishJsonLd(data.wish, canonical) : null);
+
+  // The share moment for a helper who just offered: the wish now has one more
+  // piece covered, and she knows who else could cover the rest.
+  const shareUrl = $derived(canonicalFor(`/wish/${wishId}`, $locale));
+  const shareMessage = $derived(
+    `${wish.title} — משאלה של ${wish.author}, ${wish.proposalsCount} הצעות עד עכשיו. כל חלק אפשר לאייש בנפרד, בלי התחייבות עד שיש הסכמה: ${shareUrl}`
+  );
+  let sharePromptHidden = $state(false);
+
   let copied = $state(false);
   function copyLink() {
     try {
-      navigator.clipboard?.writeText(window.location.href);
+      navigator.clipboard?.writeText(shareUrl);
       copied = true;
       setTimeout(() => (copied = false), 1800);
     } catch {}
   }
-
-  const wishId = $derived($page.params.id);
 
   // ── Provider offer panel ────────────────────────────────────────────────────
   let offerOpen = $state(false);
@@ -209,15 +239,21 @@
 </script>
 
 <svelte:head>
-  <title>{wish.title} · משאלה 1💗1</title>
-  <meta
-    name="description"
-    content={wish.long
-      .replace(/<[^>]*>/g, ' ')
-      .replace(/\s+/g, ' ')
-      .trim()
-      .slice(0, 160)}
-  />
+  <title>{pageTitle}</title>
+  <meta name="description" content={pageDesc} />
+  <link rel="canonical" href={canonical} />
+  <meta property="og:title" content={pageTitle} />
+  <meta property="og:description" content={pageDesc} />
+  <meta property="og:image" content={ogImage} />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content={`${wish.title} — ${wish.proposalsCount} הצעות`} />
+  <meta name="twitter:title" content={pageTitle} />
+  <meta name="twitter:description" content={pageDesc} />
+  <meta name="twitter:image" content={ogImage} />
+  {#if ld}
+    {@html `<script type="application/ld+json">${jsonLdBody(ld)}<\/script>`}
+  {/if}
 </svelte:head>
 
 <!-- ===================================================================
@@ -437,7 +473,31 @@
             {/if}
             <a href="/concierge" class="btn-ghost">משאלות אחרות בקהילה</a>
           </div>
+          {#if offerDone && !sharePromptHidden}
+            <div class="invite-share">
+              <SharePrompt
+                url={shareUrl}
+                message={shareMessage}
+                title="ההצעה שלך בפנים. מי עוד יכול לאייש חלק?"
+                body="שלחו את המשאלה למישהי/ו שיש להם את מה שחסר — התצוגה המקדימה כבר מראה מה פתוח."
+                variant="celebrate"
+                onDismiss={() => (sharePromptHidden = true)}
+              />
+            </div>
+          {/if}
         </div>
+      </div>
+
+      <!-- YOUR OWN WISH — the reader who came for someone else's wish (plan §4, loop 1) -->
+      <div class="own-wish anim anim-d3">
+        <div class="own-wish-text">
+          <h3 class="own-wish-h3">יש לך משאלה משלך?</h3>
+          <p class="own-wish-p">
+            כותבים מה רוצים שיקרה, Lev מפרק לחלקים, ואנשים שיש להם מה לתת מציעים — בלי קבוצה,
+            בלי תיווך, ועם הסכמה שלך על כל חלק.
+          </p>
+        </div>
+        <a href="/wish/new" class="btn-jewel own-wish-cta"><EntityIcon kind="wish" size={14} /> לפתוח משאלה</a>
       </div>
 
       <!-- ── MY PROPOSALS (logged-in provider) ──────────────────────────── -->
@@ -1311,6 +1371,35 @@
     font-size: clamp(13px, 2vw, 15px);
     color: var(--cg-muted);
     line-height: 1.7;
+  }
+  .invite-share {
+    margin-top: 16px;
+  }
+  .own-wish {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    flex-wrap: wrap;
+    margin-top: 18px;
+    padding: 18px 22px;
+    border-radius: 18px;
+    border: 1px solid rgba(191, 149, 63, 0.35);
+    background: linear-gradient(135deg, rgba(191, 149, 63, 0.08), rgba(255, 77, 158, 0.06));
+  }
+  .own-wish-h3 {
+    margin: 0 0 4px;
+    font-size: 18px;
+    font-weight: 800;
+  }
+  .own-wish-p {
+    margin: 0;
+    font-size: 14px;
+    opacity: 0.85;
+    max-width: 56ch;
+  }
+  .own-wish-cta {
+    white-space: nowrap;
   }
   .invite-cta {
     display: flex;

@@ -38,7 +38,13 @@
     "projects": "גילוי רקמות ב-1💗1",
     "products": "מוצרים ב-1💗1",
     "missions": "משימות פתוחות ב-1💗1",
-    "resources": "משאבים מבוקשים ב-1💗1"
+    "resources": "משאבים מבוקשים ב-1💗1",
+    "whatsapp": "וואטסאפ",
+    "telegram": "טלגרם",
+    "copy": "העתקת ההודעה",
+    "copied": "הועתק ✓",
+    "more": "עוד…",
+    "dismiss": "סגירה"
   },
   "richText": {
     "paragraph": "<p>פסקה</p>",

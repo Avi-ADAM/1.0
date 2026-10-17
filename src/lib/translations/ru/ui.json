@@ -38,7 +38,13 @@
     "projects": "Рикмы на 1💗1",
     "products": "Продукты на 1💗1",
     "missions": "Открытые задачи на 1💗1",
-    "resources": "Нужные ресурсы на 1💗1"
+    "resources": "Нужные ресурсы на 1💗1",
+    "whatsapp": "WhatsApp",
+    "telegram": "Telegram",
+    "copy": "Скопировать сообщение",
+    "copied": "Скопировано ✓",
+    "more": "Ещё…",
+    "dismiss": "Закрыть"
   },
   "richText": {
     "paragraph": "<p>Абзац</p>",
