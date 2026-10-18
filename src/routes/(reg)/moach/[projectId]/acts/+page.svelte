@@ -3,7 +3,7 @@
   import CrTask from '$lib/components/prPr/tasks/crtask.svelte';
   import { getMoachStore } from '$lib/stores/moachStore.svelte.js';
   import { page } from '$app/state';
-  import { invalidateAll } from '$app/navigation';
+  import { invalidateAll, replaceState } from '$app/navigation';
   import { lang } from '$lib/stores/lang.js';
   import { t } from '$lib/translations';
   import { SvelteSet } from 'svelte/reactivity';
@@ -17,6 +17,25 @@
   let acts = $derived(projectData?.base?.acts?.data || []);
 
   let showCreate = $state(false);
+  const quickCreateAction = $derived(page.url.searchParams.get('action'));
+
+  // The global Quick Create launcher lands directly on this existing form.
+  // This query flag opens the dialog only; saving still happens through CrTask.
+  $effect(() => {
+    if (quickCreateAction === 'createtask') showCreate = true;
+  });
+
+  function clearQuickCreateAction() {
+    if (page.url.searchParams.get('action') !== 'createtask') return;
+    const url = new URL(page.url);
+    url.searchParams.delete('action');
+    replaceState(url, {});
+  }
+
+  function dismissCreate() {
+    showCreate = false;
+    clearQuickCreateAction();
+  }
 
   let bmiData = $derived(data.bmiData ?? []);
 
@@ -44,13 +63,17 @@
   }
 
   async function handleTaskCreated() {
-    showCreate = false;
+    dismissCreate();
     await invalidateAll();
   }
 </script>
 
 <svelte:head>
-  <title>{data.projectBase?.projectName ? `${data.projectBase.projectName} · ` : ''}{$lang === 'he' ? 'פעולות' : $lang === 'ar' ? 'أعمال' : 'Acts'} · 1lev1</title>
+  <title
+    >{data.projectBase?.projectName
+      ? `${data.projectBase.projectName} · `
+      : ''}{$lang === 'he' ? 'פעולות' : $lang === 'ar' ? 'أعمال' : 'Acts'} · 1lev1</title
+  >
 </svelte:head>
 
 <div class="acts-page">
@@ -67,7 +90,9 @@
   <div
     class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
     role="presentation"
-    onclick={(e) => { if (e.target === e.currentTarget) showCreate = false; }}
+    onclick={(e) => {
+      if (e.target === e.currentTarget) dismissCreate();
+    }}
   >
     <div
       class="surface-dialog relative w-full max-w-2xl max-h-[92vh] overflow-y-auto rounded-2xl shadow-2xl
@@ -83,14 +108,26 @@
                border-b border-surfaceLine dark:border-zinc-700
                px-6 py-4"
       >
-        <h2 class="font-bold text-lg text-barbi">{$t('mission.crtask.heading')}</h2>
+        <h2 class="font-bold text-lg text-barbi">
+          {$t('mission.crtask.heading')}
+        </h2>
         <button
-          onclick={() => (showCreate = false)}
+          onclick={dismissCreate}
           class="p-1.5 rounded-lg text-surfaceMuted hover:text-surfaceInk hover:bg-surface2 dark:hover:bg-zinc-800 transition"
           aria-label="סגור"
         >
-          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          <svg
+            class="w-5 h-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M6 18L18 6M6 6l12 12"
+            />
           </svg>
         </button>
       </div>

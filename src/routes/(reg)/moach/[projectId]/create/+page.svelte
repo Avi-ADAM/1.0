@@ -19,7 +19,7 @@
   import { executeAction } from '$lib/client/actionClient';
   import { isLinkableMissionType } from '$lib/acts/publishAsMission.js';
   import { toast } from 'svelte-sonner';
-  import { invalidateAll } from '$app/navigation';
+  import { invalidateAll, replaceState } from '$app/navigation';
   import { decodeMissionDraft } from '$lib/prefill/missionDraft';
 
   const moachStore = getMoachStore();
@@ -239,11 +239,21 @@
     openMS = true;
   }
 
+  function clearQuickCreateAction() {
+    const action = page.url.searchParams.get('action');
+    if (action !== 'createmission' && action !== 'createresource') return;
+    const url = new URL(page.url);
+    url.searchParams.delete('action');
+    replaceState(url, {});
+  }
+
   function closeM() {
     addM = false;
+    clearQuickCreateAction();
   }
 
   function handleBack() {
+    clearQuickCreateAction();
     createMode = null;
     addM = false;
     openMS = false;
@@ -782,6 +792,7 @@
               pendingPlanItem = null;
               resourcePrefill = null;
               addN = false;
+              clearQuickCreateAction();
             }}
           />
         </div>

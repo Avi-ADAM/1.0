@@ -22,6 +22,7 @@
   import GuestMenu from '$lib/components/footer/GuestMenu.svelte';
   import DiscoverMenu from '$lib/components/footer/DiscoverMenu.svelte';
   import AppearanceMenu from '$lib/components/footer/AppearanceMenu.svelte';
+  import QuickCreateLauncher from '$lib/components/quick-create/QuickCreateLauncher.svelte';
   import { idPr } from '$lib/stores/idPr';
   /**
    * The bottom bar, on every page of the site. Its chrome (bar / column / mini
@@ -238,6 +239,7 @@
     </button>
     <span class="w-px h-5 bg-gray-200 dark:bg-gray-600"></span>
     <AppearanceMenu compact />
+    {#if isAuthed}<QuickCreateLauncher compact />{/if}
   </div>
 {:else}
   <div
@@ -266,9 +268,9 @@
           <span class="sr-only">{L('openBar')}</span>
         </button>
         <!-- Utility handles live with the footer, not free-floating over the
-             page. Accessibility joins appearance here when it lands.
-             Opens downward: the column already reaches high up the screen, so
-             upward is where the room isn't. -->
+             page. Quick Create and appearance stay in the footer's utility
+             area. Opens downward: the column already reaches high up the
+             screen, so upward is where the room isn't. -->
         <AppearanceMenu compact drop="down" />
         <button
           type="button"
@@ -282,13 +284,19 @@
           <span class="sr-only">{L('minimize')}</span>
         </button>
       </div>
+      {#if isAuthed}
+        <div class="flex justify-center py-1">
+          <QuickCreateLauncher compact />
+        </div>
+      {/if}
     {:else}
       <!-- Utility handles ride the bar's start corner, mirroring the minimize
            handle at the other end, so nothing floats loose over the page where
-           it can land on the bot bubble or the lev demand map. The
-           accessibility button joins this cluster when it lands. -->
+           it can land on the bot bubble or the lev demand map. Quick Create
+           lives here; future accessibility controls can join this cluster. -->
       <div class="absolute -top-3 start-3 flex items-center gap-1">
         <AppearanceMenu compact />
+        {#if isAuthed}<QuickCreateLauncher compact />{/if}
       </div>
       <!-- Minimize handle floating on the bar's corner -->
       <button
