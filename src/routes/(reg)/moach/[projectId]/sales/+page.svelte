@@ -51,14 +51,19 @@
   <title>{page.data.projectBase?.projectName ? `${page.data.projectBase.projectName} · ` : ''}{$t('shop.page.title')} · 1lev1</title>
 </svelte:head>
 
-<div class="sales-page px-0 py-4">
-  <!-- Site orders, and the way into "manage sales" (PLAN_SHOP_CUSTOMER_EXPERIENCE §7.3).
-       The API panel, the support page and donations moved to its "connect" tab. -->
+<!-- Site orders, and the way into "manage sales" (PLAN_SHOP_CUSTOMER_EXPERIENCE §7.3).
+     The API panel, the support page and donations moved to its "connect" tab. -->
+{#snippet shortcuts()}
   <SalesShortcuts {projectId} {banner} />
+{/snippet}
 
+<div class="sales-page">
   {#if loading && !financials}
-    <div class="flex justify-center p-12">
-      <Spinner />
+    <div class="sales-wait">
+      {@render shortcuts()}
+      <div class="flex justify-center p-12">
+        <Spinner />
+      </div>
     </div>
   {:else if financials}
     <Hamatanot
@@ -71,6 +76,17 @@
       restime={base?.restime}
       projectUsers={base?.user_1s?.data || []}
       bmiData={financials.matanotofs?.data || []}
+      uid={page.data.uid ?? null}
+      projectName={page.data.projectBase?.projectName ?? base?.projectName ?? ''}
+      top={shortcuts}
     />
+  {:else}
+    <div class="sales-wait">{@render shortcuts()}</div>
   {/if}
 </div>
+
+<style>
+  .sales-wait {
+    padding: 12px 0;
+  }
+</style>

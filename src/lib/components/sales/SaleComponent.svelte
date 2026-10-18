@@ -11,6 +11,7 @@
   import { createSaleConsentSpec } from '$lib/consent/specs/createSale';
   import { t } from '$lib/translations';
   import Money from '$lib/components/money/Money.svelte';
+  import Spinner from '$lib/celim/Spinner.svelte';
 
   /**
    * @typedef {Object} Props
@@ -27,6 +28,11 @@
    * @property {(payload: { id: any; in: any; un: any; matana: any }, operationId?: number) => void} [onDone] - Callback when sale is successfully added with quantity update
    * @property {() => void} [onDoners] - Callback when sale is successfully added without quantity update
    * @property {(error?: string, operationId?: number) => void} [onError] - Callback when an error occurs
+   * @property {string} [defaultHolder] - Username preselected as the money-holder
+   * @property {'classic' | 'shop'} [skin] - `shop`: the moach sales page's sheet (canvas
+   *   "MobileReportSale", `$lib/styles/shop.css`). Same fields, same `createSale`.
+   * @property {string | number | null} [meId] - The signed-in member, so the shop skin can
+   *   say whether the report is a self-report or a claim on someone else's money
    */
 
   /** @type {Props} */
@@ -41,11 +47,19 @@
     each = $bindable(price || 0),
     kindUlimit = false,
     defaultHolder = '',
+    skin = 'classic',
+    meId = null,
     onStart,
     onDone,
     onDoners,
     onError
   } = $props();
+
+  // The shop skin picks the sale date with a native input instead of the
+  // calendar widget; empty = the calendar's own default (now).
+  let saleDateLocal = $state('');
+  let holderId = $derived(selected[0] != null ? String(find_user_id(selected)) : '');
+  let holderIsMe = $derived(meId != null && holderId !== '' && holderId === String(meId));
 
   let store = $state();
   let selected = $state(defaultHolder ? [defaultHolder] : []);
@@ -130,7 +144,7 @@
     already = true;
 
     try {
-      const saleDate = dayjs($store?.selected).toISOString();
+      const saleDate = dayjs(saleDateLocal || $store?.selected).toISOString();
       const userId = String(find_user_id(selected));
 
       const actionParams = {
@@ -174,11 +188,7 @@
       // Money-held-by-someone-else → the report is a claim awaiting consent.
       if (holderStatus === 'open') {
         const holderName = selected?.[0] ?? '';
-        toast.info(
-          $lang === 'en'
-            ? `Report sent - awaiting ${holderName}'s consent. It will auto-approve after the rikma's response time if there is no reply.`
-            : `הדיווח נשלח - ממתין להסכמת ${holderName}. יאושר אוטומטית בתום זמן התגובה של הרקמה אם לא תגיע תגובה.`
-        );
+        toast.info($t('sales.claimSent', { holderName }));
       }
 
       if (hm > 0) {
@@ -236,8 +246,129 @@
       total = hm * each;
     }
   });
+  const initialOf = (name) => (String(name || '?').trim().charAt(0) || '?').toUpperCase();
+  let unitsMax = $derived(availableQuantity === -1 || availableQuantity == null ? Infinity : Number(availableQuantity));
 </script>
 
+{#if skin === 'shop'}
+<div class="rs">
+  {#if kindOf == 'monthly' || kindOf == 'yearly'}
+    <div class="rs-grid2">
+      <label class="sh-field">
+        {$t('sales.startDate')}
+        <input
+          class="sh-input"
+          type="datetime-local"
+          value={dates ?? ''}
+          aria-invalid={datesE}
+          oninput={(e) => (dates = e.currentTarget.value || null)}
+        />
+      </label>
+      <label class="sh-field">
+        {$t('sales.endDate')}
+        <input
+          class="sh-input"
+          type="datetime-local"
+          value={datef ?? ''}
+          min={dates ?? undefined}
+          oninput={(e) => (datef = e.currentTarget.value || null)}
+        />
+      </label>
+      {#if datesE}<p class="rs-err rs-span">{$t('sales.noStartDate')}</p>{/if}
+      {#if datef === null}<p class="rs-hint rs-span">{$t('sales.noEndDate')}</p>{/if}
+    </div>
+  {/if}
+
+  <div class="rs-grid2">
+    {#if kindOf !== 'total'}
+      <div class="sh-field">
+        <span>{$t('sales.howManyUnits')}{per ? ` (${kindOf === 'monthly' ? $t('sales.perMonth') : $t('sales.perYear')})` : ''}</span>
+        <div class="rs-step">
+          <button type="button" aria-label={$t('shop.sp.rs.more')} disabled={hm >= unitsMax} onclick={() => (hm = Math.min(unitsMax, Number(hm || 0) + 1))}>+</button>
+          <input
+            type="number"
+            inputmode="numeric"
+            min="0"
+            max={Number.isFinite(unitsMax) ? unitsMax : undefined}
+            aria-label={$t('sales.howManyUnits')}
+            bind:value={hm}
+          />
+          <button type="button" aria-label={$t('shop.sp.rs.less')} disabled={hm <= 0} onclick={() => (hm = Math.max(0, Number(hm || 0) - 1))}>−</button>
+        </div>
+      </div>
+    {/if}
+    <label class="sh-field">
+      {$t('sales.howManyPerUnit')}
+      <input class="sh-input rs-num" type="number" inputmode="decimal" min="0" step="any" bind:value={each} />
+    </label>
+  </div>
+
+  <div class="rs-total">
+    <span>{$t('sales.total')}{per ? ` ${kindOf === 'monthly' ? $t('sales.perMonth') : $t('sales.perYear')}` : ''}</span>
+    <strong><Money amount={total} /></strong>
+  </div>
+
+  <fieldset class="rs-fs">
+    <legend class="sh-section-label">{$t('sales.withWhomMoney')}</legend>
+    <div class="rs-holders" role="radiogroup" aria-label={$t('sales.withWhomMoney')}>
+      {#each projectUsers as u (u.id)}
+        <button
+          type="button"
+          role="radio"
+          class="rs-radio"
+          aria-checked={selected[0] === u.attributes.username}
+          onclick={() => {
+            selected = [u.attributes.username];
+            noSelectedE = false;
+          }}
+        >
+          <span class="rs-av" aria-hidden="true">{initialOf(u.attributes.username)}</span>
+          <span class="rs-radio-name">{meId != null && String(u.id) === String(meId) ? $t('shop.sp.rs.me') : u.attributes.username}</span>
+        </button>
+      {/each}
+    </div>
+    {#if noSelectedE}<p class="rs-err">{$t('sales.noUserSelected')}</p>{/if}
+    {#if selected[0] != null}
+      <p class="rs-holder-note" class:rs-self={holderIsMe}>
+        {holderIsMe ? $t('shop.sp.rs.holderSelf') : $t('shop.sp.rs.holderOther', { name: selected[0] })}
+      </p>
+    {/if}
+  </fieldset>
+
+  <details class="rs-details">
+    <summary>
+      {$t('sales.changeSaleDate')} · {saleDateLocal && dayjs(saleDateLocal).isValid()
+        ? dayjs(saleDateLocal).format('D.M.YY HH:mm')
+        : $t('shop.sp.rs.today')}
+    </summary>
+    <input class="sh-input" type="datetime-local" aria-label={$t('sales.changeSaleDate')} bind:value={saleDateLocal} />
+  </details>
+
+  <!-- Customer (PLAN_SALE_CUSTOMER_LINK): linked through a Sheirut so the
+       purchase shows on the customer's deals page. -->
+  <details class="rs-details" open={!!customerIdentifier}>
+    <summary>{isRecurring ? $t('shop.sp.rs.customer') : $t('shop.sp.rs.customerPaid')}</summary>
+    <label class="sh-field">
+      {$t('shop.sp.rs.customerLabel')}
+      <input class="sh-input" type="text" autocomplete="off" placeholder={$t('shop.sp.rs.customerPh')} bind:value={customerIdentifier} />
+    </label>
+    <p class="rs-hint">{isRecurring ? $t('shop.sp.rs.customerHintRecurring') : $t('shop.sp.rs.customerHintPaid')}</p>
+  </details>
+
+  <label class="sh-field">
+    {$t('sales.noteOptional')}
+    <textarea class="sh-input" rows="2" maxlength="500" placeholder={$t('sales.notePlaceholder')} bind:value={note}></textarea>
+    {#if note.length > 0}<span class="rs-hint">{note.length}/500</span>{/if}
+  </label>
+
+  <div class="rs-foot">
+    <button type="button" class="sh-btn sh-btn-primary sh-btn-lg rs-submit" disabled={already} onclick={add}>
+      {#if already}<Spinner size="sm" />{/if}
+      {$t('sales.addSale')}
+    </button>
+  </div>
+</div>
+{:else}
 <div class="flex flex-col align-middle justify-center gap-x-2">
   {#if kindOf !== 'total'}
     <NumberInput
@@ -359,3 +490,183 @@
     </div>
   {/if}
 </div>
+{/if}
+
+<style>
+  .rs {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .rs-grid2 {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .rs-span {
+    grid-column: 1 / -1;
+  }
+  .rs-err {
+    font-size: 12px;
+    color: var(--sh-accent-ink);
+    font-weight: 700;
+  }
+  .rs-hint {
+    font-size: 12px;
+    color: var(--sh-muted);
+  }
+  .rs-num {
+    font-size: 17px;
+  }
+  .rs-step {
+    display: flex;
+    align-items: center;
+    min-height: 48px;
+    border-radius: var(--sh-radius-sm);
+    border: 1px solid var(--sh-line);
+    background: var(--sh-card-2);
+  }
+  .rs-step button {
+    width: 44px;
+    height: 46px;
+    border: 0;
+    background: transparent;
+    color: var(--sh-gold);
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+  .rs-step input {
+    flex: 1 1 auto;
+    min-width: 0;
+    width: 100%;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: var(--sh-ink);
+    text-align: center;
+    font-size: 17px;
+    font-weight: 700;
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
+  .rs-step input::-webkit-inner-spin-button,
+  .rs-step input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  .rs-step:focus-within {
+    border-color: var(--sh-gold);
+  }
+  .rs-total {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 12px 14px;
+    border-radius: var(--sh-radius);
+    border: 1px solid var(--sh-gold-line);
+    background: color-mix(in srgb, var(--sh-gold) 8%, var(--sh-card));
+    font-size: 14px;
+  }
+  .rs-total strong {
+    font-family: var(--sh-display);
+    font-size: 28px;
+    color: var(--sh-gold);
+  }
+  .rs-fs {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .rs-fs legend {
+    padding: 0 0 8px;
+  }
+  .rs-holders {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+  }
+  .rs-radio {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 48px;
+    padding: 0 12px;
+    border-radius: var(--sh-radius-sm);
+    border: 1px solid var(--sh-line);
+    background: var(--sh-card-2);
+    color: var(--sh-ink);
+    font-size: 14px;
+    text-align: start;
+    min-width: 0;
+  }
+  .rs-radio[aria-checked='true'] {
+    border-color: var(--sh-gold);
+    background: color-mix(in srgb, var(--sh-gold) 10%, var(--sh-card));
+    font-weight: 700;
+  }
+  .rs-radio-name {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .rs-av {
+    width: 26px;
+    height: 26px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    border: 1px solid var(--sh-gold);
+    color: var(--sh-gold);
+    background: var(--sh-card);
+    font-size: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .rs-holder-note {
+    padding: 10px 12px;
+    border-radius: var(--sh-radius-sm);
+    font-size: 12px;
+    line-height: 1.5;
+    background: var(--sh-accent-tint);
+    color: var(--sh-ink);
+  }
+  .rs-holder-note.rs-self {
+    background: var(--sh-ok-tint);
+  }
+  .rs-details {
+    border-radius: var(--sh-radius-sm);
+    border: 1px solid var(--sh-line);
+    background: var(--sh-card-2);
+    padding: 0 12px;
+  }
+  .rs-details > summary {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  .rs-details[open] {
+    padding-bottom: 12px;
+  }
+  .rs-details[open] > :not(summary) + :not(summary) {
+    margin-top: 8px;
+  }
+  .rs-foot {
+    position: sticky;
+    bottom: 0;
+    margin: 0 -18px;
+    padding: 12px 18px calc(12px + env(safe-area-inset-bottom));
+    background: color-mix(in srgb, var(--surface, #fff) 92%, transparent);
+    backdrop-filter: blur(12px);
+    border-top: 1px solid var(--sh-line);
+  }
+  .rs-submit {
+    width: 100%;
+  }
+</style>

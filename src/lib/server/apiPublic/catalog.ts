@@ -29,6 +29,7 @@ import {
 } from './dto.js';
 import { apiRikmaPath } from './rikmaPath.js';
 import { optionAxesOf, optionValuesOf } from './shop.js';
+import { errorText, schemaProbe } from './schemaProbe.js';
 
 export type ApiRun = (
   qid: string,
@@ -40,10 +41,10 @@ export function strapiRun(fetchFn?: typeof fetch): ApiRun {
   return (qid, vars) =>
     strapiClient.execute(qid, vars, undefined, fetchFn).catch((e) => {
       // One place to say which query failed; the route turns it into a 502.
-      // The shop-schema probe is the one exception: until `1.0b` deploys the
+      // The schema probes are the exception: until `1.0b` deploys the
       // shop columns it is *expected* to fail on every pass, and `shopSchemaLive`
       // is the one that decides whether that failure is worth a word (§6.8).
-      if (qid !== 'rikmaApiShopSchema')
+      if (qid !== 'rikmaApiShopSchema' && qid !== 'stockFlagsSchema')
         console.error(
           `[apiPublic] ${qid} failed:`,
           e?.getMessages ? e.getMessages() : e
@@ -152,61 +153,6 @@ export async function fetchRikmaProfile(
 // The verdict is process state, deliberately: one tiny query per ten minutes,
 // and a deployment that adds the columns starts serving them without a restart
 // (the shorter retry on "not there yet").
-
-const SHOP_SCHEMA_TTL_MS = 10 * 60 * 1000;
-const SHOP_SCHEMA_RETRY_MS = 60 * 1000;
-
-function errorText(e: any): string {
-  return String(e?.getMessages ? e.getMessages().join(' ') : (e?.message ?? e));
-}
-
-/**
- * One cached "is this part of the schema readable?" question.
- *
- * A field that does not exist and a Strapi that is briefly unhappy both land
- * here as "not live" — the difference is only how long we believe it. A
- * validation error means the schema is absent (check again in ten minutes); a
- * network error means we do not know (check again in one minute).
- */
-function schemaProbe(opts: {
-  qid: string;
-  /** Given the probe's answer — is the schema there? */
-  isLive: (res: any) => boolean;
-  /** What callers do meanwhile, for the warning on an unexpected failure. */
-  meanwhile: string;
-}) {
-  let verdict: { live: boolean; until: number } | null = null;
-  return {
-    reset() {
-      verdict = null;
-    },
-    async live(run: ApiRun): Promise<boolean> {
-      const now = Date.now();
-      if (verdict && verdict.until > now) return verdict.live;
-
-      let live = false;
-      let retryMs = SHOP_SCHEMA_RETRY_MS;
-      try {
-        live = opts.isLive(await run(opts.qid, {}));
-        retryMs = live ? SHOP_SCHEMA_TTL_MS : SHOP_SCHEMA_RETRY_MS;
-      } catch (e) {
-        const message = errorText(e);
-        // "The columns are not there yet" is the expected state during the
-        // rollout described in §6.8 — it is not a warning, it is a schedule.
-        // Anything else (a network failure, an unreadable deployment) *is*
-        // worth saying out loud.
-        const schemaMissing = /GRAPHQL_VALIDATION_FAILED|Cannot query field/i.test(message);
-        const qidMissing = /QUERY_NOT_FOUND|not found in QIDS/i.test(message);
-        retryMs = schemaMissing ? SHOP_SCHEMA_TTL_MS : SHOP_SCHEMA_RETRY_MS;
-        if (!schemaMissing && !qidMissing) {
-          console.warn(`[apiPublic] ${opts.qid} could not be checked — ${opts.meanwhile}:`, message);
-        }
-      }
-      verdict = { live, until: now + retryMs };
-      return live;
-    }
-  };
-}
 
 const shopSchema = schemaProbe({
   qid: 'rikmaApiShopSchema',

@@ -14,5 +14,6 @@
   "addSale": "Add Sale",
   "total": "Total",
   "noteOptional": "Note (optional)",
-  "notePlaceholder": "Add a note to the sale..."
+  "notePlaceholder": "Add a note to the sale...",
+  "claimSent": "Report sent - awaiting {{holderName}}'s consent. It will auto-approve after the rikma's response time if there is no reply."
 }

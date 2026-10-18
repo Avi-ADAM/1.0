@@ -15,5 +15,6 @@
   "addSale": "Añadir venta",
   "total": "Total",
   "noteOptional": "Nota (opcional)",
-  "notePlaceholder": "Añade una nota a la venta..."
+  "notePlaceholder": "Añade una nota a la venta...",
+  "claimSent": "Reporte enviado: espera el consentimiento de {{holderName}}. Se aprobará automáticamente al terminar el tiempo de respuesta de la rikma si no hay respuesta."
 }

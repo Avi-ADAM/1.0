@@ -1,44 +1,61 @@
 ﻿<script>
+  /**
+   * The rikma's main sales page (canvas "Main" / "DesktopOverview",
+   * PLAN_SHOP_CUSTOMER_EXPERIENCE §7.3): how much is waiting to be split, the
+   * way to split it, what sold when, and the products. A re-skin on the shop
+   * design layer (`$lib/styles/shop.css`) — the money flows are the same ones
+   * as before: reporting goes through `SaleComponent` (createSale + holder
+   * consent), the split through `whowhat.svelte` (createTosplit /
+   * updateTosplitProposal / site share), discovery through
+   * `setMatanotDiscovery`.
+   */
+  import '$lib/styles/shop.css';
   import { useFormatMoney } from '$lib/money/context.svelte';
   import Money from '$lib/components/money/Money.svelte';
-  //טבלת מתנות כפתור מכירה מקפיץ תפריט של איפה הכסף יושב
-  import Col from './column/main.svelte';
   import New from './newmatana.svelte';
   import { SaleComponent } from '$lib/components/sales';
   import dayjs from 'dayjs';
   import 'dayjs/locale/he.js';
   import 'dayjs/locale/ar.js';
   import 'dayjs/locale/ru.js';
+  import 'dayjs/locale/es.js';
   import { lang } from '$lib/stores/lang.js';
-  import { t, isRtl} from '$lib/translations';
+  import { t, isRtl } from '$lib/translations';
   import { get } from 'svelte/store';
   import { idPr } from '$lib/stores/idPr.js';
-  import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
-  import { fly } from 'svelte/transition';
+  import { page } from '$app/state';
+  import { pushState } from '$app/navigation';
+  import { pack, hierarchy } from 'd3-hierarchy';
   import Halu from './whowhat.svelte';
-  import Cir from './graph/circle.svelte';
-  let isOpen = $state(false);
-  let a = $state(0);
   import Spinner from '$lib/celim/Spinner.svelte';
-  import Close from '$lib/celim/close.svelte';
+  import ShopSheet from '$lib/components/shop/ShopSheet.svelte';
   import ShareButtons from '$lib/components/share/shareButtons/index.svelte';
   import { toast } from 'svelte-sonner';
-  import SiteShareSaleNote from './SiteShareSaleNote.svelte';
   import { isSiteShareNote, parseSiteShareNote } from '$lib/revenue/parseSiteShareNote';
   import { executeAction } from '$lib/client/actionClient';
+  import {
+    chartSeries,
+    filterByStage,
+    holderState,
+    newestFirst,
+    productTotals,
+    saleStage,
+    salesYears,
+    stageShares,
+    stageSummary
+  } from '$lib/shop/salesOverview';
+  import { splitPreview } from '$lib/revenue/splitPreview';
 
-  // Site-share income Sales created before the mutation set a `date` have a null
-  // date, which dayjs renders as "Invalid Date". Fall back to a dash so the
-  // table/CSV stay readable.
-  function formatSaleDate(date) {
-    const d = dayjs(date);
-    return d.isValid() ? d.format('DD/MM/YYYY HH:mm') : '—';
-  }
-
-  // One-line, human-readable summary of a site-share note for dense contexts
-  // (table cells, CSV export) where the full card would be too large.
   const fmtMoney = useFormatMoney();
 
+  // Site-share income Sales created before the mutation set a `date` have a null
+  // date, which dayjs renders as "Invalid Date". Fall back to a dash.
+  function formatSaleDate(date) {
+    const d = dayjs(date);
+    return date && d.isValid() ? d.format('D.M.YY') : '—';
+  }
+
+  // One-line, human-readable summary of a site-share note — never the raw note.
   function siteShareSummary(note) {
     const p = parseSiteShareNote(note);
     if (!p) return note || '';
@@ -59,125 +76,10 @@
     return parts.join(' · ');
   }
 
-  /** @type {Record<string, number>} */
-  let fermatana = $state({});
-
-  let showTableModal = $state(false);
-
-  /** @type {Record<string, Record<string, number>>} */
-  let ferdate = $state({});
-
-  /** @type {Array<{key: string, value: number}>} */
-  let arr = $state([]);
-
-  /** @type {Array<Record<string, string | number>>} */
-  let arrt = $state([]);
-
-  /** @typedef {'daily' | 'monthly' | 'yearly'} ChartPeriod */
-
-  /** @type {ChartPeriod} */
-  let chartPeriod = $state('daily');
-
-  /** @type {number} */
-  let selectedChartYear = $state(dayjs().year());
-
-  /**
-   * @param {Record<string, Record<string, number | string>>} grouped
-   * @param {(key: string) => string} formatLabel
-   * @param {(a: { date: string | number }, b: { date: string | number }) => number} [sortFn]
-   * @returns {Array<Record<string, string | number>>}
-   */
-  function buildStackedChartData(grouped, formatLabel, sortFn) {
-    const rows = Object.entries(grouped).map(([key, value]) => ({
-      date: key,
-      ...value
-    }));
-    if (rows.length === 0) return [];
-
-    const keys = rows.reduce((acc, curr) => {
-      Object.keys(curr).forEach((key) => {
-        if (key !== 'date') acc.add(key);
-      });
-      return acc;
-    }, /** @type {Set<string>} */ (new Set()));
-
-    const output = rows.map((item) =>
-      [...keys].reduce(
-        (acc, key) => {
-          acc[key] = item[key] ?? 0;
-          return acc;
-        },
-        /** @type {Record<string, string | number>} */ ({ date: item.date })
-      )
-    );
-
-    output.sort(
-      sortFn ??
-        ((a, b) => new Date(String(a.date)).getTime() - new Date(String(b.date)).getTime())
-    );
-
-    return output.map((obj) => ({
-      ...obj,
-      date: formatLabel(String(obj.date))
-    }));
-  }
-
-  /** @type {string | undefined} */
-  let kindOf = $state();
-
-  let kindUlimit = $state(false);
-
-  /**
-   * @typedef {Object} MatanaAttributes
-   * @property {string} name - Gift name
-   * @property {number} price - Gift price
-   * @property {number} quant - Available quantity (-1 for unlimited)
-   * @property {string} kindOf - Type: 'total', 'monthly', 'yearly', or 'unlimited'
-   * @property {boolean} [hideFromDiscovery] - Opted out of the public /gift directory
-   */
-
   /**
    * @typedef {Object} Matana
-   * @property {string} id - Gift ID
-   * @property {Object} attributes
-   * @property {string} attributes.name
-   * @property {number} attributes.price
-   * @property {number} attributes.quant
-   * @property {string} attributes.kindOf
-   * @property {boolean} [attributes.hideFromDiscovery] - Opted out of the public /gift directory
-   */
-
-  /**
-   * @typedef {Object} SaleAttributes
-   * @property {number} in - Sale amount
-   * @property {string} date - Sale date
-   * @property {boolean} [splited] - Whether the sale has been split
-   * @property {string} [note] - Optional note about the sale
-   * @property {Object} matanot - Related gift
-   * @property {Object} matanot.data
-   * @property {MatanaAttributes} matanot.data.attributes
-   * @property {Object} users_permissions_user - User who made the sale
-   * @property {Object} users_permissions_user.data
-   * @property {string} users_permissions_user.data.id
-   * @property {Object} users_permissions_user.data.attributes
-   * @property {string} users_permissions_user.data.attributes.username
-   */
-
-  /**
-   * @typedef {Object} Sale
-   * @property {string} id - Sale ID
-   * @property {SaleAttributes} attributes
-   */
-
-  /**
-   * @typedef {Object} ProjectUser
-   * @property {string} id - User ID
-   * @property {Object} attributes
-   * @property {string} attributes.username
-   * @property {Object} attributes.profilePic
-   * @property {Object | null} attributes.profilePic.data
-   * @property {Object} [attributes.profilePic.data.attributes]
-   * @property {string} [attributes.profilePic.data.attributes.url]
+   * @property {string} id
+   * @property {{ name: string, price: number, quant: number, kindOf: string, hideFromDiscovery?: boolean }} attributes
    */
 
   let {
@@ -198,13 +100,25 @@
     trili,
     /** @type {Array<Matana>} */
     bmiData = $bindable([]),
-    /** @type {Array<Sale>} */
+    /** @type {Array<any>} */
     salee = $bindable([]),
-    /** @type {Array<ProjectUser>} */
+    /** @type {Array<any>} */
     projectUsers = [],
     /** @type {any} */
-    restime
+    restime,
+    /** The signed-in member — "the money is with you". @type {string | null} */
+    uid = null,
+    /** @type {string} */
+    projectName = '',
+    /** What sits under the header: the orders banner and "manage sales". @type {import('svelte').Snippet | undefined} */
+    top
   } = $props();
+
+  // ── reporting a sale / a new product — one sheet ──
+  let isOpen = $state(false);
+  let a = $state(0); // 0 sale · 1 new product · 3 error
+  let kindOf = $state();
+  let kindUlimit = $state(false);
   let quant = $state(),
     each = $state(),
     maid = $state();
@@ -213,18 +127,57 @@
     each = v;
     quant = z;
     kindOf = isto;
-    if (isto == 'unlimited') {
-      console.log('unlimited', isto);
-      kindUlimit = true;
-    } else {
-      kindUlimit = false;
+    kindUlimit = isto == 'unlimited';
+    isOpen = true;
+    a = 0;
+  }
+  /** "Report a sale" without a product picked yet: the sheet opens on the picker. */
+  function reportSale() {
+    const only = bmiData.length === 1 ? bmiData[0] : null;
+    if (only) {
+      sell(only.id, only.attributes.price, only.attributes.quant, only.attributes.kindOf);
+      return;
     }
+    maid = undefined;
     isOpen = true;
     a = 0;
   }
   function addnew() {
     isOpen = true;
     a = 1;
+  }
+  const closer = () => {
+    isOpen = false;
+    a = 0;
+  };
+  const sale = (event) => {
+    const id = event.id;
+    const un = event.un;
+    let oldob = bmiData;
+    const x = oldob.map((c) => c.id);
+    const indexy = x.indexOf(id);
+
+    // עדכון כמות רק אם יש un (לא unlimited) והאינדקס נמצא
+    if (un !== undefined && indexy !== -1) {
+      oldob[indexy].quant = un;
+      bmiData = oldob;
+    }
+
+    isOpen = false;
+    a = 0;
+    salee.push(event.matana);
+  };
+  function saleUnlimited() {
+    // עבור מוצרים unlimited - סגירת הדיאלוג בלבד
+    // המכירה כבר נוצרה בשרת, אין צורך לעדכן כמות
+    isOpen = false;
+    a = 0;
+  }
+  function done(event) {
+    isOpen = false;
+    a = 0;
+    bmiData.push(event.matana);
+    bmiData = bmiData;
   }
 
   /** @type {string | null} */
@@ -247,14 +200,10 @@
       });
       if (!res.success) throw new Error(res.error?.message ?? 'failed');
       bmiData = bmiData.map((p) =>
-        p.id === data.id
-          ? { ...p, attributes: { ...p.attributes, hideFromDiscovery: next } }
-          : p
+        p.id === data.id ? { ...p, attributes: { ...p.attributes, hideFromDiscovery: next } } : p
       );
       toast.success(
-        next
-          ? $t('project.hamatanot.discovery.nowHidden')
-          : $t('project.hamatanot.discovery.nowShown')
+        next ? $t('project.hamatanot.discovery.nowHidden') : $t('project.hamatanot.discovery.nowShown')
       );
     } catch (e) {
       toast.error(e instanceof Error ? e.message : String(e));
@@ -262,1200 +211,1195 @@
       discoveryBusyId = null;
     }
   }
-  const closer = () => {
-    isOpen = false;
-    a = 0;
-  };
-  let hal = $state(false);
-  const sale = (event) => {
-    const id = event.id;
-    const un = event.un;
-    let oldob = bmiData;
-    const x = oldob.map((c) => c.id);
-    const indexy = x.indexOf(id);
 
-    // עדכון כמות רק אם יש un (לא unlimited) והאינדקס נמצא
-    if (un !== undefined && indexy !== -1) {
-      oldob[indexy].quant = un;
-      bmiData = oldob;
-    }
-
-    isOpen = false;
-    a = 0;
-    salee.push(event.matana);
-  };
-
-  function saleUnlimited() {
-    // עבור מוצרים unlimited - סגירת הדיאלוג בלבד
-    // המכירה כבר נוצרה בשרת, אין צורך לעדכן כמות
-    isOpen = false;
-    a = 0;
+  // ── the split screen: its own history entry, so a phone's back button returns ──
+  let splitOpen = $derived(!!page.state?.salesSplit);
+  function openSplit() {
+    pushState('', { salesSplit: true });
+    if (typeof window !== 'undefined') window.scrollTo({ top: 0 });
+  }
+  function closeSplit() {
+    if (page.state?.salesSplit) history.back();
   }
 
-  function done(event) {
-    isOpen = false;
-    a = 0;
-    bmiData.push(event.matana);
-    bmiData = bmiData;
-  }
-  function ask() {
-    hal = true;
-    //ליצור מטבע אישור של חלוקה ליצור טופס של פרטי חלוקה כמה אחוז לחלק וכמה להעמיד להוצאות
-  }
-  let allin = $state(0);
-  let totalSales = $state(0);
-  function getSrc(id) {
-    let src;
-    for (let i = 0; i < projectUsers.length; i++) {
-      if (projectUsers[i].id == id) {
-        if (projectUsers[i].attributes.profilePic.data != null) {
-          src = projectUsers[i].attributes.profilePic.data.attributes.url;
-        } else {
-          src =
-            'https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png';
-        }
-        return src;
-      }
-    }
-    return 'https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png';
-  }
   // A sale can reference a gift (matanot) that was deleted or not populated,
   // leaving matanot.data === null. Guard the whole chain so the component never
   // crashes on render/hydration; fall back to a generic label.
   function getMatanaName(sale) {
     const linked = sale?.attributes?.matanot?.data?.attributes?.name;
     if (linked) return linked;
-    // Site-share income Sales carry no product; label them by their nature
-    // instead of the generic "unknown product" fallback.
+    // Site-share income Sales carry no product; label them by their nature.
     if (isSiteShareNote(sale?.attributes?.note)) {
       return $t('project.hamatanot.siteShare.label');
     }
     return get(t)('project.hamatanot.unknownProduct');
   }
+  const holderOf = (sale) => sale?.attributes?.users_permissions_user?.data;
+  const initialOf = (name) => (String(name || '?').trim().charAt(0) || '?').toUpperCase();
 
   // Holder-consent status chip (PLAN_sale_holder_consent). holderStatus is
   // null for legacy sales predating this feature — shown as unverified but
-  // still counted (grandfathered), matching the sovereignty-plan precedent.
-  function saleHolderLabel(sale) {
-    const hs = sale?.attributes?.holderStatus;
-    const holderName =
-      sale?.attributes?.users_permissions_user?.data?.attributes?.username ?? '';
-    if (hs === 'self') {
-      return { cls: 'chip-self', text: $t('project.misc.verifiedSelf') };
-    }
-    if (hs === 'open') {
+  // still counted (grandfathered).
+  function holderChip(sale) {
+    const hs = holderState(sale);
+    if (hs === 'self') return { cls: 'sh-chip-ok', text: $t('project.misc.verifiedSelf') };
+    if (hs === 'open')
       return {
-        cls: 'chip-open',
-        text:
-          $t('project.misc.awaitingHolderConsent', { holderName })
+        cls: 'sh-chip-accent',
+        text: $t('project.misc.awaitingHolderConsent', { holderName: holderOf(sale)?.attributes?.username ?? '' })
       };
-    }
-    if (hs === 'confirmed') {
-      const byTimeout = sale?.attributes?.confirmedBy === 'timeout';
-      return {
-        cls: 'chip-confirmed',
-        text: byTimeout
-          ? (get(t)('project.hamatanot.autoApproved'))
-          : (get(t)('project.hamatanot.confirmed'))
-      };
-    }
-    // null = legacy, predates this feature
-    return { cls: 'chip-legacy', text: get(t)('project.hamatanot.unverifiedLegacy') };
+    if (hs === 'timeout') return { cls: 'sh-chip-gold', text: $t('project.hamatanot.autoApproved') };
+    if (hs === 'confirmed') return { cls: 'sh-chip-ok', text: $t('project.hamatanot.confirmed') };
+    return { cls: 'sh-chip-muted', text: $t('project.hamatanot.unverifiedLegacy') };
   }
-  let arrc = [
-    { year: 2019, bananas: 3840, cherries: 1920, dates: 960 },
-    { year: 2020, bananas: 380, cherries: 920, dates: 1960 }
-  ];
+  const STAGE_KEY = { waiting: 'awaiting', voting: 'pending', split: 'split' };
 
-  const availableYears = $derived(
-    [...new Set(salee.map((s) => dayjs(s.attributes.date).year()))].sort(
-      (a, b) => b - a
-    )
+  // ── the headline ──
+  let summary = $derived(stageSummary(salee));
+  let shares = $derived(stageShares(summary));
+  let proposal = $derived(trili?.[0] ?? null);
+  let proposalYes = $derived(
+    (proposal?.attributes?.vots ?? []).filter((v) => v?.what === true).length
+  );
+  let preview = $derived(
+    proposal
+      ? null
+      : splitPreview({ users: projectUsers, fmiData, rikmashes, stipendPayments, sales: salee })
+  );
+  let flows = $derived(
+    preview && preview.revach > 0.01 ? preview.rows.filter((r) => r.x > 0.01 || r.ihave > 0.01) : []
   );
 
-  const monthlyGrouped = $derived.by(() => {
-    /** @type {Record<string, Record<string, number>>} */
-    const grouped = {};
-    for (let m = 1; m <= 12; m++) {
-      const monthKey = `${selectedChartYear}-${String(m).padStart(2, '0')}`;
-      grouped[monthKey] = { total: 0 };
-    }
-    for (const sale of salee) {
-      const d = dayjs(sale.attributes.date);
-      if (d.year() !== selectedChartYear) continue;
-      const monthKey = d.format('YYYY-MM');
-      grouped[monthKey].total += sale.attributes.in;
-    }
-    return grouped;
-  });
-
-  const yearlyGrouped = $derived.by(() => {
-    /** @type {Record<string, Record<string, number>>} */
-    const grouped = {};
-    for (const sale of salee) {
-      const yearKey = dayjs(sale.attributes.date).format('YYYY');
-      if (!grouped[yearKey]) grouped[yearKey] = { total: 0 };
-      grouped[yearKey].total += sale.attributes.in;
-    }
-    return grouped;
-  });
-
-  const arrtMonth = $derived.by(() => {
-    void $lang;
-    return buildStackedChartData(monthlyGrouped, (key) =>
-      dayjs(`${key}-01`).format('MMM')
-    );
-  });
-
-  const arrtYear = $derived(
-    buildStackedChartData(
-      yearlyGrouped,
-      (key) => key,
-      (a, b) => Number(a.date) - Number(b.date)
-    )
-  );
-
-  const activeChartData = $derived(
-    chartPeriod === 'daily'
-      ? arrt
-      : chartPeriod === 'monthly'
-        ? arrtMonth
-        : arrtYear
-  );
-
-  const hasActiveChartData = $derived(
-    chartPeriod === 'daily'
-      ? arrt.length > 0
-      : chartPeriod === 'monthly'
-        ? arrtMonth.some((row) => Number(row.total) > 0)
-        : arrtYear.length > 0
-  );
-  function exportToCSV() {
-    const headers = [
-      $t('project.hamatanot.productName'),
-      $t('project.hamatanot.amount'),
-      $t('project.hamatanot.reportSale'),
-      $t('project.hamatanot.salesByDate'),
-      $t('project.hamatanot.type'),
-      $t('project.hamatanot.note')
-    ];
-
-    const rows = salee.map((sale) => {
-      const status = sale.attributes.splited
-        ? (get(t)('project.hamatanot.split'))
-        : sale.attributes.pending
-          ? (get(t)('project.hamatanot.pending'))
-          : (get(t)('project.hamatanot.awaiting'));
-
-      return [
-        getMatanaName(sale),
-        sale.attributes.in,
-        sale.attributes.users_permissions_user.data.attributes.username,
-        formatSaleDate(sale.attributes.date),
-        status,
-        isSiteShareNote(sale.attributes.note)
-          ? siteShareSummary(sale.attributes.note)
-          : sale.attributes.note || ''
-      ];
-    });
-
-    const csvContent = [
-      headers.join(','),
-      ...rows.map((row) => row.map((cell) => `"${cell}"`).join(','))
-    ].join('\n');
-
-    const blob = new Blob(['\ufeff' + csvContent], {
-      type: 'text/csv;charset=utf-8;'
-    });
-    const link = document.createElement('a');
-    const url = URL.createObjectURL(blob);
-    link.setAttribute('href', url);
-    link.setAttribute('download', `sales_${dayjs().format('YYYY-MM-DD')}.csv`);
-    link.style.visibility = 'hidden';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-
-    toast.success(
-      get(t)('project.hamatanot.fileDownloaded')
-    );
-  }
-
-  $effect(() => {
-    dayjs.locale($lang);
-  });
-
+  // ── the chart ──
+  /** @type {'daily' | 'monthly' | 'yearly'} */
+  let chartPeriod = $state('daily');
+  let selectedChartYear = $state(dayjs().year());
+  let availableYears = $derived(salesYears(salee));
   $effect(() => {
     if (availableYears.length > 0 && !availableYears.includes(selectedChartYear)) {
       selectedChartYear = availableYears[0];
     }
   });
-
   $effect(() => {
-    // Show all sales in graphs
-    fermatana = salee.reduce((acc, sale) => {
-      const matanaName = getMatanaName(sale);
-      const saleIn = sale.attributes.in;
-      acc[matanaName] = (acc[matanaName] || 0) + saleIn;
-      return acc;
-    }, {});
+    dayjs.locale($lang);
   });
-  $effect(() => {
-    // Show all sales in graphs
-    const newFerdate = {};
-    for (const sale of salee) {
-      const dateKey = dayjs(sale.attributes.date).format('YYYY-MM-DD');
-      const matanaName = getMatanaName(sale);
-      const saleIn = sale.attributes.in;
+  const DAYS = 14;
+  let series = $derived(chartSeries(salee, chartPeriod, { year: selectedChartYear, days: DAYS }));
+  let seriesMax = $derived(series.reduce((m, p) => Math.max(m, p.total), 0));
+  let bars = $derived.by(() => {
+    void $lang;
+    return series.map((p, i) => ({
+      ...p,
+      label:
+        chartPeriod === 'daily'
+          ? dayjs(p.key).format('D.M')
+          : chartPeriod === 'monthly'
+            ? dayjs(`${p.key}-01`).format('MMM')
+            : p.key,
+      height: seriesMax > 0 ? Math.max(2, (Math.max(0, p.total) / seriesMax) * 100) : 2,
+      // The phone shows the last week; the desktop the last two.
+      older: chartPeriod === 'daily' && i < series.length - 7,
+      last: i === series.length - 1
+    }));
+  });
+  let chartTitle = $derived(
+    chartPeriod === 'daily'
+      ? $t('project.hamatanot.salesByDate')
+      : chartPeriod === 'monthly'
+        ? $t('project.hamatanot.salesByMonth')
+        : $t('project.hamatanot.salesByYear')
+  );
 
-      if (!newFerdate[dateKey]) {
-        newFerdate[dateKey] = {};
-      }
+  // ── by product ──
+  let byProduct = $derived(productTotals(salee, getMatanaName));
+  const BUBBLE_FILLS = ['var(--sh-accent)', 'var(--sh-gold)', 'var(--sh-info-ink)', 'var(--sh-ok-ink)', 'var(--sh-ink)', 'var(--sh-muted)'];
+  const BUBBLE = 320;
+  let bubbles = $derived.by(() => {
+    const top = byProduct.filter((p) => p.amount > 0).slice(0, BUBBLE_FILLS.length);
+    if (top.length === 0) return [];
+    const root = hierarchy({ children: top.map((p, i) => ({ ...p, i })) }).sum((d) => d.amount ?? 0);
+    return pack().size([BUBBLE, BUBBLE]).padding(6)(root).leaves().map((n) => ({
+      x: n.x,
+      y: n.y,
+      r: n.r,
+      name: n.data.name,
+      fill: BUBBLE_FILLS[n.data.i]
+    }));
+  });
 
-      if (newFerdate[dateKey][matanaName]) {
-        newFerdate[dateKey][matanaName] += saleIn;
-      } else {
-        newFerdate[dateKey][matanaName] = saleIn;
-      }
-    }
-    ferdate = newFerdate;
-  });
-  $effect(() => {
-    if (salee.length > 0) {
-      const newArrt = [];
-      for (const [key, value] of Object.entries(ferdate)) {
-        newArrt.push({ date: key, ...value });
-      }
+  // ── the sales list ──
+  /** @type {'waiting' | 'voting' | 'split' | 'all'} */
+  let saleFilter = $state('waiting');
+  let showAll = $state(false);
+  const FIRST = 6;
+  let filtered = $derived(newestFirst(filterByStage(salee, saleFilter)));
+  let shownSales = $derived(showAll ? filtered : filtered.slice(0, FIRST));
+  let filters = $derived([
+    { id: 'waiting', label: $t('project.hamatanot.awaiting'), count: summary.waiting.count },
+    { id: 'voting', label: $t('project.hamatanot.pending'), count: summary.voting.count },
+    { id: 'split', label: $t('project.hamatanot.split'), count: summary.split.count },
+    { id: 'all', label: $t('shop.sp.filterAll'), count: summary.total.count }
+  ]);
 
-      if (newArrt.length === 0) {
-        arrt = [];
-        return;
-      }
-
-      //get all keys
-      const keys = newArrt.reduce(
-        (acc, curr) => (Object.keys(curr).forEach((key) => acc.add(key)), acc),
-        new Set()
-      );
-      //add all matanot to all objects
-      const output = newArrt.map((item) =>
-        [...keys].reduce((acc, key) => ((acc[key] = item[key] ?? ''), acc), {})
-      );
-      //sort by date
-      output.sort(function (a, b) {
-        return new Date(a.date) - new Date(b.date);
-      });
-      //formate to readble local date
-      const x = output.map((obj) => {
-        return { ...obj, date: dayjs(obj.date).format('D.M.YY') };
-      });
-      arrt = x;
-    } else {
-      arrt = [];
-    }
-  });
-  $effect(() => {
-    if (salee.length > 0) {
-      arr = Object.entries(fermatana).map(([key, value]) => ({ key, value }));
-    } else {
-      arr = [];
-    }
-  });
-  $effect(() => {
-    // Count all sales
-    totalSales = salee.reduce((total, s) => total + s.attributes.in, 0);
-    // Count all unsplited sales (including pending ones) - these are awaiting split
-    allin = salee
-      .filter((s) => !s.attributes.splited)
-      .reduce((total, s) => total + s.attributes.in, 0);
-  });
+  function kindLabel(k) {
+    if (k == 'total') return $t('project.hamatanot.perUnit');
+    if (k == 'monthly') return $t('project.hamatanot.monthly');
+    if (k == 'yearly') return $t('project.hamatanot.yearly');
+    if (k == 'unlimited') return $t('project.hamatanot.unlimited');
+    return '';
+  }
+  function stockLabel(p) {
+    const q = p.attributes.quant;
+    if (p.attributes.kindOf == 'unlimited') return $t('project.hamatanot.unlimited');
+    if (q === -1) return $t('project.hamatanot.perUnitUnlimited');
+    if (q > 0) return `${$t('project.hamatanot.quantity')} ${q}`;
+    return $t('shop.products.soldOut');
+  }
+  const salesN = (n) => (n === 1 ? $t('shop.sp.salesCountOne') : $t('shop.sp.salesCount', { count: n }));
+  let picked = $derived(bmiData.find((p) => p.id === maid) ?? null);
+  let myName = $derived(
+    uid ? (projectUsers.find((u) => String(u.id) === String(uid))?.attributes?.username ?? '') : ''
+  );
 </script>
 
-<DialogOverlay style="z-index: 700;" {isOpen} onDismiss={closer}>
-  <div
-    style="z-index: 700;"
-    transition:fly|local={{ y: 450, opacity: 0.5, duration: 2000 }}
-  >
-    <DialogContent class="content surface-dialog" aria-label="form">
-      <div style="z-index: 400;" dir={$isRtl ? 'rtl' : 'ltr'}>
-        <button class="hover:bg-barbi text-barbi hover:text-gold rounded-full" onclick={closer}
-          >{$t('project.hamatanot.cancel')}</button
-        >
-        {#if a == 0}
-          <SaleComponent
-            productId={maid}
-            productName=""
-            availableQuantity={quant}
-            price={each}
-            {kindOf}
-            projectId={$idPr}
-            {projectUsers}
-            {kindUlimit}
-            onDoners={saleUnlimited}
-            onDone={sale}
-            onError={() => (a = 3)}
-          />
-        {:else if a == 1}
-          <New {projectId} onDone={done} />
-        {:else if a == 2}
-          <div class="sp bg-gold">
-            <h3 class="text-barbi">{$t('project.hamatanot.loading')}</h3>
-            <br />
-            <Spinner size="lg" />
-          </div>
-        {:else if a == 3}
-          <h1
-            class="text-center text-barbi text-bold underline decoration-mturk"
-          >
-            {$t('project.hamatanot.error')}
-          </h1>
-          <button
-            class="hover:bg-barbi text-barbi hover:text-gold bg-gold rounded-full"
-            onclick={() => (a = 0)}>{$t('project.hamatanot.tryAgain')}</button
-          >
+<ShopSheet bind:open={isOpen} label={a == 1 ? $t('project.hamatanot.createProduct') : $t('project.hamatanot.reportSale')}>
+  <div class="sp-sheet" dir={$isRtl ? 'rtl' : 'ltr'}>
+    {#if a == 1}
+      <h2 class="sh-title sp-sheet-title">{$t('project.hamatanot.createProduct')}</h2>
+      <New {projectId} onDone={done} />
+    {:else if a == 3}
+      <div class="sh-empty">
+        <strong>{$t('project.hamatanot.error')}</strong>
+        <button type="button" class="sh-btn sh-btn-primary" onclick={() => (a = 0)}>{$t('project.hamatanot.tryAgain')}</button>
+      </div>
+    {:else}
+      <h2 class="sh-title sp-sheet-title">{$t('project.hamatanot.reportSale')}</h2>
+      {#if bmiData.length === 0}
+        <div class="sh-empty">
+          <strong>{$t('shop.sp.noProducts')}</strong>
+          <p>{$t('shop.sp.noProductsBody')}</p>
+          <button type="button" class="sh-btn sh-btn-primary" onclick={addnew}>{$t('project.hamatanot.createProduct')}</button>
+        </div>
+      {:else}
+        <fieldset class="sp-pick">
+          <legend class="sh-section-label">{$t('shop.sp.whatSold')}</legend>
+          {#each bmiData as p (p.id)}
+            <button
+              type="button"
+              role="radio"
+              aria-checked={p.id === maid}
+              class="sp-radio"
+              onclick={() => sell(p.id, p.attributes.price, p.attributes.quant, p.attributes.kindOf)}
+            >
+              <span class="sp-radio-name">{p.attributes.name}</span>
+              <span class="sp-radio-meta"><bdi><Money amount={p.attributes.price} /></bdi> · {kindLabel(p.attributes.kindOf)}</span>
+            </button>
+          {/each}
+        </fieldset>
+        {#if picked}
+          {#key maid}
+            <SaleComponent
+              skin="shop"
+              productId={maid}
+              productName={picked.attributes.name}
+              availableQuantity={quant}
+              price={each}
+              {kindOf}
+              projectId={$idPr}
+              {projectUsers}
+              {kindUlimit}
+              meId={uid}
+              defaultHolder={myName}
+              onDoners={saleUnlimited}
+              onDone={sale}
+              onError={() => (a = 3)}
+            />
+          {/key}
         {/if}
-      </div></DialogContent
-    >
+      {/if}
+    {/if}
   </div>
-</DialogOverlay>
-<div class="sm:flex sm:flex-col sm:justify-evenly overflow-x-hidden max-w-full">
-  <div
-    class="flex flex-col sm:flex-row sm:justify-evenly overflow-x-hidden max-w-full"
-  >
-    <div>
-      <div class="dd md:items-center">
-        <div class="bodyi items-center d">
-          {#if bmiData.length > 0}
-            <div class="gifts-header">
-              <h1
-                class="md:text-center text-2xl md:text-2xl font-bold underline decoration-mturk text-center"
-              >
-                {$t('project.hamatanot.ourProducts')}
-              </h1>
-            </div>
-            <div class="gifts-grid max-h-[calc(100vh-200px)] overflow-y-auto d">
-              {#each bmiData as data, i}
-                <div class="gift-card">
-                  <div class="card-header">
-                    <span class="card-number">{i + 1}</span>
-                    <a href="/gift/{data.id}" class="gift-link">
-                      <h3 class="gift-name">{data.attributes.name}</h3>
-                    </a>
-                  </div>
-                  <div class="card-body">
-                    <p class="gift-price">
-                      <strong>{$t('project.hamatanot.price')}:</strong>
-                      {data.attributes.price}
-                    </p>
-                    <p class="gift-quantity">
-                      <strong>{$t('project.hamatanot.quantity')}:</strong>
-                      {#if data.attributes.quant > 0 || data.attributes.quant === -1}
-                        {#if data.attributes.kindOf == 'unlimited'}
-                          <span>{$t('project.hamatanot.unlimited')}</span>
-                        {:else}
-                          {data.attributes.quant === -1
-                            ? $t('project.hamatanot.perUnitUnlimited')
-                            : data.attributes.quant}
-                        {/if}
-                      {/if}
-                    </p>
-                    <p class="gift-kind">
-                      <strong>{$t('project.hamatanot.type')}:</strong>
-                      {#if data.attributes.kindOf == 'total'}
-                        {$t('project.hamatanot.perUnit')}
-                      {:else if data.attributes.kindOf == 'monthly'}
-                        {$t('project.hamatanot.monthly')}
-                      {:else if data.attributes.kindOf == 'yearly'}
-                        {$t('project.hamatanot.yearly')}
-                      {:else if data.attributes.kindOf == 'unlimited'}
-                        {$t('project.hamatanot.unlimited')}
-                      {/if}
-                    </p>
-                  </div>
-                  <div class="card-actions">
-                    <button
-                      class="discovery-btn"
-                      class:is-hidden={data.attributes.hideFromDiscovery}
-                      disabled={discoveryBusyId === data.id}
-                      aria-pressed={!data.attributes.hideFromDiscovery}
-                      title={data.attributes.hideFromDiscovery
-                        ? $t('project.hamatanot.discovery.showTitle')
-                        : $t('project.hamatanot.discovery.hideTitle')}
-                      onclick={() => toggleDiscovery(data)}
-                    >
-                      <span aria-hidden="true"
-                        >{data.attributes.hideFromDiscovery ? '🙈' : '🌍'}</span
-                      >
-                      {data.attributes.hideFromDiscovery
-                        ? $t('project.hamatanot.discovery.hidden')
-                        : $t('project.hamatanot.discovery.shown')}
-                    </button>
-                    <div class="share-button-container">
-                      <ShareButtons
-                        slug="gift/{data.id}"
-                        title={data.attributes.name}
-                        desc={`Check out this amazing gift: ${data.attributes.name} for ${data.attributes.price}`}
-                      />
-                    </div>
-                    <button
-                      class="report-sale-btn"
-                      title={$t('project.hamatanot.reportSale')}
-                      aria-label={$t('project.hamatanot.reportSale')}
-                      onclick={() =>
-                        sell(
-                          data.id,
-                          data.attributes.price,
-                          data.attributes.quant,
-                          data.attributes.kindOf
-                        )}
-                    >
-                      <svg
-                        class="svggg"
-                        version="1.1"
-                        id="Layer_1"
-                        xmlns="http://www.w3.org/2000/svg"
-                        xmlns:xlink="http://www.w3.org/1999/xlink"
-                        x="0px"
-                        y="0px"
-                        viewBox="0 0 496 496"
-                        style="width:32px;height:32px;"
-                        xml:space="preserve"
-                      >
-                        <g>
-                          <g>
-                            <g>
-                              <path
-                                d="M256,32.408V24h-16v8.408c-9.12,1.856-16,9.936-16,19.592c0,11.024,8.976,20,20,20h8c2.208,0,4,1.792,4,4s-1.792,4-4,4h-8c-2.208,0-4-1.792-4-4v-4h-16v4c0,9.656,6.88,17.736,16,19.592V104h16v-8.408c9.12-1.856,16-9.936,16-19.592c0-11.024-8.976-20-20-20h-8c-2.208,0-4-1.792-4-4s1.792-4,4-4h8c2.208,0,4,1.792,4,4v4h16v-4C272,42.344,265.12,34.264,256,32.408z"
-                              />
-                              <path
-                                d="M104,128.408V120H88v8.408c-9.12,1.856-16,9.936-16,19.592c0,11.024,8.976,20,20,20h8c2.208,0,4,1.792,4,4s-1.792,4-4,4h-8c-2.208,0-4-1.792-4-4v-4H72v4c0,9.656,6.88,17.736,16,19.592V200h16v-8.408c9.12-1.856,16-9.936,16-19.592c0-11.024-8.976-20-20-20h-8c-2.208,0-4-1.792-4-4s1.792-4,4-4h8c2.208,0,4,1.792,4,4v4h16v-4C120,138.344,113.12,130.264,104,128.408z"
-                              />
-                              <path
-                                d="M400,48c-35.288,0-64,28.712-64,64c0,32.144,23.848,58.752,54.76,63.256C387.664,184.928,378.688,192,368,192H256v-64.552c31.52-3.96,56-30.872,56-63.448c0-35.288-28.712-64-64-64c-35.288,0-64,28.712-64,64c0,32.576,24.48,59.488,56,63.448V240H128c-10.688,0-19.664-7.072-22.76-16.744C136.152,218.752,160,192.144,160,160c0-35.288-28.712-64-64-64c-35.288,0-64,28.712-64,64c0,32.84,24.872,59.952,56.768,63.56C92.312,242.008,108.536,256,128,256h112v16H104v64h16.76l16,160h222.48l16-160H392v-64H256v-64h112c19.464,0,35.688-13.992,39.232-32.44C439.128,171.952,464,144.84,464,112C464,76.712,435.288,48,400,48z M96,208c-26.472,0-48-21.528-48-48s21.528-48,48-48s48,21.528,48,48S122.472,208,96,208z M344.76,480H151.24l-14.4-144h222.32L344.76,480z M376,288v32H120v-32H376z M248,112c-26.472,0-48-21.528-48-48s21.528-48,48-48s48,21.528,48,48S274.472,112,248,112z M400,160c-26.472,0-48-21.528-48-48s21.528-48,48-48s48,21.528,48,48S426.472,160,400,160z"
-                              />
-                              <path
-                                d="M408,80.408V72h-16v8.408c-9.12,1.856-16,9.936-16,19.592c0,11.024,8.976,20,20,20h8c2.208,0,4,1.792,4,4s-1.792,4-4,4h-8c-2.208,0-4-1.792-4-4v-4h-16v4c0,9.656,6.88,17.736,16,19.592V152h16v-8.408c9.12-1.856,16-9.936,16-19.592c0-11.024-8.976-20-20-20h-8c-2.208,0-4-1.792-4-4s1.792-4,4-4h8c2.208,0,4,1.792,4,4v4h16v-4C424,90.344,417.12,82.264,408,80.408z"
-                              />
-                              <rect x="320" y="352" width="16" height="16" />
-                              <rect x="160" y="352" width="144" height="16" />
-                            </g>
-                          </g>
-                        </g>
-                      </svg>
-                    </button>
-                  </div>
+</ShopSheet>
+
+<div class="shop-ui sp" dir={$isRtl ? 'rtl' : 'ltr'}>
+  {#if splitOpen}
+    <header class="sp-head">
+      <button type="button" class="sh-btn sh-btn-quiet sh-btn-icon" aria-label={$t('shop.manage.back')} onclick={closeSplit}>
+        <svg class="sp-flip" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6" /></svg>
+      </button>
+      <div class="sp-head-text">
+        <nav class="sp-crumbs" aria-label={$t('shop.manage.crumbSales')}>
+          <button type="button" class="sp-crumb-link" onclick={closeSplit}>{$t('shop.page.title')}</button> › <span>{$t('shop.sp.splitTitle')}</span>
+        </nav>
+        <span class="sp-sub">
+          {$t('shop.sp.splitSub', { count: summary.waiting.count + summary.voting.count, partners: projectUsers.length })}
+        </span>
+        <h1 class="sh-title sp-h1">{$t('shop.sp.splitTitle')}</h1>
+      </div>
+    </header>
+    <Halu
+      {trili}
+      {salee}
+      allin={summary.waiting.amount + summary.voting.amount}
+      {fmiData}
+      users={projectUsers}
+      {rikmashes}
+      {stipendPayments}
+      {restime}
+    />
+  {:else}
+    <header class="sp-head">
+      <div class="sp-head-text">
+        {#if projectName}<span class="sp-sub">{projectName}</span>{/if}
+        <h1 class="sh-title sp-h1">{$t('shop.page.title')}</h1>
+      </div>
+      <button type="button" class="sh-btn sh-btn-primary" onclick={reportSale}>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
+        {$t('project.hamatanot.reportSale')}
+      </button>
+    </header>
+
+    {@render top?.()}
+
+    <section class="sp-kpis" aria-label={$t('shop.sp.kpiLabel')}>
+      <div class="sh-card sp-kpi">
+        <span class="sh-section-label">{$t('shop.sp.kpiTotal')}</span>
+        <span class="sp-kpi-value"><bdi>{fmtMoney(summary.total.amount)}</bdi></span>
+        <span class="sp-kpi-sub">{salesN(summary.total.count)}</span>
+      </div>
+      <div class="sh-card sp-kpi sp-kpi-gold">
+        <span class="sh-section-label">{$t('project.hamatanot.awaiting')}</span>
+        <span class="sp-kpi-value sp-gold"><bdi>{fmtMoney(summary.waiting.amount)}</bdi></span>
+        <span class="sp-kpi-sub">{salesN(summary.waiting.count)}</span>
+      </div>
+      <div class="sh-card sp-kpi">
+        <span class="sh-section-label">{$t('project.hamatanot.pending')}</span>
+        <span class="sp-kpi-value sp-info"><bdi>{fmtMoney(summary.voting.amount)}</bdi></span>
+        <span class="sp-kpi-sub">
+          {proposal ? $t('shop.sp.votesOf', { yes: proposalYes, total: projectUsers.length }) : $t('shop.sp.noVote')}
+        </span>
+      </div>
+      <div class="sh-card sp-kpi">
+        <span class="sh-section-label">{$t('project.hamatanot.split')}</span>
+        <span class="sp-kpi-value sp-ok"><bdi>{fmtMoney(summary.split.amount)}</bdi></span>
+        <span class="sp-kpi-sub">{salesN(summary.split.count)}</span>
+      </div>
+    </section>
+
+    <div class="sp-row">
+      <section class="sh-card-2 sp-headline" aria-label={$t('project.hamatanot.awaitingEarnings')}>
+        <h2 class="sh-section-label">{$t('project.hamatanot.awaitingEarnings')}</h2>
+        <div class="sp-big">
+          <span class="sp-big-value"><bdi>{fmtMoney(summary.waiting.amount)}</bdi></span>
+          <span class="sp-muted">{salesN(summary.waiting.count)}</span>
+        </div>
+        {#if summary.total.count > 0}
+          <div
+            class="sp-stack"
+            role="img"
+            aria-label={$t('shop.sp.stackLabel', {
+              total: fmtMoney(summary.total.amount),
+              split: fmtMoney(summary.split.amount),
+              voting: fmtMoney(summary.voting.amount),
+              waiting: fmtMoney(summary.waiting.amount)
+            })}
+          >
+            <span class="sp-seg-split" style:width="{shares.split}%"></span>
+            <span class="sp-seg-voting" style:width="{shares.voting}%"></span>
+            <span class="sp-seg-waiting" style:width="{shares.waiting}%"></span>
+          </div>
+          <div class="sp-legend">
+            <div><span class="sp-key"><i class="sp-dot sp-seg-waiting"></i>{$t('project.hamatanot.awaiting')}</span><strong><bdi>{fmtMoney(summary.waiting.amount)}</bdi></strong></div>
+            <div><span class="sp-key"><i class="sp-dot sp-seg-voting"></i>{$t('project.hamatanot.pending')}</span><strong><bdi>{fmtMoney(summary.voting.amount)}</bdi></strong></div>
+            <div><span class="sp-key"><i class="sp-dot sp-seg-split"></i>{$t('project.hamatanot.split')}</span><strong><bdi>{fmtMoney(summary.split.amount)}</bdi></strong></div>
+          </div>
+
+          {#if flows.length > 0}
+            <div class="sp-flows">
+              <span class="sh-section-label">{$t('shop.sp.flowsTitle')}</span>
+              {#each flows as f (f.uid)}
+                <div class="sp-flow">
+                  <span class="sp-av" aria-hidden="true">{initialOf(f.username)}</span>
+                  <span class="sp-flow-name">{f.username} <span class="sp-muted">· {f.p.toFixed(0)}%</span></span>
+                  {#if f.noten > 0.01}
+                    <span class="sh-chip sh-chip-accent">{$t('shop.sp.give', { amount: fmtMoney(f.noten) })}</span>
+                  {:else if f.meca > 0.01}
+                    <span class="sh-chip sh-chip-ok">{$t('shop.sp.receive', { amount: fmtMoney(f.meca) })}</span>
+                  {:else}
+                    <span class="sh-chip sh-chip-muted">{$t('mission.whowhat.balanced')}</span>
+                  {/if}
                 </div>
               {/each}
             </div>
           {/if}
-        </div>
-      </div>
-      <div class="flex flex-wrap gap-2 justify-center">
-        <button
-          class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-lg"
-          onclick={addnew}>{$t('project.hamatanot.createProduct')}</button
-        >
-        <a
-          href="/moach/{$idPr}/sales/new"
-          class="border border-gold hover:border-barbi bg-gold/10 hover:bg-gold/20 text-gold hover:text-barbi font-bold py-2 px-4 rounded-lg text-center"
-        >
-          {$t('project.hamatanot.complexProduct')}
-        </a>
-      </div>
-    </div>
-    {#if salee.length > 0}
-      <div
-        class=" text-center border-2 border-barbi rounded m-4 flex flex-col overflow-x-hidden max-w-full"
-      >
-        <div class="flex justify-between items-center px-4 pt-4">
-          <h1
-            class="md:text-center text-2xl md:text-2xl font-bold underline decoration-mturk"
-          >
-            {$t('project.hamatanot.awaitingEarnings')}
-          </h1>
-          <button
-            class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-lg transition-all duration-300"
-            onclick={() => (showTableModal = true)}
-            aria-label={$t('project.hamatanot.tableView')}
-          >
-            📊 {$t('project.hamatanot.tableView')}
-          </button>
-        </div>
-        <div class="flex d overflow-x-auto w-full">
-          {#each salee as data, i}
-            <div
-              class="relative bg-colorfulGrad justify-between flex flex-col py-2 px-5 m-2 rounded shadow-2xl shadow-fuchsia-400 {data
-                .attributes.splited
-                ? 'opacity-50 border-2 border-green-500'
-                : data.attributes.pending
-                  ? 'opacity-75 border-2 border-blue-500'
-                  : ''}"
-            >
-              {#if data.attributes.splited}
-                <div
-                  class="absolute -top-3 -right-3 bg-green-500 text-white text-xs px-2 py-1 rounded"
-                >
-                  ✓ {$t('project.hamatanot.split')}
-                </div>
-              {:else if data.attributes.pending}
-                <div
-                  class="absolute -top-3 -right-3 bg-blue-500 text-white text-xs px-2 py-1 rounded"
-                >
-                  ⏳ {$t('project.hamatanot.pending')}
-                </div>
-              {/if}
-              <!-- Holder-consent status chip -->
-              <div
-                class="holder-chip {saleHolderLabel(data).cls} text-xs px-2 py-0.5 rounded-full self-start mb-2"
-              >
-                {saleHolderLabel(data).text}
-              </div>
-              <!-- Gift Name with Modern Styling -->
-              <div class="mb-3">
-                <h3
-                  class="text-lg font-bold bg-gradient-to-r from-barbi via-mpink to-cyan-500 bg-clip-text text-transparent hover:from-gold hover:via-mpink hover:to-barbi transition-all duration-300 transform hover:scale-105"
-                  title={$t('project.hamatanot.productName')}
-                >
-                  {getMatanaName(data)}
-                </h3>
-              </div>
 
-              <!-- Amount with Enhanced Design -->
-              <div
-                class="mb-4 p-2 bg-gradient-to-r from-gold/10 to-mpink/10 rounded-lg border border-gold/20"
-              >
-                <p
-                  class="text-xl font-semibold text-center bg-gradient-to-r from-cyan-500 to-barbi bg-clip-text text-transparent"
-                  title={$t('project.hamatanot.amount')}
-                >
-                  <Money amount={data.attributes.in} entry={data.attributes} />
-                </p>
-              </div>
+          <div class="sp-actions">
+            <button type="button" class="sh-btn sh-btn-primary sh-btn-lg sp-grow" onclick={openSplit}>
+              {proposal ? $t('project.hamatanot.viewSplitOffer') : $t('project.hamatanot.requestSplit')}
+            </button>
+            <button type="button" class="sh-btn sh-btn-outline sp-tall" onclick={openSplit}>{$t('shop.sp.whoToWhom')}</button>
+          </div>
+          {#if proposal}
+            <p class="sp-vote-line">
+              {$t('shop.sp.voteLine', {
+                amount: fmtMoney(summary.voting.amount),
+                yes: proposalYes,
+                total: projectUsers.length
+              })}
+            </p>
+          {/if}
+        {:else}
+          <p>{$t('shop.sp.emptyBody')}</p>
+          <div class="sp-actions">
+            <button type="button" class="sh-btn sh-btn-primary sh-btn-lg sp-grow" onclick={reportSale}>{$t('project.hamatanot.reportSale')}</button>
+          </div>
+        {/if}
+      </section>
 
-              <!-- User Info with Avatar -->
-              <div
-                class="flex items-center justify-between space-x-3 mb-3"
-                title={$t('project.hamatanot.moneyGuardian')}
-              >
-                <div class="flex items-center space-x-3">
-                  <img
-                    class="w-6 h-6 rounded-full ring-2 ring-gold shadow-md hover:ring-mpink transition-all duration-300 transform hover:scale-105"
-                    src={getSrc(data.attributes.users_permissions_user.data.id)}
-                    alt="User avatar"
-                  />
-                  <div class="flex flex-col">
-                    <h5
-                      class="text-barbi font-bold text-sm hover:text-gold transition-colors duration-200"
-                    >
-                      {data.attributes.users_permissions_user.data.attributes
-                        .username}
-                    </h5>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Note Section with Modern Card Design -->
-              {#if isSiteShareNote(data.attributes.note)}
-                <div class="mt-4">
-                  <SiteShareSaleNote note={data.attributes.note} />
-                </div>
-              {:else if data.attributes.note}
-                <div
-                  class="mt-4 p-3 bg-gradient-to-br from-barbi/5 to-gold/5 rounded-xl border-l-4 border-gold/30 backdrop-blur-sm"
-                >
-                  <div class="flex items-center mb-2">
-                    <div class="w-2 h-2 bg-gold rounded-full mr-2"></div>
-                    <small
-                      class="text-barbi/70 font-semibold text-xs uppercase tracking-wider"
-                    >
-                      {$t('project.hamatanot.note')}
-                    </small>
-                  </div>
-                  <p
-                    class="text-sm text-barbi/90 leading-relaxed italic border-t border-barbi/20 pt-2"
+      {#if summary.total.count > 0}
+        <section class="sh-card sp-chart" aria-label={chartTitle}>
+          <div class="sp-chart-head">
+            <h2 class="sp-h2">{chartTitle}</h2>
+            <div class="sp-chart-tools">
+              {#if chartPeriod === 'monthly' && availableYears.length > 1}
+                <label class="sp-year">
+                  <span class="sp-sr">{$t('project.hamatanot.selectYear')}</span>
+                  <select
+                    class="sh-input"
+                    value={selectedChartYear}
+                    onchange={(e) => (selectedChartYear = Number(e.currentTarget.value))}
                   >
-                    {data.attributes.note}
-                  </p>
-                </div>
+                    {#each availableYears as year (year)}
+                      <option value={year}>{year}</option>
+                    {/each}
+                  </select>
+                </label>
               {/if}
+              <div class="sh-seg sp-period" role="group" aria-label={$t('shop.sp.periodLabel')}>
+                <button type="button" aria-pressed={chartPeriod === 'daily'} onclick={() => (chartPeriod = 'daily')}>{$t('project.hamatanot.chartPeriodDaily')}</button>
+                <button type="button" aria-pressed={chartPeriod === 'monthly'} onclick={() => (chartPeriod = 'monthly')}>{$t('project.hamatanot.chartPeriodMonthly')}</button>
+                <button type="button" aria-pressed={chartPeriod === 'yearly'} onclick={() => (chartPeriod = 'yearly')}>{$t('project.hamatanot.chartPeriodYearly')}</button>
+              </div>
             </div>
+          </div>
+          {#if seriesMax > 0}
+            <ol class="sp-bars" class:sp-bars-many={bars.length > 7}>
+              {#each bars as b (b.key)}
+                <li class="sp-bar-col" class:sp-older={b.older}>
+                  <span class="sp-sr">{b.label}: {fmtMoney(b.total)}</span>
+                  <span class="sp-bar-val" aria-hidden="true">{b.total > 0 ? fmtMoney(b.total, null, { notation: 'compact' }) : ''}</span>
+                  <span class="sp-bar-track" aria-hidden="true">
+                    <span class="sp-bar" class:sp-bar-last={b.last} style:height="{b.height}%"></span>
+                  </span>
+                  <span class="sp-bar-label" aria-hidden="true">{b.label}</span>
+                </li>
+              {/each}
+            </ol>
+          {:else}
+            <p class="sp-chart-empty">{$t('project.hamatanot.noSalesInPeriod')}</p>
+          {/if}
+        </section>
+      {/if}
+    </div>
+
+    {#if summary.total.count > 0}
+      <section class="sp-sales" aria-label={$t('shop.sp.salesTitle')}>
+        <div class="sp-sec-head">
+          <h2 class="sp-h2">{$t('shop.sp.salesTitle')}</h2>
+          <a class="sp-link" href="/moach/{projectId}/sales/manage/sales">{$t('shop.sp.tableLink')}</a>
+        </div>
+        <div class="sh-pills" role="group" aria-label={$t('shop.sp.filterLabel')}>
+          {#each filters as f (f.id)}
+            <button
+              type="button"
+              class="sh-pill"
+              aria-pressed={saleFilter === f.id}
+              onclick={() => {
+                saleFilter = f.id;
+                showAll = false;
+              }}
+            >
+              {f.label}{#if f.count > 0}<span class="sh-pill-count"> · {f.count}</span>{/if}
+            </button>
           {/each}
         </div>
-        <div
-          class="button-silver m-1 mt-2 py-4 px-8 mx-auto text-barbi rounded"
-        >
-          <div class="mb-2">
-            <h2 class="text-sm font-medium">
-              {$t('project.hamatanot.totalSales')}
-            </h2>
-            <p class="font-bold text-lg">{totalSales}</p>
-          </div>
-          {#if salee.some((s) => s.attributes.splited || s.attributes.pending)}
-            <div class="border-t border-barbi/30 pt-2">
-              <h2 class="text-sm font-medium">
-                {$t('project.hamatanot.awaitingSplit')}
-              </h2>
-              <p class="font-bold text-lg">{allin}</p>
-            </div>
-            {#if salee.some((s) => s.attributes.pending)}
-              <div class="border-t border-barbi/30 pt-2 mt-2">
-                <h2 class="text-sm font-medium text-blue-600">
-                  {$t('project.hamatanot.inVoting')}
-                </h2>
-                <p class="font-bold text-lg text-blue-600">
-                  {salee
-                    .filter((s) => s.attributes.pending)
-                    .reduce((total, s) => total + s.attributes.in, 0)}
-                </p>
-              </div>
-            {/if}
-          {:else}
-            <div class="border-t border-barbi/30 pt-2">
-              <h2>{$t('project.hamatanot.total')}</h2>
-              <p class="font-bold">{allin}</p>
-            </div>
-          {/if}
-        </div>
-
-        {#if hal === false}
-          <button
-            id="haluk"
-            class="m-4 mx-auto border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-full"
-            onclick={ask}>{trili.length == 0 ? $t('project.hamatanot.viewSplitOffer') : $t('project.hamatanot.requestSplit')}</button
-          >
+        {#if shownSales.length === 0}
+          <p class="sp-none">{$t('shop.sp.noneInFilter')}</p>
         {:else}
-          <button
-            class="m-4 mx-auto border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-full"
-            onclick={() => (hal = false)}><Close /></button
-          >
-          <Halu
-            {trili}
-            {salee}
-            {allin}
-            {fmiData}
-            users={projectUsers}
-            {rikmashes}
-            {stipendPayments}
-            {restime}
-          />
+          <div class="sp-cards">
+            {#each shownSales as s (s.id)}
+              {@const st = saleStage(s)}
+              {@const chip = holderChip(s)}
+              {@const holder = holderOf(s)}
+              {@const mine = uid != null && String(holder?.id) === String(uid)}
+              <article class="sh-card-2 sp-sale sp-stage-{st}">
+                <div class="sp-sale-top">
+                  <span class="sp-sale-name">{getMatanaName(s)}</span>
+                  <strong class="sp-sale-amount"><Money amount={s.attributes.in} entry={s.attributes} /></strong>
+                </div>
+                <div class="sp-sale-meta">
+                  <span class="sp-av sp-av-sm" aria-hidden="true">{initialOf(holder?.attributes?.username)}</span>
+                  <span class="sp-muted sp-sale-holder">
+                    {mine
+                      ? $t('shop.sp.moneyWithYou')
+                      : $t('shop.sp.moneyWith', { name: holder?.attributes?.username ?? '' })} · {formatSaleDate(s.attributes.date)}
+                  </span>
+                </div>
+                <div class="sp-sale-chips">
+                  {#if st !== 'waiting'}
+                    <span class="sh-chip {st === 'split' ? 'sh-chip-ok' : 'sh-chip-info'}">{$t(`project.hamatanot.${STAGE_KEY[st]}`)}</span>
+                  {/if}
+                  <span class="sh-chip {chip.cls}">{chip.text}</span>
+                </div>
+                {#if isSiteShareNote(s.attributes.note)}
+                  <p class="sp-note">{siteShareSummary(s.attributes.note)}</p>
+                {:else if s.attributes.note}
+                  <p class="sp-note">{s.attributes.note}</p>
+                {/if}
+              </article>
+            {/each}
+          </div>
+          {#if filtered.length > FIRST}
+            <button type="button" class="sh-btn sh-btn-quiet sp-more" onclick={() => (showAll = !showAll)}>
+              {showAll ? $t('shop.sp.showLess') : $t('shop.sp.showAll', { count: filtered.length })}
+            </button>
+          {/if}
         {/if}
-      </div>
+      </section>
+
+      {#if byProduct.length > 0}
+        <section class="sh-card sp-byprod" aria-label={$t('project.hamatanot.salesByProduct')}>
+          <h2 class="sp-h2">{$t('project.hamatanot.salesByProduct')}</h2>
+          <div class="sp-byprod-body">
+            {#if bubbles.length > 1}
+              <svg class="sp-bubbles" viewBox="0 0 {BUBBLE} {BUBBLE}" aria-hidden="true">
+                {#each bubbles as c (c.name)}
+                  <circle cx={c.x} cy={c.y} r={c.r} fill={c.fill} />
+                  {#if c.r > 34}
+                    <text x={c.x} y={c.y} text-anchor="middle" dominant-baseline="central" class="sp-bubble-text">{c.name.split(' · ')[0].slice(0, Math.floor(c.r / 5))}</text>
+                  {/if}
+                {/each}
+              </svg>
+            {/if}
+            <ol class="sp-prodlist">
+              {#each byProduct as p, i (p.name)}
+                <li>
+                  <span class="sp-swatch" style:background={BUBBLE_FILLS[i] ?? 'var(--sh-line)'} aria-hidden="true"></span>
+                  <span class="sp-prod-name">{p.name}</span>
+                  <bdi class="sp-prod-amount">{fmtMoney(p.amount)}</bdi>
+                  <span class="sp-muted sp-prod-pct">{Math.round(p.share * 100)}%</span>
+                </li>
+              {/each}
+            </ol>
+          </div>
+        </section>
+      {/if}
     {/if}
-  </div>
-  {#if salee.length > 0 && arr?.length > 0}
-    <div class="flex flex-col sm:flex-row-reverse justify-center">
-      <div>
-        <h1 class="text-center text-barbi text-bold underline decoration-mturk">
-          {$t('project.hamatanot.salesByProduct')}
-        </h1>
 
-        <div class="sm:w-96 [width:95vw] [height:95vw] sm:h-96 m-4">
-          <Cir data={arr} />
+    <section class="sp-products" aria-label={$t('project.hamatanot.ourProducts')}>
+      <div class="sp-sec-head">
+        <h2 class="sp-h2">{$t('project.hamatanot.ourProducts')}</h2>
+        <div class="sp-sec-actions">
+          <button type="button" class="sh-btn sh-btn-outline" onclick={addnew}>{$t('project.hamatanot.createProduct')}</button>
+          <a class="sh-btn sh-btn-quiet" href="/moach/{$idPr}/sales/new">{$t('project.hamatanot.complexProduct')}</a>
         </div>
       </div>
-      <div>
-        <div class="mx-auto">
-          <h1
-            class="text-center text-barbi text-bold underline decoration-mturk"
-          >
-            {#if chartPeriod === 'daily'}
-              {$t('project.hamatanot.salesByDate')}
-            {:else if chartPeriod === 'monthly'}
-              {$t('project.hamatanot.salesByMonth')}
-            {:else}
-              {$t('project.hamatanot.salesByYear')}
-            {/if}
-          </h1>
-
-          <div class="flex flex-wrap items-center justify-center gap-2 m-2">
-            <button
-              type="button"
-              class="px-3 py-1 rounded-full text-sm font-semibold border transition-colors {chartPeriod ===
-              'daily'
-                ? 'border-barbi bg-barbi text-white'
-                : 'border-barbi/40 text-barbi hover:border-barbi'}"
-              onclick={() => (chartPeriod = 'daily')}
-            >
-              {$t('project.hamatanot.chartPeriodDaily')}
-            </button>
-            <button
-              type="button"
-              class="px-3 py-1 rounded-full text-sm font-semibold border transition-colors {chartPeriod ===
-              'monthly'
-                ? 'border-barbi bg-barbi text-white'
-                : 'border-barbi/40 text-barbi hover:border-barbi'}"
-              onclick={() => (chartPeriod = 'monthly')}
-            >
-              {$t('project.hamatanot.chartPeriodMonthly')}
-            </button>
-            <button
-              type="button"
-              class="px-3 py-1 rounded-full text-sm font-semibold border transition-colors {chartPeriod ===
-              'yearly'
-                ? 'border-barbi bg-barbi text-white'
-                : 'border-barbi/40 text-barbi hover:border-barbi'}"
-              onclick={() => (chartPeriod = 'yearly')}
-            >
-              {$t('project.hamatanot.chartPeriodYearly')}
-            </button>
-
-            {#if chartPeriod === 'monthly' && availableYears.length > 0}
-              <label class="flex items-center gap-2 text-sm text-barbi">
-                <span>{$t('project.hamatanot.selectYear')}:</span>
-                <select
-                  class="rounded border border-barbi/40 bg-white px-2 py-1 text-barbi"
-                  value={selectedChartYear}
-                  onchange={(e) =>
-                    (selectedChartYear = Number(e.currentTarget.value))}
+      {#if bmiData.length > 0}
+        <div class="sp-prod-grid">
+          {#each bmiData as data (data.id)}
+            <article class="sh-card sp-prod">
+              <div class="sp-prod-top">
+                <div class="sp-prod-text">
+                  <a class="sp-prod-title" href="/gift/{data.id}">{data.attributes.name}</a>
+                  <span class="sp-muted">{kindLabel(data.attributes.kindOf)} · {stockLabel(data)}</span>
+                </div>
+                <strong class="sp-gold"><Money amount={data.attributes.price} /></strong>
+              </div>
+              <div class="sp-prod-actions">
+                <button
+                  type="button"
+                  class="sh-btn sp-disc"
+                  class:sp-disc-off={data.attributes.hideFromDiscovery}
+                  disabled={discoveryBusyId === data.id}
+                  aria-pressed={!data.attributes.hideFromDiscovery}
+                  title={data.attributes.hideFromDiscovery
+                    ? $t('project.hamatanot.discovery.showTitle')
+                    : $t('project.hamatanot.discovery.hideTitle')}
+                  onclick={() => toggleDiscovery(data)}
                 >
-                  {#each availableYears as year (year)}
-                    <option value={year}>{year}</option>
-                  {/each}
-                </select>
-              </label>
-            {/if}
-          </div>
-
-          <div class="sm:[width:calc(95vw-24rem)] w-4/5 h-96 m-2 pb-8 overflow-visible pr-4">
-            {#if hasActiveChartData}
-              <Col data={activeChartData} />
-            {:else}
-              <p class="flex h-full items-center justify-center text-barbi/70">
-                {$t('project.hamatanot.noSalesInPeriod')}
-              </p>
-            {/if}
-          </div>
+                  {#if discoveryBusyId === data.id}
+                    <Spinner size="xs" />
+                  {:else if data.attributes.hideFromDiscovery}
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18" /><path d="M10.6 10.6a2 2 0 002.8 2.8" /><path d="M9.9 5.1A10.4 10.4 0 0112 5c5 0 9 4.5 10 7a13 13 0 01-3.1 4.1M6.1 6.1A13.3 13.3 0 002 12c1 2.5 5 7 10 7a9.8 9.8 0 004.1-.9" /></svg>
+                  {:else}
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12c1-2.5 5-7 10-7s9 4.5 10 7c-1 2.5-5 7-10 7S3 14.5 2 12z" /><circle cx="12" cy="12" r="3" /></svg>
+                  {/if}
+                  {data.attributes.hideFromDiscovery
+                    ? $t('project.hamatanot.discovery.hidden')
+                    : $t('project.hamatanot.discovery.shown')}
+                </button>
+                <div class="sp-share">
+                  <ShareButtons
+                    slug="gift/{data.id}"
+                    title={data.attributes.name}
+                    desc={`Check out this amazing gift: ${data.attributes.name} for ${data.attributes.price}`}
+                  />
+                </div>
+                <button
+                  type="button"
+                  class="sh-btn sh-btn-outline sp-push"
+                  onclick={() => sell(data.id, data.attributes.price, data.attributes.quant, data.attributes.kindOf)}
+                >
+                  {$t('project.hamatanot.reportSale')}
+                </button>
+              </div>
+            </article>
+          {/each}
         </div>
-      </div>
-    </div>
+      {:else}
+        <p class="sp-none">{$t('shop.sp.noProducts')}</p>
+      {/if}
+    </section>
   {/if}
 </div>
 
-<!-- Table Modal -->
-{#if showTableModal}
-  <DialogOverlay
-    style="z-index: 800;"
-    isOpen={showTableModal}
-    onDismiss={() => (showTableModal = false)}
-  >
-    <div
-      style="z-index: 800;"
-      transition:fly|local={{ y: 450, opacity: 0.5, duration: 500 }}
-    >
-      <DialogContent
-        class="table-modal-content surface-dialog"
-        aria-label={$t('project.hamatanot.salesTable')}
-      >
-        <div
-          style="z-index: 800;"
-          dir={$isRtl ? 'rtl' : 'ltr'}
-          class="p-6 max-h-[90vh] overflow-y-auto"
-        >
-          <div class="flex justify-between items-center mb-4">
-            <h2 class="text-2xl font-bold text-barbi">{$t('project.hamatanot.salesTable')}</h2>
-            <div class="flex gap-2">
-              <button
-                class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-lg transition-all duration-300"
-                onclick={exportToCSV}
-                aria-label={$t('project.hamatanot.downloadCsv')}
-              >
-                📥 {$t('project.hamatanot.downloadCsv')}
-              </button>
-              <button
-                class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-lg transition-all duration-300"
-                onclick={() => (showTableModal = false)}
-                aria-label={$t('project.hamatanot.close')}
-              >
-                ✕ {$t('project.hamatanot.close')}
-              </button>
-            </div>
-          </div>
-
-          <div class="overflow-x-auto">
-            <table class="sales-table w-full">
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>{$t('project.hamatanot.productName')}</th>
-                  <th>{$t('project.hamatanot.amount')}</th>
-                  <th>{$t('project.hamatanot.reportSale')}</th>
-                  <th>{$t('project.hamatanot.salesByDate')}</th>
-                  <th>{$t('project.hamatanot.type')}</th>
-                  <th>{$t('project.hamatanot.note')}</th>
-                  <th>{$t('project.hamatanot.status')}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {#each salee as sale, index}
-                  <tr
-                    class={sale.attributes.splited
-                      ? 'split-row'
-                      : sale.attributes.pending
-                        ? 'pending-row'
-                        : ''}
-                  >
-                    <td>{index + 1}</td>
-                    <td class="font-semibold">{getMatanaName(sale)}</td>
-                    <td class="font-bold"><Money amount={sale.attributes.in} entry={sale.attributes} /></td>
-                    <td>
-                      <div class="flex items-center gap-2">
-                        <img
-                          class="w-6 h-6 rounded-full"
-                          src={getSrc(
-                            sale.attributes.users_permissions_user.data.id
-                          )}
-                          alt="User avatar"
-                        />
-                        {sale.attributes.users_permissions_user.data.attributes
-                          .username}
-                      </div>
-                    </td>
-                    <td>{formatSaleDate(sale.attributes.date)}</td>
-                    <td>
-                      {#if sale.attributes.splited}
-                        <span class="status-badge split-badge"
-                          >✓ {$t('project.hamatanot.split')}</span
-                        >
-                      {:else if sale.attributes.pending}
-                        <span class="status-badge pending-badge"
-                          >⏳ {$t('project.hamatanot.pending')}</span
-                        >
-                      {:else}
-                        <span class="status-badge awaiting-badge"
-                          >{$t('project.hamatanot.awaiting')}</span
-                        >
-                      {/if}
-                    </td>
-                    <td
-                      class="max-w-xs truncate"
-                      title={isSiteShareNote(sale.attributes.note)
-                        ? siteShareSummary(sale.attributes.note)
-                        : sale.attributes.note || ''}
-                    >
-                      {#if isSiteShareNote(sale.attributes.note)}
-                        {siteShareSummary(sale.attributes.note)}
-                      {:else}
-                        {sale.attributes.note || '-'}
-                      {/if}
-                    </td>
-                    <td>
-                      <span class="holder-chip {saleHolderLabel(sale).cls} status-badge"
-                        >{saleHolderLabel(sale).text}</span
-                      >
-                    </td>
-                  </tr>
-                {/each}
-              </tbody>
-              <tfoot>
-                <tr class="total-row">
-                  <td colspan="2" class="font-bold">{$t('project.hamatanot.total')}</td>
-                  <td class="font-bold"><Money amount={totalSales} /></td>
-                  <td colspan="4"></td>
-                </tr>
-              </tfoot>
-            </table>
-          </div>
-        </div>
-      </DialogContent>
-    </div>
-  </DialogOverlay>
-{/if}
-
 <style>
-  .d::-webkit-scrollbar {
-    width: 10px;
-  }
-
-  .d::-webkit-scrollbar-track {
-    background-color: #e4e4e4;
-    border-radius: 100px;
-  }
-
-  .d::-webkit-scrollbar-thumb {
-    background-color: #d4aa70;
-    border-radius: 100px;
-  }
-  .d {
-    scrollbar-color: #d4aa70 #e4e4e4;
-  }
-  .d::-webkit-scrollbar-thumb {
-    background-image: linear-gradient(180deg, #d0368a 0%, #708ad4 99%);
-    box-shadow: inset 2px 2px 5px 0 rgba(#fff, 0.5);
-    border-radius: 100px;
-  }
-  .svggg {
-    fill: var(--gold);
-  }
-  .svggg:hover {
-    fill: var(--barbi-pink);
-  }
-  .dd {
+  .sp {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 12px 16px 24px;
+    background: var(--sh-page);
     display: flex;
-    align-items: center;
-    justify-content: center;
     flex-direction: column;
+    gap: 14px;
+    overflow-x: clip;
   }
-  .bodyi {
-    overflow-x: auto;
-    overflow-y: auto;
-    max-width: 96vw;
-    padding-left: 0.5em;
-    padding-right: 0.5em;
-  }
-
-  .gifts-header {
-    text-align: center;
-    margin-bottom: 1rem;
-  }
-
-  .gifts-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 1rem;
-    padding: 0 0.5rem;
-  }
-
-  .gift-card {
-    background: linear-gradient(135deg, #5efaf2 0%, #eee 74%);
-    border: 2px solid rgb(103, 232, 249);
-    border-radius: 10px;
-    padding: 1rem;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition:
-      transform 0.3s ease,
-      box-shadow 0.3s ease;
-  }
-
-  .gift-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-  }
-
-  .card-header {
-    display: flex;
-    align-items: center;
-    margin-bottom: 0.5rem;
-  }
-
-  .card-number {
-    background: linear-gradient(315deg, #6b0f1a 0%, #b91372 74%);
-    color: rgb(132, 241, 223);
-    border-radius: 50%;
-    width: 2rem;
-    height: 2rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    margin-left: 0.5rem;
-  }
-
-  .gift-link {
-    text-decoration: none;
-    color: inherit;
-    flex: 1;
-  }
-
-  .gift-name {
-    color: var(--barbi-pink);
+  /* SalesShortcuts brings its own width and gutter; inside this page it is a row. */
+  .sp :global(.sc) {
+    max-width: none;
     margin: 0;
-    font-size: 1.2rem;
-    font-weight: bold;
-    cursor: pointer;
+    padding: 0;
+  }
+  .sp-sr {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+  .sp-muted {
+    color: var(--sh-muted);
+  }
+  .sp-gold {
+    color: var(--sh-gold);
+  }
+  .sp-info {
+    color: var(--sh-info-ink);
+  }
+  .sp-ok {
+    color: var(--sh-ok-ink);
+  }
+  :global([dir='ltr']) .sp-flip {
+    transform: scaleX(-1);
   }
 
-  .gift-name:hover {
-    color: var(--gold);
-  }
-
-  .card-body p {
-    margin: 0.5rem 0;
-    color: var(--barbi-pink);
-  }
-
-  .card-actions {
+  /* header */
+  .sp-head {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    margin-top: 1rem;
+    gap: 12px;
+  }
+  .sp-head-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .sp-sub {
+    font-size: 12px;
+    color: var(--sh-muted);
+  }
+  .sp-h1 {
+    font-size: 26px;
+  }
+  .sp-crumbs {
+    display: none;
+    font-size: 13px;
+    color: var(--sh-muted);
+  }
+  .sp-crumb-link {
+    border: 0;
+    padding: 0;
+    background: none;
+    color: var(--sh-gold);
+    font-size: 13px;
+  }
+  .sp-h2 {
+    font-size: 16px;
+    font-weight: 700;
   }
 
-  /* Public-directory visibility toggle: turquoise = listed on /gift, grey = hidden. */
-  .discovery-btn {
+  /* KPIs: desktop only */
+  .sp-kpis {
+    display: none;
+  }
+  .sp-kpi {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 14px 16px;
+    min-width: 0;
+  }
+  .sp-kpi-gold {
+    border-color: var(--sh-gold-line);
+  }
+  .sp-kpi-value {
+    font-family: var(--sh-display);
+    font-size: 30px;
+    line-height: 1;
+    color: var(--sh-ink);
+  }
+  .sp-kpi-sub {
+    font-size: 12px;
+    color: var(--sh-muted);
+  }
+
+  .sp-row {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  /* the headline */
+  .sp-headline {
+    border-color: var(--sh-gold-line);
+    border-radius: var(--sh-radius-lg);
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-width: 0;
+  }
+  .sp-big {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .sp-big-value {
+    font-family: var(--sh-display);
+    font-size: 44px;
+    line-height: 1;
+    color: var(--sh-gold);
+  }
+  .sp-big .sp-muted {
+    font-size: 13px;
+  }
+  .sp-stack {
+    display: flex;
+    height: 10px;
+    border-radius: 9999px;
+    overflow: hidden;
+    background: var(--sh-line);
+  }
+  .sp-seg-split {
+    background: var(--sh-ok-ink);
+  }
+  .sp-seg-voting {
+    background: var(--sh-info-ink);
+  }
+  .sp-seg-waiting {
+    background: var(--sh-gold);
+  }
+  .sp-legend {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    font-size: 12px;
+  }
+  .sp-legend > div {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+  .sp-legend strong {
+    font-size: 14px;
+  }
+  .sp-key {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--sh-muted);
+  }
+  .sp-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+  .sp-flows {
+    display: none;
+    flex-direction: column;
+    gap: 8px;
+    padding-top: 12px;
+    border-top: 1px solid var(--sh-line);
+  }
+  .sp-flow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+  }
+  .sp-flow-name {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .sp-av {
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    border: 1px solid var(--sh-gold);
+    color: var(--sh-gold);
+    background: var(--sh-card);
+    font-size: 13px;
+    font-weight: 700;
     display: inline-flex;
     align-items: center;
-    gap: 0.3rem;
-    padding: 0.3rem 0.6rem;
-    border-radius: 9999px;
-    font-size: 0.72rem;
-    font-weight: 700;
-    white-space: nowrap;
-    cursor: pointer;
-    border: 1px solid var(--mturk, #40e0d0);
-    color: var(--mturk, #40e0d0);
-    background: rgba(64, 224, 208, 0.08);
-    transition: all 0.2s ease;
+    justify-content: center;
+  }
+  .sp-av-sm {
+    width: 22px;
+    height: 22px;
+    font-size: 11px;
+  }
+  .sp-actions {
+    display: flex;
+    gap: 8px;
+  }
+  .sp-grow {
+    flex: 1 1 auto;
+  }
+  .sp-tall {
+    min-height: 52px;
+  }
+  .sp-vote-line {
+    font-size: 12px;
+    color: var(--sh-info-ink);
   }
 
-  .discovery-btn:hover:not(:disabled) {
-    background: rgba(64, 224, 208, 0.2);
-  }
-
-  .discovery-btn.is-hidden {
-    border-color: rgba(150, 150, 150, 0.8);
-    color: rgba(150, 150, 150, 1);
-    background: rgba(150, 150, 150, 0.12);
-  }
-
-  .discovery-btn:disabled {
-    opacity: 0.55;
-    cursor: default;
-  }
-
-  .share-button-container {
-    transform: scale(0.6);
-    transform-origin: center;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
-    padding: 2px;
-  }
-
-  .report-sale-btn {
-    background: var(--gold);
-    border: 2px solid var(--barbi-pink);
-    cursor: pointer;
-    padding: 0.5rem;
-    border-radius: 50%;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-
-  .report-sale-btn:hover {
-    background: var(--barbi-pink);
-    border-color: var(--gold);
-    transform: scale(1.1);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  }
-
-  .report-sale-btn:hover .svggg {
-    transform: scale(1.2);
-    transition: transform 0.3s ease;
-  }
-
-  .svggg {
-    fill: var(--barbi-pink);
-    transition:
-      fill 0.3s ease,
-      transform 0.3s ease;
-  }
-
-  .report-sale-btn:hover .svggg {
-    fill: var(--gold);
-  }
-
-  /* Table Modal Styles */
-  :global(.table-modal-content) {
-    max-width: 95vw !important;
-    width: 1200px !important;
-    max-height: 95vh !important;
-  }
-
-  .sales-table {
-    border-collapse: collapse;
-    background: var(--surface, #fff);
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  }
-
-  .sales-table thead {
-    background: linear-gradient(315deg, #6b0f1a 0%, #b91372 74%);
-  }
-
-  .sales-table th {
-    padding: 12px 16px;
-    text-align: right;
-    color: rgb(132, 241, 223);
-    font-weight: bold;
-    border-bottom: 2px solid rgb(103, 232, 249);
-  }
-
-  .sales-table tbody tr {
-    border-bottom: 1px solid var(--surface-line, #e5e7eb);
-    transition: background-color 0.2s;
-  }
-
-  .sales-table tbody tr:hover {
-    background-color: rgba(94, 250, 242, 0.1);
-  }
-
-  .sales-table td {
-    padding: 12px 16px;
-    text-align: right;
-    color: var(--barbi-pink);
-  }
-
-  .sales-table .split-row {
-    background-color: rgba(34, 197, 94, 0.05);
-  }
-
-  .sales-table .pending-row {
-    background-color: rgba(59, 130, 246, 0.05);
-  }
-
-  .status-badge {
-    display: inline-block;
-    padding: 4px 12px;
-    border-radius: 12px;
-    font-size: 0.875rem;
-    font-weight: 600;
-  }
-
-  .split-badge {
-    background-color: #dcfce7;
-    color: #166534;
-  }
-
-  .pending-badge {
-    background-color: #dbeafe;
-    color: #1e40af;
-  }
-
-  .awaiting-badge {
-    background-color: #fef3c7;
-    color: #92400e;
-  }
-
-  /* Holder-consent status chip (PLAN_sale_holder_consent) */
-  .holder-chip {
-    display: inline-block;
-    font-weight: 600;
-    white-space: nowrap;
-  }
-  .chip-self {
-    background-color: #dcfce7;
-    color: #166534;
-  }
-  .chip-open {
-    background-color: #dbeafe;
-    color: #1e40af;
-  }
-  .chip-confirmed {
-    background-color: #dcfce7;
-    color: #166534;
-  }
-  .chip-legacy {
-    background-color: #f3f4f6;
-    color: #6b7280;
-  }
-
-  .sales-table tfoot .total-row {
-    background: linear-gradient(135deg, #5efaf2 0%, #eee 74%);
-    font-weight: bold;
-  }
-
-  .sales-table tfoot td {
+  /* the chart */
+  .sp-chart {
     padding: 16px;
-    border-top: 2px solid rgb(103, 232, 249);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-width: 0;
+  }
+  .sp-chart-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .sp-chart-tools {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .sp-period button {
+    min-height: 36px;
+    padding: 0 10px;
+    font-size: 13px;
+  }
+  .sp-year .sh-input {
+    min-height: 40px;
+    width: auto;
+    padding: 0 8px;
+  }
+  .sp-bars {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: stretch;
+    gap: 8px;
+    height: 180px;
+  }
+  .sp-bar-col {
+    flex: 1 1 0;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+  .sp-bar-val,
+  .sp-bar-label {
+    font-size: 10px;
+    color: var(--sh-muted);
+    white-space: nowrap;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-height: 13px;
+  }
+  .sp-bar-track {
+    flex: 1 1 auto;
+    width: 100%;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    border-bottom: 1px solid var(--sh-line);
+  }
+  .sp-bar {
+    display: block;
+    width: 100%;
+    max-width: 32px;
+    border-radius: 6px 6px 2px 2px;
+    background: var(--sh-accent);
+    opacity: 0.7;
+  }
+  .sp-bar-last {
+    opacity: 1;
+  }
+  /* A phone shows the last week of the two. */
+  @media (max-width: 899px) {
+    .sp-older {
+      display: none;
+    }
+  }
+  /* Twelve months at 375px: every other label. */
+  @media (max-width: 899px) {
+    .sp-bars-many .sp-bar-col:nth-child(even) .sp-bar-label,
+    .sp-bars-many .sp-bar-col:nth-child(even) .sp-bar-val {
+      visibility: hidden;
+    }
+  }
+  .sp-chart-empty {
+    min-height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+  }
+
+  /* the sales */
+  .sp-sales,
+  .sp-products {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 0;
+  }
+  .sp-sec-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .sp-sec-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .sp-link {
+    font-size: 13px;
+    font-weight: 700;
+  }
+  .sp-cards {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+  }
+  .sp-sale {
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+  }
+  .sp-stage-voting {
+    border-color: color-mix(in srgb, var(--sh-info-ink) 45%, transparent);
+  }
+  .sp-stage-split {
+    border-color: color-mix(in srgb, var(--sh-ok-ink) 35%, transparent);
+  }
+  .sp-sale-top {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .sp-sale-name {
+    flex: 1 1 auto;
+    min-width: 0;
+    font-size: 15px;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .sp-sale-amount {
+    font-size: 16px;
+    color: var(--sh-gold);
+    white-space: nowrap;
+  }
+  .sp-sale-meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+  }
+  .sp-sale-holder {
+    font-size: 12px;
+    min-width: 0;
+  }
+  .sp-sale-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .sp-note {
+    padding: 8px 10px;
+    border-radius: var(--sh-radius-xs);
+    background: var(--sh-card);
+    font-size: 12px;
+    overflow-wrap: anywhere;
+  }
+  .sp-none {
+    font-size: 14px;
+    padding: 8px 2px;
+  }
+  .sp-more {
+    align-self: center;
+  }
+
+  /* by product */
+  .sp-byprod {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .sp-byprod-body {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  .sp-bubbles {
+    display: none;
+    width: 260px;
+    height: 260px;
+    flex-shrink: 0;
+  }
+  .sp-bubble-text {
+    fill: var(--sh-card);
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .sp-prodlist {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .sp-prodlist li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    min-height: 28px;
+  }
+  .sp-swatch {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .sp-prod-name {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .sp-prod-amount {
+    font-weight: 700;
+  }
+  .sp-prod-pct {
+    min-width: 3ch;
+    text-align: end;
+    font-size: 12px;
+  }
+
+  /* products */
+  .sp-prod-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+  }
+  .sp-prod {
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-width: 0;
+  }
+  .sp-prod-top {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .sp-prod-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1 1 auto;
+    min-width: 0;
+    font-size: 12px;
+  }
+  .sp-prod-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--sh-ink) !important;
+  }
+  .sp-prod-title:hover {
+    color: var(--sh-gold) !important;
+  }
+  .sp-prod-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .sp-disc {
+    min-height: 38px;
+    padding: 0 12px;
+    font-size: 12px;
+    border-color: color-mix(in srgb, var(--sh-ok-ink) 40%, transparent);
+    background: var(--sh-ok-tint);
+    color: var(--sh-ok-ink);
+  }
+  .sp-disc-off {
+    border-color: var(--sh-line);
+    background: var(--sh-card-2);
+    color: var(--sh-muted);
+  }
+  .sp-share {
+    display: flex;
+    align-items: center;
+  }
+  .sp-push {
+    margin-inline-start: auto;
+    min-height: 38px;
+  }
+
+  /* the sheet */
+  .sp-sheet {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding-top: 6px;
+  }
+  .sp-sheet-title {
+    font-size: 24px;
+    padding-inline-end: 44px;
+  }
+  .sp-pick {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .sp-pick legend {
+    padding: 0 0 8px;
+  }
+  .sp-radio {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 48px;
+    padding: 0 12px;
+    border-radius: var(--sh-radius-sm);
+    border: 1px solid var(--sh-line);
+    background: var(--sh-card-2);
+    color: var(--sh-ink);
+    font-size: 14px;
+    text-align: start;
+  }
+  .sp-radio[aria-checked='true'] {
+    border-color: var(--sh-gold);
+    background: color-mix(in srgb, var(--sh-gold) 10%, var(--sh-card));
+    font-weight: 700;
+  }
+  .sp-radio-name {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .sp-radio-meta {
+    font-size: 12px;
+    color: var(--sh-muted);
+    font-weight: 400;
+    white-space: nowrap;
+  }
+
+  @media (min-width: 640px) {
+    .sp-cards,
+    .sp-prod-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (min-width: 900px) {
+    .sp {
+      padding: 20px 28px 48px;
+      gap: 18px;
+    }
+    .sp-h1 {
+      font-size: 34px;
+    }
+    .sp-crumbs {
+      display: block;
+    }
+    .sp-kpis {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .sp-row {
+      display: grid;
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      align-items: start;
+    }
+    .sp-flows {
+      display: flex;
+    }
+    .sp-bars {
+      height: 240px;
+    }
+    .sp-bar {
+      max-width: 44px;
+    }
+    .sp-bar-val,
+    .sp-bar-label {
+      font-size: 11px;
+    }
+    .sp-cards,
+    .sp-prod-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .sp-bubbles {
+      display: block;
+    }
   }
 </style>

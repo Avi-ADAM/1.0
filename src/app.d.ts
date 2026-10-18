@@ -69,6 +69,12 @@ declare global {
       from?: string;
       sessionExpired?: boolean;
     }
+
+    /** Shallow-routing state (`pushState`) — a screen inside a page with its own history entry. */
+    interface PageState {
+      /** The moach sales page's split screen (`prPr/hamatanot.svelte`). */
+      salesSplit?: boolean;
+    }
   }
 }
 

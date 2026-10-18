@@ -690,6 +690,14 @@ export const qidsAccess = {
   'saleVariantInfo': { allow: ['serviceAdmin'] },
   'rikmaApiVariantQuant': { allow: ['serviceAdmin'] },
   'saleLinkShop': { allow: ['serviceAdmin'] },
+  // The `unlimited` stock flag ($lib/server/shop/stockFlags.ts) — run by the
+  // stock-moving actions and the moach stock screen, never through /api/send.
+  'stockFlagsSchema': { allow: ['serviceAdmin'] },
+  'stockFlagsVariants': { allow: ['serviceAdmin'] },
+  'stockFlagsMatanots': { allow: ['serviceAdmin'] },
+  'stockWriteVariant': { allow: ['serviceAdmin'] },
+  'stockWriteMatanot': { allow: ['serviceAdmin'] },
+  'moachShopStockFlags': { allow: ['serviceAdmin'] },
   // Managing the shop from the moach (S5): read by the sales/* loaders after the
   // moach layout's membership check. Orders carry the buyer's phone and address.
   'moachShopOrders': { allow: ['serviceAdmin'] },

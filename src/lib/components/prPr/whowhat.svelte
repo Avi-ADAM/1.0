@@ -1,5 +1,4 @@
 <script>
-  import { lang } from '$lib/stores/lang.js';
   import { t } from '$lib/translations';
   import { get } from 'svelte/store';
   import pic from './../../celim/pic.js';
@@ -8,9 +7,10 @@
   import { executeAction } from '$lib/client/actionClient.js';
   import { computeSiteShare } from '$lib/revenue/computeSiteShare.js';
   import { SITE_SHARE_FLAGS, DEFAULT_SITE_SHARE_CONFIG } from '$lib/revenue/config.js';
-  import ComparisonDisplay from '$lib/components/ui/ComparisonDisplay.svelte';
+  import { useFormatMoney } from '$lib/money/context.svelte';
+  import { isSiteShareNote } from '$lib/revenue/parseSiteShareNote';
   import { toast } from 'svelte-sonner';
-  import Button from '$lib/celim/ui/button.svelte';
+  import Spinner from '$lib/celim/Spinner.svelte';
   import SiteShareDecision from '$lib/components/revenue/SiteShareDecision.svelte';
   /**
    * @typedef {Object} Props
@@ -1152,266 +1152,317 @@
       checkSplitChanges();
     }
   }
+  // ── Display only (canvas "MobileSplit" / "DesktopSplit"). Nothing below is
+  // read by ask() / updateTosplit(); it only draws the ulist they act on. ──
+  const fmtMoney = useFormatMoney();
+  const initialOf = (name) => (String(name || '?').trim().charAt(0) || '?').toUpperCase();
+  let myRow = $derived(myId != null ? (ulist.find((u) => String(u.uid) === String(myId)) ?? null) : null);
+  let barMax = $derived(ulist.reduce((m, u) => Math.max(m, u.x || 0, u.ihave || 0), 0));
+  const barPct = (v) => (barMax > 0 ? Math.max(0, Math.min(100, ((v || 0) / barMax) * 100)) : 0);
+  let votes = $derived.by(() => {
+    const vots = currentTosplit?.attributes?.vots;
+    if (!vots) return { yes: Number(noofok) || 0, no: Number(noofno) || 0, waiting: Number(noofw) || 0 };
+    const yes = vots.filter((v) => v.what == true).length;
+    return { yes, no: vots.length - yes, waiting: Math.max(0, ulist.length - vots.length) };
+  });
+  /** @returns {'yes' | 'no' | 'waiting'} */
+  function voteOf(uid) {
+    const vots = currentTosplit?.attributes?.vots;
+    if (!vots) return String(uid) === String(myId) ? 'yes' : 'waiting';
+    const v = vots.find((x) => String(x?.users_permissions_user?.data?.id) === String(uid));
+    return !v ? 'waiting' : v.what == true ? 'yes' : 'no';
+  }
+  let votesLine = $derived(
+    [
+      $t('shop.sp.ww.votesYes', { count: votes.yes }),
+      votes.no > 0 ? $t('shop.sp.ww.votesNo', { count: votes.no }) : '',
+      votes.waiting > 0 ? $t('shop.sp.ww.votesWaiting', { count: votes.waiting }) : ''
+    ]
+      .filter(Boolean)
+      .join(' · ')
+  );
+  // The sales a proposal covers: the open one's own, or — before one exists —
+  // the ones ask() would link.
+  let proposalSaleIds = $derived(new Set((currentTosplit?.attributes?.sales?.data ?? []).map((s) => String(s.id))));
+  let includedSales = $derived(
+    currentTosplit ? salee.filter((s) => proposalSaleIds.has(String(s.id))) : unsplitedSales
+  );
+  let openClaims = $derived(
+    salee.filter((s) => s.attributes.holderStatus === 'open' && !s.attributes.splited).length
+  );
+  function saleName(s) {
+    const linked = s?.attributes?.matanot?.data?.attributes?.name;
+    if (linked) return linked;
+    if (isSiteShareNote(s?.attributes?.note)) return $t('project.hamatanot.siteShare.label');
+    return $t('project.hamatanot.unknownProduct');
+  }
 </script>
 
-<div class="dd md:items-center">
-  <div class="body items-center">
-    <h1 class="calc-title">{$t('mission.whowhat.calculationTable')}</h1>
+<div class="ww">
+  <div class="ww-main">
+    {#if showUpdateSuggestion}
+      <section class="ww-change" aria-labelledby="ww-change-title">
+        <strong id="ww-change-title">{$t('mission.whowhat.splitChanged')}</strong>
+        <p>{$t('mission.whowhat.splitChangedMsg')}</p>
+        {#if changesList.length > 0}
+          <ul class="ww-changes" aria-label={$t('mission.whowhat.changesDetected')}>
+            {#each changesList as change}
+              <li>
+                <span>{change.label}</span>
+                <bdi>{change.oldValue}</bdi>
+                <svg class="ww-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+                <bdi class="ww-new">{change.newValue}</bdi>
+              </li>
+            {/each}
+          </ul>
+        {/if}
+        <div class="ww-row">
+          <button type="button" class="sh-btn sh-btn-warn" onclick={updateTosplit}>{$t('mission.whowhat.updateSplit')}</button>
+          <button type="button" class="sh-btn sh-btn-quiet" onclick={() => (showUpdateSuggestion = false)}>{$t('shop.sp.ww.keepAsIs')}</button>
+        </div>
+      </section>
+    {/if}
 
-    <div class="view-toggle" dir="rtl" role="tablist">
-      <button
-        type="button"
-        class="vt-btn"
-        class:active={viewMode === 'cards'}
-        aria-pressed={viewMode === 'cards'}
-        onclick={() => (viewMode = 'cards')}
-      >
-        {$t('mission.whowhat.cards')}
-      </button>
-      <button
-        type="button"
-        class="vt-btn"
-        class:active={viewMode === 'table'}
-        aria-pressed={viewMode === 'table'}
-        onclick={() => (viewMode = 'table')}
-      >
-        {$t('mission.whowhat.table')}
-      </button>
-    </div>
+    <section class="ww-calc" aria-labelledby="ww-calc-title">
+      <div class="ww-calc-head">
+        <h2 id="ww-calc-title" class="sh-section-label">{$t('mission.whowhat.calculationTable')}</h2>
+        <div class="sh-seg ww-seg" role="group" aria-label={$t('mission.whowhat.calculationTable')}>
+          <button type="button" aria-pressed={viewMode === 'cards'} onclick={() => (viewMode = 'cards')}>{$t('mission.whowhat.cards')}</button>
+          <button type="button" aria-pressed={viewMode === 'table'} onclick={() => (viewMode = 'table')}>{$t('mission.whowhat.table')}</button>
+        </div>
+      </div>
 
-    {#if viewMode === 'cards'}
-    <div class="calc-grid" dir="rtl">
-      {#each ulist as data}
-        <div class="pcard">
-          <div class="pcard-head">
-            {#if data.src}
-              <img class="pcard-av" src={data.src} alt={data.username} />
-            {:else}
-              <div class="pcard-av pcard-av-ph">{(data.username || '?').charAt(0)}</div>
-            {/if}
-            <div class="pcard-id">
-              <span class="pcard-name">{data.username}</span>
-              <span class="pcard-pct">{data.p.toFixed(1)}% {$t('mission.whowhat.percentageInRikma')}</span>
-            </div>
-          </div>
-
-          <div class="pcard-rows">
-            <div class="prow">
-              <span>{$t('mission.whowhat.profitShare')}</span>
-              <b>{revach > 0 ? data.x.toFixed(2) : '0'}</b>
-            </div>
-            <div class="prow">
-              <span>{$t('mission.whowhat.myAmount')}</span>
-              <b>{(data.ihave || 0).toFixed(2)}</b>
-            </div>
-            {#if revach > 0 && data.noten > 0.01}
-              <div class="prow give">
-                <span>{$t('mission.whowhat.amountToGive')}</span>
-                <b>{data.noten.toFixed(2)}</b>
+      {#if viewMode === 'cards'}
+        <div class="ww-cards">
+          {#each ulist as data (data.uid)}
+            <article class="sh-card-2 ww-card" class:ww-card-give={revach > 0 && data.noten > 0.01}>
+              <div class="ww-card-head">
+                <span class="ww-av" aria-hidden="true">{initialOf(data.username)}</span>
+                <div class="ww-id">
+                  <strong>{data.username}</strong>
+                  <span class="ww-muted">{data.p.toFixed(1)}% {$t('mission.whowhat.percentageInRikma')}</span>
+                </div>
+                {#if revach > 0 && data.noten > 0.01}
+                  <span class="sh-chip sh-chip-accent">{$t('shop.sp.give', { amount: fmtMoney(data.noten) })}</span>
+                {:else if revach > 0 && data.meca > 0.01}
+                  <span class="sh-chip sh-chip-ok">{$t('shop.sp.receive', { amount: fmtMoney(data.meca) })}</span>
+                {:else}
+                  <span class="sh-chip sh-chip-muted">{$t('mission.whowhat.balanced')}</span>
+                {/if}
               </div>
-            {:else if revach > 0 && data.meca > 0.01}
-              <div class="prow get">
-                <span>{$t('mission.whowhat.amountToReceive')}</span>
-                <b>{data.meca.toFixed(2)}</b>
+              <div class="ww-bars" aria-hidden="true">
+                <span class="ww-bar"><span class="ww-bar-share" style:width="{barPct(revach > 0 ? data.x : 0)}%"></span></span>
+                <span class="ww-bar"><span class="ww-bar-hold" style:width="{barPct(data.ihave)}%"></span></span>
               </div>
-            {:else}
-              <div class="prow even">
-                <span>{$t('mission.whowhat.balanced')}</span>
-                <b>✓</b>
-              </div>
-            {/if}
-          </div>
+              <dl class="ww-rows">
+                <dt>{$t('mission.whowhat.profitShare')}</dt>
+                <dd class="ww-share"><bdi>{fmtMoney(revach > 0 ? data.x : 0)}</bdi></dd>
+                <dt>{$t('shop.sp.ww.held', { name: data.username })}</dt>
+                <dd class="ww-hold"><bdi>{fmtMoney(data.ihave || 0)}</bdi></dd>
+              </dl>
+              {#if data.le && data.le.length > 0}
+                <div class="ww-transfers">
+                  <span class="ww-muted">{$t('mission.whowhat.giveTo')}</span>
+                  {#each data.le as ee}
+                    <div class="ww-transfer" class:ww-plat={ee.platform}>
+                      <svg class="ww-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+                      <span class="ww-grow">{ee.le}</span>
+                      <bdi class="ww-strong">{fmtMoney(ee.cama)}</bdi>
+                    </div>
+                  {/each}
+                </div>
+              {/if}
+            </article>
+          {/each}
 
-          {#if data.le && data.le.length > 0}
-            <div class="pcard-transfers">
-              <span class="pt-head">{$t('mission.whowhat.giveTo')}</span>
-              {#each data.le as ee}
-                <span class="pt-chip" class:platform={ee.platform}>{ee.le} · {ee.cama.toFixed(2)}</span>
-              {/each}
-            </div>
+          {#if showPlatformCol}
+            <article class="sh-card-2 ww-card ww-platform">
+              <div class="ww-card-head">
+                <span class="ww-av ww-av-plat" aria-hidden="true">1·1</span>
+                <div class="ww-id">
+                  <strong>1💗1</strong>
+                  <span class="ww-muted">
+                    {revach > 0 ? ((siteShareFinal / revach) * 100).toFixed(1) : '0'}% · {$t('mission.whowhat.mgmtPartnership')}
+                  </span>
+                </div>
+                <bdi class="ww-strong ww-gold">{fmtMoney(siteShareFinal)}</bdi>
+              </div>
+              {#if platformTransfers.length > 0}
+                <span class="ww-muted">
+                  {$t('mission.whowhat.fundedBy')}
+                  {platformTransfers.map((tr) => `${tr.fromName} · ${fmtMoney(tr.amount)}`).join(', ')}
+                </span>
+              {/if}
+            </article>
           {/if}
         </div>
-      {/each}
-
-      {#if showPlatformCol}
-        <div class="pcard platform-card">
-          <div class="pcard-head">
-            <div class="pcard-av pcard-av-plat">💗</div>
-            <div class="pcard-id">
-              <span class="pcard-name">1💗1</span>
-              <span class="pcard-pct">
-                {revach > 0 ? ((siteShareFinal / revach) * 100).toFixed(1) : '0'}% · {$t('mission.whowhat.mgmtPartnership')}
-              </span>
-            </div>
-          </div>
-
-          <div class="pcard-rows">
-            <div class="prow get">
-              <span>{$t('mission.whowhat.siteShare')}</span>
-              <b>{siteShareFinal.toFixed(2)}</b>
-            </div>
-          </div>
-
-          {#if platformTransfers.length > 0}
-            <div class="pcard-transfers">
-              <span class="pt-head">{$t('mission.whowhat.fundedBy')}</span>
-              {#each platformTransfers as tr}
-                <span class="pt-chip platform">{tr.fromName} · {tr.amount.toFixed(2)}</span>
-              {/each}
-            </div>
-          {/if}
+      {:else}
+        <div class="sh-table-wrap">
+          <table class="sh-table ww-table">
+            <thead>
+              <tr>
+                <th scope="col"><span class="ww-sr">{$t('mission.whowhat.name')}</span></th>
+                {#each ulist as data (data.uid)}
+                  <th scope="col">
+                    <span class="ww-th"><span class="ww-av ww-av-sm" aria-hidden="true">{initialOf(data.username)}</span>{data.username}</span>
+                  </th>
+                {/each}
+                {#if showPlatformCol}<th scope="col" class="ww-gold">1💗1</th>{/if}
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row">{$t('mission.whowhat.profitShare')}</th>
+                {#each ulist as data (data.uid)}<td class="sh-num ww-share"><bdi>{fmtMoney(revach > 0 ? data.x : 0)}</bdi></td>{/each}
+                {#if showPlatformCol}<td class="sh-num ww-plat-cell"><bdi>{fmtMoney(siteShareFinal)}</bdi></td>{/if}
+              </tr>
+              <tr>
+                <th scope="row">{$t('mission.whowhat.myAmount')}</th>
+                {#each ulist as data (data.uid)}<td class="sh-num"><bdi>{fmtMoney(data.ihave || 0)}</bdi></td>{/each}
+                {#if showPlatformCol}<td class="ww-plat-cell">—</td>{/if}
+              </tr>
+              <tr>
+                <th scope="row">{$t('mission.whowhat.amountToGive')}</th>
+                {#each ulist as data (data.uid)}
+                  <td class="sh-num" class:ww-give={revach > 0 && data.noten > 0.01}>
+                    {#if revach > 0 && data.noten > 0.01}<bdi>{fmtMoney(data.noten)}</bdi>{:else}—{/if}
+                  </td>
+                {/each}
+                {#if showPlatformCol}<td class="ww-plat-cell">—</td>{/if}
+              </tr>
+              <tr>
+                <th scope="row">{$t('mission.whowhat.giveTo')}</th>
+                {#each ulist as data (data.uid)}
+                  <td class="ww-to">
+                    {#if data.le && data.le.length > 0}
+                      {#each data.le as ee}<span class="ww-to-line">{ee.le} <bdi>{fmtMoney(ee.cama)}</bdi></span>{/each}
+                    {:else}—{/if}
+                  </td>
+                {/each}
+                {#if showPlatformCol}<td class="ww-plat-cell">—</td>{/if}
+              </tr>
+              <tr>
+                <th scope="row">{$t('mission.whowhat.amountToReceive')}</th>
+                {#each ulist as data (data.uid)}
+                  <td class="sh-num" class:ww-get={revach > 0 && data.meca > 0.01}>
+                    {#if revach > 0 && data.meca > 0.01}<bdi>{fmtMoney(data.meca)}</bdi>{:else}—{/if}
+                  </td>
+                {/each}
+                {#if showPlatformCol}<td class="sh-num ww-plat-cell"><bdi>{fmtMoney(siteShareFinal)}</bdi></td>{/if}
+              </tr>
+              <tr>
+                <th scope="row">{$t('mission.whowhat.percentageInRikma')}</th>
+                {#each ulist as data (data.uid)}<td class="sh-num">{data.p.toFixed(2)}</td>{/each}
+                {#if showPlatformCol}<td class="sh-num ww-plat-cell">{revach > 0 ? ((siteShareFinal / revach) * 100).toFixed(2) : '0'}</td>{/if}
+              </tr>
+            </tbody>
+          </table>
         </div>
       {/if}
-    </div>
+    </section>
+
+    {#if includedSales.length > 0 || openClaims > 0}
+      <section class="sh-card ww-included" aria-labelledby="ww-included-title">
+        <h2 id="ww-included-title" class="ww-h2">
+          {$t('shop.sp.ww.included')} <span class="ww-muted">· {includedSales.length}</span>
+        </h2>
+        {#if includedSales.length > 0}
+          <ul class="ww-chips">
+            {#each includedSales as s (s.id)}
+              <li class="sh-chip sh-chip-plain">
+                {saleName(s)} <bdi>{fmtMoney(s.attributes.in)}</bdi>
+                <span class="ww-muted">· {s.attributes.users_permissions_user?.data?.attributes?.username ?? ''}</span>
+              </li>
+            {/each}
+          </ul>
+        {/if}
+        {#if openClaims > 0}
+          <p class="ww-note">{$t('shop.sp.ww.openNote')}</p>
+        {/if}
+      </section>
+    {/if}
+  </div>
+
+  <aside class="ww-side">
+    <section class="ww-totals" aria-label={$t('shop.sp.ww.toSplit')}>
+      <div class="sh-card-2 ww-tot ww-tot-gold">
+        <span class="ww-muted">{$t('shop.sp.ww.toSplit')}</span>
+        <strong class="ww-gold"><bdi>{fmtMoney(revach)}</bdi></strong>
+      </div>
+      <div class="sh-card-2 ww-tot">
+        <span class="ww-muted">{$t('shop.sp.ww.heldByYou')}</span>
+        <strong><bdi>{fmtMoney(myRow?.ihave ?? 0)}</bdi></strong>
+      </div>
+    </section>
+
+    {#if hatzaa == true}
+      <section class="ww-pending" aria-labelledby="ww-pending-title">
+        <strong id="ww-pending-title">{$t('shop.sp.ww.pendingTitle')}</strong>
+        <span>{votesLine}</span>
+        <ul class="ww-voters">
+          {#each ulist as u (u.uid)}
+            {@const v = voteOf(u.uid)}
+            <li>
+              <span class="ww-av ww-av-sm" aria-hidden="true">{initialOf(u.username)}</span>
+              <span class="ww-grow">{u.username}</span>
+              <span class="sh-chip {v === 'yes' ? 'sh-chip-ok' : v === 'no' ? 'sh-chip-accent' : 'sh-chip-muted'}">
+                {v === 'yes'
+                  ? $t('mission.whowhat.inFavor')
+                  : v === 'no'
+                    ? $t('mission.whowhat.against')
+                    : $t('shop.sp.ww.notYet')}
+              </span>
+            </li>
+          {/each}
+        </ul>
+        <span class="ww-muted">{$t('shop.sp.ww.silence')}</span>
+      </section>
     {/if}
 
-    {#if viewMode === 'table'}
-    <div class="table-wrap">
-      <table dir="rtl">
-        <tbody>
-          <tr class="gg">
-            <th class="gg"></th>
-            {#each ulist as data, i}
-              <td class="gg" style="font-size: 3rem">{i + 1}</td>
-            {/each}
-            {#if showPlatformCol}<td class="gg" style="font-size: 2rem">💗</td>{/if}
-          </tr>
-          <tr class="ggr">
-            <th class="ggr">{$t('mission.whowhat.name')}</th>
-            {#each ulist as data}
-              <td class="ggr">{data.username}</td>
-            {/each}
-            {#if showPlatformCol}<td class="ggr">1💗1</td>{/if}
-          </tr>
-          <tr>
-            <th>{$t('mission.whowhat.profitShare')}</th>
-            {#each ulist as data}
-              <td>{revach > 0 ? data.x.toFixed(2) : '0'}</td>
-            {/each}
-            {#if showPlatformCol}<td class="plat-cell">{siteShareFinal.toFixed(2)}</td>{/if}
-          </tr>
-          <tr>
-            <th>{$t('mission.whowhat.myAmount')}</th>
-            {#each ulist as data}
-              <td>{(data.ihave || 0).toFixed(2)}</td>
-            {/each}
-            {#if showPlatformCol}<td class="plat-cell">—</td>{/if}
-          </tr>
-          <tr>
-            <th>{$t('mission.whowhat.amountToGive')}</th>
-            {#each ulist as data}
-              <td>{revach > 0 && data.noten > 0.01 ? data.noten.toFixed(2) : '0'}</td>
-            {/each}
-            {#if showPlatformCol}<td class="plat-cell">—</td>{/if}
-          </tr>
-          <tr>
-            <th>{$t('mission.whowhat.giveTo')}</th>
-            {#each ulist as data}
-              <td>
-                {#if data.le}
-                  {#each data.le as ee}
-                    {` ${ee.le} :  ${ee.cama.toFixed(2)} `}<br />
-                  {/each}
-                {/if}
-              </td>
-            {/each}
-            {#if showPlatformCol}<td class="plat-cell">—</td>{/if}
-          </tr>
-          <tr>
-            <th>{$t('mission.whowhat.amountToReceive')}</th>
-            {#each ulist as data}
-              <td>{revach > 0 && data.meca > 0.01 ? data.meca.toFixed(2) : '0'}</td>
-            {/each}
-            {#if showPlatformCol}<td class="plat-cell">{siteShareFinal.toFixed(2)}</td>{/if}
-          </tr>
-          <tr>
-            <th>{$t('mission.whowhat.percentageInRikma')}</th>
-            {#each ulist as data}
-              <td>{data.p.toFixed(2)}</td>
-            {/each}
-            {#if showPlatformCol}<td class="plat-cell">{revach > 0 ? ((siteShareFinal / revach) * 100).toFixed(2) : '0'}</td>{/if}
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    {/if}
-<br>
     {#if siteShareProposed > 0 && !hatzaa}
-      <div class="site-share" dir="rtl">
-        <div class="ss-head">
-          <span class="ss-title">
-            {$t('mission.whowhat.mgmtService')}
-          </span>
-          <span class="ss-amount">{siteShareFinal.toFixed(2)}</span>
+      <section class="sh-card-2 ww-ss" aria-labelledby="ww-ss-title">
+        <div class="ww-row ww-between">
+          <strong id="ww-ss-title">{$t('mission.whowhat.mgmtService')}</strong>
+          <bdi class="ww-strong ww-gold">{fmtMoney(siteShareFinal)}</bdi>
         </div>
-        <p class="ss-sub">
-          {$lang === 'he'
-            ? `1💗1 נכנסת לחלוקה כשותפה נותנת־שירות. הסכום הזה יורד מהרווח שמתחלק בין השותפים (נשאר לחלוקה: ${(revach - siteShareFinal).toFixed(2)} מתוך ${revach.toFixed(2)}). מוצע: ${siteShareProposed.toFixed(2)} - אפשר לתת יותר או לבקש הנחה, וזה מאושר מיד.`
-            : `1💗1 joins the split as a service-providing partner. This amount is deducted from the profit shared between partners (left to split: ${(revach - siteShareFinal).toFixed(2)} of ${revach.toFixed(2)}). Suggested: ${siteShareProposed.toFixed(2)} - you may give more or ask for less; approved instantly.`}
+        <p class="ww-note">
+          {$t('shop.sp.ww.ssSub', {
+            left: fmtMoney(revach - siteShareFinal),
+            total: fmtMoney(revach),
+            proposed: fmtMoney(siteShareProposed)
+          })}
         </p>
-
-        <div class="ss-options">
-          <label class="ss-opt">
-            <input
-              type="radio"
-              name="siteShareDir"
-              checked={siteShareDirection === 'as_is'}
-              onchange={() => pickDirection('as_is')}
-            />
-            <span>{$lang === 'he' ? `משלם כפי שמוצע (${siteShareProposed.toFixed(2)})` : `Pay as suggested (${siteShareProposed.toFixed(2)})`}</span>
+        <div class="ww-opts" role="radiogroup" aria-labelledby="ww-ss-title">
+          <label class="ww-opt">
+            <input type="radio" name="siteShareDir" checked={siteShareDirection === 'as_is'} onchange={() => pickDirection('as_is')} />
+            <span>{$t('shop.sp.ww.ssAsIs', { amount: fmtMoney(siteShareProposed) })}</span>
           </label>
-
-          <label class="ss-opt">
-            <input
-              type="radio"
-              name="siteShareDir"
-              checked={siteShareDirection === 'more'}
-              onchange={() => pickDirection('more')}
-            />
+          <label class="ww-opt">
+            <input type="radio" name="siteShareDir" checked={siteShareDirection === 'more'} onchange={() => pickDirection('more')} />
             <span>{$t('mission.whowhat.giveMore')}</span>
           </label>
-
-          <label class="ss-opt">
-            <input
-              type="radio"
-              name="siteShareDir"
-              checked={siteShareDirection === 'less'}
-              onchange={() => pickDirection('less')}
-            />
+          <label class="ww-opt">
+            <input type="radio" name="siteShareDir" checked={siteShareDirection === 'less'} onchange={() => pickDirection('less')} />
             <span>{$t('mission.whowhat.discountLess')}</span>
           </label>
         </div>
-
         {#if siteShareDirection !== 'as_is'}
-          <div class="ss-adjust">
-            <label class="ss-field">
-              <span>{$t('mission.whowhat.amount')}</span>
-              <input
-                type="number"
-                min="0"
-                step="0.01"
-                bind:value={siteShareCustom}
-                oninput={onSiteShareAmount}
-              />
+          <div class="ww-adjust">
+            <label class="sh-field">
+              {$t('mission.whowhat.amount')}
+              <input class="sh-input" type="number" min="0" step="0.01" bind:value={siteShareCustom} oninput={onSiteShareAmount} />
             </label>
-            <label class="ss-field ss-reason">
-              <span>
-                {siteShareDirection === 'less'
-                  ? ($t('mission.whowhat.reasonRequired'))
-                  : ($t('mission.whowhat.reasonOptional'))}
-              </span>
-              <input
-                type="text"
-                bind:value={siteShareReason}
-                placeholder={$t('mission.whowhat.whyPh')}
-              />
+            <label class="sh-field">
+              {siteShareDirection === 'less' ? $t('mission.whowhat.reasonRequired') : $t('mission.whowhat.reasonOptional')}
+              <input class="sh-input" type="text" bind:value={siteShareReason} placeholder={$t('mission.whowhat.whyPh')} />
             </label>
           </div>
         {/if}
-      </div>
+      </section>
     {/if}
+
     {#if showCreatorSiteShare}
-      <div class="creator-ss" dir="rtl">
+      <section class="ww-creator">
         {#key myId}
           <SiteShareDecision
             proposed={creatorProposed}
@@ -1422,390 +1473,503 @@
           />
         {/key}
         {#if creatorSSDecision}
-          <p class="creator-ss-note">
-            {#if $lang === 'he'}
-              {creatorSSDecision.decision === 'skipped'
-                ? 'בחרת לא לתת הפעם - יירשם עם יצירת החלוקה.'
-                : `הנתינה שלך (${Number(creatorSSDecision.amount).toFixed(2)}) תירשם עם יצירת החלוקה.`}
-            {:else}
-              {creatorSSDecision.decision === 'skipped'
-                ? 'You chose not to give - saved when the split is created.'
-                : `Your contribution (${Number(creatorSSDecision.amount).toFixed(2)}) will be saved when the split is created.`}
-            {/if}
+          <p class="ww-note">
+            {creatorSSDecision.decision === 'skipped'
+              ? $t('shop.sp.ww.creatorSkipped')
+              : $t('shop.sp.ww.creatorGives', { amount: fmtMoney(Number(creatorSSDecision.amount)) })}
           </p>
         {/if}
-      </div>
-    {/if}
-    {#if availableForNewSplit > 0 && revach > 0 && !hatzaa}
-      <Button
-        text={$t('mission.whowhat.confirmSplit')}
-        loading={isLoading}
-        success={isSuccess}
-        error={isError}
-        onClick={ask}
-        disabled={isLoading || isSuccess || already}
-      />
-    {/if}
-<br>
-    {#if showUpdateSuggestion}
-      <div class="border border-yellow-500 bg-yellow-50 m-2 p-4 rounded">
-        <h2 class="font-bold text-yellow-800 mb-2">
-          {$t('mission.whowhat.splitChanged')}
-        </h2>
-        <p class="text-yellow-700 mb-3">
-          {$t('mission.whowhat.splitChangedMsg')}
-        </p>
-        {#if changesList.length > 0}
-          <div class="bg-yellow-100 p-3 rounded mb-3 border border-yellow-300">
-            <strong class="block mb-2 text-yellow-800">{$t('mission.whowhat.changesDetected')}</strong>
-            <div class="space-y-2 bg-white p-2 rounded border">
-              {#each changesList as change}
-                <ComparisonDisplay 
-                  label={change.label}
-                  oldValue={change.oldValue}
-                  newValue={change.newValue}
-                />
-              {/each}
-            </div>
-          </div>
-        {/if}
-        <div class="flex gap-2">
-          <button
-            class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded"
-            onclick={updateTosplit}
-          >
-            {$t('mission.whowhat.updateSplit')}
-          </button>
-          <button
-            class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded"
-            onclick={() => (showUpdateSuggestion = false)}
-          >
-            {$t('mission.whowhat.cancel')}
-          </button>
-        </div>
-      </div>
+      </section>
     {/if}
 
-    {#if hatzaa == true}
-      <div class="border border-barbi m-2 p-2  bg-gold">
-        <h1 class="font-bold">
-          {$t('mission.whowhat.proposalPending')}<br />
-          {` ${$t('mission.whowhat.soFar')} ${noofok > 1 ? `${$t('mission.whowhat.thereAre')} ${noofok} ${$t('mission.whowhat.votes')}` : $t('mission.whowhat.oneVote')} ${$t('mission.whowhat.inFavor')} ${noofno > 0 ? `, ${noofno} ${$t('mission.whowhat.against')} ` : ''} ${noofw > 0 ? `${$t('mission.whowhat.and')}-${noofw} ${$t('mission.whowhat.notVotedYet')}` : ''}`}
-        </h1>
-      </div>{/if}
-  </div>
+    {#if availableForNewSplit > 0 && revach > 0 && !hatzaa}
+      <div class="ww-confirm">
+        <button
+          type="button"
+          class="sh-btn sh-btn-primary sh-btn-lg ww-confirm-btn"
+          onclick={ask}
+          disabled={isLoading || isSuccess || already}
+          aria-busy={isLoading}
+        >
+          {#if isLoading}<Spinner size="sm" />{/if}
+          {isSuccess ? $t('shop.sp.ww.sent') : $t('mission.whowhat.confirmSplit')}
+        </button>
+        {#if isError}<p class="ww-err" role="alert">{$t('mission.whowhat.errorCreatingSplit')}</p>{/if}
+      </div>
+    {/if}
+  </aside>
 </div>
 
 <style>
-  .dd {
+  .ww {
     display: flex;
-    align-items: center;
-    justify-content: center;
     flex-direction: column;
+    gap: 12px;
+    min-width: 0;
   }
-  .body {
-    width: 100%;
-    max-width: 100vw;
-    padding-left: 0.5em;
-    padding-right: 0.5em;
+  /* Phone: one column, in the canvas order (totals, the vote, the change, the
+     table, the sales, the site share, the button). Wider: table | side panel. */
+  .ww-main,
+  .ww-side {
+    display: contents;
   }
-
-  /* ── Calculation: responsive participant cards (replaces the legacy table) ── */
-  .calc-title {
-    text-align: center;
-    font-weight: 800;
-    font-size: 1.5rem;
-    margin: 0.5rem 0 1.1rem;
-    color: var(--barbi-pink);
+  .ww-totals {
+    order: 1;
   }
-  /* ── View switcher (cards / table) ── */
-  .view-toggle {
-    display: flex;
-    width: fit-content;
-    gap: 0;
-    margin: 0 auto 1rem;
-    padding: 0.2rem;
-    border: 2px solid rgb(103, 232, 249);
-    border-radius: 999px;
-    background: #eafcff;
+  .ww-pending {
+    order: 2;
   }
-  .vt-btn {
-    border: none;
-    background: transparent;
-    color: #6b0f1a;
+  .ww-change {
+    order: 3;
+  }
+  .ww-calc {
+    order: 4;
+  }
+  .ww-included {
+    order: 5;
+  }
+  .ww-ss {
+    order: 6;
+  }
+  .ww-creator {
+    order: 7;
+  }
+  .ww-confirm {
+    order: 8;
+  }
+  .ww-muted {
+    color: var(--sh-muted);
+  }
+  .ww-gold {
+    color: var(--sh-gold);
+  }
+  .ww-strong {
     font-weight: 700;
-    font-size: 0.85rem;
-    padding: 0.35rem 1.1rem;
-    border-radius: 999px;
-    cursor: pointer;
-    transition: background 0.15s, color 0.15s;
   }
-  .vt-btn.active {
-    background-image: linear-gradient(315deg, #6b0f1a 0%, #b91372 74%);
-    color: rgb(132, 241, 223);
-  }
-
-  /* ── Legacy spreadsheet table view ── */
-  .table-wrap {
-    width: 100%;
-    overflow-x: auto;
-  }
-  .table-wrap table,
-  .table-wrap th,
-  .table-wrap td {
-    border-collapse: collapse;
-    border-width: 4px;
-    border-color: rgb(103, 232, 249);
-    border-radius: 4%;
-  }
-  .table-wrap table {
-    text-align: center;
-    color: var(--barbi-pink);
-    margin: 0 auto;
-  }
-  .table-wrap th {
-    background-color: #6b0f1a;
-    background-image: linear-gradient(315deg, #6b0f1a 0%, #b91372 74%);
-    color: rgb(132, 241, 223);
-    padding: 0.3rem 0.6rem;
-  }
-  .table-wrap td {
-    background-color: #5efaf2;
-    background-image: linear-gradient(8deg, #5efaf2 0%, #eee 74%);
-    padding: 0.3rem 0.6rem;
-  }
-  .table-wrap th:hover {
-    background: var(--barbi-pink);
-  }
-  .table-wrap td:hover {
-    background: rgb(132, 241, 223);
-  }
-  .table-wrap .gg,
-  .table-wrap .ggr {
-    background-color: #6b0f1a;
-    background-image: linear-gradient(315deg, #6b0f1a 0%, #b91372 74%);
-    color: rgb(132, 241, 223);
-  }
-  .table-wrap td.plat-cell {
-    background-image: linear-gradient(8deg, #ffe9a8 0%, #fff7e0 74%);
-    color: #6b0f1a;
-    font-weight: 800;
-  }
-
-  .calc-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-    gap: 0.85rem;
-    width: 100%;
-    max-width: 60rem;
-    margin: 0 auto;
-  }
-  .pcard {
-    display: flex;
-    flex-direction: column;
-    gap: 0.6rem;
-    padding: 0.9rem;
-    border-radius: 1rem;
-    border: 2px solid rgb(103, 232, 249);
-    background-image: linear-gradient(160deg, #ffffff 0%, #eafcff 100%);
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
-  }
-  .pcard-head {
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
+  .ww-grow {
+    flex: 1 1 auto;
     min-width: 0;
   }
-  .pcard-av {
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid rgb(103, 232, 249);
-    flex-shrink: 0;
-  }
-  .pcard-av-ph,
-  .pcard-av-plat {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 800;
-    color: #6b0f1a;
-    background: #b3f5ec;
-  }
-  .pcard-av-plat {
-    font-size: 1.4rem;
-    background: #ffe9a8;
-    border-color: var(--barbi-pink);
-  }
-  .pcard-id {
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
-  }
-  .pcard-name {
-    font-weight: 800;
-    color: #6b0f1a;
+  .ww-sr {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
     white-space: nowrap;
+  }
+  .ww-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+  }
+  .ww-between {
+    justify-content: space-between;
+  }
+  .ww-h2 {
+    font-size: 15px;
+    font-weight: 700;
+  }
+  .ww-note {
+    font-size: 12px;
+    line-height: 1.5;
+  }
+  :global([dir='rtl']) .ww-arrow {
+    transform: scaleX(-1);
+  }
+
+  .ww-totals {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+  .ww-tot {
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-size: 12px;
+    min-width: 0;
+  }
+  .ww-tot-gold {
+    border-color: var(--sh-gold-line);
+  }
+  .ww-tot strong {
+    font-family: var(--sh-display);
+    font-size: 26px;
+    line-height: 1.15;
+    overflow-wrap: anywhere;
+  }
+
+  .ww-pending {
+    border-radius: var(--sh-radius);
+    border: 1px solid color-mix(in srgb, var(--sh-info-ink) 45%, transparent);
+    background: var(--sh-info-tint);
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 13px;
+  }
+  .ww-pending > strong {
+    font-size: 14px;
+    color: var(--sh-info-ink);
+  }
+  .ww-voters {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .ww-voters li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .ww-change {
+    border-radius: var(--sh-radius);
+    border: 1px solid var(--sh-warn-line);
+    background: var(--sh-warn-tint);
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .ww-change p {
+    color: var(--sh-ink);
+    font-size: 13px;
+  }
+  .ww-changes {
+    list-style: none;
+    margin: 0;
+    padding: 8px 10px;
+    border-radius: var(--sh-radius-xs);
+    background: var(--sh-card);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 13px;
+  }
+  .ww-changes li {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .ww-new {
+    font-weight: 700;
+  }
+
+  .ww-calc {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 0;
+  }
+  .ww-calc-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .ww-seg button {
+    min-height: 36px;
+    padding: 0 14px;
+    font-size: 13px;
+  }
+  .ww-cards {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+  }
+  .ww-card {
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 0;
+  }
+  .ww-card-give {
+    border-color: var(--sh-gold-line);
+  }
+  .ww-platform {
+    border-style: dashed;
+    border-color: var(--sh-gold-line);
+  }
+  .ww-card-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .ww-id {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-width: 0;
+    font-size: 12px;
+  }
+  .ww-id strong {
+    font-size: 16px;
     overflow: hidden;
     text-overflow: ellipsis;
+    white-space: nowrap;
   }
-  .pcard-pct {
-    font-size: 0.72rem;
+  .ww-av {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    border: 2px solid var(--sh-gold);
+    color: var(--sh-gold);
+    background: var(--sh-card);
+    font-size: 16px;
     font-weight: 700;
-    color: var(--barbi-pink);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
   }
-  .pcard-rows {
+  .ww-av-sm {
+    width: 26px;
+    height: 26px;
+    font-size: 12px;
+    border-width: 1px;
+  }
+  .ww-av-plat {
+    background: var(--sh-gold);
+    color: var(--sh-card);
+    font-size: 13px;
+  }
+  .ww-bars {
     display: flex;
     flex-direction: column;
-    gap: 0.3rem;
+    gap: 4px;
   }
-  .prow {
+  .ww-bar {
+    display: block;
+    height: 6px;
+    border-radius: 3px;
+    background: var(--sh-line);
+    overflow: hidden;
+  }
+  .ww-bar > span {
+    display: block;
+    height: 100%;
+    border-radius: 3px;
+  }
+  .ww-bar-share {
+    background: var(--sh-gold);
+  }
+  .ww-bar-hold {
+    background: var(--sh-accent-ink);
+  }
+  .ww-rows {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 6px 10px;
+    margin: 0;
+    font-size: 13px;
+  }
+  .ww-rows dt {
+    color: var(--sh-muted);
+  }
+  .ww-rows dd {
+    margin: 0;
+    font-weight: 600;
+    text-align: end;
+  }
+  .ww-share {
+    color: var(--sh-gold);
+  }
+  .ww-hold {
+    color: var(--sh-accent-ink);
+  }
+  .ww-transfers {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
+    gap: 6px;
+    padding-top: 8px;
+    border-top: 1px solid var(--sh-line);
+    font-size: 12px;
+  }
+  .ww-transfer {
+    display: flex;
     align-items: center;
-    gap: 0.5rem;
-    font-size: 0.85rem;
-    padding: 0.32rem 0.55rem;
-    border-radius: 0.5rem;
-    background: rgba(0, 0, 0, 0.035);
-    color: #444;
+    gap: 8px;
+    font-size: 14px;
   }
-  .prow b {
-    font-weight: 800;
-    color: #6b0f1a;
+  .ww-transfer .ww-arrow {
+    color: var(--sh-gold);
+    flex-shrink: 0;
   }
-  .prow.give {
-    background: rgba(255, 0, 146, 0.1);
+  .ww-plat {
+    color: var(--sh-gold);
   }
-  .prow.give,
-  .prow.give b {
-    color: #b3006b;
+
+  .ww-table th[scope='row'] {
+    background: var(--sh-card-2);
+    white-space: nowrap;
   }
-  .prow.get {
-    background: rgba(2, 200, 150, 0.16);
+  .ww-table td {
+    text-align: center;
   }
-  .prow.get,
-  .prow.get b {
-    color: #067a5b;
+  .ww-th {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--sh-ink);
   }
-  .prow.even {
-    opacity: 0.6;
+  .ww-give {
+    color: var(--sh-accent-ink);
+    font-weight: 600;
   }
-  .pcard-transfers {
+  .ww-get {
+    color: var(--sh-ok-ink);
+    font-weight: 600;
+  }
+  .ww-to {
+    font-size: 12px;
+  }
+  .ww-to-line {
+    display: block;
+    white-space: nowrap;
+  }
+  .ww-plat-cell {
+    background: color-mix(in srgb, var(--sh-gold) 8%, transparent);
+    color: var(--sh-gold);
+  }
+
+  .ww-included {
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .ww-chips {
+    list-style: none;
+    margin: 0;
+    padding: 0;
     display: flex;
     flex-wrap: wrap;
-    gap: 0.3rem;
-    align-items: center;
-    padding-top: 0.5rem;
-    border-top: 1px dashed rgba(0, 0, 0, 0.12);
+    gap: 6px;
   }
-  .pt-head {
-    width: 100%;
-    font-size: 0.7rem;
-    font-weight: 700;
-    opacity: 0.65;
-  }
-  .pt-chip {
-    font-size: 0.75rem;
-    background: #fff;
-    border: 1px solid rgb(103, 232, 249);
-    border-radius: 999px;
-    padding: 0.12rem 0.55rem;
-    white-space: nowrap;
-  }
-  .pt-chip.platform {
-    border-color: var(--barbi-pink);
-    background: #fff7e0;
-    color: #6b0f1a;
-    font-weight: 700;
-  }
-  .platform-card {
-    background-image: linear-gradient(160deg, #fff7e0 0%, #ffe9a8 100%);
-    border-color: var(--barbi-pink);
-    box-shadow: 0 6px 18px rgba(255, 0, 146, 0.18);
-  }
-
-  /* Site-share service line + payer adjustment */
-  .creator-ss {
-    max-width: 32rem;
-    margin: 1rem auto;
-  }
-  .creator-ss-note {
-    margin: 0.5rem 0 0;
-    font-size: 0.85rem;
+  .ww-chips .sh-chip {
+    white-space: normal;
     font-weight: 600;
-    text-align: right;
-    color: var(--gold, #c9a227);
   }
 
-  .site-share {
-    max-width: 32rem;
-    margin: 1rem auto;
-    padding: 1rem 1.25rem;
-    border: 2px solid var(--barbi-pink);
-    border-radius: 0.75rem;
-    background-image: linear-gradient(315deg, #fff7e0 0%, #ffe9a8 100%);
-    color: #6b0f1a;
-    text-align: right;
-  }
-  .ss-head {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 0.75rem;
-  }
-  .ss-title {
-    font-weight: 700;
-    font-size: 1.05rem;
-  }
-  .ss-amount {
-    font-weight: 800;
-    font-size: 1.5rem;
-    color: var(--barbi-pink);
-    white-space: nowrap;
-  }
-  .ss-sub {
-    margin: 0.4rem 0 0.8rem;
-    font-size: 0.85rem;
-    opacity: 0.85;
-    line-height: 1.4;
-  }
-  .ss-options {
+  .ww-ss {
+    padding: 14px;
     display: flex;
     flex-direction: column;
-    gap: 0.4rem;
+    gap: 10px;
+    font-size: 14px;
   }
-  .ss-opt {
+  .ww-opts {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .ww-opt {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 10px;
+    min-height: 44px;
+    padding: 0 12px;
+    border-radius: var(--sh-radius-sm);
+    border: 1px solid var(--sh-line);
+    background: var(--sh-card);
     cursor: pointer;
   }
-  .ss-opt input {
-    accent-color: var(--barbi-pink);
+  .ww-opt:has(input:checked) {
+    border-color: var(--sh-gold);
+    background: color-mix(in srgb, var(--sh-gold) 10%, var(--sh-card));
   }
-  .ss-adjust {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem;
-    margin-top: 0.75rem;
+  .ww-opt input {
+    accent-color: var(--sh-gold);
+    width: 16px;
+    height: 16px;
   }
-  .ss-field {
+  .ww-adjust {
     display: flex;
     flex-direction: column;
-    gap: 0.25rem;
-    font-size: 0.8rem;
-    font-weight: 600;
+    gap: 8px;
   }
-  .ss-field.ss-reason {
-    flex: 1 1 12rem;
+
+  /* The per-member contribution prompt is shared with the heart; on this page
+     it sits on the shop surfaces. */
+  .ww-creator :global(.ssd) {
+    background: var(--sh-card-2);
+    border-color: var(--sh-line);
+    color: var(--sh-ink);
   }
-  .ss-field input {
-    padding: 0.4rem 0.5rem;
-    border: 1px solid var(--barbi-pink);
-    border-radius: 0.4rem;
-    background: #fff;
-    color: #6b0f1a;
+  .ww-creator :global(.ssd-title),
+  .ww-creator :global(.ssd-amount) {
+    color: var(--sh-gold);
+  }
+  .ww-creator :global(.ssd-sub),
+  .ww-creator :global(.ssd-settled) {
+    color: var(--sh-muted);
+  }
+  .ww-creator :global(.ssd-confirm) {
+    background: var(--sh-accent);
+    color: var(--sh-on-accent);
+    border-color: transparent;
+  }
+
+  .ww-confirm {
+    position: sticky;
+    bottom: var(--foot-h, 0px);
+    z-index: 4;
+    margin: 0 -16px;
+    padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+    background: color-mix(in srgb, var(--sh-card) 92%, transparent);
+    backdrop-filter: blur(16px);
+    border-top: 1px solid var(--sh-line);
+  }
+  .ww-confirm-btn {
+    width: 100%;
+  }
+  .ww-err {
+    margin-top: 6px;
+    font-size: 12px;
+    color: var(--sh-accent-ink);
+    font-weight: 700;
+  }
+
+  @media (min-width: 640px) {
+    .ww-cards {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (min-width: 900px) {
+    .ww {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 360px;
+      align-items: start;
+      gap: 20px;
+    }
+    .ww-main,
+    .ww-side {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      min-width: 0;
+    }
+    .ww-side {
+      position: sticky;
+      top: 16px;
+    }
+    .ww-confirm {
+      position: static;
+      margin: 0;
+      padding: 0;
+      background: none;
+      backdrop-filter: none;
+      border: 0;
+    }
   }
 </style>

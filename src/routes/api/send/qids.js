@@ -17540,6 +17540,54 @@ ${STIPEND_DECISION_FIELDS}
     updateProductVariant(id: $id, data: { quant: $quant }) { data { id attributes { quant } } }
   }`,
 
+  /* ─────────────────────────────────────────────────────────────────────
+   * The `unlimited` stock flag (PLAN_SHOP_CUSTOMER_EXPERIENCE §2.5)
+   *
+   * Apart from every other query on purpose: the column deploys in `1.0b` on
+   * its own day, and a query that names it fails whole until then. Asked only
+   * behind `stockFlagsLive` ($lib/server/shop/stockFlags.ts) — or, on the moach
+   * stock screen, tried and dropped on failure.
+   * ───────────────────────────────────────────────────────────────────── */
+
+  'stockFlagsSchema': `query StockFlagsSchema {
+    productVariants(pagination: { limit: 1 }) { data { id attributes { unlimited } } }
+    matanots(pagination: { limit: 1 }) { data { id attributes { unlimited stockUnlimited } } }
+  }`,
+
+  'stockFlagsVariants': `query StockFlagsVariants($ids: [ID]) {
+    productVariants(filters: { id: { in: $ids } }, pagination: { limit: 100 }) {
+      data { id attributes { quant unlimited } }
+    }
+  }`,
+
+  'stockFlagsMatanots': `query StockFlagsMatanots($ids: [ID]) {
+    matanots(filters: { id: { in: $ids } }, pagination: { limit: 100 }) {
+      data { id attributes { quant unlimited } }
+    }
+  }`,
+
+  'stockWriteVariant': `mutation StockWriteVariant($id: ID!, $quant: Float!, $unlimited: Boolean!) {
+    updateProductVariant(id: $id, data: { quant: $quant, unlimited: $unlimited }) {
+      data { id attributes { quant unlimited } }
+    }
+  }`,
+
+  'stockWriteMatanot': `mutation StockWriteMatanot($id: ID!, $quant: Float!, $unlimited: Boolean!) {
+    updateMatanot(id: $id, data: { quant: $quant, unlimited: $unlimited }) {
+      data { id attributes { quant unlimited } }
+    }
+  }`,
+
+  // The flags of the rikma's products and variants, for the moach stock screen.
+  'moachShopStockFlags': `query MoachShopStockFlags($pid: ID!) {
+    matanots(filters: { projectcreates: { id: { eq: $pid } } }, pagination: { limit: 200 }) {
+      data { id attributes {
+        unlimited
+        variants(pagination: { limit: 100 }) { data { id attributes { unlimited } } }
+      } }
+    }
+  }`,
+
   'saleLinkShop': `mutation SaleLinkShop($id: ID!, $product_variant: ID, $order: ID) {
     updateSale(id: $id, data: { product_variant: $product_variant, order: $order }) { data { id } }
   }`,
