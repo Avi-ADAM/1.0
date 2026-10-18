@@ -12,10 +12,23 @@ import { recipientTemplateLang, textFor } from './intent';
 /** Links in an email leave the site — they need the host. */
 const SITE = 'https://www.1lev1.com';
 
+export interface EmailSendSummary {
+  /** Recipients with a usable email address who were not suppressed by `noMail`. */
+  attempted: number;
+  /** Emails accepted by the internal mail endpoint. */
+  sent: number;
+  /** Emails the internal mail endpoint rejected. */
+  failed: number;
+  /** Recipients intentionally skipped (for example, `noMail`). */
+  skipped: number;
+}
+
 export class EmailService {
   /**
-   * Send bulk email notifications to multiple recipients
-   * 
+   * Send bulk email notifications to multiple recipients. Existing callers
+   * intentionally do not need a delivery report; invitation flows that must
+   * give the sender an honest fallback can use `sendBulkWithResult`.
+   *
    * @param recipients - List of users to send emails to
    * @param notification - Notification data with title, body, and metadata
    * @param templateName - Name of the Svelte email template to use (default: 'SimpleNuti')
@@ -25,45 +38,60 @@ export class EmailService {
     recipients: UserProfile[],
     notification: NotificationData,
     templateName: string = 'SimpleNuti',
-    context: ActionContext,
+    context: Pick<ActionContext, 'fetch' | 'lang'>,
     templateData?: Record<string, any>
   ): Promise<void> {
-    // Filter users who don't want email (noMail flag)
-    const emailRecipients = recipients.filter(user => user.noMail !== true);
+    await this.sendBulkWithResult(recipients, notification, templateName, context, templateData);
+  }
+
+  /** Like `sendBulk`, but reports delivery failures instead of making callers infer them from logs. */
+  async sendBulkWithResult(
+    recipients: UserProfile[],
+    notification: NotificationData,
+    templateName: string = 'SimpleNuti',
+    context: Pick<ActionContext, 'fetch' | 'lang'>,
+    templateData?: Record<string, any>
+  ): Promise<EmailSendSummary> {
+    // Respect email preferences and avoid calling the relay without an address.
+    const emailRecipients = recipients.filter((user) => user.noMail !== true && String(user.email ?? '').trim() !== '');
+    const skipped = recipients.length - emailRecipients.length;
 
     if (emailRecipients.length === 0) {
       console.log('EmailService: No email recipients after filtering');
-      return;
+      return { attempted: 0, sent: 0, failed: 0, skipped };
     }
 
     console.log(`EmailService: Sending emails to ${emailRecipients.length} recipients`);
 
     // Import email rendering dynamically
     const { render } = await import('svelty-email');
-    
+
     // Load the appropriate template
     const template = await this.loadTemplate(templateName);
 
     // Send emails to all recipients
-    const emailPromises = emailRecipients.map(user =>
+    const emailPromises = emailRecipients.map((user) =>
       this.sendToUser(user, notification, template, render, context, templateData)
     );
 
     // Wait for all emails to be sent (but don't fail if some fail)
     const results = await Promise.allSettled(emailPromises);
+    const failedResults = results.filter((result) => result.status === 'rejected');
+    const failed = failedResults.length;
 
     // Log any failures
-    const failures = results.filter(r => r.status === 'rejected');
-    if (failures.length > 0) {
-      console.error(`EmailService: ${failures.length} emails failed to send`);
-      failures.forEach((result, index) => {
+    if (failed > 0) {
+      console.error(`EmailService: ${failed} emails failed to send`);
+      failedResults.forEach((result, index) => {
         if (result.status === 'rejected') {
           console.error(`Email ${index} error:`, result.reason);
         }
       });
     }
 
-    console.log(`EmailService: Successfully sent ${results.length - failures.length}/${results.length} emails`);
+    const sent = results.length - failed;
+    console.log(`EmailService: Successfully sent ${sent}/${results.length} emails`);
+    return { attempted: emailRecipients.length, sent, failed, skipped };
   }
 
   /**
@@ -74,7 +102,7 @@ export class EmailService {
     notification: NotificationData,
     template: any,
     render: any,
-    context: ActionContext,
+    context: Pick<ActionContext, 'fetch' | 'lang'>,
     templateData?: Record<string, any>
   ): Promise<void> {
     try {

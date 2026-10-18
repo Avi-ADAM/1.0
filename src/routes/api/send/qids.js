@@ -16072,7 +16072,7 @@ ${STIPEND_DECISION_FIELDS}
       { user: { id: { eq: $uid } } },
       { open_mission: { id: { eq: $omId } } }
     ] }) {
-      data { id }
+      data { id attributes { status } }
     }
   }`,
 
@@ -16081,7 +16081,7 @@ ${STIPEND_DECISION_FIELDS}
       { user: { id: { eq: $uid } } },
       { open_mashaabim: { id: { eq: $omashId } } }
     ] }) {
-      data { id }
+      data { id attributes { status } }
     }
   }`,
 

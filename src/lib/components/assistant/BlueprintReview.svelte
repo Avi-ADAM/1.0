@@ -274,6 +274,8 @@
   let shareUrl = $state('');
   let shareError = $state('');
   let copied = $state(false);
+  let copiedInviteKey = $state('');
+  let inviteCopyErrorKey = $state('');
 
   async function makeShareLink() {
     if (sharing) return;
@@ -295,11 +297,46 @@
     }
   }
 
-  /** @param {{ key: string, result: string }} inv */
+  /** @param {{ key: string, result: string, emailStatus?: string, created?: number, suggestionFailures?: number, retryAfterSeconds?: number }} inv */
   function inviteText(inv) {
     const name = byKey.get(inv.key)?.label ?? '';
-    const known = ['invited', 'notRegistered', 'pendingVote', 'noEmail'];
-    return $t(`rikmaImport.invite.${known.includes(inv.result) ? inv.result : 'other'}`, { name });
+    let translation = inv.result;
+    if (inv.suggestionFailures) {
+      translation = inv.emailStatus === 'sent' ? 'cardsFailed' : inv.emailStatus === 'skipped' ? 'cardsFailedEmailSkipped' : 'cardsFailedEmailFailed';
+    } else if (inv.result === 'invited' && inv.emailStatus !== 'sent') {
+      translation = inv.created ? 'invitedCardOnly' : inv.emailStatus === 'skipped' ? 'emailSkipped' : 'emailFailed';
+    }
+    const known = [
+      'invited',
+      'invitedCardOnly',
+      'notRegistered',
+      'pendingVote',
+      'noEmail',
+      'emailFailed',
+      'emailSkipped',
+      'rateLimited',
+      'cardsFailed',
+      'cardsFailedEmailSkipped',
+      'cardsFailedEmailFailed'
+    ];
+    const retryAfterMinutes = Math.max(1, Math.ceil((inv.retryAfterSeconds ?? 60) / 60));
+    return $t(`rikmaImport.invite.${known.includes(translation) ? translation : 'other'}`, {
+      name,
+      minutes: retryAfterMinutes,
+      failed: inv.suggestionFailures ?? 0
+    });
+  }
+
+  /** @param {string} key @param {string} url */
+  async function copyJoinLink(key, url) {
+    inviteCopyErrorKey = '';
+    try {
+      await navigator.clipboard.writeText(url);
+      copiedInviteKey = key;
+    } catch {
+      copiedInviteKey = '';
+      inviteCopyErrorKey = key;
+    }
   }
 </script>
 
@@ -524,8 +561,16 @@
       {/if}
       {#each result.invites ?? [] as inv (inv.key)}
         <p class="text-sm text-surfaceInk">{inviteText(inv)}</p>
-        {#if inv.result === 'notRegistered' && result.projectId}
-          <code class="text-xs break-all">https://www.1lev1.com/project/{result.projectId}/join</code>
+        {#if inv.joinUrl && inv.result !== 'pendingVote' && inv.result !== 'self'}
+          <div class="flex flex-wrap items-center gap-2">
+            <code class="text-xs break-all rounded bg-surface2 border border-barbi/30 p-1" dir="ltr">{inv.joinUrl}</code>
+            <button type="button" class="underline text-sm" onclick={() => copyJoinLink(inv.key, inv.joinUrl)}>
+              {copiedInviteKey === inv.key ? $t('rikmaImport.invite.copied') : $t('rikmaImport.invite.copy')}
+            </button>
+            {#if inviteCopyErrorKey === inv.key}
+              <span class="text-xs text-red-700 dark:text-red-300" role="alert">{$t('rikmaImport.invite.copyFailed')}</span>
+            {/if}
+          </div>
         {/if}
       {/each}
       {#if result.proposals?.boards}

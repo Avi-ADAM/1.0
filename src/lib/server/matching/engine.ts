@@ -27,8 +27,14 @@ import {
   type UserCapabilities
 } from './scoring';
 import { normalizeResourceNode } from '$lib/resources/bookingView';
-import { sendNewSuggestionEmails, type SuggestionRecipient } from './notify';
+import {
+  sendNewSuggestionEmails,
+  sendPartnerInvitationEmail,
+  type PartnerInviteEmailStatus,
+  type SuggestionRecipient
+} from './notify';
 import { isLocationCompatible, type GeoLocation } from './geo';
+import { RateLimiter } from '$lib/server/translation/rateLimit.js';
 import { isWithinSendWindow, underDailyCap, capWindowStartIso } from './emailPolicy';
 
 /** Hard caps so one event can never fan out unboundedly. */
@@ -556,6 +562,10 @@ export async function matchUserToOpenEntities(
 
 /** Well above any computed score, so an invitation sorts first on the lev page. */
 const INVITED_SCORE = 100;
+const PARTNER_INVITE_PER_HOUR = 20;
+const HOUR_MS = 60 * 60 * 1000;
+const SITE_ORIGIN = 'https://www.1lev1.com';
+const partnerInviteLimiter = new RateLimiter();
 
 export interface InviteTargets {
   openMissions: { id: string; name: string }[];
@@ -567,38 +577,130 @@ export interface InviteTargets {
  *
  * The founder listed a partner and what they bring; those missions and
  * resources were just created *open*, exactly as if the founder had opened
- * them by hand. Here the partner — found by exact email — gets a
- * `match-suggestion` per open item (`source:'invited'`) and the usual "new
- * suggestion" email, i.e. the same lev card a matched stranger would see. From
- * there they apply, and the rikma approves them through the ordinary ask flow.
- * Nothing is assigned to them and nothing is decided for them.
+ * them by hand. A registered partner gets or reuses a `match-suggestion` per
+ * open item (`source:'invited'`) plus one email with links to the rikma and
+ * their heart page. A new person gets an email to the public join page, where the open
+ * missions/resources are listed and they can offer themselves after signup.
+ * From there the rikma approves through the ordinary consent flow. Nothing is
+ * assigned to the partner and nothing is decided for them.
  *
- * Returns `notRegistered` when no account has that address: the caller shows
- * the founder a join link to send themselves — we do not email addresses that
- * are not members of the platform.
+ * The inviter can always copy the join link if email delivery fails or the
+ * registered partner has disabled email. Invitations are rate-limited per
+ * inviter to protect the mail system.
+ */
+export type PartnerInviteResult =
+  | 'invited'
+  | 'notRegistered'
+  | 'self'
+  | 'emailFailed'
+  | 'emailSkipped'
+  | 'rateLimited'
+  | 'failed';
+
+export interface PartnerInviteOutcome {
+  result: PartnerInviteResult;
+  userId?: string;
+  /** Contribution cards created or an existing active card reused. */
+  created: number;
+  suggestionFailures?: number;
+  joinUrl: string;
+  emailStatus?: PartnerInviteEmailStatus;
+  retryAfterSeconds?: number;
+}
+
+/**
+ * Invite a named partner to a rikma and to its open contribution opportunities.
+ *
+ * A registered person receives one `match-suggestion` for each open mission or
+ * resource, plus one email linking to the rikma and their invitation cards. A
+ * person without an account receives a direct email to the public join page,
+ * which lists the same open opportunities. Nothing is assigned or accepted on
+ * their behalf. If there are no open rows, the rikma invitation still works.
  */
 export async function invitePartnerToOpenEntities(
   email: string,
   targets: InviteTargets,
   projectName: string,
-  deps: MatchDeps & { invitedBy: string }
-): Promise<{ result: 'invited' | 'notRegistered' | 'self' | 'nothingToInvite' | 'failed'; userId?: string; created: number }> {
-  const total = targets.openMissions.length + targets.openMashaabims.length;
-  if (total === 0) return { result: 'nothingToInvite', created: 0 };
+  deps: MatchDeps & { invitedBy: string; projectId: string }
+): Promise<PartnerInviteOutcome> {
+  const normalizedEmail = String(email).trim().toLowerCase();
+  const projectId = String(deps.projectId).trim();
+  const joinUrl = `${SITE_ORIGIN}/project/${encodeURIComponent(projectId)}/join`;
+  if (!normalizedEmail || !projectId) return { result: 'failed', created: 0, joinUrl };
+
+  const limit = partnerInviteLimiter.take(`partner-invite:${deps.invitedBy}`, PARTNER_INVITE_PER_HOUR, HOUR_MS);
+  if (!limit.ok) {
+    return {
+      result: 'rateLimited',
+      created: 0,
+      joinUrl,
+      retryAfterSeconds: Math.max(1, Math.ceil(limit.retryAfterMs / 1000))
+    };
+  }
+
+  const deliverEmail = async (recipient: SuggestionRecipient): Promise<PartnerInviteEmailStatus> =>
+    sendPartnerInvitationEmail(
+      recipient,
+      { id: projectId, name: projectName },
+      targets,
+      { fetch: deps.fetch, lang: deps.lang }
+    );
+
+  let u: any;
   try {
-    const res = await deps.strapi.execute('370findUserForInvite', {
-      email: String(email).trim().toLowerCase()
+    const res = await deps.strapi.execute('370findUserForInvite', { email: normalizedEmail });
+    u = res?.data?.usersPermissionsUsers?.data?.[0];
+  } catch (err) {
+    // A lookup outage must not silently lose an invitation. The email still
+    // links to the public join page, which is safe for a registered or new user.
+    console.error('[matching] partner lookup failed; sending the join link instead:', err);
+    const emailStatus = await deliverEmail({
+      id: 'external',
+      username: '',
+      email: normalizedEmail,
+      lang: deps.lang ?? 'he',
+      noMail: false
     });
-    const u = res?.data?.usersPermissionsUsers?.data?.[0];
-    if (!u?.id) return { result: 'notRegistered', created: 0 };
+    const suggestionFailures = targets.openMissions.length + targets.openMashaabims.length;
+    return {
+      result: emailStatus === 'sent' ? 'invited' : emailStatus === 'skipped' ? 'emailSkipped' : 'emailFailed',
+      created: 0,
+      ...(suggestionFailures ? { suggestionFailures } : {}),
+      joinUrl,
+      emailStatus
+    };
+  }
+
+  if (u?.id) {
     const userId = String(u.id);
-    if (userId === String(deps.invitedBy)) return { result: 'self', userId, created: 0 };
+    if (userId === String(deps.invitedBy)) return { result: 'self', userId, created: 0, joinUrl };
 
     let created = 0;
+    let suggestionFailures = 0;
     const matchedOn = { invitedBy: String(deps.invitedBy) };
+    const ensureSuggestion = async (data: Parameters<typeof createSuggestion>[1]): Promise<boolean> => {
+      const isMission = !!data.openMissionId;
+      const lookupQid = isMission ? '210findMatchSuggestionsByMission' : '211findMatchSuggestionsByMashaabim';
+      const lookupVars = isMission
+        ? { uid: userId, omId: data.openMissionId }
+        : { uid: userId, omashId: data.openMashaabimId };
+      try {
+        const existing = await deps.strapi.execute(lookupQid, lookupVars);
+        const rows: any[] = existing?.data?.matchSuggestions?.data ?? [];
+        if (rows.some((row) => !['dismissed', 'dateBlocked'].includes(row.attributes?.status))) return true;
+        // A dismissed card is a prior "no". Do not recreate it just because
+        // the rikma owner is inviting this person directly now.
+        if (rows.length) return false;
+      } catch (err) {
+        // Prefer the invitation over a missed card if the read side is down;
+        // createSuggestion still reports a failed write to the review screen.
+        console.warn(`[matching] could not check existing ${data.kind} invitation for user ${userId}:`, err);
+      }
+      return createSuggestion(deps, data);
+    };
     for (const m of targets.openMissions) {
       if (
-        await createSuggestion(deps, {
+        await ensureSuggestion({
           userId,
           openMissionId: m.id,
           kind: 'mission',
@@ -608,10 +710,11 @@ export async function invitePartnerToOpenEntities(
           matchedOn
         })
       ) created++;
+      else suggestionFailures++;
     }
     for (const r of targets.openMashaabims) {
       if (
-        await createSuggestion(deps, {
+        await ensureSuggestion({
           userId,
           openMashaabimId: r.id,
           kind: 'resource',
@@ -621,33 +724,50 @@ export async function invitePartnerToOpenEntities(
           matchedOn
         })
       ) created++;
+      else suggestionFailures++;
     }
 
-    // One email, not one per row: it names the first thing and the lev page
-    // shows the rest.
     const a = u.attributes ?? {};
-    const first = targets.openMissions[0] ?? targets.openMashaabims[0];
     const recipient: SuggestionRecipient = {
       id: userId,
       username: a.username ?? '',
-      email: a.email ?? '',
+      email: String(a.email ?? '').trim() || normalizedEmail,
       lang: a.lang ?? undefined,
       noMail: a.noMail === true
     };
-    if (created > 0 && recipient.email) {
-      await sendNewSuggestionEmails(
-        [recipient],
-        targets.openMissions.length ? 'mission' : 'resource',
-        first.name,
-        projectName,
-        { fetch: deps.fetch, lang: deps.lang }
-      );
-    }
-    return { result: 'invited', userId, created };
-  } catch (err) {
-    console.error('[matching] partner invite failed:', err);
-    return { result: 'failed', created: 0 };
+    const emailStatus = await deliverEmail(recipient);
+    const result: PartnerInviteResult =
+      created > 0 || emailStatus === 'sent'
+        ? 'invited'
+        : emailStatus === 'skipped'
+          ? 'emailSkipped'
+          : 'emailFailed';
+    return {
+      result,
+      userId,
+      created,
+      ...(suggestionFailures ? { suggestionFailures } : {}),
+      joinUrl,
+      emailStatus
+    };
   }
+
+  // Unregistered addresses have no match-suggestion row yet. Send them to the
+  // join page; after signup they can offer themselves to the open mission or
+  // resource there, and the rikma decides through its ordinary consent flow.
+  const emailStatus = await deliverEmail({
+    id: 'external',
+    username: '',
+    email: normalizedEmail,
+    lang: deps.lang ?? 'he',
+    noMail: false
+  });
+  return {
+    result: emailStatus === 'sent' ? 'notRegistered' : emailStatus === 'skipped' ? 'emailSkipped' : 'emailFailed',
+    created: 0,
+    joinUrl,
+    emailStatus
+  };
 }
 
 export async function dismissSuggestion(

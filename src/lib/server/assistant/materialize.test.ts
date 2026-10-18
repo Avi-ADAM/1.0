@@ -83,11 +83,18 @@ describe('runMaterialization — a new rikma', () => {
 
     // A new rikma has one member: nobody asked Strapi, and the partner mission is open.
     expect(deps.memberCount).not.toHaveBeenCalled();
-    expect(deps.invitePartner).toHaveBeenCalledWith('dana@x.co', { openMissions: [{ id: '101', name: 'רשתות' }], openMashaabims: [] }, 'השקד');
+    expect(deps.invitePartner).toHaveBeenCalledWith(
+      'dana@x.co',
+      { openMissions: [{ id: '101', name: 'רשתות' }], openMashaabims: [] },
+      'השקד',
+      '77'
+    );
 
     expect(out.projectId).toBe('77');
     expect(out.failed).toEqual([]);
-    expect(out.invites).toEqual([{ key: 'i5', result: 'invited' }]);
+    expect(out.invites).toEqual([
+      { key: 'i5', result: 'invited', joinUrl: 'https://www.1lev1.com/project/77/join', created: 1 }
+    ]);
     expect(out.state.items.every((it) => it.status === 'applied')).toBe(true);
     expect(out.state.items.find((it) => it.key === 'i2')!.createdRef).toEqual({ type: 'mesimabetahalich', id: '102' });
   });
@@ -122,7 +129,9 @@ describe('runMaterialization — an existing rikma', () => {
     const out = await runMaterialization(blueprint, ['i3', 'i5'], { projectId: '12', userId: '5' }, deps);
     expect(deps.memberCount).toHaveBeenCalledTimes(1);
     expect(deps.invitePartner).not.toHaveBeenCalled();
-    expect(out.invites).toEqual([{ key: 'i5', result: 'pendingVote' }]);
+    expect(out.invites).toEqual([
+      { key: 'i5', result: 'pendingVote', joinUrl: 'https://www.1lev1.com/project/12/join' }
+    ]);
   });
 
   it('one failing row does not stop the others', async () => {
