@@ -156,59 +156,93 @@ export async function fetchRikmaProfile(
 const SHOP_SCHEMA_TTL_MS = 10 * 60 * 1000;
 const SHOP_SCHEMA_RETRY_MS = 60 * 1000;
 
-let shopSchemaVerdict: { live: boolean; until: number } | null = null;
-
-/** Test seam — the verdict is process state tests must not inherit. */
-export function resetShopSchemaVerdict(): void {
-  shopSchemaVerdict = null;
-}
-
 function errorText(e: any): string {
   return String(e?.getMessages ? e.getMessages().join(' ') : (e?.message ?? e));
 }
 
 /**
- * Is the shop schema (variants / gallery / denormalized aggregates) readable?
+ * One cached "is this part of the schema readable?" question.
  *
  * A field that does not exist and a Strapi that is briefly unhappy both land
  * here as "not live" — the difference is only how long we believe it. A
  * validation error means the schema is absent (check again in ten minutes); a
  * network error means we do not know (check again in one minute).
  */
-export async function shopSchemaLive(run: ApiRun): Promise<boolean> {
-  const now = Date.now();
-  if (shopSchemaVerdict && shopSchemaVerdict.until > now)
-    return shopSchemaVerdict.live;
+function schemaProbe(opts: {
+  qid: string;
+  /** Given the probe's answer — is the schema there? */
+  isLive: (res: any) => boolean;
+  /** What callers do meanwhile, for the warning on an unexpected failure. */
+  meanwhile: string;
+}) {
+  let verdict: { live: boolean; until: number } | null = null;
+  return {
+    reset() {
+      verdict = null;
+    },
+    async live(run: ApiRun): Promise<boolean> {
+      const now = Date.now();
+      if (verdict && verdict.until > now) return verdict.live;
 
-  let live = false;
-  let retryMs = SHOP_SCHEMA_RETRY_MS;
-  try {
-    const res = await run('rikmaApiShopSchema', {});
+      let live = false;
+      let retryMs = SHOP_SCHEMA_RETRY_MS;
+      try {
+        live = opts.isLive(await run(opts.qid, {}));
+        retryMs = live ? SHOP_SCHEMA_TTL_MS : SHOP_SCHEMA_RETRY_MS;
+      } catch (e) {
+        const message = errorText(e);
+        // "The columns are not there yet" is the expected state during the
+        // rollout described in §6.8 — it is not a warning, it is a schedule.
+        // Anything else (a network failure, an unreadable deployment) *is*
+        // worth saying out loud.
+        const schemaMissing = /GRAPHQL_VALIDATION_FAILED|Cannot query field/i.test(message);
+        const qidMissing = /QUERY_NOT_FOUND|not found in QIDS/i.test(message);
+        retryMs = schemaMissing ? SHOP_SCHEMA_TTL_MS : SHOP_SCHEMA_RETRY_MS;
+        if (!schemaMissing && !qidMissing) {
+          console.warn(`[apiPublic] ${opts.qid} could not be checked — ${opts.meanwhile}:`, message);
+        }
+      }
+      verdict = { live, until: now + retryMs };
+      return live;
+    }
+  };
+}
+
+const shopSchema = schemaProbe({
+  qid: 'rikmaApiShopSchema',
+  isLive: (res) => {
     const attrs = res?.data?.matanots?.data?.[0]?.attributes;
     // The field being *present* is the test — not its value: `false` on every
     // row is a perfectly live schema.
-    live =
-      !!attrs && Object.prototype.hasOwnProperty.call(attrs, 'hasVariants');
-    retryMs = live ? SHOP_SCHEMA_TTL_MS : SHOP_SCHEMA_RETRY_MS;
-  } catch (e) {
-    const message = errorText(e);
-    // "The columns are not there yet" is the expected state during the rollout
-    // described in §6.8 — it is not a warning, it is a schedule. Anything else
-    // (a network failure, an unreadable deployment) *is* worth saying out loud.
-    const schemaMissing = /GRAPHQL_VALIDATION_FAILED|Cannot query field/i.test(
-      message
-    );
-    const qidMissing = /QUERY_NOT_FOUND|not found in QIDS/i.test(message);
-    retryMs = schemaMissing ? SHOP_SCHEMA_TTL_MS : SHOP_SCHEMA_RETRY_MS;
-    if (!schemaMissing && !qidMissing) {
-      console.warn(
-        '[apiPublic] the shop schema could not be checked — products answer without variants:',
-        message
-      );
-    }
-  }
-  shopSchemaVerdict = { live, until: now + retryMs };
-  return live;
+    return !!attrs && Object.prototype.hasOwnProperty.call(attrs, 'hasVariants');
+  },
+  meanwhile: 'products answer without variants'
+});
+
+// The order fields added after the first shop deployment (`displayNumber`,
+// UX_COPY_SHOP_SALES §10). An empty `orders` table proves nothing by its rows,
+// so here the probe *answering* is the test: a field that is not there fails
+// validation whatever the rows are.
+const ordersSchema = schemaProbe({
+  qid: 'rikmaApiOrdersSchema',
+  isLive: (res) => Array.isArray(res?.data?.orders?.data),
+  meanwhile: 'orders answer 503 SHOP_NOT_READY'
+});
+
+/** Test seam — every verdict is process state tests must not inherit. */
+export function resetShopSchemaVerdict(): void {
+  shopSchema.reset();
+  ordersSchema.reset();
+}
+
+/** Is the shop schema (variants / gallery / denormalized aggregates) readable? */
+export function shopSchemaLive(run: ApiRun): Promise<boolean> {
+  return shopSchema.live(run);
+}
+
+/** Can an order be written and read with every field the orders API uses? */
+export function ordersSchemaLive(run: ApiRun): Promise<boolean> {
+  return ordersSchema.live(run);
 }
 
 /**

@@ -181,6 +181,7 @@ import { addAskmChatEntryConfig } from './addAskmChatEntry.js';
 import { addAskChatEntryConfig } from './addAskChatEntry.js';
 import { createSaleConfig } from './createSale.js';
 import { createPaidOrderConfig } from './createPaidOrder.js';
+import { cancelOrderConfig, markOrderShippedConfig, markOrderFulfilledConfig } from './orderLifecycle.js';
 import { reportRecurringSaleCycleConfig } from './reportRecurringSaleCycle.js';
 import { customerReportRecurringSaleCycleConfig } from './customerReportRecurringSaleCycle.js';
 import { counterSaleClaimConfig } from './counterSaleClaim.js';
@@ -512,6 +513,9 @@ export function registerAllActions(): void {
   // Sale reporting (SaleComponent — shared by gift/[id] and sales-center)
   registerAction(createSaleConfig);
   registerAction(createPaidOrderConfig);
+  registerAction(cancelOrderConfig);
+  registerAction(markOrderShippedConfig);
+  registerAction(markOrderFulfilledConfig);
   // Recurring sales (PLAN_RECURRING_SALES): monthly cycle reporting
   registerAction(reportRecurringSaleCycleConfig);
   registerAction(customerReportRecurringSaleCycleConfig);

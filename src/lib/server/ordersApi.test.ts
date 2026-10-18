@@ -17,14 +17,23 @@ import { describe, it, expect } from 'vitest';
 import {
   canResume,
   lineSaleExternalId,
+  mayReceive,
   orderIsComplete,
   orderNoteOf,
+  orderNumberOf,
   orderRefOf,
+  orderSalesOf,
+  orderWebhookBody,
   planOrder,
+  refundDecisionOf,
+  refundNoteOf,
   sameOrder,
+  stockWebhookBody,
   toOrderView,
+  transitionOf,
   validateOrderPayload,
-  type OrderPayload
+  type OrderPayload,
+  type OrderSaleRow
 } from './ordersApi.js';
 
 const BODY = {
@@ -118,6 +127,31 @@ describe('validateOrderPayload', () => {
       unitPrice: 1
     }));
     expect(validateOrderPayload({ externalId: 'x', lines }).ok).toBe(false);
+  });
+});
+
+describe('displayNumber — the number people say on the phone', () => {
+  it('is optional, trimmed, and kept as text', () => {
+    expect(payload().displayNumber).toBeNull();
+    const v = validateOrderPayload({ ...BODY, displayNumber: ' #1042 ' });
+    expect(v.ok && v.value.displayNumber).toBe('#1042');
+    const n = validateOrderPayload({ ...BODY, displayNumber: 1042 });
+    expect(n.ok && n.value.displayNumber).toBe('1042');
+  });
+
+  it('refuses an object, a long one, and markup or line breaks', () => {
+    for (const bad of [{ n: 1 }, 'x'.repeat(41), '<b>1</b>', '10\n42']) {
+      const v = validateOrderPayload({ ...BODY, displayNumber: bad });
+      expect(v.ok).toBe(false);
+      if (v.ok === false) expect(v.problems.map((p) => p.field)).toEqual(['displayNumber']);
+    }
+  });
+
+  it("is the storefront's number, else our row id — never the ref", () => {
+    expect(orderNumberOf('1042', 312)).toBe('1042');
+    expect(orderNumberOf('  ', 312)).toBe('312');
+    expect(orderNumberOf(null, '312')).toBe('312');
+    expect(orderNumberOf(undefined, null)).toBe('');
   });
 });
 
@@ -238,6 +272,7 @@ describe('planOrder — what is recorded, never refused', () => {
     if (plan.ok === false) return;
     expect(plan.oversold).toBe(true);
     expect(plan.notes.join()).toContain('מכירת-יתר');
+    expect(plan.lines[0].shortBy).toBe(2); // 5 ordered, 3 left
   });
 
   it('two lines on one variant share its stock', () => {
@@ -252,6 +287,8 @@ describe('planOrder — what is recorded, never refused', () => {
     });
     if (plan.ok === false) throw new Error(plan.message);
     expect(plan.lines.map((l) => l.oversold)).toEqual([false, true]);
+    // The second line found 1 left, not −1: it is short by what it lacked.
+    expect(plan.lines.map((l) => l.shortBy)).toEqual([0, 1]);
   });
 
   it('unlimited stock (-1) is never oversold', () => {
@@ -421,6 +458,13 @@ describe('toOrderView', () => {
     expect(view.status).toBe('paid');
   });
 
+  it("carries both numbers: our id, and the storefront's own when it sent one", () => {
+    const plain = toOrderView({ id: 312, attributes: ORDER_NODE.attributes })!;
+    expect([plain.orderId, plain.displayNumber]).toEqual(['312', null]);
+    const named = toOrderView({ id: 312, attributes: { ...ORDER_NODE.attributes, displayNumber: '1042' } })!;
+    expect([named.orderId, named.displayNumber]).toEqual(['312', '1042']);
+  });
+
   it('never carries the buyer back out', () => {
     const text = JSON.stringify(toOrderView(ORDER_NODE));
     for (const secret of ['רותם-קונה', '050-0000000', 'dana@example.com', 'נתניה']) {
@@ -435,5 +479,130 @@ describe('toOrderView', () => {
     };
     expect(orderIsComplete(missing, 2)).toBe(false);
     expect(orderIsComplete(ORDER_NODE, 3)).toBe(false);
+  });
+});
+
+// ─── after the order ────────────────────────────────────────────────────────
+
+describe('transitionOf', () => {
+  it('moves forward: paid → shipped → fulfilled, and paid → fulfilled for a pickup', () => {
+    expect(transitionOf('paid', 'shipped')).toEqual({ kind: 'move', from: 'paid', to: 'shipped' });
+    expect(transitionOf('shipped', 'fulfilled')).toMatchObject({ kind: 'move' });
+    expect(transitionOf('paid', 'fulfilled')).toMatchObject({ kind: 'move' });
+  });
+
+  it('asking for the status it has is not an error', () => {
+    expect(transitionOf('shipped', 'shipped')).toEqual({ kind: 'same', status: 'shipped' });
+    expect(transitionOf('cancelled', 'cancelled')).toEqual({ kind: 'same', status: 'cancelled' });
+  });
+
+  it('never goes backwards, and a cancelled order stays cancelled', () => {
+    expect(transitionOf('fulfilled', 'shipped')).toMatchObject({ kind: 'refused', code: 'INVALID_TRANSITION' });
+    expect(transitionOf('cancelled', 'shipped')).toMatchObject({ kind: 'refused', code: 'ORDER_CANCELLED' });
+  });
+
+  it('a refund is possible at every live stage', () => {
+    for (const from of ['paid', 'shipped', 'fulfilled']) {
+      expect(transitionOf(from, 'cancelled').kind).toBe('move');
+    }
+  });
+
+  it('a purchase request (S3b status) is not moved by the paid-order flow', () => {
+    expect(transitionOf('sent', 'shipped')).toMatchObject({ kind: 'refused' });
+  });
+});
+
+const sale = (over: Partial<OrderSaleRow> = {}): OrderSaleRow => ({
+  id: '5521',
+  externalId: 'pi_3Q8x:1',
+  in: 620,
+  unit: 2,
+  note: 'הזמנה 57:pi_3Q8x',
+  holderStatus: 'self',
+  holderId: '9',
+  splited: false,
+  inSplit: false,
+  ...over
+});
+
+describe('refundDecisionOf', () => {
+  it('the holder resets their own self-report while nothing was split', () => {
+    expect(refundDecisionOf(sale(), '9')).toBe('reset');
+  });
+
+  it('a sale already in a split — proposed or approved — is left for the rikma', () => {
+    expect(refundDecisionOf(sale({ inSplit: true }), '9')).toBe('afterSplit');
+    expect(refundDecisionOf(sale({ splited: true }), '9')).toBe('afterSplit');
+  });
+
+  it("someone else's money is not the canceller's to correct", () => {
+    expect(refundDecisionOf(sale({ holderId: '12' }), '9')).toBe('notMine');
+    expect(refundDecisionOf(sale({ holderStatus: 'open' }), '9')).toBe('notMine');
+    expect(refundDecisionOf(sale({ holderStatus: 'confirmed' }), '9')).toBe('notMine');
+  });
+
+  it('a reset sale is already done — a retried cancel changes nothing', () => {
+    expect(refundDecisionOf(sale({ in: 0, unit: 0 }), '9')).toBe('already');
+  });
+
+  it('keeps what the sale was in its note — never a delete', () => {
+    const note = refundNoteOf(sale(), '57:pi_3Q8x', 'הקונה ביטל');
+    expect(note).toContain('הזמנה 57:pi_3Q8x');
+    expect(note).toContain('היה 620 עבור 2');
+    expect(note).toContain('הקונה ביטל');
+  });
+});
+
+describe('orderSalesOf', () => {
+  it('reads holder, split state and amounts from the order row', () => {
+    const rows = orderSalesOf({
+      attributes: {
+        sales: {
+          data: [
+            {
+              id: 7,
+              attributes: {
+                externalId: 'x:1',
+                in: 10,
+                unit: 1,
+                holderStatus: 'self',
+                splited: false,
+                users_permissions_user: { data: { id: 9 } },
+                tosplits: { data: [{ id: 3 }] }
+              }
+            }
+          ]
+        }
+      }
+    });
+    expect(rows[0]).toMatchObject({ id: '7', holderId: '9', inSplit: true, splited: false, in: 10 });
+  });
+});
+
+describe('order webhooks', () => {
+  it('order events reach only keys that may read orders', () => {
+    expect(mayReceive(['tasks:create', 'tasks:read'], 'order.paid')).toBe(false);
+    expect(mayReceive([], 'order.paid')).toBe(false);
+    expect(mayReceive(['orders:read'], 'order.statusChanged')).toBe(true);
+    expect(mayReceive(['orders:create'], 'order.oversold')).toBe(true);
+  });
+
+  it('stock reaches a catalog key too — it is public on the product', () => {
+    expect(mayReceive(['products:read'], 'variant.stockChanged')).toBe(true);
+    expect(mayReceive(['products:read'], 'order.paid')).toBe(false);
+    expect(mayReceive(['tasks:create'], 'variant.stockChanged')).toBe(false);
+  });
+
+  it('the order body is the public view — the buyer never travels', () => {
+    const body = orderWebhookBody('order.paid', '57', toOrderView(ORDER_NODE)!, '2026-10-18T00:00:00Z');
+    expect(JSON.parse(body)).toMatchObject({ event: 'order.paid', projectId: '57', data: { orderRef: '57:pi_3Q8x' } });
+    for (const secret of ['רותם-קונה', '050-0000000', 'dana@example.com', 'נתניה']) {
+      expect(body).not.toContain(secret);
+    }
+  });
+
+  it('a stock event says what changed', () => {
+    const body = JSON.parse(stockWebhookBody('57', { productId: '1842', variantId: '77', quant: 1 }));
+    expect(body).toMatchObject({ event: 'variant.stockChanged', data: { variantId: '77', quant: 1, changed: ['quant'] } });
   });
 });

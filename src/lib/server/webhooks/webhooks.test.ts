@@ -82,7 +82,7 @@ describe('eventForAction', () => {
 });
 
 describe('wants', () => {
-  const target = (events: any[]) => ({ keyId: '7', name: null, url: 'https://x', events });
+  const target = (events: any[]) => ({ keyId: '7', name: null, url: 'https://x', events, scopes: [] });
 
   it('an empty subscription means every event', () => {
     expect(wants(target([]), 'task.done')).toBe(true);

@@ -33,6 +33,8 @@ export const ORDER_SOURCE = 'api';
 export const MAX_ORDER_LINES = 50;
 
 const MAX_EXTERNAL_ID = 120;
+/** The storefront's own order number, as its buyer sees it (). */
+const MAX_DISPLAY_NUMBER = 40;
 const MAX_NOTE = 2000;
 const MAX_SHORT = 200;
 const MAX_ADDRESS_FIELDS = 12;
@@ -50,6 +52,8 @@ export interface OrderLineInput {
 
 export interface OrderPayload {
   externalId: string;
+  /** The number the buyer got from the storefront — what people say on the phone. */
+  displayNumber: string | null;
   paymentRef: string | null;
   paymentMethod: string | null;
   /** The total the provider charged, when the caller sends it. */
@@ -136,6 +140,23 @@ export function validateOrderPayload(body: any): OrderValidation {
       field: 'externalId',
       message: `must be at most ${MAX_EXTERNAL_ID} characters`
     });
+  }
+
+  let displayNumber: string | null = null;
+  if (body.displayNumber != null && body.displayNumber !== '') {
+    if (typeof body.displayNumber !== 'string' && typeof body.displayNumber !== 'number') {
+      problems.push({ field: 'displayNumber', message: 'must be a string' });
+    } else {
+      displayNumber = text(body.displayNumber, MAX_DISPLAY_NUMBER + 1);
+      if (displayNumber && displayNumber.length > MAX_DISPLAY_NUMBER) {
+        problems.push({
+          field: 'displayNumber',
+          message: `must be at most ${MAX_DISPLAY_NUMBER} characters`
+        });
+      } else if (displayNumber && /[<>\n\r]/.test(displayNumber)) {
+        problems.push({ field: 'displayNumber', message: 'must be a single line of plain text' });
+      }
+    }
   }
 
   let currency: string | null = null;
@@ -253,6 +274,7 @@ export function validateOrderPayload(body: any): OrderValidation {
     ok: true,
     value: {
       externalId: externalId!,
+      displayNumber,
       paymentRef: text(body.paymentRef, MAX_SHORT),
       paymentMethod: text(body.paymentMethod, 40),
       amount,
@@ -284,6 +306,20 @@ function describeProblem(p: FieldProblem): string {
  */
 export function orderRefOf(projectId: string, externalId: string): string {
   return `${projectId}:${externalId}`;
+}
+
+/**
+ * The number people say out loud: the storefront's own (`1042`, what the buyer
+ * got in the confirmation email), else our row id. Never the `ref` — that is a
+ * key, not something anyone reads to a buyer on the phone.
+ */
+export function orderNumberOf(
+  displayNumber: string | null | undefined,
+  orderId: string | number | null | undefined
+): string {
+  const own = typeof displayNumber === 'string' ? displayNumber.trim() : '';
+  if (own) return own;
+  return orderId == null ? '' : String(orderId);
 }
 
 /** The sale for line `index` (0-based) — `pi_3Q8x:1`, `pi_3Q8x:2`… */
@@ -408,6 +444,8 @@ export interface PlannedLine {
   note: string | null;
   /** This line's quantity was more than was left (after earlier lines). */
   oversold: boolean;
+  /** How many units of this line the stock did not cover; 0 when it did. */
+  shortBy: number;
 }
 
 export interface OrderPlan {
@@ -510,8 +548,10 @@ export function planOrder(args: {
     const before = remaining.get(stockKey)!;
     const preorder = (num(a.leadTimeHours) ?? 0) > 0;
     let oversold = false;
+    let shortBy = 0;
     if (before !== UNLIMITED) {
       oversold = !preorder && input.quantity > before;
+      if (oversold) shortBy = input.quantity - Math.max(before, 0);
       remaining.set(stockKey, before - input.quantity);
     }
     if (oversold) notes.push(`שורה ${n}: מכירת-יתר — נותרו ${Math.max(before, 0)}, הוזמנו ${input.quantity}`);
@@ -541,7 +581,8 @@ export function planOrder(args: {
       skuSnapshot: v ? str(v.sku) : null,
       imageUrlSnapshot: image?.url ?? null,
       note: input.note,
-      oversold
+      oversold,
+      shortBy
     });
   }
 
@@ -596,6 +637,10 @@ export interface OrderLineView {
 
 export interface OrderView {
   orderRef: string;
+  /** Our row id — the order number when the storefront sent none. */
+  orderId: string | null;
+  /** The storefront's own number, as sent in `POST /orders`; null if none. */
+  displayNumber: string | null;
   externalId: string | null;
   status: string;
   oversold: boolean;
@@ -643,6 +688,8 @@ export function toOrderView(node: { id?: string | number; attributes?: Record<st
     });
   return {
     orderRef: a.ref,
+    orderId: node.id != null ? String(node.id) : null,
+    displayNumber: str(a.displayNumber),
     externalId,
     status: str(a.status) ?? 'paid',
     oversold: a.oversold === true,
@@ -678,4 +725,172 @@ export function orderIsComplete(
   const view = toOrderView(node as any);
   if (!view || view.lines.length < lineCount) return false;
   return view.lines.every((l) => !!l.saleId);
+}
+
+// ─── after the order: shipped, fulfilled, cancelled (§3.4) ──────────────────
+
+export type OrderTransition =
+  | { kind: 'move'; from: OrderStatus; to: OrderStatus }
+  | { kind: 'same'; status: OrderStatus }
+  | { kind: 'refused'; code: 'ORDER_CANCELLED' | 'INVALID_TRANSITION'; message: string };
+
+const FORWARD: Record<string, OrderStatus[]> = {
+  paid: ['shipped', 'fulfilled', 'cancelled'],
+  // A parcel that was sent can still come back as a refund.
+  shipped: ['fulfilled', 'cancelled'],
+  // A refund after delivery is real life (a return, a fault) — and it is the
+  // holder's own money, so it is not refused; the sales say what happened.
+  fulfilled: ['cancelled'],
+  cancelled: []
+};
+
+/**
+ * May an order move from `current` to `target`?
+ *
+ * Asking for the status it already has is `same`, not an error — a storefront
+ * that retries "cancel", or two members ticking "shipped" at once, both get
+ * the order as it is. Going backwards (fulfilled → shipped) is refused: the
+ * timestamps would lie. A cancelled order stays cancelled; a second sale is a
+ * second order.
+ */
+export function transitionOf(current: string | null | undefined, target: OrderStatus): OrderTransition {
+  const from = (current ?? 'paid') as OrderStatus;
+  if (from === target) return { kind: 'same', status: from };
+  if (from === 'cancelled') {
+    return {
+      kind: 'refused',
+      code: 'ORDER_CANCELLED',
+      message: 'This order was cancelled — it cannot change any more'
+    };
+  }
+  if (!(FORWARD[from] ?? []).includes(target)) {
+    return {
+      kind: 'refused',
+      code: 'INVALID_TRANSITION',
+      message: `An order that is ${from} cannot become ${target}`
+    };
+  }
+  return { kind: 'move', from, to: target };
+}
+
+/** The sale fields a refund decision reads. */
+export interface OrderSaleRow {
+  id: string;
+  externalId: string | null;
+  in: number | null;
+  unit: number | null;
+  note: string | null;
+  holderStatus: string | null;
+  holderId: string | null;
+  splited: boolean;
+  inSplit: boolean;
+}
+
+export function orderSalesOf(node: { attributes?: Record<string, any> | null }): OrderSaleRow[] {
+  return (node?.attributes?.sales?.data ?? []).map((s: any) => {
+    const a = s?.attributes ?? {};
+    return {
+      id: String(s.id),
+      externalId: str(a.externalId),
+      in: num(a.in),
+      unit: num(a.unit),
+      note: str(a.note),
+      holderStatus: str(a.holderStatus),
+      holderId: a.users_permissions_user?.data?.id != null ? String(a.users_permissions_user.data.id) : null,
+      splited: a.splited === true,
+      inSplit: (a.tosplits?.data ?? []).length > 0
+    };
+  });
+}
+
+/**
+ * What a refund does to one of the order's sales.
+ *
+ * - `reset` — the holder's own self-report, not yet in any split: the holder
+ *   corrects it to 0 themself. Reporting "the money is with me" needed nobody's
+ *   consent (`holderStatus:'self'`), so reporting "it went back to the buyer"
+ *   needs none either. The row stays — amount and units 0, the original in the
+ *   note — because history is never deleted.
+ * - `afterSplit` — the sale is already part of a split (proposed or approved).
+ *   Its amount is what the members are voting on, or already divided, so it is
+ *   **not** changed silently: the rikma is told, and settles it the way it
+ *   settles anything (§5.4).
+ * - `notMine` — someone else's money (`open`/`confirmed`, or another holder).
+ *   Correcting it is a claim about their financial state, which only their
+ *   consent can make; the rikma is told instead.
+ * - `already` — already reset (0/0): a retried cancel does nothing twice.
+ */
+export type RefundDecision = 'reset' | 'afterSplit' | 'notMine' | 'already';
+
+export function refundDecisionOf(sale: OrderSaleRow, actorId: string): RefundDecision {
+  if ((sale.in ?? 0) === 0 && (sale.unit ?? 0) === 0) return 'already';
+  if (sale.splited || sale.inSplit) return 'afterSplit';
+  if (sale.holderStatus !== 'self' || sale.holderId !== String(actorId)) return 'notMine';
+  return 'reset';
+}
+
+/** The note a reset sale carries — the amount it had, and why it is 0 now. */
+export function refundNoteOf(sale: OrderSaleRow, orderNumber: string, reason: string | null): string {
+  const was = `היה ${sale.in ?? 0} עבור ${sale.unit ?? 0}`;
+  const why = reason ? ` — ${reason}` : '';
+  const prior = sale.note ? `${sale.note}\n` : '';
+  return `${prior}בוטל והוחזר לקונה (הזמנה ${orderNumber}; ${was})${why}`.slice(0, 2000);
+}
+
+// ─── webhooks (§5.6) ────────────────────────────────────────────────────────
+
+export const ORDER_WEBHOOK_EVENTS = [
+  'order.paid',
+  'order.statusChanged',
+  'order.oversold',
+  'variant.stockChanged'
+] as const;
+export type OrderWebhookEvent = (typeof ORDER_WEBHOOK_EVENTS)[number];
+
+function flatScopes(scopes: unknown): string[] {
+  return Array.isArray(scopes) ? scopes.map((s) => String(s)) : [];
+}
+
+/**
+ * Who may hear about an order. An empty `webhook_events` list means "every
+ * event" — and keys like that already exist for tasks. Order events go only to
+ * a key that may read orders anyway (`orders:*`), so a task desk's receiver
+ * neither breaks on a new payload nor learns the rikma's sales.
+ * `variant.stockChanged` also goes to a catalog key (`products:read`): stock is
+ * public on the product, and that is the key a storefront's cache runs on.
+ */
+export function mayReceive(scopes: unknown, event: OrderWebhookEvent): boolean {
+  const s = flatScopes(scopes);
+  const orders = s.includes(ORDERS_READ_SCOPE) || s.includes(ORDERS_CREATE_SCOPE);
+  if (event === 'variant.stockChanged') return orders || s.includes('products:read');
+  return orders;
+}
+
+export interface StockChange {
+  productId: string;
+  variantId: string | null;
+  quant: number;
+}
+
+/** An order event's body — the public order view, never the buyer. */
+export function orderWebhookBody(
+  event: OrderWebhookEvent,
+  projectId: string,
+  view: OrderView,
+  at = new Date().toISOString()
+): string {
+  return JSON.stringify({ event, at, projectId, data: view });
+}
+
+export function stockWebhookBody(
+  projectId: string,
+  change: StockChange,
+  at = new Date().toISOString()
+): string {
+  return JSON.stringify({
+    event: 'variant.stockChanged',
+    at,
+    projectId,
+    data: { ...change, changed: ['quant'] }
+  });
 }

@@ -3,9 +3,15 @@
 # DRAFT / הצעה בלבד — נכון ל-2026-10-18.
 # **ממומש:** /me, /r/{rikma}, /r/{rikma}/products(+{productId}), /categories,
 #   /r/{rikma}/options, /r/{rikma}/{sales,tasks}, ו-legacy /sales,/tasks.
-#   POST /r/{rikma}/orders ו-GET /orders/{ref} (S3, 2026-10-18).
-# **טרם ממומש:** /orders/{ref}/cancel (S3), /changes (Phase 2),
-#   /discover/products (Phase 3).
+#   POST /r/{rikma}/orders, GET /orders/{ref}, POST /orders/{ref}/cancel
+#   (S3, 2026-10-18), ו-webhooks order.* / variant.stockChanged.
+# **טרם ממומש:** /changes (Phase 2), /discover/products (Phase 3).
+# **Webhooks של הזמנות** (על `api-key.callback_url`, חתומים כמו של מטלות):
+#   order.paid · order.oversold · order.statusChanged · variant.stockChanged.
+#   הגוף: `{ event, at, projectId, data }`, ו-`data` הוא `Order` (בלי הקונה) או
+#   `{ productId, variantId, quant, changed }`. נשלחים רק למפתח עם `orders:*`
+#   (`variant.stockChanged` גם ל-`products:read`) — מנוי "לכל האירועים" של
+#   מפתח מטלות לא מתחיל לקבל מכירות.
 # **/orders הוא הזמנה ששולמה** (PLAN_SHOP_CUSTOMER_EXPERIENCE החלטות 5–6):
 #   הקונה משלם באתר, והשרת של האתר מדווח אחרי אישור ספק התשלום. בקשת רכש
 #   למוצר `quote` (Sheirutpend + צ'אט) היא S3b ואינה חלק מהחוזה הזה.
@@ -446,10 +452,15 @@ paths:
       tags: [shop]
       summary: ביטול / החזר (scope orders:create)
       description: |-
-        ההזמנה עוברת ל-`cancelled`, המלאי חוזר, וכל מכירה מקבלת **הצעה נגדית
-        לסכום 0** ("לא קיבלתי כלום" — לא מחיקה; PLAN_sale_holder_consent).
-        מכירה שכבר נכנסה לחלוקה לא נפתחת מחדש בשקט: הרקמה מקבלת התראה על החזר
-        אחרי חלוקה. אידמפוטנטי — ביטול שני מחזיר את אותה הזמנה.
+        האתר החזיר לקונה את הכסף. בעל המפתח הוא מחזיק ההזמנה, ולכן ההחזר שלו
+        לדווח (`cancelOrder`). מה קורה לכל מכירה של ההזמנה:
+        - **עוד לא בשום חלוקה** — המחזיק מתקן את הדיווח העצמי שלו ל-0 (סכום
+          ויחידות), והסכום המקורי נשמר בהערת המכירה. לא מחיקה.
+        - **כבר בחלוקה** (מוצעת או שאושרה) — לא משתנה בשקט. הרקמה מקבלת התראה
+          ומיישבת את ההחזר כמו כל החלטה אחרת (`refunds.leftForRikma`).
+        המלאי חוזר כברירת מחדל רק להזמנה שלא נשלחה (`restock` דורס).
+        בטוח לשלוח שוב: ביטול חוזר משלים את מה שחסר, מחזיר
+        `alreadyCancelled: true`, ולעולם לא מחזיר מלאי פעמיים.
       security:
         - apiKey: []
       parameters:
@@ -462,15 +473,39 @@ paths:
             schema:
               type: object
               properties:
-                reason: { type: string, description: לתצוגה במסך ההזמנות }
+                reason: { type: string, description: לתצוגה במסך ההזמנות ובהערות המכירות }
+                restock:
+                  type: boolean
+                  description: להחזיר את הפריטים למלאי. ברירת מחדל — רק כשההזמנה עוד לא נשלחה
       responses:
         '200':
           description: ההזמנה בוטלה (או כבר הייתה מבוטלת)
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/Order' }
-        '403': { $ref: '#/components/responses/Forbidden' }
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                  orderRef: { type: string }
+                  status: { type: string, enum: [cancelled] }
+                  alreadyCancelled: { type: boolean, description: 'ביטול חוזר — שום דבר לא זז פעמיים' }
+                  restocked: { type: boolean }
+                  refunds:
+                    type: object
+                    properties:
+                      reset: { type: integer, description: מכירות שאופסו בידי המחזיק }
+                      leftForRikma: { type: integer, description: 'מכירות שכבר בחלוקה — הרקמה מיישבת' }
+        '403':
+          description: '`NOT_HOLDER` — רק מחזיק ההזמנה מחזיר את כספה; או כל סירוב של מפתח'
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
         '404': { description: אין הזמנה כזו ברקמה הזו }
+        '409':
+          description: '`ORDER_CANCELLED` — לא אמור לקרות בביטול (ביטול חוזר הוא 200), שמור לשלמות'
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
 
   /api/v1/r/{rikma}/sales:
     post:
@@ -1202,6 +1237,15 @@ components:
         externalId:
           type: string
           description: מזהה העסקה אצל ספק התשלום — מפתח האידמפוטנטיות (יחד עם הרקמה)
+        displayNumber:
+          type: string
+          maxLength: 40
+          example: '1042'
+          description: |-
+            מספר ההזמנה של האתר, כפי שהקונה קיבל אותו במייל האישור. כך נקראת
+            ההזמנה במסך ההזמנות ובהתראות לרקמה, וכשהקונה מתקשר המוכר מוצא
+            אותה. שורה אחת של טקסט, בלי `<`/`>`. בלי השדה — ההזמנה נקראת לפי
+            `orderId`.
         paymentRef: { type: string, description: חופשי, לתצוגה במסך ההזמנות }
         paymentMethod: { type: string, example: card }
         amount:
@@ -1255,6 +1299,8 @@ components:
         success: { type: boolean }
         duplicated: { type: boolean }
         orderRef: { type: string, description: '`57:pi_3Q8x` — המזהה למעקב ולביטול' }
+        orderId: { type: string, description: 'מספר השורה אצלנו — מספר ההזמנה כשהאתר לא שלח `displayNumber`' }
+        displayNumber: { type: [string, 'null'], description: 'מה שנשלח ב-`displayNumber`; null אם לא נשלח' }
         status: { $ref: '#/components/schemas/OrderStatus' }
         oversold:
           type: boolean
@@ -1269,6 +1315,10 @@ components:
       description: 'ההזמנה כפי שהאתר רואה אותה — בלי פרטי הקונה'
       properties:
         orderRef: { type: string }
+        orderId: { type: string }
+        displayNumber:
+          type: [string, 'null']
+          description: 'מספר ההזמנה להצגה לקונה הוא `displayNumber ?? orderId`'
         externalId: { type: string }
         status: { $ref: '#/components/schemas/OrderStatus' }
         oversold: { type: boolean }
@@ -1308,6 +1358,9 @@ components:
                 - NOT_CHECKOUTABLE
                 - EXTERNAL_ID_CONFLICT
                 - SHOP_NOT_READY
+                - NOT_HOLDER
+                - ORDER_CANCELLED
+                - INVALID_TRANSITION
                 - NOT_FOUND
                 - RATE_LIMITED
                 - UPSTREAM_ERROR

@@ -11,6 +11,11 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { createPaidOrderConfig } from './createPaidOrder.js';
 import { createSaleConfig } from './createSale.js';
+import {
+  cancelOrderConfig,
+  markOrderFulfilledConfig,
+  markOrderShippedConfig
+} from './orderLifecycle.js';
 import { validateOrderPayload, type OrderPayload } from '$lib/server/ordersApi.js';
 
 type Row = Record<string, any>;
@@ -40,6 +45,7 @@ function orderNode(o: Row) {
     id: o.id,
     attributes: {
       ...o.data,
+      holder: { data: o.data.holder ? { id: o.data.holder } : null },
       lines: idsOf(
         db.lines
           .filter((l) => l.order === o.id)
@@ -55,7 +61,19 @@ function orderNode(o: Row) {
       sales: idsOf(
         db.sales
           .filter((s) => s.order === o.id)
-          .map((s) => ({ id: s.id, attributes: { externalId: s.externalId } }))
+          .map((s) => ({
+            id: s.id,
+            attributes: {
+              externalId: s.externalId,
+              in: s.in,
+              unit: s.unit,
+              note: s.note ?? null,
+              holderStatus: s.holderStatus,
+              splited: s.splited === true,
+              users_permissions_user: { data: { id: s.holder } },
+              tosplits: idsOf((s.tosplits ?? []).map((id: string) => ({ id })))
+            }
+          }))
       )
     }
   };
@@ -120,7 +138,7 @@ const strapi = {
       }
       case 'createSaleRecord': {
         const id = String(5500 + db.sales.length);
-        db.sales.push({ id, externalId: vars.externalId, matanot: vars.matanot, in: vars.in, unit: vars.unit, holderStatus: vars.holderStatus, source: vars.source });
+        db.sales.push({ id, externalId: vars.externalId, matanot: vars.matanot, in: vars.in, unit: vars.unit, holderStatus: vars.holderStatus, source: vars.source, holder: String(vars.users_permissions_user), note: vars.note });
         return { data: { createSale: { data: { id, attributes: { in: vars.in, matanot: { data: { attributes: { name: 'x' } } } } } } } };
       }
       case 'saleLinkShop': {
@@ -135,6 +153,16 @@ const strapi = {
       case 'updateMatanotQuant':
         db.products.get(vars.id)!.quant = vars.quant;
         return { data: { updateMatanot: { data: { id: vars.id, attributes: { quant: vars.quant } } } } };
+      case 'rikmaApiOrderUpdate': {
+        const o = db.orders.find((x) => x.id === String(vars.id))!;
+        Object.assign(o.data, vars.data);
+        return { data: { updateOrder: { data: { id: o.id, attributes: { status: o.data.status } } } } };
+      }
+      case 'saleRefundReset': {
+        const s = db.sales.find((x) => x.id === String(vars.id))!;
+        Object.assign(s, { in: vars.in, unit: vars.unit, note: vars.note });
+        return { data: { updateSale: { data: { id: s.id } } } };
+      }
       case 'saleByExternalId': {
         const s = db.sales.find((x) => x.externalId === vars.externalId);
         return { data: { sales: idsOf(s ? [{ id: s.id, attributes: { holderStatus: s.holderStatus } }] : []) } };
@@ -202,6 +230,26 @@ describe('createPaidOrder', () => {
     expect(db.orders[0].data.oversold).toBe(true);
     expect(db.variants.get('77')!.quant).toBe(-2);
     expect(notices[0].intent).toBe('review');
+    expect(notices[0].templates.title.he).toBe('🛒 הזמנה מהאתר — חסר במלאי');
+    expect(notices[0].templates.body.he).toContain('חסרות 2 יחידות');
+  });
+
+  it("names the order by the storefront's number, never by its ref", async () => {
+    const r = await run(order({ displayNumber: '1042' }));
+    expect(db.orders[0].data.displayNumber).toBe('1042');
+    expect(r.displayNumber).toBe('1042');
+    expect(db.sales[0].note).toBe('הזמנה 1042');
+    const body = notices[0].templates.body.he;
+    expect(body).toContain('הזמנה 1042');
+    expect(body).toContain('5 פריטים'); // 2 + 2 + 1 units, not 3 lines
+    expect(body).not.toContain('57:pi_1');
+    expect(notices[0].templates.title.he).toBe('🛒 הזמנה חדשה מהאתר');
+  });
+
+  it('falls back to our row id when the storefront sent no number', async () => {
+    const r = await run(order());
+    expect(r.displayNumber).toBeNull();
+    expect(notices[0].templates.body.he).toContain(`הזמנה ${r.orderId}`);
   });
 
   it('a retry of a finished order changes nothing and tells nobody again', async () => {
@@ -280,5 +328,98 @@ describe('createSale with a variant', () => {
     const r = await sale({ productId: '1901', availableQuantity: 5 });
     expect(r.newQuantity).toBe(4);
     expect(db.calls).not.toContain('saleLinkShop');
+  });
+});
+
+// ─── after the order (orderLifecycle.ts) ────────────────────────────────────
+
+const act = (config: any, params: Record<string, any>, userId = '9') =>
+  config.graphqlOperation({ projectId: '57', orderRef: '57:pi_1', ...params }, { ...context, userId }, { strapi, notifier });
+
+describe('markOrderShipped / markOrderFulfilled', () => {
+  it('moves the order forward and stamps the time', async () => {
+    await run(order());
+    const shipped = await act(markOrderShippedConfig, {}, '12');
+    expect(shipped).toMatchObject({ status: 'shipped', changed: true });
+    expect(db.orders[0].data.shippedAt).toBeTruthy();
+    const done = await act(markOrderFulfilledConfig, {});
+    expect(done).toMatchObject({ status: 'fulfilled', changed: true, from: 'shipped' });
+  });
+
+  it('twice is once, and backwards is refused', async () => {
+    await run(order());
+    await act(markOrderShippedConfig, {});
+    expect(await act(markOrderShippedConfig, {})).toMatchObject({ changed: false });
+    await act(markOrderFulfilledConfig, {});
+    await expect(act(markOrderShippedConfig, {})).rejects.toMatchObject({ code: 'INVALID_TRANSITION' });
+  });
+
+  it('an unknown order is NOT_FOUND', async () => {
+    await expect(act(markOrderShippedConfig, { orderRef: '57:nope' })).rejects.toMatchObject({ code: 'NOT_FOUND' });
+  });
+});
+
+describe('cancelOrder', () => {
+  it('the holder resets their own sales, keeps them, and gets the stock back', async () => {
+    await run(order());
+    notices.length = 0;
+    const r = await act(cancelOrderConfig, { reason: 'הקונה ביטל' });
+    expect(r).toMatchObject({ status: 'cancelled', alreadyCancelled: false, restocked: true });
+    expect(r.refunds.reset).toHaveLength(3);
+    expect(db.sales).toHaveLength(3); // nothing deleted
+    expect(db.sales.every((s) => s.in === 0 && s.unit === 0)).toBe(true);
+    expect(db.sales[0].note).toContain('היה 620 עבור 2');
+    expect(db.orders[0].data.status).toBe('cancelled');
+    expect(db.variants.get('77')!.quant).toBe(3); // 1 + 2 back
+    expect(db.products.get('1901')!.quant).toBe(5); // 2 + 2 + 1 back
+    expect(r.stockChanges).toEqual([{ productId: '1842', variantId: '77', quant: 3 }]);
+    expect(notices[0].intent).toBe('outcome');
+  });
+
+  it('only the holder may refund — it is their money', async () => {
+    await run(order());
+    await expect(act(cancelOrderConfig, {}, '12')).rejects.toMatchObject({ code: 'NOT_HOLDER' });
+    expect(db.sales.every((s) => s.in > 0)).toBe(true);
+  });
+
+  it('a sale already in a split is left as it is, and the rikma is asked to settle it', async () => {
+    await run(order());
+    db.sales[0].tosplits = ['31'];
+    notices.length = 0;
+    const r = await act(cancelOrderConfig, {});
+    expect(r.refunds.afterSplit).toEqual([db.sales[0].id]);
+    expect(db.sales[0].in).toBe(620);
+    expect(db.sales[1].in).toBe(0);
+    expect(db.orders[0].data.note).toContain(db.sales[0].id);
+    expect(notices[0].intent).toBe('review');
+  });
+
+  it('a shipped order is not back on the shelf unless asked', async () => {
+    await run(order());
+    await act(markOrderShippedConfig, {});
+    const r = await act(cancelOrderConfig, {});
+    expect(r.restocked).toBe(false);
+    expect(db.variants.get('77')!.quant).toBe(1);
+    const again = await act(cancelOrderConfig, { restock: true });
+    expect(again.alreadyCancelled).toBe(true);
+    expect(db.variants.get('77')!.quant).toBe(1); // a retry never restocks
+  });
+
+  it('a retried cancel finishes the resets and restocks nothing twice', async () => {
+    await run(order());
+    let resets = 0;
+    const original = strapi.execute.bind(strapi);
+    strapi.execute = async (qid: string, vars: any) => {
+      if (qid === 'saleRefundReset' && ++resets === 2) throw new Error('network');
+      return original(qid, vars);
+    };
+    await expect(act(cancelOrderConfig, {})).rejects.toThrow('network');
+    strapi.execute = original;
+    expect(db.orders[0].data.status).toBe('paid'); // status is written after the resets
+
+    const r = await act(cancelOrderConfig, {});
+    expect(r.refunds.already).toHaveLength(1);
+    expect(r.refunds.reset).toHaveLength(2);
+    expect(db.variants.get('77')!.quant).toBe(3); // restocked exactly once
   });
 });

@@ -15287,7 +15287,7 @@ ${STIPEND_DECISION_FIELDS}
       project: { id: { eq: $pid } },
       or: [{ revoked: { null: true } }, { revoked: { eq: false } }]
     }) {
-      data { id attributes { name callback_url webhook_events } }
+      data { id attributes { name callback_url webhook_events scopes } }
     }
   }`,
 
@@ -17468,6 +17468,13 @@ ${STIPEND_DECISION_FIELDS}
     }
   }`,
 
+  // Are the order columns the orders API reads deployed (`displayNumber`)?
+  // A missing field fails validation; an empty table answers `[]` (catalog.ts
+  // `ordersSchemaLive`).
+  'rikmaApiOrdersSchema': `query RikmaApiOrdersSchema {
+    orders(pagination: { limit: 1 }) { data { id attributes { displayNumber } } }
+  }`,
+
   // One order by its ref (`57:pi_3Q8x`), with lines and sales — idempotency,
   // resume after a half-finished write, and `GET /orders/{ref}`.
   'rikmaApiOrderByRef': `query RikmaApiOrderByRef($pid: ID!, $ref: String!) {
@@ -17476,16 +17483,32 @@ ${STIPEND_DECISION_FIELDS}
       pagination: { limit: 1 }
     ) {
       data { id attributes {
-        ref externalId status oversold total currencyCode
+        ref externalId displayNumber status oversold total currencyCode note
         paidAt shippedAt fulfilledAt updatedAt
+        holder { data { id } }
         lines(pagination: { limit: 100 }) { data { id attributes {
           position quantity unitPrice nameSnapshot optionLabelSnapshot
           matanot { data { id } }
           variant { data { id } }
         } } }
-        sales(pagination: { limit: 100 }) { data { id attributes { externalId } } }
+        sales(pagination: { limit: 100 }) { data { id attributes {
+          externalId in unit note holderStatus splited
+          users_permissions_user { data { id } }
+          tosplits { data { id } }
+        } } }
       } }
     }
+  }`,
+
+  // Status, timestamps and the note of one order (ship / fulfil / cancel).
+  'rikmaApiOrderUpdate': `mutation RikmaApiOrderUpdate($id: ID!, $data: OrderInput!) {
+    updateOrder(id: $id, data: $data) { data { id attributes { status } } }
+  }`,
+
+  // A refunded self-reported sale: 0 / 0, the original amount kept in the note
+  // (ordersApi `refundNoteOf`). Never a delete — the row is history.
+  'saleRefundReset': `mutation SaleRefundReset($id: ID!, $in: Float!, $unit: Float!, $note: String) {
+    updateSale(id: $id, data: { in: $in, unit: $unit, note: $note }) { data { id } }
   }`,
 
   'rikmaApiOrderCreate': `mutation RikmaApiOrderCreate($data: OrderInput!) {

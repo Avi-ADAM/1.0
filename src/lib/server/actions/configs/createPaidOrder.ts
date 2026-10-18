@@ -10,12 +10,14 @@ import {
   lineSaleExternalId,
   orderIsComplete,
   orderNoteOf,
+  orderNumberOf,
   orderRefOf,
   planOrder,
   sameOrder,
   storedLinesOf,
   toOrderView,
-  type OrderPayload
+  type OrderPayload,
+  type StockChange
 } from '$lib/server/ordersApi.js';
 
 /**
@@ -128,6 +130,7 @@ const handler: ActionExecutionHandler = async (params, context, deps) => {
       data: {
         ref,
         externalId: payload.externalId,
+        displayNumber: payload.displayNumber,
         project: projectId,
         status: 'paid',
         source: ORDER_SOURCE,
@@ -151,6 +154,12 @@ const handler: ActionExecutionHandler = async (params, context, deps) => {
     if (!id) throw new Error('Failed to create the order');
     orderId = String(id);
   }
+  // What people say out loud — the storefront's number, else ours. A resume
+  // keeps the number the first attempt stored.
+  const displayNumber: string | null = existing
+    ? (existing.attributes?.displayNumber ?? null)
+    : payload.displayNumber;
+  const number = orderNumberOf(displayNumber, orderId);
 
   // 5. The lines that are not there yet.
   const storedPositions = new Set(
@@ -188,6 +197,8 @@ const handler: ActionExecutionHandler = async (params, context, deps) => {
       saleIdByPosition.set(n - 1, String(s.id));
     }
   }
+  // Last stock per variant this order moved — for `variant.stockChanged`.
+  const stockChanges = new Map<string, StockChange>();
   const productStock = new Map<string, number>();
   for (const [id, node] of products) {
     const q = node?.attributes?.quant;
@@ -223,7 +234,7 @@ const handler: ActionExecutionHandler = async (params, context, deps) => {
         saleDate: now,
         availableQuantity: productStock.get(line.productId) ?? -1,
         kindOf: line.kindOf,
-        note: `הזמנה ${ref}`,
+        note: `הזמנה ${number}`,
         externalId: saleExternalId,
         source: ORDER_SOURCE,
         entryCurrency,
@@ -235,6 +246,13 @@ const handler: ActionExecutionHandler = async (params, context, deps) => {
     );
     if (!sale?.saleId) throw new Error(`Failed to record the sale for line ${line.position}`);
     saleIdByPosition.set(line.position, String(sale.saleId));
+    if (line.variantId && typeof sale.newVariantQuantity === 'number') {
+      stockChanges.set(`v:${line.variantId}`, {
+        productId: line.productId,
+        variantId: line.variantId,
+        quant: sale.newVariantQuantity
+      });
+    }
     if (!line.variantId && typeof sale.newQuantity === 'number') {
       productStock.set(line.productId, sale.newQuantity);
     } else if (!line.variantId) {
@@ -244,21 +262,31 @@ const handler: ActionExecutionHandler = async (params, context, deps) => {
   }
 
   // 7. Tell the rikma — a new order to ship, and loudly if it was oversold.
+  //    Wording: UX_COPY_SHOP_SALES §10.1 — "from your site" (in Hebrew a bare
+  //    הזמנה is also an invitation), the order's number, items not lines.
   if (notifier && !existing) {
     try {
       const amount = formatMoney(plan.total, currency, 'he');
       const amountEn = formatMoney(plan.total, currency, 'en');
-      const count = plan.lines.length;
+      // Units when they are whole; a line sold by the kilo makes "3.5 items"
+      // nonsense, so then the count is of lines.
+      const whole = plan.lines.every((l) => Number.isInteger(l.quantity));
+      const items = whole ? plan.lines.reduce((s, l) => s + l.quantity, 0) : plan.lines.length;
+      const short = plan.lines.reduce((s, l) => s + l.shortBy, 0);
+      const itemsHe = items === 1 ? 'פריט אחד' : `${items} פריטים`;
+      const itemsEn = items === 1 ? '1 item' : `${items} items`;
+      const shortHe = short === 1 ? 'חסרה יחידה אחת' : `חסרות ${short} יחידות`;
+      const shortEn = short === 1 ? '1 unit is missing' : `${short} units are missing`;
       await notifier.notify(
         {
           recipients: { type: 'projectMembers', config: { projectIdParam: 'projectId' } },
           templates: {
             title: oversold
-              ? { he: '🛒 הזמנה ששולמה — במכירת-יתר', en: '🛒 A paid order — oversold' }
-              : { he: '🛒 הזמנה חדשה ששולמה', en: '🛒 A new paid order' },
+              ? { he: '🛒 הזמנה מהאתר — חסר במלאי', en: '🛒 Order from your site — short on stock' }
+              : { he: '🛒 הזמנה חדשה מהאתר', en: '🛒 New order from your site' },
             body: {
-              he: `הזמנה ${ref} ב-${amount} (${count} שורות) שולמה באתר ונרשמה במכירות של "${projectName}".${oversold ? ' המלאי לא הספיק לכל השורות — כדאי להחליט אם לייצר או להחזיר.' : ''}`,
-              en: `Order ${ref} for ${amountEn} (${count} lines) was paid on the website and recorded in "${projectName}"'s sales.${oversold ? ' Stock did not cover every line — decide whether to make more or refund.' : ''}`
+              he: `הזמנה ${number} ב-${amount}, ${itemsHe}, שולמה באתר של "${projectName}".${oversold ? ` ${shortHe}. אפשר להכין אותן או לתאם עם הקונה מועד אחר.` : ''}`,
+              en: `Order ${number} for ${amountEn}, ${itemsEn}, was paid on "${projectName}"'s site.${oversold ? ` ${shortEn}. You can make them or agree a later date with the buyer.` : ''}`
             }
           },
           intent: oversold ? 'review' : 'outcome',
@@ -276,6 +304,7 @@ const handler: ActionExecutionHandler = async (params, context, deps) => {
   return {
     duplicated: false,
     orderId,
+    displayNumber,
     orderRef: ref,
     status: 'paid',
     oversold,
@@ -289,7 +318,8 @@ const handler: ActionExecutionHandler = async (params, context, deps) => {
       optionLabel: l.optionLabelSnapshot,
       unitPrice: l.unitPrice,
       saleId: saleIdByPosition.get(l.position) ?? null
-    }))
+    })),
+    stockChanges: [...stockChanges.values()]
   };
 };
 
@@ -297,6 +327,7 @@ const handler: ActionExecutionHandler = async (params, context, deps) => {
 function resultOf(view: ReturnType<typeof toOrderView> & {}, id: string | number) {
   return {
     orderId: String(id),
+    displayNumber: view.displayNumber,
     orderRef: view.orderRef,
     status: view.status,
     oversold: view.oversold,

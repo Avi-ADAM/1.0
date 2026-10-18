@@ -12,10 +12,11 @@
 > (`shopSchemaLive`) ומחזיר בדיוק את מה שהחזיר לפני התוכנית. פירוט ב-§7.2.
 > **S2 נסגר (2026-10-18):** השדה `checkout` ב-DTO (`checkoutOf` ב-`shop.ts`),
 > ו-`rikma-v1.openapi.yaml` עבר למודל ההזמנה ששולמה (§5.4).
-> **S3 — חלק ראשון בנוי (2026-10-18):** `POST /orders`, `GET /orders/{ref}`,
-> הפעולה `createPaidOrder`, `variantId`/`orderId` ב-`createSale`, ה-scopes
-> `orders:*`. נשאר מ-S3: ביטול + איפוס מכירה `self`, `markOrderShipped`/
-> `Fulfilled`, ו-webhooks. פירוט ומה צריך לפני שזה עולה: **§7.5**.
+> **S3 בנוי (2026-10-18):** `POST /orders`, `GET /orders/{ref}`,
+> `POST /orders/{ref}/cancel`, הפעולות `createPaidOrder` / `cancelOrder` /
+> `markOrderShipped` / `markOrderFulfilled`, `variantId`/`orderId` ב-`createSale`,
+> ה-scopes `orders:*`, ו-webhooks `order.*`/`variant.stockChanged`. פירוט ומה
+> צריך לפני שזה עולה: **§7.5**. הבא בתור: S4 (עורך למוכר) או S5 (מסך המכירות).
 >
 > **הסכמה (S1) נפרסה ב-`1.0b`** (`shabab`, 2026-10-16). הסקירה מצאה בה שבעה
 > תיקונים — כולם בענף `ccr-21b574f2-p5actf` של `1.0b`, ממתינים למיזוג
@@ -460,6 +461,7 @@ GET  /api/v1/r/{rikma}/changes?since=ISO       # Phase 2 — sync אינקרמנ
 | שדה | חובה | הערות |
 |---|---|---|
 | `externalId` | ✔ | מזהה העסקה אצל ספק התשלום. **מפתח האידמפוטנטיות** (יחד עם הרקמה) |
+| `displayNumber` | | מספר ההזמנה של האתר, כמו שהקונה קיבל אותו (`1042`), עד 40 תווים, שורה אחת. כך ההזמנה נקראת במסך ובהתראות; בלעדיו — לפי ה-`id`. התשובה ו-`GET /orders/{ref}` מחזירות `orderId` ו-`displayNumber` |
 | `lines[]` | ✔ | `productId`, `quantity>0`, `unitPrice` (מה שנגבה בפועל ליחידה); `variantId` חובה למוצר עם וריאנטים |
 | `currency` | | ברירת מחדל: מטבע הרקמה. אותו כלל של `sales` (PLAN_MULTI_CURRENCY) |
 | `amount` | | סכום כולל שנגבה. אם נשלח ואינו שווה לסכום השורות + משלוח — נרשם כפי שנשלח, והפער נכתב ל-`note` של ההזמנה |
@@ -495,11 +497,21 @@ GET  /api/v1/r/{rikma}/changes?since=ISO       # Phase 2 — sync אינקרמנ
 ```
 
 **ביטול / החזר:** `POST /orders/{ref}/cancel` (scope `orders:create`) — ההזמנה
-עוברת ל-`cancelled`, המלאי חוזר, וכל מכירה מקבלת **הצעה נגדית לסכום 0**
-("לא קיבלתי כלום" — לא מחיקה; PLAN_sale_holder_consent). מכירה שכבר נכנסה
-לחלוקה לא נפתחת מחדש בשקט: הרקמה מקבלת התראה על החזר אחרי חלוקה.
-**חסר בקוד:** `counterSaleClaim` עובד היום רק על `saleClaim` פתוח; למכירה
-`self` אין עדיין מסלול איפוס. בונים אותו ב-S3 — אחרת אין דרך לדווח על החזר.
+עוברת ל-`cancelled` ומכירה לא נמחקת לעולם. מכירה שכבר נכנסה לחלוקה לא נפתחת
+מחדש בשקט: הרקמה מקבלת התראה על החזר אחרי חלוקה.
+
+**איך זה נבנה (2026-10-18, `cancelOrder`) — ולמה זה לא "הצעה נגדית":** הנוסח
+הקודם אמר "כל מכירה מקבלת הצעה נגדית לסכום 0". הצעה נגדית היא תור במשא ומתן
+דו-צדדי (`saleClaim`), ולמכירת `self` אין צד שני: "הכסף אצלי" היה דיווח עצמי
+ריבוני שלא נדרש לו אישור של אף אחד, ולכן גם "הכסף חזר לקונה" לא נדרש לו.
+`refundDecisionOf` מחליט לכל מכירה:
+- **לא בשום חלוקה, `self`, של המחזיק** ⇒ המחזיק מאפס אותה בעצמו: `in`/`unit`
+  ל-0, והסכום המקורי נכתב בהערת המכירה (`refundNoteOf`). השורה נשארת.
+- **כבר בחלוקה — מוצעת או מאושרת** ⇒ לא נוגעים. הסכום שלה הוא מה שהחברים
+  מצביעים עליו או כבר חילקו; הרקמה מקבלת התראה ב-`review` ומיישבת.
+- **של מחזיק אחר / `open` / `confirmed`** ⇒ לא נוגעים — תיקון שלה הוא טענה על
+  הכסף של מישהו אחר, ורק ההסכמה שלו יכולה לעשות אותה.
+לכן גם **רק מחזיק ההזמנה מבטל** (`NOT_HOLDER` לכל חבר אחר — הוא מבקש מהמחזיק).
 
 ### 5.5 scopes
 
@@ -654,6 +666,7 @@ order.oversold       variant.stockChanged  (data.changed=["quant"], data.quant)
 |---|---|---|---|---|
 | `ref` | string, **unique** | ✔ | — | `57:web-2026-8811` — המזהה החוצה (`/orders/{ref}`) |
 | `externalId` | string | | — | מהצרכן. אידמפוטנטיות |
+| `displayNumber` | string | | — | **נוסף 2026-10-18.** מספר ההזמנה של האתר, לתצוגה בלבד (לא unique — שני אתרים יכולים לשלוח `1042`) |
 | `project` | relation manyToOne → `project` | ✔ | — | הרקמה שמקבלת את הבקשה |
 | `status` | enum `sent・seen・priced・accepted・pendingPayment・paid・shipped・fulfilled・cancelled` | | `sent` | MVP: נוצר ב-`paid` (§3.3); `sent…accepted` ל-S3b. שאר השדות שנוספו: §6.9 #6 |
 | `source` | enum `ui・api` | | `ui` | "מאיפה הגיע" — כמו `Act.source` |
@@ -715,6 +728,7 @@ order.oversold       variant.stockChanged  (data.changed=["quant"], data.quant)
 | `minOrder` | decimal | localized | `1` | מינימום להזמנה |
 | `maxOrder` | decimal | localized | — | מקסימום להזמנה |
 | `leadTimeHours` | integer | לא | — | זמן אספקה ב-שעות |
+| `lowStockAt` | decimal | לא | — | **נוסף 2026-10-18.** "מלאי נמוך" מתחת לזה, בכל וריאנט בנפרד. ריק = אין סימון. ב-MVP סימון במסך בלבד (UX_COPY_SHOP_SALES §5) |
 | `attributes` | json | localized | — | §4.9 — מבוקר, בלי HTML |
 | `deliveryOptions` | json | localized | — | `[{kind,note,fee,currency}]` |
 | `shopNote` | string | localized | — | הערה חופשית לתצוגה בחנות |
@@ -794,7 +808,8 @@ breakpoints: {
 | `rikmaApiOrderByRef` | הזמנה עם שורות ומכירות — מעקב, אידמפוטנטיות והמשך כתיבה שנקטעה | ✅ |
 | `ordersApiProject` / `ordersApiProducts` / `ordersApiVariants` | מה ש-`planOrder` מחליט לפיו, מגודר לרקמה בשאילתה | ✅ |
 | `saleProductHasVariants` / `saleVariantInfo` / `saleLinkShop` | `createSale`: השומר, המלאי של הווריאנט, הקישור מכירה↔וריאנט/הזמנה | ✅ |
-| `rikmaApiOrderSetStatus` | `shipped` / `fulfilled` / `cancelled` + חותמות זמן | ⛔ S3 |
+| `rikmaApiOrderUpdate` (במקום `rikmaApiOrderSetStatus`) | `shipped` / `fulfilled` / `cancelled` + חותמות זמן + הערה | ✅ |
+| `saleRefundReset` | מכירת `self` שהוחזרה: 0/0, הסכום המקורי בהערה | ✅ |
 | `rikmaApiVariantQuant` | עדכון מלאי של וריאנט | ✅ |
 | `shopVariantsSave` / `shopOptionsSave` | העורך למוכר (יצירה/עדכון וריאנטים וצירים) | ⛔ S4 |
 | `moachOrders` | רשימת ההזמנות למסך ההזמנות, עם שורות ופרטי קונה | ⛔ S5 |
@@ -867,10 +882,11 @@ breakpoints: {
 | **הטלה** | `src/lib/server/apiPublic/dto.ts` | `ApiVariant`, `ApiOption`, `ApiPriceRange`, `ApiDelivery`, `ApiShop`; `toApiProduct(node, rikma, shop?)` דרך `toApiShop()` | ✅ בנוי |
 | **שאילתה** | `src/lib/server/apiPublic/query.ts` | `hasVariants`, `available`/`inStock`, `option.<key>`, `expand=variants`, `sku`, `priceMax`; `price` → `priceMin`; `matchesNothing` | ✅ בנוי |
 | **כתיבה** | `src/lib/server/apiPublic/writeApi.ts` + `src/lib/server/ordersApi.ts` (חדש) | ולידציה (`validateOrderPayload`) + החלטות (`planOrder`) + אידמפוטנטיות (`sameOrder`/`canResume`) + תצוגה בלי הקונה (`toOrderView`) — אותה תבנית של `salesApi.ts`/`tasksApi.ts` | ✅ + 30 בדיקות |
-| **route** | `src/routes/api/v1/r/[rikma]/{options,orders,orders/[ref],orders/[ref]/cancel}/+server.ts` | דקים; כל הלוגיקה ב-`apiPublic/`. `options`, `orders`, `orders/[ref]` ✅; `cancel` ⛔ | חלקי + 17 בדיקות |
-| **פעולה** | `src/lib/server/actions/configs/createPaidOrder.ts` (חדש) | כותב `order` (`paid`) + שורות, וקורא ל-`createSale` לכל שורה עם `variantId` + `orderId`; מסמן `oversold`; התראה לרקמה. webhook `order.paid` — ⛔ | ✅ + 11 בדיקות |
+| **route** | `src/routes/api/v1/r/[rikma]/{options,orders,orders/[ref],orders/[ref]/cancel}/+server.ts` | דקים; כל הלוגיקה ב-`apiPublic/`. `options`, `orders`, `orders/[ref]`, `orders/[ref]/cancel` ✅ | ✅ + 26 בדיקות |
+| **פעולה** | `src/lib/server/actions/configs/createPaidOrder.ts` (חדש) | כותב `order` (`paid`) + שורות, וקורא ל-`createSale` לכל שורה עם `variantId` + `orderId`; מסמן `oversold`; התראה לרקמה; webhooks דרך `webhooks/orderEvents.ts` | ✅ + 11 בדיקות |
 | **פעולה** | `createSale.ts` (קיים) | + `variantId`/`orderId`; דוחה מוצר עם וריאנטים בלי `variantId`; מוריד את מלאי הווריאנט (נקרא מהשרת) | ✅ |
-| **פעולות** | `markOrderShipped` / `markOrderFulfilled` / `cancelOrder` (חדשות) | `projectMember`; `cancelOrder` מאפס את המכירות (הצעה נגדית ל-0 — המסלול ל-`self` חסר, §5.4) ומחזיר מלאי | ⛔ S3 |
+| **פעולות** | `orderLifecycle.ts`: `markOrderShipped` / `markOrderFulfilled` / `cancelOrder` (חדשות) | `projectMember`; `cancelOrder` למחזיק בלבד — מאפס מכירות `self` שלא בחלוקה, משאיר את השאר לרקמה (§5.4), מחזיר מלאי להזמנה שלא נשלחה | ✅ + 8 בדיקות |
+| **webhooks** | `src/lib/server/webhooks/orderEvents.ts` (חדש) + שלב 5c ב-`ActionService` | `order.paid` / `order.oversold` / `order.statusChanged` / `variant.stockChanged` — רק למפתח עם `orders:*` (`products:read` למלאי) | ✅ + 8 בדיקות |
 | **פעולה** | `saveProductVariants` / `saveProductOptions` (חדשות) | העורך למוכר. מלאי/תמונות/`active` מיידי; וריאנט חדש או מחיר ⇒ `editObject` במוצר של רקמה (§4 עיקרון 6); ייחודיות `(project, sku)` ו-`(matanot, axisKey)` | ⛔ S4 |
 | **lifecycle** | `1.0b`: `src/api/matanot/…/lifecycles.js`, `src/api/product-variant/…/lifecycles.js` | השדות הנגזרים (§2.4) | ⛔ S4 |
 | **עורך למוכר** | `src/lib/components/products/` | העלאת גלריה (סדר, alt, שער), מחולל מטריצת וריאנטים, עריכה מרוכזת של מחיר/מלאי, תמונות לווריאנט | ⛔ S4 |
@@ -961,7 +977,20 @@ breakpoints: {
 - הנתונים של הלשוניות נטענים רק כשנכנסים אליהן; השכבה הפשוטה לא משלמת עליהן.
 - פרטי הקונה גלויים לחברי הרקמה בלבד (`projectMember`), ולא נטענים ב-SSR
   של דף ציבורי כלשהו.
-- הטקסטים ב-`$t()` (namespace `shop`, ב-`ROUTED` רק לנתיבי `sales/*`).
+- הטקסטים ב-`$t()` (namespace `shop`, ב-`ROUTED` רק לנתיבי `sales/*`). הנוסח
+  עצמו — מפתחות, עברית/אנגלית, מצבים ריקים, שגיאות והנחיות למתרגמים — ב-
+  [UX_COPY_SHOP_SALES](../tbd/UX_COPY_SHOP_SALES.md).
+
+**הוכרע עם מסמך הטקסטים (2026-10-18, §10 שם):**
+- **מספר הזמנה לתצוגה** — `orderRef` אינו מספר שאדם מקריא בטלפון. שדה רשות
+  חדש `order.displayNumber` (string), שהאתר שולח ב-`POST /orders` (המספר שהקונה
+  קיבל במייל), ואם אין — ה-`id`. `GET /orders/{ref}` ו-`toOrderView` מחזירים את
+  שניהם, וההתראות של `createPaidOrder`/`cancelOrder` עוברות אליו במקום ה-`ref`.
+- **ביטול במסך** — רק למי שהכסף אצלו, כמו שה-`cancelOrder` אוכף.
+- **מלאי נמוך** — שדה חדש `matanot.lowStockAt` (decimal, ריק = אין סימון), נבדק
+  מול כל וריאנט. ב-MVP סימון במסך בלבד, בלי התראה.
+- **הזמנה חדשה** — ב-MVP: ההתראה הקיימת (בנוסח מתוקן) + הפס בשכבה הפשוטה.
+  **אחרי ה-MVP:** כרטיס בעמוד הלב, והזמנה לשליחה שנפתחת כמטלה ברקמה.
   כותרת הדף ב-`sales/+page.svelte` היא היום `$lang === 'he' ? …` — לתקן לאותו
   namespace כשנוגעים בקובץ.
 
@@ -1026,15 +1055,43 @@ breakpoints: {
    `create`/`update` על `order`, `order-line`, `product-variant`; ו-`update` על
    `sale` עם השדות `order`/`product_variant`. וה-**Authenticated** (§6.9) —
    ל-`createSale` מהממשק כשיעביר `variantId` (S4/S9).
-3. `npm run types:update`. `validate:qids` עובר כבר היום, אבל מול הסכמה
-   הישנה שב-`src/generated/`.
+3. `npm run types:update` — `src/generated/` כבר נוצר מחדש (2026-10-18) ומכיל את
+   `OrderInput` ואת `sale.product_variant`, ו-`validate:qids` עובר מולו. כלומר
+   תיקוני §6.9 חיים ב-Strapi; ההרשאות שלמעלה עדיין לא אומתו.
 4. אין צורך בסדר פריסה מיוחד: עד שהסכמה חיה, `/orders` עונה `503
-   SHOP_NOT_READY` (אותה בדיקת `shopSchemaLive` של הקטלוג).
+   SHOP_NOT_READY` (אותה בדיקת `shopSchemaLive` של הקטלוג). **מאז 2026-10-18
+   יש בדיקה שנייה, `ordersSchemaLive`** (qid `rikmaApiOrdersSchema`): כל שאילתת
+   הזמנה בוחרת `displayNumber`, ולכן בלי השדה ב-Strapi `/orders` עונה 503 ולא
+   502. שני השדות החדשים (`order.displayNumber`, `matanot.lowStockAt`) הם
+   עמודות על קולקציות קיימות — לא צריך לסמן להם הרשאות חדשות. הם בענף `shabab`
+   של `1.0b`, עם `types/generated/contentTypes.d.ts`. אחרי הפריסה: `npm run
+   types:update`.
 
-**נשאר מ-S3:** `POST /orders/{ref}/cancel` + מסלול איפוס למכירה `self`
-(§5.4), `markOrderShipped`/`markOrderFulfilled` (`rikmaApiOrderSetStatus`),
-webhooks `order.*`/`variant.stockChanged` (היום `WEBHOOK_ACTIONS` מכיר רק
-מטלות — זה הרחבה של `webhooks/dispatch.ts`).
+**החלק השני (2026-10-18) — ביטול, משלוח, webhooks:**
+
+- **ביטול** (`cancelOrder`, `POST /orders/{ref}/cancel`): למחזיק בלבד; כל מכירה
+  לפי `refundDecisionOf` (§5.4). הסדר הוא מה שהופך retry לבטוח: קודם איפוס
+  המכירות (אידמפוטנטי — מכירה ב-0/0 היא `already`), אחר כך הסטטוס, והמלאי
+  אחרון. ביטול שנקטע ונשלח שוב משלים את האיפוסים ולעולם לא מחזיר מלאי פעמיים.
+  **המלאי חוזר כברירת מחדל רק להזמנה שלא נשלחה** — חבילה שיצאה לא חוזרת למדף
+  כי הכסף חזר; `restock` דורס. ביטול חוזר לא מחזיר מלאי גם עם `restock: true`
+  (תיקון מלאי כזה — מהמסך המתקדם, S5).
+- **משלוח / מסירה** (`markOrderShipped` / `markOrderFulfilled`): כל חבר ברקמה —
+  הוצאת חבילה היא עבודת הרקמה. `paid → shipped → fulfilled`, ו-`paid → fulfilled`
+  לאיסוף; אותו סטטוס פעמיים הוא `same` (לא שגיאה); אחורה נדחה
+  (`INVALID_TRANSITION`) כי חותמות הזמן היו משקרות. אין להן endpoint ב-API —
+  הן של מסך ההזמנות (S5).
+- **webhooks** (`webhooks/orderEvents.ts`, שלב 5c ב-`ActionService`): אותה מסירה
+  חתומה ועם retry של מטלות, וגוף `{event, at, projectId, data}` — `data` הוא
+  תצוגת ההזמנה בלי הקונה. **נשלחים רק למפתח שמורשה לקרוא הזמנות** (`orders:*`;
+  `variant.stockChanged` גם ל-`products:read`): `webhook_events` ריק פירושו "כל
+  האירועים", ומפתחות מטלות שנרשמו כך לא ביקשו לשמוע על מכירות — ה-receiver
+  שלהם היה נשבר על payload חדש, והם היו לומדים את המכירות של הרקמה. retry
+  (כפילות, `same`, ביטול חוזר) לא משדר דבר.
+
+**לפני פריסה — תוספת להרשאות שלמעלה:** `update` על `order` ו-`sale` ל-API token
+(ביטול ומשלוח). קריאת `api-key` כבר קיימת לטוקן (ה-webhooks של מטלות), וה-
+webhooks של הזמנות קוראים ממנה גם את `scopes`.
 
 ---
 
@@ -1045,13 +1102,13 @@ webhooks `order.*`/`variant.stockChanged` (היום `WEBHOOK_ACTIONS` מכיר �
 | **S0** | המסמך + מפרט הסכמה (§6) | — | ✅ |
 | **S1** | הסכמה ב-`1.0b` + פריסה + `types:update` | S0 | ✅ נפרסה 2026-10-16. **תיקוני §6.9** — ענף מוכן, ממתין למיזוג, פריסה והרשאות Authenticated |
 | **S2** | **קריאה:** `shop.ts` + `shopAttrs` + DTO + פרמטרים + `/options` + `checkout` + OpenAPI | S1 | ✅ (2026-10-18) |
-| **S3** | **הזמנה ששולמה:** `POST /orders` + `/orders/{ref}` + `/cancel` + `createPaidOrder` + `variantId` ב-`createSale` + איפוס מכירה `self` + scopes `orders:*` + webhooks `order.*`/`variant.stockChanged` | §6.9 | 🟡 חלק ראשון ✅ (2026-10-18, §7.5). נשאר: `/cancel` + איפוס `self`, `markOrder*`, webhooks |
+| **S3** | **הזמנה ששולמה:** `POST /orders` + `/orders/{ref}` + `/cancel` + `createPaidOrder` + `variantId` ב-`createSale` + איפוס מכירה `self` + scopes `orders:*` + webhooks `order.*`/`variant.stockChanged` | §6.9 | ✅ (2026-10-18, §7.5) |
 | **S4** | **עורך למוכר:** גלריה + צירים + מחולל וריאנטים + עריכת מחיר/מלאי + `editObject` למחירים + lifecycle של הנגזרים ב-`1.0b` | §6.9 | 6–8 ימים |
 | **S5** | **מסך מכירות:** השכבה הפשוטה (פס הזמנות ממתינות) + המסך המתקדם (הזמנות, מוצרים, מלאי, מכירות, חיבורים) + ייצוא CSV | S3, S4 | 6–8 ימים |
 | **S6** | **תבנית פתיחה** (§7.4) עם מתאם ספק תשלום אחד | S3 | 3–5 ימים |
 | — | **כאן ה-MVP שלם** | | |
 | S7 | אתר סטטי: `POST /checkout` + אישור ידני של מחזיק הכסף (§3.5) | S5 | 3–4 ימים |
-| S8 | ייבוא CSV, מייל אישור לקונה, `changes?since`, delivery-log | S5 | 4–6 ימים |
+| S8 | ייבוא CSV, מייל אישור לקונה, `changes?since`, delivery-log, כרטיס "הזמנה מהאתר" בעמוד הלב + הזמנה לשליחה כמטלה ברקמה (§7.3) | S5 | 4–6 ימים |
 | S9 | חנות פנימית: גלריה ובורר וריאנטים ב-`/gift/[id]` | S4 | 4–6 ימים |
 | S3b | בקשת רכש למוצר `quote` (Sheirutpend + צ'אט + טוקן קונה) | S3 | 5–7 ימים |
 | — | אישור תשלום אוטומטי אצלנו (PLAN_MONEY_RAILS M1) | O-M1 | — |

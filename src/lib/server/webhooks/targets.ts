@@ -8,14 +8,19 @@
 // time somebody ticks a checkbox — and that negative answer is cached just like
 // a positive one.
 
-import type { WebhookEvent } from '$lib/server/tasksApi.js';
+import type { AnyWebhookEvent } from './dispatch.js';
 
 export interface WebhookTarget {
   keyId: string;
   name: string | null;
   url: string;
   /** Empty ⇒ every event. */
-  events: WebhookEvent[];
+  events: AnyWebhookEvent[];
+  /**
+   * The key's flat scopes. Order events go only to a key that may read orders
+   * (`mayReceive` in ordersApi.ts) — "every event" was written for tasks.
+   */
+  scopes: string[];
 }
 
 const CACHE_TTL_MS = 5 * 60 * 1000;
@@ -45,15 +50,18 @@ function parseRow(row: any): WebhookTarget | null {
   if (parsed.protocol !== 'https:' && parsed.protocol !== 'http:') return null;
 
   const rawEvents = row.attributes.webhook_events;
-  const events: WebhookEvent[] = Array.isArray(rawEvents)
-    ? rawEvents.map((e: unknown) => String(e) as WebhookEvent).filter(Boolean)
+  const events: AnyWebhookEvent[] = Array.isArray(rawEvents)
+    ? rawEvents.map((e: unknown) => String(e) as AnyWebhookEvent).filter(Boolean)
     : [];
+  const rawScopes = row.attributes.scopes;
+  const scopes = Array.isArray(rawScopes) ? rawScopes.map((s: unknown) => String(s)) : [];
 
   return {
     keyId: String(row.id),
     name: row.attributes.name ?? null,
     url: parsed.toString(),
-    events
+    events,
+    scopes
   };
 }
 
@@ -88,6 +96,6 @@ export async function getWebhookTargets(
 }
 
 /** Does this target want this event? An empty subscription list means "all". */
-export function wants(target: WebhookTarget, event: WebhookEvent): boolean {
+export function wants(target: WebhookTarget, event: AnyWebhookEvent): boolean {
   return target.events.length === 0 || target.events.includes(event);
 }

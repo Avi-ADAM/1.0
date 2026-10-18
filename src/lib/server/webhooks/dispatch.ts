@@ -18,6 +18,10 @@
 
 import type { ActionContext } from '$lib/server/actions/types.js';
 import type { WebhookEvent } from '$lib/server/tasksApi.js';
+import type { OrderWebhookEvent } from '$lib/server/ordersApi.js';
+
+/** Every event this module can deliver — tasks, and orders (orderEvents.ts). */
+export type AnyWebhookEvent = WebhookEvent | OrderWebhookEvent;
 import { toTaskStatusView } from '$lib/server/tasksApi.js';
 import { SITE_REPORT_PREFIX } from '$lib/server/siteReport.js';
 import { centralProjectId, syncSiteReportFromTask } from '$lib/server/siteReportMirror.js';
@@ -71,7 +75,7 @@ function actIdFor(actionKey: string, params: Record<string, any>, result: any): 
 async function postOnce(
   target: WebhookTarget,
   body: string,
-  event: WebhookEvent,
+  event: AnyWebhookEvent,
   deliveryId: string,
   fetchFn: typeof globalThis.fetch
 ): Promise<number> {
@@ -102,10 +106,10 @@ async function postOnce(
  * 4xx (other than 408/429) is the receiver telling us the request itself is
  * wrong — retrying that is pure noise, so only 5xx/timeouts are retried.
  */
-async function deliver(
+export async function deliver(
   target: WebhookTarget,
   body: string,
-  event: WebhookEvent,
+  event: AnyWebhookEvent,
   deliveryId: string,
   fetchFn: typeof globalThis.fetch
 ): Promise<void> {

@@ -56,7 +56,7 @@ import {
   ORDERS_READ_SCOPE
 } from '$lib/server/ordersApi.js';
 import { checkRateLimit, errorResponse } from './http.js';
-import { shopSchemaLive, strapiRun } from './catalog.js';
+import { ordersSchemaLive, shopSchemaLive, strapiRun } from './catalog.js';
 
 /** Admin token for Strapi bypass (internal use) — same handling as v1/actions. */
 const ADMIN_TOKEN = (env.ADMINMONTHER ?? '')
@@ -651,10 +651,16 @@ function statusOfOrderError(code: string | undefined): number {
     case 'PRODUCT_NOT_FOUND':
     case 'VARIANT_NOT_FOUND':
       return 404;
+    case 'NOT_FOUND':
+      return 404;
     case 'NOT_CHECKOUTABLE':
     case 'VARIANT_REQUIRED':
     case 'EXTERNAL_ID_CONFLICT':
+    case 'ORDER_CANCELLED':
+    case 'INVALID_TRANSITION':
       return 409;
+    case 'NOT_HOLDER':
+      return 403;
     case 'VALIDATION_FAILED':
       return 400;
     case 'UNAUTHORIZED':
@@ -687,7 +693,11 @@ async function orderGate(
     );
   }
 
-  if (!(await shopSchemaLive(strapiRun(args.fetch)))) {
+  // Both: the catalog columns, and the order columns added after them — every
+  // order query names `displayNumber`, so a Strapi without it would fail each
+  // request with a 502 instead of saying plainly that it is not ready.
+  const run = strapiRun(args.fetch);
+  if (!(await shopSchemaLive(run)) || !(await ordersSchemaLive(run))) {
     return orderError(
       503,
       'SHOP_NOT_READY',
@@ -767,6 +777,8 @@ export async function handleOrderPost(args: WriteArgs): Promise<Response> {
     success: true,
     duplicated,
     orderRef: data.orderRef,
+    orderId: data.orderId ?? null,
+    displayNumber: data.displayNumber ?? null,
     status: data.status,
     oversold: data.oversold === true,
     total: data.total,
@@ -824,6 +836,84 @@ export async function handleOrderGet(args: {
 
   touchLastUsed(key.keyId, fetch);
   return orderJson(200, view);
+}
+
+/**
+ * `POST /api/v1/r/{rikma}/orders/{ref}/cancel` — the storefront refunded the
+ * buyer. Same key as the order (`orders:create`), and its owner is the order's
+ * holder, so the refund is theirs to report (`cancelOrder`). Retry-safe: a
+ * second cancel answers 200 with `alreadyCancelled: true`.
+ */
+export async function handleOrderCancel(args: {
+  request: Request;
+  fetch?: typeof fetch;
+  ref: string;
+  pathProjectId?: string | null;
+}): Promise<Response> {
+  const { request, fetch, pathProjectId } = args;
+  const auth = keyOrResponse(
+    await authenticateWrite(request, {
+      scope: ORDERS_CREATE_SCOPE,
+      bucket: 'orders:create',
+      rateLimit: 'json'
+    })
+  );
+  if (auth instanceof Response) return auth;
+  const key = auth;
+
+  const gate = await orderGate(key, { request, fetch, pathProjectId });
+  if (gate) return gate;
+
+  const projectId = String(key.project!.id);
+  const ref = String(args.ref ?? '').trim();
+  if (!ref.startsWith(`${projectId}:`)) {
+    return orderError(404, 'NOT_FOUND', 'No such order in this rikma');
+  }
+
+  // The body is optional — a bare POST is a plain cancel.
+  let body: any = {};
+  try {
+    body = (await request.json()) ?? {};
+  } catch {
+    body = {};
+  }
+  if (body.restock != null && typeof body.restock !== 'boolean') {
+    return orderError(400, 'VALIDATION', 'restock must be true or false');
+  }
+  const params: Record<string, unknown> = { projectId, orderRef: ref };
+  if (typeof body.reason === 'string' && body.reason.trim()) params.reason = body.reason.trim();
+  if (typeof body.restock === 'boolean') params.restock = body.restock;
+
+  const result = await actionService.executeAction(
+    'cancelOrder',
+    params,
+    actionContext(String(key.user.id), fetch)
+  );
+  touchLastUsed(key.keyId, fetch);
+
+  if (!result.success) {
+    const code = result.error?.code;
+    const status = statusOfOrderError(code);
+    return orderError(
+      status,
+      status === 502 ? 'UPSTREAM_ERROR' : (code ?? 'UPSTREAM_ERROR'),
+      status === 502 ? 'The cancel could not be completed — send it again; it is safe to retry' : (result.error?.message ?? 'Refused')
+    );
+  }
+
+  const data = result.data ?? {};
+  return orderJson(200, {
+    success: true,
+    orderRef: data.orderRef ?? ref,
+    status: 'cancelled',
+    alreadyCancelled: data.alreadyCancelled === true,
+    restocked: data.restocked === true,
+    // How many sales were reset, and how many the rikma still has to settle.
+    refunds: {
+      reset: data.refunds?.reset?.length ?? 0,
+      leftForRikma: (data.refunds?.afterSplit?.length ?? 0) + (data.refunds?.notMine?.length ?? 0)
+    }
+  });
 }
 
 /** CORS preflight, identical for every write endpoint. */

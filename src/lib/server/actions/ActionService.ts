@@ -290,6 +290,32 @@ export class ActionService {
           });
       }
 
+      // Step 5c: Order webhooks (PLAN_SHOP_CUSTOMER_EXPERIENCE §5.6) — the
+      // storefront hears about its orders and stock. Same fire-and-forget rule.
+      if (
+        actionKey === 'createPaidOrder' ||
+        actionKey === 'cancelOrder' ||
+        actionKey === 'markOrderShipped' ||
+        actionKey === 'markOrderFulfilled'
+      ) {
+        import('../webhooks/orderEvents.js')
+          .then(({ onOrderChanged }) =>
+            onOrderChanged({
+              actionKey,
+              params,
+              result: strapiResult,
+              context,
+              strapi: this.strapiClient
+            })
+          )
+          .catch((err) => {
+            this.logger.warn('Order webhook error', {
+              actionKey,
+              error: err instanceof Error ? err.message : String(err)
+            });
+          });
+      }
+
       // Calculate execution time
       const executionTime = Date.now() - startTime;
 
