@@ -10,6 +10,7 @@ import { prepareRelease, manifestUrl } from './prepare-release.mjs';
 import { verifyRelease } from './verify-release.mjs';
 import { verifyUpdaterSignature } from './verify-signature.mjs';
 import { parseReleaseManifest } from '../../src/lib/download/release.js';
+import { msixIdentity, toMsixVersion, buildAppxManifest, createPackageLayout, MSIX_EXECUTABLE } from './package-msix.mjs';
 
 const read = (path) => readFileSync(path, 'utf8');
 const json = (path) => JSON.parse(read(path));
@@ -221,5 +222,74 @@ test('Actual-asset verifier connects download-page parser, hashes, sidecars and 
     assert.ok(parseReleaseManifest(manifest).windowsExe.endsWith('.exe'));
     writeFileSync(join(directory, `1lev1_${base.version}_x64.exe`), Buffer.from('not an installer'));
     assert.throws(() => verifyRelease(directory, base.version, publicKey));
+  } finally { rmSync(directory, { recursive: true, force: true }); }
+});
+
+test('MSIX Store flavour disables the GitHub updater while EXE/MSI keep it', () => {
+  const cargo = read('src-tauri/Cargo.toml');
+  assert.match(cargo, /\[features\][\s\S]*msix-store = \[\]/);
+  const source = read('src-tauri/src/desktop.rs');
+  assert.ok(source.includes('GITHUB_UPDATER_ENABLED: bool = !cfg!(feature = "msix-store")'));
+  assert.ok(source.includes('#[cfg(not(feature = "msix-store"))]\n    let builder = builder.plugin(tauri_plugin_updater::Builder::new().build());'));
+  assert.ok(source.includes('updater: disabled in the Microsoft Store (MSIX) build; the Store delivers updates'));
+  // The direct-download flavour is untouched: same bundle targets and updater.
+  assert.deepEqual(windows.bundle.targets, ['nsis', 'msi']);
+  const workflow = read('.github/workflows/desktop-windows.yml');
+  assert.ok(workflow.includes('build_msix:'));
+  assert.ok(workflow.includes('--features msix-store'));
+});
+
+test('MSIX identity comes only from the four Partner Center repository variables', () => {
+  assert.equal(msixIdentity({}), null);
+  assert.throws(() => msixIdentity({ MSIX_PACKAGE_NAME: 'Example.1lev1' }), /Incomplete MSIX identity/);
+  const env = {
+    MSIX_PACKAGE_NAME: 'ExamplePublisher.1lev1',
+    MSIX_PUBLISHER: 'CN=11111111-2222-3333-4444-555555555555',
+    MSIX_PUBLISHER_DISPLAY_NAME: 'Example Publisher',
+    MSIX_DISPLAY_NAME: '1lev1'
+  };
+  assert.deepEqual(msixIdentity(env), {
+    packageName: 'ExamplePublisher.1lev1',
+    publisher: 'CN=11111111-2222-3333-4444-555555555555',
+    publisherDisplayName: 'Example Publisher',
+    displayName: '1lev1'
+  });
+  assert.throws(() => msixIdentity({ ...env, MSIX_PUBLISHER: 'Example Publisher' }), /CN=/);
+  assert.throws(() => msixIdentity({ ...env, MSIX_PACKAGE_NAME: 'bad name!' }), /identity name/);
+});
+
+test('MSIX manifest and staged layout describe an unsigned x64 full-trust package', () => {
+  assert.equal(toMsixVersion('0.1.2'), '0.1.2.0');
+  assert.throws(() => toMsixVersion('0.1'), /major\.minor\.patch/);
+  const identity = {
+    packageName: 'ExamplePublisher.1lev1',
+    publisher: 'CN=11111111-2222-3333-4444-555555555555',
+    publisherDisplayName: 'Example & Sons',
+    displayName: '1lev1'
+  };
+  const manifest = buildAppxManifest({ identity, version: base.version });
+  assert.ok(manifest.includes('Name="ExamplePublisher.1lev1"'));
+  assert.ok(manifest.includes(`Version="${base.version}.0" ProcessorArchitecture="x64"`));
+  assert.ok(manifest.includes(`Executable="${MSIX_EXECUTABLE}" EntryPoint="Windows.FullTrustApplication"`));
+  assert.ok(manifest.includes('<rescap:Capability Name="runFullTrust" />'));
+  assert.ok(manifest.includes('<Capability Name="internetClient" />'));
+  assert.ok(manifest.includes('Example &amp; Sons'), 'Manifest values must be XML-escaped');
+  assert.ok(!manifest.includes('Sign'), 'No signing certificate is configured; the Store signs the package');
+
+  const directory = mkdtempSync(join(tmpdir(), 'desktop-msix-test-'));
+  try {
+    const executablePath = join(directory, 'app.exe');
+    writeFileSync(executablePath, Buffer.concat([Buffer.from('MZ'), Buffer.alloc(2048)]));
+    const layout = createPackageLayout({
+      stagingDir: join(directory, 'staging'),
+      executablePath,
+      identity,
+      version: base.version,
+      iconsDir: 'src-tauri/icons'
+    });
+    assert.ok(readFileSync(layout.manifestPath, 'utf8').includes('Windows.FullTrustApplication'));
+    assert.ok(readFileSync(layout.executable).length > 1024);
+    assert.ok(readFileSync(join(layout.assetsDir, 'Square150x150Logo.png')).length > 0);
+    assert.ok(readFileSync(join(layout.assetsDir, 'StoreLogo.png')).length > 0);
   } finally { rmSync(directory, { recursive: true, force: true }); }
 });

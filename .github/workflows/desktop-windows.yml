@@ -2,7 +2,7 @@ name: Windows desktop
 
 on:
   push:
-    branches: [main, arena/6127ca68-1-0]
+    branches: [main, arena/311eb765-1-0]
     tags: ['desktop-v*']
     paths:
       - 'src-tauri/**'
@@ -15,6 +15,10 @@ on:
     inputs:
       verify_public:
         description: 'Only verify the published assets and live /download (after deployment)'
+        type: boolean
+        default: false
+      build_msix:
+        description: 'Only build an unsigned x64 MSIX artifact for the Microsoft Store (requires the MSIX_* repository variables; creates/changes no GitHub Release)'
         type: boolean
         default: false
 
@@ -75,7 +79,9 @@ jobs:
   installers:
     # Pushes validate only. Publishing installers is an explicit dispatch/tag;
     # the Release remains a DRAFT until real Windows acceptance is recorded.
-    if: inputs.verify_public != true && (github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/desktop-v'))
+    # A build_msix dispatch is handled by the dedicated msix job instead and
+    # must not create or change any Release.
+    if: inputs.verify_public != true && inputs.build_msix != true && (github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/desktop-v'))
     needs: [windows-check, android-check]
     runs-on: windows-latest
     timeout-minutes: 45
@@ -141,6 +147,79 @@ jobs:
         with:
           name: windows-installers-${{ env.DESKTOP_RELEASE_TAG }}
           path: scratch/desktop/release/
+          if-no-files-found: error
+          retention-days: 14
+      # Microsoft Store track, in addition to (never instead of) EXE/MSI:
+      # only when the Partner Center identity variables are configured.
+      # The MSIX is unsigned; Microsoft signs it after Store certification.
+      - name: Build Microsoft Store flavour (GitHub updater disabled)
+        if: ${{ vars.MSIX_PACKAGE_NAME != '' && vars.MSIX_PUBLISHER != '' && vars.MSIX_PUBLISHER_DISPLAY_NAME != '' && vars.MSIX_DISPLAY_NAME != '' }}
+        run: npx --no-install tauri build --no-bundle --target x86_64-pc-windows-msvc --features msix-store
+      - name: Pack unsigned x64 MSIX and attach it to the draft Release
+        if: ${{ vars.MSIX_PACKAGE_NAME != '' && vars.MSIX_PUBLISHER != '' && vars.MSIX_PUBLISHER_DISPLAY_NAME != '' && vars.MSIX_DISPLAY_NAME != '' }}
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MSIX_PACKAGE_NAME: ${{ vars.MSIX_PACKAGE_NAME }}
+          MSIX_PUBLISHER: ${{ vars.MSIX_PUBLISHER }}
+          MSIX_PUBLISHER_DISPLAY_NAME: ${{ vars.MSIX_PUBLISHER_DISPLAY_NAME }}
+          MSIX_DISPLAY_NAME: ${{ vars.MSIX_DISPLAY_NAME }}
+        run: |
+          $version = (Get-Content src-tauri/tauri.conf.json | ConvertFrom-Json).version
+          node scripts/desktop/package-msix.mjs --exe src-tauri/target/x86_64-pc-windows-msvc/release/app.exe --out "scratch/desktop/msix/1lev1-$version-x64.msix"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $msix = Get-ChildItem scratch/desktop/msix/*.msix | Select-Object -First 1 -ExpandProperty FullName
+          gh release upload $env:DESKTOP_RELEASE_TAG $msix --repo $env:GITHUB_REPOSITORY
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Preserve MSIX package evidence
+        if: ${{ vars.MSIX_PACKAGE_NAME != '' && vars.MSIX_PUBLISHER != '' && vars.MSIX_PUBLISHER_DISPLAY_NAME != '' && vars.MSIX_DISPLAY_NAME != '' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-msix-${{ env.DESKTOP_RELEASE_TAG }}
+          path: scratch/desktop/msix/
+          if-no-files-found: error
+          retention-days: 14
+      - run: git diff --exit-code -- src-tauri/gen/android
+
+  msix:
+    # Explicit Store-package mode: produces ONLY an Actions artifact with
+    # the unsigned MSIX. It creates and changes no GitHub Release; a future
+    # Release build attaches the MSIX to its draft (see installers job).
+    if: github.event_name == 'workflow_dispatch' && inputs.verify_public != true && inputs.build_msix == true
+    needs: [windows-check, android-check]
+    runs-on: windows-latest
+    timeout-minutes: 45
+    env:
+      MSIX_PACKAGE_NAME: ${{ vars.MSIX_PACKAGE_NAME }}
+      MSIX_PUBLISHER: ${{ vars.MSIX_PUBLISHER }}
+      MSIX_PUBLISHER_DISPLAY_NAME: ${{ vars.MSIX_PUBLISHER_DISPLAY_NAME }}
+      MSIX_DISPLAY_NAME: ${{ vars.MSIX_DISPLAY_NAME }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - name: Validate Partner Center identity before building
+        run: node scripts/desktop/package-msix.mjs --check
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri -> target
+      - name: Build Microsoft Store flavour (GitHub updater disabled)
+        run: npx --no-install tauri build --no-bundle --target x86_64-pc-windows-msvc --features msix-store
+      - name: Pack unsigned x64 MSIX with MakeAppx (Microsoft signs it for the Store)
+        shell: pwsh
+        run: |
+          $version = (Get-Content src-tauri/tauri.conf.json | ConvertFrom-Json).version
+          node scripts/desktop/package-msix.mjs --exe src-tauri/target/x86_64-pc-windows-msvc/release/app.exe --out "scratch/desktop/msix/1lev1-$version-x64.msix"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Preserve MSIX package as an Actions artifact (no Release changes)
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-msix-x64
+          path: scratch/desktop/msix/
           if-no-files-found: error
           retention-days: 14
       - run: git diff --exit-code -- src-tauri/gen/android

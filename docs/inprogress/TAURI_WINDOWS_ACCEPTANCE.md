@@ -258,6 +258,46 @@ link and both stable redirects, and uploads `desktop-public-evidence`. It does
 not build or publish another installer. Network access from this agent cannot
 reach `www.1lev1.com`, so use the hosted CI check or the owner's machine.
 
+## Microsoft Store (MSIX) track — implemented, not yet packaged or submitted
+
+An additional MSIX distribution track exists alongside the existing
+updater-signed EXE/MSI installers; it does not replace or alter them:
+
+- Cargo feature `msix-store` (`src-tauri/Cargo.toml`): in the Store flavour
+  the GitHub updater plugin is not registered and no update check runs —
+  MSIX updates are delivered by the Microsoft Store. Default (EXE/MSI)
+  builds do not enable the feature and keep the existing updater.
+- `scripts/desktop/package-msix.mjs` stages the x64 package (executable,
+  `AppxManifest.xml`, existing Square/Store tile assets), validates the
+  manifest with the Windows SDK's MakeAppx, and verifies the packed file.
+- Workflow: dispatching with `build_msix=true` produces only an Actions
+  artifact and creates/changes no GitHub Release. In a future Release
+  build, the MSIX is attached to the **draft** Release — only when the
+  identity variables below are configured.
+- The identifier stays `world.onelev1.app`; `src-tauri/gen/android` is
+  untouched. No signing certificate was bought or configured: the built
+  MSIX is unsigned, and Microsoft signs it after Store certification.
+- No actual `.msix` file has been produced yet.
+
+Prerequisite owner action: a Microsoft account alone does not provide the
+package identity. Create the product in Partner Center and reserve its
+name, then set these **repository variables** (GitHub → Settings → Secrets
+and variables → Actions → Variables). They are public package identity
+values, not secrets — do not store them as secrets:
+
+```text
+MSIX_PACKAGE_NAME
+MSIX_PUBLISHER
+MSIX_PUBLISHER_DISPLAY_NAME
+MSIX_DISPLAY_NAME
+```
+
+After setting them, dispatch the workflow with `build_msix=true` to get
+the `windows-msix-x64` artifact. Still outstanding before submission: a
+real installation test and the Windows App Certification Kit; the
+`runFullTrust` capability may also need a justification in the Store
+review notes.
+
 ## Acceptance record — no boxes pre-checked
 
 Fill **both** OS columns with PASS/FAIL, test date, tester, and evidence. Include
