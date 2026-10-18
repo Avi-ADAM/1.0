@@ -4,6 +4,14 @@ version = "0.1.2"
 description = "1lev1 mobile/desktop shell (Tauri v2)"
 edition = "2021"
 
+[features]
+default = []
+# Microsoft Store (MSIX) build: the GitHub updater plugin is not registered
+# and no update check is started — MSIX packages are updated by the Store.
+# The default (EXE/MSI) build does not enable this feature and keeps using
+# the existing GitHub-Releases updater unchanged.
+msix-store = []
+
 # Required for Tauri mobile targets (Android loads the app as a shared library)
 [lib]
 name = "app_lib"

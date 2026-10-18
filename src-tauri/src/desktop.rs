@@ -2,16 +2,26 @@
 use std::{
     path::{Path, PathBuf},
     sync::atomic::{AtomicU64, Ordering},
-    time::{Duration, SystemTime, UNIX_EPOCH},
+    time::{SystemTime, UNIX_EPOCH},
 };
+#[cfg(not(feature = "msix-store"))]
+use std::time::Duration;
 use tauri::{
     webview::{DownloadEvent, NewWindowResponse},
     AppHandle, Manager, Url, WebviewUrl, WebviewWindowBuilder, Wry,
 };
 use tauri_plugin_dialog::{DialogExt, MessageDialogButtons};
 use tauri_plugin_opener::OpenerExt;
+#[cfg(not(feature = "msix-store"))]
 use tauri_plugin_updater::UpdaterExt;
-use tauri_plugin_window_state::{AppHandleExt, StateFlags};
+#[cfg(not(feature = "msix-store"))]
+use tauri_plugin_window_state::AppHandleExt;
+use tauri_plugin_window_state::StateFlags;
+
+/// The GitHub-Releases updater runs only in the directly distributed
+/// EXE/MSI build. Microsoft Store (MSIX) builds are updated by the Store,
+/// so the updater is compiled out of that flavour via `msix-store`.
+pub(crate) const GITHUB_UPDATER_ENABLED: bool = !cfg!(feature = "msix-store");
 
 const LOCAL_SHELL: &str = "http://tauri.localhost/windows.html";
 const WINDOW_STATE: StateFlags = StateFlags::SIZE
@@ -48,7 +58,7 @@ fn open_external(app: &AppHandle, url: &Url) {
 
 pub fn configure(builder: tauri::Builder<Wry>) -> tauri::Builder<Wry> {
     // Must be registered first, before a second process opens the WebView profile.
-    builder
+    let builder = builder
         .plugin(tauri_plugin_single_instance::init(|app, _, _| {
             if let Some(window) = app.get_webview_window("main") {
                 let _ = window.unminimize();
@@ -59,8 +69,12 @@ pub fn configure(builder: tauri::Builder<Wry>) -> tauri::Builder<Wry> {
         .plugin(tauri_plugin_window_state::Builder::default().with_state_flags(WINDOW_STATE).build())
         .plugin(tauri_plugin_opener::Builder::new().open_js_links_on_click(false).build())
         .plugin(tauri_plugin_dialog::init())
-        .plugin(tauri_plugin_process::init())
-        .plugin(tauri_plugin_updater::Builder::new().build())
+        .plugin(tauri_plugin_process::init());
+    // MSIX/Store builds must not poll GitHub Releases: the Store delivers
+    // their updates. EXE/MSI builds keep the consent-based updater.
+    #[cfg(not(feature = "msix-store"))]
+    let builder = builder.plugin(tauri_plugin_updater::Builder::new().build());
+    builder
 }
 
 fn startup_stage(stage: &str) {
@@ -198,7 +212,10 @@ pub fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
     startup_stage("native callback returned; navigating to local shell");
     window.navigate(Url::parse(LOCAL_SHELL)?)?;
     startup_stage("local shell navigation submitted");
+    #[cfg(not(feature = "msix-store"))]
     start_updater(app.handle().clone())?;
+    #[cfg(feature = "msix-store")]
+    log::info!("updater: disabled in the Microsoft Store (MSIX) build; the Store delivers updates");
     startup_stage("setup complete");
     Ok(())
 }
@@ -218,6 +235,7 @@ fn download_destination(directory: &Path, suggested: &Path) -> PathBuf {
     }
 }
 
+#[cfg(not(feature = "msix-store"))]
 fn start_updater(app: AppHandle) -> std::io::Result<()> {
     std::thread::Builder::new().name("desktop-updater".into()).spawn(move || loop {
         // Dedicated thread: native blocking dialogs must not block the UI thread.
@@ -229,6 +247,7 @@ fn start_updater(app: AppHandle) -> std::io::Result<()> {
     Ok(())
 }
 
+#[cfg(not(feature = "msix-store"))]
 async fn check_update(app: &AppHandle) -> Result<(), Box<dyn std::error::Error>> {
     log::info!("updater: checking for an update");
     let Some(update) = app.updater_builder().timeout(Duration::from_secs(20)).build()?.check().await? else {
@@ -266,6 +285,13 @@ mod tests {
         assert!(is_site_blob(&Url::parse("blob:https://www.1lev1.com/123").unwrap()));
         assert!(!is_site_blob(&Url::parse("blob:https://evil.test/123").unwrap()));
         assert!(!is_local(&Url::parse("http://tauri.localhost/other.html").unwrap()));
+    }
+
+    #[test]
+    fn updater_channel_matches_distribution_flavour() {
+        // EXE/MSI (default features) updates from GitHub Releases; the
+        // Microsoft Store (msix-store) flavour leaves updates to the Store.
+        assert_eq!(GITHUB_UPDATER_ENABLED, !cfg!(feature = "msix-store"));
     }
 
     #[test]
