@@ -38,6 +38,7 @@ import { apiRikmaPath } from './rikmaPath.js';
 import { sanitizeDescriptionHtml } from './html.js';
 import {
   availabilityOf,
+  checkoutOf,
   imageOf,
   num,
   str,
@@ -268,6 +269,11 @@ export interface ApiProduct {
   priceRange: ApiPriceRange | null;
   /** True when the product has variant rows — including when they were not loaded. */
   hasVariants: boolean;
+  /**
+   * May a storefront sell this in its own till and report it with
+   * `POST /orders` (§3.2)? `false` ⇒ send the buyer to `buyUrl` instead.
+   */
+  checkout: boolean;
   /** The axes a buyer chooses from (size, colour…). Empty without variants. */
   options: ApiOption[];
   /** Only populated on the detail call or with `?expand=variants`. */
@@ -356,7 +362,7 @@ export function sellerOf(
   };
 }
 
-function pricingModeOf(
+export function pricingModeOf(
   attrs: Record<string, any>
 ): 'fixed' | 'estimated' | 'quote' {
   const mode = attrs?.pricingMode;
@@ -411,12 +417,13 @@ export function toApiProduct(
   // Text comes from the sanitized HTML too, so a `<script>` body never
   // surfaces as words in the plain-text field.
   const descriptionHtml = sanitizeDescriptionHtml(a.desc);
+  const status = productStatusOf(a);
   return {
     id,
     name: a.name,
     descriptionHtml,
     descriptionText: excerptOf(descriptionHtml),
-    status: productStatusOf(a),
+    status,
     price,
     currency,
     pricingMode,
@@ -446,6 +453,7 @@ export function toApiProduct(
     buyUrl: abs(`/gift/${id}`),
     priceRange: block.priceRange,
     hasVariants: block.hasVariants,
+    checkout: checkoutOf({ status, pricingMode, price }),
     options: block.options,
     variants: block.variants,
     unit: block.unit,
@@ -559,6 +567,7 @@ export const API_PRODUCT_FIELDS: readonly string[] = [
   // dotted path — see `API_PRODUCT_FIELD_SET`.
   'priceRange',
   'hasVariants',
+  'checkout',
   'options',
   'variants',
   'unit',

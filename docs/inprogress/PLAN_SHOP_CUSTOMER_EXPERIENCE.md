@@ -10,6 +10,12 @@
 > (`rikmaApiShopSchema`, `rikmaApiShopAttrs`, `rikmaApiShopVariants`,
 > `rikmaApiShopAxes`, `rikmaApiOptions`). עד שהסכמה חיה, ה-API מזהה זאת בעצמו
 > (`shopSchemaLive`) ומחזיר בדיוק את מה שהחזיר לפני התוכנית. פירוט ב-§7.2.
+> **S2 נסגר (2026-10-18):** השדה `checkout` ב-DTO (`checkoutOf` ב-`shop.ts`),
+> ו-`rikma-v1.openapi.yaml` עבר למודל ההזמנה ששולמה (§5.4).
+> **S3 — חלק ראשון בנוי (2026-10-18):** `POST /orders`, `GET /orders/{ref}`,
+> הפעולה `createPaidOrder`, `variantId`/`orderId` ב-`createSale`, ה-scopes
+> `orders:*`. נשאר מ-S3: ביטול + איפוס מכירה `self`, `markOrderShipped`/
+> `Fulfilled`, ו-webhooks. פירוט ומה צריך לפני שזה עולה: **§7.5**.
 >
 > **הסכמה (S1) נפרסה ב-`1.0b`** (`shabab`, 2026-10-16). הסקירה מצאה בה שבעה
 > תיקונים — כולם בענף `ccr-21b574f2-p5actf` של `1.0b`, ממתינים למיזוג
@@ -784,10 +790,12 @@ breakpoints: {
 | `rikmaApiShopVariants` | שורות הווריאנטים של מוצרי העמוד | ✅ |
 | `rikmaApiShopAxes` | זוגות האפשרויות פר-מוצר (דרך יחס `variants` של המוצר) — למונה ב-`/options` | ✅ |
 | `rikmaApiOptions` | הצירים והערכים של הרקמה | ✅ |
-| `rikmaApiOrderCreate` | כתיבת `order` + `order-line` | ⛔ S3 |
-| `rikmaApiOrderByRef` | קריאת הזמנה במעקב (ולפי `externalId` — אידמפוטנטיות) | ⛔ S3 |
+| `rikmaApiOrderCreate` / `rikmaApiOrderLineCreate` | כתיבת `order` + `order-line` | ✅ |
+| `rikmaApiOrderByRef` | הזמנה עם שורות ומכירות — מעקב, אידמפוטנטיות והמשך כתיבה שנקטעה | ✅ |
+| `ordersApiProject` / `ordersApiProducts` / `ordersApiVariants` | מה ש-`planOrder` מחליט לפיו, מגודר לרקמה בשאילתה | ✅ |
+| `saleProductHasVariants` / `saleVariantInfo` / `saleLinkShop` | `createSale`: השומר, המלאי של הווריאנט, הקישור מכירה↔וריאנט/הזמנה | ✅ |
 | `rikmaApiOrderSetStatus` | `shipped` / `fulfilled` / `cancelled` + חותמות זמן | ⛔ S3 |
-| `rikmaApiVariantQuant` | עדכון מלאי של וריאנט | ⛔ S3 |
+| `rikmaApiVariantQuant` | עדכון מלאי של וריאנט | ✅ |
 | `shopVariantsSave` / `shopOptionsSave` | העורך למוכר (יצירה/עדכון וריאנטים וצירים) | ⛔ S4 |
 | `moachOrders` | רשימת ההזמנות למסך ההזמנות, עם שורות ופרטי קונה | ⛔ S5 |
 | `rikmaApiOrderLink` | קישור ה-`Sheirutpend`/פורום להזמנה | ⛔ S3b (אחרי ה-MVP) |
@@ -818,7 +826,7 @@ breakpoints: {
 - `upload.breakpoints` מוגדרים; GraphQL `defaultLimit: 250` — יחסים מקוננים בלי
   `pagination` (`rikmaApiShopAxes`, `pics`) לא נחתכים ב-10.
 
-**תוקן — ענף `ccr-21b574f2-p5actf` ב-`1.0b`, ממתין למיזוג ולפריסה:**
+**תוקן — ענף `ccr-21b574f2-p5actf` ב-`1.0b`, מוזג ל-`shabab` (PR #17); הפריסה לא אומתה מכאן:**
 
 | # | איפה | מה | למה |
 |---|---|---|---|
@@ -854,14 +862,14 @@ breakpoints: {
 
 | שכבה | קובץ | מה | מצב |
 |---|---|---|---|
-| **טהור** | `src/lib/server/apiPublic/shop.ts` (חדש) | `galleryOf`, `variantsOf`, `optionsOf`, `optionAxesOf`, `priceRangeOf`, `axisKeyOf`, `availabilityOf`, `attributesOf`, `deliveryOf`, `buyingUnitOf` — כל חישובי החנות, בלי Strapi | ✅ בנוי + 32 בדיקות |
+| **טהור** | `src/lib/server/apiPublic/shop.ts` (חדש) | `galleryOf`, `variantsOf`, `optionsOf`, `optionAxesOf`, `priceRangeOf`, `checkoutOf`, `axisKeyOf`, `availabilityOf`, `attributesOf`, `deliveryOf`, `buyingUnitOf` — כל חישובי החנות, בלי Strapi | ✅ בנוי + 32 בדיקות |
 | **קריאה** | `src/lib/server/apiPublic/catalog.ts` | `shopSchemaLive()`, `fetchShopRows()`, `fetchVariantRows()`, `fetchOptions()` — qids נפרדים + דירוג + cache; מיזוג לתשובה | ✅ בנוי |
 | **הטלה** | `src/lib/server/apiPublic/dto.ts` | `ApiVariant`, `ApiOption`, `ApiPriceRange`, `ApiDelivery`, `ApiShop`; `toApiProduct(node, rikma, shop?)` דרך `toApiShop()` | ✅ בנוי |
 | **שאילתה** | `src/lib/server/apiPublic/query.ts` | `hasVariants`, `available`/`inStock`, `option.<key>`, `expand=variants`, `sku`, `priceMax`; `price` → `priceMin`; `matchesNothing` | ✅ בנוי |
-| **כתיבה** | `src/lib/server/apiPublic/writeApi.ts` + `src/lib/server/ordersApi.ts` (חדש) | ולידציה (`validateOrderPayload`) + בנייה + אידמפוטנטיות (`EXTERNAL_ID_CONFLICT` כשהגוף שונה) — אותה תבנית של `salesApi.ts`/`tasksApi.ts` ב-`writeApi.ts` | ⛔ S3 |
-| **route** | `src/routes/api/v1/r/[rikma]/{options,orders,orders/[ref],orders/[ref]/cancel}/+server.ts` | דקים; כל הלוגיקה ב-`apiPublic/`. `options` ✅, `orders` ⛔ S3 | חלקי |
-| **פעולה** | `src/lib/server/actions/configs/createPaidOrder.ts` (חדש) | כותב `order` (`paid`) + שורות, וקורא ל-`createSale` לכל שורה עם `product_variant` + `order`; מוריד מלאי וריאנט (קורא אותו מהשרת, לא מהקורא); מסמן `oversold`; התראה לרקמה; webhook `order.paid` | ⛔ S3 |
-| **פעולה** | `createSale.ts` (קיים) | + `variantId`; דוחה מוצר עם וריאנטים בלי `variantId`; מוריד את מלאי הווריאנט | ⛔ S3 |
+| **כתיבה** | `src/lib/server/apiPublic/writeApi.ts` + `src/lib/server/ordersApi.ts` (חדש) | ולידציה (`validateOrderPayload`) + החלטות (`planOrder`) + אידמפוטנטיות (`sameOrder`/`canResume`) + תצוגה בלי הקונה (`toOrderView`) — אותה תבנית של `salesApi.ts`/`tasksApi.ts` | ✅ + 30 בדיקות |
+| **route** | `src/routes/api/v1/r/[rikma]/{options,orders,orders/[ref],orders/[ref]/cancel}/+server.ts` | דקים; כל הלוגיקה ב-`apiPublic/`. `options`, `orders`, `orders/[ref]` ✅; `cancel` ⛔ | חלקי + 17 בדיקות |
+| **פעולה** | `src/lib/server/actions/configs/createPaidOrder.ts` (חדש) | כותב `order` (`paid`) + שורות, וקורא ל-`createSale` לכל שורה עם `variantId` + `orderId`; מסמן `oversold`; התראה לרקמה. webhook `order.paid` — ⛔ | ✅ + 11 בדיקות |
+| **פעולה** | `createSale.ts` (קיים) | + `variantId`/`orderId`; דוחה מוצר עם וריאנטים בלי `variantId`; מוריד את מלאי הווריאנט (נקרא מהשרת) | ✅ |
 | **פעולות** | `markOrderShipped` / `markOrderFulfilled` / `cancelOrder` (חדשות) | `projectMember`; `cancelOrder` מאפס את המכירות (הצעה נגדית ל-0 — המסלול ל-`self` חסר, §5.4) ומחזיר מלאי | ⛔ S3 |
 | **פעולה** | `saveProductVariants` / `saveProductOptions` (חדשות) | העורך למוכר. מלאי/תמונות/`active` מיידי; וריאנט חדש או מחיר ⇒ `editObject` במוצר של רקמה (§4 עיקרון 6); ייחודיות `(project, sku)` ו-`(matanot, axisKey)` | ⛔ S4 |
 | **lifecycle** | `1.0b`: `src/api/matanot/…/lifecycles.js`, `src/api/product-variant/…/lifecycles.js` | השדות הנגזרים (§2.4) | ⛔ S4 |
@@ -870,7 +878,7 @@ breakpoints: {
 | **תבנית פתיחה** | ריפו נפרד (`1lev1-shop-starter`) | §7.4 | ⛔ S6 |
 | **שוק/חנות פנימית** | `src/lib/components/products/MatanotPublicView.svelte`, `/gift/[id]` | גלריה + בורר וריאנטים + כמות | ⛔ אחרי ה-MVP |
 | **תרגומים** | `src/lib/translations/{he,en,es,ar,ru}/` | בורר, זמינות, שגיאות, מסך ההזמנות והמסך המתקדם + `check:i18n` | עם כל שלב |
-| **OpenAPI** | `docs/tbd/api/rikma-v1.openapi.yaml` | `ApiVariant`, `ApiOption`, `checkout`, `/options`, `/orders`, `/orders/{ref}/cancel`, פרמטרים חדשים | ⛔ |
+| **OpenAPI** | `docs/tbd/api/rikma-v1.openapi.yaml` | `ApiVariant`, `ApiOption`, `checkout`, `/options`, `/orders`, `/orders/{ref}/cancel`, פרמטרים חדשים | ✅ (החוזה; `/orders` ימומש ב-S3) |
 | **qids** | `src/routes/api/send/qids.js`, `qidsAccess.js` | §6.8 |
 
 **הכלל שמחזיק את זה:** כל שדה חדש מגיע ל-DTO דרך `shop.ts`, וכל חישוב
@@ -900,8 +908,22 @@ breakpoints: {
 `variantAxes`, מאותה סיבה שהסינון קורא לווריאנטים: מונה וסינון שלא מסכימים
 גרועים מאין מונה.
 
-נשאר מ-S2: השדה `checkout` ב-DTO (§3.2, §5.1) — `pricingMode:'fixed'` ולא
-בארכיון — וה-OpenAPI (`ApiVariant`, `ApiOption`, `/options`).
+**נסגר ב-2026-10-18:**
+
+- **`checkout`** (§3.2, §5.1) — `checkoutOf` ב-`shop.ts`: `true` רק למוצר
+  `published`, `pricingMode:'fixed'`, עם `price` שאינו `null` (`0` הוא מחיר).
+  מאגד ביקוש (PLAN_POOL_PRODUCT) הוא `maagad-offer` ולא שורת מוצר, ולכן אינו
+  מגיע לקטלוג ואין לו ענף כאן.
+- **דליפה שנסגרה בדרך:** `priceRangeOf` בדק את `price === null` (מוצר `quote`)
+  רק *אחרי* השדות הנגזרים. ה-lifecycle (§2.4) כותב `priceMin = price` בלי קשר
+  ל-`pricingMode`, כך שמוצר `quote` עם `price` שנשאר בשורה היה מפרסם דרך
+  `priceRange` את המספר ש-`price: null` מסתיר. הבדיקה עלתה לראש הפונקציה.
+- **OpenAPI** — `checkout` ב-`Product`; `/orders` עבר מ"בקשת רכש" להזמנה
+  ששולמה (`OrderRequest` עם `externalId`/`unitPrice`/`amount`, `OrderAccepted`
+  עם `orderRef`/`oversold`, `Order`, `OrderStatus`); נוסף
+  `POST /orders/{ref}/cancel`; קודי השגיאה `OUT_OF_STOCK`/`QUANTITY_LIMIT`
+  הוחלפו ב-`NOT_CHECKOUTABLE`/`EXTERNAL_ID_CONFLICT` (§5.7); `Variant.price`
+  מתואר כפי שהקוד מחזיר אותו (כבר עם נפילה למחיר המוצר).
 
 ### 7.3 מסך המכירות במוח — שתי שכבות
 
@@ -961,6 +983,59 @@ breakpoints: {
 הלקוח מגדיר שלושה משתני סביבה (כתובת הרקמה, מפתח קריאה, מפתח `orders:create`)
 וסוד ה-webhook של ספק התשלום — וזה כל ה"בקאנד" שלו.
 
+
+### 7.5 S3 — מה נבנה, מה הוכרע בדרך, ומה צריך לפני שזה עולה
+
+**נבנה (2026-10-18):** `POST /api/v1/r/{rikma}/orders`, `GET …/orders/{ref}`,
+`createPaidOrder`, `variantId`/`orderId` ב-`createSale`, ה-scopes
+`orders:create`/`orders:read` (`GRANTABLE_SCOPES` + `RikmaApiPanel` עם הערת
+"שרת בלבד" בחמש שפות).
+
+**הוכרע במימוש:**
+
+- **"מהשרת בלבד" נאכף, לא רק נכתב.** בקשה עם כותרת `Origin` נדחית ב-`403
+  ORIGIN_NOT_ALLOWED` — דפדפן שולח אותה תמיד ב-POST חוצה-אתרים, `fetch` של
+  שרת לא. ל-endpoints של ההזמנות אין CORS ואין `OPTIONS`.
+- **אטומיות = הכל מוחלט לפני הכתיבה הראשונה, והמשך אחרי נפילה.** `planOrder`
+  מחליט כל שורה (404/409) לפני שנכתב משהו. אם הכתיבה נקטעת באמצע, ה-retry של
+  ספק התשלום מוצא את ההזמנה לפי `ref` וכותב רק את מה שחסר. המכירה של כל שורה
+  נמצאת לפי ה-`externalId` שלה (`pi_x:n`), כך שמכירה שהקישור שלה להזמנה לא
+  נקלט מאומצת (והקישור מתוקן) ולא נרשמת פעמיים. `canResume` מוודא שזו אותה
+  הזמנה: השורות שכבר נכתבו תואמות במקומן, וה-`total` שנכתב ראשון תואם — מה
+  שתופס retry ש*הוסיף* שורה.
+- **"אותו גוף" (`sameOrder`)** = השורות (מוצר, וריאנט, כמות, מחיר ליחידה,
+  בסדר) והמטבע. תיקון טלפון של הקונה הוא אותה הזמנה; שינוי כמות הוא `409`.
+- **מכירה של וריאנט לא נוגעת ב-`Matanot.quant`.** המלאי שזז הוא של הווריאנט
+  (נקרא מהשרת ברגע המכירה). סך המוצר הוא `stockTotal`, שה-lifecycle של
+  `product-variant` גוזר (§2.4) — **עד S4 הוא לא מתעדכן**, ולכן `?available=`
+  ברשימה יכול לפגר אחרי מכירת וריאנט; הפרט מחשב מהווריאנטים ונכון.
+- **השומר ב-`createSale`** (`hasVariants` בלי `variantId` ⇒ `VARIANT_REQUIRED`)
+  לא חוסם מכירה כשהבדיקה עצמה נכשלת — בסכמה בלי העמודה אין מוצרים עם וריאנטים.
+- **הקישור מכירה↔וריאנט/הזמנה הוא מוטציה נפרדת** (`saleLinkShop`), כך
+  ש-`createSaleRecord` ממשיך לעבוד בפריסה שאין בה את העמודות. הוא best-effort
+  ורץ אחרי שהמלאי זז; הזמנה שהקישור שלה חסר משלימה אותו ב-retry.
+- **התראה לחברי הרקמה** פעם אחת (לא ב-retry), `intent: 'review'` כשיש מכירת-יתר.
+- **מטבע:** הזמנה במטבע הרקמה לא מועברת כ-`entryCurrency` (אין מה להמיר, ואין
+  קריאה למטבע הרקמה בכל שורה).
+
+**לפני שזה עולה — חובה:**
+
+1. לוודא ש-`1.0b@shabab` (כולל PR #17, תיקוני §6.9) **נפרס**.
+2. הרשאות ב-Strapi לקולקציות החדשות, **בשני המקומות** (קולקציה חדשה נפרסת בלי
+   אף הרשאה): ה-**API token** של השרת (`ADMINMONTHER`) — `find`/`findOne`/
+   `create`/`update` על `order`, `order-line`, `product-variant`; ו-`update` על
+   `sale` עם השדות `order`/`product_variant`. וה-**Authenticated** (§6.9) —
+   ל-`createSale` מהממשק כשיעביר `variantId` (S4/S9).
+3. `npm run types:update`. `validate:qids` עובר כבר היום, אבל מול הסכמה
+   הישנה שב-`src/generated/`.
+4. אין צורך בסדר פריסה מיוחד: עד שהסכמה חיה, `/orders` עונה `503
+   SHOP_NOT_READY` (אותה בדיקת `shopSchemaLive` של הקטלוג).
+
+**נשאר מ-S3:** `POST /orders/{ref}/cancel` + מסלול איפוס למכירה `self`
+(§5.4), `markOrderShipped`/`markOrderFulfilled` (`rikmaApiOrderSetStatus`),
+webhooks `order.*`/`variant.stockChanged` (היום `WEBHOOK_ACTIONS` מכיר רק
+מטלות — זה הרחבה של `webhooks/dispatch.ts`).
+
 ---
 
 ## 8. פאזות ואומדנים
@@ -969,8 +1044,8 @@ breakpoints: {
 |---|---|---|---|
 | **S0** | המסמך + מפרט הסכמה (§6) | — | ✅ |
 | **S1** | הסכמה ב-`1.0b` + פריסה + `types:update` | S0 | ✅ נפרסה 2026-10-16. **תיקוני §6.9** — ענף מוכן, ממתין למיזוג, פריסה והרשאות Authenticated |
-| **S2** | **קריאה:** `shop.ts` + `shopAttrs` + DTO + פרמטרים + `/options` | S1 | ✅ (147+ בדיקות). נשאר: `checkout` ב-DTO, OpenAPI |
-| **S3** | **הזמנה ששולמה:** `POST /orders` + `/orders/{ref}` + `/cancel` + `createPaidOrder` + `variantId` ב-`createSale` + איפוס מכירה `self` + scopes `orders:*` + webhooks `order.*`/`variant.stockChanged` | §6.9 | 5–7 ימים |
+| **S2** | **קריאה:** `shop.ts` + `shopAttrs` + DTO + פרמטרים + `/options` + `checkout` + OpenAPI | S1 | ✅ (2026-10-18) |
+| **S3** | **הזמנה ששולמה:** `POST /orders` + `/orders/{ref}` + `/cancel` + `createPaidOrder` + `variantId` ב-`createSale` + איפוס מכירה `self` + scopes `orders:*` + webhooks `order.*`/`variant.stockChanged` | §6.9 | 🟡 חלק ראשון ✅ (2026-10-18, §7.5). נשאר: `/cancel` + איפוס `self`, `markOrder*`, webhooks |
 | **S4** | **עורך למוכר:** גלריה + צירים + מחולל וריאנטים + עריכת מחיר/מלאי + `editObject` למחירים + lifecycle של הנגזרים ב-`1.0b` | §6.9 | 6–8 ימים |
 | **S5** | **מסך מכירות:** השכבה הפשוטה (פס הזמנות ממתינות) + המסך המתקדם (הזמנות, מוצרים, מלאי, מכירות, חיבורים) + ייצוא CSV | S3, S4 | 6–8 ימים |
 | **S6** | **תבנית פתיחה** (§7.4) עם מתאם ספק תשלום אחד | S3 | 3–5 ימים |
@@ -1057,7 +1132,7 @@ curl 'https://www.1lev1.com/api/v1/r/haohel/products/1842?expand=variants&locale
     "status": "published",
     "price": 280, "currency": "ILS", "pricingMode": "fixed",
     "priceRange": { "min": 280, "max": 420, "currency": "ILS" },
-    "hasVariants": true,
+    "hasVariants": true, "checkout": true,
     "availability": { "unlimited": false, "quantity": 17 },
     "unit": "מקום", "minOrder": 1, "maxOrder": 8, "leadTimeHours": 168,
     "attributes": { "material": "חרס" },

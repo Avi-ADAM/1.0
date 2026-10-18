@@ -17425,6 +17425,102 @@ ${STIPEND_DECISION_FIELDS}
     }
   }`,
 
+  /* ─────────────────────────────────────────────────────────────────────
+   * Paid orders (PLAN_SHOP_CUSTOMER_EXPERIENCE §3.3, §5.4 — S3)
+   *
+   * Written by the `createPaidOrder` action and read by `POST/GET /orders`
+   * with the admin token; never through /api/send, hence serviceAdmin-only.
+   * Every row is fenced to the key's rikma *in the query*: a product, variant
+   * or order of another rikma comes back as no row at all.
+   * ───────────────────────────────────────────────────────────────────── */
+
+  // The rikma's currency (an order without `currency` is in it) and name.
+  'ordersApiProject': `query OrdersApiProject($pid: ID!) {
+    project(id: $pid) { data { id attributes { projectName currencyCode } } }
+  }`,
+
+  // The products an order names — everything `planOrder` decides with.
+  'ordersApiProducts': `query OrdersApiProducts($pid: ID!, $ids: [ID]) {
+    matanots(
+      filters: { and: [ { projectcreates: { id: { eq: $pid } } }, { id: { in: $ids } } ] }
+      pagination: { limit: 100 }
+    ) {
+      data { id attributes {
+        name price pricingMode quant kindOf
+        status_of_voting archived lifecycle
+        hasVariants minOrder maxOrder leadTimeHours
+        pic { data { attributes { url alternativeText formats } } }
+      } }
+    }
+  }`,
+
+  // The variants an order names, with the product they belong to.
+  'ordersApiVariants': `query OrdersApiVariants($pid: ID!, $ids: [ID]) {
+    productVariants(
+      filters: { and: [ { project: { id: { eq: $pid } } }, { id: { in: $ids } } ] }
+      pagination: { limit: 100 }
+    ) {
+      data { id attributes {
+        sku name optionValues price quant active
+        matanot { data { id } }
+        pics { data { attributes { url alternativeText formats } } }
+      } }
+    }
+  }`,
+
+  // One order by its ref (`57:pi_3Q8x`), with lines and sales — idempotency,
+  // resume after a half-finished write, and `GET /orders/{ref}`.
+  'rikmaApiOrderByRef': `query RikmaApiOrderByRef($pid: ID!, $ref: String!) {
+    orders(
+      filters: { and: [ { project: { id: { eq: $pid } } }, { ref: { eq: $ref } } ] }
+      pagination: { limit: 1 }
+    ) {
+      data { id attributes {
+        ref externalId status oversold total currencyCode
+        paidAt shippedAt fulfilledAt updatedAt
+        lines(pagination: { limit: 100 }) { data { id attributes {
+          position quantity unitPrice nameSnapshot optionLabelSnapshot
+          matanot { data { id } }
+          variant { data { id } }
+        } } }
+        sales(pagination: { limit: 100 }) { data { id attributes { externalId } } }
+      } }
+    }
+  }`,
+
+  'rikmaApiOrderCreate': `mutation RikmaApiOrderCreate($data: OrderInput!) {
+    createOrder(data: $data) { data { id attributes { ref } } }
+  }`,
+
+  'rikmaApiOrderLineCreate': `mutation RikmaApiOrderLineCreate($data: OrderLineInput!) {
+    createOrderLine(data: $data) { data { id } }
+  }`,
+
+  // ── createSale + variants ──────────────────────────────────────────────
+  // Asked only when a sale names a variant — or, for the guard, only to learn
+  // whether the product is sold by variant. Kept apart from `createSaleRecord`
+  // so a sale keeps working on a deployment whose schema has no variants yet.
+
+  'saleProductHasVariants': `query SaleProductHasVariants($id: ID!) {
+    matanot(id: $id) { data { id attributes { hasVariants } } }
+  }`,
+
+  'saleVariantInfo': `query SaleVariantInfo($id: ID!) {
+    productVariant(id: $id) { data { id attributes {
+      quant active
+      matanot { data { id } }
+      project { data { id } }
+    } } }
+  }`,
+
+  'rikmaApiVariantQuant': `mutation RikmaApiVariantQuant($id: ID!, $quant: Float!) {
+    updateProductVariant(id: $id, data: { quant: $quant }) { data { id attributes { quant } } }
+  }`,
+
+  'saleLinkShop': `mutation SaleLinkShop($id: ID!, $product_variant: ID, $order: ID) {
+    updateSale(id: $id, data: { product_variant: $product_variant, order: $order }) { data { id } }
+  }`,
+
   ...qids_base,
   ...moachQids,
   ...digestQids,

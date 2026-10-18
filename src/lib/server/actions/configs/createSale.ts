@@ -1,5 +1,6 @@
 import { noticeSubject } from '$lib/notices/links';
-import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import type { ActionConfig, ActionContext, ActionExecutionHandler } from '../types.js';
+import { ActionError } from '../errors.js';
 import { ENTRY_CURRENCY_PARAM, entryFields, normalizeEntry } from '$lib/server/money/normalizeEntry.js';
 import { formatMoney } from '$lib/money/format.js';
 import { rikmaCurrency } from '$lib/money/resolve.js';
@@ -23,7 +24,48 @@ import { scope, decisionScope, scopeList } from '$lib/realtime/scopes.js';
  * Inventory is decremented immediately in both cases (reservation); if the
  * matured version differs in quantity, the delta is reconciled at approval
  * time (phases 2–3).
+ *
+ * Variants (PLAN_SHOP_CUSTOMER_EXPERIENCE §2.3–§2.4, S3): a sale of a product
+ * that is sold by variant must name the variant (`variantId`), and then the
+ * stock that moves is the **variant's** — read from the server here, never
+ * taken from the caller, because two buyers on the same SKU would otherwise
+ * both decrement from the same stale number. `Matanot.quant` is left alone on
+ * that path: for a variant product the product-level total is `stockTotal`,
+ * which the `product-variant` lifecycle in `1.0b` derives from the variants.
+ * `orderId` links the sale to the paid order it is one line of.
  */
+
+/** "This deployment's schema has no variants yet" — expected during rollout. */
+function isSchemaMissing(err: unknown): boolean {
+  const text = err instanceof Error ? err.message : JSON.stringify(err ?? '');
+  return /GRAPHQL_VALIDATION_FAILED|Cannot query field|Unknown type|QUERY_NOT_FOUND|not found in QIDS/i.test(
+    text
+  );
+}
+
+/**
+ * Is this product sold by variant? A probe failure never blocks a sale: the
+ * guard exists to keep `Matanot.quant` from moving under a variant product,
+ * and a schema without the column has no variant products at all.
+ */
+async function productHasVariants(
+  strapi: { execute: (...args: any[]) => Promise<any> },
+  productId: string,
+  context: ActionContext
+): Promise<boolean> {
+  try {
+    const res = await strapi.execute(
+      'saleProductHasVariants',
+      { id: productId },
+      context.jwt,
+      context.fetch
+    );
+    return res?.data?.matanot?.data?.attributes?.hasVariants === true;
+  } catch (err) {
+    if (!isSchemaMissing(err)) console.warn('[createSale] hasVariants probe failed:', err);
+    return false;
+  }
+}
 
 // restime enum → milliseconds (mirrors $lib/func/calcX.svelte; inlined so this
 // server module has no dependency on a .svelte file).
@@ -37,7 +79,7 @@ function restimeToMs(restime: string | null | undefined): number {
   }
 }
 
-const handler: ActionExecutionHandler = async (params, context, { strapi, notifier }) => {
+export const createSaleHandler: ActionExecutionHandler = async (params, context, { strapi, notifier }) => {
   const {
     productId,
     projectId,
@@ -52,7 +94,9 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
     note = '',
     externalId = null,
     source = null,
-    customerIdentifier = null
+    customerIdentifier = null,
+    variantId = null,
+    orderId = null
   } = params as {
     productId: string;
     projectId: string;
@@ -68,7 +112,34 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
     externalId?: string | null;
     source?: string | null;
     customerIdentifier?: string | null;
+    variantId?: string | null;
+    orderId?: string | null;
   };
+
+  // Variant first, before anything is written: a sale that names the wrong
+  // variant, or no variant for a product sold by variant, writes nothing.
+  const variant = variantId ? String(variantId) : null;
+  let variantQuant: number | null = null;
+  if (variant) {
+    const res = await strapi.execute('saleVariantInfo', { id: variant }, context.jwt, context.fetch);
+    const v = res?.data?.productVariant?.data?.attributes;
+    if (
+      !v ||
+      String(v.matanot?.data?.id ?? '') !== String(productId) ||
+      String(v.project?.data?.id ?? '') !== String(projectId)
+    ) {
+      throw new ActionError(
+        'VARIANT_NOT_FOUND',
+        `Variant ${variant} is not a variant of product ${productId} in this rikma`
+      );
+    }
+    variantQuant = v.quant == null ? 0 : Number(v.quant);
+  } else if (await productHasVariants(strapi, String(productId), context)) {
+    throw new ActionError(
+      'VARIANT_REQUIRED',
+      `Product ${productId} is sold by variant — the sale has to name the variant`
+    );
+  }
 
   const now = new Date().toISOString();
   const reporterId = String(context.userId);
@@ -164,9 +235,28 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
   if (!saleData?.id) throw new Error('Failed to create sale');
   const saleId = String(saleData.id);
 
-  // 2. Decrement product quantity if not unlimited (reservation).
+  // 2. Decrement stock if not unlimited (reservation): the variant's when the
+  //    sale names one (read above, from the server), else the product's.
   let newQuantity: number | undefined;
-  if (Number(quantity) > 0 && Number(availableQuantity) !== -1) {
+  let newVariantQuantity: number | undefined;
+  if (variant) {
+    if (Number(quantity) > 0 && variantQuant !== -1) {
+      // May go below zero: a paid order is never refused for stock, and a
+      // negative count is the rikma's backlog (§2.5) — the order says `oversold`.
+      const next = (variantQuant ?? 0) - Number(quantity);
+      try {
+        const res = await strapi.execute(
+          'rikmaApiVariantQuant',
+          { id: variant, quant: next },
+          context.jwt,
+          context.fetch
+        );
+        newVariantQuantity = res?.data?.updateProductVariant?.data?.attributes?.quant;
+      } catch (err) {
+        console.warn('[createSale] variant quantity update failed:', err);
+      }
+    }
+  } else if (Number(quantity) > 0 && Number(availableQuantity) !== -1) {
     const newQuant = Number(availableQuantity) - Number(quantity);
     try {
       const quantRes = await strapi.execute(
@@ -178,6 +268,24 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
       newQuantity = quantRes?.data?.updateMatanot?.data?.attributes?.quant;
     } catch (err) {
       console.warn('[createSale] quantity update failed:', err);
+    }
+  }
+
+  // 2a. The shop links — the variant sold and the order it is a line of. A
+  //     separate mutation, so `createSaleRecord` keeps working on a schema
+  //     with neither column; after the stock moved and best-effort, because
+  //     the sale is already real — a paid order's retry mends a missing link
+  //     by the sale's externalId (createPaidOrder) instead of selling twice.
+  if (variant || orderId) {
+    try {
+      await strapi.execute(
+        'saleLinkShop',
+        { id: saleId, product_variant: variant, order: orderId ? String(orderId) : null },
+        context.jwt,
+        context.fetch
+      );
+    } catch (err) {
+      console.warn('[createSale] sale↔variant/order link failed:', err);
     }
   }
 
@@ -331,6 +439,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
     saleId,
     saleIn: saleData.attributes?.in,
     newQuantity,
+    newVariantQuantity,
     matana: saleData,
     holderStatus,
     decisionId,
@@ -342,7 +451,7 @@ export const createSaleConfig: ActionConfig = {
   key: 'createSale',
   description:
     'Report a sale. Self-held money → sovereign self-report (holderStatus:self). Money held by someone else → opens a bilateral saleClaim Decision (holderStatus:open) with a restime timegrama and notifies the holder.',
-  graphqlOperation: handler,
+  graphqlOperation: createSaleHandler,
   paramSchema: {
     productId: { type: 'string', required: true },
     projectId: { type: 'string', required: true },
@@ -357,6 +466,17 @@ export const createSaleConfig: ActionConfig = {
     note: { type: 'string', required: false },
     externalId: { type: 'string', required: false },
     source: { type: 'string', required: false },
+    variantId: {
+      type: 'string',
+      required: false,
+      description:
+        'The variant sold. Required for a product sold by variant (VARIANT_REQUIRED otherwise); its own stock is the one that moves.'
+    },
+    orderId: {
+      type: 'string',
+      required: false,
+      description: 'The paid order this sale is one line of (createPaidOrder).'
+    },
     entryCurrency: ENTRY_CURRENCY_PARAM,
     customerIdentifier: {
       type: 'string',

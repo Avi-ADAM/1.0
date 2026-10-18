@@ -30,7 +30,11 @@ const GRANTABLE_SCOPES = [
   'tasks:create',
   'tasks:read',
   'products:read',
-  'products:read:draft'
+  'products:read:draft',
+  // Paid orders (PLAN_SHOP_CUSTOMER_EXPERIENCE §5.5) — a storefront server's
+  // scopes; the endpoints refuse a browser caller outright.
+  'orders:create',
+  'orders:read'
 ] as const;
 
 /** Callbacks must be absolute http(s) — a relative or exotic URL is a config bug. */

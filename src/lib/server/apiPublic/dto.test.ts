@@ -300,6 +300,31 @@ describe('status derivation (§4.3, corrected — §12 #1)', () => {
     )!;
     expect(dto.price).toBeNull();
     expect(dto.pricingMode).toBe('quote');
+    expect(dto.priceRange).toBeNull();
+    expect(dto.checkout).toBe(false);
+  });
+
+  it('marks a published fixed-price product as sellable in the till (§3.2)', () => {
+    const dto = toApiProduct(
+      {
+        id: '6',
+        attributes: { name: 'ספל', price: 40, status_of_voting: 'active' }
+      },
+      RIKMA_REF
+    )!;
+    expect(dto.checkout).toBe(true);
+  });
+
+  it('never marks an archived product as sellable, even at a fixed price', () => {
+    const dto = toApiProduct(
+      {
+        id: '7',
+        attributes: { name: 'ספל', price: 40, archived: true }
+      },
+      RIKMA_REF
+    )!;
+    expect(dto.status).toBe('archived');
+    expect(dto.checkout).toBe(false);
   });
 });
 

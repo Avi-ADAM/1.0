@@ -49,7 +49,14 @@ import {
   TASKS_CREATE_SCOPE,
   TASKS_READ_SCOPE
 } from '$lib/server/tasksApi.js';
+import {
+  validateOrderPayload,
+  toOrderView,
+  ORDERS_CREATE_SCOPE,
+  ORDERS_READ_SCOPE
+} from '$lib/server/ordersApi.js';
 import { checkRateLimit, errorResponse } from './http.js';
+import { shopSchemaLive, strapiRun } from './catalog.js';
 
 /** Admin token for Strapi bypass (internal use) — same handling as v1/actions. */
 const ADMIN_TOKEN = (env.ADMINMONTHER ?? '')
@@ -612,6 +619,211 @@ export async function handleTaskStatusGet(args: {
         successor: '/api/v1/r/{rikma}/tasks'
       })
     : response;
+}
+
+// ─── orders (PLAN_SHOP_CUSTOMER_EXPERIENCE §3.3, §5.4 — S3) ────────────────
+
+/**
+ * The orders envelope: the read API's `{ error: { code, message, details } }`,
+ * with real `details` (the line problems), and **no CORS headers** — these
+ * endpoints are for a storefront's server, and a browser that cannot read the
+ * answer has one more reason not to be the caller.
+ */
+function orderJson(status: number, body: unknown): Response {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { 'Content-Type': 'application/json; charset=utf-8' }
+  });
+}
+
+function orderError(
+  status: number,
+  code: string,
+  message: string,
+  details: Record<string, unknown> = {}
+): Response {
+  return orderJson(status, { error: { code, message, details } });
+}
+
+/** `createPaidOrder`'s refusals → the statuses §5.4 promises. */
+function statusOfOrderError(code: string | undefined): number {
+  switch (code) {
+    case 'PRODUCT_NOT_FOUND':
+    case 'VARIANT_NOT_FOUND':
+      return 404;
+    case 'NOT_CHECKOUTABLE':
+    case 'VARIANT_REQUIRED':
+    case 'EXTERNAL_ID_CONFLICT':
+      return 409;
+    case 'VALIDATION_FAILED':
+      return 400;
+    case 'UNAUTHORIZED':
+      return 403;
+    default:
+      return 502;
+  }
+}
+
+/**
+ * The checks every orders endpoint shares after the key: the path's rikma is
+ * the key's, the caller is not a browser, and the shop schema is deployed.
+ */
+async function orderGate(
+  key: VerifiedApiKey,
+  args: { request: Request; fetch?: typeof fetch; pathProjectId?: string | null }
+): Promise<Response | null> {
+  const mismatch = assertPathTenant(key, args.pathProjectId);
+  if (mismatch) return mismatch;
+
+  // `orders:*` moves money and reads orders — a server-side scope (§3.3). A
+  // browser always sends `Origin` on a cross-site POST; a server's fetch does
+  // not. Refusing it here makes "never put this key in the page" a rule the
+  // API keeps, not a sentence in the docs.
+  if (args.request.headers.get('Origin')) {
+    return orderError(
+      403,
+      'ORIGIN_NOT_ALLOWED',
+      'Orders are reported from your server, never from a browser — an orders key in a web page is readable by anyone'
+    );
+  }
+
+  if (!(await shopSchemaLive(strapiRun(args.fetch)))) {
+    return orderError(
+      503,
+      'SHOP_NOT_READY',
+      "This deployment's shop schema is not live yet — try again later"
+    );
+  }
+  return null;
+}
+
+/**
+ * `POST /api/v1/r/{rikma}/orders` — a paid order, from the storefront's
+ * server, after its payment provider confirmed the charge.
+ *
+ * Validation here, everything else in `createPaidOrder`: reading the products
+ * and variants from the server, deciding every line before writing any,
+ * idempotency and resume by `<rikma>:<externalId>`, a self-held sale per line.
+ * The key's owner is the reporter and the money's holder — the till is theirs.
+ */
+export async function handleOrderPost(args: WriteArgs): Promise<Response> {
+  const { request, fetch, pathProjectId } = args;
+  const auth = keyOrResponse(
+    await authenticateWrite(request, {
+      scope: ORDERS_CREATE_SCOPE,
+      bucket: 'orders:create',
+      rateLimit: 'json'
+    })
+  );
+  if (auth instanceof Response) return auth;
+  const key = auth;
+
+  const gate = await orderGate(key, { request, fetch, pathProjectId });
+  if (gate) return gate;
+
+  let body: unknown;
+  try {
+    body = await request.json();
+  } catch {
+    return orderError(400, 'VALIDATION', 'Invalid JSON body');
+  }
+  const validated = validateOrderPayload(body);
+  if (validated.ok === false) {
+    return orderError(400, 'VALIDATION', validated.message, {
+      problems: validated.problems
+    });
+  }
+  const payload = validated.value;
+  const projectId = String(key.project!.id);
+
+  console.log(
+    `[OrdersAPI] createPaidOrder project=${projectId} externalId=${payload.externalId} lines=${payload.lines.length}`
+  );
+  const result = await actionService.executeAction(
+    'createPaidOrder',
+    { projectId, order: payload },
+    actionContext(String(key.user.id), fetch)
+  );
+  touchLastUsed(key.keyId, fetch);
+
+  if (!result.success) {
+    const code = result.error?.code;
+    const status = statusOfOrderError(code);
+    return orderError(
+      status,
+      status === 502 ? 'UPSTREAM_ERROR' : (code ?? 'UPSTREAM_ERROR'),
+      status === 502
+        ? 'The order could not be recorded — retry with the same externalId; nothing is charged twice'
+        : (result.error?.message ?? 'Refused'),
+      result.error?.details && typeof result.error.details === 'object' && !Array.isArray(result.error.details)
+        ? { line: (result.error.details as any).line }
+        : {}
+    );
+  }
+
+  const data = result.data ?? {};
+  const duplicated = data.duplicated === true;
+  return orderJson(duplicated ? 200 : 201, {
+    success: true,
+    duplicated,
+    orderRef: data.orderRef,
+    status: data.status,
+    oversold: data.oversold === true,
+    total: data.total,
+    currency: data.currency,
+    lines: data.lines ?? []
+  });
+}
+
+/**
+ * `GET /api/v1/r/{rikma}/orders/{ref}` — where the storefront's "thank you"
+ * page reads the status. Lines and money, never the buyer (`toOrderView`).
+ */
+export async function handleOrderGet(args: {
+  request: Request;
+  fetch?: typeof fetch;
+  ref: string;
+  pathProjectId?: string | null;
+}): Promise<Response> {
+  const { request, fetch, pathProjectId } = args;
+  const auth = keyOrResponse(
+    await authenticateWrite(request, {
+      scope: ORDERS_READ_SCOPE,
+      bucket: 'orders:read',
+      rateLimit: 'json'
+    })
+  );
+  if (auth instanceof Response) return auth;
+  const key = auth;
+
+  const gate = await orderGate(key, { request, fetch, pathProjectId });
+  if (gate) return gate;
+
+  const projectId = String(key.project!.id);
+  const ref = String(args.ref ?? '').trim();
+  // A ref names its rikma; another rikma's ref is simply not here.
+  if (!ref.startsWith(`${projectId}:`)) {
+    return orderError(404, 'NOT_FOUND', 'No such order in this rikma');
+  }
+
+  let res: any;
+  try {
+    res = await strapiClient.execute(
+      'rikmaApiOrderByRef',
+      { pid: projectId, ref },
+      ADMIN_TOKEN,
+      fetch
+    );
+  } catch (e) {
+    console.error('[OrdersAPI] order lookup failed:', e);
+    return orderError(502, 'UPSTREAM_ERROR', 'Failed to look up the order');
+  }
+  const node = res?.data?.orders?.data?.[0];
+  const view = node ? toOrderView(node) : null;
+  if (!view) return orderError(404, 'NOT_FOUND', 'No such order in this rikma');
+
+  touchLastUsed(key.keyId, fetch);
+  return orderJson(200, view);
 }
 
 /** CORS preflight, identical for every write endpoint. */

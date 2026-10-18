@@ -35,7 +35,17 @@
     rikmaSlug = null
   } = $props();
 
-  const ALL_SCOPES = ['tasks:create', 'tasks:read', 'sales:report', 'products:read', 'products:read:draft'];
+  const ALL_SCOPES = [
+    'tasks:create',
+    'tasks:read',
+    'sales:report',
+    'products:read',
+    'products:read:draft',
+    'orders:create',
+    'orders:read'
+  ];
+  /** Scopes that move money or read orders — a server's key, never a page's (§3.3). */
+  const SERVER_ONLY_SCOPES = ['orders:create', 'orders:read'];
 
   /** @type {Array<{id: string, name: string, key_prefix: string, revoked: boolean, lastUsedAt: string|null, scopes: string[], callbackUrl: string|null}>} */
   let keys = $state([]);
@@ -420,9 +430,12 @@
               onchange={() => toggleScope(s)}
             />
             <code>{s}</code>
-            <span class="muted">{$t(`rikmaApi.scope_${s.replace(':', '_')}`)}</span>
+            <span class="muted">{$t(`rikmaApi.scope_${s.replaceAll(':', '_')}`)}</span>
           </label>
         {/each}
+        {#if form.scopes.some((s) => SERVER_ONLY_SCOPES.includes(s))}
+          <p class="server-only">{$t('rikmaApi.ordersServerOnly')}</p>
+        {/if}
       </fieldset>
       <label class="field">
         <span>{$t('rikmaApi.callbackUrl')}</span>
@@ -869,6 +882,13 @@
     align-items: center;
     gap: 0.5rem;
     font-size: 0.85rem;
+  }
+  /* A global `p` colour would otherwise win on this dark panel. */
+  .scopes .server-only {
+    margin: 0.25rem 0 0;
+    font-size: 0.8rem;
+    line-height: 1.4;
+    color: var(--gold-l, #f5d78e);
   }
   button.primary {
     background: var(--barbi, #e91e8c);

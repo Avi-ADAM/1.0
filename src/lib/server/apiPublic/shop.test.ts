@@ -20,6 +20,7 @@ import {
   availabilityOf,
   axisKeyOf,
   buyingUnitOf,
+  checkoutOf,
   deliveryOf,
   galleryOf,
   imageOf,
@@ -286,6 +287,22 @@ describe('availability and the price range', () => {
     ).toBeNull();
   });
 
+  it('a quote product stays rangeless even when the lifecycle wrote priceMin', () => {
+    // The lifecycle copies `price` into `priceMin` whatever the pricing mode
+    // (§2.4): a leftover price on a quote product must not leak this way.
+    expect(
+      priceRangeOf({
+        price: null,
+        currency: CURRENCY,
+        variants: [],
+        variantsLoaded: false,
+        hasVariants: false,
+        priceMin: 999,
+        priceMax: 999
+      })
+    ).toBeNull();
+  });
+
   it('reads the denormalized total, and never invents one', () => {
     expect(stockTotalOf({ stockTotal: -1 })).toEqual({
       unlimited: true,
@@ -506,5 +523,40 @@ describe('optionAxesOf — the filter bar of GET /options', () => {
 
   it('drops an axis the merchant declared but nobody uses', () => {
     expect(optionAxesOf(axes, [])).toEqual([]);
+  });
+});
+
+describe('checkout — what a storefront may sell in its own till (§3.2)', () => {
+  it('sells a published fixed-price product', () => {
+    expect(
+      checkoutOf({ status: 'published', pricingMode: 'fixed', price: 280 })
+    ).toBe(true);
+  });
+
+  it('a free fixed product is still sellable — 0 is a price', () => {
+    expect(
+      checkoutOf({ status: 'published', pricingMode: 'fixed', price: 0 })
+    ).toBe(true);
+  });
+
+  it('never sells a price the rikma has not set', () => {
+    expect(
+      checkoutOf({ status: 'published', pricingMode: 'quote', price: null })
+    ).toBe(false);
+    expect(
+      checkoutOf({ status: 'published', pricingMode: 'estimated', price: 300 })
+    ).toBe(false);
+    expect(
+      checkoutOf({ status: 'published', pricingMode: 'fixed', price: null })
+    ).toBe(false);
+  });
+
+  it('never sells a draft or an archived product', () => {
+    expect(
+      checkoutOf({ status: 'draft', pricingMode: 'fixed', price: 280 })
+    ).toBe(false);
+    expect(
+      checkoutOf({ status: 'archived', pricingMode: 'fixed', price: 280 })
+    ).toBe(false);
   });
 });

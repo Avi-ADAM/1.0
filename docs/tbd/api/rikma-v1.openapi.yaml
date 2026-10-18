@@ -1,10 +1,14 @@
 # OpenAPI 3.1 — 1lev1 Rikma API (v1)
 #
-# DRAFT / הצעה בלבד — נכון ל-2026-10-16.
+# DRAFT / הצעה בלבד — נכון ל-2026-10-18.
 # **ממומש:** /me, /r/{rikma}, /r/{rikma}/products(+{productId}), /categories,
 #   /r/{rikma}/options, /r/{rikma}/{sales,tasks}, ו-legacy /sales,/tasks.
-# **טרם ממומש:** /orders (POST+GET — S3), /changes (Phase 2),
+#   POST /r/{rikma}/orders ו-GET /orders/{ref} (S3, 2026-10-18).
+# **טרם ממומש:** /orders/{ref}/cancel (S3), /changes (Phase 2),
 #   /discover/products (Phase 3).
+# **/orders הוא הזמנה ששולמה** (PLAN_SHOP_CUSTOMER_EXPERIENCE החלטות 5–6):
+#   הקונה משלם באתר, והשרת של האתר מדווח אחרי אישור ספק התשלום. בקשת רכש
+#   למוצר `quote` (Sheirutpend + צ'אט) היא S3b ואינה חלק מהחוזה הזה.
 # מלווה את docs/tbd/PLAN_HEADLESS_PRODUCTS_API.md ומשמש כמקור האמת לחוזה:
 # ממנו ייווצרו דף /docs/api, טיפוסי TypeScript ללקוח, ו-collection ל-Postman.
 #
@@ -47,7 +51,8 @@
 #
 # ── v1.1 (וריאנטים, גלריה, אפשרויות, הזמנות) ──────────────────────────────
 # הצרכן של גרסה זו הוא חנות: הוא צריך לבחור מידה וצבע, לראות מחיר ומלאי
-# מתעדכנים, לקבל גלריה ולשלוח בקשת רכש. המקור: PLAN_SHOP_CUSTOMER_EXPERIENCE
+# מתעדכנים, לקבל גלריה, לדעת מה מותר למכור בקופה שלו (`checkout`) ולדווח
+# הזמנה ששולמה. המקור: PLAN_SHOP_CUSTOMER_EXPERIENCE
 # (§5 לחוזה, §6 לסכמה ב-1.0b). שלוש הבטחות ששווה לבדוק:
 #   • תוספתי בלבד — `price` נשאר מחיר הבסיס, `quant` נשאר סמנטיקת המלאי,
 #     `images` היה מערך של תמונה אחת והוא נשאר מערך;
@@ -339,15 +344,29 @@ paths:
   /api/v1/r/{rikma}/orders:
     post:
       tags: [shop]
-      summary: בקשת רכש — כמה שורות, בלי סליקה (§5.4)
+      summary: הזמנה ששולמה — מהשרת של האתר, אחרי אישור ספק התשלום (§5.4)
       description: |-
-        זו "העגלה" שהחנות שולחת: שורות עם מוצר ווריאנט, פרטי קונה והעדפת
-        אספקה. הבקשה נולדת **בתוך** הרקמה — `order` + `order-line` ושרשור
-        `Sheirutpend` בצינור הקיים (צ'אט תמחור, אישור, ביצוע). אנחנו לא
-        סולקים: אין כרטיס, אין PSP.
-        אידמפוטנטיות: אותו `externalId` באותה רקמה ⇒ 200 עם `duplicated:true`
-        (רשתות שולחות retry).
-        אטומיות: שורה אחת עם בעיה ⇒ כל הבקשה נדחית, בלי חצי הזמנה.
+        הקונה שילם **באתר**, אצל ספק התשלום של האתר. רק אחרי שהספק אישר
+        (webhook / IPN), **השרת** של האתר מדווח כאן את ההזמנה: שורות עם מוצר
+        ווריאנט, מה שנגבה ליחידה, פרטי קונה ומשלוח. אנחנו לא סולקים.
+
+        מה נוצר, בפעולה אחת (`createPaidOrder`): `order` בסטטוס `paid` עם
+        `order-line` לכל שורה (snapshot של שם, וריאנט, SKU ותמונה); `Sale` לכל
+        שורה בסכום ששולם בפועל, `holderStatus:'self'` — בעל המפתח הוא מחזיק
+        הכסף, ולכן המכירה נספרת מיד בלי אישור ידני; והמלאי יורד (וריאנט ומוצר).
+
+        **מהשרת בלבד.** מפתח `orders:create` מייצר מכירות שמשנות יתרות ואחוזים;
+        בדפדפן הוא גלוי לכל אחד, ו-`allowed_origins` לא מגן מחוץ לדפדפן. לכן
+        בקשה עם כותרת `Origin` (דפדפן שולח אותה תמיד, `fetch` של שרת לא) נדחית
+        ב-`403 ORIGIN_NOT_ALLOWED`, ול-endpoint אין CORS ואין `OPTIONS`.
+
+        **מה במכוון לא נדחה** — הכסף כבר נגבה: מלאי שלא הספיק, וריאנט
+        `active=false`, כמות מחוץ ל-`minOrder`/`maxOrder`. ההזמנה נרשמת עם
+        `oversold: true` ו/או הערה, והרקמה מקבלת התראה. המלאי יכול לרדת מתחת לאפס.
+
+        אידמפוטנטיות: `externalId` (מזהה העסקה אצל ספק התשלום) + הרקמה. אותו
+        מזהה עם אותו גוף ⇒ 200 `duplicated:true`; עם גוף אחר ⇒ 409.
+        אטומיות: שורה אחת פסולה ⇒ שום דבר לא נכתב.
       security:
         - apiKey: []
       parameters:
@@ -359,71 +378,99 @@ paths:
             schema: { $ref: '#/components/schemas/OrderRequest' }
       responses:
         '201':
-          description: הבקשה נוצרה
+          description: ההזמנה נרשמה
           content:
             application/json:
               schema: { $ref: '#/components/schemas/OrderAccepted' }
         '200':
-          description: "אותו `externalId` כבר נקלט — מוחזר הכרטיס הקיים עם `duplicated: true`"
+          description: "אותו `externalId` עם אותו גוף כבר נקלט — מוחזרת ההזמנה הקיימת עם `duplicated: true`"
           content:
             application/json:
               schema: { $ref: '#/components/schemas/OrderAccepted' }
         '400':
-          description: ולידציה, כולל `QUANTITY_LIMIT` (מחוץ ל-`minOrder`/`maxOrder`)
+          description: שגיאות שדה, עם `details.lines[]`
           content:
             application/json:
               schema: { $ref: '#/components/schemas/Error' }
         '403': { $ref: '#/components/responses/Forbidden' }
         '404':
-          description: '`PRODUCT_NOT_FOUND` / `VARIANT_NOT_FOUND` — מוצר שאינו של הרקמה, טיוטה, וריאנט שאינו של המוצר או `active=false`'
+          description: '`PRODUCT_NOT_FOUND` (לא של הרקמה / טיוטה / בארכיון) או `VARIANT_NOT_FOUND` (וריאנט שאינו של המוצר)'
           content:
             application/json:
               schema: { $ref: '#/components/schemas/Error' }
         '409':
-          description: '`VARIANT_REQUIRED` (מוצר עם וריאנטים ושורה בלי `variantId`) או `OUT_OF_STOCK`'
+          description: |-
+            `NOT_CHECKOUTABLE` — מוצר שאינו `checkout` (`quote`/`estimated`);
+            `VARIANT_REQUIRED` — מוצר עם וריאנטים ושורה בלי `variantId`;
+            `EXTERNAL_ID_CONFLICT` — אותו `externalId` עם גוף אחר.
           content:
             application/json:
               schema: { $ref: '#/components/schemas/Error' }
         '429': { $ref: '#/components/responses/RateLimited' }
+        '502':
+          description: |-
+            `UPSTREAM_ERROR` — הכתיבה נעצרה באמצע. לשלוח שוב עם אותו `externalId`:
+            ההזמנה ממשיכה מהמקום שבו נעצרה, ושורה שכבר נרשמה לא נרשמת פעמיים.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+        '503':
+          description: '`SHOP_NOT_READY` — סכמת החנות עוד לא נפרסה בשרת הזה'
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
 
   /api/v1/r/{rikma}/orders/{ref}:
     get:
       tags: [shop]
-      summary: מעקב בקשת רכש (scope orders:read)
+      summary: מעקב הזמנה (scope orders:read)
+      description: |-
+        סטטוס ושורות — **בלי פרטי הקונה** (שם, טלפון, מייל, כתובת): האתר כבר
+        יודע אותם, והם גלויים רק לחברי הרקמה במסך ההזמנות.
+      security:
+        - apiKey: []
       parameters:
         - $ref: '#/components/parameters/Rikma'
-        - name: ref
-          in: path
-          required: true
-          description: ה-`ref` שהוחזר ביצירה, למשל `57:web-8811`. ה-slug שבו אינו סוד ולא מזהה.
-          schema: { type: string }
+        - $ref: '#/components/parameters/OrderRef'
       responses:
         '200':
-          description: מצב הבקשה
+          description: מצב ההזמנה
           content:
             application/json:
-              schema:
-                type: object
-                properties:
-                  ref: { type: string }
-                  status:
-                    type: string
-                    enum: [sent, seen, priced, accepted, declined, fulfilled, cancelled]
-                  total: { type: [number, 'null'], description: 'null = טרם תומחר' }
-                  currency: { type: [string, 'null'] }
-                  lines:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        productId: { type: string }
-                        variantId: { type: [string, 'null'] }
-                        quantity: { type: number }
-                        unitPrice: { type: [number, 'null'] }
-                        name: { type: [string, 'null'] }
-                  updatedAt: { type: string, format: date-time }
+              schema: { $ref: '#/components/schemas/Order' }
         '403': { $ref: '#/components/responses/Forbidden' }
-        '404': { description: אין בקשה כזו ברקמה הזו }
+        '404': { description: אין הזמנה כזו ברקמה הזו }
+
+  /api/v1/r/{rikma}/orders/{ref}/cancel:
+    post:
+      tags: [shop]
+      summary: ביטול / החזר (scope orders:create)
+      description: |-
+        ההזמנה עוברת ל-`cancelled`, המלאי חוזר, וכל מכירה מקבלת **הצעה נגדית
+        לסכום 0** ("לא קיבלתי כלום" — לא מחיקה; PLAN_sale_holder_consent).
+        מכירה שכבר נכנסה לחלוקה לא נפתחת מחדש בשקט: הרקמה מקבלת התראה על החזר
+        אחרי חלוקה. אידמפוטנטי — ביטול שני מחזיר את אותה הזמנה.
+      security:
+        - apiKey: []
+      parameters:
+        - $ref: '#/components/parameters/Rikma'
+        - $ref: '#/components/parameters/OrderRef'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason: { type: string, description: לתצוגה במסך ההזמנות }
+      responses:
+        '200':
+          description: ההזמנה בוטלה (או כבר הייתה מבוטלת)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Order' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { description: אין הזמנה כזו ברקמה הזו }
 
   /api/v1/r/{rikma}/sales:
     post:
@@ -650,7 +697,9 @@ components:
       bearerFormat: 1lev1_api_key
       description: |
         מפתח `1lev1_...` עם scope `products:read` (ואופציונלית `products:read:draft`).
-        `POST /orders` דורש `orders:create`; `GET /orders/{ref}` דורש `orders:read`.
+        `POST /orders` ו-`POST /orders/{ref}/cancel` דורשים `orders:create` —
+        **מפתח של שרת בלבד**, לעולם לא ב-JavaScript של דפדפן;
+        `GET /orders/{ref}` דורש `orders:read`.
         המפתח מקובע לרקמה: פנייה לרקמה אחרת ⇒ 403 `RIKMA_MISMATCH`, גם אם בעליו חבר בשתיהן.
         מפתח ברמת משתמש (בלי רקמה — מפתח פרופיל/MCP/OAuth) ⇒ 403 `KEY_NOT_SCOPED`,
         גם ב-GET שעובד אנונימית, וגם ב-`/api/v1/me`.
@@ -674,6 +723,12 @@ components:
       name: rikma
       in: query
       description: פילטר — רלוונטי רק ב-`/discover`. id או slug; ניתן לחזור.
+      schema: { type: string }
+    OrderRef:
+      name: ref
+      in: path
+      required: true
+      description: ה-`orderRef` שהוחזר ביצירה — `<rikmaId>:<externalId>`, למשל `57:pi_3Q8x`.
       schema: { type: string }
     Limit: { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 100, default: 20 } }
     Page: { name: page, in: query, schema: { type: integer, minimum: 1, default: 1 } }
@@ -937,7 +992,7 @@ components:
             מחיר מבוקש, כשהוא קיים. **אינו בהכרח המחיר הסופי** — ראה
             docs/tbd/PLAN_HEADLESS_PRODUCTS_API.md §11.א:
             pricingMode=fixed ⇒ סופי; estimated ⇒ הערכה; quote ⇒ null (בקשת הצעה).
-            אסור להזרים שדה זה לסליקה כשהוא אינו fixed.
+            אסור להזרים שדה זה לסליקה כשהוא אינו fixed — `checkout` אומר את זה במפורש.
         currency: { type: [string, 'null'] }
         pricingMode:
           type: string
@@ -960,6 +1015,13 @@ components:
         hasVariants:
           type: boolean
           description: 'Product-level flag; `variants[]` מלא רק בפרט או עם `expand=variants`'
+        checkout:
+          type: boolean
+          description: |-
+            מותר למכור את המוצר בקופה של האתר ולדווח אותו ב-`POST /orders`
+            (§3.2): `true` רק למוצר `published`, `pricingMode=fixed`, עם מחיר.
+            `false` ⇒ להפנות את הקונה ל-`buyUrl`; `POST /orders` על מוצר כזה
+            ⇒ `409 NOT_CHECKOUTABLE`.
         variants:
           type: array
           items: { $ref: '#/components/schemas/Variant' }
@@ -1101,9 +1163,9 @@ components:
         price:
           type: [number, 'null']
           description: |-
-            המחיר שהקונה משלם על הצירוף הזה. `null` ⇒ מחיר המוצר (המחיר
-            שנכתב כאן כברירת מחדל); ואם המוצר `pricingMode=quote` — `null`
-            הוא "המחיר ייקבע בהתאמה", כמו `price`.
+            המחיר שהקונה משלם על הצירוף הזה — כבר מחושב: וריאנט בלי מחיר משלו
+            מקבל כאן את מחיר המוצר, כך שאין לצרכן נפילה לממש. `null` רק כשלמוצר
+            אין מחיר (`pricingMode=quote`) — "המחיר ייקבע בהתאמה", כמו `price`.
         compareAtPrice: { type: [number, 'null'], description: מחיר "לפני" — תצוגת מבצע }
         availability: { $ref: '#/components/schemas/Availability' }
         images:
@@ -1121,50 +1183,104 @@ components:
         currency: { type: [string, 'null'] }
     OrderLine:
       type: object
-      required: [productId, quantity]
+      required: [productId, quantity, unitPrice]
       properties:
         productId: { type: string }
         variantId: { type: string, description: 'חובה כשהמוצר עם וריאנטים — אחרת 409 VARIANT_REQUIRED' }
-        quantity: { type: number, minimum: 0 }
+        quantity: { type: number, exclusiveMinimum: 0 }
+        unitPrice:
+          type: number
+          minimum: 0
+          description: |-
+            מה שנגבה בפועל ליחידה. המכירה נרשמת על `unitPrice × quantity` —
+            קופון או הנחה של האתר הם עניין שלו, ולא נבדקים מול מחיר הקטלוג.
         note: { type: string }
     OrderRequest:
       type: object
-      required: [lines]
+      required: [externalId, lines]
       properties:
-        externalId: { type: string, description: מזהה להזמנה הזו אצל הלקוח — אידמפוטנטיות }
+        externalId:
+          type: string
+          description: מזהה העסקה אצל ספק התשלום — מפתח האידמפוטנטיות (יחד עם הרקמה)
+        paymentRef: { type: string, description: חופשי, לתצוגה במסך ההזמנות }
+        paymentMethod: { type: string, example: card }
+        amount:
+          type: number
+          description: |-
+            הסכום הכולל שנגבה. אם אינו שווה לסכום השורות + המשלוח — נרשם כפי
+            שנשלח, והפער נכתב להערת ההזמנה. לא סיבה לדחייה.
+        currency:
+          type: string
+          description: ISO 4217. ברירת מחדל — מטבע הרקמה (כמו `sales`, PLAN_MULTI_CURRENCY)
         lines:
           type: array
+          minItems: 1
           items: { $ref: '#/components/schemas/OrderLine' }
         buyer:
           type: object
+          description: 'כשיש משלוח — לפחות `email` או `phone`, אחרת אין למי לחזור (400)'
           properties:
             name: { type: string }
             email: { type: string }
-            phone: { type: string, description: 'PII — לא נכתב ל-webhook ולא נחשף חזרה' }
+            phone: { type: string, description: 'PII — לא יוצא ב-webhook ולא ב-GET /orders/{ref}' }
         delivery:
           type: object
           properties:
             preference: { type: string, enum: [pickup, delivery, digital, contact] }
-            address: { type: object, additionalProperties: true }
+            address: { type: object, additionalProperties: true, example: { city: נתניה, street: הרצל 1 } }
+            fee: { type: number, minimum: 0 }
         note: { type: string }
-        requestedDate: { type: string, format: date-time }
         locale: { type: string }
-    OrderAccepted:
+    OrderStatus:
+      type: string
+      enum: [paid, shipped, fulfilled, cancelled]
+      description: |-
+        המסלול של הזמנה ששולמה (§3.4). `paid` נוצר עם ההזמנה; `shipped` /
+        `fulfilled` — חבר ברקמה, במסך ההזמנות; `cancelled` — `POST …/cancel`.
+        הצרכן צריך לטפל גם בערך שלא מוכר לו: בקשת הרכש של S3b תוסיף ערכים.
+    OrderLineResult:
       type: object
       properties:
+        productId: { type: string }
+        variantId: { type: [string, 'null'] }
+        quantity: { type: number }
+        name: { type: [string, 'null'], description: snapshot — מה שהקונה ראה }
+        optionLabel: { type: [string, 'null'], example: M / אדום }
+        unitPrice: { type: number }
+        saleId: { type: [string, 'null'], description: המכירה שנרשמה לשורה }
+    OrderAccepted:
+      type: object
+      required: [success, duplicated, orderRef, status]
+      properties:
         success: { type: boolean }
-        ref: { type: string, description: '57:web-8811 — המזהה למעקב' }
-        status: { type: string, enum: [sent] }
         duplicated: { type: boolean }
+        orderRef: { type: string, description: '`57:pi_3Q8x` — המזהה למעקב ולביטול' }
+        status: { $ref: '#/components/schemas/OrderStatus' }
+        oversold:
+          type: boolean
+          description: המלאי לא הספיק. ההזמנה נרשמה בכל זאת, והרקמה קיבלה התראה
+        total: { type: number }
+        currency: { type: [string, 'null'] }
         lines:
           type: array
-          items:
-            type: object
-            properties:
-              productId: { type: string }
-              variantId: { type: [string, 'null'] }
-              quantity: { type: number }
-              unitPrice: { type: [number, 'null'], description: 'null = טרם תומחר' }
+          items: { $ref: '#/components/schemas/OrderLineResult' }
+    Order:
+      type: object
+      description: 'ההזמנה כפי שהאתר רואה אותה — בלי פרטי הקונה'
+      properties:
+        orderRef: { type: string }
+        externalId: { type: string }
+        status: { $ref: '#/components/schemas/OrderStatus' }
+        oversold: { type: boolean }
+        total: { type: number }
+        currency: { type: [string, 'null'] }
+        paidAt: { type: [string, 'null'], format: date-time }
+        shippedAt: { type: [string, 'null'], format: date-time }
+        fulfilledAt: { type: [string, 'null'], format: date-time }
+        lines:
+          type: array
+          items: { $ref: '#/components/schemas/OrderLineResult' }
+        updatedAt: { type: string, format: date-time }
 
     Error:
       type: object
@@ -1189,8 +1305,9 @@ components:
                 - PRODUCT_NOT_FOUND
                 - VARIANT_REQUIRED
                 - VARIANT_NOT_FOUND
-                - OUT_OF_STOCK
-                - QUANTITY_LIMIT
+                - NOT_CHECKOUTABLE
+                - EXTERNAL_ID_CONFLICT
+                - SHOP_NOT_READY
                 - NOT_FOUND
                 - RATE_LIMITED
                 - UPSTREAM_ERROR

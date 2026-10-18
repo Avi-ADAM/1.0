@@ -495,7 +495,10 @@ export function variantsOf(
  *   4. no variants at all — `{min: price, max: price}`, one field to render.
  *
  * `null` also covers a `quote` product: it has no price, and `{min: 0}` would
- * be a lie a client cannot detect.
+ * be a lie a client cannot detect. That check comes first, before the
+ * denormalized fields: the lifecycle writes `priceMin = price` whatever the
+ * pricing mode (§2.4), so a quote product with a leftover `price` would
+ * otherwise publish through `priceRange` the number `price: null` withholds.
  */
 export function priceRangeOf(args: {
   price: number | null;
@@ -506,6 +509,7 @@ export function priceRangeOf(args: {
   priceMin?: number | null;
   priceMax?: number | null;
 }): ApiPriceRange | null {
+  if (args.price === null) return null;
   const prices = args.variants
     .filter((v) => v.active)
     .map((v) => v.price)
@@ -522,8 +526,33 @@ export function priceRangeOf(args: {
     return { min: args.priceMin, max, currency: args.currency };
   }
   if (args.hasVariants && !prices.length) return null;
-  if (args.price === null) return null;
   return { min: args.price, max: args.price, currency: args.currency };
+}
+
+/**
+ * `checkout` — may a storefront sell this product in its own till (§3.2)?
+ *
+ * Only a published, `fixed`-price product with a price a buyer can see. A
+ * `quote`/`estimated` product's price is the rikma's to set, not the till's;
+ * `POST /orders` refuses those with `409 NOT_CHECKOUTABLE`, and this field is
+ * how a storefront knows before the buyer pays. A product whose range is
+ * `null` (known variants, none loaded and no denormalized range) is not
+ * refused here — `pricingMode` and `price` already decide it; the range is
+ * only a display question.
+ *
+ * A demand pool (PLAN_POOL_PRODUCT) is a `maagad-offer`, not a product row,
+ * so it never reaches the catalog and needs no branch here.
+ */
+export function checkoutOf(args: {
+  status: string;
+  pricingMode: string;
+  price: number | null;
+}): boolean {
+  return (
+    args.status === 'published' &&
+    args.pricingMode === 'fixed' &&
+    args.price !== null
+  );
 }
 
 // ─── product-level shop fields ──────────────────────────────────────────────

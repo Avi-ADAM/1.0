@@ -672,6 +672,21 @@ export const qidsAccess = {
   'rikmaApiShopVariants': { allow: ['serviceAdmin'] },
   'rikmaApiShopAxes': { allow: ['serviceAdmin'] },
   'rikmaApiOptions': { allow: ['serviceAdmin'] },
+  // Paid orders (S3): the `createPaidOrder` action and `/orders` with the
+  // admin token. An order carries the buyer's phone and address — it is never
+  // reachable with a user JWT through /api/send.
+  'ordersApiProject': { allow: ['serviceAdmin'] },
+  'ordersApiProducts': { allow: ['serviceAdmin'] },
+  'ordersApiVariants': { allow: ['serviceAdmin'] },
+  'rikmaApiOrderByRef': { allow: ['serviceAdmin'] },
+  'rikmaApiOrderCreate': { allow: ['serviceAdmin'] },
+  'rikmaApiOrderLineCreate': { allow: ['serviceAdmin'] },
+  // Run by `createSale` itself (strapiClient, not /api/send) — so no session
+  // ever needs them here, whoever reported the sale.
+  'saleProductHasVariants': { allow: ['serviceAdmin'] },
+  'saleVariantInfo': { allow: ['serviceAdmin'] },
+  'rikmaApiVariantQuant': { allow: ['serviceAdmin'] },
+  'saleLinkShop': { allow: ['serviceAdmin'] },
 
   // Site reports mirrored into the central rikma — same story, and a report
   // carries the reporter's email, so it is never reachable with a user JWT.
