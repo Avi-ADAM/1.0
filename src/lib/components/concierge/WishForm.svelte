@@ -649,6 +649,7 @@
     }
     recorder?.stream.getTracks().forEach((tr) => tr.stop());
     clearTimeout(recordTimer);
+    clearTimeout(flashTimer);
   });
 
   function appendDictated(/** @type {string} */ text) {
@@ -845,9 +846,104 @@
       rephrasing = false;
     }
   }
-  const isReady = $derived(
-    title.trim().length > 6 && bodyText.length > 30 && !publishing
+  const TITLE_MIN_CHARS = 7;
+  const BODY_MIN_CHARS = 31;
+
+  const titleTrimmed = $derived(title.trim());
+  const titleLen = $derived(titleTrimmed.length);
+  const bodyLen = $derived(bodyText.length);
+  const titleOk = $derived(titleLen >= TITLE_MIN_CHARS);
+  const bodyOk = $derived(bodyLen >= BODY_MIN_CHARS);
+  const titleRemaining = $derived(Math.max(0, TITLE_MIN_CHARS - titleLen));
+  const bodyRemaining = $derived(Math.max(0, BODY_MIN_CHARS - bodyLen));
+  const formReady = $derived(titleOk && bodyOk);
+  const isReady = $derived(formReady && !publishing);
+
+  /** @type {HTMLInputElement | undefined} */
+  let titleInputEl = $state();
+  /** @type {HTMLDivElement | undefined} */
+  let bodyWrapEl = $state();
+  let flashField = $state(/** @type {'title' | 'body' | null} */ (null));
+  /** @type {ReturnType<typeof setTimeout> | undefined} */
+  let flashTimer;
+
+  /** @param {'title' | 'body'} field */
+  function focusRequiredField(field) {
+    clearTimeout(flashTimer);
+    flashField = field;
+    flashTimer = setTimeout(() => {
+      flashField = null;
+    }, 1800);
+    if (field === 'title') {
+      titleInputEl?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      titleInputEl?.focus();
+    } else {
+      bodyWrapEl?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      const pm = /** @type {HTMLElement | null | undefined} */ (
+        bodyWrapEl?.querySelector('.ProseMirror')
+      );
+      if (pm) pm.focus();
+      else bodyWrapEl?.focus();
+    }
+  }
+
+  const checklist = $derived([
+    {
+      id: /** @type {'title'} */ ('title'),
+      label: $t('concierge.new.readiness.ckTitle'),
+      sub: titleOk
+        ? $t('concierge.new.readiness.ckTitleReady')
+        : $t('concierge.new.readiness.ckTitleSub'),
+      ok: titleOk,
+      started: titleLen > 0,
+      remaining: titleRemaining,
+      badge: titleOk
+        ? `✓ ${$t('concierge.new.readiness.done')}`
+        : titleLen > 0
+          ? $t('concierge.new.readiness.moreChars', { remain: titleRemaining })
+          : $t('concierge.new.readiness.required')
+    },
+    {
+      id: /** @type {'body'} */ ('body'),
+      label: $t('concierge.new.readiness.ckBody'),
+      sub: bodyOk
+        ? $t('concierge.new.readiness.ckBodyReady')
+        : $t('concierge.new.readiness.ckBodySub'),
+      ok: bodyOk,
+      started: bodyLen > 0,
+      remaining: bodyRemaining,
+      badge: bodyOk
+        ? `✓ ${$t('concierge.new.readiness.done')}`
+        : bodyLen > 0
+          ? $t('concierge.new.readiness.moreChars', { remain: bodyRemaining })
+          : $t('concierge.new.readiness.required')
+    }
+  ]);
+  const readyDone = $derived(checklist.filter((c) => c.ok).length);
+  const readyPct = $derived(
+    formReady
+      ? 100
+      : Math.round(
+          ((Math.min(1, titleLen / TITLE_MIN_CHARS) +
+            Math.min(1, bodyLen / BODY_MIN_CHARS)) /
+            checklist.length) *
+            100
+        )
   );
+  const publishHint = $derived.by(() => {
+    if (formReady) return $t('concierge.new.readyHint');
+    if (!titleOk && !bodyOk) return $t('concierge.new.notReadyHint');
+    if (!titleOk) {
+      return titleLen > 0
+        ? $t('concierge.new.readiness.needMoreTitle', {
+            remain: titleRemaining
+          })
+        : $t('concierge.new.readiness.needTitle');
+    }
+    return bodyLen > 0
+      ? $t('concierge.new.readiness.needMoreBody', { remain: bodyRemaining })
+      : $t('concierge.new.readiness.needBody');
+  });
 
   /* Wizard progress reflected in the top step rail:
      0 WISH (writing) → 1 UNDERSTAND (Lev extracted a spec) →
@@ -1531,15 +1627,62 @@
             </div>
 
             <!-- Title -->
+            <div class="wf-field-head">
+              <label for="wish-title-inp" class="wf-field-label">
+                <span>{$t('concierge.new.readiness.ckTitle')}</span>
+                <span class="wf-req-star" aria-hidden="true">*</span>
+              </label>
+              <span
+                class="wf-req-pill"
+                class:wf-req-pill-ok={titleOk}
+                class:wf-req-pill-partial={titleLen > 0 && !titleOk}
+              >
+                {titleOk
+                  ? `✓ ${$t('concierge.new.readiness.done')}`
+                  : titleLen > 0
+                    ? $t('concierge.new.readiness.moreChars', {
+                        remain: titleRemaining
+                      })
+                    : $t('concierge.new.readiness.required')}
+              </span>
+            </div>
             <input
+              id="wish-title-inp"
+              bind:this={titleInputEl}
               bind:value={title}
               placeholder={$t('concierge.new.titlePlaceholder')}
               class="wish-title-inp"
+              class:wf-field-flash={flashField === 'title'}
               maxlength="120"
             />
 
             <!-- Body -->
-            <div class="rich-body-wrap">
+            <div class="wf-field-head wf-field-head-body">
+              <span id="wish-body-label" class="wf-field-label">
+                <span>{$t('concierge.new.readiness.ckBody')}</span>
+                <span class="wf-req-star" aria-hidden="true">*</span>
+              </span>
+              <span
+                class="wf-req-pill"
+                class:wf-req-pill-ok={bodyOk}
+                class:wf-req-pill-partial={bodyLen > 0 && !bodyOk}
+              >
+                {bodyOk
+                  ? `✓ ${$t('concierge.new.readiness.done')}`
+                  : bodyLen > 0
+                    ? $t('concierge.new.readiness.moreChars', {
+                        remain: bodyRemaining
+                      })
+                    : $t('concierge.new.readiness.required')}
+              </span>
+            </div>
+            <div
+              class="rich-body-wrap"
+              class:wf-field-flash={flashField === 'body'}
+              bind:this={bodyWrapEl}
+              role="group"
+              aria-labelledby="wish-body-label"
+            >
               <RichText
                 bind:outpot={body}
                 trans={true}
@@ -1682,54 +1825,126 @@
           </div>
 
           <!-- PUBLISH BAR -->
-          <div class="publish-bar">
-            <div style="display:flex;align-items:center;gap:14px;min-width:0">
-              <span class="pub-dot {isReady ? 'ready' : ''}"
-                >{isReady ? '✓' : '◯'}</span
+          <div class="publish-bar" class:publish-bar-ready={formReady}>
+            <div
+              class="pub-ready"
+              aria-label={$t('concierge.new.readiness.aria')}
+            >
+              <div class="pub-ready-head">
+                <span class="pub-ready-title">
+                  {$t('concierge.new.readiness.title')}
+                </span>
+                <span
+                  class="pub-ready-count"
+                  class:pub-ready-count-ok={formReady}
+                >
+                  {$t('concierge.new.readiness.ofRequired', {
+                    done: readyDone,
+                    total: checklist.length
+                  })}
+                </span>
+              </div>
+              <div
+                class="pub-ready-track"
+                role="progressbar"
+                aria-label={$t('concierge.new.readiness.aria')}
+                aria-valuemin="0"
+                aria-valuemax="100"
+                aria-valuenow={readyPct}
               >
-              <div style="min-width:0">
-                <div class="pub-status">
-                  {isReady
-                    ? $t('concierge.new.readyStatus')
-                    : $t('concierge.new.notReadyStatus')}
-                </div>
-                <div class="pub-hint">
-                  {isReady
-                    ? $t('concierge.new.readyHint')
-                    : $t('concierge.new.notReadyHint')}
+                <div
+                  class="pub-ready-bar"
+                  class:pub-ready-bar-ok={formReady}
+                  style:width="{readyPct}%"
+                ></div>
+              </div>
+              <ul class="pub-ready-list">
+                {#each checklist as c (c.id)}
+                  <li>
+                    <button
+                      type="button"
+                      class="pub-ready-item"
+                      class:pub-ready-item-ok={c.ok}
+                      class:pub-ready-item-missing={!c.ok}
+                      onclick={() => focusRequiredField(c.id)}
+                    >
+                      <span
+                        class="pub-ready-dot"
+                        class:pub-ready-dot-ok={c.ok}
+                        class:pub-ready-dot-partial={c.started && !c.ok}
+                        aria-hidden="true"
+                      >
+                        {#if c.ok}✓{:else}!{/if}
+                      </span>
+                      <span class="pub-ready-info">
+                        <span class="pub-ready-item-label">
+                          {c.label}
+                          <span class="wf-req-star" aria-hidden="true">*</span>
+                        </span>
+                        <span class="pub-ready-item-sub">{c.sub}</span>
+                      </span>
+                      <span
+                        class="pub-ready-badge"
+                        class:pub-ready-badge-ok={c.ok}
+                        class:pub-ready-badge-partial={c.started && !c.ok}
+                      >
+                        {c.badge}
+                      </span>
+                    </button>
+                  </li>
+                {/each}
+              </ul>
+            </div>
+
+            <div class="pub-cta-row">
+              <div
+                style="display:flex;align-items:center;gap:14px;min-width:0;flex:1 1 240px"
+              >
+                <span class="pub-dot {formReady ? 'ready' : ''}"
+                  >{formReady ? '✓' : '◯'}</span
+                >
+                <div style="min-width:0">
+                  <div class="pub-status">
+                    {formReady
+                      ? $t('concierge.new.readyStatus')
+                      : $t('concierge.new.notReadyStatus')}
+                  </div>
+                  <div class="pub-hint">
+                    {publishHint}
+                  </div>
                 </div>
               </div>
-            </div>
-            <div
-              style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"
-            >
-              <button
-                class="btn-ghost"
-                onclick={() => saveDraft()}
-                disabled={draftSaving || publishing}
-                >{draftSaving
-                  ? $t('concierge.new.draftSaving')
-                  : $t('concierge.new.saveDraft')}</button
+              <div
+                style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"
               >
-              <button
-                class="btn-jewel pub-btn"
-                disabled={!isReady}
-                onclick={publish}
-                style="opacity:{isReady ? 1 : 0.5};background:{isReady
-                  ? 'linear-gradient(135deg,var(--cg-g-metal-a),var(--cg-g-metal-b) 30%,var(--cg-g-metal-c) 60%,var(--cg-g-metal-d))'
-                  : 'linear-gradient(135deg,var(--cg-g-pinkd),var(--cg-g-pink))'};color:{isReady
-                  ? 'var(--cg-on-metal)'
-                  : 'var(--cg-on-cta)'};text-shadow:{isReady
-                  ? '1px 1px 0 var(--cg-on-metal-glow)'
-                  : 'none'}"
-                >{anon
-                  ? $t('concierge.new.publishRegister')
-                  : publishing
-                    ? $t('concierge.new.publishing')
-                    : hasMatches
-                      ? $t('concierge.new.publishAndSee')
-                      : $t('concierge.new.publish')}</button
-              >
+                <button
+                  class="btn-ghost"
+                  onclick={() => saveDraft()}
+                  disabled={draftSaving || publishing}
+                  >{draftSaving
+                    ? $t('concierge.new.draftSaving')
+                    : $t('concierge.new.saveDraft')}</button
+                >
+                <button
+                  class="btn-jewel pub-btn"
+                  disabled={!isReady}
+                  onclick={publish}
+                  style="opacity:{isReady ? 1 : 0.5};background:{isReady
+                    ? 'linear-gradient(135deg,var(--cg-g-metal-a),var(--cg-g-metal-b) 30%,var(--cg-g-metal-c) 60%,var(--cg-g-metal-d))'
+                    : 'linear-gradient(135deg,var(--cg-g-pinkd),var(--cg-g-pink))'};color:{isReady
+                    ? 'var(--cg-on-metal)'
+                    : 'var(--cg-on-cta)'};text-shadow:{isReady
+                    ? '1px 1px 0 var(--cg-on-metal-glow)'
+                    : 'none'}"
+                  >{anon
+                    ? $t('concierge.new.publishRegister')
+                    : publishing
+                      ? $t('concierge.new.publishing')
+                      : hasMatches
+                        ? $t('concierge.new.publishAndSee')
+                        : $t('concierge.new.publish')}</button
+                >
+              </div>
             </div>
           </div>
 
@@ -3039,6 +3254,53 @@
     inset-inline-end: 22px;
   }
 
+  .wf-field-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+  .wf-field-head-body {
+    margin-top: 18px;
+    margin-bottom: 6px;
+  }
+  .wf-field-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--cg-ink2b);
+  }
+  .wf-req-star {
+    color: var(--cg-pink);
+    font-weight: 700;
+  }
+  .wf-req-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 9px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--cg-pink);
+    background: rgb(var(--cg-pink-rgb) / 0.12);
+    border: 1px solid rgb(var(--cg-pink-rgb) / 0.35);
+    transition: all 0.2s;
+  }
+  .wf-req-pill-partial {
+    color: var(--cg-goldhi);
+    background: rgb(var(--cg-gold-rgb) / 0.12);
+    border-color: rgb(var(--cg-gold-rgb) / 0.38);
+  }
+  .wf-req-pill-ok {
+    color: var(--cg-mint);
+    background: rgb(var(--cg-mint-rgb) / 0.12);
+    border-color: rgb(var(--cg-mint-rgb) / 0.4);
+  }
+
   .wish-title-inp {
     width: 100%;
     box-sizing: border-box;
@@ -3052,7 +3314,9 @@
     font-weight: 700;
     color: var(--cg-ink);
     line-height: 1.2;
-    transition: border-color 0.2s;
+    transition:
+      border-color 0.2s,
+      box-shadow 0.2s;
   }
   .wish-title-inp::placeholder {
     color: var(--cg-muted2);
@@ -3061,6 +3325,10 @@
   }
   .wish-title-inp:focus {
     border-bottom-color: rgb(var(--cg-gold-rgb) / 0.5);
+  }
+  .wish-title-inp.wf-field-flash {
+    border-bottom-color: var(--cg-pink);
+    box-shadow: 0 3px 0 0 rgb(var(--cg-pink-rgb) / 0.45);
   }
 
   /* ── RichText inside dark scroll-frame ──
@@ -3099,7 +3367,7 @@
   /* The writing area reads as a field: framed, lifted on focus. It used to be
      a borderless strip under a toolbar, and nothing said "type here". */
   .scroll-frame .rich-body-wrap :global(.editor-wrapper) {
-    margin-top: 18px;
+    margin-top: 0;
     background: rgb(var(--cg-fg-rgb) / calc(0.025 * var(--cg-fg-k)));
     border: 1px solid rgb(var(--cg-gold-rgb) / 0.16);
     border-radius: 12px;
@@ -3111,6 +3379,10 @@
   .scroll-frame .rich-body-wrap :global(.editor-wrapper:focus-within) {
     border-color: rgb(var(--cg-goldhi-rgb) / 0.5);
     box-shadow: 0 0 0 3px rgb(var(--cg-goldhi-rgb) / 0.1);
+  }
+  .scroll-frame .rich-body-wrap.wf-field-flash :global(.editor-wrapper) {
+    border-color: var(--cg-pink);
+    box-shadow: 0 0 0 3px rgb(var(--cg-pink-rgb) / 0.24);
   }
   .rich-body-wrap :global(.rt-toolbar) {
     padding: 6px 10px;
@@ -3626,14 +3898,13 @@
     color: var(--cg-pink);
   }
 
-  /* ── Publish bar ── */
+  /* ── Publish bar & readiness checklist (inspired by baci.svelte) ── */
   .publish-bar {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
+    flex-direction: column;
     margin-top: 32px;
-    padding: 16px 18px;
-    border-radius: 18px;
+    padding: 20px 22px;
+    border-radius: 22px;
     background:
       radial-gradient(
         120% 80% at 0% 0%,
@@ -3642,11 +3913,175 @@
       ),
       radial-gradient(
         120% 80% at 100% 100%,
-        rgb(var(--cg-pinkd-rgb) / 0.08),
+        rgb(var(--cg-pinkd-rgb) / 0.12),
         transparent 60%
       ),
       var(--cg-s1);
-    border: 1px solid rgb(var(--cg-gold-rgb) / 0.22);
+    border: 1px solid rgb(var(--cg-pink-rgb) / 0.32);
+    gap: 18px;
+    transition: border-color 0.3s, box-shadow 0.3s;
+  }
+  .publish-bar.publish-bar-ready {
+    border-color: rgb(var(--cg-mint-rgb) / 0.42);
+    box-shadow: 0 0 28px rgb(var(--cg-mint-rgb) / 0.08);
+  }
+  .pub-ready {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid rgb(var(--cg-fg-rgb) / calc(0.08 * var(--cg-fg-k)));
+  }
+  .pub-ready-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .pub-ready-title {
+    font-family: 'Sababa', 'Heebo', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--cg-goldhi);
+  }
+  .pub-ready-count {
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--cg-muted);
+  }
+  .pub-ready-count-ok {
+    color: var(--cg-mint);
+    font-weight: 600;
+  }
+  .pub-ready-track {
+    height: 6px;
+    border-radius: 9999px;
+    background: rgb(var(--cg-fg-rgb) / calc(0.08 * var(--cg-fg-k)));
+    overflow: hidden;
+  }
+  .pub-ready-bar {
+    height: 100%;
+    border-radius: 9999px;
+    background: linear-gradient(90deg, var(--cg-g-pinkd), var(--cg-g-pink), var(--cg-g-goldhi));
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .pub-ready-bar-ok {
+    background: linear-gradient(90deg, var(--cg-g-goldhi), var(--cg-g-mint));
+    box-shadow: 0 0 12px rgb(var(--cg-mint-rgb) / 0.45);
+  }
+  .pub-ready-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 10px;
+  }
+  .pub-ready-item {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: 14px;
+    background: rgb(var(--cg-fg-rgb) / calc(0.025 * var(--cg-fg-k)));
+    border: 1px solid rgb(var(--cg-fg-rgb) / calc(0.08 * var(--cg-fg-k)));
+    text-align: start;
+    cursor: pointer;
+    font-family: inherit;
+    color: var(--cg-ink);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .pub-ready-item:hover {
+    border-color: rgb(var(--cg-gold-rgb) / 0.4);
+    background: rgb(var(--cg-gold-rgb) / 0.05);
+    transform: translateY(-1px);
+  }
+  .pub-ready-item-missing {
+    border-color: rgb(var(--cg-pink-rgb) / 0.35);
+    background: rgb(var(--cg-pink-rgb) / 0.04);
+  }
+  .pub-ready-item-missing:hover {
+    border-color: rgb(var(--cg-pink-rgb) / 0.65);
+    background: rgb(var(--cg-pink-rgb) / 0.08);
+  }
+  .pub-ready-item-ok {
+    border-color: rgb(var(--cg-mint-rgb) / 0.32);
+    background: rgb(var(--cg-mint-rgb) / 0.04);
+  }
+  .pub-ready-dot {
+    flex: 0 0 auto;
+    width: 24px;
+    height: 24px;
+    border-radius: 9999px;
+    border: 1.5px solid rgb(var(--cg-pink-rgb) / 0.65);
+    background: rgb(var(--cg-pink-rgb) / 0.14);
+    color: var(--cg-pink);
+    font-size: 12px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.25s;
+  }
+  .pub-ready-dot-partial {
+    border-color: rgb(var(--cg-gold-rgb) / 0.7);
+    background: rgb(var(--cg-gold-rgb) / 0.16);
+    color: var(--cg-goldhi);
+  }
+  .pub-ready-dot-ok {
+    border-color: var(--cg-mint);
+    background: var(--cg-mint);
+    color: var(--cg-on-mint);
+    box-shadow: 0 0 10px rgb(var(--cg-mint-rgb) / 0.5);
+  }
+  .pub-ready-info {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .pub-ready-item-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--cg-ink);
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .pub-ready-item-sub {
+    font-family: 'Bellefair', serif;
+    font-size: 12px;
+    line-height: 1.35;
+    color: var(--cg-muted);
+  }
+  .pub-ready-badge {
+    flex: 0 0 auto;
+    padding: 3px 10px;
+    border-radius: 9999px;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--cg-pink);
+    background: rgb(var(--cg-pink-rgb) / 0.14);
+    border: 1px solid rgb(var(--cg-pink-rgb) / 0.4);
+    white-space: nowrap;
+  }
+  .pub-ready-badge-partial {
+    color: var(--cg-goldhi);
+    background: rgb(var(--cg-gold-rgb) / 0.14);
+    border-color: rgb(var(--cg-gold-rgb) / 0.45);
+  }
+  .pub-ready-badge-ok {
+    color: var(--cg-mint);
+    background: rgb(var(--cg-mint-rgb) / 0.14);
+    border-color: rgb(var(--cg-mint-rgb) / 0.45);
+  }
+  .pub-cta-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     gap: 14px;
     flex-wrap: wrap;
   }

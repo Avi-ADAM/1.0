@@ -359,7 +359,25 @@
       "sub": "Es el pedido que escribiste antes de registrarte. En un momento verás el plan que se arma a su alrededor."
     },
     "levFilled": "Lev lo completó a partir de lo que escribiste — puedes cambiarlo",
-    "bodyPlaceholder": "Cuéntanos con tus palabras qué necesitas, para quién, cuándo y dónde…"
+    "bodyPlaceholder": "Cuéntanos con tus palabras qué necesitas, para quién, cuándo y dónde…",
+    "readiness": {
+      "title": "Preparación para publicar",
+      "ofRequired": "{{done}} de {{total}} campos obligatorios",
+      "aria": "Preparación del deseo para publicar",
+      "required": "Obligatorio",
+      "done": "Listo",
+      "moreChars": "{{remain}} caracteres más",
+      "ckTitle": "Título del deseo",
+      "ckTitleSub": "Una frase corta que describa el deseo (al menos 7 caracteres)",
+      "ckTitleReady": "El título está listo",
+      "ckBody": "Descripción del deseo",
+      "ckBodySub": "Unas líneas con tus palabras sobre lo que necesitas (al menos 31 caracteres)",
+      "ckBodyReady": "La descripción está lista",
+      "needTitle": "Falta el título del deseo — añade un título corto arriba para poder publicar.",
+      "needMoreTitle": "El título es demasiado corto — añade {{remain}} caracteres más al título para poder publicar.",
+      "needBody": "Falta la descripción del deseo — cuenta en unas frases lo que necesitas para poder publicar.",
+      "needMoreBody": "La descripción es demasiado corta — añade {{remain}} caracteres más a la descripción para poder publicar."
+    }
   },
   "no_wishes_found_title": "No se encontraron deseos",
   "proposals_so_far": "Propuestas hasta ahora",
