@@ -68,6 +68,36 @@ describe('BlueprintReview', () => {
     expect(getByText('rikmaImport.selectedCount:2')).toBeTruthy();
   });
 
+  it('shows invitation delivery status and gives the owner a working copy-link fallback', async () => {
+    executeAction.mockResolvedValue({
+      success: true,
+      data: {
+        created: [],
+        failed: [],
+        invites: [{ key: 'p1', result: 'notRegistered', emailStatus: 'sent', joinUrl: 'https://www.1lev1.com/project/77/join' }],
+        projectId: '77',
+        proposals: { boards: 0 }
+      }
+    });
+    const partnerSession = {
+      ...session,
+      items: [...session.items, { key: 'p1', group: 'partners', label: 'Dana', status: 'proposed', spec: { email: 'dana@example.com' } }]
+    };
+    const writeText = vi.fn().mockRejectedValueOnce(new Error('clipboard unavailable')).mockResolvedValueOnce(undefined);
+    Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText } });
+    const { getByRole, getByText, findByText } = render(BlueprintReview, { props: { session: partnerSession } });
+
+    await fireEvent.click(getByRole('button', { name: /rikmaImport\.submit/ }));
+    expect(await findByText('rikmaImport.invite.notRegistered:Dana,1,0')).toBeTruthy();
+    expect(getByText('https://www.1lev1.com/project/77/join')).toBeTruthy();
+
+    await fireEvent.click(getByRole('button', { name: 'rikmaImport.invite.copy' }));
+    expect(await findByText('rikmaImport.invite.copyFailed')).toBeTruthy();
+    await fireEvent.click(getByRole('button', { name: 'rikmaImport.invite.copy' }));
+    expect(writeText).toHaveBeenCalledWith('https://www.1lev1.com/project/77/join');
+    expect(getByRole('button', { name: 'rikmaImport.invite.copied' })).toBeTruthy();
+  });
+
   it('creates only the ticked rows and sends inline fixes as ops', async () => {
     executeAction.mockResolvedValue({ success: true, data: { created: [{ key: 'i1' }], failed: [], invites: [], projectId: '77', proposals: { boards: 1 } } });
     const { getAllByLabelText, getByDisplayValue, findByText, getByRole } = render(BlueprintReview, { props: { session } });

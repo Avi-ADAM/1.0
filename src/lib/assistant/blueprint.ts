@@ -35,7 +35,10 @@ const name = z.string().trim().min(1).max(LIMITS.label);
 const ref = z.string().trim().min(1).max(40);
 const money = z.number().finite().min(0).max(100_000_000);
 const why = text(LIMITS.why).optional();
-const holder = z.enum(['me', 'open', 'partner']).optional();
+const holder = z
+  .enum(['me', 'open', 'partner'])
+  .optional()
+  .describe('me = the person importing does it; open = recruit someone; partner = link to a partner by partnerRef and invite them to contribute.');
 
 const LocationSchema = z.object({
   lat: z.number().min(-90).max(90).optional(),
@@ -87,7 +90,7 @@ export const BlueprintMissionSchema = z.object({
   recurring: z.boolean().optional().describe('Ongoing work, every month'),
   /** me = the person importing does it · open = looking for someone · partner = see partnerRef */
   holder,
-  partnerRef: ref.optional(),
+  partnerRef: ref.optional().describe('Exact `ref` of the partner who will do this mission when holder is "partner".'),
   why
 });
 
@@ -100,14 +103,20 @@ export const BlueprintResourceSchema = z.object({
   price: money.optional().describe('Per month / year when kindOf is monthly / yearly, otherwise the whole price'),
   quantity: z.number().min(0).max(1_000_000).optional(),
   holder,
-  partnerRef: ref.optional(),
+  partnerRef: ref.optional().describe('Exact `ref` of the partner who will provide this resource when holder is "partner".'),
   why
 });
 
 export const BlueprintPartnerSchema = z.object({
   ref: ref.optional(),
   name,
-  email: z.string().trim().email().max(200).optional(),
+  email: z
+    .string()
+    .trim()
+    .email()
+    .max(200)
+    .optional()
+    .describe('Email address to send the rikma invitation to. Ask the person for it; never guess or invent it. If omitted, no email invitation can be sent.'),
   why
 });
 
@@ -270,6 +279,12 @@ export function blueprintToState(
   });
 
   input.partners.forEach((p, i) => {
+    if (!p.email) {
+      warnings.push({
+        where: `partners[${i}].email`,
+        message: 'No email was provided; the partner cannot receive an email invitation until one is added.'
+      });
+    }
     const spec = compact({ email: p.email?.toLowerCase() });
     items.push({ key: partnerKeys[i], group: 'partners', label: p.name, status: 'proposed', origin, ...(p.why ? { why: p.why } : {}), ...(spec ? { spec } : {}) });
   });

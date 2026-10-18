@@ -52,8 +52,16 @@ export interface MaterializeDeps {
   invitePartner: (
     email: string,
     targets: { openMissions: { id: string; name: string }[]; openMashaabims: { id: string; name: string }[] },
-    projectName: string
-  ) => Promise<{ result: string; created: number }>;
+    projectName: string,
+    projectId: string
+  ) => Promise<{
+    result: string;
+    created: number;
+    joinUrl?: string;
+    emailStatus?: 'sent' | 'failed' | 'skipped';
+    suggestionFailures?: number;
+    retryAfterSeconds?: number;
+  }>;
   /** Persist progress after each step; `projectId` once the rikma exists. */
   saveProgress: (state: AssistantState, projectId: string | null) => Promise<void>;
   leftoverTitle: string;
@@ -65,7 +73,15 @@ export interface MaterializeOutcome {
   created: { key: string; type: string; id: string }[];
   failed: { key: string; message: string }[];
   skipped: MaterializePlan['skipped'];
-  invites: { key: string; result: string }[];
+  invites: {
+    key: string;
+    result: string;
+    joinUrl?: string;
+    emailStatus?: 'sent' | 'failed' | 'skipped';
+    suggestionFailures?: number;
+    retryAfterSeconds?: number;
+    created?: number;
+  }[];
   /** Unticked rows kept as planning-board proposals / rows past the boards' capacity. */
   proposals: { boards: number; overflow: string[] };
   state: AssistantState;
@@ -216,7 +232,7 @@ export async function runMaterialization(
       }
     } else if (step.type === 'invite') {
       const partner = byKey.get(step.key)!;
-      const email = typeof partner.spec?.email === 'string' ? partner.spec.email : '';
+      const email = typeof partner.spec?.email === 'string' ? partner.spec.email.trim() : '';
       const open = (keys: string[], type: string) =>
         keys
           .map((k) => byKey.get(k)!)
@@ -224,17 +240,31 @@ export async function runMaterialization(
           .map((row) => ({ id: row.createdRef!.id, name: row.label }));
       const openMissions = open(step.missionKeys, 'openMission');
       const openMashaabims = open(step.resourceKeys, 'openMashaabim');
+      const joinUrl = `https://www.1lev1.com/project/${encodeURIComponent(projectId)}/join`;
+      let invite: Awaited<ReturnType<MaterializeDeps['invitePartner']>> | undefined;
       let result: string;
       if (!email) result = 'noEmail';
-      else if (!openMissions.length && !openMashaabims.length) {
+      else if (!openMissions.length && !openMashaabims.length && (step.missionKeys.length || step.resourceKeys.length)) {
         // In a rikma with more members these are still votes; the partner can
-        // be invited once they open.
-        result = step.missionKeys.length || step.resourceKeys.length ? 'pendingVote' : 'nothingToInvite';
+        // be invited to the contribution after the rikma approves it.
+        result = 'pendingVote';
       } else {
-        result = (await deps.invitePartner(email, { openMissions, openMashaabims }, projectName)).result;
+        invite = await deps.invitePartner(email, { openMissions, openMashaabims }, projectName, projectId);
+        result = invite.result;
       }
-      outcome.invites.push({ key: partner.key, result });
-      if (result === 'invited') {
+      outcome.invites.push({
+        key: partner.key,
+        result,
+        joinUrl: invite?.joinUrl ?? joinUrl,
+        ...(invite?.emailStatus ? { emailStatus: invite.emailStatus } : {}),
+        ...(invite?.suggestionFailures ? { suggestionFailures: invite.suggestionFailures } : {}),
+        ...(invite?.retryAfterSeconds ? { retryAfterSeconds: invite.retryAfterSeconds } : {}),
+        ...(invite ? { created: invite.created } : {})
+      });
+      if (
+        (result === 'invited' && !invite?.suggestionFailures) ||
+        (result === 'notRegistered' && invite?.emailStatus === 'sent')
+      ) {
         partner.status = 'applied';
         partner.createdRef = { type: 'invite', id: email };
       }

@@ -44,9 +44,14 @@ async function run(actionKey: string, params: Record<string, unknown>) {
 }
 
 const HOW_TO_PRESENT =
-  'Show the rows to the person in the conversation, ask about anything you guessed (prices especially), ' +
-  'fix what they say with setAssistantItems, then give them reviewUrl: on that page they tick what to create ' +
-  'and create it with one click. Nothing exists on the platform until they do - never say it was created.';
+  'Show the rows to the person in the conversation, ask about anything you guessed (prices especially), and ' +
+  'confirm every partner email before using it - never invent an address. To invite a partner to contribute, add ' +
+  'them in partners with a ref, then set holder:"partner" and partnerRef to that exact ref on each mission/resource ' +
+  'they will bring; listing a partner alone does not create a work invitation. Fix what they say with setAssistantItems, ' +
+  'then give them reviewUrl: on that page they tick what to create and create it with one click. On creation the server ' +
+  'sends a partner invitation email when delivery is allowed; registered partners also get mission/resource invitation ' +
+  'cards. The result reports delivery and includes a join link to share if no email could be sent. Nothing exists and no ' +
+  'invitation is sent until the person creates it there.';
 
 export const proposeRikmaBlueprintTool = createTool({
   id: 'proposeRikmaBlueprint',
@@ -61,8 +66,11 @@ export const proposeRikmaBlueprintTool = createTool({
     'domains ("events", "food") - they are linked to the platform\'s existing categories, which the concierge compares ' +
     'with every wish.\n' +
     '- missions and resources only when they make a product (put their refs in the product recipe) or when someone ' +
-    'is still needed (holder "open"). holder "me" = the person you are talking to does it; "partner" + partnerRef = ' +
-    'a partner listed in `partners`.\n' +
+    'is still needed. holder "me" = the person you are talking to does it; holder "open" = recruit someone; holder ' +
+    '"partner" + partnerRef = an exact `ref` from a row in `partners`. For every partner to invite, add a partner row ' +
+    'with a user-provided email and link each mission/resource they will bring with holder "partner" and partnerRef. ' +
+    'Do not invent or infer an email; ask the person for it. A partner row without an email cannot receive email, and a ' +
+    'partner without linked missions/resources gets only the general rikma join invitation.\n' +
     '- a running cost is priced per period, never as a total: rent or a subscription is a resource with ' +
     'kindOf "monthly" (or "yearly") and its price per month; ongoing work every month is a mission with ' +
     '`recurring: true` and `hours` per month.\n' +

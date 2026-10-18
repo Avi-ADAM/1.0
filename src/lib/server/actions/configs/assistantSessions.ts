@@ -376,12 +376,13 @@ const materializeHandler: ActionExecutionHandler = async (params, context, { str
       resolveCategories: categoryResolver(strapi, context.fetch),
       memberCount: async (pid) => (await projectContext(strapi, pid, context.fetch)).members.length || 1,
       projectName: async (pid) => (await projectContext(strapi, pid, context.fetch)).name,
-      invitePartner: (email, targets, projectName) =>
+      invitePartner: (email, targets, projectName, projectId) =>
         invitePartnerToOpenEntities(email, targets, projectName, {
           strapi,
           fetch: context.fetch,
           lang,
-          invitedBy: String(context.userId)
+          invitedBy: String(context.userId),
+          projectId
         }),
       saveProgress: async (s, projectId) => {
         const saved = await saveSession(

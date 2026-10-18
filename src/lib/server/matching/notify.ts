@@ -81,9 +81,115 @@ export async function sendNewSuggestionEmails(
       profiles,
       notification,
       'SimpleNuti',
-      { fetch: deps.fetch, lang: deps.lang || 'he' } as any
+      { fetch: deps.fetch, lang: deps.lang || 'he' }
     );
   } catch (err) {
     console.error('[matching/notify] failed to send suggestion emails:', err);
+  }
+}
+
+export type PartnerInviteEmailStatus = 'sent' | 'failed' | 'skipped';
+
+/**
+ * One email for the rikma invite. Existing members receive or reuse
+ * match-suggestion cards from the matching engine; the email links to those
+ * cards and the rikma's join page. A person without an account gets the public
+ * join page, where they can sign up before offering themselves.
+ */
+export async function sendPartnerInvitationEmail(
+  recipient: SuggestionRecipient,
+  project: { id: string; name: string },
+  targets: { openMissions: { id: string; name: string }[]; openMashaabims: { id: string; name: string }[] },
+  deps: { fetch: typeof globalThis.fetch; lang?: string }
+): Promise<PartnerInviteEmailStatus> {
+  const missionNames = targets.openMissions.map((item) => item.name).filter(Boolean).slice(0, 8);
+  const resourceNames = targets.openMashaabims.map((item) => item.name).filter(Boolean).slice(0, 8);
+  const joinUrl = `/project/${encodeURIComponent(project.id)}/join`;
+  const workHe = [
+    missionNames.length ? `משימות שאפשר להציע לקחת: ${missionNames.join(', ')}` : '',
+    resourceNames.length ? `משאבים שאפשר להציע לספק: ${resourceNames.join(', ')}` : ''
+  ].filter(Boolean).join('. ');
+  const workEn = [
+    missionNames.length ? `Missions you can offer to take on: ${missionNames.join(', ')}` : '',
+    resourceNames.length ? `Resources you can offer: ${resourceNames.join(', ')}` : ''
+  ].filter(Boolean).join('. ');
+  const workAr = [
+    missionNames.length ? `مهام يمكنك عرض تولّيها: ${missionNames.join('، ')}` : '',
+    resourceNames.length ? `موارد يمكنك عرض تقديمها: ${resourceNames.join('، ')}` : ''
+  ].filter(Boolean).join('. ');
+
+  const notification: NotificationData = {
+    title: {
+      he: `הזמנה להצטרף לרקמה "${project.name}"`,
+      en: `An invitation to join "${project.name}"`,
+      ar: `دعوة للانضمام إلى "${project.name}"`
+    },
+    body: {
+      he: [
+        `הוזמנת להצטרף לרקמה "${project.name}". אפשר לצפות במה שהיא מחפשת ולהציע השתתפות בתנאים שלך.`,
+        workHe,
+        'ההצעה שלך והחלטת הרקמה נעשות דרך האתר; שום דבר לא נרשם על שמך בלי הסכמתך.'
+      ].filter(Boolean).join('\n\n'),
+      en: [
+        `You are invited to join the "${project.name}" rikma. See what it needs and offer to contribute on your own terms.`,
+        workEn,
+        'Your offer and the rikma’s decision happen on the site; nothing is assigned to you without your consent.'
+      ].filter(Boolean).join('\n\n'),
+      ar: [
+        `أنت مدعو للانضمام إلى نسيج "${project.name}". اطّلع على احتياجاته وقدّم عرضًا للمساهمة بشروطك.`,
+        workAr,
+        'يتم تقديم عرضك وقرار النسيج عبر الموقع؛ لن يُسجّل أي شيء باسمك دون موافقتك.'
+      ].filter(Boolean).join('\n\n')
+    },
+    links: [
+      {
+        kind: 'rikma',
+        href: joinUrl,
+        label: {
+          he: 'לצפות ברקמה ולהצטרף',
+          en: 'View the rikma and join',
+          ar: 'عرض النسيج والانضمام',
+          ru: 'Посмотреть рикму и присоединиться',
+          es: 'Ver la rikma y unirme'
+        }
+      },
+      ...(recipient.id && recipient.id !== 'external' && (missionNames.length || resourceNames.length)
+        ? [{
+            kind: 'lev' as const,
+            href: '/lev',
+            label: {
+              he: 'לפתוח את ההזמנות שלי',
+              en: 'Open my invitations',
+              ar: 'افتح دعواتي',
+              ru: 'Открыть мои приглашения',
+              es: 'Abrir mis invitaciones'
+            }
+          }]
+        : [])
+    ]
+  };
+
+  try {
+    const summary = await emailService.sendBulkWithResult(
+      [
+        {
+          id: recipient.id || 'external',
+          username: recipient.username || '',
+          email: recipient.email,
+          lang: recipient.lang || deps.lang || 'he',
+          noMail: recipient.noMail,
+          machshirs: []
+        }
+      ],
+      notification,
+      'SimpleNuti',
+      { fetch: deps.fetch, lang: deps.lang || 'he' }
+    );
+    if (summary.sent > 0) return 'sent';
+    if (summary.failed > 0) return 'failed';
+    return 'skipped';
+  } catch (err) {
+    console.error('[matching/notify] failed to send partner invitation:', err);
+    return 'failed';
   }
 }
