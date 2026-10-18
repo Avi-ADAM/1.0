@@ -86,6 +86,7 @@
       </div>
       <SalesApiIntegration
         {projectId}
+        rikmaSlug={page.data.projectBase?.slug ?? null}
         bmiData={financials.matanotofs?.data || []}
         projectUsers={base?.user_1s?.data || []}
       />

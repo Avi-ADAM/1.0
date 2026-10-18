@@ -12,6 +12,8 @@
   "scope_tasks_create": "לפתוח מטלות ברקמה",
   "scope_tasks_read": "לבדוק מה קרה למטלה שנפתחה",
   "scope_sales_report": "לדווח מכירות",
+  "scope_products_read": "לקרוא את הקטלוג של הרקמה",
+  "scope_products_read_draft": "לקרוא גם מוצרים שעוד לא פורסמו",
   "callbackUrl": "כתובת לסנכרון חוזר (webhook)",
   "createKey": "צור מפתח",
   "creating": "יוצר…",
@@ -36,6 +38,9 @@
   "holder": "מבצע",
   "you": "אתם",
 
+  "catalogTitle": "הקטלוג של הרקמה",
+  "catalogSubtitle": "המוצרים של הרקמה נגישים בכתובת שלה — אין צורך במזהה רקמה נוסף.",
+  "catalogHint": "בלי מפתח מתקבלים כל המוצרים שפורסמו ברקמה — אותם מוצרים שדף הרקמה מציג, גם אלה שהוסתרו מספריית המוצרים של הפלטפורמה. מפתח עם products:read מוסיף מכסה גבוהה ו-fields/updatedSince, ועם products:read:draft גם טיוטות. המפתח נשלח מהשרת בלבד.",
   "codeTitle": "הקוד",
   "createKeyFirst": "צרו מפתח כדי שהקוד ייווצר עם המפתח האמיתי במקום עם מציין מקום.",
   "mission": "משימה לחיבור",

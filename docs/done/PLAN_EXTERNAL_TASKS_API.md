@@ -1,5 +1,10 @@
 # API יצירת מטלות ממערכות חיצוניות (External Tasks API)
 
+> **⚠️ שינוי כתובת מתוכנן (2026-10-16):** ה-endpoints מתוכננים לעבור מ‑`/api/v1/tasks`
+> ל‑**`/api/v1/r/{rikma}/tasks`** (וגם `GET /api/v1/r/{rikma}/tasks/{externalId}`).
+> ה-payload וההתנהגות **זהים לחלוטין**; רק ה-URL משתנה, ו‑`/api/v1/actions` נסגר
+> יחד איתו. ראו [PLAN_HEADLESS_PRODUCTS_API §5.8](../tbd/PLAN_HEADLESS_PRODUCTS_API.md).
+
 > אח תאום ל‑`PLAN_EXTERNAL_SALES_API.md`. אותה תשתית מפתחות, אותה תבנית
 > endpoint, אותה נקודת־חנק — רק שהפעם היעד הוא **מטלה (Act)** ולא מכירה.
 > מסמך משלים בצד Strapi: שינויי סכמה של `act` ו‑`api-key` ב‑`1.0b`.

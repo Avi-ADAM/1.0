@@ -12,6 +12,8 @@
   "scope_tasks_create": "Open tasks in the rikma",
   "scope_tasks_read": "Check what happened to a task it opened",
   "scope_sales_report": "Report sales",
+  "scope_products_read": "Read the rikma catalogue",
+  "scope_products_read_draft": "Also read products that are not published yet",
   "callbackUrl": "Sync-back address (webhook)",
   "createKey": "Create key",
   "creating": "Creating…",
@@ -36,6 +38,9 @@
   "holder": "Carried by",
   "you": "you",
 
+  "catalogTitle": "The rikma catalogue",
+  "catalogSubtitle": "The rikma’s products live at its own address — no extra rikma parameter to carry around.",
+  "catalogHint": "Without a key you get every published product of the rikma — the same products its public page shows, including ones hidden from the platform's product directory. A key with products:read adds a higher quota and fields/updatedSince, and products:read:draft adds drafts. Send the key from your server only.",
   "codeTitle": "The code",
   "createKeyFirst": "Create a key so the code is generated with the real key instead of a placeholder.",
   "mission": "Attach to mission",

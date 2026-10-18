@@ -24,10 +24,18 @@
     /** @type {string} */ projectId,
     /** @type {MissionRef[]} */ missions = [],
     /** @type {RoleRef[]} */ roles = [],
-    /** @type {Member[]} */ members = []
+    /** @type {Member[]} */ members = [],
+    /**
+     * The rikma's own address. Passed in from the page so the catalog snippet
+     * shows `/api/v1/r/<slug>/products` — the member is copying *their* shop's
+     * address, so a `{rikma}` placeholder would be exactly the confusion
+     * PLAN_HEADLESS_PRODUCTS_API §5.0 sets out to avoid.
+     * @type {string | null}
+     */
+    rikmaSlug = null
   } = $props();
 
-  const ALL_SCOPES = ['tasks:create', 'tasks:read', 'sales:report'];
+  const ALL_SCOPES = ['tasks:create', 'tasks:read', 'sales:report', 'products:read', 'products:read:draft'];
 
   /** @type {Array<{id: string, name: string, key_prefix: string, revoked: boolean, lastUsedAt: string|null, scopes: string[], callbackUrl: string|null}>} */
   let keys = $state([]);
@@ -62,6 +70,12 @@
   const keyForSnippet = $derived(newRawKey || '{{API_KEY}}');
   const missionForSnippet = $derived(selectedMissionId || '{{MISSION_ID}}');
 
+  const catalogPath = $derived(`/api/v1/r/${rikmaSlug || projectId}`);
+  const catalogAddress = $derived(`${apiBase}${catalogPath}`);
+  // The write half lives under the same prefix (§5.8): the old /api/v1/tasks
+  // still answers, with Deprecation/Sunset, but nothing new points at it.
+  const tasksUrl = $derived(`${catalogAddress}/tasks`);
+
   /** The assignment half of the body — a person, a role, or nobody. */
   const assignmentLines = $derived.by(() => {
     if (target === 'user') return [`  "assignedUserId": "${selectedUserId || '{{USER_ID}}'}",`];
@@ -85,7 +99,7 @@
 
   const serverSnippet = $derived(
     [
-      `curl -X POST ${apiBase}/api/v1/tasks \\`,
+      `curl -X POST ${tasksUrl} \\`,
       `  -H "Authorization: Bearer ${keyForSnippet}" \\`,
       '  -H "Content-Type: application/json" \\',
       `  -d '${bodyJson.replace(/\n\s*/g, ' ').replace(/'/g, "'\\''")}'`
@@ -96,7 +110,7 @@
     [
       '// Run this on YOUR server, after the item is created.',
       '// Keep the key in an env var — never ship it to the browser.',
-      `await fetch('${apiBase}/api/v1/tasks', {`,
+      `await fetch('${tasksUrl}', {`,
       "  method: 'POST',",
       '  headers: {',
       "    'Content-Type': 'application/json',",
@@ -147,12 +161,33 @@
     activeTab === 'server' ? serverSnippet : activeTab === 'node' ? nodeSnippet : webhookSnippet
   );
 
+  // ── The catalog (PLAN_HEADLESS_PRODUCTS_API) ──────────────────────────────
+  // Built from the rikma's OWN address: the path carries the rikma (§5.0), so
+  // there is nothing to explain and nothing to substitute.
+  const catalogKey = $derived(activeKeys.find((k) => k.scopes?.includes('products:read')) ?? null);
+
+  const catalogSnippet = $derived(
+    [
+      '// The shop reads its own catalog. The rikma is the address, not a filter.',
+      `curl "${catalogAddress}/products?limit=20&sort=-updatedAt"`,
+      '',
+      '// With the key: a higher quota, fields/updatedSince, and drafts if the',
+      '// key carries products:read:draft. Never ship the key to the browser.',
+      `curl "${catalogAddress}/products?limit=20" \\`,
+      `  -H "Authorization: Bearer ${catalogKey ? '{{API_KEY}}' : '{{API_KEY}}'}"`,
+      '',
+      `// The shop itself: ${catalogAddress}`,
+      `// One product: ${catalogAddress}/products/{productId}`,
+      `// Categories with counts: ${catalogAddress}/categories`
+    ].join('\n')
+  );
+
   const agentPrompt = $derived(
     `You are integrating my website with 1lev1's task API, so that every item my ` +
       `system opens also becomes a task inside our rikma (project ${projectId}) and ` +
       `waits there for a human to accept it. ` +
       `After an item is created, send an HTTPS POST from MY SERVER (never the browser) to ` +
-      `${apiBase}/api/v1/tasks with header Authorization: Bearer <ONELEVONE_API_KEY from env> ` +
+      `${tasksUrl} with header Authorization: Bearer <ONELEVONE_API_KEY from env> ` +
       `and a JSON body: name (the title), description, link (back to the item), ` +
       `externalId (my own item id — required, it makes retries safe), ` +
       (selectedMissionId ? `missionId (fixed: "${selectedMissionId}"), ` : '') +
@@ -403,7 +438,28 @@
     </div>
   </section>
 
-  <!-- 2 ── The ids -->
+  <!-- 2 ── The catalog: the shop's own address (PLAN_HEADLESS_PRODUCTS_API §5.0) -->
+  <section>
+    <h3>{$t('rikmaApi.catalogTitle')}</h3>
+    <p class="muted">{$t('rikmaApi.catalogSubtitle')}</p>
+
+    <div class="code-block">
+      <button type="button" class="copy-btn" onclick={() => copy(catalogAddress, 'catalog')}>
+        {copiedWhat === 'catalog' ? $t('rikmaApi.copied') : $t('rikmaApi.copy')}
+      </button>
+      <pre><code>{catalogAddress}</code></pre>
+    </div>
+
+    <div class="code-block">
+      <button type="button" class="copy-btn" onclick={() => copy(catalogSnippet, 'catalogSnippet')}>
+        {copiedWhat === 'catalogSnippet' ? $t('rikmaApi.copied') : $t('rikmaApi.copy')}
+      </button>
+      <pre><code>{catalogSnippet}</code></pre>
+    </div>
+    <p class="hint">{$t('rikmaApi.catalogHint')}</p>
+  </section>
+
+  <!-- 3 ── The ids -->
   <section>
     <h3>{$t('rikmaApi.idsTitle')}</h3>
     <p class="muted">{$t('rikmaApi.idsSubtitle')}</p>
@@ -485,7 +541,7 @@
     </div>
   </section>
 
-  <!-- 3 ── Snippet builder -->
+  <!-- 4 ── Snippet builder -->
   <section>
     <h3>{$t('rikmaApi.codeTitle')}</h3>
     {#if !taskKey && !newRawKey}
@@ -565,7 +621,7 @@
     </div>
   </section>
 
-  <!-- 4 ── Field reference -->
+  <!-- 5 ── Field reference -->
   <section>
     <h3>{$t('rikmaApi.varsTitle')}</h3>
     <div class="table-scroll">
@@ -624,7 +680,7 @@
     <p class="hint">{$t('rikmaApi.varsNote')}</p>
   </section>
 
-  <!-- 5 ── Agent prompt -->
+  <!-- 6 ── Agent prompt -->
   <section>
     <h3>{$t('rikmaApi.agentTitle')}</h3>
     <p class="muted">{$t('rikmaApi.agentSubtitle')}</p>

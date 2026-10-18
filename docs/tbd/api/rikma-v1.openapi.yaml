@@ -1,0 +1,1201 @@
+# OpenAPI 3.1 — 1lev1 Rikma API (v1)
+#
+# DRAFT / הצעה בלבד — נכון ל-2026-10-16.
+# **ממומש:** /me, /r/{rikma}, /r/{rikma}/products(+{productId}), /categories,
+#   /r/{rikma}/options, /r/{rikma}/{sales,tasks}, ו-legacy /sales,/tasks.
+# **טרם ממומש:** /orders (POST+GET — S3), /changes (Phase 2),
+#   /discover/products (Phase 3).
+# מלווה את docs/tbd/PLAN_HEADLESS_PRODUCTS_API.md ומשמש כמקור האמת לחוזה:
+# ממנו ייווצרו דף /docs/api, טיפוסי TypeScript ללקוח, ו-collection ל-Postman.
+#
+# הקובץ הזה מתאר את **כל** משטח ה-API של רקמה — קריאה (קטלוג) וגם כתיבה
+# (דיווח מכירות, מטלות), כי הכתובת של כולם אחת: /api/v1/r/{rikma}/…
+# הקובץ נקרא פעם products-v1; שונה-שם כשהסתבר שהמשטח אינו רק מוצרים.
+#
+# ── מורשת (legacy) — מיושן, נסגר §5.8 ──────────────────────────────────────
+# /api/v1/sales · /api/v1/tasks · /api/v1/tasks/{externalId} כבר רצים אצל
+# לקוחות, ומסומנים כאן `deprecated: true`. אנחנו שולטים בכל הצרכנים, ולכן הם
+# עוברים לכתובות הרקמה. **רק הכתובת משתנה** — payload, קודים, אידמפוטנטיות
+# והסכמת מחזיק-הכסף זהים. חלון: Deprecation/Sunset + wrapper שמגיש בפועל,
+# ואחריו 410 Gone עם Link ל-successor.
+#
+# ── העיקרון: הכתובת היא הרקמה, לא פילטר ────────────────────────────────────
+# רקמה היא ה-tenant, ה-scope של המפתח, והיחידה שמנהלת מוצרים. לכן משטח ה-delivery
+# יושב תחתיה — /api/v1/r/{rikma}/products — ולא כ-?rikma= על אוסף גלובלי.
+# שתי עדשות, בשמות מפורשים:
+#   • חנות  — /api/v1/r/{rikma}/…        (ראשי: האתר של הרקמה)
+#   • שוק    — /api/v1/discover/products (משני: כל המוצרים המפורסמים בפלטפורמה)
+#
+# ── כללי ברזל (מתוך המסמך) ─────────────────────────────────────────────────
+#   • projectId נגזר מהמפתח *וגם* מהנתיב; אי-התאמה ⇒ 403 (שני מקורות בלתי-תלויים).
+#   • מוצר שאינו של הרקמה שבנתיב ⇒ 404 (לא 403 — לא חושפים קיום).
+#   • כל תשובה עוברת דרך projector ציבורי (whitelist), לא מסננת GraphQL גלם.
+#   • אסור שייצאו: marginPct, estimatedPrice, entryCurrency/entryRate,
+#     המתכון (matanot_recipe_*), tosplits, holderStatus, ratson/nego/decision,
+#     hideFromDiscovery, appruved, status_of_voting, formerSlugs.
+#   • פתרון הכתובת זהה לזה של הדף: slugFromPath (301 על איות), findBySlug
+#     (301 על שם קודם), 404 אחרת. אותו קוד — לא שכפול.
+#     ⚠ 301 רק ב-GET. POST (sales/tasks/orders) לעולם לא מופנה — איות שונה או
+#     שם קודם של רקמת המפתח מוגשים כרגיל + X-1lev1-Rikma-Canonical.
+#   • רקמה שלא קיימת ⇒ 404 (קיום רקמה ציבורי ממילא). עם מפתח, רקמה קיימת
+#     שאינה רקמת המפתח ⇒ 403 RIKMA_MISMATCH. מפתח ברמת משתמש (בלי רקמה) ⇒
+#     403 KEY_NOT_SCOPED.
+#   • Cache-Control: public רק לבקשה אנונימית; עם מפתח ⇒ private, no-cache.
+#     תמיד Vary: Authorization, Origin.
+#   • חנות = דף הרקמה (כולל hideFromDiscovery); שוק = /gift (בלי). אין exposeToApi.
+#   • יומן התיקונים: PLAN_HEADLESS_PRODUCTS_API.md §12.
+#
+# ── v1.1 (וריאנטים, גלריה, אפשרויות, הזמנות) ──────────────────────────────
+# הצרכן של גרסה זו הוא חנות: הוא צריך לבחור מידה וצבע, לראות מחיר ומלאי
+# מתעדכנים, לקבל גלריה ולשלוח בקשת רכש. המקור: PLAN_SHOP_CUSTOMER_EXPERIENCE
+# (§5 לחוזה, §6 לסכמה ב-1.0b). שלוש הבטחות ששווה לבדוק:
+#   • תוספתי בלבד — `price` נשאר מחיר הבסיס, `quant` נשאר סמנטיקת המלאי,
+#     `images` היה מערך של תמונה אחת והוא נשאר מערך;
+#   • ה-DTO **מחשב** וריאנטים/זמינות מהשורות עצמן כשהועמסו, ונופל לשדות
+#     הנגזרים (`priceRange`, `availability`) כשלא — ולעולם לא ממציא מספר;
+#   • כל השדות החדשים ריקים כל עוד הסכמה לא נפרסה (הקוד מזהה זאת לבד),
+#     ולכן פריסת ה-API יכולה להקדים את פריסת Strapi.
+#
+# ── לשמור על מודעות (§11 במסמך) ────────────────────────────────────────────
+#   1. המחיר אינו סופי: pricingMode=quote ⇒ price=null; מוצר מורכב מתומחר לפי
+#      מתכון (hoursPerUnit/ratePerHour/costShape, priceMode=atCost) ולפי צריכה
+#      בפועל (SheirutFulfillment.atCostEntries / consumedMissionHours).
+#   2. מכירה מייצרת עבודה: אישור בקשת רכש (createSheirutFromPending) יוצר
+#      Mesimabetahalich + Act לחבר שאחראי, ו-Maap למשאבים — כלומר "הזמנה"
+#      היא טריגר ביצוע, לא שורת נתונים. webhooks עתידיים: fulfillment.*.
+#   אף אחד מהשניים אינו דורש שינוי ב-MVP — רק אסור שהחוזה יבטיח אחרת.
+
+openapi: 3.1.0
+info:
+  title: 1lev1 Rikma API
+  version: 1.1.0-draft
+  description: |
+    משטח ה-API של רקמה אחת: קריאת הקטלוג לשימוש באתר החיצוני שלה, דיווח
+    מכירות ומטלות פנימה. ציבורי לקריאה של מוצרים `published`; מפתח API
+    (scoped לרקמה) מרחיב מכסה, חושף טיוטות ומאפשר כתיבה.
+    פתוח גם גלובלי כמשטח משני (`/discover`), ו-`/me` לזיהוי המפתח.
+  contact:
+    name: 1lev1
+    url: https://www.1lev1.com
+servers:
+  - url: https://www.1lev1.com
+    description: Production
+  - url: https://{rikma}.1lev1.com
+    description: S2 — כתובת הרקמה (PLAN_RIKMA_SUBDOMAINS); אז הקידומת `/r/{rikma}` נעלמת
+    variables:
+      rikma:
+        default: haohel
+        description: ה-slug של הרקמה
+tags:
+  - name: shop
+    description: החנות של רקמה — המשטח הראשי
+  - name: sales
+    description: דיווח מכירות פנימה (מהאתר/הסליקה של הרקמה)
+  - name: tasks
+    description: מטלות — פתיחה חיצונית ומשיכת סטטוס
+  - name: discover
+    description: השוק — כל המוצרים המפורסמים (משני)
+  - name: me
+    description: זיהוי המפתח
+  - name: legacy
+    description: מורשת — מיושן, עובר לכתובות הרקמה (§5.8)
+
+security:
+  - {}          # ציבורי — רק מוצרים published
+  - apiKey: []  # מפתח scoped לרקמה
+
+paths:
+  /api/v1/me:
+    get:
+      tags: [me]
+      summary: מי אני — הזהות וההרשאות של המפתח
+      security:
+        - apiKey: []
+      description: |
+        נקודת הפתיחה של כל אינטגרציה: הסוכן של הלקוח מקבל כאן את מזהה הרקמה,
+        ה-slug (ומכאן את כל הכתובות), ה-scopes והמכסה — בלי לשאול אדם.
+      responses:
+        '200':
+          description: זהות המפתח
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      user: { type: object, properties: { id: { type: string }, name: { type: string } } }
+                      rikma: { $ref: '#/components/schemas/RikmaRef' }
+                      scopes: { type: array, items: { type: string } }
+                      quota:
+                        type: object
+                        properties:
+                          limit: { type: integer }
+                          windowSeconds: { type: integer }
+                          remaining: { type: integer }
+                      endpoints: { type: object, additionalProperties: { type: string } }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
+  /api/v1/r/{rikma}:
+    get:
+      tags: [shop]
+      summary: הרקמה — הזהות הציבורית שלה, כולל המראה
+      parameters:
+        - $ref: '#/components/parameters/Rikma'
+      responses:
+        '200':
+          description: הרקמה
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { $ref: '#/components/schemas/Rikma' }
+        '301': { $ref: '#/components/responses/MovedRikma' }
+        '404': { description: אין רקמה כזו }
+
+  /api/v1/r/{rikma}/products:
+    get:
+      tags: [shop]
+      summary: הקטלוג של הרקמה
+      parameters:
+        - $ref: '#/components/parameters/Rikma'
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Sort'
+        - $ref: '#/components/parameters/Query'
+        - $ref: '#/components/parameters/Seller'
+        - $ref: '#/components/parameters/Category'
+        - $ref: '#/components/parameters/MinPrice'
+        - $ref: '#/components/parameters/MaxPrice'
+        - $ref: '#/components/parameters/Currency'
+        - $ref: '#/components/parameters/Available'
+        - $ref: '#/components/parameters/HasVariants'
+        - $ref: '#/components/parameters/Sku'
+        - $ref: '#/components/parameters/OptionSize'
+        - $ref: '#/components/parameters/KindOf'
+        - $ref: '#/components/parameters/Lat'
+        - $ref: '#/components/parameters/Lng'
+        - $ref: '#/components/parameters/Radius'
+        - $ref: '#/components/parameters/Locale'
+        - $ref: '#/components/parameters/Fields'
+        - $ref: '#/components/parameters/Expand'
+        - $ref: '#/components/parameters/Status'
+        - $ref: '#/components/parameters/UpdatedSince'
+        - $ref: '#/components/parameters/Draft'
+      responses:
+        '200':
+          description: רשימת מוצרים של הרקמה
+          headers:
+            Cache-Control:
+              schema: { type: string }
+              example: public, s-maxage=60, stale-while-revalidate=300
+              description: |
+                `public, s-maxage=60, stale-while-revalidate=300` לבקשה אנונימית בלבד.
+                בקשה עם מפתח ⇒ `private, no-cache` (יכולה לכלול טיוטות).
+            Vary:
+              schema: { type: string }
+              example: Authorization, Origin
+            ETag:
+              schema: { type: string }
+            X-1lev1-Api-Version:
+              schema: { type: string }
+            X-1lev1-Rikma-Canonical:
+              schema: { type: string }
+              description: קיים כשהנתיב אינו הכתובת הקנונית (אחרי 301 ב-GET, או בהגשה ישירה ב-POST)
+            RateLimit-Remaining:
+              schema: { type: integer }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ProductList' }
+        '301': { $ref: '#/components/responses/MovedRikma' }
+        '304': { description: לא השתנה (If-None-Match) }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+
+  /api/v1/r/{rikma}/products/{productId}:
+    get:
+      tags: [shop]
+      summary: מוצר בודד בתוך הרקמה
+      parameters:
+        - $ref: '#/components/parameters/Rikma'
+        - name: productId
+          in: path
+          required: true
+          description: מזהה מספרי; בעתיד גם `externalKey` ידידותי (§9.10)
+          schema: { type: string }
+        - $ref: '#/components/parameters/Locale'
+        - $ref: '#/components/parameters/Expand'
+        - $ref: '#/components/parameters/PreviewToken'
+      responses:
+        '200':
+          description: |-
+            המוצר. כאן `variants[]` **תמיד** מלא (§5.1) — זה העמוד שהקונה בוחר
+            בו, וכל בחירה חייבת לעדכן מחיר, מלאי ותמונות בלי קריאה נוספת.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { $ref: '#/components/schemas/Product' }
+        '404': { description: 'אין מוצר כזה, או שאינו של הרקמה שבנתיב' }
+
+  /api/v1/r/{rikma}/categories:
+    get:
+      tags: [shop]
+      summary: הקטגוריות שיש להן מוצרים ברקמה
+      parameters:
+        - $ref: '#/components/parameters/Rikma'
+        - $ref: '#/components/parameters/Locale'
+      responses:
+        '200':
+          description: קטגוריות
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id: { type: string }
+                        name: { type: string }
+                        productsCount: { type: integer }
+
+  /api/v1/r/{rikma}/options:
+    get:
+      tags: [shop]
+      summary: צירי האפשרויות של הרקמה — מה שהחנות מציירת כסרגל סינון
+      description: |-
+        ציר וערכיו, עם מספר המוצרים שהקורא **רשאי לראות** מאחורי כל ערך.
+        ערך עם `products: 0` אינו מוחזר (סינון שמוביל לחנות ריקה הוא סינון
+        שבור), וציר בלי ערכים אינו מוחזר. המונים נספרים משורות הווריאנטים —
+        אותו מקור שהסינון `?option.<key>=<value>` קורא ממנו — כך שהמספר
+        שהקונה רואה הוא המספר שהוא יקבל.
+        אין פרמטרים: זו ניווט, לא משטח חיפוש.
+      parameters:
+        - $ref: '#/components/parameters/Rikma'
+        - $ref: '#/components/parameters/Locale'
+      responses:
+        '200':
+          description: הצירים והערכים
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [rikma, options]
+                properties:
+                  rikma: { $ref: '#/components/schemas/RikmaRef' }
+                  options:
+                    type: array
+                    items: { $ref: '#/components/schemas/OptionAxis' }
+        '301': { $ref: '#/components/responses/MovedRikma' }
+        '304': { description: לא השתנה (If-None-Match) }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { description: אין רקמה כזו }
+        '429': { $ref: '#/components/responses/RateLimited' }
+
+  /api/v1/r/{rikma}/changes:
+    get:
+      tags: [shop]
+      summary: מה השתנה מאז — סנכרון אינקרמנטלי למטמון של הלקוח
+      security:
+        - apiKey: []
+      parameters:
+        - $ref: '#/components/parameters/Rikma'
+        - name: since
+          in: query
+          required: true
+          schema: { type: string, format: date-time }
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: רשימת שינויים
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id: { type: string }
+                        change: { type: string, enum: [created, updated, published, archived, deleted] }
+                        changedFields: { type: array, items: { type: string } }
+                        updatedAt: { type: string, format: date-time }
+                        product: { $ref: '#/components/schemas/Product' }
+                  meta:
+                    type: object
+                    properties:
+                      nextSince: { type: string, format: date-time }
+
+  /api/v1/r/{rikma}/orders:
+    post:
+      tags: [shop]
+      summary: בקשת רכש — כמה שורות, בלי סליקה (§5.4)
+      description: |-
+        זו "העגלה" שהחנות שולחת: שורות עם מוצר ווריאנט, פרטי קונה והעדפת
+        אספקה. הבקשה נולדת **בתוך** הרקמה — `order` + `order-line` ושרשור
+        `Sheirutpend` בצינור הקיים (צ'אט תמחור, אישור, ביצוע). אנחנו לא
+        סולקים: אין כרטיס, אין PSP.
+        אידמפוטנטיות: אותו `externalId` באותה רקמה ⇒ 200 עם `duplicated:true`
+        (רשתות שולחות retry).
+        אטומיות: שורה אחת עם בעיה ⇒ כל הבקשה נדחית, בלי חצי הזמנה.
+      security:
+        - apiKey: []
+      parameters:
+        - $ref: '#/components/parameters/Rikma'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/OrderRequest' }
+      responses:
+        '201':
+          description: הבקשה נוצרה
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/OrderAccepted' }
+        '200':
+          description: "אותו `externalId` כבר נקלט — מוחזר הכרטיס הקיים עם `duplicated: true`"
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/OrderAccepted' }
+        '400':
+          description: ולידציה, כולל `QUANTITY_LIMIT` (מחוץ ל-`minOrder`/`maxOrder`)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404':
+          description: '`PRODUCT_NOT_FOUND` / `VARIANT_NOT_FOUND` — מוצר שאינו של הרקמה, טיוטה, וריאנט שאינו של המוצר או `active=false`'
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+        '409':
+          description: '`VARIANT_REQUIRED` (מוצר עם וריאנטים ושורה בלי `variantId`) או `OUT_OF_STOCK`'
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+
+  /api/v1/r/{rikma}/orders/{ref}:
+    get:
+      tags: [shop]
+      summary: מעקב בקשת רכש (scope orders:read)
+      parameters:
+        - $ref: '#/components/parameters/Rikma'
+        - name: ref
+          in: path
+          required: true
+          description: ה-`ref` שהוחזר ביצירה, למשל `57:web-8811`. ה-slug שבו אינו סוד ולא מזהה.
+          schema: { type: string }
+      responses:
+        '200':
+          description: מצב הבקשה
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ref: { type: string }
+                  status:
+                    type: string
+                    enum: [sent, seen, priced, accepted, declined, fulfilled, cancelled]
+                  total: { type: [number, 'null'], description: 'null = טרם תומחר' }
+                  currency: { type: [string, 'null'] }
+                  lines:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        productId: { type: string }
+                        variantId: { type: [string, 'null'] }
+                        quantity: { type: number }
+                        unitPrice: { type: [number, 'null'] }
+                        name: { type: [string, 'null'] }
+                  updatedAt: { type: string, format: date-time }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { description: אין בקשה כזו ברקמה הזו }
+
+  /api/v1/r/{rikma}/sales:
+    post:
+      tags: [sales]
+      summary: דיווח מכירה — מהאתר/הסליקה של הרקמה
+      description: |
+        אותו מסלול בדיוק כמו הדיווח הפנימי במוח: `createSale` — מפחית מלאי,
+        מטפל ב-`monter`, ומפעיל הסכמת מחזיק-הכסף (`saleClaim`) כשהמדווח אינו
+        מחזיק הכסף. `holderStatus:'open'` בתשובה אינו שגיאה אלא "ממתין להסכמה".
+        אידמפוטנטיות: אותו `externalId` ⇒ `duplicated:true` (סליקות עושות retry).
+      security:
+        - apiKey: []
+      parameters:
+        - $ref: '#/components/parameters/Rikma'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SaleReport' }
+            examples:
+              simple:
+                value: { productId: '1842', holderUserId: '45', amount: 320, quantity: 1, externalId: 'order_8811' }
+              subscription:
+                value: { productId: '1842', holderUserId: '45', amount: 320, startDate: '2026-11-01T00:00:00Z', finishDate: '2027-11-01T00:00:00Z', externalId: 'sub_552' }
+      responses:
+        '201':
+          description: המכירה נרשמה
+          headers:
+            X-1lev1-Api-Version: { schema: { type: string } }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SaleReported' }
+        '200':
+          description: אותו externalId כבר דווח — לא נוצרה מכירה שנייה
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SaleReported' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { description: המוצר אינו של הרקמה שבנתיב }
+        '429': { $ref: '#/components/responses/RateLimited' }
+
+  /api/v1/r/{rikma}/tasks:
+    post:
+      tags: [tasks]
+      summary: פתיחת מטלה (מערכת חיצונית של הרקמה)
+      description: |
+        עובר ב-`createTask`: ההשמה ממתינה לאישור האדם (`myIshur:false`) —
+        שום דבר לא מתחייב בשקט. `projectId` אינו מתקבל מהלקוח; הנתיב והמפתח
+        חייבים להצביע על אותה רקמה.
+      security:
+        - apiKey: []
+      parameters:
+        - $ref: '#/components/parameters/Rikma'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/TaskDraft' }
+      responses:
+        '201':
+          description: המטלה נוצרה
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TaskStatus' }
+        '200':
+          description: אותו externalId כבר קיים
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TaskStatus' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { description: missionId/roleIds אינם של הרקמה שבנתיב }
+        '429': { $ref: '#/components/responses/RateLimited' }
+
+  /api/v1/r/{rikma}/tasks/{externalId}:
+    get:
+      tags: [tasks]
+      summary: משיכת סטטוס מטלה (סנכרון "עצל", בלי מקבל webhook)
+      security:
+        - apiKey: []
+      parameters:
+        - $ref: '#/components/parameters/Rikma'
+        - name: externalId
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: הסטטוס
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TaskStatus' }
+        '404': { description: אין מטלה עם externalId כזה ברקמה }
+
+  /api/v1/discover/products:
+    get:
+      tags: [discover]
+      summary: השוק — כל המוצרים המפורסמים (מקביל ל-/gift)
+      description: |
+        עדשה משנית. כאן `rikma` הוא **פילטר** (בתוצאה תמיד), כי האוסף על-רקמתי.
+        אין לבנות על זה חנות של רקמה — לכך יש `/api/v1/r/{rikma}/products`.
+        ההבדל בתוכן: כאן מוחרגים מוצרים עם `hideFromDiscovery` (כמו `/gift`);
+        בחנות הם מופיעים (כמו דף הרקמה).
+      parameters:
+        - $ref: '#/components/parameters/RikmaFilter'
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Sort'
+        - $ref: '#/components/parameters/Query'
+        - $ref: '#/components/parameters/Category'
+        - $ref: '#/components/parameters/Lat'
+        - $ref: '#/components/parameters/Lng'
+        - $ref: '#/components/parameters/Radius'
+        - $ref: '#/components/parameters/Locale'
+      responses:
+        '200':
+          description: מוצרים
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      allOf:
+                        - $ref: '#/components/schemas/Product'
+                        - type: object
+                          properties:
+                            rikma: { $ref: '#/components/schemas/RikmaRef' }
+
+  # ─── מורשת (legacy) — מיושן, נסגר לפי §5.8 ────────────────────────────────
+  # קיימים ופועלים היום. אינם מוסרים בבת אחת: ה-wrapper מגיש בפועל בזמן חלון
+  # ההתיישנות ומחזיר Deprecation/Sunset/Link; אחריו 410 Gone עם Link ל-successor.
+  # הצרכנים מועטים ובשליטתנו — לכן ההעברה היא תחזוקה, לא אירוע חיצוני.
+  /api/v1/sales:
+    post:
+      tags: [legacy]
+      deprecated: true
+      summary: '[מיושן] דיווח מכירה — עבר ל-/api/v1/r/{rikma}/sales'
+      description: |
+        זהה לחלוטין ל-`POST /api/v1/r/{rikma}/sales`: הרקמה נגזרת מהמפתח בלבד.
+        אין להטמיע אותו באינטגרציה חדשה; ה-snippets בפאנל כבר מצביעים ל-successor.
+      security:
+        - apiKey: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SaleReport' }
+      responses:
+        '201':
+          description: המכירה נרשמה (עם כותרות ההתיישנות)
+          headers:
+            Deprecation: { $ref: '#/components/headers/Deprecation' }
+            Sunset: { $ref: '#/components/headers/Sunset' }
+            Link: { $ref: '#/components/headers/SuccessorLink' }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SaleReported' }
+        '410': { $ref: '#/components/responses/LegacyMoved' }
+  /api/v1/tasks:
+    post:
+      tags: [legacy]
+      deprecated: true
+      summary: '[מיושן] פתיחת מטלה — עברה ל-/api/v1/r/{rikma}/tasks'
+      security:
+        - apiKey: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/TaskDraft' }
+      responses:
+        '201':
+          description: המטלה נוצרה (עם כותרות ההתיישנות)
+          headers:
+            Deprecation: { $ref: '#/components/headers/Deprecation' }
+            Sunset: { $ref: '#/components/headers/Sunset' }
+            Link: { $ref: '#/components/headers/SuccessorLink' }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TaskStatus' }
+        '410': { $ref: '#/components/responses/LegacyMoved' }
+  /api/v1/tasks/{externalId}:
+    get:
+      tags: [legacy]
+      deprecated: true
+      summary: '[מיושן] סטטוס מטלה — עבר ל-/api/v1/r/{rikma}/tasks/{externalId}'
+      security:
+        - apiKey: []
+      parameters:
+        - name: externalId
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: הסטטוס (עם כותרות ההתיישנות)
+          headers:
+            Deprecation: { $ref: '#/components/headers/Deprecation' }
+            Sunset: { $ref: '#/components/headers/Sunset' }
+            Link: { $ref: '#/components/headers/SuccessorLink' }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TaskStatus' }
+        '410': { $ref: '#/components/responses/LegacyMoved' }
+  # /api/v1/actions — רשימת-ההיתר ההיסטורית (createTask בלבד). המלצה (§5.8):
+  # לסגור יחד עם המעבר; אחרי ש-tasks עומדת בזכות עצמה ו-MCP מכסה סוכנים,
+  # אין לו תפקיד. אין צרכן שאינו שלנו.
+
+components:
+  headers:
+    Deprecation: { schema: { type: string }, example: 'true' }
+    Sunset: { schema: { type: string }, example: 'Thu, 15 Jan 2027 00:00:00 GMT' }
+    SuccessorLink: { schema: { type: string }, example: '</api/v1/r/haohel/sales>; rel="successor-version"' }
+
+  securitySchemes:
+    apiKey:
+      type: http
+      scheme: bearer
+      bearerFormat: 1lev1_api_key
+      description: |
+        מפתח `1lev1_...` עם scope `products:read` (ואופציונלית `products:read:draft`).
+        `POST /orders` דורש `orders:create`; `GET /orders/{ref}` דורש `orders:read`.
+        המפתח מקובע לרקמה: פנייה לרקמה אחרת ⇒ 403 `RIKMA_MISMATCH`, גם אם בעליו חבר בשתיהן.
+        מפתח ברמת משתמש (בלי רקמה — מפתח פרופיל/MCP/OAuth) ⇒ 403 `KEY_NOT_SCOPED`,
+        גם ב-GET שעובד אנונימית, וגם ב-`/api/v1/me`.
+
+  parameters:
+    Rikma:
+      name: rikma
+      in: path
+      required: true
+      description: |
+        slug או מזהה. slug מעדיף: הוא יציב (slug קודם לא משתחרר, `formerSlugs`) ונקרא.
+        GET: איות שונה ⇒ 301 לגרסה המנורמלת; שם קודם ⇒ 301 לנוכחי.
+        POST: אין הפניה — איות שונה/שם קודם של רקמת המפתח מוגשים כרגיל,
+        עם `X-1lev1-Rikma-Canonical`. רקמה שלא קיימת ⇒ 404; עם מפתח, רקמה
+        קיימת שאינה רקמת המפתח ⇒ 403 `RIKMA_MISMATCH`.
+      schema: { type: string }
+      examples:
+        slug: { value: haohel }
+        id: { value: '57' }
+    RikmaFilter:
+      name: rikma
+      in: query
+      description: פילטר — רלוונטי רק ב-`/discover`. id או slug; ניתן לחזור.
+      schema: { type: string }
+    Limit: { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 100, default: 20 } }
+    Page: { name: page, in: query, schema: { type: integer, minimum: 1, default: 1 } }
+    Sort:
+      name: sort
+      in: query
+      schema: { type: string, default: '-updatedAt', example: '-updatedAt' }
+      description: |-
+        אחד מ-`price`, `priceMax`, `createdAt`, `updatedAt`, `name`, עם `-`
+        לסדר יורד. `price` ממופה ל-`priceMin` (המחיר הזול ביותר של המוצר),
+        ולכן הוא נכון גם למוצר עם וריאנטים.
+    Query: { name: q, in: query, schema: { type: string, maxLength: 100 } }
+    Seller: { name: seller, in: query, schema: { type: string }, example: 'person:88' , description: 'person:<id> או rikma:<id>' }
+    Category: { name: category, in: query, schema: { type: string }, description: id או שם; ניתן לחזור }
+    MinPrice:
+      name: minPrice
+      in: query
+      schema: { type: number }
+      description: |-
+        חפיפת טווחים, לא השוואה למחיר בודד: `minPrice` ⇒ `priceMax >= v`,
+        `maxPrice` ⇒ `priceMin <= v`. כך מוצר עם וריאנט ב-90 עונה ל-`maxPrice=100`
+        גם אם מחיר הבסיס שלו 300. שורה ישנה בלי נגזרים נבדקת מול `price`.
+    MaxPrice:
+      name: maxPrice
+      in: query
+      schema: { type: number }
+      description: ראו `minPrice` — אותה סמנטיקה מהצד השני.
+    Currency: { name: currency, in: query, schema: { type: string }, example: ILS }
+    Available:
+      name: available
+      in: query
+      schema: { type: boolean }
+      description: |-
+        `true` = יש מלאי. נקרא מ-`stockTotal` (נגזר) כשהוא קיים, אחרת מ-`quant`;
+        `-1` הוא "ללא הגבלה" ולכן עונה `true`. `inStock` הוא אותו פרמטר בשם אחר.
+    HasVariants:
+      name: hasVariants
+      in: query
+      schema: { type: boolean }
+      description: |-
+        `true` = רק מוצרים עם וריאנטים. כל עוד סכמת החנות לא נפרסה, התשובה היא
+        רשימה ריקה (ולא 400) — "אין כאן מוצרים שעונים על זה", שזה נכון.
+    Sku:
+      name: sku
+      in: query
+      schema: { type: string, maxLength: 64 }
+      description: |-
+        מקט"ט מדויק. סינון על הווריאנטים ⇒ מחזיר את **המוצר** של אותו SKU
+        (צרכן שקורא `expand=variants` רואה איזו שורה תאמה). רשימה ריקה לפני
+        שהסכמה נפרסה — כמו `hasVariants`.
+    OptionSize:
+      name: option.size
+      in: query
+      schema: { type: string, pattern: '^[a-z0-9][a-z0-9._-]{0,59}$' }
+      description: |-
+        בחירת ציר: `?option.size=m`, `?option.color=red`. הערך מנורמל לאותיות
+        קטנות (כמו `axisKey` שנכתב בשמירה); ריבוי צירים ⇒ **אותו** וריאנט צריך
+        לשאת את כולם (`?option.size=m&option.color=red` = M **וגם** אדום).
+        תו `|` או `:` בערך ⇒ 400 (הם המפרידים של `axisKey`).
+    KindOf: { name: kindOf, in: query, schema: { $ref: '#/components/schemas/KindOf' } }
+    Lat: { name: lat, in: query, schema: { type: number } }
+    Lng: { name: lng, in: query, schema: { type: number } }
+    Radius: { name: radius, in: query, schema: { type: integer }, description: מטרים }
+    Locale: { name: locale, in: query, schema: { type: string, enum: [he, en, ar, ru, es] } }
+    Fields: { name: fields, in: query, schema: { type: string }, example: 'id,name,price,currency' }
+    Expand:
+      name: expand
+      in: query
+      schema: { type: string, enum: [rikma, variants] }
+      description: |-
+        `rikma` = בלוק הרקמה, `variants` = שורות הווריאנטים המלאות. הערכים
+        המוכרים הם בדיוק אלה; ערך אחר ⇒ 400 (ולא "התעלמנו בשקט").
+        `variants` ברשימה הוא אופציה כי 24 מוצרים × 12 וריאנטים הוא payload
+        שאיש לא ביקש; בפרט מוצר הוא תמיד מוחזר.
+    Status:
+      name: status
+      in: query
+      schema: { type: string, enum: [published, draft, archived] }
+      description: דורש מפתח; `draft` דורש scope `products:read:draft`
+    UpdatedSince: { name: updatedSince, in: query, schema: { type: string, format: date-time } }
+    Draft: { name: draft, in: query, schema: { type: boolean }, description: דורש scope `products:read:draft` }
+    PreviewToken:
+      name: preview
+      in: query
+      schema: { type: string }
+      description: טוקן תצוגה מקדימה קצר-חיים (JWT חתום, מוצר+רקמה+exp)
+
+  responses:
+    MovedRikma:
+      description: הכתובת אינה הקנונית — איות שונה או שם קודם
+      headers:
+        Location: { schema: { type: string } }
+        X-1lev1-Rikma-Canonical: { schema: { type: string } }
+    BadRequest:
+      description: בקשה לא תקינה
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    Unauthorized:
+      description: מפתח חסר או פגום
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    Forbidden:
+      description: scope חסר / Origin חסום / הרקמה בנתיב אינה הרקמה של המפתח (RIKMA_MISMATCH) / מפתח ברמת משתמש (KEY_NOT_SCOPED)
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    RateLimited:
+      description: חריגה ממכסה
+      headers:
+        Retry-After: { schema: { type: integer } }
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    LegacyMoved:
+      description: |
+        הנתיב הזה מיושן ועובר לכתובת הרקמה (§5.8). ה-wrapper מגיש בפועל **בזמן
+        חלון ההתיישנות** ומחזיר: `Deprecation: true`,
+        `Sunset: <תאריך>`, ו-`Link: </api/v1/r/{rikma}/sales>; rel="successor-version"`.
+        אחרי החלון: `410 Gone` עם אותו `Link`.
+      headers:
+        Deprecation: { $ref: '#/components/headers/Deprecation' }
+        Sunset: { $ref: '#/components/headers/Sunset' }
+        Link: { $ref: '#/components/headers/SuccessorLink' }
+
+  schemas:
+    SaleReport:
+      type: object
+      required: [productId, holderUserId, amount]
+      properties:
+        productId: { type: string, description: מזהה המוצר ברקמה (Matanot id) }
+        holderUserId: { type: string, description: אצל מי הכסף — חייב להיות חבר רקמה }
+        amount: { type: number, minimum: 0 }
+        quantity: { type: integer, default: 1 }
+        currency: { type: string, description: 'ISO; ברירת מחדל — מטבע הרקמה. המקור נשמר ב-entryCurrency/entryRate' }
+        saleDate: { type: string, format: date-time, description: 'ברירת מחדל: now' }
+        startDate: { type: [string, 'null'], format: date-time, description: מנויים }
+        finishDate: { type: [string, 'null'], format: date-time, description: מנויים }
+        externalId: { type: string, description: מזהה ההזמנה אצל הלקוח — אידמפוטנטיות (retry של סליקה) }
+        note: { type: string }
+    SaleReported:
+      type: object
+      required: [success]
+      properties:
+        success: { type: boolean }
+        duplicated: { type: boolean }
+        saleId: { type: [string, 'null'] }
+        holderStatus:
+          type: [string, 'null']
+          enum: [self, open, confirmed, null]
+          description: '`open` = הדיווח ממתין להסכמת מחזיק הכסף (saleClaim). זו שקיפות, לא שגיאה'
+    TaskDraft:
+      type: object
+      required: [name]
+      properties:
+        name: { type: string }
+        description: { type: string, default: '' }
+        link: { type: string, default: '' }
+        externalId: { type: string, description: מזהה הפריט אצל הלקוח — אידמפוטנטיות + מפתח לסנכרון }
+        missionId: { type: string, description: 'mesimabetahalich פעיל ברקמה; אחרת 404' }
+        assignedUserId: { type: string, description: 'חבר רקמה; אלטרנטיבי ל-roleIds. אחרת 403' }
+        roleIds:
+          type: array
+          items: { type: string }
+          description: תפקידים המוכרים לרקמה; אחרת 404. נשלחו שניהם ⇒ ההשמה האישית גוברת
+        urgency: { type: string, enum: [white, green, yellow, red], default: white }
+        dateS: { type: [string, 'null'], format: date-time }
+        dateF: { type: [string, 'null'], format: date-time }
+    TaskStatus:
+      type: object
+      properties:
+        success: { type: boolean }
+        duplicated: { type: boolean }
+        taskId: { type: string }
+        externalId: { type: [string, 'null'] }
+        status:
+          type: string
+          enum: [awaitingConsent, open, accepted, done]
+          description: |
+            המצב מנקודת מבט הסנכרון. `awaitingConsent` = הושמה, טרם אושרה
+            (myIshur:false) — האדם עדיין לא התחייב.
+        assignee:
+          type: [object, 'null']
+          properties:
+            id: { type: string }
+            username: { type: [string, 'null'] }
+    KindOf:
+      type: string
+      enum: [total, daily, monthly, yearly, unlimited]
+    Status:
+      type: string
+      enum: [draft, published, archived]
+      description: |
+        נגזר (בלי שינוי סכמה), עם מגיני NULL של מורשת. `appruved` אינו משתתף —
+        איש לא מדליק אותו (ראה המסמך §4.3, §12 #1).
+        archived  = archived=true || lifecycle in (archived, released) || status_of_voting=archived
+        draft     = !archived && status_of_voting in (draft, voting)
+        published = כל השאר: status_of_voting in (active, NULL) && lifecycle in (NULL, active, archiveProposed)
+        hideFromDiscovery אינו status: החנות מחזירה מוצרים כאלה (כמו דף הרקמה),
+        ו-/discover מחריג אותם (כמו /gift).
+    Availability:
+      type: object
+      properties:
+        unlimited: { type: boolean }
+        quantity: { type: [integer, 'null'] }
+      description: quantity = null כאשר unlimited=true
+    Image:
+      type: object
+      required: [url]
+      properties:
+        url: { type: string, format: uri }
+        width: { type: [integer, 'null'] }
+        height: { type: [integer, 'null'] }
+        alt: { type: [string, 'null'] }
+    Seller:
+      type: object
+      properties:
+        type: { type: string, enum: [person, rikma] }
+        id: { type: string }
+        name: { type: [string, 'null'] }
+        url: { type: [string, 'null'] }
+        picUrl: { type: [string, 'null'] }
+    RikmaRef:
+      type: object
+      description: הרקמה כהפניה — מופיעה פעם אחת בראש התשובה, לא בכל שורה
+      properties:
+        id: { type: string }
+        slug: { type: [string, 'null'] }
+        name: { type: [string, 'null'] }
+        canonicalPath: { type: string, description: '/api/v1/r/haohel' }
+    Rikma:
+      allOf:
+        - $ref: '#/components/schemas/RikmaRef'
+        - type: object
+          properties:
+            about: { type: [string, 'null'] }
+            url: { type: string, description: הדף הציבורי — /r/haohel }
+            location: { type: [object, 'null'], additionalProperties: true }
+            look: { type: [object, 'null'], additionalProperties: true, description: פלטת המראה — כדי שאתר חיצוני ייראה אותו דבר }
+            supportPage: { type: [string, 'null'], enum: ['off', 'on', null] }
+            productsCount: { type: integer }
+    Product:
+      type: object
+      required: [id, name, status]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        descriptionHtml:
+          type: [string, 'null']
+          description: |
+            נבנה בשרת מה-rich text (JSON) ע"י serializer עם whitelist תגיות
+            (p, br, strong, em, ul, ol, li, h2–h4, blockquote, a) ו-`href` בלבד
+            (http/https/mailto). אין HTML גולמי, `style`, `on*` או `javascript:`.
+            עדיין תוכן משתמש — `descriptionText` הוא ברירת המחדל המומלצת.
+        descriptionText: { type: [string, 'null'] }
+        status: { $ref: '#/components/schemas/Status' }
+        price:
+          type: [number, 'null']
+          description: |
+            מחיר מבוקש, כשהוא קיים. **אינו בהכרח המחיר הסופי** — ראה
+            docs/tbd/PLAN_HEADLESS_PRODUCTS_API.md §11.א:
+            pricingMode=fixed ⇒ סופי; estimated ⇒ הערכה; quote ⇒ null (בקשת הצעה).
+            אסור להזרים שדה זה לסליקה כשהוא אינו fixed.
+        currency: { type: [string, 'null'] }
+        pricingMode:
+          type: string
+          enum: [fixed, estimated, quote]
+          description: |
+            צרכן חייב לבדוק את השדה הזה לפני שהוא מציג מחיר כ"סופי".
+            quote ⇒ price=null והמחיר ייקבע בהתאמה.
+        # ── עתידי (P3) — §11.א / §11.ב ────────────────────────────────────
+        # finalPrice, priceBreakdown, fulfillment{statusProcess, agreedPrice,
+        # atCost}, priceValidUntil. אין לממש לפני החלטה; מתועד כאן כדי
+        # שצרכן לא יניח שהמחיר תמיד סקלרי וסופי.
+        availability:
+          allOf: [{ $ref: '#/components/schemas/Availability' }]
+          description: |-
+            כשהמוצר עם וריאנטים והווריאנטים הועמסו — זה הסכום של הפעילים,
+            ולכן `unlimited` כשאחד מהם ללא הגבלה. אחרת: `stockTotal` הנגזר,
+            ואם אין — `quant` (כמו היום).
+        priceRange:
+          anyOf: [{ $ref: '#/components/schemas/PriceRange' }, { type: 'null' }]
+        hasVariants:
+          type: boolean
+          description: 'Product-level flag; `variants[]` מלא רק בפרט או עם `expand=variants`'
+        variants:
+          type: array
+          items: { $ref: '#/components/schemas/Variant' }
+          description: ריק ברשימה אלא אם `expand=variants`; בפרט מוצר — תמיד
+        options:
+          type: array
+          items: { $ref: '#/components/schemas/Option' }
+          description: הצירים שהמוצר הזה משתמש בהם — מה שבורר הווריאנטים מצייר
+        unit: { type: [string, 'null'], example: ק"ג }
+        minOrder: { type: [number, 'null'] }
+        maxOrder: { type: [number, 'null'] }
+        leadTimeHours: { type: [integer, 'null'] }
+        delivery:
+          type: array
+          items: { $ref: '#/components/schemas/DeliveryOption' }
+        externalKey: { type: [string, 'null'], description: מזהה URL ידידותי (§9.10) }
+        kindOf: { $ref: '#/components/schemas/KindOf' }
+        categories:
+          type: array
+          items:
+            type: object
+            properties:
+              id: { type: string }
+              name: { type: string }
+        images:
+          type: array
+          items: { $ref: '#/components/schemas/Image' }
+        seller: { $ref: '#/components/schemas/Seller' }
+        geo:
+          type: object
+          properties:
+            lat: { type: [number, 'null'] }
+            lng: { type: [number, 'null'] }
+            radius: { type: [integer, 'null'] }
+            hint: { type: [string, 'null'] }
+            isOnline: { type: boolean }
+        dates:
+          type: object
+          properties:
+            startDate: { type: [string, 'null'], format: date-time }
+            finnishDate: { type: [string, 'null'], format: date-time }
+        attributes:
+          type: object
+          additionalProperties: true
+          description: שדות מותאמים פר-רקמה (§4.9) — P2
+        locale: { type: [string, 'null'] }
+        translated: { type: [boolean, 'null'] }
+        origin: { type: string, enum: [personal, project, wish] }
+        updatedAt: { type: string, format: date-time }
+        url: { type: string, description: הדף הציבורי — /gift/1842 }
+        buyUrl: { type: [string, 'null'] }
+    Pagination:
+      type: object
+      properties:
+        page: { type: integer }
+        limit: { type: integer }
+        total: { type: integer }
+        pages: { type: integer }
+    ProductList:
+      type: object
+      required: [rikma, data]
+      properties:
+        rikma: { $ref: '#/components/schemas/RikmaRef' }
+        data:
+          type: array
+          items: { $ref: '#/components/schemas/Product' }
+        meta:
+          type: object
+          properties:
+            pagination: { $ref: '#/components/schemas/Pagination' }
+            locale: { type: string }
+            generatedAt: { type: string, format: date-time }
+        links:
+          type: object
+          properties:
+            self: { type: [string, 'null'] }
+            next: { type: [string, 'null'] }
+            prev: { type: [string, 'null'] }
+    # ── v1.1 — החנות ────────────────────────────────────────────────────
+    PriceRange:
+      type: object
+      required: [min, max]
+      properties:
+        min: { type: number }
+        max: { type: number }
+        currency: { type: [string, 'null'] }
+      description: |-
+        הטווח שהקונה יראה כ"החל מ-". מחושב מהשדות הנגזרים כשהווריאנטים לא
+        הועמסו, ומהשורות עצמן כשהם כן. `null` = אין מה להציג (מוצר `quote`,
+        או מוצר שיש לו וריאנטים שטרם תומחרו) — לא אפס.
+    OptionValue:
+      type: object
+      required: [value]
+      properties:
+        value: { type: string, description: 'המזהה שבסינון — תמיד אותיות קטנות' }
+        label: { type: [string, 'null'], description: 'ריק ⇒ הקונה רואה את ה-value' }
+        hex: { type: [string, 'null'], description: 'ריבוע צבע; נפסל אם אינו צבע חוקי' }
+        image: { anyOf: [{ $ref: '#/components/schemas/Image' }, { type: 'null' }] }
+    Option:
+      type: object
+      required: [key]
+      properties:
+        key: { type: string, example: size }
+        name: { type: [string, 'null'], example: מידה }
+        values:
+          type: array
+          items: { $ref: '#/components/schemas/OptionValue' }
+    OptionAxis:
+      allOf:
+        - $ref: '#/components/schemas/Option'
+        - type: object
+          properties:
+            values:
+              type: array
+              items:
+                allOf:
+                  - $ref: '#/components/schemas/OptionValue'
+                  - type: object
+                    properties:
+                      products:
+                        type: integer
+                        description: מספר המוצרים שהקורא רשאי לראות מאחורי הערך
+    VariantOption:
+      type: object
+      properties:
+        key: { type: string }
+        value: { type: string }
+        label: { type: [string, 'null'] }
+    Variant:
+      type: object
+      required: [id, availability]
+      properties:
+        id: { type: string }
+        sku: { type: [string, 'null'], example: KER-M-RED }
+        name: { type: [string, 'null'], description: '"M / אדום"; נגזר מהערכים כשלא הוזן' }
+        optionValues:
+          type: array
+          items: { $ref: '#/components/schemas/VariantOption' }
+        price:
+          type: [number, 'null']
+          description: |-
+            המחיר שהקונה משלם על הצירוף הזה. `null` ⇒ מחיר המוצר (המחיר
+            שנכתב כאן כברירת מחדל); ואם המוצר `pricingMode=quote` — `null`
+            הוא "המחיר ייקבע בהתאמה", כמו `price`.
+        compareAtPrice: { type: [number, 'null'], description: מחיר "לפני" — תצוגת מבצע }
+        availability: { $ref: '#/components/schemas/Availability' }
+        images:
+          type: array
+          items: { $ref: '#/components/schemas/Image' }
+          description: ריק ⇒ הגלריה של המוצר
+        active: { type: boolean, description: 'false ⇒ לא נבחר ולא נמכר (נשאר בהיסטוריה)' }
+        externalKey: { type: [string, 'null'], description: למזהה URL ידידותי }
+    DeliveryOption:
+      type: object
+      properties:
+        kind: { type: string, enum: [pickup, delivery, digital, contact] }
+        note: { type: [string, 'null'] }
+        fee: { type: [number, 'null'] }
+        currency: { type: [string, 'null'] }
+    OrderLine:
+      type: object
+      required: [productId, quantity]
+      properties:
+        productId: { type: string }
+        variantId: { type: string, description: 'חובה כשהמוצר עם וריאנטים — אחרת 409 VARIANT_REQUIRED' }
+        quantity: { type: number, minimum: 0 }
+        note: { type: string }
+    OrderRequest:
+      type: object
+      required: [lines]
+      properties:
+        externalId: { type: string, description: מזהה להזמנה הזו אצל הלקוח — אידמפוטנטיות }
+        lines:
+          type: array
+          items: { $ref: '#/components/schemas/OrderLine' }
+        buyer:
+          type: object
+          properties:
+            name: { type: string }
+            email: { type: string }
+            phone: { type: string, description: 'PII — לא נכתב ל-webhook ולא נחשף חזרה' }
+        delivery:
+          type: object
+          properties:
+            preference: { type: string, enum: [pickup, delivery, digital, contact] }
+            address: { type: object, additionalProperties: true }
+        note: { type: string }
+        requestedDate: { type: string, format: date-time }
+        locale: { type: string }
+    OrderAccepted:
+      type: object
+      properties:
+        success: { type: boolean }
+        ref: { type: string, description: '57:web-8811 — המזהה למעקב' }
+        status: { type: string, enum: [sent] }
+        duplicated: { type: boolean }
+        lines:
+          type: array
+          items:
+            type: object
+            properties:
+              productId: { type: string }
+              variantId: { type: [string, 'null'] }
+              quantity: { type: number }
+              unitPrice: { type: [number, 'null'], description: 'null = טרם תומחר' }
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+              enum:
+                - VALIDATION
+                - VALIDATION_FAILED
+                - INVALID_KEY
+                - KEY_REVOKED
+                - KEY_REQUIRED
+                - UNAUTHORIZED
+                - SCOPE_MISSING
+                - KEY_NOT_SCOPED
+                - ORIGIN_NOT_ALLOWED
+                - RIKMA_MISMATCH
+                - RIKMA_NOT_FOUND
+                - PRODUCT_NOT_FOUND
+                - VARIANT_REQUIRED
+                - VARIANT_NOT_FOUND
+                - OUT_OF_STOCK
+                - QUANTITY_LIMIT
+                - NOT_FOUND
+                - RATE_LIMITED
+                - UPSTREAM_ERROR
+              description: |
+                הקודים שהמימוש מחזיר בפועל (`apiPublic/http.ts`, `query.ts`,
+                `writeApi.ts`). צרכן צריך לטפל גם בקוד שלא מוכר לו — הרשימה יכולה לגדול.
+            message: { type: string }
+            details: { type: object, additionalProperties: true }
