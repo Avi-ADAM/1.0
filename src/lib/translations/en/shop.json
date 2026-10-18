@@ -1,0 +1,296 @@
+{
+  "page": {
+    "title": "Sales"
+  },
+  "manage": {
+    "title": "Manage sales",
+    "cta": "Manage sales",
+    "hint": "Orders, products, stock, the sales table and connections",
+    "back": "Back to sales",
+    "crumbSales": "Sales",
+    "crumbManage": "Manage"
+  },
+  "banner": {
+    "toShip": "{{count}} orders waiting to ship",
+    "toShipOne": "1 order waiting to ship",
+    "short": "{{count}} orders are short on stock",
+    "shortOne": "1 order is short on stock",
+    "cta": "Handle"
+  },
+  "tabs": {
+    "label": "Sales management tabs",
+    "orders": "Orders",
+    "products": "Products",
+    "stock": "Stock",
+    "sales": "Sales",
+    "connect": "Connect",
+    "waiting": "{{count}} waiting for you"
+  },
+  "kpi": {
+    "label": "At a glance",
+    "awaitingSplit": "Waiting to be split",
+    "toSplit": "Split",
+    "waiting": "To ship and hand over",
+    "oldest": "Oldest: {{when}}",
+    "noneWaiting": "Everything is out",
+    "short": "Short on stock",
+    "shortUnits": "{{count}} units short",
+    "shortUnitsOne": "1 unit short",
+    "month": "Sales in the last 30 days",
+    "monthSub": "{{count}} sales · {{share}}% from your site"
+  },
+  "orders": {
+    "filterLabel": "Filter by what's left to do",
+    "search": "Search by name, phone or order number",
+    "searchLabel": "Search orders",
+    "filter": {
+      "toShip": "To ship",
+      "toHandOver": "To hand over",
+      "shipped": "Shipped",
+      "done": "Completed",
+      "cancelled": "Cancelled",
+      "all": "All"
+    },
+    "col": {
+      "order": "Order",
+      "buyer": "Buyer",
+      "when": "When",
+      "delivery": "Delivery",
+      "total": "Amount",
+      "state": "Status",
+      "action": "Action"
+    },
+    "selectHint": "Pick an order from the list to see its details."
+  },
+  "order": {
+    "number": "Order {{number}}",
+    "items": "{{count}} items",
+    "itemsOne": "1 item",
+    "deliverTo": "Delivery to {{city}}",
+    "delivery": "Delivery",
+    "pickup": "Pickup",
+    "digital": "Digital",
+    "contact": "Arranged with the buyer",
+    "fromSite": "From your site",
+    "manual": "Manual",
+    "buyerUnknown": "Buyer",
+    "back": "Back to orders",
+    "more": "More actions",
+    "detailsLabel": "Order details",
+    "lines": {
+      "title": "What was ordered",
+      "sku": "SKU",
+      "total": "Total"
+    },
+    "buyer": {
+      "title": "Buyer",
+      "private": "Visible to rikma members only",
+      "noContact": "The site sent no phone or email"
+    },
+    "address": {
+      "title": "Delivery",
+      "none": "No address was given"
+    },
+    "note": {
+      "title": "Notes"
+    },
+    "payment": {
+      "title": "Payment",
+      "paid": "{{amount}} paid on your site",
+      "ref": "Payment reference",
+      "method": "Payment method"
+    },
+    "holder": "{{name}} holds the money · counted for the split",
+    "holderYou": "You hold the money · counted for the split",
+    "call": "Call",
+    "email": "Email",
+    "copyAddress": "Copy address",
+    "copied": "Address copied",
+    "print": "Print delivery note",
+    "printTitle": "Delivery note",
+    "timeline": {
+      "title": "History",
+      "paid": "Paid on the site",
+      "shipped": "Marked as shipped",
+      "done": "Marked as completed",
+      "cancelled": "Cancelled"
+    },
+    "notFound": "This order wasn't found in the rikma."
+  },
+  "status": {
+    "toShip": "To ship",
+    "toHandOver": "To hand over",
+    "shipped": "Shipped",
+    "done": "Completed",
+    "cancelled": "Cancelled"
+  },
+  "short": {
+    "tag": "{{count}} short",
+    "tagOne": "1 short",
+    "title": "The buyer paid for more than you have in stock",
+    "body": "{{count}} units are missing. You can make them and update the stock, or agree a later date with the buyer.",
+    "bodyOne": "1 unit is missing. You can make it and update the stock, or agree a later date with the buyer.",
+    "updateStock": "Update stock",
+    "contactBuyer": "Buyer details"
+  },
+  "action": {
+    "markShipped": "Mark as shipped",
+    "markDelivered": "Mark as delivered",
+    "markPickedUp": "Mark as picked up"
+  },
+  "toast": {
+    "shipping": "Marking order {{number}} as shipped…",
+    "completing": "Marking order {{number}} as completed…",
+    "undo": "Undo",
+    "shipped": "Order {{number}} marked as shipped",
+    "done": "Order {{number}} completed",
+    "failed": "That didn't save. Check your connection and try again.",
+    "retry": "Try again",
+    "cancelled": "Order {{number}} cancelled"
+  },
+  "cancel": {
+    "action": "Cancel order",
+    "title": "Cancel order {{number}}?",
+    "body": "Do this once you've agreed with the buyer and refunded them through your site. The order's sales will be reset.",
+    "inSplit": "{{count}} sales are already in a split. They won't change, and the rikma will be told so you can settle the refund together.",
+    "inSplitOne": "1 sale is already in a split. It won't change, and the rikma will be told so you can settle the refund together.",
+    "restock": "Return the items to stock",
+    "restockHint": "On by default when the order hasn't shipped",
+    "reason": "What did you agree with the buyer?",
+    "confirm": "Cancel order",
+    "keep": "Keep order",
+    "holderOnly": "Only {{name}} can cancel — they hold the money",
+    "failed": "The cancellation didn't save. Try again."
+  },
+  "products": {
+    "search": "Search products or SKU",
+    "searchLabel": "Search products",
+    "priceFrom": "From {{price}}",
+    "priceQuote": "Price on request",
+    "variants": "{{count}} variants",
+    "variantsOne": "1 variant",
+    "noVariants": "No variants",
+    "inStock": "{{count}} in stock",
+    "unlimited": "Unlimited",
+    "soldOut": "Sold out",
+    "lowStock": "{{count}} left",
+    "draft": "Waiting for the rikma's approval",
+    "view": "View product page",
+    "export": "Export CSV",
+    "exportHint": "Shopify format — opens in any sales system and in Excel",
+    "col": {
+      "product": "Product",
+      "price": "Price",
+      "variants": "Variants",
+      "stock": "Stock",
+      "status": "Status"
+    }
+  },
+  "stock": {
+    "filterLabel": "Filter stock",
+    "filter": {
+      "attention": "Needs attention",
+      "low": "Low stock",
+      "out": "Sold out",
+      "short": "Short for orders",
+      "all": "All"
+    },
+    "col": {
+      "product": "Product",
+      "variant": "Variant",
+      "sku": "SKU",
+      "qty": "In stock",
+      "state": "Status",
+      "action": "Action"
+    },
+    "short": "{{count}} short for orders",
+    "ok": "In stock",
+    "adjust": "Update stock",
+    "modeLabel": "Kind of update",
+    "set": "In stock now",
+    "add": "Add",
+    "setHint": "Counted the shelf? Type how many there are now.",
+    "addHint": "A delivery came in? Type how many units arrived.",
+    "unlimited": "Unlimited",
+    "unlimitedHint": "Nothing to count — always available",
+    "now": "Now: {{count}}",
+    "nowUnlimited": "Now: unlimited",
+    "after": "After the update: {{count}}",
+    "increase": "Add one",
+    "decrease": "Remove one",
+    "amount": "Quantity",
+    "save": "Save stock",
+    "saved": "Stock updated",
+    "failed": "The stock wasn't saved. Your number is still here — try again.",
+    "close": "Close",
+    "priceNote": "A price change on a rikma product goes to the partners for approval, so it's made in the product editor.",
+    "noThreshold": "No product has a low-stock level yet."
+  },
+  "sales": {
+    "searchLabel": "Search sales",
+    "search": "Search product or who holds the money",
+    "rangeLabel": "Date range",
+    "range": {
+      "d7": "7 days",
+      "d30": "30 days",
+      "d90": "90 days",
+      "year": "This year",
+      "all": "All"
+    },
+    "sourceLabel": "Source",
+    "source": {
+      "all": "All sources",
+      "api": "From your site",
+      "ui": "Manual"
+    },
+    "col": {
+      "date": "Date",
+      "product": "Product",
+      "amount": "Amount",
+      "units": "Qty",
+      "holder": "Who holds it",
+      "source": "Source",
+      "split": "Split",
+      "order": "Order"
+    },
+    "split": {
+      "waiting": "Waiting to split",
+      "inSplit": "In a split",
+      "claimOpen": "Waiting for consent",
+      "split": "Split"
+    },
+    "total": "Total in range: {{amount}}",
+    "count": "{{count}} sales",
+    "countOne": "1 sale",
+    "export": "Export CSV"
+  },
+  "connect": {
+    "apiTitle": "Your site ↔ the rikma",
+    "apiBody": "Keys, permissions and the snippet that reports sales and orders from your site after every payment.",
+    "statusLive": "Connected · last order {{when}}",
+    "statusNone": "No site connected yet",
+    "docs": "The rikma's API guide",
+    "supportTitle": "Support page and donations",
+    "recordDonation": "Record donation",
+    "donationHint": "A donation is recorded as a sale and goes into the split like any income."
+  },
+  "empty": {
+    "orders": "No orders yet",
+    "ordersBody": "Orders arrive here from your site once the buyer has paid.",
+    "ordersCta": "Connect a site",
+    "toShip": "Everything's shipped",
+    "toShipBody": "A new order will show up here, and you'll be notified.",
+    "products": "No products in this rikma yet",
+    "productsBody": "A new product goes to the partners for approval before it reaches the shop.",
+    "filtered": "Nothing matches this filter",
+    "clearFilter": "Clear filter",
+    "sales": "No sales in this range",
+    "stock": "Nothing to update here"
+  },
+  "err": {
+    "load": "We couldn't load this. Try refreshing.",
+    "notReady": "Site orders aren't active for this rikma yet",
+    "notReadyBody": "Once they are, every order paid on your site shows up here with its delivery details.",
+    "refresh": "Refresh"
+  }
+}

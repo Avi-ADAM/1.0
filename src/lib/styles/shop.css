@@ -1,0 +1,472 @@
+/* ─── The seller's screens: "manage sales" (PLAN_SHOP_CUSTOMER_EXPERIENCE §7.3, S5) ───
+   The design is the canvas "מוח · מכירות — עם מה שקיים", drawn in the personal
+   theme's night look. Here it is written on the app's own tokens, so the same
+   screen reads in all four fills (personal/business × light/dark):
+
+     card / card-2 / ink / muted / line → the surface pair (`--surface*`)
+     gold numbers and headings          → --goldink (readable on both)
+     the one filled button              → --barbi-pink with white
+     "short on stock"                   → amber fill + dark text (UX_COPY §3.4: never red)
+
+   Every class is `sh-` prefixed: the global `.label` / `.top` rules of
+   app.postcss would otherwise reach in (they are position:fixed). */
+
+.shop-ui {
+  /* The ground the screen stands on. The personal theme keeps its page dark in
+     BOTH modes, so in light mode the manage area brings its own light ground —
+     otherwise a pill or a label laid straight on the page reads dark on dark. */
+  --sh-page: var(--surface-2, #f7f5ef);
+  --sh-card: var(--surface, #fff);
+  --sh-card-2: var(--surface-2, #f7f5ef);
+  --sh-ink: var(--surface-ink, #2b2620);
+  --sh-muted: var(--surface-muted, #6b6156);
+  --sh-line: var(--surface-line, rgba(0, 0, 0, 0.1));
+  --sh-gold: var(--goldink, #8a6a15);
+  --sh-gold-line: color-mix(in srgb, var(--goldink, #8a6a15) 30%, transparent);
+  --sh-accent: var(--barbi-pink, #b80069);
+  --sh-on-accent: #fff;
+  --sh-accent-ink: var(--surface-accent, var(--barbi-pink, #b80069));
+  --sh-accent-tint: color-mix(in srgb, var(--barbi-pink, #b80069) 13%, transparent);
+  --sh-warn: #f59e0b;
+  --sh-on-warn: #1f1403;
+  --sh-warn-tint: rgba(245, 158, 11, 0.14);
+  --sh-warn-line: rgba(245, 158, 11, 0.55);
+  --sh-info-ink: #1d4ed8;
+  --sh-info-tint: rgba(29, 78, 216, 0.1);
+  --sh-ok-ink: #047857;
+  --sh-ok-tint: rgba(4, 120, 87, 0.11);
+  --sh-radius-xs: 6px;
+  --sh-radius-sm: 10px;
+  --sh-radius: 14px;
+  --sh-radius-lg: 22px;
+  --sh-display: 'Sababa', 'Heebo', system-ui, sans-serif;
+  --sh-mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+  color: var(--sh-ink);
+}
+:root.dark .shop-ui,
+html.dark .shop-ui {
+  --sh-page: transparent;
+  --sh-info-ink: #93c5fd;
+  --sh-info-tint: rgba(116, 191, 255, 0.14);
+  --sh-ok-ink: #34d399;
+  --sh-ok-tint: rgba(2, 255, 187, 0.11);
+  --sh-gold-line: color-mix(in srgb, var(--goldink, #f0c040) 24%, transparent);
+}
+
+.shop-ui *,
+.shop-ui *::before,
+.shop-ui *::after {
+  box-sizing: border-box;
+}
+.shop-ui :where(h1, h2, h3, p) {
+  margin: 0;
+}
+.shop-ui :where(h1, h2, h3) {
+  color: var(--sh-ink);
+}
+.shop-ui :where(p) {
+  color: var(--sh-muted);
+}
+.shop-ui :where(a) {
+  color: var(--sh-gold);
+  text-decoration: none;
+}
+.shop-ui :where(a:hover) {
+  color: var(--sh-accent-ink);
+}
+.shop-ui :where(button) {
+  font: inherit;
+  cursor: pointer;
+}
+.shop-ui :where(button:disabled) {
+  cursor: default;
+  opacity: 0.55;
+}
+.shop-ui :where(a, button, input, select, textarea, summary):focus-visible {
+  outline: 2px solid var(--sh-accent-ink);
+  outline-offset: 2px;
+}
+.shop-ui bdi {
+  unicode-bidi: isolate;
+}
+
+/* ─── headings ─── */
+.sh-title {
+  font-family: var(--sh-display);
+  color: var(--sh-gold);
+  line-height: 1.1;
+  font-weight: 700;
+}
+.sh-section-label {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--sh-muted);
+}
+
+/* ─── surfaces ─── */
+.sh-card {
+  background: var(--sh-card);
+  border: 1px solid var(--sh-line);
+  border-radius: var(--sh-radius);
+}
+.sh-card-2 {
+  background: var(--sh-card-2);
+  border: 1px solid var(--sh-line);
+  border-radius: var(--sh-radius);
+}
+
+/* ─── buttons — 44px targets, one filled button per view ─── */
+.sh-btn {
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: var(--sh-radius-sm);
+  border: 1px solid transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+  text-decoration: none;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.sh-btn-primary {
+  background: var(--sh-accent);
+  color: var(--sh-on-accent);
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--sh-accent) 30%, transparent);
+}
+.shop-ui a.sh-btn-primary,
+.shop-ui a.sh-btn-primary:hover {
+  color: var(--sh-on-accent);
+}
+.sh-btn-primary:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+.sh-btn-outline {
+  background: transparent;
+  color: var(--sh-gold);
+  border-color: var(--sh-gold-line);
+}
+.sh-btn-outline:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--sh-gold) 8%, transparent);
+}
+.sh-btn-quiet {
+  background: var(--sh-card-2);
+  color: var(--sh-ink);
+  border-color: var(--sh-line);
+}
+.sh-btn-warn {
+  background: var(--sh-warn);
+  color: var(--sh-on-warn);
+}
+.shop-ui a.sh-btn-warn,
+.shop-ui a.sh-btn-warn:hover {
+  color: var(--sh-on-warn);
+}
+.sh-btn-icon {
+  width: 44px;
+  padding: 0;
+  flex-shrink: 0;
+}
+.sh-btn-lg {
+  min-height: 52px;
+  font-family: var(--sh-display);
+  font-size: 19px;
+  font-weight: 700;
+  border-radius: var(--sh-radius);
+}
+
+/* ─── chips (status tags) ─── */
+.sh-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 9px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.3;
+  white-space: nowrap;
+}
+.sh-chip-accent {
+  background: var(--sh-accent-tint);
+  color: var(--sh-accent-ink);
+}
+.sh-chip-info {
+  background: var(--sh-info-tint);
+  color: var(--sh-info-ink);
+}
+.sh-chip-ok {
+  background: var(--sh-ok-tint);
+  color: var(--sh-ok-ink);
+}
+.sh-chip-muted {
+  background: var(--sh-card-2);
+  color: var(--sh-muted);
+  border: 1px solid var(--sh-line);
+}
+.sh-chip-plain {
+  background: var(--sh-card-2);
+  color: var(--sh-ink);
+  border: 1px solid var(--sh-line);
+}
+.sh-chip-warn {
+  background: var(--sh-warn);
+  color: var(--sh-on-warn);
+}
+.sh-chip-warn-soft {
+  background: var(--sh-warn-tint);
+  color: var(--sh-ink);
+  border: 1px solid var(--sh-warn-line);
+}
+.sh-chip-gold {
+  background: color-mix(in srgb, var(--sh-gold) 14%, transparent);
+  color: var(--sh-gold);
+}
+
+/* ─── filter pills ─── */
+.sh-pills {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding: 2px 0;
+}
+.sh-pills::-webkit-scrollbar {
+  display: none;
+}
+.sh-pill {
+  min-height: 38px;
+  padding: 0 14px;
+  border-radius: 9999px;
+  border: 1px solid var(--sh-gold-line);
+  background: transparent;
+  color: var(--sh-ink);
+  font-size: 14px;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.sh-pill[aria-pressed='true'] {
+  background: var(--sh-gold);
+  border-color: var(--sh-gold);
+  color: var(--sh-card);
+  font-weight: 700;
+}
+.sh-pill-count {
+  font-weight: 700;
+}
+
+/* ─── segmented control ─── */
+.sh-seg {
+  display: flex;
+  padding: 3px;
+  border-radius: var(--sh-radius-sm);
+  background: var(--sh-card-2);
+  border: 1px solid var(--sh-line);
+}
+.sh-seg button {
+  flex: 1 1 0;
+  min-height: 40px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--sh-muted);
+  font-size: 14px;
+}
+.sh-seg button[aria-pressed='true'] {
+  background: var(--sh-gold);
+  color: var(--sh-card);
+  font-weight: 700;
+}
+
+/* ─── search ─── */
+.sh-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 12px;
+  border-radius: var(--sh-radius-sm);
+  background: var(--sh-card-2);
+  border: 1px solid var(--sh-line);
+  color: var(--sh-muted);
+}
+.sh-search input {
+  flex: 1 1 auto;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--sh-ink);
+  font-size: 15px;
+}
+.sh-search input::placeholder {
+  color: var(--sh-muted);
+  opacity: 1;
+}
+.sh-search:focus-within {
+  border-color: var(--sh-gold);
+}
+
+/* ─── inputs ─── */
+.sh-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--sh-muted);
+}
+.sh-input {
+  min-height: 44px;
+  padding: 0 12px;
+  border-radius: var(--sh-radius-sm);
+  border: 1px solid var(--sh-line);
+  background: var(--sh-card-2);
+  color: var(--sh-ink);
+  font-size: 15px;
+  width: 100%;
+}
+textarea.sh-input {
+  padding: 10px 12px;
+  min-height: 80px;
+  resize: vertical;
+}
+.sh-input:focus {
+  outline: none;
+  border-color: var(--sh-gold);
+}
+
+/* ─── tables (desktop) ─── */
+.sh-table-wrap {
+  overflow-x: auto;
+  border-radius: var(--sh-radius);
+  border: 1px solid var(--sh-line);
+  background: var(--sh-card);
+}
+.sh-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.sh-table th {
+  text-align: start;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--sh-muted);
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--sh-line);
+  background: var(--sh-card-2);
+  white-space: nowrap;
+}
+.sh-table td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--sh-line);
+  vertical-align: middle;
+}
+.sh-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+.sh-table tbody tr.sh-row-link {
+  cursor: pointer;
+}
+.sh-table tbody tr.sh-row-link:hover td {
+  background: color-mix(in srgb, var(--sh-gold) 5%, transparent);
+}
+.sh-table tbody tr[aria-selected='true'] td {
+  background: color-mix(in srgb, var(--sh-accent) 8%, transparent);
+}
+.sh-num {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* ─── empty state ─── */
+.sh-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 48px 16px;
+  text-align: center;
+}
+.sh-empty strong {
+  font-size: 17px;
+  color: var(--sh-ink);
+}
+.sh-empty p {
+  max-width: 34ch;
+  font-size: 14px;
+}
+
+/* ─── bottom sheet (phones) / dialog (wider) — native <dialog>, top layer ─── */
+dialog.sh-sheet {
+  border: 0;
+  padding: 0;
+  margin: auto auto 0;
+  width: 100%;
+  max-width: 560px;
+  max-height: 92dvh;
+  border-radius: var(--sh-radius-lg) var(--sh-radius-lg) 0 0;
+  background: var(--surface, #fff);
+  color: var(--surface-ink, #2b2620);
+  border-top: 1px solid var(--surface-line, rgba(0, 0, 0, 0.1));
+  box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.35);
+  overflow: auto;
+}
+dialog.sh-sheet::backdrop {
+  background: rgba(0, 0, 0, 0.55);
+}
+@media (min-width: 640px) {
+  dialog.sh-sheet {
+    margin: auto;
+    border-radius: var(--sh-radius-lg);
+    border: 1px solid var(--surface-line, rgba(0, 0, 0, 0.1));
+  }
+}
+.sh-sheet-grip {
+  display: block;
+  width: 40px;
+  height: 4px;
+  border-radius: 4px;
+  margin: 10px auto 0;
+  background: var(--surface-line, rgba(0, 0, 0, 0.15));
+}
+@media (min-width: 640px) {
+  .sh-sheet-grip {
+    display: none;
+  }
+}
+
+/* ─── print: the delivery note only ─── */
+@media print {
+  body * {
+    visibility: hidden !important;
+  }
+  .sh-print,
+  .sh-print * {
+    visibility: visible !important;
+  }
+  .sh-print {
+    display: block !important;
+    position: absolute;
+    inset: 0;
+    color: #000;
+    background: #fff;
+  }
+}
+.sh-print {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shop-ui *,
+  .shop-ui *::before,
+  .shop-ui *::after {
+    transition: none !important;
+    animation: none !important;
+  }
+}

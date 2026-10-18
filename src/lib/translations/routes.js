@@ -51,6 +51,9 @@ export const ROUTED = {
     // track it opens: the agreement's "one step only" ribbon and the signup
     // and check-email screens' three-step wording (see regIntent.js).
     madeForYou: at('/made-for-you', '/hascama', '/signup'),
+    // The seller's screens (PLAN_SHOP_CUSTOMER_EXPERIENCE §7.3, UX_COPY_SHOP_SALES):
+    // the sales page's orders banner and everything under sales/manage.
+    shop: at(/\/moach\/[^/]+\/sales/),
     offerings: at('/me', '/onboard', '/gift', '/user', '/deals/sales-center', /\/moach\/[^/]+\/sales/),
     consensus: at('/consensus'),
     uses: at('/uses'),

@@ -494,6 +494,44 @@ export function filterSales(
     .sort((a, b) => (Date.parse(b.date ?? '') || 0) - (Date.parse(a.date ?? '') || 0));
 }
 
+/**
+ * The KPI strip (canvas "DesktopOrders"): what waits to be split, and the
+ * last 30 days. "Waiting" is a sale counted in balances (not an open claim)
+ * that no split has taken yet — the same money the plain page's headline shows.
+ */
+export function salesSummary(
+  sales: Pick<ShopSaleRow, 'amount' | 'date' | 'source' | 'holderStatus' | 'splited' | 'inSplit'>[],
+  now: number
+): { awaiting: number; awaitingCount: number; recent: number; recentCount: number; siteShare: number } {
+  const from = now - 30 * 86_400_000;
+  let awaiting = 0;
+  let awaitingCount = 0;
+  let recent = 0;
+  let recentCount = 0;
+  let recentSite = 0;
+  for (const s of sales) {
+    const amount = Number.isFinite(s.amount) ? s.amount : 0;
+    if (splitStateOf(s) === 'waiting' && amount !== 0) {
+      awaiting += amount;
+      awaitingCount++;
+    }
+    const at = Date.parse(s.date ?? '') || 0;
+    if (at >= from && amount !== 0) {
+      recent += amount;
+      recentCount++;
+      if (s.source === 'api') recentSite++;
+    }
+  }
+  const round = (n: number) => Math.round(n * 100) / 100;
+  return {
+    awaiting: round(awaiting),
+    awaitingCount,
+    recent: round(recent),
+    recentCount,
+    siteShare: recentCount ? Math.round((recentSite / recentCount) * 100) : 0
+  };
+}
+
 export function salesTotal(sales: Pick<ShopSaleRow, 'amount'>[]): number {
   return Math.round(sales.reduce((s, x) => s + (Number.isFinite(x.amount) ? x.amount : 0), 0) * 100) / 100;
 }

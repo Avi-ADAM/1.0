@@ -1,0 +1,296 @@
+{
+  "page": {
+    "title": "Ventas"
+  },
+  "manage": {
+    "title": "Gestionar ventas",
+    "cta": "Gestionar ventas",
+    "hint": "Pedidos, productos, stock, la tabla de ventas y conexiones",
+    "back": "Volver a ventas",
+    "crumbSales": "Ventas",
+    "crumbManage": "Gestión"
+  },
+  "banner": {
+    "toShip": "{{count}} pedidos esperan envío",
+    "toShipOne": "1 pedido espera envío",
+    "short": "A {{count}} pedidos les falta stock",
+    "shortOne": "A 1 pedido le falta stock",
+    "cta": "Atender"
+  },
+  "tabs": {
+    "label": "Pestañas de gestión de ventas",
+    "orders": "Pedidos",
+    "products": "Productos",
+    "stock": "Stock",
+    "sales": "Ventas",
+    "connect": "Conexiones",
+    "waiting": "{{count}} te esperan"
+  },
+  "kpi": {
+    "label": "Resumen",
+    "awaitingSplit": "Pendiente de reparto",
+    "toSplit": "Repartir",
+    "waiting": "Por enviar y entregar",
+    "oldest": "El más antiguo: {{when}}",
+    "noneWaiting": "Todo ha salido",
+    "short": "Falta stock",
+    "shortUnits": "Faltan {{count}} uds.",
+    "shortUnitsOne": "Falta 1 ud.",
+    "month": "Ventas de los últimos 30 días",
+    "monthSub": "{{count}} ventas · {{share}}% desde tu sitio"
+  },
+  "orders": {
+    "filterLabel": "Filtrar por lo que queda por hacer",
+    "search": "Buscar por nombre, teléfono o número de pedido",
+    "searchLabel": "Buscar pedidos",
+    "filter": {
+      "toShip": "Por enviar",
+      "toHandOver": "Por entregar",
+      "shipped": "Enviados",
+      "done": "Completados",
+      "cancelled": "Cancelados",
+      "all": "Todos"
+    },
+    "col": {
+      "order": "Pedido",
+      "buyer": "Comprador",
+      "when": "Cuándo",
+      "delivery": "Entrega",
+      "total": "Importe",
+      "state": "Estado",
+      "action": "Acción"
+    },
+    "selectHint": "Elige un pedido de la lista para ver sus detalles."
+  },
+  "order": {
+    "number": "Pedido {{number}}",
+    "items": "{{count}} artículos",
+    "itemsOne": "1 artículo",
+    "deliverTo": "Envío a {{city}}",
+    "delivery": "Envío",
+    "pickup": "Recogida",
+    "digital": "Digital",
+    "contact": "Acordado con el comprador",
+    "fromSite": "Desde tu sitio",
+    "manual": "Manual",
+    "buyerUnknown": "Comprador",
+    "back": "Volver a pedidos",
+    "more": "Más acciones",
+    "detailsLabel": "Detalles del pedido",
+    "lines": {
+      "title": "Qué se pidió",
+      "sku": "SKU",
+      "total": "Total"
+    },
+    "buyer": {
+      "title": "Comprador",
+      "private": "Visible solo para los miembros de la rikma",
+      "noContact": "El sitio no envió teléfono ni correo"
+    },
+    "address": {
+      "title": "Entrega",
+      "none": "No se indicó dirección"
+    },
+    "note": {
+      "title": "Notas"
+    },
+    "payment": {
+      "title": "Pago",
+      "paid": "{{amount}} pagados en tu sitio",
+      "ref": "Referencia del pago",
+      "method": "Método de pago"
+    },
+    "holder": "El dinero lo tiene {{name}} · cuenta para el reparto",
+    "holderYou": "El dinero lo tienes tú · cuenta para el reparto",
+    "call": "Llamar",
+    "email": "Correo",
+    "copyAddress": "Copiar dirección",
+    "copied": "Dirección copiada",
+    "print": "Imprimir albarán",
+    "printTitle": "Albarán de entrega",
+    "timeline": {
+      "title": "Historial",
+      "paid": "Pagado en el sitio",
+      "shipped": "Marcado como enviado",
+      "done": "Marcado como completado",
+      "cancelled": "Cancelado"
+    },
+    "notFound": "Este pedido no se encontró en la rikma."
+  },
+  "status": {
+    "toShip": "Por enviar",
+    "toHandOver": "Por entregar",
+    "shipped": "Enviado",
+    "done": "Completado",
+    "cancelled": "Cancelado"
+  },
+  "short": {
+    "tag": "Faltan {{count}}",
+    "tagOne": "Falta 1",
+    "title": "El comprador pagó más de lo que hay en stock",
+    "body": "Faltan {{count}} unidades. Puedes prepararlas y actualizar el stock, o acordar otra fecha con el comprador.",
+    "bodyOne": "Falta 1 unidad. Puedes prepararla y actualizar el stock, o acordar otra fecha con el comprador.",
+    "updateStock": "Actualizar stock",
+    "contactBuyer": "Datos del comprador"
+  },
+  "action": {
+    "markShipped": "Marcar como enviado",
+    "markDelivered": "Marcar como entregado",
+    "markPickedUp": "Marcar como recogido"
+  },
+  "toast": {
+    "shipping": "Marcando el pedido {{number}} como enviado…",
+    "completing": "Marcando el pedido {{number}} como completado…",
+    "undo": "Deshacer",
+    "shipped": "Pedido {{number}} marcado como enviado",
+    "done": "Pedido {{number}} completado",
+    "failed": "No se guardó. Revisa la conexión e inténtalo de nuevo.",
+    "retry": "Reintentar",
+    "cancelled": "Pedido {{number}} cancelado"
+  },
+  "cancel": {
+    "action": "Cancelar pedido",
+    "title": "¿Cancelar el pedido {{number}}?",
+    "body": "Hazlo cuando hayas acordado con el comprador y le hayas devuelto el dinero desde tu sitio. Las ventas del pedido se pondrán a cero.",
+    "inSplit": "{{count}} ventas ya están en un reparto. No cambiarán, y se avisará a la rikma para que acordéis juntos cómo saldar el reembolso.",
+    "inSplitOne": "1 venta ya está en un reparto. No cambiará, y se avisará a la rikma para que acordéis juntos cómo saldar el reembolso.",
+    "restock": "Devolver los artículos al stock",
+    "restockHint": "Activado por defecto si el pedido aún no se envió",
+    "reason": "¿Qué acordaste con el comprador?",
+    "confirm": "Cancelar pedido",
+    "keep": "Mantener pedido",
+    "holderOnly": "Solo {{name}} puede cancelar — tiene el dinero",
+    "failed": "La cancelación no se guardó. Inténtalo de nuevo."
+  },
+  "products": {
+    "search": "Buscar productos o SKU",
+    "searchLabel": "Buscar productos",
+    "priceFrom": "Desde {{price}}",
+    "priceQuote": "Precio a consultar",
+    "variants": "{{count}} variantes",
+    "variantsOne": "1 variante",
+    "noVariants": "Sin variantes",
+    "inStock": "{{count}} en stock",
+    "unlimited": "Ilimitado",
+    "soldOut": "Agotado",
+    "lowStock": "Quedan {{count}}",
+    "draft": "Esperando la aprobación de la rikma",
+    "view": "Ver la página del producto",
+    "export": "Exportar CSV",
+    "exportHint": "Formato Shopify — se abre en cualquier sistema de ventas y en Excel",
+    "col": {
+      "product": "Producto",
+      "price": "Precio",
+      "variants": "Variantes",
+      "stock": "Stock",
+      "status": "Estado"
+    }
+  },
+  "stock": {
+    "filterLabel": "Filtrar stock",
+    "filter": {
+      "attention": "Requiere atención",
+      "low": "Stock bajo",
+      "out": "Agotado",
+      "short": "Falta para pedidos",
+      "all": "Todo"
+    },
+    "col": {
+      "product": "Producto",
+      "variant": "Variante",
+      "sku": "SKU",
+      "qty": "En stock",
+      "state": "Estado",
+      "action": "Acción"
+    },
+    "short": "Faltan {{count}} para pedidos",
+    "ok": "En stock",
+    "adjust": "Actualizar stock",
+    "modeLabel": "Tipo de actualización",
+    "set": "Hay ahora",
+    "add": "Llegaron",
+    "setHint": "¿Contaste el estante? Escribe cuántos hay ahora.",
+    "addHint": "¿Llegó mercancía? Escribe cuántas unidades llegaron.",
+    "unlimited": "Ilimitado",
+    "unlimitedHint": "Nada que contar — siempre disponible",
+    "now": "Ahora: {{count}}",
+    "nowUnlimited": "Ahora: ilimitado",
+    "after": "Tras la actualización: {{count}}",
+    "increase": "Añadir una",
+    "decrease": "Quitar una",
+    "amount": "Cantidad",
+    "save": "Guardar stock",
+    "saved": "Stock actualizado",
+    "failed": "El stock no se guardó. Tu número sigue aquí — inténtalo de nuevo.",
+    "close": "Cerrar",
+    "priceNote": "Un cambio de precio en un producto de la rikma pasa por la aprobación de los socios, por eso se hace en el editor del producto.",
+    "noThreshold": "Ningún producto tiene aún un nivel de stock bajo."
+  },
+  "sales": {
+    "searchLabel": "Buscar ventas",
+    "search": "Buscar producto o quién tiene el dinero",
+    "rangeLabel": "Rango de fechas",
+    "range": {
+      "d7": "7 días",
+      "d30": "30 días",
+      "d90": "90 días",
+      "year": "Este año",
+      "all": "Todo"
+    },
+    "sourceLabel": "Origen",
+    "source": {
+      "all": "Todos los orígenes",
+      "api": "Desde tu sitio",
+      "ui": "Manual"
+    },
+    "col": {
+      "date": "Fecha",
+      "product": "Producto",
+      "amount": "Importe",
+      "units": "Cant.",
+      "holder": "Quién lo tiene",
+      "source": "Origen",
+      "split": "Reparto",
+      "order": "Pedido"
+    },
+    "split": {
+      "waiting": "Pendiente de reparto",
+      "inSplit": "En un reparto",
+      "claimOpen": "Esperando consentimiento",
+      "split": "Repartido"
+    },
+    "total": "Total en el rango: {{amount}}",
+    "count": "{{count}} ventas",
+    "countOne": "1 venta",
+    "export": "Exportar CSV"
+  },
+  "connect": {
+    "apiTitle": "Tu sitio ↔ la rikma",
+    "apiBody": "Claves, permisos y el fragmento que informa ventas y pedidos desde tu sitio tras cada pago.",
+    "statusLive": "Conectado · último pedido {{when}}",
+    "statusNone": "Aún no hay sitio conectado",
+    "docs": "Guía de la API de la rikma",
+    "supportTitle": "Página de apoyo y donaciones",
+    "recordDonation": "Registrar donación",
+    "donationHint": "La donación se registra como una venta y entra en el reparto como cualquier ingreso."
+  },
+  "empty": {
+    "orders": "Aún no hay pedidos",
+    "ordersBody": "Los pedidos llegan aquí desde tu sitio cuando el comprador ha pagado.",
+    "ordersCta": "Conectar un sitio",
+    "toShip": "Todo enviado",
+    "toShipBody": "Un pedido nuevo aparecerá aquí y recibirás un aviso.",
+    "products": "Aún no hay productos en la rikma",
+    "productsBody": "Un producto nuevo pasa por la aprobación de los socios antes de llegar a la tienda.",
+    "filtered": "Nada coincide con este filtro",
+    "clearFilter": "Quitar filtro",
+    "sales": "No hay ventas en este rango",
+    "stock": "Nada que actualizar aquí"
+  },
+  "err": {
+    "load": "No pudimos cargar esto. Prueba a recargar.",
+    "notReady": "Los pedidos del sitio aún no están activos en esta rikma",
+    "notReadyBody": "Cuando lo estén, cada pedido pagado en tu sitio aparecerá aquí con sus datos de entrega.",
+    "refresh": "Recargar"
+  }
+}

@@ -72,7 +72,10 @@
   // from a flag the page sets on mount, so the server already renders the pill
   // and the full bar never flashes first. Opening it there lasts until the
   // member leaves those pages and never overwrites the saved layout.
-  const COMPACT_ROUTES = /^\/\((?:reg|regandnon)\)\/(?:concierge|wish)(?:\/|$)/;
+  // "Manage sales" joins them: a seller's work screen whose order page keeps
+  // its one action in a bar at the bottom (PLAN_SHOP_CUSTOMER_EXPERIENCE §7.3).
+  const COMPACT_ROUTES =
+    /^\/\((?:reg|regandnon)\)\/(?:concierge|wish|moach\/\[projectId\]\/sales\/manage)(?:\/|$)/;
   let compact = $derived(COMPACT_ROUTES.test(page.route.id ?? ''));
   let compactPick = $state(/** @type {string | null} */ (null));
   $effect(() => {
