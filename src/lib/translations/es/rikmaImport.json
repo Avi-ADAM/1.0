@@ -102,10 +102,20 @@
     "openBoards": "Ir al tablero de planificación"
   },
   "invite": {
-    "invited": "{{name}} recibió una invitación: una tarjeta en su página del corazón y un correo.",
-    "notRegistered": "{{name}} aún no está en 1lev1. Envíale el enlace para unirse:",
-    "pendingVote": "{{name}} será invitado/a cuando la rikma apruebe la misión.",
-    "noEmail": "No se indicó el correo de {{name}}, así que no se envió invitación.",
+    "invited": "Se envió un correo de invitación a {{name}}. Las invitaciones vinculadas a misiones o recursos también aparecen en su página del corazón.",
+    "invitedCardOnly": "{{name}} tiene una invitación en su página del corazón, pero no se envió el correo. Comparte el enlace:",
+    "notRegistered": "{{name}} aún no está en 1lev1. Se envió un correo con el enlace para unirse; también puedes compartirlo aquí:",
+    "pendingVote": "{{name}} recibirá una invitación cuando la rikma apruebe la misión o el recurso.",
+    "noEmail": "No se indicó el correo de {{name}}, así que no se envió una invitación por correo. Comparte el enlace:",
+    "emailFailed": "No se pudo enviar un correo a {{name}}. Copia y envíale el enlace:",
+    "emailSkipped": "No se envió un correo a {{name}} según sus preferencias. Comparte el enlace:",
+    "rateLimited": "Se alcanzó el límite de invitaciones por correo. Comparte el enlace e inténtalo de nuevo en unos {{minutes}} minutos.",
+    "copy": "Copiar enlace para unirse",
+    "copied": "Enlace copiado",
+    "copyFailed": "No se pudo copiar automáticamente; selecciona y copia el enlace de arriba.",
+    "cardsFailed": "Se envió un correo a {{name}}, pero no se pudieron crear {{failed}} invitaciones a misiones o recursos. Comparte el enlace e inténtalo más tarde.",
+    "cardsFailedEmailSkipped": "No se envió el correo a {{name}} según sus preferencias y tampoco se pudieron crear {{failed}} invitaciones a misiones o recursos. Comparte el enlace.",
+    "cardsFailedEmailFailed": "No se pudo enviar un correo a {{name}} ni crear {{failed}} invitaciones a misiones o recursos. Comparte el enlace e inténtalo más tarde.",
     "other": "La invitación a {{name}} no se envió."
   },
   "preview": {

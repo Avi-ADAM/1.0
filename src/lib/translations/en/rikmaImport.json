@@ -102,10 +102,20 @@
     "openBoards": "Go to the planning board"
   },
   "invite": {
-    "invited": "{{name}} was invited - a card on their heart page and an email.",
-    "notRegistered": "{{name}} is not on 1lev1 yet. Send them the join link:",
-    "pendingVote": "{{name}} will be invited once the rikma approves the mission.",
-    "noEmail": "No email was given for {{name}}, so no invitation was sent.",
+    "invited": "An invitation email was sent to {{name}}. Any linked mission or resource invitations also appear on their heart page.",
+    "invitedCardOnly": "{{name}} has an invitation on their heart page, but the email was not sent. Share the join link:",
+    "notRegistered": "{{name}} is not on 1lev1 yet. An email with the join link was sent; you can also share it here:",
+    "pendingVote": "{{name}} will be invited once the rikma approves the mission or resource.",
+    "noEmail": "No email was given for {{name}}, so no email invitation was sent. Share the join link:",
+    "emailFailed": "We could not email {{name}}. Copy and send them the join link:",
+    "emailSkipped": "No email was sent to {{name}} because of their email preferences. Share the join link:",
+    "rateLimited": "The email invitation limit was reached. Share the join link and try again in about {{minutes}} minutes.",
+    "copy": "Copy join link",
+    "copied": "Link copied",
+    "copyFailed": "Could not copy automatically; select and copy the link above.",
+    "cardsFailed": "An email was sent to {{name}}, but {{failed}} mission or resource invitation(s) could not be added. Share the join link and try again later.",
+    "cardsFailedEmailSkipped": "Email was not sent to {{name}} due to their email preferences, and {{failed}} mission or resource invitation(s) could not be added. Share the join link.",
+    "cardsFailedEmailFailed": "We could not email {{name}} or add {{failed}} mission or resource invitation(s). Share the join link and try again later.",
     "other": "The invitation to {{name}} was not sent."
   },
   "preview": {

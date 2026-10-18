@@ -83,6 +83,16 @@ describe('blueprintToState', () => {
     expect(state.fields?.location).toEqual({ lat: 32.08, lng: 34.78, radius: 10, hint: 'תל אביב' });
   });
 
+  it('warns when a partner has no confirmed email address', () => {
+    const parsed = parseBlueprint({ fields: { track: 'partnership', name: 'Studio Gefen' }, partners: [{ ref: 'dana', name: 'Dana' }] });
+    if (!parsed.ok) throw new Error('must parse');
+    const result = blueprintToState(parsed.value);
+    expect(result.warnings).toEqual([
+      expect.objectContaining({ where: 'partners[0].email', message: expect.stringContaining('No email was provided') })
+    ]);
+    expect(result.state.items.find((item) => item.group === 'partners')?.spec).toBeUndefined();
+  });
+
   it('a dangling ref becomes a warning, not a failure', () => {
     const p = parseBlueprint({
       fields: { track: 'idea', name: 'x' },
