@@ -228,7 +228,7 @@ test('Actual-asset verifier connects download-page parser, hashes, sidecars and 
 test('MSIX Store flavour disables the GitHub updater while EXE/MSI keep it', () => {
   const cargo = read('src-tauri/Cargo.toml');
   assert.match(cargo, /\[features\][\s\S]*msix-store = \[\]/);
-  const source = read('src-tauri/src/desktop.rs');
+  const source = read('src-tauri/src/desktop.rs').replaceAll('\r\n', '\n');
   assert.ok(source.includes('GITHUB_UPDATER_ENABLED: bool = !cfg!(feature = "msix-store")'));
   assert.ok(source.includes('#[cfg(not(feature = "msix-store"))]\n    let builder = builder.plugin(tauri_plugin_updater::Builder::new().build());'));
   assert.ok(source.includes('updater: disabled in the Microsoft Store (MSIX) build; the Store delivers updates'));
