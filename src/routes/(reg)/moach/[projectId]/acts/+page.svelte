@@ -5,6 +5,8 @@
   import { page } from '$app/state';
   import { invalidateAll } from '$app/navigation';
   import { lang } from '$lib/stores/lang.js';
+  import { t } from '$lib/translations';
+  import { SvelteSet } from 'svelte/reactivity';
 
   const moachStore = getMoachStore();
 
@@ -21,7 +23,7 @@
   let proles = $derived.by(() => {
     /** @type {{ id: string; name: string }[]} */
     const roles = [];
-    const seen = new Set();
+    const seen = new SvelteSet();
     for (const bmi of bmiData) {
       for (const t of bmi.attributes?.tafkidims?.data ?? []) {
         if (!seen.has(t.id)) {
@@ -62,17 +64,29 @@
 </div>
 
 {#if showCreate}
-  <!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
   <div
-    class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4"
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+    role="presentation"
     onclick={(e) => { if (e.target === e.currentTarget) showCreate = false; }}
   >
-    <div class="relative w-full max-w-2xl max-h-[92vh] overflow-y-auto rounded-2xl shadow-2xl bg-white border border-zinc-200">
-      <div class="sticky top-0 z-10 flex items-center justify-between bg-white/95 backdrop-blur-sm border-b border-zinc-200 px-6 py-4">
-        <h2 class="font-bold text-lg text-barbi">יצירת מטלה חדשה</h2>
+    <div
+      class="surface-dialog relative w-full max-w-2xl max-h-[92vh] overflow-y-auto rounded-2xl shadow-2xl
+             bg-surface text-surfaceInk border border-surfaceLine
+             dark:bg-zinc-900 dark:border-zinc-700"
+      role="dialog"
+      aria-modal="true"
+      aria-label={$t('mission.crtask.heading')}
+    >
+      <div
+        class="sticky top-0 z-10 flex items-center justify-between gap-3
+               bg-surface/95 dark:bg-zinc-900/95 backdrop-blur-sm
+               border-b border-surfaceLine dark:border-zinc-700
+               px-6 py-4"
+      >
+        <h2 class="font-bold text-lg text-barbi">{$t('mission.crtask.heading')}</h2>
         <button
           onclick={() => (showCreate = false)}
-          class="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100 transition"
+          class="p-1.5 rounded-lg text-surfaceMuted hover:text-surfaceInk hover:bg-surface2 dark:hover:bg-zinc-800 transition"
           aria-label="סגור"
         >
           <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -87,6 +101,7 @@
           id={0}
           misid={undefined}
           fromMis={false}
+          hideHeading={true}
           onDone={handleTaskCreated}
         />
       </div>

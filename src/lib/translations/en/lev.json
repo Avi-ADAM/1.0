@@ -232,7 +232,8 @@
       "totalInvest": "Estimated total investment",
       "totalInvestHint": "Estimated total investment over the whole period",
       "noEndDate": "No end date - until marked as completed",
-      "cycleApprovalNote": "Each cycle opens a charge for the rikma to approve the actual expense"
+      "cycleApprovalNote": "Each cycle opens a charge for the rikma to approve the actual expense",
+      "rikmaValue": "Rikma value"
     },
     "welcome": {
       "welcome": "Welcome {{username}} to {{projectName}}!",
@@ -367,7 +368,8 @@
     "sugestmi": {
       "head": "Suggested mission",
       "offerAtSource": "Offer on the pool page",
-      "withdrawSelfNomination": "Withdraw your self-nomination - the mission you authored closes entirely"
+      "withdrawSelfNomination": "Withdraw your self-nomination - the mission you authored closes entirely",
+      "rikmaValue": "Rikma value"
     },
     "wishApplied": "Your offer was sent successfully",
     "toProfile": "to the profile page",

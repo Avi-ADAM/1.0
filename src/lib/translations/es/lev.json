@@ -233,7 +233,8 @@
       "totalInvest": "Inversión total estimada",
       "totalInvestHint": "Inversión total estimada para todo el periodo",
       "noEndDate": "Sin fecha de fin - hasta que se marque como completado",
-      "cycleApprovalNote": "Cada ciclo abre un cargo para que la rikma apruebe el gasto real"
+      "cycleApprovalNote": "Cada ciclo abre un cargo para que la rikma apruebe el gasto real",
+      "rikmaValue": "Valor en la rikma"
     },
     "welcome": {
       "welcome": "¡Bienvenido {{username}} a {{projectName}}!",
@@ -368,7 +369,8 @@
     "sugestmi": {
       "head": "Misión propuesta",
       "offerAtSource": "Oferta en la página del agregador",
-      "withdrawSelfNomination": "Retirar tu autopostulación: la misión que creaste se cerrará por completo"
+      "withdrawSelfNomination": "Retirar tu autopostulación: la misión que creaste se cerrará por completo",
+      "rikmaValue": "Valor en la rikma"
     },
     "wishApplied": "Tu oferta se envió con éxito",
     "toProfile": "a la página de perfil",

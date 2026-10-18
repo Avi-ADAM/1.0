@@ -232,7 +232,8 @@
       "totalInvest": "סך השקעה משוער",
       "totalInvestHint": "סך השקעה משוער לכל התקופה",
       "noEndDate": "ללא תאריך סיום - עד לסימון כהושלם",
-      "cycleApprovalNote": "בכל מחזור ייפתח חיוב לאישור ההוצאה בפועל מול הרקמה"
+      "cycleApprovalNote": "בכל מחזור ייפתח חיוב לאישור ההוצאה בפועל מול הרקמה",
+      "rikmaValue": "שווי ברקמה"
     },
     "welcome": {
       "welcome": "ברוך הבא {{username}} לרקמה {{projectName}}!",
@@ -367,7 +368,8 @@
     "sugestmi": {
       "head": "הצעה למשימה",
       "offerAtSource": "להצעה בעמוד המאגד",
-      "withdrawSelfNomination": "משיכת ההצעה העצמית - המשימה שחיברת תיסגר כולה"
+      "withdrawSelfNomination": "משיכת ההצעה העצמית - המשימה שחיברת תיסגר כולה",
+      "rikmaValue": "שווי ברקמה"
     },
     "wishApplied": "ההצעה נשלחה בהצלחה",
     "toProfile": " לעמוד הפרופיל",

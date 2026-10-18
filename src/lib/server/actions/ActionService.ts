@@ -296,7 +296,8 @@ export class ActionService {
         actionKey === 'createPaidOrder' ||
         actionKey === 'cancelOrder' ||
         actionKey === 'markOrderShipped' ||
-        actionKey === 'markOrderFulfilled'
+        actionKey === 'markOrderFulfilled' ||
+        actionKey === 'setShopStock'
       ) {
         import('../webhooks/orderEvents.js')
           .then(({ onOrderChanged }) =>

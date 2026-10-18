@@ -690,6 +690,12 @@ export const qidsAccess = {
   'saleVariantInfo': { allow: ['serviceAdmin'] },
   'rikmaApiVariantQuant': { allow: ['serviceAdmin'] },
   'saleLinkShop': { allow: ['serviceAdmin'] },
+  // Managing the shop from the moach (S5): read by the sales/* loaders after the
+  // moach layout's membership check. Orders carry the buyer's phone and address.
+  'moachShopOrders': { allow: ['serviceAdmin'] },
+  'moachShopProducts': { allow: ['serviceAdmin'] },
+  'moachShopLowStock': { allow: ['serviceAdmin'] },
+  'moachShopSales': { allow: ['serviceAdmin'] },
 
   // Site reports mirrored into the central rikma — same story, and a report
   // carries the reporter's email, so it is never reachable with a user JWT.

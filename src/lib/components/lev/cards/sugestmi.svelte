@@ -316,6 +316,11 @@
         })}
         {isMonthly ? ' ' + $t('lev.cards.common.monthly') : ''}
       </span>
+      {#if wishName == null}
+        <span class="text-emerald-700 dark:text-emerald-400 font-bold text-base">
+          {$t('lev.cards.sugestmi.rikmaValue')}
+        </span>
+      {/if}
     </div>
 
     <!-- מלגת קיום שמצורפת למשימה — ההשקעה בפרויקט והמלגה זו לצד זו, עם

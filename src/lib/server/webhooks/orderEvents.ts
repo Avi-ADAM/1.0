@@ -33,7 +33,9 @@ export const ORDER_WEBHOOK_ACTIONS = new Set([
   'createPaidOrder',
   'cancelOrder',
   'markOrderShipped',
-  'markOrderFulfilled'
+  'markOrderFulfilled',
+  // A member's stock update in the moach (S5) — only variant.stockChanged.
+  'setShopStock'
 ]);
 
 type Strapi = { execute: (qid: string, vars: any, jwt: any, fetchFn: any) => Promise<any> };
@@ -59,6 +61,8 @@ export function orderEventsFor(
       return { order: r.changed ? ['order.statusChanged'] : [], stock: [] };
     case 'cancelOrder':
       return { order: r.alreadyCancelled ? [] : ['order.statusChanged'], stock };
+    case 'setShopStock':
+      return { order: [], stock };
     default:
       return { order: [], stock: [] };
   }

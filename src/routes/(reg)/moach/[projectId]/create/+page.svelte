@@ -811,7 +811,7 @@
 
       <!-- מטלה (Act) — נפתח משורת לוח מסוג act -->
       {#if addAct}
-        <div class="m-4 border-2 border-barbi rounded bg-white/80 backdrop-blur-sm shadow-xl p-4">
+        <div class="surface-dialog m-4 border-2 border-barbi rounded-2xl bg-surface/95 dark:bg-zinc-900/95 backdrop-blur-sm shadow-xl p-4 text-surfaceInk">
           <Crtask
             {bmiData}
             {proles}

@@ -17544,6 +17544,87 @@ ${STIPEND_DECISION_FIELDS}
     updateSale(id: $id, data: { product_variant: $product_variant, order: $order }) { data { id } }
   }`,
 
+  /* ─────────────────────────────────────────────────────────────────────
+   * Managing the shop from the moach (PLAN_SHOP_CUSTOMER_EXPERIENCE §7.3 — S5)
+   *
+   * Read by the `sales/*` loaders after the moach layout's membership check,
+   * with the service token — so serviceAdmin only. These carry the buyer's
+   * name, phone and address, which are for the rikma's members and nobody
+   * else (§5.6): never widen them to `user` or `apiKey`.
+   * ───────────────────────────────────────────────────────────────────── */
+
+  // The rikma's orders, newest first, with lines, buyer, delivery and sales.
+  'moachShopOrders': `query MoachShopOrders($pid: ID!) {
+    orders(
+      filters: { project: { id: { eq: $pid } } }
+      sort: ["paidAt:desc", "createdAt:desc"]
+      pagination: { limit: 200 }
+    ) {
+      data { id attributes {
+        ref displayNumber status oversold total currencyCode note source
+        buyerName buyerEmail buyerPhone deliveryPreference deliveryAddress
+        paymentRef paymentMethod paidAt shippedAt fulfilledAt createdAt
+        holder { data { id attributes { username } } }
+        lines(pagination: { limit: 100 }) { data { id attributes {
+          position quantity unitPrice lineTotal
+          nameSnapshot optionLabelSnapshot skuSnapshot imageUrlSnapshot
+          matanot { data { id } }
+          variant { data { id } }
+        } } }
+        sales(pagination: { limit: 100 }) { data { id attributes {
+          in holderStatus splited
+          users_permissions_user { data { id } }
+          tosplits { data { id } }
+        } } }
+      } }
+    }
+  }`,
+
+  // The rikma's products with their variants — the products and stock tabs.
+  'moachShopProducts': `query MoachShopProducts($pid: ID!) {
+    matanots(
+      filters: { projectcreates: { id: { eq: $pid } } }
+      sort: ["name:asc"]
+      pagination: { limit: 200 }
+    ) {
+      data { id attributes {
+        name price pricingMode quant kindOf status_of_voting archived lifecycle hasVariants
+        pic { data { attributes { url formats } } }
+        options(pagination: { limit: 10 }) { data { attributes { key name position } } }
+        variants(pagination: { limit: 100 }) { data { id attributes {
+          sku name optionValues price quant active position
+        } } }
+      } }
+    }
+  }`,
+
+  // The low-stock level of each product (matanot.lowStockAt). Apart from the
+  // query above because it deploys on its own day: until it does this fails and
+  // nothing is ever marked "low" — the tab itself keeps working.
+  'moachShopLowStock': `query MoachShopLowStock($pid: ID!) {
+    matanots(filters: { projectcreates: { id: { eq: $pid } } }, pagination: { limit: 200 }) {
+      data { id attributes { lowStockAt } }
+    }
+  }`,
+
+  // The rikma's sales for the full table: product, variant, order, source, holder, split.
+  'moachShopSales': `query MoachShopSales($pid: ID!) {
+    sales(
+      filters: { project: { id: { eq: $pid } } }
+      sort: ["date:desc", "createdAt:desc"]
+      pagination: { limit: 1000 }
+    ) {
+      data { id attributes {
+        in unit date createdAt source holderStatus splited
+        matanot { data { id attributes { name } } }
+        product_variant { data { id attributes { name optionValues } } }
+        order { data { id } }
+        users_permissions_user { data { id attributes { username } } }
+        tosplits { data { id } }
+      } }
+    }
+  }`,
+
   ...qids_base,
   ...moachQids,
   ...digestQids,

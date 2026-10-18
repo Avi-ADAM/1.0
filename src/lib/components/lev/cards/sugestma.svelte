@@ -436,6 +436,9 @@
             {total}
           </p>
         {/if}
+        <span class="text-emerald-700 dark:text-emerald-400 font-bold text-sm ms-1">
+          {$t('lev.cards.sugestma.rikmaValue')}
+        </span>
       </div>
 
       <!-- שווי צפוי ברקמה — משאב פתוח נמנה ב-open_mashaabims, כלומר הוא כבר

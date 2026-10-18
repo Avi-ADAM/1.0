@@ -182,6 +182,7 @@ import { addAskChatEntryConfig } from './addAskChatEntry.js';
 import { createSaleConfig } from './createSale.js';
 import { createPaidOrderConfig } from './createPaidOrder.js';
 import { cancelOrderConfig, markOrderShippedConfig, markOrderFulfilledConfig } from './orderLifecycle.js';
+import { setShopStockConfig } from './shopStock.js';
 import { reportRecurringSaleCycleConfig } from './reportRecurringSaleCycle.js';
 import { customerReportRecurringSaleCycleConfig } from './customerReportRecurringSaleCycle.js';
 import { counterSaleClaimConfig } from './counterSaleClaim.js';
@@ -516,6 +517,8 @@ export function registerAllActions(): void {
   registerAction(cancelOrderConfig);
   registerAction(markOrderShippedConfig);
   registerAction(markOrderFulfilledConfig);
+  // Stock from the moach's sales screens (PLAN_SHOP_CUSTOMER_EXPERIENCE S5)
+  registerAction(setShopStockConfig);
   // Recurring sales (PLAN_RECURRING_SALES): monthly cycle reporting
   registerAction(reportRecurringSaleCycleConfig);
   registerAction(customerReportRecurringSaleCycleConfig);
