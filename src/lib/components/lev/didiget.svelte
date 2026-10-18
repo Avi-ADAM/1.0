@@ -457,7 +457,7 @@ id: ${pendId}
 
 <DialogOverlay class="overlay" {isOpen} onDismiss={close}>
   <div transition:fly|local={{ y: 450, opacity: 0.5, duration: 2000 }}>
-    <DialogContent class="chat d" aria-label="form">
+    <DialogContent class="chat d surface-dialog" aria-label="form">
       <div dir="rtl" class="grid items-center justify-center aling-center">
         <button
           onclick={close}
@@ -1194,7 +1194,6 @@ id: ${pendId}
   :global([data-svelte-dialog-content].chat) {
     z-index: 1000;
     padding: 0px;
-    background-color: #242526;
     margin: 0px;
     height: 70vh;
     aspect-ratio: 1/1.7;
@@ -1205,7 +1204,6 @@ id: ${pendId}
   :global([data-svelte-dialog-content].nego) {
     z-index: 1000;
     padding: 15px;
-    background-color: #242526;
     margin: 0px;
     margin-right: 25px;
 
@@ -1226,7 +1224,6 @@ id: ${pendId}
       overflow-y: auto;
       z-index: 1000;
       padding: 0px;
-      background-color: #242526;
       margin: 0px;
       height: 80vh;
       margin-top: 20vh;
@@ -1237,7 +1234,6 @@ id: ${pendId}
       z-index: 1000;
       padding: 15px;
       margin-right: 25px;
-      background-color: #242526;
       margin: 0px;
       margin-top: 20vh;
       height: 80vh;

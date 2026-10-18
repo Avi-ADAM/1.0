@@ -531,7 +531,7 @@
 <DialogOverlay {isOpen} onDismiss={close} class="overlay">
   <div transition:fly={{ y: 450, opacity: 0.5, duration: 2000 }}>
     {#if masa === true}
-      <DialogContent aria-label="form" class="nego">
+      <DialogContent aria-label="form" class="nego surface-dialog">
         <div dir="rtl" class="grid items-center justify-center text-center">
           <button
             onclick={close}
@@ -581,7 +581,7 @@
         </div>
       </DialogContent>
     {:else if diunm === true}
-      <DialogContent class="chat" aria-label="form">
+      <DialogContent class="chat surface-dialog" aria-label="form">
         <div dir="rtl" class="grid items-center justify-center aling-center">
           <button
             onclick={close}
@@ -1255,13 +1255,11 @@
   :global([data-svelte-dialog-content].nego) {
     z-index: 1000;
     padding: 10px;
-    background-color: #242526;
     width: 80vw;
   }
   :global([data-svelte-dialog-content].chat) {
     z-index: 1000;
     padding: 0px;
-    background-color: #242526;
     margin: 0px;
     height: 70vh;
     aspect-ratio: 1/1.7;

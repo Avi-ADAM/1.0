@@ -1006,7 +1006,7 @@
   >
     <DialogContent
       aria-label="form"
-      class={dialog === 2 ? 'formi' : 'contenti'}
+      class="{dialog === 2 ? 'formi' : 'contenti'} surface-dialog"
     >
       {#if dialog === 2}
         <Crtask
@@ -1894,8 +1894,8 @@
 </div>
 
 <style>
+  /* Both boxes are painted by `surface-dialog` (app.postcss). */
   :global([data-svelte-dialog-content].contenti) {
-    background-color: rgba(247, 250, 36, 0.5);
     width: 90vw;
   }
 
@@ -1906,22 +1906,10 @@
   }
 
   :global([data-svelte-dialog-content].formi) {
-    background-color: #000000;
-    background-image: linear-gradient(147deg, #000000 0%, #04619f 74%);
-    background-size: 400% 400%;
-    -webkit-animation: AnimationName 13s ease infinite;
-    -moz-animation: AnimationName 13s ease infinite;
-    animation: AnimationName 3s ease infinite;
     width: 80vw;
   }
   @media (min-width: 568px) {
     :global([data-svelte-dialog-content].formi) {
-      background-color: #000000;
-      background-image: linear-gradient(147deg, #000000 0%, #04619f 74%);
-      background-size: 400% 400%;
-      -webkit-animation: AnimationName 13s ease infinite;
-      -moz-animation: AnimationName 13s ease infinite;
-      animation: AnimationName 13s ease infinite;
       width: 50vw;
     }
   }

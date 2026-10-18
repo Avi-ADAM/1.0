@@ -291,7 +291,7 @@
 
         <DialogOverlay isOpen={negoOpen} onDismiss={closeNego} class="overlay">
             <div transition:fly={{ y: 40, opacity: 0, duration: 250 }}>
-                <DialogContent class="nego" aria-label="form">
+                <DialogContent class="nego surface-dialog" aria-label="form">
                     <button onclick={closeNego} style="margin: 0 auto;" class="hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full" aria-label="סגירה">✕</button>
                     {#if negoLoading}
                         <Spinner size="lg" />

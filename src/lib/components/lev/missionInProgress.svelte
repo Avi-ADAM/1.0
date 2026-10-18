@@ -747,7 +747,7 @@
 
 <DialogOverlay {isOpen} onDismiss={close} class="overlay">
   <div transition:fly|local={{ y: 450, opacity: 0.5, duration: 2000 }}>
-    <DialogContent aria-label="form" class="content">
+    <DialogContent aria-label="form" class="content surface-dialog">
       <div
         dir={$isRtl ? 'rtl' : 'ltr'}
         class="p-6 space-y-4"
@@ -756,39 +756,39 @@
           onclick={close}
           class="absolute top-4 {$locale === 'he' || $locale === 'ar'
             ? 'left-4'
-            : 'right-4'} text-gray-500 hover:text-gray-700"
+            : 'right-4'} text-surfaceMuted hover:text-surfaceInk"
         >
           {$t('lev.missionInProgress.cancel')}
         </button>
         {#if a == 1}
           <div class="space-y-4">
-            <h5 class="text-xl font-semibold text-gray-800">
+            <h5 class="text-xl font-semibold text-surfaceInk">
               {$t('lev.missionInProgress.uploadTitle')}
             </h5>
-            <p class="text-sm text-gray-600">
+            <p class="text-sm text-surfaceMuted">
               {$t('lev.missionInProgress.uploadDescription')}
             </p>
 
             <div class="space-y-3">
               <label class="block">
-                <span class="text-sm font-medium text-gray-700"
+                <span class="text-sm font-medium text-surfaceInk"
                   >{$t('lev.missionInProgress.fileLabel')}</span
                 >
                 <input
                   type="file"
                   bind:files={what}
-                  class="mt-1 block w-full text-sm text-gray-500
+                  class="mt-1 block w-full text-sm text-surfaceMuted
                         file:mr-4 file:py-2 file:px-4
                         file:rounded-lg file:border-0
                         file:text-sm file:font-semibold
-                        file:bg-gold file:text-white
+                        file:bg-gold file:text-barbi
                         hover:file:bg-yellow-600
                         file:cursor-pointer"
                 />
               </label>
 
               <label class="block">
-                <span class="text-sm font-medium text-gray-700"
+                <span class="text-sm font-medium text-surfaceInk"
                   >{$t('lev.missionInProgress.descriptionPlaceholder')}</span
                 >
                 <textarea
@@ -797,7 +797,7 @@
                     'lev.missionInProgress.descriptionPlaceholder'
                   )}
                   rows="4"
-                  class="mt-1 block w-full rounded-lg border border-gold focus:border-yellow-600 focus:ring focus:ring-yellow-200 focus:ring-opacity-50 p-3 text-gray-700"
+                  class="mt-1 block w-full rounded-lg border border-gold focus:border-yellow-600 focus:ring focus:ring-yellow-200 focus:ring-opacity-50 p-3 text-surfaceInk"
                 ></textarea>
               </label>
             </div>
@@ -805,12 +805,12 @@
             {#if butt == false}
               <button
                 onclick={afterwhy}
-                class="w-full bg-gold hover:bg-yellow-600 text-white font-semibold py-3 px-6 rounded-xl transition-colors duration-200"
+                class="w-full bg-gold hover:bg-yellow-600 text-barbi font-semibold py-3 px-6 rounded-xl transition-colors duration-200"
               >
                 {$t('lev.missionInProgress.submitButton')}
               </button>
             {:else}
-              <div class="text-center text-gray-600 py-3">
+              <div class="text-center text-surfaceMuted py-3">
                 {$t('lev.missionInProgress.pleaseWait')}
               </div>
             {/if}
@@ -850,7 +850,7 @@
           <div class="space-y-3">
             <!-- Tasks header -->
             <div class="flex items-center gap-2">
-              <h5 class="text-base font-bold text-gray-800">
+              <h5 class="text-base font-bold text-surfaceInk">
                 {$t('lev.missionInProgress2.tasks')}
               </h5>
               <span
@@ -862,17 +862,17 @@
             <div class="space-y-2 max-h-[55vh] overflow-y-auto pr-1">
               {#each localTasks as task, i}
                 <div
-                  class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden"
+                  class="bg-surface rounded-xl border border-surfaceLine shadow-sm overflow-hidden"
                 >
                   <!-- Task name + description -->
                   <div
-                    class="px-3 py-2 bg-gradient-to-r from-purple-50 to-pink-50 border-b border-gray-100"
+                    class="px-3 py-2 bg-gradient-to-r from-purple-500/10 to-pink-500/10 border-b border-surfaceLine"
                   >
-                    <h6 class="font-bold text-gray-800 text-sm leading-snug">
+                    <h6 class="font-bold text-surfaceInk text-sm leading-snug">
                       {task.attributes.shem}
                     </h6>
                     {#if task.attributes.des}
-                      <p class="text-gray-500 text-xs mt-0.5 leading-relaxed">
+                      <p class="text-surfaceMuted text-xs mt-0.5 leading-relaxed">
                         {task.attributes.des}
                       </p>
                     {/if}
@@ -891,7 +891,7 @@
                           role="button"
                           tabindex="0"
                           title={$t('lev.missionInProgress2.clickToUpdate')}
-                          class="cursor-pointer border-2 rounded-xl border-purple-300 hover:border-purple-500 overflow-hidden transition-colors bg-gray-50"
+                          class="cursor-pointer border-2 rounded-xl border-purple-300 hover:border-purple-500 overflow-hidden transition-colors bg-surface2"
                         >
                           <div
                             class="bg-gradient-to-r from-purple-500 to-pink-500 transition-all duration-300 flex items-center justify-center"
@@ -904,7 +904,7 @@
                             {/if}
                           </div>
                           {#if !(task.attributes.status > 0)}
-                            <div class="text-center text-xs text-gray-400 py-1">0%</div>
+                            <div class="text-center text-xs text-surfaceMuted py-1">0%</div>
                           {/if}
                         </div>
                       {:else if op[i] == true}
@@ -953,7 +953,7 @@
                         <!-- Assignee hasn't confirmed yet -->
                         <button
                           onclick={() => taskishor(task.id)}
-                          class="flex-1 py-1.5 text-xs font-semibold border-2 border-gray-300 text-gray-600 rounded-lg hover:border-purple-500 hover:text-purple-700 transition-all bg-white"
+                          class="flex-1 py-1.5 text-xs font-semibold border-2 border-surfaceLine text-surfaceMuted rounded-lg hover:border-purple-500 hover:text-purple-700 transition-all bg-surface"
                         >{$t('lev.missionInProgress.save')}</button>
                       {:else}
                         <!-- Assignee confirmed → can mark as done -->

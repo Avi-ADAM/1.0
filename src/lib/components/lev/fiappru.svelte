@@ -393,7 +393,7 @@
 
 <DialogOverlay {isOpen} onDismiss={close} class="overlay">
   <div transition:fly|local|local={{ y: 450, opacity: 0.5, duration: 1000 }}>
-    <DialogContent class="content fc-dialog" aria-label="form">
+    <DialogContent class="content surface-dialog fc-dialog" aria-label="form">
       <div dir="rtl" class="fc-body flex items-center flex-col">
         <button
           onclick={close}
@@ -828,43 +828,20 @@
 {/if}
 
 <style>
-  /* The dialog library paints its box a fixed #fff while the text inherits the
-   * page's ink, and the global `h1`/`p` take --heading-color (light) - so the
-   * form read light-on-white in every theme. The box and every line in it take
-   * the theme's surface pair instead. */
+  /* Colours come from the shared `surface-dialog` (app.postcss); this is only
+   * the box's shape and the fields' size. */
   :global([data-svelte-dialog-content].fc-dialog) {
-    background: var(--surface, #fff);
-    color: var(--surface-ink, #2b2620);
-    border: 1px solid var(--surface-line, rgba(0, 0, 0, 0.1));
     border-radius: 18px;
     padding: 1.25rem;
     max-height: 85vh;
     overflow-y: auto;
   }
-  .fc-body {
-    color: var(--surface-ink, #2b2620);
-  }
-  .fc-body :is(h1, label, legend, figcaption, blockquote) {
-    color: var(--surface-ink, #2b2620);
-  }
-  .fc-body p {
-    color: var(--surface-muted, #6b6156);
-  }
   .fc-body input[type='number'],
   .fc-body textarea {
-    background: var(--surface-2, #f7f5ef);
-    color: var(--surface-ink, #2b2620);
     border: 1px solid var(--surface-line, rgba(0, 0, 0, 0.1));
     border-radius: 10px;
     padding: 6px 10px;
     font-size: 1.1em;
-  }
-  .fc-body textarea::placeholder {
-    color: var(--surface-muted, #6b6156);
-    opacity: 1;
-  }
-  .fc-body input[type='checkbox'] {
-    accent-color: var(--barbi-pink);
   }
   .fc-quote {
     width: 100%;

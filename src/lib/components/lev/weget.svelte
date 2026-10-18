@@ -472,7 +472,7 @@
 
 <DialogOverlay {isOpen} onDismiss={close} class="overlay">
   <div transition:fly|local={{ y: 450, opacity: 0.5, duration: 1000 }}>
-    <DialogContent aria-label="form" class="content">
+    <DialogContent aria-label="form" class="content surface-dialog">
       <div dir="rtl" class="flex items-center flex-col">
         <button
           onclick={close}
@@ -501,10 +501,10 @@
               placeholder={$t('lev.weget.actualAmountPlaceholder')}
             />
           {:else}
-            <p style="font-size:0.9em; color:#9aa0a6; text-align:center; margin:4px 0;">
+            <p style="font-size:0.9em; color:var(--surface-muted, #6b6156); text-align:center; margin:4px 0;">
               {useraplyname} {$t('lev.weget.reportedExpenseOf')}
             </p>
-            <p class="p" style="font-size:1.6em; font-weight:bold; color:var(--gold)"><Money amount={shownAmount} {projectId} /></p>
+            <p class="p" style="font-size:1.6em; font-weight:bold; color:var(--goldink)"><Money amount={shownAmount} {projectId} /></p>
           {/if}
           <br />
           <button class="add" onclick={confirmRecurring}>{$t('lev.weget.confirmExpense')}</button>
@@ -534,7 +534,7 @@
           <p class="text-barbi" style="font-size:0.95em; text-align:center;">
             {missionBName}{#if cycleIndex} · {$t('lev.weget.cycleLabel')} #{cycleIndex}{/if}
           </p>
-          <p style="font-size:0.85em; color:#9aa0a6; text-align:center; margin:2px 0;">
+          <p style="font-size:0.85em; color:var(--surface-muted, #6b6156); text-align:center; margin:2px 0;">
             {$t('lev.weget.reportedAmount')} <Money amount={quantityDelivered} {projectId} />
           </p>
           <label style="display:flex; align-items:center; gap:6px; margin:6px 0;">
@@ -1129,7 +1129,7 @@
     -moz-border-radius: 20px;
     border-radius: 20px;
   }
-  .add:hover {
+  .add:hover:not(:disabled) {
     color: var(--gold);
     background-color: var(--barbi-pink);
     padding: 0.5em;
@@ -1138,8 +1138,10 @@
     border-radius: 20px;
   }
   .add:disabled {
-    color: red;
-    background-color: grey;
+    color: var(--surface-muted, #6b6156);
+    background-color: var(--surface-2, #f7f5ef);
+    border: 1px solid var(--surface-line, rgba(0, 0, 0, 0.1));
+    cursor: not-allowed;
     padding: 0.5em;
     -webkit-border-radius: 20px;
     -moz-border-radius: 20px;

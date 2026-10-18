@@ -594,7 +594,7 @@
 <DialogOverlay {isOpen} onDismiss={close} class="overlay">
   <div transition:fly|local={{ y: 450, opacity: 0.5, duration: 2000 }}>
     {#if masa === true}
-      <DialogContent aria-label="form" class="nego d">
+      <DialogContent aria-label="form" class="nego d surface-dialog">
         <div dir="rtl" class="grid items-center justify-center text-center">
           <button
             style="margin: 0 auto;"
@@ -649,7 +649,7 @@
         </div>
       </DialogContent>
     {:else if chatm === true}
-      <DialogContent aria-label="form" class="chat d">
+      <DialogContent aria-label="form" class="chat d surface-dialog">
         <div dir="rtl" class="grid items-center justify-center text-center">
           <button
             style="margin: 0 auto;"
@@ -681,7 +681,7 @@
         </div>
       </DialogContent>
     {:else}
-      <DialogContent aria-label="form" class="chat d">
+      <DialogContent aria-label="form" class="chat d surface-dialog">
         <div dir="rtl" class="grid items-center justify-center text-center">
           <button
             style="margin: 0 auto;"
@@ -1267,7 +1267,6 @@
   :global([data-svelte-dialog-content].chat) {
     z-index: 1000;
     padding: 0px;
-    background-color: #242526;
     margin: 0px;
     height: 70vh;
     aspect-ratio: 1/1.7;
@@ -1279,7 +1278,6 @@
   :global([data-svelte-dialog-content].nego) {
     z-index: 1000;
     padding: 15px;
-    background-color: #242526;
     margin: 0px;
     margin-right: 25px;
 
@@ -1307,7 +1305,6 @@
       overflow-y: auto;
       z-index: 1000;
       padding: 0px;
-      background-color: #242526;
       margin: 0px;
       height: 80vh;
       margin-top: 20vh;
@@ -1321,7 +1318,6 @@
       z-index: 1000;
       padding: 15px;
       margin-right: 25px;
-      background-color: #242526;
       margin: 0px;
       margin-top: 20vh;
       height: 80vh;

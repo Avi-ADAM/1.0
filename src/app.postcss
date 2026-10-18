@@ -2138,6 +2138,7 @@ html.personal {
   --surface-muted-rgb: 107 97 86;
   --surface-muted: rgb(var(--surface-muted-rgb)); /* 6.1:1 - the `text-gray-600` role */
   --surface-line: rgba(0, 0, 0, 0.1);
+  --surface-accent: var(--barbi-pink);
 }
 html.personal.dark {
   --surface-rgb: 23 21 18;
@@ -2149,6 +2150,9 @@ html.personal.dark {
   --surface-muted-rgb: 168 154 134;
   --surface-muted: rgb(var(--surface-muted-rgb)); /* 6.6:1 */
   --surface-line: rgba(238, 232, 170, 0.14);
+  /* --barbi-pink stays deep in this mode (see PERSONAL · DARK); this is its
+     readable ink on the dark surface. 6.9:1 */
+  --surface-accent: rgb(244 114 182);
 }
 html.business {
   --surface-rgb: 255 255 255;
@@ -2160,6 +2164,7 @@ html.business {
   --surface-muted-rgb: 71 85 105;
   --surface-muted: rgb(var(--surface-muted-rgb)); /* 7.4:1 */
   --surface-line: rgb(15 23 42 / 0.12);
+  --surface-accent: var(--barbi-pink);
 }
 html.business.dark {
   --surface-rgb: 17 27 46;
@@ -2171,6 +2176,68 @@ html.business.dark {
   --surface-muted-rgb: 163 179 201;
   --surface-muted: rgb(var(--surface-muted-rgb)); /* 7.1:1 */
   --surface-line: rgb(255 255 255 / 0.12);
+  --surface-accent: rgb(96 165 250); /* 7.0:1 */
+}
+
+/* --- dialogs on the surface pair ------------------------------------------
+   svelte-accessible-dialog's DialogContent injects `div{background:#fff}`
+   while its text inherits the page ink, and the global `h1, h2, p` above take
+   --heading-color - light in the personal theme. So a bare dialog read
+   light-on-white in both modes. Add `surface-dialog` to a DialogContent and
+   the box and every line in it take the theme's surface pair instead.
+
+   The box rule (0,2,0) beats the library's `div.svelte-…` (0,1,1). Everything
+   inside is in `components`, under :where(), so it lands BEFORE the utilities
+   at one class of specificity: it beats the global `h1, h2, p` but a
+   `text-barbi` (or any other utility) written on the element still wins.
+   Width, height, padding and radius stay with each component's own class. */
+[data-svelte-dialog-content].surface-dialog {
+  background: var(--surface, #fff);
+  color: var(--surface-ink, #2b2620);
+  border: 1px solid var(--surface-line, rgba(0, 0, 0, 0.1));
+}
+@layer components {
+  .surface-dialog :where(h1, h2, h3, h4, h5, h6, label, legend, figcaption, blockquote) {
+    color: var(--surface-ink, #2b2620);
+  }
+  .surface-dialog :where(p) {
+    color: var(--surface-muted, #6b6156);
+  }
+  .surface-dialog
+    :where(
+      input:not([type='checkbox'], [type='radio'], [type='range'], [type='color'], [type='file'], [type='button'], [type='submit'], [type='reset'], [type='image']),
+      textarea,
+      select
+    ) {
+    background: var(--surface-2, #f7f5ef);
+    color: var(--surface-ink, #2b2620);
+  }
+  .surface-dialog :where(input, textarea)::placeholder {
+    color: var(--surface-muted, #6b6156);
+    opacity: 1;
+  }
+  .surface-dialog :where(input[type='checkbox'], input[type='radio']) {
+    accent-color: var(--barbi-pink);
+  }
+}
+/* Forms that were drawn for a dark box write `text-gold` as plain ink, which
+   is ~1.2:1 on a white surface. --goldink is its readable counterpart and
+   flips with the mode. A `bg-…` on the same element means gold is sitting on
+   its own fill (`bg-barbi text-gold`), so that pairing is left alone.
+   Deliberately OUTSIDE @layer: inside it Tailwind treats `.text-gold` as a
+   component class and emits `hover:` / `!` variants of this rule, which would
+   repaint the `hover:bg-barbi hover:text-gold` buttons. Its (0,3,0) beats the
+   utility on its own. */
+.surface-dialog .text-gold:not([class^='bg-'], [class*=' bg-']) {
+  color: var(--goldink);
+}
+/* Same story for `text-barbi` in dark mode: --barbi-pink stays deep there for
+   its `bg-barbi text-gold` pairings, ~2.8:1 as ink on a dark surface.
+   --surface-accent is --barbi-pink in light mode, so this only moves the dark
+   fills. Not while hovered, so `hover:text-gold` on the close buttons (which
+   also turn `hover:bg-barbi`) still takes over. */
+.surface-dialog .text-barbi:not([class^='bg-'], [class*=' bg-']):not(:hover) {
+  color: var(--surface-accent, var(--barbi-pink));
 }
 
 /* --- identity colour families -------------------------------------------

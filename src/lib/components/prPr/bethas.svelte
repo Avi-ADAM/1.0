@@ -329,9 +329,9 @@
 
 <DialogOverlay style="z-index: 700;" isOpen={taskDialogOpen} onDismiss={() => (taskDialogOpen = false)}>
   <div style="z-index: 700;">
-    <DialogContent class="formi" aria-label="form">
+    <DialogContent class="formi surface-dialog" aria-label="form">
       <div style="z-index: 400;" dir={$isRtl ? 'rtl' : 'ltr'}>
-        <button class="hover:bg-barbi text-mturk rounded-full" onclick={() => (taskDialogOpen = false)}>
+        <button class="hover:bg-barbi text-barbi hover:text-gold rounded-full" onclick={() => (taskDialogOpen = false)}>
           <Close />
         </button>
         <Crtask
@@ -1358,10 +1358,8 @@
     }
   }
 
-  /* The create-task dialog keeps the shell it always had. */
+  /* The create-task dialog's box is painted by `surface-dialog` (app.postcss). */
   :global([data-svelte-dialog-content].formi) {
-    background-color: #000000;
-    background-image: linear-gradient(147deg, #000000 0%, #04619f 74%);
     width: 90vw;
     border-radius: 16px;
   }

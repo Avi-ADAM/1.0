@@ -772,7 +772,7 @@
 
                 <DialogOverlay isOpen={negoOpen} onDismiss={closeNego} class="overlay">
                   <div transition:fly={{ y: 40, opacity: 0, duration: 250 }}>
-                    <DialogContent class="nego" aria-label="form">
+                    <DialogContent class="nego surface-dialog" aria-label="form">
                       <button
                         onclick={closeNego}
                         style="margin: 0 auto;"

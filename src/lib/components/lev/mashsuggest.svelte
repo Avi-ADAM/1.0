@@ -363,7 +363,7 @@
 
 <DialogOverlay {isOpen} onDismiss={close} class="overlay">
   <div transition:fly={{ y: 40, opacity: 0, duration: 250 }}>
-    <DialogContent class="nego-modal" aria-label="form">
+    <DialogContent class="nego-modal surface-dialog" aria-label="form">
       <button class="nego-modal-close" onclick={close} aria-label="סגירה"
         >✕</button
       >
@@ -843,7 +843,6 @@
   }
   :global([data-svelte-dialog-content].nego-modal) {
     position: relative;
-    background: #12121e;
     border: 1px solid rgba(255, 0, 174, 0.35);
     border-radius: 1.25rem;
     width: min(700px, 96vw);

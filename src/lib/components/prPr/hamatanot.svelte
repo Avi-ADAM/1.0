@@ -576,9 +576,9 @@
     style="z-index: 700;"
     transition:fly|local={{ y: 450, opacity: 0.5, duration: 2000 }}
   >
-    <DialogContent class="content" aria-label="form">
+    <DialogContent class="content surface-dialog" aria-label="form">
       <div style="z-index: 400;" dir={$isRtl ? 'rtl' : 'ltr'}>
-        <button class=" hover:bg-barbi text-mturk rounded-full" onclick={closer}
+        <button class="hover:bg-barbi text-barbi hover:text-gold rounded-full" onclick={closer}
           >{$t('project.hamatanot.cancel')}</button
         >
         {#if a == 0}
@@ -1043,7 +1043,7 @@
       transition:fly|local={{ y: 450, opacity: 0.5, duration: 500 }}
     >
       <DialogContent
-        class=" table-modal-content"
+        class="table-modal-content surface-dialog"
         aria-label={$t('project.hamatanot.salesTable')}
       >
         <div
@@ -1362,7 +1362,7 @@
 
   .sales-table {
     border-collapse: collapse;
-    background: white;
+    background: var(--surface, #fff);
     border-radius: 8px;
     overflow: hidden;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -1381,7 +1381,7 @@
   }
 
   .sales-table tbody tr {
-    border-bottom: 1px solid #e5e7eb;
+    border-bottom: 1px solid var(--surface-line, #e5e7eb);
     transition: background-color 0.2s;
   }
 

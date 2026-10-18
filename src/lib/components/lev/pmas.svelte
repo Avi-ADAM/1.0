@@ -572,7 +572,7 @@ diunim = ` ${diu},`
 
 <DialogOverlay {isOpen} onDismiss={close} class="overlay">
   <div transition:fly|local={{ y: 450, opacity: 0.5, duration: 2000 }}>
-    <DialogContent class={masa == true ? 'full' : 'chat'} aria-label="form">
+    <DialogContent class="{masa == true ? 'full' : 'chat'} surface-dialog" aria-label="form">
       <div dir="rtl" class="grid items-center justify-center aling-center">
         <button
           onclick={close}
@@ -1310,7 +1310,6 @@ diunim = ` ${diu},`
   :global([data-svelte-dialog-content].chat) {
     z-index: 1000;
     padding: 0px;
-    background-color: #242526;
     margin: 0px;
     height: 70vh;
     aspect-ratio: 1/1.7;
@@ -1323,14 +1322,12 @@ diunim = ` ${diu},`
   :global([data-svelte-dialog-content].full) {
     z-index: 1000;
     padding: 10px;
-    background-color: #242526;
     width: 80vw;
   }
   @media (min-width: 600px) {
     :global([data-svelte-dialog-content].chat) {
       z-index: 1000;
       padding: 0px;
-      background-color: #242526;
       margin: 0px;
       height: 80vh;
       aspect-ratio: 1/2;
@@ -1340,7 +1337,6 @@ diunim = ` ${diu},`
     :global([data-svelte-dialog-content].full) {
       z-index: 1000;
       padding: 10px;
-      background-color: #242526;
     }
     :global([data-svelte-dialog-overlay].overlay) {
       z-index: 1000;
