@@ -99,6 +99,24 @@
       role="dialog"
       aria-label={$t('ui.appearance.title')}
     >
+      <!-- The one control here that navigates instead of toggling: a shortcut
+           to the full /me/settings. It is pinned OUT OF FLOW in the panel's
+           top-end corner on purpose — the brief was a settings button that
+           does not grow the picker, and floating it keeps the panel the exact
+           same box it was before this link existed. The corner is free in all
+           five locales (the longest first-row heading, "Language", leaves it
+           most of the row), and 14px matches the panel padding so it lines up
+           with the heading row rather than drifting off its rhythm. -->
+      <a
+        class="settings-link"
+        href="/me/settings"
+        title={$t('ui.appearance.settings')}
+        onclick={() => (open = false)}
+      >
+        <EntityIcon kind="settings" size={12} />
+        <span>{$t('ui.appearance.settings')}</span>
+      </a>
+
       <section>
         <h3>{$t('ui.appearance.language')}</h3>
         <LangSwitch />
@@ -233,6 +251,40 @@
   .panel.down {
     bottom: auto;
     top: calc(100% + 8px);
+  }
+
+  /* Out of flow so it cannot push the sections down (see the markup note):
+     the chip is 16px tall — a 12px icon plus 2px padding — against the
+     heading row's ~16px line box, so it rides that row's whitespace. Goldink
+     on the muted surface keeps the pairing the appearance layer documents as
+     AA (the same ink the trigger carries on --card); the hover reuses the
+     .seg.selected pink/gold pair, which is known-good in all four
+     theme × mode combinations. */
+  .settings-link {
+    position: absolute;
+    top: 14px;
+    inset-inline-end: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: var(--muted, rgb(0 0 0 / 0.05));
+    color: var(--goldink);
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1;
+    text-decoration: none;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .settings-link:hover {
+    background: var(--barbi-pink);
+    color: var(--gold);
+  }
+  .settings-link:focus-visible {
+    outline: 2px solid var(--barbi-pink);
+    outline-offset: 2px;
   }
 
   /* LangSwitch is an onboarding atom with a hard-coded cream/brown palette. It

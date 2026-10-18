@@ -121,6 +121,7 @@
   },
   "appearance": {
     "title": "Appearance",
+    "settings": "Settings",
     "language": "Language",
     "look": "Look",
     "brightness": "Brightness",
