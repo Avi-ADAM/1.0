@@ -1,5 +1,5 @@
 import { sveltekit } from '@sveltejs/kit/vite';
-import { sentrySvelteKit } from '@sentry/sveltekit';
+
 import tailwindcss from "@tailwindcss/vite";
 import fs from 'fs'
 import path from 'path';
@@ -69,15 +69,7 @@ const config = {
       'three'
     ]
   },
-  plugins: [/*sentrySvelteKit({
-      sourceMapsUploadOptions: {
-        org: "1lev1",
-        project: "front",
-        authToken: process.env.VITE_SENTRY_AUTH_TOKEN,
-        cleanArtifacts: true,
-        rewrite: false,
-      },
-    }),*/
+  plugins: [
     sveltekit(),
     tailwindcss(),
      devtoolsJson()
