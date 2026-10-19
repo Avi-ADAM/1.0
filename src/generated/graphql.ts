@@ -28,6 +28,7 @@ export type Act = {
   des?: Maybe<Scalars['String']['output']>;
   externalId?: Maybe<Scalars['String']['output']>;
   forums?: Maybe<ForumRelationResponseCollection>;
+  fulfillment_step?: Maybe<FulfillmentStepEntityResponse>;
   hashivut?: Maybe<Enum_Act_Hashivut>;
   isAssigned?: Maybe<Scalars['Boolean']['output']>;
   link?: Maybe<Scalars['String']['output']>;
@@ -39,6 +40,8 @@ export type Act = {
   naasa?: Maybe<Scalars['Boolean']['output']>;
   negopendmissions?: Maybe<NegopendmissionRelationResponseCollection>;
   open_mission?: Maybe<OpenMissionEntityResponse>;
+  order?: Maybe<OrderEntityResponse>;
+  order_line?: Maybe<OrderLineEntityResponse>;
   partofs?: Maybe<PartofRelationResponseCollection>;
   pendm?: Maybe<PendmEntityResponse>;
   project?: Maybe<ProjectEntityResponse>;
@@ -156,6 +159,7 @@ export type ActFiltersInput = {
   des?: InputMaybe<StringFilterInput>;
   externalId?: InputMaybe<StringFilterInput>;
   forums?: InputMaybe<ForumFiltersInput>;
+  fulfillment_step?: InputMaybe<FulfillmentStepFiltersInput>;
   hashivut?: InputMaybe<StringFilterInput>;
   id?: InputMaybe<IdFilterInput>;
   isAssigned?: InputMaybe<BooleanFilterInput>;
@@ -170,6 +174,8 @@ export type ActFiltersInput = {
   not?: InputMaybe<ActFiltersInput>;
   open_mission?: InputMaybe<OpenMissionFiltersInput>;
   or?: InputMaybe<Array<InputMaybe<ActFiltersInput>>>;
+  order?: InputMaybe<OrderFiltersInput>;
+  order_line?: InputMaybe<OrderLineFiltersInput>;
   partofs?: InputMaybe<PartofFiltersInput>;
   pendm?: InputMaybe<PendmFiltersInput>;
   project?: InputMaybe<ProjectFiltersInput>;
@@ -193,6 +199,7 @@ export type ActInput = {
   des?: InputMaybe<Scalars['String']['input']>;
   externalId?: InputMaybe<Scalars['String']['input']>;
   forums?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  fulfillment_step?: InputMaybe<Scalars['ID']['input']>;
   hashivut?: InputMaybe<Enum_Act_Hashivut>;
   isAssigned?: InputMaybe<Scalars['Boolean']['input']>;
   link?: InputMaybe<Scalars['String']['input']>;
@@ -202,6 +209,8 @@ export type ActInput = {
   naasa?: InputMaybe<Scalars['Boolean']['input']>;
   negopendmissions?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   open_mission?: InputMaybe<Scalars['ID']['input']>;
+  order?: InputMaybe<Scalars['ID']['input']>;
+  order_line?: InputMaybe<Scalars['ID']['input']>;
   partofs?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   pendm?: InputMaybe<Scalars['ID']['input']>;
   project?: InputMaybe<Scalars['ID']['input']>;
@@ -3232,6 +3241,7 @@ export enum Enum_Act_Hashivut {
 
 export enum Enum_Act_Source {
   Api = 'api',
+  Automation = 'automation',
   Ui = 'ui'
 }
 
@@ -3456,6 +3466,50 @@ export enum Enum_Forum_Spec {
   General = 'general',
   Spesifica = 'spesifica',
   Spesificm = 'spesificm'
+}
+
+export enum Enum_Fulfillmentstep_Batching {
+  PerOrder = 'perOrder',
+  Wave = 'wave'
+}
+
+export enum Enum_Fulfillmentstep_Consentstate {
+  Active = 'active',
+  Paused = 'paused',
+  Proposed = 'proposed',
+  Self = 'self'
+}
+
+export enum Enum_Fulfillmentstep_Effect {
+  MarkFulfilled = 'markFulfilled',
+  MarkShipped = 'markShipped',
+  None = 'none'
+}
+
+export enum Enum_Fulfillmentstep_Per {
+  Line = 'line',
+  Order = 'order',
+  Unit = 'unit'
+}
+
+export enum Enum_Fulfillmentstep_Routing {
+  LeastOpen = 'leastOpen',
+  OnShift = 'onShift',
+  RoundRobin = 'roundRobin',
+  Single = 'single'
+}
+
+export enum Enum_Fulfillmentstep_Scope {
+  Category = 'category',
+  Product = 'product',
+  Rikma = 'rikma',
+  Variant = 'variant'
+}
+
+export enum Enum_Fulfillmentstep_Target {
+  Member = 'member',
+  Mission = 'mission',
+  Role = 'role'
 }
 
 export enum Enum_Haluka_Adjustdirection {
@@ -5023,6 +5077,132 @@ export type ForumRelationResponseCollection = {
   data: Array<ForumEntity>;
 };
 
+export type FulfillmentStep = {
+  __typename?: 'FulfillmentStep';
+  archived?: Maybe<Scalars['Boolean']['output']>;
+  batching?: Maybe<Enum_Fulfillmentstep_Batching>;
+  consentState?: Maybe<Enum_Fulfillmentstep_Consentstate>;
+  consentedBy?: Maybe<UsersPermissionsUserRelationResponseCollection>;
+  createdAt?: Maybe<Scalars['DateTime']['output']>;
+  dueHours?: Maybe<Scalars['Int']['output']>;
+  effect?: Maybe<Enum_Fulfillmentstep_Effect>;
+  exportAddress?: Maybe<Scalars['Boolean']['output']>;
+  fields?: Maybe<Scalars['JSON']['output']>;
+  matanots?: Maybe<MatanotRelationResponseCollection>;
+  member?: Maybe<UsersPermissionsUserEntityResponse>;
+  mesimabetahalich?: Maybe<MesimabetahalichEntityResponse>;
+  name: Scalars['String']['output'];
+  per?: Maybe<Enum_Fulfillmentstep_Per>;
+  position?: Maybe<Scalars['Int']['output']>;
+  product_variants?: Maybe<ProductVariantRelationResponseCollection>;
+  project: ProjectEntityResponse;
+  proposedBy?: Maybe<UsersPermissionsUserEntityResponse>;
+  routing?: Maybe<Enum_Fulfillmentstep_Routing>;
+  scope?: Maybe<Enum_Fulfillmentstep_Scope>;
+  tafkidim?: Maybe<TafkidimEntityResponse>;
+  target: Enum_Fulfillmentstep_Target;
+  updatedAt?: Maybe<Scalars['DateTime']['output']>;
+  waveAt?: Maybe<Scalars['String']['output']>;
+  when?: Maybe<Scalars['JSON']['output']>;
+};
+
+
+export type FulfillmentStepConsentedByArgs = {
+  filters?: InputMaybe<UsersPermissionsUserFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+
+export type FulfillmentStepMatanotsArgs = {
+  filters?: InputMaybe<MatanotFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  publicationState?: InputMaybe<PublicationState>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+
+export type FulfillmentStepProduct_VariantsArgs = {
+  filters?: InputMaybe<ProductVariantFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+export type FulfillmentStepEntity = {
+  __typename?: 'FulfillmentStepEntity';
+  attributes?: Maybe<FulfillmentStep>;
+  id?: Maybe<Scalars['ID']['output']>;
+};
+
+export type FulfillmentStepEntityResponse = {
+  __typename?: 'FulfillmentStepEntityResponse';
+  data?: Maybe<FulfillmentStepEntity>;
+};
+
+export type FulfillmentStepEntityResponseCollection = {
+  __typename?: 'FulfillmentStepEntityResponseCollection';
+  data: Array<FulfillmentStepEntity>;
+  meta: ResponseCollectionMeta;
+};
+
+export type FulfillmentStepFiltersInput = {
+  and?: InputMaybe<Array<InputMaybe<FulfillmentStepFiltersInput>>>;
+  archived?: InputMaybe<BooleanFilterInput>;
+  batching?: InputMaybe<StringFilterInput>;
+  consentState?: InputMaybe<StringFilterInput>;
+  consentedBy?: InputMaybe<UsersPermissionsUserFiltersInput>;
+  createdAt?: InputMaybe<DateTimeFilterInput>;
+  dueHours?: InputMaybe<IntFilterInput>;
+  effect?: InputMaybe<StringFilterInput>;
+  exportAddress?: InputMaybe<BooleanFilterInput>;
+  fields?: InputMaybe<JsonFilterInput>;
+  id?: InputMaybe<IdFilterInput>;
+  matanots?: InputMaybe<MatanotFiltersInput>;
+  member?: InputMaybe<UsersPermissionsUserFiltersInput>;
+  mesimabetahalich?: InputMaybe<MesimabetahalichFiltersInput>;
+  name?: InputMaybe<StringFilterInput>;
+  not?: InputMaybe<FulfillmentStepFiltersInput>;
+  or?: InputMaybe<Array<InputMaybe<FulfillmentStepFiltersInput>>>;
+  per?: InputMaybe<StringFilterInput>;
+  position?: InputMaybe<IntFilterInput>;
+  product_variants?: InputMaybe<ProductVariantFiltersInput>;
+  project?: InputMaybe<ProjectFiltersInput>;
+  proposedBy?: InputMaybe<UsersPermissionsUserFiltersInput>;
+  routing?: InputMaybe<StringFilterInput>;
+  scope?: InputMaybe<StringFilterInput>;
+  tafkidim?: InputMaybe<TafkidimFiltersInput>;
+  target?: InputMaybe<StringFilterInput>;
+  updatedAt?: InputMaybe<DateTimeFilterInput>;
+  waveAt?: InputMaybe<StringFilterInput>;
+  when?: InputMaybe<JsonFilterInput>;
+};
+
+export type FulfillmentStepInput = {
+  archived?: InputMaybe<Scalars['Boolean']['input']>;
+  batching?: InputMaybe<Enum_Fulfillmentstep_Batching>;
+  consentState?: InputMaybe<Enum_Fulfillmentstep_Consentstate>;
+  consentedBy?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  dueHours?: InputMaybe<Scalars['Int']['input']>;
+  effect?: InputMaybe<Enum_Fulfillmentstep_Effect>;
+  exportAddress?: InputMaybe<Scalars['Boolean']['input']>;
+  fields?: InputMaybe<Scalars['JSON']['input']>;
+  matanots?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  member?: InputMaybe<Scalars['ID']['input']>;
+  mesimabetahalich?: InputMaybe<Scalars['ID']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  per?: InputMaybe<Enum_Fulfillmentstep_Per>;
+  position?: InputMaybe<Scalars['Int']['input']>;
+  product_variants?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  project?: InputMaybe<Scalars['ID']['input']>;
+  proposedBy?: InputMaybe<Scalars['ID']['input']>;
+  routing?: InputMaybe<Enum_Fulfillmentstep_Routing>;
+  scope?: InputMaybe<Enum_Fulfillmentstep_Scope>;
+  tafkidim?: InputMaybe<Scalars['ID']['input']>;
+  target?: InputMaybe<Enum_Fulfillmentstep_Target>;
+  waveAt?: InputMaybe<Scalars['String']['input']>;
+  when?: InputMaybe<Scalars['JSON']['input']>;
+};
+
 export type FxRate = {
   __typename?: 'FxRate';
   base: Scalars['String']['output'];
@@ -5073,7 +5253,7 @@ export type FxRateInput = {
   source?: InputMaybe<Scalars['String']['input']>;
 };
 
-export type GenericMorph = Act | Actt | ApiKey | Argument | Ask | Askm | Askwant | AssistantSession | Bakasha | Category | Chezin | Clause | ComponentDesisionEditPend | ComponentDesisionNegoarch | ComponentDesisionNegodes | ComponentDesisionNegom | ComponentDesisionNegostipend | ComponentNewCoveredMissions | ComponentNewCoveredResources | ComponentNewEdits | ComponentNewExtractedMissions | ComponentNewExtractedResources | ComponentNewLocation | ComponentNewMeeting | ComponentNewMonter | ComponentNewNego | ComponentNewNegom | ComponentNewSeen | ComponentNewTimes | ComponentNewUserAndIshur | ComponentNewWillingnessEntries | ComponentProjectsAtCostEntry | ComponentProjectsChatre | ComponentProjectsConsumedMashabetahalichDeliveries | ComponentProjectsConsumedMissionHours | ComponentProjectsConsumedOpenMu | ComponentProjectsDeliveries | ComponentProjectsHervachti | ComponentProjectsIGotMoney | ComponentProjectsMeeting | ComponentProjectsMonter | ComponentProjectsNegodes | ComponentProjectsNegom | ComponentProjectsPendmnego | ComponentProjectsShift | ComponentProjectsTaskdis | ComponentProjectsUsersOf | ComponentProjectsVots | ComponentShopOptionValue | ConsentEvent | ConventionText | Cuntry | Dea | Deal | Decision | Deffinition | DemoRequest | Filtertag | Finiapruval | FinnishedMission | Forum | ForumLastSeen | FxRate | Haamada | Haamadapruv | Haluka | Hatzaa | Hazbaah | I18NLocale | Issue | Maagad | MaagadMember | MaagadOffer | Maap | Machshir | Mashaabim | Mashabetahalich | Matanot | MatanotRecipeMission | MatanotRecipeResource | Matanotpend | Matbea | MatchSuggestion | Mesimabetahalich | Message | Mission | MissionOffer | Mode | Monter | Nego | NegoMash | Negopendmission | Negotiation | NoticeDismissal | NoticePref | OpenMashaabim | OpenMission | Order | OrderLine | Partof | Pendm | Pgisha | Pgishauser | Pgishauserpend | Pledge | Pmash | Position | ProductOption | ProductVariant | Project | ProjectPlanBoard | ProjectPlanItem | ProjectRepo | ProviderProfile | Ratson | RatsonMatchJob | RatsonProposal | RatsonShare | ResourceBooking | Richtext | Rikmash | RosterPeriod | Sale | SealedEnvelope | Seeder | Sheirut | SheirutFulfillment | Sheirutnego | Sheirutpend | Shift | ShiftAssignment | ShiftAvailability | ShiftPlan | Sidur | SiteReport | SiteShareContribution | Skill | Solution | Sp | SpaceDoc | StipendPayment | StipendPledge | StipendProgram | Tafkidim | TextTranslation | Tikunolam | Timegrama | Timer | Tosplit | Translate | UploadFile | UploadFolder | UserKey | UsersPermissionsPermission | UsersPermissionsRole | UsersPermissionsUser | Vallue | Vote | Want | WelcomTop | Whatandwhy | WorkWay | Yat | Zohar;
+export type GenericMorph = Act | Actt | ApiKey | Argument | Ask | Askm | Askwant | AssistantSession | Bakasha | Category | Chezin | Clause | ComponentDesisionEditPend | ComponentDesisionNegoarch | ComponentDesisionNegodes | ComponentDesisionNegom | ComponentDesisionNegostipend | ComponentNewCoveredMissions | ComponentNewCoveredResources | ComponentNewEdits | ComponentNewExtractedMissions | ComponentNewExtractedResources | ComponentNewLocation | ComponentNewMeeting | ComponentNewMonter | ComponentNewNego | ComponentNewNegom | ComponentNewSeen | ComponentNewTimes | ComponentNewUserAndIshur | ComponentNewWillingnessEntries | ComponentProjectsAtCostEntry | ComponentProjectsChatre | ComponentProjectsConsumedMashabetahalichDeliveries | ComponentProjectsConsumedMissionHours | ComponentProjectsConsumedOpenMu | ComponentProjectsDeliveries | ComponentProjectsHervachti | ComponentProjectsIGotMoney | ComponentProjectsMeeting | ComponentProjectsMonter | ComponentProjectsNegodes | ComponentProjectsNegom | ComponentProjectsPendmnego | ComponentProjectsShift | ComponentProjectsTaskdis | ComponentProjectsUsersOf | ComponentProjectsVots | ComponentShopOptionValue | ConsentEvent | ConventionText | Cuntry | Dea | Deal | Decision | Deffinition | DemoRequest | Filtertag | Finiapruval | FinnishedMission | Forum | ForumLastSeen | FulfillmentStep | FxRate | Haamada | Haamadapruv | Haluka | Hatzaa | Hazbaah | I18NLocale | Issue | Maagad | MaagadMember | MaagadOffer | Maap | Machshir | Mashaabim | Mashabetahalich | Matanot | MatanotRecipeMission | MatanotRecipeResource | Matanotpend | Matbea | MatchSuggestion | Mesimabetahalich | Message | Mission | MissionOffer | Mode | Monter | Nego | NegoMash | Negopendmission | Negotiation | NoticeDismissal | NoticePref | OpenMashaabim | OpenMission | Order | OrderLine | Partof | Pendm | Pgisha | Pgishauser | Pgishauserpend | Pledge | Pmash | Position | ProductOption | ProductVariant | Project | ProjectPlanBoard | ProjectPlanItem | ProjectRepo | ProviderProfile | Ratson | RatsonMatchJob | RatsonProposal | RatsonShare | ResourceBooking | Richtext | Rikmash | RosterPeriod | Sale | SealedEnvelope | Seeder | Sheirut | SheirutFulfillment | Sheirutnego | Sheirutpend | Shift | ShiftAssignment | ShiftAvailability | ShiftPlan | Sidur | SiteReport | SiteShareContribution | Skill | Solution | Sp | SpaceDoc | StipendPayment | StipendPledge | StipendProgram | Tafkidim | TextTranslation | Tikunolam | Timegrama | Timer | Tosplit | Translate | UploadFile | UploadFolder | UserKey | UsersPermissionsPermission | UsersPermissionsRole | UsersPermissionsUser | Vallue | Vote | Want | WelcomTop | Whatandwhy | WorkWay | Yat | Zohar;
 
 export type Haamada = {
   __typename?: 'Haamada';
@@ -8467,6 +8647,7 @@ export type Mutation = {
   createFinnishedMissionLocalization?: Maybe<FinnishedMissionEntityResponse>;
   createForum?: Maybe<ForumEntityResponse>;
   createForumLastSeen?: Maybe<ForumLastSeenEntityResponse>;
+  createFulfillmentStep?: Maybe<FulfillmentStepEntityResponse>;
   createFxRate?: Maybe<FxRateEntityResponse>;
   createHaamada?: Maybe<HaamadaEntityResponse>;
   createHaamadapruv?: Maybe<HaamadapruvEntityResponse>;
@@ -8618,6 +8799,7 @@ export type Mutation = {
   deleteFinnishedMission?: Maybe<FinnishedMissionEntityResponse>;
   deleteForum?: Maybe<ForumEntityResponse>;
   deleteForumLastSeen?: Maybe<ForumLastSeenEntityResponse>;
+  deleteFulfillmentStep?: Maybe<FulfillmentStepEntityResponse>;
   deleteFxRate?: Maybe<FxRateEntityResponse>;
   deleteHaamada?: Maybe<HaamadaEntityResponse>;
   deleteHaamadapruv?: Maybe<HaamadapruvEntityResponse>;
@@ -8757,6 +8939,7 @@ export type Mutation = {
   updateFinnishedMission?: Maybe<FinnishedMissionEntityResponse>;
   updateForum?: Maybe<ForumEntityResponse>;
   updateForumLastSeen?: Maybe<ForumLastSeenEntityResponse>;
+  updateFulfillmentStep?: Maybe<FulfillmentStepEntityResponse>;
   updateFxRate?: Maybe<FxRateEntityResponse>;
   updateHaamada?: Maybe<HaamadaEntityResponse>;
   updateHaamadapruv?: Maybe<HaamadapruvEntityResponse>;
@@ -9056,6 +9239,11 @@ export type MutationCreateForumArgs = {
 
 export type MutationCreateForumLastSeenArgs = {
   data: ForumLastSeenInput;
+};
+
+
+export type MutationCreateFulfillmentStepArgs = {
+  data: FulfillmentStepInput;
 };
 
 
@@ -9886,6 +10074,11 @@ export type MutationDeleteForumLastSeenArgs = {
 };
 
 
+export type MutationDeleteFulfillmentStepArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
 export type MutationDeleteFxRateArgs = {
   id: Scalars['ID']['input'];
 };
@@ -10610,6 +10803,12 @@ export type MutationUpdateForumArgs = {
 
 export type MutationUpdateForumLastSeenArgs = {
   data: ForumLastSeenInput;
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationUpdateFulfillmentStepArgs = {
+  data: FulfillmentStepInput;
   id: Scalars['ID']['input'];
 };
 
@@ -12579,6 +12778,7 @@ export type OpenMissionRelationResponseCollection = {
 
 export type Order = {
   __typename?: 'Order';
+  acts?: Maybe<ActRelationResponseCollection>;
   archived?: Maybe<Scalars['Boolean']['output']>;
   buyerEmail?: Maybe<Scalars['String']['output']>;
   buyerName?: Maybe<Scalars['String']['output']>;
@@ -12592,6 +12792,7 @@ export type Order = {
   expiresAt?: Maybe<Scalars['DateTime']['output']>;
   externalId?: Maybe<Scalars['String']['output']>;
   fulfilledAt?: Maybe<Scalars['DateTime']['output']>;
+  fulfillmentPending?: Maybe<Scalars['Boolean']['output']>;
   holder?: Maybe<UsersPermissionsUserEntityResponse>;
   lines?: Maybe<OrderLineRelationResponseCollection>;
   locale?: Maybe<Scalars['String']['output']>;
@@ -12611,6 +12812,14 @@ export type Order = {
   status?: Maybe<Enum_Order_Status>;
   total?: Maybe<Scalars['Float']['output']>;
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
+};
+
+
+export type OrderActsArgs = {
+  filters?: InputMaybe<ActFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  publicationState?: InputMaybe<PublicationState>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
 };
 
 
@@ -12653,6 +12862,7 @@ export type OrderEntityResponseCollection = {
 };
 
 export type OrderFiltersInput = {
+  acts?: InputMaybe<ActFiltersInput>;
   and?: InputMaybe<Array<InputMaybe<OrderFiltersInput>>>;
   archived?: InputMaybe<BooleanFilterInput>;
   buyerEmail?: InputMaybe<StringFilterInput>;
@@ -12667,6 +12877,7 @@ export type OrderFiltersInput = {
   expiresAt?: InputMaybe<DateTimeFilterInput>;
   externalId?: InputMaybe<StringFilterInput>;
   fulfilledAt?: InputMaybe<DateTimeFilterInput>;
+  fulfillmentPending?: InputMaybe<BooleanFilterInput>;
   holder?: InputMaybe<UsersPermissionsUserFiltersInput>;
   id?: InputMaybe<IdFilterInput>;
   lines?: InputMaybe<OrderLineFiltersInput>;
@@ -12692,6 +12903,7 @@ export type OrderFiltersInput = {
 };
 
 export type OrderInput = {
+  acts?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   archived?: InputMaybe<Scalars['Boolean']['input']>;
   buyerEmail?: InputMaybe<Scalars['String']['input']>;
   buyerName?: InputMaybe<Scalars['String']['input']>;
@@ -12704,6 +12916,7 @@ export type OrderInput = {
   expiresAt?: InputMaybe<Scalars['DateTime']['input']>;
   externalId?: InputMaybe<Scalars['String']['input']>;
   fulfilledAt?: InputMaybe<Scalars['DateTime']['input']>;
+  fulfillmentPending?: InputMaybe<Scalars['Boolean']['input']>;
   holder?: InputMaybe<Scalars['ID']['input']>;
   lines?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   locale?: InputMaybe<Scalars['String']['input']>;
@@ -15352,6 +15565,8 @@ export type Query = {
   forumLastSeen?: Maybe<ForumLastSeenEntityResponse>;
   forumLastSeens?: Maybe<ForumLastSeenEntityResponseCollection>;
   forums?: Maybe<ForumEntityResponseCollection>;
+  fulfillmentStep?: Maybe<FulfillmentStepEntityResponse>;
+  fulfillmentSteps?: Maybe<FulfillmentStepEntityResponseCollection>;
   fxRate?: Maybe<FxRateEntityResponse>;
   fxRates?: Maybe<FxRateEntityResponseCollection>;
   haamada?: Maybe<HaamadaEntityResponse>;
@@ -15889,6 +16104,18 @@ export type QueryForumsArgs = {
   filters?: InputMaybe<ForumFiltersInput>;
   pagination?: InputMaybe<PaginationArg>;
   publicationState?: InputMaybe<PublicationState>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+
+export type QueryFulfillmentStepArgs = {
+  id?: InputMaybe<Scalars['ID']['input']>;
+};
+
+
+export type QueryFulfillmentStepsArgs = {
+  filters?: InputMaybe<FulfillmentStepFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
   sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
 };
 

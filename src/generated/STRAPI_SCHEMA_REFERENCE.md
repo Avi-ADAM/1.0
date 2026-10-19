@@ -1,6 +1,6 @@
 # Strapi GraphQL Schema Reference
 > Auto-generated from `src/generated/graphql.ts`
-> Last updated: 2026-10-18
+> Last updated: 2026-10-19
 > Source: `codegen.ts` → `http://localhost:1337/graphql`
 
 This file provides a compact reference of all types available from the Strapi backend.
@@ -23,7 +23,7 @@ import type { StrapiEntity, StrapiCollection, StrapiMedia } from '$lib/types/str
 
 ---
 
-## 🏗️ Content Type Entities (139)
+## 🏗️ Content Type Entities (140)
 
 These are the main content types in the Strapi backend.
 
@@ -36,6 +36,7 @@ These are the main content types in the Strapi backend.
 | `des` | `Maybe<Scalars['String']['output']>` |
 | `externalId` | `Maybe<Scalars['String']['output']>` |
 | `forums` | `Maybe<ForumRelationResponseCollection>` |
+| `fulfillment_step` | `Maybe<FulfillmentStepEntityResponse>` |
 | `hashivut` | `Maybe<Enum_Act_Hashivut>` |
 | `isAssigned` | `Maybe<Scalars['Boolean']['output']>` |
 | `link` | `Maybe<Scalars['String']['output']>` |
@@ -47,6 +48,8 @@ These are the main content types in the Strapi backend.
 | `naasa` | `Maybe<Scalars['Boolean']['output']>` |
 | `negopendmissions` | `Maybe<NegopendmissionRelationResponseCollection>` |
 | `open_mission` | `Maybe<OpenMissionEntityResponse>` |
+| `order` | `Maybe<OrderEntityResponse>` |
+| `order_line` | `Maybe<OrderLineEntityResponse>` |
 | `partofs` | `Maybe<PartofRelationResponseCollection>` |
 | `pendm` | `Maybe<PendmEntityResponse>` |
 | `project` | `Maybe<ProjectEntityResponse>` |
@@ -532,6 +535,35 @@ These are the main content types in the Strapi backend.
 | `lastReadAt` | `Maybe<Scalars['DateTime']['output']>` |
 | `updatedAt` | `Maybe<Scalars['DateTime']['output']>` |
 | `users_permissions_user` | `Maybe<UsersPermissionsUserEntityResponse>` |
+
+### FulfillmentStep
+| Field | Type |
+|-------|------|
+| `archived` | `Maybe<Scalars['Boolean']['output']>` |
+| `batching` | `Maybe<Enum_Fulfillmentstep_Batching>` |
+| `consentState` | `Maybe<Enum_Fulfillmentstep_Consentstate>` |
+| `consentedBy` | `Maybe<UsersPermissionsUserRelationResponseCollection>` |
+| `createdAt` | `Maybe<Scalars['DateTime']['output']>` |
+| `dueHours` | `Maybe<Scalars['Int']['output']>` |
+| `effect` | `Maybe<Enum_Fulfillmentstep_Effect>` |
+| `exportAddress` | `Maybe<Scalars['Boolean']['output']>` |
+| `fields` | `Maybe<Scalars['JSON']['output']>` |
+| `matanots` | `Maybe<MatanotRelationResponseCollection>` |
+| `member` | `Maybe<UsersPermissionsUserEntityResponse>` |
+| `mesimabetahalich` | `Maybe<MesimabetahalichEntityResponse>` |
+| `name` | `Scalars['String']['output']` |
+| `per` | `Maybe<Enum_Fulfillmentstep_Per>` |
+| `position` | `Maybe<Scalars['Int']['output']>` |
+| `product_variants` | `Maybe<ProductVariantRelationResponseCollection>` |
+| `project` | `ProjectEntityResponse` |
+| `proposedBy` | `Maybe<UsersPermissionsUserEntityResponse>` |
+| `routing` | `Maybe<Enum_Fulfillmentstep_Routing>` |
+| `scope` | `Maybe<Enum_Fulfillmentstep_Scope>` |
+| `tafkidim` | `Maybe<TafkidimEntityResponse>` |
+| `target` | `Enum_Fulfillmentstep_Target` |
+| `updatedAt` | `Maybe<Scalars['DateTime']['output']>` |
+| `waveAt` | `Maybe<Scalars['String']['output']>` |
+| `when` | `Maybe<Scalars['JSON']['output']>` |
 
 ### FxRate
 | Field | Type |
@@ -1211,6 +1243,7 @@ These are the main content types in the Strapi backend.
 | `createFinnishedMissionLocalization` | `Maybe<FinnishedMissionEntityResponse>` |
 | `createForum` | `Maybe<ForumEntityResponse>` |
 | `createForumLastSeen` | `Maybe<ForumLastSeenEntityResponse>` |
+| `createFulfillmentStep` | `Maybe<FulfillmentStepEntityResponse>` |
 | `createFxRate` | `Maybe<FxRateEntityResponse>` |
 | `createHaamada` | `Maybe<HaamadaEntityResponse>` |
 | `createHaamadapruv` | `Maybe<HaamadapruvEntityResponse>` |
@@ -1360,6 +1393,7 @@ These are the main content types in the Strapi backend.
 | `deleteFinnishedMission` | `Maybe<FinnishedMissionEntityResponse>` |
 | `deleteForum` | `Maybe<ForumEntityResponse>` |
 | `deleteForumLastSeen` | `Maybe<ForumLastSeenEntityResponse>` |
+| `deleteFulfillmentStep` | `Maybe<FulfillmentStepEntityResponse>` |
 | `deleteFxRate` | `Maybe<FxRateEntityResponse>` |
 | `deleteHaamada` | `Maybe<HaamadaEntityResponse>` |
 | `deleteHaamadapruv` | `Maybe<HaamadapruvEntityResponse>` |
@@ -1493,6 +1527,7 @@ These are the main content types in the Strapi backend.
 | `updateFinnishedMission` | `Maybe<FinnishedMissionEntityResponse>` |
 | `updateForum` | `Maybe<ForumEntityResponse>` |
 | `updateForumLastSeen` | `Maybe<ForumLastSeenEntityResponse>` |
+| `updateFulfillmentStep` | `Maybe<FulfillmentStepEntityResponse>` |
 | `updateFxRate` | `Maybe<FxRateEntityResponse>` |
 | `updateHaamada` | `Maybe<HaamadaEntityResponse>` |
 | `updateHaamadapruv` | `Maybe<HaamadapruvEntityResponse>` |
@@ -1859,6 +1894,7 @@ These are the main content types in the Strapi backend.
 ### Order
 | Field | Type |
 |-------|------|
+| `acts` | `Maybe<ActRelationResponseCollection>` |
 | `archived` | `Maybe<Scalars['Boolean']['output']>` |
 | `buyerEmail` | `Maybe<Scalars['String']['output']>` |
 | `buyerName` | `Maybe<Scalars['String']['output']>` |
@@ -1872,6 +1908,7 @@ These are the main content types in the Strapi backend.
 | `expiresAt` | `Maybe<Scalars['DateTime']['output']>` |
 | `externalId` | `Maybe<Scalars['String']['output']>` |
 | `fulfilledAt` | `Maybe<Scalars['DateTime']['output']>` |
+| `fulfillmentPending` | `Maybe<Scalars['Boolean']['output']>` |
 | `holder` | `Maybe<UsersPermissionsUserEntityResponse>` |
 | `lines` | `Maybe<OrderLineRelationResponseCollection>` |
 | `locale` | `Maybe<Scalars['String']['output']>` |
@@ -2415,6 +2452,8 @@ These are the main content types in the Strapi backend.
 | `forumLastSeen` | `Maybe<ForumLastSeenEntityResponse>` |
 | `forumLastSeens` | `Maybe<ForumLastSeenEntityResponseCollection>` |
 | `forums` | `Maybe<ForumEntityResponseCollection>` |
+| `fulfillmentStep` | `Maybe<FulfillmentStepEntityResponse>` |
+| `fulfillmentSteps` | `Maybe<FulfillmentStepEntityResponseCollection>` |
 | `fxRate` | `Maybe<FxRateEntityResponse>` |
 | `fxRates` | `Maybe<FxRateEntityResponseCollection>` |
 | `haamada` | `Maybe<HaamadaEntityResponse>` |
@@ -5039,7 +5078,7 @@ These are Strapi components (reusable field groups).
 
 ---
 
-## 📝 Input Types (137)
+## 📝 Input Types (138)
 
 Used for creating/updating content.
 
@@ -5051,6 +5090,7 @@ Used for creating/updating content.
 | `des` | `InputMaybe<Scalars['String']['input']>` |
 | `externalId` | `InputMaybe<Scalars['String']['input']>` |
 | `forums` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
+| `fulfillment_step` | `InputMaybe<Scalars['ID']['input']>` |
 | `hashivut` | `InputMaybe<Enum_Act_Hashivut>` |
 | `isAssigned` | `InputMaybe<Scalars['Boolean']['input']>` |
 | `link` | `InputMaybe<Scalars['String']['input']>` |
@@ -5060,6 +5100,8 @@ Used for creating/updating content.
 | `naasa` | `InputMaybe<Scalars['Boolean']['input']>` |
 | `negopendmissions` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `open_mission` | `InputMaybe<Scalars['ID']['input']>` |
+| `order` | `InputMaybe<Scalars['ID']['input']>` |
+| `order_line` | `InputMaybe<Scalars['ID']['input']>` |
 | `partofs` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `pendm` | `InputMaybe<Scalars['ID']['input']>` |
 | `project` | `InputMaybe<Scalars['ID']['input']>` |
@@ -5595,6 +5637,33 @@ Used for creating/updating content.
 | `forum` | `InputMaybe<Scalars['ID']['input']>` |
 | `lastReadAt` | `InputMaybe<Scalars['DateTime']['input']>` |
 | `users_permissions_user` | `InputMaybe<Scalars['ID']['input']>` |
+
+### FulfillmentStepInput
+| Field | Type |
+|-------|------|
+| `archived` | `InputMaybe<Scalars['Boolean']['input']>` |
+| `batching` | `InputMaybe<Enum_Fulfillmentstep_Batching>` |
+| `consentState` | `InputMaybe<Enum_Fulfillmentstep_Consentstate>` |
+| `consentedBy` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
+| `dueHours` | `InputMaybe<Scalars['Int']['input']>` |
+| `effect` | `InputMaybe<Enum_Fulfillmentstep_Effect>` |
+| `exportAddress` | `InputMaybe<Scalars['Boolean']['input']>` |
+| `fields` | `InputMaybe<Scalars['JSON']['input']>` |
+| `matanots` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
+| `member` | `InputMaybe<Scalars['ID']['input']>` |
+| `mesimabetahalich` | `InputMaybe<Scalars['ID']['input']>` |
+| `name` | `InputMaybe<Scalars['String']['input']>` |
+| `per` | `InputMaybe<Enum_Fulfillmentstep_Per>` |
+| `position` | `InputMaybe<Scalars['Int']['input']>` |
+| `product_variants` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
+| `project` | `InputMaybe<Scalars['ID']['input']>` |
+| `proposedBy` | `InputMaybe<Scalars['ID']['input']>` |
+| `routing` | `InputMaybe<Enum_Fulfillmentstep_Routing>` |
+| `scope` | `InputMaybe<Enum_Fulfillmentstep_Scope>` |
+| `tafkidim` | `InputMaybe<Scalars['ID']['input']>` |
+| `target` | `InputMaybe<Enum_Fulfillmentstep_Target>` |
+| `waveAt` | `InputMaybe<Scalars['String']['input']>` |
+| `when` | `InputMaybe<Scalars['JSON']['input']>` |
 
 ### FxRateInput
 | Field | Type |
@@ -6513,6 +6582,7 @@ Used for creating/updating content.
 ### OrderInput
 | Field | Type |
 |-------|------|
+| `acts` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `archived` | `InputMaybe<Scalars['Boolean']['input']>` |
 | `buyerEmail` | `InputMaybe<Scalars['String']['input']>` |
 | `buyerName` | `InputMaybe<Scalars['String']['input']>` |
@@ -6525,6 +6595,7 @@ Used for creating/updating content.
 | `expiresAt` | `InputMaybe<Scalars['DateTime']['input']>` |
 | `externalId` | `InputMaybe<Scalars['String']['input']>` |
 | `fulfilledAt` | `InputMaybe<Scalars['DateTime']['input']>` |
+| `fulfillmentPending` | `InputMaybe<Scalars['Boolean']['input']>` |
 | `holder` | `InputMaybe<Scalars['ID']['input']>` |
 | `lines` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `locale` | `InputMaybe<Scalars['String']['input']>` |
@@ -8076,15 +8147,15 @@ Used for creating/updating content.
 
 ---
 
-## 🔍 Filter Input Types (126)
+## 🔍 Filter Input Types (127)
 
 Used for querying/filtering content. Each content type has a corresponding filter input.
 
 <details>
-<summary>Click to expand all 126 filter types</summary>
+<summary>Click to expand all 127 filter types</summary>
 
 #### ActFiltersInput
-Fields: `and`, `createdAt`, `dateF`, `dateS`, `des`, `externalId`, `forums`, `hashivut`, `id`, `isAssigned`, `link`, `locale`, `localizations`, `mesimabetahaliches`, `my`, `myIshur`, `naasa`, `negopendmissions`, `not`, `open_mission`, `or`, `partofs`, `pendm`, `project`, `publishedAt`, `shem`, `source`, `status`, `tafkidims`, `taskdis`, `timegrama`, `timers`, `updatedAt`, `userAndIshur`, `vali`, `valiIshur`
+Fields: `and`, `createdAt`, `dateF`, `dateS`, `des`, `externalId`, `forums`, `fulfillment_step`, `hashivut`, `id`, `isAssigned`, `link`, `locale`, `localizations`, `mesimabetahaliches`, `my`, `myIshur`, `naasa`, `negopendmissions`, `not`, `open_mission`, `or`, `order`, `order_line`, `partofs`, `pendm`, `project`, `publishedAt`, `shem`, `source`, `status`, `tafkidims`, `taskdis`, `timegrama`, `timers`, `updatedAt`, `userAndIshur`, `vali`, `valiIshur`
 
 #### ActtFiltersInput
 Fields: `and`, `createdAt`, `id`, `link`, `name`, `not`, `or`, `publishedAt`, `timegrama`, `updatedAt`
@@ -8157,6 +8228,9 @@ Fields: `acts`, `and`, `askm`, `asks`, `askwant`, `createdAt`, `decisions`, `don
 
 #### ForumLastSeenFiltersInput
 Fields: `and`, `archived`, `createdAt`, `forum`, `id`, `lastReadAt`, `not`, `or`, `updatedAt`, `users_permissions_user`
+
+#### FulfillmentStepFiltersInput
+Fields: `and`, `archived`, `batching`, `consentState`, `consentedBy`, `createdAt`, `dueHours`, `effect`, `exportAddress`, `fields`, `id`, `matanots`, `member`, `mesimabetahalich`, `name`, `not`, `or`, `per`, `position`, `product_variants`, `project`, `proposedBy`, `routing`, `scope`, `tafkidim`, `target`, `updatedAt`, `waveAt`, `when`
 
 #### FxRateFiltersInput
 Fields: `and`, `base`, `createdAt`, `date`, `fetchedAt`, `id`, `not`, `or`, `rates`, `source`, `updatedAt`
@@ -8264,7 +8338,7 @@ Fields: `and`, `archiveEffectiveFrom`, `archive_decisions`, `archived`, `askms`,
 Fields: `acts`, `and`, `archiveEffectiveFrom`, `archive_decisions`, `archived`, `asks`, `createdAt`, `dates`, `declined`, `descrip`, `dormancyDays`, `entryCurrency`, `entryRate`, `extractedKey`, `hatzaas`, `hearotMeyuchadot`, `howMeny`, `id`, `isMust`, `isRishon`, `isYesod`, `isglobal`, `iskvua`, `isshift`, `lifecycle`, `locale`, `localizations`, `location`, `maagad`, `match_suggestions`, `mesimabetahaliches`, `mission`, `name`, `negopendmissions`, `noofhours`, `not`, `or`, `partofs`, `pendm`, `perhour`, `pledges`, `privatlinks`, `project`, `publicklinks`, `publishedAt`, `ratson`, `ratson_proposals`, `rishon`, `rishonves`, `skills`, `source`, `sqadualed`, `stipendCostShare`, `stipendFunder`, `stipendMode`, `stipendRate`, `stipend_pledges`, `tafkidims`, `timegrama`, `updatedAt`, `users`, `usersNotRelevant`, `vallues`, `work_ways`
 
 #### OrderFiltersInput
-Fields: `and`, `archived`, `buyerEmail`, `buyerName`, `buyerPhone`, `buyer_user`, `createdAt`, `currencyCode`, `deliveryAddress`, `deliveryPreference`, `displayNumber`, `expiresAt`, `externalId`, `fulfilledAt`, `holder`, `id`, `lines`, `locale`, `not`, `note`, `or`, `oversold`, `paidAt`, `paymentMethod`, `paymentRef`, `project`, `publicTokenHash`, `ref`, `requestedDate`, `sales`, `sheirutpends`, `shippedAt`, `source`, `status`, `total`, `updatedAt`
+Fields: `acts`, `and`, `archived`, `buyerEmail`, `buyerName`, `buyerPhone`, `buyer_user`, `createdAt`, `currencyCode`, `deliveryAddress`, `deliveryPreference`, `displayNumber`, `expiresAt`, `externalId`, `fulfilledAt`, `fulfillmentPending`, `holder`, `id`, `lines`, `locale`, `not`, `note`, `or`, `oversold`, `paidAt`, `paymentMethod`, `paymentRef`, `project`, `publicTokenHash`, `ref`, `requestedDate`, `sales`, `sheirutpends`, `shippedAt`, `source`, `status`, `total`, `updatedAt`
 
 #### OrderLineFiltersInput
 Fields: `and`, `createdAt`, `currencyCode`, `id`, `imageUrlSnapshot`, `lineTotal`, `matanot`, `nameSnapshot`, `not`, `note`, `optionLabelSnapshot`, `or`, `order`, `position`, `quantity`, `skuSnapshot`, `unitPrice`, `updatedAt`, `variant`
@@ -8465,12 +8539,12 @@ Fields: `allSubmited`, `and`, `createdAt`, `done`, `id`, `mesimabetahalich`, `no
 
 ---
 
-## 📦 Entity Response Types (486)
+## 📦 Entity Response Types (489)
 
 Wrapper types for GraphQL responses.
 
 <details>
-<summary>Click to expand all 486 response types</summary>
+<summary>Click to expand all 489 response types</summary>
 
 - **ActEntity**: `attributes: Maybe<Act>`, `id: Maybe<Scalars['ID']['output']>`
 - **ActEntityResponse**: `data: Maybe<ActEntity>`
@@ -8569,6 +8643,9 @@ Wrapper types for GraphQL responses.
 - **ForumLastSeenEntityResponseCollection**: `data: Array<ForumLastSeenEntity>`, `meta: ResponseCollectionMeta`
 - **ForumLastSeenRelationResponseCollection**: `data: Array<ForumLastSeenEntity>`
 - **ForumRelationResponseCollection**: `data: Array<ForumEntity>`
+- **FulfillmentStepEntity**: `attributes: Maybe<FulfillmentStep>`, `id: Maybe<Scalars['ID']['output']>`
+- **FulfillmentStepEntityResponse**: `data: Maybe<FulfillmentStepEntity>`
+- **FulfillmentStepEntityResponseCollection**: `data: Array<FulfillmentStepEntity>`, `meta: ResponseCollectionMeta`
 - **FxRateEntity**: `attributes: Maybe<FxRate>`, `id: Maybe<Scalars['ID']['output']>`
 - **FxRateEntityResponse**: `data: Maybe<FxRateEntity>`
 - **FxRateEntityResponseCollection**: `data: Array<FxRateEntity>`, `meta: ResponseCollectionMeta`
@@ -8962,10 +9039,10 @@ Wrapper types for GraphQL responses.
 
 ---
 
-## 🔢 Enum Types (171)
+## 🔢 Enum Types (178)
 
 <details>
-<summary>Click to expand all 171 enum types</summary>
+<summary>Click to expand all 178 enum types</summary>
 
 - **Enum_Act_Hashivut**: 
 - **Enum_Act_Source**: 
@@ -9001,6 +9078,13 @@ Wrapper types for GraphQL responses.
 - **Enum_Demorequest_Timemode**: 
 - **Enum_Demorequest_Track**: 
 - **Enum_Forum_Spec**: 
+- **Enum_Fulfillmentstep_Batching**: 
+- **Enum_Fulfillmentstep_Consentstate**: 
+- **Enum_Fulfillmentstep_Effect**: 
+- **Enum_Fulfillmentstep_Per**: 
+- **Enum_Fulfillmentstep_Routing**: 
+- **Enum_Fulfillmentstep_Scope**: 
+- **Enum_Fulfillmentstep_Target**: 
 - **Enum_Haluka_Adjustdirection**: 
 - **Enum_Issue_Origin**: 
 - **Enum_Maagadmember_Status_Member**: 
@@ -9153,7 +9237,7 @@ Wrapper types for GraphQL responses.
 ```
 src/
 ├── generated/
-│   ├── graphql.ts              # Auto-generated types (codegen) - 23608 lines
+│   ├── graphql.ts              # Auto-generated types (codegen) - 23835 lines
 │   ├── index.ts                # Re-export hub
 │   └── STRAPI_SCHEMA_REFERENCE.md  # This file (AI agent reference)
 ├── lib/
