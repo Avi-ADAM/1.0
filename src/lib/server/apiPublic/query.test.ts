@@ -35,7 +35,7 @@ describe('pagination and sorting', () => {
     const q = ok('');
     expect(q.limit).toBe(DEFAULT_LIMIT);
     expect(q.page).toBe(1);
-    expect(q.sort).toEqual(['-updatedAt']);
+    expect(q.sort).toEqual(['updatedAt:desc']);
   });
 
   it('refuses a limit above the ceiling instead of silently clamping it', () => {
@@ -47,8 +47,8 @@ describe('pagination and sorting', () => {
   });
 
   it('accepts only the documented sort keys', () => {
-    expect(ok('sort=price').sort).toEqual(['price']);
-    expect(ok('sort=-price,name').sort).toEqual(['-price', 'name']);
+    expect(ok('sort=price').sort).toEqual(['price:asc']);
+    expect(ok('sort=-price,name').sort).toEqual(['price:desc', 'name:asc']);
     expect(fail('sort=cheap').message).toContain('sort');
     expect(fail('sort=marginPct').status).toBe(400);
   });
@@ -216,9 +216,9 @@ describe('buildCatalogFilters — tenant + visibility, composed once', () => {
 
 describe('shop parameters — without the shop schema', () => {
   it('keeps `sort=price` on the product row and `priceMax` on price', () => {
-    expect(ok('sort=price').sort).toEqual(['price']);
-    expect(ok('sort=priceMax').sort).toEqual(['price']);
-    expect(ok('sort=-priceMax').sort).toEqual(['-price']);
+    expect(ok('sort=price').sort).toEqual(['price:asc']);
+    expect(ok('sort=priceMax').sort).toEqual(['price:asc']);
+    expect(ok('sort=-priceMax').sort).toEqual(['price:desc']);
   });
 
   it('filters the price on the product row', () => {
@@ -269,8 +269,8 @@ describe('shop parameters — with the shop schema', () => {
   };
 
   it('sorts `price` by the cheapest variant', () => {
-    expect(shop('sort=price').sort).toEqual(['priceMin']);
-    expect(shop('sort=-priceMax,name').sort).toEqual(['-priceMax', 'name']);
+    expect(shop('sort=price').sort).toEqual(['priceMin:asc']);
+    expect(shop('sort=-priceMax,name').sort).toEqual(['priceMax:desc', 'name:asc']);
   });
 
   it('reads a price filter as a range overlap, with a branch for legacy rows', () => {

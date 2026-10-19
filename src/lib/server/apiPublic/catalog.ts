@@ -444,7 +444,7 @@ export async function fetchVisibleProductCount(
     query: {
       page: 1,
       limit: 1,
-      sort: ['-updatedAt'],
+      sort: ['updatedAt:desc'],
       callerFilters: [],
       statuses: args.statuses,
       fields: [],

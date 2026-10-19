@@ -97,7 +97,7 @@ const METERS_PER_DEGREE = 111_320;
 export interface CatalogQuery {
   page: number;
   limit: number;
-  /** Strapi `sort` array, e.g. `['-updatedAt']`. */
+  /** Strapi `sort` array, e.g. `['updatedAt:desc']` — Strapi refuses the `-x` spelling. */
   sort: string[];
   /** The caller's own filters (search, seller, price…), before tenant/status. */
   callerFilters: Record<string, unknown>[];
@@ -203,10 +203,10 @@ export function parseCatalogQuery(
       // Spell the column once, here: `price` means "the cheapest way in", and
       // whether that lives on the product row or on a variant is a deployment
       // fact, not a caller's problem.
-      sort.push(`${desc ? '-' : ''}${sortColumnOf(key, shopSchema)}`);
+      sort.push(`${sortColumnOf(key, shopSchema)}:${desc ? 'desc' : 'asc'}`);
     }
   }
-  if (!sort.length) sort.push('-updatedAt');
+  if (!sort.length) sort.push('updatedAt:desc');
 
   // ── fields / expand ───────────────────────────────────────────────────────
   const fields = listOf(params, 'fields');
