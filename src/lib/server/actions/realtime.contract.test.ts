@@ -38,6 +38,7 @@ const READ_ONLY = new Set([
   'getRikmaSplitsArchive',
   'getSheirutpendQuote',
   'getShiftWork',
+  'getFulfillmentWork',
   'getSiteShareAggregate',
   'getSiteShareArchive',
   'getSiteShareDecision',

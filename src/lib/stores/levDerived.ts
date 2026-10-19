@@ -31,6 +31,8 @@ import {
 import { timers } from './timers';
 // Shift cards come from their own server read, gated on SHIFTS (PLAN_SHIFTS §9.4).
 import { processedShiftWork } from '$lib/utils/levShifts';
+// Order automation cards — their own server read (PLAN_SHOP_OPERATIONS §2.2).
+import { processedFulfillWork } from '$lib/utils/levFulfill';
 import {
   processPends,
   processMtaha,
@@ -376,7 +378,8 @@ export const mergedFeed: Readable<DisplayItem[]> = derived(
     processedStipendConfirmations,
     processedStipendAccruals,
     processedStipendTransfers,
-    processedShiftWork
+    processedShiftWork,
+    processedFulfillWork
   ],
   ([
     $pends,
@@ -402,7 +405,8 @@ export const mergedFeed: Readable<DisplayItem[]> = derived(
     $stipendConfirmations,
     $stipendAccruals,
     $stipendTransfers,
-    $shiftWork
+    $shiftWork,
+    $fulfillWork
   ]) => {
     return mergeAndSort(
       $pends,
@@ -428,7 +432,8 @@ export const mergedFeed: Readable<DisplayItem[]> = derived(
       $stipendConfirmations,
       $stipendAccruals,
       $stipendTransfers,
-      $shiftWork
+      $shiftWork,
+      $fulfillWork
     );
   }
 );
@@ -518,6 +523,7 @@ export const finalSwiperArray: Readable<DisplayItem[]> = derived(
         case 'shiftSwap':
         case 'shiftStarting':
         case 'shiftLog':
+        case 'fulfill':
           return true; // Always show: a shift question addressed to me, with a deadline
         // A stipend proposal is a decision like any other — same filter.
         case 'stipend':

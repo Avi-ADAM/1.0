@@ -44,6 +44,7 @@
   import ShiftHoleCard from './ShiftHoleCard.svelte';
   import ShiftSwapCard from './ShiftSwapCard.svelte';
   import ShiftHoursCard from './ShiftHoursCard.svelte';
+  import FulfillCard from './FulfillCard.svelte';
   import { setLevItem } from '../levItemContext.js';
 
   /**
@@ -202,6 +203,8 @@
   <ShiftSwapCard {buble} isFirst={isVisible} onProj={proj} onDone={delo} />
 {:else if buble.ani === 'shiftStarting' || buble.ani === 'shiftLog'}
   <ShiftHoursCard {buble} isFirst={isVisible} onProj={proj} onDone={delo} />
+{:else if buble.ani === 'fulfill'}
+  <FulfillCard {buble} isFirst={isVisible} onProj={proj} onDone={delo} />
 {:else if buble.ani === 'sitesharedecide'}
   <SiteShareAutoApprovedCard
       {buble}

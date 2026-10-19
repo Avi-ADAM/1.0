@@ -24,7 +24,8 @@
     "stock": "Stock",
     "sales": "Ventas",
     "connect": "Conexiones",
-    "waiting": "{{count}} te esperan"
+    "waiting": "{{count}} te esperan",
+    "fulfillment": "Preparación"
   },
   "kpi": {
     "label": "Resumen",
@@ -402,5 +403,73 @@
     "keep": "Todavía no",
     "failed": "No se guardó el pago. Inténtalo de nuevo.",
     "holderOnly": "Este pago ya lo está registrando {{name}}"
+  },
+  "fulfil": {
+    "intro": "Lo que pasa cuando un pedido se paga: cada paso abre una tarea para quien tiene la misión o el rol, dentro del trabajo que ya es suyo. Los pasos nunca tocan valor ni porcentajes.",
+    "introConsent": "Un paso que recae en otra persona espera su sí. Un paso que defines para ti está activo enseguida.",
+    "notReady": "La automatización aún no está disponible aquí",
+    "notReadyBody": "Primero hay que desplegar la actualización del servidor de la tienda. Los pedidos siguen funcionando como siempre.",
+    "empty": "Aún no hay pasos de preparación",
+    "emptyBody": "Por ejemplo: \"cada pedido con envío abre una tarea de envío para el repartidor\".",
+    "add": "Añadir un paso",
+    "newTitle": "Paso nuevo",
+    "editTitle": "Editar paso",
+    "editAsksAgain": "Cambiar un paso vuelve a pedir el consentimiento de quien lo recibe.",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "edit": "Editar",
+    "counter": "Proponer un cambio",
+    "pause": "Pausar",
+    "resume": "Reanudar",
+    "remove": "Quitar",
+    "agree": "Estoy de acuerdo",
+    "askYou": "Este paso te abrirá tareas. Nada se abre hasta que aceptes — también puedes proponer un cambio.",
+    "saved": "Guardado",
+    "agreed": "Gracias — el paso está activo",
+    "pausedToast": "Paso en pausa",
+    "resumed": "Paso reanudado",
+    "removed": "Paso quitado; las tareas que ya abrió se quedan",
+    "error": "Algo salió mal, inténtalo de nuevo",
+    "targetMission": "para quien tiene la misión \"{{mission}}\"",
+    "targetRole": "para el rol \"{{role}}\"",
+    "targetMember": "para {{member}}",
+    "dueIn": "en {{hours}} horas",
+    "perLine": "una tarea por artículo",
+    "when": {
+      "any": "Cada pedido pagado",
+      "delivery": "Pedidos con envío",
+      "pickup": "Pedidos con recogida"
+    },
+    "effect": {
+      "markShipped": "Al terminar: el pedido queda \"enviado\"",
+      "markFulfilled": "Al terminar: el pedido queda \"entregado\"",
+      "none": "Al terminar: el pedido no cambia"
+    },
+    "state": {
+      "live": "Activo",
+      "paused": "En pausa",
+      "waitingFor": "Esperando el sí de {{names}}",
+      "noTarget": "Ahora no recae en nadie"
+    },
+    "f": {
+      "name": "Nombre del paso",
+      "namePh": "Envío, recolección, embalaje…",
+      "when": "Cuándo",
+      "target": "Para quién",
+      "target_mission": "Misión",
+      "target_role": "Rol",
+      "target_member": "Miembro",
+      "mission": "La misión en curso",
+      "noMissions": "Ninguna misión en curso de la rikma tiene a alguien a cargo",
+      "role": "El rol",
+      "noRoles": "Ninguna misión en curso tiene un rol definido",
+      "member": "Miembro de la rikma",
+      "me": "{{name}} (yo)",
+      "per": "Cuántas tareas",
+      "per_order": "Una por pedido",
+      "per_line": "Una por artículo",
+      "effect": "Qué pasa al terminar",
+      "due": "En cuántas horas (opcional)"
+    }
   }
 }

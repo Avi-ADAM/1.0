@@ -6,7 +6,33 @@
  */
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import { ActionError } from '../errors.js';
 import { scope, scopeList } from '$lib/realtime/scopes.js';
+import { stepIsLive } from '$lib/fulfillment/plan';
+import { stepOf } from '$lib/fulfillment/rows';
+
+/**
+ * An automatic act (PLAN_SHOP_OPERATIONS A1) may land on a person only under a
+ * live step of this rikma that this person agreed to — checked here, not by
+ * the caller, because `createTask` is also open to API keys. Returns whether
+ * the assignee's acceptance is already given (their yes to the rule is it).
+ */
+async function checkAutomationStep(
+  strapi: any,
+  context: any,
+  projectId: string,
+  stepId: string,
+  assignedUserId: string | null
+): Promise<boolean> {
+  const res = await strapi.execute('fulfillmentStep', { pid: String(projectId), id: String(stepId) }, context.jwt, context.fetch);
+  const step = stepOf(res?.data?.fulfillmentSteps?.data?.[0]);
+  if (!step) throw new ActionError('NOT_FOUND', `No fulfilment step ${stepId} in this rikma`);
+  if (!stepIsLive(step)) throw new ActionError('STEP_NOT_LIVE', 'This fulfilment step is not agreed or is paused');
+  if (assignedUserId && !step.consentedBy.includes(String(assignedUserId))) {
+    throw new ActionError('NOT_CONSENTED', 'The assignee has not agreed to this fulfilment step');
+  }
+  return !!assignedUserId;
+}
 
 /**
  * Resolve the users who should be notified when a task is assigned to a role.
@@ -68,8 +94,22 @@ const createTaskHandler: ActionExecutionHandler = async (params, context, { stra
     // the system that opened it, and where it came from. Both absent on the
     // in-app path, which keeps Strapi's `source` default of 'ui'.
     externalId,
-    source
+    source,
+    // Order automation (PLAN_SHOP_OPERATIONS A1): the order, line and step an
+    // automatic act belongs to. Only with `fulfillmentStepId`, and only under
+    // a live step the assignee agreed to (`checkAutomationStep`).
+    orderId,
+    orderLineId,
+    fulfillmentStepId
   } = params;
+
+  const automatic = source === 'automation' || !!fulfillmentStepId;
+  if (automatic && !fulfillmentStepId) {
+    throw new ActionError('VALIDATION_FAILED', "source 'automation' needs fulfillmentStepId");
+  }
+  const agreedByRule = automatic
+    ? await checkAutomationStep(strapi, context, String(projectId), String(fulfillmentStepId), isAssigned ? (assignedUserId ?? null) : null)
+    : false;
 
   const now = new Date().toISOString();
 
@@ -87,6 +127,12 @@ const createTaskHandler: ActionExecutionHandler = async (params, context, { stra
 
   if (externalId) data.externalId = String(externalId);
   if (source) data.source = String(source);
+  if (automatic) {
+    data.source = 'automation';
+    data.fulfillment_step = String(fulfillmentStepId);
+    if (orderId) data.order = String(orderId);
+    if (orderLineId) data.order_line = String(orderLineId);
+  }
 
   // Add assignment details
   if (isAssigned) {
@@ -94,7 +140,7 @@ const createTaskHandler: ActionExecutionHandler = async (params, context, { stra
       data.my = assignedUserId;
       
       // Auto-approve if the creator is the assignee
-      if (assignedUserId === context.userId) {
+      if (assignedUserId === context.userId || agreedByRule) {
         data.myIshur = true;
       } else {
         data.myIshur = myIshur;
@@ -218,7 +264,22 @@ export const createTaskAction: ActionConfig = {
     source: {
       type: 'string',
       required: false,
-      description: "Where the task came from: 'ui' (default in Strapi) or 'api'"
+      description: "Where the task came from: 'ui' (default in Strapi), 'api', or 'automation' (needs fulfillmentStepId)"
+    },
+    orderId: {
+      type: 'string',
+      required: false,
+      description: 'Order this automatic act belongs to (order automation; with fulfillmentStepId)'
+    },
+    orderLineId: {
+      type: 'string',
+      required: false,
+      description: 'Order line, for a per-line step'
+    },
+    fulfillmentStepId: {
+      type: 'string',
+      required: false,
+      description: 'The live fulfilment step that opens this act; the assignee must have agreed to it'
     }
   },
 

@@ -716,6 +716,21 @@ export const qidsAccess = {
   'shopVariantUpdate': { allow: ['serviceAdmin'] },
   'shopProductUpdate': { allow: ['serviceAdmin'] },
   'shopProductLowStock': { allow: ['serviceAdmin'] },
+  // Order automation (PLAN_SHOP_OPERATIONS A1, qidsFulfillment.js): the fulfillment
+  // actions and the engine only — a rule switched on through /api/send would land
+  // work on someone who never agreed to it.
+  'fulfillmentSteps': { allow: ['serviceAdmin'] },
+  'fulfillmentStep': { allow: ['serviceAdmin'] },
+  'fulfillmentStepCreate': { allow: ['serviceAdmin'] },
+  'fulfillmentStepUpdate': { allow: ['serviceAdmin'] },
+  'fulfillmentMissions': { allow: ['serviceAdmin'] },
+  'fulfillmentOrder': { allow: ['serviceAdmin'] },
+  'fulfillmentOrderActs': { allow: ['serviceAdmin'] },
+  'fulfillmentActClose': { allow: ['serviceAdmin'] },
+  'fulfillmentOrderFlag': { allow: ['serviceAdmin'] },
+  'fulfillmentAct': { allow: ['serviceAdmin'] },
+  'fulfillmentMyActs': { allow: ['serviceAdmin'] },
+  'fulfillmentActTake': { allow: ['serviceAdmin'] },
 
   // Site reports mirrored into the central rikma — same story, and a report
   // carries the reporter's email, so it is never reachable with a user JWT.

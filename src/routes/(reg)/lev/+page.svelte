@@ -52,6 +52,7 @@
   } from '$lib/stores/levStores';
   import { executeAction } from '$lib/client/actionClient';
   import { shiftWorkStore } from '$lib/utils/levShifts';
+  import { fulfillWorkStore } from '$lib/utils/levFulfill';
 
   // Dialog components
   import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
@@ -326,6 +327,18 @@
     }
   }
 
+  // Order automation (PLAN_SHOP_OPERATIONS §2.2): the acts the rikma's agreed
+  // steps opened for me, or for a role I hold. Members only — they carry the
+  // buyer's address, so they are read on the server.
+  async function loadFulfillWork() {
+    try {
+      const res = await executeAction('getFulfillmentWork', {});
+      if (res?.success && res.data) fulfillWorkStore.set(res.data.items ?? []);
+    } catch (e) {
+      console.error('[Fulfill] load work failed:', e);
+    }
+  }
+
   function handleCoinLapach(event) {
     // Remove item from display optimistically
     displayItems = displayItems.filter(
@@ -391,6 +404,7 @@
     loadOpenSiteShareDecisions();
     loadStipendWork();
     loadShiftWork();
+    loadFulfillWork();
 
     // Errors of a background refresh must not blank an already-rendered page —
     // only an expired session needs action.

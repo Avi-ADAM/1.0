@@ -852,7 +852,8 @@
       "shiftHole": "مناوبة غير مغطّاة",
       "shiftSwap": "تبديل مناوبة",
       "shiftStarting": "مناوبة تبدأ",
-      "shiftLog": "ساعات المناوبة"
+      "shiftLog": "ساعات المناوبة",
+      "fulfill": "مهمة طلب"
     },
     "fact": {
       "hours": "{{value}} ساعات",
@@ -914,7 +915,9 @@
       "shiftSwap": "عُرض عليك تبديل مناوبة",
       "shiftSwapCounter": "اقتُرحت نسخة أخرى من تبديلك",
       "shiftStarting": "تشغيل المؤقت",
-      "shiftLog": "انتهت المناوبة من دون مؤقت"
+      "shiftLog": "انتهت المناوبة من دون مؤقت",
+      "fulfill": "الطلب {{order}}",
+      "fulfillOpen": "الطلب {{order}} · مفتوحة لدور {{role}}"
     },
     "title": {
       "transfer": "{{from}} ← {{to}}",
@@ -966,5 +969,32 @@
     "stipend": "فُتح {{time}}",
     "sheirutp": "أُرسل {{time}}",
     "wishoffer": "قُدّم {{time}}"
+  },
+  "fulfill": {
+    "type": "مهمة لطلب من موقعك",
+    "order": "الطلب {{order}}",
+    "due": "حتى {{when}}",
+    "late": "متأخرة — كانت مطلوبة حتى {{when}}",
+    "pref": {
+      "pickup": "استلام ذاتي",
+      "delivery": "توصيل",
+      "digital": "رقمي",
+      "contact": "بالتنسيق"
+    },
+    "call": "الاتصال بالمشتري",
+    "whatsapp": "واتساب",
+    "waText": "مرحبًا، بخصوص الطلب {{order}}",
+    "openToRole": "مفتوحة لكل من في دور {{role}} — من يأخذها تصبح له.",
+    "yourRole": "دورك",
+    "inMission": "داخل المهمة \"{{mission}}\" — الساعات تُسجَّل في مؤقّتها",
+    "take": "سآخذها",
+    "taken": "المهمة لك",
+    "done": "تم ✓",
+    "doneShipped": "أُرسل ✓",
+    "doneFulfilled": "سُلّم ✓",
+    "doneToast": "ممتاز — تم التعليم وسيُبلَّغ المشتري",
+    "effectFailed": "تم تعليم المهمة، لكن حالة الطلب لم تتغير — يستحسن إلقاء نظرة على الطلب",
+    "openOrder": "تفاصيل الطلب",
+    "error": "حدث خطأ، حاول مرة أخرى"
   }
 }

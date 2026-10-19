@@ -1,7 +1,7 @@
 # PLAN — החנות, שלב ב': תפעול ההזמנה, ומוצרים מורכבים בקופה
 
-> **מצב (2026-10-19): T1 בנוי בקוד, לא נפרס ולא הורץ מול Strapi** — ראו
-> "מצב הביצוע" בסוף §7. שאר השלבים בתכנון. נכתב 2026-10-19 כהמשך ל-
+> **מצב (2026-10-19): T1, T2 ו-A1 בנויים בקוד, לא נפרסו ולא הורצו מול Strapi** —
+> ראו "מצב הביצוע" בסוף §7. שאר השלבים בתכנון. נכתב 2026-10-19 כהמשך ל-
 > [PLAN_SHOP_CUSTOMER_EXPERIENCE](../inprogress/PLAN_SHOP_CUSTOMER_EXPERIENCE.md)
 > (S1–S6 בנויים וממתינים לפריסה), אחרי קריאת הקוד: `createSheirutFromPending.ts`,
 > `createPaidOrder.ts`, `orderLifecycle.ts`, `createTask.ts`, והסכמה המיוצאת
@@ -491,6 +491,39 @@ S1–S6 בנויים ולא נפרסו. כל שלב כאן נשען על `order`
 וואטסאפ ל-`SHOP_WHATSAPP`. `ARRANGED_EXPIRES_HOURS` עובר כ-`expiresInHours`.
 חנות בלי Stripe ובלי PayPal עובדת. 8 בדיקות, `check` נקי, `build` עובר; לא
 נבדק בדפדפן — מקומית אין `.env` עם כתובת רקמה.
+
+**A1 — בנוי (2026-10-19), לא נפרס.** המנוע, ההסכמה לכלל, כרטיס הלב ולשונית
+"ביצוע". מה נבנה:
+
+| מה | איפה |
+|---|---|
+| סכמה (1.0b): קולקציה `fulfillment-step` עם כל שדות §2.1 (כולל אלה של A2 — `routing`, `batching`, `scope` + `matanots`/`product_variants` — כדי שתהיה פריסה אחת), ועוד `proposedBy` ו-`consentedBy` (מי הסכים). `Act.order` / `order_line` / `fulfillment_step` + `source:'automation'`. `Order.acts` + `Order.fulfillmentPending` | `1.0b/src/api/fulfillment-step/`, `act`, `order` schema.json |
+| `planFulfillment` — טהור: שלבים חיים (`self`/`active`) שתואמים לאירוע ולהעדפת המשלוח, היקף (רקמה/מוצר/וריאנט), `per` order/line (`unit` = מטלה לשורה עם הכמות — לא מטלה לכל צנצנת), `routing:single`, `dueHours`, `externalId` דטרמיניסטי. **משבץ אדם רק אם הוא ב-`consentedBy`**; אחרת `blocker` (`NO_TARGET`/`NO_HOLDER`/`NOT_CONSENTED`). תפקיד עם מחזיק מסכים אחד ⇒ אליו, בתוך המשימה שלו; כמה מחזיקים או אף אחד ⇒ המטלה נפתחת לתפקיד | `src/lib/fulfillment/plan.ts` (+22 בדיקות) |
+| שלב 5d ב-ActionService: `createPaidOrder` (paid) ו-`confirmOrderPayment` ⇒ `applyFulfillment`; `cancelOrder` ⇒ מטלות פתוחות נסגרות (unpublish + הסבר), שהושלמו נשארות. fire-and-forget; כשל ⇒ `fulfillmentPending` + התראה, ריצה מוצלחת מנקה | `ActionService.runFulfillment`, `src/lib/server/fulfillment/apply.ts` |
+| כל מטלה נפתחת **דרך `createTask`** (webhooks). `createTask` מקבל `orderId`/`orderLineId`/`fulfillmentStepId` ובודק בעצמו שהשלב חי ושהמשובץ הסכים — כי הוא פתוח גם למפתחות API. ההסכמה לכלל היא ה-`myIshur` | `createTask.ts` |
+| **תיאור המטלה = רק הפריטים** — לא שם, טלפון או כתובת של הקונה (עיקרון 7: מטלה משתקפת החוצה). הכרטיס קורא אותם מההזמנה, בתוך הרקמה | `plan.ts` `actText` |
+| פעולות: `saveFulfillmentStep` (כל עריכה מבקשת שוב), `respondFulfillmentStep` (רק "מסכים" — אי-הסכמה היא עריכה/הצעה), `setFulfillmentStepPaused` (יעד שמשהה מושך את ההסכמה שלו), `archiveFulfillmentStep`, `getFulfillmentWork`, `takeFulfillmentAct`, `completeFulfillmentAct` (דרך `updateTask`, ואז ה-`effect`: `markOrderShipped`/`Fulfilled`), `retryOrderFulfillment` | `configs/fulfillment.ts` |
+| qids — כולם `serviceAdmin` | `qidsFulfillment.js` |
+| כרטיס לב `fulfill`: שלב + מספר הזמנה, מועד (באיחור באדום), פריטים, קונה וכתובת, חיוג/וואטסאפ, "אני לוקח/ת" למטלה פתוחה לתפקיד, והכפתור הראשי = ה-effect ("נשלח ✓") | `FulfillCard.svelte`, `levFulfill.ts`, `cardKinds.js` |
+| לשונית "ביצוע" במסך המכירות המתקדם: רשימת שלבים עם מצב ("מחכה להסכמה של דנה"), "מסכים/ה" / "להציע שינוי" למי שהכלל נוחת עליו, השהיה, הסרה, טופס (שם, מתי, למי, אחת להזמנה/לפריט, מה בסיום, תוך כמה שעות). 5 שפות | `sales/manage/fulfillment/`, `server/fulfillment/setup.ts` |
+
+**סטייה מהתכנון, בכוונה:** ב-A1 אין עדיין `Decision kind:'fulfillmentRule'` —
+כלל שנוחת על אחר מחכה ל"כן" **מפורש** של כל מי שהוא נוחת עליו (כרגע, לא
+בשתיקה). זה מחמיר מ-H1, לא מקל: שום מטלה לא נפתחת למי שלא הסכים. השתיקה
+ב-`restime` מגיעה ב-A2 יחד עם ה-Decision.
+
+**מה חסר כדי ש-A1 ייחשב גמור:**
+1. **פריסת 1.0b** (הסכמה למעלה) + **הרשאות** ל-`fulfillment-step` (find/create/update)
+   — קולקציה חדשה צריכה שתי הרשאות: ה-Authenticated role **וגם** טוקן ה-API
+   (בלי השני השרת לא רואה אותה) — ואז `npm run types:update`. עד אז `validate:qids` מסמן את
+   `FulfillmentStepInput` ו-`fulfillmentPending` (צפוי), הלשונית מציגה "עוד לא
+   זמינה", הלב בלי כרטיסים, ו-5d לא עושה כלום.
+2. ההרצה: כלל "משלוח" לעצמי ⇒ הזמנה בתיאום ⇒ "התשלום התקבל" ⇒ כרטיס בלב ⇒
+   "נשלח ✓" ⇒ ההזמנה `shipped` ו-webhook `task.done`. ואז כלל על חבר אחר ⇒ אין
+   מטלה עד שהוא מסכים.
+3. "נסה שוב" בעמוד ההזמנה כש-`fulfillmentPending` — הפעולה קיימת
+   (`retryOrderFulfillment`), הכפתור והפס במסך עוד לא.
+4. צ'אט מהכרטיס — לא נבנה (המטלה עוד בלי פורום משלה); "העבר לאחר" הוא A2.
 
 **המקביליות:** A1 הוא נקודת המפגש — B1 לא מתחיל לפניו. אחרי A1 שני הראשים
 רצים במקביל בלי לגעת באותם קבצים: ראש א' ב-`fulfillment/`, `Mashabetahalich`

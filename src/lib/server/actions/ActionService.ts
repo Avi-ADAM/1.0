@@ -115,9 +115,49 @@ export class ActionService {
     this.logger = logger || new ActionLogger();
   }
 
+  /** Step 5d — see the call site. Never throws, never awaited. */
+  private runFulfillment(actionKey: string, params: Record<string, any>, result: any, context: ActionContext): void {
+    const r = result?.data ?? result ?? {};
+    const orderId = r?.orderId != null ? String(r.orderId) : null;
+    const projectId = params?.projectId != null ? String(params.projectId) : null;
+    if (!orderId || !projectId) return;
+
+    const paid =
+      (actionKey === 'createPaidOrder' && r.status === 'paid') ||
+      (actionKey === 'confirmOrderPayment' && r.status === 'paid');
+    const cancelled = actionKey === 'cancelOrder' && r.status === 'cancelled' && r.alreadyCancelled !== true;
+    if (!paid && !cancelled) return;
+
+    import('../fulfillment/apply.js')
+      .then(async ({ applyFulfillment, closeFulfillmentActs }) => {
+        if (cancelled) {
+          await closeFulfillmentActs({ orderId, context, strapi: this.strapiClient });
+          return;
+        }
+        await applyFulfillment({
+              event: 'order.paid',
+              projectId,
+              orderId,
+              context,
+              strapi: this.strapiClient,
+              runAction: (key, p, ctx) => this.executeAction(key, p, ctx),
+              notifier: this.notifier,
+              // A provider's retry of a finished order completes quietly.
+              announce: r.duplicated !== true && r.changed !== false
+            });
+      })
+      .catch((err) => {
+        this.logger.warn('Order automation error', {
+          actionKey,
+          orderId,
+          error: err instanceof Error ? err.message : String(err)
+        });
+      });
+  }
+
   /**
    * Execute an action
-   * 
+   *
    * This is the main entry point for action execution. It orchestrates
    * the entire flow from validation to notification.
    * 
@@ -317,6 +357,13 @@ export class ActionService {
             });
           });
       }
+
+      // Step 5d: Order automation (PLAN_SHOP_OPERATIONS §3, A1) — a paid
+      // order opens the acts the rikma's agreed steps ask for; a cancelled one
+      // closes the open ones. After the order and sales are written, and
+      // fire-and-forget: a failure is flagged on the order (`fulfillmentPending`)
+      // and never fails an order the buyer already paid for.
+      this.runFulfillment(actionKey, params, strapiResult, context);
 
       // Calculate execution time
       const executionTime = Date.now() - startTime;

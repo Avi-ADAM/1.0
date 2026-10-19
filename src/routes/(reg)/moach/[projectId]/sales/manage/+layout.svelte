@@ -54,7 +54,7 @@
   });
   let summary = $derived(sales ? salesSummary(sales, clock.minutes) : null);
 
-  const TABS = ['orders', 'products', 'stock', 'sales', 'connect'] as const;
+  const TABS = ['orders', 'products', 'stock', 'fulfillment', 'sales', 'connect'] as const;
   function hrefOf(tab: (typeof TABS)[number]) {
     return tab === 'orders' ? base : `${base}/${tab}`;
   }

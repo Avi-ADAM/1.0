@@ -852,7 +852,8 @@
       "shiftHole": "Uncovered shift",
       "shiftSwap": "Shift swap",
       "shiftStarting": "Shift starting",
-      "shiftLog": "Shift hours"
+      "shiftLog": "Shift hours",
+      "fulfill": "Order task"
     },
     "fact": {
       "hours": "{{value}} hours",
@@ -914,7 +915,9 @@
       "shiftSwap": "You were offered a shift swap",
       "shiftSwapCounter": "A different version of your swap was proposed",
       "shiftStarting": "Start the timer",
-      "shiftLog": "The shift ended without a timer"
+      "shiftLog": "The shift ended without a timer",
+      "fulfill": "Order {{order}}",
+      "fulfillOpen": "Order {{order}} · open to the {{role}} role"
     },
     "title": {
       "transfer": "{{from}} → {{to}}",
@@ -966,5 +969,32 @@
     "stipend": "Opened {{time}}",
     "sheirutp": "Sent {{time}}",
     "wishoffer": "Submitted {{time}}"
+  },
+  "fulfill": {
+    "type": "Task for an order from your site",
+    "order": "Order {{order}}",
+    "due": "By {{when}}",
+    "late": "Late — was due {{when}}",
+    "pref": {
+      "pickup": "Pickup",
+      "delivery": "Delivery",
+      "digital": "Digital",
+      "contact": "To arrange"
+    },
+    "call": "Call the buyer",
+    "whatsapp": "WhatsApp",
+    "waText": "Hi, about order {{order}}",
+    "openToRole": "Open to anyone in the {{role}} role — whoever takes it, owns it.",
+    "yourRole": "yours",
+    "inMission": "Inside the mission \"{{mission}}\" — hours go on its timer",
+    "take": "I'll take it",
+    "taken": "It's yours",
+    "done": "Done ✓",
+    "doneShipped": "Shipped ✓",
+    "doneFulfilled": "Delivered ✓",
+    "doneToast": "Great — marked, and the buyer will be updated",
+    "effectFailed": "The task is marked, but the order's status did not change — worth a look at the order",
+    "openOrder": "Order details",
+    "error": "Something went wrong, please try again"
   }
 }

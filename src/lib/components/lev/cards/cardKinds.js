@@ -58,7 +58,9 @@ const RENDERABLE = new Set([
   'shiftHole',
   'shiftSwap',
   'shiftStarting',
-  'shiftLog'
+  'shiftLog',
+  // Order automation (PLAN_SHOP_OPERATIONS §2.2) — ungated: work addressed to me.
+  'fulfill'
 ]);
 
 /**
@@ -119,7 +121,8 @@ const KIND_META = {
   shiftHole: { key: 'shiftHole', glow: 'red' },
   shiftSwap: { key: 'shiftSwap', glow: 'teal' },
   shiftStarting: { key: 'shiftStarting', glow: 'teal' },
-  shiftLog: { key: 'shiftLog', glow: 'teal' }
+  shiftLog: { key: 'shiftLog', glow: 'teal' },
+  fulfill: { key: 'fulfill', glow: 'orange' }
 };
 
 /** Translation key for a kind's label, e.g. `lev.list.kind.pends`. */
@@ -680,6 +683,14 @@ const ROW_CONTENT = {
     title: T(b.planName),
     subtitle: K('lev.list.sub.shiftLog'),
     facts: chips(f('hours', n(b.hours)))
+  }),
+
+  // ── order automation (PLAN_SHOP_OPERATIONS §2.2) ─────────────────────────
+  fulfill: (b) => ({
+    title: T(b.stepName) ?? T(b.name),
+    subtitle: b.mine
+      ? K('lev.list.sub.fulfill', { order: b.orderNumber ?? '' })
+      : K('lev.list.sub.fulfillOpen', { order: b.orderNumber ?? '', role: b.roleName ?? '' })
   })
 };
 
@@ -761,7 +772,8 @@ const CTA_BY_ANI = {
   shiftHole: 'answer',
   shiftSwap: 'answer',
   shiftStarting: 'answer',
-  shiftLog: 'answer'
+  shiftLog: 'answer',
+  fulfill: 'answer'
 };
 
 /** Translation key for the row's primary button. */

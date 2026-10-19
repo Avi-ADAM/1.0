@@ -853,7 +853,8 @@
       "shiftHole": "Turno sin cubrir",
       "shiftSwap": "Cambio de turno",
       "shiftStarting": "Turno empezando",
-      "shiftLog": "Horas del turno"
+      "shiftLog": "Horas del turno",
+      "fulfill": "Tarea de pedido"
     },
     "fact": {
       "hours": "{{value}} horas",
@@ -915,7 +916,9 @@
       "shiftSwap": "Te ofrecieron un cambio de turno",
       "shiftSwapCounter": "Se propuso otra versión de tu cambio",
       "shiftStarting": "Iniciar el temporizador",
-      "shiftLog": "El turno terminó sin temporizador"
+      "shiftLog": "El turno terminó sin temporizador",
+      "fulfill": "Pedido {{order}}",
+      "fulfillOpen": "Pedido {{order}} · abierta al rol {{role}}"
     },
     "title": {
       "transfer": "{{from}} → {{to}}",
@@ -967,5 +970,32 @@
     "stipend": "Abierta {{time}}",
     "sheirutp": "Enviada {{time}}",
     "wishoffer": "Presentada {{time}}"
+  },
+  "fulfill": {
+    "type": "Tarea de un pedido de tu sitio",
+    "order": "Pedido {{order}}",
+    "due": "Para {{when}}",
+    "late": "Atrasada — era para {{when}}",
+    "pref": {
+      "pickup": "Recogida",
+      "delivery": "Envío",
+      "digital": "Digital",
+      "contact": "A coordinar"
+    },
+    "call": "Llamar al comprador",
+    "whatsapp": "WhatsApp",
+    "waText": "Hola, sobre el pedido {{order}}",
+    "openToRole": "Abierta a quien tenga el rol {{role}} — quien la toma, se encarga.",
+    "yourRole": "tuyo",
+    "inMission": "Dentro de la misión \"{{mission}}\" — las horas van a su cronómetro",
+    "take": "Me la quedo",
+    "taken": "Es tuya",
+    "done": "Hecho ✓",
+    "doneShipped": "Enviado ✓",
+    "doneFulfilled": "Entregado ✓",
+    "doneToast": "Perfecto — marcado, y el comprador recibirá la novedad",
+    "effectFailed": "La tarea quedó marcada, pero el estado del pedido no cambió — conviene revisarlo",
+    "openOrder": "Detalles del pedido",
+    "error": "Algo salió mal, inténtalo de nuevo"
   }
 }

@@ -201,6 +201,7 @@ import { confirmResourceBookingConfig } from './confirmResourceBooking.js';
 import { cancelResourceBookingConfig } from './cancelResourceBooking.js';
 import { blockResourceDatesConfig } from './blockResourceDates.js';
 import { shiftActionConfigs } from './shifts.js';
+import { fulfillmentActionConfigs } from './fulfillment.js';
 import {
   linkGithubAccountConfig,
   unlinkGithubAccountConfig,
@@ -570,6 +571,8 @@ export function registerAllActions(): void {
   registerAction(blockResourceDatesConfig);
   // Shifts and shared staffing (docs/inprogress/PLAN_SHIFTS.md §8). All no-op while SHIFTS=off.
   for (const config of shiftActionConfigs) registerAction(config);
+  // Order automation — steps, consent, the heart's fulfil cards (PLAN_SHOP_OPERATIONS A1).
+  for (const config of fulfillmentActionConfigs) registerAction(config);
   // Code rikma — GitHub connection (PLAN_CODE_RIKMA S2)
   registerAction(linkGithubAccountConfig);
   registerAction(unlinkGithubAccountConfig);

@@ -24,7 +24,8 @@
     "stock": "Stock",
     "sales": "Sales",
     "connect": "Connect",
-    "waiting": "{{count}} waiting for you"
+    "waiting": "{{count}} waiting for you",
+    "fulfillment": "Fulfilment"
   },
   "kpi": {
     "label": "At a glance",
@@ -402,5 +403,73 @@
     "keep": "Not yet",
     "failed": "The payment didn't save. Try again.",
     "holderOnly": "This payment is already being recorded by {{name}}"
+  },
+  "fulfil": {
+    "intro": "What happens once an order is paid: each step opens a task for whoever holds the mission or role, inside the work that is already theirs. Steps never touch value or shares.",
+    "introConsent": "A step that lands on someone else waits for their yes. A step you set for yourself is live at once.",
+    "notReady": "Automation is not available here yet",
+    "notReadyBody": "The shop server update has to be deployed first. Orders keep working as usual.",
+    "empty": "No fulfilment steps yet",
+    "emptyBody": "For example: \"every order with delivery opens a shipping task for the courier\".",
+    "add": "Add a step",
+    "newTitle": "New step",
+    "editTitle": "Edit step",
+    "editAsksAgain": "Changing a step asks again for the consent of whoever it lands on.",
+    "save": "Save",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "counter": "Suggest a change",
+    "pause": "Pause",
+    "resume": "Restart",
+    "remove": "Remove",
+    "agree": "I agree",
+    "askYou": "This step will open tasks for you. Nothing opens until you agree — you can also suggest a change.",
+    "saved": "Saved",
+    "agreed": "Thanks — the step is live",
+    "pausedToast": "Step paused",
+    "resumed": "Step restarted",
+    "removed": "Step removed; tasks it already opened stay",
+    "error": "Something went wrong, please try again",
+    "targetMission": "to whoever holds the mission \"{{mission}}\"",
+    "targetRole": "to the \"{{role}}\" role",
+    "targetMember": "to {{member}}",
+    "dueIn": "within {{hours}} hours",
+    "perLine": "a task per item",
+    "when": {
+      "any": "Every paid order",
+      "delivery": "Orders with delivery",
+      "pickup": "Pickup orders"
+    },
+    "effect": {
+      "markShipped": "When done: the order is \"shipped\"",
+      "markFulfilled": "When done: the order is \"delivered\"",
+      "none": "When done: the order is unchanged"
+    },
+    "state": {
+      "live": "Live",
+      "paused": "Paused",
+      "waitingFor": "Waiting for {{names}} to agree",
+      "noTarget": "Nobody it lands on right now"
+    },
+    "f": {
+      "name": "Step name",
+      "namePh": "Shipping, picking, packing…",
+      "when": "When",
+      "target": "For whom",
+      "target_mission": "Mission",
+      "target_role": "Role",
+      "target_member": "Member",
+      "mission": "The running mission",
+      "noMissions": "No running mission in the rikma has a holder",
+      "role": "The role",
+      "noRoles": "No running mission has a role set",
+      "member": "Member of the rikma",
+      "me": "{{name}} (me)",
+      "per": "How many tasks",
+      "per_order": "One per order",
+      "per_line": "One per item",
+      "effect": "What happens when done",
+      "due": "Within how many hours (optional)"
+    }
   }
 }

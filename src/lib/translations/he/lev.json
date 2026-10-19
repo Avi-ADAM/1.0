@@ -852,7 +852,8 @@
       "shiftHole": "משמרת לא מאוישת",
       "shiftSwap": "החלפת משמרת",
       "shiftStarting": "משמרת מתחילה",
-      "shiftLog": "שעות משמרת"
+      "shiftLog": "שעות משמרת",
+      "fulfill": "מטלה להזמנה"
     },
     "fact": {
       "hours": "{{value}} שעות",
@@ -914,7 +915,9 @@
       "shiftSwap": "הוצעה לך החלפת משמרת",
       "shiftSwapCounter": "הוצעה גרסה אחרת להחלפה שלך",
       "shiftStarting": "להפעיל את הטיימר",
-      "shiftLog": "המשמרת הסתיימה בלי טיימר"
+      "shiftLog": "המשמרת הסתיימה בלי טיימר",
+      "fulfill": "הזמנה {{order}}",
+      "fulfillOpen": "הזמנה {{order}} · פתוחה לתפקיד {{role}}"
     },
     "title": {
       "transfer": "{{from}} ← {{to}}",
@@ -966,5 +969,32 @@
     "stipend": "נפתחה {{time}}",
     "sheirutp": "נשלחה {{time}}",
     "wishoffer": "הוגשה {{time}}"
+  },
+  "fulfill": {
+    "type": "מטלה להזמנה מהאתר",
+    "order": "הזמנה {{order}}",
+    "due": "עד {{when}}",
+    "late": "באיחור — היה צריך עד {{when}}",
+    "pref": {
+      "pickup": "איסוף עצמי",
+      "delivery": "משלוח",
+      "digital": "דיגיטלי",
+      "contact": "בתיאום"
+    },
+    "call": "חיוג לקונה",
+    "whatsapp": "וואטסאפ",
+    "waText": "שלום, לגבי הזמנה {{order}}",
+    "openToRole": "המטלה פתוחה לכל מי שבתפקיד {{role}} — מי שלוקח/ת, היא שלו/ה.",
+    "yourRole": "שלך",
+    "inMission": "בתוך המשימה \"{{mission}}\" — השעות נרשמות בטיימר שלה",
+    "take": "אני לוקח/ת",
+    "taken": "המטלה אצלך",
+    "done": "בוצע ✓",
+    "doneShipped": "נשלח ✓",
+    "doneFulfilled": "נמסר ✓",
+    "doneToast": "מעולה — סומן והקונה יעודכן",
+    "effectFailed": "המטלה סומנה, אבל סטטוס ההזמנה לא השתנה — כדאי להציץ בהזמנה",
+    "openOrder": "לפרטי ההזמנה",
+    "error": "משהו השתבש, אפשר לנסות שוב"
   }
 }
