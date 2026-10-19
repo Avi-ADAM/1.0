@@ -285,7 +285,7 @@
     "recordDonation": "Record donation",
     "donationHint": "A donation is recorded as a sale and goes into the split like any income.",
     "starterTitle": "A ready shop for your site",
-    "starterBody": "Catalog, variant picker, cart and payment with Stripe or PayPal — connected to the rikma. Deploy to Vercel or Netlify in one click, and every paid order lands here with its shipping details.",
+    "starterBody": "Catalog, variant picker, cart and payment with Stripe, PayPal or by arrangement over the phone — connected to the rikma. Deploy to Vercel or Netlify in one click, and every order lands here with its shipping details.",
     "starterDeploy": "Deploy to Vercel",
     "starterRepo": "Code and guide",
     "recommended": "Recommended",
@@ -307,10 +307,11 @@
     "siteBody": "A snippet your existing site sends after each checkout — one sale per payment. The key made here only reports sales and does not fit the ready-made shop.",
     "otherKeys": "Need a key with other permissions (tasks, catalog)? All keys and permissions —",
     "starterDeployReady": "The rikma address and the key will be filled in on the Vercel or Netlify form — all that’s left is the details of the payment provider you chose.",
-    "payLabel": "How will buyers pay?",
+    "payLabel": "How will buyers pay? (pick any)",
+    "payArrangedHint": "The buyer orders and leaves a name and phone number, with no payment on the site. The order waits in the \"Awaiting payment\" tab, you arrange the money with them, then tap \"Payment received\". The deploy form also asks for the shop’s WhatsApp number (972…) — for the button on the thank-you page. A shop works this way with no Stripe or PayPal at all.",
     "pay_stripe": "Stripe",
     "pay_paypal": "PayPal",
-    "pay_both": "Both",
+    "pay_arranged": "By arrangement — phone / WhatsApp",
     "starterDeployNetlify": "Deploy to Netlify"
   },
   "empty": {

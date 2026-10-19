@@ -44,13 +44,13 @@
   // address always, the orders key while it is still in hand (just created).
   let starterKey = $state('');
   // How buyers pay decides which keys Vercel's form requires (each listed one is mandatory there).
-  const PAY_CHOICES: { id: string; providers: StarterProvider[] }[] = [
-    { id: 'stripe', providers: ['stripe'] },
-    { id: 'paypal', providers: ['paypal'] },
-    { id: 'both', providers: ['stripe', 'paypal'] }
-  ];
-  let payChoice = $state('stripe');
-  let payProviders: StarterProvider[] = $derived(PAY_CHOICES.find((c) => c.id === payChoice)?.providers ?? ['stripe']);
+  // Any mix of the three; the last one chosen cannot be switched off — a shop needs a way to pay.
+  const PAY_CHOICES: StarterProvider[] = ['stripe', 'paypal', 'arranged'];
+  let payProviders: StarterProvider[] = $state(['stripe']);
+  function togglePay(p: StarterProvider) {
+    if (!payProviders.includes(p)) payProviders = PAY_CHOICES.filter((c) => c === p || payProviders.includes(c));
+    else if (payProviders.length > 1) payProviders = payProviders.filter((c) => c !== p);
+  }
   let rikmaUrl = $derived(rikmaApiUrl(base?.slug || projectId));
   // Vercel project names are lowercase letters, digits and dashes.
   let starterProject = $derived(
@@ -94,13 +94,16 @@
       <div class="cn-pay">
         <span class="cn-pay-label" id="cn-pay-label">{$t('shop.connect.payLabel')}</span>
         <div class="sh-pills" role="group" aria-labelledby="cn-pay-label">
-          {#each PAY_CHOICES as c (c.id)}
-            <button type="button" class="sh-pill" aria-pressed={payChoice === c.id} onclick={() => (payChoice = c.id)}>
-              {$t(`shop.connect.pay_${c.id}`)}
+          {#each PAY_CHOICES as c (c)}
+            <button type="button" class="sh-pill" aria-pressed={payProviders.includes(c)} onclick={() => togglePay(c)}>
+              {$t(`shop.connect.pay_${c}`)}
             </button>
           {/each}
         </div>
       </div>
+      {#if payProviders.includes('arranged')}
+        <p class="cn-hint">{$t('shop.connect.payArrangedHint')}</p>
+      {/if}
       <p class="cn-hint">{starterKey ? $t('shop.connect.starterDeployReady') : $t('shop.connect.starterDeployHint')}</p>
       <div class="cn-actions">
         <a class="sh-btn sh-btn-primary" href={deployHref} target="_blank" rel="noopener">{$t('shop.connect.starterDeploy')}</a>

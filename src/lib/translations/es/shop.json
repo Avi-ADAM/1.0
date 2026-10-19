@@ -285,7 +285,7 @@
     "recordDonation": "Registrar donación",
     "donationHint": "La donación se registra como una venta y entra en el reparto como cualquier ingreso.",
     "starterTitle": "Una tienda lista para tu sitio",
-    "starterBody": "Catálogo, selector de variantes, carrito y pago con Stripe o PayPal — conectados a la rikma. Se despliega en Vercel o Netlify con un clic, y cada pedido pagado llega aquí con sus datos de envío.",
+    "starterBody": "Catálogo, selector de variantes, carrito y pago con Stripe, PayPal o a convenir por teléfono — conectados a la rikma. Se despliega en Vercel o Netlify con un clic, y cada pedido llega aquí con sus datos de envío.",
     "starterDeploy": "Desplegar en Vercel",
     "starterRepo": "Código y guía",
     "recommended": "Recomendado",
@@ -307,10 +307,11 @@
     "siteBody": "Un fragmento que su sitio envía después de cada cobro — una venta por pago. La clave creada aquí solo reporta ventas y no sirve para la tienda lista.",
     "otherKeys": "¿Necesita una clave con otros permisos (tareas, catálogo)? Todas las claves y permisos —",
     "starterDeployReady": "La dirección de la rikma y la clave se completarán solas en el formulario de Vercel o Netlify — solo le queda ingresar los datos del proveedor de pago que eligió.",
-    "payLabel": "¿Cómo pagarán los compradores?",
+    "payLabel": "¿Cómo pagarán los compradores? (puede elegir varios)",
+    "payArrangedHint": "El comprador hace el pedido y deja su nombre y teléfono, sin pagar en el sitio. El pedido espera en la pestaña \"Pendientes de pago\", usted acuerda con él la transferencia del dinero y luego pulsa \"Pago recibido\". El formulario de despliegue también le pedirá el número de WhatsApp de la tienda (972…) — para el botón de la página de agradecimiento. La tienda funciona así incluso sin Stripe ni PayPal.",
     "pay_stripe": "Stripe",
     "pay_paypal": "PayPal",
-    "pay_both": "Ambos",
+    "pay_arranged": "A convenir — teléfono / WhatsApp",
     "starterDeployNetlify": "Desplegar en Netlify"
   },
   "empty": {

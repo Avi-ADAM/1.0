@@ -17,8 +17,13 @@ export function rikmaApiUrl(rikma: string | number): string {
   return `${PUBLIC_API_ORIGIN}/api/v1/r/${rikma}`;
 }
 
-/** The payment providers the starter ships with; it offers each one whose keys are set. */
-export type StarterProvider = 'stripe' | 'paypal';
+/**
+ * The ways to pay the starter ships with; it offers each one that is configured.
+ * `arranged` is no provider: the buyer leaves a phone number, the order waits in
+ * pendingPayment, and a member settles the money with them by phone or WhatsApp
+ * (PLAN_SHOP_OPERATIONS T1/T2). A shop with only `arranged` needs no payment keys.
+ */
+export type StarterProvider = 'stripe' | 'paypal' | 'arranged';
 
 export type StarterDeployOptions = {
   rikmaUrl?: string;
@@ -32,11 +37,13 @@ export type StarterDeployOptions = {
  * provider's keys are listed only when the member chose that provider —
  * listing both would force a PayPal-only shop to invent Stripe keys.
  * PAYPAL_WEBHOOK_ID stays out: the starter works without it, and the webhook
- * can only be added once the site has an address.
+ * can only be added once the site has an address. ARRANGED_EXPIRES_HOURS stays
+ * out as well — the starter's default (72h) is what most shops want.
  */
 const PROVIDER_ENV: Record<StarterProvider, string[]> = {
   stripe: ['STRIPE_SECRET_KEY', 'STRIPE_WEBHOOK_SECRET'],
-  paypal: ['PAYPAL_CLIENT_ID', 'PAYPAL_CLIENT_SECRET', 'PAYPAL_ENV']
+  paypal: ['PAYPAL_CLIENT_ID', 'PAYPAL_CLIENT_SECRET', 'PAYPAL_ENV'],
+  arranged: ['ARRANGED_PAYMENT', 'SHOP_WHATSAPP']
 };
 
 /**
@@ -44,7 +51,8 @@ const PROVIDER_ENV: Record<StarterProvider, string[]> = {
  * know. The rikma address always; the orders key only while the member still
  * holds the raw value, right after creating it — it is never stored, so a
  * later visit has nothing to put there. The payment keys are the member's own
- * and are always typed by them; only PAYPAL_ENV gets the starter's default.
+ * and are always typed by them; only PAYPAL_ENV and ARRANGED_PAYMENT get the
+ * starter's defaults (SHOP_WHATSAPP is the member's own number).
  */
 function starterEnv(opts: StarterDeployOptions) {
   const providers: StarterProvider[] = opts.providers?.length ? opts.providers : ['stripe'];
@@ -53,6 +61,7 @@ function starterEnv(opts: StarterDeployOptions) {
   if (opts.rikmaUrl) values.LEV_RIKMA_URL = opts.rikmaUrl;
   if (opts.ordersKey) values.LEV_ORDERS_KEY = opts.ordersKey;
   if (providers.includes('paypal')) values.PAYPAL_ENV = 'sandbox';
+  if (providers.includes('arranged')) values.ARRANGED_PAYMENT = 'phone,whatsapp';
   return { keys, values };
 }
 
