@@ -37,6 +37,9 @@ import {
   type SaleClaim
 } from './saleClaimShared.js';
 import { scope, decisionScope, scopeList } from '$lib/realtime/scopes.js';
+import { moveStock } from '$lib/shop/stock.js';
+import { readStockFlags, writeStock } from '$lib/server/shop/stockFlags.js';
+import type { ProbeRun } from '$lib/server/apiPublic/schemaProbe.js';
 
 /** Kinds whose branch notifies its own audience. */
 const INLINE_NOTICE_KINDS = new Set(['saleClaim', 'archiveObject', 'editObject', 'stipendProgram', 'stipendPledge']);
@@ -106,10 +109,17 @@ async function handleSaleClaimVote(
   if (version.unit != null && claim.matanotQuant != null && claim.matanotId) {
     const oldUnit = Number(claim.saleUnit ?? 0);
     const newUnit = Number(version.unit);
-    if (newUnit !== oldUnit && Number(claim.matanotQuant) !== -1) {
-      const adjustedQuant = Number(claim.matanotQuant) + (oldUnit - newUnit);
+    if (newUnit !== oldUnit) {
       try {
-        await strapi.execute('updateMatanotQuant', { id: claim.matanotId, quant: adjustedQuant }, context.jwt, context.fetch);
+        // "Unlimited" is the flag once deployed — a count of -1 is a queue of one (§2.5).
+        const stockRun: ProbeRun = (qid, vars) => strapi.execute(qid, vars, context.jwt, context.fetch);
+        const flags = await readStockFlags(stockRun, { productIds: [String(claim.matanotId)] });
+        const fresh = flags.products.get(String(claim.matanotId));
+        const next = moveStock(
+          { quant: fresh?.quant ?? claim.matanotQuant, unlimited: fresh?.unlimited ?? null },
+          oldUnit - newUnit
+        );
+        if (next) await writeStock(stockRun, { productId: String(claim.matanotId) }, next);
       } catch (err) {
         console.warn('[saleClaim] inventory delta failed:', err);
       }

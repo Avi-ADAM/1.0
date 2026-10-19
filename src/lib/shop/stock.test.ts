@@ -75,11 +75,11 @@ describe('count and writes', () => {
 
 // The filters are checked by evaluating them the way SQL would — `ne` and
 // `gt` are false on NULL — against every kind of row.
-function sqlMatch(filter: any, row: Record<string, unknown>): boolean {
+function sqlMatch(filter: any, row: Record<string, unknown> | StockFields): boolean {
   if (filter.or) return filter.or.some((f: any) => sqlMatch(f, row));
   if (filter.and) return filter.and.every((f: any) => sqlMatch(f, row));
   const [field, op] = Object.entries(filter)[0] as [string, Record<string, unknown>];
-  const v = row[field] ?? null;
+  const v = (row as Record<string, unknown>)[field] ?? null;
   const [k, want] = Object.entries(op)[0];
   if (k === 'null') return (v === null) === want;
   if (v === null) return false;

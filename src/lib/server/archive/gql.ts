@@ -53,6 +53,32 @@ export function dateField(name: string, value: unknown): string | null {
   return `${name}: ${gqlStr(d.toISOString())}`;
 }
 
+/**
+ * A JSON value as an inline GraphQL literal (Strapi's JSON scalar parses
+ * object and list literals). Object keys are emitted unquoted, so only plain
+ * identifiers survive — anything else is dropped rather than injected.
+ */
+export function jsonLiteral(value: unknown): string {
+  if (value === null || value === undefined) return 'null';
+  if (typeof value === 'number') return Number.isFinite(value) ? String(value) : 'null';
+  if (typeof value === 'boolean') return value ? 'true' : 'false';
+  if (typeof value === 'string') return gqlStr(value);
+  if (Array.isArray(value)) return `[${value.map(jsonLiteral).join(', ')}]`;
+  if (typeof value === 'object') {
+    const parts = Object.entries(value as Record<string, unknown>)
+      .filter(([k, v]) => /^[A-Za-z_][A-Za-z0-9_]*$/.test(k) && v !== undefined)
+      .map(([k, v]) => `${k}: ${jsonLiteral(v)}`);
+    return `{ ${parts.join(', ')} }`;
+  }
+  return 'null';
+}
+
+/** `field: <json>` — or nothing for null/undefined/an empty list. */
+export function jsonField(name: string, value: unknown): string | null {
+  if (value == null || (Array.isArray(value) && !value.length)) return null;
+  return `${name}: ${jsonLiteral(value)}`;
+}
+
 /** Join the non-null fragments produced by the helpers above. */
 export function fields(...parts: Array<string | null>): string {
   return parts.filter((p): p is string => p != null).join(', ');

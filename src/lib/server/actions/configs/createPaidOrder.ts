@@ -1,6 +1,7 @@
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { ActionError } from '../errors.js';
 import { createSaleHandler } from './createSale.js';
+import { readStockFlags, withFlag, type StockRowFlags } from '$lib/server/shop/stockFlags.js';
 import { formatMoney } from '$lib/money/format.js';
 import { rikmaCurrency } from '$lib/money/resolve.js';
 import { scope, scopeList } from '$lib/realtime/scopes.js';
@@ -69,18 +70,22 @@ const handler: ActionExecutionHandler = async (params, context, deps) => {
   const variantIds = [
     ...new Set(payload.lines.map((l) => l.variantId).filter((v): v is string => !!v))
   ];
-  const [projectRes, productsRes, variantsRes] = await Promise.all([
+  const [projectRes, productsRes, variantsRes, flags] = await Promise.all([
     run('ordersApiProject', { pid: projectId }),
     run('ordersApiProducts', { pid: projectId, ids: productIds }),
     variantIds.length
       ? run('ordersApiVariants', { pid: projectId, ids: variantIds })
-      : Promise.resolve(null)
+      : Promise.resolve(null),
+    // The `unlimited` flag beside each row, once deployed — so a variant
+    // oversold to -1 is not read as unlimited by the next order (§2.5).
+    readStockFlags(run, { productIds, variantIds })
   ]);
+  const flagged = (n: any, f: StockRowFlags | undefined) => ({ ...n, attributes: withFlag(n.attributes, f) });
   const products = new Map<string, any>(
-    (productsRes?.data?.matanots?.data ?? []).map((n: any) => [String(n.id), n])
+    (productsRes?.data?.matanots?.data ?? []).map((n: any) => [String(n.id), flagged(n, flags.products.get(String(n.id)))])
   );
   const variants = new Map<string, any>(
-    (variantsRes?.data?.productVariants?.data ?? []).map((n: any) => [String(n.id), n])
+    (variantsRes?.data?.productVariants?.data ?? []).map((n: any) => [String(n.id), flagged(n, flags.variants.get(String(n.id)))])
   );
 
   // 3. Decide everything before writing anything.
@@ -250,7 +255,8 @@ const handler: ActionExecutionHandler = async (params, context, deps) => {
       stockChanges.set(`v:${line.variantId}`, {
         productId: line.productId,
         variantId: line.variantId,
-        quant: sale.newVariantQuantity
+        quant: sale.newVariantQuantity,
+        unlimited: false
       });
     }
     if (!line.variantId && typeof sale.newQuantity === 'number') {

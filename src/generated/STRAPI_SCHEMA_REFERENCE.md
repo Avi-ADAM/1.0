@@ -877,6 +877,7 @@ These are the main content types in the Strapi backend.
 | `locale` | `Maybe<Scalars['String']['output']>` |
 | `localizations` | `Maybe<MatanotRelationResponseCollection>` |
 | `location` | `Maybe<ComponentNewLocation>` |
+| `lowStockAt` | `Maybe<Scalars['Float']['output']>` |
 | `marginPct` | `Maybe<Scalars['Float']['output']>` |
 | `mashaabims` | `Maybe<MashaabimRelationResponseCollection>` |
 | `matanot_recipe_missions` | `Maybe<MatanotRecipeMissionRelationResponseCollection>` |
@@ -921,8 +922,10 @@ These are the main content types in the Strapi backend.
 | `startDate` | `Maybe<Scalars['DateTime']['output']>` |
 | `status_of_voting` | `Maybe<Enum_Matanot_Status_Of_Voting>` |
 | `stockTotal` | `Maybe<Scalars['Float']['output']>` |
+| `stockUnlimited` | `Maybe<Scalars['Boolean']['output']>` |
 | `timegrama` | `Maybe<TimegramaEntityResponse>` |
 | `unit` | `Maybe<Scalars['String']['output']>` |
+| `unlimited` | `Maybe<Scalars['Boolean']['output']>` |
 | `updatedAt` | `Maybe<Scalars['DateTime']['output']>` |
 | `variantAxes` | `Maybe<Scalars['JSON']['output']>` |
 | `variants` | `Maybe<ProductVariantRelationResponseCollection>` |
@@ -1865,6 +1868,7 @@ These are the main content types in the Strapi backend.
 | `currencyCode` | `Maybe<Scalars['String']['output']>` |
 | `deliveryAddress` | `Maybe<Scalars['JSON']['output']>` |
 | `deliveryPreference` | `Maybe<Enum_Order_Deliverypreference>` |
+| `displayNumber` | `Maybe<Scalars['String']['output']>` |
 | `expiresAt` | `Maybe<Scalars['DateTime']['output']>` |
 | `externalId` | `Maybe<Scalars['String']['output']>` |
 | `fulfilledAt` | `Maybe<Scalars['DateTime']['output']>` |
@@ -2164,6 +2168,7 @@ These are the main content types in the Strapi backend.
 | `quant` | `Maybe<Scalars['Float']['output']>` |
 | `sales` | `Maybe<SaleRelationResponseCollection>` |
 | `sku` | `Scalars['String']['output']` |
+| `unlimited` | `Maybe<Scalars['Boolean']['output']>` |
 | `updatedAt` | `Maybe<Scalars['DateTime']['output']>` |
 | `weightGrams` | `Maybe<Scalars['Int']['output']>` |
 
@@ -3909,6 +3914,7 @@ These are Strapi components (reusable field groups).
 | `sqadualed` | `Maybe<Scalars['DateTime']['output']>` |
 | `sqadualedf` | `Maybe<Scalars['DateTime']['output']>` |
 | `transferTo` | `Maybe<MesimabetahalichEntityResponse>` |
+| `variants` | `Maybe<Scalars['JSON']['output']>` |
 | `why` | `Maybe<Scalars['String']['output']>` |
 | `zman` | `Maybe<Scalars['DateTime']['output']>` |
 
@@ -3936,6 +3942,7 @@ These are Strapi components (reusable field groups).
 | `sqadualed` | `InputMaybe<DateTimeFilterInput>` |
 | `sqadualedf` | `InputMaybe<DateTimeFilterInput>` |
 | `transferTo` | `InputMaybe<MesimabetahalichFiltersInput>` |
+| `variants` | `InputMaybe<JsonFilterInput>` |
 | `why` | `InputMaybe<StringFilterInput>` |
 | `zman` | `InputMaybe<DateTimeFilterInput>` |
 
@@ -3961,6 +3968,7 @@ These are Strapi components (reusable field groups).
 | `sqadualed` | `InputMaybe<Scalars['DateTime']['input']>` |
 | `sqadualedf` | `InputMaybe<Scalars['DateTime']['input']>` |
 | `transferTo` | `InputMaybe<Scalars['ID']['input']>` |
+| `variants` | `InputMaybe<Scalars['JSON']['input']>` |
 | `why` | `InputMaybe<Scalars['String']['input']>` |
 | `zman` | `InputMaybe<Scalars['DateTime']['input']>` |
 
@@ -5991,6 +5999,7 @@ Used for creating/updating content.
 | `lifecycle` | `InputMaybe<Enum_Matanot_Lifecycle>` |
 | `lng` | `InputMaybe<Scalars['Float']['input']>` |
 | `location` | `InputMaybe<ComponentNewLocationInput>` |
+| `lowStockAt` | `InputMaybe<Scalars['Float']['input']>` |
 | `marginPct` | `InputMaybe<Scalars['Float']['input']>` |
 | `mashaabims` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `matanot_recipe_missions` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
@@ -6035,8 +6044,10 @@ Used for creating/updating content.
 | `startDate` | `InputMaybe<Scalars['DateTime']['input']>` |
 | `status_of_voting` | `InputMaybe<Enum_Matanot_Status_Of_Voting>` |
 | `stockTotal` | `InputMaybe<Scalars['Float']['input']>` |
+| `stockUnlimited` | `InputMaybe<Scalars['Boolean']['input']>` |
 | `timegrama` | `InputMaybe<Scalars['ID']['input']>` |
 | `unit` | `InputMaybe<Scalars['String']['input']>` |
+| `unlimited` | `InputMaybe<Scalars['Boolean']['input']>` |
 | `variantAxes` | `InputMaybe<Scalars['JSON']['input']>` |
 | `variants` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 
@@ -6510,6 +6521,7 @@ Used for creating/updating content.
 | `currencyCode` | `InputMaybe<Scalars['String']['input']>` |
 | `deliveryAddress` | `InputMaybe<Scalars['JSON']['input']>` |
 | `deliveryPreference` | `InputMaybe<Enum_Order_Deliverypreference>` |
+| `displayNumber` | `InputMaybe<Scalars['String']['input']>` |
 | `expiresAt` | `InputMaybe<Scalars['DateTime']['input']>` |
 | `externalId` | `InputMaybe<Scalars['String']['input']>` |
 | `fulfilledAt` | `InputMaybe<Scalars['DateTime']['input']>` |
@@ -6767,6 +6779,7 @@ Used for creating/updating content.
 | `quant` | `InputMaybe<Scalars['Float']['input']>` |
 | `sales` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `sku` | `InputMaybe<Scalars['String']['input']>` |
+| `unlimited` | `InputMaybe<Scalars['Boolean']['input']>` |
 | `weightGrams` | `InputMaybe<Scalars['Int']['input']>` |
 
 ### ProjectInput
@@ -8191,7 +8204,7 @@ Fields: `and`, `bakashas`, `createdAt`, `descrip`, `id`, `kindOf`, `linkto`, `lo
 Fields: `allowOverdelivery`, `and`, `archiveEffectiveFrom`, `archive_decisions`, `createdAt`, `currency`, `cycleSize`, `descrip`, `dormancyDays`, `end`, `entryCurrency`, `entryRate`, `finnished`, `forappruval`, `forums`, `hoursassigned`, `howmanyhoursalready`, `id`, `isMust`, `isStipend`, `isYesod`, `kindOf`, `lifecycle`, `maaps`, `mashaabim`, `matanot_recipe_resources`, `name`, `not`, `or`, `partofs`, `perhour`, `pmash`, `pricePerUnit`, `project`, `publishedAt`, `quantityAssigned`, `quantityDelivered`, `recurring`, `reservedQuantity`, `rikmash`, `start`, `status_mashab`, `stipend_pledge`, `summarizeOnClose`, `timegrama`, `timers`, `unit`, `updatedAt`, `users_permissions_user`
 
 #### MatanotFiltersInput
-Fields: `and`, `appruved`, `archiveEffectiveFrom`, `archive_decisions`, `archived`, `attributes`, `bakashas`, `categories`, `createdAt`, `currency`, `decision`, `deliveryOptions`, `desc`, `discoveryKeywords`, `entryCurrency`, `entryRate`, `estimatedPrice`, `externalKey`, `finnishDate`, `fixPrice`, `hasVariants`, `hideFromDiscovery`, `id`, `kindOf`, `lat`, `leadTimeHours`, `lifecycle`, `lng`, `locale`, `localizations`, `location`, `marginPct`, `mashaabims`, `matanot_recipe_missions`, `matanot_recipe_resources`, `matanotpend`, `maxOrder`, `maxsaleyearone`, `maxsaleyearsec`, `minOrder`, `minsaleyearone`, `minsaleyearsec`, `missions`, `name`, `negos`, `not`, `oneForeProject`, `options`, `or`, `origin`, `owner_user`, `partofs`, `price`, `priceMax`, `priceMin`, `pricingMode`, `process`, `projectcreates`, `publishedAt`, `quant`, `radius`, `ratson`, `ratson_proposals`, `ratsons`, `sale`, `sales`, `sheirut_fulfillments`, `sheirutpends`, `sheiruts`, `shopNote`, `source_proposals`, `sp`, `startDate`, `status_of_voting`, `stockTotal`, `timegrama`, `unit`, `updatedAt`, `variantAxes`, `variants`
+Fields: `and`, `appruved`, `archiveEffectiveFrom`, `archive_decisions`, `archived`, `attributes`, `bakashas`, `categories`, `createdAt`, `currency`, `decision`, `deliveryOptions`, `desc`, `discoveryKeywords`, `entryCurrency`, `entryRate`, `estimatedPrice`, `externalKey`, `finnishDate`, `fixPrice`, `hasVariants`, `hideFromDiscovery`, `id`, `kindOf`, `lat`, `leadTimeHours`, `lifecycle`, `lng`, `locale`, `localizations`, `location`, `lowStockAt`, `marginPct`, `mashaabims`, `matanot_recipe_missions`, `matanot_recipe_resources`, `matanotpend`, `maxOrder`, `maxsaleyearone`, `maxsaleyearsec`, `minOrder`, `minsaleyearone`, `minsaleyearsec`, `missions`, `name`, `negos`, `not`, `oneForeProject`, `options`, `or`, `origin`, `owner_user`, `partofs`, `price`, `priceMax`, `priceMin`, `pricingMode`, `process`, `projectcreates`, `publishedAt`, `quant`, `radius`, `ratson`, `ratson_proposals`, `ratsons`, `sale`, `sales`, `sheirut_fulfillments`, `sheirutpends`, `sheiruts`, `shopNote`, `source_proposals`, `sp`, `startDate`, `status_of_voting`, `stockTotal`, `stockUnlimited`, `timegrama`, `unit`, `unlimited`, `updatedAt`, `variantAxes`, `variants`
 
 #### MatanotRecipeMissionFiltersInput
 Fields: `and`, `assignedMember`, `costShape`, `createdAt`, `hoursPerUnit`, `id`, `matanot`, `mesimabetahalich`, `mode`, `nego`, `not`, `notes`, `or`, `partof`, `pendm`, `publishedAt`, `ratePerHour`, `stepCapacity`, `unitsPerProduct`, `updatedAt`
@@ -8251,7 +8264,7 @@ Fields: `and`, `archiveEffectiveFrom`, `archive_decisions`, `archived`, `askms`,
 Fields: `acts`, `and`, `archiveEffectiveFrom`, `archive_decisions`, `archived`, `asks`, `createdAt`, `dates`, `declined`, `descrip`, `dormancyDays`, `entryCurrency`, `entryRate`, `extractedKey`, `hatzaas`, `hearotMeyuchadot`, `howMeny`, `id`, `isMust`, `isRishon`, `isYesod`, `isglobal`, `iskvua`, `isshift`, `lifecycle`, `locale`, `localizations`, `location`, `maagad`, `match_suggestions`, `mesimabetahaliches`, `mission`, `name`, `negopendmissions`, `noofhours`, `not`, `or`, `partofs`, `pendm`, `perhour`, `pledges`, `privatlinks`, `project`, `publicklinks`, `publishedAt`, `ratson`, `ratson_proposals`, `rishon`, `rishonves`, `skills`, `source`, `sqadualed`, `stipendCostShare`, `stipendFunder`, `stipendMode`, `stipendRate`, `stipend_pledges`, `tafkidims`, `timegrama`, `updatedAt`, `users`, `usersNotRelevant`, `vallues`, `work_ways`
 
 #### OrderFiltersInput
-Fields: `and`, `archived`, `buyerEmail`, `buyerName`, `buyerPhone`, `buyer_user`, `createdAt`, `currencyCode`, `deliveryAddress`, `deliveryPreference`, `expiresAt`, `externalId`, `fulfilledAt`, `holder`, `id`, `lines`, `locale`, `not`, `note`, `or`, `oversold`, `paidAt`, `paymentMethod`, `paymentRef`, `project`, `publicTokenHash`, `ref`, `requestedDate`, `sales`, `sheirutpends`, `shippedAt`, `source`, `status`, `total`, `updatedAt`
+Fields: `and`, `archived`, `buyerEmail`, `buyerName`, `buyerPhone`, `buyer_user`, `createdAt`, `currencyCode`, `deliveryAddress`, `deliveryPreference`, `displayNumber`, `expiresAt`, `externalId`, `fulfilledAt`, `holder`, `id`, `lines`, `locale`, `not`, `note`, `or`, `oversold`, `paidAt`, `paymentMethod`, `paymentRef`, `project`, `publicTokenHash`, `ref`, `requestedDate`, `sales`, `sheirutpends`, `shippedAt`, `source`, `status`, `total`, `updatedAt`
 
 #### OrderLineFiltersInput
 Fields: `and`, `createdAt`, `currencyCode`, `id`, `imageUrlSnapshot`, `lineTotal`, `matanot`, `nameSnapshot`, `not`, `note`, `optionLabelSnapshot`, `or`, `order`, `position`, `quantity`, `skuSnapshot`, `unitPrice`, `updatedAt`, `variant`
@@ -8284,7 +8297,7 @@ Fields: `aiMeta`, `and`, `arguments`, `author`, `authorEmail`, `authorExternalId
 Fields: `active`, `and`, `archived`, `createdAt`, `id`, `key`, `locale`, `localizations`, `name`, `not`, `or`, `position`, `project`, `updatedAt`, `values`
 
 #### ProductVariantFiltersInput
-Fields: `active`, `and`, `axisKey`, `barcode`, `compareAtPrice`, `createdAt`, `externalKey`, `id`, `matanot`, `name`, `not`, `optionValues`, `or`, `position`, `price`, `project`, `quant`, `sales`, `sku`, `updatedAt`, `weightGrams`
+Fields: `active`, `and`, `axisKey`, `barcode`, `compareAtPrice`, `createdAt`, `externalKey`, `id`, `matanot`, `name`, `not`, `optionValues`, `or`, `position`, `price`, `project`, `quant`, `sales`, `sku`, `unlimited`, `updatedAt`, `weightGrams`
 
 #### ProjectFiltersInput
 Fields: `acts`, `addHoursManualy`, `and`, `api_keys`, `askms`, `asks`, `askwants`, `assistant_sessions`, `city`, `codeLicense`, `codeLicenseOpenYears`, `codeLicenseSince`, `countries`, `createdAt`, `currencyCode`, `deals`, `decisions`, `deffinitions`, `descripFor`, `discordlink`, `dormancyDays`, `drivelink`, `fblink`, `finiapruvals`, `finnishedM72HForDecline`, `finnishedMAllApruve`, `finnished_missions`, `formerSlugs`, `forums`, `githublink`, `haamadapruvs`, `haamadas`, `halukas`, `halukas_recive`, `id`, `isMachzikim`, `isMachzikimPublik`, `isOt`, `isPlatform`, `joinPolicy`, `linkToWebsite`, `locale`, `localizations`, `location`, `look`, `maaps`, `machshirs`, `mashaabims`, `mashabetahaliches`, `matanotofs`, `mesimabetahaliches`, `missions`, `newMeMissionOuto72ho`, `newOpenMissionAllApruve`, `newOpenMotoAfter72hoursWithnono`, `newmeOpenAllapruve`, `not`, `open_mashaabims`, `open_missions`, `or`, `pendms`, `pledges`, `pmashes`, `projectName`, `project_plan_boards`, `project_repos`, `publicDescription`, `publishedAt`, `ratson_proposals`, `ratsons_offered`, `resource_bookings`, `restime`, `rikmashes`, `sales`, `sales_source`, `sheirutpends`, `sheiruts`, `sheiruts_sourced`, `shiftCloseOffsetHours`, `shiftCycleDays`, `shiftDraftWindowHours`, `shift_plans`, `site_share_contributions`, `slug`, `space_docs`, `spirit`, `sps`, `stipendDefaultCostShare`, `stipendDefaultRate`, `stipendPolicy`, `stipend_payments`, `stipend_pledges`, `stipend_programs`, `supportPage`, `tafkidims`, `timeToP`, `timerOnlyTOrAlsoManuallyF`, `timers`, `tosplits`, `totalinyearone`, `totalinyearsec`, `totalmaxyearone`, `totalmaxyearsec`, `totalminyearone`, `totalminyearsec`, `twiterlink`, `updatedAt`, `user_1s`, `usersOfP`, `vallues`, `watsapplink`, `welcom_tops`, `work_ways`, `zohars`
@@ -9140,7 +9153,7 @@ Wrapper types for GraphQL responses.
 ```
 src/
 ├── generated/
-│   ├── graphql.ts              # Auto-generated types (codegen) - 23590 lines
+│   ├── graphql.ts              # Auto-generated types (codegen) - 23608 lines
 │   ├── index.ts                # Re-export hub
 │   └── STRAPI_SCHEMA_REFERENCE.md  # This file (AI agent reference)
 ├── lib/

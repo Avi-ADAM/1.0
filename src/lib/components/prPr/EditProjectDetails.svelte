@@ -311,8 +311,8 @@
   }
 </script>
 
-<div {dir} class="edit-project-details space-y-5 p-4 bg-white rounded-xl shadow-md">
-  <h2 class="text-xl font-bold text-primary">{$t('project.editDetails.title')}</h2>
+<div {dir} class="edit-project-details space-y-5 p-4 bg-surface text-surfaceInk rounded-xl shadow-md">
+  <h2 class="text-xl font-bold text-surfaceInk">{$t('project.editDetails.title')}</h2>
 
   {#if isMultiUser}
     <div class="bg-amber-50 border border-amber-300 text-amber-800 rounded-lg p-3 text-sm">
@@ -343,7 +343,7 @@
   <!-- Profile Pic -->
   <div class="field-group">
     <label class="field-label">{$t('project.editDetails.uploadPic')}</label>
-    <div class="flex justify-center bg-gray-50 rounded-lg p-4 border-2 border-dashed border-gold/30">
+    <div class="flex justify-center bg-surface2 rounded-lg p-4 border-2 border-dashed border-surfaceLine">
       <Uplad onMessage={handleUpload} current={srcP} noHeader={true} />
     </div>
   </div>
@@ -359,7 +359,7 @@
       disabled={currencySaving}
       onchange={saveCurrency}
     />
-    <small class="text-gold">{$t('money.rikma.desc')}</small>
+    <small class="text-surfaceMuted">{$t('money.rikma.desc')}</small>
     {#if currencyMsg}<small class="text-green-600 block" role="status">{currencyMsg}</small>{/if}
     {#if currencyErr}<small class="text-red-600 block" role="alert">{currencyErr}</small>{/if}
   </div>
@@ -417,7 +417,7 @@
         bind:value={codeLicenseOpenYears}
       />
     {/if}
-    <small class="text-gold">{$t('project.editDetails.codeLicenseNote')}</small>
+    <small class="text-surfaceMuted">{$t('project.editDetails.codeLicenseNote')}</small>
   </div>
 
   <!-- Facebook -->
@@ -459,7 +459,7 @@
       <option value="nsh">{$t('project.editDetails.restime96')}</option>
       <option value="sevend">{$t('project.editDetails.restimeWeek')}</option>
     </select>
-    <small class="text-gold">{$t('project.editDetails.restimeNote')}</small>
+    <small class="text-surfaceMuted">{$t('project.editDetails.restimeNote')}</small>
   </div>
 
   <!-- Values -->
@@ -470,10 +470,10 @@
         bind:selected={selectedVallueNames}
         options={allVallues.map((v) => v.attributes.valueName)}
         placeholder={$t('project.editDetails.addValue')}
-        --sms-li-selected-bg="var(--gold)"
-        outerDivClass="!bg-gold !text-barbi"
-        inputClass="!bg-gold !text-barbi"
-        liSelectedClass="!bg-barbi !text-gold"
+        --sms-li-selected-bg="var(--barbi-pink)"
+        outerDivClass="!bg-surface2 !text-surfaceInk !border-surfaceLine"
+        inputClass="!bg-transparent !text-surfaceInk"
+        liSelectedClass="!bg-barbi !text-white"
       />
     </div>
   {/if}
@@ -517,19 +517,23 @@
   }
   .field-label {
     font-size: 13px;
-    color: var(--barbi-pink);
+    color: var(--surface-ink);
     font-weight: 500;
   }
   .field-input,
   .field-select {
     background: transparent;
     border: none;
-    border-bottom: 1px solid var(--gold);
+    border-bottom: 1px solid var(--surface-muted);
     padding: 8px 0;
     font-size: 14px;
-    color: var(--barbi-pink);
+    color: var(--surface-ink);
     outline: none;
     width: 100%;
+  }
+  .field-select option {
+    background: var(--surface);
+    color: var(--surface-ink);
   }
   .field-input:focus,
   .field-select:focus {
@@ -548,13 +552,13 @@
     cursor: not-allowed;
   }
   .btn-secondary {
-    border: 1px solid var(--gold);
-    color: var(--barbi-pink);
+    border: 1px solid var(--surface-muted);
+    color: var(--surface-ink);
     padding: 10px 24px;
     border-radius: 9999px;
     transition: background 0.2s;
   }
   .btn-secondary:hover {
-    background: rgba(0, 0, 0, 0.05);
+    background: var(--surface-2);
   }
 </style>

@@ -37,6 +37,8 @@ export function resetStockFlagsVerdict(): void {
 export interface StockRowFlags {
   quant: number | null;
   unlimited: boolean | null;
+  /** A product's derived "any active variant is unlimited" (beside `stockTotal`). */
+  stockUnlimited?: boolean | null;
 }
 
 export interface StockFlags {
@@ -48,10 +50,13 @@ export interface StockFlags {
 function rowFlags(attrs: any): StockRowFlags {
   const q = attrs?.quant;
   const n = q === null || q === undefined ? null : Number(q);
-  return {
+  const out: StockRowFlags = {
     quant: n !== null && Number.isFinite(n) ? n : null,
     unlimited: typeof attrs?.unlimited === 'boolean' ? attrs.unlimited : null
   };
+  if (attrs && 'stockUnlimited' in attrs)
+    out.stockUnlimited = typeof attrs.stockUnlimited === 'boolean' ? attrs.stockUnlimited : null;
+  return out;
 }
 
 /**

@@ -21,7 +21,12 @@ const cases: Array<[string, Parameters<typeof deriveProductFields>]> = [
   ['a quote product', [{ price: null, quant: 3 }, [], null]],
   ['variants', [{ price: 500, quant: 99 }, variants, options]],
   ['an unlimited variant', [{ price: 500 }, [...variants, { price: 10, quant: -1, active: true, optionValues: '[]' }], options]],
-  ['every variant off', [{ price: 500, quant: 9 }, [{ ...variants[2] }], options]]
+  ['every variant off', [{ price: 500, quant: 9 }, [{ ...variants[2] }], options]],
+  ['a plain product oversold by one', [{ price: 120, quant: -1, unlimited: false }, [], null]],
+  ['a plain product flagged unlimited', [{ price: 120, quant: 3, unlimited: true }, [], null]],
+  ['a counted plain product without a number', [{ price: 120, quant: null, unlimited: false }, [], null]],
+  ['a variant oversold by one', [{ price: 500 }, [{ price: 10, quant: -1, unlimited: false, active: true }, { price: 10, quant: 0, unlimited: false, active: true }], null]],
+  ['a variant flagged unlimited', [{ price: 500 }, [{ price: 10, quant: 4, unlimited: true, active: true }, { price: 10, quant: 2, active: true }], null]]
 ];
 
 describe('deriveProductFields', () => {
@@ -31,9 +36,22 @@ describe('deriveProductFields', () => {
       priceMin: 120,
       priceMax: 120,
       stockTotal: 7,
+      stockUnlimited: false,
       variantAxes: null
     });
-    expect(deriveProductFields({ price: 120, quant: null }, []).stockTotal).toBe(-1);
+    // A row from before the flag: no number read as unlimited, as it always was.
+    expect(deriveProductFields({ price: 120, quant: null }, [])).toMatchObject({ stockTotal: -1, stockUnlimited: true });
+  });
+
+  it('a counted stock that lands on -1 is a queue of one, not unlimited (§2.5)', () => {
+    expect(deriveProductFields(...cases[6][1])).toMatchObject({ stockTotal: -1, stockUnlimited: false });
+    expect(deriveProductFields(...cases[9][1])).toMatchObject({ stockTotal: -1, stockUnlimited: false });
+    expect(deriveProductFields(...cases[8][1])).toMatchObject({ stockTotal: 0, stockUnlimited: false });
+  });
+
+  it('the flag decides, whatever the number beside it', () => {
+    expect(deriveProductFields(...cases[7][1])).toMatchObject({ stockTotal: -1, stockUnlimited: true });
+    expect(deriveProductFields(...cases[10][1])).toMatchObject({ stockTotal: -1, stockUnlimited: true });
   });
 
   it('counts only active variants, a variant without a price costs the product price', () => {
@@ -46,11 +64,11 @@ describe('deriveProductFields', () => {
   });
 
   it('one unlimited variant makes the product unlimited', () => {
-    expect(deriveProductFields(...cases[4][1]).stockTotal).toBe(-1);
+    expect(deriveProductFields(...cases[4][1])).toMatchObject({ stockTotal: -1, stockUnlimited: true });
   });
 
   it('a product whose variants are all off stays sold by variant, with nothing to sell', () => {
-    expect(deriveProductFields(...cases[5][1])).toMatchObject({ hasVariants: true, stockTotal: 0, priceMin: null });
+    expect(deriveProductFields(...cases[5][1])).toMatchObject({ hasVariants: true, stockTotal: 0, stockUnlimited: false, priceMin: null });
   });
 
   // The Strapi lifecycle carries the same function in plain JS. When the

@@ -23,6 +23,9 @@ import { loadMissionDeal, notifyDealClientsOfEdit, syncDealLine } from '$lib/ser
 import { raisesPart } from '$lib/sheirut/dealEdit.js';
 import { scope, decisionScope, scopeList } from '$lib/realtime/scopes.js';
 import { objectScope } from '../../realtime/objectScope.js';
+import { ActionError } from '../errors.js';
+import { noticeSubject } from '$lib/notices/links';
+import { parseVariantTerms, variantTermsLive, variantTermsSummary } from '$lib/server/archive/variantTerms.js';
 
 const KIND_OFS = ['total', 'monthly', 'yearly', 'perUnit', 'rent', 'unlimited', 'daily'];
 
@@ -65,6 +68,7 @@ function buildRound(values: Record<string, any>, why: string): StandingRound {
 }
 
 function hasAnyChange(round: StandingRound): boolean {
+  if (round.variants?.length) return true;
   return [
     round.name, round.descrip, round.hm, round.price, round.kindOf, round.sqadualed, round.sqadualedf,
     round.shiftsMin, round.shiftsMax, round.howMany,
@@ -96,7 +100,22 @@ const handler: ActionExecutionHandler = async (params, context, { notifier, stra
     throw new Error('Only a member of the rikma may propose changes to its objects');
   }
 
-  const round = { ...buildRound(values, why), ...shiftTerms(values, targetKind) };
+  const round: StandingRound = { ...buildRound(values, why), ...shiftTerms(values, targetKind) };
+
+  // A product's variant terms — new variants, moved variant prices
+  // (PLAN_SHOP_CUSTOMER_EXPERIENCE §4 principle 6, $lib/server/archive/variantTerms).
+  // Refused, not dropped, while `negoarch.variants` is not deployed: a vote
+  // on a price that silently vanished from the round would be worse than none.
+  const variantTerms = targetKind === 'matanot' ? parseVariantTerms(values.variants) : [];
+  if (variantTerms.length) {
+    if (!(await variantTermsLive(exec))) {
+      throw new ActionError('VARIANT_TERMS_NOT_READY', 'Variant prices cannot be proposed until the schema is deployed');
+    }
+    round.variants = variantTerms;
+    // The lev card shows the reason — a partner asked to approve a price has to see it.
+    const summary = variantTermsSummary(variantTerms, 'he');
+    round.why = [why, summary].filter(Boolean).join('\n');
+  }
   if (!hasAnyChange(round)) throw new Error('Nothing to change - send at least one new value');
 
   const otherMembers = target.memberIds.filter((id) => id !== userId);
@@ -135,7 +154,7 @@ const handler: ActionExecutionHandler = async (params, context, { notifier, stra
     round,
     scope: 'archive',
     source: 'user',
-    why: why || null,
+    why: round.why || null,
     initiatorId: userId,
     decisionName: `עדכון: ${target.name}`,
   });
@@ -159,8 +178,8 @@ const handler: ActionExecutionHandler = async (params, context, { notifier, stra
               en: `Proposed change: ${target.name}`,
             },
             body: {
-              he: `${why || 'ללא נימוק'} - האובייקט נשאר, רק הפרטים משתנים. אפשר לאשר, להציע נוסחה אחרת או לפתוח שיחה.`,
-              en: `${why || 'No reason given'} - the object stays, only its terms change. Approve, propose different terms, or open a discussion. No response within ${restimeLabel(target.projectRestime, 'en')} approves it.`,
+              he: `${round.why || 'ללא נימוק'} -האובייקט נשאר, רק הפרטים משתנים. אפשר לאשר, להציע נוסחה אחרת או לפתוח שיחה.`,
+              en: `${[why, round.variants?.length ? variantTermsSummary(round.variants, 'en') : ''].filter(Boolean).join('\n') || 'No reason given'} -the object stays, only its terms change. Approve, propose different terms, or open a discussion. No response within ${restimeLabel(target.projectRestime, 'en')} approves it.`,
             },
           },
           // Silence approves it — every member has to hear that the clock is running.
@@ -204,7 +223,7 @@ export const proposeObjectEditConfig: ActionConfig = {
   paramSchema: {
     targetKind: { type: 'string', required: true, description: 'openMission | missionInProgress | openResource | resourceInProgress | matanot' },
     targetId: { type: 'string', required: true, description: 'Id of the object' },
-    newValues: { type: 'object', required: true, description: 'Proposed values: { name, descrip, hm, price, kindOf, sqadualed, sqadualedf }' },
+    newValues: { type: 'object', required: true, description: 'Proposed values: { name, descrip, hm, price, kindOf, sqadualed, sqadualedf }; on a product also `variants` (new variants / variant prices, $lib/shop/variantEditor VariantTerm[])' },
     why: { type: 'string', required: false, description: 'Why the change is proposed' },
   },
 

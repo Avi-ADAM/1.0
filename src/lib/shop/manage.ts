@@ -12,8 +12,13 @@
  * they think "to pack".
  */
 
-/** Stock `-1` is "unlimited", everywhere in the platform. */
-export const UNLIMITED = -1;
+/**
+ * Stock in these shapes: a number is a count — below zero is the production
+ * queue, and `-1` is one unit waiting — and `null` is "unlimited". The
+ * loaders read Strapi's `quant` + `unlimited` flag through `$lib/shop/stock.ts`
+ * and hand over that one meaning; nothing here ever reads `-1` as a sentinel.
+ */
+import { countedWrite, unlimitedWrite, type StockWrite } from './stock';
 
 export type OrderStatus = 'paid' | 'shipped' | 'fulfilled' | 'cancelled';
 export type DeliveryPreference = 'pickup' | 'delivery' | 'digital' | 'contact';
@@ -170,8 +175,9 @@ export function itemCountOf(lines: Pick<ShopOrderLine, 'quantity'>[]): number {
 
 /**
  * How many units the stock does not cover right now. `stock` is the current
- * quantity of each variant (`v:<id>`) and product (`p:<id>`). Below zero is
- * the production queue (§2.5) — `-1` itself is "unlimited", never a shortfall.
+ * count of each *counted* variant (`v:<id>`) and product (`p:<id>`) — an
+ * unlimited one is simply not in the map. Below zero is the production queue
+ * (§2.5), so a count of `-1` is one unit short.
  * An order that is not oversold, or no longer waiting, is never short.
  */
 export function shortUnitsOf(
@@ -183,7 +189,7 @@ export function shortUnitsOf(
   for (const line of order.lines) {
     const key = line.variantId ? `v:${line.variantId}` : line.productId ? `p:${line.productId}` : null;
     const q = key ? stock.get(key) : undefined;
-    if (q === undefined || q === UNLIMITED || q >= 0) continue;
+    if (q === undefined || q >= 0) continue;
     short += Math.min(line.quantity, -q);
   }
   return short;
@@ -269,12 +275,13 @@ export function mayCancel(order: Pick<ShopOrder, 'status' | 'holderId'>, uid: st
 export type StockState = 'unlimited' | 'short' | 'out' | 'low' | 'ok';
 
 /**
- * One stock number, as the seller should read it. `lowAt` is the product's
+ * One stock number, as the seller should read it (`null` = unlimited, a
+ * negative count = units waiting to be made). `lowAt` is the product's
  * own threshold (`matanot.lowStockAt`) — empty means "never low": a level
  * nobody chose is not a level (UX_COPY §5).
  */
 export function stockStateOf(quant: number | null, lowAt: number | null = null): StockState {
-  if (quant === null || quant === UNLIMITED) return 'unlimited';
+  if (quant === null) return 'unlimited';
   if (quant < 0) return 'short';
   if (quant === 0) return 'out';
   if (lowAt !== null && lowAt > 0 && quant <= lowAt) return 'low';
@@ -287,15 +294,21 @@ export type StockMode = 'set' | 'add';
  * The stock after an update: "in stock now" replaces the number, "add" adds a
  * delivery that came in (UX_COPY §5 — two questions, two modes). Adding to a
  * production queue (below zero) fills it first. Unlimited stays unlimited on
- * an add: there is nothing to count. `null` = not a valid update.
+ * an add: there is nothing to count. `before` is `null` when unlimited; the
+ * answer is what to write, or `null` = not a valid update.
  */
-export function nextStock(before: number | null, mode: StockMode, value: number, unlimited = false): number | null {
-  if (unlimited) return UNLIMITED;
+export function nextStock(before: number | null, mode: StockMode, value: number, unlimited = false): StockWrite | null {
+  if (unlimited) return unlimitedWrite();
   if (!Number.isFinite(value)) return null;
-  if (mode === 'set') return value >= 0 ? value : null;
+  if (mode === 'set') return value >= 0 ? countedWrite(value) : null;
   if (value <= 0) return null;
-  if (before === null || before === UNLIMITED) return null;
-  return before + value;
+  if (before === null) return null;
+  return countedWrite(before + value);
+}
+
+/** Does writing `next` change a stock that reads `before` (`null` = unlimited)? */
+export function stockWouldChange(before: number | null, next: StockWrite): boolean {
+  return next.unlimited ? before !== null : next.quant !== before;
 }
 
 export interface ShopVariantRow {
@@ -303,6 +316,7 @@ export interface ShopVariantRow {
   sku: string | null;
   label: string;
   price: number | null;
+  /** The count; `null` = unlimited. */
   quant: number | null;
   active: boolean;
 }
@@ -316,6 +330,7 @@ export interface ShopProductRow {
   /** `published` / `draft` / `archived`, as the public API reads it. */
   status: 'published' | 'draft' | 'archived';
   kindOf: string | null;
+  /** The product's own count; `null` = unlimited. */
   quant: number | null;
   lowStockAt: number | null;
   variants: ShopVariantRow[];
@@ -356,7 +371,7 @@ export function stockRowsOf(products: ShopProductRow[]): StockRow[] {
     } else {
       // A subscription or "unlimited" kind has nothing on a shelf to count.
       const counted = p.kindOf !== 'unlimited';
-      const quant = counted ? p.quant : UNLIMITED;
+      const quant = counted ? p.quant : null;
       rows.push({
         key: `p:${p.id}`,
         productId: p.id,
@@ -416,11 +431,11 @@ export function priceRangeOfRow(p: Pick<ShopProductRow, 'price' | 'variants'>): 
   return { min: Math.min(...prices), max: Math.max(...prices) };
 }
 
-/** Σ of the active variants' stock (`-1` if any is unlimited), else the product's own. */
+/** Σ of the active variants' stock (`null` if any is unlimited), else the product's own. */
 export function stockTotalOfRow(p: Pick<ShopProductRow, 'quant' | 'variants' | 'kindOf'>): number | null {
   const active = p.variants.filter((v) => v.active);
-  if (!active.length) return p.kindOf === 'unlimited' ? UNLIMITED : p.quant;
-  if (active.some((v) => v.quant === UNLIMITED)) return UNLIMITED;
+  if (!active.length) return p.kindOf === 'unlimited' ? null : p.quant;
+  if (active.some((v) => v.quant === null)) return null;
   return active.reduce((s, v) => s + Math.max(0, v.quant ?? 0), 0);
 }
 
@@ -586,10 +601,10 @@ export function shopifyCsvRows(
     const status = p.status === 'published' ? 'active' : 'draft';
     const variants = p.variants.filter((v) => v.active);
     const names = (p.options ?? []).slice(0, 3).map((o) => o.name);
-    const qty = (q: number | null) => (q === null || q === UNLIMITED ? '' : Math.max(0, q));
-    const tracker = (q: number | null) => (q === null || q === UNLIMITED ? '' : 'shopify');
+    const qty = (q: number | null) => (q === null ? '' : Math.max(0, q));
+    const tracker = (q: number | null) => (q === null ? '' : 'shopify');
     if (!variants.length) {
-      const q = p.kindOf === 'unlimited' ? UNLIMITED : p.quant;
+      const q = p.kindOf === 'unlimited' ? null : p.quant;
       rows.push([handle, p.name, status, 'Title', 'Default Title', '', '', '', '', '', p.price ?? '', tracker(q), qty(q), p.imageUrl ?? '']);
       continue;
     }

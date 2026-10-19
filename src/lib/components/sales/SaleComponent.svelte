@@ -55,12 +55,6 @@
     onError
   } = $props();
 
-  // The shop skin picks the sale date with a native input instead of the
-  // calendar widget; empty = the calendar's own default (now).
-  let saleDateLocal = $state('');
-  let holderId = $derived(selected[0] != null ? String(find_user_id(selected)) : '');
-  let holderIsMe = $derived(meId != null && holderId !== '' && holderId === String(meId));
-
   let store = $state();
   let selected = $state(defaultHolder ? [defaultHolder] : []);
   let total = $state(0);
@@ -82,6 +76,12 @@
   let noSelectedE = $state(false);
   let datesE = $state(false);
   let currentOperationId = $state(null);
+
+  // The shop skin picks the sale date with a native input instead of the
+  // calendar widget; empty = the calendar's own default (now).
+  let saleDateLocal = $state('');
+  let holderId = $derived(selected[0] != null ? String(find_user_id(selected)) : '');
+  let holderIsMe = $derived(meId != null && holderId !== '' && holderId === String(meId));
 
   function find_user_id(user_name_arr) {
     let id = 0;
@@ -284,7 +284,7 @@
       <div class="sh-field">
         <span>{$t('sales.howManyUnits')}{per ? ` (${kindOf === 'monthly' ? $t('sales.perMonth') : $t('sales.perYear')})` : ''}</span>
         <div class="rs-step">
-          <button type="button" aria-label={$t('shop.sp.rs.more')} disabled={hm >= unitsMax} onclick={() => (hm = Math.min(unitsMax, Number(hm || 0) + 1))}>+</button>
+          <button type="button" aria-label={$t('sales.shopSkin.more')} disabled={hm >= unitsMax} onclick={() => (hm = Math.min(unitsMax, Number(hm || 0) + 1))}>+</button>
           <input
             type="number"
             inputmode="numeric"
@@ -293,7 +293,7 @@
             aria-label={$t('sales.howManyUnits')}
             bind:value={hm}
           />
-          <button type="button" aria-label={$t('shop.sp.rs.less')} disabled={hm <= 0} onclick={() => (hm = Math.max(0, Number(hm || 0) - 1))}>−</button>
+          <button type="button" aria-label={$t('sales.shopSkin.less')} disabled={hm <= 0} onclick={() => (hm = Math.max(0, Number(hm || 0) - 1))}>−</button>
         </div>
       </div>
     {/if}
@@ -323,14 +323,14 @@
           }}
         >
           <span class="rs-av" aria-hidden="true">{initialOf(u.attributes.username)}</span>
-          <span class="rs-radio-name">{meId != null && String(u.id) === String(meId) ? $t('shop.sp.rs.me') : u.attributes.username}</span>
+          <span class="rs-radio-name">{meId != null && String(u.id) === String(meId) ? $t('sales.shopSkin.me') : u.attributes.username}</span>
         </button>
       {/each}
     </div>
     {#if noSelectedE}<p class="rs-err">{$t('sales.noUserSelected')}</p>{/if}
     {#if selected[0] != null}
       <p class="rs-holder-note" class:rs-self={holderIsMe}>
-        {holderIsMe ? $t('shop.sp.rs.holderSelf') : $t('shop.sp.rs.holderOther', { name: selected[0] })}
+        {holderIsMe ? $t('sales.shopSkin.holderSelf') : $t('sales.shopSkin.holderOther', { name: selected[0] })}
       </p>
     {/if}
   </fieldset>
@@ -339,7 +339,7 @@
     <summary>
       {$t('sales.changeSaleDate')} · {saleDateLocal && dayjs(saleDateLocal).isValid()
         ? dayjs(saleDateLocal).format('D.M.YY HH:mm')
-        : $t('shop.sp.rs.today')}
+        : $t('sales.shopSkin.today')}
     </summary>
     <input class="sh-input" type="datetime-local" aria-label={$t('sales.changeSaleDate')} bind:value={saleDateLocal} />
   </details>
@@ -347,12 +347,12 @@
   <!-- Customer (PLAN_SALE_CUSTOMER_LINK): linked through a Sheirut so the
        purchase shows on the customer's deals page. -->
   <details class="rs-details" open={!!customerIdentifier}>
-    <summary>{isRecurring ? $t('shop.sp.rs.customer') : $t('shop.sp.rs.customerPaid')}</summary>
+    <summary>{isRecurring ? $t('sales.shopSkin.customer') : $t('sales.shopSkin.customerPaid')}</summary>
     <label class="sh-field">
-      {$t('shop.sp.rs.customerLabel')}
-      <input class="sh-input" type="text" autocomplete="off" placeholder={$t('shop.sp.rs.customerPh')} bind:value={customerIdentifier} />
+      {$t('sales.shopSkin.customerLabel')}
+      <input class="sh-input" type="text" autocomplete="off" placeholder={$t('sales.shopSkin.customerPh')} bind:value={customerIdentifier} />
     </label>
-    <p class="rs-hint">{isRecurring ? $t('shop.sp.rs.customerHintRecurring') : $t('shop.sp.rs.customerHintPaid')}</p>
+    <p class="rs-hint">{isRecurring ? $t('sales.shopSkin.customerHintRecurring') : $t('sales.shopSkin.customerHintPaid')}</p>
   </details>
 
   <label class="sh-field">

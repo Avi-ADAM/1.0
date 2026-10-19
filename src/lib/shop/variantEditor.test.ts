@@ -33,6 +33,7 @@ function variant(over: Partial<EditorVariant> = {}): EditorVariant {
     sku: 'STL-65-NAT',
     price: 480,
     compareAtPrice: null,
+    unlimited: false,
     quant: 4,
     active: true,
     position: 0,
@@ -133,10 +134,16 @@ describe('validateVariants', () => {
   });
 
   it('allows unlimited stock, refuses a negative count or price', () => {
-    expect(validateVariants([variant({ quant: -1 })])).toEqual([]);
-    expect(validateVariants([variant({ quant: -2 })])).toContainEqual({ index: 0, code: 'stockInvalid' });
+    expect(validateVariants([variant({ unlimited: true, quant: -1 })])).toEqual([]);
+    expect(validateVariants([variant({ quant: -1 })])).toContainEqual({ index: 0, code: 'stockInvalid' });
     expect(validateVariants([variant({ price: -5 })])).toContainEqual({ index: 0, code: 'priceInvalid' });
     expect(validateVariants([variant({ sku: ' ' })])).toContainEqual({ index: 0, code: 'skuMissing' });
+  });
+
+  it('a queue below zero that sales left behind may stay as it is', () => {
+    // A counted -1 is one unit waiting to be made, not "unlimited" ($lib/shop/stock.ts).
+    expect(validateVariants([variant({ quant: -1 })], [], new Map([['10', -1]]))).toEqual([]);
+    expect(validateVariants([variant({ quant: -3 })], [], new Map([['10', -1]]))).toContainEqual({ index: 0, code: 'stockInvalid' });
   });
 });
 
@@ -151,7 +158,7 @@ describe('planVariantSave — a price is a term, stock is not', () => {
       sovereign: false
     });
     expect(plan.terms).toEqual([]);
-    expect(plan.updates).toEqual([{ id: '10', patch: { quant: 9, active: false, picIds: ['5'] } }]);
+    expect(plan.updates).toEqual([{ id: '10', patch: { stock: { quant: 9, unlimited: false }, active: false, picIds: ['5'] } }]);
   });
 
   it('sends a moved price and a new variant to the partners', () => {
@@ -164,11 +171,16 @@ describe('planVariantSave — a price is a term, stock is not', () => {
       sovereign: false
     });
     expect(plan.creates).toEqual([]);
-    expect(plan.updates).toEqual([{ id: '10', patch: { quant: 2 } }]);
+    expect(plan.updates).toEqual([{ id: '10', patch: { stock: { quant: 2, unlimited: false } } }]);
     expect(plan.terms).toEqual([
       { kind: 'price', id: '10', name: '65 / טבעי', from: 480, to: 520 },
       expect.objectContaining({ kind: 'create', sku: 'NEW-1', axisKey: '|height:75|' })
     ]);
+  });
+
+  it('switching to unlimited writes the flag with the sentinel beside it', () => {
+    const plan = planVariantSave({ existing, desired: [variant({ unlimited: true })], productPrice: 500, sovereign: false });
+    expect(plan.updates).toEqual([{ id: '10', patch: { stock: { quant: -1, unlimited: true } } }]);
   });
 
   it('writes a price spelled out that changes nothing a buyer pays', () => {

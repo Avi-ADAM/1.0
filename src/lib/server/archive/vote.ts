@@ -225,6 +225,9 @@ export async function counterObjectChange(
     hoursToCredit: round.hoursToCredit ?? previous.hoursToCredit ?? null,
     transferToId: round.transferToId ?? previous.transferToId ?? null,
     effectiveFrom: round.effectiveFrom ?? previous.effectiveFrom ?? null,
+    // A product's variant terms ride the round too (./variantTerms.ts) — a
+    // counter about the base price must not drop the variant prices.
+    variants: round.variants ?? previous.variants ?? null,
   };
 
   const negoarch = [

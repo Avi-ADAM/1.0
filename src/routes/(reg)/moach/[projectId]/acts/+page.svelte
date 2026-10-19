@@ -3,7 +3,7 @@
   import CrTask from '$lib/components/prPr/tasks/crtask.svelte';
   import { getMoachStore } from '$lib/stores/moachStore.svelte.js';
   import { page } from '$app/state';
-  import { invalidateAll, replaceState } from '$app/navigation';
+  import { goto, invalidateAll } from '$app/navigation';
   import { lang } from '$lib/stores/lang.js';
   import { t } from '$lib/translations';
   import { SvelteSet } from 'svelte/reactivity';
@@ -25,11 +25,15 @@
     if (quickCreateAction === 'createtask') showCreate = true;
   });
 
+  // A real (replacing) navigation, not shallow-routing `replaceState`: that one
+  // rewrites the address bar but leaves `page.url` stale, so `?action=` would
+  // still read as "createtask" and the next Quick Create — into this rikma or
+  // another — would see an unchanged value and never reopen the dialog.
   function clearQuickCreateAction() {
     if (page.url.searchParams.get('action') !== 'createtask') return;
     const url = new URL(page.url);
     url.searchParams.delete('action');
-    replaceState(url, {});
+    void goto(url, { replaceState: true, noScroll: true, keepFocus: true });
   }
 
   function dismissCreate() {
@@ -44,10 +48,10 @@
     const roles = [];
     const seen = new SvelteSet();
     for (const bmi of bmiData) {
-      for (const t of bmi.attributes?.tafkidims?.data ?? []) {
-        if (!seen.has(t.id)) {
-          seen.add(t.id);
-          roles.push({ id: t.id, name: t.attributes?.roleDescription ?? '' });
+      for (const role of bmi.attributes?.tafkidims?.data ?? []) {
+        if (!seen.has(role.id)) {
+          seen.add(role.id);
+          roles.push({ id: role.id, name: role.attributes?.roleDescription ?? '' });
         }
       }
     }

@@ -19,6 +19,7 @@ import { execFromContext } from '$lib/server/archive/exec.js';
 import { counterObjectChange } from '$lib/server/archive/vote.js';
 import { dealSignersFor, notifyDealClientsOfEdit, type DealSigners } from '$lib/server/sheirut/dealEdit.js';
 import { scope, decisionScope, scopeList } from '$lib/realtime/scopes.js';
+import { noticeSubject } from '$lib/notices/links';
 
 const MODES: readonly RoundMode[] = ['archive', 'keep'];
 const OUTCOMES: readonly HoursOutcome[] = ['credit', 'waive', 'transfer', 'endOfCycle'];

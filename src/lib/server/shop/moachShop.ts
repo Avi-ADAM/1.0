@@ -8,7 +8,9 @@
  * DTO, a webhook or `GET /orders/{ref}` (§5.6).
  *
  * Strapi rows become the plain shapes of `$lib/shop/manage.ts` here, so the
- * screens never read `attributes.x.data.attributes`.
+ * screens never read `attributes.x.data.attributes` — and stock arrives with
+ * one meaning (a number is a count, `null` is unlimited), read off `quant` and
+ * the `unlimited` flag through `$lib/shop/stock.ts`.
  */
 import { strapiClient } from '$lib/server/actions';
 import { ordersSchemaLive, strapiRun } from '$lib/server/apiPublic/catalog.js';
@@ -24,6 +26,8 @@ import {
   type ShopProductRow,
   type ShopSaleRow
 } from '$lib/shop/manage.js';
+import { countOf, LEGACY_UNLIMITED } from '$lib/shop/stock.js';
+import { readStockFlags } from '$lib/server/shop/stockFlags.js';
 
 type FetchFn = typeof fetch;
 
@@ -131,18 +135,21 @@ export async function loadShopOrders(projectId: string, fetchFn?: FetchFn): Prom
     const productIds = [
       ...new Set(open.flatMap((o) => o.lines.filter((l) => !l.variantId).map((l) => l.productId).filter(Boolean)))
     ] as string[];
+    // Only counted rows go in the map: an unlimited one is never short, and a
+    // count of -1 is one unit short, not "unlimited" (§2.5).
     const stock = new Map<string, number>();
     try {
-      const [vRes, pRes] = await Promise.all([
+      const [vRes, pRes, flags] = await Promise.all([
         variantIds.length ? run('ordersApiVariants', { pid: projectId, ids: variantIds }) : null,
-        productIds.length ? run('ordersApiProducts', { pid: projectId, ids: productIds }) : null
+        productIds.length ? run('ordersApiProducts', { pid: projectId, ids: productIds }) : null,
+        readStockFlags(run, { variantIds, productIds })
       ]);
       for (const v of vRes?.data?.productVariants?.data ?? []) {
-        const q = num(v?.attributes?.quant);
+        const q = countOf({ quant: v?.attributes?.quant, unlimited: flags.variants.get(String(v.id))?.unlimited });
         if (q !== null) stock.set(`v:${v.id}`, q);
       }
       for (const p of pRes?.data?.matanots?.data ?? []) {
-        const q = num(p?.attributes?.quant);
+        const q = countOf({ quant: p?.attributes?.quant, unlimited: flags.products.get(String(p.id))?.unlimited });
         if (q !== null) stock.set(`p:${p.id}`, q);
       }
     } catch {
@@ -182,6 +189,21 @@ export async function loadShopProducts(projectId: string, fetchFn?: FetchFn): Pr
     /* `lowStockAt` is not deployed yet — nothing reads "low" until it is */
   }
 
+  // The `unlimited` flag of each product and variant. Until it is deployed
+  // this fails and every row reads the old way (`-1` = unlimited).
+  const flagOf = new Map<string, boolean>();
+  try {
+    const res = await run('moachShopStockFlags', { pid: projectId });
+    for (const p of res?.data?.matanots?.data ?? []) {
+      if (typeof p?.attributes?.unlimited === 'boolean') flagOf.set(`p:${p.id}`, p.attributes.unlimited);
+      for (const v of p?.attributes?.variants?.data ?? []) {
+        if (typeof v?.attributes?.unlimited === 'boolean') flagOf.set(`v:${v.id}`, v.attributes.unlimited);
+      }
+    }
+  } catch {
+    /* the column is not deployed yet */
+  }
+
   const products = nodes.map((n: any) => {
     const a = n.attributes ?? {};
     const variants = [...(a.variants?.data ?? [])]
@@ -191,7 +213,8 @@ export async function loadShopProducts(projectId: string, fetchFn?: FetchFn): Pr
         sku: str(v.attributes?.sku),
         label: variantLabelOf(v.attributes?.name, v.attributes?.optionValues),
         price: num(v.attributes?.price),
-        quant: num(v.attributes?.quant),
+        // A variant with no number has 0 on the shelf.
+        quant: countOf({ quant: v.attributes?.quant ?? 0, unlimited: flagOf.get(`v:${v.id}`) ?? null }),
         active: v.attributes?.active !== false
       }));
     // The axes in the order the variants spell them ("M / אדום" = size, colour).
@@ -206,7 +229,11 @@ export async function loadShopProducts(projectId: string, fetchFn?: FetchFn): Pr
       pricingMode: str(a.pricingMode),
       status: productStatusOf(a),
       kindOf: str(a.kindOf),
-      quant: num(a.quant),
+      // A legacy product with no number is unlimited, as it always read.
+      quant: countOf({
+        quant: a.quant ?? (flagOf.get(`p:${n.id}`) === false ? 0 : LEGACY_UNLIMITED),
+        unlimited: flagOf.get(`p:${n.id}`) ?? null
+      }),
       lowStockAt: lowAt.get(String(n.id)) ?? null,
       variants,
       options

@@ -704,6 +704,17 @@ export const qidsAccess = {
   'moachShopProducts': { allow: ['serviceAdmin'] },
   'moachShopLowStock': { allow: ['serviceAdmin'] },
   'moachShopSales': { allow: ['serviceAdmin'] },
+  // The seller's product editor (S4, qidsShopEditor.js): the editor's loader and
+  // the saveProductVariants / saveProductOptions actions only.
+  'shopEditorProduct': { allow: ['serviceAdmin'] },
+  'shopEditorRikmaOptions': { allow: ['serviceAdmin'] },
+  'shopEditorRikmaSkus': { allow: ['serviceAdmin'] },
+  'shopOptionCreate': { allow: ['serviceAdmin'] },
+  'shopOptionUpdate': { allow: ['serviceAdmin'] },
+  'shopVariantCreate': { allow: ['serviceAdmin'] },
+  'shopVariantUpdate': { allow: ['serviceAdmin'] },
+  'shopProductUpdate': { allow: ['serviceAdmin'] },
+  'shopProductLowStock': { allow: ['serviceAdmin'] },
 
   // Site reports mirrored into the central rikma — same story, and a report
   // carries the reporter's email, so it is never reachable with a user JWT.

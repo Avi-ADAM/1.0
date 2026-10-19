@@ -304,3 +304,29 @@ describe('shop parameters — with the shop schema', () => {
     expect(json).toContain('-1');
   });
 });
+
+describe('available — with the unlimited flag deployed (§2.5)', () => {
+  const flagged = (qs: string, shopSchema: boolean) => {
+    const result = parseCatalogQuery(new URLSearchParams(qs), anon, { shopSchema, stockFlags: true });
+    if (result.ok !== true) throw new Error(`expected ok, got ${JSON.stringify(result)}`);
+    return JSON.stringify(result.value.callerFilters);
+  };
+
+  it('asks the flag, and reads -1 as unlimited only on a row without it', () => {
+    const json = flagged('available=true', false);
+    expect(json).toContain('"unlimited":{"eq":true}');
+    expect(json).toContain('"unlimited":{"null":true}'); // the legacy -1
+  });
+
+  it('reads the total through stockUnlimited, the product row when there is no total', () => {
+    const json = flagged('available=true', true);
+    expect(json).toContain('"stockUnlimited":{"eq":true}');
+    expect(json).toContain('"stockTotal":{"null":true}');
+  });
+
+  it('out of stock is a count at zero or below — a queue of one included', () => {
+    const json = flagged('available=false', true);
+    expect(json).toContain('"stockTotal":{"lte":0}');
+    expect(json).toContain('"quant":{"lte":0}');
+  });
+});

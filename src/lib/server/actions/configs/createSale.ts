@@ -6,6 +6,9 @@ import { formatMoney } from '$lib/money/format.js';
 import { rikmaCurrency } from '$lib/money/resolve.js';
 import { createSaleConsentSpec } from '$lib/consent/specs/createSale';
 import { scope, decisionScope, scopeList } from '$lib/realtime/scopes.js';
+import { LEGACY_UNLIMITED, moveStock, type StockFields } from '$lib/shop/stock.js';
+import { readStockFlags, writeStock } from '$lib/server/shop/stockFlags.js';
+import type { ProbeRun } from '$lib/server/apiPublic/schemaProbe.js';
 
 /**
  * Report a sale (PLAN_sale_holder_consent).
@@ -237,37 +240,35 @@ export const createSaleHandler: ActionExecutionHandler = async (params, context,
 
   // 2. Decrement stock if not unlimited (reservation): the variant's when the
   //    sale names one (read above, from the server), else the product's.
+  //    "Unlimited" is the `unlimited` flag once it is deployed — a count that
+  //    lands on -1 is one unit waiting, not "unlimited" (§2.5, $lib/shop/stock.ts).
   let newQuantity: number | undefined;
   let newVariantQuantity: number | undefined;
-  if (variant) {
-    if (Number(quantity) > 0 && variantQuant !== -1) {
+  if (Number(quantity) > 0) {
+    const stockRun: ProbeRun = (qid, vars) => strapi.execute(qid, vars, context.jwt, context.fetch);
+    const pid = String(productId);
+    try {
+      const flags = await readStockFlags(stockRun, variant ? { variantIds: [variant] } : { productIds: [pid] });
+      const fresh = flags.products.get(pid);
+      const row: StockFields | null = variant
+        ? { quant: variantQuant, unlimited: flags.variants.get(variant)?.unlimited ?? null }
+        : fresh
+          ? // The product's stock as Strapi holds it now; a legacy row with no
+            // number reads as unlimited, as `availableQuantity` always did.
+            { quant: fresh.quant ?? (fresh.unlimited === false ? 0 : LEGACY_UNLIMITED), unlimited: fresh.unlimited }
+          : Number.isFinite(Number(availableQuantity))
+            ? { quant: Number(availableQuantity), unlimited: null }
+            : null;
       // May go below zero: a paid order is never refused for stock, and a
       // negative count is the rikma's backlog (§2.5) — the order says `oversold`.
-      const next = (variantQuant ?? 0) - Number(quantity);
-      try {
-        const res = await strapi.execute(
-          'rikmaApiVariantQuant',
-          { id: variant, quant: next },
-          context.jwt,
-          context.fetch
-        );
-        newVariantQuantity = res?.data?.updateProductVariant?.data?.attributes?.quant;
-      } catch (err) {
-        console.warn('[createSale] variant quantity update failed:', err);
+      const next = row && moveStock(row, -Number(quantity));
+      if (next) {
+        const stored = await writeStock(stockRun, variant ? { variantId: variant } : { productId: pid }, next);
+        if (variant) newVariantQuantity = stored.quant;
+        else newQuantity = stored.quant;
       }
-    }
-  } else if (Number(quantity) > 0 && Number(availableQuantity) !== -1) {
-    const newQuant = Number(availableQuantity) - Number(quantity);
-    try {
-      const quantRes = await strapi.execute(
-        'updateMatanotQuant',
-        { id: productId, quant: newQuant },
-        context.jwt,
-        context.fetch
-      );
-      newQuantity = quantRes?.data?.updateMatanot?.data?.attributes?.quant;
     } catch (err) {
-      console.warn('[createSale] quantity update failed:', err);
+      console.warn(`[createSale] ${variant ? 'variant ' : ''}quantity update failed:`, err);
     }
   }
 

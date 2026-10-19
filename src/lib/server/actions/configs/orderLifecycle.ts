@@ -13,6 +13,9 @@ import {
   type RefundDecision,
   type StockChange
 } from '$lib/server/ordersApi.js';
+import { moveStock, type StockFields } from '$lib/shop/stock.js';
+import { readStockFlags, writeStock } from '$lib/server/shop/stockFlags.js';
+import type { ProbeRun } from '$lib/server/apiPublic/schemaProbe.js';
 
 /**
  * What happens to a paid order after it arrived (PLAN_SHOP_CUSTOMER_EXPERIENCE
@@ -135,16 +138,23 @@ const cancelHandler: ActionExecutionHandler = async (params, context, { strapi, 
   const stockChanges: StockChange[] = [];
   if (restock) {
     const view = toOrderView(node)!;
-    const variantStock = new Map<string, number>();
-    const productStock = new Map<string, number>();
+    // "Unlimited" is the flag once it is deployed: a variant oversold to -1
+    // that is cancelled goes back to 0, it is not skipped (§2.5).
+    const stockRun: ProbeRun = (qid, vars) => strapi.execute(qid, vars, context.jwt, context.fetch);
+    const variantStock = new Map<string, StockFields>();
+    const productStock = new Map<string, StockFields>();
     const productIds = [
       ...new Set(view.lines.filter((l) => !l.variantId && l.productId).map((l) => l.productId!))
     ];
+    const variantIds = [...new Set(view.lines.map((l) => l.variantId).filter((v): v is string => !!v))];
+    const flags = await readStockFlags(stockRun, { productIds, variantIds });
     if (productIds.length) {
       const res = await strapi.execute('ordersApiProducts', { pid: projectId, ids: productIds }, context.jwt, context.fetch);
       for (const p of res?.data?.matanots?.data ?? []) {
         const q = p?.attributes?.quant;
-        productStock.set(String(p.id), q == null ? -1 : Number(q));
+        const unlimited = flags.products.get(String(p.id))?.unlimited ?? null;
+        // A legacy product with no number reads as unlimited, as it always did.
+        productStock.set(String(p.id), { quant: q == null ? (unlimited === false ? 0 : -1) : Number(q), unlimited });
       }
     }
     for (const line of view.lines) {
@@ -155,20 +165,22 @@ const cancelHandler: ActionExecutionHandler = async (params, context, { strapi, 
           if (!variantStock.has(line.variantId)) {
             const res = await strapi.execute('saleVariantInfo', { id: line.variantId }, context.jwt, context.fetch);
             const q = res?.data?.productVariant?.data?.attributes?.quant;
-            variantStock.set(line.variantId, q == null ? 0 : Number(q));
+            variantStock.set(line.variantId, {
+              quant: q == null ? 0 : Number(q),
+              unlimited: flags.variants.get(line.variantId)?.unlimited ?? null
+            });
           }
-          const before = variantStock.get(line.variantId)!;
-          if (before === -1) continue;
-          const next = before + qty;
-          await strapi.execute('rikmaApiVariantQuant', { id: line.variantId, quant: next }, context.jwt, context.fetch);
-          variantStock.set(line.variantId, next);
-          stockChanges.push({ productId: line.productId, variantId: line.variantId, quant: next });
+          const next = moveStock(variantStock.get(line.variantId)!, qty);
+          if (!next) continue;
+          const stored = await writeStock(stockRun, { variantId: line.variantId }, next);
+          variantStock.set(line.variantId, stored);
+          stockChanges.push({ productId: line.productId, variantId: line.variantId, quant: stored.quant, unlimited: false });
         } else {
-          const before = productStock.get(line.productId) ?? -1;
-          if (before === -1) continue;
-          const next = before + qty;
-          await strapi.execute('updateMatanotQuant', { id: line.productId, quant: next }, context.jwt, context.fetch);
-          productStock.set(line.productId, next);
+          const before = productStock.get(line.productId);
+          const next = before && moveStock(before, qty);
+          if (!next) continue;
+          const stored = await writeStock(stockRun, { productId: line.productId }, next);
+          productStock.set(line.productId, stored);
         }
       } catch (err) {
         console.warn('[cancelOrder] restock failed for line', line, err);

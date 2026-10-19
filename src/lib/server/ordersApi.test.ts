@@ -601,8 +601,11 @@ describe('order webhooks', () => {
     }
   });
 
-  it('a stock event says what changed', () => {
-    const body = JSON.parse(stockWebhookBody('57', { productId: '1842', variantId: '77', quant: 1 }));
-    expect(body).toMatchObject({ event: 'variant.stockChanged', data: { variantId: '77', quant: 1, changed: ['quant'] } });
+  it('a stock event says what changed — and whether it is counted at all (§2.5)', () => {
+    const body = JSON.parse(stockWebhookBody('57', { productId: '1842', variantId: '77', quant: -1, unlimited: false }));
+    expect(body).toMatchObject({
+      event: 'variant.stockChanged',
+      data: { variantId: '77', quant: -1, unlimited: false, changed: ['quant'] }
+    });
   });
 });

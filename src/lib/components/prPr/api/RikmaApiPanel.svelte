@@ -12,6 +12,7 @@
   import { browser } from '$app/environment';
   import { t } from '$lib/translations';
   import { lang } from '$lib/stores/lang.js';
+  import { PUBLIC_API_ORIGIN } from '$lib/platform/index.js';
   import { toast } from 'svelte-sonner';
 
   /**
@@ -69,7 +70,8 @@
   let activeTab = $state('server');
   let copiedWhat = $state('');
 
-  const apiBase = $derived(browser ? window.location.origin : 'https://1lev1.com');
+  // Every snippet here runs on the member's own system, so it names the public API, not this page's origin.
+  const apiBase = PUBLIC_API_ORIGIN;
   const isRtl = $derived($lang === 'he' || $lang === 'ar');
 
   const activeKeys = $derived(keys.filter((k) => !k.revoked));

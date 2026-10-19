@@ -26,6 +26,7 @@
  */
 
 import { mediaUrl } from '$lib/utils/processLifecycle.js';
+import { countOf, isUnlimited } from '$lib/shop/stock.js';
 
 // ─── primitives ─────────────────────────────────────────────────────────────
 //
@@ -156,19 +157,21 @@ export interface ApiAvailability {
 }
 
 /**
- * `quant` semantics come from the sale path, not from a guess: `-1` is
- * "unlimited" (`createSale` skips the decrement for it, `hamatanot.svelte`
- * prints "ללא הגבלה"), every other value is a count, and a missing value reads
- * as 0 — which is what `/gift/[id]` does (`data.alld?.quant || 0`).
+ * Stock semantics are `$lib/shop/stock.ts` (§2.5): "unlimited" is the row's
+ * `unlimited` flag once it is deployed — the catalog merges it in — and on a
+ * row that predates it, the old `-1`. Any other number is a count, below zero
+ * included (units waiting to be made; a counted `-1` is one of them), and a
+ * missing value reads as 0 — which is what `/gift/[id]` does
+ * (`data.alld?.quant || 0`).
  */
 export function availabilityOf(attrs: Record<string, any>): ApiAvailability {
-  return availabilityFromQuant(attrs?.quant);
+  return availabilityFromQuant(attrs?.quant, attrs?.unlimited);
 }
 
-function availabilityFromQuant(quant: unknown): ApiAvailability {
-  const q = num(quant);
-  if (q === -1) return { unlimited: true, quantity: null };
-  return { unlimited: false, quantity: q === null ? 0 : q };
+function availabilityFromQuant(quant: unknown, unlimited?: boolean | null): ApiAvailability {
+  const row = { quant, unlimited: unlimited ?? null };
+  if (isUnlimited(row)) return { unlimited: true, quantity: null };
+  return { unlimited: false, quantity: countOf(row) ?? 0 };
 }
 
 /**
@@ -178,7 +181,7 @@ function availabilityFromQuant(quant: unknown): ApiAvailability {
  * merchant preview needs to see it) but it never counts towards stock, price or
  * the "is it available" answer.
  *
- * `-1` is contagious: one unlimited variant makes the product unlimited, and a
+ * Unlimited is contagious: one unlimited variant makes the product unlimited, and a
  * finite sum next to it would be a number the buyer could not act on.
  */
 export function variantsAvailabilityOf(
@@ -194,13 +197,16 @@ export function variantsAvailabilityOf(
   };
 }
 
-/** The denormalized product-level total, written by the merchant save (§2.4). */
+/**
+ * The denormalized product-level total, written by the `1.0b` lifecycles
+ * (§2.4) — with `stockUnlimited` beside it once that column is deployed.
+ */
 export function stockTotalOf(
   attrs: Record<string, any>
 ): ApiAvailability | null {
   if (attrs?.stockTotal === undefined || attrs?.stockTotal === null)
     return null;
-  return availabilityFromQuant(attrs.stockTotal);
+  return availabilityFromQuant(attrs.stockTotal, attrs.stockUnlimited);
 }
 
 // ─── options and variants ───────────────────────────────────────────────────
@@ -465,7 +471,7 @@ export function variantsOf(
         optionValues,
         price: opts.price === null ? null : (own ?? opts.price),
         compareAtPrice: num(a.compareAtPrice),
-        availability: availabilityFromQuant(a.quant),
+        availability: availabilityFromQuant(a.quant, a.unlimited),
         images: uploadsOf(a.pics)
           .map(galleryImageOf)
           .filter((i): i is ApiImage => i !== null)
@@ -682,7 +688,10 @@ export function toApiShop(
   const availability =
     loaded && variants.length
       ? variantsAvailabilityOf(variants)
-      : (stockTotalOf({ stockTotal: pick(base, extra, 'stockTotal') }) ??
+      : (stockTotalOf({
+          stockTotal: pick(base, extra, 'stockTotal'),
+          stockUnlimited: pick(base, extra, 'stockUnlimited')
+        }) ??
         availabilityOf(base));
 
   return {

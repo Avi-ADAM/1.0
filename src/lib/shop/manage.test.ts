@@ -26,8 +26,8 @@ import {
   stockRowsOf,
   stockStateOf,
   stockTotalOfRow,
+  stockWouldChange,
   toCsv,
-  UNLIMITED,
   type ShopOrder,
   type ShopProductRow,
   type ShopSaleRow
@@ -91,10 +91,13 @@ describe('the order task — what is left to do', () => {
 
 describe('short on stock — measured against the stock now', () => {
   const short = order({ oversold: true });
-  it('counts the units below zero, never the -1 that means unlimited', () => {
+  it('counts the units below zero — a count of -1 is one unit short', () => {
     expect(shortUnitsOf(short, new Map([['v:77', -3]]))).toBe(2); // capped by the line
     expect(shortUnitsOf(short, new Map([['v:77', -2]]))).toBe(2);
-    expect(shortUnitsOf(short, new Map([['v:77', UNLIMITED]]))).toBe(0);
+    // The 0 − 1 case: one unit oversold is one unit short, never "unlimited" (§2.5).
+    expect(shortUnitsOf(short, new Map([['v:77', -1]]))).toBe(1);
+    // An unlimited row is not in the map at all: never short.
+    expect(shortUnitsOf(short, new Map())).toBe(0);
     expect(shortUnitsOf(short, new Map([['v:77', 4]]))).toBe(0); // restocked
   });
   it('a shipped-on or not-oversold order is never short', () => {
@@ -172,21 +175,30 @@ describe('address', () => {
 
 describe('stock', () => {
   it('reads one number as the seller should', () => {
-    expect(stockStateOf(UNLIMITED)).toBe('unlimited');
+    expect(stockStateOf(null)).toBe('unlimited');
     expect(stockStateOf(-3)).toBe('short');
+    expect(stockStateOf(-1)).toBe('short'); // a queue of one, not "unlimited"
     expect(stockStateOf(0)).toBe('out');
     expect(stockStateOf(2, 3)).toBe('low');
     expect(stockStateOf(2)).toBe('ok'); // no threshold = never low
   });
 
-  it('set replaces, add adds a delivery, unlimited is -1', () => {
-    expect(nextStock(4, 'set', 7)).toBe(7);
+  it('set replaces, add adds a delivery, unlimited is the flag', () => {
+    expect(nextStock(4, 'set', 7)).toEqual({ quant: 7, unlimited: false });
     expect(nextStock(4, 'set', -1)).toBeNull();
-    expect(nextStock(4, 'add', 3)).toBe(7);
-    expect(nextStock(-2, 'add', 5)).toBe(3); // fills the production queue first
-    expect(nextStock(UNLIMITED, 'add', 3)).toBeNull();
+    expect(nextStock(4, 'add', 3)).toEqual({ quant: 7, unlimited: false });
+    expect(nextStock(-2, 'add', 5)).toEqual({ quant: 3, unlimited: false }); // fills the production queue first
+    expect(nextStock(-1, 'add', 1)).toEqual({ quant: 0, unlimited: false }); // -1 is a count
+    expect(nextStock(null, 'add', 3)).toBeNull(); // nothing to add to an unlimited stock
     expect(nextStock(4, 'add', 0)).toBeNull();
-    expect(nextStock(4, 'set', 0, true)).toBe(UNLIMITED);
+    expect(nextStock(4, 'set', 0, true)).toEqual({ quant: -1, unlimited: true });
+  });
+
+  it('a write changes the stock unless it says what is already there', () => {
+    expect(stockWouldChange(4, { quant: 4, unlimited: false })).toBe(false);
+    expect(stockWouldChange(-1, { quant: -1, unlimited: true })).toBe(true); // a queue of one → unlimited
+    expect(stockWouldChange(null, { quant: -1, unlimited: true })).toBe(false);
+    expect(stockWouldChange(null, { quant: -1, unlimited: false })).toBe(true);
   });
 
   const products: ShopProductRow[] = [
@@ -223,7 +235,7 @@ describe('stock', () => {
 
   it('total stock never counts a production queue as stock', () => {
     expect(stockTotalOfRow(products[0])).toBe(5);
-    expect(stockTotalOfRow(products[1])).toBe(UNLIMITED);
+    expect(stockTotalOfRow(products[1])).toBeNull(); // unlimited
   });
 });
 
@@ -291,7 +303,7 @@ describe('CSV', () => {
         options: [{ name: 'גובה', values: [] }],
         variants: [
           { id: '77', sku: 'S-65', label: '65', price: null, quant: 4, active: true },
-          { id: '78', sku: 'S-75', label: '75', price: 540, quant: UNLIMITED, active: true }
+          { id: '78', sku: 'S-75', label: '75', price: 540, quant: null, active: true }
         ]
       },
       { id: '11', name: 'כפות', imageUrl: null, price: 95, pricingMode: 'fixed', status: 'draft', kindOf: 'total', quant: 3, lowStockAt: null, variants: [] }

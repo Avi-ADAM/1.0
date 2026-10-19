@@ -19,7 +19,7 @@
   import { executeAction } from '$lib/client/actionClient';
   import { isLinkableMissionType } from '$lib/acts/publishAsMission.js';
   import { toast } from 'svelte-sonner';
-  import { invalidateAll, replaceState } from '$app/navigation';
+  import { goto, invalidateAll } from '$app/navigation';
   import { decodeMissionDraft } from '$lib/prefill/missionDraft';
 
   const moachStore = getMoachStore();
@@ -244,7 +244,9 @@
     if (action !== 'createmission' && action !== 'createresource') return;
     const url = new URL(page.url);
     url.searchParams.delete('action');
-    replaceState(url, {});
+    // Not `replaceState`: it leaves `page.url` stale, so the next Quick Create
+    // (same `?action=`) would not change what the consumer effect reads.
+    void goto(url, { replaceState: true, noScroll: true, keepFocus: true });
   }
 
   function closeM() {

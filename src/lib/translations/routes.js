@@ -54,6 +54,9 @@ export const ROUTED = {
     // The seller's screens (PLAN_SHOP_CUSTOMER_EXPERIENCE §7.3, UX_COPY_SHOP_SALES):
     // the sales page's orders banner and everything under sales/manage.
     shop: at(/\/moach\/[^/]+\/sales/),
+    // The seller's product editor (sales/manage/products/[productId]) and the
+    // "full edit" link on the products tab.
+    shopEditor: at(/\/moach\/[^/]+\/sales/),
     offerings: at('/me', '/onboard', '/gift', '/user', '/deals/sales-center', /\/moach\/[^/]+\/sales/),
     consensus: at('/consensus'),
     uses: at('/uses'),

@@ -23,14 +23,17 @@ export interface DerivedFields {
   hasVariants: boolean;
   priceMin: number | null;
   priceMax: number | null;
-  /** `-1` = unlimited. */
+  /** The count — `-1` beside `stockUnlimited`, for readers that predate the flag. */
   stockTotal: number;
+  /** Nothing to count (§2.5) — the one way to read "unlimited" off the total. */
+  stockUnlimited: boolean;
   variantAxes: DerivedAxis[] | null;
 }
 
 export interface DeriveVariant {
   price?: unknown;
   quant?: unknown;
+  unlimited?: unknown;
   active?: unknown;
   position?: unknown;
   optionValues?: unknown;
@@ -55,8 +58,20 @@ function optionValuesOf(raw: unknown): any[] {
   return Array.isArray(list) ? list : [];
 }
 
+/**
+ * Unlimited: the flag once it is written (`$lib/shop/stock.ts`); on a row that
+ * predates it, the old `-1` — and, for a product's own stock, no number at all
+ * (how this function always read it). A counted `-1` is one unit waiting.
+ */
+function unlimitedOf(row: { quant?: unknown; unlimited?: unknown } | null | undefined, nullIsUnlimited: boolean): boolean {
+  if (row?.unlimited === true) return true;
+  if (row?.unlimited === false) return false;
+  const q = num(row?.quant);
+  return q === UNLIMITED || (nullIsUnlimited && q === null);
+}
+
 export function deriveProductFields(
-  product: { price?: unknown; quant?: unknown },
+  product: { price?: unknown; quant?: unknown; unlimited?: unknown },
   variants: DeriveVariant[] | null | undefined,
   options?: Array<{ key?: unknown; name?: unknown; position?: unknown }> | null
 ): DerivedFields {
@@ -64,12 +79,13 @@ export function deriveProductFields(
   const basePrice = num(product?.price);
 
   if (!rows.length) {
-    const q = num(product?.quant);
+    const unlimited = unlimitedOf(product, true);
     return {
       hasVariants: false,
       priceMin: basePrice,
       priceMax: basePrice,
-      stockTotal: q === null ? UNLIMITED : q,
+      stockTotal: unlimited ? UNLIMITED : (num(product?.quant) ?? 0),
+      stockUnlimited: unlimited,
       variantAxes: null
     };
   }
@@ -81,15 +97,10 @@ export function deriveProductFields(
     .map((v) => num(v.price) ?? basePrice)
     .filter((p): p is number => p !== null);
 
-  let stockTotal = 0;
-  for (const v of active) {
-    const q = num(v.quant);
-    if (q === UNLIMITED) {
-      stockTotal = UNLIMITED;
-      break;
-    }
-    stockTotal += q ?? 0;
-  }
+  // One unlimited variant makes the product unlimited; otherwise the counts
+  // add up, a production queue (below zero) included.
+  const stockUnlimited = active.some((v) => unlimitedOf(v, false));
+  const stockTotal = stockUnlimited ? UNLIMITED : active.reduce((s, v) => s + (num(v.quant) ?? 0), 0);
 
   const names = new Map<string, string>();
   const order = new Map<string, number>();
@@ -119,6 +130,7 @@ export function deriveProductFields(
     priceMin: prices.length ? Math.min(...prices) : null,
     priceMax: prices.length ? Math.max(...prices) : null,
     stockTotal: active.length ? stockTotal : 0,
+    stockUnlimited,
     variantAxes: variantAxes.length ? variantAxes : null
   };
 }

@@ -318,7 +318,8 @@
     const top = byProduct.filter((p) => p.amount > 0).slice(0, BUBBLE_FILLS.length);
     if (top.length === 0) return [];
     const root = hierarchy({ children: top.map((p, i) => ({ ...p, i })) }).sum((d) => d.amount ?? 0);
-    return pack().size([BUBBLE, BUBBLE]).padding(6)(root).leaves().map((n) => ({
+    const layout = /** @type {any} */ (pack()).size([BUBBLE, BUBBLE]).padding(6);
+    return layout(root).leaves().map((n) => ({
       x: n.x,
       y: n.y,
       r: n.r,
@@ -334,6 +335,7 @@
   const FIRST = 6;
   let filtered = $derived(newestFirst(filterByStage(salee, saleFilter)));
   let shownSales = $derived(showAll ? filtered : filtered.slice(0, FIRST));
+  /** @type {Array<{ id: 'waiting' | 'voting' | 'split' | 'all', label: string, count: number }>} */
   let filters = $derived([
     { id: 'waiting', label: $t('project.hamatanot.awaiting'), count: summary.waiting.count },
     { id: 'voting', label: $t('project.hamatanot.pending'), count: summary.voting.count },
@@ -365,7 +367,6 @@
 <ShopSheet bind:open={isOpen} label={a == 1 ? $t('project.hamatanot.createProduct') : $t('project.hamatanot.reportSale')}>
   <div class="sp-sheet" dir={$isRtl ? 'rtl' : 'ltr'}>
     {#if a == 1}
-      <h2 class="sh-title sp-sheet-title">{$t('project.hamatanot.createProduct')}</h2>
       <New {projectId} onDone={done} />
     {:else if a == 3}
       <div class="sh-empty">

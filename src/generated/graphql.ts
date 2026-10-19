@@ -1243,6 +1243,7 @@ export type ComponentDesisionNegoarch = {
   sqadualed?: Maybe<Scalars['DateTime']['output']>;
   sqadualedf?: Maybe<Scalars['DateTime']['output']>;
   transferTo?: Maybe<MesimabetahalichEntityResponse>;
+  variants?: Maybe<Scalars['JSON']['output']>;
   why?: Maybe<Scalars['String']['output']>;
   zman?: Maybe<Scalars['DateTime']['output']>;
 };
@@ -1269,6 +1270,7 @@ export type ComponentDesisionNegoarchFiltersInput = {
   sqadualed?: InputMaybe<DateTimeFilterInput>;
   sqadualedf?: InputMaybe<DateTimeFilterInput>;
   transferTo?: InputMaybe<MesimabetahalichFiltersInput>;
+  variants?: InputMaybe<JsonFilterInput>;
   why?: InputMaybe<StringFilterInput>;
   zman?: InputMaybe<DateTimeFilterInput>;
 };
@@ -1293,6 +1295,7 @@ export type ComponentDesisionNegoarchInput = {
   sqadualed?: InputMaybe<Scalars['DateTime']['input']>;
   sqadualedf?: InputMaybe<Scalars['DateTime']['input']>;
   transferTo?: InputMaybe<Scalars['ID']['input']>;
+  variants?: InputMaybe<Scalars['JSON']['input']>;
   why?: InputMaybe<Scalars['String']['input']>;
   zman?: InputMaybe<Scalars['DateTime']['input']>;
 };
@@ -6691,6 +6694,7 @@ export type Matanot = {
   locale?: Maybe<Scalars['String']['output']>;
   localizations?: Maybe<MatanotRelationResponseCollection>;
   location?: Maybe<ComponentNewLocation>;
+  lowStockAt?: Maybe<Scalars['Float']['output']>;
   marginPct?: Maybe<Scalars['Float']['output']>;
   mashaabims?: Maybe<MashaabimRelationResponseCollection>;
   matanot_recipe_missions?: Maybe<MatanotRecipeMissionRelationResponseCollection>;
@@ -6735,8 +6739,10 @@ export type Matanot = {
   startDate?: Maybe<Scalars['DateTime']['output']>;
   status_of_voting?: Maybe<Enum_Matanot_Status_Of_Voting>;
   stockTotal?: Maybe<Scalars['Float']['output']>;
+  stockUnlimited?: Maybe<Scalars['Boolean']['output']>;
   timegrama?: Maybe<TimegramaEntityResponse>;
   unit?: Maybe<Scalars['String']['output']>;
+  unlimited?: Maybe<Scalars['Boolean']['output']>;
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
   variantAxes?: Maybe<Scalars['JSON']['output']>;
   variants?: Maybe<ProductVariantRelationResponseCollection>;
@@ -6953,6 +6959,7 @@ export type MatanotFiltersInput = {
   locale?: InputMaybe<StringFilterInput>;
   localizations?: InputMaybe<MatanotFiltersInput>;
   location?: InputMaybe<ComponentNewLocationFiltersInput>;
+  lowStockAt?: InputMaybe<FloatFilterInput>;
   marginPct?: InputMaybe<FloatFilterInput>;
   mashaabims?: InputMaybe<MashaabimFiltersInput>;
   matanot_recipe_missions?: InputMaybe<MatanotRecipeMissionFiltersInput>;
@@ -6997,8 +7004,10 @@ export type MatanotFiltersInput = {
   startDate?: InputMaybe<DateTimeFilterInput>;
   status_of_voting?: InputMaybe<StringFilterInput>;
   stockTotal?: InputMaybe<FloatFilterInput>;
+  stockUnlimited?: InputMaybe<BooleanFilterInput>;
   timegrama?: InputMaybe<TimegramaFiltersInput>;
   unit?: InputMaybe<StringFilterInput>;
+  unlimited?: InputMaybe<BooleanFilterInput>;
   updatedAt?: InputMaybe<DateTimeFilterInput>;
   variantAxes?: InputMaybe<JsonFilterInput>;
   variants?: InputMaybe<ProductVariantFiltersInput>;
@@ -7031,6 +7040,7 @@ export type MatanotInput = {
   lifecycle?: InputMaybe<Enum_Matanot_Lifecycle>;
   lng?: InputMaybe<Scalars['Float']['input']>;
   location?: InputMaybe<ComponentNewLocationInput>;
+  lowStockAt?: InputMaybe<Scalars['Float']['input']>;
   marginPct?: InputMaybe<Scalars['Float']['input']>;
   mashaabims?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   matanot_recipe_missions?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
@@ -7075,8 +7085,10 @@ export type MatanotInput = {
   startDate?: InputMaybe<Scalars['DateTime']['input']>;
   status_of_voting?: InputMaybe<Enum_Matanot_Status_Of_Voting>;
   stockTotal?: InputMaybe<Scalars['Float']['input']>;
+  stockUnlimited?: InputMaybe<Scalars['Boolean']['input']>;
   timegrama?: InputMaybe<Scalars['ID']['input']>;
   unit?: InputMaybe<Scalars['String']['input']>;
+  unlimited?: InputMaybe<Scalars['Boolean']['input']>;
   variantAxes?: InputMaybe<Scalars['JSON']['input']>;
   variants?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
 };
@@ -12576,6 +12588,7 @@ export type Order = {
   currencyCode?: Maybe<Scalars['String']['output']>;
   deliveryAddress?: Maybe<Scalars['JSON']['output']>;
   deliveryPreference?: Maybe<Enum_Order_Deliverypreference>;
+  displayNumber?: Maybe<Scalars['String']['output']>;
   expiresAt?: Maybe<Scalars['DateTime']['output']>;
   externalId?: Maybe<Scalars['String']['output']>;
   fulfilledAt?: Maybe<Scalars['DateTime']['output']>;
@@ -12650,6 +12663,7 @@ export type OrderFiltersInput = {
   currencyCode?: InputMaybe<StringFilterInput>;
   deliveryAddress?: InputMaybe<JsonFilterInput>;
   deliveryPreference?: InputMaybe<StringFilterInput>;
+  displayNumber?: InputMaybe<StringFilterInput>;
   expiresAt?: InputMaybe<DateTimeFilterInput>;
   externalId?: InputMaybe<StringFilterInput>;
   fulfilledAt?: InputMaybe<DateTimeFilterInput>;
@@ -12686,6 +12700,7 @@ export type OrderInput = {
   currencyCode?: InputMaybe<Scalars['String']['input']>;
   deliveryAddress?: InputMaybe<Scalars['JSON']['input']>;
   deliveryPreference?: InputMaybe<Enum_Order_Deliverypreference>;
+  displayNumber?: InputMaybe<Scalars['String']['input']>;
   expiresAt?: InputMaybe<Scalars['DateTime']['input']>;
   externalId?: InputMaybe<Scalars['String']['input']>;
   fulfilledAt?: InputMaybe<Scalars['DateTime']['input']>;
@@ -14056,6 +14071,7 @@ export type ProductVariant = {
   quant?: Maybe<Scalars['Float']['output']>;
   sales?: Maybe<SaleRelationResponseCollection>;
   sku: Scalars['String']['output'];
+  unlimited?: Maybe<Scalars['Boolean']['output']>;
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
   weightGrams?: Maybe<Scalars['Int']['output']>;
 };
@@ -14112,6 +14128,7 @@ export type ProductVariantFiltersInput = {
   quant?: InputMaybe<FloatFilterInput>;
   sales?: InputMaybe<SaleFiltersInput>;
   sku?: InputMaybe<StringFilterInput>;
+  unlimited?: InputMaybe<BooleanFilterInput>;
   updatedAt?: InputMaybe<DateTimeFilterInput>;
   weightGrams?: InputMaybe<IntFilterInput>;
 };
@@ -14132,6 +14149,7 @@ export type ProductVariantInput = {
   quant?: InputMaybe<Scalars['Float']['input']>;
   sales?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   sku?: InputMaybe<Scalars['String']['input']>;
+  unlimited?: InputMaybe<Scalars['Boolean']['input']>;
   weightGrams?: InputMaybe<Scalars['Int']['input']>;
 };
 

@@ -16,5 +16,19 @@
   "total": "Total",
   "noteOptional": "Nota (opcional)",
   "notePlaceholder": "Añade una nota a la venta...",
-  "claimSent": "Reporte enviado: espera el consentimiento de {{holderName}}. Se aprobará automáticamente al terminar el tiempo de respuesta de la rikma si no hay respuesta."
+  "claimSent": "Reporte enviado: espera el consentimiento de {{holderName}}. Se aprobará automáticamente al terminar el tiempo de respuesta de la rikma si no hay respuesta.",
+  "shopSkin": {
+    "more": "Una unidad más",
+    "less": "Una unidad menos",
+    "me": "Yo",
+    "holderSelf": "El dinero lo tienes tú: la venta queda verificada al instante y cuenta para el reparto.",
+    "holderOther": "Es una afirmación sobre el dinero de {{name}}, así que se abre una solicitud de consentimiento. Se puede aprobar, conversarlo o proponer otro importe. Sin respuesta dentro del tiempo de respuesta de la rikma, la venta se aprueba por silencio; hasta entonces no cuenta para el reparto.",
+    "today": "hoy",
+    "customer": "Cliente (opcional)",
+    "customerPaid": "Cliente (opcional · pagado)",
+    "customerLabel": "Usuario o correo exacto en 1lev1",
+    "customerPh": "usuario o correo",
+    "customerHintRecurring": "Una venta recurrente abre una tarjeta de reporte mensual; un cliente identificado también confirma cada mes cuánto transfirió.",
+    "customerHintPaid": "La venta se registra como pagada: la compra aparece en la página de acuerdos del cliente, sin necesidad de confirmación."
+  }
 }

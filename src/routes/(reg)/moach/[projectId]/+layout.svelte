@@ -287,11 +287,11 @@
         <div class="flex justify-center items-center w-full relative">
           <!-- Back button - positioned at top left -->
           <button
-            class="absolute left-0 sm:left-4 top-0 flex items-center border border-gold gap-1 text-barbi hover:text-gold hover:bg-barbi/20 rounded-full p-2 transition-colors"
+            class="absolute left-0 sm:left-4 top-0 flex items-center border border-gold gap-1 text-gold hover:text-white hover:bg-white/10 rounded-full p-2 transition-colors rtl:flex-row-reverse"
             onclick={backToProjects}
             title={$t('moach.layout.back')}
           >
-            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+            <svg class="w-5 h-5 rtl:-scale-x-100" viewBox="0 0 24 24" fill="currentColor">
               <path
                 d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"
               />

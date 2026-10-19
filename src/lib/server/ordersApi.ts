@@ -24,6 +24,7 @@
 import { normalizeCode } from '$lib/money/currencies.js';
 import { productStatusOf, pricingModeOf } from './apiPublic/dto.js';
 import { checkoutOf, imageOf, num, str } from './apiPublic/shop.js';
+import { countOf, LEGACY_UNLIMITED } from '$lib/shop/stock.js';
 
 export const ORDERS_CREATE_SCOPE = 'orders:create';
 export const ORDERS_READ_SCOPE = 'orders:read';
@@ -461,8 +462,6 @@ export interface OrderPlan {
   notes: string[];
 }
 
-/** Stock `-1` is "unlimited", everywhere in the platform. */
-const UNLIMITED = -1;
 
 /** Money is stored to the agora; float noise must not open a gap note. */
 const round2 = (n: number) => Math.round(n * 100) / 100;
@@ -473,6 +472,10 @@ const round2 = (n: number) => Math.round(n * 100) / 100;
  * `products` are raw `matanot` nodes **of this rikma** (the query filters by
  * `projectcreates`, so a foreign id is simply absent); `variants` are raw
  * `product-variant` nodes of this rikma, keyed by id.
+ *
+ * "Unlimited" is the row's `unlimited` flag — the caller merges it into the
+ * attributes when it is deployed (`withFlag`), and a row without it reads the
+ * old `-1` (`$lib/shop/stock.ts`). A counted `-1` is a queue of one.
  *
  * Stock is accounted in a running map, so two lines on the same variant (or
  * product) see each other: the second one is oversold if together they ask
@@ -485,7 +488,8 @@ export function planOrder(args: {
   variants: Map<string, { id: string | number; attributes?: Record<string, any> | null }>;
 }): OrderPlan | OrderRefusal {
   const { payload, products, variants } = args;
-  const remaining = new Map<string, number>();
+  // The running count of each counted row; `null` = unlimited.
+  const remaining = new Map<string, number | null>();
   const notes: string[] = [];
   const lines: PlannedLine[] = [];
 
@@ -543,13 +547,16 @@ export function planOrder(args: {
     // Running stock — a variant's own when the line has one, else the product's.
     const stockKey = v ? `v:${input.variantId}` : `p:${input.productId}`;
     if (!remaining.has(stockKey)) {
-      remaining.set(stockKey, num(v ? v.quant : a.quant) ?? (v ? 0 : UNLIMITED));
+      // A variant with no number has 0; a legacy product with none is unlimited.
+      const row = v ?? a;
+      const quant = num(row.quant) ?? (v || row.unlimited === false ? 0 : LEGACY_UNLIMITED);
+      remaining.set(stockKey, countOf({ quant, unlimited: row.unlimited ?? null }));
     }
     const before = remaining.get(stockKey)!;
     const preorder = (num(a.leadTimeHours) ?? 0) > 0;
     let oversold = false;
     let shortBy = 0;
-    if (before !== UNLIMITED) {
+    if (before !== null) {
       oversold = !preorder && input.quantity > before;
       if (oversold) shortBy = input.quantity - Math.max(before, 0);
       remaining.set(stockKey, before - input.quantity);
@@ -869,7 +876,10 @@ export function mayReceive(scopes: unknown, event: OrderWebhookEvent): boolean {
 export interface StockChange {
   productId: string;
   variantId: string | null;
+  /** The count — below zero is units waiting; `-1` beside `unlimited: true` only. */
   quant: number;
+  /** Nothing to count (§2.5). A webhook consumer reads this, never `quant === -1`. */
+  unlimited: boolean;
 }
 
 /** An order event's body — the public order view, never the buyer. */

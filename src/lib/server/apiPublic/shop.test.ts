@@ -314,6 +314,17 @@ describe('availability and the price range', () => {
     });
     expect(stockTotalOf({})).toBeNull();
   });
+
+  it('reads the unlimited flag once it is there — a counted -1 is a queue of one (§2.5)', () => {
+    // The 0 − 1 case: a variant oversold by exactly one unit.
+    expect(availabilityOf({ quant: -1, unlimited: false })).toEqual({ unlimited: false, quantity: -1 });
+    expect(availabilityOf({ quant: 4, unlimited: true })).toEqual({ unlimited: true, quantity: null });
+    // A row from before the flag keeps the old reading.
+    expect(availabilityOf({ quant: -1 })).toEqual({ unlimited: true, quantity: null });
+    expect(availabilityOf({ quant: -1, unlimited: null })).toEqual({ unlimited: true, quantity: null });
+    expect(stockTotalOf({ stockTotal: -1, stockUnlimited: false })).toEqual({ unlimited: false, quantity: -1 });
+    expect(stockTotalOf({ stockTotal: -1, stockUnlimited: true })).toEqual({ unlimited: true, quantity: null });
+  });
 });
 
 describe('optionsOf', () => {

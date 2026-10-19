@@ -15,5 +15,19 @@
   "total": "Total",
   "noteOptional": "Note (optional)",
   "notePlaceholder": "Add a note to the sale...",
-  "claimSent": "Report sent - awaiting {{holderName}}'s consent. It will auto-approve after the rikma's response time if there is no reply."
+  "claimSent": "Report sent - awaiting {{holderName}}'s consent. It will auto-approve after the rikma's response time if there is no reply.",
+  "shopSkin": {
+    "more": "One more unit",
+    "less": "One unit less",
+    "me": "Me",
+    "holderSelf": "The money is with you — the sale is recorded as verified right away and counts toward the split.",
+    "holderOther": "This is a claim about {{name}}'s money, so it opens a consent request. They can approve, talk it over or propose another amount. With no reply within the rikma's response time the sale is approved by silence — until then it does not count toward the split.",
+    "today": "today",
+    "customer": "Customer (optional)",
+    "customerPaid": "Customer (optional · paid)",
+    "customerLabel": "Exact 1lev1 username or email",
+    "customerPh": "username or email",
+    "customerHintRecurring": "A standing order opens a monthly report card; a named customer also confirms their transfer each month.",
+    "customerHintPaid": "The sale is recorded as already paid - the purchase appears on the customer's deals page, no confirmation needed."
+  }
 }

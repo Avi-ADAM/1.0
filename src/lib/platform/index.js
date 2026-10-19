@@ -36,6 +36,13 @@ export function apiUrl(path) {
  */
 export const API_BASE = (import.meta.env.VITE_API_BASE || '').replace(/\/+$/, '');
 
+/**
+ * The address an OUTSIDE system calls — snippets, a shop's server, webhooks
+ * docs. Never the page's own origin: that is a Vercel front (or localhost in
+ * dev), and the public API (/api/v1/...) is served by the instance next to Strapi.
+ */
+export const PUBLIC_API_ORIGIN = API_BASE || 'https://api.1lev1.com';
+
 let patched = false;
 let patchedApiBase = false;
 

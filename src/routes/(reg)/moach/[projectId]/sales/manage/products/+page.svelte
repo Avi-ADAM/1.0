@@ -127,6 +127,11 @@
                     </span>
                   </span>
                 </button>
+                <a
+                  class="pr-edit"
+                  href="/moach/{projectId}/sales/manage/products/{p.id}"
+                  onclick={(e) => e.stopPropagation()}
+                >{$t('shopEditor.edit')}</a>
               </td>
               <td class="pr-wide pr-muted">{variantsText(p)}</td>
               <td class="sh-num pr-price pr-wide"><bdi>{priceText(p)}</bdi></td>
@@ -186,6 +191,15 @@
     border: 1px solid var(--sh-line);
     background: var(--sh-card-2);
     flex-shrink: 0;
+  }
+  .pr-edit {
+    display: inline-flex;
+    align-items: center;
+    min-height: 32px;
+    margin-inline-start: 60px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--sh-gold);
   }
   .pr-name-text {
     display: flex;

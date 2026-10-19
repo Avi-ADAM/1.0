@@ -19,7 +19,15 @@
 > צריך לפני שזה עולה: **§7.5**.
 > **S5 בנוי (2026-10-18):** "ניהול מכירות" ב-`/moach/[projectId]/sales/manage` — הזמנות,
 > מוצרים, מלאי, מכירות וחיבורים — לפי הקנבס "מוח · מכירות — עם מה שקיים"; פירוט ב-**§7.6**.
-> הבא בתור: S4 (עורך הווריאציות והגלריה), והעיצוב החדש של הדף הראשי (גרף, חלוקה, דיווח מכירה).
+> **S4 בנוי (2026-10-18):** עורך המוצר ב-`/moach/[projectId]/sales/manage/products/[productId]`
+> (גלריה, אפשרויות, מטריצת וריאציות, "ממתין לאישור הרקמה"), הפעולות `saveProductVariants` /
+> `saveProductOptions`, תנאי הווריאציות על סבב ה-`editObject` (`negoarch.variants`), וה-lifecycle
+> של השדות הנגזרים ב-`1.0b`. פירוט ומה צריך לפני שזה עולה: **§7.7**.
+> **S6 בנוי (2026-10-19):** תבנית הפתיחה — ריפו נפרד `1lev1-shop-starter` (SvelteKit, Stripe Checkout), וכרטיס
+> "חנות מוכנה לאתר שלכם" בלשונית החיבורים. פירוט ומה צריך לפני שזה עולה: **§7.8**.
+> הבא בתור: העיצוב החדש של הדף הראשי (גרף, חלוקה, דיווח מכירה).
+> **שלב ב' (תכנון):** [PLAN_SHOP_OPERATIONS](../tbd/PLAN_SHOP_OPERATIONS.md) — מטלות ביצוע
+> וצריכת מלאי ממשאבים אחרי הזמנה, ומוצרים מורכבים ומאגדים בקופה (כולל S3b ו-S8 מכאן).
 >
 > **הסכמה (S1) נפרסה ב-`1.0b`** (`shabab`, 2026-10-16). הסקירה מצאה בה שבעה
 > תיקונים — כולם בענף `ccr-21b574f2-p5actf` של `1.0b`, ממתינים למיזוג
@@ -204,14 +212,54 @@
 > והזמינות מחושבת מהם; השדות הנגזרים משמשים רק ל**סינון ולמיון** ב-SQL.
 > זו אותה הפרדה של §12.4: הפילטר הוא קו ראשון, וה-JS מאמת אחריו.
 
-### 2.5 מלאי: אותה סמנטיקה, עכשיו בשלוש רמות
+### 2.5 מלאי: "ללא הגבלה" הוא דגל, ומספר הוא תמיד ספירה
 
-| מצב | `quant` בווריאנט | מה שהקונה רואה |
-|---|---|---|
-| מלאי רגיל | `7` | "נותרו 7" |
-| אזל | `0` | "אזל" + הווריאנט לא נבחר כברירת מחדל |
-| ללא הגבלה | `-1` | "זמין" (בלי מספר) |
-| הזמנה מראש | `0` + `Matanot.leadTimeHours` | "זמן אספקה: 3 שבועות" (Phase 3) |
+| מצב | `quant` | `unlimited` | מה שהקונה רואה |
+|---|---|---|---|
+| מלאי רגיל | `7` | `false` | "נותרו 7" |
+| אזל | `0` | `false` | "אזל" + הווריאנט לא נבחר כברירת מחדל |
+| ממתין לייצור | `-1`, `-3`… | `false` | "אזל" (למוכר: "חסרות 1/3 יחידות") |
+| ללא הגבלה | `-1` (רק בשביל קוראים ישנים) | `true` | "זמין" (בלי מספר) |
+| שורה ישנה | `-1` | ריק | ללא הגבלה — הקריאה הישנה, רק כשהדגל ריק |
+| הזמנה מראש | `0` + `Matanot.leadTimeHours` | `false` | "זמן אספקה: 3 שבועות" (Phase 3) |
+
+**למה דגל (הוכרע 2026-10-18).** `-1` היה גם ספירה וגם סימן: וריאנט במלאי 0
+שנמכרה ממנו יחידה אחת נחת בדיוק על `-1`, ומאותו רגע נקרא "ללא הגבלה" בכל
+מקום — בקטלוג, בלשונית המלאי ובתג "חסר במלאי". וזה קורה בשימוש רגיל, כי
+`createPaidOrder` אף פעם לא מסרב להזמנה ששולמה בגלל מלאי. נשקלו עוד שתי דרכים
+ונדחו: לדלג מעל `-1` (תור של n יחידות נשמר כ-`-(n+1)`) — המספר הגולמי משקר
+ביחידה לכל מי שקורא את `quant` ישירות (Strapi Admin, CSV, ה-API); ולקטום ב-0
+— סותר את התור של הזמנה מראש.
+
+**הכללים** (מקור אחד: `src/lib/shop/stock.ts`, עם בדיקות):
+
+- `product-variant.unlimited` ו-`matanot.unlimited` (boolean, בלי ברירת מחדל).
+  `true` = ללא הגבלה, ו-`quant` נכתב לידו `-1` רק כדי שקורא שעוד לא מכיר את
+  הדגל יגיד "ללא הגבלה". `false` = `quant` הוא ספירה, גם כשהוא `-1`.
+- **ריק = שורה מלפני הדגל**: רק אז `-1` הוא "ללא הגבלה". אין backfill — הריק
+  *הוא* ה-backfill, וכל כתיבה של ספירה שולחת `unlimited: false` במפורש
+  (`countedWrite`), כך ששורה מפסיקה להיות "ישנה" בפעם הראשונה שהיא זזה.
+- `matanot.stockUnlimited` (נגזר, ליד `stockTotal`): "יש וריאנט פעיל ללא הגבלה".
+  ה-lifecycles ב-`1.0b` כותבים את שניהם (`derive.js`, והתאום
+  `src/lib/shop/derived.ts` — הבדיקה מחזיקה אותם שווים).
+- כל מי שמזיז מלאי עובר דרך `moveStock` + `writeStock`
+  (`src/lib/server/shop/stockFlags.ts`): `createSale`, `cancelOrder`,
+  `setShopStock`, ההתאמה של `saleClaim` ב-`voteOnDecision` וב-timegrama.
+- webhook ‏`variant.stockChanged` נושא `data.unlimited`; צרכן קורא אותו, אף פעם
+  לא `quant === -1`.
+
+**הדגל נפרס ביום משלו, ולכן יש gate.** שאילתה שמבקשת שדה שלא קיים נכשלת כולה,
+אז שום שאילתה קיימת לא מבקשת את `unlimited`: הוא נקרא בשאילתות קטנות משלו
+(`stockFlags*`) מאחורי `stockFlagsLive` ומתמזג לשורות, וכתיבה עוברת למוטציה עם
+הדגל רק כשה-probe אומר שהעמודה שם. עד הפריסה הכל מתנהג בדיוק כמו קודם — כולל
+הבאג (`writeStock` מתריע בלוג כשהוא כותב ספירה של `-1` לפני הפריסה).
+
+**מי עוד קורא `-1` כ"ללא הגבלה" ולא עבר** (המשך — אחרי פריסת `1.0b` אפשר
+להוסיף את השדה לשאילתות שלהם ישירות, בלי gate): `/gift/[id]`,
+`deals/sales-center`, `hamatanot.svelte`, `SaleComponent.svelte`,
+`salesService.js` + qid ‏`matanotofs` (15447), הבוט ב-`newTelegram` (שגם מוריד
+מלאי בעצמו). עורך הווריאנטים/המוצר (`variantEditor.ts`, `productEditor`,
+`archive/apply.ts`) עובר לדגל במקביל, בעבודה נפרדת.
 
 מוצר **בלי** וריאנטים ממשיך להתנהג כמו היום (`Matanot.quant`), ו-`stockTotal`
 שלו הוא העתק שה-lifecycle כותב (§2.4). אין שני חוקים — יש רמה אחת שמאכילה את
@@ -536,7 +584,7 @@ GET  /api/v1/r/{rikma}/changes?since=ISO       # Phase 2 — sync אינקרמנ
 
 ```
 order.paid           order.statusChanged   (data.status: shipped | fulfilled | cancelled)
-order.oversold       variant.stockChanged  (data.changed=["quant"], data.quant)
+order.oversold       variant.stockChanged  (data.changed=["quant"], data.quant, data.unlimited)
 ```
 
 אחר כך: `product.created | product.updated | product.archived`,
@@ -644,7 +692,8 @@ order.oversold       variant.stockChanged  (data.changed=["quant"], data.quant)
 | `optionValues` | json | ✔ | — | `[{"key":"size","value":"m","label":"M"}]` — תמונת מצב להצגה |
 | `price` | decimal | | `null` | `null` ⇒ מחיר המוצר (`Matanot.price`) |
 | `compareAtPrice` | decimal | | `null` | מחיר "לפני" — תצוגת מבצע בלבד |
-| `quant` | decimal | | `0` | `-1` = ללא הגבלה (אותה סמנטיקה) |
+| `quant` | decimal | | `0` | ספירה; מתחת לאפס = ממתין לייצור (§2.5) |
+| `unlimited` | boolean | | — | **נוסף 2026-10-18 (§2.5).** `true` = ללא הגבלה; ריק = שורה ישנה, ואז `-1` = ללא הגבלה |
 | `pics` | media (multiple) | | — | גלריה של הווריאנט (0 ⇒ גלריה של המוצר) |
 | `barcode` | string | | — | |
 | `weightGrams` | integer | | — | למשלוח עתידי |
@@ -722,7 +771,9 @@ order.oversold       variant.stockChanged  (data.changed=["quant"], data.quant)
 | `hasVariants` | boolean | לא | `false` | **נגזר** (§2.4) |
 | `priceMin` | decimal | localized | — | **נגזר** — מחיר הבסיס כשאין וריאנטים |
 | `priceMax` | decimal | localized | — | **נגזר** |
-| `stockTotal` | decimal | localized | — | **נגזר** — `-1` = ללא הגבלה |
+| `stockTotal` | decimal | localized | — | **נגזר** — סכום הספירות (`-1` כש-`stockUnlimited`) |
+| `stockUnlimited` | boolean | לא | — | **נגזר, נוסף 2026-10-18 (§2.5)** — יש וריאנט פעיל ללא הגבלה |
+| `unlimited` | boolean | localized (כמו `quant`) | — | **נוסף 2026-10-18 (§2.5)** — מלאי המוצר עצמו ללא הגבלה; ריק = שורה ישנה |
 | `variantAxes` | json | localized | — | **נגזר** — תקציר לצרכן הרשימה |
 | `options` | relation manyToMany → `product-option` | — | — | הצירים שהמוצר משתמש בהם |
 | `variants` | relation oneToMany → `product-variant` | לא | — | **הצד השני של היחס** — בלעדיו אי אפשר לשלוף וריאנטים של מוצר (`GET /options` נשען עליו), ובעורך הווריאנטים הוא מה שמציג "הווריאנטים שלי". ב-Content-Type Builder: כשמוסיפים את השדה `matanot` בקולקציית הווריאנט, שם השדה ההפוך הוא `variants` |
@@ -814,7 +865,7 @@ breakpoints: {
 | `rikmaApiOrderUpdate` (במקום `rikmaApiOrderSetStatus`) | `shipped` / `fulfilled` / `cancelled` + חותמות זמן + הערה | ✅ |
 | `saleRefundReset` | מכירת `self` שהוחזרה: 0/0, הסכום המקורי בהערה | ✅ |
 | `rikmaApiVariantQuant` | עדכון מלאי של וריאנט | ✅ |
-| `shopVariantsSave` / `shopOptionsSave` | העורך למוכר (יצירה/עדכון וריאנטים וצירים) | ⛔ S4 |
+| `shopEditorProduct` / `shopEditorRikmaOptions` / `shopEditorRikmaSkus` / `shopOptionCreate` / `shopOptionUpdate` / `shopVariantCreate` / `shopVariantUpdate` / `shopProductUpdate` / `shopProductLowStock` | העורך למוכר — בקובץ נפרד `qidsShopEditor.js` | ✅ S4 |
 | `moachShopOrders` / `moachShopProducts` / `moachShopLowStock` / `moachShopSales` | מסכי ניהול המכירות (שרת בלבד, אחרי בדיקת החברות של ה-layout) | ✅ S5 |
 | `rikmaApiOrderLink` | קישור ה-`Sheirutpend`/פורום להזמנה | ⛔ S3b (אחרי ה-MVP) |
 
@@ -890,11 +941,11 @@ breakpoints: {
 | **פעולה** | `createSale.ts` (קיים) | + `variantId`/`orderId`; דוחה מוצר עם וריאנטים בלי `variantId`; מוריד את מלאי הווריאנט (נקרא מהשרת) | ✅ |
 | **פעולות** | `orderLifecycle.ts`: `markOrderShipped` / `markOrderFulfilled` / `cancelOrder` (חדשות) | `projectMember`; `cancelOrder` למחזיק בלבד — מאפס מכירות `self` שלא בחלוקה, משאיר את השאר לרקמה (§5.4), מחזיר מלאי להזמנה שלא נשלחה | ✅ + 8 בדיקות |
 | **webhooks** | `src/lib/server/webhooks/orderEvents.ts` (חדש) + שלב 5c ב-`ActionService` | `order.paid` / `order.oversold` / `order.statusChanged` / `variant.stockChanged` — רק למפתח עם `orders:*` (`products:read` למלאי) | ✅ + 8 בדיקות |
-| **פעולה** | `saveProductVariants` / `saveProductOptions` (חדשות) | העורך למוכר. מלאי/תמונות/`active` מיידי; וריאנט חדש או מחיר ⇒ `editObject` במוצר של רקמה (§4 עיקרון 6); ייחודיות `(project, sku)` ו-`(matanot, axisKey)` | ⛔ S4 |
-| **lifecycle** | `1.0b`: `src/api/matanot/…/lifecycles.js`, `src/api/product-variant/…/lifecycles.js` | השדות הנגזרים (§2.4) | ⛔ S4 |
-| **עורך למוכר** | `src/lib/components/products/` | העלאת גלריה (סדר, alt, שער), מחולל מטריצת וריאנטים, עריכה מרוכזת של מחיר/מלאי, תמונות לווריאנט | ⛔ S4 |
+| **פעולה** | `saveProductVariants` / `saveProductOptions` (חדשות) | העורך למוכר. מלאי/תמונות/`active` מיידי; וריאנט חדש או מחיר ⇒ `editObject` במוצר של רקמה (§4 עיקרון 6); ייחודיות `(project, sku)` ו-`(matanot, axisKey)` | ✅ S4 + 14 בדיקות (`shopProductEditor.ts`) |
+| **lifecycle** | `1.0b`: `src/api/matanot/…/lifecycles.js`, `src/api/product-variant/…/lifecycles.js` + `derive.js` | השדות הנגזרים (§2.4) | ✅ S4 (ממתין לפריסה) |
+| **עורך למוכר** | `src/lib/components/shop/ProductEditor.svelte` + `$lib/shop/{variantEditor,productEditor}.ts` | העלאת גלריה (סדר, שער), אפשרויות, מחולל מטריצת וריאנטים, מחיר אחיד, תמונות לווריאנט | ✅ S4 + 25 בדיקות |
 | **מסך מכירות** | `src/routes/(reg)/moach/[projectId]/sales/` + `sales/manage/` (חדש) | שתי שכבות — §7.3; מה נבנה — §7.6 | ✅ S5 (בלי העיצוב החדש של הדף הראשי) |
-| **תבנית פתיחה** | ריפו נפרד (`1lev1-shop-starter`) | §7.4 | ⛔ S6 |
+| **תבנית פתיחה** | ריפו נפרד (`1lev1-shop-starter`) + כרטיס בלשונית החיבורים (`$lib/shop/starter.ts`) | §7.4, §7.8 | ✅ S6 + 32 בדיקות (בריפו של התבנית) — הריפו פורסם |
 | **שוק/חנות פנימית** | `src/lib/components/products/MatanotPublicView.svelte`, `/gift/[id]` | גלריה + בורר וריאנטים + כמות | ⛔ אחרי ה-MVP |
 | **תרגומים** | `src/lib/translations/{he,en,es,ar,ru}/` | בורר, זמינות, שגיאות, מסך ההזמנות והמסך המתקדם + `check:i18n` | עם כל שלב |
 | **OpenAPI** | `docs/tbd/api/rikma-v1.openapi.yaml` | `ApiVariant`, `ApiOption`, `checkout`, `/options`, `/orders`, `/orders/{ref}/cancel`, פרמטרים חדשים | ✅ (החוזה; `/orders` ימומש ב-S3) |
@@ -1125,8 +1176,118 @@ webhooks של הזמנות קוראים ממנה גם את `scopes`.
 התצוגה (SSR) בטלפון ובדסקטופ, בהיר וכהה, והלוגיקה בבדיקות (`manage.test.ts`,
 `shopStock.test.ts`).
 
-**באג שנמצא בדרך ולא תוקן:** `createSale` מוריד מלאי וריאנט מ-0 ל-`-1` במכירת-יתר
-של יחידה אחת — ו-`-1` הוא "ללא הגבלה". צריך הכרעה במודל (ראו §2.5).
+**באג שנמצא בדרך — תוקן בקוד, ממתין לפריסת `1.0b` (2026-10-18):** `createSale`
+הוריד מלאי וריאנט מ-0 ל-`-1` במכירת-יתר של יחידה אחת — ו-`-1` היה "ללא הגבלה".
+הוכרע: דגל `unlimited` (§2.5).
+
+### 7.7 S4 — עורך המוצר: מה נבנה ומה הוכרע
+
+**העיצוב:** הלוח "דסקטופ · עורך מוצר" בקנבס "מוח · מכירות — עם מה שקיים", והקישור "עריכה
+מלאה" (בשורה של לשונית המוצרים). כתוב על אותם טוקנים `sh-*` של S5.
+
+**נבנה:**
+- **הלוגיקה, טהורה ובצד הלקוח** — `$lib/shop/variantEditor.ts`: מפתחות וערכים (`slugOf`,
+  `axisKeyOf` — זהה ל-`apiPublic/shop.ts`, בדיקה מחזיקה אותם שווים), ניקוי אפשרויות, מטריצה
+  (`buildMatrix` — שורה קיימת שומרת מחיר/מלאי/מק״ט/תמונות, צירוף שנעלם **נכבה ולא נמחק**),
+  ולידציה (`DUPLICATE_SKU` מול כל מק״ט אחר ברקמה, `DUPLICATE_VARIANT`), והפיצול
+  `planVariantSave`: מה נשמר עכשיו ומה הולך לרקמה. המסך והשרת מחליטים באותה פונקציה.
+- **הפעולה** `saveProductVariants` — שמירה אחת בשתי מהירויות (§4 עיקרון 6): תמונות, שער, מלאי,
+  מק״ט, סדר, הסתרה, מלאי נמוך והאפשרויות עצמן — מיד; **וריאנט חדש או מחיר שזז** (של וריאנט או
+  של המוצר) — דרך `proposeObjectEdit` על המוצר. מוצר אישי או רקמה של חבר אחד — הכול מיד.
+  מה שחוסם הצעה (הצעה פתוחה, סכמה שלא נפרסה) **לא חוסם את השאר**: המלאי נשמר, והתשובה
+  אומרת למה המחיר מחכה (`blocked`).
+- **תנאי הווריאנטים על הסבב** — `negoarch.variants` (JSON, `$lib/server/archive/variantTerms.ts`):
+  אותה הכרעה, אותו שעון ואותה הצעה נגדית שהמחיר של המוצר תמיד עבר בהם — בלי מודל הצבעה חדש.
+  הצעה נגדית יורשת את התנאים מהסבב הקודם; הבשלה (`applyObjectChange`) כותבת אותם אחרי כתיבת
+  המוצר, ובודקת מחדש מול המוצר **עכשיו**: צירוף שכבר קיים מקבל את המחיר במקום תאום, מק״ט שנתפס
+  בינתיים מקבל סיומת, מחיר לווריאנט שאינו של המוצר נזרק. הנימוק של ההצעה כולל שורה לכל תנאי
+  (`variantTermsSummary`) — זה מה שהשותף רואה בכרטיס בעמוד הלב.
+- **השדה נבדק לפני שקוראים אותו** (`variantTermsLive`): עד שהוא נפרס כל קריאת הכרעה ממשיכה
+  לעבוד, והעורך מסרב לפתוח הצעת מחיר לווריאנט במקום לפתוח אחת שהמחיר נשמט ממנה. כשל תעבורה
+  אינו "לא" — אחרת הצעה נגדית הייתה כותבת מחדש את הסבבים בלי התנאים.
+- **מלאי עם הדגל** (§2.5): העורך קורא `unlimited` דרך `readStockFlags` וכותב מלאי רק דרך
+  `writeStock`, כך ש-`-1` שנספר לעולם לא נשמר כ"ללא הגבלה". מלאי מתחת לאפס שהמכירות השאירו
+  נשאר כמו שהוא; הקלדה של מספר שלילי נדחית.
+- **השדות הנגזרים** — `1.0b`: `product-variant/…/derive.js` (טהור) + שני ה-`lifecycles.js`
+  (הראשונים בריפו). בנוסף הפעולה וההבשלה כותבות אותם פעם נוספת (`refreshDerived`), כדי
+  שפריסה בלי ה-lifecycle כבר תדע שהמוצר נמכר לפי וריאנט (`createSale` דוחה מכירה בלי וריאנט
+  רק כש-`hasVariants`).
+- **תרגומים** — namespace חדש `shopEditor` בחמש השפות, מגודר לנתיבי `sales/*`.
+
+**לפני שזה עולה — חובה:**
+1. לפרוס את `1.0b` עם `negoarch.variants` ושני ה-lifecycles (ענף `shabab`, לא נשלח עדיין).
+2. הרשאות **Authenticated** (§6.9): `find`/`create`/`update` על `product-option` ו-`product-variant`
+   — הפעולה כותבת עם ה-JWT של החבר. `update` על `matanot` כבר קיים.
+3. `npm run types:update`.
+
+**לא נבנה ב-S4 (נשאר):**
+- משלוח, יחידה וקטגוריה בפאנל הצד (בלוח העיצוב — עוד לא).
+- `variant.stockChanged` ל-webhook משמירה בעורך (`setShopStock` כבר משדר).
+- תמונה לערך אפשרות (swatch) — עדכון אפשרות קיימת לא שולח `image`, ולכן תמונה שהוגדרה ב-Strapi
+  Admin תימחק בעדכון הבא של אותו ציר.
+- מסך ההצבעה עצמו לא מציג את התנאים כטבלה — רק בנימוק.
+
+**לא נבדק:** הזרימה מול Strapi אמיתי והאינטראקציות בדפדפן (אותה מגבלה של §7.6). נבדקו הלוגיקה,
+הפעולה, ההבשלה והמודל בבדיקות (`variantEditor`, `productEditor`, `derived` עם בדיקת זהות מול
+העותק ב-`1.0b`, `variantTerms`, `shopProductEditor`), `validate:qids`, `check:i18n`, `check:script`.
+
+### 7.8 S6 — תבנית הפתיחה: מה נבנה ומה הוכרע
+
+**איפה:** ריפו נפרד וציבורי, [`Avi-ADAM/1lev1-shop-starter`](https://github.com/Avi-ADAM/1lev1-shop-starter)
+(מסומן כ-template; פורסם 2026-10-19, commit `3e0ff80`). כפתור ה-Deploy ב-README ובלשונית החיבורים מצביע עליו.
+SvelteKit 2 + Svelte 5, `adapter-auto` (Vercel / Netlify / Cloudflare), בלי SDK של Stripe — REST
+ו-Web Crypto, כך שאותו קוד רץ בכל אחד מהם.
+
+**נבנה:**
+- **קטלוג** (`/`) — רשימה, חיפוש, קטגוריה וצירים מ-`GET /options` (`?option.<key>=`), עימוד. טופס
+  GET רגיל, כך שסינון עובד גם לפני ה-JavaScript.
+- **עמוד מוצר** (`/p/[id]`) — גלריה (הגלריה של הווריאנט קודמת לשל המוצר), בורר וריאנטים, כמות
+  בין `minOrder` ל-`maxOrder`/מלאי, אספקה וזמן הכנה. מוצר `checkout:false` מקבל קישור ל-`buyUrl`.
+- **עגלה** (`/cart`) ב-`localStorage` — **ids וכמויות בלבד, אף פעם לא מחיר**.
+- **תשלום** — `POST /api/checkout` מתמחר מחדש ופותח Stripe Checkout. כל שורה נושאת את
+  `productId`/`variantId` ב-metadata של המוצר ב-Stripe; דמי המשלוח הם שורה נפרדת `role=delivery`.
+- **ה-webhook** (`/api/payments/webhook`) — מאמת `Stripe-Signature` מול הגוף הגולמי (סובלנות 300
+  שניות, כל `v1` שתואם — החלפת סוד), קורא את השורות **מ-Stripe** (`line_items` עם
+  `expand=data.price.product`) ומדווח `POST /orders`. זה המקום היחיד שבו `LEV_ORDERS_KEY` נקרא.
+- **דף תודה** (`/order/[sessionId]`) — שואל את Stripe אם שולם ואת 1lev1 מה מצב ההזמנה
+  (`GET /orders/{ref}`), ומרענן כל 3 שניות כשה-webhook עוד לא הגיע ("ההזמנה נרשמת").
+- **טקסטים** בקובץ אחד (`src/lib/texts.ts`, עברית RTL כברירת מחדל, אנגלית בהחלפת `LANG`),
+  **מראה** בטוקנים של `app.css` (בהיר/כהה).
+- **מתאם תשלום** — `payments/types.ts` מגדיר שלוש פעולות (`createCheckout`, `parseWebhook`,
+  `lookupPayment`). ספק ישראלי (O-M1) הוא קובץ נוסף ושורה ב-`payments/index.ts`.
+- **ב-`1.0main`:** כרטיס "חנות מוכנה לאתר שלכם" בלשונית החיבורים (`sales/manage/connect`) —
+  כפתור Deploy ל-Vercel וקישור לקוד; הכתובות ב-`$lib/shop/starter.ts`; מפתחות
+  `shop.connect.starter*` בחמש השפות.
+
+**הוכרע במימוש:**
+- **המחיר הוא של הקטלוג, תמיד.** `priceCart` (שרת) מתמחר את העגלה גם לדף העגלה וגם לתשלום, באותה
+  פונקציה. אם משהו זז מאז שהקונה הסתכל — מחיר, מלאי, מוצר שירד — `POST /api/checkout` עונה `409`
+  עם העגלה המתוקנת ולא פותח דף תשלום: הקונה לא מחויב על מה שלא ראה.
+- **ה-webhook עונה שגיאה על כל כשל, בכוונה** — `503` לכשל רגעי, `422` לסירוב. Stripe מנסה שוב
+  עד שלושה ימים ומציג את המסירה שנכשלה בלוח שלו, והניסיון החוזר בטוח (אידמפוטנטיות לפי
+  `externalId` = ה-PaymentIntent, §7.5). שורת הלוג `ORDER NOT RECORDED` היא מה שאסור לפספס.
+- **`checkout.session.completed` נספר רק עם `payment_status:'paid'`**; העברה בנקאית שעוד בדרך
+  מדווחת ב-`async_payment_succeeded`.
+- **אספקה** = מה ש**כל** מוצר בעגלה מציע (מוצר בלי `delivery[]` לא מגביל), בדמי המשלוח הגבוהים
+  מביניהם — חבילה אחת. אין הסכמה ⇒ `contact` ("בתיאום איתכם"). כתובת נאספת ב-Stripe רק ל-`delivery`.
+- **מטבע אחד לעגלה** (מוצר במטבע אחר יוצא עם הסבר), ו-`displayNumber` קצר שאפשר להקריא בטלפון
+  (`K7Q4XM`) — נכתב ל-metadata של ה-session ומגיע להזמנה.
+
+**נבדק:** 32 בדיקות בריפו של התבנית (בורר, תמחור, חתימה, מיפוי ה-session להזמנה, ה-webhook מול
+fetch מדומה), `svelte-check` נקי, `vite build`. גוף ההזמנה שהתבנית בונה **עבר את
+`validateOrderPayload` האמיתי** של `1.0main` (בדיקה חד-פעמית). בדפדפן, מול שרת mock בצורת ה-API:
+קטלוג, בורר (מחיר/מלאי/תמונה מתחלפים, ערך שלא מתאים לבחירה עובר לווריאנט שיש בו), עגלה שמתקנת
+כמות למלאי ומסירה מוצר quote ומוצר שנעלם, Stripe עונה 401 למפתח מזויף (כלומר הבקשה הגיעה בצורה
+נכונה), webhook עם חתימה שגויה ⇒ 400, אירוע לא רלוונטי ⇒ 200. ללא גלילה אופקית ב-375px.
+
+**לא נבדק:** תשלום אמיתי ב-Stripe (test mode) עד ההזמנה ברקמה — צריך את ה-API חי
+(`www.1lev1.com/api/v1/r/...` עונה היום 404 — הקוד של S2–S5 עוד לא נפרס) ומפתחות Stripe test.
+הכרטיס בלשונית החיבורים לא נבדק בדפדפן (ה-Strapi המקומי נעול).
+
+**לפני שזה עולה — חובה:**
+1. ~~ליצור את הריפו ב-GitHub~~ — נעשה 2026-10-19.
+2. לפרוס את S2–S5 (§7.5, §7.7) — בלי זה אין `/products` ו-`/orders` לתבנית לקרוא.
+3. הרצה אחת מקצה לקצה: Stripe test mode → הזמנה במסך ההזמנות של רקמת בדיקה.
 
 ---
 
@@ -1138,11 +1299,11 @@ webhooks של הזמנות קוראים ממנה גם את `scopes`.
 | **S1** | הסכמה ב-`1.0b` + פריסה + `types:update` | S0 | ✅ נפרסה 2026-10-16. **תיקוני §6.9** — ענף מוכן, ממתין למיזוג, פריסה והרשאות Authenticated |
 | **S2** | **קריאה:** `shop.ts` + `shopAttrs` + DTO + פרמטרים + `/options` + `checkout` + OpenAPI | S1 | ✅ (2026-10-18) |
 | **S3** | **הזמנה ששולמה:** `POST /orders` + `/orders/{ref}` + `/cancel` + `createPaidOrder` + `variantId` ב-`createSale` + איפוס מכירה `self` + scopes `orders:*` + webhooks `order.*`/`variant.stockChanged` | §6.9 | ✅ (2026-10-18, §7.5) |
-| **S4** | **עורך למוכר:** גלריה + צירים + מחולל וריאנטים + עריכת מחיר/מלאי + `editObject` למחירים + lifecycle של הנגזרים ב-`1.0b` | §6.9 | 6–8 ימים |
+| **S4** | **עורך למוכר:** גלריה + צירים + מחולל וריאנטים + עריכת מחיר/מלאי + `editObject` למחירים + lifecycle של הנגזרים ב-`1.0b` | §6.9 | ✅ (2026-10-18, §7.7) — ממתין לפריסת `1.0b` |
 | **S5** | **מסך מכירות:** השכבה הפשוטה (פס הזמנות ממתינות) + המסך המתקדם (הזמנות, מוצרים, מלאי, מכירות, חיבורים) + ייצוא CSV | S3, S4 | ✅ (2026-10-18, §7.6) |
-| **S6** | **תבנית פתיחה** (§7.4) עם מתאם ספק תשלום אחד | S3 | 3–5 ימים |
+| **S6** | **תבנית פתיחה** (§7.4) עם מתאם ספק תשלום אחד | S3 | ✅ (2026-10-19, §7.8) — הריפו פורסם; ממתין לפריסת S2–S5 ולהרצה מקצה לקצה |
 | — | **כאן ה-MVP שלם** | | |
-| S7 | אתר סטטי: `POST /checkout` + אישור ידני של מחזיק הכסף (§3.5) | S5 | 3–4 ימים |
+| S7 | אתר סטטי: `POST /checkout` + אישור ידני של מחזיק הכסף (§3.5). **הורחב ל"תשלום בתיאום"** (טלפון / וואטסאפ / צ'אט, גם מתוך התבנית) — מסלול T ב-[PLAN_SHOP_OPERATIONS](../tbd/PLAN_SHOP_OPERATIONS.md) §5 | S5 | 3–4 ימים |
 | S8 | ייבוא CSV, מייל אישור לקונה, `changes?since`, delivery-log, כרטיס "הזמנה מהאתר" בעמוד הלב + הזמנה לשליחה כמטלה ברקמה (§7.3) | S5 | 4–6 ימים |
 | S9 | חנות פנימית: גלריה ובורר וריאנטים ב-`/gift/[id]` | S4 | 4–6 ימים |
 | S3b | בקשת רכש למוצר `quote` (Sheirutpend + צ'אט + טוקן קונה) | S3 | 5–7 ימים |

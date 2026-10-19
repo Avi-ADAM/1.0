@@ -18,6 +18,7 @@
 
 import { LOCALES } from '$lib/translations/routes.js';
 import { normalizeCode } from '$lib/money/currencies.js';
+import { availableFilter, unavailableFilter } from '$lib/shop/stock.js';
 import {
   API_PRODUCT_FIELD_SET,
   canSeeStatus,
@@ -63,6 +64,12 @@ export function sortColumnOf(key: string, shopSchema: boolean): string {
  */
 export interface QueryCapabilities {
   shopSchema?: boolean;
+  /**
+   * The `unlimited` stock flag is deployed (`stockFlagsLive`, §2.5). Until it
+   * is, `?available=` reads `-1` as "unlimited" the old way — a variant
+   * oversold to exactly -1 still lists as available.
+   */
+  stockFlags?: boolean;
 }
 
 /** An option key/value that may travel as `?option.<key>=<value>`. */
@@ -160,6 +167,7 @@ export function parseCatalogQuery(
   caps: QueryCapabilities = {}
 ): QueryResult {
   const shopSchema = caps.shopSchema === true;
+  const stockFlags = caps.stockFlags === true;
   // ── pagination ────────────────────────────────────────────────────────────
   const rawLimit = intOf(params.get('limit'));
   if (
@@ -399,8 +407,21 @@ export function parseCatalogQuery(
     // With the shop schema the question is about the product's total stock
     // (`stockTotal`, summed over variants when there are any) — and a row that
     // predates the backfill still answers from its own `quant`.
+    //
+    // With the `unlimited` flag deployed, "unlimited" is the flag and `-1` is
+    // a count (a queue of one) — except on a row that predates the flag
+    // (`$lib/shop/stock.ts` builds those filters, and its test runs them).
     and.push(
-      shopSchema
+      stockFlags && shopSchema
+        ? {
+            or: [
+              availableFilter('stockTotal', 'stockUnlimited'),
+              { and: [{ stockTotal: { null: true } }, availableFilter()] }
+            ]
+          }
+        : stockFlags
+          ? availableFilter()
+          : shopSchema
         ? {
             or: [
               { stockTotal: { gt: 0 } },
@@ -418,7 +439,16 @@ export function parseCatalogQuery(
   }
   if (available === 'false') {
     and.push(
-      shopSchema
+      stockFlags && shopSchema
+        ? {
+            or: [
+              { and: [{ stockTotal: { notNull: true } }, unavailableFilter('stockTotal', 'stockUnlimited')] },
+              { and: [{ stockTotal: { null: true } }, unavailableFilter()] }
+            ]
+          }
+        : stockFlags
+          ? unavailableFilter()
+          : shopSchema
         ? {
             or: [
               { stockTotal: { eq: 0 } },

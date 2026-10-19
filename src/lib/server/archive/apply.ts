@@ -35,6 +35,8 @@ import {
   renegotiatePendingOffers,
   type RenegotiatedOffer,
 } from './pendingOffers.js';
+import { applyVariantTerms, type VariantTermsResult } from './variantTerms.js';
+import type { VariantTerm } from '$lib/shop/variantEditor.js';
 
 export type RoundMode = 'archive' | 'keep';
 export type HoursOutcome = 'credit' | 'waive' | 'transfer' | 'endOfCycle';
@@ -66,6 +68,13 @@ export interface StandingRound {
   shiftsMin?: number | null;
   shiftsMax?: number | null;
   howMany?: number | null;
+  /**
+   * A product's variant terms (PLAN_SHOP_CUSTOMER_EXPERIENCE §4 principle 6):
+   * new variants and moved variant prices, as `$lib/shop/variantEditor`
+   * `VariantTerm`s. Only on a `matanot` target, only once `negoarch.variants`
+   * is deployed (`./variantTerms.ts`).
+   */
+  variants?: VariantTerm[] | null;
 }
 
 export interface ApplyResult {
@@ -100,6 +109,8 @@ export interface ApplyResult {
    * before the vote, and this reports what actually happened.
    */
   membershipEnded?: { userId: string; projectId: string; remainingMembers: number };
+  /** The product variants an approved edit created or re-priced (./variantTerms.ts). */
+  variantTerms?: VariantTermsResult;
 }
 
 /** Set `lifecycle` (and optionally `archiveEffectiveFrom`) on any target. */
@@ -469,6 +480,13 @@ export async function applyObjectChange(
       await reopenIfSeatsFree(exec, target.id);
     }
 
+    // A product's agreed variant terms — after the product's own write, so a
+    // variant without a price of its own reads the agreed base price.
+    let variantTerms: VariantTermsResult | undefined;
+    if (target.kind === 'matanot' && round.variants?.length) {
+      variantTerms = await applyVariantTerms(exec, target, round.variants);
+    }
+
     // The rikma agreed among itself; the people who applied did not. Hand each
     // of them the new terms as a counter round so their earlier yes — and their
     // silence — cannot be read as consent to something they never saw.
@@ -483,6 +501,7 @@ export async function applyObjectChange(
       lifecycle: 'active',
       renegotiatedOffers,
       ...(rateFlush?.flushed ? { rateFlush } : {}),
+      ...(variantTerms ? { variantTerms } : {}),
     };
   }
 

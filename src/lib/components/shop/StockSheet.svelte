@@ -13,7 +13,8 @@
   import { toast } from 'svelte-sonner';
   import { invalidate } from '$app/navigation';
   import { executeAction } from '$lib/client/actionClient';
-  import { nextStock, UNLIMITED, type StockMode, type StockRow } from '$lib/shop/manage';
+  import { nextStock, stockWouldChange, type StockMode, type StockRow } from '$lib/shop/manage';
+  import type { StockWrite } from '$lib/shop/stock';
   import { shopOrdersKey, shopProductsKey } from '$lib/shop/keys';
   import ShopSheet from './ShopSheet.svelte';
 
@@ -33,7 +34,8 @@
   function reset() {
     const d: Record<string, Draft> = {};
     for (const r of rows) {
-      const unlimited = r.quant === UNLIMITED || r.quant === null;
+      // `null` is unlimited; any number — `-1` included — is a count.
+      const unlimited = r.quant === null;
       // The current count as it is — below zero is the production queue, and an
       // untouched row must read as unchanged, so it is not clamped here.
       d[r.key] = { value: mode === 'set' && !unlimited ? (r.quant ?? 0) : 0, unlimited, error: false };
@@ -53,15 +55,15 @@
     reset();
   }
 
-  function after(r: StockRow): number | null {
+  function after(r: StockRow): StockWrite | null {
     const d = drafts[r.key];
     if (!d) return null;
-    return nextStock(r.quant === null ? UNLIMITED : r.quant, mode, Number(d.value), d.unlimited);
+    return nextStock(r.quant, mode, Number(d.value), d.unlimited);
   }
 
   function changed(r: StockRow): boolean {
     const n = after(r);
-    return n !== null && n !== (r.quant ?? UNLIMITED);
+    return n !== null && stockWouldChange(r.quant, n);
   }
 
   let dirty = $derived(rows.filter(changed));
@@ -126,11 +128,11 @@
             <div class="ss-row-text">
               <span class="ss-label">{r.label ?? productName}</span>
               <span class="ss-now">
-                {r.quant === UNLIMITED || r.quant === null ? $t('shop.stock.nowUnlimited') : $t('shop.stock.now', { count: r.quant })}
+                {r.quant === null ? $t('shop.stock.nowUnlimited') : $t('shop.stock.now', { count: r.quant })}
                 {#if r.sku} · <bdi class="ss-mono">{r.sku}</bdi>{/if}
               </span>
-              {#if changed(r) && next !== null && next !== UNLIMITED}
-                <span class="ss-after">{$t('shop.stock.after', { count: next })}</span>
+              {#if changed(r) && next !== null && !next.unlimited}
+                <span class="ss-after">{$t('shop.stock.after', { count: next.quant })}</span>
               {/if}
             </div>
             <div class="ss-ctrl">

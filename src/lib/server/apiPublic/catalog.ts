@@ -30,6 +30,7 @@ import {
 import { apiRikmaPath } from './rikmaPath.js';
 import { optionAxesOf, optionValuesOf } from './shop.js';
 import { errorText, schemaProbe } from './schemaProbe.js';
+import { readStockFlags } from '$lib/server/shop/stockFlags.js';
 
 export type ApiRun = (
   qid: string,
@@ -293,6 +294,47 @@ function paginationOf(
 }
 
 /**
+ * The `unlimited` stock flag, merged into the rows the catalog already read
+ * (PLAN_SHOP_CUSTOMER_EXPERIENCE §2.5). Its own small queries behind
+ * `stockFlagsLive`, so the catalog queries never name a column that may not be
+ * deployed; until it is, the rows come back untouched and `-1` reads as
+ * "unlimited" the old way. New objects — the cached responses stay as they were.
+ */
+async function withStockFlags(
+  run: ApiRun,
+  nodes: any[],
+  shopRows: Map<string, Record<string, any>>,
+  variantRows: Map<string, any[]> | null
+): Promise<{ nodes: any[]; shopRows: Map<string, Record<string, any>>; variantRows: Map<string, any[]> | null }> {
+  const productIds = nodes.map((n) => String(n.id));
+  const variantIds = variantRows ? [...variantRows.values()].flat().map((v) => String(v?.id)) : [];
+  const flags = await readStockFlags(run, { productIds, variantIds });
+  if (!flags.live || (!flags.products.size && !flags.variants.size)) return { nodes, shopRows, variantRows };
+
+  const flagged = (row: any, unlimited: boolean | null | undefined) =>
+    unlimited === undefined ? row : { ...row, attributes: { ...(row?.attributes ?? {}), unlimited } };
+  return {
+    nodes: nodes.map((n) => flagged(n, flags.products.get(String(n.id))?.unlimited)),
+    // Only a row the shop layer returned gets the derived flag: a product with
+    // no shop row must keep answering "no shop layer" (`attrs: null`).
+    shopRows: new Map(
+      [...shopRows].map(([id, extra]) => {
+        const stockUnlimited = flags.products.get(id)?.stockUnlimited;
+        return [id, stockUnlimited === undefined ? extra : { ...extra, stockUnlimited }];
+      })
+    ),
+    variantRows: variantRows
+      ? new Map(
+          [...variantRows].map(([pid, list]) => [
+            pid,
+            list.map((v) => flagged(v, flags.variants.get(String(v?.id))?.unlimited))
+          ])
+        )
+      : null
+  };
+}
+
+/**
  * One page of the catalog. The filters carry the rikma and the visibility rule
  * (`buildCatalogFilters`); the JS pass below re-checks each row's derived
  * status, because a filter that is subtly wrong on a NULL column must not
@@ -332,13 +374,16 @@ export async function fetchProductPage(
   // Two optional queries, both of which degrade to "no shop layer" rather than
   // to an error: the aggregates/gallery block (always, when the schema exists)
   // and the variant rows (only when they were asked for).
-  const shopRows = await fetchShopRows(run, { projectId, productIds });
   const wantVariants = query.expand.includes('variants');
-  const variantRows = wantVariants
-    ? await fetchVariantRows(run, { projectId, productIds })
-    : null;
+  const flagged = await withStockFlags(
+    run,
+    rows,
+    await fetchShopRows(run, { projectId, productIds }),
+    wantVariants ? await fetchVariantRows(run, { projectId, productIds }) : null
+  );
+  const { shopRows, variantRows } = flagged;
 
-  const data = rows
+  const data = flagged.nodes
     .map((node) => {
       const id = String(node.id);
       return toApiProduct(node, rikma, {
@@ -369,18 +414,16 @@ export async function fetchProduct(
   // a buyer chooses on, and the price/stock of the chosen combination has to be
   // in the same response (§5.1).
   const productIds = [String(node.id)];
-  const shopRows = await fetchShopRows(run, {
-    projectId: String(args.projectId),
-    productIds
-  });
-  const variantRows = await fetchVariantRows(run, {
-    projectId: String(args.projectId),
-    productIds
-  });
+  const flagged = await withStockFlags(
+    run,
+    [node],
+    await fetchShopRows(run, { projectId: String(args.projectId), productIds }),
+    await fetchVariantRows(run, { projectId: String(args.projectId), productIds })
+  );
 
-  return toApiProduct(node, args.rikma, {
-    attrs: shopRows.get(productIds[0]) ?? null,
-    variants: variantRows.get(productIds[0]) ?? []
+  return toApiProduct(flagged.nodes[0], args.rikma, {
+    attrs: flagged.shopRows.get(productIds[0]) ?? null,
+    variants: flagged.variantRows?.get(productIds[0]) ?? []
   });
 }
 

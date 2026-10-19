@@ -1,5 +1,6 @@
 import { digestQids, serviceTwin } from './qidsDigest.js';
 import { assistantQids } from './qidsAssistant.js';
+import { shopEditorQids } from './qidsShopEditor.js';
 
 /**
  * "Not archived by a rikma decision" (PLAN_OBJECT_ARCHIVAL).
@@ -17555,14 +17556,14 @@ ${STIPEND_DECISION_FIELDS}
   }`,
 
   'stockFlagsVariants': `query StockFlagsVariants($ids: [ID]) {
-    productVariants(filters: { id: { in: $ids } }, pagination: { limit: 100 }) {
+    productVariants(filters: { id: { in: $ids } }, pagination: { limit: ${SHOP_VARIANTS_LIMIT} }) {
       data { id attributes { quant unlimited } }
     }
   }`,
 
   'stockFlagsMatanots': `query StockFlagsMatanots($ids: [ID]) {
-    matanots(filters: { id: { in: $ids } }, pagination: { limit: 100 }) {
-      data { id attributes { quant unlimited } }
+    matanots(filters: { id: { in: $ids } }, pagination: { limit: ${SHOP_ATTRS_LIMIT} }) {
+      data { id attributes { quant unlimited stockUnlimited } }
     }
   }`,
 
@@ -17676,7 +17677,8 @@ ${STIPEND_DECISION_FIELDS}
   ...qids_base,
   ...moachQids,
   ...digestQids,
-  ...assistantQids
+  ...assistantQids,
+  ...shopEditorQids
 };
 
 // The daily digest's service twin of 85 — the same query text with `$uid` for

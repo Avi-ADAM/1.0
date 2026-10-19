@@ -1,8 +1,11 @@
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { ActionError } from '../errors.js';
 import { scope, scopeList } from '$lib/realtime/scopes.js';
-import { nextStock, UNLIMITED, type StockMode } from '$lib/shop/manage.js';
+import { nextStock, stockWouldChange, type StockMode } from '$lib/shop/manage.js';
+import { countOf, LEGACY_UNLIMITED } from '$lib/shop/stock.js';
 import type { StockChange } from '$lib/server/ordersApi.js';
+import { readStockFlags, writeStock } from '$lib/server/shop/stockFlags.js';
+import type { ProbeRun } from '$lib/server/apiPublic/schemaProbe.js';
 
 /**
  * A member updates a product's or a variant's stock from the moach's sales
@@ -19,6 +22,10 @@ import type { StockChange } from '$lib/server/ordersApi.js';
  * against the stock *on the server* at the moment of the write, so a sale that
  * landed while the sheet was open is not overwritten — the same reason
  * `createSale` reads the variant's stock itself.
+ *
+ * "Unlimited" is a switch, written as the `unlimited` flag once it is deployed
+ * (§2.5) — so a count that is `-1` stays a count, and `add` to it fills the
+ * queue. Before the flag lands, `-1` is still how unlimited is written.
  *
  * Both rows are fenced to the rikma in the query (`ordersApiProducts` filters
  * by `projectcreates`; the variant must name this product and this rikma), so
@@ -39,7 +46,10 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
   const product = pRes?.data?.matanots?.data?.[0];
   if (!product?.id) throw new ActionError('PRODUCT_NOT_FOUND', 'No such product in this rikma');
   const hasVariants = product.attributes?.hasVariants === true;
+  const stockRun: ProbeRun = (qid, vars) => strapi.execute(qid, vars, context.jwt, context.fetch);
+  const flags = await readStockFlags(stockRun, variantId ? { variantIds: [variantId] } : { productIds: [productId] });
 
+  // `before` is the count, or `null` when the row is unlimited.
   let before: number | null;
   if (variantId) {
     const vRes = await strapi.execute('saleVariantInfo', { id: variantId }, context.jwt, context.fetch);
@@ -52,13 +62,15 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
     ) {
       throw new ActionError('VARIANT_NOT_FOUND', 'No such variant of this product');
     }
-    before = va.quant == null ? 0 : Number(va.quant);
+    before = countOf({ quant: va.quant ?? 0, unlimited: flags.variants.get(variantId)?.unlimited ?? null });
   } else {
     // A product sold by variant counts its stock on the variants — writing
     // `Matanot.quant` under them would make two stocks disagree (§2.3).
     if (hasVariants) throw new ActionError('VARIANT_REQUIRED', 'This product is stocked per variant');
-    const q = product.attributes?.quant;
-    before = q == null ? UNLIMITED : Number(q);
+    // A legacy product with no number reads as unlimited, as it always did.
+    const unlimitedFlag = flags.products.get(productId)?.unlimited ?? null;
+    const q = product.attributes?.quant ?? (unlimitedFlag === false ? 0 : LEGACY_UNLIMITED);
+    before = countOf({ quant: q, unlimited: unlimitedFlag });
   }
 
   const next = nextStock(before, mode, value, unlimited);
@@ -70,23 +82,19 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
         : 'Stock is a number of units, 0 or more'
     );
   }
-  if (next === before) {
-    return { productId, variantId, quant: next, changed: false, stockChanges: [] };
+  if (!stockWouldChange(before, next)) {
+    return { productId, variantId, quant: next.quant, unlimited: next.unlimited, changed: false, stockChanges: [] };
   }
 
-  if (variantId) {
-    await strapi.execute('rikmaApiVariantQuant', { id: variantId, quant: next }, context.jwt, context.fetch);
-  } else {
-    await strapi.execute('updateMatanotQuant', { id: productId, quant: next }, context.jwt, context.fetch);
-  }
-  const stockChanges: StockChange[] = [{ productId, variantId, quant: next }];
-  return { productId, variantId, quant: next, before, changed: true, stockChanges };
+  const stored = await writeStock(stockRun, variantId ? { variantId } : { productId }, next);
+  const stockChanges: StockChange[] = [{ productId, variantId, quant: stored.quant, unlimited: stored.unlimited }];
+  return { productId, variantId, quant: stored.quant, unlimited: stored.unlimited, before, changed: true, stockChanges };
 };
 
 export const setShopStockConfig: ActionConfig = {
   key: 'setShopStock',
   description:
-    "Update a product's or variant's stock (any rikma member): `set` the counted number, or `add` a delivery. Unlimited is -1. Operational — applies at once; prices are not touched.",
+    "Update a product's or variant's stock (any rikma member): `set` the counted number, or `add` a delivery; `unlimited` switches counting off. Operational — applies at once; prices are not touched.",
   graphqlOperation: handler,
   paramSchema: {
     projectId: { type: 'string', required: true },
@@ -94,7 +102,7 @@ export const setShopStockConfig: ActionConfig = {
     variantId: { type: 'string', required: false, description: 'Required for a product sold by variant' },
     mode: { type: 'string', required: false, description: '`set` (default) or `add`' },
     value: { type: 'number', required: false, description: 'Units: the new count (`set`) or how many came in (`add`)' },
-    unlimited: { type: 'boolean', required: false, description: 'Stock without a limit (-1)' }
+    unlimited: { type: 'boolean', required: false, description: 'Stock without a limit (the unlimited flag)' }
   },
   authRules: [
     { type: 'jwt', errorMessage: 'Must be authenticated to update stock' },

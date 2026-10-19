@@ -17,7 +17,6 @@
  * switched off and stays — old orders point at it (§4 principle 3).
  */
 
-export const UNLIMITED = -1;
 /** Shopify's limits, and ours: three axes, a hundred variants (the qid's page). */
 export const MAX_AXES = 3;
 export const MAX_VALUES = 30;
@@ -54,7 +53,11 @@ export interface EditorVariant {
   /** null = the product's price. */
   price: number | null;
   compareAtPrice: number | null;
-  /** -1 = unlimited. */
+  /**
+   * Nothing to count (`$lib/shop/stock.ts`). When false, `quant` is a count —
+   * and it may be below zero: the units already sold and waiting to be made.
+   */
+  unlimited: boolean;
   quant: number;
   active: boolean;
   position: number;
@@ -202,6 +205,7 @@ export function buildMatrix(args: {
       sku: suggestSku(args.productId, pairs),
       price: null,
       compareAtPrice: null,
+      unlimited: false,
       quant: 0,
       active: true,
       position: i,
@@ -234,15 +238,24 @@ export interface VariantIssue {
 }
 
 export const validPrice = (p: number | null): boolean => p === null || (Number.isFinite(p) && p >= 0);
-/** A count of units, or -1 for unlimited. */
-export const validStock = (q: number): boolean => Number.isFinite(q) && (q === UNLIMITED || q >= 0);
+/**
+ * A count the seller may type: 0 or more. Below zero is never typed — it is
+ * what sales leave behind (the production queue), so an existing row keeps
+ * whatever count it has until the seller changes it.
+ */
+export const validStock = (q: number): boolean => Number.isFinite(q) && q >= 0;
 
 /**
  * What a save refuses (§5.7): the same combination twice (`DUPLICATE_VARIANT`),
  * the same SKU twice in the rikma (`DUPLICATE_SKU` — `takenSkus` is every SKU of
  * the rikma's *other* products), a negative price or stock.
  */
-export function validateVariants(rows: EditorVariant[], takenSkus: Iterable<string> = []): VariantIssue[] {
+export function validateVariants(
+  rows: EditorVariant[],
+  takenSkus: Iterable<string> = [],
+  /** The stored count of each existing row — a queue below zero may stay as it is. */
+  storedCounts: Map<string, number> = new Map()
+): VariantIssue[] {
   const issues: VariantIssue[] = [];
   const taken = new Set([...takenSkus].map((s) => s.trim().toLowerCase()));
   const skus = new Map<string, number>();
@@ -259,7 +272,8 @@ export function validateVariants(rows: EditorVariant[], takenSkus: Iterable<stri
       keys.set(v.axisKey, index);
     }
     if (!validPrice(v.price) || !validPrice(v.compareAtPrice)) issues.push({ index, code: 'priceInvalid' });
-    if (!validStock(v.quant)) issues.push({ index, code: 'stockInvalid' });
+    const kept = v.id != null && storedCounts.get(v.id) === v.quant;
+    if (!v.unlimited && !kept && !validStock(v.quant)) issues.push({ index, code: 'stockInvalid' });
   });
   return issues;
 }
@@ -276,6 +290,7 @@ export type VariantTerm =
       sku: string;
       price: number | null;
       compareAtPrice: number | null;
+      unlimited: boolean;
       quant: number;
       position: number;
     }
@@ -283,7 +298,10 @@ export type VariantTerm =
 
 export interface VariantPatch {
   id: string;
-  patch: Partial<Pick<EditorVariant, 'sku' | 'name' | 'quant' | 'active' | 'position' | 'compareAtPrice' | 'picIds' | 'optionValues' | 'price'>>;
+  patch: Partial<Pick<EditorVariant, 'sku' | 'name' | 'active' | 'position' | 'compareAtPrice' | 'picIds' | 'optionValues' | 'price'>> & {
+    /** A stock write always carries its flag (`$lib/shop/stock.ts` `StockWrite`). */
+    stock?: { quant: number; unlimited: boolean };
+  };
 }
 
 export interface SavePlan {
@@ -329,7 +347,8 @@ export function planVariantSave(args: {
           sku: v.sku.trim(),
           price: v.price,
           compareAtPrice: v.compareAtPrice,
-          quant: v.quant,
+          unlimited: v.unlimited,
+          quant: v.unlimited ? -1 : v.quant,
           position: v.position
         });
       continue;
@@ -338,7 +357,9 @@ export function planVariantSave(args: {
     const patch: VariantPatch['patch'] = {};
     if (v.sku.trim() !== old.sku) patch.sku = v.sku.trim();
     if (v.name !== old.name) patch.name = v.name;
-    if (v.quant !== old.quant) patch.quant = v.quant;
+    if (v.unlimited !== old.unlimited || (!v.unlimited && v.quant !== old.quant)) {
+      patch.stock = v.unlimited ? { quant: -1, unlimited: true } : { quant: v.quant, unlimited: false };
+    }
     if (v.active !== old.active) patch.active = v.active;
     if (v.position !== old.position) patch.position = v.position;
     if (!samePrice(v.compareAtPrice, old.compareAtPrice)) patch.compareAtPrice = v.compareAtPrice;
@@ -394,8 +415,9 @@ export function parseVariantTerms(raw: unknown): VariantTerm[] {
       const axisKey = axisKeyOf(optionValues);
       const sku = s(t.sku, 60);
       const price = numOrNull(t.price);
-      const quant = numOrNull(t.quant) ?? 0;
-      if (!axisKey || !sku || !validPrice(price) || !validStock(quant)) continue;
+      const unlimited = t.unlimited === true;
+      const quant = unlimited ? -1 : (numOrNull(t.quant) ?? 0);
+      if (!axisKey || !sku || !validPrice(price) || (!unlimited && !validStock(quant))) continue;
       out.push({
         kind: 'create',
         axisKey,
@@ -404,6 +426,7 @@ export function parseVariantTerms(raw: unknown): VariantTerm[] {
         sku,
         price,
         compareAtPrice: numOrNull(t.compareAtPrice),
+        unlimited,
         quant,
         position: numOrNull(t.position) ?? 0
       });

@@ -11,6 +11,7 @@
 import { gqlStr, run, type Exec } from './gql.js';
 import { shiftsEnabled } from '$lib/server/shifts/mode.js';
 import { TARGET_META, type TargetKind } from './targets.js';
+import { parseVariantTerms, variantTermsLive } from './variantTerms.js';
 import type { ArchiveScope, HoursOutcome, RoundMode, StandingRound } from './apply.js';
 import type { ArchiveSource, DecisionKind } from './decision.js';
 
@@ -65,6 +66,9 @@ export async function fetchObjectChangeDecision(
   exec: Exec,
   decisionId: string,
 ): Promise<ObjectChangeDecision | null> {
+  // A product's variant terms (./variantTerms.ts) — selected only once the
+  // field is deployed, or every Decision read would fail.
+  const withVariants = await variantTermsLive(exec);
   const data = await run(
     exec,
     `{ decision(id: ${gqlStr(decisionId)}) { data { id attributes {
@@ -76,6 +80,7 @@ export async function fetchObjectChangeDecision(
         ordern mode why zman name descrip hm price kindOf
         sqadualed sqadualedf hoursOutcome hoursToCredit effectiveFrom
         ${shiftsEnabled() ? 'shiftsMin shiftsMax howMany' : ''}
+        ${withVariants ? 'variants' : ''}
         proposedBy { data { id } }
         transferTo { data { id } }
       }
@@ -135,6 +140,7 @@ export async function fetchObjectChangeDecision(
         shiftsMin: num(r.shiftsMin),
         shiftsMax: num(r.shiftsMax),
         howMany: num(r.howMany),
+        variants: withVariants ? parseVariantTerms(r.variants) : null,
         proposedById: r.proposedBy?.data?.id ? String(r.proposedBy.data.id) : null,
         zman: r.zman ?? null,
       }),

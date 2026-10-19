@@ -6,6 +6,7 @@
   import { browser } from '$app/environment';
   import { t } from '$lib/translations';
   import { lang } from '$lib/stores/lang.js';
+  import { PUBLIC_API_ORIGIN } from '$lib/platform/index.js';
   import { toast } from 'svelte-sonner';
 
   /**
@@ -33,7 +34,7 @@
 
   let expanded = $state(false);
 
-  /** @type {Array<{ id: string, name: string, key_prefix: string, revoked: boolean, lastUsedAt: string | null }>} */
+  /** @type {Array<{ id: string, name: string, key_prefix: string, revoked: boolean, lastUsedAt: string | null, scopes?: string[] }>} */
   let keys = $state([]);
   let loadingKeys = $state(false);
   let creating = $state(false);
@@ -47,9 +48,12 @@
   /** @type {string} */
   let copiedWhat = $state('');
 
-  const apiBase = $derived(browser ? window.location.origin : 'https://1lev1.com');
+  // The snippet runs on the member's site, so it names the public API, not this page's origin.
+  const apiBase = PUBLIC_API_ORIGIN;
 
-  const activeKey = $derived(keys.find((k) => !k.revoked) ?? null);
+  // Only a key that can report a sale — the rikma's other keys (the shop's
+  // orders key, a task-desk key) live in the same list but are not this panel's.
+  const activeKey = $derived(keys.find((k) => !k.revoked && k.scopes?.includes('sales:report')) ?? null);
   const hasKey = $derived(!!activeKey || !!newRawKey);
 
   // Value used inside snippets: the real key right after creation, otherwise a
@@ -381,6 +385,8 @@
     border-radius: 0.5rem;
     overflow: hidden;
     align-self: start;
+    background: var(--surface, #fff);
+    color: var(--surface-ink, #2b2620);
   }
   .accordion-toggle {
     width: 100%;
@@ -388,7 +394,8 @@
     align-items: center;
     gap: 0.5rem;
     padding: 0.75rem 1rem;
-    background: var(--gold, #fff8e1);
+    background: var(--surface-2, #f7f5ef);
+    color: var(--surface-ink, #2b2620);
     font-weight: 700;
     cursor: pointer;
     border: none;
@@ -423,10 +430,6 @@
     opacity: 0.75;
     margin: 0.25rem 0;
   }
-  button.primary,
-  .accordion-toggle {
-    color: inherit;
-  }
   button.primary {
     background: var(--barbi, #e91e8c);
     color: #fff;
@@ -449,14 +452,16 @@
     flex: 1;
     min-width: 12rem;
     word-break: break-all;
-    background: #f3f4f6;
+    background: var(--surface-2, #f3f4f6);
+    color: var(--surface-ink, #2b2620);
     padding: 0.4rem 0.6rem;
     border-radius: 0.375rem;
     font-size: 0.8rem;
   }
   .new-key {
     border: 1px solid #fcd34d;
-    background: #fffbeb;
+    background: var(--surface-2, #fffbeb);
+    color: var(--surface-ink, #2b2620);
     padding: 0.75rem;
     border-radius: 0.5rem;
     margin-bottom: 0.75rem;
@@ -506,7 +511,9 @@
   }
   .selects select {
     padding: 0.4rem;
-    border: 1px solid #d1d5db;
+    border: 1px solid var(--surface-line, #d1d5db);
+    background: var(--surface, #fff);
+    color: var(--surface-ink, #2b2620);
     border-radius: 0.375rem;
   }
   .tabs {
@@ -516,8 +523,9 @@
   }
   .tabs button {
     padding: 0.35rem 0.9rem;
-    border: 1px solid #d1d5db;
-    background: #f9fafb;
+    border: 1px solid var(--surface-line, #d1d5db);
+    background: var(--surface-2, #f9fafb);
+    color: var(--surface-ink, #2b2620);
     cursor: pointer;
     border-radius: 0.375rem;
     font-size: 0.85rem;
@@ -568,12 +576,13 @@
   }
   table.vars th,
   table.vars td {
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--surface-line, #e5e7eb);
     padding: 0.4rem 0.5rem;
     text-align: start;
   }
   table.vars code {
-    background: #f3f4f6;
+    background: var(--surface-2, #f3f4f6);
+    color: var(--surface-ink, #2b2620);
     padding: 0.1rem 0.3rem;
     border-radius: 0.25rem;
   }

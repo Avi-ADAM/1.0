@@ -17,6 +17,7 @@ import {
   markOrderShippedConfig
 } from './orderLifecycle.js';
 import { validateOrderPayload, type OrderPayload } from '$lib/server/ordersApi.js';
+import { resetStockFlagsVerdict } from '$lib/server/shop/stockFlags.js';
 
 type Row = Record<string, any>;
 
@@ -33,7 +34,9 @@ function makeDb() {
     lines: [] as Row[],
     sales: [] as Row[],
     calls: [] as string[],
-    failOnce: new Set<string>()
+    failOnce: new Set<string>(),
+    /** Is the `unlimited` column deployed in this Strapi? (§2.5) */
+    flagsLive: false
   };
 }
 let db: ReturnType<typeof makeDb>;
@@ -163,6 +166,42 @@ const strapi = {
         Object.assign(s, { in: vars.in, unit: vars.unit, note: vars.note });
         return { data: { updateSale: { data: { id: s.id } } } };
       }
+      // The `unlimited` flag — a schema without it fails validation, as Strapi does.
+      case 'stockFlagsSchema':
+        if (!db.flagsLive) throw new Error('GRAPHQL_VALIDATION_FAILED: Cannot query field "unlimited"');
+        return { data: { productVariants: idsOf([]), matanots: idsOf([]) } };
+      case 'stockFlagsVariants':
+        return {
+          data: {
+            productVariants: idsOf(
+              vars.ids.filter((id: string) => db.variants.has(id)).map((id: string) => {
+                const v = db.variants.get(id)!;
+                return { id, attributes: { quant: v.quant, unlimited: v.unlimited ?? null } };
+              })
+            )
+          }
+        };
+      case 'stockFlagsMatanots':
+        return {
+          data: {
+            matanots: idsOf(
+              vars.ids.filter((id: string) => db.products.has(id)).map((id: string) => {
+                const p = db.products.get(id)!;
+                return { id, attributes: { quant: p.quant, unlimited: p.unlimited ?? null, stockUnlimited: null } };
+              })
+            )
+          }
+        };
+      case 'stockWriteVariant': {
+        const v = db.variants.get(vars.id)!;
+        Object.assign(v, { quant: vars.quant, unlimited: vars.unlimited });
+        return { data: { updateProductVariant: { data: { id: vars.id, attributes: { quant: v.quant, unlimited: v.unlimited } } } } };
+      }
+      case 'stockWriteMatanot': {
+        const p = db.products.get(vars.id)!;
+        Object.assign(p, { quant: vars.quant, unlimited: vars.unlimited });
+        return { data: { updateMatanot: { data: { id: vars.id, attributes: { quant: p.quant, unlimited: p.unlimited } } } } };
+      }
       case 'saleByExternalId': {
         const s = db.sales.find((x) => x.externalId === vars.externalId);
         return { data: { sales: idsOf(s ? [{ id: s.id, attributes: { holderStatus: s.holderStatus } }] : []) } };
@@ -198,6 +237,7 @@ const run = (o: OrderPayload) =>
 beforeEach(() => {
   db = makeDb();
   notices.length = 0;
+  resetStockFlagsVerdict();
 });
 
 describe('createPaidOrder', () => {
@@ -372,7 +412,7 @@ describe('cancelOrder', () => {
     expect(db.orders[0].data.status).toBe('cancelled');
     expect(db.variants.get('77')!.quant).toBe(3); // 1 + 2 back
     expect(db.products.get('1901')!.quant).toBe(5); // 2 + 2 + 1 back
-    expect(r.stockChanges).toEqual([{ productId: '1842', variantId: '77', quant: 3 }]);
+    expect(r.stockChanges).toEqual([{ productId: '1842', variantId: '77', quant: 3, unlimited: false }]);
     expect(notices[0].intent).toBe('outcome');
   });
 
@@ -421,5 +461,68 @@ describe('cancelOrder', () => {
     expect(r.refunds.already).toHaveLength(1);
     expect(r.refunds.reset).toHaveLength(2);
     expect(db.variants.get('77')!.quant).toBe(3); // restocked exactly once
+  });
+});
+
+// ─── the unlimited flag (§2.5) ──────────────────────────────────────────────
+//
+// `-1` used to be both a count and "unlimited": a variant at 0 that sold one
+// unit landed on -1 and was unlimited from then on. With the column deployed,
+// the flag says unlimited and `-1` is a queue of one.
+
+const one = (quantity: number, externalId = 'pi_1') =>
+  order({ externalId, lines: [{ productId: '1842', variantId: '77', quantity, unitPrice: 310 }] });
+
+describe('the unlimited flag', () => {
+  beforeEach(() => {
+    db.flagsLive = true;
+  });
+
+  it('0 − 1 is one unit waiting, written as a count — and the next sale keeps counting', async () => {
+    db.variants.get('77')!.quant = 0;
+    const r = await run(one(1));
+    expect(r.oversold).toBe(true);
+    expect(db.variants.get('77')).toMatchObject({ quant: -1, unlimited: false });
+    expect(db.calls).toContain('stockWriteVariant');
+    expect(db.calls).not.toContain('rikmaApiVariantQuant');
+
+    const next = await run(one(1, 'pi_2'));
+    expect(next.oversold).toBe(true); // -1 is not "unlimited"
+    expect(db.variants.get('77')).toMatchObject({ quant: -2, unlimited: false });
+  });
+
+  it('a row from before the flag stops being legacy the first time it moves', async () => {
+    db.variants.get('77')!.quant = 0; // unlimited: undefined — never written
+    await run(one(1));
+    expect(db.variants.get('77')!.unlimited).toBe(false);
+  });
+
+  it('a product without variants counts past zero the same way', async () => {
+    db.products.get('1901')!.quant = 1;
+    await run(order({ lines: [{ productId: '1901', quantity: 2, unitPrice: 40 }] }));
+    expect(db.products.get('1901')).toMatchObject({ quant: -1, unlimited: false });
+  });
+
+  it('an unlimited variant is never moved, whatever number sits beside the flag', async () => {
+    Object.assign(db.variants.get('77')!, { quant: 4, unlimited: true });
+    const r = await run(one(9));
+    expect(r.oversold).toBe(false);
+    expect(db.variants.get('77')).toMatchObject({ quant: 4, unlimited: true });
+  });
+
+  it('cancelling an order oversold to -1 restocks it to 0, it is not skipped as unlimited', async () => {
+    db.variants.get('77')!.quant = 0;
+    await run(one(1));
+    const r = await act(cancelOrderConfig, {});
+    expect(db.variants.get('77')).toMatchObject({ quant: 0, unlimited: false });
+    expect(r.stockChanges).toEqual([{ productId: '1842', variantId: '77', quant: 0, unlimited: false }]);
+  });
+
+  it('before the column is deployed, -1 is still read as unlimited (the old behaviour)', async () => {
+    db.flagsLive = false;
+    db.variants.get('77')!.quant = -1;
+    await run(one(1));
+    expect(db.variants.get('77')!.quant).toBe(-1);
+    expect(db.calls).not.toContain('stockWriteVariant');
   });
 });

@@ -6,6 +6,8 @@
   import { fetchObjectChangeDecision, standingOrder, standingRound } from '$lib/server/archive/read.js';
   import { applyStandingVersion } from '$lib/server/archive/vote.js';
   import { strapiClient } from '$lib/server/actions';
+  import { moveStock } from '$lib/shop/stock.js';
+  import { readStockFlags, writeStock } from '$lib/server/shop/stockFlags.js';
   import { applyIdentityDecision } from '$lib/server/rikmaIdentity/identity.js';
   import { dealSignersFor } from '$lib/server/sheirut/dealEdit.js';
   import { clientsPendingOn } from '$lib/sheirut/dealEdit.js';
@@ -401,13 +403,15 @@
       const matanot = sa.matanot?.data;
       const oldUnit = num(sa.unit);
       const curQuant = num(matanot?.attributes?.quant);
-      if (matanot?.id && unit != null && oldUnit != null && curQuant != null && curQuant !== -1 && unit !== oldUnit) {
-        const adjusted = curQuant + (oldUnit - unit);
+      if (matanot?.id && unit != null && oldUnit != null && curQuant != null && unit !== oldUnit) {
         try {
-          await SendToAdmin(
-            `mutation { updateMatanot(id: ${matanot.id}, data: { quant: ${adjusted} }) { data { id } } }`,
-            env.ADMINMONTHER
-          );
+          // "Unlimited" is the flag once deployed — a count of -1 is a queue of
+          // one (§2.5, $lib/shop/stock.ts); the same reconcile as voteOnDecision.
+          const stockRun = (qid, vars) => strapiClient.execute(qid, vars);
+          const flags = await readStockFlags(stockRun, { productIds: [String(matanot.id)] });
+          const fresh = flags.products.get(String(matanot.id));
+          const next = moveStock({ quant: fresh?.quant ?? curQuant, unlimited: fresh?.unlimited ?? null }, oldUnit - unit);
+          if (next) await writeStock(stockRun, { productId: String(matanot.id) }, next);
         } catch (e) {
           console.error('[timegrama/decision] inventory delta failed:', e);
         }

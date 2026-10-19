@@ -5,11 +5,14 @@
  */
 import { describe, it, expect, beforeEach } from 'vitest';
 import { setShopStockConfig } from './shopStock.js';
+import { resetStockFlagsVerdict } from '$lib/server/shop/stockFlags.js';
 
 type Row = Record<string, any>;
 let products: Map<string, Row>;
 let variants: Map<string, Row>;
 let writes: string[];
+/** Is the `unlimited` column deployed (§2.5)? */
+let flagsLive: boolean;
 
 const strapi = {
   async execute(qid: string, vars: any) {
@@ -41,6 +44,21 @@ const strapi = {
         products.get(vars.id)!.quant = vars.quant;
         writes.push(`p:${vars.id}=${vars.quant}`);
         return {};
+      case 'stockFlagsSchema':
+        if (!flagsLive) throw new Error('GRAPHQL_VALIDATION_FAILED: Cannot query field "unlimited"');
+        return { data: { productVariants: { data: [] }, matanots: { data: [] } } };
+      case 'stockFlagsVariants':
+        return { data: { productVariants: { data: (vars.ids as string[]).filter((id) => variants.has(id)).map((id) => ({ id, attributes: { quant: variants.get(id)!.quant, unlimited: variants.get(id)!.unlimited ?? null } })) } } };
+      case 'stockFlagsMatanots':
+        return { data: { matanots: { data: (vars.ids as string[]).filter((id) => products.has(id)).map((id) => ({ id, attributes: { quant: products.get(id)!.quant, unlimited: products.get(id)!.unlimited ?? null } })) } } };
+      case 'stockWriteVariant':
+        Object.assign(variants.get(vars.id)!, { quant: vars.quant, unlimited: vars.unlimited });
+        writes.push(`v:${vars.id}=${vars.quant}${vars.unlimited ? '∞' : ''}`);
+        return { data: { updateProductVariant: { data: { id: vars.id, attributes: { quant: vars.quant, unlimited: vars.unlimited } } } } };
+      case 'stockWriteMatanot':
+        Object.assign(products.get(vars.id)!, { quant: vars.quant, unlimited: vars.unlimited });
+        writes.push(`p:${vars.id}=${vars.quant}${vars.unlimited ? '∞' : ''}`);
+        return { data: { updateMatanot: { data: { id: vars.id, attributes: { quant: vars.quant, unlimited: vars.unlimited } } } } };
       default:
         throw new Error(`unexpected qid ${qid}`);
     }
@@ -61,6 +79,8 @@ beforeEach(() => {
     ['88', { product: '99', project: '58', quant: 5 }]
   ]);
   writes = [];
+  flagsLive = false;
+  resetStockFlagsVerdict();
 });
 
 describe('setShopStock', () => {
@@ -76,9 +96,39 @@ describe('setShopStock', () => {
     expect(writes).toEqual(['v:77=3']);
   });
 
-  it('unlimited is -1', async () => {
+  it('before the unlimited column is deployed, unlimited is written as -1', async () => {
     const r = await run({ productId: '10', unlimited: true });
     expect(r.quant).toBe(-1);
+    expect(writes).toEqual(['p:10=-1']);
+  });
+
+  describe('with the unlimited flag (§2.5)', () => {
+    beforeEach(() => {
+      flagsLive = true;
+    });
+
+    it('unlimited is the flag, with -1 beside it for older readers', async () => {
+      const r = await run({ productId: '10', unlimited: true });
+      expect(r).toMatchObject({ quant: -1, unlimited: true, stockChanges: [{ productId: '10', quant: -1, unlimited: true }] });
+      expect(writes).toEqual(['p:10=-1∞']);
+    });
+
+    it('a variant at -1 is a queue of one: a delivery of one fills it to 0', async () => {
+      Object.assign(variants.get('77')!, { quant: -1, unlimited: false });
+      const r = await run({ productId: '11', variantId: '77', mode: 'add', value: 1 });
+      expect(r).toMatchObject({ quant: 0, unlimited: false, changed: true });
+      expect(writes).toEqual(['v:77=0']);
+    });
+
+    it('counting a shelf writes the count as one', async () => {
+      await run({ productId: '10', mode: 'set', value: 6 });
+      expect(products.get('10')).toMatchObject({ quant: 6, unlimited: false });
+    });
+
+    it('nothing is added to an unlimited stock', async () => {
+      Object.assign(products.get('10')!, { quant: 4, unlimited: true });
+      await expect(run({ productId: '10', mode: 'add', value: 3 })).rejects.toMatchObject({ code: 'INVALID_STOCK' });
+    });
   });
 
   it('a product sold by variant is never stocked on the product', async () => {
