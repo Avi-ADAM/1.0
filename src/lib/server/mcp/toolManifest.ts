@@ -83,6 +83,20 @@ import {
   getProjectStatsTool,
   proposeProjectLinkTool
 } from '../../../mastra/tools/projectDetailsTools';
+import {
+  listRikmaProductsTool,
+  getRikmaProductTool,
+  getShopInventoryTool,
+  listRikmaProductOptionsTool,
+  listRikmaProductVariantsTool,
+  listRikmaOrdersTool,
+  getRikmaOrderTool,
+  createRikmaProductTool,
+  updateRikmaProductTool,
+  archiveRikmaProductTool,
+  setShopStockTool,
+  updateRikmaOrderStatusTool
+} from '../../../mastra/tools/shopTools';
 
 export interface McpManifestEntry extends McpToolPolicy {
   tool: { id: string; [k: string]: any };
@@ -245,7 +259,28 @@ export const MCP_TOOL_MANIFEST: Record<string, McpManifestEntry> = {
   createTaskTool: { tool: createTaskTool, title: "Propose a task", tier: 'consentWrite', project: 'member', mission: 'member' },
 
   // --- sharedWrite (needs MCP_WRITE_SCOPE) ---
-  createMissionTool: { tool: createMissionTool, title: "Create an open mission", tier: 'sharedWrite', project: 'member' }
+  createMissionTool: { tool: createMissionTool, title: "Create an open mission", tier: 'sharedWrite', project: 'member' },
+
+  // --- shop: storefront & inventory (PLAN_SHOP_CUSTOMER_EXPERIENCE) ---
+  // Reads: moachShop* qids (members-only payloads; buyer contact stays inside them, §5.6).
+  // Writes: setShopStock + archivePersonalMatanot / setMatanotDiscovery + order lifecycle
+  // actions — all projectMember-gated in their actions, idempotent where relevant.
+  // Tiers mirror that reality: anyone in the rikma may count the shelf or mark
+  // a parcel shipped, so selfWrite (no extra mcp:write scope) keeps the merchant
+  // flow one token away; creation still lives here rather than behind sharedWrite
+  // because the seller and the agent are the same person with the same consent.
+  listRikmaProductsTool: { tool: listRikmaProductsTool, title: 'List rikma products', tier: 'read', project: 'member' },
+  getRikmaProductTool: { tool: getRikmaProductTool, title: 'Get rikma product', tier: 'read', project: 'member' },
+  getShopInventoryTool: { tool: getShopInventoryTool, title: 'Get shop inventory', tier: 'read', project: 'member' },
+  listRikmaProductOptionsTool: { tool: listRikmaProductOptionsTool, title: 'List product options', tier: 'read', project: 'member' },
+  listRikmaProductVariantsTool: { tool: listRikmaProductVariantsTool, title: 'List product variants', tier: 'read', project: 'member' },
+  listRikmaOrdersTool: { tool: listRikmaOrdersTool, title: 'List rikma orders', tier: 'read', project: 'member' },
+  getRikmaOrderTool: { tool: getRikmaOrderTool, title: 'Get rikma order', tier: 'read', project: 'member' },
+  createRikmaProductTool: { tool: createRikmaProductTool, title: 'Create a rikma product', tier: 'selfWrite', project: 'member' },
+  updateRikmaProductTool: { tool: updateRikmaProductTool, title: 'Update rikma product', tier: 'selfWrite', project: 'member' },
+  archiveRikmaProductTool: { tool: archiveRikmaProductTool, title: 'Archive a rikma product', tier: 'selfWrite', destructive: true, project: 'member' },
+  setShopStockTool: { tool: setShopStockTool, title: 'Set shop stock', tier: 'selfWrite', project: 'member' },
+  updateRikmaOrderStatusTool: { tool: updateRikmaOrderStatusTool, title: 'Update order status', tier: 'selfWrite', project: 'member' }
 };
 
 /** Whether an entry is switched on at all (feature flags). */
