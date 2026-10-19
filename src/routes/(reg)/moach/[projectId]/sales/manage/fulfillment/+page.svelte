@@ -21,6 +21,8 @@
   let uid = $derived(String(data.uid ?? ''));
   let setup = $derived<FulfillmentSetup>(data.fulfillment ?? { ready: false, steps: [], missions: [], roles: [], members: [] });
   let memberName = $derived(new Map(setup.members.map((m) => [m.id, m.name])));
+  let zones = $derived<Array<{ id: string; name: string }>>(data.zones ?? []);
+  let zoneName = $derived(new Map(zones.map((z) => [z.id, z.name])));
 
   type Target = 'mission' | 'role' | 'member';
   type Effect = 'none' | 'markShipped' | 'markFulfilled';
@@ -43,7 +45,8 @@
     per: 'order' as Per,
     pref: 'any' as Pref,
     dueHours: '' as string | number,
-    effect: 'markShipped' as Effect
+    effect: 'markShipped' as Effect,
+    zones: [] as string[]
   });
 
   function openNew() {
@@ -56,7 +59,8 @@
       per: 'order',
       pref: 'any',
       dueHours: 24,
-      effect: 'markShipped'
+      effect: 'markShipped',
+      zones: []
     };
     editing = 'new';
   }
@@ -72,7 +76,8 @@
       per: s.per === 'unit' ? 'line' : s.per,
       pref: prefs.length === 1 && (prefs[0] === 'delivery' || prefs[0] === 'pickup') ? prefs[0] : 'any',
       dueHours: s.dueHours ?? '',
-      effect: s.effect
+      effect: s.effect,
+      zones: [...(s.when.shippingZones ?? [])]
     };
     editing = s.id;
   }
@@ -108,6 +113,7 @@
         ...(form.target === 'member' ? { memberId: form.memberId } : {}),
         per: form.per,
         deliveryPreference: form.pref === 'any' ? [] : [form.pref],
+        shippingZones: form.pref === 'pickup' ? [] : form.zones,
         ...(due != null && Number.isFinite(due) ? { dueHours: due } : {}),
         effect: form.effect
       },
@@ -124,8 +130,12 @@
 
   function whenText(s: StepRowView): string {
     const prefs = s.when.deliveryPreference ?? [];
-    if (prefs.length === 1) return $t(`shop.fulfil.when.${prefs[0]}`);
-    return $t('shop.fulfil.when.any');
+    const base = prefs.length === 1 ? $t(`shop.fulfil.when.${prefs[0]}`) : $t('shop.fulfil.when.any');
+    const z = (s.when.shippingZones ?? []).map((id) => zoneName.get(id) ?? id);
+    return z.length ? `${base} · ${$t('shop.fulfil.whenZones', { names: z.join(', ') })}` : base;
+  }
+  function toggleZone(id: string) {
+    form.zones = form.zones.includes(id) ? form.zones.filter((z) => z !== id) : [...form.zones, id];
   }
 
   function stateOf(s: StepRowView): { label: string; chip: string } {
@@ -226,6 +236,18 @@
           {/each}
         </div>
       </fieldset>
+
+      {#if zones.length && form.pref !== 'pickup'}
+        <fieldset class="sh-field">
+          <legend>{$t('shop.fulfil.f.zones')}</legend>
+          <div class="fu-zones" role="group">
+            {#each zones as z (z.id)}
+              <button type="button" class="sh-chip" class:sh-chip-accent={form.zones.includes(z.id)} aria-pressed={form.zones.includes(z.id)} onclick={() => toggleZone(z.id)}><bdi>{z.name}</bdi></button>
+            {/each}
+          </div>
+          <span class="fu-muted">{form.zones.length ? $t('shop.fulfil.f.zonesSome') : $t('shop.fulfil.f.zonesAll')}</span>
+        </fieldset>
+      {/if}
 
       <fieldset class="sh-field">
         <legend>{$t('shop.fulfil.f.target')}</legend>
@@ -364,6 +386,15 @@
   }
   .fu-add {
     align-self: flex-start;
+  }
+  .fu-zones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .fu-zones button {
+    cursor: pointer;
+    border: 1px solid var(--sh-line);
   }
   fieldset.sh-field {
     border: 0;

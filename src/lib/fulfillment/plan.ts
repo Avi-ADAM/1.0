@@ -41,6 +41,8 @@ export interface StepWhen {
   event: FulfillmentEvent;
   /** Only orders with one of these delivery preferences. Absent = every order. */
   deliveryPreference?: DeliveryPreference[];
+  /** Only orders shipped to one of these zones of the rikma's shipping config. Absent = any. */
+  shippingZones?: string[];
 }
 
 export interface FulfillmentStepRow {
@@ -80,6 +82,8 @@ export interface OrderFacts {
   number: string;
   status: string;
   deliveryPreference: DeliveryPreference | null;
+  /** The shipping zone the order travels to (Order.shipping), when known. */
+  shippingZoneId?: string | null;
   paidAt: string | null;
   buyerName: string | null;
   /** One line, already flattened: "הרצל 1, נתניה". */
@@ -157,6 +161,10 @@ export function stepMatches(step: FulfillmentStepRow, event: FulfillmentEvent, o
   const prefs = step.when.deliveryPreference;
   if (prefs && prefs.length > 0) {
     if (!order.deliveryPreference || !prefs.includes(order.deliveryPreference)) return false;
+  }
+  const zones = step.when.shippingZones;
+  if (zones && zones.length > 0) {
+    if (!order.shippingZoneId || !zones.includes(order.shippingZoneId)) return false;
   }
   return true;
 }

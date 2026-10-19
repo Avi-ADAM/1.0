@@ -2,6 +2,7 @@ import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { ActionError } from '../errors.js';
 import { readStockFlags, withFlag, type StockRowFlags } from '$lib/server/shop/stockFlags.js';
 import { recordOrderSales } from '$lib/server/shop/orderSales.js';
+import { shippingRecordOf } from '$lib/server/shop/orderShipping.js';
 import { formatMoney } from '$lib/money/format.js';
 import { rikmaCurrency } from '$lib/money/resolve.js';
 import { scope, scopeList } from '$lib/realtime/scopes.js';
@@ -155,6 +156,9 @@ const handler: ActionExecutionHandler = async (params, context, deps) => {
     oversold = existing.attributes?.oversold === true;
   } else {
     const delivery = payload.delivery;
+    // How it travels, priced again from the rikma's shipping settings
+    // (PLAN_SHOP_SHIPPING §5) — a fee that moved is a note, never a refusal.
+    const shipping = await shippingRecordOf(run, projectId, delivery, plan.lines, context.fetch);
     const created = await run('rikmaApiOrderCreate', {
       data: {
         ref,
@@ -168,7 +172,7 @@ const handler: ActionExecutionHandler = async (params, context, deps) => {
         buyerName: payload.buyer.name,
         buyerEmail: payload.buyer.email,
         buyerPhone: payload.buyer.phone,
-        note: orderNoteOf(payload.note, plan.notes),
+        note: orderNoteOf(payload.note, shipping?.note ? [...plan.notes, shipping.note] : plan.notes),
         deliveryPreference: delivery.preference,
         deliveryAddress: delivery.address,
         currencyCode: currency,
@@ -184,6 +188,12 @@ const handler: ActionExecutionHandler = async (params, context, deps) => {
     const id = created?.data?.createOrder?.data?.id;
     if (!id) throw new Error('Failed to create the order');
     orderId = String(id);
+    if (shipping) {
+      // Its own write, after the row: the order never fails for its shipping record.
+      await run('rikmaApiOrderSetShipping', { id: orderId, shipping: shipping.record }).catch((e: unknown) =>
+        console.warn(`[shipping] order ${orderId} shipping record not written:`, (e as Error)?.message ?? e)
+      );
+    }
   }
   // What people say out loud — the storefront's number, else ours. A resume
   // keeps the number the first attempt stored.

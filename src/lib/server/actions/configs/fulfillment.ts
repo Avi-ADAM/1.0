@@ -31,6 +31,7 @@ import {
   type ConsentState,
   type FulfillmentStepRow
 } from '$lib/fulfillment/plan';
+import { readShippingConfig } from '$lib/server/shop/shippingConfig.js';
 import { EFFECTS, PERS, PREFERENCES, TARGETS, missionsMapOf, stepOf, workItemOf, type StepView } from '$lib/fulfillment/rows';
 
 type Strapi = { execute: (qid: string, vars: any, jwt?: any, fetchFn?: any) => Promise<any> };
@@ -109,6 +110,12 @@ const saveStep: ActionExecutionHandler = async (params, context, { strapi, notif
   if (prefs.some((p) => !(PREFERENCES as readonly string[]).includes(p))) {
     throw new ActionError('VALIDATION_FAILED', 'deliveryPreference has an unknown value');
   }
+  const zones: string[] = Array.isArray(params.shippingZones) ? [...new Set(params.shippingZones.map(String))] : [];
+  if (zones.length) {
+    const { config } = await readShippingConfig(run, projectId);
+    const known = new Set(config.zones.map((z) => z.id));
+    if (zones.some((z) => !known.has(z))) throw new ActionError('NOT_FOUND', 'shippingZones names a zone this rikma does not have');
+  }
   const dueHours = params.dueHours == null || params.dueHours === '' ? null : Number(params.dueHours);
   if (dueHours != null && !(Number.isInteger(dueHours) && dueHours >= 0 && dueHours <= 24 * 60)) {
     throw new ActionError('VALIDATION_FAILED', 'dueHours must be a whole number of hours');
@@ -147,7 +154,11 @@ const saveStep: ActionExecutionHandler = async (params, context, { strapi, notif
     member: memberId,
     per,
     scope: 'rikma',
-    when: { event: 'order.paid', ...(prefs.length ? { deliveryPreference: prefs } : {}) },
+    when: {
+      event: 'order.paid',
+      ...(prefs.length ? { deliveryPreference: prefs } : {}),
+      ...(zones.length ? { shippingZones: zones } : {})
+    },
     dueHours,
     effect,
     routing: 'single',
@@ -374,6 +385,7 @@ export const saveFulfillmentStepConfig: ActionConfig = {
     memberId: { type: 'string', required: false },
     per: { type: 'string', required: false, description: 'order (default) | line | unit' },
     deliveryPreference: { type: 'array', required: false, description: 'Only orders with these delivery preferences' },
+    shippingZones: { type: 'array', required: false, description: "Only orders shipped to these zones of the rikma's shipping config" },
     dueHours: { type: 'number', required: false },
     effect: { type: 'string', required: false, description: 'none | markShipped | markFulfilled' },
     position: { type: 'number', required: false }

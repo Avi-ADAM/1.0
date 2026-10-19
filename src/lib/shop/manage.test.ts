@@ -170,7 +170,17 @@ describe('cancel — the holder only', () => {
 describe('address', () => {
   it('reads the stored json and writes one line', () => {
     const a = addressOf({ city: ' נתניה ', street: 'הרצל 1', zip: '42500' });
-    expect(a).toEqual({ city: 'נתניה', street: 'הרצל 1', zip: '42500', notes: null });
+    expect(a).toEqual({
+      city: 'נתניה',
+      street: 'הרצל 1',
+      zip: '42500',
+      notes: null,
+      house: null,
+      apartment: null,
+      floor: null,
+      entrance: null,
+      country: null
+    });
     expect(addressLine(a)).toBe('הרצל 1, נתניה 42500');
     expect(addressOf({})).toBeNull();
     expect(addressOf('x')).toBeNull();

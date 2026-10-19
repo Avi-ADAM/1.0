@@ -8,7 +8,7 @@
   import { t, locale } from '$lib/translations';
   import { toast } from 'svelte-sonner';
   import { useFormatMoney } from '$lib/money/context.svelte';
-  import { addressLine, type ShopOrder } from '$lib/shop/manage';
+  import { addressExtras, addressLine, type ShopOrder } from '$lib/shop/manage';
 
   let {
     order,
@@ -21,6 +21,22 @@
   const money = (n: number | null) => fmtMoney(n, order.currency);
 
   let address = $derived(addressLine(order.delivery.address));
+  let extras = $derived(addressExtras(order.delivery.address, (k, v) => $t(k, v)));
+  let ship = $derived(order.shipping);
+  let shipEta = $derived(
+    ship && (ship.etaMinDays !== null || ship.etaMaxDays !== null)
+      ? ship.etaMinDays !== null && ship.etaMaxDays !== null && ship.etaMinDays !== ship.etaMaxDays
+        ? $t('shop.ship.etaRange', { min: ship.etaMinDays, max: ship.etaMaxDays })
+        : $t('shop.ship.etaDays', { count: ship.etaMaxDays ?? ship.etaMinDays })
+      : ''
+  );
+  let shipDispatch = $derived(
+    ship?.nextDispatch
+      ? new Intl.DateTimeFormat($locale || 'he', { weekday: 'long', day: 'numeric', month: 'numeric', timeZone: 'UTC' }).format(
+          new Date(ship.nextDispatch)
+        )
+      : ''
+  );
   let phoneHref = $derived(order.buyer.phone ? `tel:${order.buyer.phone.replace(/[^\d+]/g, '')}` : null);
   let holderLine = $derived(
     order.holderId && uid && order.holderId === uid
@@ -53,7 +69,7 @@
   );
 
   async function copyAddress() {
-    const text = [order.buyer.name, address, order.delivery.address?.notes].filter(Boolean).join('\n');
+    const text = [order.buyer.name, address, extras, order.buyer.phone, order.delivery.address?.notes].filter(Boolean).join('\n');
     try {
       await navigator.clipboard.writeText(text);
       toast.success($t('shop.order.copied'));
@@ -155,8 +171,22 @@
           ? $t('shop.order.delivery')
           : $t(`shop.order.${order.delivery.preference}`)}
       </div>
+      {#if ship}
+        <div class="od-ship">
+          {#if ship.kind === 'pickup' && ship.pickupPointName}
+            <span>{$t('shop.order.ship.pickupAt', { name: ship.pickupPointName })}</span>
+            {#if ship.pickupAddress}<span class="od-small">{ship.pickupAddress}</span>{/if}
+          {:else if ship.name}
+            <span><bdi>{ship.name}</bdi>{#if ship.zoneName} · <span class="od-small">{$t('shop.order.ship.zone', { name: ship.zoneName })}</span>{/if}</span>
+          {/if}
+          {#if ship.fee !== null && ship.fee > 0}<span class="od-small">{$t('shop.order.ship.fee', { amount: money(ship.fee) })}</span>{/if}
+          {#if shipEta}<span class="od-small">{shipEta}</span>{/if}
+          {#if shipDispatch}<span class="od-small">{$t('shop.order.ship.dispatch', { date: shipDispatch })}</span>{/if}
+        </div>
+      {/if}
       {#if address}
         <div class="od-address">{address}</div>
+        {#if extras}<div class="od-small">{extras}</div>{/if}
         {#if order.delivery.address?.notes}<div class="od-small">{order.delivery.address.notes}</div>{/if}
         <button type="button" class="sh-btn sh-btn-quiet od-self" onclick={copyAddress}>{$t('shop.order.copyAddress')}</button>
       {:else if order.delivery.preference === 'delivery'}
@@ -334,6 +364,11 @@
     gap: 4px 14px;
     font-size: 13px;
     color: var(--sh-muted);
+  }
+  .od-ship {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
   }
   .od-address {
     font-size: 14px;

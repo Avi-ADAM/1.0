@@ -61,7 +61,7 @@ const defaultAddress = (target: { slug: string | null; projectId: string }) =>
  * because a redirect header is an output sink: a path segment taken verbatim
  * from the URL would let `..%2f..` be reflected into `Location`.
  */
-const SUFFIX_SHAPE = /^\/(?:products(?:\/\d{1,12})?|categories)?$/;
+const SUFFIX_SHAPE = /^\/(?:products(?:\/\d{1,12})?|categories|options|shipping(?:\/quote)?)?$/;
 
 export interface ResolveOptions {
   /** The raw query string, `?limit=50` — preserved across a redirect. */

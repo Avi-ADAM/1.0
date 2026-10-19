@@ -12808,6 +12808,7 @@ export type Order = {
   sales?: Maybe<SaleRelationResponseCollection>;
   sheirutpends?: Maybe<SheirutpendRelationResponseCollection>;
   shippedAt?: Maybe<Scalars['DateTime']['output']>;
+  shipping?: Maybe<Scalars['JSON']['output']>;
   source?: Maybe<Enum_Order_Source>;
   status?: Maybe<Enum_Order_Status>;
   total?: Maybe<Scalars['Float']['output']>;
@@ -12896,6 +12897,7 @@ export type OrderFiltersInput = {
   sales?: InputMaybe<SaleFiltersInput>;
   sheirutpends?: InputMaybe<SheirutpendFiltersInput>;
   shippedAt?: InputMaybe<DateTimeFilterInput>;
+  shipping?: InputMaybe<JsonFilterInput>;
   source?: InputMaybe<StringFilterInput>;
   status?: InputMaybe<StringFilterInput>;
   total?: InputMaybe<FloatFilterInput>;
@@ -12932,6 +12934,7 @@ export type OrderInput = {
   sales?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   sheirutpends?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   shippedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  shipping?: InputMaybe<Scalars['JSON']['input']>;
   source?: InputMaybe<Enum_Order_Source>;
   status?: InputMaybe<Enum_Order_Status>;
   total?: InputMaybe<Scalars['Float']['input']>;
@@ -14453,6 +14456,7 @@ export type Project = {
   shiftCycleDays?: Maybe<Scalars['Int']['output']>;
   shiftDraftWindowHours?: Maybe<Scalars['Int']['output']>;
   shift_plans?: Maybe<ShiftPlanRelationResponseCollection>;
+  shipping?: Maybe<Scalars['JSON']['output']>;
   site_share_contributions?: Maybe<SiteShareContributionRelationResponseCollection>;
   slug?: Maybe<Scalars['String']['output']>;
   space_docs?: Maybe<SpaceDocRelationResponseCollection>;
@@ -15037,6 +15041,7 @@ export type ProjectFiltersInput = {
   shiftCycleDays?: InputMaybe<IntFilterInput>;
   shiftDraftWindowHours?: InputMaybe<IntFilterInput>;
   shift_plans?: InputMaybe<ShiftPlanFiltersInput>;
+  shipping?: InputMaybe<JsonFilterInput>;
   site_share_contributions?: InputMaybe<SiteShareContributionFiltersInput>;
   slug?: InputMaybe<StringFilterInput>;
   space_docs?: InputMaybe<SpaceDocFiltersInput>;
@@ -15149,6 +15154,7 @@ export type ProjectInput = {
   shiftCycleDays?: InputMaybe<Scalars['Int']['input']>;
   shiftDraftWindowHours?: InputMaybe<Scalars['Int']['input']>;
   shift_plans?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  shipping?: InputMaybe<Scalars['JSON']['input']>;
   site_share_contributions?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   slug?: InputMaybe<Scalars['String']['input']>;
   space_docs?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;

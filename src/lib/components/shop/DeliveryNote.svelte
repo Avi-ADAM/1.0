@@ -7,9 +7,10 @@
    */
   import { t, locale } from '$lib/translations';
   import { page } from '$app/state';
-  import { addressLine, type ShopOrder } from '$lib/shop/manage';
+  import { addressExtras, addressLine, type ShopOrder } from '$lib/shop/manage';
 
   let { order }: { order: ShopOrder } = $props();
+  let extras = $derived(addressExtras(order.delivery.address, (k, v) => $t(k, v)));
   let rikma = $derived(page.data?.projectBase?.projectName ?? '');
   let date = $derived(
     new Intl.DateTimeFormat($locale || 'he', { dateStyle: 'long' }).format(
@@ -32,6 +33,12 @@
   <section class="dn-to">
     <strong>{order.buyer.name ?? ''}</strong>
     {#if order.delivery.address}<div>{addressLine(order.delivery.address)}</div>{/if}
+    {#if extras}<div>{extras}</div>{/if}
+    {#if order.shipping?.kind === 'pickup' && order.shipping.pickupPointName}
+      <div>{$t('shop.order.ship.pickupAt', { name: order.shipping.pickupPointName })}</div>
+    {:else if order.shipping?.name}
+      <div>{order.shipping.name}</div>
+    {/if}
     {#if order.delivery.address?.notes}<div>{order.delivery.address.notes}</div>{/if}
     {#if order.buyer.phone}<div><bdi>{order.buyer.phone}</bdi></div>{/if}
   </section>

@@ -1924,6 +1924,7 @@ These are the main content types in the Strapi backend.
 | `sales` | `Maybe<SaleRelationResponseCollection>` |
 | `sheirutpends` | `Maybe<SheirutpendRelationResponseCollection>` |
 | `shippedAt` | `Maybe<Scalars['DateTime']['output']>` |
+| `shipping` | `Maybe<Scalars['JSON']['output']>` |
 | `source` | `Maybe<Enum_Order_Source>` |
 | `status` | `Maybe<Enum_Order_Status>` |
 | `total` | `Maybe<Scalars['Float']['output']>` |
@@ -2292,6 +2293,7 @@ These are the main content types in the Strapi backend.
 | `shiftCycleDays` | `Maybe<Scalars['Int']['output']>` |
 | `shiftDraftWindowHours` | `Maybe<Scalars['Int']['output']>` |
 | `shift_plans` | `Maybe<ShiftPlanRelationResponseCollection>` |
+| `shipping` | `Maybe<Scalars['JSON']['output']>` |
 | `site_share_contributions` | `Maybe<SiteShareContributionRelationResponseCollection>` |
 | `slug` | `Maybe<Scalars['String']['output']>` |
 | `space_docs` | `Maybe<SpaceDocRelationResponseCollection>` |
@@ -6611,6 +6613,7 @@ Used for creating/updating content.
 | `sales` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `sheirutpends` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `shippedAt` | `InputMaybe<Scalars['DateTime']['input']>` |
+| `shipping` | `InputMaybe<Scalars['JSON']['input']>` |
 | `source` | `InputMaybe<Enum_Order_Source>` |
 | `status` | `InputMaybe<Enum_Order_Status>` |
 | `total` | `InputMaybe<Scalars['Float']['input']>` |
@@ -6933,6 +6936,7 @@ Used for creating/updating content.
 | `shiftCycleDays` | `InputMaybe<Scalars['Int']['input']>` |
 | `shiftDraftWindowHours` | `InputMaybe<Scalars['Int']['input']>` |
 | `shift_plans` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
+| `shipping` | `InputMaybe<Scalars['JSON']['input']>` |
 | `site_share_contributions` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `slug` | `InputMaybe<Scalars['String']['input']>` |
 | `space_docs` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
@@ -8338,7 +8342,7 @@ Fields: `and`, `archiveEffectiveFrom`, `archive_decisions`, `archived`, `askms`,
 Fields: `acts`, `and`, `archiveEffectiveFrom`, `archive_decisions`, `archived`, `asks`, `createdAt`, `dates`, `declined`, `descrip`, `dormancyDays`, `entryCurrency`, `entryRate`, `extractedKey`, `hatzaas`, `hearotMeyuchadot`, `howMeny`, `id`, `isMust`, `isRishon`, `isYesod`, `isglobal`, `iskvua`, `isshift`, `lifecycle`, `locale`, `localizations`, `location`, `maagad`, `match_suggestions`, `mesimabetahaliches`, `mission`, `name`, `negopendmissions`, `noofhours`, `not`, `or`, `partofs`, `pendm`, `perhour`, `pledges`, `privatlinks`, `project`, `publicklinks`, `publishedAt`, `ratson`, `ratson_proposals`, `rishon`, `rishonves`, `skills`, `source`, `sqadualed`, `stipendCostShare`, `stipendFunder`, `stipendMode`, `stipendRate`, `stipend_pledges`, `tafkidims`, `timegrama`, `updatedAt`, `users`, `usersNotRelevant`, `vallues`, `work_ways`
 
 #### OrderFiltersInput
-Fields: `acts`, `and`, `archived`, `buyerEmail`, `buyerName`, `buyerPhone`, `buyer_user`, `createdAt`, `currencyCode`, `deliveryAddress`, `deliveryPreference`, `displayNumber`, `expiresAt`, `externalId`, `fulfilledAt`, `fulfillmentPending`, `holder`, `id`, `lines`, `locale`, `not`, `note`, `or`, `oversold`, `paidAt`, `paymentMethod`, `paymentRef`, `project`, `publicTokenHash`, `ref`, `requestedDate`, `sales`, `sheirutpends`, `shippedAt`, `source`, `status`, `total`, `updatedAt`
+Fields: `acts`, `and`, `archived`, `buyerEmail`, `buyerName`, `buyerPhone`, `buyer_user`, `createdAt`, `currencyCode`, `deliveryAddress`, `deliveryPreference`, `displayNumber`, `expiresAt`, `externalId`, `fulfilledAt`, `fulfillmentPending`, `holder`, `id`, `lines`, `locale`, `not`, `note`, `or`, `oversold`, `paidAt`, `paymentMethod`, `paymentRef`, `project`, `publicTokenHash`, `ref`, `requestedDate`, `sales`, `sheirutpends`, `shippedAt`, `shipping`, `source`, `status`, `total`, `updatedAt`
 
 #### OrderLineFiltersInput
 Fields: `and`, `createdAt`, `currencyCode`, `id`, `imageUrlSnapshot`, `lineTotal`, `matanot`, `nameSnapshot`, `not`, `note`, `optionLabelSnapshot`, `or`, `order`, `position`, `quantity`, `skuSnapshot`, `unitPrice`, `updatedAt`, `variant`
@@ -8374,7 +8378,7 @@ Fields: `active`, `and`, `archived`, `createdAt`, `id`, `key`, `locale`, `locali
 Fields: `active`, `and`, `axisKey`, `barcode`, `compareAtPrice`, `createdAt`, `externalKey`, `id`, `matanot`, `name`, `not`, `optionValues`, `or`, `position`, `price`, `project`, `quant`, `sales`, `sku`, `unlimited`, `updatedAt`, `weightGrams`
 
 #### ProjectFiltersInput
-Fields: `acts`, `addHoursManualy`, `and`, `api_keys`, `askms`, `asks`, `askwants`, `assistant_sessions`, `city`, `codeLicense`, `codeLicenseOpenYears`, `codeLicenseSince`, `countries`, `createdAt`, `currencyCode`, `deals`, `decisions`, `deffinitions`, `descripFor`, `discordlink`, `dormancyDays`, `drivelink`, `fblink`, `finiapruvals`, `finnishedM72HForDecline`, `finnishedMAllApruve`, `finnished_missions`, `formerSlugs`, `forums`, `githublink`, `haamadapruvs`, `haamadas`, `halukas`, `halukas_recive`, `id`, `isMachzikim`, `isMachzikimPublik`, `isOt`, `isPlatform`, `joinPolicy`, `linkToWebsite`, `locale`, `localizations`, `location`, `look`, `maaps`, `machshirs`, `mashaabims`, `mashabetahaliches`, `matanotofs`, `mesimabetahaliches`, `missions`, `newMeMissionOuto72ho`, `newOpenMissionAllApruve`, `newOpenMotoAfter72hoursWithnono`, `newmeOpenAllapruve`, `not`, `open_mashaabims`, `open_missions`, `or`, `pendms`, `pledges`, `pmashes`, `projectName`, `project_plan_boards`, `project_repos`, `publicDescription`, `publishedAt`, `ratson_proposals`, `ratsons_offered`, `resource_bookings`, `restime`, `rikmashes`, `sales`, `sales_source`, `sheirutpends`, `sheiruts`, `sheiruts_sourced`, `shiftCloseOffsetHours`, `shiftCycleDays`, `shiftDraftWindowHours`, `shift_plans`, `site_share_contributions`, `slug`, `space_docs`, `spirit`, `sps`, `stipendDefaultCostShare`, `stipendDefaultRate`, `stipendPolicy`, `stipend_payments`, `stipend_pledges`, `stipend_programs`, `supportPage`, `tafkidims`, `timeToP`, `timerOnlyTOrAlsoManuallyF`, `timers`, `tosplits`, `totalinyearone`, `totalinyearsec`, `totalmaxyearone`, `totalmaxyearsec`, `totalminyearone`, `totalminyearsec`, `twiterlink`, `updatedAt`, `user_1s`, `usersOfP`, `vallues`, `watsapplink`, `welcom_tops`, `work_ways`, `zohars`
+Fields: `acts`, `addHoursManualy`, `and`, `api_keys`, `askms`, `asks`, `askwants`, `assistant_sessions`, `city`, `codeLicense`, `codeLicenseOpenYears`, `codeLicenseSince`, `countries`, `createdAt`, `currencyCode`, `deals`, `decisions`, `deffinitions`, `descripFor`, `discordlink`, `dormancyDays`, `drivelink`, `fblink`, `finiapruvals`, `finnishedM72HForDecline`, `finnishedMAllApruve`, `finnished_missions`, `formerSlugs`, `forums`, `githublink`, `haamadapruvs`, `haamadas`, `halukas`, `halukas_recive`, `id`, `isMachzikim`, `isMachzikimPublik`, `isOt`, `isPlatform`, `joinPolicy`, `linkToWebsite`, `locale`, `localizations`, `location`, `look`, `maaps`, `machshirs`, `mashaabims`, `mashabetahaliches`, `matanotofs`, `mesimabetahaliches`, `missions`, `newMeMissionOuto72ho`, `newOpenMissionAllApruve`, `newOpenMotoAfter72hoursWithnono`, `newmeOpenAllapruve`, `not`, `open_mashaabims`, `open_missions`, `or`, `pendms`, `pledges`, `pmashes`, `projectName`, `project_plan_boards`, `project_repos`, `publicDescription`, `publishedAt`, `ratson_proposals`, `ratsons_offered`, `resource_bookings`, `restime`, `rikmashes`, `sales`, `sales_source`, `sheirutpends`, `sheiruts`, `sheiruts_sourced`, `shiftCloseOffsetHours`, `shiftCycleDays`, `shiftDraftWindowHours`, `shift_plans`, `shipping`, `site_share_contributions`, `slug`, `space_docs`, `spirit`, `sps`, `stipendDefaultCostShare`, `stipendDefaultRate`, `stipendPolicy`, `stipend_payments`, `stipend_pledges`, `stipend_programs`, `supportPage`, `tafkidims`, `timeToP`, `timerOnlyTOrAlsoManuallyF`, `timers`, `tosplits`, `totalinyearone`, `totalinyearsec`, `totalmaxyearone`, `totalmaxyearsec`, `totalminyearone`, `totalminyearsec`, `twiterlink`, `updatedAt`, `user_1s`, `usersOfP`, `vallues`, `watsapplink`, `welcom_tops`, `work_ways`, `zohars`
 
 #### ProjectPlanBoardFiltersInput
 Fields: `ai_meta`, `and`, `createdAt`, `creator`, `descrip`, `expandedAt`, `forums`, `id`, `items`, `not`, `or`, `order`, `origin`, `project`, `publishedAt`, `rationale`, `revisionNote`, `sourceText`, `status`, `title`, `updatedAt`

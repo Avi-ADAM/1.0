@@ -18,6 +18,7 @@ import { orderNumberOf } from '$lib/server/ordersApi.js';
 import { planFulfillment, type Blocker, type FulfillmentEvent, type FulfillmentPlan } from '$lib/fulfillment/plan';
 import { missionsMapOf, orderFactsOf, stepOf } from '$lib/fulfillment/rows';
 import type { ActionContext } from '$lib/server/actions/types.js';
+import { readOrderShipping } from '$lib/shop/shipping';
 
 type Strapi = { execute: (qid: string, vars: any, jwt?: any, fetchFn?: any) => Promise<any> };
 type RunAction = (key: string, params: Record<string, any>, context: ActionContext) => Promise<{ success: boolean; data?: any; error?: any }>;
@@ -65,6 +66,16 @@ export async function applyFulfillment(input: {
   const order = orderFactsOf(node, orderNumberOf(node.attributes?.displayNumber, node.id));
   if (!order) return EMPTY;
   const wasPending = node.attributes?.fulfillmentPending === true;
+  // Only a rule narrowed to shipping zones needs the order's zone — read beside
+  // the order, so the order query stays valid before `Order.shipping` deploys.
+  if (steps.some((st: any) => st?.when?.shippingZones?.length)) {
+    try {
+      const shipRes = await run('orderShippingById', { pid: projectId, id: orderId });
+      order.shippingZoneId = readOrderShipping(shipRes?.data?.orders?.data?.[0]?.attributes?.shipping)?.zoneId ?? null;
+    } catch {
+      order.shippingZoneId = null;
+    }
+  }
 
   const [missionsRes, actsRes] = await Promise.all([
     run('fulfillmentMissions', { pid: projectId }),

@@ -118,7 +118,7 @@ const handler: ActionExecutionHandler = async (params, context, deps) => {
     amount: null,
     currency: null,
     buyer: { name: null, email: null, phone: null },
-    delivery: { preference: null, address: null, fee },
+    delivery: { preference: null, address: null, fee, optionId: null },
     note: null,
     locale: null,
     lines: stored.map((l: any) => ({

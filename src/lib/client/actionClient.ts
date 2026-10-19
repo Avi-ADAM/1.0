@@ -448,6 +448,7 @@ export type ActionKey =
   | 'releaseShiftAssignment'
   | 'getShiftWork'
   | 'saveFulfillmentStep'
+  | 'saveShippingConfig'
   | 'respondFulfillmentStep'
   | 'setFulfillmentStepPaused'
   | 'archiveFulfillmentStep'

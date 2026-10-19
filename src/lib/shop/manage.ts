@@ -18,6 +18,7 @@
  * loaders read Strapi's `quant` + `unlimited` flag through `$lib/shop/stock.ts`
  * and hand over that one meaning; nothing here ever reads `-1` as a sentinel.
  */
+import type { OrderShipping } from './shipping';
 import { countedWrite, unlimitedWrite, type StockWrite } from './stock';
 
 export type OrderStatus = 'pendingPayment' | 'paid' | 'shipped' | 'fulfilled' | 'cancelled';
@@ -51,6 +52,13 @@ export interface ShopAddress {
   street: string | null;
   zip: string | null;
   notes: string | null;
+  /** House number, when the storefront sends it apart from the street (PLAN_SHOP_SHIPPING). */
+  house: string | null;
+  apartment: string | null;
+  floor: string | null;
+  entrance: string | null;
+  /** ISO alpha-2; null = Israel. */
+  country: string | null;
 }
 
 export interface ShopOrder {
@@ -71,6 +79,8 @@ export interface ShopOrder {
   createdAt: string | null;
   buyer: { name: string | null; email: string | null; phone: string | null };
   delivery: { preference: DeliveryPreference; address: ShopAddress | null };
+  /** How it travels, priced by the rikma's shipping settings — null for older orders. */
+  shipping: OrderShipping | null;
   note: string | null;
   paymentRef: string | null;
   paymentMethod: string | null;
@@ -84,6 +94,8 @@ export interface ShopOrder {
 
 // ─── small readers ──────────────────────────────────────────────────────────
 
+export type { OrderShipping };
+
 const STATUSES: OrderStatus[] = ['pendingPayment', 'paid', 'shipped', 'fulfilled', 'cancelled'];
 const PREFERENCES: DeliveryPreference[] = ['pickup', 'delivery', 'digital', 'contact'];
 
@@ -95,20 +107,44 @@ export function preferenceOf(value: unknown): DeliveryPreference {
   return PREFERENCES.includes(value as DeliveryPreference) ? (value as DeliveryPreference) : 'contact';
 }
 
-/** A delivery address as the API stored it (`{city, street, zip, notes}`), or null. */
+/** A delivery address as the API stored it (`{city, street, house, apartment, floor, entrance, zip, country, notes}`), or null. */
 export function addressOf(value: unknown): ShopAddress | null {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
   const v = value as Record<string, unknown>;
   const s = (k: string) => (typeof v[k] === 'string' && (v[k] as string).trim() ? (v[k] as string).trim() : null);
-  const a = { city: s('city'), street: s('street'), zip: s('zip'), notes: s('notes') };
+  const country = s('country')?.toUpperCase() ?? null;
+  const a: ShopAddress = {
+    city: s('city'),
+    street: s('street'),
+    zip: s('zip'),
+    notes: s('notes'),
+    house: s('house'),
+    apartment: s('apartment'),
+    floor: s('floor'),
+    entrance: s('entrance'),
+    country: country && country !== 'IL' ? country : null
+  };
   return a.city || a.street || a.zip || a.notes ? a : null;
 }
 
-/** One line for copying or printing: "הרצל 1, נתניה 4250000". */
+/** One line for copying or printing: "הרצל 1, נתניה 4250000". Apartment/floor/entrance are the screen's, in its language. */
 export function addressLine(a: ShopAddress | null): string {
   if (!a) return '';
+  const street = [a.street, a.house].filter(Boolean).join(' ');
   const place = [a.city, a.zip].filter(Boolean).join(' ');
-  return [a.street, place].filter(Boolean).join(', ');
+  return [street, place, a.country].filter(Boolean).join(', ');
+}
+
+/** "דירה 4 · קומה 2 · כניסה ב" — the parts a courier needs that `addressLine` leaves to the screen's language. */
+export function addressExtras(a: ShopAddress | null, tr: (key: string, vars: Record<string, string>) => string): string {
+  if (!a) return '';
+  return [
+    a.apartment ? tr('shop.order.address.apartment', { value: a.apartment }) : null,
+    a.floor ? tr('shop.order.address.floor', { value: a.floor }) : null,
+    a.entrance ? tr('shop.order.address.entrance', { value: a.entrance }) : null
+  ]
+    .filter(Boolean)
+    .join(' · ');
 }
 
 // ─── the order's task, and its one button ───────────────────────────────────

@@ -12,6 +12,8 @@
  * one meaning (a number is a count, `null` is unlimited), read off `quant` and
  * the `unlimited` flag through `$lib/shop/stock.ts`.
  */
+import { shippingSchemaLive } from './shippingConfig.js';
+import { readOrderShipping } from '$lib/shop/shipping';
 import { strapiClient } from '$lib/server/actions';
 import { ordersSchemaLive, strapiRun } from '$lib/server/apiPublic/catalog.js';
 import { productStatusOf } from '$lib/server/apiPublic/dto.js';
@@ -89,6 +91,7 @@ export function toShopOrder(node: any): ShopOrder | null {
     createdAt: str(a.createdAt),
     buyer: { name: str(a.buyerName), email: str(a.buyerEmail), phone: str(a.buyerPhone) },
     delivery: { preference: preferenceOf(a.deliveryPreference), address: addressOf(a.deliveryAddress) },
+    shipping: null,
     note: str(a.note),
     paymentRef: str(a.paymentRef),
     paymentMethod: str(a.paymentMethod),
@@ -129,6 +132,20 @@ export async function loadShopOrders(projectId: string, fetchFn?: FetchFn): Prom
     return { ready: true, orders: [], failed: true };
   }
   const orders = nodes.map(toShopOrder).filter((o): o is ShopOrder => !!o);
+
+  // How each order travels (PLAN_SHOP_SHIPPING) — its own query, so the list
+  // above keeps working on the day `Order.shipping` is not deployed yet.
+  if (orders.length && (await shippingSchemaLive(run))) {
+    try {
+      const res = await run('moachShopOrdersShipping', { pid: projectId });
+      const byId = new Map<string, unknown>(
+        (res?.data?.orders?.data ?? []).map((n: any) => [String(n.id), n?.attributes?.shipping])
+      );
+      for (const o of orders) o.shipping = readOrderShipping(byId.get(o.id));
+    } catch {
+      /* the orders show without their shipping method */
+    }
+  }
 
   const open = orders.filter((o) => o.oversold && (o.status === 'paid' || o.status === 'shipped'));
   if (open.length) {

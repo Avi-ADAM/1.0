@@ -84,6 +84,8 @@ export interface OrderPayload {
     preference: DeliveryPreference | null;
     address: Record<string, string> | null;
     fee: number | null;
+    /** The shipping option the buyer chose (`m:<zone>:<method>`, `p:<point>`, …) — PLAN_SHOP_SHIPPING. */
+    optionId: string | null;
   };
   note: string | null;
   locale: string | null;
@@ -276,6 +278,12 @@ export function validateOrderPayload(body: any): OrderValidation {
       fee = null;
     }
   }
+  let optionId: string | null = null;
+  if (rawDelivery.optionId != null && rawDelivery.optionId !== '') {
+    const id = String(rawDelivery.optionId);
+    if (/^(m:[a-z0-9_-]{1,40}:[a-z0-9_-]{1,40}|p:[a-z0-9_-]{1,40}|digital|contact)$/i.test(id)) optionId = id;
+    else problems.push({ field: 'delivery.optionId', message: 'is not a shipping option id' });
+  }
   // Somebody has to be reachable about a parcel. Pickup and digital orders
   // are settled by the storefront itself, so they may stay anonymous.
   if (preference === 'delivery' && !buyer.email && !buyer.phone) {
@@ -333,7 +341,7 @@ export function validateOrderPayload(body: any): OrderValidation {
       amount,
       currency,
       buyer,
-      delivery: { preference, address: addressOf(rawDelivery.address), fee },
+      delivery: { preference, address: addressOf(rawDelivery.address), fee, optionId },
       note: text(body.note, MAX_NOTE),
       locale: text(body.locale, 10),
       lines

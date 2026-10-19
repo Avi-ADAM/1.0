@@ -35,7 +35,14 @@ export function whenOf(v: unknown): StepWhen {
   const prefs = Array.isArray(raw.deliveryPreference)
     ? raw.deliveryPreference.filter((p): p is DeliveryPreference => (PREFERENCES as readonly string[]).includes(p as string))
     : [];
-  return { event: 'order.paid', ...(prefs.length ? { deliveryPreference: prefs } : {}) };
+  const zones = Array.isArray(raw.shippingZones)
+    ? [...new Set(raw.shippingZones.filter((z): z is string => typeof z === 'string' && /^[a-z0-9_-]{1,40}$/i.test(z)))]
+    : [];
+  return {
+    event: 'order.paid',
+    ...(prefs.length ? { deliveryPreference: prefs } : {}),
+    ...(zones.length ? { shippingZones: zones } : {})
+  };
 }
 
 /** The extra things the editor shows beside the planner's fields. */

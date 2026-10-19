@@ -64,6 +64,13 @@ const run = (s: FulfillmentStepRow[], o = order(), m = missions(courier), existi
   planFulfillment({ event: 'order.paid', order: o, steps: s, missions: m, existingExternalIds: existing, now: NOW });
 
 describe('planFulfillment', () => {
+  it('a rule narrowed to shipping zones opens only for orders to those zones', () => {
+    const north = step({ when: { event: 'order.paid', shippingZones: ['north'] } });
+    expect(run([north], order({ shippingZoneId: 'north' })).acts).toHaveLength(1);
+    expect(run([north], order({ shippingZoneId: 'center' })).acts).toHaveLength(0);
+    expect(run([north], order({ shippingZoneId: null })).acts).toHaveLength(0);
+  });
+
   it('opens one act inside the running mission of the consenting holder', () => {
     const plan = run([step()]);
     expect(plan.blockers).toEqual([]);
