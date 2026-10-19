@@ -54,7 +54,7 @@ const API_PRODUCT_ATTRS = `
         currency { data { id attributes { code name } } }
         owner_user { data { id attributes { username profilePic { data { attributes { url formats } } } } } }
         projectcreates { data { id attributes {
-          projectName slug
+          projectName slug currencyCode
           location { lat lng radius location_hint location_mode }
           profilePic { data { attributes { url formats } } }
         } } }`;

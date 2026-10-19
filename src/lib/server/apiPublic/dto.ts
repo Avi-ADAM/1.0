@@ -34,6 +34,7 @@ import { resolveLocation } from '$lib/server/map/normalizeMapItems.js';
 import { excerptOf } from '$lib/server/discovery/normalizeCards.js';
 import { SITE_ORIGIN, rikmaPath } from '$lib/rikmaAddress/rikmaUrl.js';
 import { parseLook } from '$lib/rikmaLook/look.js';
+import { matbeaCode, rikmaCurrency } from '$lib/money/resolve.js';
 import { apiRikmaPath } from './rikmaPath.js';
 import { sanitizeDescriptionHtml } from './html.js';
 import {
@@ -362,6 +363,22 @@ export function sellerOf(
   };
 }
 
+/**
+ * The currency a product's price is in. Most products never set their own
+ * `currency` relation — the price is then in the rikma's currency, like every
+ * amount on a rikma row (`rikmaCurrency`: null there is legacy shekels). A
+ * storefront cannot sell a price with no currency, so answering `null` here
+ * turned every order of such a product away. A personal product has no rikma
+ * to inherit from and stays `null`.
+ */
+export function productCurrencyOf(attrs: Record<string, any>): string | null {
+  const own = matbeaCode(attrs?.currency);
+  if (own) return own;
+  if (attrs?.origin === 'personal') return null;
+  const project = attrs?.projectcreates?.data?.[0];
+  return project ? rikmaCurrency(project) : null;
+}
+
 export function pricingModeOf(
   attrs: Record<string, any>
 ): 'fixed' | 'estimated' | 'quote' {
@@ -400,7 +417,7 @@ export function toApiProduct(
 
   const pricingMode = pricingModeOf(a);
   const price = pricingMode === 'quote' ? null : num(a.price);
-  const currency = str(a.currency?.data?.attributes?.code);
+  const currency = productCurrencyOf(a);
   const loc = resolveLocation(a.location, {
     lat: a.lat,
     lng: a.lng,

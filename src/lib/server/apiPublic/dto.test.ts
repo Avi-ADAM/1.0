@@ -238,6 +238,31 @@ describe('toApiProduct — the whitelist', () => {
   it('returns null for a row with no name', () => {
     expect(toApiProduct({ id: '1', attributes: {} }, RIKMA_REF)).toBeNull();
   });
+
+  describe('currency — a storefront cannot sell a price without one', () => {
+    const row = (attrs: Record<string, any>) =>
+      toApiProduct({ id: '51', attributes: { name: 'עניבה', price: 70, ...attrs } }, RIKMA_REF);
+    const rikma = (currencyCode: string | null) => ({
+      data: [{ id: '57', attributes: { projectName: 'x', currencyCode } }]
+    });
+
+    it("falls back to the rikma's currency when the product names none", () => {
+      expect(row({ projectcreates: rikma('USD') })?.currency).toBe('USD');
+    });
+
+    it('reads a rikma with no currency as legacy shekels', () => {
+      expect(row({ projectcreates: rikma(null) })?.currency).toBe('ILS');
+    });
+
+    it("keeps the product's own currency over the rikma's", () => {
+      const own = { data: { id: '3', attributes: { code: 'EUR' } } };
+      expect(row({ currency: own, projectcreates: rikma('USD') })?.currency).toBe('EUR');
+    });
+
+    it('leaves a personal product with no currency at null', () => {
+      expect(row({ origin: 'personal', projectcreates: rikma('USD') })?.currency).toBeNull();
+    });
+  });
 });
 
 describe('status derivation (§4.3, corrected — §12 #1)', () => {
