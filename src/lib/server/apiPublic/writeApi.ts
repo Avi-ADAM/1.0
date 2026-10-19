@@ -658,6 +658,7 @@ function statusOfOrderError(code: string | undefined): number {
     case 'EXTERNAL_ID_CONFLICT':
     case 'ORDER_CANCELLED':
     case 'INVALID_TRANSITION':
+    case 'PAYMENT_PENDING':
       return 409;
     case 'NOT_HOLDER':
       return 403;
@@ -780,6 +781,8 @@ export async function handleOrderPost(args: WriteArgs): Promise<Response> {
     orderId: data.orderId ?? null,
     displayNumber: data.displayNumber ?? null,
     status: data.status,
+    // An arranged order (payment: "arranged") waits in pendingPayment until then.
+    expiresAt: data.expiresAt ?? null,
     oversold: data.oversold === true,
     total: data.total,
     currency: data.currency,

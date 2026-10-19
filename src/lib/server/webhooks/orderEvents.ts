@@ -2,9 +2,11 @@
 //
 // What a storefront hears about its orders (PLAN_SHOP_CUSTOMER_EXPERIENCE §5.6):
 //
-//   order.paid            — createPaidOrder wrote a new order (not a retry)
+//   order.pendingPayment  — createPaidOrder wrote an arranged order, nothing charged yet
+//   order.paid            — createPaidOrder wrote a new order (not a retry), or
+//                           confirmOrderPayment recorded an arranged order's money
 //   order.oversold        — …and stock did not cover it
-//   order.statusChanged   — shipped / fulfilled / cancelled (data.status)
+//   order.statusChanged   — shipped / fulfilled / cancelled / lapsed (data.status)
 //   variant.stockChanged  — a variant's stock moved (a sale, a restock)
 //
 // Same delivery as the task webhooks (dispatch.ts: signed, retried, bounded),
@@ -31,7 +33,10 @@ import { getWebhookTargets, wants, type WebhookTarget } from './targets.js';
 /** The actions that can produce an order event. */
 export const ORDER_WEBHOOK_ACTIONS = new Set([
   'createPaidOrder',
+  'confirmOrderPayment',
   'cancelOrder',
+  // An arranged order that lapsed unpaid — the orders cron (arrangedExpiry.ts).
+  'expireOrder',
   'markOrderShipped',
   'markOrderFulfilled',
   // A member's stock update in the moach (S5) — only variant.stockChanged.
@@ -55,7 +60,13 @@ export function orderEventsFor(
   switch (actionKey) {
     case 'createPaidOrder':
       if (r.duplicated) return { order: [], stock: [] };
+      if (r.status === 'pendingPayment') return { order: ['order.pendingPayment'], stock: [] };
       return { order: r.oversold ? ['order.paid', 'order.oversold'] : ['order.paid'], stock };
+    case 'confirmOrderPayment':
+      if (!r.changed) return { order: [], stock: [] };
+      return { order: r.oversold ? ['order.paid', 'order.oversold'] : ['order.paid'], stock };
+    case 'expireOrder':
+      return { order: r.changed ? ['order.statusChanged'] : [], stock: [] };
     case 'markOrderShipped':
     case 'markOrderFulfilled':
       return { order: r.changed ? ['order.statusChanged'] : [], stock: [] };

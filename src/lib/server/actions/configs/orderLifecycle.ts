@@ -31,6 +31,9 @@ import type { ProbeRun } from '$lib/server/apiPublic/schemaProbe.js';
  *   any split is reset to 0 by its holder; one already in a split is left as it
  *   is and the rikma is told. Nothing is deleted.
  *
+ * An order still waiting for an arranged payment (`pendingPayment`,
+ * PLAN_SHOP_OPERATIONS §5) is cancelled by any member: nothing was sold yet.
+ *
  * Cancel is written so that a retry is safe: the sale resets are idempotent
  * (a 0/0 sale is `already`), the status is written after them, and the stock
  * comes back last — a cancel that died half way and is sent again finishes the
@@ -82,6 +85,35 @@ const cancelHandler: ActionExecutionHandler = async (params, context, { strapi, 
   // What people call this order — never the ref (UX_COPY_SHOP_SALES §10).
   const number = orderNumberOf(a.displayNumber, node.id);
   const holderId = a.holder?.data?.id != null ? String(a.holder.data.id) : null;
+
+  // An arranged order whose money never arrived (PLAN_SHOP_OPERATIONS §5): no
+  // sale, no stock, nobody's till — calling it off is any member's to do, and
+  // there is nothing to refund. Once someone started recording the payment
+  // (the holder is stamped first) it is theirs, like any paid order.
+  const noRefund = { reset: [], afterSplit: [], notMine: [], already: [] };
+  if (a.status === 'cancelled' && !holderId) {
+    // Called off (or lapsed) before anyone was paid — a retry changes nothing.
+    return { orderRef, orderId: String(node.id), status: 'cancelled', alreadyCancelled: true, refunds: noRefund, stockChanges: [] };
+  }
+  if (a.status === 'pendingPayment' && (!holderId || holderId === actorId)) {
+    await strapi.execute(
+      'rikmaApiOrderUpdate',
+      { id: node.id, data: { status: 'cancelled', note: orderNoteOf(a.note ?? null, [`בוטל לפני תשלום${reason ? `: ${reason}` : ''}`]) } },
+      context.jwt,
+      context.fetch
+    );
+    return {
+      orderRef,
+      orderId: String(node.id),
+      status: 'cancelled',
+      alreadyCancelled: false,
+      beforePayment: true,
+      refunds: noRefund,
+      restocked: false,
+      stockChanges: []
+    };
+  }
+
   if (!holderId || holderId !== actorId) {
     throw new ActionError(
       'NOT_HOLDER',

@@ -1,14 +1,14 @@
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { ActionError } from '../errors.js';
-import { createSaleHandler } from './createSale.js';
 import { readStockFlags, withFlag, type StockRowFlags } from '$lib/server/shop/stockFlags.js';
+import { recordOrderSales } from '$lib/server/shop/orderSales.js';
 import { formatMoney } from '$lib/money/format.js';
 import { rikmaCurrency } from '$lib/money/resolve.js';
 import { scope, scopeList } from '$lib/realtime/scopes.js';
 import {
   ORDER_SOURCE,
   canResume,
-  lineSaleExternalId,
+  expiresAtOf,
   orderIsComplete,
   orderNoteOf,
   orderNumberOf,
@@ -17,8 +17,7 @@ import {
   sameOrder,
   storedLinesOf,
   toOrderView,
-  type OrderPayload,
-  type StockChange
+  type OrderPayload
 } from '$lib/server/ordersApi.js';
 
 /**
@@ -40,6 +39,11 @@ import {
  *
  * Never refused for stock — the buyer has paid. Short stock is `oversold` on
  * the order and in the members' notification.
+ *
+ * `payment: 'arranged'` (PLAN_SHOP_OPERATIONS §5) is the same order with
+ * nothing charged yet: the row and its lines are written in `pendingPayment`
+ * with an `expiresAt`, and no holder, no sale, no stock move and no value
+ * follow until the member who gets the money runs `confirmOrderPayment`.
  */
 const handler: ActionExecutionHandler = async (params, context, deps) => {
   const { strapi, notifier } = deps;
@@ -58,7 +62,24 @@ const handler: ActionExecutionHandler = async (params, context, deps) => {
       `externalId "${payload.externalId}" was already reported with different lines, total or currency`
     );
   const storedCurrency: string | null = existing?.attributes?.currencyCode ?? null;
-  if (existing && orderIsComplete(existing, payload.lines.length)) {
+  const arranged = payload.payment === 'arranged';
+  // A charge reported under the id of an order still waiting for an arranged
+  // payment is not a retry of it — the money for that one is recorded by the
+  // member who got it, never by reusing its id.
+  if (existing && !arranged && existing.attributes?.status === 'pendingPayment') {
+    throw new ActionError(
+      'EXTERNAL_ID_CONFLICT',
+      `externalId "${payload.externalId}" is an order waiting for an arranged payment — report a charge under its own id`
+    );
+  }
+  // An arranged order is whole once its lines are stored (it has no sales
+  // yet); a paid one once every line has its sale.
+  const complete = existing
+    ? arranged
+      ? storedLinesOf(existing).length >= payload.lines.length
+      : orderIsComplete(existing, payload.lines.length)
+    : false;
+  if (existing && complete) {
     if (!sameOrder(payload, { currency: storedCurrency, lines: storedLinesOf(existing) })) {
       throw conflict();
     }
@@ -125,7 +146,10 @@ const handler: ActionExecutionHandler = async (params, context, deps) => {
   let orderId: string;
   // On a resume the stock already moved for the lines that got their sales, so
   // a fresh plan would call them oversold; the first attempt's verdict stands.
-  let oversold = plan.oversold;
+  let oversold = arranged ? false : plan.oversold;
+  // Nothing moves the stock until the money arrives, so an arranged order is
+  // never oversold *now* — that is measured when it is confirmed.
+  const expiresAt = arranged ? expiresAtOf(Date.now(), payload.expiresInHours) : null;
   if (existing) {
     orderId = String(existing.id);
     oversold = existing.attributes?.oversold === true;
@@ -137,9 +161,10 @@ const handler: ActionExecutionHandler = async (params, context, deps) => {
         externalId: payload.externalId,
         displayNumber: payload.displayNumber,
         project: projectId,
-        status: 'paid',
+        status: arranged ? 'pendingPayment' : 'paid',
         source: ORDER_SOURCE,
-        holder: holderId,
+        // Whose till took the money — for an arranged order, nobody's yet.
+        holder: arranged ? null : holderId,
         buyerName: payload.buyer.name,
         buyerEmail: payload.buyer.email,
         buyerPhone: payload.buyer.phone,
@@ -151,7 +176,8 @@ const handler: ActionExecutionHandler = async (params, context, deps) => {
         locale: payload.locale,
         paymentRef: payload.paymentRef,
         paymentMethod: payload.paymentMethod,
-        paidAt: now,
+        paidAt: arranged ? null : now,
+        ...(arranged ? { expiresAt } : {}),
         oversold
       }
     });
@@ -191,81 +217,82 @@ const handler: ActionExecutionHandler = async (params, context, deps) => {
     });
   }
 
-  // 6. A sale per line, through `createSale`. The product's stock is carried
-  //    from line to line here (two lines on one product must not both subtract
-  //    from the same starting number); a variant's is read by `createSale`.
-  const saleIdByPosition = new Map<number, string>();
-  for (const s of existing?.attributes?.sales?.data ?? []) {
-    const ext: string = s?.attributes?.externalId ?? '';
-    const n = Number(ext.slice(payload.externalId.length + 1));
-    if (ext.startsWith(`${payload.externalId}:`) && Number.isInteger(n) && n > 0) {
-      saleIdByPosition.set(n - 1, String(s.id));
-    }
-  }
-  // Last stock per variant this order moved — for `variant.stockChanged`.
-  const stockChanges = new Map<string, StockChange>();
-  const productStock = new Map<string, number>();
-  for (const [id, node] of products) {
-    const q = node?.attributes?.quant;
-    productStock.set(id, q == null ? -1 : Number(q));
-  }
-  for (const line of plan.lines) {
-    if (saleIdByPosition.has(line.position)) continue;
-    const saleExternalId = lineSaleExternalId(payload.externalId, line.position);
-
-    // On a resume, a sale may exist whose link to the order never landed —
-    // adopt it (and mend the link) rather than charging the line twice.
-    if (existing) {
-      const found = await run('saleByExternalId', { pid: projectId, externalId: saleExternalId });
-      const orphan = found?.data?.sales?.data?.[0];
-      if (orphan?.id) {
-        saleIdByPosition.set(line.position, String(orphan.id));
-        try {
-          await run('saleLinkShop', { id: orphan.id, product_variant: line.variantId, order: orderId });
-        } catch (err) {
-          console.warn('[createPaidOrder] could not mend the sale↔order link:', err);
-        }
-        continue;
+  // An arranged order stops here: no sale, no stock, no value until the member
+  // who gets the money says so (`confirmOrderPayment`, PLAN_SHOP_OPERATIONS §5).
+  if (arranged) {
+    if (notifier && !existing) {
+      try {
+        await notifier.notify(
+          {
+            recipients: { type: 'projectMembers', config: { projectIdParam: 'projectId' } },
+            templates: {
+              title: { he: '📞 הזמנה מהאתר — לתאם תשלום', en: '📞 Order from your site — arrange the payment' },
+              body: {
+                he: `הזמנה ${number} ב-${formatMoney(plan.total, currency, 'he')} מ${payload.buyer.name ?? 'קונה'} באתר של "${projectName}". הקונה ביקש לשלם בתיאום — מי שמתקשר וגובה, מאשר במסך ההזמנות כשהכסף אצלו.`,
+                en: `Order ${number} for ${formatMoney(plan.total, currency, 'en')} from ${payload.buyer.name ?? 'a buyer'} on "${projectName}"'s site. The buyer asked to arrange the payment — whoever calls and collects confirms it in the orders screen once the money is with them.`
+              }
+            },
+            intent: 'review',
+            metadata: { type: 'arrangedOrder', url: `moach/${projectId}/sales/manage?f=toCollect`, projectName, priority: 'high' }
+          },
+          { projectId },
+          null,
+          context
+        );
+      } catch (err) {
+        console.warn('[createPaidOrder] notification failed:', err);
       }
     }
-
-    const sale: any = await createSaleHandler(
-      {
-        productId: line.productId,
-        projectId,
-        userId: holderId,
-        total: line.lineTotal,
-        quantity: line.quantity,
-        saleDate: now,
-        availableQuantity: productStock.get(line.productId) ?? -1,
-        kindOf: line.kindOf,
-        note: `הזמנה ${number}`,
-        externalId: saleExternalId,
-        source: ORDER_SOURCE,
-        entryCurrency,
-        variantId: line.variantId,
-        orderId
-      },
-      context,
-      deps
-    );
-    if (!sale?.saleId) throw new Error(`Failed to record the sale for line ${line.position}`);
-    saleIdByPosition.set(line.position, String(sale.saleId));
-    if (line.variantId && typeof sale.newVariantQuantity === 'number') {
-      stockChanges.set(`v:${line.variantId}`, {
-        productId: line.productId,
-        variantId: line.variantId,
-        quant: sale.newVariantQuantity,
-        unlimited: false
-      });
-    }
-    if (!line.variantId && typeof sale.newQuantity === 'number') {
-      productStock.set(line.productId, sale.newQuantity);
-    } else if (!line.variantId) {
-      const before = productStock.get(line.productId) ?? -1;
-      if (before !== -1) productStock.set(line.productId, before - line.quantity);
-    }
+    return {
+      duplicated: false,
+      orderId,
+      displayNumber,
+      orderRef: ref,
+      status: 'pendingPayment',
+      expiresAt: existing ? (existing.attributes?.expiresAt ?? null) : expiresAt,
+      oversold: false,
+      total: plan.total,
+      currency,
+      lines: plan.lines.map((l) => ({
+        productId: l.productId,
+        variantId: l.variantId,
+        quantity: l.quantity,
+        name: l.nameSnapshot,
+        optionLabel: l.optionLabelSnapshot,
+        unitPrice: l.unitPrice,
+        saleId: null
+      })),
+      stockChanges: []
+    };
   }
+
+  // 6. A sale per line, through `createSale` — `recordOrderSales`, shared
+  //    with `confirmOrderPayment`.
+  const { saleIdByPosition, stockChanges } = await recordOrderSales(
+    {
+      projectId,
+      orderId,
+      externalId: payload.externalId,
+      number,
+      holderId,
+      lines: plan.lines.map((l) => ({
+        position: l.position,
+        productId: l.productId,
+        variantId: l.variantId,
+        quantity: l.quantity,
+        amount: l.lineTotal,
+        kindOf: l.kindOf
+      })),
+      products,
+      linkedSales: existing?.attributes?.sales?.data ?? [],
+      // On a resume, a sale may exist whose link to the order never landed.
+      adoptOrphans: !!existing,
+      entryCurrency,
+      saleDate: now
+    },
+    context,
+    deps
+  );
 
   // 7. Tell the rikma — a new order to ship, and loudly if it was oversold.
   //    Wording: UX_COPY_SHOP_SALES §10.1 — "from your site" (in Hebrew a bare
@@ -325,7 +352,7 @@ const handler: ActionExecutionHandler = async (params, context, deps) => {
       unitPrice: l.unitPrice,
       saleId: saleIdByPosition.get(l.position) ?? null
     })),
-    stockChanges: [...stockChanges.values()]
+    stockChanges
   };
 };
 
@@ -336,6 +363,7 @@ function resultOf(view: ReturnType<typeof toOrderView> & {}, id: string | number
     displayNumber: view.displayNumber,
     orderRef: view.orderRef,
     status: view.status,
+    expiresAt: view.expiresAt,
     oversold: view.oversold,
     total: view.total,
     currency: view.currency,
@@ -346,7 +374,7 @@ function resultOf(view: ReturnType<typeof toOrderView> & {}, id: string | number
 export const createPaidOrderConfig: ActionConfig = {
   key: 'createPaidOrder',
   description:
-    "Record an order a storefront already charged: an order + lines, and a self-held sale per line through createSale (variant stock, currency). Idempotent and resumable by <rikma>:<externalId>; never refused for stock (oversold is recorded).",
+    "Record an order a storefront already charged: an order + lines, and a self-held sale per line through createSale (variant stock, currency). Idempotent and resumable by <rikma>:<externalId>; never refused for stock (oversold is recorded). With payment:'arranged' only the order and its lines are written, in pendingPayment with an expiresAt — no sale and no stock until confirmOrderPayment.",
   graphqlOperation: handler,
   paramSchema: {
     projectId: { type: 'string', required: true },

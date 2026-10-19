@@ -62,7 +62,10 @@
     if (primary) scheduleMark(o, primary, projectId, markMessages($t, o, primary.next), toast);
   }
 
-  const COUNTED: OrderFilter[] = ['toShip', 'toHandOver'];
+  const COUNTED: OrderFilter[] = ['toCollect', 'toShip', 'toHandOver'];
+
+  /** An order waiting for an arranged payment: the quick action is the call. */
+  const telOf = (o: ShopOrder) => (o.buyer.phone ? `tel:${o.buyer.phone.replace(/[^\d+]/g, '')}` : null);
 </script>
 
 {#if !data.shop?.ready}
@@ -97,6 +100,8 @@
       <ShopNotice title={$t('shop.empty.filtered')} action={{ label: $t('shop.empty.clearFilter'), onclick: () => (query = '') }} />
     {:else if filter === 'toShip' || filter === 'toHandOver'}
       <ShopNotice title={$t('shop.empty.toShip')} body={$t('shop.empty.toShipBody')} />
+    {:else if filter === 'toCollect'}
+      <ShopNotice title={$t('shop.empty.toCollect')} body={$t('shop.empty.toCollectBody')} />
     {:else}
       <ShopNotice title={$t('shop.empty.filtered')} action={{ label: $t('shop.empty.clearFilter'), onclick: () => setParam('f', 'all') }} />
     {/if}
@@ -120,7 +125,9 @@
           </div>
           <div class="ol-card-foot">
             <span class="ol-card-meta">{itemsText($t, o)} · {deliveryText($t, o)}</span>
-            {#if primary}
+            {#if task === 'toCollect' && telOf(o)}
+              <a class="sh-btn sh-btn-primary ol-quick" href={telOf(o)}>{$t('shop.order.call')}</a>
+            {:else if primary}
               <button type="button" class="sh-btn sh-btn-primary ol-quick" onclick={() => mark(o)} disabled={isPending(o.id)}>
                 {$t(`shop.action.${primary.label}`)}
               </button>
@@ -167,7 +174,9 @@
                   </span>
                 </td>
                 <td class="ol-act">
-                  {#if primary}
+                  {#if task === 'toCollect' && telOf(o)}
+                    <a class="sh-btn sh-btn-outline ol-quick" href={telOf(o)} onclick={(e) => e.stopPropagation()}>{$t('shop.order.call')}</a>
+                  {:else if primary}
                     <button type="button" class="sh-btn sh-btn-outline ol-quick" onclick={(e) => { e.stopPropagation(); mark(o); }} disabled={isPending(o.id)}>
                       {$t(`shop.action.${primary.label}`)}
                     </button>

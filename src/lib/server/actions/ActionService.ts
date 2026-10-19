@@ -294,6 +294,7 @@ export class ActionService {
       // storefront hears about its orders and stock. Same fire-and-forget rule.
       if (
         actionKey === 'createPaidOrder' ||
+        actionKey === 'confirmOrderPayment' ||
         actionKey === 'cancelOrder' ||
         actionKey === 'markOrderShipped' ||
         actionKey === 'markOrderFulfilled' ||

@@ -43,6 +43,20 @@ const MAX_ADDRESS_FIELDS = 12;
 export const DELIVERY_PREFERENCES = ['pickup', 'delivery', 'digital', 'contact'] as const;
 export type DeliveryPreference = (typeof DELIVERY_PREFERENCES)[number];
 
+/**
+ * How the buyer pays (PLAN_SHOP_OPERATIONS §5). `paid` — the storefront's
+ * payment provider already charged them (the original S3 flow). `arranged` —
+ * nothing was charged: the buyer left a phone, someone in the rikma calls,
+ * and the money moves by bit / transfer / cash. Such an order waits in
+ * `pendingPayment` until the member who got the money says so.
+ */
+export const ORDER_PAYMENTS = ['paid', 'arranged'] as const;
+export type OrderPayment = (typeof ORDER_PAYMENTS)[number];
+
+/** How long an arranged order waits for its payment before it lapses (§5.2, rule 1). */
+export const ARRANGED_EXPIRY_HOURS = 72;
+const MAX_EXPIRY_HOURS = 24 * 30;
+
 export interface OrderLineInput {
   productId: string;
   variantId: string | null;
@@ -53,6 +67,10 @@ export interface OrderLineInput {
 
 export interface OrderPayload {
   externalId: string;
+  /** `paid` unless the storefront said `arranged` (§5). */
+  payment: OrderPayment;
+  /** An arranged order lapses after this many hours unless paid; null = the default. */
+  expiresInHours: number | null;
   /** The number the buyer got from the storefront — what people say on the phone. */
   displayNumber: string | null;
   paymentRef: string | null;
@@ -267,6 +285,38 @@ export function validateOrderPayload(body: any): OrderValidation {
     });
   }
 
+  let payment: OrderPayment = 'paid';
+  if (body.payment != null && body.payment !== '') {
+    if (ORDER_PAYMENTS.includes(body.payment)) {
+      payment = body.payment;
+    } else {
+      problems.push({ field: 'payment', message: `must be one of ${ORDER_PAYMENTS.join(', ')}` });
+    }
+  }
+  let expiresInHours: number | null = null;
+  if (body.expiresInHours != null && body.expiresInHours !== '') {
+    const h = Number(body.expiresInHours);
+    if (!Number.isFinite(h) || h < 1 || h > MAX_EXPIRY_HOURS) {
+      problems.push({ field: 'expiresInHours', message: `must be a number of hours between 1 and ${MAX_EXPIRY_HOURS}` });
+    } else {
+      expiresInHours = h;
+    }
+  }
+  if (payment === 'arranged') {
+    // Arranging a payment is a phone call — nobody can call a name alone.
+    if (!buyer.name) problems.push({ field: 'buyer.name', message: 'is required when payment is "arranged"' });
+    if (!buyer.phone) problems.push({ field: 'buyer.phone', message: 'is required when payment is "arranged"' });
+    // `amount` is what a provider charged; here nothing was charged yet.
+    if (body.amount != null) {
+      problems.push({
+        field: 'amount',
+        message: 'must be absent when payment is "arranged" — nothing was charged; the member who gets the money records what arrived'
+      });
+    }
+  } else if (expiresInHours !== null) {
+    problems.push({ field: 'expiresInHours', message: 'applies only when payment is "arranged"' });
+  }
+
   if (problems.length) {
     return { ok: false, message: problems.map(describeProblem).join('; '), problems };
   }
@@ -275,6 +325,8 @@ export function validateOrderPayload(body: any): OrderValidation {
     ok: true,
     value: {
       externalId: externalId!,
+      payment,
+      expiresInHours,
       displayNumber,
       paymentRef: text(body.paymentRef, MAX_SHORT),
       paymentMethod: text(body.paymentMethod, 40),
@@ -630,7 +682,7 @@ export function orderNoteOf(callerNote: string | null, planNotes: string[]): str
 
 // ─── what the storefront reads back ─────────────────────────────────────────
 
-export type OrderStatus = 'paid' | 'shipped' | 'fulfilled' | 'cancelled';
+export type OrderStatus = 'pendingPayment' | 'paid' | 'shipped' | 'fulfilled' | 'cancelled';
 
 export interface OrderLineView {
   productId: string | null;
@@ -656,6 +708,8 @@ export interface OrderView {
   paidAt: string | null;
   shippedAt: string | null;
   fulfilledAt: string | null;
+  /** An arranged order still waiting for its payment lapses then (§5.2). */
+  expiresAt: string | null;
   lines: OrderLineView[];
   updatedAt: string | null;
 }
@@ -705,6 +759,7 @@ export function toOrderView(node: { id?: string | number; attributes?: Record<st
     paidAt: str(a.paidAt),
     shippedAt: str(a.shippedAt),
     fulfilledAt: str(a.fulfilledAt),
+    expiresAt: a.status === 'pendingPayment' ? str(a.expiresAt) : null,
     lines,
     updatedAt: str(a.updatedAt)
   };
@@ -739,9 +794,12 @@ export function orderIsComplete(
 export type OrderTransition =
   | { kind: 'move'; from: OrderStatus; to: OrderStatus }
   | { kind: 'same'; status: OrderStatus }
-  | { kind: 'refused'; code: 'ORDER_CANCELLED' | 'INVALID_TRANSITION'; message: string };
+  | { kind: 'refused'; code: 'ORDER_CANCELLED' | 'INVALID_TRANSITION' | 'PAYMENT_PENDING'; message: string };
 
 const FORWARD: Record<string, OrderStatus[]> = {
+  // An arranged order: the money arrives (`confirmOrderPayment`), or it never
+  // does and the order is cancelled / lapses. Nothing ships before it is paid.
+  pendingPayment: ['paid', 'cancelled'],
   paid: ['shipped', 'fulfilled', 'cancelled'],
   // A parcel that was sent can still come back as a refund.
   shipped: ['fulfilled', 'cancelled'],
@@ -768,6 +826,13 @@ export function transitionOf(current: string | null | undefined, target: OrderSt
       kind: 'refused',
       code: 'ORDER_CANCELLED',
       message: 'This order was cancelled — it cannot change any more'
+    };
+  }
+  if (from === 'pendingPayment' && (target === 'shipped' || target === 'fulfilled')) {
+    return {
+      kind: 'refused',
+      code: 'PAYMENT_PENDING',
+      message: 'This order is still waiting for its payment — record the payment first'
     };
   }
   if (!(FORWARD[from] ?? []).includes(target)) {
@@ -844,9 +909,81 @@ export function refundNoteOf(sale: OrderSaleRow, orderNumber: string, reason: st
   return `${prior}בוטל והוחזר לקונה (הזמנה ${orderNumber}; ${was})${why}`.slice(0, 2000);
 }
 
+// ─── payment by arrangement (PLAN_SHOP_OPERATIONS §5) ───────────────────────
+
+/** How the money reached the member — what the "payment received" sheet offers. */
+export const ARRANGED_METHODS = ['bit', 'paybox', 'transfer', 'cash', 'other'] as const;
+export type ArrangedMethod = (typeof ARRANGED_METHODS)[number];
+
+export function arrangedMethodOf(value: unknown): ArrangedMethod | null {
+  return ARRANGED_METHODS.includes(value as ArrangedMethod) ? (value as ArrangedMethod) : null;
+}
+
+/** When an arranged order created at `fromMs` lapses. */
+export function expiresAtOf(fromMs: number, hours: number | null): string {
+  const h = hours ?? ARRANGED_EXPIRY_HOURS;
+  return new Date(fromMs + h * 3_600_000).toISOString();
+}
+
+/**
+ * Has a waiting order lapsed? An order with no `expiresAt` never lapses on its
+ * own — it waits for a member to confirm or cancel it.
+ */
+export function hasLapsed(expiresAt: string | null | undefined, nowMs: number): boolean {
+  if (!expiresAt) return false;
+  const at = Date.parse(expiresAt);
+  return Number.isFinite(at) && at <= nowMs;
+}
+
+export interface ReceivedSplit {
+  /** What each line's sale records, in line order. */
+  amounts: number[];
+  /** Lines + delivery, at the catalog's prices — what the buyer was asked for. */
+  catalogTotal: number;
+  received: number;
+  /** Less arrived than was asked: a discount given on the phone (H8). */
+  under: boolean;
+}
+
+/**
+ * The money that arrived, spread over the order's lines (§5.2, rule 3).
+ *
+ * What arrived is what is recorded. At or above the asked total each line
+ * keeps its own price — the delivery fee is not a sale, exactly as in a paid
+ * order. Below it, the discount is shared by every line *and* the fee in
+ * proportion, and the last line takes the agorot rounding left over, so the
+ * sales add up to exactly the lines' share of what arrived.
+ */
+export function splitReceived(received: number, lineTotals: number[], fee: number): ReceivedSplit {
+  const subtotal = round2(lineTotals.reduce((s, n) => s + n, 0));
+  const catalogTotal = round2(subtotal + Math.max(fee, 0));
+  const got = round2(Math.max(received, 0));
+  if (got >= catalogTotal || catalogTotal === 0) {
+    return { amounts: lineTotals.map(round2), catalogTotal, received: got, under: false };
+  }
+  const factor = got / catalogTotal;
+  const amounts = lineTotals.map((n) => round2(n * factor));
+  const target = round2(subtotal * factor);
+  const gap = round2(target - amounts.reduce((s, n) => s + n, 0));
+  if (gap !== 0 && amounts.length) {
+    let i = amounts.length - 1;
+    while (i > 0 && amounts[i] === 0) i--;
+    amounts[i] = round2(amounts[i] + gap);
+  }
+  return { amounts, catalogTotal, received: got, under: true };
+}
+
+/** The line an order's note gets when its arranged payment is recorded. */
+export function arrangedNoteOf(split: ReceivedSplit, method: ArrangedMethod, note: string | null): string {
+  const under = split.under ? ` — מתחת למחיר הקטלוג (${split.catalogTotal})` : '';
+  const own = note ? `: ${note}` : '';
+  return `שולם בתיאום — ${split.received} (${method})${under}${own}`;
+}
+
 // ─── webhooks (§5.6) ────────────────────────────────────────────────────────
 
 export const ORDER_WEBHOOK_EVENTS = [
+  'order.pendingPayment',
   'order.paid',
   'order.statusChanged',
   'order.oversold',

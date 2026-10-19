@@ -49,7 +49,8 @@
       "shipped": "Enviados",
       "done": "Completados",
       "cancelled": "Cancelados",
-      "all": "Todos"
+      "all": "Todos",
+      "toCollect": "Pendientes de pago"
     },
     "col": {
       "order": "Pedido",
@@ -98,7 +99,9 @@
       "title": "Pago",
       "paid": "{{amount}} pagados en tu sitio",
       "ref": "Referencia del pago",
-      "method": "Método de pago"
+      "method": "Método de pago",
+      "waiting": "Pendiente de un pago de {{amount}}, acordado con el comprador",
+      "expires": "Si el pago no se acuerda antes del {{when}}, el pedido se cerrará solo"
     },
     "holder": "El dinero lo tiene {{name}} · cuenta para el reparto",
     "holderYou": "El dinero lo tienes tú · cuenta para el reparto",
@@ -113,16 +116,20 @@
       "paid": "Pagado en el sitio",
       "shipped": "Marcado como enviado",
       "done": "Marcado como completado",
-      "cancelled": "Cancelado"
+      "cancelled": "Cancelado",
+      "placed": "Recibido desde el sitio"
     },
-    "notFound": "Este pedido no se encontró en la rikma."
+    "notFound": "Este pedido no se encontró en la rikma.",
+    "whatsapp": "WhatsApp",
+    "whatsappText": "Hola, sobre el pedido {{number}} que nos dejaste: nos gustaría acordar el pago contigo."
   },
   "status": {
     "toShip": "Por enviar",
     "toHandOver": "Por entregar",
     "shipped": "Enviado",
     "done": "Completado",
-    "cancelled": "Cancelado"
+    "cancelled": "Cancelado",
+    "toCollect": "Pendiente de pago"
   },
   "short": {
     "tag": "Faltan {{count}}",
@@ -146,7 +153,8 @@
     "done": "Pedido {{number}} completado",
     "failed": "No se guardó. Revisa la conexión e inténtalo de nuevo.",
     "retry": "Reintentar",
-    "cancelled": "Pedido {{number}} cancelado"
+    "cancelled": "Pedido {{number}} cancelado",
+    "paid": "Pago del pedido {{number}} registrado: ya se puede enviar"
   },
   "cancel": {
     "action": "Cancelar pedido",
@@ -160,7 +168,9 @@
     "confirm": "Cancelar pedido",
     "keep": "Mantener pedido",
     "holderOnly": "Solo {{name}} puede cancelar — tiene el dinero",
-    "failed": "La cancelación no se guardó. Inténtalo de nuevo."
+    "failed": "La cancelación no se guardó. Inténtalo de nuevo.",
+    "pendingTitle": "¿Cerrar el pedido {{number}}?",
+    "pendingBody": "Aún no llegó ningún pago, así que no hay nada que reembolsar ni reponer: el pedido simplemente se cierra. Puedes indicar el motivo."
   },
   "products": {
     "search": "Buscar productos o SKU",
@@ -313,7 +323,9 @@
     "filtered": "Nada coincide con este filtro",
     "clearFilter": "Quitar filtro",
     "sales": "No hay ventas en este rango",
-    "stock": "Nada que actualizar aquí"
+    "stock": "Nada que actualizar aquí",
+    "toCollect": "Nada pendiente de pago",
+    "toCollectBody": "Aquí aparece el pedido cuyo comprador pidió acordar el pago, con su teléfono."
   },
   "err": {
     "load": "No pudimos cargar esto. Prueba a recargar.",
@@ -369,5 +381,26 @@
       "creatorGives": "Tu aporte ({{amount}}) se guardará al crear el reparto.",
       "sent": "Propuesta enviada a la rikma"
     }
+  },
+  "pay": {
+    "action": "Pago recibido",
+    "title": "¿Tienes tú el pago del pedido {{number}}?",
+    "body": "Quien confirma aquí es quien tiene el dinero: las ventas se registran a tu nombre. Si el comprador le pagó a otro socio, pídele que lo confirme.",
+    "amount": "Importe recibido",
+    "amountHint": "¿Hiciste un descuento por teléfono? Anota lo que llegó realmente.",
+    "under": "Menos que el precio de catálogo ({{amount}}): el pedido quedará marcado como vendido con descuento.",
+    "method": "Forma de pago",
+    "methods": {
+      "bit": "Bit",
+      "paybox": "PayBox",
+      "transfer": "Transferencia bancaria",
+      "cash": "Efectivo",
+      "other": "Otro"
+    },
+    "note": "Nota (opcional)",
+    "confirm": "Sí, tengo el dinero",
+    "keep": "Todavía no",
+    "failed": "No se guardó el pago. Inténtalo de nuevo.",
+    "holderOnly": "Este pago ya lo está registrando {{name}}"
   }
 }

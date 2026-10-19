@@ -85,6 +85,7 @@ export function toShopOrder(node: any): ShopOrder | null {
     paidAt: str(a.paidAt),
     shippedAt: str(a.shippedAt),
     fulfilledAt: str(a.fulfilledAt),
+    expiresAt: str(a.expiresAt),
     createdAt: str(a.createdAt),
     buyer: { name: str(a.buyerName), email: str(a.buyerEmail), phone: str(a.buyerPhone) },
     delivery: { preference: preferenceOf(a.deliveryPreference), address: addressOf(a.deliveryAddress) },

@@ -11,6 +11,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { createPaidOrderConfig } from './createPaidOrder.js';
 import { createSaleConfig } from './createSale.js';
+import { confirmOrderPaymentConfig } from './confirmOrderPayment.js';
 import {
   cancelOrderConfig,
   markOrderFulfilledConfig,
@@ -524,5 +525,109 @@ describe('the unlimited flag', () => {
     await run(one(1));
     expect(db.variants.get('77')!.quant).toBe(-1);
     expect(db.calls).not.toContain('stockWriteVariant');
+  });
+});
+
+// ─── payment by arrangement (PLAN_SHOP_OPERATIONS §5) ───────────────────────
+
+describe('arranged orders', () => {
+  const arranged = (over: Record<string, any> = {}) =>
+    order({
+      externalId: 'arr_1',
+      payment: 'arranged',
+      buyer: { name: 'דנה', phone: '050-1234567' },
+      delivery: { preference: 'delivery', fee: 20 },
+      ...over
+    });
+  const confirm = (params: Record<string, any>, userId = '9') =>
+    act(confirmOrderPaymentConfig, { orderRef: '57:arr_1', method: 'bit', ...params }, userId);
+
+  it('writes the order and its lines — no holder, no sale, no stock', async () => {
+    const r = await run(arranged());
+    expect(r).toMatchObject({ status: 'pendingPayment', total: 760, oversold: false });
+    expect(r.expiresAt).toBeTruthy();
+    expect(db.orders[0].data).toMatchObject({ status: 'pendingPayment', holder: null, paidAt: null });
+    expect(db.lines).toHaveLength(3);
+    expect(db.sales).toHaveLength(0);
+    expect(db.variants.get('77')!.quant).toBe(3);
+    expect(notices[0].metadata.type).toBe('arrangedOrder');
+  });
+
+  it('a retry is the same order, and tells nobody again', async () => {
+    await run(arranged());
+    const again = await run(arranged());
+    expect(again).toMatchObject({ duplicated: true, status: 'pendingPayment' });
+    expect(db.orders).toHaveLength(1);
+    expect(notices).toHaveLength(1);
+  });
+
+  it('a charge reported under its id is refused', async () => {
+    await run(arranged());
+    await expect(run(order({ externalId: 'arr_1' }))).rejects.toMatchObject({ code: 'EXTERNAL_ID_CONFLICT' });
+  });
+
+  it('cannot be shipped before the money', async () => {
+    await run(arranged());
+    await expect(act(markOrderShippedConfig, { orderRef: '57:arr_1' })).rejects.toMatchObject({ code: 'PAYMENT_PENDING' });
+  });
+
+  it('the member who got the money confirms it: holder, a sale per line, stock, paid', async () => {
+    await run(arranged());
+    notices.length = 0;
+    const r = await confirm({}, '12');
+    expect(r).toMatchObject({ status: 'paid', changed: true, total: 760, underCatalog: false });
+    expect(db.orders[0].data).toMatchObject({ status: 'paid', holder: '12', paymentMethod: 'bit', total: 760 });
+    expect(db.sales.map((s) => [s.externalId, s.in, s.holder, s.holderStatus])).toEqual([
+      ['arr_1:1', 620, '12', 'self'],
+      ['arr_1:2', 80, '12', 'self'],
+      ['arr_1:3', 40, '12', 'self']
+    ]);
+    expect(db.variants.get('77')!.quant).toBe(1);
+    expect(r.stockChanges).toEqual([{ productId: '1842', variantId: '77', quant: 1, unlimited: false }]);
+    expect(notices[0].metadata.type).toBe('paidOrder');
+  });
+
+  it('what arrived is what is recorded — a discount is spread and noted', async () => {
+    await run(arranged());
+    const r = await confirm({ amount: 380, method: 'cash', note: 'הנחת חבר' });
+    expect(r.underCatalog).toBe(true);
+    expect(db.sales.map((s) => s.in)).toEqual([310, 40, 20]);
+    expect(db.orders[0].data.note).toContain('מתחת למחיר הקטלוג (760)');
+    expect(db.orders[0].data.note).toContain('הנחת חבר');
+  });
+
+  it('twice is once; a second member is refused — it is not their money', async () => {
+    await run(arranged());
+    await confirm({}, '12');
+    expect(await confirm({}, '12')).toMatchObject({ changed: false });
+    await expect(confirm({}, '9')).rejects.toMatchObject({ code: 'NOT_HOLDER' });
+    expect(db.sales).toHaveLength(3);
+  });
+
+  it('a confirm that died half way is finished by its member, without selling a line twice', async () => {
+    await run(arranged());
+    // die after the first sale: the second createSaleRecord throws once
+    let n = 0;
+    const orig = strapi.execute;
+    (strapi as any).execute = async (qid: string, vars: any) => {
+      if (qid === 'createSaleRecord' && ++n === 2) throw new Error('boom');
+      return orig(qid, vars);
+    };
+    await expect(confirm({}, '12')).rejects.toThrow();
+    (strapi as any).execute = orig;
+    expect(db.orders[0].data).toMatchObject({ status: 'pendingPayment', holder: '12' });
+    await expect(confirm({}, '9')).rejects.toMatchObject({ code: 'NOT_HOLDER' });
+    await confirm({}, '12');
+    expect(db.sales.map((s) => s.externalId)).toEqual(['arr_1:1', 'arr_1:2', 'arr_1:3']);
+    expect(db.orders[0].data.status).toBe('paid');
+  });
+
+  it('any member calls off a waiting order — nothing to refund', async () => {
+    await run(arranged());
+    const r = await act(cancelOrderConfig, { orderRef: '57:arr_1', reason: 'לא ענה' }, '12');
+    expect(r).toMatchObject({ status: 'cancelled', beforePayment: true, restocked: false });
+    expect(db.orders[0].data.note).toContain('בוטל לפני תשלום: לא ענה');
+    expect(await act(cancelOrderConfig, { orderRef: '57:arr_1' }, '12')).toMatchObject({ alreadyCancelled: true });
+    await expect(confirm({}, '12')).rejects.toMatchObject({ code: 'ORDER_CANCELLED' });
   });
 });

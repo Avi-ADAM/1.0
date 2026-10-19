@@ -12,6 +12,9 @@ import {
   itemCountOf,
   matchesOrder,
   mayCancel,
+  mayConfirmPayment,
+  whatsappHref,
+  whatsappNumberOf,
   nextStock,
   orderCounts,
   orderTaskOf,
@@ -46,6 +49,7 @@ function order(over: Partial<ShopOrder> = {}): ShopOrder {
     paidAt: '2026-10-18T09:00:00Z',
     shippedAt: null,
     fulfilledAt: null,
+    expiresAt: null,
     createdAt: '2026-10-18T09:00:00Z',
     buyer: { name: 'דנה כהן', email: 'dana@example.com', phone: '050-123 4567' },
     delivery: { preference: 'delivery', address: { city: 'נתניה', street: 'הרצל 1', zip: null, notes: null } },
@@ -312,5 +316,39 @@ describe('CSV', () => {
     expect(rows[1]).toEqual(['שרפרף-10', 'שרפרף', 'active', 'גובה', '65', '', '', '', '', 'S-65', 480, 'shopify', 4, 'https://x/1.jpg']);
     expect(rows[2]).toEqual(['שרפרף-10', '', '', '', '75', '', '', '', '', 'S-75', 540, '', '', '']);
     expect(rows[3]).toEqual(['כפות-11', 'כפות', 'draft', 'Title', 'Default Title', '', '', '', '', '', 95, 'shopify', 3, '']);
+  });
+});
+
+describe('payment by arrangement (PLAN_SHOP_OPERATIONS §5)', () => {
+  const waiting = (over: Partial<ShopOrder> = {}) =>
+    order({ status: 'pendingPayment', holderId: null, holderName: null, paidAt: null, ...over });
+
+  it('a waiting order is "to collect" — nothing to pack, no ship button', () => {
+    expect(orderTaskOf(waiting())).toBe('toCollect');
+    expect(primaryActionOf(waiting())).toBeNull();
+    expect(orderCounts([waiting(), order()])).toMatchObject({ toCollect: 1, toShip: 1 });
+  });
+
+  it('opens on "to collect" only when nothing waits to be sent', () => {
+    expect(defaultOrderFilter(orderCounts([waiting(), order()]))).toBe('toShip');
+    expect(defaultOrderFilter(orderCounts([waiting()]))).toBe('toCollect');
+  });
+
+  it('any member confirms or calls it off — until one started recording it as theirs', () => {
+    expect(mayConfirmPayment(waiting(), '8')).toBe(true);
+    expect(mayCancel(waiting(), '8')).toBe(true);
+    expect(mayConfirmPayment(waiting({ holderId: '7' }), '8')).toBe(false);
+    expect(mayConfirmPayment(waiting({ holderId: '7' }), '7')).toBe(true);
+    expect(mayCancel(waiting({ holderId: '7' }), '8')).toBe(false);
+    expect(mayConfirmPayment(order(), '7')).toBe(false);
+    expect(mayConfirmPayment(waiting(), null)).toBe(false);
+  });
+
+  it('a phone becomes a wa.me number', () => {
+    expect(whatsappNumberOf('050-123 4567')).toBe('972501234567');
+    expect(whatsappNumberOf('+1 (415) 555-0100')).toBe('14155550100');
+    expect(whatsappNumberOf('00972501234567')).toBe('972501234567');
+    expect(whatsappNumberOf('123')).toBeNull();
+    expect(whatsappHref('0501234567', 'שלום')).toBe('https://wa.me/972501234567?text=%D7%A9%D7%9C%D7%95%D7%9D');
   });
 });

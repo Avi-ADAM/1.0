@@ -20,11 +20,11 @@
  */
 import { countedWrite, unlimitedWrite, type StockWrite } from './stock';
 
-export type OrderStatus = 'paid' | 'shipped' | 'fulfilled' | 'cancelled';
+export type OrderStatus = 'pendingPayment' | 'paid' | 'shipped' | 'fulfilled' | 'cancelled';
 export type DeliveryPreference = 'pickup' | 'delivery' | 'digital' | 'contact';
 
 /** What is left to do — the seller's word for an order (UX_COPY §3.3). */
-export type OrderTask = 'toShip' | 'toHandOver' | 'shipped' | 'done' | 'cancelled';
+export type OrderTask = 'toCollect' | 'toShip' | 'toHandOver' | 'shipped' | 'done' | 'cancelled';
 
 export interface ShopOrderLine {
   productId: string | null;
@@ -66,6 +66,8 @@ export interface ShopOrder {
   paidAt: string | null;
   shippedAt: string | null;
   fulfilledAt: string | null;
+  /** An arranged order waiting for its payment lapses then (PLAN_SHOP_OPERATIONS §5). */
+  expiresAt: string | null;
   createdAt: string | null;
   buyer: { name: string | null; email: string | null; phone: string | null };
   delivery: { preference: DeliveryPreference; address: ShopAddress | null };
@@ -82,7 +84,7 @@ export interface ShopOrder {
 
 // ─── small readers ──────────────────────────────────────────────────────────
 
-const STATUSES: OrderStatus[] = ['paid', 'shipped', 'fulfilled', 'cancelled'];
+const STATUSES: OrderStatus[] = ['pendingPayment', 'paid', 'shipped', 'fulfilled', 'cancelled'];
 const PREFERENCES: DeliveryPreference[] = ['pickup', 'delivery', 'digital', 'contact'];
 
 export function statusOf(value: unknown): OrderStatus {
@@ -118,6 +120,9 @@ export function shipsByPost(pref: DeliveryPreference): boolean {
 
 export function orderTaskOf(order: Pick<ShopOrder, 'status' | 'delivery'>): OrderTask {
   switch (order.status) {
+    // Nothing to pack yet: someone has to call and collect (PLAN_SHOP_OPERATIONS §5).
+    case 'pendingPayment':
+      return 'toCollect';
     case 'paid':
       return shipsByPost(order.delivery.preference) ? 'toShip' : 'toHandOver';
     case 'shipped':
@@ -197,15 +202,15 @@ export function shortUnitsOf(
 
 // ─── the order list ─────────────────────────────────────────────────────────
 
-export type OrderFilter = 'toShip' | 'toHandOver' | 'shipped' | 'done' | 'cancelled' | 'all';
-export const ORDER_FILTERS: OrderFilter[] = ['toShip', 'toHandOver', 'shipped', 'done', 'cancelled', 'all'];
+export type OrderFilter = 'toCollect' | 'toShip' | 'toHandOver' | 'shipped' | 'done' | 'cancelled' | 'all';
+export const ORDER_FILTERS: OrderFilter[] = ['toCollect', 'toShip', 'toHandOver', 'shipped', 'done', 'cancelled', 'all'];
 
 export function orderFilterOf(value: unknown): OrderFilter | null {
   return ORDER_FILTERS.includes(value as OrderFilter) ? (value as OrderFilter) : null;
 }
 
 export function orderCounts(orders: Pick<ShopOrder, 'status' | 'delivery'>[]): Record<OrderFilter, number> {
-  const c: Record<OrderFilter, number> = { toShip: 0, toHandOver: 0, shipped: 0, done: 0, cancelled: 0, all: 0 };
+  const c: Record<OrderFilter, number> = { toCollect: 0, toShip: 0, toHandOver: 0, shipped: 0, done: 0, cancelled: 0, all: 0 };
   for (const o of orders) {
     c[orderTaskOf(o)]++;
     c.all++;
@@ -213,10 +218,14 @@ export function orderCounts(orders: Pick<ShopOrder, 'status' | 'delivery'>[]): R
   return c;
 }
 
-/** "לשליחה" when anything is there, then "למסירה", else everything (UX_COPY §3.2). */
+/**
+ * "לשליחה" when anything is there, then "למסירה", then the orders waiting for
+ * a call about their payment, else everything (UX_COPY §3.2).
+ */
 export function defaultOrderFilter(counts: Record<OrderFilter, number>): OrderFilter {
   if (counts.toShip > 0) return 'toShip';
   if (counts.toHandOver > 0) return 'toHandOver';
+  if (counts.toCollect > 0) return 'toCollect';
   return 'all';
 }
 
@@ -245,7 +254,7 @@ export function filterOrders(orders: ShopOrder[], filter: OrderFilter, query = '
  */
 export function sortOrders(orders: ShopOrder[], filter: OrderFilter): ShopOrder[] {
   const at = (o: ShopOrder) => Date.parse(o.paidAt ?? o.createdAt ?? '') || 0;
-  const oldestFirst = filter === 'toShip' || filter === 'toHandOver';
+  const oldestFirst = filter === 'toShip' || filter === 'toHandOver' || filter === 'toCollect';
   return [...orders].sort((a, b) => (oldestFirst ? at(a) - at(b) : at(b) - at(a)));
 }
 
@@ -267,7 +276,42 @@ export function salesInSplit(order: Pick<ShopOrder, 'sales'>): number {
 }
 
 export function mayCancel(order: Pick<ShopOrder, 'status' | 'holderId'>, uid: string | null): boolean {
-  return order.status !== 'cancelled' && !!uid && order.holderId === String(uid);
+  if (!uid || order.status === 'cancelled') return false;
+  // Waiting for an arranged payment: no money moved, any member calls it off —
+  // unless someone already started recording it as theirs.
+  if (order.status === 'pendingPayment') return !order.holderId || order.holderId === String(uid);
+  return order.holderId === String(uid);
+}
+
+// ─── payment by arrangement (PLAN_SHOP_OPERATIONS §5) ───────────────────────
+
+/**
+ * May this member say "the payment reached me"? Whoever gets the money is its
+ * holder — and once one member started recording it, only they may finish.
+ */
+export function mayConfirmPayment(order: Pick<ShopOrder, 'status' | 'holderId'>, uid: string | null): boolean {
+  return order.status === 'pendingPayment' && !!uid && (!order.holderId || order.holderId === String(uid));
+}
+
+/**
+ * A phone as wa.me wants it: digits only, with the country code. A local
+ * Israeli number (0501234567) gets 972 in place of its 0; a number written
+ * with + or 00 already has its code. Null when there are too few digits.
+ */
+export function whatsappNumberOf(phone: string | null, countryCode = '972'): string | null {
+  if (!phone) return null;
+  const plus = phone.trim().startsWith('+');
+  let d = phone.replace(/\D+/g, '');
+  if (plus) {
+    /* already international */
+  } else if (d.startsWith('00')) d = d.slice(2);
+  else if (d.startsWith('0')) d = countryCode + d.slice(1);
+  return d.length >= 8 ? d : null;
+}
+
+export function whatsappHref(phone: string | null, text: string): string | null {
+  const n = whatsappNumberOf(phone);
+  return n ? `https://wa.me/${n}?text=${encodeURIComponent(text)}` : null;
 }
 
 // ─── stock ──────────────────────────────────────────────────────────────────

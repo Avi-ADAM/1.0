@@ -39,6 +39,13 @@ describe('orderEventsFor', () => {
     expect(orderEventsFor('markOrderFulfilled', { changed: true }).order).toEqual(['order.statusChanged']);
     expect(orderEventsFor('cancelOrder', { alreadyCancelled: false }).order).toEqual(['order.statusChanged']);
   });
+
+  it('an arranged order is order.pendingPayment, then order.paid when its money is recorded', () => {
+    expect(orderEventsFor('createPaidOrder', { status: 'pendingPayment' })).toEqual({ order: ['order.pendingPayment'], stock: [] });
+    expect(orderEventsFor('confirmOrderPayment', { changed: true, oversold: false, stockChanges: [] }).order).toEqual(['order.paid']);
+    expect(orderEventsFor('confirmOrderPayment', { changed: false }).order).toEqual([]);
+    expect(orderEventsFor('expireOrder', { changed: true }).order).toEqual(['order.statusChanged']);
+  });
 });
 
 const ORDER = {

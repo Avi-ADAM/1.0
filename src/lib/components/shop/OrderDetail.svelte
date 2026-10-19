@@ -39,7 +39,13 @@
 
   let timeline = $derived(
     [
-      order.paidAt || order.createdAt ? { key: 'paid', at: order.paidAt ?? order.createdAt } : null,
+      // An arranged order came in before anyone was paid (PLAN_SHOP_OPERATIONS §5).
+      order.status === 'pendingPayment' || (order.paidAt && order.createdAt && order.paidAt.slice(0, 16) !== order.createdAt.slice(0, 16))
+        ? { key: 'placed', at: order.createdAt }
+        : null,
+      order.paidAt || (order.createdAt && order.status !== 'pendingPayment')
+        ? { key: 'paid', at: order.paidAt ?? order.createdAt }
+        : null,
       order.shippedAt ? { key: 'shipped', at: order.shippedAt } : null,
       order.fulfilledAt ? { key: 'done', at: order.fulfilledAt } : null,
       order.status === 'cancelled' ? { key: 'cancelled', at: null } : null
@@ -168,7 +174,14 @@
 
   <section class="od-card" aria-labelledby="od-pay-{order.id}">
     <h2 class="sh-section-label" id="od-pay-{order.id}">{$t('shop.order.payment.title')}</h2>
-    <div>{$t('shop.order.payment.paid', { amount: money(order.total) })}</div>
+    {#if order.status === 'pendingPayment'}
+      <div>{$t('shop.order.payment.waiting', { amount: money(order.total) })}</div>
+      {#if order.expiresAt}
+        <div class="od-small">{$t('shop.order.payment.expires', { when: stamp(order.expiresAt) })}</div>
+      {/if}
+    {:else}
+      <div>{$t('shop.order.payment.paid', { amount: money(order.total) })}</div>
+    {/if}
     {#if order.paymentRef}
       <div class="od-small">{$t('shop.order.payment.ref')} <bdi class="od-mono">{order.paymentRef}</bdi></div>
     {/if}

@@ -17485,7 +17485,7 @@ ${STIPEND_DECISION_FIELDS}
     ) {
       data { id attributes {
         ref externalId displayNumber status oversold total currencyCode note
-        paidAt shippedAt fulfilledAt updatedAt
+        paidAt shippedAt fulfilledAt expiresAt updatedAt
         holder { data { id } }
         lines(pagination: { limit: 100 }) { data { id attributes {
           position quantity unitPrice nameSnapshot optionLabelSnapshot
@@ -17510,6 +17510,22 @@ ${STIPEND_DECISION_FIELDS}
   // (ordersApi `refundNoteOf`). Never a delete — the row is history.
   'saleRefundReset': `mutation SaleRefundReset($id: ID!, $in: Float!, $unit: Float!, $note: String) {
     updateSale(id: $id, data: { in: $in, unit: $unit, note: $note }) { data { id } }
+  }`,
+
+  // Arranged orders whose payment did not arrive in time (PLAN_SHOP_OPERATIONS
+  // §5.2) — every rikma's, for /api/cron/orders. The holder is read so an
+  // order a member already started confirming is left alone.
+  'ordersLapsedArranged': `query OrdersLapsedArranged($now: DateTime!) {
+    orders(
+      filters: { and: [ { status: { eq: "pendingPayment" } }, { expiresAt: { lte: $now } } ] }
+      pagination: { limit: 200 }
+    ) {
+      data { id attributes {
+        ref status expiresAt note
+        project { data { id } }
+        holder { data { id } }
+      } }
+    }
   }`,
 
   'rikmaApiOrderCreate': `mutation RikmaApiOrderCreate($data: OrderInput!) {
@@ -17612,7 +17628,7 @@ ${STIPEND_DECISION_FIELDS}
       data { id attributes {
         ref displayNumber status oversold total currencyCode note source
         buyerName buyerEmail buyerPhone deliveryPreference deliveryAddress
-        paymentRef paymentMethod paidAt shippedAt fulfilledAt createdAt
+        paymentRef paymentMethod paidAt shippedAt fulfilledAt expiresAt createdAt
         holder { data { id attributes { username } } }
         lines(pagination: { limit: 100 }) { data { id attributes {
           position quantity unitPrice lineTotal

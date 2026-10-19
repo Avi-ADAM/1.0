@@ -683,6 +683,7 @@ export const qidsAccess = {
   'rikmaApiOrderCreate': { allow: ['serviceAdmin'] },
   'rikmaApiOrderLineCreate': { allow: ['serviceAdmin'] },
   'rikmaApiOrderUpdate': { allow: ['serviceAdmin'] },
+  'ordersLapsedArranged': { allow: ['serviceAdmin'] },
   'saleRefundReset': { allow: ['serviceAdmin'] },
   // Run by `createSale` itself (strapiClient, not /api/send) — so no session
   // ever needs them here, whoever reported the sale.

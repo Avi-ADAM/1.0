@@ -8,6 +8,7 @@ type T = (key: string, vars?: Record<string, unknown>) => string;
 
 /** The chip colour of each task: what waits is the accent, what's over is quiet. */
 export const TASK_CHIP: Record<OrderTask, string> = {
+  toCollect: 'sh-chip-warn',
   toShip: 'sh-chip-accent',
   toHandOver: 'sh-chip-accent',
   shipped: 'sh-chip-info',

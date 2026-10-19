@@ -1,6 +1,7 @@
 # PLAN — החנות, שלב ב': תפעול ההזמנה, ומוצרים מורכבים בקופה
 
-> **מצב: תכנון אסטרטגי. אין קוד.** נכתב 2026-10-19 כהמשך ל-
+> **מצב (2026-10-19): T1 בנוי בקוד, לא נפרס ולא הורץ מול Strapi** — ראו
+> "מצב הביצוע" בסוף §7. שאר השלבים בתכנון. נכתב 2026-10-19 כהמשך ל-
 > [PLAN_SHOP_CUSTOMER_EXPERIENCE](../inprogress/PLAN_SHOP_CUSTOMER_EXPERIENCE.md)
 > (S1–S6 בנויים וממתינים לפריסה), אחרי קריאת הקוד: `createSheirutFromPending.ts`,
 > `createPaidOrder.ts`, `orderLifecycle.ts`, `createTask.ts`, והסכמה המיוצאת
@@ -24,7 +25,7 @@
 > [PLAN_SHARED_PURCHASE](../inprogress/PLAN_SHARED_PURCHASE.md) (מאגד),
 > [PLAN_DIRECT_OFFER](../inprogress/PLAN_DIRECT_OFFER.md) (מסך העסקה),
 > [PLAN_SHIFTS](../inprogress/PLAN_SHIFTS.md) (מי במשמרת עכשיו),
-> [PLAN_MONEY_RAILS](./PLAN_MONEY_RAILS.md) (למה אין סליקה אצלנו).
+> [PLAN_MONEY_RAILS](../tbd/PLAN_MONEY_RAILS.md) (למה אין סליקה אצלנו).
 
 ---
 
@@ -459,6 +460,28 @@ S1–S6 בנויים ולא נפרסו. כל שלב כאן נשען על `order`
 | **B4** | בקשת רכש עם טוקן (S3b): `POST /quotes`, `/o/{ref}?t=`, חותם `orderToken` ב-`negoGate`, גשר לעסקה (PLAN_DIRECT_OFFER), פקיעה | B1 · T1 לתשלום · T4 (הדף והצ'אט משותפים) | 7–9 ימים |
 | **B5** | מאגד מהאתר: בלוק `pool` ב-DTO · חשבון קל · `pendingPayment` ביציאה | T1 · PLAN_POOL_PRODUCT P3 | 6–8 ימים |
 | B6 | "התחברות עם 1lev1" לחנויות (OAuth) | — | לפי ביקוש |
+
+### מצב הביצוע
+
+**T1 — בנוי (2026-10-19), לא נפרס.** אין צורך בשינוי סכמה: `Order.status`
+כבר כולל `pendingPayment`, ו-`expiresAt` כבר קיים. מה נבנה:
+
+| מה | איפה |
+|---|---|
+| `payment: "arranged"` ב-`POST /orders` (+ `expiresInHours`, ברירת מחדל 72): חובה שם + טלפון, אסור `amount`. נכתבות ההזמנה והשורות ב-`pendingPayment`, בלי מחזיק, בלי מכירה, בלי מלאי. ניסיון חוזר = אותה הזמנה; חיוב שמדווח על אותו מזהה = `409` | `ordersApi.ts` (`validateOrderPayload`), `createPaidOrder.ts` |
+| `confirmOrderPayment` — סכום, אמצעי (`bit·paybox·transfer·cash·other`), הערה. מי שמאשר **הוא** המחזיק: הכתיבה הראשונה מחתימה אותו, ומאשר שני מקבל `NOT_HOLDER`. אחר כך מכירה לכל שורה, מלאי, `oversold` לפי המלאי ברגע הזה, ובסוף הסטטוס. הסכום שהתקבל מתחלק באופן יחסי (`splitReceived`), וההערה מסמנת "מתחת למחיר הקטלוג" (H8 — נרשם כמו שהוא) | `confirmOrderPayment.ts`, `shop/orderSales.ts` (משותף עכשיו ל-`createPaidOrder`) |
+| ביטול לפני תשלום — כל חבר, בלי החזר ובלי מלאי. משלוח לפני תשלום — `409 PAYMENT_PENDING` | `orderLifecycle.ts`, `transitionOf` |
+| פקיעה — `/api/cron/orders?key=<CRON_SECRET>`: `pendingPayment` שעבר את `expiresAt` ⇒ `cancelled` + שורת הערה, ו-`order.statusChanged` לאתר. הזמנה שמישהו כבר התחיל לאשר — לא פגה | `shop/arrangedExpiry.ts`, qid `ordersLapsedArranged` |
+| webhooks: `order.pendingPayment` ביצירה, `order.paid` (+`oversold`) באישור; `GET /orders/{ref}` מחזיר `expiresAt` כשההזמנה ממתינה | `orderEvents.ts`, `toOrderView` |
+| מסך: לשונית "ממתינות לתשלום" (`toCollect`), חיוג / וואטסאפ (`wa.me` עם קידומת 972), "התשלום התקבל" (`ConfirmPaymentDialog`), תוקף בפרטי ההזמנה, ונוסח ביטול לפני תשלום. 5 שפות | `manage.ts`, `OrderActions`, `OrderDetail`, `CancelOrderDialog`, `shop.json` |
+
+**מה חסר כדי ש-T1 ייחשב גמור:**
+1. **`availability.reserved` ב-DTO הציבורי — לא נבנה.** דורש שאילתת הזמנות
+   ממתינות לכל קריאת קטלוג (נתיב ציבורי ומוטמן); נדחה עד שיתברר שאתר באמת צריך
+   אותו לפני T2.
+2. **לתזמן את `/api/cron/orders` כל שעה**, ליד `/api/cron/shifts`.
+3. שלב 0 — פריסה והרצה מקצה לקצה: הזמנה בתיאום מ-`curl` ⇒ לשונית ⇒ "התשלום
+   התקבל" ⇒ מכירות ⇒ "נשלח".
 
 **המקביליות:** A1 הוא נקודת המפגש — B1 לא מתחיל לפניו. אחרי A1 שני הראשים
 רצים במקביל בלי לגעת באותם קבצים: ראש א' ב-`fulfillment/`, `Mashabetahalich`

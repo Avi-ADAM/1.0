@@ -181,6 +181,7 @@ import { addAskmChatEntryConfig } from './addAskmChatEntry.js';
 import { addAskChatEntryConfig } from './addAskChatEntry.js';
 import { createSaleConfig } from './createSale.js';
 import { createPaidOrderConfig } from './createPaidOrder.js';
+import { confirmOrderPaymentConfig } from './confirmOrderPayment.js';
 import { cancelOrderConfig, markOrderShippedConfig, markOrderFulfilledConfig } from './orderLifecycle.js';
 import { setShopStockConfig } from './shopStock.js';
 import { saveProductVariantsConfig, saveProductOptionsConfig } from './shopProductEditor.js';
@@ -515,6 +516,7 @@ export function registerAllActions(): void {
   // Sale reporting (SaleComponent — shared by gift/[id] and sales-center)
   registerAction(createSaleConfig);
   registerAction(createPaidOrderConfig);
+  registerAction(confirmOrderPaymentConfig);
   registerAction(cancelOrderConfig);
   registerAction(markOrderShippedConfig);
   registerAction(markOrderFulfilledConfig);

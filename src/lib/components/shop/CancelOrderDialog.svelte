@@ -5,6 +5,10 @@
    * refund already agreed with the buyer and made on the site: the holder's
    * sales not yet in a split are reset, ones already in a split stay and the
    * rikma is told. No undo — the text says so by what it asks first.
+   *
+   * An order still waiting for an arranged payment (PLAN_SHOP_OPERATIONS §5)
+   * has nothing to refund or restock: any member may call it off, and the
+   * sheet says only that.
    */
   import { t } from '$lib/translations';
   import { toast } from 'svelte-sonner';
@@ -22,6 +26,7 @@
   let busy = $state(false);
   let failed = $state(false);
   let inSplit = $derived(salesInSplit(order));
+  let beforePayment = $derived(order.status === 'pendingPayment');
 
   $effect(() => {
     if (open) {
@@ -35,7 +40,7 @@
     failed = false;
     const res = await executeAction(
       'cancelOrder' as any,
-      { projectId, orderRef: order.ref, reason: reason.trim() || undefined, restock },
+      { projectId, orderRef: order.ref, reason: reason.trim() || undefined, ...(beforePayment ? {} : { restock }) },
       { showErrorToast: false }
     ).catch(() => null);
     busy = false;
@@ -49,15 +54,16 @@
   }
 </script>
 
-<ShopSheet bind:open label={$t('shop.cancel.title', { number: order.number })}>
+<ShopSheet bind:open label={$t(beforePayment ? 'shop.cancel.pendingTitle' : 'shop.cancel.title', { number: order.number })}>
   <div class="cd">
-    <h2 class="sh-title cd-title">{$t('shop.cancel.title', { number: order.number })}</h2>
-    <p>{$t('shop.cancel.body')}</p>
-    {#if inSplit > 0}
+    <h2 class="sh-title cd-title">{$t(beforePayment ? 'shop.cancel.pendingTitle' : 'shop.cancel.title', { number: order.number })}</h2>
+    <p>{$t(beforePayment ? 'shop.cancel.pendingBody' : 'shop.cancel.body')}</p>
+    {#if !beforePayment && inSplit > 0}
       <p class="cd-split">
         {inSplit === 1 ? $t('shop.cancel.inSplitOne') : $t('shop.cancel.inSplit', { count: inSplit })}
       </p>
     {/if}
+    {#if !beforePayment}
     <label class="cd-check">
       <input type="checkbox" bind:checked={restock} />
       <span>
@@ -65,6 +71,7 @@
         <small>{$t('shop.cancel.restockHint')}</small>
       </span>
     </label>
+    {/if}
     <label class="sh-field">
       {$t('shop.cancel.reason')}
       <textarea class="sh-input" bind:value={reason} maxlength="500" rows="3"></textarea>

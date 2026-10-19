@@ -49,7 +49,8 @@
       "shipped": "Shipped",
       "done": "Completed",
       "cancelled": "Cancelled",
-      "all": "All"
+      "all": "All",
+      "toCollect": "Awaiting payment"
     },
     "col": {
       "order": "Order",
@@ -98,7 +99,9 @@
       "title": "Payment",
       "paid": "{{amount}} paid on your site",
       "ref": "Payment reference",
-      "method": "Payment method"
+      "method": "Payment method",
+      "waiting": "Awaiting a payment of {{amount}}, arranged with the buyer",
+      "expires": "If the payment isn't arranged by {{when}}, the order closes by itself"
     },
     "holder": "{{name}} holds the money · counted for the split",
     "holderYou": "You hold the money · counted for the split",
@@ -113,16 +116,20 @@
       "paid": "Paid on the site",
       "shipped": "Marked as shipped",
       "done": "Marked as completed",
-      "cancelled": "Cancelled"
+      "cancelled": "Cancelled",
+      "placed": "Placed on the site"
     },
-    "notFound": "This order wasn't found in the rikma."
+    "notFound": "This order wasn't found in the rikma.",
+    "whatsapp": "WhatsApp",
+    "whatsappText": "Hi, about order {{number}} you placed with us — we'd like to arrange the payment with you."
   },
   "status": {
     "toShip": "To ship",
     "toHandOver": "To hand over",
     "shipped": "Shipped",
     "done": "Completed",
-    "cancelled": "Cancelled"
+    "cancelled": "Cancelled",
+    "toCollect": "Awaiting payment"
   },
   "short": {
     "tag": "{{count}} short",
@@ -146,7 +153,8 @@
     "done": "Order {{number}} completed",
     "failed": "That didn't save. Check your connection and try again.",
     "retry": "Try again",
-    "cancelled": "Order {{number}} cancelled"
+    "cancelled": "Order {{number}} cancelled",
+    "paid": "Payment for order {{number}} recorded — it can be sent"
   },
   "cancel": {
     "action": "Cancel order",
@@ -160,7 +168,9 @@
     "confirm": "Cancel order",
     "keep": "Keep order",
     "holderOnly": "Only {{name}} can cancel — they hold the money",
-    "failed": "The cancellation didn't save. Try again."
+    "failed": "The cancellation didn't save. Try again.",
+    "pendingTitle": "Close order {{number}}?",
+    "pendingBody": "No payment has arrived yet, so there's nothing to refund or restock — the order just closes. Say why, if you like."
   },
   "products": {
     "search": "Search products or SKU",
@@ -313,7 +323,9 @@
     "filtered": "Nothing matches this filter",
     "clearFilter": "Clear filter",
     "sales": "No sales in this range",
-    "stock": "Nothing to update here"
+    "stock": "Nothing to update here",
+    "toCollect": "Nothing awaiting payment",
+    "toCollectBody": "An order whose buyer asked to arrange the payment shows up here, with their phone number."
   },
   "err": {
     "load": "We couldn't load this. Try refreshing.",
@@ -369,5 +381,26 @@
       "creatorGives": "Your contribution ({{amount}}) will be saved when the split is created.",
       "sent": "Proposal sent to the rikma"
     }
+  },
+  "pay": {
+    "action": "Payment received",
+    "title": "Is the payment for order {{number}} with you?",
+    "body": "Whoever confirms here holds the money: the sales are recorded in your name. If the buyer paid another partner, ask them to confirm.",
+    "amount": "Amount received",
+    "amountHint": "Gave a discount on the phone? Enter what actually arrived.",
+    "under": "Less than the catalog price ({{amount}}) — the order will be marked as sold at a discount.",
+    "method": "Paid by",
+    "methods": {
+      "bit": "Bit",
+      "paybox": "PayBox",
+      "transfer": "Bank transfer",
+      "cash": "Cash",
+      "other": "Other"
+    },
+    "note": "Note (optional)",
+    "confirm": "Yes, the money is with me",
+    "keep": "Not yet",
+    "failed": "The payment didn't save. Try again.",
+    "holderOnly": "This payment is already being recorded by {{name}}"
   }
 }
