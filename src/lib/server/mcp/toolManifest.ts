@@ -91,6 +91,8 @@ import {
   listRikmaProductVariantsTool,
   listRikmaOrdersTool,
   getRikmaOrderTool,
+  getShippingConfigTool,
+  quoteShippingTool,
   createRikmaProductTool,
   updateRikmaProductTool,
   archiveRikmaProductTool,
@@ -276,6 +278,9 @@ export const MCP_TOOL_MANIFEST: Record<string, McpManifestEntry> = {
   listRikmaProductVariantsTool: { tool: listRikmaProductVariantsTool, title: 'List product variants', tier: 'read', project: 'member' },
   listRikmaOrdersTool: { tool: listRikmaOrdersTool, title: 'List rikma orders', tier: 'read', project: 'member' },
   getRikmaOrderTool: { tool: getRikmaOrderTool, title: 'Get rikma order', tier: 'read', project: 'member' },
+  // Shipping (PLAN_SHOP_SHIPPING): the rikma's own config and a priced quote — reads, members only.
+  getShippingConfigTool: { tool: getShippingConfigTool, title: 'Get shipping setup', tier: 'read', project: 'member' },
+  quoteShippingTool: { tool: quoteShippingTool, title: 'Quote shipping', tier: 'read', project: 'member' },
   createRikmaProductTool: { tool: createRikmaProductTool, title: 'Create a rikma product', tier: 'selfWrite', project: 'member' },
   updateRikmaProductTool: { tool: updateRikmaProductTool, title: 'Update rikma product', tier: 'selfWrite', project: 'member' },
   archiveRikmaProductTool: { tool: archiveRikmaProductTool, title: 'Archive a rikma product', tier: 'selfWrite', destructive: true, project: 'member' },

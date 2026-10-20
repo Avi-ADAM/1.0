@@ -27,6 +27,7 @@
 | עדכון מלאי תפעולי — set/add/unlimited (§4.6, §7.3) | `setShopStock` (nextStock) | `setShopStock` — mode set/add, value, unlimited, variantId | selfWrite |
 | הזמנה ששולמה: `paid → shipped → fulfilled` / ביטול holder-only (§3.4, §5.4) | `moachShopOrders`, `markOrderShipped/ Fulfilled`, `cancelOrder` | `listRikmaOrders`, `getRikmaOrder`, `updateRikmaOrderStatus` | read / selfWrite |
 | תמונת מלאי + oversold/shortUnits + banner (§7.3) | `moachShop.ts` `shortUnitsOf`, `bannerOf`, `loadShopOrders` | `getShopInventory` | read |
+| משלוחים: אזורים/תעריפים/נקודות איסוף, "כמה עולה משלוח לחיפה?" ([PLAN_SHOP_SHIPPING](PLAN_SHOP_SHIPPING.md)) | `readShippingConfig`, `quoteForRikma` | `getShippingConfig`, `quoteShipping` | read |
 
 עיקרון החתך (§4 בעיקרון 8, §4.6): **מלאי וגלריה הם תפעוליים — חלים מיד; מחיר חדש/וריאנט חדש הם תנאים ודורשים `editObject` ברקמה מרובת-חברים.** הכלים מכבדים את זה: `setShopStock` כתיבה ישירה, `createRikmaProduct` יצירת מוצר פשוט במחיר קבוע, ושינוי מחיר של מוצר רקמה מצביע ל-editObject במסך המתקדם.
 
@@ -94,6 +95,17 @@
 
 ---
 
+### 2.3 משלוחים — קריאה בלבד ([PLAN_SHOP_SHIPPING](PLAN_SHOP_SHIPPING.md))
+
+#### `getShippingConfig(projectId)`
+- `readShippingConfig` (`src/lib/server/shop/shippingConfig.ts`) — דרך ה-schema probe. עד ש-`1.0b` פורס את `Project.shipping`, או כשהרקמה כיבתה משלוחים: `configured:false` ומשפט "shipping isn't set up" + `manageUrl` ללשונית המשלוחים — לא שגיאה.
+- חבר רקמה רואה את ה-config **המלא** (tiers, perItem/perKg, surcharge ומשקל למוצר, contactFallback), לא את החתך של החנות (`publicShippingOf`), ועוד `freeOver` (הנמוך מכל השיטות), `currency` ו-`problems` (`configProblems`: אזור בלי שם/כיסוי/שיטות).
+
+#### `quoteShipping(projectId, items[{productId, variantId?, quantity}], address?{country, city, zip})`
+- `unitPrice` נקרא מהקטלוג של הרקמה (`moachShopProducts`: מחיר הווריאנט, אחרת מחיר המוצר) — לא מהסוכן — כך שסף "חינם מעל" חל כמו בקופה. זה גם הגדר: מוצר שאינו של הרקמה, ווריאנט של מוצר אחר, או מוצר-בווריאנטים בלי `variantId` ⇒ סירוב לפני שמשהו מתומחר.
+- `quoteForRikma` (`src/lib/server/shop/shipping.ts`) — אותה פונקציה שמתמחרת את ה-API הציבורי ואת ההזמנה; הנפה נגזרת מהעיר בשרת. מחזיר `options[]` (fee, free, freeOverRemaining, ETA, nextDispatch, zone/pickupPoint) + `outsideZones`/`noDeliveryProducts`/`needsAddress`/`weightUnknown`, ואת ה-`lines` שתומחרו.
+- ה-ProbeRun של ה-MCP זורק את הודעת Strapi הגולמית (כדי שה-probe יבחין "Cannot query field" מתקלה) — אבל לסוכן חוזר משפט כללי; ההודעה הגולמית נשארת בלוג.
+
 ## 3. הנחיות לסוכן (instructions.ts)
 
 נוספו סעיפים 7–8 ל-`MCP_INSTRUCTIONS`:
@@ -135,10 +147,11 @@
 ## 7. בדיקות
 
 - `yarn test` (vitest 3.2.7) על `src/lib/server/mcp/*`: guard 20, manifest 11, rateLimit 3, keyDiagnosis 11, lazyListing 7, strapiErrors 6 — כולם עוברים (58 כולל shop imports).
+- `src/mastra/tools/shopShippingTools.test.ts` (12): רישום במניפסט (read + `project:'member'` + title), "not set up" כשהסכמה לא חיה / כבויה, config מלא, ה-runner זורק את הודעת Strapi, תמחור מהקטלוג (ווריאנט > מוצר), סירוב למוצר של רקמה אחרת / ווריאנט זר / חסר variantId, כשל ציטוט ⇒ משפט כללי.
 - ידני נגד שרת פיתוח עם מפתח scoped ל-`[89]`: `listRikmaProducts(89)` → פירוט, `getRikmaProduct(89,1842)` → וריאנטים, `getShopInventory(89)` → low/out, `listRikmaOrders(89)` → buyerContact, `setShopStock`/`updateRikmaOrderStatus` כש-holder.
 
 ## 8. קישורים
 
-- קוד: `src/mastra/tools/shopTools.ts` (12 כלים), `src/lib/server/mcp/toolManifest.ts` (מניפסט), `src/lib/server/mcp/instructions.ts` (§7–8), `src/lib/server/shop/moachShop.ts`, `src/lib/shop/manage.ts`.
+- קוד: `src/mastra/tools/shopTools.ts` (14 כלים, כולל משלוחים), `src/lib/server/mcp/toolManifest.ts` (מניפסט), `src/lib/server/mcp/instructions.ts` (§7–8), `src/lib/server/shop/moachShop.ts`, `src/lib/shop/manage.ts`.
 - סכמה: `1.0b/src/api/*/content-types/*/schema.json` (product-option, product-variant, order/line).
 - API: `src/lib/server/apiPublic/*` (catalog.ts S2, dto.ts, query.ts, writeApi.ts+ordersApi.ts), `src/lib/server/actions/configs/{shopStock,createPaidOrder,orderLifecycle}.ts`.

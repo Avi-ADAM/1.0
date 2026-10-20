@@ -122,9 +122,9 @@
             </div>
           {:else}
             <div
-              class="w-12 h-12 rounded-full bg-gradient-to-br from-gold to-barbi flex items-center justify-center ring-2 ring-gold/30 group-hover:ring-gold transition-all duration-300 flex-shrink-0"
+              class="w-6 h-6 rounded-full bg-gradient-to-br from-gold to-barbi flex items-center justify-center ring-2 ring-gold/30 group-hover:ring-gold transition-all duration-300 flex-shrink-0"
             >
-              <span class="text-xl font-bold text-white"
+              <span class="text-xs font-bold leading-none text-white"
                 >{project.projectName.charAt(0).toUpperCase()}</span
               >
             </div>
