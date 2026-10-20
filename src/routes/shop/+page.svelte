@@ -19,14 +19,14 @@
 -->
 <script>
   import { t, isRtl, locale } from '$lib/translations';
-  import { registerHref } from '$lib/navigation/registerHref';
+  import { registerHref } from '$lib/nav/registerHref.js';
   import { STARTER_REPO_URL } from '$lib/shop/starter';
   import { jsonLdScript, breadcrumbs, faqPage } from '$lib/seo/jsonLd.js';
-  import AppearanceMenu from '$lib/components/ui/AppearanceMenu.svelte';
+  import AppearanceMenu from '$lib/components/footer/AppearanceMenu.svelte';
   import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
   import DemoRequest from '$lib/components/main/DemoRequest.svelte';
 
-  const regHref = registerHref(null, '/shop');
+  let regHref = $derived(registerHref($locale, '/shop'));
 
   const PATHS = [
     { key: 'p1', icon: 'store', href: '#template' },
@@ -136,7 +136,7 @@
     </nav>
 
     <div class="sp-actions">
-      <AppearanceMenu />
+      <AppearanceMenu compact drop="down" />
       <a href={regHref} class="sp-btn sp-btn-primary">{$t('shopPage.nav.ctaTop')}</a>
     </div>
   </header>
