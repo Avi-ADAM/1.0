@@ -58,6 +58,7 @@
     "agreementMap": "Mapa de acuerdos",
     "changeLanguage": "Cambiar idioma",
     "why": "Por qué importa",
+    "shop": "Tienda online",
     "homeAria": "1💗1 — inicio",
     "pageNav": "En esta página",
     "footer": "Enlaces"
@@ -711,6 +712,14 @@
     "desc": "Toda la diferencia está en lo que ocurre cuando la respuesta es no, y de esa frase se deriva todo lo construido aquí. Hay una página que lo explica, con números y fuentes.",
     "cta": "Leer por qué",
     "inline": "¿Y por qué es así, para empezar?"
+  },
+  "shop": {
+    "eyebrow": "Tienda online impulsada por una rikma",
+    "title": "Lanza una tienda en un clic desde una plantilla lista — con backend por consenso, automatización de tareas y stock, y MCP",
+    "desc": "Variantes, galería, cobro online o coordinado, tareas automáticas de preparación y envío, consumo de recursos y reparto automático de beneficios.",
+    "stripTitle": "Abre tu propia tienda online sobre la rikma — plantilla lista en un clic o conectando tu web existente",
+    "stripDesc": "Un backend gestionado por el consenso de los socios: variantes y stock, cobro o pago coordinado, automatización de tareas y recursos, herramientas MCP y reparto automático de beneficios.",
+    "cta": "Cómo crear una tienda con 1💗1"
   },
   "noboss": {
     "lead": "¿Sigues empleado, o trabajas por tu cuenta en solitario? Hay una página entera sobre la tercera vía: qué no funciona hoy y cómo se ve dentro de una rikma.",
