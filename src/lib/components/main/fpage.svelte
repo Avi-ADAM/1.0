@@ -250,6 +250,7 @@
   /** @type {{ href: string, key: string }[]} */
   const DEEPER = [
     { href: '/guid', key: 'guide' },
+    { href: '/shop', key: 'shop' },
     { href: '/quorum', key: 'quorum' },
     { href: '/grow', key: 'grow' },
     { href: '/why', key: 'why' }
@@ -691,6 +692,19 @@
         </div>
       {/each}
     </div>
+
+    <a href="/shop" class="hm-shop-strip" data-sveltekit-prefetch>
+      <span class="hm-icon hm-shop-strip-icon"><EntityIcon kind="store" size={22} /></span>
+      <span class="hm-shop-strip-body">
+        <span class="hm-eyebrow">{$t('home.shop.eyebrow')}</span>
+        <strong>{$t('home.shop.stripTitle')}</strong>
+        <span class="hm-muted">{$t('home.shop.stripDesc')}</span>
+      </span>
+      <span class="hm-shop-strip-cta">
+        {$t('home.shop.cta')}
+        <span aria-hidden="true" class="hm-door-arrow">{arrow}</span>
+      </span>
+    </a>
   </section>
 
   <!-- ============ DISCOVER + PRICE ============ -->
@@ -794,6 +808,7 @@
     <nav aria-label={$t('home.nav.footer')}>
       <a href="/faq" data-sveltekit-prefetch>{$t('home.nav.faq')}</a>
       <a href="/guid" data-sveltekit-prefetch>{$t('home.nav.guide')}</a>
+      <a href="/shop" data-sveltekit-prefetch>{$t('home.nav.shop')}</a>
       <a href="/why" data-sveltekit-prefetch>{$t('home.nav.why')}</a>
       {#if $lang == 'he'}
         <a href="https://agreement.1lev1.com" target="_blank" rel="noopener">{$t('home.nav.about')}</a>
@@ -2125,6 +2140,60 @@
   .hm-tile-dark .hm-icon {
     background: var(--hm-cta-bg);
     color: var(--hm-cta-ink);
+  }
+  .hm-shop-strip {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px 24px;
+    padding: 20px 24px;
+    border-radius: var(--hm-radius);
+    background: linear-gradient(135deg, var(--hm-glow-a), var(--hm-glow-b));
+    border: 1.5px solid color-mix(in srgb, var(--hm-accent) 32%, transparent);
+    color: var(--hm-ink);
+    text-decoration: none;
+    transition:
+      border-color 0.16s,
+      transform 0.16s,
+      box-shadow 0.16s;
+  }
+  .hm-shop-strip:hover {
+    border-color: var(--hm-accent);
+    transform: translateY(-2px);
+    box-shadow: var(--hm-shadow);
+  }
+  .hm-shop-strip-icon {
+    background: var(--hm-cta-bg);
+    color: var(--hm-cta-ink);
+  }
+  .hm-shop-strip-body {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1 1 320px;
+    min-width: 0;
+  }
+  .hm-shop-strip-body strong {
+    font-size: 18px;
+    font-weight: 800;
+    line-height: 1.35;
+    color: var(--hm-ink);
+  }
+  .hm-shop-strip-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border-radius: var(--hm-pill);
+    background: var(--hm-cta-bg);
+    color: var(--hm-cta-ink);
+    font-size: 14px;
+    font-weight: 800;
+    white-space: nowrap;
+  }
+  :global(html.business) .hm-shop-strip-cta {
+    border-radius: 6px;
   }
 
   /* ===== discover + price ================================================= */

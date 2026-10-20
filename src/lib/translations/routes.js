@@ -57,6 +57,8 @@ export const ROUTED = {
     // The seller's product editor (sales/manage/products/[productId]) and the
     // "full edit" link on the products tab.
     shopEditor: at(/\/moach\/[^/]+\/sales/),
+    // The public "how to build a shop with 1💗1" landing page (/shop).
+    shopPage: at('/shop'),
     offerings: at('/me', '/onboard', '/gift', '/user', '/deals/sales-center', /\/moach\/[^/]+\/sales/),
     consensus: at('/consensus'),
     uses: at('/uses'),
