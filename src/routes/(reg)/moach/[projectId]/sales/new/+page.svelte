@@ -1,8 +1,7 @@
 ﻿<script lang="ts">
-  import { isRtl } from '$lib/translations';
+  import { isRtl, t } from '$lib/translations';
   import { goto } from '$app/navigation';
   import { page } from '$app/state';
-  import { lang } from '$lib/stores/lang.js';
   import ComposeProduct from '$lib/components/products/ComposeProduct.svelte';
 
   let { data } = $props();
@@ -25,25 +24,18 @@
     return { draft: null, mode: 'complex' as const };
   })();
 
-  const t = $derived(
-    $lang === 'he'
-      ? {
-          title: 'יצירת מוצר חדש',
-          subtitle: 'מוצר מורכב - מתכון של משימות ומשאבים',
-          back: '→ חזרה למכירות'
-        }
-      : {
-          title: 'Create new product',
-          subtitle: 'Complex product - a recipe of missions and resources',
-          back: '← Back to sales'
-        }
+  // Opened from the manage tab, "back" returns there; the simple sales page otherwise.
+  const fromManage = page.url.searchParams.get('from') === 'manage';
+  const backHref = $derived(
+    fromManage ? `/moach/${data.projectId}/sales/manage/products` : `/moach/${data.projectId}/sales`
   );
 
   function backToSales() {
-    goto(`/moach/${data.projectId}/sales`);
+    goto(backHref);
   }
 
-  function handleDone() {
+  /** Saving opens the full editor — variants, pictures and stock are added there. */
+  function handleDone({ matana }: { matana: unknown }) {
     if (fromQuick && typeof localStorage !== 'undefined') {
       try {
         localStorage.removeItem(DRAFT_KEY);
@@ -51,22 +43,23 @@
         /* noop */
       }
     }
-    backToSales();
+    const id = (matana as { id?: string | number } | null)?.id;
+    goto(id != null ? `/moach/${data.projectId}/sales/manage/products/${id}` : backHref);
   }
 </script>
 
 <svelte:head>
   <title>
-    {data.projectName ? `${data.projectName} · ` : ''}{t.title} · 1lev1
+    {data.projectName ? `${data.projectName} · ` : ''}{$t('shopEditor.create.title')} · 1lev1
   </title>
 </svelte:head>
 
 <div class="page" dir={$isRtl ? 'rtl' : 'ltr'}>
   <div class="head">
-    <button class="back" type="button" onclick={backToSales}>{t.back}</button>
+    <button class="back" type="button" onclick={backToSales}>{$t('shopEditor.create.back')}</button>
     <div class="titles">
-      <h1>{t.title}</h1>
-      <p>{t.subtitle}</p>
+      <h1>{$t('shopEditor.create.title')}</h1>
+      <p>{$t('shopEditor.create.subtitle')}</p>
     </div>
   </div>
 

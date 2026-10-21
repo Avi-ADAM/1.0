@@ -132,6 +132,8 @@ export async function setLifecycle(
   );
 }
 
+const MATANOT_KINDS = ['total', 'monthly', 'yearly', 'daily', 'unlimited'] as const;
+
 /** Field mapping for a surviving object, per collection. */
 function editFragment(kind: TargetKind, round: StandingRound): string {
   switch (kind) {
@@ -180,6 +182,8 @@ function editFragment(kind: TargetKind, round: StandingRound): string {
         strField('desc', round.descrip),
         numField('quant', round.hm),
         numField('price', round.price),
+        // Enum_Matanot_Kindof — a value the product cannot hold is dropped, not written.
+        enumField('kindOf', round.kindOf, MATANOT_KINDS),
         dateField('startDate', round.sqadualed),
         dateField('finnishDate', round.sqadualedf),
       );

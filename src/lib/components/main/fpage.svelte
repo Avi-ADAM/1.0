@@ -576,6 +576,25 @@
     </figure>
   </section>
 
+  <!-- ============ IT'S YOURS ============
+       One sentence and one paragraph; the argument is the /its-yours essay. -->
+  <section id="yours" class="hm-section hm-yours">
+    <!-- a crack in the ground, stitched shut in pink - decoration only -->
+    <svg viewBox="0 0 160 40" width="160" height="40" aria-hidden="true">
+      <path class="g" d="M4 20 H58 M102 20 H156" />
+      <path class="c" d="M58 20 L66 28 L74 22 L82 32 L90 22 L102 20" />
+      {#each [66, 80, 94] as x (x)}
+        <path class="s" d="M{x - 5} 14 L{x + 5} 30 M{x + 5} 14 L{x - 5} 30" />
+      {/each}
+    </svg>
+    <span class="hm-eyebrow">{$t('home.yours.eyebrow')}</span>
+    <p class="hm-yours-quote">{$t('home.yours.quote')}</p>
+    <p class="hm-body">{$t('home.yours.lead')}</p>
+    <a href="/its-yours" class="hm-textlink" data-sveltekit-prefetch>
+      {$t('home.yours.cta')} <span aria-hidden="true">{arrow}</span>
+    </a>
+  </section>
+
   <!-- ============ CIRCLE + CONCIERGE ============ -->
   <section id="circle" class="hm-section">
     <div class="hm-center-head">
@@ -1896,6 +1915,43 @@
   .hm-vote figcaption {
     text-align: center;
     font-size: 14px;
+  }
+
+  /* ===== it's yours ======================================================= */
+  .hm-yours {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    max-width: 760px;
+    margin: 0 auto;
+    text-align: center;
+  }
+  .hm-yours svg {
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .hm-yours .g {
+    stroke: var(--hm-goldink);
+    stroke-width: 3;
+  }
+  .hm-yours .c {
+    stroke: var(--hm-muted);
+    stroke-width: 2;
+    stroke-dasharray: 3 3;
+  }
+  .hm-yours .s {
+    stroke: var(--hm-accent);
+    stroke-width: 3.5;
+  }
+  .hm-yours-quote {
+    margin: 0;
+    font-family: var(--hm-display);
+    font-weight: var(--hm-display-weight);
+    font-size: clamp(34px, 4.6vw, 62px);
+    line-height: 1.1;
+    color: var(--hm-accent);
   }
 
   /* ===== circle + concierge =============================================== */

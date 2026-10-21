@@ -857,6 +857,7 @@
     },
     "fact": {
       "hours": "{{value}} שעות",
+      "offered": "שווי מוצע {{value}}",
       "rate": "{{value}} לשעה",
       "amount": "שווי {{value}}",
       "qty": "כמות {{value}}",

@@ -858,6 +858,7 @@
     },
     "fact": {
       "hours": "{{value}} horas",
+      "offered": "ofrecido {{value}}",
       "rate": "{{value}} por hora",
       "amount": "valor {{value}}",
       "qty": "cant. {{value}}",

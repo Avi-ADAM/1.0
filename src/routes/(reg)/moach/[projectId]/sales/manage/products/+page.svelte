@@ -27,6 +27,9 @@
   let { data } = $props();
   const fmtMoney = useFormatMoney();
   let projectId = $derived(page.params.projectId ?? '');
+  // One "new product" form for the whole rikma (simple or complex); saving it
+  // opens this tab's editor, where variants, pictures and stock are added.
+  let newHref = $derived(`/moach/${projectId}/sales/new?from=manage`);
   let products = $derived<(ShopProductRow & { options: { name: string; values: string[] }[] })[]>(
     (data.catalog?.products ?? []).filter((p: ShopProductRow) => p.status !== 'archived')
   );
@@ -80,9 +83,17 @@
 {#if data.catalog?.failed}
   <ShopNotice title={$t('shop.err.load')} action={{ label: $t('shop.err.refresh'), href: page.url.pathname }} />
 {:else if products.length === 0}
-  <ShopNotice title={$t('shop.empty.products')} body={$t('shop.empty.productsBody')} />
+  <ShopNotice
+    title={$t('shop.empty.products')}
+    body={$t('shop.empty.productsBody')}
+    action={{ label: $t('shop.products.new'), href: newHref }}
+  />
 {:else}
   <div class="pr-tools">
+    <a class="sh-btn sh-btn-primary" href={newHref}>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
+      {$t('shop.products.new')}
+    </a>
     <label class="sh-search pr-search">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="M21 21l-4.3-4.3" /></svg>
       <span class="sr-only">{$t('shop.products.searchLabel')}</span>

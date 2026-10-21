@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { galleryOfNode, productAxesOf, toEditorProduct } from './productEditor';
+import { detailChanges, galleryOfNode, productAxesOf, toEditorProduct } from './productEditor';
 
 const pic = (id: number, url = `https://x/${id}.jpg`) => ({ id, attributes: { url, formats: { small: { url: `${url}?s` } } } });
 
@@ -57,5 +57,43 @@ describe('toEditorProduct', () => {
 
   it('an axis no option row names still shows', () => {
     expect(productAxesOf([], [{ optionValues: [{ key: 'color', value: 'red', label: 'אדום' }] } as any])[0]).toMatchObject({ key: 'color', values: [{ value: 'red' }] });
+  });
+});
+
+describe('detailChanges', () => {
+  const product = {
+    name: 'ספל',
+    descrip: '<p>ספל קרמיקה</p>',
+    kindOf: 'total' as const,
+    startDate: null,
+    endDate: null
+  };
+
+  it('nothing moved is nothing', () => {
+    expect(detailChanges({ name: 'ספל', descrip: '<p>ספל קרמיקה</p>', kindOf: 'total', startDate: '', endDate: '' }, product)).toEqual({});
+  });
+
+  it('re-serialised markup is not an edit', () => {
+    expect(detailChanges({ descrip: 'ספל   קרמיקה' }, product)).toEqual({});
+    expect(detailChanges({ descrip: '<p></p>' }, { ...product, descrip: '' })).toEqual({});
+  });
+
+  it('a blank name keeps the old one', () => {
+    expect(detailChanges({ name: '  ' }, product)).toEqual({});
+  });
+
+  it('a monthly product carries its period, in round field names', () => {
+    expect(detailChanges({ kindOf: 'monthly', startDate: '2026-11-01', endDate: '' }, product)).toEqual({
+      kindOf: 'monthly',
+      sqadualed: '2026-11-01T00:00:00.000Z'
+    });
+  });
+
+  it('a period means nothing on a per-unit product', () => {
+    expect(detailChanges({ kindOf: 'total', startDate: '2026-11-01' }, product)).toEqual({});
+  });
+
+  it('an unknown kind reads as per unit', () => {
+    expect(detailChanges({ kindOf: 'weekly' }, { ...product, kindOf: 'monthly' })).toEqual({ kindOf: 'total' });
   });
 });

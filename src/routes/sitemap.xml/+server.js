@@ -79,6 +79,7 @@ const PAGES = [
   // title in search results.
   { path: '/why', lastmod: '2026-09-04T00:00:00+00:00', priority: '0.80', changefreq: 'monthly' },
   { path: '/broken-deal', lastmod: '2026-10-13T00:00:00+00:00', priority: '0.80', changefreq: 'monthly' },
+  { path: '/its-yours', lastmod: '2026-10-21T00:00:00+00:00', priority: '0.80', changefreq: 'monthly' },
   { path: '/uses', lastmod: '2026-09-04T00:00:00+00:00', priority: '0.75', changefreq: 'monthly' },
   // One of the three audience tracks the homepage used to walk everyone
   // through in a single scroll. High priority: it is a landing page for its

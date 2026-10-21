@@ -3,7 +3,7 @@ import { ActionError } from '../errors.js';
 import { scope, scopeList } from '$lib/realtime/scopes.js';
 import { execFromContext } from '$lib/server/archive/exec.js';
 import { refreshDerived, variantTermsLive } from '$lib/server/archive/variantTerms.js';
-import { toEditorProduct, type EditorProduct } from '$lib/shop/productEditor.js';
+import { detailChanges, toEditorProduct, type EditorProduct } from '$lib/shop/productEditor.js';
 import { readStockFlags, withFlag, writeStock } from '$lib/server/shop/stockFlags.js';
 import {
   axisKeyOf,
@@ -216,7 +216,12 @@ const saveVariantsHandler: ActionExecutionHandler = async (params, context, { st
   }
   const priceMoves = basePrice !== undefined && basePrice !== null && !samePrice(basePrice, product.price);
   const proposeBase = priceMoves && !product.sovereign;
-  const needsProposal = plan.terms.length > 0 || proposeBase;
+
+  // Name, description, how the price is counted and its period are terms of
+  // the product too — the same ones `newmatana` / `ComposeProduct` set on create.
+  const details = detailChanges(params.details, product);
+  const proposeDetails = !product.sovereign && Object.keys(details).length > 0;
+  const needsProposal = plan.terms.length > 0 || proposeBase || proposeDetails;
 
   // What stops the terms from going to the rikma never stops the rest: stock
   // and pictures are saved either way, and the result says why the terms wait.
@@ -235,6 +240,13 @@ const saveVariantsHandler: ActionExecutionHandler = async (params, context, { st
     productData.pics = gallery;
   }
   if (priceMoves && product.sovereign) productData.price = basePrice;
+  if (product.sovereign) {
+    if (details.name !== undefined) productData.name = details.name;
+    if (details.descrip !== undefined) productData.desc = details.descrip;
+    if (details.kindOf !== undefined) productData.kindOf = details.kindOf;
+    if (details.sqadualed !== undefined) productData.startDate = details.sqadualed;
+    if (details.sqadualedf !== undefined) productData.finnishDate = details.sqadualedf;
+  }
   await run('shopProductUpdate', { id: productId, data: productData });
 
   const created: string[] = [];
@@ -281,7 +293,11 @@ const saveVariantsHandler: ActionExecutionHandler = async (params, context, { st
         targetKind: 'matanot',
         targetId: productId,
         why: typeof params.why === 'string' ? params.why.trim().slice(0, 500) : '',
-        newValues: { ...(proposeBase ? { price: basePrice } : {}), ...(plan.terms.length ? { variants: plan.terms } : {}) }
+        newValues: {
+          ...(proposeBase ? { price: basePrice } : {}),
+          ...(proposeDetails ? details : {}),
+          ...(plan.terms.length ? { variants: plan.terms } : {})
+        }
       },
       context as ActionContext
     );
@@ -302,7 +318,7 @@ const saveVariantsHandler: ActionExecutionHandler = async (params, context, { st
     productId,
     created,
     updated,
-    proposed: blocked ? 0 : plan.terms.length + (proposeBase ? 1 : 0),
+    proposed: blocked ? 0 : plan.terms.length + (proposeBase ? 1 : 0) + (proposeDetails ? 1 : 0),
     proposal,
     /** Why the terms did not go to the rikma (the rest is saved). */
     blocked,
@@ -324,6 +340,11 @@ export const saveProductVariantsConfig: ActionConfig = {
     gallery: { type: 'array', required: false, description: 'Upload ids in order; the first is the cover. Omit to leave the pictures as they are' },
     basePrice: { type: 'number', required: false, description: 'The product’s own price' },
     lowStockAt: { type: 'number', required: false, description: '“Low stock” below this, per variant; null = no mark' },
+    details: {
+      type: 'object',
+      required: false,
+      description: '{ name?, descrip?, kindOf?: total|monthly|yearly|unlimited, startDate?, endDate? } — terms like the price: proposed unless the product is sovereign'
+    },
     why: { type: 'string', required: false, description: 'The reason, when something goes to the rikma' }
   },
   authRules: [

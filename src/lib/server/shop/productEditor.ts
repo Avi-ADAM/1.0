@@ -42,6 +42,13 @@ async function pendingEdit(decisionId: string, jwt: string | undefined, fetchFn?
       decisionId: decision.id,
       basePrice: round.price ?? null,
       terms: round.variants ?? [],
+      details: {
+        name: round.name ?? null,
+        kindOf: round.kindOf ?? null,
+        descrip: round.descrip != null,
+        startDate: round.sqadualed ?? null,
+        endDate: round.sqadualedf ?? null
+      },
       deadline: decision.timegramaDate,
       signed: signersOf(decision, standingOrder(decision)).length,
       members: decision.memberIds.length

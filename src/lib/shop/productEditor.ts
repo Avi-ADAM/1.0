@@ -34,6 +34,14 @@ export interface PendingEdit {
   /** null when the proposal does not move the base price. */
   basePrice: number | null;
   terms: VariantTerm[];
+  /** Detail terms on the table (null = not moved); the description only says that it moves. */
+  details?: {
+    name: string | null;
+    kindOf: string | null;
+    descrip: boolean;
+    startDate: string | null;
+    endDate: string | null;
+  };
   deadline: string | null;
   signed: number;
   members: number;
@@ -45,6 +53,13 @@ export interface EditorProduct {
   price: number | null;
   pricingMode: string | null;
   quant: number | null;
+  /** The description as stored (`Matanot.desc`, rich-text HTML). */
+  descrip: string;
+  /** How the price is counted: once, per month, per year… (Enum_Matanot_Kindof). */
+  kindOf: ProductKind;
+  /** The period of a monthly/yearly product (`startDate` / `finnishDate`), ISO. */
+  startDate: string | null;
+  endDate: string | null;
   origin: 'project' | 'personal' | 'wish';
   /** Personal product, or a rikma of one: nothing waits for anyone (§4 principle 6). */
   sovereign: boolean;
@@ -57,6 +72,77 @@ export interface EditorProduct {
   /** An archive/edit proposal already open — a second one is refused until it is answered. */
   openDecisionId: string | null;
   pending: PendingEdit | null;
+}
+
+export const PRODUCT_KINDS = ['total', 'monthly', 'yearly', 'unlimited'] as const;
+export type ProductKind = (typeof PRODUCT_KINDS)[number] | 'daily';
+
+/** A stored kindOf the editor understands; anything else reads as a one-off price. */
+export function kindOfNode(v: unknown): ProductKind {
+  return v === 'daily' || (PRODUCT_KINDS as readonly unknown[]).includes(v) ? (v as ProductKind) : 'total';
+}
+
+/** What the editor's "details" card sends (dates as `YYYY-MM-DD`, or empty). */
+export interface DetailsDraft {
+  name?: string;
+  descrip?: string;
+  kindOf?: string;
+  startDate?: string | null;
+  endDate?: string | null;
+}
+
+/** The changed details, in a `proposeObjectEdit` round's own field names. */
+export interface DetailTerms {
+  name?: string;
+  descrip?: string;
+  kindOf?: ProductKind;
+  sqadualed?: string | null;
+  sqadualedf?: string | null;
+}
+
+/**
+ * The words of a rich-text description. The editor re-serialises the HTML it
+ * was given (`''` comes back as `<p></p>`), so markup alone is not an edit.
+ */
+const textOf = (html: string): string =>
+  html
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+const dayOf = (v: unknown): string | null => {
+  if (typeof v !== 'string' || !v.trim()) return null;
+  const d = new Date(v.trim());
+  return Number.isNaN(d.getTime()) ? null : d.toISOString().slice(0, 10);
+};
+
+/**
+ * Only what the seller actually moved. A blank name is not a change (a product
+ * keeps its name), and a period only means something on a monthly/yearly product.
+ */
+export function detailChanges(
+  raw: unknown,
+  product: Pick<EditorProduct, 'name' | 'descrip' | 'kindOf' | 'startDate' | 'endDate'>
+): DetailTerms {
+  const d = (raw && typeof raw === 'object' ? raw : {}) as DetailsDraft;
+  const out: DetailTerms = {};
+  const name = typeof d.name === 'string' ? d.name.trim().slice(0, 120) : '';
+  if (name && name !== product.name) out.name = name;
+  if (typeof d.descrip === 'string' && textOf(d.descrip) !== textOf(product.descrip)) out.descrip = d.descrip.slice(0, 20000);
+  const kind = d.kindOf === undefined ? product.kindOf : kindOfNode(d.kindOf);
+  if (kind !== product.kindOf) out.kindOf = kind;
+  if (kind === 'monthly' || kind === 'yearly') {
+    for (const [from, was, key] of [
+      [d.startDate, product.startDate, 'sqadualed'],
+      [d.endDate, product.endDate, 'sqadualedf']
+    ] as const) {
+      if (from === undefined) continue;
+      const day = dayOf(from);
+      if (day !== dayOf(was)) out[key] = day ? new Date(day).toISOString() : null;
+    }
+  }
+  return out;
 }
 
 const str = (v: unknown): string | null => (typeof v === 'string' && v.trim() ? v.trim() : null);
@@ -179,6 +265,10 @@ export function toEditorProduct(
     price: num(a.price),
     pricingMode: str(a.pricingMode),
     quant: num(a.quant),
+    descrip: typeof a.desc === 'string' ? a.desc : '',
+    kindOf: kindOfNode(a.kindOf),
+    startDate: str(a.startDate),
+    endDate: str(a.finnishDate),
     origin,
     sovereign: origin === 'personal' || members <= 1,
     members,

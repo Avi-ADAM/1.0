@@ -12,7 +12,7 @@ import { browser } from '$app/environment';
  * known advisories on every page, it was removed and these are the controls it
  * would have offered, implemented natively:
  *
- *   textScale       three steps of body text size
+ *   textScale       three steps of page zoom (text and the boxes around it)
  *   contrast        a high-contrast pass over the palette
  *   highlightLinks  makes links visible as links, not just as coloured words
  *   readableFont    swaps the decorative display face for a plain one

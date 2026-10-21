@@ -33,7 +33,15 @@
     type EditorAxis,
     type VariantError
   } from '$lib/shop/variantEditor';
-  import type { EditorPicture, EditorProduct, EditorRow } from '$lib/shop/productEditor';
+  import {
+    detailChanges,
+    PRODUCT_KINDS,
+    type EditorPicture,
+    type EditorProduct,
+    type EditorRow,
+    type ProductKind
+  } from '$lib/shop/productEditor';
+  import RichText from '$lib/celim/ui/richText.svelte';
   import ShopSheet from './ShopSheet.svelte';
 
   let {
@@ -56,8 +64,23 @@
   let why = $state('');
   let newValues = $state<Record<number, string>>({});
   let saved = $state('');
+  // The details the simple form sets on create — name, description, how the
+  // price is counted and its period.
+  let name = $state('');
+  let descrip = $state('');
+  let kindOf = $state<ProductKind>('total');
+  let startDate = $state('');
+  let endDate = $state('');
+  // RichText is mounted once per product; a reset re-seeds it through this key.
+  let descripSeed = $state(0);
 
   function reset(p: EditorProduct) {
+    name = p.name;
+    descrip = p.descrip;
+    kindOf = p.kindOf;
+    startDate = p.startDate?.slice(0, 10) ?? '';
+    endDate = p.endDate?.slice(0, 10) ?? '';
+    descripSeed++;
     gallery = copy(p.gallery);
     axes = copy(p.axes);
     rows = copy(p.variants);
@@ -94,7 +117,12 @@
     planVariantSave({ existing: product.variants, desired: rows, productPrice: product.price, sovereign: product.sovereign })
   );
   let baseMoves = $derived(base !== null && Number.isFinite(base) && base !== product.price);
-  let proposing = $derived(!product.sovereign && (plan.terms.length > 0 || baseMoves));
+  let detailsDraft = $derived({ name, descrip, kindOf, startDate, endDate });
+  let details = $derived(detailChanges(detailsDraft, product));
+  let detailsMove = $derived(Object.keys(details).length > 0);
+  let periodic = $derived(kindOf === 'monthly' || kindOf === 'yearly');
+  let nameMissing = $derived(!name.trim());
+  let proposing = $derived(!product.sovereign && (plan.terms.length > 0 || baseMoves || detailsMove));
   let pendingPrice = $derived(new Map(plan.terms.filter((t) => t.kind === 'price').map((t) => [t.id, t.to])));
 
   let waiting = $derived(product.pending ? pendingByVariant(product.pending.terms) : null);
@@ -103,7 +131,7 @@
   );
 
   function snapshot(): string {
-    return JSON.stringify({ g: gallery.map((p) => p.id), a: axes, r: rows, basePrice, lowAt });
+    return JSON.stringify({ g: gallery.map((p) => p.id), a: axes, r: rows, basePrice, lowAt, d: details });
   }
   let dirty = $derived(snapshot() !== saved);
 
@@ -214,11 +242,13 @@
 
   // ── save ───────────────────────────────────────────────────────────────
   let busy = $state(false);
-  let canSave = $derived(dirty && !busy && !uploading && !issues.length && !clean.errors.length && !baseInvalid);
+  let canSave = $derived(
+    dirty && !busy && !uploading && !issues.length && !clean.errors.length && !baseInvalid && !nameMissing
+  );
 
   async function save() {
     if (!canSave) {
-      if (dirty && (issues.length || clean.errors.length || baseInvalid)) toast.error($t('shopEditor.err.fix'));
+      if (dirty && (issues.length || clean.errors.length || baseInvalid || nameMissing)) toast.error($t('shopEditor.err.fix'));
       return;
     }
     busy = true;
@@ -244,6 +274,7 @@
         gallery: gallery.map((p) => p.id),
         ...(baseMoves ? { basePrice: base } : {}),
         lowStockAt: priceOf(lowAt),
+        ...(detailsMove ? { details: detailsDraft } : {}),
         why: why.trim()
       },
       { showErrorToast: false }
@@ -286,6 +317,52 @@
 
   <div class="pe-cols">
     <div class="pe-main">
+      <!-- ── details: what the simple "new product" form sets ── -->
+      <section class="sh-card pe-card" aria-labelledby="pe-details">
+        <div class="pe-card-head">
+          <h3 id="pe-details" class="pe-h">{$t('shopEditor.details.title')}</h3>
+        </div>
+        <label class="sh-field">
+          {$t('shopEditor.details.name')}
+          <input class="sh-input" bind:value={name} maxlength="120" aria-invalid={nameMissing} />
+          {#if nameMissing}<span class="pe-note pe-note-err">{$t('shopEditor.details.nameMissing')}</span>{/if}
+        </label>
+        <div class="sh-field">
+          <span>{$t('shopEditor.details.descrip')}</span>
+          <div class="pe-rich">
+            {#key descripSeed}
+              <RichText bind:outpot={descrip} editable={true} />
+            {/key}
+          </div>
+        </div>
+        <label class="sh-field">
+          {$t('shopEditor.details.kindOf')}
+          <select class="sh-input" bind:value={kindOf}>
+            {#each PRODUCT_KINDS as k (k)}
+              <option value={k}>{$t(`shopEditor.details.kind.${k}`)}</option>
+            {/each}
+            {#if product.kindOf === 'daily'}<option value="daily">{$t('shopEditor.details.kind.daily')}</option>{/if}
+          </select>
+          <span class="pe-hint">{$t(`shopEditor.details.kindHint.${kindOf === 'daily' ? 'total' : kindOf}`)}</span>
+        </label>
+        {#if periodic}
+          <div class="pe-dates">
+            <label class="sh-field">
+              {$t('shopEditor.details.start')}
+              <input class="sh-input" type="date" bind:value={startDate} />
+            </label>
+            <label class="sh-field">
+              {$t('shopEditor.details.end')}
+              <input class="sh-input" type="date" bind:value={endDate} min={startDate || undefined} />
+            </label>
+          </div>
+          <span class="pe-hint">{$t('shopEditor.details.periodHint')}</span>
+        {/if}
+        {#if detailsMove && !product.sovereign}
+          <span class="pe-note pe-note-gold">{$t('shopEditor.variants.willPropose')}</span>
+        {/if}
+      </section>
+
       <!-- ── pictures ── -->
       <section class="sh-card pe-card" aria-labelledby="pe-gallery">
         <div class="pe-card-head">
@@ -526,6 +603,10 @@
             {#if p.basePrice !== null}
               <li>{$t('shopEditor.pending.base', { from: money(product.price), to: money(p.basePrice) })}</li>
             {/if}
+            {#if p.details?.name}<li>{$t('shopEditor.pending.name', { name: p.details.name })}</li>{/if}
+            {#if p.details?.descrip}<li>{$t('shopEditor.pending.descrip')}</li>{/if}
+            {#if p.details?.kindOf}<li>{$t('shopEditor.pending.kindOf', { kind: $t(`shopEditor.details.kind.${p.details.kindOf}`) })}</li>{/if}
+            {#if p.details?.startDate || p.details?.endDate}<li>{$t('shopEditor.pending.period')}</li>{/if}
             {#each p.terms as term, k (k)}
               <li>
                 {#if term.kind === 'price'}
@@ -552,6 +633,10 @@
             {#if baseMoves}
               <li>{$t('shopEditor.pending.base', { from: money(product.price), to: money(base) })}</li>
             {/if}
+            {#if details.name}<li>{$t('shopEditor.pending.name', { name: details.name })}</li>{/if}
+            {#if details.descrip !== undefined}<li>{$t('shopEditor.pending.descrip')}</li>{/if}
+            {#if details.kindOf}<li>{$t('shopEditor.pending.kindOf', { kind: $t(`shopEditor.details.kind.${details.kindOf}`) })}</li>{/if}
+            {#if details.sqadualed !== undefined || details.sqadualedf !== undefined}<li>{$t('shopEditor.pending.period')}</li>{/if}
             {#each plan.terms as term, k (k)}
               <li>
                 {#if term.kind === 'price'}
@@ -568,7 +653,7 @@
             <textarea class="sh-input" bind:value={why} maxlength="500" placeholder={$t('shopEditor.propose.whyPlaceholder')}></textarea>
           </label>
         </section>
-      {:else if product.sovereign && (plan.terms.length || baseMoves || plan.creates.length)}
+      {:else if product.sovereign && (plan.terms.length || baseMoves || plan.creates.length || detailsMove)}
         <p class="pe-muted pe-sovereign">{product.origin === 'personal' ? $t('shopEditor.propose.personal') : $t('shopEditor.propose.alone')}</p>
       {/if}
 
@@ -727,6 +812,19 @@
   }
   .pe-hint {
     font-size: 12px;
+  }
+  .pe-rich {
+    border: 1px solid var(--sh-line);
+    border-radius: var(--sh-radius-sm);
+    background: var(--sh-card);
+    color: var(--sh-ink);
+    min-height: 96px;
+    padding: 4px 8px;
+  }
+  .pe-dates {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
   }
   .pe-gold {
     margin: 0;

@@ -161,7 +161,10 @@
       "hideTitle": "Ocultar el producto de la página pública de descubrimiento - sigue activo en la rikma y por enlace directo",
       "nowShown": "El producto aparece en la página de descubrimiento",
       "nowHidden": "El producto se ocultó de la página de descubrimiento"
-    }
+    },
+    "fullEdit": "Edición completa",
+    "createdAddVariants": "Producto creado",
+    "addVariants": "Variantes y fotos"
   },
   "newmatana": {
     "unlimited": "ilimitado",
@@ -181,7 +184,8 @@
     "add": "Añadir producto",
     "optional": "opcional",
     "description": "Descripción",
-    "singleProduct": "un producto para un proyecto"
+    "singleProduct": "un producto para un proyecto",
+    "variantsHint": "Tallas, colores, galería y stock por variante: en el editor completo, una vez creado el producto."
   },
   "nego": {
     "remove": "eliminar"

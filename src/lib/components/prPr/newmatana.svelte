@@ -235,5 +235,6 @@
     bind:value={oneForeProject}
     lebel={$t('common.labels.oneProductPerProject')}
   />
+  <small class="text-center text-barbi">{$t('project.newmatana.variantsHint')}</small>
   <Button text={$t('common.buttons.addProduct')} onClick={add} {loading} {success} {error} />
 </div>

@@ -160,7 +160,10 @@
       "hideTitle": "Hide this product from the public discovery page - it stays active in the rikma and by direct link",
       "nowShown": "The product now appears on the discovery page",
       "nowHidden": "The product was hidden from the discovery page"
-    }
+    },
+    "fullEdit": "Full edit",
+    "createdAddVariants": "Product created",
+    "addVariants": "Variants & pictures"
   },
   "newmatana": {
     "unlimited": "unlimited",
@@ -180,7 +183,8 @@
     "add": "Add product",
     "optional": "optional",
     "description": "Description",
-    "singleProduct": "one product for one project"
+    "singleProduct": "one product for one project",
+    "variantsHint": "Sizes, colours, a gallery and stock per variant — in the full editor, once the product exists."
   },
   "nego": {
     "remove": "remove"

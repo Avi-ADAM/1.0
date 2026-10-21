@@ -205,7 +205,8 @@
       "variants": "וריאציות",
       "stock": "מלאי",
       "status": "מצב"
-    }
+    },
+    "new": "מוצר חדש"
   },
   "stock": {
     "filterLabel": "סינון מלאי",

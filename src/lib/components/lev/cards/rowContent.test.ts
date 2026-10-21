@@ -66,9 +66,9 @@ const SAMPLES: Record<string, any> = {
   fiapp: { nameRaw: 'תיקון הצנרת', username: 'איתי', nhours: 6, perhour: 200 },
   walcomen: { username: 'מיכל', details: 'ברוכה הבאה לרקמה', projectName: 'גינת הקהילה' },
   askedcoin: { username: 'תמר', openName: 'ניהול קהילה', nhours: 15, perhour: 130 },
-  askedm: { username: 'שי', openName: 'הגברה לאירוע', price: 900, myp: 1, easy: 900 },
+  askedm: { username: 'שי', openName: 'הגברה לאירוע', price: 900, myp: 850, hm: 1, easy: 900 },
   meData: { name: 'צילום מוצרים', descrip: 'יום צילום בסטודיו', noofhours: 8, perhour: 250 },
-  huca: { mashname: 'רמקולים', descrip: 'זוג רמקולים מוגברים', price: 700, myp: 2, easy: 1400 },
+  huca: { mashname: 'רמקולים', descrip: 'זוג רמקולים מוגברים', price: 700, myp: 1300, easy: 1400 },
   archObject: {
     archive: {
       targetName: 'משימת הניקיון',
@@ -291,5 +291,22 @@ describe('the CTA follows what the item wants', () => {
   it('drops to "view" once the item no longer wants anything', () => {
     expect(rowCtaKey({ ani: 'pends', pl: 100, already: true })).toBe('lev.list.cta.view');
     expect(rowCtaKey({ ani: 'pends', pl: 900 })).toBe('lev.list.cta.view');
+  });
+});
+
+describe('a resource offer reads its fields by what they mean', () => {
+  // `myp` is the offerer's proposed value ("ההצעה שלי"), not a quantity; the
+  // quantity is `hm`. Reading `myp` as qty printed "כמות 5,790".
+  it('shows myp as the offered value and hm as the quantity', () => {
+    const facts = rowContent({ ani: 'askedm', price: 5790, myp: 5790, hm: 1, easy: 5790 }).facts;
+    expect(facts).toContainEqual({ key: 'offered', value: 5790 });
+    expect(facts).toContainEqual({ key: 'qty', value: 1 });
+    expect(facts).not.toContainEqual({ key: 'qty', value: 5790 });
+  });
+
+  it('never turns a huca offer into a quantity', () => {
+    const facts = rowContent({ ani: 'huca', price: 700, myp: 1300, easy: 1400 }).facts;
+    expect(facts.find((x) => x.key === 'qty')).toBeUndefined();
+    expect(facts).toContainEqual({ key: 'offered', value: 1300 });
   });
 });

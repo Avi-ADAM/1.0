@@ -2509,19 +2509,24 @@ html.business .boxleft {
   }
 }
 
-/* Text size, applied at the root.
+/* Text size, applied as CSS `zoom` on <body>.
 
-   Tailwind's type and spacing scales are both rem-based, i.e. relative to this
-   one value, so scaling it behaves like browser zoom: the hierarchy between
-   sizes is preserved and the padding grows with the text instead of letting
-   larger text overflow boxes that stayed put.
+   This used to scale the root font-size, on the theory that Tailwind's type
+   and spacing are rem-based. They are, but most of this site's text is not:
+   the homepage hero, nav, CTAs and cards are sized in fixed px (and clamp()s
+   with px bounds), and measured on the homepage 26 of the first 40 visible
+   text elements did not move at all — the button "did nothing".
 
-   The tempting alternative — `font-size: calc(1em * scale)` on every text
-   element — is wrong twice over: `em` is relative to the *parent*, so a span
-   inside a paragraph inside a div multiplies the scale three times, and
-   rem-based Tailwind utilities would ignore it entirely. */
-html {
-  font-size: calc(100% * var(--a11y-text-scale));
+   `zoom` scales px, rem and em alike, the way browser zoom does: the
+   hierarchy between sizes is kept, padding grows with the text, and the
+   layout reflows into the (now narrower) available width instead of
+   overflowing. It sits on <body>, not <html>, so the rem base itself is not
+   multiplied a second time.
+
+   Never go back to `font-size: calc(1em * scale)` on text elements either:
+   `em` compounds through every nesting level. */
+body {
+  zoom: var(--a11y-text-scale);
 }
 
 /* --- high contrast ------------------------------------------------------

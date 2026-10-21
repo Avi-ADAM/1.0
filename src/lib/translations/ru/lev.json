@@ -857,6 +857,7 @@
     },
     "fact": {
       "hours": "часов: {{value}}",
+      "offered": "предложено {{value}}",
       "rate": "{{value}} в час",
       "amount": "стоимость {{value}}",
       "qty": "кол-во {{value}}",

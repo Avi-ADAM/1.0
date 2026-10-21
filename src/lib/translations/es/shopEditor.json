@@ -115,7 +115,11 @@
     "buyers": "Hasta que se apruebe, los compradores ven el precio actual.",
     "silence": "Si nadie responde, se aprueba {{when}}",
     "signed": "{{signed}} de {{members}} aprobaron",
-    "vote": "Ir a la votación"
+    "vote": "Ir a la votación",
+    "name": "Nombre nuevo: {{name}}",
+    "descrip": "Descripción actualizada",
+    "kindOf": "Cobro: {{kind}}",
+    "period": "Periodo de suscripción"
   },
   "propose": {
     "title": "Se envía a la rikma para su aprobación",
@@ -133,5 +137,33 @@
     "lowHint": "¿Cuántas unidades quedan antes de pedir más? Se aplica a cada variante por separado.",
     "units": "unidades",
     "lowNotSaved": "La marca de stock bajo todavía no se guarda"
+  },
+  "details": {
+    "title": "Datos del producto",
+    "name": "Nombre",
+    "nameMissing": "El producto necesita un nombre",
+    "descrip": "Descripción",
+    "kindOf": "Cómo se cuenta el precio",
+    "kind": {
+      "total": "Por unidad",
+      "monthly": "Suscripción mensual",
+      "yearly": "Suscripción anual",
+      "unlimited": "Cantidad ilimitada",
+      "daily": "Diario"
+    },
+    "kindHint": {
+      "total": "Un precio por cada unidad vendida.",
+      "monthly": "El precio se cobra cada mes.",
+      "yearly": "El precio se cobra cada año.",
+      "unlimited": "Sin stock: se puede vender sin límite."
+    },
+    "start": "Inicio",
+    "end": "Fin",
+    "periodHint": "Opcional. El periodo en que la suscripción está a la venta."
+  },
+  "create": {
+    "title": "Producto nuevo",
+    "subtitle": "Simple — o compuesto, una receta de misiones y recursos. Al guardar se abre el editor completo: fotos, variantes y stock.",
+    "back": "Volver"
   }
 }

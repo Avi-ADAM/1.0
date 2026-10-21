@@ -223,8 +223,8 @@
     gap: 6px;
     padding: 10px 11px;
     border-radius: 12px;
-    background: var(--cg-s2, var(--surface2, #f4f4f5));
-    color: var(--cg-ink, var(--surfaceInk, #18181b));
+    background: var(--cg-s2, var(--surface-2, #f4f4f5));
+    color: var(--cg-ink, var(--surface-ink, #18181b));
     border-inline-start: 3px solid var(--cg-gold, #d4a017);
     text-align: start;
   }
@@ -272,7 +272,7 @@
     margin: 0;
     font-size: 12px;
     line-height: 1.4;
-    color: var(--cg-muted, var(--surfaceMuted, #52525b));
+    color: var(--cg-muted, var(--surface-muted, #52525b));
     display: -webkit-box;
     -webkit-line-clamp: 2;
     line-clamp: 2;
@@ -293,12 +293,12 @@
     font-size: 11px;
     font-weight: 700;
     background: var(--cg-s3, var(--surface, #e4e4e7));
-    color: var(--cg-ink, var(--surfaceInk, #18181b));
+    color: var(--cg-ink, var(--surface-ink, #18181b));
   }
   .nr-clock {
     margin: 0;
     font-size: 11px;
-    color: var(--cg-muted, var(--surfaceMuted, #52525b));
+    color: var(--cg-muted, var(--surface-muted, #52525b));
   }
   .nr.urgent .nr-clock {
     color: var(--cg-pink, #e11d48);

@@ -19,6 +19,7 @@ export const shopEditorQids = {
     matanots(filters: { id: { eq: $id }, projectcreates: { id: { eq: $pid } } }) {
       data { id attributes {
         name price pricingMode quant origin hasVariants status_of_voting archived lifecycle kindOf
+        desc startDate finnishDate oneForeProject
         pic { data { id attributes { url formats width height alternativeText } } }
         pics(pagination: { limit: 12 }) { data { id attributes { url formats width height alternativeText } } }
         options(pagination: { limit: 10 }) { data { id attributes { key name position active values { value label position hex } } } }

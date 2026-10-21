@@ -115,7 +115,11 @@
     "buyers": "Until it's approved, buyers see the current price.",
     "silence": "If nobody responds, it is approved {{when}}",
     "signed": "{{signed}} of {{members}} approved",
-    "vote": "Go to the vote"
+    "vote": "Go to the vote",
+    "name": "New name: {{name}}",
+    "descrip": "Updated description",
+    "kindOf": "Charged: {{kind}}",
+    "period": "Subscription period"
   },
   "propose": {
     "title": "Goes to the rikma for approval",
@@ -133,5 +137,33 @@
     "lowHint": "How many units left before you reorder? Applies to each variant separately.",
     "units": "units",
     "lowNotSaved": "The low-stock mark isn't stored yet"
+  },
+  "details": {
+    "title": "Product details",
+    "name": "Name",
+    "nameMissing": "The product needs a name",
+    "descrip": "Description",
+    "kindOf": "How the price is counted",
+    "kind": {
+      "total": "Per unit",
+      "monthly": "Monthly subscription",
+      "yearly": "Yearly subscription",
+      "unlimited": "Unlimited quantity",
+      "daily": "Daily"
+    },
+    "kindHint": {
+      "total": "One price for every unit sold.",
+      "monthly": "The price is charged every month.",
+      "yearly": "The price is charged every year.",
+      "unlimited": "No stock — sell as many as you like."
+    },
+    "start": "Start",
+    "end": "End",
+    "periodHint": "Optional. The period the subscription is open for sale."
+  },
+  "create": {
+    "title": "New product",
+    "subtitle": "Simple — or complex, a recipe of missions and resources. Saving opens the full editor: pictures, variants and stock.",
+    "back": "Back"
   }
 }

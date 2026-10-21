@@ -857,6 +857,7 @@
     },
     "fact": {
       "hours": "{{value}} ساعات",
+      "offered": "القيمة المقترحة {{value}}",
       "rate": "{{value}} للساعة",
       "amount": "القيمة {{value}}",
       "qty": "الكمية {{value}}",

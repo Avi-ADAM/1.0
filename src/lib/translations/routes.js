@@ -80,6 +80,9 @@ export const ROUTED = {
     why: at('/why'),
     // The long-form article "The deal that broke" - one route, one namespace.
     brokenDeal: at('/broken-deal'),
+    // The article "If you see a job, it's yours" - one route, one namespace.
+    // Its homepage band keeps its own copy in `home`.
+    itsYours: at('/its-yours'),
     // The privacy policy - one route, one namespace. The menu link's label
     // lives in `common` so it renders everywhere.
     privacy: at('/privacy'),

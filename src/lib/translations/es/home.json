@@ -721,6 +721,12 @@
     "stripDesc": "Un backend gestionado por el consenso de los socios: variantes y stock, cobro o pago coordinado, automatización de tareas y recursos, herramientas MCP y reparto automático de beneficios.",
     "cta": "Cómo crear una tienda con 1💗1"
   },
+  "yours": {
+    "eyebrow": "◈ Responsabilidad personal ◈",
+    "quote": "Si ves una tarea, es tuya.",
+    "lead": "En la rikma no hay jefe a quien quejarse ni \"ellos\" a quienes culpar. Quien ve algo que hay que arreglar abre una misión - para sí o para quien sepa hacerlo mejor - y las horas que pone entran en su parte. Ni protestar ni culpar: arreglar y crear juntos.",
+    "cta": "Leer el ensayo"
+  },
   "noboss": {
     "lead": "¿Sigues empleado, o trabajas por tu cuenta en solitario? Hay una página entera sobre la tercera vía: qué no funciona hoy y cómo se ve dentro de una rikma.",
     "cta": "Trabaja con socios en lugar de para un jefe"

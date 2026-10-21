@@ -491,7 +491,7 @@ const ROW_CONTENT = {
 
   huca: (b) => ({
     title: T(b.mashname) ?? T(b.nameRaw) ?? T(b.name),
-    facts: chips(f('price', n(b.price)), f('qty', n(b.myp)), f('amount', n(b.easy)))
+    facts: chips(f('offered', n(b.myp)), f('amount', n(b.easy)), f('price', n(b.price)))
   }),
 
   // ── people asking / approving ────────────────────────────────────────────
@@ -504,7 +504,7 @@ const ROW_CONTENT = {
   askedm: (b) => ({
     title: T(b.username) ?? T(b.useraplyname),
     subtitle: T(b.openName) ?? T(rowSubtitle(b)),
-    facts: chips(f('price', n(b.price)), f('qty', n(b.myp)), f('amount', n(b.easy)))
+    facts: chips(f('offered', n(b.myp)), f('qty', n(b.hm)), f('amount', n(b.easy)), f('price', n(b.price)))
   }),
 
   fiapp: (b) => ({

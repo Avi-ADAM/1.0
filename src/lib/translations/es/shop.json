@@ -205,7 +205,8 @@
       "variants": "Variantes",
       "stock": "Stock",
       "status": "Estado"
-    }
+    },
+    "new": "Producto nuevo"
   },
   "stock": {
     "filterLabel": "Filtrar stock",

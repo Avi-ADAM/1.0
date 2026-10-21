@@ -24,7 +24,7 @@
   import { get } from 'svelte/store';
   import { idPr } from '$lib/stores/idPr.js';
   import { page } from '$app/state';
-  import { pushState } from '$app/navigation';
+  import { goto, pushState } from '$app/navigation';
   import { pack, hierarchy } from 'd3-hierarchy';
   import Halu from './whowhat.svelte';
   import Spinner from '$lib/celim/Spinner.svelte';
@@ -178,6 +178,16 @@
     a = 0;
     bmiData.push(event.matana);
     bmiData = bmiData;
+    // The quick form sets the basics; variants, the gallery and stock live in the full editor.
+    const id = event.matana?.id;
+    if (id != null) {
+      toast.success($t('project.hamatanot.createdAddVariants'), {
+        action: {
+          label: $t('project.hamatanot.addVariants'),
+          onClick: () => goto(`/moach/${projectId}/sales/manage/products/${id}`)
+        }
+      });
+    }
   }
 
   /** @type {string | null} */
@@ -739,6 +749,9 @@
                     ? $t('project.hamatanot.discovery.hidden')
                     : $t('project.hamatanot.discovery.shown')}
                 </button>
+                <a class="sh-btn sh-btn-quiet" href="/moach/{projectId}/sales/manage/products/{data.id}">
+                  {$t('project.hamatanot.fullEdit')}
+                </a>
                 <div class="sp-share">
                   <ShareButtons
                     slug="gift/{data.id}"
