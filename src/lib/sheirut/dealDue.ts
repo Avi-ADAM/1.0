@@ -26,6 +26,7 @@
  * charged: `due` is `min(approved, cap)` whatever the overrun reads.
  */
 
+import { isEssenceOnly } from '$lib/pooling/bomPrice';
 import { isRealOverrun, roundHours, roundMoney } from '$lib/timers/precision.js';
 
 export type DealLineKind = 'mission' | 'resource';
@@ -219,6 +220,8 @@ export interface RawRecipeMission {
 export interface RawRecipeResource {
   quantityPerUnit?: number | null;
   pricePerUnit?: number | null;
+  /** `none` — an essence-only stock link, never a line of the deal (bomPrice.ts). */
+  priceMode?: string | null;
   mode?: string | null;
   notes?: string | null;
   assignedMember?: Rel<Node<{ username?: string | null }>> | null;
@@ -318,7 +321,8 @@ export function buildDealLines(args: {
 
   for (const rr of args.recipeResources ?? []) {
     const a = rr?.attributes ?? {};
-    if (a.mode === 'consumeExisting') continue;
+    // Nothing to pay for: stock already owned, or an essence-only row (bomPrice.ts).
+    if (a.mode === 'consumeExisting' || isEssenceOnly(a)) continue;
     lines.push({
       key: String(rr.id),
       kind: 'resource',

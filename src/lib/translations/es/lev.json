@@ -216,7 +216,14 @@
       "counterOffer": "Proponer otro importe",
       "approveExpense": "Aprobar el gasto",
       "reportApprove": "Informar y aprobar el gasto",
-      "approveMonthlyExpense": "Aprobar el gasto mensual"
+      "approveMonthlyExpense": "Aprobar el gasto mensual",
+      "stockReceipt": "Recepción de stock",
+      "receiptUnits": "{{count}} unidades",
+      "receiptWorth": "Valor:",
+      "receiptOpening": "Un recuento inicial — sin valor nuevo",
+      "receiptYouGive": "Tú aportas este recurso — tu firma lo pone en el estante",
+      "receiptGiverSigns": "Entra al estante tras la firma de quien lo aporta, y el silencio del resto es consentimiento",
+      "approveReceipt": "Aprobar la recepción"
     },
     "sugestma": {
       "head": "Propuesta para compartir un recurso con la rikma",
@@ -574,7 +581,11 @@
     "objectAria": "Objetar",
     "proposeAmountAria": "Proponer otro importe",
     "awaitingReport": "⏳ Esperando el informe del responsable",
-    "awaitingReportHint": "La aprobación se abre cuando la persona responsable informa del gasto mensual"
+    "awaitingReportHint": "La aprobación se abre cuando la persona responsable informa del gasto mensual",
+    "approveStockReceipt": "Aprobar una recepción de stock",
+    "receiptUnits": "{{count}} unidades",
+    "receiptWorth": "Valor:",
+    "receiptOpening": "Un recuento inicial — sin valor nuevo"
   },
   "levchat": {
     "messagePlaceholder": "Escribe tu mensaje..."
@@ -854,7 +865,8 @@
       "shiftSwap": "Cambio de turno",
       "shiftStarting": "Turno empezando",
       "shiftLog": "Horas del turno",
-      "fulfill": "Tarea de pedido"
+      "fulfill": "Tarea de pedido",
+      "fulfillRule": "Regla de automatización"
     },
     "fact": {
       "hours": "{{value}} horas",
@@ -919,7 +931,11 @@
       "shiftStarting": "Iniciar el temporizador",
       "shiftLog": "El turno terminó sin temporizador",
       "fulfill": "Pedido {{order}}",
-      "fulfillOpen": "Pedido {{order}} · abierta al rol {{role}}"
+      "fulfillOpen": "Pedido {{order}} · abierta al rol {{role}}",
+      "fulfillWave": "Una tanda de {{count}} pedidos",
+      "fulfillStock": "Poco stock: {{name}}",
+      "fulfillRule": "Propuesta de {{name}} — espera tu respuesta",
+      "fulfillRuleAnon": "Una regla que recae en ti — espera tu respuesta"
     },
     "title": {
       "transfer": "{{from}} → {{to}}",
@@ -997,6 +1013,79 @@
     "doneToast": "Perfecto — marcado, y el comprador recibirá la novedad",
     "effectFailed": "La tarea quedó marcada, pero el estado del pedido no cambió — conviene revisarlo",
     "openOrder": "Detalles del pedido",
+    "error": "Algo salió mal, inténtalo de nuevo",
+    "typeStock": "Tarea de compra — poco stock",
+    "wave": "Una tanda de {{count}} pedidos",
+    "waveItems": "{{count}} artículos",
+    "waveShipped": "Los {{count}} enviados ✓",
+    "waveFulfilled": "Los {{count}} entregados ✓",
+    "waveDone": "Hecho para los {{count}} ✓",
+    "wavePartial": "{{done}} marcados y {{failed}} no — conviene revisar los pedidos",
+    "waveToast": "Perfecto — {{count}} pedidos marcados, y los compradores recibirán la novedad",
+    "onHand": "En el estante: {{count}}",
+    "lowAt": "Umbral de poco stock: {{count}}",
+    "dispatchOn": "Día de salida: {{day}}",
+    "openToAll": "Abierta a toda la rikma — quien la toma, se encarga.",
+    "receive": "Recibí stock",
+    "receiveQty": "¿Cuántas unidades llegaron?",
+    "receivePrice": "Precio por unidad",
+    "receiveHint": "El valor se acredita a quien aporta el recurso cuando la rikma lo aprueba — o por silencio, después de su firma. Un recuento inicial de lo ya acreditado: precio 0.",
+    "receiveSubmit": "Recibir",
+    "cancel": "Cancelar",
+    "doneNoReceipt": "Hecho — sin recepción por ahora",
+    "handOff": "Pasarla a otra persona",
+    "openOrders": "Todos los pedidos",
+    "openStock": "Pantalla de stock",
+    "receivedSettled": "Recibido y en el estante",
+    "receivedGiver": "Recibido — espera la firma de quien aporta el recurso",
+    "receivedWaiting": "Recibido — entra al estante si nadie se opone antes de {{when}}",
+    "receivedActOpen": "La recepción quedó registrada, pero la tarea no se cerró — puedes marcarla a mano",
+    "handedTo": "La tarea se pasó",
+    "handedRole": "La tarea volvió al rol, y quienes lo tienen recibieron aviso",
+    "handedAll": "La tarea está abierta ahora a toda la rikma",
+    "handedNobody": "Nadie más tiene el rol ahora — se propuso a la rikma publicar una misión abierta",
+    "openMission": "Publicar una misión"
+  },
+  "fulfillRule": {
+    "type": "Una regla de automatización espera tu respuesta",
+    "proposedBy": "{{name}} propone:",
+    "proposed": "Se propuso una regla:",
+    "when": {
+      "any": "Cada pedido pagado",
+      "delivery": "Cada pedido pagado con envío",
+      "pickup": "Cada pedido pagado con recogida",
+      "digital": "Cada pedido digital pagado",
+      "contact": "Cada pedido pagado a coordinar",
+      "stockLow": "Cuando un recurso baja a su umbral de poco stock"
+    },
+    "after": "Después de que terminen los pasos anteriores del mismo pedido",
+    "narrowed": "Solo pedidos que cumplen sus condiciones (categoría, zona, método de envío o punto de recogida)",
+    "target": {
+      "role": "Abre una tarea para el rol {{role}}, que tienes",
+      "mission": "Abre una tarea dentro de tu misión \"{{mission}}\"",
+      "member": "Abre una tarea para ti"
+    },
+    "per": {
+      "line": "Una tarea por línea del pedido",
+      "unit": "Una tarea por unidad"
+    },
+    "wave": "En una tanda al día, con corte a las {{time}}",
+    "due": "Para dentro de {{hours}} horas",
+    "routing": {
+      "roundRobin": "Por turnos entre quienes tienen el rol",
+      "leastOpen": "A quien tenga menos tareas abiertas"
+    },
+    "effect": {
+      "markShipped": "Al terminar, el pedido se marca \"enviado\"",
+      "markFulfilled": "Al terminar, el pedido se marca \"entregado\""
+    },
+    "silence": "Si no hay respuesta antes de {{when}}, cuenta como consentimiento.",
+    "noClock": "No se abre nada para ti hasta que estés de acuerdo.",
+    "agree": "Estoy de acuerdo",
+    "counter": "Proponer un cambio",
+    "noReject": "Aquí no hay \"no\": puedes cambiar la regla — es una contrapropuesta que abre una nueva ronda.",
+    "agreed": "Aceptaste — la regla está activa",
+    "agreedWaiting": "Tu consentimiento quedó registrado — la regla aún espera a otros",
     "error": "Algo salió mal, inténtalo de nuevo"
   }
 }

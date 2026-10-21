@@ -27,6 +27,7 @@
  * once providers have accepted, but the action is the source of truth).
  */
 
+import { pricedResourceRows } from '$lib/pooling/bomPrice';
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { createSheirutFromPendingConfig } from './createSheirutFromPending.js';
 import { STRAPI_URL } from '$lib/server/strapiUrl.js';
@@ -87,7 +88,9 @@ const handler: ActionExecutionHandler = async (params, context, util) => {
   );
   const mAttrs = recRes?.data?.matanot?.data?.attributes ?? {};
   const recipeMissions: any[] = mAttrs.matanot_recipe_missions?.data ?? [];
-  const recipeResources: any[] = mAttrs.matanot_recipe_resources?.data ?? [];
+  // Essence-only rows (stock links, PLAN_SHOP_OPERATIONS §2.4) are neither a part to
+  // provide nor a price — they never count here.
+  const recipeResources: any[] = pricedResourceRows(mAttrs.matanot_recipe_resources?.data ?? []);
   const allLines = [...recipeMissions, ...recipeResources];
   if (allLines.length === 0) {
     throw new Error('אין חלקים בתכנית כדי לייצר - יש להוסיף משימות/משאבים קודם');

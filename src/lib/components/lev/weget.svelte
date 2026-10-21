@@ -61,6 +61,20 @@
    * @property {(payload: any) => void} [onAcsept]
    * @property {(payload: any) => void} [onHover]
    * @property {(payload: any) => void} [onModal]
+   * @property {boolean} [isRecurringCycle] - a recurring resource's cycle Maap
+   * @property {boolean} [isStockReceipt] - a supply portion on a stock resource (units, not money)
+   * @property {number} [receiptUnitPrice] - the receipt's price per unit; 0 = an opening count
+   * @property {boolean} [cycleReported]
+   * @property {any} [mashabetahalichId]
+   * @property {any} [cycleIndex]
+   * @property {number} [quantityDelivered]
+   * @property {number} [pricePerUnit]
+   * @property {any} [responsibleUserId]
+   * @property {any} [myid]
+   * @property {number} [orderon]
+   * @property {any} [timegramaId]
+   * @property {any} [timegramaDate]
+   * @property {boolean} [timegramaDone]
    */
 
   /** @type {Props} */
@@ -107,6 +121,9 @@
     cards = false,
     // Recurring monthly resource cycle (mashabetahalich engine)
     isRecurringCycle = false,
+    // …or a supply portion on a stock resource (receiveStock): units, not money
+    isStockReceipt = false,
+    receiptUnitPrice = 0,
     // Has the responsible user reported this month's actual spend yet?
     cycleReported = false,
     mashabetahalichId,
@@ -487,12 +504,28 @@
         >
         {#if spend === true}
           <h1 style="font-size:1.5em;">
-            {isResponsible ? $t('lev.weget.howMuchSpentThisMonth') : $t('lev.weget.approveMonthlyExpense')}
+            {isStockReceipt
+              ? $t('lev.weget.approveStockReceipt')
+              : isResponsible
+                ? $t('lev.weget.howMuchSpentThisMonth')
+                : $t('lev.weget.approveMonthlyExpense')}
           </h1>
           <p class="text-barbi" style="font-size:0.95em; text-align:center;">
             {missionBName}{#if cycleIndex} · {$t('lev.weget.cycleLabel')} #{cycleIndex}{/if}
           </p>
-          {#if isResponsible}
+          {#if isStockReceipt}
+            <!-- A supply portion: units, at the price its name carries. -->
+            <p class="p" style="font-size:1.6em; font-weight:bold; color:var(--goldink)">
+              {$t('lev.weget.receiptUnits', { count: shownAmount })}
+            </p>
+            {#if receiptUnitPrice > 0}
+              <p style="font-size:0.9em; text-align:center;">
+                {$t('lev.weget.receiptWorth')} <Money amount={Number(shownAmount) * receiptUnitPrice} {projectId} />
+              </p>
+            {:else}
+              <p style="font-size:0.9em; text-align:center;">{$t('lev.weget.receiptOpening')}</p>
+            {/if}
+          {:else if isResponsible}
             <input
               type="number"
               min="0"
@@ -987,6 +1020,8 @@
                 {hm}
                 {spnot}
                 {isRecurringCycle}
+                {isStockReceipt}
+                {receiptUnitPrice}
                 {cycleReported}
                 {cycleIndex}
                 quantityDelivered={shownAmount}
@@ -1027,6 +1062,8 @@
     {hm}
     {spnot}
     {isRecurringCycle}
+    {isStockReceipt}
+    {receiptUnitPrice}
     {cycleReported}
     {cycleIndex}
     quantityDelivered={shownAmount}

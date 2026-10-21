@@ -112,7 +112,10 @@ const SAMPLES: Record<string, any> = {
     take: null
   },
   shiftStarting: { planName: 'עמדת קבלה', hours: 4 },
-  shiftLog: { planName: 'עמדת קבלה', hours: 4 }
+  shiftLog: { planName: 'עמדת קבלה', hours: 4 },
+  // Order automation (PLAN_SHOP_OPERATIONS §2.2–2.3).
+  fulfill: { actId: '31', stepName: 'משלוח', name: 'משלוח · הזמנה K7Q4XM', orderNumber: 'K7Q4XM', mine: true, kind: 'order', wave: null },
+  fulfillRule: { stepId: '4', name: 'משלוח', proposedByName: 'דנה', target: 'role', roleName: 'שליח', deadline: '2026-10-23T09:00:00Z' }
 };
 
 const base = (ani: string) => ({
@@ -308,5 +311,25 @@ describe('a resource offer reads its fields by what they mean', () => {
     const facts = rowContent({ ani: 'huca', price: 700, myp: 1300, easy: 1400 }).facts;
     expect(facts.find((x) => x.key === 'qty')).toBeUndefined();
     expect(facts).toContainEqual({ key: 'offered', value: 1300 });
+  });
+});
+
+describe('fulfil rows (PLAN_SHOP_OPERATIONS A2–A3)', () => {
+  it('counts a wave instead of naming one order', () => {
+    const row = rowContent({ ...base('fulfill'), wave: { key: 'k', actIds: ['1', '2', '3'], orders: [], itemCount: 5 } });
+    expect(row.subtitle).toEqual({ key: 'lev.list.sub.fulfillWave', params: { count: 3 } });
+  });
+
+  it('names the resource of a purchase act', () => {
+    const row = rowContent({ ...base('fulfill'), kind: 'stock', stock: { name: 'צנצנות', onHand: 3, lowStockAt: 5, pricePerUnit: 4 } });
+    expect(row.subtitle).toEqual({ key: 'lev.list.sub.fulfillStock', params: { name: 'צנצנות' } });
+  });
+
+  it('says who proposed a rule, or that one waits, without a blank name', () => {
+    expect(rowContent(base('fulfillRule')).subtitle).toEqual({ key: 'lev.list.sub.fulfillRule', params: { name: 'דנה' } });
+    expect(rowContent({ ...base('fulfillRule'), proposedByName: null }).subtitle).toEqual({
+      key: 'lev.list.sub.fulfillRuleAnon',
+      params: undefined
+    });
   });
 });

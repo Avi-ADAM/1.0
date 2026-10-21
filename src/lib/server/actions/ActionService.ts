@@ -126,12 +126,35 @@ export class ActionService {
       (actionKey === 'createPaidOrder' && r.status === 'paid') ||
       (actionKey === 'confirmOrderPayment' && r.status === 'paid');
     const cancelled = actionKey === 'cancelOrder' && r.status === 'cancelled' && r.alreadyCancelled !== true;
-    if (!paid && !cancelled) return;
+    // Shipped / delivered from the orders screen, an API key or an agent: the
+    // acts that were waiting to make that change follow it (A2).
+    const moved =
+      (actionKey === 'markOrderShipped' || actionKey === 'markOrderFulfilled') &&
+      r.changed === true &&
+      (r.status === 'shipped' || r.status === 'fulfilled');
+    if (!paid && !cancelled && !moved) return;
 
     import('../fulfillment/apply.js')
-      .then(async ({ applyFulfillment, closeFulfillmentActs }) => {
+      .then(async ({ applyFulfillment, closeFulfillmentActs, restoreOrderStock, settleEffectActs }) => {
+        if (moved) {
+          await settleEffectActs({
+            projectId,
+            orderId,
+            status: r.status,
+            context,
+            strapi: this.strapiClient,
+            runAction: (key, p, ctx) => this.executeAction(key, p, ctx),
+            notifier: this.notifier
+          });
+          return;
+        }
         if (cancelled) {
           await closeFulfillmentActs({ orderId, context, strapi: this.strapiClient });
+          // A cancel that restocked the shop (before shipping, by default) gives
+          // the resources back what the order took too (PLAN_SHOP_OPERATIONS A3).
+          if (r.restocked === true) {
+            await restoreOrderStock({ projectId, orderId, context, strapi: this.strapiClient });
+          }
           return;
         }
         await applyFulfillment({

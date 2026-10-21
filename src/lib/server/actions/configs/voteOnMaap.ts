@@ -23,6 +23,7 @@ import { voteIntent } from '../../notifications/intent.js';
 import { STRAPI_URL } from '$lib/server/strapiUrl.js';
 import { gqlString } from './actionUtils.js';
 import { settleCycleMaap } from '$lib/server/recurring/settleCycleMaap';
+import { receiptValueOf } from '$lib/server/fulfillment/stock';
 import { bestEffort } from '$lib/server/resources/bookingStore.js';
 import { openGrantBooking } from '$lib/server/resources/grantBooking.js';
 import { execFromContext } from '$lib/server/archive/exec.js';
@@ -172,6 +173,14 @@ async function handleCycleMaapVote(
   // ── Consensus: archive the month's spend as a delivery on the Rikmash ──────
   // Shared with the restime maturation in the timegrama finalizer so a month
   // settled by signature and one settled by silence cannot differ.
+  // A supply portion (receiveStock, PLAN_SHOP_OPERATIONS A3): the shelf grows
+  // by the units, the giver's Rikmash by their value.
+  const receipt = await receiptValueOf(
+    (qid, vars) => strapi.execute(qid, vars, context.jwt, context.fetch),
+    String(askId),
+    Number(spend),
+    mashAttrs.pricePerUnit
+  );
   const { rikmashId } = await settleCycleMaap(
     strapi,
     { jwt: context.jwt, fetch: context.fetch },
@@ -183,6 +192,7 @@ async function handleCycleMaapVote(
       maapName: attrs.name,
       cycleIndex: attrs.cycleIndex ?? 1,
       spend,
+      ...(receipt ? { value: receipt.value, note: receipt.note } : {}),
       vots: allVots,
       confirmedBy: strUserId,
       timegramaId,

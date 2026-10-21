@@ -123,3 +123,59 @@ describe('workItemOf', () => {
     expect(workItemOf({ id: 50, attributes: { my: rels(8) } }, '7', () => '')!.mine).toBe(false);
   });
 });
+
+describe('A2 rows', () => {
+  it('whenOf keeps the A2 conditions and drops what is malformed', () => {
+    expect(
+      whenOf({
+        event: 'order.paid',
+        after: ['3', 3, 'x', '3'],
+        shippingMethods: ['m:north:courier', 'p:shop', 'm:bad id:x'],
+        pickupPoints: ['shopA', 'bad id'],
+        categories: [12, '13', 'c'],
+        resources: ['40']
+      })
+    ).toEqual({
+      event: 'order.paid',
+      after: ['3'],
+      shippingMethods: ['m:north:courier'],
+      pickupPoints: ['shopA'],
+      categories: ['12', '13']
+    });
+    expect(whenOf({ event: 'stock.low', resources: ['40', 'x'], after: ['3'] })).toEqual({ event: 'stock.low', resources: ['40'] });
+    expect(whenOf({ event: 'nope' })).toEqual({ event: 'order.paid' });
+  });
+
+  it('stepOf reads routing, batching and the wave hour', () => {
+    const s = stepOf({ id: 1, attributes: { routing: 'roundRobin', batching: 'wave', waveAt: '16:00' } })!;
+    expect(s).toMatchObject({ routing: 'roundRobin', batching: 'wave', waveAt: '16:00' });
+    const d = stepOf({ id: 1, attributes: { routing: 'x', waveAt: '24:61' } })!;
+    expect(d).toMatchObject({ routing: 'single', batching: 'perOrder', waveAt: null });
+  });
+
+  it('workItemOf tells a stock act from an order act, and an act open to everyone', () => {
+    const w = workItemOf(
+      { id: 60, attributes: { shem: 'רכש · צנצנות', externalId: 'stock:40:low:100:step:9', my: rels(), tafkidims: { data: [] }, fulfillment_step: rel(9, { name: 'רכש', batching: 'perOrder' }) } },
+      '7',
+      () => ''
+    )!;
+    expect(w).toMatchObject({ kind: 'stock', resourceId: '40', stepId: '9', mine: false, openToAll: true, orderId: null });
+    const o = workItemOf({ id: 61, attributes: { externalId: 'order:5:x:step:4', my: rels(7), fulfillment_step: rel(4, { batching: 'wave', per: 'unit' }) } }, '7', () => '')!;
+    expect(o).toMatchObject({ kind: 'order', batching: 'wave', per: 'unit', openToAll: false, stepId: '4' });
+  });
+
+  it('orderFactsOf reads line categories when they were asked for', () => {
+    const o = orderFactsOf(
+      {
+        id: 1,
+        attributes: {
+          ref: 'r',
+          status: 'paid',
+          lines: { data: [{ id: 2, attributes: { position: 0, quantity: 1, matanot: rel(4, { categories: rels(12, 13) }) } }] }
+        }
+      },
+      '#1'
+    )!;
+    expect(o.lines[0].categoryIds).toEqual(['12', '13']);
+  });
+});

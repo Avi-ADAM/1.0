@@ -22,6 +22,7 @@
  * Pure readers + two small effects. The reads go through a qid runner, so the same code
  * serves an action (`strapi.execute` with the member's JWT) and the cron (admin client).
  */
+import { isEssenceOnly } from '$lib/pooling/bomPrice';
 
 export type OfferKind = 'mission' | 'resource';
 
@@ -62,6 +63,8 @@ export function linePrice(kind: OfferKind, a: any): number {
   if (kind === 'mission') {
     return num(a?.hoursPerUnit) * num(a?.ratePerHour) * (num(a?.unitsPerProduct, 1) || 1);
   }
+  // An essence-only row carries no price (PLAN_SHOP_OPERATIONS §2.4).
+  if (isEssenceOnly(a)) return 0;
   return num(a?.quantityPerUnit, 1) * num(a?.pricePerUnit);
 }
 

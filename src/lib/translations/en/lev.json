@@ -215,7 +215,14 @@
       "counterOffer": "Counter-offer",
       "approveExpense": "Approve expense",
       "reportApprove": "report & approve",
-      "approveMonthlyExpense": "approve monthly expense"
+      "approveMonthlyExpense": "approve monthly expense",
+      "stockReceipt": "Stock received",
+      "receiptUnits": "{{count}} units",
+      "receiptWorth": "Worth:",
+      "receiptOpening": "An opening count — no new value",
+      "receiptYouGive": "You give this resource — your signature puts it on the shelf",
+      "receiptGiverSigns": "It goes on the shelf after the giver signs, and everyone else's silence is consent",
+      "approveReceipt": "Approve the receipt"
     },
     "sugestma": {
       "head": "Suggestion for sharing a resource with the rikma",
@@ -573,7 +580,11 @@
     "objectAria": "Object",
     "proposeAmountAria": "Propose a different amount",
     "awaitingReport": "⏳ Waiting for the responsible member to report",
-    "awaitingReportHint": "Approval opens once the responsible member reports the monthly expense"
+    "awaitingReportHint": "Approval opens once the responsible member reports the monthly expense",
+    "approveStockReceipt": "Approve a stock receipt",
+    "receiptUnits": "{{count}} units",
+    "receiptWorth": "Worth:",
+    "receiptOpening": "An opening count — no new value"
   },
   "levchat": {
     "messagePlaceholder": "Write your message..."
@@ -853,7 +864,8 @@
       "shiftSwap": "Shift swap",
       "shiftStarting": "Shift starting",
       "shiftLog": "Shift hours",
-      "fulfill": "Order task"
+      "fulfill": "Order task",
+      "fulfillRule": "Automation rule"
     },
     "fact": {
       "hours": "{{value}} hours",
@@ -918,7 +930,11 @@
       "shiftStarting": "Start the timer",
       "shiftLog": "The shift ended without a timer",
       "fulfill": "Order {{order}}",
-      "fulfillOpen": "Order {{order}} · open to the {{role}} role"
+      "fulfillOpen": "Order {{order}} · open to the {{role}} role",
+      "fulfillWave": "A wave of {{count}} orders",
+      "fulfillStock": "Low stock: {{name}}",
+      "fulfillRule": "Proposed by {{name}} — waiting for your answer",
+      "fulfillRuleAnon": "A rule that lands on you — waiting for your answer"
     },
     "title": {
       "transfer": "{{from}} → {{to}}",
@@ -996,6 +1012,79 @@
     "doneToast": "Great — marked, and the buyer will be updated",
     "effectFailed": "The task is marked, but the order's status did not change — worth a look at the order",
     "openOrder": "Order details",
+    "error": "Something went wrong, please try again",
+    "typeStock": "Purchase task — low stock",
+    "wave": "A wave of {{count}} orders",
+    "waveItems": "{{count}} items",
+    "waveShipped": "All {{count}} shipped ✓",
+    "waveFulfilled": "All {{count}} delivered ✓",
+    "waveDone": "All {{count}} done ✓",
+    "wavePartial": "{{done}} marked, {{failed}} not — worth a look at the orders",
+    "waveToast": "Great — {{count}} orders marked, and the buyers will be updated",
+    "onHand": "On the shelf: {{count}}",
+    "lowAt": "Low-stock threshold: {{count}}",
+    "dispatchOn": "Leaves on: {{day}}",
+    "openToAll": "Open to the whole rikma — whoever takes it, owns it.",
+    "receive": "I received stock",
+    "receiveQty": "How many units arrived?",
+    "receivePrice": "Price per unit",
+    "receiveHint": "The value is credited to the resource's giver once the rikma approves — or by silence, after the giver signed. An opening count of what was already credited: price 0.",
+    "receiveSubmit": "Receive",
+    "cancel": "Cancel",
+    "doneNoReceipt": "Done — no receipt for now",
+    "handOff": "Pass to someone else",
+    "openOrders": "All orders",
+    "openStock": "Stock screen",
+    "receivedSettled": "Received and on the shelf",
+    "receivedGiver": "Received — waiting for the resource giver's signature",
+    "receivedWaiting": "Received — it goes on the shelf if nobody objects by {{when}}",
+    "receivedActOpen": "The receipt is recorded, but the task did not close — you can mark it by hand",
+    "handedTo": "The task was passed on",
+    "handedRole": "The task went back to the role, and its holders were told",
+    "handedAll": "The task is now open to the whole rikma",
+    "handedNobody": "Nobody else holds the role right now — the rikma was offered to publish an open mission",
+    "openMission": "Publish a mission"
+  },
+  "fulfillRule": {
+    "type": "An automation rule waiting for your answer",
+    "proposedBy": "{{name}} proposes:",
+    "proposed": "A rule was proposed:",
+    "when": {
+      "any": "Every paid order",
+      "delivery": "Every paid delivery order",
+      "pickup": "Every paid pickup order",
+      "digital": "Every paid digital order",
+      "contact": "Every paid order to arrange",
+      "stockLow": "When a resource falls to its low-stock threshold"
+    },
+    "after": "After the earlier steps of the same order are done",
+    "narrowed": "Only orders that meet its conditions (category, zone, delivery method or pickup point)",
+    "target": {
+      "role": "Opens a task for the {{role}} role, which you hold",
+      "mission": "Opens a task inside your mission \"{{mission}}\"",
+      "member": "Opens a task for you"
+    },
+    "per": {
+      "line": "One task per order line",
+      "unit": "One task per unit"
+    },
+    "wave": "In one wave a day, cut-off at {{time}}",
+    "due": "Due within {{hours}} hours",
+    "routing": {
+      "roundRobin": "Taking turns among the role's holders",
+      "leastOpen": "To whoever has the fewest open tasks"
+    },
+    "effect": {
+      "markShipped": "When done, the order is marked \"shipped\"",
+      "markFulfilled": "When done, the order is marked \"delivered\""
+    },
+    "silence": "If there is no answer by {{when}}, that counts as consent.",
+    "noClock": "Nothing opens for you until you agree.",
+    "agree": "I agree",
+    "counter": "Propose a change",
+    "noReject": "There is no \"no\" here: you can change the rule — a counter-proposal that starts a new round.",
+    "agreed": "You agreed — the rule is live",
+    "agreedWaiting": "Your consent is recorded — the rule still waits for others",
     "error": "Something went wrong, please try again"
   }
 }

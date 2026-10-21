@@ -45,7 +45,10 @@
    * @property {number} [activeOrder]
    * @property {Function} [onProj]
    * @property {number} [noOfusers]
+   * @property {any} [projectId]
    * @property {boolean} [isRecurringCycle]
+   * @property {boolean} [isStockReceipt]
+   * @property {number} [receiptUnitPrice]
    * @property {boolean} [cycleReported]
    * @property {any} [cycleIndex]
    * @property {number} [quantityDelivered]
@@ -89,6 +92,9 @@
     noOfusers = 0,
     // Recurring monthly resource cycle (mashabetahalich engine)
     isRecurringCycle = false,
+    // A supply portion on a stock resource (receiveStock, PLAN_SHOP_OPERATIONS A3)
+    isStockReceipt = false,
+    receiptUnitPrice = 0,
     cycleReported = false,
     cycleIndex,
     quantityDelivered = 0,
@@ -106,7 +112,11 @@
   // hovering, which leaves a screen reader — and anyone on touch — with a pair
   // of unlabelled buttons on the one card that closes a resource receipt.
   let approveLabel = $derived(
-    isRecurringCycle ? $t('lev.cards.dowegeot.approveMonthlyExpense') : $t('common.approve')
+    isStockReceipt
+      ? $t('lev.cards.dowegeot.approveReceipt')
+      : isRecurringCycle
+        ? $t('lev.cards.dowegeot.approveMonthlyExpense')
+        : $t('common.approve')
   );
   let declineLabel = $derived(
     isRecurringCycle ? $t('lev.cards.dowegeot.counterOffer') : $t('lev.cards.confirmDecline')
@@ -121,7 +131,9 @@
   // שווי המשאב עבור "החלק שלך ברקמה": מחזור מתחדש נמדד בסכום המדווח/מתוכנן
   // לחודש הזה, ואספקה חד-פעמית לפי אותו חישוב שמוצג בשורת הכסף שמעליה.
   const equityValue = $derived(
-    isRecurringCycle
+    isStockReceipt
+      ? (Number(quantityDelivered) || 0) * (Number(receiptUnitPrice) || 0)
+      : isRecurringCycle
       ? Number(effectiveAmount) || 0
       : kindOf === 'perUnit'
         ? (Number(agprice) || 0) * (Number(hm) || 1)
@@ -241,7 +253,25 @@
           src="https://res.cloudinary.com/love1/image/upload/v1653148344/Crashing-Money_n6qaqj.svg"
           alt="howmuch"
         />
-        {#if isRecurringCycle}
+        {#if isStockReceipt}
+          <!-- A supply portion: the shelf grows by the units, the giver's share by their value. -->
+          <div class="flex flex-col gap-1 w-full">
+            <span class="font-bold text-base">📦 {$t('lev.cards.dowegeot.stockReceipt')}</span>
+            <span style="color:var(--barbi-pink)" class="font-extrabold text-2xl">
+              {$t('lev.cards.dowegeot.receiptUnits', { count: quantityDelivered })}
+            </span>
+            {#if receiptUnitPrice > 0}
+              <span class="text-sm text-gray-700 dark:text-gray-300">
+                {$t('lev.cards.dowegeot.receiptWorth')} <Money amount={(Number(quantityDelivered) || 0) * receiptUnitPrice} {projectId} />
+              </span>
+            {:else}
+              <span class="text-sm text-gray-700 dark:text-gray-300">{$t('lev.cards.dowegeot.receiptOpening')}</span>
+            {/if}
+            <span class="text-xs text-gray-500">
+              {isResponsible ? $t('lev.cards.dowegeot.receiptYouGive') : $t('lev.cards.dowegeot.receiptGiverSigns')}
+            </span>
+          </div>
+        {:else if isRecurringCycle}
           <div class="flex flex-col gap-2 w-full">
             <span class="font-bold text-base">
               🔁 {$t('lev.cards.dowegeot.recurringMonthlyExpense')}
@@ -404,8 +434,8 @@
         <EquityPreview
           {projectId}
           missionValue={equityValue}
-          monthlyValue={isRecurringCycle ? equityValue : null}
-          alreadyCountedIn={isRecurringCycle ? 'approved' : 'none'}
+          monthlyValue={isRecurringCycle && !isStockReceipt ? equityValue : null}
+          alreadyCountedIn={isRecurringCycle && !isStockReceipt ? 'approved' : 'none'}
           subject="resource"
           titleKey="equity.yourShareIfGiven"
           compact={isMobileOrTablet()}
@@ -453,7 +483,7 @@
             onmouseenter={() => hover($t('lev.cards.dowegeot.reportApprove'))}
             onmouseleave={() => hover('0')}
           >
-            {$t('lev.cards.dowegeot.reportAndApprove')}
+            {isStockReceipt ? $t('lev.cards.dowegeot.approveReceipt') : $t('lev.cards.dowegeot.reportAndApprove')}
             <Lev />
           </button>
         {:else}
@@ -480,7 +510,7 @@
             onmouseenter={() => hover(approveLabel)}
             onmouseleave={() => hover('0')}
           >
-            {#if isRecurringCycle}{$t('lev.cards.dowegeot.approveExpense')}{/if}
+            {#if isStockReceipt}{$t('lev.cards.dowegeot.approveReceipt')}{:else if isRecurringCycle}{$t('lev.cards.dowegeot.approveExpense')}{/if}
             <Lev />
           </button>
         {/if}

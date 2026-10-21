@@ -52,7 +52,7 @@
   } from '$lib/stores/levStores';
   import { executeAction } from '$lib/client/actionClient';
   import { shiftWorkStore } from '$lib/utils/levShifts';
-  import { fulfillWorkStore } from '$lib/utils/levFulfill';
+  import { fulfillWorkStore, fulfillRuleStore, FULFILL_REALTIME_KEYS } from '$lib/utils/levFulfill';
 
   // Dialog components
   import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
@@ -77,6 +77,7 @@
   let loading = $state(true);
   let error = $state(null);
   let unsubscribeRealtime = null;
+  let unsubscribeFulfill = null;
   let timerCleanup = null;
 
   // Subscribe to finalSwiperArray from new architecture
@@ -327,13 +328,17 @@
     }
   }
 
-  // Order automation (PLAN_SHOP_OPERATIONS §2.2): the acts the rikma's agreed
-  // steps opened for me, or for a role I hold. Members only — they carry the
-  // buyer's address, so they are read on the server.
+  // Order automation (PLAN_SHOP_OPERATIONS §2.2–2.3): the acts the rikma's
+  // agreed steps opened for me, or for a role I hold, and the rules waiting for
+  // my answer. Members only — the acts carry the buyer's address, so they are
+  // read on the server.
   async function loadFulfillWork() {
     try {
       const res = await executeAction('getFulfillmentWork', {});
-      if (res?.success && res.data) fulfillWorkStore.set(res.data.items ?? []);
+      if (res?.success && res.data) {
+        fulfillWorkStore.set(res.data.items ?? []);
+        fulfillRuleStore.set(res.data.proposals ?? []);
+      }
     } catch (e) {
       console.error('[Fulfill] load work failed:', e);
     }
@@ -400,6 +405,11 @@
     timerCleanup = listenForTimerChanges(page.data.uid, fetch);
     // Scopes an action declared (`realtime`) re-read the slices they touch.
     unsubscribeRealtime = connectLevRealtime(realtimeBus, page.data.uid, data.lang);
+    // The fulfil cards are their own server read: a rule proposed, an act
+    // opened, taken or passed on anywhere in my rikmas re-reads them.
+    unsubscribeFulfill = realtimeBus.subscribe(['project:*'], (batch) => {
+      if (batch.resync || batch.changes.some((c) => FULFILL_REALTIME_KEYS.has(c.actionKey))) loadFulfillWork();
+    });
     loadSiteSharePayables();
     loadOpenSiteShareDecisions();
     loadStipendWork();
@@ -497,6 +507,7 @@
 
   onDestroy(() => {
     unsubscribeRealtime?.();
+    unsubscribeFulfill?.();
     // Clean up timer listener
     if (timerCleanup) {
       timerCleanup();

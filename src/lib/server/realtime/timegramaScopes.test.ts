@@ -42,7 +42,10 @@ describe('timegrama maturation scopes (B9)', () => {
   });
 
   it('the query asks for the rikma only where the target has one', () => {
-    expect(relationSelection('act')).toBe('act{data{id}}');
+    expect(relationSelection('actt')).toBe('actt{data{id}}');
+    // An automatic act's reminder (PLAN_SHOP_OPERATIONS A2) knows its rikma.
+    expect(relationSelection('act')).toBe('act{data{id attributes{ project{data{id}} }}}');
+    expect(maturedScopes('act', { id: 5, attributes: { project: { data: { id: 3 } } } })).toEqual(['project:3', 'act:5']);
     expect(relationSelection('decision')).toBe('decision{data{id attributes{ projects{data{id}} }}}');
     expect(relationSelection('ratson_proposal')).toBe('ratson_proposal{data{id attributes{ project{data{id}} ratson{data{id}} }}}');
     for (const k of Object.keys(PROJECT_FIELD)) expect(relationSelection(k)).toContain(PROJECT_FIELD[k]);

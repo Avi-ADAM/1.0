@@ -3,3 +3,4 @@ export const shopOrdersKey = (projectId: string) => `shop:orders:${projectId}`;
 export const shopProductsKey = (projectId: string) => `shop:products:${projectId}`;
 export const shopFulfillmentKey = (projectId: string) => `shop:fulfillment:${projectId}`;
 export const shopShippingKey = (projectId: string) => `shop:shipping:${projectId}`;
+export const shopResourcesKey = (projectId: string) => `shop:resources:${projectId}`;

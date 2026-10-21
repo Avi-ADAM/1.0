@@ -45,6 +45,7 @@
   import ShiftSwapCard from './ShiftSwapCard.svelte';
   import ShiftHoursCard from './ShiftHoursCard.svelte';
   import FulfillCard from './FulfillCard.svelte';
+  import FulfillRuleCard from './FulfillRuleCard.svelte';
   import { setLevItem } from '../levItemContext.js';
 
   /**
@@ -205,6 +206,8 @@
   <ShiftHoursCard {buble} isFirst={isVisible} onProj={proj} onDone={delo} />
 {:else if buble.ani === 'fulfill'}
   <FulfillCard {buble} isFirst={isVisible} onProj={proj} onDone={delo} />
+{:else if buble.ani === 'fulfillRule'}
+  <FulfillRuleCard {buble} isFirst={isVisible} onProj={proj} onDone={delo} />
 {:else if buble.ani === 'sitesharedecide'}
   <SiteShareAutoApprovedCard
       {buble}
@@ -408,6 +411,8 @@
       userId={buble.uid}
       myid={buble.myid}
       isRecurringCycle={buble.isRecurringCycle}
+      isStockReceipt={buble.isStockReceipt === true}
+      receiptUnitPrice={buble.receiptUnitPrice ?? 0}
       mashabetahalichId={buble.mashabetahalichId}
       cycleIndex={buble.cycleIndex}
       cycleReported={buble.cycleReported}

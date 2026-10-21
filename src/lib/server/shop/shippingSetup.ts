@@ -20,8 +20,11 @@ export interface ShippingSetup {
   currency: string;
   products: Array<{ id: string; name: string }>;
   districts: string[];
-  /** Live or proposed fulfilment rules narrowed to zones — "who delivers there". */
-  rules: Array<{ id: string; name: string; zones: string[]; who: string | null }>;
+  /**
+   * Live or proposed fulfilment rules narrowed to zones, delivery methods
+   * (`m:<zone>:<method>`) or pickup points — "who delivers there" (A2).
+   */
+  rules: Array<{ id: string; name: string; zones: string[]; methods: string[]; points: string[]; who: string | null }>;
   updatedByName: string | null;
 }
 
@@ -54,11 +57,17 @@ export async function loadShippingSetup(projectId: string, fetchFn?: typeof fetc
     })),
     districts: districtsOf(places),
     rules: (fulfillment?.steps ?? [])
-      .filter((s) => s.when.shippingZones?.length && s.consentState !== 'paused')
+      .filter(
+        (s) =>
+          s.consentState !== 'paused' &&
+          !!(s.when.shippingZones?.length || s.when.shippingMethods?.length || s.when.pickupPoints?.length)
+      )
       .map((s) => ({
         id: s.id,
         name: s.name,
         zones: s.when.shippingZones ?? [],
+        methods: s.when.shippingMethods ?? [],
+        points: s.when.pickupPoints ?? [],
         who: s.missionName ?? s.roleName ?? s.memberName ?? null
       })),
     updatedByName: shipping.config.updatedBy ? (members.get(shipping.config.updatedBy) ?? null) : null

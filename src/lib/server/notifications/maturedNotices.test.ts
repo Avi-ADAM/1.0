@@ -24,7 +24,10 @@ const ALL: Array<[string, MaturedNotice[]]> = [
   ['stipendPaymentConfirmed', N.stipendPaymentConfirmed({ projectId: 7, projectName: 'X', amount: 100, moved: true, recipientId: 4, funderId: 5 })],
   ['dormancyOpened', N.dormancyOpened({ projectId: 7, decisionId: 9, name: 'M', ownerId: 4 })],
   ['archiveTookEffect', [N.archiveTookEffect({ projectId: 7, name: 'R', kind: 'matanot' })]],
-  ['rosterClosed', [N.rosterClosed({ projectId: 7 })]]
+  ['rosterClosed', [N.rosterClosed({ projectId: 7 })]],
+  ['fulfillmentRuleMatured', N.fulfillmentRuleMatured({ projectId: 7, name: 'משלוח', agreedIds: [4], proposerId: 5, live: true })],
+  ['fulfillmentActDue', [N.fulfillmentActDue({ projectId: 7, name: 'משלוח · #1', userIds: [4], overdue: false })]],
+  ['stockReceiptSettled', [N.stockReceiptSettled({ projectId: 7, name: 'צנצנות', quantity: 50 })]]
 ];
 
 describe('every matured notice', () => {
@@ -99,5 +102,20 @@ describe('who is told, and what is asked of them', () => {
     const [n] = N.objectChangeApplied({ projectId: 7, decisionId: 9, decisionName: 'D', effectiveFrom: '2026-11-01' });
     expect(n.url).toBe('/moach/7/votes/decision/9');
     expect(n.body.en).toMatch(/end of the cycle/);
+  });
+});
+
+describe('order automation notices (PLAN_SHOP_OPERATIONS A2/A3)', () => {
+  it('a rule matured on silence tells the people whose silence it was, and its author', () => {
+    const [agreed, author] = N.fulfillmentRuleMatured({ projectId: 7, name: 'R', agreedIds: [4, 6], proposerId: 5, live: true });
+    expect(agreed.to).toEqual({ userIds: [4, 6] });
+    expect(agreed.intent).toBe('personal');
+    expect(author.to).toEqual({ userIds: [5] });
+    // An author who was also asked hears it once.
+    expect(N.fulfillmentRuleMatured({ projectId: 7, name: 'R', agreedIds: [5], proposerId: 5, live: true })).toHaveLength(1);
+  });
+
+  it('a reminder goes to whoever holds the act', () => {
+    expect(N.fulfillmentActDue({ projectId: 7, name: 'A', userIds: [4], overdue: true }).to).toEqual({ userIds: [4] });
   });
 });

@@ -6,6 +6,7 @@
   import { lang } from '$lib/stores/lang.js';
   import RichText from '$lib/celim/ui/richText.svelte';
   import { costAt, effectiveShape, hasGroupCurve, toBomLines, type CostShape } from '$lib/pooling/priceCurve';
+  import { isEssenceOnly } from '$lib/pooling/bomPrice';
 
   type RecipeMissionRow = {
     id: string;
@@ -27,6 +28,7 @@
     attributes: {
       quantityPerUnit?: number;
       pricePerUnit?: number;
+      priceMode?: string | null;
       kindOf?: string | null;
       mode?: 'createNew' | 'consumeExisting' | 'reuseSp';
       notes?: string | null;
@@ -66,7 +68,8 @@
   const isComplex = $derived(matanot.pricingMode && matanot.pricingMode !== 'fixed');
   const showBom = $derived(isComplex);
   const missionRows = $derived(matanot.matanot_recipe_missions?.data ?? []);
-  const resourceRows = $derived(matanot.matanot_recipe_resources?.data ?? []);
+  // Essence-only rows link the product to its stock; they are not part of the price (bomPrice.ts).
+  const resourceRows = $derived((matanot.matanot_recipe_resources?.data ?? []).filter((r) => !isEssenceOnly(r.attributes)));
 
   // One unit bought directly is a group of one (PLAN_POOL_PRODUCT §3.2).
   const bom = $derived(

@@ -2,7 +2,8 @@
   /**
    * Stock — one row per variant (or per product sold without variants),
    * "what needs me" first: short for paid orders, sold out, low (UX_COPY §5).
-   * Tapping a row opens the update sheet for the whole product.
+   * Tapping a row opens the update sheet for the whole product. Below, the
+   * shelves of the rikma's resources (A3): what a sale takes, what a receipt adds.
    */
   import { page } from '$app/state';
   import { goto } from '$app/navigation';
@@ -18,6 +19,7 @@
   import { STOCK_CHIP, stockText } from '$lib/shop/display';
   import StockSheet from '$lib/components/shop/StockSheet.svelte';
   import ShopNotice from '$lib/components/shop/ShopNotice.svelte';
+  import ResourceStock from '$lib/components/shop/ResourceStock.svelte';
 
   let { data } = $props();
   let projectId = $derived(page.params.projectId ?? '');
@@ -116,6 +118,11 @@
       </table>
     </div>
   {/if}
+{/if}
+
+<!-- The shelves of the rikma's resources (PLAN_SHOP_OPERATIONS A3) — absent until 1.0b deploys them. -->
+{#if data.resources?.ready}
+  <ResourceStock {projectId} uid={String(data.uid ?? '')} resources={data.resources.resources} {products} />
 {/if}
 
 {#if sheetProduct}
