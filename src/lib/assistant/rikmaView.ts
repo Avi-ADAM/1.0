@@ -8,6 +8,7 @@
  * the owner's conversation), no row the owner set aside.
  */
 
+import { stripHtml } from '$lib/utils/stripHtml';
 import type { AssistantItem, AssistantState } from './types.js';
 
 export type ViewHolder = { kind: 'me' | 'open' } | { kind: 'partner'; name: string };
@@ -20,12 +21,22 @@ export interface RikmaViewRow {
   ratePerHour?: number;
   price?: number;
   quantity?: number;
+  kindOf?: string;
+  recurring?: boolean;
+  roles?: string[];
+  skills?: string[];
+  workways?: string[];
 }
 
 export interface RikmaViewProduct {
   label: string;
   text?: string;
   price?: number;
+  kindOf?: string;
+  quant?: number;
+  unlimited?: boolean;
+  isOnline?: boolean;
+  categories?: string[];
   onRequest: boolean;
   madeOf: string[];
 }
@@ -34,10 +45,13 @@ export interface RikmaView {
   track?: string;
   name: string;
   publicDescription?: string;
+  descripFor?: string;
   linkToWebsite?: string;
   vals: string[];
   place?: string;
+  isOnline?: boolean;
   currency?: string;
+  restime?: string;
   products: RikmaViewProduct[];
   missions: RikmaViewRow[];
   resources: RikmaViewRow[];
@@ -52,6 +66,16 @@ export interface RikmaView {
 
 const num = (v: unknown): number | undefined => (typeof v === 'number' && Number.isFinite(v) && v >= 0 ? v : undefined);
 const str = (v: unknown): string | undefined => (typeof v === 'string' && v.trim() ? v.trim() : undefined);
+const plain = (v: unknown): string | undefined => {
+  if (typeof v !== 'string' || !v.trim()) return undefined;
+  const cleaned = stripHtml(v).trim();
+  return cleaned || undefined;
+};
+const strList = (v: unknown): string[] | undefined => {
+  if (!Array.isArray(v)) return undefined;
+  const out = v.filter((x): x is string => typeof x === 'string' && !!x.trim()).map((x) => x.trim());
+  return out.length ? out : undefined;
+};
 
 export function blueprintToRikmaView(state: AssistantState): RikmaView {
   const f = state.fields ?? {};
@@ -71,11 +95,17 @@ export function blueprintToRikmaView(state: AssistantState): RikmaView {
   const row = (it: AssistantItem): RikmaViewRow => {
     const s = it.spec ?? {};
     const out: RikmaViewRow = { label: it.label, holder: holderOf(it) };
-    const text = str(s.descrip);
+    const text = plain(s.descrip);
     if (text) out.text = text;
     for (const k of ['hours', 'ratePerHour', 'price', 'quantity'] as const) {
       const v = num(s[k]);
       if (v !== undefined) out[k] = v;
+    }
+    if (str(s.kindOf)) out.kindOf = str(s.kindOf);
+    if (s.recurring === true) out.recurring = true;
+    for (const k of ['roles', 'skills', 'workways'] as const) {
+      const list = strList(s[k]);
+      if (list) out[k] = list;
     }
     return out;
   };
@@ -86,10 +116,16 @@ export function blueprintToRikmaView(state: AssistantState): RikmaView {
       const s = it.spec ?? {};
       const r = (s.recipe ?? {}) as { missionKeys?: string[]; resourceKeys?: string[] };
       const price = num(s.price);
+      const categories = strList(s.categories);
       return {
         label: it.label,
         ...(str(s.desc) ? { text: str(s.desc) } : {}),
         ...(price !== undefined ? { price } : {}),
+        ...(str(s.kindOf) ? { kindOf: str(s.kindOf) } : {}),
+        ...(num(s.quant) !== undefined ? { quant: num(s.quant) } : {}),
+        ...(s.unlimited === true ? { unlimited: true } : {}),
+        ...(s.isOnline === true ? { isOnline: true } : {}),
+        ...(categories ? { categories } : {}),
         onRequest: price === undefined || s.pricingMode === 'quote',
         madeOf: [...(r.missionKeys ?? []), ...(r.resourceKeys ?? [])]
           .map((k) => byKey.get(k)?.label)
@@ -130,10 +166,13 @@ export function blueprintToRikmaView(state: AssistantState): RikmaView {
     ...(str(f.track) ? { track: str(f.track) } : {}),
     name: str(f.name) ?? '',
     ...(str(f.publicDescription) ? { publicDescription: str(f.publicDescription) } : {}),
+    ...(str(f.descripFor) ? { descripFor: str(f.descripFor) } : {}),
     ...(str(f.linkToWebsite) && /^https?:\/\//i.test(String(f.linkToWebsite)) ? { linkToWebsite: str(f.linkToWebsite) } : {}),
     vals: Array.isArray(f.vals) ? (f.vals as unknown[]).filter((v): v is string => typeof v === 'string' && !!v.trim()) : [],
     ...(str(loc?.hint) ? { place: str(loc?.hint) } : {}),
+    ...(loc?.isOnline === true ? { isOnline: true } : {}),
     ...(str(f.currency) ? { currency: str(f.currency) } : {}),
+    ...(str(f.restime) ? { restime: str(f.restime) } : {}),
     products,
     missions: missionItems.map(row),
     resources: resourceItems.map(row),

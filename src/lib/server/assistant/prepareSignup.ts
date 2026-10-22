@@ -53,7 +53,10 @@ export interface PrepareSignupResult {
   /** The signup screen — or, for a person who already has an account (§5.7), the page that hands the draft over. */
   signupUrl?: string;
   receiveUrl?: string;
+  /** Read-only public rikma preview safe to share with partners or customers. */
   previewUrl?: string;
+  /** Behind-the-scenes studio link: edit the rikma, add/remove missions & hours, then sign up and create. */
+  manageUrl?: string;
   expiresAt: string;
 }
 
@@ -117,7 +120,7 @@ export async function prepareSignup(
   );
 
   let previewUrl: string | undefined;
-  if (kind === 'rikma' && state.items.length) {
+  if (kind === 'rikma') {
     const key = await setShare(deps.strapi, row.id, { expiresAt: new Date(now.getTime() + SHARE_DAYS * 86_400_000).toISOString() }, deps.fetch);
     previewUrl = `${SITE}/preview/rikma/${key}`;
   }
@@ -130,16 +133,20 @@ export async function prepareSignup(
       email: input.email,
       countryIds: countryIdsOf(input.countries ?? []),
       intent: input.intent,
-      lang: input.lang ?? 'he'
+      lang: input.lang ?? 'he',
+      ...(opts.receive ? { receive: true } : {})
     },
     now.getTime(),
     undefined,
     ttl
   );
 
+  const manageUrl = kind === 'rikma' ? `${SITE}/preview/rikma/studio/${token}` : undefined;
+
   return {
     ...(opts.receive ? { receiveUrl: `${SITE}/assistant/receive/${token}` } : { signupUrl: `${SITE}/hascama?agent=${token}` }),
     ...(previewUrl ? { previewUrl } : {}),
+    ...(manageUrl ? { manageUrl } : {}),
     expiresAt: new Date(now.getTime() + ttl).toISOString()
   };
 }

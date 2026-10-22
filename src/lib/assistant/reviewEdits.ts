@@ -306,3 +306,66 @@ export function effectiveSpec(row: AssistantItem, edit: RowEdit | undefined): Re
   }
   return out;
 }
+
+/**
+ * Increment/decrement a numeric form field (hours, rate, quantity…) cleanly,
+ * clamped to `[0, max]` and rounded to 2 decimal places so repeated taps never
+ * drift into floating-point noise.
+ */
+export function stepNumber(
+  currentRaw: Raw | undefined,
+  currentStored: unknown,
+  delta: number,
+  max = 10_000
+): string {
+  const rawStr = currentRaw !== undefined ? String(currentRaw).trim() : '';
+  let base: number;
+  if (rawStr !== '') {
+    const parsed = Number(rawStr.replace(',', '.'));
+    base = Number.isFinite(parsed) ? parsed : 0;
+  } else {
+    base = typeof currentStored === 'number' && Number.isFinite(currentStored) ? currentStored : 0;
+  }
+  const next = Math.min(max, Math.max(0, Math.round((base + delta) * 100) / 100));
+  return String(next);
+}
+
+/** Build the initial spec for a newly added draft row from its defaults + edits. */
+export function addRowSpec(
+  group: string,
+  baseSpec: Record<string, unknown> | undefined,
+  edit: RowEdit | undefined
+): Record<string, unknown> | undefined {
+  const out: Record<string, unknown> = { ...(baseSpec ?? {}) };
+  const defs = SPEC_DEFS[group] ?? {};
+  for (const [field, raw] of Object.entries(edit?.spec ?? {})) {
+    const def = defs[field];
+    if (!def) continue;
+    const p = parseValue(def, raw);
+    if (!p.ok) continue;
+    if (p.value === null) delete out[field];
+    else out[field] = p.value;
+  }
+  if (group === 'products' && out.price !== undefined) out.pricingMode = 'fixed';
+  return Object.keys(out).length ? out : undefined;
+}
+
+/**
+ * Turn checkbox changes on existing draft rows into `drop` / `restore` ops when
+ * saving a draft before creation (so the public preview and future claims match
+ * what the user ticked). Untouched checkboxes emit nothing.
+ */
+export function selectionOps(
+  items: readonly AssistantItem[],
+  selected: Record<string, boolean>
+): Record<string, unknown>[] {
+  const ops: Record<string, unknown>[] = [];
+  for (const row of items) {
+    if (row.createdRef || row.status === 'applied') continue;
+    const isTicked = !!selected[row.key];
+    if (row.status === 'dropped' && isTicked) ops.push({ op: 'restore', key: row.key });
+    else if (row.status !== 'dropped' && !isTicked) ops.push({ op: 'drop', key: row.key });
+  }
+  return ops;
+}
+

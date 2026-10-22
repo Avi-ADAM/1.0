@@ -244,11 +244,15 @@ export function makePrepareSignupTool(clientIp: string, fetchFn: typeof fetch) {
       'intent: "business" (add their business so the concierge finds and orders from it), "partnership" (see an ' +
       'existing partnership on 1lev1), "idea" (break an idea down and recruit partners) - for these three send the ' +
       'rikma blueprint you built (the same shape as proposeRikmaBlueprint takes: fields, products first, missions, ' +
-      'resources, partners) and you also get a previewUrl showing how it would look; "join" (join rikmas - pass ' +
-      'aboutText: who they are, what they do); "order" (they want something made or arranged - pass wishText). ' +
-      'You cannot sign, set a password or confirm the email for them, and nothing is created until they do. Give ' +
-      'them signupUrl (valid 24h). After they confirm their email they land straight in what you prepared. ' +
-      'Docs: https://1lev1.com/mcp#prepareSignup',
+      'resources, partners) and you get TWO links to share with the person: `previewUrl` (the rich public rikma page, ' +
+      'safe to share with anyone) and `manageUrl` (behind-the-scenes studio where they can edit the rikma, add/remove ' +
+      'missions, products and resources, adjust hours +/-, watch shares update live, and sign up & create from there), ' +
+      'plus `signupUrl` (direct 1-screen prefilled signup); "join" (join rikmas - pass aboutText: who they are, what ' +
+      'they do); "order" (they want something made or arranged - pass wishText). ' +
+      'You cannot sign, set a password or confirm the email for them, and nothing is created until they do. ' +
+      'Always give them BOTH `previewUrl` (public rikma page) and `manageUrl` (behind-the-scenes control & signup) ' +
+      'when preparing a rikma, or `signupUrl` otherwise (valid 24h). After they confirm their email they land straight ' +
+      'in what you prepared. Docs: https://1lev1.com/mcp#prepareSignup',
     // Saves a pending signup (and a preview) that nobody is bound by until they sign.
     mcp: {
       annotations: {
@@ -273,9 +277,12 @@ export function makePrepareSignupTool(clientIp: string, fetchFn: typeof fetch) {
         return {
           success: true,
           ...r,
-          next:
-            'Give the person signupUrl' + (r.previewUrl ? ' (and previewUrl, to see it first)' : '') +
-            '. They sign and choose a password there, then confirm by email.'
+          next: r.manageUrl && r.previewUrl
+            ? 'Give the person BOTH links clearly labeled: (1) previewUrl - the public rikma page (safe to share with ' +
+              'partners and customers), and (2) manageUrl - behind the scenes, where they can edit everything, add or ' +
+              'remove missions/products/resources, adjust hours +/-, see live shares, and sign up & create the rikma ' +
+              '(signupUrl is also inside manageUrl for direct signup + email confirmation).'
+            : 'Give the person signupUrl. They sign and choose a password there, then confirm by email.'
         };
       } catch (e) {
         return { success: false, message: e instanceof Error ? e.message : 'Could not prepare the signup.' };
@@ -301,17 +308,19 @@ export function makePrepareSignupTool(clientIp: string, fetchFn: typeof fetch) {
 export const prepareForSomeoneElseTool = createTool({
   id: 'prepareForSomeoneElse',
   description:
-    'Prepare a rikma on 1lev1 for ANOTHER person - not the user you are talking to - and get one link to give them: ' +
-    'for example the user markets 1lev1 and sets up a new customer\'s business, or helps another member get started. ' +
-    'NEVER use it for the user themselves; for their own business, partnership or idea use proposeRikmaBlueprint. ' +
-    'If it is not clear who the rikma is for, ask before calling. Pass that other person\'s name and email as the user ' +
-    'gave them for this, and the intent and blueprint exactly as prepareSignup takes them. If the person has no ' +
-    'account yet you get signupUrl: they sign, choose a password and confirm their email themselves, then land on the ' +
-    'prepared rikma (intent join/order also work here). If they already have an account you get receiveUrl ' +
-    '(intent business/partnership/idea with a blueprint only): opened while signed in to the account with that email, ' +
-    'it hands them the drafted rikma to review and create. Nothing is created until they do, and the user gets no ' +
-    'access to it. Refused when the email is the user\'s own. The link is valid 14 days; previewUrl shows the draft ' +
-    'to anyone with it.',
+    'Prepare a rikma on 1lev1 for ANOTHER person - not the user you are talking to - and get two links to pass on to ' +
+    'them: (1) `previewUrl` - the rich public rikma page showing products, missions, hours/rates, resources, values ' +
+    'and share split (read-only, safe to share anywhere, and live-synced with behind-the-scenes edits), and (2) ' +
+    '`manageUrl` - the behind-the-scenes studio where they can edit everything without logging in first (add/remove ' +
+    'missions, products, resources and partners, adjust hours +/- and rates, preview the public page, and click to ' +
+    'sign up or claim and create the rikma). Use this when a member markets 1lev1 and sets up a new customer\'s ' +
+    'business, or helps another member get started. NEVER use it for the user themselves; for their own business, ' +
+    'partnership or idea use proposeRikmaBlueprint. If it is not clear who the rikma is for, ask before calling. ' +
+    'Pass that other person\'s name and email as the user gave them for this, and the intent and blueprint exactly ' +
+    'as prepareSignup takes them (include detailed missions with hours & ratePerHour where relevant so they can tweak ' +
+    'hours immediately). Direct `signupUrl` (no account yet) or `receiveUrl` (existing account) is also returned. ' +
+    'Nothing is created until the recipient creates it, and the caller keeps no access once claimed. Refused when the ' +
+    'email is the user\'s own. Valid 14 days.',
   inputSchema: SignupInputSchema.extend({
     forSomeoneElse: z
       .literal(true)
@@ -336,15 +345,22 @@ export const prepareForSomeoneElseTool = createTool({
     const { forSomeoneElse: _, ...signup } = input;
     try {
       const r = await prepareSignup(signup, deps, { tokenTtlMs: HANDOFF_TOKEN_TTL_MS, receive: who.hasAccount });
-      const pass = (r.previewUrl ? ' (and previewUrl, to see it first)' : '') + ' to pass on to ' + input.name + '. ';
+      if (r.manageUrl && r.previewUrl) {
+        return {
+          success: true,
+          ...r,
+          next:
+            `Give the user BOTH links to send to ${input.name}, clearly labeled:\n` +
+            `1. Public rikma page (previewUrl): ${r.previewUrl} - how the rikma looks publicly (safe to share with partners/customers; updates live).\n` +
+            `2. Behind the scenes (manageUrl): ${r.manageUrl} - full control studio where ${input.name} can edit details, add/remove missions & products, adjust hours (+/-), see live share percentages, and ${who.hasAccount ? 'claim & create the rikma in their existing 1lev1 account' : 'sign up and create the rikma with one click'} (direct link also in ${who.hasAccount ? 'receiveUrl' : 'signupUrl'}).`
+        };
+      }
       return {
         success: true,
         ...r,
         next: who.hasAccount
-          ? 'Give the user receiveUrl' + pass + input.name + ' already has a 1lev1 account: they open it signed in to ' +
-            'the account with this email and get the review screen, where they create the rikma with one click.'
-          : 'Give the user signupUrl' + pass + input.name + ' signs and chooses a password there, confirms by email ' +
-            'and lands on the prepared rikma.'
+          ? `Give the user receiveUrl to pass on to ${input.name}. They already have a 1lev1 account: they open it signed in to the account with this email and get the review screen.`
+          : `Give the user signupUrl to pass on to ${input.name}. They sign and choose a password there, confirm by email and land on what was prepared.`
       };
     } catch (e) {
       return { success: false, message: e instanceof Error ? e.message : 'Could not prepare it.' };

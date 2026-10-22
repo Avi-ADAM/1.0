@@ -130,7 +130,58 @@
     "splitNote": "Según el valor que aporta cada parte: horas × tarifa, y los recursos a su precio. Solo ilustrativo - el reparto real se acuerda entre todos.",
     "openReal": "Ir a la rikma",
     "ownerHint": "La rikma aún no se ha creado. Quien la preparó la crea con un clic en la pantalla de revisión.",
-    "joinCta": "Unirse a 1lev1"
+    "joinCta": "Unirse a 1lev1",
+    "supportDoorTitle": "Pedir o apoyar",
+    "supportDoorDesc": "Ver los productos y recursos de la rikma",
+    "joinDoorTitle": "Unirse a la rikma",
+    "joinDoorDesc": "Misiones abiertas, habilidades y colaboración",
+    "lookingForHeading": "A quién buscamos",
+    "team": "Socios en la rikma",
+    "hoursBadge": "{{hours}} h",
+    "perHour": "/ h",
+    "consentClock": "Tiempo de acuerdo: {{label}}",
+    "totalValue": "Valor total estimado: {{amount}}"
+  },
+  "add": {
+    "products": "+ Añadir producto",
+    "rikmaMissions": "+ Añadir misión",
+    "rikmaResources": "+ Añadir recurso",
+    "partners": "+ Añadir socio",
+    "remove": "Quitar",
+    "placeholder": {
+      "products": "Nombre del producto o servicio",
+      "rikmaMissions": "Nombre de la misión",
+      "rikmaResources": "Nombre del recurso",
+      "partners": "Nombre del socio/a"
+    }
+  },
+  "hoursControl": {
+    "minus": "Restar hora",
+    "plus": "Sumar hora",
+    "plusFive": "+5 h",
+    "hoursBadge": "{{hours}} h",
+    "rateMinus": "Bajar tarifa",
+    "ratePlus": "Subir tarifa"
+  },
+  "tabs": {
+    "edit": "Entre bastidores - edición y control",
+    "public": "Vista pública de la rikma"
+  },
+  "liveSplit": {
+    "heading": "Reparto en vivo (según horas y recursos)"
+  },
+  "studio": {
+    "badge": "Entre bastidores",
+    "greeting": "La rikma está lista para {{name}} - puedes editarlo todo antes de registrarte",
+    "subtitle": "Añade o quita misiones, ajusta horas y tarifas, edita productos y observa en vivo cómo cambian la página pública y las participaciones. Cuando esté listo, regístrate y créalo todo en un clic.",
+    "publicLinkLabel": "Enlace a la página pública de la rikma (para compartir)",
+    "studioLinkLabel": "Enlace entre bastidores (edición y control)",
+    "openPublic": "Abrir página pública",
+    "signupAndCreate": "Registrarse y crear la rikma",
+    "receiveAndCreate": "Recibir y crear la rikma en tu cuenta",
+    "proceeding": "Guardando y continuando…",
+    "waitingEmail": "Ya firmaste y elegiste contraseña - confirma el correo que te enviamos para entrar y crear la rikma en un clic. Cualquier cambio guardado aquí te esperará dentro.",
+    "savedPublic": "Guardado - la página pública de la rikma también se actualizó al instante."
   },
   "share": {
     "button": "Enlace de vista previa para socios",
