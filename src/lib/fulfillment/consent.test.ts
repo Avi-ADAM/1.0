@@ -1,5 +1,16 @@
 import { describe, expect, it } from 'vitest';
-import { agreedIn, answerRound, askedIn, matureRule, openRound, readRuleVotes, roundComplete, roundOf, votsInput } from './consent';
+import {
+  agreedIn,
+  answerRound,
+  askedIn,
+  matureRule,
+  openRound,
+  readRuleVotes,
+  roundAskingMe,
+  roundComplete,
+  roundOf,
+  votsInput
+} from './consent';
 
 const NOW = '2026-10-19T10:00:00.000Z';
 
@@ -26,6 +37,30 @@ describe('rounds', () => {
     expect(v.filter((x) => x.userId === '7')).toHaveLength(1);
     expect(roundComplete(v, ['7', '8'])).toBe(false);
     expect(roundComplete(answerRound(v, '8', NOW), ['7', '8'])).toBe(true);
+  });
+});
+
+describe('roundAskingMe — a counter to my rule waits for me', () => {
+  const LATER = '2026-10-19T11:00:00.000Z';
+
+  it('names who countered and why, while my row in the standing round is open', () => {
+    const r1 = openRound([], '1', ['7', '8'], NOW);
+    const r2 = openRound(r1, '7', ['1', '7', '8'], NOW, 'רק עד 10 ביום');
+    expect(roundAskingMe(r2, '1')).toEqual({ openerId: '7', why: 'רק עד 10 ביום' });
+  });
+
+  it('the opener stays the first yes even after others answered', () => {
+    const r2 = openRound(openRound([], '1', ['7', '8'], NOW), '7', ['1', '7', '8'], NOW, 'פחות');
+    const answered = answerRound(r2, '8', LATER);
+    expect(roundAskingMe(answered, '1')?.openerId).toBe('7');
+  });
+
+  it('nothing once I answered, nothing when I am not asked, nothing on my own round', () => {
+    const r2 = openRound(openRound([], '1', ['7'], NOW), '7', ['1', '7'], NOW);
+    expect(roundAskingMe(answerRound(r2, '1', LATER), '1')).toBeNull();
+    expect(roundAskingMe(r2, '9')).toBeNull();
+    expect(roundAskingMe(openRound([], '1', ['7'], NOW), '1')).toBeNull();
+    expect(roundAskingMe([], '1')).toBeNull();
   });
 });
 

@@ -63,6 +63,7 @@ function order(over: Partial<ShopOrder> = {}): ShopOrder {
     ],
     sales: [],
     shortUnits: 0,
+    fulfillmentPending: false,
     ...over
   };
 }

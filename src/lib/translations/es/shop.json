@@ -730,5 +730,13 @@
     "error": "No se pudo guardar la configuración de envíos",
     "methodRules": "Se encarga: {{names}}",
     "pointRules": "Prepara las recogidas aquí: {{names}}"
+  },
+  "retry": {
+    "title": "Las tareas de este pedido no se abrieron",
+    "body": "Las reglas de la rikma no pudieron abrir las tareas. Puedes intentarlo de nuevo: solo se abrirá lo que falta.",
+    "button": "Intentar de nuevo",
+    "busy": "Intentando…",
+    "done": "Las tareas están abiertas",
+    "failed": "Todavía no funcionó. Inténtalo de nuevo en un momento."
   }
 }

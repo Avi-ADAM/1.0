@@ -11,6 +11,7 @@ import { asUser as asShiftUser } from '$lib/server/shifts/exec.js';
 import { setAskCommitment, setMissionCommitment } from '$lib/server/shifts/store.js';
 import { loadOfferDeal, notifyDealClients } from '$lib/server/deal/offerDeal.js';
 import { scope, decisionScope, scopeList } from '$lib/realtime/scopes.js';
+import { acceptShownRoleRules } from '$lib/server/fulfillment/roleRules';
 
 /**
  * "I can do only 2 shifts a week" / "I want up to 7" (PLAN_SHIFTS §3.8): a
@@ -246,8 +247,15 @@ const applyToMissionHandler: ActionExecutionHandler = async (params, context, { 
       context.fetch
     );
 
+    const acceptedRules = await acceptShownRoleRules((qid, vars) => strapi.execute(qid, vars, context.jwt, context.fetch), String(context.userId), {
+      projectId: String(projectId),
+      openMissionId: String(openMissionId),
+      roleIds: (omAttrs.tafkidims?.data ?? []).map((t: any) => String(t.id)),
+      ruleIds: params.acceptedRuleIds
+    });
+
     return {
-      data: { mesimabetahalichId: chiluzh, openMissionId, solo: true },
+      data: { mesimabetahalichId: chiluzh, openMissionId, solo: true, acceptedRules },
       updateStrategy: { type: 'none' },
     };
   }
@@ -317,8 +325,14 @@ const applyToMissionHandler: ActionExecutionHandler = async (params, context, { 
     }
   }
 
+  const acceptedRules = await acceptShownRoleRules((qid, vars) => strapi.execute(qid, vars, context.jwt, context.fetch), String(context.userId), {
+    projectId: String(projectId),
+    openMissionId: String(openMissionId),
+    ruleIds: params.acceptedRuleIds
+  });
+
   return {
-    data: { askId, openMissionId },
+    data: { askId, openMissionId, acceptedRules },
     updateStrategy: { type: 'none' },
   };
 };
@@ -336,6 +350,8 @@ export const applyToMissionConfig: ActionConfig = {
     // Shift commitment per cycle, for a mission staffed in shifts (PLAN_SHIFTS §3.8).
     shiftsMin: { type: 'number', required: false },
     shiftsMax: { type: 'number', required: false },
+    // The role rules the page showed with the mission's terms (PLAN_SHOP_OPERATIONS §2.3).
+    acceptedRuleIds: { type: 'array', required: false },
   },
 
   authRules: [{ type: 'jwt' }],

@@ -84,6 +84,22 @@ export function answerRound(votes: RuleVote[], userId: string, nowIso: string, w
   return [...kept, { userId, what: true, order: round, why: why ?? null, zman: nowIso }];
 }
 
+/**
+ * The standing round waits for me, and someone else opened it — a counter to
+ * my rule. Who opened it and why (their row is the round's first yes), or null
+ * when I am not asked or already answered.
+ */
+export function roundAskingMe(votes: RuleVote[], userId: string): { openerId: string; why: string | null } | null {
+  const round = roundOf(votes);
+  if (round === 0) return null;
+  const rows = votes.filter((v) => v.order === round);
+  if (!rows.some((v) => v.userId === userId && v.what === null)) return null;
+  const opener = rows
+    .filter((v) => v.what === true && v.userId !== userId)
+    .sort((a, b) => (a.zman ?? '').localeCompare(b.zman ?? ''))[0];
+  return opener ? { openerId: opener.userId, why: opener.why } : null;
+}
+
 /** RuleVote[] → the Decision `vots` component input. */
 export function votsInput(votes: RuleVote[]): Array<Record<string, unknown>> {
   return votes.map((v) => {

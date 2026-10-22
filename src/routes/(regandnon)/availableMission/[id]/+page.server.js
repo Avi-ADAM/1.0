@@ -144,6 +144,7 @@ async function awaitapi(mId, lang, tok, fetch) {
  *   mId: string,
  *   tok: boolean,
  *   alld: any | null,
+ *   roleRules: import('$lib/fulfillment/ruleTerms').RoleRuleView[],
  *   authExpired: boolean,
  *   loadError: 'auth'|'notfound'|'server'|null,
  *   sessionExpired: boolean,
@@ -179,6 +180,26 @@ export async function load({ locals, params, fetch, cookies, depends }) {
 
   const { alld, authExpired, loadError } = await awaitapi(mId, lang, tok, fetch);
 
+  // The rikma's automation rules that come with this mission's roles — terms of
+  // the assignment, shown before applying (PLAN_SHOP_OPERATIONS §2.3). Only for
+  // someone signed in (a guest cannot apply), and never a reason to fail the page.
+  /** @type {import('$lib/fulfillment/ruleTerms').RoleRuleView[]} */
+  let roleRules = [];
+  const rulesProjectId = alld?.attributes?.project?.data?.id;
+  const roleIds = (alld?.attributes?.tafkidims?.data ?? []).map((/** @type {any} */ r) => String(r.id));
+  if (tok !== false && !authExpired && rulesProjectId && roleIds.length) {
+    try {
+      const { strapiClient } = await import('$lib/server/actions/index.js');
+      const { loadRoleRules } = await import('$lib/server/fulfillment/roleRules');
+      roleRules = await loadRoleRules((qid, vars) => strapiClient.execute(qid, vars, undefined, fetch), {
+        projectId: String(rulesProjectId),
+        roleIds
+      });
+    } catch (e) {
+      console.warn(`[availableMission/${mId}] role rules unavailable:`, e);
+    }
+  }
+
   // UGC translation (PLAN_UGC_TRANSLATION §7) — the mission's own page. The
   // directory already bought this mission's *name* and its rikma's name, so
   // those two arrive as cache hits at no cost; the full description is the one
@@ -202,6 +223,7 @@ export async function load({ locals, params, fetch, cookies, depends }) {
     // let `authExpired` explain why and offer the way back in.
     tok: tok !== false && !authExpired,
     alld,
+    roleRules,
     authExpired,
     loadError,
     // Set once, on the request that found the dead cookie (hooks.server.js).

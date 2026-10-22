@@ -8310,7 +8310,7 @@ Fields: `and`, `appruved`, `archiveEffectiveFrom`, `archive_decisions`, `archive
 Fields: `and`, `assignedMember`, `costShape`, `createdAt`, `hoursPerUnit`, `id`, `matanot`, `mesimabetahalich`, `mode`, `nego`, `not`, `notes`, `or`, `partof`, `pendm`, `publishedAt`, `ratePerHour`, `stepCapacity`, `unitsPerProduct`, `updatedAt`
 
 #### MatanotRecipeResourceFiltersInput
-Fields: `and`, `assignedMember`, `costShape`, `createdAt`, `id`, `kindOf`, `mashabetahalich`, `matanot`, `mode`, `nego`, `not`, `notes`, `or`, `pmash`, `priceMode`, `pricePerUnit`, `product_variant`, `publishedAt`, `quantityPerUnit`, `stepCapacity`, `updatedAt`
+Fields: `and`, `archived`, `archivedAt`, `assignedMember`, `costShape`, `createdAt`, `id`, `kindOf`, `mashabetahalich`, `matanot`, `mode`, `nego`, `not`, `notes`, `or`, `pmash`, `priceMode`, `pricePerUnit`, `product_variant`, `publishedAt`, `quantityPerUnit`, `stepCapacity`, `updatedAt`
 
 #### MatanotpendFiltersInput
 Fields: `and`, `createdAt`, `forums`, `id`, `matanot`, `negos`, `not`, `or`, `publishedAt`, `resolvedAt`, `status_pend`, `timegrama`, `updatedAt`, `votes`
@@ -9264,7 +9264,7 @@ Wrapper types for GraphQL responses.
 ```
 src/
 ├── generated/
-│   ├── graphql.ts              # Auto-generated types (codegen) - 23891 lines
+│   ├── graphql.ts              # Auto-generated types (codegen) - 23897 lines
 │   ├── index.ts                # Re-export hub
 │   └── STRAPI_SCHEMA_REFERENCE.md  # This file (AI agent reference)
 ├── lib/

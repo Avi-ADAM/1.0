@@ -294,6 +294,11 @@ export interface RuleProposal {
   /** When silence becomes my yes, if the rule rides a Decision. */
   deadline: string | null;
   decisionId: string | null;
+  /**
+   * My own rule, countered by someone it lands on (§2.3): the round asks me
+   * back. Who changed it and why — the card leads with that instead of "X proposes".
+   */
+  counter?: { byName: string | null; why: string | null } | null;
 }
 
 /** The sales screen's Fulfilment tab (server/fulfillment/setup.ts). */

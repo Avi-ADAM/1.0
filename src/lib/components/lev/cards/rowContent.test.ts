@@ -332,4 +332,9 @@ describe('fulfil rows (PLAN_SHOP_OPERATIONS A2–A3)', () => {
       params: undefined
     });
   });
+
+  it('on my own rule, says who countered it — not "Dana proposes" about myself', () => {
+    const row = rowContent({ ...base('fulfillRule'), counter: { byName: 'יוסי', why: 'רק עד 10 ביום' } });
+    expect(row.subtitle).toEqual({ key: 'lev.list.sub.fulfillRuleCounter', params: { name: 'יוסי' } });
+  });
 });

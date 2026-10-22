@@ -935,7 +935,8 @@
       "fulfillWave": "Una tanda de {{count}} pedidos",
       "fulfillStock": "Poco stock: {{name}}",
       "fulfillRule": "Propuesta de {{name}} — espera tu respuesta",
-      "fulfillRuleAnon": "Una regla que recae en ti — espera tu respuesta"
+      "fulfillRuleAnon": "Una regla que recae en ti — espera tu respuesta",
+      "fulfillRuleCounter": "{{name}} propuso un cambio — espera tu respuesta"
     },
     "title": {
       "transfer": "{{from}} → {{to}}",
@@ -1086,6 +1087,17 @@
     "noReject": "Aquí no hay \"no\": puedes cambiar la regla — es una contrapropuesta que abre una nueva ronda.",
     "agreed": "Aceptaste — la regla está activa",
     "agreedWaiting": "Tu consentimiento quedó registrado — la regla aún espera a otros",
-    "error": "Algo salió mal, inténtalo de nuevo"
+    "error": "Algo salió mal, inténtalo de nuevo",
+    "counteredBy": "{{name}} propuso un cambio en tu regla:",
+    "countered": "Se propuso un cambio en tu regla:",
+    "targetOther": {
+      "role": "Se abre una tarea para el rol {{role}}",
+      "mission": "Se abre una tarea dentro de la misión \"{{mission}}\"",
+      "member": "Se abre una tarea para el miembro al que se aplica la regla"
+    },
+    "roleTerms": {
+      "title": "Reglas de automatización que vienen con el rol",
+      "note": "Al postularte aceptas también estas reglas. Si una regla cambia, se te pedirá de nuevo."
+    }
   }
 }

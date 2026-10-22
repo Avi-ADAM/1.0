@@ -105,7 +105,8 @@ export function toShopOrder(node: any): ShopOrder | null {
       inSplit: s.attributes?.splited === true || (s.attributes?.tosplits?.data ?? []).length > 0,
       amount: num(s.attributes?.in)
     })),
-    shortUnits: 0
+    shortUnits: 0,
+    fulfillmentPending: a.fulfillmentPending === true
   };
 }
 

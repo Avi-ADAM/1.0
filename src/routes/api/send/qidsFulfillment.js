@@ -329,6 +329,7 @@ export const fulfillmentQids = {
       data { id attributes {
         fulfillmentStep { data { id } }
         timegrama { data { attributes { date done } } }
+        vots { what order why zman ide users_permissions_user { data { id attributes { username } } } }
       } }
     }
   }`,

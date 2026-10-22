@@ -17,6 +17,7 @@
   import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
   import { fly } from 'svelte/transition';
   import { computeHeadcount } from '$lib/missions/headcount';
+  import RoleRulesTerms from '$lib/components/mission/RoleRulesTerms.svelte';
 
   //TODO: get asked from server then show you alr .., find a way to get title
   let error1 = null;
@@ -42,6 +43,8 @@
   let commitMin = $state(/** @type {number|null} */ (null));
   let commitMax = $state(/** @type {number|null} */ (null));
   const isShiftMission = $derived(data.alld?.attributes?.isshift === true);
+  /** The role rules shown with the terms — applying agrees to them (PLAN_SHOP_OPERATIONS §2.3). */
+  const acceptedRuleIds = $derived((data.roleRules ?? []).map((r) => r.stepId));
 
   async function ask() {
     alr = true;
@@ -83,7 +86,8 @@
         projectId: String(inD.attributes.project.data.id),
         ...(isShiftMission
           ? { shiftsMin: commitMin ?? undefined, shiftsMax: commitMax ?? undefined }
-          : {})
+          : {}),
+        ...(acceptedRuleIds.length ? { acceptedRuleIds } : {})
       });
 
       if (!result.success) {
@@ -123,7 +127,8 @@
         openMissionId: String(data.mId),
         projectId: String(inD.attributes.project.data.id),
         newValues,
-        originalValues
+        originalValues,
+        ...(acceptedRuleIds.length ? { acceptedRuleIds } : {})
       });
       if (!result.success) {
         toast.error(result.error?.message ?? 'שגיאה בשליחת ההצעה');
@@ -686,6 +691,7 @@
                       />
                     </p>{/each}
                 </div>
+                <RoleRulesTerms rules={data.roleRules ?? []} />
               {/if}
               {#if data.alld.attributes.work_ways?.data?.length > 0}
                 <small class="text-sm lg:text-2xl text-barbi"

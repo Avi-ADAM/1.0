@@ -70,6 +70,7 @@ import {
   ruleDeadlines,
   withdrawFromRule
 } from '$lib/server/fulfillment/consent';
+import { roundAskingMe } from '$lib/fulfillment/consent';
 import { openMissionHref, routingStateOf } from '$lib/server/fulfillment/apply';
 
 type Strapi = { execute: (qid: string, vars: any, jwt?: any, fetchFn?: any) => Promise<any> };
@@ -453,16 +454,24 @@ async function myProposals(run: (qid: string, vars: Record<string, unknown>) => 
     rolesByProject.set(pid, set);
   }
   const out: RuleProposal[] = [];
+  // My own rules still being agreed — a counter to one of them asks me back.
+  const authored = new Set<string>();
   for (const node of stepsRes?.data?.fulfillmentSteps?.data ?? []) {
     const s = stepOf(node);
     // A paused rule opens nothing — asking about it now would only nag.
-    if (!s || s.archived || s.consentState === 'paused' || s.consentedBy.includes(uid) || s.proposedById === uid) continue;
+    if (!s || s.archived || s.consentState === 'paused') continue;
     const pid = node?.attributes?.project?.data?.id != null ? String(node.attributes.project.data.id) : '';
-    const mine =
-      (s.target === 'member' && s.memberId === uid) ||
-      (s.target === 'mission' && !!s.missionId && missionIds.has(s.missionId)) ||
-      (s.target === 'role' && !!s.roleId && (rolesByProject.get(pid)?.has(s.roleId) ?? false));
-    if (!mine) continue;
+    if (s.proposedById === uid) {
+      if (s.consentState !== 'proposed') continue;
+      authored.add(s.id);
+    } else {
+      if (s.consentedBy.includes(uid)) continue;
+      const mine =
+        (s.target === 'member' && s.memberId === uid) ||
+        (s.target === 'mission' && !!s.missionId && missionIds.has(s.missionId)) ||
+        (s.target === 'role' && !!s.roleId && (rolesByProject.get(pid)?.has(s.roleId) ?? false));
+      if (!mine) continue;
+    }
     out.push({
       stepId: s.id,
       projectId: pid,
@@ -490,8 +499,13 @@ async function myProposals(run: (qid: string, vars: Record<string, unknown>) => 
       p.deadline = d.deadline;
       p.decisionId = d.decisionId;
     }
+    if (authored.has(p.stepId)) {
+      const asking = d ? roundAskingMe(d.votes, uid) : null;
+      p.counter = asking ? { byName: d?.names[asking.openerId] ?? null, why: asking.why } : null;
+    }
   }
-  return out;
+  // My own rule is a card only while a counter waits for my answer.
+  return out.filter((p) => !authored.has(p.stepId) || !!p.counter);
 }
 
 const getWork: ActionExecutionHandler = async (_params, context, { strapi }) => {

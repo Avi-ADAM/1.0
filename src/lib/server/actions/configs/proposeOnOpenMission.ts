@@ -20,6 +20,7 @@ import { normalizeLocationInput } from './actionUtils.js';
 import { ensureCandidacyTimegrama } from '../../nego/timegrama.js';
 import { createVolunteerProposal } from '$lib/server/wish/volunteerProposal.js';
 import { scope, decisionScope, scopeList } from '$lib/realtime/scopes.js';
+import { acceptShownRoleRules } from '$lib/server/fulfillment/roleRules';
 
 export const openMissionProposalHandler: ActionExecutionHandler = async (params, context, { strapi, notifier }) => {
   const { openMissionId } = params;
@@ -133,8 +134,15 @@ export const openMissionProposalHandler: ActionExecutionHandler = async (params,
 
   const recipientIds = Array.from(new Set([...memberIds, requesterId].filter(Boolean)));
 
+  // The role rules the page showed are terms of this request too (PLAN_SHOP_OPERATIONS §2.3).
+  const acceptedRules = await acceptShownRoleRules(
+    (qid, vars) => strapi.execute(qid, vars, context.jwt, context.fetch),
+    String(context.userId),
+    { projectId: String(projectId), openMissionId: String(openMissionId), ruleIds: params.acceptedRuleIds }
+  );
+
   return {
-    data: { askId, openMissionId },
+    data: { askId, openMissionId, acceptedRules },
     recipientIds,
     updateStrategy: { type: 'none' },
   };
@@ -159,6 +167,11 @@ export const proposeOnOpenMissionConfig: ActionConfig = {
       type: 'object',
       required: false,
       description: "The rikma's baseline terms (reference only - not written anywhere)",
+    },
+    acceptedRuleIds: {
+      type: 'array',
+      required: false,
+      description: 'The role automation rules the page showed with the terms — applying agrees to them'
     },
   },
 

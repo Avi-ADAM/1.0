@@ -90,6 +90,11 @@ export interface ShopOrder {
   sales: ShopOrderSale[];
   /** Units the stock still does not cover *now* — 0 once it was restocked. */
   shortUnits: number;
+  /**
+   * The automation could not open this order's acts (PLAN_SHOP_OPERATIONS A1,
+   * risk 2) — the order page offers "try again" (`retryOrderFulfillment`).
+   */
+  fulfillmentPending: boolean;
 }
 
 // ─── small readers ──────────────────────────────────────────────────────────

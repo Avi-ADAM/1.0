@@ -730,5 +730,13 @@
     "error": "The shipping settings could not be saved",
     "methodRules": "Handled by: {{names}}",
     "pointRules": "Prepares the pickups here: {{names}}"
+  },
+  "retry": {
+    "title": "This order's tasks did not open",
+    "body": "The rikma's fulfillment rules could not open the tasks. You can try again — only what is missing will open.",
+    "button": "Try again",
+    "busy": "Trying…",
+    "done": "The tasks are open",
+    "failed": "Still did not work. Try again in a moment."
   }
 }

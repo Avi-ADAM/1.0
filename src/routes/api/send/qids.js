@@ -17632,7 +17632,7 @@ ${STIPEND_DECISION_FIELDS}
       data { id attributes {
         ref displayNumber status oversold total currencyCode note source
         buyerName buyerEmail buyerPhone deliveryPreference deliveryAddress
-        paymentRef paymentMethod paidAt shippedAt fulfilledAt expiresAt createdAt
+        paymentRef paymentMethod paidAt shippedAt fulfilledAt expiresAt createdAt fulfillmentPending
         holder { data { id attributes { username } } }
         lines(pagination: { limit: 100 }) { data { id attributes {
           position quantity unitPrice lineTotal

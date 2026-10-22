@@ -170,7 +170,17 @@ export async function closeRuleDecisions(run: Run, stepId: string): Promise<void
   }
 }
 
-type Deadlines = Map<string, { deadline: string; decisionId: string }>;
+type Deadlines = Map<
+  string,
+  {
+    deadline: string;
+    decisionId: string;
+    /** The Decision's rounds — who is asked in the standing one, and who opened it. */
+    votes: RuleVote[];
+    /** Usernames of the people in `votes`. */
+    names: Record<string, string>;
+  }
+>;
 
 /**
  * When each step's silence becomes consent, and whether the clock exists at
@@ -186,7 +196,14 @@ export async function ruleClock(run: Run, stepIds: string[]): Promise<{ ready: b
     for (const d of res?.data?.decisions?.data ?? []) {
       const sid = d?.attributes?.fulfillmentStep?.data?.id;
       const tg = d?.attributes?.timegrama?.data?.attributes;
-      if (sid != null && tg?.date && !tg.done) deadlines.set(String(sid), { deadline: tg.date, decisionId: String(d.id) });
+      if (sid == null || !tg?.date || tg.done) continue;
+      const raw = d?.attributes?.vots ?? [];
+      const names: Record<string, string> = {};
+      for (const v of raw) {
+        const u = v?.users_permissions_user?.data;
+        if (u?.id != null && u.attributes?.username) names[String(u.id)] = u.attributes.username;
+      }
+      deadlines.set(String(sid), { deadline: tg.date, decisionId: String(d.id), votes: readRuleVotes(raw), names });
     }
     return { ready: true, deadlines };
   } catch {

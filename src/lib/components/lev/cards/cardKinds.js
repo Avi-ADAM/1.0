@@ -702,9 +702,11 @@ const ROW_CONTENT = {
 
   fulfillRule: (b) => ({
     title: T(b.name),
-    subtitle: T(b.proposedByName)
-      ? K('lev.list.sub.fulfillRule', { name: T(b.proposedByName)?.text })
-      : K('lev.list.sub.fulfillRuleAnon')
+    subtitle: b.counter
+      ? K('lev.list.sub.fulfillRuleCounter', { name: T(b.counter.byName)?.text ?? '—' })
+      : T(b.proposedByName)
+        ? K('lev.list.sub.fulfillRule', { name: T(b.proposedByName)?.text })
+        : K('lev.list.sub.fulfillRuleAnon')
   })
 };
 

@@ -934,7 +934,8 @@
       "fulfillWave": "A wave of {{count}} orders",
       "fulfillStock": "Low stock: {{name}}",
       "fulfillRule": "Proposed by {{name}} — waiting for your answer",
-      "fulfillRuleAnon": "A rule that lands on you — waiting for your answer"
+      "fulfillRuleAnon": "A rule that lands on you — waiting for your answer",
+      "fulfillRuleCounter": "{{name}} proposed a change — waiting for your answer"
     },
     "title": {
       "transfer": "{{from}} → {{to}}",
@@ -1085,6 +1086,17 @@
     "noReject": "There is no \"no\" here: you can change the rule — a counter-proposal that starts a new round.",
     "agreed": "You agreed — the rule is live",
     "agreedWaiting": "Your consent is recorded — the rule still waits for others",
-    "error": "Something went wrong, please try again"
+    "error": "Something went wrong, please try again",
+    "counteredBy": "{{name}} proposed a change to your rule:",
+    "countered": "A change to your rule was proposed:",
+    "targetOther": {
+      "role": "A task opens for the {{role}} role",
+      "mission": "A task opens inside the mission \"{{mission}}\"",
+      "member": "A task opens for the member the rule lands on"
+    },
+    "roleTerms": {
+      "title": "Automation rules that come with the role",
+      "note": "Applying includes agreeing to these rules. If a rule changes, you will be asked again."
+    }
   }
 }

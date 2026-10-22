@@ -7,8 +7,11 @@
    */
   import { t, locale } from '$lib/translations';
   import { toast } from 'svelte-sonner';
+  import { invalidate } from '$app/navigation';
+  import { executeAction } from '$lib/client/actionClient';
   import { useFormatMoney } from '$lib/money/context.svelte';
   import { addressExtras, addressLine, type ShopOrder } from '$lib/shop/manage';
+  import { shopOrdersKey } from '$lib/shop/keys';
 
   let {
     order,
@@ -68,6 +71,26 @@
     ].filter((x): x is { key: string; at: string | null } => !!x)
   );
 
+  // The automation could not open this order's acts (A1, risk 2). The engine is
+  // idempotent: a retry opens only what is missing, and a clean run clears the flag.
+  let retrying = $state(false);
+  async function retryFulfillment() {
+    retrying = true;
+    const res = await executeAction(
+      'retryOrderFulfillment' as any,
+      { projectId, orderId: order.id },
+      { showErrorToast: false }
+    ).catch(() => null);
+    retrying = false;
+    const failed = (res?.data?.failed ?? []).length;
+    if (res?.success && failed === 0) {
+      toast.success($t('shop.retry.done'));
+      invalidate(shopOrdersKey(projectId));
+    } else {
+      toast.error($t('shop.retry.failed'));
+    }
+  }
+
   async function copyAddress() {
     const text = [order.buyer.name, address, extras, order.buyer.phone, order.delivery.address?.notes].filter(Boolean).join('\n');
     try {
@@ -80,6 +103,17 @@
 </script>
 
 <div class="od" class:od-compact={compact}>
+  {#if order.fulfillmentPending && order.status !== 'cancelled'}
+    <section class="od-short" aria-labelledby="od-retry-{order.id}">
+      <strong id="od-retry-{order.id}" class="od-short-head">{$t('shop.retry.title')}</strong>
+      <p>{$t('shop.retry.body')}</p>
+      <div class="od-row">
+        <button type="button" class="sh-btn sh-btn-warn" onclick={retryFulfillment} disabled={retrying} aria-busy={retrying}>
+          {retrying ? $t('shop.retry.busy') : $t('shop.retry.button')}
+        </button>
+      </div>
+    </section>
+  {/if}
   {#if order.shortUnits > 0}
     <section class="od-short" aria-labelledby="od-short-{order.id}">
       <div class="od-short-head">
