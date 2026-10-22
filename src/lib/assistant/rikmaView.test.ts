@@ -70,4 +70,46 @@ describe('blueprintToRikmaView', () => {
   it('no numbers → no split', () => {
     expect(blueprintToRikmaView({ fields: { name: 'x' }, items: [row({ key: 'a', group: 'rikmaMissions', label: 'm' })] }).split).toEqual([]);
   });
+
+  it('projects rich mission, product and rikma metadata while stripping HTML safely', () => {
+    const rich = blueprintToRikmaView({
+      fields: {
+        name: 'אור',
+        descripFor: 'אדריכלית ומפתחת',
+        location: { isOnline: true },
+        restime: 'sth'
+      },
+      items: [
+        row({
+          key: 'm1',
+          group: 'rikmaMissions',
+          label: 'תכנון',
+          spec: {
+            descrip: '<p>סקיצה <strong>ראשונית</strong></p>',
+            hours: 12,
+            ratePerHour: 200,
+            recurring: true,
+            roles: ['אדריכלית'],
+            skills: ['שרטוט']
+          }
+        })
+      ]
+    });
+    expect(rich).toMatchObject({
+      name: 'אור',
+      descripFor: 'אדריכלית ומפתחת',
+      isOnline: true,
+      restime: 'sth'
+    });
+    expect(rich.missions[0]).toEqual({
+      label: 'תכנון',
+      text: 'סקיצה ראשונית',
+      holder: { kind: 'open' },
+      hours: 12,
+      ratePerHour: 200,
+      recurring: true,
+      roles: ['אדריכלית'],
+      skills: ['שרטוט']
+    });
+  });
 });

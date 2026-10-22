@@ -297,6 +297,50 @@ describe('BlueprintReview — full detail before creation', () => {
     await fireEvent.click(getByRole('button', { name: /rikmaImport\.row\.details/ }));
     expect((getByDisplayValue('40') as HTMLInputElement).disabled).toBe(true);
   });
+
+  it('quick +/- hour controls and adding a new mission update value & live split, and save/proceed cleanly in behind-the-scenes studio mode', async () => {
+    const saveStudio = vi.fn().mockResolvedValue({
+      success: true,
+      data: { version: 6, fields: series.fields, items: series.items, applied: 3, rejected: [], conflict: false }
+    });
+    const proceedStudio = vi.fn().mockResolvedValue(undefined);
+
+    const { getByTestId, getByRole, getAllByPlaceholderText } = render(BlueprintReview, {
+      props: {
+        session: series,
+        studio: {
+          save: saveStudio,
+          proceed: proceedStudio,
+          proceedLabel: 'rikmaImport.studio.signupAndCreate',
+          previewUrl: 'https://www.1lev1.com/preview/rikma/8.abc'
+        }
+      }
+    });
+
+    // Click +5h twice on mission m1 (40 → 50h; 50 × 150 = 7,500 vs m2 10 × 200 = 2,000)
+    const stepper = getByTestId('hours-stepper-m1');
+    const plusFive = stepper.querySelectorAll('button')[2];
+    await fireEvent.click(plusFive);
+    await fireEvent.click(plusFive);
+    expect(getByTestId('live-split').textContent).toContain('7,500');
+
+    // Add a new mission right in the studio
+    await fireEvent.click(getByRole('button', { name: 'rikmaImport.add.rikmaMissions' }));
+    const missionInputs = getAllByPlaceholderText('rikmaImport.add.placeholder.rikmaMissions');
+    await fireEvent.input(missionInputs[missionInputs.length - 1], { target: { value: 'עריכת וידאו' } });
+
+    // Switch to live public preview tab and verify new mission is already visible before saving
+    await fireEvent.click(getByRole('tab', { name: 'rikmaImport.tabs.public' }));
+    expect(getByTestId('rikma-public-preview').textContent).toContain('עריכת וידאו');
+
+    // Clicking "Sign up & create this rikma" auto-saves pending studio edits first, then navigates
+    await fireEvent.click(getByRole('button', { name: 'rikmaImport.studio.signupAndCreate' }));
+    expect(saveStudio).toHaveBeenCalledWith(5, [
+      { op: 'setSpec', key: 'm1', spec: { hours: 50 } },
+      { op: 'add', group: 'rikmaMissions', label: 'עריכת וידאו', spec: { holder: 'me', hours: 10 } }
+    ]);
+    expect(proceedStudio).toHaveBeenCalledTimes(1);
+  });
 });
 
 /** The "details" toggle of the row with this name. */

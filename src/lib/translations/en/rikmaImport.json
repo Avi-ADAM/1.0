@@ -130,7 +130,58 @@
     "splitNote": "By the value each side brings: hours × rate, and resources at their price. An illustration only - the real split is agreed together.",
     "openReal": "Go to the rikma",
     "ownerHint": "The rikma has not been created yet. Whoever drafted it creates it with one click on the review screen.",
-    "joinCta": "Join 1lev1"
+    "joinCta": "Join 1lev1",
+    "supportDoorTitle": "Order or support",
+    "supportDoorDesc": "Explore what the rikma offers and brings",
+    "joinDoorTitle": "Join the rikma",
+    "joinDoorDesc": "Open missions, skills and partnership shares",
+    "lookingForHeading": "Who we are looking for",
+    "team": "Partners in the rikma",
+    "hoursBadge": "{{hours}} hrs",
+    "perHour": "/ hr",
+    "consentClock": "Consent clock: {{label}}",
+    "totalValue": "Estimated total value: {{amount}}"
+  },
+  "add": {
+    "products": "+ Add product",
+    "rikmaMissions": "+ Add mission",
+    "rikmaResources": "+ Add resource",
+    "partners": "+ Add partner",
+    "remove": "Remove",
+    "placeholder": {
+      "products": "Product or service name",
+      "rikmaMissions": "Mission name",
+      "rikmaResources": "Resource name",
+      "partners": "Partner name"
+    }
+  },
+  "hoursControl": {
+    "minus": "Decrease hours",
+    "plus": "Increase hours",
+    "plusFive": "+5h",
+    "hoursBadge": "{{hours}} hrs",
+    "rateMinus": "Decrease rate",
+    "ratePlus": "Increase rate"
+  },
+  "tabs": {
+    "edit": "Behind the scenes - edit & control",
+    "public": "Public rikma view"
+  },
+  "liveSplit": {
+    "heading": "Live share preview (by hours & resources)"
+  },
+  "studio": {
+    "badge": "Behind the scenes",
+    "greeting": "Prepared for {{name}} - edit anything before signing up",
+    "subtitle": "Add or remove missions, tweak hours and rates, edit products and watch the public page and shares update live. When ready, sign up and create everything in one click.",
+    "publicLinkLabel": "Public rikma page link (to share)",
+    "studioLinkLabel": "Behind-the-scenes link (edit & control)",
+    "openPublic": "Open public page",
+    "signupAndCreate": "Sign up & create this rikma",
+    "receiveAndCreate": "Claim & create in your account",
+    "proceeding": "Saving & continuing…",
+    "waitingEmail": "You already signed and set a password - confirm the email sent to you to sign in and create the rikma in one click. Any changes saved here will be waiting inside.",
+    "savedPublic": "Saved - the public rikma page updated immediately too."
   },
   "share": {
     "button": "Preview link for partners",

@@ -1,5 +1,17 @@
 import { describe, it, expect } from 'vitest';
-import { effectiveSpec, fieldOps, fieldRaw, fieldValueError, parseValue, rowOps, rowValue, SPEC_DEFS } from './reviewEdits';
+import {
+  addRowSpec,
+  effectiveSpec,
+  fieldOps,
+  fieldRaw,
+  fieldValueError,
+  parseValue,
+  rowOps,
+  rowValue,
+  selectionOps,
+  SPEC_DEFS,
+  stepNumber
+} from './reviewEdits';
 import type { AssistantItem } from './types';
 
 const mission: AssistantItem = {
@@ -92,6 +104,35 @@ describe('fieldOps', () => {
     expect(fieldOps(fields, { vals: 'כנות, הקשבה', currency: 'usd', name: '  ' })).toEqual([
       { op: 'setField', field: 'vals', value: ['כנות', 'הקשבה'] },
       { op: 'setField', field: 'currency', value: 'USD' }
+    ]);
+  });
+});
+
+describe('stepNumber, addRowSpec & selectionOps', () => {
+  it('increments and decrements hours cleanly without going negative or drifting', () => {
+    expect(stepNumber(undefined, undefined, 1)).toBe('1');
+    expect(stepNumber(undefined, 10, -1)).toBe('9');
+    expect(stepNumber('0', 10, -5)).toBe('0');
+    expect(stepNumber('1,5', undefined, 0.5)).toBe('2');
+    expect(stepNumber('9999', undefined, 5, 10_000)).toBe('10000');
+  });
+
+  it('builds specs for newly added rows and turns checkbox flips into drop/restore ops', () => {
+    expect(addRowSpec('products', { kindOf: 'total' }, { spec: { price: '250', isOnline: true } })).toEqual({
+      kindOf: 'total',
+      price: 250,
+      pricingMode: 'fixed',
+      isOnline: true
+    });
+
+    const items: AssistantItem[] = [
+      { key: 'i1', group: 'products', label: 'א', status: 'proposed', origin: 'agent' },
+      { key: 'i2', group: 'products', label: 'ב', status: 'dropped', origin: 'agent' },
+      { key: 'i3', group: 'products', label: 'ג', status: 'applied', origin: 'agent', createdRef: { type: 'matanot', id: '1' } }
+    ];
+    expect(selectionOps(items, { i1: false, i2: true, i3: false })).toEqual([
+      { op: 'drop', key: 'i1' },
+      { op: 'restore', key: 'i2' }
     ]);
   });
 });

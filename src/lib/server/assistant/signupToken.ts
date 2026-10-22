@@ -34,6 +34,8 @@ export interface SignupTokenPayload {
   countryIds: number[];
   intent: SignupIntent;
   lang: string;
+  /** True when minted for an existing 1lev1 account (§5.7 receive flow). */
+  receive?: boolean;
   /** Issued at, ms since epoch. Absent on tokens minted before it existed. */
   iat?: number;
   /** Absolute expiry, ms since epoch. */
