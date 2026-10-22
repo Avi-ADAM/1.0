@@ -33,11 +33,12 @@ import { shiftsEnabled, shiftsMode } from '$lib/server/shifts/mode.js';
 //ask need to creater 0on first vote or on request if the requester is project member4
 //מעביר ראשון ראשון ברסק , אם מישהו ביקש מחכים למענה בעניינו ורק לאחר שיש כן 1 לפחות או לא 1 לפחות  ניתן לקבלו או לא 1 לפחות וניתן להציע לאנשים נוספים, בקשה של הקודם כאשר יש לא נשארת אך ניתן להוסיף עוד סקשות
 import { SendToAdmin } from '$lib/server/sendToAdmin.js';
-import { realtimeBroadcaster } from '$lib/server/actions/index.js';
+import { realtimeBroadcaster, strapiClient } from '$lib/server/actions/index.js';
 import { maturedScopes, relationSelection } from '$lib/server/realtime/timegramaScopes';
 import { projectIdsOf } from '$lib/realtime/scopes';
 import { tellMatured } from '$lib/server/notifications/matured';
 import { rosterClosed } from '$lib/server/notifications/maturedNotices';
+import { remindAct } from '$lib/server/fulfillment/reminder';
 // Server-only secret — never exposed to the client bundle (no VITE_ prefix).
 import { env } from '$env/dynamic/private';
 
@@ -67,7 +68,10 @@ const HANDLED_KINDS = new Set([
   'roster_period',
   // A wish proposal's terms nobody answered within the wish's pace (QA C-9). Like
   // roster_period, the relation only exists once 1.0b is deployed — see wishClockEnabled.
-  'ratson_proposal'
+  'ratson_proposal',
+  // A reminder before an automatic act is due (PLAN_SHOP_OPERATIONS A2,
+  // $lib/server/fulfillment/reminder.ts). A reminder, not a consent clock.
+  'act'
 ]);
 
 /**
@@ -242,6 +246,19 @@ async function x(id, kind, taid, fetch, scopes = []) {
     // The terms of a wish proposal nobody answered within the wish's pace: the version on
     // the table is approved for the side that stayed silent (C-9).
     await WishProposal(id, taid, fetch);
+  } else if (kind == 'act') {
+    // An automatic act is close to its due time (PLAN_SHOP_OPERATIONS A2). Whatever
+    // the act's state, the clock ends here; a failed read leaves it for the next run.
+    try {
+      const outcome = await remindAct(
+        (qid, vars) => strapiClient.execute(qid, vars),
+        String(id),
+        (notice) => tellMatured(notice, fetch)
+      );
+      await markDone(taid, `act reminder: ${outcome}`);
+    } catch (e) {
+      console.error(`[timegrama] act reminder #${id} failed:`, e);
+    }
   }
 }
 

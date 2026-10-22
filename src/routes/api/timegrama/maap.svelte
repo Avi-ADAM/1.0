@@ -41,7 +41,8 @@
   // Server-only secret — this module is imported only by timegrama/+server.js.
   import { env } from '$env/dynamic/private';
   import { tellMatured } from '$lib/server/notifications/matured';
-  import { maapSettled } from '$lib/server/notifications/maturedNotices';
+  import { maapSettled, stockReceiptSettled } from '$lib/server/notifications/maturedNotices';
+  import { receiptValueOf } from '$lib/server/fulfillment/stock';
 
   /** Close the clock. Every path that decides not to settle ends here. */
   async function markDone(taid, why) {
@@ -115,6 +116,14 @@
       // What the responsible member reported. The engine's pricePerUnit is only
       // a planned preview, used when nothing was typed.
       const spend = Number(attrs.quantityDelivered ?? mashAttrs.pricePerUnit ?? 0);
+      // A supply portion (receiveStock, PLAN_SHOP_OPERATIONS A3) delivers units
+      // worth units × its price; a recurring month's spend is both at once.
+      const receipt = await receiptValueOf(
+        (qid, vars) => strapi.execute(qid, vars),
+        String(id),
+        spend,
+        mashAttrs.pricePerUnit
+      );
 
       // Normalize the vote rows for the write-back: Strapi wants plain ids.
       const vots = allVots
@@ -138,6 +147,7 @@
           maapName: attrs.name,
           cycleIndex: attrs.cycleIndex ?? 1,
           spend,
+          ...(receipt ? { value: receipt.value, note: receipt.note } : {}),
           vots,
           // The figure is the responsible member's assertion, so the delivery
           // line is recorded under them — not under a user who never acted.
@@ -153,7 +163,12 @@
         round
       });
       // Silence did this — tell the rikma (N5).
-      await tellMatured(maapSettled({ projectId, name: attrs.name ?? mashAttrs.name ?? '' }), fetch);
+      await tellMatured(
+        receipt
+          ? stockReceiptSettled({ projectId, name: mashAttrs.name ?? attrs.name ?? '', quantity: spend })
+          : maapSettled({ projectId, name: attrs.name ?? mashAttrs.name ?? '' }),
+        fetch
+      );
       // settleCycleMaap closed the clock; this is the belt-and-braces for the
       // case where that one write failed.
       await markDone(taid, `maap ${id} settled on silence`);

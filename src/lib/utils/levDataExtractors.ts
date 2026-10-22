@@ -31,6 +31,7 @@ import { buildArchiveDecisionView } from '$lib/archive/decisionView.js';
 import { dateMatchFrom } from '$lib/resources/dateMatchView.js';
 import { buildStipendDecisionView } from '$lib/stipend/decisionView.js';
 import { calculateScore } from './suggestionMatchers';
+import { isStockReceiptMaap, receiptPriceOf } from '$lib/fulfillment/stock';
 
 /**
  * Extract pending missions (pendms) from GraphQL user data
@@ -798,6 +799,10 @@ export function extractWegets(userData: any): ResourceRequestData[] {
           myid: userData.id,
           // Recurring cycle fields (only present on recurring cycle Maaps)
           isRecurringCycle,
+          // A supply portion on a stock resource (receiveStock, PLAN_SHOP_OPERATIONS
+          // A3): units, not money — the card must not show "50" as a month's spend.
+          isStockReceipt: isStockReceiptMaap(maap.attributes, isRecurringCycle),
+          receiptUnitPrice: receiptPriceOf(maap.attributes.name),
           mashabetahalichId: mashab?.id,
           cycleIndex: maap.attributes.cycleIndex,
           cycleStart: maap.attributes.cycleStart,

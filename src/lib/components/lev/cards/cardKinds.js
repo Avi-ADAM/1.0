@@ -59,8 +59,10 @@ const RENDERABLE = new Set([
   'shiftSwap',
   'shiftStarting',
   'shiftLog',
-  // Order automation (PLAN_SHOP_OPERATIONS §2.2) — ungated: work addressed to me.
-  'fulfill'
+  // Order automation (PLAN_SHOP_OPERATIONS §2.2–2.3) — ungated: work, or a
+  // rule that would land work on me, addressed to me.
+  'fulfill',
+  'fulfillRule'
 ]);
 
 /**
@@ -122,7 +124,8 @@ const KIND_META = {
   shiftSwap: { key: 'shiftSwap', glow: 'teal' },
   shiftStarting: { key: 'shiftStarting', glow: 'teal' },
   shiftLog: { key: 'shiftLog', glow: 'teal' },
-  fulfill: { key: 'fulfill', glow: 'orange' }
+  fulfill: { key: 'fulfill', glow: 'orange' },
+  fulfillRule: { key: 'fulfillRule', glow: 'orange' }
 };
 
 /** Translation key for a kind's label, e.g. `lev.list.kind.pends`. */
@@ -685,12 +688,23 @@ const ROW_CONTENT = {
     facts: chips(f('hours', n(b.hours)))
   }),
 
-  // ── order automation (PLAN_SHOP_OPERATIONS §2.2) ─────────────────────────
+  // ── order automation (PLAN_SHOP_OPERATIONS §2.2–2.3) ─────────────────────
   fulfill: (b) => ({
     title: T(b.stepName) ?? T(b.name),
-    subtitle: b.mine
-      ? K('lev.list.sub.fulfill', { order: b.orderNumber ?? '' })
-      : K('lev.list.sub.fulfillOpen', { order: b.orderNumber ?? '', role: b.roleName ?? '' })
+    subtitle: b.wave
+      ? K('lev.list.sub.fulfillWave', { count: b.wave.actIds?.length ?? 0 })
+      : b.kind === 'stock'
+        ? K('lev.list.sub.fulfillStock', { name: T(b.stock?.name)?.text ?? T(b.stepName)?.text ?? '' })
+        : b.mine
+          ? K('lev.list.sub.fulfill', { order: b.orderNumber ?? '' })
+          : K('lev.list.sub.fulfillOpen', { order: b.orderNumber ?? '', role: b.roleName ?? '' })
+  }),
+
+  fulfillRule: (b) => ({
+    title: T(b.name),
+    subtitle: T(b.proposedByName)
+      ? K('lev.list.sub.fulfillRule', { name: T(b.proposedByName)?.text })
+      : K('lev.list.sub.fulfillRuleAnon')
   })
 };
 
@@ -773,7 +787,8 @@ const CTA_BY_ANI = {
   shiftSwap: 'answer',
   shiftStarting: 'answer',
   shiftLog: 'answer',
-  fulfill: 'answer'
+  fulfill: 'answer',
+  fulfillRule: 'answer'
 };
 
 /** Translation key for the row's primary button. */

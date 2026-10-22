@@ -8,6 +8,7 @@
  *
  * Pure: the composer, the actions, the preview page and the tests read the same rules.
  */
+import { isEssenceOnly } from '$lib/pooling/bomPrice';
 
 export const MAX_LINES = 20;
 export const MAX_NAME = 120;
@@ -164,7 +165,8 @@ export function offerView(res: any): OfferView | null {
         price: amount != null && rate != null ? round2(amount * rate) : null
       };
     }),
-    ...list(product.matanot_recipe_resources).map((l: any) => {
+    // An essence-only row is stock bookkeeping, not a part anyone prices (bomPrice.ts).
+    ...list(product.matanot_recipe_resources).filter((l: any) => !isEssenceOnly(l?.attributes)).map((l: any) => {
       const la = l.attributes ?? {};
       const amount = num(la.quantityPerUnit);
       const unit = num(la.pricePerUnit);

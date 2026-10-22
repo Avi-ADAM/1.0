@@ -9,6 +9,7 @@
  * BOM, and a hand-sent tier table is ignored (§2).
  */
 
+import { isEssenceOnly } from './bomPrice';
 import {
 	curve,
 	effectiveShape,
@@ -100,7 +101,8 @@ export function linesFromMatanot(attrs: any): DepartureLine[] {
 			stepCapacity: a.stepCapacity ?? null
 		};
 	});
-	const resources = (attrs?.matanot_recipe_resources?.data ?? []).map((n: any) => {
+	// An essence-only row says what the product consumes, not what it costs (bomPrice.ts).
+	const resources = (attrs?.matanot_recipe_resources?.data ?? []).filter((n: any) => !isEssenceOnly(n?.attributes)).map((n: any) => {
 		const a = n?.attributes ?? {};
 		return {
 			kind: 'resource' as const,

@@ -39,8 +39,16 @@ export interface SettleCycleMaapInput {
   /** Fallback name when the engine has none. */
   maapName?: string | null;
   cycleIndex: number;
-  /** The confirmed spend for this cycle. */
+  /** The confirmed spend for this cycle — for a supply portion, the units delivered. */
   spend: number;
+  /**
+   * The money value, when it is not the spend itself: a supply portion
+   * (`receiveStock`, PLAN_SHOP_OPERATIONS A3) delivers 50 jars worth 200 — the
+   * shelf grows by 50, the giver's Rikmash by 200. Absent = `spend` (a month).
+   */
+  value?: number;
+  /** A line for the delivery record ("50 × 4"). */
+  note?: string | null;
   /** The full vote list to stamp on the archived Maap. */
   vots: Array<Record<string, any>>;
   /** Whose confirmation this delivery is recorded under. */
@@ -67,6 +75,7 @@ export async function settleCycleMaap(
     confirmedBy,
     timegramaId = null
   } = input;
+  const value = input.value ?? spend;
   const now = input.now ?? new Date();
   const kindOf = mashAttrs?.kindOf ?? 'monthly';
   const responsibleId = String(mashAttrs?.users_permissions_user?.data?.id ?? '');
@@ -77,7 +86,8 @@ export async function settleCycleMaap(
     deliveredAt: now.toISOString(),
     quantity: spend,
     maap: maapId,
-    confirmedBy
+    confirmedBy,
+    ...(input.note ? { note: input.note } : {})
   };
 
   if (rikmashId) {
@@ -99,7 +109,7 @@ export async function settleCycleMaap(
         id: rikmashId,
         data: {
           deliveries: [...existingDeliveries, delivery],
-          total: (rAttrs.total ?? 0) + spend,
+          total: (rAttrs.total ?? 0) + value,
           cyclesCount: (rAttrs.cyclesCount ?? 0) + 1,
           lastDeliveryAt: now.toISOString()
         }
@@ -117,8 +127,8 @@ export async function settleCycleMaap(
           mashabetahalich: mashId,
           kindOf,
           ...(responsibleId ? { users_permissions_user: responsibleId } : {}),
-          total: spend,
-          agprice: mashAttrs?.pricePerUnit ?? spend,
+          total: value,
+          agprice: mashAttrs?.pricePerUnit ?? value,
           cyclesCount: 1,
           firstDeliveryAt: now.toISOString(),
           lastDeliveryAt: now.toISOString(),

@@ -13,15 +13,18 @@
  * its margin and nothing more (§1א).
  */
 
+import { isEssenceOnly } from './bomPrice';
+
 export type CostShape = 'perUnit' | 'shared' | 'stepped';
-export type PriceMode = 'fixed' | 'atCost';
+/** `none` — an essence-only row (PLAN_SHOP_OPERATIONS §2.4): what a unit consumes, never what it costs. */
+export type PriceMode = 'fixed' | 'atCost' | 'none';
 
 export type BomLine = {
 	/** Cost of the line for one unit of the product (see missionLineCost / resourceLineCost). */
 	cost: number;
 	costShape?: CostShape | string | null;
 	stepCapacity?: number | null;
-	/** `atCost` lines are personal (§6.2) and never enter the group curve. */
+	/** `atCost` lines are personal (§6.2) and `none` lines carry no price — neither enters the group curve. */
 	priceMode?: PriceMode | string | null;
 };
 
@@ -45,8 +48,9 @@ export function missionLineCost(m: {
 	return num(m.hoursPerUnit) * (units || 1) * num(m.ratePerHour);
 }
 
-/** A resource line: quantity × price. */
-export function resourceLineCost(r: { quantityPerUnit?: unknown; pricePerUnit?: unknown }): number {
+/** A resource line: quantity × price — 0 for an essence-only row (bomPrice.ts). */
+export function resourceLineCost(r: { quantityPerUnit?: unknown; pricePerUnit?: unknown; priceMode?: unknown }): number {
+	if (isEssenceOnly(r)) return 0;
 	return num(r.quantityPerUnit) * num(r.pricePerUnit);
 }
 
@@ -80,7 +84,7 @@ export function storedCostShape(
 }
 
 function inCurve(line: BomLine): boolean {
-	return line.priceMode !== 'atCost';
+	return line.priceMode !== 'atCost' && !isEssenceOnly(line);
 }
 
 function groupSize(n: number): number {

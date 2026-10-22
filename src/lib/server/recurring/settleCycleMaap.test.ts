@@ -141,4 +141,21 @@ describe('settleCycleMaap', () => {
       kindOf: 'monthly'
     });
   });
+
+  it('a supply portion keeps the units on the shelf and the value on the Rikmash (A3)', async () => {
+    const { strapi, matching } = makeStrapi({
+      mrGetRikmashForDelivery: { data: { rikmash: { data: { attributes: { total: 1000, cyclesCount: 2, deliveries: [] } } } } }
+    });
+    await settleCycleMaap(strapi, {}, {
+      ...baseInput,
+      spend: 50,
+      value: 200,
+      note: '50 × 4',
+      mashAttrs: { name: 'צנצנות', kindOf: 'perUnit', quantityDelivered: 100, rikmash: { data: { id: '77' } } }
+    });
+    const [upd] = matching('mrUpdateRikmash');
+    expect(upd.vars.data.total).toBe(1200);
+    expect(upd.vars.data.deliveries.at(-1)).toMatchObject({ quantity: 50, note: '50 × 4' });
+    expect(matching('mrUpdateMashabetahalich')[0].vars.data.quantityDelivered).toBe(150);
+  });
 });

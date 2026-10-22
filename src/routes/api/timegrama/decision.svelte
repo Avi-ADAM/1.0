@@ -18,8 +18,10 @@
   } from '$lib/server/stipend/apply.js';
   import { normalizeLicenseChange } from '$lib/codeLicense/codeLicense.js';
   import { tellMatured } from '$lib/server/notifications/matured';
+  import { matureRuleDecision } from '$lib/server/fulfillment/consent';
   import {
     decisionAwaitsCustomer,
+    fulfillmentRuleMatured,
     objectChangeApplied,
     rikmaDecisionApplied,
     saleClaimMatured,
@@ -187,6 +189,32 @@
       }
       const a = d.attributes || {};
       if (a.archived) return markDone();
+
+      // An automation rule nobody answered within restime (PLAN_SHOP_OPERATIONS
+      // §2.3, A2): silence is consent for everyone the round asked. Its own
+      // reader — the rule and its targets live on the step, not on the Decision.
+      if (a.kind === 'fulfillmentRule') {
+        try {
+          const out = await matureRuleDecision((qid, vars) => strapiClient.execute(qid, vars), String(id));
+          if (out.outcome === 'matured') {
+            await tellMatured(
+              fulfillmentRuleMatured({
+                projectId: out.projectId,
+                name: out.stepName,
+                agreedIds: out.agreedBySilence,
+                proposerId: out.proposerId,
+                live: out.live
+              }),
+              fetch
+            );
+          }
+        } catch (e) {
+          // Left open: the next run retries rather than losing the consent.
+          console.error(`[timegrama/decision] fulfillmentRule ${id} failed — clock left open:`, e);
+          return;
+        }
+        return markDone();
+      }
 
       // Archive/edit proposals mature on silence exactly the way they mature
       // on a unanimous vote — same applyStandingVersion, so the two routes

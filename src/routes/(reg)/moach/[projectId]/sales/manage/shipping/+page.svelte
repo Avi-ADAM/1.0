@@ -160,8 +160,16 @@
     return parts.join(' · ');
   }
   function rulesFor(zoneId: string) {
-    return setup.rules.filter((r) => r.zones.includes(zoneId));
+    // A rule on one of the zone's methods delivers there too (A2).
+    return setup.rules.filter((r) => r.zones.includes(zoneId) || (r.methods ?? []).some((m) => m.startsWith(`m:${zoneId}:`)));
   }
+  function rulesForMethod(zoneId: string, methodId: string) {
+    return setup.rules.filter((r) => (r.methods ?? []).includes(`m:${zoneId}:${methodId}`));
+  }
+  function rulesForPoint(pointId: string) {
+    return setup.rules.filter((r) => (r.points ?? []).includes(pointId));
+  }
+  const ruleNames = (rules: typeof setup.rules) => rules.map((r) => (r.who ? `${r.name} (${r.who})` : r.name)).join(', ');
 
   // ── pickup points ──
   function addPoint() {
@@ -309,7 +317,11 @@
             {#if openZone !== zone.id}
               <ul class="sp-methods">
                 {#each zone.methods as m (m.id)}
-                  <li><bdi>{m.name || '—'}</bdi> <span class="sp-muted">{methodText(m)}</span></li>
+                  {@const mr = rulesForMethod(zone.id, m.id)}
+                  <li>
+                    <bdi>{m.name || '—'}</bdi> <span class="sp-muted">{methodText(m)}</span>
+                    {#if mr.length}<span class="sp-muted"> · {$t('shop.ship.methodRules', { names: ruleNames(mr) })}</span>{/if}
+                  </li>
                 {/each}
               </ul>
               {#if rules.length}
@@ -415,6 +427,7 @@
       <span class="sp-muted">{$t('shop.ship.pickupHint')}</span>
     </div>
     {#each draft.pickupPoints as p, pi (p.id)}
+      {@const pr = rulesForPoint(p.id)}
       <div class="sh-card sp-point">
         <div class="sp-grid2">
           <label class="sh-field">
@@ -442,6 +455,7 @@
             <input class="sh-input" bind:value={draft.pickupPoints[pi].note} maxlength="200" />
           </label>
         </div>
+        {#if pr.length}<p class="sp-muted">{$t('shop.ship.pointRules', { names: ruleNames(pr) })}</p>{/if}
         <button type="button" class="sh-btn sh-btn-quiet sh-btn-warn sp-self" onclick={() => (draft.pickupPoints = draft.pickupPoints.filter((x) => x.id !== p.id))}>{$t('shop.ship.remove')}</button>
       </div>
     {/each}

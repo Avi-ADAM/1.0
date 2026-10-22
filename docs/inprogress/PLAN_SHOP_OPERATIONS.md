@@ -1,7 +1,7 @@
 # PLAN — החנות, שלב ב': תפעול ההזמנה, ומוצרים מורכבים בקופה
 
-> **מצב (2026-10-19): T1, T2 ו-A1 בנויים בקוד, לא נפרסו ולא הורצו מול Strapi** —
-> ראו "מצב הביצוע" בסוף §7. שאר השלבים בתכנון. נכתב 2026-10-19 כהמשך ל-
+> **מצב (2026-10-21): T1, T2, A1, A2 ו-A3 בנויים בקוד, לא נפרסו ולא הורצו מול
+> Strapi** — ראו "מצב הביצוע" בסוף §7 (שם גם הסכמה ל-1.0b של A2+A3). שאר השלבים בתכנון. נכתב 2026-10-19 כהמשך ל-
 > [PLAN_SHOP_CUSTOMER_EXPERIENCE](../inprogress/PLAN_SHOP_CUSTOMER_EXPERIENCE.md)
 > (S1–S6 בנויים וממתינים לפריסה), אחרי קריאת הקוד: `createSheirutFromPending.ts`,
 > `createPaidOrder.ts`, `orderLifecycle.ts`, `createTask.ts`, והסכמה המיוצאת
@@ -523,7 +523,74 @@ S1–S6 בנויים ולא נפרסו. כל שלב כאן נשען על `order`
    מטלה עד שהוא מסכים.
 3. "נסה שוב" בעמוד ההזמנה כש-`fulfillmentPending` — הפעולה קיימת
    (`retryOrderFulfillment`), הכפתור והפס במסך עוד לא.
-4. צ'אט מהכרטיס — לא נבנה (המטלה עוד בלי פורום משלה); "העבר לאחר" הוא A2.
+4. צ'אט מהכרטיס — לא נבנה (המטלה עוד בלי פורום משלה); "העבר לאחר" נבנה ב-A2.
+
+**A2 — בנוי (2026-10-21), לא נפרס.** ההסכמה בשתיקה, שרשרת, תנאים, ייצור
+ליחידה, ניתוב, "העבר לאחר", תזכורת וגל — כולל התנאים שתכנית המשלוחים
+([PLAN_SHOP_SHIPPING](PLAN_SHOP_SHIPPING.md)) פתחה. מה נבנה:
+
+| מה | איפה |
+|---|---|
+| **`Decision kind:'fulfillmentRule'`** — כל עריכה של כלל שנוחת על אחר פותחת סבב חדש (`vots.order`) על ה-Decision של הכלל: "כן" של העורך, שורה `what:null` לכל מי שנשאל, ושעון `restime` (timegrama `decision`). כשהשעון נגמר: `consentedBy ∪= נשאלו ∩ מי שהכלל נוחת עליו − מתנגדים`. עריכה של מי שהכלל נוחת עליו = **הצעה נגדית**: נשארת `proposed`, הסבב שואל גם את מחבר הכלל, השעון מתאפס, ואפשר לצרף `why`. יעד שמשהה כותב `what:false` — שתיקה לא תחזיר אותו. ה-Decision לא מקושר ל-`projects` (אחרת הלב היה מציג אותו לכל הרקמה כהצבעה). **עד הפריסה** — חוזר להסכמה המפורשת של A1, בלי לשבור דבר | `src/lib/fulfillment/consent.ts` (טהור, בדיקות), `src/lib/server/fulfillment/consent.ts`, `timegrama/decision.svelte` |
+| **שרשרת** `when.after` — שלב נפתח כשכל קודמיו "סגורים" להזמנה הזו: המטלות שלהם בוצעו, או שהם לא חלים עליה וקודמיהם סגורים (שלב לא ידוע / בארכיון = סגור). מועד השלב נספר מרגע הפתיחה. בשמירה: `chainProblem` (`UNKNOWN_STEP`/`NOT_ORDER_STEP`/`SELF`/`CYCLE`). השלמת מטלה מריצה שוב את המנוע (`runChain`) — הוא פותח רק מה שהגיע זמנו | `plan.ts`, `apply.ts` (`doneStepsOf`), `configs/fulfillment.ts` |
+| **תנאים** — `deliveryPreference`, קטגוריה (`fulfillmentOrderCategories`, נקרא רק כשכלל מבקש), מוצר (`scope:'product'` + `matanots`), ומתכנית המשלוחים: `shippingZones`, **`shippingMethods`** (`m:<zone>:<method>`, כמו שההזמנה מדווחת את הבחירה) ו-**`pickupPoints`**. בשמירה כל מזהה נבדק מול ה-config של הרקמה | `plan.ts` (`stepMatches`, `linesInScope`), `rows.ts` (`whenOf`) |
+| **סטטוס שזז במקום אחר** — "נשלח" ממסך ההזמנות, ממפתח API או מסוכן (`updateRikmaOrderStatus` של [PLAN_SHOP_MCP_TOOLS](PLAN_SHOP_MCP_TOOLS.md)): מטלת הזמנה (`per:'order'`) שכל עניינה היה השינוי הזה נסגרת דרך `updateTask`, והשרשרת ממשיכה — שלב שמחכה למשלוח לא מחכה לכרטיס ישן. מטלות לשורה וליחידה הן עבודה בפני עצמה ונשארות. בלי להתעקש: אם `updateTask` נדחה, המטלה נשארת פתוחה והכרטיס עדיין סוגר אותה | `apply.ts` (`settleEffectActs`), `ActionService.runFulfillment` |
+| **`per:'unit'`** (ייצור) — מטלה לכל יחידה, עד `UNIT_CAP`=12 לשורה (האחרונה נושאת את השאר); `externalId` `order:<ref>:step:<id>:line:<pos>:unit:<k>` | `plan.ts` |
+| **ניתוב** `roundRobin` (המחזיק המסכים הבא אחרי האחרון שקיבל) ו-`leastOpen` (הכי מעט מטלות אוטומטיות פתוחות; שוויון — לפי התור), מתוך `fulfillmentRoutingActs`. `onShift` מתנהג כ-`single` עד A6 | `plan.ts` (`pickHolder`), `apply.ts` (`routingStateOf`) |
+| **"העבר לאחר"** (`handOffFulfillmentAct`) — למחזיק מסכים בשם, או לבא בתור לפי הניתוב; אין כזה ⇒ המטלה נפתחת לתפקיד (או לתפקידי המשימה, או לכל הרקמה). אין לתפקיד מחזיק אחר ⇒ הרקמה מקבלת הצעה לפרסם **משימה פתוחה** בתפקיד, עם קישור ישיר (`moach/<pid>/create?action=createmission&name=&roles=&fromAct=`), וגם המעביר/ה רואה אותו ב-toast. מטלה שפתוחה לכולם — כל חבר לוקח | `configs/fulfillment.ts`, `FulfillCard.svelte` |
+| **`dueHours` + תזכורת** — timegrama `whatami:'act'` ב-25% האחרונים של החלון (בין 15 דק' ל-3 שעות לפני; חלון מתחת לחצי שעה — בלי תזכורת). המסיים מזכיר למחזיק/ה, או למחזיקי התפקיד כשהמטלה פתוחה | `src/lib/server/fulfillment/reminder.ts`, `timegrama/+server.js` |
+| **גל** (`batching:'wave'` + `waveAt`) — ראו הסטייה למטה | `plan.ts` (`waveOf`, `timingOf`), `levFulfill.ts` (`groupWaves`), `completeFulfillmentWave` |
+| **הלב** — כרטיס `fulfillRule` ("דנה מציעה: …", כל תנאי הכלל, "אם לא תהיה תשובה עד … — זו הסכמה", "מסכים/ה" או "להציע שינוי" שפותח את הכלל בעורך, `?step=`); כרטיס גל אחד עם "בוצע לכולן"; "להעביר למישהו אחר"; יום היציאה מ-`Order.shipping.nextDispatch`; "אני לוקח/ת" גם למטלה פתוחה לכולם. הכרטיסים נקראים מחדש כשפעולת ביצוע/מלאי רצה באחת הרקמות (realtime) | `FulfillRuleCard.svelte`, `FulfillCard.svelte`, `levFulfill.ts`, `cardKinds.js`, `lev/+page.svelte` |
+| **העורך** — אירוע (הזמנה / מלאי נמוך), תנאים (אזורים, שיטות, נקודות איסוף, קטגוריות, מוצרים), "מחכה לשלבים", אחת ליחידה, ניתוב, גל + שעת סגירה, מועד, `why` בהצעה נגדית, ומתי השתיקה תהיה הסכמה. לשונית המשלוחים מראה מי מטפל בכל שיטה ובכל נקודת איסוף | `sales/manage/fulfillment/`, `server/fulfillment/setup.ts`, `shippingSetup.ts` |
+
+**סטייה מהתכנון, בכוונה — הגל.** §2.1 תיאר "מטלה אחת ליום". נבנה: **מטלה
+אחת להזמנה**, שמועדה הוא יום הגל ב-`waveAt` (+`dueHours`); יום הגל = היום אם
+שולמה לפני `waveAt`, אחרת מחר, ולעולם לא לפני `Order.shipping.nextDispatch`.
+**הלב** מאחד את כל המטלות של אותו שלב ואותו מועד לכרטיס אחד, ו-"בוצע לכולן"
+סוגר אותן יחד (`completeFulfillmentWave`, עד 60). כך כל הזמנה שומרת את ה-effect
+שלה ("נשלחה"), את השרשרת, את הביטול ואת ה-webhooks — ואין מרוץ בין שתי הזמנות
+שמנסות ליצור את "מטלת היום". שיטפון המטלות (סיכון 1) נפתר במקום שבו הוא כואב: בלב.
+
+**A3 — בנוי (2026-10-21), לא נפרס.** מלאי בבעלות, מקצה לקצה. מה נבנה:
+
+| מה | איפה |
+|---|---|
+| **מחיר BOM** — `priceMode:'none'` ("מהות בלבד") לא מתומחר בשום מקום: `isEssenceOnly`/`resourceRowPrice`/`pricedResourceRows`, ובדיקה אחת שעוברת על כל הקוראים — עקומת המחיר (דף מוצר, מאגד, `MatanotPublicView`), יציאת מאגד, הצעה שממלאת שורת עסקה, שורות העסקה, הצעה ישירה, `materializeWish`. `priceMode` נוסף לכל בחירה של שורות BOM ב-qids | `src/lib/pooling/bomPrice.ts` + `bomPrice.test.ts` |
+| **`consumeStock` במנוע** — שורות `none` שמקושרות ל-`Mashabetahalich`; שורה עם `product_variant` חלה רק על הווריאנט שלה. ספר תנועות ב-`Order.stockMoves` (מפתח `order:<ref>:consume:<recipe>:line:<pos>` — אידמפוטנטי): המדפים נכתבים קודם, הספר אחריהם, ואם הספר נכשל — המדפים מוחזרים. רקמה בלי קישורי מלאי משלמת קריאה זולה אחת (`stockLinksExist`) | `src/lib/fulfillment/stock.ts` (טהור), `src/lib/server/fulfillment/stock.ts`, `apply.ts` |
+| **ביטול לפני משלוח מחזיר** — אותו כלל של `cancelOrder` (`restocked`) ⇒ `restoreOrderStock` מהספר; ביטול חוזר לא מחזיר פעמיים | `ActionService.runFulfillment`, `apply.ts` |
+| **`receiveStock`** — "קניתי עוד 50 צנצנות ב-4": `Maap` מחזור על ה-`Mashabetahalich` הקיים (`quantityDelivered` = יחידות, `unit:'unit'`, `unitPrice`), עם שעון `maap`. מבשיל כמו חודש של משאב מתחדש (PLAN_TIMEGRAMA D1): **הנותן/ת חייב/ת לחתום**, ושתיקת השאר היא הסכמה; ברקמת יחיד של הנותן/ת — מיד. בהבשלה: המדף גדל ביחידות, וה-`Rikmash` של הנותן/ת בשווי (`settleCycleMaap` עם `value`/`note`). **ספירת פתיחה** של מה שכבר נזקף = אותה קליטה במחיר 0. מי שמדווח/ת ואינו הנותן/ת — הנותן/ת מקבל/ת בקשת חתימה (`consent`) | `configs/stockResource.ts`, `settleCycleMaap.ts`, `voteOnMaap.ts`, `timegrama/maap.svelte` |
+| **הכרטיס בלב** של קליטה מציג יחידות ושווי — לא "הוצאה חודשית". המחיר נקרא משם הקליטה (`receiptName`/`receiptPriceOf`), כי שאילתת הלב לא מבקשת עמודה (`Maap.unitPrice`) שעוד לא נפרסה | `levDataExtractors.ts`, `dowegeot.svelte`, `weget.svelte` |
+| **מלאי נמוך ⇒ מטלת רכש** — כלל `when.event:'stock.low'` (משאבים מסוימים או כולם) פותח מטלה לתפקיד "רכש" — אחת לכל מילוי (`stock:<id>:low:<delivered>:step:<sid>`). בלי כלל — הנותן/ת מקבל/ת התראה כשהמדף חוצה את הסף. בלב: המדף כמו שהוא עכשיו, ו"קלטתי מלאי" ישר מהכרטיס (סוגר גם את המטלה) | `plan.ts` (`planStockLow`), `stock.ts` (`openLowStock`), `FulfillCard.svelte` |
+| **מסך המלאי** — לכל משאב: על המדף, התקבל/נצרך, סף (כל חבר/ה), קליטות שממתינות ועד מתי, קליטה / ספירת פתיחה, קישור מוצר (ווריאנט, כמות ליחידה) וניתוק, ולכל קישור: "מספיק ל-N" מול המלאי של החנות (סיכון 4 — שני המספרים זה לצד זה עד A5). `accounting` נקבע רק בידי הנותן/ת | `ResourceStock.svelte`, `fulfillment/stockView.ts`, `stock/+page.server.ts` |
+| פעולות: `receiveStock`, `setResourceStock`, `linkProductResource`, `unlinkProductResource` — כל ה-qids `serviceAdmin`, הבדיקות בפעולה | `configs/stockResource.ts`, `qidsFulfillment.js` |
+
+**סכמה ל-1.0b (A2+A3) — פריסה אחת:**
+- `Decision.kind` += `fulfillmentRule`; `Decision.fulfillmentStep` (manyToOne ↔ `FulfillmentStep.decisions`).
+- `Mashabetahalich`: `quantityConsumed` (decimal, ברירת מחדל 0), `accounting` (enum `owned·perUse`, ברירת מחדל `owned`), `lowStockAt` (decimal).
+- `MatanotRecipeResource.priceMode` += `none`; `MatanotRecipeResource.product_variant` (manyToOne ↔ `ProductVariant.matanot_recipe_resources`).
+- `Maap.unitPrice` (decimal). `Order.stockMoves` (JSON).
+- `Timegrama.whatami` כבר מחרוזת, ו-`Timegrama.act` כבר קיים — התזכורת לא צריכה שינוי סכמה.
+
+**הרשאות** (ה-Authenticated role **וגם** טוקן ה-API): `decision` create/update/find
+(כולל `fulfillmentStep`), `timegrama` create/update, `mashabetahalich` update,
+`matanot-recipe-resource` create/update/delete/find, `maap` create/update,
+`order` update (`stockMoves`), `rikmash` create/update. ואז `npm run types:update`.
+
+**מה חסר כדי ש-A2/A3 ייחשבו גמורים:**
+1. **פריסת 1.0b** + ההרשאות למעלה. עד אז: כלל שנוחת על אחר מחכה ל"כן" מפורש
+   (A1), פעולות המלאי עונות `NOT_READY`, המסך מציג רק את מלאי החנות, ומטלות
+   נפתחות בלי צריכה — שום דבר לא נשבר.
+2. ההרצה: כלל על חבר אחר ⇒ כרטיס `fulfillRule` ⇒ שתיקה ⇒ פעיל; הצעה נגדית ⇒
+   השעון מתאפס; שרשרת ליקוט→משלוח; גל של שלוש הזמנות ⇒ כרטיס אחד; "העבר
+   לאחר" כשאין מחזיק נוסף ⇒ הצעה למשימה פתוחה. מלאי: קישור מוצר ⇒ הזמנה ⇒
+   המדף יורד ⇒ ביטול ⇒ חוזר ⇒ סף ⇒ מטלת רכש ⇒ "קלטתי" ⇒ שתיקה ⇒ המדף והשווי.
+3. מחבר/ת כלל שקיבל/ה הצעה נגדית מקבל/ת התראה ואת תיבת "מסכים/ה" בעורך —
+   אבל עוד לא כרטיס בלב (`myProposals` מדלג על כללים שהמשתמש/ת כתב/ה).
+   מחזיק/ה חדש/ה בתפקיד רואה את כללי התפקיד ככרטיס `fulfillRule` ומסכים/ה
+   במפורש (בלי שעון — אין סבב פתוח); עד אז שום מטלה לא משובצת לו/ה. הצגת
+   הכללים **כחלק מתנאי ההשמה** (§2.3, לפני החתימה על המשימה) — עוד לא.
+4. מה במכוון לא כאן: `perUse` (קונסיגנציה) ומקור צד שלישי — A4; זמינות נגזרת —
+   A5; `onShift` — A6. "נסה שוב" בעמוד ההזמנה — עדיין חסר מ-A1.
 
 **המקביליות:** A1 הוא נקודת המפגש — B1 לא מתחיל לפניו. אחרי A1 שני הראשים
 רצים במקביל בלי לגעת באותם קבצים: ראש א' ב-`fulfillment/`, `Mashabetahalich`

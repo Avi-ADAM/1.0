@@ -30,7 +30,8 @@ export const PROJECT_FIELD: Readonly<Record<string, string>> = {
   sheirutpend: 'project',
   stipend_payment: 'project',
   roster_period: 'project',
-  ratson_proposal: 'project'
+  ratson_proposal: 'project',
+  act: 'project'
 };
 
 /** The GraphQL selection for one relation of the timegrama query. */
@@ -81,6 +82,9 @@ export function maturedScopes(kind: string, target: { id: string | number; attri
       case 'ratson_proposal':
         // A wish has no rikma of its own: its parties are resolved from the wish.
         return ids(a.ratson).map((rid) => scope('wish', rid));
+      case 'act':
+        // A reminder on an automatic act (PLAN_SHOP_OPERATIONS A2).
+        return [scope('act', id)];
       default:
         // askwant — a candidacy on a wish's need; the rikma is all a screen can follow.
         return [];

@@ -105,7 +105,7 @@ const OFFER_DEAL_RESOURCE = `
       project { data { id } }
       pmash { data { id attributes {
         matanot_recipe_resources { data { id attributes {
-          quantityPerUnit pricePerUnit
+          quantityPerUnit pricePerUnit priceMode
           assignedMember { data { id } }
           matanot { data { id attributes { name ${OFFER_DEAL_SALES} } } }
         } } }
@@ -1904,7 +1904,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
             data {
               id
               attributes {
-                quantityPerUnit pricePerUnit kindOf costShape stepCapacity mode notes
+                quantityPerUnit pricePerUnit priceMode kindOf costShape stepCapacity mode notes
                 pmash { data { id attributes { name } } }
                 mashabetahalich {
                   data {
@@ -3115,7 +3115,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                     id
                     attributes {
                       quantityPerUnit
-                      pricePerUnit
+                      pricePerUnit priceMode
                       kindOf
                       costShape
                       stepCapacity
@@ -5006,6 +5006,7 @@ ${STIPEND_DECISION_FIELDS}
                     cycleIndex
                     cycleStart
                     cycleEnd
+                    unit
                     mashabetahalich {
                       data {
                         id
@@ -7356,7 +7357,7 @@ ${STIPEND_DECISION_FIELDS}
                         } }
                       }
                       matanot_recipe_resources {
-                        data { id attributes { quantityPerUnit pricePerUnit kindOf costShape stepCapacity mode notes
+                        data { id attributes { quantityPerUnit pricePerUnit priceMode kindOf costShape stepCapacity mode notes
                           pmash { data { id attributes { name } } }
                           mashabetahalich { data { id attributes { name pricePerUnit kindOf } } }
                         } }
@@ -7464,7 +7465,7 @@ ${STIPEND_DECISION_FIELDS}
                               } }
                             }
                             matanot_recipe_resources {
-                              data { id attributes { quantityPerUnit pricePerUnit kindOf costShape stepCapacity mode notes
+                              data { id attributes { quantityPerUnit pricePerUnit priceMode kindOf costShape stepCapacity mode notes
                                 pmash { data { id attributes { name } } }
                                 mashabetahalich { data { id attributes { name pricePerUnit kindOf } } }
                               } }
@@ -8585,7 +8586,7 @@ ${STIPEND_DECISION_FIELDS}
               id
               attributes {
                 quantityPerUnit
-                pricePerUnit
+                pricePerUnit priceMode
                 kindOf
                 mode
                 notes
@@ -8915,7 +8916,7 @@ ${STIPEND_DECISION_FIELDS}
                     id
                     attributes {
                       quantityPerUnit
-                      pricePerUnit
+                      pricePerUnit priceMode
                       mode
                       notes
                       assignedMember { data { id attributes { username } } }
@@ -9596,7 +9597,7 @@ ${STIPEND_DECISION_FIELDS}
           notes hoursPerUnit ratePerHour assignedMember { data { id } }
         } } }
         matanot_recipe_resources(pagination: { limit: 50 }) { data { id attributes {
-          notes quantityPerUnit pricePerUnit assignedMember { data { id } }
+          notes quantityPerUnit pricePerUnit priceMode assignedMember { data { id } }
         } } }
       } } }
     } } }
@@ -10176,7 +10177,7 @@ export const moachQids = {
               assignedMember { data { id attributes { username } } }
             } } }
             matanot_recipe_resources { data { id attributes {
-              mode notes kindOf pricePerUnit quantityPerUnit
+              mode notes kindOf pricePerUnit priceMode quantityPerUnit
               pmash { data { id attributes { name } } }
               assignedMember { data { id attributes { username } } }
             } } }
@@ -12960,6 +12961,7 @@ ${STIPEND_DECISION_FIELDS}
                     cycleIndex
                     cycleStart
                     cycleEnd
+                    unit
                     mashabetahalich {
                       data {
                         id

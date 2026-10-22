@@ -499,3 +499,79 @@ export function rosterClosed(p: { projectId: Id }): MaturedNotice {
     url: moach(p.projectId, 'shifts')
   };
 }
+
+// ── order automation (PLAN_SHOP_OPERATIONS A2/A3) ───────────────────────────
+
+const fulfilTab = (pid: Id) => moach(pid, 'sales/manage/fulfillment');
+
+/**
+ * A `fulfillmentRule` round ran out with nobody answering: the rule is live
+ * for everyone it asked. They are told — it is their silence that did it — and
+ * so is its author.
+ */
+export function fulfillmentRuleMatured(p: { projectId: Id; name: string; agreedIds: Id[]; proposerId: Id; live: boolean }): MaturedNotice[] {
+  const out: MaturedNotice[] = [];
+  if (p.agreedIds.length) {
+    out.push({
+      kind: 'decision',
+      intent: 'personal',
+      to: { userIds: p.agreedIds },
+      title: L(`הכלל "${p.name}" נכנס לתוקף`, `The rule "${p.name}" is in effect`, `القاعدة «${p.name}» سارية`),
+      body: L(
+        'לא הייתה תגובה בזמן התגובה של הרקמה, ולכן ההסכמה נרשמה. מעכשיו הזמנות מתאימות יפתחו מטלות — אפשר לעצור או לשנות את הכלל בכל רגע.',
+        "There was no answer within the rikma's response time, so it counts as consent. Matching orders now open tasks — you can pause or change the rule at any time.",
+        'لم يصل رد خلال وقت الاستجابة في الريكما، لذلك اعتُبر ذلك موافقة. الطلبات المطابقة ستفتح مهام من الآن — يمكن إيقاف القاعدة أو تغييرها في أي وقت.'
+      ),
+      url: fulfilTab(p.projectId)
+    });
+  }
+  if (p.proposerId != null && !p.agreedIds.map(String).includes(String(p.proposerId))) {
+    out.push({
+      kind: 'decision',
+      intent: 'outcome',
+      to: { userIds: [p.proposerId] },
+      title: p.live
+        ? L(`הכלל "${p.name}" פעיל`, `The rule "${p.name}" is live`, `القاعدة «${p.name}» فعّالة`)
+        : L(`הכלל "${p.name}" עדיין מחכה`, `The rule "${p.name}" is still waiting`, `القاعدة «${p.name}» ما زالت تنتظر`),
+      body: p.live
+        ? L('כל מי שהכלל נוחת עליו הסכים, בתשובה או בשתיקה.', 'Everyone it lands on agreed — by answering or by silence.', 'وافق كل من تقع عليه القاعدة — بالرد أو بالصمت.')
+        : L(
+            'מי שנכנס לתפקיד אחרי שההצעה נפתחה צריך להסכים בעצמו — שתיקה שלו אינה הסכמה.',
+            'Whoever took the role after the proposal opened has to agree themself — their silence is not consent.',
+            'من تولّى الدور بعد فتح الاقتراح عليه أن يوافق بنفسه — صمته ليس موافقة.'
+          ),
+      url: fulfilTab(p.projectId)
+    });
+  }
+  return out;
+}
+
+/** An automatic act is close to its due time and still open (the reminder clock). */
+export function fulfillmentActDue(p: { projectId: Id; name: string; userIds: Id[]; overdue: boolean }): MaturedNotice {
+  return {
+    kind: 'act',
+    intent: 'personal',
+    to: { userIds: p.userIds },
+    title: p.overdue
+      ? L(`⏰ "${p.name}" באיחור`, `⏰ "${p.name}" is overdue`, `⏰ «${p.name}» متأخرة`)
+      : L(`⏰ "${p.name}" מתקרבת למועד`, `⏰ "${p.name}" is due soon`, `⏰ «${p.name}» يقترب موعدها`),
+    body: L(
+      'המטלה עדיין פתוחה. אם זה לא מסתדר — אפשר להעביר אותה למישהו אחר מכרטיס המטלה.',
+      'The task is still open. If it does not work out, you can pass it to someone else from its card.',
+      'المهمة ما زالت مفتوحة. إن لم يناسبك ذلك يمكنك تمريرها لشخص آخر من بطاقتها.'
+    ),
+    url: levOf(p.projectId)
+  };
+}
+
+/** A supply portion (`receiveStock`) settled on silence (A3). */
+export function stockReceiptSettled(p: { projectId: Id; name: string; quantity: number }): MaturedNotice {
+  return {
+    kind: 'maap',
+    intent: 'outcome',
+    to: { projectId: p.projectId },
+    title: L(`נקלטו ${p.quantity} ל"${p.name}"`, `${p.quantity} received into "${p.name}"`, `تم استلام ${p.quantity} إلى «${p.name}»`),
+    body: after(SILENT, L('ולכן הכמות נוספה למלאי והשווי נרשם לנותן.', 'so the quantity is on the shelf and its value is recorded for the giver.', 'لذلك أُضيفت الكمية إلى المخزون وسُجّلت قيمتها للمانح.')),
+    url: moach(p.projectId, 'sales/manage/stock')
+  };
+}

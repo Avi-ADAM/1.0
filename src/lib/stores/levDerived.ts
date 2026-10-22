@@ -524,7 +524,8 @@ export const finalSwiperArray: Readable<DisplayItem[]> = derived(
         case 'shiftStarting':
         case 'shiftLog':
         case 'fulfill':
-          return true; // Always show: a shift question addressed to me, with a deadline
+        case 'fulfillRule':
+          return true; // Always show: a shift question, a task or a rule addressed to me, with a deadline
         // A stipend proposal is a decision like any other — same filter.
         case 'stipend':
           return $milon.hachla;
