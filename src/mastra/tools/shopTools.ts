@@ -49,6 +49,7 @@ import { z } from 'zod';
 import { sendToSer } from '../../lib/send/sendToSer.js';
 import { getMcpContext } from '../../lib/server/mcpContext.js';
 import { describeStrapiFailure, strapiErrors } from '../../lib/server/mcp/strapiErrors.js';
+import { describeActionError } from '../../lib/server/mcp/actionErrors.js';
 
 const SITE = 'https://www.1lev1.com';
 
@@ -298,7 +299,10 @@ async function runAction(actionKey: string, params: Record<string, unknown>): Pr
       fetch: ctx.fetchInstance
     });
     if (result?.success === false) {
-      return { ok: false, error: String(result.error ?? 'The action reported a failure.') };
+      // result.error is { code, message, details } — String() of it was "[object Object]"
+      const error = describeActionError(result.error);
+      console.error(`[shopTools:${actionKey}] action failed:`, result.error);
+      return { ok: false, error };
     }
     return { ok: true, data: result?.data ?? result };
   } catch (e: any) {

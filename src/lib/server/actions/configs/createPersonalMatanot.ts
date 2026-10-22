@@ -15,6 +15,7 @@
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { screenLabel } from '../../vocab/moderation.js';
+import { ActionError } from '../errors.js';
 import { ensurePersonalRikmaFor } from './ensurePersonalRikma.js';
 import { scope, scopeList } from '$lib/realtime/scopes.js';
 
@@ -29,15 +30,15 @@ const handler: ActionExecutionHandler = async (params, context, util) => {
   };
 
   const name = String(params.name ?? '').trim();
-  if (!name) throw new Error('name is required');
+  if (!name) throw new ActionError('VALIDATION_FAILED', 'name is required');
   const price = Number(params.price);
-  if (!price || price <= 0) throw new Error('נדרש מחיר גדול מאפס');
+  if (!price || price <= 0) throw new ActionError('VALIDATION_FAILED', 'נדרש מחיר גדול מאפס');
   const kindOf = KINDS.includes(params.kindOf) ? params.kindOf : 'total';
 
   // Inline moderation — same non-bypassable screen as the vocab pipeline.
   const verdict = screenLabel(name, { checkLength: false });
   if (verdict.flagged) {
-    throw new Error(`השם לא עבר בדיקת תוכן (${verdict.reasons.join(', ')})`);
+    throw new ActionError('VALIDATION_FAILED', `השם לא עבר בדיקת תוכן (${verdict.reasons.join(', ')})`);
   }
 
   // ── Resolve the hosting rikma (see header) ────────────────────────────────
@@ -55,13 +56,13 @@ const handler: ActionExecutionHandler = async (params, context, util) => {
     );
     const members = pRes?.data?.project?.data?.attributes?.user_1s?.data ?? [];
     const isMember = members.some((m: any) => String(m.id) === String(ctx.userId));
-    if (!isMember) throw new Error('רק חבר רקמה יכול ליצור בה מוצר');
+    if (!isMember) throw new ActionError('UNAUTHORIZED', 'רק חבר רקמה יכול ליצור בה מוצר');
     hostProjectId = requestedProjectId;
     origin = 'project';
   } else if (newRikmaName) {
     const rikmaVerdict = screenLabel(newRikmaName, { checkLength: false });
     if (rikmaVerdict.flagged) {
-      throw new Error(`שם הרקמה לא עבר בדיקת תוכן (${rikmaVerdict.reasons.join(', ')})`);
+      throw new ActionError('VALIDATION_FAILED', `שם הרקמה לא עבר בדיקת תוכן (${rikmaVerdict.reasons.join(', ')})`);
     }
     const wRes = await strapi.execute(
       'crWeaveFull',
@@ -82,7 +83,7 @@ const handler: ActionExecutionHandler = async (params, context, util) => {
       ctx.fetch
     );
     const project = wRes?.data?.createProject?.data;
-    if (!project?.id) throw new Error('יצירת הרקמה נכשלה');
+    if (!project?.id) throw new ActionError('CREATE_FAILED', 'יצירת הרקמה נכשלה', wRes?.errors);
     hostProjectId = String(project.id);
     origin = 'project';
   } else {
@@ -137,7 +138,7 @@ const handler: ActionExecutionHandler = async (params, context, util) => {
           ctx.fetch
         );
   const matanotId = mRes?.data?.createMatanot?.data?.id;
-  if (!matanotId) throw new Error('יצירת המוצר נכשלה');
+  if (!matanotId) throw new ActionError('CREATE_FAILED', 'יצירת המוצר נכשלה', mRes?.errors);
 
   return {
     data: { matanotId: String(matanotId), projectId: hostProjectId, origin },
