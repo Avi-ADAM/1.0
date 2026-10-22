@@ -189,6 +189,16 @@
         <MultiSelect
           bind:selected
           id="agent-location"
+          outerDivClass="agent-ms"
+          --sms-bg="rgba(255, 255, 255, 0.08)"
+          --sms-text-color="#fff"
+          --sms-border="1px solid rgba(255, 255, 255, 0.25)"
+          --sms-border-radius="10px"
+          --sms-options-bg="rgb(30, 25, 55)"
+          --sms-options-border="1px solid rgba(255, 255, 255, 0.2)"
+          --sms-active-color="rgba(255, 0, 174, 0.45)"
+          --sms-selected-bg="rgba(255, 0, 174, 0.3)"
+          --sms-selected-text-color="#fff"
           placeholder={$t('home.amana.form.locationPlaceholder')}
           options={SIGNUP_COUNTRIES.map(labelOf)}
         />
@@ -306,6 +316,31 @@
     border: 1px solid rgba(255, 255, 255, 0.25);
     background: rgba(255, 255, 255, 0.08);
     color: #fff;
+  }
+  /* The country dropdown sits on the dark card: without this its options list
+     keeps the library's light default and the card's white text vanishes on it
+     (white on white, worst in a phone's dark mode). */
+  .field :global(.agent-ms) {
+    color-scheme: dark;
+    color: #fff;
+  }
+  .field :global(.agent-ms input) {
+    color: #fff;
+    background: transparent;
+  }
+  .field :global(.agent-ms input::placeholder) {
+    color: rgba(255, 255, 255, 0.55);
+  }
+  .field :global(.agent-ms ul.options) {
+    background: rgb(30, 25, 55);
+    color: #fff;
+  }
+  .field :global(.agent-ms ul.options li) {
+    color: #fff;
+  }
+  .field :global(.agent-ms ul.options li:hover),
+  .field :global(.agent-ms ul.options li.active) {
+    background: rgba(255, 0, 174, 0.45);
   }
   .field small {
     font-size: 0.75rem;
