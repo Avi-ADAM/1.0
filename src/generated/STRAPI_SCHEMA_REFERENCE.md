@@ -991,6 +991,8 @@ These are the main content types in the Strapi backend.
 ### MatanotRecipeResource
 | Field | Type |
 |-------|------|
+| `archived` | `Maybe<Scalars['Boolean']['output']>` |
+| `archivedAt` | `Maybe<Scalars['DateTime']['output']>` |
 | `assignedMember` | `Maybe<UsersPermissionsUserEntityResponse>` |
 | `costShape` | `Maybe<Enum_Matanotreciperesource_Costshape>` |
 | `createdAt` | `Maybe<Scalars['DateTime']['output']>` |
@@ -6158,6 +6160,8 @@ Used for creating/updating content.
 ### MatanotRecipeResourceInput
 | Field | Type |
 |-------|------|
+| `archived` | `InputMaybe<Scalars['Boolean']['input']>` |
+| `archivedAt` | `InputMaybe<Scalars['DateTime']['input']>` |
 | `assignedMember` | `InputMaybe<Scalars['ID']['input']>` |
 | `costShape` | `InputMaybe<Enum_Matanotreciperesource_Costshape>` |
 | `kindOf` | `InputMaybe<Enum_Matanotreciperesource_Kindof>` |

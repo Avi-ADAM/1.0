@@ -336,11 +336,13 @@ export const fulfillmentQids = {
   // ── A3: stock from a resource (§2.4) ──────────────────────────────────────
 
   // The essence-only BOM rows of an order's products, fenced to the rikma
-  // through the resource they consume.
+  // through the resource they consume. A link is never deleted, only archived
+  // (history) — null = legacy = live, so a bare `ne` would hide every old row.
   'stockRecipesForProducts': `query StockRecipesForProducts($pid: ID!, $products: [ID]) {
     matanotRecipeResources(
       filters: { and: [
         { priceMode: { eq: "none" } }
+        { or: [ { archived: { null: true } }, { archived: { eq: false } } ] }
         { matanot: { id: { in: $products } } }
         { mashabetahalich: { project: { id: { eq: $pid } } } }
       ] }
@@ -369,7 +371,10 @@ export const fulfillmentQids = {
         name unit kindOf recurring finnished pricePerUnit
         quantityDelivered quantityConsumed lowStockAt accounting
         users_permissions_user { data { id attributes { username } } }
-        matanot_recipe_resources(filters: { priceMode: { eq: "none" } }, pagination: { limit: 50 }) { data { id attributes {
+        matanot_recipe_resources(filters: { and: [
+          { priceMode: { eq: "none" } }
+          { or: [ { archived: { null: true } }, { archived: { eq: false } } ] }
+        ] }, pagination: { limit: 50 }) { data { id attributes {
           quantityPerUnit
           matanot { data { id attributes { name } } }
           product_variant { data { id attributes { name sku } } }
@@ -427,12 +432,9 @@ export const fulfillmentQids = {
     createMatanotRecipeResource(data: $data) { data { id } }
   }`,
 
-  'stockRecipeUpdate': `mutation StockRecipeUpdate($id: ID!, $data: MatanotRecipeResourceInput!) {
-    updateMatanotRecipeResource(id: $id, data: $data) { data { id } }
-  }`,
-
-  'stockRecipeDelete': `mutation StockRecipeDelete($id: ID!) {
-    deleteMatanotRecipeResource(id: $id) { data { id } }
+  // Unlinking archives the row — never a delete, so the history stays.
+  'stockRecipeArchive': `mutation StockRecipeArchive($id: ID!, $at: DateTime) {
+    updateMatanotRecipeResource(id: $id, data: { archived: true, archivedAt: $at }) { data { id } }
   }`,
 
   // One essence-only row, fenced to the rikma through its resource.
@@ -441,7 +443,7 @@ export const fulfillmentQids = {
       { id: { eq: $id } }
       { mashabetahalich: { project: { id: { eq: $pid } } } }
     ] }) {
-      data { id attributes { priceMode quantityPerUnit mashabetahalich { data { id } } matanot { data { id } } product_variant { data { id } } } }
+      data { id attributes { priceMode quantityPerUnit archived mashabetahalich { data { id } } matanot { data { id } } product_variant { data { id } } } }
     }
   }`,
 
@@ -456,7 +458,11 @@ export const fulfillmentQids = {
   // rikma without automation or stock still pays almost nothing per order.
   'stockLinksExist': `query StockLinksExist($pid: ID!) {
     matanotRecipeResources(
-      filters: { and: [ { priceMode: { eq: "none" } }, { mashabetahalich: { project: { id: { eq: $pid } } } } ] }
+      filters: { and: [
+        { priceMode: { eq: "none" } }
+        { or: [ { archived: { null: true } }, { archived: { eq: false } } ] }
+        { mashabetahalich: { project: { id: { eq: $pid } } } }
+      ] }
       pagination: { limit: 1 }
     ) { data { id } }
   }`,

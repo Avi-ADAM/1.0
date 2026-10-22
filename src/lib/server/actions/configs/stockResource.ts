@@ -339,7 +339,9 @@ const linkProduct: ActionExecutionHandler = async (params, context, { strapi }) 
     if (!variants.includes(variantId)) throw new ActionError('NOT_FOUND', 'That variant is not of this product');
   }
 
-  // One row per product × variant × resource: linking again changes the quantity.
+  // One live row per product × variant × resource. Linking again with another
+  // quantity archives that row and writes a new one — a link is never edited
+  // or deleted in place, so what a product took at any time stays on record.
   let existing: RecipeRow | null = null;
   try {
     const res = await run('stockRecipesForProducts', { pid: projectId, products: [productId] });
@@ -352,9 +354,11 @@ const linkProduct: ActionExecutionHandler = async (params, context, { strapi }) 
     throw new ActionError('NOT_READY', 'Stock from resources is not available yet');
   }
 
+  if (existing && existing.quantityPerUnit === quantityPerUnit) {
+    return { recipeId: existing.id, resourceId: resource.id, productId, variantId, quantityPerUnit, updated: false };
+  }
   if (existing) {
-    await run('stockRecipeUpdate', { id: existing.id, data: { quantityPerUnit } });
-    return { recipeId: existing.id, resourceId: resource.id, productId, variantId, quantityPerUnit, updated: true };
+    await run('stockRecipeArchive', { id: existing.id, at: new Date().toISOString() });
   }
   const res = await run('stockRecipeCreate', {
     data: {
@@ -371,7 +375,15 @@ const linkProduct: ActionExecutionHandler = async (params, context, { strapi }) 
   });
   const id = res?.data?.createMatanotRecipeResource?.data?.id;
   if (!id) throw new Error('Failed to link the product to the resource');
-  return { recipeId: String(id), resourceId: resource.id, productId, variantId, quantityPerUnit, updated: false };
+  return {
+    recipeId: String(id),
+    resourceId: resource.id,
+    productId,
+    variantId,
+    quantityPerUnit,
+    updated: !!existing,
+    ...(existing ? { replaced: existing.id } : {})
+  };
 };
 
 const unlinkProduct: ActionExecutionHandler = async (params, context, { strapi }) => {
@@ -392,7 +404,10 @@ const unlinkProduct: ActionExecutionHandler = async (params, context, { strapi }
   if (row.attributes?.priceMode !== 'none') {
     throw new ActionError('NOT_ALLOWED', 'Only a stock link (essence only) can be removed here');
   }
-  await run('stockRecipeDelete', { id: recipeId });
+  // Archived, never deleted: past orders' ledgers still name this link.
+  if (row.attributes?.archived !== true) {
+    await run('stockRecipeArchive', { id: recipeId, at: new Date().toISOString() });
+  }
   return {
     recipeId,
     resourceId: row.attributes?.mashabetahalich?.data?.id != null ? String(row.attributes.mashabetahalich.data.id) : null,

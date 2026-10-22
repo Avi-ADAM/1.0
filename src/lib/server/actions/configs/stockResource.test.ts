@@ -104,7 +104,7 @@ const strapi = {
       case 'stockRecipesForProducts': {
         if (!deployed) throw new Error('GRAPHQL_VALIDATION_FAILED: Unknown field "product_variant"');
         const data = [...recipes.entries()]
-          .filter(([, r]) => r.priceMode === 'none' && (vars.products as string[]).includes(r.product) && resources.get(r.resource)?.project === vars.pid)
+          .filter(([, r]) => r.priceMode === 'none' && !r.archived && (vars.products as string[]).includes(r.product) && resources.get(r.resource)?.project === vars.pid)
           .map(([id, r]) => ({
             id,
             attributes: {
@@ -129,8 +129,8 @@ const strapi = {
         });
         return { data: { createMatanotRecipeResource: { data: { id } } } };
       }
-      case 'stockRecipeUpdate':
-        recipes.get(vars.id)!.qpu = vars.data.quantityPerUnit;
+      case 'stockRecipeArchive':
+        recipes.get(vars.id)!.archived = true;
         return {};
       case 'stockRecipe': {
         const r = recipes.get(vars.id);
@@ -139,15 +139,12 @@ const strapi = {
           data: {
             matanotRecipeResources: {
               data: fenced
-                ? [{ id: vars.id, attributes: { priceMode: r.priceMode, mashabetahalich: { data: { id: r.resource } }, matanot: { data: { id: r.product } } } }]
+                ? [{ id: vars.id, attributes: { priceMode: r.priceMode, archived: r.archived ?? null, mashabetahalich: { data: { id: r.resource } }, matanot: { data: { id: r.product } } } }]
                 : []
             }
           }
         };
       }
-      case 'stockRecipeDelete':
-        recipes.delete(vars.id);
-        return {};
       default:
         throw new Error(`unexpected qid ${qid}`);
     }
@@ -299,11 +296,19 @@ describe('linkProductResource / unlinkProductResource', () => {
     });
   });
 
-  it('linking the same product and variant again changes the quantity', async () => {
+  it('linking again with another quantity archives the old link and writes a new one', async () => {
     const out = await call(linkProductResourceConfig, { resourceId: '40', productId: '10', quantityPerUnit: 3 });
-    expect(out).toMatchObject({ recipeId: '500', updated: true });
-    expect(recipes.get('500')!.qpu).toBe(3);
+    expect(out).toMatchObject({ updated: true, replaced: '500', quantityPerUnit: 3 });
+    expect(out.recipeId).not.toBe('500');
+    expect(recipes.get('500')).toMatchObject({ archived: true, qpu: 1 });
+    expect(recipes.get(out.recipeId)!.qpu).toBe(3);
+  });
+
+  it('linking again with the same quantity writes nothing', async () => {
+    const out = await call(linkProductResourceConfig, { resourceId: '40', productId: '10', quantityPerUnit: 1 });
+    expect(out).toMatchObject({ recipeId: '500', updated: false });
     expect(qids()).not.toContain('stockRecipeCreate');
+    expect(qids()).not.toContain('stockRecipeArchive');
   });
 
   it('names only this rikma’s products and their own variants', async () => {
@@ -316,11 +321,22 @@ describe('linkProductResource / unlinkProductResource', () => {
     });
   });
 
-  it('unlinks a stock link, and leaves a priced BOM row to the product editor', async () => {
+  it('unlinks a stock link by archiving it — never a delete — and leaves a priced BOM row to the product editor', async () => {
     await expect(call(unlinkProductResourceConfig, { recipeId: '509' })).rejects.toMatchObject({ code: 'NOT_ALLOWED' });
-    expect(recipes.has('509')).toBe(true);
+    expect(recipes.get('509')!.archived).toBeFalsy();
     const out = await call(unlinkProductResourceConfig, { recipeId: '500' });
     expect(out).toEqual({ recipeId: '500', resourceId: '40', productId: '10', removed: true });
-    expect(recipes.has('500')).toBe(false);
+    expect(recipes.get('500')).toMatchObject({ archived: true });
+    expect(varsOf('stockRecipeArchive')).toMatchObject({ id: '500', at: expect.any(String) });
+  });
+
+  it('an archived link no longer takes from the shelf, and unlinking it again writes nothing', async () => {
+    await call(unlinkProductResourceConfig, { recipeId: '500' });
+    calls.length = 0;
+    await call(unlinkProductResourceConfig, { recipeId: '500' });
+    expect(qids()).not.toContain('stockRecipeArchive');
+    const out = await call(linkProductResourceConfig, { resourceId: '40', productId: '10', quantityPerUnit: 1 });
+    expect(out).toMatchObject({ updated: false });
+    expect(out.recipeId).not.toBe('500');
   });
 });

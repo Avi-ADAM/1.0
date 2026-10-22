@@ -7390,6 +7390,8 @@ export type MatanotRecipeMissionRelationResponseCollection = {
 
 export type MatanotRecipeResource = {
   __typename?: 'MatanotRecipeResource';
+  archived?: Maybe<Scalars['Boolean']['output']>;
+  archivedAt?: Maybe<Scalars['DateTime']['output']>;
   assignedMember?: Maybe<UsersPermissionsUserEntityResponse>;
   costShape?: Maybe<Enum_Matanotreciperesource_Costshape>;
   createdAt?: Maybe<Scalars['DateTime']['output']>;
@@ -7428,6 +7430,8 @@ export type MatanotRecipeResourceEntityResponseCollection = {
 
 export type MatanotRecipeResourceFiltersInput = {
   and?: InputMaybe<Array<InputMaybe<MatanotRecipeResourceFiltersInput>>>;
+  archived?: InputMaybe<BooleanFilterInput>;
+  archivedAt?: InputMaybe<DateTimeFilterInput>;
   assignedMember?: InputMaybe<UsersPermissionsUserFiltersInput>;
   costShape?: InputMaybe<StringFilterInput>;
   createdAt?: InputMaybe<DateTimeFilterInput>;
@@ -7451,6 +7455,8 @@ export type MatanotRecipeResourceFiltersInput = {
 };
 
 export type MatanotRecipeResourceInput = {
+  archived?: InputMaybe<Scalars['Boolean']['input']>;
+  archivedAt?: InputMaybe<Scalars['DateTime']['input']>;
   assignedMember?: InputMaybe<Scalars['ID']['input']>;
   costShape?: InputMaybe<Enum_Matanotreciperesource_Costshape>;
   kindOf?: InputMaybe<Enum_Matanotreciperesource_Kindof>;

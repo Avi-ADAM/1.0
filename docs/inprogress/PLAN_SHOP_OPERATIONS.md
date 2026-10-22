@@ -562,18 +562,18 @@ S1–S6 בנויים ולא נפרסו. כל שלב כאן נשען על `order`
 | **הכרטיס בלב** של קליטה מציג יחידות ושווי — לא "הוצאה חודשית". המחיר נקרא משם הקליטה (`receiptName`/`receiptPriceOf`), כי שאילתת הלב לא מבקשת עמודה (`Maap.unitPrice`) שעוד לא נפרסה | `levDataExtractors.ts`, `dowegeot.svelte`, `weget.svelte` |
 | **מלאי נמוך ⇒ מטלת רכש** — כלל `when.event:'stock.low'` (משאבים מסוימים או כולם) פותח מטלה לתפקיד "רכש" — אחת לכל מילוי (`stock:<id>:low:<delivered>:step:<sid>`). בלי כלל — הנותן/ת מקבל/ת התראה כשהמדף חוצה את הסף. בלב: המדף כמו שהוא עכשיו, ו"קלטתי מלאי" ישר מהכרטיס (סוגר גם את המטלה) | `plan.ts` (`planStockLow`), `stock.ts` (`openLowStock`), `FulfillCard.svelte` |
 | **מסך המלאי** — לכל משאב: על המדף, התקבל/נצרך, סף (כל חבר/ה), קליטות שממתינות ועד מתי, קליטה / ספירת פתיחה, קישור מוצר (ווריאנט, כמות ליחידה) וניתוק, ולכל קישור: "מספיק ל-N" מול המלאי של החנות (סיכון 4 — שני המספרים זה לצד זה עד A5). `accounting` נקבע רק בידי הנותן/ת | `ResourceStock.svelte`, `fulfillment/stockView.ts`, `stock/+page.server.ts` |
-| פעולות: `receiveStock`, `setResourceStock`, `linkProductResource`, `unlinkProductResource` — כל ה-qids `serviceAdmin`, הבדיקות בפעולה | `configs/stockResource.ts`, `qidsFulfillment.js` |
+| פעולות: `receiveStock`, `setResourceStock`, `linkProductResource`, `unlinkProductResource` — כל ה-qids `serviceAdmin`, הבדיקות בפעולה. **קישור לעולם לא נמחק**: ניתוק = `archived:true` + `archivedAt`, ושינוי כמות = ארכוב הקישור הישן ושורה חדשה — כך ההיסטוריה של מה שמוצר לקח נשמרת (החלטה 2026-10-22; אין הרשאת delete) | `configs/stockResource.ts`, `qidsFulfillment.js` |
 
 **סכמה ל-1.0b (A2+A3) — פריסה אחת:**
 - `Decision.kind` += `fulfillmentRule`; `Decision.fulfillmentStep` (manyToOne ↔ `FulfillmentStep.decisions`).
 - `Mashabetahalich`: `quantityConsumed` (decimal, ברירת מחדל 0), `accounting` (enum `owned·perUse`, ברירת מחדל `owned`), `lowStockAt` (decimal).
-- `MatanotRecipeResource.priceMode` += `none`; `MatanotRecipeResource.product_variant` (manyToOne ↔ `ProductVariant.matanot_recipe_resources`).
+- `MatanotRecipeResource.priceMode` += `none`; `MatanotRecipeResource.product_variant` (manyToOne ↔ `ProductVariant.matanot_recipe_resources`); `MatanotRecipeResource.archived` (boolean, ברירת מחדל false) + `archivedAt` (datetime) — null = חי, לכן כל סינון הוא `or: [{archived:{null:true}},{archived:{eq:false}}]`.
 - `Maap.unitPrice` (decimal). `Order.stockMoves` (JSON).
 - `Timegrama.whatami` כבר מחרוזת, ו-`Timegrama.act` כבר קיים — התזכורת לא צריכה שינוי סכמה.
 
 **הרשאות** (ה-Authenticated role **וגם** טוקן ה-API): `decision` create/update/find
 (כולל `fulfillmentStep`), `timegrama` create/update, `mashabetahalich` update,
-`matanot-recipe-resource` create/update/delete/find, `maap` create/update,
+`matanot-recipe-resource` create/update/find (**בלי delete** — ארכוב בלבד), `maap` create/update,
 `order` update (`stockMoves`), `rikmash` create/update. ואז `npm run types:update`.
 
 **מה חסר כדי ש-A2/A3 ייחשבו גמורים:**
