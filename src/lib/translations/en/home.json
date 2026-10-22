@@ -60,7 +60,8 @@
     "shop": "Online Shop",
     "homeAria": "1💗1 — home",
     "pageNav": "On this page",
-    "footer": "Links"
+    "footer": "Links",
+    "itsYours": "It's yours"
   },
   "languages": {
     "en": "English",
@@ -636,7 +637,9 @@
     "thirdWayLabel": "Video: the third way",
     "close": "Close",
     "conciergeCta": "Watch: the concierge end to end (2:42)",
-    "conciergeLabel": "Video: the concierge — from a wish to a completed deal"
+    "conciergeLabel": "Video: the concierge — from a wish to a completed deal",
+    "shopCta": "Watch how a shop is made",
+    "shopLabel": "Video: building an online shop on a rikma"
   },
   "pageUrl": "https://1lev1.com/?lang=en",
   "motion": {

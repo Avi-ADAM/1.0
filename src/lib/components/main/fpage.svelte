@@ -27,7 +27,7 @@
   import ProductPeek from '$lib/components/main/ProductPeek.svelte';
   import SplitCalculator from '$lib/components/main/SplitCalculator.svelte';
   import VideoModal from '$lib/components/main/VideoModal.svelte';
-  import { VIDEO_HOW_IT_WORKS, VIDEO_CONCIERGE, videoFor } from '$lib/videos.js';
+  import { VIDEO_HOW_IT_WORKS, VIDEO_CONCIERGE, VIDEO_SHOP_BUILD, videoFor } from '$lib/videos.js';
   import DemoRequest from '$lib/components/main/DemoRequest.svelte';
   import MotionControl from '$lib/components/main/MotionControl.svelte';
   import AppearanceMenu from '$lib/components/footer/AppearanceMenu.svelte';
@@ -280,6 +280,14 @@
     if (!conciergeVideo) return;
     videoId = conciergeVideo;
     videoTitle = $t('home.videos.conciergeLabel');
+    videoOpen = true;
+  }
+  /* Building a shop, beside the /shop strip — same language gate. */
+  const shopVideo = $derived(videoFor(VIDEO_SHOP_BUILD, $lang));
+  function watchShop() {
+    if (!shopVideo) return;
+    videoId = shopVideo;
+    videoTitle = $t('home.videos.shopLabel');
     videoOpen = true;
   }
 
@@ -724,6 +732,12 @@
         <span aria-hidden="true" class="hm-door-arrow">{arrow}</span>
       </span>
     </a>
+    {#if shopVideo}
+      <button type="button" class="hm-textlink hm-watch hm-shop-watch" onclick={watchShop}>
+        <span aria-hidden="true">▶</span>
+        {$t('home.videos.shopCta')}
+      </button>
+    {/if}
   </section>
 
   <!-- ============ DISCOVER + PRICE ============ -->
@@ -828,6 +842,7 @@
       <a href="/faq" data-sveltekit-prefetch>{$t('home.nav.faq')}</a>
       <a href="/guid" data-sveltekit-prefetch>{$t('home.nav.guide')}</a>
       <a href="/shop" data-sveltekit-prefetch>{$t('home.nav.shop')}</a>
+      <a href="/its-yours" data-sveltekit-prefetch>{$t('home.nav.itsYours')}</a>
       <a href="/why" data-sveltekit-prefetch>{$t('home.nav.why')}</a>
       {#if $lang == 'he'}
         <a href="https://agreement.1lev1.com" target="_blank" rel="noopener">{$t('home.nav.about')}</a>
@@ -2196,6 +2211,12 @@
   .hm-tile-dark .hm-icon {
     background: var(--hm-cta-bg);
     color: var(--hm-cta-ink);
+  }
+  .hm .hm-shop-watch {
+    align-self: flex-start;
+    margin-top: 10px;
+    margin-inline-start: 6px;
+    font-size: 14px;
   }
   .hm-shop-strip {
     display: flex;

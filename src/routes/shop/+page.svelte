@@ -25,6 +25,8 @@
   import AppearanceMenu from '$lib/components/footer/AppearanceMenu.svelte';
   import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
   import DemoRequest from '$lib/components/main/DemoRequest.svelte';
+  import VideoModal from '$lib/components/main/VideoModal.svelte';
+  import { VIDEO_SHOP_BUILD, videoFor } from '$lib/videos.js';
 
   let regHref = $derived(registerHref($locale, '/shop'));
 
@@ -81,6 +83,9 @@
   const FAQ_KEYS = ['q1', 'q2', 'q3', 'q4', 'q5'];
 
   let demoOpen = $state(false);
+  let videoOpen = $state(false);
+  // Offered only to readers of the language it is recorded in ($lib/videos.js).
+  let shopVideo = $derived(videoFor(VIDEO_SHOP_BUILD, $locale));
   let arrow = $derived($isRtl ? '←' : '→');
 
   let ld = $derived.by(() => {
@@ -173,6 +178,12 @@
             {$t('shopPage.hero.ctaDemo')}
           </button>
         </div>
+        {#if shopVideo}
+          <button type="button" class="sp-watch" onclick={() => (videoOpen = true)}>
+            <span class="sp-watch-play" aria-hidden="true">▶</span>
+            {$t('shopPage.hero.ctaVideo')}
+          </button>
+        {/if}
       </div>
 
       <!-- Visual 4-step order journey card -->
@@ -432,6 +443,13 @@
 </div>
 
 <DemoRequest bind:open={demoOpen} source="shop" initialTrack="partnership" />
+
+<VideoModal
+  bind:open={videoOpen}
+  videoId={shopVideo ?? ''}
+  title={$t('shopPage.hero.videoLabel')}
+  closeLabel={$t('shopPage.hero.videoClose')}
+/>
 
 <style>
   /* ===== Theme × mode tokens (matching fpage.svelte) ====================== */
@@ -782,6 +800,36 @@
     display: flex;
     flex-direction: column;
     gap: 18px;
+  }
+  .sp-watch {
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0;
+    background: none;
+    border: 0;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--hm-accent);
+    cursor: pointer;
+  }
+  .sp-watch:hover {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+  .sp-watch-play {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: var(--hm-cta-bg);
+    color: var(--hm-cta-ink);
+    font-size: 12px;
+    padding-inline-start: 2px;
   }
   .sp-flow-card {
     display: flex;

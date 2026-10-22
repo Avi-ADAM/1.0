@@ -27,7 +27,7 @@ vi.mock('$lib/translations', () => {
 vi.mock('$lib/components/stipend/MissionStipendOffer.svelte', async () => ({
   default: (await import('./__mocks__/Empty.svelte')).default
 }));
-vi.mock('$lib/components/share/shareButtons/index.svelte', async () => ({
+vi.mock('$lib/components/share/ShareLink.svelte', async () => ({
   default: (await import('./__mocks__/Empty.svelte')).default
 }));
 vi.mock('$lib/components/archive/ArchiveObjectButton.svelte', async () => ({

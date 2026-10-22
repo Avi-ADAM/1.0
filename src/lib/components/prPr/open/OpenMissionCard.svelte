@@ -10,7 +10,7 @@
   import { t, locale } from '$lib/translations';
   import MissionStipendOffer from '$lib/components/stipend/MissionStipendOffer.svelte';
   import Tile from '$lib/celim/tile.svelte';
-  import Share from '$lib/components/share/shareButtons/index.svelte';
+  import Share from '$lib/components/share/ShareLink.svelte';
   import ArchiveObjectButton from '$lib/components/archive/ArchiveObjectButton.svelte';
   import { htmlExcerpt } from '$lib/text/htmlExcerpt';
   import { computeHeadcount } from '$lib/missions/headcount';
@@ -70,11 +70,11 @@
 </script>
 
 <article
-  class="open-card group relative flex flex-col gap-3 overflow-hidden rounded-2xl border border-gold/40 bg-slate-900/70 p-4 text-start shadow-lg backdrop-blur-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-gold"
+  class="open-card group relative flex flex-col gap-3 rounded-2xl border border-gold/40 bg-slate-900/70 p-4 text-start shadow-lg backdrop-blur-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-gold"
   class:pending
 >
   <!-- status strip -->
-  <span class="absolute inset-x-0 top-0 h-1 {pending ? 'bg-mturk/70' : 'bg-goldShain bg-[length:250%_auto] animate-gradientx'}"></span>
+  <span class="absolute inset-x-0 top-0 h-1 rounded-t-2xl {pending ? 'bg-mturk/70' : 'bg-goldShain bg-[length:250%_auto] animate-gradientx'}"></span>
 
   <header class="flex items-start justify-between gap-3">
     <div class="min-w-0 flex-1">
@@ -211,7 +211,7 @@
     </a>
     {#if !pending}
       <Share
-        slug={`availableMission/${node.id}`}
+        path={`availableMission/${node.id}`}
         title={shareTitle}
         desc={excerpt || shareTitle}
         hashtags={['1💗1', 'consensus']}
@@ -232,6 +232,11 @@
 </article>
 
 <style>
+  /* backdrop-blur makes every card its own stacking context, so the next card
+     would paint over an open share menu; lift this one while it is open. */
+  .open-card:has(:global(.share-dropdown)) {
+    z-index: 20;
+  }
   .open-card:hover {
     box-shadow: 0 8px 26px rgba(238, 232, 170, 0.18);
   }

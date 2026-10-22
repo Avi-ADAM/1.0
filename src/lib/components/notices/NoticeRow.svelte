@@ -258,7 +258,10 @@
     border-radius: 999px;
     font-size: 11px;
     font-weight: 700;
-    background: var(--cg-s3, #e4e4e7);
+    /* A tint of the row's own ink: outside the concierge (the heart) there is
+       no --cg-s3, and a fixed light fill sat under white dark-mode ink. */
+    background: var(--cg-s3, color-mix(in srgb, currentColor 14%, transparent));
+    color: inherit;
     unicode-bidi: isolate;
   }
   .nr-sentence {
@@ -371,23 +374,23 @@
     color: var(--cg-muted, #71717a);
   }
   .nr-hide:hover {
-    background: var(--cg-s3, #e4e4e7);
+    background: var(--cg-s3, color-mix(in srgb, currentColor 14%, transparent));
   }
   .nr-restore,
   .nr-ghost {
     min-height: 36px;
     padding: 0 10px;
     border-radius: 8px;
-    border: 1px solid rgb(var(--cg-fg-rgb, 0 0 0) / 0.15);
+    border: 1px solid color-mix(in srgb, currentColor 15%, transparent);
     background: transparent;
-    color: var(--cg-ink, #18181b);
+    color: var(--cg-ink, var(--surface-ink, #18181b));
     font-size: 12px;
     font-weight: 600;
   }
   .nr-confirm {
     padding: 8px 10px;
     border-radius: 10px;
-    background: var(--cg-s3, #e4e4e7);
+    background: var(--cg-s3, color-mix(in srgb, currentColor 10%, transparent));
     font-size: 12px;
     line-height: 1.45;
   }

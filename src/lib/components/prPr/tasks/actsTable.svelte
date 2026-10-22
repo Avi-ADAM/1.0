@@ -315,6 +315,10 @@
       .filter(Boolean);
   }
 
+  /** Lanes where someone is working on the act, so a percentage means something. */
+  const PROGRESS_LANES = new Set(['inProgress', 'pendingValidation', 'completed']);
+  const RING_LENGTH = 2 * Math.PI * 10;
+
   const COLUMNS = [
     { key: 'shem', labelKey: 'mission.actsTable.name', sortable: true },
     { key: 'status', labelKey: 'mission.actsTable.status', sortable: true },
@@ -326,6 +330,31 @@
     { key: 'actions', labelKey: 'mission.actsTable.actions', sortable: false }
   ];
 </script>
+
+<!-- Progress ring, as the old grid's assignee cell drew it: shown from the
+     moment work is under way (0% included) through to done. -->
+{#snippet progressRing(row)}
+  {#if PROGRESS_LANES.has(getActStatus(row))}
+    {@const progress = getActProgress(row)}
+    <span
+      class="acts__progress"
+      class:acts__progress--done={progress === 100}
+      role="img"
+      aria-label="{progress}%"
+    >
+      <svg viewBox="0 0 24 24" width="100%" height="100%" aria-hidden="true">
+        <circle class="acts__progress-track" cx="12" cy="12" r="10" fill="none" stroke-width="2.5" />
+        <circle
+          class="acts__progress-value"
+          cx="12" cy="12" r="10" fill="none" stroke-width="2.5" stroke-linecap="round"
+          stroke-dasharray={RING_LENGTH}
+          stroke-dashoffset={RING_LENGTH * (1 - progress / 100)}
+        />
+      </svg>
+      <span class="acts__progress-label" aria-hidden="true">{progress}%</span>
+    </span>
+  {/if}
+{/snippet}
 
 <div class="acts" dir={$isRtl ? 'rtl' : 'ltr'}>
   <!-- ── Toolbar ────────────────────────────────────────────────────── -->
@@ -484,7 +513,6 @@
             {@const who = assignee(row)}
             {@const by = creator(row)}
             {@const roles = rowRoles(row)}
-            {@const progress = getActProgress(row)}
             <tr
               class="acts__row"
               tabindex="0"
@@ -516,11 +544,7 @@
 
               <td class="acts__td">
                 <ActStatusBadge {row} />
-                {#if progress > 0 && progress < 100}
-                  <span class="acts__progress" aria-label="{progress}%">
-                    <span class="acts__progress-bar" style="width:{progress}%"></span>
-                  </span>
-                {/if}
+                {@render progressRing(row)}
               </td>
 
               <td class="acts__td"><UrgencyBadge value={row.hashivut || 'white'} /></td>
@@ -599,6 +623,7 @@
 
             <div class="acts__card-meta">
               <ActStatusBadge {row} />
+              {@render progressRing(row)}
               {#if chip}
                 <button
                   type="button"
@@ -893,7 +918,6 @@
 
   @media (min-width: 900px) {
     .acts__scroll { display: block; }
-    .acts__cards { display: none; }
   }
 
   .acts__table {
@@ -1019,20 +1043,35 @@
   .acts__muted { color: var(--tbl-muted); }
 
   .acts__progress {
-    display: block;
-    margin-top: 0.3rem;
-    height: 3px;
-    width: 100%;
-    max-width: 5rem;
-    border-radius: 999px;
-    background: var(--tbl-raised);
-    overflow: hidden;
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    flex: none;
+    vertical-align: middle;
   }
 
-  .acts__progress-bar {
-    display: block;
-    height: 100%;
-    background: var(--tbl-accent);
+  .acts__td .acts__progress { margin-inline-start: 0.4rem; }
+
+  .acts__progress svg {
+    position: absolute;
+    inset: 0;
+    transform: rotate(-90deg);
+  }
+
+  .acts__progress-track { stroke: var(--tbl-raised); }
+  .acts__progress-value {
+    stroke: var(--tbl-accent);
+    transition: stroke-dashoffset 0.3s ease;
+  }
+  .acts__progress--done .acts__progress-value { stroke: #16a34a; }
+
+  .acts__progress-label {
+    font-size: 0.58rem;
+    font-weight: 700;
+    color: var(--tbl-ink);
   }
 
   /* ── Cards (below 900px) ───────────────────────────────────────── */
@@ -1043,6 +1082,12 @@
     list-style: none;
     margin: 0;
     padding: 0;
+  }
+
+  /* After the base rule on purpose: same specificity, so an earlier
+     media query loses and the cards render under the table on desktop. */
+  @media (min-width: 900px) {
+    .acts__cards { display: none; }
   }
 
   .acts__card {

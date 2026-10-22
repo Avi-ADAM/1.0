@@ -28,7 +28,10 @@
     "flow3_t": "3 · Se activan las tareas y el consumo de stock",
     "flow3_d": "El stock se descuenta, el motor de ejecución abre tareas de preparación y envío como tarjetas en el corazón para los responsables de rol, y se consumen materias primas de los recursos de la rikma.",
     "flow4_t": "4 · El ingreso entra en el reparto justo",
-    "flow4_d": "Las ventas se registran automáticamente a nombre de quien recibe el dinero y se suman al importe pendiente de reparto según la fórmula de la rikma: (tiempo + recursos) = % de los beneficios."
+    "flow4_d": "Las ventas se registran automáticamente a nombre de quien recibe el dinero y se suman al importe pendiente de reparto según la fórmula de la rikma: (tiempo + recursos) = % de los beneficios.",
+    "ctaVideo": "Mira: cómo crear una tienda",
+    "videoLabel": "Vídeo: crear una tienda online sobre una rikma",
+    "videoClose": "Cerrar"
   },
   "paths": {
     "p1_badge": "Sin código · En 1 clic",

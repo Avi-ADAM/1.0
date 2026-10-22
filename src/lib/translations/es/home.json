@@ -61,7 +61,8 @@
     "shop": "Tienda online",
     "homeAria": "1💗1 — inicio",
     "pageNav": "En esta página",
-    "footer": "Enlaces"
+    "footer": "Enlaces",
+    "itsYours": "Es tuyo"
   },
   "languages": {
     "en": "English",
@@ -637,7 +638,9 @@
     "thirdWayLabel": "Vídeo: la tercera vía",
     "close": "Cerrar",
     "conciergeCta": "Mira: la conserjería de principio a fin (2:42)",
-    "conciergeLabel": "Video: la conserjería — del deseo a un trato completado"
+    "conciergeLabel": "Video: la conserjería — del deseo a un trato completado",
+    "shopCta": "Mira cómo se crea una tienda",
+    "shopLabel": "Vídeo: crear una tienda online sobre una rikma"
   },
   "pageUrl": "https://1lev1.com/?lang=es",
   "motion": {

@@ -28,7 +28,10 @@
     "flow3_t": "3 · Task & inventory automation fires",
     "flow3_d": "Stock decrements, the fulfillment engine opens picking and shipping tasks as heart cards for role holders, and raw materials are consumed from rikma resources.",
     "flow4_t": "4 · Revenue enters the fair split",
-    "flow4_d": "Sales are automatically recorded under the money holder and counted toward the rikma's profit split formula: (time + resources) = % of profits."
+    "flow4_d": "Sales are automatically recorded under the money holder and counted toward the rikma's profit split formula: (time + resources) = % of profits.",
+    "ctaVideo": "Watch: building a shop",
+    "videoLabel": "Video: building an online shop on a rikma",
+    "videoClose": "Close"
   },
   "paths": {
     "p1_badge": "No-code · 1-Click Deploy",
