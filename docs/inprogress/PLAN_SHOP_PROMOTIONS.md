@@ -1,6 +1,9 @@
 # PLAN — מבצעים בחנות: הנחה על פריט, "5 ב-100", מבצע על כל החנות — בהסכמה
 
-> **מצב: tbd. תכנון, לא נכתב קוד.** נכתב 2026-10-23 אחרי קריאת תכניות החנות
+> **מצב: P1 (סכמה) כתוב ב-`1.0b`, לא נפרס.** ענף `claude/shop-promotions-schema`,
+> נחתך מ-`shabab` — פירוט, מה נבדק ומה צריך לפני שזה עולה ב-**§9.1**. שאר השלבים בתכנון.
+>
+> נכתב 2026-10-23 אחרי קריאת תכניות החנות
 > ([PLAN_SHOP_CUSTOMER_EXPERIENCE](../inprogress/PLAN_SHOP_CUSTOMER_EXPERIENCE.md),
 > [PLAN_SHOP_OPERATIONS](../inprogress/PLAN_SHOP_OPERATIONS.md),
 > [PLAN_SHOP_SHIPPING](../inprogress/PLAN_SHOP_SHIPPING.md),
@@ -344,7 +347,7 @@ promoPriceOf(product, variant, promos, now)
 | שלב | תכולה | תלות | אומדן |
 |---|---|---|---|
 | **P0** | המסמך + הכרעות (§10) | — | ✅ |
-| **P1** | סכמה ב-`1.0b`: `promotion`, `price-point` + lifecycle, `Decision.kind` + `negopromo` + `promotion`, `Project.promoPolicy`, `order-line`/`Sale` (`listPrice`, `promotion`); `types:update`; qids + `qidsAccess.js` | S1–S5 של החנות נפרסו | 2–3 ימים |
+| **P1** | סכמה ב-`1.0b`: `promotion`, `price-point` + lifecycle, `Decision.kind` + `negopromo` + `promotion`, `Project.promoPolicy`, `order-line`/`Sale` (`listPrice`, `promotion`); `types:update`; qids + `qidsAccess.js` | S1–S5 של החנות נפרסו | 🟡 הסכמה כתובה (§9.1); נשארו פריסה, `types:update`, qids |
 | **P2** | המנוע `promotions.ts` + בדיקות property; `promoPriceOf` | — (טהור, במקביל ל-P1) | 2–3 ימים |
 | **P3** | ההסכמה: פעולות `proposePromotion`, `counterPromotion`, `pausePromotion`, `endPromotion`, `proposePromoPolicy` (ב-`configs/`, עם `access` ו-`authRules`); ענף הבשלה ב-`timegrama/decision.svelte`; קרון `scheduled→active→ended`; כרטיס בלב (מה מוצע, מה חורג מהמעטפת, הרצפה, התאריך המוקדם) | P1 | 4–5 ימים |
 | **P4** | המשטחים: DTO, `GET /promotions`, `POST /cart/quote`, `createPaidOrder`/`confirmOrderPayment` (§5.3), מונים ותקרה, webhooks `promotion.started/ended`; OpenAPI | P2, P3 | 3–4 ימים |
@@ -354,6 +357,38 @@ promoPriceOf(product, variant, promos, now)
 סדר: **P2 במקביל ל-P1**. `item` + `store` נכנסים ראשונים לכל שלב (הם מחיר לשורה,
 בלי עגלה), `bundle`/`bxgy`/`threshold` מיד אחריהם באותו שלב — הם צריכים את
 `/cart/quote`.
+
+### 9.1 P1 — מה נכתב ב-`1.0b`, ומה צריך לפני שזה עולה
+
+**איפה:** `Avi-ADAM/1.0b`, ענף `claude/shop-promotions-schema` (נחתך מ-`shabab`).
+**לא מוזג ל-`shabab` בכוונה:** push ל-`shabab` מפעיל את `.github/workflows/deploy.yml`
+ופורס ל-EC2.
+
+| מה | קובץ | הערה |
+|---|---|---|
+| `promotion` (**חדש**) | `src/api/promotion/` | כל השדות של §4.1. `status` ברירת מחדל `proposed`; `usedUnits` decimal (כמו `order-line.quantity`), `usedOrders` integer, שניהם 0; `code` הוא `private`; `currencyCode` נוסף (הסכומים ב-`rule` במטבע הרקמה, כמו `order-line`). `scope`/`rule` נשארו json — רקמה טוענת את המבצעים הפעילים שלה (מעט שורות) ומסננת ב-JS |
+| `price-point` (**חדש**) | `src/api/price-point/` + `history.js` | שורה פתוחה (`to = null`) לכל מוצר בלי וריאנטים או לכל וריאנט. `recordPrice` נקרא מה-lifecycles הקיימים של `matanot` (`afterCreate`/`afterUpdate`, רק כשהכתיבה נושאת `price` והמוצר לא נמכר לפי וריאנט) ושל `product-variant`. כתיבה שלא מזיזה את המחיר לא כותבת שורה; כשל נרשם בלוג ונבלע, כמו שאר ה-lifecycles של החנות. **אין backfill:** "אין שורה" נקרא "המחיר הנוכחי, ככל שידוע" |
+| `desision.negopromo` (**חדש**) | `src/components/desision/negopromo.json` | סבב עם התנאים המלאים (`ordern`, `mode: propose \| end`, `why`, `proposedBy`, `zman`, ותנאי המבצע) — כמו `negostipend` |
+| `Decision` | `kind` += `promotion`, `promoPolicy`; `promotion` (oneToOne, `mappedBy`); `negopromo`; `newPromoPolicy` (json) | `newPromoPolicy` הוא המסגרת המוצעת, כמו `newLook` |
+| `Project` | `promoPolicy` (json, לא מתורגם), `promotions` | null = אין מסגרת |
+| `order-line` | `listPrice`, `discount`, `promotion` | |
+| `Sale` | `listPrice`, `promotion` | |
+| `types/generated/*` | נוצר מחדש ע"י Strapi | תוספות בלבד |
+
+**נבדק:** Strapi 4.26.2 עלה על SQLite זמני (`strapi develop --no-build`, override
+ב-`config/env/` שלא נכנס ל-commit), טען את הסכמה ויצר את הטבלאות. סקריפט שרץ בתוך
+התהליך בדק: מוצר שנוצר ב-100 ועבר ל-90 → שתי שורות (100 סגורה, 90 פתוחה); עדכון של
+`quant` בלבד ועדכון חוזר ל-90 לא כתבו שורה; וריאנט שנוצר ב-50 ועבר ל-45 → שתי שורות על
+הווריאנט, עם המוצר; `promotion` נוצר ב-`proposed` עם מונים 0; Decision `kind:'promotion'`
+נשמר עם `promotion` וסבב `negopromo`.
+**לא נבדק:** Postgres, ו-GraphQL מול הרשאות אמיתיות.
+
+**לפני שזה עולה — חובה:**
+1. מיזוג הענף ל-`shabab` (= פריסה).
+2. **Settings → Users & Permissions → Roles → Authenticated**: `find`/`findOne`/`create`/`update`
+   על `promotion`, ו-`find`/`findOne` על `price-point` (אותו לא כותבים מהאפליקציה). בלי זה — 403
+   על סכמה שנפרסה.
+3. `npm run types:update` ב-`1.0`.
 
 ---
 
