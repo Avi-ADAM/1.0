@@ -159,6 +159,8 @@
   /** @type {[string, string, string, import('$lib/celim/icons/entityIcons').EntityIconKind][]} */
   const DOORS = [
     ['a1', 'd1', '/partnership', 'members'],
+    // The founder with an idea and no partners yet - one step before /partnership.
+    ['a8', 'd6', '/vision', 'growth'],
     ['a2', 'd2', '/join', 'search'],
     ['a5', 'd3', '/no-boss', 'rikma'],
     // The reader the other doors quietly assume away: someone whose constraint

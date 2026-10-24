@@ -76,7 +76,9 @@
   },
   "audience": {
     "title": "¿Dónde estás hoy?",
-    "a1": "Tengo una asociación (o una idea para una)",
+    "a1": "Tengo una asociación",
+    "a8": "Tengo una idea y busco socios",
+    "d6": "En vez de presentaciones e inversores: quien construye el negocio se vuelve socio",
     "a2": "Busco un proyecto al que unirme",
     "a3": "Solo quiero ver el sistema",
     "a4": "Quiero entenderlo antes de empezar",

@@ -75,7 +75,9 @@
   },
   "audience": {
     "title": "Where are you today?",
-    "a1": "I have a partnership (or an idea for one)",
+    "a1": "I have a partnership",
+    "a8": "I have an idea and need partners",
+    "d6": "Instead of decks and investors: whoever builds the business becomes a partner",
     "a2": "I'm looking for a venture to join",
     "a3": "I just want to see the system",
     "a4": "I want to understand before I start",
