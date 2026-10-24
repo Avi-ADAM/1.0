@@ -1,0 +1,80 @@
+{
+  "meta": {
+    "title": "From vision to a working partnership · start a venture with partners, no complex contracts | 1lev1",
+    "description": "Have a dream — a village, a center, a community business — and looking for partners? Here is how a vision becomes an active partnership: open missions anyone can take, a transparent split by contribution, decisions by consent, and no months of contracts."
+  },
+  "hero": {
+    "eyebrow": "◈ Have a vision? ◈",
+    "h1": "From vision to a partnership that works",
+    "sub": "The dream is already clear to you, and people around you are excited about it. What is missing is the road from excitement to shared work: who does what, what each person gets, and how you decide together. In a rikma that is in place from day one — no lawyers, and no carrying it all alone.",
+    "ctaStart": "Start a rikma for my vision",
+    "ctaTalk": "Talk to us first"
+  },
+  "gap": {
+    "title": "Where dreams like this usually stall",
+    "sub": "Not for lack of people or passion. Most initiatives stop at the same four points:",
+    "g1": "A WhatsApp group full of enthusiasm, and nobody knows what exactly their task is this week.",
+    "g2": "One brings land, one brings money, one puts in two years of work — and there is no fair way to compare them.",
+    "g3": "A partnership contract costs a lot, takes months, and freezes what was agreed on day one — exactly while everything is still changing.",
+    "g4": "The founder becomes the bottleneck: every decision, every idea and every step goes through them, until they burn out."
+  },
+  "steps": {
+    "title": "How a vision becomes a partnership in a rikma",
+    "s1_t": "Write the vision",
+    "s1_b": "In your own words, the way you would tell a friend. The smart assistant breaks it into a draft: missions, missing resources, and what the rikma will eventually sell. Everything stays editable.",
+    "s2_t": "Publish open missions and resources",
+    "s2_b": "Finding land, raising funds, planning, building, marketing — each one an open mission with a scope and a rate. And the resources you lack: land, capital, equipment. Whoever connects with the vision joins through a mission, not through a questionnaire.",
+    "s3_t": "Every contribution is recorded and becomes a share",
+    "s3_b": "Work hours, money, equipment and space — all measured in the same units and approved by the rikma. Each partner's share follows from what they actually gave, and everyone sees the same numbers.",
+    "s4_t": "Anyone can move things forward",
+    "s4_b": "A partner who sees a need does not wait for the founder: they propose a new mission, a resource or an outreach process, and the rikma approves it. The vision keeps moving even when you are not in the room.",
+    "s5_t": "Decide by consent, at the rikma's pace",
+    "s5_b": "There is no unilateral \"no\": you can approve, discuss or make a counter-proposal. A proposal nobody answered within the time the rikma set is approved. So things move without endless meetings.",
+    "s6_t": "When income arrives, it is split by contribution",
+    "s6_b": "Stays, workshops, event rentals — everything the rikma sells is recorded as a sale, and the profit is divided among the partners by the shares they built up. Transparent, with no arguing over fifty-fifty."
+  },
+  "pillars": {
+    "title": "What makes it fast",
+    "transparency_t": "Transparency",
+    "transparency_b": "Every partner sees what was done, who contributed what, and how it translates into their share. Nobody keeps a separate tally in their head.",
+    "initiative_t": "Everyone initiates",
+    "initiative_b": "Missions are opened by whoever sees the need. The founder does not have to manage everything — only to spark it.",
+    "order_t": "Detail and order",
+    "order_b": "Every mission has a scope, a rate, an owner and its own conversation. It is clear what is open, what is in progress and what is done.",
+    "contracts_t": "No complex contracts",
+    "contracts_b": "The agreements themselves are recorded: who committed to what, at what rate, and who approved. They update along the way instead of freezing on day one."
+  },
+  "ai": {
+    "title": "You can also do it from a chat with your AI",
+    "body": "Connect Claude or another AI agent to 1lev1 in a few clicks. The agent can draft a rikma from your vision, open missions, run a timer on work hours and tell you what is waiting for approval — but every decision that touches other people stays in people's hands.",
+    "example": "\"I dream of building a healing village with lodging for 50 people, a kitchen, a garden and a spa. Prepare a rikma with the first missions.\"",
+    "cta": "How to connect an AI agent"
+  },
+  "example": {
+    "title": "For example: a healing village",
+    "sub": "A vision of a community village with lodging, a kitchen, a vegetable garden, a workshop space and a spa — this is how it looks as a rikma in its first week:",
+    "missions_t": "Open missions",
+    "missions_b": "Finding suitable land · a business plan and fundraising · planning the spaces · setting up the kitchen and vegetable garden · building the workshop and treatment program · reaching out to producers and facilitators.",
+    "resources_t": "Missing resources",
+    "resources_b": "Land or a building · seed capital · lodging and camping equipment · kitchen and spa equipment. Whoever brings one becomes a partner by doing so.",
+    "products_t": "What the rikma will sell",
+    "products_b": "Retreat stays · treatments and workshops · renting the venue for private events. The income from each is split by contribution."
+  },
+  "doubts": {
+    "title": "Questions founders ask",
+    "q1_q": "No contract at all? Isn't that risky?",
+    "q1_a": "The agreements do not disappear — they are recorded in the system: who committed to what, at what rate, and who approved. That is a clearer basis than most contracts, and it updates along the way. If at some point you want a formal agreement as well, it is written from the data rather than from scratch.",
+    "q2_q": "How do you compare someone who brings money with someone who brings work?",
+    "q2_a": "Every contribution gets a value: an hour at the agreed rate, money at its amount, equipment and space at their worth. It all goes into the same account, so at any moment you can see each person's share.",
+    "q3_q": "What if a partner disappears halfway?",
+    "q3_a": "A mission that is not moving does not stay stuck: the rikma can propose releasing it, and whoever holds it gets time to respond. What they already contributed stays theirs, and the mission opens up again for someone else.",
+    "q4_q": "Do I lose control over my vision?",
+    "q4_a": "The values and the vision are written into the rikma from the start, and whoever joins, joins them. Decisions are shared, but nobody can impose a veto — not against you either. And your contribution as founders counts like any other."
+  },
+  "close": {
+    "title": "Your vision is waiting for partners",
+    "sub": "Start a rikma in a few minutes, no credit card. You can begin from a draft and send it to the friends who already said \"I'm in\".",
+    "split": "How exactly the split is calculated",
+    "back": "Back to the homepage"
+  }
+}

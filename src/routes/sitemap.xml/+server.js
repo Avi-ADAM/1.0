@@ -86,6 +86,7 @@ const PAGES = [
   // own search intent, not a supporting page.
   { path: '/no-boss', lastmod: '2026-09-04T00:00:00+00:00', priority: '0.85', changefreq: 'monthly' },
   { path: '/partnership', lastmod: '2026-09-05T00:00:00+00:00', priority: '0.85', changefreq: 'monthly' },
+  { path: '/vision', lastmod: '2026-10-25T00:00:00+00:00', priority: '0.85', changefreq: 'monthly' },
   { path: '/join', lastmod: '2026-09-05T00:00:00+00:00', priority: '0.85', changefreq: 'weekly' },
   { path: '/flexible-work', lastmod: '2026-09-05T00:00:00+00:00', priority: '0.85', changefreq: 'monthly' },
   // The concierge, for customers who come to order something made for them.

@@ -1,0 +1,80 @@
+{
+  "meta": {
+    "title": "De la visión a una sociedad que funciona · emprende con socios sin contratos complicados | 1lev1",
+    "description": "¿Tienes un sueño — una aldea, un centro, un negocio comunitario — y buscas socios? Así una visión se convierte en una sociedad activa: misiones abiertas que cualquiera puede tomar, un reparto transparente según la aportación, decisiones por consenso y sin meses de contratos."
+  },
+  "hero": {
+    "eyebrow": "◈ ¿Tienes una visión? ◈",
+    "h1": "De la visión a una sociedad que funciona",
+    "sub": "El sueño ya lo tienes claro, y hay gente a tu alrededor que se entusiasma. Lo que falta es el camino del entusiasmo al trabajo compartido: quién hace qué, qué recibe cada uno y cómo se decide en conjunto. En una rikma eso está resuelto desde el primer día — sin abogados y sin cargar con todo a solas.",
+    "ctaStart": "Crear una rikma para mi visión",
+    "ctaTalk": "Hablar con nosotros primero"
+  },
+  "gap": {
+    "title": "Dónde suelen atascarse sueños como este",
+    "sub": "No por falta de gente ni de pasión. La mayoría de las iniciativas se detienen en los mismos cuatro puntos:",
+    "g1": "Un grupo de WhatsApp lleno de entusiasmo, y nadie sabe cuál es exactamente su tarea esta semana.",
+    "g2": "Uno aporta el terreno, otro el dinero, otro dos años de trabajo — y no hay una forma justa de compararlos.",
+    "g3": "Un contrato de sociedad cuesta mucho, tarda meses y congela lo acordado el primer día — justo cuando todo sigue cambiando.",
+    "g4": "La persona fundadora se convierte en un cuello de botella: cada decisión, cada idea y cada paso pasan por ella, hasta que se agota."
+  },
+  "steps": {
+    "title": "Cómo una visión se convierte en una sociedad dentro de una rikma",
+    "s1_t": "Escribe la visión",
+    "s1_b": "Con tus palabras, como se lo contarías a un amigo. El asistente inteligente la divide en un borrador: misiones, recursos que faltan y lo que la rikma venderá al final. Todo se puede editar.",
+    "s2_t": "Publica misiones y recursos abiertos",
+    "s2_b": "Buscar terreno, conseguir financiación, planificar, construir, comercializar — cada una es una misión abierta con alcance y tarifa. Y también los recursos que faltan: terreno, capital, equipo. Quien conecta con la visión se suma a través de una misión, no de un cuestionario.",
+    "s3_t": "Cada aportación se registra y se convierte en participación",
+    "s3_b": "Horas de trabajo, dinero, equipo y espacio — todo se mide en las mismas unidades y lo aprueba la rikma. La participación de cada socio se deriva de lo que realmente aportó, y todos ven las mismas cuentas.",
+    "s4_t": "Cualquiera puede impulsar",
+    "s4_b": "Quien ve una necesidad no espera a la persona fundadora: propone una nueva misión, un recurso o un proceso con un actor externo, y la rikma lo aprueba. La visión sigue avanzando aunque no estés presente.",
+    "s5_t": "Se decide por consenso, al ritmo de la rikma",
+    "s5_b": "No existe un \"no\" unilateral: se puede aprobar, conversar o hacer una contrapropuesta. Una propuesta que nadie respondió en el plazo que fijó la rikma queda aprobada. Así las cosas avanzan sin reuniones interminables.",
+    "s6_t": "Cuando llegan ingresos, se reparten según la aportación",
+    "s6_b": "Alojamiento, talleres, alquiler para eventos — todo lo que vende la rikma se registra como venta, y la ganancia se reparte entre los socios según las participaciones acumuladas. Transparente, sin discusiones sobre el cincuenta y cincuenta."
+  },
+  "pillars": {
+    "title": "Lo que lo hace rápido",
+    "transparency_t": "Transparencia",
+    "transparency_b": "Cada socio ve qué se hizo, quién aportó qué y cómo eso se traduce en su participación. Nadie lleva una cuenta aparte en la cabeza.",
+    "initiative_t": "Cualquiera inicia",
+    "initiative_b": "Las misiones las abre quien ve la necesidad. La persona fundadora no tiene que gestionarlo todo — solo encender la chispa.",
+    "order_t": "Detalle y orden",
+    "order_b": "Cada misión tiene alcance, tarifa, responsable y su propia conversación. Está claro qué está abierto, qué está en curso y qué está terminado.",
+    "contracts_t": "Sin contratos complicados",
+    "contracts_b": "Los acuerdos mismos quedan registrados: quién se comprometió a qué, con qué tarifa y quién lo aprobó. Se actualizan por el camino en lugar de congelarse el primer día."
+  },
+  "ai": {
+    "title": "También puedes hacerlo desde el chat con tu IA",
+    "body": "Conecta Claude u otro agente de IA a 1lev1 en pocos clics. El agente puede preparar un borrador de rikma a partir de tu visión, abrir misiones, poner en marcha un temporizador de horas de trabajo y contarte qué espera aprobación — pero toda decisión que afecta a otras personas queda en manos de personas.",
+    "example": "\"Sueño con crear una aldea de sanación con alojamiento para 50 personas, cocina, huerta y spa. Prepárame una rikma con las primeras misiones.\"",
+    "cta": "Cómo conectar un agente de IA"
+  },
+  "example": {
+    "title": "Por ejemplo: una aldea de sanación",
+    "sub": "Una visión de aldea comunitaria con alojamiento, cocina, huerta, espacio de talleres y spa — así se ve como rikma ya en su primera semana:",
+    "missions_t": "Misiones abiertas",
+    "missions_b": "Buscar un terreno adecuado · plan de negocio y financiación · planificar los espacios · montar la cocina y la huerta · diseñar el programa de talleres y terapias · contactar con productores y facilitadores.",
+    "resources_t": "Recursos que faltan",
+    "resources_b": "Terreno o edificio · capital inicial · equipo de alojamiento y camping · equipo de cocina y spa. Quien aporta uno de ellos se convierte en socio por ello.",
+    "products_t": "Lo que venderá la rikma",
+    "products_b": "Estancias de retiro · terapias y talleres · alquiler del espacio para eventos privados. Los ingresos de cada uno se reparten según la aportación."
+  },
+  "doubts": {
+    "title": "Preguntas que hacen los fundadores",
+    "q1_q": "¿Sin ningún contrato? ¿No es arriesgado?",
+    "q1_a": "Los acuerdos no desaparecen — quedan registrados en el sistema: quién se comprometió a qué, con qué tarifa y quién lo aprobó. Es una base más clara que la mayoría de los contratos, y se actualiza por el camino. Si en algún momento quieres también un acuerdo formal, se redacta a partir de los datos y no desde cero.",
+    "q2_q": "¿Cómo se compara a quien aporta dinero con quien aporta trabajo?",
+    "q2_a": "Cada aportación recibe un valor: una hora según la tarifa acordada, el dinero por su importe, el equipo y el espacio por lo que valen. Todo entra en la misma cuenta, así que en cualquier momento se ve la participación de cada uno.",
+    "q3_q": "¿Y si un socio desaparece a mitad de camino?",
+    "q3_a": "Una misión que no avanza no se queda atascada: la rikma puede proponer liberarla, y quien la tiene recibe tiempo para responder. Lo que ya aportó sigue siendo suyo, y la misión vuelve a quedar abierta para otra persona.",
+    "q4_q": "¿Pierdo el control sobre mi visión?",
+    "q4_a": "Los valores y la visión están escritos en la rikma desde el principio, y quien se suma, se suma a ellos. Las decisiones son compartidas, pero nadie puede imponer un veto — tampoco contra ti. Y tu aportación como fundador cuenta como cualquier otra."
+  },
+  "close": {
+    "title": "Tu visión espera socios",
+    "sub": "Crea una rikma en pocos minutos, sin tarjeta de crédito. Puedes empezar con un borrador y enviárselo a los amigos que ya dijeron \"me apunto\".",
+    "split": "Cómo se calcula exactamente el reparto",
+    "back": "Volver a la página principal"
+  }
+}
