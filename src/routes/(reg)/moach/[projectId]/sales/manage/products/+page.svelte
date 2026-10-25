@@ -174,13 +174,18 @@
     clip: rect(0 0 0 0);
     white-space: nowrap;
   }
+  /* Narrow screens: the two buttons share the first row and the search takes
+     the full row below — three nowrap items never fit a phone side by side. */
   .pr-tools {
     display: flex;
+    flex-wrap: wrap;
     gap: 8px;
     margin-bottom: 12px;
   }
   .pr-search {
-    flex: 1 1 auto;
+    flex: 1 1 100%;
+    min-width: 0;
+    order: 1;
   }
   .pr-name {
     display: flex;
@@ -250,6 +255,13 @@
     text-align: end;
   }
   @media (min-width: 700px) {
+    .pr-tools {
+      flex-wrap: nowrap;
+    }
+    .pr-search {
+      flex: 1 1 auto;
+      order: 0;
+    }
     .pr-wide {
       display: table-cell;
     }
