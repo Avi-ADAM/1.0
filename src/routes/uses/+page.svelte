@@ -41,7 +41,7 @@
   let cases = $derived([
     { key: 'sales', icon: 'growth', href: registerHref },
     { key: 'team', icon: 'mission', href: registerHref },
-    { key: 'idea', icon: 'idea', href: '/availableMission' },
+    { key: 'idea', icon: 'idea', href: '/vision' },
     { key: 'concierge', icon: 'wish', href: '/wish/new' },
     { key: 'land', icon: 'opportunity', href: '/grow' },
     { key: 'group', icon: 'members', href: '/quorum' }

@@ -1559,10 +1559,17 @@
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
-  @media (min-width: 1100px) {
+  /* Six doors: only divisors of six per row (2×3, 3×2, 6×1), so no row is
+     ever left with a lone card. */
+  @media (min-width: 900px) {
     .hm-doors-grid {
-      grid-template-columns: repeat(5, minmax(0, 1fr));
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 16px;
+    }
+  }
+  @media (min-width: 1500px) {
+    .hm-doors-grid {
+      grid-template-columns: repeat(6, minmax(0, 1fr));
     }
   }
   .hm-door {
