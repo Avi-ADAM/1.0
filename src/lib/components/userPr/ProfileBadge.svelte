@@ -12,6 +12,9 @@
     crownContent,
     buttonsContent,
     diamondContent,
+    // true: fill the parent's box instead of centring itself on the screen —
+    // the profile's orbit layout sizes and places the badge itself.
+    contained = false,
     wreathSvgUrl = 'https://res.cloudinary.com/love1/image/upload/v1640438986/goldenP_bz4wu5.svg'
   } = $props();
 
@@ -28,7 +31,7 @@
   );
 </script>
 
-<div class="badge-container">
+<div class="badge-container" class:contained>
   <svg
     viewBox="0 0 500 700"
     style="overflow: visible;"
@@ -154,5 +157,22 @@
       width: 100%;
       height: 100%;
     }
+  }
+
+  /* After the media query, so it wins at every width. */
+  .badge-container.contained {
+    position: relative;
+    top: auto;
+    left: auto;
+    transform: none;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    aspect-ratio: auto;
+  }
+  .badge-container.contained svg {
+    width: 100%;
+    height: 100%;
   }
 </style>

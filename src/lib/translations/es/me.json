@@ -58,5 +58,31 @@
     "updatesTip": "Propuestas que esperan tu respuesta: {{count}}",
     "newWish": "Nuevo pedido",
     "customerHint": "Todos tus pedidos, borradores y propuestas, en un solo lugar"
+  },
+  "orbit": {
+    "settings": "Ajustes",
+    "photo": "Foto",
+    "empty": "Vacío por ahora — toca el lápiz para añadir",
+    "emptyRikmas": "Aún no hay rikmas. Crea una o únete a una",
+    "unavailable": "No disponible ahora",
+    "missions": "Mis misiones",
+    "done": "{{count}} completadas",
+    "missionsTour": "Tus misiones: lo que ofreciste y lo que estás haciendo. El más ofrece una nueva",
+    "acts": "Mis tareas",
+    "actsOpen": "Todas las tareas",
+    "actsTour": "Las tareas abiertas de tus misiones — toca para ver la lista completa",
+    "products": "Mis productos",
+    "productsTour": "Lo que venden tus rikmas. El más crea un producto nuevo",
+    "conciergeEmpty": "¿Necesitas algo? Escribe una solicitud y encontraremos quién lo haga",
+    "conciergeTour": "Tu conserje: borradores, pedidos y propuestas que te esperan",
+    "available": "Libre para ofrecer",
+    "inProgress": "En curso — ábrela en su rikma",
+    "offered": "Una oferta que publicaste",
+    "emptyMissions": "Aún no hay misiones. Puedes ofrecer lo que sabes hacer",
+    "emptyActs": "No hay tareas abiertas",
+    "emptyProducts": "Tus rikmas aún no venden productos",
+    "toTimers": "Temporizadores — iniciar una misión",
+    "timersTitle": "Iniciar en el temporizador",
+    "allTimers": "Todos los temporizadores"
   }
 }

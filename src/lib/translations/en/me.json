@@ -57,5 +57,31 @@
     "updatesTip": "Offers waiting for your answer: {{count}}",
     "newWish": "New request",
     "customerHint": "All your orders, drafts and offers - in one place"
+  },
+  "orbit": {
+    "settings": "Settings",
+    "photo": "Photo",
+    "empty": "Empty for now — tap the pencil to add",
+    "emptyRikmas": "No rikmas yet. Start one or join one",
+    "unavailable": "Not available right now",
+    "missions": "My missions",
+    "done": "{{count}} done",
+    "missionsTour": "Your missions: what you offered and what you are doing. The plus offers a new one",
+    "acts": "My tasks",
+    "actsOpen": "All tasks",
+    "actsTour": "The open tasks in your missions — tap to see the full list",
+    "products": "My products",
+    "productsTour": "What your rikmas sell. The plus creates a new product",
+    "conciergeEmpty": "Need something? Write a request and we will find who can do it",
+    "conciergeTour": "Your concierge: drafts, orders and proposals waiting for you",
+    "available": "Free to offer",
+    "inProgress": "In progress — open it in its rikma",
+    "offered": "An offer you published",
+    "emptyMissions": "No missions yet. You can offer what you know how to do",
+    "emptyActs": "No open tasks",
+    "emptyProducts": "Your rikmas do not sell products yet",
+    "toTimers": "Timers — start a mission",
+    "timersTitle": "Start on the timer",
+    "allTimers": "All timers"
   }
 }

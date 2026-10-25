@@ -14420,16 +14420,20 @@ ${STIPEND_DECISION_FIELDS}
         mission_offers(
           filters: { archived: { ne: true }, active: { eq: true } }
           pagination: { limit: 200 }
-        ) { data { id } }
+        ) { data { id attributes { name } } }
         mesimabetahaliches(
           filters: { and: [ { finnished: { ne: true }, forappruval: { ne: true } }, ${NOT_ARCHIVED} ] }
           pagination: { limit: 200 }
-        ) { data { id } }
+        ) { data { id attributes {
+          name
+          project { data { id } }
+          acts(pagination: { limit: 200 }) { data { id attributes { shem naasa status } } }
+        } } }
         finnished_missions(pagination: { limit: 500 }) { data { id } }
         projects_1s(pagination: { limit: 100 }) {
           data { id attributes {
             matanotofs(filters: { and: [ { archived: { ne: true } }, ${NOT_ARCHIVED} ] }, pagination: { limit: 200 }) {
-              data { id }
+              data { id attributes { name } }
             }
           } }
         }

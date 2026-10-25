@@ -1,6 +1,9 @@
 <script>
+  import { onMount } from 'svelte';
   import { page } from '$app/state';
   import MissionOffersEditor from '$lib/components/offerings/MissionOffersEditor.svelte';
+  import ProTimerRow from '$lib/components/timers/ProTimerRow.svelte';
+  import { fetchTimers, listenForTimerChanges, timers } from '$lib/stores/timers';
   import { t, isRtl } from '$lib/translations';
 
   /**
@@ -11,6 +14,21 @@
 
   let { data } = $props();
   const autoOpen = page.url.searchParams.get('new') === '1';
+
+  // A mission in progress is started and stopped right here — the same row,
+  // store and save dialogs as the timers page, so a timer started here is the
+  // timer that page shows.
+  onMount(() => {
+    if (!data.uid) return;
+    const uid = String(data.uid);
+    fetchTimers(uid, fetch);
+    const stop = listenForTimerChanges(uid, fetch);
+    return () => stop();
+  });
+
+  /** @param {{ id: string, projectId: string | null }} m */
+  const missionHref = (m) =>
+    m.projectId ? `/moach/${m.projectId}/progress/${m.id}` : undefined;
 </script>
 
 <svelte:head>
@@ -36,8 +54,13 @@
   <section
     class="rounded-2xl bg-white dark:bg-gray-800 shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden"
   >
-    <div class="px-4 py-2.5 bg-gradient-to-l from-barbi to-mpink text-white">
+    <div
+      class="px-4 py-2.5 bg-gradient-to-l from-barbi to-mpink text-white flex items-center justify-between gap-2"
+    >
       <h2 class="font-bold">⏳ {$t('offerings.page.doing')}</h2>
+      <a class="text-sm font-semibold underline underline-offset-2" href="/timers"
+        >⏱ {$t('me.orbit.allTimers')}</a
+      >
     </div>
     <div class="p-3 space-y-2 max-h-72 overflow-y-auto d">
       {#if data.doing.length === 0}
@@ -46,13 +69,17 @@
         </p>
       {:else}
         {#each data.doing as m (m.id)}
+          {#if $timers.some((x) => String(x.mId) === m.id)}
+            <ProTimerRow missionId={m.id} href={missionHref(m)} />
+          {:else}
           <div
             class="rounded-xl border border-gray-200 dark:border-gray-600 px-3 py-2 flex items-center justify-between gap-2"
           >
             <span class="min-w-0">
-              <span
-                class="block font-semibold text-gray-900 dark:text-gray-100 truncate"
-                >{m.name}</span
+              <a
+                class="block font-semibold text-gray-900 dark:text-gray-100 truncate hover:text-barbi"
+                href={missionHref(m) ?? '/timers'}
+                >{m.name}</a
               >
               {#if m.projectName}
                 <a
@@ -65,11 +92,12 @@
             </span>
             {#if m.hours}
               <span class="shrink-0 text-xs text-gray-500 dark:text-gray-400">
-                {m.hoursDone ?? 0}/{m.hours}
+                {Math.round((m.hoursDone ?? 0) * 10) / 10}/{m.hours}
                 {$t('offerings.page.hours_done')}
               </span>
             {/if}
           </div>
+          {/if}
         {/each}
       {/if}
     </div>

@@ -1,9 +1,7 @@
 <script>
   import Dialog from '$lib/celim/ui/dialog.svelte';
   import { page } from '$app/state';
-  import { isMobileOrTablet } from '$lib/utilities/device';
   import { liUN } from '$lib/stores/liUN.js';
-  import Arrow from '$lib/celim/icons/arrow.svelte';
   import Close from '$lib/celim/close.svelte';
   import Spinner from '$lib/celim/Spinner.svelte';
   import { TourItem } from 'svelte-tour';
@@ -25,7 +23,6 @@
   const baseUrl = import.meta.env.VITE_URL;
   //import Profile from '../../lib/components/userPr/new.svelte';
   //import { addS } from '../../lib/stores/addS.js';
-  import { idPr } from '$lib/stores/idPr.js';
   import { goto, invalidateAll } from '$app/navigation';
   import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
   import { fly, scale } from 'svelte/transition';
@@ -122,12 +119,6 @@
       a = 0;
     }
   }
-  let load = $state(false);
-  function project(id) {
-    load = true;
-    idPr.set(id);
-    goto('/moach');
-  }
   /**
    * Sync local state from the server load. Re-runs whenever `data` changes —
    * i.e. after invalidate('app:meProfile') triggered by one of our actions or
@@ -175,23 +166,6 @@
     capture: () => JSON.parse(JSON.stringify(meData)),
     restore: (value) => (meData = value)
   };
-  function getCookie(name) {
-    let dc = document.cookie;
-    let prefix = name + '=';
-    let begin = dc.indexOf('; ' + prefix);
-    if (begin == -1) {
-      begin = dc.indexOf(prefix);
-      if (begin != 0) return null;
-    } else {
-      begin += 2;
-      let end = document.cookie.indexOf(';', begin);
-      if (end == -1) {
-        end = dc.length;
-      }
-    }
-
-    return decodeURI(dc.substring(begin + prefix.length, end));
-  }
   /*
   onMount(async () => {
      if ((navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('Chrome') == -1)) {
@@ -356,12 +330,16 @@
 
   import { toast } from 'svelte-sonner';
   import { decodeProjectDraft, sanitizeProjectDraft } from '$lib/prefill/projectDraft';
-  import CrNewProject from '$lib/celim/icons/crNewProject.svelte';
-  import { end } from 'happy-dom/lib/PropertySymbol.js';
   import ProfileBadge from '$lib/components/userPr/ProfileBadge.svelte';
   import Diamond from '$lib/components/userPr/Diamond.svelte';
-  import OfferingsBadges from '$lib/components/offerings/OfferingsBadges.svelte';
-  import ConciergeBadge from '$lib/components/concierge/ConciergeBadge.svelte';
+  import MeOrb from '$lib/components/me/MeOrb.svelte';
+  import CreateProductFlow from '$lib/components/offerings/CreateProductFlow.svelte';
+  import { layoutOrbit } from '$lib/me/orbitLayout';
+  import { readOfferings } from '$lib/offerings/counts.js';
+  import CrNewProject from '$lib/celim/icons/crNewProject.svelte';
+  import Grow from '$lib/celim/icons/grow.svelte';
+  import { sendToSer } from '$lib/send/sendToSer.js';
+  import { isRtl } from '$lib/translations';
   let mass = $state(false);
 
   function massss(event) {
@@ -460,15 +438,16 @@
       guid();
     }
   });
-  // `/me#my-resources` (the demand sheet's "add a resource") means "show me my
-  // resources", not "scroll to them": this page is a fixed-height collage that
-  // never scrolls, so the anchor alone can do nothing. Open the card instead.
+  // `/me#my-resources` (the demand sheet's "add a resource") means "add to my
+  // resources", not "scroll to them": the orbit never scrolls, so the anchor
+  // alone can do nothing. Open the resources editor instead.
   let handledHash = '';
   $effect(() => {
     const hash = page.url.hash;
-    if (hash === handledHash) return;
+    const editor = editors.mashaabims;
+    if (hash === handledHash || !editor) return;
     handledHash = hash;
-    if (hash === '#my-resources') current = 'a3';
+    if (hash === '#my-resources') editor.open();
   });
 
   function guid() {
@@ -496,8 +475,149 @@
       window.removeEventListener('offline', goOffline);
     });
   });
-  let width = $state(),
-    height = $state();
+  // --- The orbit -------------------------------------------------------------
+  // Everything the member has orbits the badge as one large circle each — see
+  // $lib/me/orbitLayout.ts for where they go and when they stack instead.
+  let vw = $state(0);
+  let vh = $state(0);
+  /** The footer bar's height in px, which the bar publishes as `--foot-h`. */
+  let footPx = $state(0);
+  // Edit animates its panel in from the side by half the screen width.
+  let width = $derived(vw);
+
+  function readFootH() {
+    const raw = getComputedStyle(document.documentElement)
+      .getPropertyValue('--foot-h')
+      .trim();
+    const n = parseFloat(raw) || 0;
+    return raw.endsWith('rem')
+      ? n * (parseFloat(getComputedStyle(document.documentElement).fontSize) || 16)
+      : n;
+  }
+  onMount(() => {
+    footPx = readFootH();
+    // The bar sets `--foot-h` from its own effect, which may run after ours,
+    // and changes it when the member switches bar modes.
+    const mo = new MutationObserver(() => (footPx = readFootH()));
+    mo.observe(document.documentElement, { attributes: true, attributeFilter: ['style'] });
+    return () => mo.disconnect();
+  });
+
+  /**
+   * Products / missions / done / open acts, and the items behind them — null
+   * until they arrive. Read after the page is up, never in the load: the
+   * circles render their counts as "…" meanwhile.
+   * @type {import('$lib/offerings/counts.js').Offerings | null}
+   */
+  let counts = $state(null);
+  let creatingProduct = $state(false);
+  async function loadCounts() {
+    try {
+      const res = await sendToSer(
+        { uid: String(data.uid) },
+        '276myOfferingsViaUser',
+        0,
+        0,
+        false,
+        fetch
+      );
+      counts = readOfferings(res?.data?.usersPermissionsUser?.data?.attributes);
+    } catch (e) {
+      console.warn('me: offering counts failed', e);
+      counts = readOfferings(null);
+    }
+  }
+  onMount(() => {
+    loadCounts();
+    // Deep link from AddSupplySheet: /me?createProduct=1 opens the flow.
+    if (page.url.searchParams.get('createProduct') === '1') creatingProduct = true;
+  });
+
+  /** The concierge summary's links: the one draft, or the wish that moved. */
+  let draftsHref = $derived(
+    data.concierge?.onlyDraftId
+      ? `/concierge/new?draft=${data.concierge.onlyDraftId}`
+      : '/concierge?tab=drafts'
+  );
+  let updatesHref = $derived(
+    data.concierge?.updatesWishId ? `/concierge/${data.concierge.updatesWishId}` : '/concierge'
+  );
+
+  /**
+   * The Edit instances, opened from their circle's edit button.
+   * @type {Record<string, { open: () => void, cancel: () => void }>}
+   */
+  let editors = $state({});
+  /** An editor's side panel is open — the orbit steps back behind it. */
+  let editing = $derived(['a1', 'a2', 'a3', 'a4', 'a5'].includes(current));
+  /** Which editor each panel state belongs to, and the colour of its circle. */
+  const EDITOR_OF = {
+    a1: { key: 'skills', accent: '#16a34a' },
+    a2: { key: 'tafkidims', accent: '#db2777' },
+    a3: { key: 'mashaabims', accent: '#4f46e5' },
+    a4: { key: 'vallues', accent: '#ca8a04' },
+    a5: { key: 'workWays', accent: '#0d9488' }
+  };
+  /** Close the open editor the way its own cancel button does. */
+  function closeEditor() {
+    editors[EDITOR_OF[current]?.key]?.cancel();
+  }
+
+  /**
+   * The circles, in reading order: what the member is *doing* first (rikmas,
+   * missions, acts, products, concierge), then who they *are* (skills, roles,
+   * resources, values, ways of working). Someone who came only to order
+   * something gets the concierge first — the rest of their profile is empty.
+   */
+  let orbs = $derived.by(() => {
+    const doing = [
+      { key: 'rikmas', title: $t('pages.me.myfr'), accent: '#e6007e', icon: '🧶', count: meData?.projects_1s?.data?.length ?? 0, tour: $t('pages.me.message9'), body: rikmasOrb, actions: rikmasActions },
+      { key: 'missions', title: $t('me.orbit.missions'), accent: '#7c3aed', icon: '🛠️', href: '/me/offerings', count: counts?.missions ?? null, tour: $t('me.orbit.missionsTour'), body: missionsOrb, actions: missionsActions },
+      { key: 'acts', title: $t('me.orbit.acts'), accent: '#0284c7', icon: '✅', href: '/myacts', count: counts?.acts ?? null, tour: $t('me.orbit.actsTour'), body: actsOrb, actions: actsActions },
+      { key: 'products', title: $t('me.orbit.products'), accent: '#ea580c', icon: '🎁', href: '/deals/sales-center', count: counts?.products ?? null, tour: $t('me.orbit.productsTour'), body: productsOrb, actions: productsActions },
+      { key: 'concierge', title: $t('me.concierge.title'), accent: '#b38728', icon: '🛎️', href: '/concierge', tour: $t('me.orbit.conciergeTour'), body: conciergeOrb, actions: conciergeActions }
+    ];
+    if (isConciergeCustomer) doing.unshift(...doing.splice(4, 1));
+    const cat = (key, title, accent, icon, list, tour, editor) => ({
+      key,
+      title: $t('pages.editPic.myThing', { name: title }),
+      accent,
+      icon,
+      count: list?.length ?? 0,
+      tour,
+      body: categoryOrb,
+      actions: categoryActions,
+      list,
+      editor
+    });
+    return [
+      ...doing,
+      cat('skills', $t('pages.me.sk'), '#16a34a', '🧠', meData?.skills?.data, $t('pages.me.message2'), 'skills'),
+      cat('roles', $t('pages.me.rl'), '#db2777', '🎭', meData?.tafkidims?.data, $t('pages.me.message3'), 'tafkidims'),
+      cat('resources', $t('pages.me.ms'), '#4f46e5', '🧰', meData?.sps?.data, $t('pages.me.message4'), 'mashaabims'),
+      cat('values', $t('pages.me.valuesLabel'), '#ca8a04', '💛', meData?.vallues?.data, $t('pages.me.message5'), 'vallues'),
+      cat('workways', $t('pages.me.ww'), '#0d9488', '🌿', meData?.work_ways?.data, $t('pages.me.message6'), 'workWays')
+    ];
+  });
+  /** Which attribute holds each category item's name. */
+  const CATEGORY_FIELD = {
+    skills: 'skillName',
+    roles: 'roleDescription',
+    resources: 'name',
+    values: 'valueName',
+    workways: 'workWayName'
+  };
+
+  let layout = $derived(
+    layoutOrbit({
+      width: vw,
+      height: vh,
+      reserveBottom: footPx,
+      count: orbs.length,
+      rtl: $isRtl
+    })
+  );
+  let orbit = $derived(layout.mode === 'orbit' ? layout : null);
 
   /**
    * Someone who came to order through the concierge and has not (yet) joined
@@ -521,6 +641,240 @@
 <svelte:head>
   <title>{$t('pages.me.title')}</title>
 </svelte:head>
+<svelte:window
+  bind:innerWidth={vw}
+  bind:innerHeight={vh}
+  onkeydown={(e) => {
+    if (e.key === 'Escape' && editing && !mass) closeEditor();
+  }}
+/>
+
+<!-- ── what each circle holds ─────────────────────────────────────────────── -->
+{#snippet editIcon()}
+  <svg viewBox="0 0 24 24" aria-hidden="true">
+    <path
+      fill="currentColor"
+      d="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z"
+    />
+  </svg>
+{/snippet}
+
+{#snippet plusIcon()}
+  <svg viewBox="0 0 24 24" aria-hidden="true">
+    <path fill="currentColor" d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" />
+  </svg>
+{/snippet}
+
+{#snippet categoryOrb(orb)}
+  {#if orb.list?.length}
+    {#each orb.list as item (item.id)}
+      {#if orb.key === 'resources'}
+        <!-- A resource says where it stands — out in a rikma or free to offer —
+             and opens its own calendar, the same two facts the editor shows. -->
+        {@const invested = item.attributes?.panui === false}
+        <a
+          class="orb-chip link"
+          class:muted={invested}
+          href="/me/resources?sp={item.id}"
+          dir="auto"
+          title={invested ? $t('pages.editPic.onin') : $t('me.orbit.available')}
+        >
+          {#if invested}
+            <Grow width={14} height={14} />
+          {:else}
+            <span class="free-dot" aria-hidden="true"></span>
+          {/if}
+          <span>{item.attributes?.name}</span>
+          <span class="sr-only">· {invested ? $t('pages.editPic.onin') : $t('me.orbit.available')}</span>
+        </a>
+      {:else}
+        <span class="orb-chip" dir="auto">{item.attributes?.[CATEGORY_FIELD[orb.key]]}</span>
+      {/if}
+    {/each}
+  {:else}
+    <p class="orb-empty">{$t('me.orbit.empty')}</p>
+  {/if}
+{/snippet}
+{#snippet categoryActions(orb)}
+  <button
+    type="button"
+    class="orb-btn"
+    title={$t('pages.editPic.edito')}
+    aria-label={`${$t('pages.editPic.edito')} · ${orb.title}`}
+    onclick={() => editors[orb.editor]?.open()}
+  >
+    {@render editIcon()}
+  </button>
+{/snippet}
+
+{#snippet rikmasOrb()}
+  {#if meData?.projects_1s?.data?.length}
+    {#each meData.projects_1s.data as rikma (rikma.id)}
+      <a class="orb-chip link" href="/moach/{rikma.id}" dir="auto" data-sveltekit-preload-data
+        >{rikma.attributes.projectName}</a
+      >
+    {/each}
+  {:else}
+    <p class="orb-empty">{$t('me.orbit.emptyRikmas')}</p>
+  {/if}
+{/snippet}
+{#snippet rikmasActions()}
+  <!-- The lamp, with its heart cursor — the way a new rikma has always been
+       started here. -->
+  <button
+    type="button"
+    class="new-rikma"
+    title={$t('pages.me.crnfr')}
+    aria-label={$t('pages.me.crnfr')}
+    onclick={() => {
+      iwant = false;
+      addP = true;
+    }}
+  >
+    <CrNewProject />
+  </button>
+{/snippet}
+
+{#snippet loadingStat()}
+  <p class="orb-stat">…</p>
+{/snippet}
+
+{#snippet missionsOrb()}
+  {#if !counts}
+    {@render loadingStat()}
+  {:else if counts.doing.length || counts.offers.length}
+    {#each counts.doing as m (m.id)}
+      <a
+        class="orb-chip link"
+        href={m.projectId ? `/moach/${m.projectId}/progress/${m.id}` : '/me/offerings'}
+        dir="auto"
+        title={$t('me.orbit.inProgress')}>⏳ {m.name}</a
+      >
+    {/each}
+    {#each counts.offers as o (o.id)}
+      <a class="orb-chip link muted" href="/me/offerings" dir="auto" title={$t('me.orbit.offered')}
+        >{o.name}</a
+      >
+    {/each}
+    {#if counts.done}
+      <span class="orb-chip" title={$t('offerings.badges.done_tip')}
+        >✓ {$t('me.orbit.done', { count: counts.done })}</span
+      >
+    {/if}
+  {:else}
+    <p class="orb-empty">{$t('me.orbit.emptyMissions')}</p>
+  {/if}
+{/snippet}
+{#snippet missionsActions()}
+  <a
+    class="orb-btn"
+    href="/timers"
+    title={$t('me.orbit.toTimers')}
+    aria-label={$t('me.orbit.toTimers')}
+  >
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path
+        fill="currentColor"
+        d="M15,1H9V3H15M11,14H13V8H11M19.03,7.39L20.45,5.97C20,5.46 19.55,5 19.04,4.56L17.62,6C16.07,4.74 14.12,4 12,4A9,9 0 0,0 3,13A9,9 0 0,0 12,22C17,22 21,17.97 21,13C21,10.88 20.26,8.93 19.03,7.39M12,20A7,7 0 0,1 5,13A7,7 0 0,1 12,6A7,7 0 0,1 19,13A7,7 0 0,1 12,20Z"
+      />
+    </svg>
+  </a>
+  <a
+    class="orb-btn"
+    href="/me/offerings?new=1"
+    title={$t('offerings.badges.add_mission')}
+    aria-label={$t('offerings.badges.add_mission')}>{@render plusIcon()}</a
+  >
+{/snippet}
+
+{#snippet actsOrb()}
+  {#if !counts}
+    {@render loadingStat()}
+  {:else if counts.openActs.length}
+    {#each counts.openActs as act (act.id)}
+      <a
+        class="orb-chip link"
+        href={act.projectId ? `/moach/${act.projectId}/acts` : '/myacts'}
+        dir="auto">{act.name}</a
+      >
+    {/each}
+  {:else}
+    <p class="orb-empty">{$t('me.orbit.emptyActs')}</p>
+  {/if}
+{/snippet}
+{#snippet actsActions()}
+  <a class="orb-link" href="/myacts">{$t('me.orbit.actsOpen')}</a>
+{/snippet}
+
+{#snippet productsOrb()}
+  {#if !counts}
+    {@render loadingStat()}
+  {:else if counts.productList.length}
+    {#each counts.productList as product (product.id)}
+      <a
+        class="orb-chip link"
+        href={product.projectId
+          ? `/moach/${product.projectId}/sales/manage/products`
+          : '/deals/sales-center'}
+        dir="auto">{product.name || '—'}</a
+      >
+    {/each}
+  {:else}
+    <p class="orb-empty">{$t('me.orbit.emptyProducts')}</p>
+  {/if}
+{/snippet}
+{#snippet productsActions()}
+  <button
+    type="button"
+    class="orb-btn"
+    title={$t('offerings.badges.add_product')}
+    aria-label={$t('offerings.badges.add_product')}
+    onclick={() => (creatingProduct = true)}>{@render plusIcon()}</button
+  >
+{/snippet}
+
+{#snippet conciergeOrb()}
+  {@const c = data.concierge}
+  {#if c?.total > 0}
+    {#if c.updates > 0}
+      <a
+        class="orb-chip link hot"
+        href={updatesHref}
+        title={$t('me.concierge.updatesTip', { count: c.updates })}
+        ><b>{c.updates}</b> {$t('me.concierge.updates')}</a
+      >
+    {/if}
+    {#if c.drafts > 0}
+      <a
+        class="orb-chip link"
+        href={draftsHref}
+        title={$t('me.concierge.draftsTip', { count: c.drafts })}
+        ><b>{c.drafts}</b> {$t('me.concierge.drafts')}</a
+      >
+    {/if}
+    {#if c.ordered > 0}
+      <a
+        class="orb-chip link"
+        href="/concierge"
+        title={$t('me.concierge.orderedTip', { count: c.ordered })}
+        ><b>{c.ordered}</b> {$t('me.concierge.ordered')}</a
+      >
+    {/if}
+    {#if isConciergeCustomer}
+      <p class="orb-empty">{$t('me.concierge.customerHint')}</p>
+    {/if}
+  {:else}
+    <p class="orb-empty">{$t('me.orbit.conciergeEmpty')}</p>
+  {/if}
+{/snippet}
+{#snippet conciergeActions()}
+  <a
+    class="orb-btn"
+    href="/concierge/new"
+    title={$t('me.concierge.newWish')}
+    aria-label={$t('me.concierge.newWish')}>{@render plusIcon()}</a
+  >
+{/snippet}
 {#if (!online || data.loadError) && meData}
   <div class="stale-banner" dir="rtl">
     {$lang === 'he'
@@ -619,320 +973,293 @@
     </div>
   {/if}
   {#if addP == false}
-    <div class="body me-page-bg transition-colors duration-500">
+    <div class="me-page-bg transition-colors duration-500" class:stack={!orbit}>
       <!-- כדורים מרחפים ברקע לסימטריה מלאה -->
       <div class="bg-orb bg-orb-tr"></div>
       <div class="bg-orb bg-orb-bl"></div>
 
-      <!-- הכנסת הקומפוננטה החדשה שלנו -->
-      <ProfileBadge
-        username={meData.username}
-        avatarUrl={picLink != null
-          ? picLink
-          : 'https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png'}
+      <div
+        class="me-field"
+        class:ready={vw > 0}
+        class:editing={editing}
+        inert={editing}
+        style:height={orbit ? `${vh}px` : null}
       >
-        <!-- Snippet לכתר (יוזרק למעלה) -->
-        {#snippet crownContent()}
-          <a data-sveltekit-prefetch target="_self" href="/lev">
-            <TourItem message={$t('pages.me.message1')}>
-              <img
-                title={$t('pages.me.levtitle')}
-                class="ceterr name-hover"
-                src="https://res.cloudinary.com/love1/image/upload/v1641481504/newC_qq5z3l.svg"
-                alt="link to the heart page"
-              />
-            </TourItem>
-          </a>
-        {/snippet}
-
-        <!-- Snippet לכפתורים (יוזרקו למטה בצורה סימטרית) -->
-        {#snippet buttonsContent()}
-          {#if updX == 0 && $uPic}
-            <button
-              onclick={openen}
-              class="hover:bg-gold text-mturk hover:text-barbi rounded-full"
-              title={$t('pages.me.message7')}
-            >
-              <TourItem message={$t('pages.me.message7')}>
-                <svg style="width:32px;height:32px" viewBox="0 0 24 24">
-                  <path
-                    fill="currentColor"
-                    d="M22.7 14.3L21.7 15.3L19.7 13.3L20.7 12.3C20.8 12.2 20.9 12.1 21.1 12.1C21.2 12.1 21.4 12.2 21.5 12.3L22.8 13.6C22.9 13.8 22.9 14.1 22.7 14.3M13 19.9V22H15.1L21.2 15.9L19.2 13.9L13 19.9M11.21 15.83L9.25 13.47L6.5 17H13.12L15.66 14.55L13.96 12.29L11.21 15.83M11 19.9V19.05L11.05 19H5V5H19V11.31L21 9.38V5C21 3.9 20.11 3 19 3H5C3.9 3 3 3.9 3 5V19C3 20.11 3.9 21 5 21H11V19.9Z"
+        <div
+          class="me-center"
+          style={orbit
+            ? `left:${orbit.center.x}px;top:${orbit.center.y}px;width:${orbit.center.w}px;height:${orbit.center.h}px`
+            : null}
+        >
+          <ProfileBadge
+            contained
+            username={meData.username}
+            avatarUrl={picLink != null
+              ? picLink
+              : 'https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png'}
+          >
+            <!-- Snippet לכתר (יוזרק למעלה) -->
+            {#snippet crownContent()}
+              <a data-sveltekit-prefetch target="_self" href="/lev">
+                <TourItem message={$t('pages.me.message1')}>
+                  <img
+                    title={$t('pages.me.levtitle')}
+                    class="ceterr name-hover"
+                    src="https://res.cloudinary.com/love1/image/upload/v1641481504/newC_qq5z3l.svg"
+                    alt="link to the heart page"
                   />
-                </svg>
-              </TourItem>
-            </button>
-          {/if}
+                </TourItem>
+              </a>
+            {/snippet}
 
-          {#if a == 0}
-            <a
-              href="/me/settings"
-              data-sveltekit-prefetch
-              title={$t('pages.me.editbas')}
-              class="hover:bg-gold text-mturk hover:text-barbi rounded-full"
-            >
-              <TourItem message={$t('pages.me.message11')}>
-                <svg style="width:32px;height:32px" viewBox="0 0 24 24">
-                  <path
-                    transition:draw|local={{ duration: 1000 }}
-                    fill="currentColor"
-                    d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12H20A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4V2M18.78,3C18.61,3 18.43,3.07 18.3,3.2L17.08,4.41L19.58,6.91L20.8,5.7C21.06,5.44 21.06,5 20.8,4.75L19.25,3.2C19.12,3.07 18.95,3 18.78,3M16.37,5.12L9,12.5V15H11.5L18.87,7.62L16.37,5.12Z"
-                  />
-                </svg>
-              </TourItem>
-            </a>
-          {/if}
-
-          <!-- במקרה שאין תמונה וצריך כפתור העלאה ענק -->
-          {#if !$uPic && addpic == 0}
-            <button
-              onclick={openen}
-              class="hover:bg-gold text-mturk hover:text-barbi rounded-full"
-              title={$t('pages.me.message8')}
-            >
-              <TourItem message={$t('pages.me.message8')}>
-                <svg style="width:32px;height:32px" viewBox="0 0 24 24">
-                  <path
-                    fill="currentColor"
-                    d="M7 19L12 14L13.88 15.88C13.33 16.79 13 17.86 13 19H7M10 10.5C10 9.67 9.33 9 8.5 9S7 9.67 7 10.5 7.67 12 8.5 12 10 11.33 10 10.5M13.09 20H6V4H13V9H18V13.09C18.33 13.04 18.66 13 19 13C19.34 13 19.67 13.04 20 13.09V8L14 2H6C4.89 2 4 2.9 4 4V20C4 21.11 4.89 22 6 22H13.81C13.46 21.39 13.21 20.72 13.09 20M18 15V18H15V20H18V23H20V20H23V18H20V15H18Z"
-                  />
-                </svg>
-              </TourItem>
-            </button>
-          {/if}
-        {/snippet}
-
-        {#snippet diamondContent()}
-          <!-- עוטפים את היהלום במדריך (TourItem) ומעבירים אליו את הסכום והכותרת.
-               היהלום כבר מציג "סך הכל הרווחתי", ולכן הוא גם הכניסה הטבעית לעמוד
-               שמפרק את המספר הזה לאורך זמן ולפי רקמה. -->
-          <a href="/me/income" data-sveltekit-prefetch title={$t('me.income.title')}>
-            <TourItem message={$t('pages.me.message10')}>
-              <Diamond
-                total={total != null ? total : 0}
-                title={$t('pages.me.sofartit')}
-              />
-            </TourItem>
-          </a>
-        {/snippet}
-      </ProfileBadge>
-
-      <div class="flexi">
-        {#if addNs1 == true}
-          {#key addSl}
-            <div
-              class="category-wrapper {current === 'a1'
-                ? `selected ${isMobileOrTablet ? 'h-[calc(100vh-3rem)]' : 'h-screen'}`
-                : ' a1'}"
-            >
-              <TourItem message={$t('pages.me.message2')}>
-                <Edit
-                  {width}
-                  onAddnew={addnew}
-                  onClose={close}
-                  onRemove={remove}
-                  onOpen={open}
-                  bgi={'green'}
-                  onAdd={add}
-                  addSl={addSl1}
-                  meData={odata}
-                  {allvn}
-                  Valname={$t('pages.me.sk')}
-                  valc={'skillName'}
-                  bind:data={meData.skills.data}
-                  datan={'skil'}
-                  linkp={'skills'}
-                  kish={'skills'}
-                  placeholder={$t('pages.me.pls')}
-                />
-              </TourItem>
-            </div>
-            <div
-              class="category-wrapper {current === 'a2'
-                ? `selected ${isMobileOrTablet ? 'h-[calc(100vh-3rem)]' : 'h-screen'}`
-                : ' a2'}"
-            >
-              <TourItem message={$t('pages.me.message3')}>
-                <Edit
-                  {width}
-                  onAddnew={addnew}
-                  onClose={close}
-                  onRemove={remove}
-                  onOpen={open}
-                  onAdd={add}
-                  addSl={addSl2}
-                  meData={odata}
-                  {allvn}
-                  Valname={$t('pages.me.rl')}
-                  valc={'roleDescription'}
-                  bgi={'pink'}
-                  bind:data={meData.tafkidims.data}
-                  datan={'taf'}
-                  linkp={'tafkidims'}
-                  kish={'tafkidims'}
-                  placeholder={$t('pages.me.plt')}
-                />
-              </TourItem>
-            </div>
-            <TourItem message={$t('pages.me.message4')}>
-              <div
-                id="my-resources"
-                class="category-wrapper {current === 'a3' && mass !== true
-                  ? `selected ${isMobileOrTablet ? 'h-[calc(100vh-3rem)]' : 'h-screen'}`
-                  : ''}"
-                class:a3={current !== 'a3'}
-                class:whole={mass === true}
-              >
-                <Edit
-                  {width}
-                  onDelm={delm}
-                  onMassss={massss}
-                  onAddnew={addnew}
-                  onClose={close}
-                  onRemove={remove}
-                  onOpen={open}
-                  onAdd={add}
-                  addSl={addSl3}
-                  meData={odata}
-                  {allvn}
-                  bgi={'indigo'}
-                  Valname={$t('pages.me.ms')}
-                  valc={'name'}
-                  bind:data={meData.sps.data}
-                  datan={'mash'}
-                  linkp={'mashaabims'}
-                  kish={'sps'}
-                  placeholder={$t('pages.me.plm')}
-                />
-              </div>
-            </TourItem>
-
-            <div
-              class="category-wrapper {current === 'a4'
-                ? `selectedl ${isMobileOrTablet ? 'h-[calc(100vh-3rem)]' : 'h-screen'}`
-                : ' a4'}"
-            >
-              <TourItem message={$t('pages.me.message5')}>
-                <Edit
-                  {width}
-                  onAddnew={addnew}
-                  onClose={close}
-                  onRemove={remove}
-                  onOpen={open}
-                  onAdd={add}
-                  addSl={addSl4}
-                  meData={odata}
-                  {allvn}
-                  Valname={$t('pages.me.valuesLabel')}
-                  bgi={'gold'}
-                  valc={'valueName'}
-                  bind:data={meData.vallues.data}
-                  datan={'val'}
-                  linkp={'vallues'}
-                  kish={'vallues'}
-                  placeholder={$t('pages.me.plv')}
-                />
-              </TourItem>
-            </div>
-            <TourItem message={$t('pages.me.message6')}>
-              <div
-                class="category-wrapper {current === 'a5'
-                  ? `selectedl ${isMobileOrTablet ? 'h-[calc(100vh-3rem)]' : 'h-screen'}`
-                  : ' a5'}"
-              >
-                <Edit
-                  {width}
-                  onAddnew={addnew}
-                  onClose={close}
-                  onRemove={remove}
-                  onOpen={open}
-                  onAdd={add}
-                  addSl={addSl5}
-                  meData={odata}
-                  {allvn}
-                  Valname={$t('pages.me.ww')}
-                  bgi={'yellow'}
-                  valc={'workWayName'}
-                  bind:data={meData.work_ways.data}
-                  datan={'work'}
-                  linkp={'workWays'}
-                  kish={'work_ways'}
-                  placeholder={$t('pages.me.plw')}
-                />
-              </div>
-            </TourItem>
-          {/key}
-        {/if}
-        <!-- או גלילה לעשות רינדור עד מקסימום מסויים  של תפקידים כישורים וכו'ואז ההמשך בהרחבה של זה-->
-        <!-- ההיצע שלי (PLAN_USER_OFFERINGS §4.1, קומפקטי): אייקון + מונה + פלוס.
-             ההרחבות: מוצרים → /deals/sales-center, משימות → /me/offerings -->
-        <div id="my-mission-offers" class="w-full px-2">
-          <div id="my-products"></div>
-          <!-- הקונסיירז' שלי: טיוטות / בהזמנה / התפתחויות. ללקוחה שבאה רק
-               להזמין הוא מוביל את השורה — שאר הפרופיל ריק אצלה. -->
-          {#if isConciergeCustomer}
-            <ConciergeBadge summary={data.concierge} prominent />
-          {/if}
-          <OfferingsBadges uid={data.uid} />
-          {#if !isConciergeCustomer}
-            <ConciergeBadge summary={data.concierge} />
-          {/if}
-        </div>
-        <div class="a6">
-          <TourItem message={$t('pages.me.message9')}>
-            <div
-              in:fly|local={{ x: -(width / 2), opacity: 0.5 }}
-              out:scale|local={{ opacity: 0.5, start: 0.1 }}
-              class="another"
-              dir="rtl"
-            >
-              <h2 class="cot">{$t('pages.me.myfr')}</h2>
-              {#if load == false}
-                <div class="inner-scroll d pro">
-                  {#each meData.projects_1s.data as data, i}
-                    <div class="cont">
-                      <button
-                        onclick={() => project(data.id)}
-                        class="pt drop-shadow-lg"
-                      >
-                        <div
-                          class="cont inline-flex items-center sm:text-xl mt-1 mr-2 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-gradient-to-br from-mpink via-transparent via-lpink to-barbi"
-                        >
-                          {data.attributes.projectName}<span
-                            style="margin-top: 2px ;"
-                            ><Arrow
-                              width={width > 640 ? 47.4 : 23.7}
-                              height={width > 640 ? 35.7 : 17.85}
-                            /></span
-                          >
-                        </div></button
-                      >
-                    </div>
-                  {/each}
-                </div>
-              {:else}
-                <Spinner />
+            <!-- תמונה + הגדרות, עם מילים: אייקון עיפרון לבד לא אמר לאף אחד "הגדרות" -->
+            {#snippet buttonsContent()}
+              {#if updX == 0 && addpic == 0}
+                <TourItem message={$uPic ? $t('pages.me.message7') : $t('pages.me.message8')}>
+                  <button
+                    type="button"
+                    onclick={openen}
+                    class="badge-pill"
+                    title={$uPic ? $t('pages.me.message7') : $t('pages.me.message8')}
+                  >
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path
+                        fill="currentColor"
+                        d="M4,4H7L9,2H15L17,4H20A2,2 0 0,1 22,6V18A2,2 0 0,1 20,20H4A2,2 0 0,1 2,18V6A2,2 0 0,1 4,4M12,7A5,5 0 0,0 7,12A5,5 0 0,0 12,17A5,5 0 0,0 17,12A5,5 0 0,0 12,7M12,9A3,3 0 0,1 15,12A3,3 0 0,1 12,15A3,3 0 0,1 9,12A3,3 0 0,1 12,9Z"
+                      />
+                    </svg>
+                    {$t('me.orbit.photo')}
+                  </button>
+                </TourItem>
               {/if}
+              {#if a == 0}
+                <TourItem message={$t('pages.me.message11')}>
+                  <a
+                    href="/me/settings"
+                    data-sveltekit-prefetch
+                    title={$t('pages.me.editbas')}
+                    class="badge-pill"
+                  >
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path
+                        fill="currentColor"
+                        d="M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.21,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.21,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.67 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z"
+                      />
+                    </svg>
+                    {$t('me.orbit.settings')}
+                  </a>
+                </TourItem>
+              {/if}
+            {/snippet}
 
-              <button
-                aria-label={$t('pages.me.crnfr')}
-                style="z-index: 7;"
-                class=" hover:scale-150"
-                onclick={() => {
-                  iwant = false;
-                  addP = true;
-                }}
-                title={$t('pages.me.crnfr')}
-              >
-                <CrNewProject />
-              </button>
-            </div>
-          </TourItem>
+            {#snippet diamondContent()}
+              <!-- היהלום כבר מציג "סך הכל הרווחתי", ולכן הוא גם הכניסה הטבעית
+                   לעמוד שמפרק את המספר הזה לאורך זמן ולפי רקמה. -->
+              <a href="/me/income" data-sveltekit-prefetch title={$t('me.income.title')}>
+                <TourItem message={$t('pages.me.message10')}>
+                  <Diamond total={total != null ? total : 0} title={$t('pages.me.sofartit')} />
+                </TourItem>
+              </a>
+            {/snippet}
+          </ProfileBadge>
         </div>
-        <TourItem message={$t('pages.me.message12')}>
-          <div class="footer-tour-anchor" aria-hidden="true"></div>
-        </TourItem>
+
+        <div class="me-orbs">
+          {#each orbs as orb, i (orb.key)}
+            {@const p = orbit?.orbs[i]}
+            <div
+              class="me-orb-slot"
+              id={orb.key === 'resources' ? 'my-resources' : undefined}
+              style:--i={i}
+              style={p
+                ? `left:${p.x - orbit.size / 2}px;top:${p.y - orbit.size / 2}px;width:${orbit.size}px`
+                : null}
+            >
+              <TourItem message={orb.tour}>
+                <MeOrb
+                  title={orb.title}
+                  accent={orb.accent}
+                  icon={orb.icon}
+                  href={orb.href}
+                  count={orb.count}
+                >
+                  {@render orb.body(orb)}
+                  {#snippet actions()}
+                    {@render orb.actions(orb)}
+                  {/snippet}
+                </MeOrb>
+              </TourItem>
+            </div>
+          {/each}
+        </div>
       </div>
+
+      <!-- העורכים: כפתור העריכה בעיגול מגדיל אותו לעיגול גדול באמצע המסך ובו
+           העורך. כשהם סגורים הם לא מציירים כלום — את הרשימה מציג העיגול. -->
+      {#if editing && !mass}
+        <!-- Tapping outside the circle closes it, like its own cancel button. -->
+        <button
+          type="button"
+          class="editor-scrim"
+          aria-label={$t('pages.editPic.cencel')}
+          onclick={closeEditor}
+        ></button>
+      {/if}
+      {#if addNs1 == true}
+        <div
+          class="category-wrapper"
+          class:editor-orb={current === 'a1'}
+          style:--accent={EDITOR_OF.a1.accent}
+        >
+          <Edit
+            bind:this={editors.skills}
+            face={false}
+            {width}
+            onAddnew={addnew}
+            onClose={close}
+            onRemove={remove}
+            onOpen={open}
+            bgi={'green'}
+            onAdd={add}
+            addSl={addSl1}
+            meData={odata}
+            {allvn}
+            Valname={$t('pages.me.sk')}
+            valc={'skillName'}
+            bind:data={meData.skills.data}
+            datan={'skil'}
+            linkp={'skills'}
+            kish={'skills'}
+            placeholder={$t('pages.me.pls')}
+          />
+        </div>
+        <div
+          class="category-wrapper"
+          class:editor-orb={current === 'a2'}
+          style:--accent={EDITOR_OF.a2.accent}
+        >
+          <Edit
+            bind:this={editors.tafkidims}
+            face={false}
+            {width}
+            onAddnew={addnew}
+            onClose={close}
+            onRemove={remove}
+            onOpen={open}
+            onAdd={add}
+            addSl={addSl2}
+            meData={odata}
+            {allvn}
+            Valname={$t('pages.me.rl')}
+            valc={'roleDescription'}
+            bgi={'pink'}
+            bind:data={meData.tafkidims.data}
+            datan={'taf'}
+            linkp={'tafkidims'}
+            kish={'tafkidims'}
+            placeholder={$t('pages.me.plt')}
+          />
+        </div>
+        <div
+          class="category-wrapper"
+          class:editor-orb={current === 'a3' && mass !== true}
+          style:--accent={EDITOR_OF.a3.accent}
+          class:whole={mass === true}
+        >
+          <Edit
+            bind:this={editors.mashaabims}
+            face={false}
+            {width}
+            onDelm={delm}
+            onMassss={massss}
+            onAddnew={addnew}
+            onClose={close}
+            onRemove={remove}
+            onOpen={open}
+            onAdd={add}
+            addSl={addSl3}
+            meData={odata}
+            {allvn}
+            bgi={'indigo'}
+            Valname={$t('pages.me.ms')}
+            valc={'name'}
+            bind:data={meData.sps.data}
+            datan={'mash'}
+            linkp={'mashaabims'}
+            kish={'sps'}
+            placeholder={$t('pages.me.plm')}
+          />
+        </div>
+        <div
+          class="category-wrapper"
+          class:editor-orb={current === 'a4'}
+          style:--accent={EDITOR_OF.a4.accent}
+        >
+          <Edit
+            bind:this={editors.vallues}
+            face={false}
+            {width}
+            onAddnew={addnew}
+            onClose={close}
+            onRemove={remove}
+            onOpen={open}
+            onAdd={add}
+            addSl={addSl4}
+            meData={odata}
+            {allvn}
+            Valname={$t('pages.me.valuesLabel')}
+            bgi={'gold'}
+            valc={'valueName'}
+            bind:data={meData.vallues.data}
+            datan={'val'}
+            linkp={'vallues'}
+            kish={'vallues'}
+            placeholder={$t('pages.me.plv')}
+          />
+        </div>
+        <div
+          class="category-wrapper"
+          class:editor-orb={current === 'a5'}
+          style:--accent={EDITOR_OF.a5.accent}
+        >
+          <Edit
+            bind:this={editors.workWays}
+            face={false}
+            {width}
+            onAddnew={addnew}
+            onClose={close}
+            onRemove={remove}
+            onOpen={open}
+            onAdd={add}
+            addSl={addSl5}
+            meData={odata}
+            {allvn}
+            Valname={$t('pages.me.ww')}
+            bgi={'yellow'}
+            valc={'workWayName'}
+            bind:data={meData.work_ways.data}
+            datan={'work'}
+            linkp={'workWays'}
+            kish={'work_ways'}
+            placeholder={$t('pages.me.plw')}
+          />
+        </div>
+      {/if}
+
+      {#if creatingProduct}
+        <CreateProductFlow
+          uid={data.uid}
+          onDone={() => {
+            creatingProduct = false;
+            loadCounts();
+          }}
+          onClose={() => (creatingProduct = false)}
+        />
+      {/if}
+
+      <TourItem message={$t('pages.me.message12')}>
+        <div class="footer-tour-anchor" aria-hidden="true"></div>
+      </TourItem>
     </div>
   {:else if addP == true}
     <Addnew userName_value={meData.username} drafted={baciDrafted} onBack={closeCreate} />
@@ -970,17 +1297,22 @@
     align-items: center;
   }
 
-  .pro {
-    max-height: 15vh;
-    overflow-y: scroll;
-    overflow-x: hidden;
-  }
-
   :global([data-svelte-dialog-overlay].content) {
     z-index: 700;
     width: 80vw;
     padding: 0px;
+    margin: auto auto;
   }
+  :global([data-svelte-dialog-content].content) {
+    padding: 0px;
+    margin: auto auto;
+  }
+  @media (min-width: 892px) {
+    :global([data-svelte-dialog-overlay].content) {
+      width: 50vw;
+    }
+  }
+
   .whole {
     position: absolute;
     top: 0;
@@ -993,280 +1325,196 @@
     background-size: cover;
   }
 
-  .n {
-    cursor:
-      url(https://res.cloudinary.com/love1/image/upload/v1639255090/Fingerprint-Heart-II_wqvlih.svg),
-      auto;
-  }
-
-  .n:hover:before {
-    transform: scale(1.2);
-    box-shadow: 0 0 15px #d35400;
-    filter: blur(3px);
-  }
-
-  .n:hover {
-    color: #ffa502;
-    box-shadow: 0 0 15px #d35400;
-    text-shadow: 0 0 15px #d35400;
-  }
-  .cot {
-    color: var(--barbi-pink);
-    margin: 0 auto;
-    padding: 0;
-    text-shadow: 1px 1px #feeb02;
-  }
-  .pt {
-    color: #9900cd;
-    text-shadow: 1px 1px aqua;
-    font-size: 13px;
-    text-align: start;
-  }
-  .pt:hover {
-    color: #574010;
-    text-shadow: 1px 1px var(--gold);
-  }
-  .cont {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    max-width: 100%;
-    word-break: break-word;
-  }
-  .cont > span {
-    display: none;
-    transition: all 0.5;
-  }
-  .cont:hover > span {
-    display: inline;
-  }
   .sp {
     display: grid;
     justify-content: center;
     align-items: center;
   }
 
-  @media (max-width: 528px) {
-    :global([data-svelte-dialog-overlay].content) {
-      z-index: 700;
-      width: 80vw;
-    }
-    .cont {
-      white-space: none;
-      line-height: 1;
-      font-size: 13px;
-    }
-    .sv {
-      width: 8px;
-      height: 8px;
-    }
-    .cot {
-      font-size: 10px;
-    }
-    .pt {
-      font-size: 13px;
-    }
-    .pro {
-      max-height: 15vh;
-      overflow-y: scroll;
-      overflow-x: hidden;
-    }
-    .another {
-      max-height: 25vh;
-      min-height: 25vh;
-      max-width: 27vw;
-      min-width: 27vw;
-    }
-  }
-
+  /* The crown sits in the badge's SVG, so it is sized in the badge's own
+     units and scales with it — a `vh` height here ignored the badge's size. */
   .ceterr {
-    height: 12vh;
+    height: 92px;
     width: auto;
     margin: 0 auto;
   }
 
-  @media (min-width: 529px) {
-    .d::-webkit-scrollbar {
-      width: 12px;
-    }
-
-    .sv {
-      width: 13px;
-      height: 13px;
-    }
-    .cot {
-      font-size: 17px;
-    }
-    .pt {
-      font-size: 13px;
-    }
+  /* ── the badge's two buttons: a word each, not a bare icon ───────────────
+     Inside the SVG's foreignObject, so these px are badge units (500 wide):
+     22 units is ~14px on a 320px badge and grows with it. */
+  .badge-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 16px 5px 14px;
+    border-radius: 999px;
+    border: 2px solid var(--gold, #d4af37);
+    background: rgba(255, 253, 247, 0.92);
+    color: #7a1050;
+    font-size: 22px;
+    font-weight: 800;
+    line-height: 1.2;
+    white-space: nowrap;
+    box-shadow: 0 2px 8px rgba(122, 16, 80, 0.18);
+    transition: transform 0.15s;
   }
-  @media (min-width: 892px) {
-    :global([data-svelte-dialog-overlay].content) {
-      z-index: 700;
-      width: 50vw;
-    }
+  .badge-pill:hover {
+    transform: scale(1.06);
   }
-  @media (min-height: 500px) {
-    .ceterr {
-      height: 12vh;
-      width: auto;
-      margin: 0 auto;
-    }
+  .badge-pill svg {
+    width: 24px;
+    height: 24px;
   }
-
-  @media (min-height: 500px) and (min-width: 520px) {
-    .ceterr {
-      height: 10vh;
-      width: auto;
-      margin: 0 auto;
-    }
+  :global(.dark) .badge-pill {
+    background: rgba(20, 28, 46, 0.92);
+    color: #ffd7ec;
   }
 
-  :global([data-svelte-dialog-content].content) {
-    padding: 0px;
-    margin: auto auto;
-  }
-  :global([data-svelte-dialog-overlay].content) {
-    z-index: 700;
-    width: 80vw;
-    margin: auto auto;
-  }
-  :global(data-svelte-dialog-overlay) {
-    z-index: 700;
-    width: 50vw;
-  }
-  .a1 {
-    position: absolute;
-    transform: translate(-50%, -50%);
-    top: 17%;
-    left: 80%;
-    overflow: visible;
-    transition: all 1s;
-  }
-  .a2 {
-    position: absolute;
-    transform: translate(-50%, -50%);
-    top: 46%;
-    left: 86%;
-    overflow: visible;
-  }
-  .a3 {
-    position: absolute;
-    transform: translate(-50%, -50%);
-    top: 76%;
-    left: 80%;
-    overflow: visible;
-  }
-  .a6 {
-    position: absolute;
-    transform: translate(-50%, -50%);
-    top: 17%;
-    left: 20%;
-    overflow: visible;
-  }
-  #my-mission-offers {
-    position: relative;
-    z-index: 10;
-  }
-  .a4 {
-    position: absolute;
-    transform: translate(-50%, -50%);
-    top: 46%;
-    left: 14%;
-    overflow: visible;
-  }
-  .a5 {
-    position: absolute;
-    transform: translate(-50%, -50%);
-    top: 76%;
-    left: 20%;
-    overflow: visible;
-  }
-  @media (min-width: 348px) {
-    .a2 {
-      left: 80%;
-    }
-    .a4 {
-      left: 20%;
-    }
-  }
-  .selected {
-    z-index: 77;
-
+  /* ── an editor: its circle grows into the middle of the screen ──────────
+     The disc follows the theme because the editor's tiles do (Tile is light
+     ink on dark only under .dark). It scrolls inside the disc; the mask fades
+     the cut so nothing looks sliced by it. */
+  .editor-orb {
+    /* A circle where the screen allows it; on a short wide screen it widens
+       into an ellipse rather than shrinking the editor into a porthole. */
+    --editor-h: min(calc(100dvh - var(--foot-h, 0px) - 24px), 640px);
+    --editor-w: min(92vw, max(var(--editor-h), calc(var(--editor-h) * 1.5)), 760px);
     position: fixed;
-    top: 0;
-    right: 0;
-    padding: 2rem 8px 0.6rem;
-    border-left: 1px solid #aaa;
+    z-index: 77;
+    left: 50%;
+    top: calc((100dvh - var(--foot-h, 0px)) / 2);
+    translate: -50% -50%;
+    width: var(--editor-w);
+    height: var(--editor-h);
+    border-radius: 50%;
+    padding: 9% 15%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: safe center;
+    gap: 0.5rem;
+    text-align: center;
     overflow-y: auto;
-    overflow-x: auto;
-    width: 230px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    background-image: url(https://res.cloudinary.com/love1/image/upload/v1640438541/4nd_w3gv33.svg);
-    background-position: right center;
-    background-repeat: no-repeat;
-    background-size: cover;
+    overflow-x: hidden;
+    /* A scrollbar is a straight line on a round edge; the fade says "more". */
+    scrollbar-width: none;
+    background: radial-gradient(
+        circle at 50% 30%,
+        color-mix(in srgb, var(--accent) 14%, #fffdf7),
+        #fffdf7 72%
+      );
+    color: #2b2620;
+    border: 6px solid color-mix(in srgb, var(--accent) 80%, white);
+    box-shadow:
+      0 20px 60px rgba(0, 0, 0, 0.45),
+      0 0 60px -10px var(--accent);
+    -webkit-mask: linear-gradient(transparent, #000 9%, #000 91%, transparent);
+    mask: linear-gradient(transparent, #000 9%, #000 91%, transparent);
+    animation: editor-in 0.35s cubic-bezier(0.2, 0.8, 0.3, 1.15) both;
   }
-  .selectedl {
-    z-index: 77;
-    background-image: url(https://res.cloudinary.com/love1/image/upload/v1640438541/4nd_w3gv33.svg);
-    background-position: left center;
-    background-repeat: no-repeat;
-    background-size: cover;
-    position: fixed;
-    top: 0;
-    left: 0;
-    padding: 5rem 1rem 0.6rem;
-    overflow-y: scroll;
-    overflow-x: auto;
-
-    width: 17rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
+  /* The editor was written for the night-sky panel: white title, gold icons.
+     On the light disc those two go to ink. */
+  .editor-orb :global(.text-white) {
+    color: #2b2620;
   }
-  @media (min-width: 720px) {
-    .selected,
-    .selectedl {
-      width: 30vw;
+  .editor-orb :global(.text-gold) {
+    color: #8a6510;
+  }
+  :global(.dark) .editor-orb {
+    background: radial-gradient(
+        circle at 50% 30%,
+        color-mix(in srgb, var(--accent) 30%, #1b2440),
+        #0f172a 72%
+      );
+    color: #f1ede4;
+  }
+  :global(.dark) .editor-orb :global(.text-white) {
+    color: #fff;
+  }
+  :global(.dark) .editor-orb :global(.text-gold) {
+    color: var(--gold);
+  }
+  .editor-orb::-webkit-scrollbar {
+    display: none;
+  }
+  /* The editor's own column takes the disc's width, so its pickers do too. */
+  .editor-orb > :global(div) {
+    width: 100%;
+  }
+  @keyframes editor-in {
+    from {
+      scale: 0.35;
+      opacity: 0;
     }
+  }
+  /* A phone is too narrow for a readable disc: the same panel, rounded. */
+  @media (max-width: 479px) {
+    .editor-orb {
+      width: calc(100vw - 24px);
+      height: auto;
+      max-height: calc(100dvh - var(--foot-h, 0px) - 24px);
+      border-radius: 28px;
+      padding: 1.25rem 0.9rem;
+      justify-content: flex-start;
+      -webkit-mask: none;
+      mask: none;
+    }
+  }
+  .editor-scrim {
+    position: fixed;
+    inset: 0;
+    z-index: 76;
+    background: rgba(15, 23, 42, 0.35);
+    cursor: default;
+  }
+
+  /* The lamp that starts a new rikma, at the size of a circle's buttons. */
+  .new-rikma {
+    display: inline-grid;
+    place-items: center;
+    transition: transform 0.2s;
+  }
+  .new-rikma:hover {
+    transform: scale(1.25);
+  }
+  .new-rikma :global(svg) {
+    width: 2.3em;
+    height: 2.3em;
+  }
+
+  /* "Free to offer" on a resource chip — a dot, so the invested ones (the
+     sprout) are the ones that stand out. */
+  .free-dot {
+    flex: none;
+    width: 0.55em;
+    height: 0.55em;
+    border-radius: 50%;
+    background: #16a34a;
+    box-shadow: 0 0 0 2px color-mix(in srgb, #16a34a 25%, transparent);
   }
 
   .body {
     width: 100vw;
     height: 100vh;
-    /* `clip`, not just `hidden`: an `overflow:hidden` box is still a scroll
-       container, so anything that calls scrollIntoView() inside it — a
-       `/me#my-resources` deep link, a focused element — could scroll this
-       fixed-height collage up and leave the badge and the top cards off
-       screen, with no scrollbar to get back. `hidden` stays first as the
-       fallback for browsers without `clip`. */
     overflow: hidden;
     overflow: clip;
     position: relative;
-    padding-bottom: 10vh;
   }
 
   .me-page-bg {
     position: relative;
-    /* Sits on the same element as `.body` and would otherwise win on source
-       order and hand the collage a scrollport back — see the note there. */
+    width: 100%;
+    height: 100dvh;
+    /* `clip`, not just `hidden`: an `overflow:hidden` box is still a scroll
+       container, so a scrollIntoView() inside it — a `/me#my-resources` deep
+       link, a focused circle — could scroll the orbit up with no scrollbar to
+       get back. `hidden` stays first for browsers without `clip`. */
     overflow: hidden;
     overflow: clip;
-    /* `clip` (unlike `hidden`) does not form a block formatting context, so
-       the `my-2` on the first row inside (OfferingsBadges) collapsed straight
-       through this box and shoved the whole 100vh page 8px down. That made the
-       document taller than the viewport, which tripped mobileFooter's "page
-       fits" check and added --foot-pad on top: black bands above and below.
-       `flow-root` contains the margin. Only here, not on `.body` — the loading
-       branch puts `.grid` on that element and a scoped `display` would win. */
+    /* `clip` (unlike `hidden`) does not form a block formatting context, so a
+       child's top margin would collapse through and push the 100dvh page down
+       — taller than the viewport, which trips mobileFooter's "page fits" check
+       and adds --foot-pad on top. `flow-root` contains it. */
     display: flow-root;
     background: radial-gradient(
       circle at bottom center,
@@ -1274,6 +1522,17 @@
       #fdfbfb 70%
     );
     transition: background 0.5s ease;
+  }
+  /* The honeycomb is taller than the screen and scrolls like any page. */
+  .me-page-bg.stack {
+    height: auto;
+    min-height: 100dvh;
+    overflow: visible;
+    /* A page that scrolls gets the footer's reserve as body padding, which
+       would show as a dark band under the gradient. Paint over it instead —
+       the content height mobileFooter measures stays the same. */
+    padding-bottom: var(--foot-pad, 0px);
+    margin-bottom: calc(-1 * var(--foot-pad, 0px));
   }
 
   :global(.dark) .me-page-bg {
@@ -1375,71 +1634,94 @@
     }
   }
 
-  /* שיפור למכלים שיהיו Glassmorphic */
-  .another {
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+  /* ── the orbit ───────────────────────────────────────────────────────────
+     Positions come from $lib/me/orbitLayout.ts as inline left/top/width; the
+     CSS only says "absolutely, inside the field". */
+  .me-field {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+  }
+  .me-center,
+  .me-orb-slot {
+    position: absolute;
+  }
+  /* The SSR render cannot know the screen, so it renders the honeycomb; the
+     circles fade in once the client has measured and placed them, instead of
+     visibly jumping from one layout to the other. */
+  .me-orbs {
+    opacity: 0;
+    transition: opacity 0.35s ease;
+  }
+  .me-field.ready .me-orbs {
+    opacity: 1;
+  }
+  /* An editor panel is open: the orbit dims and stops taking clicks (inert)
+     so the panel reads as the one thing on screen. */
+  .me-field.editing {
+    opacity: 0.25;
+    filter: blur(2px);
+    transition:
+      opacity 0.25s,
+      filter 0.25s;
+  }
+  .me-field.ready .me-orb-slot {
+    animation: orb-in 0.5s calc(var(--i) * 40ms) both cubic-bezier(0.2, 0.8, 0.3, 1.2);
+  }
+  @keyframes orb-in {
+    from {
+      transform: scale(0.6);
+      opacity: 0;
+    }
   }
 
-  :global(.dark) .another {
-    background: rgba(15, 23, 42, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-  }
-
-  .another {
-    padding: 0.6em;
+  /* ── the honeycomb (a screen too small to orbit at a readable size) ───── */
+  .stack .me-field {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: space-between;
-    text-align: center;
-    z-index: -1;
-    height: 28vh;
-    width: 27vw;
-    overflow: visible;
+    padding: 1.25rem 12px 2rem;
   }
-
-  .inner-scroll {
-    max-height: 20vh;
+  .stack .me-center {
+    position: relative;
+    width: min(78vw, 380px, calc((100dvh - var(--foot-h, 0px)) * 0.6 * 5 / 7));
+    aspect-ratio: 5 / 7;
+  }
+  .stack .me-orbs {
     width: 100%;
-    overflow-y: auto;
-    overflow-x: hidden;
+    max-width: 1180px;
+    margin-top: 1rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 14px;
+    justify-items: center;
   }
-
-  .cot {
-    color: var(--barbi-pink);
-    margin-top: 0.2em;
-    margin-bottom: 0.2em;
-    padding: 0;
-    text-shadow: 1px 1px #feeb02;
-    line-height: 1.1;
+  .stack .me-orb-slot {
+    position: relative;
+    width: 100%;
+    max-width: 250px;
   }
-
-  .by {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-family: 'Anonymous Pro', 'Monospace';
-    font-size: 30px;
-  }
-
-  @-moz-keyframes spin {
-    100% {
-      -moz-transform: rotate(360deg);
+  /* A phone gets exactly two columns, the second dropped half a circle — a
+     coin field rather than a table. */
+  @media (max-width: 559px) {
+    .stack .me-orbs {
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      padding-bottom: 26%;
+    }
+    .stack .me-orb-slot:nth-child(even) {
+      translate: 0 50%;
     }
   }
-  @-webkit-keyframes spin {
-    100% {
-      -webkit-transform: rotate(360deg);
+
+  @media (prefers-reduced-motion: reduce) {
+    .me-field.ready .me-orb-slot,
+    .editor-orb {
+      animation: none;
     }
-  }
-  @keyframes spin {
-    100% {
-      -webkit-transform: rotate(360deg);
-      transform: rotate(360deg);
+    .me-orbs,
+    .badge-pill {
+      transition: none;
     }
   }
 

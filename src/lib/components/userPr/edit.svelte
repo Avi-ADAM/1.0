@@ -257,7 +257,8 @@ console.log("skillslist",skillslist);
     }
   }
 
-  function open() {
+  /** Exported so a page that draws its own face (`face={false}`) can open the editor. */
+  export function open() {
     //if there is no already , but to check changes
     // Reset per-session edit state. `yy` drives the save button AND the
     // close/cancel path, and this component instance is reused across edit
@@ -271,6 +272,11 @@ console.log("skillslist",skillslist);
     onOpen?.({
       linkp: linkp
     });
+  }
+
+  /** Exported so the page can close the editor from outside (scrim, Escape) — the same as its own cancel button. */
+  export function cancel() {
+    bitul();
   }
 
   function bitul() {
@@ -469,6 +475,7 @@ console.log("skillslist",skillslist);
    * @property {boolean} [addR]
    * @property {boolean} [addW]
    * @property {number} [width]
+   * @property {boolean} [face] - false: render nothing while closed; the page draws the list itself and calls `open()`
    * @property {(payload: { linkp: any, list: any[] }) => void} [onClose]
    * @property {(payload: { data: any[], linkp: any, valc: any, a: any }) => void} [onAdd]
    * @property {(payload: { id: any, nj: any }) => void} [onDelm]
@@ -492,6 +499,7 @@ console.log("skillslist",skillslist);
     Valname = 'כישורים',
     masss = $bindable(false),
     width = 1,
+    face = true,
     onClose,
     onAdd,
     onDelm,
@@ -681,7 +689,7 @@ console.log("skillslist",skillslist);
       <Edsp meData={xd} onClose={clodd} />
     {/if}
   </div>
-{:else if addSl == false}
+{:else if addSl == false && face}
   <div
     class="another"
     style="margin: auto"

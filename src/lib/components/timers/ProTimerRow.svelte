@@ -26,10 +26,11 @@
   /**
    * @typedef {Object} Props
    * @property {string|number} missionId
+   * @property {string} [href] where the mission's name links — its page in the rikma
    */
 
   /** @type {Props} */
-  let { missionId } = $props();
+  let { missionId, href } = $props();
 
   let showSaveDialog = $state(false);
   let showClearDialog = $state(false);
@@ -120,11 +121,18 @@
   }}
 />
 
+<!-- The wrapper is the size container: the row folds by its own width, so it
+     reads the same in the timers ledger and in a narrow column like /me/offerings. -->
+<div class="row-wrap">
 <div class="row" class:running={isRunning}>
   <span class="state" aria-hidden="true"></span>
 
   <div class="who">
-    <span class="mission">{timer?.missionName ?? ''}</span>
+    {#if href}
+      <a class="mission link" {href}>{timer?.missionName ?? ''}</a>
+    {:else}
+      <span class="mission">{timer?.missionName ?? ''}</span>
+    {/if}
     <span class="project">{timer?.projectName ?? ''}</span>
   </div>
 
@@ -172,8 +180,12 @@
     </button>
   </div>
 </div>
+</div>
 
 <style>
+  .row-wrap {
+    container-type: inline-size;
+  }
   /* One grid, one row. The columns collapse in order of how much they earn
      their place: the meter goes first, then the readout moves under the name. */
   .row {
@@ -213,6 +225,15 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+  .mission.link {
+    color: inherit;
+    text-decoration: underline;
+    text-decoration-color: var(--surface-line);
+    text-underline-offset: 0.2em;
+  }
+  .mission.link:hover {
+    text-decoration-color: currentColor;
   }
   .project {
     font-size: 12px;
@@ -325,7 +346,7 @@
     filter: none;
   }
 
-  @media (max-width: 860px) {
+  @container (max-width: 760px) {
     .row {
       grid-template-columns: 3px minmax(0, 1fr) auto;
       row-gap: 8px;
