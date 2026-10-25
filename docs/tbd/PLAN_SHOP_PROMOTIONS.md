@@ -1,6 +1,6 @@
 # PLAN — מבצעים בחנות: הנחה על פריט, "5 ב-100", מבצע על כל החנות — בהסכמה
 
-> **מצב: tbd. תכנון, לא נכתב קוד.** נכתב 2026-10-23 אחרי קריאת תכניות החנות
+> **מצב: בתהליך. P2 מומש בריפו הזה; P1 מתבצע במקביל בריפו `1.0b`.** נכתב 2026-10-23 אחרי קריאת תכניות החנות
 > ([PLAN_SHOP_CUSTOMER_EXPERIENCE](../inprogress/PLAN_SHOP_CUSTOMER_EXPERIENCE.md),
 > [PLAN_SHOP_OPERATIONS](../inprogress/PLAN_SHOP_OPERATIONS.md),
 > [PLAN_SHOP_SHIPPING](../inprogress/PLAN_SHOP_SHIPPING.md),
@@ -345,7 +345,7 @@ promoPriceOf(product, variant, promos, now)
 |---|---|---|---|
 | **P0** | המסמך + הכרעות (§10) | — | ✅ |
 | **P1** | סכמה ב-`1.0b`: `promotion`, `price-point` + lifecycle, `Decision.kind` + `negopromo` + `promotion`, `Project.promoPolicy`, `order-line`/`Sale` (`listPrice`, `promotion`); `types:update`; qids + `qidsAccess.js` | S1–S5 של החנות נפרסו | 2–3 ימים |
-| **P2** | המנוע `promotions.ts` + בדיקות property; `promoPriceOf` | — (טהור, במקביל ל-P1) | 2–3 ימים |
+| **P2** | המנוע `promotions.ts` + בדיקות property; `promoPriceOf` | — (טהור, במקביל ל-P1) | ✅ מימוש + בדיקות; ראו הערת המימוש למטה |
 | **P3** | ההסכמה: פעולות `proposePromotion`, `counterPromotion`, `pausePromotion`, `endPromotion`, `proposePromoPolicy` (ב-`configs/`, עם `access` ו-`authRules`); ענף הבשלה ב-`timegrama/decision.svelte`; קרון `scheduled→active→ended`; כרטיס בלב (מה מוצע, מה חורג מהמעטפת, הרצפה, התאריך המוקדם) | P1 | 4–5 ימים |
 | **P4** | המשטחים: DTO, `GET /promotions`, `POST /cart/quote`, `createPaidOrder`/`confirmOrderPayment` (§5.3), מונים ותקרה, webhooks `promotion.started/ended`; OpenAPI | P2, P3 | 3–4 ימים |
 | **P5** | ה-UI במוח: לשונית "מבצעים" ב-`sales/manage` (יצירה באשף של 3 צעדים: מה · על מה · מתי), באנר "פעיל עכשיו", מדיניות הרקמה בהגדרות; מחיר מבצע בדיווח מכירה וב-`/gift`; מפתחות `shop.promo.*` בחמש השפות + `check:i18n`; תבנית הפתיחה עוברת ל-`/cart/quote` | P4 | 4–5 ימים |
@@ -354,6 +354,24 @@ promoPriceOf(product, variant, promos, now)
 סדר: **P2 במקביל ל-P1**. `item` + `store` נכנסים ראשונים לכל שלב (הם מחיר לשורה,
 בלי עגלה), `bundle`/`bxgy`/`threshold` מיד אחריהם באותו שלב — הם צריכים את
 `/cart/quote`.
+
+### הערת מימוש P2 — 2026-10-23
+
+`src/lib/shop/promotions.ts` הוא מנוע טהור, ללא תלות בסכמת Strapi; הוא מקבל
+`CartLine`, מבצעים מנורמלים ופונקציית רצפת BOM. `lineTotal` הוא הסכום המדויק
+באגורות לשורה; `unitPrice` הוא ממוצע, ולכן בשורה של כמה יחידות הוא עשוי להיות
+שבר אגורה — האינטגרציה חייבת לשמור את `lineTotal` ולא לחשב אותו מחדש ממחיר ליחידה
+מעוגל. `promoPriceOf` מחזיר מחיר עצמאי ל-`item`/`store` בלבד.
+
+יש סתירה בין שתי דרישות §5.1 אם מפרשים אותן על מחיר סופי של כל שורת הזמנה:
+**חלוקת הנחת עגלה/כמות באופן יחסי בין שורות** מול **"הוספת פריט לעולם אינה
+מייקרת שורה קיימת"**. לדוגמה, בהנחת סף בסכום קבוע, הוספת שורה מגדילה את בסיס
+החלוקה ומקטינה את חלק ההנחה של שורה קודמת. בלי היסטוריית עגלה/הקפאת הקצאות אי
+אפשר להבטיח את שניהם ובו בזמן לשמור על תוצאה סימטרית שאינה תלויה בסדר השורות.
+לכן בדיקות P2 מאמתות אי-העלאה עבור תמחור עצמאי `item`/`store`, ואת יתר המבצעים
+לפי רצפה, תקרת מחיר, סכום מדויק ואי-תלות בסדר הקלט. אם נדרשת מונוטוניות גם
+בהקצאה הסופית של `bundle`/`bxgy`/`threshold`, צריך לבחור בהמשך מדיניות אחרת
+(למשל הנחת הזמנה נפרדת שאינה מחולקת למחירי שורות, או הקצאה דביקה).
 
 ---
 
