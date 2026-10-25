@@ -519,6 +519,12 @@ export type ActionKey =
   | 'publishStipendFundingRequest'
   | 'getStipendWork'
   | 'getStipendOverview'
+  // Shop promotions (PLAN_SHOP_PROMOTIONS P3)
+  | 'proposePromotion'
+  | 'counterPromotion'
+  | 'pausePromotion'
+  | 'endPromotion'
+  | 'proposePromoPolicy'
   | 'setMatanotDiscovery'
   | 'refreshMySuggestions'
   | 'declineSpForMashaabim'

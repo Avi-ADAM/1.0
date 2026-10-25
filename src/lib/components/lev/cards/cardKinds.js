@@ -39,6 +39,7 @@ export const MILON_KEY_BY_ANI = {
   huca: 'pmashs',
   archObject: 'hachla',
   stipend: 'hachla',
+  promotion: 'hachla',
   hachla: 'hachla'
 };
 
@@ -110,6 +111,7 @@ const KIND_META = {
   huca: { key: 'huca', glow: 'orange' },
   archObject: { key: 'archObject', glow: 'red' },
   stipend: { key: 'stipend', glow: 'purple' },
+  promotion: { key: 'promotion', glow: 'orange' },
   hachla: { key: 'hachla', glow: 'green' },
   wishoffer: { key: 'wishoffer', glow: 'barbi' },
   sitesharepay: { key: 'sitesharepay', glow: 'gold' },
@@ -274,6 +276,7 @@ export const WHEN_KINDS = [
   'hachla',
   'archObject',
   'stipend',
+  'promotion',
   'sheirutp',
   'wishoffer'
 ];
@@ -459,6 +462,16 @@ const ROW_CONTENT = {
       f('rate', n(b.stipend?.standing?.stipendRate)),
       f('hours', n(b.stipend?.standing?.monthlyHours ?? b.stipend?.standing?.hours)),
       f('round', n(b.stipend?.standingOrder))
+    )
+  }),
+
+  // A shop promotion or the rikma's envelope (PLAN_SHOP_PROMOTIONS §3.3).
+  promotion: (b) => ({
+    title: T(b.promo?.standing?.name) ?? (b.promo?.kind === 'promoPolicy' ? K('lev.promo.policyTitle') : T(b.projectName)),
+    subtitle: b.promo?.standing ? K(`lev.promo.kind.${b.promo.standing.kind}`) : K('lev.promo.policySub'),
+    facts: chips(
+      f('pct', n(b.promo?.standing?.rule?.pct ?? b.promo?.standing?.rule?.getPct ?? b.promo?.policy?.maxPct)),
+      f('round', n(b.promo?.order))
     )
   }),
 

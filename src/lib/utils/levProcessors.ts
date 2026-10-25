@@ -2240,6 +2240,27 @@ export function processDecisions(
         already: sv ? sv.myTurn === false : false,
         pl: sv && sv.myTurn === false ? PRIORITY_BAND.VOTE_DONE : PRIORITY_BAND.VOTE_PENDING
       };
+    } else if (decision.kind === 'promotion' || decision.kind === 'promoPolicy') {
+      // Shop promotion / envelope (PLAN_SHOP_PROMOTIONS §3.3). Rikma-wide,
+      // counted on the standing round only.
+      const pv = (decision as any).promo;
+      const signed = (pv?.signedIds ?? []).length;
+      const noof = (decision as any).memberCount ?? (projectInfo.noof || 0);
+      return {
+        ...commonFields,
+        ...decision,
+        ani: 'promotion',
+        azmi: 'hachla',
+        pendId: decision.id,
+        restime: getProjectRestime(decision.projectId),
+        created_at: decision.createdAt,
+        noof,
+        noofusersOk: signed,
+        noofusersNo: 0,
+        noofusersWaiting: Math.max(0, noof - signed),
+        already: pv ? pv.myTurn === false : false,
+        pl: pv && pv.myTurn === false ? PRIORITY_BAND.VOTE_DONE : PRIORITY_BAND.VOTE_PENDING
+      };
     } else if (decision.kind === 'sheirutpends') {
       return {
         ...commonFields,

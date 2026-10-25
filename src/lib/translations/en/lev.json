@@ -865,7 +865,8 @@
       "shiftStarting": "Shift starting",
       "shiftLog": "Shift hours",
       "fulfill": "Order task",
-      "fulfillRule": "Automation rule"
+      "fulfillRule": "Automation rule",
+      "promotion": "Shop promotion"
     },
     "fact": {
       "hours": "{{value}} hours",
@@ -880,7 +881,8 @@
       "members": "{{value}} partners",
       "round": "Round {{value}}",
       "basis": "of {{value}}",
-      "transfers": "{{value}} transfers"
+      "transfers": "{{value}} transfers",
+      "pct": "{{value}}%"
     },
     "decision": {
       "name": "Rikma name change",
@@ -986,7 +988,8 @@
     "archObject": "Proposed {{time}}",
     "stipend": "Opened {{time}}",
     "sheirutp": "Sent {{time}}",
-    "wishoffer": "Submitted {{time}}"
+    "wishoffer": "Submitted {{time}}",
+    "promotion": "Proposed {{time}}"
   },
   "fulfill": {
     "type": "Task for an order from your site",
@@ -1097,6 +1100,90 @@
     "roleTerms": {
       "title": "Automation rules that come with the role",
       "note": "Applying includes agreeing to these rules. If a rule changes, you will be asked again."
+    }
+  },
+  "promo": {
+    "policyTitle": "Promotion envelope",
+    "policySub": "A promotion inside it goes out without a vote",
+    "kind": {
+      "item": "Item discount",
+      "bundle": "Quantity deal",
+      "bxgy": "Buy and get",
+      "store": "Store-wide sale",
+      "threshold": "Spend and save"
+    },
+    "type": {
+      "promotion": "Proposed promotion",
+      "counter": "Counter-version of a promotion",
+      "policy": "Proposed promotion envelope"
+    },
+    "what": {
+      "pct": "{{value}}% off",
+      "price": "Sale price {{value}}",
+      "off": "{{value}} off each",
+      "bundle": "{{qty}} for {{price}}",
+      "bxgy": "Buy {{buy}}, get {{get}} at {{getPct}}% off",
+      "thresholdPct": "{{pct}}% off over {{min}}",
+      "thresholdOff": "{{off}} off over {{min}}"
+    },
+    "scope": {
+      "all": "on the whole shop",
+      "products": "on {{count}} products",
+      "categories": "on {{count}} categories"
+    },
+    "dates": "{{from}} – {{to}}",
+    "fromApproval": "as soon as it is approved",
+    "capUnits": "up to {{count}} units",
+    "perOrderMax": "up to {{count}} per order",
+    "by": "Proposed by {{name}}",
+    "why": "Why",
+    "beyond": "Beyond the envelope",
+    "breach": {
+      "noPolicy": "The rikma has no promotion envelope yet — every promotion is a proposal",
+      "kind": "This kind of promotion is not in the envelope",
+      "pct": "{{value}}% — above the envelope ({{limit}}%)",
+      "pctUnknown": "The depth depends on the prices (envelope: up to {{limit}}%)",
+      "days": "{{value}} days — longer than the envelope ({{limit}})",
+      "who": "The envelope lets only certain roles launch promotions"
+    },
+    "startsLate": "If it is approved after its start date, it starts at approval — and its end does not move.",
+    "silence": "No response by {{date}} counts as consent.",
+    "signed": "{{ok}} of {{total}} signed",
+    "policy": {
+      "line": "up to {{pct}}% · up to {{days}} days",
+      "floorCost": "never below cost",
+      "floorNone": "below cost allowed",
+      "whoMembers": "any member of the rikma can launch one",
+      "whoRoles": "only certain roles can launch one",
+      "arranged": "a discount arranged in a conversation up to {{pct}}% — without asking"
+    },
+    "btn": {
+      "approve": "Approve",
+      "counter": "Another version",
+      "chat": "Talk it over",
+      "send": "Send this version",
+      "cancel": "Cancel"
+    },
+    "counter": {
+      "title": "Your version",
+      "pct": "Discount %",
+      "price": "Sale price",
+      "off": "Off each",
+      "bundlePrice": "Price for the bundle",
+      "getPct": "Discount % on the reward",
+      "thresholdOff": "Amount off",
+      "startsAt": "From",
+      "endsAt": "Until",
+      "maxPct": "Up to what %",
+      "maxDays": "Up to how many days",
+      "why": "Why this version?",
+      "zeroHint": "0 = no promotion. It is a counter-proposal, not a veto."
+    },
+    "toast": {
+      "signed": "You signed the version on the table",
+      "applied": "Everyone signed — it is approved",
+      "countered": "Your version is on the table and the clock restarted",
+      "error": "Something went wrong — try again"
     }
   }
 }

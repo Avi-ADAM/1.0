@@ -866,7 +866,8 @@
       "shiftStarting": "Turno empezando",
       "shiftLog": "Horas del turno",
       "fulfill": "Tarea de pedido",
-      "fulfillRule": "Regla de automatización"
+      "fulfillRule": "Regla de automatización",
+      "promotion": "Promoción de la tienda"
     },
     "fact": {
       "hours": "{{value}} horas",
@@ -881,7 +882,8 @@
       "members": "{{value}} socios",
       "round": "Ronda {{value}}",
       "basis": "de {{value}}",
-      "transfers": "{{value}} transferencias"
+      "transfers": "{{value}} transferencias",
+      "pct": "{{value}}%"
     },
     "decision": {
       "name": "Cambio de nombre de la rikma",
@@ -987,7 +989,8 @@
     "archObject": "Propuesta {{time}}",
     "stipend": "Abierta {{time}}",
     "sheirutp": "Enviada {{time}}",
-    "wishoffer": "Presentada {{time}}"
+    "wishoffer": "Presentada {{time}}",
+    "promotion": "Propuesta {{time}}"
   },
   "fulfill": {
     "type": "Tarea de un pedido de tu sitio",
@@ -1098,6 +1101,90 @@
     "roleTerms": {
       "title": "Reglas de automatización que vienen con el rol",
       "note": "Al postularte aceptas también estas reglas. Si una regla cambia, se te pedirá de nuevo."
+    }
+  },
+  "promo": {
+    "policyTitle": "Marco de promociones",
+    "policySub": "Una promoción dentro de él sale sin votación",
+    "kind": {
+      "item": "Descuento en un artículo",
+      "bundle": "Oferta por cantidad",
+      "bxgy": "Compra y llévate",
+      "store": "Oferta en toda la tienda",
+      "threshold": "Descuento desde un monto"
+    },
+    "type": {
+      "promotion": "Promoción propuesta",
+      "counter": "Contraversión de una promoción",
+      "policy": "Marco de promociones propuesto"
+    },
+    "what": {
+      "pct": "{{value}}% de descuento",
+      "price": "Precio de oferta {{value}}",
+      "off": "{{value}} de descuento por unidad",
+      "bundle": "{{qty}} por {{price}}",
+      "bxgy": "Compra {{buy}}, llévate {{get}} con {{getPct}}% de descuento",
+      "thresholdPct": "{{pct}}% de descuento desde {{min}}",
+      "thresholdOff": "{{off}} de descuento desde {{min}}"
+    },
+    "scope": {
+      "all": "en toda la tienda",
+      "products": "en {{count}} productos",
+      "categories": "en {{count}} categorías"
+    },
+    "dates": "{{from}} – {{to}}",
+    "fromApproval": "en cuanto se apruebe",
+    "capUnits": "hasta {{count}} unidades",
+    "perOrderMax": "hasta {{count}} por pedido",
+    "by": "Propuesta de {{name}}",
+    "why": "El motivo",
+    "beyond": "Lo que excede el marco",
+    "breach": {
+      "noPolicy": "La rikma aún no tiene marco de promociones — cada promoción es una propuesta",
+      "kind": "Este tipo de promoción no está en el marco",
+      "pct": "{{value}}% — por encima del marco ({{limit}}%)",
+      "pctUnknown": "La profundidad depende de los precios (marco: hasta {{limit}}%)",
+      "days": "{{value}} días — más largo que el marco ({{limit}})",
+      "who": "El marco solo permite lanzar promociones a ciertos roles"
+    },
+    "startsLate": "Si se aprueba después de su fecha de inicio, empieza al aprobarse — y su fin no se mueve.",
+    "silence": "Sin respuesta hasta el {{date}}, cuenta como consentimiento.",
+    "signed": "{{ok}} de {{total}} firmaron",
+    "policy": {
+      "line": "hasta {{pct}}% · hasta {{days}} días",
+      "floorCost": "nunca por debajo del costo",
+      "floorNone": "se permite por debajo del costo",
+      "whoMembers": "cualquier miembro de la rikma puede lanzarla",
+      "whoRoles": "solo ciertos roles pueden lanzarla",
+      "arranged": "un descuento acordado en una conversación hasta {{pct}}% — sin preguntar"
+    },
+    "btn": {
+      "approve": "Apruebo",
+      "counter": "Otra versión",
+      "chat": "Hablarlo",
+      "send": "Enviar la versión",
+      "cancel": "Cancelar"
+    },
+    "counter": {
+      "title": "Tu versión",
+      "pct": "% de descuento",
+      "price": "Precio de oferta",
+      "off": "Descuento por unidad",
+      "bundlePrice": "Precio del paquete",
+      "getPct": "% de descuento en el regalo",
+      "thresholdOff": "Monto de descuento",
+      "startsAt": "Desde",
+      "endsAt": "Hasta",
+      "maxPct": "Hasta qué %",
+      "maxDays": "Hasta cuántos días",
+      "why": "¿Por qué esta versión?",
+      "zeroHint": "0 = sin promoción. Es una contrapropuesta, no un veto."
+    },
+    "toast": {
+      "signed": "Firmaste la versión sobre la mesa",
+      "applied": "Todos firmaron — está aprobado",
+      "countered": "Tu versión está sobre la mesa y el reloj se reinició",
+      "error": "Algo salió mal — inténtalo de nuevo"
     }
   }
 }

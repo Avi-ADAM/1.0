@@ -30,6 +30,7 @@ import type {
 import { buildArchiveDecisionView } from '$lib/archive/decisionView.js';
 import { dateMatchFrom } from '$lib/resources/dateMatchView.js';
 import { buildStipendDecisionView } from '$lib/stipend/decisionView.js';
+import { buildPromoDecisionView } from '$lib/shop/promoDecisionView';
 import { calculateScore } from './suggestionMatchers';
 import { isStockReceiptMaap, receiptPriceOf } from '$lib/fulfillment/stock';
 
@@ -1190,6 +1191,36 @@ export function extractDecisions(
             timegramaId: decision.attributes.timegrama?.data?.id,
             timegramaDate: decision.attributes.timegrama?.data?.attributes?.date,
             stipend: view
+          } as any);
+          continue;
+        }
+
+        // Shop promotions and the rikma's envelope (PLAN_SHOP_PROMOTIONS §3.3).
+        // Rikma-wide, counted on the standing round; on the heart only while
+        // it is my move.
+        if (kind === 'promotion' || kind === 'promoPolicy') {
+          const memberIds = (project.attributes?.user_1s?.data ?? []).map((u: any) =>
+            String(u.id)
+          );
+          const timegramaDate = decision.attributes.timegrama?.data?.attributes?.date;
+          const view = buildPromoDecisionView(decision, memberIds, String(userData.id), { timegramaDate });
+          if (!view) continue; // no version on the table — nothing to decide on
+          if (!view.myTurn && !includeNotMyTurn) continue;
+
+          decisions.push({
+            id: decision.id,
+            projectId: project.id,
+            decision: 'promotion',
+            priority: 10,
+            myid: userData.id,
+            kind,
+            createdAt: decision.attributes.createdAt,
+            vots,
+            users: vots,
+            timegramaId: decision.attributes.timegrama?.data?.id,
+            timegramaDate,
+            promo: view,
+            memberCount: memberIds.length
           } as any);
           continue;
         }

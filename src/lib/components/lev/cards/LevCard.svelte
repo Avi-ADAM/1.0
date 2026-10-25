@@ -31,6 +31,7 @@
   import CustomerSaleCard from './CustomerSaleCard.svelte';
   import SiteSharePayCard from './SiteSharePayCard.svelte';
   import StipendDecisionCard from './StipendDecisionCard.svelte';
+  import PromotionDecisionCard from './PromotionDecisionCard.svelte';
   import StipendPayCard from './StipendPayCard.svelte';
   import StipendConfirmCard from './StipendConfirmCard.svelte';
   import StipendAccruedCard from './StipendAccruedCard.svelte';
@@ -752,6 +753,20 @@
       projectName={buble.projectName}
       logoSrc={buble.src}
       timegramaDate={buble.timegramaDate}
+      isFirst={isVisible}
+      onProj={proj}
+      onUser={user}
+      onChat={chat}
+      onDone={delo}
+    />
+{:else if buble.ani === 'promotion' && milon.hachla == true}
+  <PromotionDecisionCard
+      promo={buble.promo}
+      projectId={buble.projectId}
+      projectName={buble.projectName}
+      logoSrc={buble.src}
+      timegramaDate={buble.timegramaDate}
+      memberCount={buble.noof}
       isFirst={isVisible}
       onProj={proj}
       onUser={user}

@@ -25,6 +25,7 @@ import { execFromContext } from '$lib/server/archive/exec.js';
 import { signObjectChange } from '$lib/server/archive/vote.js';
 import { dealSignersFor } from '$lib/server/sheirut/dealEdit.js';
 import { signStipend } from '$lib/server/stipend/vote.js';
+import { signPromoDecision } from '$lib/server/promotions/decision';
 import { normalizeLicenseChange } from '$lib/codeLicense/codeLicense.js';
 import { applyIdentityDecision } from '$lib/server/rikmaIdentity/identity.js';
 import { calcDeadlineMs } from './actionUtils.js';
@@ -42,7 +43,7 @@ import { readStockFlags, writeStock } from '$lib/server/shop/stockFlags.js';
 import type { ProbeRun } from '$lib/server/apiPublic/schemaProbe.js';
 
 /** Kinds whose branch notifies its own audience. */
-const INLINE_NOTICE_KINDS = new Set(['saleClaim', 'archiveObject', 'editObject', 'stipendProgram', 'stipendPledge']);
+const INLINE_NOTICE_KINDS = new Set(['saleClaim', 'archiveObject', 'editObject', 'stipendProgram', 'stipendPledge', 'promotion', 'promoPolicy']);
 
 /**
  * saleClaim agree() branch (PLAN_sale_holder_consent — phase 2).
@@ -326,6 +327,56 @@ async function handleStipendVote(
   };
 }
 
+/**
+ * promotion / promoPolicy branch (PLAN_SHOP_PROMOTIONS §3.3–3.4). A vote
+ * belongs to the standing round; the last signature applies it, through the
+ * same applier the restime clock uses.
+ */
+async function handlePromoVote(params: Record<string, any>, context: any, notifier: any) {
+  const decisionId = String(params.decisionId);
+  const outcome = await signPromoDecision(execFromContext(context), decisionId, String(context.userId));
+
+  if (notifier && params.projectId && outcome.consensus) {
+    const status = outcome.applied?.status;
+    notifier
+      .notify(
+        {
+          recipients: { type: 'projectMembers', config: { projectIdParam: 'projectId', excludeSender: false } },
+          templates: {
+            title: outcome.kind === 'promoPolicy'
+              ? { he: 'מסגרת המבצעים אושרה', en: 'The promotion envelope was approved' }
+              : { he: 'המבצע אושר', en: 'The promotion was approved' },
+            body: outcome.kind === 'promoPolicy'
+              ? { he: 'מבצע בתוך המסגרת ייצא מעכשיו בלי הצבעה, עם הודעה לכולם.', en: 'From now on a promotion inside the envelope goes out without a vote, with a notice to everyone.' }
+              : status === 'active'
+                ? { he: 'כולם חתמו — המבצע פעיל עכשיו.', en: 'Everyone signed — the promotion is live now.' }
+                : status === 'scheduled'
+                  ? { he: 'כולם חתמו — המבצע יתחיל בתאריך שנקבע.', en: 'Everyone signed — the promotion starts on its date.' }
+                  : { he: 'כולם חתמו על הגרסה שעל השולחן.', en: 'Everyone signed the version on the table.' },
+          },
+          intent: 'outcome',
+          metadata: { type: 'voteUpdate', url: `/moach/${params.projectId}/votes/decision/${decisionId}` },
+        },
+        { projectId: params.projectId },
+        { projectId: params.projectId, decisionId },
+        context,
+      )
+      .catch((e: unknown) => console.warn('[voteOnDecision:promotion] notification failed:', e));
+  }
+
+  return {
+    data: {
+      decisionId,
+      kind: params.kind,
+      order: outcome.order,
+      consensus: outcome.consensus,
+      awaiting: outcome.awaiting,
+      applied: outcome.applied,
+    },
+    updateStrategy: { type: 'fullRefresh' as const },
+  };
+}
+
 const voteOnDecisionHandler: ActionExecutionHandler = async (params, context, { strapi, notifier }) => {
   const { decisionId, projectId, kind, newpicid, timegramaId } = params;
   const { userId } = context;
@@ -346,6 +397,12 @@ const voteOnDecisionHandler: ActionExecutionHandler = async (params, context, { 
   // whether the terms dilute anyone but the two parties.
   if (kind === 'stipendProgram' || kind === 'stipendPledge') {
     return handleStipendVote(params, context, notifier);
+  }
+
+  // Shop promotions and their envelope vote per round too (PLAN_SHOP_PROMOTIONS §3.3);
+  // rikma-wide and unanimous, the bar every change to the rikma's income clears.
+  if (kind === 'promotion' || kind === 'promoPolicy') {
+    return handlePromoVote(params, context, notifier);
   }
 
   // 1. Fetch Decision with current vots

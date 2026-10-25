@@ -204,6 +204,7 @@ import { shiftActionConfigs } from './shifts.js';
 import { fulfillmentActionConfigs } from './fulfillment.js';
 import { stockResourceActionConfigs } from './stockResource.js';
 import { shippingActionConfigs } from './shipping.js';
+import { promotionActionConfigs } from './promotions.js';
 import {
   linkGithubAccountConfig,
   unlinkGithubAccountConfig,
@@ -579,6 +580,8 @@ export function registerAllActions(): void {
   for (const config of stockResourceActionConfigs) registerAction(config);
   // Shipping — zones, rates, pickup points (PLAN_SHOP_SHIPPING).
   for (const config of shippingActionConfigs) registerAction(config);
+  // Shop promotions — proposals, counters, the brake, the envelope (PLAN_SHOP_PROMOTIONS P3).
+  for (const config of promotionActionConfigs) registerAction(config);
   // Code rikma — GitHub connection (PLAN_CODE_RIKMA S2)
   registerAction(linkGithubAccountConfig);
   registerAction(unlinkGithubAccountConfig);

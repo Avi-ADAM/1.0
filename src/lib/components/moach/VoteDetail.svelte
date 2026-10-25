@@ -65,6 +65,7 @@
   import DecisionMaking from '$lib/components/lev/decisionMaking.svelte';
   import ArchiveObjectCard from '$lib/components/lev/cards/ArchiveObjectCard.svelte';
   import StipendDecisionCard from '$lib/components/lev/cards/StipendDecisionCard.svelte';
+  import PromotionDecisionCard from '$lib/components/lev/cards/PromotionDecisionCard.svelte';
   import Spinner from '$lib/celim/Spinner.svelte';
 
   let { kind, entity, projectId, projectBase, uid, backHref } = $props();
@@ -610,6 +611,24 @@
         projectName={buble.projectName}
         logoSrc={buble.src}
         timegramaDate={buble.timegramaDate}
+        isFirst={true}
+        onProj={proj}
+        onUser={user}
+        onChat={chat}
+        onDone={onCoinLapach}
+      />
+    </div>
+  {:else if kind === 'decision' && buble.ani === 'promotion'}
+    <!-- Shop promotions and the envelope (PLAN_SHOP_PROMOTIONS §3.3) — the
+         same card the heart uses. -->
+    <div class="vote-card-wrap mx-auto">
+      <PromotionDecisionCard
+        promo={buble.promo}
+        projectId={buble.projectId}
+        projectName={buble.projectName}
+        logoSrc={buble.src}
+        timegramaDate={buble.timegramaDate}
+        memberCount={buble.noof}
         isFirst={true}
         onProj={proj}
         onUser={user}

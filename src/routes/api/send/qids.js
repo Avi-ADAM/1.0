@@ -185,6 +185,26 @@ const ARCH_DECISION_FIELDS = `
  * A thinner selection anywhere makes the card appear and then vanish when the
  * full lev load overwrites the slice store.
  */
+/**
+ * The shop-promotion half of a Decision (PLAN_SHOP_PROMOTIONS §3.3–3.4).
+ *
+ * Same rule as the two fragments above: `buildPromoDecisionView` returns null
+ * — and the lev extractor drops the card — without a version on the table, so
+ * every query that feeds decisions into the lev pipeline selects these. The
+ * rikma's envelope rides along on the promotion, so the card can say what in
+ * the version goes beyond it.
+ */
+const PROMO_DECISION_FIELDS = `
+                    newPromoPolicy
+                    negopromo {
+                      ordern mode why zman kind name scope rule startsAt endsAt capUnits capOrders perOrderMax
+                      proposedBy { data { id attributes { username } } }
+                    }
+                    promotion { data { id attributes {
+                      status
+                      project { data { id attributes { promoPolicy } } }
+                    } } }`;
+
 const STIPEND_DECISION_FIELDS = `
                     negostip {
                       ordern
@@ -3516,6 +3536,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
           }
 ${ARCH_DECISION_FIELDS}
 ${STIPEND_DECISION_FIELDS}
+${PROMO_DECISION_FIELDS}
         }
       }
     }
@@ -4862,6 +4883,7 @@ ${STIPEND_DECISION_FIELDS}
                     }
 ${ARCH_DECISION_FIELDS}
 ${STIPEND_DECISION_FIELDS}
+${PROMO_DECISION_FIELDS}
                   }
                 }
               }
@@ -12629,6 +12651,7 @@ export const qids = {
                     }
 ${ARCH_DECISION_FIELDS}
 ${STIPEND_DECISION_FIELDS}
+${PROMO_DECISION_FIELDS}
                   }
                 }
               }

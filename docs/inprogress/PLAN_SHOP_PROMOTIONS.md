@@ -1,6 +1,6 @@
 # PLAN — מבצעים בחנות: הנחה על פריט, "5 ב-100", מבצע על כל החנות — בהסכמה
 
-> **מצב: בתהליך. P2 מומש בריפו הזה; P1 מתבצע במקביל בריפו `1.0b`.** נכתב 2026-10-23 אחרי קריאת תכניות החנות
+> **מצב: בתהליך. P1 (סכמה ב-`1.0b`) ו-P2 (המנוע) נבנו; P3 (ההסכמה) נבנה 2026-10-25 — ראו הערת המימוש בסוף §9. הבא: P4.** נכתב 2026-10-23 אחרי קריאת תכניות החנות
 > ([PLAN_SHOP_CUSTOMER_EXPERIENCE](../inprogress/PLAN_SHOP_CUSTOMER_EXPERIENCE.md),
 > [PLAN_SHOP_OPERATIONS](../inprogress/PLAN_SHOP_OPERATIONS.md),
 > [PLAN_SHOP_SHIPPING](../inprogress/PLAN_SHOP_SHIPPING.md),
@@ -346,7 +346,7 @@ promoPriceOf(product, variant, promos, now)
 | **P0** | המסמך + הכרעות (§10) | — | ✅ |
 | **P1** | סכמה ב-`1.0b`: `promotion`, `price-point` + lifecycle, `Decision.kind` + `negopromo` + `promotion`, `Project.promoPolicy`, `order-line`/`Sale` (`listPrice`, `promotion`); `types:update`; qids + `qidsAccess.js` | S1–S5 של החנות נפרסו | 2–3 ימים |
 | **P2** | המנוע `promotions.ts` + בדיקות property; `promoPriceOf` | — (טהור, במקביל ל-P1) | ✅ מימוש + בדיקות; ראו הערת המימוש למטה |
-| **P3** | ההסכמה: פעולות `proposePromotion`, `counterPromotion`, `pausePromotion`, `endPromotion`, `proposePromoPolicy` (ב-`configs/`, עם `access` ו-`authRules`); ענף הבשלה ב-`timegrama/decision.svelte`; קרון `scheduled→active→ended`; כרטיס בלב (מה מוצע, מה חורג מהמעטפת, הרצפה, התאריך המוקדם) | P1 | 4–5 ימים |
+| **P3** | ההסכמה: פעולות `proposePromotion`, `counterPromotion`, `pausePromotion`, `endPromotion`, `proposePromoPolicy` (ב-`configs/`, עם `access` ו-`authRules`); ענף הבשלה ב-`timegrama/decision.svelte`; קרון `scheduled→active→ended`; כרטיס בלב (מה מוצע, מה חורג מהמעטפת, הרצפה, התאריך המוקדם) | P1 | ✅ 2026-10-25 — ראו הערת המימוש; D4 (קונסיגנציה) ו-§6.3 נדחו |
 | **P4** | המשטחים: DTO, `GET /promotions`, `POST /cart/quote`, `createPaidOrder`/`confirmOrderPayment` (§5.3), מונים ותקרה, webhooks `promotion.started/ended`; OpenAPI | P2, P3 | 3–4 ימים |
 | **P5** | ה-UI במוח: לשונית "מבצעים" ב-`sales/manage` (יצירה באשף של 3 צעדים: מה · על מה · מתי), באנר "פעיל עכשיו", מדיניות הרקמה בהגדרות; מחיר מבצע בדיווח מכירה וב-`/gift`; מפתחות `shop.promo.*` בחמש השפות + `check:i18n`; תבנית הפתיחה עוברת ל-`/cart/quote` | P4 | 4–5 ימים |
 | **P6** | קודי קופון; "מחיר לפני" לפי §6 (סגירת הפרצה של `compareAtPrice`); דוח §7; כלי MCP | P5 | 3–4 ימים |
@@ -372,6 +372,45 @@ promoPriceOf(product, variant, promos, now)
 לפי רצפה, תקרת מחיר, סכום מדויק ואי-תלות בסדר הקלט. אם נדרשת מונוטוניות גם
 בהקצאה הסופית של `bundle`/`bxgy`/`threshold`, צריך לבחור בהמשך מדיניות אחרת
 (למשל הנחת הזמנה נפרדת שאינה מחולקת למחירי שורות, או הקצאה דביקה).
+
+### הערת מימוש P3 — 2026-10-25
+
+**מה נבנה ואיפה:**
+
+| חלק | קובץ |
+|---|---|
+| תנאים, מעטפת, חלון (D2), שעון (D3), זכאות, מי חותם — טהור | `src/lib/shop/promoTerms.ts` (+ `isValidPromotionRule` ב-`promotions.ts`, כדי שגרסה שחותמים עליה תמיד ניתנת לתמחור) |
+| קריאה/כתיבה מ-Strapi (`Exec`, כמו stipend/archive) | `src/lib/server/promotions/store.ts` |
+| ה-Decision: פתיחה, סבב נגדי, חתימה, החלה אחת לאישור ולשתיקה | `src/lib/server/promotions/decision.ts` |
+| השעון | `src/lib/server/promotions/clock.ts` + `GET /api/cron/promotions?key=<CRON_SECRET>` |
+| הפעולות | `src/lib/server/actions/configs/promotions.ts` |
+| חתימה | `voteOnDecision` — ענף `promotion`/`promoPolicy` |
+| שתיקה | `timegrama/decision.svelte` — ענף לפני `editObject` |
+| הכרטיס | `PromotionDecisionCard.svelte` (בלב וב-`VoteDetail`), `promoDecisionView.ts`, `PROMO_DECISION_FIELDS` בשלוש שאילתות הלב, `ani:'promotion'` ב-`cardKinds.js`, מפתחות `lev.promo.*` בחמש השפות |
+
+**הכרעות מימוש:**
+
+- **`promoPolicy` בלי `negopromo`.** למעטפת יש ערך אחד (`newPromoPolicy`); הצעה נגדית מחליפה אותו ומעבירה את כולם לסבב הבא ב-`vots.order`. אותו `counterPromotion` משרת את שני הסוגים.
+- **שינוי מבצע שכבר אושר = פתיחה מחדש של אותו Decision** (`archived:false`, סבב חדש, שעון חדש). מבצע שיצא במעטפת ואין לו Decision — ההצעה הנגדית פותחת לו אחד. עד שהיא מבשילה המבצע ממשיך בתנאים הקודמים; מבצע מושהה ממתין לה ולא חוזר לבד.
+- **"0%" שמבשיל מסיים את המבצע** (`endedReason:'early'`) — הצעה נגדית, לא וטו.
+- **`endPromotion`**: מבצע רץ — כל חבר, מיידי, עם סבב `mode:'end'` להיסטוריה. הצעה שעדיין על השולחן — רק המציע מושך אותה; האחרים מציעים 0%.
+- **`pausePromotion({ paused:false })`** — כל חבר יכול לחדש לפני 24 השעות.
+- **עומק הנחה לא ידוע הוא אף פעם לא "בתוך המעטפת"** (`maxEffectivePct` = null למחיר קבוע / ₪ בלי מחירי מחירון). בשרת מחירי המחירון ידועים; בכרטיס, שאין לו אותם, זה מוצג "תלוי במחירים". `bundle` נמדד מול הפריטים היקרים בהיקף, `bxgy` כממוצע הקבוצה ("1+1" = 50%).
+- **`who: roles:<ids>`** נבדק מול התפקידים שהמציע מחזיק דרך משימות פעילות ברקמה.
+- **מה לא בהיקף:** מבצע על מוצר pool/estimated, quote או משאלה נדחה כשהוא נקרא בשמו; בהיקף קטגוריה / כל החנות הוא פשוט לא נכלל.
+
+**מה נדחה בכוונה:**
+
+- **D4 — בעל משאב בקונסיגנציה / `atCost`.** אין עדיין בקוד מושג של קונסיגנציה בשורות BOM (PLAN_SHOP_OPERATIONS §2.3 לא נבנה), אז אין את מי לשאול. כשייבנה: `promoNeedsRikma` מחזיר גם את בעלי המשאבים, והחלה בלי ה"כן" שלהם מוציאה את המוצר מההיקף.
+- **§6.3 — ימי מבצע בחצי שנה.** צריך את ה-`price-point` של מבצעים; עובר ל-P6 עם שאר §6.
+- **הרצפה על הכרטיס** ("נקטם לעלות") — המנוע כבר קוטם; ההצגה על הכרטיס צריכה את עלות ה-BOM ועוברת ל-P4/P5 עם ה-DTO.
+- **webhooks `promotion.started/ended`** — P4. השעון רק כותב.
+
+**לפני שזה עובד בפרודקשן:**
+
+1. **הרשאות Strapi** על `promotion` (find/findOne/create/update) — לתפקיד **Authenticated** (הפעולות רצות עם ה-JWT של החבר, כמו stipend) **וגם** ל-API token (השעון וההבשלה בשתיקה רצים עם טוקן השירות). בלי זה כל הצעה נכשלת ב-Forbidden.
+2. **לתזמן את `/api/cron/promotions`** כל 15 דקות, ליד `/api/cron/orders`.
+3. אין צורך ב-`types:update` — הסכמה של P1 כבר בקבצים המחוללים.
 
 ---
 

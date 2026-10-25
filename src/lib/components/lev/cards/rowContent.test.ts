@@ -86,6 +86,10 @@ const SAMPLES: Record<string, any> = {
       standing: { stipendRate: 45 }
     }
   },
+  promotion: {
+    projectName: 'רקמת הלחם',
+    promo: { kind: 'promotion', order: 1, standing: { kind: 'item', name: 'סוף עונה', rule: { pct: 15 } } }
+  },
   hachla: { kind: 'pubdes', projectName: 'רקמת הלחם' },
   wishoffer: { volunteerName: 'ליאור', missionName: 'הסעה לבית החולים', hours: 3 },
   sitesharepay: { amount: 320, rikmaName: 'רקמת הלחם' },

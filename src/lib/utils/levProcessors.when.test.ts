@@ -48,6 +48,10 @@ const cases: [string, (createdAt?: string) => any[]][] = [
     'stipend',
     (c) => P.processDecisions([raw({ createdAt: c, kind: 'stipendPledge', stipend: null })] as any, [])
   ],
+  [
+    'promotion',
+    (c) => P.processDecisions([raw({ createdAt: c, kind: 'promotion', promo: null })] as any, [])
+  ],
   ['sheirutp', (c) => P.processProductRequests([raw({ createdAt: c })] as any, [])],
   ['wishoffer', (c) => P.processWishOffers([raw({ createdAt: c })] as any, [])]
 ];

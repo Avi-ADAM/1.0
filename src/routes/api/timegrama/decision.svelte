@@ -19,6 +19,7 @@
   import { normalizeLicenseChange } from '$lib/codeLicense/codeLicense.js';
   import { tellMatured } from '$lib/server/notifications/matured';
   import { matureRuleDecision } from '$lib/server/fulfillment/consent';
+  import { applyStandingPromoDecision, fetchPromoDecision } from '$lib/server/promotions/decision';
   import {
     decisionAwaitsCustomer,
     fulfillmentRuleMatured,
@@ -211,6 +212,28 @@
         } catch (e) {
           // Left open: the next run retries rather than losing the consent.
           console.error(`[timegrama/decision] fulfillmentRule ${id} failed — clock left open:`, e);
+          return;
+        }
+        return markDone();
+      }
+
+      // A promotion, or the envelope, nobody answered within restime
+      // (PLAN_SHOP_PROMOTIONS §3.3): the version on the table is approved —
+      // the same applier as the last signature, so the two cannot differ. A
+      // promotion approved after its start begins now; its end does not move.
+      if (a.kind === 'promotion' || a.kind === 'promoPolicy') {
+        const exec = execFromAdmin(SendToAdmin, env.ADMINMONTHER);
+        try {
+          const decision = await fetchPromoDecision(exec, String(id));
+          if (!decision || decision.archived) return markDone();
+          await applyStandingPromoDecision(exec, decision);
+          await tellMatured(
+            rikmaDecisionApplied({ projectId: decision.projectId, decisionId: id, decisionName: decision.decisionName }),
+            fetch
+          );
+        } catch (e) {
+          // Left open: a standing version the machine could not write is still standing.
+          console.error(`[timegrama/decision] ${a.kind} ${id} failed — clock left OPEN for retry:`, e);
           return;
         }
         return markDone();

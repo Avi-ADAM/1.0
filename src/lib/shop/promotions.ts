@@ -1361,6 +1361,15 @@ export function promoPriceOf(
   };
 }
 
+/**
+ * Would the engine accept this rule for this kind? The consent layer
+ * (`$lib/shop/promoTerms`) asks before a proposal is written, so a version the
+ * rikma signs is always one the engine can price.
+ */
+export function isValidPromotionRule(kind: PromotionKind, rule: unknown): boolean {
+  return normalizeRule(kind, rule) !== null;
+}
+
 /** Public cent converter for adapters and tests; rejects invalid money values. */
 export function moneyToMinorUnits(value: number): number {
   return requiredCents(value, 'money');
