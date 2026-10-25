@@ -9,6 +9,7 @@ import {
 } from '$lib/server/apiPublic/http.js';
 import { resolveRikmaFromPath } from '$lib/server/apiPublic/rikmaPath.js';
 import { projectFields, canSeeStatus } from '$lib/server/apiPublic/dto.js';
+import { withPromotions } from '$lib/server/apiPublic/promoCatalog.js';
 import {
   fetchProduct,
   fetchRikmaRef,
@@ -103,15 +104,19 @@ export const GET: RequestHandler = async ({ params, url, request, fetch }) => {
     );
   }
 
+  // The rikma's promotions — `salePrice` / `promotion` (PLAN_SHOP_PROMOTIONS §5.2).
+  const promoted = await withPromotions(resolved.projectId, [product]);
+  const shown = promoted.data[0];
   const body = {
     data: requestedFields.length
-      ? projectFields(product, requestedFields)
-      : product
+      ? projectFields(shown, requestedFields)
+      : shown
   };
   const etag = etagOf({
     p: `${resolved.projectId}/products/${productId}`,
     q: [...url.searchParams.entries()],
-    v: product.updatedAt
+    v: product.updatedAt,
+    promo: promoted.etagPart
   });
 
   return respond({ request, auth, body, etag });

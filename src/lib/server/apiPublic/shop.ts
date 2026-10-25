@@ -238,10 +238,21 @@ export interface ApiVariant {
   /** Absolute, ready to print: the variant's own price, or the product's. */
   price: number | null;
   compareAtPrice: number | null;
+  /** The variant's price under an item / store promotion; null when none (PLAN_SHOP_PROMOTIONS §5.2). */
+  salePrice: number | null;
+  promotion: ApiPromotionBadge | null;
   availability: ApiAvailability;
   images: ApiImage[];
   active: boolean;
   externalKey: string | null;
+}
+
+/** The promotion behind a `salePrice` — enough for a badge and a countdown. */
+export interface ApiPromotionBadge {
+  id: string;
+  name: string | null;
+  kind: string;
+  endsAt: string | null;
 }
 
 export interface ApiPriceRange {
@@ -471,6 +482,8 @@ export function variantsOf(
         optionValues,
         price: opts.price === null ? null : (own ?? opts.price),
         compareAtPrice: num(a.compareAtPrice),
+        salePrice: null,
+        promotion: null,
         availability: availabilityFromQuant(a.quant, a.unlimited),
         images: uploadsOf(a.pics)
           .map(galleryImageOf)

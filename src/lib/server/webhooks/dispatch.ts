@@ -20,8 +20,10 @@ import type { ActionContext } from '$lib/server/actions/types.js';
 import type { WebhookEvent } from '$lib/server/tasksApi.js';
 import type { OrderWebhookEvent } from '$lib/server/ordersApi.js';
 
-/** Every event this module can deliver — tasks, and orders (orderEvents.ts). */
-export type AnyWebhookEvent = WebhookEvent | OrderWebhookEvent;
+import type { PromotionWebhookEvent } from './promotionEvents.js';
+
+/** Every event this module can deliver — tasks, orders (orderEvents.ts) and promotions (promotionEvents.ts). */
+export type AnyWebhookEvent = WebhookEvent | OrderWebhookEvent | PromotionWebhookEvent;
 import { toTaskStatusView } from '$lib/server/tasksApi.js';
 import { SITE_REPORT_PREFIX } from '$lib/server/siteReport.js';
 import { centralProjectId, syncSiteReportFromTask } from '$lib/server/siteReportMirror.js';

@@ -7,6 +7,13 @@ import { formatMoney } from '$lib/money/format.js';
 import { rikmaCurrency } from '$lib/money/resolve.js';
 import { scope, scopeList } from '$lib/realtime/scopes.js';
 import {
+  pricePaidOrderFor,
+  recordPromoUsage,
+  tagPromoOrderLines,
+  tagPromoSales
+} from '$lib/server/promotions/pricing';
+import type { PaidOrderPricing } from '$lib/shop/promoPricing';
+import {
   ORDER_SOURCE,
   canResume,
   expiresAtOf,
@@ -143,6 +150,22 @@ const handler: ActionExecutionHandler = async (params, context, deps) => {
   const now = new Date().toISOString();
   const holderId = String(context.userId);
 
+  // 3b. Promotions (PLAN_SHOP_PROMOTIONS §5.3): what was paid against what
+  //     the engine says. Never a refusal — a gap is a fact on the order.
+  const promo = await pricePaidOrderFor(
+    projectId,
+    plan.lines.map((l, i) => ({
+      position: l.position,
+      productId: l.productId,
+      variantId: l.variantId,
+      quantity: l.quantity,
+      lineTotal: l.lineTotal,
+      promotionId: payload.lines[i]?.promotionId ?? null
+    }))
+  );
+  const promoLine = new Map((promo?.lines ?? []).map((l) => [l.position, l]));
+  if (promo?.gap) plan.notes.push(belowCatalogNote(promo, currency));
+
   // 4. The order row (unless a previous attempt already wrote it).
   let orderId: string;
   // On a resume the stock already moved for the lines that got their sales, so
@@ -206,10 +229,14 @@ const handler: ActionExecutionHandler = async (params, context, deps) => {
   const storedPositions = new Set(
     existing ? storedLinesOf(existing).map((l: any) => Number(l.position)) : []
   );
+  const lineTags: Array<{ lineId: string | null; promotionId: string | null }> = [];
   for (const line of plan.lines) {
     if (storedPositions.has(line.position)) continue;
-    await run('rikmaApiOrderLineCreate', {
+    const pl = promoLine.get(line.position);
+    const createdLine = await run('rikmaApiOrderLineCreate', {
       data: {
+        // What the buyer would have paid, and what came off it (§4.4).
+        ...(pl ? { listPrice: pl.listPrice, discount: pl.discount } : {}),
         order: orderId,
         matanot: line.productId,
         variant: line.variantId,
@@ -225,7 +252,10 @@ const handler: ActionExecutionHandler = async (params, context, deps) => {
         position: line.position
       }
     });
+    const lineId = createdLine?.data?.createOrderLine?.data?.id;
+    if (pl?.promotionId) lineTags.push({ lineId: lineId != null ? String(lineId) : null, promotionId: pl.promotionId });
   }
+  await tagPromoOrderLines(lineTags);
 
   // An arranged order stops here: no sale, no stock, no value until the member
   // who gets the money says so (`confirmOrderPayment`, PLAN_SHOP_OPERATIONS §5).
@@ -263,6 +293,7 @@ const handler: ActionExecutionHandler = async (params, context, deps) => {
       oversold: false,
       total: plan.total,
       currency,
+      belowCatalog: belowCatalogOf(promo),
       lines: plan.lines.map((l) => ({
         productId: l.productId,
         variantId: l.variantId,
@@ -270,6 +301,7 @@ const handler: ActionExecutionHandler = async (params, context, deps) => {
         name: l.nameSnapshot,
         optionLabel: l.optionLabelSnapshot,
         unitPrice: l.unitPrice,
+        promotionId: promoLine.get(l.position)?.promotionId ?? null,
         saleId: null
       })),
       stockChanges: []
@@ -304,6 +336,19 @@ const handler: ActionExecutionHandler = async (params, context, deps) => {
     deps
   );
 
+  // 6b. What the order used of each promotion — once, on the first report
+  //     (a resume never counts twice); and each sale says what it was sold under.
+  if (promo) {
+    if (!existing) await recordPromoUsage(projectId, promo.usage);
+    await tagPromoSales(
+      plan.lines.map((l) => ({
+        saleId: saleIdByPosition.get(l.position),
+        listPrice: promoLine.get(l.position)?.listPrice ?? null,
+        promotionId: promoLine.get(l.position)?.promotionId ?? null
+      }))
+    );
+  }
+
   // 7. Tell the rikma — a new order to ship, and loudly if it was oversold.
   //    Wording: UX_COPY_SHOP_SALES §10.1 — "from your site" (in Hebrew a bare
   //    הזמנה is also an invitation), the order's number, items not lines.
@@ -320,6 +365,13 @@ const handler: ActionExecutionHandler = async (params, context, deps) => {
       const itemsEn = items === 1 ? '1 item' : `${items} items`;
       const shortHe = short === 1 ? 'חסרה יחידה אחת' : `חסרות ${short} יחידות`;
       const shortEn = short === 1 ? '1 unit is missing' : `${short} units are missing`;
+      // Sold under the catalog with no promotion that covers it (§5.3, D7).
+      const gapHe = promo?.gap
+        ? ` נגבו ${formatMoney(promo.gap, currency, 'he')} פחות ממחיר הקטלוג והמבצעים${promo.overArranged ? ' — יותר ממה שהרקמה מאפשרת לסכם לבד, כדאי לברר עם מי שמפעיל את האתר' : ''}.`
+        : '';
+      const gapEn = promo?.gap
+        ? ` ${formatMoney(promo.gap, currency, 'en')} less than the catalog and promotion prices was charged${promo.overArranged ? " — more than the rikma lets a member arrange alone; worth asking whoever runs the site" : ''}.`
+        : '';
       await notifier.notify(
         {
           recipients: { type: 'projectMembers', config: { projectIdParam: 'projectId' } },
@@ -328,12 +380,17 @@ const handler: ActionExecutionHandler = async (params, context, deps) => {
               ? { he: '🛒 הזמנה מהאתר — חסר במלאי', en: '🛒 Order from your site — short on stock' }
               : { he: '🛒 הזמנה חדשה מהאתר', en: '🛒 New order from your site' },
             body: {
-              he: `הזמנה ${number} ב-${amount}, ${itemsHe}, שולמה באתר של "${projectName}".${oversold ? ` ${shortHe}. אפשר להכין אותן או לתאם עם הקונה מועד אחר.` : ''}`,
-              en: `Order ${number} for ${amountEn}, ${itemsEn}, was paid on "${projectName}"'s site.${oversold ? ` ${shortEn}. You can make them or agree a later date with the buyer.` : ''}`
+              he: `הזמנה ${number} ב-${amount}, ${itemsHe}, שולמה באתר של "${projectName}".${oversold ? ` ${shortHe}. אפשר להכין אותן או לתאם עם הקונה מועד אחר.` : ''}${gapHe}`,
+              en: `Order ${number} for ${amountEn}, ${itemsEn}, was paid on "${projectName}"'s site.${oversold ? ` ${shortEn}. You can make them or agree a later date with the buyer.` : ''}${gapEn}`
             }
           },
-          intent: oversold ? 'review' : 'outcome',
-          metadata: { type: 'paidOrder', url: `moach/${projectId}/sales`, projectName, priority: oversold ? 'high' : 'normal' }
+          intent: oversold || promo?.overArranged ? 'review' : 'outcome',
+          metadata: {
+            type: 'paidOrder',
+            url: `moach/${projectId}/sales`,
+            projectName,
+            priority: oversold || promo?.overArranged ? 'high' : 'normal'
+          }
         },
         { projectId },
         null,
@@ -353,6 +410,7 @@ const handler: ActionExecutionHandler = async (params, context, deps) => {
     oversold,
     total: plan.total,
     currency,
+    belowCatalog: belowCatalogOf(promo),
     lines: plan.lines.map((l) => ({
       productId: l.productId,
       variantId: l.variantId,
@@ -360,11 +418,25 @@ const handler: ActionExecutionHandler = async (params, context, deps) => {
       name: l.nameSnapshot,
       optionLabel: l.optionLabelSnapshot,
       unitPrice: l.unitPrice,
+      promotionId: promoLine.get(l.position)?.promotionId ?? null,
       saleId: saleIdByPosition.get(l.position) ?? null
     })),
     stockChanges
   };
 };
+
+/** The order's gap below the engine's price, for the storefront's response — null when none. */
+function belowCatalogOf(promo: PaidOrderPricing | null) {
+  return promo?.gap ? { catalogTotal: promo.catalogTotal, by: promo.gap, pct: promo.gapPct } : null;
+}
+
+function belowCatalogNote(promo: PaidOrderPricing, currency: string): string {
+  return (
+    `מתחת למחיר הקטלוג והמבצעים: שולם ${formatMoney(promo.paidTotal, currency, 'he')}, ` +
+    `לפי הקטלוג ${formatMoney(promo.catalogTotal, currency, 'he')} (פער ${formatMoney(promo.gap, currency, 'he')}, ${promo.gapPct}%)` +
+    (promo.overArranged ? ' — מעבר למה שהרקמה מאפשרת לסכם לבד' : '')
+  );
+}
 
 /** A stored order, in the action's result shape. */
 function resultOf(view: ReturnType<typeof toOrderView> & {}, id: string | number) {

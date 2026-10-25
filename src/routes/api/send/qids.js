@@ -17520,6 +17520,7 @@ ${PROMO_DECISION_FIELDS}
         holder { data { id } }
         lines(pagination: { limit: 100 }) { data { id attributes {
           position quantity unitPrice nameSnapshot optionLabelSnapshot
+          listPrice discount
           matanot { data { id } }
           variant { data { id } }
         } } }

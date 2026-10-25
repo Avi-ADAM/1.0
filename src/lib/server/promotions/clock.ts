@@ -6,10 +6,11 @@
  * that nobody answered with a counter runs again after 24 hours. Idempotent —
  * a row that moved is no longer in the state that moved it.
  *
- * The storefront webhooks (`promotion.started/ended`) are P4; this only writes.
+ * Every move is announced to the rikma's storefronts (`promotion.started/ended`).
  */
 import type { Exec } from '$lib/server/archive/gql.js';
 import { nextPromoStatus, type PromoTransition } from '$lib/shop/promoTerms';
+import { announcePromotion } from '$lib/server/webhooks/promotionEvents';
 import { fetchLivePromotions, updatePromotion } from './store';
 
 export interface ClockReport {
@@ -29,6 +30,12 @@ export async function runPromotionClock(exec: Exec, now = new Date()): Promise<C
         ...(row.status === 'paused' ? { pausedAt: null, pausedById: null } : {})
       });
       report.moved.push({ promotionId: row.id, projectId: row.projectId, from: row.status, to: next });
+      announcePromotion({
+        projectId: row.projectId,
+        promotionId: row.id,
+        status: next.status,
+        endedReason: next.status === 'ended' ? next.endedReason : null
+      });
     } catch (e) {
       report.errors.push({ promotionId: row.id, error: (e as Error)?.message ?? String(e) });
     }

@@ -313,6 +313,10 @@ export interface ShelfProduct {
   archived: boolean;
   categoryIds: string[];
   variants: { id: string; price: number | null }[];
+  /** Open for sale (not a draft, not archived) — absent = not read, taken as yes. */
+  published?: boolean;
+  /** BOM cost per unit — the floor a promotion may not cut through (§4.3). */
+  cost?: number | null;
 }
 
 export type Ineligible = 'pool' | 'quote' | 'wish' | 'archived' | 'noPrice';

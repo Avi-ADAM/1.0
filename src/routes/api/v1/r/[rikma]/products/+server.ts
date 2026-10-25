@@ -11,6 +11,7 @@ import {
 import { resolveRikmaFromPath } from '$lib/server/apiPublic/rikmaPath.js';
 import { parseCatalogQuery } from '$lib/server/apiPublic/query.js';
 import { projectFields } from '$lib/server/apiPublic/dto.js';
+import { withPromotions } from '$lib/server/apiPublic/promoCatalog.js';
 import {
   buildListBody,
   fetchProductPage,
@@ -110,6 +111,10 @@ export const GET: RequestHandler = async ({ params, url, request, fetch }) => {
   }
 
   const body = buildListBody({ rikma, page, query, search: url.searchParams });
+  // The rikma's promotions — `salePrice` / `promotion` (PLAN_SHOP_PROMOTIONS §5.2),
+  // before the sparse fieldset so it can be asked for.
+  const promoted = await withPromotions(resolved.projectId, body.data);
+  body.data = promoted.data;
   if (query.fields.length) {
     body.data = body.data.map((product) =>
       projectFields(product, query.fields)
@@ -122,7 +127,8 @@ export const GET: RequestHandler = async ({ params, url, request, fetch }) => {
   const etag = etagOf({
     p: rikma.canonicalPath,
     q: [...url.searchParams.entries()],
-    v: page.data.map((p) => `${p.id}:${p.updatedAt ?? ''}`)
+    v: page.data.map((p) => `${p.id}:${p.updatedAt ?? ''}`),
+    promo: promoted.etagPart
   });
 
   // No `X-1lev1-Rikma-Canonical` on a 200: the client is already on the

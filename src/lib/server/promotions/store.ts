@@ -65,7 +65,7 @@ export async function fetchShelf(exec: Exec, projectId: string): Promise<ShelfPr
   const data = await run(
     exec,
     `{ matanots(filters: { projectcreates: { id: { eq: ${gqlStr(projectId)} } } }, pagination: { limit: 300 }) { data { id attributes {
-      name price pricingMode origin archived lifecycle
+      name price pricingMode origin archived lifecycle status_of_voting estimatedPrice marginPct
       owner_user { data { id } }
       categories { data { id } }
       variants(pagination: { limit: 100 }) { data { id attributes { price active } } }
@@ -74,6 +74,7 @@ export async function fetchShelf(exec: Exec, projectId: string): Promise<ShelfPr
   );
   return (data?.matanots?.data ?? []).map((m: any) => {
     const a = m.attributes ?? {};
+    const estimated = num(a.estimatedPrice);
     return {
       id: String(m.id),
       name: String(a.name ?? ''),
@@ -85,7 +86,10 @@ export async function fetchShelf(exec: Exec, projectId: string): Promise<ShelfPr
       categoryIds: (a.categories?.data ?? []).map((c: any) => String(c.id)),
       variants: (a.variants?.data ?? [])
         .filter((v: any) => v?.attributes?.active !== false)
-        .map((v: any) => ({ id: String(v.id), price: num(v.attributes?.price) }))
+        .map((v: any) => ({ id: String(v.id), price: num(v.attributes?.price) })),
+      published: !['draft', 'voting', 'archived'].includes(a.status_of_voting) && !['archived', 'released'].includes(a.lifecycle),
+      // ComposeProduct prices a BOM as cost × (1 + margin%); the floor is that cost.
+      cost: estimated != null && estimated > 0 ? Math.round((estimated / (1 + (num(a.marginPct) ?? 0) / 100)) * 100) / 100 : null
     } satisfies ShelfProduct;
   });
 }
@@ -97,6 +101,7 @@ export interface PromotionRow {
   decisionArchived: boolean;
   proposedById: string | null;
   status: PromotionStatus;
+  endedReason: EndedReason | null;
   kind: PromoTerms['kind'];
   name: string | null;
   scope: PromoTerms['scope'];
@@ -113,7 +118,7 @@ export interface PromotionRow {
 }
 
 const ROW_FIELDS = `
-  status kind name scope rule startsAt endsAt capUnits capOrders perOrderMax usedUnits usedOrders pausedAt
+  status endedReason kind name scope rule startsAt endsAt capUnits capOrders perOrderMax usedUnits usedOrders pausedAt
   project { data { id } }
   decision { data { id attributes { archived } } }
   proposedBy { data { id } }
@@ -129,6 +134,7 @@ function rowOf(node: any): PromotionRow | null {
     decisionArchived: a.decision?.data?.attributes?.archived === true,
     proposedById: idOf(a.proposedBy),
     status: STATUSES.includes(a.status) ? a.status : 'proposed',
+    endedReason: ENDED_REASONS.includes(a.endedReason) ? a.endedReason : null,
     kind: a.kind,
     name: a.name ?? null,
     scope: a.scope ?? {},
@@ -156,6 +162,23 @@ export async function fetchLivePromotions(exec: Exec): Promise<PromotionRow[]> {
     exec,
     `{ promotions(filters: { status: { in: ["scheduled", "active", "paused"] } }, pagination: { limit: 500 }) { data { id attributes { ${ROW_FIELDS} } } } }`,
     'promo:live'
+  );
+  return (data?.promotions?.data ?? []).map(rowOf).filter(Boolean) as PromotionRow[];
+}
+
+/**
+ * One rikma's promotions that can price something: scheduled and active, and
+ * — for the payment grace of §5.3 — those that ended since `endedSince`.
+ */
+export async function fetchProjectPromotions(exec: Exec, projectId: string, endedSince?: Date): Promise<PromotionRow[]> {
+  const live = `{ status: { in: ["scheduled", "active"] } }`;
+  const lately = endedSince
+    ? `, { and: [{ status: { eq: "ended" } }, { endsAt: { gte: ${gqlStr(endedSince.toISOString())} } }] }`
+    : '';
+  const data = await run(
+    exec,
+    `{ promotions(filters: { and: [{ project: { id: { eq: ${gqlStr(projectId)} } } }, { or: [${live}${lately}] }] }, pagination: { limit: 200 }) { data { id attributes { ${ROW_FIELDS} } } } }`,
+    'promo:project-list'
   );
   return (data?.promotions?.data ?? []).map(rowOf).filter(Boolean) as PromotionRow[];
 }
@@ -203,6 +226,8 @@ export interface PromotionPatch extends Partial<PromoTerms> {
   decisionId?: string | null;
   pausedAt?: string | null;
   pausedById?: string | null;
+  usedUnits?: number;
+  usedOrders?: number;
 }
 
 export async function updatePromotion(exec: Exec, id: string, patch: PromotionPatch): Promise<void> {
@@ -212,7 +237,9 @@ export async function updatePromotion(exec: Exec, id: string, patch: PromotionPa
     'endedReason' in patch ? (patch.endedReason ? enumField('endedReason', patch.endedReason, ENDED_REASONS) : 'endedReason: null') : null,
     'decisionId' in patch ? (patch.decisionId ? strField('decision', patch.decisionId) : 'decision: null') : null,
     'pausedAt' in patch ? (patch.pausedAt ? dateField('pausedAt', patch.pausedAt) : 'pausedAt: null') : null,
-    'pausedById' in patch ? (patch.pausedById ? strField('pausedBy', patch.pausedById) : 'pausedBy: null') : null
+    'pausedById' in patch ? (patch.pausedById ? strField('pausedBy', patch.pausedById) : 'pausedBy: null') : null,
+    numField('usedUnits', patch.usedUnits),
+    numField('usedOrders', patch.usedOrders)
   );
   if (!parts) return;
   await run(exec, `mutation { updatePromotion(id: ${gqlStr(id)}, data: { ${parts} }) { data { id } } }`, 'promo:update');

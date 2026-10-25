@@ -1,6 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('$lib/server/actions/configs/actionUtils.js', () => ({ calcDeadlineMs: () => 48 * 3600_000 }));
+const announced = vi.hoisted(() => [] as Array<Record<string, unknown>>);
+vi.mock('$lib/server/webhooks/promotionEvents', () => ({ announcePromotion: (c: Record<string, unknown>) => void announced.push(c) }));
 
 import { applyStandingPromoDecision, signPromoDecision, standingOrder, standingRound, type PromoDecision } from './decision';
 import { runPromotionClock } from './clock';
@@ -177,5 +179,11 @@ describe('runPromotionClock', () => {
       ['3', 'active']
     ]);
     expect(writes.find((w) => w.includes('updatePromotion(id: "3"'))).toContain('pausedAt: null');
+    // Every move reaches the storefronts.
+    expect(announced.slice(-3).map((a) => [a.promotionId, a.status, a.endedReason ?? null])).toEqual([
+      ['1', 'active', null],
+      ['2', 'ended', 'time'],
+      ['3', 'active', null]
+    ]);
   });
 });

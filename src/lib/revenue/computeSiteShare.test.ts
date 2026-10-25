@@ -47,3 +47,11 @@ describe('computeSiteShare', () => {
     expect(r.line.en.toLowerCase()).toContain('service');
   });
 });
+
+describe('computeSiteShare under a promotion (PLAN_SHOP_PROMOTIONS §7)', () => {
+  it('is read off what was actually sold, so a promotion shrinks it in the same proportion', () => {
+    const list = computeSiteShare({ payerRole: 'provider', baseAmount: 1000, config: { pctProvider: 0.03 } });
+    const sold = computeSiteShare({ payerRole: 'provider', baseAmount: 800, config: { pctProvider: 0.03 } }); // 20% off
+    expect(sold.siteAmount / list.siteAmount).toBeCloseTo(0.8, 10);
+  });
+});

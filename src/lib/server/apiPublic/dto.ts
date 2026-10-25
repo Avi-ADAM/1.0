@@ -49,6 +49,7 @@ import {
   type ApiImage,
   type ApiOption,
   type ApiPriceRange,
+  type ApiPromotionBadge,
   type ApiShop,
   type ApiVariant
 } from './shop.js';
@@ -63,6 +64,7 @@ export type {
   ApiImage,
   ApiOption,
   ApiPriceRange,
+  ApiPromotionBadge,
   ApiVariant
 };
 
@@ -268,6 +270,13 @@ export interface ApiProduct {
   // ─── the shop layer (PLAN_SHOP_CUSTOMER_EXPERIENCE §5.1) ─────────────────
   /** `min`/`max` of the active variants, or the single price. `null` ⇒ quote. */
   priceRange: ApiPriceRange | null;
+  /**
+   * What a buyer pays today under an item / store promotion
+   * (PLAN_SHOP_PROMOTIONS §5.2). `price` stays the approved price; null when
+   * no promotion prices this product on its own.
+   */
+  salePrice: number | null;
+  promotion: ApiPromotionBadge | null;
   /** True when the product has variant rows — including when they were not loaded. */
   hasVariants: boolean;
   /**
@@ -469,6 +478,9 @@ export function toApiProduct(
     url: abs(`/gift/${id}`),
     buyUrl: abs(`/gift/${id}`),
     priceRange: block.priceRange,
+    // Filled by the routes from the rikma's promotions (`withPromotions`).
+    salePrice: null,
+    promotion: null,
     hasVariants: block.hasVariants,
     checkout: checkoutOf({ status, pricingMode, price }),
     options: block.options,
@@ -583,6 +595,8 @@ export const API_PRODUCT_FIELDS: readonly string[] = [
   // the shop layer (§5.1). `?fields=priceRange.min` works like every other
   // dotted path — see `API_PRODUCT_FIELD_SET`.
   'priceRange',
+  'salePrice',
+  'promotion',
   'hasVariants',
   'checkout',
   'options',
@@ -637,7 +651,8 @@ export const API_PRODUCT_FIELD_SET = new Set<string>([
     'seller',
     'geo',
     'dates',
-    'priceRange'
+    'priceRange',
+    'promotion'
   ].flatMap((block) =>
     // The dotted forms a client may ask for. Kept explicit rather than derived:
     // an accidental `geo.isOnline` typo should be a 400, not an empty object.
@@ -648,7 +663,8 @@ export const API_PRODUCT_FIELD_SET = new Set<string>([
       seller: ['type', 'id', 'name', 'url', 'picUrl'],
       geo: ['lat', 'lng', 'radius', 'hint', 'isOnline'],
       dates: ['startDate', 'finnishDate'],
-      priceRange: ['min', 'max', 'currency']
+      priceRange: ['min', 'max', 'currency'],
+      promotion: ['id', 'name', 'kind', 'endsAt']
     })[block].map((sub) => `${block}.${sub}` as string)
   )
 ]);

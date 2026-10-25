@@ -65,6 +65,7 @@ import {
   recordEndRound,
   standingRound
 } from '$lib/server/promotions/decision';
+import { announcePromotion } from '$lib/server/webhooks/promotionEvents';
 
 type Lang = 'he' | 'en';
 type Text = Record<Lang, string>;
@@ -201,6 +202,7 @@ const proposeHandler: ActionExecutionHandler = async (params, context, { notifie
       status,
       currencyCode: project.currencyCode
     });
+    announcePromotion({ projectId, promotionId, status });
     if (needsRikma) {
       await notify(
         notifier,
@@ -413,6 +415,7 @@ const pauseHandler: ActionExecutionHandler = async (params, context, { notifier 
     if (promotion.status !== 'paused') return { data: { promotionId: promotion.id, status: promotion.status }, updateStrategy: { type: 'none' as const } };
     const status = promotion.startsAt && Date.parse(promotion.startsAt) > now.getTime() ? 'scheduled' : 'active';
     await updatePromotion(exec, promotion.id, { status, pausedAt: null, pausedById: null });
+    announcePromotion({ projectId: project.id, promotionId: promotion.id, status });
     return { data: { projectId: project.id, promotionId: promotion.id, status }, updateStrategy: { type: 'fullRefresh' as const } };
   }
 
@@ -420,6 +423,7 @@ const pauseHandler: ActionExecutionHandler = async (params, context, { notifier 
     throw new ActionError('NOT_RUNNING', 'Only a scheduled or running promotion can be paused');
   }
   await updatePromotion(exec, promotion.id, { status: 'paused', pausedAt: now.toISOString(), pausedById: actor });
+  announcePromotion({ projectId: project.id, promotionId: promotion.id, status: 'paused' });
   const reason = typeof params.why === 'string' && params.why.trim() ? params.why.trim() : null;
   await notify(
     notifier,
@@ -456,6 +460,8 @@ const endHandler: ActionExecutionHandler = async (params, context, { notifier })
     throw new ActionError('NOT_PROPOSER', 'A proposal still on the table is withdrawn by whoever proposed it — counter it with 0% instead');
   }
   await updatePromotion(exec, promotion.id, { status: 'ended', endedReason: 'early', pausedAt: null, pausedById: null });
+  // A proposal that never ran priced nothing — no storefront needs to hear it was withdrawn.
+  if (promotion.status !== 'proposed') announcePromotion({ projectId: project.id, promotionId: promotion.id, status: 'ended', endedReason: 'early' });
   if (promotion.decisionId) {
     const d = await fetchPromoDecision(exec, promotion.decisionId);
     if (d && promotion.status === 'proposed') await closePromoDecision(exec, d);

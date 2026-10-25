@@ -786,6 +786,9 @@ export async function handleOrderPost(args: WriteArgs): Promise<Response> {
     oversold: data.oversold === true,
     total: data.total,
     currency: data.currency,
+    // Paid below the catalog and promotion prices (PLAN_SHOP_PROMOTIONS §5.3) —
+    // recorded as paid, and the rikma is told. Null when it was not.
+    belowCatalog: data.belowCatalog ?? null,
     lines: data.lines ?? []
   });
 }

@@ -1,6 +1,6 @@
 # PLAN — מבצעים בחנות: הנחה על פריט, "5 ב-100", מבצע על כל החנות — בהסכמה
 
-> **מצב: בתהליך. P1 (סכמה ב-`1.0b`) ו-P2 (המנוע) נבנו; P3 (ההסכמה) נבנה 2026-10-25 — ראו הערת המימוש בסוף §9. הבא: P4.** נכתב 2026-10-23 אחרי קריאת תכניות החנות
+> **מצב: בתהליך. P1 (סכמה ב-`1.0b`) ו-P2 (המנוע) נבנו; P3 (ההסכמה) ו-P4 (המשטחים) נבנו 2026-10-25 — ראו הערות המימוש בסוף §9. הבא: P5.** נכתב 2026-10-23 אחרי קריאת תכניות החנות
 > ([PLAN_SHOP_CUSTOMER_EXPERIENCE](../inprogress/PLAN_SHOP_CUSTOMER_EXPERIENCE.md),
 > [PLAN_SHOP_OPERATIONS](../inprogress/PLAN_SHOP_OPERATIONS.md),
 > [PLAN_SHOP_SHIPPING](../inprogress/PLAN_SHOP_SHIPPING.md),
@@ -347,7 +347,7 @@ promoPriceOf(product, variant, promos, now)
 | **P1** | סכמה ב-`1.0b`: `promotion`, `price-point` + lifecycle, `Decision.kind` + `negopromo` + `promotion`, `Project.promoPolicy`, `order-line`/`Sale` (`listPrice`, `promotion`); `types:update`; qids + `qidsAccess.js` | S1–S5 של החנות נפרסו | 2–3 ימים |
 | **P2** | המנוע `promotions.ts` + בדיקות property; `promoPriceOf` | — (טהור, במקביל ל-P1) | ✅ מימוש + בדיקות; ראו הערת המימוש למטה |
 | **P3** | ההסכמה: פעולות `proposePromotion`, `counterPromotion`, `pausePromotion`, `endPromotion`, `proposePromoPolicy` (ב-`configs/`, עם `access` ו-`authRules`); ענף הבשלה ב-`timegrama/decision.svelte`; קרון `scheduled→active→ended`; כרטיס בלב (מה מוצע, מה חורג מהמעטפת, הרצפה, התאריך המוקדם) | P1 | ✅ 2026-10-25 — ראו הערת המימוש; D4 (קונסיגנציה) ו-§6.3 נדחו |
-| **P4** | המשטחים: DTO, `GET /promotions`, `POST /cart/quote`, `createPaidOrder`/`confirmOrderPayment` (§5.3), מונים ותקרה, webhooks `promotion.started/ended`; OpenAPI | P2, P3 | 3–4 ימים |
+| **P4** | המשטחים: DTO, `GET /promotions`, `POST /cart/quote`, `createPaidOrder`/`confirmOrderPayment` (§5.3), מונים ותקרה, webhooks `promotion.started/ended`; OpenAPI | P2, P3 | ✅ 2026-10-25 — ראו הערת המימוש; `perOrderMax` ו-`sort=price` על מחיר המבצע נדחו |
 | **P5** | ה-UI במוח: לשונית "מבצעים" ב-`sales/manage` (יצירה באשף של 3 צעדים: מה · על מה · מתי), באנר "פעיל עכשיו", מדיניות הרקמה בהגדרות; מחיר מבצע בדיווח מכירה וב-`/gift`; מפתחות `shop.promo.*` בחמש השפות + `check:i18n`; תבנית הפתיחה עוברת ל-`/cart/quote` | P4 | 4–5 ימים |
 | **P6** | קודי קופון; "מחיר לפני" לפי §6 (סגירת הפרצה של `compareAtPrice`); דוח §7; כלי MCP | P5 | 3–4 ימים |
 
@@ -411,6 +411,43 @@ promoPriceOf(product, variant, promos, now)
 1. **הרשאות Strapi** על `promotion` (find/findOne/create/update) — לתפקיד **Authenticated** (הפעולות רצות עם ה-JWT של החבר, כמו stipend) **וגם** ל-API token (השעון וההבשלה בשתיקה רצים עם טוקן השירות). בלי זה כל הצעה נכשלת ב-Forbidden.
 2. **לתזמן את `/api/cron/promotions`** כל 15 דקות, ליד `/api/cron/orders`.
 3. אין צורך ב-`types:update` — הסכמה של P1 כבר בקבצים המחוללים.
+
+### הערת מימוש P4 — 2026-10-25
+
+**מה נבנה ואיפה:**
+
+| חלק | קובץ |
+|---|---|
+| המתאם בין השורות למנוע — טהור: מה מתמחר עכשיו (פעיל, לא בתקרה, בלי מה שמבצע לא נוגע בו), עגלה ממחירי המדף, `salePrice` למוצר, §5.3, מונים | `src/lib/shop/promoPricing.ts` |
+| קריאה (טוקן שירות, מטמון של דקה לקטלוג), מונים, תיוג שורות ומכירות | `src/lib/server/promotions/pricing.ts` (+ `fetchProjectPromotions`, עלות BOM ו-`published` במדף, `endedReason` ומונים ב-`store.ts`) |
+| `GET /api/v1/r/{rikma}/promotions` | `src/routes/api/v1/r/[rikma]/promotions/+server.ts` |
+| `POST /api/v1/r/{rikma}/cart/quote` — מבצעים + משלוח על השורות המוזלות | `src/routes/api/v1/r/[rikma]/cart/quote/+server.ts` |
+| DTO: `salePrice` + `promotion` במוצר ובווריאנט, `priceRange` על המחיר המוזל, ETag שמשתנה כשמבצע מתחיל/נגמר | `apiPublic/promoCatalog.ts`, `dto.ts`, `shop.ts`, שני נתיבי המוצרים |
+| הזמנה ששולמה (§5.3) | `createPaidOrder.ts`, `confirmOrderPayment.ts`, `promotionId` אופציונלי בשורה (`ordersApi.ts`), `belowCatalog` בתשובה (`writeApi.ts`) |
+| webhooks `promotion.started / paused / ended` | `src/lib/server/webhooks/promotionEvents.ts` — מהפעולות, מההבשלה (חתימה ושתיקה), מהשעון, ומתקרה שהוצתה בהזמנה |
+| OpenAPI | `docs/tbd/api/rikma-v1.openapi.yaml` — שני הנתיבים, `Promotion`/`PromotionBadge`/`CartQuote`, השדות במוצר/וריאנט/שורה |
+
+**הכרעות מימוש:**
+
+- **הפער נמדד על ההזמנה כולה, לא לפי שורה.** חבילה, "1+1" וסף מתחלקים בין שורות, ואתר רשאי לחלק אותם אחרת מאיתנו. שורה מקושרת למבצע רק כשנמכרה מתחת למחיר המחירון.
+- **סובלנות 15 הדקות חלה רק על מבצע שהאתר נקב בשמו** (`promotionId` בשורה, מ-`/cart/quote`), ורק כשהסתיים בזמנו או בתקרה. סיום מוקדם הוא החלטה של הרקמה, לא שעון שקונה התחרה בו.
+- **D7 — "פותחים הצעה" מעל `arrangedDiscountPct` הוא בינתיים התראה בעדיפות גבוהה**, לא Decision. H8 עצמו (`confirmOrderPayment`) הוא היום הערה בלבד, ואין עדיין "הצעה לרקמה" לפער מחיר לרכוב עליה; כשתיבנה — אחת לשניהם.
+- **מונים: נקראים טריים ונכתבים**, ונספרים פעם אחת — בדיווח הראשון של הזמנה ששולמה, או כשתשלום מתואם מגיע (המבצע נקרא מהשורה). Strapi בלי increment ב-GraphQL, אז שתי הזמנות באותה שנייה עלולות להיספר כאחת — חריגה מהתקרה בהזמנה אחת היא ה-`oversold` של מבצעים (§5.3), לא תשלום שנדחה. הזמנה שהגיעה לתקרה סוגרת את המבצע (`endedReason:'cap'`) ושומרת על המחיר.
+- **הקישור למבצע נכתב בטוקן השירות, אחרי השורה ואחרי המכירה** (`order-line.promotion`, `Sale.promotion`/`listPrice`) — ולא בשאילתת ההזמנה החמה: הזמנה לעולם לא נכשלת על הרשאה לקולקציה שהקופה לא נוגעת בה אחרת. `listPrice`/`discount` (סקלרים) כן נכתבים ביצירת השורה.
+- **מבצע שלא ניתן לקרוא = אין מבצע.** הקטלוג, ה-quote וההזמנה ממשיכים בדיוק כמו לפני P4; ההזמנה רק לא מקבלת `listPrice`.
+- **הרצפה** היא עלות ה-BOM ליחידה (`estimatedPrice / (1 + marginPct%)`, כמו ב-`ComposeProduct`) כשהיא ידועה; מדיניות `floor:'none'` מבטלת אותה. ההצגה על כרטיס ההצבעה — P5.
+- **site-share** נבדק בבדיקה אחת (`computeSiteShare.test.ts`): הוא נגזר ממה שנמכר בפועל, ולכן קטן באותו יחס.
+
+**מה נדחה בכוונה:**
+
+- **`perOrderMax`** — המנוע מתמחר לפי היקף, לא לפי מכסת יחידות; "עד 2 ללקוח" צריך פיצול שורה בתוך המנוע. נשמר ומוצג ב-`GET /promotions`, לא נאכף. הולך עם P5/P6.
+- **`sort=price` ומסנני מחיר על המחיר המוזל** — רצים בשאילתת הקטלוג על המחיר המאושר; מבצע לא מסדר מחדש את הרשימה. `/discover/products` (בין-רקמתי) לא מקבל `salePrice`.
+- **409 "המבצע הסתיים" בתבנית הפתיחה** — עובר ל-P5 עם המעבר של התבנית ל-`/cart/quote`.
+
+**לפני שזה עובד בפרודקשן** (בנוסף לשלושת הסעיפים של P3):
+
+1. הרשאות Strapi ל-**API token** גם על `updateOrderLine` ו-`updateSale` (התיוג), ועל `find` של `order-line` (קריאת המבצע של הזמנה מתואמת).
+2. אין צורך ב-`types:update` ואין פריסת `1.0b` — כל השדות מ-P1.
 
 ---
 

@@ -8,7 +8,19 @@
  * without selling a line twice, and a reused id that is refused.
  */
 
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+
+// Promotions are read and counted with the service token (promotions/pricing.ts);
+// here they are a seam — null means "no promotion could be read", the default.
+const promo = vi.hoisted(() => ({
+  pricePaidOrderFor: vi.fn(async (..._a: any[]): Promise<any> => null),
+  recordPromoUsage: vi.fn(async (..._a: any[]) => {}),
+  tagPromoOrderLines: vi.fn(async (..._a: any[]) => {}),
+  tagPromoSales: vi.fn(async (..._a: any[]) => {}),
+  fetchOrderLinePromotions: vi.fn(async (..._a: any[]) => new Map<number, string>())
+}));
+vi.mock('$lib/server/promotions/pricing', () => promo);
+
 import { createPaidOrderConfig } from './createPaidOrder.js';
 import { createSaleConfig } from './createSale.js';
 import { confirmOrderPaymentConfig } from './confirmOrderPayment.js';
@@ -239,6 +251,9 @@ beforeEach(() => {
   db = makeDb();
   notices.length = 0;
   resetStockFlagsVerdict();
+  for (const fn of Object.values(promo)) fn.mockClear();
+  promo.pricePaidOrderFor.mockImplementation(async () => null);
+  promo.fetchOrderLinePromotions.mockImplementation(async () => new Map());
 });
 
 describe('createPaidOrder', () => {
@@ -629,5 +644,72 @@ describe('arranged orders', () => {
     expect(db.orders[0].data.note).toContain('בוטל לפני תשלום: לא ענה');
     expect(await act(cancelOrderConfig, { orderRef: '57:arr_1' }, '12')).toMatchObject({ alreadyCancelled: true });
     await expect(confirm({}, '12')).rejects.toMatchObject({ code: 'ORDER_CANCELLED' });
+  });
+});
+
+describe('promotions (PLAN_SHOP_PROMOTIONS §5.3)', () => {
+  const pricing = (over: Record<string, any> = {}) => ({
+    lines: [
+      { position: 0, listPrice: 310, discount: 62, promotionId: '5' },
+      { position: 1, listPrice: 40, discount: 0, promotionId: null },
+      { position: 2, listPrice: 40, discount: 0, promotionId: null }
+    ],
+    listTotal: 740,
+    catalogTotal: 678,
+    paidTotal: 678,
+    gap: 0,
+    gapPct: 0,
+    overArranged: false,
+    usage: new Map([['5', { units: 2, orders: 1 }]]),
+    ...over
+  });
+  const discounted = () =>
+    order({
+      lines: [
+        { productId: '1842', variantId: '77', quantity: 2, unitPrice: 279, promotionId: '5' },
+        { productId: '1901', quantity: 2, unitPrice: 40 },
+        { productId: '1901', quantity: 1, unitPrice: 40 }
+      ]
+    });
+
+  it('prices the paid lines, links them, counts the promotion once and tags the sales', async () => {
+    promo.pricePaidOrderFor.mockImplementation(async () => pricing());
+    const r = await run(discounted());
+    expect(promo.pricePaidOrderFor.mock.calls[0][1][0]).toMatchObject({ position: 0, lineTotal: 558, promotionId: '5' });
+    expect(db.lines[0]).toMatchObject({ listPrice: 310, discount: 62 });
+    expect(promo.tagPromoOrderLines).toHaveBeenCalledWith([{ lineId: db.lines[0].id, promotionId: '5' }]);
+    expect(promo.recordPromoUsage).toHaveBeenCalledWith('57', pricing().usage);
+    expect(promo.tagPromoSales.mock.calls[0][0][0]).toMatchObject({ saleId: db.sales[0].id, listPrice: 310, promotionId: '5' });
+    expect(r.lines[0].promotionId).toBe('5');
+    expect(r.belowCatalog).toBeNull();
+  });
+
+  it('a resumed order does not count the promotion again', async () => {
+    promo.pricePaidOrderFor.mockImplementation(async () => pricing());
+    db.failOnce.add('createSaleRecord');
+    await expect(run(discounted())).rejects.toThrow();
+    await run(discounted());
+    expect(promo.recordPromoUsage).not.toHaveBeenCalled();
+  });
+
+  it('paid below the catalog: recorded as paid, noted, and the rikma hears it', async () => {
+    promo.pricePaidOrderFor.mockImplementation(async () =>
+      pricing({ catalogTotal: 740, paidTotal: 600, gap: 140, gapPct: 18.92, overArranged: true, usage: new Map() })
+    );
+    const r = await run(order());
+    expect(r.status).toBe('paid');
+    expect(r.belowCatalog).toEqual({ catalogTotal: 740, by: 140, pct: 18.92 });
+    expect(db.orders[0].data.note).toContain('מתחת למחיר הקטלוג והמבצעים');
+    expect(notices[0].intent).toBe('review');
+    expect(notices[0].templates.body.he).toContain('פחות ממחיר הקטלוג והמבצעים');
+  });
+
+  it('an arranged order counts its promotions only when the money arrives', async () => {
+    promo.pricePaidOrderFor.mockImplementation(async () => pricing());
+    await run(order({ externalId: 'arr_p', payment: 'arranged', buyer: { name: 'דנה', phone: '050-1234567' }, delivery: { preference: 'pickup' } }));
+    expect(promo.recordPromoUsage).not.toHaveBeenCalled();
+    promo.fetchOrderLinePromotions.mockImplementation(async () => new Map([[0, '5']]));
+    await act(confirmOrderPaymentConfig, { orderRef: '57:arr_p', method: 'cash' });
+    expect(promo.recordPromoUsage).toHaveBeenCalledWith('57', new Map([['5', { units: 2, orders: 1 }]]));
   });
 });

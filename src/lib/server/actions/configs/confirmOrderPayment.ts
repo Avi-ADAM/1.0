@@ -5,6 +5,7 @@ import { formatMoney } from '$lib/money/format.js';
 import { rikmaCurrency } from '$lib/money/resolve.js';
 import { readStockFlags, withFlag, type StockRowFlags } from '$lib/server/shop/stockFlags.js';
 import { recordOrderSales } from '$lib/server/shop/orderSales.js';
+import { fetchOrderLinePromotions, recordPromoUsage, tagPromoSales } from '$lib/server/promotions/pricing';
 import {
   ARRANGED_METHODS,
   arrangedMethodOf,
@@ -172,6 +173,30 @@ const handler: ActionExecutionHandler = async (params, context, deps) => {
     },
     context,
     deps
+  );
+
+  // 2b. The promotions its lines were taken under (PLAN_SHOP_PROMOTIONS §5.3)
+  //     count only now that the money arrived. Read with the service token —
+  //     the order's own read never touches the promotion collection.
+  const linePromos = await fetchOrderLinePromotions(orderId);
+  if (linePromos.size) {
+    const usage = new Map<string, { units: number; orders: number }>();
+    for (const l of plan.lines) {
+      const id = linePromos.get(l.position);
+      if (!id) continue;
+      const u = usage.get(id) ?? { units: 0, orders: 1 };
+      u.units += l.quantity;
+      usage.set(id, u);
+    }
+    // A retry by the same member already counted on its first pass.
+    if (!holderId) await recordPromoUsage(projectId, usage);
+  }
+  await tagPromoSales(
+    plan.lines.map((l, i) => ({
+      saleId: saleIdByPosition.get(l.position),
+      listPrice: stored[i]?.listPrice ?? null,
+      promotionId: linePromos.get(l.position) ?? null
+    }))
   );
 
   // 3. The status, last.

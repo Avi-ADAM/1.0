@@ -5,6 +5,9 @@
 #   /r/{rikma}/options, /r/{rikma}/{sales,tasks}, ו-legacy /sales,/tasks.
 #   POST /r/{rikma}/orders, GET /orders/{ref}, POST /orders/{ref}/cancel
 #   (S3, 2026-10-18), ו-webhooks order.* / variant.stockChanged.
+#   GET /r/{rikma}/promotions, POST /r/{rikma}/cart/quote, `salePrice` /
+#   `promotion` על מוצר ווריאנט, `promotionId` על שורת הזמנה, ו-webhooks
+#   promotion.* (PLAN_SHOP_PROMOTIONS P4, 2026-10-25).
 # **טרם ממומש:** /changes (Phase 2), /discover/products (Phase 3).
 # **Webhooks של הזמנות** (על `api-key.callback_url`, חתומים כמו של מטלות):
 #   order.paid · order.oversold · order.statusChanged · variant.stockChanged.
@@ -12,6 +15,10 @@
 #   `{ productId, variantId, quant, changed }`. נשלחים רק למפתח עם `orders:*`
 #   (`variant.stockChanged` גם ל-`products:read`) — מנוי "לכל האירועים" של
 #   מפתח מטלות לא מתחיל לקבל מכירות.
+# **Webhooks של מבצעים:** promotion.started · promotion.paused · promotion.ended.
+#   הגוף: `{ event, at, projectId, data: { id, status, endedReason } }` — דחיפה
+#   לרענן את `GET /promotions` ואת עמודי המוצר, לא העתק של הקטלוג. נשלחים
+#   למפתח עם `products:read` או `orders:*`.
 # **/orders הוא הזמנה ששולמה** (PLAN_SHOP_CUSTOMER_EXPERIENCE החלטות 5–6):
 #   הקונה משלם באתר, והשרת של האתר מדווח אחרי אישור ספק התשלום. בקשת רכש
 #   למוצר `quote` (Sheirutpend + צ'אט) היא S3b ואינה חלק מהחוזה הזה.
@@ -346,6 +353,77 @@ paths:
                     type: object
                     properties:
                       nextSince: { type: string, format: date-time }
+
+  /api/v1/r/{rikma}/promotions:
+    get:
+      tags: [shop]
+      summary: המבצעים הפעילים והמתוזמנים של הרקמה
+      description: |-
+        לבאנר ולעמוד "מבצעים" באתר (PLAN_SHOP_PROMOTIONS §5.2). רק מה שהרקמה
+        הסכימה לו — הצעות, מבצעים מושהים ומבצעים שהסתיימו אינם כאן. המחיר של
+        מבצע על פריט הוא `salePrice` על המוצר; מה שעגלה משלמת — `POST /cart/quote`.
+      parameters:
+        - $ref: '#/components/parameters/Rikma'
+      responses:
+        '200':
+          description: המבצעים
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  rikma: { $ref: '#/components/schemas/RikmaRef' }
+                  data:
+                    type: array
+                    items: { $ref: '#/components/schemas/Promotion' }
+
+  /api/v1/r/{rikma}/cart/quote:
+    post:
+      tags: [shop]
+      summary: כמה העגלה עולה — מבצעים ומשלוח
+      description: |-
+        **1lev1 מתמחר, האתר שואל** (PLAN_SHOP_PROMOTIONS §5.2) — כדי שלא יהיו
+        שני מנועים שיסטו. מחירי המחירון נקראים מהשורות של הרקמה; `unitPrice`
+        שנשלח מתעלמים ממנו. שואלים בעמוד העגלה, ושוב בשרת של האתר רגע לפני
+        התשלום — התשובה השנייה היא מה שנגבה. את `promotionId` של כל שורה מחזירים
+        ב-`POST /orders`, כך שקונה שהתחיל לשלם רגע לפני סוף המבצע שומר על המחיר.
+      parameters:
+        - $ref: '#/components/parameters/Rikma'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [lines]
+              properties:
+                lines:
+                  type: array
+                  maxItems: 50
+                  items:
+                    type: object
+                    required: [productId, quantity]
+                    properties:
+                      productId: { type: string }
+                      variantId: { type: string }
+                      quantity: { type: integer, minimum: 1 }
+                      lineId: { type: string, maxLength: 64, description: מזהה שורת העגלה של האתר — חוזר כמו שהוא }
+                address:
+                  type: object
+                  properties:
+                    country: { type: string }
+                    city: { type: string }
+                    zip: { type: string }
+      responses:
+        '200':
+          description: העגלה מתומחרת
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CartQuote' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '404': { description: 'PRODUCT_NOT_FOUND / VARIANT_NOT_FOUND — עם אינדקס השורה' }
+        '409': { description: 'NOT_CHECKOUTABLE / VARIANT_REQUIRED — אותם קודים של POST /orders' }
 
   /api/v1/r/{rikma}/orders:
     post:
@@ -1047,6 +1125,16 @@ components:
             ואם אין — `quant` (כמו היום).
         priceRange:
           anyOf: [{ $ref: '#/components/schemas/PriceRange' }, { type: 'null' }]
+          description: מחושב על המחיר אחרי מבצע על פריט, כשיש (`salePrice`)
+        salePrice:
+          type: [number, 'null']
+          description: |-
+            מה שהקונה משלם היום תחת מבצע על פריט / על החנות. `price` נשאר המחיר
+            המאושר. `null` = אין מבצע שמתמחר את המוצר לבדו (חבילה, "1+1" וסף —
+            תלויים בעגלה, ומופיעים ב-`POST /cart/quote`). `sort=price` ומסנני
+            המחיר רצים על המחיר המאושר.
+        promotion:
+          anyOf: [{ $ref: '#/components/schemas/PromotionBadge' }, { type: 'null' }]
         hasVariants:
           type: boolean
           description: 'Product-level flag; `variants[]` מלא רק בפרט או עם `expand=variants`'
@@ -1136,6 +1224,85 @@ components:
             next: { type: [string, 'null'] }
             prev: { type: [string, 'null'] }
     # ── v1.1 — החנות ────────────────────────────────────────────────────
+    PromotionBadge:
+      type: object
+      required: [id, kind]
+      properties:
+        id: { type: string }
+        name: { type: [string, 'null'], example: סוף עונה }
+        kind: { type: string, enum: [item, store] }
+        endsAt: { type: [string, 'null'], format: date-time, description: לספירה לאחור }
+    Promotion:
+      type: object
+      required: [id, kind, status, scope, rule]
+      properties:
+        id: { type: string }
+        name: { type: [string, 'null'] }
+        kind: { type: string, enum: [item, bundle, bxgy, store, threshold] }
+        status: { type: string, enum: [scheduled, active] }
+        scope:
+          type: object
+          properties:
+            all: { type: boolean }
+            products: { type: array, items: { type: string } }
+            variants: { type: array, items: { type: string } }
+            categories: { type: array, items: { type: string } }
+            exclude: { type: array, items: { type: string }, description: כולל מוצרים שמבצע לא נוגע בהם (מאגד, הצעת מחיר, משאלה) }
+        rule:
+          type: object
+          description: |-
+            לפי `kind`: item `{pct}`|`{price}`|`{off}` · bundle `{qty, price, repeat}` ·
+            bxgy `{buy, get, getPct, cheapestFree}` · store `{pct}` · threshold `{minSubtotal, off}`|`{minSubtotal, pct}`
+        startsAt: { type: [string, 'null'], format: date-time }
+        endsAt: { type: [string, 'null'], format: date-time }
+        remaining:
+          type: object
+          description: מה שנשאר מהתקרה; null = בלי תקרה. "עד גמר המלאי" הוא המלאי, לא זה
+          properties:
+            units: { type: [number, 'null'] }
+            orders: { type: [integer, 'null'] }
+        perOrderMax: { type: [integer, 'null'] }
+    CartQuote:
+      type: object
+      properties:
+        rikma: { $ref: '#/components/schemas/RikmaRef' }
+        currency: { type: [string, 'null'] }
+        pricedAt: { type: string, format: date-time }
+        lines:
+          type: array
+          items:
+            type: object
+            properties:
+              lineId: { type: [string, 'null'] }
+              productId: { type: string }
+              variantId: { type: [string, 'null'] }
+              quantity: { type: number }
+              listPrice: { type: number, description: המחיר המאושר ליחידה }
+              unitPrice: { type: number, description: ממוצע ליחידה אחרי מבצעים — לתצוגה; הסכום המחייב הוא lineTotal }
+              lineTotal: { type: number }
+              discount: { type: number }
+              promotionId: { type: [string, 'null'], description: להחזיר ב-POST /orders }
+              promotionIds: { type: array, items: { type: string } }
+        listTotal: { type: number }
+        subtotal: { type: number, description: אחרי מבצעי השורות, לפני סף }
+        thresholdDiscount: { type: number }
+        total: { type: number, description: לפני משלוח }
+        applied:
+          type: array
+          items:
+            type: object
+            properties:
+              promotionId: { type: string }
+              name: { type: [string, 'null'] }
+              kind: { type: string }
+              discount: { type: number }
+        hints:
+          type: array
+          description: '"חסרים 2 ל-5 ב-₪100", "עוד ₪40 ל-₪30 הנחה" — מובנה; הניסוח בתבנית'
+          items: { type: object }
+        shipping:
+          type: [object, 'null']
+          description: התשובה של /shipping/quote על השורות המוזלות; null כשלא חושב
     PriceRange:
       type: object
       required: [min, max]
@@ -1202,6 +1369,9 @@ components:
             מקבל כאן את מחיר המוצר, כך שאין לצרכן נפילה לממש. `null` רק כשלמוצר
             אין מחיר (`pricingMode=quote`) — "המחיר ייקבע בהתאמה", כמו `price`.
         compareAtPrice: { type: [number, 'null'], description: מחיר "לפני" — תצוגת מבצע }
+        salePrice: { type: [number, 'null'], description: המחיר של הצירוף הזה תחת מבצע על פריט; null כשאין }
+        promotion:
+          anyOf: [{ $ref: '#/components/schemas/PromotionBadge' }, { type: 'null' }]
         availability: { $ref: '#/components/schemas/Availability' }
         images:
           type: array
@@ -1228,8 +1398,15 @@ components:
           minimum: 0
           description: |-
             מה שנגבה בפועל ליחידה. המכירה נרשמת על `unitPrice × quantity` —
-            קופון או הנחה של האתר הם עניין שלו, ולא נבדקים מול מחיר הקטלוג.
+            קופון או הנחה של האתר הם עניין שלו. מחיר נמוך מהקטלוג ומהמבצעים
+            לא נדחה — ההזמנה נרשמת, השורה מקבלת `listPrice`/`discount`, והרקמה
+            מקבלת התראה עם הפער (`belowCatalog` בתשובה).
         note: { type: string }
+        promotionId:
+          type: string
+          description: |-
+            המבצע שהשורה נמכרה תחתיו, כפי שהחזיר `POST /cart/quote`. מבצע שהסתיים
+            בזמנו או בתקרה עד 15 דקות לפני הדיווח עדיין מכסה את המחיר (§5.3).
     OrderRequest:
       type: object
       required: [externalId, lines]
@@ -1291,6 +1468,7 @@ components:
         name: { type: [string, 'null'], description: snapshot — מה שהקונה ראה }
         optionLabel: { type: [string, 'null'], example: M / אדום }
         unitPrice: { type: number }
+        promotionId: { type: [string, 'null'], description: המבצע שהשורה קושרה אליו }
         saleId: { type: [string, 'null'], description: המכירה שנרשמה לשורה }
     OrderAccepted:
       type: object
@@ -1307,6 +1485,13 @@ components:
           description: המלאי לא הספיק. ההזמנה נרשמה בכל זאת, והרקמה קיבלה התראה
         total: { type: number }
         currency: { type: [string, 'null'] }
+        belowCatalog:
+          type: [object, 'null']
+          description: שולם פחות ממחיר הקטלוג והמבצעים — נרשם כשולם, והרקמה קיבלה התראה. null כשלא
+          properties:
+            catalogTotal: { type: number }
+            by: { type: number }
+            pct: { type: number }
         lines:
           type: array
           items: { $ref: '#/components/schemas/OrderLineResult' }

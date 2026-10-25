@@ -37,6 +37,7 @@ import {
   type PromoPolicy,
   type PromoTerms
 } from '$lib/shop/promoTerms';
+import { announcePromotion } from '$lib/server/webhooks/promotionEvents';
 import { updatePromotion, writePromoPolicy } from './store';
 
 export type PromoDecisionKind = 'promotion' | 'promoPolicy';
@@ -356,6 +357,7 @@ export async function applyStandingPromoDecision(exec: Exec, d: PromoDecision, n
   if (isNoDiscount(terms)) {
     await updatePromotion(exec, d.promotionId, { ...terms, status: 'ended', endedReason: 'early', pausedAt: null });
     await closePromoDecision(exec, d);
+    announcePromotion({ projectId: d.projectId, promotionId: d.promotionId, status: 'ended', endedReason: 'early' });
     return { kind: d.kind, promotionId: d.promotionId, status: 'ended', startsAt: null, endsAt: terms.endsAt };
   }
   const window = effectiveWindow(terms, now);
@@ -370,6 +372,8 @@ export async function applyStandingPromoDecision(exec: Exec, d: PromoDecision, n
     pausedById: null
   });
   await closePromoDecision(exec, d);
+  // Also when a running promotion's terms changed: its prices did.
+  announcePromotion({ projectId: d.projectId, promotionId: d.promotionId, status, endedReason: status === 'ended' ? 'time' : null });
   return { kind: d.kind, promotionId: d.promotionId, status, startsAt: window.startsAt, endsAt: window.endsAt };
 }
 

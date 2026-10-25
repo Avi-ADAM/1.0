@@ -63,6 +63,11 @@ export interface OrderLineInput {
   quantity: number;
   unitPrice: number;
   note: string | null;
+  /**
+   * The promotion the storefront sold this line under (PLAN_SHOP_PROMOTIONS
+   * §5.3) — it keeps a price for a buyer who started paying just before the end.
+   */
+  promotionId?: string | null;
 }
 
 export interface OrderPayload {
@@ -218,6 +223,9 @@ export function validateOrderPayload(body: any): OrderValidation {
       const variantId = raw.variantId == null ? '' : idOf(raw.variantId);
       const quantity = Number(raw.quantity);
       const unitPrice = Number(raw.unitPrice);
+      const promotionId = raw.promotionId == null || raw.promotionId === '' ? '' : idOf(raw.promotionId);
+      if (raw.promotionId != null && raw.promotionId !== '' && !promotionId)
+        problems.push({ field: 'promotionId', line, message: 'must be an id when present' });
       if (!productId)
         problems.push({ field: 'productId', line, message: 'is required' });
       if (raw.variantId != null && !variantId)
@@ -243,7 +251,8 @@ export function validateOrderPayload(body: any): OrderValidation {
         variantId: variantId || null,
         quantity,
         unitPrice,
-        note: text(raw.note, MAX_SHORT)
+        note: text(raw.note, MAX_SHORT),
+        ...(promotionId ? { promotionId } : {})
       });
     });
   }
@@ -782,7 +791,8 @@ export function storedLinesOf(node: { attributes?: Record<string, any> | null })
       variantId: l.variant?.data?.id != null ? String(l.variant.data.id) : null,
       quantity: num(l.quantity),
       unitPrice: num(l.unitPrice),
-      position: num(l.position)
+      position: num(l.position),
+      listPrice: num(l.listPrice)
     };
   });
 }
