@@ -222,6 +222,21 @@ const JOBS = [
     }
   },
   {
+    name: 'orders',
+    description: 'arranged-payment orders — cancel the ones past expiresAt',
+    // PLAN_SHOP_OPERATIONS. A `pendingPayment` order past its `expiresAt` is
+    // cancelled; one somebody already started confirming never lapses. Hourly
+    // is enough — the deadline is in days.
+    path: CRON_SECRET ? `/api/cron/orders?key=${encodeURIComponent(CRON_SECRET)}` : '/api/cron/orders',
+    timeoutMs: num('SCHEDULER_ORDERS_TIMEOUT_SECONDS', 300) * 1000,
+    due(now, state) {
+      const every = num('SCHEDULER_ORDERS_MINUTES', 60) * 60 * 1000;
+      if (!state.lastSuccess) return 'never run on this box';
+      const since = now.getTime() - Date.parse(state.lastSuccess);
+      return since >= every ? `${Math.round(since / 60000)}m since the last run` : null;
+    }
+  },
+  {
     name: 'assistant-cleanup',
     description: 'agent-prepared signups nobody claimed — delete after 14 days',
     // PLAN_AI_SIGNUP_CONCIERGE §5.4 (M13). A pending session holds someone's

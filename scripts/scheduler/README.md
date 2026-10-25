@@ -11,6 +11,7 @@ until this existed both ran only when somebody remembered to call them:
 | `translate-backfill` | `GET /api/cron/translate-backfill` | daily at 05:00 | fills the UGC translation cache out of a free quota, so a guest reads a translated page on their **first** load |
 | `shifts` | `GET /api/cron/shifts` | every hour | materializes shifts, opens declaration cycles, publishes drafts, closes rosters — answers `skipped` while `SHIFTS=off` |
 | `promotions` | `GET /api/cron/promotions` | every 15 minutes | starts scheduled promotions, ends them on time or cap, lifts a 24h pause |
+| `orders` | `GET /api/cron/orders` | every hour | cancels arranged-payment orders still `pendingPayment` past their `expiresAt` |
 | `assistant-cleanup` | `GET /api/cron/assistant-cleanup` | daily at 06:00 | deletes agent-prepared signups nobody claimed within 14 days |
 
 Every job is safe to run more often than needed: `timegrama` skips clocks that
@@ -113,6 +114,7 @@ Environment variables win over the `.env` file; the `.env` file is found at
 | `SCHEDULER_BACKFILL_TIMEOUT_SECONDS` | `900` | it walks a corpus page and may wait on a rate-limited model |
 | `SCHEDULER_SHIFTS_MINUTES` | `60` | shift-engine interval |
 | `SCHEDULER_PROMOTIONS_MINUTES` | `15` | promotion-clock interval |
+| `SCHEDULER_ORDERS_MINUTES` | `60` | order-expiry interval |
 | `SCHEDULER_ASSISTANT_CLEANUP_HOUR` | `6` | earliest the signup cleanup may run |
 | `SCHEDULER_FAILURE_BACKOFF_MINUTES` | `15` | how long a failed job waits before it is tried again |
 | `SCHEDULER_ALERT_AFTER_FAILURES` | `3` | consecutive failures before a Telegram alert |
