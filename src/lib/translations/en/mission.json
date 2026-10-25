@@ -286,5 +286,23 @@
     "autoSaveNote": "Translations will be auto-saved after publishing.",
     "close": "Close",
     "cancel": "Cancel"
+  },
+  "invite": {
+    "optionLabel": "Invite someone new to this mission",
+    "help": "The mission is published open, and the person you invite can offer themselves. You'll get a link to send on WhatsApp or any other way.",
+    "emailPlaceholder": "Their email (optional)",
+    "invalidEmail": "That email address doesn't look right",
+    "title": "Your invite is ready",
+    "sentRegistered": "We emailed them, and the mission will appear first on their heart page.",
+    "sentEmail": "We emailed them an invitation to join. It's worth sending the link directly too.",
+    "linkOnly": "Send the link to whoever you'd like to invite.",
+    "self": "That's your own address. Send the link to someone else.",
+    "emailNotSent": "The email wasn't sent, but the link works. Send it yourself.",
+    "linkLabel": "Invite link",
+    "whatsapp": "Send on WhatsApp",
+    "copy": "Copy link",
+    "copied": "Link copied",
+    "done": "Done",
+    "shareMessage": "Hi! In the rikma \"{{project}}\" I opened a mission that fits you: \"{{mission}}\". I'd love for you to join:"
   }
 }

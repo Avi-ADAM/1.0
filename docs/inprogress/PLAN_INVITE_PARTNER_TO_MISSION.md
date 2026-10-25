@@ -1,6 +1,6 @@
 # PLAN — Invite a new partner from the mission form
 
-**State:** tbd · **Owner:** Baruch · **Date:** 2026-10-25
+**State:** inprogress — P1 built (solo rikma, link + optional email) · **Owner:** Baruch · **Date:** 2026-10-25
 
 ## Why
 

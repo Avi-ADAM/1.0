@@ -287,5 +287,23 @@
     "autoSaveNote": "Las traducciones se guardarán automáticamente tras publicar.",
     "close": "Cerrar",
     "cancel": "Cancelar"
+  },
+  "invite": {
+    "optionLabel": "Invitar a alguien nuevo a esta misión",
+    "help": "La misión se publica abierta y la persona invitada puede ofrecerse. Recibirás un enlace para enviarlo por WhatsApp o como prefieras.",
+    "emailPlaceholder": "Su email (opcional)",
+    "invalidEmail": "Esa dirección de email no parece correcta",
+    "title": "Tu invitación está lista",
+    "sentRegistered": "Le enviamos un email, y la misión aparecerá primera en su página del corazón.",
+    "sentEmail": "Le enviamos una invitación por email. Vale la pena enviarle también el enlace directamente.",
+    "linkOnly": "Envía el enlace a quien quieras invitar.",
+    "self": "Esa es tu propia dirección. Envía el enlace a otra persona.",
+    "emailNotSent": "El email no se envió, pero el enlace funciona. Envíalo tú.",
+    "linkLabel": "Enlace de invitación",
+    "whatsapp": "Enviar por WhatsApp",
+    "copy": "Copiar enlace",
+    "copied": "Enlace copiado",
+    "done": "Listo",
+    "shareMessage": "¡Hola! En la rikma \"{{project}}\" abrí una misión que te encaja: \"{{mission}}\". Me encantaría que te unas:"
   }
 }
