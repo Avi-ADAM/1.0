@@ -23,6 +23,7 @@
   import { breadcrumbs, jsonLdBody } from '$lib/seo/jsonLd.js';
   import DemoRequest from '$lib/components/main/DemoRequest.svelte';
   import VisionDemo from '$lib/components/vision/VisionDemo.svelte';
+  import VisionArt from '$lib/components/vision/VisionArt.svelte';
 
   let demoOpen = $state(false);
 
@@ -85,6 +86,9 @@
     <div class="mt-6 flex flex-wrap justify-center gap-3">
       <a href="#try" class={primary}>{$t('vision.hero.ctaTry')}</a>
       <a href={startHref} class={secondary}>{$t('vision.hero.ctaStart')}</a>
+    </div>
+    <div class="mt-8">
+      <VisionArt />
     </div>
   </header>
 
