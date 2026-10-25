@@ -207,6 +207,21 @@ const JOBS = [
     }
   },
   {
+    name: 'promotions',
+    description: 'promotion clock — start, end, cap out, resume paused promotions',
+    // PLAN_SHOP_PROMOTIONS P3. A promotion's window is in hours, and a 24h
+    // emergency pause must lift on time, so this runs every 15 minutes.
+    // Idempotent: a row whose status already matches the clock is skipped.
+    path: CRON_SECRET ? `/api/cron/promotions?key=${encodeURIComponent(CRON_SECRET)}` : '/api/cron/promotions',
+    timeoutMs: num('SCHEDULER_PROMOTIONS_TIMEOUT_SECONDS', 300) * 1000,
+    due(now, state) {
+      const every = num('SCHEDULER_PROMOTIONS_MINUTES', 15) * 60 * 1000;
+      if (!state.lastSuccess) return 'never run on this box';
+      const since = now.getTime() - Date.parse(state.lastSuccess);
+      return since >= every ? `${Math.round(since / 60000)}m since the last run` : null;
+    }
+  },
+  {
     name: 'assistant-cleanup',
     description: 'agent-prepared signups nobody claimed — delete after 14 days',
     // PLAN_AI_SIGNUP_CONCIERGE §5.4 (M13). A pending session holds someone's
