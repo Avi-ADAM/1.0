@@ -75,7 +75,7 @@
     <!-- `end-0`: this is the bar's edge tab, so an unanchored menu grows
          straight off-screen and `body { overflow-x: hidden }` clips it. -->
     <div
-      class="absolute z-50 end-0 bottom-full mb-2 max-w-[calc(100vw-1rem)] bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-gray-800"
+      class="absolute z-50 end-0 bottom-full mb-2 max-w-[calc(100vw-1rem)] max-h-[calc(100dvh-6rem)] overflow-y-auto overscroll-contain bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-gray-800"
     >
       <div class="py-1" role="menu" aria-orientation="vertical">
         <!-- The guide and login own footer tabs from 400px up; below that the

@@ -14,6 +14,20 @@
   let { onChat } = $props();
 
   let showMenu = $state(false);
+  // The menu is two-level so it fits a phone: the member's own tools stay on
+  // the first screen, and the public discovery and explainer pages — nice to
+  // reach, rarely the reason for opening "more" — each sit one tap deeper.
+  // Flat, below 400px it ran to 18 rows and pushed the profile off the top.
+  /** @type {'main' | 'discover' | 'learn'} */
+  let view = $state('main');
+
+  const LEARN_LINKS = [
+    { key: 'guide', href: '/guid' },
+    { key: 'grow', href: '/grow' },
+    { key: 'quorum', href: '/quorum' },
+    { key: 'consensus', href: '/consensus' },
+    { key: 'why', href: '/why' }
+  ];
 
   // SVG Icons
   const profileIcon = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>`;
@@ -30,14 +44,33 @@
   const consensusIcon = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v17.25m0 0c-1.472 0-2.882.265-4.185.75M12 20.25c1.472 0 2.882.265 4.185.75M18.75 4.97A48.416 48.416 0 0012 4.5c-2.291 0-4.545.16-6.75.47m13.5 0c1.01.143 2.01.317 3 .52m-3-.52l2.62 10.726c.122.499-.106 1.028-.589 1.202a5.988 5.988 0 01-2.031.352 5.988 5.988 0 01-2.031-.352c-.483-.174-.711-.703-.59-1.202L18.75 4.971zm-16.5.52c.99-.203 1.99-.377 3-.52m0 0l2.62 10.726c.122.499-.106 1.028-.589 1.202a5.989 5.989 0 01-2.031.352 5.989 5.989 0 01-2.031-.352c-.483-.174-.711-.703-.59-1.202L5.25 4.971z" /></svg>`;
   const whyIcon = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 18v-5.25m0 0a6.01 6.01 0 001.5-.189m-1.5.189a6.01 6.01 0 01-1.5-.189m3.75 7.478a12.06 12.06 0 01-4.5 0m3.75 2.383a14.406 14.406 0 01-3 0M14.25 18v-.192c0-.983.658-1.823 1.508-2.316a7.5 7.5 0 10-7.517 0c.85.493 1.509 1.333 1.509 2.316V18" /></svg>`;
 
+  const learnIcons = {
+    guide: guideIcon,
+    grow: growIcon,
+    quorum: quorumIcon,
+    consensus: consensusIcon,
+    why: whyIcon
+  };
+  const infoIcon = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" /></svg>`;
+  const discoverIcon = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9 9 0 100-18 9 9 0 000 18zm3.75-12.75l-2.03 5.72-5.72 2.03 2.03-5.72 5.72-2.03z" /></svg>`;
+
+  function closeMenu() {
+    showMenu = false;
+    view = 'main';
+  }
+
   function toggleMenu() {
-    showMenu = !showMenu;
+    if (showMenu) closeMenu();
+    else showMenu = true;
   }
 
   function navigateTo(path) {
     goto(path);
-    showMenu = false; // Close menu after navigation
+    closeMenu();
   }
+
+  const itemCls =
+    'flex items-center w-full text-start px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700';
 </script>
 
 <div
@@ -78,15 +111,17 @@
       type="button"
       aria-label={$t('common.footer.close')}
       class="fixed inset-0 z-40 cursor-default"
-      onclick={() => (showMenu = false)}
+      onclick={closeMenu}
     ></button>
 
     <!-- `end-0`, not the static position: this is the bar's edge tab, so an
          unanchored menu grows straight off-screen and `body { overflow-x:
          hidden }` clips it. Anchoring the outer edge makes it open inward —
-         correct in both RTL and LTR. -->
+         correct in both RTL and LTR. The max-height is the backstop for a
+         short landscape phone: the menu grows upward, so without it the top
+         rows would sit above the viewport where no scroll reaches them. -->
     <div
-      class="absolute z-50 end-0 bottom-full mb-2 max-w-[calc(100vw-1rem)] bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-gray-800"
+      class="absolute z-50 end-0 bottom-full mb-2 min-w-48 max-w-[calc(100vw-1rem)] max-h-[calc(100dvh-6rem)] overflow-y-auto overscroll-contain bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-gray-800"
     >
       <div
         class="py-1"
@@ -94,164 +129,157 @@
         aria-orientation="vertical"
         aria-labelledby="options-menu"
       >
-        <!-- Profile gets its own footer tab from 520px up -->
-        <button
-          onclick={() => navigateTo('/me')}
-          class="flex min-[520px]:hidden items-center w-full text-start px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
-          role="menuitem"
-        >
-          {@html profileIcon}
-          <span class="mx-2">
-            {$t('common.footer.profile')}
-          </span>
-        </button>
-        <!-- Chat moves in here on screens too narrow for its footer tab -->
-        <button
-          onclick={() => {
-            onChat?.();
-            showMenu = false;
-          }}
-          class="hidden max-[399px]:flex items-center w-full text-start px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
-          role="menuitem"
-        >
-          {@html chatIcon}
-          <span class="mx-2">
-            {$t('lev.cards.saleCard.chat')}
-          </span>
-        </button>
-        <!-- Likewise the five discovery pages, which share a tab from 400px up -->
-        <div class="hidden max-[399px]:block">
-          <div
-            class="px-4 pt-1 pb-1.5 text-[10px] font-semibold text-gray-400 dark:text-gray-500"
+        {#if view === 'main'}
+          <!-- Profile gets its own footer tab from 520px up -->
+          <button
+            onclick={() => navigateTo('/me')}
+            class="{itemCls} min-[520px]:hidden"
+            role="menuitem"
           >
-            {$t('common.footer.discoverLabel')}
-          </div>
-          {#each DISCOVERY_LINKS as link (link.key)}
+            {@html profileIcon}
+            <span class="mx-2">
+              {$t('common.footer.profile')}
+            </span>
+          </button>
+          <!-- Chat moves in here on screens too narrow for its footer tab -->
+          <button
+            onclick={() => {
+              onChat?.();
+              closeMenu();
+            }}
+            class="{itemCls} min-[400px]:hidden"
+            role="menuitem"
+          >
+            {@html chatIcon}
+            <span class="mx-2">
+              {$t('lev.cards.saleCard.chat')}
+            </span>
+          </button>
+          <!-- Deals moves in here on screens too narrow for its footer tab -->
+          <button
+            onclick={() => navigateTo('/deals')}
+            class="{itemCls} min-[520px]:hidden"
+            role="menuitem"
+          >
+            {@html dealsIcon}
+            <span class="mx-2">
+              {$t('common.footer.deals')}
+            </span>
+          </button>
+          <button
+            onclick={() => navigateTo('/myacts')}
+            class={itemCls}
+            role="menuitem"
+          >
+            {@html myActsIcon}
+            <span class="mx-2">
+              {$t('common.footer.myActs')}
+            </span>
+          </button>
+          <button
+            onclick={() => navigateTo('/deals/sales-center')}
+            class={itemCls}
+            role="menuitem"
+          >
+            {@html salesIcon}
+            <span class="mx-2">
+              {$t('common.footer.salesCenter')}
+            </span>
+          </button>
+          <button
+            onclick={() => navigateTo('/timers')}
+            class={itemCls}
+            role="menuitem"
+          >
+            {@html timersIcon}
+            <span class="mx-2">
+              {$t('common.footer.timers')}
+            </span>
+          </button>
+          <button
+            onclick={() => navigateTo('/myCalander')}
+            class={itemCls}
+            role="menuitem"
+          >
+            {@html calendarIcon}
+            <span class="mx-2">
+              {$t('common.footer.calendar')}
+            </span>
+          </button>
+          <button
+            onclick={() => navigateTo('/meeting')}
+            class={itemCls}
+            role="menuitem"
+          >
+            {@html meetingIcon}
+            <span class="mx-2">
+              {$t('common.footer.meeting')}
+            </span>
+          </button>
+
+          <!-- The secondary screens. Discovery has its own footer tab from
+               400px up, so its entry only shows below that. -->
+          <div class="border-t border-gray-100 dark:border-gray-700 mt-1 pt-1">
             <button
-              onclick={() => navigateTo(link.href)}
-              class="flex items-center w-full text-start px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
+              onclick={() => (view = 'discover')}
+              class="{itemCls} min-[400px]:hidden"
               role="menuitem"
+              aria-haspopup="menu"
             >
-              <span aria-hidden="true">{link.emoji}</span>
-              <span class="mx-2">{$t(`common.footer.discover_${link.key}`)}</span>
+              {@html discoverIcon}
+              <span class="mx-2 flex-1">{$t('common.footer.discoverLabel')}</span>
+              <span aria-hidden="true" class="text-gray-400 rtl:rotate-180">›</span>
             </button>
-          {/each}
-        </div>
-        <!-- Deals moves in here on screens too narrow for its footer tab -->
-        <button
-          onclick={() => navigateTo('/deals')}
-          class="hidden max-[519px]:flex items-center w-full text-start px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
-          role="menuitem"
-        >
-          {@html dealsIcon}
-          <span class="mx-2">
-            {$t('common.footer.deals')}
-          </span>
-        </button>
-        <button
-          onclick={() => navigateTo('/myacts')}
-          class="flex items-center w-full text-start px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
-          role="menuitem"
-        >
-          {@html myActsIcon}
-          <span class="mx-2">
-            {$t('common.footer.myActs')}
-          </span>
-        </button>
-        <button
-          onclick={() => navigateTo('/deals/sales-center')}
-          class="flex items-center w-full text-start px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
-          role="menuitem"
-        >
-          {@html salesIcon}
-          <span class="mx-2">
-            {$t('common.footer.salesCenter')}
-          </span>
-        </button>
-        <button
-          onclick={() => navigateTo('/timers')}
-          class="flex items-center w-full text-start px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
-          role="menuitem"
-        >
-          {@html timersIcon}
-          <span class="mx-2">
-            {$t('common.footer.timers')}
-          </span>
-        </button>
-        <button
-          onclick={() => navigateTo('/myCalander')}
-          class="flex items-center w-full text-start px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
-          role="menuitem"
-        >
-          {@html calendarIcon}
-          <span class="mx-2">
-            {$t('common.footer.calendar')}
-          </span>
-        </button>
-        <button
-          onclick={() => navigateTo('/meeting')}
-          class="flex items-center w-full text-start px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
-          role="menuitem"
-        >
-          {@html meetingIcon}
-          <span class="mx-2">
-            {$t('common.footer.meeting')}
-          </span>
-        </button>
-        <!-- The guide (/guid) had no entry point anywhere in the app; "more" is
-             where a reference page belongs, so it sits last, after the tools —
-             together with the three public explainer landings, which a member
-             could otherwise only reach by leaving for the home page. -->
-        <button
-          onclick={() => navigateTo('/guid')}
-          class="flex items-center w-full text-start px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700 border-t border-gray-100 dark:border-gray-700"
-          role="menuitem"
-        >
-          {@html guideIcon}
-          <span class="mx-2">
-            {$t('common.footer.guide')}
-          </span>
-        </button>
-        <button
-          onclick={() => navigateTo('/grow')}
-          class="flex items-center w-full text-start px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
-          role="menuitem"
-        >
-          {@html growIcon}
-          <span class="mx-2">
-            {$t('common.footer.grow')}
-          </span>
-        </button>
-        <button
-          onclick={() => navigateTo('/quorum')}
-          class="flex items-center w-full text-start px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
-          role="menuitem"
-        >
-          {@html quorumIcon}
-          <span class="mx-2">
-            {$t('common.footer.quorum')}
-          </span>
-        </button>
-        <button
-          onclick={() => navigateTo('/consensus')}
-          class="flex items-center w-full text-start px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
-          role="menuitem"
-        >
-          {@html consensusIcon}
-          <span class="mx-2">
-            {$t('common.footer.consensus')}
-          </span>
-        </button>
-        <button
-          onclick={() => navigateTo('/why')}
-          class="flex items-center w-full text-start px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
-          role="menuitem"
-        >
-          {@html whyIcon}
-          <span class="mx-2">
-            {$t('common.footer.why')}
-          </span>
-        </button>
+            <button
+              onclick={() => (view = 'learn')}
+              class={itemCls}
+              role="menuitem"
+              aria-haspopup="menu"
+            >
+              {@html infoIcon}
+              <span class="mx-2 flex-1">{$t('common.footer.learnLabel')}</span>
+              <span aria-hidden="true" class="text-gray-400 rtl:rotate-180">›</span>
+            </button>
+          </div>
+        {:else}
+          <button
+            onclick={() => (view = 'main')}
+            class="flex items-center w-full text-start px-4 py-2 text-xs font-semibold text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 border-b border-gray-100 dark:border-gray-700 mb-1"
+          >
+            <span aria-hidden="true" class="rtl:rotate-180">‹</span>
+            <span class="mx-2">{$t('common.footer.back')}</span>
+            <span class="ms-auto text-gray-400 dark:text-gray-500">
+              {view === 'discover'
+                ? $t('common.footer.discoverLabel')
+                : $t('common.footer.learnLabel')}
+            </span>
+          </button>
+          {#if view === 'discover'}
+            {#each DISCOVERY_LINKS as link (link.key)}
+              <button
+                onclick={() => navigateTo(link.href)}
+                class={itemCls}
+                role="menuitem"
+              >
+                <span aria-hidden="true">{link.emoji}</span>
+                <span class="mx-2">{$t(`common.footer.discover_${link.key}`)}</span>
+              </button>
+            {/each}
+          {:else}
+            <!-- The guide (/guid) and the public explainer landings, which a
+                 member could otherwise only reach by leaving for the home page. -->
+            {#each LEARN_LINKS as link (link.key)}
+              <button
+                onclick={() => navigateTo(link.href)}
+                class={itemCls}
+                role="menuitem"
+              >
+                {@html learnIcons[link.key]}
+                <span class="mx-2">{$t(`common.footer.${link.key}`)}</span>
+              </button>
+            {/each}
+          {/if}
+        {/if}
       </div>
     </div>
   {/if}

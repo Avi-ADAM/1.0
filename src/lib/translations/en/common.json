@@ -95,7 +95,9 @@
     "privacy": "Privacy",
     "login": "Log in",
     "signup": "Sign up",
-    "why": "Why this matters"
+    "why": "Why this matters",
+    "learnLabel": "Info & guides",
+    "back": "Back"
   },
   "quickCreate": {
     "open": "Quick create",

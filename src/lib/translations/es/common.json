@@ -96,7 +96,9 @@
     "privacy": "Privacidad",
     "login": "Entrar",
     "signup": "Registrarse",
-    "why": "Por qué importa"
+    "why": "Por qué importa",
+    "learnLabel": "Información y guías",
+    "back": "Atrás"
   },
   "quickCreate": {
     "open": "Crear rápidamente",
