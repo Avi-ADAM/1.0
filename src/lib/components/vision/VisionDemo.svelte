@@ -9,6 +9,18 @@
 
   The examples fill the box rather than calling the model, so trying one costs
   the visitor one of their few tries only when they press the button.
+
+  Beside it, "Ask Claude" opens claude.ai with the idea already wrapped in a
+  consultant's brief — a stronger answer than our quick sketch, at no cost to
+  us. The brief is also copied, because claude.ai only prefills a short enough
+  URL (a long Hebrew idea percent-encodes past it) and then the visitor pastes.
+
+  The third road is for whoever wants a real draft: connect the 1lev1 connector
+  (the /mcp guide), then hand Claude a message that tells it to use the tools —
+  with no account, prepareSignup carries the blueprint and returns the preview
+  and the editing page that signs up and creates it; with one,
+  proposeRikmaBlueprint. Copy is its own button too, since the Claude apps
+  take no ?q= prefill.
 -->
 <script>
   import { t, isRtl, locale } from '$lib/translations';
@@ -18,6 +30,9 @@
   const MIN = 60;
   const MAX = 1500;
   const EXAMPLES = ['ex1', 'ex2', 'ex3'];
+  const CLAUDE_NEW = 'https://claude.ai/new';
+  /* Past this the prefilled URL risks a 414 at claude.ai; open it empty and paste. */
+  const CLAUDE_URL_MAX = 8000;
 
   let text = $state('');
   let website = $state('');
@@ -31,6 +46,35 @@
   let length = $derived(text.trim().length);
   /* No currency symbol: the sketch has no rikma, so no rikma currency yet. */
   let money = $derived(new Intl.NumberFormat($locale, { maximumFractionDigits: 0 }));
+
+  let claudePrompt = $derived($t('vision.demo.claudePrompt', { idea: text.trim() }));
+  let connectorPrompt = $derived($t('vision.demo.connectorPrompt', { idea: text.trim() }));
+  let claudeHref = $derived(claudeUrl(claudePrompt));
+  let connectorHref = $derived(claudeUrl(connectorPrompt));
+  /** @type {'' | 'claude' | 'connector'} */
+  let copied = $state('');
+
+  /** @param {string} prompt */
+  function claudeUrl(prompt) {
+    const url = `${CLAUDE_NEW}?q=${encodeURIComponent(prompt)}`;
+    return url.length > CLAUDE_URL_MAX ? CLAUDE_NEW : url;
+  }
+
+  /**
+   * Copy the brief on the way to Claude (or alone, from the copy button).
+   * @param {MouseEvent} e
+   * @param {'claude' | 'connector'} which
+   */
+  function copyFor(e, which) {
+    if (length < MIN) {
+      e.preventDefault();
+      return;
+    }
+    navigator.clipboard?.writeText(which === 'claude' ? claudePrompt : connectorPrompt).then(
+      () => (copied = which),
+      () => {}
+    );
+  }
 
   async function run() {
     if (busy || length < MIN) return;
@@ -96,15 +140,85 @@
     </span>
   </div>
 
-  <button
-    type="button"
-    onclick={run}
-    disabled={busy || length < MIN}
-    class="mt-4 w-full sm:w-auto bg-barbi hover:bg-white hover:text-barbi text-gold font-bold text-lg sm:text-base px-6 py-3 rounded-2xl shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
-  >
-    {#if busy}<Spinner size="xs" color="currentColor" />{/if}
-    {busy ? $t('vision.demo.working') : $t('vision.demo.run')}
-  </button>
+  <!-- Two roads: our quick sketch, or Claude's fuller, more professional answer. -->
+  <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+    <div class="flex flex-col gap-1">
+      <button
+        type="button"
+        onclick={run}
+        disabled={busy || length < MIN}
+        class="w-full bg-barbi hover:bg-white hover:text-barbi text-gold font-bold text-lg sm:text-base px-6 py-3 rounded-2xl shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
+      >
+        {#if busy}<Spinner size="xs" color="currentColor" />{/if}
+        {busy ? $t('vision.demo.working') : $t('vision.demo.run')}
+      </button>
+      <span class="text-xs text-slate-600 dark:text-surfaceMuted text-center">{$t('vision.demo.runNote')}</span>
+    </div>
+    <div class="flex flex-col gap-1">
+      <a
+        href={claudeHref}
+        target="_blank"
+        rel="noopener noreferrer"
+        onclick={(e) => copyFor(e, 'claude')}
+        aria-disabled={length < MIN}
+        class="w-full bg-white dark:bg-surface border-2 border-barbi text-barbi dark:text-gold dark:border-gold hover:bg-barbi hover:text-gold font-bold text-lg sm:text-base px-6 py-3 rounded-2xl shadow-lg transition-all duration-300 inline-flex items-center justify-center gap-2 {length < MIN ? 'opacity-50 cursor-not-allowed' : ''}"
+      >
+        {$t('vision.demo.claude')} ↗
+      </a>
+      <span class="text-xs text-slate-600 dark:text-surfaceMuted text-center">{$t('vision.demo.claudeNote')}</span>
+    </div>
+  </div>
+  {#if copied === 'claude'}
+    <p class="mt-2 text-xs text-slate-700 dark:text-surfaceMuted" aria-live="polite">{$t('vision.demo.claudeCopied')}</p>
+  {/if}
+
+  <!-- Third road: Claude with the 1lev1 connector builds a real draft rikma. More effort, so it is the quiet one. -->
+  <div class="mt-4 rounded-xl border-2 border-dashed border-gold/70 bg-white/60 dark:bg-surface px-4 py-3">
+    <p class="text-rose-700 dark:text-gold font-semibold text-base sm:text-sm">{$t('vision.demo.connector')}</p>
+    <p class="mt-1 text-xs sm:text-sm text-slate-700 dark:text-surfaceMuted leading-relaxed">{$t('vision.demo.connectorNote')}</p>
+    <ol class="mt-2 flex flex-col gap-2 text-sm text-slate-800 dark:text-surfaceInk list-decimal ps-5">
+      <li>
+        {$t('vision.demo.connectorStep1')}
+        <a
+          href="/mcp#connect"
+          target="_blank"
+          rel="noopener"
+          class="font-semibold text-barbi dark:text-gold underline decoration-barbi/40 underline-offset-4"
+        >
+          {$t('vision.demo.connectorGuide')} ↗
+        </a>
+      </li>
+      <li>
+        {$t('vision.demo.connectorStep2')}
+        <span class="mt-1 flex flex-wrap gap-2">
+          <button
+            type="button"
+            onclick={(e) => copyFor(e, 'connector')}
+            aria-disabled={length < MIN}
+            class="text-sm font-semibold px-3 py-1 rounded-xl border-2 border-barbi text-barbi dark:text-gold dark:border-gold hover:bg-barbi hover:text-gold transition-all {length < MIN ? 'opacity-50 cursor-not-allowed' : ''}"
+          >
+            {copied === 'connector' ? $t('vision.demo.connectorCopied') : $t('vision.demo.connectorCopy')}
+          </button>
+          <a
+            href={connectorHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            onclick={(e) => copyFor(e, 'connector')}
+            aria-disabled={length < MIN}
+            class="text-sm font-semibold px-3 py-1 rounded-xl border-2 border-barbi text-barbi dark:text-gold dark:border-gold hover:bg-barbi hover:text-gold transition-all {length < MIN ? 'opacity-50 cursor-not-allowed' : ''}"
+          >
+            {$t('vision.demo.connectorOpen')} ↗
+          </a>
+        </span>
+      </li>
+    </ol>
+    {#if length >= MIN}
+      <details class="mt-2">
+        <summary class="cursor-pointer text-xs text-slate-600 dark:text-surfaceMuted">{$t('vision.demo.connectorShow')}</summary>
+        <pre class="mt-2 whitespace-pre-wrap text-xs text-slate-800 dark:text-surfaceInk bg-cyan-50/70 dark:bg-surface2 rounded-lg p-3 font-sans" dir="auto">{connectorPrompt}</pre>
+      </details>
+    {/if}
+  </div>
 
   <p class="mt-3 text-xs sm:text-[11px] text-slate-700 dark:text-surfaceMuted leading-relaxed">
     {$t('vision.demo.disclaimer')}

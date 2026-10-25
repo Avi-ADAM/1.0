@@ -60,7 +60,20 @@
     "backToList": "Volver a la lista de chats",
     "cancel": "Cancelar",
     "moneyTransfer": "Chat sobre una transferencia",
-    "meeting": "Chat sobre una reunión"
+    "meeting": "Chat sobre una reunión",
+    "title": "Mis chats",
+    "openFull": "Abrir en página completa",
+    "newMeeting": "Nueva reunión",
+    "minimize": "Minimizar",
+    "expand": "Expandir",
+    "close": "Cerrar",
+    "drag": "Arrastra para mover · doble clic para restablecer",
+    "empty": "Aún no hay chats. Un chat se abre desde una misión, una transferencia o una reunión.",
+    "noMessages": "Aún no hay mensajes",
+    "system": "Sistema 1💗1",
+    "loading": "Cargando…",
+    "onlineStatus": "Estado de disponibilidad",
+    "meetingFallback": "Reunión"
   },
   "footer": {
     "brain": "Cerebro de las rikmas",

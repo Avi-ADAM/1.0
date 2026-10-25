@@ -13,6 +13,7 @@
   import { createMessage } from '$lib/func/chat/createMessage.svelte';
   import { createForum } from '$lib/func/chat/createForum.svelte';
   import { toast } from 'svelte-sonner';
+  import Spinner from '$lib/celim/Spinner.svelte';
 
   let unsubscribe;
   let messagesArray = $state(forumToArr());
@@ -66,7 +67,6 @@
   }
   let clicked = $state(false),
     ani = 'forum';
-  console.log(messagesArray);
   async function afreact(e) {
     const m = e.why;
     if ($nowChatId != -1) {
@@ -116,9 +116,7 @@
       }
     }
   }
-  $effect(() => {
-    console.log($forum[$nowChatId]);
-  });</script>
+</script>
 
 {#if $nowChatId == 0}
   {#key messagesArray}
@@ -128,6 +126,7 @@
   {@const md = $forum[$nowChatId].md}
   <Diun
     dont={true}
+    compact
     rikmaName={md.projectName || ''}
     onRect={afreact}
     smalldes={md.mesimaName || md.transferDetails || ''}
@@ -147,7 +146,8 @@
   {@const meeting = $meetingsData[$nowChatId]}
   <Diun
     dont={true}
-    rikmaName={meeting.attributes?.title || 'פגישה'}
+    compact
+    rikmaName={meeting.attributes?.title || $t('common.chat.meetingFallback')}
     onRect={afreact}
     smalldes={meeting.attributes?.description || ''}
     nameChatPartner={$t('common.chat.meeting')}
@@ -159,7 +159,8 @@
     {ani}
   />
 {:else}
-  <div class="flex items-center justify-center h-full">
-    <p class="text-gray-500">טוען נתונים...</p>
+  <div class="flex flex-col items-center justify-center gap-2 h-full py-10">
+    <Spinner />
+    <p class="text-sm text-gray-300">{$t('common.chat.loading')}</p>
   </div>
 {/if}

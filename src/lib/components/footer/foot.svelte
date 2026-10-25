@@ -1,35 +1,12 @@
-<script module>
-  import { t } from '$lib/translations';
-  import mapTouchToMouseFor from 'svelte-touch-to-mouse';
-</script>
-
 <script>
-  import { fly } from 'svelte/transition';
-  import { lang } from '$lib/stores/lang.js';
   import { forum, isChatOpen, nowChatId } from '$lib/stores/pendMisMes.js';
   import { initialForum } from '$lib/stores/pendMisMes.js';
   import { onMount } from 'svelte';
-  import Drag from '$lib/celim/icons/drag.svelte';
-  import ChatSmall from './chatSmall.svelte';
-  import Arrow from '$lib/celim/icons/arrow.svelte';
+  import ChatDock from './ChatDock.svelte';
   import { Drawer } from 'vaul-svelte';
-  import OnlineSwitch from '$lib/celim/onlineSwitch.svelte';
-  import NewMeetingIcon from '$lib/celim/3d/newMeetingIcon.svelte';
-  import { Canvas } from '@threlte/core';
   import CreateNewMeeting from '../addnew/createNewMeeting.svelte';
-  import {
-    initiatePgishot,
-    isOnline,
-    myUserMeeting
-  } from '$lib/stores/pgishot';
+  import { initiatePgishot } from '$lib/stores/pgishot';
   import MobileFooter from './mobileFooter.svelte';
-  import { goto } from '$app/navigation';
-  let draggable = $state();
-  $effect(() => {
-    if (isAuthed) {
-      mapTouchToMouseFor('.draggable');
-    }
-  });
 
   let username = '';
   let iwant = false,
@@ -38,7 +15,6 @@
   function addi(kind) {
     if (kind == 'chat') {
       iwant = true;
-      mapTouchToMouseFor('.draggable');
       isChatOpen.set(true);
     } else {
       newMeeting = false;
@@ -77,64 +53,10 @@
   });
 
   onMount(async () => {
-    draggable = (await import('svelte-agnostic-draggable')).draggable;
     if (idL && idL > 0) {
       initiatePgishot(idL);
     }
   });
-
-  async function onlineSwitcher(e) {
-    const changedTo = e.checked;
-    console.log(
-      'Changing online status to:',
-      changedTo,
-      'My UserMeeting ID:',
-      $myUserMeeting
-    );
-
-    // Optimistic update
-    isOnline.set(changedTo);
-
-    try {
-      const response = await fetch('/api/action', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          actionKey: 'toggleOnline',
-          params: {
-            status: changedTo
-          }
-        })
-      });
-
-      const res = await response.json();
-      if (!res.success) {
-        console.error('Failed to toggle online status:', res.error);
-        // Revert on failure
-        isOnline.set(!changedTo);
-      }
-    } catch (err) {
-      console.error('Error calling toggleOnline:', err);
-      isOnline.set(!changedTo);
-    }
-  }
-  /**** Svelte Event Handling ****/
-
-  function onDraggableInit() {
-    console.log('Draggable was created');
-  }
-  function onDragStart() {
-    console.log('dragging started');
-  }
-  function onDragMove() {
-    console.log('dragging continues');
-  }
-  function onDragStop() {
-    console.log('dragging was stopped');
-  }
-  function onDraggableDestroy() {
-    console.log('Draggable was destroyed');
-  }
 </script>
 
 {#if isAuthed}
@@ -174,92 +96,16 @@
   </div>
 
   {#if $isChatOpen == true}
-    <div
-      use:draggable={{
-        containment: 'window',
-        cursor: 'grabbing'
+    <ChatDock
+      bind:chatId
+      {un}
+      onClose={close}
+      onNewMeeting={() => {
+        isChatOpen.set(false);
+        newMeeting = true;
+        dialogOpen = true;
       }}
-      style="
-    display:block; cursor:grab
-  "
-      ondraggable:init={onDraggableInit}
-      ondraggable:destroy={onDraggableDestroy}
-      ondrag:start={onDragStart}
-      ondrag:move={onDragMove}
-      ondrag:stop={onDragStop}
-      transition:fly|local={{ y: 450, opacity: 0.5, duration: 2000 }}
-      dir="rtl"
-      class=" draggable z-[9999] absolute top-0 left-0 w-[340px] max-h-[420px] grid items-center justify-center aling-center rounded"
-    >
-      <div>
-        <div class="flex flex-row bg-gold rounded justify-between">
-          <div class="flex flex-row items-start justify-start">
-            <div>
-              <button
-                onclick={close}
-                class="hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full"
-                title={$t('common.chat.cancel')}
-                ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
-                  <path
-                    fill="currentColor"
-                    d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41"
-                  />
-                </svg></button
-              >
-            </div>
-            <div
-              class="hover:bg-wow text-barbi hover:text-barbi font-bold rounded"
-            >
-              <Drag />
-            </div>
-            {#if $nowChatId != 0}
-              <div
-                class="hover:bg-wow justify-end flex text-barbi hover:text-barbi font-bold rounded"
-              >
-                <button
-                  onclick={() => ($nowChatId = 0)}
-                  class="hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full"
-                  title={$t('common.chat.backToList')}><Arrow back={true} /></button
-                >
-              </div>
-            {/if}
-          </div>
-          <div class="flex flex-row gap-2 items-start justify-end">
-            <div>
-              <OnlineSwitch
-                bind:checked={$isOnline}
-                onChange={onlineSwitcher}
-              />
-            </div>
-            <button
-              onclick={() => {
-                isChatOpen.set(false);
-                goto($nowChatId != 0 ? '/forum/' + $nowChatId : '/forum');
-              }}
-              class="hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full p-0.5"
-              title={$lang === 'en' ? 'Open full page' : 'פתח עמוד מלא'}
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-              </svg>
-            </button>
-            <button
-              class="h-6 w-6 mx-2 my-1"
-              onclick={() => {
-                isChatOpen.set(false);
-                newMeeting = true;
-                dialogOpen = true;
-              }}
-            >
-              <Canvas>
-                <NewMeetingIcon />
-              </Canvas>
-            </button>
-          </div>
-        </div>
-        <ChatSmall bind:chatId {un} />
-      </div>
-    </div>
+    />
   {/if}
   <!--{#if isMobileOrTablet()}
 
@@ -308,15 +154,6 @@
      would only duplicate it. -->
 
 <style>
-  .draggable {
-    -webkit-touch-callout: none;
-    -ms-touch-action: none;
-    touch-action: none;
-    -moz-user-select: none;
-    -webkit-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-  }
   .ww2 {
     top: calc(100% - 105px);
     right: calc(100% - 55px);

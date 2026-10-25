@@ -24,6 +24,7 @@
    * @typedef {Object} Props
    * @property {any} ani
    * @property {boolean} [dont]
+   * @property {boolean} [compact] - Tight header/input for the floating chat dock.
    * @property {any} pendId
    * @property {string} [rikmaName]
    * @property {any} rect
@@ -46,6 +47,7 @@
   let {
     ani,
     dont = false,
+    compact = false,
     pendId,
     rikmaName = '1💗1',
     rect,
@@ -171,18 +173,20 @@
   dir={$isRtl ? 'rtl' : 'ltr'}
   class="flex flex-col {dont == false
     ? 'dont h-[75vh] sm:h-[80vh]'
-    : 'shadow-lg shadow-fuchsia-400/20 h-full'} max-h-[calc(100vh-100px)] bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-xl overflow-hidden"
+    : compact
+      ? 'h-full'
+      : 'shadow-lg shadow-fuchsia-400/20 h-full'} max-h-[calc(100vh-100px)] bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 {compact ? '' : 'rounded-xl'} overflow-hidden"
 >
   <!-- Header -->
   <div
-    class="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 bg-gradient-to-r from-gray-800/60 to-gray-800/40 backdrop-blur-md border-b border-gray-700/30"
+    class="flex items-center justify-between {compact ? 'px-3 py-2' : 'px-4 sm:px-6 py-3 sm:py-4'} bg-gradient-to-r from-gray-800/60 to-gray-800/40 backdrop-blur-md border-b border-gray-700/30"
   >
-    <div class="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
+    <div class="flex items-center {compact ? 'gap-2.5' : 'gap-3 sm:gap-4'} flex-1 min-w-0">
       <div class="relative flex-shrink-0">
         <img
           src={profilePicChatPartner}
           alt={nameChatPartner}
-          class="w-11 h-11 sm:w-14 sm:h-14 rounded-full ring-2 ring-gray-700/50 hover:ring-fuchsia-500/50 object-cover transition-all duration-200"
+          class="{compact ? 'w-9 h-9' : 'w-11 h-11 sm:w-14 sm:h-14'} rounded-full ring-2 ring-gray-700/50 hover:ring-fuchsia-500/50 object-cover transition-all duration-200"
         />
         <span
           class="absolute -bottom-0.5 {$lang === 'en'
@@ -194,11 +198,11 @@
         ></span>
       </div>
       <div class="flex flex-col min-w-0 flex-1 gap-0.5">
-        <h3 class="text-base sm:text-xl font-semibold text-white truncate">
+        <h3 class="{compact ? 'text-sm' : 'text-base sm:text-xl'} font-semibold text-white truncate">
           {nameChatPartner}
         </h3>
         {#if rikmaName}
-          <p class="text-xs sm:text-sm text-barbi truncate font-medium">
+          <p class="{compact ? 'text-xs' : 'text-xs sm:text-sm'} text-barbi truncate font-medium">
             {rikmaName}
           </p>
         {/if}
@@ -214,7 +218,7 @@
     bind:this={dow}
     bind:offsetHeight={off}
     id="messages"
-    class="flex-1 overflow-y-auto overflow-x-hidden px-3 sm:px-4 py-4 sm:py-6 space-y-2 sm:space-y-3 bg-gray-900/30 scroll-smooth min-h-0"
+    class="flex-1 overflow-y-auto overflow-x-hidden {compact ? 'px-2 py-3 space-y-2' : 'px-3 sm:px-4 py-4 sm:py-6 space-y-2 sm:space-y-3'} bg-gray-900/30 scroll-smooth min-h-0"
   >
     {#each messagesi as message}
       <ChatMessage
@@ -237,7 +241,7 @@
   <div
     dir={$isRtl ? 'rtl' : 'ltr'}
     class:pb-8={rect == false && no == false}
-    class="px-4 py-3 bg-gradient-to-r from-gray-800/40 to-gray-800/60 backdrop-blur-md {loading ==
+    class="{compact ? 'px-2.5 py-2' : 'px-4 py-3'} bg-gradient-to-r from-gray-800/40 to-gray-800/60 backdrop-blur-md {loading ==
     true
       ? ''
       : 'border-t border-gray-700/30'}"
@@ -261,7 +265,7 @@
             onblur={() => typing?.stopped()}
             minlength="26"
             placeholder={labelText}
-            class="input text-base sm:text-lg text-white bg-gray-700/30 backdrop-blur-sm border border-gray-600/30 rounded-2xl px-3 sm:px-4 py-2.5 sm:py-3 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/50 focus:border-fuchsia-500/50 hover:border-gray-500/50 hover:bg-gray-700/40 resize-none transition-all duration-200 max-h-32"
+            class="input {compact ? 'text-[15px] py-2' : 'text-base sm:text-lg py-2.5 sm:py-3'} text-white bg-gray-700/30 backdrop-blur-sm border border-gray-600/30 rounded-2xl px-3 sm:px-4 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/50 focus:border-fuchsia-500/50 hover:border-gray-500/50 hover:bg-gray-700/40 resize-none transition-all duration-200 max-h-32"
             rows="1"
             required
           ></textarea>
@@ -273,7 +277,7 @@
               onclick={click}
               type="button"
               aria-label="Send message"
-              class="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-2xl bg-gradient-to-br from-fuchsia-600 via-pink-600 to-fuchsia-700 hover:from-fuchsia-500 hover:via-pink-500 hover:to-fuchsia-600 active:scale-95 text-white transition-all duration-200 shadow-lg shadow-fuchsia-500/30 hover:shadow-fuchsia-500/50 focus:outline-none focus:ring-2 focus:ring-fuchsia-400 focus:ring-offset-2 focus:ring-offset-gray-800"
+              class="flex-shrink-0 {compact ? 'w-10 h-10' : 'w-10 h-10 sm:w-12 sm:h-12'} flex items-center justify-center rounded-2xl bg-gradient-to-br from-fuchsia-600 via-pink-600 to-fuchsia-700 hover:from-fuchsia-500 hover:via-pink-500 hover:to-fuchsia-600 active:scale-95 text-white transition-all duration-200 shadow-lg shadow-fuchsia-500/30 hover:shadow-fuchsia-500/50 focus:outline-none focus:ring-2 focus:ring-fuchsia-400 focus:ring-offset-2 focus:ring-offset-gray-800"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"

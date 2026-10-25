@@ -59,7 +59,20 @@
     "backToList": "Back to the chat list",
     "cancel": "Cancel",
     "moneyTransfer": "Chat on a money transfer",
-    "meeting": "Chat on a meeting"
+    "meeting": "Chat on a meeting",
+    "title": "My chats",
+    "openFull": "Open full page",
+    "newMeeting": "New meeting",
+    "minimize": "Minimize",
+    "expand": "Expand",
+    "close": "Close",
+    "drag": "Drag to move · double-click to reset",
+    "empty": "No chats yet. A chat opens from a mission, a transfer or a meeting.",
+    "noMessages": "No messages yet",
+    "system": "1💗1 system",
+    "loading": "Loading…",
+    "onlineStatus": "Availability status",
+    "meetingFallback": "Meeting"
   },
   "footer": {
     "brain": "Rikma brain",
