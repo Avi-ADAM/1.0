@@ -1,7 +1,6 @@
 # PLAN — מבצעים בחנות: הנחה על פריט, "5 ב-100", מבצע על כל החנות — בהסכמה
 
-> **מצב: P1 (סכמה) כתוב ב-`1.0b`, לא נפרס.** ענף `claude/shop-promotions-schema`,
-> נחתך מ-`shabab` — פירוט, מה נבדק ומה צריך לפני שזה עולה ב-**§9.1**. שאר השלבים בתכנון.
+> **מצב: P1 (סכמה) מוזג ל-`shabab` של `1.0b` (2026-10-25), ממתין לפריסה** — פירוט, מה נבדק ומה צריך לפני שזה עולה ב-**§9.1**. שאר השלבים בתכנון.
 >
 > נכתב 2026-10-23 אחרי קריאת תכניות החנות
 > ([PLAN_SHOP_CUSTOMER_EXPERIENCE](../inprogress/PLAN_SHOP_CUSTOMER_EXPERIENCE.md),
@@ -347,7 +346,7 @@ promoPriceOf(product, variant, promos, now)
 | שלב | תכולה | תלות | אומדן |
 |---|---|---|---|
 | **P0** | המסמך + הכרעות (§10) | — | ✅ |
-| **P1** | סכמה ב-`1.0b`: `promotion`, `price-point` + lifecycle, `Decision.kind` + `negopromo` + `promotion`, `Project.promoPolicy`, `order-line`/`Sale` (`listPrice`, `promotion`); `types:update`; qids + `qidsAccess.js` | S1–S5 של החנות נפרסו | 🟡 הסכמה כתובה (§9.1); נשארו פריסה, `types:update`, qids |
+| **P1** | סכמה ב-`1.0b`: `promotion`, `price-point` + lifecycle, `Decision.kind` + `negopromo` + `promotion`, `Project.promoPolicy`, `order-line`/`Sale` (`listPrice`, `promotion`); `types:update`; qids + `qidsAccess.js` | S1–S5 של החנות נפרסו | 🟡 הסכמה ב-`shabab` (§9.1); נשארו פריסה, `types:update`, qids |
 | **P2** | המנוע `promotions.ts` + בדיקות property; `promoPriceOf` | — (טהור, במקביל ל-P1) | 2–3 ימים |
 | **P3** | ההסכמה: פעולות `proposePromotion`, `counterPromotion`, `pausePromotion`, `endPromotion`, `proposePromoPolicy` (ב-`configs/`, עם `access` ו-`authRules`); ענף הבשלה ב-`timegrama/decision.svelte`; קרון `scheduled→active→ended`; כרטיס בלב (מה מוצע, מה חורג מהמעטפת, הרצפה, התאריך המוקדם) | P1 | 4–5 ימים |
 | **P4** | המשטחים: DTO, `GET /promotions`, `POST /cart/quote`, `createPaidOrder`/`confirmOrderPayment` (§5.3), מונים ותקרה, webhooks `promotion.started/ended`; OpenAPI | P2, P3 | 3–4 ימים |
@@ -360,9 +359,8 @@ promoPriceOf(product, variant, promos, now)
 
 ### 9.1 P1 — מה נכתב ב-`1.0b`, ומה צריך לפני שזה עולה
 
-**איפה:** `Avi-ADAM/1.0b`, ענף `claude/shop-promotions-schema` (נחתך מ-`shabab`).
-**לא מוזג ל-`shabab` בכוונה:** push ל-`shabab` מפעיל את `.github/workflows/deploy.yml`
-ופורס ל-EC2.
+**איפה:** `Avi-ADAM/1.0b`, ב-`shabab` (commit `2c8b7be`, מוזג 2026-10-25). באותו push
+נמחק `.github/workflows/deploy.yml` — שלב הפריסה בו היה מוער, והוא רק בנה artifact.
 
 | מה | קובץ | הערה |
 |---|---|---|
@@ -384,7 +382,7 @@ promoPriceOf(product, variant, promos, now)
 **לא נבדק:** Postgres, ו-GraphQL מול הרשאות אמיתיות.
 
 **לפני שזה עולה — חובה:**
-1. מיזוג הענף ל-`shabab` (= פריסה).
+1. ~~מיזוג ל-`shabab`~~ — נעשה 2026-10-25. נשארה הפריסה עצמה (`release.ps1`).
 2. **Settings → Users & Permissions → Roles → Authenticated**: `find`/`findOne`/`create`/`update`
    על `promotion`, ו-`find`/`findOne` על `price-point` (אותו לא כותבים מהאפליקציה). בלי זה — 403
    על סכמה שנפרסה.
