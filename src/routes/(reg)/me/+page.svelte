@@ -618,6 +618,8 @@
     })
   );
   let orbit = $derived(layout.mode === 'orbit' ? layout : null);
+  /** On a phone the honeycomb splits around the badge: these go above it. */
+  let upperCount = $derived(Math.ceil(orbs.length / 2));
 
   /**
    * Someone who came to order through the concierge and has not (yet) joined
@@ -982,6 +984,7 @@
         class="me-field"
         class:ready={vw > 0}
         class:editing={editing}
+        class:upper-even={upperCount % 2 === 0}
         inert={editing}
         style:height={orbit ? `${vh}px` : null}
       >
@@ -1067,9 +1070,11 @@
         <div class="me-orbs">
           {#each orbs as orb, i (orb.key)}
             {@const p = orbit?.orbs[i]}
+            {@const upper = i < upperCount}
             <div
               class="me-orb-slot"
-              id={orb.key === 'resources' ? 'my-resources' : undefined}
+              class:upper
+              class:zig={(upper ? i : i - upperCount) % 2 === 1}              id={orb.key === 'resources' ? 'my-resources' : undefined}
               style:--i={i}
               style={p
                 ? `left:${p.x - orbit.size / 2}px;top:${p.y - orbit.size / 2}px;width:${orbit.size}px`
@@ -1527,7 +1532,12 @@
   .me-page-bg.stack {
     height: auto;
     min-height: 100dvh;
-    overflow: visible;
+    /* Still clipped: the blurred background orbs are 50–60vw wide and sit
+       past the edges, and on a page that scrolls they widened it — a phone
+       then zoomed the whole page out (the wide side margins) and scrolled
+       into empty space below. `clip` cuts them without making this a scroll
+       container, and the content still sets the height. */
+    overflow: clip;
     /* A page that scrolls gets the footer's reserve as body padding, which
        would show as a dark band under the gradient. Paint over it instead —
        the content height mobileFooter measures stays the same. */
@@ -1702,15 +1712,40 @@
     max-width: 250px;
   }
   /* A phone gets exactly two columns, the second dropped half a circle — a
-     coin field rather than a table. */
+     coin field rather than a table — and the circles split around the badge:
+     what the member is doing above it, who they are below. The list wrapper
+     steps out of the way so the badge can sit between the two halves. */
   @media (max-width: 559px) {
-    .stack .me-orbs {
+    .stack .me-field {
+      display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 10px;
-      padding-bottom: 26%;
+      /* The last dropped circle hangs half a circle below its row. */
+      padding-bottom: calc(2rem + 25%);
     }
-    .stack .me-orb-slot:nth-child(even) {
+    .stack .me-orbs {
+      display: contents;
+    }
+    .stack .me-orb-slot {
+      order: 2;
+      max-width: none;
+    }
+    .stack .me-orb-slot.upper {
+      order: 0;
+    }
+    .stack .me-orb-slot.zig {
       translate: 0 50%;
+    }
+    .stack .me-center {
+      order: 1;
+      grid-column: 1 / -1;
+      justify-self: center;
+      margin-block: 0.75rem;
+    }
+    /* An even upper half ends on a dropped circle, which would hang into the
+       badge. */
+    .stack .me-field.upper-even .me-center {
+      margin-top: calc(0.75rem + 25%);
     }
   }
 
