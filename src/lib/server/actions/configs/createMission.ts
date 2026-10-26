@@ -37,6 +37,11 @@ import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { calcDeadlineMs, restimeLabel, voteUrl } from './actionUtils.js';
 import { createMissionConsentSpec } from '$lib/consent/specs/s2b';
 import { matchOpenMissionToUsers } from '$lib/server/matching/engine';
+import {
+  inviteToOpenMission,
+  normalizeInviteEmail,
+  type MissionInviteOutcome
+} from '$lib/server/invites/missionInvite.js';
 import { normalizeNeed } from '$lib/missions/headcount.js';
 import { validatePattern } from '$lib/shifts/pattern.js';
 import { shiftsEnabled } from '$lib/server/shifts/mode.js';
@@ -107,9 +112,21 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
     // "This mission needs to be staffed at these hours" (PLAN_SHIFTS §13.6):
     // part of the proposal, so the rikma answers it in the same vote.
     shiftPlan,
+    // "Invite someone new to this mission" (PLAN_INVITE_PARTNER_TO_MISSION):
+    // the mission stays open; the invitee offers themselves and the rikma
+    // approves as usual. `{ email? }` — without an email it is a link-only invite.
+    invite,
   } = params;
 
   const { userId } = context;
+
+  // Checked before anything is written, so a bad address cannot leave a
+  // mission behind whose invite was silently lost.
+  const wantsInvite = invite != null && typeof invite === 'object';
+  const inviteEmail = wantsInvite ? normalizeInviteEmail((invite as any).email) : undefined;
+  if (wantsInvite && assignedUserId) {
+    throw new Error('A mission with an invite is open — it cannot also be assigned');
+  }
   const now = new Date();
   const nowISO = now.toISOString();
 
@@ -131,6 +148,13 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
   const userCount = members.length;
   const restime: string = projAttrs.restime ?? 'feh';
   const deadlineISO = new Date(Date.now() + calcDeadlineMs(restime)).toISOString();
+
+  // A multi-member rikma votes on the mission first, and inviting someone to
+  // a mission it has not approved would be acting for it. Until the invite can
+  // wait on the vote (plan phase 2), only a solo rikma can invite here.
+  if (wantsInvite && userCount > 1) {
+    throw new Error('Inviting from the mission form is available in a one-member rikma for now');
+  }
 
   // Context for the case-specific notifications sent at the end of the handler.
   const projectName: string = projAttrs.projectName ?? '';
@@ -261,6 +285,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
   let createdEntityType: string | null = null;
   let notificationKind: string | null = null;
   let createdAskId: string | null = null;
+  let inviteOutcome: MissionInviteOutcome | null = null;
 
   // ── BRANCH 1: Multi-user, open vote → Pendm ──────────────────────────────
   if (userCount > 1 && !assignedUserId) {
@@ -348,6 +373,20 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
       fetch: context.fetch,
       lang: context.lang
     });
+
+    if (wantsInvite) {
+      inviteOutcome = await inviteToOpenMission(
+        {
+          projectId: String(projectId),
+          projectName,
+          openMissionId: String(createdEntityId),
+          missionName,
+          inviterId: String(userId),
+          email: inviteEmail
+        },
+        { strapi, fetch: context.fetch, lang: context.lang }
+      );
+    }
   }
   // ── BRANCH 4: Solo, self-assigned → Mesimabetahalich ─────────────────────
   else {
@@ -615,6 +654,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
       userCount,
       shiftPlanId,
       shiftPlanError,
+      invite: inviteOutcome,
     },
     updateStrategy: { type: 'none' },
   };
@@ -687,6 +727,7 @@ export const createMissionConfig: ActionConfig = {
     stipendCostShare:   { type: 'number',  required: false, description: 'α — 1 (default) the recipient carries it and nobody is diluted, 0 the whole rikma does' },
     stipendMode:        { type: 'string',  required: false, description: 'equity (default) | gift' },
     stipendFunderId:    { type: 'string',  required: false, description: 'Member offering to fund it, when there already is one' },
+    invite:             { type: 'object',  required: false, description: 'Invite someone new to this open mission: { email? }. Solo rikma only for now; returns data.invite { result, link }. Cannot be combined with assignedUserId — docs/inprogress/PLAN_INVITE_PARTNER_TO_MISSION.md' },
   },
 
   authRules: [

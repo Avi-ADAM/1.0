@@ -293,6 +293,7 @@
   import ShiftPlanForm, { emptyShiftPlan } from '$lib/components/shifts/ShiftPlanForm.svelte';
   import { validatePattern } from '$lib/shifts/pattern';
   import MobileModal from '$lib/celim/ui/mobileModal.svelte';
+  import InviteResultCard from './InviteResultCard.svelte';
   import { page } from '$app/state';
   import LocationPicker from '$lib/components/location/LocationPicker.svelte';
   import EquityPreview from '$lib/components/equity/EquityPreview.svelte';
@@ -756,6 +757,14 @@
       return;
     }
 
+    const inviting = canInvite && inviteNew && element.myM !== true;
+    const inviteAddress = inviteEmail.trim();
+    if (inviting && inviteAddress && !INVITE_EMAIL_SHAPE.test(inviteAddress)) {
+      loading = false;
+      toast.warning($trans('mission.invite.invalidEmail'));
+      return;
+    }
+
     const skills = find_skill_id(element.selectedSkills);
     const work_ways = find_workway_id(element.selectedWorkways);
     const tafkidims = find_role_id(element.selectedRoles);
@@ -822,6 +831,7 @@
         privatlinks: element.privatlinks,
         spnot: element.spnot,
         assignedUserId,
+        invite: inviting ? (inviteAddress ? { email: inviteAddress } : {}) : undefined,
         checklist: element.checklist || [],
         stipendRate: Number(element.stipendRate) > 0 ? Number(element.stipendRate) : undefined,
         stipendCostShare:
@@ -943,8 +953,24 @@
     success = true;
     confettiStore.trigger();
     toast.success(mf.publishedSuccess);
+    // With an invite the form stays up until the inviter has the link in hand —
+    // closing first would lose the one thing they came here to send.
+    if (md?.invite?.link) {
+      inviteResult = md.invite;
+      inviteMd = md;
+      return;
+    }
     onClose?.({ md });
   }
+
+  // "Invite someone new" (PLAN_INVITE_PARTNER_TO_MISSION, phase 1): a solo
+  // rikma only — a larger one votes on the mission before it is open.
+  const canInvite = $derived(!!projectId && !specMode && !publishMode && userslength <= 1);
+  let inviteNew = $state(false);
+  let inviteEmail = $state('');
+  let inviteResult = $state(null);
+  let inviteMd = null;
+  const INVITE_EMAIL_SHAPE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   let wid = $state(0);
   //TODO: כמות לכל משימה עד אינסוף
@@ -1779,9 +1805,36 @@
                     value="tome"
                     onclick={() => {
                       miData[0].rishon = 'self';
+                      inviteNew = false;
                     }}
                   />
                   <label for="tome">{$trans('mission.assingToMe')}</label>
+                {/if}
+                {#if canInvite}
+                  <div class="mt-3 rounded-lg border border-gold/40 p-3">
+                    <input
+                      bind:checked={inviteNew}
+                      type="checkbox"
+                      id="inviteNewC"
+                      onchange={() => {
+                        if (inviteNew) miData[0].myM = false;
+                      }}
+                    />
+                    <label for="inviteNewC" class="font-semibold">{$trans('mission.invite.optionLabel')}</label>
+                    <p class="text-sm opacity-80">{$trans('mission.invite.help')}</p>
+                    {#if inviteNew}
+                      <input
+                        bind:value={inviteEmail}
+                        type="email"
+                        inputmode="email"
+                        autocomplete="off"
+                        dir="ltr"
+                        class="mt-2 w-full rounded-lg border border-gold/50 bg-white/90 px-3 py-2 text-barbi"
+                        placeholder={$trans('mission.invite.emailPlaceholder')}
+                        aria-label={$trans('mission.invite.emailPlaceholder')}
+                      />
+                    {/if}
+                  </div>
                 {/if}
                 <button
                   title={$trans('mission.assingTo') +
@@ -1892,6 +1945,20 @@
     </div>
   </div>
 </div>
+
+{#if inviteResult}
+  <InviteResultCard
+    invite={inviteResult}
+    missionName={miData[0].missionName}
+    projectName={pn ?? ''}
+    onDone={() => {
+      const md = inviteMd;
+      inviteResult = null;
+      inviteMd = null;
+      onClose?.({ md });
+    }}
+  />
+{/if}
 
 <style>
   /* Both boxes are painted by `surface-dialog` (app.postcss). */
