@@ -244,7 +244,9 @@
     "quoteNote": "מה צריך?",
     "quoteNotePlaceholder": "למשל: 2 בקבוקי קולה, גבינה צהובה 200 גר׳, לחם",
     "quoteBudget": "כמה אתם מוכנים לשלם? (לא חובה)",
-    "quoteBudgetPlaceholder": "אפשר להשאיר ריק"
+    "quoteBudgetPlaceholder": "אפשר להשאיר ריק",
+    "promoUntil": "מחיר מבצע עד {{date}}",
+    "onSale": "במבצע"
   },
   "editBasic": {
     "head": "עריכת פרופיל",

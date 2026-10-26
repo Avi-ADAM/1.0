@@ -1,6 +1,7 @@
 import { sendToSer } from '$lib/send/sendToSer.js';
 import { sendViaProxy } from '$lib/server/sendViaProxy.js';
 import { rtKey } from '$lib/realtime/scopes.js';
+import { salePricesFor } from '$lib/server/promotions/pricing';
 
 async function fetchPendingForMatanot(fetchFn, uid, matId) {
   try {
@@ -76,6 +77,15 @@ export async function load({ locals, params, fetch, depends }) {
   const projectUsers = alld?.projectcreates?.data?.[0]?.attributes?.user_1s?.data ?? [];
   const isMember = uid ? projectUsers.some((u) => String(u.id) === String(uid)) : false;
 
+  // A running item / store promotion (PLAN_SHOP_PROMOTIONS P5): the page shows
+  // the sale price beside the approved one, and a request starts from it.
+  let promo = null;
+  const promoProjectId = alld?.projectcreates?.data?.[0]?.id;
+  if (alld && promoProjectId && !archived) {
+    const sale = (await salePricesFor(String(promoProjectId)).catch(() => ({})))[String(mId)];
+    if (sale) promo = { price: sale.price, listPrice: sale.listPrice, name: sale.promotion?.name ?? null, endsAt: sale.promotion?.endsAt ?? null };
+  }
+
   return {
     uid,
     lang,
@@ -86,7 +96,8 @@ export async function load({ locals, params, fetch, depends }) {
     existingRequests,
     projectUsers,
     isMember,
-    personalSeller
+    personalSeller,
+    promo
   };
 }
 

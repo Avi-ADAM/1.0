@@ -244,7 +244,9 @@
     "quoteNote": "ماذا تحتاجون؟",
     "quoteNotePlaceholder": "مثلًا: زجاجتا كولا، جبنة صفراء 200 غرام، خبز",
     "quoteBudget": "كم أنتم مستعدون للدفع؟ (اختياري)",
-    "quoteBudgetPlaceholder": "يمكن تركه فارغًا"
+    "quoteBudgetPlaceholder": "يمكن تركه فارغًا",
+    "promoUntil": "سعر العرض حتى {{date}}",
+    "onSale": "ضمن عرض"
   },
   "editBasic": {
     "head": "تعديل الملف الشخصي",

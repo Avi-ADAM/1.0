@@ -111,8 +111,17 @@
     /** @type {string} */
     projectName = '',
     /** What sits under the header: the orders banner and "manage sales". @type {import('svelte').Snippet | undefined} */
-    top
+    top,
+    /**
+     * Today's price of each product on promotion (PLAN_SHOP_PROMOTIONS P5): a sale
+     * report starts from it. The member still types what was actually received.
+     * @type {Record<string, { price: number, listPrice: number }>}
+     */
+    salePrices = {}
   } = $props();
+
+  /** @param {Matana} m */
+  const priceOf = (m) => salePrices[m.id]?.price ?? m.attributes.price;
 
   // ── reporting a sale / a new product — one sheet ──
   let isOpen = $state(false);
@@ -135,7 +144,7 @@
   function reportSale() {
     const only = bmiData.length === 1 ? bmiData[0] : null;
     if (only) {
-      sell(only.id, only.attributes.price, only.attributes.quant, only.attributes.kindOf);
+      sell(only.id, priceOf(only), only.attributes.quant, only.attributes.kindOf);
       return;
     }
     maid = undefined;
@@ -400,10 +409,10 @@
               role="radio"
               aria-checked={p.id === maid}
               class="sp-radio"
-              onclick={() => sell(p.id, p.attributes.price, p.attributes.quant, p.attributes.kindOf)}
+              onclick={() => sell(p.id, priceOf(p), p.attributes.quant, p.attributes.kindOf)}
             >
               <span class="sp-radio-name">{p.attributes.name}</span>
-              <span class="sp-radio-meta"><bdi><Money amount={p.attributes.price} /></bdi> · {kindLabel(p.attributes.kindOf)}</span>
+              <span class="sp-radio-meta">{#if salePrices[p.id]}<s><bdi><Money amount={p.attributes.price} /></bdi></s> {/if}<bdi><Money amount={priceOf(p)} /></bdi> · {kindLabel(p.attributes.kindOf)}</span>
             </button>
           {/each}
         </fieldset>
@@ -724,7 +733,10 @@
                   <a class="sp-prod-title" href="/gift/{data.id}">{data.attributes.name}</a>
                   <span class="sp-muted">{kindLabel(data.attributes.kindOf)} · {stockLabel(data)}</span>
                 </div>
-                <strong class="sp-gold"><Money amount={data.attributes.price} /></strong>
+                <strong class="sp-gold">
+                  {#if salePrices[data.id]}<span class="sh-chip sh-chip-accent">{$t('shop.promo.onSale')}</span> <s class="sp-muted"><Money amount={data.attributes.price} /></s>{/if}
+                  <Money amount={priceOf(data)} />
+                </strong>
               </div>
               <div class="sp-prod-actions">
                 <button
@@ -762,7 +774,7 @@
                 <button
                   type="button"
                   class="sh-btn sh-btn-outline sp-push"
-                  onclick={() => sell(data.id, data.attributes.price, data.attributes.quant, data.attributes.kindOf)}
+                  onclick={() => sell(data.id, priceOf(data), data.attributes.quant, data.attributes.kindOf)}
                 >
                   {$t('project.hamatanot.reportSale')}
                 </button>

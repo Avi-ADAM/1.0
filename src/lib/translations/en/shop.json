@@ -26,7 +26,8 @@
     "connect": "Connect",
     "waiting": "{{count}} waiting for you",
     "fulfillment": "Fulfilment",
-    "shipping": "Shipping"
+    "shipping": "Shipping",
+    "promotions": "Promotions"
   },
   "kpi": {
     "label": "At a glance",
@@ -738,5 +739,138 @@
     "busy": "Trying…",
     "done": "The tasks are open",
     "failed": "Still did not work. Try again in a moment."
+  },
+  "promo": {
+    "notReady": "Promotions are not available in this rikma yet",
+    "notReadyBody": "The server cannot read promotions yet. After the update this tab fills in.",
+    "intro": "A promotion lowers prices for a while. Anything inside the envelope the rikma agreed to goes out at once; anything else goes to a vote — approve, talk it over, or put up another version.",
+    "new": "New promotion",
+    "activeNow": "Running now",
+    "until": "until {{date}}",
+    "empty": "No promotions yet",
+    "emptyBody": "\"15% off mugs\", \"3 for 100\", \"10% off the whole store\" — each one starts here.",
+    "sec": {
+      "live": "Running",
+      "upcoming": "Scheduled",
+      "proposals": "On the table",
+      "ended": "Ended in the last 30 days"
+    },
+    "status": {
+      "active": "Running",
+      "paused": "Paused",
+      "scheduled": "Scheduled",
+      "proposed": "In a vote",
+      "ended": "Ended"
+    },
+    "endedReason": {
+      "time": "reached its end date",
+      "cap": "the cap was reached",
+      "early": "ended early",
+      "superseded": "replaced by another version"
+    },
+    "used": "{{count}} units sold on this promotion",
+    "usedOfCap": "{{used}} of {{cap}} units",
+    "pausedUntil": "Paused until {{date}}, then it runs again",
+    "counterOpen": "Another version of this promotion is on the table",
+    "toVote": "To the vote",
+    "pause": "Pause for 24 hours",
+    "resume": "Resume",
+    "end": "End the promotion",
+    "endSure": "Sure? End it now",
+    "withdraw": "Withdraw the proposal",
+    "step": {
+      "what": "What",
+      "scope": "On what",
+      "when": "When"
+    },
+    "kindHint": {
+      "item": "A percentage, a fixed price or an amount off each unit — on the products you pick.",
+      "bundle": "Several units for one price, mixed from any product on the promotion.",
+      "bxgy": "\"1+1\", \"the second at 50%\" — the cheaper item is the one discounted.",
+      "store": "A percentage off the whole store.",
+      "threshold": "A discount on the whole order once it passes an amount."
+    },
+    "itemMode": {
+      "pct": "Percent",
+      "price": "Fixed price",
+      "off": "Amount per unit"
+    },
+    "value": {
+      "pct": "Percent off",
+      "price": "Promotion price",
+      "off": "Off each unit"
+    },
+    "bundleQty": "How many units",
+    "bundlePrice": "For",
+    "buy": "Buy",
+    "get": "and get",
+    "getPct": "at percent off",
+    "minSubtotal": "Over an order of",
+    "thresholdMode": {
+      "off": "Amount",
+      "pct": "Percent"
+    },
+    "name": "Promotion name (shown to buyers)",
+    "namePh": "End of season",
+    "pickProducts": "Products I pick",
+    "picked": "{{count}} picked",
+    "noProducts": "The rikma has no products yet",
+    "ineligible": {
+      "pool": "composed — the savings already go to the participants",
+      "quote": "priced by quote — no price to cut",
+      "wish": "a wish deal — the price is the customer's signature",
+      "archived": "archived",
+      "noPrice": "no price"
+    },
+    "startsOn": "From",
+    "startsOnHint": "Empty = as soon as it is approved",
+    "endsOn": "Until",
+    "capUnits": "Unit cap (optional)",
+    "capHint": "When this many units are sold, the promotion closes.",
+    "why": "Why? (shown in the vote)",
+    "preview": {
+      "now": "Goes out at once — the rikma is notified",
+      "vote": "This goes to a vote of the rikma",
+      "reaches": "Applies to {{count}} products",
+      "blocked": "Not included: {{names}}",
+      "earliest": "With no answer, it is approved on {{date}} at the earliest"
+    },
+    "problem": {
+      "value": "The discount is missing",
+      "pctRange": "The percentage must be below 100",
+      "bundle": "At least 2 units and a price",
+      "bxgy": "How many to buy, how many they get, and a percentage from 1 to 100",
+      "minSubtotal": "The amount the discount starts at is missing",
+      "noProducts": "Pick at least one product",
+      "noEnd": "A promotion needs an end date",
+      "endPassed": "The end date has already passed",
+      "endBeforeStart": "The end must come after the start"
+    },
+    "back": "Back",
+    "next": "Next",
+    "cancel": "Cancel",
+    "sendNow": "Start the promotion",
+    "sendVote": "Send to a vote",
+    "toast": {
+      "proposedNow": "The promotion is set, and the rikma was notified",
+      "proposedVote": "The proposal is up for a vote",
+      "paused": "The promotion is paused for 24 hours",
+      "resumed": "The promotion is running again",
+      "ended": "The promotion ended — back to the approved prices",
+      "withdrawn": "The proposal was withdrawn",
+      "policySent": "The envelope proposal is up for a vote",
+      "error": "Something went wrong — try again"
+    },
+    "policy": {
+      "none": "The rikma has no envelope yet — every promotion goes to a vote.",
+      "pending": "An envelope proposal is waiting for a vote",
+      "change": "Propose a change to the envelope",
+      "propose": "Propose a promotion envelope",
+      "arranged": "Discount in a conversation up to (%)",
+      "kinds": "Kinds of promotion inside the envelope",
+      "voteNote": "The envelope itself goes to a vote of the whole rikma. Silence until the response time is consent.",
+      "send": "Send to a vote"
+    },
+    "onSale": "On sale"
   }
 }

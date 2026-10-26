@@ -26,7 +26,8 @@
     "connect": "Conexiones",
     "waiting": "{{count}} te esperan",
     "fulfillment": "Preparación",
-    "shipping": "Envíos"
+    "shipping": "Envíos",
+    "promotions": "Promociones"
   },
   "kpi": {
     "label": "Resumen",
@@ -738,5 +739,138 @@
     "busy": "Intentando…",
     "done": "Las tareas están abiertas",
     "failed": "Todavía no funcionó. Inténtalo de nuevo en un momento."
+  },
+  "promo": {
+    "notReady": "Las promociones aún no están disponibles en esta rikma",
+    "notReadyBody": "El servidor todavía no puede leer promociones. Después de la actualización esta pestaña se llena.",
+    "intro": "Una promoción baja los precios por un tiempo. Lo que cabe en el marco que la rikma aprobó sale al instante; lo demás va a votación — aprobar, conversarlo o proponer otra versión.",
+    "new": "Nueva promoción",
+    "activeNow": "Activa ahora",
+    "until": "hasta {{date}}",
+    "empty": "Aún no hay promociones",
+    "emptyBody": "\"15% en tazas\", \"3 por 100\", \"10% en toda la tienda\" — cada una empieza aquí.",
+    "sec": {
+      "live": "En curso",
+      "upcoming": "Programadas",
+      "proposals": "Sobre la mesa",
+      "ended": "Terminadas en los últimos 30 días"
+    },
+    "status": {
+      "active": "Activa",
+      "paused": "En pausa",
+      "scheduled": "Programada",
+      "proposed": "En votación",
+      "ended": "Terminada"
+    },
+    "endedReason": {
+      "time": "llegó a su fecha de fin",
+      "cap": "se agotó el tope",
+      "early": "terminó antes",
+      "superseded": "reemplazada por otra versión"
+    },
+    "used": "{{count}} unidades vendidas en la promoción",
+    "usedOfCap": "{{used}} de {{cap}} unidades",
+    "pausedUntil": "En pausa hasta {{date}}, luego vuelve a correr",
+    "counterOpen": "Otra versión de esta promoción está sobre la mesa",
+    "toVote": "A la votación",
+    "pause": "Pausar 24 horas",
+    "resume": "Reanudar",
+    "end": "Terminar la promoción",
+    "endSure": "¿Seguro? Terminar ahora",
+    "withdraw": "Retirar la propuesta",
+    "step": {
+      "what": "Qué",
+      "scope": "Sobre qué",
+      "when": "Cuándo"
+    },
+    "kindHint": {
+      "item": "Un porcentaje, un precio fijo o un monto por unidad — en los productos que elijas.",
+      "bundle": "Varias unidades por un precio, mezclando productos de la promoción.",
+      "bxgy": "\"1+1\", \"el segundo al 50%\" — el descuento va al más barato.",
+      "store": "Un porcentaje en toda la tienda.",
+      "threshold": "Un descuento en todo el pedido cuando supera un monto."
+    },
+    "itemMode": {
+      "pct": "Porcentaje",
+      "price": "Precio fijo",
+      "off": "Monto por unidad"
+    },
+    "value": {
+      "pct": "Porcentaje de descuento",
+      "price": "Precio de promoción",
+      "off": "Descuento por unidad"
+    },
+    "bundleQty": "Cuántas unidades",
+    "bundlePrice": "Por",
+    "buy": "Compra",
+    "get": "y llévate",
+    "getPct": "con descuento de (%)",
+    "minSubtotal": "En pedidos desde",
+    "thresholdMode": {
+      "off": "Monto",
+      "pct": "Porcentaje"
+    },
+    "name": "Nombre de la promoción (lo ven los compradores)",
+    "namePh": "Fin de temporada",
+    "pickProducts": "Productos que elijo",
+    "picked": "{{count}} elegidos",
+    "noProducts": "La rikma aún no tiene productos",
+    "ineligible": {
+      "pool": "compuesto — el ahorro ya va a los participantes",
+      "quote": "por cotización — no hay precio que bajar",
+      "wish": "trato de deseo — el precio está firmado con la clienta",
+      "archived": "archivado",
+      "noPrice": "sin precio"
+    },
+    "startsOn": "Desde",
+    "startsOnHint": "Vacío = en cuanto se apruebe",
+    "endsOn": "Hasta",
+    "capUnits": "Tope de unidades (opcional)",
+    "capHint": "Cuando se venden estas unidades, la promoción se cierra.",
+    "why": "¿Por qué? (se ve en la votación)",
+    "preview": {
+      "now": "Sale al instante — la rikma recibe un aviso",
+      "vote": "Esto va a votación de la rikma",
+      "reaches": "Aplica a {{count}} productos",
+      "blocked": "No incluidos: {{names}}",
+      "earliest": "Sin respuesta, se aprueba el {{date}} como pronto"
+    },
+    "problem": {
+      "value": "Falta el descuento",
+      "pctRange": "El porcentaje debe ser menor que 100",
+      "bundle": "Al menos 2 unidades y un precio",
+      "bxgy": "Cuántas comprar, cuántas llevar y un porcentaje de 1 a 100",
+      "minSubtotal": "Falta el monto desde el que aplica",
+      "noProducts": "Elige al menos un producto",
+      "noEnd": "Una promoción necesita fecha de fin",
+      "endPassed": "La fecha de fin ya pasó",
+      "endBeforeStart": "El fin debe ser después del inicio"
+    },
+    "back": "Atrás",
+    "next": "Siguiente",
+    "cancel": "Cancelar",
+    "sendNow": "Iniciar la promoción",
+    "sendVote": "Enviar a votación",
+    "toast": {
+      "proposedNow": "La promoción quedó fijada y la rikma recibió un aviso",
+      "proposedVote": "La propuesta está en votación",
+      "paused": "La promoción está en pausa 24 horas",
+      "resumed": "La promoción vuelve a correr",
+      "ended": "La promoción terminó — de vuelta a los precios aprobados",
+      "withdrawn": "La propuesta fue retirada",
+      "policySent": "La propuesta de marco está en votación",
+      "error": "Algo salió mal — inténtalo de nuevo"
+    },
+    "policy": {
+      "none": "La rikma aún no tiene marco — cada promoción va a votación.",
+      "pending": "Una propuesta de marco espera votación",
+      "change": "Proponer un cambio al marco",
+      "propose": "Proponer un marco de promociones",
+      "arranged": "Descuento en una conversación hasta (%)",
+      "kinds": "Tipos de promoción dentro del marco",
+      "voteNote": "El marco mismo va a votación de toda la rikma. El silencio hasta el plazo de respuesta es consentimiento.",
+      "send": "Enviar a votación"
+    },
+    "onSale": "En promoción"
   }
 }

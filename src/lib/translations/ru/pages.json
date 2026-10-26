@@ -244,7 +244,9 @@
     "quoteNote": "Что нужно?",
     "quoteNotePlaceholder": "например: 2 бутылки колы, жёлтый сыр 200 г, хлеб",
     "quoteBudget": "Сколько вы готовы заплатить? (необязательно)",
-    "quoteBudgetPlaceholder": "Можно оставить пустым"
+    "quoteBudgetPlaceholder": "Можно оставить пустым",
+    "promoUntil": "Цена по акции до {{date}}",
+    "onSale": "По акции"
   },
   "editBasic": {
     "head": "Редактировать профиль",

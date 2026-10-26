@@ -183,6 +183,22 @@ export async function fetchProjectPromotions(exec: Exec, projectId: string, ende
   return (data?.promotions?.data ?? []).map(rowOf).filter(Boolean) as PromotionRow[];
 }
 
+/**
+ * Everything the sales screen's "Promotions" tab lists: open proposals, what is
+ * scheduled, running or paused, and what ended since `endedSince`.
+ */
+export async function fetchManagePromotions(exec: Exec, projectId: string, endedSince: Date): Promise<PromotionRow[]> {
+  const data = await run(
+    exec,
+    `{ promotions(filters: { and: [{ project: { id: { eq: ${gqlStr(projectId)} } } }, { or: [
+      { status: { in: ["proposed", "scheduled", "active", "paused"] } },
+      { and: [{ status: { eq: "ended" } }, { updatedAt: { gte: ${gqlStr(endedSince.toISOString())} } }] }
+    ] }] }, sort: "id:desc", pagination: { limit: 200 }) { data { id attributes { ${ROW_FIELDS} } } } }`,
+    'promo:manage-list'
+  );
+  return (data?.promotions?.data ?? []).map(rowOf).filter(Boolean) as PromotionRow[];
+}
+
 /** The terms of a version as promotion fields. */
 export function termsFields(t: Partial<PromoTerms>): Array<string | null> {
   return [

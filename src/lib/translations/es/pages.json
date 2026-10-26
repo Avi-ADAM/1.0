@@ -245,7 +245,9 @@
     "quoteNote": "¿Qué necesitas?",
     "quoteNotePlaceholder": "p. ej.: 2 botellas de cola, queso amarillo 200 g, pan",
     "quoteBudget": "¿Cuánto pagarías? (opcional)",
-    "quoteBudgetPlaceholder": "Puedes dejarlo vacío"
+    "quoteBudgetPlaceholder": "Puedes dejarlo vacío",
+    "promoUntil": "Precio de promoción hasta {{date}}",
+    "onSale": "En promoción"
   },
   "editBasic": {
     "head": "Editar perfil",

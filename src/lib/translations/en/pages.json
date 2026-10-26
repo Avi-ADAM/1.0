@@ -244,7 +244,9 @@
     "quoteNote": "What do you need?",
     "quoteNotePlaceholder": "e.g. 2 bottles of cola, 200 g yellow cheese, bread",
     "quoteBudget": "How much would you pay? (optional)",
-    "quoteBudgetPlaceholder": "You can leave this empty"
+    "quoteBudgetPlaceholder": "You can leave this empty",
+    "promoUntil": "Sale price until {{date}}",
+    "onSale": "On sale"
   },
   "editBasic": {
     "head": "Edit Profile",

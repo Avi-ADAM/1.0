@@ -32,6 +32,20 @@
     };
   });
 
+  // Today's promotion prices, also streamed: a sale report starts from them.
+  /** @type {Record<string, { price: number, listPrice: number, promotion: { id: string, name: string | null } }>} */
+  let salePrices = $state({});
+  $effect(() => {
+    const p = data.salePrices;
+    let live = true;
+    Promise.resolve(p).then((s) => {
+      if (live) salePrices = s ?? {};
+    });
+    return () => {
+      live = false;
+    };
+  });
+
   onMount(async () => {
     if (!moachStore.isDataFresh(projectId, 'financials')) {
       loading = true;
@@ -77,6 +91,7 @@
       projectUsers={base?.user_1s?.data || []}
       bmiData={financials.matanotofs?.data || []}
       uid={page.data.uid ?? null}
+      {salePrices}
       projectName={page.data.projectBase?.projectName ?? base?.projectName ?? ''}
       top={shortcuts}
     />

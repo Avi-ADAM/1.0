@@ -24,6 +24,9 @@
     switch (invite?.result) {
       case 'invited':
         return invite.registered ? 'mission.invite.sentRegistered' : 'mission.invite.sentEmail';
+      case 'notRegistered':
+        // The engine's "email sent to an address with no account yet".
+        return 'mission.invite.sentEmail';
       case 'linkOnly':
         return 'mission.invite.linkOnly';
       case 'self':

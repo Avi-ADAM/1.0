@@ -1,5 +1,5 @@
 ﻿<script>
-  import { isRtl, t } from '$lib/translations';
+  import { isRtl, locale, t } from '$lib/translations';
   import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
   import { Head } from 'svead';
   import { page } from '$app/state';
@@ -30,7 +30,11 @@
   // and describe what she needs — the seller names the price on the request
   // (docs/inprogress/PLAN_CONCIERGE_LOCAL_PROVIDERS.md §6).
   const byQuote = data.alld?.pricingMode === 'quote';
-  let price = $state(byQuote ? null : data.alld?.price || 0);
+  // A running promotion (PLAN_SHOP_PROMOTIONS P5) is the price a request starts from.
+  let price = $state(byQuote ? null : (data.promo?.price ?? data.alld?.price) || 0);
+  let promoUntil = $derived(data.promo?.endsAt
+    ? new Intl.DateTimeFormat($locale || 'he', { day: 'numeric', month: 'numeric', timeZone: 'Asia/Jerusalem' }).format(new Date(data.promo.endsAt))
+    : '');
   let orderNote = $state('');
   let startDate = $state(new Date().toISOString().split('T')[0]);
   let endDate = $state('');
@@ -339,6 +343,11 @@
               {/if}
             </div>
 
+            {#if data.promo}
+              <p class="mb-1 text-sm font-semibold text-barbi">
+                {data.promo.name ? `${data.promo.name} · ` : ''}{promoUntil ? $t('pages.gift.promoUntil', { date: promoUntil }) : $t('pages.gift.onSale')}
+              </p>
+            {/if}
             <!-- Price Tag -->
             <div
               class="flex items-center gap-3 bg-gray-50 dark:bg-gray-700/50 p-3 rounded-lg w-fit mb-4"
@@ -352,7 +361,10 @@
                 <span
                   class="text-xl font-bold text-gray-800 dark:text-gray-100"
                 >
-                  {#if data.alld.price != null}
+                  {#if data.promo}
+                    <s class="text-sm font-normal text-gray-400">{Number(data.promo.listPrice).toLocaleString('en-US', { maximumFractionDigits: 2 })}</s>
+                    {Number(data.promo.price).toLocaleString('en-US', { maximumFractionDigits: 2 })}
+                  {:else if data.alld.price != null}
                     {Number(data.alld.price).toLocaleString('en-US', {
                       maximumFractionDigits: 2
                     })}
@@ -495,7 +507,7 @@
                         productId={data.mId}
                         productName={data.alld.name}
                         availableQuantity={currentQuantity}
-                        price={data.alld.price || 0}
+                        price={(data.promo?.price ?? data.alld.price) || 0}
                         kindOf={data.alld.kindOf || 'total'}
                         projectId={data.alld.projectcreates.data[0].id}
                         projectUsers={data.projectUsers}
@@ -524,7 +536,7 @@
                 <div
                   class="mb-4 rounded-lg bg-barbi/10 px-4 py-2 text-xl font-bold text-barbi"
                 >
-                  {data.alld.price}
+                  {data.promo?.price ?? data.alld.price}
                   {data.alld.currency ?? ''}
                 </div>
 

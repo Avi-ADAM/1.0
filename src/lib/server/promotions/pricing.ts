@@ -15,7 +15,10 @@ import { execFromAdmin } from '$lib/server/archive/exec.js';
 import { fields, gqlStr, numField, run, strField, type Exec } from '$lib/server/archive/gql.js';
 import {
   PAYMENT_GRACE_MS,
+  floorOfShelf,
   pricePaidOrder,
+  pricingPromotions,
+  shelfSalePrices,
   usageAfter,
   type PaidLine,
   type PaidOrderPricing
@@ -23,6 +26,8 @@ import {
 import type { PromoPolicy, ShelfProduct } from '$lib/shop/promoTerms';
 import { announcePromotion } from '$lib/server/webhooks/promotionEvents';
 import { fetchProjectPromotions, fetchPromoProject, fetchPromotion, fetchShelf, updatePromotion, type PromotionRow } from './store';
+
+export type SalePrices = ReturnType<typeof shelfSalePrices>;
 
 export function promoAdminExec(): Exec {
   return execFromAdmin(SendToAdmin, env.ADMINMONTHER ?? '');
@@ -78,6 +83,14 @@ export async function cachedPromoPricing(projectId: string): Promise<PromoPricin
 /** Test seam. */
 export function clearPromoPricingCache(): void {
   cache.clear();
+}
+
+/** Today's sale price of each product on promotion — `{}` when there is none or it cannot be read. */
+export async function salePricesFor(projectId: string, now = new Date()): Promise<SalePrices> {
+  const pricing = await cachedPromoPricing(projectId);
+  if (!pricing) return {};
+  const promos = pricingPromotions(pricing.rows, pricing.shelf, { now });
+  return shelfSalePrices(pricing.shelf, promos, now, floorOfShelf(pricing.shelf, pricing.policy));
 }
 
 /** §5.3 for an order being recorded — null when promotions cannot be read or the order is off-shelf. */

@@ -229,6 +229,28 @@ export function decorateProduct<P extends DecoratableProduct>(
   return { ...product, priceRange, variants, salePrice: own?.price ?? null, promotion };
 }
 
+/**
+ * Inside 1lev1 — reporting a sale, the gift page: the price each product sells
+ * for today when an item / store promotion is running on it. Only products
+ * whose price is today's sale price are listed; a manual report still records
+ * what was actually received.
+ */
+export function shelfSalePrices(
+  shelf: readonly ShelfProduct[],
+  promos: readonly ActivePromotion[],
+  now: Date,
+  floorOf?: FloorOf
+): Record<string, { price: number; listPrice: number; promotion: PromotionBadge }> {
+  const out: Record<string, { price: number; listPrice: number; promotion: PromotionBadge }> = {};
+  if (!promos.length) return out;
+  for (const p of shelf) {
+    if (p.price == null || promoIneligible(p)) continue;
+    const sale = promoPriceOf({ id: p.id, price: p.price, categoryIds: p.categoryIds }, null, promos, now, floorOf);
+    if (sale && sale.price < p.price) out[p.id] = sale;
+  }
+  return out;
+}
+
 // ── what a storefront may know of a promotion ─────────────────────────────────
 
 export interface ApiPromotion {
