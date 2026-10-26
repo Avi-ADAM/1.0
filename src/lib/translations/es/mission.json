@@ -308,7 +308,14 @@
     "resourceOptionLabel": "Invitar a alguien nuevo a aportar este recurso",
     "resourceHelp": "El recurso se publica abierto y la persona invitada puede ofrecerse a aportarlo. Recibirás un enlace para enviarlo por WhatsApp o como prefieras.",
     "sentRegisteredResource": "Le enviamos un email, y el recurso aparecerá primero en su página del corazón.",
-    "shareMessageResource": "¡Hola! En la rikma \"{{project}}\" buscamos un recurso que quizá tengas: \"{{resource}}\". Me encantaría que te unas:"
+    "shareMessageResource": "¡Hola! En la rikma \"{{project}}\" buscamos un recurso que quizá tengas: \"{{resource}}\". Me encantaría que te unas:",
+    "voteHelp": "Tu rikma vota primero: la invitación se envía por email solo cuando se aprueba la misión, y la propuesta misma indica que incluye una invitación.",
+    "resourceVoteHelp": "Tu rikma vota primero: la invitación se envía por email solo cuando se aprueba el recurso, y la propuesta misma indica que incluye una invitación.",
+    "emailPlaceholderRequired": "Email de la persona invitada (obligatorio)",
+    "emailRequired": "Una rikma que vota necesita un email — la invitación se envía cuando se aprueba la propuesta.",
+    "pendingVote": "La invitación quedó guardada. Se enviará por email en cuanto la rikma apruebe la misión.",
+    "pendingVoteResource": "La invitación quedó guardada. Se enviará por email en cuanto la rikma apruebe el recurso.",
+    "notStored": "La propuesta se creó, pero no pudimos guardar la invitación. Puedes invitar de nuevo cuando la rikma la apruebe."
   },
   "form2": {
     "title": "Nueva misión",

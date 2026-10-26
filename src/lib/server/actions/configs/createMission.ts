@@ -42,6 +42,7 @@ import {
   normalizeInviteEmail,
   type MissionInviteOutcome
 } from '$lib/server/invites/missionInvite.js';
+import { storePendingInvite } from '$lib/server/invites/pendingInvites.js';
 import { normalizeNeed } from '$lib/missions/headcount.js';
 import { validatePattern } from '$lib/shifts/pattern.js';
 import { shiftsEnabled } from '$lib/server/shifts/mode.js';
@@ -150,10 +151,11 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
   const deadlineISO = new Date(Date.now() + calcDeadlineMs(restime)).toISOString();
 
   // A multi-member rikma votes on the mission first, and inviting someone to
-  // a mission it has not approved would be acting for it. Until the invite can
-  // wait on the vote (plan phase 2), only a solo rikma can invite here.
-  if (wantsInvite && userCount > 1) {
-    throw new Error('Inviting from the mission form is available in a one-member rikma for now');
+  // a mission it has not approved would be acting for it — so the invite waits
+  // on the pendm and is emailed when it matures (pendingInvites.ts). Nobody is
+  // there to hand a link to at that moment, so here the email is required.
+  if (wantsInvite && userCount > 1 && !inviteEmail) {
+    throw new Error('An invite in a rikma that votes needs an email — it is sent when the vote matures');
   }
 
   // Context for the case-specific notifications sent at the end of the handler.
@@ -306,6 +308,16 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
       context.fetch,
     );
     notificationKind = 'pend';
+
+    if (wantsInvite && inviteEmail) {
+      const stored = await storePendingInvite(
+        'pendm',
+        String(createdEntityId),
+        { email: inviteEmail, invitedBy: String(userId), at: nowISO, lang: context.lang },
+        strapi,
+      );
+      inviteOutcome = { result: stored ? 'pendingVote' : 'notStored' };
+    }
   }
   // ── BRANCH 2: Multi-user, assigned → OpenMission + Ask ───────────────────
   else if (userCount > 1 && assignedUserId) {
@@ -506,6 +518,12 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
 
     if (notificationKind === 'pend') {
       const url = voteUrl(projectId, 'pendm', createdEntityId);
+      // Voters see the invite before they vote — it is part of what they approve.
+      const invites = inviteOutcome?.result === 'pendingVote';
+      const inviteNote = {
+        he: invites ? ' ההצעה כוללת הזמנה של שותף חדש מחוץ לרקמה - היא תישלח רק אם המשימה תאושר.' : '',
+        en: invites ? ' The proposal includes inviting a new partner from outside the rikma - it is sent only if the mission is approved.' : '',
+      };
       notifier
         .notify(
           {
@@ -519,8 +537,8 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
                 en: `New mission up for a vote: "${missionName}"`,
               },
               body: {
-                he: `${creatorName} הציע/ה ברקמה "${projectName}" את המשימה "${missionName}". במהלך ${restimeHe} של זמן התגובה אפשר לאשר, לפתוח שיחה או להציע גרסה מדויקת משלך - ההצעה משתנה כרצונך וההצעה האחרונה שעל השולחן מאושרת אוטומטית בתום הזמן. לחצו להצבעה.`,
-                en: `${creatorName} proposed the mission "${missionName}" in the "${projectName}" rikma. During the ${restimeEn} response window you can approve, open a discussion or counter with your own refined version - the proposal is yours to shape, and the last version on the table is auto-approved when time runs out. Tap to vote.`,
+                he: `${creatorName} הציע/ה ברקמה "${projectName}" את המשימה "${missionName}". במהלך ${restimeHe} של זמן התגובה אפשר לאשר, לפתוח שיחה או להציע גרסה מדויקת משלך - ההצעה משתנה כרצונך וההצעה האחרונה שעל השולחן מאושרת אוטומטית בתום הזמן.${inviteNote.he} לחצו להצבעה.`,
+                en: `${creatorName} proposed the mission "${missionName}" in the "${projectName}" rikma. During the ${restimeEn} response window you can approve, open a discussion or counter with your own refined version - the proposal is yours to shape, and the last version on the table is auto-approved when time runs out.${inviteNote.en} Tap to vote.`,
               },
             },
             intent: 'consent',
@@ -727,7 +745,7 @@ export const createMissionConfig: ActionConfig = {
     stipendCostShare:   { type: 'number',  required: false, description: 'α — 1 (default) the recipient carries it and nobody is diluted, 0 the whole rikma does' },
     stipendMode:        { type: 'string',  required: false, description: 'equity (default) | gift' },
     stipendFunderId:    { type: 'string',  required: false, description: 'Member offering to fund it, when there already is one' },
-    invite:             { type: 'object',  required: false, description: 'Invite someone new to this open mission: { email? }. Solo rikma only for now; returns data.invite { result, link }. Cannot be combined with assignedUserId — docs/inprogress/PLAN_INVITE_PARTNER_TO_MISSION.md' },
+    invite:             { type: 'object',  required: false, description: 'Invite someone new to this open mission: { email? }. Solo rikma → sent now, data.invite { result, link }; a rikma that votes needs the email and gets { result: pendingVote } — it is sent when the pendm matures. Cannot be combined with assignedUserId — docs/inprogress/PLAN_INVITE_PARTNER_TO_MISSION.md' },
   },
 
   authRules: [

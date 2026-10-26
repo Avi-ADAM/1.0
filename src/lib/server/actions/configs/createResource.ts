@@ -18,6 +18,7 @@ import {
   normalizeInviteEmail,
   type MissionInviteOutcome
 } from '$lib/server/invites/missionInvite.js';
+import { storePendingInvite } from '$lib/server/invites/pendingInvites.js';
 import { restimeLabel, voteUrl } from './actionUtils.js';
 import { STRAPI_GRAPHQL } from '$lib/server/strapiUrl.js';
 import { ENTRY_CURRENCY_PARAM, entryFields, normalizeEntry } from '$lib/server/money/normalizeEntry.js';
@@ -235,10 +236,11 @@ const createResourceHandler: ActionExecutionHandler = async (params, context, { 
   const isPmash = userCount > 1;
 
   // A multi-member rikma votes on the resource first, and inviting someone to
-  // a resource it has not approved would be acting for it. Until the invite can
-  // wait on the vote (plan phase 2), only a solo rikma can invite here.
-  if (wantsInvite && isPmash) {
-    throw new Error('Inviting from the resource form is available in a one-member rikma for now');
+  // a resource it has not approved would be acting for it — so the invite waits
+  // on the pmash and is emailed when it matures (pendingInvites.ts). Nobody is
+  // there to hand a link to at that moment, so here the email is required.
+  if (wantsInvite && isPmash && !inviteEmail) {
+    throw new Error('An invite in a rikma that votes needs an email — it is sent when the vote matures');
   }
 
   const operationName = isPmash ? 'createPmash' : 'createOpenMashaabim';
@@ -313,6 +315,15 @@ const createResourceHandler: ActionExecutionHandler = async (params, context, { 
   // Open (unclaimed) resource request → tag users who offer this mashaabim
   // with a match-suggestion and notify them by email.
   let inviteOutcome: MissionInviteOutcome | null = null;
+  if (isPmash && wantsInvite && inviteEmail) {
+    const stored = await storePendingInvite(
+      'pmash',
+      String(createdId),
+      { email: inviteEmail, invitedBy: String(userId), at: now, lang: context.lang },
+      strapi
+    );
+    inviteOutcome = { result: stored ? 'pendingVote' : 'notStored' };
+  }
   if (!isPmash && !isAssigned) {
     await matchOpenMashaabimToUsers(String(createdId), 'resourceCreated', {
       strapi,
@@ -641,6 +652,12 @@ const createResourceHandler: ActionExecutionHandler = async (params, context, { 
     const restimeEn = restimeLabel(effectiveRestime, 'en');
     const url = voteUrl(String(projectId), 'pmash', createdId);
     const selfProposal = Boolean(isAssigned);
+    // Voters see the invite before they vote — it is part of what they approve.
+    const invites = inviteOutcome?.result === 'pendingVote';
+    const inviteNote = {
+      he: invites ? ' ההצעה כוללת הזמנה של שותף חדש מחוץ לרקמה - היא תישלח רק אם המשאב יאושר.' : '',
+      en: invites ? ' The proposal includes inviting a new partner from outside the rikma - it is sent only if the resource is approved.' : '',
+    };
 
     const title = selfProposal
       ? {
@@ -657,8 +674,8 @@ const createResourceHandler: ActionExecutionHandler = async (params, context, { 
           en: `${creatorName} proposed the resource "${name}" in the "${projectName}" rikma${isReceived ? ' - already delivered by them' : ' and offers to provide it themselves'}. During the ${restimeEn} response window you can approve, open a discussion or counter with your own refined version - the last version on the table is auto-approved when time runs out. Tap to vote.`,
         }
       : {
-          he: `${creatorName} הציע/ה ברקמה "${projectName}" את המשאב "${name}". במהלך ${restimeHe} של זמן התגובה אפשר לאשר, לפתוח שיחה או להציע גרסה מדויקת משלך - ההצעה משתנה כרצונך וההצעה האחרונה שעל השולחן מאושרת אוטומטית בתום הזמן. לחצו להצבעה.`,
-          en: `${creatorName} proposed the resource "${name}" in the "${projectName}" rikma. During the ${restimeEn} response window you can approve, open a discussion or counter with your own refined version - the proposal is yours to shape, and the last version on the table is auto-approved when time runs out. Tap to vote.`,
+          he: `${creatorName} הציע/ה ברקמה "${projectName}" את המשאב "${name}". במהלך ${restimeHe} של זמן התגובה אפשר לאשר, לפתוח שיחה או להציע גרסה מדויקת משלך - ההצעה משתנה כרצונך וההצעה האחרונה שעל השולחן מאושרת אוטומטית בתום הזמן.${inviteNote.he} לחצו להצבעה.`,
+          en: `${creatorName} proposed the resource "${name}" in the "${projectName}" rikma. During the ${restimeEn} response window you can approve, open a discussion or counter with your own refined version - the proposal is yours to shape, and the last version on the table is auto-approved when time runs out.${inviteNote.en} Tap to vote.`,
         };
 
     notifier
@@ -822,7 +839,7 @@ export const createResourceAction: ActionConfig = {
     invite: {
       type: 'object',
       required: false,
-      description: 'Invite someone new to this open resource: { email? }. Solo rikma only for now; returns invite { result, link }. Cannot be combined with isAssigned — docs/inprogress/PLAN_INVITE_PARTNER_TO_MISSION.md'
+      description: 'Invite someone new to this open resource: { email? }. Solo rikma → sent now, returns invite { result, link }; a rikma that votes needs the email and gets { result: pendingVote } — it is sent when the pmash matures. Cannot be combined with isAssigned — docs/inprogress/PLAN_INVITE_PARTNER_TO_MISSION.md'
     }
   },
   

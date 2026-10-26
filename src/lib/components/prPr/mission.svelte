@@ -748,6 +748,11 @@
       toast.warning($trans('mission.invite.invalidEmail'));
       return;
     }
+    if (inviting && inviteNeedsEmail && !inviteAddress) {
+      loading = false;
+      toast.warning($trans('mission.invite.emailRequired'));
+      return;
+    }
 
     const skills = find_skill_id(element.selectedSkills);
     const work_ways = find_workway_id(element.selectedWorkways);
@@ -926,8 +931,9 @@
     confettiStore.trigger();
     toast.success(mf.publishedSuccess);
     // With an invite the form stays up until the inviter has the link in hand —
-    // closing first would lose the one thing they came here to send.
-    if (md?.invite?.link) {
+    // closing first would lose the one thing they came here to send. In a rikma
+    // that votes there is no link yet; the card says when the invite goes out.
+    if (md?.invite) {
       inviteResult = md.invite;
       inviteMd = md;
       return;
@@ -935,9 +941,11 @@
     onClose?.({ md });
   }
 
-  // "Invite someone new" (PLAN_INVITE_PARTNER_TO_MISSION, phase 1): a solo
-  // rikma only — a larger one votes on the mission before it is open.
-  const canInvite = $derived(!!projectId && !specMode && !publishMode && userslength <= 1);
+  // "Invite someone new" (PLAN_INVITE_PARTNER_TO_MISSION). A solo rikma sends it
+  // at once; a larger one votes first, so the invite waits on the proposal and
+  // is emailed when it matures — which is why the email is required there.
+  const canInvite = $derived(!!projectId && !specMode && !publishMode);
+  const inviteNeedsEmail = $derived(userslength > 1);
   let inviteNew = $state(false);
   let inviteEmail = $state('');
   let inviteResult = $state(null);
@@ -1887,7 +1895,9 @@
                   />
                   <span class="font-semibold">{$trans('mission.invite.optionLabel')}</span>
                 </label>
-                <p class="m-0 text-sm text-[#6b5560]">{$trans('mission.invite.help')}</p>
+                <p class="m-0 text-sm text-[#6b5560]">
+                  {$trans(inviteNeedsEmail ? 'mission.invite.voteHelp' : 'mission.invite.help')}
+                </p>
                 {#if inviteNew}
                   <input
                     bind:value={inviteEmail}
@@ -1895,9 +1905,10 @@
                     inputmode="email"
                     autocomplete="off"
                     dir="ltr"
+                    required={inviteNeedsEmail}
                     class="{inp} mt-2"
-                    placeholder={$trans('mission.invite.emailPlaceholder')}
-                    aria-label={$trans('mission.invite.emailPlaceholder')}
+                    placeholder={$trans(inviteNeedsEmail ? 'mission.invite.emailPlaceholderRequired' : 'mission.invite.emailPlaceholder')}
+                    aria-label={$trans(inviteNeedsEmail ? 'mission.invite.emailPlaceholderRequired' : 'mission.invite.emailPlaceholder')}
                   />
                 {/if}
               </OptionRow>

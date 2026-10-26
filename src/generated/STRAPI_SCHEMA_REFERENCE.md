@@ -1,6 +1,6 @@
 # Strapi GraphQL Schema Reference
 > Auto-generated from `src/generated/graphql.ts`
-> Last updated: 2026-10-25
+> Last updated: 2026-10-26
 > Source: `codegen.ts` → `http://localhost:1337/graphql`
 
 This file provides a compact reference of all types available from the Strapi backend.
@@ -2041,6 +2041,7 @@ These are the main content types in the Strapi backend.
 | `noofhours` | `Maybe<Scalars['Float']['output']>` |
 | `open_mission` | `Maybe<OpenMissionEntityResponse>` |
 | `partofs` | `Maybe<PartofRelationResponseCollection>` |
+| `pendingInvites` | `Maybe<Scalars['JSON']['output']>` |
 | `perhour` | `Maybe<Scalars['Float']['output']>` |
 | `privatlinks` | `Maybe<Scalars['String']['output']>` |
 | `project` | `Maybe<ProjectEntityResponse>` |
@@ -2154,6 +2155,7 @@ These are the main content types in the Strapi backend.
 | `negom` | `Maybe<Array<Maybe<ComponentNewNegom>>>` |
 | `open_mashaabim` | `Maybe<OpenMashaabimEntityResponse>` |
 | `partofs` | `Maybe<PartofRelationResponseCollection>` |
+| `pendingInvites` | `Maybe<Scalars['JSON']['output']>` |
 | `price` | `Maybe<Scalars['Float']['output']>` |
 | `project` | `Maybe<ProjectEntityResponse>` |
 | `publishedAt` | `Maybe<Scalars['DateTime']['output']>` |
@@ -6834,6 +6836,7 @@ Used for creating/updating content.
 | `noofhours` | `InputMaybe<Scalars['Float']['input']>` |
 | `open_mission` | `InputMaybe<Scalars['ID']['input']>` |
 | `partofs` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
+| `pendingInvites` | `InputMaybe<Scalars['JSON']['input']>` |
 | `perhour` | `InputMaybe<Scalars['Float']['input']>` |
 | `privatlinks` | `InputMaybe<Scalars['String']['input']>` |
 | `project` | `InputMaybe<Scalars['ID']['input']>` |
@@ -6878,6 +6881,7 @@ Used for creating/updating content.
 | Field | Type |
 |-------|------|
 | `available` | `InputMaybe<Scalars['Boolean']['input']>` |
+| `availableUntil` | `InputMaybe<Scalars['DateTime']['input']>` |
 | `pgishas` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `publishedAt` | `InputMaybe<Scalars['DateTime']['input']>` |
 | `readyForStart` | `InputMaybe<Scalars['Boolean']['input']>` |
@@ -6934,6 +6938,7 @@ Used for creating/updating content.
 | `negom` | `InputMaybe<Array<InputMaybe<ComponentNewNegomInput>>>` |
 | `open_mashaabim` | `InputMaybe<Scalars['ID']['input']>` |
 | `partofs` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
+| `pendingInvites` | `InputMaybe<Scalars['JSON']['input']>` |
 | `price` | `InputMaybe<Scalars['Float']['input']>` |
 | `project` | `InputMaybe<Scalars['ID']['input']>` |
 | `publishedAt` | `InputMaybe<Scalars['DateTime']['input']>` |
@@ -8542,13 +8547,13 @@ Fields: `and`, `createdAt`, `currencyCode`, `discount`, `id`, `imageUrlSnapshot`
 Fields: `acts`, `and`, `askms`, `asks`, `createdAt`, `default`, `finiapruvals`, `forums`, `id`, `maaps`, `mashabetahaliches`, `matanot`, `matanot_recipe_missions`, `matanots`, `mesimabetahaliches`, `not`, `open_mashaabims`, `open_missions`, `or`, `pendms`, `pmashes`, `ratson`, `sheirut_fulfillments`, `updatedAt`
 
 #### PendmFiltersInput
-Fields: `acts`, `and`, `archived`, `createdAt`, `dates`, `descrip`, `diun`, `dormancyDays`, `entryCurrency`, `entryRate`, `forums`, `hearotMeyuchadot`, `howMeny`, `id`, `isLast`, `isMust`, `isYesod`, `isglobal`, `iskvua`, `isshift`, `location`, `matanot_recipe_missions`, `mission`, `name`, `nego`, `negopendmissions`, `noofhours`, `not`, `open_mission`, `or`, `partofs`, `perhour`, `privatlinks`, `project`, `publicklinks`, `publishedAt`, `rishon`, `rishonves`, `skills`, `sqadualed`, `stipendCostShare`, `stipendFunder`, `stipendMode`, `stipendRate`, `tafkidims`, `timegrama`, `updatedAt`, `users`, `vallues`, `work_ways`
+Fields: `acts`, `and`, `archived`, `createdAt`, `dates`, `descrip`, `diun`, `dormancyDays`, `entryCurrency`, `entryRate`, `forums`, `hearotMeyuchadot`, `howMeny`, `id`, `isLast`, `isMust`, `isYesod`, `isglobal`, `iskvua`, `isshift`, `location`, `matanot_recipe_missions`, `mission`, `name`, `nego`, `negopendmissions`, `noofhours`, `not`, `open_mission`, `or`, `partofs`, `pendingInvites`, `perhour`, `privatlinks`, `project`, `publicklinks`, `publishedAt`, `rishon`, `rishonves`, `skills`, `sqadualed`, `stipendCostShare`, `stipendFunder`, `stipendMode`, `stipendRate`, `tafkidims`, `timegrama`, `updatedAt`, `users`, `vallues`, `work_ways`
 
 #### PgishaFiltersInput
 Fields: `and`, `archived`, `available`, `createdAt`, `desc`, `forum`, `id`, `isLive`, `locale`, `localizations`, `meeting`, `meetingStartedAt`, `name`, `not`, `or`, `pendingStart`, `pgishauserpends`, `pgishausers`, `publishedAt`, `set`, `startRequestedAt`, `startRequestedBy`, `startedBy`, `updatedAt`, `videoLink`
 
 #### PgishauserFiltersInput
-Fields: `and`, `available`, `createdAt`, `id`, `not`, `or`, `pgishas`, `publishedAt`, `readyForStart`, `uid`, `updatedAt`, `users_permissions_user`
+Fields: `and`, `available`, `availableUntil`, `createdAt`, `id`, `not`, `or`, `pgishas`, `publishedAt`, `readyForStart`, `uid`, `updatedAt`, `users_permissions_user`
 
 #### PgishauserpendFiltersInput
 Fields: `and`, `approved`, `archived`, `createdAt`, `id`, `not`, `or`, `pgisha`, `updatedAt`, `users_permissions_user`
@@ -8557,7 +8562,7 @@ Fields: `and`, `approved`, `archived`, `createdAt`, `id`, `not`, `or`, `pgisha`,
 Fields: `amount`, `and`, `createdAt`, `donors`, `expiry`, `id`, `matbea`, `not`, `open_missions`, `or`, `project`, `publishedAt`, `status`, `updatedAt`
 
 #### PmashFiltersInput
-Fields: `and`, `archived`, `askm`, `createdAt`, `cycleSize`, `descrip`, `diun`, `dormancyDays`, `easy`, `entryCurrency`, `entryRate`, `forums`, `hm`, `id`, `isMaap`, `isMust`, `isSelfProposal`, `isYesod`, `kindOf`, `linkto`, `location`, `maap`, `mashaabim`, `mashabetahaliches`, `matanot_recipe_resources`, `name`, `nego_mashes`, `negom`, `not`, `open_mashaabim`, `or`, `partofs`, `price`, `project`, `publishedAt`, `recurring`, `selfProposalUser`, `sheirut_fulfillments`, `spnot`, `sqadualed`, `sqadualedf`, `timegrama`, `updatedAt`, `users`
+Fields: `and`, `archived`, `askm`, `createdAt`, `cycleSize`, `descrip`, `diun`, `dormancyDays`, `easy`, `entryCurrency`, `entryRate`, `forums`, `hm`, `id`, `isMaap`, `isMust`, `isSelfProposal`, `isYesod`, `kindOf`, `linkto`, `location`, `maap`, `mashaabim`, `mashabetahaliches`, `matanot_recipe_resources`, `name`, `nego_mashes`, `negom`, `not`, `open_mashaabim`, `or`, `partofs`, `pendingInvites`, `price`, `project`, `publishedAt`, `recurring`, `selfProposalUser`, `sheirut_fulfillments`, `spnot`, `sqadualed`, `sqadualedf`, `timegrama`, `updatedAt`, `users`
 
 #### PositionFiltersInput
 Fields: `aiMeta`, `and`, `arguments`, `author`, `authorEmail`, `authorExternalId`, `authorType`, `clauses`, `createdAt`, `description`, `heading`, `id`, `intensity`, `isAnchor`, `kind`, `location`, `negotiation`, `not`, `or`, `order`, `pole`, `publishedAt`, `relativePlacement`, `selfPlacement`, `tags`, `updatedAt`, `voters`, `votes`
@@ -9452,7 +9457,7 @@ Wrapper types for GraphQL responses.
 ```
 src/
 ├── generated/
-│   ├── graphql.ts              # Auto-generated types (codegen) - 24286 lines
+│   ├── graphql.ts              # Auto-generated types (codegen) - 24295 lines
 │   ├── index.ts                # Re-export hub
 │   └── STRAPI_SCHEMA_REFERENCE.md  # This file (AI agent reference)
 ├── lib/

@@ -297,6 +297,11 @@ export const qidsAccess = {
   '142getPendmForVote': { allow: ['user', 'serviceAdmin'] },
   '143archivePendmWithVotes': { allow: ['user', 'serviceAdmin'] },
   '144getPmashForVote': { allow: ['user', 'serviceAdmin'] },
+  // Invites waiting on a vote (pendingInvites.ts) — the invitee's email never reaches a client.
+  '461pendmPendingInvites': { allow: ['serviceAdmin'] },
+  '462setPendmPendingInvites': { allow: ['serviceAdmin'] },
+  '463pmashPendingInvites': { allow: ['serviceAdmin'] },
+  '464setPmashPendingInvites': { allow: ['serviceAdmin'] },
   '145archivePmashWithVotes': { allow: ['user', 'serviceAdmin'] },
   '146addVoteToPmash': { allow: ['user', 'serviceAdmin'] },
   '147getPendmDiun': { allow: ['user', 'serviceAdmin'] },

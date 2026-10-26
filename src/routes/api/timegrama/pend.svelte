@@ -5,6 +5,7 @@
   import { env } from '$env/dynamic/private';
   import { strapiClient } from '$lib/server/actions/index.js';
   import { matchOpenMissionToUsers } from '$lib/server/matching/engine';
+  import { firePendingInvites } from '$lib/server/invites/pendingInvites.js';
   import { calcDeadlineMs } from '$lib/server/actions/configs/actionUtils.js';
   import { shiftsEnabled } from '$lib/server/shifts/mode.js';
   import { asService } from '$lib/server/shifts/exec.js';
@@ -146,6 +147,13 @@ export async function Pend(id,taid,fetchFn){
                   strapi: strapiClient,
                   fetch: fetchFn || fetch
                 });
+
+                // An invite proposed with the mission was waiting for this
+                // maturation (PLAN_INVITE_PARTNER_TO_MISSION P2). Never throws.
+                await firePendingInvites(
+                  { kind: 'pendm', proposalId: String(id), openEntityId: String(newOpenMissionId) },
+                  { strapi: strapiClient, fetch: fetchFn || fetch }
+                );
               }
 
               // Silence did this — tell the rikma, and the assignee whose answer it now waits for (N5).

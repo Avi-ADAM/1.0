@@ -3281,6 +3281,36 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
     }
   }`,
 
+  // "This proposal will invite a new partner" (PLAN_INVITE_PARTNER_TO_MISSION P2):
+  // an invite made while the rikma still votes waits on the pendm / pmash and
+  // is sent when it matures ($lib/server/invites/pendingInvites.ts). Kept out
+  // of the vote qids above on purpose — the invitee's email is for the server
+  // only, and a missing field before 1.0b deploys must not break a vote.
+  // Server-only — run with the service token.
+  '461pendmPendingInvites': `query PendmPendingInvites($id: ID!) {
+    pendm(id: $id) {
+      data { id attributes { name pendingInvites project { data { id attributes { projectName } } } } }
+    }
+  }`,
+
+  '462setPendmPendingInvites': `mutation SetPendmPendingInvites($id: ID!, $invites: JSON) {
+    updatePendm(id: $id, data: { pendingInvites: $invites }) {
+      data { id }
+    }
+  }`,
+
+  '463pmashPendingInvites': `query PmashPendingInvites($id: ID!) {
+    pmash(id: $id) {
+      data { id attributes { name pendingInvites project { data { id attributes { projectName } } } } }
+    }
+  }`,
+
+  '464setPmashPendingInvites': `mutation SetPmashPendingInvites($id: ID!, $invites: JSON) {
+    updatePmash(id: $id, data: { pendingInvites: $invites }) {
+      data { id }
+    }
+  }`,
+
   '145archivePmashWithVotes': `mutation ArchivePmashWithVotes($id: ID!, $users: [ComponentProjectsVotsInput!]!) {
     updatePmash(id: $id, data: { archived: true, users: $users }) {
       data { id }

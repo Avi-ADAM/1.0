@@ -3,13 +3,14 @@
    * What the inviter sees after creating a mission with "invite someone new"
    * (docs/inprogress/PLAN_INVITE_PARTNER_TO_MISSION.md). Whatever happened to the
    * email, the link always works — so the card always offers to send it by
-   * hand, and never dead-ends.
+   * hand, and never dead-ends. In a rikma that votes there is no link yet
+   * (`pendingVote` / `notStored`): the card only says what happens next.
    */
   import { t as trans } from '$lib/translations';
 
   /**
    * @typedef {Object} Props
-   * @property {{ result: string, link: string, registered?: boolean }} invite
+   * @property {{ result: string, link?: string, registered?: boolean }} invite
    * @property {'mission' | 'resource'} [kind] - what the person is invited to
    * @property {string} [missionName] - the mission's or the resource's name
    * @property {string} [projectName]
@@ -35,6 +36,10 @@
         return 'mission.invite.linkOnly';
       case 'self':
         return 'mission.invite.self';
+      case 'pendingVote':
+        return isResource ? 'mission.invite.pendingVoteResource' : 'mission.invite.pendingVote';
+      case 'notStored':
+        return 'mission.invite.notStored';
       default:
         // emailFailed · emailSkipped · rateLimited · failed — the link still works.
         return 'mission.invite.emailNotSent';
@@ -72,32 +77,34 @@
     <h2 id="invite-result-title" class="text-xl font-bold text-barbi">{$trans('mission.invite.title')}</h2>
     <p class="mt-2 text-white/90">{$trans(statusKey)}</p>
 
-    <input
-      class="mt-4 w-full rounded-lg border border-gold/50 bg-black/40 px-3 py-2 text-sm text-white"
-      dir="ltr"
-      readonly
-      value={invite.link}
-      aria-label={$trans('mission.invite.linkLabel')}
-      onfocus={(e) => e.currentTarget.select()}
-    />
+    {#if invite.link}
+      <input
+        class="mt-4 w-full rounded-lg border border-gold/50 bg-black/40 px-3 py-2 text-sm text-white"
+        dir="ltr"
+        readonly
+        value={invite.link}
+        aria-label={$trans('mission.invite.linkLabel')}
+        onfocus={(e) => e.currentTarget.select()}
+      />
 
-    <div class="mt-4 flex flex-col gap-2 sm:flex-row">
-      <a
-        href={whatsapp}
-        target="_blank"
-        rel="noopener noreferrer"
-        class="flex-1 rounded-lg bg-[#25D366] px-4 py-3 text-center font-semibold text-black hover:brightness-110"
-      >
-        {$trans('mission.invite.whatsapp')}
-      </a>
-      <button
-        type="button"
-        onclick={copyLink}
-        class="flex-1 rounded-lg border border-gold px-4 py-3 font-semibold hover:bg-gold hover:text-barbi"
-      >
-        {copied ? $trans('mission.invite.copied') : $trans('mission.invite.copy')}
-      </button>
-    </div>
+      <div class="mt-4 flex flex-col gap-2 sm:flex-row">
+        <a
+          href={whatsapp}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="flex-1 rounded-lg bg-[#25D366] px-4 py-3 text-center font-semibold text-black hover:brightness-110"
+        >
+          {$trans('mission.invite.whatsapp')}
+        </a>
+        <button
+          type="button"
+          onclick={copyLink}
+          class="flex-1 rounded-lg border border-gold px-4 py-3 font-semibold hover:bg-gold hover:text-barbi"
+        >
+          {copied ? $trans('mission.invite.copied') : $trans('mission.invite.copy')}
+        </button>
+      </div>
+    {/if}
 
     <button
       type="button"

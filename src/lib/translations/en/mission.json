@@ -307,7 +307,14 @@
     "resourceOptionLabel": "Invite someone new to provide this resource",
     "resourceHelp": "The resource is published open, and the person you invite can offer to provide it. You'll get a link to send on WhatsApp or any other way.",
     "sentRegisteredResource": "We emailed them, and the resource will appear first on their heart page.",
-    "shareMessageResource": "Hi! In the rikma \"{{project}}\" we're looking for a resource you might have: \"{{resource}}\". I'd love for you to join:"
+    "shareMessageResource": "Hi! In the rikma \"{{project}}\" we're looking for a resource you might have: \"{{resource}}\". I'd love for you to join:",
+    "voteHelp": "Your rikma votes first: the invite is emailed only once the mission is approved, and the proposal itself says it includes an invite.",
+    "resourceVoteHelp": "Your rikma votes first: the invite is emailed only once the resource is approved, and the proposal itself says it includes an invite.",
+    "emailPlaceholderRequired": "Their email (required)",
+    "emailRequired": "A rikma that votes needs an email — the invite is sent when the proposal is approved.",
+    "pendingVote": "The invite is saved. It will be emailed as soon as the rikma approves the mission.",
+    "pendingVoteResource": "The invite is saved. It will be emailed as soon as the rikma approves the resource.",
+    "notStored": "The proposal was created, but we couldn't save the invite. You can invite again once the rikma approves."
   },
   "form2": {
     "title": "New mission",

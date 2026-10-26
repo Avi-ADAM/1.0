@@ -13490,6 +13490,7 @@ export type Pendm = {
   noofhours?: Maybe<Scalars['Float']['output']>;
   open_mission?: Maybe<OpenMissionEntityResponse>;
   partofs?: Maybe<PartofRelationResponseCollection>;
+  pendingInvites?: Maybe<Scalars['JSON']['output']>;
   perhour?: Maybe<Scalars['Float']['output']>;
   privatlinks?: Maybe<Scalars['String']['output']>;
   project?: Maybe<ProjectEntityResponse>;
@@ -13659,6 +13660,7 @@ export type PendmFiltersInput = {
   open_mission?: InputMaybe<OpenMissionFiltersInput>;
   or?: InputMaybe<Array<InputMaybe<PendmFiltersInput>>>;
   partofs?: InputMaybe<PartofFiltersInput>;
+  pendingInvites?: InputMaybe<JsonFilterInput>;
   perhour?: InputMaybe<FloatFilterInput>;
   privatlinks?: InputMaybe<StringFilterInput>;
   project?: InputMaybe<ProjectFiltersInput>;
@@ -13707,6 +13709,7 @@ export type PendmInput = {
   noofhours?: InputMaybe<Scalars['Float']['input']>;
   open_mission?: InputMaybe<Scalars['ID']['input']>;
   partofs?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  pendingInvites?: InputMaybe<Scalars['JSON']['input']>;
   perhour?: InputMaybe<Scalars['Float']['input']>;
   privatlinks?: InputMaybe<Scalars['String']['input']>;
   project?: InputMaybe<Scalars['ID']['input']>;
@@ -14087,6 +14090,7 @@ export type Pmash = {
   negom?: Maybe<Array<Maybe<ComponentNewNegom>>>;
   open_mashaabim?: Maybe<OpenMashaabimEntityResponse>;
   partofs?: Maybe<PartofRelationResponseCollection>;
+  pendingInvites?: Maybe<Scalars['JSON']['output']>;
   price?: Maybe<Scalars['Float']['output']>;
   project?: Maybe<ProjectEntityResponse>;
   publishedAt?: Maybe<Scalars['DateTime']['output']>;
@@ -14219,6 +14223,7 @@ export type PmashFiltersInput = {
   open_mashaabim?: InputMaybe<OpenMashaabimFiltersInput>;
   or?: InputMaybe<Array<InputMaybe<PmashFiltersInput>>>;
   partofs?: InputMaybe<PartofFiltersInput>;
+  pendingInvites?: InputMaybe<JsonFilterInput>;
   price?: InputMaybe<FloatFilterInput>;
   project?: InputMaybe<ProjectFiltersInput>;
   publishedAt?: InputMaybe<DateTimeFilterInput>;
@@ -14261,6 +14266,7 @@ export type PmashInput = {
   negom?: InputMaybe<Array<InputMaybe<ComponentNewNegomInput>>>;
   open_mashaabim?: InputMaybe<Scalars['ID']['input']>;
   partofs?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  pendingInvites?: InputMaybe<Scalars['JSON']['input']>;
   price?: InputMaybe<Scalars['Float']['input']>;
   project?: InputMaybe<Scalars['ID']['input']>;
   publishedAt?: InputMaybe<Scalars['DateTime']['input']>;

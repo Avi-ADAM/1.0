@@ -27,12 +27,17 @@ const MAX_EMAIL_LENGTH = 254;
 // obvious typos and anything that could not be an address at all.
 const EMAIL_SHAPE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-export type MissionInviteResult = PartnerInviteResult | 'linkOnly';
+/**
+ * `pendingVote` / `notStored`: a multi-member rikma votes first, so the invite
+ * was (or failed to be) stored on the proposal to be sent when it matures
+ * (pendingInvites.ts). Neither carries a link — there is nothing open yet.
+ */
+export type MissionInviteResult = PartnerInviteResult | 'linkOnly' | 'pendingVote' | 'notStored';
 
 export interface MissionInviteOutcome {
   result: MissionInviteResult;
-  /** The link to send by hand (WhatsApp, SMS…). Present for every result. */
-  link: string;
+  /** The link to send by hand (WhatsApp, SMS…). Present once the entity is open. */
+  link?: string;
   /** Set when the address belongs to an existing user. */
   registered?: boolean;
   retryAfterSeconds?: number;

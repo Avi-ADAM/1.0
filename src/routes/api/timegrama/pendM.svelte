@@ -4,6 +4,7 @@
      import { env } from '$env/dynamic/private';
      import { strapiClient } from '$lib/server/actions/index.js';
      import { matchOpenMashaabimToUsers } from '$lib/server/matching/engine';
+     import { firePendingInvites } from '$lib/server/invites/pendingInvites.js';
      import { tellMatured } from '$lib/server/notifications/matured';
      import { pmashOpened } from '$lib/server/notifications/maturedNotices';
 
@@ -105,6 +106,13 @@ export async function PendM(id,taid,fetchFn){
                   strapi: strapiClient,
                   fetch: fetchFn || fetch
                 });
+
+                // An invite proposed with the resource was waiting for this
+                // maturation (PLAN_INVITE_PARTNER_TO_MISSION P2). Never throws.
+                await firePendingInvites(
+                  { kind: 'pmash', proposalId: String(id), openEntityId: String(newOpenMashaabimId) },
+                  { strapi: strapiClient, fetch: fetchFn || fetch }
+                );
               }
 
               // Silence did this — tell the rikma (N5).

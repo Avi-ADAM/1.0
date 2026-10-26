@@ -1,6 +1,6 @@
 # PLAN — Invite a new partner from the mission form
 
-**State:** inprogress — P1 built (solo rikma, link + optional email) · **Owner:** Baruch · **Date:** 2026-10-25 · **Checked against the code:** 2026-10-26
+**State:** inprogress — P1 built (solo rikma, link + optional email); P2 built 2026-10-26, awaiting the 1.0b deploy + `types:update` (see "P2 — as built") · **Owner:** Baruch · **Date:** 2026-10-25 · **Checked against the code:** 2026-10-26
 
 ## Why
 
@@ -51,9 +51,8 @@ the rikma. So for branch 1 the invite is **stored on the Pendm** and fired when
 it becomes an `OpenMission`. Voters see "this proposal will invite X" before
 they vote (transparency; they can counter).
 
-Until P2 lands, P1 blocks it on both sides: the UI hides the choice when
-`userslength > 1`, and `createMission` throws if `invite` arrives with
-`userCount > 1` — so an invite is never silently lost on a vote.
+P1 blocked this on both sides; P2 (built) replaced the block with the stored
+invite described in "P2 — as built" below.
 
 Pendm matures in **two** places — both must fire it:
 1. `src/lib/server/actions/configs/voteOnPendm.ts` (~line 241, explicit vote)
@@ -94,7 +93,7 @@ call it from both.
    - The email is normalized **before anything is written**, so a bad address
      cannot leave a mission behind with a lost invite.
    - Rejected if combined with `assignedUserId` (an invited mission is open).
-   - Rejected when `userCount > 1` (until P2).
+   - When `userCount > 1`: requires the email (P2 — see "P2 — as built").
    - Branch 3 (solo): after the `OpenMission` exists and the matching engine has
      run → `inviteToOpenMission`; the outcome is returned as `data.invite`.
    - *P2* — Branch 1 (vote): write `pendingInvites` on the Pendm; return
@@ -172,6 +171,53 @@ call it from both.
   `invited_by` attribution, and a small counter on the inviter's lev page
   ("3 people joined through you").
 
+## P2 — as built (2026-10-26)
+
+Where this differs from the sketch above, this section is the truth.
+
+- **Strapi (1.0b):** `pendingInvites: json` on **both** `pendm` and `pmash`
+  (`src/api/{pendm,pmash}/content-types/*/schema.json`). Entry shape
+  `{ email, invitedBy, at, lang? }` — `lang` so the email reads in the
+  inviter's language even when silence matures it.
+- **Server-only field.** Four new qids, all `serviceAdmin`-only in
+  `qidsAccess.js`: `461pendmPendingInvites` / `463pmashPendingInvites` (read:
+  name, invites, rikma name) and `462setPendmPendingInvites` /
+  `464setPmashPendingInvites` (write). Deliberately **not** added to the vote
+  qids (`142getPendmForVote` / `144getPmashForVote`): the invitee's address
+  never reaches a member's browser, and a missing field cannot break a vote.
+- **`src/lib/server/invites/pendingInvites.ts`:** `storePendingInvite(kind, id,
+  invite, strapi)` → boolean, and `firePendingInvites({ kind, proposalId,
+  openEntityId }, deps)` → reads with the service token, dedupes by address,
+  sends through `inviteToOpenMission` / `inviteToOpenResource`. Neither throws —
+  which also covers the window where the app is deployed before 1.0b.
+- **Email required when the rikma votes.** Nobody is there to receive a link at
+  maturation, so `createMission` / `createResource` throw on a link-only invite
+  when `userCount > 1`, and both forms mark the email required there. The
+  outcome is `{ result: 'pendingVote' }` (stored) or `{ result: 'notStored' }`
+  (the proposal stands, the invite did not land) — no `link` in either.
+- **Voters are told.** The pendm / pmash vote notification gains one sentence:
+  the proposal includes inviting a new partner, sent only if it is approved.
+  (The vote card itself does not show it yet.)
+- **All four maturation paths fire it**, right after the open entity exists:
+  `voteOnPendm.ts`, `timegrama/pend.svelte`, `voteOnPmash.ts`,
+  `timegrama/pendM.svelte`. An *assigned* pendm (`rishon`) never carries an
+  invite — `invite` + `assignedUserId` is rejected at creation.
+- **UI:** `mission.svelte` and `ResourceCreator.svelte` offer the invite in
+  every rikma; `InviteResultCard` shows `pendingVote` / `notStored` without the
+  link and buttons. New keys `mission.invite.voteHelp / resourceVoteHelp /
+  emailPlaceholderRequired / emailRequired / pendingVote / pendingVoteResource
+  / notStored` (5 locales).
+- **Tests:** `pendingInvites.test.ts` (9) and
+  `configs/voteMaturesPendingInvites.test.ts` (3: both explicit-vote paths
+  fire; a vote that does not complete consensus fires nothing). The two
+  timegrama paths have no test (`.svelte` modules, no harness yet), and
+  `createMission`'s own guards are still untested.
+- **Deploy order:** 1.0b first, then `npm run types:update` here — until then
+  `validate:qids` reports the two `set…PendingInvites` mutations, and every
+  invite in a rikma that votes ends as `notStored`.
+- **Known limit / next:** a link-only invite is impossible in a rikma that
+  votes. If wanted, notify the inviter with the link when the proposal matures.
+
 ## Decisions (Baruch, 2026-10-26)
 1. **Open.** Open-with-invite (this plan), not a *reserved* mission that others
    can't take for N hours — reserved would need a new consent rule.
@@ -204,7 +250,7 @@ call it from both.
 
 # תרגום לעברית — הזמנת שותף חדש מטופס המשימה
 
-**מצב:** בתהליך — שלב P1 בנוי (רקמה של חבר יחיד, קישור + מייל אופציונלי) · **אחראי:** ברוך · **תאריך:** 2026-10-25 · **נבדק מול הקוד:** 2026-10-26
+**מצב:** בתהליך — שלב P1 בנוי (רקמה של חבר יחיד, קישור + מייל אופציונלי); שלב P2 נבנה ב־2026-10-26, ממתין לפריסת 1.0b ול־`types:update` (ראו "P2 — כפי שנבנה") · **אחראי:** ברוך · **תאריך:** 2026-10-25 · **נבדק מול הקוד:** 2026-10-26
 
 ## למה
 
@@ -252,9 +298,8 @@ call it from both.
 ההזמנה **נשמרת על ה־Pendm** ונשלחת כשהוא הופך ל־`OpenMission`. המצביעים רואים
 "ההצעה הזו תזמין את X" לפני שהם מצביעים (שקיפות; אפשר להציע נגדית).
 
-עד ש־P2 ייכנס, P1 חוסם את זה משני הצדדים: הממשק מסתיר את האפשרות כש־
-`userslength > 1`, ו־`createMission` זורק שגיאה אם `invite` מגיע עם
-`userCount > 1` — כך שהזמנה לעולם לא הולכת לאיבוד בשקט בהצבעה.
+שלב P1 חסם את זה משני הצדדים; שלב P2 (בנוי) החליף את החסימה בהזמנה השמורה
+שמתוארת ב"P2 — כפי שנבנה" למטה.
 
 Pendm מבשיל **בשני** מקומות — שניהם חייבים לשלוח:
 1. `src/lib/server/actions/configs/voteOnPendm.ts` (בערך שורה 241, הצבעה מפורשת)
@@ -294,7 +339,7 @@ Pendm מבשיל **בשני** מקומות — שניהם חייבים לשלו�
    - המייל מנורמל **לפני שמשהו נכתב**, כך שכתובת שגויה לא יכולה להשאיר מאחור
      משימה שההזמנה שלה אבדה.
    - נדחה בשילוב עם `assignedUserId` (משימה עם הזמנה היא פתוחה).
-   - נדחה כש־`userCount > 1` (עד P2).
+   - כש־`userCount > 1`: המייל חובה (P2 — ראו "P2 — כפי שנבנה").
    - ענף 3 (חבר יחיד): אחרי שה־`OpenMission` קיים ומנוע ההתאמות רץ ←
      `inviteToOpenMission`; התוצאה מוחזרת כ־`data.invite`.
    - *P2* — ענף 1 (הצבעה): לכתוב `pendingInvites` על ה־Pendm; להחזיר
@@ -369,6 +414,53 @@ Pendm מבשיל **בשני** מקומות — שניהם חייבים לשלו�
 - **P3:** הקישור שבמייל נושא `?m=&inv=`, הצמדת `?m=` בעמוד ההצטרפות, ייחוס
   `invited_by`, ומונה קטן בעמוד הלב של המזמין ("3 אנשים הצטרפו דרכך").
 
+## P2 — כפי שנבנה (2026-10-26)
+
+איפה שזה שונה מהשרטוט שלמעלה, הסעיף הזה הוא הקובע.
+
+- **Strapi (1.0b):** `pendingInvites: json` על **שניהם**, `pendm` ו־`pmash`
+  (`src/api/{pendm,pmash}/content-types/*/schema.json`). מבנה רשומה
+  `{ email, invitedBy, at, lang? }` — `lang` כדי שהמייל ייכתב בשפת המזמין גם
+  כשהשתיקה היא שמבשילה את ההצעה.
+- **שדה של השרת בלבד.** ארבעה qids חדשים, כולם `serviceAdmin` בלבד
+  ב־`qidsAccess.js`: `461pendmPendingInvites` / `463pmashPendingInvites` (קריאה:
+  שם, הזמנות, שם הרקמה) ו־`462setPendmPendingInvites` /
+  `464setPmashPendingInvites` (כתיבה). בכוונה **לא** נוסף ל־qids של ההצבעה
+  (`142getPendmForVote` / `144getPmashForVote`): כתובת המוזמן לא מגיעה לדפדפן
+  של אף חבר, ושדה חסר לא יכול לשבור הצבעה.
+- **`src/lib/server/invites/pendingInvites.ts`:** `storePendingInvite(kind, id,
+  invite, strapi)` ← boolean, ו־`firePendingInvites({ kind, proposalId,
+  openEntityId }, deps)` ← קורא בטוקן השירות, מסנן כפילויות לפי כתובת, ושולח
+  דרך `inviteToOpenMission` / `inviteToOpenResource`. אף אחת מהן לא זורקת — מה
+  שמכסה גם את חלון הזמן שבו האפליקציה נפרסת לפני 1.0b.
+- **ברקמה שמצביעה המייל חובה.** ברגע ההבשלה אין מי שיקבל קישור, לכן
+  `createMission` / `createResource` זורקים על הזמנת קישור בלבד כש־
+  `userCount > 1`, ושני הטפסים מסמנים שם את המייל כחובה. התוצאה היא
+  `{ result: 'pendingVote' }` (נשמרה) או `{ result: 'notStored' }` (ההצעה קיימת,
+  ההזמנה לא נשמרה) — בלי `link` באף אחת מהן.
+- **המצביעים יודעים.** להתראת ההצבעה על pendm / pmash נוסף משפט אחד: ההצעה
+  כוללת הזמנה של שותף חדש, שתישלח רק אם תאושר. (כרטיס ההצבעה עצמו עוד לא מציג
+  את זה.)
+- **כל ארבעת מסלולי ההבשלה שולחים**, מיד אחרי שהישות הפתוחה קיימת:
+  `voteOnPendm.ts`, `timegrama/pend.svelte`, `voteOnPmash.ts`,
+  `timegrama/pendM.svelte`. pendm *משובץ* (`rishon`) אף פעם לא נושא הזמנה —
+  `invite` + `assignedUserId` נדחה כבר ביצירה.
+- **ממשק:** `mission.svelte` ו־`ResourceCreator.svelte` מציעים את ההזמנה בכל
+  רקמה; `InviteResultCard` מציג `pendingVote` / `notStored` בלי הקישור והכפתורים.
+  מפתחות חדשים `mission.invite.voteHelp / resourceVoteHelp /
+  emailPlaceholderRequired / emailRequired / pendingVote / pendingVoteResource
+  / notStored` (5 שפות).
+- **בדיקות:** `pendingInvites.test.ts` (9) ו־
+  `configs/voteMaturesPendingInvites.test.ts` (3: שני מסלולי ההצבעה המפורשת
+  שולחים; הצבעה שלא משלימה הסכמה לא שולחת כלום). לשני מסלולי ה־timegrama אין
+  בדיקה (מודולי `.svelte`, עוד אין להם תשתית בדיקה), וגם השמירות של
+  `createMission` עצמו עדיין לא בדוקות.
+- **סדר פריסה:** קודם 1.0b, ואז `npm run types:update` כאן — עד אז
+  `validate:qids` מדווח על שתי המוטציות `set…PendingInvites`, וכל הזמנה ברקמה
+  שמצביעה מסתיימת כ־`notStored`.
+- **מגבלה ידועה / הצעד הבא:** ברקמה שמצביעה אי אפשר להזמין בקישור בלבד. אם
+  רוצים, אפשר לשלוח למזמין את הקישור כשההצעה מבשילה.
+
 ## החלטות (ברוך, 2026-10-26)
 1. **פתוחה.** משימה פתוחה־עם־הזמנה (התכנית הזו), ולא משימה *שמורה* שאחרים לא
    יכולים לקחת במשך N שעות — שמורה הייתה דורשת כלל הסכמה חדש.
@@ -380,7 +472,7 @@ Pendm מבשיל **בשני** מקומות — שניהם חייבים לשלו�
      ב־`missionInvite.ts`, עם פונקציה פרטית אחת `inviteTo` המשותפת למסלול
      המשימה. `createResource` מקבל `invite: { email? }` באותם כללים כמו
      `createMission`: מנורמל לפני שמשהו נכתב, נדחה יחד עם `isAssigned` (המשאב
-     פתוח), נדחה כש־`userCount > 1` (עד P2); ברקמה של חבר יחיד הוא רץ מיד אחרי
+     פתוח), וכש־`userCount > 1` המייל חובה (P2); ברקמה של חבר יחיד הוא רץ מיד אחרי
      `matchOpenMashaabimToUsers` ומחזיר `invite: { result, link, … }` לצד הרשומה
      שנוצרה. מוגדר בטיפוסים של `actionClient.ts`. בדיקות: 4 נוספות
      ב־`missionInvite.test.ts`.

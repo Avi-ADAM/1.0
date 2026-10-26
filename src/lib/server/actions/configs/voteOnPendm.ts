@@ -26,6 +26,7 @@ import { normalizeNeed } from '$lib/missions/headcount.js';
 import { shiftsEnabled } from '$lib/server/shifts/mode.js';
 import { asUser as asShiftUser } from '$lib/server/shifts/exec.js';
 import { activatePlanForPendm } from '$lib/server/shifts/store.js';
+import { firePendingInvites } from '$lib/server/invites/pendingInvites.js';
 import { scope, decisionScope, scopeList } from '$lib/realtime/scopes.js';
 
 // Helper: normalise a vote component row to a plain object for GraphQL variables
@@ -319,6 +320,13 @@ const voteOnPendmHandler: ActionExecutionHandler = async (params, context, { str
         fetch: context.fetch,
         lang: context.lang
       });
+
+      // An invite proposed with the mission was waiting for exactly this vote
+      // (PLAN_INVITE_PARTNER_TO_MISSION P2). Never throws — the vote stands.
+      await firePendingInvites(
+        { kind: 'pendm', proposalId: String(pendId), openEntityId: String(newOpenMissionId) },
+        { strapi, fetch: context.fetch, lang: context.lang }
+      );
     }
 
     // Consensus archives the pendm and creates an OpenMission — both the

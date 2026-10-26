@@ -112,11 +112,13 @@
   let createNewSp = $state(false); // יצירת Sp חדש
   let loadingSpOptions = $state(false);
 
-  // "Invite someone new" (PLAN_INVITE_PARTNER_TO_MISSION, decision 3): a solo
-  // rikma only — a larger one votes on the resource before it is open. Keyed on
-  // the real member count, not `userslength`, whose default of 1 keeps the
+  // "Invite someone new" (PLAN_INVITE_PARTNER_TO_MISSION, decision 3). A solo
+  // rikma sends it at once; a larger one votes first, so the invite waits on the
+  // pmash and is emailed when it matures — hence the required email there. Keyed
+  // on the real member count, not `userslength`, whose default of 1 keeps the
   // self-assign box on for callers that never pass it.
-  const canInvite = $derived(!!projectId && !specMode && !publishMode && memberCount === 1);
+  const canInvite = $derived(!!projectId && !specMode && !publishMode && Number(memberCount) >= 1);
+  const inviteNeedsEmail = $derived(Number(memberCount) > 1);
   let inviteNew = $state(false);
   let inviteEmail = $state('');
   let inviteResult = $state(null);
@@ -454,6 +456,10 @@
       toast.warning($t('mission.invite.invalidEmail'));
       return;
     }
+    if (inviting && inviteNeedsEmail && !inviteAddress) {
+      toast.warning($t('mission.invite.emailRequired'));
+      return;
+    }
 
     isSubmitting = true;
     try {
@@ -499,7 +505,8 @@
         toast.success($t('project.resourceCreator.success'));
         // With an invite the form stays up until the inviter has the link in
         // hand — closing first would lose the one thing they came here to send.
-        if (result.data?.invite?.link) {
+        // In a rikma that votes there is no link yet; the card says when it goes.
+        if (result.data?.invite) {
           inviteResult = result.data.invite;
           inviteCreated = result.data;
           return;
@@ -898,7 +905,9 @@
             />
             <span>
               <span class="block text-sm font-semibold text-barbie/80">{$t('mission.invite.resourceOptionLabel')}</span>
-              <span class="block text-xs text-barbie/90 mt-0.5">{$t('mission.invite.resourceHelp')}</span>
+              <span class="block text-xs text-barbie/90 mt-0.5">
+                {$t(inviteNeedsEmail ? 'mission.invite.resourceVoteHelp' : 'mission.invite.resourceHelp')}
+              </span>
             </span>
           </label>
           {#if inviteNew}
@@ -908,9 +917,10 @@
               inputmode="email"
               autocomplete="off"
               dir="ltr"
+              required={inviteNeedsEmail}
               class="w-full rounded-xl border border-gold bg-white/90 px-3 py-2 text-barbi"
-              placeholder={$t('mission.invite.emailPlaceholder')}
-              aria-label={$t('mission.invite.emailPlaceholder')}
+              placeholder={$t(inviteNeedsEmail ? 'mission.invite.emailPlaceholderRequired' : 'mission.invite.emailPlaceholder')}
+              aria-label={$t(inviteNeedsEmail ? 'mission.invite.emailPlaceholderRequired' : 'mission.invite.emailPlaceholder')}
             />
           {/if}
         </div>

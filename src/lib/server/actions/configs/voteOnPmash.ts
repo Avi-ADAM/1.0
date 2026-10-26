@@ -19,6 +19,7 @@ import { noticeSubject } from '$lib/notices/links';
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { voteIntent } from '../../notifications/intent.js';
 import { matchOpenMashaabimToUsers } from '$lib/server/matching/engine';
+import { firePendingInvites } from '$lib/server/invites/pendingInvites.js';
 import { STRAPI_URL } from '$lib/server/strapiUrl.js';
 import { gqlString } from './actionUtils.js';
 import { scope, decisionScope, scopeList } from '$lib/realtime/scopes.js';
@@ -201,6 +202,13 @@ const voteOnPmashHandler: ActionExecutionHandler = async (params, context, { str
         fetch: context.fetch,
         lang: context.lang
       });
+
+      // An invite proposed with the resource was waiting for exactly this vote
+      // (PLAN_INVITE_PARTNER_TO_MISSION P2). Never throws — the vote stands.
+      await firePendingInvites(
+        { kind: 'pmash', proposalId: String(pmashId), openEntityId: String(newOpenMashaabimId) },
+        { strapi, fetch: context.fetch, lang: context.lang }
+      );
     }
 
     // Consensus archives the pmash and creates an OpenMashaabim — refresh everywhere.
