@@ -1,5 +1,11 @@
 import { describe, expect, it, vi } from 'vitest';
-import { inviteToOpenMission, missionInviteLink, normalizeInviteEmail } from './missionInvite';
+import {
+  inviteToOpenMission,
+  inviteToOpenResource,
+  missionInviteLink,
+  normalizeInviteEmail,
+  resourceInviteLink
+} from './missionInvite';
 
 const deps = {
   strapi: { execute: vi.fn() },
@@ -73,5 +79,53 @@ describe('inviteToOpenMission', () => {
     const engine = vi.fn().mockResolvedValue({ result: 'rateLimited', created: 0, joinUrl: 'x', retryAfterSeconds: 60 });
     const out = await inviteToOpenMission({ ...base, email: 'dana@example.com' }, deps, engine);
     expect(out).toMatchObject({ result: 'rateLimited', retryAfterSeconds: 60 });
+  });
+});
+
+describe('inviteToOpenResource', () => {
+  const resource = {
+    projectId: '20',
+    projectName: 'רקמה',
+    openMashaabimId: '61',
+    resourceName: 'מקרר תצוגה',
+    inviterId: '5'
+  };
+
+  it('links to the join page with the resource, not a mission', () => {
+    const url = new URL(resourceInviteLink('20', '61', '5'));
+    expect(url.pathname).toBe('/project/20/join');
+    expect(url.searchParams.get('r')).toBe('61');
+    expect(url.searchParams.get('m')).toBeNull();
+    expect(url.searchParams.get('inv')).toBe('5');
+  });
+
+  it('without an email returns the link and calls nothing', async () => {
+    const engine = vi.fn();
+    const out = await inviteToOpenResource(resource, deps, engine);
+    expect(out).toMatchObject({ result: 'linkOnly' });
+    expect(out.link).toContain('r=61');
+    expect(engine).not.toHaveBeenCalled();
+  });
+
+  it('hands exactly this open resource to the engine', async () => {
+    const engine = vi.fn().mockResolvedValue({ result: 'notRegistered', created: 0, joinUrl: 'x' });
+    const out = await inviteToOpenResource({ ...resource, email: 'dana@example.com' }, deps, engine);
+    expect(engine).toHaveBeenCalledWith(
+      'dana@example.com',
+      { openMissions: [], openMashaabims: [{ id: '61', name: 'מקרר תצוגה' }] },
+      'רקמה',
+      expect.objectContaining({ invitedBy: '5', projectId: '20' })
+    );
+    expect(out.result).toBe('notRegistered');
+    expect(out.registered).toBeUndefined();
+  });
+
+  it('never throws — a failed invite still returns the link', async () => {
+    const engine = vi.fn().mockRejectedValue(new Error('mail down'));
+    const err = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const out = await inviteToOpenResource({ ...resource, email: 'dana@example.com' }, deps, engine);
+    expect(out).toMatchObject({ result: 'failed' });
+    expect(out.link).toContain('r=61');
+    err.mockRestore();
   });
 });

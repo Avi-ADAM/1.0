@@ -2,7 +2,6 @@
   import { isRtl } from '$lib/translations';
   import Daterange from './../../celim/ui/daterange.svelte';
   import Crtask from '$lib/components/prPr/tasks/crtask.svelte';
-  import Plus from '$lib/celim/plus.svelte';
   import ExpandTask from '$lib/components/prPr/tasks/expandTask.svelte';
   import { mi, skil, ww, role } from './mi.js';
   import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
@@ -18,13 +17,12 @@
   import heMission from '$lib/translations/he/mission.json';
   import enMission from '$lib/translations/en/mission.json';
   import arMission from '$lib/translations/ar/mission.json';
-  import Addnewro from '../addnew/addNewRole.svelte';
   import SkillSelector from '../ui/SkillSelector.svelte';
+  import RoleSelector from '../ui/RoleSelector.svelte';
   import { t as trans } from '$lib/translations';
   import { get } from 'svelte/store';
   import RichText from '$lib/celim/ui/richText.svelte';
   import { quintOut } from 'svelte/easing';
-  import Expand from '$lib/celim/icons/expand.svelte';
   import { executeAction } from '$lib/client/actionClient';
   import Button from '$lib/celim/ui/button.svelte';
   // AI suggest / improve / translate
@@ -280,19 +278,9 @@
       aiTranslating = false;
     }
   }
-  import Tile from '$lib/celim/tile.svelte';
   import TextInput from '$lib/celim/ui/input/textInput.svelte';
-  import EditIcon from '$lib/celim/icons/editIcon.svelte';
-  import Done from '$lib/celim/icons/done.svelte';
-  import NumberInput from '$lib/celim/ui/input/numberInput.svelte';
-  import Chooser from '$lib/celim/ui/chooser.svelte';
-  import AddPerson from '$lib/celim/icons/addPerson.svelte';
-  import LinkIcon from '$lib/celim/icons/linkIcon.svelte';
-  import LinkToIcon from '$lib/celim/icons/linkToIcon.svelte';
-  import ShiftsIcon from '$lib/celim/icons/shiftsIcon.svelte';
   import ShiftPlanForm, { emptyShiftPlan } from '$lib/components/shifts/ShiftPlanForm.svelte';
   import { validatePattern } from '$lib/shifts/pattern';
-  import MobileModal from '$lib/celim/ui/mobileModal.svelte';
   import InviteResultCard from './InviteResultCard.svelte';
   import { page } from '$app/state';
   import LocationPicker from '$lib/components/location/LocationPicker.svelte';
@@ -617,7 +605,7 @@
   // VocabSelector.entryName so the labels SkillSelector emits (including
   // semantic suggestions that live in the DB store but not in the statically
   // bundled snapshot) map back to ids reliably instead of being silently
-  // dropped. Used for skills, which go through VocabSelector.
+  // dropped. Used for skills and roles, which both go through VocabSelector.
   function catName(c, field) {
     let name = c.attributes?.[field] || '';
     if ($lang === 'he' && c.attributes?.localizations?.data?.length > 0) {
@@ -626,9 +614,6 @@
     return name;
   }
 
-  // Roles use a raw MultiSelect whose options are the master `roleDescription`,
-  // so match on that — but against the live store (not the stale `roles1`
-  // snapshot) so refreshed entries still resolve.
   /**
    * Vocabulary ids resolved on the server for an AI prefill, keyed by the chip
    * label — see `initialSpec.vocab` and `resolveMissionSpec`.
@@ -665,7 +650,7 @@
         arr.push(pre);
         continue;
       }
-      const hit = $role.find((c) => c.attributes.roleDescription === nm);
+      const hit = $role.find((c) => catName(c, 'roleDescription') === nm);
       if (hit) arr.push(hit.id);
     }
     return arr;
@@ -699,7 +684,6 @@
   }
   let selected = [];
   let skills2 = $state($skil);
-  let roles = $state($role);
   let selected3;
 
   function find_skill_id(skill_name_arr) {
@@ -882,18 +866,6 @@
     mi.set(miData);
   }
 
-  function addnewrole(event) {
-    const newOb = event.skob;
-    const newN = event.skob.attributes.roleDescription;
-    const newValues = roles;
-    newValues.push(newOb);
-    roles = newValues;
-    const mid = event.mid;
-    const y = miData.map((c) => c.id);
-    const index = y.indexOf(mid);
-    miData[index].selectedRoles.push(newN);
-    miData = miData;
-  }
   //add new workway option
   async function newnew(selectedWorkways) {
     for (let i = 0; i < selectedWorkways.length; i++) {
@@ -1023,6 +995,156 @@
     }
     return location.location_hint?.trim() || ml.selected;
   }
+  // ── Redesigned layout (docs/tbd/PLAN_MISSION_FORM_REDESIGN.md) ─────────────
+  // Presentation only: every field still reads and writes `miData[0]`, and
+  // `increment` builds the exact same payload as before.
+  import FormSection from './missionForm/FormSection.svelte';
+  import OptionRow from './missionForm/OptionRow.svelte';
+  import MissionSummary from './missionForm/MissionSummary.svelte';
+  import { useFormatMoney } from '$lib/money/context.svelte';
+  import {
+    Sparkles,
+    WandSparkles,
+    Globe,
+    Undo2,
+    ListChecks,
+    UserPlus,
+    Mail,
+    Link as LinkLucide,
+    Clock,
+    Pencil,
+    X,
+    Maximize2,
+    Minimize2,
+    MapPin,
+    Plus as PlusIcon,
+    Heart
+  } from '@lucide/svelte';
+
+  const fmtMoney = useFormatMoney();
+  const fmtNum = (/** @type {any} */ n) =>
+    (Number(n) || 0).toLocaleString('en-US', { maximumFractionDigits: 2 });
+  /** An amount typed in the form, in the currency it was typed in. */
+  const moneyText = (/** @type {any} */ n) =>
+    specMode || publishMode ? fmtNum(n) : fmtMoney(Number(n) || 0, entryCurrency);
+  const isBlankHtml = (/** @type {any} */ h) =>
+    !h || (typeof h === 'string' && !h.replace(/<[^>]*>/g, '').trim());
+
+  /** The rikma-only parts (headcount, stipend, equity, assignment, shifts). */
+  const inProject = $derived(!!projectId && !specMode && !publishMode);
+  const showHeadcount = $derived(inProject && miData[0].myM !== true);
+  const totalValue = $derived(perPersonValue * seats);
+  const formulaText = $derived(
+    seats > 1
+      ? $trans('mission.form2.formulaSeats', {
+          rate: moneyText(miData[0].valph),
+          hours: fmtNum(miData[0].nhours),
+          count: seats
+        })
+      : $trans('mission.form2.formula', {
+          rate: moneyText(miData[0].valph),
+          hours: fmtNum(miData[0].nhours)
+        })
+  );
+  const totalText = $derived(
+    miData[0].iskvua
+      ? $trans('mission.form2.perMonth', { value: moneyText(totalValue) })
+      : moneyText(totalValue)
+  );
+  const summaryMeta = $derived(
+    `${miData[0].iskvua ? $trans('mission.form2.recurring') : $trans('mission.form2.oneTime')} · ${
+      seats > 1 ? $trans('mission.form2.people', { count: seats }) : $trans('mission.form2.onePerson')
+    }`
+  );
+  const checks = $derived([
+    {
+      label: $trans('mission.form2.checkName'),
+      done: !!miData[0].missionName?.trim() && !isBlankHtml(miData[0].descrip)
+    },
+    {
+      label: $trans('mission.form2.checkValue'),
+      done: Number(miData[0].valph) > 0 && Number(miData[0].nhours) > 0
+    },
+    {
+      label: $trans('mission.form2.checkWho'),
+      done: miData[0].selectedSkills.length + miData[0].selectedRoles.length > 0
+    },
+    {
+      label: $trans('mission.form2.checkWhen'),
+      done: !!miData[0].date || hasLocationValue(miData[0].location),
+      optional: true
+    }
+  ]);
+  const consentNote = $derived(
+    inProject
+      ? userslength > 1
+        ? $trans('mission.form2.noteVote')
+        : $trans('mission.form2.noteSolo')
+      : ''
+  );
+  const assignStatus = $derived(
+    miData[0].myM === true
+      ? userslength > 1 && miData[0].rishoni?.[0]
+        ? $trans('mission.form2.assignedTo', { name: miData[0].rishoni[0] })
+        : $trans('mission.form2.assignedSelf')
+      : $trans('mission.form2.notAssigned')
+  );
+  const tasksStatus = $derived(
+    miData[0].checklist?.length
+      ? $trans('mission.form2.tasksCount', { count: miData[0].checklist.length })
+      : $trans('mission.form2.tasksNone')
+  );
+  const linksStatus = $derived(
+    miData[0].publicklinks?.trim() || miData[0].privatlinks?.trim()
+      ? $trans('mission.form2.linksSet')
+      : $trans('mission.form2.linksStatus')
+  );
+  let tasksOpen = $state(false);
+  /**
+   * Full-screen mode: the form covers the whole window (Esc leaves). A rikma's
+   * new mission opens in it; the concierge spec/publish flows open inline.
+   */
+  let fullscreen = $state(untrack(() => !!projectId && !specMode && !publishMode));
+
+  /**
+   * Full screen is `position: fixed`, but the form usually sits inside a card
+   * whose transform makes `fixed` relative to that card. While full screen is
+   * on, the form is moved to <body> and put back in place when it is off.
+   * @param {HTMLElement} node
+   * @param {boolean} active
+   */
+  function portal(node, active) {
+    const anchor = document.createComment('mission-form');
+    node.before(anchor);
+    const apply = (/** @type {boolean} */ on) => {
+      if (on) document.body.appendChild(node);
+      else if (node.previousSibling !== anchor) anchor.after(node);
+    };
+    apply(active);
+    return {
+      update: apply,
+      destroy() {
+        // Put it back where Svelte expects it, so its own teardown removes it.
+        if (node.parentNode === document.body && anchor.isConnected) anchor.after(node);
+        else if (node.parentNode === document.body) node.remove();
+        anchor.remove();
+      }
+    };
+  }
+  let inviteOpen = $state(false);
+
+  // Shared class strings, so every field in the form looks the same.
+  const lbl = 'mb-2 block text-sm font-bold text-[#2a1420]';
+  const fieldBox =
+    'rounded-xl border-[1.5px] border-[#e4d9c4] bg-[#fffdf8] text-[#2a1420] transition focus-within:border-[#c8155f] focus-within:ring-[3px] focus-within:ring-[#c8155f]/15';
+  const inp =
+    'h-[52px] w-full min-w-0 rounded-xl border-[1.5px] border-[#e4d9c4] bg-[#fffdf8] px-4 text-[17px] font-medium text-[#2a1420] outline-none transition placeholder:text-[#9b8a92] focus:border-[#c8155f] focus:ring-[3px] focus:ring-[#c8155f]/15';
+  const ghost =
+    'inline-flex min-h-9 items-center gap-1.5 rounded-full border-[1.5px] border-[#e4d9c4] bg-white px-3 text-[13px] font-medium text-[#2a1420] transition hover:border-[#c8155f] hover:text-[#c8155f] disabled:opacity-50';
+  const segBtn = (/** @type {boolean} */ on) =>
+    `h-10 rounded-[9px] px-4 text-[15px] transition ${
+      on ? 'bg-white font-bold text-[#c8155f] shadow-sm' : 'text-[#6b5560] hover:text-[#2a1420]'
+    }`;
 </script>
 
 <DialogOverlay style="z-index: 700;" {isOpen} onDismiss={closer}>
@@ -1074,716 +1196,648 @@
   </div>
 </DialogOverlay>
 
+{#snippet publishActions()}
+  <div class="flex flex-wrap items-center justify-end gap-2">
+    {#if specMode || publishMode}
+      <button
+        type="button"
+        onclick={() => onClose?.()}
+        class="min-h-11 rounded-xl border-[1.5px] border-[#e4d9c4] bg-white px-4 text-sm text-[#2a1420] transition hover:border-[#c8155f]"
+      >
+        {$trans('mission.ai.cancel')}
+      </button>
+    {/if}
+    <Button
+      text={publishMode
+        ? $trans('common.buttons.publishToCommunity')
+        : inProject
+          ? $trans('mission.form2.publish')
+          : mf.publish}
+      onClick={increment}
+      {loading}
+      {success}
+      {error}
+    />
+  </div>
+{/snippet}
+
+<svelte:window
+  onkeydown={(e) => {
+    if (fullscreen && e.key === 'Escape') fullscreen = false;
+  }}
+/>
+
 <div
-  bind:clientWidth={wid}
+  use:portal={fullscreen}
   dir={$isRtl ? 'rtl' : 'ltr'}
-  style="overflow-y:auto"
-  class=" d sm:pt-4 w-full"
+  class={fullscreen
+    ? 'fixed inset-0 z-[600] overflow-y-auto bg-[#f4efe6] px-3 py-4 text-start text-[#2a1420] sm:px-8 sm:py-6'
+    : 'w-full text-start text-[#2a1420]'}
+  role={fullscreen ? 'dialog' : undefined}
+  aria-modal={fullscreen ? 'true' : undefined}
+  aria-label={fullscreen ? $trans('mission.form2.title') : undefined}
 >
-  <!-- <div class="h-48 lg:h-auto lg:w-48 flex-none bg-cover rounded-t lg:rounded-t-none lg:rounded-l text-center overflow-hidden bg-gold" style:background-image={`url('${src2}')`} title="">
-    </div>-->
-  <div class=" py-3">
-    <div
-      class="  bg-transparent rounded-b lg:rounded-b-none lg:rounded-r p-4 leading-normal"
-    >
-      <div class="mb-8">
-        <div class="  mb-2">
-          <div class="px-2">
-            {#if missionNameE == false}
-              <h2
-                class="text-barbi text-{$lang == 'en'
-                  ? 'left'
-                  : 'right'}  font-bold text-xl lg:text-4xl underline"
-              >
-                {miData[0].missionName}<button
-                  onclick={() => (missionNameE = true)}><EditIcon /></button
-                >
-              </h2>
+<div class="mission-form mx-auto w-full max-w-6xl pb-2 sm:pt-2">
+  <!-- Header -->
+  <header class="mb-5 flex flex-col gap-2 px-1">
+    {#if pn && !specMode && !publishMode}
+      <span
+        class="inline-flex items-center gap-2 self-start rounded-full bg-[#fdeef4] px-3 py-1 text-sm font-medium text-[#a3124e]"
+      >
+        <Heart size={14} fill="currentColor" aria-hidden="true" />
+        {$trans('mission.form2.rikmaChip', { name: pn })}
+      </span>
+    {/if}
+    <div class="flex items-center justify-between gap-3">
+      <h1 class="m-0 text-3xl font-extrabold leading-tight text-[#2a1420] sm:text-4xl">
+        {$trans('mission.form2.title')}
+      </h1>
+      <div class="flex flex-none items-center gap-2">
+      <button
+        type="button"
+        onclick={() => (fullscreen = !fullscreen)}
+        aria-pressed={fullscreen}
+        title={fullscreen ? $trans('mission.form2.exitFullscreen') : $trans('mission.form2.fullscreen')}
+        class="inline-flex min-h-11 flex-none items-center gap-2 rounded-full border-[1.5px] border-[#e4d9c4] bg-white px-4 text-sm font-medium text-[#2a1420] transition hover:border-[#c8155f] hover:text-[#c8155f]"
+      >
+        {#if fullscreen}
+          <Minimize2 size={16} aria-hidden="true" />
+          <span class="hidden sm:inline">{$trans('mission.form2.exitFullscreen')}</span>
+        {:else}
+          <Maximize2 size={16} aria-hidden="true" />
+          <span class="hidden sm:inline">{$trans('mission.form2.fullscreen')}</span>
+        {/if}
+      </button>
+      {#if fullscreen && onClose}
+        <button
+          type="button"
+          onclick={() => {
+            fullscreen = false;
+            onClose?.();
+          }}
+          aria-label={$trans('mission.form2.close')}
+          title={$trans('mission.form2.close')}
+          class="flex h-11 w-11 flex-none items-center justify-center rounded-full border-[1.5px] border-[#e4d9c4] bg-white text-[#2a1420] transition hover:border-[#c8155f] hover:text-[#c8155f]"
+        >
+          <X size={18} aria-hidden="true" />
+        </button>
+      {/if}
+      </div>
+    </div>
+    <p class="m-0 max-w-2xl text-base text-[#6b5560]">{$trans('mission.form2.intro')}</p>
+  </header>
+
+  <div class="flex flex-col gap-6 lg:flex-row lg:items-start">
+    <!-- FORM -->
+    <div class="flex min-w-0 flex-1 flex-col gap-4 sm:gap-5">
+      {#if gloading}
+        <div class="flex items-center justify-center rounded-2xl bg-white p-10" aria-busy="true">
+          <span
+            class="inline-block h-8 w-8 animate-spin rounded-full border-[3px] border-[#c8155f] border-t-transparent"
+          ></span>
+        </div>
+      {:else}
+        <!-- 1 · What -->
+        <FormSection
+          step={1}
+          title={$trans('mission.form2.step1Title')}
+          subtitle={$trans('mission.form2.step1Sub')}
+        >
+          <div>
+            {#if missionNameE}
+              <label for="mission-name-input" class={lbl}>{$trans('mission.ai.missionName')}</label>
             {:else}
-              <div class="flex flex-col">
-                <label
-                  for="mission-name-input"
-                  class="text-barbi font-bold text-sm mb-1 text-{$lang == 'en'
-                    ? 'left'
-                    : 'right'}"
-                >
-                  {$trans('mission.ai.missionName')}
-                </label>
+              <span class={lbl}>{$trans('mission.ai.missionName')}</span>
+            {/if}
+            <div class="flex flex-col gap-2 sm:flex-row">
+              {#if missionNameE}
                 <input
                   id="mission-name-input"
                   type="text"
                   bind:value={miData[0].missionName}
                   list="mission-name-options"
                   placeholder={$trans('mission.ai.typePickTemplate')}
-                  class="bg-pink-950/30 border placeholder:text-white border-gold rounded-xl p-3 text-white focus:border-gold outline-none transition-all shadow-sm"
+                  class="{inp} flex-1"
                 />
                 <datalist id="mission-name-options">
                   {#each missionTemplates as template (template.id)}
                     <option value={template.attributes.missionName}></option>
                   {/each}
                 </datalist>
-                <!-- AI Suggest button -->
+              {:else}
+                <div
+                  class="flex min-h-[52px] min-w-0 flex-1 items-center gap-2 rounded-xl border-[1.5px] border-[#eee2a6] bg-[#fdf9ea] ps-4 pe-1"
+                >
+                  <strong class="min-w-0 flex-1 truncate text-[17px]">{miData[0].missionName}</strong>
+                  <span class="hidden text-xs text-[#6b5560] sm:inline">{$trans('mission.form2.fromTemplate')}</span>
+                  <button
+                    type="button"
+                    onclick={() => (missionNameE = true)}
+                    aria-label={$trans('mission.form2.editName')}
+                    title={$trans('mission.form2.editName')}
+                    class="flex h-11 w-11 flex-none items-center justify-center rounded-lg text-[#c8155f] transition hover:bg-[#fdeef4]"
+                  >
+                    <Pencil size={18} />
+                  </button>
+                </div>
+              {/if}
+              <button
+                type="button"
+                onclick={handleAiSuggest}
+                disabled={aiSuggesting}
+                title={$trans('mission.ai.suggestTitle')}
+                class="inline-flex h-[52px] flex-none items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-[#ff0092] to-[#c8155f] px-5 text-[15px] font-bold text-white shadow-sm transition hover:brightness-110 disabled:opacity-60"
+              >
+                {#if aiSuggesting}
+                  <span
+                    class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"
+                  ></span>
+                {:else}
+                  <Sparkles size={18} aria-hidden="true" />
+                {/if}
+                {$trans('mission.form2.fillWithAi')}
+              </button>
+            </div>
+            {#if missionNameE}
+              <p class="m-0 mt-1.5 text-[13px] text-[#6b5560]">{$trans('mission.form2.nameHint')}</p>
+            {/if}
+          </div>
+
+          {#if aiSuggestResult}
+            <div
+              transition:slide={{ duration: 250 }}
+              class="flex flex-col gap-3 rounded-2xl border-[1.5px] border-[#f3c6da] bg-[#fff6fa] p-4 text-sm"
+            >
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <strong class="inline-flex items-center gap-2 text-base text-[#c8155f]">
+                  <Sparkles size={18} aria-hidden="true" />
+                  {$trans('mission.ai.suggestionsHeader')}
+                </strong>
+                {#if aiSuggestResult.similarMissions?.length > 0}
+                  <span class="text-xs text-[#6b5560]">
+                    {$trans('mission.ai.similarTemplates')}
+                    {aiSuggestResult.similarMissions.map((m) => m.missionName).join(', ')}
+                  </span>
+                {/if}
+              </div>
+              <dl class="m-0 grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-3 gap-y-2">
+                {#if aiSuggestResult.extraction.skills.length > 0}
+                  <dt class="text-[#6b5560]">{$trans('mission.ai.skillsLabel')}</dt>
+                  <dd class="m-0 flex flex-wrap gap-1.5">
+                    {#each aiSuggestResult.extraction.skills as s}
+                      <span class="rounded-full border border-dashed border-[#d9a5bb] bg-white px-2.5 py-1">{s}</span>
+                    {/each}
+                  </dd>
+                {/if}
+                {#if aiSuggestResult.extraction.roles.length > 0}
+                  <dt class="text-[#6b5560]">{$trans('mission.ai.rolesLabel')}</dt>
+                  <dd class="m-0 flex flex-wrap gap-1.5">
+                    {#each aiSuggestResult.extraction.roles as r}
+                      <span class="rounded-full border border-dashed border-[#9fd3d8] bg-white px-2.5 py-1">{r}</span>
+                    {/each}
+                  </dd>
+                {/if}
+                {#if aiSuggestResult.extraction.workways.length > 0}
+                  <dt class="text-[#6b5560]">{$trans('mission.ai.workModesLabel')}</dt>
+                  <dd class="m-0 flex flex-wrap gap-1.5">
+                    {#each aiSuggestResult.extraction.workways as w}
+                      <span class="rounded-full border border-dashed border-[#d8cbb0] bg-white px-2.5 py-1">{w}</span>
+                    {/each}
+                  </dd>
+                {/if}
+                {#if aiSuggestResult.extraction.valph > 0 || aiSuggestResult.extraction.nhours > 0}
+                  <dt class="text-[#6b5560]">{$trans('mission.ai.valueLabel')}</dt>
+                  <dd class="m-0 font-bold">
+                    {#if aiSuggestResult.extraction.valph > 0}
+                      {fmtNum(aiSuggestResult.extraction.valph)} {mf.perHour}
+                    {/if}
+                    {#if aiSuggestResult.extraction.valph > 0 && aiSuggestResult.extraction.nhours > 0}
+                      ×
+                    {/if}
+                    {#if aiSuggestResult.extraction.nhours > 0}
+                      {fmtNum(aiSuggestResult.extraction.nhours)} {mf.hours}
+                    {/if}
+                  </dd>
+                {/if}
+              </dl>
+              <div class="flex flex-wrap gap-2">
                 <button
                   type="button"
-                  onclick={handleAiSuggest}
-                  disabled={aiSuggesting}
-                  class="mt-2 flex items-center gap-1 px-3 py-1.5 rounded-full border border-gold/60 text-xs text-barbi hover:bg-gold/20 transition-all disabled:opacity-50"
-                  title={$trans('mission.ai.suggestTitle')}
+                  onclick={applyAiSuggestions}
+                  disabled={aiApplying}
+                  class="inline-flex min-h-10 items-center gap-2 rounded-full bg-[#c8155f] px-5 text-sm font-bold text-white transition hover:bg-[#a3124e] disabled:opacity-50"
                 >
-                  {#if aiSuggesting}
+                  {#if aiApplying}
                     <span
-                      class="animate-spin inline-block w-3 h-3 border border-barbi rounded-full border-t-transparent"
+                      class="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-white border-t-transparent"
                     ></span>
+                    {$trans('mission.ai.applying')}
                   {:else}
-                    ✨
+                    {$trans('mission.ai.applyAll')}
                   {/if}
-                  {$trans('mission.ai.suggestWithAi')}
+                </button>
+                <button
+                  type="button"
+                  onclick={() => (aiSuggestResult = null)}
+                  disabled={aiApplying}
+                  class="{ghost} min-h-10"
+                >
+                  {$trans('mission.ai.dismiss')}
                 </button>
               </div>
-              <button onclick={() => (missionNameE = false)}><Done /></button>
+            </div>
+          {/if}
 
-              <!-- AI Suggestion result panel -->
-              {#if aiSuggestResult}
-                <div
-                  class="mt-3 p-3 rounded-xl border border-gold/40 bg-pink-950/30 text-sm text-barbi space-y-2"
-                >
-                  <p class="font-bold text-gold">
-                    {$trans('mission.ai.suggestionsHeader')}
+          <div>
+            <span class={lbl}>{$trans('common.description')}</span>
+            <div class="{fieldBox} overflow-hidden">
+              <RichText bind:outpot={miData[0].descrip} />
+              <div
+                class="flex flex-wrap items-center gap-2 border-t border-[#efe6d3] bg-[#fbf7ee] px-2.5 py-2"
+              >
+                <button type="button" onclick={handleAiImprove} disabled={aiImproving} class={ghost}>
+                  {#if aiImproving}
+                    <span
+                      class="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-[#c8155f] border-t-transparent"
+                    ></span>
+                  {:else}
+                    <WandSparkles size={15} aria-hidden="true" />
+                  {/if}
+                  {$trans('mission.ai.improveWithAi')}
+                </button>
+                {#if aiDescUndo}
+                  <button type="button" onclick={undoAiImprove} class={ghost}>
+                    <Undo2 size={15} aria-hidden="true" />
+                    {$trans('mission.ai.undo')}
+                  </button>
+                {/if}
+                <button type="button" onclick={handleAiTranslate} disabled={aiTranslating} class={ghost}>
+                  {#if aiTranslating}
+                    <span
+                      class="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-[#c8155f] border-t-transparent"
+                    ></span>
+                  {:else}
+                    <Globe size={15} aria-hidden="true" />
+                  {/if}
+                  {$trans('mission.ai.translate')}
+                </button>
+              </div>
+            </div>
+            {#if aiTranslations}
+              <div
+                transition:slide={{ duration: 250 }}
+                class="mt-2 flex flex-col gap-2 rounded-xl border border-[#efe6d3] bg-[#fbf7ee] p-3 text-sm"
+              >
+                <p class="m-0 font-bold">{$trans('mission.ai.translationPreview')}</p>
+                {#if aiTranslations.he && $lang !== 'he'}
+                  <p class="m-0" dir="rtl">
+                    <span class="font-medium text-[#6b5560]">עברית:</span>
+                    {aiTranslations.he.replace(/<[^>]+>/g, '').slice(0, 120)}…
                   </p>
-                  {#if aiSuggestResult.extraction.skills.length > 0}
-                    <p>
-                      <span class="text-mturk"
-                        >{$trans('mission.ai.skillsLabel')}</span
-                      >
-                      {aiSuggestResult.extraction.skills.join(', ')}
-                    </p>
-                  {/if}
-                  {#if aiSuggestResult.extraction.roles.length > 0}
-                    <p>
-                      <span class="text-mturk"
-                        >{$trans('mission.ai.rolesLabel')}</span
-                      >
-                      {aiSuggestResult.extraction.roles.join(', ')}
-                    </p>
-                  {/if}
-                  {#if aiSuggestResult.extraction.workways.length > 0}
-                    <p>
-                      <span class="text-mturk"
-                        >{$trans('mission.ai.workModesLabel')}</span
-                      >
-                      {aiSuggestResult.extraction.workways.join(', ')}
-                    </p>
-                  {/if}
-                  {#if aiSuggestResult.extraction.valph > 0 || aiSuggestResult.extraction.nhours > 0}
-                    <p>
-                      <span class="text-mturk"
-                        >{$trans('mission.ai.valueLabel')}</span
-                      >
-                      {#if aiSuggestResult.extraction.valph > 0}
-                        {aiSuggestResult.extraction.valph.toLocaleString('en-US', {
-                          maximumFractionDigits: 2
-                        })}
-                        {mf.perHour}
-                      {/if}
-                      {#if aiSuggestResult.extraction.valph > 0 && aiSuggestResult.extraction.nhours > 0}
-                        ✖
-                      {/if}
-                      {#if aiSuggestResult.extraction.nhours > 0}
-                        {aiSuggestResult.extraction.nhours.toLocaleString('en-US', {
-                          maximumFractionDigits: 2
-                        })}
-                        {mf.hours}
-                      {/if}
-                    </p>
-                  {/if}
-                  {#if aiSuggestResult.similarMissions?.length > 0}
-                    <p class="text-xs text-barbi/60">
-                      {$trans('mission.ai.similarTemplates')}
-                      {aiSuggestResult.similarMissions
-                        .map((m) => m.missionName)
-                        .join(', ')}
-                    </p>
-                  {/if}
-                  <div class="flex gap-2 pt-1">
-                    <button
-                      type="button"
-                      onclick={applyAiSuggestions}
-                      disabled={aiApplying}
-                      class="px-3 py-1 rounded-full bg-gold text-barbi text-xs font-bold hover:bg-mturk transition-all disabled:opacity-50 flex items-center gap-1"
-                    >
-                      {#if aiApplying}
-                        <span
-                          class="animate-spin inline-block w-3 h-3 border border-barbi rounded-full border-t-transparent"
-                        ></span>
-                        {$trans('mission.ai.applying')}
-                      {:else}
-                        {$trans('mission.ai.applyAll')}
-                      {/if}
-                    </button>
-                    <button
-                      type="button"
-                      onclick={() => (aiSuggestResult = null)}
-                      disabled={aiApplying}
-                      class="px-3 py-1 rounded-full border border-gold/60 text-barbi text-xs hover:bg-pink-950/30 transition-all disabled:opacity-50"
-                    >
-                      {$trans('mission.ai.dismiss')}
-                    </button>
-                  </div>
-                </div>
-              {/if}
-            {/if}
-            {#if gloading == false}
-              <h3
-                class="text-barbi
-            text-{$lang == 'en' ? 'left' : 'right'} 
-            font-bold text-lg lg:text-2xl underline"
-              >
-                <mark>{$trans('common.description')}:</mark><button
-                  onclick={() => (descripE = !descripE)}
-                  >{#if descripE}<Done />{:else}<EditIcon />{/if}</button
-                >
-              </h3>
-              {#if descripE}
-                <RichText bind:outpot={miData[0].descrip} />
-                <!-- AI description actions -->
-                <div class="flex flex-wrap gap-2 mt-2">
-                  <button
-                    type="button"
-                    onclick={handleAiImprove}
-                    disabled={aiImproving}
-                    class="flex items-center gap-1 px-3 py-1.5 rounded-full border border-gold/60 text-xs text-barbi hover:bg-gold/20 transition-all disabled:opacity-50"
-                  >
-                    {#if aiImproving}<span
-                        class="animate-spin inline-block w-3 h-3 border border-barbi rounded-full border-t-transparent"
-                      ></span>{:else}🪄{/if}
-                    {$trans('mission.ai.improveWithAi')}
-                  </button>
-                  {#if aiDescUndo}
-                    <button
-                      type="button"
-                      onclick={undoAiImprove}
-                      class="flex items-center gap-1 px-3 py-1.5 rounded-full border border-gold/40 text-xs text-barbi hover:bg-pink-950/30 transition-all"
-                    >
-                      ↩️ {$trans('mission.ai.undo')}
-                    </button>
-                  {/if}
-                  <button
-                    type="button"
-                    onclick={handleAiTranslate}
-                    disabled={aiTranslating}
-                    class="flex items-center gap-1 px-3 py-1.5 rounded-full border border-gold/60 text-xs text-barbi hover:bg-gold/20 transition-all disabled:opacity-50"
-                  >
-                    {#if aiTranslating}<span
-                        class="animate-spin inline-block w-3 h-3 border border-barbi rounded-full border-t-transparent"
-                      ></span>{:else}🌍{/if}
-                    {$trans('mission.ai.translate')}
-                  </button>
-                </div>
-                <!-- Translation preview -->
-                {#if aiTranslations}
-                  <div
-                    class="mt-2 p-3 rounded-xl border border-gold/40 bg-pink-950/30 text-xs text-barbi space-y-2"
-                  >
-                    <p class="font-bold text-gold">
-                      {$trans('mission.ai.translationPreview')}
-                    </p>
-                    {#if aiTranslations.he && $lang !== 'he'}
-                      <p>
-                        <span class="text-mturk">עברית:</span>
-                        {aiTranslations.he
-                          .replace(/<[^>]+>/g, '')
-                          .slice(0, 120)}…
-                      </p>
-                    {/if}
-                    {#if aiTranslations.en && $lang !== 'en'}
-                      <p>
-                        <span class="text-mturk">English:</span>
-                        {aiTranslations.en
-                          .replace(/<[^>]+>/g, '')
-                          .slice(0, 120)}…
-                      </p>
-                    {/if}
-                    {#if aiTranslations.ar && $lang !== 'ar'}
-                      <p>
-                        <span class="text-mturk">العربية:</span>
-                        {aiTranslations.ar
-                          .replace(/<[^>]+>/g, '')
-                          .slice(0, 120)}…
-                      </p>
-                    {/if}
-                    <p class="text-barbi/50 text-xs">
-                      {$trans('mission.ai.autoSaveNote')}
-                    </p>
-                    <button
-                      type="button"
-                      onclick={() => (aiTranslations = null)}
-                      class="px-2 py-1 rounded-full border border-gold/40 text-xs hover:bg-pink-950/30"
-                      >{$trans('mission.ai.close')}</button
-                    >
-                  </div>
                 {/if}
-              {:else if miData[0].descrip}
-                <RichText
-                  outpot={miData[0].descrip}
-                  sml={true}
-                  editable={false}
-                />
-              {/if}
-            {/if}
-            <!----   <h3 class="text-barbi font-bold text-lg lg:text-2xl underline ">
-            {$trans('mission.specialNotes')}</h3>
-    <RichText bind:outpot={miData[0].spnot} editable={spnotE}/>-->
-
-            <p
-              style="line-height: 1;"
-              class="text-md flex items-center lg:text-2xl {dateE
-                ? 'm-0'
-                : ' m-5'} lg:m-5"
-            >
-              <img
-                class=" {dateE
-                  ? 'hidden'
-                  : 'w-6 mx-2'} lg:block lg:w-12 lg:mx-2"
-                src="https://res.cloudinary.com/love1/image/upload/v1699831987/FX13_calendar2_jlxcn1.svg"
-                alt="howmuch"
-              />
-              <Daterange
-                onEdit={() => (dateE = true)}
-                onEditStop={() => (dateE = false)}
-                dir={$isRtl ? 'rtl' : 'ltr'}
-                bind:start={miData[0].date}
-                bind:finnish={miData[0].dates}
-              />
-            </p>
-            <div class="my-2">
-              <mark class="text-barbi text-sm lg:text-2xl">{ml.title}:</mark>
-              <button onclick={() => (locationE = !locationE)}
-                >{#if locationE}<Done />{:else}<EditIcon />{/if}</button
-              >
-              {#if locationE}
-                <div class="my-3">
-                  <LocationPicker
-                    bind:value={miData[0].location}
-                    label={ml.title}
-                    helper={ml.helper}
-                    height="300px"
-                  />
-                </div>
-              {:else if hasLocationValue(miData[0].location)}
-                <div
-                  class="border border-gold flex flex-row lg:p-4 flex-wrap justify-center align-middle d cd p-2"
-                >
-                  <Tile
-                    bg="gold"
-                    sm={wid > 555 ? true : false}
-                    big={wid > 555 ? true : false}
-                    word={locationSummary(miData[0].location)}
-                  />
-                </div>
-              {/if}
-            </div>
-            <div
-              class="md:text-xl text-lg md:flex-row {valphE
-                ? 'flex-col'
-                : ''} justify-start text-barbie flex items-center space-x-2 lg:text-2xl m-5"
-            >
-              <img
-                class="w-12 lg:w-24"
-                src="https://res.cloudinary.com/love1/image/upload/v1653148344/Crashing-Money_n6qaqj.svg"
-                alt="howmuch"
-              />
-              <span class="text-barbie">
-                {#if valphE == false}
-                  {miData[0].valph.toLocaleString('en-US', {
-                    maximumFractionDigits: 2
-                  })}
-                {:else}
-                  <NumberInput bind:value={miData[0].valph} />{/if}
-                {#if valphE && projectId && !specMode && !publishMode}
-                  <CurrencyPicker bind:value={entryCurrency} compact />
-                {:else}
-                  <CurrencySymbol currency={specMode || publishMode ? null : entryCurrency} />
+                {#if aiTranslations.en && $lang !== 'en'}
+                  <p class="m-0" dir="ltr">
+                    <span class="font-medium text-[#6b5560]">English:</span>
+                    {aiTranslations.en.replace(/<[^>]+>/g, '').slice(0, 120)}…
+                  </p>
                 {/if}
-                {mf.perHour}
-              </span><span> ✖ </span><span
-                >{#if valphE == false}
-                  {miData[0].nhours.toLocaleString('en-US', {
-                    maximumFractionDigits: 2
-                  })}
-                {:else}
-                  <NumberInput bind:value={miData[0].nhours} />
+                {#if aiTranslations.ar && $lang !== 'ar'}
+                  <p class="m-0" dir="rtl">
+                    <span class="font-medium text-[#6b5560]">العربية:</span>
+                    {aiTranslations.ar.replace(/<[^>]+>/g, '').slice(0, 120)}…
+                  </p>
                 {/if}
-                {mf.hours}
-                {#if seats > 1}{$trans('mission.form.perPerson')}{/if}
-                {miData[0].iskvua ? mf.perMonth : mf.total}
-              </span> <span> = </span>
-              <span
-                >{(miData[0].nhours * miData[0].valph).toLocaleString('en-US', {
-                  maximumFractionDigits: 2
-                })}
-                {miData[0].iskvua ? mf.perMonth : mf.total}
-              </span>
-              {#if valphE}
-                <span
-                  >{mf.isRecurring}
-                  <Chooser
-                    bind:checked={miData[0].iskvua}
-                    tr={mf.recurring}
-                    fl={mf.oneTime}
-                  /></span
-                >
-              {/if}
-              <button onclick={() => (valphE = !valphE)}>
-                {#if valphE}<Done />{:else}<EditIcon />{/if}</button
-              >
-            </div>
-            <!-- How many people the mission needs (PLAN_SHIFTS §2). Not shown
-                 for an assigned mission: that is an offer to one named person. -->
-            {#if projectId && !specMode && !publishMode && miData[0].myM !== true}
-              <div class="mx-5 my-2 flex flex-col gap-1 text-barbie">
-                <label class="flex flex-wrap items-center gap-2 text-lg lg:text-xl">
-                  <span>👥 {$trans('mission.form.headcountLabel')}</span>
-                  <input
-                    type="number"
-                    min="1"
-                    step="1"
-                    inputmode="numeric"
-                    class="w-20 rounded-lg border border-gold bg-transparent px-2 py-1 text-center"
-                    bind:value={miData[0].howMeny}
-                  />
-                </label>
-                <small class="text-sm opacity-90">
-                  {seats > 1
-                    ? $trans('mission.form.headcountMany', { count: seats })
-                    : $trans('mission.form.headcountOne')}
-                </small>
-                {#if seats > 1}
-                  <small class="text-sm font-semibold">
-                    {$trans('mission.form.rikmaTotal', {
-                      count: seats,
-                      value: perPersonValue.toLocaleString('en-US', { maximumFractionDigits: 2 }),
-                      total: (perPersonValue * seats).toLocaleString('en-US', {
-                        maximumFractionDigits: 2
-                      })
-                    })}
-                  </small>
-                {/if}
+                <p class="m-0 text-xs text-[#6b5560]">{$trans('mission.ai.autoSaveNote')}</p>
+                <button type="button" onclick={() => (aiTranslations = null)} class="{ghost} self-start">
+                  {$trans('mission.ai.close')}
+                </button>
               </div>
             {/if}
-            <!-- שווי צפוי ברקמה — כמה מהרקמה תהווה המשימה החדשה שנוצרת כאן.
-                 משימה חדשה שעדיין לא פורסמה ⇒ alreadyCountedIn="none".
-                 specMode/publishMode הם ללא רקמה, ולכן projectId ריק והתצוגה מוסתרת. -->
-            <!-- "This mission also wants a subsistence stipend" (PLAN_STIPEND
-                 §13). Right under the money row, because it is the same
-                 question: what this mission costs and what it pays. -->
-            {#if projectId && !specMode && !publishMode}
-              <MissionStipendSection
-                bind:rate={miData[0].stipendRate}
-                bind:costShare={miData[0].stipendCostShare}
-                bind:mode={miData[0].stipendMode}
-                marketRate={Number(miData[0].valph) || 0}
-                hours={Number(miData[0].nhours) || 0}
-                iskvua={miData[0].iskvua}
+          </div>
+        </FormSection>
+
+        <!-- 2 · Value -->
+        <FormSection
+          step={2}
+          title={$trans('mission.form2.step2Title')}
+          subtitle={$trans('mission.form2.step2Sub')}
+        >
+          <div class="inline-flex gap-1 self-start rounded-xl bg-[#f6f0e4] p-1" role="group" aria-label={mf.isRecurring}>
+            <button
+              type="button"
+              aria-pressed={!miData[0].iskvua}
+              onclick={() => (miData[0].iskvua = false)}
+              class={segBtn(!miData[0].iskvua)}>{$trans('mission.form2.oneTime')}</button
+            >
+            <button
+              type="button"
+              aria-pressed={miData[0].iskvua}
+              onclick={() => (miData[0].iskvua = true)}
+              class={segBtn(miData[0].iskvua)}>{$trans('mission.form2.recurring')}</button
+            >
+          </div>
+
+          <div class="grid items-end gap-3 {showHeadcount ? 'grid-cols-2 sm:grid-cols-3' : 'grid-cols-2'}">
+            <div class={showHeadcount ? 'col-span-2 sm:col-span-1' : ''}>
+              <div class="mb-2 flex min-h-6 items-center justify-between gap-2">
+                <label for="mission-valph" class="whitespace-nowrap text-sm font-bold text-[#2a1420]">{$trans('mission.form2.ratePerHour')}</label>
+                {#if inProject}
+                  <CurrencyPicker bind:value={entryCurrency} compact />
+                {/if}
+              </div>
+              <div class="{fieldBox} flex h-[52px] items-center overflow-hidden">
+                <input
+                  id="mission-valph"
+                  type="number"
+                  min="0"
+                  step="any"
+                  inputmode="decimal"
+                  bind:value={miData[0].valph}
+                  class="h-full w-full min-w-0 flex-1 border-0 bg-transparent px-3.5 text-xl font-bold outline-none"
+                />
+                <span class="flex-none pe-3.5 text-lg font-bold text-[#6b5560]">
+                  <CurrencySymbol currency={specMode || publishMode ? null : entryCurrency} />
+                </span>
+              </div>
+            </div>
+            <div>
+              <label for="mission-nhours" class={lbl}>
+                {#if showHeadcount}
+                  {miData[0].iskvua ? $trans('mission.form2.hoursPerPersonMonth') : $trans('mission.form2.hoursPerPerson')}
+                {:else}
+                  {miData[0].iskvua ? $trans('mission.form2.hoursMonth') : $trans('mission.form2.hours')}
+                {/if}
+              </label>
+              <input
+                id="mission-nhours"
+                type="number"
+                min="0"
+                step="any"
+                inputmode="decimal"
+                bind:value={miData[0].nhours}
+                class="{inp} text-xl font-bold"
               />
+            </div>
+            {#if showHeadcount}
+              <div>
+                <label for="mission-howmeny" class={lbl}>{$trans('mission.form2.headcount')}</label>
+                <input
+                  id="mission-howmeny"
+                  type="number"
+                  min="1"
+                  step="1"
+                  inputmode="numeric"
+                  bind:value={miData[0].howMeny}
+                  class="{inp} text-xl font-bold"
+                />
+              </div>
             {/if}
-            {#if projectId && !specMode && !publishMode}
-              <div class="my-2">
+          </div>
+          {#if showHeadcount}
+            <p class="m-0 -mt-1 text-[13px] text-[#6b5560]">
+              {seats > 1
+                ? $trans('mission.form.headcountMany', { count: seats })
+                : $trans('mission.form.headcountOne')}
+            </p>
+          {/if}
+
+          <div
+            class="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 rounded-2xl border border-[#eee2a6] bg-[#fdf9ea] px-4 py-3.5"
+          >
+            <span class="text-[15px] text-[#5a4a2a]" dir="auto">{formulaText}</span>
+            <strong class="text-2xl font-extrabold text-[#2a1420]" dir="auto">{totalText}</strong>
+          </div>
+
+          {#if inProject}
+            <!-- "This mission also wants a subsistence stipend" (PLAN_STIPEND §13).
+                 Right under the money row: it is the same question. -->
+            <MissionStipendSection
+              bind:rate={miData[0].stipendRate}
+              bind:costShare={miData[0].stipendCostShare}
+              bind:mode={miData[0].stipendMode}
+              marketRate={Number(miData[0].valph) || 0}
+              hours={Number(miData[0].nhours) || 0}
+              iskvua={miData[0].iskvua}
+            />
+            <!-- Expected share in the rikma. A mission not yet published ⇒
+                 alreadyCountedIn="none". -->
+            <details class="group rounded-2xl border border-[#efe6d3] bg-[#fffdf8]">
+              <summary
+                class="flex min-h-12 cursor-pointer list-none items-center justify-between gap-2 px-4 text-sm font-bold text-[#2a1420]"
+              >
+                {$trans('mission.form2.equityTitle')}
+                <svg
+                  class="h-5 w-5 flex-none text-[#6b5560] transition-transform group-open:rotate-180"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg
+                >
+              </summary>
+              <div class="border-t border-[#efe6d3] p-2">
                 <EquityPreview
                   {projectId}
-                  missionValue={inRikma(perPersonValue * seats)}
-                  monthlyValue={miData[0].iskvua ? inRikma(perPersonValue * seats) : null}
+                  missionValue={inRikma(totalValue)}
+                  monthlyValue={miData[0].iskvua ? inRikma(totalValue) : null}
                   alreadyCountedIn="none"
                   titleKey="equity.missionShareAtCreation"
                 />
               </div>
-            {/if}
-            <div class="my-2">
-              <mark class="text-barbi text-sm lg:text-2xl">{mf.tasksList}:</mark
-              >
-              {#key miData}
-                {#if miData[0].checklist}
-                  <ul transition:slide={{ duration: 1000, easing: quintOut }}>
-                    {#each miData[0].checklist as datai, t}
-                      <li>
-                        <div
-                          class="flex flex-row space-x-2 items-start border-y-2 border-y-mturk"
-                        >
-                          <span class="p-1">✅</span>
-                          <h2 class="md:text-xl p-1">{datai.shem}</h2>
-                          <button
-                            class="bg-gold p-0.5 m-0.5 rounded text-barb"
-                            onclick={() => {
-                              dialog = 3;
-                              misid = miData[0].id;
-                              itemid = t;
-                              isOpen = true;
-                            }}
-                            title={$trans('mission.seechecklist')}
-                          >
-                            <Expand /></button
-                          >
+            </details>
+          {/if}
+        </FormSection>
 
-                          <button
-                            onclick={() => {
-                              dialog = 2;
-                              misid = miData[0].id;
-                              itemid = t;
-                              editdata = datai;
-                              isOpen = true;
-                            }}
-                            class="bg-gold p-0.5 m-0.5 rounded">🖍️</button
-                          >
-                          <button
-                            onclick={() => {
-                              miData[0].checklist.splice(t, 1);
-                              miData = miData;
-                            }}
-                            class="bg-gold p-0.5 m-0.5 rounded">✖️</button
-                          >
-                        </div>
+        <!-- 3 · Who -->
+        <FormSection
+          step={3}
+          title={$trans('mission.form2.step3Title')}
+          subtitle={$trans('mission.form2.step3Sub')}
+          badge={$trans('mission.form2.optional')}
+        >
+          <div>
+            <span class={lbl}>{$trans('mission.form2.skills')}</span>
+            <SkillSelector
+              bind:selectedSkills={miData[0].selectedSkills}
+              placeholder={mf.skillsPlaceholder}
+              autoCreate={true}
+              outerDivClass="!min-h-[52px] !w-full !rounded-xl !border-[1.5px] !border-[#e4d9c4] !bg-[#fffdf8] !text-[#2a1420]"
+              inputClass="!w-full !bg-transparent !text-[#2a1420]"
+              liSelectedClass="!rounded-full !bg-[#fdeef4] !text-[#a3124e]"
+            />
+          </div>
+          <div class="flex flex-col gap-4">
+            <div>
+              <span class={lbl}>{$trans('mission.form2.roles')}</span>
+              <RoleSelector
+                bind:selectedRoles={miData[0].selectedRoles}
+                placeholder={mf.rolePlaceholder}
+                autoCreate={true}
+                outerDivClass="!min-h-[52px] !w-full !rounded-xl !border-[1.5px] !border-[#e4d9c4] !bg-[#fffdf8] !text-[#2a1420]"
+                inputClass="!w-full !bg-transparent !text-[#2a1420]"
+                liSelectedClass="!rounded-full !bg-[#e6f7f8] !text-[#0b6470]"
+              />
+            </div>
+            <div>
+              <span class={lbl}>{$trans('mission.form2.workways')}</span>
+              <MultiSelect
+                outerDivClass="!min-h-[52px] !rounded-xl !border-[1.5px] !border-[#e4d9c4] !bg-[#fffdf8] !text-[#2a1420]"
+                inputClass="!bg-transparent !text-[#2a1420]"
+                liSelectedClass="!rounded-full !bg-[#f6f0e4] !text-[#5a4a2a]"
+                --sms-open-z-index={10000}
+                createOptionMsg={addn}
+                allowUserOptions={true}
+                bind:searchText
+                loading={newcontentW}
+                bind:selected={miData[0].selectedWorkways}
+                placeholder={mf.missionType}
+                options={$ww.map((c) => c.attributes.workWayName)}
+                onchange={(e) => {
+                  addW(miData[0].selectedWorkways, miData[0].id, e);
+                }}
+              />
+            </div>
+          </div>
+        </FormSection>
+
+        <!-- 4 · When & where -->
+        <FormSection
+          step={4}
+          title={$trans('mission.form2.step4Title')}
+          subtitle={$trans('mission.form2.step4Sub')}
+          badge={$trans('mission.form2.optional')}
+        >
+          <div>
+            <span class={lbl}>{$trans('mission.form2.dates')}</span>
+            <div class="{fieldBox} px-3 py-2">
+              <Daterange
+                dir={$isRtl ? 'rtl' : 'ltr'}
+                bind:start={miData[0].date}
+                bind:finnish={miData[0].dates}
+              />
+            </div>
+          </div>
+          <div>
+            <span class={lbl}>{$trans('mission.form2.location')}</span>
+            {#if locationE}
+              <div class="flex flex-col gap-3">
+                <LocationPicker
+                  bind:value={miData[0].location}
+                  label={ml.title}
+                  helper={ml.helper}
+                  height="300px"
+                />
+                <button type="button" onclick={() => (locationE = false)} class="{ghost} self-start">
+                  {$trans('mission.form2.closeLocation')}
+                </button>
+              </div>
+            {:else}
+              <button
+                type="button"
+                onclick={() => (locationE = true)}
+                class="flex min-h-[56px] w-full items-center gap-3 rounded-xl border-[1.5px] border-[#e4d9c4] bg-[#fffdf8] px-3 text-start transition hover:border-[#c8155f]"
+              >
+                <span class="flex h-9 w-9 flex-none items-center justify-center rounded-lg bg-[#fdeef4] text-[#c8155f]">
+                  <MapPin size={18} aria-hidden="true" />
+                </span>
+                <span class="min-w-0 flex-1 truncate text-[15px] {hasLocationValue(miData[0].location) ? 'font-medium' : 'text-[#6b5560]'}">
+                  {locationSummary(miData[0].location)}
+                </span>
+                <span class="flex-none text-sm font-bold text-[#c8155f]">{$trans('mission.form2.setLocation')}</span>
+              </button>
+            {/if}
+          </div>
+        </FormSection>
+
+        <!-- More options -->
+        <FormSection title={$trans('mission.form2.moreTitle')} subtitle={$trans('mission.form2.moreSub')}>
+          <div class="flex flex-col gap-2.5">
+            <OptionRow icon={ListChecks} title={$trans('mission.form2.tasks')} status={tasksStatus} bind:open={tasksOpen}>
+              <div class="flex flex-col gap-2">
+                {#if miData[0].checklist?.length}
+                  <ul class="m-0 flex list-none flex-col gap-1.5 p-0" transition:slide={{ duration: 300, easing: quintOut }}>
+                    {#each miData[0].checklist as datai, t}
+                      <li class="flex items-center gap-2 rounded-xl border border-[#efe6d3] bg-white px-3 py-1.5">
+                        <span class="min-w-0 flex-1 truncate font-medium">{datai.shem}</span>
+                        <button
+                          type="button"
+                          class="flex h-10 w-10 items-center justify-center rounded-lg text-[#6b5560] hover:bg-[#f6f0e4]"
+                          aria-label={$trans('mission.form2.viewTask')}
+                          title={$trans('mission.seechecklist')}
+                          onclick={() => {
+                            dialog = 3;
+                            misid = miData[0].id;
+                            itemid = t;
+                            isOpen = true;
+                          }}><Maximize2 size={16} /></button
+                        >
+                        <button
+                          type="button"
+                          class="flex h-10 w-10 items-center justify-center rounded-lg text-[#6b5560] hover:bg-[#f6f0e4]"
+                          aria-label={$trans('mission.form2.editTask')}
+                          onclick={() => {
+                            dialog = 2;
+                            misid = miData[0].id;
+                            itemid = t;
+                            editdata = datai;
+                            isOpen = true;
+                          }}><Pencil size={16} /></button
+                        >
+                        <button
+                          type="button"
+                          class="flex h-10 w-10 items-center justify-center rounded-lg text-[#a3124e] hover:bg-[#fdeef4]"
+                          aria-label={$trans('mission.form2.removeTask')}
+                          onclick={() => {
+                            miData[0].checklist.splice(t, 1);
+                            miData = miData;
+                          }}><X size={16} /></button
+                        >
                       </li>
                     {/each}
                   </ul>
-
+                {/if}
+                <div class="flex flex-wrap gap-2">
                   <button
+                    type="button"
+                    class={ghost}
                     onclick={() => {
-                      dialog = 3;
+                      dialog = 2;
                       misid = miData[0].id;
+                      editdata = -1;
                       itemid = -1;
                       isOpen = true;
                     }}
-                    title={$trans('mission.seechecklist')}
                   >
-                    <Expand /></button
-                  >
-                  <!--expand list of items with checkmark as list counter and x for deliting-->
-                {/if}
-                <button
-                  title=" {$trans('mission.checklistadd')}"
-                  onclick={() => {
-                    dialog = 2;
-                    misid = miData[0].id;
-                    editdata = -1;
-                    itemid = -1;
-                    isOpen = true;
-                  }}><Plus /></button
-                >
-              {/key}
-            </div>
-            <div class="my-2">
-              <mark class="text-barbi text-sm lg:text-2xl"
-                >{mf.requiredSkills}:</mark
-              >
-              <button onclick={() => (ske = !ske)}
-                >{#if ske}<Done />{:else}<EditIcon />{/if}</button
-              >
-              {#if !ske}
-                {#if miData[0].selectedSkills.length > 0}
-                  <div
-                    class="border border-gold flex sm:flex-row flex-wrap justify-center align-middle d cd p-2 lg:p-4"
-                  >
-                    {#each miData[0].selectedSkills as skill}
-                      <p>
-                        <Tile
-                          sm={wid > 555 ? true : false}
-                          big={wid > 555 ? true : false}
-                          pink={true}
-                          word={skill}
-                        />
-                      </p>
-                    {/each}
-                  </div>
-                {/if}
-              {:else if page.data.isDesktop}
-                <div
-                  class="border border-gold flex w-full lg:p-4 flex-row justify-center align-middle p-2"
-                >
-                  <SkillSelector
-                    bind:selectedSkills={miData[0].selectedSkills}
-                    placeholder={mf.skillsPlaceholder}
-                    autoCreate={true}
-                  />
-                </div>
-              {:else}
-                <MobileModal
-                  onClose={() => (ske = false)}
-                  bind:isOpen={ske}
-                  title={mf.skillsPlaceholder}
-                >
-                  <div
-                    class="border border-gold flex flex-row lg:p-4 flex-wrap justify-center align-middle p-2"
-                  >
-                    <SkillSelector
-                      bind:selectedSkills={miData[0].selectedSkills}
-                      placeholder={mf.skillsPlaceholder}
-                      autoCreate={true}
-                    />
-                    <button onclick={() => (ske = false)}><Done /></button>
-                  </div>
-                </MobileModal>
-              {/if}
-            </div>
-            <div class="my-2">
-              <mark class="text-sm text-barbi lg:text-2xl"
-                >{mf.roleDefinition}</mark
-              >
-              <button onclick={() => (roleE = !roleE)}
-                >{#if roleE}<Done />{:else}<EditIcon />{/if}</button
-              >
-              {#if !roleE}
-                {#if miData[0].selectedRoles.length > 0}
-                  <div
-                    class="border border-gold flex flex-row lg:p-4 flex-wrap justify-center align-middle d cd p-2"
-                  >
-                    {#each miData[0].selectedRoles as rol}
-                      <p
-                        onmouseenter={() => hover(mf.requestedRole)}
-                        onmouseleave={() => hover('0')}
-                        class="m-0"
-                        style="text-shadow:none;"
-                      >
-                        <Tile
-                          sm={wid > 555 ? true : false}
-                          big={wid > 555 ? true : false}
-                          word={rol}
-                          wow={true}
-                        />
-                      </p>
-                    {/each}
-                  </div>
-                {/if}
-              {:else if page.data.isDesktop}
-                <div
-                  class="border border-gold flex flex-row lg:p-4 flex-wrap justify-center align-middle p-2"
-                >
-                  <MultiSelect
-                    outerDivClass="!bg-gold !text-barbi"
-                    inputClass="!bg-gold !text-barbi"
-                    liSelectedClass="!bg-barbi !text-gold"
-                    --sms-open-z-index={10000}
-                    loading={newcontentR}
-                    bind:selected={miData[0].selectedRoles}
-                    onchange={() => (miData = miData)}
-                    onadd={(event) => console.log(event)}
-                    placeholder={mf.rolePlaceholder}
-                    options={$role.map((c) => c.attributes.roleDescription)}
-                  />
-                  <Addnewro mid={miData[0].id} onAddnewrole={addnewrole} />
-                </div>
-              {:else}
-                <MobileModal
-                  onClose={() => (roleE = false)}
-                  bind:isOpen={roleE}
-                  title={mf.rolePlaceholder}
-                >
-                  <div
-                    class="border border-gold flex flex-row lg:p-4 flex-wrap justify-center align-middle p-2"
-                  >
-                    <MultiSelect
-                      outerDivClass="!bg-gold !text-barbi"
-                      inputClass="!bg-gold !text-barbi"
-                      liSelectedClass="!bg-barbi !text-gold"
-                      --sms-open-z-index={10000}
-                      loading={newcontentR}
-                      bind:selected={miData[0].selectedRoles}
-                      onchange={() => (miData = miData)}
-                      onadd={(event) => console.log(event)}
-                      placeholder={mf.rolePlaceholder}
-                      options={$role.map((c) => c.attributes.roleDescription)}
-                    />
-                    <Addnewro mid={miData[0].id} onAddnewrole={addnewrole} />
-                    <button onclick={() => (roleE = false)}><Done /></button>
-                  </div>
-                </MobileModal>
-              {/if}
-            </div>
-            <div class="my-2">
-              <mark class="text-sm lg:text-2xl text-barbi">{mf.workways}</mark>
-              <button onclick={() => (wwe = !wwe)}
-                >{#if wwe}<Done />{:else}<EditIcon />{/if}</button
-              >
-              {#if !wwe}
-                {#if miData[0].selectedWorkways.length > 0}
-                  <div
-                    class="border border-gold flex sm:flex-row flex-wrap lg:p-4 justify-center align-middle d cd p-2"
-                  >
-                    {#each miData[0].selectedWorkways as rol}
-                      <p
-                        onmouseenter={() => hover(mf.requestedWorkways)}
-                        onmouseleave={() => hover('0')}
-                        class="m-0"
-                        style="text-shadow:none;"
-                      >
-                        <Tile
-                          bg="gold"
-                          sm={wid > 555 ? true : false}
-                          big={wid > 555 ? true : false}
-                          word={rol}
-                        />
-                      </p>
-                    {/each}
-                  </div>
-                {/if}
-              {:else if page.data.isDesktop}
-                <div
-                  class="border border-gold flex flex-row lg:p-4 flex-wrap justify-center align-middle p-2"
-                >
-                  <MultiSelect
-                    outerDivClass="!bg-gold !text-barbi"
-                    inputClass="!bg-gold !text-barbi"
-                    liSelectedClass="!bg-barbi !text-gold"
-                    --sms-open-z-index={10000}
-                    createOptionMsg={addn}
-                    allowUserOptions={true}
-                    bind:searchText
-                    loading={newcontentW}
-                    bind:selected={miData[0].selectedWorkways}
-                    placeholder={mf.missionType}
-                    options={$ww.map((c) => c.attributes.workWayName)}
-                    onchange={(e) => {
-                      addW(miData[0].selectedWorkways, miData[0].id, e);
-                    }}
-                  />
-                </div>
-              {:else}
-                <MobileModal
-                  onClose={() => (wwe = false)}
-                  bind:isOpen={wwe}
-                  title={mf.missionType}
-                >
-                  <div
-                    class="border border-gold flex flex-row lg:p-4 flex-wrap justify-center align-middle p-2"
-                  >
-                    <MultiSelect
-                      outerDivClass="!bg-gold !text-barbi"
-                      inputClass="!bg-gold !text-barbi"
-                      liSelectedClass="!bg-barbi !text-gold"
-                      --sms-open-z-index={10000}
-                      createOptionMsg={addn}
-                      allowUserOptions={true}
-                      bind:searchText
-                      loading={newcontentW}
-                      bind:selected={miData[0].selectedWorkways}
-                      placeholder={mf.missionType}
-                      options={$ww.map((c) => c.attributes.workWayName)}
-                      onchange={(e) => {
-                        addW(miData[0].selectedWorkways, miData[0].id, e);
+                    <PlusIcon size={15} aria-hidden="true" />
+                    {$trans('mission.form2.addTask')}
+                  </button>
+                  {#if miData[0].checklist?.length > 1}
+                    <button
+                      type="button"
+                      class={ghost}
+                      onclick={() => {
+                        dialog = 3;
+                        misid = miData[0].id;
+                        itemid = -1;
+                        isOpen = true;
                       }}
-                    />
-                    <button onclick={() => (wwe = false)}><Done /></button>
-                  </div>
-                </MobileModal>
-              {/if}
-            </div>
-            <div>
-              {#if assignE}
+                    >
+                      <Maximize2 size={15} aria-hidden="true" />
+                      {$trans('mission.form2.seeAllTasks')}
+                    </button>
+                  {/if}
+                </div>
+              </div>
+            </OptionRow>
+
+            {#if !specMode && !publishMode}
+              <OptionRow icon={UserPlus} title={$trans('mission.form2.assign')} status={assignStatus} bind:open={assignE}>
+                <p class="m-0 mb-2 text-sm text-[#6b5560]">{$trans('mission.assingHelp')}</p>
                 {#if userslength > 1}
-                  <mark>{$trans('mission.assingTo')}</mark>
-                  <p>{$trans('mission.assingHelp')}</p>
                   <MultiSelect
-                    outerDivClass="!bg-gold !text-barbi"
-                    inputClass="!bg-gold !text-barbi"
-                    liSelectedClass="!bg-barbi !text-gold"
+                    outerDivClass="!min-h-[52px] !rounded-xl !border-[1.5px] !border-[#e4d9c4] !bg-white !text-[#2a1420]"
+                    inputClass="!bg-transparent !text-[#2a1420]"
+                    liSelectedClass="!rounded-full !bg-[#fdeef4] !text-[#a3124e]"
                     --sms-open-z-index={10000}
                     bind:selected={miData[0].rishoni}
                     placeholder={mf.searchUser}
@@ -1791,159 +1845,145 @@
                     maxSelect={1}
                     onchange={function () {
                       miData[0].rishon = find_user_id(miData[0].rishoni);
-                      miData[0].myM = true;
+                      miData[0].myM = miData[0].rishoni?.length > 0;
                     }}
                   />
                 {:else}
-                  <mark>{$trans('mission.assingToMe')}</mark>
-                  <p>{$trans('mission.assingHelp')}</p>
-                  <input
-                    bind:checked={miData[0].myM}
-                    type="checkbox"
-                    id="tomeC"
-                    name="tome"
-                    value="tome"
-                    onclick={() => {
-                      miData[0].rishon = 'self';
-                      inviteNew = false;
-                    }}
-                  />
-                  <label for="tome">{$trans('mission.assingToMe')}</label>
-                {/if}
-                {#if canInvite}
-                  <div class="mt-3 rounded-lg border border-gold/40 p-3">
+                  <label for="tomeC" class="flex min-h-11 cursor-pointer items-center gap-3">
                     <input
-                      bind:checked={inviteNew}
+                      bind:checked={miData[0].myM}
                       type="checkbox"
-                      id="inviteNewC"
-                      onchange={() => {
-                        if (inviteNew) miData[0].myM = false;
+                      id="tomeC"
+                      name="tome"
+                      value="tome"
+                      class="h-5 w-5 accent-[#c8155f]"
+                      onclick={() => {
+                        miData[0].rishon = 'self';
+                        inviteNew = false;
                       }}
                     />
-                    <label for="inviteNewC" class="font-semibold">{$trans('mission.invite.optionLabel')}</label>
-                    <p class="text-sm opacity-80">{$trans('mission.invite.help')}</p>
-                    {#if inviteNew}
-                      <input
-                        bind:value={inviteEmail}
-                        type="email"
-                        inputmode="email"
-                        autocomplete="off"
-                        dir="ltr"
-                        class="mt-2 w-full rounded-lg border border-gold/50 bg-white/90 px-3 py-2 text-barbi"
-                        placeholder={$trans('mission.invite.emailPlaceholder')}
-                        aria-label={$trans('mission.invite.emailPlaceholder')}
-                      />
-                    {/if}
-                  </div>
+                    <span class="font-medium">{$trans('mission.form2.assignSelfTitle')}</span>
+                  </label>
                 {/if}
-                <button
-                  title={$trans('mission.assingTo') +
-                    ' ' +
-                    $trans('mission.assingHelp')}
-                  onclick={() => (assignE = !assignE)}
-                  class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
-                  ><Done /></button
-                >
-              {/if}
-            </div>
-            <div>
-              {#if publinkE}
-                <mark>{$trans('mission.publicLinks')}</mark>
-                <TextInput
-                  bind:text={miData[0].publicklinks}
-                  lebel={$trans('mission.publicLinks')}
-                />
-                <button
-                  onclick={() => (publinkE = !publinkE)}
-                  class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
-                  title={$trans('mission.publicLinks')}><Done /></button
-                >
-              {/if}
-            </div>
-            <div>
-              {#if mislinkE}
-                <mark>{$trans('mission.linkToMission')}</mark>
-                <TextInput
-                  bind:text={miData[0].privatlinks}
-                  lebel={$trans('mission.linkToMission')}
-                />
-                <button
-                  onclick={() => (mislinkE = !mislinkE)}
-                  class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
-                  title={$trans('mission.linkToMission')}><Done /></button
-                >
-              {/if}
-            </div>
-            <div>
-              {#if shiftE && shiftsOn}
-                <!-- A staffing plan travels with the mission and is approved in
-                     the same vote (PLAN_SHIFTS §9.5, §13.6). -->
+              </OptionRow>
+            {/if}
+
+            {#if canInvite}
+              <OptionRow
+                icon={Mail}
+                title={$trans('mission.form2.invite')}
+                status={inviteNew && inviteEmail.trim() ? inviteEmail.trim() : $trans('mission.form2.inviteStatus')}
+                bind:open={inviteOpen}
+              >
+                <label for="inviteNewC" class="flex min-h-11 cursor-pointer items-center gap-3">
+                  <input
+                    bind:checked={inviteNew}
+                    type="checkbox"
+                    id="inviteNewC"
+                    class="h-5 w-5 accent-[#c8155f]"
+                    onchange={() => {
+                      if (inviteNew) miData[0].myM = false;
+                    }}
+                  />
+                  <span class="font-semibold">{$trans('mission.invite.optionLabel')}</span>
+                </label>
+                <p class="m-0 text-sm text-[#6b5560]">{$trans('mission.invite.help')}</p>
+                {#if inviteNew}
+                  <input
+                    bind:value={inviteEmail}
+                    type="email"
+                    inputmode="email"
+                    autocomplete="off"
+                    dir="ltr"
+                    class="{inp} mt-2"
+                    placeholder={$trans('mission.invite.emailPlaceholder')}
+                    aria-label={$trans('mission.invite.emailPlaceholder')}
+                  />
+                {/if}
+              </OptionRow>
+            {/if}
+
+            <OptionRow icon={LinkLucide} title={$trans('mission.form2.links')} status={linksStatus} bind:open={publinkE}>
+              <div class="flex flex-col gap-3">
+                <TextInput bind:text={miData[0].publicklinks} lebel={$trans('mission.publicLinks')} />
+                <TextInput bind:text={miData[0].privatlinks} lebel={$trans('mission.linkToMission')} />
+              </div>
+            </OptionRow>
+
+            {#if shiftsOn && inProject}
+              <!-- A staffing plan travels with the mission and is approved in
+                   the same vote (PLAN_SHIFTS §9.5, §13.6). -->
+              <OptionRow
+                icon={Clock}
+                title={$trans('mission.form2.shifts')}
+                status={shiftPlan.enabled ? $trans('mission.form2.shiftsOn') : $trans('mission.form2.shiftsStatus')}
+                bind:open={shiftE}
+              >
                 <ShiftPlanForm
                   bind:value={shiftPlan}
                   onHeadcount={(n) => {
                     miData[0].howMeny = n;
                   }}
                 />
-                <button
-                  onclick={() => (shiftE = !shiftE)}
-                  class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
-                  title={$trans('shifts.form.enable')}><Done /></button
-                >
-              {/if}
-            </div>
-            <div
-              class="flex flex-row items-center justify-start my-4 space-x-3"
-            >
-              {#if !publinkE}
-                <button
-                  onclick={() => (publinkE = !publinkE)}
-                  class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
-                  title={$trans('mission.publicLinks')}><LinkIcon /></button
-                >{/if}
-              {#if !assignE && !specMode && !publishMode}<button
-                  title={$trans('mission.assingTo') +
-                    ' ' +
-                    $trans('mission.assingHelp')}
-                  onclick={() => (assignE = !assignE)}
-                  class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
-                  ><AddPerson /></button
-                >{/if}
-              {#if !mislinkE}<button
-                  onclick={() => (mislinkE = !mislinkE)}
-                  class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
-                  title={$trans('mission.linkToMission')}
-                  ><LinkToIcon /></button
-                >{/if}
-              {#if !shiftE && shiftsOn && projectId && !specMode && !publishMode}
-                <button
-                  onclick={() => (shiftE = !shiftE)}
-                  class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
-                  title={$trans('shifts.form.enable')}><ShiftsIcon /></button
-                >{/if}
-            </div>
-            <div class="flex flex-row flex-wrap items-center justify-end gap-3">
-              {#if specMode || publishMode}
-                <button
-                  type="button"
-                  onclick={() => onClose?.()}
-                  class="rounded-xl border border-gold/60 px-4 py-2 text-sm text-barbi hover:bg-pink-950/30 transition-all"
-                >
-                  {$trans('mission.ai.cancel')}
-                </button>
-              {/if}
-              <Button
-                text={publishMode ? $trans('common.buttons.publishToCommunity') : mf.publish}
-                onClick={increment}
-                {loading}
-                {success}
-                {error}
-              />
-            </div>
+              </OptionRow>
+            {/if}
           </div>
-        </div>
-      </div>
+        </FormSection>
+      {/if}
     </div>
+
+    <!-- SUMMARY + publish (desktop): stays in view while the form scrolls. -->
+    <aside class="hidden lg:sticky lg:top-4 lg:block lg:w-[340px] lg:flex-none">
+      <MissionSummary
+        heading={$trans('mission.form2.summary')}
+        name={miData[0].missionName}
+        meta={summaryMeta}
+        valueLabel={$trans('mission.form2.missionValue')}
+        total={totalText}
+        formula={formulaText}
+        {checks}
+        note={consentNote}
+      >
+        {#snippet actions()}
+          {@render publishActions()}
+        {/snippet}
+      </MissionSummary>
+    </aside>
   </div>
+
+  <!-- SUMMARY + publish (phone / tablet), at the end of the form -->
+  <div class="mt-5 lg:hidden">
+    <MissionSummary
+      wide
+      heading={$trans('mission.form2.summary')}
+      name={miData[0].missionName}
+      meta={summaryMeta}
+      valueLabel={$trans('mission.form2.missionValue')}
+      total={totalText}
+      formula={formulaText}
+      {checks}
+      note={consentNote}
+    >
+      {#snippet actions()}
+        {@render publishActions()}
+      {/snippet}
+    </MissionSummary>
+  </div>
+
+  <!-- Publish bar (phone / tablet): above the app's bottom nav, or at the
+       very bottom in full-screen mode where the nav is covered. -->
+  <div
+    class="sticky z-10 mt-4 flex items-center gap-3 rounded-2xl border border-[#eee2a6] bg-[#fffdf7] p-3 shadow-[0_-6px_30px_rgba(0,0,0,.18)] lg:hidden {fullscreen
+      ? 'bottom-2'
+      : 'bottom-24'}"
+  >
+    <div class="min-w-0 flex-1">
+      <strong class="block truncate text-xl font-extrabold text-[#c8155f]" dir="auto">{totalText}</strong>
+      <span class="block truncate text-xs text-[#6b5560]" dir="auto">{formulaText}</span>
+    </div>
+    {@render publishActions()}
+  </div>
+</div>
 </div>
 
 {#if inviteResult}

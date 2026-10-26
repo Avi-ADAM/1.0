@@ -697,7 +697,8 @@
 
   <!-- פורמים — עם כפתור חזרה -->
   {#if addM || openMS || addN || openMA || addAct || addProduct || createMode === 'process'}
-    <div class="max-w-4xl mx-auto">
+    <!-- The mission form has its own two-column layout, so it gets the wider column. -->
+    <div class="{addM ? 'max-w-6xl' : 'max-w-4xl'} mx-auto">
       <button
         onclick={handleBack}
         class="mb-6 flex items-center gap-2 text-[color:var(--goldink,#8a6a15)] hover:text-barbi hover:underline"
@@ -741,8 +742,8 @@
         </div>
       {/if}
       {#if addM}
-        <div class="m-4 border-2 border-barbi rounded bg-white/80 backdrop-blur-sm shadow-xl">
-          <div class="p-2 flex justify-end">
+        <div class="mx-2 my-4 sm:mx-4 rounded-2xl border border-barbi/30 bg-[#f4efe6] px-3 pb-4 sm:px-5 shadow-xl">
+          <div class="pt-2 flex justify-end">
             <button
               onclick={closeM}
               aria-label={$t('moach.create.back')}
@@ -788,6 +789,8 @@
         <div class="m-4 border-2 border-barbi rounded bg-white/80 backdrop-blur-sm shadow-xl p-6">
           <ResourceCreator
             {projectId}
+            memberCount={projectBase ? projectUsers.length : null}
+            projectName={pn}
             initialSpec={resourcePrefill}
             onCreated={handleResourceCreated}
             onCancel={() => {

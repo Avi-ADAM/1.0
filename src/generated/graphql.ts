@@ -13860,6 +13860,7 @@ export type PgishaRelationResponseCollection = {
 export type Pgishauser = {
   __typename?: 'Pgishauser';
   available?: Maybe<Scalars['Boolean']['output']>;
+  availableUntil?: Maybe<Scalars['DateTime']['output']>;
   createdAt?: Maybe<Scalars['DateTime']['output']>;
   pgishas?: Maybe<PgishaRelationResponseCollection>;
   publishedAt?: Maybe<Scalars['DateTime']['output']>;
@@ -13897,6 +13898,7 @@ export type PgishauserEntityResponseCollection = {
 export type PgishauserFiltersInput = {
   and?: InputMaybe<Array<InputMaybe<PgishauserFiltersInput>>>;
   available?: InputMaybe<BooleanFilterInput>;
+  availableUntil?: InputMaybe<DateTimeFilterInput>;
   createdAt?: InputMaybe<DateTimeFilterInput>;
   id?: InputMaybe<IdFilterInput>;
   not?: InputMaybe<PgishauserFiltersInput>;
@@ -13911,6 +13913,7 @@ export type PgishauserFiltersInput = {
 
 export type PgishauserInput = {
   available?: InputMaybe<Scalars['Boolean']['input']>;
+  availableUntil?: InputMaybe<Scalars['DateTime']['input']>;
   pgishas?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   publishedAt?: InputMaybe<Scalars['DateTime']['input']>;
   readyForStart?: InputMaybe<Scalars['Boolean']['input']>;

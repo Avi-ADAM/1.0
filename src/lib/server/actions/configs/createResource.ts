@@ -13,6 +13,11 @@
 import { noticeSubject } from '$lib/notices/links';
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { matchOpenMashaabimToUsers } from '$lib/server/matching/engine';
+import {
+  inviteToOpenResource,
+  normalizeInviteEmail,
+  type MissionInviteOutcome
+} from '$lib/server/invites/missionInvite.js';
 import { restimeLabel, voteUrl } from './actionUtils.js';
 import { STRAPI_GRAPHQL } from '$lib/server/strapiUrl.js';
 import { ENTRY_CURRENCY_PARAM, entryFields, normalizeEntry } from '$lib/server/money/normalizeEntry.js';
@@ -150,8 +155,20 @@ const createResourceHandler: ActionExecutionHandler = async (params, context, { 
     lat,
     lng,
     radius,
-    location_hint
+    location_hint,
+    // "Invite someone new to this resource" (PLAN_INVITE_PARTNER_TO_MISSION):
+    // the resource stays open; the invitee offers it and the rikma approves as
+    // usual. `{ email? }` — without an email it is a link-only invite.
+    invite
   } = params;
+
+  // Checked before anything is written, so a bad address cannot leave a
+  // resource behind whose invite was silently lost.
+  const wantsInvite = invite != null && typeof invite === 'object';
+  const inviteEmail = wantsInvite ? normalizeInviteEmail((invite as any).email) : undefined;
+  if (wantsInvite && isAssigned) {
+    throw new Error('A resource with an invite is open — it cannot also be self-assigned');
+  }
 
   if ((kindOf === 'monthly' || kindOf === 'yearly') && !startDate) {
     throw new Error('Start date is required for monthly and yearly resources');
@@ -216,6 +233,14 @@ const createResourceHandler: ActionExecutionHandler = async (params, context, { 
   const effectiveRestime: string = (restime as string) || projAttrs.restime || 'feh';
 
   const isPmash = userCount > 1;
+
+  // A multi-member rikma votes on the resource first, and inviting someone to
+  // a resource it has not approved would be acting for it. Until the invite can
+  // wait on the vote (plan phase 2), only a solo rikma can invite here.
+  if (wantsInvite && isPmash) {
+    throw new Error('Inviting from the resource form is available in a one-member rikma for now');
+  }
+
   const operationName = isPmash ? 'createPmash' : 'createOpenMashaabim';
   const typeName      = isPmash ? 'Pmash'       : 'OpenMashaabim';
 
@@ -287,12 +312,27 @@ const createResourceHandler: ActionExecutionHandler = async (params, context, { 
 
   // Open (unclaimed) resource request → tag users who offer this mashaabim
   // with a match-suggestion and notify them by email.
+  let inviteOutcome: MissionInviteOutcome | null = null;
   if (!isPmash && !isAssigned) {
     await matchOpenMashaabimToUsers(String(createdId), 'resourceCreated', {
       strapi,
       fetch: context.fetch,
       lang: context.lang
     });
+
+    if (wantsInvite) {
+      inviteOutcome = await inviteToOpenResource(
+        {
+          projectId: String(projectId),
+          projectName,
+          openMashaabimId: String(createdId),
+          resourceName: name,
+          inviterId: String(userId),
+          email: inviteEmail
+        },
+        { strapi, fetch: context.fetch, lang: context.lang }
+      );
+    }
   }
 
   // ── 3b. Recurring expense engine (monthly / yearly) ──────────────────────
@@ -654,7 +694,7 @@ const createResourceHandler: ActionExecutionHandler = async (params, context, { 
   }
 
   // `createdKind` says which entity `id` is — the realtime scopes need it.
-  return { ...createdRecord, createdKind: typeName };
+  return { ...createdRecord, createdKind: typeName, ...(inviteOutcome ? { invite: inviteOutcome } : {}) };
 };
 
 export const createResourceAction: ActionConfig = {
@@ -778,6 +818,11 @@ export const createResourceAction: ActionConfig = {
       type: 'string',
       required: false,
       description: 'Response time string for Timegrama deadline calculation (e.g. "7d", "2h")'
+    },
+    invite: {
+      type: 'object',
+      required: false,
+      description: 'Invite someone new to this open resource: { email? }. Solo rikma only for now; returns invite { result, link }. Cannot be combined with isAssigned — docs/inprogress/PLAN_INVITE_PARTNER_TO_MISSION.md'
     }
   },
   

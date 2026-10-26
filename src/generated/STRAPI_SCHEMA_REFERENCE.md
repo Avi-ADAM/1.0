@@ -2090,6 +2090,7 @@ These are the main content types in the Strapi backend.
 | Field | Type |
 |-------|------|
 | `available` | `Maybe<Scalars['Boolean']['output']>` |
+| `availableUntil` | `Maybe<Scalars['DateTime']['output']>` |
 | `createdAt` | `Maybe<Scalars['DateTime']['output']>` |
 | `pgishas` | `Maybe<PgishaRelationResponseCollection>` |
 | `publishedAt` | `Maybe<Scalars['DateTime']['output']>` |

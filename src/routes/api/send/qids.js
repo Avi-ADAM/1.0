@@ -740,9 +740,26 @@ const qids_base = {
   '21createMission': `mutation CreateMission($descrip: String, $missionName: String, $publishedAt: DateTime, $skills: [ID], $tafkidims: [ID]) {
   createMission(data: {descrip: $descrip, missionName: $missionName, publishedAt: $publishedAt, skills: $skills, tafkidims: $tafkidims}) {data{id}}
   }`,
-  '22setOnline': `mutation SetOnline($id:ID!,$online:Boolean) {
-    updatePgishauser(id: $id, data: {available: $online}){
-      data{id attributes{available}}}
+  '22setOnline': `mutation SetOnline($id:ID!,$online:Boolean,$until:DateTime) {
+    updatePgishauser(id: $id, data: {available: $online, availableUntil: $until}){
+      data{id attributes{available availableUntil}}}
+  }`,
+  // Availability rows to sweep: on and past their availableUntil, or on with
+  // none at all (set before the auto-off existed). Read by /api/cron/availability.
+  'availabilityToExpire': `query AvailabilityToExpire($now: DateTime!) {
+    pgishausers(
+      filters: { available: { eq: true }, or: [{ availableUntil: { lte: $now } }, { availableUntil: { null: true } }] }
+      pagination: { limit: 500 }
+    ) {
+      data {
+        id
+        attributes {
+          availableUntil
+          users_permissions_user { data { id attributes { lang } } }
+          pgishas { data { id } }
+        }
+      }
+    }
   }`,
   "23myUserMeeting": `query GetMyUserMeeting($id: ID!) {
     pgishausers(filters: {users_permissions_user: {id: {eq: $id}}}) {
@@ -750,6 +767,7 @@ const qids_base = {
         id
         attributes {
           available
+          availableUntil
           readyForStart
           uid
           users_permissions_user {

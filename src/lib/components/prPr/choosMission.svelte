@@ -142,7 +142,7 @@ function closeMobileModal() {
 </script>
 
 <div dir="{$isRtl ? 'rtl' : 'ltr'}" >
-  {#if children}{@render children()}{:else}
+  {#if children}{@render children()}{:else if before}
 <h2 class="text-barbi font-bold">{$t('project.choosMission.head')}</h2>
   {/if}
             {#if before}

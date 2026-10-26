@@ -276,7 +276,7 @@
   />
   <MoachTour steps={tourSteps} bind:open={tourOpen} />
   <div
-    class="moach-layout min-h-screen text-barbi text-center overflow-y-auto scroll-smooth"
+    class="moach-layout min-h-screen text-barbi text-center overflow-x-clip scroll-smooth"
   >
     <div
       class="alli bg-[radial-gradient(circle_at_50%,theme(colors.slate.400),theme(colors.slate.500)_10%,theme(colors.slate.600)_20%,theme(colors.slate.800),theme(colors.slate.900),#19031d)]"

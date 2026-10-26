@@ -4836,6 +4836,7 @@ export interface ApiPgishauserPgishauser extends Schema.CollectionType {
       'plugin::users-permissions.user'
     >;
     readyForStart: Attribute.Boolean;
+    availableUntil: Attribute.DateTime;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;

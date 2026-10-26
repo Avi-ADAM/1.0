@@ -15,12 +15,16 @@
   import NumberInput from '$lib/celim/ui/numberInput.svelte';
   import LocationPicker from '$lib/components/location/LocationPicker.svelte';
   import EquityPreview from '$lib/components/equity/EquityPreview.svelte';
+  import InviteResultCard from '$lib/components/prPr/InviteResultCard.svelte';
   import moment from 'moment';
 
   /**
    * @typedef {Object} Props
    * @property {string} [projectId]
    * @property {number} [userslength]   - מספר חברי הפרויקט (1 = משתמש יחיד)
+   * @property {number|null} [memberCount] - מספר החברים בפועל, להזמנת שותף חדש
+   *                                      (PLAN_INVITE_PARTNER_TO_MISSION). לא ידוע = האפשרות מוסתרת.
+   * @property {string} [projectName]    - שם הרקמה, להודעת השיתוף של ההזמנה
    * @property {string} [restime]       - זמן תגובה לחישוב Timegrama (לדוגמה: "7d")
    * @property {boolean} [specMode]     - מצב "ספק" (PLAN_CONCIERGE §5.3): הלקוחה מנסחת מפרט משאב
    *                                      ולא יוצרת רשומה — handleSubmit מחזיר את המפרט ל-onSpec.
@@ -31,7 +35,7 @@
    *                                      כדי שהקורא יפרסם openMashaabim. תאימות לאחור: פעיל רק
    *                                      כשמוזרק onPublish/publishMode.
    * @property {(payload: {name:string, descrip:string, price:number, easy:number, kindOf:string, quantity:number, recurring:boolean, cycleSize:number|null, linkto:string, spnot:string, mashaabimId:string|null, startDate:string|null, endDate:string|null, isOnline:boolean, lat:number|null, lng:number|null, radius:number|null, location_hint:string|null}) => void} [onPublish]
-   * @property {() => void} [onCreated]
+   * @property {(created?: any) => void} [onCreated] - receives the created record
    * @property {() => void} [onCancel]
    * @property {{name?:string, descrip?:string, price?:number, quantity?:number, kindOf?:string}|null} [initialSpec]
    *   - פרה-מילוי: מצב specMode (עריכת מפרט קונסיירז') וגם שורת `resource` מלוח תכנון.
@@ -41,6 +45,8 @@
   let {
     projectId = '',
     userslength = 1,
+    memberCount = null,
+    projectName = '',
     restime = '',
     specMode = false,
     onSpec,
@@ -105,6 +111,17 @@
   let selectedSpName = $state([]); // MultiSelect
   let createNewSp = $state(false); // יצירת Sp חדש
   let loadingSpOptions = $state(false);
+
+  // "Invite someone new" (PLAN_INVITE_PARTNER_TO_MISSION, decision 3): a solo
+  // rikma only — a larger one votes on the resource before it is open. Keyed on
+  // the real member count, not `userslength`, whose default of 1 keeps the
+  // self-assign box on for callers that never pass it.
+  const canInvite = $derived(!!projectId && !specMode && !publishMode && memberCount === 1);
+  let inviteNew = $state(false);
+  let inviteEmail = $state('');
+  let inviteResult = $state(null);
+  let inviteCreated = null;
+  const INVITE_EMAIL_SHAPE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   // derived: ID של Sp נבחר קיים
   let selectedSpId = $derived(
@@ -362,6 +379,7 @@
   function toggleSelfAssign() {
     isSelfAssigned = !isSelfAssigned;
     if (isSelfAssigned) {
+      inviteNew = false;
       loadSpOptions();
     } else {
       // ביטול השמה – איפוס
@@ -430,11 +448,19 @@
       return;
     }
 
+    const inviting = canInvite && inviteNew && !isSelfAssigned;
+    const inviteAddress = inviteEmail.trim();
+    if (inviting && inviteAddress && !INVITE_EMAIL_SHAPE.test(inviteAddress)) {
+      toast.warning($t('mission.invite.invalidEmail'));
+      return;
+    }
+
     isSubmitting = true;
     try {
       const selectedTemplate = findResourceTemplateByName(name);
 
       const result = await createResource({
+        invite: inviting ? (inviteAddress ? { email: inviteAddress } : {}) : undefined,
         projectId,
         name,
         description,
@@ -471,6 +497,13 @@
 
       if (result.success) {
         toast.success($t('project.resourceCreator.success'));
+        // With an invite the form stays up until the inviter has the link in
+        // hand — closing first would lose the one thing they came here to send.
+        if (result.data?.invite?.link) {
+          inviteResult = result.data.invite;
+          inviteCreated = result.data;
+          return;
+        }
         // Forward the created record so callers (e.g. AcceptWishOffer) can link
         // it. Existing no-arg callers are unaffected.
         onCreated?.(result.data);
@@ -851,6 +884,38 @@
         </div>
       {/if}
 
+      <!-- הזמנת שותף חדש — רקמה של חבר יחיד בלבד (PLAN_INVITE_PARTNER_TO_MISSION) -->
+      {#if canInvite}
+        <div class="rounded-2xl border border-gold bg-pink-950/20 backdrop-blur-sm p-4 space-y-2">
+          <label class="flex items-start gap-2 cursor-pointer">
+            <input
+              bind:checked={inviteNew}
+              type="checkbox"
+              class="mt-1"
+              onchange={() => {
+                if (inviteNew && isSelfAssigned) toggleSelfAssign();
+              }}
+            />
+            <span>
+              <span class="block text-sm font-semibold text-barbie/80">{$t('mission.invite.resourceOptionLabel')}</span>
+              <span class="block text-xs text-barbie/90 mt-0.5">{$t('mission.invite.resourceHelp')}</span>
+            </span>
+          </label>
+          {#if inviteNew}
+            <input
+              bind:value={inviteEmail}
+              type="email"
+              inputmode="email"
+              autocomplete="off"
+              dir="ltr"
+              class="w-full rounded-xl border border-gold bg-white/90 px-3 py-2 text-barbi"
+              placeholder={$t('mission.invite.emailPlaceholder')}
+              aria-label={$t('mission.invite.emailPlaceholder')}
+            />
+          {/if}
+        </div>
+      {/if}
+
       <!-- סיכום עלות -->
       <div
         class="summary-box mt-4 rounded-2xl border border-gold-500/40 bg-pink-950/20 backdrop-blur-sm p-4 space-y-3 shadow-lg"
@@ -909,6 +974,21 @@
     </div>
   {/if}
 </div>
+
+{#if inviteResult}
+  <InviteResultCard
+    invite={inviteResult}
+    kind="resource"
+    missionName={name}
+    {projectName}
+    onDone={() => {
+      const created = inviteCreated;
+      inviteResult = null;
+      inviteCreated = null;
+      onCreated?.(created);
+    }}
+  />
+{/if}
 
 <style>
   :global(.svelte-multiselect) {

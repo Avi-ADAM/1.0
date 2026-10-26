@@ -191,6 +191,7 @@ export const qidsAccess = {
   '21createMission': { allow: ['user', 'serviceAdmin'] },
   '22setOnline': { allow: ['user', 'serviceAdmin'] },
   '23myUserMeeting': { allow: ['user', 'serviceAdmin'] },
+  'availabilityToExpire': { allow: ['serviceAdmin'] },
   '24userJSONQue': { allow: ['user', 'serviceAdmin'] },
   '25UserArr1': { allow: ['serviceAdmin'] }, // unreferenced in codebase (2026-07-18) — tightened to serviceAdmin-only
   '26addUserArr1': { allow: ['serviceAdmin'] }, // unreferenced in codebase (2026-07-18) — tightened to serviceAdmin-only

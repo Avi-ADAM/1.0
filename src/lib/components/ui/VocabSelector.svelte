@@ -30,7 +30,11 @@
     color = '--gold',
     autoCreate = true,
     onadd = undefined,
-    onremove = undefined
+    onremove = undefined,
+    // Optional look overrides; the defaults are the original gold style.
+    outerDivClass = '!bg-gold !text-barbi w-full',
+    inputClass = '!bg-gold !text-barbi w-full',
+    liSelectedClass = '!bg-barbi !text-gold'
   } = $props();
 
   const meta = VOCAB_KINDS[kind];
@@ -250,9 +254,9 @@
   style="--the:var({color});"
 >
   <MultiSelect
-    outerDivClass="!bg-gold !text-barbi w-full"
-    inputClass="!bg-gold !text-barbi w-full"
-    liSelectedClass="!bg-barbi !text-gold"
+    {outerDivClass}
+    {inputClass}
+    {liSelectedClass}
     --sms-width="100%"
     createOptionMsg={searchText ? addnMsg : '...'}
     allowUserOptions="append"

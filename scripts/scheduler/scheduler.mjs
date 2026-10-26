@@ -222,6 +222,23 @@ const JOBS = [
     }
   },
   {
+    name: 'availability',
+    description: 'meeting availability — switch off members past their availableUntil',
+    // Someone who marked themselves free and forgot keeps meetings being set up
+    // around them, so the switch-off has to land close to the time they chose.
+    // Idempotent: a row already off is not in the query.
+    path: CRON_SECRET
+      ? `/api/cron/availability?key=${encodeURIComponent(CRON_SECRET)}`
+      : '/api/cron/availability',
+    timeoutMs: num('SCHEDULER_AVAILABILITY_TIMEOUT_SECONDS', 120) * 1000,
+    due(now, state) {
+      const every = num('SCHEDULER_AVAILABILITY_MINUTES', 5) * 60 * 1000;
+      if (!state.lastSuccess) return 'never run on this box';
+      const since = now.getTime() - Date.parse(state.lastSuccess);
+      return since >= every ? `${Math.round(since / 60000)}m since the last run` : null;
+    }
+  },
+  {
     name: 'orders',
     description: 'arranged-payment orders — cancel the ones past expiresAt',
     // PLAN_SHOP_OPERATIONS. A `pendingPayment` order past its `expiresAt` is

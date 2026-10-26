@@ -172,14 +172,33 @@ call it from both.
   `invited_by` attribution, and a small counter on the inviter's lev page
   ("3 people joined through you").
 
-## Open decisions
-1. Open-with-invite (this plan) vs. a *reserved* mission that others can't take
-   for N hours. Reserved is stronger for the invitee but needs a new consent
-   rule; recommend starting open.
-2. Phone number instead of email for unregistered invitees — only useful with
-   an SMS/WhatsApp sender; the copy-link button covers it for now.
-3. Same affordance on the resource form (`open_mashaabim`)? The engine already
-   supports resources, so it's cheap — likely P2.
+## Decisions (Baruch, 2026-10-26)
+1. **Open.** Open-with-invite (this plan), not a *reserved* mission that others
+   can't take for N hours — reserved would need a new consent rule.
+2. **No phone for now.** A phone number instead of email is only useful with an
+   SMS/WhatsApp sender; the copy-link / WhatsApp buttons cover it.
+3. **Yes — the resource form too.** The engine already supports resources.
+   - *Server — built:* `inviteToOpenResource({ projectId, projectName, openMashaabimId, resourceName, inviterId, email? }, deps)`
+     and `resourceInviteLink(...)` (`/project/{id}/join?r={openMashaabimId}&inv=…`)
+     in `missionInvite.ts`, sharing one private `inviteTo` with the mission
+     path. `createResource` takes `invite: { email? }` with the same rules as
+     `createMission`: normalized before anything is written, rejected with
+     `isAssigned` (the resource is open), rejected when `userCount > 1` (until
+     P2); in a solo rikma it runs right after `matchOpenMashaabimToUsers` and
+     returns `invite: { result, link, … }` beside the created record. Typed in
+     `actionClient.ts`. Tests: 4 more in `missionInvite.test.ts`.
+   - *UI — built:* `ResourceCreator.svelte` shows the same checkbox + optional
+     email under the self-assign box (the two exclude each other), sends
+     `invite`, and keeps the form up behind `InviteResultCard kind="resource"`
+     until the inviter taps Done, then calls `onCreated`. Gated on a new
+     `memberCount` prop (`=== 1`), not on `userslength` — the moach create page
+     never passed `userslength`, so its default of 1 would show the invite in
+     every rikma; the page now passes `memberCount` and `projectName`. Keys:
+     `mission.invite.resourceOptionLabel / resourceHelp / sentRegisteredResource
+     / shareMessageResource` (5 locales).
+   - *To do:* `?r=` pinning on the join page (P3), and the `pendingInvites`
+     field on `pmash` alongside `pendm` (P2 — matures in `voteOnPmash.ts` and
+     the timegrama pmash path).
 
 ---
 
@@ -350,11 +369,29 @@ Pendm מבשיל **בשני** מקומות — שניהם חייבים לשלו�
 - **P3:** הקישור שבמייל נושא `?m=&inv=`, הצמדת `?m=` בעמוד ההצטרפות, ייחוס
   `invited_by`, ומונה קטן בעמוד הלב של המזמין ("3 אנשים הצטרפו דרכך").
 
-## החלטות פתוחות
-1. פתוחה־עם־הזמנה (התכנית הזו) מול משימה *שמורה* שאחרים לא יכולים לקחת במשך
-   N שעות. שמורה חזקה יותר עבור המוזמן אבל דורשת כלל הסכמה חדש; ההמלצה להתחיל
-   בפתוחה.
-2. מספר טלפון במקום מייל למוזמנים לא רשומים — שימושי רק עם שולח SMS/וואטסאפ;
-   כפתור העתקת הקישור מכסה את זה בינתיים.
-3. אותה אפשרות בטופס המשאב (`open_mashaabim`)? המנוע כבר תומך במשאבים, אז זה
-   זול — כנראה P2.
+## החלטות (ברוך, 2026-10-26)
+1. **פתוחה.** משימה פתוחה־עם־הזמנה (התכנית הזו), ולא משימה *שמורה* שאחרים לא
+   יכולים לקחת במשך N שעות — שמורה הייתה דורשת כלל הסכמה חדש.
+2. **בינתיים בלי טלפון.** מספר טלפון במקום מייל שימושי רק עם שולח SMS/וואטסאפ;
+   כפתורי העתקת הקישור והוואטסאפ מכסים את זה.
+3. **כן — גם בטופס המשאב.** המנוע כבר תומך במשאבים.
+   - *שרת — נבנה:* `inviteToOpenResource({ projectId, projectName, openMashaabimId, resourceName, inviterId, email? }, deps)`
+     ו־`resourceInviteLink(...)` (`/project/{id}/join?r={openMashaabimId}&inv=…`)
+     ב־`missionInvite.ts`, עם פונקציה פרטית אחת `inviteTo` המשותפת למסלול
+     המשימה. `createResource` מקבל `invite: { email? }` באותם כללים כמו
+     `createMission`: מנורמל לפני שמשהו נכתב, נדחה יחד עם `isAssigned` (המשאב
+     פתוח), נדחה כש־`userCount > 1` (עד P2); ברקמה של חבר יחיד הוא רץ מיד אחרי
+     `matchOpenMashaabimToUsers` ומחזיר `invite: { result, link, … }` לצד הרשומה
+     שנוצרה. מוגדר בטיפוסים של `actionClient.ts`. בדיקות: 4 נוספות
+     ב־`missionInvite.test.ts`.
+   - *ממשק — נבנה:* `ResourceCreator.svelte` מציג את אותה תיבת סימון + מייל
+     אופציונלי מתחת לתיבת "השמה לעצמי" (השתיים מבטלות זו את זו), שולח `invite`,
+     ומשאיר את הטופס פתוח מאחורי `InviteResultCard kind="resource"` עד שהמזמין
+     לוחץ "סיום", ואז קורא ל־`onCreated`. מותנה ב־prop חדש `memberCount`
+     (`=== 1`) ולא ב־`userslength` — דף היצירה ב־moach אף פעם לא העביר
+     `userslength`, וברירת המחדל 1 הייתה מציגה את ההזמנה בכל רקמה; הדף מעביר
+     עכשיו `memberCount` ו־`projectName`. מפתחות:
+     `mission.invite.resourceOptionLabel / resourceHelp / sentRegisteredResource
+     / shareMessageResource` (5 שפות).
+   - *נותר:* הצמדת `?r=` בעמוד ההצטרפות (P3), ושדה `pendingInvites` על `pmash`
+     לצד `pendm` (P2 — מבשיל ב־`voteOnPmash.ts` ובמסלול ה־pmash של timegrama).

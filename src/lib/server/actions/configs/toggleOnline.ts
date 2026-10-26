@@ -3,14 +3,34 @@ import type { ActionConfig } from '../types.js';
 import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 /**
+ * Being available is never open-ended: people switch it on and forget, and the
+ * other participants then schedule around someone who is not there. Every "on"
+ * carries an `availableUntil`, and /api/cron/availability switches off what has
+ * passed it — through this same action, with `autoExpired`.
+ */
+export const DEFAULT_AVAILABLE_MINUTES = 60;
+export const MAX_AVAILABLE_MINUTES = 20 * 60;
+const MIN_AVAILABLE_MINUTES = 5;
+
+export function availableUntilFrom(durationMinutes: unknown, now = Date.now()): string {
+    const n = Number(durationMinutes);
+    const minutes = Number.isFinite(n) && n > 0
+        ? Math.min(MAX_AVAILABLE_MINUTES, Math.max(MIN_AVAILABLE_MINUTES, Math.round(n)))
+        : DEFAULT_AVAILABLE_MINUTES;
+    return new Date(now + minutes * 60_000).toISOString();
+}
+
+/**
  * Toggle user online availability status.
  * Can be global (all meetings) or specific to one meeting.
+ * Turning on a row that is already on only moves its `availableUntil` (an
+ * extension), without telling the others again.
  */
 export const toggleOnlineConfig: ActionConfig = {
     key: 'toggleOnline',
     description: 'Toggle user online availability status for meetings',
     graphqlOperation: async (params, context, { strapi, notifier }) => {
-        const { status, meetingId } = params; // status: boolean, meetingId?: string
+        const { status, meetingId, durationMinutes, autoExpired } = params; // status: boolean, meetingId?: string
         const userId = context.userId;
         console.log('toggleOnline', params, context);
         // 1. Get all user meeting records
@@ -44,10 +64,11 @@ export const toggleOnlineConfig: ActionConfig = {
         }
 
         // 3. Perform updates
+        const availableUntil = status ? availableUntilFrom(durationMinutes) : null;
         const updatePromises = targets.map((pu: any) => {
             return strapi.execute(
                 '22setOnline',
-                { id: pu.id, online: status },
+                { id: pu.id, online: status, until: availableUntil },
                 context.jwt,
                 context.fetch
             );
@@ -80,6 +101,8 @@ export const toggleOnlineConfig: ActionConfig = {
             for (const target of targets) {
                 const meeting = target.attributes.pgishas?.data?.[0]; // Assuming 1-to-1 now per pgishauser
                 if (!meeting) continue;
+                // An extension, or switching off what was already off: nothing changed for the others.
+                if ((target.attributes.available === true) === status) continue;
 
                 const mId = meeting.id;
                 const mName = meeting.attributes.name;
@@ -116,12 +139,17 @@ export const toggleOnlineConfig: ActionConfig = {
                                     en: status ? '✨ Meeting Opportunity!' : '💤 Participant is unavailable'
                                 },
                                 body: {
+                                    // autoExpired: they did not switch off, their time ran out.
                                     he: status
                                         ? `${myName} פנוי/ה כעת לפגישה: ${mName}. בוא/י נתחיל!`
-                                        : `${myName} כבר לא פנוי/ה לפגישה: ${mName}`,
+                                        : autoExpired
+                                            ? `זמן הזמינות של ${myName} לפגישה ${mName} הסתיים`
+                                            : `${myName} כבר לא פנוי/ה לפגישה: ${mName}`,
                                     en: status
                                         ? `${myName} is now available for: ${mName}`
-                                        : `${myName} is no longer available for: ${mName}`
+                                        : autoExpired
+                                            ? `${myName}'s availability for ${mName} has run out`
+                                            : `${myName} is no longer available for: ${mName}`
                                 }
                             },
                             intent: status ? 'outcome' : 'ambient',
@@ -185,11 +213,43 @@ export const toggleOnlineConfig: ActionConfig = {
                     }
                 }
             }
+
+            // 4c. Tell the participant themself that their availability ran out,
+            // so a forgotten switch is noticed and can be turned back on.
+            if (autoExpired && status === false) {
+                const names = targets
+                    .map((pu: any) => pu.attributes.pgishas?.data?.[0]?.attributes?.name)
+                    .filter(Boolean)
+                    .join(', ');
+                await notifier.notify(
+                    {
+                        recipients: { type: 'specificUsers', config: { userIdsParam: 'self' } },
+                        templates: {
+                            title: { he: '⏰ הזמינות שלך כובתה אוטומטית', en: '⏰ Your availability was switched off' },
+                            body: {
+                                he: `הזמן שבחרת לזמינות הסתיים${names ? ` (${names})` : ''}. עדיין פנוי/ה? אפשר להדליק שוב.`,
+                                en: `The time you chose has run out${names ? ` (${names})` : ''}. Still free? Switch it on again.`
+                            }
+                        },
+                        intent: 'ambient',
+                        metadata: {
+                            url: '/meeting',
+                            type: 'availabilityExpired',
+                            userId: userId,
+                            status: 'offline'
+                        }
+                    },
+                    { self: [userId] },
+                    lastResult,
+                    context
+                );
+            }
         }
 
         return {
             success: true,
             status: status,
+            availableUntil,
             meetingId: meetingId || 'global',
             meetingIds: targets
                 .map((pu: any) => pu.attributes.pgishas?.data?.[0]?.id)
@@ -208,7 +268,11 @@ export const toggleOnlineConfig: ActionConfig = {
     },
     paramSchema: {
         status: { type: 'boolean', required: true },
-        meetingId: { type: 'string', required: false }
+        meetingId: { type: 'string', required: false },
+        // How long an "on" lasts; defaults to an hour, capped at 20 hours.
+        durationMinutes: { type: 'number', required: false },
+        // Set only by /api/cron/availability.
+        autoExpired: { type: 'boolean', required: false }
     },
     authRules: [{ type: 'jwt' }],
     updateStrategy: { type: 'partialUpdate', config: {} },

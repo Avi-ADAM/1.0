@@ -10,20 +10,24 @@
   /**
    * @typedef {Object} Props
    * @property {{ result: string, link: string, registered?: boolean }} invite
-   * @property {string} [missionName]
+   * @property {'mission' | 'resource'} [kind] - what the person is invited to
+   * @property {string} [missionName] - the mission's or the resource's name
    * @property {string} [projectName]
    * @property {() => void} [onDone]
    */
 
   /** @type {Props} */
-  let { invite, missionName = '', projectName = '', onDone } = $props();
+  let { invite, kind = 'mission', missionName = '', projectName = '', onDone } = $props();
+
+  const isResource = $derived(kind === 'resource');
 
   let copied = $state(false);
 
   const statusKey = $derived.by(() => {
     switch (invite?.result) {
       case 'invited':
-        return invite.registered ? 'mission.invite.sentRegistered' : 'mission.invite.sentEmail';
+        if (!invite.registered) return 'mission.invite.sentEmail';
+        return isResource ? 'mission.invite.sentRegisteredResource' : 'mission.invite.sentRegistered';
       case 'notRegistered':
         // The engine's "email sent to an address with no account yet".
         return 'mission.invite.sentEmail';
@@ -38,7 +42,11 @@
   });
 
   const message = $derived(
-    $trans('mission.invite.shareMessage', { project: projectName, mission: missionName }) + '\n' + invite.link
+    (isResource
+      ? $trans('mission.invite.shareMessageResource', { project: projectName, resource: missionName })
+      : $trans('mission.invite.shareMessage', { project: projectName, mission: missionName })) +
+      '\n' +
+      invite.link
   );
   const whatsapp = $derived(`https://wa.me/?text=${encodeURIComponent(message)}`);
 

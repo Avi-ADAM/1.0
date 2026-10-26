@@ -9,7 +9,10 @@
     color = '--gold',
     autoCreate = true,
     onadd = undefined,
-    onremove = undefined
+    onremove = undefined,
+    outerDivClass = undefined,
+    inputClass = undefined,
+    liSelectedClass = undefined
   } = $props();
 </script>
 
@@ -21,4 +24,7 @@
   {autoCreate}
   {onadd}
   {onremove}
+  {...outerDivClass ? { outerDivClass } : {}}
+  {...inputClass ? { inputClass } : {}}
+  {...liSelectedClass ? { liSelectedClass } : {}}
 />

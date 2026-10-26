@@ -664,6 +664,8 @@ export interface ActionParamsMap {
     location_hint?: string | null;
     /** ISO code `price`/`easy` were typed in (PLAN_MULTI_CURRENCY); absent = the rikma's. */
     entryCurrency?: string;
+    /** Invite someone new to the open resource (solo rikma, not with `isAssigned`). */
+    invite?: { email?: string };
   };
   submitNegoMission: SubmitNegoMissionParams;
   submitNegoMash: SubmitNegoMashParams;
