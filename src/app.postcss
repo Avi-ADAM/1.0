@@ -2592,8 +2592,12 @@ html.a11y-font :is(h1, h2, h3, h4, p, li, span, a, button, label, div) {
 }
 
 /* A visible focus ring everywhere, not only where a component remembered to
-   add one. WCAG 2.4.7 — and the panel below is itself keyboard-driven. */
-:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+   add one. WCAG 2.4.7 — and the panel below is itself keyboard-driven.
+   An element that says `outline-none` draws its own focus (usually a
+   focus-within ring on its wrapper). This rule sits after the utilities, so
+   without the exclusion it beat that class — and a wrapper's overflow-hidden
+   clipped the ring down to one stray pink line inside the field. */
+:where(a, button, input, select, textarea, [tabindex]):where(:not([class*='outline-none'])):focus-visible {
   outline: 3px solid #ff0092;
   outline-offset: 2px;
 }
