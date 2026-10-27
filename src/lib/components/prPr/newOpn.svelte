@@ -14,7 +14,7 @@
    */
   import { t, locale } from '$lib/translations';
   import RichText from '$lib/celim/ui/richText.svelte';
-  import Share from '$lib/components/share/shareButtons/index.svelte';
+  import ShareLink from '$lib/components/share/ShareLink.svelte';
   import Tile from '$lib/celim/tile.svelte';
   import OpenMissionCard from '$lib/components/prPr/open/OpenMissionCard.svelte';
 
@@ -164,12 +164,13 @@
             {$t('project.newOpn.seePr')}
           </a>
 
-          <Share
-            slug={`availableMission/${datai.id}`}
+          <ShareLink
+            path={`/availableMission/${datai.id}`}
             title={shareTitle}
-            desc={shareTitle}
-            hashtags={['1💗1', 'consensus']}
+            desc={$t('ui.share.mission')}
+            hashtags={['1lev1', 'consensus']}
             quote={shareTitle}
+            align="start"
           />
         </footer>
       </article>

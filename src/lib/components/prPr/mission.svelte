@@ -1009,6 +1009,8 @@
   import FormSection from './missionForm/FormSection.svelte';
   import OptionRow from './missionForm/OptionRow.svelte';
   import MissionSummary from './missionForm/MissionSummary.svelte';
+  import { portal } from './missionForm/portal.js';
+  import { lbl, fieldBox, inp, ghost, segBtn } from './missionForm/classes.js';
   import { useFormatMoney } from '$lib/money/context.svelte';
   import {
     Sparkles,
@@ -1114,45 +1116,8 @@
    */
   let fullscreen = $state(untrack(() => !!projectId && !specMode && !publishMode));
 
-  /**
-   * Full screen is `position: fixed`, but the form usually sits inside a card
-   * whose transform makes `fixed` relative to that card. While full screen is
-   * on, the form is moved to <body> and put back in place when it is off.
-   * @param {HTMLElement} node
-   * @param {boolean} active
-   */
-  function portal(node, active) {
-    const anchor = document.createComment('mission-form');
-    node.before(anchor);
-    const apply = (/** @type {boolean} */ on) => {
-      if (on) document.body.appendChild(node);
-      else if (node.previousSibling !== anchor) anchor.after(node);
-    };
-    apply(active);
-    return {
-      update: apply,
-      destroy() {
-        // Put it back where Svelte expects it, so its own teardown removes it.
-        if (node.parentNode === document.body && anchor.isConnected) anchor.after(node);
-        else if (node.parentNode === document.body) node.remove();
-        anchor.remove();
-      }
-    };
-  }
   let inviteOpen = $state(false);
 
-  // Shared class strings, so every field in the form looks the same.
-  const lbl = 'mb-2 block text-sm font-bold text-[#2a1420]';
-  const fieldBox =
-    'rounded-xl border-[1.5px] border-[#e4d9c4] bg-[#fffdf8] text-[#2a1420] transition focus-within:border-[#c8155f] focus-within:ring-[3px] focus-within:ring-[#c8155f]/15';
-  const inp =
-    'h-[52px] w-full min-w-0 rounded-xl border-[1.5px] border-[#e4d9c4] bg-[#fffdf8] px-4 text-[17px] font-medium text-[#2a1420] outline-none transition placeholder:text-[#9b8a92] focus:border-[#c8155f] focus:ring-[3px] focus:ring-[#c8155f]/15';
-  const ghost =
-    'inline-flex min-h-9 items-center gap-1.5 rounded-full border-[1.5px] border-[#e4d9c4] bg-white px-3 text-[13px] font-medium text-[#2a1420] transition hover:border-[#c8155f] hover:text-[#c8155f] disabled:opacity-50';
-  const segBtn = (/** @type {boolean} */ on) =>
-    `h-10 rounded-[9px] px-4 text-[15px] transition ${
-      on ? 'bg-white font-bold text-[#c8155f] shadow-sm' : 'text-[#6b5560] hover:text-[#2a1420]'
-    }`;
 </script>
 
 <DialogOverlay style="z-index: 700;" {isOpen} onDismiss={closer}>

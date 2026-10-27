@@ -1,10 +1,10 @@
 ﻿<script>
-  import Money from '$lib/components/money/Money.svelte';
   import CurrencyPicker from '$lib/components/money/CurrencyPicker.svelte';
-  import { useRikmaCurrency } from '$lib/money/context.svelte';
+  import CurrencySymbol from '$lib/components/money/CurrencySymbol.svelte';
+  import { useFormatMoney, useRikmaCurrency } from '$lib/money/context.svelte';
   import { DEFAULT_CURRENCY } from '$lib/money/currencies.js';
   import { isRtl, t } from '$lib/translations';
-  import { onMount } from 'svelte';
+  import { onMount, untrack } from 'svelte';
   import MultiSelect from 'svelte-multiselect';
   import { lang } from '$lib/stores/lang.js';
   import { sendToSer } from '$lib/send/sendToSer.js';
@@ -12,10 +12,27 @@
   import { toast } from 'svelte-sonner';
   import Arrow from '$lib/celim/icons/arrow.svelte';
   import Button from '$lib/celim/ui/button.svelte';
-  import NumberInput from '$lib/celim/ui/numberInput.svelte';
+  import RichText from '$lib/celim/ui/richText.svelte';
   import LocationPicker from '$lib/components/location/LocationPicker.svelte';
   import EquityPreview from '$lib/components/equity/EquityPreview.svelte';
   import InviteResultCard from '$lib/components/prPr/InviteResultCard.svelte';
+  // Same layout as the mission form (docs/tbd/PLAN_MISSION_FORM_REDESIGN.md).
+  import FormSection from '$lib/components/prPr/missionForm/FormSection.svelte';
+  import OptionRow from '$lib/components/prPr/missionForm/OptionRow.svelte';
+  import MissionSummary from '$lib/components/prPr/missionForm/MissionSummary.svelte';
+  import { portal } from '$lib/components/prPr/missionForm/portal.js';
+  import { lbl, fieldBox, inp, ghost, segBtn } from '$lib/components/prPr/missionForm/classes.js';
+  import {
+    Heart,
+    Link as LinkLucide,
+    Mail,
+    MapPin,
+    Maximize2,
+    Minimize2,
+    Repeat,
+    UserCheck,
+    X
+  } from '@lucide/svelte';
   import moment from 'moment';
 
   /**
@@ -297,8 +314,10 @@
     createNewSp = false;
   }
 
+  // A cleared number field reads back as null; it is held as is (so the field
+  // stays empty while typing) and every use reads it through Number().
   function handlePriceInput(value) {
-    price = value ?? 0;
+    price = value;
     if (!maxInvestmentTouched) {
       maxInvestment = price;
     }
@@ -306,7 +325,7 @@
 
   function handleMaxInvestmentInput(value) {
     maxInvestmentTouched = true;
-    maxInvestment = value ?? 0;
+    maxInvestment = value;
   }
 
   function handleStartDateInput(value) {
@@ -470,8 +489,8 @@
         projectId,
         name,
         description,
-        price,
-        easy: maxInvestment || price,
+        price: Number(price) || 0,
+        easy: Number(maxInvestment) || Number(price) || 0,
         entryCurrency: entryCurrency !== rikmaCur ? entryCurrency : undefined,
         kindOf,
         recurring: isRecurring && (kindOf === 'monthly' || kindOf === 'yearly'),
@@ -479,7 +498,7 @@
           isRecurring && (kindOf === 'monthly' || kindOf === 'yearly')
             ? Math.max(1, Number(cycleSize) || 1)
             : undefined,
-        hm: showQuantity ? hm : 1,
+        hm: showQuantity ? Number(hm) || 1 : 1,
         linkto,
         spnot,
         mashaabimId: selectedTemplate?.id,
@@ -524,465 +543,678 @@
       isSubmitting = false;
     }
   }
+
+  // ── Layout (same as the mission form) ───────────────────────────────────────
+  // Presentation only: the fields above and `handleSubmit`'s payloads are unchanged.
+  const rc = (/** @type {string} */ key, /** @type {any} */ vars = undefined) =>
+    $t(`project.resourceCreator.${key}`, vars);
+  const fmtMoney = useFormatMoney();
+  const fmtNum = (/** @type {any} */ n) =>
+    (Number(n) || 0).toLocaleString('en-US', { maximumFractionDigits: 2 });
+  /** An amount typed in the form, in the currency it was typed in. */
+  const moneyText = (/** @type {any} */ n) =>
+    specMode || publishMode ? fmtNum(n) : fmtMoney(Number(n) || 0, entryCurrency);
+
+  /** The rikma-only parts (currency, equity, self-assign, invite, consent note). */
+  const inProject = $derived(!!projectId && !specMode && !publishMode);
+  /** A rikma's new resource opens full screen, like a new mission; concierge flows open inline. */
+  let fullscreen = $state(untrack(() => !!projectId && !specMode && !publishMode));
+  let assignOpen = $state(false);
+  let inviteOpen = $state(false);
+  let detailsOpen = $state(false);
+
+  const KINDS = ['total', 'monthly', 'yearly', 'perUnit', 'rent'];
+  const cycles = $derived(Math.max(1, Number(cycleSize) || 1));
+  const spanCount = $derived(
+    showDates && startDate && endDate
+      ? Math.max(moment(endDate).diff(moment(startDate), kindOf === 'yearly' ? 'years' : 'months', true), 0)
+      : null
+  );
+  const formulaText = $derived.by(() => {
+    const p = moneyText(price);
+    if (isRecurring) {
+      const unit = kindOf === 'yearly' ? 'Year' : 'Month';
+      return cycles > 1
+        ? rc(`form2.everyN${unit}s`, { price: p, count: cycles })
+        : rc(`form2.every${unit}`, { price: p });
+    }
+    if (kindOf === 'perUnit') return rc('form2.formulaUnits', { price: p, count: fmtNum(hm) });
+    if (spanCount != null)
+      return rc(kindOf === 'yearly' ? 'form2.formulaYears' : 'form2.formulaMonths', {
+        price: p,
+        count: fmtNum(spanCount)
+      });
+    // A one-time / rent price is the total itself; the kind is already in the meta line.
+    return '';
+  });
+  const totalText = $derived(moneyText(totalPrice));
+  const maxDiffers = $derived((+totalMax || 0) !== (+totalPrice || 0));
+  const maxText = $derived(
+    rc(publishMode ? 'form2.upTo' : 'form2.rikmaValue', { value: moneyText(totalMax) })
+  );
+  const summaryMeta = $derived(
+    [
+      rc(`kinds.${kindOf}`),
+      isRecurring ? rc('form2.recurringShort') : '',
+      showQuantity ? rc('form2.units', { count: fmtNum(hm) }) : ''
+    ]
+      .filter(Boolean)
+      .join(' · ')
+  );
+  const checks = $derived([
+    { label: rc('form2.checkName'), done: !!name.trim() },
+    { label: $t('mission.form2.checkValue'), done: Number(price) > 0 },
+    ...(showDates ? [{ label: rc('form2.checkDates'), done: hasValidDates }] : []),
+    { label: rc('form2.checkWhere'), done: hasLocationValue(locationScope), optional: true }
+  ]);
+  const consentNote = $derived(
+    inProject && memberCount != null
+      ? Number(memberCount) > 1
+        ? $t('mission.form2.noteVote')
+        : rc('form2.noteSolo')
+      : ''
+  );
+  const assignStatus = $derived(
+    isSelfAssigned
+      ? isReceived
+        ? rc('form2.assignReceived')
+        : rc('form2.assignSelf')
+      : rc('form2.assignNone')
+  );
+  const detailsStatus = $derived(
+    linkto.trim() || spnot.trim() ? rc('form2.detailsSet') : rc('form2.detailsStatus')
+  );
+  const title = $derived(
+    specMode ? rc('form2.titleSpec') : publishMode ? rc('form2.titlePublish') : rc('title')
+  );
+  const submitText = $derived(
+    specMode
+      ? $t('common.buttons.sendOfferToProvider')
+      : publishMode
+        ? $t('common.buttons.publishToCommunity')
+        : rc('submit')
+  );
+  const msClasses = {
+    outerDivClass: '!min-h-[52px] !rounded-xl !border-[1.5px] !border-[#e4d9c4] !bg-white !text-[#2a1420]',
+    inputClass: '!bg-transparent !text-[#2a1420]',
+    liSelectedClass: '!rounded-full !bg-[#fdeef4] !text-[#a3124e]'
+  };
+
+  function cancel() {
+    fullscreen = false;
+    if (onCancel) onCancel();
+    else showForm = false;
+  }
 </script>
 
-<div class="resource-creator space-y-6" dir={$isRtl ? 'rtl' : 'ltr'}>
-  <header class="flex justify-between items-center mb-4">
-    <h2 class="text-2xl font-bold text-barbi">{specMode ? ($lang === 'en' ? 'Resource offer' : 'הצעת משאב') : publishMode ? ($lang === 'en' ? 'Publish to community' : 'פרסום משאב לקהילה') : $t('project.resourceCreator.title')}</h2>
-    {#if onCancel}
-      <button
-        onclick={onCancel}
-        class="text-grey-400 hover:text-white transition-colors"
-      >
-        <svg
-          class="w-6 h-6"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-          ><path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M6 18L18 6M6 6l12 12"
-          ></path></svg
-        >
-      </button>
-    {/if}
-  </header>
-
-  {#if !showForm}
-    <div
-      class="selection-step animate-in fade-in slide-in-from-bottom-4 duration-300"
+{#snippet publishActions()}
+  <div class="flex flex-wrap items-center justify-end gap-2">
+    <button
+      type="button"
+      onclick={cancel}
+      class="min-h-11 rounded-xl border-[1.5px] border-[#e4d9c4] bg-white px-4 text-sm text-[#2a1420] transition hover:border-[#c8155f]"
     >
-      <div class="flex items-center gap-2">
-        <div class="flex-grow">
-          <MultiSelect
-            outerDivClass="!bg-pink-900 !border-gold/30 focus-within:!border-gold !text-white !rounded-xl !p-2 shadow-inner"
-            inputClass="!bg-transparent !text-white"
-            ulOptionsClass="!bg-pink-900 !border-gold/30 !text-white !rounded-xl"
-            liOptionClass="!text-white hover:!bg-gold/20"
-            liSelectedClass="!bg-gold !text-white"
-            loading={isLoading}
-            placeholder={$t('project.resourceCreator.selectPlaceholder')}
-            options={mashaabimTemplates.map((t) => t.attributes.name)}
-            bind:selected={selectedTemplateName}
-            bind:searchText
-            allowUserOptions="append"
-            createOptionMsg={$t('project.resourceCreator.createOption').replace('{name}', searchText)}
-            maxSelect={1}
-          />
-        </div>
-        {#if selectedTemplateName.length > 0}
-          <Button onClick={handleSelect} class="!p-4">
-            <Arrow back={$lang === 'en'} />
-          </Button>
+      {rc('cancel')}
+    </button>
+    <Button
+      text={submitText}
+      onClick={handleSubmit}
+      disabled={isSubmitting || !canSubmit}
+      loading={isSubmitting}
+    />
+  </div>
+{/snippet}
+
+<svelte:window
+  onkeydown={(e) => {
+    if (fullscreen && e.key === 'Escape') fullscreen = false;
+  }}
+/>
+
+<div
+  use:portal={fullscreen}
+  dir={$isRtl ? 'rtl' : 'ltr'}
+  class={fullscreen
+    ? 'fixed inset-0 z-[600] overflow-y-auto bg-[#f4efe6] px-3 py-4 text-start text-[#2a1420] sm:px-8 sm:py-6'
+    : 'w-full text-start text-[#2a1420]'}
+  role={fullscreen ? 'dialog' : undefined}
+  aria-modal={fullscreen ? 'true' : undefined}
+  aria-label={fullscreen ? title : undefined}
+>
+<div class="resource-creator mx-auto w-full max-w-6xl pb-2 sm:pt-2">
+  <!-- Header -->
+  <header class="mb-5 flex flex-col gap-2 px-1">
+    {#if projectName && inProject}
+      <span
+        class="inline-flex items-center gap-2 self-start rounded-full bg-[#fdeef4] px-3 py-1 text-sm font-medium text-[#a3124e]"
+      >
+        <Heart size={14} fill="currentColor" aria-hidden="true" />
+        {$t('mission.form2.rikmaChip', { name: projectName })}
+      </span>
+    {/if}
+    <div class="flex items-center justify-between gap-3">
+      <h1 class="m-0 text-3xl font-extrabold leading-tight text-[#2a1420] sm:text-4xl">{title}</h1>
+      <div class="flex flex-none items-center gap-2">
+        {#if showForm}
+          <button
+            type="button"
+            onclick={() => (fullscreen = !fullscreen)}
+            aria-pressed={fullscreen}
+            title={fullscreen ? $t('mission.form2.exitFullscreen') : $t('mission.form2.fullscreen')}
+            class="inline-flex min-h-11 flex-none items-center gap-2 rounded-full border-[1.5px] border-[#e4d9c4] bg-white px-4 text-sm font-medium text-[#2a1420] transition hover:border-[#c8155f] hover:text-[#c8155f]"
+          >
+            {#if fullscreen}
+              <Minimize2 size={16} aria-hidden="true" />
+              <span class="hidden sm:inline">{$t('mission.form2.exitFullscreen')}</span>
+            {:else}
+              <Maximize2 size={16} aria-hidden="true" />
+              <span class="hidden sm:inline">{$t('mission.form2.fullscreen')}</span>
+            {/if}
+          </button>
+        {/if}
+        {#if fullscreen && onCancel}
+          <button
+            type="button"
+            onclick={cancel}
+            aria-label={$t('mission.form2.close')}
+            title={$t('mission.form2.close')}
+            class="flex h-11 w-11 flex-none items-center justify-center rounded-full border-[1.5px] border-[#e4d9c4] bg-white text-[#2a1420] transition hover:border-[#c8155f] hover:text-[#c8155f]"
+          >
+            <X size={18} aria-hidden="true" />
+          </button>
         {/if}
       </div>
     </div>
+    <p class="m-0 max-w-2xl text-base text-[#6b5560]">{rc('form2.intro')}</p>
+  </header>
+
+  {#if !showForm}
+    <div class="flex items-center gap-2 rounded-2xl border border-[#efe6d3] bg-white p-4 shadow-sm">
+      <div class="min-w-0 flex-grow">
+        <MultiSelect
+          {...msClasses}
+          loading={isLoading}
+          placeholder={rc('selectPlaceholder')}
+          options={mashaabimTemplates.map((t) => t.attributes.name)}
+          bind:selected={selectedTemplateName}
+          bind:searchText
+          allowUserOptions="append"
+          createOptionMsg={rc('createOption').replace('{name}', searchText)}
+          maxSelect={1}
+        />
+      </div>
+      {#if selectedTemplateName.length > 0}
+        <Button onClick={handleSelect} class="!p-4">
+          <Arrow back={$lang === 'en'} />
+        </Button>
+      {/if}
+    </div>
   {:else}
-    <div
-      class="form-step space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500"
-    >
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div class="flex flex-col">
-          <label class="text-sm text-barbie mb-1">{$t('project.resourceCreator.name')}</label>
+  <div class="flex flex-col gap-6 lg:flex-row lg:items-start">
+    <!-- FORM -->
+    <div class="flex min-w-0 flex-1 flex-col gap-4 sm:gap-5">
+      <!-- 1 · What -->
+      <FormSection step={1} title={rc('form2.step1Title')} subtitle={rc('form2.step1Sub')}>
+        <div>
+          <label for="resource-name-input" class={lbl}>{rc('name')}</label>
           <input
+            id="resource-name-input"
             type="text"
             bind:value={name}
             list="resource-name-options"
             oninput={() => hydrateFromResourceName(name)}
             required
-            class="bg-pink-950/30 border border-gold rounded-xl p-3 text-white focus:border-gold outline-none transition-all shadow-sm"
+            placeholder={rc('selectPlaceholder')}
+            class={inp}
           />
           <datalist id="resource-name-options">
             {#each mashaabimTemplates as template (template.id)}
               <option value={template.attributes.name}></option>
             {/each}
           </datalist>
-        </div>
-        <div class="flex flex-col">
-          <label class="text-sm text-barbie mb-1">{$t('project.resourceCreator.kindOf')}</label>
-          <select
-            bind:value={kindOf}
-            class="bg-pink-950/30 border border-gold rounded-xl p-3 text-white focus:border-gold outline-none transition-all shadow-sm"
-          >
-            {#each ['total', 'monthly', 'yearly', 'perUnit', 'rent'] as val (val)}
-              <option value={val} class="bg-pink-900">{$t(`project.resourceCreator.kinds.${val}`)}</option>
-            {/each}
-          </select>
-        </div>
-
-        <div class="flex flex-col">
-          <label class="text-sm text-barbie mb-1 font-medium"
-            >{publishMode ? $t('project.resourceCreator.minValue') : $t('project.resourceCreator.price')}</label
-          >
-          <NumberInput value={price} onValueChange={handlePriceInput} />
-        </div>
-        {#if !specMode && !publishMode}
-          <div class="flex flex-col">
-            <label class="text-sm text-barbie mb-1 font-medium" for="resource-currency">{$t('money.currency')}</label>
-            <CurrencyPicker id="resource-currency" bind:value={entryCurrency} compact />
-          </div>
-        {/if}
-        <div class="flex flex-col">
-          <label class="text-sm text-barbie mb-1 font-medium"
-            >{publishMode ? $t('project.resourceCreator.maxValue') : $t('project.resourceCreator.maxInvestment')}</label
-          >
-          <p class="text-xs text-barbie/80 mb-1">
-            {publishMode ? $t('project.resourceCreator.maxValueHint') : $t('project.resourceCreator.maxInvestmentHint')}
+          <p class="m-0 mt-1.5 text-[13px] {hydratedTemplateId ? 'font-medium text-[#1f7a55]' : 'text-[#6b5560]'}">
+            {hydratedTemplateId ? rc('form2.fromTemplate') : rc('form2.nameHint')}
           </p>
-          <NumberInput
-            value={maxInvestment}
-            onValueChange={handleMaxInvestmentInput}
-          />
+        </div>
+        <div>
+          <span class={lbl}>{rc('description')}</span>
+          <div class="{fieldBox} overflow-hidden">
+            <RichText bind:outpot={description} />
+          </div>
+        </div>
+      </FormSection>
+
+      <!-- 2 · Value -->
+      <FormSection step={2} title={$t('mission.form2.step2Title')} subtitle={rc('form2.step2Sub')}>
+        <div>
+          <span class={lbl}>{rc('kindOf')}</span>
+          <div class="inline-flex flex-wrap gap-1 rounded-xl bg-[#f6f0e4] p-1" role="group" aria-label={rc('kindOf')}>
+            {#each KINDS as val (val)}
+              <button
+                type="button"
+                aria-pressed={kindOf === val}
+                onclick={() => (kindOf = val)}
+                class={segBtn(kindOf === val)}>{rc(`kinds.${val}`)}</button
+              >
+            {/each}
+          </div>
         </div>
 
-        {#if showQuantity}
-          <div class="md:col-span-2 flex flex-col">
-            <label class="text-sm text-barbie mb-1 font-medium"
-              >{$t('project.resourceCreator.quantity')}</label
-            >
-            <NumberInput bind:value={hm} />
+        <div class="grid items-start gap-3 sm:grid-cols-2">
+          <div>
+            <div class="mb-2 flex min-h-6 items-center justify-between gap-2">
+              <label for="resource-price" class="whitespace-nowrap text-sm font-bold text-[#2a1420]"
+                >{publishMode ? rc('minValue') : rc('price')}</label
+              >
+              {#if inProject}
+                <CurrencyPicker id="resource-currency" bind:value={entryCurrency} compact />
+              {/if}
+            </div>
+            <div class="{fieldBox} flex h-[52px] items-center overflow-hidden">
+              <input
+                id="resource-price"
+                type="number"
+                min="0"
+                step="any"
+                inputmode="decimal"
+                bind:value={() => price, handlePriceInput}
+                class="h-full w-full min-w-0 flex-1 border-0 bg-transparent px-3.5 text-xl font-bold outline-none"
+              />
+              <span class="flex-none pe-3.5 text-lg font-bold text-[#6b5560]">
+                <CurrencySymbol currency={specMode || publishMode ? null : entryCurrency} />
+              </span>
+            </div>
           </div>
-        {/if}
+          <div>
+            <div class="mb-2 flex min-h-6 items-center">
+              <label for="resource-max" class="text-sm font-bold text-[#2a1420]"
+                >{publishMode ? rc('maxValue') : rc('maxInvestment')}</label
+              >
+            </div>
+            <div class="{fieldBox} flex h-[52px] items-center overflow-hidden">
+              <input
+                id="resource-max"
+                type="number"
+                min="0"
+                step="any"
+                inputmode="decimal"
+                bind:value={() => maxInvestment, handleMaxInvestmentInput}
+                class="h-full w-full min-w-0 flex-1 border-0 bg-transparent px-3.5 text-xl font-bold outline-none"
+              />
+              <span class="flex-none pe-3.5 text-lg font-bold text-[#6b5560]">
+                <CurrencySymbol currency={specMode || publishMode ? null : entryCurrency} />
+              </span>
+            </div>
+            <p class="m-0 mt-1.5 text-[13px] text-[#6b5560]">
+              {publishMode ? rc('maxValueHint') : rc('maxInvestmentHint')}
+            </p>
+          </div>
+          {#if showQuantity}
+            <div>
+              <label for="resource-quantity" class={lbl}>{rc('quantity')}</label>
+              <input
+                id="resource-quantity"
+                type="number"
+                min="1"
+                step="1"
+                inputmode="numeric"
+                bind:value={hm}
+                class="{inp} text-xl font-bold"
+              />
+            </div>
+          {/if}
+        </div>
 
         {#if canBeRecurring}
-          <div class="md:col-span-2">
+          <div class="flex flex-col gap-3">
             <button
               type="button"
+              role="switch"
+              aria-checked={isRecurring}
               onclick={() => (isRecurring = !isRecurring)}
-              class="w-full flex items-center justify-between gap-3 rounded-xl border border-gold bg-pink-950/20 p-3 text-start transition-all"
-              class:!bg-gold-600={isRecurring}
+              class="flex min-h-[60px] w-full items-center gap-3 rounded-2xl border-[1.5px] bg-[#fffdf8] p-3 text-start transition sm:p-4 {isRecurring
+                ? 'border-[#d9a5bb]'
+                : 'border-[#efe6d3] hover:border-[#d9a5bb]'}"
             >
-              <span class="flex flex-col">
-                <span class="text-sm font-semibold text-white">🔁 {$t('project.resourceCreator.recurring')}</span>
-                <span class="text-xs text-barbie/90">{$t('project.resourceCreator.recurringHint')}</span>
+              <span
+                class="flex h-10 w-10 flex-none items-center justify-center rounded-xl bg-[#fdeef4] text-[#c8155f]"
+                aria-hidden="true"><Repeat size={20} /></span
+              >
+              <span class="min-w-0 flex-1">
+                <strong class="block text-base text-[#2a1420]">{rc('recurring')}</strong>
+                <span class="block text-sm text-[#6b5560]">{rc('recurringHint')}</span>
               </span>
               <span
-                class="shrink-0 w-12 h-7 rounded-full flex items-center px-1 transition-colors"
-                class:bg-gold={isRecurring}
-                class:bg-pink-800={!isRecurring}
+                class="flex h-7 w-12 flex-none items-center rounded-full p-1 transition-colors {isRecurring
+                  ? 'justify-end bg-[#c8155f]'
+                  : 'justify-start bg-[#d8cbb0]'}"
+                aria-hidden="true"><span class="h-5 w-5 rounded-full bg-white shadow"></span></span
               >
-                <span
-                  class="w-5 h-5 rounded-full bg-white transition-transform"
-                  class:translate-x-5={isRecurring && $lang !== 'he'}
-                  class:-translate-x-5={isRecurring && $lang === 'he'}
-                ></span>
-              </span>
             </button>
-
             {#if isRecurring}
-              <div
-                class="mt-3 flex flex-col rounded-xl border border-gold/40 bg-pink-950/10 p-3 animate-in fade-in duration-300"
-              >
-                <label class="text-sm text-barbie mb-1 font-medium"
-                  >{$t('project.resourceCreator.cycleSize')}</label
-                >
-                <p class="text-xs text-barbie/80 mb-2">
-                  {kindOf === 'yearly'
-                    ? $t('project.resourceCreator.cycleSizeHintYearly')
-                    : $t('project.resourceCreator.cycleSizeHintMonthly')}
-                </p>
+              <div>
+                <label for="resource-cycle" class={lbl}>{rc('cycleSize')}</label>
                 <div class="flex items-center gap-3">
-                  <NumberInput
-                    value={cycleSize}
-                    onValueChange={(v) => (cycleSize = Math.max(1, Number(v) || 1))}
+                  <input
+                    id="resource-cycle"
+                    type="number"
+                    min="1"
+                    step="1"
+                    inputmode="numeric"
+                    bind:value={() => cycleSize, (v) => (cycleSize = Math.max(1, Number(v) || 1))}
+                    class="{inp} max-w-32 text-xl font-bold"
                   />
-                  <span class="text-sm text-barbie/90 whitespace-nowrap">
-                    {kindOf === 'yearly'
-                      ? $t('project.resourceCreator.cycleUnitYearly')
-                      : $t('project.resourceCreator.cycleUnitMonthly')}
+                  <span class="text-[15px] text-[#6b5560]">
+                    {kindOf === 'yearly' ? rc('cycleUnitYearly') : rc('cycleUnitMonthly')}
                   </span>
                 </div>
+                <p class="m-0 mt-1.5 text-[13px] text-[#6b5560]">
+                  {kindOf === 'yearly' ? rc('cycleSizeHintYearly') : rc('cycleSizeHintMonthly')}
+                </p>
               </div>
             {/if}
           </div>
         {/if}
 
-        {#if showDates}
-          <div class="flex flex-col">
-            <label class="text-sm text-barbie mb-1">{$t('project.resourceCreator.startDate')} *</label>
-            <input
-              type="date"
-              value={startDate}
-              onchange={(event) => handleStartDateInput(event.currentTarget.value)}
-              required
-              class="bg-pink-950/30 border border-gold rounded-xl p-3 text-white focus:border-gold outline-none transition-all"
-              class:!border-red-400={showDates && !startDate}
-            />
+        <div class="flex flex-col gap-1 rounded-2xl border border-[#eee2a6] bg-[#fdf9ea] px-4 py-3.5">
+          <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
+            <span class="text-[15px] text-[#5a4a2a]" dir="auto">{formulaText}</span>
+            <strong class="text-2xl font-extrabold text-[#2a1420]" dir="auto">{totalText}</strong>
           </div>
-          <div class="flex flex-col">
-            <label class="text-sm text-barbie mb-1"
-              >{isRecurring ? $t('project.resourceCreator.recurringEndOptional') : `${$t('project.resourceCreator.endDate')} *`}</label
-            >
-            <input
-              type="date"
-              bind:value={endDate}
-              min={startDate || undefined}
-              required={!isRecurring}
-              class="bg-pink-950/30 border border-gold rounded-xl p-3 text-white focus:border-gold outline-none transition-all"
-              class:!border-red-400={showDates && !isRecurring && !endDate}
-            />
-          </div>
-        {/if}
-
-        <div class="md:col-span-2 flex flex-col">
-          <label class="text-sm text-barbie mb-1">{$t('project.resourceCreator.link')}</label>
-          <input
-            type="url"
-            bind:value={linkto}
-            placeholder="https://..."
-            class="bg-pink-950/30 placeholder:text-barbie border border-gold rounded-xl p-3 text-white focus:border-gold outline-none transition-all shadow-sm"
-          />
-        </div>
-
-        <div class="md:col-span-2">
-          <label class="text-sm text-barbie mb-1">{$t('project.resourceCreator.description')}</label>
-          <textarea
-            bind:value={description}
-            class="w-full bg-pink-950/30 border border-gold rounded-xl p-3 text-white focus:border-gold outline-none transition-all h-24 resize-none shadow-sm"
-          ></textarea>
-        </div>
-
-        <div class="md:col-span-2">
-          <label class="text-sm text-barbie mb-1">{$t('project.resourceCreator.notes')}</label>
-          <textarea
-            bind:value={spnot}
-            class="w-full bg-pink-950/30 border border-gold rounded-xl p-3 text-white focus:border-gold outline-none transition-all h-20 resize-none shadow-sm"
-          ></textarea>
-        </div>
-
-        <div class="md:col-span-2 space-y-2">
-          <label class="text-sm text-barbie mb-1">{$t('project.resourceCreator.locationTitle')}</label>
-          <button
-            type="button"
-            onclick={() => (locationOpen = !locationOpen)}
-            class="w-full px-4 py-3 text-sm font-medium text-white rounded-xl border border-gold/40 transition-colors flex items-center justify-center"
-            class:bg-pink-800={!locationOpen}
-            class:hover:bg-pink-700={!locationOpen}
-            class:bg-gold-700={locationOpen}
-            class:hover:bg-gold-600={locationOpen}
-          >
-            {locationOpen ? $t('project.resourceCreator.locationDone') : locationSummary(locationScope)}
-          </button>
-          {#if locationOpen}
-            <LocationPicker
-              bind:value={locationScope}
-              label={$t('project.resourceCreator.locationTitle')}
-              helper={$t('project.resourceCreator.locationHelper')}
-              height="280px"
-            />
+          {#if maxDiffers}
+            <span class="text-sm text-[#5a4a2a]" dir="auto">{maxText}</span>
           {/if}
-        </div>
-      </div>
-
-      <!-- השמה לעצמי – מוצג רק כשיש משתמש יחיד בפרויקט; מוסתר במצב מפרט (הצעה לספק) ובמצב פרסום לקהילה -->
-      {#if isSingleUser && !specMode && !publishMode}
-        <div
-          class="self-assign-box rounded-2xl border border-gold bg-pink-950/20 backdrop-blur-sm p-4 space-y-3"
-        >
-          <div class="flex items-center justify-between">
-            <div>
-              <h3
-                class="text-sm font-semibold text-barbie/80 uppercase tracking-wider"
-              >
-                {$t('project.resourceCreator.selfAssign')}
-              </h3>
-              <p class="text-xs text-barbie/90 mt-0.5">{$t('project.resourceCreator.selfAssignHint')}</p>
-            </div>
-            <button
-              type="button"
-              onclick={toggleSelfAssign}
-              class="px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 flex items-center gap-2"
-              class:bg-pink-600={!isSelfAssigned}
-              class:hover:bg-pink-500={!isSelfAssigned}
-              class:bg-gold-600={isSelfAssigned}
-              class:hover:bg-gold-500={isSelfAssigned}
-              class:text-white={true}
-            >
-              {$t('project.resourceCreator.selfAssign')}
-              {#if isSelfAssigned}<span>✓</span>{/if}
-            </button>
-          </div>
-
-          {#if isSelfAssigned}
-            <div class="space-y-3 animate-in fade-in duration-300">
-              {#if loadingSpOptions}
-                <div class="text-center text-barbie text-sm py-2">טוען...</div>
-              {:else if existingSpOptions.length > 0}
-                <!-- יש SPs קיימים – בחר מהם -->
-                <div>
-                  <label
-                    class="text-xs text-barbie font-semibold uppercase tracking-wider mb-1 block"
-                  >
-                    {$t('project.resourceCreator.chooseExistingSp')}
-                  </label>
-                  <MultiSelect
-                    outerDivClass="!bg-pink-900/40 !border-gold focus-within:!border-gold !text-white !rounded-xl !p-2"
-                    inputClass="!bg-transparent !text-white"
-                    ulOptionsClass="!bg-pink-900 !border-gold !text-white !rounded-xl"
-                    liOptionClass="!text-white hover:!bg-gold-500/20"
-                    liSelectedClass="!bg-gold-600 !text-white"
-                    placeholder={$t('project.resourceCreator.chooseExistingSp')}
-                    options={existingSpOptions.map((s) => s.attributes.name)}
-                    bind:selected={selectedSpName}
-                    noMatchingOptionsMsg={$t('project.resourceCreator.noMatchingSp')}
-                    maxSelect={1}
-                  />
-                </div>
-                {#if selectedSpName.length > 0}
-                  <button
-                    type="button"
-                    onclick={() => (isReceived = !isReceived)}
-                    class="w-full px-4 py-2 text-sm font-semibold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-sm"
-                    class:bg-pink-800={!isReceived}
-                    class:hover:bg-pink-700={!isReceived}
-                    class:bg-pink-500={isReceived}
-                    class:hover:bg-pink-400={isReceived}
-                    class:text-white={true}
-                  >
-                    {$t('project.resourceCreator.resourceReceived')}
-                    {#if isReceived}<span>✓</span>{/if}
-                  </button>
-                  {#if isReceived}
-                    <p class="text-xs text-pink-200/70 text-center">
-                      {$t('project.resourceCreator.resourceReceivedHint')}
-                    </p>
-                  {/if}
-                {/if}
-              {:else if !createNewSp}
-                <!-- אין SPs – שאל אם ליצור חדש -->
-                <div class="text-center space-y-3 py-2">
-                  <p class="text-sm font-semibold text-barbie">{$t('project.resourceCreator.noSpForResource')}</p>
-                  <button
-                    type="button"
-                    onclick={() => (createNewSp = true)}
-                    class="w-full px-4 py-2 text-sm font-semibold rounded-xl bg-pink-800 hover:bg-pink-700 text-white transition-all duration-200 shadow-sm"
-                  >
-                    {$t('project.resourceCreator.confirmCreateSp')}
-                  </button>
-                </div>
-              {:else}
-                <!-- createNewSp = true – SP חדש ייוצר -->
-                <div class="space-y-3">
-                  <p class="text-sm text-center text-barbie/90">{$t('project.resourceCreator.newSpWillBeCreated')}</p>
-                  <button
-                    type="button"
-                    onclick={() => (isReceived = !isReceived)}
-                    class="w-full px-4 py-2 text-sm font-semibold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-sm"
-                    class:bg-pink-800={!isReceived}
-                    class:hover:bg-pink-700={!isReceived}
-                    class:bg-pink-500={isReceived}
-                    class:hover:bg-pink-400={isReceived}
-                    class:text-white={true}
-                  >
-                    {$t('project.resourceCreator.resourceReceived')}
-                    {#if isReceived}<span>✓</span>{/if}
-                  </button>
-                  {#if isReceived}
-                    <p class="text-xs text-pink-200/70 text-center">
-                      {$t('project.resourceCreator.resourceReceivedHint')}
-                    </p>
-                  {/if}
-                </div>
-              {/if}
-            </div>
-          {/if}
-        </div>
-      {/if}
-
-      <!-- הזמנת שותף חדש — רקמה של חבר יחיד בלבד (PLAN_INVITE_PARTNER_TO_MISSION) -->
-      {#if canInvite}
-        <div class="rounded-2xl border border-gold bg-pink-950/20 backdrop-blur-sm p-4 space-y-2">
-          <label class="flex items-start gap-2 cursor-pointer">
-            <input
-              bind:checked={inviteNew}
-              type="checkbox"
-              class="mt-1"
-              onchange={() => {
-                if (inviteNew && isSelfAssigned) toggleSelfAssign();
-              }}
-            />
-            <span>
-              <span class="block text-sm font-semibold text-barbie/80">{$t('mission.invite.resourceOptionLabel')}</span>
-              <span class="block text-xs text-barbie/90 mt-0.5">
-                {$t(inviteNeedsEmail ? 'mission.invite.resourceVoteHelp' : 'mission.invite.resourceHelp')}
-              </span>
-            </span>
-          </label>
-          {#if inviteNew}
-            <input
-              bind:value={inviteEmail}
-              type="email"
-              inputmode="email"
-              autocomplete="off"
-              dir="ltr"
-              required={inviteNeedsEmail}
-              class="w-full rounded-xl border border-gold bg-white/90 px-3 py-2 text-barbi"
-              placeholder={$t(inviteNeedsEmail ? 'mission.invite.emailPlaceholderRequired' : 'mission.invite.emailPlaceholder')}
-              aria-label={$t(inviteNeedsEmail ? 'mission.invite.emailPlaceholderRequired' : 'mission.invite.emailPlaceholder')}
-            />
-          {/if}
-        </div>
-      {/if}
-
-      <!-- סיכום עלות -->
-      <div
-        class="summary-box mt-4 rounded-2xl border border-gold-500/40 bg-pink-950/20 backdrop-blur-sm p-4 space-y-3 shadow-lg"
-      >
-        <h3
-          class="text-sm font-semibold text-gold-400 uppercase tracking-wider"
-        >
-          {$t('project.resourceCreator.summaryTitle')}
-        </h3>
-        <div class="grid grid-cols-2 gap-3">
-          <div class="summary-item">
-            <span class="summary-label">{$t('project.resourceCreator.totalPrice')}</span>
-            <span class="summary-value price"
-              ><Money amount={+totalPrice || 0} currency={entryCurrency} /></span
-            >
-          </div>
-          <div class="summary-item">
-            <span class="summary-label">{$t('project.resourceCreator.totalMax')}</span>
-            <span class="summary-value max"
-              ><Money amount={+totalMax || 0} currency={entryCurrency} /></span
-            >
-          </div>
         </div>
 
         <!-- כמה מהרקמה יהיה שווה המשאב הזה — מתעדכן בזמן אמת עם הטופס.
              השווי הוא סכום ההשקעה המבוקש (easy), כפי שנרשם על המשאב. -->
         {#if projectId && totalMax > 0}
-          <EquityPreview
-            projectId={String(projectId)}
-            missionValue={+totalMax || 0}
-            monthlyValue={equityMonthlyValue}
-            alreadyCountedIn="none"
-            subject="resource"
-            titleKey="equity.resourceShareAtCreation"
-          />
+          <details class="group rounded-2xl border border-[#efe6d3] bg-[#fffdf8]">
+            <summary
+              class="flex min-h-12 cursor-pointer list-none items-center justify-between gap-2 px-4 text-sm font-bold text-[#2a1420]"
+            >
+              {$t('mission.form2.equityTitle')}
+              <svg
+                class="h-5 w-5 flex-none text-[#6b5560] transition-transform group-open:rotate-180"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg
+              >
+            </summary>
+            <div class="border-t border-[#efe6d3] p-2">
+              <EquityPreview
+                projectId={String(projectId)}
+                missionValue={+totalMax || 0}
+                monthlyValue={equityMonthlyValue}
+                alreadyCountedIn="none"
+                subject="resource"
+                titleKey="equity.resourceShareAtCreation"
+              />
+            </div>
+          </details>
         {/if}
-      </div>
+      </FormSection>
 
-      <div class="flex gap-4 pt-4">
-        <Button
-          onClick={handleSubmit}
-          disabled={isSubmitting || !canSubmit}
-          loading={isSubmitting}
-          text={specMode ? $t('common.buttons.sendOfferToProvider') : publishMode ? $t('common.buttons.publishToCommunity') : $t('project.resourceCreator.submit')}
-          class="flex-grow !py-4 text-lg font-bold !bg-gold-600 hover:!bg-gold !text-pink-950 shadow-md"
-        />
-        <Button
-          onClick={() => {
-            if (onCancel) onCancel();
-            else showForm = false;
-          }}
-          text={$t('project.resourceCreator.cancel')}
-          class="!bg-pink-900 hover:!bg-pink-800 !text-pink-200"
-        />
-      </div>
+      <!-- 3 · When & where -->
+      <FormSection
+        step={3}
+        title={$t('mission.form2.step4Title')}
+        subtitle={showDates ? rc('form2.step3SubDates') : rc('form2.step3Sub')}
+        badge={showDates ? '' : $t('mission.form2.optional')}
+      >
+        {#if showDates}
+          <div class="grid gap-3 sm:grid-cols-2">
+            <div>
+              <label for="resource-start" class={lbl}>{rc('startDate')} *</label>
+              <input
+                id="resource-start"
+                type="date"
+                value={startDate}
+                onchange={(event) => handleStartDateInput(event.currentTarget.value)}
+                required
+                class="{inp} {startDate ? '' : '!border-[#e0849f]'}"
+              />
+            </div>
+            <div>
+              <label for="resource-end" class={lbl}
+                >{isRecurring ? rc('recurringEndOptional') : `${rc('endDate')} *`}</label
+              >
+              <input
+                id="resource-end"
+                type="date"
+                bind:value={endDate}
+                min={startDate || undefined}
+                required={!isRecurring}
+                class="{inp} {isRecurring || endDate ? '' : '!border-[#e0849f]'}"
+              />
+            </div>
+          </div>
+        {/if}
+        <div>
+          <span class={lbl}>{$t('mission.form2.location')}</span>
+          {#if locationOpen}
+            <div class="flex flex-col gap-3">
+              <LocationPicker
+                bind:value={locationScope}
+                label={rc('locationTitle')}
+                helper={rc('locationHelper')}
+                height="280px"
+              />
+              <button type="button" onclick={() => (locationOpen = false)} class="{ghost} self-start">
+                {$t('mission.form2.closeLocation')}
+              </button>
+            </div>
+          {:else}
+            <button
+              type="button"
+              onclick={() => (locationOpen = true)}
+              class="flex min-h-[56px] w-full items-center gap-3 rounded-xl border-[1.5px] border-[#e4d9c4] bg-[#fffdf8] px-3 text-start transition hover:border-[#c8155f]"
+            >
+              <span class="flex h-9 w-9 flex-none items-center justify-center rounded-lg bg-[#fdeef4] text-[#c8155f]">
+                <MapPin size={18} aria-hidden="true" />
+              </span>
+              <span
+                class="min-w-0 flex-1 truncate text-[15px] {hasLocationValue(locationScope) ? 'font-medium' : 'text-[#6b5560]'}"
+              >
+                {locationSummary(locationScope)}
+              </span>
+              <span class="flex-none text-sm font-bold text-[#c8155f]">{$t('mission.form2.setLocation')}</span>
+            </button>
+          {/if}
+        </div>
+      </FormSection>
+
+      <!-- More options -->
+      <FormSection title={$t('mission.form2.moreTitle')} subtitle={$t('mission.form2.moreSub')}>
+        <div class="flex flex-col gap-3">
+          <!-- השמה לעצמי – רק כשיש משתמש יחיד בפרויקט; לא במצב מפרט (הצעה לספק) ולא בפרסום לקהילה -->
+          {#if isSingleUser && !specMode && !publishMode}
+            <OptionRow icon={UserCheck} title={rc('selfAssign')} status={assignStatus} bind:open={assignOpen}>
+              <div class="flex flex-col gap-3">
+                <label for="resource-self" class="flex min-h-11 cursor-pointer items-center gap-3">
+                  <input
+                    id="resource-self"
+                    type="checkbox"
+                    checked={isSelfAssigned}
+                    onchange={toggleSelfAssign}
+                    class="h-5 w-5 accent-[#c8155f]"
+                  />
+                  <span>
+                    <span class="block font-semibold">{rc('selfAssign')}</span>
+                    <span class="block text-sm text-[#6b5560]">{rc('selfAssignHint')}</span>
+                  </span>
+                </label>
+
+                {#if isSelfAssigned}
+                  {#if loadingSpOptions}
+                    <p class="m-0 text-sm text-[#6b5560]" aria-busy="true">{rc('loading')}</p>
+                  {:else if existingSpOptions.length > 0}
+                    <!-- יש SPs קיימים – בחר מהם -->
+                    <div>
+                      <span class={lbl}>{rc('chooseExistingSp')}</span>
+                      <MultiSelect
+                        {...msClasses}
+                        --sms-open-z-index={10000}
+                        placeholder={rc('chooseExistingSp')}
+                        options={existingSpOptions.map((s) => s.attributes.name)}
+                        bind:selected={selectedSpName}
+                        noMatchingOptionsMsg={rc('noMatchingSp')}
+                        maxSelect={1}
+                      />
+                    </div>
+                  {:else if !createNewSp}
+                    <!-- אין SPs – שאל אם ליצור חדש -->
+                    <div class="flex flex-col gap-2">
+                      <p class="m-0 text-sm font-semibold">{rc('noSpForResource')}</p>
+                      <button type="button" onclick={() => (createNewSp = true)} class="{ghost} self-start">
+                        {rc('confirmCreateSp')}
+                      </button>
+                    </div>
+                  {:else}
+                    <p class="m-0 text-sm text-[#6b5560]">{rc('newSpWillBeCreated')}</p>
+                  {/if}
+
+                  {#if selectedSpName.length > 0 || (createNewSp && existingSpOptions.length === 0)}
+                    <label for="resource-received" class="flex min-h-11 cursor-pointer items-center gap-3">
+                      <input
+                        id="resource-received"
+                        type="checkbox"
+                        bind:checked={isReceived}
+                        class="h-5 w-5 accent-[#c8155f]"
+                      />
+                      <span>
+                        <span class="block font-semibold">{rc('resourceReceived')}</span>
+                        <span class="block text-sm text-[#6b5560]">{rc('resourceReceivedHint')}</span>
+                      </span>
+                    </label>
+                  {/if}
+                {/if}
+              </div>
+            </OptionRow>
+          {/if}
+
+          <!-- הזמנת שותף חדש (PLAN_INVITE_PARTNER_TO_MISSION) -->
+          {#if canInvite}
+            <OptionRow
+              icon={Mail}
+              title={$t('mission.form2.invite')}
+              status={inviteNew && inviteEmail.trim() ? inviteEmail.trim() : $t('mission.form2.inviteStatus')}
+              bind:open={inviteOpen}
+            >
+              <label for="resource-invite" class="flex min-h-11 cursor-pointer items-center gap-3">
+                <input
+                  id="resource-invite"
+                  bind:checked={inviteNew}
+                  type="checkbox"
+                  class="h-5 w-5 accent-[#c8155f]"
+                  onchange={() => {
+                    if (inviteNew && isSelfAssigned) toggleSelfAssign();
+                  }}
+                />
+                <span class="font-semibold">{$t('mission.invite.resourceOptionLabel')}</span>
+              </label>
+              <p class="m-0 text-sm text-[#6b5560]">
+                {$t(inviteNeedsEmail ? 'mission.invite.resourceVoteHelp' : 'mission.invite.resourceHelp')}
+              </p>
+              {#if inviteNew}
+                <input
+                  bind:value={inviteEmail}
+                  type="email"
+                  inputmode="email"
+                  autocomplete="off"
+                  dir="ltr"
+                  required={inviteNeedsEmail}
+                  class="{inp} mt-2"
+                  placeholder={$t(inviteNeedsEmail ? 'mission.invite.emailPlaceholderRequired' : 'mission.invite.emailPlaceholder')}
+                  aria-label={$t(inviteNeedsEmail ? 'mission.invite.emailPlaceholderRequired' : 'mission.invite.emailPlaceholder')}
+                />
+              {/if}
+            </OptionRow>
+          {/if}
+
+          <OptionRow icon={LinkLucide} title={rc('form2.details')} status={detailsStatus} bind:open={detailsOpen}>
+            <div class="flex flex-col gap-3">
+              <div>
+                <label for="resource-link" class={lbl}>{rc('link')}</label>
+                <input
+                  id="resource-link"
+                  type="url"
+                  bind:value={linkto}
+                  placeholder="https://..."
+                  dir="ltr"
+                  class={inp}
+                />
+              </div>
+              <div>
+                <label for="resource-notes" class={lbl}>{rc('notes')}</label>
+                <textarea
+                  id="resource-notes"
+                  bind:value={spnot}
+                  rows="3"
+                  class="{inp} h-auto min-h-20 resize-y py-3"
+                ></textarea>
+              </div>
+            </div>
+          </OptionRow>
+        </div>
+      </FormSection>
     </div>
+
+    <!-- SUMMARY + submit (desktop): stays in view while the form scrolls. -->
+    <aside class="hidden lg:sticky lg:top-4 lg:block lg:w-[340px] lg:flex-none">
+      <MissionSummary
+        heading={$t('mission.form2.summary')}
+        {name}
+        meta={summaryMeta}
+        valueLabel={publishMode ? rc('minValue') : rc('totalPrice')}
+        total={totalText}
+        formula={maxDiffers ? `${formulaText} · ${maxText}` : formulaText}
+        {checks}
+        note={consentNote}
+      >
+        {#snippet actions()}
+          {@render publishActions()}
+        {/snippet}
+      </MissionSummary>
+    </aside>
+  </div>
+
+  <!-- SUMMARY + submit (phone / tablet), at the end of the form -->
+  <div class="mt-5 lg:hidden">
+    <MissionSummary
+      wide
+      heading={$t('mission.form2.summary')}
+      {name}
+      meta={summaryMeta}
+      valueLabel={publishMode ? rc('minValue') : rc('totalPrice')}
+      total={totalText}
+      formula={maxDiffers ? `${formulaText} · ${maxText}` : formulaText}
+      {checks}
+      note={consentNote}
+    >
+      {#snippet actions()}
+        {@render publishActions()}
+      {/snippet}
+    </MissionSummary>
+  </div>
+
+  <!-- Submit bar (phone / tablet): above the app's bottom nav, or at the very
+       bottom in full-screen mode where the nav is covered. -->
+  <div
+    class="sticky z-10 mt-4 flex items-center gap-3 rounded-2xl border border-[#eee2a6] bg-[#fffdf7] p-3 shadow-[0_-6px_30px_rgba(0,0,0,.18)] lg:hidden {fullscreen
+      ? 'bottom-2'
+      : 'bottom-24'}"
+  >
+    <div class="min-w-0 flex-1">
+      <strong class="block truncate text-xl font-extrabold text-[#c8155f]" dir="auto">{totalText}</strong>
+      <span class="block truncate text-xs text-[#6b5560]" dir="auto">{formulaText}</span>
+    </div>
+    {@render publishActions()}
+  </div>
   {/if}
+</div>
 </div>
 
 {#if inviteResult}
@@ -999,74 +1231,3 @@
     }}
   />
 {/if}
-
-<style>
-  :global(.svelte-multiselect) {
-    border: none !important;
-  }
-  :global(.svelte-multiselect ul.options) {
-    background-color: #500724 !important; /* pink-950 */
-    border: 1px solid rgba(251, 191, 36, 0.3) !important; /* gold-400 */
-    border-radius: 0.75rem !important;
-    color: white !important;
-  }
-  :global(.svelte-multiselect ul.options li.selected) {
-    background-color: #d97706 !important; /* gold-600 */
-    color: white !important;
-  }
-  :global(.svelte-multiselect ul.options li) {
-    color: white !important;
-  }
-  :global(.svelte-multiselect ul.options li:hover) {
-    background-color: rgba(251, 191, 36, 0.2) !important;
-  }
-
-  .summary-box {
-    animation: fadeIn 0.3s ease;
-  }
-
-  .summary-item {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-    padding: 0.75rem 1rem;
-    border-radius: 0.75rem;
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(251, 191, 36, 0.1);
-  }
-
-  .summary-label {
-    font-size: 0.7rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--barbie-pink); /* pink-100 */
-  }
-
-  .summary-value {
-    font-size: 1.4rem;
-    font-weight: 800;
-    line-height: 1;
-  }
-
-  .summary-value.price {
-    color: var(--barbie-pink); /* pink-200 */
-    text-shadow: 0 0 10px rgba(244, 114, 182, 0.3);
-  }
-
-  .summary-value.max {
-    color: var(--gold); /* gold-300 */
-    text-shadow: 0 0 10px rgba(251, 191, 36, 0.3);
-  }
-
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(6px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-</style>

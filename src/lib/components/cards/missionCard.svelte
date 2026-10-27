@@ -1,6 +1,6 @@
 <script>
 	import  RichText from '$lib/celim/ui/richText.svelte';
-  import Share from '$lib/components/share/shareButtons/index.svelte';
+  import ShareLink from '$lib/components/share/ShareLink.svelte';
   import Tile from '$lib/celim/tile.svelte';
   import { lang } from '$lib/stores/lang'
   import { t } from '$lib/translations';
@@ -102,15 +102,13 @@ function hover(){
            <!--
             <div class="basis-14" >
                 
-                <Share
-                slug="{"/availableMission/"+myId}"
-	 title={$t('project.newOpn.title', { name: data.name, projectName })}
-     desc="its new thing"
-     hashtags={['1💗1','consensus']}
-	 quote={$t('project.newOpn.title', { name: data.name, projectName })}
-	 related={[]}
-	 via={''}
-	 />
+                <ShareLink
+                  path={'/availableMission/' + myId}
+                  title={$t('project.newOpn.title', { name: data.name, projectName })}
+                  desc={$t('ui.share.mission')}
+                  hashtags={['1lev1', 'consensus']}
+                  quote={$t('project.newOpn.title', { name: data.name, projectName })}
+                />
             </div>     -->
         </div>
           </div>

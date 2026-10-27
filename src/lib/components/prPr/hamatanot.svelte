@@ -29,7 +29,7 @@
   import Halu from './whowhat.svelte';
   import Spinner from '$lib/celim/Spinner.svelte';
   import ShopSheet from '$lib/components/shop/ShopSheet.svelte';
-  import ShareButtons from '$lib/components/share/shareButtons/index.svelte';
+  import ShareLink from '$lib/components/share/ShareLink.svelte';
   import { toast } from 'svelte-sonner';
   import { isSiteShareNote, parseSiteShareNote } from '$lib/revenue/parseSiteShareNote';
   import { executeAction } from '$lib/client/actionClient';
@@ -765,10 +765,12 @@
                   {$t('project.hamatanot.fullEdit')}
                 </a>
                 <div class="sp-share">
-                  <ShareButtons
-                    slug="gift/{data.id}"
+                  <ShareLink
+                    path={'/gift/' + data.id}
                     title={data.attributes.name}
-                    desc={`Check out this amazing gift: ${data.attributes.name} for ${data.attributes.price}`}
+                    desc={$t('ui.share.product')}
+                    hashtags={['1lev1', 'gift']}
+                    size={22}
                   />
                 </div>
                 <button

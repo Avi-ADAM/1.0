@@ -1,6 +1,7 @@
 <script>
   import { lang } from '$lib/stores/lang.js';
   import { t } from '$lib/translations';
+  import { htmlExcerpt } from '$lib/text/htmlExcerpt';
   import { goto } from '$app/navigation';
   import { fly } from 'svelte/transition';
   import { Drawer } from 'vaul-svelte';
@@ -515,7 +516,8 @@
               onmouseleave={() => hover('0')}
               class="ab"
             >
-              {descrip}
+              <!-- descrip is rich-text HTML; this small heading shows it as text -->
+              {htmlExcerpt(descrip, 400)}
             </h6>{/if}
           <h5
             onmouseenter={() => hover('הערות')}

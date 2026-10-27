@@ -9900,15 +9900,6 @@ svelte-scrollto-element@^3.1.0:
   resolved "https://registry.npmjs.org/svelte-scrollto-element/-/svelte-scrollto-element-3.1.0.tgz"
   integrity sha512-VQerLa4KOB2lbvuaxKorDxfz5kYolHD0VJOxM6lqamwLNVOQYoWcBeNIrIPgBQVsnEnWNauorSz9ui0eYhNnsw==
 
-svelte-share-buttons-component@^3.0.0:
-  version "3.0.0"
-  resolved "https://registry.npmjs.org/svelte-share-buttons-component/-/svelte-share-buttons-component-3.0.0.tgz"
-  integrity sha512-EOs3uqfM6tmDZzXppfTLJtzd1M0Dnt44oPSbw+2CUHbkziiv4PRPRtLu4k3JGQj9j0R2n+JcwDPfJTixeinXdg==
-  dependencies:
-    css "^3.0.0"
-    from "^0.1.7"
-    import "^0.0.6"
-
 svelte-sonner@^0.3.28:
   version "0.3.28"
   resolved "https://registry.npmjs.org/svelte-sonner/-/svelte-sonner-0.3.28.tgz"

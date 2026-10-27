@@ -1,7 +1,7 @@
 <script>
   import { t } from '$lib/translations';
   import SucssesConf from '$lib/celim/sucssesConf.svelte';
-  import Share from '$lib/components/share/shareButtons/index.svelte';
+  import ShareLink from '$lib/components/share/ShareLink.svelte';
   import { requestSheirutJoin } from '$lib/client/actionClient';
 import { toast } from 'svelte-sonner';
 import { onMount } from 'svelte';/**
@@ -96,15 +96,13 @@ onMount(()=>{
            </div>
             <div class="basis-14" >
                 {#if data.isApruved}
-                <Share
-                slug="{"project/"+pid}"
-	 title={$t('project.sheirut.shareTitle', { name: data.name, projectName })}
-     desc="new service at 1💗1"
-     hashtags={['1💗1','consensus']}
-	 quote={$t('project.sheirut.shareTitle', { name: data.name, projectName })}
-	 related={[]}
-	 via={''}
-	 />
+                <ShareLink
+                  path={'/project/' + pid}
+                  title={$t('project.sheirut.shareTitle', { name: data.name, projectName })}
+                  desc={$t('ui.share.project')}
+                  hashtags={['1lev1', 'consensus']}
+                  quote={$t('project.sheirut.shareTitle', { name: data.name, projectName })}
+                />
      {:else}
             <h2 class="bg-red-700 text-gold">{$t('project.sheirut.notApproved')}</h2>
      {/if}

@@ -697,8 +697,8 @@
 
   <!-- פורמים — עם כפתור חזרה -->
   {#if addM || openMS || addN || openMA || addAct || addProduct || createMode === 'process'}
-    <!-- The mission form has its own two-column layout, so it gets the wider column. -->
-    <div class="{addM ? 'max-w-6xl' : 'max-w-4xl'} mx-auto">
+    <!-- The mission and resource forms have their own two-column layout, so they get the wider column. -->
+    <div class="{addM || addN ? 'max-w-6xl' : 'max-w-4xl'} mx-auto">
       <button
         onclick={handleBack}
         class="mb-6 flex items-center gap-2 text-[color:var(--goldink,#8a6a15)] hover:text-barbi hover:underline"
@@ -786,9 +786,10 @@
         </div>
       {/if}
       {#if addN}
-        <div class="m-4 border-2 border-barbi rounded bg-white/80 backdrop-blur-sm shadow-xl p-6">
+        <div class="mx-2 my-4 sm:mx-4 rounded-2xl border border-barbi/30 bg-[#f4efe6] px-3 py-4 sm:px-5 shadow-xl">
           <ResourceCreator
             {projectId}
+            userslength={projectUsers.length || 1}
             memberCount={projectBase ? projectUsers.length : null}
             projectName={pn}
             initialSpec={resourcePrefill}
