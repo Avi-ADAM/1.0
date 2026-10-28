@@ -572,7 +572,41 @@ diunim = ` ${diu},`
 
 <DialogOverlay {isOpen} onDismiss={close} class="overlay">
   <div transition:fly|local={{ y: 450, opacity: 0.5, duration: 2000 }}>
-    <DialogContent class="{masa == true ? 'full' : 'chat'} surface-dialog" aria-label="form">
+    <DialogContent class="{masa == true ? 'nego-shell' : 'chat'} surface-dialog" aria-label="form">
+      {#if masa === true && loading !== true}
+        <Nego
+          framed
+          onDismiss={close}
+          onLoad={() => (loading = true)}
+          onClose={afternego}
+          {ordern}
+          {descrip}
+          {projectName}
+          name1={name}
+          spnot={hearotMeyuchadot}
+          {kindOf}
+          {hm}
+          {timegramaId}
+          {projectId}
+          {total}
+          {noofusers}
+          {price}
+          {easy}
+          {recurring}
+          {recurringNoEnd}
+          {pricePerUnit}
+          {cycleSize}
+          {linkto}
+          {pendId}
+          {mshaabId}
+          {sqadualedf}
+          {sqadualed}
+          {users}
+          {acts}
+          {location}
+          {restime}
+        />
+      {:else}
       <div dir="rtl" class="grid items-center justify-center aling-center">
         <button
           onclick={close}
@@ -602,40 +636,6 @@ diunim = ` ${diu},`
     <lebel for="yu">התגובה שלך</lebel>   
     <input id="yu" minlength="26"  type="text" bind:value={why} placeholder="התשובה שלך">
             <button on:click={afreact}>אישור</button>  </div> -->
-        {:else if masa === true}
-          <!--<h2 class="bg-gold text-barbi text-center">   .יבנה במהרה בימינו אמן 
-בנתיים יש להגיב לא ולנמק ואז ליצור משאב חדש עם המאפיינים הרצויים </h2>
--->
-          <Nego
-            onLoad={() => (loading = true)}
-            onClose={afternego}
-            {ordern}
-            {descrip}
-            {projectName}
-            name1={name}
-            spnot={hearotMeyuchadot}
-            {kindOf}
-            {hm}
-            {timegramaId}
-            {projectId}
-            {total}
-            {noofusers}
-            {price}
-            {easy}
-            {recurring}
-            {recurringNoEnd}
-            {pricePerUnit}
-            {cycleSize}
-            {linkto}
-            {pendId}
-            {mshaabId}
-            {sqadualedf}
-            {sqadualed}
-            {users}
-            {acts}
-            {location}
-            {restime}
-          />
         {:else if chatm === true}
           <Diun
             onRect={sendForumMessage}
@@ -668,6 +668,7 @@ diunim = ` ${diu},`
           />
         {/if}
       </div>
+      {/if}
     </DialogContent>
   </div>
 </DialogOverlay>
@@ -1319,11 +1320,6 @@ diunim = ` ${diu},`
   :global([data-svelte-dialog-overlay].overlay) {
     z-index: 1000;
   }
-  :global([data-svelte-dialog-content].full) {
-    z-index: 1000;
-    padding: 10px;
-    width: 80vw;
-  }
   @media (min-width: 600px) {
     :global([data-svelte-dialog-content].chat) {
       z-index: 1000;
@@ -1334,19 +1330,12 @@ diunim = ` ${diu},`
       margin-top: 20vh;
       border-radius: 15%;
     }
-    :global([data-svelte-dialog-content].full) {
-      z-index: 1000;
-      padding: 10px;
-    }
     :global([data-svelte-dialog-overlay].overlay) {
       z-index: 1000;
     }
     .btin {
       width: 24px;
       height: 24px;
-    }
-    :global([data-svelte-dialog-content].full) {
-      width: 50vw;
     }
   }
   @media (min-width: 550px) {

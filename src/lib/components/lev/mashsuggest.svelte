@@ -364,14 +364,18 @@
 
 <DialogOverlay {isOpen} onDismiss={close} class="overlay">
   <div transition:fly={{ y: 40, opacity: 0, duration: 250 }}>
-    <DialogContent class="nego-modal surface-dialog" aria-label="form">
-      <button class="nego-modal-close" onclick={close} aria-label="סגירה"
-        >✕</button
-      >
+    <DialogContent class="{masa === true && loading !== true ? 'nego-shell' : 'nego-modal'} surface-dialog" aria-label="form">
+      {#if !(masa === true && loading !== true)}
+        <button class="nego-modal-close" onclick={close} aria-label={$t('common.close')}
+          >✕</button
+        >
+      {/if}
       {#if loading === true}
         <Spinner size="lg" />
       {:else if masa === true}
         <Nego
+          framed
+          onDismiss={close}
           onLoad={() => (loading = true)}
           onClose={afternego}
           onSubmit={handleNegoSubmit}

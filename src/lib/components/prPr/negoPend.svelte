@@ -53,6 +53,8 @@
    * @property {number} [ordern]
    * @property {boolean} [masaalr]
    * @property {any} [location]
+   * @property {boolean} [framed]
+   * @property {(() => void) | null} [onDismiss]
    */
 
   /** @type {Props} */
@@ -110,7 +112,15 @@
      * the project member knows what they are counter-proposing against.
      * @type {any | null}
      */
-    candidateRound = null
+    candidateRound = null,
+    /**
+     * Rendered inside a `nego-shell` dialog: the title and the close button
+     * stay in a fixed header, the submit buttons in a fixed footer, and only
+     * the fields between them scroll. Without it the form flows as one column.
+     */
+    framed = false,
+    /** Close button in the framed header. @type {(() => void) | null} */
+    onDismiss = null
   } = $props();
 
   let descrip2 = $state(descrip);
@@ -423,11 +433,18 @@
   ]);
 </script>
 
-<div class="text-barbi" dir={$isRtl ? 'rtl' : 'ltr'}>
+<div class="text-barbi" class:nego-framed={framed} dir={$isRtl ? 'rtl' : 'ltr'}>
+  <header class="nego-framed-head">
   <h1 class="md:text-center text-2xl md:text-2xl font-bold underline">
     {onSubmit ? $t('nego.headMashCandidate') : $t('nego.headmash')}:
     {name1}
   </h1>
+  {#if framed && onDismiss}
+    <button type="button" class="nego-framed-close" onclick={onDismiss} aria-label={$t('common.close')}>✕</button>
+  {/if}
+  </header>
+
+  <div class="nego-framed-body">
 
   <!-- Candidate proposal context — shown only in counter-proposal flow -->
   {#if onSubmit && candidateRound}
@@ -649,8 +666,9 @@
       />
     </div>
   {/if}
+  </div>
 
-  <div class="w-fit mx-auto flex flex-col items-center gap-y-2">
+  <div class="nego-framed-foot w-fit mx-auto flex flex-col items-center gap-y-2">
     <button
       onclick={increment}
       class="mx-auto border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-full"
@@ -666,3 +684,62 @@
     </button>
   </div>
 </div>
+
+<style>
+  /* Framed: header and footer hold still, the fields scroll between them.
+     The bounded box itself is `.nego-shell` on the DialogContent (app.postcss). */
+  .nego-framed {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+  .nego-framed .nego-framed-head {
+    flex: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.85rem 1rem;
+    border-bottom: 1px solid var(--surface-line, rgba(0, 0, 0, 0.1));
+  }
+  .nego-framed .nego-framed-head h1 {
+    flex: 1;
+    min-width: 0;
+    font-size: 1.15rem;
+    line-height: 1.3;
+    text-align: start;
+  }
+  .nego-framed-close {
+    flex: none;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 9999px;
+    color: var(--barbi-pink);
+    font-size: 1.1rem;
+    line-height: 1;
+  }
+  .nego-framed-close:hover {
+    background: rgba(255, 0, 174, 0.15);
+  }
+  .nego-framed .nego-framed-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 0.5rem 0.5rem 1rem;
+  }
+  .nego-framed .nego-framed-foot {
+    flex: none;
+    width: 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    border-top: 1px solid var(--surface-line, rgba(0, 0, 0, 0.1));
+    background: var(--surface, #fff);
+  }
+  .nego-framed .nego-framed-foot :global(button) {
+    margin: 0;
+  }
+</style>
