@@ -768,7 +768,17 @@
     "toWebsite": "Enlace",
     "toGithub": "Enlace a GitHub",
     "toFacebook": "Enlace a Facebook",
-    "missionCount": "{{name}}: {{count}}"
+    "missionCount": "{{name}}: {{count}}",
+    "orderTitle": "Qué puedes pedir",
+    "orderHint": "Toca un elemento para pedirlo",
+    "kindProduct": "Producto",
+    "kindResource": "Recurso",
+    "kindService": "Servicio",
+    "doneMissions": "Misiones completadas",
+    "emptyProfile": "Este perfil aún está vacío",
+    "notFound": "No encontramos a este usuario",
+    "joinCta": "Únete para colaborar y crear juntos",
+    "joinBtn": "Registrarse"
   },
   "decision": {
     "logoVote": "Votación sobre el cambio del logo de la rikma",

@@ -767,7 +767,17 @@
     "toWebsite": "לינק",
     "toGithub": "לינק לגיטהב",
     "toFacebook": "לינק לפייסבוק",
-    "missionCount": "{{name}}: {{count}}"
+    "missionCount": "{{name}}: {{count}}",
+    "orderTitle": "מה אפשר להזמין",
+    "orderHint": "לחיצה על פריט פותחת את ההזמנה",
+    "kindProduct": "מוצר",
+    "kindResource": "משאב",
+    "kindService": "שירות",
+    "doneMissions": "משימות שהושלמו",
+    "emptyProfile": "הפרופיל עוד ריק",
+    "notFound": "לא מצאנו את המשתמש הזה",
+    "joinCta": "הצטרפו כדי לשתף פעולה וליצור יחד",
+    "joinBtn": "להרשמה"
   },
   "decision": {
     "logoVote": "הצבעה על שינוי לוגו הרקמה",

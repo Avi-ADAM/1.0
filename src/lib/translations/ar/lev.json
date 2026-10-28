@@ -767,7 +767,17 @@
     "toWebsite": "رابط",
     "toGithub": "رابط جيت هاب",
     "toFacebook": "رابط فيسبوك",
-    "missionCount": "{{name}}: {{count}}"
+    "missionCount": "{{name}}: {{count}}",
+    "orderTitle": "ما يمكن طلبه",
+    "orderHint": "اضغط على عنصر لطلبه",
+    "kindProduct": "منتج",
+    "kindResource": "مورد",
+    "kindService": "خدمة",
+    "doneMissions": "مهام مكتملة",
+    "emptyProfile": "هذا الملف الشخصي ما زال فارغًا",
+    "notFound": "لم نعثر على هذا المستخدم",
+    "joinCta": "انضمّوا لتتعاونوا وتبدعوا معًا",
+    "joinBtn": "التسجيل"
   },
   "decision": {
     "logoVote": "التصويت على تغيير شعار الريكما",

@@ -35,11 +35,14 @@ async function fetchStorefront(userId, tok, fetch) {
         (s) => s.attributes?.matanot?.data && !s.attributes.matanot.data.attributes?.archived
       ),
       missionOffers: d.missionOffers?.data ?? [],
-      products: (d.matanots?.data ?? []).filter((m) => !m.attributes?.sp?.data)
+      products: (d.matanots?.data ?? []).filter((m) => !m.attributes?.sp?.data),
+      // What the rikmas they are a member of sell — a member is their
+      // rikmas' storefront too, not only their own.
+      rikmaProducts: d.rikmaProducts?.data ?? []
     };
   } catch (e) {
     console.warn('storefront load failed (non-fatal):', e);
-    return { resources: [], missionOffers: [], products: [] };
+    return { resources: [], missionOffers: [], products: [], rikmaProducts: [] };
   }
 }
 

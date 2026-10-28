@@ -767,7 +767,17 @@
     "toWebsite": "Ссылка",
     "toGithub": "Ссылка на GitHub",
     "toFacebook": "Ссылка на Facebook",
-    "missionCount": "{{name}}: {{count}}"
+    "missionCount": "{{name}}: {{count}}",
+    "orderTitle": "Что можно заказать",
+    "orderHint": "Нажмите на позицию, чтобы заказать",
+    "kindProduct": "Товар",
+    "kindResource": "Ресурс",
+    "kindService": "Услуга",
+    "doneMissions": "Выполненные задачи",
+    "emptyProfile": "Профиль пока пуст",
+    "notFound": "Мы не нашли этого пользователя",
+    "joinCta": "Присоединяйтесь, чтобы сотрудничать и творить вместе",
+    "joinBtn": "Регистрация"
   },
   "decision": {
     "logoVote": "Голосование за смену логотипа рикмы",

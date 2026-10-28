@@ -14940,6 +14940,21 @@ ${PROMO_DECISION_FIELDS}
         sp { data { id } }
       } }
     }
+    rikmaProducts: matanots(
+      filters: { and: [
+        { projectcreates: { user_1s: { id: { eq: $uid } } } },
+        { archived: { ne: true } },
+        { or: [{ hideFromDiscovery: { null: true } }, { hideFromDiscovery: { eq: false } }] },
+        ${NOT_ARCHIVED}
+      ] }
+      sort: "updatedAt:desc"
+      pagination: { limit: 100 }
+    ) {
+      data { id attributes {
+        name price
+        projectcreates { data { id attributes { projectName } } }
+      } }
+    }
   }`,
 
   '267setMaagadOfferProposerProject': `mutation SetMaagadOfferProposerProject($id: ID!, $project: ID) {

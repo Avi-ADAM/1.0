@@ -767,7 +767,17 @@
     "toWebsite": "Link",
     "toGithub": "Link to GitHub",
     "toFacebook": "Link to Facebook",
-    "missionCount": "{{name}}: {{count}}"
+    "missionCount": "{{name}}: {{count}}",
+    "orderTitle": "What you can order",
+    "orderHint": "Tap an item to order it",
+    "kindProduct": "Product",
+    "kindResource": "Resource",
+    "kindService": "Service",
+    "doneMissions": "Missions done",
+    "emptyProfile": "This profile is still empty",
+    "notFound": "We couldn't find this user",
+    "joinCta": "Join to collaborate and create together",
+    "joinBtn": "Sign up"
   },
   "decision": {
     "logoVote": "Vote on changing the rikma's logo",
