@@ -1,4 +1,6 @@
 import { redirect } from '@sveltejs/kit';
+import { env } from '$env/dynamic/private';
+import { parseSpaceSyncProjects } from '$lib/space/syncFlag';
 
 export function load({ locals, url }) {
     const tok = locals.tok;
@@ -25,6 +27,9 @@ export function load({ locals, url }) {
         un,
         uid,
         // The session could not be checked this time (network) — not a sign-out.
-        identityUnreachable: !uid && locals.identityUnreachable === true
+        identityUnreachable: !uid && locals.identityUnreachable === true,
+        // A1 (PLAN_DISTRIBUTED_EXECUTION): the pilot rikmas that run on the
+        // Space. Project ids, not a secret; empty = off everywhere.
+        spaceSyncProjects: parseSpaceSyncProjects(env.SPACE_SYNC_PROJECTS)
     };
 }

@@ -147,7 +147,7 @@ export async function signActionShadow(
   if (projectId) {
     try {
       const { spaceSyncEnabled } = await import('$lib/space/spaceStore.svelte');
-      if (spaceSyncEnabled()) {
+      if (spaceSyncEnabled(projectId)) {
         return await publishViaSpace(userId, projectId, template);
       }
     } catch (e) {

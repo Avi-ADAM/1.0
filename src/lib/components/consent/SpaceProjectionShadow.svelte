@@ -14,10 +14,12 @@
    *                        (exit criterion: a defined period with 0 unexplained
    *                        mismatches before projection becomes the display source)
    *
-   * Renders nothing unless localStorage.SPACE_SYNC_ENABLED === '1'.
+   * Renders nothing unless the Space is on for this rikma — the server's
+   * SPACE_SYNC_PROJECTS, or localStorage.SPACE_SYNC_ENABLED === '1' (dev).
    */
 
   import { browser } from '$app/environment';
+  import { untrack } from 'svelte';
   import { openSpace, startAutoSync, spaceSyncEnabled } from '$lib/space/spaceStore.svelte';
   import { spaceIdForProject } from '$lib/space/protocol';
   import { proposeGenesis, voteGenesis, genesisStatus } from '$lib/space/genesis';
@@ -36,8 +38,9 @@
   // Deliberately captures the INITIAL projectId: a replica is bound to one
   // space for the component's lifetime. The call site wraps this component
   // in {#key projectId}, so a project switch remounts with a fresh replica.
-  const enabled = browser && spaceSyncEnabled();
-  const replica = enabled ? openSpace(spaceIdForProject(projectId)) : null;
+  const boundProjectId = untrack(() => projectId);
+  const enabled = browser && spaceSyncEnabled(boundProjectId);
+  const replica = enabled ? openSpace(spaceIdForProject(boundProjectId)) : null;
 
   if (replica) void replica.hydrate();
 

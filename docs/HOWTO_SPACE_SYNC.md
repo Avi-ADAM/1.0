@@ -42,8 +42,28 @@ src/routes/api/relay/[spaceId]/+server.ts   # POST push / GET pull (?since=, ?he
 
 ## הפעלה (shadow, opt-in)
 
+ה-Space נדלק **לפי רקמה** (A1). `spaceSyncEnabled(projectId)` ב-`spaceStore.svelte.ts`
+מחליט, והלוגיקה הטהורה שלו נמצאת ב-`$lib/space/syncFlag.ts`:
+
+| מצב | איך | מה דולק |
+|---|---|---|
+| כבוי (ברירת מחדל) | אין env, אין override | כלום — כמו לפני A1 |
+| פיילוט | `SPACE_SYNC_PROJECTS=12,40` בשרת | רק ה-Space של הרקמות האלה, לכל החברים שלהן |
+| מפתח | `localStorage.SPACE_SYNC_ENABLED = '1'` בדפדפן | כל ה-spaces, בדפדפן הזה בלבד |
+
+- **איפה מגדירים את ה-env**: ה-`load` של `(reg)/+layout.server.js` קורא אותו
+  (`$env/dynamic/private`) ומעביר ללקוח `spaceSyncProjects`. ה-loads רצים על
+  **Vercel**, לא על ה-VPS, ולכן בפרודקשן המשתנה נכנס ל-env של Vercel. אחרי
+  שינוי ב-env צריך redeploy. בפיתוח המשתנה נכנס ל-`.env`.
+- **בלי הקשר רקמה** (קריאה בלי `projectId`, או space שאינו `project:`, למשל
+  `vault:`) רק ה-override יכול להדליק.
+- הרשימה גלויה לכל לקוח מחובר. היא מכילה מזהי רקמות בלבד, וכל טוקן שאינו
+  מזהה פשוט נזרק.
+- דף מחוץ ל-`(reg)` לא מקבל את הרשימה ב-`page.data`; הלקוח זוכר את האחרונה
+  שקיבל בניווט.
+
 ```js
-localStorage.SPACE_SYNC_ENABLED = '1';
+localStorage.SPACE_SYNC_ENABLED = '1';   // override של מפתח
 ```
 
 שימוש מדף Svelte:

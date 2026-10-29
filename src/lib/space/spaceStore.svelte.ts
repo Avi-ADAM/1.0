@@ -23,10 +23,13 @@
 // re-derives them from the rotate events + the KEM private key in IDB.
 //
 // This layer runs in parallel to the existing Strapi/GraphQL flow and is
-// gated by localStorage.SPACE_SYNC_ENABLED — same shadow pattern the consent
-// plan used. Nothing here mutates Strapi state.
+// gated per rikma by spaceSyncEnabled() (the server's SPACE_SYNC_PROJECTS,
+// or localStorage.SPACE_SYNC_ENABLED='1' as a developer override) — same
+// shadow pattern the consent plan used. Nothing here mutates Strapi state.
 
 import { browser } from '$app/environment';
+import { page } from '$app/state';
+import { decideSpaceSync } from './syncFlag';
 import {
   idbAdd,
   idbGet,
@@ -76,8 +79,28 @@ import {
 import { sealEvent, openSealed, type SealedEnvelope } from './e2e/seal';
 import { validateKeyEvent, type KeyGuardContext } from './rotateGuard';
 
-export function spaceSyncEnabled(): boolean {
-  return browser && localStorage.getItem('SPACE_SYNC_ENABLED') === '1';
+/** Last allowlist the (reg) layout delivered — survives a hop to a route
+ * outside (reg), whose page.data does not carry it. */
+let knownSpaceSyncProjects: readonly string[] = [];
+
+/**
+ * A1: is the Space on for this rikma? The server's SPACE_SYNC_PROJECTS
+ * (delivered as page.data.spaceSyncProjects by the (reg) layout) names the
+ * pilot rikmas; localStorage.SPACE_SYNC_ENABLED='1' stays the developer
+ * override, on for every space in that browser. No projectId = only the
+ * override can say yes.
+ */
+export function spaceSyncEnabled(projectId?: string | number | null): boolean {
+  if (!browser) return false;
+  const delivered = page.data?.spaceSyncProjects;
+  if (Array.isArray(delivered)) knownSpaceSyncProjects = delivered;
+  let override: string | null = null;
+  try {
+    override = localStorage.getItem('SPACE_SYNC_ENABLED');
+  } catch {
+    // storage blocked (private mode) — the server list still decides
+  }
+  return decideSpaceSync({ override, projectId, allowlist: knownSpaceSyncProjects });
 }
 
 export type SpaceStatus =
@@ -694,7 +717,8 @@ const SOCKET_FALLBACK_POLL_MS = 3 * 60_000;
 
 /**
  * Background loop for a replica. Call from onMount of a page that opted in;
- * returns a stop function for onDestroy. No-op unless SPACE_SYNC_ENABLED.
+ * returns a stop function for onDestroy. No-op unless the Space is on for
+ * this replica's rikma (spaceSyncEnabled — server list or dev override).
  *
  * T1: when the Socket.io client is available, the replica also subscribes to
  * 'space:changed' wake-ups — a push in another tab/device triggers a pull
@@ -703,8 +727,7 @@ const SOCKET_FALLBACK_POLL_MS = 3 * 60_000;
  * be down; pollAndSyncIfBehind is cheap).
  */
 export function startAutoSync(replica: SpaceReplica, intervalMs = 20_000): () => void {
-  console.log("[space]",spaceSyncEnabled())
-  if (!spaceSyncEnabled()) return () => {};
+  if (!spaceSyncEnabled(projectIdOfSpace(replica.spaceId))) return () => {};
   let stopped = false;
   let timer: ReturnType<typeof setTimeout> | null = null;
   let unsubSocket: (() => void) | null = null;

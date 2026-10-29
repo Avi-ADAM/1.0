@@ -85,7 +85,9 @@ PQ  עמידות קוונטית (היברידי)           ✗           KEM = �
   מילוי מ-`/api/consent/keys/[userId]`) + `fetchKemRecipients`.
 - `spaceStore.svelte.ts` — הרפליקה: `hydrate()` (טעינה מיידית מ-IDB),
   `sync()`, `publish()`, `publishSealed()`, `rotateEpoch()`,
-  `startAutoSync()`. דגל: `localStorage.SPACE_SYNC_ENABLED='1'`.
+  `startAutoSync()`. דגל: `spaceSyncEnabled(projectId)` — לפי רקמה מ-env
+  `SPACE_SYNC_PROJECTS` (A1, `syncFlag.ts`), או `localStorage.SPACE_SYNC_ENABLED='1'`
+  כ-override של מפתח.
 
 **הצפנה קבוצתית (S3a)** — `src/lib/space/e2e/`
 
@@ -239,7 +241,8 @@ interval ארוך (2–5 דקות).
 ConsentBadge (אפור=projection ריק, ירוק=תואם, אדום=לא תואם) והשוואת יתרות
 hervachti ברזולוציית אגורות (chain agorot מול Strapi שקלים×100). אי-התאמות
 נרשמות ל-console עם התג `[space-shadow-telemetry]` — זה הבסיס לקריטריון
-היציאה מ-shadow שמוגדר למטה. מוצג רק עם `SPACE_SYNC_ENABLED='1'`.
+היציאה מ-shadow שמוגדר למטה. מוצג רק כשה-Space דלוק לרקמה (A1 — רשימת
+`SPACE_SYNC_PROJECTS`, או override `SPACE_SYNC_ENABLED='1'`).
 
 **גשר T2↔T4 (יולי 2026)**: חתימות הצל זורמות עכשיו אל ה-Space, לא רק למראה.
 `signActionShadow` (‏`src/lib/client/shadowSign.ts`) גוזר projectId מה-params

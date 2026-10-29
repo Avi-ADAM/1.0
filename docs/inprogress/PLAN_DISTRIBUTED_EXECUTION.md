@@ -68,7 +68,7 @@
 | שלב | בקוד | בפרודקשן |
 |---|---|---|
 | S1 חתימות shadow | ✔ | **חלקי** — 7 actions חותמים (addVote, chat, completeMission, createMission, createHaluka, createSale, counterSaleClaim). נשמר במראה ב-Strapi (`CONSENT_MIRROR`), **לא נאכף** |
-| S2a relay + סנכרון | ✔ | **כבוי** — רק `localStorage.SPACE_SYNC_ENABLED='1'` בדפדפן ספציפי |
+| S2a relay + סנכרון | ✔ | **כבוי** — `SPACE_SYNC_PROJECTS` ריק; override של מפתח ב-`localStorage.SPACE_SYNC_ENABLED='1'` |
 | S2b reducers + projection | ✔ | **כבוי** — הקורא היחיד: רכיב shadow בדף split |
 | S3a הצפנה | ליבה + טסטים | **אסור** |
 | T7 DeviceCert / T9 שחזור / כספת | ✔ / ◐ / ✔ | כבויים (`DEVICE_CERT_ENFORCE`, `VAULT_ENABLED`) |
@@ -101,7 +101,7 @@
 | 1b | A0b | push ב-chunks של ≤200 + relay מסרב לרוץ על Vercel (ממצאי A0) | S | A0 | ✔ |
 | 2 | B1 | vectors ל-quorum ול-deltaCheck (O-4) | M | — | ⬜ |
 | 3 | B2 | ECDSA low-S בצד החותם (O-2) | S | — | ⬜ |
-| 4 | A1 | דגל Space לפי רקמה (allowlist בשרת) | M | — | ⬜ |
+| 4 | A1 | דגל Space לפי רקמה (allowlist בשרת) | M | — | ✔ |
 | 5 | A3 | טלמטריית אי-התאמות לשרת | M | A1 | ⬜ |
 | 6 | A2 | הרחבת חתימות ה-shadow — באצוות | L | — | ⬜ |
 | 7 | B6 | אימות התחייבויות אינקרמנטלי (O(n²) → O(n)) | M–L | — | ⬜ |
@@ -324,7 +324,8 @@ snapshots/genesis קיימים. **בלי מימוש** עד אישור המשתמ
 
 ### A4 — פיילוט 🧑
 המשתמש בוחר רקמה פעילה (עדיף עם 2–3 חברים שמשתמשים כל יום), מגדיר
-`SPACE_SYNC_PROJECTS` בפרודקשן לפי ממצאי A0, ועוקב בדוח של A3. הסוכן מכין
+`SPACE_SYNC_PROJECTS` בפרודקשן (**ב-env של Vercel**: ה-load של `(reg)` רץ שם, לא
+על ה-VPS; אחרי שינוי צריך redeploy), ועוקב בדוח של A3. הסוכן מכין
 runbook: מה להפעיל, איך לכבות, מה בודקים בשבוע הראשון.
 
 ### A5 — דף ראשון מה-projection
@@ -352,3 +353,4 @@ projection, עם fallback ל-Strapi כשה-Space ריק או לא מסונכרן
 - 2026-10-08 · R0 · מפרט SPEC_CONSENT_FORMAT + vectors (canonical/signatures/events/e2e); הקשחת canonical (NFC-sort, surrogate, b64url קנוני); מסקנות Rust ו-PQ בתכניות · 448 טסטים בשכבה + 14 vectors · לא בוצע commit · —
 - 2026-10-29 · A0 · מיפוי ה-relay: בפרודקשן הווב הוא על ה-VPS (`VITE_API_BASE` → nginx → קונטיינר `sveltekit-api` יחיד); נמצאו פער rehydrate של אירועים גלויים (אין `spaceId` ב-`consent-event`) ובאג 413 בדחיפה אחרי restart מעל 200 אירועים ⇒ נפתחה A0b, ו-A4 תלויה בה · מסמכים בלבד, בלי שינוי קוד · commit `dist: A0` · הבא: A0b
 - 2026-10-29 · A0b · `RELAY_MAX_BATCH` ב-`space/protocol.ts` (מקור יחיד ללקוח ול-route); `pushEvents`/`pushSealed` מחלקים ל-chunks בסדר ה-diff ועוצרים בכישלון הראשון; `relay/host.ts` + 503 `relay_not_on_this_host` ב-GET/POST כש-`VERCEL` מוגדר. ניתוב ה-`/api` של הדפדפן ל-`api.1lev1.com` אומת באתר החי; Preview לא נבדק (חסר אישור צוות ב-Vercel). נוסף `docs/inprogress/SPACE_RELAY_EXPLAINER.html` — הסבר לא-טכני · 442→450 בשכבה (8 חדשים ב-`pushChunked.test.ts`), 14 vectors ללא diff, check: ‏1315 שגיאות (מתחת לבסיס) ואף אחת בקבצים שנגעתי בהם · commit `dist: A0b` · הבא: A1 (או B1/B2 במסלול B)
+- 2026-10-30 · A1 · `$lib/space/syncFlag.ts` (טהור: `decideSpaceSync`, `parseSpaceSyncProjects`); `(reg)/+layout.server.js` מעביר `spaceSyncProjects` מ-`SPACE_SYNC_PROJECTS` (`$env/dynamic/private`); `spaceSyncEnabled(projectId?)` קורא את `page.data` (‏`$app/state`, בלי תלות בסדר mount) וזוכר את הרשימה האחרונה; הקוראים (`shadowSign`, `SpaceProjectionShadow`, `startAutoSync`) מעבירים רקמה. **ה-env נכנס ל-Vercel, לא ל-VPS** — ה-load רץ שם. הוסר `console.log` דיבאג מ-`startAutoSync` · 450→458 (8 ב-`syncFlag.test.ts`), 14 vectors, check: ‏1315 שגיאות (ללא שינוי) ו-1286 אזהרות (מ-1287). לא נבדק בדפדפן: דורש dev server עם המשתנה וסשן מחובר מקומי · commit `dist: A1` · הבא: A3 (טלמטריה), או B1/B2
