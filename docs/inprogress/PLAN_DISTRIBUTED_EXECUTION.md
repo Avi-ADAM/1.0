@@ -278,14 +278,14 @@ override של מפתחים; אחרת — הפרויקט ברשימה. עדכן �
 | `time.tick` | `timerStart` / `timerStop` (**שים לב**: start ו-stop חולקים מפתח dedupe — `sessionMs` ב-stop חובה; SPEC §6.2) |
 | `pendm.vote` / `decision.vote` / `ask.vote` / `sheirutpend.vote` | `voteOnPendm` / `voteOnDecision` / `voteOnAskm` / `approveSheirutpend` — **בדוק קודם** אם `addVote` כבר מכסה את אותו מסלול; אל תחתום פעמיים |
 | `project.join` | `finalizeJoinAcceptance` — **לא מתאים כמו שהוא**: ה-reducer מוסיף את `ev.actor`, אבל ה-action מורץ ע"י החבר המאשר ולא ע"י המצטרף. צריך `predicate.member` ב-reducer (שינוי פורמט + vector) או חתימה בצד המצטרף |
-| `mission.approve` | `closeFiniapruval` (הכסף כ-`{amount: string, code}` — D-12) — **ממתין להחלטת היתרות** (למטה): ה-reducer מזכה את ה-balance בערך העבודה, ו-`hervachti` ב-Strapi לא זז באישור משימה |
+| `mission.approve` | `closeFiniapruval` — **בלי `amount`** (החלטת היתרות, למטה): היתרה היא כסף מחלוקות, ואישור משימה לא מזיז אותה. ה-predicate: payee + מזהה המשימה/השלב בלבד |
 | `project.amend` | `updateProjectDetails` (רק השדות שה-reducer מבין: `path`/`value`) |
 
 לכל action: spec ב-`s2b.ts` + רישום + טסט שמוודא שה-predicate בדיוק בצורה
 שה-reducer קורא (הרץ את האירוע דרך `project()` ובדוק את ה-state).
 **קבלה לכל אצווה**: טסטים ירוקים; עדכון הטבלה כאן (✔ לכל שורה שנעשתה).
 
-#### ממצא היתרות (2026-10-30) — 🧑 החלטה לפני חתימה על כסף
+#### ממצא היתרות (2026-10-30) — ✔ הוכרע באותו יום
 
 `User.hervachti` ב-Strapi הוא **מספר אחד למשתמש, על פני כל הרקמות שלו**. הוא
 זז רק בשני מקומות: אישור חלוקה (`applyTosplitApproval`, ‏`hervachUpdates`) ואישור
@@ -304,6 +304,24 @@ override של מפתחים; אחרת — הפרויקט ברשימה. עדכן �
 החלוקות שהסתיימו ברקמה, ו-`mission.approve` לא נוגע בו), או שווי שנצבר (ואז
 ההשוואה מול `hervachti` שגויה מהיסוד ויש למצוא ערך אחר). עד ההחלטה: אצווה 1
 חותמת סטטוס בלבד, והדוח של A3 יראה אי-התאמות יתרה שאינן באגים.
+
+**ההחלטה (המשתמש, 2026-10-30): יתרה = כסף מחלוקות באותה רקמה בלבד.** ל-`hervachti`
+הגלובלי יש ערך משלו: הוא יוצר "שרשרת" בין-רקמתית שמוודאת שהמספרים מסונכרנים בכל
+מקום. אבל להשתמש בו פירושו שרקמה אחת מאומתת דרך רקמה אחרת, וזה לא רלוונטי
+לריבונות של רקמה. לכן הבסיס הוא לפי רקמה. **מה מומש:**
+
+- `$lib/consent/rikmaSplitBalances` (טהור) — שני הכללים של Strapi בדיוק: באישור
+  חלוקה כל רשומה שאינה `noten`/`mekabel` (כמו `hervachDeltasFrom`); כשההעברה האחרונה
+  מאושרת — רשומות הנותן והמקבל (כמו `confirmHaluka`). באגורות, עיגול לכל רשומה.
+- `/api/consent/genesis/[projectId]` מחזיר עכשיו את היתרה **לפי רקמה** (מ-`/api/tosplits`
+  דרך `$lib/server/consent/rikmaBalancesExport`), 0 לחבר שלא קיבל כלום, ו-
+  `balanceSource: 'rikma-splits'`. genesis שנחתם לפני השינוי נושא את הערך הגלובלי;
+  ברקמות הטסט זה לא משנה.
+- `SpaceProjectionShadow` משווה מול אותו export (ולא מול `user_1s.hervachti`), טוען אותו
+  מחדש כשהלוג גדל, ושולח טלמטריה רק כשהמספרים של Strapi שייכים לאותו גודל לוג.
+- `mission.approve` ייחתם **בלי** `amount` — כשיגיע תורו (אצווה 3).
+- **לא נבדק מול Strapi חי**: שאילתת ה-REST (populate של component + relation). אם
+  היא נכשלת, ה-export מחזיר 502 והפאנל נשאר אפור. זה נראה מיד אחרי deploy.
 
 ### B6 — אימות התחייבויות אינקרמנטלי
 **למה**: `verifyCommitments` משחזר את כל סגור האבות לכל אירוע ⇒ O(n²) בסנכרון
@@ -387,7 +405,6 @@ projection, עם fallback ל-Strapi כשה-Space ריק או לא מסונכרן
 | C0 | התקנת Node 24 מקומית; deploy VPS עם `node:24-alpine` | C1, C2 (vectors PQ) |
 | B5 | אישור חבילת v3 | מימוש O-3/O-5/O-6 |
 | A4 | בחירת רקמת פיילוט + env בפרודקשן | A5 |
-| משמעות היתרות | מה `balances` בפרויקציה מייצג (כרטיס A2, "ממצא היתרות") — ההשוואה היום מול `hervachti` גלובלי | חתימת כסף ב-A2, אמינות הדוח של A3, genesis |
 | שער S3 | ההחלטה המוצרית (PLAN_serverless_p2p_data §1, תנאים א–ד) | S3, E1 |
 
 ---
@@ -403,3 +420,4 @@ projection, עם fallback ל-Strapi כשה-Space ריק או לא מסונכרן
 - 2026-10-30 · A1 (הפעלה) · לפי בקשת המשתמש: `SPACE_SYNC_PROJECTS` הוגדר ב-Vercel (פרויקט `1-0`, Production בלבד, plain) עם 19 רקמות הטסט מ-`hiddenProjects.ts` (`45,46,51,56,55,54,63,72,80,67,43,83,84,85,82,86,81,79,88`). זה שלב מקדים ל-A4, על רקמות טסט בלבד. **לכבות**: למחוק את המשתנה ב-Vercel ולעשות redeploy · נדחף יחד עם A1
 - 2026-10-30 · A3 · `POST /api/consent/telemetry` (מחובר, 30 לדקה, ולידציה שמסירה כל שדה זר) + `SpaceProjectionShadow` שולח snapshot לכל מצב synced שונה + `scripts/space-shadow-report.mjs` שמחשב את קריטריון היציאה לכל רקמה. השורות נכנסות ל-Axiom דרך ה-VPS, ו-JSONL אופציונלי ב-`CONSENT_TELEMETRY_FILE` · 458→478 (20 ב-`server/consent/shadowTelemetry.test.ts`), 14 vectors, check:proxy ירוק, check: ‏1315/1286 ללא שינוי · commit `dist: A3` · **🧑 deploy ל-VPS** (ה-endpoint רץ שם) · הבא: A2 (הרחבת החתימות), או B1/B2
 - 2026-10-30 · A2 אצווה 1 · מחזור החלוקה נחתם: `createTosplit` → `tosplit.create` (ids), `approveHaluka` → `haluka.approve` לכל העברה (סטטוס בלבד, בלי deltas), `confirmHaluka` (`kind:'receive'` בלבד) → `haluka.confirm`. **ממצא**: `User.hervachti` גלובלי למשתמש ⇒ השוואת היתרות של A3 ו-genesis של T6 משווים יתרת רקמה למספר על פני כל הרקמות; `mission.approve` לא נחתם עד החלטה (§5). `project.join` לא מתאים בלי שינוי reducer. פערי כיסוי ידועים: אישור חלוקה בשתיקה (timegrama, צד שרת) ו-`confirmHaluka` מדף `/deals` (fetch ישיר, לא `executeAction`) לא חותמים · 478→488, 14 vectors, check 1315/1286 · commit `dist: A2.1` · הבא: החלטת היתרות; אצווה 2 (`pgisha.*`, `time.tick`)
+- 2026-10-30 · A2 החלטת היתרות · המשתמש הכריע: יתרה = כסף מחלוקות באותה רקמה. `rikmaSplitBalances` (שני הכללים של Strapi) + `rikmaBalancesExport` (REST, דפדוף); ה-export של genesis וההשוואה ב-`SpaceProjectionShadow` עברו ליתרה לפי רקמה; תוקנו בדרך `projectName` (נקרא משדה לא קיים) ו-`console.log` של כל תשובת Strapi. דיאגרמה נוספה ל-`SPACE_RELAY_EXPLAINER.html` (סשן הצד) · 12 טסטים חדשים, 511 בשכבה (כולל `server/haluka`), 14 vectors, check 1315/1286, check:proxy ירוק · שאילתת ה-REST לא נבדקה מול Strapi חי · commit `dist: A2 balances` · **🧑 deploy ל-VPS** (ה-export רץ שם) · הבא: אצווה 2 (`pgisha.*`, `time.tick`), ואז `mission.approve` בלי סכום

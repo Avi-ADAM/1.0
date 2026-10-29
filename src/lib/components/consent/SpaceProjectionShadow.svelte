@@ -24,7 +24,7 @@
   import { untrack } from 'svelte';
   import { openSpace, startAutoSync, spaceSyncEnabled } from '$lib/space/spaceStore.svelte';
   import { spaceIdForProject } from '$lib/space/protocol';
-  import { proposeGenesis, voteGenesis, genesisStatus } from '$lib/space/genesis';
+  import { proposeGenesis, voteGenesis, genesisStatus, fetchGenesisExport } from '$lib/space/genesis';
   import ConsentBadge from './ConsentBadge.svelte';
   import { sendShadowReport } from '$lib/client/shadowTelemetry';
   import type { ShadowMismatch } from '$lib/consent/shadowTelemetry';
@@ -33,7 +33,8 @@
 
   type Props = {
     projectId: string;
-    /** base.user_1s.data — the GraphQL truth we compare balances against. */
+    /** base.user_1s.data — the rikma's members (gates the genesis button).
+     * Its `hervachti` is NOT compared: that one sums every rikma. */
     users?: GqlUserRow[];
   };
 
@@ -57,30 +58,52 @@
   const eventCount = $derived(replica ? replica.state.eventsById.size : 0);
 
   /**
-   * Balance comparison: projection balances are bigint agorot (D-12);
-   * Strapi hervachti is a float in shekels. Compare at agorot resolution.
-   * Only members present on BOTH sides are compared — the chain legitimately
-   * starts empty and fills as signed events flow.
+   * The Strapi side of the comparison: each member's balance IN THIS RIKMA,
+   * from its splits — the genesis export ($lib/consent/rikmaBalances). Not
+   * the page's user_1s.hervachti, which sums every rikma the user is in
+   * (decided 2026-10-30, PLAN_DISTRIBUTED_EXECUTION A2). Re-read whenever the
+   * signed log grows, since a new event usually means Strapi moved too;
+   * `strapiForEvents` says which log size the numbers belong to.
+   */
+  let strapiBalances = $state<Map<string, number> | null>(null);
+  let strapiForEvents = $state(-1);
+
+  $effect(() => {
+    if (!replica || replica.state.status !== 'synced') return;
+    const at = eventCount;
+    if (at === 0 || at === strapiForEvents) return;
+    void fetchGenesisExport(boundProjectId).then((exp) => {
+      if (!exp.ok) return;
+      const m = new Map<string, number>();
+      for (const row of exp.members) {
+        if (typeof row.hervachti === 'number') m.set(String(row.id), Math.round(row.hervachti * 100));
+      }
+      strapiBalances = m;
+      strapiForEvents = at;
+    });
+  });
+
+  /**
+   * Balance comparison: projection balances are bigint agorot (D-12); the
+   * export is shekels. Compare at agorot resolution. Only members present on
+   * BOTH sides are compared — the chain legitimately starts empty and fills
+   * as signed events flow.
    */
   const comparison = $derived.by(() => {
-    if (!projection || eventCount === 0) {
+    if (!projection || eventCount === 0 || !strapiBalances) {
       return { status: 'unsigned' as const, compared: 0, mismatches: [] as ShadowMismatch[] };
     }
 
-    const gqlBalances = new Map<string, number>();
-    for (const u of users) {
-      const h = u?.attributes?.hervachti;
-      if (typeof h === 'number') gqlBalances.set(String(u.id), Math.round(h * 100));
-    }
+    const strapiBy = strapiBalances;
 
     let compared = 0;
     const mismatches: ShadowMismatch[] = [];
     for (const [member, agorot] of projection.balances) {
-      const gql = gqlBalances.get(member);
-      if (gql === undefined) continue; // member unknown to this page's slice
+      const strapi = strapiBy.get(member);
+      if (strapi === undefined) continue; // not a member of this rikma in Strapi
       compared++;
-      if (BigInt(gql) !== agorot) {
-        mismatches.push({ kind: 'balance', member, chain: String(agorot), strapi: String(gql) });
+      if (BigInt(strapi) !== agorot) {
+        mismatches.push({ kind: 'balance', member, chain: String(agorot), strapi: String(strapi) });
       }
     }
 
@@ -98,6 +121,8 @@
   $effect(() => {
     if (!replica || replica.state.status !== 'synced') return;
     if (comparison.status === 'unsigned') return;
+    // Strapi numbers read for an older log would report a gap that is only lag.
+    if (strapiForEvents !== eventCount) return;
     sendShadowReport({
       v: 1,
       pid: boundProjectId,
@@ -175,7 +200,7 @@
     {#if comparison.mismatches.length > 0}
       <ul class="mt-2 list-inside list-disc text-xs text-rose-600 dark:text-rose-400">
         {#each comparison.mismatches as m (m.member)}
-          <li>{m.member}: chain={m.chain} gql={m.strapi}</li>
+          <li>{m.member}: chain={m.chain} strapi={m.strapi}</li>
         {/each}
       </ul>
     {/if}

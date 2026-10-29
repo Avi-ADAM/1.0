@@ -388,6 +388,9 @@ project באותו רגע (`project.join` בלי `project.leave`). דחייה = 
   סדרי הגעה (יש טסט).
 - **ייצוא שרת**: GET `/api/consent/genesis/[projectId]` — user_1s + hervachti
   בתבנית של strapiMirror (admin token). קריאה בלבד; הסמכות היא החתימות.
+  **מאוקטובר 2026** ה-`hervachti` שבו הוא היתרה **לפי רקמה**, מהחלוקות שלה
+  (`$lib/consent/rikmaBalances`), ולא `User.hervachti` הגלובלי. ההשוואה של T2
+  קוראת את אותו export (PLAN_DISTRIBUTED_EXECUTION, A2 "ממצא היתרות").
 - **זרימת לקוח**: `src/lib/space/genesis.ts` — `proposeGenesis` (ייצוא →
   publish snapshot.commit חסר-הורים → ההצעה כוללת את קול המציע),
   `voteGenesis` (אימות קשיח + diff מדווח → snapshot.vote), `genesisStatus`.

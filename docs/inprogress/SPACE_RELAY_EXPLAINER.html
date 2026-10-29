@@ -174,6 +174,14 @@ svg .badge-wake { fill: var(--stamp); }
 svg .badge-t { fill: var(--surface); font-size: 12px; font-weight: 700; font-family: var(--mono); direction: ltr; }
 svg .warnmark { fill: var(--bad-soft); stroke: var(--bad); stroke-width: 1; }
 svg .warnmark-t { fill: var(--bad); font-size: 11px; font-weight: 700; }
+svg .badge-ok { fill: var(--ok); }
+svg .badge-bad { fill: var(--bad); }
+svg .badge-sym { fill: var(--surface); font-size: 15px; font-weight: 700; font-family: var(--mono); direction: ltr; }
+svg .t-ok { fill: var(--ok); font-weight: 600; font-size: 12.5px; }
+svg .t-bad { fill: var(--bad); font-weight: 600; font-size: 12.5px; }
+svg .cmp-bad { fill: none; stroke: var(--bad); stroke-width: 1.6; stroke-dasharray: 5 4; }
+svg .cmp-ok { fill: none; stroke: var(--ok); stroke-width: 1.6; stroke-dasharray: 5 4; }
+svg .divider { stroke: var(--line); stroke-width: 1.4; stroke-dasharray: 3 5; }
 svg .m-accent { fill: var(--accent); }
 svg .m-muted { fill: var(--muted); }
 svg .m-wake { fill: var(--stamp); }
@@ -510,6 +518,108 @@ a { color: var(--accent); }
         <p>אפליקציית Tauri, וכל deploy שחסר בו המשתנה <code>VITE_API_BASE</code>, יפנו ל-relay על Vercel. שם רצים כמה מופעים במקביל, ולכל אחד תיבה משלו. מסמך שנכנס לתיבה אחת לא נראה בשנייה.</p>
         <p class="muted">כמו שני סניפי דואר עם אותה כתובת שלא מדברים זה עם זה. אף אחד לא מקבל שגיאה, והמסמכים פשוט לא מגיעים.</p>
         <p class="fix"><b>מה עושים (A0b):</b> ה-relay יסרב לרוץ על Vercel ויחזיר שגיאה ברורה (503). עדיפה שגיאה גלויה על פיצול שקט.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="figure">
+    <span class="eyebrow">היתרה</span>
+    <h2>מה משווים, ולמה זה היה שגוי</h2>
+    <p class="col">תג ההשוואה בדף החלוקה בודק אם היתרה בקלסר שווה ליתרה ב-Strapi. התברר שהוא השווה שני דברים שונים. זה כמו להשוות את היתרה בחשבון בנק אחד לסך כל החשבונות שלך בכל הבנקים.</p>
+    <div class="stack col">
+      <p><b>ב-Strapi יש לכל משתמש מספר אחד</b>, <code>User.hervachti</code>. הוא מצטבר מכל הרקמות שהמשתמש חבר בהן. הוא זז רק בשני רגעים: כשחלוקה מאושרת (<code>applyTosplitApproval</code>), וכשההעברה האחרונה בחלוקה מאושרת (<code>confirmHaluka</code>, לפי <code>Tosplit.hervachti</code>).</p>
+      <p><b>בקלסר יש יתרה לכל רקמה בנפרד</b> (<code>projection.balances</code>). הקלסר של רקמה א' רואה רק את המסמכים של רקמה א'.</p>
+      <p><b>הבאג:</b> תג ההשוואה (T2, ובהמשך הדיווח לשרת ב-A3) והייבוא הפותח (genesis, T6) שמו את היתרה של רקמה אחת ליד המספר הכולל. חבר בשתי רקמות שיש בהן חלוקות ייראה תמיד "לא תואם", אף שלא נשבר כלום. הייבוא אף פתח את הקלסר עם המספר הכולל.</p>
+    </div>
+    <p class="scroll-hint">התרשים רחב. גוללים אותו לצדדים.</p>
+    <div class="scroller" role="img" aria-label="תרשים: לפני, יתרת רקמה א' בקלסר מושווית לסכום של רקמה א' ורקמה ב' ב-Strapi; אחרי, כל רקמה מושווית לסכום החלוקות שלה">
+      <svg viewBox="0 0 1000 660" xmlns="http://www.w3.org/2000/svg">
+        <!-- ===== before ===== -->
+        <rect class="zone" x="16" y="16" width="968" height="314" rx="14"/>
+        <text class="t-title" x="500" y="44" text-anchor="middle">עד היום: רקמה אחת מול כל הרקמות</text>
+
+        <rect class="box" x="760" y="66" width="200" height="70" rx="10"/>
+        <text class="t-title" x="860" y="94" text-anchor="middle">רקמה א' · חלוקה</text>
+        <text class="t-body" x="860" y="118" text-anchor="middle">נועה מקבלת 300 ₪</text>
+
+        <rect class="box" x="520" y="66" width="200" height="70" rx="10"/>
+        <text class="t-title" x="620" y="94" text-anchor="middle">רקמה ב' · חלוקה</text>
+        <text class="t-body" x="620" y="118" text-anchor="middle">נועה מקבלת 200 ₪</text>
+
+        <rect class="box-strong" x="40" y="146" width="262" height="78" rx="10"/>
+        <text class="t-title" x="171" y="172" text-anchor="middle">Strapi</text>
+        <text class="t-small ltr" x="171" y="190" text-anchor="middle">User.hervachti</text>
+        <text class="t-body" x="171" y="212" text-anchor="middle">נועה: 500 ₪, מספר אחד לכולן</text>
+        <text class="t-small" x="130" y="244" text-anchor="middle">וזה גם המספר שהייבוא הכניס לקלסר</text>
+
+        <path class="flow" d="M620,136 V172 H306" marker-end="url(#ar-acc)"/>
+        <text class="t-accent ltr" x="470" y="165" text-anchor="middle">+200</text>
+        <path class="flow" d="M840,136 V204 H306" marker-end="url(#ar-acc)"/>
+        <text class="t-accent ltr" x="470" y="197" text-anchor="middle">+300</text>
+
+        <path class="flow-thin" d="M900,136 V232" marker-end="url(#ar-mut)"/>
+        <text class="t-small" x="934" y="190" text-anchor="middle">רק א'</text>
+        <rect class="box-strong" x="760" y="236" width="200" height="64" rx="10"/>
+        <text class="t-title" x="860" y="262" text-anchor="middle">הקלסר של רקמה א'</text>
+        <text class="t-body" x="860" y="286" text-anchor="middle">יתרת נועה: 300 ₪</text>
+
+        <path class="cmp-bad" d="M760,268 H262 V228"/>
+        <circle class="badge-bad" cx="465" cy="268" r="14"/><text class="badge-sym" x="465" y="273" text-anchor="middle">≠</text>
+        <text class="t-bad" x="465" y="302" text-anchor="middle">300 מול 500: "לא תואם", תמיד, בלי שום תקלה</text>
+
+        <!-- ===== after ===== -->
+        <rect class="zone" x="16" y="346" width="968" height="298" rx="14"/>
+        <text class="t-title" x="500" y="374" text-anchor="middle">מעכשיו: כל רקמה מול החלוקות שלה</text>
+        <line class="divider" x1="500" y1="392" x2="500" y2="600"/>
+
+        <!-- rikma A (right half) -->
+        <rect class="box" x="640" y="392" width="200" height="60" rx="10"/>
+        <text class="t-title" x="740" y="417" text-anchor="middle">רקמה א' · חלוקה</text>
+        <text class="t-body" x="740" y="439" text-anchor="middle">נועה מקבלת 300 ₪</text>
+        <path class="flow" d="M800,452 V496" marker-end="url(#ar-acc)"/>
+        <path class="flow" d="M680,452 V496" marker-end="url(#ar-acc)"/>
+        <rect class="box-strong" x="760" y="500" width="200" height="64" rx="10"/>
+        <text class="t-title" x="860" y="526" text-anchor="middle">הקלסר של רקמה א'</text>
+        <text class="t-body" x="860" y="550" text-anchor="middle">300 ₪</text>
+        <rect class="box" x="520" y="500" width="200" height="64" rx="10"/>
+        <text class="t-title" x="620" y="522" text-anchor="middle">Strapi: חלוקות של א'</text>
+        <text class="t-small ltr" x="620" y="538" text-anchor="middle">Σ Tosplit.hervachti</text>
+        <text class="t-body" x="620" y="556" text-anchor="middle">300 ₪</text>
+        <path class="cmp-ok" d="M760,532 H720"/>
+        <circle class="badge-ok" cx="740" cy="532" r="14"/><text class="badge-sym" x="740" y="537" text-anchor="middle">=</text>
+        <text class="t-ok" x="740" y="590" text-anchor="middle">תואם</text>
+
+        <!-- rikma B (left half) -->
+        <rect class="box" x="160" y="392" width="200" height="60" rx="10"/>
+        <text class="t-title" x="260" y="417" text-anchor="middle">רקמה ב' · חלוקה</text>
+        <text class="t-body" x="260" y="439" text-anchor="middle">נועה מקבלת 200 ₪</text>
+        <path class="flow" d="M320,452 V496" marker-end="url(#ar-acc)"/>
+        <path class="flow" d="M200,452 V496" marker-end="url(#ar-acc)"/>
+        <rect class="box-strong" x="280" y="500" width="200" height="64" rx="10"/>
+        <text class="t-title" x="380" y="526" text-anchor="middle">הקלסר של רקמה ב'</text>
+        <text class="t-body" x="380" y="550" text-anchor="middle">200 ₪</text>
+        <rect class="box" x="40" y="500" width="200" height="64" rx="10"/>
+        <text class="t-title" x="140" y="522" text-anchor="middle">Strapi: חלוקות של ב'</text>
+        <text class="t-small ltr" x="140" y="538" text-anchor="middle">Σ Tosplit.hervachti</text>
+        <text class="t-body" x="140" y="556" text-anchor="middle">200 ₪</text>
+        <path class="cmp-ok" d="M280,532 H240"/>
+        <circle class="badge-ok" cx="260" cy="532" r="14"/><text class="badge-sym" x="260" y="537" text-anchor="middle">=</text>
+        <text class="t-ok" x="260" y="590" text-anchor="middle">תואם</text>
+
+        <text class="t-small" x="500" y="626" text-anchor="middle">המספר הכולל User.hervachti נשאר ב-Strapi, אבל כבר לא משמש להשוואה</text>
+      </svg>
+    </div>
+    <p class="col"><span class="chip c-next">הוחלט ב-30 באוקטובר 2026</span> היתרה בקלסר היא הכסף שהגיע מחלוקות <b>באותה רקמה בלבד</b>. ההשוואה תהיה מול סכום רכיבי <code>Tosplit.hervachti</code> של החלוקות של הרקמה, ולא מול המספר הכולל.</p>
+    <div class="cards2">
+      <article class="card">
+        <h3>למה לא לבדוק את כל הרקמות יחד</h3>
+        <p>המספר הכולל יכול היה לשמש כשרשרת שבודקת שהמספרים מסונכרנים בכל מקום. אבל אז רקמה אחת הייתה נבדקת דרך רקמה אחרת.</p>
+        <p class="muted">לרקמה ריבונית זה לא רלוונטי. כל רקמה אחראית לספרים שלה, כמו עסק שלא צריך את הדוחות של השכן כדי לסגור את החודש. לכן הבסיס הוא לפי רקמה.</p>
+      </article>
+      <article class="card">
+        <h3>ומה עם אישור שעות</h3>
+        <p>כשמאשרים שעות של משימה (<code>mission.approve</code>), הקלסר זיכה את היתרה בשווי העבודה. ב-Strapi ה-<code>hervachti</code> לא זז ברגע הזה, וכך נוצר עוד פער שאינו תקלה.</p>
+        <p class="fix"><b>ההחלטה:</b> אישור שעות ייחתם בלי סכום. שעות שאושרו הן חלק בשותפות, לא כסף ביד, והיתרה נשארת "כסף מחלוקות".</p>
       </article>
     </div>
   </section>
