@@ -2,7 +2,9 @@
 // no crypto/IDB needed (same approach as shadowSign.test.ts).
 
 import { describe, it, expect } from 'vitest';
-import { deriveConsentEventFromAction } from '$lib/client/shadowSign';
+import { deriveConsentEventFromAction, type SignableConsentEvent } from '$lib/client/shadowSign';
+import { project } from '$lib/consent/projection';
+import type { ConsentEvent } from '$lib/consent/event';
 import { s2bShadowJobs } from './s2b';
 
 describe('createMission shadow jobs', () => {
@@ -76,5 +78,129 @@ describe('completeMission / createChatMessage / createHaluka shadow jobs', () =>
     expect(ev?.predicate).toMatchObject({
       from: '1', to: '2', tosplitId: 'T1', amount: 120, code: 'ILS'
     });
+  });
+});
+
+// ------------------------------------------------------------- A2: the split
+// The events these jobs sign are run through the real reducers: the
+// predicate must be exactly what the projection reads, and none of them may
+// move a balance (A2 card — Strapi hervachti is per user, not per rikma).
+
+let seq = 0;
+function asEvent(t: SignableConsentEvent | null, actor: string, ts: number): ConsentEvent {
+  if (!t) throw new Error('template expected');
+  return {
+    v: 1, id: `e${++seq}`, actor, device: 'd', action: t.action, subject: t.subject,
+    predicate: t.predicate, parents: [], ts, nonce: 'n', sig: 's'
+  } as ConsentEvent;
+}
+
+const derive = (jobs: ReturnType<(typeof s2bShadowJobs)[string]>) =>
+  jobs.map((j) => deriveConsentEventFromAction(j.spec, j.params));
+
+describe('createTosplit shadow job', () => {
+  const params = {
+    data: { project: '45', halukas: ['H1', { id: 'H2' }], sales: [7, 8], hervachti: [{ amount: 100 }] }
+  };
+
+  it('signs tosplit.create from the raw GraphQL result, ids only', () => {
+    const [t] = derive(s2bShadowJobs.createTosplit(params, { data: { createTosplit: { data: { id: 'T5' } } } }));
+    expect(t?.action).toBe('tosplit.create');
+    expect(t?.subject).toEqual({ type: 'tosplit', id: 'T5' });
+    expect(t?.predicate).toEqual({ halukaIds: ['H1', 'H2'], saleIds: ['7', '8'] });
+  });
+
+  it('routes into the rikma from data.project', () => {
+    const [job] = s2bShadowJobs.createTosplit(params, { createTosplit: { data: { id: 'T5' } } });
+    expect(job.spec.projectIdFromParams?.(job.params)).toBe('45');
+  });
+
+  it('shadow-skips a failed create', () => {
+    expect(s2bShadowJobs.createTosplit(params, { errors: [{}] })).toEqual([]);
+  });
+});
+
+describe('approveHaluka shadow job', () => {
+  it('one haluka.approve per transfer, with the split it belongs to and no deltas', () => {
+    const ts = derive(
+      s2bShadowJobs.approveHaluka(
+        { tosplitId: 'T5', projectId: '45', halukot: ['H1', { id: 'H2' }], hervachUpdates: [{ userId: '1', amountDelta: 50 }] },
+        {}
+      )
+    );
+    expect(ts.map((t) => t?.subject)).toEqual([
+      { type: 'haluka', id: 'H1' },
+      { type: 'haluka', id: 'H2' }
+    ]);
+    for (const t of ts) {
+      expect(t?.action).toBe('haluka.approve');
+      expect(t?.predicate).toEqual({ tosplitId: 'T5' });
+    }
+  });
+
+  it('a split with nothing to transfer signs nothing', () => {
+    expect(s2bShadowJobs.approveHaluka({ tosplitId: 'T5', projectId: '45', halukot: [] }, {})).toEqual([]);
+    expect(s2bShadowJobs.approveHaluka({ projectId: '45', halukot: ['H1'] }, {})).toEqual([]);
+  });
+});
+
+describe('confirmHaluka shadow job', () => {
+  it('the receiver signs haluka.confirm', () => {
+    const [t] = derive(s2bShadowJobs.confirmHaluka({ halukaId: 'H1', projectId: '45', kind: 'receive' }, {}));
+    expect(t?.action).toBe('haluka.confirm');
+    expect(t?.subject).toEqual({ type: 'haluka', id: 'H1' });
+    expect(t?.predicate).toEqual({});
+  });
+
+  it("the sender's confirmation has no chain event", () => {
+    expect(s2bShadowJobs.confirmHaluka({ halukaId: 'H1', projectId: '45', kind: 'send' }, {})).toEqual([]);
+  });
+
+  it('no project (the deals page passes "") falls back to the mirror path', () => {
+    const [job] = s2bShadowJobs.confirmHaluka({ halukaId: 'H1', projectId: '', kind: 'receive' }, {});
+    expect(job.params.projectId).toBeUndefined();
+  });
+});
+
+describe('the split lifecycle through the reducers', () => {
+  it('create → haluka.create → approve → confirm: statuses move, balances do not', () => {
+    const tosplit = derive(
+      s2bShadowJobs.createTosplit({ data: { project: '45', halukas: ['H1'] } }, { data: { createTosplit: { data: { id: 'T5' } } } })
+    )[0];
+    const haluka = derive(
+      s2bShadowJobs.createHaluka(
+        { data: { project: '45', usersend: '256', userrecive: '258', tosplit: 'T5', amount: 120, matbea: 'ILS' } },
+        { createHaluka: { data: { id: 'H1' } } }
+      )
+    )[0];
+    const approve = derive(s2bShadowJobs.approveHaluka({ tosplitId: 'T5', projectId: '45', halukot: ['H1'] }, {}))[0];
+    const confirm = derive(s2bShadowJobs.confirmHaluka({ halukaId: 'H1', projectId: '45', kind: 'receive' }, {}))[0];
+
+    const events = [
+      asEvent(tosplit, '256', 1),
+      asEvent(haluka, '256', 2),
+      asEvent(approve, '261', 3),
+      asEvent(confirm, '258', 4)
+    ];
+    const state = project(events, '45');
+
+    expect(state.tosplits.get('T5')?.predicate).toEqual({ halukaIds: ['H1'], saleIds: [] });
+    expect(state.halukas.get('H1')).toMatchObject({ from: '256', to: '258', tosplitId: 'T5', status: 'confirmed' });
+    expect(state.balances.size).toBe(0);
+
+    // stop before the receipt: approved, not confirmed
+    expect(project(events.slice(0, 3), '45').halukas.get('H1')?.status).toBe('approved');
+  });
+
+  it("a confirm signed by anyone but the receiver changes nothing", () => {
+    const haluka = derive(
+      s2bShadowJobs.createHaluka(
+        { data: { usersend: '256', userrecive: '258', tosplit: 'T5', amount: 1 } },
+        { createHaluka: { data: { id: 'H1' } } }
+      )
+    )[0];
+    const confirm = derive(s2bShadowJobs.confirmHaluka({ halukaId: 'H1', projectId: '45', kind: 'receive' }, {}))[0];
+    const state = project([asEvent(haluka, '256', 1), asEvent(confirm, '261', 2)], '45');
+    expect(state.halukas.get('H1')?.status).toBe('pending');
   });
 });

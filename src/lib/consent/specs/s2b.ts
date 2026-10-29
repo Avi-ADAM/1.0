@@ -81,6 +81,53 @@ export const createHalukaConsentSpec: ConsentSpec = {
   }
 };
 
+// ---------------------------------------------------------------- tosplit
+// A2 (PLAN_DISTRIBUTED_EXECUTION): the split lifecycle around the votes
+// addVote already signs — the proposal those votes land on, its approval,
+// and each transfer's receipt. STATUS ONLY: no event here carries a balance
+// delta. Strapi's `hervachti` is one number per user across every rikma,
+// while the projection's balances are per rikma, so signing deltas now would
+// turn every multi-rikma member into a standing mismatch (A2 card).
+
+export const createTosplitConsentSpec: ConsentSpec = {
+  action: 'tosplit.create',
+  subjectType: 'tosplit',
+  subjectIdParam: 'tosplitId',
+  requireConsensus: false, // the consensus rides tosplit.vote
+  restimeFrom: 'project',
+  // createTosplit nests everything under `data` (raw GraphQL shape).
+  projectIdFromParams: (params) => {
+    const data = (params.data ?? {}) as Record<string, unknown>;
+    return data.project != null ? String(data.project) : null;
+  },
+  predicateFromParams: (params) => {
+    const data = (params.data ?? {}) as Record<string, unknown>;
+    return {
+      halukaIds: idList(data.halukas),
+      saleIds: idList(data.sales)
+    };
+  }
+};
+
+export const approveHalukaConsentSpec: ConsentSpec = {
+  action: 'haluka.approve',
+  subjectType: 'haluka',
+  subjectIdParam: 'halukaId',
+  requireConsensus: false, // quorum-free until the verifier owns it (policy.ts)
+  restimeFrom: 'project',
+  predicateFromParams: (params) => ({
+    tosplitId: params.tosplitId != null ? String(params.tosplitId) : undefined
+  })
+};
+
+export const confirmHalukaConsentSpec: ConsentSpec = {
+  action: 'haluka.confirm',
+  subjectType: 'haluka',
+  subjectIdParam: 'halukaId',
+  requireConsensus: false, // the receiver's sovereign "it arrived"
+  predicateFromParams: () => ({})
+};
+
 // ---------------------------------------------------------------- chat
 
 export const createChatMessageConsentSpec: ConsentSpec = {
@@ -99,6 +146,17 @@ export const createChatMessageConsentSpec: ConsentSpec = {
 
 function str(x: unknown): string | undefined {
   return x === undefined || x === null ? undefined : String(x);
+}
+
+/** Relation lists arrive as ids or as `{ id }` rows; signed as id strings. */
+function idList(x: unknown): string[] {
+  if (!Array.isArray(x)) return [];
+  const out: string[] = [];
+  for (const item of x) {
+    const id = str(item !== null && typeof item === 'object' ? (item as { id?: unknown }).id : item);
+    if (id) out.push(id);
+  }
+  return out;
 }
 
 /**
@@ -148,5 +206,37 @@ export const s2bShadowJobs: Record<string, ShadowJobDeriver> = {
     const messageId = str(result.messageId) ?? str((result as any)?.data?.messageId);
     if (!messageId) return [];
     return [{ spec: createChatMessageConsentSpec, params: { ...params, messageId } }];
+  },
+
+  createTosplit: (params, result) => {
+    // Returns the raw '70.5createTosplit' result, as the qid did.
+    const tosplitId =
+      str((result as any)?.data?.createTosplit?.data?.id) ??
+      str((result as any)?.createTosplit?.data?.id);
+    if (!tosplitId) return [];
+    return [{ spec: createTosplitConsentSpec, params: { ...params, tosplitId } }];
+  },
+
+  approveHaluka: (params) => {
+    // One approval per transfer in the split. A split with nothing to
+    // transfer (always so in a rikma of one) has no haluka to sign.
+    const tosplitId = str(params.tosplitId);
+    if (!tosplitId) return [];
+    return idList(params.halukot).map((halukaId) => ({
+      spec: approveHalukaConsentSpec,
+      params: { projectId: params.projectId, tosplitId, halukaId }
+    }));
+  },
+
+  confirmHaluka: (params) => {
+    // Only the receiver's confirmation is the chain's haluka.confirm (the
+    // reducer ignores anyone else). The sender's "I sent it" has no event yet.
+    if (params.kind !== 'receive') return [];
+    const halukaId = str(params.halukaId);
+    if (!halukaId) return [];
+    return [{
+      spec: confirmHalukaConsentSpec,
+      params: { projectId: params.projectId || undefined, halukaId }
+    }];
   }
 };

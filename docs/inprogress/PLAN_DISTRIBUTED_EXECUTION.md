@@ -103,7 +103,7 @@
 | 3 | B2 | ECDSA low-S בצד החותם (O-2) | S | — | ⬜ |
 | 4 | A1 | דגל Space לפי רקמה (allowlist בשרת) | M | — | ✔ |
 | 5 | A3 | טלמטריית אי-התאמות לשרת | M | A1 | ✔ |
-| 6 | A2 | הרחבת חתימות ה-shadow — באצוות | L | — | ⬜ |
+| 6 | A2 | הרחבת חתימות ה-shadow — באצוות | L | — | ◐ אצווה 1 (חלוקה) |
 | 7 | B6 | אימות התחייבויות אינקרמנטלי (O(n²) → O(n)) | M–L | — | ⬜ |
 | 8 | C0 | יישור Node 24 (Dockerfile, פיתוח) + גילוי יכולות PQ | S | — | ⬜ 🧑 (התקנה/deploy) |
 | 9 | B4 | מזהה מכשיר כטביעת אצבע (O-7) | L | — | ⬜ |
@@ -272,18 +272,38 @@ override של מפתחים; אחרת — הפרויקט ברשימה. עדכן �
 
 | reducer | config מועמד |
 |---|---|
-| `tosplit.create` | `createTosplit` |
-| `haluka.approve` / `haluka.confirm` | `approveHaluka` / `confirmHaluka` |
+| `tosplit.create` | `createTosplit` — ✔ אצווה 1 (ids בלבד: `halukaIds`, `saleIds`) |
+| `haluka.approve` / `haluka.confirm` | `approveHaluka` / `confirmHaluka` — ✔ אצווה 1, **סטטוס בלבד** (בלי `hervachDeltas` — ראו "ממצא היתרות"; confirm רק ב-`kind:'receive'`) |
 | `pgisha.create` / `pgisha.approve` | `createNewMeeting` / `approveMeeting` |
 | `time.tick` | `timerStart` / `timerStop` (**שים לב**: start ו-stop חולקים מפתח dedupe — `sessionMs` ב-stop חובה; SPEC §6.2) |
 | `pendm.vote` / `decision.vote` / `ask.vote` / `sheirutpend.vote` | `voteOnPendm` / `voteOnDecision` / `voteOnAskm` / `approveSheirutpend` — **בדוק קודם** אם `addVote` כבר מכסה את אותו מסלול; אל תחתום פעמיים |
-| `project.join` | `finalizeJoinAcceptance` |
-| `mission.approve` | `closeFiniapruval` (הכסף כ-`{amount: string, code}` — D-12) |
+| `project.join` | `finalizeJoinAcceptance` — **לא מתאים כמו שהוא**: ה-reducer מוסיף את `ev.actor`, אבל ה-action מורץ ע"י החבר המאשר ולא ע"י המצטרף. צריך `predicate.member` ב-reducer (שינוי פורמט + vector) או חתימה בצד המצטרף |
+| `mission.approve` | `closeFiniapruval` (הכסף כ-`{amount: string, code}` — D-12) — **ממתין להחלטת היתרות** (למטה): ה-reducer מזכה את ה-balance בערך העבודה, ו-`hervachti` ב-Strapi לא זז באישור משימה |
 | `project.amend` | `updateProjectDetails` (רק השדות שה-reducer מבין: `path`/`value`) |
 
 לכל action: spec ב-`s2b.ts` + רישום + טסט שמוודא שה-predicate בדיוק בצורה
 שה-reducer קורא (הרץ את האירוע דרך `project()` ובדוק את ה-state).
 **קבלה לכל אצווה**: טסטים ירוקים; עדכון הטבלה כאן (✔ לכל שורה שנעשתה).
+
+#### ממצא היתרות (2026-10-30) — 🧑 החלטה לפני חתימה על כסף
+
+`User.hervachti` ב-Strapi הוא **מספר אחד למשתמש, על פני כל הרקמות שלו**. הוא
+זז רק בשני מקומות: אישור חלוקה (`applyTosplitApproval`, ‏`hervachUpdates`) ואישור
+קבלה של ההעברה האחרונה (`confirmHaluka`, מ-`Tosplit.hervachti`). מנגד:
+
+1. **ההשוואה של T2/A3** מעמידה את `projection.balances` של רקמה **אחת** מול
+   ה-`hervachti` **הגלובלי**. חבר בשתי רקמות עם חלוקות ⇒ אי-התאמה קבועה שאינה
+   באג. רוב משתמשי הטסט (256/258/261) הם בדיוק כאלה.
+2. **genesis (T6)** מייבא את אותו `hervachti` גלובלי כיתרת הפתיחה של הרקמה —
+   אותה טעות, בעוגן החתום.
+3. **`mission.approve`** מזכה את ה-balance בערך העבודה, ו-`hervachti` לא זז
+   באישור משימה. לכן אלה שני מושגים שונים בשם אחד.
+
+**מה צריך להכריע:** מה `balances` בפרויקציה אמור לייצג — כסף שהתקבל מחלוקות
+ברקמה הזו (ואז ערך ההשוואה בצד Strapi = סכום רכיבי `Tosplit.hervachti` של
+החלוקות שהסתיימו ברקמה, ו-`mission.approve` לא נוגע בו), או שווי שנצבר (ואז
+ההשוואה מול `hervachti` שגויה מהיסוד ויש למצוא ערך אחר). עד ההחלטה: אצווה 1
+חותמת סטטוס בלבד, והדוח של A3 יראה אי-התאמות יתרה שאינן באגים.
 
 ### B6 — אימות התחייבויות אינקרמנטלי
 **למה**: `verifyCommitments` משחזר את כל סגור האבות לכל אירוע ⇒ O(n²) בסנכרון
@@ -367,6 +387,7 @@ projection, עם fallback ל-Strapi כשה-Space ריק או לא מסונכרן
 | C0 | התקנת Node 24 מקומית; deploy VPS עם `node:24-alpine` | C1, C2 (vectors PQ) |
 | B5 | אישור חבילת v3 | מימוש O-3/O-5/O-6 |
 | A4 | בחירת רקמת פיילוט + env בפרודקשן | A5 |
+| משמעות היתרות | מה `balances` בפרויקציה מייצג (כרטיס A2, "ממצא היתרות") — ההשוואה היום מול `hervachti` גלובלי | חתימת כסף ב-A2, אמינות הדוח של A3, genesis |
 | שער S3 | ההחלטה המוצרית (PLAN_serverless_p2p_data §1, תנאים א–ד) | S3, E1 |
 
 ---
@@ -381,3 +402,4 @@ projection, עם fallback ל-Strapi כשה-Space ריק או לא מסונכרן
 - 2026-10-30 · A1 · `$lib/space/syncFlag.ts` (טהור: `decideSpaceSync`, `parseSpaceSyncProjects`); `(reg)/+layout.server.js` מעביר `spaceSyncProjects` מ-`SPACE_SYNC_PROJECTS` (`$env/dynamic/private`); `spaceSyncEnabled(projectId?)` קורא את `page.data` (‏`$app/state`, בלי תלות בסדר mount) וזוכר את הרשימה האחרונה; הקוראים (`shadowSign`, `SpaceProjectionShadow`, `startAutoSync`) מעבירים רקמה. **ה-env נכנס ל-Vercel, לא ל-VPS** — ה-load רץ שם. הוסר `console.log` דיבאג מ-`startAutoSync` · 450→458 (8 ב-`syncFlag.test.ts`), 14 vectors, check: ‏1315 שגיאות (ללא שינוי) ו-1286 אזהרות (מ-1287). לא נבדק בדפדפן: דורש dev server עם המשתנה וסשן מחובר מקומי · commit `dist: A1` · הבא: A3 (טלמטריה), או B1/B2
 - 2026-10-30 · A1 (הפעלה) · לפי בקשת המשתמש: `SPACE_SYNC_PROJECTS` הוגדר ב-Vercel (פרויקט `1-0`, Production בלבד, plain) עם 19 רקמות הטסט מ-`hiddenProjects.ts` (`45,46,51,56,55,54,63,72,80,67,43,83,84,85,82,86,81,79,88`). זה שלב מקדים ל-A4, על רקמות טסט בלבד. **לכבות**: למחוק את המשתנה ב-Vercel ולעשות redeploy · נדחף יחד עם A1
 - 2026-10-30 · A3 · `POST /api/consent/telemetry` (מחובר, 30 לדקה, ולידציה שמסירה כל שדה זר) + `SpaceProjectionShadow` שולח snapshot לכל מצב synced שונה + `scripts/space-shadow-report.mjs` שמחשב את קריטריון היציאה לכל רקמה. השורות נכנסות ל-Axiom דרך ה-VPS, ו-JSONL אופציונלי ב-`CONSENT_TELEMETRY_FILE` · 458→478 (20 ב-`server/consent/shadowTelemetry.test.ts`), 14 vectors, check:proxy ירוק, check: ‏1315/1286 ללא שינוי · commit `dist: A3` · **🧑 deploy ל-VPS** (ה-endpoint רץ שם) · הבא: A2 (הרחבת החתימות), או B1/B2
+- 2026-10-30 · A2 אצווה 1 · מחזור החלוקה נחתם: `createTosplit` → `tosplit.create` (ids), `approveHaluka` → `haluka.approve` לכל העברה (סטטוס בלבד, בלי deltas), `confirmHaluka` (`kind:'receive'` בלבד) → `haluka.confirm`. **ממצא**: `User.hervachti` גלובלי למשתמש ⇒ השוואת היתרות של A3 ו-genesis של T6 משווים יתרת רקמה למספר על פני כל הרקמות; `mission.approve` לא נחתם עד החלטה (§5). `project.join` לא מתאים בלי שינוי reducer. פערי כיסוי ידועים: אישור חלוקה בשתיקה (timegrama, צד שרת) ו-`confirmHaluka` מדף `/deals` (fetch ישיר, לא `executeAction`) לא חותמים · 478→488, 14 vectors, check 1315/1286 · commit `dist: A2.1` · הבא: החלטת היתרות; אצווה 2 (`pgisha.*`, `time.tick`)
