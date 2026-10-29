@@ -1,0 +1,652 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>השכבה המבוזרת של 1lev1</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@500;700&family=IBM+Plex+Sans+Hebrew:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one reading column (~68ch) of short sections; the diagram and the roadmap break out wider. Paper-and-ink, with a postal-stamp accent. */
+:root {
+  --bg: #f3f6f7;
+  --surface: #ffffff;
+  --surface2: #e9eff1;
+  --ink: #16232b;
+  --muted: #586973;
+  --line: #cfd9de;
+  --accent: #0e6a76;
+  --accent-soft: #d6ecee;
+  --stamp: #9a3d2a;
+
+  --ok: #2f7a3e;
+  --ok-soft: #dcefdf;
+  --warn: #8a5b00;
+  --warn-soft: #f6e9c8;
+  --off: #5f6b72;
+  --off-soft: #e3e8eb;
+  --bad: #a3302a;
+  --bad-soft: #f6dcd9;
+
+  --display: "Frank Ruhl Libre", "David", "Times New Roman", serif;
+  --sans: "IBM Plex Sans Hebrew", "Segoe UI", "Arial Hebrew", Arial, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e1519;
+    --surface: #152027;
+    --surface2: #1b2931;
+    --ink: #e3eaee;
+    --muted: #96a6b0;
+    --line: #2c3c46;
+    --accent: #5cc3cd;
+    --accent-soft: #163a40;
+    --stamp: #e58b74;
+    --ok: #7fcf8d;
+    --ok-soft: #173622;
+    --warn: #e9be62;
+    --warn-soft: #3a2e12;
+    --off: #a3afb6;
+    --off-soft: #24323a;
+    --bad: #f08a80;
+    --bad-soft: #3d1c1a;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e1519;
+  --surface: #152027;
+  --surface2: #1b2931;
+  --ink: #e3eaee;
+  --muted: #96a6b0;
+  --line: #2c3c46;
+  --accent: #5cc3cd;
+  --accent-soft: #163a40;
+  --stamp: #e58b74;
+  --ok: #7fcf8d;
+  --ok-soft: #173622;
+  --warn: #e9be62;
+  --warn-soft: #3a2e12;
+  --off: #a3afb6;
+  --off-soft: #24323a;
+  --bad: #f08a80;
+  --bad-soft: #3d1c1a;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 17px;
+  line-height: 1.7;
+}
+.page {
+  direction: rtl;
+  max-width: 1080px;
+  margin: 0 auto;
+  padding-block: 40px 72px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid;
+  gap: 56px;
+}
+.col { max-width: 70ch; }
+h1, h2, h3 { font-family: var(--display); text-wrap: balance; margin: 0; line-height: 1.25; }
+h1 { font-size: clamp(2.1rem, 5vw, 3.2rem); font-weight: 700; }
+h2 { font-size: clamp(1.55rem, 3.4vw, 2rem); font-weight: 700; }
+h3 { font-size: 1.2rem; font-weight: 700; }
+p { margin: 0; }
+code, .mono { font-family: var(--mono); font-size: .86em; direction: ltr; unicode-bidi: isolate; }
+code { background: var(--surface2); padding: 1px 6px; border-radius: 4px; }
+section { display: grid; gap: 20px; }
+.eyebrow { font-size: .8rem; letter-spacing: .08em; color: var(--accent); font-weight: 600; }
+.lead { font-size: 1.15rem; color: var(--ink); }
+.muted { color: var(--muted); }
+.stack { display: grid; gap: 12px; }
+
+/* hero */
+header.hero { display: grid; gap: 18px; }
+.now {
+  display: flex; flex-wrap: wrap; gap: 10px 22px; align-items: center;
+  border-block: 1px solid var(--line); padding-block: 14px; font-size: .95rem;
+}
+.now b { font-weight: 600; }
+
+/* chips */
+.chip {
+  display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
+  font-size: .78rem; font-weight: 600; padding: 2px 10px; border-radius: 999px;
+  line-height: 1.7;
+}
+.chip::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.c-ok { color: var(--ok); background: var(--ok-soft); }
+.c-warn { color: var(--warn); background: var(--warn-soft); }
+.c-off { color: var(--off); background: var(--off-soft); }
+.c-bad { color: var(--bad); background: var(--bad-soft); }
+.c-next { color: var(--accent); background: var(--accent-soft); }
+
+/* glossary */
+.terms { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 14px; }
+.term {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 10px;
+  padding: 18px 18px 16px; display: grid; gap: 8px; align-content: start; min-width: 0;
+}
+.term h3 { font-size: 1.15rem; }
+.term .like { color: var(--stamp); font-weight: 600; font-size: .95rem; }
+.term p { font-size: .95rem; }
+.term .tech { font-size: .8rem; color: var(--muted); }
+
+/* diagram */
+.figure { display: grid; gap: 14px; }
+.scroller {
+  overflow-x: auto; background: var(--surface); border: 1px solid var(--line);
+  border-radius: 12px; padding: 12px;
+}
+.scroller svg { display: block; width: 100%; min-width: 820px; height: auto; }
+.scroll-hint { font-size: .85rem; color: var(--muted); display: none; }
+@media (max-width: 860px) { .scroll-hint { display: block; } }
+
+svg text { font-family: var(--sans); fill: var(--ink); direction: rtl; }
+svg .ltr { direction: ltr; unicode-bidi: isolate; font-family: var(--mono); }
+svg .t-title { font-size: 15px; font-weight: 600; }
+svg .t-body { font-size: 13px; }
+svg .t-small { font-size: 11.5px; fill: var(--muted); }
+svg .t-accent { fill: var(--accent); font-weight: 600; font-size: 12.5px; }
+svg .t-warn { fill: var(--stamp); font-weight: 600; font-size: 12px; }
+svg .zone { fill: var(--surface2); stroke: var(--line); stroke-width: 1.2; }
+svg .box { fill: var(--surface); stroke: var(--line); stroke-width: 1.2; }
+svg .box-strong { fill: var(--surface); stroke: var(--accent); stroke-width: 1.6; }
+svg .row { fill: var(--bg); stroke: var(--line); stroke-width: 1; }
+svg .ghost { fill: none; stroke: var(--off); stroke-width: 1.3; stroke-dasharray: 6 5; }
+svg .slot { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 1; }
+svg .slot-new { fill: none; stroke: var(--accent); stroke-width: 1; stroke-dasharray: 3 3; }
+svg .flow { fill: none; stroke: var(--accent); stroke-width: 2; }
+svg .flow-thin { fill: none; stroke: var(--muted); stroke-width: 1.4; stroke-dasharray: 4 4; }
+svg .flow-wake { fill: none; stroke: var(--stamp); stroke-width: 2; stroke-dasharray: 8 5; }
+svg .badge { fill: var(--accent); }
+svg .badge-wake { fill: var(--stamp); }
+svg .badge-t { fill: var(--surface); font-size: 12px; font-weight: 700; font-family: var(--mono); direction: ltr; }
+svg .warnmark { fill: var(--bad-soft); stroke: var(--bad); stroke-width: 1; }
+svg .warnmark-t { fill: var(--bad); font-size: 11px; font-weight: 700; }
+svg .m-accent { fill: var(--accent); }
+svg .m-muted { fill: var(--muted); }
+svg .m-wake { fill: var(--stamp); }
+
+ol.steps { margin: 0; padding: 0 1.4em 0 0; display: grid; gap: 8px; }
+ol.steps li { padding-inline-start: 4px; }
+ol.steps li::marker { font-family: var(--mono); color: var(--accent); font-weight: 600; }
+
+/* gaps */
+.cards2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 14px; }
+.card {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 10px;
+  padding: 20px; display: grid; gap: 10px; align-content: start; min-width: 0;
+}
+.card .head { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; justify-content: space-between; }
+.card .fix { border-top: 1px dashed var(--line); padding-top: 10px; font-size: .95rem; }
+.card .fix b { color: var(--accent); }
+
+/* status table */
+.tablewrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; min-width: 600px; font-size: .95rem; }
+th, td { text-align: right; padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: .8rem; letter-spacing: .05em; color: var(--muted); font-weight: 600; background: var(--surface2); }
+tr:last-child td { border-bottom: 0; }
+td .chip { margin-bottom: 4px; }
+td small { display: block; color: var(--muted); font-size: .85rem; line-height: 1.5; }
+
+/* ladder */
+.ladder { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; }
+.rung {
+  border: 1px solid var(--line); background: var(--surface); border-radius: 8px;
+  padding: 12px 10px; display: grid; gap: 4px; align-content: start; min-width: 0;
+  font-size: .88rem; line-height: 1.5;
+}
+.rung .k { font-family: var(--mono); font-weight: 500; color: var(--muted); font-size: .85rem; }
+.rung.here { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+.rung.here .k { color: var(--accent); }
+.rung.gate { background: var(--surface2); }
+@media (max-width: 760px) { .ladder { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* roadmap */
+.track { display: grid; gap: 0; position: relative; }
+.stop {
+  display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 0 16px; position: relative;
+}
+.stop .dot {
+  grid-row: 1 / span 2; justify-self: center; width: 40px; height: 40px; border-radius: 50%;
+  display: grid; place-items: center; font-family: var(--mono); font-size: .78rem; font-weight: 600;
+  background: var(--surface); border: 2px solid var(--line); color: var(--muted); position: relative; z-index: 1;
+}
+.stop::before {
+  content: ""; position: absolute; top: 40px; bottom: 0; right: 27px; width: 2px; background: var(--line);
+}
+.stop:last-child::before { display: none; }
+.stop .body { padding-bottom: 24px; display: grid; gap: 4px; min-width: 0; }
+.stop .body .t { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; font-weight: 600; font-size: 1.05rem; }
+.stop .body p { font-size: .95rem; color: var(--muted); }
+.stop.done .dot { background: var(--ok-soft); border-color: var(--ok); color: var(--ok); }
+.stop.next .dot { background: var(--accent); border-color: var(--accent); color: var(--surface); }
+.stop.user .dot { border-style: dashed; border-color: var(--warn); color: var(--warn); }
+.stop.gate .dot { border-radius: 8px; border-color: var(--stamp); color: var(--stamp); background: var(--surface2); }
+
+.tracks { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr)); gap: 12px; }
+.tr {
+  border: 1px solid var(--line); border-radius: 10px; padding: 16px; background: var(--surface);
+  display: grid; gap: 6px; align-content: start; min-width: 0;
+}
+.tr .k { font-family: var(--mono); font-weight: 600; color: var(--accent); }
+.tr p { font-size: .92rem; }
+
+.waiting { display: grid; gap: 0; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+.waiting > div { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 16px; padding: 14px 16px; border-bottom: 1px solid var(--line); align-items: baseline; }
+.waiting > div:last-child { border-bottom: 0; }
+.waiting .blocks { font-size: .82rem; color: var(--muted); white-space: nowrap; }
+@media (max-width: 520px) { .waiting > div { grid-template-columns: minmax(0, 1fr); } .waiting .blocks { white-space: normal; } }
+
+footer { border-top: 1px solid var(--line); padding-top: 18px; font-size: .85rem; color: var(--muted); display: grid; gap: 6px; }
+footer ul { margin: 0; padding: 0 1.2em 0 0; }
+a { color: var(--accent); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+</style>
+</head>
+<body>
+
+<div class="page" lang="he" dir="rtl">
+
+  <header class="hero">
+    <span class="eyebrow">1lev1 · השכבה המבוזרת · מצב לאוקטובר 2026</span>
+    <h1>השכבה המבוזרת של 1lev1</h1>
+    <p class="lead col">היום כל הנתונים של רקמה יושבים במקום אחד: Strapi, הדאטהבייס שלנו. לידו נבנית מערכת שנייה. בה כל הסכמה היא מסמך חתום, וכל חבר מחזיק עותק של כל המסמכים במכשיר שלו. המערכת השנייה רצה כבר, אבל רק כ"צל": היא רושמת ומשווה, ולא מחליטה כלום.</p>
+    <div class="now">
+      <span><b>מקור האמת היום:</b> Strapi בלבד</span>
+      <span><span class="chip c-warn">צל</span> חתימות על 7 פעולות</span>
+      <span><span class="chip c-off">כבוי</span> סנכרון ותצוגה מה-Space</span>
+      <span><span class="chip c-bad">אסור</span> הצפנה למשתמשים אמיתיים</span>
+    </div>
+  </header>
+
+  <section>
+    <span class="eyebrow">המילים</span>
+    <h2>שמונה מושגים, בשפה של כל יום</h2>
+    <p class="col muted">כל מושג מקבל השוואה מהחיים. השורה הקטנה בסוף כל כרטיס היא השם בקוד, למי שירצה לחפש.</p>
+    <div class="terms">
+      <article class="term">
+        <h3>אירוע הסכמה חתום</h3>
+        <span class="like">כמו מסמך חתום</span>
+        <p>כל פעולה ברקמה, כמו הצבעה, מכירה או משימה שהסתיימה, נכתבת כמסמך קטן. המכשיר שלך חותם עליו. מי שמשנה בו אות אחת שובר את החתימה, וכולם רואים.</p>
+        <span class="tech">ConsentEvent · מזהה = טביעת אצבע של התוכן (sha256)</span>
+      </article>
+      <article class="term">
+        <h3>Space</h3>
+        <span class="like">כמו קלסר משותף של רקמה</span>
+        <p>כל המסמכים החתומים של רקמה אחת. לכל רקמה קלסר משלה. מסמך חדש תמיד מצביע על המסמכים שהיו לפניו, וכך נשמר הסדר.</p>
+        <span class="tech">spaceId = project:&lt;id&gt; · DAG של אירועים</span>
+      </article>
+      <article class="term">
+        <h3>רפליקה</h3>
+        <span class="like">כמו צילום של הקלסר שמחזיקים בבית</span>
+        <p>העותק של הקלסר בתוך המכשיר שלך. הוא נפתח מיד, עוד לפני שיש רשת. כשהרשת חוזרת, העותק משלים את מה שחסר.</p>
+        <span class="tech">IndexedDB ‏freemates-crypto · spaceStore.svelte.ts</span>
+      </article>
+      <article class="term">
+        <h3>relay</h3>
+        <span class="like">כמו תיבת דואר טיפשה</span>
+        <p>תיבה על השרת שמקבלת מסמכים ומעבירה אותם הלאה. היא נותנת לכל מסמך מספר סידורי. היא לא מחליטה כלום ולא מוחקת כלום. היא בודקת חתימה רק כדי לסנן זבל, וכל מכשיר בודק שוב בעצמו.</p>
+        <span class="tech">/api/relay/[spaceId] · log.ts</span>
+      </article>
+      <article class="term">
+        <h3>סנכרון</h3>
+        <span class="like">כמו "מה הדף האחרון שיש לך?"</span>
+        <p>שני מכשירים לא שולחים את כל הקלסר. הם משווים רק את הדפים האחרונים, ושולחים רק את מה שחסר. כשאין שינוי, הבדיקה כמעט בחינם.</p>
+        <span class="tech">heads / diff, בסגנון git · seq cursor</span>
+      </article>
+      <article class="term">
+        <h3>projection</h3>
+        <span class="like">כמו רואה חשבון שקורא את הקלסר</span>
+        <p>חישוב שעובר על כל המסמכים לפי הסדר ומסכם: מי חבר, מה אושר, כמה לכל אחד. אותם מסמכים נותנים אותה תוצאה בכל מכשיר, תמיד.</p>
+        <span class="tech">project(events) → ProjectState · reducers</span>
+      </article>
+      <article class="term">
+        <h3>הצפנה לפי epoch</h3>
+        <span class="like">כמו מנעול לקלסר שמחליפים כשמישהו עוזב</span>
+        <p>לכל תקופה מפתח משלה, וכל חבר מקבל עותק. חבר שעזב קורא את מה שהיה כשהיה שם, אבל לא את מה שנכתב אחריו. זה בנוי ונבדק, ואסור להפעיל למשתמשים אמיתיים.</p>
+        <span class="tech">epoch.rotate · S3a · src/lib/space/e2e</span>
+      </article>
+      <article class="term">
+        <h3>צל (shadow)</h3>
+        <span class="like">כמו מתלמד שרושם לצד המנהל</span>
+        <p>המערכת החדשה רצה לצד Strapi, רושמת את אותן פעולות ומשווה תוצאות. אם יש פער, זה נרשם. ההחלטה עדיין של Strapi.</p>
+        <span class="tech">CONSENT_MIRROR · SpaceProjectionShadow</span>
+      </article>
+    </div>
+  </section>
+
+  <section class="figure">
+    <span class="eyebrow">איך זה זורם היום</span>
+    <h2>מסמך אחד, מהטלפון של דנה לטלפון של יוסי</h2>
+    <p class="col muted">כך זה עובד כשהסנכרון דלוק בדפדפן. היום הוא דלוק רק אצל מפתחים, בדגל מקומי. המספרים בתרשים הם סדר הצעדים, והם מוסברים מתחתיו.</p>
+    <p class="scroll-hint">התרשים רחב. גוללים אותו לצדדים.</p>
+    <div class="scroller" role="img" aria-label="תרשים: שני מכשירים, Vercel, ושרת ה-VPS עם nginx, הקונטיינר sveltekit-api שבו ה-relay, Strapi ו-socket-server">
+      <svg viewBox="0 0 1000 640" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="ar-acc" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="m-accent"/></marker>
+          <marker id="ar-mut" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="m-muted"/></marker>
+          <marker id="ar-wake" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="m-wake"/></marker>
+        </defs>
+
+        <!-- ===== VPS zone (left) ===== -->
+        <rect class="zone" x="16" y="16" width="398" height="606" rx="14"/>
+        <text class="t-title" x="215" y="42" text-anchor="middle">שרת ה-VPS (Docker)</text>
+
+        <!-- nginx strip -->
+        <rect class="box" x="334" y="60" width="64" height="330" rx="8"/>
+        <text class="t-title ltr" transform="translate(360 225) rotate(-90)" text-anchor="middle">nginx</text>
+        <text class="t-small ltr" transform="translate(381 225) rotate(-90)" text-anchor="middle">api.1lev1.com</text>
+
+        <!-- sveltekit-api container -->
+        <rect class="box-strong" x="32" y="60" width="288" height="330" rx="10"/>
+        <text class="t-title ltr" x="176" y="84" text-anchor="middle">sveltekit-api</text>
+        <text class="t-small" x="176" y="103" text-anchor="middle">קונטיינר אחד, תהליך אחד. אין עותקים נוספים</text>
+
+        <!-- relay -->
+        <rect class="row" x="48" y="116" width="256" height="156" rx="8"/>
+        <text class="t-title" x="176" y="140" text-anchor="middle">ה-relay: תיבת הדואר</text>
+        <text class="t-small" x="176" y="159" text-anchor="middle">יומן בזיכרון, מספר סידורי לכל מסמך</text>
+        <!-- seq slots, 1 on the right (reading order) -->
+        <rect class="slot" x="252" y="172" width="34" height="30" rx="4"/><text class="t-body ltr" x="269" y="192" text-anchor="middle">1</text>
+        <rect class="slot" x="212" y="172" width="34" height="30" rx="4"/><text class="t-body ltr" x="229" y="192" text-anchor="middle">2</text>
+        <rect class="slot" x="172" y="172" width="34" height="30" rx="4"/><text class="t-body ltr" x="189" y="192" text-anchor="middle">3</text>
+        <rect class="slot" x="132" y="172" width="34" height="30" rx="4"/><text class="t-body ltr" x="149" y="192" text-anchor="middle">4</text>
+        <rect class="slot-new" x="92" y="172" width="34" height="30" rx="4"/><text class="t-body ltr" x="109" y="192" text-anchor="middle">5</text>
+        <text class="t-small" x="74" y="192" text-anchor="middle">…</text>
+        <text class="t-body" x="176" y="226" text-anchor="middle">כל deploy מתחיל את המספור מחדש</text>
+        <text class="t-small ltr" x="176" y="246" text-anchor="middle">logEpoch</text>
+        <text class="t-small" x="176" y="263" text-anchor="middle">המכשירים מזהים ומסנכרנים מאפס</text>
+
+        <rect class="row" x="48" y="282" width="256" height="40" rx="8"/>
+        <text class="t-body" x="176" y="307" text-anchor="middle">בודק חתימה נגד זבל, ונותן מספר</text>
+
+        <rect class="row" x="48" y="332" width="256" height="44" rx="8"/>
+        <text class="t-body" x="190" y="359" text-anchor="middle">מקבל עד 200 מסמכים בבקשה אחת</text>
+        <rect class="warnmark" x="56" y="343" width="46" height="22" rx="11"/>
+        <text class="warnmark-t" x="79" y="358" text-anchor="middle">פער 2</text>
+
+        <!-- Strapi & socket-server -->
+        <rect class="box" x="32" y="424" width="138" height="112" rx="10"/>
+        <text class="t-title ltr" x="101" y="452" text-anchor="middle">Strapi</text>
+        <text class="t-body" x="101" y="474" text-anchor="middle">מקור האמת היום</text>
+        <text class="t-small" x="101" y="496" text-anchor="middle">שומר עותק של כל מסמך</text>
+        <text class="t-small ltr" x="101" y="514" text-anchor="middle">consent-event</text>
+
+        <rect class="box" x="182" y="424" width="138" height="112" rx="10"/>
+        <text class="t-title ltr" x="251" y="452" text-anchor="middle">socket-server</text>
+        <text class="t-body" x="251" y="474" text-anchor="middle">הפעמון</text>
+        <text class="t-small ltr" x="251" y="496" text-anchor="middle">space:changed</text>
+        <text class="t-small" x="251" y="514" text-anchor="middle">רק "יש חדש", בלי תוכן</text>
+
+        <!-- gap 1 note -->
+        <rect class="warnmark" x="32" y="552" width="366" height="56" rx="8"/>
+        <text class="warnmark-t" x="215" y="574" text-anchor="middle">פער 1: אחרי deploy, Strapi לא יודע להחזיר "כל מסמכי הרקמה"</text>
+        <text class="t-small" x="215" y="595" text-anchor="middle">לכן התיבה מתחילה ריקה, עד שחבר ותיק מסנכרן וממלא אותה</text>
+
+        <!-- internal arrows -->
+        <path class="flow" d="M334,200 H306" marker-end="url(#ar-acc)"/>
+        <circle class="badge" cx="320" cy="180" r="11"/><text class="badge-t" x="320" y="184" text-anchor="middle">3</text>
+
+        <path class="flow" d="M101,390 V422" marker-end="url(#ar-acc)"/>
+        <circle class="badge" cx="124" cy="406" r="11"/><text class="badge-t" x="124" y="410" text-anchor="middle">4</text>
+
+        <path class="flow-wake" d="M251,390 V422" marker-end="url(#ar-wake)"/>
+        <circle class="badge-wake" cx="274" cy="406" r="11"/><text class="badge-t" x="274" y="410" text-anchor="middle">5</text>
+
+        <!-- ===== middle: Vercel + ghost relay ===== -->
+        <rect class="box" x="452" y="36" width="224" height="128" rx="10"/>
+        <text class="t-title ltr" x="564" y="64" text-anchor="middle">1lev1.com</text>
+        <text class="t-body" x="564" y="86" text-anchor="middle">Vercel: מגיש את הדפים</text>
+        <text class="t-small" x="564" y="110" text-anchor="middle">המשתנה VITE_API_BASE שולח</text>
+        <text class="t-small ltr" x="564" y="128" text-anchor="middle">/api/* → api.1lev1.com</text>
+        <text class="t-small" x="564" y="148" text-anchor="middle">ולכן ה-relay לא רץ כאן</text>
+
+        <rect class="ghost" x="452" y="262" width="224" height="104" rx="10"/>
+        <text class="t-body" x="564" y="288" text-anchor="middle">relay על Vercel: לא בשימוש</text>
+        <text class="t-small" x="564" y="308" text-anchor="middle">אפליקציית Tauri, או deploy</text>
+        <text class="t-small" x="564" y="325" text-anchor="middle">בלי VITE_API_BASE, יגיעו לכאן</text>
+        <text class="t-warn" x="564" y="349" text-anchor="middle">כמה תיבות שלא מכירות זו את זו</text>
+
+        <!-- page load -->
+        <path class="flow-thin" d="M676,100 H718" marker-end="url(#ar-mut)"/>
+        <text class="t-small" x="697" y="92" text-anchor="middle">הדף</text>
+
+        <!-- 2: push -->
+        <path class="flow" d="M720,214 H400" marker-end="url(#ar-acc)"/>
+        <circle class="badge" cx="700" cy="196" r="11"/><text class="badge-t" x="700" y="200" text-anchor="middle">2</text>
+        <text class="t-accent ltr" x="560" y="205" text-anchor="middle">POST /api/relay/project:X</text>
+        <text class="t-small" x="560" y="234" text-anchor="middle">שולח את המסמך החתום</text>
+
+        <!-- 7: pull -->
+        <path class="flow" d="M720,404 H428 V340 H400" marker-end="url(#ar-acc)"/>
+        <circle class="badge" cx="700" cy="386" r="11"/><text class="badge-t" x="700" y="390" text-anchor="middle">7</text>
+        <text class="t-accent ltr" x="575" y="396" text-anchor="middle">GET ?since=4</text>
+        <text class="t-small" x="575" y="422" text-anchor="middle">מושך רק מה שחסר</text>
+
+        <!-- 6: wake -->
+        <path class="flow-wake" d="M320,470 H718" marker-end="url(#ar-wake)"/>
+        <circle class="badge-wake" cx="700" cy="452" r="11"/><text class="badge-t" x="700" y="456" text-anchor="middle">6</text>
+        <text class="t-warn" x="560" y="460" text-anchor="middle">דינג: "יש חדש בקלסר"</text>
+        <text class="t-small" x="560" y="490" text-anchor="middle">גיבוי: בדיקה כל 3 דקות, וכל 20 שניות בלי socket</text>
+
+        <!-- ===== right: devices ===== -->
+        <!-- Device A -->
+        <rect class="box-strong" x="720" y="40" width="262" height="254" rx="12"/>
+        <text class="t-title" x="851" y="66" text-anchor="middle">הטלפון של דנה</text>
+        <rect class="row" x="736" y="80" width="230" height="42" rx="7"/>
+        <text class="t-body" x="851" y="106" text-anchor="middle">האפליקציה בדפדפן</text>
+        <rect class="row" x="736" y="128" width="230" height="48" rx="7"/>
+        <text class="t-body" x="851" y="148" text-anchor="middle">מפתח החתימה של המכשיר</text>
+        <text class="t-small" x="851" y="166" text-anchor="middle">לא יוצא מהמכשיר, אף פעם</text>
+        <rect class="row" x="736" y="182" width="230" height="48" rx="7"/>
+        <text class="t-body" x="851" y="202" text-anchor="middle">הקלסר המקומי</text>
+        <text class="t-small ltr" x="851" y="220" text-anchor="middle">IndexedDB · freemates-crypto</text>
+        <rect class="row" x="736" y="236" width="230" height="46" rx="7"/>
+        <text class="t-body" x="851" y="256" text-anchor="middle">projection מקומי</text>
+        <text class="t-small" x="851" y="273" text-anchor="middle">יתרות, חברים, הצבעות</text>
+        <circle class="badge" cx="736" cy="152" r="11"/><text class="badge-t" x="736" y="156" text-anchor="middle">1</text>
+
+        <!-- Device B -->
+        <rect class="box-strong" x="720" y="340" width="262" height="254" rx="12"/>
+        <text class="t-title" x="851" y="366" text-anchor="middle">הטלפון של יוסי</text>
+        <rect class="row" x="736" y="380" width="230" height="42" rx="7"/>
+        <text class="t-body" x="851" y="406" text-anchor="middle">האפליקציה בדפדפן</text>
+        <rect class="row" x="736" y="428" width="230" height="48" rx="7"/>
+        <text class="t-body" x="851" y="448" text-anchor="middle">בודק כל חתימה בעצמו</text>
+        <text class="t-small" x="851" y="466" text-anchor="middle">לא סומך על השרת</text>
+        <rect class="row" x="736" y="482" width="230" height="48" rx="7"/>
+        <text class="t-body" x="851" y="502" text-anchor="middle">הקלסר המקומי</text>
+        <text class="t-small ltr" x="851" y="520" text-anchor="middle">IndexedDB · freemates-crypto</text>
+        <rect class="row" x="736" y="536" width="230" height="46" rx="7"/>
+        <text class="t-body" x="851" y="556" text-anchor="middle">projection מקומי</text>
+        <text class="t-small" x="851" y="573" text-anchor="middle">מתעדכן מיד</text>
+        <circle class="badge" cx="736" cy="507" r="11"/><text class="badge-t" x="736" y="511" text-anchor="middle">8</text>
+      </svg>
+    </div>
+    <ol class="steps col">
+      <li><b>דנה מצביעה.</b> הטלפון שלה כותב את ההצבעה כמסמך, חותם עליו, שומר אותו בקלסר המקומי ומעדכן את המסך. כל זה קורה לפני שמשהו יוצא לרשת.</li>
+      <li><b>המסמך נשלח.</b> הקוד פונה לכתובת <code>/api/relay</code>. בפרודקשן הכתובת מופנית ל-<code>api.1lev1.com</code>, כלומר ל-VPS ולא ל-Vercel.</li>
+      <li><b>nginx מעביר לקונטיינר.</b> יש קונטיינר <code>sveltekit-api</code> אחד בלבד, ולכן יש תיבת דואר אחת לכל רקמה. ה-relay בודק את החתימה ונותן למסמך מספר.</li>
+      <li><b>עותק נשמר ב-Strapi.</b> המספור עצמו חי רק בזיכרון. המסמך נשמר גם ב-Strapi, כדי שלא ילך לאיבוד.</li>
+      <li><b>ה-relay מצלצל.</b> הוא מודיע ל-socket-server, ברשת הפנימית של השרת, שהקלסר של הרקמה השתנה.</li>
+      <li><b>הפעמון מגיע ליוסי.</b> רק "יש חדש בקלסר X", בלי תוכן. אם אין חיבור socket, הטלפון בודק בעצמו מדי פעם.</li>
+      <li><b>יוסי מושך.</b> "יש לי עד מספר 4, תן מה שאחרי". הוא מקבל רק את מה שחסר לו.</li>
+      <li><b>יוסי בודק בעצמו.</b> הטלפון שלו מאמת כל חתימה, שומר בקלסר המקומי ומחשב מחדש. ה-relay יכול לשקר, ומסמך מזויף פשוט נזרק.</li>
+    </ol>
+  </section>
+
+  <section>
+    <span class="eyebrow">מה מצאנו במיפוי (משימה A0)</span>
+    <h2>הכתובת נכונה. נשארו שני פערים וסיכון אחד</h2>
+    <p class="col">החשש המקורי היה שה-relay רץ על Vercel. שם כל בקשה עלולה להגיע לשרת אחר, וכל שרת מחזיק תיבת דואר משלו. התברר שבווב הוא כבר על ה-VPS, בקונטיינר יחיד. זה המקום הנכון. אחרי כל deploy של ה-API התיבה מתחילה מחדש, וכל טלפון מסנכרן פעם אחת מאפס. בקנה מידה של רקמה זה זול.</p>
+    <div class="cards2">
+      <article class="card">
+        <div class="head"><h3>פער 1: תיבה ריקה אחרי deploy</h3><span class="chip c-off">לא עכשיו</span></div>
+        <p>אחרי הפעלה מחדש, רק המעטפות המוצפנות חוזרות לתיבה מ-Strapi. המסמכים הגלויים לא חוזרים. הסיבה: ב-Strapi הם מסודרים לפי נושא (הצבעה, מכירה), ואין עליהם תווית "שייך לרקמה X".</p>
+        <p class="muted">כמו סניף דואר שנפתח מחדש עם מגירות ריקות. המכתבים לא אבדו, כי לכל חבר יש עותק. הם חוזרים כשחבר ותיק נכנס ומשלים. טלפון חדש שמגיע ראשון רואה קלסר ריק.</p>
+        <p class="fix"><b>מה עושים:</b> בפיילוט של 2–3 חברים זה נסגר מעצמו תוך שעות. אם זה יורגש, נוסיף ב-Strapi שדה <code>spaceId</code>. זה דורש deploy של 1.0b.</p>
+      </article>
+      <article class="card">
+        <div class="head"><h3>פער 2: מעל 200 מסמכים, התקיעה</h3><span class="chip c-bad">באג</span></div>
+        <p>אחרי deploy התיבה ריקה, ולכן הטלפון מנסה לשלוח את <b>כל</b> ההיסטוריה בבקשה אחת. ה-relay מקבל עד 200 מסמכים בבקשה ומחזיר שגיאה (413). הטלפון ננעל במצב שגיאה ומנסה שוב, ונכשל שוב.</p>
+        <p class="muted">כמו לנסות לשלוח 1,000 דפים במעטפה אחת, כשהדואר מקבל עד 200. המעטפה חוזרת, שוב ושוב. היעד של הפיילוט הוא 1,000 מסמכים, ולכן הוא ייתקע בדיוק בפעם הראשונה שיעבור את 200.</p>
+        <p class="fix"><b>מה עושים (A0b):</b> לחלק למעטפות של 200 לכל היותר, ולשלוח אותן לפי הסדר.</p>
+      </article>
+      <article class="card">
+        <div class="head"><h3>סיכון: כמה תיבות במקביל</h3><span class="chip c-warn">לפני מובייל</span></div>
+        <p>אפליקציית Tauri, וכל deploy שחסר בו המשתנה <code>VITE_API_BASE</code>, יפנו ל-relay על Vercel. שם רצים כמה מופעים במקביל, ולכל אחד תיבה משלו. מסמך שנכנס לתיבה אחת לא נראה בשנייה.</p>
+        <p class="muted">כמו שני סניפי דואר עם אותה כתובת שלא מדברים זה עם זה. אף אחד לא מקבל שגיאה, והמסמכים פשוט לא מגיעים.</p>
+        <p class="fix"><b>מה עושים (A0b):</b> ה-relay יסרב לרוץ על Vercel ויחזיר שגיאה ברורה (503). עדיפה שגיאה גלויה על פיצול שקט.</p>
+      </article>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">מה בנוי, ומה באמת דלוק</span>
+    <h2>הרבה בנוי בקוד, כמעט שום דבר לא דלוק</h2>
+    <p class="col muted">"בנוי" פירושו קוד עם טסטים. "בפרודקשן" פירושו מה שמשתמשים אמיתיים פוגשים היום.</p>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>שכבה</th><th>בקוד</th><th>בפרודקשן</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><b>מסמכים חתומים</b><small>S1 · חתימה על פעולות</small></td>
+            <td><span class="chip c-ok">בנוי</span></td>
+            <td><span class="chip c-warn">צל, חלקי</span><small>7 פעולות חותמות: הצבעה, צ'אט, סיום משימה, יצירת משימה, חלוקה, מכירה, הצעה נגדית למכירה. נשמר ב-Strapi, לא נאכף.</small></td>
+          </tr>
+          <tr>
+            <td><b>הקלסר והסנכרון</b><small>S2a · Space + relay</small></td>
+            <td><span class="chip c-ok">בנוי</span></td>
+            <td><span class="chip c-off">כבוי</span><small>נדלק רק בדפדפן שמישהו הגדיר בו <code>SPACE_SYNC_ENABLED</code>.</small></td>
+          </tr>
+          <tr>
+            <td><b>רואה החשבון</b><small>S2b · reducers + projection</small></td>
+            <td><span class="chip c-ok">בנוי</span></td>
+            <td><span class="chip c-off">כבוי</span><small>הקורא היחיד: תג השוואה בדף החלוקה (split), מאחורי אותו דגל.</small></td>
+          </tr>
+          <tr>
+            <td><b>הפעמון</b><small>T1 · socket wake</small></td>
+            <td><span class="chip c-ok">בנוי</span></td>
+            <td><span class="chip c-off">כבוי</span><small>עובד רק כשהסנכרון דלוק.</small></td>
+          </tr>
+          <tr>
+            <td><b>המנעול</b><small>S3a · הצפנה לפי epoch</small></td>
+            <td><span class="chip c-ok">ליבה + טסטים</span></td>
+            <td><span class="chip c-bad">אסור</span><small>אסור למשתמשים אמיתיים עד החלטה מוצרית (שער S3).</small></td>
+          </tr>
+          <tr>
+            <td><b>זיווג מכשירים, שחזור, כספת</b><small>T7 · T9 · vault</small></td>
+            <td><span class="chip c-ok">בנוי</span> <span class="chip c-warn">שחזור: חלקי</span></td>
+            <td><span class="chip c-off">כבוי</span><small>שלושתם מאחורי דגלים בשרת.</small></td>
+          </tr>
+          <tr>
+            <td><b>החוזה</b><small>R0 · מפרט + דוגמאות בדיקה</small></td>
+            <td><span class="chip c-ok">בנוי</span></td>
+            <td><span class="chip c-off">לא רלוונטי</span><small>זה לא פיצ'ר. זה חוזה שכל מימוש עתידי, למשל ב-Rust, חייב לעמוד בו.</small></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">התמונה הגדולה</span>
+    <h2>סולם המדרגות</h2>
+    <p class="col">השרת מאבד קודם <b>ידע</b>, ורק אחר כך <b>תפקיד</b>. קודם הוא מפסיק להבין את הנתונים, אחר כך הוא מפסיק להיות יחיד, ורק בסוף הוא מיותר. ככה אין קפיצה באוויר, רק ירידה במדרגות.</p>
+    <div class="ladder" role="list">
+      <div class="rung" role="listitem"><span class="k">S0</span><span>Strapi מחליט על הכל, והשרת רואה הכל</span></div>
+      <div class="rung here" role="listitem"><span class="k">S1 · אנחנו כאן</span><span>מסמכים חתומים לצד Strapi, כצל</span></div>
+      <div class="rung gate" role="listitem"><span class="k">S2 · השער</span><span>הקלסר הוא מקור האמת, ו-Strapi רק מראה</span></div>
+      <div class="rung" role="listitem"><span class="k">S3</span><span>הצפנה: השרת רואה רק ג'יבריש</span></div>
+      <div class="rung" role="listitem"><span class="k">S4</span><span>כמה תיבות דואר, ושחזור בעזרת חברים</span></div>
+      <div class="rung" role="listitem"><span class="k">S5</span><span>אין שרת מיוחד בכלל</span></div>
+    </div>
+    <p class="col muted">עד S2 כל מדרגה היא רווח נקי: טעינה מיידית, עבודה בלי רשת, הסכמות שאי אפשר לזייף. השרת עדיין רואה הכל, ולכן תמיכה ותיקוני נתונים ממשיכים לעבוד. מ-S3 משלמים מחיר: השרת כבר לא רואה, ומפתח שאבד הוא נתונים שאבדו. לכן S3 דורש החלטה נפרדת.</p>
+  </section>
+
+  <section>
+    <span class="eyebrow">לאן הולכים</span>
+    <h2>התור: מהמיפוי ועד הדף הראשון</h2>
+    <p class="col muted">מסלול A הוא הקו הראשי. הוא מביא רקמה אחת לרוץ באמת על הקלסר. הסדר כאן הוא סדר הביצוע.</p>
+    <div class="track col">
+      <div class="stop done">
+        <span class="dot">A0</span>
+        <div class="body"><div class="t">מיפוי: איפה ה-relay רץ <span class="chip c-ok">בוצע</span></div><p>על ה-VPS, בקונטיינר אחד. נמצאו שני הפערים והסיכון שלמעלה.</p></div>
+      </div>
+      <div class="stop next">
+        <span class="dot">A0b</span>
+        <div class="body"><div class="t">מעטפות של 200, ו-relay רק על ה-VPS <span class="chip c-next">הבא בתור</span></div><p>מתקן את פער 2 וחוסם את הסיכון. משימה קטנה, קוד וטסטים בלבד.</p></div>
+      </div>
+      <div class="stop">
+        <span class="dot">A1</span>
+        <div class="body"><div class="t">מתג לפי רקמה</div><p>היום המתג יושב בדפדפן של מפתח. אחרי A1 יהיה מתג בשרת עם רשימת רקמות, כך שאפשר להדליק לרקמה אחת בלבד.</p></div>
+      </div>
+      <div class="stop">
+        <span class="dot">A3</span>
+        <div class="body"><div class="t">דיווח פערים לשרת</div><p>היום כל פער בין הקלסר ל-Strapi נכתב רק בדפדפן. אחרי A3 הוא יגיע לשרת, ואפשר יהיה לספור אותו. בלי זה אין דרך לדעת אם הפיילוט הצליח.</p></div>
+      </div>
+      <div class="stop user">
+        <span class="dot">A4</span>
+        <div class="body"><div class="t">פיילוט: רקמה אחת על הקלסר <span class="chip c-warn">דורש אותך</span></div><p>רקמה פעילה, עדיף עם 2–3 חברים שנכנסים כל יום. 30 יום או 1,000 מסמכים, המאוחר מביניהם, עם אפס פערים שאין להם הסבר. תלוי ב-A0b, A1 ו-A3.</p></div>
+      </div>
+      <div class="stop">
+        <span class="dot">A5</span>
+        <div class="body"><div class="t">הדף הראשון שקורא מהקלסר</div><p>ההצעה: יתרות בדף החלוקה. אם הקלסר ריק או לא מעודכן, הדף חוזר ל-Strapi.</p></div>
+      </div>
+      <div class="stop gate">
+        <span class="dot">S2b</span>
+        <div class="body"><div class="t">שער S2b: רקמה חיה על הקלסר</div><p>זה היעד שהוחלט עליו. היום אין אף רקמה שרצה על הקלסר. A4 ו-A5 הם הדרך לכאן.</p></div>
+      </div>
+      <div class="stop gate">
+        <span class="dot">S3</span>
+        <div class="body"><div class="t">שער S3: הצפנה, רק בהחלטה מפורשת</div><p>נפתח רק אחרי ש-S2b חי, ואם התשובה לארבע שאלות היא כן: (א) יש תחליף לתמיכה, לשחזור ולפיקוח? (ב) אכיפת הרשאות המנעול והשחזור בעזרת חברים סגורים? (ג) מישהו בשטח באמת מבקש הצפנה? (ד) המנעול עמיד גם למחשבים קוונטיים? גם אז, הצפנה רק לרקמות שמבקשות.</p></div>
+      </div>
+    </div>
+
+    <h3>מסלולים מקבילים</h3>
+    <div class="tracks">
+      <div class="tr"><span class="k">A2</span><p><b>עוד פעולות חותמות.</b> היום 7. פיילוט שחסרות בו רוב הפעולות יראה פערים שהם חוסר כיסוי ולא באגים. מתבצע באצוות, לצד הקו הראשי.</p></div>
+      <div class="tr"><span class="k">B</span><p><b>הקשחת הפורמט.</b> סגירת שאלות פתוחות במפרט: דוגמאות בדיקה להצבעות, חתימות אחידות, אימות מהיר יותר. קוד וטסטים בלבד, בלי deploy.</p></div>
+      <div class="tr"><span class="k">C</span><p><b>עמידות קוונטית.</b> מעבר ל-Node 24, ומנעול כפול (קלאסי + קוונטי). המנעול הכפול הוא תנאי לשער S3.</p></div>
+      <div class="tr"><span class="k">D</span><p><b>Tauri: חתימה במפתח של הטלפון.</b> המפתח יישב בשבב המאובטח של המכשיר. חסום עד שאפליקציית המובייל תתקדם.</p></div>
+      <div class="tr"><span class="k">E</span><p><b>ליבה אחת ב-Rust.</b> אותו קוד בדפדפן ובאפליקציה. מתוכנן ל-S3b. לא מתחילים עכשיו.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">ממתין לך</span>
+    <h2>מה מחכה להחלטה שלך</h2>
+    <div class="waiting col">
+      <div><span><b>לאשר את ממצאי A0</b> ולבדוק ב-Vercel ש-<code>VITE_API_BASE</code> מוגדר ל-Production. כדאי להחליט אם גם ל-Preview. דקה של עבודה.</span><span class="blocks">חוסם את A4</span></div>
+      <div><span><b>לבחור רקמת פיילוט</b> ולהדליק לה את המתג בפרודקשן.</span><span class="blocks">חוסם את A5</span></div>
+      <div><span><b>Node 24</b> במחשב הפיתוח וב-VPS.</span><span class="blocks">חוסם את מסלול C</span></div>
+      <div><span><b>לאשר חבילת שינויי פורמט (v3)</b>: שלושה תיקונים קטנים שכדאי לעשות יחד.</span><span class="blocks">חוסם את B5</span></div>
+      <div><span><b>ההחלטה על הצפנה</b>: ארבע השאלות של שער S3.</span><span class="blocks">חוסם את S3 ואת E</span></div>
+    </div>
+  </section>
+
+  <footer>
+    <span>נכתב ב-29 באוקטובר 2026, אחרי משימה A0. המקורות במאגר:</span>
+    <ul>
+      <li><code>docs/inprogress/PLAN_DISTRIBUTED_EXECUTION.md</code>: התור, כרטיס A0 וממצאיו</li>
+      <li><code>docs/inprogress/HANDOFF_DISTRIBUTED_DB.md</code>: מפת המצב, החוקים, מובייל</li>
+      <li><code>docs/inprogress/PLAN_serverless_p2p_data.md</code>: סולם המדרגות ושער S3</li>
+      <li><code>docs/HOWTO_SPACE_SYNC.md</code>, <code>src/lib/server/relay/log.ts</code>, <code>src/lib/space/spaceStore.svelte.ts</code></li>
+    </ul>
+  </footer>
+</div>
+</body>
+</html>

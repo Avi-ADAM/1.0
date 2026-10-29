@@ -38,6 +38,13 @@ export function spaceIdForVault(projectId: string): string {
   return `vault:${projectId}`;
 }
 
+/**
+ * Most items one relay push may carry. The route rejects more with 413, so
+ * the client splits a larger diff — the first push after a relay restart
+ * offers a replica's whole history (A0, PLAN_DISTRIBUTED_EXECUTION).
+ */
+export const RELAY_MAX_BATCH = 200;
+
 /** Space ids travel in URLs and IDB keys — keep them boring. */
 export const SPACE_ID_RE = /^[A-Za-z0-9:_-]{1,80}$/;
 

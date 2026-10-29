@@ -20,10 +20,13 @@ import {
   logEpoch
 } from '$lib/server/relay/log';
 import { notifySpaceChanged } from '$lib/server/relay/notify';
-
-const MAX_BATCH = 200;
+import { relayRefusalReason } from '$lib/server/relay/host';
+import { RELAY_MAX_BATCH as MAX_BATCH } from '$lib/space/protocol';
+import { env } from '$env/dynamic/private';
 
 export const POST: RequestHandler = async ({ request, params, cookies }) => {
+  const refusal = relayRefusalReason(env);
+  if (refusal) throw error(503, refusal);
   // JWT cookie gates abuse; the event signatures are the real authentication.
   if (!cookies.get('jwt')) throw error(401, 'Unauthorized');
   const spaceId = params.spaceId;
@@ -97,6 +100,8 @@ export const POST: RequestHandler = async ({ request, params, cookies }) => {
 };
 
 export const GET: RequestHandler = async ({ url, params, cookies }) => {
+  const refusal = relayRefusalReason(env);
+  if (refusal) throw error(503, refusal);
   if (!cookies.get('jwt')) throw error(401, 'Unauthorized');
   const spaceId = params.spaceId;
   if (!isValidSpaceId(spaceId)) throw error(400, 'bad spaceId');

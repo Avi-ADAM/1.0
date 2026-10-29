@@ -98,7 +98,7 @@
 | # | ID | משימה | גודל | תלוי ב- | מצב |
 |---|---|---|---|---|---|
 | 1 | A0 | מיפוי ה-relay בטופולוגיה של פרודקשן (Vercel מול VPS) + המלצה | S | — | ✔ |
-| 1b | A0b | push ב-chunks של ≤200 + relay מסרב לרוץ על Vercel (ממצאי A0) | S | A0 | ⬜ |
+| 1b | A0b | push ב-chunks של ≤200 + relay מסרב לרוץ על Vercel (ממצאי A0) | S | A0 | ✔ |
 | 2 | B1 | vectors ל-quorum ול-deltaCheck (O-4) | M | — | ⬜ |
 | 3 | B2 | ECDSA low-S בצד החותם (O-2) | S | — | ⬜ |
 | 4 | A1 | דגל Space לפי רקמה (allowlist בשרת) | M | — | ⬜ |
@@ -180,9 +180,10 @@
 4. **מובייל (D1/Tauri):** ה-relay צריך לפנות ל-`api.1lev1.com` גם שם — לתקן
    כשמסלול ה-SPA מתקדם, לא קודם.
 
-**לבדיקה ידנית (🧑, דקה):** ב-Vercel → Settings → Environment Variables, שה-
-`VITE_API_BASE` מוגדר ל-Production (ולבחור אם גם ל-Preview). הממצא נשען על
-PLAN_PROXY_SECURITY; לא ראיתי את ה-env בעצמי.
+**אומת בפרודקשן (2026-10-29):** ב-`www.1lev1.com` ה-`fetch` מותקן, ו-
+`fetch('/api/health')` נוחת ב-`https://api.1lev1.com/api/health` (200). **Preview
+לא נבדק**: קריאת ה-env דרך ה-MCP של Vercel דורשת אישור גישה לצוות
+`aviadams-projects`. A0b (ב) סוגר את הסיכון בכל מקרה.
 
 ### A0b — push מחולק + relay רק על ה-VPS
 **למה**: פער 2 של A0 (413 אחרי restart מעל 200 אירועים — הפיילוט נתקע) והסיכון
@@ -336,7 +337,7 @@ projection, עם fallback ל-Strapi כשה-Space ריק או לא מסונכרן
 
 | נושא | מה צריך | חוסם את |
 |---|---|---|
-| ממצאי A0 | ההמלצה: ה-VPS, כמו היום, עם full-pull אחרי deploy. לאשר, ולוודא ש-`VITE_API_BASE` מוגדר ב-Vercel (גם ל-Preview?) | A4 |
+| ממצאי A0 | ההמלצה: ה-VPS, כמו היום, עם full-pull אחרי deploy (הניתוב ל-VPS אומת בפרודקשן). לאשר | A4 |
 | C0 | התקנת Node 24 מקומית; deploy VPS עם `node:24-alpine` | C1, C2 (vectors PQ) |
 | B5 | אישור חבילת v3 | מימוש O-3/O-5/O-6 |
 | A4 | בחירת רקמת פיילוט + env בפרודקשן | A5 |
@@ -350,3 +351,4 @@ projection, עם fallback ל-Strapi כשה-Space ריק או לא מסונכרן
 
 - 2026-10-08 · R0 · מפרט SPEC_CONSENT_FORMAT + vectors (canonical/signatures/events/e2e); הקשחת canonical (NFC-sort, surrogate, b64url קנוני); מסקנות Rust ו-PQ בתכניות · 448 טסטים בשכבה + 14 vectors · לא בוצע commit · —
 - 2026-10-29 · A0 · מיפוי ה-relay: בפרודקשן הווב הוא על ה-VPS (`VITE_API_BASE` → nginx → קונטיינר `sveltekit-api` יחיד); נמצאו פער rehydrate של אירועים גלויים (אין `spaceId` ב-`consent-event`) ובאג 413 בדחיפה אחרי restart מעל 200 אירועים ⇒ נפתחה A0b, ו-A4 תלויה בה · מסמכים בלבד, בלי שינוי קוד · commit `dist: A0` · הבא: A0b
+- 2026-10-29 · A0b · `RELAY_MAX_BATCH` ב-`space/protocol.ts` (מקור יחיד ללקוח ול-route); `pushEvents`/`pushSealed` מחלקים ל-chunks בסדר ה-diff ועוצרים בכישלון הראשון; `relay/host.ts` + 503 `relay_not_on_this_host` ב-GET/POST כש-`VERCEL` מוגדר. ניתוב ה-`/api` של הדפדפן ל-`api.1lev1.com` אומת באתר החי; Preview לא נבדק (חסר אישור צוות ב-Vercel). נוסף `docs/inprogress/SPACE_RELAY_EXPLAINER.html` — הסבר לא-טכני · 442→450 בשכבה (8 חדשים ב-`pushChunked.test.ts`), 14 vectors ללא diff, check: ‏1315 שגיאות (מתחת לבסיס) ואף אחת בקבצים שנגעתי בהם · commit `dist: A0b` · הבא: A1 (או B1/B2 במסלול B)

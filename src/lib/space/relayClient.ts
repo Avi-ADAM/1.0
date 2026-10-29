@@ -4,6 +4,7 @@
 
 import type { ConsentEvent } from '$lib/consent/event';
 import type { SealedEnvelope } from './e2e/seal';
+import { RELAY_MAX_BATCH } from './protocol';
 
 export type RelayPullResponse = {
   ok: boolean;
@@ -60,20 +61,39 @@ export function pushEvents(
   spaceId: string,
   events: ConsentEvent[]
 ): Promise<RelayResult<RelayPushResponse>> {
-  return call(`/api/relay/${encodeURIComponent(spaceId)}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ events })
-  });
+  return pushChunked(spaceId, 'events', events);
 }
 
 export function pushSealed(
   spaceId: string,
   sealed: SealedEnvelope[]
 ): Promise<RelayResult<RelayPushResponse>> {
-  return call(`/api/relay/${encodeURIComponent(spaceId)}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ sealed })
-  });
+  return pushChunked(spaceId, 'sealed', sealed);
+}
+
+/**
+ * One POST per RELAY_MAX_BATCH items, in the order given (computeDiff's
+ * topological order), merged into a single response. Stops at the first
+ * failed chunk: what already landed stays — the relay dedupes by id, so the
+ * next sync simply re-offers the rest.
+ */
+async function pushChunked(
+  spaceId: string,
+  key: 'events' | 'sealed',
+  items: Array<ConsentEvent | SealedEnvelope>
+): Promise<RelayResult<RelayPushResponse>> {
+  let merged: RelayPushResponse | null = null;
+  // An empty push still makes one request, as before (the route answers 400).
+  for (let i = 0; i < Math.max(items.length, 1); i += RELAY_MAX_BATCH) {
+    const res = await call<RelayPushResponse>(`/api/relay/${encodeURIComponent(spaceId)}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ [key]: items.slice(i, i + RELAY_MAX_BATCH) })
+    });
+    if (!res.ok) return res;
+    merged = merged
+      ? { ...res.data, results: [...merged.results, ...res.data.results] }
+      : res.data;
+  }
+  return { ok: true, data: merged };
 }

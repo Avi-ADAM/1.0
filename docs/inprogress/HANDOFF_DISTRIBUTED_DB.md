@@ -577,7 +577,9 @@ _כל_ אירועי ה-rotate פר-epoch בסדר דטרמיניסטי (זוכה
    את `/api/*` ל-`api.1lev1.com`, קונטיינר יחיד על ה-VPS. מה שעוד פוגע
    בזה: אפליקציית Tauri (`VITE_URL` = Vercel), deploy בלי `VITE_API_BASE`,
    ושאירועים גלויים לא נטענים מחדש מהמראה אחרי restart. פירוט והמלצה:
-   PLAN_DISTRIBUTED_EXECUTION, כרטיס A0.
+   PLAN_DISTRIBUTED_EXECUTION, כרטיס A0. **A0b**: ה-route מחזיר 503
+   ‏`relay_not_on_this_host` על Vercel (`relay/host.ts`), והלקוח מחלק push
+   ל-`RELAY_MAX_BATCH`, כך שהסנכרון הראשון אחרי restart לא נתקע ב-413.
 3. **T7 (זיווג מכשירים) הופך דחוף**: ברגע שיש אפליקציה, "שני מכשירים
    לאותו משתמש" הוא המצב הרגיל, לא מקרה קצה. TOFU per-device בלי שרשרת
    DeviceCert = לכל משתמש שתי זהויות מכשיר זרות זו לזו.
