@@ -97,7 +97,8 @@
 
 | # | ID | משימה | גודל | תלוי ב- | מצב |
 |---|---|---|---|---|---|
-| 1 | A0 | מיפוי ה-relay בטופולוגיה של פרודקשן (Vercel מול VPS) + המלצה | S | — | ⬜ |
+| 1 | A0 | מיפוי ה-relay בטופולוגיה של פרודקשן (Vercel מול VPS) + המלצה | S | — | ✔ |
+| 1b | A0b | push ב-chunks של ≤200 + relay מסרב לרוץ על Vercel (ממצאי A0) | S | A0 | ⬜ |
 | 2 | B1 | vectors ל-quorum ול-deltaCheck (O-4) | M | — | ⬜ |
 | 3 | B2 | ECDSA low-S בצד החותם (O-2) | S | — | ⬜ |
 | 4 | A1 | דגל Space לפי רקמה (allowlist בשרת) | M | — | ⬜ |
@@ -110,7 +111,7 @@
 | 11 | B3 | מדיניות קצוות Ed25519 + vectors (O-1) | M | — | ⬜ |
 | 12 | C1 | שדה `cosig` — חתימה היברידית על עוגנים (O-8) | L | C0, B4 | ⬜ |
 | 13 | B5 | מזכר החלטה: חבילת bump v3 (O-3, O-5, O-6) | S | — | ⬜ 🧑 (אישור) |
-| 14 | A4 | פיילוט: רקמה אחת על ה-Space, 30 יום / 1,000 אירועים | — | A1, A3 | ⬜ 🧑 |
+| 14 | A4 | פיילוט: רקמה אחת על ה-Space, 30 יום / 1,000 אירועים | — | A0b, A1, A3 | ⬜ 🧑 |
 | 15 | A5 | דף ראשון קורא מה-projection (עם fallback) | M | A4 | ⬜ |
 | — | D1 | Tauri R1 | L | PLAN_TAURI_MOBILE שלבים 1–2 | ⬜ חסום |
 | — | E1 | R2 ליבת Rust | L+ | שער S3 + HANDOFF §8.3 | ⬜ לא להתחיל |
@@ -129,6 +130,69 @@
 **תוצר**: סעיף "A0 — ממצאים" בכרטיס הזה + המלצה (להצמיד את ה-relay ל-VPS /
 להתמיד את רצף ה-seq / לקבל full-pull בפיילוט). **בלי שינוי קוד.**
 **קבלה**: המשתמש יכול להחליט מהממצא בלי לקרוא קוד.
+
+#### A0 — ממצאים (2026-10-29)
+
+**בשורה אחת**: בפרודקשן הווב ה-relay **כבר רץ על ה-VPS**, בקונטיינר יחיד —
+לא על Vercel. החשש של HANDOFF §7.2 (epoch חדש בכל cold start) לא חל על הדפדפן.
+אבל יש שני פערים שהפיילוט ייתקל בהם, ואחד מהם הוא באג.
+
+**לאן הדפדפן פונה** — `relayClient.ts` קורא ל-`/api/relay/…` יחסי.
+`installApiBasePatch()` (`src/routes/+layout.js` → `$lib/platform`) מעביר כל
+`/api/*` אל `VITE_API_BASE`, שדלוק ב-Vercel עם `https://api.1lev1.com`
+(PLAN_PROXY_SECURITY, "מה מחזיק את זה"). nginx (1.0b,
+`nginx/default.conf.template`) מעביר `api.1lev1.com/api/` אל
+`sveltekit-api:3000` — **קונטיינר אחד** (`docker-compose.api.yml`, adapter-node,
+בלי replicas, בלי blue/green בצד ה-API). ה-wake של T1 יוצא משם ל-socket-server
+ברשת הפנימית.
+
+| מסלול | איפה ה-relay | היומן והסמן |
+|---|---|---|
+| ווב בפרודקשן | VPS, תהליך אחד | יציב בין deploys. כל deploy של ה-API = `logEpoch` חדש ⇒ כל רפליקה מסנכרנת פעם אחת מ-0 |
+| ווב, deploy בלי `VITE_API_BASE` (למשל preview, אם אין בו את המשתנה) | Vercel lambdas | **split-brain**: כמה מופעים במקביל, לכל אחד יומן ו-epoch משלו; push שנחת במופע א' לא נראה במופע ב' |
+| אפליקציית Tauri | `VITE_URL` = `https://1lev1.com` (PLAN_TAURI_MOBILE) = Vercel | אותו split-brain. לא פעיל היום — אין משתמשי מובייל עם הדגל |
+| `npm run dev` | התהליך המקומי | `VITE_API_BASE` ריק ב-`.env` — יומן בזיכרון של ה-dev server |
+
+**פער 1 — אחרי restart היומן הגלוי ריק.** `relayEnsureHydrated` טוען מהמראה רק
+מעטפות **sealed** (T3). אירועים גלויים נכתבים ל-`consentStore`, אבל ה-collection
+‏`consent-event` ב-Strapi ממופתח לפי `subjectType/subjectId` ואין בו `spaceId` —
+אי אפשר לשלוף ממנו "את כל אירועי `project:X`". לכן אחרי deploy ה-relay מתמלא
+מחדש רק כשרפליקה שמחזיקה את האירועים מסנכרנת ודוחפת את ה-diff. מכשיר חדש
+שמגיע לפני שחבר ותיק פתח את האפליקציה — רואה space ריק. בפיילוט של 2–3 חברים
+יומיים זה נסגר מעצמו תוך שעות; זה לא מקור אמת שאבד (הרפליקות וה-mirror מחזיקים).
+
+**פער 2 — באג: דחיפה אחרי restart נכשלת מעל 200 אירועים.** אחרי restart ה-heads
+ב-relay ריקים ⇒ `computeDiff` מחזיר את **כל** ההיסטוריה ⇒ `pushEvents` שולח
+הכל בבקשה אחת ⇒ ה-route מחזיר 413 (`MAX_BATCH = 200`) ⇒ `sync()` זורק,
+והרפליקה נשארת ב-`status: 'error'` בכל סבב, עד שמישהו אחר ממלא. היעד של A4
+הוא 1,000 אירועים — הפיילוט **ייתקע** בדיוק ב-deploy הראשון אחרי 200.
+
+**המלצה**:
+
+1. **לפיילוט: לקבל full-pull על ה-VPS.** הטופולוגיה הנכונה כבר קיימת; לא צריך
+   להעביר שום דבר. resync מ-0 בכל deploy של ה-API זול בקנה מידה של רקמה.
+2. **לפני A4 — משימה A0b (S, קוד בלבד):** (א) `pushEvents` מחלק ל-chunks של
+   ≤200; (ב) ה-route של ה-relay מסרב (503 `relay_not_on_this_host`) כשהוא רץ על
+   Vercel (`VERCEL` ב-env) — כך deploy בלי `VITE_API_BASE` או אפליקציית מובייל
+   מקבלים שגיאה גלויה במקום split-brain שקט.
+3. **לא עכשיו — התמדת היומן הגלוי:** שדה `spaceId` ב-`consent-event` (1.0b,
+   🧑 deploy) + טעינה עצלה כמו T3. נחוץ רק אם יתברר בפיילוט שפער 1 מורגש.
+4. **מובייל (D1/Tauri):** ה-relay צריך לפנות ל-`api.1lev1.com` גם שם — לתקן
+   כשמסלול ה-SPA מתקדם, לא קודם.
+
+**לבדיקה ידנית (🧑, דקה):** ב-Vercel → Settings → Environment Variables, שה-
+`VITE_API_BASE` מוגדר ל-Production (ולבחור אם גם ל-Preview). הממצא נשען על
+PLAN_PROXY_SECURITY; לא ראיתי את ה-env בעצמי.
+
+### A0b — push מחולק + relay רק על ה-VPS
+**למה**: פער 2 של A0 (413 אחרי restart מעל 200 אירועים — הפיילוט נתקע) והסיכון
+ל-split-brain כש-`/api/relay` מגיע ל-Vercel.
+**צעדים**: (א) `pushEvents` / `pushSealed` ב-`relayClient.ts` מחלקים ל-chunks של
+`MAX_BATCH` (לייצא את הקבוע ממקום משותף, לא לשכפל 200), בסדר ש-`computeDiff`
+החזיר; כישלון ב-chunk עוצר ומחזיר את הסיבה. (ב) ב-route, כש-`env.VERCEL` (דרך
+`$env/dynamic/private`) — 503 `relay_not_on_this_host`, ל-GET ול-POST.
+**קבלה**: טסט ש-push של 450 אירועים יוצא כ-3 בקשות ושה-relay מכיל את כולם; טסט
+ל-503 תחת `VERCEL=1`; `syncRoundtrip.test.ts` ירוק.
 
 ### B1 — vectors ל-quorum ול-deltaCheck (O-4)
 **למה**: במצב strict האימות כולל `verifyQuorum` ו-`checkDeltas`, ואין להם
@@ -272,7 +336,7 @@ projection, עם fallback ל-Strapi כשה-Space ריק או לא מסונכרן
 
 | נושא | מה צריך | חוסם את |
 |---|---|---|
-| ממצאי A0 | החלטה איפה ה-relay רץ בפיילוט | A4 |
+| ממצאי A0 | ההמלצה: ה-VPS, כמו היום, עם full-pull אחרי deploy. לאשר, ולוודא ש-`VITE_API_BASE` מוגדר ב-Vercel (גם ל-Preview?) | A4 |
 | C0 | התקנת Node 24 מקומית; deploy VPS עם `node:24-alpine` | C1, C2 (vectors PQ) |
 | B5 | אישור חבילת v3 | מימוש O-3/O-5/O-6 |
 | A4 | בחירת רקמת פיילוט + env בפרודקשן | A5 |
@@ -285,3 +349,4 @@ projection, עם fallback ל-Strapi כשה-Space ריק או לא מסונכרן
 > שורה לכל סשן: תאריך · ID · מה נעשה · טסטים · commit · הצעד הבא אם ◐.
 
 - 2026-10-08 · R0 · מפרט SPEC_CONSENT_FORMAT + vectors (canonical/signatures/events/e2e); הקשחת canonical (NFC-sort, surrogate, b64url קנוני); מסקנות Rust ו-PQ בתכניות · 448 טסטים בשכבה + 14 vectors · לא בוצע commit · —
+- 2026-10-29 · A0 · מיפוי ה-relay: בפרודקשן הווב הוא על ה-VPS (`VITE_API_BASE` → nginx → קונטיינר `sveltekit-api` יחיד); נמצאו פער rehydrate של אירועים גלויים (אין `spaceId` ב-`consent-event`) ובאג 413 בדחיפה אחרי restart מעל 200 אירועים ⇒ נפתחה A0b, ו-A4 תלויה בה · מסמכים בלבד, בלי שינוי קוד · commit `dist: A0` · הבא: A0b
