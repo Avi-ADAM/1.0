@@ -240,7 +240,8 @@ interval ארוך (2–5 דקות).
 `/moach/[projectId]/split` — hydrate מיידי מ-IDB, autoSync ברקע, badge בסגנון
 ConsentBadge (אפור=projection ריק, ירוק=תואם, אדום=לא תואם) והשוואת יתרות
 hervachti ברזולוציית אגורות (chain agorot מול Strapi שקלים×100). אי-התאמות
-נרשמות ל-console עם התג `[space-shadow-telemetry]` — זה הבסיס לקריטריון
+נשלחות לשרת (A3, `POST /api/consent/telemetry`, שורת `[space-shadow-telemetry]`
+ודוח ב-`scripts/space-shadow-report.mjs`) — זה הבסיס לקריטריון
 היציאה מ-shadow שמוגדר למטה. מוצג רק כשה-Space דלוק לרקמה (A1 — רשימת
 `SPACE_SYNC_PROJECTS`, או override `SPACE_SYNC_ENABLED='1'`).
 

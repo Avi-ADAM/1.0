@@ -10,9 +10,11 @@
    *
    *   gray  (unsigned)   — projection empty; no signed events for this rikma yet
    *   green (signed)     — projection and GraphQL agree on the compared slice
-   *   red   (unverified) — mismatch; details go to console as telemetry
-   *                        (exit criterion: a defined period with 0 unexplained
-   *                        mismatches before projection becomes the display source)
+   *   red   (unverified) — mismatch
+   *
+   * Every synced snapshot, green or red, is reported to the server (A3) —
+   * the exit criterion is a defined period with 0 unexplained mismatches
+   * before projection becomes the display source.
    *
    * Renders nothing unless the Space is on for this rikma — the server's
    * SPACE_SYNC_PROJECTS, or localStorage.SPACE_SYNC_ENABLED === '1' (dev).
@@ -24,6 +26,8 @@
   import { spaceIdForProject } from '$lib/space/protocol';
   import { proposeGenesis, voteGenesis, genesisStatus } from '$lib/space/genesis';
   import ConsentBadge from './ConsentBadge.svelte';
+  import { sendShadowReport } from '$lib/client/shadowTelemetry';
+  import type { ShadowMismatch } from '$lib/consent/shadowTelemetry';
 
   type GqlUserRow = { id: string | number; attributes?: { hervachti?: number | null } };
 
@@ -59,7 +63,9 @@
    * starts empty and fills as signed events flow.
    */
   const comparison = $derived.by(() => {
-    if (!projection || eventCount === 0) return { status: 'unsigned' as const, mismatches: [] as string[] };
+    if (!projection || eventCount === 0) {
+      return { status: 'unsigned' as const, compared: 0, mismatches: [] as ShadowMismatch[] };
+    }
 
     const gqlBalances = new Map<string, number>();
     for (const u of users) {
@@ -67,30 +73,38 @@
       if (typeof h === 'number') gqlBalances.set(String(u.id), Math.round(h * 100));
     }
 
-    const mismatches: string[] = [];
+    let compared = 0;
+    const mismatches: ShadowMismatch[] = [];
     for (const [member, agorot] of projection.balances) {
       const gql = gqlBalances.get(member);
       if (gql === undefined) continue; // member unknown to this page's slice
+      compared++;
       if (BigInt(gql) !== agorot) {
-        mismatches.push(`${member}: chain=${agorot} gql=${gql}`);
+        mismatches.push({ kind: 'balance', member, chain: String(agorot), strapi: String(gql) });
       }
     }
 
     return {
       status: (mismatches.length === 0 ? 'signed' : 'unverified') as 'signed' | 'unverified',
+      compared,
       mismatches
     };
   });
 
-  // Telemetry (T2 exit criterion): every mismatch is logged with a stable
-  // tag so it can be counted over the observation window.
+  // Telemetry (A3 — the T2 exit criterion): one line per distinct snapshot to
+  // /api/consent/telemetry, matching ones included — they are the evidence
+  // the exit counts. Only once the replica is synced: a half-pulled log
+  // differs from Strapi by construction, and that is not a mismatch.
   $effect(() => {
-    if (comparison.status === 'unverified') {
-      console.warn('[space-shadow-telemetry] projection/gql mismatch', {
-        projectId,
-        mismatches: comparison.mismatches
-      });
-    }
+    if (!replica || replica.state.status !== 'synced') return;
+    if (comparison.status === 'unsigned') return;
+    sendShadowReport({
+      v: 1,
+      pid: boundProjectId,
+      events: eventCount,
+      compared: comparison.compared,
+      mismatches: comparison.mismatches
+    });
   });
 
   const statusLabel = $derived(
@@ -160,8 +174,8 @@
     </div>
     {#if comparison.mismatches.length > 0}
       <ul class="mt-2 list-inside list-disc text-xs text-rose-600 dark:text-rose-400">
-        {#each comparison.mismatches as m (m)}
-          <li>{m}</li>
+        {#each comparison.mismatches as m (m.member)}
+          <li>{m.member}: chain={m.chain} gql={m.strapi}</li>
         {/each}
       </ul>
     {/if}

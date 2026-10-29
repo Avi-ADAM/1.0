@@ -102,7 +102,7 @@
 | 2 | B1 | vectors ל-quorum ול-deltaCheck (O-4) | M | — | ⬜ |
 | 3 | B2 | ECDSA low-S בצד החותם (O-2) | S | — | ⬜ |
 | 4 | A1 | דגל Space לפי רקמה (allowlist בשרת) | M | — | ✔ |
-| 5 | A3 | טלמטריית אי-התאמות לשרת | M | A1 | ⬜ |
+| 5 | A3 | טלמטריית אי-התאמות לשרת | M | A1 | ✔ |
 | 6 | A2 | הרחבת חתימות ה-shadow — באצוות | L | — | ⬜ |
 | 7 | B6 | אימות התחייבויות אינקרמנטלי (O(n²) → O(n)) | M–L | — | ⬜ |
 | 8 | C0 | יישור Node 24 (Dockerfile, פיתוח) + גילוי יכולות PQ | S | — | ⬜ 🧑 (התקנה/deploy) |
@@ -237,6 +237,31 @@ override של מפתחים; אחרת — הפרויקט ברשימה. עדכן �
 שולח במקום/בנוסף ל-console. הוסף ל-`qidsAccess`/authz לפי `CLAUDE.md`.
 **קבלה**: טסט ל-endpoint (מאומת בלבד, ולידציה); `npm run check:proxy` ירוק.
 
+#### A3 — מה נבנה (2026-10-30)
+
+- **צורה**: שורה אחת לכל **snapshot** של ההשוואה, לא לכל אי-התאמה:
+  `{v:1, pid, events, compared, mismatches:[{kind:'balance', member, chain, strapi}]}`
+  (אגורות כמחרוזת עשרונית). snapshot נקי הוא הראיה שנספרת ליציאה, ו-`events`
+  הוא המונה של "1,000 אירועים". אין שם, אין אימייל, אין מזהה המדווח. `member`
+  הוא מזהה החבר שהיתרה שלו שונה, כי זה מה שאי-התאמה מתארת. קוד משותף:
+  `$lib/consent/shadowTelemetry.ts` (`validateShadowReport`, `shadowReportKey`).
+- **שרת**: `POST /api/consent/telemetry` → `$lib/server/consent/shadowTelemetry.ts`.
+  מחובר בלבד (`locals.uid`), JSON בלבד, 30 לדקה למשתמש (`RateLimiter` הקיים),
+  שורה `[space-shadow-telemetry]` ב-stdout, ועל ה-VPS היא מגיעה ל-Axiom
+  (`vps-docker`). JSONL אופציונלי ב-`CONSENT_TELEMETRY_FILE`.
+- **לקוח**: `SpaceProjectionShadow` שולח רק כשהרפליקה `synced` (לוג שנמשך
+  חלקית שונה מ-Strapi מעצם הגדרתו), וכל snapshot נשלח פעם אחת בסשן
+  (`$lib/client/shadowTelemetry.ts`).
+- **דוח**: `node scripts/space-shadow-report.mjs <jsonl | log | ייצוא Axiom> [--json]`
+  — לכל רקמה: ימים, אירועים, snapshots נקיים, אי-התאמות ייחודיות (שלושה חברים
+  שרואים אותו פער = אחת), והאם הקריטריון מתקיים (30 יום **וגם** 1,000 אירועים,
+  ו-0 אי-התאמות).
+- **authz**: ה-endpoint אינו qid ואינו action, ולכן אין לו מקום ב-`qidsAccess`.
+  זה אותו דפוס כמו `/api/v1/p2p/telemetry`.
+- **מה שהטלמטריה לא מבחינה בו**: פער בין נתוני ה-GraphQL שהדף טען לבין אירוע
+  שנחתם אחריהם מופיע כאי-התאמה. בדוח הוא ייראה כאי-התאמה שנעלמה ב-snapshot
+  הבא; ההסבר הוא עבודה של אדם.
+
 ### A2 — הרחבת חתימות ה-shadow (באצוות של 3–4 actions לסשן)
 **למה**: 7 actions חותמים; פיילוט על projection שחסרות בו רוב הפעולות יראה
 אי-התאמות שהן חוסר כיסוי, לא באגים.
@@ -355,3 +380,4 @@ projection, עם fallback ל-Strapi כשה-Space ריק או לא מסונכרן
 - 2026-10-29 · A0b · `RELAY_MAX_BATCH` ב-`space/protocol.ts` (מקור יחיד ללקוח ול-route); `pushEvents`/`pushSealed` מחלקים ל-chunks בסדר ה-diff ועוצרים בכישלון הראשון; `relay/host.ts` + 503 `relay_not_on_this_host` ב-GET/POST כש-`VERCEL` מוגדר. ניתוב ה-`/api` של הדפדפן ל-`api.1lev1.com` אומת באתר החי; Preview לא נבדק (חסר אישור צוות ב-Vercel). נוסף `docs/inprogress/SPACE_RELAY_EXPLAINER.html` — הסבר לא-טכני · 442→450 בשכבה (8 חדשים ב-`pushChunked.test.ts`), 14 vectors ללא diff, check: ‏1315 שגיאות (מתחת לבסיס) ואף אחת בקבצים שנגעתי בהם · commit `dist: A0b` · הבא: A1 (או B1/B2 במסלול B)
 - 2026-10-30 · A1 · `$lib/space/syncFlag.ts` (טהור: `decideSpaceSync`, `parseSpaceSyncProjects`); `(reg)/+layout.server.js` מעביר `spaceSyncProjects` מ-`SPACE_SYNC_PROJECTS` (`$env/dynamic/private`); `spaceSyncEnabled(projectId?)` קורא את `page.data` (‏`$app/state`, בלי תלות בסדר mount) וזוכר את הרשימה האחרונה; הקוראים (`shadowSign`, `SpaceProjectionShadow`, `startAutoSync`) מעבירים רקמה. **ה-env נכנס ל-Vercel, לא ל-VPS** — ה-load רץ שם. הוסר `console.log` דיבאג מ-`startAutoSync` · 450→458 (8 ב-`syncFlag.test.ts`), 14 vectors, check: ‏1315 שגיאות (ללא שינוי) ו-1286 אזהרות (מ-1287). לא נבדק בדפדפן: דורש dev server עם המשתנה וסשן מחובר מקומי · commit `dist: A1` · הבא: A3 (טלמטריה), או B1/B2
 - 2026-10-30 · A1 (הפעלה) · לפי בקשת המשתמש: `SPACE_SYNC_PROJECTS` הוגדר ב-Vercel (פרויקט `1-0`, Production בלבד, plain) עם 19 רקמות הטסט מ-`hiddenProjects.ts` (`45,46,51,56,55,54,63,72,80,67,43,83,84,85,82,86,81,79,88`). זה שלב מקדים ל-A4, על רקמות טסט בלבד. **לכבות**: למחוק את המשתנה ב-Vercel ולעשות redeploy · נדחף יחד עם A1
+- 2026-10-30 · A3 · `POST /api/consent/telemetry` (מחובר, 30 לדקה, ולידציה שמסירה כל שדה זר) + `SpaceProjectionShadow` שולח snapshot לכל מצב synced שונה + `scripts/space-shadow-report.mjs` שמחשב את קריטריון היציאה לכל רקמה. השורות נכנסות ל-Axiom דרך ה-VPS, ו-JSONL אופציונלי ב-`CONSENT_TELEMETRY_FILE` · 458→478 (20 ב-`server/consent/shadowTelemetry.test.ts`), 14 vectors, check:proxy ירוק, check: ‏1315/1286 ללא שינוי · commit `dist: A3` · **🧑 deploy ל-VPS** (ה-endpoint רץ שם) · הבא: A2 (הרחבת החתימות), או B1/B2
