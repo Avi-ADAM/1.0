@@ -393,6 +393,7 @@
           {easy}
           linkto={''}
           pendId={null}
+          bridgeSourceId={id}
           sqadualedf={sqedualedf}
           sqadualed={null}
           users={[]}

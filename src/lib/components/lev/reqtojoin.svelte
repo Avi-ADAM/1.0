@@ -709,6 +709,7 @@
               {privatlinks}
               restime={getProjectData(projectId, 'restime')}
               pendId={null}
+              bridgeSourceId={openMid}
               {users}
               acts={negotiatedActs}
             />

@@ -314,6 +314,7 @@
                             easy={data.alld.easy || 0}
                             linkto={''}
                             pendId={null}
+                            bridgeSourceId={data.mId}
                             sqadualedf={data.alld.sqadualedf}
                             sqadualed={data.alld.sqadualed}
                             users={[]}

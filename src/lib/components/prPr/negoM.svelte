@@ -55,6 +55,7 @@
    * @property {any} mdates
    * @property {number} [stepState]
    * @property {any} pendId
+   * @property {any} [bridgeSourceId] - the bridge's source row when there is no pending proposal yet (the open listing's id)
    * @property {any} [users]
    * @property {any} isKavua
    * @property {number} [howMeny] - how many people the mission needs (PLAN_SHIFTS §2)
@@ -103,6 +104,7 @@
     mdates,
     stepState = 2,
     pendId,
+    bridgeSourceId = null,
     users = [],
     isKavua,
     howMeny = 1,
@@ -303,12 +305,16 @@
   }
 
   // ── Consensus bridge ──────────────────────────────────────────────────────
+  // Keyed by the pending proposal, or by the open listing before one exists.
+  // Without either there is no row to key the discussion on, so no bridge.
+  let bridgeId = $derived(pendId ?? bridgeSourceId);
+
   // Open a structured mediation discussion in the consensus app, seeded with the
   // mission's negotiable terms (original vs. current proposal). See negoBridge.js.
   function openBridge() {
     openNegoBridge({
       sourceType: 'mission',
-      sourceId: pendId,
+      sourceId: bridgeId,
       title: name1,
       projectName,
       fields: [
@@ -356,12 +362,13 @@
   // Either way the values only prefill the editable side; the user still
   // submits and the proposal passes the regular vote round.
   async function applyBridgeReturn() {
-    const fromUrl = readNegoBridgeReturn(pendId);
+    if (!bridgeId) return;
+    const fromUrl = readNegoBridgeReturn(bridgeId);
     if (fromUrl) {
       applyBridgeValues(fromUrl);
       return;
     }
-    const found = await fetchBridgeResolution('mission', pendId);
+    const found = await fetchBridgeResolution('mission', bridgeId);
     if (found?.resolution?.values) applyBridgeValues(found.resolution.values);
   }
 
@@ -932,13 +939,15 @@
       type="submit"
       name="addm">{onSubmit ? $t('nego.submitProposal') : $t('common.puttovote')}</button
     >
-    <button
-      onclick={openBridge}
-      type="button"
-      class="mx-auto text-sm border border-gold/50 text-gold hover:bg-gold/20 rounded-full px-4 py-1"
-    >
-      {$t('nego.cand.deeperDiscussion')}
-    </button>
+    {#if bridgeId}
+      <button
+        onclick={openBridge}
+        type="button"
+        class="mx-auto text-sm border border-gold/50 text-gold hover:bg-gold/20 rounded-full px-4 py-1"
+      >
+        {$t('nego.cand.deeperDiscussion')}
+      </button>
+    {/if}
   </div>
 </div>
 

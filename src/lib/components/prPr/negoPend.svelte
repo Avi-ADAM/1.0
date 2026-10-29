@@ -46,6 +46,7 @@
    * @property {any} sqadualedf
    * @property {number} [stepState]
    * @property {any} pendId
+   * @property {any} [bridgeSourceId] - the bridge's source row when there is no pending proposal yet (the open listing's id)
    * @property {any} [users]
    * @property {string} [kindOf]
    * @property {number} [oldide] - last tg id, if non 0
@@ -84,6 +85,7 @@
     sqadualedf,
     stepState = 2,
     pendId,
+    bridgeSourceId = null,
     users = [],
     kindOf = 'perUnit',
     oldide = 0,
@@ -174,13 +176,17 @@
   }
 
   // ── Consensus bridge ──────────────────────────────────────────────────────
+  // Keyed by the pending proposal, or by the open listing before one exists.
+  // Without either there is no row to key the discussion on, so no bridge.
+  let bridgeId = $derived(pendId ?? bridgeSourceId);
+
   // Open a structured mediation discussion in the consensus app, seeded with
   // every negotiable term (original vs. current proposal). Unchanged terms are
   // sent too — the consensus side marks them agreed. See negoBridge.js.
   function openBridge() {
     openNegoBridge({
       sourceType: 'pmash',
-      sourceId: pendId,
+      sourceId: bridgeId,
       title: name1,
       projectName,
       fields: [
@@ -211,12 +217,13 @@
   // for whoever clicked the link) and the resolution signed in the discussion
   // and persisted on the server (visible to every member opening the card).
   onMount(async () => {
-    const fromUrl = readNegoBridgeReturn(pendId);
+    if (!bridgeId) return;
+    const fromUrl = readNegoBridgeReturn(bridgeId);
     if (fromUrl) {
       applyBridgeValues(fromUrl);
       return;
     }
-    const found = await fetchBridgeResolution('pmash', pendId);
+    const found = await fetchBridgeResolution('pmash', bridgeId);
     if (found?.resolution?.values) applyBridgeValues(found.resolution.values);
   });
 
@@ -675,13 +682,15 @@
       type="submit"
       name="addm">{onSubmit ? $t('nego.submitProposal') : $t('common.puttovote')}</button
     >
-    <button
-      onclick={openBridge}
-      type="button"
-      class="mx-auto text-sm border border-gold/50 text-gold hover:bg-gold/20 rounded-full px-4 py-1"
-    >
-      {$t('nego.cand.deeperDiscussion')}
-    </button>
+    {#if bridgeId}
+      <button
+        onclick={openBridge}
+        type="button"
+        class="mx-auto text-sm border border-gold/50 text-gold hover:bg-gold/20 rounded-full px-4 py-1"
+      >
+        {$t('nego.cand.deeperDiscussion')}
+      </button>
+    {/if}
   </div>
 </div>
 
