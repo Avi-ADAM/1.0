@@ -145,18 +145,19 @@ const JOBS = [
   },
   {
     name: 'maagad',
-    description: 'demand pools — cluster open wishes, expire stale offers',
+    description: 'demand pools — cluster open wishes, expire stale offers, settle departure prices',
+    // Hourly, because a departure's price notices are merged per window and a
+    // consent window that ran out waits for this run to let its silent
+    // participants go (PLAN_POOL_PRODUCT §4.2). All three steps are idempotent:
+    // pooled wishes are skipped, expired offers are no longer listed, and an
+    // unmoved price announces nothing.
     path: CRON_SECRET ? `/api/cron/maagad?key=${encodeURIComponent(CRON_SECRET)}` : '/api/cron/maagad',
     timeoutMs: num('SCHEDULER_MAAGAD_TIMEOUT_SECONDS', 300) * 1000,
     due(now, state) {
-      const hour = num('SCHEDULER_MAAGAD_HOUR', 4);
-      const day = dayKey(now);
-      if (state.lastDay === day) return null;
-      if (now.getHours() < hour) return null;
-      return `${day} not run yet`;
-    },
-    onSuccess(state, now) {
-      state.lastDay = dayKey(now);
+      const every = num('SCHEDULER_MAAGAD_MINUTES', 60) * 60 * 1000;
+      if (!state.lastSuccess) return 'never run on this box';
+      const since = now.getTime() - Date.parse(state.lastSuccess);
+      return since >= every ? `${Math.round(since / 60000)}m since the last run` : null;
     }
   },
   {

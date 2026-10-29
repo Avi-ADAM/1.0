@@ -374,7 +374,22 @@
     "showServices": "Mostrar nuestros servicios",
     "shareTitle": "Servicio \"{{name}}\" en la rikma {{projectName}} en 1💗1",
     "oneTimeLevel": "¿El servicio es puntual o mensual?",
-    "equaliSplitedLevel": "¿Los costes se reparten por igual o cada persona paga lo que quiera?"
+    "equaliSplitedLevel": "¿Los costes se reparten por igual o cada persona paga lo que quiera?",
+    "again": {
+      "pageTitle": "Tu solicitud para recibir un servicio",
+      "kicker": "Tu solicitud para recibir un servicio",
+      "someService": "Un servicio de una rikma",
+      "fromRikma": "De la rikma «{{rikma}}»",
+      "lapsed": "Nadie en la rikma aprobó la solicitud dentro del tiempo de respuesta, así que todavía no entró en vigor. No es un rechazo: puedes pedirlo de nuevo, y la solicitud vuelve a los miembros con un nuevo tiempo de respuesta.",
+      "button": "Pedir de nuevo",
+      "sent": "La solicitud volvió a la rikma",
+      "failed": "No pudimos enviarla de nuevo. Puedes intentarlo otra vez.",
+      "waiting": "La solicitud espera la respuesta de los miembros de la rikma. Basta con el sí de un miembro, y si nadie se opone antes de que termine el tiempo de respuesta, entra en vigor.",
+      "until": "El tiempo de respuesta termina {{time}}",
+      "approved": "La solicitud fue aprobada: ya recibes el servicio.",
+      "toDeals": "A mis acuerdos",
+      "unavailable": "La rikma no ofrece este servicio ahora, así que no se puede solicitar por el momento."
+    }
   },
   "misc": {
     "sidurInDev": "En desarrollo activo: pronto podrás ver y organizar turnos aquí",

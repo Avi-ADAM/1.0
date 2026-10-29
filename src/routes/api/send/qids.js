@@ -5291,9 +5291,14 @@ ${PROMO_DECISION_FIELDS}
                 data {
                   id
                   attributes {
+                    createdAt
                     timegrama {
                       data {
                         id
+                        attributes {
+                          date
+                          done
+                        }
                       }
                     }
                     vots {
@@ -5311,11 +5316,20 @@ ${PROMO_DECISION_FIELDS}
                     users_permissions_user {
                       data {
                         id
+                        attributes {
+                          username
+                        }
                       }
                     }
                     sheirut {
                       data {
                         id
+                        attributes {
+                          name
+                          descrip
+                          isApruved
+                          archived
+                        }
                       }
                     }
                   }
@@ -14220,7 +14234,10 @@ ${PROMO_DECISION_FIELDS}
       filters: { maagad: { id: { eq: $maagadId } }, user: { id: { eq: $userId } } }
       pagination: { limit: 1 }
     ) {
-      data { id attributes { status_member visibility options signed_offer { data { id } } } }
+      data { id attributes {
+        status_member visibility options signed_offer { data { id } }
+        sheirutpend { data { id attributes { archived } } }
+      } }
     }
   }`,
 
@@ -16822,10 +16839,11 @@ ${PROMO_DECISION_FIELDS}
         id
         attributes {
           archived
-          project { data { id attributes { projectName user_1s { data { id } } } } }
+          project { data { id attributes { projectName restime user_1s { data { id } } } } }
           sheirut { data { id attributes { name isApruved archived } } }
           users_permissions_user { data { id } }
           vots { what order why zman users_permissions_user { data { id } } }
+          timegrama { data { id attributes { done date } } }
         }
       }
     }

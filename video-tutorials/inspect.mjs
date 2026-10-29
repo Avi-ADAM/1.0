@@ -1,4 +1,4 @@
-// npm run inspect -- <session> <path> [--full] [--wait ms] [--width 1280 --height 720]
+// npm run inspect -- <session> <path> [--full] [--wait ms] [--width 1280 --height 720] [--lang en]
 //
 // Opens one page as one session and writes what a flow author needs:
 // a screenshot and the ARIA snapshot (roles + accessible names = the
@@ -15,11 +15,12 @@ if (!name) {
 }
 const s = sessionInfo(name);
 const outDir = ensureDir(join(ROOT, 'out', 'inspect'));
-const slug = `${name}${path.replace(/[^\w֐-׿]+/g, '_')}`.slice(0, 80);
+const slug = `${name}${opt.lang ? '-' + opt.lang : ''}${path.replace(/[^\w֐-׿]+/g, '_')}`.slice(0, 80);
 
 const browser = await launch();
 const ctx = await newContext(browser, s, {
-  viewport: { width: +(opt.width ?? 1280), height: +(opt.height ?? 720) }
+  viewport: { width: +(opt.width ?? 1280), height: +(opt.height ?? 720) },
+  lang: opt.lang
 });
 const page = await ctx.newPage();
 await page.goto(`${s.base}${path}`, { waitUntil: 'domcontentloaded', timeout: +(opt.timeout ?? 180000) });

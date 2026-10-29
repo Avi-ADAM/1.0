@@ -348,6 +348,9 @@
       "monthly": "mensual",
       "oneTime": "una sola vez",
       "splitEqually": "reparto equitativo",
+      "askwantWho": "{{name}} pide recibir este servicio de la rikma.",
+      "askwantWhoAnon": "Alguien pide recibir este servicio de la rikma.",
+      "askwantRule": "Basta con el sí de un miembro: si nadie se opone antes de que termine el tiempo de respuesta, la solicitud se aprueba. Sin ningún sí, no se aprueba sola.",
       "subscription": "cuota de suscripción",
       "oldLogo": "Logo actual",
       "newLogo": "Logo nuevo"
@@ -787,7 +790,9 @@
     "currentLogo": "Logo actual",
     "offeredLogo": "El nuevo logo propuesto",
     "executionDate": "Fecha de ejecución",
-    "newServiceVote": "Votación sobre crear un servicio nuevo"
+    "newServiceVote": "Votación sobre crear un servicio nuevo",
+    "askwantVote": "Una solicitud para recibir un servicio",
+    "askwantVoteFailed": "Tu sí no se guardó. Puedes intentarlo de nuevo."
   },
   "income": {
     "already": "Ya tiene ingresos",
@@ -866,6 +871,7 @@
       "stipendProgram": "Programa de estipendio",
       "saleClaim": "Consentimiento del receptor",
       "newService": "Servicio nuevo",
+      "askwant": "Solicitud de servicio",
       "picVote": "Cambio de logo",
       "stipendaccrued": "Beca de subsistencia",
       "stipendtransfer": "Transferencia de beca",
@@ -907,6 +913,7 @@
       "vallueles": "Quitar valores",
       "pic": "Cambio de logo de la rikma",
       "sheirutpends": "Nuevo producto o servicio",
+      "askwants": "Una solicitud para recibir un servicio",
       "saleClaim": "Consentimiento del receptor",
       "saleClaimSub": "Quién tiene el dinero",
       "generic": "Una decisión espera tu firma",

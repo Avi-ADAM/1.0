@@ -1359,7 +1359,41 @@ export function extractDecisions(
       }
     }
 
-    // 2. Process Service Requests (Sheirut Pends)
+    // 2. Requests to receive one of the rikma's services (askwant, D2 /
+    // TIMEGRAMA_REMINDERS R2). Taking a customer on needs one member's yes, so
+    // each open request is a vote card; `addVote` type 'askwant' answers it.
+    // A service that is not published (or was archived) cannot be joined, so
+    // its requests have nothing to vote on.
+    for (const aw of project?.attributes?.askwants?.data ?? []) {
+      if (!aw?.id || !aw?.attributes) continue;
+      const sheirut = aw.attributes.sheirut?.data;
+      if (!sheirut || sheirut.attributes?.isApruved !== true || sheirut.attributes?.archived === true) continue;
+      const vots = aw.attributes.vots || [];
+      const clock = aw.attributes.timegrama?.data;
+      decisions.push({
+        id: aw.id,
+        projectId: project.id,
+        decision: 'askwants',
+        priority: 10,
+        myid: userData.id,
+        kind: 'askwants',
+        askwant: {
+          requesterId: aw.attributes.users_permissions_user?.data?.id ?? null,
+          requesterName: aw.attributes.users_permissions_user?.data?.attributes?.username ?? '',
+          sheirutName: sheirut.attributes?.name ?? '',
+          sheirutDescrip: sheirut.attributes?.descrip ?? ''
+        },
+        createdAt: aw.attributes.createdAt,
+        vots,
+        users: vots,
+        timegramaId: clock?.id,
+        // A clock that already ran out has no deadline to count down to; the
+        // first yes on it opens a fresh one.
+        timegramaDate: clock?.attributes?.done === true ? undefined : clock?.attributes?.date
+      } as any);
+    }
+
+    // 3. Process Service Requests (Sheirut Pends)
     /*
     if (project?.attributes?.sheirutpends?.data) {
       for (const sp of project.attributes.sheirutpends.data) {

@@ -331,17 +331,43 @@
     height: 50vw;
     opacity: 0.5;
   }
+  /* The two corners trade colours every so often: both run the same `swap`,
+     half a cycle apart, so one is always blue while the other is purple. A
+     registered <color> property is what lets the gradient fade between them —
+     a browser without @property just keeps each corner's starting colour. */
+  @property --orb-c {
+    syntax: '<color>';
+    inherits: false;
+    initial-value: hsla(210, 100%, 65%, 0.8);
+  }
   .bg-orb-tr {
     top: -15%;
     right: -10%;
-    background: radial-gradient(circle, hsla(210, 100%, 65%, 0.8) 0%, transparent 60%);
-    animation: drift 28s -6s infinite alternate ease-in-out;
+    --orb-c: hsla(210, 100%, 65%, 0.8);
+    background: radial-gradient(circle, var(--orb-c) 0%, transparent 60%);
+    animation:
+      drift 28s -6s infinite alternate ease-in-out,
+      swap 40s infinite ease-in-out;
   }
   .bg-orb-bl {
     bottom: -15%;
     left: -10%;
-    background: radial-gradient(circle, hsla(280, 100%, 65%, 0.7) 0%, transparent 60%);
-    animation: drift 30s -18s infinite alternate-reverse ease-in-out;
+    --orb-c: hsla(280, 100%, 65%, 0.7);
+    background: radial-gradient(circle, var(--orb-c) 0%, transparent 60%);
+    animation:
+      drift 30s -18s infinite alternate-reverse ease-in-out,
+      swap 40s -20s infinite ease-in-out;
+  }
+  @keyframes swap {
+    0%,
+    40%,
+    100% {
+      --orb-c: hsla(210, 100%, 65%, 0.8);
+    }
+    50%,
+    90% {
+      --orb-c: hsla(280, 100%, 65%, 0.7);
+    }
   }
   @keyframes drift {
     33% {

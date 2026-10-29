@@ -334,6 +334,28 @@ export function maapSettled(p: { projectId: Id; name: string }): MaturedNotice {
   };
 }
 
+/**
+ * A cycle whose clock ran out without the responsible member's signature (D1,
+ * docs/tbd/TIMEGRAMA_REMINDERS.md R1). Nothing matured — only they know what
+ * was spent, so their silence cannot settle it — and without this the cycle
+ * just sits open with nobody aware it is waiting on them.
+ */
+export function maapAwaitsResponsible(p: { projectId: Id; name: string; cycleIndex: number | null; responsibleId: Id }): MaturedNotice {
+  const n = p.cycleIndex != null ? ` ${p.cycleIndex}` : '';
+  return {
+    kind: 'maap',
+    intent: 'consent',
+    to: { userIds: [p.responsibleId] },
+    title: L(`מחזור${n} של "${p.name}" מחכה לדיווח שלך`, `Cycle${n} of "${p.name}" waits for your report`, `الدورة${n} من «${p.name}» بانتظار تقريرك`),
+    body: L(
+      'זמן התגובה של הרקמה עבר, אבל ההוצאה של המחזור לא נרשמת בשתיקה: רק מי שאחראי על המשאב יודע כמה יצא. אפשר לדווח את הסכום מהכרטיס בלב, או להציע סכום אחר.',
+      "The rikma's response time is over, but a cycle's expense is not recorded by silence: only the person responsible for the resource knows what was spent. You can report the amount from its card on the heart page, or propose another one.",
+      'انتهى وقت الاستجابة في الريكما، لكن نفقة الدورة لا تُسجَّل بالصمت: وحده المسؤول عن المورد يعرف كم أُنفق. يمكنك الإبلاغ عن المبلغ من بطاقتها في صفحة القلب، أو اقتراح مبلغ آخر.'
+    ),
+    url: levOf(p.projectId)
+  };
+}
+
 export function sheirutApproved(p: { projectId: Id; name: string }): MaturedNotice {
   return {
     kind: 'sheirutpend',
@@ -375,7 +397,11 @@ export function quoteMatured(p: { projectId: Id; productName: string; customerId
   ];
 }
 
-export function askwantApproved(p: { requesterId: Id; name?: string | null }): MaturedNotice {
+/**
+ * `unanimous`: every member signed (addVote type `askwant`) rather than one yes
+ * plus the rest's silence — the same result, said truthfully.
+ */
+export function askwantApproved(p: { requesterId: Id; name?: string | null; unanimous?: boolean }): MaturedNotice {
   const n = p.name?.trim();
   return {
     kind: 'askwant',
@@ -384,12 +410,43 @@ export function askwantApproved(p: { requesterId: Id; name?: string | null }): M
     title: n
       ? L(`הבקשה שלך לקבל את "${n}" התקבלה`, `Your request to receive "${n}" was accepted`, `قُبل طلبك للحصول على «${n}»`)
       : L('הבקשה שלך לקבל את השירות התקבלה', 'Your request to receive the service was accepted', 'قُبل طلبك للحصول على الخدمة'),
-    body: L(
-      'הרקמה אישרה, ובלי התנגדות בזמן התגובה הבקשה נכנסה לתוקף — נרשמת לשירות.',
-      'The rikma approved, and with no objection in time the request took effect — you are signed up for the service.',
-      'وافقت الريكما، ودون اعتراض في الوقت المحدد أصبح الطلب ساريًا — أنت مسجّل في الخدمة.'
-    ),
+    body: p.unanimous
+      ? L(
+          'כל החברים ברקמה אישרו, והבקשה נכנסה לתוקף — נרשמת לשירות.',
+          'Every member of the rikma approved, and the request took effect — you are signed up for the service.',
+          'وافق جميع أعضاء الريكما، وأصبح الطلب ساريًا — أنت مسجّل في الخدمة.'
+        )
+      : L(
+          'הרקמה אישרה, ובלי התנגדות בזמן התגובה הבקשה נכנסה לתוקף — נרשמת לשירות.',
+          'The rikma approved, and with no objection in time the request took effect — you are signed up for the service.',
+          'وافقت الريكما، ودون اعتراض في الوقت المحدد أصبح الطلب ساريًا — أنت مسجّل في الخدمة.'
+        ),
     url: '/deals'
+  };
+}
+
+/**
+ * A request to receive a service whose clock ran out with no member's yes
+ * (D2, docs/tbd/TIMEGRAMA_REMINDERS.md R3). Nothing matured and nothing was
+ * refused — the rikma just did not answer in time — so the door stays open:
+ * the link is the requester's own page for the request, with "ask again".
+ */
+export function askwantLapsed(p: { requesterId: Id; askwantId: Id; name?: string | null; projectName?: string | null }): MaturedNotice {
+  const n = p.name?.trim();
+  const r = p.projectName?.trim();
+  return {
+    kind: 'askwant',
+    intent: 'personal',
+    to: { userIds: [p.requesterId] },
+    title: n
+      ? L(`הרקמה לא הספיקה לענות על הבקשה שלך לקבל את "${n}"`, `The rikma did not get to your request to receive "${n}"`, `لم تتمكّن الريكما من الرد على طلبك للحصول على «${n}»`)
+      : L('הרקמה לא הספיקה לענות על הבקשה שלך', 'The rikma did not get to your request', 'لم تتمكّن الريكما من الرد على طلبك'),
+    body: L(
+      `${r ? `אף אחד ב"${r}"` : 'אף אחד ברקמה'} לא אישר את הבקשה בזמן התגובה, ולכן היא לא נכנסה לתוקף. זו לא דחייה: אפשר לבקש שוב, והבקשה חוזרת לחברי הרקמה עם זמן תגובה חדש.`,
+      `${r ? `Nobody in "${r}"` : 'Nobody in the rikma'} approved the request within the response time, so it has not taken effect. This is not a refusal: you can ask again, and the request goes back to the members with a new response time.`,
+      `${r ? `لم يوافق أحد في «${r}»` : 'لم يوافق أحد في الريكما'} على الطلب خلال وقت الاستجابة، لذلك لم يصبح ساريًا. هذا ليس رفضًا: يمكنك الطلب مرة أخرى، فيعود الطلب إلى أعضاء الريكما مع وقت استجابة جديد.`
+    ),
+    url: p.askwantId != null ? `/askwant/${p.askwantId}` : '/lev'
   };
 }
 

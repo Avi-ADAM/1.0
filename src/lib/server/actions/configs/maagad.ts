@@ -43,6 +43,7 @@ import {
   tierPriceAt,
   type DepartureTerms
 } from '$lib/pooling/departure';
+import { loadDeparture, lockMs, settleDeparture } from '$lib/server/pooling/settleDeparture';
 
 const VISIBILITIES = new Set(['anonymous', 'first_name', 'full']);
 const RECURRENCES = new Set(['one_time', 'weekly', 'biweekly', 'monthly']);
@@ -177,11 +178,32 @@ function departurePriceNow(oa: any, signedCount: number): number | null {
   return tierPriceAt(Array.isArray(oa.price_tiers) ? oa.price_tiers : null, Math.max(signedCount, min));
 }
 
-/** Keep a departure's displayed price in step with its size (service-only qid 445). */
-async function syncDeparturePrice(strapi: any, context: any, offerId: string, oa: any, signedCount: number) {
-  const priceNow = departurePriceNow(oa, signedCount);
-  if (priceNow == null) return;
-  await strapi.execute('445setMaagadOfferPricing', { id: offerId, price_current: priceNow }, undefined, context.fetch);
+/**
+ * An activated departure stays open to joining and leaving until its lock: until
+ * then nothing is closed, and the deals follow the size (PLAN_POOL_PRODUCT §4.1).
+ */
+function openUntilLock(oa: any, nowMs = Date.now()): boolean {
+  if (!oa?.matanot?.data?.id || oa.status_offer !== 'activated') return false;
+  const lock = lockMs(oa);
+  return lock == null || lock > nowMs;
+}
+
+/**
+ * After a join or an exit: re-price the departure from what is stored now, let
+ * lapsed consents go, and tell what moved (§4.2). The signature already stands,
+ * so a failure here only delays the price — the hourly cron settles it.
+ * Returns the parties whose screens the move touched.
+ */
+async function resettleDeparture(util: any, context: any, offerId: string, oa: any): Promise<string[]> {
+  if (!oa?.matanot?.data?.id) return [];
+  try {
+    const fresh = await loadDeparture(util.strapi, context, offerId);
+    const settled = fresh ? await settleDeparture(fresh, context, util) : null;
+    return settled?.partyIds ?? [];
+  } catch (e) {
+    console.error('[maagad] departure settlement failed (the cron will retry)', offerId, e);
+    return [];
+  }
 }
 
 // ── openMaagad ──────────────────────────────────────────────────────────────
@@ -498,7 +520,8 @@ const createMaagadOfferHandler: ActionExecutionHandler = async (params, context,
 
 // ── signMaagadOffer (§7.1) ──────────────────────────────────────────────────
 
-const signMaagadOfferHandler: ActionExecutionHandler = async (params, context, { strapi }) => {
+const signMaagadOfferHandler: ActionExecutionHandler = async (params, context, util) => {
+  const { strapi } = util;
   const { maagadId, offerId, options = null, visibility = 'anonymous' } = params as Record<string, any>;
   if (!maagadId) throw new Error('maagadId is required');
   if (!offerId) throw new Error('offerId is required');
@@ -509,16 +532,20 @@ const signMaagadOfferHandler: ActionExecutionHandler = async (params, context, {
   );
   if (!offer) throw new Error(`Offer ${offerId} not found on maagad ${maagadId}`);
   const oa = offer.attributes ?? {};
-  if (oa.status_offer !== 'open' && oa.status_offer !== 'quorum_reached') {
+  // A departure already under way still takes participants until its lock (A6).
+  const lateJoin = openUntilLock(oa);
+  if (oa.status_offer !== 'open' && oa.status_offer !== 'quorum_reached' && !lateJoin) {
     throw new Error(`offer is ${oa.status_offer} - signing is closed`);
   }
-  if (oa.sign_deadline && new Date(oa.sign_deadline).getTime() <= Date.now()) {
+  if (!lateJoin && oa.sign_deadline && new Date(oa.sign_deadline).getTime() <= Date.now()) {
     throw new Error('sign_deadline has passed');
   }
   const currentCount = Number(oa.signed_count) || 0;
   if (oa.max_participants != null && currentCount >= oa.max_participants) {
     throw new Error('offer is full');
   }
+  const proposerProjectId = oa.proposer_project?.data?.id ? String(oa.proposer_project.data.id) : null;
+  if (lateJoin && !proposerProjectId) throw new Error('this departure has no rikma to hold the deal');
 
   // Signing implies membership (§7.1) — create it on the fly if needed.
   let member = await fetchMyMember(strapi, context, maagadId);
@@ -550,14 +577,39 @@ const signMaagadOfferHandler: ActionExecutionHandler = async (params, context, {
     member = { id: created?.data?.createMaagadMember?.data?.id, attributes: {} };
   }
 
+  const newCount = currentCount + 1;
+
+  // Joining after activation: her deal is minted now, at the price of the size
+  // she makes; the settlement below re-prices everyone's deal to match (§4.1).
+  let sheirutpendId: string | null = null;
+  if (lateJoin) {
+    const price = departurePriceNow(oa, newCount) ?? (Number(oa.unit_price) || 0);
+    const pendRes = await strapi.execute(
+      '235crMaagadSheirutpend',
+      {
+        project: proposerProjectId,
+        userId: String(context.userId),
+        maagadOffer: offerId,
+        price,
+        quant: 1,
+        total: price
+      },
+      undefined,
+      context.fetch
+    );
+    sheirutpendId = pendRes?.data?.createSheirutpend?.data?.id ?? null;
+    if (!sheirutpendId) throw new Error('failed to create the deal for this departure');
+  }
+
   await strapi.execute(
     '226updateMaagadMember',
     {
       id: member.id,
-      status_member: 'signed',
+      status_member: lateJoin ? 'active' : 'signed',
       signed_offer: offerId,
       options,
-      signedAt: nowIso()
+      signedAt: nowIso(),
+      ...(sheirutpendId ? { sheirutpend: sheirutpendId } : {})
     },
     undefined,
     context.fetch
@@ -574,37 +626,41 @@ const signMaagadOfferHandler: ActionExecutionHandler = async (params, context, {
     );
   }
 
-  const newCount = currentCount + 1;
   const quorum = newCount >= Number(oa.min_participants || Infinity);
   await strapi.execute(
     '228updateMaagadOffer',
     {
       id: offerId,
       signed_count: newCount,
-      status_offer: quorum ? 'quorum_reached' : 'open'
+      status_offer: lateJoin ? 'activated' : quorum ? 'quorum_reached' : 'open'
     },
     undefined,
     context.fetch
   );
-  await syncDeparturePrice(strapi, context, String(offerId), oa, newCount);
+  const moved = await resettleDeparture(util, context, String(offerId), oa);
 
   // Quorum! The proposer confirms the final number (§7.2) — notify them.
+  // A late join is not news to them: the quorum was confirmed long ago.
   const notifyUserIds =
-    quorum && oa.proposer_user?.data?.id ? [oa.proposer_user.data.id] : [];
-
-  // NOTE (P3): the conditional Sheirutpend (`conditional=true`, guard on
-  // createSheirutFromPending) is created here once the deal-flow milestone
-  // lands; the membership record already carries everything needed.
+    quorum && !lateJoin && oa.proposer_user?.data?.id ? [oa.proposer_user.data.id] : [];
 
   return {
-    data: { maagadId, offerId, signedCount: newCount, quorumReached: quorum, partyIds: poolPartyIds(maagadNode) },
+    data: {
+      maagadId,
+      offerId,
+      signedCount: newCount,
+      quorumReached: quorum,
+      ...(lateJoin ? { sheirutpendId } : {}),
+      partyIds: [...new Set([...poolPartyIds(maagadNode), ...moved])]
+    },
     notifyUserIds
   };
 };
 
 // ── unsignMaagadOffer (§7.3 — cancel before activation) ─────────────────────
 
-const unsignMaagadOfferHandler: ActionExecutionHandler = async (params, context, { strapi }) => {
+const unsignMaagadOfferHandler: ActionExecutionHandler = async (params, context, util) => {
+  const { strapi } = util;
   const { maagadId, offerId } = params as Record<string, any>;
   if (!maagadId) throw new Error('maagadId is required');
   if (!offerId) throw new Error('offerId is required');
@@ -615,7 +671,11 @@ const unsignMaagadOfferHandler: ActionExecutionHandler = async (params, context,
   );
   if (!offer) throw new Error(`Offer ${offerId} not found on maagad ${maagadId}`);
   const oa = offer.attributes ?? {};
-  if (oa.status_offer === 'activated') {
+  // A departure is not closed until its lock: leaving stays free after the
+  // activation too (§1ב, B6a). Past the lock, or for a plain offer, the
+  // cancellation terms govern.
+  const afterActivation = oa.status_offer === 'activated';
+  if (afterActivation && !openUntilLock(oa)) {
     throw new Error('offer already activated - exit is governed by its cancellation terms');
   }
 
@@ -623,6 +683,13 @@ const unsignMaagadOfferHandler: ActionExecutionHandler = async (params, context,
   const signedOn = member?.attributes?.signed_offer?.data?.id;
   if (!member || String(signedOn) !== String(offerId)) {
     return { data: { maagadId, offerId, unsigned: false } };
+  }
+
+  // Her deal goes with her. The refund of anything she paid ahead is P4's
+  // settlement of advances; nothing here charges her.
+  const pend = member.attributes?.sheirutpend?.data;
+  if (afterActivation && pend?.id && !pend.attributes?.archived) {
+    await strapi.execute('450archiveDeparturePend', { id: String(pend.id) }, undefined, context.fetch);
   }
 
   await strapi.execute(
@@ -645,11 +712,17 @@ const unsignMaagadOfferHandler: ActionExecutionHandler = async (params, context,
     undefined,
     context.fetch
   );
-  // The repricing this leaves for the others (and their "not for me" window) is P3.
-  await syncDeparturePrice(strapi, context, String(offerId), oa, newCount);
+  // What her exit does to everyone else's price (and their "not for me" window).
+  const moved = await resettleDeparture(util, context, String(offerId), oa);
 
   return {
-    data: { maagadId, offerId, unsigned: true, signedCount: newCount, partyIds: poolPartyIds(maagadNode) }
+    data: {
+      maagadId,
+      offerId,
+      unsigned: true,
+      signedCount: newCount,
+      partyIds: [...new Set([...poolPartyIds(maagadNode), ...moved])]
+    }
   };
 };
 
@@ -1122,7 +1195,7 @@ export const maagadActions: ActionConfig[] = [
   },
   {
     key: 'unsignMaagadOffer',
-    description: 'Withdraw a signature before activation (quietly reverts to interested)',
+    description: 'Withdraw a signature before activation, or from a departure before its lock (quietly reverts to interested)',
     graphqlOperation: unsignMaagadOfferHandler,
     paramSchema: {
       maagadId: { type: 'string', required: true, description: 'The pool' },

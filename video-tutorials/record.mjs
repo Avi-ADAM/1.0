@@ -4,6 +4,9 @@
 //   --from id         record this scene and everything after it
 //   --vars file.json  start from saved variables (e.g. the wishId of a past run)
 //   --out dir         write here instead of out/<flow>/<stamp>/
+//   --lang he,en      the languages to shoot (default: the flow's "languages",
+//                     else its "language", else he). The first is live, the
+//                     others mirror it — see lanes.mjs
 //   --headed          show the browser while recording
 //   --capture video   use Playwright's built-in recorder instead of the
 //                     CDP screencast (lower quality, no ffmpeg needed)
@@ -14,17 +17,22 @@
 // ended inside that clip and where its element was on screen — narration,
 // captions, zooms and callouts are timed from it downstream, so a re-shoot
 // after a UI change re-times the whole video by itself.
+//
+// With more than one language every language gets its own folder
+// (out/<flow>/<run>/<lang>/) holding exactly what a one-language run holds, so
+// the editing side composes each language as if it were its own shoot.
 import {
   launch, newContext, sessionInfo, parseArgs, resolve, interpolate,
   ensureDir, stamp, findFfmpeg, writeJson, ROOT
 } from './lib.mjs';
+import { localize, swapPairs, MirrorBus, wireLive, wireMirror } from './lanes.mjs';
 import { readFileSync, writeFileSync, existsSync, readdirSync, renameSync, rmSync } from 'node:fs';
 import { join, resolve as resolvePath, basename } from 'node:path';
 import { spawnSync } from 'node:child_process';
 
 const { pos, opt } = parseArgs(process.argv.slice(2));
 if (!pos[0]) {
-  console.error('usage: npm run record -- flows/<flow>.json [--scene id] [--from id] [--headed] [--dry]');
+  console.error('usage: npm run record -- flows/<flow>.json [--scene id] [--from id] [--lang he,en] [--headed] [--dry]');
   process.exit(1);
 }
 const flowPath = resolvePath(pos[0]);
@@ -38,14 +46,24 @@ if (capture === 'screencast' && !ffmpeg) {
   process.exit(1);
 }
 
+const LANGS = opt.lang ? String(opt.lang).split(',') : (flow.languages ?? [flow.language ?? 'he']);
+const LIVE = LANGS[0];
+const multi = LANGS.length > 1;
+const laneDir = lang => (multi ? ensureDir(join(outDir, lang)) : outDir);
+
+// vars stay raw ({ he, en } maps, "${RUN}" inside) and are resolved per
+// language when a step needs them; saved ids are language-free
 const vars = {
   RUN: runStamp.slice(4, 13).replace('-', ' '), // "1006 1530" — tells this run's rows apart
   ...(flow.vars ?? {}),
   ...(opt.vars ? JSON.parse(readFileSync(resolvePath(opt.vars), 'utf8')) : {})
 };
-
-// vars may use each other ("… (הדגמה ${RUN})") — resolve them before any scene does
-for (const k of Object.keys(vars)) vars[k] = interpolate(vars[k], vars);
+// vars may use each other ("… (הדגמה ${RUN})") — two passes cover one level of nesting
+function varsFor(lang) {
+  let v = localize(vars, lang);
+  v = interpolate(v, v);
+  return interpolate(v, v);
+}
 
 // a scene still marked todo has no steps worth filming yet; --dry runs it anyway
 let scenes = flow.scenes.filter(s => {
@@ -68,10 +86,20 @@ const defaults = { viewport: { width: 1280, height: 720 }, scale: 1.5, pace: 1, 
 // how long the viewer gets to read the result of each kind of step
 const SETTLE = { goto: 1200, click: 900, type: 700, fill: 500, select: 700, press: 600, hover: 700, scroll: 500, highlight: 0, check: 600, upload: 900 };
 
+// a stray rejection (a request disposed mid-navigation) must not take a
+// long shoot down with it — log it and keep filming
+process.on('unhandledRejection', e => console.log(`   · ignored: ${String(e?.message ?? e).split(/\r?\n/)[0]}`));
+
 const browser = await launch({ headed: !!opt.headed });
 await warmup();
-const timeline = { flow: flow.id, title: flow.title, recordedAt: new Date().toISOString(), capture, flowFile: basename(flowPath), scenes: [] };
+const timelines = Object.fromEntries(LANGS.map(lang => [lang, {
+  flow: flow.id, title: localize(flow.title, lang), lang, recordedAt: new Date().toISOString(),
+  capture, flowFile: basename(flowPath), ...(multi ? { live: LIVE, mirrored: lang !== LIVE } : {}), scenes: []
+}]));
 let failed = null;
+// a mirror lane that lost a scene does not stop the shoot — the live lane has
+// already written; the scene is listed here and re-shot later in that language
+const brokenMirrors = [];
 
 // A dev server that reloads the page mid-scene (someone saved a file, Vite
 // re-optimized a dependency) wipes what was typed and films a white flash.
@@ -103,129 +131,198 @@ for (const rawScene of scenes) {
         : `the page kept reloading (${RETRIES + 1} takes) — is someone editing the code?`
     };
   }
-  timeline.scenes.push(result.entry);
-  console.log(`   ✓ ${result.entry.file ?? '(dry)'} ${result.entry.duration ? result.entry.duration.toFixed(1) + 's' : ''}`);
+  for (const [lang, entry] of Object.entries(result.entries)) {
+    timelines[lang].scenes.push(entry);
+    // written after every scene: a crash later must not lose the takes so far
+    writeJson(join(laneDir(lang), 'timeline.json'), timelines[lang]);
+    console.log(`   ✓ ${multi ? lang + ' ' : ''}${entry.file ?? (entry.broken ? '✗ ' + entry.broken : '(dry)')} ${entry.duration ? entry.duration.toFixed(1) + 's' : ''}`);
+  }
+  writeJson(join(outDir, 'vars.json'), vars);
   if (failed) break;
 }
 
-async function shootScene(rawScene, attempt) {
-  const scene = interpolate(rawScene, vars);
-  const session = sessionInfo(scene.session);
+async function openLane(scene, session, lang, bus, attempt) {
   const viewport = scene.viewport ?? defaults.viewport;
   const scale = scene.scale ?? defaults.scale;
-  const pace = scene.pace ?? defaults.pace;
-  if (attempt === 1) console.log(`\n▶ ${scene.id} — ${scene.title ?? ''} [${session.name}]`);
-
-  const ctxOpened = Date.now() / 1000;
-  const videoTmp = capture === 'video' ? ensureDir(join(outDir, `.video-${scene.id}`)) : null;
-  const ctx = await newContext(browser, session, { viewport, scale, recordVideoDir: videoTmp, css: [defaults.css, scene.css].filter(Boolean).join('\n') });
+  const dir = laneDir(lang);
+  const videoTmp = capture === 'video' ? ensureDir(join(dir, `.video-${scene.id}`)) : null;
+  const ctx = await newContext(browser, session, {
+    viewport, scale, recordVideoDir: videoTmp, lang: multi || lang !== 'he' ? lang : undefined,
+    css: [defaults.css, scene.css].filter(Boolean).join('\n')
+  });
   ctx.setDefaultTimeout(scene.timeout ?? flow.timeout ?? 20000);
   // per-browser UI memory a real member would already have (a dismissed guide,
   // the heart view they picked), set before the site's own scripts read it
-  const storage = { ...(defaults.localStorage ?? {}), ...(scene.localStorage ?? {}) };
+  const storage = interpolate({ ...(defaults.localStorage ?? {}), ...(scene.localStorage ?? {}) }, varsFor(lang));
   if (Object.keys(storage).length) {
     await ctx.addInitScript(items => {
       for (const [k, v] of Object.entries(items)) try { localStorage.setItem(k, v); } catch {}
     }, storage);
   }
-  const page = await ctx.newPage();
+  const lane = { lang, dir, ctx, videoTmp, viewport, scale, missed: [], ctxOpened: Date.now() / 1000 };
+  if (multi) {
+    if (lang === LIVE) await wireLive(ctx, session.base, bus, m => console.log(m));
+    else await wireMirror(ctx, session.base, bus, swapPairs(vars, LIVE, lang, interpolate), {
+      timeoutMs: flow.mirrorTimeout ?? 25000,
+      log: m => console.log(`${m} [${lang}]`),
+      onMiss: k => lane.missed.push(k)
+    });
+  }
+  lane.page = await ctx.newPage();
   // everything from here on is in output pixels (viewport × scale), see newContext
-  const out = { width: Math.round(viewport.width * scale), height: Math.round(viewport.height * scale) };
-  const cursor = { x: out.width * 0.62, y: out.height * 0.55 };
-  await page.mouse.move(cursor.x, cursor.y);
+  lane.out = { width: Math.round(viewport.width * scale), height: Math.round(viewport.height * scale) };
+  lane.cursor = { x: lane.out.width * 0.62, y: lane.out.height * 0.55 };
+  await lane.page.mouse.move(lane.cursor.x, lane.cursor.y);
+  return lane;
+}
+
+async function shootScene(rawScene, attempt) {
+  const scene0 = localize(rawScene, LIVE);
+  const session = sessionInfo(scene0.session);
+  const pace = scene0.pace ?? defaults.pace;
+  if (attempt === 1) console.log(`\n▶ ${scene0.id} — ${scene0.title ?? ''} [${session.name}${multi ? ' · ' + LANGS.join('+') : ''}]`);
+
+  // record:false — a backstage scene: it moves the story forward (the second
+  // supplier also applies) but the video doesn't need to watch it happen, so
+  // only the live language runs it
+  const filming = scene0.record !== false;
+  const langs = filming ? LANGS : [LIVE];
+  const bus = new MirrorBus();
+  const lanes = [];
+  for (const lang of langs) lanes.push(await openLane(scene0, session, lang, bus, attempt));
+  const live = lanes[0];
+
+  const entries = {};
+  for (const l of lanes) {
+    const sc = localize(rawScene, l.lang);
+    entries[l.lang] = {
+      id: sc.id, title: sc.title, session: session.name, narration: interpolate(sc.narration ?? null, varsFor(l.lang)),
+      size: l.out, layoutViewport: l.viewport, steps: []
+    };
+  }
+  // the step as this lane sees it: its language's names and texts, its vars
+  const stepFor = (l, raw) => { const v = varsFor(l.lang); return interpolate(localize(raw, l.lang), v); };
+  const ctxFor = l => ({ page: l.page, session, vars, cursor: l.cursor, pace, outDir: l.dir, sceneId: scene0.id, lang: l.lang });
 
   // setup runs before the camera rolls: open the page, wait for it to load, so
   // the clip starts on a finished screen instead of a white flash
-  const runCtx = { page, session, vars, cursor, pace, outDir, sceneId: scene.id };
-  const entry = { id: scene.id, title: scene.title, session: session.name, narration: scene.narration ?? null, size: out, layoutViewport: viewport, steps: [] };
   try {
-    for (const step of scene.setup ?? []) await runStep(runCtx, interpolate(step, vars), null);
+    bus.setStep(-1);
+    for (const step of rawScene.setup ?? []) {
+      const res = await Promise.allSettled(lanes.map(l => runStep(ctxFor(l), stepFor(l, step), null)));
+      const bad = res.findIndex(r => r.status === 'rejected');
+      if (bad >= 0) throw Object.assign(res[bad].reason, { lane: lanes[bad] });
+    }
   } catch (e) {
-    failed = await fail(runCtx, 'setup', e);
-    await ctx.close();
-    return { entry, committed: false };
+    failed = await fail(ctxFor(e.lane ?? live), 'setup', e);
+    if (multi) failed.message += ` [${(e.lane ?? live).lang}]`;
+    for (const l of lanes) await l.ctx.close();
+    return { entries: {}, committed: false };
   }
 
   // the Vite client logs "connecting..." on every full page load; after setup
   // there should be none unless a step navigates on purpose
   let reloaded = false;
-  let expectNav = false;
-  page.on('console', m => { if (!expectNav && m.text().includes('[vite] connecting')) reloaded = true; });
+  for (const l of lanes) {
+    l.expectNav = false;
+    l.page.on('console', m => { if (!l.expectNav && m.text().includes('[vite] connecting')) reloaded = true; });
+  }
 
-  // record:false — a backstage scene: it moves the story forward (the second
-  // supplier also applies) but the video doesn't need to watch it happen
-  const filming = scene.record !== false;
-  const cam = filming && capture === 'screencast' ? await startScreencast(page, join(outDir, `.frames-${scene.id}-${attempt}`), viewport, scale) : null;
-  const t0 = capture === 'video' ? null : Date.now() / 1000;
-  const videoStart = Date.now() / 1000; // for capture=video t is relative to the setup end; see trimStart
-  if (filming) await page.waitForTimeout((scene.lead ?? 600) * pace);
+  for (const l of lanes) {
+    l.cam = filming && capture === 'screencast' ? await startScreencast(l.page, join(l.dir, `.frames-${scene0.id}-${attempt}`), l.viewport, l.scale) : null;
+    l.t0 = Date.now() / 1000;
+    l.now = () => Date.now() / 1000 - (l.cam?.paused() ?? 0);
+  }
+  if (filming) await Promise.all(lanes.map(l => l.page.waitForTimeout((scene0.lead ?? 600) * pace)));
 
   let committed = false;
   // --steps 9-17: resume a scene part-way, when its first half already ran
   // (and wrote) in a take that was lost
   const [stepFrom, stepTo] = opt.steps ? String(opt.steps).split('-').map(Number) : [0, Infinity];
-  for (let i = 0; i < (scene.steps ?? []).length; i++) {
+  const steps = rawScene.steps ?? [];
+  for (let i = 0; i < steps.length; i++) {
     if (i < stepFrom || i > (stepTo ?? stepFrom)) continue;
-    const step = interpolate(scene.steps[i], vars);
-    const started = Date.now() / 1000;
-    let info = null;
+    const meta = localize(steps[i], LIVE);
     // a goto/reload, or a click that is meant to leave the page, loads Vite again
-    expectNav = step.do === 'goto' || step.do === 'reload' || !!step.navigates;
-    try {
-      info = await runStep(runCtx, step, i);
-    } catch (e) {
-      if (reloaded && !committed) break; // the reload is the real cause — retake
-      if (step.optional) {
-        console.log(`   · step ${i} (${step.do}) skipped: ${e.message.split('\n')[0]}`);
-        continue;
+    const nav = meta.do === 'goto' || meta.do === 'reload' || !!meta.navigates;
+    bus.setStep(i);
+    // every language does step i together; whoever is done first waits with
+    // its camera paused, so no clip films the other language's work
+    await Promise.all(lanes.filter(l => !l.broken).map(async l => {
+      // a saved id comes from the live lane; the mirror would read the same one
+      if (meta.do === 'save' && l !== live) return;
+      const step = stepFor(l, steps[i]);
+      const started = l.now();
+      let info = null;
+      l.expectNav = nav;
+      try {
+        info = await runStep(ctxFor(l), step, i);
+      } catch (e) {
+        if (step.optional) {
+          console.log(`   · step ${i} (${step.do}) skipped${multi ? ' [' + l.lang + ']' : ''}: ${e.message.split('\n')[0]}`);
+          l.cam?.pause();
+          return;
+        }
+        const f = await fail(ctxFor(l), i, e, step);
+        if (l === live) { if (!(reloaded && !committed)) failed = f; }
+        else { l.broken = `step ${i}: ${f.message}`; brokenMirrors.push({ lang: l.lang, scene: scene0.id, ...f }); }
+        l.cam?.pause();
+        return;
+      } finally {
+        // the next page's own "connecting" can arrive a moment after the step returns
+        if (nav) { await l.page.waitForTimeout(300); l.expectNav = false; }
       }
-      failed = await fail(runCtx, i, e, step);
-      break;
-    } finally {
-      // the next page's own "connecting" can arrive a moment after the step returns
-      if (expectNav) { await page.waitForTimeout(300); expectNav = false; }
-    }
-    if (step.commits) committed = true;
-    const ended = Date.now() / 1000;
-    entry.steps.push({
-      i, do: step.do, mark: step.mark ?? null, note: step.note ?? null,
-      t: +(started - (t0 ?? videoStart)).toFixed(3),
-      tEnd: +(ended - (t0 ?? videoStart)).toFixed(3),
-      ...(info ?? {})
-    });
-    if (reloaded) break;
+      entries[l.lang].steps.push({
+        i, do: step.do, mark: step.mark ?? null, note: step.note ?? null,
+        t: +(started - l.t0).toFixed(3),
+        tEnd: +(l.now() - l.t0).toFixed(3),
+        ...(info ?? {})
+      });
+      l.cam?.pause();
+    }));
+    for (const l of lanes) l.cam?.resume();
+    if (meta.commits && !failed) committed = true;
+    if (failed || reloaded) break;
   }
-  if (!failed && !reloaded) await page.waitForTimeout((scene.tail ?? 900) * pace);
-  const tStop = Date.now() / 1000;
+  if (!failed && !reloaded) await Promise.all(lanes.map(l => l.page.waitForTimeout((scene0.tail ?? 900) * pace)));
 
-  if (cam) {
-    const frames = await cam.stop();
-    if (!reloaded) {
-      const file = `scene-${scene.id}.mp4`;
-      entry.duration = encodeFrames(frames, cam.dir, join(outDir, file), t0, tStop, scene.fps ?? defaults.fps ?? 30);
-      entry.file = file;
+  for (const l of lanes) {
+    const entry = entries[l.lang];
+    const tStop = l.now();
+    if (l.cam) {
+      const frames = await l.cam.stop();
+      if (!reloaded && !l.broken) {
+        const file = `scene-${scene0.id}.mp4`;
+        entry.duration = encodeFrames(frames, l.cam.dir, join(l.dir, file), l.t0, tStop, scene0.fps ?? defaults.fps ?? 30);
+        entry.file = file;
+      }
+      rmSync(l.cam.dir, { recursive: true, force: true });
     }
-    rmSync(cam.dir, { recursive: true, force: true });
-  }
-  await ctx.close();
-  if (videoTmp) {
-    const webm = readdirSync(videoTmp).find(f => f.endsWith('.webm'));
-    if (webm && !reloaded) {
-      entry.file = `scene-${scene.id}.webm`;
-      renameSync(join(videoTmp, webm), join(outDir, entry.file));
-      entry.trimStart = +(videoStart - ctxOpened).toFixed(3); // step t is relative to this point in the webm
+    await l.ctx.close();
+    if (l.videoTmp) {
+      const webm = readdirSync(l.videoTmp).find(f => f.endsWith('.webm'));
+      if (webm && !reloaded) {
+        entry.file = `scene-${scene0.id}.webm`;
+        renameSync(join(l.videoTmp, webm), join(l.dir, entry.file));
+        entry.trimStart = +(l.t0 - l.ctxOpened).toFixed(3); // step t is relative to this point in the webm
+      }
+      rmSync(l.videoTmp, { recursive: true, force: true });
     }
-    rmSync(videoTmp, { recursive: true, force: true });
+    if (capture === 'none' || !filming) { entry.duration = +(tStop - l.t0).toFixed(3); entry.backstage = !filming; }
+    if (attempt > 1) entry.takes = attempt;
+    if (l.broken) entry.broken = l.broken;
+    if (l.missed.length) entry.mirrorMissed = l.missed;
   }
-  if (capture === 'none' || !filming) { entry.duration = +(tStop - (t0 ?? videoStart)).toFixed(3); entry.backstage = !filming; }
-  if (attempt > 1) entry.takes = attempt;
-  return { entry, reloaded, committed };
+  return { entries, reloaded, committed };
 }
 
 await browser.close();
-writeJson(join(outDir, 'timeline.json'), timeline);
+for (const lang of LANGS) writeJson(join(laneDir(lang), 'timeline.json'), timelines[lang]);
 writeJson(join(outDir, 'vars.json'), vars);
 console.log(`\n${failed ? '✗ stopped' : '✓ done'} → ${outDir}`);
+for (const b of brokenMirrors) {
+  console.log(`  ⚠ ${b.lang}: scene ${b.scene} lost at step ${b.step}: ${b.message}\n    screenshot: ${b.png}`);
+}
 if (failed) {
   console.log(`  failed at scene ${failed.scene}, step ${failed.step}: ${failed.message}`);
   console.log(`  screenshot: ${failed.png}\n  aria: ${failed.aria}`);
@@ -248,9 +345,10 @@ async function warmup() {
   if (!jobs.size) return;
   console.log(`warming ${jobs.size} page(s)…`);
   const bySession = Map.groupBy([...jobs.values()], j => j.session);
-  await Promise.all([...bySession].map(async ([name, list]) => {
+  // each language loads its own translation namespaces — warm every one
+  await Promise.all([...bySession].flatMap(([name, list]) => LANGS.map(lang => [name, list, lang])).map(async ([name, list, lang]) => {
     const s = sessionInfo(name);
-    const ctx = await newContext(browser, s, { viewport: defaults.viewport, scale: 1 }).catch(() => null);
+    const ctx = await newContext(browser, s, { viewport: defaults.viewport, scale: 1, lang: multi ? lang : undefined }).catch(() => null);
     if (!ctx) return;
     const page = await ctx.newPage();
     for (const j of list) {
@@ -284,7 +382,7 @@ async function runStep(c, step, i) {
     case 'hover':
     case 'check': {
       const loc = await resolve(page, step.target, timeout);
-      info = await glideTo(c, loc, step);
+      info = step.dispatch ? await glideOverlay(c, loc, step) : await glideTo(c, loc, step);
       if (step.do === 'click') {
         // a native confirm() is invisible to the camera and auto-dismissed by
         // Playwright; acceptDialog says "yes" to it instead
@@ -293,7 +391,15 @@ async function runStep(c, step, i) {
         // after a save) — wait for that load so the Vite reconnect it causes is
         // not mistaken for a stray dev-server reload
         const loaded = step.navigates ? page.waitForEvent('load', { timeout: timeout ?? 180000 }) : null;
-        await loc.click({ force: step.force, timeout });
+        // dispatch: an SVG <g role=button> whose centre is painted by a sibling —
+        // a real click lands on the sibling; the cursor still glides there
+        // viaKeyboard: a control that moves under the pointer (it grows on
+        // mouseenter) never becomes "stable" — activate it like a keyboard user
+        if (step.dispatch || step.viaKeyboard) {
+          await page.evaluate(([x, y]) => window.dispatchEvent(new MouseEvent('mousedown', { clientX: x, clientY: y })), [c.cursor.x, c.cursor.y]);
+          if (step.viaKeyboard) { await loc.focus({ timeout }); await page.keyboard.press('Enter'); }
+          else await loc.evaluate(el => el.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true })));
+        } else await loc.click({ force: step.force, timeout });
         if (loaded) {
           await loaded;
           await page.waitForLoadState('networkidle', { timeout: 15000 }).catch(() => {});
@@ -352,7 +458,7 @@ async function runStep(c, step, i) {
       break;
     }
     case 'waitForUrl':
-      await page.waitForURL(new RegExp(step.match), { timeout: timeout ?? 30000 });
+      await page.waitForURL(new RegExp(step.match), { timeout: timeout ?? 30000, waitUntil: 'commit' }); // commit: a client-side goto fires no load
       await page.waitForLoadState('networkidle', { timeout: 8000 }).catch(() => {});
       break;
     case 'highlight': {
@@ -397,6 +503,15 @@ async function runStep(c, step, i) {
     case 'screenshot':
       await page.screenshot({ path: join(c.outDir, `${c.sceneId}-${step.name ?? i}.png`) });
       break;
+    case 'aria': {
+      // while writing a flow: what the page offers at this point (roles + names)
+      const snap = await page.locator('body').ariaSnapshot().catch(() => '(no snapshot)');
+      const f = join(c.outDir, `${c.sceneId}-${step.name ?? i}.aria.yml`);
+      writeFileSync(f, `# ${page.url()}\n${snap}\n`, 'utf8');
+      await page.screenshot({ path: f.replace(/\.aria\.yml$/, '.png') });
+      console.log(`   · aria → ${f}`);
+      break;
+    }
     case 'mark':
       break;
     default:
@@ -440,6 +555,35 @@ async function glideTo(c, loc, step) {
   return { ...info, cursor: { x: Math.round(tx), y: Math.round(ty) } };
 }
 
+// The drawn cursor alone moves, the real pointer stays put: for a control
+// that swaps itself on mouseenter, so the click is dispatched on what was seen
+async function glideOverlay(c, loc, step) {
+  const { page, cursor, pace } = c;
+  await loc.evaluate(el => {
+    const r = el.getBoundingClientRect();
+    if (r.top < 70 || r.bottom > window.innerHeight - 70) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  });
+  await page.waitForTimeout(450);
+  const info = await bbox(loc);
+  if (!info) return null;
+  const { x, y, w, h } = info.box;
+  const tx = x + w / 2, ty = y + h / 2;
+  await page.evaluate(([fx, fy, tx, ty, ms]) => new Promise(done => {
+    const el = document.getElementById('__vt_cursor');
+    if (!el) return done();
+    const t0 = performance.now();
+    const tick = now => {
+      const k = Math.min(1, (now - t0) / ms), e = 1 - Math.pow(1 - k, 3);
+      el.style.transform = 'translate(' + (fx + (tx - fx) * e) + 'px,' + (fy + (ty - fy) * e) + 'px)';
+      if (k < 1) requestAnimationFrame(tick); else done();
+    };
+    requestAnimationFrame(tick);
+  }), [cursor.x, cursor.y, tx, ty, 520 * pace]);
+  cursor.x = tx; cursor.y = ty;
+  await page.waitForTimeout((step.dwell ?? 250) * pace);
+  return { ...info, cursor: { x: Math.round(tx), y: Math.round(ty) } };
+}
+
 async function fail(c, stepIndex, e, step) {
   const tag = `error-${c.sceneId}-${stepIndex}`;
   const png = join(c.outDir, `${tag}.png`);
@@ -462,8 +606,12 @@ async function startScreencast(page, dir, viewport, scale) {
   let n = 0;
   let lastTs = 0;
   let diskError = null;
+  // paused while this language waits for another to finish the same step:
+  // those frames are dropped and the clip's clock skips the wait
+  let pausedAt = null, pausedTotal = 0;
   cdp.on('Page.screencastFrame', async ({ data, metadata, sessionId }) => {
-    const ts = metadata.timestamp ?? Date.now() / 1000;
+    if (pausedAt != null) { await cdp.send('Page.screencastFrameAck', { sessionId }).catch(() => {}); return; }
+    const ts = (metadata.timestamp ?? Date.now() / 1000) - pausedTotal;
     // the output is 30fps; frames arriving faster only cost disk (a 3-minute
     // scene at 60/s once filled the drive) — keep at most one per 1/30 s
     if (!diskError && ts - lastTs >= 1 / 30 - 0.002) {
@@ -490,6 +638,9 @@ async function startScreencast(page, dir, viewport, scale) {
   });
   return {
     dir,
+    pause() { if (pausedAt == null) pausedAt = Date.now() / 1000; },
+    resume() { if (pausedAt != null) { pausedTotal += Date.now() / 1000 - pausedAt; pausedAt = null; } },
+    paused: () => pausedTotal + (pausedAt != null ? Date.now() / 1000 - pausedAt : 0),
     async stop() {
       await cdp.send('Page.stopScreencast').catch(() => {});
       await new Promise(r => setTimeout(r, 200));

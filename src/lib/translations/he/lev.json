@@ -347,6 +347,9 @@
       "monthly": "חודשי",
       "oneTime": "חד פעמי",
       "splitEqually": "חלוקה שווה",
+      "askwantWho": "בקשה של {{name}} לקבל את השירות הזה מהרקמה.",
+      "askwantWhoAnon": "מישהו מבקש לקבל את השירות הזה מהרקמה.",
+      "askwantRule": "הסכמה של חבר אחד מספיקה: אם אף אחד לא מתנגד עד סוף זמן התגובה, הבקשה מאושרת. בלי אף הסכמה היא לא מאושרת מעצמה.",
       "subscription": "דמי מנוי",
       "oldLogo": "הלוגו העכשווי",
       "newLogo": "הלוגו החדש"
@@ -786,7 +789,9 @@
     "currentLogo": "הלוגו העכשווי",
     "offeredLogo": "הלוגו החדש שמוצע",
     "executionDate": "תאריך הביצוע",
-    "newServiceVote": "הצבעה על יצירת שירות חדש"
+    "newServiceVote": "הצבעה על יצירת שירות חדש",
+    "askwantVote": "בקשה לקבל שירות",
+    "askwantVoteFailed": "ההסכמה לא נשמרה. אפשר לנסות שוב."
   },
   "income": {
     "already": "נכנס כבר כסף",
@@ -865,6 +870,7 @@
       "stipendProgram": "תוכנית מלגה",
       "saleClaim": "אישור מחזיק התמורה",
       "newService": "מוצר חדש",
+      "askwant": "בקשה לשירות",
       "picVote": "החלפת לוגו",
       "stipendaccrued": "מלגת קיום",
       "stipendtransfer": "העברת מלגה",
@@ -906,6 +912,7 @@
       "vallueles": "הסרת ערכים",
       "pic": "שינוי לוגו הרקמה",
       "sheirutpends": "מוצר או שירות חדש",
+      "askwants": "בקשה לקבל שירות",
       "saleClaim": "אישור מחזיק התמורה",
       "saleClaimSub": "מי מחזיק את הכסף",
       "generic": "החלטה שממתינה לחתימתך",

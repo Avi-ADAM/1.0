@@ -423,12 +423,16 @@ const ROW_CONTENT = {
         ? (T(b.saleClaim?.productName) ?? K('lev.list.decision.saleClaim'))
         : FIELD_DECISIONS.has(b.kind)
           ? K(`lev.list.decision.${b.kind}`)
+          : b.kind === 'askwants'
+            ? (T(b.askwant?.sheirutName) ?? K('lev.list.decision.askwants'))
           : b.kind === 'sheirutpends'
             ? K('lev.list.decision.sheirutpends')
             : (T(b.name) ?? T(b.projectName)),
     subtitle:
       b.kind === 'saleClaim'
         ? K('lev.list.decision.saleClaimSub')
+        : b.kind === 'askwants' && b.askwant?.requesterName
+          ? K('lev.list.sub.requestedBy', { name: b.askwant.requesterName })
         : (T(rowSubtitle(b)) ?? K('lev.list.decision.generic')),
     facts:
       b.kind === 'saleClaim'
@@ -741,6 +745,7 @@ export function rowKindKey(item) {
   if (ani === 'hachla') {
     if (item?.kind === 'saleClaim') return 'lev.list.kind.saleClaim';
     if (item?.kind === 'sheirutpends') return 'lev.list.kind.newService';
+    if (item?.kind === 'askwants') return 'lev.list.kind.askwant';
     if (item?.kind === 'pic') return 'lev.list.kind.picVote';
   }
   return kindLabelKey(ani);

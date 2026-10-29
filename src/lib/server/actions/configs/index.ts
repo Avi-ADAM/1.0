@@ -13,6 +13,7 @@ import { createTosplitConfig } from './createTosplit.js';
 import { createSheirutpendConfig } from './createSheirutpend.js';
 import { proposeSheirutConfig } from './proposeSheirut.js';
 import { requestSheirutJoinConfig } from './requestSheirutJoin.js';
+import { renewSheirutJoinConfig } from './renewSheirutJoin.js';
 import { createNewMeetingConfig } from './createNewMeeting.js';
 import { approveMeetingConfig } from './approveMeeting.js';
 import { toggleOnlineConfig } from './toggleOnline.js';
@@ -265,6 +266,7 @@ export function registerAllActions(): void {
   // browser (PLAN_TIMEGRAMA B6), each with a timegrama finalizer behind it.
   registerAction(proposeSheirutConfig);
   registerAction(requestSheirutJoinConfig);
+  registerAction(renewSheirutJoinConfig);
   registerAction(createNewMeetingConfig);
   registerAction(approveMeetingConfig);
   registerAction(toggleOnlineConfig);
@@ -689,5 +691,6 @@ export {
   getDecisionDetailsConfig,
   proposeSheirutConfig,
   requestSheirutJoinConfig,
+  renewSheirutJoinConfig,
   cacheTranslationsConfig
 };

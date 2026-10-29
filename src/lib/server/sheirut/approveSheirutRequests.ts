@@ -75,6 +75,62 @@ export function sheirutGate({ vots, memberIds, proposerId }: SheirutGateInput) {
   return computeNegoGate({ rounds: [], vots, takerId: proposerId, memberIds, takerApplied: true });
 }
 
+/** An askwant `vots` row as `ComponentProjectsVotsInput` wants it — plain ids, `ide` an Int. */
+export interface AskwantVoteRow {
+  what: boolean;
+  users_permissions_user: string;
+  ide: number;
+  order: number;
+  zman?: string;
+  why?: string;
+}
+
+/**
+ * A member's yes on someone's request to receive a service (`addVote` type
+ * `askwant`, TIMEGRAMA_REMINDERS R2). The component is written whole, so the
+ * stored rows are normalised and the yes appended — once: a second tap by the
+ * same member changes nothing. `allYes` is "every member signed", the explicit
+ * twin of the clock's one-yes-plus-silence (D2), and settles the request now.
+ */
+export function addAskwantYes({
+  vots,
+  memberIds,
+  userId,
+  now
+}: {
+  vots: any[];
+  memberIds: Array<string | number>;
+  userId: string | number;
+  now: Date;
+}): { rows: AskwantVoteRow[]; changed: boolean; allYes: boolean; hasNo: boolean } {
+  const rows: AskwantVoteRow[] = (vots ?? [])
+    .map((v: any) => {
+      const uid = normId(v?.users_permissions_user);
+      if (!uid) return null;
+      const row: AskwantVoteRow = {
+        what: v?.what === true,
+        users_permissions_user: uid,
+        ide: parseInt(uid, 10),
+        order: Number(v?.order ?? 0)
+      };
+      if (v?.zman) row.zman = v.zman;
+      if (v?.why) row.why = v.why;
+      return row;
+    })
+    .filter((r): r is AskwantVoteRow => r !== null);
+
+  const me = String(userId);
+  const changed = !rows.some((r) => r.what === true && r.users_permissions_user === me);
+  if (changed) {
+    rows.push({ what: true, users_permissions_user: me, ide: parseInt(me, 10), order: 0, zman: now.toISOString() });
+  }
+
+  const members = [...new Set((memberIds ?? []).map((m) => normId(m)).filter(Boolean))];
+  const yes = new Set(rows.filter((r) => r.what === true).map((r) => r.users_permissions_user));
+  const hasNo = rows.some((r) => r.what === false);
+  return { rows, changed, allYes: members.length > 0 && members.every((m) => yes.has(m)) && !hasNo, hasNo };
+}
+
 export interface ApproveSheirutProposalInput {
   sheirutpendId: string;
   sheirutId: string;

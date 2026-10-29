@@ -29,7 +29,7 @@ type Built = { sentence: NoticeText; detail?: NoticeText | null; terms?: NoticeT
 /** Decision kinds that change a field of the rikma — each has a label in `lev.list.decision`. */
 const FIELD_DECISIONS = new Set([
   'name', 'pubdes', 'prides', 'newFlink', 'newWlink', 'timtoM',
-  'vallueadd', 'vallueles', 'pic', 'codeLicense', 'address', 'look', 'sheirutpends'
+  'vallueadd', 'vallueles', 'pic', 'codeLicense', 'address', 'look', 'sheirutpends', 'askwants'
 ]);
 
 const who = (b: any) => txt(b.username) ?? txt(b.useraplyname);

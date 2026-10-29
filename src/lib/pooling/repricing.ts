@@ -104,12 +104,12 @@ export function planAnnouncement(input: {
  * Whose window ran out without the yes a price above her ceiling needs. She
  * returns to `interested`, is not charged, and gets back what she paid (§4.2).
  */
-export function lapsedConsents(
-	participants: Participant[],
+export function lapsedConsents<P extends Participant>(
+	participants: P[],
 	priceNow: number,
 	envelopeNow: number | null,
 	nowMs: number
-): Participant[] {
+): P[] {
 	return participants.filter((p) => {
 		if (p.windowUntilMs == null || p.windowUntilMs > nowMs) return false;
 		return classifyMove(priceNow, priceNow, p.envelopeAtSign, envelopeNow) === 'aboveEnvelope';

@@ -384,6 +384,7 @@ export type ActionKey =
   | 'rejectSheirutpend'
   | 'proposeSheirut'
   | 'requestSheirutJoin'
+  | 'renewSheirutJoin'
   | 'createProcess'
   | 'attachEntityToProcess'
   | 'ensureProcessForum'
@@ -608,7 +609,7 @@ export interface ActionParamsMap {
   ensureStageForum: EnsureStageForumParams;
   timerSave: TimerSaveParams;
   addVote: {
-    type: 'pend' | 'sheirutpend' | 'ask' | 'decision';
+    type: 'pend' | 'sheirutpend' | 'ask' | 'decision' | 'askwant';
     id: string;
     projectId: string;
     existingComponentData?: any[];
@@ -629,6 +630,10 @@ export interface ActionParamsMap {
   requestSheirutJoin: {
     projectId: string;
     sheirutId: string;
+  };
+  /** Ask again on a service request whose clock ran out with no answer (TIMEGRAMA_REMINDERS R3). */
+  renewSheirutJoin: {
+    askwantId: string;
   };
   approveSheirutpend: {
     id: string;

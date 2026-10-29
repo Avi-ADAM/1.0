@@ -52,14 +52,16 @@ export async function launch({ headed = false } = {}) {
 // obvious tool, but CDP screencast frames come out at CSS pixels, so a DSF of
 // 1.5 still records 1280 wide.) Mouse events, bounding boxes and the timeline
 // are all in output pixels this way, which is what the editor wants.
-export async function newContext(browser, session, { viewport, scale, recordVideoDir, css } = {}) {
+const LOCALES = { he: 'he-IL', en: 'en-US', ar: 'ar', ru: 'ru-RU', es: 'es-ES' };
+
+export async function newContext(browser, session, { viewport, scale, recordVideoDir, css, lang } = {}) {
   const vp = viewport ?? { width: 1280, height: 720 };
   const z = scale ?? 1.5;
   const device = { width: Math.round(vp.width * z), height: Math.round(vp.height * z) };
   const opts = {
     viewport: device,
     deviceScaleFactor: 1,
-    locale: 'he-IL',
+    locale: LOCALES[lang ?? 'he'] ?? 'he-IL',
     timezoneId: 'Asia/Jerusalem',
     colorScheme: 'light',
     reducedMotion: 'no-preference'
@@ -72,6 +74,9 @@ export async function newContext(browser, session, { viewport, scale, recordVide
   }
   if (recordVideoDir) opts.recordVideo = { dir: recordVideoDir, size: device };
   const ctx = await browser.newContext(opts);
+  // the site picks its language from ?lang=, then this cookie — the signed-in
+  // state may carry another one, which this replaces (same name/domain/path)
+  if (lang) await ctx.addCookies([{ name: 'lang', value: lang, domain: session.host, path: '/' }]);
   await ctx.addInitScript(CURSOR_SCRIPT, { zoom: z, css: css ?? '' });
   return ctx;
 }

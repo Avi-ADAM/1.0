@@ -50,8 +50,42 @@ function fakeStrapi({
 	member = null as any,
 	memberOfProjects = [] as string[]
 } = {}) {
+	// What the departure looks like after the handler's own writes: the settlement
+	// re-reads it (448) and prices the size it finds there.
+	let signedNow: number | null = null;
+	const signedMembers = (n: number) => {
+		const live = offer?.attributes?.status_offer === 'activated';
+		return Array.from({ length: n }, (_, i) => ({
+			id: `m${i}`,
+			attributes: {
+				status_member: live ? 'active' : 'signed',
+				envelope_at_sign: offer?.attributes?.price_envelope ?? null,
+				user: { data: { id: String(100 + i) } },
+				sheirutpend: live ? { data: { id: `p${i}`, attributes: { price: offer.attributes.price_current, archived: false } } } : null
+			}
+		}));
+	};
 	const execute = vi.fn(async (qid: string, vars: Record<string, any>, _jwt?: string) => {
 		switch (qid) {
+			case '448queryDeparture': {
+				if (!offer) return { data: { maagadOffer: { data: null } } };
+				const n = signedNow ?? (Number(offer.attributes.signed_count) || 0);
+				return {
+					data: {
+						maagadOffer: {
+							data: { id: offer.id, attributes: { ...offer.attributes, signed_count: n, signed_members: { data: signedMembers(n) } } }
+						}
+					}
+				};
+			}
+			case '235crMaagadSheirutpend':
+				return { data: { createSheirutpend: { data: { id: '900' } } } };
+			case '449repriceDeparturePend':
+			case '450archiveDeparturePend':
+				return {};
+			case '228updateMaagadOffer':
+				if (vars.signed_count != null) signedNow = vars.signed_count;
+				return {};
 			case '65checkProjectMembership':
 				return {
 					data: {
@@ -88,7 +122,6 @@ function fakeStrapi({
 			case '227crMaagadOffer':
 				return { data: { createMaagadOffer: { data: { id: '300' } } } };
 			case '226updateMaagadMember':
-			case '228updateMaagadOffer':
 			case '230updateMaagad':
 			case '445setMaagadOfferPricing':
 			case '446setMaagadMemberEnvelope':
@@ -206,7 +239,7 @@ describe('createMaagadOffer — a plain offer in a rikma\'s name', () => {
 describe('maagad writes go out under the service token', () => {
 	// The write qids are serviceAdmin-only in qidsAccess.js; a write under the
 	// caller's jwt would fail in production, and a direct /api/send call is refused.
-	const WRITES = /^(22[4-8]|230|235|267|44[56])/;
+	const WRITES = /^(22[4-8]|230|235|267|44[5-9]|450)/;
 	const jwtWrites = (calls: any[][]) => calls.filter(([q, , jwt]) => WRITES.test(q) && jwt !== undefined).map(([q]) => q);
 
 	it('createMaagadOffer, signMaagadOffer and unsignMaagadOffer', async () => {
@@ -256,7 +289,7 @@ describe('signing a departure (B1)', () => {
 		// no fixed price on her, and no deal before activation
 		expect(varsOf('226updateMaagadMember')[0]).not.toHaveProperty('price');
 		expect(callsOf('235crMaagadSheirutpend')).toHaveLength(0);
-		expect(varsOf('445setMaagadOfferPricing')).toEqual([{ id: '300', price_current: 9600 }]);
+		expect(varsOf('445setMaagadOfferPricing')).toEqual([{ id: '300', price_current: 9600, price_announced: 9600 }]);
 	});
 
 	it('leaving re-reads the price at the smaller size', async () => {
@@ -265,7 +298,7 @@ describe('signing a departure (B1)', () => {
 			member: { id: '70', attributes: { signed_offer: { data: { id: '300' } } } }
 		});
 		await unsignOffer({ maagadId: '7', offerId: '300' }, context, { strapi });
-		expect(varsOf('445setMaagadOfferPricing')).toEqual([{ id: '300', price_current: 9800 }]);
+		expect(varsOf('445setMaagadOfferPricing')).toEqual([{ id: '300', price_current: 9800, price_announced: 9800 }]);
 	});
 
 	it('B10: signing a plain offer writes no ceiling and no price', async () => {
@@ -274,5 +307,91 @@ describe('signing a departure (B1)', () => {
 		await signOffer({ maagadId: '7', offerId: '300' }, context, { strapi });
 		expect(callsOf('446setMaagadMemberEnvelope')).toHaveLength(0);
 		expect(callsOf('445setMaagadOfferPricing')).toHaveLength(0);
+	});
+});
+
+describe('an activated departure, before its lock (P3)', () => {
+	const tiers = Array.from({ length: 17 }, (_, i) => ({ min: 8 + i, price: 10000 - i * 100 }));
+	const past = new Date(Date.now() - 86400_000).toISOString();
+	const live = (over: Record<string, any> = {}) => ({
+		id: '300',
+		attributes: {
+			status_offer: 'activated',
+			signed_count: 11,
+			min_participants: 8,
+			max_participants: 24,
+			sign_deadline: future,
+			price_lock_at: future,
+			unit_price: 10000,
+			price_tiers: tiers,
+			price_current: 9700,
+			price_announced: 9700,
+			price_envelope: 10375,
+			matanot: { data: { id: '40' } },
+			proposer_user: { data: { id: '9' } },
+			proposer_project: { data: { id: '90', attributes: { restime: 'feh' } } },
+			...over
+		}
+	});
+
+	it('A6: a late joiner gets her own deal at the new size, and every deal follows the price', async () => {
+		const { strapi, varsOf } = fakeStrapi({ offer: live() });
+		const out = await signOffer({ maagadId: '7', offerId: '300' }, context, { strapi });
+		expect(varsOf('235crMaagadSheirutpend')).toEqual([
+			{ project: '90', userId: '5', maagadOffer: '300', price: 9600, quant: 1, total: 9600 }
+		]);
+		expect(varsOf('226updateMaagadMember')[0]).toMatchObject({ status_member: 'active', signed_offer: '300', sheirutpend: '900' });
+		// the offer stays activated — a late join is not a new quorum
+		expect(varsOf('228updateMaagadOffer')).toEqual([{ id: '300', signed_count: 12, status_offer: 'activated' }]);
+		expect(out.notifyUserIds).toEqual([]);
+		// 12 live deals re-priced from 9,700 to 9,600
+		expect(varsOf('449repriceDeparturePend')).toHaveLength(12);
+		expect(varsOf('449repriceDeparturePend')[0]).toEqual({ id: 'p0', price: 9600, total: 9600 });
+		expect(varsOf('445setMaagadOfferPricing')[0]).toMatchObject({ id: '300', price_current: 9600 });
+	});
+
+	it('B6a: leaving after the activation is free — her deal is archived and the rest re-priced', async () => {
+		const { strapi, varsOf } = fakeStrapi({
+			offer: live(),
+			member: {
+				id: '70',
+				attributes: {
+					status_member: 'active',
+					signed_offer: { data: { id: '300' } },
+					sheirutpend: { data: { id: '880', attributes: { archived: false } } }
+				}
+			}
+		});
+		const out = await unsignOffer({ maagadId: '7', offerId: '300' }, context, { strapi });
+		expect(out.data.unsigned).toBe(true);
+		expect(varsOf('450archiveDeparturePend')).toEqual([{ id: '880' }]);
+		expect(varsOf('226updateMaagadMember')[0]).toMatchObject({ id: '70', status_member: 'interested', signed_offer: null });
+		expect(varsOf('228updateMaagadOffer')).toEqual([{ id: '300', signed_count: 10, status_offer: 'activated' }]);
+		expect(varsOf('449repriceDeparturePend')[0]).toEqual({ id: 'p0', price: 9800, total: 9800 });
+	});
+
+	it('after the lock, neither joining nor leaving is open', async () => {
+		const locked = live({ price_lock_at: past });
+		const join = fakeStrapi({ offer: locked });
+		await expect(signOffer({ maagadId: '7', offerId: '300' }, context, { strapi: join.strapi })).rejects.toThrow(/signing is closed/);
+		expect(join.callsOf('235crMaagadSheirutpend')).toHaveLength(0);
+		const leave = fakeStrapi({ offer: locked, member: { id: '70', attributes: { signed_offer: { data: { id: '300' } } } } });
+		await expect(unsignOffer({ maagadId: '7', offerId: '300' }, context, { strapi: leave.strapi })).rejects.toThrow(/cancellation terms/);
+		expect(leave.callsOf('226updateMaagadMember')).toHaveLength(0);
+	});
+
+	it('a plain activated offer stays closed to both', async () => {
+		const plain = live({ matanot: { data: null } });
+		const { strapi } = fakeStrapi({ offer: plain });
+		await expect(signOffer({ maagadId: '7', offerId: '300' }, context, { strapi })).rejects.toThrow(/signing is closed/);
+		await expect(
+			unsignOffer({ maagadId: '7', offerId: '300' }, context, { strapi: fakeStrapi({ offer: plain, member: { id: '70', attributes: { signed_offer: { data: { id: '300' } } } } }).strapi })
+		).rejects.toThrow(/cancellation terms/);
+	});
+
+	it('a full departure takes no late joiner', async () => {
+		const { strapi, callsOf } = fakeStrapi({ offer: live({ signed_count: 24 }) });
+		await expect(signOffer({ maagadId: '7', offerId: '300' }, context, { strapi })).rejects.toThrow(/full/);
+		expect(callsOf('235crMaagadSheirutpend')).toHaveLength(0);
 	});
 });

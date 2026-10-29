@@ -7,7 +7,7 @@ until this existed both ran only when somebody remembered to call them:
 |---|---|---|---|
 | `timegrama` | `GET /api/timegrama` | every 10 minutes | matures every deadline that has arrived — "silence is consent" only happens if something looks at the clock |
 | `monthi` | `GET /api/monthi` | once a calendar month, from the 1st at 03:00 | files each month's hours from the timers and resets the counter; opens recurring resource and standing-order cycles |
-| `maagad` | `GET /api/cron/maagad` | daily at 04:00 | clusters open wishes into demand pools, expires stale offers |
+| `maagad` | `GET /api/cron/maagad` | every hour | clusters open wishes into demand pools, expires stale offers, re-prices live departures and lets lapsed price consents go |
 | `translate-backfill` | `GET /api/cron/translate-backfill` | daily at 05:00 | fills the UGC translation cache out of a free quota, so a guest reads a translated page on their **first** load |
 | `shifts` | `GET /api/cron/shifts` | every hour | materializes shifts, opens declaration cycles, publishes drafts, closes rosters — answers `skipped` while `SHIFTS=off` |
 | `promotions` | `GET /api/cron/promotions` | every 15 minutes | starts scheduled promotions, ends them on time or cap, lifts a 24h pause |
@@ -110,7 +110,7 @@ Environment variables win over the `.env` file; the `.env` file is found at
 | `SCHEDULER_DISABLE` | — | comma-separated job names to leave alone |
 | `SCHEDULER_TIMEGRAMA_MINUTES` | `10` | maturation-clock interval |
 | `SCHEDULER_MONTHI_DAY` / `_HOUR` | `1` / `3` | earliest the monthly close may run |
-| `SCHEDULER_MAAGAD_HOUR` | `4` | earliest the daily batch may run |
+| `SCHEDULER_MAAGAD_MINUTES` | `60` | demand-pool batch interval |
 | `SCHEDULER_BACKFILL_HOUR` | `5` | earliest the translation backfill may run |
 | `SCHEDULER_BACKFILL_TIMEOUT_SECONDS` | `900` | it walks a corpus page and may wait on a rate-limited model |
 | `SCHEDULER_SHIFTS_MINUTES` | `60` | shift-engine interval |

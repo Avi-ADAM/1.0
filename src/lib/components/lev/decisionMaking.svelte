@@ -56,6 +56,7 @@
    * @property {any} restime
    * @property {any} timegramaId
    * @property {any} [saleClaim] - Bilateral saleClaim payload (holder/reporter, standing round, negom)
+   * @property {{ requesterId: any, requesterName: string, sheirutName: string, sheirutDescrip: string } | null} [askwant] - kind 'askwants': who asks to receive which service
    * @property {boolean} [cards]
    * @property {number} [tx]
    * @property {boolean} [modal]
@@ -106,6 +107,7 @@
     cards = false,
     tx = 200,
     saleClaim = null,
+    askwant = null,
     modal = $bindable(false),
     onModal,
     onHover,
@@ -132,6 +134,10 @@
       nprice = saleClaim?.standing?.price ?? 0;
     } else if (kind === 'sheirutpends') {
       openmissionName = $t('lev.decision.newServiceVote');
+    } else if (kind === 'askwants') {
+      // Not a Decision row — getDecisionDetails would look the askwant id up
+      // as a decision id.
+      openmissionName = askwant?.sheirutName || $t('lev.decision.askwantVote');
     } else if (askId && projectId) {
       // Fetch current vs. proposed values for all other decision kinds
       try {
@@ -279,6 +285,20 @@
           shadowSignFromCookie(addVoteConsentSpec, voteParams);
         } else {
           error1 = result.error;
+        }
+      } else if (kind === 'askwants') {
+        // A request to receive a service (D2): one member's yes lets the rest's
+        // silence settle it; every member's yes settles it now (server-side).
+        const result = await executeAction('addVote', {
+          type: 'askwant',
+          id: String(askId),
+          projectId: String(projectId),
+        });
+        if (result.success) {
+          if (result.data?.approved) onAcsept?.({ ani: 'askedma', coinlapach });
+        } else {
+          error1 = result.error;
+          toast.error($t('lev.decision.askwantVoteFailed'));
         }
       } else {
         // Decision vote (pic, etc.) — server-authoritative consensus check
@@ -1367,6 +1387,8 @@
                 {kind}
                 {spdata}
                 {saleClaim}
+
+                {askwant}
                 {timegramaDate}
                 {restime}
                 {deadline}
@@ -1408,6 +1430,8 @@
     {onProj}
     {spdata}
     {saleClaim}
+
+    {askwant}
     {timegramaDate}
     {restime}
     {deadline}

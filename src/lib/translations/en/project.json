@@ -373,7 +373,22 @@
     "showServices": "Show our services",
     "shareTitle": "Service \"{{name}}\" in the rikma {{projectName}} on 1💗1",
     "oneTimeLevel": "Is the service one-off or monthly?",
-    "equaliSplitedLevel": "Are the service costs split equally, or do subscribers pay what they want?"
+    "equaliSplitedLevel": "Are the service costs split equally, or do subscribers pay what they want?",
+    "again": {
+      "pageTitle": "Your request to receive a service",
+      "kicker": "Your request to receive a service",
+      "someService": "A rikma's service",
+      "fromRikma": "From the rikma \"{{rikma}}\"",
+      "lapsed": "Nobody in the rikma approved the request within the response time, so it has not taken effect yet. This is not a refusal: you can ask again, and the request goes back to the members with a new response time.",
+      "button": "Ask again",
+      "sent": "The request is back with the rikma",
+      "failed": "We could not send it again. You can try once more.",
+      "waiting": "The request is waiting for the rikma's members. One member's yes is enough, and if nobody objects by the end of the response time, it takes effect.",
+      "until": "The response time ends {{time}}",
+      "approved": "The request was approved — you are signed up for the service.",
+      "toDeals": "To my deals",
+      "unavailable": "The rikma does not offer this service right now, so it cannot be requested at the moment."
+    }
   },
   "misc": {
     "sidurInDev": "Under active development - shift viewing and scheduling are coming here soon",

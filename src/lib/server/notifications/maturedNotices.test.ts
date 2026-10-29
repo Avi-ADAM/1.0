@@ -18,6 +18,8 @@ const ALL: Array<[string, MaturedNotice[]]> = [
   ['saleClaimMatured', [N.saleClaimMatured({ projectId: 7, holderId: 4, reporterId: 5 })]],
   ['tosplitMatured', [N.tosplitMatured({ projectId: 7 })]],
   ['maapSettled', [N.maapSettled({ projectId: 7, name: 'R' })]],
+  ['maapAwaitsResponsible', [N.maapAwaitsResponsible({ projectId: 7, name: 'R', cycleIndex: 2, responsibleId: 4 })]],
+  ['askwantLapsed', [N.askwantLapsed({ requesterId: 5, askwantId: 90, name: 'S', projectName: 'P' })]],
   ['sheirutApproved', [N.sheirutApproved({ projectId: 7, name: 'S' })]],
   ['quoteMatured', N.quoteMatured({ projectId: 7, productName: 'P', customerId: 5 })],
   ['askwantApproved', [N.askwantApproved({ requesterId: 5, name: 'S' })]],
@@ -86,6 +88,22 @@ describe('who is told, and what is asked of them', () => {
   it('whoever the clock could not answer for is asked — consent, not told', () => {
     expect(N.decisionAwaitsCustomer({ projectId: 7, decisionName: 'D', clientIds: [5] })).toMatchObject({ intent: 'consent', to: { userIds: [5] } });
     expect(N.stipendAwaitsFunder({ projectId: 7, decisionName: 'D', funderId: 5 })).toMatchObject({ intent: 'consent', to: { userIds: [5] } });
+    // Only the responsible member — never the whole rikma — and to the heart, where the maap card lives.
+    expect(N.maapAwaitsResponsible({ projectId: 7, name: 'R', cycleIndex: 2, responsibleId: 4 })).toMatchObject({
+      intent: 'consent',
+      to: { userIds: [4] },
+      url: '/lev?project=7'
+    });
+    expect(N.maapAwaitsResponsible({ projectId: 7, name: 'R', cycleIndex: null, responsibleId: 4 }).title.he).toBe('מחזור של "R" מחכה לדיווח שלך');
+  });
+
+  it('a request nobody answered goes back to its requester only, with the way to ask again', () => {
+    const n = N.askwantLapsed({ requesterId: 5, askwantId: 90, name: 'S' });
+    expect(n).toMatchObject({ intent: 'personal', to: { userIds: [5] }, url: '/askwant/90' });
+    // Not a refusal — the sentence has to say so.
+    expect(n.body.en).toMatch(/not a refusal/);
+    // Every member signed (addVote): the same result, said truthfully — no "silence".
+    expect(N.askwantApproved({ requesterId: 5, unanimous: true }).body.en).toMatch(/Every member/);
     for (const n of N.dormancyOpened({ projectId: 7, decisionId: 9, name: 'M', ownerId: 4 })) {
       expect(n.intent).toBe('consent');
     }

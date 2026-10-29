@@ -14,6 +14,10 @@ import { ensureCandidacyTimegrama } from '../../nego/timegrama';
 import { evaluateCandidacyVote, assertStandingRound } from '../../nego/candidacyVote';
 import { ActionError } from '../errors.js';
 import { scope, decisionScope, scopeList } from '$lib/realtime/scopes.js';
+import { addAskwantYes, approveAskwant } from '../../sheirut/approveSheirutRequests';
+import { tellMatured } from '../../notifications/matured';
+import { askwantApproved } from '../../notifications/maturedNotices';
+import { restimeToMs } from './saleClaimShared.js';
 
 /** addVote's `type` names the record voted on; this is its scope. */
 function addVoteScope(type: unknown, id: unknown): string | null {
@@ -25,6 +29,8 @@ function addVoteScope(type: unknown, id: unknown): string | null {
     case 'weFinnish': return decisionScope('finiapruval', v);
     case 'tosplit': return decisionScope('tosplit', v);
     case 'sheirutpend': return scope('deal', v);
+    // An askwant has no scope of its own; the project scope carries it.
+    case 'askwant': return null;
     default: return null;
   }
 }
@@ -38,8 +44,8 @@ const addVoteHandler: ActionExecutionHandler = async (params, context, util) => 
   const { strapi } = util;
 
   // Validation
-  if (!type || !['pend', 'sheirutpend', 'ask', 'decision', 'weFinnish', 'tosplit'].includes(type)) {
-    throw new Error('Invalid type. Must be "pend", "sheirutpend", "ask", "decision", "weFinnish", or "tosplit"');
+  if (!type || !['pend', 'sheirutpend', 'ask', 'decision', 'weFinnish', 'tosplit', 'askwant'].includes(type)) {
+    throw new Error('Invalid type. Must be "pend", "sheirutpend", "ask", "decision", "weFinnish", "tosplit", or "askwant"');
   }
 
   if (!id || !projectId) {
@@ -318,6 +324,77 @@ const addVoteHandler: ActionExecutionHandler = async (params, context, util) => 
     };
   }
 
+  // --- Logic for Askwant (Component Based - someone asks to receive a service) ---
+  // TIMEGRAMA_REMINDERS R2: until this branch existed nothing could answer an
+  // askwant, so under D2 none could ever mature. Reads and writes go under the
+  // service token — the askwant qids are serviceAdmin-only, and the checks here
+  // (member of this rikma, the askwant is this rikma's) are what guard them.
+  if (type === 'askwant') {
+    const read = await strapi.execute('298getAskwantForFinalize', { id: String(id) }, undefined, context.fetch);
+    const row = read?.data?.askwant?.data;
+    const attrs = row?.attributes;
+    if (!attrs) throw new Error(`Askwant ${id} could not be loaded - vote not recorded`);
+    if (attrs.archived === true) {
+      throw new ActionError('ALREADY_RESOLVED', `Askwant ${id} was already answered`);
+    }
+    const project = attrs.project?.data;
+    if (!project || String(project.id) !== String(projectId)) {
+      throw new ActionError('FORBIDDEN', `Askwant ${id} does not belong to project ${projectId}`);
+    }
+    const memberIds = (project.attributes?.user_1s?.data ?? []).map((u: any) => String(u.id));
+    if (!memberIds.includes(String(userId))) {
+      throw new ActionError('FORBIDDEN', 'Only a member of the rikma can answer a service request');
+    }
+
+    const { rows, changed, allYes } = addAskwantYes({
+      vots: attrs.vots ?? [],
+      memberIds,
+      userId,
+      now: new Date()
+    });
+    if (changed) {
+      await strapi.execute('301updateAskwant', { id: String(id), data: { vots: rows } }, undefined, context.fetch);
+    }
+
+    // A member's yes is what D2 waits for — but a request whose clock already
+    // ran out (every askwant filed before this branch existed) has nothing left
+    // to mature it on the rest's silence. Give it a fresh restime.
+    const clock = attrs.timegrama?.data;
+    if (changed && !allYes && (!clock || clock.attributes?.done === true)) {
+      const dueAt = new Date(Date.now() + restimeToMs(project.attributes?.restime)).toISOString();
+      await strapi.execute('300createTimegramaForAskwant', { date: dueAt, askwantId: String(id) }, undefined, context.fetch);
+    }
+
+    // Every member signed: the explicit twin of the clock's one-yes-plus-silence.
+    // Settle through the same function the clock calls (approveSheirutRequests),
+    // under the same conditions it checks, so the two cannot disagree.
+    const sheirut = attrs.sheirut?.data;
+    const askerId = attrs.users_permissions_user?.data?.id;
+    let approved = false;
+    if (allYes && sheirut && sheirut.attributes?.isApruved === true && sheirut.attributes?.archived !== true && askerId) {
+      const { created } = await approveAskwant(
+        strapi,
+        { fetch: context.fetch },
+        { askwantId: String(id), sheirutId: String(sheirut.id), userId: String(askerId) }
+      );
+      approved = true;
+      if (created) {
+        await tellMatured(
+          askwantApproved({ requesterId: askerId, name: sheirut.attributes?.name, unanimous: true }),
+          context.fetch
+        );
+      }
+    }
+
+    return {
+      data: { id, askwantId: String(id), approved, success: true },
+      updateStrategy: {
+        type: 'partialUpdate',
+        config: { dataKeys: ['askwants'], updateFunction: 'refreshVotes' }
+      }
+    };
+  }
+
   // --- Logic for weFinnish (Relation Based - Sheirut delivery confirmation) ---
   if (type === 'weFinnish') {
     const result = await strapi.execute(
@@ -467,8 +544,8 @@ export const addVoteConfig: ActionConfig = {
     type: {
       type: 'string',
       required: true,
-      validate: (value) => ['pend', 'sheirutpend', 'ask', 'decision', 'weFinnish', 'tosplit'].includes(value),
-      description: 'Type of item: "pend", "sheirutpend", "ask", "decision", "weFinnish", or "tosplit"'
+      validate: (value) => ['pend', 'sheirutpend', 'ask', 'decision', 'weFinnish', 'tosplit', 'askwant'].includes(value),
+      description: 'Type of item: "pend", "sheirutpend", "ask", "decision", "weFinnish", "tosplit", or "askwant"'
     },
     id: {
       type: 'string',
@@ -543,7 +620,8 @@ export const addVoteConfig: ActionConfig = {
     },
     // A plain vote stays on the site. The one branch that matures here — a
     // service request every member signed — becomes a sheirut: an outcome.
-    intent: (_params, result) => (result?.data?.serviceId ? 'outcome' : 'ambient'),
+    // An askwant every member signed is the same kind of result (`approved`).
+    intent: (_params, result) => (result?.data?.serviceId || result?.data?.approved ? 'outcome' : 'ambient'),
     metadata: {
       type: 'voteUpdate',
       url: 'lev'

@@ -1,0 +1,1842 @@
+{
+  "$schema": "../flow.schema.json",
+  "id": "rikma-tour",
+  "title": {
+    "he": "מהרעיון לרקמה: מדריך מלא",
+    "en": "From idea to rikma: the full tour"
+  },
+  "audience": {
+    "he": "מייסדים עם רעיון (דף /vision) — סרטון הדרכה מלא",
+    "en": "Founders with an idea (/vision) — full tutorial"
+  },
+  "languages": [
+    "he",
+    "en"
+  ],
+  "defaults": {
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "scale": 1.5,
+    "pace": 1,
+    "localStorage": {
+      "lev:view": "list",
+      "moachGuide_${rikmaId}": "done"
+    }
+  },
+  "vars": {
+    "rikmaName": {
+      "he": "מאפיית השכונה (הדגמה ${RUN})",
+      "en": "The Neighborhood Bakery (demo ${RUN})"
+    },
+    "rikmaDesc": {
+      "he": "מאפיית שאור קטנה שאופה לחם טרי לשכונה בכל בוקר. מחפשים אופה, תנור ואנשים שאכפת להם.",
+      "en": "A small sourdough bakery baking fresh bread for the neighborhood every morning. Looking for a baker, an oven and people who care."
+    },
+    "rikmaDetails": {
+      "he": "שלב ראשון: חודשיים של אפייה ניסיונית ומכירה לשכנים. ההכנסות מתחלקות לפי מה שכל אחד תרם.",
+      "en": "Phase one: two months of trial baking and selling to neighbors. Income is split by what each partner contributed."
+    },
+    "valueName": {
+      "he": "קהילה",
+      "en": "Community"
+    },
+    "missionName": {
+      "he": "אפיית לחם שאור",
+      "en": "Baking sourdough bread"
+    },
+    "missionDesc": {
+      "he": "לאפות ארבעים כיכרות שאור בכל בוקר, משש עד עשר, ולהכין את הבצק ליום הבא.",
+      "en": "Bake forty sourdough loaves every morning, six to ten, and prepare the dough for the next day."
+    },
+    "resourceName": {
+      "he": "תנור אבן לאפייה",
+      "en": "Stone baking oven"
+    },
+    "resourceDesc": {
+      "he": "תנור אבן שמספיק לארבעים כיכרות בסבב, לתקופה של חודשיים לפחות.",
+      "en": "A stone oven big enough for forty loaves a round, for at least two months."
+    },
+    "taskName": {
+      "he": "להזמין 25 ק״ג קמח מלא",
+      "en": "Order 25 kg of whole-wheat flour"
+    },
+    "taskDesc": {
+      "he": "מהטחנה בגליל, עד יום חמישי.",
+      "en": "From the mill in the Galilee, by Thursday."
+    },
+    "workDone": {
+      "he": "אפייה ראשונה: ארבעים כיכרות, שתי טעימות לשכנים, והבצק של מחר כבר תופח.",
+      "en": "First bake: forty loaves, two tastings for the neighbors, and tomorrow's dough is already rising."
+    },
+    "productName": {
+      "he": "כיכר שאור כפרית",
+      "en": "Country sourdough loaf"
+    },
+    "productDesc": {
+      "he": "כיכר שאור מקמח מלא, 900 גרם, נאפית בכל בוקר.",
+      "en": "Whole-wheat sourdough, 900 grams, baked every morning."
+    },
+    "founderName": {
+      "he": "קלוד בודק",
+      "en": "Claude Tester"
+    },
+    "partnerName": {
+      "he": "קלוד בודק 2",
+      "en": "Claude Tester 2"
+    }
+  },
+  "scenes": [
+    {
+      "id": "s01-vision",
+      "title": {
+        "he": "הרעיון: במקום משקיעים — שותפים",
+        "en": "The idea: partners instead of investors"
+      },
+      "session": "guest",
+      "narration": {
+        "he": "יש לכם רעיון? הדרך המוכרת היא מצגת, משקיעים ומשכורות. ברקמה, האנשים שהיו העובדים הראשונים שלכם מצטרפים כשותפים, וכל אחד מקבל חלק לפי מה שתרם בפועל. בסרטון הזה נעבור על כל הדרך: מהקמת הרקמה, דרך משימות, מטלות ומשאבים, ועד מכירה וחלוקת הכסף.",
+        "en": "Got an idea? The usual road is a deck, investors and salaries. In a rikma, the people who would have been your first hires join as partners, and each one gets a share for what they actually contributed. In this video we'll walk the whole road: setting up the rikma, missions, tasks and resources, all the way to a sale and splitting the money."
+      },
+      "setup": [
+        {
+          "do": "goto",
+          "url": "/vision"
+        }
+      ],
+      "steps": [
+        {
+          "do": "highlight",
+          "target": {
+            "role": "heading",
+            "level": 1,
+            "nameKey": "vision.hero.h1"
+          },
+          "ms": 2600,
+          "mark": "hero"
+        },
+        {
+          "do": "scroll",
+          "target": {
+            "role": "heading",
+            "nameKey": "vision.roads.title"
+          },
+          "block": "start"
+        },
+        {
+          "do": "wait",
+          "ms": 2500,
+          "mark": "roads"
+        },
+        {
+          "do": "scroll",
+          "target": {
+            "role": "heading",
+            "nameKey": "vision.steps.title"
+          },
+          "block": "start"
+        },
+        {
+          "do": "highlight",
+          "target": {
+            "role": "heading",
+            "nameKey": "vision.steps.s1_t"
+          },
+          "ms": 1400,
+          "mark": "step1"
+        },
+        {
+          "do": "highlight",
+          "target": {
+            "role": "heading",
+            "nameKey": "vision.steps.s2_t"
+          },
+          "ms": 1400,
+          "mark": "step2"
+        },
+        {
+          "do": "highlight",
+          "target": {
+            "role": "heading",
+            "nameKey": "vision.steps.s3_t"
+          },
+          "ms": 1400,
+          "mark": "step3"
+        },
+        {
+          "do": "highlight",
+          "target": {
+            "role": "heading",
+            "nameKey": "vision.steps.s4_t"
+          },
+          "ms": 1400,
+          "mark": "step4"
+        },
+        {
+          "do": "highlight",
+          "target": {
+            "role": "heading",
+            "nameKey": "vision.steps.s5_t"
+          },
+          "ms": 1400,
+          "mark": "step5"
+        },
+        {
+          "do": "highlight",
+          "target": {
+            "role": "heading",
+            "nameKey": "vision.steps.s6_t"
+          },
+          "ms": 1400,
+          "mark": "step6"
+        }
+      ]
+    },
+    {
+      "id": "s02-create-rikma",
+      "title": {
+        "he": "מקימים רקמה",
+        "en": "Setting up the rikma"
+      },
+      "session": "sup1",
+      "narration": {
+        "he": "מתחילים ביצירת רקמה. נותנים לה שם, כותבים במשפט או שניים מה היא עושה — זה מה ששותפים פוטנציאליים יראו — ומוסיפים פירוט פנימי שרק החברים רואים. בוחרים ערך שהרקמה מקדמת, ואז את כללי ההסכמה: רקמה מתמשכת, וזמן תגובה של שבעים ושתיים שעות. זה החוק החשוב ביותר כאן: שתיקה היא הסכמה. הצעה שאף אחד לא הגיב עליה בזמן הזה — מאושרת.",
+        "en": "We start by creating a rikma. Give it a name, write a sentence or two about what it does — that's what potential partners will see — and add internal details only members can read. Pick a value the rikma stands for, then the consent rules: an ongoing rikma, with a seventy-two hour response time. That's the most important rule here: silence is consent. A proposal nobody responds to within that time is approved."
+      },
+      "setup": [
+        {
+          "do": "goto",
+          "url": "/me?action=createproject"
+        },
+        {
+          "do": "waitFor",
+          "target": {
+            "role": "textbox",
+            "nameKey": "addnew.baci.frn"
+          }
+        }
+      ],
+      "steps": [
+        {
+          "do": "type",
+          "target": {
+            "role": "textbox",
+            "nameKey": "addnew.baci.frn"
+          },
+          "text": "${rikmaName}",
+          "mark": "name"
+        },
+        {
+          "do": "type",
+          "target": {
+            "within": {
+              "css": "[aria-labelledby=bc-desc-label]"
+            },
+            "role": "textbox"
+          },
+          "text": "${rikmaDesc}",
+          "delay": 18,
+          "mark": "desc"
+        },
+        {
+          "do": "type",
+          "target": {
+            "within": {
+              "css": "[aria-labelledby=bc-details-label]"
+            },
+            "role": "textbox"
+          },
+          "text": "${rikmaDetails}",
+          "delay": 14,
+          "mark": "details"
+        },
+        {
+          "do": "type",
+          "target": {
+            "role": "textbox",
+            "nameKey": "addnew.baci.addValue"
+          },
+          "text": "${valueName}"
+        },
+        {
+          "do": "click",
+          "target": {
+            "role": "button",
+            "nameKey": "addnew.baci.add",
+            "exact": true
+          },
+          "mark": "value"
+        },
+        {
+          "do": "click",
+          "target": {
+            "role": "button",
+            "nameKey": "addnew.baci.continuous"
+          },
+          "mark": "type"
+        },
+        {
+          "do": "click",
+          "target": {
+            "within": {
+              "role": "group",
+              "nameKey": "addnew.baci.hre"
+            },
+            "role": "button",
+            "name": "/72/"
+          },
+          "mark": "restime"
+        },
+        {
+          "do": "highlight",
+          "target": {
+            "textKey": "addnew.baci.silenceLead"
+          },
+          "ms": 2600,
+          "mark": "silence"
+        },
+        {
+          "do": "click",
+          "target": {
+            "within": {
+              "role": "group",
+              "nameKey": "addnew.baci.timeto"
+            },
+            "role": "button",
+            "nameKey": "addnew.baci.month",
+            "exact": true
+          }
+        },
+        {
+          "do": "highlight",
+          "target": {
+            "role": "complementary"
+          },
+          "ms": 2200,
+          "mark": "preview"
+        },
+        {
+          "do": "click",
+          "target": {
+            "role": "button",
+            "nameKey": "addnew.baci.cree"
+          },
+          "commits": true,
+          "mark": "create"
+        },
+        {
+          "do": "waitForUrl",
+          "match": "/moach/\\d+",
+          "timeout": 90000
+        },
+        {
+          "do": "save",
+          "as": "rikmaId",
+          "fromUrl": "/moach/(\\d+)"
+        },
+        {
+          "do": "click",
+          "target": {
+            "role": "button",
+            "nameKey": "moach.guide.no"
+          },
+          "optional": true
+        },
+        {
+          "do": "wait",
+          "ms": 2200,
+          "mark": "created"
+        }
+      ]
+    },
+    {
+      "id": "s03-open-mission",
+      "title": {
+        "he": "משימה פתוחה: עבודה שמביאה חלק",
+        "en": "An open mission: work that earns a share"
+      },
+      "session": "sup1",
+      "narration": {
+        "he": "עכשיו מגדירים מה צריך כדי שהרקמה תעבוד. משימה היא עבודה שמישהו ייקח על עצמו, והיא נושאת חלק ברקמה. כותבים מה צריך לעשות, ואז כמה זה שווה: שישים שקל לשעה, עשרים שעות. מי שיבצע אותה יקבל חלק לפי השווי הזה — בלי ראיון עבודה ובלי חוזה העסקה. כל עוד אתם השותפים היחידים, המשימה מתפרסמת מיד.",
+        "en": "Now we define what the rikma needs to run. A mission is work someone takes on, and it carries a share in the rikma. Write what needs doing, then what it's worth: sixty an hour, twenty hours. Whoever does it gets a share by that value — no job interview, no employment contract. While you are the only partner, the mission is published right away."
+      },
+      "setup": [
+        {
+          "do": "goto",
+          "url": "/moach/${rikmaId}/create"
+        },
+        {
+          "do": "waitFor",
+          "target": {
+            "role": "button",
+            "nameKey": "moach.create.hosafa"
+          }
+        }
+      ],
+      "steps": [
+        {
+          "do": "highlight",
+          "target": {
+            "role": "heading",
+            "nameKey": "moach.create.mission"
+          },
+          "ms": 1400,
+          "optional": true
+        },
+        {
+          "do": "click",
+          "target": {
+            "role": "button",
+            "nameKey": "moach.create.hosafa"
+          },
+          "dispatch": true,
+          "mark": "open-form"
+        },
+        {
+          "do": "type",
+          "target": {
+            "role": "combobox",
+            "nameKey": "mission.ai.missionName"
+          },
+          "text": "${missionName}",
+          "mark": "name"
+        },
+        {
+          "do": "type",
+          "target": {
+            "role": "textbox"
+          },
+          "text": "${missionDesc}",
+          "delay": 16,
+          "mark": "desc"
+        },
+        {
+          "do": "scroll",
+          "target": {
+            "role": "heading",
+            "nameKey": "mission.form2.step2Title"
+          },
+          "block": "start"
+        },
+        {
+          "do": "fill",
+          "target": {
+            "role": "spinbutton",
+            "nameKey": "mission.form2.ratePerHour"
+          },
+          "text": "60",
+          "mark": "rate"
+        },
+        {
+          "do": "wait",
+          "ms": 600
+        },
+        {
+          "do": "fill",
+          "target": {
+            "role": "spinbutton",
+            "nameKey": "mission.form2.hoursPerPerson"
+          },
+          "text": "20",
+          "mark": "hours"
+        },
+        {
+          "do": "wait",
+          "ms": 1600,
+          "mark": "value"
+        },
+        {
+          "do": "click",
+          "target": {
+            "role": "button",
+            "nameKey": "mission.form2.publish"
+          },
+          "commits": true,
+          "mark": "publish"
+        },
+        {
+          "do": "wait",
+          "ms": 5000
+        }
+      ]
+    },
+    {
+      "id": "s04-open-resource",
+      "title": {
+        "he": "משאב נדרש: מה שחסר כדי להתחיל",
+        "en": "A needed resource: what's missing to start"
+      },
+      "session": "sup1",
+      "narration": {
+        "he": "מלבד עבודה, רקמה צריכה גם משאבים: כסף, ציוד, מקום או שירות. כאן מבקשים תנור אבן, ונותנים לו שווי — שלושת אלפים שקל. מי שיביא את התנור יקבל חלק ברקמה בדיוק כמו מי שעובד: הכל נמדד באותן יחידות.",
+        "en": "Besides work, a rikma needs resources too: money, equipment, a space or a service. Here we ask for a stone oven and give it a value — three thousand. Whoever brings the oven gets a share in the rikma exactly like someone who works: everything is measured in the same units."
+      },
+      "setup": [
+        {
+          "do": "goto",
+          "url": "/moach/${rikmaId}/create"
+        },
+        {
+          "do": "waitFor",
+          "target": {
+            "role": "button",
+            "nameKey": "moach.create.hosafat"
+          }
+        }
+      ],
+      "steps": [
+        {
+          "do": "click",
+          "target": {
+            "role": "button",
+            "nameKey": "moach.create.hosafat"
+          },
+          "dispatch": true,
+          "mark": "open-form"
+        },
+        {
+          "do": "type",
+          "target": {
+            "role": "combobox",
+            "nameKey": "project.resourceCreator.name"
+          },
+          "text": "${resourceName}",
+          "mark": "name"
+        },
+        {
+          "do": "type",
+          "target": {
+            "within": {
+              "role": "dialog"
+            },
+            "role": "textbox"
+          },
+          "text": "${resourceDesc}",
+          "delay": 16,
+          "mark": "desc"
+        },
+        {
+          "do": "fill",
+          "target": {
+            "role": "spinbutton",
+            "nameKey": "project.resourceCreator.price",
+            "exact": true
+          },
+          "text": "3000",
+          "mark": "value"
+        },
+        {
+          "do": "wait",
+          "ms": 1800
+        },
+        {
+          "do": "click",
+          "target": {
+            "within": {
+              "role": "complementary"
+            },
+            "role": "button",
+            "nameKey": "project.resourceCreator.submit"
+          },
+          "commits": true,
+          "mark": "publish"
+        },
+        {
+          "do": "wait",
+          "ms": 5000
+        }
+      ]
+    },
+    {
+      "id": "s05-candidate-applies",
+      "title": {
+        "he": "מועמד מציע את עצמו",
+        "en": "A candidate steps forward"
+      },
+      "session": "sup2",
+      "narration": {
+        "he": "שותפה פוטנציאלית מגיעה לדף הציבורי של הרקמה ורואה את המשימות הפתוחות. בדף המשימה היא רואה בדיוק כמה זה שווה, ואיזה חלק ברקמה היא תקבל כשתסיים. אפשר להציע תנאים אחרים — או פשוט ללחוץ \"אני אשמח לבצע\".",
+        "en": "A potential partner arrives at the rikma's public page and sees the open missions. On the mission page she sees exactly what it's worth, and what share of the rikma she'll hold when she's done. She can propose other terms — or simply click \"I want to do it\"."
+      },
+      "setup": [
+        {
+          "do": "goto",
+          "url": "/project/${rikmaId}"
+        },
+        {
+          "do": "waitFor",
+          "target": {
+            "role": "button",
+            "name": "${missionName}"
+          }
+        }
+      ],
+      "steps": [
+        {
+          "do": "highlight",
+          "target": {
+            "role": "button",
+            "name": "${missionName}"
+          },
+          "ms": 1600,
+          "mark": "open-missions"
+        },
+        {
+          "do": "click",
+          "target": {
+            "role": "button",
+            "name": "${missionName}"
+          },
+          "mark": "open-mission"
+        },
+        {
+          "do": "waitForUrl",
+          "match": "availableMission/\\d+"
+        },
+        {
+          "do": "save",
+          "as": "missionId",
+          "fromUrl": "availableMission/(\\d+)"
+        },
+        {
+          "do": "waitFor",
+          "target": {
+            "role": "button",
+            "nameKey": "pages.availMission.iwantto"
+          }
+        },
+        {
+          "do": "highlight",
+          "target": {
+            "textKey": "equity.title"
+          },
+          "ms": 2600,
+          "mark": "equity"
+        },
+        {
+          "do": "highlight",
+          "target": {
+            "role": "button",
+            "nameKey": "lev.cards.proposeOther"
+          },
+          "ms": 1400,
+          "mark": "other-offer",
+          "optional": true
+        },
+        {
+          "do": "click",
+          "target": {
+            "role": "button",
+            "nameKey": "pages.availMission.iwantto"
+          },
+          "commits": true,
+          "mark": "apply"
+        },
+        {
+          "do": "wait",
+          "ms": 3500
+        }
+      ]
+    },
+    {
+      "id": "s06-approve-candidate",
+      "title": {
+        "he": "אישור מועמד: אישור, משא ומתן או דיון",
+        "en": "Approving a candidate: approve, negotiate or discuss"
+      },
+      "session": "sup1",
+      "narration": {
+        "he": "הבקשה מגיעה ללשונית ההצבעות של הרקמה — המקום שבו מחכה כל דבר שצריך את הסכמתכם. אין כאן כפתור \"לא\". אפשר לאשר, לפתוח משא ומתן על התנאים, או לדבר. ואם אף אחד לא מגיב עד שעבר זמן התגובה של הרקמה — שתיקה היא הסכמה. כאן מאשרים, והמועמדת הופכת לשותפה.",
+        "en": "The request lands in the rikma's Votes tab — where everything that needs your consent waits. There is no \"no\" button here. You can approve, negotiate the terms, or talk it through. And if nobody responds before the rikma's response time runs out — silence is consent. Here we approve, and the candidate becomes a partner."
+      },
+      "setup": [
+        {
+          "do": "goto",
+          "url": "/moach/${rikmaId}/votes"
+        },
+        {
+          "do": "waitFor",
+          "target": {
+            "role": "button",
+            "nameKey": "moach.votes.toVote",
+            "hasText": "${missionName}"
+          },
+          "timeout": 120000
+        }
+      ],
+      "steps": [
+        {
+          "do": "highlight",
+          "target": {
+            "role": "button",
+            "nameKey": "moach.votes.toVote",
+            "hasText": "${missionName}"
+          },
+          "ms": 1600,
+          "mark": "vote-row"
+        },
+        {
+          "do": "click",
+          "target": {
+            "role": "button",
+            "nameKey": "moach.votes.toVote",
+            "hasText": "${missionName}"
+          },
+          "mark": "open-vote"
+        },
+        {
+          "do": "waitFor",
+          "target": {
+            "role": "button",
+            "nameKey": "common.approve",
+            "exact": true
+          }
+        },
+        {
+          "do": "highlight",
+          "target": {
+            "role": "button",
+            "nameKey": "common.nego",
+            "exact": true
+          },
+          "ms": 1300,
+          "mark": "nego"
+        },
+        {
+          "do": "highlight",
+          "target": {
+            "role": "button",
+            "nameKey": "common.watchthe",
+            "exact": true
+          },
+          "ms": 1300,
+          "mark": "discuss",
+          "optional": true
+        },
+        {
+          "do": "click",
+          "target": {
+            "role": "button",
+            "nameKey": "common.approve",
+            "exact": true
+          },
+          "commits": true,
+          "mark": "approve"
+        },
+        {
+          "do": "wait",
+          "ms": 9000
+        }
+      ]
+    },
+    {
+      "id": "s07-task",
+      "title": {
+        "he": "מטלה: צעד קטן בתוך משימה",
+        "en": "A task: a small step inside a mission"
+      },
+      "session": "sup1",
+      "narration": {
+        "he": "מטלה היא צעד קטן ומעשי בתוך משימה שכבר בביצוע — היא לא נושאת חלק משלה, אלא עוזרת לא לשכוח כלום. מוסיפים שם, תיאור קצר ודחיפות, ומשייכים אותה למשימה של האופה. כל שותף יכול להוסיף מטלות כשהוא רואה צורך.",
+        "en": "A task is a small, practical step inside a mission that's already running — it carries no share of its own, it just makes sure nothing is forgotten. Add a name, a short description and urgency, and attach it to the baker's mission. Any partner can add tasks when they see a need."
+      },
+      "setup": [
+        {
+          "do": "goto",
+          "url": "/moach/${rikmaId}/acts"
+        },
+        {
+          "do": "waitFor",
+          "target": {
+            "role": "button",
+            "nameKey": "mission.actsTable.newTask"
+          }
+        }
+      ],
+      "steps": [
+        {
+          "do": "click",
+          "target": {
+            "role": "button",
+            "nameKey": "mission.actsTable.newTask"
+          },
+          "mark": "open-form"
+        },
+        {
+          "do": "type",
+          "target": {
+            "within": {
+              "role": "dialog"
+            },
+            "role": "textbox",
+            "nameKey": "mission.crtask.taskName"
+          },
+          "text": "${taskName}",
+          "mark": "name"
+        },
+        {
+          "do": "type",
+          "target": {
+            "within": {
+              "role": "dialog"
+            },
+            "role": "textbox",
+            "nameKey": "mission.crtask.taskDescription"
+          },
+          "text": "${taskDesc}",
+          "mark": "desc"
+        },
+        {
+          "do": "click",
+          "target": {
+            "within": {
+              "role": "dialog"
+            },
+            "role": "button",
+            "nameKey": "mission.crtask.urgencyYellow"
+          },
+          "mark": "urgency"
+        },
+        {
+          "do": "click",
+          "target": {
+            "within": {
+              "role": "dialog"
+            },
+            "role": "button",
+            "nameKey": "mission.crtask.missionInProgress"
+          }
+        },
+        {
+          "do": "click",
+          "target": {
+            "within": {
+              "role": "dialog"
+            },
+            "role": "combobox",
+            "nameKey": "mission.crtask.chooseMission"
+          }
+        },
+        {
+          "do": "click",
+          "target": {
+            "role": "option",
+            "name": "${missionName}"
+          },
+          "mark": "mission"
+        },
+        {
+          "do": "click",
+          "target": {
+            "within": {
+              "role": "dialog"
+            },
+            "role": "button",
+            "nameKey": "mission.crtask.send"
+          },
+          "commits": true,
+          "mark": "send"
+        },
+        {
+          "do": "wait",
+          "ms": 4000
+        }
+      ]
+    },
+    {
+      "id": "s08-timer",
+      "title": {
+        "he": "טיימר: כל שעה נרשמת",
+        "en": "The timer: every hour is recorded"
+      },
+      "session": "sup2",
+      "narration": {
+        "he": "השותפה עובדת, והשעות נספרות. מפעילים טיימר על המשימה — או מוסיפים קטע זמן ידנית, למשל לבוקר האפייה של אתמול. כששומרים, כותבים במשפט מה נעשה. בשותפות של שניים ומעלה, השמירה הזאת היא בקשת אישור: השותפים האחרים מאשרים את השעות, ורק אז הן הופכות לחלק.",
+        "en": "The partner works, and the hours count. Start a timer on the mission — or add a time block by hand, for yesterday's baking morning for example. When you save, write a sentence about what was done. With two or more partners, saving is a request for approval: the other partners approve the hours, and only then do they become a share."
+      },
+      "setup": [
+        {
+          "do": "goto",
+          "url": "/moach/${rikmaId}/progress"
+        },
+        {
+          "do": "waitFor",
+          "target": {
+            "role": "link",
+            "name": "${missionName}"
+          },
+          "timeout": 60000
+        },
+        {
+          "do": "save",
+          "as": "progressId",
+          "fromAttr": {
+            "target": {
+              "role": "link",
+              "name": "${missionName}"
+            },
+            "name": "href"
+          },
+          "regex": "progress/(\\d+)"
+        },
+        {
+          "do": "goto",
+          "url": "/moach/${rikmaId}/progress/${progressId}"
+        },
+        {
+          "do": "waitFor",
+          "target": {
+            "role": "button",
+            "nameKey": "moach.progress.startTimer"
+          }
+        }
+      ],
+      "steps": [
+        {
+          "do": "highlight",
+          "target": {
+            "role": "heading",
+            "level": 1,
+            "name": "${missionName}"
+          },
+          "ms": 1500,
+          "mark": "mission"
+        },
+        {
+          "do": "click",
+          "target": {
+            "role": "button",
+            "nameKey": "moach.progress.startTimer"
+          },
+          "commits": true,
+          "mark": "start"
+        },
+        {
+          "do": "wait",
+          "ms": 4500,
+          "mark": "ticking"
+        },
+        {
+          "do": "click",
+          "target": {
+            "any": [
+              {
+                "role": "button",
+                "nameKey": "moach.progress.saveTimer"
+              },
+              {
+                "role": "button",
+                "nameKey": "moach.progress.stopTimer"
+              }
+            ]
+          },
+          "mark": "stop"
+        },
+        {
+          "do": "click",
+          "target": {
+            "any": [
+              {
+                "role": "button",
+                "nameKey": "timers.editTimes"
+              },
+              {
+                "role": "button",
+                "nameKey": "timers.addManually"
+              }
+            ]
+          },
+          "mark": "edit-times"
+        },
+        {
+          "do": "wait",
+          "ms": 2500
+        },
+        {
+          "do": "click",
+          "target": {
+            "role": "button",
+            "nameKey": "timers.editorAdd"
+          },
+          "mark": "add-block"
+        },
+        {
+          "do": "fill",
+          "target": {
+            "within": {
+              "role": "dialog"
+            },
+            "labelKey": "timers.editorStart",
+            "exact": true
+          },
+          "text": "2026-10-27T06:00"
+        },
+        {
+          "do": "fill",
+          "target": {
+            "within": {
+              "role": "dialog"
+            },
+            "labelKey": "timers.editorEnd",
+            "exact": true
+          },
+          "text": "2026-10-27T10:00"
+        },
+        {
+          "do": "wait",
+          "ms": 1200,
+          "mark": "block"
+        },
+        {
+          "do": "click",
+          "target": {
+            "within": {
+              "role": "dialog"
+            },
+            "role": "button",
+            "nameKey": "timers.editorSave",
+            "exact": true
+          },
+          "commits": true
+        },
+        {
+          "do": "wait",
+          "ms": 2500
+        },
+        {
+          "do": "press",
+          "key": "Escape",
+          "optional": true
+        },
+        {
+          "do": "click",
+          "target": {
+            "role": "button",
+            "nameKey": "moach.progress.saveTimer"
+          },
+          "mark": "save-time"
+        },
+        {
+          "do": "click",
+          "target": {
+            "within": {
+              "role": "dialog"
+            },
+            "role": "button",
+            "nameKey": "timers.saveTimerBtn"
+          },
+          "optional": true
+        },
+        {
+          "do": "type",
+          "target": {
+            "within": {
+              "role": "dialog"
+            },
+            "role": "textbox",
+            "nameKey": "timers.whatDidYouDo"
+          },
+          "text": "${workDone}",
+          "delay": 18,
+          "mark": "what-done"
+        },
+        {
+          "do": "click",
+          "target": {
+            "within": {
+              "role": "dialog"
+            },
+            "role": "button",
+            "nameKey": "timers.saveTimerBtn"
+          },
+          "commits": true,
+          "mark": "saved"
+        },
+        {
+          "do": "wait",
+          "ms": 4000
+        }
+      ]
+    },
+    {
+      "id": "s09-approve-hours",
+      "title": {
+        "he": "אישור שעות",
+        "en": "Approving hours"
+      },
+      "session": "sup1",
+      "narration": {
+        "he": "השעות מגיעות לאישור. רואים מה נעשה וכמה זמן, ומאשרים — או מציעים מספר שעות אחר. ברגע שהשעות מאושרות, הן נרשמות כחלק של השותפה ברקמה. כולם רואים את אותו חשבון.",
+        "en": "The hours arrive for approval. You see what was done and for how long, and approve — or counter with a different number of hours. Once approved, the hours are recorded as the partner's share of the rikma. Everyone sees the same ledger."
+      },
+      "setup": [
+        {
+          "do": "goto",
+          "url": "/moach/${rikmaId}/votes"
+        },
+        {
+          "do": "waitFor",
+          "target": {
+            "role": "button",
+            "nameKey": "moach.votes.toVote",
+            "hasText": "${missionName}"
+          },
+          "timeout": 180000
+        }
+      ],
+      "steps": [
+        {
+          "do": "highlight",
+          "target": {
+            "role": "button",
+            "nameKey": "moach.votes.toVote",
+            "hasText": "${missionName}"
+          },
+          "ms": 1500,
+          "mark": "vote-row"
+        },
+        {
+          "do": "click",
+          "target": {
+            "role": "button",
+            "nameKey": "moach.votes.toVote",
+            "hasText": "${missionName}"
+          },
+          "mark": "open-vote"
+        },
+        {
+          "do": "waitFor",
+          "target": {
+            "role": "button",
+            "nameKey": "common.approve",
+            "exact": true
+          }
+        },
+        {
+          "do": "wait",
+          "ms": 2000,
+          "mark": "details"
+        },
+        {
+          "do": "click",
+          "target": {
+            "role": "button",
+            "nameKey": "common.approve",
+            "exact": true
+          },
+          "commits": true,
+          "mark": "approve"
+        },
+        {
+          "do": "wait",
+          "ms": 14000,
+          "note": "closeFiniapruval takes up to ~14s"
+        }
+      ]
+    },
+    {
+      "id": "s10-bring-resource",
+      "title": {
+        "he": "מביאים משאב",
+        "en": "Bringing a resource"
+      },
+      "session": "sup1",
+      "narration": {
+        "he": "למייסד יש תנור אבן. הוא פותח את המשאב שהרקמה ביקשה, רואה את השווי ואת החלק שהתנור יקנה לו, ומציע אותו. גם מייסד צריך את הסכמת השותפים: ההצעה הולכת להצבעה כמו כל הצעה אחרת.",
+        "en": "The founder has a stone oven. He opens the resource the rikma asked for, sees its value and the share the oven will buy him, and offers it. Even a founder needs the partners' consent: the offer goes to a vote like any other."
+      },
+      "setup": [
+        {
+          "do": "goto",
+          "url": "/moach/${rikmaId}/open"
+        },
+        {
+          "do": "waitFor",
+          "target": {
+            "role": "link",
+            "name": "${resourceName}"
+          },
+          "timeout": 120000
+        },
+        {
+          "do": "save",
+          "as": "resourceId",
+          "fromAttr": {
+            "target": {
+              "role": "link",
+              "name": "${resourceName}"
+            },
+            "name": "href"
+          },
+          "regex": "availiableResorce/(\\d+)"
+        },
+        {
+          "do": "goto",
+          "url": "/availiableResorce/${resourceId}"
+        },
+        {
+          "do": "waitFor",
+          "target": {
+            "role": "button",
+            "nameKey": "pages.availResource.iwantto"
+          }
+        }
+      ],
+      "steps": [
+        {
+          "do": "highlight",
+          "target": {
+            "role": "heading",
+            "name": "${resourceName}"
+          },
+          "ms": 1500,
+          "mark": "resource"
+        },
+        {
+          "do": "highlight",
+          "target": {
+            "textKey": "equity.title"
+          },
+          "ms": 2000,
+          "mark": "equity"
+        },
+        {
+          "do": "click",
+          "target": {
+            "role": "button",
+            "nameKey": "pages.availResource.iwantto"
+          },
+          "mark": "share"
+        },
+        {
+          "do": "click",
+          "target": {
+            "role": "button",
+            "nameKey": "pages.availResource.creatnew"
+          },
+          "mark": "new"
+        },
+        {
+          "do": "waitFor",
+          "target": {
+            "role": "button",
+            "nameKey": "pages.availResource.okk"
+          }
+        },
+        {
+          "do": "wait",
+          "ms": 1500,
+          "mark": "value"
+        },
+        {
+          "do": "click",
+          "target": {
+            "role": "button",
+            "nameKey": "pages.availResource.okk"
+          },
+          "commits": true,
+          "mark": "offer"
+        },
+        {
+          "do": "wait",
+          "ms": 5000
+        }
+      ]
+    },
+    {
+      "id": "s11-accept-resource",
+      "title": {
+        "he": "מאשרים את המשאב ואת קבלתו",
+        "en": "Accepting the resource, and receiving it"
+      },
+      "session": "sup2",
+      "narration": {
+        "he": "השותפה מקבלת את ההצעה בהצבעות של הרקמה ומאשרת. אבל משאב נכנס לחשבון רק כשהוא באמת הגיע: בלב מופיע כרטיס \"אישור קבלת משאב\", והשותפים מאשרים שהתנור התקבל. רק אז השווי שלו הופך לחלק.",
+        "en": "The partner gets the offer in the rikma's votes and approves. But a resource only counts once it has actually arrived: a \"resource received\" card appears in the heart, and the partners confirm the oven was received. Only then does its value become a share."
+      },
+      "setup": [
+        {
+          "do": "goto",
+          "url": "/moach/${rikmaId}/votes"
+        },
+        {
+          "do": "waitFor",
+          "target": {
+            "role": "button",
+            "nameKey": "moach.votes.toVote",
+            "hasText": "${resourceName}"
+          },
+          "timeout": 180000
+        }
+      ],
+      "steps": [
+        {
+          "do": "click",
+          "target": {
+            "role": "button",
+            "nameKey": "moach.votes.toVote",
+            "hasText": "${resourceName}"
+          },
+          "mark": "open-vote"
+        },
+        {
+          "do": "waitFor",
+          "target": {
+            "role": "button",
+            "nameKey": "common.approve",
+            "exact": true
+          }
+        },
+        {
+          "do": "wait",
+          "ms": 1800,
+          "mark": "details"
+        },
+        {
+          "do": "click",
+          "target": {
+            "role": "button",
+            "nameKey": "common.approve",
+            "exact": true
+          },
+          "commits": true,
+          "mark": "approve"
+        },
+        {
+          "do": "wait",
+          "ms": 10000
+        },
+        {
+          "do": "goto",
+          "url": "/lev"
+        },
+        {
+          "do": "waitFor",
+          "target": {
+            "role": "heading",
+            "name": "${resourceName}"
+          },
+          "timeout": 180000
+        },
+        {
+          "do": "highlight",
+          "target": {
+            "role": "heading",
+            "name": "${resourceName}"
+          },
+          "ms": 1600,
+          "mark": "received-card"
+        },
+        {
+          "do": "click",
+          "target": {
+            "role": "button",
+            "name": "${resourceName}"
+          },
+          "mark": "open-card"
+        },
+        {
+          "do": "wait",
+          "ms": 2500
+        },
+        {
+          "do": "click",
+          "target": {
+            "role": "button",
+            "nameKey": "common.approve",
+            "exact": true,
+            "last": true
+          },
+          "commits": true,
+          "mark": "confirm-received"
+        },
+        {
+          "do": "wait",
+          "ms": 8000
+        }
+      ]
+    },
+    {
+      "id": "s11b-partner-confirms-resource",
+      "session": "sup1",
+      "record": false,
+      "setup": [
+        {
+          "do": "goto",
+          "url": "/lev"
+        },
+        {
+          "do": "waitFor",
+          "target": {
+            "role": "heading",
+            "name": "${resourceName}"
+          },
+          "timeout": 180000
+        }
+      ],
+      "steps": [
+        {
+          "do": "click",
+          "target": {
+            "role": "button",
+            "name": "${resourceName}"
+          }
+        },
+        {
+          "do": "wait",
+          "ms": 2500
+        },
+        {
+          "do": "click",
+          "target": {
+            "role": "button",
+            "nameKey": "common.approve",
+            "exact": true,
+            "last": true
+          },
+          "commits": true
+        },
+        {
+          "do": "wait",
+          "ms": 8000
+        }
+      ]
+    },
+    {
+      "id": "s12-product",
+      "title": {
+        "he": "מוצר: מה הרקמה מוכרת",
+        "en": "A product: what the rikma sells"
+      },
+      "session": "sup1",
+      "narration": {
+        "he": "עכשיו מה שהרקמה מוכרת. יוצרים מוצר פשוט: שם, תיאור ומחיר — שלושים וחמישה שקל לכיכר, בלי הגבלת מלאי. אחרי השמירה נפתחת העריכה המלאה: תמונות, וריאציות, מלאי וחנות.",
+        "en": "Now, what the rikma sells. Create a simple product: a name, a description and a price — thirty-five a loaf, with no stock limit. After saving, the full editor opens: photos, variants, stock and the shop."
+      },
+      "setup": [
+        {
+          "do": "goto",
+          "url": "/moach/${rikmaId}/sales/new"
+        },
+        {
+          "do": "waitFor",
+          "target": {
+            "role": "tab",
+            "nameKey": "offerings.compose.modeSimple"
+          }
+        }
+      ],
+      "steps": [
+        {
+          "do": "click",
+          "target": {
+            "role": "tab",
+            "nameKey": "offerings.compose.modeSimple"
+          },
+          "mark": "simple"
+        },
+        {
+          "do": "type",
+          "target": {
+            "role": "textbox",
+            "nameKey": "offerings.compose.name",
+            "exact": true
+          },
+          "text": "${productName}",
+          "mark": "name"
+        },
+        {
+          "do": "type",
+          "target": {
+            "role": "textbox",
+            "nameKey": "offerings.compose.desc",
+            "exact": true
+          },
+          "text": "${productDesc}",
+          "delay": 18,
+          "mark": "desc"
+        },
+        {
+          "do": "fill",
+          "target": {
+            "role": "spinbutton",
+            "nameKey": "offerings.compose.price",
+            "exact": true
+          },
+          "text": "35",
+          "mark": "price"
+        },
+        {
+          "do": "select",
+          "target": {
+            "role": "combobox",
+            "nameKey": "offerings.compose.kindOf",
+            "exact": true
+          },
+          "value": "unlimited",
+          "mark": "kind"
+        },
+        {
+          "do": "wait",
+          "ms": 1200
+        },
+        {
+          "do": "click",
+          "target": {
+            "role": "button",
+            "nameKey": "common.save",
+            "exact": true
+          },
+          "commits": true,
+          "mark": "save"
+        },
+        {
+          "do": "waitForUrl",
+          "match": "sales/manage/products/\\d+",
+          "timeout": 60000
+        },
+        {
+          "do": "wait",
+          "ms": 3000,
+          "mark": "editor"
+        }
+      ]
+    },
+    {
+      "id": "s13-sale",
+      "title": {
+        "he": "מכירה",
+        "en": "A sale"
+      },
+      "session": "sup1",
+      "narration": {
+        "he": "הבוקר נמכרו ארבעים כיכרות. מדווחים על המכירה: מה נמכר, כמה יחידות, ואצל מי הכסף. כשהכסף אצלכם, זה דיווח עצמי והמכירה נספרת מיד. אם הכסף אצל שותף אחר, הוא מתבקש לאשר — כי זו טענה על המצב הכספי שלו.",
+        "en": "Forty loaves sold this morning. Report the sale: what was sold, how many units, and who holds the money. When the money is with you, it's a self-report and the sale counts right away. If another partner holds it, they are asked to confirm — because it's a claim about their finances."
+      },
+      "setup": [
+        {
+          "do": "goto",
+          "url": "/moach/${rikmaId}/sales"
+        },
+        {
+          "do": "waitFor",
+          "target": {
+            "role": "button",
+            "nameKey": "project.hamatanot.reportSale",
+            "last": true
+          }
+        }
+      ],
+      "steps": [
+        {
+          "do": "click",
+          "target": {
+            "role": "button",
+            "nameKey": "project.hamatanot.reportSale",
+            "last": true
+          },
+          "mark": "open"
+        },
+        {
+          "do": "waitFor",
+          "target": {
+            "within": {
+              "role": "dialog"
+            },
+            "role": "spinbutton",
+            "nameKey": "sales.howManyUnits"
+          }
+        },
+        {
+          "do": "highlight",
+          "target": {
+            "within": {
+              "role": "dialog"
+            },
+            "role": "radio",
+            "name": "${productName}"
+          },
+          "ms": 1300,
+          "mark": "product"
+        },
+        {
+          "do": "fill",
+          "target": {
+            "within": {
+              "role": "dialog"
+            },
+            "role": "spinbutton",
+            "nameKey": "sales.howManyUnits"
+          },
+          "text": "40",
+          "mark": "units"
+        },
+        {
+          "do": "wait",
+          "ms": 900
+        },
+        {
+          "do": "highlight",
+          "target": {
+            "within": {
+              "role": "dialog"
+            },
+            "role": "group",
+            "nameKey": "sales.withWhomMoney"
+          },
+          "ms": 2400,
+          "mark": "holder"
+        },
+        {
+          "do": "click",
+          "target": {
+            "within": {
+              "role": "dialog"
+            },
+            "role": "button",
+            "nameKey": "sales.addSale"
+          },
+          "commits": true,
+          "mark": "add"
+        },
+        {
+          "do": "wait",
+          "ms": 5000
+        },
+        {
+          "do": "highlight",
+          "target": {
+            "role": "region",
+            "nameKey": "project.hamatanot.awaitingEarnings"
+          },
+          "ms": 2400,
+          "mark": "pending"
+        }
+      ]
+    },
+    {
+      "id": "s14-split-request",
+      "title": {
+        "he": "חלוקת הכסף לפי התרומה",
+        "en": "Splitting the money by contribution"
+      },
+      "session": "sup1",
+      "narration": {
+        "he": "עכשיו מחלקים. הרקמה מחשבת לכל שותף את החלק שלו לפי מה שתרם בפועל: השעות המאושרות של האופה, והתנור שהמייסד הביא. כל אחד רואה כמה מגיע לו וכמה כסף כבר אצלו, ומי צריך להעביר למי. מאשרים ומבקשים חלוקה — וגם החלוקה עצמה עוברת להסכמת השותפים.",
+        "en": "Now we split. The rikma works out each partner's share from what they actually contributed: the baker's approved hours, and the oven the founder brought. Everyone sees what they are owed, how much money they already hold, and who needs to pay whom. Confirm and request the split — and the split itself goes to the partners for consent."
+      },
+      "setup": [
+        {
+          "do": "goto",
+          "url": "/moach/${rikmaId}/sales"
+        },
+        {
+          "do": "waitFor",
+          "target": {
+            "role": "button",
+            "nameKey": "project.hamatanot.requestSplit"
+          },
+          "timeout": 60000
+        }
+      ],
+      "steps": [
+        {
+          "do": "highlight",
+          "target": {
+            "role": "region",
+            "nameKey": "project.hamatanot.awaitingEarnings"
+          },
+          "ms": 2000,
+          "mark": "pending"
+        },
+        {
+          "do": "click",
+          "target": {
+            "role": "button",
+            "nameKey": "project.hamatanot.requestSplit"
+          },
+          "mark": "request"
+        },
+        {
+          "do": "waitFor",
+          "target": {
+            "role": "heading",
+            "level": 1,
+            "nameKey": "shop.sp.splitTitle"
+          }
+        },
+        {
+          "do": "highlight",
+          "target": {
+            "role": "region",
+            "nameKey": "mission.whowhat.calculationTable",
+            "optional": true
+          },
+          "ms": 3200,
+          "mark": "table",
+          "optional": true
+        },
+        {
+          "do": "click",
+          "target": {
+            "role": "button",
+            "nameKey": "mission.whowhat.confirmSplit"
+          },
+          "commits": true,
+          "mark": "confirm"
+        },
+        {
+          "do": "wait",
+          "ms": 8000
+        }
+      ]
+    },
+    {
+      "id": "s15-split-approve",
+      "title": {
+        "he": "השותפה מאשרת את החלוקה",
+        "en": "The partner approves the split"
+      },
+      "session": "sup2",
+      "narration": {
+        "he": "השותפה מקבלת את הצעת החלוקה בהצבעות. היא רואה את החשבון, ויכולה לאשר, לדון או להציע אחרת. היא מאשרת — והרווח מתחלק לפי החלקים שנצברו. בלי ויכוחים על חצי-חצי.",
+        "en": "The partner gets the split proposal in the votes. She sees the numbers, and can approve, discuss or counter. She approves — and the profit is divided by the shares each partner earned. No arguments about fifty-fifty."
+      },
+      "setup": [
+        {
+          "do": "goto",
+          "url": "/moach/${rikmaId}/votes"
+        },
+        {
+          "do": "waitFor",
+          "target": {
+            "role": "heading",
+            "nameKey": "moach.votes.splitVotes"
+          },
+          "timeout": 180000
+        }
+      ],
+      "steps": [
+        {
+          "do": "highlight",
+          "target": {
+            "role": "heading",
+            "nameKey": "moach.votes.splitVotes"
+          },
+          "ms": 1500,
+          "mark": "section"
+        },
+        {
+          "do": "click",
+          "target": {
+            "role": "button",
+            "nameKey": "moach.votes.toVote",
+            "last": true
+          },
+          "mark": "open-vote"
+        },
+        {
+          "do": "waitFor",
+          "target": {
+            "any": [
+              {
+                "role": "button",
+                "nameKey": "common.approve",
+                "exact": true
+              },
+              {
+                "css": "button.from-barbi.to-mpink"
+              }
+            ]
+          },
+          "timeout": 60000
+        },
+        {
+          "do": "highlight",
+          "target": {
+            "css": "table"
+          },
+          "ms": 3200,
+          "mark": "table"
+        },
+        {
+          "do": "wait",
+          "ms": 2500,
+          "mark": "details"
+        },
+        {
+          "do": "click",
+          "target": {
+            "any": [
+              {
+                "role": "button",
+                "nameKey": "common.approve",
+                "exact": true
+              },
+              {
+                "css": "button.from-barbi.to-mpink"
+              }
+            ]
+          },
+          "commits": true,
+          "mark": "approve"
+        },
+        {
+          "do": "wait",
+          "ms": 10000
+        }
+      ]
+    },
+    {
+      "id": "s16-outro",
+      "title": {
+        "he": "הכל שקוף, מההתחלה ועד הסוף",
+        "en": "Transparent from start to finish"
+      },
+      "session": "guest",
+      "narration": {
+        "he": "זה כל הסיפור: רעיון, משימות ומשאבים, שותפים שמצטרפים בהסכמה, שעות שנרשמות, מכירה, וחלוקה לפי מה שכל אחד תרם. יש לכם רעיון? הקימו רקמה — ואת השאר נבנה יחד.",
+        "en": "That's the whole story: an idea, missions and resources, partners who join by consent, hours that are recorded, a sale, and a split by what each one contributed. Got an idea? Start a rikma — and we'll build the rest together."
+      },
+      "setup": [
+        {
+          "do": "goto",
+          "url": "/vision"
+        },
+        {
+          "do": "scroll",
+          "target": {
+            "role": "heading",
+            "nameKey": "vision.close.title"
+          },
+          "block": "center"
+        }
+      ],
+      "steps": [
+        {
+          "do": "highlight",
+          "target": {
+            "role": "heading",
+            "nameKey": "vision.close.title"
+          },
+          "ms": 2200,
+          "mark": "close"
+        },
+        {
+          "do": "hover",
+          "target": {
+            "role": "link",
+            "nameKey": "vision.hero.ctaStart",
+            "last": true
+          },
+          "mark": "cta"
+        },
+        {
+          "do": "wait",
+          "ms": 2500
+        }
+      ]
+    }
+  ]
+}

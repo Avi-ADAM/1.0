@@ -9,7 +9,8 @@
  * nobody heard about — the screens learned of it (B9), the people did not.
  *
  * Each handler calls `tellMatured` at the point it actually matured something
- * (never on a clock it only closed), with the rikma or the people concerned,
+ * (never on a clock it only closed — except to the one person a closed clock
+ * is now waiting on, the `…Awaits…` notices), with the rikma or the people concerned,
  * and the same orchestrator every action uses decides the channels from the
  * intent:
  * - `outcome`  — a rikma-wide result (a mission opened, a split settled);

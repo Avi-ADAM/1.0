@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import {
+  addAskwantYes,
   approveAskwant,
   approveSheirutProposal,
   mergeSheirutpendVotes,
@@ -207,5 +208,43 @@ describe('approveAskwant', () => {
 
     const starte = matching('302createWant')[0].vars.starte as string;
     expect(Date.parse(starte)).toBeGreaterThanOrEqual(before);
+  });
+});
+
+describe('addAskwantYes', () => {
+  const now = new Date('2026-10-29T10:00:00.000Z');
+  const member = (id: string, what = true) => ({ what, order: 0, users_permissions_user: { data: { id } } });
+
+  it('appends the member’s yes with plain ids and an Int ide', () => {
+    const r = addAskwantYes({ vots: [], memberIds: ['1', '2'], userId: '1', now });
+    expect(r.changed).toBe(true);
+    expect(r.rows).toEqual([
+      { what: true, users_permissions_user: '1', ide: 1, order: 0, zman: now.toISOString() }
+    ]);
+    expect(r.allYes).toBe(false);
+  });
+
+  it('a second tap by the same member writes nothing new', () => {
+    const r = addAskwantYes({ vots: [member('1')], memberIds: ['1', '2'], userId: '1', now });
+    expect(r.changed).toBe(false);
+    expect(r.rows).toHaveLength(1);
+  });
+
+  it('the last member’s yes is every member — it settles now', () => {
+    const r = addAskwantYes({ vots: [member('1')], memberIds: ['1', '2'], userId: '2', now });
+    expect(r.allYes).toBe(true);
+  });
+
+  it('a standing objection keeps it from settling, and the row is kept', () => {
+    const r = addAskwantYes({ vots: [member('3', false), member('1')], memberIds: ['1', '2', '3'], userId: '2', now });
+    expect(r.hasNo).toBe(true);
+    expect(r.allYes).toBe(false);
+    expect(r.rows.map((x) => x.users_permissions_user)).toEqual(['3', '1', '2']);
+  });
+
+  it('the requester’s own row (an outsider) is not a member’s yes', () => {
+    const r = addAskwantYes({ vots: [member('9')], memberIds: ['1'], userId: '1', now });
+    expect(r.allYes).toBe(true);
+    expect(sheirutGate({ vots: [{ what: true, order: 0, users_permissions_user: '9' }], memberIds: ['1'], proposerId: '9' }).hasPMyes).toBe(false);
   });
 });

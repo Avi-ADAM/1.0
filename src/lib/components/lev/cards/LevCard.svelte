@@ -810,6 +810,8 @@
       st={buble.st}
       spid={buble.spid}
       saleClaim={buble.saleClaim}
+
+      askwant={buble.askwant}
       {low}
     />
 {/if}

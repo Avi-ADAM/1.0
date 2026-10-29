@@ -158,6 +158,49 @@ async function requireBridgeSourceParty(ctx, sourceType, sourceId) {
 }
 
 /**
+ * Read a negotiation's bridge source. A missing row or an unbridged
+ * negotiation comes back with no sourceType.
+ *
+ * @param {SendGuardContext} ctx
+ * @param {unknown} id
+ * @returns {Promise<{ sourceType?: string, sourceId?: string } | null>}
+ */
+async function readNegotiationSource(ctx, id) {
+  const { bearer1, ep, fetch: injected } = ctx;
+  const doFetch = injected || fetch;
+  let body;
+  try {
+    const res = await doFetch(ep, {
+      method: 'POST',
+      body: JSON.stringify({
+        query: `query NegotiationSource($id: ID!) { negotiation(id: $id) { data { attributes { sourceType sourceId } } } }`,
+        variables: { id: String(id) }
+      }),
+      headers: { 'Content-Type': 'application/json', Authorization: bearer1 }
+    });
+    body = await res.json();
+  } catch (e) {
+    throw error(503, `Could not read the negotiation source: ${e.message}`);
+  }
+  return body?.data?.negotiation?.data?.attributes ?? null;
+}
+
+/**
+ * Issues and clauses of a bridged negotiation carry the terms of a main-app
+ * proposal, so only a party to its source may read or add them. A discussion
+ * that was not bridged keeps its existing rules.
+ * @param {SendGuardContext} ctx
+ */
+async function bridgedNegotiationContent(ctx) {
+  if (ctx.isSer) return;
+  const id = ctx.variablesObject.negotiationId;
+  if (!id) throw error(400, 'Missing negotiationId');
+  const source = await readNegotiationSource(ctx, id);
+  if (!source?.sourceType || !source?.sourceId) return;
+  await requireBridgeSourceParty(ctx, source.sourceType, source.sourceId);
+}
+
+/**
  * A bridge lookup by `(sourceType, sourceId)`: only a party to the source
  * object may find its discussion or read its signed resolution.
  * @param {SendGuardContext} ctx
@@ -329,31 +372,23 @@ const PRE_GUARDS = {
   'GetNegotiationBySource': bridgeSourceRead,
   'GetNegotiationResolutionBySource': bridgeSourceRead,
 
+  // The terms of a bridged discussion (issues and clauses) follow the same
+  // membership. UpdateClause keeps its author check below.
+  'ListIssues': bridgedNegotiationContent,
+  'ListClauses': bridgedNegotiationContent,
+  'CreateIssue': bridgedNegotiationContent,
+  'CreateClause': bridgedNegotiationContent,
+
   // Signing the bridge decision. The negotiation's own source decides who may
   // sign — never the client's `resolution` blob, which must name that same
   // source, since the source card reads it back by (sourceType, sourceId).
   '43SetNegotiationResolution': async (ctx) => {
     if (ctx.isSer) return;
-    const { variablesObject, bearer1, ep, fetch: injected } = ctx;
+    const { variablesObject } = ctx;
     const id = variablesObject.id;
     if (!id) throw error(400, 'Missing id for 43SetNegotiationResolution');
 
-    const doFetch = injected || fetch;
-    let body;
-    try {
-      const res = await doFetch(ep, {
-        method: 'POST',
-        body: JSON.stringify({
-          query: `query NegotiationSource($id: ID!) { negotiation(id: $id) { data { attributes { sourceType sourceId } } } }`,
-          variables: { id: String(id) }
-        }),
-        headers: { 'Content-Type': 'application/json', Authorization: bearer1 }
-      });
-      body = await res.json();
-    } catch (e) {
-      throw error(503, `Could not read the negotiation source: ${e.message}`);
-    }
-    const source = body?.data?.negotiation?.data?.attributes;
+    const source = await readNegotiationSource(ctx, id);
     if (!source?.sourceType || !source?.sourceId) {
       throw error(403, 'Forbidden: Only a bridged negotiation carries a resolution');
     }

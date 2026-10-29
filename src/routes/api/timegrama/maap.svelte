@@ -41,7 +41,7 @@
   // Server-only secret — this module is imported only by timegrama/+server.js.
   import { env } from '$env/dynamic/private';
   import { tellMatured } from '$lib/server/notifications/matured';
-  import { maapSettled, stockReceiptSettled } from '$lib/server/notifications/maturedNotices';
+  import { maapAwaitsResponsible, maapSettled, stockReceiptSettled } from '$lib/server/notifications/maturedNotices';
   import { receiptValueOf } from '$lib/server/fulfillment/stock';
 
   /** Close the clock. Every path that decides not to settle ends here. */
@@ -99,7 +99,17 @@
       );
       if (!responsibleSigned) {
         // D1. Not a rejection — the proposal keeps standing, it just cannot
-        // mature on silence alone.
+        // mature on silence alone. Tell the one person it waits on, or the
+        // closed clock is the last anyone hears of it (TIMEGRAMA_REMINDERS R1).
+        await tellMatured(
+          maapAwaitsResponsible({
+            projectId,
+            name: attrs.name ?? mashAttrs.name ?? '',
+            cycleIndex: attrs.cycleIndex ?? null,
+            responsibleId
+          }),
+          fetch
+        );
         return markDone(
           taid,
           `maap ${id}: the responsible member has not signed — cycle left open`

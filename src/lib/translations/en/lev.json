@@ -347,6 +347,9 @@
       "monthly": "monthly",
       "oneTime": "one time",
       "splitEqually": "split equally",
+      "askwantWho": "{{name}} asks to receive this service from the rikma.",
+      "askwantWhoAnon": "Someone asks to receive this service from the rikma.",
+      "askwantRule": "One member's yes is enough: if nobody objects by the end of the response time, the request is approved. With no yes at all, it is not approved on its own.",
       "subscription": "subscription",
       "oldLogo": "Current logo",
       "newLogo": "New logo"
@@ -786,7 +789,9 @@
     "currentLogo": "Current logo",
     "offeredLogo": "The proposed new logo",
     "executionDate": "execution date",
-    "newServiceVote": "vote on creating new service"
+    "newServiceVote": "vote on creating new service",
+    "askwantVote": "A request to receive a service",
+    "askwantVoteFailed": "Your yes was not saved. You can try again."
   },
   "income": {
     "already": "Already has income",
@@ -865,6 +870,7 @@
       "stipendProgram": "Stipend program",
       "saleClaim": "Sale holder consent",
       "newService": "New service",
+      "askwant": "Service request",
       "picVote": "Logo change",
       "stipendaccrued": "Subsistence stipend",
       "stipendtransfer": "Stipend transfer",
@@ -906,6 +912,7 @@
       "vallueles": "Removing values",
       "pic": "Rikma logo change",
       "sheirutpends": "New product or service",
+      "askwants": "A request to receive a service",
       "saleClaim": "Sale holder consent",
       "saleClaimSub": "Who holds the money",
       "generic": "A decision awaiting your signature",

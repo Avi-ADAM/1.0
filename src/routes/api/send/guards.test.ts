@@ -536,6 +536,40 @@ describe('runSendGuards — 43SetNegotiationResolution', () => {
   });
 });
 
+for (const queId of ['ListIssues', 'ListClauses', 'CreateIssue', 'CreateClause']) {
+  describe(`runSendGuards — ${queId}`, () => {
+    const q = { ...base, queId };
+    const bridged = { attributes: { sourceType: 'pmash', sourceId: '42' } };
+
+    it('lets a member of the source rikma use a bridged discussion', async () => {
+      const fetchMock = strapiRows({ negotiation: bridged, pmash: memberOf('7') });
+      await expect(
+        runSendGuards({ ...q, callerId: '7', variablesObject: { negotiationId: '5' }, fetch: fetchMock as any })
+      ).resolves.toBeUndefined();
+    });
+
+    it('blocks a logged-in user outside the source rikma', async () => {
+      const fetchMock = strapiRows({ negotiation: bridged, pmash: memberOf('8') });
+      const r = await statusOf(() =>
+        runSendGuards({ ...q, callerId: '7', variablesObject: { negotiationId: '5' }, fetch: fetchMock as any })
+      );
+      expect(r).toMatchObject({ threw: true, status: 403 });
+    });
+
+    it('leaves a discussion that was not bridged alone', async () => {
+      const fetchMock = strapiRows({ negotiation: { attributes: {} } });
+      await expect(
+        runSendGuards({ ...q, callerId: '7', variablesObject: { negotiationId: '5' }, fetch: fetchMock as any })
+      ).resolves.toBeUndefined();
+    });
+
+    it('400s without a negotiationId', async () => {
+      const r = await statusOf(() => runSendGuards({ ...q, callerId: '7', variablesObject: {} }));
+      expect(r).toMatchObject({ threw: true, status: 400 });
+    });
+  });
+}
+
 describe('runSendGuards — unguarded qids', () => {
   it('is a no-op for a qid with no registered guard', async () => {
     await expect(

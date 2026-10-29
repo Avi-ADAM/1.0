@@ -18,11 +18,11 @@
    * first writer of that path; the shape comes from the content type, and the
    * write is guarded so a retry cannot subscribe anyone twice.
    *
-   * Note what this cannot yet do anything about: there is no UI that votes on
-   * an askwant. Until one exists every clock here ends in "no member approval",
-   * which is the correct answer to a request nobody could answer — but it means
-   * the requester hears nothing. That reminder is tracked separately in
-   * docs/tbd/TIMEGRAMA_REMINDERS.md.
+   * Members answer an askwant from its heart card (`addVote` type 'askwant',
+   * TIMEGRAMA_REMINDERS R2). Every member's yes settles it there and then; one
+   * yes leaves it to this clock — and a yes on a request whose clock already
+   * ran out opens a fresh one. A clock that ends with no yes at all still tells
+   * the requester so, with a link to ask again (R3, renewSheirutJoin).
    */
   import { strapiClient as strapi } from '$lib/server/actions';
   import { approveAskwant, sheirutGate } from '$lib/server/sheirut/approveSheirutRequests';
@@ -31,7 +31,7 @@
   // Server-only secret — this module is imported only by timegrama/+server.js.
   import { env } from '$env/dynamic/private';
   import { tellMatured } from '$lib/server/notifications/matured';
-  import { askwantApproved } from '$lib/server/notifications/maturedNotices';
+  import { askwantApproved, askwantLapsed } from '$lib/server/notifications/maturedNotices';
 
   /** Close the clock. Every path that decides not to act ends here. */
   async function markDone(taid, why) {
@@ -86,7 +86,17 @@
       if (!gate.hasPMyes) {
         // D2. The whole point: an outsider joining is the rikma's decision, and
         // nobody made it. The request is not refused — it just cannot mature on
-        // silence, so the clock ends here.
+        // silence, so the clock ends here. Tell the one who asked, or this is
+        // the last anyone hears of it (TIMEGRAMA_REMINDERS R3).
+        await tellMatured(
+          askwantLapsed({
+            requesterId: askerId,
+            askwantId: id,
+            name: sheirut.attributes?.name,
+            projectName: a.project?.data?.attributes?.projectName
+          }),
+          fetch
+        );
         return markDone(taid, `askwant ${id}: no rikma member approved — not matured (D2)`);
       }
 

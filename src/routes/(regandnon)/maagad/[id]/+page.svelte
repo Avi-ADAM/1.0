@@ -416,7 +416,8 @@
                 {$t('demand.unsign')}
               </button>
             {/if}
-          {:else if (offer.status === 'open' || offer.status === 'quorum_reached') && !offer.proposerIsMe}
+          {:else if (offer.status === 'open' || offer.status === 'quorum_reached' || (offer.status === 'activated' && offer.matanotId && !lockedNow(offer))) && !offer.proposerIsMe}
+            <!-- An activated departure still takes participants until its lock (§4.1). -->
             <button class="primary" onclick={() => sign(offer.id)} disabled={busy || !!my?.signedOfferId}>
               <EntityIcon kind="signed" size={15} /> {$t('demand.sign')}
             </button>

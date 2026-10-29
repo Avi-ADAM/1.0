@@ -43,6 +43,7 @@
    * @property {(payload: { alr: any }) => void} [onDecline]
    * @property {{ focus: string, hue: string | null, hue2: string | null, cover: string | null } | null} [lookProposal]
    * @property {string} [previewHref]
+   * @property {{ requesterId: any, requesterName: string, sheirutName: string, sheirutDescrip: string } | null} [askwant]
    */
 
   /** @type {Props} */
@@ -77,6 +78,8 @@
     onProj,
     /** @type {any} bilateral saleClaim payload (reporter/holder, standing round, negom) */
     saleClaim = null,
+    /** @type {{ requesterId: any, requesterName: string, sheirutName: string, sheirutDescrip: string } | null} kind 'askwants': who asks to receive which service */
+    askwant = null,
     /** @type {string} current value of the project field being changed */
     currentValue = '',
     /** @type {string} proposed new value */
@@ -306,7 +309,9 @@
     logoSrc={src}
     {projectName}
     cardType={cardTypeLabel}
-    cardTitle={kind === 'sheirutpends' &&
+    cardTitle={kind === 'askwants' && askwant?.sheirutName
+      ? askwant.sheirutName
+      : kind === 'sheirutpends' &&
     spdata?.sheirut?.data?.attributes?.name
       ? spdata.sheirut.data.attributes.name
       : openmissionName?.length > 0
@@ -375,6 +380,22 @@
               : $t('lev.cards.hachlata.splitEqually')}
           </h5>
         </div>
+      </div>
+    {:else if kind === 'askwants'}
+      <div
+        class="space-y-3 bg-gray-100 dark:bg-gray-900/50 p-4 rounded-xl border border-gray-200 dark:border-gray-700"
+      >
+        <p class="text-gray-800 dark:text-gray-200 font-bold text-lg">
+          {askwant?.requesterName
+            ? $t('lev.cards.hachlata.askwantWho', { name: askwant.requesterName })
+            : $t('lev.cards.hachlata.askwantWhoAnon')}
+        </p>
+        {#if askwant?.sheirutDescrip}
+          <p class="text-gray-700 dark:text-gray-300">{askwant.sheirutDescrip}</p>
+        {/if}
+        <p class="text-sm text-gray-600 dark:text-gray-400">
+          {$t('lev.cards.hachlata.askwantRule')}
+        </p>
       </div>
     {:else if kind === 'saleClaim'}
       <!-- Bilateral sale-holder consent: show the version currently on the
@@ -483,7 +504,7 @@
           </a>
         {/if}
       </div>
-    {:else if kind !== 'sheirutpends' && kind !== 'pic' && (currentValue || newValue)}
+    {:else if kind !== 'sheirutpends' && kind !== 'pic' && kind !== 'askwants' && (currentValue || newValue)}
       <!-- Generic before/after display for text-based decision kinds -->
       <div
         class="space-y-3 bg-gray-50 dark:bg-gray-900/50 p-4 rounded-xl border border-gray-200 dark:border-gray-700"
@@ -537,7 +558,7 @@
           {/if}
         {/if}
       </div>
-    {:else if kind !== 'sheirutpends' && kind !== 'pic' && !currentValue && !newValue}
+    {:else if kind !== 'sheirutpends' && kind !== 'pic' && kind !== 'askwants' && !currentValue && !newValue}
       <!-- Loading state for text-based kinds before data arrives -->
       <div class="flex items-center justify-center py-6 text-gray-400 dark:text-gray-500">
         <svg class="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24" fill="none">
@@ -1046,7 +1067,9 @@
               />
             </svg>
           </button>
-        {:else}
+        {:else if kind !== 'askwants'}
+          <!-- An askwant has no "no": without a member's yes it simply does not
+               mature (D2), and this button never recorded anything. -->
           <button
             class="flex-1 py-2 bg-white dark:bg-gray-800 border-2 border-red-500 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 font-bold rounded-xl transition-all flex justify-center items-center"
             onmouseenter={() => hover('התנגדות')}
