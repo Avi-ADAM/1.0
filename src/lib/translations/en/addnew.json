@@ -188,5 +188,26 @@
   },
   "meeting": {
     "nameLabel": "Meeting Name"
+  },
+  "aiFill": {
+    "title": "Let AI fill it in",
+    "sub": "Describe the idea in your own words and get the form filled, or let your own AI agent build the rikma.",
+    "writeFree": "Write freely",
+    "close": "Close",
+    "agentCta": "With your agent",
+    "recommended": "Recommended",
+    "label": "Tell us about the rikma: the idea, who it is for, what it needs to start",
+    "placeholder": "For example: a neighbourhood café that doubles as a workspace. I bring the place, we need a barista and a designer, and we want to open mornings first...",
+    "more": "{{count}} more characters and you can start",
+    "planNote": "AI fills in the name, the descriptions (including a rich internal one) and the values, and drafts missions and resources for you to approve after creating.",
+    "fill": "Fill the form",
+    "working": "Filling...",
+    "errLimit": "You have reached the draft limit for now. Try again later, or use your own agent.",
+    "errAuth": "You need to be signed in to draft a rikma.",
+    "errGeneric": "We could not draft it this time. Try wording it a little differently, or fill the form by hand.",
+    "agentTitle": "Your AI agent",
+    "agentBody": "Connect Claude or another agent to 1lev1 in a few clicks. It understands the idea in depth, prepares this form filled in, and then opens missions, runs timers and shows what is waiting for approval.",
+    "agentExample": "\"I have an idea for a neighbourhood café that doubles as a workspace. Make me a rikma with the first missions.\"",
+    "agentLink": "How to connect an agent"
   }
 }

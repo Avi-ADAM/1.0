@@ -188,5 +188,26 @@
   },
   "meeting": {
     "nameLabel": "Nombre de la reunión"
+  },
+  "aiFill": {
+    "title": "Que la IA lo rellene por ti",
+    "sub": "Describe la idea con tus palabras y recibe el formulario relleno, o deja que tu propio agente de IA construya la rikma.",
+    "writeFree": "Escribir libremente",
+    "close": "Cerrar",
+    "agentCta": "Con tu agente",
+    "recommended": "Recomendado",
+    "label": "Cuéntanos sobre la rikma: la idea, para quién es, qué necesita para empezar",
+    "placeholder": "Por ejemplo: un café de barrio que también sirve de espacio de trabajo. Yo pongo el local, buscamos un barista y una diseñadora, y queremos abrir primero por las mañanas...",
+    "more": "Faltan {{count}} caracteres para empezar",
+    "planNote": "La IA rellena el nombre, las descripciones (incluida una interna detallada) y los valores, y prepara propuestas de misiones y recursos que aprobarás después de crearla.",
+    "fill": "Rellenar el formulario",
+    "working": "Rellenando...",
+    "errLimit": "Has llegado al límite de borradores por ahora. Inténtalo más tarde o con tu propio agente.",
+    "errAuth": "Necesitas iniciar sesión para preparar un borrador.",
+    "errGeneric": "Esta vez no pudimos preparar el borrador. Prueba a redactarlo un poco distinto o rellena el formulario a mano.",
+    "agentTitle": "Tu agente de IA",
+    "agentBody": "Conecta Claude u otro agente a 1lev1 en unos clics. Entiende la idea a fondo, te prepara este formulario relleno y después abre misiones, lleva los temporizadores y muestra qué espera aprobación.",
+    "agentExample": "«Tengo una idea para un café de barrio que también sea espacio de trabajo. Prepárame una rikma con las primeras misiones.»",
+    "agentLink": "Cómo conectar un agente"
   }
 }

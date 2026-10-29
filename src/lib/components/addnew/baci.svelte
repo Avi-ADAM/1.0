@@ -10,8 +10,14 @@
   import { baciStore, resetBaciStore } from '$lib/stores/baciStore.js';
   import { executeAction } from '$lib/client/actionClient';
   import { goto } from '$app/navigation';
-  import { peekSeedPlan, takeSeedPlan, countStashedItems } from '$lib/onboard/seedPlanHandoff.js';
-  import { onMount, onDestroy, untrack } from 'svelte';
+  import {
+    peekSeedPlan,
+    takeSeedPlan,
+    countStashedItems,
+    stashSeedPlan
+  } from '$lib/onboard/seedPlanHandoff.js';
+  import AiFill from './AiFill.svelte';
+  import { onMount, onDestroy, untrack, tick } from 'svelte';
   import Uplad from '../userPr/uploadPic.svelte';
   import Spinner from '$lib/celim/Spinner.svelte';
   import RichText from '$lib/celim/ui/richText.svelte';
@@ -267,9 +273,11 @@
   // The store was filled before this form mounted, so what it holds now is
   // what the assistant proposed. A field keeps its "suggested" mark only while
   // it still says what was proposed — once the member rewrites it, it is theirs.
-  const draftSnap = untrack(() => drafted) ? structuredClone(get(baciStore)) : null;
+  // A draft written here, from the AI card, replaces the snapshot the same way.
+  let draftSnap = $state(untrack(() => drafted) ? structuredClone(get(baciStore)) : null);
+  let aiDrafted = $state(false);
   let cleared = $state(false);
-  const showDraft = $derived(drafted && !cleared);
+  const showDraft = $derived((drafted || aiDrafted) && !cleared);
 
   /** @param {'projectName_value'|'desP'|'desPl'|'restime'|'timeToP'} field */
   function isSuggested(field) {
@@ -288,9 +296,46 @@
 
   function clearDraft() {
     resetBaciStore();
+    // The starter proposals came with the AI draft; an empty form drops them too.
+    if (aiDrafted) {
+      stashSeedPlan(null);
+      pendingItems = 0;
+    }
     cleared = true;
     shgi = false;
   }
+
+  /** @param {string} s */
+  const escapeHtml = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+  /**
+   * The AI card's answer (/api/analyze-business) → the form, as suggestions.
+   * `details` is already reduced to the editor's tags on the server; the
+   * short description is plain text. Values add to what the member picked.
+   * @param {any} data
+   */
+  async function applyAiDraft(data) {
+    baciStore.update((s) => ({
+      ...s,
+      projectName_value: data.name || s.projectName_value,
+      desP: data.desc ? `<p>${escapeHtml(data.desc)}</p>` : s.desP,
+      desPl: data.details || s.desPl,
+      selected: [...new Set([...s.selected, ...(Array.isArray(data.vals) ? data.vals : [])])],
+      timeToP: data.profit ?? s.timeToP,
+      ont: typeof data.ont === 'boolean' ? data.ont : s.ont
+    }));
+    // Starter missions/resources/products wait for the rikma, as in onboarding.
+    stashSeedPlan(data.plan, 'form');
+    pendingItems = countStashedItems(peekSeedPlan());
+    draftSnap = structuredClone(get(baciStore));
+    aiDrafted = true;
+    cleared = false;
+    shgi = false;
+    await tick();
+    formTop?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+  /** @type {HTMLElement | undefined} */
+  let formTop = $state();
 
   // ── Values ──────────────────────────────────────────────────────────────
   let ugug = $state('');
@@ -427,7 +472,13 @@
       <p class="bc-lede">{$t('addnew.baci.lede')}</p>
     </section>
 
-    {#if showDraft}
+    <!-- Before the form: the AI card when nothing was drafted yet. A form that
+         arrived prefilled (agent link, onboarding) or that the card just filled
+         shows the draft banner instead. -->
+    <div bind:this={formTop} class="bc-anchor"></div>
+    {#if !showDraft}
+      <AiFill onFilled={applyAiDraft} />
+    {:else}
       <section class="bc-draft" aria-label={$t('addnew.baci.draftTitle')}>
         <div class="bc-draft-icon" aria-hidden="true">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3a2a08" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"></path><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"></path></svg>
@@ -927,6 +978,10 @@
     font-size: 20px;
     line-height: 1.5;
     color: var(--bc-ink-2);
+  }
+
+  .bc-anchor {
+    scroll-margin-top: 80px;
   }
 
   /* assistant draft banner */
