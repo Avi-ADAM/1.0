@@ -62,22 +62,22 @@
   }
 </script>
 
-<section class="space-y-3 rounded-xl border border-zinc-200 dark:border-zinc-700 p-4 bg-white/60 dark:bg-zinc-900/40">
+<section class="space-y-3 rounded-xl border border-surfaceLine p-4 bg-surface text-surfaceInk">
   <h2 class="font-semibold text-goldink">{$t('recovery.recover.title')}</h2>
   {#if done}
     <p class="text-sm text-emerald-700 dark:text-emerald-300" role="status">{$t('recovery.recover.done')}</p>
   {:else if !expanded}
     <button class="text-sm text-goldink underline" onclick={() => (open = true)}>{$t('recovery.recover.desc')}</button>
   {:else}
-    <p class="text-sm text-zinc-500">{$t('recovery.recover.desc')}</p>
+    <p class="text-sm text-surfaceMuted">{$t('recovery.recover.desc')}</p>
 
     {#if request}
-      <div class="space-y-2 rounded-lg bg-zinc-50 p-3 text-center dark:bg-zinc-800/60">
+      <div class="space-y-2 rounded-lg bg-surface2 p-3 text-center">
         <p class="text-sm">{$t('recovery.recover.code')}</p>
         <p class="font-mono text-3xl tracking-[0.3em]" dir="ltr">{request.code.slice(0, 4)}-{request.code.slice(4)}</p>
         <p class="text-sm">{$t('recovery.recover.fingerprint')}</p>
         <p class="font-mono text-2xl tracking-widest" dir="ltr">{request.fingerprint}</p>
-        <p class="text-xs text-zinc-500">{$t('recovery.recover.readTo')}</p>
+        <p class="text-xs text-surfaceMuted">{$t('recovery.recover.readTo')}</p>
         <p class="text-xs">
           {$t('recovery.recover.guardians')}: {request.guardians.map((g) => g.username ?? g.id).join(', ')}
         </p>

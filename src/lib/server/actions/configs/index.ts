@@ -175,6 +175,7 @@ import { updateUserRelationConfig } from './updateUserRelation.js';
 import { refreshMySuggestionsConfig } from './refreshMySuggestions.js';
 import { loadCatalogConfig } from './loadCatalog.js';
 import { toggleGuideStatusConfig } from './toggleGuideStatus.js';
+import { registerPushDeviceConfig } from './registerPushDevice.js';
 import { createMissionTemplateConfig } from './createMissionTemplate.js';
 import { offerWishHelpConfig } from './offerWishHelp.js';
 import { offerNewProductsToWishesConfig } from './offerNewProductsToWishes.js';
@@ -515,6 +516,7 @@ export function registerAllActions(): void {
 
   // Onboarding guide visibility toggle (editBasic.svelte)
   registerAction(toggleGuideStatusConfig);
+  registerAction(registerPushDeviceConfig);
 
   // Standalone mission catalog entry (addNewMission.svelte)
   registerAction(createMissionTemplateConfig);

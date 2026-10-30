@@ -427,6 +427,7 @@ export type ActionKey =
   | 'getSiteShareArchive'
   | 'getRikmaSplitsArchive'
   | 'toggleGuideStatus'
+  | 'registerPushDevice'
   | 'createMissionTemplate'
   | 'updateUserProfilePic'
   | 'updateUserBasic'

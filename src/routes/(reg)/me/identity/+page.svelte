@@ -58,15 +58,15 @@
   <title>{label('title')} · 1lev1</title>
 </svelte:head>
 
-<main class="mx-auto max-w-2xl p-4 md:p-8 text-zinc-800 dark:text-zinc-100" dir={$isRtl ? 'rtl' : 'ltr'}>
-  <a href="/me" class="text-sm text-zinc-500 hover:underline">← {label('backToMe')}</a>
+<main class="mx-auto max-w-2xl p-4 md:p-8" dir={$isRtl ? 'rtl' : 'ltr'}>
+  <a href="/me" class="text-sm text-[var(--tm)] hover:underline">← {label('backToMe')}</a>
 
   <h1 class="text-2xl font-bold mt-4 mb-2">{label('title')}</h1>
-  <p class="text-sm text-zinc-600 dark:text-zinc-300 leading-relaxed mb-6">
+  <p class="text-sm text-[var(--tm)] leading-relaxed mb-6">
     {label('explainer')}
   </p>
 
-  <section class="rounded-xl border border-zinc-200 dark:border-zinc-700 p-4 md:p-5 space-y-4 bg-white/60 dark:bg-zinc-900/40">
+  <section class="rounded-xl border border-surfaceLine p-4 md:p-5 space-y-4 bg-surface text-surfaceInk">
 
     <div class="flex items-center justify-between gap-3 flex-wrap">
       <span class="font-medium">{label('status')}</span>
@@ -74,17 +74,17 @@
     </div>
 
     <div class="grid grid-cols-[max-content_1fr] gap-x-4 gap-y-2 text-sm">
-      <span class="text-zinc-500">{label('algo')}</span>
+      <span class="text-surfaceMuted">{label('algo')}</span>
       <span class="font-mono">{consentStatus.algo ?? label('nothing')}</span>
 
-      <span class="text-zinc-500">{label('createdAt')}</span>
+      <span class="text-surfaceMuted">{label('createdAt')}</span>
       <span class="font-mono">
         {consentStatus.createdAt
           ? new Date(consentStatus.createdAt).toLocaleString($lang === 'en' ? 'en-US' : 'he-IL')
           : label('nothing')}
       </span>
 
-      <span class="text-zinc-500">{label('fingerprint')}</span>
+      <span class="text-surfaceMuted">{label('fingerprint')}</span>
       <span class="font-mono break-all">
         {#if consentStatus.devicePubB64}
           {showFullKey
@@ -103,13 +103,13 @@
       </span>
 
       {#if signedEventCount !== null}
-        <span class="text-zinc-500">{label('signedEvents')}</span>
+        <span class="text-surfaceMuted">{label('signedEvents')}</span>
         <span class="font-mono">{signedEventCount}</span>
       {/if}
     </div>
 
     {#if consentStatus.kind === 'error' || consentStatus.kind === 'local-only'}
-      <div class="pt-2 border-t border-zinc-200 dark:border-zinc-700">
+      <div class="pt-2 border-t border-surfaceLine">
         {#if consentStatus.reason}
           <p class="text-xs text-rose-600 dark:text-rose-400 mb-2">
             {consentStatus.reason}

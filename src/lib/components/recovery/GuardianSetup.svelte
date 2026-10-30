@@ -111,7 +111,7 @@
   }
 </script>
 
-<section class="rounded-xl border border-zinc-200 dark:border-zinc-700 p-4 bg-white/60 dark:bg-zinc-900/40 space-y-3">
+<section class="rounded-xl border border-surfaceLine p-4 bg-surface text-surfaceInk space-y-3">
   <h2 class="font-semibold text-goldink">{$t('recovery.set.title')}</h2>
 
   {#snippet chips(list: GuardianSetView['guardians'])}
@@ -120,7 +120,7 @@
         <li
           class="rounded-full px-3 py-1 text-sm {g.accepted
             ? 'bg-emerald-50 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-200'
-            : 'bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300'}"
+            : 'bg-surface2 text-surfaceMuted'}"
         >
           {g.accepted ? '✓' : '…'} {g.username ?? g.id}
           <span class="text-xs opacity-80">· {g.accepted ? $t('recovery.set.agreed') : $t('recovery.set.waitingConsent')}</span>
@@ -133,7 +133,7 @@
     <p class="text-sm">{$t('recovery.set.effective', { threshold: effective.threshold, total: effective.guardians.length })}</p>
     {@render chips(effective.guardians)}
   {:else if !pending}
-    <p class="text-sm text-zinc-500">{$t('recovery.set.none')}</p>
+    <p class="text-sm text-surfaceMuted">{$t('recovery.set.none')}</p>
   {/if}
 
   {#if pending}
@@ -153,12 +153,12 @@
       onclick={startEditing}
     >{current ? $t('recovery.set.edit') : $t('recovery.set.create')}</button>
   {:else}
-    <p class="text-xs text-zinc-500">{$t('recovery.set.tip')}</p>
+    <p class="text-xs text-surfaceMuted">{$t('recovery.set.tip')}</p>
 
     <div>
       <h3 class="mb-1 text-sm font-semibold">{$t('recovery.set.partners')}</h3>
       {#if partners.length === 0}
-        <p class="text-xs text-zinc-500">{$t('recovery.set.noPartners')}</p>
+        <p class="text-xs text-surfaceMuted">{$t('recovery.set.noPartners')}</p>
       {:else}
         <div class="flex max-h-48 flex-wrap gap-2 overflow-y-auto">
           {#each partners as p (p.id)}
@@ -195,11 +195,11 @@
         <h3 class="mb-1 text-sm font-semibold">{$t('recovery.set.chosen')}</h3>
         <ul class="flex flex-wrap gap-2">
           {#each chosen as c (c.id)}
-            <li class="flex items-center gap-1 rounded-full bg-zinc-100 dark:bg-zinc-800 px-3 py-1 text-sm">
+            <li class="flex items-center gap-1 rounded-full bg-surface2 px-3 py-1 text-sm">
               {c.username}
               <button
                 type="button"
-                class="text-zinc-500 hover:text-rose-600"
+                class="text-surfaceMuted hover:text-rose-600"
                 aria-label={$t('recovery.set.remove')}
                 onclick={() => toggle(c)}
               >×</button>
@@ -210,7 +210,7 @@
     {/if}
 
     {#if chosen.length < MIN_THRESHOLD}
-      <p class="text-xs text-zinc-500">{$t('recovery.set.minGuardians')}</p>
+      <p class="text-xs text-surfaceMuted">{$t('recovery.set.minGuardians')}</p>
     {:else}
       <label class="flex flex-wrap items-center gap-2 text-sm">
         <span>{$t('recovery.set.threshold')}</span>
@@ -219,11 +219,11 @@
             <option value={k}>{k}</option>
           {/each}
         </select>
-        <span class="text-zinc-500">{$t('recovery.set.thresholdOf', { threshold, total: chosen.length })}</span>
+        <span class="text-surfaceMuted">{$t('recovery.set.thresholdOf', { threshold, total: chosen.length })}</span>
       </label>
     {/if}
 
-    <p class="text-xs text-zinc-500">{$t('recovery.set.delayNote')}</p>
+    <p class="text-xs text-surfaceMuted">{$t('recovery.set.delayNote')}</p>
     <button
       class="rounded-full bg-gradient-to-br from-barbi to-mpink px-4 py-2 text-sm font-bold text-gold hover:brightness-110 disabled:opacity-40"
       disabled={busy || !canSave}

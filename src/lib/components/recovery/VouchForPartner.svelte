@@ -49,9 +49,9 @@
   }
 </script>
 
-<section class="space-y-3 rounded-xl border border-zinc-200 dark:border-zinc-700 p-4 bg-white/60 dark:bg-zinc-900/40">
+<section class="space-y-3 rounded-xl border border-surfaceLine p-4 bg-surface text-surfaceInk">
   <h2 class="font-semibold text-goldink">{$t('recovery.vouch.title')}</h2>
-  <p class="text-sm text-zinc-500">{$t('recovery.vouch.desc')}</p>
+  <p class="text-sm text-surfaceMuted">{$t('recovery.vouch.desc')}</p>
   <form class="flex gap-2" onsubmit={(e) => { e.preventDefault(); check(); }}>
     <input
       class="w-44 rounded-lg border border-zinc-300 dark:border-zinc-600 bg-transparent px-2 py-1 font-mono uppercase tracking-widest"
@@ -67,7 +67,7 @@
   </form>
 
   {#if request}
-    <div class="space-y-2 rounded-lg bg-zinc-50 p-3 text-sm dark:bg-zinc-800/60">
+    <div class="space-y-2 rounded-lg bg-surface2 p-3 text-sm">
       <p class="font-semibold">{$t('recovery.vouch.who', { name: request.username ?? $t('recovery.vouch.unknownUser') })}</p>
       <p>{$t('recovery.vouch.already', { count: request.vouchers.length, threshold: request.threshold })}</p>
       {#if request.protestedAt}

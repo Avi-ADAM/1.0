@@ -231,7 +231,8 @@ export const qidsAccess = {
   '43updateProfilePic': { allow: ['user', 'serviceAdmin'] },
   '44updateWelcomeCard': { allow: ['user', 'serviceAdmin'] },
   '45deleteMachshir': { allow: ['serviceAdmin'] }, // server-only callers
-  '46getMachshirByEndpoint': { allow: ['serviceAdmin'] }, // unreferenced in codebase (2026-07-18) — tightened to serviceAdmin-only
+  '46getMachshirByEndpoint': { allow: ['serviceAdmin'] }, // registerPushDevice dedupe
+  '467createMachshir': { allow: ['serviceAdmin'] }, // registerPushDevice — user bound server-side
   '47GetGiftById': { allow: ['serviceAdmin'] }, // unreferenced in codebase (2026-07-18) — tightened to serviceAdmin-only
   '48GetServiceById': { allow: ['user', 'serviceAdmin'] },
   '49GetProjectById': { allow: ['user', 'serviceAdmin'] },

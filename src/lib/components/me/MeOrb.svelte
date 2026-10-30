@@ -23,6 +23,7 @@
    * @type {{
    *   title: string,
    *   accent: string,
+   *   featured?: boolean,
    *   icon?: string,
    *   href?: string,
    *   count?: number | null,
@@ -30,7 +31,8 @@
    *   actions?: import('svelte').Snippet
    * }}
    */
-  let { title, accent, icon = '', href, count = null, children, actions } = $props();
+  let { title, accent, featured = false, icon = '', href, count = null, children, actions } =
+    $props();
 
   const uid = $props.id();
 </script>
@@ -38,7 +40,7 @@
 <!-- The wrapper is the size container: an element's own cqi resolve against
      its *ancestor*, so the circle cannot measure itself. -->
 <div class="orb-wrap">
-  <section class="orb" style:--accent={accent} aria-labelledby="{uid}-t">
+  <section class="orb" class:featured style:--accent={accent} aria-labelledby="{uid}-t">
     <div class="orb-head">
       {#if href}
         <a {href} id="{uid}-t" class="orb-title" data-sveltekit-preload-data>
@@ -120,6 +122,22 @@
     box-shadow:
       0 6px 18px rgba(0, 0, 0, 0.45),
       0 0 30px -6px color-mix(in srgb, var(--accent) 70%, transparent);
+  }
+
+  /* The one circle the page is about: a full-strength ring and a wider halo,
+     so it reads first among ten of the same size. */
+  .orb.featured {
+    border: max(4px, 2.2cqi) solid var(--accent);
+    box-shadow:
+      0 6px 18px rgba(0, 0, 0, 0.14),
+      0 0 0 max(2px, 0.8cqi) color-mix(in srgb, var(--accent) 30%, transparent),
+      0 0 40px -4px color-mix(in srgb, var(--accent) 80%, transparent);
+  }
+  :global(.dark) .orb.featured {
+    box-shadow:
+      0 6px 18px rgba(0, 0, 0, 0.45),
+      0 0 0 max(2px, 0.8cqi) color-mix(in srgb, var(--accent) 35%, transparent),
+      0 0 44px -4px color-mix(in srgb, var(--accent) 85%, transparent);
   }
 
   .orb-head {

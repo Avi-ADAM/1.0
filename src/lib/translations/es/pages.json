@@ -312,7 +312,16 @@
       "Jueves",
       "Viernes",
       "Sábado"
-    ]
+    ],
+    "nutiOn": "Las notificaciones están activadas en este dispositivo",
+    "nutiTurnOff": "Desactivar las notificaciones en este dispositivo",
+    "nutiOff": "Las notificaciones están desactivadas en este dispositivo",
+    "nutiBlocked": "Las notificaciones están bloqueadas en este navegador. Puedes permitirlas en la configuración del sitio del navegador.",
+    "nutiUnsupported": "Este navegador no admite notificaciones",
+    "saved": "Cambios guardados",
+    "deleteKeyConfirm": "¿Eliminar la clave «{{name}}»?",
+    "keyDeleted": "Clave eliminada",
+    "keyCreateError": "No se pudo crear la clave"
   },
   "editPic": {
     "myThing": "Mis {{name}}",
@@ -369,7 +378,35 @@
     "title": "Ajustes",
     "back": "← Volver al perfil",
     "onboarding": "Abrir la guía de incorporación",
-    "onboardingDesc": "Volver a pasar por el proceso de incorporación de 1💗1"
+    "onboardingDesc": "Volver a pasar por el proceso de incorporación de 1💗1",
+    "subtitle": "Tu perfil, preferencias y conexiones - en un solo lugar",
+    "navLabel": "Ir a una sección de los ajustes",
+    "sections": {
+      "profile": "Perfil",
+      "preferences": "Preferencias",
+      "notifications": "Notificaciones",
+      "connections": "Conexiones",
+      "security": "Seguridad",
+      "help": "Ayuda y guía",
+      "account": "Cuenta"
+    },
+    "sectionsDesc": {
+      "profile": "Lo que los demás miembros ven de ti",
+      "preferences": "Idioma, traducción, moneda y visualización",
+      "notifications": "Dónde y cómo mantenerte al tanto",
+      "connections": "Cuentas, agentes de IA y claves de acceso",
+      "security": "Identidad, recuperación de la cuenta y contraseña",
+      "help": "Volver a conocer 1💗1"
+    },
+    "pushTitle": "Notificaciones en este dispositivo",
+    "pushDesc": "Notificaciones de este navegador, incluso con el sitio cerrado",
+    "telegramDesc": "Novedades directamente en Telegram a través del bot de 1💗1",
+    "emailTitle": "Correo",
+    "emailDesc": "Novedades y recordatorios en tu correo",
+    "passwordDesc": "Cambiar la contraseña con la que entras a la cuenta",
+    "tourTitle": "Recorrido guiado",
+    "tourDesc": "Explicaciones breves que aparecen en las pantallas mientras usas el sitio",
+    "logoutDesc": "Cerrar sesión en este navegador"
   },
   "salesCenter": {
     "title": "Mis productos",

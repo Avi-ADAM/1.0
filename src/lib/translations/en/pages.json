@@ -311,7 +311,16 @@
       "Thursday",
       "Friday",
       "Saturday"
-    ]
+    ],
+    "nutiOn": "Notifications are on for this device",
+    "nutiTurnOff": "Turn off notifications on this device",
+    "nutiOff": "Notifications are off for this device",
+    "nutiBlocked": "Notifications are blocked in this browser. You can allow them in the browser’s site settings.",
+    "nutiUnsupported": "This browser does not support notifications",
+    "saved": "Changes saved",
+    "deleteKeyConfirm": "Delete the key \"{{name}}\"?",
+    "keyDeleted": "Key deleted",
+    "keyCreateError": "Could not create the key"
   },
   "editPic": {
     "myThing": "My {{name}}",
@@ -368,7 +377,35 @@
     "title": "Settings",
     "back": "← Back to profile",
     "onboarding": "Open onboarding",
-    "onboardingDesc": "Go through the 1💗1 onboarding flow again"
+    "onboardingDesc": "Go through the 1💗1 onboarding flow again",
+    "subtitle": "Your profile, preferences and connections - in one place",
+    "navLabel": "Jump to a settings section",
+    "sections": {
+      "profile": "Profile",
+      "preferences": "Preferences",
+      "notifications": "Notifications",
+      "connections": "Connections",
+      "security": "Security",
+      "help": "Help & guidance",
+      "account": "Account"
+    },
+    "sectionsDesc": {
+      "profile": "What other members see about you",
+      "preferences": "Language, translation, currency and display",
+      "notifications": "Where and how to keep you posted",
+      "connections": "Accounts, AI agents and access keys",
+      "security": "Identity, account recovery and password",
+      "help": "Get to know 1💗1 again"
+    },
+    "pushTitle": "Notifications on this device",
+    "pushDesc": "Notifications from this browser, even when the site is closed",
+    "telegramDesc": "Updates straight to Telegram through the 1💗1 bot",
+    "emailTitle": "Email",
+    "emailDesc": "Updates and reminders to your inbox",
+    "passwordDesc": "Change the password you sign in with",
+    "tourTitle": "Guided tour",
+    "tourDesc": "Short explanations that appear on screens as you use the site",
+    "logoutDesc": "Sign out of your account in this browser"
   },
   "salesCenter": {
     "title": "My Products",

@@ -8,11 +8,11 @@
 </script>
 
 <div
-  class="flex w-full items-center justify-between gap-3 flex-wrap rounded-xl border border-zinc-200 dark:border-zinc-700 p-4 bg-white/60 dark:bg-zinc-900/40"
+  class="flex w-full items-center justify-between gap-3 flex-wrap rounded-xl border border-surfaceLine p-4 bg-surface text-surfaceInk"
 >
   <div class="min-w-0 flex-1">
     <p class="font-medium text-goldink">🛡️ {$t('recovery.banner.title')}</p>
-    <p class="text-sm text-zinc-500">{$t('recovery.banner.desc')}</p>
+    <p class="text-sm text-surfaceMuted">{$t('recovery.banner.desc')}</p>
   </div>
   <a
     href="/me/settings/recovery"

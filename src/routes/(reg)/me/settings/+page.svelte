@@ -14,7 +14,8 @@
     adoptFromProfile
   } from '$lib/stores/autoTranslate.js';
   import CurrencyPicker from '$lib/components/money/CurrencyPicker.svelte';
-  import RecoveryBanner from '$lib/components/recovery/RecoveryBanner.svelte';
+  import SettingsRow from '$lib/components/settings/SettingsRow.svelte';
+  import { SETTINGS_SECTIONS, btnSecondary } from '$lib/components/settings/ui.js';
   import { useMoney, setDisplayCurrency, adoptCurrencyFromProfile } from '$lib/money/context.svelte';
   import { formatMoney } from '$lib/money/format.js';
   let { data } = $props();
@@ -164,142 +165,23 @@
     >{$t('pages.meSettings.back')}</a
   >
 
-  <h1 class="text-2xl font-bold mt-4 mb-6 text-center text-goldink">
-    {$t('pages.meSettings.title')}
-  </h1>
+  <header class="mt-4 mb-5 text-center">
+    <h1 class="text-2xl font-bold text-goldink">{$t('pages.meSettings.title')}</h1>
+    <p class="mt-1 text-sm text-goldink">{$t('pages.meSettings.subtitle')}</p>
+  </header>
 
-  <div
-    class="mb-6 flex items-center justify-between gap-3 flex-wrap rounded-xl border border-zinc-200 dark:border-zinc-700 p-4 bg-white/60 dark:bg-zinc-900/40"
-  >
-    <div>
-      <p class="font-medium text-goldink">{$t('pages.meSettings.onboarding')}</p>
-      <p class="text-sm text-zinc-500">{$t('pages.meSettings.onboardingDesc')}</p>
-    </div>
-    <a
-      href="/onboard"
-      data-sveltekit-prefetch
-      class="shrink-0 px-4 py-2 rounded-full bg-gradient-to-br from-barbi to-mpink text-gold font-bold hover:brightness-110"
-    >
-      {$t('pages.meSettings.onboarding')}
-    </a>
-  </div>
-
-  <div
-    class="mb-6 flex items-center justify-between gap-3 flex-wrap rounded-xl border border-zinc-200 dark:border-zinc-700 p-4 bg-white/60 dark:bg-zinc-900/40"
-  >
-    <div class="min-w-0">
-      <p class="font-medium text-goldink">🤖 {$t('mcp.banner.title')}</p>
-      <p class="text-sm text-zinc-500">{$t('mcp.banner.desc')}</p>
-    </div>
-    <!-- `goldink`, not `gold`: the card sits on a white surface, where --gold
-         renders at ~1.2:1 and is effectively invisible (see tailwind.config). -->
-    <a
-      href="/me/settings/mcp"
-      data-sveltekit-prefetch
-      class="shrink-0 px-4 py-2 rounded-full border border-goldink text-goldink font-bold hover:bg-goldink/10"
-    >
-      {$t('mcp.banner.cta')}
-    </a>
-  </div>
-
-  <div class="mb-6">
-    <RecoveryBanner />
-  </div>
-
-  <div
-    class="mb-6 rounded-xl border border-zinc-200 dark:border-zinc-700 p-4 bg-white/60 dark:bg-zinc-900/40"
-  >
-    <div class="flex items-center justify-between gap-3 flex-wrap">
-      <div class="min-w-0">
-        <p class="font-medium text-goldink flex items-center gap-2">
-          <GithubIcon width={18} />
-          {$t('rikmaCode.account.title')}
-        </p>
-        <p class="text-sm text-zinc-500 mt-1">{$t('rikmaCode.account.desc')}</p>
-        {#if githubLogin}
-          <p class="text-sm mt-1 font-medium">
-            <bdi dir="ltr">{$t('rikmaCode.account.linkedAs', { login: githubLogin })}</bdi>
-          </p>
-        {/if}
-      </div>
-      {#if githubLogin}
-        <button
-          class="shrink-0 px-4 py-2 rounded-full border border-zinc-400 text-zinc-600 dark:text-zinc-300 font-bold hover:bg-zinc-500/10 disabled:opacity-50"
-          onclick={unlinkGithub}
-          disabled={unlinking}
-        >
-          {$t('rikmaCode.account.unlink')}
-        </button>
-      {:else}
-        <a
-          href={`${data.githubConnectBase ?? ''}/api/v1/github/connect?intent=link&return=${encodeURIComponent(page.url.origin)}`}
-          data-sveltekit-reload
-          class="shrink-0 px-4 py-2 rounded-full border border-goldink text-goldink font-bold hover:bg-goldink/10"
-        >
-          {$t('rikmaCode.account.link')}
-        </a>
-      {/if}
-    </div>
-    {#if githubNoticeText}
-      <p class="text-sm mt-2 text-zinc-600 dark:text-zinc-300" role="status">{githubNoticeText}</p>
-    {/if}
-    {#if unlinkError}
-      <p class="text-sm mt-2 text-red-600" role="alert">{unlinkError}</p>
-    {/if}
-  </div>
-
-  <!-- Translation of what *other members* wrote (PLAN_UGC_TRANSLATION §4.4).
-       Separate from the display-language picker inside <EditB> on purpose:
-       that one chooses the language of the site's own chrome; this one only
-       says what to do with text the platform did not write. Saved to
-       localStorage for the first paint and mirrored to the profile on a
-       debounce, so it follows the account to the next device. -->
-  <div
-    class="mb-6 rounded-xl border border-zinc-200 dark:border-zinc-700 p-4 bg-white/60 dark:bg-zinc-900/40"
-  >
-    <p class="font-medium text-goldink">🌐 {$t('translated.pref.title')}</p>
-    <p class="text-sm text-zinc-500 mt-1">{$t('translated.pref.desc')}</p>
-
-    <div class="mt-3 flex flex-col gap-2">
-      {#each AUTO_TRANSLATE_VALUES as value (value)}
-        <label class="flex items-start gap-2 text-sm cursor-pointer">
-          <input
-            type="radio"
-            name="autoTranslate"
-            {value}
-            checked={$autoTranslate === value}
-            onchange={() => setAutoTranslate(value)}
-            class="mt-1 shrink-0"
-          />
-          <span>{$t(`translated.pref.${value}`)}</span>
-        </label>
-      {/each}
-    </div>
-
-    <p class="text-xs text-zinc-400 mt-2">{$t('translated.pref.saved')}</p>
-  </div>
-
-  <!-- The reader's currency (PLAN_MULTI_CURRENCY D-C9). Everyone writes in their
-       own currency; this only chooses what *this* reader sees amounts in. The
-       cookie makes the next server render right, the account copy follows. -->
-  <div
-    class="mb-6 rounded-xl border border-zinc-200 dark:border-zinc-700 p-4 bg-white/60 dark:bg-zinc-900/40"
-  >
-    <p class="font-medium text-goldink">💱 {$t('money.pref.title')}</p>
-    <p class="text-sm text-zinc-500 mt-1">{$t('money.pref.desc')}</p>
-    <div class="mt-3 flex flex-wrap items-center gap-3">
-      <CurrencyPicker
-        id="display-currency"
-        ariaLabel={$t('money.pref.title')}
-        bind:value={currencyVal}
-        onchange={(code) => setDisplayCurrency(money, code)}
-      />
-      <span class="text-sm text-zinc-500" dir="ltr">{formatMoney(100, 'ILS', money.lang)} = {money.fmt(100, 'ILS')}</span>
-    </div>
-    <p class="text-xs text-zinc-400 mt-2">
-      {money.chosen ? $t('money.pref.saved') : $t('money.pref.guessed')}
-    </p>
-  </div>
+  <!-- Jump links to each section; the sections themselves render in <EditB>. -->
+  <nav aria-label={$t('pages.meSettings.navLabel')} class="mb-6 flex flex-wrap justify-center gap-2">
+    {#each SETTINGS_SECTIONS as s (s.id)}
+      <a
+        href="#{s.id}"
+        class="inline-flex items-center gap-1.5 rounded-full border border-surfaceLine bg-surface px-3 py-1.5 text-sm font-medium text-surfaceInk hover:border-goldink"
+      >
+        <span aria-hidden="true">{s.icon}</span>
+        {$t(`pages.meSettings.sections.${s.id}`)}
+      </a>
+    {/each}
+  </nav>
 
   {#if meData}
     <EditB
@@ -322,6 +204,86 @@
       bi={meData.bio}
       {onMessage}
       {onGuid}
-    />
+    >
+      <!-- Translation of what *other members* wrote (PLAN_UGC_TRANSLATION §4.4).
+           Separate from the display-language picker on purpose: that one
+           chooses the language of the site's own chrome; this one only says
+           what to do with text the platform did not write. Saved to
+           localStorage for the first paint and mirrored to the profile on a
+           debounce, so it follows the account to the next device. -->
+      {#snippet translationPref()}
+        <SettingsRow title="🌐 {$t('translated.pref.title')}" desc={$t('translated.pref.desc')}>
+          <div class="flex flex-col gap-2">
+            {#each AUTO_TRANSLATE_VALUES as value (value)}
+              <label class="flex items-start gap-2 text-sm cursor-pointer text-surfaceInk">
+                <input
+                  type="radio"
+                  name="autoTranslate"
+                  {value}
+                  checked={$autoTranslate === value}
+                  onchange={() => setAutoTranslate(value)}
+                  class="mt-1 shrink-0 accent-barbi"
+                />
+                <span>{$t(`translated.pref.${value}`)}</span>
+              </label>
+            {/each}
+          </div>
+          <p class="text-xs text-surfaceMuted mt-2">{$t('translated.pref.saved')}</p>
+        </SettingsRow>
+      {/snippet}
+
+      <!-- The reader's currency (PLAN_MULTI_CURRENCY D-C9). Everyone writes in
+           their own currency; this only chooses what *this* reader sees amounts
+           in. The cookie makes the next server render right, the account copy
+           follows. -->
+      {#snippet currencyPref()}
+        <SettingsRow title="💱 {$t('money.pref.title')}" desc={$t('money.pref.desc')}>
+          <div class="flex flex-wrap items-center gap-3">
+            <CurrencyPicker
+              id="display-currency"
+              ariaLabel={$t('money.pref.title')}
+              bind:value={currencyVal}
+              onchange={(code) => setDisplayCurrency(money, code)}
+            />
+            <span class="text-sm text-surfaceMuted" dir="ltr">{formatMoney(100, 'ILS', money.lang)} = {money.fmt(100, 'ILS')}</span>
+          </div>
+          <p class="text-xs text-surfaceMuted mt-2">
+            {money.chosen ? $t('money.pref.saved') : $t('money.pref.guessed')}
+          </p>
+        </SettingsRow>
+      {/snippet}
+
+      {#snippet githubAccount()}
+        <SettingsRow title={$t('rikmaCode.account.title')} desc={$t('rikmaCode.account.desc')}>
+          {#snippet icon()}<GithubIcon width={18} />{/snippet}
+          {#snippet action()}
+            {#if githubLogin}
+              <button class={btnSecondary} onclick={unlinkGithub} disabled={unlinking}>
+                {$t('rikmaCode.account.unlink')}
+              </button>
+            {:else}
+              <a
+                href={`${data.githubConnectBase ?? ''}/api/v1/github/connect?intent=link&return=${encodeURIComponent(page.url.origin)}`}
+                data-sveltekit-reload
+                class={btnSecondary}
+              >
+                {$t('rikmaCode.account.link')}
+              </a>
+            {/if}
+          {/snippet}
+          {#if githubLogin}
+            <p class="text-sm font-medium text-surfaceInk">
+              <bdi dir="ltr">{$t('rikmaCode.account.linkedAs', { login: githubLogin })}</bdi>
+            </p>
+          {/if}
+          {#if githubNoticeText}
+            <p class="text-sm mt-2 text-surfaceMuted" role="status">{githubNoticeText}</p>
+          {/if}
+          {#if unlinkError}
+            <p class="text-sm mt-2 text-red-600" role="alert">{unlinkError}</p>
+          {/if}
+        </SettingsRow>
+      {/snippet}
+    </EditB>
   {/if}
 </main>

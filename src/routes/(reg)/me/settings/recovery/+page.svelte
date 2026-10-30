@@ -49,7 +49,7 @@
   </a>
 
   <h1 class="text-2xl font-bold text-center text-goldink">{$t('recovery.title')}</h1>
-  <p class="text-sm text-zinc-600 dark:text-zinc-400">{$t('recovery.intro')}</p>
+  <p class="text-sm text-[var(--tm)]">{$t('recovery.intro')}</p>
 
   {#if error}
     <p class="rounded-lg bg-amber-50 p-3 text-sm text-amber-800" role="alert">{error}</p>

@@ -118,7 +118,8 @@
       {
         key: 'rikmas',
         title: $t('lev.hevel.freemates'),
-        accent: '#e6007e',
+        accent: '#d4a017',
+        featured: true,
         icon: '🧶',
         items: (user.projects_1s?.data ?? []).map((p) => ({
           name: p.attributes.projectName,
@@ -129,8 +130,8 @@
       chips('missions', $t('lev.hevel.doneMissions'), '#7c3aed', '🛠️', doneMissions.map((name) => ({ name }))),
       chips('skills', $t('lev.hevel.skills'), '#16a34a', '🧠', names(user.skills?.data, 'skillName').map((name) => ({ name }))),
       chips('roles', $t('lev.hevel.roles'), '#db2777', '🎭', names(user.tafkidims?.data, 'roleDescription').map((name) => ({ name }))),
-      chips('resources', $t('lev.hevel.resources'), '#4f46e5', '🧰', (user.sps?.data ?? []).map((s) => ({ name: s.attributes.name }))),
-      chips('values', $t('lev.hevel.values'), '#ca8a04', '💛', names(user.vallues?.data, 'valueName').map((name) => ({ name }))),
+      chips('resources', $t('lev.hevel.resources'), '#8a9a0b', '🧰', (user.sps?.data ?? []).map((s) => ({ name: s.attributes.name }))),
+      chips('values', $t('lev.hevel.values'), '#c026d3', '💛', names(user.vallues?.data, 'valueName').map((name) => ({ name }))),
       chips('workways', $t('lev.hevel.waysOfCreation'), '#0d9488', '🌿', names(user.work_ways?.data, 'workWayName').map((name) => ({ name })))
     ].filter((o) => o.items.length > 0);
   });
@@ -278,7 +279,7 @@
             style:--from-y={p ? `${ring.center.y - p.y}px` : '0px'}
             style={p ? `left:${p.x - ring.size / 2}px;top:${p.y - ring.size / 2}px;width:${ring.size}px` : null}
           >
-            <MeOrb title={orb.title} accent={orb.accent} icon={orb.icon} count={orb.items.length}>
+            <MeOrb title={orb.title} accent={orb.accent} featured={orb.featured} icon={orb.icon} count={orb.items.length}>
               {@render orb.body(orb)}
             </MeOrb>
           </div>

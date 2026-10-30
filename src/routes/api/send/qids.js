@@ -1873,10 +1873,17 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
     machshirs(filters: { jsoni: { contains: $endpoint }}) {
       data {
         id
+        attributes { users_permissions_user { data { id } } }
       }
     }
   }`
   ,
+  // registerPushDevice only — the user is bound by the action, never a param.
+  '467createMachshir': `mutation createMachshir($uid: ID!, $jsoni: JSON!, $publishedAt: DateTime!) {
+    createMachshir(data: { users_permissions_user: $uid, jsoni: $jsoni, publishedAt: $publishedAt }) {
+      data { id }
+    }
+  }`,
   '47GetGiftById': `query GetGiftById($id: ID!) {
     matanot(id: $id) {
       data {

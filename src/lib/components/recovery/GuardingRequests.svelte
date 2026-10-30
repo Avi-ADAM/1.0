@@ -27,13 +27,13 @@
 </script>
 
 {#if guarding.length > 0}
-  <section class="space-y-3 rounded-xl border border-zinc-200 dark:border-zinc-700 p-4 bg-white/60 dark:bg-zinc-900/40">
+  <section class="space-y-3 rounded-xl border border-surfaceLine p-4 bg-surface text-surfaceInk">
     <h2 class="font-semibold text-goldink">{$t('recovery.guarding.title')}</h2>
-    <p class="text-sm text-zinc-500">{$t('recovery.guarding.desc')}</p>
+    <p class="text-sm text-surfaceMuted">{$t('recovery.guarding.desc')}</p>
     <ul class="space-y-2">
       {#each guarding as g (g.ownerId)}
         {@const name = g.username ?? $t('recovery.vouch.unknownUser')}
-        <li class="flex flex-wrap items-center gap-2 rounded-lg bg-zinc-50 p-3 text-sm dark:bg-zinc-800/60">
+        <li class="flex flex-wrap items-center gap-2 rounded-lg bg-surface2 p-3 text-sm">
           <span class="min-w-0 flex-1">
             {#if g.stance === 'accepted'}
               ✓ {$t('recovery.guarding.youGuard', { name })}

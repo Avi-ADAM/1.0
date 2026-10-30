@@ -554,8 +554,8 @@
   const EDITOR_OF = {
     a1: { key: 'skills', accent: '#16a34a' },
     a2: { key: 'tafkidims', accent: '#db2777' },
-    a3: { key: 'mashaabims', accent: '#4f46e5' },
-    a4: { key: 'vallues', accent: '#ca8a04' },
+    a3: { key: 'mashaabims', accent: '#8a9a0b' },
+    a4: { key: 'vallues', accent: '#c026d3' },
     a5: { key: 'workWays', accent: '#0d9488' }
   };
   /** Close the open editor the way its own cancel button does. */
@@ -569,13 +569,16 @@
    * resources, values, ways of working). Someone who came only to order
    * something gets the concierge first — the rest of their profile is empty.
    */
+  // Ten circles, ten hues — two neighbours of one hue read as one list. Gold is
+  // the rikmas' alone (and `featured` rings it brighter): they are what the
+  // whole profile is for.
   let orbs = $derived.by(() => {
     const doing = [
-      { key: 'rikmas', title: $t('pages.me.myfr'), accent: '#e6007e', icon: '🧶', count: meData?.projects_1s?.data?.length ?? 0, tour: $t('pages.me.message9'), body: rikmasOrb, actions: rikmasActions },
+      { key: 'rikmas', title: $t('pages.me.myfr'), accent: '#d4a017', featured: true, icon: '🧶', count: meData?.projects_1s?.data?.length ?? 0, tour: $t('pages.me.message9'), body: rikmasOrb, actions: rikmasActions },
       { key: 'missions', title: $t('me.orbit.missions'), accent: '#7c3aed', icon: '🛠️', href: '/me/offerings', count: counts?.missions ?? null, tour: $t('me.orbit.missionsTour'), body: missionsOrb, actions: missionsActions },
       { key: 'acts', title: $t('me.orbit.acts'), accent: '#0284c7', icon: '✅', href: '/myacts', count: counts?.acts ?? null, tour: $t('me.orbit.actsTour'), body: actsOrb, actions: actsActions },
       { key: 'products', title: $t('me.orbit.products'), accent: '#ea580c', icon: '🎁', href: '/deals/sales-center', count: counts?.products ?? null, tour: $t('me.orbit.productsTour'), body: productsOrb, actions: productsActions },
-      { key: 'concierge', title: $t('me.concierge.title'), accent: '#b38728', icon: '🛎️', href: '/concierge', tour: $t('me.orbit.conciergeTour'), body: conciergeOrb, actions: conciergeActions }
+      { key: 'concierge', title: $t('me.concierge.title'), accent: '#64748b', icon: '🛎️', href: '/concierge', tour: $t('me.orbit.conciergeTour'), body: conciergeOrb, actions: conciergeActions }
     ];
     if (isConciergeCustomer) doing.unshift(...doing.splice(4, 1));
     const cat = (key, title, accent, icon, list, tour, editor) => ({
@@ -594,8 +597,8 @@
       ...doing,
       cat('skills', $t('pages.me.sk'), '#16a34a', '🧠', meData?.skills?.data, $t('pages.me.message2'), 'skills'),
       cat('roles', $t('pages.me.rl'), '#db2777', '🎭', meData?.tafkidims?.data, $t('pages.me.message3'), 'tafkidims'),
-      cat('resources', $t('pages.me.ms'), '#4f46e5', '🧰', meData?.sps?.data, $t('pages.me.message4'), 'mashaabims'),
-      cat('values', $t('pages.me.valuesLabel'), '#ca8a04', '💛', meData?.vallues?.data, $t('pages.me.message5'), 'vallues'),
+      cat('resources', $t('pages.me.ms'), '#8a9a0b', '🧰', meData?.sps?.data, $t('pages.me.message4'), 'mashaabims'),
+      cat('values', $t('pages.me.valuesLabel'), '#c026d3', '💛', meData?.vallues?.data, $t('pages.me.message5'), 'vallues'),
       cat('workways', $t('pages.me.ww'), '#0d9488', '🌿', meData?.work_ways?.data, $t('pages.me.message6'), 'workWays')
     ];
   });
@@ -915,7 +918,7 @@
       showSaveDialog = false;
       // Resume guide → profilManualAlready=false
       await executeAction('toggleGuideStatus', { show: true });
-      document.cookie = `guidMe=again; expires=${new Date(2027, 0, 1).toUTCString()}; path=/`;
+      document.cookie = `guidMe=again; expires=${new Date(Date.now() + 365 * 864e5).toUTCString()}; path=/`;
       run();
     }}
     onClearTimer={async () => {
@@ -923,7 +926,7 @@
       isG = true; // Mark as viewed without showing
       // Stop guide → profilManualAlready=true
       await executeAction('toggleGuideStatus', { show: false });
-      document.cookie = `guidMe=done; expires=${new Date(2027, 0, 1).toUTCString()}; path=/`;
+      document.cookie = `guidMe=done; expires=${new Date(Date.now() + 365 * 864e5).toUTCString()}; path=/`;
     }}
   />
   <DialogOverlay style="z-index: 700;" {isOpen} onDismiss={closer}>
@@ -1084,6 +1087,7 @@
                 <MeOrb
                   title={orb.title}
                   accent={orb.accent}
+                  featured={orb.featured}
                   icon={orb.icon}
                   href={orb.href}
                   count={orb.count}

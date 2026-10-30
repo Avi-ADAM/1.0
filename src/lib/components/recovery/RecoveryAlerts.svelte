@@ -38,14 +38,14 @@
     <h2 class="font-semibold text-rose-700 dark:text-rose-300">{$t('recovery.alerts.title')}</h2>
     <p class="text-sm text-rose-800 dark:text-rose-200">{$t('recovery.alerts.desc')}</p>
     {#each others as r (r.devicePubKey)}
-      <div class="space-y-1 rounded-lg bg-white/70 p-3 text-sm dark:bg-zinc-900/60">
+      <div class="space-y-1 rounded-lg bg-surface p-3 text-sm text-surfaceInk">
         <p>{$t('recovery.alerts.fingerprint')}: <b class="font-mono" dir="ltr">{r.fingerprint}</b></p>
         {#if r.threshold}
           <p>{$t('recovery.alerts.vouches', { count: r.vouchers.length, threshold: r.threshold })}
             {#if r.vouchers.length}({r.vouchers.map((v) => v.username ?? v.id).join(', ')}){/if}</p>
         {/if}
         {#if r.readyAt}<p class="font-semibold">{$t('recovery.alerts.readyAt', { date: fmt(r.readyAt) })}</p>{/if}
-        {#if r.protestedAt}<p class="text-zinc-600 dark:text-zinc-400">{$t('recovery.alerts.protested', { date: fmt(r.protestedAt) })}</p>{/if}
+        {#if r.protestedAt}<p class="text-surfaceMuted">{$t('recovery.alerts.protested', { date: fmt(r.protestedAt) })}</p>{/if}
         <button
           class="mt-1 rounded-full bg-rose-600 px-4 py-1.5 font-bold text-white hover:bg-rose-700 disabled:opacity-40"
           disabled={busy}
@@ -53,6 +53,6 @@
         >{$t('recovery.alerts.protest')}</button>
       </div>
     {/each}
-    {#if message}<p class="text-sm" role="status">{message}</p>{/if}
+    {#if message}<p class="text-sm text-rose-800 dark:text-rose-200" role="status">{message}</p>{/if}
   </section>
 {/if}
