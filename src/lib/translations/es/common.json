@@ -223,5 +223,20 @@
   "publicLinks": "Enlaces públicos",
   "assignToMe": "Lo hago yo",
   "sessionCheckFailed": "No pudimos comprobar tu sesión ahora mismo — probablemente un fallo breve de red. Sigues conectado; inténtalo de nuevo.",
-  "retry": "Intentar de nuevo"
+  "retry": "Intentar de nuevo",
+  "goldenMeeting": {
+    "label": "Reunión de oro",
+    "openSite": "Sitio de reuniones",
+    "opensSite": "Se abre en el sitio de reuniones",
+    "hint": "La reunión de oro se fija en el sitio de reuniones: cada invitado la aprueba y empieza cuando todos están disponibles.",
+    "withAll": "Con todos los miembros de la rikma",
+    "byRole": "Por rol",
+    "byMission": "Con quien hace una misión",
+    "withCandidate": "Reunión de oro con la candidatura",
+    "withHolder": "Reunión de oro",
+    "empty": "Esta rikma aún no tiene misiones en curso.",
+    "loadError": "No se pudieron cargar los miembros de la rikma.",
+    "titleAll": "Reunión de oro · {{rikma}}",
+    "titleScoped": "{{scope}} · {{rikma}}"
+  }
 }

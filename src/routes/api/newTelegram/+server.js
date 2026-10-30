@@ -2072,7 +2072,7 @@ function buildMeetingAvailKeyboard(meetings, uid, lang) {
         rows.push([Markup.button.callback(getText('meetAvailAllOnBtn', lang), `meetAll-1-${uid}`)]);
         rows.push([Markup.button.callback(getText('meetAvailAllOffBtn', lang), `meetAll-0-${uid}`)]);
     }
-    rows.push([Markup.button.url(getText('meetAvailOpenSite', lang), 'https://1lev1.com/meeting')]);
+    rows.push([Markup.button.url(getText('meetAvailOpenSite', lang), 'https://meetings.1lev1.com/meeting')]);
     return Markup.inlineKeyboard(rows);
 }
 

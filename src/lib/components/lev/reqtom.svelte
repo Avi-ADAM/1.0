@@ -924,6 +924,7 @@
           >
             <div class="swiper-slidec mx-auto">
               <Card
+                candidateId={userId}
                 onTochat={tochat}
                 onAgree={() => agree()}
                 onDecline={() => decline()}
@@ -968,6 +969,7 @@
   {/if}
 {:else}
   <Card
+    candidateId={userId}
     onTochat={tochat}
     onAgree={() => agree()}
     onDecline={() => decline()}

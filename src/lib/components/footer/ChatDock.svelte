@@ -13,6 +13,7 @@
   import { nowChatId } from '$lib/stores/pendMisMes.js';
   import { isOnline, myUserMeeting } from '$lib/stores/pgishot';
   import OnlineSwitch from '$lib/celim/onlineSwitch.svelte';
+  import { goldenMeetingHref } from '$lib/meetings/goldenMeeting.js';
   import ChatSmall from './chatSmall.svelte';
 
   /**
@@ -20,11 +21,10 @@
    * @property {any} un
    * @property {number} [chatId]
    * @property {() => void} onClose
-   * @property {() => void} onNewMeeting
    */
 
   /** @type {Props} */
-  let { un, chatId = $bindable(0), onClose, onNewMeeting } = $props();
+  let { un, chatId = $bindable(0), onClose } = $props();
 
   const POS_KEY = 'chatDock.pos';
   const MARGIN = 8;
@@ -219,10 +219,13 @@
       onChange={onlineSwitcher}
     />
 
-    <button
-      type="button"
+    <!-- Golden meetings are created on the meetings app; the switch beside this
+         stays here so availability is one tap away. -->
+    <a
       class="cd-btn"
-      onclick={onNewMeeting}
+      href={goldenMeetingHref()}
+      target="_blank"
+      rel="noopener"
       title={$t('common.chat.newMeeting')}
       aria-label={$t('common.chat.newMeeting')}
     >
@@ -230,7 +233,7 @@
         <rect x="3" y="5" width="18" height="16" rx="2" />
         <path d="M16 3v4M8 3v4M3 10h18M12 13v5M9.5 15.5h5" />
       </svg>
-    </button>
+    </a>
 
     <button
       type="button"

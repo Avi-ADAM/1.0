@@ -47,7 +47,7 @@
     myacts: { href: '/myacts', icon: 'tasks' },
     timers: { href: '/timers', icon: 'timer' },
     calendar: { href: '/myCalander', icon: 'calendar' },
-    meeting: { href: '/meeting', icon: 'video' },
+    meeting: { href: 'https://meetings.1lev1.com/meeting', icon: 'video' },
     moach: { href: pid ? `/moach/${pid}/main` : '/moach', icon: 'moach' },
     moachCreate: { href: moachTab('create'), icon: 'add' },
     moachWork: { href: moachTab('progress'), icon: 'mission' },

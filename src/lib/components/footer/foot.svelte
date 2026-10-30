@@ -3,9 +3,8 @@
   import { initialForum } from '$lib/stores/pendMisMes.js';
   import { onMount } from 'svelte';
   import ChatDock from './ChatDock.svelte';
-  import { Drawer } from 'vaul-svelte';
-  import CreateNewMeeting from '../addnew/createNewMeeting.svelte';
   import { initiatePgishot } from '$lib/stores/pgishot';
+  import { goldenMeetingHref } from '$lib/meetings/goldenMeeting.js';
   import MobileFooter from './mobileFooter.svelte';
 
   let username = '';
@@ -17,18 +16,15 @@
       iwant = true;
       isChatOpen.set(true);
     } else {
-      newMeeting = false;
-      dialogOpen = true;
+      // New meetings are made on the meetings app (magik-meetings).
+      window.open(goldenMeetingHref(), '_blank', 'noopener');
     }
   }
-  let dialogOpen = $state(false);
   const close = () => {
-    dialogOpen = false;
     iwant = false;
     isChatOpen.set(false);
   };
   let loading = false;
-  let newMeeting = $state(false);
   /**
    * @typedef {Object} Props
    * @property {any} un
@@ -60,52 +56,8 @@
 </script>
 
 {#if isAuthed}
-  <div data-vaul-drawer-wrapper>
-    <Drawer.Root bind:open={dialogOpen} shouldScaleBackground>
-      <Drawer.Trigger />
-      <Drawer.Portal>
-        <Drawer.Overlay class="fixed inset-0 bg-black/40 z-[1000]" />
-        <Drawer.Content
-          class="fixed bottom-0 left-0 right-0 mt-24 flex max-h-[96%] flex-col rounded-t-[10px] z-[1000] bg-gold"
-        >
-          <div class="flex-1 rounded-t-[10px] p-4">
-            <div
-              class="mx-auto mb-8 h-1.5 w-12 flex-shrink-0 rounded-full bg-barbi"
-            ></div>
-
-            <div class="mx-auto d overflow-auto flex flex-col">
-              <div>
-                <div
-                  class="mx-auto h-[85vh] d overflow-auto flex flex-col z-[1001]"
-                >
-                  <!-- Wish creation moved to the /concierge flow; this drawer
-                       now only hosts the new-meeting form. -->
-                  <CreateNewMeeting
-                    onClose={() => {
-                      newMeeting = false;
-                      dialogOpen = false;
-                    }}
-                  />
-                </div>
-              </div>
-            </div>
-          </div></Drawer.Content
-        >
-      </Drawer.Portal>
-    </Drawer.Root>
-  </div>
-
   {#if $isChatOpen == true}
-    <ChatDock
-      bind:chatId
-      {un}
-      onClose={close}
-      onNewMeeting={() => {
-        isChatOpen.set(false);
-        newMeeting = true;
-        dialogOpen = true;
-      }}
-    />
+    <ChatDock bind:chatId {un} onClose={close} />
   {/if}
   <!--{#if isMobileOrTablet()}
 

@@ -123,7 +123,7 @@
         ['/myacts', 'The user’s act list across rikmas'],
         ['/timers', 'Timer control and history'],
         ['/myCalander', 'Shifts and dates'],
-        ['/meeting', 'Video meetings'],
+        ['https://meetings.1lev1.com/meeting', 'Golden meetings (separate meetings site; /meeting here redirects there)'],
         ['/deals', 'Deals overview'],
         ['/deals/sales-center', 'Sales reporting, customers, recurring sales'],
         ['/deals/request', 'Purchase request'],

@@ -21,6 +21,7 @@
   import { connectMoachRealtime } from '$lib/realtime/adapters/moach';
   import MoachTour from '$lib/components/moach/MoachTour.svelte';
   import PresenceBar from '$lib/components/moach/PresenceBar.svelte';
+  import GoldenMeetingMenu from '$lib/components/meetings/GoldenMeetingMenu.svelte';
   import { RikmaPresence } from '$lib/realtime/presence.svelte';
   import Dialog from '$lib/celim/ui/dialog.svelte';
   import { sendToSer } from '$lib/send/sendToSer.js';
@@ -518,6 +519,11 @@
         {#if presence}
           <PresenceBar {presence} memberCount={projectBase.user_1s?.data?.length ?? 0} />
         {/if}
+        <GoldenMeetingMenu
+          {projectId}
+          projectName={projectBase.projectName}
+          memberIds={(projectBase.user_1s?.data ?? []).map((u) => u.id)}
+        />
 
         <!-- Navigation: primary groups row + contextual sub-tabs row -->
         <div class="overflow-x-auto pt-2" dir={$isRtl ? 'rtl' : 'ltr'}>

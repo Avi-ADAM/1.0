@@ -1,6 +1,7 @@
 <script>
   import Money from '$lib/components/money/Money.svelte';
-  import { isRtl } from '$lib/translations';
+  import { isRtl, t } from '$lib/translations';
+  import GoldenMeetingLink from '$lib/components/meetings/GoldenMeetingLink.svelte';
   let isonly = $state(false);
   import RichText from '$lib/celim/ui/richText.svelte';
   import { onMount } from 'svelte';
@@ -238,6 +239,14 @@
                 </svg>
                 {data.attributes.users_permissions_user.data.attributes.username}
               </a>
+              <div class="mt-2">
+                <GoldenMeetingLink
+                  compact
+                  withIds={[data.attributes.users_permissions_user.data.id]}
+                  title={data.attributes.name}
+                  label={$t('common.goldenMeeting.withHolder')}
+                />
+              </div>
             </td>
           {/each}
         </tr>

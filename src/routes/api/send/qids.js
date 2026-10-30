@@ -3966,6 +3966,44 @@ ${PROMO_DECISION_FIELDS}
       }
     }
   }`,
+  // magik-meetings: a golden-meeting link (src/lib/meetings/goldenMeeting.js)
+  // arrives with participant ids; the create form needs their usernames to show
+  // and select them. Only id → username, the same pair a public /user page shows.
+  '465meetingInviteesByIds': `query MeetingInviteesByIds($ids: [ID]) {
+    usersPermissionsUsers(filters: { id: { in: $ids } }, pagination: { limit: 50 }) {
+      data {
+        id
+        attributes { username }
+      }
+    }
+  }`,
+  // Who a golden meeting can be called with, from inside a rikma: every member,
+  // and the holders of each running mission — grouped by mission and by role
+  // (GoldenMeetingMenu.svelte).
+  '466rikmaMeetingGroups': `query RikmaMeetingGroups($pid: ID!) {
+    project(id: $pid) {
+      data {
+        id
+        attributes {
+          projectName
+          user_1s { data { id attributes { username } } }
+          mesimabetahaliches(
+            filters: { and: [ { or: [ { finnished: { null: true } }, { finnished: { eq: false } } ] }, ${NOT_ARCHIVED} ] }
+            pagination: { limit: 200 }
+          ) {
+            data {
+              id
+              attributes {
+                name
+                users_permissions_user { data { id attributes { username } } }
+                tafkidims { data { id attributes { roleDescription } } }
+              }
+            }
+          }
+        }
+      }
+    }
+  }`,
   '64ClearPendingStart': `mutation ClearPendingStart($id: ID!) {
     updatePgisha(id: $id, data: { pendingStart: false }) {
       data {
@@ -10506,7 +10544,7 @@ export const moachQids = {
               }
             }
           }
-          rikmashes {
+          rikmashes(pagination: { limit: -1 }) {
             data {
               id
               attributes {
@@ -10515,7 +10553,7 @@ export const moachQids = {
               }
             }
           }
-          finnished_missions {
+          finnished_missions(pagination: { limit: -1 }) {
             data {
               id
               attributes {

@@ -222,5 +222,20 @@
   "publicLinks": "Public links",
   "assignToMe": "assign to me",
   "sessionCheckFailed": "We couldn't check your session just now — probably a brief network problem. You're still signed in; please try again.",
-  "retry": "Try again"
+  "retry": "Try again",
+  "goldenMeeting": {
+    "label": "Golden meeting",
+    "openSite": "Meetings site",
+    "opensSite": "Opens on the meetings site",
+    "hint": "A golden meeting is set on the meetings site: everyone invited approves, and it starts once all of them are available.",
+    "withAll": "With every member of the rikma",
+    "byRole": "By role",
+    "byMission": "With whoever does a mission",
+    "withCandidate": "Golden meeting with the candidate",
+    "withHolder": "Golden meeting",
+    "empty": "This rikma has no missions in progress yet.",
+    "loadError": "Couldn't load the rikma's members.",
+    "titleAll": "Golden meeting · {{rikma}}",
+    "titleScoped": "{{scope}} · {{rikma}}"
+  }
 }

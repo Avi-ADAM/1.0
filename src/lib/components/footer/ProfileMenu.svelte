@@ -2,6 +2,7 @@
   import { t } from '$lib/translations';
   import { goto } from '$app/navigation';
   import { DISCOVERY_LINKS } from './discoveryLinks.js';
+  import { meetingsAppUrl } from '$lib/meetings/goldenMeeting.js';
 
   /**
    * The footer's "more" menu. It is also the overflow home for the tabs the
@@ -206,8 +207,12 @@
               {$t('common.footer.calendar')}
             </span>
           </button>
-          <button
-            onclick={() => navigateTo('/meeting')}
+          <!-- Meetings live on the meetings app; this opens it in a new tab. -->
+          <a
+            href={meetingsAppUrl('/meeting')}
+            target="_blank"
+            rel="noopener"
+            onclick={closeMenu}
             class={itemCls}
             role="menuitem"
           >
@@ -215,7 +220,7 @@
             <span class="mx-2">
               {$t('common.footer.meeting')}
             </span>
-          </button>
+          </a>
 
           <!-- The secondary screens. Discovery has its own footer tab from
                400px up, so its entry only shows below that. -->

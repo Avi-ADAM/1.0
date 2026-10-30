@@ -63,7 +63,6 @@ const PAGES = [
   { path: '/gift', lastmod: '2026-08-13T00:00:00+00:00', priority: '0.90', changefreq: 'daily' },
   { path: '/demand', lastmod: '2026-08-13T00:00:00+00:00', priority: '0.90', changefreq: 'daily' },
   { path: '/quorum', lastmod: '2026-08-13T00:00:00+00:00', priority: '0.80', changefreq: 'weekly' },
-  { path: '/meeting', lastmod: '2026-08-13T00:00:00+00:00', priority: '0.70', changefreq: 'weekly' },
 
   // Explanatory pages
   { path: '/guid', lastmod: '2026-08-03T00:00:00+00:00', priority: '0.85', changefreq: 'monthly' },

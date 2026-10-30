@@ -334,6 +334,8 @@ export const qidsAccess = {
   '63CheckMeetingReadyStatus': { allow: ['user', 'serviceAdmin'] },
   '64ClearPendingStart': { allow: ['user', 'serviceAdmin'] },
   '172getMeetingMemberIds': { allow: ['user', 'serviceAdmin'] }, // meeting qid — magik-meetings guest-invite membership check
+  '465meetingInviteesByIds': { allow: ['user', 'serviceAdmin'] }, // called by magik-meetings (createNewMeeting.svelte, golden-meeting prefill) — not unreferenced
+  '466rikmaMeetingGroups': { allow: ['user', 'serviceAdmin'] }, // GoldenMeetingMenu.svelte
   'updateMeetingAvailability': { allow: ['user', 'serviceAdmin'] },
   '65GetAskById': { allow: ['user', 'serviceAdmin'] },
   '66CreateForumForAsk': { allow: ['user', 'serviceAdmin'] },

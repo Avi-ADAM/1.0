@@ -14,6 +14,7 @@
   import CardHeader from './CardHeader.svelte';
   import VoteStatusDisplay from './VoteStatusDisplay.svelte';
   import { getProjectData } from '$lib/stores/projectStore';
+  import GoldenMeetingLink from '$lib/components/meetings/GoldenMeetingLink.svelte';
 
   /**
    * @typedef {Object} Props
@@ -59,6 +60,7 @@
    * @property {() => void} [onProj]
    * @property {boolean} [selfNomination] - candidate-authored proposal (PLAN_SELF_NOMINATION)
    * @property {(() => void) | null} [onDismiss] - fully dismiss a self-nominated proposal
+   * @property {string|number|null} [candidateId] - the candidate's user id (golden meeting with them)
    */
 
   /** @type {Props} */
@@ -108,6 +110,8 @@
     // members get a full-dismiss option alongside approve/nego/chat.
     selfNomination = false,
     onDismiss = null,
+    // The candidate's user id — opens a golden meeting with them.
+    candidateId = null,
   } = $props();
 
   let user_1s = $derived.by(() => {
@@ -532,6 +536,16 @@
         <p class="text-gray-900 dark:text-white font-bold text-base mb-1">
           {useraplyname}
         </p>
+        {#if candidateId}
+          <div class="mb-1">
+            <GoldenMeetingLink
+              compact
+              withIds={[candidateId]}
+              title={`${openmissionName ?? ''} · ${useraplyname ?? ''}`}
+              label={$t('common.goldenMeeting.withCandidate')}
+            />
+          </div>
+        {/if}
         <!-- העיקר של הפעולה כשהמציע/ה עדיין לא ברקמה: האישור מצרף אותו/ה. -->
         {#if joinsRikma}
           <p class="text-xs text-emerald-700 dark:text-emerald-400 font-semibold">
