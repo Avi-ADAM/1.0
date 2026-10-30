@@ -1,7 +1,7 @@
 // Thin IndexedDB wrapper for storing identity, events, and pending sync items.
 // CryptoKey objects are structured-cloned into IndexedDB and remain non-extractable.
-
-import { browser } from '$app/environment';
+// No $app/* imports: the service worker loads this module (via swSign / swCosign),
+// and SvelteKit refuses to build a worker that imports $app/environment.
 
 const DB_NAME = 'freemates-crypto';
 const DB_VERSION = 3;
@@ -74,7 +74,7 @@ function req<T>(r: IDBRequest<T>): Promise<T> {
 }
 
 export async function idbGet<T = unknown>(store: StoreName, key: IDBValidKey): Promise<T | undefined> {
-  if (!browser && typeof indexedDB === 'undefined') return undefined;
+  if (typeof indexedDB === 'undefined') return undefined;
   const db = await openDb();
   const tx = db.transaction(store, 'readonly');
   return req<T>(tx.objectStore(store).get(key));
