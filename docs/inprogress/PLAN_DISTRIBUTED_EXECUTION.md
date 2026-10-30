@@ -103,7 +103,7 @@
 | 3 | B2 | ECDSA low-S בצד החותם (O-2) | S | — | ⬜ |
 | 4 | A1 | דגל Space לפי רקמה (allowlist בשרת) | M | — | ✔ |
 | 5 | A3 | טלמטריית אי-התאמות לשרת | M | A1 | ✔ |
-| 6 | A2 | הרחבת חתימות ה-shadow — באצוות | L | — | ◐ אצווה 1 (חלוקה) |
+| 6 | A2 | הרחבת חתימות ה-shadow — באצוות | L | — | ◐ אצווה 1 (חלוקה), אצווה 2 (טיימרים); פגישות ⏸ |
 | 7 | B6 | אימות התחייבויות אינקרמנטלי (O(n²) → O(n)) | M–L | — | ⬜ |
 | 8 | C0 | יישור Node 24 (Dockerfile, פיתוח) + גילוי יכולות PQ | S | — | ⬜ 🧑 (התקנה/deploy) |
 | 9 | B4 | מזהה מכשיר כטביעת אצבע (O-7) | L | — | ⬜ |
@@ -274,8 +274,8 @@ override של מפתחים; אחרת — הפרויקט ברשימה. עדכן �
 |---|---|
 | `tosplit.create` | `createTosplit` — ✔ אצווה 1 (ids בלבד: `halukaIds`, `saleIds`) |
 | `haluka.approve` / `haluka.confirm` | `approveHaluka` / `confirmHaluka` — ✔ אצווה 1, **סטטוס בלבד** (בלי `hervachDeltas` — ראו "ממצא היתרות"; confirm רק ב-`kind:'receive'`) |
-| `pgisha.create` / `pgisha.approve` | `createNewMeeting` / `approveMeeting` |
-| `time.tick` | `timerStart` / `timerStop` (**שים לב**: start ו-stop חולקים מפתח dedupe — `sessionMs` ב-stop חובה; SPEC §6.2) |
+| `pgisha.create` / `pgisha.approve` | `createNewMeeting` / `approveMeeting` — **⏸ הוצא מהתור (2026-10-30)**: הפגישות עוברות לאתר נפרד (magik-meetings), שם הן MVP לתקשורת גם בלי שרת ועם אורחים. לאורח אין מפתח, ומי שחותם בשבילו הוא שאלת תכנון, לא אצווה. בנוסף, סשן אחר מעביר עכשיו את כל ה-UI של הפגישות. לחזור לזה רק אחרי שההעברה תסתיים, ובתכנון משותף עם magik-meetings |
+| `time.tick` | `timerStart` / `timerStop` — ✔ אצווה 2 (ראו "טיימרים" למטה) |
 | `pendm.vote` / `decision.vote` / `ask.vote` / `sheirutpend.vote` | `voteOnPendm` / `voteOnDecision` / `voteOnAskm` / `approveSheirutpend` — **בדוק קודם** אם `addVote` כבר מכסה את אותו מסלול; אל תחתום פעמיים |
 | `project.join` | `finalizeJoinAcceptance` — **לא מתאים כמו שהוא**: ה-reducer מוסיף את `ev.actor`, אבל ה-action מורץ ע"י החבר המאשר ולא ע"י המצטרף. צריך `predicate.member` ב-reducer (שינוי פורמט + vector) או חתימה בצד המצטרף |
 | `mission.approve` | `closeFiniapruval` — **בלי `amount`** (החלטת היתרות, למטה): היתרה היא כסף מחלוקות, ואישור משימה לא מזיז אותה. ה-predicate: payee + מזהה המשימה/השלב בלבד |
@@ -322,6 +322,31 @@ override של מפתחים; אחרת — הפרויקט ברשימה. עדכן �
 - `mission.approve` ייחתם **בלי** `amount` — כשיגיע תורו (אצווה 3).
 - **לא נבדק מול Strapi חי**: שאילתת ה-REST (populate של component + relation). אם
   היא נכשלת, ה-export מחזיר 502 והפאנל נשאר אפור. זה נראה מיד אחרי deploy.
+
+#### טיימרים — אצווה 2 (2026-10-30)
+
+- **ה-subject הוא הטיימר** (`timer:<id>`), לא המשימה: ב-stop אין מזהה משימה, ורשימת
+  ה-intervals של הטיימר היא הרשומה ב-Strapi שמשווים אליה. ה-reducer ממפתח לפי
+  id בלבד, ולכן לא השתנו פורמט או vector. ה-start נושא `mission` לקישור בהמשך.
+- **`order` = זמן ה-interval** (start או stop, ב-ms). כך start ו-stop לא בולעים זה
+  את זה, ו-stop חוזר על אותו interval (טאב שני, עדכון בוט כפול) מתקפל לראשון
+  במקום להיספר פעמיים.
+- **`sessionMs`** = סכום ה-intervals שה-stop סגר, כלומר אלה שמסתיימים בזמן העצירה
+  האחרון (`closedByStop`). זה לא `totalHours`, שמעוגל לדקות.
+- **החיבור**: הטיימרים בדפדפן שולחים ל-`/api/action` דרך `executeTimerAction`
+  (`func/timers.js`), לא דרך `actionClient`, ולכן ה-hook נקרא שם.
+- **השוואה**: `/api/consent/timers/[projectId]?ids=` מחזיר מ-Strapi את סכום
+  ה-intervals הסגורים (ms מדויקים) לטיימרים שביקשו, ברקמה הזו בלבד, עד 100.
+  הפאנל משווה רק טיימרים שה-start הראשון שלהם בשרשרת פתח טיימר חדש (`fresh`),
+  כי לטיימר ישן שחודש יש שעות שהשרשרת לא ראתה. אי-התאמה נשלחת כ-`kind:'timer'`.
+- **פערי כיסוי שיופיעו כאי-התאמת טיימר** (אלה פערים אמיתיים, לא רעש):
+  - עריכת intervals ב-`TimeEditor`;
+  - סגירת interval יתום בזמן resume או ב-`timerSave`;
+  - start/stop מהשרת: בוט טלגרם, MCP `timerActionTool`, mastra.
+  טיימר ידני (`manual`) לא נחתם בכלל, כי השעות שלו מוקלדות.
+- **לא נבדק מול Strapi חי**: שאילתת `/api/timers` (filter `id $in` + populate של
+  component). אם היא נכשלת, השוואת הטיימרים פשוט לא סופרת כלום, וחצי היתרות
+  ממשיך כרגיל.
 
 ### B6 — אימות התחייבויות אינקרמנטלי
 **למה**: `verifyCommitments` משחזר את כל סגור האבות לכל אירוע ⇒ O(n²) בסנכרון
@@ -421,3 +446,4 @@ projection, עם fallback ל-Strapi כשה-Space ריק או לא מסונכרן
 - 2026-10-30 · A3 · `POST /api/consent/telemetry` (מחובר, 30 לדקה, ולידציה שמסירה כל שדה זר) + `SpaceProjectionShadow` שולח snapshot לכל מצב synced שונה + `scripts/space-shadow-report.mjs` שמחשב את קריטריון היציאה לכל רקמה. השורות נכנסות ל-Axiom דרך ה-VPS, ו-JSONL אופציונלי ב-`CONSENT_TELEMETRY_FILE` · 458→478 (20 ב-`server/consent/shadowTelemetry.test.ts`), 14 vectors, check:proxy ירוק, check: ‏1315/1286 ללא שינוי · commit `dist: A3` · **🧑 deploy ל-VPS** (ה-endpoint רץ שם) · הבא: A2 (הרחבת החתימות), או B1/B2
 - 2026-10-30 · A2 אצווה 1 · מחזור החלוקה נחתם: `createTosplit` → `tosplit.create` (ids), `approveHaluka` → `haluka.approve` לכל העברה (סטטוס בלבד, בלי deltas), `confirmHaluka` (`kind:'receive'` בלבד) → `haluka.confirm`. **ממצא**: `User.hervachti` גלובלי למשתמש ⇒ השוואת היתרות של A3 ו-genesis של T6 משווים יתרת רקמה למספר על פני כל הרקמות; `mission.approve` לא נחתם עד החלטה (§5). `project.join` לא מתאים בלי שינוי reducer. פערי כיסוי ידועים: אישור חלוקה בשתיקה (timegrama, צד שרת) ו-`confirmHaluka` מדף `/deals` (fetch ישיר, לא `executeAction`) לא חותמים · 478→488, 14 vectors, check 1315/1286 · commit `dist: A2.1` · הבא: החלטת היתרות; אצווה 2 (`pgisha.*`, `time.tick`)
 - 2026-10-30 · A2 החלטת היתרות · המשתמש הכריע: יתרה = כסף מחלוקות באותה רקמה. `rikmaSplitBalances` (שני הכללים של Strapi) + `rikmaBalancesExport` (REST, דפדוף); ה-export של genesis וההשוואה ב-`SpaceProjectionShadow` עברו ליתרה לפי רקמה; תוקנו בדרך `projectName` (נקרא משדה לא קיים) ו-`console.log` של כל תשובת Strapi. דיאגרמה נוספה ל-`SPACE_RELAY_EXPLAINER.html` (סשן הצד) · 12 טסטים חדשים, 511 בשכבה (כולל `server/haluka`), 14 vectors, check 1315/1286, check:proxy ירוק · שאילתת ה-REST לא נבדקה מול Strapi חי · commit `dist: A2 balances` · **🧑 deploy ל-VPS** (ה-export רץ שם) · הבא: אצווה 2 (`pgisha.*`, `time.tick`), ואז `mission.approve` בלי סכום
+- 2026-10-30 · A2 אצווה 2 · **פגישות הוצאו מהתור** (החלטת המשתמש): הן עוברות ל-magik-meetings, יש שם שאלת אורחים בלי מפתח, וסשן אחר מעביר את ה-UI. **טיימרים נחתמים**: `timerStart`/`timerStop` → `time.tick` על `timer:<id>`, עם `order` = זמן ה-interval ו-`sessionMs` = מה שה-stop סגר. החיבור ב-`executeTimerAction` (`func/timers.js`), כי הטיימרים לא עוברים דרך `actionClient`. השוואה: `/api/consent/timers/[projectId]?ids=`, ו-`kind:'timer'` בטלמטריה, רק לטיימרים `fresh`. `strapiGet` הוצא ל-`$lib/server/consent/strapiRest`. פערי כיסוי: TimeEditor, intervals יתומים, start/stop מהשרת (בוט, MCP) · +16 טסטים (482 בשכבה, 200 ב-crypto/vault/timers), 14 vectors, check 1311/1277 (ללא שגיאות בקבצים שנגעתי), check:proxy ירוק · שאילתת `/api/timers` לא נבדקה מול Strapi חי · commit `dist: A2.2` · **🧑 deploy ל-VPS** (ה-endpoint רץ שם) · הבא: `mission.approve` בלי סכום (אצווה 3)

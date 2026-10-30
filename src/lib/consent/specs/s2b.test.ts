@@ -204,3 +204,86 @@ describe('the split lifecycle through the reducers', () => {
     expect(state.halukas.get('H1')?.status).toBe('pending');
   });
 });
+
+describe('timer shadow jobs (time.tick)', () => {
+  const t0 = '2026-10-30T09:00:00.000Z';
+  const t1 = '2026-10-30T10:30:00.000Z';
+  const t2 = '2026-10-30T11:00:00.000Z';
+  const t3 = '2026-10-30T11:20:00.000Z';
+  const ms = (iso: string) => Date.parse(iso);
+
+  it('a new timer: start on the created id, fresh, ordered by its first interval', () => {
+    const [ev] = derive(
+      s2bShadowJobs.timerStart(
+        { missionId: 'M9', projectId: '45', userId: '256', timerId: '0', start: t0, timers: [{ start: t0 }] },
+        { createTimer: { data: { id: '71' } } }
+      )
+    );
+    expect(ev?.action).toBe('time.tick');
+    expect(ev?.subject).toEqual({ type: 'timer', id: '71' });
+    expect(ev?.predicate).toEqual({ op: 'start', order: ms(t0), sessionMs: undefined, fresh: true, mission: 'M9' });
+  });
+
+  it('a resume: start on the existing id, ordered by newStart, not fresh', () => {
+    const [ev] = derive(
+      s2bShadowJobs.timerStart(
+        { missionId: 'M9', projectId: '45', timerId: '71', newStart: t2, timers: [{ start: t0, stop: t1 }, { start: t2 }] },
+        {}
+      )
+    );
+    expect(ev?.subject.id).toBe('71');
+    expect(ev?.predicate).toMatchObject({ op: 'start', order: ms(t2) });
+    expect(ev?.predicate?.fresh).toBeUndefined();
+  });
+
+  it('a manual timer, or a start with no id or time, signs nothing', () => {
+    expect(s2bShadowJobs.timerStart({ missionId: 'M9', projectId: '45', manual: true }, { createTimer: { data: { id: '72' } } })).toEqual([]);
+    expect(s2bShadowJobs.timerStart({ timerId: '0', start: t0 }, {})).toEqual([]);
+    expect(s2bShadowJobs.timerStart({ timerId: '71' }, {})).toEqual([]);
+  });
+
+  it('a stop declares exactly the interval(s) it closed', () => {
+    const [ev] = derive(
+      s2bShadowJobs.timerStop(
+        { timerId: '71', projectId: '45', isActive: false, timers: [{ start: t0, stop: t1 }, { start: t2, stop: t3 }] },
+        {}
+      )
+    );
+    expect(ev?.predicate).toMatchObject({ op: 'stop', order: ms(t3), sessionMs: 20 * 60_000 });
+  });
+
+  it('a stop that closed two open intervals at once declares both', () => {
+    const closed = s2bShadowJobs.timerStop(
+      { timerId: '71', isActive: false, timers: [{ start: t0, stop: t3 }, { start: t2, stop: t3 }] },
+      {}
+    );
+    expect(closed[0].params.sessionMs).toBe(ms(t3) - ms(t0) + (ms(t3) - ms(t2)));
+  });
+
+  it('an update that leaves the timer running, or has nothing closed, is not a stop', () => {
+    expect(s2bShadowJobs.timerStop({ timerId: '71', isActive: true, timers: [{ start: t0, stop: t1 }] }, {})).toEqual([]);
+    expect(s2bShadowJobs.timerStop({ timerId: '71', isActive: false, timers: [{ start: t0 }] }, {})).toEqual([]);
+    expect(s2bShadowJobs.timerStop({ timerId: '71', isActive: false }, {})).toEqual([]);
+  });
+
+  it('through the reducer: start and stop both count, a repeated stop folds into the first', () => {
+    const start = derive(
+      s2bShadowJobs.timerStart(
+        { missionId: 'M9', projectId: '45', timerId: '0', start: t0 },
+        { createTimer: { data: { id: '71' } } }
+      )
+    )[0];
+    const stopParams = { timerId: '71', projectId: '45', isActive: false, timers: [{ start: t0, stop: t1 }] };
+    const stop = derive(s2bShadowJobs.timerStop(stopParams, {}))[0];
+    const again = derive(s2bShadowJobs.timerStop(stopParams, {}))[0];
+
+    const once = project([asEvent(start, '256', ms(t0)), asEvent(stop, '256', ms(t1))], '45');
+    expect(once.timers.get('71')).toEqual({ id: '71', totalMs: 90 * 60_000 });
+
+    const twice = project(
+      [asEvent(start, '256', ms(t0)), asEvent(stop, '256', ms(t1)), asEvent(again, '256', ms(t1) + 5_000)],
+      '45'
+    );
+    expect(twice.timers.get('71')?.totalMs).toBe(90 * 60_000);
+  });
+});

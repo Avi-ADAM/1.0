@@ -17,34 +17,11 @@
 
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from '@sveltejs/kit';
-import { env } from '$env/dynamic/private';
 import { rikmaSplitBalances } from '$lib/consent/rikmaBalances';
 import { fetchRikmaSplitRows } from '$lib/server/consent/rikmaBalancesExport';
-
-import { STRAPI_URL as BASE } from '$lib/server/strapiUrl.js';
-function adminToken(): string {
-  return String(env.ADMINMONTHER ?? '').replace(/\s+/g, '').replace(/^ADMINMONTHER=/, '');
-}
+import { adminToken, strapiGet } from '$lib/server/consent/strapiRest';
 
 type UserRow = { id: string | number };
-
-async function strapiGet(pathAndQuery: string): Promise<unknown> {
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 5000);
-  try {
-    const res = await fetch(`${BASE}${pathAndQuery}`, {
-      headers: { Authorization: `Bearer ${adminToken()}` },
-      signal: controller.signal
-    });
-    if (!res.ok) throw error(502, `strapi ${res.status} ${res.statusText}`);
-    return await res.json();
-  } catch (e) {
-    if ((e as { status?: number }).status) throw e;
-    throw error(502, 'strapi unreachable');
-  } finally {
-    clearTimeout(timer);
-  }
-}
 
 export const GET: RequestHandler = async ({ params, cookies }) => {
   // JWT gates abuse; the export is only meaningful to members anyway and the

@@ -99,7 +99,7 @@ function verdict(s) {
         `${r.mismatches.length} distinct mismatch(es) — ${r.exitReady ? '✅ exit criterion met' : '⏳ ' + r.missing.join(', ')}`
     );
     for (const m of r.mismatches) {
-      lines.push(`    ${m.kind} member ${m.member}: chain=${m.chain} strapi=${m.strapi} (first ${m.firstAt}, at ${m.events} events)`);
+      lines.push(`    ${m.kind} ${m.member}: chain=${m.chain} strapi=${m.strapi} (first ${m.firstAt}, at ${m.events} events)`);
     }
   }
   return lines.join('\n');

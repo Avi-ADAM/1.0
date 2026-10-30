@@ -28,6 +28,7 @@
   import ConsentBadge from './ConsentBadge.svelte';
   import { sendShadowReport } from '$lib/client/shadowTelemetry';
   import type { ShadowMismatch } from '$lib/consent/shadowTelemetry';
+  import { freshTimerIds, compareTimers } from '$lib/consent/timerShadow';
 
   type GqlUserRow = { id: string | number; attributes?: { hervachti?: number | null } };
 
@@ -66,19 +67,40 @@
    * `strapiForEvents` says which log size the numbers belong to.
    */
   let strapiBalances = $state<Map<string, number> | null>(null);
+  /** closed-interval ms of the fresh timers on the chain (A2 batch 2) */
+  let strapiTimers = $state<Map<string, number>>(new Map());
   let strapiForEvents = $state(-1);
+
+  /** Strapi's totals for the given timers; empty on any failure (nothing compared). */
+  async function fetchTimerTotals(ids: string[]): Promise<Map<string, number>> {
+    const m = new Map<string, number>();
+    if (ids.length === 0) return m;
+    try {
+      const res = await fetch(`/api/consent/timers/${boundProjectId}?ids=${ids.join(',')}`, {
+        credentials: 'include'
+      });
+      if (!res.ok) return m;
+      const body = await res.json();
+      for (const t of body.timers ?? []) if (typeof t?.ms === 'number') m.set(String(t.id), t.ms);
+    } catch {
+      // the balance half still compares
+    }
+    return m;
+  }
 
   $effect(() => {
     if (!replica || replica.state.status !== 'synced') return;
     const at = eventCount;
     if (at === 0 || at === strapiForEvents) return;
-    void fetchGenesisExport(boundProjectId).then((exp) => {
+    const fresh = [...freshTimerIds(replica.state.eventsById.values())];
+    void Promise.all([fetchGenesisExport(boundProjectId), fetchTimerTotals(fresh)]).then(([exp, timers]) => {
       if (!exp.ok) return;
       const m = new Map<string, number>();
       for (const row of exp.members) {
         if (typeof row.hervachti === 'number') m.set(String(row.id), Math.round(row.hervachti * 100));
       }
       strapiBalances = m;
+      strapiTimers = timers;
       strapiForEvents = at;
     });
   });
@@ -106,6 +128,15 @@
         mismatches.push({ kind: 'balance', member, chain: String(agorot), strapi: String(strapi) });
       }
     }
+
+    // Timers (A2 batch 2): only those opened on the chain — see timerShadow.ts.
+    const t = compareTimers(
+      projection.timers,
+      freshTimerIds(replica?.state.eventsById.values() ?? []),
+      strapiTimers
+    );
+    compared += t.compared;
+    mismatches.push(...t.mismatches);
 
     return {
       status: (mismatches.length === 0 ? 'signed' : 'unverified') as 'signed' | 'unverified',
@@ -194,13 +225,14 @@
       <span class="text-zinc-500 dark:text-zinc-400">
         {eventCount} אירועים · {projection.members.size} חברים ·
         {projection.missions.size} משימות · {projection.halukas.size} חלוקות ·
+        {projection.timers.size} טיימרים ·
         סנכרון: {replica.state.status}
       </span>
     </div>
     {#if comparison.mismatches.length > 0}
       <ul class="mt-2 list-inside list-disc text-xs text-rose-600 dark:text-rose-400">
-        {#each comparison.mismatches as m (m.member)}
-          <li>{m.member}: chain={m.chain} strapi={m.strapi}</li>
+        {#each comparison.mismatches as m (m.kind + ':' + m.member)}
+          <li>{m.kind === 'timer' ? 'טיימר ' : ''}{m.member}: chain={m.chain} strapi={m.strapi}</li>
         {/each}
       </ul>
     {/if}

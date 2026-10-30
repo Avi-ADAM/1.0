@@ -128,6 +128,65 @@ export const confirmHalukaConsentSpec: ConsentSpec = {
   predicateFromParams: () => ({})
 };
 
+// ---------------------------------------------------------------- timer
+// A2 batch 2: the work timer. The subject is the Strapi TIMER, not the
+// mission — every start and stop carries the timer id while a stop does not
+// know its mission, and the timer's interval list is the Strapi record the
+// shadow panel compares against. The reducer keys by subject id, so the
+// type changes nothing in it.
+//
+// `order` is the interval's own time (start or stop, epoch ms): dedupeKey
+// folds (actor, subject, action, order), so a constant order would let the
+// stop swallow its start — and a repeated stop of the same interval (a
+// second tab, a redelivered bot update) folds into the first instead of
+// crediting it twice.
+
+export const timeTickConsentSpec: ConsentSpec = {
+  action: 'time.tick',
+  subjectType: 'timer',
+  subjectIdParam: 'timerId',
+  requireConsensus: false, // the member's own clock; approval rides finiapruval
+  predicateFromParams: (params) => ({
+    op: params.op === 'stop' ? 'stop' : 'start',
+    order: typeof params.order === 'number' ? params.order : undefined,
+    sessionMs: typeof params.sessionMs === 'number' ? params.sessionMs : undefined,
+    // A start that opened a NEW timer: its whole history is on the chain, so
+    // the shadow panel may compare its total with Strapi (a resumed legacy
+    // timer has hours the chain never saw).
+    fresh: params.fresh === true ? true : undefined,
+    mission: params.missionId != null ? String(params.missionId) : undefined
+  })
+};
+
+type Interval = { start?: unknown; stop?: unknown };
+
+function intervalsOf(x: unknown): Interval[] {
+  return Array.isArray(x) ? (x.filter((i) => i && typeof i === 'object') as Interval[]) : [];
+}
+
+const msOf = (x: unknown): number => (typeof x === 'string' ? Date.parse(x) : NaN);
+
+/**
+ * What a stop closed: every interval ending at the latest stop time. stopTimer
+ * closes all open intervals with one `now`, so they share it; an older closed
+ * interval cannot end later than the stop that is happening.
+ */
+export function closedByStop(timers: unknown): { at: number; sessionMs: number } | null {
+  let at = -Infinity;
+  for (const i of intervalsOf(timers)) {
+    const s = msOf(i.stop);
+    if (Number.isFinite(s) && s > at) at = s;
+  }
+  if (!Number.isFinite(at)) return null;
+  let sessionMs = 0;
+  for (const i of intervalsOf(timers)) {
+    if (msOf(i.stop) !== at) continue;
+    const st = msOf(i.start);
+    if (Number.isFinite(st) && at >= st) sessionMs += at - st;
+  }
+  return { at, sessionMs };
+}
+
 // ---------------------------------------------------------------- chat
 
 export const createChatMessageConsentSpec: ConsentSpec = {
@@ -237,6 +296,50 @@ export const s2bShadowJobs: Record<string, ShadowJobDeriver> = {
     return [{
       spec: confirmHalukaConsentSpec,
       params: { projectId: params.projectId || undefined, halukaId }
+    }];
+  },
+
+  timerStart: (params, result) => {
+    // A manual timer opens stopped and empty — its hours arrive typed in,
+    // through timerSave, and are not a clock tick.
+    if (params.manual === true) return [];
+    const fresh = params.timerId == null || String(params.timerId) === '0';
+    const timerId = fresh
+      ? str((result as any)?.createTimer?.data?.id) ?? str((result as any)?.data?.createTimer?.data?.id)
+      : str(params.timerId);
+    if (!timerId) return [];
+    // The interval this start opened (startTimer stamps both with one `now`).
+    const order = msOf(fresh ? params.start : params.newStart);
+    if (!Number.isFinite(order)) return [];
+    return [{
+      spec: timeTickConsentSpec,
+      params: {
+        projectId: params.projectId,
+        timerId,
+        missionId: params.missionId,
+        op: 'start',
+        order,
+        fresh
+      }
+    }];
+  },
+
+  timerStop: (params) => {
+    const timerId = str(params.timerId);
+    // isActive:false is a stop; the same action key also carries edits that
+    // leave the timer running.
+    if (!timerId || params.isActive !== false) return [];
+    const closed = closedByStop(params.timers);
+    if (!closed) return [];
+    return [{
+      spec: timeTickConsentSpec,
+      params: {
+        projectId: params.projectId,
+        timerId,
+        op: 'stop',
+        order: closed.at,
+        sessionMs: closed.sessionMs
+      }
     }];
   }
 };

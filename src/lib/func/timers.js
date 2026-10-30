@@ -69,6 +69,14 @@ async function executeTimerAction(actionType, params, fetchFn = null, options = 
     if (response.ok) {
       const result = await response.json();
       console.log(`[Timers] ${actionType} executed successfully`, result);
+      // Timers post to /api/action themselves rather than through
+      // actionClient.executeAction, so they miss its shadow-sign hook — wire
+      // it here (A2 batch 2, time.tick). Fire-and-forget; never blocks the clock.
+      if (browser) {
+        import('$lib/client/shadowSignRegistry')
+          .then(({ shadowSignForAction }) => shadowSignForAction(actionType, params, result.data))
+          .catch(() => {});
+      }
       return result.data;
     } else {
       const errorText = await response.text();
