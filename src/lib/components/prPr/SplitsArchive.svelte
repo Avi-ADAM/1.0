@@ -65,14 +65,14 @@
 </script>
 
 {#if loading}
-  <section class="bg-white p-6 rounded-xl shadow-sm">
+  <section class="rounded-2xl border border-surfaceLine bg-surface text-surfaceInk p-5 sm:p-6 shadow-sm">
     <div class="flex justify-center p-8"><Spinner /></div>
   </section>
 {:else}
   {#if hasSplits}
     <!-- All-time per-member summary -->
-    <section class="bg-white p-6 rounded-xl shadow-sm" dir={$isRtl ? 'rtl' : 'ltr'}>
-      <h2 class="text-xl font-bold text-primary mb-3">{$t('project.splitsArchive.summary')}</h2>
+    <section class="rounded-2xl border border-surfaceLine bg-surface text-surfaceInk p-5 sm:p-6 shadow-sm" dir={$isRtl ? 'rtl' : 'ltr'}>
+      <h2 class="text-xl font-bold text-surfaceInk mb-3">{$t('project.splitsArchive.summary')}</h2>
       <div class="sa-total">
         <span class="sa-total-label">{$t('project.splitsArchive.totalDistributed')}</span>
         <span class="sa-total-value">{fmt(data.totalDistributed)}</span>
@@ -97,8 +97,8 @@
     </section>
 
     <!-- Per-split list -->
-    <section class="bg-white p-6 rounded-xl shadow-sm" dir={$isRtl ? 'rtl' : 'ltr'}>
-      <h2 class="text-xl font-bold text-primary mb-3">{$t('project.splitsArchive.allSplits')}</h2>
+    <section class="rounded-2xl border border-surfaceLine bg-surface text-surfaceInk p-5 sm:p-6 shadow-sm" dir={$isRtl ? 'rtl' : 'ltr'}>
+      <h2 class="text-xl font-bold text-surfaceInk mb-3">{$t('project.splitsArchive.allSplits')}</h2>
       <div class="space-y-2">
         {#each splits as s (s.id)}
           <div class="sa-split">
@@ -175,13 +175,13 @@
       </div>
     </section>
   {:else if data}
-    <section class="bg-white p-6 rounded-xl shadow-sm">
-      <p class="text-sm text-gray-400">{$t('project.splitsArchive.empty')}</p>
+    <section class="rounded-2xl border border-surfaceLine bg-surface text-surfaceInk p-5 sm:p-6 shadow-sm">
+      <p class="text-sm text-surfaceMuted">{$t('project.splitsArchive.empty')}</p>
     </section>
   {/if}
 
   <!-- Site-share archive (giving to the main rikma) -->
-  <section class="bg-white p-6 rounded-xl shadow-sm">
+  <section class="rounded-2xl border border-surfaceLine bg-surface text-surfaceInk p-5 sm:p-6 shadow-sm">
     <SiteShareArchive {projectId} />
   </section>
 {/if}
@@ -195,16 +195,16 @@
   }
   .sa-total-label {
     font-weight: 700;
-    color: #8a6d00;
+    color: var(--surface-ink);
   }
   .sa-total-value {
     font-size: 1.6rem;
     font-weight: 900;
-    color: #8a6d00;
+    color: var(--surface-ink);
   }
   .sa-total-meta {
     font-size: 0.85rem;
-    color: #9ca3af;
+    color: var(--surface-muted);
   }
   .sa-list {
     list-style: none;
@@ -220,7 +220,7 @@
     justify-content: space-between;
     gap: 12px;
     padding: 8px 12px;
-    background: #f9fafb;
+    background: var(--surface-2);
     border-radius: 8px;
   }
   .sa-who {
@@ -248,11 +248,11 @@
     white-space: nowrap;
   }
   .sa-muted {
-    color: #9ca3af;
+    color: var(--surface-muted);
     font-size: 0.85rem;
   }
   .sa-split {
-    border: 1px solid #eee;
+    border: 1px solid var(--surface-line);
     border-radius: 10px;
     overflow: hidden;
   }
@@ -263,7 +263,8 @@
     justify-content: space-between;
     gap: 12px;
     padding: 10px 14px;
-    background: #fff;
+    background: var(--surface);
+    color: var(--surface-ink);
     border: none;
     cursor: pointer;
     text-align: inherit;
@@ -282,7 +283,7 @@
   }
   .sa-chev {
     transition: transform 0.2s ease;
-    color: #9ca3af;
+    color: var(--surface-muted);
   }
   .sa-chev.open {
     transform: rotate(180deg);
@@ -313,7 +314,7 @@
     flex-direction: column;
     gap: 6px;
     padding: 8px 12px;
-    background: #f9fafb;
+    background: var(--surface-2);
     border-radius: 8px;
   }
   .sa-alloc-head {
@@ -338,7 +339,7 @@
   }
   .sa-fig-l {
     font-size: 0.65rem;
-    color: #9ca3af;
+    color: var(--surface-muted);
   }
   .sa-fig-actual {
     color: #166534;
@@ -378,6 +379,6 @@
   .sa-transfers {
     padding: 0 14px 10px;
     font-size: 0.8rem;
-    color: #9ca3af;
+    color: var(--surface-muted);
   }
 </style>

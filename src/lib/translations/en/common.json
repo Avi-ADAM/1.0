@@ -235,6 +235,8 @@
     "withHolder": "Golden meeting",
     "empty": "This rikma has no missions in progress yet.",
     "loadError": "Couldn't load the rikma's members.",
+    "solo": "You're the only member of this rikma for now. Once partners join, you can call a golden meeting with them from here.",
+    "onlyMine": "Every mission in progress in this rikma is yours.",
     "titleAll": "Golden meeting · {{rikma}}",
     "titleScoped": "{{scope}} · {{rikma}}"
   }

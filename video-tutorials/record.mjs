@@ -67,6 +67,8 @@ function varsFor(lang) {
 
 // a scene still marked todo has no steps worth filming yet; --dry runs it anyway
 let scenes = flow.scenes.filter(s => {
+  // footage from outside the site (a phone recording) — the editor places it, nothing to film
+  if (s.external) return false;
   if (s.todo && !(s.steps ?? []).length && !opt.dry) {
     console.log(`· skipping ${s.id} (todo: ${s.todo})`);
     return false;

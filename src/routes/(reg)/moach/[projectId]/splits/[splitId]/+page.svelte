@@ -17,7 +17,7 @@
 
   async function reload() {
     try {
-      const res = await sendToSer({ id: splitId }, 'getProjectFinancials', null, null, false, fetch);
+      const res = await sendToSer({ pid: projectId }, 'getProjectFinancials', null, null, false, fetch);
       split = res?.data?.project?.data?.attributes?.tosplits?.data?.find(s => s.id === splitId);
       if (split) {
         moachStore.updateEntity(projectId, splitId, split);

@@ -375,7 +375,7 @@ export const qidsAccess = {
   '99updateAskForums': { allow: ['user', 'serviceAdmin'] },
   '100getMesimabetahalichForums': { allow: ['user', 'serviceAdmin'] },
   '101updateMesimabetahalichForums': { allow: ['user', 'serviceAdmin'] },
-  '102projectProcessesQuery': { allow: ['user', 'serviceAdmin'] },
+  '102projectProcessesQuery': { allow: ['user', 'serviceAdmin'] }, // members only — PRE guard in guards.js
   '102getMesimabetahalichForFinish': { allow: ['user', 'serviceAdmin'] },
   '103createFinnishedMission': { allow: ['user', 'serviceAdmin'] },
   '104createFiniapruval': { allow: ['user', 'serviceAdmin'] },
@@ -488,15 +488,15 @@ export const qidsAccess = {
   'getProjectBaseInfo': { allow: ['user', 'serviceAdmin'] },
   'getProjectBaseInfoWithAuth': { allow: ['user', 'serviceAdmin'] },
   'chainExtraData': { allow: ['user', 'serviceAdmin'] },
-  'chainDetailProjectData': { allow: ['user', 'serviceAdmin'] },
-  'processLifecycleData': { allow: ['user', 'serviceAdmin'] },
-  'getProjectMissions': { allow: ['user', 'serviceAdmin'] },
+  'chainDetailProjectData': { allow: ['user', 'serviceAdmin'] }, // members only — PRE guard in guards.js
+  'processLifecycleData': { allow: ['user', 'serviceAdmin'] }, // members only — PRE guard in guards.js
+  'getProjectMissions': { allow: ['user', 'serviceAdmin'] }, // members only — PRE guard in guards.js
   'projectMissionTimerSegments': { allow: ['user', 'serviceAdmin'] },
   'missionTimerSessions': { allow: ['user', 'serviceAdmin'] }, // the per-session timer log on a mission's page
   'getMissionTemplates': { allow: ['user', 'serviceAdmin'] },
-  'getProjectFinancials': { allow: ['user', 'serviceAdmin'] },
-  'getProjectValueSummary': { allow: ['user', 'serviceAdmin'] }, // mission-equity preview; serviceAdmin path serves the public availableMission page
-  'getMemberValueTotal': { allow: ['user', 'serviceAdmin'] }, // "my share" numerator for the stipend dilution line
+  'getProjectFinancials': { allow: ['user', 'serviceAdmin'] }, // members only — PRE guard in guards.js
+  'getProjectValueSummary': { allow: ['user', 'serviceAdmin'] }, // mission-equity preview, aggregates only — open to non-members on purpose (lev suggestion cards); serviceAdmin path serves the public availableMission page
+  'getMemberValueTotal': { allow: ['user', 'serviceAdmin'] }, // "my share" numerator for the stipend dilution line; members only — PRE guard in guards.js
   'getProjectVotes': { allow: ['user', 'serviceAdmin'] },
   'getOpenVoteCounts': { allow: ['user', 'serviceAdmin'] },
   'getOpenWishCounts': { allow: ['user', 'serviceAdmin'] },
@@ -841,7 +841,7 @@ export const qidsAccess = {
   // SSR loads that used to reach Strapi directly (PLAN_PROXY_SECURITY §11).
   // /love is anonymous — no cookie, so it can only run as the service.
   '305loveCountryAgreement': { allow: ['serviceAdmin'] },
-  '306moachChainsExtra': { allow: ['user', 'serviceAdmin'] },
+  '306moachChainsExtra': { allow: ['user', 'serviceAdmin'] }, // members only — PRE guard in guards.js
 
   // The member's own income history. JWT only in practice — the guard in
   // guards.js pins `uid` to the caller, so 'user' here means "yourself".

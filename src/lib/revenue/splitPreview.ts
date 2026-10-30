@@ -10,6 +10,8 @@
  * against the same worked example.
  */
 
+import { memberShares } from './memberShares';
+
 type Rel = { data?: { id?: string | number | null } | null } | null | undefined;
 
 export type PreviewUser = { id: string | number; attributes: { username: string } };
@@ -61,39 +63,18 @@ export function splitPreview(input: {
     if (!(u.id in dictidi)) dictidi[u.id] = 0;
   }
 
-  // buildBase(): each member's contribution and the rikma's total.
-  const dictid: Record<string, number> = {};
-  for (const u of users) {
-    for (const f of fmiData) {
-      if (idOf(f.attributes.users_permissions_user) === u.id) dictid[u.id] = (dictid[u.id] ?? 0) + (f.attributes.total ?? 0);
-    }
-    for (const r of rikmashes) {
-      if (idOf(r.attributes.users_permissions_user) === u.id) dictid[u.id] = (dictid[u.id] ?? 0) + (r.attributes.total ?? 0);
-    }
-  }
-  for (const p of stipendPayments) {
-    const a = p?.attributes ?? {};
-    const funderId = idOf(a.funder);
-    const recipientId = idOf(a.recipient);
-    const credit = Number(a.equityCredit) || 0;
-    const debit = Number(a.equityDebit) || 0;
-    if (funderId != null && credit !== 0) dictid[funderId] = (dictid[funderId] || 0) + credit;
-    if (recipientId != null && debit !== 0) dictid[recipientId] = (dictid[recipientId] || 0) - debit;
-  }
-  let net: number | undefined;
-  for (const f of fmiData) net = (net ?? 0) + (f.attributes.total ?? 0);
-  for (const r of rikmashes) net = (net ?? 0) + (r.attributes.total ?? 0);
-  for (const p of stipendPayments) {
-    const a = p?.attributes ?? {};
-    const d = (Number(a.equityCredit) || 0) - (Number(a.equityDebit) || 0);
-    if (d !== 0) net = (net || 0) + d;
-  }
-
-  const rows: PreviewRow[] = users.map((u) => {
-    const total = dictid[u.id] || 0;
-    const p = net && net > 0 ? (100 * total) / net : 0;
-    return { uid: u.id, username: u.attributes.username, p, ihave: dictidi[u.id] || 0, x: 0, noten: 0, meca: 0, le: [] };
-  });
+  // buildBase(): each member's share of the rikma's value.
+  const { rows: shares } = memberShares({ users, fmiData, rikmashes, stipendPayments });
+  const rows: PreviewRow[] = shares.map(({ uid, username, p }) => ({
+    uid,
+    username,
+    p,
+    ihave: dictidi[uid] || 0,
+    x: 0,
+    noten: 0,
+    meca: 0,
+    le: []
+  }));
 
   // distribute(): fair share → surplus / deficit → greedy matching.
   for (const r of rows) {

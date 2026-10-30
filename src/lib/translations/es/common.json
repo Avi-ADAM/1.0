@@ -236,6 +236,8 @@
     "withHolder": "Reunión de oro",
     "empty": "Esta rikma aún no tiene misiones en curso.",
     "loadError": "No se pudieron cargar los miembros de la rikma.",
+    "solo": "Por ahora eres el único miembro de esta rikma. Cuando se sumen socios, podrás convocar una reunión de oro con ellos desde aquí.",
+    "onlyMine": "Todas las misiones en curso de esta rikma son tuyas.",
     "titleAll": "Reunión de oro · {{rikma}}",
     "titleScoped": "{{scope}} · {{rikma}}"
   }

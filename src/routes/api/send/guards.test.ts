@@ -570,6 +570,105 @@ for (const queId of ['ListIssues', 'ListClauses', 'CreateIssue', 'CreateClause']
   });
 }
 
+/** A Strapi double for the membership lookup: the rikma's members are `ids`. */
+function projectMembers(...ids: string[]) {
+  return vi.fn().mockResolvedValue({
+    json: async () => ({
+      data: { project: { data: { attributes: { user_1s: { data: ids.map((id) => ({ id })) } } } } }
+    })
+  });
+}
+
+// Partnership-internal reads: members of the named rikma only, on the
+// variable each qid actually takes. The books (getProjectFinancials) were
+// readable by any logged-in user before this guard.
+for (const [queId, variable] of [
+  ['310projectResourceOccupancy', 'pid'],
+  ['325projectSpaceDocs', 'pid'],
+  ['getProjectFinancials', 'pid'],
+  ['getMemberValueTotal', 'pid'],
+  ['getProjectMissions', 'pid'],
+  ['processLifecycleData', 'pid'],
+  ['chainDetailProjectData', 'pid'],
+  ['306moachChainsExtra', 'id'],
+  ['102projectProcessesQuery', 'projectId']
+] as const) {
+  describe(`runSendGuards — ${queId} (members only)`, () => {
+    const q = { ...base, queId, bearer1: 'Bearer user-jwt' };
+
+    it('lets a member read, looking membership up with the caller’s own token', async () => {
+      const fetchMock = projectMembers('3', '7');
+      await expect(
+        runSendGuards({ ...q, callerId: '7', variablesObject: { [variable]: '57' }, fetch: fetchMock as any })
+      ).resolves.toBeUndefined();
+      const [, opts] = fetchMock.mock.calls[0];
+      expect(JSON.parse(opts.body).variables).toEqual({ id: '57' });
+      expect(opts.headers.Authorization).toBe('Bearer user-jwt');
+    });
+
+    it('matches a numeric caller id against the stored string', async () => {
+      const fetchMock = projectMembers('7');
+      await expect(
+        runSendGuards({ ...q, callerId: 7 as any, variablesObject: { [variable]: 57 }, fetch: fetchMock as any })
+      ).resolves.toBeUndefined();
+    });
+
+    it('403s a logged-in user who is not a member', async () => {
+      const fetchMock = projectMembers('3', '8');
+      const r = await statusOf(() =>
+        runSendGuards({ ...q, callerId: '7', variablesObject: { [variable]: '57' }, fetch: fetchMock as any })
+      );
+      expect(r).toMatchObject({ threw: true, status: 403 });
+    });
+
+    it('403s when the rikma cannot be read at all', async () => {
+      const fetchMock = vi.fn().mockResolvedValue({ json: async () => ({ data: { project: { data: null } } }) });
+      const r = await statusOf(() =>
+        runSendGuards({ ...q, callerId: '7', variablesObject: { [variable]: '57' }, fetch: fetchMock as any })
+      );
+      expect(r).toMatchObject({ threw: true, status: 403 });
+    });
+
+    it('400s without a project id, before any lookup', async () => {
+      const fetchMock = projectMembers('7');
+      const r = await statusOf(() =>
+        runSendGuards({ ...q, callerId: '7', variablesObject: {}, fetch: fetchMock as any })
+      );
+      expect(r).toMatchObject({ threw: true, status: 400 });
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+
+    it('401s without a caller id', async () => {
+      const fetchMock = projectMembers('7');
+      const r = await statusOf(() =>
+        runSendGuards({ ...q, variablesObject: { [variable]: '57' }, fetch: fetchMock as any })
+      );
+      expect(r).toMatchObject({ threw: true, status: 401 });
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+
+    it('leaves the service path alone', async () => {
+      const fetchMock = projectMembers();
+      await expect(
+        runSendGuards({ ...q, isSer: true, variablesObject: { [variable]: '57' }, fetch: fetchMock as any })
+      ).resolves.toBeUndefined();
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+  });
+}
+
+describe('runSendGuards — getProjectValueSummary stays open', () => {
+  // Aggregates only, and the lev suggestion cards show the equity preview to the
+  // non-member the mission is suggested to.
+  it('does not look membership up', async () => {
+    const fetchMock = projectMembers();
+    await expect(
+      runSendGuards({ ...base, queId: 'getProjectValueSummary', callerId: '7', variablesObject: { pid: '57' }, fetch: fetchMock as any })
+    ).resolves.toBeUndefined();
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+});
+
 describe('runSendGuards — unguarded qids', () => {
   it('is a no-op for a qid with no registered guard', async () => {
     await expect(

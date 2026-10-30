@@ -61,14 +61,15 @@ function writeShape(queId, query) {
  * resource calendar and the shared library so the two cannot drift apart.
  *
  * @param {SendGuardContext} ctx
- * @param {string} label   qid name, for the 400 when `pid` is missing
+ * @param {string} label   qid name, for the 400 when the project id is missing
  * @param {string} denial  the 403 message
+ * @param {string} [variable]  the qid's project-id variable (`pid`, `id`, `projectId`)
  */
-async function requireProjectMember(ctx, label, denial) {
+async function requireProjectMember(ctx, label, denial, variable = 'pid') {
   const { callerId, variablesObject, bearer1, ep, fetch: injected } = ctx;
   if (!callerId) throw error(401, 'Unauthorized: No caller id');
-  const pid = variablesObject.pid;
-  if (!pid) throw error(400, `Missing pid for ${label}`);
+  const pid = variablesObject[variable];
+  if (!pid) throw error(400, `Missing ${variable} for ${label}`);
 
   const doFetch = injected || fetch;
   let data;
@@ -90,6 +91,23 @@ async function requireProjectMember(ctx, label, denial) {
   if (!members.some((m) => String(m.id) === String(callerId))) {
     throw error(403, denial);
   }
+}
+
+/**
+ * A partnership-internal read: on the JWT path the caller must be a member of
+ * the rikma the qid names. Service calls (server loads, the MCP bridge) have
+ * already been authorized for the member they act for and pass.
+ *
+ * @param {string} label     qid name
+ * @param {string} denial    the 403 message
+ * @param {string} [variable] the qid's project-id variable
+ * @returns {(ctx: SendGuardContext) => Promise<void>}
+ */
+function membersOnly(label, denial, variable = 'pid') {
+  return async (ctx) => {
+    if (ctx.isSer) return;
+    await requireProjectMember(ctx, label, denial, variable);
+  };
 }
 
 /**
@@ -300,26 +318,64 @@ const PRE_GUARDS = {
   // which customers the rikma has committed weeks to. That is partnership-
   // internal, so it is members-only — and membership has to be looked up,
   // because a project id alone proves nothing about the caller.
-  '310projectResourceOccupancy': async (ctx) => {
-    if (ctx.isSer) return;
-    await requireProjectMember(
-      ctx,
-      '310projectResourceOccupancy',
-      'Forbidden: Only members can read the rikma’s resource calendar'
-    );
-  },
+  '310projectResourceOccupancy': membersOnly(
+    '310projectResourceOccupancy',
+    'Forbidden: Only members can read the rikma’s resource calendar'
+  ),
 
   // The rikma's shared library (docs/inprogress/PLAN_RIKMA_SHARED_INFO.md §5): contracts,
   // scans, internal links. Partnership-internal by definition, so members-only
   // on the same lookup as the calendar above.
-  '325projectSpaceDocs': async (ctx) => {
-    if (ctx.isSer) return;
-    await requireProjectMember(
-      ctx,
-      '325projectSpaceDocs',
-      'Forbidden: Only members can read the rikma’s shared library'
-    );
-  },
+  '325projectSpaceDocs': membersOnly(
+    '325projectSpaceDocs',
+    'Forbidden: Only members can read the rikma’s shared library'
+  ),
+
+  // The rikma's books: every sale and who holds the money, the open profit
+  // splits with each member's haluka, finished missions with their private
+  // notes (hearotMeyuchadot), received resources and stipend payments. The
+  // moach pages that read it are members-only (the layout 403s), but the qid
+  // took any pid from any logged-in user, so the page gate protected nothing.
+  'getProjectFinancials': membersOnly(
+    'getProjectFinancials',
+    'Forbidden: Only members can read the rikma’s financials'
+  ),
+
+  // One member's contribution total — the numerator of the stipend card's "my
+  // share". Read by members voting on a stipend; nobody else's business.
+  'getMemberValueTotal': membersOnly(
+    'getMemberValueTotal',
+    'Forbidden: Only members can read a member’s share'
+  ),
+
+  // The other moach reads that carry the same books: missions with their rates,
+  // totals and private notes (getProjectMissions, the chains and processes
+  // pages), and the process lifecycle, which also pulls sales and open splits.
+  // Every caller is a moach page or a service call. getProjectValueSummary is
+  // deliberately NOT here: it is aggregates only, and the lev suggestion cards
+  // show it to the non-member a mission is suggested to (the equity preview).
+  'getProjectMissions': membersOnly(
+    'getProjectMissions',
+    'Forbidden: Only members can read the rikma’s missions'
+  ),
+  'processLifecycleData': membersOnly(
+    'processLifecycleData',
+    'Forbidden: Only members can read the rikma’s processes'
+  ),
+  'chainDetailProjectData': membersOnly(
+    'chainDetailProjectData',
+    'Forbidden: Only members can read the rikma’s chains'
+  ),
+  '306moachChainsExtra': membersOnly(
+    '306moachChainsExtra',
+    'Forbidden: Only members can read the rikma’s chains',
+    'id'
+  ),
+  '102projectProcessesQuery': membersOnly(
+    '102projectProcessesQuery',
+    'Forbidden: Only members can read the rikma’s processes',
+    'projectId'
+  ),
 
   // UpdateClause ownership — every edit is the clause author's, on both paths:
   //   • body/issueId: registered (JWT) owner only — block the service path.

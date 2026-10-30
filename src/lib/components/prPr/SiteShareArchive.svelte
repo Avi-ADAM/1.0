@@ -54,7 +54,7 @@
   <div class="flex justify-center p-8"><Spinner /></div>
 {:else if hasData}
   <div dir={$isRtl ? 'rtl' : 'ltr'} class="space-y-6">
-    <h2 class="text-xl font-bold text-primary">
+    <h2 class="text-xl font-bold text-surfaceInk">
       {isPlatform ? $t('project.siteShareArchive.titleIn') : $t('project.siteShareArchive.titleOut')}
     </h2>
 
@@ -133,7 +133,7 @@
     {/if}
   </div>
 {:else if data}
-  <p class="text-sm text-gray-400">{$t('project.siteShareArchive.empty')}</p>
+  <p class="text-sm text-surfaceMuted">{$t('project.siteShareArchive.empty')}</p>
 {/if}
 
 <style>
@@ -151,12 +151,12 @@
   }
   .ssa-total-label {
     font-weight: 700;
-    color: #8a6d00;
+    color: var(--surface-ink);
   }
   .ssa-total-value {
     font-size: 1.8rem;
     font-weight: 900;
-    color: #8a6d00;
+    color: var(--surface-ink);
   }
   .ssa-total-sub {
     margin-top: 6px;
@@ -184,7 +184,7 @@
     justify-content: space-between;
     gap: 12px;
     padding: 8px 12px;
-    background: #f9fafb;
+    background: var(--surface-2);
     border-radius: 8px;
   }
   .ssa-who {
@@ -212,7 +212,7 @@
     white-space: nowrap;
   }
   .ssa-muted {
-    color: #9ca3af;
+    color: var(--surface-muted);
     font-size: 0.85rem;
   }
   .ssa-chip {
@@ -220,7 +220,7 @@
     padding: 2px 8px;
     border-radius: 999px;
     background: rgba(201, 162, 39, 0.15);
-    color: #8a6d00;
+    color: var(--surface-ink);
     font-weight: 700;
   }
 </style>

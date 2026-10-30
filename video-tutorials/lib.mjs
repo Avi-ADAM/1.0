@@ -169,6 +169,8 @@ export function locate(page, t) {
   else if (t.css) loc = base.locator(t.css);
   else throw new Error(`target has no selector: ${JSON.stringify(t)}`);
   if (t.hasText) loc = loc.filter({ hasText: rx(t.hasText) });
+  // has: an element inside it — the article of *this* rikma that is a transfer
+  if (t.has) loc = loc.filter({ has: locate(page, t.has) });
   return t.nth != null ? loc.nth(t.nth) : t.last ? loc.last() : loc.first();
 }
 

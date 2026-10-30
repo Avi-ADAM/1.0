@@ -96,7 +96,7 @@
       },
       "session": "guest",
       "narration": {
-        "he": "יש לכם רעיון? הדרך המוכרת היא מצגת, משקיעים ומשכורות. ברקמה, האנשים שהיו העובדים הראשונים שלכם מצטרפים כשותפים, וכל אחד מקבל חלק לפי מה שתרם בפועל. בסרטון הזה נעבור על כל הדרך: מהקמת הרקמה, דרך משימות, מטלות ומשאבים, ועד מכירה וחלוקת הכסף.",
+        "he": "יש לכם רעיון? הדרך המוכרת היא מצגת, משקיעים ומשכורות. ברקמה, האנשים שהייתם מגייסים כעובדים הראשונים מצטרפים כשותפים, וכל אחד מקבל חלק לפי מה שתרם בפועל. בסרטון הזה נעבור על כל הדרך: מהקמת הרקמה, דרך משימות, מטלות ומשאבים, ועד מכירה וחלוקת הכסף.",
         "en": "Got an idea? The usual road is a deck, investors and salaries. In a rikma, the people who would have been your first hires join as partners, and each one gets a share for what they actually contributed. In this video we'll walk the whole road: setting up the rikma, missions, tasks and resources, all the way to a sale and splitting the money."
       },
       "setup": [
@@ -1355,7 +1355,14 @@
           "do": "wait",
           "ms": 8000
         }
-      ]
+      ],
+      "edit": {
+        "cut": {
+          "fromStep": 5,
+          "toStep": 7
+        },
+        "fill": "s11c-coins"
+      }
     },
     {
       "id": "s11b-partner-confirms-resource",
@@ -1785,6 +1792,434 @@
         {
           "do": "wait",
           "ms": 10000
+        }
+      ]
+    },
+    {
+      "id": "s11c-coins",
+      "session": "sup2",
+      "insertInto": "s11-accept-resource",
+      "localStorage": {
+        "lev:view": "coins"
+      },
+      "setup": [
+        {
+          "do": "goto",
+          "url": "/lev"
+        },
+        {
+          "do": "waitFor",
+          "target": {
+            "role": "button",
+            "nameKey": "lev.coins.center"
+          },
+          "timeout": 180000
+        },
+        {
+          "do": "wait",
+          "ms": 4000
+        }
+      ],
+      "steps": [
+        {
+          "do": "wait",
+          "ms": 2500
+        },
+        {
+          "do": "hover",
+          "target": {
+            "role": "button",
+            "nameKey": "lev.coins.center"
+          }
+        },
+        {
+          "do": "wait",
+          "ms": 6000
+        }
+      ]
+    },
+    {
+      "id": "s15b-transfer-sent",
+      "title": {
+        "he": "הכסף עובר — ושני הצדדים מאשרים",
+        "en": "The money moves — and both sides confirm"
+      },
+      "session": "sup1",
+      "narration": {
+        "he": "אחרי שהחלוקה אושרה, כל אחד מקבל בלב כרטיס העברה לפי החישוב: כמה להעביר, ולמי. הכסף עצמו עובר ביניכם, מחוץ לאתר. המייסד, שאצלו נמצא הכסף מהמכירה, מעביר לשותפה את החלק שלה ומאשר שהעביר.",
+        "en": "Once the split is approved, each partner gets a transfer card in the heart, from the calculation: how much to send, and to whom. The money itself moves between you, outside the site. The founder, who holds the money from the sale, sends the partner her part and confirms he sent it."
+      },
+      "setup": [
+        {
+          "do": "goto",
+          "url": "/lev"
+        },
+        {
+          "do": "waitFor",
+          "target": {
+            "role": "button",
+            "nameKey": "lev.list.cta.confirm",
+            "within": {
+              "role": "article",
+              "hasText": "${rikmaName}",
+              "has": {
+                "role": "button",
+                "nameKey": "lev.list.kind.vidu"
+              }
+            }
+          },
+          "timeout": 180000
+        }
+      ],
+      "steps": [
+        {
+          "do": "highlight",
+          "target": {
+            "role": "article",
+            "hasText": "${rikmaName}",
+            "has": {
+              "role": "button",
+              "nameKey": "lev.list.kind.vidu"
+            }
+          },
+          "ms": 1800,
+          "mark": "transfer-card"
+        },
+        {
+          "do": "click",
+          "target": {
+            "role": "button",
+            "nameKey": "lev.list.cta.confirm",
+            "within": {
+              "role": "article",
+              "hasText": "${rikmaName}",
+              "has": {
+                "role": "button",
+                "nameKey": "lev.list.kind.vidu"
+              }
+            }
+          },
+          "mark": "open-card"
+        },
+        {
+          "do": "wait",
+          "ms": 2500
+        },
+        {
+          "do": "aria",
+          "name": "card"
+        },
+        {
+          "do": "click",
+          "target": {
+            "role": "button",
+            "nameKey": "lev.cards.didiget.confirmTransferred",
+            "last": true
+          },
+          "commits": true,
+          "mark": "confirm-sent"
+        },
+        {
+          "do": "wait",
+          "ms": 8000
+        }
+      ]
+    },
+    {
+      "id": "s15c-transfer-received",
+      "sameChapter": true,
+      "title": {
+        "he": "הכסף עובר — ושני הצדדים מאשרים",
+        "en": "The money moves — and both sides confirm"
+      },
+      "session": "sup2",
+      "narration": {
+        "he": "עכשיו השותפה רואה שהמייסד אישר שהעביר לה. כשהכסף הגיע, היא מאשרת שקיבלה. רק כששני הצדדים אישרו, ההעברה נסגרת — כך המערכת יודעת שהחלוקה באמת חולקה, בדיוק לפי החשבון.",
+        "en": "Now the partner sees that the founder confirmed sending it. When the money arrives, she confirms she received it. Only when both sides have confirmed is the transfer closed — that is how the system knows the split was really paid out, exactly by the numbers."
+      },
+      "setup": [
+        {
+          "do": "goto",
+          "url": "/lev"
+        },
+        {
+          "do": "waitFor",
+          "target": {
+            "role": "button",
+            "nameKey": "lev.list.cta.confirm",
+            "within": {
+              "role": "article",
+              "hasText": "${rikmaName}",
+              "has": {
+                "role": "button",
+                "nameKey": "lev.list.kind.vidu"
+              }
+            }
+          },
+          "timeout": 180000
+        }
+      ],
+      "steps": [
+        {
+          "do": "highlight",
+          "target": {
+            "role": "article",
+            "hasText": "${rikmaName}",
+            "has": {
+              "role": "button",
+              "nameKey": "lev.list.kind.vidu"
+            }
+          },
+          "ms": 1800,
+          "mark": "transfer-card"
+        },
+        {
+          "do": "click",
+          "target": {
+            "role": "button",
+            "nameKey": "lev.list.cta.confirm",
+            "within": {
+              "role": "article",
+              "hasText": "${rikmaName}",
+              "has": {
+                "role": "button",
+                "nameKey": "lev.list.kind.vidu"
+              }
+            }
+          },
+          "mark": "open-card"
+        },
+        {
+          "do": "wait",
+          "ms": 2500
+        },
+        {
+          "do": "aria",
+          "name": "card"
+        },
+        {
+          "do": "click",
+          "target": {
+            "role": "button",
+            "nameKey": "lev.cards.didiget.confirmReceived",
+            "last": true
+          },
+          "commits": true,
+          "mark": "confirm-received"
+        },
+        {
+          "do": "wait",
+          "ms": 8000
+        }
+      ]
+    },
+    {
+      "id": "s17a-ai-chat",
+      "title": {
+        "he": "הכל גם בשיחה: AI, טלגרם וסוכן משלכם",
+        "en": "All of it by talking: AI, Telegram and your own agent"
+      },
+      "session": "sup2",
+      "narration": {
+        "he": "ואם אין לכם זמן ללחוץ: את כל מה שראינו אפשר לעשות גם בשיחה. הבוט שלנו, בפינת המסך, יכול להקים רקמה, ליצור משימות ומוצרים, להפעיל טיימר ולשמור אותו. פשוט כותבים לו מה צריך.",
+        "en": "And if you don't have time to click: everything we saw can also be done by talking. Our bot, in the corner of the screen, can set up a rikma, create missions and products, start a timer and save it. You just write what you need."
+      },
+      "setup": [
+        {
+          "do": "goto",
+          "url": "/lev"
+        },
+        {
+          "do": "waitFor",
+          "target": {
+            "role": "button",
+            "nameKey": "bot.title"
+          },
+          "timeout": 180000
+        },
+        {
+          "do": "wait",
+          "ms": 2000
+        }
+      ],
+      "steps": [
+        {
+          "do": "click",
+          "target": {
+            "role": "button",
+            "nameKey": "bot.title"
+          },
+          "dispatch": true,
+          "mark": "open-bot"
+        },
+        {
+          "do": "waitFor",
+          "target": {
+            "role": "textbox",
+            "placeholderKey": "bot.timerPlaceholder"
+          }
+        },
+        {
+          "do": "wait",
+          "ms": 1200
+        },
+        {
+          "do": "type",
+          "target": {
+            "role": "textbox",
+            "placeholderKey": "bot.timerPlaceholder"
+          },
+          "text": {
+            "he": "תפעיל טיימר על המשימה ${missionName}",
+            "en": "Start a timer on the mission ${missionName}"
+          },
+          "mark": "ask"
+        },
+        {
+          "do": "wait",
+          "ms": 2500
+        }
+      ]
+    },
+    {
+      "id": "s17b-telegram-settings",
+      "sameChapter": true,
+      "title": {
+        "he": "הכל גם בשיחה: AI, טלגרם וסוכן משלכם",
+        "en": "All of it by talking: AI, Telegram and your own agent"
+      },
+      "session": "sup1",
+      "narration": {
+        "he": "לאנשים עסוקים יש גם בוט בטלגרם. מחברים אותו פעם אחת, מעמוד ההגדרות.",
+        "en": "For busy people there is also a Telegram bot. You connect it once, from the settings page."
+      },
+      "setup": [
+        {
+          "do": "goto",
+          "url": "/me/settings"
+        },
+        {
+          "do": "waitFor",
+          "target": {
+            "role": "heading",
+            "nameKey": "pages.editBasic.telegramNuti"
+          },
+          "timeout": 180000
+        }
+      ],
+      "steps": [
+        {
+          "do": "scroll",
+          "target": {
+            "role": "heading",
+            "nameKey": "pages.editBasic.telegramNuti"
+          },
+          "block": "center"
+        },
+        {
+          "do": "wait",
+          "ms": 1200
+        },
+        {
+          "do": "highlight",
+          "target": {
+            "role": "heading",
+            "nameKey": "pages.editBasic.telegramNuti"
+          },
+          "ms": 2400,
+          "mark": "telegram"
+        },
+        {
+          "do": "wait",
+          "ms": 2000
+        }
+      ]
+    },
+    {
+      "id": "s17t-telegram-phone",
+      "sameChapter": true,
+      "title": {
+        "he": "הכל גם בשיחה: AI, טלגרם וסוכן משלכם",
+        "en": "All of it by talking: AI, Telegram and your own agent"
+      },
+      "external": "C:/Users/babay/Downloads/טלגרם.mp4",
+      "phone": {
+        "width": 596,
+        "height": 1280,
+        "cropHeight": 700,
+        "rate": 1.25
+      },
+      "narration": {
+        "he": "ומשם הכל ישר מהטלפון: מפעילים ועוצרים טיימר, מדווחים על מכירה או מוסיפים מטלה. בוחרים משימה — והטיימר כבר רץ.",
+        "en": "From then on it all happens from your phone: start and stop timers, report a sale or add a task. Pick a mission — and the timer is running."
+      }
+    },
+    {
+      "id": "s17c-mcp",
+      "sameChapter": true,
+      "title": {
+        "he": "הכל גם בשיחה: AI, טלגרם וסוכן משלכם",
+        "en": "All of it by talking: AI, Telegram and your own agent"
+      },
+      "session": "sup1",
+      "narration": {
+        "he": "ואם אתם כבר עובדים עם Claude, אפשר לחבר אותו כקונקטור — או כל כלי שיודע לדבר MCP. בעמוד הזה יש את ההוראות, ובהגדרות יוצרים מפתח משלכם. הסוכן עובד רק בשמכם, וכל מה שדורש הסכמה של שותף — עדיין מחכה לו.",
+        "en": "And if you already work with Claude, you can connect it as a connector — or any tool that speaks MCP. This page has the instructions, and in settings you create a key of your own. The agent acts only as you, and anything that needs a partner's consent still waits for that partner."
+      },
+      "setup": [
+        {
+          "do": "goto",
+          "url": "/mcp"
+        },
+        {
+          "do": "waitFor",
+          "target": {
+            "role": "heading",
+            "nameKey": "mcp.title"
+          },
+          "timeout": 180000
+        }
+      ],
+      "steps": [
+        {
+          "do": "highlight",
+          "target": {
+            "role": "heading",
+            "nameKey": "mcp.title"
+          },
+          "ms": 2200,
+          "mark": "mcp"
+        },
+        {
+          "do": "wait",
+          "ms": 1500
+        },
+        {
+          "do": "scroll",
+          "target": {
+            "role": "heading",
+            "level": 3,
+            "nameKey": "mcp.boundaryTitle"
+          },
+          "block": "center"
+        },
+        {
+          "do": "wait",
+          "ms": 1500
+        },
+        {
+          "do": "highlight",
+          "target": {
+            "role": "heading",
+            "level": 3,
+            "nameKey": "mcp.boundaryTitle"
+          },
+          "ms": 2200,
+          "mark": "not-do"
+        },
+        {
+          "do": "wait",
+          "ms": 1500
         }
       ]
     },

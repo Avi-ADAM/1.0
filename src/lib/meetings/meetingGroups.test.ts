@@ -43,7 +43,35 @@ describe('buildMeetingGroups', () => {
     expect(groups.roles).toEqual([]);
   });
 
+  it('leaves the viewer out of every group', () => {
+    const groups = buildMeetingGroups(
+      {
+        user_1s: { data: [user(1, 'dana'), user(2, 'omer')] },
+        mesimabetahaliches: {
+          data: [
+            mission(10, 'Logo', user(1, 'dana'), [role(7, 'Designer'), role(9, 'Writer')]),
+            mission(11, 'Website', user(2, 'omer'), [role(7, 'Designer')]),
+            mission(12, 'Icons', user(1, 'dana'), [role(9, 'Writer')])
+          ]
+        }
+      },
+      1
+    );
+    expect(groups.all).toEqual(['2']);
+    expect(groups.missions.map((m) => m.id)).toEqual(['11']);
+    expect(groups.ownMissions).toBe(2);
+    expect(groups.roles).toEqual([{ id: '7', name: 'Designer', ids: ['2'] }]);
+  });
+
+  it('is empty for the only member of a rikma', () => {
+    const groups = buildMeetingGroups(
+      { user_1s: { data: [user(4, 'solo')] }, mesimabetahaliches: { data: [mission(1, 'All of it', user(4, 'solo'))] } },
+      '4'
+    );
+    expect(groups).toEqual({ all: [], roles: [], missions: [], ownMissions: 1 });
+  });
+
   it('survives an empty answer', () => {
-    expect(buildMeetingGroups(undefined)).toEqual({ all: [], roles: [], missions: [] });
+    expect(buildMeetingGroups(undefined)).toEqual({ all: [], roles: [], missions: [], ownMissions: 0 });
   });
 });

@@ -1,7 +1,9 @@
 <script>
   // The rikma's door to golden meetings: with every member, with the holders of
   // a role, or with whoever does a running mission. Each choice opens the
-  // meetings app with that meeting filled in (GoldenMeetingLink).
+  // meetings app with that meeting filled in (GoldenMeetingLink). The viewer is
+  // left out of every group — nobody is offered a meeting with themself.
+  import { page } from '$app/state';
   import { t } from '$lib/translations';
   import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
   import Spinner from '$lib/celim/Spinner.svelte';
@@ -25,7 +27,10 @@
   /** @type {import('$lib/meetings/meetingGroups.js').MeetingGroups | null} */
   let groups = $state(null);
 
-  let allIds = $derived(groups?.all.length ? groups.all : memberIds);
+  let selfId = $derived(page.data.uid == null ? '' : String(page.data.uid));
+  let allIds = $derived(groups ? groups.all : memberIds.map(String).filter((id) => id !== selfId));
+  // Nobody else in the rikma yet: there is no one to meet.
+  let solo = $derived(allIds.length === 0);
 
   async function load() {
     if (groups || loading) return;
@@ -33,7 +38,7 @@
     failed = false;
     try {
       const res = await sendToSer({ pid: String(projectId) }, '466rikmaMeetingGroups', null, null, false, fetch);
-      groups = buildMeetingGroups(res?.data?.project?.data?.attributes);
+      groups = buildMeetingGroups(res?.data?.project?.data?.attributes, selfId);
     } catch (e) {
       console.error('[GoldenMeetingMenu] load failed', e);
       failed = true;
@@ -64,53 +69,58 @@
 
   {#if open}
     <div class="w-full max-w-xl rounded-2xl border border-gold/50 bg-slate-900/80 p-4 text-start backdrop-blur-sm">
-      <p class="mb-3 text-xs leading-relaxed text-white/80">{$t('common.goldenMeeting.hint')}</p>
-
-      <div class="flex flex-wrap gap-2">
-        <GoldenMeetingLink
-          withIds={allIds}
-          title={$t('common.goldenMeeting.titleAll', { rikma: projectName })}
-          label={$t('common.goldenMeeting.withAll')}
-        />
-      </div>
-
       {#if loading}
         <div class="flex justify-center py-3"><Spinner size="sm" /></div>
-      {:else if failed}
-        <p class="mt-3 text-xs text-white/80">{$t('common.goldenMeeting.loadError')}</p>
-      {:else if groups}
-        {#if groups.roles.length}
-          <h3 class="mt-4 mb-2 text-xs font-bold uppercase tracking-wide text-gold">
-            {$t('common.goldenMeeting.byRole')}
-          </h3>
-          <div class="flex flex-wrap gap-2">
-            {#each groups.roles as role (role.id)}
-              <GoldenMeetingLink
-                compact
-                withIds={role.ids}
-                title={scoped(role.name)}
-                label={`${role.name} (${role.ids.length})`}
-              />
-            {/each}
-          </div>
-        {/if}
+      {:else if solo}
+        <p class="text-xs leading-relaxed text-white/80">{$t('common.goldenMeeting.solo')}</p>
+      {:else}
+        <p class="mb-3 text-xs leading-relaxed text-white/80">{$t('common.goldenMeeting.hint')}</p>
+        <div class="flex flex-wrap gap-2">
+          <GoldenMeetingLink
+            withIds={allIds}
+            title={$t('common.goldenMeeting.titleAll', { rikma: projectName })}
+            label={$t('common.goldenMeeting.withAll')}
+          />
+        </div>
 
-        <h3 class="mt-4 mb-2 text-xs font-bold uppercase tracking-wide text-gold">
-          {$t('common.goldenMeeting.byMission')}
-        </h3>
-        {#if groups.missions.length}
-          <div class="flex flex-wrap gap-2">
-            {#each groups.missions as m (m.id)}
-              <GoldenMeetingLink
-                compact
-                withIds={[m.holderId]}
-                title={scoped(m.name)}
-                label={`${m.name} · ${m.holderName}`}
-              />
-            {/each}
-          </div>
-        {:else}
-          <p class="text-xs text-white/80">{$t('common.goldenMeeting.empty')}</p>
+        {#if failed}
+          <p class="mt-3 text-xs text-white/80">{$t('common.goldenMeeting.loadError')}</p>
+        {:else if groups}
+          {#if groups.roles.length}
+            <h3 class="mt-4 mb-2 text-xs font-bold uppercase tracking-wide text-gold">
+              {$t('common.goldenMeeting.byRole')}
+            </h3>
+            <div class="flex flex-wrap gap-2">
+              {#each groups.roles as role (role.id)}
+                <GoldenMeetingLink
+                  compact
+                  withIds={role.ids}
+                  title={scoped(role.name)}
+                  label={`${role.name} (${role.ids.length})`}
+                />
+              {/each}
+            </div>
+          {/if}
+
+          <h3 class="mt-4 mb-2 text-xs font-bold uppercase tracking-wide text-gold">
+            {$t('common.goldenMeeting.byMission')}
+          </h3>
+          {#if groups.missions.length}
+            <div class="flex flex-wrap gap-2">
+              {#each groups.missions as m (m.id)}
+                <GoldenMeetingLink
+                  compact
+                  withIds={[m.holderId]}
+                  title={scoped(m.name)}
+                  label={`${m.name} · ${m.holderName}`}
+                />
+              {/each}
+            </div>
+          {:else}
+            <p class="text-xs text-white/80">
+              {groups.ownMissions ? $t('common.goldenMeeting.onlyMine') : $t('common.goldenMeeting.empty')}
+            </p>
+          {/if}
         {/if}
       {/if}
     </div>
