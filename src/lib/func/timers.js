@@ -22,9 +22,10 @@ function unwrapTimerResult(res) {
  * @param {string} actionType - 'timerStart', 'timerStop', or 'timerSave'
  * @param {Object} params - Action parameters
  * @param {Function} [fetchFn] - Optional fetch function
- * @param {{ timeoutMs?: number }} [options] - `timeoutMs` gives up on an answer
+ * @param {{ timeoutMs?: number, via?: string }} [options] - `timeoutMs` gives up on an answer
  *   that never comes, so the caller can show an error instead of a ⏳ that
- *   spins forever. Only for actions that are safe to retry.
+ *   spins forever. Only for actions that are safe to retry. `via` names the
+ *   channel of a server-side caller ($lib/consent/cosign COSIGN_VIAS).
  * @returns {Promise<Object|null>} - The resulting data or null on failure
  */
 async function executeTimerAction(actionType, params, fetchFn = null, options = {}) {
@@ -52,8 +53,13 @@ async function executeTimerAction(actionType, params, fetchFn = null, options = 
     };
     if (params.isSer) {
       bodyPayload.isSer = true;
-      // Remove isSer from params to keep it clean if desired, or keep it. 
+      // Remove isSer from params to keep it clean if desired, or keep it.
       // Based on +server.ts structure, isSer is expected at root or we put it there.
+    }
+    // The channel a server-side caller acts through (telegram / mcp /
+    // assistant): /api/action asks the member's device to co-sign the tick.
+    if (!browser && options.via) {
+      bodyPayload.via = options.via;
     }
 
     const response = await useFetch('/api/action', {
@@ -125,7 +131,8 @@ export async function createManualTimer(missionID, uId, pId, fetch, options = {}
  * @param {number|string} [timerId=0] - Optional timer ID, defaults to 0
  * @param {boolean} [isSer=false] - Flag indicating if this is a server operation
  * @param {Function} fetch - Fetch function
- * @param {Object} [options={}] - Optional additional options
+ * @param {Object} [options={}] - Optional additional options; `via` names the
+ *   channel of a server-side caller (telegram / mcp / assistant)
  * @returns {Promise<Object>} - The created or updated timer data
  */
 export async function startTimer(activeTimer, missionID, uId, pId, fetch, timerId = 0, isSer = false, options) {
@@ -176,7 +183,7 @@ export async function startTimer(activeTimer, missionID, uId, pId, fetch, timerI
     return activeTimer.data;
   }
 
-  return unwrapTimerResult(await executeTimerAction('timerStart', params, fetch));
+  return unwrapTimerResult(await executeTimerAction('timerStart', params, fetch, { via: options?.via }));
 }
 
 // Function to stop the timer
@@ -187,9 +194,10 @@ export async function startTimer(activeTimer, missionID, uId, pId, fetch, timerI
  * @param {boolean} [isSer=false] - Flag indicating if this is a server operation
  * @param {string} [projectId=''] - Project ID
  * @param {string} [userId=''] - User ID
+ * @param {{ via?: string }} [options] - `via`: the channel of a server-side caller
  * @returns {Promise<Object>} - The updated timer data
  */
-export async function stopTimer(timer, fetch, isSer = false, projectId = '', userId = '') {
+export async function stopTimer(timer, fetch, isSer = false, projectId = '', userId = '', options = {}) {
   console.log('Stopping timer:', timer?.id);
   if (!timer?.id) return timer;
 
@@ -222,7 +230,7 @@ export async function stopTimer(timer, fetch, isSer = false, projectId = '', use
     isSer: isSer
   };
 
-  return unwrapTimerResult(await executeTimerAction('timerStop', params, fetch));
+  return unwrapTimerResult(await executeTimerAction('timerStop', params, fetch, { via: options?.via }));
 }
 
 /**

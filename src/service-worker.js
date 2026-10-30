@@ -3,6 +3,7 @@
 //TODO: push nutifiction, english menifast
 import { build, files, version } from '$service-worker';
 import { signEventInSw, flushPending } from '$lib/crypto/swSign';
+import { cosignInSw } from '$lib/crypto/swCosign';
 
 // Create a unique cache name for this deployment
 const CACHE = `cache-${version}`;
@@ -52,9 +53,14 @@ self.addEventListener('push', ev => {
     .filter((a) => a && a.action && a.title && a.url)
     .slice(0, 2);
   const urls = Object.fromEntries(links.map((a) => [a.action, siteUrl(a.url)]));
-  ev.waitUntil(
+  // A tick made through Telegram / MCP / the assistant: this device co-signs it
+  // ($lib/consent/cosign) and the notification says whether it did.
+  const cosigned = message.cosign
+    ? cosignInSw(message.cosign).catch((e) => ({ ok: false, reason: 'threw:' + (e && e.message) }))
+    : Promise.resolve(null);
+  ev.waitUntil(cosigned.then((res) =>
     self.registration.showNotification(message.title, {
-      body: message.body,
+      body: res && res.ok && message.bodySigned ? message.bodySigned : message.body,
       icon:
         message.pic ??
         'https://res.cloudinary.com/love1/image/upload/v1645647192/apple-touch-icon_irclue.png',
@@ -67,7 +73,7 @@ self.addEventListener('push', ev => {
         ? links.map((a) => ({ action: a.action, title: a.title }))
         : [{ action: 'open_url', title: 'Open' }]
     })
-  );
+  ));
 });
 
 self.addEventListener('notificationclick', function (event) {

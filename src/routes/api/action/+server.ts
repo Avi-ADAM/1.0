@@ -27,6 +27,8 @@ import { isInternalRequest } from '$lib/server/internalSecret.js';
 import { resolvePrincipal } from '$lib/server/authz/principal.js';
 import { applyAuthz } from '$lib/server/authz/authorize.js';
 import { getAction } from '$lib/server/actions/registry.js';
+import { normalizeVia } from '$lib/consent/cosign';
+import { requestDeviceCosign } from '$lib/server/consent/deviceCosign';
 
 // Environment variables
 const STRAPI_ENDPOINT = STRAPI_URL + '/graphql';
@@ -143,6 +145,14 @@ export const POST: RequestHandler = async ({ request, cookies, fetch, locals }) 
     // Execute action
     const service = getActionService();
     const result = await service.executeAction(actionKey, params, context);
+
+    // A timer moved from Telegram / MCP / the assistant has no member key on
+    // this side: ask the member's devices to co-sign it ($lib/consent/cosign).
+    // Only a genuine server-side caller can name a channel.
+    const via = normalizeVia(body.via);
+    if (result.success && via && isInternalRequest(request)) {
+      await requestDeviceCosign({ actionKey, params, result: result.data, userId, via, fetch });
+    }
 
     // Clear timeout
     clearTimeout(timeoutId);

@@ -33,6 +33,8 @@ export const timerActionTool = createTool({
     const userId = ctx.userId;
     const fetchInstance = ctx.fetchInstance;
     const isServerRequest = !ctx.isInternalBot;
+    // The member's device co-signs the tick and is told where it came from.
+    const via = ctx.isInternalBot ? 'assistant' : 'mcp';
     const currentMessage = ctx.currentMessage || '';
     const lastMissionSearch = ctx.lastMissionSearch;
 
@@ -174,7 +176,8 @@ export const timerActionTool = createTool({
             projectId,
             fetchInstance,
             timerId,
-            isServerRequest
+            isServerRequest,
+            { via }
           );
 
           return {
@@ -201,7 +204,8 @@ export const timerActionTool = createTool({
             fetchInstance,
             isServerRequest,
             projectId,
-            userId
+            userId,
+            { via }
           );
 
           // Calculate duration

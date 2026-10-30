@@ -912,7 +912,7 @@ bot.action(/^startTimer-(\d+)-(\d+)$/, async (ctx) => {
         const projectId = missionData?.data?.mesimabetahalich?.data?.attributes?.project?.data?.id;
         if (!projectId) throw new Error(`Project ID not found for mission ${missionId}`);
 
-        const res = await startTimer(activeTimer, missionId, userId, projectId, fetch, timerId, true); // GLOBAL fetch
+        const res = await startTimer(activeTimer, missionId, userId, projectId, fetch, timerId, true, { via: 'telegram' }); // GLOBAL fetch
 
         if (res) {
             await ctx.editMessageReplyMarkup(undefined).catch(() => { }); // Remove choice buttons
@@ -981,7 +981,7 @@ bot.action(/^stopTimer-(\d+)-(\d+)$/, async (ctx) => {
         }
 
         const projectId = missionData?.data?.mesimabetahalich?.data?.attributes?.project?.data?.id;
-        const stoppedTimer = await stopTimer(activeTimerData, fetch, true, projectId, userId); // GLOBAL fetch
+        const stoppedTimer = await stopTimer(activeTimerData, fetch, true, projectId, userId, { via: 'telegram' }); // GLOBAL fetch
 
         const timerAttributes = stoppedTimer?.updateTimer?.data?.attributes || stoppedTimer?.attributes;
 
@@ -2380,7 +2380,7 @@ bot.on('text', async (ctx) => {
                         const timerId = activeTimer?.data?.id || 0;
                         const projectId = missionData?.data?.mesimabetahalich?.data?.attributes?.project?.data?.id;
                         if (!projectId) throw new Error(`Project ID not found for mission ${missionId}`);
-                        const res = await startTimer(activeTimer, missionId, userInfo.uid, projectId, fetch, timerId, true);
+                        const res = await startTimer(activeTimer, missionId, userInfo.uid, projectId, fetch, timerId, true, { via: 'telegram' });
                         if (res) { ctx.reply(getText('timerStartedMission', lang, { missionName })); }
                         else { throw new Error("Start failed via AI"); }
                     } catch (error) {
@@ -2430,7 +2430,7 @@ bot.on('text', async (ctx) => {
                             return;
                         }
                         const projectId = missionData?.data?.mesimabetahalich?.data?.attributes?.project?.data?.id;
-                        const stoppedTimer = await stopTimer(activeTimerData, fetch, true, projectId, userInfo.uid);
+                        const stoppedTimer = await stopTimer(activeTimerData, fetch, true, projectId, userInfo.uid, { via: 'telegram' });
                         const timerAttributes = stoppedTimer?.updateTimer?.data?.attributes || stoppedTimer?.attributes;
 
                         if (timerAttributes && !timerAttributes.isActive) {

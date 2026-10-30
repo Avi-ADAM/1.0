@@ -8,7 +8,7 @@ import { signCanonical } from './sign';
 import { canonicalize } from './canonical';
 import type { ConsentEvent } from '$lib/consent/event';
 
-type IdentityRow = {
+export type IdentityRow = {
   id: 'self';
   userId: string;
   algo: 'Ed25519' | 'ECDSA-P256';
@@ -20,17 +20,29 @@ type IdentityRow = {
 };
 
 const DB_NAME = 'freemates-crypto';
-const DB_VERSION = 1;
 
-function openDb(): Promise<IDBDatabase> {
+/**
+ * Open the keystore at WHATEVER version the page created it at. The schema is
+ * the page's (keystore.ts, now v3): opening with an explicit older version
+ * throws VersionError, and a worker that upgraded it would race the page.
+ * No database yet ⇒ no identity — the upgrade is aborted rather than leaving
+ * an empty v1 behind.
+ */
+export function openDb(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
-    const r = indexedDB.open(DB_NAME, DB_VERSION);
-    r.onsuccess = () => resolve(r.result);
+    const r = indexedDB.open(DB_NAME);
+    r.onupgradeneeded = () => r.transaction?.abort();
+    r.onsuccess = () => {
+      const db = r.result;
+      // Never block the page's own upgrade.
+      db.onversionchange = () => db.close();
+      resolve(db);
+    };
     r.onerror = () => reject(r.error);
   });
 }
 
-async function getIdentity(): Promise<IdentityRow | undefined> {
+export async function getIdentity(): Promise<IdentityRow | undefined> {
   const db = await openDb();
   return new Promise((resolve, reject) => {
     const tx = db.transaction('identity', 'readonly');

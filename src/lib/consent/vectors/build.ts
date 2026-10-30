@@ -484,6 +484,17 @@ const SCENARIOS: Scenario[] = [
       { label: 'c01', actor: 'alice', action: 'snapshot.commit', subject: ['project', 'p-2'], t: 0, parents: [] },
       { label: 'c02', actor: 'carol', action: 'project.join', subject: ['project', 'p-2'], t: 5000 }
     ]
+  },
+  {
+    name: 'timer-cosigned-by-device',
+    projectId: 'p-3',
+    description:
+      'A clock moved through another channel (Telegram, MCP, the assistant) and co-signed by the member\'s own device carries `via`; the reducer reads it as any other tick. `order` is the interval time, so start and stop keep separate dedupe keys.',
+    steps: [
+      { label: 'd01', actor: 'alice', action: 'project.create', subject: ['project', 'p-3'], predicate: { settings: { name: 'p-3' } }, t: 0, parents: [] },
+      { label: 'd02', actor: 'alice', action: 'time.tick', subject: ['timer', 't-1'], predicate: { op: 'start', order: T0 + 60_000, fresh: true, mission: 'm-3', via: 'telegram' }, t: 61_000 },
+      { label: 'd03', actor: 'alice', action: 'time.tick', subject: ['timer', 't-1'], predicate: { op: 'stop', order: T0 + 3_660_000, sessionMs: 3_600_000, via: 'mcp' }, t: 3_662_000 }
+    ]
   }
 ];
 

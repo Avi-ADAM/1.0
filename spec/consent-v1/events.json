@@ -1690,6 +1690,158 @@
         },
         "stateRoot": "mNbD99L2DrbKI7zlvDAo0BrzaUMSX-8YW8bGqusEzs0"
       }
+    },
+    {
+      "name": "timer-cosigned-by-device",
+      "description": "A clock moved through another channel (Telegram, MCP, the assistant) and co-signed by the member's own device carries `via`; the reducer reads it as any other tick. `order` is the interval time, so start and stop keep separate dedupe keys.",
+      "projectId": "p-3",
+      "labels": {
+        "8EGoUknO1Gb4LJdQk0_joVc20iBBfGY8Pz_39hjOhIg": "d01",
+        "3EjDUBZl0HiuQqfVcGf5v1E_rMNwMI_AbDJ327SNqBs": "d02",
+        "HIiqofo4WAe_VG83b9mV0q7kwJGK5urLJPc3ZUN2oBY": "d03"
+      },
+      "events": [
+        {
+          "v": 1,
+          "actor": "u-alice",
+          "device": "MCowBQYDK2VwAyEAw2aFyT5XfLsPDVxfoEQOCSVgl1_YS5aoiK8UGIh1RTY",
+          "action": "project.create",
+          "subject": {
+            "type": "project",
+            "id": "p-3"
+          },
+          "predicate": {
+            "settings": {
+              "name": "p-3"
+            }
+          },
+          "parents": [],
+          "ts": 1760000000000,
+          "nonce": "JkLsexhqHAH9b4Xfl_GxMw",
+          "sig": "gsa9t6VgAa1MRanxL8z7ixMUg4JzCFuDU94r0PDmI-3hsZ3hEHv9qKajrVuzCw8GCdZGbr3mfKiQVb5SIuKLAw",
+          "id": "8EGoUknO1Gb4LJdQk0_joVc20iBBfGY8Pz_39hjOhIg"
+        },
+        {
+          "v": 1,
+          "actor": "u-alice",
+          "device": "MCowBQYDK2VwAyEAw2aFyT5XfLsPDVxfoEQOCSVgl1_YS5aoiK8UGIh1RTY",
+          "action": "time.tick",
+          "subject": {
+            "type": "timer",
+            "id": "t-1"
+          },
+          "predicate": {
+            "op": "start",
+            "order": 1760000060000,
+            "fresh": true,
+            "mission": "m-3",
+            "via": "telegram"
+          },
+          "parents": [
+            "8EGoUknO1Gb4LJdQk0_joVc20iBBfGY8Pz_39hjOhIg"
+          ],
+          "ts": 1760000061000,
+          "nonce": "tZnyCq0BnQK1ZcIMSdTYIw",
+          "sig": "ABcEEd-GGXdIYR6-ifH7adqUc8tff1K0Yk-DBAV1V6GoIJE0XlKHhN-431v3v2sJ7YKuLbArHBK6lowTz7oqAw",
+          "id": "3EjDUBZl0HiuQqfVcGf5v1E_rMNwMI_AbDJ327SNqBs"
+        },
+        {
+          "v": 1,
+          "actor": "u-alice",
+          "device": "MCowBQYDK2VwAyEAw2aFyT5XfLsPDVxfoEQOCSVgl1_YS5aoiK8UGIh1RTY",
+          "action": "time.tick",
+          "subject": {
+            "type": "timer",
+            "id": "t-1"
+          },
+          "predicate": {
+            "op": "stop",
+            "order": 1760003660000,
+            "sessionMs": 3600000,
+            "via": "mcp"
+          },
+          "parents": [
+            "3EjDUBZl0HiuQqfVcGf5v1E_rMNwMI_AbDJ327SNqBs"
+          ],
+          "ts": 1760003662000,
+          "nonce": "snCfG9VZCWtqtii2Gg1I3Q",
+          "sig": "Sfa61mH1rJ0qcKBgB2qeKy1HchqFsZnkIPBu2DE9Kx0LcodjYpQa3mLQLNaN8VfKCIFJGy8-SlKpAI4msno9CA",
+          "id": "HIiqofo4WAe_VG83b9mV0q7kwJGK5urLJPc3ZUN2oBY"
+        }
+      ],
+      "expect": {
+        "topoOrder": [
+          "8EGoUknO1Gb4LJdQk0_joVc20iBBfGY8Pz_39hjOhIg",
+          "3EjDUBZl0HiuQqfVcGf5v1E_rMNwMI_AbDJ327SNqBs",
+          "HIiqofo4WAe_VG83b9mV0q7kwJGK5urLJPc3ZUN2oBY"
+        ],
+        "dedupeKeys": {
+          "8EGoUknO1Gb4LJdQk0_joVc20iBBfGY8Pz_39hjOhIg": "u-alice|project:p-3|project.create|0",
+          "3EjDUBZl0HiuQqfVcGf5v1E_rMNwMI_AbDJ327SNqBs": "u-alice|timer:t-1|time.tick|1760000060000",
+          "HIiqofo4WAe_VG83b9mV0q7kwJGK5urLJPc3ZUN2oBY": "u-alice|timer:t-1|time.tick|1760003660000"
+        },
+        "applied": [
+          "8EGoUknO1Gb4LJdQk0_joVc20iBBfGY8Pz_39hjOhIg",
+          "3EjDUBZl0HiuQqfVcGf5v1E_rMNwMI_AbDJ327SNqBs",
+          "HIiqofo4WAe_VG83b9mV0q7kwJGK5urLJPc3ZUN2oBY"
+        ],
+        "heads": [
+          "HIiqofo4WAe_VG83b9mV0q7kwJGK5urLJPc3ZUN2oBY"
+        ],
+        "steps": [
+          {
+            "id": "8EGoUknO1Gb4LJdQk0_joVc20iBBfGY8Pz_39hjOhIg",
+            "label": "d01",
+            "rootAfter": "FZXFU8LWkl69m_1ClV_QCKWE0kucrkExVQOZz4Ae5PY"
+          },
+          {
+            "id": "3EjDUBZl0HiuQqfVcGf5v1E_rMNwMI_AbDJ327SNqBs",
+            "label": "d02",
+            "rootAfter": "5vA_ZcgJm1sYNLiHkdxw0dpR6PLS49RR3JjEs4zsABc"
+          },
+          {
+            "id": "HIiqofo4WAe_VG83b9mV0q7kwJGK5urLJPc3ZUN2oBY",
+            "label": "d03",
+            "rootAfter": "QZmUpMDxgyfvjKJ7F7Xampjl2zL26nwJWLd8br5kSDg"
+          }
+        ],
+        "normalizedState": {
+          "v": 2,
+          "projectId": "p-3",
+          "asOf": 1760003662000,
+          "members": [
+            "u-alice"
+          ],
+          "balances": [],
+          "tosplits": [],
+          "rounds": [],
+          "sales": [],
+          "saleClaims": [],
+          "missions": [],
+          "halukas": [],
+          "decisions": [],
+          "stageVotes": [],
+          "timers": [
+            [
+              "t-1",
+              {
+                "id": "t-1",
+                "totalMs": 3600000
+              }
+            ]
+          ],
+          "forums": [],
+          "meetings": [],
+          "away": [],
+          "settings": [
+            [
+              "name",
+              "p-3"
+            ]
+          ]
+        },
+        "stateRoot": "QZmUpMDxgyfvjKJ7F7Xampjl2zL26nwJWLd8br5kSDg"
+      }
     }
   ]
 }

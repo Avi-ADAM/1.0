@@ -154,7 +154,10 @@ export const timeTickConsentSpec: ConsentSpec = {
     // the shadow panel may compare its total with Strapi (a resumed legacy
     // timer has hours the chain never saw).
     fresh: params.fresh === true ? true : undefined,
-    mission: params.missionId != null ? String(params.missionId) : undefined
+    mission: params.missionId != null ? String(params.missionId) : undefined,
+    // Set only when the member's DEVICE co-signed a tick made through another
+    // channel ($lib/consent/cosign). Absent = signed where it happened.
+    via: typeof params.via === 'string' ? params.via : undefined
   })
 };
 

@@ -535,7 +535,8 @@ export const startTimerWithNotesTool = createTool({
       // Start timer with additional parameters
       await startTimer(activeTimer, missionId, userId, projectId, fetchInstance, timerId, isServerRequest, {
         notes,
-        taskId
+        taskId,
+        via: globalContext.isInternalBot ? 'assistant' : 'mcp'
       });
       
       return { 
@@ -592,11 +593,18 @@ export const stopTimerWithSummaryTool = createTool({
         return { success: false, message: `No active timer found for ${missionName}`, error: 'No active timer' };
       }
 
-      // Stop timer with additional parameters
-      await stopTimer(activeTimerData, fetchInstance, isServerRequest, {
-        summary,
-        completedTasks
-      });
+      // stopTimer takes (projectId, userId, options) here — this call used to
+      // pass { summary, completedTasks } as the project id, which stopTimer
+      // never read anyway.
+      const projectId = mission.attributes?.project?.data?.id;
+      await stopTimer(
+        activeTimerData,
+        fetchInstance,
+        isServerRequest,
+        projectId ? String(projectId) : '',
+        String(globalContext.userId ?? ''),
+        { via: globalContext.isInternalBot ? 'assistant' : 'mcp' }
+      );
       
       // Calculate duration (this would come from the timer data)
       const startTime = new Date(activeTimerData.attributes.startTime);
