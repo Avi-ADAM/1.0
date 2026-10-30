@@ -6,9 +6,10 @@
 > is one commit with its own acceptance criteria — except 2 and 3, which cannot
 > ship apart and landed together. Tick the boxes as they land.
 >
-> **What is left:** Stage 6 (pan, zoom, keyboard, minimap) and Stage 7 (delete
-> the now unreachable coin-mode branches from the 12 giant components and drop
-> `swiper` from `package.json`).
+> **What is left:** Stage 6 (pan, zoom, keyboard, minimap) and the rest of
+> Stage 7 (`letters()`, the conventions §10). Its first box — the unreachable
+> coin-mode branches out of the 12 giant components, and `swiper` out of
+> `package.json` — landed 2026-10-30.
 >
 > The four open questions were **decided by the owner on 2026-08-24** — see §6.
 > In short: `/newlev` redirects to `/lev`; distance from the heart *is* urgency;
@@ -483,9 +484,9 @@ end of Stage 3 for why the two could not be separate commits.
         and the `.burst` rule that references them were confirmed in the page's
         CSSOM. Actually watching one pop needs a real vote on the owner's real
         heart, which is not a thing to do from a test pass.
-- [ ] The `{#if cards == false}` branches inside the 12 giant components are now
-      **unreachable** — nothing renders a card in coin mode any more — but they
-      are still in the files. Deleting them, and `swiper` with them, is Stage 7.
+- [x] The `{#if cards == false}` branches inside the 12 giant components are now
+      **unreachable** — nothing renders a card in coin mode any more. Deleted in
+      Stage 7, `swiper` with them.
 
 *Acceptance — measured in the browser on the same 137-coin heart:*
 
@@ -743,8 +744,15 @@ tab-and-arrow navigation reaches every coin.
 
 ### Stage 7 — cleanup and the convention
 
-- [ ] Delete the `{#if cards == false}` branch from all 12 components; drop
-      `swiper` from `package.json`.
+- [x] Delete the `{#if cards == false}` branch from all 12 components; drop
+      `swiper` from `package.json`. *(2026-10-30.)* With the branches went
+      everything only they used — the Swiper glue, the hover/coin-modal state,
+      the `Drawer`/`ProgressBar` imports, `lev/style.css` and every selector
+      the compiler then reported unused; about 11,000 lines across the 12. The
+      other Swiper leftovers went too: `registration/scree.svelte` (imported
+      nowhere) with its stylesheet, `func/uti/preventScroll.svelte`, and the
+      `.swipermobile` rules. `.swiperc` / `.swiper-slidec` stay — they are the
+      scroll-snap deck's own class names now, not the library's.
 - [ ] Retire `letters()` and the `nameRaw` duplication once nothing renders
       Hebrew into raw SVG `<text>` (see `project_lev_letters_reverses` memory —
       update it when this lands). **Stage 5b settled the doubt this raised:**

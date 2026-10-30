@@ -1,19 +1,14 @@
 <script>
   import CurrencySymbol from '$lib/components/money/CurrencySymbol.svelte';
   import Money from '$lib/components/money/Money.svelte';
-  import { Drawer } from 'vaul-svelte';
-  import { ProgressBar } from 'progressbar-svelte';
   import { goto } from '$app/navigation';
-  import Lowbtn from '$lib/celim/lowbtn.svelte';
   import { t } from '$lib/translations';
-  import { clickOutside } from './outsidclick.js';
   import { fly } from 'svelte/transition';
   import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
   import { idPr } from './../../stores/idPr.js';
   import { onMount } from 'svelte';
   import moment from 'moment';
   import { executeAction } from '$lib/client/actionClient';
-  let dialogOpen = $state(false);
   /**
    * @typedef {Object} Props
    * @property {boolean} [low]
@@ -153,13 +148,6 @@
   let awaitingReport = $derived(
     isRecurringCycle && !isResponsible && !cycleReported
   );
-  // Accessible names for the two icon-only actions on this card.
-  let approveLabel = $derived(
-    isResponsible ? $t('lev.weget.reportApproveAria') : $t('lev.weget.approveAria')
-  );
-  let objectLabel = $derived(
-    isRecurringCycle ? $t('lev.weget.proposeAmountAria') : $t('lev.weget.objectAria')
-  );
   let amountInput = $state(0);
   // Counter-offer (negotiation) on a recurring cycle.
   let nego = $state(false);
@@ -171,34 +159,8 @@
   let shownAmount = $derived(amountOverride ?? quantityDelivered);
   let resP = [];
   let lang;
-  import { Swiper, SwiperSlide } from 'swiper/svelte';
 
-  // Import Swiper styles
-  import 'swiper/css';
 
-  import 'swiper/css/effect-flip';
-  import './style.css';
-
-  // import required modules
-  import { EffectFlip, Navigation } from 'swiper';
-  let swiperRef = null;
-
-  const setSwiperRef = ({ detail }) => {
-    const [swiper] = detail;
-    // set swiper instance
-    setTimeout(() => {
-      swiperRef = swiper;
-    });
-  };
-
-  const slideTo = (index) => {
-    if (swiperRef !== null) {
-      swiperRef.slideTo(index, 400);
-    }
-  };
-  function toggleShow() {
-    slideTo(0);
-  }
   let error1;
 
   let monts = $state(0);
@@ -248,25 +210,8 @@
 
   let ser = $state(xyz());
 
-  let ucli = $state(0);
-
-  let pcli = $state(0);
-
   let pmcli = $state(0);
 
-  function linke(s) {
-    if (s == 'u') {
-      ucli += 1;
-      if (ucli >= 2) {
-        onUser?.({ id: userId });
-      }
-    } else if (s == 'p') {
-      pcli += 1;
-      if (pcli >= 2) {
-        onProj?.({ id: projectId });
-      }
-    }
-  }
   function project(id) {
     pmcli += 1;
     if (pmcli >= 2) {
@@ -406,13 +351,6 @@
       console.log(error1);
     }
   }
-  function ask() {
-    console.log('nego');
-    // text and more hours if needed ,
-    masa = true;
-    no = false;
-    isOpen = true;
-  }
 
   async function decline() {
     // Optimistic UI update
@@ -452,25 +390,12 @@
     nego = false;
   }
 
-  let hovered = $state(false);
-
-  let w = $state(0);
-
   let u = 'בקשה לאישור קבלת משאב בהצלחה';
   function hover(id) {
     if (id == '0') {
       u = 'בקשה לאישור קבלת משאב בהצלחה';
     } else {
       u = id;
-    }
-    onHover?.({ id: u });
-  }
-  function hoverede() {
-    hovered = !hovered;
-    if (hovered == false) {
-      u = 'לב המערכת';
-    } else {
-      u = 'בקשה לאישור קבלת משאב בהצלחה';
     }
     onHover?.({ id: u });
   }
@@ -484,7 +409,6 @@
     onHover?.({ id: u });
   }
   import Cards from './cards/dowegeot.svelte';
-  import TimetToTimegrama from './cards/timetToTimegrama.svelte';
 </script>
 
 <DialogOverlay {isOpen} onDismiss={close} class="overlay">
@@ -604,536 +528,44 @@
     </DialogContent>
   </div>
 </DialogOverlay>
-{#if cards == false}
-  <div
-    style="position: relative;"
-    style:z-index={hovered === false ? 11 : 16}
-    onclick={() => {
-      modal = true;
-      onModal?.();
-      dialogOpen = true;
-    }}
-    role="button"
-    onmouseenter={() => hoverede()}
-    onmouseleave={() => hoverede()}
-    use:clickOutside
-    onclick_outside={toggleShow}
-    class="hover:scale-290 duration-1000 ease-in"
-    transition:fly|local={{ y: 250, opacity: 0.9, duration: 2000 }}
-  >
-    {#if timegramaDate && !timegramaDone}
-      <TimetToTimegrama {timegramaDate} />
-    {/if}
-    <Swiper
-      dir="rtl"
-      on:swiper={setSwiperRef}
-      effect={'flip'}
-      grabCursor={true}
-      modules={[EffectFlip, Navigation]}
-      flipEffect={{ slideShadows: false }}
-      class="mySwiper swiperg"
-      navigation={{
-        nextEl: `.normSml${spid}-opo`,
-        prevEl: `.normSmll${spid}-opo`
-      }}
-    >
-      <div
-        bind:clientWidth={w}
-        style:width={tryo}
-        style:top={tryot}
-        style:left={tryoti}
-        style="position:absolute;"
-      >
-        <ProgressBar
-          cls="transition: all 1000ms ease-in-out;"
-          series={ser}
-          width={w}
-          textSize={0}
-          thickness={4}
-          style="radial"
-        />
-      </div>
-      <SwiperSlide class="swiper-slideg"
-        ><div id="normSml">
-          <div style="--the:{stylef};">
-            <svg
-              version="1.1"
-              viewBox="-106 -106 212 212"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <defs>
-                <linearGradient id="lg" x1="1" y1="1" spreadMethod="pad">
-                  <stop offset="0" style="stop-color: rgb(100, 71, 105);" />
-                  <stop offset="1" style="stop-color: rgb(54, 241, 155);" />
-                </linearGradient>
-                <linearGradient id="lgb" x1="1" y1="1">
-                  <stop offset="0" style="stop-color: rgb(125, 105, 155);" />
-                  <stop offset="1" style="stop-color: rgb(0, 100, 120);" />
-                </linearGradient>
-              </defs>
-              <circle
-                stroke-opacity="0.01"
-                r="100"
-                fill-opacity="0.01"
-                fill="url(#lg)"
-                transform="rotate(135)"
-                stroke="url(#lgb)"
-                stroke-width="6"
-                style="fill-rule: nonzero; paint-order: fill;"
-              />
-              <circle
-                r="80"
-                fill-opacity="0.01"
-                fill="url(#lg)"
-                transform="rotate(315)"
-                stroke="none"
-              />
-
-              <g
-                onclick={() => linke('u')}
-                onmouseenter={() =>
-                  hover(` לחיצה למעבר לעמוד הפרופיל של ${useraplyname}`)}
-                onmouseleave={() => hover('0')}
-                x="0"
-                y="40"
-                style="margin-top: 2px; margin-bottom: 2px"
-              >
-                <foreignObject
-                  x="0"
-                  y="0"
-                  width="56px"
-                  height="56px"
-                  transform="translate(-28,-28)"
-                >
-                  <span class={`normSml${spid}-opo`}></span>
-                  <img
-                    width="56px"
-                    height="56px"
-                    alt={useraplyname}
-                    {src}
-                    style="border-radius: 50%;"
-                  />
-                </foreignObject>
-                <text
-                  fill="#FF0092"
-                  text-anchor="middle"
-                  x="0"
-                  y="46"
-                  style="margin: 2px; font-size: 24px; line-height: 1; font-weight: bold;"
-                  >{useraplyname}</text
-                >
-              </g>
-              <path
-                id="curve"
-                fill-opacity="0.01"
-                d="M -79.587 0 C -81.732 -2.923 -75.008 -81.366 0 -80.446 C 74.342 -79.534 81.282 -3.522 80.257 0"
-              />
-              <text
-                color="#EEE8AA"
-                width="208.55"
-                x="-90"
-                y="-90"
-                style="white-space: pre-wrap;"
-              >
-                <textPath
-                  onmouseenter={() => hover('שם המשאב')}
-                  onmouseleave={() => hover('0')}
-                  color="#EEE8AA"
-                  x="-90"
-                  y="-90"
-                  class="curved-text"
-                  startOffset={st}
-                  xlink:href="#curve"
-                >
-                  {missionBName}
-                </textPath>
-              </text>
-              <g
-                onclick={() => linke('p')}
-                onmouseenter={() =>
-                  hover('לחיצה למעבר לעמוד הציבורי של הרקמה')}
-                onmouseleave={() => hover('0')}
-                x="0"
-                y="-40"
-              >
-                <text
-                  fill="#FF0092"
-                  text-anchor="middle"
-                  x="0"
-                  y="-29"
-                  style="font-size: 15px; line-height: 1; font-weight: bold; white-space: pre;"
-                  >{projectName}</text
-                >
-              </g>
-              <foreignObject
-                x="0"
-                y="-60 "
-                width="40px"
-                height="40px"
-                transform="translate(-20,-20)"
-              >
-                <button
-                  onclick={() => project(projectId)}
-                  onmouseenter={() =>
-                    hover(` לחיצה למעבר למוח רקמת ${projectName}`)}
-                  onmouseleave={() => hover('0')}
-                >
-                  <img
-                    style="margin-top: 0px; margin-bottom: 0px; margin-right:auto; margin-left: auto; border-radius: 50%;"
-                    src={src2}
-                    width="40"
-                    height="40"
-                    alt="projectlogo"
-                    title={projectName}
-                  />
-                </button>
-              </foreignObject>
-            </svg>
-          </div>
-        </div>
-      </SwiperSlide><SwiperSlide class="swiper-slideg"
-        ><div id="normSmll">
-          <span class={`normSmll${spid}-opo`}></span>
-          <p class="ab pnn">
-            <span
-              onmouseenter={() => hover('סך ההצבעות בעד')}
-              onmouseleave={() => hover('0')}
-              style="color:#7EE081;"
-              >{noofusersOk}
-            </span>
-            <span
-              onmouseenter={() => hover('לא הצביעו')}
-              onmouseleave={() => hover('0')}
-              style="color:#0000cc;"
-            >
-              {noofusersWaiting}
-            </span><span
-              onmouseenter={() => hover('כמות ההצבעות נגד')}
-              onmouseleave={() => hover('0')}
-              style="color:#80037e;"
-              >{noofusersNo}
-            </span>
-          </p>
-          <h2
-            onmouseenter={() => hover('הערות')}
-            onmouseleave={() => hover('0')}
-            class="text-barbi bc"
-          >
-            {spnot}
-          </h2>
-          {#if isRecurringCycle}
-            <p class="p cd">
-              {#if cycleReported}
-                <span
-                  onmouseenter={() => hover('ההוצאה שדווחה החודש - לחצו על הלב לאישור')}
-                  onmouseleave={() => hover('0')}
-                  style="color:var(--gold)">🔁 <Money amount={shownAmount} {projectId} /></span
-                >
-              {:else}
-                <span
-                  onmouseenter={() =>
-                    hover(
-                      isResponsible
-                        ? 'טרם דיווחת את ההוצאה החודש - לחצו על הלב לדיווח'
-                        : 'ממתין לדיווח ההוצאה ע"י האחראי'
-                    )}
-                  onmouseleave={() => hover('0')}
-                  style="color:#9aa0a6;">🔁 ~<Money amount={pricePerUnit} {projectId} /> {isResponsible ? '(מתוכנן)' : '(טרם דווח)'}</span
-                >
-              {/if}
-              {#if cycleIndex}
-                <span style="color: aqua; font-size:0.8em;"> · #{cycleIndex}</span>
-              {/if}
-            </p>
-          {:else if kindOf === 'perUnit'}
-            <p dir="ltr" class="p cd">
-              <span
-                onmouseenter={() => hover(' שווי ליחידה')}
-                onmouseleave={() => hover('0')}
-                style="color:var(--gold)">{agprice}</span
-              >
-              *
-              <span
-                onmouseenter={() => hover('כמות')}
-                onmouseleave={() => hover('0')}
-                style="color: aqua">{hm}</span
-              >
-              =
-              <span
-                onmouseenter={() => hover('סך הכל')}
-                onmouseleave={() => hover('0')}
-                >{(agprice * hm).toFixed(2)}</span
-              >
-            </p>
-          {:else if kindOf === 'total' || kindOf === 'rent'}
-            <p class="p cd">
-              <span
-                onmouseenter={() => hover('שווי מוצע')}
-                onmouseleave={() => hover('0')}
-                style="color:var(--gold)">{agprice}</span
-              >
-            </p>
-          {:else if kindOf === 'monthly'}
-            <p class="p cd">
-              <span
-                onmouseenter={() => hover('שווי לחודש')}
-                onmouseleave={() => hover('0')}
-                style="color:var(--gold)">{agprice}</span
-              >
-              *
-              <span
-                onmouseenter={() => hover('כמות חודשים')}
-                onmouseleave={() => hover('0')}
-                style="color: aqua">{monts}</span
-              >
-              =
-              <span
-                onmouseenter={() => hover('סך הכל')}
-                onmouseleave={() => hover('0')}
-                >{(agprice * monts).toFixed(2)}</span
-              >
-            </p>
-          {:else if kindOf === 'yearly'}
-            <p class="p cd">
-              <span
-                onmouseenter={() => hover('שווי לשנה')}
-                onmouseleave={() => hover('0')}
-                style="color:var(--gold)">{agprice}</span
-              >
-              *
-              <span
-                onmouseenter={() => hover('מספר שנים')}
-                onmouseleave={() => hover('0')}
-                style="color: aqua">{yers}</span
-              >
-              =
-              <span
-                onmouseenter={() => hover('סך הכל')}
-                onmouseleave={() => hover('0')}
-                >{(agprice * yers).toFixed(2)}</span
-              >
-            </p>
-          {/if}
-          {#if low == false}
-            {#if awaitingReport}
-              <p
-                class="cd"
-                style="grid-column:1/3; grid-row:4/5; margin:0; font-size:8px; line-height:1.1; color:#9aa0a6; text-align:center;"
-                onmouseenter={() => hover($t('lev.weget.awaitingReportHint'))}
-                onmouseleave={() => hover('0')}
-              >
-                {$t('lev.weget.awaitingReport')}
-              </p>
-            {:else if !already}
-              <!-- Icon-only, and it is the ONLY control that closes a resource
-                   receipt — without a name it is invisible to a screen reader
-                   and unexplained to everyone else until they hover. -->
-              <button
-                onmouseenter={() => hover(approveLabel)}
-                onmouseleave={() => hover('0')}
-                onclick={agree}
-                style="margin: 0;"
-                class="btn ga"
-                name="requestToJoin"
-                aria-label={approveLabel}
-                title={approveLabel}
-                ><svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  xmlns:xlink="http://www.w3.org/1999/xlink"
-                  version="1.1"
-                  class="btin"
-                  viewBox="0 0 24 24"
-                  ><path
-                    d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z"
-                  /></svg
-                ></button
-              >
-              <!--   <button on:click= {ask} style="margin: 0;" class = "btn" name="negotiate"><i class="far fa-comments"></i></button>-->
-              <!-- Objection / counter-offer. Hidden for the responsible owner on a
-                   recurring cycle — they set the amount via the heart (report). -->
-              {#if !(isRecurringCycle && isResponsible)}
-              <button
-                onmouseenter={() => hover(objectLabel)}
-                onmouseleave={() => hover('0')}
-                onclick={isRecurringCycle ? counter : open}
-                style="margin: 0;"
-                class="btn gb"
-                name="decline"
-                aria-label={objectLabel}
-                title={objectLabel}
-                ><svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  xmlns:xlink="http://www.w3.org/1999/xlink"
-                  version="1.1"
-                  class="btin"
-                  viewBox="0 0 24 24"
-                  ><path
-                    d="M17,13H7V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"
-                  /></svg
-                ></button
-              >
-              {/if}
-            {/if}
-          {:else if low == true}
-            <Lowbtn />
-          {/if}
-        </div>
-      </SwiperSlide>
-    </Swiper>
-  </div>
-  {#if modal}
-    <div data-vaul-drawer-wrapper>
-      <Drawer.Root
-        bind:open={dialogOpen}
-        direction="right"
-        shouldScaleBackground
-      >
-        <Drawer.Trigger />
-        <Drawer.Portal>
-          <Drawer.Overlay class="fixed inset-0 bg-black/40 " />
-          <Drawer.Content
-            class="fixed bottom-0 top-0 right-0 max-h-[96%] rounded-t-[10px] z-[1000] flex flex-row-reverse"
-          >
-            <div class="swiper-slidec mx-auto">
-              <Cards
-                onAgree={agree}
-                onReport={reportFromCard}
-                onDecline={open}
-                onNego={counter}
-                onHover={hoverc}
-                {low}
-                {agprice}
-                {useraplyname}
-                {src2}
-                {missionBName}
-                {already}
-                {yers}
-                {projectName}
-                {src}
-                {kindOf}
-                {noofusersWaiting}
-                {noofusersOk}
-                {noofusersNo}
-                {users}
-                {projectId}
-                {monts}
-                {hm}
-                {spnot}
-                {isRecurringCycle}
-                {isStockReceipt}
-                {receiptUnitPrice}
-                {cycleReported}
-                {cycleIndex}
-                quantityDelivered={shownAmount}
-                {pricePerUnit}
-                {isResponsible}
-                {awaitingReport}
-              />
-            </div>
-          </Drawer.Content>
-        </Drawer.Portal>
-      </Drawer.Root>
-    </div>
-  {/if}
-{:else}
-  <Cards
-    onAgree={agree}
-    onReport={reportFromCard}
-    onDecline={open}
-    onNego={counter}
-    onHover={hoverc}
-    {isVisible}
-    {low}
-    {agprice}
-    {useraplyname}
-    {src2}
-    {projectId}
-    {missionBName}
-    {already}
-    {yers}
-    {projectName}
-    {src}
-    {kindOf}
-    {noofusersWaiting}
-    {noofusersOk}
-    {noofusersNo}
-    {monts}
-    {users}
-    {hm}
-    {spnot}
-    {isRecurringCycle}
-    {isStockReceipt}
-    {receiptUnitPrice}
-    {cycleReported}
-    {cycleIndex}
-    quantityDelivered={shownAmount}
-    {pricePerUnit}
-    {isResponsible}
-    {awaitingReport}
-  />
-{/if}
+<Cards
+  onAgree={agree}
+  onReport={reportFromCard}
+  onDecline={open}
+  onNego={counter}
+  onHover={hoverc}
+  {isVisible}
+  {low}
+  {agprice}
+  {useraplyname}
+  {src2}
+  {projectId}
+  {missionBName}
+  {already}
+  {yers}
+  {projectName}
+  {src}
+  {kindOf}
+  {noofusersWaiting}
+  {noofusersOk}
+  {noofusersNo}
+  {monts}
+  {users}
+  {hm}
+  {spnot}
+  {isRecurringCycle}
+  {isStockReceipt}
+  {receiptUnitPrice}
+  {cycleReported}
+  {cycleIndex}
+  quantityDelivered={shownAmount}
+  {pricePerUnit}
+  {isResponsible}
+  {awaitingReport}
+/>
 
 <style>
-  .swiper-slidec {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 18px !important;
-    font-size: 22px;
-    font-weight: bold;
-    min-height: 100vh;
-    min-width: 25vw !important;
-    max-width: 80vw !important;
-  }
-  .btin {
-    width: 13px;
-    height: 13px;
-  }
-  .pnn {
-    margin: 2px;
-    font-size: 8px;
-    font-weight: bold;
-    line-height: 0.7;
-  }
-  .ab {
-    grid-column: 1/3;
-    grid-row: 1/ 2;
-  }
-  .bc {
-    grid-column: 1/3;
-    grid-row: 2/ 3;
-  }
-  .cd {
-    grid-column: 1/3;
-    grid-row: 3/ 4;
-  }
 
-  .ga {
-    grid-column: 1/2;
-  }
-  .gb {
-    grid-column: 2/3;
-  }
-  #normSmll {
-    white-space: normal;
-    text-align: center;
-    align-items: center;
-    justify-content: center;
-    color: var(--barbi-pink);
-    min-height: 75px;
-    min-width: 75px;
-    max-width: 94%;
-    max-height: 94%;
-    aspect-ratio: 1 /1;
-    border-radius: 50%;
-    background: url(https://res.cloudinary.com/love1/image/upload/v1647379261/FLOWER-032-1_1_1_zk45tv.svg);
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: 125% 125%;
-    display: grid;
-    grid-template-columns: auto auto;
-    grid-auto-rows: auto auto auto auto;
-  }
   input[type='text'] {
     -webkit-border-radius: 20px;
     -moz-border-radius: 20px;
@@ -1184,52 +616,7 @@
     -moz-border-radius: 20px;
     border-radius: 20px;
   }
-  #curve {
-    fill: transparent;
-  }
 
-  .curved-text {
-    fill: #1b0813;
-    text-align: center;
-    font-size: var(--the, 24px);
-  }
-
-  #normSml {
-    text-align: center;
-    line-height: 0.5;
-    align-items: center;
-    justify-content: center;
-    color: var(--barbi-pink);
-    min-height: 75px;
-    min-width: 75px;
-    max-width: 94%;
-    max-height: 94%;
-    aspect-ratio: 1 /1;
-
-    border-radius: 50%;
-    background: url(https://res.cloudinary.com/love1/image/upload/v1647379261/FLOWER-032-1_1_1_zk45tv.svg);
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: 125% 125%;
-  }
-
-  .btn {
-    background-color: rgb(87, 208, 248);
-    border-radius: 50%;
-    color: var(--barbi-pink);
-    text-align: center;
-    opacity: 0.6;
-    transition: 0.3s;
-    padding: 2px;
-    margin-right: 4px;
-    margin-left: 4px;
-    grid-row: 4/ 5;
-  }
-
-  .btn:hover {
-    opacity: 1;
-    padding: 6px;
-  }
   :global([data-svelte-dialog-content].content) {
     width: 80vw;
     z-index: 60;
@@ -1244,14 +631,6 @@
     }
     :global([data-svelte-dialog-overlay].overlay) {
       z-index: 1000;
-    }
-    .pnn {
-      margin: 3px;
-      font-size: 10px;
-    }
-    #normSmll {
-      max-width: 94%;
-      max-height: 94%;
     }
   }
 </style>

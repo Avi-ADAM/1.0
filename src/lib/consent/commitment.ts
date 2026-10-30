@@ -23,6 +23,8 @@ import { computeStateRoot } from './stateRoot';
 import { checkDeltas } from './deltaCheck';
 import { verifyQuorum, type QuorumContext } from './quorum';
 import { quorumRequirement } from './policy';
+import { restoreState } from './stateRestore';
+import { GENESIS_UP_TO } from './genesis';
 
 export type EventLookup = (
   id: string
@@ -169,16 +171,29 @@ export async function verifyCommitments(
     if (typeof p?.upTo !== 'string' || typeof p?.stateRoot !== 'string') {
       return { ok: false, reason: 'snapshot_bad_predicate' };
     }
-    if (!closure.has(p.upTo)) {
-      // The attested coverage point must be an ancestor of the snapshot event.
-      return { ok: false, reason: `snapshot_upTo_not_ancestor:${p.upTo}` };
+    if (p.upTo === GENESIS_UP_TO) {
+      // T6 — a genesis covers no history: it is a DAG root carrying the state
+      // imported from Strapi inline. There is nothing to replay, so the root
+      // it attests must be the hash of that inline state.
+      if (ev.parents.length > 0) return { ok: false, reason: 'genesis_has_parents' };
+      const restored = restoreState((ev.predicate as { state?: unknown }).state);
+      if (!restored.ok) return { ok: false, reason: `genesis_restore_failed:${restored.reason}` };
+      if ((await computeStateRoot(restored.state)) !== p.stateRoot) {
+        return { ok: false, reason: 'snapshot_root_mismatch' };
+      }
+      checked.push('genesisRoot');
+    } else {
+      if (!closure.has(p.upTo)) {
+        // The attested coverage point must be an ancestor of the snapshot event.
+        return { ok: false, reason: `snapshot_upTo_not_ancestor:${p.upTo}` };
+      }
+      const covered = await ancestorClosure([p.upTo], opts.getEvent, []);
+      const attestedRoot = await computeStateRoot(project([...covered.values()], projectId));
+      if (attestedRoot !== p.stateRoot) {
+        return { ok: false, reason: 'snapshot_root_mismatch' };
+      }
+      checked.push('snapshotRoot');
     }
-    const covered = await ancestorClosure([p.upTo], opts.getEvent, []);
-    const attestedRoot = await computeStateRoot(project([...covered.values()], projectId));
-    if (attestedRoot !== p.stateRoot) {
-      return { ok: false, reason: 'snapshot_root_mismatch' };
-    }
-    checked.push('snapshotRoot');
   }
 
   // ── quorum: the witness that the decision passed ─────────────────────────

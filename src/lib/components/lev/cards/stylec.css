@@ -10,15 +10,6 @@
   width: 95% ;
   border-radius: 0%;
 }
-.swipermobile{ 
-  position: absolute;
-  top: calc(50% - 1.5rem);
-  left: 50%;
-  transform: translate(-50%, -50%);
-  height: calc(100% - 3rem) ;
-  width: 100% ;
-  border-radius: 0%;
-}
 
 .swiper-slidec {
   display: flex;
@@ -29,17 +20,6 @@
   height: 100%;
   width: 100%;
   overflow: hidden; /* שינוי מ-visible ל-hidden */
-}
-.swipr-slidemobile {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 18px !important;
-  font-size: 22px;
-  font-weight: bold;
-  height: 100%;
-  width: 100%;
-  
 }
 
 @media (min-width:250px) and (max-width:549px){

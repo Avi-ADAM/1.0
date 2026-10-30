@@ -24,15 +24,6 @@ vi.mock('$lib/translations', () => ({
   isRtl: readable(true)
 }));
 vi.mock('$lib/stores/lang.js', () => ({ lang: readable('he') }));
-vi.mock('progressbar-svelte', () => ({ ProgressBar: noop }));
-vi.mock('vaul-svelte', () => ({
-  Drawer: { Root: noop, Trigger: noop, Portal: noop, Overlay: noop, Content: noop }
-}));
-vi.mock('swiper/svelte', () => ({ Swiper: noop, SwiperSlide: noop }));
-vi.mock('swiper', () => ({ EffectFlip: {}, Navigation: {} }));
-vi.mock('swiper/css', () => ({}));
-vi.mock('swiper/css/effect-flip', () => ({}));
-vi.mock('./style.css', () => ({}));
 vi.mock('./cards/timetToTimegrama.svelte', () => ({ default: noop }));
 vi.mock('./cards/CardHeader.svelte', () => ({ default: noop }));
 vi.mock('./cards/VoteStatusDisplay.svelte', () => ({ default: noop }));

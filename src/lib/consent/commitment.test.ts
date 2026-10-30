@@ -4,6 +4,7 @@ import { project } from './projection';
 import { computeStateRoot } from './stateRoot';
 import type { ConsentEvent, Delta } from './event';
 import type { QuorumProof } from './quorum';
+import { buildGenesisState, buildGenesisPredicate } from './genesis';
 
 function ev(p: Partial<ConsentEvent> & { id: string; action: string }): ConsentEvent {
   return {
@@ -286,5 +287,49 @@ describe('verifyCommitments — snapshot.commit (§5.1)', () => {
     const r = await verifyCommitments(snap, { getEvent: lookup(BASE), projectId: 'p1' });
     expect(r.ok).toBe(false);
     if (!r.ok) expect(r.reason).toContain('snapshot_upTo_not_ancestor');
+  });
+});
+
+describe('verifyCommitments — genesis snapshot (T6)', () => {
+  async function genesisEvent(over: { parents?: string[]; stateRoot?: string } = {}) {
+    const state = buildGenesisState('p1', [{ id: 'A', hervachti: 12.5 }, { id: 'B', hervachti: null }]);
+    const predicate = await buildGenesisPredicate(state);
+    return ev({
+      id: 'gen', actor: 'A', action: 'snapshot.commit',
+      subject: { type: 'project', id: 'p1' },
+      predicate: { ...predicate, ...(over.stateRoot ? { stateRoot: over.stateRoot } : {}) } as unknown as Record<string, unknown>,
+      parents: over.parents ?? [], ts: 10
+    });
+  }
+
+  // Found in production: the relay ran the T10 rule (upTo must be an
+  // ancestor) on the parentless genesis and refused every one of them.
+  it('accepts a parentless genesis whose inline state hashes to its root', async () => {
+    // 'available' — the relay's mode. (Strict demands a quorum on every
+    // snapshot.commit; the genesis gathers its votes after it is published.)
+    const r = await verifyCommitments(await genesisEvent(), { getEvent: lookup([]) });
+    expect(r.ok).toBe(true);
+    if (r.ok) expect(r.checked).toContain('genesisRoot');
+  });
+
+  it('rejects a genesis attesting a root its inline state does not hash to', async () => {
+    const r = await verifyCommitments(await genesisEvent({ stateRoot: 'forged-root' }), { getEvent: lookup([]) });
+    expect(r).toEqual({ ok: false, reason: 'snapshot_root_mismatch' });
+  });
+
+  it('rejects a genesis that is not a DAG root', async () => {
+    const r = await verifyCommitments(await genesisEvent({ parents: ['jA'] }), { getEvent: lookup(BASE) });
+    expect(r).toEqual({ ok: false, reason: 'genesis_has_parents' });
+  });
+
+  it('rejects a genesis without restorable inline state', async () => {
+    const bare = ev({
+      id: 'gen', actor: 'A', action: 'snapshot.commit',
+      subject: { type: 'project', id: 'p1' },
+      predicate: { upTo: 'genesis', stateRoot: 'r' }, parents: [], ts: 10
+    });
+    const r = await verifyCommitments(bare, { getEvent: lookup([]) });
+    expect(r.ok).toBe(false);
+    if (!r.ok) expect(r.reason).toMatch(/^genesis_restore_failed:/);
   });
 });

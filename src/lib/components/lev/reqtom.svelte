@@ -2,19 +2,13 @@
   import { lang } from '$lib/stores/lang.js';
   import { t } from '$lib/translations';
   import { toast } from 'svelte-sonner';
-  import { ProgressBar } from 'progressbar-svelte';
   import { goto } from '$app/navigation';
-  import Chaticon from '../../celim/chaticon.svelte';
-  import { Drawer } from 'vaul-svelte';
-  import { clickOutside } from './outsidclick.js';
   import { fly } from 'svelte/transition';
-  import Lowbtn from '$lib/celim/lowbtn.svelte';
   import Card from './cards/rektom.svelte';
   import { nowId } from '$lib/stores/pendMisMes';
   import { DialogContent, DialogOverlay } from 'svelte-accessible-dialog';
   import Spinner from '$lib/celim/Spinner.svelte';
   import Diun from './diun.svelte';
-  import TimetToTimegrama from './cards/timetToTimegrama.svelte';
   const baseUrl = import.meta.env.VITE_URL;
   let clicked = $state(false);
   /**
@@ -154,17 +148,7 @@
     orderon = 0,
     selfNomination = false,
   } = $props();
-  let dialogOpen = $state(false);
   let resP = [];
-
-  // Approving an Askm from an offerer who isn't a rikma member yet also onboards
-  // them (runResourceAskmAcceptance → 74addUserToProject). That — not "ratifying
-  // a cycle" — is what this vote decides; recurring cycles only start afterwards.
-  const joinsRikma = $derived(
-    !isRishon &&
-      userId != null &&
-      !(Array.isArray(pid) ? pid.map(String) : []).includes(String(userId))
-  );
 
   // Full dismiss of a self-nominated resource offer (PLAN_SELF_NOMINATION §3.3):
   // archives the Askm, cancels the timegrama and archives the OpenMashaabim.
@@ -229,34 +213,8 @@
   import { executeAction } from '$lib/client/actionClient';
   import Nego from '../prPr/negoPend.svelte';
   import { getProjectData } from '$lib/stores/projectStore.js';
-  import { Swiper, SwiperSlide } from 'swiper/svelte';
 
-  // Import Swiper styles
-  import 'swiper/css';
 
-  import 'swiper/css/effect-flip';
-  import './style.css';
-
-  // import required modules
-  import { EffectFlip, Navigation } from 'swiper';
-  let swiperRef = null;
-
-  const setSwiperRef = ({ detail }) => {
-    const [swiper] = detail;
-    // set swiper instance
-    setTimeout(() => {
-      swiperRef = swiper;
-    });
-  };
-
-  const slideTo = (index) => {
-    if (swiperRef !== null) {
-      swiperRef.slideTo(index, 400);
-    }
-  };
-  function toggleShow() {
-    slideTo(0);
-  }
   let error1;
   let miDatan = [];
 
@@ -303,25 +261,8 @@
 
   let ser = $state(xyz());
 
-  let ucli = $state(0);
-
-  let pcli = $state(0);
-
   let pmcli = $state(0);
 
-  function linke(s) {
-    if (s == 'u') {
-      ucli += 1;
-      if (ucli >= 2) {
-        onUser?.({ id: userId });
-      }
-    } else if (s == 'p') {
-      pcli += 1;
-      if (pcli >= 2) {
-        onProj?.({ id: projectId });
-      }
-    }
-  }
   import { idPr } from '$lib/stores/idPr.js';
   import { page } from '$app/state';
 
@@ -399,9 +340,6 @@
       }
     }
   }
-  function ask() {
-    // plain text? list? terms???
-  }
 
   async function decline() {
     already = true;
@@ -458,9 +396,6 @@
       }
     }
   }
-  let hovered = $state(false);
-
-  let w = $state(0);
 
   function hover(id) {
     let ut;
@@ -468,16 +403,6 @@
       ut = $t('lev.reqtom.voteTitle');
     } else {
       ut = id;
-    }
-    onHover?.({ id: ut });
-  }
-  function hoverede() {
-    hovered = !hovered;
-    let ut;
-    if (hovered == false) {
-      ut = $t('lev.reqtom.heartOf');
-    } else {
-      ut = $t('lev.reqtom.voteTitle');
     }
     onHover?.({ id: ut });
   }
@@ -606,636 +531,46 @@
   </div>
 </DialogOverlay>
 
-{#if cards == false}
-  <div
-    onclick={() => {
-      modal = true;
-      onModal?.();
-      dialogOpen = true;
-    }}
-    role="button"
-    style="position: relative;"
-    style:z-index={hovered === false ? 11 : 16}
-    onmouseenter={() => hoverede()}
-    onmouseleave={() => hoverede()}
-    use:clickOutside
-    onclick_outside={toggleShow}
-    class="hover:scale-290 duration-1000 ease-in"
-    transition:fly|local={{ y: 250, opacity: 0.9, duration: 2000 }}
-  >
-    {#if timegramaDate && !timegramaDone}
-      <TimetToTimegrama {timegramaDate} />
-    {/if}
-    <Swiper
-      dir="rtl"
-      on:swiper={setSwiperRef}
-      effect={'flip'}
-      grabCursor={true}
-      modules={[EffectFlip, Navigation]}
-      flipEffect={{ slideShadows: false }}
-      class="mySwiper swiperg"
-      navigation={{
-        nextEl: `.normSml${askId}-noo`,
-        prevEl: `.normSmll${askId}-noo`
-      }}
-    >
-      <div
-        bind:clientWidth={w}
-        style:width={tryo}
-        style:top={tryot}
-        style:left={tryoti}
-        style="position:absolute;"
-      >
-        <ProgressBar
-          cls="transition: all 1000ms ease-in-out;"
-          series={ser}
-          width={w}
-          textSize={0}
-          thickness={4}
-          style="radial"
-        />
-      </div>
-      <SwiperSlide class="swiper-slideg"
-        ><div id="normSml">
-          <div style="--the:{stylef};">
-            <svg
-              version="1.1"
-              viewBox="-106 -106 212 212"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <defs>
-                <linearGradient id="lggm" x1="1" y1="1" spreadMethod="pad">
-                  <stop offset="0" style="stop-color: rgb(100, 71, 105);" />
-                  <stop offset="1" style="stop-color: rgb(54, 241, 155);" />
-                </linearGradient>
-                <linearGradient id="lgbgm" x1="1" y1="1">
-                  <stop offset="0" style="stop-color: rgb(125, 105, 155);" />
-                  <stop offset="1" style="stop-color: rgb(0, 100, 120);" />
-                </linearGradient>
-              </defs>
-              <circle
-                r="100"
-                fill="url(#lggm)"
-                transform="rotate(135)"
-                stroke="url(#lgbgm)"
-                stroke-width="6"
-                style="fill-rule: nonzero; paint-order: fill;"
-              />
-              <circle
-                r="80"
-                fill="url(#lggm)"
-                transform="rotate(315)"
-                stroke="none"
-              />
-
-              <g
-                role="button"
-                tabindex="0"
-                onkeypress={() => linke('u')}
-                onclick={() => linke('u')}
-                onmouseenter={() => hover($t('lev.reqtom.clickToProfile', { name: useraplyname }))}
-                onmouseleave={() => hover('0')}
-                x="0"
-                y="40"
-                style="margin-top: 2px; margin-bottom: 2px"
-              >
-                <foreignObject
-                  x="0"
-                  y="0"
-                  width="56px"
-                  height="56px"
-                  transform="translate(-28,-28)"
-                >
-                  <span class={`normSml${askId}-noo`}></span>
-                  <img
-                    width="56px"
-                    height="56px"
-                    alt={useraplyname}
-                    src={src && src.length > 0
-                      ? src
-                      : 'https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png'}
-                    style="border-radius: 50%;"
-                  />
-                </foreignObject>
-                <text
-                  fill="#EEE8AA "
-                  text-anchor="middle"
-                  x="0"
-                  y="46"
-                  style="margin: 2px; font-size: 24px; line-height: 1; font-weight: bold;"
-                  >{useraplyname}</text
-                >
-              </g>
-              <path
-                id="curvee"
-                d="M -79.587 0 C -81.732 -2.923 -75.008 -81.366 0 -80.446 C 74.342 -79.534 81.282 -3.522 80.257 0"
-              />
-              <text
-                color="#EEE8AA"
-                width="208.55"
-                x="-90"
-                y="-90"
-                style="white-space: pre-wrap;"
-              >
-                <textPath
-                  role="contentinfo"
-                  onmouseenter={() => hover($t('lev.reqtom.resourceName'))}
-                  onmouseleave={() => hover('0')}
-                  color="#EEE8AA"
-                  x="-90"
-                  y="-90"
-                  class="curved-text"
-                  startOffset={st}
-                  xlink:href="#curvee"
-                >
-                  {openmissionName}
-                </textPath>
-              </text>
-              <g
-                role="button"
-                tabindex="0"
-                onkeypress={() => linke('p')}
-                onclick={() => linke('p')}
-                onmouseenter={() => hover($t('lev.reqtom.clickToPublic'))}
-                onmouseleave={() => hover('0')}
-                data-sveltekit-prefetch
-                x="0"
-                y="-40"
-              >
-                <text
-                  fill="#FF0092"
-                  text-anchor="middle"
-                  x="0"
-                  y="-29"
-                  style="font-size: 15px; line-height: 1; font-weight: bold; white-space: pre;"
-                  >{projectName}</text
-                >
-              </g>
-              <foreignObject
-                x="0"
-                y="-60 "
-                width="40px"
-                height="40px"
-                transform="translate(-20,-20)"
-              >
-                <button
-                  onclick={() => project()}
-                  onmouseenter={() => hover($t('lev.reqtom.clickToBrain', { projectName }))}
-                  onmouseleave={() => hover('0')}
-                >
-                  <img
-                    style="margin-top: 0px; margin-bottom: 0px; margin-right:auto; margin-left: auto; border-radius: 50%;"
-                    src={src2}
-                    width="40"
-                    height="40"
-                    alt="projectlogo"
-                    title={projectName}
-                  />
-                </button>
-              </foreignObject>
-              <foreignObject x="-25" y="55" width="50px" height="20px">
-                <p style="margin-top: 10px;">
-                  <span
-                    role="contentinfo"
-                    onmouseenter={() => hover('בעד')}
-                    onmouseleave={() => hover('0')}
-                    style="color:var(--gold)"
-                    >{noofusersOk}
-                  </span><span
-                    role="contentinfo"
-                    onmouseenter={() => hover('לא הצביעו')}
-                    onmouseleave={() => hover('0')}
-                    style="color:aqua"
-                    >{noofusersWaiting}
-                  </span><span
-                    role="contentinfo"
-                    onmouseenter={() => hover('נגד')}
-                    onmouseleave={() => hover('0')}
-                    style="color:var(--barbi-pink)"
-                    title="נגד"
-                    >{noofusersNo}
-                  </span>
-                </p>
-              </foreignObject>
-            </svg>
-          </div>
-        </div>
-      </SwiperSlide><SwiperSlide class="swiper-slideg"
-        ><div id="normSmll">
-          <div class={`normSmll${askId}-noo`}></div>
-          <!--  <button on:click={tochat}><Chaticon/></button>-->
-          {#if deadline}
-            <p
-              onmouseenter={() => hover('תאריך הביצוע')}
-              onmouseleave={() => hover('0')}
-              class="hslink ab"
-            >
-              {new Date(deadline).toLocaleDateString('he-IL')}
-            </p>{/if}
-          <p
-            onmouseenter={() => hover(recurring ? 'משאב חוזר · שווי למחזור' : 'שווי')}
-            onmouseleave={() => hover('0')}
-            class="hslink bc"
-          >
-            {#if recurring}🔁 {/if}{price}
-          </p>
-          <p class="hslink cd">
-            <span
-              role="contentinfo"
-              onmouseenter={() => hover('ההצעה שהתקבלה')}
-              onmouseleave={() => hover('0')}
-              style="color: var(--gold)">{myp}</span
-            >
-            /<span
-              role="contentinfo"
-              onmouseenter={() => hover('ההצעה של הרקמה')}
-              onmouseleave={() => hover('0')}
-            >
-              {easy}</span
-            >
-          </p>
-          {#if missionDetails !== null}
-            <p
-              onmouseenter={() => hover('פרטי ההצעה ')}
-              onmouseleave={() => hover('0')}
-              class="hslink de d"
-            >
-              {missionDetails}
-            </p>{/if}
-          {#if low == false}
-            {#if already === false}
-              <button
-                onmouseenter={() => hover('אישור')}
-                onmouseleave={() => hover('0')}
-                onclick={agree}
-                class="btn ga"
-                name="requestToJoin"
-                ><svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  xmlns:xlink="http://www.w3.org/1999/xlink"
-                  version="1.1"
-                  class="btin"
-                  viewBox="0 0 24 24"
-                  ><path
-                    fill="currentColor"
-                    d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z"
-                  /></svg
-                ></button
-              >
-              <!-- <button3 on:click= {ask} style="margin: 0;" class = "btn" name="negotiate"><i class="far fa-comments"></i></button3>-->
-              <button
-                onmouseenter={() => hover('דחיה')}
-                onmouseleave={() => hover('0')}
-                onclick={decline}
-                class="btn gb"
-                name="decline"
-                ><svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  xmlns:xlink="http://www.w3.org/1999/xlink"
-                  version="1.1"
-                  class="btin"
-                  viewBox="0 0 24 24"
-                  ><path
-                    fill="currentColor"
-                    d="M17,13H7V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"
-                  /></svg
-                ></button
-              >
-            {/if}
-          {:else if low == true}
-            <Lowbtn />
-          {/if}
-        </div>
-      </SwiperSlide>
-    </Swiper>
-  </div>
-  {#if modal}
-    <div data-vaul-drawer-wrapper>
-      <Drawer.Root
-        bind:open={dialogOpen}
-        direction="right"
-        shouldScaleBackground
-      >
-        <Drawer.Trigger />
-        <Drawer.Portal>
-          <Drawer.Overlay class="fixed inset-0 bg-black/40 " />
-          <Drawer.Content
-            class="fixed bottom-0 top-0 right-0 max-h-[96%] rounded-t-[10px] z-[1000] flex flex-row-reverse"
-          >
-            <div class="swiper-slidec mx-auto">
-              <Card
-                candidateId={userId}
-                onTochat={tochat}
-                onAgree={() => agree()}
-                onDecline={() => decline()}
-                onNego={toggleNegotiationMode}
-                onHover={hoverc}
-                {already}
-                {projectName}
-                {src}
-                {low}
-                {deadline}
-                {sqadualedf}
-                {kindOf}
-                {recurring}
-                {cycleSize}
-                {easy}
-                {myp}
-                {price}
-                {hearotMeyuchadot}
-                {spnot}
-                {noofusersWaiting}
-                {useraplyname}
-                {noofusersOk}
-                {src2}
-                {openmissionName}
-                {missionDetails}
-                {noofusersNo}
-                {users}
-                {projectId}
-                {isRishon}
-                {negotiationMode}
-                {negopendmissions}
-                {orderon}
-                {joinsRikma}
-                {selfNomination}
-                onDismiss={dismissSelfNom}
-              />
-            </div>
-          </Drawer.Content>
-        </Drawer.Portal>
-      </Drawer.Root>
-    </div>
-  {/if}
-{:else}
-  <Card
-    candidateId={userId}
-    onTochat={tochat}
-    onAgree={() => agree()}
-    onDecline={() => decline()}
-    onNego={toggleNegotiationMode}
-    onHover={hoverc}
-    {isVisible}
-    {already}
-    {users}
-    {projectName}
-    {projectId}
-    {src}
-    {low}
-    {deadline}
-    {sqadualedf}
-    {kindOf}
-    {recurring}
-    {cycleSize}
-    {easy}
-    {myp}
-    {price}
-    {hearotMeyuchadot}
-    {spnot}
-    {noofusersWaiting}
-    {useraplyname}
-    {noofusersOk}
-    {src2}
-    {openmissionName}
-    {missionDetails}
-    {noofusersNo}
-    {isRishon}
-    {negotiationMode}
-    {negopendmissions}
-    {orderon}
-    {selfNomination}
-    onDismiss={dismissSelfNom}
-  />
-{/if}
+<Card
+  candidateId={userId}
+  onTochat={tochat}
+  onAgree={() => agree()}
+  onDecline={() => decline()}
+  onNego={toggleNegotiationMode}
+  onHover={hoverc}
+  {isVisible}
+  {already}
+  {users}
+  {projectName}
+  {projectId}
+  {src}
+  {low}
+  {deadline}
+  {sqadualedf}
+  {kindOf}
+  {recurring}
+  {cycleSize}
+  {easy}
+  {myp}
+  {price}
+  {hearotMeyuchadot}
+  {spnot}
+  {noofusersWaiting}
+  {useraplyname}
+  {noofusersOk}
+  {src2}
+  {openmissionName}
+  {missionDetails}
+  {noofusersNo}
+  {isRishon}
+  {negotiationMode}
+  {negopendmissions}
+  {orderon}
+  {selfNomination}
+  onDismiss={dismissSelfNom}
+/>
 
 <style>
-  .swiper-slidec {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 18px !important;
-    font-size: 22px;
-    font-weight: bold;
-    min-height: 100vh;
-    min-width: 25vw !important;
-    max-width: 80vw !important;
-  }
-  .btin {
-    width: 13px;
-    height: 13px;
-  }
-  .pnn {
-    margin: 2px;
-    font-size: 8px;
-    font-weight: bold;
-    line-height: 0.7;
-  }
-  .ab {
-    grid-column: 1/3;
-    grid-row: 1/ 2;
-  }
-  .bc {
-    grid-column: 1/3;
-    grid-row: 2/ 3;
-  }
-  .cd {
-    grid-column: 1/3;
-    grid-row: 3/ 4;
-  }
-  .de {
-    grid-column: 1/3;
-    grid-row: 4/ 5;
-    max-height: 55px;
-    overflow-y: auto;
-  }
-  .ef {
-    grid-column: 1/3;
-    grid-row: 5/ 6;
-  }
-  .ga {
-    grid-column: 1/2;
-    margin-right: 20px;
-  }
-  .gb {
-    grid-column: 2/3;
-    margin-left: 20px;
-  }
-  #normSmll {
-    background: url(https://res.cloudinary.com/love1/image/upload/v1650979768/coinnn_oatfhw.svg);
-    white-space: normal;
-    text-align: center;
-    align-items: center;
-    justify-content: center;
-    color: var(--barbi-pink);
-    min-height: 75px;
-    min-width: 75px;
-    max-width: 94%;
-    max-height: 94%;
-    aspect-ratio: 1 /1;
-    border-radius: 50%;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: 125% 125%;
-    display: grid;
-    grid-template-columns: auto auto;
-    grid-auto-rows: auto auto auto auto;
-  }
-  .a {
-    margin-right: 20px;
-  }
-  .b {
-    margin-left: 20px;
-  }
-  .vo {
-    margin: 1px;
-    font-size: 8px;
-  }
-  .hslink {
-    margin: 0px;
-    font-size: 8px;
-    line-height: 1;
-    font-weight: bold;
-  }
-  .slink {
-    margin-top: 0px;
-    margin-bottom: 0px;
-  }
-  .seimg {
-    margin-top: 0px;
-    margin-bottom: 0px;
-    margin-right: auto;
-    margin-left: auto;
-    border-radius: 50%;
-    width: 22px;
-    height: 22px;
-  }
-  .na {
-    margin: 1px;
-    font-size: 8px;
-    font-weight: bold;
-    color: var(--gold);
-    line-height: 0.7;
-  }
-  .hflink {
-    margin: 0px;
-    font-size: 8px;
-    line-height: 1;
-    font-weight: bold;
-  }
-  .flink {
-    margin-top: 0px;
-    margin-bottom: 0px;
-  }
-  .timg {
-    margin-top: 0px;
-    margin-bottom: 0px;
-    margin-right: auto;
-    margin-left: auto;
-    border-radius: 50%;
-    width: 22px;
-    height: 22px;
-  }
-  #curvee {
-    fill: transparent;
-  }
-
-  .curved-text {
-    fill: #d0f5f6;
-    text-align: center;
-    font-size: var(--the, 24px);
-  }
-
-  #normSml {
-    text-align: center;
-    line-height: 0.5;
-    align-items: center;
-    justify-content: safe center;
-    color: var(--barbi-pink);
-    min-height: 75px;
-    min-width: 75px;
-    max-width: 94%;
-    max-height: 94%;
-    aspect-ratio: 1 /1;
-    background-color: rgb(100, 224, 137);
-    border-radius: 50%;
-
-    background: url(https://res.cloudinary.com/love1/image/upload/v1647261055/spare_gv0gui.svg);
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: cover;
-  }
-
-  .btn {
-    background-color: rgb(87, 208, 248);
-    border-radius: 50%;
-    color: var(--barbi-pink);
-    text-align: center;
-    opacity: 0.6;
-    transition: 0.3s;
-    padding: 2px;
-    grid-row: 6/ 7;
-  }
-
-  .btn:hover {
-    opacity: 1;
-    padding: 6px;
-  }
-  @media (min-width: 550px) {
-    .btin {
-      width: 24px;
-      height: 24px;
-    }
-    .ga {
-      margin-right: 26px;
-    }
-    .gb {
-      margin-left: 26px;
-    }
-    .vo {
-      margin: 7px;
-      font-size: 13px;
-    }
-    .hslink {
-      margin: 2px;
-      font-size: 13px;
-      line-height: 1;
-      font-weight: bold;
-    }
-    .slink {
-      margin-top: 2px;
-      margin-bottom: 2px;
-    }
-    .seimg {
-      width: 32px;
-      height: 32px;
-    }
-    .na {
-      margin: 7px;
-      font-size: 13px;
-      font-weight: bold;
-      color: var(--gold);
-      line-height: 0.7;
-    }
-    .hflink {
-      margin: 2px;
-      font-size: 13px;
-      line-height: 1;
-      font-weight: bold;
-    }
-    .flink {
-      margin-top: 2px;
-      margin-bottom: 2px;
-    }
-    #normSml {
-      max-width: 94%;
-      max-height: 94%;
-    }
-
-    .timg {
-      height: 32px;
-      height: 32px;
-    }
-  }
 
   /* ─── Dialog overlays ─── */
   :global([data-svelte-dialog-overlay].overlay) {

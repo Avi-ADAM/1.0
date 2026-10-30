@@ -15,7 +15,6 @@
  import Workways from '../registration/workways.svelte'
  import Roles from '../registration/roles.svelte'
   import Vallues from '../registration/vallues.svelte'
- // import Scree from '../registration/scree.svelte'
   
 let userName_value = $state();
 let show_value = $state(0);

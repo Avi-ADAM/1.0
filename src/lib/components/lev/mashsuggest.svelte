@@ -4,33 +4,11 @@
   import { htmlExcerpt } from '$lib/text/htmlExcerpt';
   import { goto } from '$app/navigation';
   import { fly } from 'svelte/transition';
-  import { Drawer } from 'vaul-svelte';
-  import { clickOutside } from './outsidclick.js';
-  import Lowbtn from '$lib/celim/lowbtn.svelte';
-  let dialogOpen = $state(false);
   const baseUrl = import.meta.env.VITE_URL;
 
   let token;
   let uId;
 
-  let swiperRef = null;
-
-  const setSwiperRef = ({ detail }) => {
-    const [swiper] = detail;
-    // set swiper instance
-    setTimeout(() => {
-      swiperRef = swiper;
-    });
-  };
-
-  const slideTo = (index) => {
-    if (swiperRef !== null) {
-      swiperRef.slideTo(index, 400);
-    }
-  };
-  function toggleShow() {
-    slideTo(0);
-  }
   function less() {
     onLess?.({
       ani: 'mashsu',
@@ -39,14 +17,6 @@
   }
   let miData = [];
   let error1 = null;
-  let pcli = $state(0);
-
-  function linke() {
-    pcli += 1;
-    if (pcli >= 2) {
-      projectNav();
-    }
-  }
 
   function projectNav() {
     // Wish/maagad-sourced needs have no rikma dialog — go to the source page.
@@ -163,17 +133,6 @@
   }
   //out:fly={{duration: 2200, opacity: 0.5, y: 450}}
 
-  import { Swiper, SwiperSlide } from 'swiper/svelte';
-
-  // Import Swiper styles
-  import 'swiper/css';
-
-  import 'swiper/css/effect-flip';
-  import './style.css';
-
-  // import required modules
-  import { EffectFlip, Navigation } from 'swiper';
-  let hovered = $state(false);
 
   let w = $derived(0);
   let u = 'הצעה לשיתוף משאב והצטרפות לרקמה';
@@ -418,361 +377,44 @@
     </DialogContent>
   </div>
 </DialogOverlay>
-{#if cards == false}
-  <div
-    style="position: relative;"
-    onclick={() => {
-      modal = true;
-      onModal();
-      dialogOpen = true;
-    }}
-    role="button"
-    style:z-index={hovered === false ? 11 : 16}
-    onmouseenter={() => (hovered = true)}
-    onmouseleave={() => (hovered = false)}
-    use:clickOutside
-    onclick_outside={toggleShow}
-    class="hover:scale-290 duration-1000 ease-in"
-    transition:fly|local={{ y: 450, duration: 2200, opacity: 0.5 }}
-  >
-    <Swiper
-      dir="rtl"
-      on:swiper={setSwiperRef}
-      effect={'flip'}
-      grabCursor={true}
-      modules={[EffectFlip, Navigation]}
-      flipEffect={{ slideShadows: false }}
-      class="mySwiper swiperg"
-      navigation={{
-        nextEl: `.normSml${oid}`,
-        prevEl: `.normSmll${oid}`
-      }}
-    >
-      <SwiperSlide class="swiper-slideg"
-        ><div>
-          <div id="normSml">
-            <span class={`normSml${oid}`}></span>
-            <img
-              onmouseenter={() => hover('לוגו הרקמה')}
-              onmouseleave={() => hover('0')}
-              class="img"
-              {src}
-              alt="logo"
-            />
-            <button
-              onclick={() => linke()}
-              onmouseenter={() => hover('לחיצה למעבר לעמוד הציבורי של הרקמה')}
-              onmouseleave={() => hover('0')}
-              class="hover:scale-110 lt">{projectName}</button
-            >
-            <h1
-              onmouseenter={() => hover('שם המשאב')}
-              onmouseleave={() => hover('0')}
-              style="color: var(--barbi-pink); "
-              class="ltn"
-            >
-              {mashName}
-            </h1>
-            {#if recurring}
-              <span
-                onmouseenter={() => hover('משאב חוזר · אישרור כל מחזור')}
-                onmouseleave={() => hover('0')}
-                class="ltn"
-                style="color: var(--gold);">🔁 חוזר</span
-              >
-            {/if}
-            <h3
-              onmouseenter={() => hover('שווי')}
-              onmouseleave={() => hover('0')}
-              class="ltn"
-            >
-              {price}
-            </h3>
-            <h3 class="ltn">
-              <span
-                role="contentinfo"
-                onmouseenter={() => hover('ההצעה שלי')}
-                onmouseleave={() => hover('0')}
-                style="color: var(--gold)">{easy}</span
-              >
-              /<span
-                role="contentinfo"
-                onmouseenter={() => hover('ההצעה של הרקמה')}
-                onmouseleave={() => hover('0')}
-              >
-                {myp}</span
-              >
-            </h3>
-            {#if total}
-              <p
-                onmouseenter={() => hover('סך הכל')}
-                onmouseleave={() => hover('0')}
-              >
-                {total}
-              </p>{/if}
-          </div>
-        </div>
-      </SwiperSlide><SwiperSlide class="swiper-slideg"
-        ><div id="normSmll">
-          <span class={`normSmll${oid}`}></span>
-
-          {#if descrip !== null}<h6
-              onmouseenter={() => hover('תיאור')}
-              onmouseleave={() => hover('0')}
-              class="ab"
-            >
-              <!-- descrip is rich-text HTML; this small heading shows it as text -->
-              {htmlExcerpt(descrip, 400)}
-            </h6>{/if}
-          <h5
-            onmouseenter={() => hover('הערות')}
-            onmouseleave={() => hover('0')}
-            class="bc"
-          >
-            {spnot}
-          </h5>
-          {#if low == false}
-            {#if already === false}
-              <button
-                onmouseenter={() => hover(' אני רוצה')}
-                onmouseleave={() => hover('0')}
-                onclick={() => agree(oid)}
-                class="btn a"
-                name="requestToJoin"
-                ><svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  xmlns:xlink="http://www.w3.org/1999/xlink"
-                  version="1.1"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  ><path
-                    fill="currentColor"
-                    d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z"
-                  /></svg
-                ></button
-              >
-              <!--<button on:click={nego(oid)} name="negotiate" class="btn" title="משא ומתן"><i class="far fa-comments"></i></button>
-   -->
-              <button
-                onmouseenter={() => hover('לא מתאים לי')}
-                onmouseleave={() => hover('0')}
-                onclick={() => decline(oid)}
-                class="btn b"
-                name="decline"
-                ><svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  xmlns:xlink="http://www.w3.org/1999/xlink"
-                  version="1.1"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  ><path
-                    fill="currentColor"
-                    d="M17,13H7V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"
-                  /></svg
-                ></button
-              >
-            {/if}
-          {:else if low == true}
-            <Lowbtn />
-          {/if}
-        </div>
-      </SwiperSlide>
-    </Swiper>
-  </div>
-  {#if modal}
-    <div data-vaul-drawer-wrapper>
-      <Drawer.Root
-        bind:open={dialogOpen}
-        direction="right"
-        shouldScaleBackground
-      >
-        <Drawer.Trigger />
-        <Drawer.Portal>
-          <Drawer.Overlay class="fixed inset-0 bg-black/40 " />
-          <Drawer.Content
-            class="fixed bottom-0 top-0 right-0 max-h-[96%] rounded-t-[10px] z-[1000] flex flex-row-reverse"
-          >
-            <div class="swiper-slidec mx-auto">
-              <Cards
-                onAgree={() => agree(oid)}
-                onDecline={() => decline(oid)}
-                onNego={() => nego(oid)}
-                onAccept={() => acceptCounter()}
-                {myRoundProposedBy}
-                {myRound}
-                onHover={hoverc}
-                onTochat={tochat}
-                {low}
-                {mashName}
-                {easy}
-                {myp}
-                {already}
-                {deadLine}
-                {sqedualedf}
-                {sqadualedf}
-                {kindOf}
-                {recurring}
-                {cycleSize}
-                {price}
-                {total}
-                {descrip}
-                {projectName}
-                {projectId}
-                {src}
-                {spnot}
-                {selfNomination}
-                {dateMatch}
-                onNegoDates={() => nego(oid)}
-                onWithdraw={withdrawSelfNom}
-                {offerHref}
-                onProj={projectNav}
-              />
-            </div>
-          </Drawer.Content>
-        </Drawer.Portal>
-      </Drawer.Root>
-    </div>
-  {/if}
-{:else}
-  <Cards
-    onAgree={() => agree(oid)}
-    onDecline={() => decline(oid)}
-    onNego={() => nego(oid)}
-    onAccept={() => acceptCounter()}
-    {myRoundProposedBy}
-    {myRound}
-    onHover={hoverc}
-    onTochat={tochat}
-    {isVisible}
-    {low}
-    {mashName}
-    {easy}
-    {myp}
-    {already}
-    {deadLine}
-    {sqedualedf}
-    {sqadualedf}
-    {kindOf}
-    {recurring}
-    {cycleSize}
-    {price}
-    {total}
-    {descrip}
-    {projectName}
-    {projectId}
-    {src}
-    {spnot}
-    {selfNomination}
-    {dateMatch}
-    onNegoDates={() => nego(oid)}
-    onWithdraw={withdrawSelfNom}
-    {offerHref}
-    onProj={projectNav}
-  />
-{/if}
+<Cards
+  onAgree={() => agree(oid)}
+  onDecline={() => decline(oid)}
+  onNego={() => nego(oid)}
+  onAccept={() => acceptCounter()}
+  {myRoundProposedBy}
+  {myRound}
+  onHover={hoverc}
+  onTochat={tochat}
+  {isVisible}
+  {low}
+  {mashName}
+  {easy}
+  {myp}
+  {already}
+  {deadLine}
+  {sqedualedf}
+  {sqadualedf}
+  {kindOf}
+  {recurring}
+  {cycleSize}
+  {price}
+  {total}
+  {descrip}
+  {projectName}
+  {projectId}
+  {src}
+  {spnot}
+  {selfNomination}
+  {dateMatch}
+  onNegoDates={() => nego(oid)}
+  onWithdraw={withdrawSelfNom}
+  {offerHref}
+  onProj={projectNav}
+/>
 
 <style>
-  .swiper-slidec {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 18px !important;
-    border: 1px solid var(--barbi-pink);
-    font-size: 22px;
-    font-weight: bold;
-    min-height: 100vh;
-    min-width: 25vw !important;
-    max-width: 80vw !important;
-  }
-  .ab {
-    grid-column: 1/3;
-    grid-row: 1/ 2;
-    font-size: 9px;
-  }
-  .bc {
-    grid-column: 1/3;
-    grid-row: 2/ 3;
-    font-size: 9px;
-  }
 
-  .a {
-    margin-right: 10px;
-    grid-column: 1/2;
-  }
-  .b {
-    margin-left: 10px;
-    grid-column: 2/3;
-  }
-  .ltb {
-    margin: 0px;
-    font-size: 9px;
-    font-weight: bold;
-    line-height: 1;
-  }
-  .ltn {
-    margin: 2px;
-    font-size: 8px;
-    line-height: 1;
-    font-weight: bold;
-  }
-  .lt {
-    margin: 1px;
-    font-size: 8px;
-    line-height: 1;
-    font-weight: bold;
-  }
-  .img {
-    margin-top: 0px;
-    margin-bottom: 0px;
-    margin-right: auto;
-    margin-left: auto;
-    border-radius: 50%;
-    width: 22px;
-    height: 22px;
-  }
-  #normSmll {
-    white-space: normal;
-    text-align: center;
-    align-items: center;
-    justify-content: safe center;
-    color: var(--barbi-pink);
-    min-height: 75px;
-    min-width: 75px;
-    max-width: 100%;
-    max-height: 100%;
-    aspect-ratio: 1 /1;
-    border-radius: 50%;
-    text-shadow: 1px 1px rgb(63, 56, 18);
-    background: url(https://res.cloudinary.com/love1/image/upload/v1646313201/turkiz_v5a7c8.jpg);
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: cover;
-    display: grid;
-    grid-template-columns: auto auto;
-    grid-template-rows: auto auto auto;
-  }
-  #normSml {
-    white-space: normal;
-    text-align: center;
-    line-height: 0.5;
-    align-items: center;
-    justify-content: safe center;
-    color: var(--barbi-pink);
-    min-height: 75px;
-    min-width: 75px;
-    max-width: 100%;
-    max-height: 100%;
-    aspect-ratio: 1 /1;
-    background-color: rgb(100, 224, 137);
-    border-radius: 50%;
-    text-shadow: 1px 1px rgb(63, 56, 18);
-    background: url(https://res.cloudinary.com/love1/image/upload/v1646313201/turkiz_v5a7c8.jpg);
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: cover;
-  }
   /*
     .normSmlHover{
         text-shadow: 1px 1px var(--gold);
@@ -790,55 +432,6 @@
     background-repeat: no-repeat; 
     background-size: cover;
     }*/
-  .btn {
-    grid-row: 3/ 4;
-    background-color: rgb(87, 208, 248);
-    border-radius: 50%;
-    color: var(--barbi-pink);
-    text-align: center;
-    opacity: 0.6;
-    transition: 0.3s;
-    padding: 2px;
-  }
-
-  .btn:hover {
-    opacity: 1;
-    padding: 6px;
-  }
-  @media (min-width: 550px) {
-    .a {
-      margin-right: 30px;
-    }
-    .b {
-      margin-left: 30px;
-    }
-    .ltb {
-      margin: 0px;
-      font-size: 17px;
-    }
-    .ltn {
-      margin: 7px;
-      font-size: 13px;
-    }
-    .lt {
-      margin: 2px;
-      font-size: 13px;
-    }
-    .img {
-      width: 32px;
-      height: 32px;
-    }
-    .normSml {
-      min-height: 125px;
-      min-width: 125px;
-      max-width: 125px;
-      max-height: 125px;
-    }
-    .normSmlHover {
-      height: 195px;
-      width: 195px;
-    }
-  }
 
   :global([data-svelte-dialog-overlay].overlay) {
     z-index: 9000;

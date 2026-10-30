@@ -157,7 +157,6 @@
     "sveltekit-i18n": "^2.4.2",
     "svelty-email": "^0.1.1",
     "svelty-picker": "^5.2.9",
-    "swiper": "^8.4.7",
     "tailwind-merge": "^2.6.0",
     "tailwind-variants": "^1.0.0",
     "telegraf": "^4.16.3",
