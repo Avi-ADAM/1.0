@@ -45,9 +45,13 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
   if (!sub) throw new Error('Invalid push subscription');
   const userId = String(context.userId);
 
-  const found = await strapi.execute('46getMachshirByEndpoint', { endpoint: sub.endpoint }, undefined, context.fetch);
+  // The member's own devices, matched on the endpoint here — jsoni is jsonb and
+  // Strapi cannot filter it by substring.
+  const found = await strapi.execute('46getUserMachshirs', { uid: userId }, undefined, context.fetch);
   const rows: any[] = found?.machshirs?.data ?? found?.data?.machshirs?.data ?? [];
-  const mine = rows.find((r) => String(r?.attributes?.users_permissions_user?.data?.id) === userId);
+  const mine = rows.find(
+    (r) => !r?.attributes?.archived && normalizeSubscription(r?.attributes?.jsoni)?.endpoint === sub.endpoint
+  );
   if (mine) return { data: { machshirId: mine.id, created: false } };
 
   const res = await strapi.execute(

@@ -1869,11 +1869,13 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
       }
     }
   }`,
-  '46getMachshirByEndpoint': `query getMachshirByEndpoint($endpoint: JSON!) {
-    machshirs(filters: { jsoni: { contains: $endpoint }}) {
+  // registerPushDevice dedupe. Not a filter on jsoni: it is jsonb in Postgres,
+  // and `contains` compiles to LIKE, which jsonb has no operator for (500).
+  '46getUserMachshirs': `query getUserMachshirs($uid: ID!) {
+    machshirs(filters: { users_permissions_user: { id: { eq: $uid } } }, pagination: { limit: 100 }) {
       data {
         id
-        attributes { users_permissions_user { data { id } } }
+        attributes { jsoni archived }
       }
     }
   }`

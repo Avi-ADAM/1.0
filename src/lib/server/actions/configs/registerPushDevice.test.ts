@@ -31,20 +31,29 @@ describe('registerPushDevice', () => {
       { strapi }
     );
 
-  it('returns the existing machshir of this user instead of a second row', async () => {
-    const execute = vi.fn().mockResolvedValueOnce({
-      data: { machshirs: { data: [{ id: '9', attributes: { users_permissions_user: { data: { id: '1' } } } }] } }
-    });
-    await expect(run({ execute })).resolves.toEqual({ data: { machshirId: '9', created: false } });
-    expect(execute).toHaveBeenCalledTimes(1);
-  });
+  const rows = (...r: any[]) => ({ data: { machshirs: { data: r } } });
 
-  it("creates one for the JWT's user even when another user holds the endpoint", async () => {
+  it('returns the existing machshir of this user instead of a second row', async () => {
+    // jsoni comes back either as the stringified subscription or as an object (legacy rows).
     const execute = vi
       .fn()
-      .mockResolvedValueOnce({
-        data: { machshirs: { data: [{ id: '9', attributes: { users_permissions_user: { data: { id: '2' } } } }] } }
-      })
+      .mockResolvedValueOnce(
+        rows(
+          { id: '8', attributes: { jsoni: { ...SUB, endpoint: 'https://fcm.googleapis.com/fcm/send/other' } } },
+          { id: '9', attributes: { jsoni: JSON.stringify(SUB) } }
+        )
+      );
+    await expect(run({ execute })).resolves.toEqual({ data: { machshirId: '9', created: false } });
+    expect(execute).toHaveBeenCalledTimes(1);
+    const [qid, vars] = execute.mock.calls[0];
+    expect(qid).toBe('46getUserMachshirs');
+    expect(vars).toEqual({ uid: '1' });
+  });
+
+  it('creates one when the endpoint is new for this user or only on an archived row', async () => {
+    const execute = vi
+      .fn()
+      .mockResolvedValueOnce(rows({ id: '9', attributes: { jsoni: JSON.stringify(SUB), archived: true } }))
       .mockResolvedValueOnce({ data: { createMachshir: { data: { id: '10' } } } });
     await expect(run({ execute })).resolves.toEqual({ data: { machshirId: '10', created: true } });
     const [qid, vars] = execute.mock.calls[1];
