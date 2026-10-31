@@ -58,7 +58,9 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
     '467createMachshir',
     // jsoni holds the stringified subscription — /api/pusher JSON.parses it.
     { uid: userId, jsoni: JSON.stringify(sub), publishedAt: new Date().toISOString() },
-    undefined,
+    // The member's own JWT: the service token has find on Machshir but not
+    // create (Forbidden). uid still comes from the JWT, never a param.
+    context.jwt,
     context.fetch
   );
   const id = res?.createMachshir?.data?.id ?? res?.data?.createMachshir?.data?.id;

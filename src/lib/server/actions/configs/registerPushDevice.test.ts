@@ -27,7 +27,7 @@ describe('registerPushDevice', () => {
   const run = (strapi: any, userId = '1') =>
     (registerPushDeviceConfig.graphqlOperation as any)(
       { subscription: SUB },
-      { userId, fetch: vi.fn() },
+      { userId, jwt: 'user-jwt', fetch: vi.fn() },
       { strapi }
     );
 
@@ -56,8 +56,9 @@ describe('registerPushDevice', () => {
       .mockResolvedValueOnce(rows({ id: '9', attributes: { jsoni: JSON.stringify(SUB), archived: true } }))
       .mockResolvedValueOnce({ data: { createMachshir: { data: { id: '10' } } } });
     await expect(run({ execute })).resolves.toEqual({ data: { machshirId: '10', created: true } });
-    const [qid, vars] = execute.mock.calls[1];
+    const [qid, vars, jwt] = execute.mock.calls[1];
     expect(qid).toBe('467createMachshir');
+    expect(jwt).toBe('user-jwt');
     expect(vars.uid).toBe('1');
     expect(JSON.parse(vars.jsoni)).toEqual({ endpoint: SUB.endpoint, keys: SUB.keys });
   });
