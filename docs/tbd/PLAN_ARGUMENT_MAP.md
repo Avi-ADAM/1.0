@@ -245,3 +245,16 @@ create table stance (
 4. **AI:** האם מותר לייבא מפה שלמה מסיכום אוטומטי (לדוגמה פילוסופיה)? ההצעה:
    כן, אבל כל צומת כזה מסומן `aiDrafted` עד שאדם עובר עליו ומאמץ אותו.
 5. **שם ודומיין** לאתר.
+
+## 11. מה נדרש מ-1lev1 (עד עכשיו)
+
+מגדל השן פונה ל-1lev1 רק בשם החבר/ה, עם הטוקן שלו/ה. כל השימושים חוץ מאחד
+עוברים דרך נקודות קצה שכבר קיימות: `64getUserProjectList`, `createMission`,
+`createProcess`. התוספת היחידה היא qid לקריאה בלבד:
+
+- **`ivoryWorkStatus`** (`src/routes/api/send/qids.js`): מצב ה-pendms וה-open missions
+  שענף במגדל השן פתח ברקמה (`archived`, `lifecycle`, האם כבר יש
+  `mesimabetahalich`). הוא קורא דרך `project(id)`, ולכן מחזיר רק שורות של אותה
+  רקמה, ומחזיר מצבים בלבד. ב-`qidsAccess.js` הוא מוגדר `allow: ['user']`, וב-guards
+  הוא עובר דרך `membersOnly`. הבדיקות נמצאות ב-`guards.test.ts`.
+
