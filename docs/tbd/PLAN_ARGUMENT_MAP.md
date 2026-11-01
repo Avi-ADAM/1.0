@@ -1,6 +1,13 @@
-# מפת טיעונים: מודל נתונים לחקירה שמתפצלת
+# מגדל השן (Ivory Tower): מפת טיעונים לחקירה שמתפצלת
 
-> **סטטוס: tbd. מסמך תכנון, לא נכתב בעקבותיו קוד.** נכתב 2026-11-01.
+> **סטטוס: tbd ב-1lev1. ה-MVP נבנה כאתר נפרד:
+> [`Avi-ADAM/ivory-tower`](https://github.com/Avi-ADAM/ivory-tower)**, ושם נמצא
+> המודל המעודכן (`docs/MODEL.md`). נכתב 2026-11-01.
+>
+> ההכרעות: האתר נקרא **מגדל השן / Ivory Tower**. הוא יושב על תת-דומיין של
+> `1lev1.com`, וההתחברות היא ה-session המשותף של 1lev1 (עוגיית `jwt` על
+> `.1lev1.com`, אימות מול `/api/users/me`). בהמשך יהיה גם גשר לאתר ההסכמה:
+> לסגור דיון שם, או לפתוח כאן דיון פתוח יותר.
 >
 > מסמכים קשורים: [`PLAN_OBJECT_ARCHIVAL.md`](../done/PLAN_OBJECT_ARCHIVAL.md) (מודל
 > ההסכמה שכאן *לא* חל), [`PLAN_central_rikma_definition.md`](./PLAN_central_rikma_definition.md),
