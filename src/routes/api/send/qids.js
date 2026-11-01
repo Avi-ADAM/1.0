@@ -17337,6 +17337,27 @@ ${PROMO_DECISION_FIELDS}
     }
   }`,
 
+  // Ivory Tower (the sister argument-map site) records the work a branch led to
+  // in a rikma — the pendm it proposed or the open mission it opened — and asks
+  // here, as the member, where that work stands now. Read through the project so
+  // only that rikma's rows can come back, and members-only (PRE guard in
+  // guards.js). States only: no descriptions, votes, people or money.
+  'ivoryWorkStatus': `query IvoryWorkStatus($pid: ID!, $pmIds: [ID], $omIds: [ID]) {
+    project(id: $pid) {
+      data { id attributes {
+        pendms(filters: { id: { in: $pmIds } }, pagination: { limit: 100 }) {
+          data { id attributes {
+            archived
+            open_mission { data { id attributes { archived lifecycle mesimabetahaliches(pagination: { limit: 1 }) { data { id } } } } }
+          } }
+        }
+        open_missions(filters: { id: { in: $omIds } }, pagination: { limit: 100 }) {
+          data { id attributes { archived lifecycle mesimabetahaliches(pagination: { limit: 1 }) { data { id } } } }
+        }
+      } }
+    }
+  }`,
+
   // One library entry plus the members of the rikma that owns it — what the
   // serve endpoint (/api/v1/space-docs/[id]/file) needs to decide, in one
   // round trip, whether the caller may have a signed URL for it.

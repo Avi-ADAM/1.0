@@ -585,6 +585,7 @@ function projectMembers(...ids: string[]) {
 for (const [queId, variable] of [
   ['310projectResourceOccupancy', 'pid'],
   ['325projectSpaceDocs', 'pid'],
+  ['ivoryWorkStatus', 'pid'],
   ['getProjectFinancials', 'pid'],
   ['getMemberValueTotal', 'pid'],
   ['getProjectMissions', 'pid'],

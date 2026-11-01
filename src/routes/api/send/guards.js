@@ -341,6 +341,13 @@ const PRE_GUARDS = {
     'Forbidden: Only members can read the rikma’s financials'
   ),
 
+  // Where the work an Ivory Tower branch led to stands (open / approved / taken).
+  // The rikma's own pendms and open missions, so members only, like the books.
+  'ivoryWorkStatus': membersOnly(
+    'ivoryWorkStatus',
+    'Forbidden: Only members can read where the rikma’s work stands'
+  ),
+
   // One member's contribution total — the numerator of the stipend card's "my
   // share". Read by members voting on a stipend; nobody else's business.
   'getMemberValueTotal': membersOnly(

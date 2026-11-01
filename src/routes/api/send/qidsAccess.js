@@ -95,6 +95,7 @@ export const qidsAccess = {
   '309myResourceOccupancy': { allow: ['user', 'serviceAdmin'] }, // self-only on the JWT path — PRE guard in guards.js
   '310projectResourceOccupancy': { allow: ['user', 'serviceAdmin'] }, // members only — PRE guard in guards.js
   '325projectSpaceDocs': { allow: ['user', 'serviceAdmin'] }, // members only — PRE guard in guards.js
+  'ivoryWorkStatus': { allow: ['user'] }, // Ivory Tower, as the member; members only — PRE guard in guards.js
   '326spaceDocForServe': { allow: ['serviceAdmin'] }, // any doc id → the serve endpoint decides membership against locals.uid
   '278myMissionsViaUser': { allow: ['user', 'serviceAdmin'] },
   '274getProjectMembers': { allow: ['user', 'serviceAdmin'] },
