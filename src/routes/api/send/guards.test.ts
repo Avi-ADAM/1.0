@@ -536,6 +536,81 @@ describe('runSendGuards — 43SetNegotiationResolution', () => {
   });
 });
 
+// An Ivory Tower question sent to a rikma for a decision: the source row lives
+// in Ivory Tower, so the party rule is membership in the rikma the id names.
+describe('runSendGuards — ivoryNode bridge source', () => {
+  const NODE = '0f8fad5b-d9cb-469f-a165-70867728950e';
+  const sourceId = `57:${NODE}`;
+  /** Strapi double: the negotiation's source, then the rikma's members. */
+  function ivoryStrapi(members: string[], negotiation: any = { attributes: { sourceType: 'ivoryNode', sourceId } }) {
+    return vi.fn().mockImplementation(async (_ep: string, opts: any) => {
+      const { query, variables } = JSON.parse(opts.body);
+      if (/negotiation\(id/.test(query)) return { json: async () => ({ data: { negotiation: { data: negotiation } } }) };
+      if (/project\(id/.test(query)) {
+        expect(variables).toEqual({ id: '57' });
+        return { json: async () => ({ data: { project: { data: { attributes: { user_1s: { data: members.map((id) => ({ id })) } } } } } }) };
+      }
+      throw new Error('unexpected lookup: ' + query);
+    });
+  }
+
+  for (const queId of ['GetNegotiationBySource', 'GetNegotiationResolutionBySource']) {
+    it(`${queId}: a member of the deciding rikma may look it up`, async () => {
+      const fetchMock = ivoryStrapi(['7']);
+      await expect(
+        runSendGuards({ ...base, queId, callerId: '7', variablesObject: { sourceType: 'ivoryNode', sourceId }, fetch: fetchMock as any })
+      ).resolves.toBeUndefined();
+    });
+
+    it(`${queId}: anyone else is refused`, async () => {
+      const r = await statusOf(() =>
+        runSendGuards({ ...base, queId, callerId: '7', variablesObject: { sourceType: 'ivoryNode', sourceId }, fetch: ivoryStrapi(['8']) as any })
+      );
+      expect(r).toMatchObject({ threw: true, status: 403 });
+    });
+  }
+
+  it('a malformed id is refused before any lookup', async () => {
+    for (const bad of ['57', `x:${NODE}`, '57:not-a-uuid', `57:${NODE}:extra`, '']) {
+      const fetchMock = ivoryStrapi(['7']);
+      const r = await statusOf(() =>
+        runSendGuards({ ...base, queId: 'GetNegotiationBySource', callerId: '7', variablesObject: { sourceType: 'ivoryNode', sourceId: bad }, fetch: fetchMock as any })
+      );
+      expect(r).toMatchObject({ threw: true, status: 403 });
+      expect(fetchMock).not.toHaveBeenCalled();
+    }
+  });
+
+  it('only a member signs the decision, and it must name the same question', async () => {
+    const resolution = { v: 2, sourceType: 'ivoryNode', sourceId, positionId: '3' };
+    await expect(
+      runSendGuards({ ...base, queId: '43SetNegotiationResolution', callerId: '7', variablesObject: { id: '9', resolution }, fetch: ivoryStrapi(['7']) as any })
+    ).resolves.toBeUndefined();
+    const outsider = await statusOf(() =>
+      runSendGuards({ ...base, queId: '43SetNegotiationResolution', callerId: '7', variablesObject: { id: '9', resolution }, fetch: ivoryStrapi(['8']) as any })
+    );
+    expect(outsider).toMatchObject({ threw: true, status: 403 });
+    const other = await statusOf(() =>
+      runSendGuards({
+        ...base, queId: '43SetNegotiationResolution', callerId: '7',
+        variablesObject: { id: '9', resolution: { ...resolution, sourceId: `58:${NODE}` } },
+        fetch: ivoryStrapi(['7']) as any
+      })
+    );
+    expect(other).toMatchObject({ threw: true, status: 400 });
+  });
+
+  it("the discussion's issues and clauses follow the same membership", async () => {
+    await expect(
+      runSendGuards({ ...base, queId: 'ListClauses', callerId: '7', variablesObject: { negotiationId: '9' }, fetch: ivoryStrapi(['7']) as any })
+    ).resolves.toBeUndefined();
+    const r = await statusOf(() =>
+      runSendGuards({ ...base, queId: 'CreateIssue', callerId: '7', variablesObject: { negotiationId: '9' }, fetch: ivoryStrapi(['8']) as any })
+    );
+    expect(r).toMatchObject({ threw: true, status: 403 });
+  });
+});
+
 for (const queId of ['ListIssues', 'ListClauses', 'CreateIssue', 'CreateClause']) {
   describe(`runSendGuards — ${queId}`, () => {
     const q = { ...base, queId };

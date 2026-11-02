@@ -139,6 +139,17 @@ const BRIDGE_SOURCES = {
 };
 
 /**
+ * A question in Ivory Tower (the sister argument-map site) sent to a rikma for
+ * a consensus decision. The row lives in Ivory Tower's own database, which this
+ * server never reads, so the party rule is the electorate itself: the rikma
+ * named in the id. `sourceId` is `<rikmaId>:<ivory node uuid>` — the same
+ * question decided by two rikmas is two discussions, each its members' own.
+ * See ivory-tower docs/PLAN_CONSENSUS_BRIDGE.md §3.
+ */
+export const IVORY_SOURCE_TYPE = 'ivoryNode';
+const IVORY_SOURCE_ID = /^(\d+):([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$/i;
+
+/**
  * Throw unless the caller is a party to the main-app object a bridged
  * negotiation mediates: named on the row or a member of its rikma, by the
  * same ownership rules the generic write guard uses.
@@ -150,6 +161,18 @@ const BRIDGE_SOURCES = {
 async function requireBridgeSourceParty(ctx, sourceType, sourceId) {
   const { callerId, bearer1, ep, fetch: injected } = ctx;
   if (!callerId) throw error(401, 'Unauthorized: No caller id');
+
+  if (String(sourceType) === IVORY_SOURCE_TYPE) {
+    const m = IVORY_SOURCE_ID.exec(String(sourceId ?? ''));
+    if (!m) throw error(403, 'Forbidden: Malformed Ivory Tower source');
+    await requireProjectMember(
+      { ...ctx, variablesObject: { pid: m[1] } },
+      'ivoryNode bridge',
+      'Forbidden: Not a member of the rikma deciding this question'
+    );
+    return;
+  }
+
   const entities = BRIDGE_SOURCES[/** @type {keyof typeof BRIDGE_SOURCES} */ (String(sourceType))];
   if (!entities || sourceId == null || sourceId === '') {
     throw error(403, 'Forbidden: Unknown negotiation source');
