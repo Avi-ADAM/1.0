@@ -1,5 +1,7 @@
 # 1lev1 (1💗1) — Consensus-Based Partnerships
 
+[![1lev1 rikma](https://www.1lev1.com/api/badge/78.svg)](https://www.1lev1.com/project/78)
+
 **Build together, agree together, share the value you create.**
 
 1lev1 is a collaborative platform for forming and managing **rikmas**: partnerships where people contribute work and resources, agree on commitments, and distribute income according to their contributions and shared agreements.
