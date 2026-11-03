@@ -342,6 +342,7 @@
       <a href="#consensus">{$t('home.consensus.eyebrow')}</a>
       <a href="#circle">{$t('home.sections.navConcierge')}</a>
       <a href="#features">{$t('home.sections.navFeatures')}</a>
+      <a href="#pricing">{$t('home.pricing.nav')}</a>
       <a href="#faq">{$t('home.sections.navFaq')}</a>
       <a href="/why" data-sveltekit-prefetch>{$t('home.nav.why')}</a>
     </nav>
@@ -453,6 +454,30 @@
           <span class="hm-door-arrow" aria-hidden="true">{arrow}</span>
         </a>
       {/each}
+    </div>
+  </section>
+
+  <!-- ============ PRICING ============
+       High on purpose: "how much does it cost?" is the first thing people look
+       for, and when it sat at the bottom of #discover nobody found it. -->
+  <section id="pricing" class="hm-section hm-pricing" aria-labelledby="hm-pricing-title">
+    <div class="hm-pricing-card">
+      <div class="hm-pricing-head">
+        <span class="hm-eyebrow">{$t('home.pricing.eyebrow')}</span>
+        <h2 id="hm-pricing-title" class="hm-h2">{$t('home.pricing.title')}</h2>
+        <span class="hm-pricing-free">{$t('home.pricing.free')}</span>
+      </div>
+      <div class="hm-pricing-body">
+        <p>{$t('home.pricing.costs')}</p>
+        <p>{$t('home.pricing.why')}</p>
+        <p class="hm-pricing-invite">{$t('home.pricing.invite')}</p>
+        <div class="hm-pill-row">
+          <a href={regHref} class="hm-btn hm-btn-ink">{$t('home.sections.modelCta')}</a>
+          <a href="/project/1" class="hm-textlink" data-sveltekit-prefetch>
+            {$t('home.pricing.rikma')} <span aria-hidden="true">{arrow}</span>
+          </a>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -772,11 +797,6 @@
         <span class="hm-count-go">{$t('home.discover.view')} <span aria-hidden="true">{arrow}</span></span>
       </a>
     </div>
-    <div class="hm-price">
-      <h3 class="hm-price-title">{$t('home.sections.modelTitle')}</h3>
-      <p>{$t('home.sections.modelSub')}</p>
-      <a href={regHref} class="hm-btn hm-btn-ink">{$t('home.sections.modelCta')}</a>
-    </div>
   </section>
 
   <!-- ============ FAQ + DEEPER ============ -->
@@ -841,6 +861,7 @@
   <footer class="hm-footer">
     {@render logo(24)}
     <nav aria-label={$t('home.nav.footer')}>
+      <a href="#pricing">{$t('home.pricing.nav')}</a>
       <a href="/faq" data-sveltekit-prefetch>{$t('home.nav.faq')}</a>
       <a href="/guid" data-sveltekit-prefetch>{$t('home.nav.guide')}</a>
       <a href="/shop" data-sveltekit-prefetch>{$t('home.nav.shop')}</a>
@@ -2378,29 +2399,57 @@
   .hm-count-map .hm-count-go {
     color: #f0c040;
   }
-  .hm-price {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 12px 24px;
-    padding: 20px 26px;
+  .hm-pricing {
+    padding-block: clamp(32px, 4vw, 56px);
+  }
+  .hm-pricing-card {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px 48px;
+    padding: clamp(22px, 4vw, 40px);
     border-radius: var(--hm-radius);
     background: var(--hm-gold);
     color: var(--hm-ink);
   }
-  .hm-price-title {
-    margin: 0;
-    font-family: var(--hm-display);
-    font-weight: var(--hm-display-weight);
-    font-size: 26px;
-    white-space: nowrap;
+  @media (min-width: 900px) {
+    .hm-pricing-card {
+      grid-template-columns: minmax(260px, 2fr) 3fr;
+      align-items: start;
+    }
   }
-  .hm-price p {
-    flex: 1 1 320px;
+  .hm-pricing-head {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .hm-pricing-head .hm-h2 {
     margin: 0;
+  }
+  .hm-pricing-free {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 999px;
+    border: 1.5px solid currentColor;
+    color: var(--hm-ink);
+    font-weight: 700;
+    font-size: 15px;
+  }
+  .hm-pricing-body p {
+    margin: 0 0 12px;
     font-size: 17px;
-    line-height: 1.55;
+    line-height: 1.6;
     color: var(--hm-ink2);
+  }
+  .hm-pricing-body .hm-pricing-invite {
+    color: var(--hm-ink);
+    font-weight: 600;
+  }
+  .hm-pricing-body .hm-pill-row {
+    margin-top: 8px;
+  }
+  .hm .hm-pricing-body .hm-textlink {
+    color: var(--hm-ink);
   }
 
   /* ===== faq + deeper ===================================================== */
