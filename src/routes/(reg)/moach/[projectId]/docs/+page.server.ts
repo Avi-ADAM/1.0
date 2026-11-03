@@ -5,6 +5,7 @@ import { maxUploadBytes, storageKind } from '$lib/server/storage/index.js';
 import { PROXY_MAX_BYTES } from '$lib/uploads/policy.js';
 import { env } from '$env/dynamic/private';
 import { rtKey } from '$lib/realtime/scopes.js';
+import { rikmaTowerSpaces, towerBase } from '$lib/server/ivoryTower';
 import type { PageServerLoad } from './$types';
 
 /**
@@ -23,7 +24,7 @@ import type { PageServerLoad } from './$types';
  * The existing `Project.drivelink` rides along (§5): it is the rikma's Drive
  * link today, and the links list is exactly where a member looks for it.
  */
-export const load: PageServerLoad = async ({ params, fetch, depends }) => {
+export const load: PageServerLoad = async ({ params, fetch, depends, cookies }) => {
   const { projectId } = params;
   // A member added, edited or removed an entry (any rikma of theirs — a doc change
   // reaches only members, and re-reading one shelf is cheap).
@@ -41,6 +42,13 @@ export const load: PageServerLoad = async ({ params, fetch, depends }) => {
     ? { mode: 'direct' as const, maxBytes: maxUploadBytes() }
     : { mode: 'proxy' as const, maxBytes: PROXY_MAX_BYTES };
 
+  // The rikma's spaces in Ivory Tower (docs/tbd/PLAN_ARGUMENT_MAP.md), asked with
+  // the member's own jwt. Streamed, so another site never slows the shelf down;
+  // null = could not ask, which the card shows as both links rather than "none".
+  const towerUrl = towerBase(env.IVORY_TOWER_URL);
+  const towerSpaces = rikmaTowerSpaces(towerUrl, projectId, cookies.get('jwt'));
+  const tower = { towerUrl, towerSpaces };
+
   try {
     const res = (await sendToSer({ pid: projectId }, '325projectSpaceDocs', 0, 0, false, fetch)) as any;
 
@@ -50,7 +58,7 @@ export const load: PageServerLoad = async ({ params, fetch, depends }) => {
     // not exist on the deployed schema hides itself (the `Sp.hm` incident).
     if (res?.errors?.length) {
       console.error('[moach/docs] shared library query rejected', res.errors);
-      return { projectId, upload, vaultEnabled, drivelink: '', docs: [], loadFailed: true };
+      return { projectId, upload, vaultEnabled, ...tower, drivelink: '', docs: [], loadFailed: true };
     }
 
     const attributes = res?.data?.project?.data?.attributes ?? {};
@@ -59,6 +67,7 @@ export const load: PageServerLoad = async ({ params, fetch, depends }) => {
       projectId,
       upload,
       vaultEnabled,
+      ...tower,
       drivelink: String(attributes.drivelink ?? '').trim(),
       docs: normalizeSpaceDocs(attributes.space_docs?.data, mediaUrl),
       loadFailed: false
@@ -66,6 +75,6 @@ export const load: PageServerLoad = async ({ params, fetch, depends }) => {
   } catch (e) {
     // An empty shelf the member can still upload to beats a 500 on the tab.
     console.error('[moach/docs] shared library load failed', e);
-    return { projectId, upload, vaultEnabled, drivelink: '', docs: [], loadFailed: true };
+    return { projectId, upload, vaultEnabled, ...tower, drivelink: '', docs: [], loadFailed: true };
   }
 };

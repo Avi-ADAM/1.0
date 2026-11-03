@@ -115,5 +115,25 @@
     "edit": "Edit",
     "remove": "Delete",
     "removeConfirm": "Delete \"{{name}}\" from the vault? No member will see it anymore."
+  },
+  "tower": {
+    "title": "Ivory Tower",
+    "badge": "Sister site",
+    "lead": "An argument map for the rikma's inquiries: questions, positions, arguments and evidence as one branching graph. The map does not decide who is right; it shows where each path stands.",
+    "why1": "Every line of thought stays open until whoever walks it reaches its end. No argument is \"approved\" just because nobody answered in time.",
+    "why2": "The space belongs to the rikma: only members contribute, and you choose whether everyone can read it or only you.",
+    "why3": "A branch that reaches a practical conclusion opens an open mission here, and the hours on it count in the rikma as usual.",
+    "why4": "Dead ends are kept too. Whoever comes after you sees what was already tried, and why.",
+    "checking": "Checking whether the rikma already has a space…",
+    "yours": "The rikma's spaces",
+    "members": "Rikma members only",
+    "public": "Public",
+    "nodes": "{{count}} nodes",
+    "unknown": "We could not check right now whether the rikma has a space.",
+    "createFirst": "Open a space for the rikma",
+    "another": "Open another space",
+    "open": "Go to Ivory Tower",
+    "moreWhy": "What does the rikma gain?",
+    "lessWhy": "Less"
   }
 }

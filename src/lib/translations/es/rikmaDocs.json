@@ -115,5 +115,25 @@
     "edit": "Editar",
     "remove": "Eliminar",
     "removeConfirm": "¿Eliminar «{{name}}» de la caja fuerte? Ningún miembro volverá a verlo."
+  },
+  "tower": {
+    "title": "Torre de Marfil",
+    "badge": "Sitio hermano",
+    "lead": "Un mapa de argumentos para las investigaciones de la rikma: preguntas, posturas, argumentos y evidencias en un solo grafo que se ramifica. El mapa no decide quién tiene razón; muestra dónde está cada camino.",
+    "why1": "Cada línea de pensamiento queda abierta hasta que quien la recorre llega al final. Ningún argumento se «aprueba» solo porque nadie respondió a tiempo.",
+    "why2": "El espacio pertenece a la rikma: solo sus miembros contribuyen, y ustedes eligen si lo ve todo el mundo o solo ustedes.",
+    "why3": "Una rama que llega a una conclusión práctica abre aquí una misión abierta, y sus horas cuentan en la rikma como siempre.",
+    "why4": "También se guardan los callejones sin salida. Quien venga después verá qué ya se probó y por qué.",
+    "checking": "Comprobando si la rikma ya tiene un espacio…",
+    "yours": "Los espacios de la rikma",
+    "members": "Solo miembros de la rikma",
+    "public": "Público",
+    "nodes": "{{count}} nodos",
+    "unknown": "Ahora no pudimos comprobar si la rikma tiene un espacio.",
+    "createFirst": "Abrir un espacio para la rikma",
+    "another": "Abrir otro espacio",
+    "open": "Ir a la Torre de Marfil",
+    "moreWhy": "¿Qué gana la rikma?",
+    "lessWhy": "Menos"
   }
 }

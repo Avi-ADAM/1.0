@@ -23,6 +23,7 @@
   import { invalidateAll } from '$app/navigation';
   import { untrack, onMount } from 'svelte';
   import P2pPilotCard from '$lib/components/rikmaDocs/P2pPilotCard.svelte';
+  import IvoryTowerCard from '$lib/components/rikmaDocs/IvoryTowerCard.svelte';
   import { RikmaP2p } from '$lib/p2p/pilot.svelte.js';
   import AddSpaceDoc from '$lib/components/rikmaDocs/AddSpaceDoc.svelte';
   import SpaceDocRow from '$lib/components/rikmaDocs/SpaceDocRow.svelte';
@@ -159,6 +160,8 @@
         </section>
       {/each}
     {/if}
+
+    <IvoryTowerCard url={data.towerUrl} projectId={data.projectId} spaces={data.towerSpaces} />
 
     {#if pilot}
       <P2pPilotCard {pilot} />
