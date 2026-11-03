@@ -9120,6 +9120,19 @@ ${PROMO_DECISION_FIELDS}
     }
   }`,
 
+  // The pricing track a wish deal is signed under: the wish's, and each accepted
+  // proposal's ($lib/sheirut/pricingTrack, PLAN_DEAL_PRICING_TRACKS P1). Its own qid so a
+  // backend without the field fails only this read, which materializeWish treats as null.
+  '469ratsonPricingTrack': `query RatsonPricingTrack($id: ID!) {
+    ratson(id: $id) { data { id attributes { pricingTrack } } }
+    ratsonProposals(
+      filters: { and: [{ ratson: { id: { eq: $id } } }, { status_proposal: { eq: "accepted" } }] }
+      pagination: { limit: 50 }
+    ) {
+      data { id attributes { pricingTrack } }
+    }
+  }`,
+
   // A part's new terms, once the rikma and the customer signed them: its ceiling follows.
   '399updateDealLineTerms': `mutation UpdateDealLineTerms($id: ID!, $hoursPerUnit: Float, $ratePerHour: Float) {
     updateMatanotRecipeMission(id: $id, data: { hoursPerUnit: $hoursPerUnit, ratePerHour: $ratePerHour, unitsPerProduct: 1 }) {

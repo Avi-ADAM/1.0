@@ -34,6 +34,7 @@ import { STRAPI_URL } from '$lib/server/strapiUrl.js';
 import { resolveRikmaPictureId } from '$lib/server/concierge/rikmaPicture.js';
 import { openWishGaps, type OpenGapsResult } from '$lib/server/wish/openGaps.js';
 import { scope, scopeList } from '$lib/realtime/scopes.js';
+import { dealPricingTrack, type PricingTrack } from '$lib/sheirut/pricingTrack';
 
 const handler: ActionExecutionHandler = async (params, context, util) => {
   const { strapi } = util;
@@ -213,6 +214,19 @@ const handler: ActionExecutionHandler = async (params, context, util) => {
     : null;
   if (!sheirutpendId) throw new Error('פתיחת ההסכמה (Sheirutpend) נכשלה');
 
+  // ── 6b. The pricing track the deal is signed under (PLAN_DEAL_PRICING_TRACKS P1) ──
+  // Best-effort: a failed read leaves it null, which is `atCost` — how the deal behaves anyway.
+  let pricingTrack: PricingTrack | null = null;
+  try {
+    const trRes = await strapi.execute('469ratsonPricingTrack', { id: ratsonId }, context.jwt, context.fetch);
+    pricingTrack = dealPricingTrack(
+      trRes?.data?.ratson?.data?.attributes?.pricingTrack,
+      (trRes?.data?.ratsonProposals?.data ?? []).map((p: any) => p?.attributes?.pricingTrack)
+    );
+  } catch (e) {
+    console.warn('[materializeWish] reading the pricing track failed (deal stays atCost):', e);
+  }
+
   // ── 7. Produce the Sheirut + activate the BOM (reuse the tested flow) ───────
   let serviceId: string | null = null;
   try {
@@ -225,6 +239,16 @@ const handler: ActionExecutionHandler = async (params, context, util) => {
   } catch (e) {
     console.error('[materializeWish] createSheirutFromPending failed:', e);
     throw new Error('הרקמה נוצרה אך פתיחת הדיל נכשלה - אפשר לנסות שוב מתוך הדילים');
+  }
+
+  // Written only when someone chose a track: null is legacy = atCost, so a deal nobody
+  // chose for stays exactly as it was, and a backend without the field never sees it.
+  if (serviceId && pricingTrack) {
+    try {
+      await strapi.execute('213updateSheirut', { id: serviceId, data: { pricingTrack } }, context.jwt, context.fetch);
+    } catch (e) {
+      console.error('[materializeWish] recording the pricing track failed (deal reads atCost):', e);
+    }
   }
 
   // ── 7b. The parts nobody took go on in the rikma, when she chose so (C-19) ──
