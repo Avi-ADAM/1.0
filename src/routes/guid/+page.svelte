@@ -8,6 +8,8 @@
   // `locale.set` inside it re-triggers the loader for this route, so the
   // route-gated `guide` namespace arrives in the new language.
   import LangSwitch from '$lib/components/onboard/LangSwitch.svelte';
+  import WatchVideoButton from '$lib/components/main/WatchVideoButton.svelte';
+  import { VIDEO_IDEA_TO_RIKMA } from '$lib/videos.js';
 
   /**
    * The user-facing guide.
@@ -167,6 +169,14 @@
         {$t('guide.title')}
       </h1>
       <p class="mt-3 text-lg text-rose-700 sm:text-xl">{$t('guide.tagline')}</p>
+      <p class="mt-4">
+        <WatchVideoButton
+          video={VIDEO_IDEA_TO_RIKMA}
+          cta={$t('home.videos.ideaToRikmaCta')}
+          label={$t('home.videos.ideaToRikmaLabel')}
+          class="inline-flex items-center gap-2 rounded-full bg-rose-700 px-5 py-2 font-semibold text-white shadow-sm hover:bg-rose-800"
+        />
+      </p>
       <div class="mx-auto mt-6 max-w-3xl space-y-3 text-start text-base leading-relaxed text-slate-700">
         <p>{$t('guide.intro')}</p>
         <p class="text-slate-500">{$t('guide.intro2')}</p>

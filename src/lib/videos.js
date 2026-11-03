@@ -19,11 +19,18 @@ export const VIDEO_CONCIERGE = '03c1X5p1iL0';
 /** Building an online shop on a rikma — the starter, products, orders (/shop hero). */
 export const VIDEO_SHOP_BUILD = '3N3pDPfSi2w';
 
+/**
+ * From an idea to a rikma — the full guide to a consensual partnership (home hero, /vision,
+ * /guid). The English cut will be its own id; add it here with ['en'].
+ */
+export const VIDEO_IDEA_TO_RIKMA = 'L2NDGpyIOqc';
+
 /** @type {Record<string, string[]>} video id → the languages it speaks */
 const LANGS = {
   [VIDEO_HOW_IT_WORKS]: ['he'],
   [VIDEO_CONCIERGE]: ['he'],
-  [VIDEO_SHOP_BUILD]: ['he']
+  [VIDEO_SHOP_BUILD]: ['he'],
+  [VIDEO_IDEA_TO_RIKMA]: ['he']
 };
 
 /**

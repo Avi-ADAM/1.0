@@ -27,7 +27,7 @@
   import ProductPeek from '$lib/components/main/ProductPeek.svelte';
   import SplitCalculator from '$lib/components/main/SplitCalculator.svelte';
   import VideoModal from '$lib/components/main/VideoModal.svelte';
-  import { VIDEO_HOW_IT_WORKS, VIDEO_CONCIERGE, VIDEO_SHOP_BUILD, videoFor } from '$lib/videos.js';
+  import { VIDEO_HOW_IT_WORKS, VIDEO_CONCIERGE, VIDEO_SHOP_BUILD, VIDEO_IDEA_TO_RIKMA, videoFor } from '$lib/videos.js';
   import DemoRequest from '$lib/components/main/DemoRequest.svelte';
   import MotionControl from '$lib/components/main/MotionControl.svelte';
   import AppearanceMenu from '$lib/components/footer/AppearanceMenu.svelte';
@@ -292,6 +292,14 @@
     videoTitle = $t('home.videos.shopLabel');
     videoOpen = true;
   }
+  /* From an idea to a rikma, the full guide — in the hero's CTA row, same language gate. */
+  const ideaVideo = $derived(videoFor(VIDEO_IDEA_TO_RIKMA, $lang));
+  function watchIdea() {
+    if (!ideaVideo) return;
+    videoId = ideaVideo;
+    videoTitle = $t('home.videos.ideaToRikmaLabel');
+    videoOpen = true;
+  }
 
   onMount(() => {
     if (!statsLoaded) loadStats();
@@ -394,6 +402,12 @@
           {$t('demo.button')}
         </button>
         <a href="#demo" class="hm-textlink">{$t('home.split.ctaSecondary')} ↓</a>
+        {#if ideaVideo}
+          <button type="button" class="hm-textlink hm-watch" onclick={watchIdea}>
+            <span aria-hidden="true">▶</span>
+            {$t('home.videos.ideaToRikmaCta')}
+          </button>
+        {/if}
       </div>
 
       {#if heroStats.length}

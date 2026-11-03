@@ -24,6 +24,8 @@
   import DemoRequest from '$lib/components/main/DemoRequest.svelte';
   import VisionDemo from '$lib/components/vision/VisionDemo.svelte';
   import VisionArt from '$lib/components/vision/VisionArt.svelte';
+  import WatchVideoButton from '$lib/components/main/WatchVideoButton.svelte';
+  import { VIDEO_IDEA_TO_RIKMA } from '$lib/videos.js';
 
   let demoOpen = $state(false);
 
@@ -87,6 +89,14 @@
       <a href="#try" class={primary}>{$t('vision.hero.ctaTry')}</a>
       <a href={startHref} class={secondary}>{$t('vision.hero.ctaStart')}</a>
     </div>
+    <p class="mt-4">
+      <WatchVideoButton
+        video={VIDEO_IDEA_TO_RIKMA}
+        cta={$t('home.videos.ideaToRikmaCta')}
+        label={$t('home.videos.ideaToRikmaLabel')}
+        class={link}
+      />
+    </p>
     <div class="mt-8">
       <VisionArt />
     </div>
