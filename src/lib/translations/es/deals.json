@@ -276,5 +276,28 @@
     "fixed": "Precio cerrado",
     "atCost": "Pago transparente",
     "unsure": "Aún sin decidir"
+  },
+  "receipt": {
+    "title": "Recepción del trato",
+    "explain": "Con precio cerrado, el trato termina cuando la clienta tiene el resultado. La rikma marca que lo entregó, y la clienta lo aprueba o escribe qué falta. Sin respuesta antes de la fecha límite, la recepción queda aprobada.",
+    "none": "Aún no se entregó.",
+    "delivered": "Entregado, esperando que se apruebe la recepción.",
+    "defects": "Se escribió lo que falta. La rikma lo arreglará y entregará de nuevo.",
+    "accepted": "Recibido.",
+    "silenceUntil": "Sin respuesta antes de {{when}}, la recepción queda aprobada.",
+    "roundDelivered": "{{name}}: entregado",
+    "roundDefects": "{{name}}: aún falta",
+    "deliverNote": "¿Qué se entregó? (opcional)",
+    "deliver": "Entregamos",
+    "accept": "Lo recibí",
+    "writeDefects": "Todavía falta algo",
+    "defectsNote": "¿Qué falta todavía?",
+    "sendDefects": "Enviar la lista",
+    "back": "Volver",
+    "confirmOwn": "Ya lo recibí",
+    "error": "No funcionó. Inténtalo de nuevo.",
+    "deliveredToast": "Enviado a la clienta para aprobar",
+    "acceptedToast": "La recepción quedó registrada",
+    "defectsToast": "La lista se envió a la rikma"
   }
 }

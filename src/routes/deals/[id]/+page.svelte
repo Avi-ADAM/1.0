@@ -11,6 +11,7 @@
   import DealEditsPanel from '$lib/components/deals/DealEditsPanel.svelte';
   import DealOffersPanel from '$lib/components/deals/DealOffersPanel.svelte';
   import DealPartsPanel from '$lib/components/deals/DealPartsPanel.svelte';
+  import DealReceiptPanel from '$lib/components/deals/DealReceiptPanel.svelte';
   import type { DealCandidacyView } from '$lib/sheirut/dealOffers';
   import ApprovalPanel from '$lib/components/deals/ApprovalPanel.svelte';
   import DealTimeline from '$lib/components/deals/DealTimeline.svelte';
@@ -173,6 +174,25 @@
   const parts = $derived(data.parts ?? null);
   let signingId: string | null = $state(null);
   let confirmingPart = $state(false);
+
+  // A fixed-price deal is received as a whole (P6): the rikma says it delivered, she
+  // approves or writes what is missing.
+  const receipt = $derived(data.receipt ?? null);
+  let receiptBusy = $state(false);
+  async function receiptAction(actionKey: string, params: Record<string, unknown>, okKey: string) {
+    if (receiptBusy) return;
+    receiptBusy = true;
+    try {
+      await runAction(actionKey, { sheirutId: String(deal?.sheirutId ?? ''), ...params });
+      toast.success($t(okKey));
+      await invalidateAll();
+    } catch (err) {
+      console.error(err);
+      toast.error($t('deals.receipt.error'));
+    } finally {
+      receiptBusy = false;
+    }
+  }
 
   async function signOffer(c: DealCandidacyView) {
     if (signingId) return;
@@ -389,6 +409,18 @@
               busyId={signingId}
               onSign={signOffer}
               onTalk={() => forumPanel?.focus()}
+            />
+          </div>
+        {/if}
+
+        {#if receipt}
+          <div class="anim anim-d2">
+            <DealReceiptPanel
+              {receipt}
+              busy={receiptBusy}
+              onDeliver={(why) => receiptAction('deliverDeal', { why }, 'deals.receipt.deliveredToast')}
+              onAccept={() => receiptAction('answerDealReceipt', { answer: 'accept' }, 'deals.receipt.acceptedToast')}
+              onDefects={(why) => receiptAction('answerDealReceipt', { answer: 'defects', why }, 'deals.receipt.defectsToast')}
             />
           </div>
         {/if}

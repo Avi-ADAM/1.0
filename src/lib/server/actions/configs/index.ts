@@ -115,6 +115,8 @@ import { acceptWishOfferConfig } from './acceptWishOffer.js';
 import { declineWishOfferConfig } from './declineWishOffer.js';
 import { materializeWishConfig } from './materializeWish.js';
 import { signDealOfferConfig } from './signDealOffer.js';
+import { deliverDealConfig } from './deliverDeal.js';
+import { answerDealReceiptConfig } from './answerDealReceipt.js';
 import { confirmDealPartReceivedConfig } from './confirmDealPartReceived.js';
 import { publishWishNeedToCommunityConfig } from './publishWishNeedToCommunity.js';
 import { finalizeAskAcceptanceConfig } from './finalizeAskAcceptance.js';
@@ -448,6 +450,8 @@ export function registerAllActions(): void {
   registerAction(materializeWishConfig);
   // QA C-19: the customer co-signs the open parts of her deal; "paid" waits for every provider
   registerAction(signDealOfferConfig);
+  registerAction(deliverDealConfig);
+  registerAction(answerDealReceiptConfig);
   registerAction(confirmDealPartReceivedConfig);
   registerAction(publishWishNeedToCommunityConfig);
   registerAction(offerWishHelpConfig);

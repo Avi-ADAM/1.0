@@ -18,6 +18,8 @@ import { loadParts } from '$lib/server/deal/partsReceived';
 import type { PartsView } from '$lib/sheirut/partsReceived';
 import { partViaSplit, providerTransfers } from '$lib/sheirut/splitCarriage';
 import { loadDealTrack } from '$lib/server/sheirut/dealTrack';
+import { loadReceipt } from '$lib/server/deal/receipt';
+import { receiptView, type ReceiptView } from '$lib/sheirut/dealReceipt';
 
 export interface DealPieces {
   due: LoadedDealDue | null;
@@ -27,9 +29,11 @@ export interface DealPieces {
   parts: PartsView | null;
   /** The deal's mission ids — the page reads progress updates by them. */
   missionIds: string[];
+  /** A fixed-price deal's receipt (P6); null on at-cost. */
+  receipt: ReceiptView | null;
 }
 
-export const NO_PIECES: DealPieces = { due: null, edits: [], offers: null, parts: null, missionIds: [] };
+export const NO_PIECES: DealPieces = { due: null, edits: [], offers: null, parts: null, missionIds: [], receipt: null };
 
 export async function readDealPieces(run: QidRunner, sheirutId: string, viewerId: string, tag = 'deal'): Promise<DealPieces> {
   const warn = (what: string) => (e: unknown) => {
@@ -79,5 +83,15 @@ export async function readDealPieces(run: QidRunner, sheirutId: string, viewerId
     }
   }
 
-  return { due: due ?? null, edits, offers: offers ?? null, parts: parts ?? null, missionIds };
+  let receipt: ReceiptView | null = null;
+  if ((await track) === 'fixed') {
+    try {
+      const r = await loadReceipt(run, sheirutId);
+      receipt = r ? receiptView(r, String(viewerId)) : null;
+    } catch (e) {
+      warn('the receipt')(e);
+    }
+  }
+
+  return { due: due ?? null, edits, offers: offers ?? null, parts: parts ?? null, missionIds, receipt };
 }

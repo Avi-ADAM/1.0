@@ -275,5 +275,28 @@
     "fixed": "Set price",
     "atCost": "Open book",
     "unsure": "Not decided yet"
+  },
+  "receipt": {
+    "title": "Receiving the deal",
+    "explain": "On a set price the deal is done when the customer has the result. The rikma marks it delivered, and the customer approves or writes what is still missing. With no answer by the deadline, the receipt is approved.",
+    "none": "Not delivered yet.",
+    "delivered": "Delivered, waiting for the receipt to be approved.",
+    "defects": "What is missing was written down. The rikma will fix it and deliver again.",
+    "accepted": "Received.",
+    "silenceUntil": "With no answer by {{when}}, the receipt is approved.",
+    "roundDelivered": "{{name}}: delivered",
+    "roundDefects": "{{name}}: still missing",
+    "deliverNote": "What was delivered? (optional)",
+    "deliver": "We delivered",
+    "accept": "I received it",
+    "writeDefects": "Something is still missing",
+    "defectsNote": "What is still missing?",
+    "sendDefects": "Send the list",
+    "back": "Back",
+    "confirmOwn": "I already received it",
+    "error": "That did not work. Please try again.",
+    "deliveredToast": "Sent to the customer to approve",
+    "acceptedToast": "The receipt was recorded",
+    "defectsToast": "The list was sent to the rikma"
   }
 }

@@ -684,3 +684,35 @@ export function overrunHeldForProvider(p: {
     url: p.sheirutId != null ? `/deals/${p.sheirutId}` : moach(p.projectId)
   };
 }
+
+// ── a fixed-price deal received by silence (PLAN_DEAL_PRICING_TRACKS P6) ────
+
+export function dealReceiptMatured(p: { sheirutId: Id; projectId: Id; customerIds: Id[]; memberIds: Id[] }): MaturedNotice[] {
+  const url = p.sheirutId != null ? `/deals/${p.sheirutId}` : '/deals';
+  return [
+    {
+      kind: 'decision',
+      intent: 'personal',
+      to: { userIds: p.customerIds },
+      title: L('הקבלה של העסקה אושרה', 'The deal’s receipt was approved', 'اعتُمد استلام الصفقة'),
+      body: L(
+        'לא הייתה תשובה על המסירה בזמן התגובה של הרקמה, ולכן הקבלה נרשמה. אם משהו עדיין חסר, אפשר לכתוב על זה בשיחה של העסקה.',
+        "There was no answer to the delivery within the rikma's response time, so the receipt was recorded. If something is still missing, write about it in the deal's chat.",
+        'لم يصل رد على التسليم خلال وقت الاستجابة في الريكما، لذلك سُجّل الاستلام. إن كان شيء ما زال ناقصًا، يمكن الكتابة عنه في محادثة الصفقة.'
+      ),
+      url
+    },
+    {
+      kind: 'decision',
+      intent: 'outcome',
+      to: { userIds: p.memberIds },
+      title: L('העסקה התקבלה', 'The deal was received', 'استُلمت الصفقة'),
+      body: L(
+        'לא הייתה תשובה על המסירה בזמן התגובה של הרקמה, ולכן הקבלה נרשמה.',
+        "There was no answer to the delivery within the rikma's response time, so the receipt was recorded.",
+        'لم يصل رد على التسليم خلال وقت الاستجابة في الريكما، لذلك سُجّل الاستلام.'
+      ),
+      url
+    }
+  ];
+}

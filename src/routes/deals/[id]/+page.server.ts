@@ -29,7 +29,7 @@ export const load: PageServerLoad = async ({ params, locals, fetch, depends }) =
     // feed the deals bell's notices ($lib/server/deal/dealPieces).
     // And the deal's stages — the wish it was shaped in, the request that was
     // approved (PLAN_DIRECT_OFFER P1) — read on the service token for a party only.
-    const [{ due, edits, offers, parts, missionIds }, stages] = result.sale
+    const [{ due, edits, offers, parts, missionIds, receipt }, stages] = result.sale
       ? await Promise.all([
           readDealPieces(run, params.id, String(uid), 'deals/[id]/+page.server'),
           readDealStages(
@@ -61,6 +61,7 @@ export const load: PageServerLoad = async ({ params, locals, fetch, depends }) =
       edits,
       offers,
       parts,
+      receipt,
       stages,
       viewerId: String(uid),
       viewerName: un ?? ''

@@ -9146,6 +9146,36 @@ ${PROMO_DECISION_FIELDS}
     }
   }`,
 
+  // Receiving a fixed-price deal — the `dealReceipt` Decision (P6, $lib/server/deal/receipt).
+  // Not linked to `projects`: an open project Decision is a vote card for the whole rikma,
+  // and this one is between the rikma and its customer.
+  '473dealReceipt': `query DealReceipt($id: ID!) {
+    sheirut(id: $id) { data { id attributes {
+      productExepted
+      users_permissions_users { data { id attributes { username } } }
+      project { data { id attributes { restime user_1s { data { id } } } } }
+      receipt_decisions(filters: { kind: { eq: "dealReceipt" } }, sort: ["id:desc"], pagination: { limit: 1 }) {
+        data { id attributes {
+          archived
+          vots { what why order zman ide users_permissions_user { data { id attributes { username } } } }
+          timegrama { data { id attributes { date done } } }
+        } }
+      }
+    } } }
+  }`,
+  '474createDealReceipt': `mutation CreateDealReceipt($data: DecisionInput!) {
+    createDecision(data: $data) { data { id } }
+  }`,
+  '475updateDealReceipt': `mutation UpdateDealReceipt($id: ID!, $data: DecisionInput!) {
+    updateDecision(id: $id, data: $data) { data { id } }
+  }`,
+  '476dealReceiptClock': `mutation DealReceiptClock($date: DateTime!, $decision: ID!) {
+    createTimegrama(data: { date: $date, done: false, whatami: "decision", decision: $decision }) { data { id } }
+  }`,
+  '477dealReceiptDecision': `query DealReceiptDecision($id: ID!) {
+    decision(id: $id) { data { id attributes { kind archived receiptDeal { data { id } } } } }
+  }`,
+
   // A part's new terms, once the rikma and the customer signed them: its ceiling follows.
   '399updateDealLineTerms': `mutation UpdateDealLineTerms($id: ID!, $hoursPerUnit: Float, $ratePerHour: Float) {
     updateMatanotRecipeMission(id: $id, data: { hoursPerUnit: $hoursPerUnit, ratePerHour: $ratePerHour, unitsPerProduct: 1 }) {

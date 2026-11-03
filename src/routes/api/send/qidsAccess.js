@@ -627,6 +627,12 @@ export const qidsAccess = {
   '470setRatsonPricingTrack': { allow: ['serviceAdmin'] }, // server-only: createRatson / updateRatsonDraft, owner checked there
   '471setProposalPricingTrack': { allow: ['serviceAdmin'] }, // server-only: counterRatsonProposal checks party + turn
   '472sheirutPricingTracks': { allow: ['serviceAdmin'] }, // server-only: who co-signs a deal change ($lib/server/sheirut/dealTrack)
+  // P6 receipt of a fixed-price deal — server-only: deliverDeal / answerDealReceipt check party.
+  '473dealReceipt': { allow: ['serviceAdmin'] },
+  '474createDealReceipt': { allow: ['serviceAdmin'] },
+  '475updateDealReceipt': { allow: ['serviceAdmin'] },
+  '476dealReceiptClock': { allow: ['serviceAdmin'] },
+  '477dealReceiptDecision': { allow: ['serviceAdmin'] },
 
   // matching/engine.ts: always run through StrapiClient with the admin
   // token, never with a user JWT — writes suggestion data for *other* users.

@@ -19,10 +19,12 @@
   import { normalizeLicenseChange } from '$lib/codeLicense/codeLicense.js';
   import { tellMatured } from '$lib/server/notifications/matured';
   import { matureRuleDecision } from '$lib/server/fulfillment/consent';
+  import { matureDealReceipt } from '$lib/server/deal/receipt';
   import { applyStandingPromoDecision, fetchPromoDecision } from '$lib/server/promotions/decision';
   import {
     decisionAwaitsCustomer,
     fulfillmentRuleMatured,
+    dealReceiptMatured,
     objectChangeApplied,
     rikmaDecisionApplied,
     saleClaimMatured,
@@ -212,6 +214,21 @@
         } catch (e) {
           // Left open: the next run retries rather than losing the consent.
           console.error(`[timegrama/decision] fulfillmentRule ${id} failed — clock left open:`, e);
+          return;
+        }
+        return markDone();
+      }
+
+      // A fixed-price deal's delivery nobody answered within restime (PLAN_DEAL_PRICING_TRACKS
+      // P6): her silence is her receipt. A list of defects on the table matures nothing.
+      if (a.kind === 'dealReceipt') {
+        try {
+          const out = await matureDealReceipt((qid, vars) => strapiClient.execute(qid, vars), String(id));
+          if (out.outcome === 'received') {
+            await tellMatured(dealReceiptMatured(out), fetch);
+          }
+        } catch (e) {
+          console.error(`[timegrama/decision] dealReceipt ${id} failed — clock left open:`, e);
           return;
         }
         return markDone();
