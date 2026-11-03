@@ -111,6 +111,8 @@ tags:
     description: דיווח מכירות פנימה (מהאתר/הסליקה של הרקמה)
   - name: tasks
     description: מטלות — פתיחה חיצונית ומשיכת סטטוס
+  - name: leads
+    description: לידים — מי פנה לרקמה מהאתר, ומה קרה איתו (PLAN_LEADS)
   - name: discover
     description: השוק — כל המוצרים המפורסמים (משני)
   - name: me
@@ -680,6 +682,80 @@ paths:
               schema: { $ref: '#/components/schemas/TaskStatus' }
         '404': { description: אין מטלה עם externalId כזה ברקמה }
 
+  /api/v1/r/{rikma}/leads:
+    post:
+      tags: [leads]
+      summary: העברת פנייה של מתעניין (scope leads:create, מהשרת בלבד)
+      description: |
+        מישהו השאיר פרטים באתר של הרקמה; השרת של האתר מעביר אותם **עם נוסח ההסכמה
+        שהפונה אישר** (`consent` חובה). עובר ב-`createLead`: נשמר ליד, נרשם ביומן,
+        ונפתחת מטלת מעקב לחברי הרקמה (`externalId: lead:<id>`).
+
+        - אותו `externalId` שוב ⇒ `200` עם `duplicated: true, reason: "externalId"`.
+        - אותו טלפון או מייל כמו ליד פתוח ⇒ `200` עם `reason: "sameContact"` — לא נוצר
+          ליד שני; הפנייה נרשמת ביומן של הקיים.
+        - שמירת הליד היא הצעד היחיד שכישלונו מכשיל את הבקשה. מטלה שלא נפתחה מופיעה
+          ב-`warnings` (`TASK_NOT_CREATED`), והליד שמור.
+        - קריאה עם כותרת `Origin` (מדפדפן) ⇒ `403 ORIGIN_NOT_ALLOWED`. טופס סטטי בלי שרת
+          יקבל scope ציבורי נפרד (`leads:create:public`, PLAN_LEADS §5.2).
+      security:
+        - apiKey: []
+      parameters:
+        - $ref: '#/components/parameters/Rikma'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/LeadDraft' }
+      responses:
+        '201':
+          description: הליד נשמר
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/LeadCreated' }
+        '200':
+          description: אותו externalId, או אותו אדם שפונה שוב
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/LeadCreated' }
+        '400':
+          description: '`VALIDATION` (עם `details.field`) או `CONSENT_REQUIRED`'
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { description: '`productId` אינו מוצר של הרקמה שבנתיב' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '503':
+          description: '`LEADS_NOT_READY` — סכמת הלידים עוד לא נפרסה בשרת הזה'
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+
+  /api/v1/r/{rikma}/leads/{externalId}:
+    get:
+      tags: [leads]
+      summary: האם חזרו לפונה (scope leads:read)
+      description: |-
+        סטטוס בלבד — **בלי פרטי קשר, בלי יומן ובלי שם האחראי**. מספיק לאתר כדי
+        להראות "פנו אליכם".
+      security:
+        - apiKey: []
+      parameters:
+        - $ref: '#/components/parameters/Rikma'
+        - name: externalId
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: הסטטוס
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/LeadStatus' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { description: אין ליד עם externalId כזה ברקמה }
+
   /api/v1/discover/products:
     get:
       tags: [discover]
@@ -813,6 +889,8 @@ components:
         `POST /orders` ו-`POST /orders/{ref}/cancel` דורשים `orders:create` —
         **מפתח של שרת בלבד**, לעולם לא ב-JavaScript של דפדפן;
         `GET /orders/{ref}` דורש `orders:read`.
+        `POST /leads` דורש `leads:create` ו-`GET /leads/{externalId}` דורש `leads:read` —
+        גם הם **מפתח של שרת בלבד**: הם נושאים טלפונים ומיילים של אנשים.
         המפתח מקובע לרקמה: פנייה לרקמה אחרת ⇒ 403 `RIKMA_MISMATCH`, גם אם בעליו חבר בשתיהן.
         מפתח ברמת משתמש (בלי רקמה — מפתח פרופיל/MCP/OAuth) ⇒ 403 `KEY_NOT_SCOPED`,
         גם ב-GET שעובד אנונימית, וגם ב-`/api/v1/me`.
@@ -1029,6 +1107,72 @@ components:
           properties:
             id: { type: string }
             username: { type: [string, 'null'] }
+    LeadDraft:
+      type: object
+      required: [name, consent]
+      description: '`email` או `phone` — לפחות אחד.'
+      properties:
+        name: { type: string, maxLength: 200 }
+        email: { type: string, format: email }
+        phone: { type: string, maxLength: 40 }
+        organization: { type: string, maxLength: 200, description: 'חברה / בניין / ארגון' }
+        city: { type: string, maxLength: 200 }
+        address: { type: string, maxLength: 200 }
+        message: { type: string, maxLength: 4000, description: מה הפונה כתב }
+        details:
+          type: object
+          description: שדות חופשיים של הטופס — עד 30 מפתחות, עד 4KB, ערכים פרימיטיביים בלבד
+          additionalProperties: { type: [string, number, boolean, 'null'] }
+        productId: { type: string, description: מוצר של הרקמה שהפונה שאל עליו }
+        externalId: { type: string, maxLength: 128, description: 'המזהה אצלכם — מפתח אידמפוטנטיות לרקמה' }
+        source: { type: string, enum: [api, form, shop, quote, bot, import], default: api }
+        sourceLabel: { type: string, maxLength: 200, description: '"טופס דף הבית"' }
+        sourceUrl: { type: string, format: uri }
+        utm:
+          type: object
+          properties:
+            source: { type: string }
+            medium: { type: string }
+            campaign: { type: string }
+            term: { type: string }
+            content: { type: string }
+        consent:
+          type: object
+          required: [text]
+          description: 'מה הפונה אישר ומתי. הנוסח צריך להזכיר שהפרטים עוברים לרקמה ב-1lev1.'
+          properties:
+            text: { type: string, maxLength: 4000 }
+            at: { type: string, format: date-time }
+        lang: { type: string, description: שפת הפונה }
+    LeadCreated:
+      type: object
+      properties:
+        success: { type: boolean }
+        duplicated: { type: boolean }
+        reason: { type: string, enum: [externalId, sameContact], description: רק כש-duplicated }
+        leadId: { type: string }
+        externalId: { type: [string, 'null'] }
+        status: { $ref: '#/components/schemas/LeadStage' }
+        taskId: { type: [string, 'null'], description: מטלת המעקב ברקמה }
+        warnings:
+          type: array
+          items: { type: string, enum: [ACTIVITY_NOT_RECORDED, TASK_NOT_CREATED, TASK_NOT_LINKED, LEAD_NOT_TOUCHED] }
+    LeadStatus:
+      type: object
+      properties:
+        success: { type: boolean }
+        leadId: { type: string }
+        externalId: { type: [string, 'null'] }
+        status: { $ref: '#/components/schemas/LeadStage' }
+        hasOwner: { type: boolean, description: חבר ברקמה לקח את הליד }
+        lastActivityAt: { type: [string, 'null'], format: date-time }
+    LeadStage:
+      type: string
+      enum: [new, contacted, talking, offered, won, paused, spam]
+      description: |
+        `new` מחכה שיחזרו אליו · `contacted` חזרו אליו · `talking` בשיחה ·
+        `offered` הצעה אצלו · `won` לקוח · `paused` לא עכשיו · `spam`.
+        אין "אבוד" — פנייה שנעצרה היא `paused`.
     KindOf:
       type: string
       enum: [total, daily, monthly, yearly, unlimited]
@@ -1543,6 +1687,8 @@ components:
                 - NOT_CHECKOUTABLE
                 - EXTERNAL_ID_CONFLICT
                 - SHOP_NOT_READY
+                - LEADS_NOT_READY
+                - CONSENT_REQUIRED
                 - NOT_HOLDER
                 - ORDER_CANCELLED
                 - INVALID_TRANSITION

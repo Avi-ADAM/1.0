@@ -21,9 +21,10 @@ import type { WebhookEvent } from '$lib/server/tasksApi.js';
 import type { OrderWebhookEvent } from '$lib/server/ordersApi.js';
 
 import type { PromotionWebhookEvent } from './promotionEvents.js';
+import type { LeadWebhookEvent } from '$lib/server/leadsApi.js';
 
-/** Every event this module can deliver — tasks, orders (orderEvents.ts) and promotions (promotionEvents.ts). */
-export type AnyWebhookEvent = WebhookEvent | OrderWebhookEvent | PromotionWebhookEvent;
+/** Every event this module can deliver — tasks, orders (orderEvents.ts), promotions (promotionEvents.ts) and leads (leadEvents.ts). */
+export type AnyWebhookEvent = WebhookEvent | OrderWebhookEvent | PromotionWebhookEvent | LeadWebhookEvent;
 import { toTaskStatusView } from '$lib/server/tasksApi.js';
 import { SITE_REPORT_PREFIX } from '$lib/server/siteReport.js';
 import { centralProjectId, syncSiteReportFromTask } from '$lib/server/siteReportMirror.js';

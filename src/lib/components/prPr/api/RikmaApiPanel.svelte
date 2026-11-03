@@ -43,10 +43,13 @@
     'products:read',
     'products:read:draft',
     'orders:create',
-    'orders:read'
+    'orders:read',
+    'leads:create',
+    'leads:read'
   ];
-  /** Scopes that move money or read orders — a server's key, never a page's (§3.3). */
-  const SERVER_ONLY_SCOPES = ['orders:create', 'orders:read'];
+  // orders:* and leads:* move money or carry people's contact details — a
+  // server's key, never a page's (§3.3; PLAN_LEADS §5.1). Each family has its
+  // own warning under the checkboxes.
 
   /** @type {Array<{id: string, name: string, key_prefix: string, revoked: boolean, lastUsedAt: string|null, scopes: string[], callbackUrl: string|null}>} */
   let keys = $state([]);
@@ -435,8 +438,11 @@
             <span class="muted">{$t(`rikmaApi.scope_${s.replaceAll(':', '_')}`)}</span>
           </label>
         {/each}
-        {#if form.scopes.some((s) => SERVER_ONLY_SCOPES.includes(s))}
+        {#if form.scopes.some((s) => s.startsWith('orders:'))}
           <p class="server-only">{$t('rikmaApi.ordersServerOnly')}</p>
+        {/if}
+        {#if form.scopes.some((s) => s.startsWith('leads:'))}
+          <p class="server-only">{$t('rikmaApi.leadsServerOnly')}</p>
         {/if}
       </fieldset>
       <label class="field">

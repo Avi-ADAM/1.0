@@ -8574,6 +8574,7 @@ ${PROMO_DECISION_FIELDS}
                 status_ratson
                 startDate
                 finnishDate
+                bounti
                 totalbounti
                 terms_digest
                 chat_forum { data { id } }
@@ -15457,8 +15458,13 @@ ${PROMO_DECISION_FIELDS}
       filters: { project: { id: { eq: $pid } }, externalId: { eq: $externalId } }
       pagination: { limit: 1 }
     ) {
-      data { id attributes { status act { data { id } } } }
+      data { id attributes { status externalId lastActivityAt act { data { id } } owner { data { id } } } }
     }
+  }`,
+
+  // GET /api/v1/r/{rikma}/leads/{externalId} answers 503 until this reads.
+  'rikmaApiLeadsSchema': `query RikmaApiLeadsSchema {
+    leads(pagination: { limit: 1 }) { data { id } }
   }`,
 
   // Leads of this rikma whose dedupeKey shares a contact part (§2.4). The

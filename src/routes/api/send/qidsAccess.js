@@ -669,6 +669,7 @@ export const qidsAccess = {
   // with the ADMIN token, after their projectMember rule. Never widen these.
   'leadById': { allow: ['serviceAdmin'] },
   'leadByExternalId': { allow: ['serviceAdmin'] },
+  'rikmaApiLeadsSchema': { allow: ['serviceAdmin'] },
   'leadsByContact': { allow: ['serviceAdmin'] },
   'leadCreate': { allow: ['serviceAdmin'] },
   'leadUpdate': { allow: ['serviceAdmin'] },

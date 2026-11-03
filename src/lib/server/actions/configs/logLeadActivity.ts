@@ -69,7 +69,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
     });
   }
 
-  return { leadId: lead.id, activityId, status: next ?? lead.status };
+  return { leadId: lead.id, activityId, status: next ?? lead.status, statusChanged: !!next };
 };
 
 export const logLeadActivityConfig: ActionConfig = {

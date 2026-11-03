@@ -369,6 +369,31 @@ export class ActionService {
           });
       }
 
+      // Step 5b″: Lead webhooks (PLAN_LEADS §7.4) — the site that sent a lead
+      // hears it arrived and when its status moves. Ids and status only.
+      if (
+        actionKey === 'createLead' ||
+        actionKey === 'updateLeadStatus' ||
+        actionKey === 'logLeadActivity'
+      ) {
+        import('../webhooks/leadEvents.js')
+          .then(({ onLeadChanged }) =>
+            onLeadChanged({
+              actionKey,
+              params,
+              result: strapiResult,
+              context,
+              strapi: this.strapiClient
+            })
+          )
+          .catch((err) => {
+            this.logger.warn('Lead webhook error', {
+              actionKey,
+              error: err instanceof Error ? err.message : String(err)
+            });
+          });
+      }
+
       // Step 5c: Order webhooks (PLAN_SHOP_CUSTOMER_EXPERIENCE §5.6) — the
       // storefront hears about its orders and stock. Same fire-and-forget rule.
       if (

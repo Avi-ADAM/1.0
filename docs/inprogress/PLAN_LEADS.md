@@ -1,7 +1,8 @@
 # PLAN — לידים ברקמה: טבלה מסודרת, מטלה לכל ליד, וחיבור לחנות
 
 > **מצב (2026-11-04): L0 בנוי ב-`1.0b` (ענף `shabab`), ממתין ל-deploy + הרשאות (§7.5).
-> L1 בנוי ב-1.0main (§8.1) — לא ירוץ מול Strapi עד ש-L0 נפרס.** L2 ואילך — עוד לא בקוד.
+> L1 ו-L2 בנויים ב-1.0main (§8.1, §8.2) — לא ירוצו מול Strapi עד ש-L0 נפרס** (`/leads` עונה
+> `503 LEADS_NOT_READY` עד אז). L3a ואילך — עוד לא בקוד.
 >
 > נכתב 2026-11-03 אחרי קריאת הקוד והמסמכים
 > (`demo-request`, `createTask`, `/api/v1/r/[rikma]/*`, `webhooks/`, מסך
@@ -520,7 +521,7 @@ namespace חדש `leads` ב-`ROUTED` רק לנתיבי `sales/*` (כמו `shop`)
 |---|---|---|---|
 | L0 ✅ | סכמה ב-1.0b (`lead`, `lead-activity`, `leadSettings`) + הרשאות + types — **הקוד בנוי; ממתין ל-deploy, הרשאות ו-`types:update` (§7.5)** | — | יום |
 | L1 ✅ | `src/lib/leads/` טהור (`validateLeadPayload`, `dedupeKey`, `needsAttention`, מעברי סטטוס) + vitest; actions `createLead` / `logLeadActivity` / `updateLeadStatus` + סנכרון מטלה | L0 | 2–3 ימים |
-| L2 | `POST /leads` + `GET /leads/{externalId}` + scopes + webhooks + OpenAPI (`rikma-v1.openapi.yaml`) | L1 | 1–2 ימים |
+| L2 ✅ | `POST /leads` + `GET /leads/{externalId}` + scopes + webhooks + OpenAPI (`rikma-v1.openapi.yaml`) | L1 | 1–2 ימים |
 | L3a | המסלול (§4.0): `stageOf` (ליד · הזמנה · הצעת קונסיירז') + vitest; סנכרון `offered`/`won`/`cancelled` מ-`createPaidOrder`, `orderLifecycle`, `createSale`; סידור הלשוניות לפי המסלול, לשוניות לפי מה שיש, `/sales/manage` ⇒ הלשונית שמחכה, קישורים קיימים ⇒ `/manage/orders` | L1 | 2 ימים |
 | L3 | לשונית "בתהליך" + עמוד ליד (עם "שלח הצעה" / "דווח מכירה") + פס בשכבה הפשוטה + i18n | L3a | 3–4 ימים |
 | **→ הוועד עובר ל-`/leads`** | | L2 | שעה בצד `vaad` |
@@ -553,6 +554,30 @@ namespace חדש `leads` ב-`ROUTED` רק לנתיבי `sales/*` (כמו `shop`)
   notification); ופתיחת מטלת מעקב כש-`followUpAt` מגיע — שניהם ב-L3 עם ה-cron/הסיכום היומי.
 - ה-qids `leadCreate` / `leadUpdate` / `leadActivityCreate` מתריעים ב-`validate:qids` (`LeadInput` לא
   קיים) עד ש-L0 נפרס ו-`types:update` רץ.
+
+### 8.2 L2 — מה נבנה (2026-11-04)
+
+- `POST /api/v1/r/{rikma}/leads` ו-`GET /leads/{externalId}` — `handleLeadPost` / `handleLeadGet`
+  ב-`apiPublic/writeApi.ts`, באותה מעטפת של הזמנות (`{ error: { code, message, details } }`, בלי CORS).
+  בדיקות: `routes/api/v1/r/[rikma]/leads/server.test.ts`.
+- **scopes** `leads:create` · `leads:read` — `GRANTABLE_SCOPES`, צ'קבוקסים ב-`RikmaApiPanel` עם אזהרה
+  משלהם ("מפתח לידים יושב רק בשרת"), חמש השפות.
+- **webhooks** `lead.created` · `lead.statusChanged` — `webhooks/leadEvents.ts`, שלב 5b″ ב-`ActionService`.
+  רק למפתח עם scope של לידים (`mayReceiveLead`); הגוף `{ leadId, externalId, status }` בלבד.
+  `lead.won` מוגדר ויירה מ-L3a, המקום היחיד שבו ליד נהיה `won`.
+- **OpenAPI** — שני הנתיבים, `LeadDraft` / `LeadCreated` / `LeadStatus` / `LeadStage`, ושני קודי שגיאה.
+
+מה הוחלט בדרך:
+- **קריאה מדפדפן (`Origin`) ⇒ `403 ORIGIN_NOT_ALLOWED`**, כמו בהזמנות: מי שקורא את הדף יכול לשלוח
+  טלפון של אדם זר "עם הסכמה" בשם הרקמה. טופס סטטי מחכה ל-`leads:create:public` (§5.2, L5).
+- **אתר לא יכול להצהיר `source: manual` או `demo`** (`400`, `details.field: "source"`) — `manual` הוא
+  המקור היחיד שפטור מהסכמה.
+- **`503 LEADS_NOT_READY`** עד שהסכמה נפרסה (בדיקה `rikmaApiLeadsSchema`, כמו `SHOP_NOT_READY`).
+- `GET` מחזיר `{ leadId, externalId, status, hasOwner, lastActivityAt }`. `wonAt` מ-§5.3 לא נכנס —
+  אין לו שדה בסכמה; יתווסף עם הסנכרון של L3a.
+- מעבר סטטוס שנעשה דרך המטלה (`naasa` ⇒ `contacted`) **לא** יורה webhook — הסנכרון אינו action.
+  אם אתר יצטרך את זה, הסנכרון יקרא ל-`onLeadChanged` ישירות.
+- הוועד יכול לעבור ל-`/leads` כשיש L0 בפרודקשן ומפתח עם `leads:create`.
 
 **בדיקות**: vitest לפונקציות הטהורות ול-endpoint (תבנית `server.test.ts` של `orders`);
 תרחישים: מפתח של רקמה A על רקמה B ⇒ 403; בלי הסכמה ⇒ 400; אותו `externalId` ⇒

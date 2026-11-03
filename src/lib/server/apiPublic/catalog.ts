@@ -176,10 +176,24 @@ const ordersSchema = schemaProbe({
   meanwhile: 'orders answer 503 SHOP_NOT_READY'
 });
 
+// The lead collections (docs/inprogress/PLAN_LEADS.md L0) — deployed in 1.0b
+// on their own day; until then `/leads` answers 503 LEADS_NOT_READY.
+const leadsSchema = schemaProbe({
+  qid: 'rikmaApiLeadsSchema',
+  isLive: (res) => Array.isArray(res?.data?.leads?.data),
+  meanwhile: 'leads answer 503 LEADS_NOT_READY'
+});
+
 /** Test seam — every verdict is process state tests must not inherit. */
 export function resetShopSchemaVerdict(): void {
   shopSchema.reset();
   ordersSchema.reset();
+  leadsSchema.reset();
+}
+
+/** Can a lead be written and read? */
+export function leadsSchemaLive(run: ApiRun): Promise<boolean> {
+  return leadsSchema.live(run);
 }
 
 /** Is the shop schema (variants / gallery / denormalized aggregates) readable? */

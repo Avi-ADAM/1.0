@@ -55,8 +55,15 @@ import {
   ORDERS_CREATE_SCOPE,
   ORDERS_READ_SCOPE
 } from '$lib/server/ordersApi.js';
+import {
+  API_LEAD_SOURCES,
+  LEADS_CREATE_SCOPE,
+  LEADS_READ_SCOPE,
+  toLeadStatusView
+} from '$lib/server/leadsApi.js';
+import { validateLeadPayload } from '$lib/leads/validate';
 import { checkRateLimit, errorResponse } from './http.js';
-import { ordersSchemaLive, shopSchemaLive, strapiRun } from './catalog.js';
+import { leadsSchemaLive, ordersSchemaLive, shopSchemaLive, strapiRun } from './catalog.js';
 
 /** Admin token for Strapi bypass (internal use) — same handling as v1/actions. */
 const ADMIN_TOKEN = (env.ADMINMONTHER ?? '')
@@ -920,6 +927,200 @@ export async function handleOrderCancel(args: {
       leftForRikma: (data.refunds?.afterSplit?.length ?? 0) + (data.refunds?.notMine?.length ?? 0)
     }
   });
+}
+
+// ─── leads (docs/inprogress/PLAN_LEADS.md §5.1, §5.3 — L2) ────────────────
+//
+// Same envelope as orders (`{ error: { code, message, details } }`, no CORS):
+// `leads:create` is a server's scope. A browser form gets its own public scope
+// with an origin list, a per-IP budget and a honeypot (§5.2, L5) — until then a
+// page holding this key is refused, because whoever reads the page can post a
+// stranger's phone number "with consent" in the rikma's name.
+
+/** `createLead`'s refusals → the statuses §5.1 promises. */
+function statusOfLeadError(code: string | undefined): number {
+  switch (code) {
+    case 'VALIDATION_FAILED':
+    case 'CONSENT_REQUIRED':
+      return 400;
+    case 'NOT_FOUND':
+      return 404;
+    case 'UNAUTHORIZED':
+      return 403;
+    default:
+      return 502;
+  }
+}
+
+/** The checks both lead endpoints share after the key: tenant, server caller, schema. */
+async function leadGate(
+  key: VerifiedApiKey,
+  args: { request: Request; fetch?: typeof fetch; pathProjectId?: string | null }
+): Promise<Response | null> {
+  const mismatch = assertPathTenant(key, args.pathProjectId);
+  if (mismatch) return mismatch;
+  if (args.request.headers.get('Origin')) {
+    return orderError(
+      403,
+      'ORIGIN_NOT_ALLOWED',
+      'Leads are sent from your server, never from a browser — a leads key in a web page lets anyone file contact details in the rikma'
+    );
+  }
+  if (!(await leadsSchemaLive(strapiRun(args.fetch)))) {
+    return orderError(503, 'LEADS_NOT_READY', "This deployment's leads schema is not live yet — try again later");
+  }
+  return null;
+}
+
+/**
+ * `POST /api/v1/r/{rikma}/leads` — someone left their details on the rikma's
+ * site; the site's server passes them on, with the consent they gave.
+ *
+ * Validation here (so a bad body is a 400 with the field, before any lookup),
+ * everything else in `createLead`: idempotency by `externalId`, a returning
+ * contact folded into its open lead (`200 duplicated`), the lead written
+ * first and its task opened after (`warnings` when that part failed).
+ */
+export async function handleLeadPost(args: WriteArgs): Promise<Response> {
+  const { request, fetch, pathProjectId } = args;
+  const auth = keyOrResponse(
+    await authenticateWrite(request, {
+      scope: LEADS_CREATE_SCOPE,
+      bucket: 'leads:create',
+      rateLimit: 'json'
+    })
+  );
+  if (auth instanceof Response) return auth;
+  const key = auth;
+
+  const gate = await leadGate(key, { request, fetch, pathProjectId });
+  if (gate) return gate;
+
+  let body: any;
+  try {
+    body = await request.json();
+  } catch {
+    return orderError(400, 'VALIDATION', 'Invalid JSON body');
+  }
+  if (!body || typeof body !== 'object' || Array.isArray(body)) {
+    return orderError(400, 'VALIDATION', 'Expected a JSON object');
+  }
+  const source = body.source ?? 'api';
+  if (!(API_LEAD_SOURCES as readonly unknown[]).includes(source)) {
+    return orderError(400, 'VALIDATION', `source must be one of ${API_LEAD_SOURCES.join(', ')}`, {
+      field: 'source'
+    });
+  }
+  const validated = validateLeadPayload({ ...body, source }, { requireConsent: true });
+  if (validated.ok === false) {
+    const refusal = validated as Extract<typeof validated, { ok: false }>;
+    return orderError(400, refusal.code === 'CONSENT_REQUIRED' ? 'CONSENT_REQUIRED' : 'VALIDATION', refusal.message, {
+      field: refusal.field
+    });
+  }
+  const lead = validated.value;
+  const projectId = String(key.project!.id);
+
+  // Never the person — only where it came from (§6: no contact details in logs).
+  console.log(
+    `[LeadsAPI] createLead project=${projectId} key=${key.keyId} externalId=${lead.externalId || '-'} source=${source}`
+  );
+  const result = await actionService.executeAction(
+    'createLead',
+    {
+      projectId,
+      name: lead.name,
+      email: lead.email,
+      phone: lead.phone,
+      organization: lead.organization,
+      city: lead.city,
+      address: lead.address,
+      message: lead.message,
+      details: lead.details,
+      productId: lead.productId,
+      externalId: lead.externalId,
+      source,
+      sourceKeyId: key.keyId,
+      sourceLabel: lead.sourceLabel,
+      sourceUrl: lead.sourceUrl,
+      utm: lead.utm,
+      consent: { text: lead.consentText, at: lead.consentAt },
+      lang: lead.lang
+    },
+    actionContext(String(key.user.id), fetch)
+  );
+  touchLastUsed(key.keyId, fetch);
+
+  if (!result.success) {
+    const code = result.error?.code;
+    const status = statusOfLeadError(code);
+    return orderError(
+      status,
+      status === 502 ? 'UPSTREAM_ERROR' : (code ?? 'UPSTREAM_ERROR'),
+      status === 502
+        ? 'The lead could not be recorded — retry with the same externalId; it will not be filed twice'
+        : (result.error?.message ?? 'Refused')
+    );
+  }
+
+  const data = result.data ?? {};
+  const duplicated = data.duplicated === true;
+  return orderJson(duplicated ? 200 : 201, {
+    success: true,
+    duplicated,
+    ...(duplicated ? { reason: data.reason } : {}),
+    leadId: data.leadId,
+    externalId: data.externalId ?? null,
+    status: data.status,
+    taskId: data.taskId ?? null,
+    warnings: data.warnings ?? []
+  });
+}
+
+/**
+ * `GET /api/v1/r/{rikma}/leads/{externalId}` — "did anyone get back to them?"
+ * Status only (§5.3): no contact details, no log, not even who owns it.
+ */
+export async function handleLeadGet(args: {
+  request: Request;
+  fetch?: typeof fetch;
+  externalId: string;
+  pathProjectId?: string | null;
+}): Promise<Response> {
+  const { request, fetch, pathProjectId } = args;
+  const auth = keyOrResponse(
+    await authenticateWrite(request, {
+      scope: LEADS_READ_SCOPE,
+      bucket: 'leads:read',
+      rateLimit: 'json'
+    })
+  );
+  if (auth instanceof Response) return auth;
+  const key = auth;
+
+  const gate = await leadGate(key, { request, fetch, pathProjectId });
+  if (gate) return gate;
+
+  const externalId = String(args.externalId ?? '').trim();
+  if (!externalId) return orderError(400, 'VALIDATION', 'externalId is required');
+
+  let res: any;
+  try {
+    res = await strapiClient.execute(
+      'leadByExternalId',
+      { pid: String(key.project!.id), externalId },
+      ADMIN_TOKEN,
+      fetch
+    );
+  } catch (e) {
+    console.error('[LeadsAPI] status lookup failed:', e);
+    return orderError(502, 'UPSTREAM_ERROR', 'Failed to look up the lead');
+  }
+  const view = toLeadStatusView(res?.data?.leads?.data?.[0]);
+  if (!view) return orderError(404, 'NOT_FOUND', `No lead with externalId "${externalId}" in this rikma`);
+
+  touchLastUsed(key.keyId, fetch);
+  return orderJson(200, { success: true, ...view });
 }
 
 /** CORS preflight, identical for every write endpoint. */

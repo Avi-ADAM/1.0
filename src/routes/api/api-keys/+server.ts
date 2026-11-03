@@ -34,7 +34,11 @@ const GRANTABLE_SCOPES = [
   // Paid orders (PLAN_SHOP_CUSTOMER_EXPERIENCE §5.5) — a storefront server's
   // scopes; the endpoints refuse a browser caller outright.
   'orders:create',
-  'orders:read'
+  'orders:read',
+  // Leads (PLAN_LEADS §7.3) — a site's server passes on who reached out, and
+  // reads back only their status.
+  'leads:create',
+  'leads:read'
 ] as const;
 
 /** Callbacks must be absolute http(s) — a relative or exotic URL is a config bug. */
