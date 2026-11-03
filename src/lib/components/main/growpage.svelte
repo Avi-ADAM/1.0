@@ -6,6 +6,7 @@
   import { Head } from 'svead';
   import { onMount } from 'svelte';
   import { lang, langUs, doesLang } from '$lib/stores/lang';
+  import { youtubeEmbedSrc, noCaptions } from '$lib/youtube.js';
 
   const regPath = $derived(
     $locale === 'he'
@@ -728,7 +729,8 @@
           >
             <iframe
               class="absolute inset-0 w-full h-full"
-              src="https://www.youtube.com/embed/Ma17YV2Aem0"
+              src={youtubeEmbedSrc('Ma17YV2Aem0')}
+              use:noCaptions
               title="1lev1 - הסרטון שלנו"
               frameborder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"

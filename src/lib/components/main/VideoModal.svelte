@@ -1,6 +1,7 @@
 <script>
   import { fade, scale } from 'svelte/transition';
   import { isRtl } from '$lib/translations';
+  import { youtubeEmbedSrc, noCaptions } from '$lib/youtube.js';
 
   /**
    * מודל וידאו כמעט מסך‑מלא עם הטמעת יוטיוב שמתחילה אוטומטית ברגע הפתיחה.
@@ -14,12 +15,8 @@
     closeLabel = ''
   } = $props();
 
-  // כתובת הטמעה עם ניגון אוטומטי ברגע הטעינה
-  let embedSrc = $derived(
-    videoId
-      ? `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1&playsinline=1`
-      : ''
-  );
+  // כתובת הטמעה עם ניגון אוטומטי ברגע הטעינה, בלי הכתוביות של יוטיוב (הכתוביות צרובות בסרטון)
+  let embedSrc = $derived(videoId ? youtubeEmbedSrc(videoId, { autoplay: 1 }) : '');
 
   function close() {
     open = false;
@@ -68,6 +65,7 @@
       <iframe
         class="absolute inset-0 w-full h-full"
         src={embedSrc}
+        use:noCaptions
         {title}
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
         allowfullscreen
