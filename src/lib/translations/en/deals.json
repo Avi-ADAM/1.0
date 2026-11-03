@@ -175,7 +175,12 @@
     "final": "Every part of the deal is finished. This is the final amount.",
     "payWhenFinal": "Payment opens once every part of the deal is finished. The amount follows the approved hours and never exceeds the agreed price.",
     "payNow": "To pay now",
-    "nothingLeft": "Nothing is left to pay on this deal."
+    "nothingLeft": "Nothing is left to pay on this deal.",
+    "fixedTitle": "Set price",
+    "heroLabelFixed": "Set price",
+    "fixedExplain": "One price was agreed for the whole deal. The hours do not change it: they only decide how the rikma splits it among its partners.",
+    "fixedFinal": "The price is known in advance, and it is the amount to pay.",
+    "fixedFree": "There is nothing to pay on this deal."
   },
   "offers": {
     "title": "Parts of the deal still open",

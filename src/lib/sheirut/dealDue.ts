@@ -24,10 +24,17 @@
  * minutes, money in agorot, and an overrun under 1 ₪ or under a minute of the line's work
  * is noise — a clock's seconds, not a claim — so it is not reported. It is still never
  * charged: `due` is `min(approved, cap)` whatever the overrun reads.
+ *
+ * All of that is the **at-cost** track (docs/inprogress/PLAN_DEAL_PRICING_TRACKS.md §2).
+ * On a **fixed price** (P4) she owes the price she signed, `Sheirut.total`, known from the
+ * start and never moved by the hours — they only split it inside the rikma. It reads paid
+ * the way any sale does: once her payment, recorded as the rikma's income, covers it (the
+ * split carries each partner's share from there). A fixed price of 0 bills nothing.
  */
 
 import { isEssenceOnly } from '$lib/pooling/bomPrice';
 import { isRealOverrun, roundHours, roundMoney } from '$lib/timers/precision.js';
+import { effectivePricingTrack, type PricingTrack } from './pricingTrack.js';
 
 export type DealLineKind = 'mission' | 'resource';
 
@@ -105,8 +112,10 @@ export interface DealDue {
   remaining: number;
   /** committed − due when positive: sent beyond what the hours came to. */
   excess: number;
-  /** Every mission line is closed, so `due` is the final figure. */
+  /** Every mission line is closed, so `due` is the final figure. Always true on a fixed price. */
   final: boolean;
+  /** The track the deal is billed under (null and unknown read as `atCost`). */
+  track: PricingTrack;
 }
 
 /** Money at the cent, without floating-point dust. */
@@ -142,7 +151,10 @@ export function computeDealDue(input: {
   confirmed?: Iterable<string> | null;
   /** `Sheirut.moneyTransfered` — set only once every provider confirmed. */
   settled?: boolean | null;
+  /** `Sheirut.pricingTrack` (P4). */
+  track?: unknown;
 }): DealDue {
+  if (effectivePricingTrack(input.track) === 'fixed') return computeFixedDue(input);
   const yes = new Set([...(input.confirmed ?? [])].map(String));
   const providers = new Set((input.lines ?? []).filter((l) => l?.providerId).map((l) => String(l.providerId)));
   const settled =
@@ -191,7 +203,53 @@ export function computeDealDue(input: {
     inTransit: round2(Math.max(0, Math.min(committed, due) - paid)),
     remaining: settled ? 0 : round2(Math.max(0, due - committed)),
     excess: round2(Math.max(0, committed - due)),
-    final: lines.every((l) => l.kind !== 'mission' || (l.matched !== false && l.closed))
+    final: lines.every((l) => l.kind !== 'mission' || (l.matched !== false && l.closed)),
+    track: 'atCost'
+  };
+}
+
+/**
+ * A fixed price: she owes `Sheirut.total`, whatever the hours come to. The lines are still
+ * listed — they are how the rikma splits it — but none of them is a bill: no ceiling to
+ * stay under, no overrun to sign, no part paid apart from the whole.
+ */
+function computeFixedDue(input: Parameters<typeof computeDealDue>[0]): DealDue {
+  const due = round2(nonNeg(input.dealTotal));
+  const recorded = round2(nonNeg(input.recorded));
+  // Paid as any sale is: her recorded payment covers the price. Nothing to pay is paid.
+  const settled = input.settled === true || due <= 0 || recorded >= due - 0.005;
+  const lines: DealLine[] = (input.lines ?? []).map((l) => {
+    const cap = nonNeg(l.cap);
+    const approved = l.kind === 'resource' ? cap : nonNeg(l.approved);
+    return {
+      ...l,
+      cap,
+      approved,
+      closed: l.kind === 'resource' || l.closed === true,
+      due: round2(l.kind === 'resource' ? cap : Math.min(approved, cap)),
+      overrun: 0,
+      paid: settled
+    };
+  });
+  const paid = settled ? due : round2(Math.min(recorded, due));
+  const committed = round2(Math.max(paid, recorded, nonNeg(input.committed)));
+  return {
+    lines,
+    cap: due,
+    approved: round2(lines.reduce((s, l) => s + l.approved, 0)),
+    due,
+    overrun: 0,
+    unused: 0,
+    recorded,
+    received: paid,
+    settled,
+    paid,
+    committed,
+    inTransit: round2(Math.max(0, Math.min(committed, due) - paid)),
+    remaining: settled ? 0 : round2(Math.max(0, due - committed)),
+    excess: round2(Math.max(0, committed - due)),
+    final: true,
+    track: 'fixed'
   };
 }
 

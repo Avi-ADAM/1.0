@@ -1,6 +1,13 @@
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { partsState, providerParts, readPartEntries, withPartReceived } from '$lib/sheirut/partsReceived';
-import { confirmPartReceived } from './partsReceived';
+import { confirmPartReceived, loadParts, settleCoveredPayment } from './partsReceived';
+
+// The track is read only while the switch is on (P4); the fixed-price tests turn it on.
+const flag = vi.hoisted(() => ({ on: false }));
+vi.mock('$lib/sheirut/pricingTracksFlag', () => ({ pricingTracksEnabled: () => flag.on }));
+afterEach(() => {
+  flag.on = false;
+});
 
 /** QA_CONCIERGE_E2E C-19 — a deal reads "paid" only once every provider has their part. */
 
@@ -124,5 +131,33 @@ describe('confirmPartReceived', () => {
     await expect(confirmPartReceived(w.run, '8', '256', shown + 50)).rejects.toMatchObject({ code: 'AMOUNT_MOVED' });
     expect(w.calls.some((c) => c.qid === '213updateSheirut')).toBe(false);
     await expect(confirmPartReceived(world([]).run, '8', '256', shown)).resolves.toBeTruthy();
+  });
+});
+
+describe('P4 — a fixed price is paid as a sale is', () => {
+  const fixed = (run: any) =>
+    vi.fn(async (qid: string, vars: any) =>
+      qid === '472sheirutPricingTracks'
+        ? { data: { sheiruts: { data: vars.ids.map((id: string) => ({ id, attributes: { pricingTrack: 'fixed' } })) } } }
+        : run(qid, vars)
+    );
+
+  it('has no parts to confirm', async () => {
+    flag.on = true;
+    expect(await loadParts(fixed(world([]).run), '8')).toBeNull();
+    await expect(confirmPartReceived(fixed(world([]).run), '8', '256')).rejects.toThrow(/part by part/);
+  });
+
+  it('covered is paid, with no provider having confirmed', async () => {
+    flag.on = true;
+    const w = world([]);
+    const run = fixed(w.run);
+    expect(await settleCoveredPayment(run, '8')).toEqual({ paid: true });
+    const write = run.mock.calls.find((c: any[]) => c[0] === '213updateSheirut')!;
+    expect(write[1].data).toEqual({ iTransferMoney: true, moneyTransfered: true });
+  });
+
+  it('an at-cost deal still waits for its providers', async () => {
+    expect(await settleCoveredPayment(world([]).run, '8')).toEqual({ paid: false });
   });
 });

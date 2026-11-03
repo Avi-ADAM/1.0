@@ -176,7 +176,12 @@
     "final": "Todas las partes del trato terminaron; el monto es final.",
     "payWhenFinal": "El pago se abre cuando todas las partes del trato terminen. El monto sigue las horas aprobadas y nunca supera el precio acordado.",
     "payNow": "A pagar ahora",
-    "nothingLeft": "No queda nada por pagar en este trato."
+    "nothingLeft": "No queda nada por pagar en este trato.",
+    "fixedTitle": "Precio cerrado",
+    "heroLabelFixed": "Precio cerrado",
+    "fixedExplain": "Se acordó un solo precio para todo el trato. Las horas no lo cambian: solo deciden cómo la rikma lo reparte entre sus socios.",
+    "fixedFinal": "El precio se conoce de antemano y es el monto a pagar.",
+    "fixedFree": "En este trato no hay nada que pagar."
   },
   "offers": {
     "title": "Partes del trato todavía abiertas",

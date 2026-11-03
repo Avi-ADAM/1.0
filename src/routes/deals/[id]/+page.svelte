@@ -38,8 +38,9 @@
   const due = $derived(data.due ?? null);
   const totalCost = $derived(due ? due.due : (deal?.totalCost ?? 0));
   const paid = $derived(due ? due.paid : (deal?.paid ?? 0));
+  // On a fixed price the parts split the price inside the rikma; they are not its cost (P4).
   const costBreakdown = $derived(
-    due
+    due && due.track !== 'fixed'
       ? {
           missions: due.lines.filter((l) => l.kind === 'mission').reduce((s, l) => s + l.due, 0),
           resources: due.lines.filter((l) => l.kind === 'resource').reduce((s, l) => s + l.due, 0)
@@ -297,7 +298,7 @@
       <div class="hero-stats">
         <div class="hs">
           <div class="hs-v gold"><Money amount={totalCost} /></div>
-          <div class="hs-l">{due ? $t('deals.due.heroLabel') : 'עלות כוללת'}</div>
+          <div class="hs-l">{due ? (due.track === 'fixed' ? $t('deals.due.heroLabelFixed') : $t('deals.due.heroLabel')) : 'עלות כוללת'}</div>
         </div>
         <div class="hs">
           <div class="hs-v" style="color:#4ade80"><Money amount={paid} /></div>

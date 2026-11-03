@@ -15,7 +15,6 @@ import type { ExtraSigners, ExtraSignersFor } from '$lib/server/archive/vote.js'
 import { editedValue, raiseBy, raisesPart } from '$lib/sheirut/dealEdit.js';
 import { loadDealDue, type QidRunner } from './dealDue.js';
 import { releaseHeldHours } from './overCap.js';
-import { loadDealTrack } from './dealTrack.js';
 import type { PricingTrack } from '$lib/sheirut/pricingTrack';
 
 export interface MissionDeal {
@@ -71,7 +70,7 @@ export async function loadMissionDeal(run: QidRunner, missionId: string): Promis
     if (!due) continue;
     const line = due.lines.find((l) => l.kind === 'mission' && l.missionId === String(node.id));
     if (!line) continue;
-    const track = await loadDealTrack(run, due.sheirutId);
+    const track = due.track;
     return {
       missionId: String(node.id),
       missionName: line.name,

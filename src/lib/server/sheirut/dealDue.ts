@@ -9,6 +9,7 @@
 import { buildDealLines, computeDealDue, type DealDue } from '$lib/sheirut/dealDue.js';
 import { readPartEntries } from '$lib/sheirut/partsReceived.js';
 import { PAYMENT_KEY_PREFIX } from '$lib/sheirut/splitCarriage.js';
+import { loadDealTrack } from './dealTrack.js';
 
 /** Every customer payment's `Sale.externalId` starts with this (`./paymentSale`). */
 export { PAYMENT_KEY_PREFIX };
@@ -72,8 +73,12 @@ export async function loadDealDue(run: QidRunner, sheirutId: string): Promise<Lo
     0
   );
 
+  // What she is billed by (P4). A failed read is atCost — billed by the hours, as always.
+  const track = await loadDealTrack(run, String(node.id ?? sheirutId));
+
   return {
     ...computeDealDue({
+      track,
       lines,
       dealTotal: Number(sh.total) || null,
       recorded,

@@ -33,10 +33,14 @@ export interface LoadedParts extends PartsState {
 
 const root = (res: any) => res?.data?.sheirut ?? res?.sheirut;
 
-/** Null when the deal is not a wish deal — those keep their old single "money arrived" flag. */
+/**
+ * Null when the deal is not a wish deal — those keep their old single "money arrived" flag —
+ * and on a fixed price, which reads paid as any sale does (P4): the rikma received the
+ * price, and its split carries each partner's share. No part is confirmed apart from it.
+ */
 export async function loadParts(run: QidRunner, sheirutId: string): Promise<LoadedParts | null> {
   const due = await loadDealDue(run, sheirutId);
-  if (!due) return null;
+  if (!due || due.track === 'fixed') return null;
   const [res, carriage] = await Promise.all([
     run('418dealPartsReceived', { id: String(sheirutId) }),
     loadDealCarriage(run, sheirutId).catch((err) => {
@@ -122,11 +126,16 @@ export async function confirmPartReceived(
  * confirmed their part; otherwise it waits for them.
  */
 export async function settleCoveredPayment(run: QidRunner, sheirutId: string): Promise<{ paid: boolean }> {
-  const parts = await loadParts(run, sheirutId).catch((err) => {
-    console.warn('[partsReceived] could not read the confirmations; the deal waits for them:', err);
-    return null;
-  });
-  const paid = parts?.allConfirmed === true;
+  // A fixed price is paid once covered: there are no parts to wait for (P4).
+  const due = await loadDealDue(run, sheirutId).catch(() => null);
+  let paid = due?.track === 'fixed';
+  if (!paid) {
+    const parts = await loadParts(run, sheirutId).catch((err) => {
+      console.warn('[partsReceived] could not read the confirmations; the deal waits for them:', err);
+      return null;
+    });
+    paid = parts?.allConfirmed === true;
+  }
   const res = await run('213updateSheirut', {
     id: String(sheirutId),
     data: { iTransferMoney: true, ...(paid ? { moneyTransfered: true } : {}) }

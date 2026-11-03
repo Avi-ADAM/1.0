@@ -4,6 +4,9 @@
   Each part is billed by the hours its rikma approved, never above the price agreed for it.
   The agreed price is shown as the ceiling, so nobody reads the approved figure as a
   discount someone took — it is the same number the partners' shares follow.
+
+  On a fixed price (PLAN_DEAL_PRICING_TRACKS P4) there is one number: the price she signed.
+  The parts are how the rikma splits it, not a bill, so they are not listed here.
 -->
 <script lang="ts">
   import Money from '$lib/components/money/Money.svelte';
@@ -15,11 +18,13 @@
   let { due }: { due: DealDue } = $props();
 
   const hours = (n: number | undefined) => String(displayHours(n));
+  const fixed = $derived(due.track === 'fixed');
 </script>
 
-<Panel title={$t('deals.due.title')}>
-  <p class="dd-explain">{$t('deals.due.explain')}</p>
+<Panel title={fixed ? $t('deals.due.fixedTitle') : $t('deals.due.title')}>
+  <p class="dd-explain">{fixed ? $t('deals.due.fixedExplain') : $t('deals.due.explain')}</p>
 
+  {#if !fixed}
   <ul class="dd-lines">
     {#each due.lines as line (line.key)}
       <li class="dd-line">
@@ -51,16 +56,19 @@
       </li>
     {/each}
   </ul>
+  {/if}
 
   <div class="dd-sum">
     <div class="dd-row strong">
       <span>{$t('deals.due.total')}</span>
       <span><Money amount={due.due} /></span>
     </div>
+    {#if !fixed}
     <div class="dd-row">
       <span>{$t('deals.due.cap')}</span>
       <span><Money amount={due.cap} /></span>
     </div>
+    {/if}
     {#if due.unused > 0}
       <div class="dd-row">
         <span>{$t('deals.due.unused')}</span>
@@ -76,7 +84,7 @@
   </div>
 
   <p class="dd-status {due.final ? 'final' : ''}">
-    {due.final ? $t('deals.due.final') : $t('deals.due.running')}
+    {fixed ? (due.due > 0 ? $t('deals.due.fixedFinal') : $t('deals.due.fixedFree')) : due.final ? $t('deals.due.final') : $t('deals.due.running')}
   </p>
 </Panel>
 

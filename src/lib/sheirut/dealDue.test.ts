@@ -298,3 +298,32 @@ describe('buildDealLines', () => {
     ]);
   });
 });
+
+describe('computeDealDue — a fixed price (P4)', () => {
+  const lines = [mission({ cap: 600, approved: 900, closed: false }), mission({ key: '2', providerId: '8', cap: 400, approved: 100 })];
+
+  it('owes the price she signed, whatever the hours — no ceiling, no overrun', () => {
+    const d = computeDealDue({ track: 'fixed', lines, dealTotal: 1000 });
+    expect(d).toMatchObject({ track: 'fixed', due: 1000, cap: 1000, overrun: 0, unused: 0, final: true, settled: false, remaining: 1000 });
+  });
+
+  it('reads paid once her recorded payment covers it — not part by part', () => {
+    expect(computeDealDue({ track: 'fixed', lines, dealTotal: 1000, confirmed: ['7', '8'] }).settled).toBe(false);
+    const d = computeDealDue({ track: 'fixed', lines, dealTotal: 1000, recorded: 1000 });
+    expect(d).toMatchObject({ settled: true, paid: 1000, remaining: 0 });
+    expect(d.lines.every((l) => l.paid)).toBe(true);
+  });
+
+  it('a part payment is paid as far as it goes', () => {
+    expect(computeDealDue({ track: 'fixed', lines, dealTotal: 1000, recorded: 300 })).toMatchObject({ paid: 300, remaining: 700, settled: false });
+  });
+
+  it('a fixed price of 0 bills nothing and reads paid', () => {
+    expect(computeDealDue({ track: 'fixed', lines, dealTotal: 0 })).toMatchObject({ due: 0, settled: true, remaining: 0 });
+  });
+
+  it('null and unknown tracks bill by the hours, as before', () => {
+    expect(computeDealDue({ lines, dealTotal: 1000 })).toMatchObject({ track: 'atCost', due: 700, final: false });
+    expect(computeDealDue({ track: 'help', lines, dealTotal: 1000 }).track).toBe('atCost');
+  });
+});
