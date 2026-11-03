@@ -487,6 +487,9 @@
         <p class="hm-pricing-invite">{$t('home.pricing.invite')}</p>
         <div class="hm-pill-row">
           <a href={regHref} class="hm-btn hm-btn-ink">{$t('home.sections.modelCta')}</a>
+          <a href="/project/1/support" class="hm-btn hm-btn-outline" data-sveltekit-prefetch>
+            {$t('home.pricing.give')}
+          </a>
           <a href="/project/1" class="hm-textlink" data-sveltekit-prefetch>
             {$t('home.pricing.rikma')} <span aria-hidden="true">{arrow}</span>
           </a>
