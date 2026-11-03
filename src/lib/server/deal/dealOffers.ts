@@ -9,6 +9,7 @@
  */
 
 import { computeNegoGate, normId } from '$lib/server/nego/negoGate.js';
+import type { PricingTrack } from '$lib/sheirut/pricingTrack';
 
 export type { DealCandidacyView, DealOpenOfferView, DealOffersView } from '$lib/sheirut/dealOffers.js';
 import type { DealCandidacyView, DealOpenOfferView, DealOffersView } from '$lib/sheirut/dealOffers.js';
@@ -56,12 +57,15 @@ function candidacy(
   };
 }
 
-/** `res` is qid 417's answer, through `strapi.execute` (`{ data: { sheirut } }`) or the proxy (`{ sheirut }`). */
-export function readDealOffers(res: any, viewerId: string): DealOffersView {
+/**
+ * `res` is qid 417's answer, through `strapi.execute` (`{ data: { sheirut } }`) or the proxy (`{ sheirut }`).
+ * On a fixed-price deal she does not co-sign who takes a part (P3), so no candidacy waits for her.
+ */
+export function readDealOffers(res: any, viewerId: string, track: PricingTrack = 'atCost'): DealOffersView {
   const sh = (res?.data?.sheirut ?? res?.sheirut)?.data?.attributes ?? {};
   const customerIds = (sh.users_permissions_users?.data ?? []).map((u: any) => String(u.id));
   const memberIds = (sh.project?.data?.attributes?.user_1s?.data ?? []).map((u: any) => String(u.id));
-  const ctx = { memberIds, clientIds: customerIds, viewerId: String(viewerId) };
+  const ctx = { memberIds, clientIds: track === 'fixed' ? [] : customerIds, viewerId: String(viewerId) };
   const product = sh.matanot?.data?.attributes ?? {};
   const offers: DealOpenOfferView[] = [];
 

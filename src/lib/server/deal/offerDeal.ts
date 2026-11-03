@@ -23,6 +23,8 @@
  * serves an action (`strapi.execute` with the member's JWT) and the cron (admin client).
  */
 import { isEssenceOnly } from '$lib/pooling/bomPrice';
+import type { PricingTrack } from '$lib/sheirut/pricingTrack';
+import { loadDealTracks } from '$lib/server/sheirut/dealTrack';
 
 export type OfferKind = 'mission' | 'resource';
 
@@ -34,6 +36,8 @@ export interface OfferDealSale {
   quant: number;
   total: number;
   clientIds: string[];
+  /** The track the deal was signed under (P3) — 'atCost' until it is read. */
+  track: PricingTrack;
 }
 
 export interface OfferDeal {
@@ -51,7 +55,10 @@ export interface OfferDeal {
   offerAmount: number;
   offerUnitPrice: number;
   sales: OfferDealSale[];
-  /** Every customer of every deal the line belongs to — each of them signs. */
+  /**
+   * Every customer of every at-cost deal the line belongs to — each of them signs. A fixed
+   * price deal adds none: who takes a part of it is the rikma's business (PLAN_DEAL_PRICING_TRACKS §3).
+   */
   clientIds: string[];
 }
 
@@ -100,7 +107,8 @@ export function readOfferDeal(kind: OfferKind, node: any): OfferDeal | null {
         sheirutId: String(s.id),
         quant: num(s.attributes?.quant, 1) || 1,
         total: num(s.attributes?.total),
-        clientIds: (s.attributes?.users_permissions_users?.data ?? []).map((u: any) => String(u.id))
+        clientIds: (s.attributes?.users_permissions_users?.data ?? []).map((u: any) => String(u.id)),
+        track: 'atCost' as PricingTrack
       }));
     if (sales.length === 0) continue;
 
@@ -132,11 +140,29 @@ function unwrap(res: any, what: string) {
   return res?.data ?? null;
 }
 
+/**
+ * Who signs follows each deal's track (P3): only the customers of an at-cost deal co-sign,
+ * and only an at-cost deal grows when the part is filled. Pure.
+ */
+export function withDealTracks(deal: OfferDeal, tracks: Record<string, PricingTrack>): OfferDeal {
+  const sales = deal.sales.map((s) => ({ ...s, track: tracks[s.sheirutId] ?? 'atCost' }));
+  return {
+    ...deal,
+    sales,
+    clientIds: [...new Set(sales.filter((s) => s.track === 'atCost').flatMap((s) => s.clientIds))]
+  };
+}
+
+async function tracked(run: QidRunner, deal: OfferDeal | null): Promise<OfferDeal | null> {
+  if (!deal) return null;
+  return withDealTracks(deal, await loadDealTracks(run, deal.sales.map((s) => s.sheirutId)));
+}
+
 export async function loadOfferDeal(run: QidRunner, kind: OfferKind, offerId: string): Promise<OfferDeal | null> {
   const qid = kind === 'mission' ? '410openMissionDeal' : '411openMashaabimDeal';
   const data = unwrap(await run(qid, { id: String(offerId) }), `${kind} ${offerId}`);
   const node = kind === 'mission' ? data?.openMission?.data : data?.openMashaabim?.data;
-  return readOfferDeal(kind, node);
+  return tracked(run, readOfferDeal(kind, node));
 }
 
 /** The deal behind a candidacy: Ask → its open mission, Askm → its open mashaabim. */
@@ -144,7 +170,7 @@ export async function loadCandidacyDeal(run: QidRunner, side: 'ask' | 'askm', ca
   const qid = side === 'ask' ? '412askOfferDeal' : '413askmOfferDeal';
   const data = unwrap(await run(qid, { id: String(candidacyId) }), `${side} ${candidacyId}`);
   const node = side === 'ask' ? data?.ask?.data?.attributes?.open_mission?.data : data?.askm?.data?.attributes?.open_mashaabim?.data;
-  return readOfferDeal(side === 'ask' ? 'mission' : 'resource', node);
+  return tracked(run, readOfferDeal(side === 'ask' ? 'mission' : 'resource', node));
 }
 
 /** The terms a candidacy materialized with. */
@@ -164,7 +190,8 @@ export function filledPrice(kind: OfferKind, terms: FilledTerms): number {
 
 /**
  * The offer was taken: put the taker on the BOM line at the terms that materialized and
- * let each deal of the product grow by what the line now costs. Every signer agreed to
+ * let each at-cost deal of the product grow by what the line now costs. A fixed-price deal
+ * does not move: she bought the outcome at its price, and filling it is the rikma's cost. Every signer agreed to
  * those terms — the customer included (the gate does not let it materialize otherwise).
  *
  * A deal that grows is no longer fully paid, and it has a provider who has not confirmed
@@ -198,6 +225,7 @@ export async function fillOfferIntoDeal(
     if (lineRes?.errors?.length) throw new Error(JSON.stringify(lineRes.errors).slice(0, 300));
 
     for (const sale of deal.sales) {
+      if (sale.track === 'fixed') continue;
       const total = Math.round((sale.total + price * sale.quant) * 100) / 100;
       const res = await run('213updateSheirut', {
         id: sale.sheirutId,

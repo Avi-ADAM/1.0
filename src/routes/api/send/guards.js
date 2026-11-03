@@ -228,8 +228,32 @@ async function bridgeSourceRead(ctx) {
   await requireBridgeSourceParty(ctx, ctx.variablesObject.sourceType, ctx.variablesObject.sourceId);
 }
 
+/**
+ * A deal's pricing track decides who signs what changes it (PLAN_DEAL_PRICING_TRACKS P3):
+ * a member who could write it through the deal passthroughs could drop the customer from
+ * every signature on her own deal. It is written only on the server (`materializeWish`).
+ * @param {SendGuardContext} ctx
+ */
+function noPricingTrackFromClient({ isSer, variablesObject }) {
+  if (isSer) return;
+  let data = variablesObject?.data;
+  if (typeof data === 'string') {
+    try {
+      data = JSON.parse(data);
+    } catch {
+      return;
+    }
+  }
+  if (data && typeof data === 'object' && 'pricingTrack' in data) {
+    throw error(403, 'Forbidden: A deal’s pricing track is set only by the server');
+  }
+}
+
 /** @type {Record<string, (ctx: SendGuardContext) => void | Promise<void>>} */
 const PRE_GUARDS = {
+  '213updateSheirut': noPricingTrackFromClient,
+  '87createSheirut': noPricingTrackFromClient,
+
   // Co-member lookup is self-only on the JWT path. The qid takes `uid` from the
   // client and returns that account's projects plus every co-member's username,
   // so an unpinned uid would let any logged-in user enumerate someone else's

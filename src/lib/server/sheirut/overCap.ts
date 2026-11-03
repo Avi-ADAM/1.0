@@ -22,7 +22,9 @@
  * money she pays is split by exactly the hours she agreed to pay for, and no other
  * provider of the deal is diluted by an overrun they never signed.
  *
- * Only a part of a wish deal has a ceiling. Every other mission files exactly as before.
+ * Only a part of an at-cost wish deal has a ceiling. Every other mission files exactly as
+ * before — and so does a part of a fixed-price deal: there an overrun is the rikma's own
+ * risk, decided inside it, and the members' silence matures it as always (§3.2, P3).
  */
 
 import { splitAtCap, isHeldForCustomer, type CapSplit } from '$lib/sheirut/overCap.js';
@@ -57,7 +59,7 @@ export async function capApproval(
 ): Promise<CappedApproval | null> {
   if (missionId == null || missionId === '') return null;
   const deal = await loadMissionDeal(run, String(missionId));
-  if (!deal) return null;
+  if (!deal || deal.track === 'fixed') return null;
   return { deal, split: splitAtCap({ cap: deal.cap, approved: deal.approved, hours, rate }) };
 }
 

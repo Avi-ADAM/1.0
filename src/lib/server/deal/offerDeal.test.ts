@@ -1,5 +1,12 @@
-import { describe, expect, it, vi } from 'vitest';
-import { fillOfferIntoDeal, loadCandidacyDeal, readOfferDeal } from './offerDeal';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { fillOfferIntoDeal, loadCandidacyDeal, readOfferDeal, withDealTracks } from './offerDeal';
+
+// The track is read only while the switch is on (P3); each fixed-price test turns it on.
+const flag = vi.hoisted(() => ({ on: false }));
+vi.mock('$lib/sheirut/pricingTracksFlag', () => ({ pricingTracksEnabled: () => flag.on }));
+afterEach(() => {
+  flag.on = false;
+});
 import { computeNegoGate } from '$lib/server/nego/negoGate';
 import { evaluateAskAcceptance } from '$lib/server/nego/askAcceptance';
 
@@ -161,5 +168,49 @@ describe('fillOfferIntoDeal — a taken gap joins the deal', () => {
     const run = vi.fn().mockResolvedValue({ errors: [{ message: 'nope' }] });
     const out = await fillOfferIntoDeal(run, readOfferDeal('mission', missionOffer())!, { takerId: '400', amount: 1, unitPrice: 1 });
     expect(out.filled).toBe(false);
+  });
+});
+
+describe('P3 — who signs follows the deal’s track', () => {
+  const twoDeals = () => readOfferDeal('mission', missionOffer({ sales: [sale('8', ['261']), sale('9', ['262'])] }))!;
+
+  it('a fixed-price deal adds no co-signer; an at-cost one still does', () => {
+    const d = withDealTracks(twoDeals(), { '8': 'fixed', '9': 'atCost' });
+    expect(d.clientIds).toEqual(['262']);
+    expect(withDealTracks(twoDeals(), { '8': 'fixed', '9': 'fixed' }).clientIds).toEqual([]);
+  });
+
+  it('an unread track is at-cost — she keeps her signature', () => {
+    expect(withDealTracks(twoDeals(), {}).clientIds.sort()).toEqual(['261', '262']);
+  });
+
+  it('filling a part grows only the at-cost deal: a fixed price does not move', async () => {
+    const run = vi.fn().mockResolvedValue({ data: {} });
+    const d = withDealTracks(twoDeals(), { '8': 'fixed', '9': 'atCost' });
+    await fillOfferIntoDeal(run, d, { takerId: '400', amount: 5, unitPrice: 120 });
+    const totals = run.mock.calls.filter((c) => c[0] === '213updateSheirut').map((c) => c[1].id);
+    expect(totals).toEqual(['9']);
+  });
+
+  it('loading reads the tracks only while the switch is on', async () => {
+    const answer = { data: { ask: { data: { attributes: { open_mission: { data: missionOffer() } } } } } };
+    const run = vi.fn(async (qid: string, vars: any) =>
+      qid === '472sheirutPricingTracks'
+        ? { data: { sheiruts: { data: vars.ids.map((id: string) => ({ id, attributes: { pricingTrack: 'fixed' } })) } } }
+        : answer
+    );
+    expect((await loadCandidacyDeal(run, 'ask', '5'))?.clientIds).toEqual(['261']);
+    expect(run.mock.calls.map((c) => c[0])).toEqual(['412askOfferDeal']);
+
+    flag.on = true;
+    expect((await loadCandidacyDeal(run, 'ask', '5'))?.clientIds).toEqual([]);
+  });
+
+  it('a failed track read keeps her signature', async () => {
+    flag.on = true;
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const answer = { data: { ask: { data: { attributes: { open_mission: { data: missionOffer() } } } } } };
+    const run = vi.fn(async (qid: string) => (qid === '472sheirutPricingTracks' ? { errors: [{ message: 'Unknown field' }] } : answer));
+    expect((await loadCandidacyDeal(run, 'ask', '5'))?.clientIds).toEqual(['261']);
   });
 });

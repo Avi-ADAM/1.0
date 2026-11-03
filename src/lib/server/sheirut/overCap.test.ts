@@ -1,6 +1,21 @@
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { capApproval, keepVots, overrunRound, releaseHeldHours } from './overCap';
 import type { MissionDeal } from './dealEdit';
+
+// The track is read only while the switch is on (P3); each fixed-price test turns it on.
+const flag = vi.hoisted(() => ({ on: false }));
+vi.mock('$lib/sheirut/pricingTracksFlag', () => ({ pricingTracksEnabled: () => flag.on }));
+afterEach(() => {
+  flag.on = false;
+});
+
+/** Answers qid 472 with `track` for every deal asked about, and passes the rest to `run`. */
+const withTrack = (run: any, track: string) =>
+  vi.fn(async (qid: string, vars: any) =>
+    qid === '472sheirutPricingTracks'
+      ? { data: { sheiruts: { data: vars.ids.map((id: string) => ({ id, attributes: { pricingTrack: track } })) } } }
+      : run(qid, vars)
+  );
 
 /**
  * One wish deal (Sheirut 8) with one part: mission 90, provider 1, `hours × 60` agreed,
@@ -240,5 +255,19 @@ describe('keepVots', () => {
     expect(
       keepVots([{ what: true, order: 2, why: 'x', zman: 'z', ide: 1, users_permissions_user: { data: { id: '1' } } }])
     ).toEqual([{ what: true, order: 2, why: 'x', zman: 'z', ide: 1, users_permissions_user: '1' }]);
+  });
+});
+
+describe('P3 — capApproval on a fixed price', () => {
+  it('files the approval whole: an overrun is the rikma’s own risk there', async () => {
+    flag.on = true;
+    const w = world({ lineHours: 10, filed: 9 });
+    expect(await capApproval(withTrack(w.run, 'fixed'), '90', 3, 60)).toBeNull();
+  });
+
+  it('an at-cost part still splits at its ceiling', async () => {
+    flag.on = true;
+    const w = world({ lineHours: 10, filed: 9 });
+    expect((await capApproval(withTrack(w.run, 'atCost'), '90', 3, 60))?.split).toMatchObject({ inHours: 1, overHours: 2 });
   });
 });

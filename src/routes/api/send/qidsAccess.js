@@ -626,6 +626,7 @@ export const qidsAccess = {
   '469ratsonPricingTrack': { allow: ['user', 'serviceAdmin'] }, // the tracks of a wish and its proposals (as 105, which it narrows)
   '470setRatsonPricingTrack': { allow: ['serviceAdmin'] }, // server-only: createRatson / updateRatsonDraft, owner checked there
   '471setProposalPricingTrack': { allow: ['serviceAdmin'] }, // server-only: counterRatsonProposal checks party + turn
+  '472sheirutPricingTracks': { allow: ['serviceAdmin'] }, // server-only: who co-signs a deal change ($lib/server/sheirut/dealTrack)
 
   // matching/engine.ts: always run through StrapiClient with the admin
   // token, never with a user JWT — writes suggestion data for *other* users.

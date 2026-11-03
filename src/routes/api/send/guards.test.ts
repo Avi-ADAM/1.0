@@ -702,3 +702,24 @@ describe('filterSendResponse — 39GetNegotiation', () => {
     expect(out).toBeUndefined();
   });
 });
+
+for (const queId of ['213updateSheirut', '87createSheirut']) {
+  describe(`runSendGuards — ${queId} pricing track`, () => {
+    const q = { ...base, queId, callerId: '7' };
+
+    it('refuses a pricing track from the client — it decides who signs', async () => {
+      const r = await statusOf(() => runSendGuards({ ...q, variablesObject: { id: '1', data: { pricingTrack: 'fixed' } } }));
+      expect(r).toMatchObject({ threw: true, status: 403 });
+    });
+
+    it('lets every other deal field through', async () => {
+      await expect(runSendGuards({ ...q, variablesObject: { id: '1', data: { iTransferMoney: true } } })).resolves.toBeUndefined();
+    });
+
+    it('leaves the service path alone (materializeWish writes it)', async () => {
+      await expect(
+        runSendGuards({ ...q, isSer: true, variablesObject: { id: '1', data: { pricingTrack: 'fixed' } } })
+      ).resolves.toBeUndefined();
+    });
+  });
+}

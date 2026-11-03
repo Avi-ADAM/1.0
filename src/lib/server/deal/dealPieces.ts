@@ -17,6 +17,7 @@ import type { DealOffersView } from '$lib/sheirut/dealOffers';
 import { loadParts } from '$lib/server/deal/partsReceived';
 import type { PartsView } from '$lib/sheirut/partsReceived';
 import { partViaSplit, providerTransfers } from '$lib/sheirut/splitCarriage';
+import { loadDealTrack } from '$lib/server/sheirut/dealTrack';
 
 export interface DealPieces {
   due: LoadedDealDue | null;
@@ -36,11 +37,14 @@ export async function readDealPieces(run: QidRunner, sheirutId: string, viewerId
     return null;
   };
 
+  // Who signs follows the deal's track (P3); a read that fails is atCost, and never throws.
+  const track = loadDealTrack(run, sheirutId);
+
   const [due, offers, parts] = await Promise.all([
     loadDealDue(run, sheirutId).catch(warn('what the deal owes')),
     run('417dealOpenOffers', { id: sheirutId })
-      .then((res) => {
-        const view = readDealOffers(res, String(viewerId));
+      .then(async (res) => {
+        const view = readDealOffers(res, String(viewerId), await track);
         return view.offers.length > 0 ? view : null;
       })
       .catch(warn('the open parts of the deal')),
@@ -69,7 +73,7 @@ export async function readDealPieces(run: QidRunner, sheirutId: string, viewerId
   if (due && missionIds.length > 0) {
     try {
       const res = await run('400dealEdits', { missions: missionIds });
-      edits = readDealEdits(res, due.lines as any, due.customerIds, String(viewerId));
+      edits = readDealEdits(res, due.lines as any, (await track) === 'fixed' ? [] : due.customerIds, String(viewerId));
     } catch (e) {
       warn('the requests for more hours')(e);
     }

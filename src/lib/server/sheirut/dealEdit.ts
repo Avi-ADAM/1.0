@@ -15,6 +15,8 @@ import type { ExtraSigners, ExtraSignersFor } from '$lib/server/archive/vote.js'
 import { editedValue, raiseBy, raisesPart } from '$lib/sheirut/dealEdit.js';
 import { loadDealDue, type QidRunner } from './dealDue.js';
 import { releaseHeldHours } from './overCap.js';
+import { loadDealTrack } from './dealTrack.js';
+import type { PricingTrack } from '$lib/sheirut/pricingTrack';
 
 export interface MissionDeal {
   missionId: string;
@@ -23,7 +25,13 @@ export interface MissionDeal {
   projectId: string | null;
   dealTotal: number;
   quant: number;
+  /**
+   * Who co-signs a raise of the part: the customers of an at-cost deal, nobody on a fixed
+   * price (the part's terms are the rikma's business there — PLAN_DEAL_PRICING_TRACKS §3).
+   */
   clientIds: string[];
+  /** The track the deal was signed under (P3). */
+  track: PricingTrack;
   /** The BOM line (`MatanotRecipeMission`) the mission carries. */
   lineKey: string;
   /** The price she agreed for the part — the ceiling. */
@@ -63,6 +71,7 @@ export async function loadMissionDeal(run: QidRunner, missionId: string): Promis
     if (!due) continue;
     const line = due.lines.find((l) => l.kind === 'mission' && l.missionId === String(node.id));
     if (!line) continue;
+    const track = await loadDealTrack(run, due.sheirutId);
     return {
       missionId: String(node.id),
       missionName: line.name,
@@ -70,7 +79,8 @@ export async function loadMissionDeal(run: QidRunner, missionId: string): Promis
       projectId: due.projectId,
       dealTotal: due.dealTotal,
       quant: due.quant,
-      clientIds: due.customerIds,
+      clientIds: track === 'atCost' ? due.customerIds : [],
+      track,
       lineKey: line.key,
       cap: line.cap,
       missionHours: line.missionHours ?? 0,
@@ -87,6 +97,9 @@ export async function loadMissionDeal(run: QidRunner, missionId: string): Promis
  * The deal follows an applied version: the line carries the new terms (so its ceiling is
  * the new value) and the deal's total moves by the difference. A deal that grows is not
  * fully paid any more (`moneyTransfered: false`, as when a gap is filled — C-19).
+ *
+ * On a fixed price only the line follows: she pays the price she signed, and a part's
+ * new terms are the rikma's split of it, never a change to her bill (P3).
  */
 export async function syncDealLine(
   run: QidRunner,
@@ -100,6 +113,7 @@ export async function syncDealLine(
   const hours = round.hm != null ? Number(round.hm) : deal.missionHours;
   const rate = round.price != null ? Number(round.price) : deal.missionRate;
   unwrap(await run('399updateDealLineTerms', { id: deal.lineKey, hoursPerUnit: hours, ratePerHour: rate }), 'the deal line');
+  if (deal.track === 'fixed') return { changed: true, delta };
 
   const total = round2(Math.max(0, deal.dealTotal + delta * deal.quant));
   unwrap(
@@ -115,12 +129,16 @@ export async function syncDealLine(
 /** Extra signers that remember which deal they came from. */
 export type DealSigners = ExtraSigners & { deal: MissionDeal };
 
-/** The extra signers of a version on a deal mission: its customers, when it raises her part. */
+/**
+ * The extra signers of a version on a deal mission: its customers, when it raises her part
+ * of an at-cost deal. On a fixed price nobody besides the rikma signs, and an applied
+ * version still carries the line along.
+ */
 export function signersFromDeal(run: QidRunner, deal: MissionDeal): DealSigners {
   return {
     deal,
     ids: deal.clientIds,
-    needed: (round: ArchRound) => round.mode === 'keep' && raisesPart(round, deal),
+    needed: (round: ArchRound) => deal.track === 'atCost' && round.mode === 'keep' && raisesPart(round, deal),
     onApplied: async (round: ArchRound) => {
       if (round.mode !== 'keep') return;
       await syncDealLine(run, deal, round);

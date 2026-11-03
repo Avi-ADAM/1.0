@@ -9138,6 +9138,13 @@ ${PROMO_DECISION_FIELDS}
   '471setProposalPricingTrack': `mutation SetProposalPricingTrack($id: ID!, $track: ENUM_RATSONPROPOSAL_PRICINGTRACK) {
     updateRatsonProposal(id: $id, data: { pricingTrack: $track }) { data { id } }
   }`,
+  // The track each deal was signed under — who co-signs a change to it (P3). Apart from
+  // the deal reads so none of them carries a field an older backend lacks.
+  '472sheirutPricingTracks': `query SheirutPricingTracks($ids: [ID]) {
+    sheiruts(filters: { id: { in: $ids } }, pagination: { limit: 100 }) {
+      data { id attributes { pricingTrack } }
+    }
+  }`,
 
   // A part's new terms, once the rikma and the customer signed them: its ceiling follows.
   '399updateDealLineTerms': `mutation UpdateDealLineTerms($id: ID!, $hoursPerUnit: Float, $ratePerHour: Float) {

@@ -1,5 +1,20 @@
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { dealSignersFor, loadMissionDeal, signersFromDeal, syncDealLine, type MissionDeal } from './dealEdit';
+
+// The track is read only while the switch is on (P3); each fixed-price test turns it on.
+const flag = vi.hoisted(() => ({ on: false }));
+vi.mock('$lib/sheirut/pricingTracksFlag', () => ({ pricingTracksEnabled: () => flag.on }));
+afterEach(() => {
+  flag.on = false;
+});
+
+/** Answers qid 472 with `track` for every deal asked about, and passes the rest to `run`. */
+const withTrack = (run: any, track: string) =>
+  vi.fn(async (qid: string, vars: any) =>
+    qid === '472sheirutPricingTracks'
+      ? { data: { sheiruts: { data: vars.ids.map((id: string) => ({ id, attributes: { pricingTrack: track } })) } } }
+      : run(qid, vars)
+  );
 
 /** A qid-397 answer: one BOM line (10 h × 60) carried by mission 90, held by provider 1. */
 function dealAnswer(sheirutId: string, total = 1800, quant = 1) {
@@ -96,6 +111,7 @@ const deal: MissionDeal = {
   dealTotal: 1800,
   quant: 1,
   clientIds: ['9'],
+  track: 'atCost',
   lineKey: '11',
   cap: 600,
   missionHours: 10,
@@ -173,5 +189,28 @@ describe('the deal’s signers', () => {
     expect(await of(decision({}))).not.toBeNull();
     expect(await of(decision({ targetKind: 'openMission' }))).toBeNull();
     expect(await of(decision({ kind: 'stipendPledge' }))).toBeNull();
+  });
+});
+
+describe('P3 — a fixed-price deal', () => {
+  it('reads with no co-signer, and the raise is the rikma’s alone', async () => {
+    flag.on = true;
+    const w = world([{ id: '8', wish: true }]);
+    const d = await loadMissionDeal(withTrack(w.run, 'fixed'), '90');
+    expect(d).toMatchObject({ track: 'fixed', clientIds: [] });
+    const s = signersFromDeal(vi.fn() as any, d!);
+    expect(s.needed({ ordern: 1, proposedById: null, zman: null, mode: 'keep', hm: 15 } as any)).toBe(false);
+  });
+
+  it('an at-cost deal still needs her', async () => {
+    flag.on = true;
+    const w = world([{ id: '8', wish: true }]);
+    expect(await loadMissionDeal(withTrack(w.run, 'atCost'), '90')).toMatchObject({ track: 'atCost', clientIds: ['9'] });
+  });
+
+  it('an applied version carries the line, never her bill', async () => {
+    const w = world([]);
+    expect(await syncDealLine(w.run, { ...deal, track: 'fixed', clientIds: [] }, { hm: 15 })).toEqual({ changed: true, delta: 300 });
+    expect(w.calls.map((c) => c.qid)).toEqual(['399updateDealLineTerms']);
   });
 });

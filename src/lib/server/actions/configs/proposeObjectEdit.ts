@@ -125,7 +125,8 @@ const handler: ActionExecutionHandler = async (params, context, { notifier, stra
   // $lib/server/sheirut/dealEdit). Her silence is not her yes.
   const run = (qid: string, vars: Record<string, unknown>) => strapi.execute(qid, vars, context.jwt, context.fetch);
   const deal = target.kind === 'missionInProgress' ? await loadMissionDeal(run, target.id) : null;
-  const needsCustomer = !!deal && raisesPart(round, deal);
+  // On a fixed price nobody besides the rikma signs (clientIds is empty there, P3).
+  const needsCustomer = !!deal && deal.clientIds.length > 0 && raisesPart(round, deal);
 
   // A rikma of one is unanimous by definition — unless the customer has to sign.
   if (otherMembers.length === 0 && !needsCustomer) {
