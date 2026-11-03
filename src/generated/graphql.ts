@@ -4154,6 +4154,11 @@ export enum Enum_Ratsonproposal_Kind {
   Partial = 'partial'
 }
 
+export enum Enum_Ratsonproposal_Pricingtrack {
+  AtCost = 'atCost',
+  Fixed = 'fixed'
+}
+
 export enum Enum_Ratsonproposal_Status_Proposal {
   Accepted = 'accepted',
   Expired = 'expired',
@@ -4199,6 +4204,11 @@ export enum Enum_Ratson_Partialconsensusfallback {
   AgreersOnly = 'agreers_only',
   Skip = 'skip',
   WillingnessPricing = 'willingness_pricing'
+}
+
+export enum Enum_Ratson_Pricingtrack {
+  AtCost = 'atCost',
+  Fixed = 'fixed'
 }
 
 export enum Enum_Ratson_Restime {
@@ -4299,6 +4309,11 @@ export enum Enum_Sheirutfulfillment_Status_Process {
 export enum Enum_Sheirutpend_Source {
   Api = 'api',
   Ui = 'ui'
+}
+
+export enum Enum_Sheirut_Pricingtrack {
+  AtCost = 'atCost',
+  Fixed = 'fixed'
 }
 
 export enum Enum_Shiftassignment_Source {
@@ -17950,6 +17965,7 @@ export type Ratson = {
   partialConsensusFallback?: Maybe<Enum_Ratson_Partialconsensusfallback>;
   pics?: Maybe<UploadFileRelationResponseCollection>;
   pinecone_id?: Maybe<Scalars['String']['output']>;
+  pricingTrack?: Maybe<Enum_Ratson_Pricingtrack>;
   process?: Maybe<PartofEntityResponse>;
   publishedAt?: Maybe<Scalars['DateTime']['output']>;
   radius?: Maybe<Scalars['Long']['output']>;
@@ -18199,6 +18215,7 @@ export type RatsonFiltersInput = {
   or?: InputMaybe<Array<InputMaybe<RatsonFiltersInput>>>;
   partialConsensusFallback?: InputMaybe<StringFilterInput>;
   pinecone_id?: InputMaybe<StringFilterInput>;
+  pricingTrack?: InputMaybe<StringFilterInput>;
   process?: InputMaybe<PartofFiltersInput>;
   publishedAt?: InputMaybe<DateTimeFilterInput>;
   radius?: InputMaybe<LongFilterInput>;
@@ -18274,6 +18291,7 @@ export type RatsonInput = {
   partialConsensusFallback?: InputMaybe<Enum_Ratson_Partialconsensusfallback>;
   pics?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   pinecone_id?: InputMaybe<Scalars['String']['input']>;
+  pricingTrack?: InputMaybe<Enum_Ratson_Pricingtrack>;
   process?: InputMaybe<Scalars['ID']['input']>;
   publishedAt?: InputMaybe<Scalars['DateTime']['input']>;
   radius?: InputMaybe<Scalars['Long']['input']>;
@@ -18373,6 +18391,7 @@ export type RatsonProposal = {
   negos?: Maybe<NegoRelationResponseCollection>;
   open_mashaabims?: Maybe<OpenMashaabimRelationResponseCollection>;
   open_mission?: Maybe<OpenMissionEntityResponse>;
+  pricingTrack?: Maybe<Enum_Ratsonproposal_Pricingtrack>;
   project?: Maybe<ProjectEntityResponse>;
   proposer_users?: Maybe<UsersPermissionsUserRelationResponseCollection>;
   publishedAt?: Maybe<Scalars['DateTime']['output']>;
@@ -18491,6 +18510,7 @@ export type RatsonProposalFiltersInput = {
   open_mashaabims?: InputMaybe<OpenMashaabimFiltersInput>;
   open_mission?: InputMaybe<OpenMissionFiltersInput>;
   or?: InputMaybe<Array<InputMaybe<RatsonProposalFiltersInput>>>;
+  pricingTrack?: InputMaybe<StringFilterInput>;
   project?: InputMaybe<ProjectFiltersInput>;
   proposer_users?: InputMaybe<UsersPermissionsUserFiltersInput>;
   publishedAt?: InputMaybe<DateTimeFilterInput>;
@@ -18521,6 +18541,7 @@ export type RatsonProposalInput = {
   negos?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   open_mashaabims?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   open_mission?: InputMaybe<Scalars['ID']['input']>;
+  pricingTrack?: InputMaybe<Enum_Ratsonproposal_Pricingtrack>;
   project?: InputMaybe<Scalars['ID']['input']>;
   proposer_users?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   publishedAt?: InputMaybe<Scalars['DateTime']['input']>;
@@ -19339,6 +19360,7 @@ export type Sheirut = {
   name?: Maybe<Scalars['String']['output']>;
   oneTime?: Maybe<Scalars['Boolean']['output']>;
   price?: Maybe<Scalars['Float']['output']>;
+  pricingTrack?: Maybe<Enum_Sheirut_Pricingtrack>;
   productExepted?: Maybe<Scalars['Boolean']['output']>;
   project?: Maybe<ProjectEntityResponse>;
   quant?: Maybe<Scalars['Float']['output']>;
@@ -19525,6 +19547,7 @@ export type SheirutFiltersInput = {
   oneTime?: InputMaybe<BooleanFilterInput>;
   or?: InputMaybe<Array<InputMaybe<SheirutFiltersInput>>>;
   price?: InputMaybe<FloatFilterInput>;
+  pricingTrack?: InputMaybe<StringFilterInput>;
   productExepted?: InputMaybe<BooleanFilterInput>;
   project?: InputMaybe<ProjectFiltersInput>;
   quant?: InputMaybe<FloatFilterInput>;
@@ -19684,6 +19707,7 @@ export type SheirutInput = {
   name?: InputMaybe<Scalars['String']['input']>;
   oneTime?: InputMaybe<Scalars['Boolean']['input']>;
   price?: InputMaybe<Scalars['Float']['input']>;
+  pricingTrack?: InputMaybe<Enum_Sheirut_Pricingtrack>;
   productExepted?: InputMaybe<Scalars['Boolean']['input']>;
   project?: InputMaybe<Scalars['ID']['input']>;
   quant?: InputMaybe<Scalars['Float']['input']>;

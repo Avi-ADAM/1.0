@@ -1,6 +1,6 @@
 # Strapi GraphQL Schema Reference
 > Auto-generated from `src/generated/graphql.ts`
-> Last updated: 2026-10-26
+> Last updated: 2026-11-03
 > Source: `codegen.ts` → `http://localhost:1337/graphql`
 
 This file provides a compact reference of all types available from the Strapi backend.
@@ -2791,6 +2791,7 @@ These are the main content types in the Strapi backend.
 | `partialConsensusFallback` | `Maybe<Enum_Ratson_Partialconsensusfallback>` |
 | `pics` | `Maybe<UploadFileRelationResponseCollection>` |
 | `pinecone_id` | `Maybe<Scalars['String']['output']>` |
+| `pricingTrack` | `Maybe<Enum_Ratson_Pricingtrack>` |
 | `process` | `Maybe<PartofEntityResponse>` |
 | `publishedAt` | `Maybe<Scalars['DateTime']['output']>` |
 | `radius` | `Maybe<Scalars['Long']['output']>` |
@@ -2843,6 +2844,7 @@ These are the main content types in the Strapi backend.
 | `negos` | `Maybe<NegoRelationResponseCollection>` |
 | `open_mashaabims` | `Maybe<OpenMashaabimRelationResponseCollection>` |
 | `open_mission` | `Maybe<OpenMissionEntityResponse>` |
+| `pricingTrack` | `Maybe<Enum_Ratsonproposal_Pricingtrack>` |
 | `project` | `Maybe<ProjectEntityResponse>` |
 | `proposer_users` | `Maybe<UsersPermissionsUserRelationResponseCollection>` |
 | `publishedAt` | `Maybe<Scalars['DateTime']['output']>` |
@@ -3061,6 +3063,7 @@ These are the main content types in the Strapi backend.
 | `name` | `Maybe<Scalars['String']['output']>` |
 | `oneTime` | `Maybe<Scalars['Boolean']['output']>` |
 | `price` | `Maybe<Scalars['Float']['output']>` |
+| `pricingTrack` | `Maybe<Enum_Sheirut_Pricingtrack>` |
 | `productExepted` | `Maybe<Scalars['Boolean']['output']>` |
 | `project` | `Maybe<ProjectEntityResponse>` |
 | `quant` | `Maybe<Scalars['Float']['output']>` |
@@ -7285,6 +7288,7 @@ Used for creating/updating content.
 | `partialConsensusFallback` | `InputMaybe<Enum_Ratson_Partialconsensusfallback>` |
 | `pics` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `pinecone_id` | `InputMaybe<Scalars['String']['input']>` |
+| `pricingTrack` | `InputMaybe<Enum_Ratson_Pricingtrack>` |
 | `process` | `InputMaybe<Scalars['ID']['input']>` |
 | `publishedAt` | `InputMaybe<Scalars['DateTime']['input']>` |
 | `radius` | `InputMaybe<Scalars['Long']['input']>` |
@@ -7333,6 +7337,7 @@ Used for creating/updating content.
 | `negos` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `open_mashaabims` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `open_mission` | `InputMaybe<Scalars['ID']['input']>` |
+| `pricingTrack` | `InputMaybe<Enum_Ratsonproposal_Pricingtrack>` |
 | `project` | `InputMaybe<Scalars['ID']['input']>` |
 | `proposer_users` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `publishedAt` | `InputMaybe<Scalars['DateTime']['input']>` |
@@ -7544,6 +7549,7 @@ Used for creating/updating content.
 | `name` | `InputMaybe<Scalars['String']['input']>` |
 | `oneTime` | `InputMaybe<Scalars['Boolean']['input']>` |
 | `price` | `InputMaybe<Scalars['Float']['input']>` |
+| `pricingTrack` | `InputMaybe<Enum_Sheirut_Pricingtrack>` |
 | `productExepted` | `InputMaybe<Scalars['Boolean']['input']>` |
 | `project` | `InputMaybe<Scalars['ID']['input']>` |
 | `quant` | `InputMaybe<Scalars['Float']['input']>` |
@@ -8595,13 +8601,13 @@ Fields: `and`, `capOrders`, `capUnits`, `code`, `createdAt`, `currencyCode`, `de
 Fields: `ai_meta`, `and`, `archived`, `avg_rating`, `bio_raw`, `createdAt`, `display_name`, `id`, `lat`, `lng`, `location`, `not`, `or`, `owner_id`, `owner_type`, `pinecone_id`, `publishedAt`, `radius_km`, `updatedAt`
 
 #### RatsonFiltersInput
-Fields: `access_mode`, `age_group`, `aggregation_opt_out`, `ai_meta`, `allowJoin`, `and`, `assistant_sessions`, `bounti`, `categories`, `chat_forum`, `claimed_at`, `consensusRule`, `createdAt`, `derivedComplexMatanot`, `desc`, `entryCurrency`, `entryRate`, `extracted_missions`, `extracted_resources`, `finnishDate`, `frequency`, `fulfilled`, `fulfillment_score`, `id`, `isOnline`, `joinDeadline`, `joinKind`, `language`, `last_matched_at`, `lat`, `link`, `lng`, `locale`, `localizations`, `location`, `location_hint`, `lockedAt`, `longDes`, `maagad`, `mashaabims`, `matanots`, `matanots_offered`, `maxJoiners`, `minJoiners`, `missions`, `name`, `not`, `offer_email_lock`, `offer_expires_at`, `offer_link_at`, `offer_recipient_hint`, `offered_by`, `offered_by_project`, `open_mashaabims`, `open_missions`, `or`, `partialConsensusFallback`, `pinecone_id`, `process`, `publishedAt`, `radius`, `ratson_match_jobs`, `ratson_proposals`, `ratson_shares`, `restime`, `share_status`, `sheiruts`, `startDate`, `status_ratson`, `sub_category`, `terms_digest`, `totalbounti`, `updatedAt`, `users_permissions_users`, `vallues`, `votes`, `willingnessModel`
+Fields: `access_mode`, `age_group`, `aggregation_opt_out`, `ai_meta`, `allowJoin`, `and`, `assistant_sessions`, `bounti`, `categories`, `chat_forum`, `claimed_at`, `consensusRule`, `createdAt`, `derivedComplexMatanot`, `desc`, `entryCurrency`, `entryRate`, `extracted_missions`, `extracted_resources`, `finnishDate`, `frequency`, `fulfilled`, `fulfillment_score`, `id`, `isOnline`, `joinDeadline`, `joinKind`, `language`, `last_matched_at`, `lat`, `link`, `lng`, `locale`, `localizations`, `location`, `location_hint`, `lockedAt`, `longDes`, `maagad`, `mashaabims`, `matanots`, `matanots_offered`, `maxJoiners`, `minJoiners`, `missions`, `name`, `not`, `offer_email_lock`, `offer_expires_at`, `offer_link_at`, `offer_recipient_hint`, `offered_by`, `offered_by_project`, `open_mashaabims`, `open_missions`, `or`, `partialConsensusFallback`, `pinecone_id`, `pricingTrack`, `process`, `publishedAt`, `radius`, `ratson_match_jobs`, `ratson_proposals`, `ratson_shares`, `restime`, `share_status`, `sheiruts`, `startDate`, `status_ratson`, `sub_category`, `terms_digest`, `totalbounti`, `updatedAt`, `users_permissions_users`, `vallues`, `votes`, `willingnessModel`
 
 #### RatsonMatchJobFiltersInput
 Fields: `and`, `createdAt`, `error`, `finished_at`, `id`, `mode`, `not`, `or`, `proposals_created`, `publishedAt`, `ratson`, `started_at`, `updatedAt`
 
 #### RatsonProposalFiltersInput
-Fields: `and`, `auto_generated`, `covered_missions`, `covered_resources`, `createdAt`, `entryCurrency`, `entryRate`, `final_breakdown`, `forum`, `hidden_by_wisher`, `id`, `kind`, `matanot`, `matbea`, `match_score`, `negos`, `not`, `open_mashaabims`, `open_mission`, `or`, `project`, `proposer_users`, `publishedAt`, `ratson`, `ratson_willingness_entry`, `sheirutpends`, `status_proposal`, `timegrama`, `tosplits`, `total_price`, `updatedAt`, `votes`
+Fields: `and`, `auto_generated`, `covered_missions`, `covered_resources`, `createdAt`, `entryCurrency`, `entryRate`, `final_breakdown`, `forum`, `hidden_by_wisher`, `id`, `kind`, `matanot`, `matbea`, `match_score`, `negos`, `not`, `open_mashaabims`, `open_mission`, `or`, `pricingTrack`, `project`, `proposer_users`, `publishedAt`, `ratson`, `ratson_willingness_entry`, `sheirutpends`, `status_proposal`, `timegrama`, `tosplits`, `total_price`, `updatedAt`, `votes`
 
 #### RatsonShareFiltersInput
 Fields: `and`, `createdAt`, `halukas`, `id`, `joinedAt`, `leftAt`, `matbea`, `maxContribution`, `not`, `notificationsOn`, `or`, `publishedAt`, `ratson`, `role`, `status_share`, `updatedAt`, `users_permissions_user`
@@ -8628,7 +8634,7 @@ Fields: `and`, `createdAt`, `envelopeId`, `id`, `not`, `or`, `payload`, `spaceId
 Fields: `and`, `createdAt`, `finnish`, `id`, `mesimabetahalich`, `not`, `or`, `publishedAt`, `start`, `updatedAt`
 
 #### SheirutFiltersInput
-Fields: `and`, `archived`, `askwants`, `categories`, `createdAt`, `descrip`, `entryCurrency`, `entryRate`, `equaliSplited`, `finnishDate`, `forums`, `halukas`, `iCanGetMonay`, `iGotIt`, `iGotMoney`, `iTransferMoney`, `iTransferedTo`, `id`, `isApruved`, `isItOnlyOneInProject`, `isSiteShareIncome`, `locale`, `localizations`, `matanot`, `moneyTransfered`, `monters`, `name`, `not`, `oneTime`, `or`, `price`, `productExepted`, `project`, `quant`, `sales`, `sheirut_fulfillments`, `sheirutpend`, `site_share_contributions`, `source_project`, `source_proposals`, `source_tosplit`, `startDate`, `total`, `updatedAt`, `users_permissions_users`, `wants`, `weFinnish`
+Fields: `and`, `archived`, `askwants`, `categories`, `createdAt`, `descrip`, `entryCurrency`, `entryRate`, `equaliSplited`, `finnishDate`, `forums`, `halukas`, `iCanGetMonay`, `iGotIt`, `iGotMoney`, `iTransferMoney`, `iTransferedTo`, `id`, `isApruved`, `isItOnlyOneInProject`, `isSiteShareIncome`, `locale`, `localizations`, `matanot`, `moneyTransfered`, `monters`, `name`, `not`, `oneTime`, `or`, `price`, `pricingTrack`, `productExepted`, `project`, `quant`, `sales`, `sheirut_fulfillments`, `sheirutpend`, `site_share_contributions`, `source_project`, `source_proposals`, `source_tosplit`, `startDate`, `total`, `updatedAt`, `users_permissions_users`, `wants`, `weFinnish`
 
 #### SheirutFulfillmentFiltersInput
 Fields: `agreedPrice`, `and`, `atCostEntries`, `cmdm`, `consumedMissionHours`, `consumedOpenMU`, `createdAt`, `createdMaaps`, `createdMissions`, `createdPmashes`, `id`, `maagad_offer`, `matanot`, `not`, `or`, `participants`, `process`, `publishedAt`, `quantity`, `sheirut`, `status_process`, `updatedAt`
@@ -9252,10 +9258,10 @@ Wrapper types for GraphQL responses.
 
 ---
 
-## 🔢 Enum Types (185)
+## 🔢 Enum Types (188)
 
 <details>
-<summary>Click to expand all 185 enum types</summary>
+<summary>Click to expand all 188 enum types</summary>
 
 - **Enum_Act_Hashivut**: 
 - **Enum_Act_Source**: 
@@ -9380,6 +9386,7 @@ Wrapper types for GraphQL responses.
 - **Enum_Providerprofile_Owner_Type**: 
 - **Enum_Ratsonmatchjob_Mode**: 
 - **Enum_Ratsonproposal_Kind**: 
+- **Enum_Ratsonproposal_Pricingtrack**: 
 - **Enum_Ratsonproposal_Status_Proposal**: 
 - **Enum_Ratsonshare_Role**: 
 - **Enum_Ratsonshare_Status_Share**: 
@@ -9387,6 +9394,7 @@ Wrapper types for GraphQL responses.
 - **Enum_Ratson_Consensusrule**: 
 - **Enum_Ratson_Joinkind**: 
 - **Enum_Ratson_Partialconsensusfallback**: 
+- **Enum_Ratson_Pricingtrack**: 
 - **Enum_Ratson_Restime**: 
 - **Enum_Ratson_Share_Status**: 
 - **Enum_Ratson_Status_Ratson**: 
@@ -9401,6 +9409,7 @@ Wrapper types for GraphQL responses.
 - **Enum_Sale_Source**: 
 - **Enum_Sheirutfulfillment_Status_Process**: 
 - **Enum_Sheirutpend_Source**: 
+- **Enum_Sheirut_Pricingtrack**: 
 - **Enum_Shiftassignment_Source**: 
 - **Enum_Shiftassignment_State**: 
 - **Enum_Shiftavailability_Stance**: 
@@ -9457,7 +9466,7 @@ Wrapper types for GraphQL responses.
 ```
 src/
 ├── generated/
-│   ├── graphql.ts              # Auto-generated types (codegen) - 24295 lines
+│   ├── graphql.ts              # Auto-generated types (codegen) - 24319 lines
 │   ├── index.ts                # Re-export hub
 │   └── STRAPI_SCHEMA_REFERENCE.md  # This file (AI agent reference)
 ├── lib/
