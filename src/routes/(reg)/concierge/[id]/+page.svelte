@@ -2447,6 +2447,14 @@
                       {/if}
                     </div>
 
+                    <!-- Said before she picks it, not on the deal page after (PLAN_DEAL_PRICING_TRACKS P0):
+                         a mission's price is a ceiling on approved hours, not a bill. -->
+                    {#if isOwner && p.status !== 'rejected' && p.hours && p.price != null && !row.need.isResource}
+                      <p class="neg-deadline">
+                        {$t('concierge.pay_upto_hours')} <Money amount={p.price} />
+                      </p>
+                    {/if}
+
                     <!-- The terms negotiation: what each side put on the table, and why.
                          There is no flat "no" — the answer to terms you cannot take is the
                          terms you could (C-9). -->
@@ -2994,6 +3002,25 @@
                 ><Money amount={grandTotal} /></span
               >
             </div>
+            <!-- The plan against the budget she gave — nothing compared them before (P0). -->
+            {#if isOwner && typeof data?.wish?.totalBounti === 'number' && data.wish.totalBounti > 0}
+              {@const budget = data.wish.totalBounti}
+              <div class="budget-row">
+                <span>{$t('concierge.total_budget')}</span>
+                <Money amount={budget} />
+              </div>
+              {#if grandTotal > budget}
+                <div class="budget-over" role="status">
+                  <div>{$t('concierge.total_over')} <Money amount={grandTotal - budget} /></div>
+                  <small>{$t('concierge.total_over_hint')}</small>
+                </div>
+              {:else if grandTotal > 0}
+                <div class="budget-ok">{$t('concierge.total_within')}</div>
+              {/if}
+            {/if}
+            {#if isOwner && !consentClosed}
+              <p class="pay-disclosure">{$t('concierge.pay_disclosure')}</p>
+            {/if}
             {#if isOwner && !consentClosed}
               <div
                 style="margin-top:16px;padding:12px 14px;border:1px dashed rgb(var(--cg-gold-rgb) / .25);border-radius:12px;display:flex;gap:12px;align-items:center"
@@ -4886,6 +4913,45 @@
     border-radius: 999px;
     box-shadow: 0 0 12px rgb(var(--cg-gold-rgb) / 0.5);
     transition: width 0.6s ease;
+  }
+  /* the plan against her budget, and how she pays (PLAN_DEAL_PRICING_TRACKS P0) */
+  .budget-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-top: 10px;
+    font-family: 'Bellefair', serif;
+    font-size: 14px;
+    color: var(--cg-muted);
+  }
+  .budget-over {
+    margin-top: 8px;
+    padding: 9px 13px;
+    background: rgb(var(--cg-pink-rgb) / 0.06);
+    border: 1px solid rgb(var(--cg-pink-rgb) / 0.3);
+    border-radius: 10px;
+    font-family: 'Bellefair', serif;
+    font-size: 14px;
+    color: var(--cg-pink);
+  }
+  .budget-over small {
+    display: block;
+    margin-top: 3px;
+    font-size: 12px;
+    color: var(--cg-muted);
+  }
+  .budget-ok {
+    margin-top: 6px;
+    font-family: 'Bellefair', serif;
+    font-size: 13px;
+    color: var(--cg-mint);
+  }
+  .pay-disclosure {
+    margin: 12px 0 0;
+    font-family: 'Bellefair', serif;
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--cg-muted);
   }
 
   /* ── Consent row ── */

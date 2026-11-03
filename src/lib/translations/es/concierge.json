@@ -314,7 +314,7 @@
     },
     "modal": {
       "when": "¿Cuándo ocurrirá?",
-      "budget": "¿Cuánto te gustaría dar?",
+      "budget": "¿Cuál es tu presupuesto?",
       "whoCanOffer": "¿Quién puede ofrecer?",
       "whoCanSee": "¿Quién puede ver?",
       "invite": "¿Cómo invitar a los socios?",
@@ -330,10 +330,10 @@
       "clear": "Limpiar"
     },
     "dateHint": "No es obligatorio - puedes dejarlo vacío y Lev propondrá fechas flexibles.",
-    "budgetLabel": "Importe máximo (₪)",
+    "budgetLabel": "Presupuesto (₪)",
     "budgetPlaceholder": "p. ej. 500",
-    "budgetNoCap": "Sin tope",
-    "budgetHint": "Un máximo. Las propuestas se ordenan por calidad de coincidencia, no solo por precio.",
+    "budgetNoCap": "Sin presupuesto",
+    "budgetHint": "El presupuesto es lo máximo que pagarás. En la práctica, cada parte se cobra según lo aprobado en ella, nunca más del precio acordado. Las propuestas se ordenan por calidad de coincidencia, no solo por precio.",
     "inviteHint": "Esta elección ayuda a Lev a saber cuánta iniciativa tomar y cuánto esperarte.",
     "minJoiners": "Mínimo de participantes",
     "minJoinersPlaceholder": "p. ej. 2",
@@ -523,5 +523,11 @@
   "watch_btn": "Cómo funciona — video",
   "help_video": "Video tutorial: cómo funciona la conserjería",
   "video_label": "Video: la conserjería — del deseo a un trato completado",
-  "video_close": "Cerrar"
+  "video_close": "Cerrar",
+  "pay_upto_hours": "Se cobra según las horas realmente aprobadas, hasta",
+  "total_budget": "Tu presupuesto",
+  "total_within": "Dentro de tu presupuesto",
+  "total_over": "Por encima de tu presupuesto en",
+  "total_over_hint": "Puedes hacer una contrapropuesta sobre una parte, o prescindir de una parte que no necesites.",
+  "pay_disclosure": "Cómo pagas: cada parte se cobra según lo realmente aprobado en ella (las horas que aprueba la rikma, o el precio acordado de un recurso), nunca más del precio acordado. El total del plan es un tope, no una factura final. Las horas por encima no se añaden sin tu firma."
 }

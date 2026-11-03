@@ -313,7 +313,7 @@
     },
     "modal": {
       "when": "When will it happen?",
-      "budget": "How much would you like to give?",
+      "budget": "What's your budget?",
       "whoCanOffer": "Who can offer?",
       "whoCanSee": "Who can see?",
       "invite": "How should partners be invited?",
@@ -329,10 +329,10 @@
       "clear": "Clear"
     },
     "dateHint": "Optional - leave it empty and Lev will suggest flexible dates.",
-    "budgetLabel": "Maximum amount (₪)",
+    "budgetLabel": "Budget (₪)",
     "budgetPlaceholder": "e.g. 500",
-    "budgetNoCap": "No ceiling",
-    "budgetHint": "A maximum. Proposals are ordered by how well they match, not by price alone.",
+    "budgetNoCap": "No budget",
+    "budgetHint": "Your budget is the most you will pay. In practice each part is billed by what is approved on it, never more than the price agreed. Proposals are ordered by how well they match, not by price alone.",
     "inviteHint": "This helps Lev judge how much to initiate on its own and how much to wait for you.",
     "minJoiners": "Minimum participants",
     "minJoinersPlaceholder": "e.g. 2",
@@ -522,5 +522,11 @@
   "watch_btn": "How it works — video",
   "help_video": "Tutorial video: how the concierge works",
   "video_label": "Video: the concierge — from a wish to a completed deal",
-  "video_close": "Close"
+  "video_close": "Close",
+  "pay_upto_hours": "Billed by the hours actually approved, up to",
+  "total_budget": "Your budget",
+  "total_within": "Within your budget",
+  "total_over": "Over your budget by",
+  "total_over_hint": "You can counter a part, or leave out a part you don't need.",
+  "pay_disclosure": "How you pay: each part is billed by what is actually approved on it (the hours the rikma approves, or the agreed price of a resource), never more than the price agreed. The plan total is a ceiling, not a final bill. Hours beyond it are not added without your signature."
 }
