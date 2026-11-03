@@ -1,7 +1,7 @@
 # PLAN — לידים ברקמה: טבלה מסודרת, מטלה לכל ליד, וחיבור לחנות
 
-> **מצב (2026-11-03): L0 בנוי ב-`1.0b` (ענף `shabab`), ממתין ל-deploy + הרשאות (§7.5).**
-> L1 ואילך — עוד לא בקוד.
+> **מצב (2026-11-04): L0 בנוי ב-`1.0b` (ענף `shabab`), ממתין ל-deploy + הרשאות (§7.5).
+> L1 בנוי ב-1.0main (§8.1) — לא ירוץ מול Strapi עד ש-L0 נפרס.** L2 ואילך — עוד לא בקוד.
 >
 > נכתב 2026-11-03 אחרי קריאת הקוד והמסמכים
 > (`demo-request`, `createTask`, `/api/v1/r/[rikma]/*`, `webhooks/`, מסך
@@ -519,7 +519,7 @@ namespace חדש `leads` ב-`ROUTED` רק לנתיבי `sales/*` (כמו `shop`)
 | # | מה | תלוי ב- | אומדן |
 |---|---|---|---|
 | L0 ✅ | סכמה ב-1.0b (`lead`, `lead-activity`, `leadSettings`) + הרשאות + types — **הקוד בנוי; ממתין ל-deploy, הרשאות ו-`types:update` (§7.5)** | — | יום |
-| L1 | `src/lib/leads/` טהור (`validateLeadPayload`, `dedupeKey`, `needsAttention`, מעברי סטטוס) + vitest; actions `createLead` / `logLeadActivity` / `updateLeadStatus` + סנכרון מטלה | L0 | 2–3 ימים |
+| L1 ✅ | `src/lib/leads/` טהור (`validateLeadPayload`, `dedupeKey`, `needsAttention`, מעברי סטטוס) + vitest; actions `createLead` / `logLeadActivity` / `updateLeadStatus` + סנכרון מטלה | L0 | 2–3 ימים |
 | L2 | `POST /leads` + `GET /leads/{externalId}` + scopes + webhooks + OpenAPI (`rikma-v1.openapi.yaml`) | L1 | 1–2 ימים |
 | L3a | המסלול (§4.0): `stageOf` (ליד · הזמנה · הצעת קונסיירז') + vitest; סנכרון `offered`/`won`/`cancelled` מ-`createPaidOrder`, `orderLifecycle`, `createSale`; סידור הלשוניות לפי המסלול, לשוניות לפי מה שיש, `/sales/manage` ⇒ הלשונית שמחכה, קישורים קיימים ⇒ `/manage/orders` | L1 | 2 ימים |
 | L3 | לשונית "בתהליך" + עמוד ליד (עם "שלח הצעה" / "דווח מכירה") + פס בשכבה הפשוטה + i18n | L3a | 3–4 ימים |
@@ -528,6 +528,31 @@ namespace חדש `leads` ב-`ROUTED` רק לנתיבי `sales/*` (כמו `shop`)
 | L5 | `leads:create:public`, מיזוג, ייצוא CSV, MCP tools, סיכום יומי, תצוגת לוח | L3 | 3 ימים |
 | L6 | `demo-request` ⇒ `lead` ברקמה המרכזית (`source: demo`), `/api/demo` כותב ל-`createLead`; לשונית "לקוחות" | L3 | 2 ימים |
 | L7 | S3b (בקשת רכש ל-`quote`) נבנה מעל הליד | L4 | לפי SHOP |
+
+### 8.1 L1 — מה נבנה (2026-11-04)
+
+- **טהור** (`src/lib/leads/`): `status.ts` (סטטוסים, `checkManualTransition`, `statusAfterActivity`),
+  `dedupe.ts`, `settings.ts` (`resolveLeadSettings`), `attention.ts` (`needsAttention` — המקור היחיד,
+  §4.3), `validate.ts` (`validateLeadPayload`), `taskSync.ts` (`leadEffectOfTask`). בדיקות: `leads.test.ts`.
+- **שרת**: `src/lib/server/leads/store.ts` (כל קריאה בטוקן האדמין — ה-qids `lead*` הם
+  `serviceAdmin` בלבד, כי בליד יש טלפון ומייל), `taskSync.ts` (רץ אחרי כל `updateTask`, שלב 5b′
+  ב-`ActionService`, fire-and-forget).
+- **actions**: `createLead` (`user · serviceAdmin · apiKey`), `logLeadActivity`, `updateLeadStatus`.
+  בדיקות מול Strapi בזיכרון: `configs/leads.test.ts`.
+
+מה הוחלט בדרך:
+- **`dedupeKey` = חלק לכל ערוץ** — `p:<hash>|e:<hash>` (sha-256, 16 תווים). פנייה חוזרת מזוהה
+  לפי טלפון **או** מייל, כך שאותו טלפון עם מייל חדש הוא אותו אדם. המספר עצמו לא נשמר במפתח.
+- **ליד `paused` שפונה שוב** מקבל `followUpAt = now` — כך הוא עולה ב"צריך טיפול" בלי לשנות סטטוס ביד.
+- **ההתראה**: רשימת נמענים ריקה היא "אף אחד" (N4), כך שמטלה לא משויכת **לא** מתריעה לרקמה —
+  בניגוד למה ש-§3 הניח ולמה שההערה ב-`createTask` עדיין אומרת. לכן `createLead` מתריע בעצמו:
+  לחברים כשאין תפקידי לידים (או כשהמטלה לא נפתחה), ולבעלים (או לחברים) בפנייה חוזרת.
+  כש-`leadRoleIds` מוגדר — מחזיקי התפקיד שומעים דרך המטלה, ו-`createLead` שותק.
+- תפקידים ומשימה ב-`leadSettings` לא מתחברים יחד (`createTask` מקבל אחד מהם): תפקידים קודמים.
+- **נשאר פתוח מ-§3**: התראה לרקמה כשבעלים משחרר ליד (הסנכרון אינו action, ולכן אין לו
+  notification); ופתיחת מטלת מעקב כש-`followUpAt` מגיע — שניהם ב-L3 עם ה-cron/הסיכום היומי.
+- ה-qids `leadCreate` / `leadUpdate` / `leadActivityCreate` מתריעים ב-`validate:qids` (`LeadInput` לא
+  קיים) עד ש-L0 נפרס ו-`types:update` רץ.
 
 **בדיקות**: vitest לפונקציות הטהורות ול-endpoint (תבנית `server.test.ts` של `orders`);
 תרחישים: מפתח של רקמה A על רקמה B ⇒ 403; בלי הסכמה ⇒ 400; אותו `externalId` ⇒

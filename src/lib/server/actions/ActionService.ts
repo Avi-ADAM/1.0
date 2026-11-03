@@ -353,6 +353,22 @@ export class ActionService {
           });
       }
 
+      // Step 5b′: A lead follows its task (PLAN_LEADS §3) — taking it owns
+      // the lead, handing it back releases it, "done" marks a new lead
+      // contacted. Same fire-and-forget rule as the mirrored-task sync.
+      if (actionKey === 'updateTask') {
+        import('../leads/taskSync.js')
+          .then(({ syncLeadFromTask }) =>
+            syncLeadFromTask({ params, context, strapi: this.strapiClient })
+          )
+          .catch((err) => {
+            this.logger.warn('Lead task sync error', {
+              actionKey,
+              error: err instanceof Error ? err.message : String(err)
+            });
+          });
+      }
+
       // Step 5c: Order webhooks (PLAN_SHOP_CUSTOMER_EXPERIENCE §5.6) — the
       // storefront hears about its orders and stock. Same fire-and-forget rule.
       if (

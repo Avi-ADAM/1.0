@@ -665,6 +665,16 @@ export const qidsAccess = {
   'salesApiProductInfo': { allow: ['serviceAdmin'] },
   'saleByExternalId': { allow: ['serviceAdmin'] },
 
+  // Leads (PLAN_LEADS L1): contact details — run only inside the lead actions
+  // with the ADMIN token, after their projectMember rule. Never widen these.
+  'leadById': { allow: ['serviceAdmin'] },
+  'leadByExternalId': { allow: ['serviceAdmin'] },
+  'leadsByContact': { allow: ['serviceAdmin'] },
+  'leadCreate': { allow: ['serviceAdmin'] },
+  'leadUpdate': { allow: ['serviceAdmin'] },
+  'leadActivityCreate': { allow: ['serviceAdmin'] },
+  'leadProjectSettings': { allow: ['serviceAdmin'] },
+
   // api/v1/tasks/+server.ts + the webhook dispatcher (External Tasks API):
   // same story — executed with the ADMIN_TOKEN through strapiClient, never
   // reachable with a user JWT or a plain apiKey principal.

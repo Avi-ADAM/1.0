@@ -15429,6 +15429,79 @@ ${PROMO_DECISION_FIELDS}
   }`,
 
   /* ─────────────────────────────────────────────────────────────────────
+   * Leads (docs/inprogress/PLAN_LEADS.md, L1)
+   *
+   * A lead holds a person's contact details, so every one of these runs
+   * only inside the lead actions ($lib/server/leads/), under the ADMIN token,
+   * after the action's projectMember rule — serviceAdmin-only in qidsAccess.
+   * The members' reads (the "in progress" tab) are separate qids in L3.
+   * ───────────────────────────────────────────────────────────────────── */
+
+  'leadById': `query LeadById($id: ID!) {
+    lead(id: $id) {
+      data {
+        id
+        attributes {
+          name organization status externalId dedupeKey followUpAt lastActivityAt createdAt
+          project { data { id } }
+          owner { data { id } }
+          act { data { id } }
+        }
+      }
+    }
+  }`,
+
+  // Idempotency: has this externalId already produced a lead in this rikma?
+  'leadByExternalId': `query LeadByExternalId($pid: ID!, $externalId: String!) {
+    leads(
+      filters: { project: { id: { eq: $pid } }, externalId: { eq: $externalId } }
+      pagination: { limit: 1 }
+    ) {
+      data { id attributes { status act { data { id } } } }
+    }
+  }`,
+
+  // Leads of this rikma whose dedupeKey shares a contact part (§2.4). The
+  // `or` over the parts is built by the caller, so it arrives as $filters.
+  'leadsByContact': `query LeadsByContact($filters: LeadFiltersInput!) {
+    leads(filters: $filters, sort: ["createdAt:desc"], pagination: { limit: 5 }) {
+      data { id attributes { name organization status dedupeKey owner { data { id } } } }
+    }
+  }`,
+
+  'leadCreate': `mutation LeadCreate($data: LeadInput!) {
+    createLead(data: $data) {
+      data { id attributes { status } }
+    }
+  }`,
+
+  'leadUpdate': `mutation LeadUpdate($id: ID!, $data: LeadInput!) {
+    updateLead(id: $id, data: $data) {
+      data { id attributes { status } }
+    }
+  }`,
+
+  // Append-only: there is deliberately no update or delete qid for activity.
+  'leadActivityCreate': `mutation LeadActivityCreate($data: LeadActivityInput!) {
+    createLeadActivity(data: $data) {
+      data { id }
+    }
+  }`,
+
+  // The rikma's lead settings, and its members for "nobody owns it yet" notices.
+  'leadProjectSettings': `query LeadProjectSettings($pid: ID!) {
+    project(id: $pid) {
+      data {
+        id
+        attributes {
+          leadSettings
+          user_1s { data { id } }
+        }
+      }
+    }
+  }`,
+
+  /* ─────────────────────────────────────────────────────────────────────
    * External Tasks API (PLAN_EXTERNAL_TASKS_API)
    *
    * Read exclusively by src/routes/api/v1/tasks/+server.ts and the webhook
