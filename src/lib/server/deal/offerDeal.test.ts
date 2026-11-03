@@ -214,3 +214,39 @@ describe('P3 — who signs follows the deal’s track', () => {
     expect((await loadCandidacyDeal(run, 'ask', '5'))?.clientIds).toEqual(['261']);
   });
 });
+
+describe('§3.4 — work at her place', () => {
+  const twoDeals = () => readOfferDeal('mission', missionOffer({ sales: [sale('8', ['261']), sale('9', ['262'])] }))!;
+
+  it('a marked line brings the fixed-price customer back as a signer — for who, not for how much', async () => {
+    const d = withDealTracks(twoDeals(), { '8': 'fixed', '9': 'fixed' }, true);
+    expect(d.clientIds.sort()).toEqual(['261', '262']);
+    const run = vi.fn().mockResolvedValue({ data: {} });
+    await fillOfferIntoDeal(run, d, { takerId: '400', amount: 5, unitPrice: 120 });
+    expect(run.mock.calls.some((c) => c[0] === '213updateSheirut')).toBe(false);
+  });
+
+  it('loading reads the mark only where the track took her signature away', async () => {
+    flag.on = true;
+    const answer = { data: { ask: { data: { attributes: { open_mission: { data: missionOffer() } } } } } };
+    const run = vi.fn(async (qid: string, vars: any) => {
+      if (qid === '472sheirutPricingTracks') return { data: { sheiruts: { data: vars.ids.map((id: string) => ({ id, attributes: { pricingTrack: 'fixed' } })) } } };
+      if (qid === '478recipeLinesAtCustomer') return { data: { matanotRecipeMissions: { data: [{ id: '70', attributes: { atCustomer: true } }] }, matanotRecipeResources: { data: [] } } };
+      return answer;
+    });
+    expect((await loadCandidacyDeal(run, 'ask', '5'))?.clientIds).toEqual(['261']);
+    expect(run.mock.calls.map((c) => c[0])).toContain('478recipeLinesAtCustomer');
+  });
+
+  it('a failed read of the mark keeps her signature', async () => {
+    flag.on = true;
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const answer = { data: { ask: { data: { attributes: { open_mission: { data: missionOffer() } } } } } };
+    const run = vi.fn(async (qid: string, vars: any) => {
+      if (qid === '472sheirutPricingTracks') return { data: { sheiruts: { data: vars.ids.map((id: string) => ({ id, attributes: { pricingTrack: 'fixed' } })) } } };
+      if (qid === '478recipeLinesAtCustomer') return { errors: [{ message: 'Unknown field atCustomer' }] };
+      return answer;
+    });
+    expect((await loadCandidacyDeal(run, 'ask', '5'))?.clientIds).toEqual(['261']);
+  });
+});

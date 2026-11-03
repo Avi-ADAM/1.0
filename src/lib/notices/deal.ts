@@ -39,6 +39,8 @@ export function dealNotices(input: DealNoticeInput, now: number = Date.now()): N
   const offers = input.offers;
   if (offers && offers.customerIds.map(String).includes(me)) {
     for (const offer of offers.offers) {
+      // On a fixed price she signs only a part she marked as work at her place (§3.4).
+      if (offers.fixed && !offer.atCustomer) continue;
       for (const c of offer.candidacies) {
         if (c.signedByViewer) continue;
         const list = terms(term(offer.kind === 'resource' ? 'qty' : 'hours', c.amount), term('price', c.price));

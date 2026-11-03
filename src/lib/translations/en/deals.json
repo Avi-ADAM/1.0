@@ -199,7 +199,14 @@
     "ready": "Everyone signed — registering soon",
     "talk": "Talk it over",
     "signedToast": "Your signature was recorded",
-    "error": "The signature was not recorded"
+    "error": "The signature was not recorded",
+    "explainCustomerFixed": "These parts are still open in the rikma. On a set price, who takes a part does not change what you pay, and the rikma decides it. A part marked \"work at your place\" also waits for your approval of who takes it.",
+    "explainMemberFixed": "These parts are still open. On a set price, who takes a part does not change the deal’s price, and the rikma decides it. On a part marked \"work at the customer’s place\", the customer approves who takes it too.",
+    "atCustomer": "Work at the customer’s place",
+    "markAtCustomer": "This work happens at my place (my home, with my children or my papers), and I approve who takes it",
+    "markedToast": "Your approval is now needed for whoever takes this part",
+    "unmarkedToast": "The mark was removed",
+    "markError": "The mark was not saved"
   },
   "parts": {
     "title": "Has every provider received their part?",

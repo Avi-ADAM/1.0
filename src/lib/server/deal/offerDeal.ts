@@ -25,6 +25,7 @@
 import { isEssenceOnly } from '$lib/pooling/bomPrice';
 import type { PricingTrack } from '$lib/sheirut/pricingTrack';
 import { loadDealTracks } from '$lib/server/sheirut/dealTrack';
+import { lineAtCustomer } from './atCustomer';
 
 export type OfferKind = 'mission' | 'resource';
 
@@ -57,7 +58,8 @@ export interface OfferDeal {
   sales: OfferDealSale[];
   /**
    * Every customer of every at-cost deal the line belongs to — each of them signs. A fixed
-   * price deal adds none: who takes a part of it is the rikma's business (PLAN_DEAL_PRICING_TRACKS §3).
+   * price deal adds none: who takes a part of it is the rikma's business (PLAN_DEAL_PRICING_TRACKS §3) —
+   * unless she marked the line as work at her place (§3.4): then she approves who, at any price.
    */
   clientIds: string[];
 }
@@ -142,20 +144,25 @@ function unwrap(res: any, what: string) {
 
 /**
  * Who signs follows each deal's track (P3): only the customers of an at-cost deal co-sign,
- * and only an at-cost deal grows when the part is filled. Pure.
+ * and only an at-cost deal grows when the part is filled. A line marked as work at her
+ * place (`atCustomer`, §3.4) brings the customers of a fixed-price deal back as signers —
+ * for who, not for how much: the deal still does not grow. Pure.
  */
-export function withDealTracks(deal: OfferDeal, tracks: Record<string, PricingTrack>): OfferDeal {
+export function withDealTracks(deal: OfferDeal, tracks: Record<string, PricingTrack>, atCustomer = false): OfferDeal {
   const sales = deal.sales.map((s) => ({ ...s, track: tracks[s.sheirutId] ?? 'atCost' }));
   return {
     ...deal,
     sales,
-    clientIds: [...new Set(sales.filter((s) => s.track === 'atCost').flatMap((s) => s.clientIds))]
+    clientIds: [...new Set(sales.filter((s) => s.track === 'atCost' || atCustomer).flatMap((s) => s.clientIds))]
   };
 }
 
 async function tracked(run: QidRunner, deal: OfferDeal | null): Promise<OfferDeal | null> {
   if (!deal) return null;
-  return withDealTracks(deal, await loadDealTracks(run, deal.sales.map((s) => s.sheirutId)));
+  const tracks = await loadDealTracks(run, deal.sales.map((s) => s.sheirutId));
+  // The mark matters only where the track took her signature away.
+  const anyFixed = deal.sales.some((s) => tracks[s.sheirutId] === 'fixed');
+  return withDealTracks(deal, tracks, anyFixed && (await lineAtCustomer(run, deal.kind, deal.lineId)));
 }
 
 export async function loadOfferDeal(run: QidRunner, kind: OfferKind, offerId: string): Promise<OfferDeal | null> {

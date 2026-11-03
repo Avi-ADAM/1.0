@@ -9177,6 +9177,20 @@ ${PROMO_DECISION_FIELDS}
     decision(id: $id) { data { id attributes { kind archived receiptDeal { data { id } } } } }
   }`,
 
+  // "Work at your place" on a line of the plan (§3.4): on a fixed price she still approves
+  // who does it. Apart from the deal reads, so none of them carries a field an older
+  // backend lacks ($lib/server/deal/atCustomer).
+  '478recipeLinesAtCustomer': `query RecipeLinesAtCustomer($mids: [ID], $rids: [ID]) {
+    matanotRecipeMissions(filters: { id: { in: $mids } }, pagination: { limit: 100 }) { data { id attributes { atCustomer } } }
+    matanotRecipeResources(filters: { id: { in: $rids } }, pagination: { limit: 100 }) { data { id attributes { atCustomer } } }
+  }`,
+  '479setRecipeMissionAtCustomer': `mutation SetRecipeMissionAtCustomer($id: ID!, $atCustomer: Boolean) {
+    updateMatanotRecipeMission(id: $id, data: { atCustomer: $atCustomer }) { data { id } }
+  }`,
+  '480setRecipeResourceAtCustomer': `mutation SetRecipeResourceAtCustomer($id: ID!, $atCustomer: Boolean) {
+    updateMatanotRecipeResource(id: $id, data: { atCustomer: $atCustomer }) { data { id } }
+  }`,
+
   // A part's new terms, once the rikma and the customer signed them: its ceiling follows.
   '399updateDealLineTerms': `mutation UpdateDealLineTerms($id: ID!, $hoursPerUnit: Float, $ratePerHour: Float) {
     updateMatanotRecipeMission(id: $id, data: { hoursPerUnit: $hoursPerUnit, ratePerHour: $ratePerHour, unitsPerProduct: 1 }) {

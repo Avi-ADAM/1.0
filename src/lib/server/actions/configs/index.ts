@@ -117,6 +117,7 @@ import { materializeWishConfig } from './materializeWish.js';
 import { signDealOfferConfig } from './signDealOffer.js';
 import { deliverDealConfig } from './deliverDeal.js';
 import { answerDealReceiptConfig } from './answerDealReceipt.js';
+import { markDealLineAtCustomerConfig } from './markDealLineAtCustomer.js';
 import { confirmDealPartReceivedConfig } from './confirmDealPartReceived.js';
 import { publishWishNeedToCommunityConfig } from './publishWishNeedToCommunity.js';
 import { finalizeAskAcceptanceConfig } from './finalizeAskAcceptance.js';
@@ -455,6 +456,7 @@ export function registerAllActions(): void {
   registerAction(signDealOfferConfig);
   registerAction(deliverDealConfig);
   registerAction(answerDealReceiptConfig);
+  registerAction(markDealLineAtCustomerConfig);
   registerAction(confirmDealPartReceivedConfig);
   registerAction(publishWishNeedToCommunityConfig);
   registerAction(offerWishHelpConfig);

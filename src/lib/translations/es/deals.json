@@ -200,7 +200,14 @@
     "ready": "Todos firmaron — se registra en breve",
     "talk": "Conversarlo",
     "signedToast": "Tu firma quedó registrada",
-    "error": "La firma no se registró"
+    "error": "La firma no se registró",
+    "explainCustomerFixed": "Estas partes siguen abiertas en la rikma. Con precio cerrado, quién toma una parte no cambia lo que pagas, y lo decide la rikma. Una parte marcada \"trabajo en tu casa\" también espera tu aprobación de quién la toma.",
+    "explainMemberFixed": "Estas partes siguen abiertas. Con precio cerrado, quién toma una parte no cambia el precio del trato, y lo decide la rikma. En una parte marcada \"trabajo en casa de la clienta\", la clienta también aprueba quién la toma.",
+    "atCustomer": "Trabajo en casa de la clienta",
+    "markAtCustomer": "Este trabajo se hace en mi casa (con mis hijos o mis papeles), y apruebo quién lo toma",
+    "markedToast": "Desde ahora hace falta tu aprobación para quien tome esta parte",
+    "unmarkedToast": "Se quitó la marca",
+    "markError": "La marca no se guardó"
   },
   "parts": {
     "title": "¿Cada proveedor recibió su parte?",

@@ -19,6 +19,7 @@ import type { PartsView } from '$lib/sheirut/partsReceived';
 import { partViaSplit, providerTransfers } from '$lib/sheirut/splitCarriage';
 import { loadDealTrack } from '$lib/server/sheirut/dealTrack';
 import { loadReceipt } from '$lib/server/deal/receipt';
+import { loadAtCustomer, type LineKind } from '$lib/server/deal/atCustomer';
 import { receiptView, type ReceiptView } from '$lib/sheirut/dealReceipt';
 
 export interface DealPieces {
@@ -35,6 +36,14 @@ export interface DealPieces {
 
 export const NO_PIECES: DealPieces = { due: null, edits: [], offers: null, parts: null, missionIds: [], receipt: null };
 
+/** The unassigned lines of qid 417's answer — the ones a mark (§3.4) can apply to. */
+function openLinesOf(res: any): Array<{ kind: LineKind; id: string }> {
+  const product = (res?.data?.sheirut ?? res?.sheirut)?.data?.attributes?.matanot?.data?.attributes ?? {};
+  const open = (rows: any[] | undefined, kind: LineKind) =>
+    (rows ?? []).filter((l) => !l?.attributes?.assignedMember?.data?.id).map((l) => ({ kind, id: String(l.id) }));
+  return [...open(product.matanot_recipe_missions?.data, 'mission'), ...open(product.matanot_recipe_resources?.data, 'resource')];
+}
+
 export async function readDealPieces(run: QidRunner, sheirutId: string, viewerId: string, tag = 'deal'): Promise<DealPieces> {
   const warn = (what: string) => (e: unknown) => {
     console.warn(`[${tag}] could not read ${what}:`, e);
@@ -48,7 +57,9 @@ export async function readDealPieces(run: QidRunner, sheirutId: string, viewerId
     loadDealDue(run, sheirutId).catch(warn('what the deal owes')),
     run('417dealOpenOffers', { id: sheirutId })
       .then(async (res) => {
-        const view = readDealOffers(res, String(viewerId), await track);
+        const t = await track;
+        const marks = t === 'fixed' ? await loadAtCustomer(run, openLinesOf(res)) : new Set<string>();
+        const view = readDealOffers(res, String(viewerId), t, marks);
         return view.offers.length > 0 ? view : null;
       })
       .catch(warn('the open parts of the deal')),

@@ -28,6 +28,10 @@ export interface DealCandidacyView {
 
 export interface DealOpenOfferView {
   kind: 'mission' | 'resource';
+  /** The unassigned line of the plan this offer fills. */
+  lineId: string;
+  /** Work at her place (§3.4): on a fixed price she still approves who takes it. */
+  atCustomer: boolean;
   offerId: string;
   name: string;
   amount: number;
@@ -37,5 +41,7 @@ export interface DealOpenOfferView {
 
 export interface DealOffersView {
   customerIds: string[];
+  /** The deal is on a fixed price — the only one where marking a line changes who signs. */
+  fixed: boolean;
   offers: DealOpenOfferView[];
 }

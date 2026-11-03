@@ -633,6 +633,10 @@ export const qidsAccess = {
   '475updateDealReceipt': { allow: ['serviceAdmin'] },
   '476dealReceiptClock': { allow: ['serviceAdmin'] },
   '477dealReceiptDecision': { allow: ['serviceAdmin'] },
+  // §3.4 "work at your place" — server-only: markDealLineAtCustomer checks she is the customer.
+  '478recipeLinesAtCustomer': { allow: ['serviceAdmin'] },
+  '479setRecipeMissionAtCustomer': { allow: ['serviceAdmin'] },
+  '480setRecipeResourceAtCustomer': { allow: ['serviceAdmin'] },
 
   // matching/engine.ts: always run through StrapiClient with the admin
   // token, never with a user JWT — writes suggestion data for *other* users.

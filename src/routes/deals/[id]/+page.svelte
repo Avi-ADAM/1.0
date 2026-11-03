@@ -12,7 +12,7 @@
   import DealOffersPanel from '$lib/components/deals/DealOffersPanel.svelte';
   import DealPartsPanel from '$lib/components/deals/DealPartsPanel.svelte';
   import DealReceiptPanel from '$lib/components/deals/DealReceiptPanel.svelte';
-  import type { DealCandidacyView } from '$lib/sheirut/dealOffers';
+  import type { DealCandidacyView, DealOpenOfferView } from '$lib/sheirut/dealOffers';
   import ApprovalPanel from '$lib/components/deals/ApprovalPanel.svelte';
   import DealTimeline from '$lib/components/deals/DealTimeline.svelte';
   import ForumPanel from '$lib/components/deals/ForumPanel.svelte';
@@ -191,6 +191,27 @@
       toast.error($t('deals.receipt.error'));
     } finally {
       receiptBusy = false;
+    }
+  }
+
+  // Work at her place (§3.4): on a fixed price she still approves who takes that part.
+  async function markAtCustomer(offer: DealOpenOfferView, atCustomer: boolean) {
+    if (signingId) return;
+    signingId = 'mark' + offer.kind + offer.lineId;
+    try {
+      await runAction('markDealLineAtCustomer', {
+        sheirutId: String(deal?.sheirutId ?? ''),
+        kind: offer.kind,
+        lineId: offer.lineId,
+        atCustomer
+      });
+      toast.success($t(atCustomer ? 'deals.offers.markedToast' : 'deals.offers.unmarkedToast'));
+      await invalidateAll();
+    } catch (err) {
+      console.error(err);
+      toast.error($t('deals.offers.markError'));
+    } finally {
+      signingId = null;
     }
   }
 
@@ -409,6 +430,7 @@
               busyId={signingId}
               onSign={signOffer}
               onTalk={() => forumPanel?.focus()}
+              onMark={markAtCustomer}
             />
           </div>
         {/if}

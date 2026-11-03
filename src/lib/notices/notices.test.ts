@@ -297,9 +297,12 @@ describe('wishNotice', () => {
 const deal = { sheirutId: '8', name: 'Laptop repair' };
 const offers = {
   customerIds: ['261'],
+  fixed: false,
   offers: [
     {
       kind: 'mission' as const,
+      lineId: '70',
+      atCustomer: false,
       offerId: '300',
       name: 'Diagnostics',
       amount: 4,
@@ -438,5 +441,14 @@ describe('groupNotices', () => {
     const a = wishNotice(wishInput({ id: '70' }), NOW)!;
     const b = { ...a, key: 'wish:71:v0', subject: 'proposal:71' };
     expect(groupNotices([a, b])).toHaveLength(2);
+  });
+});
+
+describe('deal notices on a fixed price (PLAN_DEAL_PRICING_TRACKS P3, §3.4)', () => {
+  it('ask her to sign only a part she marked as work at her place', () => {
+    const fixed = { ...offers, fixed: true };
+    expect(dealNotices({ viewerId: '261', deal, offers: fixed }, NOW).filter((n) => n.kind === 'dealOffer')).toEqual([]);
+    const marked = { ...fixed, offers: fixed.offers.map((o) => ({ ...o, atCustomer: true })) };
+    expect(dealNotices({ viewerId: '261', deal, offers: marked }, NOW).filter((n) => n.kind === 'dealOffer').length).toBeGreaterThan(0);
   });
 });

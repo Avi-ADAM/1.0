@@ -10,6 +10,7 @@
 
 import { computeNegoGate, normId } from '$lib/server/nego/negoGate.js';
 import type { PricingTrack } from '$lib/sheirut/pricingTrack';
+import { lineKey } from './atCustomer';
 
 export type { DealCandidacyView, DealOpenOfferView, DealOffersView } from '$lib/sheirut/dealOffers.js';
 import type { DealCandidacyView, DealOpenOfferView, DealOffersView } from '$lib/sheirut/dealOffers.js';
@@ -59,13 +60,24 @@ function candidacy(
 
 /**
  * `res` is qid 417's answer, through `strapi.execute` (`{ data: { sheirut } }`) or the proxy (`{ sheirut }`).
- * On a fixed-price deal she does not co-sign who takes a part (P3), so no candidacy waits for her.
+ * On a fixed-price deal she does not co-sign who takes a part (P3), so no candidacy waits for her —
+ * except on a line she marked as work at her place (`atCustomer`, keys from `lineKey`, §3.4).
  */
-export function readDealOffers(res: any, viewerId: string, track: PricingTrack = 'atCost'): DealOffersView {
+export function readDealOffers(
+  res: any,
+  viewerId: string,
+  track: PricingTrack = 'atCost',
+  atCustomer: ReadonlySet<string> = new Set()
+): DealOffersView {
   const sh = (res?.data?.sheirut ?? res?.sheirut)?.data?.attributes ?? {};
   const customerIds = (sh.users_permissions_users?.data ?? []).map((u: any) => String(u.id));
   const memberIds = (sh.project?.data?.attributes?.user_1s?.data ?? []).map((u: any) => String(u.id));
-  const ctx = { memberIds, clientIds: track === 'fixed' ? [] : customerIds, viewerId: String(viewerId) };
+  const fixed = track === 'fixed';
+  const ctxFor = (key: string) => ({
+    memberIds,
+    clientIds: !fixed || atCustomer.has(key) ? customerIds : [],
+    viewerId: String(viewerId)
+  });
   const product = sh.matanot?.data?.attributes ?? {};
   const offers: DealOpenOfferView[] = [];
 
@@ -75,8 +87,12 @@ export function readDealOffers(res: any, viewerId: string, track: PricingTrack =
     const om = la.pendm?.data?.attributes?.open_mission?.data;
     if (!om?.id || om.attributes?.archived === true) continue;
     const base = { amount: num(om.attributes?.noofhours), unitPrice: num(om.attributes?.perhour) };
+    const key = lineKey('mission', line.id);
+    const ctx = ctxFor(key);
     offers.push({
       kind: 'mission',
+      lineId: String(line.id),
+      atCustomer: atCustomer.has(key),
       offerId: String(om.id),
       name: om.attributes?.name ?? '',
       ...base,
@@ -89,13 +105,17 @@ export function readDealOffers(res: any, viewerId: string, track: PricingTrack =
     const om = la.pmash?.data?.attributes?.open_mashaabim?.data;
     if (!om?.id || om.attributes?.archived === true) continue;
     const base = { amount: num(om.attributes?.hm) || 1, unitPrice: num(om.attributes?.price) };
+    const key = lineKey('resource', line.id);
+    const ctx = ctxFor(key);
     offers.push({
       kind: 'resource',
+      lineId: String(line.id),
+      atCustomer: atCustomer.has(key),
       offerId: String(om.id),
       name: om.attributes?.name ?? '',
       ...base,
       candidacies: (om.attributes?.askms?.data ?? []).map((n: any) => candidacy('askm', n, base, ctx))
     });
   }
-  return { customerIds, offers };
+  return { customerIds, fixed, offers };
 }
