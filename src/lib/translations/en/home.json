@@ -121,8 +121,6 @@
     "whoBusiness_d": "Get leads from real demand, manage transparently, and connect your business to a network of complementary partners.",
     "whoCreators_t": "Creators & communities",
     "whoCreators_d": "Build a shared venture around a dream or goal, with decisions by agreement and transparent profit sharing.",
-    "modelTitle": "How much does it cost?",
-    "modelSub": "Free to start. You earn when the rikma earns - no hidden subscription fees, just full transparency.",
     "painLead": "The truth no one talks about:",
     "pain1": "You wake up to work that's a 'must' - not a 'want'.",
     "pain2": "You invest hours, talent and energy - and the value you build stays someone else's.",
@@ -763,5 +761,15 @@
     "register": "Sign up",
     "demo": "Book a demo",
     "login": "Log in"
+  },
+  "pricing": {
+    "eyebrow": "Pricing",
+    "nav": "Pricing",
+    "title": "What does it cost? Whatever feels right to you.",
+    "free": "No payment required",
+    "costs": "Keeping 1💗1 running costs us quite a lot - servers, development, maintenance and plenty of quiet work behind the scenes.",
+    "why": "But we know how hard it is to build a business, and how long it takes until the first money comes in. We don't want to be the ones who weigh you down - we want to be the ones who make it easier. So for now we don't charge anything, and there is no obligation to pay.",
+    "invite": "What we do: invite you to give whatever you feel you can and feel we deserve. And if right now you can't - that's completely fine too.",
+    "rikma": "Meet the 1💗1 rikma"
   }
 }

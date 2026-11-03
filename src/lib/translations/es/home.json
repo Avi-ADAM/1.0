@@ -122,8 +122,6 @@
     "whoBusiness_d": "Consigue clientes potenciales de una demanda real, gestiona con transparencia y conecta tu negocio a una red de socios complementarios.",
     "whoCreators_t": "Creadores y comunidades",
     "whoCreators_d": "Construye un proyecto compartido en torno a un sueño o un objetivo, con decisiones por acuerdo y reparto transparente de beneficios.",
-    "modelTitle": "¿Cuánto cuesta?",
-    "modelSub": "Empezar es gratis. Ganas cuando la rikma gana: sin cuotas de suscripción ocultas, solo total transparencia.",
     "painLead": "La verdad de la que nadie habla:",
     "pain1": "Te despiertas para un trabajo que es un 'deber', no un 'querer'.",
     "pain2": "Inviertes horas, talento y energía, y el valor que construyes sigue siendo de otro.",
@@ -764,5 +762,15 @@
     "register": "Registrarse",
     "demo": "Agendar demo",
     "login": "Entrar"
+  },
+  "pricing": {
+    "eyebrow": "Precios",
+    "nav": "Precios",
+    "title": "¿Cuánto cuesta? Lo que te parezca justo.",
+    "free": "Sin pago obligatorio",
+    "costs": "Mantener 1💗1 en marcha nos cuesta bastante: servidores, desarrollo, mantenimiento y mucho trabajo silencioso entre bastidores.",
+    "why": "Pero sabemos lo difícil que es levantar un negocio y cuánto tarda en entrar el primer dinero. No queremos ser quienes te pesan, sino quienes te lo hacen más fácil. Por eso, por ahora no cobramos nada y no hay ninguna obligación de pagar.",
+    "invite": "Lo que sí hacemos es invitarte a dar lo que sientas que puedes y que nos merecemos. Y si ahora mismo no puedes, también está perfectamente bien.",
+    "rikma": "Conoce la rikma de 1💗1"
   }
 }
