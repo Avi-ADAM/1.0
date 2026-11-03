@@ -12,6 +12,8 @@ const ALL: Array<[string, MaturedNotice[]]> = [
   ['finiapprovalMatured', [N.finiapprovalMatured({ projectId: 7, name: 'M', hours: 3, isHours: true })]],
   ['objectChangeApplied', N.objectChangeApplied({ projectId: 7, decisionId: 9, decisionName: 'D', endedMemberId: 4 })],
   ['decisionAwaitsCustomer', [N.decisionAwaitsCustomer({ projectId: 7, decisionName: 'D', clientIds: [5] })]],
+  ['overrunAwaitsCustomer', [N.overrunAwaitsCustomer({ sheirutId: 3, missionName: 'M', hours: 2.5, amount: 250, clientIds: [5] })]],
+  ['overrunHeldForProvider', [N.overrunHeldForProvider({ projectId: 7, sheirutId: 3, missionName: 'M', hours: 2.5, providerId: 9 })]],
   ['stipendAwaitsFunder', [N.stipendAwaitsFunder({ projectId: 7, decisionName: 'D', funderId: 5 })]],
   ['stipendApplied', [N.stipendApplied({ projectId: 7, decisionName: 'D' })]],
   ['rikmaDecisionApplied', [N.rikmaDecisionApplied({ projectId: 7, decisionId: 9, decisionName: null })]],

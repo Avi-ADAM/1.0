@@ -8,7 +8,14 @@
   import { standingVotes } from '$lib/finiapruval/rounds.js';
   import { isHoursApproval } from '$lib/finiapruval/kind.js';
   import { tellMatured } from '$lib/server/notifications/matured';
-  import { finiapprovalMatured } from '$lib/server/notifications/maturedNotices';
+  import {
+    finiapprovalMatured,
+    overrunAwaitsCustomer,
+    overrunHeldForProvider
+  } from '$lib/server/notifications/maturedNotices';
+  import { strapiClient } from '$lib/server/actions';
+  import { execFromAdmin } from '$lib/server/archive/exec.js';
+  import { askCustomerForOverrun, capApproval } from '$lib/server/sheirut/overCap.js';
 
   // Free-text the user typed (`why`, `missname`) goes into an inline mutation
   // string, so it has to be escaped. An unescaped quote or newline breaks the
@@ -95,9 +102,30 @@
       const projectId = fa.project.data.id;
       const userId = fa.users_permissions_user.data.id;
 
+      // A part of a customer's wish deal has a ceiling: the rikma's silence matures only
+      // what fits under the price she agreed. The rest stays on the approval, held for her
+      // (docs/inprogress/PLAN_DEAL_PRICING_TRACKS.md §3.2, $lib/server/sheirut/overCap) — the same
+      // rule as closeFiniapruval, its explicit-vote twin. A deal that cannot be read must
+      // not pass for "no customer": the clock stays open and the next run retries.
+      let capped = null;
+      try {
+        capped = await capApproval((qid, vars) => strapiClient.execute(qid, vars), mba.id, noofhours, perhour);
+      } catch (e) {
+        console.error('[timegrama/finiapp] could not read the deal behind this approval — clock left OPEN for retry:', {
+          finiapruvalId: id,
+          error: e
+        });
+        return;
+      }
+      const heldHours = capped ? capped.split.overHours : 0;
+      const fileNow = capped ? capped.split.inHours : noofhours;
+
       let finnishedMissionMutation = '';
 
-      if (isTimerSave) {
+      if (isTimerSave && fileNow <= 0) {
+        // Every hour of it waits above the ceiling: the books do not move.
+        finnishedMissionMutation = '';
+      } else if (isTimerSave) {
         // Timer save: accumulate into the active FinnishedMission of this rate era
         const targetRow = pickRateRow(fmRows, perhour);
         const existingFm = targetRow
@@ -105,14 +133,14 @@
           : null;
 
         if (existingFm && targetRow) {
-          const newHours = (existingFm.attributes.noofhours ?? 0) + noofhours;
+          const newHours = (existingFm.attributes.noofhours ?? 0) + fileNow;
           finnishedMissionMutation = `
             updateFinnishedMission(id: "${existingFm.id}", data: {
               noofhours: ${newHours},
               total: ${newHours * rowRate(targetRow, perhour)}
             }) { data { id } }
             updateMesimabetahalich(id: "${mba.id}", data: {
-              totalHoursSaved: ${(mbaa.totalHoursSaved ?? 0) + noofhours}
+              totalHoursSaved: ${(mbaa.totalHoursSaved ?? 0) + fileNow}
             }) { data { id } }
           `;
         } else {
@@ -120,11 +148,11 @@
             createFinnishedMission(data: {
               missionName: ${gqlStr(fa.missname)},
               why: ${gqlStr(fa.why ?? 'timer save')},
-              noofhours: ${noofhours},
+              noofhours: ${fileNow},
               mesimabetahalich: "${mba.id}",
               mission: "${mbaa.mission.data.id}",
               perhour: ${perhour},
-              total: ${noofhours * perhour},
+              total: ${fileNow * perhour},
               project: "${projectId}",
               users_permissions_user: "${userId}",
               isNotFinished: true,
@@ -132,10 +160,16 @@
               publishedAt: "${d.toISOString()}"
             }) { data { id } }
             updateMesimabetahalich(id: "${mba.id}", data: {
-              totalHoursSaved: ${(mbaa.totalHoursSaved ?? 0) + noofhours}
+              totalHoursSaved: ${(mbaa.totalHoursSaved ?? 0) + fileNow}
             }) { data { id } }
           `;
         }
+      } else if (heldHours > 0 && fileNow <= 0) {
+        // A finish whose every hour waits above the ceiling: the claim "this is done"
+        // stands, the hours do not — no empty row, they are written when she signs.
+        finnishedMissionMutation = `
+          updateMesimabetahalich(id: "${mba.id}", data: { finnished: true, forappruval: false }) { data { id } }
+        `;
       } else {
         // Mission completion: create the final FinnishedMission + mark the
         // mission done — `finnished: true` is what takes it off every board.
@@ -150,11 +184,11 @@
           createFinnishedMission(data: {
             missionName: ${gqlStr(fa.missname)},
             why: ${gqlStr(fa.why ?? '')},
-            noofhours: ${noofhours},
+            noofhours: ${fileNow},
             mesimabetahalich: "${mba.id}",
             mission: "${mbaa.mission.data.id}",
             perhour: ${perhour},
-            total: ${noofhours * perhour},
+            total: ${fileNow * perhour},
             project: "${projectId}",
             users_permissions_user: "${userId}",
             isFinished: true,
@@ -167,7 +201,7 @@
 
       const closeMutation = `mutation {
         ${finnishedMissionMutation}
-        updateFiniapruval(id: "${id}", data: { archived: true }) { data { id } }
+        updateFiniapruval(id: "${id}", data: ${heldHours > 0 ? `{ noofhours: ${heldHours} }` : '{ archived: true }'}) { data { id } }
         updateTimegrama(id: ${taid}, data: { done: true }) { data { id } }
       }`;
 
@@ -176,9 +210,34 @@
       if (res2?.data) {
         // Silence did this — tell the rikma, as the explicit vote does (N5).
         await tellMatured(
-          finiapprovalMatured({ projectId, name: fa.missname ?? '', hours: noofhours, isHours: isTimerSave }),
+          finiapprovalMatured({ projectId, name: fa.missname ?? '', hours: fileNow, isHours: isTimerSave }),
           fetch
         );
+        if (capped && heldHours > 0) {
+          // The rest is hers to answer: ask her, and tell the provider their hours wait.
+          await askCustomerForOverrun(execFromAdmin(SendToAdmin, env.ADMINMONTHER), capped.deal, capped.split, String(userId)).catch(
+            (e) => console.error('[timegrama/finiapp] hours held for the customer, but the request to her was not opened:', e)
+          );
+          await tellMatured(
+            [
+              overrunAwaitsCustomer({
+                sheirutId: capped.deal.sheirutId,
+                missionName: capped.deal.missionName,
+                hours: heldHours,
+                amount: capped.split.overValue,
+                clientIds: capped.deal.clientIds
+              }),
+              overrunHeldForProvider({
+                projectId: capped.deal.projectId,
+                sheirutId: capped.deal.sheirutId,
+                missionName: capped.deal.missionName,
+                hours: heldHours,
+                providerId: capped.deal.providerId
+              })
+            ],
+            fetch
+          );
+        }
         return 'sucsses' + id;
       }
 

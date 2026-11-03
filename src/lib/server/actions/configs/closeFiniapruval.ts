@@ -1,13 +1,13 @@
 import type { ActionConfig } from '../types.js';
-import { roundHours, workValue } from '$lib/timers/precision.js';
+import { roundHours } from '$lib/timers/precision.js';
 import { allSigned, roundOf, standingOrder, voterId } from '$lib/finiapruval/rounds.js';
 import { isHoursApproval } from '$lib/finiapruval/kind.js';
-import {
-    pickRateRow,
-    resolveRate,
-    rowRate,
-    type RateRow,
-} from '$lib/timers/rate.js';
+import { resolveRate } from '$lib/timers/rate.js';
+import { fileApprovedHours } from '$lib/server/finiapruval/fileApproved.js';
+import { askCustomerForOverrun, capApproval } from '$lib/server/sheirut/overCap.js';
+import { execFromContext } from '$lib/server/archive/exec.js';
+import { tellMatured } from '$lib/server/notifications/matured.js';
+import { overrunAwaitsCustomer, overrunHeldForProvider } from '$lib/server/notifications/maturedNotices.js';
 import { scope, decisionScope, scopeList } from '$lib/realtime/scopes.js';
 
 export const closeFiniapruvalConfig: ActionConfig = {
@@ -105,82 +105,72 @@ export const closeFiniapruvalConfig: ActionConfig = {
             mbaa?.perhour,
         );
 
-        const fmRows: RateRow[] = (mbaa?.finnished_missions?.data ?? []).map((fm: any) => ({
-            id: String(fm.id),
-            noofhours: Number(fm.attributes?.noofhours ?? 0),
-            perhour: fm.attributes?.perhour == null ? null : Number(fm.attributes.perhour),
-        }));
+        const run = (qid: string, vars: Record<string, unknown>) =>
+            strapi.execute(qid, vars, context.jwt, context.fetch);
 
-        if (isTimerSave) {
-            // Timer save approval: accumulate hours into the row of this rate era
-            const targetRow = pickRateRow(fmRows, perhour);
-            const existingFm = targetRow
-                ? mbaa?.finnished_missions?.data?.find((fm: any) => String(fm.id) === targetRow.id)
-                : null;
+        // A part of a customer's wish deal has a ceiling: what the rikma approves above the
+        // price she agreed for it waits for her signature instead of going into the shares
+        // (docs/inprogress/PLAN_DEAL_PRICING_TRACKS.md §3.2, $lib/server/sheirut/overCap). Every
+        // other mission files whole, as always. A deal that cannot be read throws — the
+        // vote fails and can be cast again, rather than billing her without her.
+        const capped = await capApproval(run, mba?.id, noofhours, perhour);
+        const fileNow = capped ? capped.split.inHours : noofhours;
+        const heldHours = capped ? capped.split.overHours : 0;
 
-            if (existingFm && targetRow) {
-                const newHours = roundHours((existingFm.attributes.noofhours ?? 0) + noofhours);
-                await strapi.execute('114updateFinnishedMissionHours', {
-                    id: existingFm.id,
-                    noofhours: newHours,
-                    total: workValue(newHours, rowRate(targetRow, perhour))
-                }, context.jwt, context.fetch);
-            } else {
-                await strapi.execute('113createFinnishedMissionForTimerSave', {
-                    missionName: fa.missname,
-                    noofhours,
-                    mesimabetahalich: mba?.id,
-                    mission: mbaa?.mission?.data?.id,
-                    project: fa.project?.data?.id,
-                    publishedAt: now.toISOString(),
-                    users_permissions_user: fa.users_permissions_user?.data?.id,
-                    perhour,
-                    total: workValue(noofhours, perhour),
-                    why: fa.why ?? 'timer save'
-                }, context.jwt, context.fetch);
+        await fileApprovedHours(run, {
+            finiapruvalId: String(finiapruvalId),
+            fa,
+            hours: fileNow,
+            perhour,
+            isTimerSave,
+            writeEmptyFinal: heldHours === 0,
+            now
+        });
+
+        if (capped && heldHours > 0) {
+            // The rikma said its yes; the rest is the customer's to answer. The approval
+            // stays open with the held hours only, every signature kept, and its clock is
+            // closed — so neither a second vote nor silence can file them past her.
+            await strapi.execute('386counterFiniapruval', {
+                id: finiapruvalId,
+                vots: allVots,
+                noofhours: heldHours
+            }, context.jwt, context.fetch);
+            const clock = timegramaId ?? fa.timegrama?.data?.id;
+            if (clock) {
+                await strapi.execute('35updateTimeGrama', { id: String(clock), done: true }, context.jwt, context.fetch)
+                    .catch((e: unknown) => console.warn('[closeFiniapruval] closing the clock of a held approval failed:', e));
             }
-
-            await strapi.execute('115updateMissionTotalHoursSaved', {
-                id: mba?.id,
-                totalHoursSaved: roundHours((mbaa?.totalHoursSaved ?? 0) + noofhours)
-            }, context.jwt, context.fetch);
-
-        } else {
-            // Mission completion: create the final FinnishedMission and mark the
-            // mission done.
-            //
-            // The row carries **only the hours this completion adds**, never the
-            // mission's running total. The accumulated rows from every timer save
-            // are still there and are still counted — this row used to be written
-            // as `accumulated + noofhours` while they stayed, so `buildBase`
-            // (which sums every finnished-mission of the rikma with no filter)
-            // counted the whole banked history a second time. Live: a mission with
-            // 5.005 banked hours completed at 5 more produced rows of 5.005 and
-            // 10.005 side by side — ₪250.26 of value out of thin air, straight
-            // into everybody's percentages (docs/inprogress/FIXES.md §5).
-            //
-            // One row per rate era is also what the timer-save branch above
-            // already does, and what the single-member path in completeMission.ts
-            // does. This makes all three agree.
-            await strapi.execute('119createFinnishedMissionFinal', {
-                missionName: fa.missname,
-                why: fa.why ?? '',
-                noofhours,
-                mesimabetahalich: mba?.id,
-                perhour,
-                total: workValue(noofhours, perhour),
-                project: fa.project?.data?.id,
-                mission: mbaa?.mission?.data?.id,
-                users_permissions_user: fa.users_permissions_user?.data?.id,
-                publishedAt: now.toISOString(),
-                finiapruvals: [finiapruvalId]
-            }, context.jwt, context.fetch);
-
-            await strapi.execute('105updateMesimabetahalichForFinish', {
-                id: mba?.id,
-                finnished: true,
-                forappruval: false
-            }, context.jwt, context.fetch);
+            const asked = await askCustomerForOverrun(execFromContext(context), capped.deal, capped.split, String(context.userId))
+                .catch((e: unknown) => {
+                    console.error('[closeFiniapruval] hours held for the customer, but the request to her was not opened:', e);
+                    return { opened: false, decisionId: null };
+                });
+            await tellMatured(
+                [
+                    overrunAwaitsCustomer({
+                        sheirutId: capped.deal.sheirutId,
+                        missionName: capped.deal.missionName,
+                        hours: heldHours,
+                        amount: capped.split.overValue,
+                        clientIds: capped.deal.clientIds
+                    }),
+                    overrunHeldForProvider({
+                        projectId: capped.deal.projectId,
+                        sheirutId: capped.deal.sheirutId,
+                        missionName: capped.deal.missionName,
+                        hours: heldHours,
+                        providerId: capped.deal.providerId
+                    })
+                ],
+                context.fetch
+            ).catch((e: unknown) => console.warn('[closeFiniapruval] overrun notices failed:', e));
+            return {
+                success: true,
+                closed: false,
+                isTimerSave,
+                heldForCustomer: { hours: heldHours, amount: capped.split.overValue, filed: fileNow, decisionId: asked.decisionId }
+            };
         }
 
         // Archive finiapruval with final votes + close timegrama

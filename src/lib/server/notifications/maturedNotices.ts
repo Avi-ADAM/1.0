@@ -632,3 +632,55 @@ export function stockReceiptSettled(p: { projectId: Id; name: string; quantity: 
     url: moach(p.projectId, 'sales/manage/stock')
   };
 }
+
+// ── hours above a deal part's ceiling (docs/inprogress/PLAN_DEAL_PRICING_TRACKS.md §3.2) ──
+
+/**
+ * The rikma approved hours on a part of a customer's deal, and some of them go above the
+ * price she agreed for it. Those hours wait for her: she is asked to sign a raise of the
+ * part, or to propose other terms. Her silence is not her yes — `consent`.
+ */
+export function overrunAwaitsCustomer(p: {
+  sheirutId: Id;
+  missionName: string;
+  hours: number;
+  amount: number;
+  clientIds: Id[];
+}): MaturedNotice {
+  const h = Math.round(p.hours * 100) / 100;
+  return {
+    kind: 'decision',
+    intent: 'consent',
+    to: { userIds: p.clientIds },
+    title: L('שעות מעבר למחיר שסוכם מחכות לך', 'Hours above the agreed price wait for you', 'ساعات تتجاوز السعر المتفق عليه بانتظارك'),
+    body: L(
+      `ב"${p.missionName}" הרקמה אישרה ${h} שעות (${p.amount}) מעבר למחיר שסוכם על החלק הזה. הן לא ייכנסו לחשבון שלך בלי החתימה שלך. אפשר לאשר, להציע שעות או תעריף אחרים, או לדבר על זה בעמוד העסקה.`,
+      `On "${p.missionName}" the rikma approved ${h} hours (${p.amount}) above the price agreed for this part. They are not added to your bill without your signature. Approve, propose other hours or another rate, or talk it over on the deal page.`,
+      `في «${p.missionName}» وافقت الريكما على ${h} ساعات (${p.amount}) فوق السعر المتفق عليه لهذا الجزء. لن تُضاف إلى حسابك بدون توقيعك. وافق، أو اقترح ساعات أو سعرًا آخر، أو ناقش ذلك في صفحة الصفقة.`
+    ),
+    url: p.sheirutId != null ? `/deals/${p.sheirutId}` : '/deals'
+  };
+}
+
+/** The provider whose hours are held: they are not lost, they wait for the customer. */
+export function overrunHeldForProvider(p: {
+  projectId: Id;
+  sheirutId: Id;
+  missionName: string;
+  hours: number;
+  providerId: Id;
+}): MaturedNotice {
+  const h = Math.round(p.hours * 100) / 100;
+  return {
+    kind: 'decision',
+    intent: 'personal',
+    to: { userIds: [p.providerId] },
+    title: L('חלק מהשעות מחכה ללקוחה', 'Some of your hours wait for the customer', 'جزء من ساعاتك بانتظار العميلة'),
+    body: L(
+      `${h} שעות ב"${p.missionName}" עוברות את המחיר שסוכם עם הלקוחה. הן לא אבדו: נפתחה בקשה להגדלת החלק, והן ייכנסו לחשבון כשהלקוחה תחתום עליה, או לפי מה שתסכימו ביניכם.`,
+      `${h} hours on "${p.missionName}" go above the price agreed with the customer. They are not lost: a request to raise the part is open, and they count once the customer signs it, or as you agree between you.`,
+      `${h} ساعات في «${p.missionName}» تتجاوز السعر المتفق عليه مع العميلة. لم تضع: فُتح طلب لزيادة الجزء، وتُحتسب عندما توقّع العميلة عليه، أو حسب ما تتفقان عليه.`
+    ),
+    url: p.sheirutId != null ? `/deals/${p.sheirutId}` : moach(p.projectId)
+  };
+}

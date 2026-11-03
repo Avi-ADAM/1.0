@@ -9103,6 +9103,23 @@ ${PROMO_DECISION_FIELDS}
     }
   }`,
 
+  // A mission's approvals that are still open, with whether their silence clock is closed —
+  // the ones held above a deal part's ceiling wait for the customer and are released when
+  // the part is raised (docs/inprogress/PLAN_DEAL_PRICING_TRACKS.md §3.2, $lib/server/sheirut/overCap).
+  // Server-only. `archived` is null on old rows, so "open" is null-or-false, never a bare ne.
+  '468missionOpenFiniapruvals': `query MissionOpenFiniapruvals($id: ID!) {
+    finiapruvals(
+      filters: { and: [
+        { mesimabetahalich: { id: { eq: $id } } },
+        { or: [{ archived: { null: true } }, { archived: { eq: false } }] }
+      ] }
+      sort: "id:asc"
+      pagination: { limit: 100 }
+    ) {
+      data { id attributes { timegrama { data { id attributes { done } } } } }
+    }
+  }`,
+
   // A part's new terms, once the rikma and the customer signed them: its ceiling follows.
   '399updateDealLineTerms': `mutation UpdateDealLineTerms($id: ID!, $hoursPerUnit: Float, $ratePerHour: Float) {
     updateMatanotRecipeMission(id: $id, data: { hoursPerUnit: $hoursPerUnit, ratePerHour: $ratePerHour, unitsPerProduct: 1 }) {

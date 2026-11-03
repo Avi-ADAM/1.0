@@ -14,6 +14,7 @@ import type { ArchRound, ObjectChangeDecision } from '$lib/server/archive/read.j
 import type { ExtraSigners, ExtraSignersFor } from '$lib/server/archive/vote.js';
 import { editedValue, raiseBy, raisesPart } from '$lib/sheirut/dealEdit.js';
 import { loadDealDue, type QidRunner } from './dealDue.js';
+import { releaseHeldHours } from './overCap.js';
 
 export interface MissionDeal {
   missionId: string;
@@ -29,6 +30,8 @@ export interface MissionDeal {
   cap: number;
   missionHours: number;
   missionRate: number;
+  /** Σ value already filed on the part (its mission's `FinnishedMission.total`). */
+  approved: number;
   providerId: string | null;
   providerName: string | null;
 }
@@ -72,6 +75,7 @@ export async function loadMissionDeal(run: QidRunner, missionId: string): Promis
       cap: line.cap,
       missionHours: line.missionHours ?? 0,
       missionRate: line.missionRate ?? 0,
+      approved: line.approved ?? 0,
       providerId: line.providerId,
       providerName: line.providerName ?? null
     };
@@ -118,7 +122,11 @@ export function signersFromDeal(run: QidRunner, deal: MissionDeal): DealSigners 
     ids: deal.clientIds,
     needed: (round: ArchRound) => round.mode === 'keep' && raisesPart(round, deal),
     onApplied: async (round: ArchRound) => {
-      if (round.mode === 'keep') await syncDealLine(run, deal, round);
+      if (round.mode !== 'keep') return;
+      await syncDealLine(run, deal, round);
+      // The part's ceiling moved: hours the rikma approved above the old one, held for her
+      // signature, are filed up to the new one (docs/inprogress/PLAN_DEAL_PRICING_TRACKS.md §3.2).
+      await releaseHeldHours(run, deal.missionId);
     }
   };
 }

@@ -100,6 +100,7 @@ const deal: MissionDeal = {
   cap: 600,
   missionHours: 10,
   missionRate: 60,
+  approved: 0,
   providerId: '1',
   providerName: 'u1'
 };
