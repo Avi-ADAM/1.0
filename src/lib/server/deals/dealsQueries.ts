@@ -67,6 +67,12 @@ export interface IncomingWishInvitation {
    * P2). Null when nobody chose, or while the switch is off.
    */
   pricingTrack?: PricingTrack | null;
+  /**
+   * A request for help (PLAN_DEAL_PRICING_TRACKS §5): on a wish she put on a fixed price,
+   * what she can pay for all of it, when it is below this part alone. Part of the work is a
+   * gift then, and only the provider's own yes gives it. Null otherwise.
+   */
+  helpAmount?: number | null;
   values: string[];
   categories: string[];
 }
@@ -87,6 +93,11 @@ function mapWishInvitation(
   if (!wisher) return null;
   const slotM = (pa.covered_missions ?? [])[0];
   const slotR = (pa.covered_resources ?? [])[0];
+  const slotPrice = typeof slotM?.price === 'number' ? slotM.price : typeof slotR?.price === 'number' ? slotR.price : null;
+  const helpAmount =
+    pricing?.wish === 'fixed' && ra.bounti === true && typeof ra.totalbounti === 'number' && slotPrice != null && ra.totalbounti < slotPrice
+      ? ra.totalbounti
+      : null;
 
   return {
     proposalId: String(node.id),
@@ -116,12 +127,8 @@ function mapWishInvitation(
     ),
     pricingTrack: pricing ? (pricing.proposals[String(node.id)]?.track ?? pricing.wish) : null,
     slotHours: typeof slotM?.hours === 'number' ? slotM.hours : null,
-    slotPrice:
-      typeof slotM?.price === 'number'
-        ? slotM.price
-        : typeof slotR?.price === 'number'
-          ? slotR.price
-          : null,
+    slotPrice,
+    helpAmount,
     values: (ra.vallues?.data ?? []).map((v: any) => v.attributes?.valueName).filter(Boolean),
     categories: (ra.categories?.data ?? []).map((c: any) => c.attributes?.name).filter(Boolean)
   };

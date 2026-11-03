@@ -36,6 +36,7 @@ import { openWishGaps, type OpenGapsResult } from '$lib/server/wish/openGaps.js'
 import { scope, scopeList } from '$lib/realtime/scopes.js';
 import { dealPricingTrack, type PricingTrack } from '$lib/sheirut/pricingTrack';
 import { readWishPricing } from '$lib/server/wish/pricingTrack';
+import { fixedDealPrice } from '$lib/sheirut/dealSupport';
 
 const handler: ActionExecutionHandler = async (params, context, util) => {
   const { strapi } = util;
@@ -244,8 +245,24 @@ const handler: ActionExecutionHandler = async (params, context, util) => {
   // Written only when someone chose a track: null is legacy = atCost, so a deal nobody
   // chose for stays exactly as it was, and a backend without the field never sees it.
   if (serviceId && pricingTrack) {
+    // On a fixed price she pays what she said she can, never more than the plan (P7): a
+    // price below it is the providers' gift (`dealSupport`), and each of them said yes to
+    // it themselves — their silence never matured it (`matureWishProposal`). A price of 0
+    // bills nothing, so the deal is paid as it opens (P4).
+    // Her amount is a price only when she chose a fixed price herself; on a wish she left
+    // at cost (or "not sure") it is a ceiling, and a provider who countered with a fixed
+    // price agreed to their own figure, never to hers.
+    const price = fixedDealPrice({
+      track: pricingTrack,
+      given: ratAttrs.bounti === true && pricing?.wish === 'fixed',
+      amount: ratAttrs.totalbounti,
+      planValue: total
+    });
+    const data: Record<string, unknown> = { pricingTrack };
+    if (Math.abs(price - total) >= 0.005) Object.assign(data, { total: price, price });
+    if (pricingTrack === 'fixed' && price <= 0) Object.assign(data, { moneyTransfered: true, iTransferMoney: true });
     try {
-      await strapi.execute('213updateSheirut', { id: serviceId, data: { pricingTrack } }, context.jwt, context.fetch);
+      await strapi.execute('213updateSheirut', { id: serviceId, data }, context.jwt, context.fetch);
     } catch (e) {
       console.error('[materializeWish] recording the pricing track failed (deal reads atCost):', e);
     }

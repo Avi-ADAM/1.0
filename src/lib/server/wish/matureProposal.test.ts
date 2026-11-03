@@ -1,5 +1,12 @@
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { matureWishProposal, type MatureDeps } from './matureProposal';
+
+// The pricing tracks are read only while the switch is on (P7's gift rule needs them).
+const flag = vi.hoisted(() => ({ on: false }));
+vi.mock('$lib/sheirut/pricingTracksFlag', () => ({ pricingTracksEnabled: () => flag.on }));
+afterEach(() => {
+  flag.on = false;
+});
 
 /**
  * QA_CONCIERGE_E2E C-9 — "silence is consent, at the pace of the wish". When the clock
@@ -32,6 +39,9 @@ interface Opts {
   matanot?: boolean;
   needTaken?: boolean;
   noWish?: boolean;
+  /** Extra wish attributes (bounti / totalbounti), and the tracks 469 answers. */
+  wish?: Record<string, unknown>;
+  track?: string | null;
 }
 
 function setup(o: Opts = {}) {
@@ -52,7 +62,8 @@ function setup(o: Opts = {}) {
                   id: '16',
                   attributes: {
                     status_ratson: o.wishStatus ?? 'open',
-                    users_permissions_users: { data: [{ id: WISHER }] }
+                    users_permissions_users: { data: [{ id: WISHER }] },
+                    ...(o.wish ?? {})
                   }
                 }
               },
@@ -77,6 +88,8 @@ function setup(o: Opts = {}) {
               }
             }
           };
+        case '469ratsonPricingTrack':
+          return { data: { ratson: { data: { id: '16', attributes: { pricingTrack: o.track ?? null } } }, ratsonProposals: { data: [] } } };
         case '388getRatsonRestime':
           return { data: { ratson: { data: { attributes: { restime: o.restime ?? null } } } } };
         case '392getOpenMissionArchived':
@@ -236,5 +249,33 @@ describe('what silence never does', () => {
     vi.spyOn(console, 'error').mockImplementation(() => {});
     expect(await matureWishProposal('77', 'T1', w.deps)).toBe('retry');
     expect(w.actions.map((a) => a.key)).toEqual(['acceptWishOffer']); // the close never ran
+  });
+});
+
+describe('a gift is the provider’s own yes (PLAN_DEAL_PRICING_TRACKS §5.2)', () => {
+  const gift = { wish: { bounti: true, totalbounti: 50 }, track: 'fixed' };
+
+  it('on a fixed price below the work, the provider’s silence gives nothing away', async () => {
+    flag.on = true;
+    const w = setup({ entries: wisherCounter(), ...gift });
+    expect(await matureWishProposal('77', 'T1', w.deps)).toBe('closed:a gift needs the provider’s own yes');
+    expect(w.actions).toEqual([]);
+    expect(w.closed).toEqual(['T1']);
+  });
+
+  it('her silence still matures what the provider put on the table', async () => {
+    flag.on = true;
+    const w = setup({ entries: providerCounter(), ...gift });
+    expect(await matureWishProposal('77', 'T1', w.deps)).toBe('matured');
+  });
+
+  it('a fixed price that covers the work, an at-cost wish, or the switch off: silence as always', async () => {
+    flag.on = true;
+    expect(await matureWishProposal('77', 'T1', setup({ entries: wisherCounter(), wish: { bounti: true, totalbounti: 900 }, track: 'fixed' }).deps)).toBe('matured');
+    expect(await matureWishProposal('77', 'T1', setup({ entries: wisherCounter(), ...gift, track: 'atCost' }).deps)).toBe('matured');
+    // Her amount on a wish she left at cost is a ceiling, not a price — no gift there either.
+    expect(await matureWishProposal('77', 'T1', setup({ entries: wisherCounter(), ...gift, track: null }).deps)).toBe('matured');
+    flag.on = false;
+    expect(await matureWishProposal('77', 'T1', setup({ entries: wisherCounter(), ...gift }).deps)).toBe('matured');
   });
 });

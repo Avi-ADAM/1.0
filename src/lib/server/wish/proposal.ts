@@ -45,6 +45,8 @@ export interface WishProposal {
    * (PLAN_DIRECT_OFFER §4.3) — stamp it on every entry this action writes.
    */
   signDigest: string;
+  /** The wish's other proposals: their status and price (what the plan is worth so far). */
+  siblings: Array<{ id: string; status: string | null; price: number }>;
 }
 
 /**
@@ -133,7 +135,14 @@ export async function loadWishProposal(
     version,
     entries,
     standing: standing(ref, entries, version, wishDigestOf(ratsonAttrs)),
-    signDigest: signDigestOf(ratsonAttrs)
+    signDigest: signDigestOf(ratsonAttrs),
+    siblings: (res?.data?.ratsonProposals?.data ?? [])
+      .filter((n: any) => String(n.id) !== String(proposalId))
+      .map((n: any) => ({
+        id: String(n.id),
+        status: n?.attributes?.status_proposal ?? null,
+        price: Number(n?.attributes?.total_price) || 0
+      }))
   };
 }
 

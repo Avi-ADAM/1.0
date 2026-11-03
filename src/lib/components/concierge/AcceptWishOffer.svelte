@@ -49,6 +49,7 @@
     item,
     negotiation = null,
     pricingTrack = null,
+    helpAmount = null,
     onClose,
     onDone
   }: {
@@ -58,6 +59,8 @@
     negotiation?: Negotiation | null;
     /** How the money works on this proposal (PLAN_DEAL_PRICING_TRACKS P2); null = nobody chose, or the switch is off. */
     pricingTrack?: PricingTrack | null;
+    /** A request for help: what she can pay for the whole wish, below this part (PLAN_DEAL_PRICING_TRACKS §5). */
+    helpAmount?: number | null;
     onClose?: () => void;
     onDone?: (result: { accepted: boolean }) => void;
   } = $props();
@@ -230,6 +233,14 @@
           {#if pricingTrack}<span>{$tr(`deals.pricingTrack.${pricingTrack}`)}</span>{/if}
         </div>
       </div>
+
+      {#if helpAmount != null}
+        <!-- Part of this work would be a gift — only the provider's own yes gives it (§5.2). -->
+        <p class="ofr-help" role="note">
+          <strong>{helpAmount > 0 ? $tr('deals.help.symbolic') : $tr('deals.help.free')}</strong>
+          {helpAmount > 0 ? $tr('deals.help.explainSymbolic', { amount: String(helpAmount) }) : $tr('deals.help.explainFree')}
+        </p>
+      {/if}
 
       {#if negotiation?.termsChanged}
         <!-- New details of the wish are a new version: read them before you sign again. -->
@@ -513,4 +524,6 @@
   .ofr-done-body { font-size: 13px; color: var(--tm, #9a8f80); line-height: 1.55; margin-bottom: 16px; }
   .ofr-err-title { font-size: 16px; font-weight: 700; color: var(--pink-l, #ff6496); margin-bottom: 6px; }
   .ofr-err-msg { font-size: 12.5px; color: var(--tm, #9a8f80); margin-bottom: 14px; word-break: break-word; }
+  .ofr-help { margin: 10px 0 0; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--gold); font-size: 12px; line-height: 1.5; color: var(--text); }
+  .ofr-help strong { color: var(--gold-l); margin-inline-end: 4px; }
 </style>

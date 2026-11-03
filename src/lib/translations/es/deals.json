@@ -299,5 +299,11 @@
     "deliveredToast": "Enviado a la clienta para aprobar",
     "acceptedToast": "La recepción quedó registrada",
     "defectsToast": "La lista se envió a la rikma"
+  },
+  "help": {
+    "symbolic": "Precio simbólico.",
+    "free": "Una solicitud de ayuda.",
+    "explainSymbolic": "La clienta puede pagar hasta {{amount}} por todo el deseo, menos de lo que vale esta parte. La diferencia es tu regalo, y solo tu propio sí lo da: si no respondes, la propuesta no se aprueba sola.",
+    "explainFree": "La clienta no puede pagar este deseo. El trabajo sería tu regalo, y solo tu propio sí lo da: si no respondes, la propuesta no se aprueba sola."
   }
 }

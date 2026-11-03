@@ -18,6 +18,10 @@
  *                       then the wisher's own close — she already put those terms on
  *                       the table, and nobody has to click twice for a silence.
  *
+ * One silence is never consent: a provider's, on a fixed price below what the work is
+ * worth (PLAN_DEAL_PRICING_TRACKS §5.2). That gap is a gift of their work, and only they
+ * give it — so the clock closes, and the proposal waits for their own yes.
+ *
  * Everything that is not a live, negotiated proposal closes its clock without acting
  * (the rule of the whole dispatcher: a clock we will not act on must be closed). A
  * maturation that *fails* leaves the clock open, so the next run tries again instead
@@ -29,7 +33,10 @@
 import { otherParty } from '$lib/wish/proposalRounds.js';
 import { lastSignedAt, proposalDeadline, silenceApplies } from '$lib/wish/restime.js';
 import { readWishRestime } from './clock.js';
-import { loadWishProposal } from './proposal.js';
+import { loadWishProposal, type WishProposal } from './proposal.js';
+import { readWishPricing } from './pricingTrack.js';
+import { pricingTracksEnabled } from '$lib/sheirut/pricingTracksFlag';
+import { wishGivesSupport } from '$lib/sheirut/dealSupport';
 
 type Strapi = { execute: (qid: string, vars: any, jwt: string, fetch: any) => Promise<any> };
 
@@ -49,6 +56,27 @@ export interface MatureDeps {
 
 const ENDED_WISH = new Set(['fulfilled', 'cancelled', 'expired', 'draft']);
 const OPEN_PROPOSAL = new Set(['suggested', 'viewed']);
+
+/**
+ * Whether this proposal's provider would give part of their work: the wish is on a fixed
+ * price, she named what she can pay, and it is below what is already on the table — the
+ * proposals she accepted plus this one's standing version. A lower bound of the plan, so
+ * a gift is never missed for want of the parts nobody offered yet. Off, never.
+ */
+async function givesWork(strapi: Strapi, ctx: { jwt: string; fetch: any }, p: WishProposal): Promise<boolean> {
+  if (!pricingTracksEnabled()) return false;
+  const pricing = await readWishPricing(strapi, ctx, p.ratsonId);
+  const track = pricing?.proposals[p.proposalId]?.track ?? pricing?.wish ?? null;
+  const accepted = p.siblings.filter((s) => s.status === 'accepted').reduce((t, s) => t + s.price, 0);
+  const mine = Number(p.version?.price ?? p.attrs?.total_price) || 0;
+  return wishGivesSupport({
+    track,
+    // Her amount is a price only on a wish she put on a fixed price herself.
+    given: p.ratsonAttrs?.bounti === true && pricing?.wish === 'fixed',
+    amount: p.ratsonAttrs?.totalbounti,
+    planValue: accepted + mine
+  });
+}
 
 export async function matureWishProposal(proposalId: string, taid: string, deps: MatureDeps): Promise<MatureOutcome> {
   const { strapi, jwt, fetch } = deps;
@@ -102,6 +130,7 @@ export async function matureWishProposal(proposalId: string, taid: string, deps:
   if (!wisher || !provider) return close('no parties');
 
   const silent = otherParty(p.standing.signedBy);
+  if (silent === 'provider' && (await givesWork(strapi, { jwt, fetch }, p))) return close('a gift needs the provider’s own yes');
   const base = { proposalId: String(proposalId), ratsonId: String(ratsonId), viaSilence: true };
   const steps: [string, string][] =
     p.path === 'invite'

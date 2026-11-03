@@ -125,6 +125,7 @@
     item={offerItem}
     {negotiation}
     pricingTrack={wish.pricingTrack ?? null}
+    helpAmount={wish.helpAmount ?? null}
     onClose={() => (showOffer = false)}
     {onDone}
   />
