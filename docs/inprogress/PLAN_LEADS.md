@@ -1,6 +1,9 @@
 # PLAN — לידים ברקמה: טבלה מסודרת, מטלה לכל ליד, וחיבור לחנות
 
-> **מצב: תכנית בלבד — אין קוד.** נכתב 2026-11-03 אחרי קריאת הקוד והמסמכים
+> **מצב (2026-11-03): L0 בנוי ב-`1.0b` (ענף `shabab`), ממתין ל-deploy + הרשאות (§7.5).**
+> L1 ואילך — עוד לא בקוד.
+>
+> נכתב 2026-11-03 אחרי קריאת הקוד והמסמכים
 > (`demo-request`, `createTask`, `/api/v1/r/[rikma]/*`, `webhooks/`, מסך
 > `sales/manage`), לא אחרי הנחות.
 >
@@ -26,8 +29,8 @@
 > [PLAN_SHOP_CUSTOMER_EXPERIENCE](../inprogress/PLAN_SHOP_CUSTOMER_EXPERIENCE.md) — הזמנות,
 > S3b (בקשת רכש ל-`quote`), לשונית "לקוחות" (§7.3).
 > [PLAN_SALE_CUSTOMER_LINK](../done/PLAN_SALE_CUSTOMER_LINK.md) — לקוח↔מכירה דרך `Sheirut`.
-> [PLAN_HEADLESS_PRODUCTS_API](./PLAN_HEADLESS_PRODUCTS_API.md) — הכתובת היא הרקמה, מפתחות, webhooks.
-> [UX_COPY_SHOP_SALES](./UX_COPY_SHOP_SALES.md) — נוסח מסך המכירות.
+> [PLAN_HEADLESS_PRODUCTS_API](../tbd/PLAN_HEADLESS_PRODUCTS_API.md) — הכתובת היא הרקמה, מפתחות, webhooks.
+> [UX_COPY_SHOP_SALES](../tbd/UX_COPY_SHOP_SALES.md) — נוסח מסך המכירות.
 
 ---
 
@@ -119,7 +122,7 @@
 | `organization` | string | חברה / בניין / ארגון ("ועד בית הרצל 12") |
 | `city` / `address` | string | אופציונלי |
 | `message` | text | מה הפונה כתב. **לא** נכנס ל-manifest התרגום (`fields.js`) |
-| `attributes` | json | שדות חופשיים של המקור (`{ apartments: 16, interest: "shared" }`). מוצגים כטבלת מפתח/ערך |
+| `details` | json | שדות חופשיים של המקור (`{ apartments: 16, interest: "shared" }`). מוצגים כטבלת מפתח/ערך. **לא** `attributes` — ב-GraphQL של Strapi 4 זה כבר שם העטיפה של כל ישות (`data { attributes { … } }`) |
 | `status` | enum (§2.1) | ברירת מחדל `new` |
 | `pausedReason` | enum `timing · budget · noAnswer · choseOther · notFit · other` | + `pausedNote` (text). כמו "Lost reason" בכלים המקצועיים — כדי לספור למה פניות נעצרות (§4.0) |
 | `followUpAt` | datetime | "לחזור אליו ב-" |
@@ -339,7 +342,7 @@ choseOther · notFit · other`) + טקסט חופשי, כדי שהרקמה תו�
 
 - כותרת: שם, ארגון, סטטוס (בורר), אחראי (או כפתור "קח"), "לחזור ב-", הצעד הבא.
 - פרטי קשר עם קישורי `tel:` / `wa.me` / `mailto:` — לחיצה מציעה "לרשום את השיחה?".
-- `attributes` כטבלה; המוצרים שהוא מתעניין בהם; הזמנות/מכירות מקושרות.
+- `details` כטבלה; המוצרים שהוא מתעניין בהם; הזמנות/מכירות מקושרות.
 - **ציר זמן**: היומן + הודעות ה-forum של המטלה, ממוזגים לפי זמן, מסומנים שונה
   ("מול הלקוח" / "בין החברים").
 - **הצעד הבא** (§4.0): "שלח הצעה" ⇒ הזמנה ב-`sent` עם פרטי הקונה ממולאים מראש (§5.5);
@@ -377,7 +380,7 @@ choseOther · notFit · other`) + טקסט חופשי, כדי שהרקמה תו�
   "organization": "בניין הרצל 12, חיפה",
   "city": "חיפה",
   "message": "16 דירות, אין ועד פעיל",
-  "attributes": { "apartments": 16, "interest": "shared", "role": "resident" },
+  "details": { "apartments": 16, "interest": "shared", "role": "resident" },
   "productId": "123",
   "externalId": "lead_6f1c…",
   "sourceLabel": "טופס דף הבית",
@@ -395,7 +398,7 @@ choseOther · notFit · other`) + טקסט חופשי, כדי שהרקמה תו�
 ```
 
 ולידציות: `name` + (`email`|`phone`) + `consent` — חובה (`400 CONSENT_REQUIRED`).
-`productId` חייב להיות מוצר של הרקמה (`404`). `attributes` עד 4KB, עד 30 מפתחות,
+`productId` חייב להיות מוצר של הרקמה (`404`). `details` עד 4KB, עד 30 מפתחות,
 ערכים פרימיטיביים בלבד. `message` עד 4,000 תווים.
 
 ### 5.2 מפתח ציבורי — לאתר סטטי בלי שרת
@@ -439,7 +442,7 @@ scope `leads:read`. מחזיר `{ leadId, externalId, status, hasOwner, lastActi
 - **מי רואה**: `projectMember` בלבד. qids חדשים (`leadsList`, `leadGet`,
   `leadActivities`) מסומנים ב-`qidsAccess.js` כ-`conditional` עם guard חברות;
   פרטי קשר לא יוצאים ב-API ציבורי, ב-webhook או ב-`GET /leads/{externalId}`.
-- **"שכח אותי"** — action `anonymizeLead`: מוחק `name/email/phone/address/message/attributes`,
+- **"שכח אותי"** — action `anonymizeLead`: מוחק `name/email/phone/address/message/details`,
   משאיר סטטוס, מקור, תאריכים וקישורים (שהמספרים של הרקמה יישארו נכונים),
   רושם `system` ביומן. כל חבר יכול להפעיל — זו בקשה של אדם, לא החלטה של הרקמה.
 - **שמירה**: ליד ב-`paused`/`spam` בלי פעילות 18 חודשים ⇒ אנונימיזציה אוטומטית
@@ -447,7 +450,7 @@ scope `leads:read`. מחזיר `{ leadId, externalId, status, hasOwner, lastActi
 - **עזיבת רקמה**: חבר שעזב מאבד גישה מיד (חברות נבדקת בכל בקשה); הלידים שהיו
   שלו חוזרים ל"בלי אחראי" עם התראה לרקמה.
 - **לוגים וטלגרם**: בלי פרטי קשר. ההתראה לטלגרם (אם מוגדרת) — שם + מקור בלבד.
-- `message` ו-`attributes` הם טקסט של הפונה ⇒ escape בכל מקום שמוצג (HTML, מייל, טלגרם).
+- `message` ו-`details` הם טקסט של הפונה ⇒ escape בכל מקום שמוצג (HTML, מייל, טלגרם).
 
 ---
 
@@ -487,12 +490,21 @@ scope `leads:read`. מחזיר `{ leadId, externalId, status, hasOwner, lastActi
 `webhooks/leadEvents.ts`, באותה תבנית של `orderEvents.ts` (לא הרחבה של
 `WEBHOOK_ACTIONS`, שהוא סט של task בלבד).
 
-### 7.5 Strapi (`1.0b`) — מסמך משלים נדרש
+### 7.5 Strapi (`1.0b`) — L0, בנוי
 
-`lead`, `lead-activity`, `Project.leadSettings`, ו-`leads` (relation הפוך) על
-`order`. הרשאות Authenticated: `lead` find/findOne/create/update,
-`lead-activity` find/findOne/create (**בלי update/delete**). אחרי פריסה: `npm run types:update`
-ו-`npm run validate:qids`.
+בקוד (`1.0b`): `src/api/lead/`, `src/api/lead-activity/`, `Project.leadSettings` (json, לא
+מתורגם) + `Project.leads`, ו-`Order.leads` (manyToMany, הצד ההפוך של `Lead.orders`).
+`npx strapi ts:generate-types` טוען את הסכמה בלי שגיאות. הבדלים מ-§2.2:
+- השדה החופשי נקרא **`details`**, לא `attributes` (ראו §2.2).
+- המטבע הוא `currencyCode` (כמו `Order`), ונוסף `previousLead` (§2.4).
+- ייחודיות (`project`, `externalId`) ו-(`project`, `dedupeKey`) נאכפת ב-`createLead`, לא בסכמה —
+  ל-Strapi 4 אין אינדקס ייחודי מורכב.
+
+**אחרי הפריסה — ביד, באדמין** (קולקציה חדשה צריכה שתי הענקות, ו-`validate:qids` בודק רק mutations):
+1. **Authenticated**: `lead` find/findOne/create/update; `lead-activity` find/findOne/create
+   (**בלי update/delete**).
+2. **ה-API token של השרת**: אותן הרשאות.
+3. ב-1.0main: `npm run types:update`, ואז `npm run validate:qids`.
 
 ### 7.6 i18n
 
@@ -506,7 +518,7 @@ namespace חדש `leads` ב-`ROUTED` רק לנתיבי `sales/*` (כמו `shop`)
 
 | # | מה | תלוי ב- | אומדן |
 |---|---|---|---|
-| L0 | סכמה ב-1.0b (`lead`, `lead-activity`, `leadSettings`) + הרשאות + types | — | יום |
+| L0 ✅ | סכמה ב-1.0b (`lead`, `lead-activity`, `leadSettings`) + הרשאות + types — **הקוד בנוי; ממתין ל-deploy, הרשאות ו-`types:update` (§7.5)** | — | יום |
 | L1 | `src/lib/leads/` טהור (`validateLeadPayload`, `dedupeKey`, `needsAttention`, מעברי סטטוס) + vitest; actions `createLead` / `logLeadActivity` / `updateLeadStatus` + סנכרון מטלה | L0 | 2–3 ימים |
 | L2 | `POST /leads` + `GET /leads/{externalId}` + scopes + webhooks + OpenAPI (`rikma-v1.openapi.yaml`) | L1 | 1–2 ימים |
 | L3a | המסלול (§4.0): `stageOf` (ליד · הזמנה · הצעת קונסיירז') + vitest; סנכרון `offered`/`won`/`cancelled` מ-`createPaidOrder`, `orderLifecycle`, `createSale`; סידור הלשוניות לפי המסלול, לשוניות לפי מה שיש, `/sales/manage` ⇒ הלשונית שמחכה, קישורים קיימים ⇒ `/manage/orders` | L1 | 2 ימים |
@@ -536,7 +548,7 @@ namespace חדש `leads` ב-`ROUTED` רק לנתיבי `sales/*` (כמו `shop`)
    PLAN_OBJECT_ARCHIVAL: הצעה, שתיקה משלימה, לבעלים יש restime להגיב).
 4. **פרטים אישיים אצל צד שלישי** — הפונה הסכים לרקמה, לא ל-1lev1 כפלטפורמה.
    הנוסח שהאתר מציג חייב להזכיר את 1lev1; `consentText` נשמר כדי שאפשר יהיה להראות מה נאמר לו.
-5. **`attributes` כ-JSON חופשי** — נוח לכל אתר, אבל אין סינון לפיו ב-MVP. אם רקמה
+5. **`details` כ-JSON חופשי** — נוח לכל אתר, אבל אין סינון לפיו ב-MVP. אם רקמה
    צריכה לסנן ("בניינים עם 20+ דירות") — שדות מוגדרים לרקמה הם תכנית נפרדת.
 
 ## 10. מה במכוון **לא**
