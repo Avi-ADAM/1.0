@@ -334,6 +334,25 @@
     "budgetPlaceholder": "p. ej. 500",
     "budgetNoCap": "Sin presupuesto",
     "budgetHint": "El presupuesto es lo máximo que pagarás. En la práctica, cada parte se cobra según lo aprobado en ella, nunca más del precio acordado. Las propuestas se ordenan por calidad de coincidencia, no solo por precio.",
+    "money": {
+      "question": "¿Cómo funciona el dinero?",
+      "unsure": "No estoy seguro/a",
+      "unsureSub": "Deja que los proveedores propongan una modalidad en su propuesta.",
+      "fixed": "Precio cerrado",
+      "fixedSub": "Sabes de antemano cuánto cuesta. Apruebas cuando está listo.",
+      "atCost": "Pago transparente",
+      "atCostSub": "Pagas lo que realmente se hace, hasta un monto que tú fijas. Lo que lo supere necesita tu aprobación.",
+      "fixedAmount": "¿Cuánto puedes pagar? (₪)",
+      "atCostAmount": "¿Hasta cuánto? (₪)",
+      "fixedHelp": "¿No puedes pagar? Puedes poner 0 o un monto simbólico.",
+      "valueFixed": "Precio cerrado · {{amount}}",
+      "valueAtCost": "Pago transparente · hasta {{amount}}",
+      "valueFree": "Precio cerrado · sin pago",
+      "refuse": {
+        "ceiling": "El pago transparente necesita un monto máximo mayor que 0.",
+        "amount": "El monto no puede ser negativo."
+      }
+    },
     "inviteHint": "Esta elección ayuda a Lev a saber cuánta iniciativa tomar y cuánto esperarte.",
     "minJoiners": "Mínimo de participantes",
     "minJoinersPlaceholder": "p. ej. 2",
@@ -529,5 +548,11 @@
   "total_within": "Dentro de tu presupuesto",
   "total_over": "Por encima de tu presupuesto en",
   "total_over_hint": "Puedes hacer una contrapropuesta sobre una parte, o prescindir de una parte que no necesites.",
-  "pay_disclosure": "Cómo pagas: cada parte se cobra según lo realmente aprobado en ella (las horas que aprueba la rikma, o el precio acordado de un recurso), nunca más del precio acordado. El total del plan es un tope, no una factura final. Las horas por encima no se añaden sin tu firma."
+  "pay_disclosure": "Cómo pagas: cada parte se cobra según lo realmente aprobado en ella (las horas que aprueba la rikma, o el precio acordado de un recurso), nunca más del precio acordado. El total del plan es un tope, no una factura final. Las horas por encima no se añaden sin tu firma.",
+  "track_fixed": "Precio cerrado",
+  "track_atCost": "Pago transparente",
+  "track_unsure": "Aún sin decidir",
+  "track_free": "Sin pago",
+  "neg_track": "Cómo se paga",
+  "pay_disclosure_fixed": "Cómo pagas: precio cerrado. Pagas el monto acordado cuando el trabajo está listo y confirmaste que lo recibiste. Lo de dentro (quién, cuántas horas, cómo se reparte) es asunto de la rikma. Un cambio de alcance necesita tu firma."
 }

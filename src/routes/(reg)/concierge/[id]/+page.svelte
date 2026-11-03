@@ -10,6 +10,7 @@
   import { toast } from 'svelte-sonner';
   import { t, locale } from '$lib/translations';
   import { refuseCounter as refuseProposalCounter } from '$lib/wish/proposalRounds';
+  import { dealPricingTrack, effectivePricingTrack } from '$lib/sheirut/pricingTrack';
   import ExternalOfferCard from '$lib/components/concierge/ExternalOfferCard.svelte';
   import ConciergeBell from '$lib/components/concierge/ConciergeBell.svelte';
   import DealStages from '$lib/components/deals/DealStages.svelte';
@@ -19,7 +20,7 @@
   import { tick } from 'svelte';
   import { page } from '$app/state';
 
-  /** @type {{ data: { wish: any | null; proposals: any[]; loadOk: boolean; uid?: string; isOwner: boolean; enrichment?: any; forumMessages?: any[]; missionTemplates?: any[]; external?: any; bell?: { id: string; name: string; count: number }[]; notices?: import('$lib/notices').Notice[] | null; published?: { missions: { name: string; extractedKey: string | null }[]; resources: { name: string; extractedKey: string | null }[] }; gaps?: { label: string; imp: 'must' | 'nice' }[] | null; stages?: import('$lib/sheirut/dealChain').DealStageView[]; partLines?: Record<string, string[]> | null; pool?: import('$lib/server/maagad/wishPool').WishPoolPanel | null } }} */
+  /** @type {{ data: { wish: any | null; proposals: any[]; loadOk: boolean; uid?: string; isOwner: boolean; enrichment?: any; forumMessages?: any[]; missionTemplates?: any[]; external?: any; bell?: { id: string; name: string; count: number }[]; notices?: import('$lib/notices').Notice[] | null; published?: { missions: { name: string; extractedKey: string | null }[]; resources: { name: string; extractedKey: string | null }[] }; gaps?: { label: string; imp: 'must' | 'nice' }[] | null; stages?: import('$lib/sheirut/dealChain').DealStageView[]; partLines?: Record<string, string[]> | null; pool?: import('$lib/server/maagad/wishPool').WishPoolPanel | null; pricing?: import('$lib/server/wish/pricingTrack').WishPricing | null } }} */
   let { data } = $props();
 
   // The bell's "expand" (docs/inprogress/PLAN_SMART_NOTICES.md) links to #proposal-<id>.
@@ -1357,6 +1358,26 @@
     });
   }
 
+  /* ===== How the money works (PLAN_DEAL_PRICING_TRACKS P2) =====
+   * Read only while the switch is on (data.pricing is null otherwise): a proposal's own
+   * track, or the wish's when it has none. */
+  const TRACKS = $derived(!!data?.pricing);
+  const trackOf = (proposalId) =>
+    data?.pricing?.proposals?.[String(proposalId)]?.track ?? data?.pricing?.wish ?? null;
+  /** The deal's track if she closed now — what the disclosure above the close button tells. */
+  const DEAL_TRACK = $derived(
+    effectivePricingTrack(
+      data?.pricing
+        ? dealPricingTrack(
+            data.pricing.wish,
+            Object.values(data.pricing.proposals)
+              .filter((p) => p.status === 'accepted')
+              .map((p) => p.track)
+          )
+        : null
+    )
+  );
+
   /* ===== Counter on a proposal's terms (QA C-9) =====
    * There is no flat "no": terms she cannot take are answered with the terms she
    * could — hours and price, with the reason. The provider approves them or
@@ -1368,19 +1389,27 @@
   let counterNote = $state('');
   let counterBusy = $state(false);
   let counterError = $state('');
+  let counterTrackFrom = $state(/** @type {'atCost'|'fixed'|null} */ (null));
+  let counterTrack = $state(/** @type {'atCost'|'fixed'|null} */ (null));
+  const counterTrackChanged = $derived(TRACKS && counterTrack != null && counterTrack !== counterTrackFrom);
 
-  const counterRefusal = $derived(
-    counterFor
-      ? refuseProposalCounter(
-          counterCurrent,
-          {
-            amount: counterHours === '' ? undefined : counterHours,
-            price: counterPrice === '' ? undefined : counterPrice
-          },
-          counterNote
-        )
-      : null
-  );
+  const counterRefusal = $derived.by(() => {
+    if (!counterFor) return null;
+    const r = refuseProposalCounter(
+      counterCurrent,
+      {
+        amount: counterHours === '' ? undefined : counterHours,
+        price: counterPrice === '' ? undefined : counterPrice
+      },
+      counterNote
+    );
+    // Same numbers, the other track: still a counter — as the server reads it.
+    return r === 'same' && counterTrackChanged
+      ? counterNote.trim().length < 8
+        ? 'note'
+        : null
+      : r;
+  });
 
   function openCounter(p) {
     counterFor = p.proposalId;
@@ -1391,6 +1420,8 @@
     counterPrice = price ?? '';
     counterNote = '';
     counterError = '';
+    counterTrackFrom = trackOf(p.proposalId);
+    counterTrack = counterTrackFrom;
   }
   function closeCounter() {
     counterFor = null;
@@ -1412,6 +1443,7 @@
             ratsonId: String(wishId),
             ...(counterHours !== '' ? { hours: Number(counterHours) } : {}),
             ...(counterPrice !== '' ? { price: Number(counterPrice) } : {}),
+            ...(counterTrackChanged ? { pricingTrack: counterTrack } : {}),
             note: counterNote.trim()
           }
         })
@@ -1598,8 +1630,15 @@
             .join(' · ')
         : '';
     if (where) out.push({ icon: '📍', label: $t('concierge.hero_where'), text: where });
-    if (typeof w.totalBounti === 'number' && w.totalBounti > 0) {
-      out.push({ icon: '💰', label: $t('concierge.hero_budget'), amount: w.totalBounti });
+    const wishTrack = data?.pricing?.wish ?? null;
+    if (wishTrack === 'fixed' && w.totalBounti === 0) {
+      out.push({ icon: '💰', label: $t('concierge.track_fixed'), text: $t('concierge.track_free') });
+    } else if (typeof w.totalBounti === 'number' && w.totalBounti > 0) {
+      out.push({
+        icon: '💰',
+        label: wishTrack ? $t(`concierge.track_${wishTrack}`) : $t('concierge.hero_budget'),
+        amount: w.totalBounti
+      });
     }
     return out;
   });
@@ -2449,7 +2488,10 @@
 
                     <!-- Said before she picks it, not on the deal page after (PLAN_DEAL_PRICING_TRACKS P0):
                          a mission's price is a ceiling on approved hours, not a bill. -->
-                    {#if isOwner && p.status !== 'rejected' && p.hours && p.price != null && !row.need.isResource}
+                    {#if TRACKS && p.proposalId && trackOf(p.proposalId)}
+                      <p class="neg-deadline">{$t(`concierge.track_${trackOf(p.proposalId)}`)}</p>
+                    {/if}
+                    {#if isOwner && p.status !== 'rejected' && p.hours && p.price != null && !row.need.isResource && effectivePricingTrack(trackOf(p.proposalId)) === 'atCost'}
                       <p class="neg-deadline">
                         {$t('concierge.pay_upto_hours')} <Money amount={p.price} />
                       </p>
@@ -2521,6 +2563,16 @@
                             />
                           </label>
                         </div>
+                        {#if TRACKS}
+                          <label class="neg-note">
+                            {$t('concierge.neg_track')}
+                            <select bind:value={counterTrack} disabled={counterBusy}>
+                              {#if counterTrackFrom == null}<option value={null}>{$t('concierge.track_unsure')}</option>{/if}
+                              <option value="fixed">{$t('concierge.track_fixed')}</option>
+                              <option value="atCost">{$t('concierge.track_atCost')}</option>
+                            </select>
+                          </label>
+                        {/if}
                         <label class="neg-note">
                           {$t('concierge.neg_note')}
                           <textarea
@@ -3019,7 +3071,9 @@
               {/if}
             {/if}
             {#if isOwner && !consentClosed}
-              <p class="pay-disclosure">{$t('concierge.pay_disclosure')}</p>
+              <p class="pay-disclosure">
+                {$t(DEAL_TRACK === 'fixed' ? 'concierge.pay_disclosure_fixed' : 'concierge.pay_disclosure')}
+              </p>
             {/if}
             {#if isOwner && !consentClosed}
               <div
@@ -4254,6 +4308,7 @@
     color: var(--cg-muted);
   }
   .neg-form input,
+  .neg-form select,
   .neg-form textarea {
     background: var(--cg-s1);
     color: var(--cg-ink);
@@ -4264,6 +4319,7 @@
     font-size: 13px;
   }
   .neg-form input:focus-visible,
+  .neg-form select:focus-visible,
   .neg-form textarea:focus-visible {
     outline: 2px solid var(--cg-goldhi);
     outline-offset: 1px;

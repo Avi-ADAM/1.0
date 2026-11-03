@@ -7,6 +7,9 @@ import {
   markCustomerTrack,
   REG_INTENT_COOKIE
 } from '$lib/concierge/regIntent.js';
+import { readWishPricing } from '$lib/server/wish/pricingTrack';
+import { pricingTracksEnabled } from '$lib/sheirut/pricingTracksFlag';
+import type { PricingTrack } from '$lib/sheirut/pricingTrack';
 import type { PageServerLoad } from './$types';
 
 /** What the composer needs to resume a saved draft — its own form fields. */
@@ -17,6 +20,8 @@ export type ServerWishDraft = {
   startDate: string | null;
   finnishDate: string | null;
   budgetAmount: number | null;
+  /** How the money works, when she answered (PLAN_DEAL_PRICING_TRACKS P2); null = not sure. */
+  pricingTrack: PricingTrack | null;
   whoCanOffer: boolean;
   whoCanSee: string;
   location: {
@@ -56,6 +61,11 @@ async function loadDraft(
     const owners = a.users_permissions_users?.data ?? [];
     if (!owners.some((o: any) => String(o.id) === String(uid))) return null;
 
+    // Only while the switch is on — off, nothing reads the field (pricingTracksFlag).
+    const pricing = pricingTracksEnabled()
+      ? await readWishPricing({ execute: (qid, vars) => sendToSer(vars, qid, 0, 0, false, fetch) }, {}, id)
+      : null;
+
     const hasPoint = typeof a.lat === 'number' && typeof a.lng === 'number';
     return {
       id: String(node.id),
@@ -64,6 +74,7 @@ async function loadDraft(
       startDate: dateInput(a.startDate),
       finnishDate: dateInput(a.finnishDate),
       budgetAmount: a.bounti && typeof a.totalbounti === 'number' ? a.totalbounti : null,
+      pricingTrack: pricing?.wish ?? null,
       whoCanOffer: !!a.allowJoin,
       whoCanSee: a.access_mode || 'personal',
       location: {

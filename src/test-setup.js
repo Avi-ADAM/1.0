@@ -1,4 +1,5 @@
 import '@testing-library/jest-dom';
+import { vi } from 'vitest';
 
 // Mock environment variables
 global.import = {
@@ -8,6 +9,10 @@ global.import = {
     }
   }
 };
+
+// $env/dynamic/public needs a running SvelteKit; in tests every public switch reads as off
+// (a test that wants one on mocks the module that reads it, e.g. $lib/sheirut/pricingTracksFlag).
+vi.mock('$env/dynamic/public', () => ({ env: {} }));
 
 // Mock document.cookie for authentication tests
 Object.defineProperty(document, 'cookie', {

@@ -4,6 +4,9 @@ import { stripHtml } from '$lib/utils/stripHtml';
 import { sendViaProxy } from '$lib/server/sendViaProxy.js';
 import { negotiationView, type NegotiationView } from '$lib/server/wish/negotiationView.js';
 import { normalizeRestime } from '$lib/wish/restime.js';
+import { readWishPricing, type WishPricing } from '$lib/server/wish/pricingTrack';
+import { pricingTracksEnabled } from '$lib/sheirut/pricingTracksFlag';
+import type { PricingTrack } from '$lib/sheirut/pricingTrack';
 
 export interface PendingRequestData {
   id: string;
@@ -59,11 +62,21 @@ export interface IncomingWishInvitation {
   slotPrice?: number | null;
   /** The terms negotiation, from the provider's side: whose move it is, and what was said (C-9). */
   negotiation?: NegotiationView | null;
+  /**
+   * How the money works on this proposal: its own track, or the wish's (PLAN_DEAL_PRICING_TRACKS
+   * P2). Null when nobody chose, or while the switch is off.
+   */
+  pricingTrack?: PricingTrack | null;
   values: string[];
   categories: string[];
 }
 
-function mapWishInvitation(node: any, viewerId?: string, restime?: string): IncomingWishInvitation | null {
+function mapWishInvitation(
+  node: any,
+  viewerId?: string,
+  restime?: string,
+  pricing?: WishPricing | null
+): IncomingWishInvitation | null {
   const pa = node?.attributes ?? {};
   const ratNode = pa.ratson?.data;
   if (!ratNode) return null;
@@ -101,6 +114,7 @@ function mapWishInvitation(node: any, viewerId?: string, restime?: string): Inco
       restime,
       ra.terms_digest ?? null
     ),
+    pricingTrack: pricing ? (pricing.proposals[String(node.id)]?.track ?? pricing.wish) : null,
     slotHours: typeof slotM?.hours === 'number' ? slotM.hours : null,
     slotPrice:
       typeof slotM?.price === 'number'
@@ -239,6 +253,9 @@ export async function fetchWishInvitationsForUser(
       )
     ];
     const paces = new Map<string, string>();
+    // And how the money works on each — only while the switch is on (pricingTracksFlag).
+    const pricings = new Map<string, WishPricing | null>();
+    const tracks = pricingTracksEnabled();
     await Promise.all(
       wishIds.map(async (id) => {
         try {
@@ -247,11 +264,17 @@ export async function fetchWishInvitationsForUser(
         } catch {
           /* the default */
         }
+        if (tracks) {
+          pricings.set(id, await readWishPricing({ execute: (qid, vars) => gql(fetchFn, qid, vars).then((data) => ({ data })) }, {}, id));
+        }
       })
     );
 
     return nodes
-      .map((n: any) => mapWishInvitation(n, userId, paces.get(String(n?.attributes?.ratson?.data?.id))))
+      .map((n: any) => {
+        const rid = String(n?.attributes?.ratson?.data?.id);
+        return mapWishInvitation(n, userId, paces.get(rid), pricings.get(rid));
+      })
       .filter((x: IncomingWishInvitation | null): x is IncomingWishInvitation => x !== null);
   } catch (e) {
     console.error('[deals] fetchWishInvitationsForUser failed (non-fatal):', e);

@@ -623,7 +623,9 @@ export const qidsAccess = {
   '399updateDealLineTerms': { allow: ['serviceAdmin'] }, // server-only: a part's ceiling follows terms the customer signed — never from a browser
   '400dealEdits': { allow: ['user', 'serviceAdmin'] }, // read: open requests for more hours on a deal; the deal page checks the role, like 124
   '468missionOpenFiniapruvals': { allow: ['serviceAdmin'] }, // server-only: approvals held above a deal part's ceiling, released when it is raised
-  '469ratsonPricingTrack': { allow: ['user', 'serviceAdmin'] }, // materializeWish: the track the deal is signed under (as 105, which it narrows)
+  '469ratsonPricingTrack': { allow: ['user', 'serviceAdmin'] }, // the tracks of a wish and its proposals (as 105, which it narrows)
+  '470setRatsonPricingTrack': { allow: ['serviceAdmin'] }, // server-only: createRatson / updateRatsonDraft, owner checked there
+  '471setProposalPricingTrack': { allow: ['serviceAdmin'] }, // server-only: counterRatsonProposal checks party + turn
 
   // matching/engine.ts: always run through StrapiClient with the admin
   // token, never with a user JWT — writes suggestion data for *other* users.

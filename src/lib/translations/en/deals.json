@@ -264,5 +264,11 @@
   },
   "negTermsChanged": "The wish's details changed since you signed: the description, dates or place. Worth reading them before you approve.",
   "negTermsChangedLink": "See the new details",
-  "negApproveNewTerms": "✓ Approve the new details"
+  "negApproveNewTerms": "✓ Approve the new details",
+  "pricingTrack": {
+    "label": "How it's paid",
+    "fixed": "Set price",
+    "atCost": "Open book",
+    "unsure": "Not decided yet"
+  }
 }

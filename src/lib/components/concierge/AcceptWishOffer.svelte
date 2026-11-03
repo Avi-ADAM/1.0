@@ -19,6 +19,8 @@
   // `t` below is this component's own dictionary; the shared translations are `tr`.
   import { t as tr, locale } from '$lib/translations';
   import { refuseCounter } from '$lib/wish/proposalRounds';
+  import type { PricingTrack } from '$lib/sheirut/pricingTrack';
+  import { pricingTracksEnabled } from '$lib/sheirut/pricingTracksFlag';
 
   type WishItem = {
     kind: 'mission' | 'resource';
@@ -46,6 +48,7 @@
     ratsonId,
     item,
     negotiation = null,
+    pricingTrack = null,
     onClose,
     onDone
   }: {
@@ -53,6 +56,8 @@
     ratsonId: string;
     item: WishItem;
     negotiation?: Negotiation | null;
+    /** How the money works on this proposal (PLAN_DEAL_PRICING_TRACKS P2); null = nobody chose, or the switch is off. */
+    pricingTrack?: PricingTrack | null;
     onClose?: () => void;
     onDone?: (result: { accepted: boolean }) => void;
   } = $props();
@@ -87,21 +92,30 @@
   let counterPrice = $state<number | string>('');
   let counterNote = $state('');
   let counterBusy = $state(false);
-  const counterRefusal = $derived(
-    refuseCounter(
+  /* The track is a term too: offering the other one is a counter (PLAN_DEAL_PRICING_TRACKS P2).
+     Asked only while the switch is on; with no track yet, the provider may offer one. */
+  const TRACKS = pricingTracksEnabled();
+  let counterTrack = $state<PricingTrack | null>(null);
+  const trackChanged = $derived(counterTrack != null && counterTrack !== pricingTrack);
+  const counterRefusal = $derived.by(() => {
+    const r = refuseCounter(
       { amount: item.hours ?? null, price: item.price ?? null },
       {
         amount: counterHours === '' ? undefined : counterHours,
         price: counterPrice === '' ? undefined : counterPrice
       },
       counterNote
-    )
-  );
+    );
+    // Same numbers, the other track: still a counter — as the server reads it.
+    if (r === 'same' && trackChanged) return counterNote.trim().length < 8 ? 'note' : null;
+    return r;
+  });
 
   function openCounter() {
     counterHours = item.hours ?? '';
     counterPrice = item.price ?? '';
     counterNote = '';
+    counterTrack = pricingTrack;
     errorMsg = '';
     step = 'counter';
   }
@@ -116,6 +130,7 @@
         ratsonId,
         ...(counterHours !== '' ? { hours: Number(counterHours) } : {}),
         ...(counterPrice !== '' ? { price: Number(counterPrice) } : {}),
+        ...(trackChanged ? { pricingTrack: counterTrack } : {}),
         note: counterNote.trim()
       });
       if (!res?.success) throw new Error(res?.error?.message || 'failed');
@@ -212,6 +227,7 @@
         <div class="ofr-offer-meta">
           {#if item.hours}<span><EntityIcon kind="timer" size={13} /> {item.hours} {t.hours}</span>{/if}
           {#if item.price != null}<span><EntityIcon kind="money" size={13} /> <Money amount={item.price} /></span>{/if}
+          {#if pricingTrack}<span>{$tr(`deals.pricingTrack.${pricingTrack}`)}</span>{/if}
         </div>
       </div>
 
@@ -288,6 +304,16 @@
             <input type="number" min="0" step="1" bind:value={counterPrice} disabled={counterBusy} />
           </label>
         </div>
+        {#if TRACKS}
+          <label>
+            {$tr('deals.pricingTrack.label')}
+            <select bind:value={counterTrack} disabled={counterBusy}>
+              {#if pricingTrack == null}<option value={null}>{$tr('deals.pricingTrack.unsure')}</option>{/if}
+              <option value="fixed">{$tr('deals.pricingTrack.fixed')}</option>
+              <option value="atCost">{$tr('deals.pricingTrack.atCost')}</option>
+            </select>
+          </label>
+        {/if}
         <label>
           {$tr('deals.negNote')}
           <textarea
@@ -466,6 +492,7 @@
   .ofr-fields label { flex: 1; }
   .ofr-form label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--tm, #9a8f80); }
   .ofr-form input,
+  .ofr-form select,
   .ofr-form textarea {
     background: var(--s2, #1b1711);
     color: var(--text, #f1e9d8);
@@ -476,6 +503,7 @@
     font-size: 14px;
   }
   .ofr-form input:focus-visible,
+  .ofr-form select:focus-visible,
   .ofr-form textarea:focus-visible { outline: 2px solid var(--gold-l, #e8d59a); outline-offset: 1px; }
   .ofr-form-error { margin: 0; font-size: 12.5px; color: var(--pink-l, #ff7aa8); }
   .ofr-state { text-align: center; padding: 28px 12px; color: var(--tm, #9a8f80); font-size: 14px; }

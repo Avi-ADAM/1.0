@@ -333,6 +333,25 @@
     "budgetPlaceholder": "e.g. 500",
     "budgetNoCap": "No budget",
     "budgetHint": "Your budget is the most you will pay. In practice each part is billed by what is approved on it, never more than the price agreed. Proposals are ordered by how well they match, not by price alone.",
+    "money": {
+      "question": "How does the money work?",
+      "unsure": "Not sure",
+      "unsureSub": "Let providers suggest one as part of their proposal.",
+      "fixed": "Set price",
+      "fixedSub": "You know upfront what it costs. You approve when it's ready.",
+      "atCost": "Open book",
+      "atCostSub": "Pay for what is actually done, up to an amount you set. Anything above it needs your approval.",
+      "fixedAmount": "How much can you pay? (₪)",
+      "atCostAmount": "Up to how much? (₪)",
+      "fixedHelp": "Can't pay? You can enter 0 or a token amount.",
+      "valueFixed": "Set price · {{amount}}",
+      "valueAtCost": "Open book · up to {{amount}}",
+      "valueFree": "Set price · no payment",
+      "refuse": {
+        "ceiling": "Open book needs an upper amount above 0.",
+        "amount": "The amount can't be negative."
+      }
+    },
     "inviteHint": "This helps Lev judge how much to initiate on its own and how much to wait for you.",
     "minJoiners": "Minimum participants",
     "minJoinersPlaceholder": "e.g. 2",
@@ -528,5 +547,11 @@
   "total_within": "Within your budget",
   "total_over": "Over your budget by",
   "total_over_hint": "You can counter a part, or leave out a part you don't need.",
-  "pay_disclosure": "How you pay: each part is billed by what is actually approved on it (the hours the rikma approves, or the agreed price of a resource), never more than the price agreed. The plan total is a ceiling, not a final bill. Hours beyond it are not added without your signature."
+  "pay_disclosure": "How you pay: each part is billed by what is actually approved on it (the hours the rikma approves, or the agreed price of a resource), never more than the price agreed. The plan total is a ceiling, not a final bill. Hours beyond it are not added without your signature.",
+  "track_fixed": "Set price",
+  "track_atCost": "Open book",
+  "track_unsure": "Not decided yet",
+  "track_free": "No payment",
+  "neg_track": "How it's paid",
+  "pay_disclosure_fixed": "How you pay: a set price. You pay the agreed amount once the work is ready and you've confirmed you received it. What happens inside (who, how many hours, how it is split) is the rikma's business. A change of scope needs your signature."
 }

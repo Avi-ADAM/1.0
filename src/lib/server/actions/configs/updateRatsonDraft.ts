@@ -18,6 +18,7 @@
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { writeWishRestime } from '$lib/server/wish/clock.js';
+import { writeWishTrack } from '$lib/server/wish/pricingTrack';
 import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 const VALID_ACCESS = new Set(['personal', 'free_threshold', 'pay_to_access']);
@@ -97,6 +98,15 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
     }
   }
 
+  // How the money works (PLAN_DEAL_PRICING_TRACKS P2); `null` is "not sure", omitted keeps it.
+  if ('pricingTrack' in p) {
+    try {
+      await writeWishTrack(strapi, context, ratsonId, p.pricingTrack ?? null);
+    } catch (err) {
+      console.warn('[updateRatsonDraft] could not set the pricing track (non-fatal):', err);
+    }
+  }
+
   return {
     success: true,
     ratsonId,
@@ -120,6 +130,7 @@ export const updateRatsonDraftConfig: ActionConfig = {
     allowJoin: { type: 'boolean', required: false },
     bounti: { type: 'boolean', required: false },
     totalbounti: { type: 'number', required: false },
+    pricingTrack: { type: 'string', required: false, description: 'atCost | fixed | null ("not sure"); omit to keep' },
     access_mode: { type: 'string', required: false },
     isOnline: { type: 'boolean', required: false },
     lat: { type: 'number', required: false },

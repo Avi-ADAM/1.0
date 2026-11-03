@@ -265,5 +265,11 @@
   },
   "negTermsChanged": "Los detalles del deseo cambiaron desde que firmaste: la descripción, las fechas o el lugar. Conviene revisarlos antes de aprobar.",
   "negTermsChangedLink": "Ver los nuevos detalles",
-  "negApproveNewTerms": "✓ Aprobar los nuevos detalles"
+  "negApproveNewTerms": "✓ Aprobar los nuevos detalles",
+  "pricingTrack": {
+    "label": "Cómo se paga",
+    "fixed": "Precio cerrado",
+    "atCost": "Pago transparente",
+    "unsure": "Aún sin decidir"
+  }
 }

@@ -9120,17 +9120,23 @@ ${PROMO_DECISION_FIELDS}
     }
   }`,
 
-  // The pricing track a wish deal is signed under: the wish's, and each accepted
-  // proposal's ($lib/sheirut/pricingTrack, PLAN_DEAL_PRICING_TRACKS P1). Its own qid so a
-  // backend without the field fails only this read, which materializeWish treats as null.
+  // The pricing tracks of a wish: its own, and each proposal's with its status
+  // ($lib/server/wish/pricingTrack, PLAN_DEAL_PRICING_TRACKS P1–P2). Its own qid so a
+  // backend without the field fails only this read, which every caller treats as "none".
   '469ratsonPricingTrack': `query RatsonPricingTrack($id: ID!) {
     ratson(id: $id) { data { id attributes { pricingTrack } } }
-    ratsonProposals(
-      filters: { and: [{ ratson: { id: { eq: $id } } }, { status_proposal: { eq: "accepted" } }] }
-      pagination: { limit: 50 }
-    ) {
-      data { id attributes { pricingTrack } }
+    ratsonProposals(filters: { ratson: { id: { eq: $id } } }, pagination: { limit: 100 }) {
+      data { id attributes { pricingTrack status_proposal } }
     }
+  }`,
+
+  // Writing a track — apart from 100/387 so those never carry a type an older backend
+  // lacks. Called only while PUBLIC_PRICING_TRACKS is on.
+  '470setRatsonPricingTrack': `mutation SetRatsonPricingTrack($id: ID!, $track: ENUM_RATSON_PRICINGTRACK) {
+    updateRatson(id: $id, data: { pricingTrack: $track }) { data { id } }
+  }`,
+  '471setProposalPricingTrack': `mutation SetProposalPricingTrack($id: ID!, $track: ENUM_RATSONPROPOSAL_PRICINGTRACK) {
+    updateRatsonProposal(id: $id, data: { pricingTrack: $track }) { data { id } }
   }`,
 
   // A part's new terms, once the rikma and the customer signed them: its ceiling follows.

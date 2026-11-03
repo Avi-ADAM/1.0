@@ -21,6 +21,7 @@
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { WISH_RESTIME_DEFAULT, normalizeRestime } from '$lib/wish/restime.js';
 import { writeWishRestime } from '$lib/server/wish/clock.js';
+import { writeWishTrack } from '$lib/server/wish/pricingTrack';
 import { scope, scopeList } from '$lib/realtime/scopes.js';
 
 type ExtractedMissionInput = {
@@ -229,6 +230,14 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
     }
   }
 
+  // How the money works, as she answered it (PLAN_DEAL_PRICING_TRACKS P2). Best-effort: a
+  // wish without it is "not sure — let them offer", and providers propose a track.
+  try {
+    await writeWishTrack(strapi, context, ratsonId, (params as any).pricingTrack);
+  } catch (err) {
+    console.warn('[createRatson] could not set the pricing track (non-fatal):', err);
+  }
+
   // ── 2. Create process anchor + chat forum (best-effort) ──────────────────
   let processId: string | null = null;
   let chatForumId: string | null = null;
@@ -309,6 +318,7 @@ export const createRatsonConfig: ActionConfig = {
     allowJoin: { type: 'boolean', required: false },
     bounti: { type: 'boolean', required: false },
     totalbounti: { type: 'number', required: false },
+    pricingTrack: { type: 'string', required: false, description: 'atCost | fixed; omit for "not sure" (PLAN_DEAL_PRICING_TRACKS)' },
     vallues: { type: 'array', required: false },
     categories: { type: 'array', required: false },
     missions: { type: 'array', required: false },

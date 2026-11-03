@@ -31,6 +31,9 @@ import {
 import { entryInput, loadWishProposal, requireParty } from '$lib/server/wish/proposal.js';
 import { armProposalClock } from '$lib/server/wish/clock.js';
 import { scope, scopeList } from '$lib/realtime/scopes.js';
+import { parsePricingTrack, type PricingTrack } from '$lib/sheirut/pricingTrack';
+import { pricingTracksEnabled } from '$lib/sheirut/pricingTracksFlag';
+import { readWishPricing, writeProposalTrack } from '$lib/server/wish/pricingTrack';
 
 const NEGOTIABLE_FROM = new Set(['suggested', 'viewed']);
 
@@ -47,6 +50,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
     ratsonId: string;
     hours?: number;
     price?: number;
+    pricingTrack?: string | null;
     note: string;
   };
   const me = String(context.userId);
@@ -68,9 +72,23 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
     throw new Error("You already stand behind the current terms — it is the other side's turn. To talk it over, use the chat");
   }
 
+  // The pricing track is a term like the others (PLAN_DEAL_PRICING_TRACKS P2): a counter may
+  // offer the other one. The version on the table is the proposal's own track, or the wish's.
+  let nextTrack: PricingTrack | null = null;
+  let trackChanged = false;
+  if (pricingTracksEnabled() && params.pricingTrack !== undefined && params.pricingTrack !== null) {
+    nextTrack = parsePricingTrack(params.pricingTrack);
+    if (!nextTrack) throw new Error('The pricing track is atCost or fixed');
+    const pricing = await readWishPricing(strapi, context, String(ratsonId));
+    if (!pricing) throw new Error('The pricing track could not be read — try again in a moment');
+    const standingTrack = pricing.proposals[String(proposalId)]?.track ?? pricing.wish;
+    trackChanged = nextTrack !== standingTrack;
+  }
+
   const proposed = { amount: hours, price };
   const refusal = refuseCounter(p.version, proposed, note);
-  if (refusal) throw new Error(REFUSALS[refusal]);
+  // Same hours and price, other track: that is a change, and a counter.
+  if (refusal && !(refusal === 'same' && trackChanged)) throw new Error(REFUSALS[refusal]);
   const next = resolveVersion(p.version, proposed);
 
   const covered =
@@ -112,6 +130,11 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
   );
   if (!written || written.errors) {
     throw new Error(`counterRatsonProposal failed: ${JSON.stringify(written?.errors ?? 'Unknown')}`);
+  }
+  // The signature log has no place for the track, so the proposal carries it: it is the
+  // version on the table, and the one materializeWish signs the deal under.
+  if (trackChanged && nextTrack) {
+    await writeProposalTrack(strapi, context, String(proposalId), nextTrack);
   }
 
   // The other side's time to answer starts now (the wish's pace, 48 h unless its owner chose otherwise).
@@ -179,6 +202,7 @@ export const counterRatsonProposalConfig: ActionConfig = {
     ratsonId: { type: 'string', required: true },
     hours: { type: 'number', required: false, description: 'Hours (a task) or quantity (a resource) — omit to keep' },
     price: { type: 'number', required: false, description: 'Price for the slot — omit to keep' },
+    pricingTrack: { type: 'string', required: false, description: 'atCost | fixed — offer the other track; omit to keep' },
     note: { type: 'string', required: true, description: 'Why — shown to the other side' }
   },
   authRules: [{ type: 'jwt', errorMessage: 'Must be logged in to negotiate a proposal' }],

@@ -23,6 +23,8 @@ import { lineNames } from '$lib/wish/lineNames';
 import { readDealStages } from '$lib/server/deal/dealChain';
 import { sendViaProxy } from '$lib/server/sendViaProxy.js';
 import { rtKey } from '$lib/realtime/scopes';
+import { readWishPricing, type WishPricing } from '$lib/server/wish/pricingTrack';
+import { pricingTracksEnabled } from '$lib/sheirut/pricingTracksFlag';
 import { buildWishPoolPanel, volumeOf, type WishPoolPanel } from '$lib/server/maagad/wishPool';
 
 type PublishedNeed = { name: string; extractedKey: string | null };
@@ -567,5 +569,11 @@ export const load: PageServerLoad = async ({ params, locals, fetch, depends }) =
 
   const stages = await stagesP;
 
-  return { wish, proposals, loadOk, uid, isOwner, enrichment, forumMessages, missionTemplates, external, bell, notices, published, gaps, stages, partLines, pool };
+  // How the money works, on the wish and on each proposal (PLAN_DEAL_PRICING_TRACKS P2).
+  // Only while the switch is on; a failed read is "nobody chose".
+  const pricing: WishPricing | null = pricingTracksEnabled()
+    ? await readWishPricing({ execute: (qid, vars) => sendToSer(vars, qid, 0, 0, false, fetch) }, {}, params.id)
+    : null;
+
+  return { pricing, wish, proposals, loadOk, uid, isOwner, enrichment, forumMessages, missionTemplates, external, bell, notices, published, gaps, stages, partLines, pool };
 };

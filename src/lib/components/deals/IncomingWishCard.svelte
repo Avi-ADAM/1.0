@@ -124,6 +124,7 @@
     ratsonId={wish.ratsonId}
     item={offerItem}
     {negotiation}
+    pricingTrack={wish.pricingTrack ?? null}
     onClose={() => (showOffer = false)}
     {onDone}
   />

@@ -29,6 +29,26 @@ export function effectivePricingTrack(v: unknown): PricingTrack {
 }
 
 /**
+ * What the money question in the wish form may hold (§8.3). A fixed price may be 0 or
+ * left empty (0 is a real answer: help, §5); an at-cost ceiling must be above 0 — it is
+ * the only protection she has. With no track ("not sure"), any amount or none.
+ */
+export function refuseBudget(track: PricingTrack | null, amount: number | null): 'ceiling' | 'amount' | null {
+  if (amount != null && (!Number.isFinite(amount) || amount < 0)) return 'amount';
+  if (track === 'atCost' && !(amount != null && amount > 0)) return 'ceiling';
+  return null;
+}
+
+/**
+ * The amount as `Ratson` stores it. `bounti` says whether she gave one at all, so a fixed
+ * price of 0 ("I can't pay") is told apart from "no amount" — it used to read as no amount.
+ */
+export function budgetFields(track: PricingTrack | null, amount: number | null): { bounti: boolean; totalbounti: number } {
+  const given = amount != null && Number.isFinite(amount) && (amount > 0 || (track === 'fixed' && amount === 0));
+  return { bounti: given, totalbounti: given ? amount : 0 };
+}
+
+/**
  * The track a deal is signed under, from the wish and the proposals she accepted.
  *
  * A proposal's own track is what was offered her, so it wins over the wish's — a

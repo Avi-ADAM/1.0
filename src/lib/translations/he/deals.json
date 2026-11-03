@@ -264,5 +264,11 @@
   },
   "negTermsChanged": "פרטי המשאלה השתנו מאז שחתמת: התיאור, התאריכים או המקום. כדאי לעבור עליהם לפני שמאשרים.",
   "negTermsChangedLink": "לפרטים החדשים",
-  "negApproveNewTerms": "✓ אישור הפרטים החדשים"
+  "negApproveNewTerms": "✓ אישור הפרטים החדשים",
+  "pricingTrack": {
+    "label": "איך משלמים",
+    "fixed": "מחיר סגור",
+    "atCost": "תשלום שקוף",
+    "unsure": "עוד לא נקבע"
+  }
 }

@@ -16,6 +16,8 @@
     WISH_PREFILL_KEY
   } from '$lib/concierge/wishDraft.js';
   import { CONCIERGE_INTENT } from '$lib/concierge/regIntent.js';
+  import { budgetFields, parsePricingTrack, refuseBudget } from '$lib/sheirut/pricingTrack';
+  import { pricingTracksEnabled } from '$lib/sheirut/pricingTracksFlag';
   import LocationPicker from '$lib/components/location/LocationPicker.svelte';
   import RichText from '$lib/celim/ui/richText.svelte';
   import { uPic } from '$lib/stores/uPic.js';
@@ -105,6 +107,7 @@
     if (d.startDate) startDate = d.startDate;
     if (d.finnishDate) finnishDate = d.finnishDate;
     if (typeof d.budgetAmount === 'number') budgetAmount = d.budgetAmount;
+    pricingTrack = parsePricingTrack(d.pricingTrack);
     whoCanOffer = d.whoCanOffer;
     whoCanSee = d.whoCanSee;
     location = { ...location, ...d.location };
@@ -154,6 +157,7 @@
       if (d.startDate) startDate = d.startDate;
       if (d.finnishDate) finnishDate = d.finnishDate;
       if (typeof d.budgetAmount === 'number') budgetAmount = d.budgetAmount;
+      if (parsePricingTrack(d.pricingTrack)) pricingTrack = parsePricingTrack(d.pricingTrack);
       if (typeof d.whoCanOffer === 'boolean') whoCanOffer = d.whoCanOffer;
       if (d.whoCanSee) whoCanSee = d.whoCanSee;
       if (d.invitePartners) invitePartners = d.invitePartners;
@@ -511,6 +515,12 @@
   let startDate = $state(''); // ISO yyyy-mm-dd (empty = none)
   let finnishDate = $state(''); // ISO yyyy-mm-dd
   let budgetAmount = $state(/** @type {number|null} */ (null));
+  /* How the money works (PLAN_DEAL_PRICING_TRACKS §8.3): null = "not sure, let them offer".
+     Asked only while the switch is on — off, the jewel is the plain budget it always was. */
+  const TRACKS = pricingTracksEnabled();
+  let pricingTrack = $state(/** @type {'atCost'|'fixed'|null} */ (null));
+  /** @type {('atCost'|'fixed'|null)[]} */
+  const TRACK_CHOICES = [null, 'fixed', 'atCost'];
   let whoCanOffer = $state(true); // → allowJoin
   let whoCanSee = $state('personal'); // → access_mode
   let invitePartners = $state('lev'); // UI-only for now (no Ratson field)
@@ -543,12 +553,25 @@
       return `${fmtDayMon(startDate)} → ${fmtDayMon(finnishDate)}`;
     return fmtDayMon(startDate || finnishDate);
   });
-  const budgetJewelValue = $derived(
-    typeof budgetAmount === 'number' &&
-      Number.isFinite(budgetAmount) &&
-      budgetAmount > 0
-      ? fmtMoney(budgetAmount)
-      : ''
+  const budgetJewelValue = $derived.by(() => {
+    const amount =
+      typeof budgetAmount === 'number' && Number.isFinite(budgetAmount) ? budgetAmount : null;
+    if (TRACKS && pricingTrack === 'fixed') {
+      if (amount === 0) return $t('concierge.new.money.valueFree');
+      return amount
+        ? $t('concierge.new.money.valueFixed', { amount: fmtMoney(amount) })
+        : $t('concierge.new.money.fixed');
+    }
+    if (TRACKS && pricingTrack === 'atCost' && amount) {
+      return $t('concierge.new.money.valueAtCost', { amount: fmtMoney(amount) });
+    }
+    return amount && amount > 0 ? fmtMoney(amount) : '';
+  });
+  /** Why the money answer cannot go out as it is — at-cost needs a ceiling above 0. */
+  const budgetRefusal = $derived(
+    TRACKS
+      ? refuseBudget(pricingTrack, typeof budgetAmount === 'number' ? budgetAmount : null)
+      : null
   );
   const whoCanOfferJewelValue = $derived(
     $t(`concierge.new.whoCanOffer.${whoCanOffer ? 'open' : 'mine'}.label`)
@@ -994,6 +1017,7 @@
       startDate,
       finnishDate,
       budgetAmount,
+      pricingTrack,
       whoCanOffer,
       whoCanSee,
       invitePartners,
@@ -1081,8 +1105,13 @@
       longDes: body.trim(),
       access_mode: whoCanSee,
       allowJoin: whoCanOffer,
-      bounti: hasBudget,
-      totalbounti: hasBudget ? budgetAmount : 0,
+      // With tracks, a fixed price of 0 is an answer (help), not "no amount" (§8.3).
+      ...(TRACKS
+        ? {
+            ...budgetFields(pricingTrack, typeof budgetAmount === 'number' ? budgetAmount : null),
+            pricingTrack
+          }
+        : { bounti: hasBudget, totalbounti: hasBudget ? budgetAmount : 0 }),
       startDate: startDate ? new Date(startDate).toISOString() : null,
       finnishDate: finnishDate ? new Date(finnishDate).toISOString() : null,
       isOnline: location.location_mode === 'online',
@@ -1187,6 +1216,7 @@
       startDate,
       finnishDate,
       budgetAmount,
+      pricingTrack,
       whoCanOffer,
       whoCanSee,
       location
@@ -1205,6 +1235,11 @@
   /** @returns {Promise<boolean>} whether the wish went out */
   async function publish() {
     if (!isReady) return false;
+    if (budgetRefusal) {
+      editingJewel = 2;
+      toast.error($t(`concierge.new.money.refuse.${budgetRefusal}`));
+      return false;
+    }
     if (anon) {
       saveDraftAndRegister({ sendOnReturn: true });
       return false;
@@ -2398,7 +2433,7 @@
               {editingJewel === 0
                 ? $t('concierge.new.modal.when')
                 : editingJewel === 2
-                  ? $t('concierge.new.modal.budget')
+                  ? $t(TRACKS ? 'concierge.new.money.question' : 'concierge.new.modal.budget')
                   : editingJewel === 3
                     ? $t('concierge.new.modal.whoCanOffer')
                     : editingJewel === 4
@@ -2466,8 +2501,39 @@
             </p>
           {:else if editingJewel === 2}
             <!-- Budget -->
+            {#if TRACKS}
+              <!-- How the money works — one question, three answers (PLAN_DEAL_PRICING_TRACKS §8.3) -->
+              <div class="radio-list">
+                {#each TRACK_CHOICES as opt (opt ?? 'unsure')}
+                  <label class="radio-row {pricingTrack === opt ? 'on' : ''}">
+                    <input
+                      type="radio"
+                      name="pricingTrack"
+                      checked={pricingTrack === opt}
+                      onchange={() => (pricingTrack = opt)}
+                    />
+                    <div>
+                      <div class="radio-label">
+                        {$t(`concierge.new.money.${opt ?? 'unsure'}`)}
+                      </div>
+                      <div class="radio-hint">
+                        {$t(`concierge.new.money.${opt ?? 'unsure'}Sub`)}
+                      </div>
+                    </div>
+                  </label>
+                {/each}
+              </div>
+            {/if}
             <label class="field">
-              <span class="field-lbl">{$t('concierge.new.budgetLabel')}</span>
+              <span class="field-lbl"
+                >{$t(
+                  TRACKS && pricingTrack === 'fixed'
+                    ? 'concierge.new.money.fixedAmount'
+                    : TRACKS && pricingTrack === 'atCost'
+                      ? 'concierge.new.money.atCostAmount'
+                      : 'concierge.new.budgetLabel'
+                )}</span
+              >
               <input
                 type="number"
                 inputmode="numeric"
@@ -2494,9 +2560,15 @@
                 >{$t('concierge.new.budgetNoCap')}</button
               >
             </div>
-            <p class="modal-hint">
-              {$t('concierge.new.budgetHint')}
-            </p>
+            {#if TRACKS && pricingTrack === 'fixed'}
+              <p class="modal-hint">{$t('concierge.new.money.fixedHelp')}</p>
+            {:else if budgetRefusal === 'ceiling'}
+              <p class="modal-hint" role="alert">{$t('concierge.new.money.refuse.ceiling')}</p>
+            {:else}
+              <p class="modal-hint">
+                {$t('concierge.new.budgetHint')}
+              </p>
+            {/if}
           {:else if editingJewel === 3}
             <!-- Who can offer -->
             <div class="radio-list">
