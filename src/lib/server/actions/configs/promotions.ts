@@ -217,7 +217,7 @@ const proposeHandler: ActionExecutionHandler = async (params, context, { notifie
             }
           },
           intent: 'outcome',
-          metadata: { type: 'promotion', url: `/moach/${projectId}/sales/manage`, priority: 'normal' }
+          metadata: { type: 'promotion', url: `/moach/${projectId}/sales/manage/promotions`, priority: 'normal' }
         },
         { projectId },
         { projectId },
@@ -438,7 +438,7 @@ const pauseHandler: ActionExecutionHandler = async (params, context, { notifier 
         }
       },
       intent: 'outcome',
-      metadata: { type: 'promotion', url: `/moach/${project.id}/sales/manage`, priority: 'high' }
+      metadata: { type: 'promotion', url: `/moach/${project.id}/sales/manage/promotions`, priority: 'high' }
     },
     { projectId: project.id },
     { projectId: project.id }
@@ -481,7 +481,7 @@ const endHandler: ActionExecutionHandler = async (params, context, { notifier })
           }
         },
         intent: 'outcome',
-        metadata: { type: 'promotion', url: `/moach/${project.id}/sales/manage`, priority: 'normal' }
+        metadata: { type: 'promotion', url: `/moach/${project.id}/sales/manage/promotions`, priority: 'normal' }
       },
       { projectId: project.id },
       { projectId: project.id }

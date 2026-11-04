@@ -357,7 +357,7 @@
           {$t('lev.fulfill.openOrder')}
         </a>
       {:else}
-        <a class="text-center text-xs text-gray-600 underline dark:text-gray-300" href={resolve(`/moach/${buble.projectId}/sales/manage`)}>
+        <a class="text-center text-xs text-gray-600 underline dark:text-gray-300" href={resolve(`/moach/${buble.projectId}/sales/manage/orders`)}>
           {wave ? $t('lev.fulfill.openOrders') : $t('lev.fulfill.openOrder')}
         </a>
       {/if}

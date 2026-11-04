@@ -32,7 +32,7 @@
 {:else}
   <div class="op">
     <div class="op-head">
-      <a class="sh-btn sh-btn-quiet sh-btn-icon" href={base} aria-label={$t('shop.order.back')}>
+      <a class="sh-btn sh-btn-quiet sh-btn-icon" href="{base}/orders" aria-label={$t('shop.order.back')}>
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="op-flip"><path d="M9 18l6-6-6-6" /></svg>
       </a>
       <div class="op-head-text">

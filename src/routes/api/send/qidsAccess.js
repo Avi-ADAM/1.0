@@ -674,6 +674,9 @@ export const qidsAccess = {
   'leadById': { allow: ['serviceAdmin'] },
   'leadByExternalId': { allow: ['serviceAdmin'] },
   'rikmaApiLeadsSchema': { allow: ['serviceAdmin'] },
+  'leadOrderLinks': { allow: ['serviceAdmin'] },
+  'leadMoneyOrders': { allow: ['serviceAdmin'] },
+  'leadMoneySales': { allow: ['serviceAdmin'] },
   'leadsByContact': { allow: ['serviceAdmin'] },
   'leadCreate': { allow: ['serviceAdmin'] },
   'leadUpdate': { allow: ['serviceAdmin'] },
@@ -739,6 +742,7 @@ export const qidsAccess = {
   // moach layout's membership check. Orders carry the buyer's phone and address.
   'moachShopOrders': { allow: ['serviceAdmin'] },
   'moachShopProducts': { allow: ['serviceAdmin'] },
+  'moachManageFacts': { allow: ['serviceAdmin'] },
   'moachShopLowStock': { allow: ['serviceAdmin'] },
   'moachShopSales': { allow: ['serviceAdmin'] },
   // The seller's product editor (S4, qidsShopEditor.js): the editor's loader and

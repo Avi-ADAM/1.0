@@ -14,6 +14,7 @@
  */
 import { shippingSchemaLive } from './shippingConfig.js';
 import { readOrderShipping } from '$lib/shop/shipping';
+import { productShips, type ManageFacts } from '$lib/shop/manageTabs';
 import { strapiClient } from '$lib/server/actions';
 import { ordersSchemaLive, strapiRun } from '$lib/server/apiPublic/catalog.js';
 import { productStatusOf } from '$lib/server/apiPublic/dto.js';
@@ -116,6 +117,32 @@ export interface ShopOrdersResult {
   orders: ShopOrder[];
   /** The query failed for another reason; the screen offers a refresh. */
   failed?: boolean;
+}
+
+/**
+ * What decides which "manage sales" tabs show (`visibleTabs`, PLAN_LEADS §4.0).
+ * `orders` is filled by the caller from the orders it already loaded. Null
+ * when it cannot be read — the screen then shows every tab.
+ */
+export async function loadManageFacts(
+  projectId: string,
+  orderCount: number,
+  fetchFn?: FetchFn
+): Promise<ManageFacts | null> {
+  try {
+    const res = await strapiClient.execute('moachManageFacts', { pid: projectId }, undefined, fetchFn);
+    const products = (res?.data?.matanots?.data ?? []) as any[];
+    const shipping = res?.data?.project?.data?.attributes?.shipping;
+    return {
+      products: products.length,
+      ships: products.some((p) => productShips(p?.attributes?.deliveryOptions)),
+      shippingSet: shipping != null && typeof shipping === 'object' && Object.keys(shipping).length > 0,
+      orders: orderCount
+    };
+  } catch (e) {
+    console.error('[moachShop] manage facts failed:', (e as any)?.getMessages?.() ?? e);
+    return null;
+  }
 }
 
 /**

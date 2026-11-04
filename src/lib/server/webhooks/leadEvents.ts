@@ -71,3 +71,41 @@ export async function onLeadChanged(opts: {
   }
   await Promise.all(sends);
 }
+
+/**
+ * The money sync moved leads (moneySync.ts, L3a) — not an action of its own,
+ * so it announces here: `lead.statusChanged` for every move, and `lead.won`
+ * too when the lead became a customer.
+ */
+export async function announceLeadMoves(opts: {
+  projectId: string;
+  moved: Array<{ leadId: string; to: string }>;
+  strapi: Strapi;
+  fetchFn: typeof globalThis.fetch;
+}): Promise<void> {
+  const { projectId, moved, strapi, fetchFn } = opts;
+  if (!moved.length) return;
+  const targets = await getWebhookTargets(projectId, strapi, fetchFn);
+  const forEvent = (event: LeadWebhookEvent) =>
+    targets.filter((t) => wants(t, event) && mayReceiveLead(t.scopes));
+  if (!forEvent('lead.statusChanged').length && !forEvent('lead.won').length) return;
+
+  const sends: Promise<void>[] = [];
+  for (const m of moved) {
+    let externalId: string | null = null;
+    try {
+      const res = await strapi.execute('leadById', { id: m.leadId }, undefined, fetchFn);
+      externalId = res?.data?.lead?.data?.attributes?.externalId ?? null;
+    } catch (e) {
+      console.warn('[webhooks] could not read lead', m.leadId, e);
+    }
+    const change = { leadId: m.leadId, externalId, status: m.to };
+    const events: LeadWebhookEvent[] = m.to === 'won' ? ['lead.statusChanged', 'lead.won'] : ['lead.statusChanged'];
+    for (const event of events) {
+      const body = leadWebhookBody(event, projectId, change);
+      const deliveryId = `lead-${m.leadId}-${event}-${Date.now()}`;
+      for (const t of forEvent(event)) sends.push(deliver(t, body, event, deliveryId, fetchFn));
+    }
+  }
+  await Promise.all(sends);
+}

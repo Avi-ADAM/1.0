@@ -1,8 +1,8 @@
 # PLAN — לידים ברקמה: טבלה מסודרת, מטלה לכל ליד, וחיבור לחנות
 
-> **מצב (2026-11-04): L0 בנוי ב-`1.0b` (ענף `shabab`), ממתין ל-deploy + הרשאות (§7.5).
-> L1 ו-L2 בנויים ב-1.0main (§8.1, §8.2) — לא ירוצו מול Strapi עד ש-L0 נפרס** (`/leads` עונה
-> `503 LEADS_NOT_READY` עד אז). L3a ואילך — עוד לא בקוד.
+> **מצב (2026-11-04): L0 נפרס (1.0b release 1.18/1.19; ההרשאות באדמין — לאמת, §7.5).
+> L1, L2 ו-L3a בנויים ב-1.0main (§8.1–§8.3). `lead.sales` (L3a) ב-1.0b ממתין לפריסה הבאה.**
+> L3 ואילך — עוד לא בקוד.
 >
 > נכתב 2026-11-03 אחרי קריאת הקוד והמסמכים
 > (`demo-request`, `createTask`, `/api/v1/r/[rikma]/*`, `webhooks/`, מסך
@@ -522,7 +522,7 @@ namespace חדש `leads` ב-`ROUTED` רק לנתיבי `sales/*` (כמו `shop`)
 | L0 ✅ | סכמה ב-1.0b (`lead`, `lead-activity`, `leadSettings`) + הרשאות + types — **הקוד בנוי; ממתין ל-deploy, הרשאות ו-`types:update` (§7.5)** | — | יום |
 | L1 ✅ | `src/lib/leads/` טהור (`validateLeadPayload`, `dedupeKey`, `needsAttention`, מעברי סטטוס) + vitest; actions `createLead` / `logLeadActivity` / `updateLeadStatus` + סנכרון מטלה | L0 | 2–3 ימים |
 | L2 ✅ | `POST /leads` + `GET /leads/{externalId}` + scopes + webhooks + OpenAPI (`rikma-v1.openapi.yaml`) | L1 | 1–2 ימים |
-| L3a | המסלול (§4.0): `stageOf` (ליד · הזמנה · הצעת קונסיירז') + vitest; סנכרון `offered`/`won`/`cancelled` מ-`createPaidOrder`, `orderLifecycle`, `createSale`; סידור הלשוניות לפי המסלול, לשוניות לפי מה שיש, `/sales/manage` ⇒ הלשונית שמחכה, קישורים קיימים ⇒ `/manage/orders` | L1 | 2 ימים |
+| L3a ✅ | המסלול (§4.0): `stageOf` (ליד · הזמנה · הצעת קונסיירז') + vitest; סנכרון `offered`/`won`/`cancelled` מ-`createPaidOrder`, `orderLifecycle`, `createSale`; סידור הלשוניות לפי המסלול, לשוניות לפי מה שיש, `/sales/manage` ⇒ הלשונית שמחכה, קישורים קיימים ⇒ `/manage/orders` | L1 | 2 ימים |
 | L3 | לשונית "בתהליך" + עמוד ליד (עם "שלח הצעה" / "דווח מכירה") + פס בשכבה הפשוטה + i18n | L3a | 3–4 ימים |
 | **→ הוועד עובר ל-`/leads`** | | L2 | שעה בצד `vaad` |
 | L4 | חנות: "בקשו הצעה" בעמוד מוצר ובתבנית, קישור הזמנה↔ליד, `won` אוטומטי | L2, S3 | 2 ימים |
@@ -578,6 +578,36 @@ namespace חדש `leads` ב-`ROUTED` רק לנתיבי `sales/*` (כמו `shop`)
 - מעבר סטטוס שנעשה דרך המטלה (`naasa` ⇒ `contacted`) **לא** יורה webhook — הסנכרון אינו action.
   אם אתר יצטרך את זה, הסנכרון יקרא ל-`onLeadChanged` ישירות.
 - הוועד יכול לעבור ל-`/leads` כשיש L0 בפרודקשן ומפתח עם `leads:create`.
+
+### 8.3 L3a — מה נבנה (2026-11-04)
+
+- **`src/lib/leads/stage.ts`** — `stageOf(lead, { orderStatuses, saleCount })`, `stageOfOrder`,
+  `syncedStatus` (רק מעברים אל `offered`/`won` וממנו הם עניין הסנכרון), `stageOfProposal` (הצעת
+  קונסיירז' על אותו מסלול; נעצרה = `paused` עם סיבה). בדיקות: `stage.test.ts`.
+- **`src/lib/server/leads/moneySync.ts`** — שלב 5b‴ ב-`ActionService`, אחרי `createPaidOrder`,
+  `confirmOrderPayment`, `cancelOrder`, `expireOrder` ו-`createSale` עם `leadId`. הזמנה ששולמה
+  מקונה שתואם ליד פתוח (טלפון/מייל) — מקושרת אליו (`linkOrder`) והוא `won`; הזמנה ששולמה בלי
+  התאמה לא יוצרת ליד. ביטול ⇒ `talking`. כל מעבר נרשם ביומן בלי `actor` (מערכת), ויורה
+  `lead.statusChanged` (+ `lead.won`) דרך `announceLeadMoves`. בדיקות: `moneySync.test.ts`.
+- **`createSale.leadId`** — "דווח מכירה" מעמוד הליד (L3) מעביר אותו; הסנכרון מקשר את המכירה ל-`lead.sales`.
+- **`lead.sales`** (1.0b `cd35eb7`) — manyToMany חד-כיווני. עד שייפרס, הקריאה שלו (`leadMoneySales`)
+  נכשלת בשקט וליד נהיה `won` רק דרך הזמנות.
+- **מסך הניהול**: ההזמנות עברו ל-`/sales/manage/orders`; `/sales/manage` מפנה ללשונית שמחכה
+  (`landingTab`: הזמנה ששולמה ומחכה למשלוח ⇒ הזמנות; אחרת הזמנות אם יש, ו"מכירות" ברקמה שמעולם
+  לא הייתה לה הזמנה — L3 ישים כאן את "בתהליך"); `?f=` ישן ממשיך להזמנות. הלשוניות בסדר המסלול
+  (`MANAGE_TABS`) ומוצגות לפי מה שיש (`visibleTabs`, `$lib/shop/manageTabs.ts`, בדיקות). כרטיס
+  "חסר במלאי" ב-KPI מוצג רק כשיש לשונית מלאי. הקישורים שהתכוונו להזמנות (פס השכבה הפשוטה, כרטיס
+  הביצוע בלב, התראות הזמנה, חזרה מהזמנה) הולכים ל-`/orders`; התראות מבצע ל-`/promotions`.
+
+מה הוחלט בדרך:
+- **"ביצוע" מופיע עם המוצר הראשון**, לא רק כשיש שלבי ביצוע — השלבים נוצרים מהלשונית עצמה, והסתרתה
+  הייתה מסתירה את הדרך ליצור את הראשון. "מלאי" ו"מבצעים" — גם עם המוצר הראשון (אין דרך אמינה לדעת
+  "סופר מלאי" מ-`quant` לבד). "משלוחים" — כשמוצר מציין `delivery` או שיש הגדרת משלוח.
+- **הלשונית שחבר נמצא בה לא נעלמת**, וכשאי אפשר לקרוא את העובדות — כל הלשוניות מוצגות.
+- **מכסף מנצח "לא עכשיו"**, הצעה פתוחה לא: ליד ב-`paused` עם הזמנה ששולמה הוא `won`; עם הצעה פתוחה בלבד —
+  נשאר `paused` (המילה של החבר עומדת).
+- KPI "צריכים טיפול" ופס "פניות מחכות" בשכבה הפשוטה — עם L3 (הם קוראים את רשימת הלידים).
+- **לא נבדק בדפדפן** — רק vitest ו-`npm run check`.
 
 **בדיקות**: vitest לפונקציות הטהורות ול-endpoint (תבנית `server.test.ts` של `orders`);
 תרחישים: מפתח של רקמה A על רקמה B ⇒ 403; בלי הסכמה ⇒ 400; אותו `externalId` ⇒

@@ -12,6 +12,7 @@
     type ShopSaleRow
   } from '$lib/shop/manage';
   import { forgetSettled, shownStatus } from '$lib/shop/pendingMarks.svelte';
+  import { MANAGE_TABS, visibleTabs, type ManageTab } from '$lib/shop/manageTabs';
 
   let { data, children } = $props();
   const fmtMoney = useFormatMoney();
@@ -54,9 +55,9 @@
   });
   let summary = $derived(sales ? salesSummary(sales, clock.minutes) : null);
 
-  const TABS = ['orders', 'products', 'stock', 'promotions', 'shipping', 'fulfillment', 'sales', 'connect'] as const;
-  function hrefOf(tab: (typeof TABS)[number]) {
-    return tab === 'orders' ? base : `${base}/${tab}`;
+  // Along the path of a sale, and only the tabs this rikma needs (PLAN_LEADS §4.0).
+  function hrefOf(tab: ManageTab) {
+    return `${base}/${tab}`;
   }
   // One order on a phone is its own screen (canvas "MobileOrder"): the page draws
   // its own header, so the manage header and tabs step aside there.
@@ -64,8 +65,9 @@
   let active = $derived.by(() => {
     const rest = page.url.pathname.split('/sales/manage')[1] ?? '';
     const seg = rest.split('/').filter(Boolean)[0];
-    return (TABS as readonly string[]).includes(seg) ? seg : 'orders';
+    return (MANAGE_TABS as readonly string[]).includes(seg) ? seg : 'orders';
   });
+  let tabs = $derived(visibleTabs(data.facts ?? null, active));
 
   // The active tab scrolls into view on narrow screens (Russian and Spanish
   // labels do not fit five across at 375px — UX_COPY §3.1).
@@ -100,18 +102,20 @@
       <span class="sh-kpi-value sh-gold"><bdi>{summary ? fmtMoney(summary.awaiting) : '—'}</bdi></span>
       <a class="sh-kpi-sub" href="/moach/{projectId}/sales">{$t('shop.kpi.toSplit')}</a>
     </div>
-    <a class="sh-kpi sh-card sh-kpi-link" href={base}>
+    <a class="sh-kpi sh-card sh-kpi-link" href="{base}/orders">
       <span class="sh-section-label">{$t('shop.kpi.waiting')}</span>
       <span class="sh-kpi-value">{waiting.length}</span>
       <span class="sh-kpi-sub">{waiting.length ? $t('shop.kpi.oldest', { when: oldestWhen }) : $t('shop.kpi.noneWaiting')}</span>
     </a>
-    <a class="sh-kpi sh-card sh-kpi-link" class:sh-kpi-warn={shortOrders.length > 0} href="{base}/stock?f=short">
-      <span class="sh-section-label">{$t('shop.kpi.short')}</span>
-      <span class="sh-kpi-value">{shortOrders.length}</span>
-      <span class="sh-kpi-sub">
-        {#if shortUnits}{shortUnits === 1 ? $t('shop.kpi.shortUnitsOne') : $t('shop.kpi.shortUnits', { count: shortUnits })}{:else}&nbsp;{/if}
-      </span>
-    </a>
+    {#if tabs.includes('stock')}
+      <a class="sh-kpi sh-card sh-kpi-link" class:sh-kpi-warn={shortOrders.length > 0} href="{base}/stock?f=short">
+        <span class="sh-section-label">{$t('shop.kpi.short')}</span>
+        <span class="sh-kpi-value">{shortOrders.length}</span>
+        <span class="sh-kpi-sub">
+          {#if shortUnits}{shortUnits === 1 ? $t('shop.kpi.shortUnitsOne') : $t('shop.kpi.shortUnits', { count: shortUnits })}{:else}&nbsp;{/if}
+        </span>
+      </a>
+    {/if}
     <div class="sh-kpi sh-card">
       <span class="sh-section-label">{$t('shop.kpi.month')}</span>
       <span class="sh-kpi-value"><bdi>{summary ? fmtMoney(summary.recent) : '—'}</bdi></span>
@@ -120,7 +124,7 @@
   </section>
 
   <nav class="sh-tabs" aria-label={$t('shop.tabs.label')} bind:this={tabsEl}>
-    {#each TABS as tab (tab)}
+    {#each tabs as tab (tab)}
       <a href={hrefOf(tab)} aria-current={active === tab ? 'page' : undefined} data-sveltekit-noscroll>
         {$t(`shop.tabs.${tab}`)}
         {#if tab === 'orders' && badge > 0}
@@ -279,7 +283,9 @@
     }
     .sh-kpis {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      /* three cards in a rikma without stock, four with it */
+      grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+      grid-auto-flow: column;
       gap: 12px;
     }
     .sh-tabs {

@@ -29,7 +29,7 @@
 
 <div class="shop-ui sc">
   {#if banner}
-    <a class="sc-banner" class:sc-short={banner.kind === 'short'} href={banner.kind === 'short' ? `${base}/stock?f=short` : base}>
+    <a class="sc-banner" class:sc-short={banner.kind === 'short'} href={banner.kind === 'short' ? `${base}/stock?f=short` : `${base}/orders`}>
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 8l-9-5-9 5 9 5 9-5z" /><path d="M3 8v8l9 5 9-5V8" /><path d="M12 13v8" /></svg>
       <span class="sc-text">{text}</span>
       <span class="sc-cta">{$t('shop.banner.cta')}</span>

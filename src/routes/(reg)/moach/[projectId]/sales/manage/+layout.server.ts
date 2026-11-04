@@ -1,4 +1,4 @@
-import { loadShopOrders, loadShopSales } from '$lib/server/shop/moachShop.js';
+import { loadManageFacts, loadShopOrders, loadShopSales } from '$lib/server/shop/moachShop.js';
 import { shopOrdersKey } from '$lib/shop/keys.js';
 import type { LayoutServerLoad } from './$types';
 
@@ -8,16 +8,20 @@ import type { LayoutServerLoad } from './$types';
  * that matters — the orders carry the buyer's phone and address.
  *
  * The orders come with the first paint (the tab badge and the KPI strip need
- * them on every tab). The sales table is streamed: the KPI strip fills in when
- * it arrives, and the sales tab reads the same promise instead of asking again.
+ * them on every tab), and with them the few facts that decide which tabs this
+ * rikma needs (PLAN_LEADS §4.0). The sales table is streamed: the KPI strip
+ * fills in when it arrives, and the sales tab reads the same promise instead
+ * of asking again.
  */
 export const load: LayoutServerLoad = async ({ params, parent, fetch, depends }) => {
   await parent();
   const projectId = params.projectId;
   depends(shopOrdersKey(projectId));
 
+  const shop = await loadShopOrders(projectId, fetch);
   return {
-    shop: await loadShopOrders(projectId, fetch),
+    shop,
+    facts: await loadManageFacts(projectId, shop.orders.length, fetch),
     sales: loadShopSales(projectId, fetch)
   };
 };

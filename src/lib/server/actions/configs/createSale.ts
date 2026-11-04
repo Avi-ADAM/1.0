@@ -479,6 +479,12 @@ export const createSaleConfig: ActionConfig = {
       description: 'The paid order this sale is one line of (createPaidOrder).'
     },
     entryCurrency: ENTRY_CURRENCY_PARAM,
+    leadId: {
+      type: 'string',
+      required: false,
+      description:
+        'The lead this sale closes (PLAN_LEADS §4.0 "report a sale" from the lead page). After the sale is written, the lead is linked to it and becomes a customer (`won`) — nowhere else.'
+    },
     customerIdentifier: {
       type: 'string',
       required: false,

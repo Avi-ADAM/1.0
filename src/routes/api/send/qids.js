@@ -15476,6 +15476,35 @@ ${PROMO_DECISION_FIELDS}
     }
   }`,
 
+  // The order side of the money sync (L3a): its status, the buyer's contact
+  // (to find an open lead it belongs to) and the leads already linked.
+  'leadOrderLinks': `query LeadOrderLinks($pid: ID!, $ref: String!) {
+    orders(
+      filters: { and: [ { project: { id: { eq: $pid } } }, { ref: { eq: $ref } } ] }
+      pagination: { limit: 1 }
+    ) {
+      data { id attributes { status buyerEmail buyerPhone leads { data { id } } } }
+    }
+  }`,
+
+  // A lead's orders, for stageOf. Sales are a separate read (leadMoneySales):
+  // that column comes with a later deploy, and must not break this one.
+  'leadMoneyOrders': `query LeadMoneyOrders($id: ID!) {
+    lead(id: $id) {
+      data { id attributes {
+        status
+        project { data { id } }
+        orders(pagination: { limit: 100 }) { data { id attributes { status } } }
+      } }
+    }
+  }`,
+
+  'leadMoneySales': `query LeadMoneySales($id: ID!) {
+    lead(id: $id) {
+      data { id attributes { sales(pagination: { limit: 100 }) { data { id } } } }
+    }
+  }`,
+
   // GET /api/v1/r/{rikma}/leads/{externalId} answers 503 until this reads.
   'rikmaApiLeadsSchema': `query RikmaApiLeadsSchema {
     leads(pagination: { limit: 1 }) { data { id } }
@@ -17993,6 +18022,15 @@ ${PROMO_DECISION_FIELDS}
   }`,
 
   // The rikma's products with their variants — the products and stock tabs.
+  // Which "manage sales" tabs this rikma needs (PLAN_LEADS §4.0, $lib/shop/manageTabs):
+  // how many products, whether any ships, and whether shipping is set up.
+  'moachManageFacts': `query MoachManageFacts($pid: ID!) {
+    matanots(filters: { projectcreates: { id: { eq: $pid } } }, pagination: { limit: 200 }) {
+      data { id attributes { deliveryOptions } }
+    }
+    project(id: $pid) { data { id attributes { shipping } } }
+  }`,
+
   'moachShopProducts': `query MoachShopProducts($pid: ID!) {
     matanots(
       filters: { projectcreates: { id: { eq: $pid } } }

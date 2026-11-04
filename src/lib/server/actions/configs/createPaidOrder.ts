@@ -273,7 +273,7 @@ const handler: ActionExecutionHandler = async (params, context, deps) => {
               }
             },
             intent: 'review',
-            metadata: { type: 'arrangedOrder', url: `moach/${projectId}/sales/manage?f=toCollect`, projectName, priority: 'high' }
+            metadata: { type: 'arrangedOrder', url: `moach/${projectId}/sales/manage/orders?f=toCollect`, projectName, priority: 'high' }
           },
           { projectId },
           null,

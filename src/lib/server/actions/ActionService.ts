@@ -394,6 +394,29 @@ export class ActionService {
           });
       }
 
+      // Step 5b‴: A lead follows its money (PLAN_LEADS §4.0, L3a) — an order
+      // on the table makes it `offered`, a paid order or a sale reported with
+      // `leadId` makes it `won`, a cancelled order sends it back to `talking`.
+      // Fire-and-forget: a lead that failed to follow never fails a payment.
+      if (
+        actionKey === 'createPaidOrder' ||
+        actionKey === 'confirmOrderPayment' ||
+        actionKey === 'cancelOrder' ||
+        actionKey === 'expireOrder' ||
+        (actionKey === 'createSale' && params?.leadId)
+      ) {
+        import('../leads/moneySync.js')
+          .then(({ syncLeadsAfterMoney }) =>
+            syncLeadsAfterMoney({ actionKey, params, result: strapiResult, context, strapi: this.strapiClient })
+          )
+          .catch((err) => {
+            this.logger.warn('Lead money sync error', {
+              actionKey,
+              error: err instanceof Error ? err.message : String(err)
+            });
+          });
+      }
+
       // Step 5c: Order webhooks (PLAN_SHOP_CUSTOMER_EXPERIENCE §5.6) — the
       // storefront hears about its orders and stock. Same fire-and-forget rule.
       if (

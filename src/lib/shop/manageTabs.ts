@@ -1,0 +1,86 @@
+/**
+ * The tabs of "manage sales", read along the path of a sale
+ * (docs/inprogress/PLAN_LEADS.md §4.0): before the sale · fulfilment ·
+ * money · products · connections. "In progress" (the pipeline) opens the row
+ * when L3 adds it.
+ *
+ * Tabs follow what the rikma has, not a mode it chose: a rikma that sells a
+ * service sees sales · products · connect; the moment it adds a product that
+ * ships, shipping appears. Nothing to remember to switch on — and the tab a
+ * member is on never disappears from under them.
+ */
+
+import { isWaiting, type ShopOrder } from './manage';
+
+export const MANAGE_TABS = [
+  'orders',
+  'stock',
+  'shipping',
+  'fulfillment',
+  'promotions',
+  'products',
+  'sales',
+  'connect'
+] as const;
+export type ManageTab = (typeof MANAGE_TABS)[number];
+
+export interface ManageFacts {
+  /** Products this rikma sells (any state). */
+  products: number;
+  /** Some product can be delivered (its `deliveryOptions` name `delivery`). */
+  ships: boolean;
+  /** The rikma has shipping settings. */
+  shippingSet: boolean;
+  /** Orders it has ever had. */
+  orders: number;
+}
+
+/** Shown no matter what: the ways to start (add a product, connect a site) and the money. */
+const ALWAYS: ReadonlySet<ManageTab> = new Set(['products', 'sales', 'connect']);
+
+/** `facts` null (could not be read) ⇒ every tab, rather than hide one wrongly. */
+export function visibleTabs(facts: ManageFacts | null, active?: string | null): ManageTab[] {
+  if (!facts) return [...MANAGE_TABS];
+  const has = facts.products > 0;
+  const show: Record<ManageTab, boolean> = {
+    orders: has || facts.orders > 0,
+    stock: has,
+    shipping: facts.ships || facts.shippingSet,
+    // Fulfilment steps are set up from their own tab, so it shows with the
+    // first product — waiting for a step to exist would hide the way to add one.
+    fulfillment: has,
+    promotions: has,
+    products: true,
+    sales: true,
+    connect: true
+  };
+  return MANAGE_TABS.filter((tab) => show[tab] || ALWAYS.has(tab) || tab === active);
+}
+
+/**
+ * Where `/sales/manage` lands: the first tab with something waiting. A paid
+ * order that still has to go out is the most urgent thing on the screen.
+ * Otherwise the orders while the rikma has any, and the sales when it never
+ * had an order — L3 puts "in progress" here.
+ */
+export function landingTab(orders: Array<Pick<ShopOrder, 'status' | 'delivery'>>, facts: ManageFacts | null): ManageTab {
+  if (orders.some(isWaiting)) return 'orders';
+  return visibleTabs(facts).includes('orders') ? 'orders' : 'sales';
+}
+
+/**
+ * Does a product's `deliveryOptions` name home delivery? It is a json array of
+ * `{ kind, note, fee }` — sometimes stored as its string — as `deliveryOf`
+ * (apiPublic/shop.ts) reads it.
+ */
+export function productShips(deliveryOptions: unknown): boolean {
+  let list: unknown = deliveryOptions;
+  if (typeof list === 'string') {
+    try {
+      list = JSON.parse(list);
+    } catch {
+      return false;
+    }
+  }
+  return Array.isArray(list) && list.some((d) => (d as { kind?: unknown } | null)?.kind === 'delivery');
+}
