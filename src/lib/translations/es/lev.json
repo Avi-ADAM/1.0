@@ -363,7 +363,9 @@
       "recurringTag": "🔁 Recurso recurrente",
       "assignment": "Aprobación de asignación y uso compartido del recurso",
       "request": "Aprobación de solicitud de recurso compartido",
-      "joinRequest": "Aprobación de incorporación a la rikma y del recurso compartido"
+      "joinRequest": "Aprobación de incorporación a la rikma y del recurso compartido",
+      "offeredToYou": "Un recurso que te proponen",
+      "offeredToMember": "Aprobar un recurso propuesto a un miembro"
     },
     "nav": {
       "heart": "Corazón de 1💗1",
@@ -674,7 +676,16 @@
     "totalInvestHint": "Inversión total estimada para todo el período",
     "noEndDate": "Sin fecha de fin - hasta marcarlo como completado",
     "recurringApprovalNote": "La aprobación pone en marcha el motor de recurso recurrente; después, cada ciclo abre su propio cargo para que la rikma apruebe el gasto real",
-    "recurringJoinNote": "La aprobación incorpora a quien ofrece a la rikma y pone en marcha el motor de recurso recurrente; solo después cada ciclo abre su propio cargo para el gasto real"
+    "recurringJoinNote": "La aprobación incorpora a quien ofrece a la rikma y pone en marcha el motor de recurso recurrente; solo después cada ciclo abre su propio cargo para el gasto real",
+    "backfillTitle": "Incluye {{count}} meses anteriores que quien propone ya pagó",
+    "backfillTitleYears": "Incluye {{count}} años anteriores que quien propone ya pagó",
+    "backfillTotal": "Total pagado:",
+    "backfillShow": "Mes a mes",
+    "backfillNote": "Aprobar el recurso aprueba también estos pagos, y cada uno se registra como la parte de quien propone en la rikma. Puedes contraproponer otra versión o abrir una conversación.",
+    "resourceOfferedTo": "Propuesto a:",
+    "assignedChooseNote": "Nada se registra a tu nombre sin tu consentimiento: elige uno de tus recursos o crea uno nuevo; esa es tu aprobación.",
+    "assignedWaitingNote": "Esperando a que {{name}} elija el recurso que aporta y lo apruebe explícitamente: su silencio no es consentimiento.",
+    "chooseAndApprove": "Elegir recurso y aprobar"
   },
   "hachlata": {
     "theClaim": "La declaración",
@@ -1203,5 +1214,39 @@
       "countered": "Tu versión está sobre la mesa y el reloj se reinició",
       "error": "Algo salió mal — inténtalo de nuevo"
     }
+  },
+  "provideAssigned": {
+    "title": "¿Qué recurso aportarás a \"{{name}}\"?",
+    "intro": "Elige uno de tus recursos que encaje o crea uno nuevo. Tu elección es también tu aprobación; el recurso se registra cuando todos los miembros están de acuerdo.",
+    "create": "Crear un recurso nuevo mío",
+    "createInstead": "Crear un recurso nuevo en su lugar",
+    "valueLabel": "Lo que vale para mí",
+    "valueHint": "El valor que aportas a la rikma. Los demás detalles se toman de la solicitud.",
+    "submit": "Aprobar y aportarlo",
+    "cancel": "Cancelar",
+    "failed": "No se pudo guardar tu respuesta",
+    "registered": "El recurso quedó registrado a tu nombre en la rikma",
+    "recorded": "Tu aprobación quedó guardada; esperamos a los demás miembros"
+  },
+  "assignedOptions": {
+    "button": "Más opciones",
+    "title": "¿Qué hacer con el recurso que te proponen?",
+    "terms": "Ajustar las condiciones",
+    "termsHint": "Una contrapropuesta: precio, cantidad, fechas, detalles. Los miembros la responden, y elegir tu recurso sigue siendo tu aprobación.",
+    "reassign": "Pasarlo a otro miembro",
+    "reassignHint": "Proponer que otra persona de la rikma aporte este recurso.",
+    "withdraw": "Retirarme",
+    "withdrawHint": "No es para mí. El recurso sigue y se abre a cualquiera que pueda aportarlo.",
+    "toWhom": "¿A quién pasarlo?",
+    "pickMember": "Elegir un miembro",
+    "reassignNote": "La votación empieza de nuevo, sobre el recurso y sobre quién lo aporta, y esa persona tendrá que aprobarlo explícitamente.",
+    "withdrawNote": "Nada se registra a tu nombre. El recurso se abre a toda la comunidad y cada oferta llega a la rikma para votar.",
+    "why": "Unas palabras para la rikma (opcional)",
+    "reassignSubmit": "Pasarlo",
+    "withdrawSubmit": "Retirarme",
+    "back": "Volver",
+    "failed": "No se guardó la acción",
+    "passed": "Lo pasaste; esperamos su respuesta",
+    "withdrawn": "Te retiraste; el recurso ahora está abierto a todos"
   }
 }

@@ -1884,6 +1884,9 @@ export function extractAskedResources(userData: any): AskedResourceData[] {
         sqadualedf: omData.sqadualedf,
         recurring: omData.recurring === true,
         cycleSize: omData.cycleSize ?? 1,
+        // Past cycles the proposer paid, signed with this request
+        // ($lib/recurring/backfill). Only a self-proposal can carry them.
+        backfill: pmashAttrs.backfill ?? null,
         openName: omData.name,
         omid: askAttributes.open_mashaabim?.data?.id,
         pmashId: askAttributes.pmash?.data?.id,
@@ -1899,6 +1902,16 @@ export function extractAskedResources(userData: any): AskedResourceData[] {
         pid: project.attributes.user_1s?.data?.map((u: any) => u.id) || [],
         ani: 'askedm',
         azmi: 'ziruf',
+        // A resource offered TO a member carries no Sp until they choose what
+        // they bring (docs/inprogress/PLAN_RESOURCE_ASSIGNMENT.md). Their own card
+        // asks them to; the others' cards say whom it waits for.
+        assignedOffer: !askAttributes.sp?.data?.id && !askAttributes.isSelfProposal,
+        awaitingMyResource:
+          !askAttributes.sp?.data?.id &&
+          !askAttributes.isSelfProposal &&
+          String(userId) !== '' &&
+          String(userId) === String(userData.id),
+        omMashaabimId: openMashaabimAttrs.mashaabim?.data?.id ?? null,
         // Self-proposal flags (set by createResource when a project member self-assigns)
         isSelfProposal: askAttributes.isSelfProposal ?? false,
         pendingMainVote: askAttributes.pendingMainVote ?? false,

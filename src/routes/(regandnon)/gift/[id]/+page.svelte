@@ -1,4 +1,4 @@
-﻿<script>
+<script>
   import { isRtl, locale, t } from '$lib/translations';
   import EntityIcon from '$lib/celim/icons/EntityIcon.svelte';
   import { Head } from 'svead';
@@ -229,7 +229,7 @@
     >
       <!-- Header Gradient -->
       <div
-        class="bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre p-4 sm:p-6 text-white"
+        class="bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre p-4 sm:p-6 text-[color:var(--ramp-ink,#16131b)]"
       >
         <div
           class="flex flex-col sm:flex-row justify-between items-center gap-4"
@@ -250,11 +250,11 @@
                 <span class="text-barbi font-bold text-lg sm:text-xl drop-shadow-sm"
                   >{$t('pages.gift.gift')}</span
                 >
-                <h1 class="text-xl sm:text-3xl font-extrabold text-white leading-tight">
+                <h1 class="text-xl sm:text-3xl font-extrabold text-[color:var(--ramp-ink,#16131b)] leading-tight">
                   {data.personalSeller.username}
                 </h1>
                 <span
-                  class="mt-1 self-start text-xs font-bold bg-white/20 border border-white/40 rounded-full px-2.5 py-0.5"
+                  class="mt-1 self-start text-xs font-bold bg-black/10 dark:bg-white/10 border border-black/20 dark:border-white/20 text-[color:var(--ramp-ink,#16131b)] rounded-full px-2.5 py-0.5"
                 >
                   {$t('offerings.products.seller_badge')}
                 </span>
@@ -275,7 +275,7 @@
                   >{$t('pages.gift.gift')}</span
                 >
                 <h1
-                  class="text-xl sm:text-3xl font-extrabold text-white leading-tight"
+                  class="text-xl sm:text-3xl font-extrabold text-[color:var(--ramp-ink,#16131b)] leading-tight"
                 >
                   {data.alld.projectcreates?.data?.[0]?.attributes?.projectName}
                 </h1>
@@ -287,14 +287,14 @@
           {#if data.personalSeller}
             <a
               href={`/user/${data.personalSeller.id}`}
-              class="w-full sm:w-auto px-6 py-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/40 rounded-full text-white font-bold transition-all transform hover:scale-105 shadow-sm whitespace-nowrap text-center"
+              class="w-full sm:w-auto px-6 py-2 bg-gradient-to-r from-barbi to-mpink hover:brightness-110 text-gold border-2 border-gold rounded-full font-bold transition-all transform hover:scale-105 shadow-sm whitespace-nowrap text-center"
             >
               {$t('offerings.products.seller_profile')}
             </a>
           {:else if data.alld.projectcreates?.data?.[0]?.id}
             <button
               onclick={(e) => project(data.alld.projectcreates.data[0].id, e)}
-              class="w-full sm:w-auto px-6 py-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/40 rounded-full text-white font-bold transition-all transform hover:scale-105 shadow-sm whitespace-nowrap"
+              class="w-full sm:w-auto px-6 py-2 bg-gradient-to-r from-barbi to-mpink hover:brightness-110 text-gold border-2 border-gold rounded-full font-bold transition-all transform hover:scale-105 shadow-sm whitespace-nowrap"
             >
               {$t('pages.gift.seeProject')}
             </button>

@@ -791,6 +791,7 @@
             {projectId}
             userslength={projectUsers.length || 1}
             memberCount={projectBase ? projectUsers.length : null}
+            members={projectUsers}
             projectName={pn}
             initialSpec={resourcePrefill}
             onCreated={handleResourceCreated}

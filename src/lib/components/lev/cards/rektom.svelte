@@ -15,6 +15,7 @@
   import VoteStatusDisplay from './VoteStatusDisplay.svelte';
   import { getProjectData } from '$lib/stores/projectStore';
   import GoldenMeetingLink from '$lib/components/meetings/GoldenMeetingLink.svelte';
+  import BackfillSummary from '$lib/components/resource/BackfillSummary.svelte';
 
   /**
    * @typedef {Object} Props
@@ -36,6 +37,7 @@
    * @property {any} [kindOf]
    * @property {boolean} [recurring] - recurring monthly/yearly expense
    * @property {number} [cycleSize] - every N months/years
+   * @property {unknown} [backfill] - past cycles the proposer already paid ($lib/recurring/backfill)
    * @property {any} [hearotMeyuchadot]
    * @property {any} [spnot]
    * @property {boolean} [already]
@@ -61,6 +63,8 @@
    * @property {boolean} [selfNomination] - candidate-authored proposal (PLAN_SELF_NOMINATION)
    * @property {(() => void) | null} [onDismiss] - fully dismiss a self-nominated proposal
    * @property {string|number|null} [candidateId] - the candidate's user id (golden meeting with them)
+   * @property {boolean} [assignedOffer] - offered TO a member, who has not chosen what they bring yet
+   * @property {boolean} [awaitingMyResource] - …and that member is me
    */
 
   /** @type {Props} */
@@ -80,6 +84,7 @@
     kindOf,
     recurring = false,
     cycleSize = 1,
+    backfill = null,
     easy,
     myp,
     price,
@@ -112,6 +117,10 @@
     onDismiss = null,
     // The candidate's user id — opens a golden meeting with them.
     candidateId = null,
+    // A resource offered TO a member (docs/inprogress/PLAN_RESOURCE_ASSIGNMENT.md):
+    // nothing is registered until they choose what they bring and agree.
+    assignedOffer = false,
+    awaitingMyResource = false,
   } = $props();
 
   let user_1s = $derived.by(() => {
@@ -180,7 +189,11 @@
   const cardTypeKey = $derived(
     isRishon
       ? 'lev.cards.rektom.assignment'
-      : joinsRikma
+      : awaitingMyResource
+        ? 'lev.cards.rektom.offeredToYou'
+        : assignedOffer
+          ? 'lev.cards.rektom.offeredToMember'
+          : joinsRikma
         ? 'lev.cards.rektom.joinRequest'
         : 'lev.cards.rektom.request'
   );
@@ -514,6 +527,7 @@
             : $t('lev.rektom.recurringApprovalNote')}
         </div>
       </div>
+      <BackfillSummary {backfill} kindOf={effKindOf} {projectId} />
     {/if}
 
     <!-- פרטי משתמש -->
@@ -531,7 +545,9 @@
         <p class="text-xs text-gray-500 dark:text-gray-400 mb-0.5">
           {isRishon
             ? ($t('lev.rektom.memberProposing'))
-            : ($t('lev.rektom.resourceOfferedBy'))}
+            : assignedOffer
+              ? $t('lev.rektom.resourceOfferedTo')
+              : ($t('lev.rektom.resourceOfferedBy'))}
         </p>
         <p class="text-gray-900 dark:text-white font-bold text-base mb-1">
           {useraplyname}
@@ -550,6 +566,16 @@
         {#if joinsRikma}
           <p class="text-xs text-emerald-700 dark:text-emerald-400 font-semibold">
             🤝 {$t('lev.rektom.willJoinRikma')}
+          </p>
+        {/if}
+        <!-- הצעה לחבר/ה: שתיקה אינה הסכמה, והאישור הוא גם בחירת המשאב -->
+        {#if awaitingMyResource}
+          <p class="text-xs text-amber-800 dark:text-amber-300 font-semibold">
+            {$t('lev.rektom.assignedChooseNote')}
+          </p>
+        {:else if assignedOffer}
+          <p class="text-xs text-gray-600 dark:text-gray-300">
+            {$t('lev.rektom.assignedWaitingNote', { name: useraplyname ?? '' })}
           </p>
         {/if}
       </div>
@@ -677,10 +703,14 @@
           onclick={() => agree('f')}
         >
           <Lev />
-          <span class="ms-2 text-xs sm:text-sm whitespace-nowrap">{$t('lev.cards.confirmApprove')}</span>
+          <span class="ms-2 text-xs sm:text-sm whitespace-nowrap">
+            {awaitingMyResource ? $t('lev.rektom.chooseAndApprove') : $t('lev.cards.confirmApprove')}
+          </span>
         </button>
 
-        <!-- כפתור משא ומתן (isRishon) או דחיה (שאר חברי הרקמה) -->
+        <!-- כפתור משא ומתן (isRishon) או דחיה (שאר חברי הרקמה). מי שהמשאב הוצע
+             לו/ה לא "דוחה" — שתיקה שלו/ה כבר אינה הסכמה; יש שיחה. -->
+        {#if !awaitingMyResource}
         <button
           aria-label={isRishon
             ? negotiationMode
@@ -724,6 +754,17 @@
             <span class="ms-2 text-xs sm:text-sm whitespace-nowrap">{$t('lev.cards.confirmDecline')}</span>
           {/if}
         </button>
+        {:else}
+          <!-- מי שהמשאב הוצע לו/ה: לדייק תנאים, להעביר לחבר/ה אחר/ת, או לוותר -->
+          <button
+            onmouseenter={() => hover($t('lev.assignedOptions.button'))}
+            onmouseleave={() => hover('0')}
+            onclick={() => nego('f')}
+            class="flex-1 py-2 flex justify-center items-center font-bold rounded-xl transition-all bg-white dark:bg-gray-800 border-2 border-gold text-goldink hover:bg-gold/10"
+          >
+            <span class="text-xs sm:text-sm whitespace-nowrap">{$t('lev.assignedOptions.button')}</span>
+          </button>
+        {/if}
 
         <!-- כפתור צ'אט -->
         {#if onTochat}

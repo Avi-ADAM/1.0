@@ -477,6 +477,7 @@
         kindOf={buble.kindOf}
         recurring={buble.recurring}
         cycleSize={buble.cycleSize}
+        backfill={buble.backfill}
         missId={buble.missId}
         id={buble.id}
         openMid={buble.omid}
@@ -492,6 +493,9 @@
         pendingMainVote={buble.pendingMainVote === true}
         negopendmissions={buble.negopendmissions || []}
         orderon={buble.orderon || 0}
+        assignedOffer={buble.assignedOffer === true}
+        awaitingMyResource={buble.awaitingMyResource === true}
+        omMashaabimId={buble.omMashaabimId ?? null}
       />
     </div>
   {:else if kind === 'tosplit'}

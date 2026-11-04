@@ -15,6 +15,7 @@ import { normalizeLocationInput, extractRelationId } from './actionUtils.js';
 import { cancelCandidacyTimegrama } from '../../nego/timegrama.js';
 import { notifyDealClientsOfCounter } from '$lib/server/deal/offerDeal.js';
 import { scope, decisionScope, scopeList } from '$lib/realtime/scopes.js';
+import { ActionError } from '../errors.js';
 
 interface UserVote {
   what: boolean;
@@ -31,6 +32,16 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
   const nowISO = now.toISOString();
   const userId = String(context.userId);
   const nextOrder = (Number(params.ordern) || 0) + 1;
+
+  // A candidate round speaks for the candidate — only they may add one. The
+  // check was missing: any signed-in user could counter on anyone's Askm.
+  const who: any = await strapi.execute('getAskmForFinalize', { id: String(askmId) }, context.jwt, context.fetch);
+  const askmAttrs = who?.data?.askm?.data?.attributes;
+  if (!askmAttrs) throw new ActionError('NOT_FOUND', `Askm ${askmId} not found`);
+  if (askmAttrs.archived === true) throw new ActionError('ALREADY_RESOLVED', `Askm ${askmId} was already resolved`);
+  if (String(askmAttrs.users_permissions_user?.data?.id ?? '') !== userId) {
+    throw new ActionError('FORBIDDEN', 'Only the candidate can counter as the candidate');
+  }
 
   const loc = normalizeLocationInput(newValues.location);
   await strapi.execute(

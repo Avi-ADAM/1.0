@@ -5477,6 +5477,7 @@ ${PROMO_DECISION_FIELDS}
                           easy
                           recurring
                           cycleSize
+                          mashaabim { data { id } }
                         }
                       }
                     }
@@ -5495,6 +5496,7 @@ ${PROMO_DECISION_FIELDS}
                           sqadualedf
                           recurring
                           cycleSize
+                          backfill
                         }
                       }
                     }
@@ -10099,8 +10101,10 @@ export const moachQids = {
       pagination: { limit: 1 }
     ) {
       data { id attributes {
-        recurring cycleSize easy price kindOf sqadualed sqadualedf
+        recurring cycleSize easy price kindOf sqadualed sqadualedf backfill
         mashaabim { data { id } }
+        selfProposalUser { data { id } }
+        users { what why order users_permissions_user { data { id } } }
       } }
     }
   }`,
@@ -10965,8 +10969,8 @@ export const moachQids = {
           createdAt
           chat { why ide what zman id users_permissions_user { data { id } } }
           users_permissions_user { data { id attributes { username profilePic { data { attributes { url formats } } } } } }
-          open_mashaabim { data { id attributes { price descrip spnot kindOf sqadualedf sqadualed linkto createdAt hm name easy recurring cycleSize } } }
-          pmash { data { id attributes { name descrip spnot price easy hm kindOf sqadualed sqadualedf recurring cycleSize } } }
+          open_mashaabim { data { id attributes { price descrip spnot kindOf sqadualedf sqadualed linkto createdAt hm name easy recurring cycleSize mashaabim { data { id } } } } }
+          pmash { data { id attributes { name descrip spnot price easy hm kindOf sqadualed sqadualedf recurring cycleSize backfill } } }
           sp { data { id attributes { name descrip price myp spnot users_permissions_user { data { id attributes { username profilePic { data { attributes { url formats } } } } } } } } }
         }
       }
@@ -13393,6 +13397,7 @@ ${PROMO_DECISION_FIELDS}
                           easy
                           recurring
                           cycleSize
+                          mashaabim { data { id } }
                         }
                       }
                     }
@@ -13411,6 +13416,7 @@ ${PROMO_DECISION_FIELDS}
                           sqadualedf
                           recurring
                           cycleSize
+                          backfill
                         }
                       }
                     }
@@ -15550,12 +15556,6 @@ ${PROMO_DECISION_FIELDS}
     }
   }`,
 
-  /* ─────────────────────────────────────────────────────────────────────
-   * External Tasks API (PLAN_EXTERNAL_TASKS_API)
-   *
-   * Read exclusively by src/routes/api/v1/tasks/+server.ts and the webhook
-   * dispatcher with the ADMIN token via strapiClient.execute — they never
-   * travel through /api/send, hence serviceAdmin-only in qidsAccess.
   // "In progress" (L3, §4.1): every lead not yet won or spam. Read by the
   // manage layout's loader (members only, after the moach layout's check).
   'moachPipelineLeads': `query MoachPipelineLeads($pid: ID!) {
@@ -15658,6 +15658,12 @@ ${PROMO_DECISION_FIELDS}
     }
   }`,
 
+  /* ─────────────────────────────────────────────────────────────────────
+   * External Tasks API (PLAN_EXTERNAL_TASKS_API)
+   *
+   * Read exclusively by src/routes/api/v1/tasks/+server.ts and the webhook
+   * dispatcher with the ADMIN token via strapiClient.execute — they never
+   * travel through /api/send, hence serviceAdmin-only in qidsAccess.
    * ───────────────────────────────────────────────────────────────────── */
 
   // Idempotency: has this externalId already produced an Act in this rikma?

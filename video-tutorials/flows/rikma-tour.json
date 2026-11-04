@@ -358,8 +358,8 @@
       },
       "session": "sup1",
       "narration": {
-        "he": "עכשיו מגדירים מה צריך כדי שהרקמה תעבוד. משימה היא עבודה שמישהו ייקח על עצמו, והיא נושאת חלק ברקמה. כותבים מה צריך לעשות, ואז כמה זה שווה: שישים שקל לשעה, עשרים שעות. מי שיבצע אותה יקבל חלק לפי השווי הזה — בלי ראיון עבודה ובלי חוזה העסקה. כל עוד אתם השותפים היחידים, המשימה מתפרסמת מיד.",
-        "en": "Now we define what the rikma needs to run. A mission is work someone takes on, and it carries a share in the rikma. Write what needs doing, then what it's worth: sixty an hour, twenty hours. Whoever does it gets a share by that value — no job interview, no employment contract. While you are the only partner, the mission is published right away."
+        "he": "עכשיו מגדירים מה צריך כדי שהרקמה תעבוד. משימה היא עבודה שמישהו ייקח על עצמו, והיא נושאת חלק ברקמה. כותבים מה צריך לעשות, ואז כמה זה שווה: שישים שקל לשעה, עשרים שעות. מי שיבצע אותה יקבל חלק לפי השווי הזה — בלי סיבוכים מיותרים, ובשקיפות מלאה. כל עוד אתם השותפים היחידים, המשימה מתפרסמת מיד.",
+        "en": "Now we define what the rikma needs to run. A mission is work someone takes on, and it carries a share in the rikma. Write what needs doing, then what it's worth: sixty an hour, twenty hours. Whoever does it gets a share by that value — no needless complications, and fully transparent. While you are the only partner, the mission is published right away."
       },
       "setup": [
         {
@@ -1361,7 +1361,12 @@
           "fromStep": 5,
           "toStep": 7
         },
-        "fill": "s11c-coins"
+        "fill": "s11c-coins",
+        "fillMaxSec": 4.5,
+        "ffSteps": [
+          4
+        ],
+        "tailSec": 2.5
       }
     },
     {

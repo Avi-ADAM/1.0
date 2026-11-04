@@ -10,6 +10,7 @@
   import { strapiClient as strapi } from '$lib/server/actions';
   import { runResourceAskmAcceptance } from '$lib/server/actions/helpers/runResourceAskmAcceptance';
   import { computeNegoGate, normId } from '$lib/server/nego/negoGate';
+  import { askmTakerApplied } from '$lib/server/nego/askmAssigned';
   import { loadCandidacyDeal } from '$lib/server/deal/offerDeal';
   import { tellMatured } from '$lib/server/notifications/matured';
   import { askmAccepted } from '$lib/server/notifications/maturedNotices';
@@ -52,8 +53,18 @@
       // A gap of a customer's deal: she signs what she pays for (QA C-19). A read
       // error throws — the clock is retried, never matured without her.
       const offerDeal = await loadCandidacyDeal((qid, vars) => strapi.execute(qid, vars), 'askm', String(id));
-      const gate = computeNegoGate({ rounds, vots, takerId, memberIds, clientIds: offerDeal?.clientIds ?? [] });
-      if (!gate.approvable) {
+      // A resource assigned to a member (no Sp yet) is theirs to answer: the
+      // creator's opening yes is not theirs, so silence never registers it
+      // under their name (nego/askmAssigned.ts).
+      const gate = computeNegoGate({
+        rounds,
+        vots,
+        takerId,
+        memberIds,
+        takerApplied: askmTakerApplied(attrs),
+        clientIds: offerDeal?.clientIds ?? []
+      });
+      if (!gate.approvable || !spId) {
         // Not agreed by both sides yet (e.g. a project counter awaiting the
         // candidate's consent, or a candidate counter awaiting a member's yes).
         // Don't materialize; close this timegrama — the resuming action

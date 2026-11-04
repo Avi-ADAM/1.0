@@ -620,6 +620,7 @@
       kindOf={buble.kindOf}
       recurring={buble.recurring}
       cycleSize={buble.cycleSize}
+      backfill={buble.backfill}
       missId={buble.missId}
       id={buble.id}
       openMid={buble.omid}
@@ -636,6 +637,9 @@
       negopendmissions={buble.negopendmissions || []}
       orderon={buble.orderon || 0}
       selfNomination={buble.openMashaabimData?.source === 'selfNomination'}
+      assignedOffer={buble.assignedOffer === true}
+      awaitingMyResource={buble.awaitingMyResource === true}
+      omMashaabimId={buble.omMashaabimId ?? null}
     />
 {:else if buble.ani === 'meData' && milon.sugg == true}
   <ProjectSuggestor

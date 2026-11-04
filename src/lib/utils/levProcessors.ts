@@ -1076,6 +1076,10 @@ export function processAskedResources(
       const myVote = users.find((u: any) => u.users_permissions_user?.data?.id === myid);
       if (myVote) mypos = myVote.what;
     }
+    // A resource offered to me that I have not answered: a counter of mine
+    // puts my vote on its round, but my answer — what I bring — is still owed,
+    // so the card stays open for me (docs/inprogress/PLAN_RESOURCE_ASSIGNMENT.md).
+    if ((res as any).awaitingMyResource === true) already = false;
 
     const noofusersWaiting = (projectInfo.noof || 0) - users.length;
 

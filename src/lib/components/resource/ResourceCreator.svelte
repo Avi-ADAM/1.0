@@ -7,6 +7,7 @@
   import { onMount, untrack } from 'svelte';
   import MultiSelect from 'svelte-multiselect';
   import { lang } from '$lib/stores/lang.js';
+  import { page } from '$app/state';
   import { sendToSer } from '$lib/send/sendToSer.js';
   import { createResource } from '$lib/client/actionClient';
   import { toast } from 'svelte-sonner';
@@ -34,6 +35,7 @@
     X
   } from '@lucide/svelte';
   import moment from 'moment';
+  import { pastCycleWindows, backfillTotal, MAX_BACKFILL_CYCLES } from '$lib/recurring/backfill';
 
   /**
    * @typedef {Object} Props
@@ -43,6 +45,9 @@
    *                                      (PLAN_INVITE_PARTNER_TO_MISSION). לא ידוע = האפשרות מוסתרת.
    * @property {string} [projectName]    - שם הרקמה, להודעת השיתוף של ההזמנה
    * @property {string} [restime]       - זמן תגובה לחישוב Timegrama (לדוגמה: "7d")
+   * @property {Array<{id: string|number, attributes?: {username?: string}}>} [members]
+   *   - חברי הרקמה, להצעת המשאב לחבר/ה אחר/ת (docs/inprogress/PLAN_RESOURCE_ASSIGNMENT.md).
+   *     ריק = האפשרות מוסתרת.
    * @property {boolean} [specMode]     - מצב "ספק" (PLAN_CONCIERGE §5.3): הלקוחה מנסחת מפרט משאב
    *                                      ולא יוצרת רשומה — handleSubmit מחזיר את המפרט ל-onSpec.
    * @property {(spec: {name:string, descrip:string, price:number, quantity:number, kindOf:string, linkto:string, spnot:string}) => void} [onSpec]
@@ -65,6 +70,7 @@
     memberCount = null,
     projectName = '',
     restime = '',
+    members = [],
     specMode = false,
     onSpec,
     publishMode = false,
@@ -128,6 +134,21 @@
   let selectedSpName = $state([]); // MultiSelect
   let createNewSp = $state(false); // יצירת Sp חדש
   let loadingSpOptions = $state(false);
+
+  // --- Offer to another member (docs/inprogress/PLAN_RESOURCE_ASSIGNMENT.md) ---
+  // They answer on their heart page: choose one of their resources or create
+  // one, then agree. Their silence is not consent.
+  const otherMembers = $derived(
+    (members ?? []).filter((m) => m?.id != null && String(m.id) !== String(page.data?.uid ?? ''))
+  );
+  let assignMemberName = $state([]);
+  const assignMemberId = $derived(
+    (() => {
+      if (!assignMemberName.length) return null;
+      const found = otherMembers.find((m) => m.attributes?.username === assignMemberName[0]);
+      return found ? String(found.id) : null;
+    })()
+  );
 
   // "Invite someone new" (PLAN_INVITE_PARTNER_TO_MISSION, decision 3). A solo
   // rikma sends it at once; a larger one votes first, so the invite waits on the
@@ -401,6 +422,7 @@
     isSelfAssigned = !isSelfAssigned;
     if (isSelfAssigned) {
       inviteNew = false;
+      assignMemberName = [];
       loadSpOptions();
     } else {
       // ביטול השמה – איפוס
@@ -469,7 +491,13 @@
       return;
     }
 
-    const inviting = canInvite && inviteNew && !isSelfAssigned;
+    if (wantBackfill && isSelfAssigned && backfillTooLong) {
+      toast.warning(rc('backfill.tooLong', { count: MAX_BACKFILL_CYCLES }));
+      return;
+    }
+
+    const offeredTo = canAssignMember && !isSelfAssigned ? assignMemberId : null;
+    const inviting = canInvite && inviteNew && !isSelfAssigned && !offeredTo;
     const inviteAddress = inviteEmail.trim();
     if (inviting && inviteAddress && !INVITE_EMAIL_SHAPE.test(inviteAddress)) {
       toast.warning($t('mission.invite.invalidEmail'));
@@ -509,8 +537,15 @@
         endDate:
           showDates && endDate ? new Date(endDate).toISOString() : undefined,
         // Self-assignment
-        isAssigned: isSingleUser && isSelfAssigned,
+        isAssigned: canAssignSelf && isSelfAssigned,
+        assignedUserId: offeredTo ?? undefined,
         isReceived: isSingleUser && isSelfAssigned && isReceived,
+        // Past cycles already paid — signed with the resource, settled on approval.
+        backfill: backfillOn
+          ? backfillRows
+              .map((r) => ({ key: r.key, amount: Number(r.amount) || 0 }))
+              .filter((r) => r.amount > 0)
+          : undefined,
         existingSpId: selectedSpId ?? undefined,
         restime: restime || undefined,
         isOnline: locationScope.location_mode === 'online',
@@ -562,6 +597,51 @@
   let assignOpen = $state(false);
   let inviteOpen = $state(false);
   let detailsOpen = $state(false);
+
+  // ── Past cycles of a recurring expense (src/lib/recurring/backfill.ts) ──────
+  // Only here, at creation, and only for a recurring resource the creator pays
+  // for themselves: the table is a claim about what *they* already paid. The
+  // rikma signs it together with the resource, in one vote.
+  // Self-assigning was solo-only. In a rikma that votes the server has always
+  // taken it as a self-proposal: one double vote, on the resource and on the
+  // proposer bringing it (pmash + askm), like a self-assigned mission. So it is
+  // open for every resource (docs/inprogress/PLAN_RESOURCE_ASSIGNMENT.md).
+  const canAssignSelf = $derived(!specMode && !publishMode);
+  /** Offer it to another member — a rikma with someone else in it. */
+  const canAssignMember = $derived(inProject && !isSingleUser && otherMembers.length > 0);
+  const pastWindows = $derived(
+    inProject && isRecurring && startDate
+      ? pastCycleWindows(kindOf === 'yearly' ? 'year' : 'month', startDate, cycleSize)
+      : []
+  );
+  const backfillTooLong = $derived(pastWindows.length > MAX_BACKFILL_CYCLES);
+  let wantBackfill = $state(false);
+  /** Amounts the creator typed, by `YYYY-MM`; an untouched month reads the cycle price. */
+  /** @type {Record<string, any>} */
+  let backfillAmounts = $state({});
+  const backfillOn = $derived(
+    wantBackfill && isSelfAssigned && pastWindows.length > 0 && !backfillTooLong
+  );
+  const backfillRows = $derived(
+    pastWindows.slice(0, MAX_BACKFILL_CYCLES).map((w) => ({
+      key: w.key,
+      amount: backfillAmounts[w.key] ?? (Number(price) || 0)
+    }))
+  );
+  const backfillSum = $derived(backfillTotal(backfillRows.map((r) => ({ amount: Number(r.amount) || 0 }))));
+
+  function toggleBackfill() {
+    const next = !(wantBackfill && isSelfAssigned);
+    wantBackfill = next;
+    if (next && !isSelfAssigned) toggleSelfAssign();
+  }
+
+  /** @param {string} key */
+  function backfillLabel(key) {
+    const [y, m] = key.split('-').map(Number);
+    if (kindOf === 'yearly') return String(y);
+    return new Date(y, m - 1, 1).toLocaleDateString($lang || undefined, { month: 'long', year: 'numeric' });
+  }
 
   const KINDS = ['total', 'monthly', 'yearly', 'perUnit', 'rent'];
   const cycles = $derived(Math.max(1, Number(cycleSize) || 1));
@@ -619,7 +699,9 @@
       ? isReceived
         ? rc('form2.assignReceived')
         : rc('form2.assignSelf')
-      : rc('form2.assignNone')
+      : canAssignMember && assignMemberId
+        ? rc('form2.assignMember', { name: assignMemberName[0] })
+        : rc('form2.assignNone')
   );
   const detailsStatus = $derived(
     linkto.trim() || spnot.trim() ? rc('form2.detailsSet') : rc('form2.detailsStatus')
@@ -991,6 +1073,62 @@
               />
             </div>
           </div>
+
+          <!-- Past cycles already paid (src/lib/recurring/backfill.ts) -->
+          {#if pastWindows.length > 0}
+            <div class="flex flex-col gap-3 rounded-2xl border border-[#eee2a6] bg-[#fdf9ea] p-3 sm:p-4">
+              <label for="resource-backfill" class="flex min-h-11 cursor-pointer items-center gap-3">
+                <input
+                  id="resource-backfill"
+                  type="checkbox"
+                  checked={wantBackfill && isSelfAssigned}
+                  onchange={toggleBackfill}
+                  class="h-5 w-5 flex-none accent-[#c8155f]"
+                />
+                <span>
+                  <span class="block font-semibold text-[#2a1420]">
+                    {kindOf === 'yearly'
+                      ? rc('backfill.toggleYears', { count: Math.min(pastWindows.length, MAX_BACKFILL_CYCLES) })
+                      : rc('backfill.toggle', { count: Math.min(pastWindows.length, MAX_BACKFILL_CYCLES) })}
+                  </span>
+                  <span class="block text-sm text-[#6b5560]">{rc('backfill.hint')}</span>
+                </span>
+              </label>
+
+              {#if wantBackfill && isSelfAssigned && backfillTooLong}
+                <p class="m-0 text-sm font-semibold text-[#a3124e]" role="alert">
+                  {rc('backfill.tooLong', { count: MAX_BACKFILL_CYCLES })}
+                </p>
+              {:else if backfillOn}
+                <ul class="m-0 grid list-none gap-2 p-0 sm:grid-cols-2">
+                  {#each backfillRows as row (row.key)}
+                    <li class="flex items-center gap-2">
+                      <label for="bf-{row.key}" class="min-w-0 flex-1 text-[15px] text-[#2a1420]">
+                        {backfillLabel(row.key)}
+                      </label>
+                      <input
+                        id="bf-{row.key}"
+                        type="number"
+                        min="0"
+                        step="any"
+                        inputmode="decimal"
+                        value={row.amount}
+                        oninput={(e) => (backfillAmounts[row.key] = e.currentTarget.value)}
+                        class="{inp} max-w-36 tabular-nums"
+                      />
+                    </li>
+                  {/each}
+                </ul>
+                <div class="flex flex-wrap items-center justify-between gap-2 border-t border-[#eee2a6] pt-2">
+                  <span class="text-[15px] text-[#5a4a2a]">{rc('backfill.total')}</span>
+                  <strong class="text-xl font-extrabold text-[#2a1420]" dir="auto">{moneyText(backfillSum)}</strong>
+                </div>
+                <p class="m-0 text-[13px] text-[#6b5560]">
+                  {isSingleUser ? rc('backfill.noteSolo') : rc('backfill.noteVote')}
+                </p>
+              {/if}
+            </div>
+          {/if}
         {/if}
         <div>
           <span class={lbl}>{$t('mission.form2.location')}</span>
@@ -1029,9 +1167,15 @@
       <!-- More options -->
       <FormSection title={$t('mission.form2.moreTitle')} subtitle={$t('mission.form2.moreSub')}>
         <div class="flex flex-col gap-3">
-          <!-- השמה לעצמי – רק כשיש משתמש יחיד בפרויקט; לא במצב מפרט (הצעה לספק) ולא בפרסום לקהילה -->
-          {#if isSingleUser && !specMode && !publishMode}
-            <OptionRow icon={UserCheck} title={rc('selfAssign')} status={assignStatus} bind:open={assignOpen}>
+          <!-- השמה לעצמי – ברקמה של משתמש יחיד, או להוצאה חוזרת שחבר/ה משלם/ת (גם ברקמה שמצביעה);
+               לא במצב מפרט (הצעה לספק) ולא בפרסום לקהילה -->
+          {#if canAssignSelf}
+            <OptionRow
+              icon={UserCheck}
+              title={canAssignMember ? rc('form2.assignWho') : rc('selfAssign')}
+              status={assignStatus}
+              bind:open={assignOpen}
+            >
               <div class="flex flex-col gap-3">
                 <label for="resource-self" class="flex min-h-11 cursor-pointer items-center gap-3">
                   <input
@@ -1043,7 +1187,9 @@
                   />
                   <span>
                     <span class="block font-semibold">{rc('selfAssign')}</span>
-                    <span class="block text-sm text-[#6b5560]">{rc('selfAssignHint')}</span>
+                    <span class="block text-sm text-[#6b5560]">
+                      {isSingleUser ? rc('selfAssignHint') : rc('selfAssignVoteHint')}
+                    </span>
                   </span>
                 </label>
 
@@ -1076,7 +1222,9 @@
                     <p class="m-0 text-sm text-[#6b5560]">{rc('newSpWillBeCreated')}</p>
                   {/if}
 
-                  {#if selectedSpName.length > 0 || (createNewSp && existingSpOptions.length === 0)}
+                  <!-- "Already received" is a one-off delivery in a solo rikma; a
+                       recurring expense settles cycle by cycle instead. -->
+                  {#if isSingleUser && !isRecurring && (selectedSpName.length > 0 || (createNewSp && existingSpOptions.length === 0))}
                     <label for="resource-received" class="flex min-h-11 cursor-pointer items-center gap-3">
                       <input
                         id="resource-received"
@@ -1090,6 +1238,29 @@
                       </span>
                     </label>
                   {/if}
+                {/if}
+
+                <!-- הצעה לחבר/ה אחר/ת ברקמה: הוא/היא בוחר/ת או יוצר/ת את המשאב שלו/ה
+                     בלב כחלק מהאישור, ושתיקה אינה הסכמה (PLAN_RESOURCE_ASSIGNMENT) -->
+                {#if canAssignMember}
+                  <div class="flex flex-col gap-2 border-t border-[#efe5d3] pt-3">
+                    <span class={lbl}>{rc('assignMember')}</span>
+                    <MultiSelect
+                      {...msClasses}
+                      --sms-open-z-index={10000}
+                      placeholder={rc('assignMemberPlaceholder')}
+                      options={otherMembers.map((m) => m.attributes?.username ?? String(m.id))}
+                      bind:selected={assignMemberName}
+                      maxSelect={1}
+                      onchange={() => {
+                        if (assignMemberName.length > 0) {
+                          if (isSelfAssigned) toggleSelfAssign();
+                          inviteNew = false;
+                        }
+                      }}
+                    />
+                    <p class="m-0 text-sm text-[#6b5560]">{rc('assignMemberHint')}</p>
+                  </div>
                 {/if}
               </div>
             </OptionRow>
@@ -1111,6 +1282,7 @@
                   class="h-5 w-5 accent-[#c8155f]"
                   onchange={() => {
                     if (inviteNew && isSelfAssigned) toggleSelfAssign();
+                    if (inviteNew) assignMemberName = [];
                   }}
                 />
                 <span class="font-semibold">{$t('mission.invite.resourceOptionLabel')}</span>

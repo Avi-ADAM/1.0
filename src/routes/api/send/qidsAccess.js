@@ -473,7 +473,7 @@ export const qidsAccess = {
   'mrUpdateMashabetahalich': { allow: ['user', 'serviceAdmin'] },
   'mrGetMashabetahalich': { allow: ['serviceAdmin'] }, // unreferenced in codebase (2026-07-18) — tightened to serviceAdmin-only
   'mrGetRecurringForMonthi': { allow: ['serviceAdmin'] }, // unreferenced in codebase (2026-07-18) — tightened to serviceAdmin-only
-  'mrCreateCycleMaap': { allow: ['serviceAdmin'] }, // unreferenced in codebase (2026-07-18) — tightened to serviceAdmin-only
+  'mrCreateCycleMaap': { allow: ['user', 'serviceAdmin'] }, // past cycles of a recurring resource (settleBackfill), run under the approver's or creator's session
   'mrGetRikmashForDelivery': { allow: ['user', 'serviceAdmin'] },
   'mrCreateRikmash': { allow: ['user', 'serviceAdmin'] },
   'mrUpdateRikmash': { allow: ['user', 'serviceAdmin'] },

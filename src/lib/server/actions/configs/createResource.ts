@@ -23,10 +23,19 @@ import { restimeLabel, voteUrl } from './actionUtils.js';
 import { STRAPI_GRAPHQL } from '$lib/server/strapiUrl.js';
 import { ENTRY_CURRENCY_PARAM, entryFields, normalizeEntry } from '$lib/server/money/normalizeEntry.js';
 import { resolveRecurringPlan, cycleWindowIso } from '$lib/recurring/recurringPlan.js';
+import {
+  readBackfillEntries,
+  normalizeBackfill,
+  pastCycleWindows,
+  backfillPayload,
+  MAX_BACKFILL_CYCLES
+} from '$lib/recurring/backfill';
+import { settleBackfill } from '$lib/server/recurring/settleBackfill';
 import { bestEffort } from '$lib/server/resources/bookingStore.js';
 import { openGrantBooking } from '$lib/server/resources/grantBooking.js';
 import { execFromContext } from '$lib/server/archive/exec.js';
 import { scope, decisionScope, scopeList } from '$lib/realtime/scopes.js';
+import { ensureCandidacyTimegrama } from '../../nego/timegrama.js';
 
 // ─── helpers ───────────────────────────────────────────────────────────────
 async function gql(
@@ -146,7 +155,10 @@ const createResourceHandler: ActionExecutionHandler = async (params, context, { 
     startDate,
     endDate,
     // Self-assignment params
-    isAssigned = false,
+    isAssigned: isAssignedParam = false,
+    // Offer the resource to a member (docs/inprogress/PLAN_RESOURCE_ASSIGNMENT.md).
+    // Self → the self-assignment flow; another member → an Askm they answer.
+    assignedUserId,
     isReceived = false,
     recurring = false,     // monthly/yearly recurring expense (server rent, apartment…)
     cycleSize = 1,         // recurrence period in units of kindOf (e.g. every N months)
@@ -163,9 +175,29 @@ const createResourceHandler: ActionExecutionHandler = async (params, context, { 
     invite
   } = params;
 
+  // Who brings it. `assignedUserId` naming the creator is the self-assignment
+  // flow under another name; naming another member is an offer to them — an
+  // Askm with no Sp, which they answer by choosing or creating the resource
+  // they bring (provideAssignedResource). Their silence is not their yes.
+  const assigneeId =
+    assignedUserId != null && String(assignedUserId).trim() !== '' && String(assignedUserId) !== 'self'
+      ? String(assignedUserId)
+      : null;
+  const assignsOther = assigneeId != null && assigneeId !== String(context.userId);
+  const isAssigned = !assignsOther && (Boolean(isAssignedParam) || String(assignedUserId) === 'self' || assigneeId != null);
+  if (assignsOther && isAssignedParam) {
+    throw new Error('A resource is either yours to provide or offered to another member — not both');
+  }
+  if (assignsOther && isReceived) {
+    throw new Error('A resource offered to another member cannot be marked as already received');
+  }
+
   // Checked before anything is written, so a bad address cannot leave a
   // resource behind whose invite was silently lost.
   const wantsInvite = invite != null && typeof invite === 'object';
+  if (wantsInvite && assignsOther) {
+    throw new Error('A resource offered to a member is not open — it cannot also carry an invite');
+  }
   const inviteEmail = wantsInvite ? normalizeInviteEmail((invite as any).email) : undefined;
   if (wantsInvite && isAssigned) {
     throw new Error('A resource with an invite is open — it cannot also be self-assigned');
@@ -185,10 +217,42 @@ const createResourceHandler: ActionExecutionHandler = async (params, context, { 
   const jwt = context.jwt as string;
   const userId = context.userId as string;
 
+  // Past cycles of a recurring expense (src/lib/recurring/backfill.ts) — only at
+  // creation, and only for the creator's own payments.
+  const rawBackfill = readBackfillEntries(params.backfill);
+  if (rawBackfill.length > 0) {
+    if (!(recurring && (kindOf === 'monthly' || kindOf === 'yearly'))) {
+      throw new Error('Past cycles can only be entered for a recurring monthly or yearly resource');
+    }
+    // The table says what *you* paid — a resource someone else will provide
+    // has nobody to have paid it.
+    if (!isAssigned) {
+      throw new Error('Past cycles can only be entered when you provide the resource yourself');
+    }
+    if (rawBackfill.some((e) => e.amount < 0)) {
+      throw new Error('A past cycle cannot have a negative amount');
+    }
+    const windows = pastCycleWindows(kindOf === 'yearly' ? 'year' : 'month', startDate, cycleSize);
+    if (windows.length === 0) {
+      throw new Error('Past cycles need a start date before the current cycle');
+    }
+    if (windows.length > MAX_BACKFILL_CYCLES) {
+      throw new Error(`At most ${MAX_BACKFILL_CYCLES} past cycles can be entered — choose a later start date`);
+    }
+  }
+
   // Both prices were typed in the writer's currency; the rikma counts in its
   // own (PLAN_MULTI_CURRENCY C5). Nothing is read when `entryCurrency` is absent.
+  // The past cycles were typed in the same currency and ride the same rate.
+  const typedAmounts: Record<string, number> = {
+    price: Number(priceTyped) || 0,
+    easy: Number(easyTyped) || 0
+  };
+  rawBackfill.forEach((e, i) => {
+    typedAmounts[`bf${i}`] = e.amount;
+  });
   const entry = await normalizeEntry({
-    amounts: { price: Number(priceTyped) || 0, easy: Number(easyTyped) || 0 },
+    amounts: typedAmounts,
     entryCurrency: params.entryCurrency,
     projectId,
     jwt,
@@ -196,6 +260,7 @@ const createResourceHandler: ActionExecutionHandler = async (params, context, { 
   });
   const price = entry.values.price ?? 0;
   const easy = entry.values.easy ?? 0;
+  const convertedBackfill = rawBackfill.map((e, i) => ({ key: e.key, amount: entry.values[`bf${i}`] ?? 0 }));
   const ensuredMashaabimId = await ensureMashaabim(f, jwt, {
     id: mashaabimId,
     name,
@@ -233,7 +298,18 @@ const createResourceHandler: ActionExecutionHandler = async (params, context, { 
     members.find((m) => String(m.id) === String(userId))?.attributes?.username ?? '';
   const effectiveRestime: string = (restime as string) || projAttrs.restime || 'feh';
 
-  const isPmash = userCount > 1;
+  if (assignsOther && !members.some((m) => String(m.id) === assigneeId)) {
+    throw new Error('A resource can be offered only to a member of this rikma — invite someone new instead');
+  }
+  const assigneeName: string = assignsOther
+    ? (members.find((m) => String(m.id) === assigneeId)?.attributes?.username ?? '')
+    : '';
+
+  // An offer to a named member is not a proposal the rikma votes on first and
+  // fills later: like an assigned mission (createMission branch 2) it is an
+  // OpenMashaabim already taken (archived) plus the Askm everyone signs — the
+  // members for the resource, the assignee for themselves — in one vote.
+  const isPmash = userCount > 1 && !assignsOther;
 
   // A multi-member rikma votes on the resource first, and inviting someone to
   // a resource it has not approved would be acting for it — so the invite waits
@@ -267,7 +343,7 @@ const createResourceHandler: ActionExecutionHandler = async (params, context, { 
     easy:        easy || price,
     linkto,
     publishedAt: now,
-    archived:    isAssigned,  // archived=true means it's self-assigned / claimed
+    archived:    isAssigned || assignsOther,  // archived=true means it's claimed — by the creator or the member it is offered to
     ...entryFields(entry)
   };
 
@@ -281,6 +357,13 @@ const createResourceHandler: ActionExecutionHandler = async (params, context, { 
     resourceData.recurring = true;
     resourceData.cycleSize = cycleEvery;
   }
+
+  // The past cycles go on the request itself, so the rikma signs them together
+  // with the resource — one vote — and activation reads them from there.
+  const backfillCycles = isRecurring
+    ? normalizeBackfill(convertedBackfill, { unit: cycleUnit, anchor: startDate, size: cycleEvery })
+    : [];
+  if (backfillCycles.length > 0) resourceData.backfill = backfillPayload(backfillCycles);
 
   const locationInput = buildLocationInput(isOnline, lat, lng, radius, location_hint);
   if (locationInput) resourceData.location = locationInput;
@@ -324,6 +407,95 @@ const createResourceHandler: ActionExecutionHandler = async (params, context, { 
     );
     inviteOutcome = { result: stored ? 'pendingVote' : 'notStored' };
   }
+  // ── 3a. Offered to another member → their Askm, with no Sp ──────────────
+  if (assignsOther) {
+    const askmRes = await gql(f, jwt, `
+      mutation CreateAssignedAskm($data: AskmInput!) {
+        createAskm(data: $data) { data { id } }
+      }
+    `, {
+      data: {
+        publishedAt: now,
+        project: projectId,
+        open_mashaabim: createdId,
+        users_permissions_user: assigneeId,
+        // The creator's yes, at the baseline round. It is not the assignee's:
+        // nego/askmAssigned.ts reads a missing Sp as "not answered yet".
+        vots: [{ what: true, users_permissions_user: userId, order: 0 }]
+      }
+    });
+    const askmId = askmRes?.createAskm?.data?.id;
+    if (!askmId) throw new Error('Failed to create the Askm for the assigned member');
+
+    await ensureCandidacyTimegrama(strapi, context, {
+      side: 'askm',
+      id: String(askmId),
+      projectId: String(projectId),
+      restime: effectiveRestime
+    });
+
+    if (notifier) {
+      const restimeHe = restimeLabel(effectiveRestime, 'he');
+      const restimeEn = restimeLabel(effectiveRestime, 'en');
+      const url = voteUrl(String(projectId), 'askm', String(askmId));
+
+      notifier
+        .notify(
+          {
+            recipients: { type: 'specificUsers', config: { userIdsParam: 'recipients' } },
+            templates: {
+              title: {
+                he: `${creatorName} מציע/ה שאת/ה תביא/י את המשאב "${name}"`,
+                en: `${creatorName} suggests you bring the resource "${name}"`,
+              },
+              body: {
+                he: `ברקמה "${projectName}" ${creatorName} הציע/ה את המשאב "${name}" ובחר/ה בך לספק אותו. שום דבר לא נרשם על שמך בלי הסכמתך: בכרטיס בלב בוחרים אחד מהמשאבים שלך או יוצרים חדש, ואז מאשרים - או מדייקים את התנאים בהצעה נגדית או פותחים שיחה. לחצו כדי לצפות בפרטים.`,
+                en: `In "${projectName}", ${creatorName} proposed the resource "${name}" and picked you to provide it. Nothing is registered under your name without your consent: on the card in your heart page you choose one of your resources or create a new one, then approve - or refine the terms with a counter-offer or open a discussion. Tap to see the details.`,
+              },
+            },
+            intent: 'consent',
+            subject: () => noticeSubject('askm', String(askmId), projectId),
+            metadata: { type: 'voteUpdate', url, priority: 'high' },
+          },
+          { recipients: [assigneeId], projectId },
+          { projectId, createdId, askmId },
+          context,
+        )
+        .catch((e: unknown) => console.warn('[createResource] assignee notification failed:', e));
+
+      const otherMemberIds = members
+        .map((m) => String(m.id))
+        .filter((id) => id !== String(userId) && id !== assigneeId);
+      if (otherMemberIds.length > 0) {
+        notifier
+          .notify(
+            {
+              recipients: { type: 'specificUsers', config: { userIdsParam: 'recipients' } },
+              templates: {
+                title: {
+                  he: `משאב חדש בדרך אל ${assigneeName}: "${name}"`,
+                  en: `New resource on its way to ${assigneeName}: "${name}"`,
+                },
+                body: {
+                  he: `${creatorName} הציע/ה ברקמה "${projectName}" את המשאב "${name}" והועיד/ה אותו ל${assigneeName}. ההצבעה כפולה - גם על המשאב וגם על מי שמביא אותו - והיא ממתינה להסכמה המפורשת של ${assigneeName}. במהלך ${restimeHe} של זמן התגובה אפשר לאשר, לדייק את התנאים או לפתוח שיחה. לחצו להצבעה.`,
+                  en: `${creatorName} proposed the resource "${name}" in "${projectName}" and offered it to ${assigneeName}. The vote is double - on the resource and on who brings it - and it awaits ${assigneeName}'s explicit consent. During the ${restimeEn} response window you can approve, refine the terms or open a discussion. Tap to vote.`,
+                },
+              },
+              intent: 'consent',
+              subject: () => noticeSubject('askm', String(askmId), projectId),
+              metadata: { type: 'voteUpdate', url },
+            },
+            { recipients: otherMemberIds, projectId },
+            { projectId, createdId, askmId },
+            context,
+          )
+          .catch((e: unknown) => console.warn('[createResource] assigned-resource notification failed:', e));
+      }
+    }
+
+    return { ...createdRecord, createdKind: typeName, askmId: String(askmId), assignedUserId: assigneeId };
+  }
+
   if (!isPmash && !isAssigned) {
     await matchOpenMashaabimToUsers(String(createdId), 'resourceCreated', {
       strapi,
@@ -402,6 +574,30 @@ const createResourceHandler: ActionExecutionHandler = async (params, context, { 
       publishedAt: now
     });
 
+    // Past cycles first. A solo creator is the whole quorum, so their own yes
+    // is the signature on each month.
+    const settledPast = backfillCycles.length
+      ? await settleBackfill(
+          strapi,
+          { jwt, fetch: f },
+          {
+            projectId: String(projectId),
+            mashId: mashabetahalichId,
+            mashAttrs: {
+              name,
+              kindOf,
+              pricePerUnit,
+              users_permissions_user: { data: { id: String(userId) } }
+            },
+            name,
+            cycles: backfillCycles,
+            vots: [{ what: true, users_permissions_user: String(userId), order: 0 }],
+            confirmedBy: String(userId),
+            spId
+          }
+        )
+      : 0;
+
     // Open the first cycle so the card shows on lev right away, anchored to the
     // start date so a cycleSize > 1 resource lines up with monthi's windows.
     const { cycleStart, cycleEnd } = cycleWindowIso(
@@ -417,7 +613,7 @@ const createResourceHandler: ActionExecutionHandler = async (params, context, { 
         name,
         mashabetahalich: mashabetahalichId,
         ...(spId ? { sp: spId } : {}),
-        cycleIndex: 1,
+        cycleIndex: settledPast + 1,
         cycleStart,
         cycleEnd,
         quantityDelivered: pricePerUnit,
@@ -809,7 +1005,12 @@ export const createResourceAction: ActionConfig = {
     isAssigned: {
       type: 'boolean',
       required: false,
-      description: 'Whether the current user is self-assigning this resource (single-user project)'
+      description: 'Whether the current user provides this resource themselves (any rikma; a rikma that votes gets the double-vote self-proposal)'
+    },
+    assignedUserId: {
+      type: 'string',
+      required: false,
+      description: 'Offer the resource to this member. Self → same as isAssigned; another member → an archived OpenMashaabim + an Askm with no Sp that they answer by choosing or creating their resource (provideAssignedResource). Their silence is not consent. Not with invite — docs/inprogress/PLAN_RESOURCE_ASSIGNMENT.md'
     },
     isReceived: {
       type: 'boolean',
@@ -825,6 +1026,12 @@ export const createResourceAction: ActionConfig = {
       type: 'number',
       required: false,
       description: 'Recurrence period in units of kindOf (default 1 = every month/year)'
+    },
+    backfill: {
+      type: 'array',
+      required: false,
+      description:
+        'Recurring resource only, at creation only, self-assigned only: what each past cycle cost, [{ key: "YYYY-MM", amount }]. Signed with the resource and settled on activation — src/lib/recurring/backfill.ts'
     },
     existingSpId: {
       type: 'string',
@@ -866,6 +1073,7 @@ export const createResourceAction: ActionConfig = {
       scopeList([
         scope('project', p.projectId),
         r?.createdKind === 'Pmash' ? decisionScope('pmash', r?.id) : scope('resource', r?.id),
+        r?.askmId ? decisionScope('askm', r.askmId) : null,
         scope('resource', r?.mashabetahalichId),
       ]),
   },

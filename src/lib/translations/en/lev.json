@@ -362,7 +362,9 @@
       "recurringTag": "🔁 Recurring resource",
       "assignment": "Resource assignment & share approval",
       "request": "Resource request approval",
-      "joinRequest": "Approve joining the rikma & sharing the resource"
+      "joinRequest": "Approve joining the rikma & sharing the resource",
+      "offeredToYou": "A resource offered to you",
+      "offeredToMember": "Approve a resource offered to a member"
     },
     "nav": {
       "heart": "Heart of 1💗1",
@@ -673,7 +675,16 @@
     "totalInvestHint": "Estimated total investment for the whole period",
     "noEndDate": "No end date - until marked complete",
     "recurringApprovalNote": "Approval starts the recurring-resource engine; each cycle then opens its own charge for the rikma to approve the actual spend",
-    "recurringJoinNote": "Approval brings the offerer into the rikma and starts the recurring-resource engine; only afterwards does each cycle open its own charge for the actual spend"
+    "recurringJoinNote": "Approval brings the offerer into the rikma and starts the recurring-resource engine; only afterwards does each cycle open its own charge for the actual spend",
+    "backfillTitle": "Includes {{count}} past months the proposer already paid",
+    "backfillTitleYears": "Includes {{count}} past years the proposer already paid",
+    "backfillTotal": "Total paid:",
+    "backfillShow": "Month by month",
+    "backfillNote": "Approving the resource approves these payments too, and each one is recorded as the proposer's share in the rikma. You can counter with another version or open a discussion.",
+    "resourceOfferedTo": "Offered to:",
+    "assignedChooseNote": "Nothing is registered under your name without your consent: choose one of your resources or create a new one - that is your approval.",
+    "assignedWaitingNote": "Waiting for {{name}} to choose the resource they bring and approve explicitly - their silence is not consent.",
+    "chooseAndApprove": "Choose a resource and approve"
   },
   "hachlata": {
     "theClaim": "The claim",
@@ -1202,5 +1213,39 @@
       "countered": "Your version is on the table and the clock restarted",
       "error": "Something went wrong — try again"
     }
+  },
+  "provideAssigned": {
+    "title": "Which resource will you bring to \"{{name}}\"?",
+    "intro": "Choose one of your matching resources, or create a new one. Your choice is also your approval; the resource is registered once every member agrees.",
+    "create": "Create a new resource of mine",
+    "createInstead": "Create a new resource instead",
+    "valueLabel": "What it is worth to me",
+    "valueHint": "The value you put into the rikma. The other details come from the request.",
+    "submit": "Approve and bring it",
+    "cancel": "Cancel",
+    "failed": "Your answer could not be saved",
+    "registered": "The resource is registered under your name in the rikma",
+    "recorded": "Your approval is saved - waiting for the other members"
+  },
+  "assignedOptions": {
+    "button": "More options",
+    "title": "What to do with the resource offered to you?",
+    "terms": "Refine the terms",
+    "termsHint": "A counter-offer - price, quantity, dates, details. The members answer it, and choosing your resource is still your approval.",
+    "reassign": "Pass it to another member",
+    "reassignHint": "Suggest that someone else in the rikma brings this resource.",
+    "withdraw": "Step back",
+    "withdrawHint": "Not for me. The resource stays and opens to anyone who can bring it.",
+    "toWhom": "Pass it to whom?",
+    "pickMember": "Choose a member",
+    "reassignNote": "The vote starts over - on the resource and on who brings it - and they have to approve it explicitly.",
+    "withdrawNote": "Nothing is registered under your name. The resource opens to the whole community, and every offer comes to the rikma for a vote.",
+    "why": "A word to the rikma (optional)",
+    "reassignSubmit": "Pass it on",
+    "withdrawSubmit": "Step back",
+    "back": "Back",
+    "failed": "The action was not saved",
+    "passed": "Passed on - waiting for their answer",
+    "withdrawn": "You stepped back - the resource is open to everyone now"
   }
 }

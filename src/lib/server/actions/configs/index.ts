@@ -132,6 +132,8 @@ import { dismissSelfNominationConfig } from './dismissSelfNomination.js';
 import { declineOpenMissionConfig } from './declineOpenMission.js';
 import { declineMissionRequestConfig } from './declineMissionRequest.js';
 import { finalizeAskmAcceptanceConfig } from './finalizeAskmAcceptance.js';
+import { provideAssignedResourceConfig } from './provideAssignedResource.js';
+import { releaseAssignedResourceConfig } from './releaseAssignedResource.js';
 import { declineAskmRequestConfig } from './declineAskmRequest.js';
 import { voteOnAskmConfig } from './voteOnAskm.js';
 import { voteOnPendmConfig } from './voteOnPendm.js';
@@ -189,12 +191,11 @@ import { createPaidOrderConfig } from './createPaidOrder.js';
 import { createLeadConfig } from './createLead.js';
 import { logLeadActivityConfig } from './logLeadActivity.js';
 import { updateLeadStatusConfig } from './updateLeadStatus.js';
-import { confirmOrderPaymentConfig } from './confirmOrderPayment.js';
-import { cancelOrderConfig, markOrderShippedConfig, markOrderFulfilledConfig } from './orderLifecycle.js';
 import { updateLeadPlanConfig } from './updateLeadPlan.js';
 import { mergeLeadsConfig } from './mergeLeads.js';
 import { exportLeadContactsConfig } from './exportLeadContacts.js';
-import { updateLeadPlanConfig } from './updateLeadPlan.js';
+import { confirmOrderPaymentConfig } from './confirmOrderPayment.js';
+import { cancelOrderConfig, markOrderShippedConfig, markOrderFulfilledConfig } from './orderLifecycle.js';
 import { setShopStockConfig } from './shopStock.js';
 import { saveProductVariantsConfig, saveProductOptionsConfig } from './shopProductEditor.js';
 import { reportRecurringSaleCycleConfig } from './reportRecurringSaleCycle.js';
@@ -375,6 +376,8 @@ export function registerAllActions(): void {
   // Mission request: project-member decline / Askm accept+decline
   registerAction(declineMissionRequestConfig);
   registerAction(finalizeAskmAcceptanceConfig);
+  registerAction(provideAssignedResourceConfig);
+  registerAction(releaseAssignedResourceConfig);
   registerAction(declineAskmRequestConfig);
   registerAction(voteOnAskmConfig);
 
@@ -541,14 +544,13 @@ export function registerAllActions(): void {
   registerAction(createLeadConfig);
   registerAction(logLeadActivityConfig);
   registerAction(updateLeadStatusConfig);
-  registerAction(confirmOrderPaymentConfig);
-  registerAction(cancelOrderConfig);
-  registerAction(markOrderShippedConfig);
   registerAction(updateLeadPlanConfig);
   registerAction(mergeLeadsConfig);
   registerAction(exportLeadContactsConfig);
+  registerAction(confirmOrderPaymentConfig);
+  registerAction(cancelOrderConfig);
+  registerAction(markOrderShippedConfig);
   registerAction(markOrderFulfilledConfig);
-  registerAction(updateLeadPlanConfig);
   // Stock from the moach's sales screens (PLAN_SHOP_CUSTOMER_EXPERIENCE S5)
   registerAction(setShopStockConfig);
   // The seller's product editor (PLAN_SHOP_CUSTOMER_EXPERIENCE S4)

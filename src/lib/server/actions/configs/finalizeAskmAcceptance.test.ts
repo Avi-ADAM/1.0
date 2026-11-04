@@ -32,7 +32,8 @@ function world({
   vots = [] as any[],
   rounds = [] as { ordern: number; proposedBy: string }[],
   project = '5',
-  archived = false
+  archived = false,
+  sp = { data: { id: '77' } } as any
 } = {}) {
   const calls: { qid: string; vars: any }[] = [];
   const strapi = {
@@ -48,7 +49,7 @@ function world({
                   archived,
                   vots,
                   users_permissions_user: { data: { id: '9' } },
-                  sp: { data: { id: '77' } },
+                  sp,
                   project: {
                     data: {
                       id: project,
@@ -168,5 +169,28 @@ describe('voteOnAskm', () => {
     );
     expect(res.data.order).toBe(1);
     expect(rows(w.written()[0])).toEqual(['2@1:y', '3@1:n']);
+  });
+});
+
+describe('finalizeAskmAcceptance — a resource assigned to a member (no Sp yet)', () => {
+  // docs/inprogress/PLAN_RESOURCE_ASSIGNMENT.md: member 2 offered resource 60 to member 9.
+  it('never registers it on the members’ yes alone — the assignee has not answered', async () => {
+    const w = world({ vots: [v('2'), v('3')], sp: { data: null } });
+    const res: any = await finalize(
+      { variant: 'allVoted', askmId: '40', projectId: '5', openMashaabimId: '60', acceptedUserId: '9', existingMemberIds: ['1', '2', '3'] },
+      ctx('1'),
+      { strapi: w.strapi } as any
+    );
+    expect(res.data.materialized).toBe(false);
+    expect(res.data.pending).toBe('candidateConsent');
+    expect(runAcceptance).not.toHaveBeenCalled();
+  });
+
+  it('turns the assignee’s bare yes away: choosing what they bring is the yes', async () => {
+    const w = world({ vots: [v('1'), v('2'), v('3')], sp: { data: null } });
+    await expect(
+      finalize({ variant: 'partial', askmId: '40', projectId: '5' }, ctx('9'), { strapi: w.strapi } as any)
+    ).rejects.toThrow(/provideAssignedResource/);
+    expect(runAcceptance).not.toHaveBeenCalled();
   });
 });

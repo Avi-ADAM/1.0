@@ -503,7 +503,22 @@
       "assignReceived": "I am bringing this resource · already received",
       "details": "Link and notes",
       "detailsStatus": "Details link · special notes",
-      "detailsSet": "Has extra details"
-    }
+      "detailsSet": "Has extra details",
+      "assignWho": "Who brings this resource",
+      "assignMember": "Offered to {{name}} - awaiting their approval"
+    },
+    "backfill": {
+      "toggle": "I've already paid for the past {{count}} months — enter them",
+      "toggleYears": "I've already paid for the past {{count}} years — enter them",
+      "hint": "Only now, while creating the resource: each month starts at the monthly price and you can correct it to what was actually paid. A month at 0 is not recorded. This also marks you as the one providing the resource.",
+      "total": "Total paid so far",
+      "noteVote": "These months are part of the proposal: the rikma approves them together with the resource, in one vote. Once approved, each month is recorded as your share in the rikma, and the current month opens as usual.",
+      "noteSolo": "Each month is recorded right away as your share in the rikma, and the current month opens as usual.",
+      "tooLong": "Up to {{count}} past cycles can be entered — choose a later start date."
+    },
+    "selfAssignVoteHint": "I bring this resource. The vote is double - the rikma approves both the resource and me bringing it",
+    "assignMember": "Or offer it to another member of the rikma",
+    "assignMemberPlaceholder": "Choose a member",
+    "assignMemberHint": "It is registered only once the member chooses one of their resources or creates a new one on their heart page and explicitly approves - silence is not consent. The other members vote on the same card."
   }
 }

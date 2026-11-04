@@ -25,6 +25,7 @@ import {
 import { ensureCandidacyTimegrama } from '../../nego/timegrama.js';
 import { evaluateCandidacyVote, assertStandingRound } from '../../nego/candidacyVote.js';
 import { loadCandidacyDeal } from '$lib/server/deal/offerDeal.js';
+import { askmSpId, askmTakerApplied } from '../../nego/askmAssigned.js';
 import { ActionError } from '../errors.js';
 import { scope, decisionScope, scopeList } from '$lib/realtime/scopes.js';
 
@@ -60,14 +61,26 @@ const finalizeAskmAcceptanceHandler: ActionExecutionHandler = async (params, con
   // A gap of a customer's deal (QA C-19): she pays for whatever this ends on, so
   // she signs it too. A read error throws — it must not pass for "nobody pays".
   const offerDeal = await loadCandidacyDeal(run, 'askm', String(askmId));
+  // A resource assigned to a member carries no Sp until they choose what they
+  // bring (nego/askmAssigned.ts). Until then their yes has nothing to say yes
+  // to — it goes through provideAssignedResource — and nobody else's yes can
+  // register it under their name.
+  const spOnAskm = askmSpId(attrs);
   const vote = evaluateCandidacyVote({
     attrs,
     side: 'askm',
     callerId: context.userId,
     clientIds: offerDeal?.clientIds ?? [],
+    takerApplied: askmTakerApplied(attrs),
     now,
   });
   assertStandingRound(expectRound, vote.L);
+  if (!spOnAskm && vote.takerId && String(context.userId) === vote.takerId) {
+    throw new ActionError(
+      'VALIDATION_FAILED',
+      'Choose one of your resources or create one before agreeing — provideAssignedResource'
+    );
+  }
 
   if (acceptedUserId != null && vote.takerId && String(acceptedUserId) !== vote.takerId) {
     throw new Error(`acceptedUserId ${acceptedUserId} is not the candidate of askm ${askmId}`);
@@ -82,7 +95,7 @@ const finalizeAskmAcceptanceHandler: ActionExecutionHandler = async (params, con
   // carries none of it, and the card's copy may be stale anyway.
   const omId = attrs.open_mashaabim?.data?.id ? String(attrs.open_mashaabim.data.id) : null;
   const selfProposal = !omId && isSelfProposal === true;
-  const canMaterialize = !!omId || selfProposal;
+  const canMaterialize = (!!omId || selfProposal) && !!spOnAskm;
 
   const ready = vote.gate.takerYes && vote.gate.clientYes && vote.allMembersYes;
   if (!ready || !canMaterialize) {
@@ -138,6 +151,7 @@ const finalizeAskmAcceptanceHandler: ActionExecutionHandler = async (params, con
       resourceName: String(missionName ?? ''),
       acceptedUserId: takerId,
       maapId: maapRes?.data?.createMaap?.data?.id,
+      vots: vote.vots,
     });
 
     await run('132archiveAskmWithVotes', { id: askmId, vots: vote.vots });

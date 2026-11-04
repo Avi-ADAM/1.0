@@ -483,6 +483,8 @@ export type ActionKey =
   | 'voteOnMaap'
   | 'finalizeJoinAcceptance'
   | 'finalizeAskmAcceptance'
+  | 'provideAssignedResource'
+  | 'releaseAssignedResource'
   | 'voteOnAskm'
   | 'dismissNotice'
   | 'restoreNotice'
@@ -541,8 +543,6 @@ export type ActionKey =
   | 'createPlanItem'
   | 'updatePlanItem'
   | 'markPlanItemCreated'
-  // Onboarding: the starter boards a new rikma is born with (PLAN_ONBOARDING Track B)
-  | 'seedPlanBoards'
   // Leads (PLAN_LEADS)
   | 'createLead'
   | 'logLeadActivity'
@@ -667,9 +667,13 @@ export interface ActionParamsMap {
     startDate?: string;
     endDate?: string;
     isAssigned?: boolean;
+    /** Offer it to a member: yourself, or another member who answers on their heart page. */
+    assignedUserId?: string;
     isReceived?: boolean;
     recurring?: boolean;
     cycleSize?: number;
+    /** Past cycles already paid, at creation only — src/lib/recurring/backfill.ts */
+    backfill?: Array<{ key: string; amount: number }>;
     existingSpId?: string;
     restime?: string;
     isOnline?: boolean;

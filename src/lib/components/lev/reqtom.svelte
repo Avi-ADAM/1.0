@@ -9,6 +9,8 @@
   import { DialogContent, DialogOverlay } from 'svelte-accessible-dialog';
   import Spinner from '$lib/celim/Spinner.svelte';
   import Diun from './diun.svelte';
+  import ProvideAssigned from './ProvideAssignedResource.svelte';
+  import AssignedOfferOptions from './AssignedOfferOptions.svelte';
   const baseUrl = import.meta.env.VITE_URL;
   let clicked = $state(false);
   /**
@@ -26,6 +28,7 @@
    * @property {any} [kindOf]
    * @property {boolean} [recurring]
    * @property {number} [cycleSize]
+   * @property {unknown} [backfill] - past cycles the proposer already paid ($lib/recurring/backfill)
    * @property {any} projectName
    * @property {any} openmissionName
    * @property {any} myp
@@ -78,6 +81,9 @@
    * @property {(payload: { id: any }) => void} [onUser]
    * @property {(payload: { id: any }) => void} [onProj]
    * @property {boolean} [selfNomination] - candidate-authored proposal (PLAN_SELF_NOMINATION)
+   * @property {boolean} [assignedOffer] - offered TO a member who has not chosen what they bring (PLAN_RESOURCE_ASSIGNMENT)
+   * @property {boolean} [awaitingMyResource] - …and that member is me: approving opens the choose/create window
+   * @property {string|number|null} [omMashaabimId] - the need's template, to find my matching resources
    */
 
   /** @type {Props} */
@@ -97,6 +103,7 @@
     kindOf,
     recurring = false,
     cycleSize = 1,
+    backfill = null,
     projectName,
     openmissionName,
     myp,
@@ -147,7 +154,14 @@
     negopendmissions = [],
     orderon = 0,
     selfNomination = false,
+    // A resource offered TO a member (docs/inprogress/PLAN_RESOURCE_ASSIGNMENT.md).
+    assignedOffer = false,
+    awaitingMyResource = false,
+    omMashaabimId = null,
   } = $props();
+
+  // The assignee's "approve" is choosing what they bring — a window, not a vote.
+  let provideOpen = $state(false);
   let resP = [];
 
   // Full dismiss of a self-nominated resource offer (PLAN_SELF_NOMINATION §3.3):
@@ -173,7 +187,16 @@
   let negotiationMode = $state(false);
   let negotiationLoading = $state(false);
 
+  // The assignee's other answers: refine the terms, pass it on, step back.
+  let optionsOpen = $state(false);
+
   function toggleNegotiationMode() {
+    if (awaitingMyResource) {
+      already = true;
+      optionsOpen = true;
+      isOpen = true;
+      return;
+    }
     negotiationMode = !negotiationMode;
     if (negotiationMode) {
       already = true;
@@ -207,6 +230,22 @@
     });
     if (!result.success) {
       throw new Error(result.error || 'counterOnAskm failed');
+    }
+  }
+
+  // The assignee refining the terms of a resource offered to them: a
+  // candidate round. Choosing what they bring is still their yes after it.
+  async function handleCandidateCounter({ newValues }) {
+    const result = await executeAction('candidateCounterOnAskm', {
+      askmId: String(askId ?? id),
+      openMashaabimId: openMid != null ? String(openMid) : undefined,
+      projectId: String(projectId),
+      ordern: orderon ?? 0,
+      newValues,
+      users
+    });
+    if (!result.success) {
+      throw new Error(result.error?.message || 'candidateCounterOnAskm failed');
     }
   }
 
@@ -274,6 +313,12 @@
     }
   }
   async function agree() {
+    if (awaitingMyResource) {
+      already = true;
+      provideOpen = true;
+      isOpen = true;
+      return;
+    }
     const isFirst = noofusersOk === 0 && noofusersNo === 0;
     already = true;
     noofusersOk += 1;
@@ -426,6 +471,11 @@
     masa = $state(false),
     loading = false;
   const close = () => {
+    if (provideOpen || optionsOpen || (awaitingMyResource && masa)) {
+      provideOpen = false;
+      optionsOpen = false;
+      already = false;
+    }
     isOpen = false;
     diunm = false;
     // Reset negotiation state when closing without saving
@@ -455,7 +505,42 @@
 
 <DialogOverlay {isOpen} onDismiss={close} class="overlay">
   <div transition:fly={{ y: 450, opacity: 0.5, duration: 2000 }}>
-    {#if masa === true}
+    {#if provideOpen}
+      <DialogContent aria-label={$t('lev.provideAssigned.title', { name: openmissionName ?? '' })} class="nego-shell surface-dialog">
+        <ProvideAssigned
+          askmId={askId ?? id}
+          {projectId}
+          mashaabimId={omMashaabimId}
+          name={openmissionName}
+          value={Number(easy) || Number(price) || 0}
+          round={orderon}
+          onCancel={close}
+          onDone={({ materialized }) => {
+            provideOpen = false;
+            isOpen = false;
+            onAcsept?.({ ani: 'askedma', coinlapach, finalized: materialized });
+          }}
+        />
+      </DialogContent>
+    {:else if optionsOpen}
+      <DialogContent aria-label={$t('lev.assignedOptions.title')} class="nego-shell surface-dialog">
+        <AssignedOfferOptions
+          askmId={askId ?? id}
+          {projectId}
+          onCancel={close}
+          onTerms={() => {
+            optionsOpen = false;
+            negotiationMode = true;
+            masa = true;
+          }}
+          onDone={() => {
+            optionsOpen = false;
+            isOpen = false;
+            onDecline?.({ ani: 'askedma', coinlapach, finalized: true });
+          }}
+        />
+      </DialogContent>
+    {:else if masa === true}
       <DialogContent aria-label="form" class="{negotiationLoading ? 'nego' : 'nego-shell'} surface-dialog">
           {#if negotiationLoading}
             <div class="grid justify-center p-4"><Spinner size="lg" /></div>
@@ -466,8 +551,8 @@
               masaalr={false}
               onLoad={() => (negotiationLoading = true)}
               onClose={afternego}
-              onSubmit={isRishon ? null : handleCounter}
-              candidateRound={!isRishon ? (negopendmissions?.find(r => r.attributes?.proposedBy === 'candidate')?.attributes ?? null) : null}
+              onSubmit={awaitingMyResource ? handleCandidateCounter : isRishon ? null : handleCounter}
+              candidateRound={!isRishon && !awaitingMyResource ? (negopendmissions?.find(r => r.attributes?.proposedBy === 'candidate')?.attributes ?? null) : null}
               descrip={missionDetails}
               {projectName}
               name1={openmissionName}
@@ -550,6 +635,7 @@
   {kindOf}
   {recurring}
   {cycleSize}
+  {backfill}
   {easy}
   {myp}
   {price}
@@ -567,6 +653,8 @@
   {negopendmissions}
   {orderon}
   {selfNomination}
+  {assignedOffer}
+  {awaitingMyResource}
   onDismiss={dismissSelfNom}
 />
 

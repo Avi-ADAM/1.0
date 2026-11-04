@@ -4,6 +4,8 @@
  */
 
 import { cycleWindowIso, normalizeCycleSize } from '$lib/recurring/recurringPlan.js';
+import { normalizeBackfill } from '$lib/recurring/backfill';
+import { settleBackfill, votsFromRequest } from '$lib/server/recurring/settleBackfill';
 import { bestEffort } from '$lib/server/resources/bookingStore.js';
 import { openGrantBooking } from '$lib/server/resources/grantBooking.js';
 import { execFromContext } from '$lib/server/archive/exec.js';
@@ -92,9 +94,14 @@ export async function activateRecurringEngine(
     maapId?: string;
     /** Solo-rikma fallback source when no recurring Pmash matches. */
     openMashaabimId?: string;
+    /**
+     * The signatures that approved taking the resource on (the askm's vots).
+     * Stamped on any past cycles; the request's own list is the fallback.
+     */
+    vots?: unknown[];
   }
 ): Promise<void> {
-  const { projectId, resourceName, acceptedUserId, maapId, openMashaabimId } = args;
+  const { projectId, resourceName, acceptedUserId, maapId, openMashaabimId, vots } = args;
   if (!resourceName) return;
 
   const res: any = await strapi.execute(
@@ -162,6 +169,46 @@ export async function activateRecurringEngine(
   const mashId = createRes?.data?.createMashabetahalich?.data?.id;
   if (!mashId || !maapId) return;
 
+  // Past cycles the creator entered when proposing the resource
+  // (src/lib/recurring/backfill.ts). The rikma signed them with the request, so
+  // they settle now with the request's own signatures. Read against the agreed
+  // start — a counter that moved it later drops the months before it. They are
+  // a claim about what the proposer paid, so they count only when the proposer
+  // is the one taking the resource on.
+  const proposerId = pm.selfProposalUser?.data?.id;
+  const pastCycles =
+    termsFromPmash && proposerId && String(proposerId) === String(acceptedUserId)
+      ? normalizeBackfill(pm.backfill, { unit, anchor: pm.sqadualed, size: cycleSize, now })
+      : [];
+  let settledPast = 0;
+  if (pastCycles.length > 0) {
+    try {
+      settledPast = await settleBackfill(
+        strapi,
+        { jwt: context.jwt, fetch: context.fetch },
+        {
+          projectId,
+          mashId: String(mashId),
+          mashAttrs: {
+            name: resourceName,
+            kindOf,
+            pricePerUnit,
+            users_permissions_user: { data: { id: String(acceptedUserId) } }
+          },
+          name: resourceName,
+          cycles: pastCycles,
+          vots: votsFromRequest(vots && vots.length > 0 ? vots : pm.users),
+          confirmedBy: String(acceptedUserId),
+          now
+        }
+      );
+    } catch (e) {
+      // The engine and the months already written stand; the live cycle still
+      // has to open, or the resource has no card at all.
+      console.error('activateRecurringEngine: settling past cycles failed', e);
+    }
+  }
+
   const startAnchor = pm.sqadualed ? new Date(pm.sqadualed) : now;
   const { cycleStart, cycleEnd } = cycleWindowIso(unit, startAnchor, cycleSize, now);
   // Turn the acceptance Maap into cycle #1. Leave quantityDelivered unset (null):
@@ -174,7 +221,7 @@ export async function activateRecurringEngine(
       id: maapId,
       data: {
         mashabetahalich: mashId,
-        cycleIndex: 1,
+        cycleIndex: settledPast + 1,
         cycleStart,
         cycleEnd,
         publishedAt: now.toISOString(),
@@ -372,6 +419,7 @@ export async function runResourceAskmAcceptance(
       acceptedUserId,
       maapId,
       openMashaabimId,
+      vots: existingVotes,
     });
   }
 
