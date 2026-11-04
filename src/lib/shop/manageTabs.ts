@@ -21,6 +21,7 @@ export const MANAGE_TABS = [
   'promotions',
   'products',
   'sales',
+  'customers',
   'connect'
 ] as const;
 export type ManageTab = (typeof MANAGE_TABS)[number];
@@ -37,7 +38,8 @@ export interface ManageFacts {
 }
 
 /** Shown no matter what: the ways to start (add a product, connect a site) and the money. */
-const ALWAYS: ReadonlySet<ManageTab> = new Set(['pipeline', 'products', 'sales', 'connect']);
+// Customers (L6) is a view over leads and orders — there from the start, empty until the first payment.
+const ALWAYS: ReadonlySet<ManageTab> = new Set(['pipeline', 'products', 'sales', 'customers', 'connect']);
 
 /** `facts` null (could not be read) ⇒ every tab, rather than hide one wrongly. */
 export function visibleTabs(facts: ManageFacts | null, active?: string | null): ManageTab[] {
@@ -54,6 +56,7 @@ export function visibleTabs(facts: ManageFacts | null, active?: string | null): 
     promotions: has,
     products: true,
     sales: true,
+    customers: true,
     connect: true
   };
   return MANAGE_TABS.filter((tab) => show[tab] || ALWAYS.has(tab) || tab === active);

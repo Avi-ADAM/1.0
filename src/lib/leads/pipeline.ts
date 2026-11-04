@@ -316,3 +316,8 @@ export function pipelineCounts(rows: PipelineRow[]): PipelineCounts {
   }
   return { open, attention, paused };
 }
+
+/** The board view: one column per stage, in path order, each keeping the table's order. */
+export function groupByStage(rows: PipelineRow[], stages: readonly Stage[]): Array<{ stage: Stage; rows: PipelineRow[] }> {
+  return stages.map((stage) => ({ stage, rows: rows.filter((r) => r.stage === stage) }));
+}

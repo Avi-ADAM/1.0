@@ -46,6 +46,9 @@
       "resources": "משאבים",
       "products": "מוצרים",
       "sales": "מכירות"
-    }
+    },
+    "leads": "פניות מחכות לך",
+    "leadsUnanswered": "בלי תשובה",
+    "leadsFollowUp": "לחזור היום"
   }
 }

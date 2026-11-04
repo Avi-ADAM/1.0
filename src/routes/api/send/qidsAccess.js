@@ -21,6 +21,8 @@ export const qidsAccess = {
   '345digestWhatsNewFor': { allow: ['serviceAdmin'] },
   '346digestAudience': { allow: ['serviceAdmin'] },
   '347digestHubSummaryFor': { allow: ['serviceAdmin'] },
+  '348digestLeads': { allow: ['user', 'serviceAdmin'] },
+  '349digestLeadsFor': { allow: ['serviceAdmin'] },
   // getMyUpdates (MCP, no session): the `$uid` twins of 421/394/423/123 — serviceAdmin only.
   '428myWishNoticesFor': { allow: ['serviceAdmin'] },
   '429hiddenWishProposalsFor': { allow: ['serviceAdmin'] },
@@ -685,6 +687,9 @@ export const qidsAccess = {
   'moachPipelineLeads': { allow: ['serviceAdmin'] },
   'moachPipelineProposals': { allow: ['serviceAdmin'] },
   'moachLeadPage': { allow: ['serviceAdmin'] },
+  'moachCustomerLeads': { allow: ['serviceAdmin'] },
+  'leadMergeSide': { allow: ['serviceAdmin'] },
+  'leadContactsForExport': { allow: ['serviceAdmin'] },
 
   // api/v1/tasks/+server.ts + the webhook dispatcher (External Tasks API):
   // same story — executed with the ADMIN_TOKEN through strapiClient, never

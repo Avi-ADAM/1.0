@@ -32,7 +32,8 @@
     "shipping": "Shipping",
     "promotions": "Promotions",
     "pipeline": "In progress",
-    "attention": "{{count}} need attention"
+    "attention": "{{count}} need attention",
+    "customers": "Customers"
   },
   "kpi": {
     "label": "At a glance",
@@ -1040,7 +1041,10 @@
       "release": "Handed the enquiry back",
       "inbound": "Wrote again",
       "linkOrder": "Order linked",
-      "system": "Update"
+      "system": "Update",
+      "mergedInto": "Merged into another enquiry",
+      "mergedFrom": "A duplicate enquiry was merged here",
+      "contactsExported": "Phone and email exported to a file"
     },
     "plan": {
       "title": "What's next",
@@ -1057,6 +1061,46 @@
       "repause": "Change reason / day",
       "lockedOffered": "An offer is open with them — the stage follows the order. Cancelling the order puts the enquiry back to talking.",
       "lockedWon": "They paid — the stage follows the money."
+    },
+    "export": {
+      "cta": "Export CSV",
+      "withContacts": "With phone and email",
+      "confirm": "The file will include phones and emails, and each enquiry's log will note that you exported them. Continue?",
+      "col": {
+        "kind": "Kind"
+      },
+      "kind": {
+        "lead": "Enquiry",
+        "order": "Order",
+        "proposal": "Wish"
+      }
+    },
+    "view": {
+      "label": "View",
+      "table": "Table",
+      "board": "Board"
+    },
+    "merge": {
+      "title": "Same person twice?",
+      "hint": "If this is the same enquiry arriving again, merge it into the existing one. Nothing is deleted — the log stays and the orders move over.",
+      "pick": "Merge into which enquiry",
+      "cta": "Merge",
+      "confirm": "Merge this enquiry into the one you picked? It will be marked a duplicate and leave the table.",
+      "done": "Merged",
+      "open": "Open the enquiry",
+      "banner": "This enquiry was merged into another one — tap to go there"
     }
+  },
+  "customers": {
+    "empty": {
+      "title": "No customers yet",
+      "body": "Whoever paid — a site order or an enquiry that became a sale — shows up here, one person per row."
+    },
+    "count": "{{count}} customers",
+    "search": "Search by name, phone or email",
+    "ordersOne": "One order",
+    "orders": "{{count}} orders",
+    "fromLead": "Came from an enquiry",
+    "last": "last {{when}}"
   }
 }

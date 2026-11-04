@@ -57,12 +57,14 @@ import {
 } from '$lib/server/ordersApi.js';
 import {
   API_LEAD_SOURCES,
+  LEADS_CREATE_PUBLIC_SCOPE,
   LEADS_CREATE_SCOPE,
   LEADS_READ_SCOPE,
+  PUBLIC_LEADS_PER_IP_HOUR,
   toLeadStatusView
 } from '$lib/server/leadsApi.js';
 import { validateLeadPayload } from '$lib/leads/validate';
-import { checkRateLimit, errorResponse } from './http.js';
+import { checkRateLimit, clientIpOf, errorResponse } from './http.js';
 import { leadsSchemaLive, ordersSchemaLive, shopSchemaLive, strapiRun } from './catalog.js';
 
 /** Admin token for Strapi bypass (internal use) — same handling as v1/actions. */
@@ -117,7 +119,8 @@ export interface WriteArgs {
 async function authenticateWrite(
   request: Request,
   opts: {
-    scope: string;
+    /** One scope, or several of which any one will do. */
+    scope: string | string[];
     bucket: string;
     /**
      * How this endpoint has always refused a caller over its budget: `sales`
@@ -137,8 +140,9 @@ async function authenticateWrite(
   const key = await verifyApiKeyDetailed(rawKey);
   if (!key) throw error(401, 'Invalid API key');
   if (key.revoked) throw error(401, 'API key has been revoked');
-  if (!assertScope(key, opts.scope))
-    throw error(403, `API key is missing the "${opts.scope}" scope`);
+  const wanted = Array.isArray(opts.scope) ? opts.scope : [opts.scope];
+  if (!wanted.some((scope) => assertScope(key, scope)))
+    throw error(403, `API key is missing the "${wanted.join('" or "')}" scope`);
   if (!key.project?.id) throw error(403, 'API key is not scoped to a rikma');
 
   if (
@@ -931,11 +935,49 @@ export async function handleOrderCancel(args: {
 
 // ─── leads (docs/inprogress/PLAN_LEADS.md §5.1, §5.3 — L2) ────────────────
 //
-// Same envelope as orders (`{ error: { code, message, details } }`, no CORS):
-// `leads:create` is a server's scope. A browser form gets its own public scope
-// with an origin list, a per-IP budget and a honeypot (§5.2, L5) — until then a
-// page holding this key is refused, because whoever reads the page can post a
-// stranger's phone number "with consent" in the rikma's name.
+// Same envelope as orders (`{ error: { code, message, details } }`):
+// `leads:create` is a server's scope, and a browser carrying it is refused —
+// whoever reads the page could post a stranger's phone number "with consent"
+// in the rikma's name. A browser form has its own scope, `leads:create:public`
+// (§5.2, L5): a key of its own, only from the origins it lists, 10 leads an
+// hour per address, a honeypot, always `source: form`, and an answer that says
+// nothing — not even whether this person had written before.
+
+/** CORS for a public lead form: the page's own origin, never `*`. */
+function publicLeadCors(request: Request): Record<string, string> | null {
+  const origin = request.headers.get('Origin');
+  if (!origin) return null;
+  return {
+    'Access-Control-Allow-Origin': origin,
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    Vary: 'Origin'
+  };
+}
+
+function withHeaders(response: Response, extra: Record<string, string>): Response {
+  const headers = new Headers(response.headers);
+  for (const [k, v] of Object.entries(extra)) headers.set(k, v);
+  return new Response(response.body, { status: response.status, headers });
+}
+
+/**
+ * The browser's preflight for a public lead form. It answers any origin: the
+ * POST itself checks the key's list, and a preflight carries no key.
+ */
+export function leadPreflight(request: Request): Response {
+  const origin = request.headers.get('Origin');
+  return new Response(null, {
+    status: 204,
+    headers: {
+      'Access-Control-Allow-Origin': origin || '*',
+      'Access-Control-Allow-Methods': 'POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+      'Access-Control-Max-Age': '600',
+      Vary: 'Origin'
+    }
+  });
+}
 
 /** `createLead`'s refusals → the statuses §5.1 promises. */
 function statusOfLeadError(code: string | undefined): number {
@@ -955,11 +997,19 @@ function statusOfLeadError(code: string | undefined): number {
 /** The checks both lead endpoints share after the key: tenant, server caller, schema. */
 async function leadGate(
   key: VerifiedApiKey,
-  args: { request: Request; fetch?: typeof fetch; pathProjectId?: string | null }
+  args: { request: Request; fetch?: typeof fetch; pathProjectId?: string | null; isPublic?: boolean }
 ): Promise<Response | null> {
   const mismatch = assertPathTenant(key, args.pathProjectId);
   if (mismatch) return mismatch;
-  if (args.request.headers.get('Origin')) {
+  if (args.isPublic) {
+    const origin = args.request.headers.get('Origin');
+    if (!key.allowedOrigins.length) {
+      return orderError(403, 'PUBLIC_KEY_NEEDS_ORIGINS', 'A public leads key works only from the site addresses set on it');
+    }
+    if (!origin || !key.allowedOrigins.includes(origin)) {
+      return orderError(403, 'ORIGIN_NOT_ALLOWED', 'This key works only from the site it was made for');
+    }
+  } else if (args.request.headers.get('Origin')) {
     return orderError(
       403,
       'ORIGIN_NOT_ALLOWED',
@@ -985,27 +1035,45 @@ export async function handleLeadPost(args: WriteArgs): Promise<Response> {
   const { request, fetch, pathProjectId } = args;
   const auth = keyOrResponse(
     await authenticateWrite(request, {
-      scope: LEADS_CREATE_SCOPE,
+      scope: [LEADS_CREATE_SCOPE, LEADS_CREATE_PUBLIC_SCOPE],
       bucket: 'leads:create',
       rateLimit: 'json'
     })
   );
   if (auth instanceof Response) return auth;
   const key = auth;
+  // A key with the server scope is a server's, whatever else it carries.
+  const isPublic = !assertScope(key, LEADS_CREATE_SCOPE);
+  const cors = isPublic ? publicLeadCors(request) : null;
+  const answer = (r: Response) => (cors ? withHeaders(r, cors) : r);
 
-  const gate = await leadGate(key, { request, fetch, pathProjectId });
-  if (gate) return gate;
+  const gate = await leadGate(key, { request, fetch, pathProjectId, isPublic });
+  if (gate) return answer(gate);
+
+  if (
+    isPublic &&
+    !checkRateLimit(`leads:public:${key.keyId}:${clientIpOf(request)}`, PUBLIC_LEADS_PER_IP_HOUR, 60 * 60 * 1000)
+      .allowed
+  ) {
+    return answer(orderError(429, 'RATE_LIMITED', 'Too many enquiries from this address — try again later'));
+  }
 
   let body: any;
   try {
     body = await request.json();
   } catch {
-    return orderError(400, 'VALIDATION', 'Invalid JSON body');
+    return answer(orderError(400, 'VALIDATION', 'Invalid JSON body'));
   }
   if (!body || typeof body !== 'object' || Array.isArray(body)) {
-    return orderError(400, 'VALIDATION', 'Expected a JSON object');
+    return answer(orderError(400, 'VALIDATION', 'Expected a JSON object'));
   }
-  const source = body.source ?? 'api';
+  // The honeypot: a field no person sees. A bot that fills it is told "done".
+  if (isPublic && typeof body.website === 'string' && body.website.trim() !== '') {
+    console.log(`[LeadsAPI] honeypot key=${key.keyId}`);
+    return answer(orderJson(201, { success: true }));
+  }
+  // A page cannot say where a lead came from: it is a form, nothing else.
+  const source = isPublic ? 'form' : (body.source ?? 'api');
   if (!(API_LEAD_SOURCES as readonly unknown[]).includes(source)) {
     return orderError(400, 'VALIDATION', `source must be one of ${API_LEAD_SOURCES.join(', ')}`, {
       field: 'source'
@@ -1014,9 +1082,11 @@ export async function handleLeadPost(args: WriteArgs): Promise<Response> {
   const validated = validateLeadPayload({ ...body, source }, { requireConsent: true });
   if (validated.ok === false) {
     const refusal = validated as Extract<typeof validated, { ok: false }>;
-    return orderError(400, refusal.code === 'CONSENT_REQUIRED' ? 'CONSENT_REQUIRED' : 'VALIDATION', refusal.message, {
-      field: refusal.field
-    });
+    return answer(
+      orderError(400, refusal.code === 'CONSENT_REQUIRED' ? 'CONSENT_REQUIRED' : 'VALIDATION', refusal.message, {
+        field: refusal.field
+      })
+    );
   }
   const lead = validated.value;
   const projectId = String(key.project!.id);
@@ -1054,14 +1124,19 @@ export async function handleLeadPost(args: WriteArgs): Promise<Response> {
   if (!result.success) {
     const code = result.error?.code;
     const status = statusOfLeadError(code);
-    return orderError(
-      status,
-      status === 502 ? 'UPSTREAM_ERROR' : (code ?? 'UPSTREAM_ERROR'),
-      status === 502
-        ? 'The lead could not be recorded — retry with the same externalId; it will not be filed twice'
-        : (result.error?.message ?? 'Refused')
+    return answer(
+      orderError(
+        status,
+        status === 502 ? 'UPSTREAM_ERROR' : (code ?? 'UPSTREAM_ERROR'),
+        status === 502
+          ? 'The lead could not be recorded — retry with the same externalId; it will not be filed twice'
+          : (result.error?.message ?? 'Refused')
+      )
     );
   }
+
+  // A page learns nothing back: no id, no task, not whether this person wrote before.
+  if (isPublic) return answer(orderJson(201, { success: true }));
 
   const data = result.data ?? {};
   const duplicated = data.duplicated === true;

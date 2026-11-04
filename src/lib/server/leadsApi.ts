@@ -13,6 +13,40 @@ export const LEADS_CREATE_SCOPE = 'leads:create';
 export const LEADS_READ_SCOPE = 'leads:read';
 
 /**
+ * A browser form's key (§5.2, L5): the raw key sits in a public web page, so
+ * it may do exactly one thing — file a lead, from the rikma's own origins,
+ * a few times an hour per visitor — and read nothing at all.
+ */
+export const LEADS_CREATE_PUBLIC_SCOPE = 'leads:create:public';
+/** Leads per hour from one address through a public key. */
+export const PUBLIC_LEADS_PER_IP_HOUR = 10;
+
+/**
+ * Why a key with the public scope cannot be minted as asked, or null.
+ * It goes on a key of its own (anything else on it would be readable by
+ * whoever opens the page), and only with the origins it may be used from.
+ */
+export function publicLeadKeyRefusal(scopes: string[], allowedOrigins: string[]): string | null {
+  if (!scopes.includes(LEADS_CREATE_PUBLIC_SCOPE)) return null;
+  if (scopes.length > 1) return `${LEADS_CREATE_PUBLIC_SCOPE} goes on a key of its own — the key is visible in the page`;
+  if (!allowedOrigins.length) return `${LEADS_CREATE_PUBLIC_SCOPE} needs the site's address (allowedOrigins)`;
+  return null;
+}
+
+/** `https://Site.example/path` ⇒ `https://site.example`; anything that is not an http(s) origin ⇒ null. */
+export function normalizeOrigin(raw: unknown): string | null {
+  const text = String(raw ?? '').trim();
+  if (!text) return null;
+  try {
+    const u = new URL(text);
+    if (u.protocol !== 'https:' && u.protocol !== 'http:') return null;
+    return u.origin;
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Sources a site's server may claim. Not `manual` (a member recording a phone
  * call — the only source that may skip consent) and not `demo` (the central
  * rikma's own form).

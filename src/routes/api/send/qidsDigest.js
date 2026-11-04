@@ -10,8 +10,8 @@
 // `$uid` twin that takes the id as given — and those are `serviceAdmin` only in
 // qidsAccess.js, because a `$uid` query open to `user` is an IDOR.
 //
-//   hub (signed-in user) → 340 / 341 / 342        + 85levHubSummary
-//   /api/digest (cron)   → 343 / 344 / 345 / 346  + 347digestHubSummaryFor
+//   hub (signed-in user) → 340 / 341 / 342 / 348        + 85levHubSummary
+//   /api/digest (cron)   → 343 / 344 / 345 / 346 / 349  + 347digestHubSummaryFor
 //
 // 347 is 85 with `$idL` → `$uid`, built in qids.js so the vote logic reads one
 // query text, never two copies that drift.
@@ -20,6 +20,28 @@ const NOT_ARCHIVED = `{ or: [{ lifecycle: { null: true } }, { lifecycle: { ne: "
 
 /** Count-only read: the total rides on meta.pagination, no rows come back. */
 const COUNT_ONLY = `pagination: { page: 1, pageSize: 1 }) { meta { pagination { total } } }`;
+
+/**
+ * Open leads in the user's rikmot (PLAN_LEADS §4.4) — statuses, dates and the
+ * owner only. No name, phone or email: this read is open to `user` through
+ * the `$idL` door, and the brief it feeds may go out by mail or Telegram.
+ *
+ * @param {string} v GraphQL variable carrying the user id
+ */
+const LEADS = (v) => `
+  leads(
+    filters: {
+      project: { user_1s: { id: { eq: ${v} } } }
+      or: [{ status: { null: true } }, { status: { notIn: ["won", "spam"] } }]
+    }
+    pagination: { limit: 500 }
+  ) {
+    data { id attributes {
+      status createdAt lastActivityAt followUpAt
+      owner { data { id } }
+      project { data { id attributes { projectName leadSettings } } }
+    } }
+  }`;
 
 /**
  * Missions the user carries (the `85levHubSummary` filter) with what §4.2–4.3
@@ -167,6 +189,9 @@ export const digestQids = {
   '342digestWhatsNew': `query DigestWhatsNew($idL: ID!, $since: DateTime!) {${WHATS_NEW('$idL')}
   }`,
 
+  '348digestLeads': `query DigestLeads($idL: ID!) {${LEADS('$idL')}
+  }`,
+
   // ── The digest run (/api/digest, service token; serviceAdmin only) ──
   '343digestWorkFor': `query DigestWorkFor($uid: ID!) {${WORK('$uid', true)}
   }`,
@@ -175,6 +200,9 @@ export const digestQids = {
   }`,
 
   '345digestWhatsNewFor': `query DigestWhatsNewFor($uid: ID!, $since: DateTime!) {${WHATS_NEW('$uid')}
+  }`,
+
+  '349digestLeadsFor': `query DigestLeadsFor($uid: ID!) {${LEADS('$uid')}
   }`,
 
   // Who gets a digest: members of at least one rikma (§11 Q2 — a user with no

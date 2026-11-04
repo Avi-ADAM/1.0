@@ -5,6 +5,7 @@ import type { RequestHandler } from './$types';
 import { generateApiKey }   from '$lib/server/apiKeys';
 import { webhookSecretForKey } from '$lib/server/webhooks/secret';
 import { invalidateWebhookTargets } from '$lib/server/webhooks/targets';
+import { normalizeOrigin, publicLeadKeyRefusal } from '$lib/server/leadsApi';
 
 import { STRAPI_URL } from '$lib/server/strapiUrl.js';
 
@@ -38,7 +39,9 @@ const GRANTABLE_SCOPES = [
   // Leads (PLAN_LEADS §7.3) — a site's server passes on who reached out, and
   // reads back only their status.
   'leads:create',
-  'leads:read'
+  'leads:read',
+  // A browser form's key (§5.2, L5): alone on its key, with the site's origins.
+  'leads:create:public'
 ] as const;
 
 /** Callbacks must be absolute http(s) — a relative or exotic URL is a config bug. */
@@ -126,6 +129,15 @@ export const POST: RequestHandler = async ({ request, cookies, locals }) => {
   const explicitScopes = bodyIn?.scopes != null;
   const scopes = explicitScopes ? normalizeScopes(bodyIn.scopes) : SALES_API_SCOPES;
   const callbackUrl = normalizeCallbackUrl(bodyIn?.callbackUrl);
+  // Origins at creation: a public form key is useless (and refused) without them.
+  if (bodyIn?.allowedOrigins != null && !Array.isArray(bodyIn.allowedOrigins)) {
+    throw error(400, 'allowedOrigins must be an array');
+  }
+  const rawOrigins: unknown[] = bodyIn?.allowedOrigins ?? [];
+  const allowedOrigins = [...new Set(rawOrigins.map(normalizeOrigin))];
+  if (allowedOrigins.includes(null)) throw error(400, 'allowedOrigins must be http(s) site addresses');
+  const publicRefusal = publicLeadKeyRefusal(scopes, allowedOrigins as string[]);
+  if (publicRefusal) throw error(400, publicRefusal);
 
   const name = projectId
     ? (explicitScopes ? String(bodyIn?.name ?? '').trim() : SALES_API_KEY_NAME)
@@ -171,6 +183,7 @@ export const POST: RequestHandler = async ({ request, cookies, locals }) => {
     data.scopes = scopes;
     data.revoked = false;
     if (callbackUrl) data.callback_url = callbackUrl;
+    if (allowedOrigins.length) data.allowed_origins = allowedOrigins;
   }
 
   const res = await fetch(`${STRAPI_URL}/api/api-keys`, {

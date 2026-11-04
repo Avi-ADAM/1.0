@@ -43,7 +43,9 @@
   const hasTasks = $derived(s.tasks.open > 0);
   const hasNew = $derived(s.whatsNew.total > 0);
   const hasSuggestions = $derived(s.suggestions.count > 0);
-  const hasAnything = $derived(hasWork || hasTasks || hasNew || hasSuggestions);
+  // Enquiries waiting on this member, per rikma (PLAN_LEADS §4.4).
+  const leadProjects = $derived(s.leads?.projects ?? []);
+  const hasAnything = $derived(hasWork || hasTasks || hasNew || hasSuggestions || leadProjects.length > 0);
 
   // Sections that failed to load, minus votes (not rendered here).
   const failedHere = $derived(failed.filter((f) => f !== 'hub'));
@@ -89,6 +91,25 @@
     {/each}
 
     <div class="divide-y divide-white/[0.06]">
+      {#each leadProjects as lp (lp.projectId)}
+        <a href={lp.url} class="br-row">
+          <span class="br-icon">📨</span>
+          <span class="br-num font-litt">{lp.attention}</span>
+          <span class="flex-1 min-w-0">
+            <span class="br-label">{$t('hub.brief.leads')}{#if lp.projectName}<span class="text-white/40"> · {lp.projectName}</span>{/if}</span>
+            <span class="br-chips">
+              {#if lp.unanswered > 0}
+                <span class="br-chip br-chip-alert">{lp.unanswered} {$t('hub.brief.leadsUnanswered')}</span>
+              {/if}
+              {#if lp.followUpDue > 0}
+                <span class="br-chip">{lp.followUpDue} {$t('hub.brief.leadsFollowUp')}</span>
+              {/if}
+            </span>
+          </span>
+          <span class="br-chev">‹</span>
+        </a>
+      {/each}
+
       {#if hasWork}
         <a href="/lev?focus=mtaha" class="br-row">
           <span class="br-icon">💼</span>

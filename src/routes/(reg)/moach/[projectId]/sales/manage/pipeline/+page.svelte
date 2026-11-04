@@ -18,10 +18,13 @@
   import { shopOrdersKey } from '$lib/shop/keys.js';
   import { shownStatus } from '$lib/shop/pendingMarks.svelte';
   import { executeAction, actionErrorText } from '$lib/client/actionClient';
+  import { pipelineCsv, type CsvContact } from '$lib/leads/csv';
+  import { downloadCsv } from '$lib/shop/download';
   import {
     buildPipeline,
     DEFAULT_PIPELINE_FILTER,
     filterPipeline,
+    groupByStage,
     orderInput,
     pipelineCounts,
     type OwnerFilter,
@@ -88,6 +91,62 @@
   });
   let list = $derived(filterPipeline(rows, filter, uid));
   let sources = $derived([...new Set(rows.map((r) => r.source))].sort());
+
+  // The board (L5): a column per stage, the same rows in the same order.
+  let view = $derived<'table' | 'board'>(page.url.searchParams.get('view') === 'board' ? 'board' : 'table');
+  let columns = $derived(
+    groupByStage(
+      list,
+      filter.stage === 'paused' ? ['paused'] : filter.stage === 'open' ? ['new', 'contacted', 'talking', 'offered'] : [filter.stage]
+    )
+  );
+
+  // ── CSV (L5): no contact details unless ticked — and then on each lead's record ──
+  let withContacts = $state(false);
+  let exporting = $state(false);
+  async function exportCsv() {
+    if (exporting) return;
+    let contacts: Map<string, CsvContact> | null = null;
+    if (withContacts) {
+      if (!confirm($t('shop.leads.export.confirm'))) return;
+      exporting = true;
+      try {
+        const res = await executeAction('exportLeadContacts', { projectId }, { showErrorToast: false });
+        if (!res.success) {
+          toast.error(actionErrorText(res, $t('shop.leads.err.save')));
+          return;
+        }
+        const got = ((res.data as any)?.contacts ?? []) as Array<{ leadId: string } & CsvContact>;
+        contacts = new Map(got.map((c) => [String(c.leadId), { phone: c.phone, email: c.email }]));
+      } finally {
+        exporting = false;
+      }
+    }
+    const csv = pipelineCsv(
+      list,
+      {
+        headers: {
+          kind: $t('shop.leads.export.col.kind'),
+          name: $t('shop.leads.col.name'),
+          organization: $t('shop.leads.field.organization'),
+          source: $t('shop.leads.col.source'),
+          products: $t('shop.leads.col.product'),
+          stage: $t('shop.leads.col.stage'),
+          owner: $t('shop.leads.col.owner'),
+          last: $t('shop.leads.col.last'),
+          followUp: $t('shop.leads.plan.backOn'),
+          next: $t('shop.leads.col.next'),
+          phone: $t('shop.leads.field.phone'),
+          email: $t('shop.leads.field.email')
+        },
+        kind: (k) => $t(`shop.leads.export.kind.${k}`),
+        source: (s) => $t(`shop.leads.source.${s}`),
+        stage: (s) => $t(`shop.leads.stage.${s}`)
+      },
+      contacts
+    );
+    downloadCsv(`leads-${projectId}-${new Date().toISOString().slice(0, 10)}.csv`, csv);
+  }
 
   function setParam(key: string, value: string | null) {
     const url = new URL(page.url);
@@ -212,7 +271,20 @@
           </select>
         </label>
       {/if}
+      <div class="sh-seg pl-view" role="group" aria-label={$t('shop.leads.view.label')}>
+        <button type="button" aria-pressed={view === 'table'} onclick={() => setParam('view', null)}>{$t('shop.leads.view.table')}</button>
+        <button type="button" aria-pressed={view === 'board'} onclick={() => setParam('view', 'board')}>{$t('shop.leads.view.board')}</button>
+      </div>
     </div>
+  </div>
+  <div class="pl-export">
+    <label class="pl-check">
+      <input type="checkbox" bind:checked={withContacts} />
+      {$t('shop.leads.export.withContacts')}
+    </label>
+    <button type="button" class="sh-btn sh-btn-quiet pl-quick" disabled={exporting || list.length === 0} onclick={exportCsv}>
+      {$t('shop.leads.export.cta')}
+    </button>
   </div>
 
   {#if list.length === 0}
@@ -237,28 +309,47 @@
       {/if}
     {/snippet}
 
+    {#snippet card(r: PipelineRow)}
+      <a class="pl-card-top" href={hrefOf(r)}>
+        <span class="pl-name">{r.name}{#if r.organization}<span class="pl-org"> · {r.organization}</span>{/if}</span>
+        {#if r.amount}<span class="pl-sum sh-num"><bdi>{fmtMoney(r.amount, r.currency)}</bdi></span>{/if}
+      </a>
+      <div class="pl-tags">
+        <span class="sh-chip {STAGE_CHIP[r.stage]}">{stageText(r)}</span>
+        {@render attentionTag(r)}
+        <span class="pl-muted">{sourceText(r)}</span>
+        <time class="pl-muted" datetime={when(r.lastAt)?.iso} title={when(r.lastAt)?.full}>{when(r.lastAt)?.short}</time>
+      </div>
+      {#if r.nextAction || r.followUpAt}
+        <p class="pl-next">
+          {#if r.nextAction}{r.nextAction}{/if}
+          {#if r.followUpAt}<span class="pl-muted"> · {$t('shop.leads.list.backOn', { when: when(r.followUpAt)?.short ?? '' })}</span>{/if}
+        </p>
+      {/if}
+      <div class="pl-card-foot">{@render actions(r, false)}</div>
+    {/snippet}
+
+    {#if view === 'board'}
+      <div class="pl-board">
+        {#each columns as col (col.stage)}
+          <section class="pl-col" aria-label={$t(`shop.leads.stage.${col.stage}`)}>
+            <h3 class="pl-col-head">
+              <span class="sh-chip {STAGE_CHIP[col.stage]}">{$t(`shop.leads.stage.${col.stage}`)}</span>
+              <span class="pl-muted">{col.rows.length}</span>
+            </h3>
+            <ul class="pl-col-list">
+              {#each col.rows as r (r.key)}
+                <li class="pl-card" class:pl-card-warn={!!r.attention}>{@render card(r)}</li>
+              {/each}
+            </ul>
+          </section>
+        {/each}
+      </div>
+    {:else}
     <!-- phone: cards -->
     <ul class="pl-cards">
       {#each list as r (r.key)}
-        <li class="pl-card" class:pl-card-warn={!!r.attention}>
-          <a class="pl-card-top" href={hrefOf(r)}>
-            <span class="pl-name">{r.name}{#if r.organization}<span class="pl-org"> · {r.organization}</span>{/if}</span>
-            {#if r.amount}<span class="pl-sum sh-num"><bdi>{fmtMoney(r.amount, r.currency)}</bdi></span>{/if}
-          </a>
-          <div class="pl-tags">
-            <span class="sh-chip {STAGE_CHIP[r.stage]}">{stageText(r)}</span>
-            {@render attentionTag(r)}
-            <span class="pl-muted">{sourceText(r)}</span>
-            <time class="pl-muted" datetime={when(r.lastAt)?.iso} title={when(r.lastAt)?.full}>{when(r.lastAt)?.short}</time>
-          </div>
-          {#if r.nextAction || r.followUpAt}
-            <p class="pl-next">
-              {#if r.nextAction}{r.nextAction}{/if}
-              {#if r.followUpAt}<span class="pl-muted"> · {$t('shop.leads.list.backOn', { when: when(r.followUpAt)?.short ?? '' })}</span>{/if}
-            </p>
-          {/if}
-          <div class="pl-card-foot">{@render actions(r, false)}</div>
-        </li>
+        <li class="pl-card" class:pl-card-warn={!!r.attention}>{@render card(r)}</li>
       {/each}
     </ul>
 
@@ -308,6 +399,7 @@
         </tbody>
       </table>
     </div>
+    {/if}
   {/if}
 {/if}
 
@@ -452,6 +544,54 @@
   .pl-sheet-title {
     font-size: 22px;
     margin: 0 0 12px;
+  }
+  .pl-export {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .pl-check {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--sh-muted);
+  }
+  .pl-view {
+    min-width: 180px;
+  }
+  /* The board scrolls sideways on its own, never the page. */
+  .pl-board {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(260px, 1fr);
+    gap: 12px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+  }
+  .pl-col {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+  }
+  .pl-col-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 0;
+    font-size: 14px;
+  }
+  .pl-col-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
   }
   @media (min-width: 900px) {
     .pl-tools {

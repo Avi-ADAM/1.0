@@ -183,6 +183,19 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
 
   let taskId: string | null = null;
   const byRole = settings.leadRoleIds.length > 0;
+  // A caller that already opened the work and told the team (the demo form,
+  // L6) records the lead without a second task or a second notice.
+  if (params.openTask === false) {
+    return {
+      leadId: String(leadId),
+      externalId: lead.externalId,
+      status: 'new',
+      taskId: null,
+      duplicated: false,
+      warnings,
+      notifyUserIds: []
+    };
+  }
   try {
     const lang = TASK_PREFIX[context.lang] ? context.lang : 'he';
     const { actionService } = await import('../index.js');
@@ -251,7 +264,12 @@ export const createLeadConfig: ActionConfig = {
     sourceUrl: optionalString('The page it was sent from'),
     utm: { type: 'object', required: false, description: 'utm source/medium/campaign/term/content' },
     consent: { type: 'object', required: false, description: '{ text, at } — required unless source is manual' },
-    lang: optionalString("The person's language")
+    lang: optionalString("The person's language"),
+    openTask: {
+      type: 'boolean',
+      required: false,
+      description: 'false: record the lead only — the caller already opened the work and told the team (the demo form)'
+    }
   },
 
   access: ['user', 'serviceAdmin', 'apiKey'],

@@ -46,6 +46,9 @@
       "resources": "ресурсы",
       "products": "продукты",
       "sales": "продажи"
-    }
+    },
+    "leads": "Обращения ждут вас",
+    "leadsUnanswered": "без ответа",
+    "leadsFollowUp": "вернуться сегодня"
   }
 }

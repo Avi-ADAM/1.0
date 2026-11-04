@@ -242,3 +242,69 @@ describe('GET /leads/{externalId}', () => {
     expect((await get(AUTH, 'lead_6f1c')).status).toBe(403);
   });
 });
+
+describe('POST /leads from a public form (leads:create:public, §5.2)', () => {
+  const SITE = 'https://vaad.example';
+  const publicKey = (origins: string[] = [SITE]) => ({ ...key(['leads:create:public']), allowedOrigins: origins });
+  const FROM_SITE = { ...AUTH, Origin: SITE, 'x-forwarded-for': '203.0.113.7' };
+
+  beforeEach(() => {
+    mocks.verifyApiKeyDetailed.mockResolvedValue(publicKey());
+  });
+
+  it('files the lead as a form, and the page learns nothing back', async () => {
+    mocks.executeAction.mockResolvedValue({
+      success: true,
+      data: { leadId: '77', status: 'talking', duplicated: true, reason: 'sameContact', warnings: [] }
+    });
+    const r = await post(FROM_SITE, { ...BODY, source: 'api' });
+    expect(r.status).toBe(201);
+    expect(r.body).toEqual({ success: true });
+    expect(mocks.executeAction.mock.calls[0][1]).toMatchObject({ source: 'form', projectId: '57' });
+  });
+
+  it('answers the page with its own origin, never *', async () => {
+    const res = (await POST({
+      params: { rikma: 'haohel' },
+      request: request(FROM_SITE, BODY),
+      fetch: vi.fn()
+    } as any)) as Response;
+    expect(res.headers.get('Access-Control-Allow-Origin')).toBe(SITE);
+  });
+
+  it('works only from the origins on the key — and not at all without them', async () => {
+    let r = await post({ ...FROM_SITE, Origin: 'https://evil.example' });
+    expect(r.status).toBe(403);
+    r = await post({ ...AUTH, 'x-forwarded-for': '203.0.113.7' });
+    expect(r.status).toBe(403);
+    expect(r.body.error.code).toBe('ORIGIN_NOT_ALLOWED');
+    mocks.verifyApiKeyDetailed.mockResolvedValue(publicKey([]));
+    r = await post(FROM_SITE);
+    expect(r.status).toBe(403);
+    expect(r.body.error.code).toBe('PUBLIC_KEY_NEEDS_ORIGINS');
+    expect(mocks.executeAction).not.toHaveBeenCalled();
+  });
+
+  it('tells a bot that filled the hidden field "done", and files nothing', async () => {
+    const r = await post(FROM_SITE, { ...BODY, website: 'http://spam.example' });
+    expect(r.status).toBe(201);
+    expect(mocks.executeAction).not.toHaveBeenCalled();
+  });
+
+  it('takes ten an hour from one address', async () => {
+    for (let i = 0; i < 10; i++) expect((await post(FROM_SITE)).status).toBe(201);
+    const r = await post(FROM_SITE);
+    expect(r.status).toBe(429);
+    expect(r.body.error.code).toBe('RATE_LIMITED');
+    expect((await post({ ...FROM_SITE, 'x-forwarded-for': '198.51.100.2' })).status).toBe(201);
+  });
+
+  it('still needs consent', async () => {
+    const { consent: _c, ...noConsent } = BODY;
+    expect((await post(FROM_SITE, noConsent)).status).toBe(400);
+  });
+
+  it('cannot read a status back', async () => {
+    expect((await get(FROM_SITE, 'lead_6f1c')).status).toBe(403);
+  });
+});

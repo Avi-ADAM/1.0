@@ -13,7 +13,9 @@
  *      free takes it, rather than the lead becoming a note in one inbox;
  *   4. pings the team on Telegram;
  *   5. writes the meeting/task ids back onto the lead row, so one record shows
- *      the whole state.
+ *      the whole state;
+ *   6. records the person as a `lead` of the central rikma (`source: demo`,
+ *      PLAN_LEADS L6) — no task of its own and no second notice.
  *
  * Steps 2–5 are all best-effort. The lead is the thing that must not be lost:
  * as long as Strapi took the row, the response is a success, and a `warnings`
@@ -36,6 +38,7 @@ import { env } from '$env/dynamic/private';
 import { STRAPI_URL } from '$lib/server/strapiUrl.js';
 import { createDemoTasks, centralRikmaId } from '$lib/server/demo/centralRikmaTasks.js';
 import { createDemoMeeting } from '$lib/server/demo/demoMeeting.js';
+import { recordDemoLead } from '$lib/server/demo/demoLead.js';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 
@@ -267,6 +270,13 @@ export const POST: RequestHandler = async ({ request, fetch, getClientAddress })
     fetch
   );
   if (!tasks.created) warnings.push(`tasks:${tasks.reason ?? 'error'}`);
+
+  // ── 3b. The person as a lead of the central rikma (PLAN_LEADS L6) ─────────
+  const demoLead = await recordDemoLead(
+    { name, email, phone, track, timeMode, preferredTime, goal, lang, page, source, demoRequestId: strapiId },
+    fetch
+  );
+  if (!demoLead.ok) warnings.push(`lead:${demoLead.reason ?? 'error'}`);
 
   // ── 4. Write the task ids back onto the lead ──────────────────────────────
   if (strapiId && (tasks.coordActId || tasks.callActId)) {

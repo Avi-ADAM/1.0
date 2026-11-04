@@ -18,6 +18,8 @@ import { createLeadConfig } from './createLead.js';
 import { logLeadActivityConfig } from './logLeadActivity.js';
 import { updateLeadStatusConfig } from './updateLeadStatus.js';
 import { updateLeadPlanConfig } from './updateLeadPlan.js';
+import { mergeLeadsConfig } from './mergeLeads.js';
+import { exportLeadContactsConfig } from './exportLeadContacts.js';
 import { syncLeadFromTask } from '$lib/server/leads/taskSync';
 
 type Row = Record<string, any>;
@@ -29,6 +31,7 @@ function makeDb() {
     acts: new Map<string, Row>(),
     settings: null as any,
     members: ['5', '6'],
+    orderStatus: {} as Record<string, string>,
     nextId: 70
   };
 }
@@ -100,6 +103,28 @@ const strapi = {
             }
           }
         };
+      }
+      case 'leadMergeSide': {
+        const l = db.leads.get(vars.id);
+        if (!l) return { data: { lead: { data: null } } };
+        const ids = (v: any) => ({ data: (v ?? []).map((id: any) => ({ id: String(id), attributes: { status: db.orderStatus[String(id)] ?? 'sent' } })) });
+        return {
+          data: {
+            lead: {
+              data: {
+                id: vars.id,
+                attributes: { ...l, project: rel(l.project), act: rel(l.act), orders: ids(l.orders), products: ids(l.products) }
+              }
+            }
+          }
+        };
+      }
+      case 'leadContactsForExport': {
+        const hits = [...db.leads.keys()].filter((id) => {
+          const l = db.leads.get(id)!;
+          return l.project === vars.pid && l.status !== 'spam' && !l.anonymizedAt;
+        });
+        return { data: { leads: { data: hits.map((id) => ({ id, attributes: { phone: db.leads.get(id)!.phone ?? null, email: db.leads.get(id)!.email ?? null } })) } } };
       }
       default:
         throw new Error(`unexpected qid ${qid}`);
@@ -314,5 +339,53 @@ describe('the task pulls the lead along', () => {
     await sync({ status: 40 });
     expect(db.activities).toEqual([]);
     expect(db.leads.get('70')!.status).toBe('new');
+  });
+});
+
+describe('mergeLeads / exportLeadContacts (L5)', () => {
+  beforeEach(async () => {
+    await createLead({ name: 'דנה', phone: '0500000000', consent });
+    await createLead({ name: 'דנה כהן', email: 'dana@example.com', organization: 'הרצל 12', consent });
+    db.activities = [];
+  });
+
+  it('folds the duplicate in: its contact and orders move, it becomes spam, both logs say so', async () => {
+    db.leads.get('71')!.orders = ['40'];
+    db.orderStatus['40'] = 'paid';
+    const r = await call(mergeLeadsConfig, { keepId: '70', mergeId: '71' });
+    expect(r).toMatchObject({ keepId: '70', mergedId: '71', status: 'won', movedOrders: 1 });
+    expect(db.leads.get('70')).toMatchObject({ email: 'dana@example.com', organization: 'הרצל 12', orders: ['40'], status: 'won' });
+    expect(db.leads.get('70')!.dedupeKey.split('|')).toHaveLength(2);
+    expect(db.leads.get('71')).toMatchObject({ status: 'spam', orders: [] });
+    expect(db.activities).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ lead: '70', kind: 'system', body: 'mergedFrom:71', actor: '5' }),
+        expect.objectContaining({ lead: '71', kind: 'system', body: 'mergedInto:70', actor: '5' }),
+        expect.objectContaining({ lead: '71', kind: 'statusChange', toStatus: 'spam' })
+      ])
+    );
+  });
+
+  it('refuses itself and a lead of another rikma', async () => {
+    await expect(call(mergeLeadsConfig, { keepId: '70', mergeId: '70' })).rejects.toMatchObject({ code: 'VALIDATION_FAILED' });
+    db.leads.get('71')!.project = '58';
+    await expect(call(mergeLeadsConfig, { keepId: '70', mergeId: '71' })).rejects.toMatchObject({ code: 'NOT_FOUND' });
+  });
+
+  it('exports contacts only on the record — one log line per lead it gave away', async () => {
+    db.leads.get('71')!.status = 'spam';
+    const r = await call(exportLeadContactsConfig, {});
+    expect(r.contacts).toEqual([{ leadId: '70', phone: '0500000000', email: null }]);
+    expect(r.logged).toBe(1);
+    expect(db.activities).toEqual([expect.objectContaining({ lead: '70', kind: 'system', body: 'contactsExported', actor: '5' })]);
+  });
+});
+
+describe('createLead with openTask: false (the demo form, L6)', () => {
+  it('records the lead only — no second task, no second notice', async () => {
+    const r = await createLead({ name: 'דנה', email: 'dana@example.com', source: 'demo', consent, openTask: false });
+    expect(r).toMatchObject({ duplicated: false, taskId: null, notifyUserIds: [] });
+    expect(nested.executeAction).not.toHaveBeenCalled();
+    expect(db.leads.get(r.leadId)).toMatchObject({ source: 'demo', status: 'new' });
   });
 });

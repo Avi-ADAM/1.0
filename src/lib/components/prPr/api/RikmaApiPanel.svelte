@@ -45,11 +45,15 @@
     'orders:create',
     'orders:read',
     'leads:create',
-    'leads:read'
+    'leads:read',
+    'leads:create:public'
   ];
   // orders:* and leads:* move money or carry people's contact details — a
   // server's key, never a page's (§3.3; PLAN_LEADS §5.1). Each family has its
-  // own warning under the checkboxes.
+  // own warning under the checkboxes. The one exception is a browser form's
+  // key, `leads:create:public` (PLAN_LEADS §5.2): alone on its key, and only
+  // from the site addresses written on it.
+  const PUBLIC_LEADS = 'leads:create:public';
 
   /** @type {Array<{id: string, name: string, key_prefix: string, revoked: boolean, lastUsedAt: string|null, scopes: string[], callbackUrl: string|null}>} */
   let keys = $state([]);
@@ -61,7 +65,44 @@
   let newRawKey = $state('');
   let newWebhookSecret = $state('');
 
-  let form = $state({ name: '', scopes: ['tasks:create', 'tasks:read'], callbackUrl: '' });
+  let form = $state({ name: '', scopes: ['tasks:create', 'tasks:read'], callbackUrl: '', origins: '' });
+  const formIsPublic = $derived(form.scopes.includes(PUBLIC_LEADS));
+  /** The site addresses typed for a public form key — one per line or comma. */
+  const formOrigins = $derived(
+    form.origins
+      .split(/[\s,]+/)
+      .map((o) => o.trim())
+      .filter(Boolean)
+  );
+  // The form snippet for a public key: a plain HTML form posting to the rikma.
+  let publicSnippetKey = $state('');
+  const publicFormSnippet = $derived(`<form id="lead-form">
+  <input name="name" required placeholder="Name">
+  <input name="phone" placeholder="Phone">
+  <input name="email" type="email" placeholder="Email">
+  <textarea name="message"></textarea>
+  <!-- left empty by people; bots fill it -->
+  <input name="website" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px">
+  <label><input type="checkbox" name="consent" required> I agree that my details go to the rikma on 1lev1</label>
+  <button>Send</button>
+</form>
+<script>
+document.getElementById('lead-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const f = new FormData(e.target);
+  const res = await fetch('${PUBLIC_API_ORIGIN}/api/v1/r/${rikmaSlug || projectId}/leads', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ${publicSnippetKey || '{{API_KEY}}'}' },
+    body: JSON.stringify({
+      name: f.get('name'), phone: f.get('phone'), email: f.get('email'),
+      message: f.get('message'), website: f.get('website'),
+      sourceUrl: location.href,
+      consent: { text: 'I agree that my details go to the rikma on 1lev1', at: new Date().toISOString() }
+    })
+  });
+  e.target.innerHTML = res.ok ? 'Thank you — we will get back to you.' : 'Something went wrong, please try again.';
+});
+<\/script>`);
 
   let currentUserId = $state('');
   let selectedMissionId = $state('');
@@ -248,9 +289,13 @@
   }
 
   function toggleScope(scope) {
-    form.scopes = form.scopes.includes(scope)
-      ? form.scopes.filter((s) => s !== scope)
-      : [...form.scopes, scope];
+    if (form.scopes.includes(scope)) {
+      form.scopes = form.scopes.filter((s) => s !== scope);
+      return;
+    }
+    // The public form scope goes on a key of its own: ticking it clears the
+    // rest, and ticking anything else clears it.
+    form.scopes = scope === PUBLIC_LEADS ? [PUBLIC_LEADS] : [...form.scopes.filter((s) => s !== PUBLIC_LEADS), scope];
   }
 
   async function createKey() {
@@ -262,6 +307,10 @@
       toast.error($t('rikmaApi.errScopeRequired'));
       return;
     }
+    if (formIsPublic && formOrigins.length === 0) {
+      toast.error($t('rikmaApi.errOriginsRequired'));
+      return;
+    }
     creating = true;
     try {
       const res = await fetch('/api/api-keys', {
@@ -271,7 +320,8 @@
           projectId,
           name: form.name.trim(),
           scopes: form.scopes,
-          callbackUrl: form.callbackUrl.trim() || null
+          callbackUrl: formIsPublic ? null : form.callbackUrl.trim() || null,
+          ...(formIsPublic ? { allowedOrigins: formOrigins } : {})
         })
       });
       if (!res.ok) {
@@ -281,7 +331,8 @@
       const data = await res.json();
       newRawKey = data.raw;
       newWebhookSecret = data.webhookSecret ?? '';
-      form = { name: '', scopes: ['tasks:create', 'tasks:read'], callbackUrl: '' };
+      publicSnippetKey = formIsPublic ? data.raw : '';
+      form = { name: '', scopes: ['tasks:create', 'tasks:read'], callbackUrl: '', origins: '' };
       await loadKeys();
     } catch (e) {
       console.error('[RikmaApiPanel] create key failed:', e);
@@ -377,6 +428,15 @@
             </button>
           </div>
         {/if}
+        {#if publicSnippetKey}
+          <p class="hint">{$t('rikmaApi.leadsFormSnippet')}</p>
+          <div class="code-block">
+            <button type="button" class="copy-btn" onclick={() => copy(publicFormSnippet, 'leadForm')}>
+              {copiedWhat === 'leadForm' ? $t('rikmaApi.copied') : $t('rikmaApi.copy')}
+            </button>
+            <pre dir="ltr"><code>{publicFormSnippet}</code></pre>
+          </div>
+        {/if}
       </div>
     {/if}
 
@@ -441,18 +501,27 @@
         {#if form.scopes.some((s) => s.startsWith('orders:'))}
           <p class="server-only">{$t('rikmaApi.ordersServerOnly')}</p>
         {/if}
-        {#if form.scopes.some((s) => s.startsWith('leads:'))}
+        {#if formIsPublic}
+          <p class="server-only">{$t('rikmaApi.leadsPublicNote')}</p>
+        {:else if form.scopes.some((s) => s.startsWith('leads:'))}
           <p class="server-only">{$t('rikmaApi.leadsServerOnly')}</p>
         {/if}
       </fieldset>
-      <label class="field">
-        <span>{$t('rikmaApi.callbackUrl')}</span>
-        <input
-          type="url"
-          bind:value={form.callbackUrl}
-          placeholder="https://my-site.example/api/1lev1-webhook"
-        />
-      </label>
+      {#if formIsPublic}
+        <label class="field">
+          <span>{$t('rikmaApi.allowedOrigins')}</span>
+          <textarea bind:value={form.origins} rows="2" dir="ltr" placeholder="https://my-site.example"></textarea>
+        </label>
+      {:else}
+        <label class="field">
+          <span>{$t('rikmaApi.callbackUrl')}</span>
+          <input
+            type="url"
+            bind:value={form.callbackUrl}
+            placeholder="https://my-site.example/api/1lev1-webhook"
+          />
+        </label>
+      {/if}
       <button type="button" class="primary" onclick={createKey} disabled={creating}>
         {creating ? $t('rikmaApi.creating') : $t('rikmaApi.createKey')}
       </button>

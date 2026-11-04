@@ -83,6 +83,7 @@ import {
   getProjectStatsTool,
   proposeProjectLinkTool
 } from '../../../mastra/tools/projectDetailsTools';
+import { listRikmaLeadsTool, getLeadTool, logLeadActivityTool } from '../../../mastra/tools/leadTools';
 import {
   listRikmaProductsTool,
   getRikmaProductTool,
@@ -291,6 +292,11 @@ export const MCP_TOOL_MANIFEST: Record<string, McpManifestEntry> = {
 /** Whether an entry is switched on at all (feature flags). */
 export function entryEnabled(entry: McpManifestEntry): boolean {
   return entry.enabled ? entry.enabled() : true;
+  // Leads (PLAN_LEADS §4.4, L5): read the enquiries and log a conversation the member had.
+  // No status tool — "won" follows money and "not now" is the member's own click.
+  listRikmaLeadsTool: { tool: listRikmaLeadsTool, title: 'List rikma leads', tier: 'read', project: 'member' },
+  getLeadTool: { tool: getLeadTool, title: 'Get a lead', tier: 'read', project: 'member' },
+  logLeadActivityTool: { tool: logLeadActivityTool, title: 'Log a lead conversation', tier: 'selfWrite', project: 'member' },
 }
 
 /** Whether a key with these ops may see a tool of this tier. */

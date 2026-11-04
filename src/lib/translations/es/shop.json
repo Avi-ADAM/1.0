@@ -32,7 +32,8 @@
     "shipping": "Envíos",
     "promotions": "Promociones",
     "pipeline": "En curso",
-    "attention": "{{count}} requieren atención"
+    "attention": "{{count}} requieren atención",
+    "customers": "Clientes"
   },
   "kpi": {
     "label": "Resumen",
@@ -1040,7 +1041,10 @@
       "release": "Devolvió la consulta",
       "inbound": "Volvió a escribir",
       "linkOrder": "Pedido vinculado",
-      "system": "Actualización"
+      "system": "Actualización",
+      "mergedInto": "Unida a otra consulta",
+      "mergedFrom": "Una consulta duplicada se unió aquí",
+      "contactsExported": "Teléfono y correo exportados a un archivo"
     },
     "plan": {
       "title": "Qué sigue",
@@ -1057,6 +1061,46 @@
       "repause": "Cambiar motivo / día",
       "lockedOffered": "Tiene una oferta abierta — la etapa sigue al pedido. Cancelar el pedido devuelve la consulta a conversación.",
       "lockedWon": "Ya pagó — la etapa sigue al dinero."
+    },
+    "export": {
+      "cta": "Exportar CSV",
+      "withContacts": "Con teléfono y correo",
+      "confirm": "El archivo incluirá teléfonos y correos, y el registro de cada consulta anotará que los exportaste. ¿Continuar?",
+      "col": {
+        "kind": "Tipo"
+      },
+      "kind": {
+        "lead": "Consulta",
+        "order": "Pedido",
+        "proposal": "Deseo"
+      }
+    },
+    "view": {
+      "label": "Vista",
+      "table": "Tabla",
+      "board": "Tablero"
+    },
+    "merge": {
+      "title": "¿La misma persona dos veces?",
+      "hint": "Si es la misma consulta que llegó otra vez, únela a la existente. No se borra nada — el registro se conserva y los pedidos pasan.",
+      "pick": "Unir a qué consulta",
+      "cta": "Unir",
+      "confirm": "¿Unir esta consulta a la que elegiste? Quedará marcada como duplicada y saldrá de la tabla.",
+      "done": "Unida",
+      "open": "Ir a la consulta",
+      "banner": "Esta consulta se unió a otra — toca para ir allí"
     }
+  },
+  "customers": {
+    "empty": {
+      "title": "Aún no hay clientes",
+      "body": "Quien pagó — un pedido del sitio o una consulta que se convirtió en venta — aparece aquí, una persona por fila."
+    },
+    "count": "{{count}} clientes",
+    "search": "Buscar por nombre, teléfono o correo",
+    "ordersOne": "Un pedido",
+    "orders": "{{count}} pedidos",
+    "fromLead": "Vino de una consulta",
+    "last": "último {{when}}"
   }
 }

@@ -21,23 +21,26 @@ import { emptyHubSummary, processHubSummary, type HubSummary } from '$lib/digest
 import { emptySuggestionSummary, processSuggestions, type SuggestionSummary } from '$lib/digest/suggestions.js';
 import { emptyWhatsNew, processWhatsNew, resolveSince, type WhatsNewSummary } from '$lib/digest/whatsNew.js';
 import { emptyWorkSummary, processWork, type WorkSummary } from '$lib/digest/work.js';
+import { emptyLeadsDigest, processLeads, type LeadsDigest } from '$lib/digest/leads.js';
 import type { DigestContact } from '$lib/digest/policy.js';
 
 export type DigestDoor = 'session' | 'service';
-export type DigestPart = 'hub' | 'work' | 'suggestions' | 'whatsNew';
+export type DigestPart = 'hub' | 'work' | 'suggestions' | 'whatsNew' | 'leads';
 
 const QIDS: Record<DigestDoor, Record<DigestPart, string>> = {
   session: {
     hub: '85levHubSummary',
     work: '340digestWork',
     suggestions: '341digestSuggestions',
-    whatsNew: '342digestWhatsNew'
+    whatsNew: '342digestWhatsNew',
+    leads: '348digestLeads'
   },
   service: {
     hub: '347digestHubSummaryFor',
     work: '343digestWorkFor',
     suggestions: '344digestSuggestionsFor',
-    whatsNew: '345digestWhatsNewFor'
+    whatsNew: '345digestWhatsNewFor',
+    leads: '349digestLeadsFor'
   }
 };
 
@@ -108,6 +111,9 @@ export function startDigestReads(uid: string, opts: CollectOptions, hubRaw?: Pro
       q(qids.whatsNew, { since }).then((raw) => processWhatsNew(raw, since)),
       emptyWhatsNew(since)
     ),
+    // Enquiries waiting on the reader (PLAN_LEADS §4.4). Before the leads
+    // schema is deployed this read fails — the brief then simply has no line.
+    leads: settle(q(qids.leads).then((raw) => processLeads(raw, uid, now)), emptyLeadsDigest()),
     /**
      * Only meaningful on the service door, where 343 selects the fields.
      * Settled like the rest: the hub never awaits it, and an unawaited
@@ -137,6 +143,7 @@ export interface CollectedDigest {
   work: WorkSummary;
   suggestions: SuggestionSummary;
   whatsNew: WhatsNewSummary;
+  leads: LeadsDigest;
   /** Parts whose read failed, with the reason. Empty ⇔ the payload is whole. */
   failed: Partial<Record<DigestPart, string>>;
 }
@@ -147,17 +154,19 @@ export async function composeFromReads(
   reads: ReturnType<typeof startDigestReads>,
   { lang, now = Date.now() }: { lang?: string | null; now?: number } = {}
 ): Promise<CollectedDigest> {
-  const [hub, work, suggestions, whatsNew] = await Promise.all([
+  const [hub, work, suggestions, whatsNew, leads] = await Promise.all([
     reads.hub,
     reads.work,
     reads.suggestions,
-    reads.whatsNew
+    reads.whatsNew,
+    reads.leads
   ]);
   const failed: CollectedDigest['failed'] = {};
   if (hub.error) failed.hub = hub.error;
   if (work.error) failed.work = work.error;
   if (suggestions.error) failed.suggestions = suggestions.error;
   if (whatsNew.error) failed.whatsNew = whatsNew.error;
+  if (leads.error) failed.leads = leads.error;
 
   const payload = composeDigest({
     userId: uid,
@@ -166,6 +175,7 @@ export async function composeFromReads(
     work: work.value,
     suggestions: suggestions.value,
     whatsNew: whatsNew.value,
+    leads: leads.value,
     now
   });
   return {
@@ -175,6 +185,7 @@ export async function composeFromReads(
     work: work.value,
     suggestions: suggestions.value,
     whatsNew: whatsNew.value,
+    leads: leads.value,
     failed
   };
 }

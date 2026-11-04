@@ -16,6 +16,8 @@ import type { WhatsNewSummary } from './whatsNew.js';
 import type { DormantSoonItem, TaskItem, WorkSummary } from './work.js';
 
 /** How many vote lines the digest carries (the hub's topFive). */
+import { emptyLeadsDigest, type LeadsDigest } from './leads.js';
+
 export const MAX_VOTE_ITEMS = 5;
 
 export type DigestLang = 'he' | 'en' | 'ar';
@@ -45,6 +47,8 @@ export interface DigestPayload {
     tasks: Omit<WorkSummary['tasks'], 'items'> & { items: (TaskItem & { url: string })[] };
     whatsNew: WhatsNewSummary;
     suggestions: Omit<SuggestionSummary, 'top'> & { top: (SuggestionItem & { url: string })[] };
+    /** Enquiries waiting on the reader, per rikma (PLAN_LEADS §4.4). */
+    leads: LeadsDigest;
   };
 }
 
@@ -64,6 +68,8 @@ export interface DigestCounts {
   suggestions: number;
   freshSuggestions: number;
   whatsNew: number;
+  /** Leads that need the reader's answer; absent in counts stored before PLAN_LEADS L5. */
+  leadsAttention?: number;
   urgentKeys: string[];
 }
 
@@ -74,6 +80,7 @@ export interface ComposeInput {
   work: WorkSummary;
   suggestions: SuggestionSummary;
   whatsNew: WhatsNewSummary;
+  leads?: LeadsDigest;
   now?: number;
 }
 
@@ -92,6 +99,7 @@ export function voteUrl(item: Pick<HubFeedItem, 'type' | 'projectId'>): string {
 export function composeDigest(input: ComposeInput): DigestPayload {
   const now = input.now ?? Date.now();
   const { hub, work, suggestions, whatsNew } = input;
+  const leads = input.leads ?? emptyLeadsDigest();
 
   const votes = {
     count: hub.kpi.votes,
@@ -131,7 +139,8 @@ export function composeDigest(input: ComposeInput): DigestPayload {
     missions.active === 0 &&
     tasks.open === 0 &&
     whatsNew.total === 0 &&
-    suggestions.count === 0;
+    suggestions.count === 0 &&
+    leads.attention === 0;
 
   return {
     userId: String(input.userId),
@@ -144,7 +153,8 @@ export function composeDigest(input: ComposeInput): DigestPayload {
       missions,
       tasks,
       whatsNew,
-      suggestions: { count: suggestions.count, fresh: suggestions.fresh, top }
+      suggestions: { count: suggestions.count, fresh: suggestions.fresh, top },
+      leads
     }
   };
 }
@@ -168,6 +178,7 @@ export function digestCounts(payload: DigestPayload, hub?: HubSummary): DigestCo
     suggestions: s.suggestions.count,
     freshSuggestions: s.suggestions.fresh,
     whatsNew: s.whatsNew.total,
+    leadsAttention: s.leads?.attention ?? 0,
     urgentKeys: feed
       .filter((f) => f.urgent)
       .map((f) => `${f.type}:${f.id}`)

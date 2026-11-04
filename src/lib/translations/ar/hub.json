@@ -46,6 +46,9 @@
       "resources": "موارد",
       "products": "منتجات",
       "sales": "مبيعات"
-    }
+    },
+    "leads": "استفسارات تنتظرك",
+    "leadsUnanswered": "بلا رد",
+    "leadsFollowUp": "العودة اليوم"
   }
 }

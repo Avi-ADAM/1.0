@@ -90,5 +90,11 @@
   "errNameRequired": "La clave necesita un nombre",
   "errScopeRequired": "Elige al menos una capacidad",
   "errCreate": "La acción falló",
-  "errCopy": "No se pudo copiar"
+  "errCopy": "No se pudo copiar",
+
+  "scope_leads_create_public": "Formulario de consulta en un sitio (una clave que vive en la página)",
+  "leadsPublicNote": "Esta clave vive en el código de la página, así que hace una sola cosa: añadir una consulta. Solo funciona desde las direcciones del sitio que escribas aquí, como mucho 10 consultas por hora desde cada dirección, y no lee nada de vuelta.",
+  "allowedOrigins": "Direcciones del sitio desde las que se envía el formulario (una por línea)",
+  "errOriginsRequired": "Escribe la dirección del sitio donde está el formulario",
+  "leadsFormSnippet": "Un formulario listo para pegar en la página — la clave ya está dentro:"
 }

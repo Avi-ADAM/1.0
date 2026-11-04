@@ -118,7 +118,9 @@ let sincePrune = 0;
  */
 export function checkRateLimit(
   bucket: string,
-  limit: number
+  limit: number,
+  /** The window; a minute unless a caller counts per hour (a public lead form, 10/h per IP). */
+  windowMs: number = RATE_WINDOW_MS
 ): { allowed: boolean; remaining: number; resetAt: number } {
   const now = Date.now();
   if (++sincePrune % 500 === 0) {
@@ -126,7 +128,7 @@ export function checkRateLimit(
   }
   const current = buckets.get(bucket);
   if (!current || current.resetAt <= now) {
-    const resetAt = now + RATE_WINDOW_MS;
+    const resetAt = now + windowMs;
     buckets.set(bucket, { count: 1, resetAt });
     return { allowed: true, remaining: limit - 1, resetAt };
   }

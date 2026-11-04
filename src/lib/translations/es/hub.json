@@ -47,6 +47,9 @@
       "resources": "recursos",
       "products": "productos",
       "sales": "ventas"
-    }
+    },
+    "leads": "Consultas que te esperan",
+    "leadsUnanswered": "sin respuesta",
+    "leadsFollowUp": "volver hoy"
   }
 }

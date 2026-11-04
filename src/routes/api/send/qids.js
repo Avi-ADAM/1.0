@@ -15596,6 +15596,46 @@ ${PROMO_DECISION_FIELDS}
   }`,
 
   // One lead's page (§4.2): contact, details, what is linked, and its log.
+  // Both sides of a merge (L5, §2.4): what the kept lead may inherit.
+  'leadMergeSide': `query LeadMergeSide($id: ID!) {
+    lead(id: $id) {
+      data { id attributes {
+        status email phone organization city address message nextAction followUpAt lastActivityAt
+        dedupeKey anonymizedAt
+        project { data { id } }
+        act { data { id } }
+        orders(pagination: { limit: 100 }) { data { id attributes { status } } }
+        products(pagination: { limit: 50 }) { data { id } }
+      } }
+    }
+  }`,
+
+  // "Export with contact details" (L5): phone and email only, never spam or
+  // anonymized. Each lead returned gets a log line from exportLeadContacts.
+  'leadContactsForExport': `query LeadContactsForExport($pid: ID!) {
+    leads(
+      filters: {
+        project: { id: { eq: $pid } }
+        anonymizedAt: { null: true }
+        or: [{ status: { null: true } }, { status: { ne: "spam" } }]
+      }
+      pagination: { limit: 500 }
+    ) {
+      data { id attributes { phone email } }
+    }
+  }`,
+
+  // "Customers" (L6, §5.5): the won leads, folded with paid orders by contact.
+  'moachCustomerLeads': `query MoachCustomerLeads($pid: ID!) {
+    leads(
+      filters: { project: { id: { eq: $pid } }, status: { eq: "won" }, anonymizedAt: { null: true } }
+      sort: ["lastActivityAt:desc"]
+      pagination: { limit: 500 }
+    ) {
+      data { id attributes { name organization email phone createdAt lastActivityAt } }
+    }
+  }`,
+
   'moachLeadPage': `query MoachLeadPage($id: ID!) {
     lead(id: $id) {
       data { id attributes {

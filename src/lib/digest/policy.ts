@@ -136,9 +136,10 @@ export function isUnchanged(current: DigestCounts, last: DigestCounts | null | u
     'overdue',
     'dueSoon',
     'suggestions',
-    'freshSuggestions'
+    'freshSuggestions',
+    'leadsAttention'
   ];
-  return keys.every((k) => current[k] === (last[k] ?? 0));
+  return keys.every((k) => (current[k] ?? 0) === (last[k] ?? 0));
 }
 
 export interface DecideOptions {

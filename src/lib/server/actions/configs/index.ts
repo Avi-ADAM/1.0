@@ -192,6 +192,9 @@ import { updateLeadStatusConfig } from './updateLeadStatus.js';
 import { confirmOrderPaymentConfig } from './confirmOrderPayment.js';
 import { cancelOrderConfig, markOrderShippedConfig, markOrderFulfilledConfig } from './orderLifecycle.js';
 import { updateLeadPlanConfig } from './updateLeadPlan.js';
+import { mergeLeadsConfig } from './mergeLeads.js';
+import { exportLeadContactsConfig } from './exportLeadContacts.js';
+import { updateLeadPlanConfig } from './updateLeadPlan.js';
 import { setShopStockConfig } from './shopStock.js';
 import { saveProductVariantsConfig, saveProductOptionsConfig } from './shopProductEditor.js';
 import { reportRecurringSaleCycleConfig } from './reportRecurringSaleCycle.js';
@@ -541,6 +544,9 @@ export function registerAllActions(): void {
   registerAction(confirmOrderPaymentConfig);
   registerAction(cancelOrderConfig);
   registerAction(markOrderShippedConfig);
+  registerAction(updateLeadPlanConfig);
+  registerAction(mergeLeadsConfig);
+  registerAction(exportLeadContactsConfig);
   registerAction(markOrderFulfilledConfig);
   registerAction(updateLeadPlanConfig);
   // Stock from the moach's sales screens (PLAN_SHOP_CUSTOMER_EXPERIENCE S5)

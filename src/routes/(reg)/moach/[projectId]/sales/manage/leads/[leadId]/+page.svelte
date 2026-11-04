@@ -6,7 +6,8 @@
    * money (a paid order or a reported sale), so success cannot be typed in.
    */
   import { page } from '$app/state';
-  import { invalidate } from '$app/navigation';
+  import { goto, invalidate } from '$app/navigation';
+  import { CONTACTS_EXPORTED, mergeNoteOf } from '$lib/leads/merge';
   import { t, locale } from '$lib/translations';
   import { toast } from 'svelte-sonner';
   import { clock } from '$lib/stores/clock.svelte';
@@ -130,7 +131,48 @@
 
   let pauseOpen = $state(false);
 
+  // ── merge (L5): the same person wrote twice ──
+  // The other leads come from the layout's streamed pipeline.
+  let others = $state<Array<{ id: string; name: string | null; organization: string | null }>>([]);
+  $effect(() => {
+    const p = data.pipeline;
+    const self = lead.id;
+    let live = true;
+    Promise.resolve(p).then((r) => {
+      if (live) others = (r?.leads ?? []).filter((l) => l.id !== self).map((l) => ({ id: l.id, name: l.name, organization: l.organization }));
+    });
+    return () => {
+      live = false;
+    };
+  });
+  let mergeTarget = $state('');
+  async function mergeInto() {
+    if (!mergeTarget || busy) return;
+    if (!confirm($t('shop.leads.merge.confirm'))) return;
+    busy = true;
+    try {
+      const res = await executeAction('mergeLeads', { projectId, keepId: mergeTarget, mergeId: lead.id }, { showErrorToast: false });
+      if (!res.success) toast.error(actionErrorText(res, $t('shop.leads.err.save')));
+      else {
+        toast.success($t('shop.leads.merge.done'));
+        invalidate(shopOrdersKey(projectId));
+        goto(`${base}/leads/${mergeTarget}`);
+      }
+    } finally {
+      busy = false;
+    }
+  }
+  // Where this lead went, if it was folded into another one.
+  let mergedInto = $derived(
+    lead.activities.map((a) => (a.kind === 'system' ? mergeNoteOf(a.body) : null)).find((n) => n?.dir === 'into') ?? null
+  );
+
   function activityText(a: (typeof lead.activities)[number]): string {
+    if (a.kind === 'system') {
+      const note = mergeNoteOf(a.body);
+      if (note) return $t(note.dir === 'into' ? 'shop.leads.timeline.mergedInto' : 'shop.leads.timeline.mergedFrom');
+      if (a.body === CONTACTS_EXPORTED) return $t('shop.leads.timeline.contactsExported');
+    }
     if (a.kind === 'statusChange' && a.toStatus) {
       return $t('shop.leads.timeline.statusChange', {
         from: a.fromStatus ? $t(`shop.leads.stage.${a.fromStatus}`) : '—',
@@ -155,6 +197,9 @@
 </a>
 
 <div class="ld">
+  {#if mergedInto}
+    <a class="ld-merged sh-card" href="{base}/leads/{mergedInto.id}">{$t('shop.leads.merge.banner')}</a>
+  {/if}
   <header class="ld-head sh-card">
     <div class="ld-who">
       <h2 class="sh-title ld-name">{lead.name ?? '—'}</h2>
@@ -251,7 +296,12 @@
                     {actorText(a)} · <time datetime={when(a.at)?.iso} title={when(a.at)?.full}>{when(a.at)?.short}</time>
                   </span>
                 </div>
-                {#if a.body}<p class="ld-entry-body">{a.body}</p>{/if}
+                {#if a.kind === 'system' && mergeNoteOf(a.body)}
+                  {@const note = mergeNoteOf(a.body)}
+                  <a class="ld-entry-body" href="{base}/leads/{note?.id}">{$t('shop.leads.merge.open')}</a>
+                {:else if a.body && !(a.kind === 'system' && a.body === CONTACTS_EXPORTED)}
+                  <p class="ld-entry-body">{a.body}</p>
+                {/if}
               </li>
             {/each}
           </ol>
@@ -311,6 +361,23 @@
           {#if lead.status === 'paused' && lead.pausedNote}<p class="ld-muted">{lead.pausedNote}</p>{/if}
         {/if}
       </section>
+
+      <!-- the same person twice (L5) -->
+      {#if !mergedInto && lead.status !== 'spam' && others.length > 0}
+        <section class="sh-card ld-box" aria-labelledby="ld-merge">
+          <h3 id="ld-merge" class="sh-section-label">{$t('shop.leads.merge.title')}</h3>
+          <p class="ld-muted">{$t('shop.leads.merge.hint')}</p>
+          <select class="sh-input" bind:value={mergeTarget} aria-label={$t('shop.leads.merge.pick')}>
+            <option value="">{$t('shop.leads.merge.pick')}</option>
+            {#each others as o (o.id)}
+              <option value={o.id}>{o.name ?? '—'}{o.organization ? ` · ${o.organization}` : ''}</option>
+            {/each}
+          </select>
+          <button type="button" class="sh-btn sh-btn-outline" disabled={!mergeTarget || busy} onclick={mergeInto}>
+            {$t('shop.leads.merge.cta')}
+          </button>
+        </section>
+      {/if}
 
       <!-- what is linked -->
       {#if lead.orders.length || lead.previousLeadId}
@@ -515,6 +582,12 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
+  }
+  .ld-merged {
+    padding: 12px 16px;
+    font-weight: 700;
+    color: var(--sh-ink) !important;
+    border-color: var(--sh-gold-line);
   }
   .ld-status-more {
     display: flex;

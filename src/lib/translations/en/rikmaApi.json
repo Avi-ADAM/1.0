@@ -90,5 +90,11 @@
   "errNameRequired": "The key needs a name",
   "errScopeRequired": "Pick at least one capability",
   "errCreate": "The action failed",
-  "errCopy": "Copying failed"
+  "errCopy": "Copying failed",
+
+  "scope_leads_create_public": "Enquiry form on a website (a key that sits in the page)",
+  "leadsPublicNote": "This key sits in the page's code, so it does exactly one thing: add an enquiry. It works only from the site addresses you write here, at most 10 enquiries an hour from one address, and reads nothing back.",
+  "allowedOrigins": "Site addresses the form is sent from (one per line)",
+  "errOriginsRequired": "Write the address of the site the form is on",
+  "leadsFormSnippet": "A form ready to paste into the page — the key is already in it:"
 }

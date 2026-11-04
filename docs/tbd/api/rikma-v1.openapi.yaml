@@ -685,7 +685,7 @@ paths:
   /api/v1/r/{rikma}/leads:
     post:
       tags: [leads]
-      summary: העברת פנייה של מתעניין (scope leads:create, מהשרת בלבד)
+      summary: העברת פנייה של מתעניין (scope leads:create מהשרת, או leads:create:public מטופס בדף)
       description: |
         מישהו השאיר פרטים באתר של הרקמה; השרת של האתר מעביר אותם **עם נוסח ההסכמה
         שהפונה אישר** (`consent` חובה). עובר ב-`createLead`: נשמר ליד, נרשם ביומן,
@@ -696,8 +696,13 @@ paths:
           ליד שני; הפנייה נרשמת ביומן של הקיים.
         - שמירת הליד היא הצעד היחיד שכישלונו מכשיל את הבקשה. מטלה שלא נפתחה מופיעה
           ב-`warnings` (`TASK_NOT_CREATED`), והליד שמור.
-        - קריאה עם כותרת `Origin` (מדפדפן) ⇒ `403 ORIGIN_NOT_ALLOWED`. טופס סטטי בלי שרת
-          יקבל scope ציבורי נפרד (`leads:create:public`, PLAN_LEADS §5.2).
+        - מפתח `leads:create` שנקרא מדפדפן (כותרת `Origin`) ⇒ `403 ORIGIN_NOT_ALLOWED`.
+        - **טופס בדף, בלי שרת** — מפתח `leads:create:public` (PLAN_LEADS §5.2): לבד על המפתח,
+          עם `allowedOrigins`. עובד רק מ-Origin שברשימה (אחרת `403 ORIGIN_NOT_ALLOWED`; מפתח
+          בלי כתובות ⇒ `403 PUBLIC_KEY_NEEDS_ORIGINS`), עד 10 פניות בשעה מכל IP
+          (`429 RATE_LIMITED`), תמיד `source: form`, ושדה `website` מלא (honeypot) ⇒ `201`
+          בלי לשמור. התשובה היא `201 { "success": true }` בלבד — בלי מזהה, בלי מטלה, ובלי לומר
+          אם האדם כבר פנה קודם. ל-endpoint יש `OPTIONS` (preflight) עבור הטופס הזה.
       security:
         - apiKey: []
       parameters:
@@ -1688,6 +1693,8 @@ components:
                 - EXTERNAL_ID_CONFLICT
                 - SHOP_NOT_READY
                 - LEADS_NOT_READY
+                - PUBLIC_KEY_NEEDS_ORIGINS
+                - RATE_LIMITED
                 - CONSENT_REQUIRED
                 - NOT_HOLDER
                 - ORDER_CANCELLED

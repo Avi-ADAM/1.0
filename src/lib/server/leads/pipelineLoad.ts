@@ -16,6 +16,7 @@ import { strapiClient } from '$lib/server/actions';
 import { orderNumberOf } from '$lib/server/ordersApi.js';
 import { resolveLeadSettings, type LeadSettings } from '$lib/leads/settings';
 import type { PipelineData, PipelineLeadInput, PipelineProposalInput } from '$lib/leads/pipeline';
+import type { CustomerLeadInput } from '$lib/leads/customers';
 
 export type { PipelineData };
 
@@ -262,5 +263,29 @@ export async function loadLeadSettings(projectId: string, fetchFn?: FetchFn): Pr
     return resolveLeadSettings(res?.data?.project?.data?.attributes?.leadSettings);
   } catch {
     return resolveLeadSettings(null);
+  }
+}
+
+// ─── customers (L6, §5.5) ───────────────────────────────────────────────────
+
+/** Won leads of the rikma — the lead half of the customers view. Null when unreadable. */
+export async function loadCustomerLeads(projectId: string, fetchFn?: FetchFn): Promise<CustomerLeadInput[] | null> {
+  try {
+    const res = await run('moachCustomerLeads', { pid: projectId }, fetchFn);
+    return ((res?.data?.leads?.data ?? []) as any[]).map((node) => {
+      const a = node?.attributes ?? {};
+      return {
+        id: String(node.id),
+        name: str(a.name),
+        organization: str(a.organization),
+        email: str(a.email),
+        phone: str(a.phone),
+        createdAt: str(a.createdAt),
+        lastActivityAt: str(a.lastActivityAt)
+      };
+    });
+  } catch (e) {
+    console.error('[leads] customers read failed:', (e as any)?.getMessages?.() ?? e);
+    return null;
   }
 }
