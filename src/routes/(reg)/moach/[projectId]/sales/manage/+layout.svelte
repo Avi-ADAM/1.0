@@ -13,6 +13,8 @@
   } from '$lib/shop/manage';
   import { forgetSettled, shownStatus } from '$lib/shop/pendingMarks.svelte';
   import { MANAGE_TABS, visibleTabs, type ManageTab } from '$lib/shop/manageTabs';
+  import { buildPipeline, orderInput, pipelineCounts, type PipelineData } from '$lib/leads/pipeline';
+  import { DEFAULT_LEAD_SETTINGS } from '$lib/leads/settings';
 
   let { data, children } = $props();
   const fmtMoney = useFormatMoney();
@@ -55,6 +57,31 @@
   });
   let summary = $derived(sales ? salesSummary(sales, clock.minutes) : null);
 
+  // The deals in progress, streamed too (PLAN_LEADS §4.1): the "needs
+  // attention" card counts them with the same rule the tab sorts by.
+  let pipeline = $state<PipelineData | null>(null);
+  $effect(() => {
+    const p = data.pipeline;
+    let live = true;
+    Promise.resolve(p).then((r) => {
+      if (live) pipeline = r ?? null;
+    });
+    return () => {
+      live = false;
+    };
+  });
+  let counts = $derived(
+    pipeline?.ready
+      ? pipelineCounts(
+          buildPipeline(
+            { leads: pipeline.leads, proposals: pipeline.proposals, orders: shown.map(orderInput) },
+            clock.minutes,
+            pipeline.settings ?? DEFAULT_LEAD_SETTINGS
+          )
+        )
+      : null
+  );
+
   // Along the path of a sale, and only the tabs this rikma needs (PLAN_LEADS §4.0).
   function hrefOf(tab: ManageTab) {
     return `${base}/${tab}`;
@@ -65,6 +92,8 @@
   let active = $derived.by(() => {
     const rest = page.url.pathname.split('/sales/manage')[1] ?? '';
     const seg = rest.split('/').filter(Boolean)[0];
+    // A lead's page belongs to "in progress".
+    if (seg === 'leads') return 'pipeline';
     return (MANAGE_TABS as readonly string[]).includes(seg) ? seg : 'orders';
   });
   let tabs = $derived(visibleTabs(data.facts ?? null, active));
@@ -97,6 +126,11 @@
   </header>
 
   <section class="sh-kpis" aria-label={$t('shop.kpi.label')}>
+    <a class="sh-kpi sh-card sh-kpi-link" class:sh-kpi-warn={(counts?.attention ?? 0) > 0} href="{base}/pipeline?attention=1">
+      <span class="sh-section-label">{$t('shop.kpi.attention')}</span>
+      <span class="sh-kpi-value">{counts ? counts.attention : '—'}</span>
+      <span class="sh-kpi-sub">{counts ? $t('shop.kpi.attentionSub', { count: counts.open }) : ''}</span>
+    </a>
     <div class="sh-kpi sh-card">
       <span class="sh-section-label">{$t('shop.kpi.awaitingSplit')}</span>
       <span class="sh-kpi-value sh-gold"><bdi>{summary ? fmtMoney(summary.awaiting) : '—'}</bdi></span>
@@ -129,6 +163,8 @@
         {$t(`shop.tabs.${tab}`)}
         {#if tab === 'orders' && badge > 0}
           <span class="sh-badge" aria-label={$t('shop.tabs.waiting', { count: badge })}>{badge}</span>
+        {:else if tab === 'pipeline' && (counts?.attention ?? 0) > 0}
+          <span class="sh-badge" aria-label={$t('shop.tabs.attention', { count: counts?.attention ?? 0 })}>{counts?.attention}</span>
         {/if}
       </a>
     {/each}
@@ -283,7 +319,7 @@
     }
     .sh-kpis {
       display: grid;
-      /* three cards in a rikma without stock, four with it */
+      /* four cards in a rikma without stock, five with it */
       grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
       grid-auto-flow: column;
       gap: 12px;

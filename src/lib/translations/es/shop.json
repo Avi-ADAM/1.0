@@ -15,7 +15,10 @@
     "toShipOne": "1 pedido espera envío",
     "short": "A {{count}} pedidos les falta stock",
     "shortOne": "A 1 pedido le falta stock",
-    "cta": "Atender"
+    "cta": "Atender",
+    "leads": "{{count}} consultas esperan respuesta",
+    "leadsOne": "Una consulta espera respuesta",
+    "leadsCta": "Verlas"
   },
   "tabs": {
     "label": "Pestañas de gestión de ventas",
@@ -27,7 +30,9 @@
     "waiting": "{{count}} te esperan",
     "fulfillment": "Preparación",
     "shipping": "Envíos",
-    "promotions": "Promociones"
+    "promotions": "Promociones",
+    "pipeline": "En curso",
+    "attention": "{{count}} requieren atención"
   },
   "kpi": {
     "label": "Resumen",
@@ -40,7 +45,9 @@
     "shortUnits": "Faltan {{count}} uds.",
     "shortUnitsOne": "Falta 1 ud.",
     "month": "Ventas de los últimos 30 días",
-    "monthSub": "{{count}} ventas · {{share}}% desde tu sitio"
+    "monthSub": "{{count}} ventas · {{share}}% desde tu sitio",
+    "attention": "Requieren atención",
+    "attentionSub": "de {{count}} en curso"
   },
   "orders": {
     "filterLabel": "Filtrar por lo que queda por hacer",
@@ -872,5 +879,184 @@
       "send": "Enviar a votación"
     },
     "onSale": "En promoción"
+  },
+  "leads": {
+    "taken": "Ahora es tuya",
+    "err": {
+      "save": "No se guardó — inténtalo de nuevo",
+      "notReady": "Las consultas aún no están activas aquí",
+      "notReadyBody": "Aparecerán tras la próxima actualización del servidor."
+    },
+    "new": {
+      "cta": "Consulta",
+      "title": "Nueva consulta",
+      "hint": "¿Alguien llamó o preguntó en persona? Anótalo aquí para que la rikma sepa que espera respuesta.",
+      "duplicated": "Ya está en la tabla — se añadió a su consulta",
+      "needContact": "Hace falta un teléfono o un correo para responderle",
+      "save": "Guardar"
+    },
+    "field": {
+      "name": "Nombre",
+      "phone": "Teléfono",
+      "email": "Correo",
+      "organization": "Organización / empresa",
+      "message": "Qué pidió"
+    },
+    "log": {
+      "title": "Registrar una conversación con {{name}}",
+      "kindLabel": "Tipo",
+      "directionLabel": "Quién contactó",
+      "out": "Lo contactamos",
+      "in": "Nos contactó",
+      "whatWasSaid": "Qué se dijo o acordó",
+      "note": "Nota",
+      "save": "Registrar"
+    },
+    "kind": {
+      "note": "Nota",
+      "call": "Llamada",
+      "whatsapp": "WhatsApp",
+      "email": "Correo",
+      "meeting": "Reunión"
+    },
+    "pause": {
+      "title": "Ahora no",
+      "hint": "La consulta no se cierra — queda en pausa. Si eliges un día, vuelve sola a \"requieren atención\".",
+      "why": "Por qué",
+      "note": "En palabras (opcional)",
+      "comeBack": "Volver a contactar el",
+      "save": "Ahora no"
+    },
+    "reason": {
+      "timing": "No es el momento",
+      "budget": "Presupuesto",
+      "noAnswer": "No contesta",
+      "choseOther": "Eligió a otro",
+      "notFit": "No encaja",
+      "other": "Otro"
+    },
+    "list": {
+      "count": "{{count}} en curso",
+      "loading": "Cargando…",
+      "stageLabel": "Etapa",
+      "ownerLabel": "Responsable",
+      "sourceLabel": "Origen",
+      "backOn": "volver {{when}}"
+    },
+    "empty": {
+      "title": "Aún no hay consultas",
+      "body": "Las consultas del sitio, del concierge y por teléfono aparecen aquí — cada una con una tarea para la rikma.",
+      "cta": "Conectar un sitio"
+    },
+    "filter": {
+      "open": "Todas",
+      "new": "Nuevas",
+      "contacted": "Respondidas",
+      "talking": "En conversación",
+      "offered": "Oferta enviada",
+      "paused": "Ahora no",
+      "attention": "Requieren atención"
+    },
+    "owner": {
+      "all": "Cualquier responsable",
+      "me": "Mías",
+      "none": "Sin responsable",
+      "you": "Tú",
+      "nobody": "Nadie aún"
+    },
+    "source": {
+      "all": "Cualquier origen",
+      "api": "Sitio web",
+      "form": "Formulario",
+      "shop": "Tienda",
+      "quote": "Solicitud de presupuesto",
+      "manual": "A mano",
+      "bot": "Bot",
+      "demo": "Demo",
+      "import": "Importación",
+      "concierge": "Concierge"
+    },
+    "attention": {
+      "unanswered": "Espera respuesta",
+      "followUpDue": "Es hora de volver",
+      "stale": "Sin movimiento hace tiempo"
+    },
+    "action": {
+      "take": "Me encargo",
+      "log": "Registrar conversación",
+      "pause": "Ahora no",
+      "openOrder": "Ver pedido",
+      "openWish": "Ver deseo"
+    },
+    "col": {
+      "name": "Nombre",
+      "source": "Origen",
+      "product": "Producto",
+      "stage": "Etapa",
+      "owner": "Responsable",
+      "last": "Último contacto",
+      "next": "Próximo paso",
+      "action": "Acción"
+    },
+    "stage": {
+      "new": "Espera respuesta",
+      "contacted": "Respondida",
+      "talking": "En conversación",
+      "offered": "Oferta enviada",
+      "won": "Cliente",
+      "paused": "Ahora no",
+      "spam": "Spam"
+    },
+    "page": {
+      "back": "Todas las consultas",
+      "contact": "Cómo contactar",
+      "call": "Llamar",
+      "email": "Correo",
+      "logIt": "¿Registrar la conversación?",
+      "logYes": "Registrar",
+      "logNo": "Ahora no",
+      "asked": "Qué pidió",
+      "products": "Le interesa",
+      "timeline": "Qué pasó",
+      "nextStep": "Próximo paso",
+      "wonHint": "Ya es cliente — sigue en pedidos y ventas.",
+      "reportSale": "Registrar una venta",
+      "reportSaleHint": "Una venta registrada desde aquí queda vinculada a la consulta, y la consulta pasa a cliente.",
+      "linked": "Vinculado",
+      "previous": "Su consulta anterior",
+      "consent": "Aceptó compartir sus datos {{when}}",
+      "sourcePage": "La página desde la que escribió"
+    },
+    "timeline": {
+      "empty": "Aún no hay nada registrado.",
+      "bySystem": "El sistema",
+      "statusChange": "{{from}} → {{to}}",
+      "note": "Nota",
+      "call": "Llamada",
+      "whatsapp": "WhatsApp",
+      "email": "Correo",
+      "meeting": "Reunión",
+      "assign": "Tomó la consulta",
+      "release": "Devolvió la consulta",
+      "inbound": "Volvió a escribir",
+      "linkOrder": "Pedido vinculado",
+      "system": "Actualización"
+    },
+    "plan": {
+      "title": "Qué sigue",
+      "next": "Próximo paso",
+      "nextPlaceholder": "p. ej. enviar la lista de precios",
+      "backOn": "Volver a contactar el",
+      "save": "Guardar",
+      "saved": "Guardado"
+    },
+    "status": {
+      "title": "Dónde está",
+      "spam": "Spam",
+      "spamConfirm": "¿Marcar como spam? Sale de la tabla.",
+      "repause": "Cambiar motivo / día",
+      "lockedOffered": "Tiene una oferta abierta — la etapa sigue al pedido. Cancelar el pedido devuelve la consulta a conversación.",
+      "lockedWon": "Ya pagó — la etapa sigue al dinero."
+    }
   }
 }

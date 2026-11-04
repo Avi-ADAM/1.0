@@ -33,6 +33,7 @@
    *   "MobileReportSale", `$lib/styles/shop.css`). Same fields, same `createSale`.
    * @property {string | number | null} [meId] - The signed-in member, so the shop skin can
    *   say whether the report is a self-report or a claim on someone else's money
+   * @property {string | null} [leadId] - The lead this sale closes (PLAN_LEADS §4.0)
    */
 
   /** @type {Props} */
@@ -49,6 +50,8 @@
     defaultHolder = '',
     skin = 'classic',
     meId = null,
+    /** The lead this sale closes (PLAN_LEADS §4.0) — the sync links it and the lead is won. */
+    leadId = null,
     onStart,
     onDone,
     onDoners,
@@ -166,6 +169,8 @@
 
       if (customerIdentifier.trim())
         actionParams.customerIdentifier = customerIdentifier.trim();
+
+      if (leadId) actionParams.leadId = String(leadId);
 
       const result = await executeAction('createSale', actionParams);
 

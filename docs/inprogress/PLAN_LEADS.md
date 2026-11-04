@@ -1,7 +1,7 @@
 # PLAN — לידים ברקמה: טבלה מסודרת, מטלה לכל ליד, וחיבור לחנות
 
 > **מצב (2026-11-04): L0 נפרס (1.0b release 1.18/1.19; ההרשאות באדמין — לאמת, §7.5).
-> L1, L2 ו-L3a בנויים ב-1.0main (§8.1–§8.3). `lead.sales` (L3a) ב-1.0b ממתין לפריסה הבאה.**
+> L1, L2, L3a ו-L3 בנויים ב-1.0main (§8.1–§8.4). `lead.sales` (L3a) ב-1.0b ממתין לפריסה הבאה.**
 > L3 ואילך — עוד לא בקוד.
 >
 > נכתב 2026-11-03 אחרי קריאת הקוד והמסמכים
@@ -523,7 +523,7 @@ namespace חדש `leads` ב-`ROUTED` רק לנתיבי `sales/*` (כמו `shop`)
 | L1 ✅ | `src/lib/leads/` טהור (`validateLeadPayload`, `dedupeKey`, `needsAttention`, מעברי סטטוס) + vitest; actions `createLead` / `logLeadActivity` / `updateLeadStatus` + סנכרון מטלה | L0 | 2–3 ימים |
 | L2 ✅ | `POST /leads` + `GET /leads/{externalId}` + scopes + webhooks + OpenAPI (`rikma-v1.openapi.yaml`) | L1 | 1–2 ימים |
 | L3a ✅ | המסלול (§4.0): `stageOf` (ליד · הזמנה · הצעת קונסיירז') + vitest; סנכרון `offered`/`won`/`cancelled` מ-`createPaidOrder`, `orderLifecycle`, `createSale`; סידור הלשוניות לפי המסלול, לשוניות לפי מה שיש, `/sales/manage` ⇒ הלשונית שמחכה, קישורים קיימים ⇒ `/manage/orders` | L1 | 2 ימים |
-| L3 | לשונית "בתהליך" + עמוד ליד (עם "שלח הצעה" / "דווח מכירה") + פס בשכבה הפשוטה + i18n | L3a | 3–4 ימים |
+| L3 ✅ | לשונית "בתהליך" + עמוד ליד ("דווח מכירה"; "שלח הצעה" עבר ל-L4) + פס בשכבה הפשוטה + KPI + i18n | L3a | 3–4 ימים |
 | **→ הוועד עובר ל-`/leads`** | | L2 | שעה בצד `vaad` |
 | L4 | חנות: "בקשו הצעה" בעמוד מוצר ובתבנית, קישור הזמנה↔ליד, `won` אוטומטי | L2, S3 | 2 ימים |
 | L5 | `leads:create:public`, מיזוג, ייצוא CSV, MCP tools, סיכום יומי, תצוגת לוח | L3 | 3 ימים |
@@ -608,6 +608,34 @@ namespace חדש `leads` ב-`ROUTED` רק לנתיבי `sales/*` (כמו `shop`)
   נשאר `paused` (המילה של החבר עומדת).
 - KPI "צריכים טיפול" ופס "פניות מחכות" בשכבה הפשוטה — עם L3 (הם קוראים את רשימת הלידים).
 - **לא נבדק בדפדפן** — רק vitest ו-`npm run check`.
+
+### 8.4 L3 — מה נבנה (2026-11-04)
+
+- **`src/lib/leads/pipeline.ts`** — `buildPipeline` (ליד · הזמנה ב-`pendingPayment` שאף ליד לא מצביע עליה ·
+  הצעת קונסיירז'), `filterPipeline`, `pipelineCounts`, `orderInput`. מיון: "צריך טיפול" ואז הישן ביותר.
+  `won` ו-`spam` לא בטבלה; `paused` מאחורי מסנן "לא עכשיו". בדיקות: `pipeline.test.ts`.
+- **`/sales/manage/pipeline`** — הלשונית הראשונה, תמיד מוצגת; `/sales/manage` נוחת עליה כשאין הזמנה
+  ששולמה ומחכה. מסננים ב-URL (`s`, `who`, `src`, `attention=1`), כרטיסים בטלפון / טבלה במחשב,
+  פעולות בשורה: "אני לוקח/ת" (= `updateTask` על המטלה; הסנכרון כותב את הבעלים), "רישום שיחה", "לא עכשיו";
+  "+ פנייה" ידנית (`createLead`, `source: manual`). שורת הזמנה ⇒ ההזמנה; שורת הצעה ⇒ `/moach/<pid>/wishes`.
+- **`/sales/manage/leads/[leadId]`** (הקישור שבמטלה) — פרטי קשר עם חיוג / WhatsApp / מייל ו"לרשום את
+  השיחה?", מה ביקש (`details` כטבלה), יומן + טופס רישום, "מה הלאה" (action חדש **`updateLeadPlan`** —
+  `nextAction` / `followUpAt`, לא נרשם כקשר), סטטוס ידני / "לא עכשיו" / ספאם, הזמנות מקושרות וליד קודם.
+- **"דווח מכירה"** ⇒ `/moach/<pid>/sales?lead=<id>`: הטופס נפתח, `SaleComponent` שולח `leadId`, ואחרי
+  השמירה חוזרים לליד. הסנכרון של L3a הופך אותו ל-`won` (אחרי ש-`lead.sales` נפרס).
+- **KPI "צריכות טיפול"** + badge על הלשונית; **פס בשכבה הפשוטה** "N פניות מחכות לתשובה" (`SalesShortcuts`,
+  מתחת לפס ההזמנות). שניהם קוראים את אותו `buildPipeline`.
+- qids `moachPipelineLeads` · `moachPipelineProposals` · `moachLeadPage` — `serviceAdmin`, נקראים רק אחרי
+  בדיקת החברות של layout המוח. i18n: `shop.leads.*` בחמש השפות.
+
+מה הוחלט בדרך:
+- **"שלח הצעה" לא נבנה** — אין עדיין action שפותח הזמנה ב-`sent` ביד חבר (שאלה פתוחה 5). עובר ל-L4 עם "בקשו הצעה".
+- **הצעת קונסיירז'**: "יש שיחה" = יש `negos` או `ratson_willingness_entry`; `hasSale` לא נקרא, כך שדיל ששולם
+  נראה `offered` עד שההצעה משנה סטטוס. הודעות forum לא נספרות.
+- **ציר הזמן לא ממזג את הודעות ה-forum של המטלה** (§4.2) — רק היומן. נשאר ל-L5.
+- בעמוד הליד `won` נסמך על הסטטוס השמור (הסנכרון שומר אותו); המכירות עצמן לא נקראות שם.
+- תצוגת לוח, ייצוא CSV וסינון לפי מוצר/תאריכים — L5, כמתוכנן.
+- **לא נבדק בדפדפן** — vitest (88 בבדיקות הלידים), `check:i18n`, `check:script`, `validate:qids`, `npm run check`.
 
 **בדיקות**: vitest לפונקציות הטהורות ול-endpoint (תבנית `server.test.ts` של `orders`);
 תרחישים: מפתח של רקמה A על רקמה B ⇒ 403; בלי הסכמה ⇒ 400; אותו `externalId` ⇒

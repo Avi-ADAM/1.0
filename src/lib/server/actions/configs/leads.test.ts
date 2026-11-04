@@ -17,6 +17,7 @@ vi.mock('../index.js', () => ({ actionService: nested }));
 import { createLeadConfig } from './createLead.js';
 import { logLeadActivityConfig } from './logLeadActivity.js';
 import { updateLeadStatusConfig } from './updateLeadStatus.js';
+import { updateLeadPlanConfig } from './updateLeadPlan.js';
 import { syncLeadFromTask } from '$lib/server/leads/taskSync';
 
 type Row = Record<string, any>;
@@ -205,7 +206,7 @@ describe('createLead', () => {
   });
 });
 
-describe('logLeadActivity / updateLeadStatus', () => {
+describe('logLeadActivity / updateLeadStatus / updateLeadPlan', () => {
   beforeEach(async () => {
     await createLead({ name: 'דנה', phone: '0500000000', consent });
     db.activities = [];
@@ -255,6 +256,24 @@ describe('logLeadActivity / updateLeadStatus', () => {
     db.leads.get('70')!.status = 'won';
     await expect(call(updateLeadStatusConfig, { leadId: '70', status: 'talking' })).rejects.toMatchObject({
       code: 'DERIVED_LOCKED'
+    });
+  });
+
+  it('the next step and the day to come back are set, cleared, and not logged as contact', async () => {
+    const before = db.leads.get('70')!.lastActivityAt;
+    await call(updateLeadPlanConfig, { leadId: '70', nextAction: '  לשלוח מחירון ', followUpAt: '2026-12-01T09:00:00Z' });
+    expect(db.leads.get('70')).toMatchObject({ nextAction: 'לשלוח מחירון', followUpAt: '2026-12-01T09:00:00.000Z' });
+    await call(updateLeadPlanConfig, { leadId: '70', followUpAt: '' });
+    expect(db.leads.get('70')).toMatchObject({ nextAction: 'לשלוח מחירון', followUpAt: null });
+    expect(db.leads.get('70')!.lastActivityAt).toBe(before);
+    expect(db.activities).toEqual([]);
+  });
+
+  it('refuses an empty plan, a bad date, and another rikma', async () => {
+    await expect(call(updateLeadPlanConfig, { leadId: '70' })).rejects.toMatchObject({ code: 'VALIDATION_FAILED' });
+    await expect(call(updateLeadPlanConfig, { leadId: '70', followUpAt: 'soon' })).rejects.toMatchObject({ code: 'VALIDATION_FAILED' });
+    await expect(call(updateLeadPlanConfig, { projectId: '58', leadId: '70', nextAction: 'x' })).rejects.toMatchObject({
+      code: 'NOT_FOUND'
     });
   });
 });

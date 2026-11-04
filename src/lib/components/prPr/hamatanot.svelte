@@ -155,6 +155,20 @@
     isOpen = true;
     a = 1;
   }
+
+  // "Report a sale" from a lead's page (PLAN_LEADS §4.2): `?lead=<id>` opens the
+  // sheet, the sale carries the lead, and saving goes back to the lead.
+  const leadId = /^d+$/.test(page.url.searchParams.get('lead') ?? '') ? page.url.searchParams.get('lead') : null;
+  let leadOpened = false;
+  $effect(() => {
+    if (leadId && !leadOpened && bmiData.length) {
+      leadOpened = true;
+      reportSale();
+    }
+  });
+  function backToLead() {
+    if (leadId) goto(`/moach/${$idPr ?? page.params.projectId}/sales/manage/leads/${leadId}`);
+  }
   const closer = () => {
     isOpen = false;
     a = 0;
@@ -175,11 +189,13 @@
     isOpen = false;
     a = 0;
     salee.push(event.matana);
+    backToLead();
   };
   function saleUnlimited() {
     // עבור מוצרים unlimited - סגירת הדיאלוג בלבד
     // המכירה כבר נוצרה בשרת, אין צורך לעדכן כמות
     isOpen = false;
+    backToLead();
     a = 0;
   }
   function done(event) {
@@ -429,6 +445,7 @@
               {projectUsers}
               {kindUlimit}
               meId={uid}
+              {leadId}
               defaultHolder={myName}
               onDoners={saleUnlimited}
               onDone={sale}

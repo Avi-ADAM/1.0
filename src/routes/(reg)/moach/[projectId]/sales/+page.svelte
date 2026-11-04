@@ -32,6 +32,20 @@
     };
   });
 
+  // Enquiries waiting for an answer (PLAN_LEADS §4.4), streamed the same way.
+  /** @type {{ count: number } | null} */
+  let leadsBanner = $state(null);
+  $effect(() => {
+    const p = data.leadsBanner;
+    let live = true;
+    Promise.resolve(p).then((b) => {
+      if (live) leadsBanner = b ?? null;
+    });
+    return () => {
+      live = false;
+    };
+  });
+
   // Today's promotion prices, also streamed: a sale report starts from them.
   /** @type {Record<string, { price: number, listPrice: number, promotion: { id: string, name: string | null } }>} */
   let salePrices = $state({});
@@ -68,7 +82,7 @@
 <!-- Site orders, and the way into "manage sales" (PLAN_SHOP_CUSTOMER_EXPERIENCE §7.3).
      The API panel, the support page and donations moved to its "connect" tab. -->
 {#snippet shortcuts()}
-  <SalesShortcuts {projectId} {banner} />
+  <SalesShortcuts {projectId} {banner} leads={leadsBanner} />
 {/snippet}
 
 <div class="sales-page">

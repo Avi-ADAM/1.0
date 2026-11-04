@@ -543,6 +543,11 @@ export type ActionKey =
   | 'markPlanItemCreated'
   // Onboarding: the starter boards a new rikma is born with (PLAN_ONBOARDING Track B)
   | 'seedPlanBoards'
+  // Leads (PLAN_LEADS)
+  | 'createLead'
+  | 'logLeadActivity'
+  | 'updateLeadStatus'
+  | 'updateLeadPlan'
   // Products — newmatana.svelte has always called this; the key was just missing here.
   | 'createComplexMatanot'
   // Mission progress percentage — the lev card and the moach progress board.

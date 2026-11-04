@@ -15556,6 +15556,68 @@ ${PROMO_DECISION_FIELDS}
    * Read exclusively by src/routes/api/v1/tasks/+server.ts and the webhook
    * dispatcher with the ADMIN token via strapiClient.execute — they never
    * travel through /api/send, hence serviceAdmin-only in qidsAccess.
+  // "In progress" (L3, §4.1): every lead not yet won or spam. Read by the
+  // manage layout's loader (members only, after the moach layout's check).
+  'moachPipelineLeads': `query MoachPipelineLeads($pid: ID!) {
+    leads(
+      filters: {
+        project: { id: { eq: $pid } }
+        or: [{ status: { null: true } }, { status: { notIn: ["won", "spam"] } }]
+      }
+      sort: ["lastActivityAt:asc", "createdAt:asc"]
+      pagination: { limit: 300 }
+    ) {
+      data { id attributes {
+        name organization status source sourceLabel followUpAt nextAction lastActivityAt createdAt
+        pausedReason estimatedValue currencyCode
+        owner { data { id attributes { username } } }
+        act { data { id } }
+        products(pagination: { limit: 10 }) { data { id attributes { name } } }
+        orders(pagination: { limit: 50 }) { data { id attributes { status } } }
+      } }
+    }
+  }`,
+
+  // The concierge proposals this rikma is a candidate on, projected onto the
+  // same path (§4.0) — counts of a round / a willingness entry only, no terms.
+  'moachPipelineProposals': `query MoachPipelineProposals($pid: ID!) {
+    ratsonProposals(
+      filters: { project: { id: { eq: $pid } } }
+      sort: ["updatedAt:desc"]
+      pagination: { limit: 100 }
+    ) {
+      data { id attributes {
+        status_proposal hidden_by_wisher total_price createdAt updatedAt
+        ratson { data { id attributes { name } } }
+        negos(pagination: { limit: 1 }) { data { id } }
+        ratson_willingness_entry { id }
+      } }
+    }
+  }`,
+
+  // One lead's page (§4.2): contact, details, what is linked, and its log.
+  'moachLeadPage': `query MoachLeadPage($id: ID!) {
+    lead(id: $id) {
+      data { id attributes {
+        name organization email phone city address message details lang externalId
+        status pausedReason pausedNote followUpAt nextAction
+        source sourceLabel sourceUrl estimatedValue currencyCode consentAt createdAt lastActivityAt
+        project { data { id } }
+        owner { data { id attributes { username } } }
+        act { data { id } }
+        previousLead { data { id } }
+        products(pagination: { limit: 20 }) { data { id attributes { name } } }
+        orders(pagination: { limit: 50 }) { data { id attributes {
+          ref displayNumber status total currencyCode createdAt
+        } } }
+        activities(sort: ["at:desc", "id:desc"], pagination: { limit: 200 }) { data { id attributes {
+          kind direction body fromStatus toStatus at
+          actor { data { id attributes { username } } }
+        } } }
+      } }
+    }
+  }`,
+
    * ───────────────────────────────────────────────────────────────────── */
 
   // Idempotency: has this externalId already produced an Act in this rikma?

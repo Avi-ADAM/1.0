@@ -191,6 +191,7 @@ import { logLeadActivityConfig } from './logLeadActivity.js';
 import { updateLeadStatusConfig } from './updateLeadStatus.js';
 import { confirmOrderPaymentConfig } from './confirmOrderPayment.js';
 import { cancelOrderConfig, markOrderShippedConfig, markOrderFulfilledConfig } from './orderLifecycle.js';
+import { updateLeadPlanConfig } from './updateLeadPlan.js';
 import { setShopStockConfig } from './shopStock.js';
 import { saveProductVariantsConfig, saveProductOptionsConfig } from './shopProductEditor.js';
 import { reportRecurringSaleCycleConfig } from './reportRecurringSaleCycle.js';
@@ -541,6 +542,7 @@ export function registerAllActions(): void {
   registerAction(cancelOrderConfig);
   registerAction(markOrderShippedConfig);
   registerAction(markOrderFulfilledConfig);
+  registerAction(updateLeadPlanConfig);
   // Stock from the moach's sales screens (PLAN_SHOP_CUSTOMER_EXPERIENCE S5)
   registerAction(setShopStockConfig);
   // The seller's product editor (PLAN_SHOP_CUSTOMER_EXPERIENCE S4)

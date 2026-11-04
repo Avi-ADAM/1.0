@@ -4,12 +4,12 @@ import { landingTab, productShips, visibleTabs, type ManageFacts } from './manag
 const facts = (f: Partial<ManageFacts> = {}): ManageFacts => ({ products: 0, ships: false, shippingSet: false, orders: 0, ...f });
 
 describe('visibleTabs', () => {
-  it('a rikma that sells a service sees sales, products and connect', () => {
-    expect(visibleTabs(facts())).toEqual(['products', 'sales', 'connect']);
+  it('a rikma that sells a service sees in progress, sales, products and connect', () => {
+    expect(visibleTabs(facts())).toEqual(['pipeline', 'products', 'sales', 'connect']);
   });
 
   it('a product opens orders, stock, fulfilment and promotions — shipping only when something ships', () => {
-    expect(visibleTabs(facts({ products: 2 }))).toEqual(['orders', 'stock', 'fulfillment', 'promotions', 'products', 'sales', 'connect']);
+    expect(visibleTabs(facts({ products: 2 }))).toEqual(['pipeline', 'orders', 'stock', 'fulfillment', 'promotions', 'products', 'sales', 'connect']);
     expect(visibleTabs(facts({ products: 2, ships: true }))).toContain('shipping');
     expect(visibleTabs(facts({ shippingSet: true }))).toContain('shipping');
   });
@@ -20,7 +20,7 @@ describe('visibleTabs', () => {
 
   it('never hides the tab a member is on, and shows everything when facts are unknown', () => {
     expect(visibleTabs(facts(), 'stock')).toContain('stock');
-    expect(visibleTabs(null)).toHaveLength(8);
+    expect(visibleTabs(null)).toHaveLength(9);
   });
 });
 
@@ -29,9 +29,9 @@ describe('landingTab', () => {
   it('lands on orders when a paid order waits to go out', () => {
     expect(landingTab([paidToShip], facts())).toBe('orders');
   });
-  it('otherwise on orders while there are any, on sales when the rikma never had one', () => {
-    expect(landingTab([], facts({ products: 1 }))).toBe('orders');
-    expect(landingTab([], facts())).toBe('sales');
+  it('otherwise on the deals in progress', () => {
+    expect(landingTab([], facts({ products: 1 }))).toBe('pipeline');
+    expect(landingTab([{ status: 'pendingPayment', delivery: { preference: 'delivery' } } as any], facts())).toBe('pipeline');
   });
 });
 

@@ -10,8 +10,14 @@
 
   let {
     projectId,
-    banner = null
-  }: { projectId: string; banner?: { kind: 'short' | 'toShip'; count: number } | null } = $props();
+    banner = null,
+    leads = null
+  }: {
+    projectId: string;
+    banner?: { kind: 'short' | 'toShip'; count: number } | null;
+    /** Enquiries that need an answer (PLAN_LEADS §4.4) — under the orders banner when both wait. */
+    leads?: { count: number } | null;
+  } = $props();
 
   let base = $derived(`/moach/${projectId}/sales/manage`);
   let text = $derived(
@@ -33,6 +39,15 @@
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 8l-9-5-9 5 9 5 9-5z" /><path d="M3 8v8l9 5 9-5V8" /><path d="M12 13v8" /></svg>
       <span class="sc-text">{text}</span>
       <span class="sc-cta">{$t('shop.banner.cta')}</span>
+      <svg class="sc-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6" /></svg>
+    </a>
+  {/if}
+
+  {#if leads}
+    <a class="sc-banner sc-leads" href="{base}/pipeline?attention=1">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg>
+      <span class="sc-text">{leads.count === 1 ? $t('shop.banner.leadsOne') : $t('shop.banner.leads', { count: leads.count })}</span>
+      <span class="sc-cta">{$t('shop.banner.leadsCta')}</span>
       <svg class="sc-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6" /></svg>
     </a>
   {/if}
@@ -72,6 +87,13 @@
   .sc-banner.sc-short {
     background: var(--sh-warn);
     color: var(--sh-on-warn) !important;
+    box-shadow: none;
+  }
+  /* Second in line: an answer is owed, not a parcel — a quieter banner. */
+  .sc-banner.sc-leads {
+    background: var(--sh-card);
+    color: var(--sh-ink) !important;
+    border: 1px solid var(--sh-accent);
     box-shadow: none;
   }
   .sc-text {

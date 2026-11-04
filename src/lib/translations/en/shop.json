@@ -15,7 +15,10 @@
     "toShipOne": "1 order waiting to ship",
     "short": "{{count}} orders are short on stock",
     "shortOne": "1 order is short on stock",
-    "cta": "Handle"
+    "cta": "Handle",
+    "leads": "{{count}} enquiries waiting for an answer",
+    "leadsOne": "One enquiry waiting for an answer",
+    "leadsCta": "See them"
   },
   "tabs": {
     "label": "Sales management tabs",
@@ -27,7 +30,9 @@
     "waiting": "{{count}} waiting for you",
     "fulfillment": "Fulfilment",
     "shipping": "Shipping",
-    "promotions": "Promotions"
+    "promotions": "Promotions",
+    "pipeline": "In progress",
+    "attention": "{{count}} need attention"
   },
   "kpi": {
     "label": "At a glance",
@@ -40,7 +45,9 @@
     "shortUnits": "{{count}} units short",
     "shortUnitsOne": "1 unit short",
     "month": "Sales in the last 30 days",
-    "monthSub": "{{count}} sales · {{share}}% from your site"
+    "monthSub": "{{count}} sales · {{share}}% from your site",
+    "attention": "Need attention",
+    "attentionSub": "of {{count}} in progress"
   },
   "orders": {
     "filterLabel": "Filter by what's left to do",
@@ -872,5 +879,184 @@
       "send": "Send to a vote"
     },
     "onSale": "On sale"
+  },
+  "leads": {
+    "taken": "It's yours now",
+    "err": {
+      "save": "Didn't save — try again",
+      "notReady": "Enquiries aren't on here yet",
+      "notReadyBody": "They'll show up after the next server update."
+    },
+    "new": {
+      "cta": "Enquiry",
+      "title": "New enquiry",
+      "hint": "Someone called or asked in person? Note them here so the rikma knows they are waiting.",
+      "duplicated": "They're already in the table — this was added to their enquiry",
+      "needContact": "A phone or an email is needed to get back to them",
+      "save": "Save"
+    },
+    "field": {
+      "name": "Name",
+      "phone": "Phone",
+      "email": "Email",
+      "organization": "Organisation / company",
+      "message": "What they asked"
+    },
+    "log": {
+      "title": "Log a conversation with {{name}}",
+      "kindLabel": "Kind",
+      "directionLabel": "Who reached out",
+      "out": "We reached them",
+      "in": "They reached us",
+      "whatWasSaid": "What was said or agreed",
+      "note": "Note",
+      "save": "Log it"
+    },
+    "kind": {
+      "note": "Note",
+      "call": "Call",
+      "whatsapp": "WhatsApp",
+      "email": "Email",
+      "meeting": "Meeting"
+    },
+    "pause": {
+      "title": "Not now",
+      "hint": "The enquiry isn't closed — it's on hold. Pick a day and it comes back to \"need attention\" by itself.",
+      "why": "Why",
+      "note": "In words (optional)",
+      "comeBack": "Get back to them on",
+      "save": "Not now"
+    },
+    "reason": {
+      "timing": "Not the time",
+      "budget": "Budget",
+      "noAnswer": "No answer",
+      "choseOther": "Chose someone else",
+      "notFit": "Not a fit",
+      "other": "Other"
+    },
+    "list": {
+      "count": "{{count}} in progress",
+      "loading": "Loading…",
+      "stageLabel": "Stage",
+      "ownerLabel": "Owner",
+      "sourceLabel": "Source",
+      "backOn": "back {{when}}"
+    },
+    "empty": {
+      "title": "No enquiries yet",
+      "body": "Enquiries from your site, the concierge and the phone show up here — each with a task for the rikma.",
+      "cta": "Connect a site"
+    },
+    "filter": {
+      "open": "All",
+      "new": "New",
+      "contacted": "Got back",
+      "talking": "Talking",
+      "offered": "Offer out",
+      "paused": "Not now",
+      "attention": "Need attention"
+    },
+    "owner": {
+      "all": "Any owner",
+      "me": "Mine",
+      "none": "No owner",
+      "you": "You",
+      "nobody": "Nobody yet"
+    },
+    "source": {
+      "all": "Any source",
+      "api": "Website",
+      "form": "Form",
+      "shop": "Shop",
+      "quote": "Quote request",
+      "manual": "By hand",
+      "bot": "Bot",
+      "demo": "Demo",
+      "import": "Import",
+      "concierge": "Concierge"
+    },
+    "attention": {
+      "unanswered": "Waiting for an answer",
+      "followUpDue": "Time to get back",
+      "stale": "Quiet for a while"
+    },
+    "action": {
+      "take": "I'll take it",
+      "log": "Log a conversation",
+      "pause": "Not now",
+      "openOrder": "Open order",
+      "openWish": "Open wish"
+    },
+    "col": {
+      "name": "Name",
+      "source": "Source",
+      "product": "Product",
+      "stage": "Stage",
+      "owner": "Owner",
+      "last": "Last contact",
+      "next": "Next step",
+      "action": "Action"
+    },
+    "stage": {
+      "new": "Waiting to hear back",
+      "contacted": "Got back",
+      "talking": "Talking",
+      "offered": "Offer out",
+      "won": "Customer",
+      "paused": "Not now",
+      "spam": "Spam"
+    },
+    "page": {
+      "back": "All enquiries",
+      "contact": "How to reach them",
+      "call": "Call",
+      "email": "Email",
+      "logIt": "Log the conversation?",
+      "logYes": "Log it",
+      "logNo": "Not now",
+      "asked": "What they asked",
+      "products": "Interested in",
+      "timeline": "What happened",
+      "nextStep": "Next step",
+      "wonHint": "They're a customer now — it continues in orders and sales.",
+      "reportSale": "Report a sale",
+      "reportSaleHint": "A sale reported from here is linked to the enquiry, and the enquiry becomes a customer.",
+      "linked": "Linked",
+      "previous": "Their previous enquiry",
+      "consent": "Agreed to share their details {{when}}",
+      "sourcePage": "The page they wrote from"
+    },
+    "timeline": {
+      "empty": "Nothing logged yet.",
+      "bySystem": "The system",
+      "statusChange": "{{from}} → {{to}}",
+      "note": "Note",
+      "call": "Call",
+      "whatsapp": "WhatsApp",
+      "email": "Email",
+      "meeting": "Meeting",
+      "assign": "Took the enquiry",
+      "release": "Handed the enquiry back",
+      "inbound": "Wrote again",
+      "linkOrder": "Order linked",
+      "system": "Update"
+    },
+    "plan": {
+      "title": "What's next",
+      "next": "Next step",
+      "nextPlaceholder": "e.g. send the price list",
+      "backOn": "Get back to them on",
+      "save": "Save",
+      "saved": "Saved"
+    },
+    "status": {
+      "title": "Where it stands",
+      "spam": "Spam",
+      "spamConfirm": "Mark as spam? It leaves the table.",
+      "repause": "Change reason / day",
+      "lockedOffered": "An offer is open with them — the stage follows the order. Cancelling the order puts the enquiry back to talking.",
+      "lockedWon": "They paid — the stage follows the money."
+    }
   }
 }

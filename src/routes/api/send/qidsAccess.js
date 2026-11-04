@@ -682,6 +682,9 @@ export const qidsAccess = {
   'leadUpdate': { allow: ['serviceAdmin'] },
   'leadActivityCreate': { allow: ['serviceAdmin'] },
   'leadProjectSettings': { allow: ['serviceAdmin'] },
+  'moachPipelineLeads': { allow: ['serviceAdmin'] },
+  'moachPipelineProposals': { allow: ['serviceAdmin'] },
+  'moachLeadPage': { allow: ['serviceAdmin'] },
 
   // api/v1/tasks/+server.ts + the webhook dispatcher (External Tasks API):
   // same story — executed with the ADMIN_TOKEN through strapiClient, never

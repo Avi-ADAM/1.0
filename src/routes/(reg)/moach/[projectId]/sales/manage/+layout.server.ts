@@ -1,4 +1,5 @@
 import { loadManageFacts, loadShopOrders, loadShopSales } from '$lib/server/shop/moachShop.js';
+import { loadPipeline } from '$lib/server/leads/pipelineLoad';
 import { shopOrdersKey } from '$lib/shop/keys.js';
 import type { LayoutServerLoad } from './$types';
 
@@ -11,7 +12,9 @@ import type { LayoutServerLoad } from './$types';
  * them on every tab), and with them the few facts that decide which tabs this
  * rikma needs (PLAN_LEADS §4.0). The sales table is streamed: the KPI strip
  * fills in when it arrives, and the sales tab reads the same promise instead
- * of asking again.
+ * of asking again. The deals in progress (leads, concierge proposals —
+ * PLAN_LEADS §4.1) stream the same way: the "needs attention" card and the
+ * "in progress" tab read one promise.
  */
 export const load: LayoutServerLoad = async ({ params, parent, fetch, depends }) => {
   await parent();
@@ -22,6 +25,7 @@ export const load: LayoutServerLoad = async ({ params, parent, fetch, depends })
   return {
     shop,
     facts: await loadManageFacts(projectId, shop.orders.length, fetch),
-    sales: loadShopSales(projectId, fetch)
+    sales: loadShopSales(projectId, fetch),
+    pipeline: loadPipeline(projectId, fetch)
   };
 };
