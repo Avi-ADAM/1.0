@@ -50,7 +50,7 @@ export interface SiteAnalysis {
  * Hosts that must never be fetched: the machine itself, the private ranges an
  * internal service would live on, and cloud metadata endpoints.
  */
-function isBlockedHost(hostname: string): boolean {
+export function isBlockedHost(hostname: string): boolean {
   const h = hostname.toLowerCase().replace(/^\[|\]$/g, '');
 
   if (!h) return true;

@@ -131,6 +131,8 @@ const handler: ActionExecutionHandler = async (params, context, util) => {
             kindOf,
             pic: params.picId ? String(params.picId) : null,
             location,
+            // fixed | estimated | quote — the MCP passes it; anything else stays fixed.
+            pricingMode: ['fixed', 'estimated', 'quote'].includes(params.pricingMode) ? params.pricingMode : 'fixed',
             status_of_voting: 'active',
             publishedAt: new Date().toISOString()
           },
@@ -159,6 +161,7 @@ export const createPersonalMatanotConfig: ActionConfig = {
     kindOf: { type: 'string', required: false, description: "total|monthly|yearly|daily|unlimited (default 'total')" },
     picId: { type: 'string', required: false, description: 'Uploaded image id' },
     location: { type: 'object', required: false, description: 'ComponentNewLocation shape' },
+    pricingMode: { type: 'string', required: false, description: 'fixed|estimated|quote, rikma-hosted products only (default fixed)' },
     projectId: { type: 'string', required: false, description: 'Host on this existing rikma (caller must be a member)' },
     newRikmaName: { type: 'string', required: false, description: 'Create a fresh rikma with this name to host the product' }
   },

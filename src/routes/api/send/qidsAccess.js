@@ -764,6 +764,11 @@ export const qidsAccess = {
   'shopVariantUpdate': { allow: ['serviceAdmin'] },
   'shopProductUpdate': { allow: ['serviceAdmin'] },
   'shopProductLowStock': { allow: ['serviceAdmin'] },
+  // The MCP storefront tools (shopCatalogTools.ts) and the /upload/<token> page:
+  // the rikma's categories and the pictures an upload session stored.
+  'shopRikmaCategories': { allow: ['serviceAdmin'] },
+  'mediaUploadsByCaption': { allow: ['serviceAdmin'] },
+  'mediaUploadsByIds': { allow: ['serviceAdmin'] },
   // Order automation (PLAN_SHOP_OPERATIONS A1, qidsFulfillment.js): the fulfillment
   // actions and the engine only — a rule switched on through /api/send would land
   // work on someone who never agreed to it.

@@ -27,6 +27,8 @@ const at = (...paths) =>
  */
 export const ROUTED = {
     onboard: at('/onboard'),
+    // The picture upload link an agent hands out (MCP createUploadSession).
+    upload: at('/upload'),
     tasks: at('/myacts', /\/moach\/[^/]+\/acts/),
     // /concierge: the deal's stage strip (DealStages) heads the wish page too.
     deals: at('/deals', '/lev', '/concierge'),

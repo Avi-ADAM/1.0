@@ -1,0 +1,23 @@
+{
+  "title": "Subir fotos",
+  "intro": "Elige o arrastra hasta {{count}} fotos para el producto. Se guardan en la biblioteca de medios de la rikma y tu asistente las añade al producto.",
+  "pick": "Elegir fotos",
+  "full": "Este enlace ya tiene todas las fotos que acepta",
+  "formats": "JPG, PNG o WebP. Las fotos grandes se reducen antes de enviarlas.",
+  "count": "{{count}} de {{max}} subidas",
+  "done": "Fotos guardadas. Vuelve al chat y dile a tu asistente que terminaste.",
+  "until": "Este enlace funciona hasta las {{time}}",
+  "expired": "Este enlace caducó. Pide uno nuevo a tu asistente.",
+  "invalid": "Este enlace no es válido. Pide uno nuevo a tu asistente.",
+  "error": {
+    "type": "Solo JPG, PNG o WebP",
+    "size": "Archivo demasiado grande",
+    "empty": "El archivo está vacío",
+    "mismatch": "El archivo no es el tipo de imagen que dice ser",
+    "limit": "Se alcanzó el límite de fotos",
+    "expired": "El enlace caducó",
+    "notMember": "Este enlace ya no sirve para esta rikma",
+    "invalid": "El enlace no es válido",
+    "store": "No se pudo guardar, inténtalo de nuevo"
+  }
+}

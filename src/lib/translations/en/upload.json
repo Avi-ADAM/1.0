@@ -1,0 +1,23 @@
+{
+  "title": "Upload pictures",
+  "intro": "Pick or drop up to {{count}} pictures for the product. They are saved in the rikma's media library, and your assistant attaches them to the product.",
+  "pick": "Choose pictures",
+  "full": "This link has all the pictures it accepts",
+  "formats": "JPG, PNG or WebP. Large photos are scaled down before sending.",
+  "count": "{{count}} of {{max}} uploaded",
+  "done": "Pictures saved. Go back to the chat and tell your assistant you are done.",
+  "until": "This link works until {{time}}",
+  "expired": "This link has expired. Ask your assistant for a new one.",
+  "invalid": "This link is not valid. Ask your assistant for a new one.",
+  "error": {
+    "type": "JPG, PNG or WebP only",
+    "size": "File too large",
+    "empty": "The file is empty",
+    "mismatch": "The file is not the picture type it claims",
+    "limit": "The picture limit is reached",
+    "expired": "The link has expired",
+    "notMember": "This link no longer works for this rikma",
+    "invalid": "The link is not valid",
+    "store": "Saving failed, try again"
+  }
+}

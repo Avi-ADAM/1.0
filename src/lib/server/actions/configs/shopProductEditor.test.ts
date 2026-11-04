@@ -109,6 +109,8 @@ const strapi = {
         Object.assign(variants.get(vars.id)!, vars.data);
         writes.push(`variant~${vars.id}:${Object.keys(vars.data).sort().join(',')}`);
         return {};
+      case 'shopRikmaCategories':
+        return { data: { categories: { data: [{ id: '3', attributes: { active: true } }, { id: '4', attributes: { active: false } }] } } };
       case 'shopProductLowStock':
         writes.push(`low=${vars.lowStockAt}`);
         return {};
@@ -266,5 +268,24 @@ describe('saveProductVariants', () => {
   it('the gallery: first is the cover, twelve at most', async () => {
     await run({ axes: sizeAxis, variants: [rowM()], gallery: ['1', '2', '2', '3'] });
     expect(writes).toContain('product:options,pic,pics');
+  });
+
+  it('categories are operational: written at once on a rikma product, no proposal', async () => {
+    await run({ categories: ['3'] });
+    expect(writes).toContain('product:categories,options');
+    expect(proposals).toHaveLength(0);
+  });
+
+  it('a category outside the rikma (or switched off) is refused before anything is written', async () => {
+    await expect(run({ categories: ['3', '4', '99'] })).rejects.toMatchObject({ code: 'INVALID_CATEGORIES' });
+    expect(writes).toEqual([]);
+  });
+
+  it('pricingMode: refused on a rikma product, applied on a personal one', async () => {
+    await expect(run({ pricingMode: 'quote' })).rejects.toMatchObject({ code: 'PRICING_MODE_IS_TERM' });
+    expect(writes).toEqual([]);
+    products.get('10')!.origin = 'personal';
+    await run({ pricingMode: 'quote' });
+    expect(writes).toContain('product:options,pricingMode');
   });
 });

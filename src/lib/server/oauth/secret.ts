@@ -91,6 +91,15 @@ export function directOfferEmailKey(): Buffer {
   return derive('1lev1-direct-offer-email-v1');
 }
 
+/**
+ * HMAC key for media upload sessions (/upload/<token>, the MCP
+ * createUploadSession tool). Its own label, so an upload link can never be
+ * replayed as a preview or offer link.
+ */
+export function uploadSessionKey(): Buffer {
+  return derive('1lev1-upload-session-v1');
+}
+
 export function b64url(buf: Buffer | string): string {
   return Buffer.from(buf).toString('base64url');
 }

@@ -62,6 +62,15 @@ async function loadProduct(run: Run, projectId: string, productId: string): Prom
   return product;
 }
 
+const PRICING_MODES = ['fixed', 'estimated', 'quote'];
+
+/** The categories a product of this rikma may carry: its own and the platform-wide ones. */
+export async function allowedCategoryIds(run: Run, projectId: string): Promise<Set<string>> {
+  const res = await run('shopRikmaCategories', { pid: projectId });
+  const rows: any[] = res?.data?.categories?.data ?? [];
+  return new Set(rows.filter((r) => r?.attributes?.active !== false).map((r) => String(r.id)));
+}
+
 function axesFrom(raw: unknown): EditorAxis[] {
   const { axes, errors } = normaliseAxes(Array.isArray(raw) ? raw : []);
   if (errors.length) throw new ActionError('INVALID_OPTIONS', `The options are not valid: ${errors.join(', ')}`, { errors });
@@ -223,6 +232,37 @@ const saveVariantsHandler: ActionExecutionHandler = async (params, context, { st
   const proposeDetails = !product.sovereign && Object.keys(details).length > 0;
   const needsProposal = plan.terms.length > 0 || proposeBase || proposeDetails;
 
+  // How the price is counted (fixed / estimated / quote) decides whether the
+  // product has a recipe at all — an `editObject` round cannot carry it. On a
+  // sovereign product it is the owner's own call; on a rikma's it is refused
+  // here, before anything is written, with what to do instead.
+  const pricingMode = params.pricingMode == null ? null : String(params.pricingMode);
+  if (pricingMode !== null && !PRICING_MODES.includes(pricingMode)) {
+    throw new ActionError('INVALID_PRICING_MODE', `pricingMode is one of ${PRICING_MODES.join(', ')}`);
+  }
+  const pricingModeMoves = pricingMode !== null && pricingMode !== (product.pricingMode ?? 'fixed');
+  if (pricingModeMoves && !product.sovereign) {
+    throw new ActionError(
+      'PRICING_MODE_IS_TERM',
+      'Switching a rikma product between fixed, estimated and quote pricing changes its recipe; do it from the product page in the moach, where the partners see the new recipe.'
+    );
+  }
+
+  // Categories are where the product is filed, like its pictures: operational.
+  // Only the rikma's own categories and the platform-wide ones.
+  let categoryIds: string[] | null = null;
+  if (Array.isArray(params.categories)) {
+    categoryIds = [...new Set(params.categories.map((c: unknown) => String(c ?? '').trim()).filter(Boolean))] as string[];
+    if (categoryIds.length > 20) throw new ActionError('INVALID_CATEGORIES', 'A product is filed under at most 20 categories');
+    if (categoryIds.length) {
+      const allowed = await allowedCategoryIds(run, projectId);
+      const unknown = categoryIds.filter((id) => !allowed.has(id));
+      if (unknown.length) {
+        throw new ActionError('INVALID_CATEGORIES', `Unknown categories for this rikma: ${unknown.join(', ')}`, { unknown });
+      }
+    }
+  }
+
   // What stops the terms from going to the rikma never stops the rest: stock
   // and pictures are saved either way, and the result says why the terms wait.
   let blocked: 'OPEN_PROPOSAL' | 'VARIANT_TERMS_NOT_READY' | null = null;
@@ -240,6 +280,8 @@ const saveVariantsHandler: ActionExecutionHandler = async (params, context, { st
     productData.pics = gallery;
   }
   if (priceMoves && product.sovereign) productData.price = basePrice;
+  if (pricingModeMoves) productData.pricingMode = pricingMode;
+  if (categoryIds) productData.categories = categoryIds;
   if (product.sovereign) {
     if (details.name !== undefined) productData.name = details.name;
     if (details.descrip !== undefined) productData.desc = details.descrip;
@@ -345,7 +387,9 @@ export const saveProductVariantsConfig: ActionConfig = {
       required: false,
       description: '{ name?, descrip?, kindOf?: total|monthly|yearly|unlimited, startDate?, endDate? } — terms like the price: proposed unless the product is sovereign'
     },
-    why: { type: 'string', required: false, description: 'The reason, when something goes to the rikma' }
+    why: { type: 'string', required: false, description: 'The reason, when something goes to the rikma' },
+    categories: { type: 'array', required: false, description: 'Category ids (the rikma’s own or platform-wide) — operational, applied at once. Omit to leave them' },
+    pricingMode: { type: 'string', required: false, description: 'fixed|estimated|quote — applied on a sovereign product; refused (PRICING_MODE_IS_TERM) on a rikma’s' }
   },
   authRules: [
     { type: 'jwt', errorMessage: 'Must be authenticated to edit a product' },

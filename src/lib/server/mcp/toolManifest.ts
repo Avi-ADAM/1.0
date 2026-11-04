@@ -100,6 +100,19 @@ import {
   setShopStockTool,
   updateRikmaOrderStatusTool
 } from '../../../mastra/tools/shopTools';
+import {
+  proposeProductEditTool,
+  proposeProductEditsBatchTool,
+  createUploadSessionTool,
+  getUploadSessionTool,
+  uploadMediaFromUrlTool,
+  setProductImagesTool,
+  upsertProductOptionsTool,
+  upsertProductVariantsTool,
+  listRikmaCategoriesTool,
+  setProductCategoriesTool,
+  createRikmaProductsBatchTool
+} from '../../../mastra/tools/shopCatalogTools';
 
 export interface McpManifestEntry extends McpToolPolicy {
   tool: { id: string; [k: string]: any };
@@ -279,6 +292,11 @@ export const MCP_TOOL_MANIFEST: Record<string, McpManifestEntry> = {
   listRikmaProductVariantsTool: { tool: listRikmaProductVariantsTool, title: 'List product variants', tier: 'read', project: 'member' },
   listRikmaOrdersTool: { tool: listRikmaOrdersTool, title: 'List rikma orders', tier: 'read', project: 'member' },
   getRikmaOrderTool: { tool: getRikmaOrderTool, title: 'Get rikma order', tier: 'read', project: 'member' },
+  // Leads (PLAN_LEADS §4.4, L5): read the enquiries and log a conversation the member had.
+  // No status tool — "won" follows money and "not now" is the member's own click.
+  listRikmaLeadsTool: { tool: listRikmaLeadsTool, title: 'List rikma leads', tier: 'read', project: 'member' },
+  getLeadTool: { tool: getLeadTool, title: 'Get a lead', tier: 'read', project: 'member' },
+  logLeadActivityTool: { tool: logLeadActivityTool, title: 'Log a lead conversation', tier: 'selfWrite', project: 'member' },
   // Shipping (PLAN_SHOP_SHIPPING): the rikma's own config and a priced quote — reads, members only.
   getShippingConfigTool: { tool: getShippingConfigTool, title: 'Get shipping setup', tier: 'read', project: 'member' },
   quoteShippingTool: { tool: quoteShippingTool, title: 'Quote shipping', tier: 'read', project: 'member' },
@@ -286,17 +304,33 @@ export const MCP_TOOL_MANIFEST: Record<string, McpManifestEntry> = {
   updateRikmaProductTool: { tool: updateRikmaProductTool, title: 'Update rikma product', tier: 'selfWrite', project: 'member' },
   archiveRikmaProductTool: { tool: archiveRikmaProductTool, title: 'Archive a rikma product', tier: 'selfWrite', destructive: true, project: 'member' },
   setShopStockTool: { tool: setShopStockTool, title: 'Set shop stock', tier: 'selfWrite', project: 'member' },
-  updateRikmaOrderStatusTool: { tool: updateRikmaOrderStatusTool, title: 'Update order status', tier: 'selfWrite', project: 'member' }
+  updateRikmaOrderStatusTool: { tool: updateRikmaOrderStatusTool, title: 'Update order status', tier: 'selfWrite', project: 'member' },
+
+  // --- shop: the catalogue from a chat (shopCatalogTools.ts → $lib/server/shop/storefrontAgent).
+  // Every write is saveProductVariants / saveProductOptions / createPersonalMatanot, so a
+  // rikma product's terms become an editObject proposal the partners answer — the
+  // tools never vote. Same tier as the other shop writes (selfWrite: the seller and
+  // the agent are the same person; consent is in the action, not the key).
+  proposeProductEditTool: { tool: proposeProductEditTool, title: 'Propose a product edit', tier: 'selfWrite', project: 'member' },
+  proposeProductEditsBatchTool: { tool: proposeProductEditsBatchTool, title: 'Propose product edits (batch)', tier: 'selfWrite', project: 'member' },
+  setProductImagesTool: { tool: setProductImagesTool, title: 'Set product pictures', tier: 'selfWrite', project: 'member' },
+  upsertProductOptionsTool: { tool: upsertProductOptionsTool, title: 'Create or extend product options', tier: 'selfWrite', project: 'member' },
+  upsertProductVariantsTool: { tool: upsertProductVariantsTool, title: 'Create or update product variants', tier: 'selfWrite', project: 'member' },
+  listRikmaCategoriesTool: { tool: listRikmaCategoriesTool, title: 'List product categories', tier: 'read', project: 'member' },
+  setProductCategoriesTool: { tool: setProductCategoriesTool, title: 'Set product categories', tier: 'selfWrite', project: 'member' },
+  createRikmaProductsBatchTool: { tool: createRikmaProductsBatchTool, title: 'Create products (batch)', tier: 'selfWrite', project: 'member' },
+  // Media ($lib/server/media): a signed, 60-minute upload link the user opens on
+  // their phone, and server-side upload from a public URL (SSRF-guarded) or base64.
+  // getUploadSession has no projectId: the signed token names the rikma, and the
+  // tool checks the caller made it and the key reaches that rikma.
+  createUploadSessionTool: { tool: createUploadSessionTool, title: 'Create a picture upload link', tier: 'selfWrite', project: 'member' },
+  getUploadSessionTool: { tool: getUploadSessionTool, title: 'Read an upload link', tier: 'read' },
+  uploadMediaFromUrlTool: { tool: uploadMediaFromUrlTool, title: 'Upload a picture from a URL', tier: 'selfWrite', project: 'member' }
 };
 
 /** Whether an entry is switched on at all (feature flags). */
 export function entryEnabled(entry: McpManifestEntry): boolean {
   return entry.enabled ? entry.enabled() : true;
-  // Leads (PLAN_LEADS §4.4, L5): read the enquiries and log a conversation the member had.
-  // No status tool — "won" follows money and "not now" is the member's own click.
-  listRikmaLeadsTool: { tool: listRikmaLeadsTool, title: 'List rikma leads', tier: 'read', project: 'member' },
-  getLeadTool: { tool: getLeadTool, title: 'Get a lead', tier: 'read', project: 'member' },
-  logLeadActivityTool: { tool: logLeadActivityTool, title: 'Log a lead conversation', tier: 'selfWrite', project: 'member' },
 }
 
 /** Whether a key with these ops may see a tool of this tier. */

@@ -74,5 +74,34 @@ export const shopEditorQids = {
   // without the column still saves everything else.
   'shopProductLowStock': `mutation ShopProductLowStock($id: ID!, $lowStockAt: Float) {
     updateMatanot(id: $id, data: { lowStockAt: $lowStockAt }) { data { id } }
+  }`,
+
+  // The categories a product of this rikma may be filed under: the rikma's own
+  // (Category.project) and the platform-wide ones (no project). Default locale
+  // only — a relation sees the master row.
+  'shopRikmaCategories': `query ShopRikmaCategories($pid: ID!) {
+    categories(
+      filters: { or: [ { project: { id: { eq: $pid } } }, { project: { id: { null: true } } } ] }
+      sort: ["position:asc", "name:asc"]
+      pagination: { limit: 500 }
+    ) {
+      data { id attributes { name slug position active project { data { id } } parent { data { id } } } }
+    }
+  }`,
+
+  // Every picture one upload session stored ($lib/server/media/uploadSession):
+  // the session's files carry its caption. Oldest first, the order they arrived.
+  'mediaUploadsByCaption': `query MediaUploadsByCaption($caption: String!) {
+    uploadFiles(filters: { caption: { eq: $caption } }, sort: "createdAt:asc", pagination: { limit: 50 }) {
+      data { id attributes { url name mime width height size createdAt } }
+    }
+  }`,
+
+  // Pictures by id — that the ids a tool was given are real images before they
+  // are attached to a product.
+  'mediaUploadsByIds': `query MediaUploadsByIds($ids: [ID]) {
+    uploadFiles(filters: { id: { in: $ids } }, pagination: { limit: 100 }) {
+      data { id attributes { url name mime width height } }
+    }
   }`
 };

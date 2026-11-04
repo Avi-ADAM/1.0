@@ -784,7 +784,7 @@ export const createRikmaProductTool = createTool({
     '→ the product lives on that rikma (caller must be a member); without it → personal offer hosted on the caller’s home ' +
     'rikma (origin=personal); `newRikmaName` → a fresh named rikma is created first and hosts it. ' +
     'Use it for the storefront: name, description, price, stock (quant, -1 = unlimited), kindOf (total/monthly/yearly/daily/unlimited), ' +
-    'location, and an uploaded image id (picId). ' +
+    'location, an uploaded cover (picId) and — on a rikma — galleryIds, categories, options and variants in the same call. ' +
     'For a complex recipe (BOM, margin, estimated price) use createComplexMatanot in the UI — the MCP creates the simple, shippable shelf item. ' +
     'Members or personal owner. Returns the new Matanot id and where it lives.',
   inputSchema: z.object({
@@ -816,9 +816,41 @@ export const createRikmaProductTool = createTool({
         location_mode: z.enum(['online', 'physical']).optional()
       })
       .optional()
-      .describe('Where the product is (or isOnline:true via location_mode online).')
+      .describe('Where the product is (or isOnline:true via location_mode online).'),
+    galleryIds: z.array(z.string()).max(11).optional().describe('With projectId: more upload ids after the cover, in order.'),
+    categories: z.array(z.string()).max(20).optional().describe('With projectId: category ids from listRikmaCategories.'),
+    options: z
+      .array(
+        z.object({
+          name: z.string().min(1).max(60),
+          key: z.string().max(40).optional(),
+          values: z
+            .array(
+              z.union([
+                z.string().min(1).max(60),
+                z.object({ label: z.string().min(1).max(60), value: z.string().max(40).optional(), hex: z.string().nullable().optional() })
+              ])
+            )
+            .min(1)
+            .max(30)
+        })
+      )
+      .max(3)
+      .optional()
+      .describe('With projectId: option axes (size, colour…) to make sure exist before the variants.'),
+    variants: z
+      .array(z.record(z.string(), z.any()))
+      .max(100)
+      .optional()
+      .describe('With projectId: variants, each { optionValues: { size: "M" }, sku?, price?, quant?, active?, position?, imageIds? } — see upsertProductVariants.')
   }),
-  execute: async ({ name, descrip, price, quant, kindOf, pricingMode, projectId, newRikmaName, picId, location }) => {
+  execute: async ({ name, descrip, price, quant, kindOf, pricingMode, projectId, newRikmaName, picId, location, galleryIds, categories, options, variants }) => {
+    // A rikma-hosted product with pictures, categories, options or variants:
+    // one call through the storefront path (shopCatalogTools / storefrontAgent).
+    if (projectId && !newRikmaName && (galleryIds?.length || categories?.length || options?.length || variants?.length)) {
+      const { createRikmaProductWithExtras } = await import('./shopCatalogTools.js');
+      return createRikmaProductWithExtras(String(projectId), { name, descrip, price, quant, kindOf, pricingMode, picId, location, galleryIds, categories, options, variants });
+    }
     // Personal vs. project vs. new-rikma creation all go through the existing actions
     if (newRikmaName?.trim() || (!projectId && !newRikmaName)) {
       // Personal path: the home rikma owns it, or a fresh rikma is minted
@@ -905,7 +937,7 @@ export const updateRikmaProductTool = createTool({
       return {
         success: false,
         message:
-          'Changing name/description of a product goes through the product edit in the moach (editObject for rikma products — members approve it; direct for personal products).',
+          'Use proposeProductEdit to change name/description/price: on a rikma product it opens an edit proposal (members approve it, silence approves at the restime); on a personal product it applies at once.',
         manageUrl: `${SITE}/moach/${pid}/sales/manage`,
         url: `${SITE}/gift/${mid}`
       };
