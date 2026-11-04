@@ -12,7 +12,7 @@
    * is personal or the rikma has one member.
    */
   import { untrack } from 'svelte';
-  import { beforeNavigate, invalidate } from '$app/navigation';
+  import { beforeNavigate, goto, invalidate } from '$app/navigation';
   import { toast } from 'svelte-sonner';
   import { t, locale } from '$lib/translations';
   import { executeAction } from '$lib/client/actionClient';
@@ -43,6 +43,7 @@
   } from '$lib/shop/productEditor';
   import RichText from '$lib/celim/ui/richText.svelte';
   import ShopSheet from './ShopSheet.svelte';
+  import ArchiveObjectButton from '$lib/components/archive/ArchiveObjectButton.svelte';
 
   let {
     projectId,
@@ -292,6 +293,40 @@
     if (d.lowStockSaved === false) toast.message($t('shopEditor.stock.lowNotSaved'));
     saved = snapshot();
     await Promise.all([invalidate(shopProductsKey(projectId)), invalidate(shopOrdersKey(projectId))]);
+  }
+
+  // ── removing from the shop ─────────────────────────────────────────────
+  // Never a delete (sales, orders and halukas point at the product): it is
+  // archived, which takes it off the storefront, /gift and the products tab
+  // while every sale it ever made stays readable. A personal product is its
+  // owner's call; a rikma product goes through proposeObjectArchive — at once
+  // in a rikma of one, otherwise a proposal silence approves at restime.
+  let removing = $state(false);
+  let removalOpen = $derived(!!product.openDecisionId && !product.pending);
+  let productsHref = $derived(`/moach/${projectId}/sales/manage/products`);
+
+  async function afterRemoved() {
+    await Promise.all([invalidate(shopProductsKey(projectId)), invalidate(shopOrdersKey(projectId))]);
+    // A proposal leaves the product live until it matures — stay on it.
+    if (product.sovereign) {
+      saved = snapshot();
+      await goto(productsHref);
+    }
+  }
+
+  async function removePersonal() {
+    if (removing || !confirm($t('shopEditor.remove.confirm', { name: product.name }))) return;
+    removing = true;
+    const res: any = await executeAction('archivePersonalMatanot' as any, { matanotId: product.id }, { showErrorToast: false }).catch(
+      () => null
+    );
+    removing = false;
+    if (!res?.success) {
+      toast.error($t('shopEditor.remove.failed'));
+      return;
+    }
+    toast.success($t('shopEditor.remove.done'));
+    await afterRemoved();
   }
 </script>
 
@@ -672,6 +707,34 @@
           </span>
           <span class="pe-hint">{$t('shopEditor.stock.lowHint')}</span>
         </label>
+      </section>
+
+      <section class="sh-card pe-card" aria-labelledby="pe-remove">
+        <h3 id="pe-remove" class="pe-h pe-h-sm">{$t('shopEditor.remove.title')}</h3>
+        {#if product.archived}
+          <p class="pe-muted">{$t('shopEditor.remove.archived')}</p>
+        {:else if removalOpen}
+          <p class="pe-muted">{$t('shopEditor.remove.open')}</p>
+          <a href="/moach/{projectId}/votes/decision/{product.openDecisionId}">{$t('shopEditor.pending.vote')}</a>
+        {:else}
+          <p class="pe-muted">{$t('shopEditor.remove.hint')}</p>
+          {#if product.origin === 'personal'}
+            <button type="button" class="sh-btn sh-btn-outline pe-remove" onclick={removePersonal} disabled={removing} aria-busy={removing}>
+              {$t('shopEditor.remove.button')}
+            </button>
+          {:else}
+            <p class="pe-muted">{product.sovereign ? $t('shopEditor.remove.alone') : $t('shopEditor.remove.rikma')}</p>
+            <ArchiveObjectButton
+              targetKind="matanot"
+              targetId={product.id}
+              targetName={product.name}
+              soleMember={product.sovereign}
+              label={$t('shopEditor.remove.button')}
+              className="sh-btn sh-btn-outline pe-remove"
+              onDone={afterRemoved}
+            />
+          {/if}
+        {/if}
       </section>
     </aside>
   </div>
@@ -1067,6 +1130,11 @@
     display: inline-block;
   }
   .pe-note-err {
+    color: var(--sh-accent-ink);
+  }
+  /* Handed to ArchiveObjectButton too, so it has to reach past this scope. */
+  :global(.pe-remove) {
+    align-self: flex-start;
     color: var(--sh-accent-ink);
   }
   .pe-link {

@@ -165,5 +165,17 @@
     "title": "New product",
     "subtitle": "Simple — or complex, a recipe of missions and resources. Saving opens the full editor: pictures, variants and stock.",
     "back": "Back"
+  },
+  "remove": {
+    "title": "Remove from the shop",
+    "hint": "The product leaves the shop, the catalog and the products list. Sales, orders and profit splits already made on it stay in the history — nothing is deleted.",
+    "button": "Remove product",
+    "confirm": "Remove \"{{name}}\" from the shop? Its sales stay in the history.",
+    "done": "Product removed from the shop",
+    "failed": "We couldn't remove the product. Please try again.",
+    "rikma": "This product belongs to the rikma, so removing it is a proposal to the partners: they can approve, discuss or counter, and silence until the rikma's response time approves it.",
+    "alone": "You're the only member of the rikma — the removal applies at once.",
+    "open": "There is already an open proposal on this product (removal or change). You can respond to it in the vote.",
+    "archived": "This product was removed from the shop. It is kept in the rikma's archive with all its sales."
   }
 }

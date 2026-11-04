@@ -165,5 +165,17 @@
     "title": "Producto nuevo",
     "subtitle": "Simple — o compuesto, una receta de misiones y recursos. Al guardar se abre el editor completo: fotos, variantes y stock.",
     "back": "Volver"
+  },
+  "remove": {
+    "title": "Quitar de la tienda",
+    "hint": "El producto sale de la tienda, del catálogo y de la lista de productos. Las ventas, pedidos y repartos ya hechos se quedan en el historial: no se borra nada.",
+    "button": "Quitar producto",
+    "confirm": "¿Quitar \"{{name}}\" de la tienda? Sus ventas se quedan en el historial.",
+    "done": "Producto quitado de la tienda",
+    "failed": "No pudimos quitar el producto. Inténtalo de nuevo.",
+    "rikma": "Este producto es de la rikma, así que quitarlo es una propuesta a los socios: pueden aprobar, conversar o contraproponer, y el silencio hasta el tiempo de respuesta de la rikma la aprueba.",
+    "alone": "Eres el único miembro de la rikma: la retirada se aplica de inmediato.",
+    "open": "Ya hay una propuesta abierta sobre este producto (retirada o cambio). Puedes responder en la votación.",
+    "archived": "Este producto se quitó de la tienda. Se guarda en el archivo de la rikma con todas sus ventas."
   }
 }
