@@ -1,6 +1,6 @@
 # Strapi GraphQL Schema Reference
 > Auto-generated from `src/generated/graphql.ts`
-> Last updated: 2026-11-04
+> Last updated: 2026-11-05
 > Source: `codegen.ts` → `http://localhost:1337/graphql`
 
 This file provides a compact reference of all types available from the Strapi backend.
@@ -718,6 +718,7 @@ These are the main content types in the Strapi backend.
 | `previousLead` | `Maybe<LeadEntityResponse>` |
 | `products` | `Maybe<MatanotRelationResponseCollection>` |
 | `project` | `ProjectEntityResponse` |
+| `sales` | `Maybe<SaleRelationResponseCollection>` |
 | `sheirut` | `Maybe<SheirutEntityResponse>` |
 | `source` | `Maybe<Enum_Lead_Source>` |
 | `sourceKey` | `Maybe<ApiKeyEntityResponse>` |
@@ -6100,6 +6101,7 @@ Used for creating/updating content.
 | `previousLead` | `InputMaybe<Scalars['ID']['input']>` |
 | `products` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `project` | `InputMaybe<Scalars['ID']['input']>` |
+| `sales` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `sheirut` | `InputMaybe<Scalars['ID']['input']>` |
 | `source` | `InputMaybe<Enum_Lead_Source>` |
 | `sourceKey` | `InputMaybe<Scalars['ID']['input']>` |
@@ -8606,7 +8608,7 @@ Fields: `and`, `clauses`, `createdAt`, `id`, `negotiation`, `not`, `or`, `order`
 Fields: `actor`, `and`, `at`, `body`, `createdAt`, `direction`, `fromStatus`, `id`, `kind`, `lead`, `meetingId`, `not`, `or`, `toStatus`, `updatedAt`
 
 #### LeadFiltersInput
-Fields: `act`, `activities`, `address`, `and`, `anonymizedAt`, `city`, `consentAt`, `consentText`, `createdAt`, `currencyCode`, `customer_user`, `dedupeKey`, `details`, `email`, `estimatedValue`, `externalId`, `followUpAt`, `id`, `lang`, `lastActivityAt`, `message`, `name`, `nextAction`, `not`, `or`, `orders`, `organization`, `owner`, `pausedNote`, `pausedReason`, `phone`, `previousLead`, `products`, `project`, `sheirut`, `source`, `sourceKey`, `sourceLabel`, `sourceUrl`, `status`, `updatedAt`, `utm`, `variant`
+Fields: `act`, `activities`, `address`, `and`, `anonymizedAt`, `city`, `consentAt`, `consentText`, `createdAt`, `currencyCode`, `customer_user`, `dedupeKey`, `details`, `email`, `estimatedValue`, `externalId`, `followUpAt`, `id`, `lang`, `lastActivityAt`, `message`, `name`, `nextAction`, `not`, `or`, `orders`, `organization`, `owner`, `pausedNote`, `pausedReason`, `phone`, `previousLead`, `products`, `project`, `sales`, `sheirut`, `source`, `sourceKey`, `sourceLabel`, `sourceUrl`, `status`, `updatedAt`, `utm`, `variant`
 
 #### MaagadFiltersInput
 Fields: `and`, `canonical_desc`, `categories`, `chat_forum`, `createdAt`, `frequency`, `id`, `lat`, `lng`, `members`, `name`, `not`, `offers`, `open_mashaabims`, `open_missions`, `or`, `origin`, `pinecone_id`, `process`, `publishedAt`, `radius`, `ratsons`, `scope`, `status_maagad`, `updatedAt`, `vallues`, `viability_hint`
@@ -9625,7 +9627,7 @@ Wrapper types for GraphQL responses.
 ```
 src/
 ├── generated/
-│   ├── graphql.ts              # Auto-generated types (codegen) - 24724 lines
+│   ├── graphql.ts              # Auto-generated types (codegen) - 24735 lines
 │   ├── index.ts                # Re-export hub
 │   └── STRAPI_SCHEMA_REFERENCE.md  # This file (AI agent reference)
 ├── lib/

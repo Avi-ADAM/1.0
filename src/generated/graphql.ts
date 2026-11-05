@@ -6073,6 +6073,7 @@ export type Lead = {
   previousLead?: Maybe<LeadEntityResponse>;
   products?: Maybe<MatanotRelationResponseCollection>;
   project: ProjectEntityResponse;
+  sales?: Maybe<SaleRelationResponseCollection>;
   sheirut?: Maybe<SheirutEntityResponse>;
   source?: Maybe<Enum_Lead_Source>;
   sourceKey?: Maybe<ApiKeyEntityResponse>;
@@ -6101,6 +6102,14 @@ export type LeadOrdersArgs = {
 
 export type LeadProductsArgs = {
   filters?: InputMaybe<MatanotFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  publicationState?: InputMaybe<PublicationState>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+
+export type LeadSalesArgs = {
+  filters?: InputMaybe<SaleFiltersInput>;
   pagination?: InputMaybe<PaginationArg>;
   publicationState?: InputMaybe<PublicationState>;
   sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
@@ -6225,6 +6234,7 @@ export type LeadFiltersInput = {
   previousLead?: InputMaybe<LeadFiltersInput>;
   products?: InputMaybe<MatanotFiltersInput>;
   project?: InputMaybe<ProjectFiltersInput>;
+  sales?: InputMaybe<SaleFiltersInput>;
   sheirut?: InputMaybe<SheirutFiltersInput>;
   source?: InputMaybe<StringFilterInput>;
   sourceKey?: InputMaybe<ApiKeyFiltersInput>;
@@ -6266,6 +6276,7 @@ export type LeadInput = {
   previousLead?: InputMaybe<Scalars['ID']['input']>;
   products?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   project?: InputMaybe<Scalars['ID']['input']>;
+  sales?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   sheirut?: InputMaybe<Scalars['ID']['input']>;
   source?: InputMaybe<Enum_Lead_Source>;
   sourceKey?: InputMaybe<Scalars['ID']['input']>;
