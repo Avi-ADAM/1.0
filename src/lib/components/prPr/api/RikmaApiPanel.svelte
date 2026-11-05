@@ -104,6 +104,137 @@ document.getElementById('lead-form').addEventListener('submit', async (e) => {
 });
 <\/script>`);
 
+  // ── Leads (PLAN_LEADS §5) ─────────────────────────────────────────────────
+  // A standing guide, not only the one-off form shown after creating a public
+  // key: the raw key is gone after a reload, the guide must not be.
+  /** The scopes of the key created on this visit — decides which snippet gets the real key. */
+  let newKeyScopes = $state(/** @type {string[]} */ ([]));
+  let leadsTab = $state('form');
+  const rikmaAddress = $derived(`${PUBLIC_API_ORIGIN}/api/v1/r/${rikmaSlug || projectId}`);
+  const leadsUrl = $derived(`${rikmaAddress}/leads`);
+  const serverLeadKey = $derived(newKeyScopes.includes('leads:create') ? newRawKey : '');
+  const leadKeyForSnippet = $derived(serverLeadKey || '{{API_KEY}}');
+  const pipelineHref = $derived(`/moach/${projectId}/sales/manage/pipeline`);
+
+  const leadsCurlSnippet = $derived(
+    [
+      `curl -X POST ${leadsUrl} \\`,
+      `  -H "Authorization: Bearer ${leadKeyForSnippet}" \\`,
+      '  -H "Content-Type: application/json" \\',
+      `  -d '${JSON.stringify({
+        name: 'Dana Cohen',
+        phone: '050-0000000',
+        email: 'dana@example.com',
+        message: 'Interested — please call me back',
+        externalId: 'enquiry_1234',
+        sourceLabel: 'Home page form',
+        sourceUrl: 'https://my-site.example/',
+        consent: { text: 'I agree that my details go to the rikma on 1lev1', at: '2026-11-05T10:00:00Z' }
+      })}'`,
+      '',
+      '# 201 → { success, duplicated:false, leadId, externalId, status:"new", taskId, warnings }',
+      '# 200 → duplicated:true — the same externalId, or the same person (phone/email) writing again'
+    ].join('\n')
+  );
+
+  const leadsNodeSnippet = $derived(
+    [
+      "// Run this on YOUR server, right after someone submits the site's form.",
+      '// Keep the key in an env var — never ship it to the browser.',
+      `const res = await fetch('${leadsUrl}', {`,
+      "  method: 'POST',",
+      '  headers: {',
+      "    'Content-Type': 'application/json',",
+      `    Authorization: \`Bearer \${process.env.ONELEVONE_LEADS_KEY}\``,
+      '  },',
+      '  body: JSON.stringify({',
+      '    name: form.name,                       // ← required',
+      '    phone: form.phone,                     // ← phone or email, at least one',
+      '    email: form.email,',
+      '    message: form.message,',
+      '    externalId: `enquiry_${form.id}`,      // ← your id: a retry never files it twice',
+      "    // productId: '<id from the catalog>', // ← optional: the product asked about",
+      '    details: { apartments: form.apartments }, // ← optional: any extra form fields',
+      "    sourceLabel: 'Home page form',",
+      '    sourceUrl: form.pageUrl,',
+      '    utm: form.utm,                         // ← optional: { source, campaign, … }',
+      '    consent: { text: CONSENT_TEXT, at: form.submittedAt } // ← required: what they agreed to',
+      '  })',
+      '});',
+      "if (!res.ok) console.error('1lev1 lead failed', res.status, await res.text()); // never block your user"
+    ].join('\n')
+  );
+
+  const leadsHookSnippet = $derived(
+    [
+      '// Receiver for lead.created / lead.statusChanged / lead.won.',
+      "import crypto from 'crypto';",
+      '',
+      'export async function POST({ request }) {',
+      '  const raw = await request.text();               // sign the RAW text',
+      "  const sent = request.headers.get('X-1lev1-Signature');",
+      "  const mine = 'sha256=' + crypto",
+      "    .createHmac('sha256', process.env.ONELEVONE_WEBHOOK_SECRET)",
+      "    .update(raw, 'utf8').digest('hex');",
+      '  if (sent !== mine) return new Response(null, { status: 401 });',
+      '',
+      '  const { event, data } = JSON.parse(raw);',
+      '  // data = { leadId, externalId, status } — never the person, never who owns it.',
+      '  // status: new | contacted | talking | offered | won | paused | spam',
+      '  await markMyEnquiry(data.externalId, event, data.status);',
+      '  return new Response(null, { status: 204 });',
+      '}'
+    ].join('\n')
+  );
+
+  const leadsStatusSnippet = $derived(
+    [
+      '# Needs a key with leads:read. Status only — no contact details, no log.',
+      `curl "${leadsUrl}/enquiry_1234" \\`,
+      `  -H "Authorization: Bearer ${leadKeyForSnippet}"`,
+      '',
+      '# → { success, leadId, externalId, status, hasOwner, lastActivityAt }'
+    ].join('\n')
+  );
+
+  const leadsAgentPrompt = $derived(
+    `You are connecting my website's contact form to 1lev1, so that every enquiry ` +
+      `also lands as a lead in our rikma (project ${projectId}), where a member picks it up. ` +
+      `Two ways — choose the one that fits the site:\n` +
+      `(A) The site has a server: after the form is submitted, POST from MY SERVER (never the browser — ` +
+      `a call carrying an Origin header is refused) to ${leadsUrl} with header ` +
+      `Authorization: Bearer <ONELEVONE_LEADS_KEY from env> (a key with leads:create). ` +
+      `JSON body: name (required), phone and/or email (at least one), message, ` +
+      `externalId (my own enquiry id — retries with it never file twice), optional productId ` +
+      `(a product id from ${rikmaAddress}/products), optional details (flat object, ≤30 keys, ` +
+      `primitive values, ≤4KB), sourceLabel, sourceUrl, utm, and consent {text, at} — the exact ` +
+      `consent text the person ticked and an ISO timestamp; without it the answer is 400 CONSENT_REQUIRED. ` +
+      `201 = filed; 200 with duplicated:true = already known (same externalId or same person) — treat as success. ` +
+      `Never block or fail my user's flow if this call fails: log it and retry with the same externalId.\n` +
+      `(B) A static site with no server: use a key with leads:create:public only, made for the site's ` +
+      `exact origin(s). POST the same body from the page with fetch; the answer is only {success:true}. ` +
+      `Add a hidden honeypot input named "website" that people leave empty, and a required consent checkbox. ` +
+      `Limit: 10 enquiries an hour per visitor address.\n` +
+      `Sync back (server keys only): register a callback URL on the key. It receives ` +
+      `{event, at, projectId, data:{leadId, externalId, status}} for lead.created, lead.statusChanged ` +
+      `and lead.won. Verify X-1lev1-Signature = 'sha256=' + HMAC-SHA256 of the RAW body with my ` +
+      `webhook secret. With leads:read, GET ${leadsUrl}/{externalId} returns the status only.`
+  );
+
+  const leadsSnippet = $derived(
+    leadsTab === 'form'
+      ? publicFormSnippet
+      : leadsTab === 'server'
+        ? leadsCurlSnippet
+        : leadsTab === 'node'
+          ? leadsNodeSnippet
+          : leadsTab === 'hook'
+            ? leadsHookSnippet
+            : leadsTab === 'status'
+              ? leadsStatusSnippet
+              : leadsAgentPrompt
+  );
+
   let currentUserId = $state('');
   let selectedMissionId = $state('');
   /** 'user' | 'role' | 'open' — who the generated task goes to. */
@@ -332,6 +463,7 @@ document.getElementById('lead-form').addEventListener('submit', async (e) => {
       newRawKey = data.raw;
       newWebhookSecret = data.webhookSecret ?? '';
       publicSnippetKey = formIsPublic ? data.raw : '';
+      newKeyScopes = [...form.scopes];
       form = { name: '', scopes: ['tasks:create', 'tasks:read'], callbackUrl: '', origins: '' };
       await loadKeys();
     } catch (e) {
@@ -370,6 +502,8 @@ document.getElementById('lead-form').addEventListener('submit', async (e) => {
       if (!res.ok) throw new Error('revoke failed');
       newRawKey = '';
       newWebhookSecret = '';
+      publicSnippetKey = '';
+      newKeyScopes = [];
       await loadKeys();
     } catch (e) {
       console.error('[RikmaApiPanel] revoke failed:', e);
@@ -547,6 +681,126 @@ document.getElementById('lead-form').addEventListener('submit', async (e) => {
       <pre><code>{catalogSnippet}</code></pre>
     </div>
     <p class="hint">{$t('rikmaApi.catalogHint')}</p>
+  </section>
+
+  <!-- 2b ── Leads: enquiries from the rikma's site (PLAN_LEADS §5) -->
+  <section>
+    <h3>{$t('rikmaApi.leadsGuideTitle')}</h3>
+    <p class="muted">{$t('rikmaApi.leadsGuideSubtitle')}</p>
+
+    <ol class="steps">
+      <li>{$t('rikmaApi.leadsGuideStep1')}</li>
+      <li>{$t('rikmaApi.leadsGuideStep2')}</li>
+      <li>
+        {$t('rikmaApi.leadsGuideStep3')}
+        <a class="inline-link" href={pipelineHref}>{$t('rikmaApi.leadsGuidePipelineLink')}</a>
+      </li>
+    </ol>
+
+    <div class="tabs">
+      <button type="button" class:active={leadsTab === 'form'} onclick={() => (leadsTab = 'form')}>
+        {$t('rikmaApi.leadsTabForm')}
+      </button>
+      <button type="button" class:active={leadsTab === 'server'} onclick={() => (leadsTab = 'server')}>
+        {$t('rikmaApi.tabCurl')}
+      </button>
+      <button type="button" class:active={leadsTab === 'node'} onclick={() => (leadsTab = 'node')}>
+        {$t('rikmaApi.tabNode')}
+      </button>
+      <button type="button" class:active={leadsTab === 'hook'} onclick={() => (leadsTab = 'hook')}>
+        {$t('rikmaApi.tabWebhook')}
+      </button>
+      <button type="button" class:active={leadsTab === 'status'} onclick={() => (leadsTab = 'status')}>
+        {$t('rikmaApi.leadsTabStatus')}
+      </button>
+      <button type="button" class:active={leadsTab === 'agent'} onclick={() => (leadsTab = 'agent')}>
+        {$t('rikmaApi.leadsTabAgent')}
+      </button>
+    </div>
+
+    <p class="hint">
+      {#if leadsTab === 'form'}
+        {$t('rikmaApi.leadsHintForm')}
+      {:else if leadsTab === 'server' || leadsTab === 'node'}
+        {$t('rikmaApi.leadsHintServer')}
+      {:else if leadsTab === 'hook'}
+        {$t('rikmaApi.leadsHintHook')}
+      {:else if leadsTab === 'status'}
+        {$t('rikmaApi.leadsHintStatus')}
+      {:else}
+        {$t('rikmaApi.leadsHintAgent')}
+      {/if}
+    </p>
+
+    <div class="code-block">
+      <button type="button" class="copy-btn" onclick={() => copy(leadsSnippet, 'leadsSnippet')}>
+        {copiedWhat === 'leadsSnippet' ? $t('rikmaApi.copied') : $t('rikmaApi.copy')}
+      </button>
+      {#if leadsTab === 'agent'}
+        <textarea readonly rows="10">{leadsSnippet}</textarea>
+      {:else}
+        <pre dir="ltr"><code>{leadsSnippet}</code></pre>
+      {/if}
+    </div>
+
+    <div class="table-scroll">
+      <table class="vars">
+        <thead>
+          <tr>
+            <th>{$t('rikmaApi.varField')}</th>
+            <th>{$t('rikmaApi.varDesc')}</th>
+            <th>{$t('rikmaApi.varStatus')}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>name</code></td>
+            <td>{$t('rikmaApi.leadsVarName')}</td>
+            <td><span class="tag do">{$t('rikmaApi.leadsRequired')}</span></td>
+          </tr>
+          <tr>
+            <td><code>phone</code> / <code>email</code></td>
+            <td>{$t('rikmaApi.leadsVarContact')}</td>
+            <td><span class="tag do">{$t('rikmaApi.leadsRequired')}</span></td>
+          </tr>
+          <tr>
+            <td><code>consent</code></td>
+            <td>{$t('rikmaApi.leadsVarConsent')}</td>
+            <td><span class="tag do">{$t('rikmaApi.leadsRequired')}</span></td>
+          </tr>
+          <tr>
+            <td><code>externalId</code></td>
+            <td>{$t('rikmaApi.leadsVarExternalId')}</td>
+            <td><span class="tag ok">{$t('rikmaApi.leadsRecommended')}</span></td>
+          </tr>
+          <tr>
+            <td><code>message</code></td>
+            <td>{$t('rikmaApi.leadsVarMessage')}</td>
+            <td><span class="tag opt">{$t('rikmaApi.optional')}</span></td>
+          </tr>
+          <tr>
+            <td><code>productId</code></td>
+            <td>{$t('rikmaApi.leadsVarProductId')}</td>
+            <td><span class="tag opt">{$t('rikmaApi.optional')}</span></td>
+          </tr>
+          <tr>
+            <td><code>details</code></td>
+            <td>{$t('rikmaApi.leadsVarDetails')}</td>
+            <td><span class="tag opt">{$t('rikmaApi.optional')}</span></td>
+          </tr>
+          <tr>
+            <td><code>organization</code> / <code>city</code></td>
+            <td>{$t('rikmaApi.leadsVarOrg')}</td>
+            <td><span class="tag opt">{$t('rikmaApi.optional')}</span></td>
+          </tr>
+          <tr>
+            <td><code>sourceLabel</code> / <code>sourceUrl</code> / <code>utm</code></td>
+            <td>{$t('rikmaApi.leadsVarSource')}</td>
+            <td><span class="tag opt">{$t('rikmaApi.optional')}</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </section>
 
   <!-- 3 ── The ids -->
@@ -1072,6 +1326,21 @@ document.getElementById('lead-form').addEventListener('submit', async (e) => {
   }
   .code-block {
     position: relative;
+  }
+  .steps {
+    margin: 0;
+    list-style: decimal;
+    text-align: start;
+    padding-inline-start: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    font-size: 0.88rem;
+    line-height: 1.5;
+  }
+  .inline-link {
+    color: var(--gold-l, #f5d78e);
+    text-decoration: underline;
   }
   .code-block pre,
   .code-block textarea {
