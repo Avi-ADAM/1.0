@@ -9,22 +9,45 @@ import devtoolsJson from 'vite-plugin-devtools-json';
 // Set by `tauri android dev` so the device's WebView can reach the dev server over LAN
 const tauriDevHost = process.env.TAURI_DEV_HOST;
 
+// Sibling apps and build output that live in the repo but are not part of the
+// SvelteKit app. Vite's watcher opens an fs.watch handle per directory, and on
+// Windows src-tauri (Rust target/, ~4 GB) + remotion + build/.vercel cost ~75 s
+// of blocked event loop at startup — long enough that SSR's fetchModule hits
+// its 60 s "transport invoke timed out" and the dev server never serves a page.
+// Vite merges these with its own defaults (.git, node_modules, cacheDir).
+const WATCH_IGNORED = [
+  '**/src-tauri/**',
+  '**/android/**',
+  '**/remotion/**',
+  '**/video-tutorials/**',
+  '**/socket-server/**',
+  '**/build/**',
+  '**/.vercel/**',
+  '**/.svelte-kit/output/**',
+  '**/.mastra/**',
+  '**/docs/**',
+  '**/scratch/**',
+  '**/outputs/**',
+  '**/brain/**'
+];
+
 /** @type {import('vite').UserConfig} */
 const config = {
-  ...(tauriDevHost
+  server: tauriDevHost
     ? {
-        server: {
-          host: tauriDevHost,
-          port: 5173,
-          strictPort: true,
-          hmr: { protocol: 'ws', host: tauriDevHost, port: 5183 }
-        }
+        // Set by `tauri android dev` so the device's WebView can reach the dev server over LAN
+        host: tauriDevHost,
+        port: 5173,
+        strictPort: true,
+        hmr: { protocol: 'ws', host: tauriDevHost, port: 5183 },
+        watch: { ignored: WATCH_IGNORED }
       }
     : {
         // hosts-file alias (127.0.0.1 dev.1lev1.com) for testing VITE_API_BASE
         // against api.1lev1.com with same-site cookies — see PLAN_PROXY_SECURITY §9
-        server: { allowedHosts: ['dev.1lev1.com'] }
-      }),
+        allowedHosts: ['dev.1lev1.com'],
+        watch: { ignored: WATCH_IGNORED }
+      },
   build: {
     // The per-chunk gzip report is pure log output, and on this many chunks it
     // was the memory peak that got Docker's VM killed ("computing gzip size...").
