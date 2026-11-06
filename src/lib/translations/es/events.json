@@ -188,6 +188,8 @@
     "noRegistrations": "Todavía no hay registros",
     "session": "Fecha",
     "regStatus": "Estado",
-    "answers": "Respuestas"
+    "answers": "Respuestas",
+    "changeNotifies": "Hay personas registradas en esta fecha: cambiar la hora o cancelarla les envía un correo con el calendario actualizado.",
+    "sessionHasRegistrations": "No se puede borrar una fecha con registros: cancélala y se les avisará."
   }
 }

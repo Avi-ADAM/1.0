@@ -973,4 +973,6 @@ export const qidsAccess = {
   'eventRegistrationUpdate': { allow: ['serviceAdmin'] },
   'eventCreateDecision': { allow: ['serviceAdmin'] },
   'eventDecision': { allow: ['serviceAdmin'] },
+  'eventsForCron': { allow: ['serviceAdmin'] },
+  'eventRegistrationsForCron': { allow: ['serviceAdmin'] },
 };

@@ -51,7 +51,7 @@ export function normalizeOrigin(raw: unknown): string | null {
  * call — the only source that may skip consent) and not `demo` (the central
  * rikma's own form).
  */
-export const API_LEAD_SOURCES = LEAD_SOURCES.filter((s) => s !== 'manual' && s !== 'demo');
+export const API_LEAD_SOURCES = LEAD_SOURCES.filter((s) => s !== 'manual' && s !== 'demo' && s !== 'event');
 
 export interface LeadStatusView {
   leadId: string;

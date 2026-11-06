@@ -975,7 +975,8 @@
       "bot": "Bot",
       "demo": "Demo",
       "import": "Importación",
-      "concierge": "Concierge"
+      "concierge": "Concierge",
+      "event": "Evento"
     },
     "attention": {
       "unanswered": "Espera respuesta",
@@ -1044,7 +1045,8 @@
       "system": "Actualización",
       "mergedInto": "Unida a otra consulta",
       "mergedFrom": "Una consulta duplicada se unió aquí",
-      "contactsExported": "Teléfono y correo exportados a un archivo"
+      "contactsExported": "Teléfono y correo exportados a un archivo",
+      "event": "Evento"
     },
     "plan": {
       "title": "Qué sigue",

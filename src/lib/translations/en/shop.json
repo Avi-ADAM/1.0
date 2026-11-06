@@ -975,7 +975,8 @@
       "bot": "Bot",
       "demo": "Demo",
       "import": "Import",
-      "concierge": "Concierge"
+      "concierge": "Concierge",
+      "event": "Event"
     },
     "attention": {
       "unanswered": "Waiting for an answer",
@@ -1044,7 +1045,8 @@
       "system": "Update",
       "mergedInto": "Merged into another enquiry",
       "mergedFrom": "A duplicate enquiry was merged here",
-      "contactsExported": "Phone and email exported to a file"
+      "contactsExported": "Phone and email exported to a file",
+      "event": "Event"
     },
     "plan": {
       "title": "What's next",

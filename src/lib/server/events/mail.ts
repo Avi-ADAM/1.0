@@ -186,3 +186,65 @@ export async function sendConfirmation(to: string, c: ConfirmationInput) {
     ...(m.ics ? { attachments: [{ filename: 'event.ics', content: m.ics, contentType: 'text/calendar; charset=utf-8; method=PUBLISH' }] } : {})
   });
 }
+
+// ─── the shared layout for every later mail (W3: reminders, changes, after) ──
+
+export interface MailButton {
+  href: string;
+  label: string;
+  /** The filled button; others are plain links under it. */
+  primary?: boolean;
+}
+
+export interface RenderInput {
+  lang: string | null;
+  name: string;
+  title: string;
+  tagline?: string | null;
+  lead: string;
+  whenLabel?: string;
+  when?: string | null;
+  note?: string | null;
+  buttons: MailButton[];
+}
+
+/** The same card the confirmation uses, with any lead line and buttons. */
+export function renderMail(r: RenderInput): { html: string; text: string } {
+  const lang = mailLang(r.lang);
+  const t = COPY[lang];
+  const dir = RTL.has(lang) ? 'rtl' : 'ltr';
+  const buttons = r.buttons.filter((b) => b.href);
+  const html = `<!doctype html><html lang="${lang}" dir="${dir}"><body style="margin:0;background:#f4f1ea;font-family:Arial,Helvetica,sans-serif;color:#1f2430">
+<div style="max-width:560px;margin:0 auto;padding:24px 16px">
+<div style="background:#ffffff;border-radius:12px;padding:24px;text-align:${dir === 'rtl' ? 'right' : 'left'}">
+<p style="margin:0 0 12px">${esc(fill(t.hello, { name: r.name }))}</p>
+<h1 style="margin:0 0 8px;font-size:22px">${esc(r.title)}</h1>
+${r.tagline ? `<p style="margin:0 0 16px;color:#555">${esc(r.tagline)}</p>` : ''}
+<p style="margin:0 0 16px;font-weight:bold">${esc(r.lead)}</p>
+${r.when ? `<p style="margin:0 0 4px;color:#555">${esc(r.whenLabel ?? t.when)}</p><p style="margin:0 0 16px;font-size:17px">${esc(r.when)}</p>` : ''}
+${r.note ? `<p style="margin:0 0 20px">${esc(r.note)}</p>` : ''}
+${buttons
+  .map((b) =>
+    b.primary
+      ? `<p style="margin:0 0 12px"><a href="${esc(b.href)}" style="display:inline-block;background:#2f5d50;color:#ffffff;text-decoration:none;padding:12px 20px;border-radius:8px;font-weight:bold">${esc(b.label)}</a></p>`
+      : `<p style="margin:0 0 8px"><a href="${esc(b.href)}" style="color:#2f5d50">${esc(b.label)}</a></p>`
+  )
+  .join('\n')}
+</div>
+<p style="color:#777;font-size:12px;margin:16px 4px 0">${esc(t.footer)}</p>
+</div></body></html>`;
+  const text = [
+    fill(t.hello, { name: r.name }),
+    '',
+    r.title,
+    r.lead,
+    r.when ? `${r.whenLabel ?? t.when}: ${r.when}` : '',
+    r.note ?? '',
+    ...buttons.map((b) => `${b.label}: ${b.href}`),
+    '',
+    t.footer
+  ]
+    .filter((l, i, all) => l !== '' || (all[i - 1] ?? '') !== '')
+    .join('\n');
+  return { html, text };
+}

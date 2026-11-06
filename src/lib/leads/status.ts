@@ -21,7 +21,8 @@ export const DERIVED_STATUSES = ['offered', 'won'] as const;
 export const PAUSED_REASONS = ['timing', 'budget', 'noAnswer', 'choseOther', 'notFit', 'other'] as const;
 export type PausedReason = (typeof PAUSED_REASONS)[number];
 
-export const LEAD_SOURCES = ['api', 'form', 'shop', 'quote', 'manual', 'bot', 'demo', 'import'] as const;
+// `event`: a registration to a rikma event (PLAN_EVENTS_WEBINARS) — written only by registerForEvent.
+export const LEAD_SOURCES = ['api', 'form', 'shop', 'quote', 'manual', 'bot', 'demo', 'import', 'event'] as const;
 export type LeadSource = (typeof LEAD_SOURCES)[number];
 
 /** Activity a member records by hand. The rest (`statusChange`, `assign`, …) only the system writes. */
@@ -35,7 +36,9 @@ export const ACTIVITY_KINDS = [
   'release',
   'inbound',
   'linkOrder',
-  'system'
+  'system',
+  // A rikma event: registered, came, did not come (PLAN_EVENTS_WEBINARS).
+  'event'
 ] as const;
 export type ActivityKind = (typeof ACTIVITY_KINDS)[number];
 

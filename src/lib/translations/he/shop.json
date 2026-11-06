@@ -975,7 +975,8 @@
       "bot": "בוט",
       "demo": "הדגמה",
       "import": "ייבוא",
-      "concierge": "קונסיירז׳"
+      "concierge": "קונסיירז׳",
+      "event": "אירוע"
     },
     "attention": {
       "unanswered": "מחכה לתשובה",
@@ -1044,7 +1045,8 @@
       "system": "עדכון",
       "mergedInto": "מוזגה לפנייה אחרת",
       "mergedFrom": "פנייה כפולה מוזגה לכאן",
-      "contactsExported": "הטלפון והמייל יוצאו לקובץ"
+      "contactsExported": "הטלפון והמייל יוצאו לקובץ",
+      "event": "אירוע"
     },
     "plan": {
       "title": "מה הלאה",

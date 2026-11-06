@@ -148,6 +148,7 @@
     if (code === 'SLUG_TAKEN') return $t('events.editor.slugTaken');
     if (code === 'UNDER_PROPOSAL') return $t('events.editor.underProposal');
     if (code === 'NOT_READY') return $t('events.editor.notReady');
+    if (code === 'SESSION_HAS_REGISTRATIONS') return $t('events.editor.sessionHasRegistrations');
     return $t('events.editor.saveFailed');
   }
 
@@ -350,6 +351,9 @@
               <button type="button" class="text-sm underline text-slate-300" onclick={() => draft.sessions.splice(i, 1)}>{$t('events.editor.remove')}</button>
             {/if}
           </div>
+          {#if data.taken?.[s.key]}
+            <p class="sm:col-span-2 text-xs text-amber-200">{$t('events.editor.changeNotifies')}</p>
+          {/if}
         </div>
       {/each}
       <button type="button" class="add" onclick={() => draft.sessions.push(blankSession())}>+ {$t('events.editor.addSession')}</button>

@@ -85,6 +85,20 @@ const saveEvent: ActionExecutionHandler = async (params, context, { strapi }) =>
     }
   }
 
+  // A date people registered for is cancelled (they are told, W3), never
+  // deleted — deleting it would leave them with no date and no notice.
+  if (stored) {
+    const kept = new Set(draft.sessions.map((s) => s.key));
+    const dropped = ((stored.attributes?.sessions ?? []) as any[]).map((s) => s?.key).filter((k) => k && !kept.has(k));
+    if (dropped.length) {
+      const seats = await loadSeats(run, eventId!);
+      const held = dropped.filter((k) => seats.some((r) => r.sessionKey === k && r.status !== 'cancelled'));
+      if (held.length) {
+        throw new ActionError('SESSION_HAS_REGISTRATIONS', 'A date with registrations can be cancelled, not removed', { sessionKeys: held });
+      }
+    }
+  }
+
   const same = await loadEventBySlug(run, projectId, draft.slug);
   if (same && same.id !== eventId) throw new ActionError('SLUG_TAKEN', 'Another event of this rikma uses this address');
 
@@ -375,9 +389,25 @@ const registerForEvent: ActionExecutionHandler = async (params, context, { strap
       waitlist: status === 'waitlist',
       registrationId
     });
-    if (sent.ok) {
-      await run('eventRegistrationUpdate', { id: registrationId, data: { sent: { confirm: new Date().toISOString() } } }).catch(() => null);
-    } else {
+    // A repeat registration only gets the mail again: its log already holds
+    // what it was told and which reminders went out — rewriting it would send
+    // them all a second time.
+    if (sent.ok && !duplicated) {
+      // What this mail told them — the cron compares against it to know that a
+      // date moved or a waiting-list place became a seat (reminders.ts).
+      await run('eventRegistrationUpdate', {
+        id: registrationId,
+        data: {
+          sent: {
+            confirm: new Date().toISOString(),
+            confirmedAs: status === 'waitlist' ? 'waitlist' : 'registered',
+            startsAt: session.startsAt,
+            seq: 0
+          }
+        }
+      }).catch(() => null);
+    } else if (!sent.ok) {
+      // The cron resends a confirmation that never went out (reminders.ts, `confirm`).
       warnings.push('mail:failed');
     }
   }

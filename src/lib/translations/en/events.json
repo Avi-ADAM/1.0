@@ -188,6 +188,8 @@
     "noRegistrations": "No registrations yet",
     "session": "Date",
     "regStatus": "Status",
-    "answers": "Answers"
+    "answers": "Answers",
+    "changeNotifies": "People registered for this date: changing the time or cancelling emails them an updated calendar entry.",
+    "sessionHasRegistrations": "A date with registrations can't be deleted — cancel it instead, and they'll be told."
   }
 }

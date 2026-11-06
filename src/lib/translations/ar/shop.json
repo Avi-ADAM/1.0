@@ -975,7 +975,8 @@
       "bot": "بوت",
       "demo": "عرض تجريبي",
       "import": "استيراد",
-      "concierge": "كونسيرج"
+      "concierge": "كونسيرج",
+      "event": "فعالية"
     },
     "attention": {
       "unanswered": "ينتظر ردًا",
@@ -1044,7 +1045,8 @@
       "system": "تحديث",
       "mergedInto": "دُمج في استفسار آخر",
       "mergedFrom": "دُمج هنا استفسار مكرر",
-      "contactsExported": "صُدّر الهاتف والبريد إلى ملف"
+      "contactsExported": "صُدّر الهاتف والبريد إلى ملف",
+      "event": "فعالية"
     },
     "plan": {
       "title": "ما التالي",

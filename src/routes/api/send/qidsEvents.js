@@ -108,6 +108,31 @@ export const eventsQids = {
     updateEventRegistration(id: $id, data: $data) { data { id attributes { status } } }
   }`,
 
+  // The reminder clock (/api/cron/events, W3): every published event with its
+  // dates, and per event the rows with what they were already sent.
+  'eventsForCron': `query EventsForCron {
+    rikmaEvents(
+      filters: { status: { eq: "published" } }
+      sort: ["id:asc"]
+      pagination: { limit: 500 }
+    ) { data { id attributes {
+      slug title tagline afterUrl lifecycle hosts { data { id } }
+      project { data { id attributes { slug } } }
+      ${SESSION}
+    } } }
+  }`,
+
+  'eventRegistrationsForCron': `query EventRegistrationsForCron($eid: ID!) {
+    eventRegistrations(
+      filters: { event: { id: { eq: $eid } } }
+      sort: ["createdAt:asc"]
+      pagination: { limit: 5000 }
+    ) { data { id attributes {
+      sessionKey name email status joinedAt sent lang createdAt token
+      lead { data { id } }
+    } } }
+  }`,
+
   // Publishing on everyone's behalf rides the Decision model (kind 'event').
   'eventCreateDecision': `mutation EventCreateDecision(
     $projectIds: [ID]
