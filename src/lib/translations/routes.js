@@ -121,6 +121,10 @@ export const ROUTED = {
     // /project/<id> and /r/<slug>, the editor under /moach, and the heart's
     // address/look decision cards.
     rikmaLook: at('/lev', /\/moach\/[^/]+/, '/project', '/r/'),
+    // Rikma events (docs/inprogress/PLAN_EVENTS_WEBINARS.md): the landing page under
+    // /r/<rikma>/e/<event>, the registrant's own /e/<token> page, and the
+    // rikma's events tab and editor under /moach.
+    events: at('/r/', '/e/', /\/moach\/[^/]+\/events/),
     // Shifts (docs/inprogress/PLAN_SHIFTS.md): the rikma's shifts tab and plan form under
     // /moach, the member's own shifts under /me, the heart's shift cards, and
     // the shift commitment a candidate states on a public mission page. The

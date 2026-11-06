@@ -706,7 +706,9 @@
     "chatClarify": "chat / clarify",
     "negotiateRefine": "negotiate / refine",
     "roundWord": "Round",
-    "onTheTablePrefix": "On the table"
+    "onTheTablePrefix": "On the table",
+    "eventIntro": "It's proposed to publish an event page on the rikma's behalf. Read it before you approve:",
+    "eventPreview": "Read the event page"
   },
   "endOfLine": "End of the line",
   "missionInProgress2": {
@@ -928,7 +930,8 @@
       "saleClaimSub": "Who holds the money",
       "generic": "A decision awaiting your signature",
       "address": "A new address for the rikma",
-      "look": "A new look for the public page"
+      "look": "A new look for the public page",
+      "event": "Publishing a rikma event"
     },
     "sub": {
       "stipendFrom": "Funded by {{name}}",

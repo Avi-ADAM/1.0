@@ -504,6 +504,24 @@
           </a>
         {/if}
       </div>
+    {:else if kind === 'event' && (newValue || previewHref)}
+      <!-- PLAN_EVENTS_WEBINARS: a page in the rikma's name is judged by reading it. -->
+      <div class="space-y-3 bg-gray-50 dark:bg-gray-900/50 p-4 rounded-xl border border-gray-200 dark:border-gray-700">
+        <p class="text-sm text-gray-700 dark:text-gray-200">{$t('lev.hachlata.eventIntro')}</p>
+        {#if newValue}
+          <p class="text-base font-semibold text-gray-900 dark:text-gray-100">{newValue}</p>
+        {/if}
+        {#if previewHref}
+          <a
+            href={previewHref}
+            target="_blank"
+            rel="noopener"
+            class="inline-block text-sm font-semibold text-barbi dark:text-mpink underline"
+          >
+            {$t('lev.hachlata.eventPreview')}
+          </a>
+        {/if}
+      </div>
     {:else if kind !== 'sheirutpends' && kind !== 'pic' && kind !== 'askwants' && (currentValue || newValue)}
       <!-- Generic before/after display for text-based decision kinds -->
       <div

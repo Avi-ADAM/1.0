@@ -3,6 +3,7 @@ import { assistantQids } from './qidsAssistant.js';
 import { shopEditorQids } from './qidsShopEditor.js';
 import { fulfillmentQids } from './qidsFulfillment.js';
 import { shippingQids } from './qidsShipping.js';
+import { eventsQids } from './qidsEvents.js';
 
 /**
  * "Not archived by a rikma decision" (PLAN_OBJECT_ARCHIVAL).
@@ -18189,7 +18190,8 @@ ${PROMO_DECISION_FIELDS}
   ...assistantQids,
   ...shopEditorQids,
   ...fulfillmentQids,
-  ...shippingQids
+  ...shippingQids,
+  ...eventsQids
 };
 
 // The daily digest's service twin of 85 — the same query text with `$uid` for

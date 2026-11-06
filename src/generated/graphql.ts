@@ -2851,6 +2851,7 @@ export type Decision = {
   promotion?: Maybe<PromotionEntityResponse>;
   publishedAt?: Maybe<Scalars['DateTime']['output']>;
   receiptDeal?: Maybe<SheirutEntityResponse>;
+  rikma_event?: Maybe<RikmaEventEntityResponse>;
   sale?: Maybe<SaleEntityResponse>;
   stipFunder?: Maybe<UsersPermissionsUserEntityResponse>;
   stipRecipient?: Maybe<UsersPermissionsUserEntityResponse>;
@@ -3030,6 +3031,7 @@ export type DecisionFiltersInput = {
   promotion?: InputMaybe<PromotionFiltersInput>;
   publishedAt?: InputMaybe<DateTimeFilterInput>;
   receiptDeal?: InputMaybe<SheirutFiltersInput>;
+  rikma_event?: InputMaybe<RikmaEventFiltersInput>;
   sale?: InputMaybe<SaleFiltersInput>;
   stipFunder?: InputMaybe<UsersPermissionsUserFiltersInput>;
   stipRecipient?: InputMaybe<UsersPermissionsUserFiltersInput>;
@@ -3099,6 +3101,7 @@ export type DecisionInput = {
   promotion?: InputMaybe<Scalars['ID']['input']>;
   publishedAt?: InputMaybe<Scalars['DateTime']['input']>;
   receiptDeal?: InputMaybe<Scalars['ID']['input']>;
+  rikma_event?: InputMaybe<Scalars['ID']['input']>;
   sale?: InputMaybe<Scalars['ID']['input']>;
   stipFunder?: InputMaybe<Scalars['ID']['input']>;
   stipRecipient?: InputMaybe<Scalars['ID']['input']>;
@@ -3498,6 +3501,7 @@ export enum Enum_Decision_Kind {
   DormtoM = 'dormtoM',
   Drive = 'drive',
   EditObject = 'editObject',
+  Event = 'event',
   FulfillmentRule = 'fulfillmentRule',
   Github = 'github',
   Look = 'look',
@@ -3628,6 +3632,7 @@ export enum Enum_Leadactivity_Kind {
   Assign = 'assign',
   Call = 'call',
   Email = 'email',
+  Event = 'event',
   Inbound = 'inbound',
   LinkOrder = 'linkOrder',
   Meeting = 'meeting',
@@ -3651,6 +3656,7 @@ export enum Enum_Lead_Source {
   Api = 'api',
   Bot = 'bot',
   Demo = 'demo',
+  Event = 'event',
   Form = 'form',
   Import = 'import',
   Manual = 'manual',
@@ -15113,6 +15119,7 @@ export type Project = {
   ratsons_offered?: Maybe<RatsonRelationResponseCollection>;
   resource_bookings?: Maybe<ResourceBookingRelationResponseCollection>;
   restime?: Maybe<Enum_Project_Restime>;
+  rikma_events?: Maybe<RikmaEventRelationResponseCollection>;
   rikmashes?: Maybe<RikmashRelationResponseCollection>;
   sales?: Maybe<SaleRelationResponseCollection>;
   sales_source?: Maybe<SaleRelationResponseCollection>;
@@ -15833,6 +15840,7 @@ export type ProjectInput = {
   ratsons_offered?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   resource_bookings?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   restime?: InputMaybe<Enum_Project_Restime>;
+  rikma_events?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   rikmashes?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   sales?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   sales_source?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
@@ -24731,4 +24739,280 @@ export type ZoharInput = {
 export type ZoharRelationResponseCollection = {
   __typename?: 'ZoharRelationResponseCollection';
   data: Array<ZoharEntity>;
+};
+
+// ─── Rikma events (docs/inprogress/PLAN_EVENTS_WEBINARS.md) ───
+// Synced by hand from 1.0b ahead of its deploy; `npm run types:update`
+// after the deploy regenerates this file and must not change these shapes.
+
+export type ComponentEventsAgendaItem = {
+  __typename?: 'ComponentEventsAgendaItem';
+  desc?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  minutes?: Maybe<Scalars['Int']['output']>;
+  title: Scalars['String']['output'];
+};
+
+export type ComponentEventsAgendaItemInput = {
+  desc?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  minutes?: InputMaybe<Scalars['Int']['input']>;
+  title?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type ComponentEventsFaqItem = {
+  __typename?: 'ComponentEventsFaqItem';
+  a: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  q: Scalars['String']['output'];
+};
+
+export type ComponentEventsFaqItemInput = {
+  a?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  q?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type ComponentEventsSession = {
+  __typename?: 'ComponentEventsSession';
+  capacity?: Maybe<Scalars['Int']['output']>;
+  durationMin?: Maybe<Scalars['Int']['output']>;
+  externalUrl?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  key: Scalars['String']['output'];
+  pgisha?: Maybe<PgishaEntityResponse>;
+  recordingUrl?: Maybe<Scalars['String']['output']>;
+  room?: Maybe<Enum_Componenteventssession_Room>;
+  startsAt: Scalars['DateTime']['output'];
+  state?: Maybe<Enum_Componenteventssession_State>;
+  timezone?: Maybe<Scalars['String']['output']>;
+};
+
+export type ComponentEventsSessionInput = {
+  capacity?: InputMaybe<Scalars['Int']['input']>;
+  durationMin?: InputMaybe<Scalars['Int']['input']>;
+  externalUrl?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  key?: InputMaybe<Scalars['String']['input']>;
+  pgisha?: InputMaybe<Scalars['ID']['input']>;
+  recordingUrl?: InputMaybe<Scalars['String']['input']>;
+  room?: InputMaybe<Enum_Componenteventssession_Room>;
+  startsAt?: InputMaybe<Scalars['DateTime']['input']>;
+  state?: InputMaybe<Enum_Componenteventssession_State>;
+  timezone?: InputMaybe<Scalars['String']['input']>;
+};
+
+export enum Enum_Componenteventssession_Room {
+  External = 'external',
+  Meetings = 'meetings'
+}
+
+export enum Enum_Componenteventssession_State {
+  Cancelled = 'cancelled',
+  Done = 'done',
+  Full = 'full',
+  Open = 'open'
+}
+
+export enum Enum_Rikmaevent_Kind {
+  Meetup = 'meetup',
+  OpenHouse = 'openHouse',
+  Webinar = 'webinar',
+  Workshop = 'workshop'
+}
+
+export enum Enum_Rikmaevent_Lifecycle {
+  Active = 'active',
+  ArchiveProposed = 'archiveProposed',
+  Archived = 'archived',
+  Released = 'released'
+}
+
+export enum Enum_Rikmaevent_Status {
+  Closed = 'closed',
+  Draft = 'draft',
+  Proposed = 'proposed',
+  Published = 'published'
+}
+
+export enum Enum_Eventregistration_Status {
+  Attended = 'attended',
+  Cancelled = 'cancelled',
+  NoShow = 'noShow',
+  Registered = 'registered',
+  Waitlist = 'waitlist'
+}
+
+export type RikmaEvent = {
+  __typename?: 'RikmaEvent';
+  afterUrl?: Maybe<Scalars['String']['output']>;
+  agenda?: Maybe<Array<Maybe<ComponentEventsAgendaItem>>>;
+  audience?: Maybe<Scalars['String']['output']>;
+  consentText?: Maybe<Scalars['String']['output']>;
+  cover?: Maybe<UploadFileEntityResponse>;
+  createdAt?: Maybe<Scalars['DateTime']['output']>;
+  createdByUser?: Maybe<UsersPermissionsUserEntityResponse>;
+  decision?: Maybe<DecisionEntityResponse>;
+  description?: Maybe<Scalars['String']['output']>;
+  faq?: Maybe<Array<Maybe<ComponentEventsFaqItem>>>;
+  form?: Maybe<Scalars['JSON']['output']>;
+  hosts?: Maybe<UsersPermissionsUserRelationResponseCollection>;
+  kind?: Maybe<Enum_Rikmaevent_Kind>;
+  lang?: Maybe<Scalars['String']['output']>;
+  lifecycle?: Maybe<Enum_Rikmaevent_Lifecycle>;
+  outcomes?: Maybe<Scalars['String']['output']>;
+  project?: Maybe<ProjectEntityResponse>;
+  publishedOn?: Maybe<Scalars['DateTime']['output']>;
+  registrations?: Maybe<EventRegistrationRelationResponseCollection>;
+  sessions?: Maybe<Array<Maybe<ComponentEventsSession>>>;
+  slug: Scalars['String']['output'];
+  status?: Maybe<Enum_Rikmaevent_Status>;
+  tagline?: Maybe<Scalars['String']['output']>;
+  title: Scalars['String']['output'];
+  updatedAt?: Maybe<Scalars['DateTime']['output']>;
+};
+
+export type RikmaEventEntity = {
+  __typename?: 'RikmaEventEntity';
+  attributes?: Maybe<RikmaEvent>;
+  id?: Maybe<Scalars['ID']['output']>;
+};
+
+export type RikmaEventEntityResponse = {
+  __typename?: 'RikmaEventEntityResponse';
+  data?: Maybe<RikmaEventEntity>;
+};
+
+export type RikmaEventEntityResponseCollection = {
+  __typename?: 'RikmaEventEntityResponseCollection';
+  data: Array<RikmaEventEntity>;
+  meta: ResponseCollectionMeta;
+};
+
+export type RikmaEventRelationResponseCollection = {
+  __typename?: 'RikmaEventRelationResponseCollection';
+  data: Array<RikmaEventEntity>;
+};
+
+export type RikmaEventFiltersInput = {
+  and?: InputMaybe<Array<InputMaybe<RikmaEventFiltersInput>>>;
+  createdAt?: InputMaybe<DateTimeFilterInput>;
+  id?: InputMaybe<IdFilterInput>;
+  kind?: InputMaybe<StringFilterInput>;
+  lifecycle?: InputMaybe<StringFilterInput>;
+  not?: InputMaybe<RikmaEventFiltersInput>;
+  or?: InputMaybe<Array<InputMaybe<RikmaEventFiltersInput>>>;
+  project?: InputMaybe<ProjectFiltersInput>;
+  slug?: InputMaybe<StringFilterInput>;
+  status?: InputMaybe<StringFilterInput>;
+  title?: InputMaybe<StringFilterInput>;
+};
+
+export type RikmaEventInput = {
+  afterUrl?: InputMaybe<Scalars['String']['input']>;
+  agenda?: InputMaybe<Array<InputMaybe<ComponentEventsAgendaItemInput>>>;
+  audience?: InputMaybe<Scalars['String']['input']>;
+  consentText?: InputMaybe<Scalars['String']['input']>;
+  cover?: InputMaybe<Scalars['ID']['input']>;
+  createdByUser?: InputMaybe<Scalars['ID']['input']>;
+  decision?: InputMaybe<Scalars['ID']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  faq?: InputMaybe<Array<InputMaybe<ComponentEventsFaqItemInput>>>;
+  form?: InputMaybe<Scalars['JSON']['input']>;
+  hosts?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  kind?: InputMaybe<Enum_Rikmaevent_Kind>;
+  lang?: InputMaybe<Scalars['String']['input']>;
+  lifecycle?: InputMaybe<Enum_Rikmaevent_Lifecycle>;
+  outcomes?: InputMaybe<Scalars['String']['input']>;
+  project?: InputMaybe<Scalars['ID']['input']>;
+  publishedOn?: InputMaybe<Scalars['DateTime']['input']>;
+  registrations?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  sessions?: InputMaybe<Array<InputMaybe<ComponentEventsSessionInput>>>;
+  slug?: InputMaybe<Scalars['String']['input']>;
+  status?: InputMaybe<Enum_Rikmaevent_Status>;
+  tagline?: InputMaybe<Scalars['String']['input']>;
+  title?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type EventRegistration = {
+  __typename?: 'EventRegistration';
+  answers?: Maybe<Scalars['JSON']['output']>;
+  consentAt?: Maybe<Scalars['DateTime']['output']>;
+  consentText?: Maybe<Scalars['String']['output']>;
+  createdAt?: Maybe<Scalars['DateTime']['output']>;
+  email: Scalars['String']['output'];
+  event?: Maybe<RikmaEventEntityResponse>;
+  joinedAt?: Maybe<Scalars['DateTime']['output']>;
+  lang?: Maybe<Scalars['String']['output']>;
+  lead?: Maybe<LeadEntityResponse>;
+  name: Scalars['String']['output'];
+  phone?: Maybe<Scalars['String']['output']>;
+  project?: Maybe<ProjectEntityResponse>;
+  ref?: Maybe<Scalars['String']['output']>;
+  sent?: Maybe<Scalars['JSON']['output']>;
+  sessionKey?: Maybe<Scalars['String']['output']>;
+  sourceUrl?: Maybe<Scalars['String']['output']>;
+  status?: Maybe<Enum_Eventregistration_Status>;
+  token: Scalars['String']['output'];
+  updatedAt?: Maybe<Scalars['DateTime']['output']>;
+  user?: Maybe<UsersPermissionsUserEntityResponse>;
+  utm?: Maybe<Scalars['JSON']['output']>;
+};
+
+export type EventRegistrationEntity = {
+  __typename?: 'EventRegistrationEntity';
+  attributes?: Maybe<EventRegistration>;
+  id?: Maybe<Scalars['ID']['output']>;
+};
+
+export type EventRegistrationEntityResponse = {
+  __typename?: 'EventRegistrationEntityResponse';
+  data?: Maybe<EventRegistrationEntity>;
+};
+
+export type EventRegistrationEntityResponseCollection = {
+  __typename?: 'EventRegistrationEntityResponseCollection';
+  data: Array<EventRegistrationEntity>;
+  meta: ResponseCollectionMeta;
+};
+
+export type EventRegistrationRelationResponseCollection = {
+  __typename?: 'EventRegistrationRelationResponseCollection';
+  data: Array<EventRegistrationEntity>;
+};
+
+export type EventRegistrationFiltersInput = {
+  and?: InputMaybe<Array<InputMaybe<EventRegistrationFiltersInput>>>;
+  createdAt?: InputMaybe<DateTimeFilterInput>;
+  email?: InputMaybe<StringFilterInput>;
+  event?: InputMaybe<RikmaEventFiltersInput>;
+  id?: InputMaybe<IdFilterInput>;
+  not?: InputMaybe<EventRegistrationFiltersInput>;
+  or?: InputMaybe<Array<InputMaybe<EventRegistrationFiltersInput>>>;
+  project?: InputMaybe<ProjectFiltersInput>;
+  sessionKey?: InputMaybe<StringFilterInput>;
+  status?: InputMaybe<StringFilterInput>;
+  token?: InputMaybe<StringFilterInput>;
+};
+
+export type EventRegistrationInput = {
+  answers?: InputMaybe<Scalars['JSON']['input']>;
+  consentAt?: InputMaybe<Scalars['DateTime']['input']>;
+  consentText?: InputMaybe<Scalars['String']['input']>;
+  email?: InputMaybe<Scalars['String']['input']>;
+  event?: InputMaybe<Scalars['ID']['input']>;
+  joinedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  lang?: InputMaybe<Scalars['String']['input']>;
+  lead?: InputMaybe<Scalars['ID']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  phone?: InputMaybe<Scalars['String']['input']>;
+  project?: InputMaybe<Scalars['ID']['input']>;
+  ref?: InputMaybe<Scalars['String']['input']>;
+  sent?: InputMaybe<Scalars['JSON']['input']>;
+  sessionKey?: InputMaybe<Scalars['String']['input']>;
+  sourceUrl?: InputMaybe<Scalars['String']['input']>;
+  status?: InputMaybe<Enum_Eventregistration_Status>;
+  token?: InputMaybe<Scalars['String']['input']>;
+  user?: InputMaybe<Scalars['ID']['input']>;
+  utm?: InputMaybe<Scalars['JSON']['input']>;
 };

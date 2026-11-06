@@ -23,7 +23,7 @@ import type { StrapiEntity, StrapiCollection, StrapiMedia } from '$lib/types/str
 
 ---
 
-## 🏗️ Content Type Entities (144)
+## 🏗️ Content Type Entities (146)
 
 These are the main content types in the Strapi backend.
 
@@ -368,6 +368,7 @@ These are the main content types in the Strapi backend.
 | `promotion` | `Maybe<PromotionEntityResponse>` |
 | `publishedAt` | `Maybe<Scalars['DateTime']['output']>` |
 | `receiptDeal` | `Maybe<SheirutEntityResponse>` |
+| `rikma_event` | `Maybe<RikmaEventEntityResponse>` |
 | `sale` | `Maybe<SaleEntityResponse>` |
 | `stipFunder` | `Maybe<UsersPermissionsUserEntityResponse>` |
 | `stipRecipient` | `Maybe<UsersPermissionsUserEntityResponse>` |
@@ -2397,6 +2398,7 @@ These are the main content types in the Strapi backend.
 | `ratsons_offered` | `Maybe<RatsonRelationResponseCollection>` |
 | `resource_bookings` | `Maybe<ResourceBookingRelationResponseCollection>` |
 | `restime` | `Maybe<Enum_Project_Restime>` |
+| `rikma_events` | `Maybe<RikmaEventRelationResponseCollection>` |
 | `rikmashes` | `Maybe<RikmashRelationResponseCollection>` |
 | `sales` | `Maybe<SaleRelationResponseCollection>` |
 | `sales_source` | `Maybe<SaleRelationResponseCollection>` |
@@ -4068,9 +4070,63 @@ These are the main content types in the Strapi backend.
 | `users_permissions_user` | `Maybe<UsersPermissionsUserEntityResponse>` |
 | `weekSt` | `Maybe<Scalars['Date']['output']>` |
 
+### RikmaEvent
+| Field | Type |
+|-------|------|
+| `afterUrl` | `Maybe<Scalars['String']['output']>` |
+| `agenda` | `Maybe<Array<Maybe<ComponentEventsAgendaItem>>>` |
+| `audience` | `Maybe<Scalars['String']['output']>` |
+| `consentText` | `Maybe<Scalars['String']['output']>` |
+| `cover` | `Maybe<UploadFileEntityResponse>` |
+| `createdAt` | `Maybe<Scalars['DateTime']['output']>` |
+| `createdByUser` | `Maybe<UsersPermissionsUserEntityResponse>` |
+| `decision` | `Maybe<DecisionEntityResponse>` |
+| `description` | `Maybe<Scalars['String']['output']>` |
+| `faq` | `Maybe<Array<Maybe<ComponentEventsFaqItem>>>` |
+| `form` | `Maybe<Scalars['JSON']['output']>` |
+| `hosts` | `Maybe<UsersPermissionsUserRelationResponseCollection>` |
+| `kind` | `Maybe<Enum_Rikmaevent_Kind>` |
+| `lang` | `Maybe<Scalars['String']['output']>` |
+| `lifecycle` | `Maybe<Enum_Rikmaevent_Lifecycle>` |
+| `outcomes` | `Maybe<Scalars['String']['output']>` |
+| `project` | `Maybe<ProjectEntityResponse>` |
+| `publishedOn` | `Maybe<Scalars['DateTime']['output']>` |
+| `registrations` | `Maybe<EventRegistrationRelationResponseCollection>` |
+| `sessions` | `Maybe<Array<Maybe<ComponentEventsSession>>>` |
+| `slug` | `Scalars['String']['output']` |
+| `status` | `Maybe<Enum_Rikmaevent_Status>` |
+| `tagline` | `Maybe<Scalars['String']['output']>` |
+| `title` | `Scalars['String']['output']` |
+| `updatedAt` | `Maybe<Scalars['DateTime']['output']>` |
+
+### EventRegistration
+| Field | Type |
+|-------|------|
+| `answers` | `Maybe<Scalars['JSON']['output']>` |
+| `consentAt` | `Maybe<Scalars['DateTime']['output']>` |
+| `consentText` | `Maybe<Scalars['String']['output']>` |
+| `createdAt` | `Maybe<Scalars['DateTime']['output']>` |
+| `email` | `Scalars['String']['output']` |
+| `event` | `Maybe<RikmaEventEntityResponse>` |
+| `joinedAt` | `Maybe<Scalars['DateTime']['output']>` |
+| `lang` | `Maybe<Scalars['String']['output']>` |
+| `lead` | `Maybe<LeadEntityResponse>` |
+| `name` | `Scalars['String']['output']` |
+| `phone` | `Maybe<Scalars['String']['output']>` |
+| `project` | `Maybe<ProjectEntityResponse>` |
+| `ref` | `Maybe<Scalars['String']['output']>` |
+| `sent` | `Maybe<Scalars['JSON']['output']>` |
+| `sessionKey` | `Maybe<Scalars['String']['output']>` |
+| `sourceUrl` | `Maybe<Scalars['String']['output']>` |
+| `status` | `Maybe<Enum_Eventregistration_Status>` |
+| `token` | `Scalars['String']['output']` |
+| `updatedAt` | `Maybe<Scalars['DateTime']['output']>` |
+| `user` | `Maybe<UsersPermissionsUserEntityResponse>` |
+| `utm` | `Maybe<Scalars['JSON']['output']>` |
+
 ---
 
-## 🧩 Component Types (107)
+## 🧩 Component Types (113)
 
 These are Strapi components (reusable field groups).
 
@@ -5293,9 +5349,69 @@ These are Strapi components (reusable field groups).
 | `position` | `InputMaybe<Scalars['Int']['input']>` |
 | `value` | `InputMaybe<Scalars['String']['input']>` |
 
+### ComponentEventsAgendaItem
+| Field | Type |
+|-------|------|
+| `desc` | `Maybe<Scalars['String']['output']>` |
+| `id` | `Scalars['ID']['output']` |
+| `minutes` | `Maybe<Scalars['Int']['output']>` |
+| `title` | `Scalars['String']['output']` |
+
+### ComponentEventsAgendaItemInput
+| Field | Type |
+|-------|------|
+| `desc` | `InputMaybe<Scalars['String']['input']>` |
+| `id` | `InputMaybe<Scalars['ID']['input']>` |
+| `minutes` | `InputMaybe<Scalars['Int']['input']>` |
+| `title` | `InputMaybe<Scalars['String']['input']>` |
+
+### ComponentEventsFaqItem
+| Field | Type |
+|-------|------|
+| `a` | `Scalars['String']['output']` |
+| `id` | `Scalars['ID']['output']` |
+| `q` | `Scalars['String']['output']` |
+
+### ComponentEventsFaqItemInput
+| Field | Type |
+|-------|------|
+| `a` | `InputMaybe<Scalars['String']['input']>` |
+| `id` | `InputMaybe<Scalars['ID']['input']>` |
+| `q` | `InputMaybe<Scalars['String']['input']>` |
+
+### ComponentEventsSession
+| Field | Type |
+|-------|------|
+| `capacity` | `Maybe<Scalars['Int']['output']>` |
+| `durationMin` | `Maybe<Scalars['Int']['output']>` |
+| `externalUrl` | `Maybe<Scalars['String']['output']>` |
+| `id` | `Scalars['ID']['output']` |
+| `key` | `Scalars['String']['output']` |
+| `pgisha` | `Maybe<PgishaEntityResponse>` |
+| `recordingUrl` | `Maybe<Scalars['String']['output']>` |
+| `room` | `Maybe<Enum_Componenteventssession_Room>` |
+| `startsAt` | `Scalars['DateTime']['output']` |
+| `state` | `Maybe<Enum_Componenteventssession_State>` |
+| `timezone` | `Maybe<Scalars['String']['output']>` |
+
+### ComponentEventsSessionInput
+| Field | Type |
+|-------|------|
+| `capacity` | `InputMaybe<Scalars['Int']['input']>` |
+| `durationMin` | `InputMaybe<Scalars['Int']['input']>` |
+| `externalUrl` | `InputMaybe<Scalars['String']['input']>` |
+| `id` | `InputMaybe<Scalars['ID']['input']>` |
+| `key` | `InputMaybe<Scalars['String']['input']>` |
+| `pgisha` | `InputMaybe<Scalars['ID']['input']>` |
+| `recordingUrl` | `InputMaybe<Scalars['String']['input']>` |
+| `room` | `InputMaybe<Enum_Componenteventssession_Room>` |
+| `startsAt` | `InputMaybe<Scalars['DateTime']['input']>` |
+| `state` | `InputMaybe<Enum_Componenteventssession_State>` |
+| `timezone` | `InputMaybe<Scalars['String']['input']>` |
+
 ---
 
-## 📝 Input Types (142)
+## 📝 Input Types (144)
 
 Used for creating/updating content.
 
@@ -5675,6 +5791,7 @@ Used for creating/updating content.
 | `promotion` | `InputMaybe<Scalars['ID']['input']>` |
 | `publishedAt` | `InputMaybe<Scalars['DateTime']['input']>` |
 | `receiptDeal` | `InputMaybe<Scalars['ID']['input']>` |
+| `rikma_event` | `InputMaybe<Scalars['ID']['input']>` |
 | `sale` | `InputMaybe<Scalars['ID']['input']>` |
 | `stipFunder` | `InputMaybe<Scalars['ID']['input']>` |
 | `stipRecipient` | `InputMaybe<Scalars['ID']['input']>` |
@@ -7237,6 +7354,7 @@ Used for creating/updating content.
 | `ratsons_offered` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `resource_bookings` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `restime` | `InputMaybe<Enum_Project_Restime>` |
+| `rikma_events` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `rikmashes` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `sales` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `sales_source` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
@@ -8493,14 +8611,64 @@ Used for creating/updating content.
 | `users_permissions_user` | `InputMaybe<Scalars['ID']['input']>` |
 | `weekSt` | `InputMaybe<Scalars['Date']['input']>` |
 
+### RikmaEventInput
+| Field | Type |
+|-------|------|
+| `afterUrl` | `InputMaybe<Scalars['String']['input']>` |
+| `agenda` | `InputMaybe<Array<InputMaybe<ComponentEventsAgendaItemInput>>>` |
+| `audience` | `InputMaybe<Scalars['String']['input']>` |
+| `consentText` | `InputMaybe<Scalars['String']['input']>` |
+| `cover` | `InputMaybe<Scalars['ID']['input']>` |
+| `createdByUser` | `InputMaybe<Scalars['ID']['input']>` |
+| `decision` | `InputMaybe<Scalars['ID']['input']>` |
+| `description` | `InputMaybe<Scalars['String']['input']>` |
+| `faq` | `InputMaybe<Array<InputMaybe<ComponentEventsFaqItemInput>>>` |
+| `form` | `InputMaybe<Scalars['JSON']['input']>` |
+| `hosts` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
+| `kind` | `InputMaybe<Enum_Rikmaevent_Kind>` |
+| `lang` | `InputMaybe<Scalars['String']['input']>` |
+| `lifecycle` | `InputMaybe<Enum_Rikmaevent_Lifecycle>` |
+| `outcomes` | `InputMaybe<Scalars['String']['input']>` |
+| `project` | `InputMaybe<Scalars['ID']['input']>` |
+| `publishedOn` | `InputMaybe<Scalars['DateTime']['input']>` |
+| `registrations` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
+| `sessions` | `InputMaybe<Array<InputMaybe<ComponentEventsSessionInput>>>` |
+| `slug` | `InputMaybe<Scalars['String']['input']>` |
+| `status` | `InputMaybe<Enum_Rikmaevent_Status>` |
+| `tagline` | `InputMaybe<Scalars['String']['input']>` |
+| `title` | `InputMaybe<Scalars['String']['input']>` |
+
+### EventRegistrationInput
+| Field | Type |
+|-------|------|
+| `answers` | `InputMaybe<Scalars['JSON']['input']>` |
+| `consentAt` | `InputMaybe<Scalars['DateTime']['input']>` |
+| `consentText` | `InputMaybe<Scalars['String']['input']>` |
+| `email` | `InputMaybe<Scalars['String']['input']>` |
+| `event` | `InputMaybe<Scalars['ID']['input']>` |
+| `joinedAt` | `InputMaybe<Scalars['DateTime']['input']>` |
+| `lang` | `InputMaybe<Scalars['String']['input']>` |
+| `lead` | `InputMaybe<Scalars['ID']['input']>` |
+| `name` | `InputMaybe<Scalars['String']['input']>` |
+| `phone` | `InputMaybe<Scalars['String']['input']>` |
+| `project` | `InputMaybe<Scalars['ID']['input']>` |
+| `ref` | `InputMaybe<Scalars['String']['input']>` |
+| `sent` | `InputMaybe<Scalars['JSON']['input']>` |
+| `sessionKey` | `InputMaybe<Scalars['String']['input']>` |
+| `sourceUrl` | `InputMaybe<Scalars['String']['input']>` |
+| `status` | `InputMaybe<Enum_Eventregistration_Status>` |
+| `token` | `InputMaybe<Scalars['String']['input']>` |
+| `user` | `InputMaybe<Scalars['ID']['input']>` |
+| `utm` | `InputMaybe<Scalars['JSON']['input']>` |
+
 ---
 
-## 🔍 Filter Input Types (131)
+## 🔍 Filter Input Types (133)
 
 Used for querying/filtering content. Each content type has a corresponding filter input.
 
 <details>
-<summary>Click to expand all 131 filter types</summary>
+<summary>Click to expand all 133 filter types</summary>
 
 #### ActFiltersInput
 Fields: `and`, `createdAt`, `dateF`, `dateS`, `des`, `externalId`, `forums`, `fulfillment_step`, `hashivut`, `id`, `isAssigned`, `link`, `locale`, `localizations`, `mesimabetahaliches`, `my`, `myIshur`, `naasa`, `negopendmissions`, `not`, `open_mission`, `or`, `order`, `order_line`, `partofs`, `pendm`, `project`, `publishedAt`, `shem`, `source`, `status`, `tafkidims`, `taskdis`, `timegrama`, `timers`, `updatedAt`, `userAndIshur`, `vali`, `valiIshur`
@@ -8554,7 +8722,7 @@ Fields: `and`, `createdAt`, `desc`, `head`, `id`, `not`, `or`, `publishedAt`, `s
 Fields: `and`, `costumers`, `createdAt`, `id`, `not`, `or`, `publishedAt`, `salers`, `updatedAt`
 
 #### DecisionFiltersInput
-Fields: `and`, `archEndsMembership`, `archMashabetahalich`, `archMatanot`, `archMember`, `archMesimabetahalich`, `archOpenMashaabim`, `archOpenMission`, `archScope`, `archSource`, `archWhy`, `archived`, `createdAt`, `decisionName`, `discord`, `drive`, `forums`, `fulfillmentStep`, `github`, `id`, `kind`, `matanot`, `moreHours`, `negoarch`, `negodes`, `negom`, `negopromo`, `negos`, `negostip`, `newCodeLicense`, `newCodeLicenseYears`, `newDormancyDays`, `newFlink`, `newHours`, `newLook`, `newPromoPolicy`, `newSlug`, `newWlink`, `newname`, `newprides`, `newpubdes`, `not`, `or`, `projects`, `promotion`, `publishedAt`, `receiptDeal`, `sale`, `stipFunder`, `stipRecipient`, `stipendPledge`, `stipendProgram`, `swapDeadline`, `swapFrom`, `swapGive`, `swapPlan`, `swapSilence`, `swapStatus`, `swapTake`, `swapTo`, `targetKind`, `timegrama`, `timtoM`, `twitter`, `updatedAt`, `valluesadd`, `valluesles`, `votes`, `vots`, `whatsapp`
+Fields: `and`, `archEndsMembership`, `archMashabetahalich`, `archMatanot`, `archMember`, `archMesimabetahalich`, `archOpenMashaabim`, `archOpenMission`, `archScope`, `archSource`, `archWhy`, `archived`, `createdAt`, `decisionName`, `discord`, `drive`, `forums`, `fulfillmentStep`, `github`, `id`, `kind`, `matanot`, `moreHours`, `negoarch`, `negodes`, `negom`, `negopromo`, `negos`, `negostip`, `newCodeLicense`, `newCodeLicenseYears`, `newDormancyDays`, `newFlink`, `newHours`, `newLook`, `newPromoPolicy`, `newSlug`, `newWlink`, `newname`, `newprides`, `newpubdes`, `not`, `or`, `projects`, `promotion`, `publishedAt`, `receiptDeal`, `rikma_event`, `sale`, `stipFunder`, `stipRecipient`, `stipendPledge`, `stipendProgram`, `swapDeadline`, `swapFrom`, `swapGive`, `swapPlan`, `swapSilence`, `swapStatus`, `swapTake`, `swapTo`, `targetKind`, `timegrama`, `timtoM`, `twitter`, `updatedAt`, `valluesadd`, `valluesles`, `votes`, `vots`, `whatsapp`
 
 #### DeffinitionFiltersInput
 Fields: `and`, `countries`, `createdAt`, `deffinitionName`, `free_people`, `id`, `locale`, `localizations`, `not`, `or`, `projects`, `publishedAt`, `updatedAt`
@@ -8895,16 +9063,22 @@ Fields: `and`, `createdAt`, `id`, `modes`, `name`, `not`, `or`, `publishedAt`, `
 #### ZoharFiltersInput
 Fields: `allSubmited`, `and`, `createdAt`, `done`, `id`, `mesimabetahalich`, `not`, `or`, `project`, `publishedAt`, `updatedAt`, `users_permissions_user`, `weekSt`
 
+#### RikmaEventFiltersInput
+Fields: `and`, `createdAt`, `id`, `kind`, `lifecycle`, `not`, `or`, `project`, `slug`, `status`, `title`
+
+#### EventRegistrationFiltersInput
+Fields: `and`, `createdAt`, `email`, `event`, `id`, `not`, `or`, `project`, `sessionKey`, `status`, `token`
+
 </details>
 
 ---
 
-## 📦 Entity Response Types (504)
+## 📦 Entity Response Types (512)
 
 Wrapper types for GraphQL responses.
 
 <details>
-<summary>Click to expand all 504 response types</summary>
+<summary>Click to expand all 512 response types</summary>
 
 - **ActEntity**: `attributes: Maybe<Act>`, `id: Maybe<Scalars['ID']['output']>`
 - **ActEntityResponse**: `data: Maybe<ActEntity>`
@@ -9410,14 +9584,22 @@ Wrapper types for GraphQL responses.
 - **ZoharEntityResponse**: `data: Maybe<ZoharEntity>`
 - **ZoharEntityResponseCollection**: `data: Array<ZoharEntity>`, `meta: ResponseCollectionMeta`
 - **ZoharRelationResponseCollection**: `data: Array<ZoharEntity>`
+- **RikmaEventEntity**: `attributes: Maybe<RikmaEvent>`, `id: Maybe<Scalars['ID']['output']>`
+- **RikmaEventEntityResponse**: `data: Maybe<RikmaEventEntity>`
+- **RikmaEventEntityResponseCollection**: `data: Array<RikmaEventEntity>`, `meta: ResponseCollectionMeta`
+- **RikmaEventRelationResponseCollection**: `data: Array<RikmaEventEntity>`
+- **EventRegistrationEntity**: `attributes: Maybe<EventRegistration>`, `id: Maybe<Scalars['ID']['output']>`
+- **EventRegistrationEntityResponse**: `data: Maybe<EventRegistrationEntity>`
+- **EventRegistrationEntityResponseCollection**: `data: Array<EventRegistrationEntity>`, `meta: ResponseCollectionMeta`
+- **EventRegistrationRelationResponseCollection**: `data: Array<EventRegistrationEntity>`
 </details>
 
 ---
 
-## 🔢 Enum Types (193)
+## 🔢 Enum Types (199)
 
 <details>
-<summary>Click to expand all 193 enum types</summary>
+<summary>Click to expand all 199 enum types</summary>
 
 - **Enum_Act_Hashivut**: 
 - **Enum_Act_Source**: 
@@ -9612,6 +9794,12 @@ Wrapper types for GraphQL responses.
 - **Enum_Userspermissionsuser_Onboarding_Track**: 
 - **Enum_Vote_Item_Kind**: 
 - **PublicationState**: 
+- **Enum_Componenteventssession_Room**: 
+- **Enum_Componenteventssession_State**: 
+- **Enum_Rikmaevent_Kind**: 
+- **Enum_Rikmaevent_Lifecycle**: 
+- **Enum_Rikmaevent_Status**: 
+- **Enum_Eventregistration_Status**: 
 </details>
 
 ---
@@ -9627,7 +9815,7 @@ Wrapper types for GraphQL responses.
 ```
 src/
 ├── generated/
-│   ├── graphql.ts              # Auto-generated types (codegen) - 24735 lines
+│   ├── graphql.ts              # Auto-generated types (codegen) - 25019 lines
 │   ├── index.ts                # Re-export hub
 │   └── STRAPI_SCHEMA_REFERENCE.md  # This file (AI agent reference)
 ├── lib/

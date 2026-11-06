@@ -707,7 +707,9 @@
     "chatClarify": "chat / aclarar",
     "negotiateRefine": "negociar / precisar",
     "roundWord": "Ronda",
-    "onTheTablePrefix": "La versión sobre la mesa"
+    "onTheTablePrefix": "La versión sobre la mesa",
+    "eventIntro": "Se propone publicar una página de evento en nombre de la rikma. Léela antes de aprobar:",
+    "eventPreview": "Leer la página del evento"
   },
   "endOfLine": "Estás al día",
   "missionInProgress2": {
@@ -929,7 +931,8 @@
       "saleClaimSub": "Quién tiene el dinero",
       "generic": "Una decisión espera tu firma",
       "address": "Nueva dirección para la rikma",
-      "look": "Nuevo aspecto para la página pública"
+      "look": "Nuevo aspecto para la página pública",
+      "event": "Publicar un evento de la rikma"
     },
     "sub": {
       "stipendFrom": "Financiado por {{name}}",

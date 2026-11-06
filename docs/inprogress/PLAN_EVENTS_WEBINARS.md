@@ -1,6 +1,9 @@
 # PLAN — אירועים ווובינרים לכל רקמה: דף נחיתה, מועדים, הרשמה, קישור בזמן
 
-> מצב: **tbd** — תכנון בלבד, אין קוד. נכתב 2026-11-05 אחרי קריאת הקוד:
+> מצב: **inprogress** — W1 ו-W2 בנויים (2026-11-06), ממתינים ל-deploy של 1.0b ולבדיקת עשן.
+> W3–W5 עוד לא בקוד. מה נבנה ואיפה הקוד סטה מהתכנון — §13.
+>
+> נכתב 2026-11-05 אחרי קריאת הקוד:
 > `lead` / `lead-activity` (PLAN_LEADS, L0–L6 בנויים), `demo-request` + חדר דמו
 > (`src/lib/server/demo/demoMeeting.ts`), `Pgisha.videoLink`, `guestInvite.ts`,
 > הדף הציבורי `/r/[slug]` + `RikmaSkin`, `mailer.js` / `EmailService`, ו-`cronAuth.js`.
@@ -367,3 +370,61 @@ Strapi: הרשאות לשתי הקולקציות החדשות רק לתפקיד 
 2. ספק דיוור: Zoho מוגבל ל-20 בדקה ובשליחה מסיבית מסתכן בחסימה (`mailer.js`). מעל כמה נרשמים לאירוע עוברים לספק כמו Resend או Postmark, ומי משלם?
 3. האם פרסום אירוע באמת צריך Decision, או שמספיקה הודעה לרקמה + אפשרות להציע הסרה (`archiveObject`)? ההמלצה כאן: Decision, כי הדף מדבר בשם כולם.
 4. האם להציג ברקמה המרכזית את אירועי כל הרקמות (לוח אירועים ציבורי)? זה לא חלק מהתוכנית, אבל המודל מאפשר.
+
+---
+
+## 13. מה נבנה (W1 + W2, 2026-11-06)
+
+**Deploy:** קודם 1.0b (ענף `ccr-a7feba3d-hqzjvd` מ-`shabab`): שתי קולקציות חדשות
+(`rikma-event`, `event-registration`), שלושה רכיבים (`events.session`,
+`events.agenda-item`, `events.faq-item`), `Project.rikma_events`,
+`Decision.rikma_event`, והערך `event` ב-`Decision.kind`, `lead.source` ו-`lead-activity.kind`.
+אחר כך `npm run types:update` — הטיפוסים כאן סונכרנו ביד (בלוק בסוף
+`src/generated/graphql.ts`), ואחרי הייצור מחדש לא אמור לצאת diff בצורות.
+עד ה-deploy הכול כבוי מעצמו: `eventsLive` שואל את השרת, הלשונית אומרת "עוד לא
+זמין", והדף הציבורי מחזיר 404.
+
+**הרשאות:** כל קריאה וכתיבה של אירועים והרשמות רצה על טוקן השירות, אחרי בדיקת
+חברות (layout של moach / `projectMember`) או אחרי הטוקן של הנרשם. לכן **אין צורך
+לסמן הרשאות לתפקיד Authenticated** בשתי הקולקציות. אם `ADMINMONTHER` הוא API
+token מוגבל ולא full access — לתת לו `find/findOne/create/update` על שתיהן.
+
+**משתני סביבה:** אין חדשים. `room: meetings` משתמש ב-`MEETINGS_URL` ו-`GUEST_INVITE_SECRET`
+הקיימים (כמו הדמו); בלעדיהם הדף אומר "החדר עוד לא מוכן" ומומלץ קישור חיצוני.
+
+| מה | איפה |
+|---|---|
+| מודל, ולידציה, זמנים, יומן (טהור) | `src/lib/events/` — `model.ts`, `validate.ts`, `sessions.ts`, `ics.ts` (+ `events.test.ts`) |
+| שרת: קריאה/כתיבה, חדר, מייל, פרסום | `src/lib/server/events/` — `store.ts`, `room.ts`, `mail.ts`, `publish.ts` (+ `events.server.test.ts`) |
+| qids (serviceAdmin בלבד) | `src/routes/api/send/qidsEvents.js` + `qidsAccess.js` |
+| Actions | `configs/events.ts` — `saveEvent`, `proposeEvent` (חבר רקמה); `registerForEvent`, `cancelEventRegistration`, `joinEventSession` (`access: ['serviceAdmin']`) |
+| החלה בהסכמה / בשתיקה | `voteOnDecision.ts`, `routes/api/timegrama/decision.svelte` — שניהם קוראים `applyEventDecision` |
+| כרטיס בלב | `getDecisionDetails.ts`, `decisionMaking.svelte`, `cards/hachlata.svelte`, `cardKinds.js` |
+| דף הנחיתה | `routes/(regandnon)/r/[slug]/e/[event]/` (בתוך `RikmaSkin`) |
+| הרשמה | `POST /api/v1/r/{rikma}/events/{slug}/register` |
+| הדף האישי | `routes/(regandnon)/e/[token]/` + `join/` + `calendar.ics/` |
+| במסך הרקמה | `/moach/<pid>/events` (רשימה), `/moach/<pid>/events/<id|new>` (עורך, פרסום, נרשמים); לשונית בקבוצת `opps` |
+| תרגום | namespace `events` (5 שפות, מוגבל ל-`/r/`, `/e/`, `/moach/*/events`), `lev.list.decision.event`, `lev.hachlata.event*`, `moach.layout.events` |
+
+מה הוחלט בדרך (סטייה מהתוכנית):
+- **הפרסום דרך Decision נבנה כבר ב-W2** (תוכנן ל-W3): בלי זה הרקמה המרכזית — שיש בה
+  יותר מחבר אחד — לא הייתה יכולה לפרסם. רקמה של חבר אחד מפרסמת מיד. אירוע
+  שממתין להחלטה נעול לעריכה, כדי שלא ישתנה מתחת למצביעים. ה-Decision נוצר על טוקן
+  השירות (הקישור ל-`rikma_event` לא תלוי בהרשאות התפקיד); המציע רשום כהצבעת "כן" הראשונה.
+- **`externalUrl` אינו `private` ב-Strapi**: שדה private נעלם גם מ-GraphQL, ואז אי
+  אפשר לקרוא אותו בכלל. ההגנה היא ה-qids (serviceAdmin) ו-`toEventView` בלי סודות —
+  הקישור לא מגיע לדף הציבורי, ל-SSR או לתשובת ההרשמה (נבדק ב-`events.test.ts`).
+- **נוסף שדה `outcomes`** ("מה תקבלו", שורה לכל פריט), לצד `audience`.
+- **הכתובת** היא `/r/<slug>/e/<event>`, ולרקמה בלי כתובת `/r/<id>/e/<event>` —
+  `resolveRikmaFromPath` מקבל את שתיהן.
+- **אין התראה לחברים על כל נרשם** — זה ההתראה המקובצת של W4. הנרשם מופיע בלידים
+  (`openTask: false`) ובטבלת הנרשמים של האירוע.
+- **ליד:** `createLead` רץ בשם המגיש הראשון (חבר, כפי ש-`projectMember` דורש);
+  `externalId: event-registration:<id>`; התשובות נשמרות ב-`details` כ-`q_<key>`.
+  אותו אדם שנרשם שוב (גם לאירוע אחר) לא פותח ליד חדש — `inbound` על הקיים.
+- **השתתפות:** לחיצה על "כניסה" בזמן החלון מסמנת `attended` + `joinedAt`. `noShow`
+  יסומן ב-W3 כשהמועד נגמר.
+- `sendMailSafe` קיבל `attachments` (אופציונלי) בשביל ה-`.ics`.
+- **לא נבדק בדפדפן ולא מול Strapi אמיתי.** בדיקות: 27 חדשות (vitest), `check:i18n`,
+  `check:script`, `check:proxy`, `check:translatable`, `validate:qids` עוברים; `npm run check`
+  בלי שגיאות חדשות בקבצים שנגעתי בהם; כשלי הטסטים הקיימים זהים לפני ואחרי.

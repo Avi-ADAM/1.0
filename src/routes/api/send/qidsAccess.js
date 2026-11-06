@@ -955,4 +955,22 @@ export const qidsAccess = {
   // open wish's needs and place, so never a user's own query.
   '376listOpenWishesForMatching': { allow: ['serviceAdmin'] },
   '377matanotsForWishOffer': { allow: ['serviceAdmin'] },
+  // Rikma events (PLAN_EVENTS_WEBINARS, qidsEvents.js): a session carries the
+  // join link and a registration a person's email and phone. Run only inside
+  // the event actions and loaders, after membership or the registrant's own
+  // token. Never widen these.
+  'eventsSchemaLive': { allow: ['serviceAdmin'] },
+  'eventById': { allow: ['serviceAdmin'] },
+  'eventBySlug': { allow: ['serviceAdmin'] },
+  'eventsOfProject': { allow: ['serviceAdmin'] },
+  'eventCreate': { allow: ['serviceAdmin'] },
+  'eventUpdate': { allow: ['serviceAdmin'] },
+  'eventSeats': { allow: ['serviceAdmin'] },
+  'eventRegistrationsOfEvent': { allow: ['serviceAdmin'] },
+  'eventRegistrationFind': { allow: ['serviceAdmin'] },
+  'eventRegistrationByToken': { allow: ['serviceAdmin'] },
+  'eventRegistrationCreate': { allow: ['serviceAdmin'] },
+  'eventRegistrationUpdate': { allow: ['serviceAdmin'] },
+  'eventCreateDecision': { allow: ['serviceAdmin'] },
+  'eventDecision': { allow: ['serviceAdmin'] },
 };

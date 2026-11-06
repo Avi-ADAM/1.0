@@ -9,6 +9,7 @@
   import { moveStock } from '$lib/shop/stock.js';
   import { readStockFlags, writeStock } from '$lib/server/shop/stockFlags.js';
   import { applyIdentityDecision } from '$lib/server/rikmaIdentity/identity.js';
+  import { applyEventDecision } from '$lib/server/events/publish';
   import { dealSignersFor } from '$lib/server/sheirut/dealEdit.js';
   import { clientsPendingOn } from '$lib/sheirut/dealEdit.js';
   import {
@@ -115,6 +116,13 @@
           kind: a.kind,
           error: e
         });
+      }
+    } else if (a.kind === 'event') {
+      // PLAN_EVENTS_WEBINARS — the same applier as the unanimous-vote path.
+      try {
+        await applyEventDecision((qid, vars) => strapiClient.execute(qid, vars), String(decisionId), String(projectId));
+      } catch (e) {
+        console.error('[timegrama/decision] event proposal matured but was not published:', { decisionId, error: e });
       }
     } else if (a.kind === 'vallueadd' || a.kind === 'vallueles') {
       const projRes = await SendToAdmin(

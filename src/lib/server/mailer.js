@@ -45,13 +45,16 @@ export function getTransporter() {
  * never rejects and never throws, so a caller looping over recipients cannot
  * be interrupted (or crash the process) because one address was refused.
  *
- * @param {{ to: string, subject?: string, html?: string, text?: string }} options
+ * `attachments` is passed to nodemailer as is — e.g. an event's `.ics`
+ * (`{ filename, content, contentType }`).
+ *
+ * @param {{ to: string, subject?: string, html?: string, text?: string, attachments?: Array<{ filename: string, content: string, contentType?: string }> }} options
  * @returns {Promise<{ ok: boolean, error?: unknown }>}
  */
-export async function sendMailSafe({ to, subject, html, text }) {
+export async function sendMailSafe({ to, subject, html, text, attachments }) {
   if (!to) return { ok: false, error: 'missing recipient' };
   try {
-    await getTransporter().sendMail({ from: FROM, to, subject, html, text });
+    await getTransporter().sendMail({ from: FROM, to, subject, html, text, ...(attachments?.length ? { attachments } : {}) });
     return { ok: true };
   } catch (error) {
     console.error(
