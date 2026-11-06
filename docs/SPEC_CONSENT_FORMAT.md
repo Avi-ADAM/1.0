@@ -107,11 +107,40 @@ id        = b64url(SHA-256(canonical(body ∪ {sig})))      — כלומר הא�
   לנצח (אינווריאנט 1). מאמת שדוחה high-S מפצל רקמה.
 - vector: `signatures.json › ecdsa-p256-high-s-event` (+ `lowSSig`).
 
+**Ed25519 קפדני (B3, O-1, נובמבר 2026).** ספריות Ed25519 לא מסכימות בקצוות, וחתימה
+שעוברת רק באחת מפצלת רקמה. לכן הכלל כתוב כאן ונבדק **לפני** `crypto.subtle.verify`
+(`src/lib/crypto/ed25519Strict.ts`):
+1. **המפתח A**: קידוד קנוני (y < p, בלי "‎−0"), על העקום, **בתת-החבורה מסדר ראשוני**
+   (‎[L]A = O). מפתח שלא עומד בזה לא מציין שום מכשיר (`unknown_or_revoked_device`),
+   ונדחה גם ברישום (`keys/register`, `devices/pair` → 400).
+2. **S < L**.
+3. **R ≠ קידוד נקודת האפס** (`0100…00`).
+4. המשוואה **ללא cofactor**, ו-R מושווה כבייטים (RFC 8032 §5.1.7 כפי ש-OpenSSL מממש) —
+   זה מה ש-`crypto.subtle.verify` עושה.
+
+מה WebCrypto של Node 22 (OpenSSL) עושה **בלי** הכלל — נבדק 2026-11-06 על
+`signatures.json › ed25519Edge`:
+
+| מקרה | WebCrypto לבד | הכלל |
+|---|---|---|
+| `honest` | מקבל | מקבל |
+| `s-plus-l` | דוחה | דוחה (2) |
+| `identity-key` — A = O, ‏R = O, ‏S = 0 | **מקבל, על כל הודעה** | דוחה (1) |
+| `order-2-key` | **מקבל** | דוחה (1) |
+| `non-canonical-identity-key` (y = p+1) | **מקבל** | דוחה (1) |
+| `mixed-order-key` — A + T מסדר 2 | **מקבל** (כש-k זוגי) | דוחה (1) |
+| `identity-r` — R = O, ‏S = k·a | **מקבל** | דוחה (3) |
+
+ה-vectors האלה הם שלשות גולמיות (מפתח, הודעה, חתימה) עם `expect` ו-`reason`
+(הכלל הראשון שנכשל); הן נבנות מה-seed של alice בחתימת RFC 8032 ידנית, ולכן
+דטרמיניסטיות. דפדפנים (BoringSSL, NSS, CryptoKit) לא נבדקו — ובגלל זה הכלל רץ
+לפניהם ולא סומך עליהם. מפתח ישר עומד תמיד בכלל, ולכן שום אירוע אמיתי לא נפסל.
+
 סדר האימות (והסיבה שחוזרת):
-1. `device` לא ידוע או מבוטל → `unknown_or_revoked_device`
+1. `device` לא ידוע או מבוטל, או מפתח Ed25519 חלש (כלל 1) → `unknown_or_revoked_device`
 2. `sig` לא מתפענח או לא קנוני (§1) → `bad_sig_encoding`
 3. הגוף לא קנוני (§2.2) → `non_canonical_body`
-4. החתימה לא מאומתת → `bad_signature`
+4. Ed25519: ‏S ≥ L או R = O (כללים 2–3), או החתימה לא מאומתת → `bad_signature`
 5. ה-id לא תואם → `bad_id`
 
 עוגן בלתי-תלוי: `signatures.json › rfc8032` הוא RFC 8032 §7.1 TEST 1 — מוכיח
@@ -274,7 +303,7 @@ meetings, away, settings`.
 | קובץ | מה |
 |---|---|
 | `canonical.json` | קלט JSON כטקסט → מחרוזת קנונית + hash; ו-`rejects` |
-| `signatures.json` | RFC 8032, מפתחות (עם `deviceId`), אובייקטים תקפים (כולל DeviceCert, P-256 ו-`device` כ-`deviceId`), אובייקטים פסולים + סיבה |
+| `signatures.json` | RFC 8032, `ed25519Edge` (שלשות קצה + הכרעה, §3), מפתחות (עם `deviceId`), אובייקטים תקפים (כולל DeviceCert, P-256 ו-`device` כ-`deviceId`), אובייקטים פסולים + סיבה |
 | `events.json` | שלושה תרחישים: אירועים חתומים → סדר, dedupe, heads, root אחרי כל צעד, state מנורמל, root סופי |
 | `e2e.json` | התחייבות מפתח, מעטפת sealed, עטיפת KEM עם ערכי ביניים |
 | `quorum.json` | הצבעות חתומות; לכל כלל QuorumProof (`quorum.ts`) מקרה עובר ומקרה נכשל עם ה-reason; לכל `Delta.kind` (`deltaCheck.ts`) לפני/אחרי/הצהרה → ok + `unchecked`, או reason. ה-state בקובץ הוא רק החלק ש-`checkDeltas` קורא (members, balances, `tosplits.approved`, rounds), ו-`agreers` ממוינים לפי code units |
@@ -311,7 +340,7 @@ meetings, away, settings`.
 
 | # | נושא | למה זה חשוב |
 |---|---|---|
-| O-1 | **קפדנות Ed25519** — מימושים נבדלים במקרי קצה (S לא קנוני, מפתח ציבורי מסדר קטן, R לא קנוני): RFC 8032, `verify_strict` של dalek ו-ZIP-215 לא מסכימים ביניהם, וההתנהגות של WebCrypto בכל דפדפן לא נבדקה כאן | חתימה "מוזרה" שעוברת במימוש אחד בלבד = פיצול. להחליט על כלל אחד ולהוסיף vectors של מקרי קצה |
+| ~~O-1~~ | ✔ **נסגר (נובמבר 2026)**: ארבעת הכללים ב-§3 + `signatures.json › ed25519Edge`. במקור: **קפדנות Ed25519** — מימושים נבדלים במקרי קצה (S לא קנוני, מפתח ציבורי מסדר קטן, R לא קנוני): RFC 8032, `verify_strict` של dalek ו-ZIP-215 לא מסכימים ביניהם, וההתנהגות של WebCrypto בכל דפדפן לא נבדקה כאן | חתימה "מוזרה" שעוברת במימוש אחד בלבד = פיצול. להחליט על כלל אחד ולהוסיף vectors של מקרי קצה |
 | ~~O-2~~ | ✔ **נסגר (נובמבר 2026)**: החותם מנרמל ל-low-S, המאמת מקבל את שתיהן (§3) | — |
 | O-3 | הצבעה לא יכולה להתחייב ל-root של עצמה | §7.3 |
 | ~~O-4~~ | ✔ **נסגר (נובמבר 2026)**: `quorum.json` (§10). `policy.ts` (איזו פעולה דורשת quorum) עדיין בלי vector — הוא טבלה, לא חישוב | — |

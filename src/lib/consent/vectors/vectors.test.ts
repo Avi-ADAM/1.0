@@ -30,6 +30,7 @@ import { isLowS, normalizeLowS } from '$lib/crypto/lowS';
 import type { SigAlgo } from '$lib/crypto/algorithm';
 import { verifyDeviceCert } from '$lib/crypto/deviceCert';
 import { deviceFingerprint, isDeviceFingerprint } from '$lib/crypto/deviceId';
+import { ed25519VerifyStrict } from '$lib/crypto/ed25519Strict';
 import type { ConsentEvent, DeviceCert } from '$lib/consent/event';
 import { project } from '$lib/consent/projection';
 import { computeStateRoot } from '$lib/consent/stateRoot';
@@ -150,6 +151,16 @@ describe('consent vectors — signatures.json', () => {
     expect(isDeviceFingerprint(cert.device)).toBe(true);
     const res = await verifyDeviceCert(cert, resolver, { userId: cert.userId, devicePubKey: cert.devicePubKey }, cert.notBefore);
     expect(res).toEqual({ ok: true });
+  });
+
+  it('every Ed25519 edge triple gets the verdict of SPEC §3 rules 1–4 (O-1)', async () => {
+    const edges = vectors.signatures.ed25519Edge as Obj[];
+    expect(edges.length).toBeGreaterThanOrEqual(7);
+    for (const e of edges) {
+      const res = await ed25519VerifyStrict(unhex(e.publicKeyHex), unhex(e.signatureHex), unhex(e.messageHex));
+      if (e.expect === 'accept') expect(res, e.name).toEqual({ ok: true });
+      else expect(res, e.name).toEqual({ ok: false, reason: e.reason });
+    }
   });
 
   it('every invalid object fails with its stated reason', async () => {

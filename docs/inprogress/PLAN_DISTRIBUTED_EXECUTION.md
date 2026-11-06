@@ -108,7 +108,7 @@
 | 8 | C0 | יישור Node 24 (Dockerfile, פיתוח) + גילוי יכולות PQ | S | — | ⬜ 🧑 (התקנה/deploy) |
 | 9 | B4 | מזהה מכשיר כטביעת אצבע (O-7) | L | — | ◐ קריאה ✔; פליטה ⬜ (מתג, אחרי deploy) |
 | 10 | C2 | KEM היברידי — `WrappedKey` v2 (O-9) | M | C0 | ⬜ |
-| 11 | B3 | מדיניות קצוות Ed25519 + vectors (O-1) | M | — | ⬜ |
+| 11 | B3 | מדיניות קצוות Ed25519 + vectors (O-1) | M | — | ✔ |
 | 12 | C1 | שדה `cosig` — חתימה היברידית על עוגנים (O-8) | L | C0, B4 | ⬜ |
 | 13 | B5 | מזכר החלטה: חבילת bump v3 (O-3, O-5, O-6) | S | — | ⬜ 🧑 (אישור) |
 | 14 | A4 | פיילוט: רקמה אחת על ה-Space, 30 יום / 1,000 אירועים | — | A0b, A1, A3 | ⬜ 🧑 |
@@ -640,6 +640,15 @@ ZIP-215), הרץ אותם מול `crypto.subtle.verify` של Node, תעד מה �
 vectors ב-`signatures.json` (`edge` cases) + SPEC §3/§12.
 **קבלה**: כל מקרה מתועד עם התוצאה הצפויה; freeze ללא diff בקיים.
 
+**✔ בוצע (2026-11-06)**: ניסוי מול Node 22 הראה ש-WebCrypto לבד **מקבל** מפתח מסדר קטן
+(עם R = O, ‏S = 0 — כל הודעה), מפתח בקידוד לא קנוני, מפתח מסדר מעורב ו-R = O; דוחה רק
+S ≥ L. הכלל (SPEC §3) מחמיר מההמלצה המקורית: לא רק דחייה ברישום אלא גם באימות, ו-A
+בתת-החבורה מסדר ראשוני + R ≠ O — כך שכל מימוש (dalek `verify_strict`, OpenSSL, דפדפנים)
+מגיע לאותה הכרעה. `src/lib/crypto/ed25519Strict.ts` (BigInt טהור, memo לפי מפתח);
+`verify.ts`, `keys/register`, `devices/pair`. ‏`signatures.json › ed25519Edge`: 7 שלשות
+(תוספת בלבד). טסט נפרד מתעד מה WebCrypto עושה לבד — אם עדכון Node משנה אותו, מעדכנים
+את הטבלה ב-SPEC, לא את ה-vectors.
+
 ### C1 — `cosig` (O-8)
 **צעדים**: לפי SPEC §13.3 — `cosig?: {device, alg, sig}[]`; כל cosig חותם על
 הגוף בלי `id/sig/cosig`; `sig` על הגוף כולל `cosig`; `id` כמו היום. `verifySignedObject`
@@ -703,3 +712,4 @@ projection, עם fallback ל-Strapi כשה-Space ריק או לא מסונכרן
 - 2026-11-06 · A2b P4 · השוואת settings ב-`SpaceProjectionShadow` (רק paths שנחתמו, canonical JSON) + `kind:'setting'` בטלמטריה בלי ערכים (אינדקס path + טביעת FNV-1a); `current` ב-endpoint; הדוח מציג את שם ה-path, וטסט מקבע את העותק של `AMEND_PATHS` · +9 ב-`settingsShadow.test.ts`; ‏600 בשכבה, vectors ללא diff, check ‏1218, check:proxy ירוק · לא נבדק בדפדפן · commit `dist: A2b P4` · **A2 ✔**. הבא בתור: C0 (🧑 Node 24) או B4 (מזהה מכשיר כטביעה); פתוח מ-§5: O-10
 - 2026-11-06 · B4 קריאה · `deviceId` = b64url(SHA-256(SPKI)) מתקבל בכל מאמת (שרת, לקוח, cert, reset) בלי שדה Strapi; vectors תוספת בלבד (5 אובייקטים + `deviceId` לכל מפתח), יציבים בשתי הרצות · +5 ב-`deviceId.test.ts`, +2 ב-`syncRoundtrip.test.ts` (שתי הצורות דרך ה-relay; טביעה של משתמש אחר; מבוטל), +2 ב-vectors; ‏607 בשכבה, check ‏1218, check:proxy ירוק · commit `dist: B4 read deviceId` · הבא: פליטה רק אחרי deploy + חלון; O-10 הוצג להכרעה
 - 2026-11-06 · O-10 · הוכרע (המשתמש): "לא" ב-`agreers-only` = יציאה מהקוורום, לא וטו; גם אחרי שיחה — רק מו"מ. הקוד כבר כך — תוקנה ההערה ב-`quorum.ts`, ו-`SPEC_VOTING_SYSTEM` (tbd) יושר; vectors `agreers-only-no-leaves` + `-revote-no-leaves` (תוספת בלבד) · אין שינוי אימות
+- 2026-11-06 · B3 · Ed25519 קפדני: A קנוני + בתת-החבורה מסדר ראשוני, S < L, R ≠ O, לפני `crypto.subtle.verify` — באימות וברישום. Node 22 לבד מקבל 5 מ-6 המקרים הפסולים (טבלה ב-SPEC §3) · `ed25519Edge` (7 שלשות, תוספת בלבד) · +12 ב-`ed25519Strict.test.ts`, +1 ב-vectors; ‏620 בשכבה, check ‏1218, check:proxy ירוק · O-1 ✔

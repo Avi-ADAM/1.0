@@ -22,6 +22,7 @@ import { b64urlEncode, b64urlDecode } from '$lib/crypto/b64';
 import { canonicalBytes } from '$lib/crypto/canonical';
 import { isLowS, mirrorS, normalizeLowS } from '$lib/crypto/lowS';
 import { deviceFingerprint } from '$lib/crypto/deviceId';
+import { ED25519_L, ed25519AddOrder2, ed25519BaseMul, ed25519LeToBig } from '$lib/crypto/ed25519Strict';
 import type { ConsentEvent, Delta } from '$lib/consent/event';
 import { project, topoSort, emptyState, type ProjectState } from '$lib/consent/projection';
 import { verifyQuorum, type QuorumProof, type QuorumResult, type QuorumRule } from '$lib/consent/quorum';
@@ -294,6 +295,81 @@ function nonCanonicalB64(s: string): string {
   return s.slice(0, -1) + alphabet[last | 1];
 }
 
+// ── B3 (O-1): Ed25519 edges ─────────────────────────────────────────────────
+
+/**
+ * Raw (key, message, signature) triples at the edges where Ed25519 libraries
+ * disagree, each with what SPEC §3 rules 1–4 decide. Built from alice's seed
+ * by hand-rolled RFC 8032 signing, so every case is deterministic.
+ */
+async function buildEd25519Edge(alice: EdKey): Promise<Obj[]> {
+  const sha512 = async (...parts: Uint8Array[]) =>
+    ed25519LeToBig(new Uint8Array(await crypto.subtle.digest('SHA-512', toBuf(concat(...parts))))) % ED25519_L;
+  const le32 = (n: bigint) => {
+    const out = new Uint8Array(32);
+    for (let i = 0; i < 32; i++) { out[i] = Number(n & 0xffn); n >>= 8n; }
+    return out;
+  };
+  const h = new Uint8Array(await crypto.subtle.digest('SHA-512', toBuf(unhex(alice.seedHex))));
+  const aBytes = h.slice(0, 32);
+  aBytes[0] &= 248; aBytes[31] &= 127; aBytes[31] |= 64;
+  const a = ed25519LeToBig(aBytes);
+  const prefix = h.slice(32);
+  const A = unhex(alice.publicKeyHex);
+  const kOf = (R: Uint8Array, key: Uint8Array, m: Uint8Array) => sha512(R, key, m);
+  const signOver = async (key: Uint8Array, m: Uint8Array) => {
+    const r = await sha512(prefix, m);
+    const R = ed25519BaseMul(r);
+    const S = (r + (await kOf(R, key, m)) * a) % ED25519_L;
+    return concat(R, le32(S));
+  };
+  const IDENTITY = le32(1n);
+  const P = (1n << 255n) - 19n;
+  /** First 'label/i' whose challenge k is even — a torsion of order 2 then cancels. */
+  const evenK = async (label: string, R: (m: Uint8Array) => Promise<Uint8Array> | Uint8Array, key: Uint8Array) => {
+    for (let i = 0; ; i++) {
+      const m = enc.encode(label + '/' + i);
+      if ((await kOf(await R(m), key, m)) % 2n === 0n) return m;
+    }
+  };
+
+  // 1. the honest signature — and the hand-rolled signer matches WebCrypto.
+  const mValid = enc.encode('edge/valid');
+  const sigValid = await signOver(A, mValid);
+  assertEq(hex(sigValid), hex(await crypto.subtle.sign({ name: 'Ed25519' }, alice.privateKey, toBuf(mValid))), 'hand-rolled Ed25519 = WebCrypto');
+
+  // 2. S + L: the same point equation, a second encoding of S.
+  const sigSL = concat(sigValid.slice(0, 32), le32(ed25519LeToBig(sigValid.slice(32)) + ED25519_L));
+
+  // 3–5. small-order / non-canonical keys with R = O, S = 0.
+  const zeroSig = concat(IDENTITY, le32(0n));
+  const mAny = enc.encode('edge/any message');
+  const order2 = le32(P - 1n);
+  const mOrder2 = await evenK('edge/order2', () => IDENTITY, order2);
+
+  // 6. alice's key plus an order-2 point, signed with alice's scalar.
+  const mixed = ed25519AddOrder2(A);
+  const mMixed = await evenK('edge/mixed', async (m) => ed25519BaseMul(await sha512(prefix, m)), mixed);
+  const sigMixed = await signOver(mixed, mMixed);
+
+  // 7. R = O under an honest key: S = k·a.
+  const mIdR = enc.encode('edge/identity-r');
+  const sigIdR = concat(IDENTITY, le32(((await kOf(IDENTITY, A, mIdR)) * a) % ED25519_L));
+
+  const row = (name: string, key: Uint8Array, m: Uint8Array, sig: Uint8Array, expect: 'accept' | 'reject', reason: string | null, note: string) => ({
+    name, publicKeyHex: hex(key), messageHex: hex(m), signatureHex: hex(sig), expect, ...(reason ? { reason } : {}), note
+  });
+  return [
+    row('honest', A, mValid, sigValid, 'accept', null, 'RFC 8032 signature by alice.'),
+    row('s-plus-l', A, mValid, sigSL, 'reject', 'bad_signature:non_canonical_s', 'Rule 2. S + L satisfies the same equation; S must be < L.'),
+    row('identity-key', le32(1n), mAny, zeroSig, 'reject', 'weak_key:small_order', 'Rule 1. A = O: R = O, S = 0 verifies EVERY message under a cofactorless verifier that skips the key check.'),
+    row('order-2-key', order2, mOrder2, zeroSig, 'reject', 'weak_key:small_order', 'Rule 1. A of order 2; the message is chosen so k is even and R = O, S = 0 satisfies the equation.'),
+    row('non-canonical-identity-key', le32(P + 1n), mAny, zeroSig, 'reject', 'weak_key:non_canonical', 'Rule 1. y = p + 1 ≡ 1: the identity in a second spelling.'),
+    row('mixed-order-key', mixed, mMixed, sigMixed, 'reject', 'weak_key:mixed_order', 'Rule 1. A + T (T of order 2), signed with alice\u2019s scalar; k is even so the cofactorless equation holds.'),
+    row('identity-r', A, mIdR, sigIdR, 'reject', 'bad_signature:identity_r', 'Rule 3. R = O and S = k·a under an honest key: the cofactorless equation holds; dalek verify_strict refuses it.')
+  ];
+}
+
 async function buildSignatures(
   keys: Record<string, EdKey>,
   firstEvent: Obj,
@@ -413,6 +489,8 @@ async function buildSignatures(
     about: 'Signed objects (SPEC_CONSENT_FORMAT §3). Resolve `device` against `keys`; every `valid` object must verify, every `invalid` one must fail with the given reason class. Ed25519 objects must also be reproduced byte-for-byte by re-signing their body.',
     deviceIdRule: 'device is either the SPKI (b64url) or its deviceId = b64url(SHA-256(SPKI DER)), 43 chars (SPEC §1, O-7). A 43-char canonical b64url string of 32 bytes is a deviceId; nothing else is. Resolve by either; both forms are valid forever.',
     rfc8032: RFC8032_TEST1,
+    ed25519EdgeRule: 'Rules of SPEC §3 (O-1): (1) A canonical, on the curve, in the prime-order subgroup; (2) S < L; (3) R ≠ identity; (4) cofactorless equation, R compared as bytes. Run each ed25519Edge triple through all four; `reason` is the first rule that fails.',
+    ed25519Edge: await buildEd25519Edge(keys.alice),
     keys: [
       ...(await Promise.all(Object.values(keys).map(async (k) => ({
         label: k.label,

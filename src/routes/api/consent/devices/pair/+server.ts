@@ -1,6 +1,7 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from '@sveltejs/kit';
 import { openPairing, findPairing, PAIRING_TTL_MS } from '$lib/server/consent/pairing';
+import { ed25519SpkiAcceptable } from '$lib/crypto/ed25519Strict';
 
 // T7 pairing — step 1 of the QR/code flow (PLAN_user_sovereign_consent
 // §Multi-device; a typable code instead of a camera for v1).
@@ -24,6 +25,11 @@ export const POST: RequestHandler = async ({ request, cookies, locals }) => {
       typeof pubSpkiB64 !== 'string' ||
       typeof label !== 'string') {
     throw error(400, 'bad shape');
+  }
+  // B3 (O-1): no small-order / mixed-order / non-canonical Ed25519 key enters
+  // the registry — with such a key one signature verifies every message.
+  if (algo === 'Ed25519' && !ed25519SpkiAcceptable(pubSpkiB64)) {
+    throw error(400, 'weak Ed25519 key');
   }
 
   const session = openPairing({

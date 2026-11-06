@@ -13,6 +13,71 @@
     "messageHex": "",
     "signatureHex": "e5564300c360ac729086e2cc806e828a84877f1eb8e5d974d873e065224901555fb8821590a33bacc61e39701cf9b46bd25bf5f0595bbe24655141438e7a100b"
   },
+  "ed25519EdgeRule": "Rules of SPEC §3 (O-1): (1) A canonical, on the curve, in the prime-order subgroup; (2) S < L; (3) R ≠ identity; (4) cofactorless equation, R compared as bytes. Run each ed25519Edge triple through all four; `reason` is the first rule that fails.",
+  "ed25519Edge": [
+    {
+      "name": "honest",
+      "publicKeyHex": "c36685c93e577cbb0f0d5c5fa0440e092560975fd84b96a888af141888754536",
+      "messageHex": "656467652f76616c6964",
+      "signatureHex": "1174bb5d09d2a761da34b26a2482846806837f0e290d3819d829e720379a23e76d12bc8ba72d0323bcf302d8e2a026d3b93dd9d47e91fb8201c05cff7fc4660c",
+      "expect": "accept",
+      "note": "RFC 8032 signature by alice."
+    },
+    {
+      "name": "s-plus-l",
+      "publicKeyHex": "c36685c93e577cbb0f0d5c5fa0440e092560975fd84b96a888af141888754536",
+      "messageHex": "656467652f76616c6964",
+      "signatureHex": "1174bb5d09d2a761da34b26a2482846806837f0e290d3819d829e720379a23e75ae6b1e8c190157b9290fa7ac19a05e8b93dd9d47e91fb8201c05cff7fc4661c",
+      "expect": "reject",
+      "reason": "bad_signature:non_canonical_s",
+      "note": "Rule 2. S + L satisfies the same equation; S must be < L."
+    },
+    {
+      "name": "identity-key",
+      "publicKeyHex": "0100000000000000000000000000000000000000000000000000000000000000",
+      "messageHex": "656467652f616e79206d657373616765",
+      "signatureHex": "01000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+      "expect": "reject",
+      "reason": "weak_key:small_order",
+      "note": "Rule 1. A = O: R = O, S = 0 verifies EVERY message under a cofactorless verifier that skips the key check."
+    },
+    {
+      "name": "order-2-key",
+      "publicKeyHex": "ecffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7f",
+      "messageHex": "656467652f6f72646572322f32",
+      "signatureHex": "01000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+      "expect": "reject",
+      "reason": "weak_key:small_order",
+      "note": "Rule 1. A of order 2; the message is chosen so k is even and R = O, S = 0 satisfies the equation."
+    },
+    {
+      "name": "non-canonical-identity-key",
+      "publicKeyHex": "eeffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7f",
+      "messageHex": "656467652f616e79206d657373616765",
+      "signatureHex": "01000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+      "expect": "reject",
+      "reason": "weak_key:non_canonical",
+      "note": "Rule 1. y = p + 1 ≡ 1: the identity in a second spelling."
+    },
+    {
+      "name": "mixed-order-key",
+      "publicKeyHex": "2a997a36c1a88344f0f2a3a05fbbf1f6da9f68a027b469577750ebe7778abac9",
+      "messageHex": "656467652f6d697865642f31",
+      "signatureHex": "3d6dcf5ea333dfef03f3901ec7edff8be013d4439184d1ca6c0c930325e93afaf9d7cba56aa3ca2c5f2f12cfdba184608be9123ebab9a8ba4e62a90556fe8005",
+      "expect": "reject",
+      "reason": "weak_key:mixed_order",
+      "note": "Rule 1. A + T (T of order 2), signed with alice’s scalar; k is even so the cofactorless equation holds."
+    },
+    {
+      "name": "identity-r",
+      "publicKeyHex": "c36685c93e577cbb0f0d5c5fa0440e092560975fd84b96a888af141888754536",
+      "messageHex": "656467652f6964656e746974792d72",
+      "signatureHex": "010000000000000000000000000000000000000000000000000000000000000078a5e23209cd9233e47c1f705159761f172f11d898637f003bd561afb9fcc807",
+      "expect": "reject",
+      "reason": "bad_signature:identity_r",
+      "note": "Rule 3. R = O and S = k·a under an honest key: the cofactorless equation holds; dalek verify_strict refuses it."
+    }
+  ],
   "keys": [
     {
       "label": "alice",

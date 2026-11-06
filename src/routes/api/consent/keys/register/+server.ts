@@ -9,6 +9,7 @@ import {
   closeRecoverySessionsFor
 } from '$lib/server/consent/recovery';
 import { notifyRecovery } from '$lib/server/consent/recoveryNotify';
+import { ed25519SpkiAcceptable } from '$lib/crypto/ed25519Strict';
 import { deviceFingerprint, type RecoveryCheck } from '$lib/consent/recovery';
 
 // POST /api/consent/keys/register
@@ -45,6 +46,11 @@ export const POST: RequestHandler = async ({ request, cookies, locals }) => {
       typeof pubSpkiB64 !== 'string' ||
       typeof label !== 'string') {
     throw error(400, 'bad shape');
+  }
+  // B3 (O-1): no small-order / mixed-order / non-canonical Ed25519 key enters
+  // the registry — with such a key one signature verifies every message.
+  if (algo === 'Ed25519' && !ed25519SpkiAcceptable(pubSpkiB64)) {
+    throw error(400, 'weak Ed25519 key');
   }
   const viaRecovery = recovery === true;
   if (viaRecovery && (typeof kemPubSpkiB64 !== 'string' || !kemPubSpkiB64)) {
