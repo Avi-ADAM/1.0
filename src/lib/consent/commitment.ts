@@ -17,8 +17,9 @@
 //                 local DAGs keep flowing.
 //   'strict'    — everything unverifiable is a rejection. Phase 3 enforcement.
 
-import type { ConsentEvent } from './event';
-import { project } from './projection';
+import { dedupeKey, type ConsentEvent } from './event';
+import { project, applyEvent, emptyState, type ProjectState } from './projection';
+import { compareIds } from './ids';
 import { computeStateRoot } from './stateRoot';
 import { checkDeltas } from './deltaCheck';
 import { verifyQuorum, type QuorumContext } from './quorum';
@@ -37,7 +38,131 @@ export type CommitmentOptions = {
   projectId?: string | null;
   /** Per-member weights in agorot for weighted-* quorum rules (D-13). */
   memberWeights?: Map<string, bigint>;
+  /**
+   * B6 — replayed states, reused across calls. Default: a cache for this call
+   * only. Pass `defaultCommitmentCache` to share across calls — ONLY after the
+   * event's signature and id were verified: the cache is keyed by ids and is
+   * exact because an id is the hash of its content. `null` replays everything
+   * from scratch (the reference the cache is tested against).
+   */
+  cache?: CommitmentCache | null;
 };
+
+// ── B6: incremental replay ──────────────────────────────────────────────────
+//
+// Verifying a commitment replays the event's ancestor closure. Done from
+// scratch for every event of a sync, that is O(n²) reducer calls. But the
+// state of a closure is a pure function of (projectId, its heads): ids are
+// content hashes, so the closure behind a set of heads can never change, and
+// a cached state can never go stale.
+//
+// An event's state is its parents' state plus one applyEvent — the event
+// descends from every other event in its closure, so topoSort places it last
+// without reordering the rest — EXCEPT when an ancestor shares its dedupe key:
+// then dedupe may drop one of the two, and only a full replay is exact. That
+// case (and a parent state not in the cache) falls back to `project`.
+// Same semantics, same roots; vectors and the property test hold it to that.
+
+export type CommitmentCache = {
+  get(key: string): ProjectState | undefined;
+  set(key: string, state: ProjectState): void;
+  /** Reducer calls spent on incremental steps / full replays (telemetry, tests). */
+  stats: { hits: number; incremental: number; full: number };
+};
+
+export function createCommitmentCache(limit = 256): CommitmentCache {
+  const states = new Map<string, ProjectState>();
+  return {
+    stats: { hits: 0, incremental: 0, full: 0 },
+    get(key) {
+      const s = states.get(key);
+      if (s !== undefined) {
+        // refresh LRU position
+        states.delete(key);
+        states.set(key, s);
+      }
+      return s;
+    },
+    set(key, state) {
+      states.delete(key);
+      states.set(key, state);
+      while (states.size > limit) states.delete(states.keys().next().value as string);
+    }
+  };
+}
+
+export const defaultCommitmentCache: CommitmentCache = createCommitmentCache();
+
+function headsKey(projectId: string | null, heads: string[]): string {
+  return `${projectId ?? ''}|${[...new Set(heads)].sort(compareIds).join(',')}`;
+}
+
+// Ancestor closure of `heads` inside an already-resolved pool (no lookups).
+function closureIn(heads: string[], pool: Map<string, ConsentEvent>): ConsentEvent[] {
+  const out: ConsentEvent[] = [];
+  const seen = new Set<string>();
+  const stack = [...heads];
+  while (stack.length) {
+    const id = stack.pop()!;
+    if (seen.has(id)) continue;
+    seen.add(id);
+    const ev = pool.get(id);
+    if (!ev) continue;
+    out.push(ev);
+    for (const p of ev.parents) if (!seen.has(p)) stack.push(p);
+  }
+  return out;
+}
+
+/**
+ * project(closure(heads)) — through the cache. `pool` must hold the whole
+ * closure of `heads` (verifyCommitments resolves it before calling).
+ */
+function stateAt(
+  heads: string[],
+  pool: Map<string, ConsentEvent>,
+  projectId: string | null,
+  cache: CommitmentCache | null
+): ProjectState {
+  if (!cache) return project(closureIn(heads, pool), projectId);
+  const key = headsKey(projectId, heads);
+  const hit = cache.get(key);
+  if (hit) {
+    cache.stats.hits++;
+    return hit;
+  }
+
+  let state: ProjectState | undefined;
+  if (heads.length === 1) {
+    const h = pool.get(heads[0]);
+    if (h) {
+      const base =
+        h.parents.length === 0 ? emptyState(projectId) : cache.get(headsKey(projectId, h.parents));
+      if (base) {
+        const k = dedupeKey(h);
+        // Conservative: the pool may hold more than h's ancestors — a key
+        // shared with any of them only costs a full replay, never a wrong root.
+        let collides = false;
+        for (const e of pool.values()) {
+          if (e.id !== h.id && dedupeKey(e) === k) {
+            collides = true;
+            break;
+          }
+        }
+        if (!collides) {
+          state = applyEvent(base, h);
+          cache.stats.incremental++;
+        }
+      }
+    }
+  }
+  if (!state) {
+    state = project(closureIn(heads, pool), projectId);
+    cache.stats.full++;
+  }
+  cache.set(key, state);
+  return state;
+}
 
 export type CommitmentResult =
   | { ok: true; checked: string[]; warnings: string[]; reason?: undefined }
@@ -125,8 +250,11 @@ export async function verifyCommitments(
     return { ok: true, checked, warnings };
   }
 
-  const ancestors = [...closure.values()];
   const projectId = opts.projectId ?? null;
+  const cache = opts.cache === undefined ? createCommitmentCache(16) : opts.cache;
+  // closure + the event itself: everything any replay below needs.
+  const pool = new Map(closure);
+  pool.set(ev.id, ev);
 
   // ── parentStateRoots: one root per parent, each over that parent's own
   //    ancestor closure (plan §2 — "אם 1 הורה — אחד; אם merge — N") ─────────
@@ -135,10 +263,8 @@ export async function verifyCommitments(
       return { ok: false, reason: 'parent_roots_arity' };
     }
     for (let i = 0; i < ev.parents.length; i++) {
-      const subMissing: string[] = [];
-      const sub = await ancestorClosure([ev.parents[i]], opts.getEvent, subMissing);
-      // closure already resolved every ancestor; a sub-closure can't miss.
-      const root = await computeStateRoot(project([...sub.values()], projectId));
+      // closure already resolved every ancestor; a parent's sub-closure is in the pool.
+      const root = await computeStateRoot(stateAt([ev.parents[i]], pool, projectId, cache));
       if (root !== ev.parentStateRoots[i]) {
         return { ok: false, reason: `parent_root_mismatch:${ev.parents[i]}` };
       }
@@ -146,8 +272,8 @@ export async function verifyCommitments(
     checked.push('parentStateRoots');
   }
 
-  const before = project(ancestors, projectId);
-  const after = project([...ancestors, ev], projectId);
+  const before = stateAt(ev.parents, pool, projectId, cache);
+  const after = stateAt([ev.id], pool, projectId, cache);
 
   // ── stateRoot: the state after applying this event ───────────────────────
   if (ev.stateRoot !== undefined) {
@@ -187,8 +313,7 @@ export async function verifyCommitments(
         // The attested coverage point must be an ancestor of the snapshot event.
         return { ok: false, reason: `snapshot_upTo_not_ancestor:${p.upTo}` };
       }
-      const covered = await ancestorClosure([p.upTo], opts.getEvent, []);
-      const attestedRoot = await computeStateRoot(project([...covered.values()], projectId));
+      const attestedRoot = await computeStateRoot(stateAt([p.upTo], pool, projectId, cache));
       if (attestedRoot !== p.stateRoot) {
         return { ok: false, reason: 'snapshot_root_mismatch' };
       }

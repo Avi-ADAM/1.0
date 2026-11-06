@@ -1,7 +1,7 @@
 import { verifySignedObject, type PubKeyResolver } from '$lib/crypto/verify';
 import { idbAdd, idbGet } from '$lib/crypto/keystore';
 import { isConsentEventShape, type ConsentEvent } from './event';
-import { hasCommitments, verifyCommitments, type CommitmentOptions } from './commitment';
+import { hasCommitments, verifyCommitments, defaultCommitmentCache, type CommitmentOptions } from './commitment';
 
 export type IngestResult =
   | { ok: true; deduped: false; event: ConsentEvent; warnings?: string[] }
@@ -36,7 +36,10 @@ export async function ingestEvent(
       getEvent: opts.getEvent ?? ((id) => idbGet<ConsentEvent>('events', id)),
       mode: opts.mode,
       projectId: opts.projectId,
-      memberWeights: opts.memberWeights
+      memberWeights: opts.memberWeights,
+      // The signature (and so the id) was verified above: the shared state
+      // cache is exact from here on (B6).
+      cache: opts.cache === undefined ? defaultCommitmentCache : opts.cache
     });
     if (!c.ok) return { ok: false, reason: `commitment:${c.reason}` };
     if (c.warnings.length > 0) warnings = c.warnings;

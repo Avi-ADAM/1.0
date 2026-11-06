@@ -12,6 +12,7 @@
 // "shadow-skip this invocation" (missing id, malformed result…).
 
 import type { ConsentSpec } from '$lib/server/actions/types';
+import { addVoteConsentSpec } from './addVote';
 
 export type ShadowSignJob = { spec: ConsentSpec; params: Record<string, unknown> };
 
@@ -368,6 +369,51 @@ export const s2bShadowJobs: Record<string, ShadowJobDeriver> = {
         op: 'start',
         order,
         fresh
+      }
+    }];
+  },
+
+  // ── votes (A2 batch 4) ──────────────────────────────────────────────────
+  // These actions vote without going through addVote, so their votes were
+  // never signed. They reuse addVoteConsentSpec on purpose: the event is then
+  // byte-for-byte the shape an addVote vote on the same subject has (subject
+  // type 'pend' / 'decision'), so the tally and the dedupe key are shared,
+  // and a vote signed twice folds into one. Not here: voteOnAskm / voteOnMaap
+  // / voteOnPmash (resource asks and proposals — no reducer reads them yet),
+  // approveSheirutpend (a direct update, not a vote, and has no caller).
+
+  voteOnPendm: (params, result) => {
+    const id = str(params.pendId);
+    if (!id || typeof params.what !== 'boolean') return [];
+    return [{
+      spec: addVoteConsentSpec,
+      params: {
+        projectId: params.projectId,
+        type: 'pend',
+        id,
+        what: params.what,
+        why: params.why || undefined,
+        // The round is the server's (voteOnPendm never trusts the client's).
+        order: typeof result.order === 'number' ? result.order : 0
+      }
+    }];
+  },
+
+  voteOnDecision: (params, result) => {
+    const id = str(params.decisionId);
+    // saleClaim is signed at its call site (decisionMaking.svelte) with the
+    // standing order it knows — skipping it here keeps one signer per vote.
+    if (!id || params.kind === 'saleClaim') return [];
+    return [{
+      spec: addVoteConsentSpec,
+      params: {
+        projectId: params.projectId,
+        type: 'decision',
+        id,
+        what: true, // voteOnDecision only says yes; disagreement is a counter
+        // Round-based kinds (archive/edit, stipend, promotion) return the
+        // round they signed; the generic path votes on round 0.
+        order: typeof result.order === 'number' ? result.order : 0
       }
     }];
   },

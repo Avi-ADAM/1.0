@@ -2,7 +2,7 @@ import { webcrypto } from 'node:crypto';
 import { algoParams } from '$lib/crypto/algorithm';
 import { verifySignedObject, type PubKeyResolver } from '$lib/crypto/verify';
 import type { ConsentEvent } from '$lib/consent/event';
-import { hasCommitments, verifyCommitments } from '$lib/consent/commitment';
+import { hasCommitments, verifyCommitments, defaultCommitmentCache } from '$lib/consent/commitment';
 import { consentStore, type StoredPubKey } from './store';
 import { b64urlDecode } from '$lib/crypto/b64';
 import { setSignerAcceptable } from '$lib/consent/recovery';
@@ -53,7 +53,9 @@ export async function verifyConsentEvent(ev: ConsentEvent) {
   // delta / quorum is rejected; unverifiable claims pass with warnings.
   if (hasCommitments(ev)) {
     const c = await verifyCommitments(ev, {
-      getEvent: (id) => consentStore.getEvent(id)
+      getEvent: (id) => consentStore.getEvent(id),
+      // Signature + id verified above: the shared state cache is exact (B6).
+      cache: defaultCommitmentCache
     });
     if (!c.ok) return { ok: false as const, reason: `commitment:${c.reason}` };
   }

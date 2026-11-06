@@ -103,8 +103,8 @@
 | 3 | B2 | ECDSA low-S בצד החותם (O-2) | S | — | ✔ |
 | 4 | A1 | דגל Space לפי רקמה (allowlist בשרת) | M | — | ✔ |
 | 5 | A3 | טלמטריית אי-התאמות לשרת | M | A1 | ✔ |
-| 6 | A2 | הרחבת חתימות ה-shadow — באצוות | L | — | ◐ אצווה 1 (חלוקה), 2 (טיימרים), 3 (אישור משימה); פגישות ⏸; נשארו: הצבעות (בדיקת כפילות מול `addVote`), `project.amend` |
-| 7 | B6 | אימות התחייבויות אינקרמנטלי (O(n²) → O(n)) | M–L | — | ⬜ |
+| 6 | A2 | הרחבת חתימות ה-shadow — באצוות | L | — | ◐ אצוות 1–4 (חלוקה, טיימרים, אישור משימה, הצבעות); פגישות ⏸; **`project.amend` ממתין להחלטה (§5)** |
+| 7 | B6 | אימות התחייבויות אינקרמנטלי (O(n²) → O(n)) | M–L | — | ✔ |
 | 8 | C0 | יישור Node 24 (Dockerfile, פיתוח) + גילוי יכולות PQ | S | — | ⬜ 🧑 (התקנה/deploy) |
 | 9 | B4 | מזהה מכשיר כטביעת אצבע (O-7) | L | — | ⬜ |
 | 10 | C2 | KEM היברידי — `WrappedKey` v2 (O-9) | M | C0 | ⬜ |
@@ -276,10 +276,10 @@ override של מפתחים; אחרת — הפרויקט ברשימה. עדכן �
 | `haluka.approve` / `haluka.confirm` | `approveHaluka` / `confirmHaluka` — ✔ אצווה 1, **סטטוס בלבד** (בלי `hervachDeltas` — ראו "ממצא היתרות"; confirm רק ב-`kind:'receive'`) |
 | `pgisha.create` / `pgisha.approve` | `createNewMeeting` / `approveMeeting` — **⏸ הוצא מהתור (2026-10-30)**: הפגישות עוברות לאתר נפרד (magik-meetings), שם הן MVP לתקשורת גם בלי שרת ועם אורחים. לאורח אין מפתח, ומי שחותם בשבילו הוא שאלת תכנון, לא אצווה. בנוסף, סשן אחר מעביר עכשיו את כל ה-UI של הפגישות. לחזור לזה רק אחרי שההעברה תסתיים, ובתכנון משותף עם magik-meetings |
 | `time.tick` | `timerStart` / `timerStop` — ✔ אצווה 2 (ראו "טיימרים" למטה) |
-| `pendm.vote` / `decision.vote` / `ask.vote` / `sheirutpend.vote` | `voteOnPendm` / `voteOnDecision` / `voteOnAskm` / `approveSheirutpend` — **בדוק קודם** אם `addVote` כבר מכסה את אותו מסלול; אל תחתום פעמיים |
+| `pendm.vote` / `decision.vote` / `ask.vote` / `sheirutpend.vote` | ✔ אצווה 4: `voteOnPendm` → `pendm.vote`, `voteOnDecision` → `decision.vote` (חוץ מ-`saleClaim`, שנחתם כבר ב-`decisionMaking`). **לא**: `voteOnAskm`/`voteOnMaap`/`voteOnPmash` (בקשות ומשאבים, אין reducer), `approveSheirutpend` (עדכון ישיר ולא הצבעה, ואין לו קוראים) |
 | `project.join` | `finalizeJoinAcceptance` — **לא מתאים כמו שהוא**: ה-reducer מוסיף את `ev.actor`, אבל ה-action מורץ ע"י החבר המאשר ולא ע"י המצטרף. צריך `predicate.member` ב-reducer (שינוי פורמט + vector) או חתימה בצד המצטרף |
 | `mission.approve` | `closeFiniapruval` — ✔ אצווה 3, **בלי `amount`** (ראו "אישור משימה" למטה) |
-| `project.amend` | `updateProjectDetails` (רק השדות שה-reducer מבין: `path`/`value`) |
+| `project.amend` | `updateProjectDetails` — **⏸ ממתין להחלטה** (ראו "הצבעות — אצווה 4" למטה) |
 
 לכל action: spec ב-`s2b.ts` + רישום + טסט שמוודא שה-predicate בדיוק בצורה
 שה-reducer קורא (הרץ את האירוע דרך `project()` ובדוק את ה-state).
@@ -402,6 +402,23 @@ override של מפתחים; אחרת — הפרויקט ברשימה. עדכן �
   לא נחתם; שעות שמוחזקות ללקוחה (`heldForCustomer`) חותמות את ההצבעה בלבד.
 - **לא נבדק בדפדפן**: דורש הצבעה אמיתית ברקמה שב-`SPACE_SYNC_PROJECTS`.
 
+#### הצבעות — אצווה 4 (2026-11-06)
+
+- **אותה צורה כמו `addVote`**: `voteOnPendm` ו-`voteOnDecision` נחתמים דרך
+  `addVoteConsentSpec` עצמו (subject `pend:<id>` / `decision:<id>`). כך הספירה
+  ומפתח ה-dedupe משותפים, והצבעה שנחתמת פעמיים מתקפלת לאחת.
+- **הסבב מהשרת**: `voteOnPendm` מחזיר עכשיו `order` (ה-`orderon` שהוא מחשב ולא מקבל
+  מהלקוח). `voteOnDecision` כבר החזיר `order` בסוגים שיש בהם סבבים (ארכוב/עריכה,
+  מלגה, מבצע), ובשאר הסוגים זה 0.
+- **`saleClaim` נשאר בנקודת הקריאה** (`decisionMaking.svelte`, עם `standingOrder`),
+  ולכן הוא מדולג ב-registry.
+- **`project.amend` — ⏸ שאלה למשתמש**: `updateProjectDetails` משנה ישירות רק ברקמה
+  של חבר אחד. ברקמה עם יותר חברים הוא פותח `Decision` לכל שדה, והשינוי נכנס רק
+  כשההחלטה מבשילה: בהצבעה האחרונה, או בשתיקה בצד השרת. בנוסף, אוצר המילים של
+  `path` לא הוגדר אף פעם: ה-vectors משתמשים ב-`restime` במילישניות, ו-Strapi שומר
+  קוד (`'feh'`). צריך להחליט (א) מי חותם על השינוי ומתי, ו-(ב) רשימת paths וסוגי ערכים,
+  ואז זה שינוי פורמט עם vector.
+
 ### B6 — אימות התחייבויות אינקרמנטלי
 **למה**: `verifyCommitments` משחזר את כל סגור האבות לכל אירוע ⇒ O(n²) בסנכרון
 (HANDOFF §8.3). היום לא מורגש (רק snapshots נושאים התחייבויות); ב-strict של S3b כן.
@@ -410,6 +427,24 @@ override של מפתחים; אחרת — הפרויקט ברשימה. עדכן �
 (T10). **הסמנטיקה לא משתנה** — אותו root בדיוק.
 **קבלה**: טסט property (fast-check): תוצאות זהות עם ובלי cache על DAGs אקראיים;
 benchmark: 500 אירועים עם התחייבויות — מספר קריאות ל-`applyEvent` לינארי; freeze ללא diff.
+
+#### B6 — מה נבנה (2026-11-06)
+
+- **הרעיון**: state של סגור-אבות הוא פונקציה טהורה של (projectId, ה-heads), כי id הוא
+  hash של התוכן. לכן cache לפי heads אף פעם לא מתיישן. ה-state של אירוע = ה-state
+  של ההורים + `applyEvent` אחד, כי האירוע הוא צאצא של כל השאר, ו-topoSort שם אותו
+  אחרון בלי לשנות את סדר האחרים.
+- **החריג**: אב עם אותו מפתח dedupe. אז ה-dedupe יכול להפיל אחד מהשניים, ורק replay
+  מלא מדויק. גם state של הורה שלא נמצא ב-cache נופל ל-`project` מלא. הבדיקה
+  שמרנית: היא סורקת את כל ה-pool, כך שהתנגשות עם ענף אחר עולה רק בביצועים.
+- **איפה**: `stateAt` ו-`createCommitmentCache` (LRU, ברירת מחדל 256) ב-`commitment.ts`.
+  בברירת מחדל ה-cache חי לקריאה אחת בלבד. `ingestEvent` ו-`verifyConsentEvent` (שרת)
+  מעבירים את `defaultCommitmentCache` המשותף, **רק אחרי שהחתימה וה-id אומתו**: ה-cache
+  ממופתח לפי ids, וטסטים עם ids מזויפים שחוזרים על עצמם היו מרעילים cache גלובלי.
+- **קבלה**: property (fast-check, 40 DAGs אקראיים עם merges, התנגשויות dedupe ו-roots
+  שקריים): אותן תוצאות עם ובלי cache, בסדר רגיל ובסדר הפוך, ועם cache קטן שמפנה.
+  שרשרת של 500 אירועים: ‏≤2 replays מלאים ו-499 צעדים אינקרמנטליים (מאפס זה ~N²/2).
+  ה-vectors ללא diff.
 
 ### C0 — Node 24 + גילוי יכולות PQ 🧑
 **למה**: ML-DSA/ML-KEM ב-WebCrypto קיימים מ-Node 24.7. Vercel כבר על 24
@@ -484,6 +519,8 @@ projection, עם fallback ל-Strapi כשה-Space ריק או לא מסונכרן
 | C0 | התקנת Node 24 מקומית; deploy VPS עם `node:24-alpine` | C1, C2 (vectors PQ) |
 | B5 | אישור חבילת v3 | מימוש O-3/O-5/O-6 |
 | A4 | בחירת רקמת פיילוט + env בפרודקשן | A5 |
+| `project.amend` (A2) | מי חותם על שינוי הגדרות רקמה ומתי (חבר אחד: מיד; כמה חברים: כשה-Decision מבשיל), ואוצר ה-paths והערכים (למשל `restime` כקוד או במילישניות) | סיום A2 |
+| O-10 | `agreers-only`: האם הצבעת "לא" מפילה אותו (ההערה אומרת כן, הקוד לא) | vector חסר, Ratson §3.0 |
 | שער S3 | ההחלטה המוצרית (PLAN_serverless_p2p_data §1, תנאים א–ד) | S3, E1 |
 
 ---
@@ -505,3 +542,5 @@ projection, עם fallback ל-Strapi כשה-Space ריק או לא מסונכרן
 - 2026-11-06 · A2 אצווה 3 · `closeFiniapruval` → `mission.approve.vote` (כל הצבעה, על `finiapruval:<id>`, `order` = הסבב) + `mission.approve` (רק ה-yes שסוגר אישור סיום; payee, בלי `amount`). ה-action מחזיר `round`/`missionStageId`/`payee`; החיבור ב-`fiappru.svelte` (fetch ישיר). פערי כיסוי: סגירה בשתיקה, counter, שעות שמוחזקות ללקוחה · +5 ב-`s2b.test.ts` · לא נבדק בדפדפן · הבא ב-A2: הצבעות (`voteOnPendm`/… מול `addVote`), `project.amend`
 - 2026-11-06 · B2 · `$lib/crypto/lowS` (‏`normalizeLowS`/`mirrorS`, BigInt על P1363); `signCanonical` מנרמל ECDSA-P256 לפני חישוב ה-id, המאמת לא השתנה. vector `ecdsa-p256-high-s-event` + `lowSSig`, נגזר מהחתימה הקפואה ולכן דטרמיניסטי. SPEC §3 + §12 (O-2 ✔) · +4 ב-`lowS.test.ts` (כולל 50 חתימות שכולן low-S), diff ב-`signatures.json` = 23 שורות תוספת בלבד, יציב בשתי הרצות
 - 2026-11-06 · B1 · `spec/consent-v1/quorum.json`: 5 הצבעות חתומות, 22 מקרי quorum (לכל 7 הכללים עובר + נכשל, ועוד evidence חסר, מצביע לא זכאי, אירוע הקשר שמדולג, הצבעה חוזרת), 23 מקרי deltaCheck (כל 8 ה-kinds, completeness, `unchecked`). ה-state בקובץ = רק מה ש-`checkDeltas` קורא (`deltaStateFromJson`). **ממצא O-10**: `agreers-only` מקבל "לא" בניגוד להערה שלו; ה-vectors עוקפים את המקרה עד החלטה. SPEC §10 + §12 (O-4 ✔) · 549 בשכבה (היו 535), 19 vectors (היו 14), check: ‏1218 שגיאות (ביומן 1311; אין חדשות בקבצים שנגעתי) · commit `dist: A2.3 B1 B2` · הבא: B6 (מסלול B), או A2 (הצבעות)
+- 2026-11-06 · A2 אצווה 4 · `voteOnPendm` → `pendm.vote` (הסבב מהשרת, `order` חדש בתוצאה), `voteOnDecision` → `decision.vote` (כל הסוגים חוץ מ-`saleClaim`, שכבר נחתם בנקודת הקריאה), דרך `addVoteConsentSpec` עצמו, ולכן אותה צורה ואותו dedupe. `project.amend` הוחזר כשאלה (§5): השינוי מבשיל בצד השרת, ואוצר ה-paths לא מוגדר · +4 ב-`s2b.test.ts` · לא נבדק בדפדפן
+- 2026-11-06 · B6 · cache של `ProjectState` לפי heads ב-`commitment.ts` (`stateAt`, LRU); `applyEvent` אחד על ה-state של ההורים, ו-replay מלא רק כשיש התנגשות dedupe עם אב או כשאין state ב-cache. משותף רק ב-`ingestEvent` ובאימות בצד השרת, אחרי אימות החתימה · `commitmentCache.pbt.test.ts`: property על 40 DAGs + שרשרת 500 (≤2 replays מלאים), ‏555 בשכבה, 19 vectors ללא diff, check ‏1218 (ללא שינוי) · commit `dist: A2.4 B6` · הבא: C0 (🧑 Node 24) או B4 (מזהה מכשיר כטביעה), ו-A2 אחרי החלטת `project.amend`

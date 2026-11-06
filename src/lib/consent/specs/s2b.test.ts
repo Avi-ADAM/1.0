@@ -351,3 +351,48 @@ describe('closeFiniapruval shadow jobs (A2 batch 3)', () => {
     expect([...tally!.votes.keys()].sort()).toEqual(['258', '261']);
   });
 });
+
+describe('vote shadow jobs (A2 batch 4)', () => {
+  it('voteOnPendm signs pendm.vote in the exact addVote shape, on the server round', () => {
+    const [ev] = derive(s2bShadowJobs.voteOnPendm(
+      { pendId: '900', projectId: '45', what: false, why: 'too many hours' },
+      { id: '900', consensus: false, order: 2 }
+    ));
+    expect(ev?.action).toBe('pendm.vote');
+    expect(ev?.subject).toEqual({ type: 'pend', id: '900' });
+    expect(ev?.predicate).toEqual({ what: false, why: 'too many hours', order: 2 });
+    expect(s2bShadowJobs.voteOnPendm({ pendId: '900' }, {})).toEqual([]);
+  });
+
+  it('a unanimous pendm.vote yes moves the pend mission to inProgress', () => {
+    const create = derive(s2bShadowJobs.createMission(
+      { projectId: '45', missionName: 'build' },
+      { missionId: '77', createdEntityId: '900', createdEntityType: 'pendm' }
+    ))[0];
+    const yes = () => derive(s2bShadowJobs.voteOnPendm({ pendId: '900', projectId: '45', what: true }, { order: 0 }))[0];
+    const state = project([
+      asEvent(create, '256', 1),
+      asEvent(yes(), '256', 2),
+      asEvent(yes(), '258', 3)
+    ], '45');
+    // members are empty in this chain, so every vote seen being yes is unanimity
+    expect(state.missions.get('77')?.state).toBe('inProgress');
+  });
+
+  it('voteOnDecision signs decision.vote yes with the round the server returned', () => {
+    const [ev] = derive(s2bShadowJobs.voteOnDecision(
+      { decisionId: 'D3', projectId: '45', kind: 'archiveObject' },
+      { decisionId: 'D3', kind: 'archiveObject', order: 1, consensus: false }
+    ));
+    expect(ev?.action).toBe('decision.vote');
+    expect(ev?.subject).toEqual({ type: 'decision', id: 'D3' });
+    expect(ev?.predicate).toMatchObject({ what: true, order: 1 });
+
+    const [generic] = derive(s2bShadowJobs.voteOnDecision({ decisionId: 'D4', kind: 'pic' }, { consensus: false }));
+    expect(generic?.predicate).toMatchObject({ what: true, order: 0 });
+  });
+
+  it('voteOnDecision leaves saleClaim to its call site (no double signer)', () => {
+    expect(s2bShadowJobs.voteOnDecision({ decisionId: 'D5', kind: 'saleClaim' }, { consensus: false })).toEqual([]);
+  });
+});

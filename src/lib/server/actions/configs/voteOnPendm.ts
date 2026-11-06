@@ -336,6 +336,8 @@ const voteOnPendmHandler: ActionExecutionHandler = async (params, context, { str
         openMissionId: responseData.data?.createOpenMission?.data?.id,
         pendId,
         consensus: true,
+        // The round the vote was cast on — the shadow-signed pendm.vote order.
+        order: orderon,
       },
       updateStrategy: { type: 'fullRefresh' },
     };
@@ -359,7 +361,7 @@ const voteOnPendmHandler: ActionExecutionHandler = async (params, context, { str
     await strapi.execute('143archivePendmWithVotes', { id: pendId, users: allVots }, context.jwt, context.fetch);
     // Full NO consensus archives the pendm — it must disappear for everyone.
     return {
-      data: { pendId, consensus: false, archived: true },
+      data: { pendId, consensus: false, archived: true, order: orderon },
       updateStrategy: { type: 'fullRefresh' },
     };
   }
@@ -369,7 +371,7 @@ const voteOnPendmHandler: ActionExecutionHandler = async (params, context, { str
   // Regular vote: broadcast the single new vote so every project member (and the
   // voter's other devices) appends it and re-derives the live vote counts.
   return {
-    data: { id: pendId, newVote: strapiVote, consensus: false, archived: false },
+    data: { id: pendId, newVote: strapiVote, consensus: false, archived: false, order: orderon },
     updateStrategy: { type: 'partialUpdate', config: { dataKeys: ['pends'] } },
   };
 };
