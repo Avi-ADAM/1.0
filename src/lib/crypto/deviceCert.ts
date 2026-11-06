@@ -18,6 +18,7 @@ import type { DeviceCert } from '$lib/consent/event';
 import type { IdentityRecord } from './identity';
 import { signCanonical } from './sign';
 import { verifySignedObject, type PubKeyResolver, type VerifyResult } from './verify';
+import { sameDevice } from './deviceId';
 import { b64urlEncode } from './b64';
 import type { JsonValue } from './canonical';
 
@@ -107,7 +108,8 @@ export async function verifyDeviceCert(
     return { ok: false, reason: 'cert_wrong_device' };
   }
   if (cert.actor !== cert.userId) return { ok: false, reason: 'cert_actor_mismatch' };
-  if (cert.device !== cert.parentDevicePubKey) {
+  // `device` may name the parent by fingerprint (B4).
+  if (!(await sameDevice(cert.device, cert.parentDevicePubKey))) {
     return { ok: false, reason: 'cert_device_alias_mismatch' };
   }
   if (cert.parentDevicePubKey === cert.devicePubKey) {

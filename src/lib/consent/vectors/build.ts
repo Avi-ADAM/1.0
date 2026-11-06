@@ -21,6 +21,7 @@ import { signCanonical, bodyForSigning, bodyWithSig } from '$lib/crypto/sign';
 import { b64urlEncode, b64urlDecode } from '$lib/crypto/b64';
 import { canonicalBytes } from '$lib/crypto/canonical';
 import { isLowS, mirrorS, normalizeLowS } from '$lib/crypto/lowS';
+import { deviceFingerprint } from '$lib/crypto/deviceId';
 import type { ConsentEvent, Delta } from '$lib/consent/event';
 import { project, topoSort, emptyState, type ProjectState } from '$lib/consent/projection';
 import { verifyQuorum, type QuorumProof, type QuorumResult, type QuorumRule } from '$lib/consent/quorum';
@@ -364,6 +365,41 @@ async function buildSignatures(
   };
   const lowSSig = b64urlEncode(normalizeLowS(highSig));
 
+  // B4 (O-7): `device` as the 43-char fingerprint b64url(SHA-256(SPKI DER)).
+  // Ed25519 is deterministic, so these rebuild byte for byte.
+  const aliceId = await deviceFingerprint(keys.alice.spki);
+  const fpEvent = await signWith(
+    strip({
+      v: 1,
+      actor: 'u-alice',
+      device: aliceId,
+      action: 'project.join',
+      subject: { type: 'project', id: 'p-1' },
+      parents: [],
+      ts: T0,
+      nonce: await nonceFor('deviceId/alice')
+    }),
+    keys.alice.privateKey,
+    'Ed25519'
+  );
+  const fpCert = await signWith(
+    { ...certBody, device: aliceId, nonce: await nonceFor('deviceCert/alice-phone/by-id') },
+    keys.alice.privateKey,
+    'Ed25519'
+  );
+  // bob's event naming bob's key by deviceId, but signed with alice's key: the
+  // lookup finds a key (bob's, under bob), and it is the wrong one.
+  const { id: _fi, sig: _fs, ...fpBody } = fpEvent;
+  const fpOtherKey = await signWith(
+    { ...fpBody, actor: 'u-bob', device: await deviceFingerprint(keys.bob.spki) },
+    keys.alice.privateKey,
+    'Ed25519'
+  );
+  const fpUnknown = { ...fpEvent, device: await deviceFingerprint((await edKey('mallory')).spki) };
+  // 43 characters, 32 bytes under a lenient decoder — but not the canonical
+  // spelling, so it is no fingerprint (and no SPKI either).
+  const fpNonCanonical = { ...fpEvent, device: nonCanonicalB64(aliceId) };
+
   const tamperedPredicate = { ...firstEvent, predicate: { settings: { name: 'זיוף', restime: 172800000 } } };
   const badId = { ...firstEvent, id: b64urlEncode(toBuf(await derive('not-the-id'))) };
   const badSigEncoding = { ...firstEvent, sig: nonCanonicalB64(firstEvent.sig as string) };
@@ -375,16 +411,18 @@ async function buildSignatures(
 
   return {
     about: 'Signed objects (SPEC_CONSENT_FORMAT §3). Resolve `device` against `keys`; every `valid` object must verify, every `invalid` one must fail with the given reason class. Ed25519 objects must also be reproduced byte-for-byte by re-signing their body.',
+    deviceIdRule: 'device is either the SPKI (b64url) or its deviceId = b64url(SHA-256(SPKI DER)), 43 chars (SPEC §1, O-7). A 43-char canonical b64url string of 32 bytes is a deviceId; nothing else is. Resolve by either; both forms are valid forever.',
     rfc8032: RFC8032_TEST1,
     keys: [
-      ...Object.values(keys).map((k) => ({
+      ...(await Promise.all(Object.values(keys).map(async (k) => ({
         label: k.label,
         alg: 'Ed25519',
         seedHex: k.seedHex,
         publicKeyHex: k.publicKeyHex,
-        spki: k.spki
-      })),
-      { label: 'dave', alg: 'ECDSA-P256', dHex: dave.dHex, spki: dave.spki }
+        spki: k.spki,
+        deviceId: await deviceFingerprint(k.spki)
+      })))),
+      { label: 'dave', alg: 'ECDSA-P256', dHex: dave.dHex, spki: dave.spki, deviceId: await deviceFingerprint(dave.spki) }
     ],
     valid: [
       { name: 'minimal-object', alg: 'Ed25519', object: minimal, ...describeSigned(minimal) },
@@ -404,6 +442,20 @@ async function buildSignatures(
         object: highSEvent,
         lowSSig,
         ...describeSigned(highSEvent)
+      },
+      {
+        name: 'device-id-event',
+        alg: 'Ed25519',
+        note: 'device is the deviceId of the signing key (SPEC §1, O-7): b64url(SHA-256(SPKI DER)), 43 chars. A verifier resolves either form; this is the same key as consent-event.',
+        object: fpEvent,
+        ...describeSigned(fpEvent)
+      },
+      {
+        name: 'device-cert-by-device-id',
+        alg: 'Ed25519',
+        note: 'device-cert with device = the deviceId of the parent; parentDevicePubKey stays the SPKI. The alias check is "device names the parent", not string equality.',
+        object: fpCert,
+        ...describeSigned(fpCert)
       }
     ],
     invalid: [
@@ -413,7 +465,10 @@ async function buildSignatures(
       { name: 'unknown-device', reason: 'unknown_or_revoked_device', object: unknownDevice },
       { name: 'signature-by-another-object', reason: 'bad_signature', object: otherSigner },
       { name: 'lone-surrogate-in-body', reason: 'non_canonical_body', object: loneSurrogate },
-      { name: 'nfc-duplicate-keys-in-body', reason: 'non_canonical_body', object: nfcDuplicate }
+      { name: 'nfc-duplicate-keys-in-body', reason: 'non_canonical_body', object: nfcDuplicate },
+      { name: 'device-id-of-unknown-key', reason: 'unknown_or_revoked_device', object: fpUnknown },
+      { name: 'device-id-of-another-key', reason: 'bad_signature', note: 'actor u-bob, device = deviceId of bob, signed with the key of alice.', object: fpOtherKey },
+      { name: 'device-id-non-canonical-spelling', reason: 'unknown_or_revoked_device', note: 'Same 32 bytes as the deviceId of alice under a lenient decoder; not a deviceId, not an SPKI.', object: fpNonCanonical }
     ]
   };
 }

@@ -17,6 +17,7 @@ import {
   mirrorLoadKey,
   mirrorKeysForUser
 } from './strapiMirror';
+import { findDevice, isDeviceFingerprint } from '$lib/crypto/deviceId';
 
 export type StoredPubKey = {
   userId: string;
@@ -98,9 +99,18 @@ export const consentStore = {
     await mirrorSaveKey(k);
   },
 
+  /** `devicePubB64` is either form (B4): the SPKI, or its fingerprint. */
   async getKey(userId: string, devicePubB64: string): Promise<StoredPubKey | undefined> {
     const local = keysByUser.get(userId)?.get(devicePubB64);
     if (local) return local;
+    if (isDeviceFingerprint(devicePubB64)) {
+      // Rows are keyed by SPKI, so a fingerprint is matched against the
+      // user's own few keys — no Strapi column or index needed.
+      const cached = keysByUser.get(userId);
+      const hit = cached ? await findDevice(devicePubB64, cached.values(), (k) => k.devicePubB64) : undefined;
+      if (hit) return hit;
+      return findDevice(devicePubB64, await consentStore.getKeysForUser(userId), (k) => k.devicePubB64);
+    }
     const remote = await mirrorLoadKey(userId, devicePubB64);
     if (remote) cacheKey(remote);
     return remote;

@@ -106,7 +106,7 @@
 | 6 | A2 | הרחבת חתימות ה-shadow — באצוות | L | — | ✔ אצוות 1–4 + A2b P1–P4 (הגדרות רקמה). פגישות ⏸ (עוברות ל-magik-meetings); פערי כיסוי מתועדים בכרטיס |
 | 7 | B6 | אימות התחייבויות אינקרמנטלי (O(n²) → O(n)) | M–L | — | ✔ |
 | 8 | C0 | יישור Node 24 (Dockerfile, פיתוח) + גילוי יכולות PQ | S | — | ⬜ 🧑 (התקנה/deploy) |
-| 9 | B4 | מזהה מכשיר כטביעת אצבע (O-7) | L | — | ⬜ |
+| 9 | B4 | מזהה מכשיר כטביעת אצבע (O-7) | L | — | ◐ קריאה ✔; פליטה ⬜ (מתג, אחרי deploy) |
 | 10 | C2 | KEM היברידי — `WrappedKey` v2 (O-9) | M | C0 | ⬜ |
 | 11 | B3 | מדיניות קצוות Ed25519 + vectors (O-1) | M | — | ⬜ |
 | 12 | C1 | שדה `cosig` — חתימה היברידית על עוגנים (O-8) | L | C0, B4 | ⬜ |
@@ -600,6 +600,27 @@ benchmark: 500 אירועים עם התחייבויות — מספר קריאו�
 מפרט §1 + §4 + vectors (אירוע עם `device` כטביעה, מאומת מול אותו מפתח).
 **קבלה**: vectors חדשים עוברים; כל הקיימים ללא diff; טסט relay roundtrip עם שתי הצורות.
 
+**✔ שלב הקריאה (2026-11-06)**:
+- `src/lib/crypto/deviceId.ts` — `deviceFingerprint`, `isDeviceFingerprint` (43 תווים,
+  b64url קנוני של 32 בייט; אין SPKI באורך הזה), `sameDevice`, `findDevice`.
+- **בלי שינוי Strapi**: `consentStore.getKey` מקבל טביעה ומתאים אותה מול
+  `getKeysForUser(actor)` (לכל משתמש מעט מפתחות); `resolvePeerKey` סורק את `peerKeys`
+  של ה-actor, ממלא מהרשת פעם אחת (עם ה-negative cache הקיים). טביעה מאתרת רק מפתח של
+  ה-actor עצמו, ומפתח מבוטל נשאר מבוטל.
+- `verifyDeviceCert`: הכלל "`device` מציין את ה-parent" במקום שוויון מחרוזות;
+  `devices/reset` (protest) מקבל את שתי הצורות.
+- `epoch.wraps` ממופתח לפי ה-SPKI של המקבל מתוך מאגר המפתחות, לא לפי `device` של
+  אירוע — לא מושפע (גם `vault` משווה recipients מהמאגר).
+- vectors (`signatures.json`, תוספת בלבד): `deviceId` לכל מפתח + `deviceIdRule`;
+  תקפים `device-id-event`, `device-cert-by-device-id`; פסולים
+  `device-id-of-unknown-key`, `device-id-of-another-key`, `device-id-non-canonical-spelling`.
+  SPEC §1, §3, §4, §10, §12 (O-7 ◐).
+
+**⬜ שלב הפליטה (לא עכשיו)**: חותמים יפלטו `deviceId` רק אחרי שכל הלקוחות מריצים את
+קוד הקריאה — לקוח ישן **מפיל** אירוע עם טביעה (`unknown_or_revoked_device`) ונשאר בלי
+אותו בשרשרת שלו. לכן: deploy של הקריאה (Vercel + VPS), חלון של כמה שבועות, ורק אז מתג
+(ברירת מחדל כבוי). זה רלוונטי באמת רק עם מפתחות ML-DSA (C1) — ב-Ed25519 החיסכון 16 תווים.
+
 ### C2 — KEM היברידי (O-9)
 **למה**: תנאי (ד) לשער S3 (PLAN_serverless_p2p_data §1, SPEC §13.2).
 **צעדים**: ב-`src/lib/space/e2e/kem.ts`: `WrappedKey` v2 = `{v:2, epk, kemCt, iv, ct}`;
@@ -680,3 +701,4 @@ projection, עם fallback ל-Strapi כשה-Space ריק או לא מסונכרן
 - 2026-11-06 · A2b P1–P2 · אוצר ה-paths (`projectAmend.ts`, SPEC §6.6, vector `rikma-settings`); **ממצא**: מפתח ה-dedupe בלי path מקפל את כל ה-amends של חבר, ולכן `order = "<path>#<decision|direct>"`; שני המחילים בשרת (`voteOnDecision`, `timegrama/decision`) אוחדו סביב `decisionToAmend` + `amendToStrapiWrite` (ב-timegrama: qid עם משתנים במקום GraphQL inline); חתימה של עריכה ישירה, הצעה + yes של המציע, וה-yes שסוגר · +13 ב-`projectAmend.test.ts`, +4 ב-`s2b.test.ts`, טסט הזהות עודכן לצורת ההחזרה. בשכבה הכל ירוק, `events.json` +493 שורות תוספת בלבד ויציב, check ‏1218, check:proxy ירוק. ב-configs נכשלים `proposeObjectArchive` (mock של `res.text`) ו-`updateTask`, שלא מייבאים שום דבר שנגעתי בו · commit `dist: A2b P1-P2` · **🧑 deploy ל-VPS** (‏`voteOnDecision`, `updateProjectDetails`; ו-timegrama, איפה שהוא רץ) · הבא: P3 (שתיקה, חתימה עצלה של `consensus.timeout`)
 - 2026-11-06 · A2b P3 · שתיקה בחתימה עצלה: `/api/consent/settings/[projectId]` (חבר בלבד; ה-amend נגזר מה-Decision עצמו, בלי שדה חדש ב-Strapi; `values` רק האחרון, `address` רק כשהוא עדיין ה-slug) + `planLazySettingsSigns` (רק החדש ביותר לכל path, ורק כשאין amend מאוחר יותר) + חתימה פעם בסשן ב-`SpaceProjectionShadow` (‏`consensus.timeout` ואז `project.amend`) · +7 ב-`projectAmend.test.ts`, +5 ב-`settingsMatured.test.ts`; ‏593 בשכבה, vectors ללא diff, check ‏1218, check:proxy ירוק · REST לא נבדק מול Strapi חי, ולא בדפדפן · commit `dist: A2b P3` · **🧑 deploy ל-VPS** (ה-endpoint רץ שם) · הבא: P4 (השוואת settings מול Strapi + טלמטריה `kind:'setting'`)
 - 2026-11-06 · A2b P4 · השוואת settings ב-`SpaceProjectionShadow` (רק paths שנחתמו, canonical JSON) + `kind:'setting'` בטלמטריה בלי ערכים (אינדקס path + טביעת FNV-1a); `current` ב-endpoint; הדוח מציג את שם ה-path, וטסט מקבע את העותק של `AMEND_PATHS` · +9 ב-`settingsShadow.test.ts`; ‏600 בשכבה, vectors ללא diff, check ‏1218, check:proxy ירוק · לא נבדק בדפדפן · commit `dist: A2b P4` · **A2 ✔**. הבא בתור: C0 (🧑 Node 24) או B4 (מזהה מכשיר כטביעה); פתוח מ-§5: O-10
+- 2026-11-06 · B4 קריאה · `deviceId` = b64url(SHA-256(SPKI)) מתקבל בכל מאמת (שרת, לקוח, cert, reset) בלי שדה Strapi; vectors תוספת בלבד (5 אובייקטים + `deviceId` לכל מפתח), יציבים בשתי הרצות · +5 ב-`deviceId.test.ts`, +2 ב-`syncRoundtrip.test.ts` (שתי הצורות דרך ה-relay; טביעה של משתמש אחר; מבוטל), +2 ב-vectors; ‏607 בשכבה, check ‏1218, check:proxy ירוק · commit `dist: B4 read deviceId` · הבא: פליטה רק אחרי deploy + חלון; O-10 הוצג להכרעה

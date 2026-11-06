@@ -29,6 +29,7 @@ import { b64urlDecode, b64urlEncode } from '$lib/crypto/b64';
 import { isLowS, normalizeLowS } from '$lib/crypto/lowS';
 import type { SigAlgo } from '$lib/crypto/algorithm';
 import { verifyDeviceCert } from '$lib/crypto/deviceCert';
+import { deviceFingerprint, isDeviceFingerprint } from '$lib/crypto/deviceId';
 import type { ConsentEvent, DeviceCert } from '$lib/consent/event';
 import { project } from '$lib/consent/projection';
 import { computeStateRoot } from '$lib/consent/stateRoot';
@@ -68,7 +69,10 @@ beforeAll(async () => {
   const keys = new Map<string, { key: CryptoKey; algo: SigAlgo }>();
   for (const k of vectors.signatures.keys as Obj[]) {
     const algo = k.alg as SigAlgo;
-    keys.set(k.spki, { key: await importPublicKey(b64urlDecode(k.spki), algo), algo });
+    const entry = { key: await importPublicKey(b64urlDecode(k.spki), algo), algo };
+    keys.set(k.spki, entry);
+    // B4: a device may be named by its deviceId (SPEC §1).
+    if (typeof k.deviceId === 'string') keys.set(k.deviceId, entry);
   }
   resolver = async (_actor, device) => keys.get(device) ?? null;
 }, 60_000);
@@ -127,6 +131,23 @@ describe('consent vectors — signatures.json', () => {
 
   it('the device cert also passes the T7 semantic checks', async () => {
     const cert = (vectors.signatures.valid as Obj[]).find((v) => v.name === 'device-cert')!.object as DeviceCert;
+    const res = await verifyDeviceCert(cert, resolver, { userId: cert.userId, devicePubKey: cert.devicePubKey }, cert.notBefore);
+    expect(res).toEqual({ ok: true });
+  });
+
+  it('every deviceId is the SHA-256 of its SPKI, and only a deviceId reads as one (O-7)', async () => {
+    for (const k of vectors.signatures.keys as Obj[]) {
+      expect(k.deviceId, k.label).toBe(await deviceFingerprint(k.spki));
+      expect(isDeviceFingerprint(k.deviceId), k.label).toBe(true);
+      expect(isDeviceFingerprint(k.spki), k.label).toBe(false);
+    }
+    const nonCanonical = (vectors.signatures.invalid as Obj[]).find((v) => v.name === 'device-id-non-canonical-spelling')!;
+    expect(isDeviceFingerprint((nonCanonical.object as Obj).device)).toBe(false);
+  });
+
+  it('a cert naming its parent by deviceId passes the T7 checks too', async () => {
+    const cert = (vectors.signatures.valid as Obj[]).find((v) => v.name === 'device-cert-by-device-id')!.object as DeviceCert;
+    expect(isDeviceFingerprint(cert.device)).toBe(true);
     const res = await verifyDeviceCert(cert, resolver, { userId: cert.userId, devicePubKey: cert.devicePubKey }, cert.notBefore);
     expect(res).toEqual({ ok: true });
   });

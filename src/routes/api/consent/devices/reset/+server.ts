@@ -3,6 +3,7 @@ import type { RequestHandler } from '@sveltejs/kit';
 import { consentStore } from '$lib/server/consent/store';
 import { RESET_COOLDOWN_MS } from '$lib/server/consent/devicePolicy';
 import { verifySignedObject } from '$lib/crypto/verify';
+import { findDevice, sameDevice } from '$lib/crypto/deviceId';
 // Side-effect import: injects Node webcrypto into globalThis for verify paths.
 import '$lib/server/consent/verifyServerSide';
 
@@ -41,15 +42,17 @@ export const POST: RequestHandler = async ({ request, cookies, locals }) => {
     if (!protest || protest.actor !== userId || protest.kind !== 'resetProtest') {
       throw error(400, 'protest object required');
     }
-    const signerKey = keys.find(
-      (k) => k.devicePubB64 === protest.device && k.revokedReason === 'reset'
+    const signerKey = await findDevice(
+      protest.device,
+      keys.filter((k) => k.revokedReason === 'reset'),
+      (k) => k.devicePubB64
     );
     if (!signerKey) throw error(403, 'protest must come from a reset-revoked device');
 
     // The signer is revoked, so resolveFromStore would refuse it — resolve
     // through a one-off resolver that accepts exactly this stored key.
     const v = await verifySignedObject(protest, async (actor, device) => {
-      if (actor !== userId || device !== signerKey.devicePubB64) return null;
+      if (actor !== userId || !(await sameDevice(device, signerKey.devicePubB64))) return null;
       return resolveStored(signerKey.pubSpkiB64, signerKey.algo);
     });
     if (!v.ok) throw error(403, `bad protest signature: ${v.reason}`);

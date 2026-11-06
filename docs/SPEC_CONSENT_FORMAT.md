@@ -27,7 +27,8 @@
 | מה | קידוד |
 |---|---|
 | בינארי בשדות (`sig`, `id`, `iv`, `ct`, מפתחות) | **b64url בלי ריפוד** (RFC 4648 §5) |
-| מפתח ציבורי של מכשיר (`device`, `devicePubKey`) | b64url של **SPKI DER**. Ed25519 = 44 בייט (`302a300506032b6570032100‖pk`), P-256 = 91 בייט, נקודה לא-דחוסה |
+| מפתח ציבורי של מכשיר (`devicePubKey`, `parentDevicePubKey`) | b64url של **SPKI DER**. Ed25519 = 44 בייט (`302a300506032b6570032100‖pk`), P-256 = 91 בייט, נקודה לא-דחוסה |
+| מכשיר חותם (`device`) | **אחת משתי צורות, שתיהן תקפות לנצח** (O-7): ה-SPKI כנ"ל, או **`deviceId` = b64url(SHA-256(SPKI DER))**, 43 תווים. מחרוזת של 43 תווים שהיא b64url קנוני של 32 בייט היא `deviceId`; כל דבר אחר הוא SPKI (אין SPKI באורך 32 בייט). המאמת מאתר את המפתח לפי כל אחת מהן; `deviceId` לא קנוני לא מאתר כלום → `unknown_or_revoked_device`. מפתח הוא של משתמש: `deviceId` של מפתח שאינו של `actor` לא נמצא |
 | זמנים (`ts`, `notBefore`, …) | מילישניות מ-Unix epoch, מספר JSON |
 | כסף | `{ amount: string, code: string }` — `amount` = מספר שלם של יחידות קטנות (אגורות) כמחרוזת עשרונית. **לעולם לא float** (החלטה D-12, `src/lib/crypto/money.ts`) |
 | טקסט | UTF-8 |
@@ -37,6 +38,16 @@
 נכנסת ל-`id`, שתי כתיבות של אותם בייטים = אותה חתימה תחת שני מזהים.
 לכן מאמת **חייב** לדחות `sig` כש-`encode(decode(sig)) ≠ sig`
 (`bad_sig_encoding`; vector: `signatures.json › non-canonical-sig-encoding`).
+
+**`deviceId` (B4, נובמבר 2026).** בשלב הזה רק **קריאה**: חותמים ממשיכים
+לפלוט SPKI עד מתג נפרד, כי `deviceId` לבדו לא ניתן לאימות — המפתח חייב
+להגיע קודם למאגר המפתחות. מפתחות במאגר (שרת: `consentStore`, לקוח:
+`peerKeys`) נשארים ממופתחים לפי SPKI; `deviceId` מותאם מול המפתחות של
+`actor` (`src/lib/crypto/deviceId.ts`). `epoch.wraps` (§9) ממופתח לפי
+ה-SPKI של המכשיר המקבל ולא לפי `device` של אירוע, ולכן לא מושפע.
+vectors: `signatures.json › device-id-event`, `device-cert-by-device-id`,
+ו-`device-id-of-unknown-key` / `-of-another-key` / `-non-canonical-spelling`;
+לכל מפתח ב-`keys` יש `deviceId`.
 
 ## 2. JSON קנוני
 
@@ -118,8 +129,8 @@ subject:{type,id}, parents:string[], ts, nonce, sig`. אופציונליים:
   (נשמרת, מסונכרנת), ראו §6.3.
 
 **DeviceCert** (T7, `src/lib/crypto/deviceCert.ts`): אובייקט חתום עם
-`kind:'deviceCert'`, `device = parentDevicePubKey` (המכשיר החותם), `actor =
-userId`. נדחה אם חותם על עצמו, אם `actor≠userId`, או מחוץ לחלון התוקף ±5 דק'.
+`kind:'deviceCert'`, `device` **מציין את** `parentDevicePubKey` (המכשיר החותם —
+אותו SPKI, או ה-`deviceId` שלו, §1), `actor = userId`. נדחה אם חותם על עצמו, אם `actor≠userId`, או מחוץ לחלון התוקף ±5 דק'.
 
 **מעטפת sealed** (S3a, `src/lib/space/e2e/seal.ts`): אובייקט חתום עם
 `kind:'sealed'` — §9.
@@ -263,7 +274,7 @@ meetings, away, settings`.
 | קובץ | מה |
 |---|---|
 | `canonical.json` | קלט JSON כטקסט → מחרוזת קנונית + hash; ו-`rejects` |
-| `signatures.json` | RFC 8032, מפתחות, אובייקטים תקפים (כולל DeviceCert ו-P-256), אובייקטים פסולים + סיבה |
+| `signatures.json` | RFC 8032, מפתחות (עם `deviceId`), אובייקטים תקפים (כולל DeviceCert, P-256 ו-`device` כ-`deviceId`), אובייקטים פסולים + סיבה |
 | `events.json` | שלושה תרחישים: אירועים חתומים → סדר, dedupe, heads, root אחרי כל צעד, state מנורמל, root סופי |
 | `e2e.json` | התחייבות מפתח, מעטפת sealed, עטיפת KEM עם ערכי ביניים |
 | `quorum.json` | הצבעות חתומות; לכל כלל QuorumProof (`quorum.ts`) מקרה עובר ומקרה נכשל עם ה-reason; לכל `Delta.kind` (`deltaCheck.ts`) לפני/אחרי/הצהרה → ok + `unchecked`, או reason. ה-state בקובץ הוא רק החלק ש-`checkDeltas` קורא (members, balances, `tosplits.approved`, rounds), ו-`agreers` ממוינים לפי code units |
@@ -307,7 +318,7 @@ meetings, away, settings`.
 | O-10 | **`agreers-only` מקבל הצבעות "לא"** — ההערה ב-`quorum.ts` אומרת "at least 1 yes vote, no nos", והקוד בודק רק שיש yes אחד. ה-vectors מקבעים רק מקרים ששתי הקריאות מסכימות עליהם (yes בודד עובר, no בודד נכשל) | Ratson §3.0 משתמש בכלל הזה. להחליט מה נכון ולהוסיף vector של yes+no — תיקון בקוד = שינוי אימות |
 | O-5 | מפתח dedupe בלי escaping | §6.5 |
 | O-6 | `Boolean("false") === true` ב-`what` | לא באג קריפטוגרפי, אבל מפתיע; תיקון = bump |
-| O-7 | **`device` = ה-SPKI המלא** בכל אירוע | ב-Ed25519 זה 44 בייט; ב-ML-DSA-65 כ-1,974 בייט (~2.6KB ב-b64url) — בכל אירוע. לפני מפתחות PQ: מזהה מכשיר = `b64url(SHA-256(SPKI))` (43 תווים), המפתח עצמו רק במאגר המפתחות. מאמת מזהה את הצורה לפי האורך, ושתי הצורות תקפות לנצח (§13) |
+| O-7 | ◐ **קריאה סגורה (B4, נובמבר 2026)**: המאמת מקבל `deviceId` (§1); הפליטה עדיין SPKI עד מתג. במקור: **`device` = ה-SPKI המלא** בכל אירוע | ב-Ed25519 זה 44 בייט; ב-ML-DSA-65 כ-1,974 בייט (~2.6KB ב-b64url) — בכל אירוע. לפני מפתחות PQ: מזהה מכשיר = `b64url(SHA-256(SPKI))` (43 תווים), המפתח עצמו רק במאגר המפתחות. מאמת מזהה את הצורה לפי האורך, ושתי הצורות תקפות לנצח (§13) |
 | O-8 | **אין מקום לחתימה שנייה** על אותו אובייקט | חתימה היברידית (Ed25519 + ML-DSA) דורשת שדה אופציונלי והגדרה מה הוא מכסה ואיך ה-id מחושב (§13.3) |
 | O-9 | **ה-KEM של S3 קלאסי בלבד** (ECDH P-256) | "אסוף עכשיו, פענח אחר כך": כל מעטפה sealed נשמרת לנצח במראה. **תנאי לפתיחת שער S3**: KEM היברידי (§13.2) |
 

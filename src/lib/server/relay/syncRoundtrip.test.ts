@@ -15,6 +15,7 @@ import { project } from '$lib/consent/projection';
 import { consentStore } from '$lib/server/consent/store';
 import { verifyConsentEvent } from '$lib/server/consent/verifyServerSide';
 import { relayAppend, relayRead, _resetRelayLogs } from './log';
+import { deviceFingerprint, isDeviceFingerprint } from '$lib/crypto/deviceId';
 
 type Identity = {
   userId: string;
@@ -179,5 +180,55 @@ describe('two replicas converge through the relay', () => {
 
     expect([...A.local.keys()].sort()).toEqual([...B.local.keys()].sort());
     expect(computeHeads(A.local.values()).length).toBe(2); // true fork, both tips kept
+  });
+});
+
+describe('B4 — a device named by its fingerprint (O-7)', () => {
+  async function signAs(who: Identity, device: string, subject: { type: string; id: string }, parents: string[]) {
+    const body = {
+      v: 1 as const,
+      actor: who.userId,
+      device,
+      action: ACTIONS.projectJoin,
+      subject,
+      parents,
+      ts: Date.now(),
+      nonce: b64urlEncode(crypto.getRandomValues(new Uint8Array(16)).buffer)
+    };
+    const { sig, id } = await signCanonical(body as unknown as JsonValue, who.privateKey, who.algo);
+    return { ...body, sig, id } as ConsentEvent;
+  }
+
+  it('both forms sync through the relay and verify on the other side', async () => {
+    const dana = await bootstrapIdentity('user-dana-fp');
+    const avi = await bootstrapIdentity('user-avi-fp');
+    const A = makeReplica();
+    const B = makeReplica();
+    const space = 'project:fp-1';
+
+    const spkiForm = await signAs(dana, dana.devicePubB64, { type: 'project', id: 'p-fp' }, []);
+    const fpForm = await signAs(avi, await deviceFingerprint(avi.devicePubB64), { type: 'project', id: 'p-fp' }, [spkiForm.id]);
+    expect(isDeviceFingerprint(fpForm.device)).toBe(true);
+    expect(fpForm.device).toHaveLength(43);
+    A.add(spkiForm);
+    A.add(fpForm);
+    await A.pushToRelay(space); // pushToRelay asserts each verifies
+
+    await B.pullFromRelay(space);
+    expect(B.local.size).toBe(2);
+    expect(project([...B.local.values()], 'p-fp').members).toEqual(new Set(['user-dana-fp', 'user-avi-fp']));
+  });
+
+  it('a fingerprint names only its own user, and a revoked key stays revoked', async () => {
+    const dana = await bootstrapIdentity('user-dana-fp2');
+    const avi = await bootstrapIdentity('user-avi-fp2');
+    // dana's own signature, claimed by avi through dana's fingerprint: avi has no such key.
+    const ev = await signAs(dana, await deviceFingerprint(dana.devicePubB64), { type: 'project', id: 'p-fp2' }, []);
+    expect((await verifyConsentEvent({ ...ev, actor: avi.userId } as ConsentEvent)).ok).toBe(false);
+    expect(await verifyConsentEvent(ev)).toEqual({ ok: true });
+
+    const stored = await consentStore.getKey(dana.userId, dana.devicePubB64);
+    await consentStore.putKey({ ...stored!, revokedAt: Date.now() });
+    expect(await verifyConsentEvent(ev)).toMatchObject({ ok: false, reason: 'unknown_or_revoked_device' });
   });
 });

@@ -4,7 +4,8 @@
 // and a wrong key simply fails signature verification.
 
 import { browser } from '$app/environment';
-import { idbGet, idbPut } from '$lib/crypto/keystore';
+import { idbAll, idbGet, idbPut } from '$lib/crypto/keystore';
+import { findDevice, isDeviceFingerprint } from '$lib/crypto/deviceId';
 import { algoParams, type SigAlgo } from '$lib/crypto/algorithm';
 import { b64urlDecode } from '$lib/crypto/b64';
 import type { PubKeyResolver } from '$lib/crypto/verify';
@@ -55,8 +56,38 @@ async function fetchAndCache(userId: string): Promise<void> {
   }
 }
 
-export const resolvePeerKey: PubKeyResolver = async (actor, devicePubB64) => {
+/** B4 — the SPKI a fingerprint names, among `actor`'s cached keys. */
+async function spkiForFingerprint(actor: string, fp: string): Promise<string | null> {
+  const scan = async () => {
+    const mine = (await idbAll<CachedPeerKey>('peerKeys')).filter((k) => k.userId === actor);
+    return (await findDevice(fp, mine, (k) => k.devicePubKey))?.devicePubKey ?? null;
+  };
+  const found = await scan();
+  if (found) return found;
+  const lastMiss = misses.get(fp);
+  if (lastMiss && Date.now() - lastMiss < MISS_TTL_MS) return null;
+  try {
+    await fetchAndCache(actor);
+  } catch {
+    // offline
+  }
+  const after = await scan();
+  if (!after) misses.set(fp, Date.now());
+  return after;
+}
+
+export const resolvePeerKey: PubKeyResolver = async (actor, device) => {
   if (!browser) return null;
+
+  // Either form names the device (B4); everything below is keyed by SPKI.
+  let devicePubB64 = device;
+  if (isDeviceFingerprint(device)) {
+    const hitFp = imported.get(device);
+    if (hitFp) return hitFp;
+    const spki = await spkiForFingerprint(actor, device);
+    if (!spki) return null;
+    devicePubB64 = spki;
+  }
 
   const hit = imported.get(devicePubB64);
   if (hit) return hit;
@@ -83,6 +114,7 @@ export const resolvePeerKey: PubKeyResolver = async (actor, devicePubB64) => {
 
   const entry = await importSpki(cached.algo, cached.pubSpkiB64);
   imported.set(devicePubB64, entry);
+  if (device !== devicePubB64) imported.set(device, entry);
   return entry;
 };
 
