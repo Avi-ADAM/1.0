@@ -265,3 +265,109 @@ export const settingsDecisionCreateConsentSpec: ConsentSpec = {
     value: params.value === undefined ? undefined : params.value
   })
 };
+
+// ------------------------------------------------------- P3: lazy signing
+
+/**
+ * consensus.timeout on a settings Decision that silence matured
+ * (PLAN_restime_in_signed_chain §3.2). Anyone who saw the deadline pass may
+ * sign it; signed late, by the first member whose client syncs the rikma.
+ */
+export const settingsTimeoutConsentSpec: ConsentSpec = {
+  action: 'consensus.timeout',
+  subjectType: 'decision',
+  subjectIdParam: 'decisionId',
+  requireConsensus: false,
+  restimeFrom: 'project',
+  predicateFromParams: (params) => {
+    const roundStart = typeof params.roundStart === 'number' ? params.roundStart : undefined;
+    const expectedEnd = typeof params.expectedEnd === 'number' ? params.expectedEnd : undefined;
+    return {
+      closingRound: 0, // settings Decisions have no counter rounds
+      roundStart,
+      expectedEnd,
+      roundDuration: roundStart !== undefined && expectedEnd !== undefined ? expectedEnd - roundStart : undefined,
+      counted: Array.isArray(params.counted) ? (params.counted as unknown[]).map(String) : [],
+      attestedNow: typeof params.attestedNow === 'number' ? params.attestedNow : undefined,
+      decision: 'approve' // silence is consent
+    };
+  }
+};
+
+/** One row of /api/consent/settings/[projectId] ($lib/server/consent/settingsMatured). */
+export type MaturedSettingRow = {
+  decisionId: string;
+  kind: string;
+  amend: Amend;
+  maturedBy: 'vote' | 'silence';
+  roundStart: number | null;
+  maturedAt: number | null;
+  expectedEnd: number | null;
+  counted: string[];
+};
+
+type ChainEvent = { action: string; ts: number; subject: { type: string; id: string }; predicate?: Record<string, unknown> };
+
+/**
+ * What a member's client should sign now for Decisions that took effect
+ * without a signature on the chain. Pure: a function of the server's list
+ * and the events the replica holds.
+ *
+ * - Only the NEWEST matured Decision per path is a candidate (rows arrive
+ *   newest first): the value is the whole value, so an older one is already
+ *   superseded — and signed now, it would land after the newer one in topo
+ *   order and overwrite it.
+ * - Skipped too when the chain has an amend of that path signed after the
+ *   Decision took effect (a later direct edit), for the same reason.
+ * - Silence gets its consensus.timeout first, unless the chain has one.
+ */
+export function planLazySettingsSigns(
+  rows: MaturedSettingRow[],
+  events: Iterable<ChainEvent>,
+  projectId: string,
+  now: number
+): Array<{ spec: ConsentSpec; params: Record<string, unknown> }> {
+  const signedDecisions = new Set<string>();
+  const timedOut = new Set<string>();
+  const latestAmendTs = new Map<string, number>();
+  for (const e of events) {
+    if (e.action === 'project.amend') {
+      const p = e.predicate ?? {};
+      if (p.decisionId != null) signedDecisions.add(String(p.decisionId));
+      if (typeof p.path === 'string') latestAmendTs.set(p.path, Math.max(latestAmendTs.get(p.path) ?? -Infinity, e.ts));
+    } else if (e.action === 'consensus.timeout' && e.subject.type === 'decision') {
+      timedOut.add(e.subject.id);
+    }
+  }
+
+  const jobs: Array<{ spec: ConsentSpec; params: Record<string, unknown> }> = [];
+  const seenPath = new Set<string>();
+  for (const r of rows) {
+    if (!r || !isAmendPath(r.amend?.path)) continue;
+    const path = r.amend.path;
+    if (seenPath.has(path)) continue; // an older Decision for a path already covered
+    seenPath.add(path);
+    if (signedDecisions.has(r.decisionId)) continue;
+    const later = latestAmendTs.get(path);
+    if (later !== undefined && (r.maturedAt === null || later > r.maturedAt)) continue;
+
+    if (r.maturedBy === 'silence' && !timedOut.has(r.decisionId) && r.expectedEnd !== null) {
+      jobs.push({
+        spec: settingsTimeoutConsentSpec,
+        params: {
+          projectId,
+          decisionId: r.decisionId,
+          roundStart: r.roundStart ?? undefined,
+          expectedEnd: r.expectedEnd,
+          counted: r.counted,
+          attestedNow: now
+        }
+      });
+    }
+    jobs.push({
+      spec: projectAmendConsentSpec,
+      params: { projectId, path, value: r.amend.value, decisionId: r.decisionId }
+    });
+  }
+  return jobs;
+}

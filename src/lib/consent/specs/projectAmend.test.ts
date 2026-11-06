@@ -12,8 +12,10 @@ import {
   decisionToAmend,
   directEditAmends,
   identityAmend,
+  planLazySettingsSigns,
   projectAmendConsentSpec,
-  settingsDecisionCreateConsentSpec
+  settingsDecisionCreateConsentSpec,
+  type MaturedSettingRow
 } from './projectAmend';
 
 describe('decisionToAmend', () => {
@@ -138,5 +140,81 @@ describe('the signed predicates', () => {
     });
     const state = project([asEvent(ev, '256', 1)], '45');
     expect(state.decisions.get('D1')).toMatchObject({ kind: 'name', ref: 'name', createdBy: '256' });
+  });
+});
+
+describe('planLazySettingsSigns (P3)', () => {
+  const row = (decisionId: string, path: string, value: unknown, over: Partial<MaturedSettingRow> = {}): MaturedSettingRow =>
+    ({
+      decisionId,
+      kind: 'k',
+      amend: { path, value },
+      maturedBy: 'silence',
+      roundStart: 1000,
+      maturedAt: 5000,
+      expectedEnd: 4000,
+      counted: ['256'],
+      ...over
+    }) as MaturedSettingRow;
+  const amendEv = (path: string, ts: number, decisionId?: string) => ({
+    action: 'project.amend',
+    ts,
+    subject: { type: 'project', id: '45' },
+    predicate: { path, value: 'x', decisionId }
+  });
+
+  it('silence: consensus.timeout first, then the amend', () => {
+    const jobs = planLazySettingsSigns([row('D1', 'name', 'n')], [], '45', 9000);
+    expect(jobs.map((j) => j.spec.action)).toEqual(['consensus.timeout', 'project.amend']);
+    const timeout = deriveConsentEventFromAction(jobs[0].spec, jobs[0].params);
+    expect(timeout?.subject).toEqual({ type: 'decision', id: 'D1' });
+    expect(timeout?.predicate).toMatchObject({
+      closingRound: 0, roundStart: 1000, expectedEnd: 4000, roundDuration: 3000,
+      counted: ['256'], attestedNow: 9000, decision: 'approve'
+    });
+    expect(deriveConsentEventFromAction(jobs[1].spec, jobs[1].params)?.predicate)
+      .toEqual({ path: 'name', value: 'n', decisionId: 'D1', order: 'name#D1' });
+  });
+
+  it('a full vote that nobody signed gets the amend only', () => {
+    const jobs = planLazySettingsSigns([row('D1', 'name', 'n', { maturedBy: 'vote' })], [], '45', 9000);
+    expect(jobs.map((j) => j.spec.action)).toEqual(['project.amend']);
+  });
+
+  it('nothing when the chain already has that Decision amend', () => {
+    expect(planLazySettingsSigns([row('D1', 'name', 'n')], [amendEv('name', 6000, 'D1')], '45', 9000)).toEqual([]);
+  });
+
+  it('only the newest Decision per path — an older one would overwrite it', () => {
+    const jobs = planLazySettingsSigns([row('D2', 'name', 'new'), row('D1', 'name', 'old')], [], '45', 9000);
+    expect(jobs.filter((j) => j.spec.action === 'project.amend').map((j) => j.params.decisionId)).toEqual(['D2']);
+    // when the newest is signed already, the older one is not a candidate either
+    expect(
+      planLazySettingsSigns([row('D2', 'name', 'new'), row('D1', 'name', 'old')], [amendEv('name', 6000, 'D2')], '45', 9000)
+    ).toEqual([]);
+  });
+
+  it('skips a Decision a later direct edit of the same path superseded', () => {
+    expect(planLazySettingsSigns([row('D1', 'name', 'n')], [amendEv('name', 7000)], '45', 9000)).toEqual([]);
+    // an earlier edit does not block it
+    expect(planLazySettingsSigns([row('D1', 'name', 'n')], [amendEv('name', 3000)], '45', 9000)).toHaveLength(2);
+  });
+
+  it('does not sign a second timeout the chain already has', () => {
+    const ev = { action: 'consensus.timeout', ts: 6000, subject: { type: 'decision', id: 'D1' }, predicate: {} };
+    expect(planLazySettingsSigns([row('D1', 'name', 'n')], [ev], '45', 9000).map((j) => j.spec.action))
+      .toEqual(['project.amend']);
+  });
+
+  it('signed through the reducers, the setting lands', () => {
+    let n = 0;
+    const events = planLazySettingsSigns([row('D1', 'restime', 'feh')], [], '45', 9000).map((j) => {
+      const t = deriveConsentEventFromAction(j.spec, j.params)!;
+      return {
+        v: 1, id: `z${++n}`, actor: '258', device: 'd', action: t.action, subject: t.subject,
+        predicate: t.predicate, parents: [], ts: 9000 + n, nonce: 'n', sig: 's'
+      } as ConsentEvent;
+    });
+    expect(project(events, '45').settings.get('restime')).toBe('feh');
   });
 });

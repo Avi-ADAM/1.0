@@ -103,7 +103,7 @@
 | 3 | B2 | ECDSA low-S בצד החותם (O-2) | S | — | ✔ |
 | 4 | A1 | דגל Space לפי רקמה (allowlist בשרת) | M | — | ✔ |
 | 5 | A3 | טלמטריית אי-התאמות לשרת | M | A1 | ✔ |
-| 6 | A2 | הרחבת חתימות ה-shadow — באצוות | L | — | ◐ אצוות 1–4 + A2b P1–P2 (הגדרות רקמה); פגישות ⏸; נשארו: A2b P3 (שתיקה), P4 (השוואה) |
+| 6 | A2 | הרחבת חתימות ה-shadow — באצוות | L | — | ◐ אצוות 1–4 + A2b P1–P3 (הגדרות רקמה, כולל שתיקה); פגישות ⏸; נשאר: A2b P4 (השוואה) |
 | 7 | B6 | אימות התחייבויות אינקרמנטלי (O(n²) → O(n)) | M–L | — | ✔ |
 | 8 | C0 | יישור Node 24 (Dockerfile, פיתוח) + גילוי יכולות PQ | S | — | ⬜ 🧑 (התקנה/deploy) |
 | 9 | B4 | מזהה מכשיר כטביעת אצבע (O-7) | L | — | ⬜ |
@@ -419,7 +419,7 @@ override של מפתחים; אחרת — הפרויקט ברשימה. עדכן �
   קוד (`'feh'`). צריך להחליט (א) מי חותם על השינוי ומתי, ו-(ב) רשימת paths וסוגי ערכים,
   ואז זה שינוי פורמט עם vector.
 
-#### A2b — `project.amend` (2026-11-06; אושר, P1–P2 בוצעו)
+#### A2b — `project.amend` (2026-11-06; אושר, P1–P3 בוצעו)
 
 **מה קיים היום.** `updateProjectDetails` משנה ישירות רק ברקמה של חבר אחד. ברקמה עם
 יותר חברים הוא פותח `Decision` לכל שדה שהשתנה (12 סוגים: `name`, `pubdes`, `prides`,
@@ -512,7 +512,28 @@ P4 השוואה וטלמטריה (S).
   של המציע. `voteOnDecision` בהבשלה מחזיר `amend`, והמצביע חותם `project.amend`
   עם `decisionId`.
 - **הבדלי התנהגות קטנים** (מכוונים): טקסט מ-Decision נכתב אחרי trim, ו-`vallues` נכתב ממוין.
-- **פערים**: שתיקה (P3); `proposeProjectLink` ב-mastra קורא ל-action בצד השרת, ולכן אין
+**P3 — שתיקה, חתימה עצלה (2026-11-06)**
+- **אין שדה חדש ב-Strapi.** מה ש-Decision של הגדרה שינה הוא פונקציה טהורה של השדות
+  שלו (`decisionToAmend`). יש שני חריגים, ושניהם נפתרים מול הרקמה כפי שהיא עכשיו:
+  - `values`: רק ה-Decision האחרון שהבשיל מדווח, עם הקבוצה של עכשיו. הערך הוא הקבוצה
+    המלאה, ולכן דילוג על הקודמים לא מאבד כלום.
+  - `address`: מדווח רק כל עוד הוא עדיין ה-slug, כי כתובת שנדחתה לא הוחלה.
+- **שרת**: `GET /api/consent/settings/[projectId]` (חבר בלבד; REST כמו שאר ה-exports)
+  → `$lib/server/consent/settingsMatured`. מחזיר את 50 ה-Decisions האחרונים, עם `amend`,
+  `maturedBy` (‏`vote` כשכל החברים אמרו כן, אחרת `silence`), `maturedAt`, `expectedEnd`
+  ו-`counted`.
+- **לקוח**: `planLazySettingsSigns` (טהור, ב-`projectAmend.ts`) ו-`$lib/client/settingsLazySign`.
+  הם רצים פעם אחת בסשן לכל רקמה, אחרי שה-replica הראשון ב-`SpaceProjectionShadow` מסונכרן.
+  בשתיקה נחתם קודם `consensus.timeout` (‏`closingRound:0`, `attestedNow`) ואז ה-amend.
+  כשההחלטה הבשילה בהצבעה שלא נחתמה, נחתם ה-amend בלבד.
+- **ההגנה החשובה**: חתימה מאוחרת של Decision ישן נכנסת אחרי כל ה-heads, ולכן גוברת על
+  מה שקדם לה. לכן נחתם **רק ה-Decision החדש ביותר לכל path**, ורק כשאין בשרשרת amend
+  של אותו path שנחתם אחרי ש-`maturedAt` עבר.
+- **מחיר ידוע**: עד שחבר פותח את דף החלוקה, השרשרת מפגרת אחרי Strapi. כרגע זה הדף היחיד
+  שמסנכרן Space.
+- **לא נבדק מול Strapi חי**: שאילתת ה-REST (‏`filters[kind][$in]`, ‏populate של `vots`
+  ושל `timegrama`). אם היא נכשלת, ה-endpoint מחזיר 502 ושום דבר לא נחתם.
+- **פערים**: `proposeProjectLink` ב-mastra קורא ל-action בצד השרת, ולכן אין
   מי שיחתום.
 - **לא נבדק מול Strapi חי ולא בדפדפן**: הכתיבה של timegrama דרך `strapiClient`
   (`updateProjectDetails` / `43updateProfilePic` עם טוקן האדמין). זה אותו טוקן ואותה
@@ -644,3 +665,4 @@ projection, עם fallback ל-Strapi כשה-Space ריק או לא מסונכרן
 - 2026-11-06 · B6 · cache של `ProjectState` לפי heads ב-`commitment.ts` (`stateAt`, LRU); `applyEvent` אחד על ה-state של ההורים, ו-replay מלא רק כשיש התנגשות dedupe עם אב או כשאין state ב-cache. משותף רק ב-`ingestEvent` ובאימות בצד השרת, אחרי אימות החתימה · `commitmentCache.pbt.test.ts`: property על 40 DAGs + שרשרת 500 (≤2 replays מלאים), ‏555 בשכבה, 19 vectors ללא diff, check ‏1218 (ללא שינוי) · commit `dist: A2.4 B6` · הבא: C0 (🧑 Node 24) או B4 (מזהה מכשיר כטביעה), ו-A2 אחרי החלטת `project.amend`
 - 2026-11-06 · A2b (תכנון) · הצעה ל-`project.amend`: רשימת paths סגורה עם ערכים מלאים, `decisionToAmend` כמקור יחיד שגם מאחד את שני המחילים בשרת, חתימה ברגע שהשינוי נכנס לתוקף (עריכה ישירה, ה-yes האחרון, ושתיקה בחתימה עצלה של `consensus.timeout`), ו-4 שלבים · מסמכים בלבד · ממתין לאישור (§5)
 - 2026-11-06 · A2b P1–P2 · אוצר ה-paths (`projectAmend.ts`, SPEC §6.6, vector `rikma-settings`); **ממצא**: מפתח ה-dedupe בלי path מקפל את כל ה-amends של חבר, ולכן `order = "<path>#<decision|direct>"`; שני המחילים בשרת (`voteOnDecision`, `timegrama/decision`) אוחדו סביב `decisionToAmend` + `amendToStrapiWrite` (ב-timegrama: qid עם משתנים במקום GraphQL inline); חתימה של עריכה ישירה, הצעה + yes של המציע, וה-yes שסוגר · +13 ב-`projectAmend.test.ts`, +4 ב-`s2b.test.ts`, טסט הזהות עודכן לצורת ההחזרה. בשכבה הכל ירוק, `events.json` +493 שורות תוספת בלבד ויציב, check ‏1218, check:proxy ירוק. ב-configs נכשלים `proposeObjectArchive` (mock של `res.text`) ו-`updateTask`, שלא מייבאים שום דבר שנגעתי בו · commit `dist: A2b P1-P2` · **🧑 deploy ל-VPS** (‏`voteOnDecision`, `updateProjectDetails`; ו-timegrama, איפה שהוא רץ) · הבא: P3 (שתיקה, חתימה עצלה של `consensus.timeout`)
+- 2026-11-06 · A2b P3 · שתיקה בחתימה עצלה: `/api/consent/settings/[projectId]` (חבר בלבד; ה-amend נגזר מה-Decision עצמו, בלי שדה חדש ב-Strapi; `values` רק האחרון, `address` רק כשהוא עדיין ה-slug) + `planLazySettingsSigns` (רק החדש ביותר לכל path, ורק כשאין amend מאוחר יותר) + חתימה פעם בסשן ב-`SpaceProjectionShadow` (‏`consensus.timeout` ואז `project.amend`) · +7 ב-`projectAmend.test.ts`, +5 ב-`settingsMatured.test.ts`; ‏593 בשכבה, vectors ללא diff, check ‏1218, check:proxy ירוק · REST לא נבדק מול Strapi חי, ולא בדפדפן · commit `dist: A2b P3` · **🧑 deploy ל-VPS** (ה-endpoint רץ שם) · הבא: P4 (השוואת settings מול Strapi + טלמטריה `kind:'setting'`)

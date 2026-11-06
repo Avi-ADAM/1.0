@@ -29,6 +29,7 @@
   import { sendShadowReport } from '$lib/client/shadowTelemetry';
   import type { ShadowMismatch } from '$lib/consent/shadowTelemetry';
   import { freshTimerIds, compareTimers } from '$lib/consent/timerShadow';
+  import { signMaturedSettings } from '$lib/client/settingsLazySign';
 
   type GqlUserRow = { id: string | number; attributes?: { hervachti?: number | null } };
 
@@ -56,6 +57,14 @@
   });
 
   const projection = $derived(replica ? replica.projectFor(projectId) : null);
+
+  // A2b P3: once the chain is in, sign the settings Decisions that took
+  // effect without a signature (silence, or a voter whose client did not
+  // sign). Once per page session per rikma; the server holds no key.
+  $effect(() => {
+    if (!replica || replica.state.status !== 'synced') return;
+    untrack(() => void signMaturedSettings(boundProjectId, replica.state.eventsById.values()));
+  });
   const eventCount = $derived(replica ? replica.state.eventsById.size : 0);
 
   /**
