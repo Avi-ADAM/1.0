@@ -17,11 +17,16 @@
 import { describe, it, expect, beforeAll } from 'vitest';
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { buildVectors, VECTOR_FILES, unhex, type VectorSet } from './build';
+import { buildVectors, VECTOR_FILES, unhex, deltaStateFromJson, type VectorSet } from './build';
+import { verifyQuorum, type QuorumProof } from '$lib/consent/quorum';
+import { checkDeltas } from '$lib/consent/deltaCheck';
+import { compareIds } from '$lib/consent/ids';
+import type { Delta } from '$lib/consent/event';
 import { canonicalize, type JsonValue } from '$lib/crypto/canonical';
 import { verifySignedObject, type PubKeyResolver } from '$lib/crypto/verify';
 import { importPublicKey } from '$lib/crypto/identity';
 import { b64urlDecode, b64urlEncode } from '$lib/crypto/b64';
+import { isLowS, normalizeLowS } from '$lib/crypto/lowS';
 import type { SigAlgo } from '$lib/crypto/algorithm';
 import { verifyDeviceCert } from '$lib/crypto/deviceCert';
 import type { ConsentEvent, DeviceCert } from '$lib/consent/event';
@@ -109,6 +114,17 @@ describe('consent vectors — signatures.json', () => {
     }
   });
 
+  it('the high-S mirror verifies, and normalising it gives the low-S sig (O-2)', () => {
+    const v = (vectors.signatures.valid as Obj[]).find((x) => x.name === 'ecdsa-p256-high-s-event')!;
+    const high = b64urlDecode((v.object as Obj).sig as string);
+    expect(isLowS(high)).toBe(false);
+    const low = b64urlDecode(v.lowSSig as string);
+    expect(isLowS(low)).toBe(true);
+    expect(b64urlEncode(normalizeLowS(high))).toBe(v.lowSSig);
+    // r is shared: one signing act, two encodings.
+    expect(low.subarray(0, 32)).toEqual(high.subarray(0, 32));
+  });
+
   it('the device cert also passes the T7 semantic checks', async () => {
     const cert = (vectors.signatures.valid as Obj[]).find((v) => v.name === 'device-cert')!.object as DeviceCert;
     const res = await verifyDeviceCert(cert, resolver, { userId: cert.userId, devicePubKey: cert.devicePubKey }, cert.notBefore);
@@ -194,5 +210,50 @@ describe('consent vectors — e2e.json', () => {
     );
     const raw = await kemUnwrap(k.wrapped, priv);
     expect(raw && Array.from(raw)).toEqual(Array.from(unhex(k.payloadHex)));
+  });
+});
+
+describe('consent vectors — quorum.json (O-4)', () => {
+  it('every vote is a valid signed event', async () => {
+    for (const [name, v] of Object.entries(vectors.quorum.votes as Obj)) {
+      expect(await verifySignedObject(v, resolver), name).toEqual({ ok: true });
+    }
+  });
+
+  it('every quorum case reproduces its verdict and reason', () => {
+    const events = new Map<string, ConsentEvent>(
+      Object.values(vectors.quorum.votes as Record<string, ConsentEvent>).map((e) => [e.id, e])
+    );
+    for (const c of vectors.quorum.quorum as Obj[]) {
+      const res = verifyQuorum(c.proof as QuorumProof, {
+        eligibleMembers: new Set(c.eligibleMembers as string[]),
+        events,
+        voteAction: vectors.quorum.voteAction as string,
+        ...(c.memberWeights
+          ? { memberWeights: new Map(Object.entries(c.memberWeights as Record<string, string>).map(([m, w]) => [m, BigInt(w)])) }
+          : {})
+      });
+      const got = res.ok ? { ok: true, agreers: [...res.agreers].sort(compareIds) } : { ok: false, reason: res.reason };
+      expect(got, c.name).toEqual(c.expect);
+    }
+  });
+
+  it('every rule kind has a passing and a failing case', () => {
+    const byKind = new Map<string, Set<boolean>>();
+    for (const c of vectors.quorum.quorum as Obj[]) {
+      const k = (c.proof as QuorumProof).rule.kind;
+      if (!byKind.has(k)) byKind.set(k, new Set());
+      byKind.get(k)!.add((c.expect as Obj).ok as boolean);
+    }
+    for (const kind of ['unanimous', 'majority', 'k-of-n', 'agreers-only', 'timeout', 'weighted-unanimous-positive', 'weighted-threshold']) {
+      expect([...(byKind.get(kind) ?? [])].sort(), kind).toEqual([false, true]);
+    }
+  });
+
+  it('every delta case reproduces its verdict and reason', () => {
+    for (const c of vectors.quorum.deltas as Obj[]) {
+      const res = checkDeltas(deltaStateFromJson(c.before), deltaStateFromJson(c.after), c.deltas as Delta[]);
+      expect(res, c.name).toEqual(c.expect);
+    }
   });
 });

@@ -135,6 +135,29 @@
       },
       "canonicalBody": "{\"action\":\"project.join\",\"actor\":\"u-dave\",\"device\":\"MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEtUnRLd6lTaegci0W81V_1oqo1yRh5WmYaTNyTGYAm5cQvirNm3c9JJPWRm3Enxg-9UC16PjCHZV4CvO6eqdllw\",\"nonce\":\"7E1u7L61eLNmPWKsCvKvvQ\",\"parents\":[],\"subject\":{\"id\":\"p-1\",\"type\":\"project\"},\"ts\":1760000000000,\"v\":1}",
       "canonicalBodyWithSig": "{\"action\":\"project.join\",\"actor\":\"u-dave\",\"device\":\"MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEtUnRLd6lTaegci0W81V_1oqo1yRh5WmYaTNyTGYAm5cQvirNm3c9JJPWRm3Enxg-9UC16PjCHZV4CvO6eqdllw\",\"nonce\":\"7E1u7L61eLNmPWKsCvKvvQ\",\"parents\":[],\"sig\":\"GOEaaGYMNRy_5hE8ACHElGk9c45L9uzuk6A3oDB7UJVq70M1RRZ8toO4RgAnusNIMeymLJGh4mg6G2pG6YrFgQ\",\"subject\":{\"id\":\"p-1\",\"type\":\"project\"},\"ts\":1760000000000,\"v\":1}"
+    },
+    {
+      "name": "ecdsa-p256-high-s-event",
+      "alg": "ECDSA-P256",
+      "note": "The ecdsa-p256-event signing act with s replaced by n − s (SPEC §3, O-2). A verifier MUST accept it; a signer MUST NOT emit it — normalising its sig gives `lowSSig`. Same body, different sig ⇒ different id: why signers normalise.",
+      "object": {
+        "v": 1,
+        "actor": "u-dave",
+        "device": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEtUnRLd6lTaegci0W81V_1oqo1yRh5WmYaTNyTGYAm5cQvirNm3c9JJPWRm3Enxg-9UC16PjCHZV4CvO6eqdllw",
+        "action": "project.join",
+        "subject": {
+          "type": "project",
+          "id": "p-1"
+        },
+        "parents": [],
+        "ts": 1760000000000,
+        "nonce": "7E1u7L61eLNmPWKsCvKvvQ",
+        "sig": "GOEaaGYMNRy_5hE8ACHElGk9c45L9uzuk6A3oDB7UJWVELzJuumDSnxHuf_YRTy3ivpUgRV1vBy5nmB8Ethf0A",
+        "id": "532cq1TXkCvd8GPQTlJfRkpWL8I2m3EA7hLq2BAKvkI"
+      },
+      "lowSSig": "GOEaaGYMNRy_5hE8ACHElGk9c45L9uzuk6A3oDB7UJVq70M1RRZ8toO4RgAnusNIMeymLJGh4mg6G2pG6YrFgQ",
+      "canonicalBody": "{\"action\":\"project.join\",\"actor\":\"u-dave\",\"device\":\"MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEtUnRLd6lTaegci0W81V_1oqo1yRh5WmYaTNyTGYAm5cQvirNm3c9JJPWRm3Enxg-9UC16PjCHZV4CvO6eqdllw\",\"nonce\":\"7E1u7L61eLNmPWKsCvKvvQ\",\"parents\":[],\"subject\":{\"id\":\"p-1\",\"type\":\"project\"},\"ts\":1760000000000,\"v\":1}",
+      "canonicalBodyWithSig": "{\"action\":\"project.join\",\"actor\":\"u-dave\",\"device\":\"MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEtUnRLd6lTaegci0W81V_1oqo1yRh5WmYaTNyTGYAm5cQvirNm3c9JJPWRm3Enxg-9UC16PjCHZV4CvO6eqdllw\",\"nonce\":\"7E1u7L61eLNmPWKsCvKvvQ\",\"parents\":[],\"sig\":\"GOEaaGYMNRy_5hE8ACHElGk9c45L9uzuk6A3oDB7UJWVELzJuumDSnxHuf_YRTy3ivpUgRV1vBy5nmB8Ethf0A\",\"subject\":{\"id\":\"p-1\",\"type\":\"project\"},\"ts\":1760000000000,\"v\":1}"
     }
   ],
   "invalid": [

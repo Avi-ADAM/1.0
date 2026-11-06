@@ -190,6 +190,51 @@ export function closedByStop(timers: unknown): { at: number; sessionMs: number }
   return { at, sessionMs };
 }
 
+// ---------------------------------------------------------- finiapruval
+// A2 batch 3: the rikma's approval of delivered work. closeFiniapruval is
+// both the vote and, on the last yes, the close — so one call signs the vote
+// (`mission.approve.vote`, a tally on the finiapruval) and, only when it
+// closed a FINISH approval, `mission.approve` on the mission's stage.
+//
+// NO `amount` (the balances decision, 2026-10-30): the projection's balance
+// is money received from splits in this rikma, and approving a mission moves
+// none. An hours approval (timer save / month) banks hours and leaves the
+// mission running, so it signs the vote only — a mission.approve there would
+// close a running mission in the projection.
+
+export const finiapruvalVoteConsentSpec: ConsentSpec = {
+  action: 'mission.approve.vote',
+  subjectType: 'finiapruval',
+  subjectIdParam: 'finiapruvalId',
+  requireConsensus: false, // a vote is evidence, not a ratification
+  restimeFrom: 'project',
+  predicateFromParams: (params) => ({
+    what: params.vote === true,
+    // Deletable free text (HANDOFF T4 deletion policy) — payload.redact target.
+    why: params.why != null && params.why !== '' ? String(params.why) : undefined,
+    // The negotiation round the vote was cast on ($lib/finiapruval/rounds.ts):
+    // a counter re-opens signing at round+1, and dedupe folds by order.
+    order: typeof params.round === 'number' ? params.round : 0
+  })
+};
+
+export const approveMissionConsentSpec: ConsentSpec = {
+  action: 'mission.approve',
+  subjectType: 'mission',
+  // The mesimabetahalich id, as mission.complete — the reducer resolves it to
+  // the mission through MissionView.stageIds, or plants a legacy stub.
+  subjectIdParam: 'missionId',
+  // policy.ts requires a QuorumProof; in 'available' mode its absence is a
+  // warning. The evidence (the mission.approve.vote events above) is on the
+  // chain for the verifier that will own it.
+  requireConsensus: false,
+  restimeFrom: 'project',
+  predicateFromParams: (params) => ({
+    payee: params.payee != null ? String(params.payee) : undefined,
+    finiapruvalId: params.finiapruvalId != null ? String(params.finiapruvalId) : undefined
+  })
+};
+
 // ---------------------------------------------------------------- chat
 
 export const createChatMessageConsentSpec: ConsentSpec = {
@@ -325,6 +370,31 @@ export const s2bShadowJobs: Record<string, ShadowJobDeriver> = {
         fresh
       }
     }];
+  },
+
+  closeFiniapruval: (params, result) => {
+    const finiapruvalId = str(params.finiapruvalId);
+    // alreadyArchived: nothing was recorded, so nothing is signed.
+    if (!finiapruvalId || result.success !== true || result.alreadyArchived) return [];
+    const projectId = params.projectId;
+    const jobs: ShadowSignJob[] = [{
+      spec: finiapruvalVoteConsentSpec,
+      params: {
+        projectId,
+        finiapruvalId,
+        vote: params.vote === true,
+        why: params.why,
+        round: typeof result.round === 'number' ? result.round : 0
+      }
+    }];
+    const stageId = str(result.missionStageId);
+    if (result.closed === true && result.isTimerSave !== true && stageId) {
+      jobs.push({
+        spec: approveMissionConsentSpec,
+        params: { projectId, missionId: stageId, payee: result.payee, finiapruvalId }
+      });
+    }
+    return jobs;
   },
 
   timerStop: (params) => {

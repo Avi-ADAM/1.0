@@ -1,0 +1,1461 @@
+{
+  "format": "1lev1-consent-vectors",
+  "version": 1,
+  "file": "quorum",
+  "spec": "docs/SPEC_CONSENT_FORMAT.md",
+  "generator": "src/lib/consent/vectors/build.ts (npm run vectors:consent)",
+  "keyDerivation": "seed = SHA-256(UTF-8(\"1lev1-consent-v1/\" + label)); Ed25519 labels \"ed25519/<name>\", P-256 \"p256/<name>\", nonces \"nonce/<...>\" (first 16 bytes)",
+  "about": "QuorumProof rules (quorum.ts) and declared deltas (deltaCheck.ts) — SPEC_CONSENT_FORMAT §7.4 / §10, O-4. `votes` are signed (resolve against signatures.json keys). For each quorum case: verify `proof` with the given eligible members, voteAction \"mission.approve.vote\" and weights (agorot strings), and reproduce `expect` — `agreers` sorted by code units. For each delta case: build the states (members, balances, tosplits.approved, rounds; everything else empty) and reproduce `expect`, reasons byte for byte.",
+  "voteAction": "mission.approve.vote",
+  "votes": {
+    "context": {
+      "v": 1,
+      "actor": "u-bob",
+      "device": "MCowBQYDK2VwAyEA6RjNbe3z0BZms5MszZc34tt-y7ERI4-oB0h6aXTRHy8",
+      "action": "mission.complete",
+      "subject": {
+        "type": "mission",
+        "id": "m-1"
+      },
+      "predicate": {
+        "hoursDone": 8
+      },
+      "parents": [],
+      "ts": 1760000000000,
+      "nonce": "x5KWfqLMkxYo1TOQMMZxfQ",
+      "sig": "EdZUVn_6DU0ZgW4O_YC-OZ5qhPcw_aadXlo0nvUlqA8xFZMalt-p0SxpGZFwQe35BwAQYK_A0FUAth7HgCt-Dw",
+      "id": "CJHlqfeFx44pSexgGPxZwvcXbgK3wugbu8oCb2EAPaE"
+    },
+    "aliceYes": {
+      "v": 1,
+      "actor": "u-alice",
+      "device": "MCowBQYDK2VwAyEAw2aFyT5XfLsPDVxfoEQOCSVgl1_YS5aoiK8UGIh1RTY",
+      "action": "mission.approve.vote",
+      "subject": {
+        "type": "mission",
+        "id": "m-1"
+      },
+      "predicate": {
+        "what": true,
+        "order": 0
+      },
+      "parents": [],
+      "ts": 1760000000010,
+      "nonce": "Bi4B14gnVZRDdqom8C7fbA",
+      "sig": "F8p5DVz106b7pi0UVCQqI_CLmBaTs6wKFaLgWhgYWm9gtb3AgSkiT5IAIl8_jpbosIhXYWdGzIg54ugpiMyeAQ",
+      "id": "SgTJ2g-fF8Z-05hMhu6zcVuG-d0O58BgE99Q7HGyrYs"
+    },
+    "bobYes": {
+      "v": 1,
+      "actor": "u-bob",
+      "device": "MCowBQYDK2VwAyEA6RjNbe3z0BZms5MszZc34tt-y7ERI4-oB0h6aXTRHy8",
+      "action": "mission.approve.vote",
+      "subject": {
+        "type": "mission",
+        "id": "m-1"
+      },
+      "predicate": {
+        "what": true,
+        "order": 0
+      },
+      "parents": [],
+      "ts": 1760000000020,
+      "nonce": "DnYDfzgfBDS_wVhG0e5NRw",
+      "sig": "oXmeHgefxqoqlQbMKH6GFQRhVbY0AhBxEdKT1fitm5jfpe7lBXpRDnmvRYmS_EvZtPy9ZWvpFOZqtcn-AbfPAg",
+      "id": "CzsjoBWnbpiFL71aJPAXt3z0rz1_AjuhxuNpWdWD2Rw"
+    },
+    "carolYes": {
+      "v": 1,
+      "actor": "u-carol",
+      "device": "MCowBQYDK2VwAyEAsstdtAKx6uNVNkciaL63LhA505Nlz4IcwVXgFN4GSsI",
+      "action": "mission.approve.vote",
+      "subject": {
+        "type": "mission",
+        "id": "m-1"
+      },
+      "predicate": {
+        "what": true,
+        "order": 0
+      },
+      "parents": [],
+      "ts": 1760000000030,
+      "nonce": "hGhXDEsBg-RB3L_J9ZYTjQ",
+      "sig": "UfsMkp8IPnb7g4pJ6EuG5oJzYSUqU7pH3KPuj9yzt6Tf1p61AdqhnXGSOTNZLWDkAHS5u5xEG2sZ78iyDmf2Dw",
+      "id": "PN3hZ2YEzhDER1ycqeLkN7DK0HyJvXwTaDYZO58LXAc"
+    },
+    "carolNo": {
+      "v": 1,
+      "actor": "u-carol",
+      "device": "MCowBQYDK2VwAyEAsstdtAKx6uNVNkciaL63LhA505Nlz4IcwVXgFN4GSsI",
+      "action": "mission.approve.vote",
+      "subject": {
+        "type": "mission",
+        "id": "m-1"
+      },
+      "predicate": {
+        "what": false,
+        "order": 0
+      },
+      "parents": [],
+      "ts": 1760000000040,
+      "nonce": "cUTR52bI0azYprx9IqtNJQ",
+      "sig": "X97_gMwPIbWQGETeyLG64flvs11UBb1pqH6Fd63U04PCCwCwQVyLXcchMOFdBC7iNkOqTqdrRP_LWS9w4BysBA",
+      "id": "m3yHr-TXZIIzmyUosS0nSzq0Ec-y6FcwUJlZYBHRMYE"
+    }
+  },
+  "quorum": [
+    {
+      "name": "unanimous-pass",
+      "proof": {
+        "rule": {
+          "kind": "unanimous"
+        },
+        "evidence": [
+          "SgTJ2g-fF8Z-05hMhu6zcVuG-d0O58BgE99Q7HGyrYs",
+          "CzsjoBWnbpiFL71aJPAXt3z0rz1_AjuhxuNpWdWD2Rw",
+          "PN3hZ2YEzhDER1ycqeLkN7DK0HyJvXwTaDYZO58LXAc"
+        ]
+      },
+      "eligibleMembers": [
+        "u-alice",
+        "u-bob",
+        "u-carol"
+      ],
+      "expect": {
+        "ok": true,
+        "agreers": [
+          "u-alice",
+          "u-bob",
+          "u-carol"
+        ]
+      }
+    },
+    {
+      "name": "unanimous-context-event-skipped",
+      "proof": {
+        "rule": {
+          "kind": "unanimous"
+        },
+        "evidence": [
+          "CJHlqfeFx44pSexgGPxZwvcXbgK3wugbu8oCb2EAPaE",
+          "SgTJ2g-fF8Z-05hMhu6zcVuG-d0O58BgE99Q7HGyrYs",
+          "CzsjoBWnbpiFL71aJPAXt3z0rz1_AjuhxuNpWdWD2Rw",
+          "PN3hZ2YEzhDER1ycqeLkN7DK0HyJvXwTaDYZO58LXAc"
+        ]
+      },
+      "eligibleMembers": [
+        "u-alice",
+        "u-bob",
+        "u-carol"
+      ],
+      "expect": {
+        "ok": true,
+        "agreers": [
+          "u-alice",
+          "u-bob",
+          "u-carol"
+        ]
+      }
+    },
+    {
+      "name": "unanimous-revote-no-wins",
+      "proof": {
+        "rule": {
+          "kind": "unanimous"
+        },
+        "evidence": [
+          "SgTJ2g-fF8Z-05hMhu6zcVuG-d0O58BgE99Q7HGyrYs",
+          "CzsjoBWnbpiFL71aJPAXt3z0rz1_AjuhxuNpWdWD2Rw",
+          "PN3hZ2YEzhDER1ycqeLkN7DK0HyJvXwTaDYZO58LXAc",
+          "m3yHr-TXZIIzmyUosS0nSzq0Ec-y6FcwUJlZYBHRMYE"
+        ]
+      },
+      "eligibleMembers": [
+        "u-alice",
+        "u-bob",
+        "u-carol"
+      ],
+      "expect": {
+        "ok": false,
+        "reason": "has_no_vote"
+      }
+    },
+    {
+      "name": "unanimous-missing-voter",
+      "proof": {
+        "rule": {
+          "kind": "unanimous"
+        },
+        "evidence": [
+          "SgTJ2g-fF8Z-05hMhu6zcVuG-d0O58BgE99Q7HGyrYs",
+          "CzsjoBWnbpiFL71aJPAXt3z0rz1_AjuhxuNpWdWD2Rw"
+        ]
+      },
+      "eligibleMembers": [
+        "u-alice",
+        "u-bob",
+        "u-carol"
+      ],
+      "expect": {
+        "ok": false,
+        "reason": "not_unanimous"
+      }
+    },
+    {
+      "name": "majority-pass",
+      "proof": {
+        "rule": {
+          "kind": "majority"
+        },
+        "evidence": [
+          "SgTJ2g-fF8Z-05hMhu6zcVuG-d0O58BgE99Q7HGyrYs",
+          "CzsjoBWnbpiFL71aJPAXt3z0rz1_AjuhxuNpWdWD2Rw"
+        ]
+      },
+      "eligibleMembers": [
+        "u-alice",
+        "u-bob",
+        "u-carol"
+      ],
+      "expect": {
+        "ok": true,
+        "agreers": [
+          "u-alice",
+          "u-bob"
+        ]
+      }
+    },
+    {
+      "name": "majority-fail",
+      "proof": {
+        "rule": {
+          "kind": "majority"
+        },
+        "evidence": [
+          "SgTJ2g-fF8Z-05hMhu6zcVuG-d0O58BgE99Q7HGyrYs",
+          "m3yHr-TXZIIzmyUosS0nSzq0Ec-y6FcwUJlZYBHRMYE"
+        ]
+      },
+      "eligibleMembers": [
+        "u-alice",
+        "u-bob",
+        "u-carol"
+      ],
+      "expect": {
+        "ok": false,
+        "reason": "below_majority:1/2"
+      }
+    },
+    {
+      "name": "k-of-n-pass",
+      "proof": {
+        "rule": {
+          "kind": "k-of-n",
+          "k": 2
+        },
+        "evidence": [
+          "SgTJ2g-fF8Z-05hMhu6zcVuG-d0O58BgE99Q7HGyrYs",
+          "CzsjoBWnbpiFL71aJPAXt3z0rz1_AjuhxuNpWdWD2Rw"
+        ]
+      },
+      "eligibleMembers": [
+        "u-alice",
+        "u-bob",
+        "u-carol"
+      ],
+      "expect": {
+        "ok": true,
+        "agreers": [
+          "u-alice",
+          "u-bob"
+        ]
+      }
+    },
+    {
+      "name": "k-of-n-fail",
+      "proof": {
+        "rule": {
+          "kind": "k-of-n",
+          "k": 3
+        },
+        "evidence": [
+          "SgTJ2g-fF8Z-05hMhu6zcVuG-d0O58BgE99Q7HGyrYs",
+          "CzsjoBWnbpiFL71aJPAXt3z0rz1_AjuhxuNpWdWD2Rw"
+        ]
+      },
+      "eligibleMembers": [
+        "u-alice",
+        "u-bob",
+        "u-carol"
+      ],
+      "expect": {
+        "ok": false,
+        "reason": "below_k:2/3"
+      }
+    },
+    {
+      "name": "agreers-only-pass",
+      "proof": {
+        "rule": {
+          "kind": "agreers-only"
+        },
+        "evidence": [
+          "SgTJ2g-fF8Z-05hMhu6zcVuG-d0O58BgE99Q7HGyrYs"
+        ]
+      },
+      "eligibleMembers": [
+        "u-alice",
+        "u-bob",
+        "u-carol"
+      ],
+      "expect": {
+        "ok": true,
+        "agreers": [
+          "u-alice"
+        ]
+      }
+    },
+    {
+      "name": "agreers-only-fail",
+      "proof": {
+        "rule": {
+          "kind": "agreers-only"
+        },
+        "evidence": [
+          "m3yHr-TXZIIzmyUosS0nSzq0Ec-y6FcwUJlZYBHRMYE"
+        ]
+      },
+      "eligibleMembers": [
+        "u-alice",
+        "u-bob",
+        "u-carol"
+      ],
+      "expect": {
+        "ok": false,
+        "reason": "no_agreers"
+      }
+    },
+    {
+      "name": "timeout-pass",
+      "proof": {
+        "rule": {
+          "kind": "timeout",
+          "expectedEnd": 1760000001000,
+          "clockTolerance": 100
+        },
+        "evidence": [],
+        "attestedTs": 1760000000900
+      },
+      "eligibleMembers": [
+        "u-alice",
+        "u-bob",
+        "u-carol"
+      ],
+      "expect": {
+        "ok": true,
+        "agreers": []
+      }
+    },
+    {
+      "name": "timeout-too-early",
+      "proof": {
+        "rule": {
+          "kind": "timeout",
+          "expectedEnd": 1760000001000,
+          "clockTolerance": 100
+        },
+        "evidence": [],
+        "attestedTs": 1760000000899
+      },
+      "eligibleMembers": [
+        "u-alice",
+        "u-bob",
+        "u-carol"
+      ],
+      "expect": {
+        "ok": false,
+        "reason": "timeout_too_early"
+      }
+    },
+    {
+      "name": "timeout-needs-attestedTs",
+      "proof": {
+        "rule": {
+          "kind": "timeout",
+          "expectedEnd": 1760000001000,
+          "clockTolerance": 100
+        },
+        "evidence": []
+      },
+      "eligibleMembers": [
+        "u-alice",
+        "u-bob",
+        "u-carol"
+      ],
+      "expect": {
+        "ok": false,
+        "reason": "timeout_needs_attestedTs"
+      }
+    },
+    {
+      "name": "weighted-unanimous-positive-pass",
+      "proof": {
+        "rule": {
+          "kind": "weighted-unanimous-positive"
+        },
+        "evidence": [
+          "SgTJ2g-fF8Z-05hMhu6zcVuG-d0O58BgE99Q7HGyrYs",
+          "CzsjoBWnbpiFL71aJPAXt3z0rz1_AjuhxuNpWdWD2Rw",
+          "m3yHr-TXZIIzmyUosS0nSzq0Ec-y6FcwUJlZYBHRMYE"
+        ]
+      },
+      "eligibleMembers": [
+        "u-alice",
+        "u-bob",
+        "u-carol"
+      ],
+      "memberWeights": {
+        "u-alice": "100000",
+        "u-bob": "50000",
+        "u-carol": "0"
+      },
+      "expect": {
+        "ok": true,
+        "agreers": [
+          "u-alice",
+          "u-bob"
+        ]
+      }
+    },
+    {
+      "name": "weighted-unanimous-positive-no-vote",
+      "proof": {
+        "rule": {
+          "kind": "weighted-unanimous-positive"
+        },
+        "evidence": [
+          "SgTJ2g-fF8Z-05hMhu6zcVuG-d0O58BgE99Q7HGyrYs",
+          "CzsjoBWnbpiFL71aJPAXt3z0rz1_AjuhxuNpWdWD2Rw",
+          "m3yHr-TXZIIzmyUosS0nSzq0Ec-y6FcwUJlZYBHRMYE"
+        ]
+      },
+      "eligibleMembers": [
+        "u-alice",
+        "u-bob",
+        "u-carol"
+      ],
+      "memberWeights": {
+        "u-alice": "100000",
+        "u-bob": "50000",
+        "u-carol": "1"
+      },
+      "expect": {
+        "ok": false,
+        "reason": "positive_no_vote:u-carol"
+      }
+    },
+    {
+      "name": "weighted-unanimous-positive-missing",
+      "proof": {
+        "rule": {
+          "kind": "weighted-unanimous-positive"
+        },
+        "evidence": [
+          "SgTJ2g-fF8Z-05hMhu6zcVuG-d0O58BgE99Q7HGyrYs"
+        ]
+      },
+      "eligibleMembers": [
+        "u-alice",
+        "u-bob",
+        "u-carol"
+      ],
+      "memberWeights": {
+        "u-alice": "100000",
+        "u-bob": "50000",
+        "u-carol": "0"
+      },
+      "expect": {
+        "ok": false,
+        "reason": "positive_missing_vote:u-bob"
+      }
+    },
+    {
+      "name": "weighted-unanimous-positive-no-weights",
+      "proof": {
+        "rule": {
+          "kind": "weighted-unanimous-positive"
+        },
+        "evidence": [
+          "SgTJ2g-fF8Z-05hMhu6zcVuG-d0O58BgE99Q7HGyrYs"
+        ]
+      },
+      "eligibleMembers": [
+        "u-alice",
+        "u-bob",
+        "u-carol"
+      ],
+      "expect": {
+        "ok": false,
+        "reason": "missing_weights"
+      }
+    },
+    {
+      "name": "weighted-threshold-pass",
+      "proof": {
+        "rule": {
+          "kind": "weighted-threshold",
+          "thresholdBps": 6667
+        },
+        "evidence": [
+          "SgTJ2g-fF8Z-05hMhu6zcVuG-d0O58BgE99Q7HGyrYs",
+          "CzsjoBWnbpiFL71aJPAXt3z0rz1_AjuhxuNpWdWD2Rw"
+        ]
+      },
+      "eligibleMembers": [
+        "u-alice",
+        "u-bob",
+        "u-carol"
+      ],
+      "memberWeights": {
+        "u-alice": "100000",
+        "u-bob": "50000",
+        "u-carol": "50000"
+      },
+      "expect": {
+        "ok": true,
+        "agreers": [
+          "u-alice",
+          "u-bob"
+        ]
+      }
+    },
+    {
+      "name": "weighted-threshold-fail",
+      "proof": {
+        "rule": {
+          "kind": "weighted-threshold",
+          "thresholdBps": 6667
+        },
+        "evidence": [
+          "SgTJ2g-fF8Z-05hMhu6zcVuG-d0O58BgE99Q7HGyrYs"
+        ]
+      },
+      "eligibleMembers": [
+        "u-alice",
+        "u-bob",
+        "u-carol"
+      ],
+      "memberWeights": {
+        "u-alice": "100000",
+        "u-bob": "50000",
+        "u-carol": "50000"
+      },
+      "expect": {
+        "ok": false,
+        "reason": "below_threshold:1000000000/1333400000"
+      }
+    },
+    {
+      "name": "weighted-threshold-zero-total",
+      "proof": {
+        "rule": {
+          "kind": "weighted-threshold",
+          "thresholdBps": 5001
+        },
+        "evidence": [
+          "SgTJ2g-fF8Z-05hMhu6zcVuG-d0O58BgE99Q7HGyrYs"
+        ]
+      },
+      "eligibleMembers": [
+        "u-alice",
+        "u-bob",
+        "u-carol"
+      ],
+      "memberWeights": {
+        "u-alice": "0",
+        "u-bob": "0",
+        "u-carol": "0"
+      },
+      "expect": {
+        "ok": false,
+        "reason": "zero_total_weight"
+      }
+    },
+    {
+      "name": "missing-evidence",
+      "proof": {
+        "rule": {
+          "kind": "unanimous"
+        },
+        "evidence": [
+          "SgTJ2g-fF8Z-05hMhu6zcVuG-d0O58BgE99Q7HGyrYs",
+          "d8dnH1uya0cq7f58kMxU19FQyRKkk9g4AVA5RfTMI-Q"
+        ]
+      },
+      "eligibleMembers": [
+        "u-alice",
+        "u-bob",
+        "u-carol"
+      ],
+      "expect": {
+        "ok": false,
+        "reason": "missing_evidence:d8dnH1uya0cq7f58kMxU19FQyRKkk9g4AVA5RfTMI-Q"
+      }
+    },
+    {
+      "name": "ineligible-voter",
+      "proof": {
+        "rule": {
+          "kind": "k-of-n",
+          "k": 1
+        },
+        "evidence": [
+          "SgTJ2g-fF8Z-05hMhu6zcVuG-d0O58BgE99Q7HGyrYs"
+        ]
+      },
+      "eligibleMembers": [
+        "u-bob",
+        "u-carol"
+      ],
+      "expect": {
+        "ok": false,
+        "reason": "ineligible_voter:u-alice"
+      }
+    }
+  ],
+  "deltas": [
+    {
+      "name": "member-add-ok",
+      "before": {
+        "members": [
+          "u-alice",
+          "u-bob"
+        ],
+        "balances": {
+          "u-alice": "100000",
+          "u-bob": "50000"
+        }
+      },
+      "after": {
+        "members": [
+          "u-alice",
+          "u-bob",
+          "u-carol"
+        ],
+        "balances": {
+          "u-alice": "100000",
+          "u-bob": "50000"
+        }
+      },
+      "deltas": [
+        {
+          "kind": "member.add",
+          "member": "u-carol"
+        }
+      ],
+      "expect": {
+        "ok": true,
+        "unchecked": []
+      }
+    },
+    {
+      "name": "member-add-already-member",
+      "before": {
+        "members": [
+          "u-alice",
+          "u-bob",
+          "u-carol"
+        ],
+        "balances": {
+          "u-alice": "100000",
+          "u-bob": "50000"
+        }
+      },
+      "after": {
+        "members": [
+          "u-alice",
+          "u-bob",
+          "u-carol"
+        ],
+        "balances": {
+          "u-alice": "100000",
+          "u-bob": "50000"
+        }
+      },
+      "deltas": [
+        {
+          "kind": "member.add",
+          "member": "u-carol"
+        }
+      ],
+      "expect": {
+        "ok": false,
+        "reason": "member.add:already_member:u-carol"
+      }
+    },
+    {
+      "name": "member-remove-ok",
+      "before": {
+        "members": [
+          "u-alice",
+          "u-bob",
+          "u-carol"
+        ],
+        "balances": {
+          "u-alice": "100000",
+          "u-bob": "50000"
+        }
+      },
+      "after": {
+        "members": [
+          "u-alice",
+          "u-bob"
+        ],
+        "balances": {
+          "u-alice": "100000",
+          "u-bob": "50000"
+        }
+      },
+      "deltas": [
+        {
+          "kind": "member.remove",
+          "member": "u-carol"
+        }
+      ],
+      "expect": {
+        "ok": true,
+        "unchecked": []
+      }
+    },
+    {
+      "name": "member-remove-not-removed",
+      "before": {
+        "members": [
+          "u-alice",
+          "u-bob",
+          "u-carol"
+        ],
+        "balances": {
+          "u-alice": "100000",
+          "u-bob": "50000"
+        }
+      },
+      "after": {
+        "members": [
+          "u-alice",
+          "u-bob",
+          "u-carol"
+        ],
+        "balances": {
+          "u-alice": "100000",
+          "u-bob": "50000"
+        }
+      },
+      "deltas": [
+        {
+          "kind": "member.remove",
+          "member": "u-carol"
+        }
+      ],
+      "expect": {
+        "ok": false,
+        "reason": "member.remove:not_removed:u-carol"
+      }
+    },
+    {
+      "name": "hervachti-add-ok",
+      "before": {
+        "members": [
+          "u-alice",
+          "u-bob"
+        ],
+        "balances": {
+          "u-alice": "100000",
+          "u-bob": "50000"
+        }
+      },
+      "after": {
+        "members": [
+          "u-alice",
+          "u-bob"
+        ],
+        "balances": {
+          "u-alice": "100000",
+          "u-bob": "60000"
+        }
+      },
+      "deltas": [
+        {
+          "kind": "hervachti.add",
+          "member": "u-bob",
+          "amount": "10000",
+          "code": "ILS"
+        }
+      ],
+      "expect": {
+        "ok": true,
+        "unchecked": []
+      }
+    },
+    {
+      "name": "hervachti-add-mismatch",
+      "before": {
+        "members": [
+          "u-alice",
+          "u-bob"
+        ],
+        "balances": {
+          "u-alice": "100000",
+          "u-bob": "50000"
+        }
+      },
+      "after": {
+        "members": [
+          "u-alice",
+          "u-bob"
+        ],
+        "balances": {
+          "u-alice": "100000",
+          "u-bob": "60000"
+        }
+      },
+      "deltas": [
+        {
+          "kind": "hervachti.add",
+          "member": "u-bob",
+          "amount": "9999",
+          "code": "ILS"
+        }
+      ],
+      "expect": {
+        "ok": false,
+        "reason": "hervachti.add:amount_mismatch:10000!=9999"
+      }
+    },
+    {
+      "name": "hervachti-add-bad-amount",
+      "before": {
+        "members": [
+          "u-alice",
+          "u-bob"
+        ],
+        "balances": {
+          "u-alice": "100000",
+          "u-bob": "50000"
+        }
+      },
+      "after": {
+        "members": [
+          "u-alice",
+          "u-bob"
+        ],
+        "balances": {
+          "u-alice": "100000",
+          "u-bob": "60000"
+        }
+      },
+      "deltas": [
+        {
+          "kind": "hervachti.add",
+          "member": "u-bob",
+          "amount": "10.5",
+          "code": "ILS"
+        }
+      ],
+      "expect": {
+        "ok": false,
+        "reason": "hervachti.add:bad_amount:10.5"
+      }
+    },
+    {
+      "name": "hervachti-move-ok",
+      "before": {
+        "members": [
+          "u-alice",
+          "u-bob"
+        ],
+        "balances": {
+          "u-alice": "100000",
+          "u-bob": "50000"
+        }
+      },
+      "after": {
+        "members": [
+          "u-alice",
+          "u-bob"
+        ],
+        "balances": {
+          "u-alice": "90000",
+          "u-bob": "60000"
+        }
+      },
+      "deltas": [
+        {
+          "kind": "hervachti.move",
+          "from": "u-alice",
+          "to": "u-bob",
+          "amount": "10000",
+          "code": "ILS"
+        }
+      ],
+      "expect": {
+        "ok": true,
+        "unchecked": []
+      }
+    },
+    {
+      "name": "hervachti-move-from-mismatch",
+      "before": {
+        "members": [
+          "u-alice",
+          "u-bob"
+        ],
+        "balances": {
+          "u-alice": "100000",
+          "u-bob": "50000"
+        }
+      },
+      "after": {
+        "members": [
+          "u-alice",
+          "u-bob"
+        ],
+        "balances": {
+          "u-alice": "100000",
+          "u-bob": "60000"
+        }
+      },
+      "deltas": [
+        {
+          "kind": "hervachti.move",
+          "from": "u-alice",
+          "to": "u-bob",
+          "amount": "10000",
+          "code": "ILS"
+        }
+      ],
+      "expect": {
+        "ok": false,
+        "reason": "hervachti.move:from_mismatch:0!=-10000"
+      }
+    },
+    {
+      "name": "share-bump-ok",
+      "before": {
+        "members": [
+          "u-alice",
+          "u-bob"
+        ],
+        "balances": {
+          "u-alice": "100000",
+          "u-bob": "50000"
+        }
+      },
+      "after": {
+        "members": [
+          "u-alice",
+          "u-bob"
+        ],
+        "balances": {
+          "u-alice": "100000",
+          "u-bob": "60000"
+        }
+      },
+      "deltas": [
+        {
+          "kind": "hervachti.add",
+          "member": "u-bob",
+          "amount": "10000",
+          "code": "ILS"
+        },
+        {
+          "kind": "share.bump",
+          "member": "u-bob",
+          "oldBps": 3333,
+          "newBps": 3750
+        }
+      ],
+      "expect": {
+        "ok": true,
+        "unchecked": []
+      }
+    },
+    {
+      "name": "share-bump-rounded-up-rejected",
+      "before": {
+        "members": [
+          "u-alice",
+          "u-bob"
+        ],
+        "balances": {
+          "u-alice": "100000",
+          "u-bob": "50000"
+        }
+      },
+      "after": {
+        "members": [
+          "u-alice",
+          "u-bob"
+        ],
+        "balances": {
+          "u-alice": "100000",
+          "u-bob": "60000"
+        }
+      },
+      "deltas": [
+        {
+          "kind": "hervachti.add",
+          "member": "u-bob",
+          "amount": "10000",
+          "code": "ILS"
+        },
+        {
+          "kind": "share.bump",
+          "member": "u-bob",
+          "oldBps": 3334,
+          "newBps": 3750
+        }
+      ],
+      "expect": {
+        "ok": false,
+        "reason": "share.bump:old_bps:3333!=3334"
+      }
+    },
+    {
+      "name": "value-set-balance-ok",
+      "before": {
+        "members": [
+          "u-alice",
+          "u-bob"
+        ],
+        "balances": {
+          "u-alice": "100000",
+          "u-bob": "50000"
+        }
+      },
+      "after": {
+        "members": [
+          "u-alice",
+          "u-bob"
+        ],
+        "balances": {
+          "u-alice": "100000",
+          "u-bob": "60000"
+        }
+      },
+      "deltas": [
+        {
+          "kind": "value.set",
+          "path": "balances/u-bob",
+          "before": "50000",
+          "after": "60000"
+        }
+      ],
+      "expect": {
+        "ok": true,
+        "unchecked": []
+      }
+    },
+    {
+      "name": "value-set-after-mismatch",
+      "before": {
+        "members": [
+          "u-alice",
+          "u-bob"
+        ],
+        "balances": {
+          "u-alice": "100000",
+          "u-bob": "50000"
+        }
+      },
+      "after": {
+        "members": [
+          "u-alice",
+          "u-bob"
+        ],
+        "balances": {
+          "u-alice": "100000",
+          "u-bob": "60000"
+        }
+      },
+      "deltas": [
+        {
+          "kind": "value.set",
+          "path": "balances/u-bob",
+          "before": "50000",
+          "after": 60000
+        }
+      ],
+      "expect": {
+        "ok": false,
+        "reason": "value.set:after_mismatch:balances/u-bob"
+      }
+    },
+    {
+      "name": "value-set-unmodeled-path-unchecked",
+      "before": {
+        "members": [
+          "u-alice",
+          "u-bob"
+        ],
+        "balances": {
+          "u-alice": "100000",
+          "u-bob": "50000"
+        }
+      },
+      "after": {
+        "members": [
+          "u-alice",
+          "u-bob"
+        ],
+        "balances": {
+          "u-alice": "100000",
+          "u-bob": "50000"
+        }
+      },
+      "deltas": [
+        {
+          "kind": "value.set",
+          "path": "settings/name",
+          "before": "a",
+          "after": "b"
+        }
+      ],
+      "expect": {
+        "ok": true,
+        "unchecked": [
+          "value.set:settings/name"
+        ]
+      }
+    },
+    {
+      "name": "consensus-reach-tosplit-ok",
+      "before": {
+        "members": [
+          "u-alice",
+          "u-bob"
+        ],
+        "balances": {
+          "u-alice": "100000",
+          "u-bob": "50000"
+        }
+      },
+      "after": {
+        "members": [
+          "u-alice",
+          "u-bob"
+        ],
+        "balances": {
+          "u-alice": "100000",
+          "u-bob": "50000"
+        },
+        "tosplits": {
+          "t-1": {
+            "approved": true
+          }
+        }
+      },
+      "deltas": [
+        {
+          "kind": "consensus.reach",
+          "subject": "tosplit:t-1",
+          "decision": "approve"
+        }
+      ],
+      "expect": {
+        "ok": true,
+        "unchecked": []
+      }
+    },
+    {
+      "name": "consensus-reach-round-closed-mismatch",
+      "before": {
+        "members": [
+          "u-alice",
+          "u-bob"
+        ],
+        "balances": {
+          "u-alice": "100000",
+          "u-bob": "50000"
+        }
+      },
+      "after": {
+        "members": [
+          "u-alice",
+          "u-bob"
+        ],
+        "balances": {
+          "u-alice": "100000",
+          "u-bob": "50000"
+        },
+        "rounds": {
+          "mission:m-1": {
+            "current": 0,
+            "start": 1760000000000,
+            "closed": {
+              "round": 0,
+              "reachedAt": 1760000000005,
+              "decision": "reject"
+            }
+          }
+        }
+      },
+      "deltas": [
+        {
+          "kind": "consensus.reach",
+          "subject": "mission:m-1",
+          "decision": "approve"
+        }
+      ],
+      "expect": {
+        "ok": false,
+        "reason": "consensus.reach:round_decision:reject!=approve"
+      }
+    },
+    {
+      "name": "consensus-reach-unmodeled-subject-unchecked",
+      "before": {
+        "members": [
+          "u-alice",
+          "u-bob"
+        ],
+        "balances": {
+          "u-alice": "100000",
+          "u-bob": "50000"
+        }
+      },
+      "after": {
+        "members": [
+          "u-alice",
+          "u-bob"
+        ],
+        "balances": {
+          "u-alice": "100000",
+          "u-bob": "50000"
+        }
+      },
+      "deltas": [
+        {
+          "kind": "consensus.reach",
+          "subject": "mission:m-1",
+          "decision": "approve"
+        }
+      ],
+      "expect": {
+        "ok": true,
+        "unchecked": [
+          "consensus.reach:mission:m-1"
+        ]
+      }
+    },
+    {
+      "name": "round-advance-ok",
+      "before": {
+        "members": [
+          "u-alice",
+          "u-bob"
+        ],
+        "balances": {
+          "u-alice": "100000",
+          "u-bob": "50000"
+        },
+        "rounds": {
+          "mission:m-1": {
+            "current": 0,
+            "start": 1760000000000
+          }
+        }
+      },
+      "after": {
+        "members": [
+          "u-alice",
+          "u-bob"
+        ],
+        "balances": {
+          "u-alice": "100000",
+          "u-bob": "50000"
+        },
+        "rounds": {
+          "mission:m-1": {
+            "current": 1,
+            "start": 1760000000005
+          }
+        }
+      },
+      "deltas": [
+        {
+          "kind": "round.advance",
+          "subject": "mission:m-1",
+          "from": 0,
+          "to": 1,
+          "reason": "counter"
+        }
+      ],
+      "expect": {
+        "ok": true,
+        "unchecked": []
+      }
+    },
+    {
+      "name": "round-advance-to-mismatch",
+      "before": {
+        "members": [
+          "u-alice",
+          "u-bob"
+        ],
+        "balances": {
+          "u-alice": "100000",
+          "u-bob": "50000"
+        }
+      },
+      "after": {
+        "members": [
+          "u-alice",
+          "u-bob"
+        ],
+        "balances": {
+          "u-alice": "100000",
+          "u-bob": "50000"
+        },
+        "rounds": {
+          "mission:m-1": {
+            "current": 1,
+            "start": 1760000000005
+          }
+        }
+      },
+      "deltas": [
+        {
+          "kind": "round.advance",
+          "subject": "mission:m-1",
+          "from": 0,
+          "to": 2,
+          "reason": "counter"
+        }
+      ],
+      "expect": {
+        "ok": false,
+        "reason": "round.advance:to_round:1!=2"
+      }
+    },
+    {
+      "name": "unknown-kind-unchecked",
+      "before": {
+        "members": [
+          "u-alice",
+          "u-bob"
+        ],
+        "balances": {
+          "u-alice": "100000",
+          "u-bob": "50000"
+        }
+      },
+      "after": {
+        "members": [
+          "u-alice",
+          "u-bob"
+        ],
+        "balances": {
+          "u-alice": "100000",
+          "u-bob": "50000"
+        }
+      },
+      "deltas": [
+        {
+          "kind": "future.thing"
+        }
+      ],
+      "expect": {
+        "ok": true,
+        "unchecked": [
+          "unknown_kind:future.thing"
+        ]
+      }
+    },
+    {
+      "name": "undeclared-balance-change",
+      "before": {
+        "members": [
+          "u-alice",
+          "u-bob"
+        ],
+        "balances": {
+          "u-alice": "100000",
+          "u-bob": "50000"
+        }
+      },
+      "after": {
+        "members": [
+          "u-alice",
+          "u-bob"
+        ],
+        "balances": {
+          "u-alice": "100000",
+          "u-bob": "60000"
+        }
+      },
+      "deltas": [],
+      "expect": {
+        "ok": false,
+        "reason": "undeclared_balance_change:u-bob"
+      }
+    },
+    {
+      "name": "undeclared-membership-change",
+      "before": {
+        "members": [
+          "u-alice",
+          "u-bob"
+        ],
+        "balances": {
+          "u-alice": "100000",
+          "u-bob": "50000"
+        }
+      },
+      "after": {
+        "members": [
+          "u-alice",
+          "u-bob",
+          "u-carol"
+        ],
+        "balances": {
+          "u-alice": "100000",
+          "u-bob": "50000"
+        }
+      },
+      "deltas": [],
+      "expect": {
+        "ok": false,
+        "reason": "undeclared_membership_change:u-carol"
+      }
+    },
+    {
+      "name": "empty-declaration-no-change",
+      "before": {
+        "members": [
+          "u-alice",
+          "u-bob"
+        ],
+        "balances": {
+          "u-alice": "100000",
+          "u-bob": "50000"
+        }
+      },
+      "after": {
+        "members": [
+          "u-alice",
+          "u-bob"
+        ],
+        "balances": {
+          "u-alice": "100000",
+          "u-bob": "50000"
+        }
+      },
+      "deltas": [],
+      "expect": {
+        "ok": true,
+        "unchecked": []
+      }
+    }
+  ]
+}

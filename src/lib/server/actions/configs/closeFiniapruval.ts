@@ -81,7 +81,7 @@ export const closeFiniapruvalConfig: ActionConfig = {
                 id: finiapruvalId,
                 vots: allVots
             }, context.jwt, context.fetch);
-            return { success: true, closed: false };
+            return { success: true, closed: false, round: standing };
         }
 
         // All voted yes — close based on type. Hours (a timer save, a month)
@@ -168,6 +168,7 @@ export const closeFiniapruvalConfig: ActionConfig = {
             return {
                 success: true,
                 closed: false,
+                round: standing,
                 isTimerSave,
                 heldForCustomer: { hours: heldHours, amount: capped.split.overValue, filed: fileNow, decisionId: asked.decisionId }
             };
@@ -187,7 +188,16 @@ export const closeFiniapruvalConfig: ActionConfig = {
             }, context.jwt, context.fetch);
         }
 
-        return { success: true, closed: true, isTimerSave };
+        // round / missionStageId / payee feed the client's shadow-signed
+        // mission.approve(.vote) ($lib/consent/specs/s2b.ts, A2 batch 3).
+        return {
+            success: true,
+            closed: true,
+            isTimerSave,
+            round: standing,
+            missionStageId: mba?.id != null ? String(mba.id) : undefined,
+            payee: fa.users_permissions_user?.data?.id != null ? String(fa.users_permissions_user.data.id) : undefined
+        };
     },
 
     paramSchema: {

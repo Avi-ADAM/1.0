@@ -18,15 +18,20 @@
 import { createECDH } from 'node:crypto';
 import { canonicalize, type JsonValue } from '$lib/crypto/canonical';
 import { signCanonical, bodyForSigning, bodyWithSig } from '$lib/crypto/sign';
-import { b64urlEncode } from '$lib/crypto/b64';
-import type { ConsentEvent } from '$lib/consent/event';
-import { project, topoSort, emptyState } from '$lib/consent/projection';
+import { b64urlEncode, b64urlDecode } from '$lib/crypto/b64';
+import { canonicalBytes } from '$lib/crypto/canonical';
+import { isLowS, mirrorS, normalizeLowS } from '$lib/crypto/lowS';
+import type { ConsentEvent, Delta } from '$lib/consent/event';
+import { project, topoSort, emptyState, type ProjectState } from '$lib/consent/projection';
+import { verifyQuorum, type QuorumProof, type QuorumResult, type QuorumRule } from '$lib/consent/quorum';
+import { checkDeltas } from '$lib/consent/deltaCheck';
+import { compareIds } from '$lib/consent/ids';
 import { dedupeKey } from '$lib/consent/event';
 import { computeStateRoot, normalizeState } from '$lib/consent/stateRoot';
 import { computeHeads } from '$lib/space/protocol';
 import { keyCommitment } from '$lib/space/e2e/epoch';
 
-export const VECTOR_FILES = ['canonical', 'signatures', 'events', 'e2e'] as const;
+export const VECTOR_FILES = ['canonical', 'signatures', 'events', 'e2e', 'quorum'] as const;
 export type VectorFile = (typeof VECTOR_FILES)[number];
 export type VectorSet = Record<VectorFile, Record<string, unknown>>;
 
@@ -345,6 +350,20 @@ async function buildSignatures(
     p256Event = await signWith(daveBody, priv, 'ECDSA-P256');
   }
 
+  // O-2 (B2): the same signing act in its HIGH-S mirror. Derived from the
+  // frozen event, so it is deterministic. A verifier accepts it (events signed
+  // before the signer normalised stay valid); a signer never emits it.
+  const frozenSig = b64urlDecode(p256Event.sig as string);
+  const highSig = isLowS(frozenSig) ? mirrorS(frozenSig) : frozenSig;
+  const highSBody = bodyForSigning(p256Event as { id: string; sig: string }) as Obj;
+  const highSSigB64 = b64urlEncode(highSig);
+  const highSEvent: Obj = {
+    ...highSBody,
+    sig: highSSigB64,
+    id: b64urlEncode(await crypto.subtle.digest('SHA-256', canonicalBytes({ ...highSBody, sig: highSSigB64 } as JsonValue)))
+  };
+  const lowSSig = b64urlEncode(normalizeLowS(highSig));
+
   const tamperedPredicate = { ...firstEvent, predicate: { settings: { name: 'זיוף', restime: 172800000 } } };
   const badId = { ...firstEvent, id: b64urlEncode(toBuf(await derive('not-the-id'))) };
   const badSigEncoding = { ...firstEvent, sig: nonCanonicalB64(firstEvent.sig as string) };
@@ -377,6 +396,14 @@ async function buildSignatures(
         note: 'Signature is frozen (ECDSA is randomized): verify only. IEEE P1363 r‖s, 64 bytes — not DER.',
         object: p256Event,
         ...describeSigned(p256Event)
+      },
+      {
+        name: 'ecdsa-p256-high-s-event',
+        alg: 'ECDSA-P256',
+        note: 'The ecdsa-p256-event signing act with s replaced by n − s (SPEC §3, O-2). A verifier MUST accept it; a signer MUST NOT emit it — normalising its sig gives `lowSSig`. Same body, different sig ⇒ different id: why signers normalise.',
+        object: highSEvent,
+        lowSSig,
+        ...describeSigned(highSEvent)
       }
     ],
     invalid: [
@@ -388,6 +415,160 @@ async function buildSignatures(
       { name: 'lone-surrogate-in-body', reason: 'non_canonical_body', object: loneSurrogate },
       { name: 'nfc-duplicate-keys-in-body', reason: 'non_canonical_body', object: nfcDuplicate }
     ]
+  };
+}
+
+// ── quorum.json — QuorumProof rules and declared deltas (O-4) ───────────────
+//
+// Both checks run in strict-mode verification (SPEC §7), so a second
+// implementation that disagrees with either one splits the rikma. Every
+// expectation is computed by quorum.ts / deltaCheck.ts — this file freezes
+// what they answer today, reasons included.
+
+/** The part of ProjectState that checkDeltas reads, in the vector's JSON form. */
+export type DeltaStateJson = {
+  members: string[];
+  balances: Record<string, string>; // agorot, decimal string
+  tosplits?: Record<string, { approved: boolean }>;
+  rounds?: Record<string, { current: number; start: number; closed?: { round: number; reachedAt: number; decision: 'approve' | 'reject' } }>;
+};
+
+export function deltaStateFromJson(j: DeltaStateJson): ProjectState {
+  const s = emptyState('p-1');
+  for (const m of j.members) s.members.add(m);
+  for (const [m, a] of Object.entries(j.balances)) s.balances.set(m, BigInt(a));
+  for (const [id, t] of Object.entries(j.tosplits ?? {})) {
+    s.tosplits.set(id, { id, createdBy: '', createdAt: 0, predicate: undefined, votes: new Map(), approved: t.approved });
+  }
+  for (const [k, r] of Object.entries(j.rounds ?? {})) s.rounds.set(k, { ...r });
+  return s;
+}
+
+const sortAgreers = (r: QuorumResult): Obj =>
+  r.ok ? { ok: true, agreers: [...r.agreers].sort(compareIds) } : { ok: false, reason: r.reason };
+
+async function buildQuorum(keys: Record<string, EdKey>): Promise<Record<string, unknown>> {
+  const VOTE = 'mission.approve.vote';
+  const subject = { type: 'mission', id: 'm-1' };
+  const vote = async (label: string, actor: Actor, what: boolean, t: number, action = VOTE): Promise<ConsentEvent> =>
+    (await signWith(
+      {
+        v: 1,
+        actor: userId(actor),
+        device: keys[actor].spki,
+        action,
+        subject,
+        predicate: action === VOTE ? { what, order: 0 } : { hoursDone: 8 },
+        parents: [],
+        ts: T0 + t,
+        nonce: await nonceFor(`quorum/${label}`)
+      },
+      keys[actor].privateKey,
+      'Ed25519'
+    )) as unknown as ConsentEvent;
+
+  const ev = {
+    context: await vote('context', 'bob', true, 0, 'mission.complete'),
+    aliceYes: await vote('alice-yes', 'alice', true, 10),
+    bobYes: await vote('bob-yes', 'bob', true, 20),
+    carolYes: await vote('carol-yes', 'carol', true, 30),
+    carolNo: await vote('carol-no', 'carol', false, 40) // later than carolYes: her re-vote
+  };
+  type V = keyof typeof ev;
+  const events = new Map(Object.values(ev).map((e) => [e.id, e]));
+  const all = ['u-alice', 'u-bob', 'u-carol'];
+  const absent = b64urlEncode(toBuf(await derive('quorum/absent-evidence')));
+
+  type Case = {
+    name: string;
+    rule: QuorumRule;
+    evidence: (V | '!absent')[];
+    eligible?: string[];
+    weights?: Record<string, string>;
+    attestedTs?: number;
+  };
+  const W = { 'u-alice': '100000', 'u-bob': '50000', 'u-carol': '0' };
+  const cases: Case[] = [
+    { name: 'unanimous-pass', rule: { kind: 'unanimous' }, evidence: ['aliceYes', 'bobYes', 'carolYes'] },
+    { name: 'unanimous-context-event-skipped', rule: { kind: 'unanimous' }, evidence: ['context', 'aliceYes', 'bobYes', 'carolYes'] },
+    { name: 'unanimous-revote-no-wins', rule: { kind: 'unanimous' }, evidence: ['aliceYes', 'bobYes', 'carolYes', 'carolNo'] },
+    { name: 'unanimous-missing-voter', rule: { kind: 'unanimous' }, evidence: ['aliceYes', 'bobYes'] },
+    { name: 'majority-pass', rule: { kind: 'majority' }, evidence: ['aliceYes', 'bobYes'] },
+    { name: 'majority-fail', rule: { kind: 'majority' }, evidence: ['aliceYes', 'carolNo'] },
+    { name: 'k-of-n-pass', rule: { kind: 'k-of-n', k: 2 }, evidence: ['aliceYes', 'bobYes'] },
+    { name: 'k-of-n-fail', rule: { kind: 'k-of-n', k: 3 }, evidence: ['aliceYes', 'bobYes'] },
+    { name: 'agreers-only-pass', rule: { kind: 'agreers-only' }, evidence: ['aliceYes'] },
+    { name: 'agreers-only-fail', rule: { kind: 'agreers-only' }, evidence: ['carolNo'] },
+    { name: 'timeout-pass', rule: { kind: 'timeout', expectedEnd: T0 + 1000, clockTolerance: 100 }, evidence: [], attestedTs: T0 + 900 },
+    { name: 'timeout-too-early', rule: { kind: 'timeout', expectedEnd: T0 + 1000, clockTolerance: 100 }, evidence: [], attestedTs: T0 + 899 },
+    { name: 'timeout-needs-attestedTs', rule: { kind: 'timeout', expectedEnd: T0 + 1000, clockTolerance: 100 }, evidence: [] },
+    { name: 'weighted-unanimous-positive-pass', rule: { kind: 'weighted-unanimous-positive' }, evidence: ['aliceYes', 'bobYes', 'carolNo'], weights: W },
+    { name: 'weighted-unanimous-positive-no-vote', rule: { kind: 'weighted-unanimous-positive' }, evidence: ['aliceYes', 'bobYes', 'carolNo'], weights: { ...W, 'u-carol': '1' } },
+    { name: 'weighted-unanimous-positive-missing', rule: { kind: 'weighted-unanimous-positive' }, evidence: ['aliceYes'], weights: W },
+    { name: 'weighted-unanimous-positive-no-weights', rule: { kind: 'weighted-unanimous-positive' }, evidence: ['aliceYes'] },
+    { name: 'weighted-threshold-pass', rule: { kind: 'weighted-threshold', thresholdBps: 6667 }, evidence: ['aliceYes', 'bobYes'], weights: { ...W, 'u-carol': '50000' } },
+    { name: 'weighted-threshold-fail', rule: { kind: 'weighted-threshold', thresholdBps: 6667 }, evidence: ['aliceYes'], weights: { ...W, 'u-carol': '50000' } },
+    { name: 'weighted-threshold-zero-total', rule: { kind: 'weighted-threshold', thresholdBps: 5001 }, evidence: ['aliceYes'], weights: { 'u-alice': '0', 'u-bob': '0', 'u-carol': '0' } },
+    { name: 'missing-evidence', rule: { kind: 'unanimous' }, evidence: ['aliceYes', '!absent'] },
+    { name: 'ineligible-voter', rule: { kind: 'k-of-n', k: 1 }, evidence: ['aliceYes'], eligible: ['u-bob', 'u-carol'] }
+  ];
+
+  const quorumCases = cases.map((c) => {
+    const evidence = c.evidence.map((k) => (k === '!absent' ? absent : ev[k].id));
+    const eligible = c.eligible ?? all;
+    const proof: QuorumProof = { rule: c.rule, evidence, ...(c.attestedTs !== undefined ? { attestedTs: c.attestedTs } : {}) };
+    const result = verifyQuorum(proof, {
+      eligibleMembers: new Set(eligible),
+      events,
+      voteAction: VOTE,
+      ...(c.weights ? { memberWeights: new Map(Object.entries(c.weights).map(([m, w]) => [m, BigInt(w)])) } : {})
+    });
+    return strip({ name: c.name, proof, eligibleMembers: eligible, memberWeights: c.weights, expect: sortAgreers(result) });
+  });
+
+  // checkDeltas: before → after, a declaration, and the verdict.
+  const base: DeltaStateJson = { members: ['u-alice', 'u-bob'], balances: { 'u-alice': '100000', 'u-bob': '50000' } };
+  const withCarol: DeltaStateJson = { ...base, members: [...base.members, 'u-carol'] };
+  const credited: DeltaStateJson = { ...base, balances: { ...base.balances, 'u-bob': '60000' } };
+  const moved: DeltaStateJson = { ...base, balances: { 'u-alice': '90000', 'u-bob': '60000' } };
+  type DCase = { name: string; before: DeltaStateJson; after: DeltaStateJson; deltas: Delta[] };
+  const dcases: DCase[] = [
+    { name: 'member-add-ok', before: base, after: withCarol, deltas: [{ kind: 'member.add', member: 'u-carol' }] },
+    { name: 'member-add-already-member', before: withCarol, after: withCarol, deltas: [{ kind: 'member.add', member: 'u-carol' }] },
+    { name: 'member-remove-ok', before: withCarol, after: base, deltas: [{ kind: 'member.remove', member: 'u-carol' }] },
+    { name: 'member-remove-not-removed', before: withCarol, after: withCarol, deltas: [{ kind: 'member.remove', member: 'u-carol' }] },
+    { name: 'hervachti-add-ok', before: base, after: credited, deltas: [{ kind: 'hervachti.add', member: 'u-bob', amount: '10000', code: 'ILS' }] },
+    { name: 'hervachti-add-mismatch', before: base, after: credited, deltas: [{ kind: 'hervachti.add', member: 'u-bob', amount: '9999', code: 'ILS' }] },
+    { name: 'hervachti-add-bad-amount', before: base, after: credited, deltas: [{ kind: 'hervachti.add', member: 'u-bob', amount: '10.5', code: 'ILS' }] },
+    { name: 'hervachti-move-ok', before: base, after: moved, deltas: [{ kind: 'hervachti.move', from: 'u-alice', to: 'u-bob', amount: '10000', code: 'ILS' }] },
+    { name: 'hervachti-move-from-mismatch', before: base, after: credited, deltas: [{ kind: 'hervachti.move', from: 'u-alice', to: 'u-bob', amount: '10000', code: 'ILS' }] },
+    // shareBps floors: 50000/150000 = 3333, 60000/160000 = 3750.
+    { name: 'share-bump-ok', before: base, after: credited, deltas: [{ kind: 'hervachti.add', member: 'u-bob', amount: '10000', code: 'ILS' }, { kind: 'share.bump', member: 'u-bob', oldBps: 3333, newBps: 3750 }] },
+    { name: 'share-bump-rounded-up-rejected', before: base, after: credited, deltas: [{ kind: 'hervachti.add', member: 'u-bob', amount: '10000', code: 'ILS' }, { kind: 'share.bump', member: 'u-bob', oldBps: 3334, newBps: 3750 }] },
+    { name: 'value-set-balance-ok', before: base, after: credited, deltas: [{ kind: 'value.set', path: 'balances/u-bob', before: '50000', after: '60000' }] },
+    { name: 'value-set-after-mismatch', before: base, after: credited, deltas: [{ kind: 'value.set', path: 'balances/u-bob', before: '50000', after: 60000 }] },
+    { name: 'value-set-unmodeled-path-unchecked', before: base, after: base, deltas: [{ kind: 'value.set', path: 'settings/name', before: 'a', after: 'b' }] },
+    { name: 'consensus-reach-tosplit-ok', before: base, after: { ...base, tosplits: { 't-1': { approved: true } } }, deltas: [{ kind: 'consensus.reach', subject: 'tosplit:t-1', decision: 'approve' }] },
+    { name: 'consensus-reach-round-closed-mismatch', before: base, after: { ...base, rounds: { 'mission:m-1': { current: 0, start: T0, closed: { round: 0, reachedAt: T0 + 5, decision: 'reject' } } } }, deltas: [{ kind: 'consensus.reach', subject: 'mission:m-1', decision: 'approve' }] },
+    { name: 'consensus-reach-unmodeled-subject-unchecked', before: base, after: base, deltas: [{ kind: 'consensus.reach', subject: 'mission:m-1', decision: 'approve' }] },
+    { name: 'round-advance-ok', before: { ...base, rounds: { 'mission:m-1': { current: 0, start: T0 } } }, after: { ...base, rounds: { 'mission:m-1': { current: 1, start: T0 + 5 } } }, deltas: [{ kind: 'round.advance', subject: 'mission:m-1', from: 0, to: 1, reason: 'counter' }] },
+    { name: 'round-advance-to-mismatch', before: base, after: { ...base, rounds: { 'mission:m-1': { current: 1, start: T0 + 5 } } }, deltas: [{ kind: 'round.advance', subject: 'mission:m-1', from: 0, to: 2, reason: 'counter' }] },
+    { name: 'unknown-kind-unchecked', before: base, after: base, deltas: [{ kind: 'future.thing' } as unknown as Delta] },
+    { name: 'undeclared-balance-change', before: base, after: credited, deltas: [] },
+    { name: 'undeclared-membership-change', before: base, after: withCarol, deltas: [] },
+    { name: 'empty-declaration-no-change', before: base, after: base, deltas: [] }
+  ];
+  const deltaCases = dcases.map((c) => ({
+    ...c,
+    expect: checkDeltas(deltaStateFromJson(c.before), deltaStateFromJson(c.after), c.deltas)
+  }));
+
+  return {
+    about: 'QuorumProof rules (quorum.ts) and declared deltas (deltaCheck.ts) — SPEC_CONSENT_FORMAT §7.4 / §10, O-4. `votes` are signed (resolve against signatures.json keys). For each quorum case: verify `proof` with the given eligible members, voteAction "mission.approve.vote" and weights (agorot strings), and reproduce `expect` — `agreers` sorted by code units. For each delta case: build the states (members, balances, tosplits.approved, rounds; everything else empty) and reproduce `expect`, reasons byte for byte.',
+    voteAction: VOTE,
+    votes: Object.fromEntries(Object.entries(ev)),
+    quorum: quorumCases,
+    deltas: deltaCases
   };
 }
 
@@ -708,6 +889,7 @@ export async function buildVectors(previous?: Partial<VectorSet>): Promise<Vecto
       stateRootVersion: 2,
       scenarios
     },
-    e2e: { ...header('e2e'), ...(await buildE2e(keys, firstEvent)) }
+    e2e: { ...header('e2e'), ...(await buildE2e(keys, firstEvent)) },
+    quorum: { ...header('quorum'), ...(await buildQuorum(keys)) }
   };
 }

@@ -287,3 +287,67 @@ describe('timer shadow jobs (time.tick)', () => {
     expect(twice.timers.get('71')?.totalMs).toBe(90 * 60_000);
   });
 });
+
+describe('closeFiniapruval shadow jobs (A2 batch 3)', () => {
+  const params = { finiapruvalId: 'F9', projectId: '45', vote: true };
+
+  it('a vote that does not close signs mission.approve.vote only, on the standing round', () => {
+    const jobs = derive(s2bShadowJobs.closeFiniapruval(params, { success: true, closed: false, round: 2 }));
+    expect(jobs).toHaveLength(1);
+    expect(jobs[0]?.action).toBe('mission.approve.vote');
+    expect(jobs[0]?.subject).toEqual({ type: 'finiapruval', id: 'F9' });
+    expect(jobs[0]?.predicate).toMatchObject({ what: true, order: 2 });
+  });
+
+  it('the closing yes on a finish approval also signs mission.approve — payee, no amount', () => {
+    const jobs = derive(s2bShadowJobs.closeFiniapruval(params, {
+      success: true, closed: true, isTimerSave: false, round: 0, missionStageId: 'mb-3', payee: '258'
+    }));
+    expect(jobs.map((j) => j?.action)).toEqual(['mission.approve.vote', 'mission.approve']);
+    expect(jobs[1]?.subject).toEqual({ type: 'mission', id: 'mb-3' });
+    expect(jobs[1]?.predicate).toEqual({ payee: '258', finiapruvalId: 'F9' });
+    expect((jobs[1]?.predicate as Record<string, unknown>).amount).toBeUndefined();
+  });
+
+  it('an hours approval (timer save) closes without mission.approve', () => {
+    const jobs = s2bShadowJobs.closeFiniapruval(params, {
+      success: true, closed: true, isTimerSave: true, round: 0, missionStageId: 'mb-3', payee: '258'
+    });
+    expect(jobs.map((j) => j.spec.action)).toEqual(['mission.approve.vote']);
+  });
+
+  it('held for the customer, already archived, or failed: no approval, and nothing at all when nothing was recorded', () => {
+    const held = s2bShadowJobs.closeFiniapruval(params, { success: true, closed: false, round: 1, isTimerSave: false });
+    expect(held.map((j) => j.spec.action)).toEqual(['mission.approve.vote']);
+    expect(s2bShadowJobs.closeFiniapruval(params, { success: true, alreadyArchived: true })).toEqual([]);
+    expect(s2bShadowJobs.closeFiniapruval(params, {})).toEqual([]);
+    expect(s2bShadowJobs.closeFiniapruval({ vote: true }, { success: true, closed: false })).toEqual([]);
+  });
+
+  it('through the reducers: the mission is approved, the payee joins, balances do not move', () => {
+    const create = derive(s2bShadowJobs.createMission(
+      { projectId: '45', missionName: 'build', nhours: 10, valph: 50 },
+      { missionId: '77', createdEntityId: 'mb-3', createdEntityType: 'mesimabetahalich' }
+    ))[0];
+    const complete = derive(s2bShadowJobs.completeMission({ missionId: 'mb-3', hoursdon: 10 }, { projectId: '45' }))[0];
+    const [vote258, ] = derive(s2bShadowJobs.closeFiniapruval(params, { success: true, closed: false, round: 0 }));
+    const [vote261, approve] = derive(s2bShadowJobs.closeFiniapruval(params, {
+      success: true, closed: true, isTimerSave: false, round: 0, missionStageId: 'mb-3', payee: '258'
+    }));
+
+    const state = project([
+      asEvent(create, '258', 1),
+      asEvent(complete, '258', 2),
+      asEvent(vote258, '258', 3),
+      asEvent(vote261, '261', 4),
+      asEvent(approve, '261', 5)
+    ], '45');
+
+    expect(state.missions.get('77')).toMatchObject({ state: 'approved', approval: { by: '261', ts: 5 } });
+    expect(state.members.has('258')).toBe(true);
+    expect(state.balances.size).toBe(0);
+    const tally = [...state.stageVotes.values()].find((v) => v.subjectType === 'finiapruval');
+    expect(tally?.subjectId).toBe('F9');
+    expect([...tally!.votes.keys()].sort()).toEqual(['258', '261']);
+  });
+});

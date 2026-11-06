@@ -99,11 +99,11 @@
 |---|---|---|---|---|---|
 | 1 | A0 | מיפוי ה-relay בטופולוגיה של פרודקשן (Vercel מול VPS) + המלצה | S | — | ✔ |
 | 1b | A0b | push ב-chunks של ≤200 + relay מסרב לרוץ על Vercel (ממצאי A0) | S | A0 | ✔ |
-| 2 | B1 | vectors ל-quorum ול-deltaCheck (O-4) | M | — | ⬜ |
-| 3 | B2 | ECDSA low-S בצד החותם (O-2) | S | — | ⬜ |
+| 2 | B1 | vectors ל-quorum ול-deltaCheck (O-4) | M | — | ✔ |
+| 3 | B2 | ECDSA low-S בצד החותם (O-2) | S | — | ✔ |
 | 4 | A1 | דגל Space לפי רקמה (allowlist בשרת) | M | — | ✔ |
 | 5 | A3 | טלמטריית אי-התאמות לשרת | M | A1 | ✔ |
-| 6 | A2 | הרחבת חתימות ה-shadow — באצוות | L | — | ◐ אצווה 1 (חלוקה), אצווה 2 (טיימרים); פגישות ⏸ |
+| 6 | A2 | הרחבת חתימות ה-shadow — באצוות | L | — | ◐ אצווה 1 (חלוקה), 2 (טיימרים), 3 (אישור משימה); פגישות ⏸; נשארו: הצבעות (בדיקת כפילות מול `addVote`), `project.amend` |
 | 7 | B6 | אימות התחייבויות אינקרמנטלי (O(n²) → O(n)) | M–L | — | ⬜ |
 | 8 | C0 | יישור Node 24 (Dockerfile, פיתוח) + גילוי יכולות PQ | S | — | ⬜ 🧑 (התקנה/deploy) |
 | 9 | B4 | מזהה מכשיר כטביעת אצבע (O-7) | L | — | ⬜ |
@@ -278,7 +278,7 @@ override של מפתחים; אחרת — הפרויקט ברשימה. עדכן �
 | `time.tick` | `timerStart` / `timerStop` — ✔ אצווה 2 (ראו "טיימרים" למטה) |
 | `pendm.vote` / `decision.vote` / `ask.vote` / `sheirutpend.vote` | `voteOnPendm` / `voteOnDecision` / `voteOnAskm` / `approveSheirutpend` — **בדוק קודם** אם `addVote` כבר מכסה את אותו מסלול; אל תחתום פעמיים |
 | `project.join` | `finalizeJoinAcceptance` — **לא מתאים כמו שהוא**: ה-reducer מוסיף את `ev.actor`, אבל ה-action מורץ ע"י החבר המאשר ולא ע"י המצטרף. צריך `predicate.member` ב-reducer (שינוי פורמט + vector) או חתימה בצד המצטרף |
-| `mission.approve` | `closeFiniapruval` — **בלי `amount`** (החלטת היתרות, למטה): היתרה היא כסף מחלוקות, ואישור משימה לא מזיז אותה. ה-predicate: payee + מזהה המשימה/השלב בלבד |
+| `mission.approve` | `closeFiniapruval` — ✔ אצווה 3, **בלי `amount`** (ראו "אישור משימה" למטה) |
 | `project.amend` | `updateProjectDetails` (רק השדות שה-reducer מבין: `path`/`value`) |
 
 לכל action: spec ב-`s2b.ts` + רישום + טסט שמוודא שה-predicate בדיוק בצורה
@@ -383,6 +383,25 @@ override של מפתחים; אחרת — הפרויקט ברשימה. עדכן �
   component). אם היא נכשלת, השוואת הטיימרים פשוט לא סופרת כלום, וחצי היתרות
   ממשיך כרגיל.
 
+#### אישור משימה — אצווה 3 (2026-11-06)
+
+- **קריאה אחת, שני אירועים**: `closeFiniapruval` הוא גם ההצבעה וגם הסגירה. כל קריאה
+  חותמת `mission.approve.vote` על `finiapruval:<id>` (‏`what`, ‏`why`, ‏`order` = הסבב
+  העומד, `$lib/finiapruval/rounds`), וה-yes שסוגר אישור **סיום** חותם גם
+  `mission.approve` על השלב (`mesimabetahalich`, כמו `mission.complete`), עם `payee`
+  ו-`finiapruvalId` בלבד. **אין `amount`**, לפי החלטת היתרות.
+- **אישור שעות** (`isTimerSave`: שמירת טיימר, חודש) חותם רק את ההצבעה. `mission.approve`
+  שם היה סוגר בפרויקציה משימה שעדיין רצה.
+- **מה ה-action מחזיר עכשיו**: `round`, ובסגירה גם `missionStageId` ו-`payee`. אלה
+  נגזרים רק מנתונים שהשרת כבר קרא (qid 117), בלי שאילתה נוספת.
+- **החיבור**: `fiappru.svelte` שולח ל-`/api/action` ישירות, ולכן ה-hook נקרא שם, כמו
+  בטיימרים.
+- **quorum**: `policy.ts` דורש QuorumProof ל-`mission.approve`. במצב `available`
+  היעדרו הוא אזהרה בלבד, וה-evidence (ההצבעות) נמצא בשרשרת בשביל המאמת שיבנה אותו.
+- **פערי כיסוי**: סגירה בשתיקה (timegrama, בצד השרת); counter (`counterFiniapruval`)
+  לא נחתם; שעות שמוחזקות ללקוחה (`heldForCustomer`) חותמות את ההצבעה בלבד.
+- **לא נבדק בדפדפן**: דורש הצבעה אמיתית ברקמה שב-`SPACE_SYNC_PROJECTS`.
+
 ### B6 — אימות התחייבויות אינקרמנטלי
 **למה**: `verifyCommitments` משחזר את כל סגור האבות לכל אירוע ⇒ O(n²) בסנכרון
 (HANDOFF §8.3). היום לא מורגש (רק snapshots נושאים התחייבויות); ב-strict של S3b כן.
@@ -483,3 +502,6 @@ projection, עם fallback ל-Strapi כשה-Space ריק או לא מסונכרן
 - 2026-10-30 · A2 החלטת היתרות · המשתמש הכריע: יתרה = כסף מחלוקות באותה רקמה. `rikmaSplitBalances` (שני הכללים של Strapi) + `rikmaBalancesExport` (REST, דפדוף); ה-export של genesis וההשוואה ב-`SpaceProjectionShadow` עברו ליתרה לפי רקמה; תוקנו בדרך `projectName` (נקרא משדה לא קיים) ו-`console.log` של כל תשובת Strapi. דיאגרמה נוספה ל-`SPACE_RELAY_EXPLAINER.html` (סשן הצד) · 12 טסטים חדשים, 511 בשכבה (כולל `server/haluka`), 14 vectors, check 1315/1286, check:proxy ירוק · שאילתת ה-REST לא נבדקה מול Strapi חי · commit `dist: A2 balances` · **🧑 deploy ל-VPS** (ה-export רץ שם) · הבא: אצווה 2 (`pgisha.*`, `time.tick`), ואז `mission.approve` בלי סכום
 - 2026-10-30 · A2 אצווה 2 · **פגישות הוצאו מהתור** (החלטת המשתמש): הן עוברות ל-magik-meetings, יש שם שאלת אורחים בלי מפתח, וסשן אחר מעביר את ה-UI. **טיימרים נחתמים**: `timerStart`/`timerStop` → `time.tick` על `timer:<id>`, עם `order` = זמן ה-interval ו-`sessionMs` = מה שה-stop סגר. החיבור ב-`executeTimerAction` (`func/timers.js`), כי הטיימרים לא עוברים דרך `actionClient`. השוואה: `/api/consent/timers/[projectId]?ids=`, ו-`kind:'timer'` בטלמטריה, רק לטיימרים `fresh`. `strapiGet` הוצא ל-`$lib/server/consent/strapiRest`. פערי כיסוי: TimeEditor, intervals יתומים, start/stop מהשרת (בוט, MCP) · +16 טסטים (482 בשכבה, 200 ב-crypto/vault/timers), 14 vectors, check 1311/1277 (ללא שגיאות בקבצים שנגעתי), check:proxy ירוק · שאילתת `/api/timers` לא נבדקה מול Strapi חי · commit `dist: A2.2` · **🧑 deploy ל-VPS** (ה-endpoint רץ שם) · הבא: `mission.approve` בלי סכום (אצווה 3)
 - 2026-10-30 · T6 תיקון (נמצא ברקמת טסט בפרודקשן) · כפתור הייסוד החזיר `verify:commitment:snapshot_upTo_not_ancestor:genesis`: `verifyCommitments` הריץ על genesis את כלל T10 (`upTo` חייב להיות אב), וזה תמיד נכשל, כי genesis הוא אירוע בלי הורים. ה-relay דחה אותו, ולכן הוא נשאר רק בדפדפן של המציע. עכשיו genesis נבדק לפי ה-state ה-inline שלו: בלי הורים, `restoreState` מצליח, וה-hash שווה ל-root. האירוע שנדחה יידחף מחדש בסנכרון הבא, דרך `computeDiff` · +4 ב-`commitment.test.ts`, ‏462 בשכבה, ה-vectors ללא diff · **🧑 deploy ל-VPS וגם ל-Vercel**, כי אותו אימות רץ גם ב-relay וגם ב-ingest של כל דפדפן
+- 2026-11-06 · A2 אצווה 3 · `closeFiniapruval` → `mission.approve.vote` (כל הצבעה, על `finiapruval:<id>`, `order` = הסבב) + `mission.approve` (רק ה-yes שסוגר אישור סיום; payee, בלי `amount`). ה-action מחזיר `round`/`missionStageId`/`payee`; החיבור ב-`fiappru.svelte` (fetch ישיר). פערי כיסוי: סגירה בשתיקה, counter, שעות שמוחזקות ללקוחה · +5 ב-`s2b.test.ts` · לא נבדק בדפדפן · הבא ב-A2: הצבעות (`voteOnPendm`/… מול `addVote`), `project.amend`
+- 2026-11-06 · B2 · `$lib/crypto/lowS` (‏`normalizeLowS`/`mirrorS`, BigInt על P1363); `signCanonical` מנרמל ECDSA-P256 לפני חישוב ה-id, המאמת לא השתנה. vector `ecdsa-p256-high-s-event` + `lowSSig`, נגזר מהחתימה הקפואה ולכן דטרמיניסטי. SPEC §3 + §12 (O-2 ✔) · +4 ב-`lowS.test.ts` (כולל 50 חתימות שכולן low-S), diff ב-`signatures.json` = 23 שורות תוספת בלבד, יציב בשתי הרצות
+- 2026-11-06 · B1 · `spec/consent-v1/quorum.json`: 5 הצבעות חתומות, 22 מקרי quorum (לכל 7 הכללים עובר + נכשל, ועוד evidence חסר, מצביע לא זכאי, אירוע הקשר שמדולג, הצבעה חוזרת), 23 מקרי deltaCheck (כל 8 ה-kinds, completeness, `unchecked`). ה-state בקובץ = רק מה ש-`checkDeltas` קורא (`deltaStateFromJson`). **ממצא O-10**: `agreers-only` מקבל "לא" בניגוד להערה שלו; ה-vectors עוקפים את המקרה עד החלטה. SPEC §10 + §12 (O-4 ✔) · 549 בשכבה (היו 535), 19 vectors (היו 14), check: ‏1218 שגיאות (ביומן 1311; אין חדשות בקבצים שנגעתי) · commit `dist: A2.3 B1 B2` · הבא: B6 (מסלול B), או A2 (הצבעות)

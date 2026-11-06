@@ -185,25 +185,30 @@
 
   let error1;
   async function callCloseFiniapruval(vote, whyText) {
+    const params = {
+      finiapruvalId: String(askId),
+      timegramaId: timegramaId ? String(timegramaId) : undefined,
+      vote,
+      why: whyText || undefined,
+      projectId: String(projectId)
+    };
     try {
       const res = await fetch('/api/action', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-          actionKey: 'closeFiniapruval',
-          params: {
-            finiapruvalId: String(askId),
-            timegramaId: timegramaId ? String(timegramaId) : undefined,
-            vote,
-            why: whyText || undefined,
-            projectId: String(projectId)
-          }
-        })
+        body: JSON.stringify({ actionKey: 'closeFiniapruval', params })
       });
       const data = await res.json();
-      console.log('closeFiniapruval result', data);
+      // This card posts to /api/action itself, so it misses actionClient's
+      // shadow-sign hook — wire it here (A2 batch 3: mission.approve(.vote)).
+      // Fire-and-forget; never blocks the vote.
+      if (data?.success && data?.data?.success) {
+        import('$lib/client/shadowSignRegistry')
+          .then(({ shadowSignForAction }) => shadowSignForAction('closeFiniapruval', params, data.data))
+          .catch(() => {});
+      }
       return data;
     } catch (e) {
       error1 = e;

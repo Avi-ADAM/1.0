@@ -16,6 +16,7 @@ reproduces every file here byte for byte.
 | `signatures.json` | RFC 8032 anchor, keys, valid objects (event, DeviceCert, P-256), invalid objects with the expected reason |
 | `events.json` | signed event logs → topological order, dedupe, heads, root after each step, normalized state, final root |
 | `e2e.json` | epoch-key commitment, sealed envelope (AES-256-GCM), KEM wrap (ECDH P-256 + HKDF) with intermediates |
+| `quorum.json` | signed votes; every QuorumProof rule with a passing and a failing case (reasons included); every declared-delta kind checked against a before/after state |
 
 All keys, nonces and IVs derive from `SHA-256("1lev1-consent-v1/" + label)`,
 so every file is reproducible except the one ECDSA signature (randomized by
