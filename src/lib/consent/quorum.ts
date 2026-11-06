@@ -8,7 +8,12 @@
 //   - unanimous       : every member of the eligible set voted yes (head count)
 //   - majority        : > half of the eligible set voted yes
 //   - k-of-n          : at least k yes votes (k specified in rule.params)
-//   - agreers-only    : at least 1 yes vote, no nos (used by Ratson §3.0)
+//   - agreers-only    : at least 1 yes vote; the agreers are exactly the yes
+//                       voters (used by Ratson §3.0). A "no" is not a veto —
+//                       it is leaving the agreers: whoever says no simply is
+//                       not in, and the rest go ahead (O-10, decided
+//                       2026-11-06: "no absolute no"; a member who wants to
+//                       change the terms counters/negotiates, never vetoes).
 //   - timeout         : deadline passed AND no counter-proposal exists
 //                       (full validation lives in PLAN_restime_in_signed_chain;
 //                        the proof here only carries the receipts)
@@ -127,6 +132,7 @@ export function verifyQuorum(proof: QuorumProof, ctx: QuorumContext): QuorumResu
     }
 
     case 'agreers-only': {
+      // A "no" leaves the agreers; it does not block them (O-10).
       const { yesActors, reason } = collectVotes(proof, ctx);
       if (reason) return { ok: false, reason };
       if (yesActors.size === 0) return { ok: false, reason: 'no_agreers' };

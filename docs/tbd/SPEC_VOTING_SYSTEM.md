@@ -128,8 +128,9 @@ const passed = weightedPositive / totalWeight >= threshold;
 
 ### 3.5 `agreers_only` — רק המסכימים
 ```typescript
-// עובר כש: כל מי שהצביע (לא חייב כולם) הצביע ✓
-const passed = negativeVotes === 0 && positiveVotes > 0;
+// עובר כש: יש לפחות מסכים אחד. המסכימים = מי שהצביע ✓
+const passed = positiveVotes > 0;
+// "לא" = יציאה מהמסכימים, לא וטו (O-10, הוכרע 2026-11-06)
 // מי שלא הצביע = לא מונע אישור
 ```
 **שימוש:** הצטרפות ל-group purchase (ratson-share)
@@ -196,7 +197,7 @@ export function evaluateConsensus(
       return { status: 'pending', progress: positive / total };
       
     case 'agreers_only':
-      if (negative > 0) return { status: 'rejected', reason: 'negative_vote' };
+      // "לא" לא דוחה: מי שאמר "לא" פשוט לא בין המסכימים (O-10)
       if (positive > 0) return { status: 'passed' };
       return { status: 'pending', progress: 0 };
   }

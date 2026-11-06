@@ -336,6 +336,55 @@
       }
     },
     {
+      "name": "agreers-only-no-leaves",
+      "proof": {
+        "rule": {
+          "kind": "agreers-only"
+        },
+        "evidence": [
+          "SgTJ2g-fF8Z-05hMhu6zcVuG-d0O58BgE99Q7HGyrYs",
+          "CzsjoBWnbpiFL71aJPAXt3z0rz1_AjuhxuNpWdWD2Rw",
+          "m3yHr-TXZIIzmyUosS0nSzq0Ec-y6FcwUJlZYBHRMYE"
+        ]
+      },
+      "eligibleMembers": [
+        "u-alice",
+        "u-bob",
+        "u-carol"
+      ],
+      "expect": {
+        "ok": true,
+        "agreers": [
+          "u-alice",
+          "u-bob"
+        ]
+      }
+    },
+    {
+      "name": "agreers-only-revote-no-leaves",
+      "proof": {
+        "rule": {
+          "kind": "agreers-only"
+        },
+        "evidence": [
+          "SgTJ2g-fF8Z-05hMhu6zcVuG-d0O58BgE99Q7HGyrYs",
+          "PN3hZ2YEzhDER1ycqeLkN7DK0HyJvXwTaDYZO58LXAc",
+          "m3yHr-TXZIIzmyUosS0nSzq0Ec-y6FcwUJlZYBHRMYE"
+        ]
+      },
+      "eligibleMembers": [
+        "u-alice",
+        "u-bob",
+        "u-carol"
+      ],
+      "expect": {
+        "ok": true,
+        "agreers": [
+          "u-alice"
+        ]
+      }
+    },
+    {
       "name": "timeout-pass",
       "proof": {
         "rule": {

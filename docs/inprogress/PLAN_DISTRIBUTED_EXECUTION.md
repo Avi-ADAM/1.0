@@ -673,7 +673,7 @@ projection, עם fallback ל-Strapi כשה-Space ריק או לא מסונכרן
 | C0 | התקנת Node 24 מקומית; deploy VPS עם `node:24-alpine` | C1, C2 (vectors PQ) |
 | B5 | אישור חבילת v3 | מימוש O-3/O-5/O-6 |
 | A4 | בחירת רקמת פיילוט + env בפרודקשן | A5 |
-| O-10 | `agreers-only`: האם הצבעת "לא" מפילה אותו (ההערה אומרת כן, הקוד לא) | vector חסר, Ratson §3.0 |
+| ~~O-10~~ | ✔ הוכרע 2026-11-06: "לא" = יציאה מהקוורום, לא וטו; גם אחרי שיחה — רק מו"מ, לא "לא" מוחלט | — |
 | שער S3 | ההחלטה המוצרית (PLAN_serverless_p2p_data §1, תנאים א–ד) | S3, E1 |
 
 ---
@@ -702,3 +702,4 @@ projection, עם fallback ל-Strapi כשה-Space ריק או לא מסונכרן
 - 2026-11-06 · A2b P3 · שתיקה בחתימה עצלה: `/api/consent/settings/[projectId]` (חבר בלבד; ה-amend נגזר מה-Decision עצמו, בלי שדה חדש ב-Strapi; `values` רק האחרון, `address` רק כשהוא עדיין ה-slug) + `planLazySettingsSigns` (רק החדש ביותר לכל path, ורק כשאין amend מאוחר יותר) + חתימה פעם בסשן ב-`SpaceProjectionShadow` (‏`consensus.timeout` ואז `project.amend`) · +7 ב-`projectAmend.test.ts`, +5 ב-`settingsMatured.test.ts`; ‏593 בשכבה, vectors ללא diff, check ‏1218, check:proxy ירוק · REST לא נבדק מול Strapi חי, ולא בדפדפן · commit `dist: A2b P3` · **🧑 deploy ל-VPS** (ה-endpoint רץ שם) · הבא: P4 (השוואת settings מול Strapi + טלמטריה `kind:'setting'`)
 - 2026-11-06 · A2b P4 · השוואת settings ב-`SpaceProjectionShadow` (רק paths שנחתמו, canonical JSON) + `kind:'setting'` בטלמטריה בלי ערכים (אינדקס path + טביעת FNV-1a); `current` ב-endpoint; הדוח מציג את שם ה-path, וטסט מקבע את העותק של `AMEND_PATHS` · +9 ב-`settingsShadow.test.ts`; ‏600 בשכבה, vectors ללא diff, check ‏1218, check:proxy ירוק · לא נבדק בדפדפן · commit `dist: A2b P4` · **A2 ✔**. הבא בתור: C0 (🧑 Node 24) או B4 (מזהה מכשיר כטביעה); פתוח מ-§5: O-10
 - 2026-11-06 · B4 קריאה · `deviceId` = b64url(SHA-256(SPKI)) מתקבל בכל מאמת (שרת, לקוח, cert, reset) בלי שדה Strapi; vectors תוספת בלבד (5 אובייקטים + `deviceId` לכל מפתח), יציבים בשתי הרצות · +5 ב-`deviceId.test.ts`, +2 ב-`syncRoundtrip.test.ts` (שתי הצורות דרך ה-relay; טביעה של משתמש אחר; מבוטל), +2 ב-vectors; ‏607 בשכבה, check ‏1218, check:proxy ירוק · commit `dist: B4 read deviceId` · הבא: פליטה רק אחרי deploy + חלון; O-10 הוצג להכרעה
+- 2026-11-06 · O-10 · הוכרע (המשתמש): "לא" ב-`agreers-only` = יציאה מהקוורום, לא וטו; גם אחרי שיחה — רק מו"מ. הקוד כבר כך — תוקנה ההערה ב-`quorum.ts`, ו-`SPEC_VOTING_SYSTEM` (tbd) יושר; vectors `agreers-only-no-leaves` + `-revote-no-leaves` (תוספת בלבד) · אין שינוי אימות
