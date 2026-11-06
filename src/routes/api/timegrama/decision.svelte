@@ -16,7 +16,7 @@
     fetchStipendDecision,
     funderHasSigned
   } from '$lib/server/stipend/apply.js';
-  import { normalizeLicenseChange } from '$lib/codeLicense/codeLicense.js';
+  import { decisionToAmend, amendToStrapiWrite } from '$lib/consent/specs/projectAmend';
   import { tellMatured } from '$lib/server/notifications/matured';
   import { matureRuleDecision } from '$lib/server/fulfillment/consent';
   import { matureDealReceipt } from '$lib/server/deal/receipt';
@@ -50,57 +50,6 @@
     const projectId = a.projects?.data?.[0]?.id;
     if (!projectId) {
       console.warn(`[timegrama/decision] decision ${decisionId} has no linked project`);
-    } else if (a.kind === 'pic') {
-      const picId = a.newpic?.data?.id;
-      if (picId) {
-        await SendToAdmin(
-          `mutation { updateProject(id: ${projectId}, data: { profilePic: ${picId} }) { data { id } } }`,
-          env.ADMINMONTHER
-        );
-      }
-    } else if (a.kind === 'name' && a.newname) {
-      await SendToAdmin(
-        `mutation { updateProject(id: ${projectId}, data: { projectName: ${gqlStr(a.newname)} }) { data { id } } }`,
-        env.ADMINMONTHER
-      );
-    } else if (a.kind === 'pubdes') {
-      await SendToAdmin(
-        `mutation { updateProject(id: ${projectId}, data: { publicDescription: ${gqlStr(a.newpubdes)} }) { data { id } } }`,
-        env.ADMINMONTHER
-      );
-    } else if (a.kind === 'prides') {
-      await SendToAdmin(
-        `mutation { updateProject(id: ${projectId}, data: { descripFor: ${gqlStr(a.newprides)} }) { data { id } } }`,
-        env.ADMINMONTHER
-      );
-    } else if (a.kind === 'newFlink') {
-      await SendToAdmin(
-        `mutation { updateProject(id: ${projectId}, data: { fblink: ${gqlStr(a.newFlink)} }) { data { id } } }`,
-        env.ADMINMONTHER
-      );
-    } else if (a.kind === 'newWlink') {
-      await SendToAdmin(
-        `mutation { updateProject(id: ${projectId}, data: { linkToWebsite: ${gqlStr(a.newWlink)} }) { data { id } } }`,
-        env.ADMINMONTHER
-      );
-    } else if (a.kind === 'timtoM' && a.timtoM) {
-      // restime is an ENUM_PROJECT_RESTIME — must stay an unquoted literal.
-      await SendToAdmin(
-        `mutation { updateProject(id: ${projectId}, data: { restime: ${a.timtoM} }) { data { id } } }`,
-        env.ADMINMONTHER
-      );
-    } else if (a.kind === 'codeLicense') {
-      // codeLicense is an enum written as an unquoted literal, so the stored
-      // string is re-validated against the list before it reaches the query.
-      const next = normalizeLicenseChange(a.newCodeLicense, a.newCodeLicenseYears);
-      if (next) {
-        await SendToAdmin(
-          `mutation { updateProject(id: ${projectId}, data: { codeLicense: ${next.license}, codeLicenseOpenYears: ${
-            next.openYears ?? 'null'
-          }, codeLicenseSince: ${gqlStr(new Date().toISOString())} }) { data { id } } }`,
-          env.ADMINMONTHER
-        );
-      }
     } else if (a.kind === 'address' || a.kind === 'look') {
       // PLAN_RIKMA_SUBDOMAINS — same applier as the unanimous-vote path in
       // voteOnDecision, so silence and consent cannot diverge. An address taken
@@ -116,28 +65,21 @@
           error: e
         });
       }
-    } else if (a.kind === 'vallueadd' || a.kind === 'vallueles') {
-      const projRes = await SendToAdmin(
-        `{ project(id: ${projectId}) { data { attributes { vallues { data { id } } } } } }`,
-        env.ADMINMONTHER
-      );
-      const currentIds = (projRes?.data?.project?.data?.attributes?.vallues?.data ?? []).map((v) =>
-        String(v.id)
-      );
-      let newIds;
-      if (a.kind === 'vallueadd') {
-        const toAdd = (a.valluesadd?.data ?? []).map((v) => String(v.id));
-        newIds = Array.from(new Set([...currentIds, ...toAdd]));
-      } else {
-        const toRemove = new Set((a.valluesles?.data ?? []).map((v) => String(v.id)));
-        newIds = currentIds.filter((vid) => !toRemove.has(vid));
+    } else {
+      // Every other settings kind: the one mapping voteOnDecision uses too
+      // ($lib/consent/specs/projectAmend), written through the qid with
+      // variables — no hand-escaped inline GraphQL, and enums stay enums.
+      let currentValueIds;
+      if (a.kind === 'vallueadd' || a.kind === 'vallueles') {
+        const projRes = await SendToAdmin(
+          `{ project(id: ${projectId}) { data { attributes { vallues { data { id } } } } } }`,
+          env.ADMINMONTHER
+        );
+        currentValueIds = (projRes?.data?.project?.data?.attributes?.vallues?.data ?? []).map((v) => String(v.id));
       }
-      await SendToAdmin(
-        `mutation { updateProject(id: ${projectId}, data: { vallues: [${newIds
-          .map((vid) => `"${vid}"`)
-          .join(', ')}] }) { data { id } } }`,
-        env.ADMINMONTHER
-      );
+      const amend = decisionToAmend(a.kind, a, { currentValueIds });
+      const write = amend ? amendToStrapiWrite(String(projectId), amend, new Date().toISOString()) : null;
+      if (write) await strapiClient.execute(write.qid, write.vars);
     }
 
     await SendToAdmin(

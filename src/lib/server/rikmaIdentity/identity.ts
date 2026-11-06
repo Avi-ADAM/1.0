@@ -13,6 +13,7 @@
  * just JSON somebody once wrote.
  */
 
+import { identityAmend, type Amend } from '$lib/consent/specs/projectAmend';
 import { formerSlugToken, nextFormerSlugs, validateSlug, type SlugProblem } from '$lib/rikmaAddress/slug.js';
 import { lookIssues, parseLook, type LookImage, type RikmaLook } from '$lib/rikmaLook/look.js';
 
@@ -211,7 +212,7 @@ export async function applyIdentityDecision(
   runners: Runners,
   decisionId: string,
   projectId: string
-): Promise<{ applied: boolean; kind: string | null }> {
+): Promise<{ applied: boolean; kind: string | null; amend: Amend | null }> {
   const res = await runners.read('rikmaIdentityDecision', { id: String(decisionId) });
   const a = res?.data?.decision?.data?.attributes;
   if (!a) throw new IdentityError('decisionUnreadable', `Decision ${decisionId} could not be read`);
@@ -219,14 +220,15 @@ export async function applyIdentityDecision(
   if (!onProject) throw new IdentityError('wrongProject', `Decision ${decisionId} is not this rikma's`);
 
   if (a.kind === 'address') {
-    if (!a.newSlug) return { applied: false, kind: a.kind };
+    if (!a.newSlug) return { applied: false, kind: a.kind, amend: null };
     await applyRikmaIdentity(runners, projectId, { slug: a.newSlug });
-    return { applied: true, kind: a.kind };
+    // What was applied, for the signed project.amend ($lib/consent/specs/projectAmend).
+    return { applied: true, kind: a.kind, amend: identityAmend(a.kind, a) };
   }
   if (a.kind === 'look') {
     // A stored null means "back to the classic page".
     await applyRikmaIdentity(runners, projectId, { look: a.newLook ?? null });
-    return { applied: true, kind: a.kind };
+    return { applied: true, kind: a.kind, amend: identityAmend(a.kind, a) };
   }
-  return { applied: false, kind: a.kind ?? null };
+  return { applied: false, kind: a.kind ?? null, amend: null };
 }

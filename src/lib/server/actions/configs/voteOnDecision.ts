@@ -26,8 +26,8 @@ import { signObjectChange } from '$lib/server/archive/vote.js';
 import { dealSignersFor } from '$lib/server/sheirut/dealEdit.js';
 import { signStipend } from '$lib/server/stipend/vote.js';
 import { signPromoDecision } from '$lib/server/promotions/decision';
-import { normalizeLicenseChange } from '$lib/codeLicense/codeLicense.js';
 import { applyIdentityDecision } from '$lib/server/rikmaIdentity/identity.js';
+import { decisionToAmend, amendToStrapiWrite, type Amend } from '$lib/consent/specs/projectAmend';
 import { calcDeadlineMs } from './actionUtils.js';
 import {
   fetchSaleClaim,
@@ -481,83 +481,18 @@ const voteOnDecisionHandler: ActionExecutionHandler = async (params, context, { 
 
     const da = decisionData.attributes;
 
-    // Apply the approved change based on kind
-    if (kind === 'pic') {
-      const picId = newpicid ?? da.newpic?.data?.id;
-      if (picId) {
-        await strapi.execute(
-          '43updateProfilePic',
-          { projectId, imageId: String(picId) },
-          context.jwt,
-          context.fetch,
-        );
-      }
-    } else if (kind === 'name' && da.newname) {
-      await strapi.execute(
-        'updateProjectDetails',
-        { id: projectId, projectName: da.newname },
-        context.jwt,
-        context.fetch,
-      );
-    } else if (kind === 'pubdes') {
-      await strapi.execute(
-        'updateProjectDetails',
-        { id: projectId, publicDescription: da.newpubdes ?? '' },
-        context.jwt,
-        context.fetch,
-      );
-    } else if (kind === 'prides') {
-      await strapi.execute(
-        'updateProjectDetails',
-        { id: projectId, descripFor: da.newprides ?? '' },
-        context.jwt,
-        context.fetch,
-      );
-    } else if (kind === 'newFlink') {
-      await strapi.execute(
-        'updateProjectDetails',
-        { id: projectId, fblink: da.newFlink ?? '' },
-        context.jwt,
-        context.fetch,
-      );
-    } else if (kind === 'newWlink') {
-      await strapi.execute(
-        'updateProjectDetails',
-        { id: projectId, linkToWebsite: da.newWlink ?? '' },
-        context.jwt,
-        context.fetch,
-      );
-    } else if (kind === 'timtoM' && da.timtoM) {
-      await strapi.execute(
-        'updateProjectDetails',
-        { id: projectId, restime: da.timtoM },
-        context.jwt,
-        context.fetch,
-      );
-    } else if (kind === 'codeLicense') {
-      // PLAN_CODE_RIKMA §2.2 — the value is re-validated here, never trusted
-      // from the Decision row, and the change date is stamped on consensus.
-      const next = normalizeLicenseChange(da.newCodeLicense, da.newCodeLicenseYears);
-      if (next) {
-        await strapi.execute(
-          'updateProjectDetails',
-          {
-            id: projectId,
-            codeLicense: next.license,
-            codeLicenseOpenYears: next.openYears,
-            codeLicenseSince: now.toISOString(),
-          },
-          context.jwt,
-          context.fetch,
-        );
-      }
-    } else if (kind === 'address' || kind === 'look') {
+    // Apply the approved change. What a settings kind changes is one pure
+    // mapping ($lib/consent/specs/projectAmend), shared with the silence path
+    // in /api/timegrama/decision and with the client that signs project.amend —
+    // so the write, the silence and the signature cannot drift apart (A2b).
+    let amend: Amend | null = null;
+    if (kind === 'address' || kind === 'look') {
       // PLAN_RIKMA_SUBDOMAINS — the same applier the restime-silence path uses,
       // which re-validates the address (it may have been taken meanwhile) and
       // the look. A refusal leaves the decision closed and unapplied; the
       // members propose again.
       try {
-        await applyIdentityDecision(
+        const res = await applyIdentityDecision(
           {
             read: (qid, vars) => strapi.execute(qid, vars, undefined, context.fetch),
             write: (qid, vars) => strapi.execute(qid, vars, context.jwt, context.fetch),
@@ -565,38 +500,26 @@ const voteOnDecisionHandler: ActionExecutionHandler = async (params, context, { 
           String(decisionId),
           String(projectId),
         );
+        amend = res.amend;
       } catch (e) {
         console.error('[voteOnDecision:identity] approved but not applied:', { decisionId, kind, error: e });
       }
-    } else if (kind === 'vallueadd' || kind === 'vallueles') {
-      // Fetch current project vallue IDs
-      const projRes2 = await strapi.execute(
-        'getProjectBaseInfo',
-        { pid: projectId },
-        context.jwt,
-        context.fetch,
-      );
-      const currentVallues: any[] =
-        projRes2?.data?.project?.data?.attributes?.vallues?.data ?? [];
-      const currentIds: string[] = currentVallues.map((v: any) => String(v.id));
-
-      let newVallueIds: string[];
-      if (kind === 'vallueadd') {
-        const toAdd: string[] = (da.valluesadd?.data ?? []).map((v: any) => String(v.id));
-        newVallueIds = Array.from(new Set([...currentIds, ...toAdd]));
-      } else {
-        const toRemove = new Set(
-          (da.valluesles?.data ?? []).map((v: any) => String(v.id)),
+    } else {
+      let currentValueIds: string[] | undefined;
+      if (kind === 'vallueadd' || kind === 'vallueles') {
+        const projRes2 = await strapi.execute(
+          'getProjectBaseInfo',
+          { pid: projectId },
+          context.jwt,
+          context.fetch,
         );
-        newVallueIds = currentIds.filter((id) => !toRemove.has(id));
+        currentValueIds = (projRes2?.data?.project?.data?.attributes?.vallues?.data ?? []).map((v: any) =>
+          String(v.id),
+        );
       }
-
-      await strapi.execute(
-        'updateProjectDetails',
-        { id: projectId, vallues: newVallueIds },
-        context.jwt,
-        context.fetch,
-      );
+      amend = decisionToAmend(kind, da, { currentValueIds, newPicId: newpicid ?? null });
+      const write = amend ? amendToStrapiWrite(String(projectId), amend, now.toISOString()) : null;
+      if (write) await strapi.execute(write.qid, write.vars, context.jwt, context.fetch);
     }
 
     // Mark timegrama as done
@@ -612,7 +535,8 @@ const voteOnDecisionHandler: ActionExecutionHandler = async (params, context, { 
 
     // Consensus archives the Decision and applies the project change — refresh everywhere.
     return {
-      data: { decisionId, consensus: true, kind },
+      // `amend` is what took effect — the client signs it as project.amend.
+      data: { decisionId, consensus: true, kind, ...(amend ? { amend } : {}) },
       updateStrategy: { type: 'fullRefresh' },
     };
   } else {

@@ -676,6 +676,29 @@ const SCENARIOS: Scenario[] = [
       { label: 'd02', actor: 'alice', action: 'time.tick', subject: ['timer', 't-1'], predicate: { op: 'start', order: T0 + 60_000, fresh: true, mission: 'm-3', via: 'telegram' }, t: 61_000 },
       { label: 'd03', actor: 'alice', action: 'time.tick', subject: ['timer', 't-1'], predicate: { op: 'stop', order: T0 + 3_660_000, sessionMs: 3_600_000, via: 'mcp' }, t: 3_662_000 }
     ]
+  },
+  {
+    name: 'rikma-settings',
+    projectId: 'p-4',
+    description:
+      'A2b settings vocabulary (SPEC §6.6): a proposal is decision.create (kind, ref = the path, the proposed value) + decision.vote; project.amend is signed when the change takes effect, with the WHOLE new value — `restime` as its code, `values` as the full sorted set, a cleared text as null — and an optional `decisionId` the reducer ignores. `order` is the string "<path>#<decisionId | direct>": the dedupe key (§6.2) has no path, so without it every amend of one member would fold into the latest. A later amend of the same path wins by topological order.',
+    steps: [
+      { label: 'g01', actor: 'alice', action: 'project.create', subject: ['project', 'p-4'], predicate: { settings: { name: 'רקמה' } }, t: 0, parents: [] },
+      { label: 'g02', actor: 'bob', action: 'project.join', subject: ['project', 'p-4'], t: 1000 },
+      // a rikma of two: a direct edit of a minor link, and a cleared description
+      { label: 'g03', actor: 'bob', action: 'project.amend', subject: ['project', 'p-4'], predicate: { path: 'links/github', value: 'https://github.com/example/p-4', order: 'links/github#direct' }, t: 2000 },
+      { label: 'g04', actor: 'bob', action: 'project.amend', subject: ['project', 'p-4'], predicate: { path: 'publicDescription', value: null, order: 'publicDescription#direct' }, t: 2001 },
+      // the name goes through a Decision: proposal, both yes votes, then the amend
+      { label: 'g05', actor: 'alice', action: 'decision.create', subject: ['decision', 'dn-1'], predicate: { kind: 'name', ref: 'name', value: 'רקמת הגינה' }, t: 3000 },
+      { label: 'g06', actor: 'alice', action: 'decision.vote', subject: ['decision', 'dn-1'], predicate: { what: true, order: 0 }, t: 3001 },
+      { label: 'g07', actor: 'bob', action: 'decision.vote', subject: ['decision', 'dn-1'], predicate: { what: true, order: 0 }, t: 4000 },
+      { label: 'g08', actor: 'bob', action: 'project.amend', subject: ['project', 'p-4'], predicate: { path: 'name', value: 'רקמת הגינה', decisionId: 'dn-1', order: 'name#dn-1' }, t: 4001 },
+      { label: 'g09', actor: 'alice', action: 'project.amend', subject: ['project', 'p-4'], predicate: { path: 'restime', value: 'feh', decisionId: 'dt-1', order: 'restime#dt-1' }, t: 5000 },
+      { label: 'g10', actor: 'alice', action: 'project.amend', subject: ['project', 'p-4'], predicate: { path: 'values', value: ['12', '7', '9'], decisionId: 'dv-1', order: 'values#dv-1' }, t: 6000 },
+      { label: 'g11', actor: 'alice', action: 'project.amend', subject: ['project', 'p-4'], predicate: { path: 'codeLicense', value: { license: 'mit', openYears: null }, decisionId: 'dl-1', order: 'codeLicense#dl-1' }, t: 7000 },
+      // a second name later: the latest amend of a path is the setting
+      { label: 'g12', actor: 'bob', action: 'project.amend', subject: ['project', 'p-4'], predicate: { path: 'name', value: 'הגינה', decisionId: 'dn-2', order: 'name#dn-2' }, t: 8000 }
+    ]
   }
 ];
 

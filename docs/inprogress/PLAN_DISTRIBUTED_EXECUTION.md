@@ -103,7 +103,7 @@
 | 3 | B2 | ECDSA low-S בצד החותם (O-2) | S | — | ✔ |
 | 4 | A1 | דגל Space לפי רקמה (allowlist בשרת) | M | — | ✔ |
 | 5 | A3 | טלמטריית אי-התאמות לשרת | M | A1 | ✔ |
-| 6 | A2 | הרחבת חתימות ה-shadow — באצוות | L | — | ◐ אצוות 1–4 (חלוקה, טיימרים, אישור משימה, הצבעות); פגישות ⏸; **`project.amend` ממתין להחלטה (§5)** |
+| 6 | A2 | הרחבת חתימות ה-shadow — באצוות | L | — | ◐ אצוות 1–4 + A2b P1–P2 (הגדרות רקמה); פגישות ⏸; נשארו: A2b P3 (שתיקה), P4 (השוואה) |
 | 7 | B6 | אימות התחייבויות אינקרמנטלי (O(n²) → O(n)) | M–L | — | ✔ |
 | 8 | C0 | יישור Node 24 (Dockerfile, פיתוח) + גילוי יכולות PQ | S | — | ⬜ 🧑 (התקנה/deploy) |
 | 9 | B4 | מזהה מכשיר כטביעת אצבע (O-7) | L | — | ⬜ |
@@ -279,7 +279,7 @@ override של מפתחים; אחרת — הפרויקט ברשימה. עדכן �
 | `pendm.vote` / `decision.vote` / `ask.vote` / `sheirutpend.vote` | ✔ אצווה 4: `voteOnPendm` → `pendm.vote`, `voteOnDecision` → `decision.vote` (חוץ מ-`saleClaim`, שנחתם כבר ב-`decisionMaking`). **לא**: `voteOnAskm`/`voteOnMaap`/`voteOnPmash` (בקשות ומשאבים, אין reducer), `approveSheirutpend` (עדכון ישיר ולא הצבעה, ואין לו קוראים) |
 | `project.join` | `finalizeJoinAcceptance` — **לא מתאים כמו שהוא**: ה-reducer מוסיף את `ev.actor`, אבל ה-action מורץ ע"י החבר המאשר ולא ע"י המצטרף. צריך `predicate.member` ב-reducer (שינוי פורמט + vector) או חתימה בצד המצטרף |
 | `mission.approve` | `closeFiniapruval` — ✔ אצווה 3, **בלי `amount`** (ראו "אישור משימה" למטה) |
-| `project.amend` | `updateProjectDetails` — **⏸ ממתין להחלטה** (ראו "הצבעות — אצווה 4" למטה) |
+| `project.amend` | ✔ A2b P1–P2: `updateProjectDetails` (רקמה של חבר אחד, קישורים משניים, הצעות) + ה-yes שסוגר ב-`voteOnDecision`. שתיקה = P3 |
 
 לכל action: spec ב-`s2b.ts` + רישום + טסט שמוודא שה-predicate בדיוק בצורה
 שה-reducer קורא (הרץ את האירוע דרך `project()` ובדוק את ה-state).
@@ -419,7 +419,7 @@ override של מפתחים; אחרת — הפרויקט ברשימה. עדכן �
   קוד (`'feh'`). צריך להחליט (א) מי חותם על השינוי ומתי, ו-(ב) רשימת paths וסוגי ערכים,
   ואז זה שינוי פורמט עם vector.
 
-#### A2b — `project.amend`: הצעת תכנון (2026-11-06, ממתין לאישור)
+#### A2b — `project.amend` (2026-11-06; אושר, P1–P2 בוצעו)
 
 **מה קיים היום.** `updateProjectDetails` משנה ישירות רק ברקמה של חבר אחד. ברקמה עם
 יותר חברים הוא פותח `Decision` לכל שדה שהשתנה (12 סוגים: `name`, `pubdes`, `prides`,
@@ -494,7 +494,29 @@ settings). טלמטריה `kind:'setting'`.
 משניים, `decision.create`, ה-yes האחרון, ואיחוד שני המחילים (M) · P3 שתיקה בחתימה עצלה (M) ·
 P4 השוואה וטלמטריה (S).
 
-**לאשר:** (1) `restime` כקוד; (2) `values` כקבוצה מלאה; (3) שתיקה = חתימה עצלה (א).
+**אושר (המשתמש, 2026-11-06):** `restime` כקוד, `values` כקבוצה מלאה, שתיקה = חתימה עצלה (א).
+
+**P1–P2 — מה נבנה (2026-11-06)**
+- `$lib/consent/specs/projectAmend.ts`: `AMEND_PATHS`, `decisionToAmend`, `identityAmend`,
+  `directEditAmends`, `amendToStrapiWrite` ו-`amendOrder`, וגם ה-specs של `project.amend` ושל
+  `decision.create` להצעת הגדרה. SPEC §6.6. vector `events.json › rikma-settings` (תוספת בלבד).
+- **ממצא בבנייה: `order`.** מפתח ה-dedupe לא כולל את ה-path. בלי `order`, כל amend של
+  אותו חבר היה מתקפל לאחרון שלו, ושינוי שם היה מוחק שינוי restime. לכן
+  `order = "<path>#<decisionId | direct>"`. Decision שנחתם פעמיים עדיין מתקפל לאחד.
+- **שני המחילים אוחדו**: `voteOnDecision` (ה-yes האחרון) ו-`/api/timegrama/decision`
+  (שתיקה) מחילים את השינוי דרך `decisionToAmend` + `amendToStrapiWrite`. ב-timegrama
+  זה מחליף GraphQL inline עם escaping ידני ב-qid עם משתנים (`strapiClient`, כמו מסלול
+  הזהות שכבר היה שם). `applyIdentityDecision` מחזיר גם `amend`.
+- **מה נחתם**: `updateProjectDetails` מחזיר `amends` (רקמה של חבר אחד, קישורים משניים)
+  ו-`decisions[].path/value`. ה-registry חותם `project.amend`, `decision.create` וה-yes
+  של המציע. `voteOnDecision` בהבשלה מחזיר `amend`, והמצביע חותם `project.amend`
+  עם `decisionId`.
+- **הבדלי התנהגות קטנים** (מכוונים): טקסט מ-Decision נכתב אחרי trim, ו-`vallues` נכתב ממוין.
+- **פערים**: שתיקה (P3); `proposeProjectLink` ב-mastra קורא ל-action בצד השרת, ולכן אין
+  מי שיחתום.
+- **לא נבדק מול Strapi חי ולא בדפדפן**: הכתיבה של timegrama דרך `strapiClient`
+  (`updateProjectDetails` / `43updateProfilePic` עם טוקן האדמין). זה אותו טוקן ואותה
+  דרך שמסלול הזהות כבר משתמש בהן.
 
 ### B6 — אימות התחייבויות אינקרמנטלי
 **למה**: `verifyCommitments` משחזר את כל סגור האבות לכל אירוע ⇒ O(n²) בסנכרון
@@ -596,7 +618,6 @@ projection, עם fallback ל-Strapi כשה-Space ריק או לא מסונכרן
 | C0 | התקנת Node 24 מקומית; deploy VPS עם `node:24-alpine` | C1, C2 (vectors PQ) |
 | B5 | אישור חבילת v3 | מימוש O-3/O-5/O-6 |
 | A4 | בחירת רקמת פיילוט + env בפרודקשן | A5 |
-| `project.amend` (A2b) | אישור ההצעה ב-"A2b": `restime` כקוד, `values` כקבוצה מלאה, שתיקה = חתימה עצלה של `consensus.timeout` | סיום A2 |
 | O-10 | `agreers-only`: האם הצבעת "לא" מפילה אותו (ההערה אומרת כן, הקוד לא) | vector חסר, Ratson §3.0 |
 | שער S3 | ההחלטה המוצרית (PLAN_serverless_p2p_data §1, תנאים א–ד) | S3, E1 |
 
@@ -622,3 +643,4 @@ projection, עם fallback ל-Strapi כשה-Space ריק או לא מסונכרן
 - 2026-11-06 · A2 אצווה 4 · `voteOnPendm` → `pendm.vote` (הסבב מהשרת, `order` חדש בתוצאה), `voteOnDecision` → `decision.vote` (כל הסוגים חוץ מ-`saleClaim`, שכבר נחתם בנקודת הקריאה), דרך `addVoteConsentSpec` עצמו, ולכן אותה צורה ואותו dedupe. `project.amend` הוחזר כשאלה (§5): השינוי מבשיל בצד השרת, ואוצר ה-paths לא מוגדר · +4 ב-`s2b.test.ts` · לא נבדק בדפדפן
 - 2026-11-06 · B6 · cache של `ProjectState` לפי heads ב-`commitment.ts` (`stateAt`, LRU); `applyEvent` אחד על ה-state של ההורים, ו-replay מלא רק כשיש התנגשות dedupe עם אב או כשאין state ב-cache. משותף רק ב-`ingestEvent` ובאימות בצד השרת, אחרי אימות החתימה · `commitmentCache.pbt.test.ts`: property על 40 DAGs + שרשרת 500 (≤2 replays מלאים), ‏555 בשכבה, 19 vectors ללא diff, check ‏1218 (ללא שינוי) · commit `dist: A2.4 B6` · הבא: C0 (🧑 Node 24) או B4 (מזהה מכשיר כטביעה), ו-A2 אחרי החלטת `project.amend`
 - 2026-11-06 · A2b (תכנון) · הצעה ל-`project.amend`: רשימת paths סגורה עם ערכים מלאים, `decisionToAmend` כמקור יחיד שגם מאחד את שני המחילים בשרת, חתימה ברגע שהשינוי נכנס לתוקף (עריכה ישירה, ה-yes האחרון, ושתיקה בחתימה עצלה של `consensus.timeout`), ו-4 שלבים · מסמכים בלבד · ממתין לאישור (§5)
+- 2026-11-06 · A2b P1–P2 · אוצר ה-paths (`projectAmend.ts`, SPEC §6.6, vector `rikma-settings`); **ממצא**: מפתח ה-dedupe בלי path מקפל את כל ה-amends של חבר, ולכן `order = "<path>#<decision|direct>"`; שני המחילים בשרת (`voteOnDecision`, `timegrama/decision`) אוחדו סביב `decisionToAmend` + `amendToStrapiWrite` (ב-timegrama: qid עם משתנים במקום GraphQL inline); חתימה של עריכה ישירה, הצעה + yes של המציע, וה-yes שסוגר · +13 ב-`projectAmend.test.ts`, +4 ב-`s2b.test.ts`, טסט הזהות עודכן לצורת ההחזרה. בשכבה הכל ירוק, `events.json` +493 שורות תוספת בלבד ויציב, check ‏1218, check:proxy ירוק. ב-configs נכשלים `proposeObjectArchive` (mock של `res.text`) ו-`updateTask`, שלא מייבאים שום דבר שנגעתי בו · commit `dist: A2b P1-P2` · **🧑 deploy ל-VPS** (‏`voteOnDecision`, `updateProjectDetails`; ו-timegrama, איפה שהוא רץ) · הבא: P3 (שתיקה, חתימה עצלה של `consensus.timeout`)

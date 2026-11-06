@@ -1842,6 +1842,499 @@
         },
         "stateRoot": "QZmUpMDxgyfvjKJ7F7Xampjl2zL26nwJWLd8br5kSDg"
       }
+    },
+    {
+      "name": "rikma-settings",
+      "description": "A2b settings vocabulary (SPEC §6.6): a proposal is decision.create (kind, ref = the path, the proposed value) + decision.vote; project.amend is signed when the change takes effect, with the WHOLE new value — `restime` as its code, `values` as the full sorted set, a cleared text as null — and an optional `decisionId` the reducer ignores. `order` is the string \"<path>#<decisionId | direct>\": the dedupe key (§6.2) has no path, so without it every amend of one member would fold into the latest. A later amend of the same path wins by topological order.",
+      "projectId": "p-4",
+      "labels": {
+        "qUfcu07g37dcGIIkf_Wi6VURb8UFA3m_ADnaYUihzPk": "g01",
+        "CqJka1Qa9AEFR9IehusnCEjDJYUqNI40EJk3WKKHqCc": "g02",
+        "H0ejSAvKaoDltPLNFTFPl91D2WtMuLZZgRSCqI15qbQ": "g03",
+        "7w4hSsTTXMDKfHsqI13ZeO-BJcdICHmwyLbiU6QcbpE": "g04",
+        "mW9ach48G4CbBqMczqezuFI1CkcKoSi8k9v8WWqEhDM": "g05",
+        "Ol21W_FEhIXswOf0Py3ypT2uNie1N88lHvc7FbHRCh4": "g06",
+        "FUQAp2WZVMZIhdYBPcvWiugqD20DhW64jCmGdRJcMjM": "g07",
+        "ZVzQ--8aC9n0k5UIQo-BgjtU42W1A8ZAF-3arw3vrTI": "g08",
+        "mg9zQIr7cGtqTlSsv93uUYuligzZap3rx-zBNN21spM": "g09",
+        "XVv4idie1N6JckJe-GBZvJllxKc97TAPNQ8cYyiujak": "g10",
+        "ed8O0u6Q5K8XWY8YmvX6gqetQNakCDpFpEFAExLJRjI": "g11",
+        "gYuV9bv6-CSiGNDxY89QuOYTWNroWoloLdm1MHdcni4": "g12"
+      },
+      "events": [
+        {
+          "v": 1,
+          "actor": "u-alice",
+          "device": "MCowBQYDK2VwAyEAw2aFyT5XfLsPDVxfoEQOCSVgl1_YS5aoiK8UGIh1RTY",
+          "action": "project.create",
+          "subject": {
+            "type": "project",
+            "id": "p-4"
+          },
+          "predicate": {
+            "settings": {
+              "name": "רקמה"
+            }
+          },
+          "parents": [],
+          "ts": 1760000000000,
+          "nonce": "gRIwSK3Kt3pDTPmMIeenCA",
+          "sig": "ActPmho9oiXSeVNmHzPcVh_i3aXsWl5myaG9RzoRnXMkL4mlg-c5hC2eefCgQfc8xEvkd0wH6LE8upZGo_I1Bw",
+          "id": "qUfcu07g37dcGIIkf_Wi6VURb8UFA3m_ADnaYUihzPk"
+        },
+        {
+          "v": 1,
+          "actor": "u-bob",
+          "device": "MCowBQYDK2VwAyEA6RjNbe3z0BZms5MszZc34tt-y7ERI4-oB0h6aXTRHy8",
+          "action": "project.join",
+          "subject": {
+            "type": "project",
+            "id": "p-4"
+          },
+          "parents": [
+            "qUfcu07g37dcGIIkf_Wi6VURb8UFA3m_ADnaYUihzPk"
+          ],
+          "ts": 1760000001000,
+          "nonce": "sAz5BMPHAWYVB6232vMTIA",
+          "sig": "NpiOEwxxeik70DPidhmsx8hgGvsuFb6-U9-eQpGR2UBb2t8SQUpKKIvIwBop0mKJf_imcpeH4UjbpEHy9buxAg",
+          "id": "CqJka1Qa9AEFR9IehusnCEjDJYUqNI40EJk3WKKHqCc"
+        },
+        {
+          "v": 1,
+          "actor": "u-bob",
+          "device": "MCowBQYDK2VwAyEA6RjNbe3z0BZms5MszZc34tt-y7ERI4-oB0h6aXTRHy8",
+          "action": "project.amend",
+          "subject": {
+            "type": "project",
+            "id": "p-4"
+          },
+          "predicate": {
+            "path": "links/github",
+            "value": "https://github.com/example/p-4",
+            "order": "links/github#direct"
+          },
+          "parents": [
+            "CqJka1Qa9AEFR9IehusnCEjDJYUqNI40EJk3WKKHqCc"
+          ],
+          "ts": 1760000002000,
+          "nonce": "YfhggLzUooeSHPGvHy_IFA",
+          "sig": "ZqBSaShABjo10XgP0dhvjwAESYfKWzWoqzsJYej2ZZGehdK6K86cuVLsWej039m-Hd4kW5rvmbhq7_bIjcRmDw",
+          "id": "H0ejSAvKaoDltPLNFTFPl91D2WtMuLZZgRSCqI15qbQ"
+        },
+        {
+          "v": 1,
+          "actor": "u-bob",
+          "device": "MCowBQYDK2VwAyEA6RjNbe3z0BZms5MszZc34tt-y7ERI4-oB0h6aXTRHy8",
+          "action": "project.amend",
+          "subject": {
+            "type": "project",
+            "id": "p-4"
+          },
+          "predicate": {
+            "path": "publicDescription",
+            "value": null,
+            "order": "publicDescription#direct"
+          },
+          "parents": [
+            "H0ejSAvKaoDltPLNFTFPl91D2WtMuLZZgRSCqI15qbQ"
+          ],
+          "ts": 1760000002001,
+          "nonce": "V62Nsh1Z9TnS5SB9HvmNCA",
+          "sig": "UcHHkrCBeGEFKNncs5kTTFAcj5_XgilOhVqU9OgzmNbWpjnUeuEf9x8Ud8sbpDl-4q2a0fNEx9pQhqCidv08BQ",
+          "id": "7w4hSsTTXMDKfHsqI13ZeO-BJcdICHmwyLbiU6QcbpE"
+        },
+        {
+          "v": 1,
+          "actor": "u-alice",
+          "device": "MCowBQYDK2VwAyEAw2aFyT5XfLsPDVxfoEQOCSVgl1_YS5aoiK8UGIh1RTY",
+          "action": "decision.create",
+          "subject": {
+            "type": "decision",
+            "id": "dn-1"
+          },
+          "predicate": {
+            "kind": "name",
+            "ref": "name",
+            "value": "רקמת הגינה"
+          },
+          "parents": [
+            "7w4hSsTTXMDKfHsqI13ZeO-BJcdICHmwyLbiU6QcbpE"
+          ],
+          "ts": 1760000003000,
+          "nonce": "4mlUL0PsHk47uw1Ce4hYIA",
+          "sig": "cFiCqgBDoBd2fN-Qmv4SCS4gkjZmKrgr1XRQ1tYcwwrU_4lfT-x7gomYcWM7SO-IuZrTfkz_WsC95aVp2T1cBQ",
+          "id": "mW9ach48G4CbBqMczqezuFI1CkcKoSi8k9v8WWqEhDM"
+        },
+        {
+          "v": 1,
+          "actor": "u-alice",
+          "device": "MCowBQYDK2VwAyEAw2aFyT5XfLsPDVxfoEQOCSVgl1_YS5aoiK8UGIh1RTY",
+          "action": "decision.vote",
+          "subject": {
+            "type": "decision",
+            "id": "dn-1"
+          },
+          "predicate": {
+            "what": true,
+            "order": 0
+          },
+          "parents": [
+            "mW9ach48G4CbBqMczqezuFI1CkcKoSi8k9v8WWqEhDM"
+          ],
+          "ts": 1760000003001,
+          "nonce": "ahCqJ0kuI9U0FR7aSUARKA",
+          "sig": "3-6UKARjliSfuhcLpzM0KdqwIM2fYtbpCuNi6PLmwQxg9FdMEGaxp9TzKrilrIqqQRIlaUa__3F0y73JDd4IDQ",
+          "id": "Ol21W_FEhIXswOf0Py3ypT2uNie1N88lHvc7FbHRCh4"
+        },
+        {
+          "v": 1,
+          "actor": "u-bob",
+          "device": "MCowBQYDK2VwAyEA6RjNbe3z0BZms5MszZc34tt-y7ERI4-oB0h6aXTRHy8",
+          "action": "decision.vote",
+          "subject": {
+            "type": "decision",
+            "id": "dn-1"
+          },
+          "predicate": {
+            "what": true,
+            "order": 0
+          },
+          "parents": [
+            "Ol21W_FEhIXswOf0Py3ypT2uNie1N88lHvc7FbHRCh4"
+          ],
+          "ts": 1760000004000,
+          "nonce": "6OTW3UnGGeZehrWw3Da9Sw",
+          "sig": "BQMRepiSRckBeutDrLL9Bl1UHh1dTH0rAN4C5KVq7P4bGfbAInmJY627gfQbT6ZSKyRFyWpL672Xc0CwcizyBw",
+          "id": "FUQAp2WZVMZIhdYBPcvWiugqD20DhW64jCmGdRJcMjM"
+        },
+        {
+          "v": 1,
+          "actor": "u-bob",
+          "device": "MCowBQYDK2VwAyEA6RjNbe3z0BZms5MszZc34tt-y7ERI4-oB0h6aXTRHy8",
+          "action": "project.amend",
+          "subject": {
+            "type": "project",
+            "id": "p-4"
+          },
+          "predicate": {
+            "path": "name",
+            "value": "רקמת הגינה",
+            "decisionId": "dn-1",
+            "order": "name#dn-1"
+          },
+          "parents": [
+            "FUQAp2WZVMZIhdYBPcvWiugqD20DhW64jCmGdRJcMjM"
+          ],
+          "ts": 1760000004001,
+          "nonce": "Kd9AdLwU-ShdaYaSvYRy3w",
+          "sig": "kpaQnILpZ2V_wL1iGu0xEVA4asEOSc1rEq2iS_dxvFQHgmqPwNSupIwfXShdS4yawbRUopg8cotv0-8fOOJzDQ",
+          "id": "ZVzQ--8aC9n0k5UIQo-BgjtU42W1A8ZAF-3arw3vrTI"
+        },
+        {
+          "v": 1,
+          "actor": "u-alice",
+          "device": "MCowBQYDK2VwAyEAw2aFyT5XfLsPDVxfoEQOCSVgl1_YS5aoiK8UGIh1RTY",
+          "action": "project.amend",
+          "subject": {
+            "type": "project",
+            "id": "p-4"
+          },
+          "predicate": {
+            "path": "restime",
+            "value": "feh",
+            "decisionId": "dt-1",
+            "order": "restime#dt-1"
+          },
+          "parents": [
+            "ZVzQ--8aC9n0k5UIQo-BgjtU42W1A8ZAF-3arw3vrTI"
+          ],
+          "ts": 1760000005000,
+          "nonce": "otsW7r-NDS0zmJKUWMULtw",
+          "sig": "eZL98kVxB9w8SwMmSrOFgSzYXGDObJ9g8I5fJx9Vn40i15jVPgSmnSaTXoDPjMu8ArqjKhAo8CMo64Lu2bDbCw",
+          "id": "mg9zQIr7cGtqTlSsv93uUYuligzZap3rx-zBNN21spM"
+        },
+        {
+          "v": 1,
+          "actor": "u-alice",
+          "device": "MCowBQYDK2VwAyEAw2aFyT5XfLsPDVxfoEQOCSVgl1_YS5aoiK8UGIh1RTY",
+          "action": "project.amend",
+          "subject": {
+            "type": "project",
+            "id": "p-4"
+          },
+          "predicate": {
+            "path": "values",
+            "value": [
+              "12",
+              "7",
+              "9"
+            ],
+            "decisionId": "dv-1",
+            "order": "values#dv-1"
+          },
+          "parents": [
+            "mg9zQIr7cGtqTlSsv93uUYuligzZap3rx-zBNN21spM"
+          ],
+          "ts": 1760000006000,
+          "nonce": "xCF7-MjTJEeHtQn1JrT-NA",
+          "sig": "S2Z-5f1RQU4zMyIO2O-H8_9HlStXAe8TztIIxCV55zk6UzpmueOvrtQjQT53kCabDdPL1WvxZ55SARKuM7dKDg",
+          "id": "XVv4idie1N6JckJe-GBZvJllxKc97TAPNQ8cYyiujak"
+        },
+        {
+          "v": 1,
+          "actor": "u-alice",
+          "device": "MCowBQYDK2VwAyEAw2aFyT5XfLsPDVxfoEQOCSVgl1_YS5aoiK8UGIh1RTY",
+          "action": "project.amend",
+          "subject": {
+            "type": "project",
+            "id": "p-4"
+          },
+          "predicate": {
+            "path": "codeLicense",
+            "value": {
+              "license": "mit",
+              "openYears": null
+            },
+            "decisionId": "dl-1",
+            "order": "codeLicense#dl-1"
+          },
+          "parents": [
+            "XVv4idie1N6JckJe-GBZvJllxKc97TAPNQ8cYyiujak"
+          ],
+          "ts": 1760000007000,
+          "nonce": "hMvhNGE6i8tRYk12mhCoQw",
+          "sig": "wyG3FE-_I6G8b2-fYuAn9B40HA9lQ3azab43QSZQER1GpRtTie01Q_uBaJjEi0MxQGZI0h_G4cel_V3TXDHFBA",
+          "id": "ed8O0u6Q5K8XWY8YmvX6gqetQNakCDpFpEFAExLJRjI"
+        },
+        {
+          "v": 1,
+          "actor": "u-bob",
+          "device": "MCowBQYDK2VwAyEA6RjNbe3z0BZms5MszZc34tt-y7ERI4-oB0h6aXTRHy8",
+          "action": "project.amend",
+          "subject": {
+            "type": "project",
+            "id": "p-4"
+          },
+          "predicate": {
+            "path": "name",
+            "value": "הגינה",
+            "decisionId": "dn-2",
+            "order": "name#dn-2"
+          },
+          "parents": [
+            "ed8O0u6Q5K8XWY8YmvX6gqetQNakCDpFpEFAExLJRjI"
+          ],
+          "ts": 1760000008000,
+          "nonce": "8vwq80eiK6fyCMP03IVN6w",
+          "sig": "Q8McO4PYIusTTZtPPTy3MzBj8pLQ9yVEcsFbWU02mQEx-dsxZYpKHAA6GbEO7ROzMkl4gaNZuU3_pL8ri67FDQ",
+          "id": "gYuV9bv6-CSiGNDxY89QuOYTWNroWoloLdm1MHdcni4"
+        }
+      ],
+      "expect": {
+        "topoOrder": [
+          "qUfcu07g37dcGIIkf_Wi6VURb8UFA3m_ADnaYUihzPk",
+          "CqJka1Qa9AEFR9IehusnCEjDJYUqNI40EJk3WKKHqCc",
+          "H0ejSAvKaoDltPLNFTFPl91D2WtMuLZZgRSCqI15qbQ",
+          "7w4hSsTTXMDKfHsqI13ZeO-BJcdICHmwyLbiU6QcbpE",
+          "mW9ach48G4CbBqMczqezuFI1CkcKoSi8k9v8WWqEhDM",
+          "Ol21W_FEhIXswOf0Py3ypT2uNie1N88lHvc7FbHRCh4",
+          "FUQAp2WZVMZIhdYBPcvWiugqD20DhW64jCmGdRJcMjM",
+          "ZVzQ--8aC9n0k5UIQo-BgjtU42W1A8ZAF-3arw3vrTI",
+          "mg9zQIr7cGtqTlSsv93uUYuligzZap3rx-zBNN21spM",
+          "XVv4idie1N6JckJe-GBZvJllxKc97TAPNQ8cYyiujak",
+          "ed8O0u6Q5K8XWY8YmvX6gqetQNakCDpFpEFAExLJRjI",
+          "gYuV9bv6-CSiGNDxY89QuOYTWNroWoloLdm1MHdcni4"
+        ],
+        "dedupeKeys": {
+          "qUfcu07g37dcGIIkf_Wi6VURb8UFA3m_ADnaYUihzPk": "u-alice|project:p-4|project.create|0",
+          "CqJka1Qa9AEFR9IehusnCEjDJYUqNI40EJk3WKKHqCc": "u-bob|project:p-4|project.join|0",
+          "H0ejSAvKaoDltPLNFTFPl91D2WtMuLZZgRSCqI15qbQ": "u-bob|project:p-4|project.amend|links/github#direct",
+          "7w4hSsTTXMDKfHsqI13ZeO-BJcdICHmwyLbiU6QcbpE": "u-bob|project:p-4|project.amend|publicDescription#direct",
+          "mW9ach48G4CbBqMczqezuFI1CkcKoSi8k9v8WWqEhDM": "u-alice|decision:dn-1|decision.create|0",
+          "Ol21W_FEhIXswOf0Py3ypT2uNie1N88lHvc7FbHRCh4": "u-alice|decision:dn-1|decision.vote|0",
+          "FUQAp2WZVMZIhdYBPcvWiugqD20DhW64jCmGdRJcMjM": "u-bob|decision:dn-1|decision.vote|0",
+          "ZVzQ--8aC9n0k5UIQo-BgjtU42W1A8ZAF-3arw3vrTI": "u-bob|project:p-4|project.amend|name#dn-1",
+          "mg9zQIr7cGtqTlSsv93uUYuligzZap3rx-zBNN21spM": "u-alice|project:p-4|project.amend|restime#dt-1",
+          "XVv4idie1N6JckJe-GBZvJllxKc97TAPNQ8cYyiujak": "u-alice|project:p-4|project.amend|values#dv-1",
+          "ed8O0u6Q5K8XWY8YmvX6gqetQNakCDpFpEFAExLJRjI": "u-alice|project:p-4|project.amend|codeLicense#dl-1",
+          "gYuV9bv6-CSiGNDxY89QuOYTWNroWoloLdm1MHdcni4": "u-bob|project:p-4|project.amend|name#dn-2"
+        },
+        "applied": [
+          "qUfcu07g37dcGIIkf_Wi6VURb8UFA3m_ADnaYUihzPk",
+          "CqJka1Qa9AEFR9IehusnCEjDJYUqNI40EJk3WKKHqCc",
+          "H0ejSAvKaoDltPLNFTFPl91D2WtMuLZZgRSCqI15qbQ",
+          "7w4hSsTTXMDKfHsqI13ZeO-BJcdICHmwyLbiU6QcbpE",
+          "mW9ach48G4CbBqMczqezuFI1CkcKoSi8k9v8WWqEhDM",
+          "Ol21W_FEhIXswOf0Py3ypT2uNie1N88lHvc7FbHRCh4",
+          "FUQAp2WZVMZIhdYBPcvWiugqD20DhW64jCmGdRJcMjM",
+          "ZVzQ--8aC9n0k5UIQo-BgjtU42W1A8ZAF-3arw3vrTI",
+          "mg9zQIr7cGtqTlSsv93uUYuligzZap3rx-zBNN21spM",
+          "XVv4idie1N6JckJe-GBZvJllxKc97TAPNQ8cYyiujak",
+          "ed8O0u6Q5K8XWY8YmvX6gqetQNakCDpFpEFAExLJRjI",
+          "gYuV9bv6-CSiGNDxY89QuOYTWNroWoloLdm1MHdcni4"
+        ],
+        "heads": [
+          "gYuV9bv6-CSiGNDxY89QuOYTWNroWoloLdm1MHdcni4"
+        ],
+        "steps": [
+          {
+            "id": "qUfcu07g37dcGIIkf_Wi6VURb8UFA3m_ADnaYUihzPk",
+            "label": "g01",
+            "rootAfter": "ZqYCWO9lKCNg5x6UDtQX6IORRPUzzAOAZHgST7lmI4w"
+          },
+          {
+            "id": "CqJka1Qa9AEFR9IehusnCEjDJYUqNI40EJk3WKKHqCc",
+            "label": "g02",
+            "rootAfter": "-Bveq7OBO8-tG529il9K8fCzFCxR43PKw6D7hU6FlEA"
+          },
+          {
+            "id": "H0ejSAvKaoDltPLNFTFPl91D2WtMuLZZgRSCqI15qbQ",
+            "label": "g03",
+            "rootAfter": "ZrufmelKPMqqJFlU4hOHralIdkW6ap4r9rTT59tz2jk"
+          },
+          {
+            "id": "7w4hSsTTXMDKfHsqI13ZeO-BJcdICHmwyLbiU6QcbpE",
+            "label": "g04",
+            "rootAfter": "5hkfV2-_jksNQZVih2aT4M2lavftt-CwlBjnGU12mnM"
+          },
+          {
+            "id": "mW9ach48G4CbBqMczqezuFI1CkcKoSi8k9v8WWqEhDM",
+            "label": "g05",
+            "rootAfter": "8HBYjoHfCfGE9_UX3QLpq2Rx4oALtTxIbGvNPCCt98E"
+          },
+          {
+            "id": "Ol21W_FEhIXswOf0Py3ypT2uNie1N88lHvc7FbHRCh4",
+            "label": "g06",
+            "rootAfter": "Mo2MRcr4UedJ1ByUIqUSR29IALZ5mXDPf9NJhLgManM"
+          },
+          {
+            "id": "FUQAp2WZVMZIhdYBPcvWiugqD20DhW64jCmGdRJcMjM",
+            "label": "g07",
+            "rootAfter": "bbUcrk1q9Xc9KPDblEe6G6p3_fyDRmxecdIKy_zcCTk"
+          },
+          {
+            "id": "ZVzQ--8aC9n0k5UIQo-BgjtU42W1A8ZAF-3arw3vrTI",
+            "label": "g08",
+            "rootAfter": "WAO7TuUKatXPt4Tn0p4KCJRrofXX2u9wV5AZJKvzJVs"
+          },
+          {
+            "id": "mg9zQIr7cGtqTlSsv93uUYuligzZap3rx-zBNN21spM",
+            "label": "g09",
+            "rootAfter": "wpQkDBEJzbzZFv_uBUvvwXFTwIQjg43NTwd1Ec6wQ4U"
+          },
+          {
+            "id": "XVv4idie1N6JckJe-GBZvJllxKc97TAPNQ8cYyiujak",
+            "label": "g10",
+            "rootAfter": "nh-dDeaT76p6tDf3tZHMEmxqvu0esiimxec4716U_fM"
+          },
+          {
+            "id": "ed8O0u6Q5K8XWY8YmvX6gqetQNakCDpFpEFAExLJRjI",
+            "label": "g11",
+            "rootAfter": "EtHszSTF-3s1FbVT3XLBUd34EJlBJUGJrn2mWnzmOmY"
+          },
+          {
+            "id": "gYuV9bv6-CSiGNDxY89QuOYTWNroWoloLdm1MHdcni4",
+            "label": "g12",
+            "rootAfter": "6DuyMEVzmgi891CFnWK8ICMzwSjRPQW2P6uCPbMU2fE"
+          }
+        ],
+        "normalizedState": {
+          "v": 2,
+          "projectId": "p-4",
+          "asOf": 1760000008000,
+          "members": [
+            "u-alice",
+            "u-bob"
+          ],
+          "balances": [],
+          "tosplits": [],
+          "rounds": [],
+          "sales": [],
+          "saleClaims": [],
+          "missions": [],
+          "halukas": [],
+          "decisions": [
+            [
+              "dn-1",
+              {
+                "id": "dn-1",
+                "createdBy": "u-alice",
+                "createdAt": 1760000003000,
+                "kind": "name",
+                "ref": "name"
+              }
+            ]
+          ],
+          "stageVotes": [
+            [
+              "decision:dn-1",
+              {
+                "subjectType": "decision",
+                "subjectId": "dn-1",
+                "approved": true,
+                "votes": [
+                  [
+                    "u-alice",
+                    {
+                      "what": true,
+                      "ts": 1760000003001,
+                      "eventId": "Ol21W_FEhIXswOf0Py3ypT2uNie1N88lHvc7FbHRCh4",
+                      "order": 0
+                    }
+                  ],
+                  [
+                    "u-bob",
+                    {
+                      "what": true,
+                      "ts": 1760000004000,
+                      "eventId": "FUQAp2WZVMZIhdYBPcvWiugqD20DhW64jCmGdRJcMjM",
+                      "order": 0
+                    }
+                  ]
+                ]
+              }
+            ]
+          ],
+          "timers": [],
+          "forums": [],
+          "meetings": [],
+          "away": [],
+          "settings": [
+            [
+              "codeLicense",
+              {
+                "license": "mit",
+                "openYears": null
+              }
+            ],
+            [
+              "links/github",
+              "https://github.com/example/p-4"
+            ],
+            [
+              "name",
+              "הגינה"
+            ],
+            [
+              "publicDescription",
+              null
+            ],
+            [
+              "restime",
+              "feh"
+            ],
+            [
+              "values",
+              [
+                "12",
+                "7",
+                "9"
+              ]
+            ]
+          ]
+        },
+        "stateRoot": "6DuyMEVzmgi891CFnWK8ICMzwSjRPQW2P6uCPbMU2fE"
+      }
     }
   ]
 }

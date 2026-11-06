@@ -142,7 +142,12 @@ describe('applyIdentityDecision', () => {
         '11': { kind: 'address', newSlug: 'wasps', projects: { data: [{ id: '9' }] } }
       }
     });
-    expect(await applyIdentityDecision(runners, '10', '1')).toEqual({ applied: true, kind: 'address' });
+    expect(await applyIdentityDecision(runners, '10', '1')).toEqual({
+      applied: true,
+      kind: 'address',
+      // what took effect, for the signed project.amend (A2b)
+      amend: { path: 'address', value: 'bees' }
+    });
     expect(ps[0].slug).toBe('bees');
     await expect(applyIdentityDecision(runners, '11', '1')).rejects.toMatchObject({ code: 'wrongProject' });
   });

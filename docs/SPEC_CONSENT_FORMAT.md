@@ -175,6 +175,32 @@ null פירושו "הראשון שנראה" (`project.create`/`project.join` ק�
 במפתח של מישהו אחר. כרגע `actor` = userId מספרי, אז זה לא מנוצל — אבל זו
 התנהגות קפואה עד bump (O-5).
 
+### 6.6 הגדרות רקמה — `project.amend` (A2b, נובמבר 2026)
+
+`predicate = { path, value, decisionId?, order }`. ה-reducer קובע `settings[path] = value`
+ולא קורא שום שדה אחר. מה שמחייב מימוש שני הוא אוצר המילים, כדי ששני מימושים יקראו
+את אותו path כאותו דבר. מקור יחיד: `src/lib/consent/specs/projectAmend.ts`.
+
+| path | ערך |
+|---|---|
+| `name`, `publicDescription`, `descripFor` | מחרוזת אחרי trim; ריקה = `null` ("נמחק") |
+| `links/website` · `links/facebook` · `links/github` · `links/discord` · `links/drive` · `links/twitter` · `links/whatsapp` | כנ"ל |
+| `restime` | **הקוד** (`'feh'`, …), לא מילישניות |
+| `pic` | מזהה ה-upload כמחרוזת |
+| `codeLicense` | `{ license, openYears }` אחרי `normalizeLicenseChange` |
+| `values` | **כל** הקבוצה אחרי השינוי, ids כמחרוזות, ממוינים ביחידות קוד |
+| `address` / `look` | מה שהוחל בפועל, אחרי הוולידציה מחדש |
+
+- **הערך המלא, לא דלתא.** שני amends של אותו path מתקפלים לפי הסדר הטופולוגי בלבד.
+- **`order` = `"<path>#<decisionId | direct>"`.** מפתח ה-dedupe (§6.2) לא כולל את ה-path,
+  ולכן `order` קבוע היה מקפל כל amend של חבר לאחרון שלו. עם ה-path: Decision שנחתם
+  פעמיים מתקפל לאחד, ועריכה ישירה מאוחרת של חבר מחליפה את הקודמת שלו.
+- **נחתם כשהשינוי נכנס לתוקף** (עריכה ישירה, ה-yes האחרון, שתיקה), לא כשהוא מוצע. הצעה
+  היא `decision.create` עם `{kind, ref: path, value}` ואחריה `decision.vote`.
+- ה-`project.amend` של `rikma-lifecycle` s30 (`restime: 86400000`) קדם לאוצר המילים
+  ונשאר כמו שהוא: ה-reducer שומר כל ערך, וה-vector קפוא.
+- vector: `events.json › rikma-settings`.
+
 ## 7. State root
 
 `src/lib/consent/stateRoot.ts`, `STATE_ROOT_VERSION = 2`.

@@ -3,9 +3,24 @@ import type { ActionConfig, ActionExecutionHandler } from '../types';
 import { calcDeadlineMs } from './actionUtils.js';
 import { licenseChanged, normalizeLicenseChange } from '$lib/codeLicense/codeLicense.js';
 import { scope, decisionScope, scopeList } from '$lib/realtime/scopes.js';
+import { decisionToAmend, directEditAmends, type Amend } from '$lib/consent/specs/projectAmend';
 
 const toVal = (v: string | undefined | null): string | null =>
   v && v.trim() !== '' ? v.trim() : null;
+
+/**
+ * The create-time `extra` in the shape a stored Decision reads back (relations
+ * as {data}), so decisionToAmend reads a proposal exactly as it will read the
+ * matured Decision.
+ */
+function asStoredDecision(extra: Record<string, unknown>): Record<string, unknown> {
+  const out: Record<string, unknown> = { ...extra };
+  for (const k of ['valluesadd', 'valluesles']) {
+    if (Array.isArray(extra[k])) out[k] = { data: (extra[k] as unknown[]).map((id) => ({ id })) };
+  }
+  if (extra.newpic != null) out.newpic = { data: { id: extra.newpic } };
+  return out;
+}
 
 interface DecisionSpec {
   kind: string;
@@ -61,20 +76,23 @@ const handler: ActionExecutionHandler = async (params, context, util) => {
       : null;
 
   if (memberCount <= 1) {
+    const text = {
+      projectName: projectName?.trim() || attrs.projectName,
+      publicDescription: toVal(publicDescription),
+      descripFor: toVal(descripFor),
+      linkToWebsite: toVal(linkToWebsite),
+      githublink: toVal(githublink),
+      fblink: toVal(fblink),
+      discordlink: toVal(discordlink),
+      drivelink: toVal(drivelink),
+      twiterlink: toVal(twiterlink),
+      watsapplink: toVal(watsapplink)
+    };
     const result = await strapi.execute(
       'updateProjectDetails',
       {
         id: projectId,
-        projectName: projectName?.trim() || attrs.projectName,
-        publicDescription: toVal(publicDescription),
-        descripFor: toVal(descripFor),
-        linkToWebsite: toVal(linkToWebsite),
-        githublink: toVal(githublink),
-        fblink: toVal(fblink),
-        discordlink: toVal(discordlink),
-        drivelink: toVal(drivelink),
-        twiterlink: toVal(twiterlink),
-        watsapplink: toVal(watsapplink),
+        ...text,
         restime: restime || currentRestime,
         vallues: vallueIds.map(String),
         // Omitted (not null) when unchanged, so the since-date is kept.
@@ -99,8 +117,17 @@ const handler: ActionExecutionHandler = async (params, context, util) => {
       );
     }
 
+    // A rikma of one decides alone: what was written took effect now, and the
+    // client signs it as project.amend ($lib/consent/specs/projectAmend, A2b).
+    const amends: Amend[] = directEditAmends(attrs, {
+      text,
+      restime: restime || currentRestime,
+      valueIds: vallueIds.map(String),
+      picId: newPicId,
+      license: licenseDiff ? { license: licenseDiff.license, openYears: licenseDiff.openYears } : null
+    });
     return {
-      data: result.data?.updateProject?.data?.attributes ?? {},
+      data: { ...(result.data?.updateProject?.data?.attributes ?? {}), amends },
       updateStrategy: { type: 'fullRefresh' }
     };
   }
@@ -177,9 +204,13 @@ const handler: ActionExecutionHandler = async (params, context, util) => {
         context.fetch
       );
 
-      return { kind, id: decisionId };
+      // The path and value it would change, for the signed decision.create.
+      const proposed = decisionToAmend(kind, asStoredDecision(extra), { currentValueIds: currentVallueIds });
+      return { kind, id: decisionId, path: proposed?.path, value: proposed?.value };
     })
-  ).then((results) => results.filter((r): r is { kind: string; id: string } => r !== null));
+  ).then((results) =>
+    results.filter((r): r is { kind: string; id: string; path: Amend['path'] | undefined; value: Amend['value'] | undefined } => r !== null)
+  );
 
   const minorLinksChanged =
     toVal(githublink) !== attrs.githublink ||
@@ -211,8 +242,21 @@ const handler: ActionExecutionHandler = async (params, context, util) => {
     );
   }
 
+  // Minor links skip the Decision and took effect now — signed as project.amend.
+  const amends: Amend[] = minorLinksChanged
+    ? directEditAmends(attrs, {
+        text: {
+          githublink: toVal(githublink),
+          discordlink: toVal(discordlink),
+          drivelink: toVal(drivelink),
+          twiterlink: toVal(twiterlink),
+          watsapplink: toVal(watsapplink)
+        }
+      })
+    : [];
+
   return {
-    data: { decisionsCreated: createdDecisions.length, decisions: createdDecisions },
+    data: { decisionsCreated: createdDecisions.length, decisions: createdDecisions, amends },
     updateStrategy: createdDecisions.length > 0 ? { type: 'none' } : { type: 'fullRefresh' }
   };
 };

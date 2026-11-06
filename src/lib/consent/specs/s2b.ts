@@ -13,6 +13,12 @@
 
 import type { ConsentSpec } from '$lib/server/actions/types';
 import { addVoteConsentSpec } from './addVote';
+import {
+  isAmendPath,
+  projectAmendConsentSpec,
+  settingsDecisionCreateConsentSpec,
+  type Amend
+} from './projectAmend';
 
 export type ShadowSignJob = { spec: ConsentSpec; params: Record<string, unknown> };
 
@@ -404,7 +410,7 @@ export const s2bShadowJobs: Record<string, ShadowJobDeriver> = {
     // saleClaim is signed at its call site (decisionMaking.svelte) with the
     // standing order it knows — skipping it here keeps one signer per vote.
     if (!id || params.kind === 'saleClaim') return [];
-    return [{
+    const jobs: ShadowSignJob[] = [{
       spec: addVoteConsentSpec,
       params: {
         projectId: params.projectId,
@@ -416,6 +422,43 @@ export const s2bShadowJobs: Record<string, ShadowJobDeriver> = {
         order: typeof result.order === 'number' ? result.order : 0
       }
     }];
+    // A2b: this yes closed a settings Decision — sign what took effect.
+    const amend = result.amend as Amend | undefined;
+    if (result.consensus === true && amend && isAmendPath(amend.path)) {
+      jobs.push({
+        spec: projectAmendConsentSpec,
+        params: { projectId: params.projectId, path: amend.path, value: amend.value, decisionId: id }
+      });
+    }
+    return jobs;
+  },
+
+  // A2b: a rikma's settings. What took effect now (a rikma of one, the minor
+  // links) is project.amend; what goes to a Decision is decision.create plus
+  // the proposer's own yes, which the server records with it. The amend of a
+  // proposal is signed when it matures (voteOnDecision above, or silence).
+  updateProjectDetails: (params, result) => {
+    const projectId = str(params.projectId);
+    if (!projectId) return [];
+    const jobs: ShadowSignJob[] = [];
+    for (const a of (Array.isArray(result.amends) ? result.amends : []) as Amend[]) {
+      if (!a || !isAmendPath(a.path)) continue;
+      jobs.push({ spec: projectAmendConsentSpec, params: { projectId, path: a.path, value: a.value } });
+    }
+    const decisions = (Array.isArray(result.decisions) ? result.decisions : []) as Array<Record<string, unknown>>;
+    for (const d of decisions) {
+      const decisionId = str(d?.id);
+      if (!decisionId) continue;
+      jobs.push({
+        spec: settingsDecisionCreateConsentSpec,
+        params: { projectId, decisionId, kind: d.kind, path: d.path, value: d.value }
+      });
+      jobs.push({
+        spec: addVoteConsentSpec,
+        params: { projectId, type: 'decision', id: decisionId, what: true, order: 0 }
+      });
+    }
+    return jobs;
   },
 
   closeFiniapruval: (params, result) => {

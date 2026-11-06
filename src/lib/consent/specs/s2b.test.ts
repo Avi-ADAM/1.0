@@ -396,3 +396,57 @@ describe('vote shadow jobs (A2 batch 4)', () => {
     expect(s2bShadowJobs.voteOnDecision({ decisionId: 'D5', kind: 'saleClaim' }, { consensus: false })).toEqual([]);
   });
 });
+
+describe('settings shadow jobs (A2b)', () => {
+  it('a rikma of one: every amend the edit made is a project.amend', () => {
+    const jobs = derive(s2bShadowJobs.updateProjectDetails({ projectId: '45' }, {
+      projectName: 'n',
+      amends: [{ path: 'name', value: 'n' }, { path: 'restime', value: 'feh' }, { path: 'nope', value: 1 }]
+    }));
+    expect(jobs.map((j) => j?.predicate)).toEqual([
+      { path: 'name', value: 'n', order: 'name#direct' },
+      { path: 'restime', value: 'feh', order: 'restime#direct' }
+    ]);
+    expect(jobs[0]?.subject).toEqual({ type: 'project', id: '45' });
+  });
+
+  it('a proposal is decision.create + the proposer yes, and no amend yet', () => {
+    const jobs = derive(s2bShadowJobs.updateProjectDetails({ projectId: '45' }, {
+      decisionsCreated: 1,
+      decisions: [{ kind: 'name', id: 'D1', path: 'name', value: 'הגינה' }],
+      amends: []
+    }));
+    expect(jobs.map((j) => j?.action)).toEqual(['decision.create', 'decision.vote']);
+    expect(jobs[0]?.predicate).toEqual({ kind: 'name', ref: 'name', value: 'הגינה' });
+    expect(jobs[1]?.predicate).toMatchObject({ what: true, order: 0 });
+  });
+
+  it('the yes that closes it signs project.amend with the Decision id', () => {
+    const jobs = derive(s2bShadowJobs.voteOnDecision(
+      { decisionId: 'D1', projectId: '45', kind: 'name' },
+      { decisionId: 'D1', consensus: true, kind: 'name', amend: { path: 'name', value: 'הגינה' } }
+    ));
+    expect(jobs.map((j) => j?.action)).toEqual(['decision.vote', 'project.amend']);
+    expect(jobs[1]?.predicate).toEqual({ path: 'name', value: 'הגינה', decisionId: 'D1', order: 'name#D1' });
+
+    // a vote that does not close it signs the vote only
+    expect(s2bShadowJobs.voteOnDecision({ decisionId: 'D1', kind: 'name' }, { consensus: false })).toHaveLength(1);
+  });
+
+  it('through the reducers: proposal, votes, amend → the setting', () => {
+    const [create, ownYes] = derive(s2bShadowJobs.updateProjectDetails({ projectId: '45' }, {
+      decisions: [{ kind: 'name', id: 'D1', path: 'name', value: 'הגינה' }]
+    }));
+    const [otherYes, amend] = derive(s2bShadowJobs.voteOnDecision(
+      { decisionId: 'D1', projectId: '45', kind: 'name' },
+      { consensus: true, amend: { path: 'name', value: 'הגינה' } }
+    ));
+    const state = project(
+      [asEvent(create, '256', 1), asEvent(ownYes, '256', 2), asEvent(otherYes, '258', 3), asEvent(amend, '258', 4)],
+      '45'
+    );
+    expect(state.settings.get('name')).toBe('הגינה');
+    expect(state.decisions.get('D1')).toMatchObject({ kind: 'name', ref: 'name' });
+    expect(state.stageVotes.get('decision:D1')?.approved).toBe(true);
+  });
+});
