@@ -105,13 +105,13 @@
 | 5 | A3 | טלמטריית אי-התאמות לשרת | M | A1 | ✔ |
 | 6 | A2 | הרחבת חתימות ה-shadow — באצוות | L | — | ✔ אצוות 1–4 + A2b P1–P4 (הגדרות רקמה). פגישות ⏸ (עוברות ל-magik-meetings); פערי כיסוי מתועדים בכרטיס |
 | 7 | B6 | אימות התחייבויות אינקרמנטלי (O(n²) → O(n)) | M–L | — | ✔ |
-| 8 | C0 | יישור Node 24 (Dockerfile, פיתוח) + גילוי יכולות PQ | S | — | ⬜ 🧑 (התקנה/deploy) |
+| 8 | C0 | יישור Node 24 (Dockerfile, פיתוח) + גילוי יכולות PQ | S | — | ◐ גילוי ✔; Dockerfile + Node 24 ⬜ 🧑 |
 | 9 | B4 | מזהה מכשיר כטביעת אצבע (O-7) | L | — | ◐ קריאה ✔; פליטה ⬜ (מתג, אחרי deploy) |
 | 10 | C2 | KEM היברידי — `WrappedKey` v2 (O-9) | M | C0 | ⬜ |
 | 11 | B3 | מדיניות קצוות Ed25519 + vectors (O-1) | M | — | ✔ |
 | 12 | C1 | שדה `cosig` — חתימה היברידית על עוגנים (O-8) | L | C0, B4 | ⬜ |
 | 13 | B5 | מזכר החלטה: חבילת bump v3 (O-3, O-5, O-6) | S | — | ✔ קריאה; פליטה ⬜ (אותו מתג כמו B4) |
-| 14 | A4 | פיילוט: רקמה אחת על ה-Space, 30 יום / 1,000 אירועים | — | A0b, A1, A3 | ⬜ 🧑 |
+| 14 | A4 | פיילוט: רקמה אחת על ה-Space, 30 יום / 1,000 אירועים | — | A0b, A1, A3 | ⬜ 🧑 — runbook מוכן: [RUNBOOK_SPACE_PILOT](RUNBOOK_SPACE_PILOT.md) |
 | 15 | A5 | דף ראשון קורא מה-projection (עם fallback) | M | A4 | ⬜ |
 | — | D1 | Tauri R1 | L | PLAN_TAURI_MOBILE שלבים 1–2 | ⬜ חסום |
 | — | E1 | R2 ליבת Rust | L+ | שער S3 + HANDOFF §8.3 | ⬜ לא להתחיל |
@@ -590,6 +590,14 @@ benchmark: 500 אירועים עם התחייבויות — מספר קריאו�
 והזיכרון על compose v1 לפני). **הסוכן לא מבצע deploy.**
 **קבלה**: build של ה-Docker image עובר מקומית (אם Docker זמין); הטסטים עוברים ב-22 וב-24.
 
+**◐ (2026-11-06)**: `src/lib/crypto/pqCapabilities.ts` — `pqCapabilities()` → `{mldsa65, mlkem768}`
+בניסיון `generateKey` (לא לפי גרסה), memo. טסט: ב-Node 22 שניהם false; ב-≥ 24.7 שניהם
+true, ו-round-trip של ML-DSA-65 (ה-SPKI מעל 1,900 בייט) — מדולג ב-22. **לא נבדק על 24.**
+**ה-`Dockerfile` לא שונה בכוונה**: ה-deploy הקרוב של ה-VPS מעלה 12 commits של השכבה,
+ומעבר ל-`node:24-alpine` באותו deploy היה מערבב שני שינויים. שלב נפרד: Node 24 מקומית,
+`npx vitest run src/lib/crypto/pqCapabilities.test.ts` ירוק עם round-trip, ורק אז
+`Dockerfile` + deploy משלו.
+
 ### B4 — מזהה מכשיר כטביעת אצבע (O-7)
 **למה**: `device` = SPKI מלא; במפתח ML-DSA-65 זה ~2.6KB בכל אירוע.
 **צעדים**: `deviceId(spki) = b64url(SHA-256(SPKI DER))` (43 תווים). המאמת מקבל
@@ -776,3 +784,4 @@ projection, עם fallback ל-Strapi כשה-Space ריק או לא מסונכרן
 - 2026-11-06 · B3 · Ed25519 קפדני: A קנוני + בתת-החבורה מסדר ראשוני, S < L, R ≠ O, לפני `crypto.subtle.verify` — באימות וברישום. Node 22 לבד מקבל 5 מ-6 המקרים הפסולים (טבלה ב-SPEC §3) · `ed25519Edge` (7 שלשות, תוספת בלבד) · +12 ב-`ed25519Strict.test.ts`, +1 ב-vectors; ‏620 בשכבה, check ‏1218, check:proxy ירוק · O-1 ✔
 - 2026-11-06 · B5 · מזכר bump v3 בכרטיס: `v:2` לאירוע (O-6 לפי אירוע), dedupe JSON אחיד לכל הגרסאות (O-5), `STATE_ROOT_VERSION 3` בלי `eventId` (O-3), אותו מתג כמו פליטת `deviceId` · ממתין לאישור, בלי מימוש
 - 2026-11-06 · B5 מימוש (קריאה) · `v:2` (what boolean, roots ב-v3), state root v3 בלי `eventId` של הצבעות, dedupe עם escape (במקום JSON — המפתחות קפואים ב-`events.json`), מתג פליטה אחד כבוי ב-`emitFormat.ts` · `format-v2-mixed` + `shapeRejects`, תוספת בלבד · +12 ב-`formatV2.test.ts`, +4 ב-vectors; ‏636 בשכבה, check ‏1218, check:proxy ירוק · O-3/O-5/O-6 ✔ · הבא: להדליק את המתג אחרי deploy + חלון (B4+B5 יחד)
+- 2026-11-06 · C0 (חלק הסוכן) + A4 runbook · `pqCapabilities.ts` (ניסיון generateKey, memo) + טסט שמדלג ב-22; ה-`Dockerfile` נשאר על 22 בכוונה (deploy נפרד). `RUNBOOK_SPACE_PILOT.md`: env בשני המקומות (Vercel ל-load, VPS ל-`deviceCosign`), genesis, דוח, אי-התאמות צפויות, כיבוי · הבא: 🧑 Node 24 מקומית → C2/C1; 🧑 בחירת רקמה ל-A4
