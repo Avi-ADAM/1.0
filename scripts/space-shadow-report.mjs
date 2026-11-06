@@ -90,6 +90,15 @@ export function summarize(rows) {
   return { reports: rows.length, rikmas };
 }
 
+
+// Mirror of AMEND_PATHS ($lib/consent/specs/projectAmend.ts) — the index a
+// setting mismatch carries. A path is only ever appended there, never moved.
+const AMEND_PATHS = [
+  'name', 'publicDescription', 'descripFor', 'links/website', 'links/facebook', 'links/github',
+  'links/discord', 'links/drive', 'links/twitter', 'links/whatsapp', 'restime', 'pic', 'codeLicense',
+  'values', 'address', 'look'
+];
+
 function verdict(s) {
   if (!s.rikmas.length) return 'No shadow telemetry yet.';
   const lines = [];
@@ -99,7 +108,9 @@ function verdict(s) {
         `${r.mismatches.length} distinct mismatch(es) — ${r.exitReady ? '✅ exit criterion met' : '⏳ ' + r.missing.join(', ')}`
     );
     for (const m of r.mismatches) {
-      lines.push(`    ${m.kind} ${m.member}: chain=${m.chain} strapi=${m.strapi} (first ${m.firstAt}, at ${m.events} events)`);
+      // A setting mismatch names the path by its index; the values are fingerprints (settingsShadow.ts).
+      const what = m.kind === 'setting' ? `setting ${AMEND_PATHS[Number(m.member)] ?? m.member}` : `${m.kind} ${m.member}`;
+      lines.push(`    ${what}: chain=${m.chain} strapi=${m.strapi} (first ${m.firstAt}, at ${m.events} events)`);
     }
   }
   return lines.join('\n');

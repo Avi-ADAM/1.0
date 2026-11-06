@@ -103,7 +103,7 @@
 | 3 | B2 | ECDSA low-S בצד החותם (O-2) | S | — | ✔ |
 | 4 | A1 | דגל Space לפי רקמה (allowlist בשרת) | M | — | ✔ |
 | 5 | A3 | טלמטריית אי-התאמות לשרת | M | A1 | ✔ |
-| 6 | A2 | הרחבת חתימות ה-shadow — באצוות | L | — | ◐ אצוות 1–4 + A2b P1–P3 (הגדרות רקמה, כולל שתיקה); פגישות ⏸; נשאר: A2b P4 (השוואה) |
+| 6 | A2 | הרחבת חתימות ה-shadow — באצוות | L | — | ✔ אצוות 1–4 + A2b P1–P4 (הגדרות רקמה). פגישות ⏸ (עוברות ל-magik-meetings); פערי כיסוי מתועדים בכרטיס |
 | 7 | B6 | אימות התחייבויות אינקרמנטלי (O(n²) → O(n)) | M–L | — | ✔ |
 | 8 | C0 | יישור Node 24 (Dockerfile, פיתוח) + גילוי יכולות PQ | S | — | ⬜ 🧑 (התקנה/deploy) |
 | 9 | B4 | מזהה מכשיר כטביעת אצבע (O-7) | L | — | ⬜ |
@@ -419,7 +419,7 @@ override של מפתחים; אחרת — הפרויקט ברשימה. עדכן �
   קוד (`'feh'`). צריך להחליט (א) מי חותם על השינוי ומתי, ו-(ב) רשימת paths וסוגי ערכים,
   ואז זה שינוי פורמט עם vector.
 
-#### A2b — `project.amend` (2026-11-06; אושר, P1–P3 בוצעו)
+#### A2b — `project.amend` (2026-11-06; אושר, P1–P4 בוצעו)
 
 **מה קיים היום.** `updateProjectDetails` משנה ישירות רק ברקמה של חבר אחד. ברקמה עם
 יותר חברים הוא פותח `Decision` לכל שדה שהשתנה (12 סוגים: `name`, `pubdes`, `prides`,
@@ -533,6 +533,19 @@ P4 השוואה וטלמטריה (S).
   שמסנכרן Space.
 - **לא נבדק מול Strapi חי**: שאילתת ה-REST (‏`filters[kind][$in]`, ‏populate של `vots`
   ושל `timegrama`). אם היא נכשלת, ה-endpoint מחזיר 502 ושום דבר לא נחתם.
+**P4 — השוואה וטלמטריה (2026-11-06)**
+- `$lib/consent/settingsShadow` (טהור): משווה רק paths שיש להם `project.amend` בשרשרת.
+  ל-genesis של T6 אין settings, ולכן path שהשרשרת לא ראתה הוא לא-ידוע, לא שגוי. ההשוואה
+  ב-canonical JSON, ושני הצדדים בצורה הנורמלית של אוצר המילים
+  (`settingsFromProjectAttrs` לצד של Strapi).
+- **הטלמטריה לא נושאת ערכים.** תיאור הוא הטקסט של הרקמה, והפורמט מקבל ספרות בלבד. לכן
+  `kind:'setting'`, ‏`member` = האינדקס של ה-path ב-`AMEND_PATHS`, ו-`chain`/`strapi` =
+  טביעת FNV-1a של 32 ביט. לכן `AMEND_PATHS` **מוסיפים לסוף בלבד**. הדוח
+  (`space-shadow-report.mjs`) מחזיק עותק שלו, וטסט מוודא ששניהם זהים.
+- **מקור**: `/api/consent/settings/[projectId]` מחזיר גם `current`. הפאנל קורא אותו יחד
+  עם היתרות והטיימרים, בכל פעם שהלוג גדל.
+- **אי-התאמה צפויה שאינה באג**: מה-הבשלה בשתיקה ועד החתימה העצלה (P3) Strapi כבר
+  מעודכן והשרשרת עוד לא. בדוח זה ייראה כאי-התאמה שנעלמת ב-snapshot הבא.
 - **פערים**: `proposeProjectLink` ב-mastra קורא ל-action בצד השרת, ולכן אין
   מי שיחתום.
 - **לא נבדק מול Strapi חי ולא בדפדפן**: הכתיבה של timegrama דרך `strapiClient`
@@ -666,3 +679,4 @@ projection, עם fallback ל-Strapi כשה-Space ריק או לא מסונכרן
 - 2026-11-06 · A2b (תכנון) · הצעה ל-`project.amend`: רשימת paths סגורה עם ערכים מלאים, `decisionToAmend` כמקור יחיד שגם מאחד את שני המחילים בשרת, חתימה ברגע שהשינוי נכנס לתוקף (עריכה ישירה, ה-yes האחרון, ושתיקה בחתימה עצלה של `consensus.timeout`), ו-4 שלבים · מסמכים בלבד · ממתין לאישור (§5)
 - 2026-11-06 · A2b P1–P2 · אוצר ה-paths (`projectAmend.ts`, SPEC §6.6, vector `rikma-settings`); **ממצא**: מפתח ה-dedupe בלי path מקפל את כל ה-amends של חבר, ולכן `order = "<path>#<decision|direct>"`; שני המחילים בשרת (`voteOnDecision`, `timegrama/decision`) אוחדו סביב `decisionToAmend` + `amendToStrapiWrite` (ב-timegrama: qid עם משתנים במקום GraphQL inline); חתימה של עריכה ישירה, הצעה + yes של המציע, וה-yes שסוגר · +13 ב-`projectAmend.test.ts`, +4 ב-`s2b.test.ts`, טסט הזהות עודכן לצורת ההחזרה. בשכבה הכל ירוק, `events.json` +493 שורות תוספת בלבד ויציב, check ‏1218, check:proxy ירוק. ב-configs נכשלים `proposeObjectArchive` (mock של `res.text`) ו-`updateTask`, שלא מייבאים שום דבר שנגעתי בו · commit `dist: A2b P1-P2` · **🧑 deploy ל-VPS** (‏`voteOnDecision`, `updateProjectDetails`; ו-timegrama, איפה שהוא רץ) · הבא: P3 (שתיקה, חתימה עצלה של `consensus.timeout`)
 - 2026-11-06 · A2b P3 · שתיקה בחתימה עצלה: `/api/consent/settings/[projectId]` (חבר בלבד; ה-amend נגזר מה-Decision עצמו, בלי שדה חדש ב-Strapi; `values` רק האחרון, `address` רק כשהוא עדיין ה-slug) + `planLazySettingsSigns` (רק החדש ביותר לכל path, ורק כשאין amend מאוחר יותר) + חתימה פעם בסשן ב-`SpaceProjectionShadow` (‏`consensus.timeout` ואז `project.amend`) · +7 ב-`projectAmend.test.ts`, +5 ב-`settingsMatured.test.ts`; ‏593 בשכבה, vectors ללא diff, check ‏1218, check:proxy ירוק · REST לא נבדק מול Strapi חי, ולא בדפדפן · commit `dist: A2b P3` · **🧑 deploy ל-VPS** (ה-endpoint רץ שם) · הבא: P4 (השוואת settings מול Strapi + טלמטריה `kind:'setting'`)
+- 2026-11-06 · A2b P4 · השוואת settings ב-`SpaceProjectionShadow` (רק paths שנחתמו, canonical JSON) + `kind:'setting'` בטלמטריה בלי ערכים (אינדקס path + טביעת FNV-1a); `current` ב-endpoint; הדוח מציג את שם ה-path, וטסט מקבע את העותק של `AMEND_PATHS` · +9 ב-`settingsShadow.test.ts`; ‏600 בשכבה, vectors ללא diff, check ‏1218, check:proxy ירוק · לא נבדק בדפדפן · commit `dist: A2b P4` · **A2 ✔**. הבא בתור: C0 (🧑 Node 24) או B4 (מזהה מכשיר כטביעה); פתוח מ-§5: O-10

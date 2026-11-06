@@ -10,6 +10,7 @@ import {
   settingsDecisionsQuery,
   settingsProjectQuery
 } from '$lib/server/consent/settingsMatured';
+import { settingsFromProjectAttrs } from '$lib/consent/specs/projectAmend';
 
 export const GET: RequestHandler = async ({ params, locals }) => {
   if (!locals.uid) throw error(401, 'Unauthorized');
@@ -25,5 +26,7 @@ export const GET: RequestHandler = async ({ params, locals }) => {
   const members = ((project as any)?.data?.attributes?.user_1s?.data ?? []).map((u: any) => String(u.id));
   if (!members.includes(String(locals.uid))) throw error(403, 'not a member of this rikma');
 
-  return json({ ok: true, projectId, matured: maturedSettingsFromRest(decisions, project) });
+  // P4: Strapi's settings now, in the chain's vocabulary — the shadow panel's comparison.
+  const current = Object.fromEntries(settingsFromProjectAttrs((project as any)?.data?.attributes ?? {}));
+  return json({ ok: true, projectId, matured: maturedSettingsFromRest(decisions, project), current });
 };

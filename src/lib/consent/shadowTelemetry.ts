@@ -18,13 +18,15 @@ export const SHADOW_TELEMETRY_TAG = '[space-shadow-telemetry]';
 /** Lines past this many mismatches are truncated — one bad sync is not a flood. */
 export const MAX_MISMATCHES_PER_REPORT = 50;
 
-export type ShadowMismatchKind = 'balance' | 'timer';
+export type ShadowMismatchKind = 'balance' | 'timer' | 'setting';
 
 export interface ShadowMismatch {
   kind: ShadowMismatchKind;
-  /** what the mismatch is about: the member (balance) or the timer id (timer) */
+  /** what the mismatch is about: the member (balance), the timer id (timer), or
+   *  the path's index in AMEND_PATHS (setting — $lib/consent/settingsShadow) */
   member: string;
-  /** balance: agorot (the chain holds a bigint); timer: ms. A decimal string. */
+  /** balance: agorot (the chain holds a bigint); timer: ms; setting: a 32-bit
+   *  fingerprint of the value, never the value itself. A decimal string. */
   chain: string;
   /** balance: agorot (the rikma's split balance × 100); timer: closed-interval ms */
   strapi: string;
@@ -42,7 +44,7 @@ export interface ShadowReport {
 
 const ID_RE = /^\d{1,12}$/;
 const AGOROT_RE = /^-?\d{1,18}$/;
-const KINDS = new Set<ShadowMismatchKind>(['balance', 'timer']);
+const KINDS = new Set<ShadowMismatchKind>(['balance', 'timer', 'setting']);
 
 const clampInt = (v: unknown, max: number) => {
   const n = Math.round(Number(v));

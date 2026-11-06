@@ -83,7 +83,16 @@ export function settingsDecisionsQuery(projectId: string): string {
 }
 
 export function settingsProjectQuery(projectId: string): string {
-  const q = ['fields[0]=slug', 'populate[user_1s][fields][0]=username', 'populate[vallues][fields][0]=valueName'];
+  const fields = [
+    'slug', 'projectName', 'publicDescription', 'descripFor', 'linkToWebsite', 'fblink', 'githublink',
+    'discordlink', 'drivelink', 'twiterlink', 'watsapplink', 'restime', 'codeLicense', 'codeLicenseOpenYears', 'look'
+  ];
+  const q = [
+    ...fields.map((f, i) => `fields[${i}]=${f}`),
+    'populate[user_1s][fields][0]=username',
+    'populate[vallues][fields][0]=valueName',
+    'populate[profilePic][fields][0]=name'
+  ];
   return `/api/projects/${projectId}?${q.join('&')}`;
 }
 

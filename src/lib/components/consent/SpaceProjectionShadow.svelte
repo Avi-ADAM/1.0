@@ -30,6 +30,8 @@
   import type { ShadowMismatch } from '$lib/consent/shadowTelemetry';
   import { freshTimerIds, compareTimers } from '$lib/consent/timerShadow';
   import { signMaturedSettings } from '$lib/client/settingsLazySign';
+  import { amendedPaths, compareSettings } from '$lib/consent/settingsShadow';
+  import type { AmendPath, AmendValue } from '$lib/consent/specs/projectAmend';
 
   type GqlUserRow = { id: string | number; attributes?: { hervachti?: number | null } };
 
@@ -78,6 +80,8 @@
   let strapiBalances = $state<Map<string, number> | null>(null);
   /** closed-interval ms of the fresh timers on the chain (A2 batch 2) */
   let strapiTimers = $state<Map<string, number>>(new Map());
+  /** the rikma's settings in Strapi now (A2b P4); null = not read, nothing compared */
+  let strapiSettings = $state<Map<AmendPath, AmendValue> | null>(null);
   let strapiForEvents = $state(-1);
 
   /** Strapi's totals for the given timers; empty on any failure (nothing compared). */
@@ -97,12 +101,24 @@
     return m;
   }
 
+  /** Strapi's settings in the chain's vocabulary; null on any failure (nothing compared). */
+  async function fetchSettings(): Promise<Map<AmendPath, AmendValue> | null> {
+    try {
+      const res = await fetch(`/api/consent/settings/${boundProjectId}`, { credentials: 'include' });
+      if (!res.ok) return null;
+      const body = await res.json();
+      return body?.current ? new Map(Object.entries(body.current) as [AmendPath, AmendValue][]) : null;
+    } catch {
+      return null;
+    }
+  }
+
   $effect(() => {
     if (!replica || replica.state.status !== 'synced') return;
     const at = eventCount;
     if (at === 0 || at === strapiForEvents) return;
     const fresh = [...freshTimerIds(replica.state.eventsById.values())];
-    void Promise.all([fetchGenesisExport(boundProjectId), fetchTimerTotals(fresh)]).then(([exp, timers]) => {
+    void Promise.all([fetchGenesisExport(boundProjectId), fetchTimerTotals(fresh), fetchSettings()]).then(([exp, timers, settings]) => {
       if (!exp.ok) return;
       const m = new Map<string, number>();
       for (const row of exp.members) {
@@ -110,6 +126,7 @@
       }
       strapiBalances = m;
       strapiTimers = timers;
+      strapiSettings = settings;
       strapiForEvents = at;
     });
   });
@@ -146,6 +163,15 @@
     );
     compared += t.compared;
     mismatches.push(...t.mismatches);
+
+    // Settings (A2b P4): only the paths the chain has amended — settingsShadow.ts.
+    const st = compareSettings(
+      projection.settings,
+      strapiSettings,
+      amendedPaths(replica?.state.eventsById.values() ?? [])
+    );
+    compared += st.compared;
+    mismatches.push(...st.mismatches);
 
     return {
       status: (mismatches.length === 0 ? 'signed' : 'unverified') as 'signed' | 'unverified',

@@ -15,8 +15,10 @@
 
 import type { ConsentSpec } from '$lib/server/actions/types';
 import { compareIds } from '$lib/consent/ids';
-import { normalizeLicenseChange } from '$lib/codeLicense/codeLicense';
+import { normalizeLicenseChange, effectiveLicense } from '$lib/codeLicense/codeLicense';
 
+// APPEND ONLY: a setting mismatch in the shadow telemetry carries a path's
+// index here (settingsShadow.ts, scripts/space-shadow-report.mjs).
 export const AMEND_PATHS = [
   'name',
   'publicDescription',
@@ -370,4 +372,27 @@ export function planLazySettingsSigns(
     });
   }
   return jobs;
+}
+
+// ------------------------------------------------------ P4: Strapi's side
+
+/**
+ * The rikma's settings as Strapi holds them now, in the chain's vocabulary
+ * and normal form — the other side of the shadow comparison
+ * ($lib/consent/settingsShadow). `attrs` is a project's attributes (REST or
+ * GraphQL: relations as {data}).
+ */
+export function settingsFromProjectAttrs(attrs: DecisionAttrs): Map<AmendPath, AmendValue> {
+  const out = new Map<AmendPath, AmendValue>();
+  for (const [field, path] of TEXT_FIELDS) out.set(path, amendText(attrs[field]));
+  const restime = amendText(attrs.restime);
+  if (restime) out.set('restime', restime);
+  const pic = relId(attrs.profilePic);
+  if (pic) out.set('pic', pic);
+  const lic = normalizeLicenseChange(effectiveLicense(attrs.codeLicense), attrs.codeLicenseOpenYears);
+  if (lic) out.set('codeLicense', { license: lic.license, openYears: lic.openYears });
+  out.set('values', sortedIds(relIds(attrs.vallues)));
+  if (amendText(attrs.slug)) out.set('address', amendText(attrs.slug));
+  out.set('look', (attrs.look ?? null) as AmendValue);
+  return out;
 }
