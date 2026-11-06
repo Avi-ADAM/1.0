@@ -3,6 +3,25 @@ import { randomNonceB64 } from '$lib/crypto/b64';
 import type { IdentityRecord } from '$lib/crypto/identity';
 import type { ConsentEvent, ActionName, Delta } from './event';
 import type { QuorumProof } from './quorum';
+import { EMIT_FORMAT_V2 } from './emitFormat';
+import { deviceFingerprint } from '$lib/crypto/deviceId';
+
+/**
+ * The format bits a signer writes (B5): `v`, and `device` as SPKI or
+ * deviceId. Decided by emitFormat.ts; the parameter exists for tests.
+ */
+export async function emitEnvelope(
+  devicePubB64: string,
+  predicate: Record<string, unknown> | undefined,
+  v2: boolean = EMIT_FORMAT_V2
+): Promise<{ v: 1 | 2; device: string }> {
+  if (!v2) return { v: 1, device: devicePubB64 };
+  // A v2 event with a non-boolean `what` is no event (O-6) — refuse to sign one.
+  if (predicate && 'what' in predicate && typeof predicate.what !== 'boolean') {
+    throw new Error('emitEnvelope: v2 needs a boolean what');
+  }
+  return { v: 2, device: await deviceFingerprint(devicePubB64) };
+}
 
 export type SignableEvent = {
   actor: string;
@@ -23,12 +42,14 @@ export type SignableEvent = {
 
 export async function buildAndSignEvent(
   identity: IdentityRecord,
-  partial: SignableEvent
+  partial: SignableEvent,
+  v2: boolean = EMIT_FORMAT_V2
 ): Promise<ConsentEvent> {
+  const env = await emitEnvelope(identity.devicePubB64, partial.predicate, v2);
   const body = {
-    v: 1 as const,
+    v: env.v,
     actor: partial.actor,
-    device: identity.devicePubB64,
+    device: env.device,
     action: partial.action,
     subject: partial.subject,
     predicate: partial.predicate,

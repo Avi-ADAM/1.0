@@ -1,4 +1,5 @@
 import type { ConsentEvent } from '../event';
+import { voteWhat } from '../event';
 import type { ProjectState, StageVotesView, MissionView } from '../projection';
 import { subjectKey } from '../projection';
 import { findMissionBySubject } from './missionCreate';
@@ -23,7 +24,7 @@ export function recordStageVote(state: ProjectState, ev: ConsentEvent): ProjectS
   const prev = state.stageVotes.get(key);
 
   const p = ev.predicate as { what?: unknown; order?: unknown } | undefined;
-  const what = Boolean(p?.what);
+  const what = voteWhat(ev);
   const order = typeof p?.order === 'number' ? p.order : 0;
 
   const votes = new Map(prev?.votes ?? []);

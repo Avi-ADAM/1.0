@@ -28,6 +28,7 @@
 //                       For 2/3 use thresholdBps=6667; for 50%+1 use 5001.
 
 import type { ConsentEvent } from './event';
+import { voteWhat } from './event';
 
 export type QuorumRule =
   | { kind: 'unanimous' }
@@ -65,7 +66,7 @@ export type QuorumResult =
   | { ok: false; reason: string };
 
 function defaultIsYes(ev: ConsentEvent): boolean {
-  return Boolean((ev.predicate as { what?: unknown } | undefined)?.what);
+  return voteWhat(ev);
 }
 
 // Collect the latest vote per actor from the evidence set. (Re-votes use the

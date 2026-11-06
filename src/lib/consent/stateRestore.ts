@@ -27,10 +27,10 @@ import type {
   AwayMark
 } from './projection';
 import { emptyState } from './projection';
-import { STATE_ROOT_VERSION } from './stateRoot';
+import { isStateRootVersion, type StateRootVersion } from './stateRoot';
 
 export type RestoreResult =
-  | { ok: true; state: ProjectState; reason?: undefined }
+  | { ok: true; state: ProjectState; version: StateRootVersion; reason?: undefined }
   | { ok: false; reason: string; state?: undefined };
 
 type Norm = Record<string, unknown>;
@@ -43,9 +43,12 @@ function entries(x: unknown): Entry[] {
 export function restoreState(normalized: unknown): RestoreResult {
   const n = normalized as Norm | null;
   if (!n || typeof n !== 'object') return { ok: false, reason: 'not_an_object' };
-  if (n.v !== STATE_ROOT_VERSION) {
+  // v2 and v3 (B5): v3 carries no vote eventId — restored votes lack it, and
+  // the state then re-normalizes only under v3.
+  if (!isStateRootVersion(n.v)) {
     return { ok: false, reason: `unknown_state_version:${String(n.v)}` };
   }
+  const version = n.v;
 
   const state = emptyState((n.projectId as string | null) ?? null);
   state.asOf = typeof n.asOf === 'number' ? n.asOf : 0;
@@ -98,7 +101,7 @@ export function restoreState(normalized: unknown): RestoreResult {
   // state.snapshots stays [] on purpose: marks are attestations ABOUT roots,
   // excluded from the root itself (stateRoot.ts) — pre-snapshot marks are
   // part of what compaction prunes.
-  return { ok: true, state };
+  return { ok: true, state, version };
 }
 
 function restoreTosplit(t: Norm): TosplitView {

@@ -21,7 +21,8 @@ export type Delta =
   | { kind: 'round.advance';  subject: string; from: number; to: number; reason: 'counter' | 'merge' };
 
 export type ConsentEvent = {
-  v: 1;
+  /** 1 forever valid; 2 (B5) = strict `what`, committed under state root v3. SPEC §4. */
+  v: 1 | 2;
   id: string;          // b64url(sha256(canonical(body+sig)))
   actor: string;       // userId
   device: string;      // b64(SPKI) of signing device
@@ -140,16 +141,42 @@ export const ACTIONS = {
 
 export type ActionName = typeof ACTIONS[keyof typeof ACTIONS];
 
+// O-5 (B5): the key used to be the bare join, so `id:"x|a", action:"b"` and
+// `id:"x", action:"a|b"` collided. The escape is the identity on every string
+// without `\` or `|` (and a type without `:`) — i.e. on every key any producer
+// has ever written — so no existing key, root or Strapi `dedupeKey` changes,
+// for v1 and v2 alike. The ToString of `order` stays: 1 and "1" are one key
+// (frozen, events.json › dedupe-tostring-and-dangling). SPEC §6.5.
+const escKey = (s: string) => s.replace(/\\/g, '\\\\').replace(/\|/g, '\\|');
+const escType = (s: string) => escKey(s).replace(/:/g, '\\:');
+
 export function dedupeKey(ev: ConsentEvent): string {
   const order = (ev.predicate?.order as number | undefined) ?? 0;
-  return `${ev.actor}|${ev.subject.type}:${ev.subject.id}|${ev.action}|${order}`;
+  return `${escKey(String(ev.actor))}|${escType(String(ev.subject.type))}:${escKey(String(ev.subject.id))}|${escKey(String(ev.action))}|${escKey(String(order))}`;
+}
+
+/**
+ * A vote's yes/no. O-6 (B5): `v: 1` keeps `Boolean()` forever — the string
+ * "false" is a yes there (events.json › s07); in `v: 2` only `true` is a yes,
+ * and a non-boolean `what` is not a valid event at all (isConsentEventShape).
+ */
+export function voteWhat(ev: ConsentEvent): boolean {
+  const what = (ev.predicate as { what?: unknown } | undefined)?.what;
+  return ev.v === 2 ? what === true : Boolean(what);
+}
+
+/** v2: a predicate is an object, and a `what` in it is a boolean (O-6). */
+function v2PredicateOk(p: unknown): boolean {
+  if (p === undefined) return true;
+  if (!p || typeof p !== 'object' || Array.isArray(p)) return false;
+  return !('what' in p) || typeof (p as { what: unknown }).what === 'boolean';
 }
 
 export function isConsentEventShape(x: unknown): x is ConsentEvent {
   if (!x || typeof x !== 'object') return false;
   const o = x as Record<string, unknown>;
   return (
-    o.v === 1 &&
+    (o.v === 1 || (o.v === 2 && v2PredicateOk(o.predicate))) &&
     typeof o.id === 'string' &&
     typeof o.actor === 'string' &&
     typeof o.device === 'string' &&

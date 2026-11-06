@@ -29,7 +29,8 @@ import { verifyQuorum, type QuorumProof, type QuorumResult, type QuorumRule } fr
 import { checkDeltas } from '$lib/consent/deltaCheck';
 import { compareIds } from '$lib/consent/ids';
 import { dedupeKey } from '$lib/consent/event';
-import { computeStateRoot, normalizeState } from '$lib/consent/stateRoot';
+import { computeStateRoot, normalizeState, stateVersionForEvent } from '$lib/consent/stateRoot';
+import { isConsentEventShape } from '$lib/consent/event';
 import { computeHeads } from '$lib/space/protocol';
 import { keyCommitment } from '$lib/space/e2e/epoch';
 
@@ -719,9 +720,10 @@ type Step = {
   t: number; // ms after T0
   parents?: string[]; // labels (or literal ids prefixed "!"); default: the previous step
   commit?: boolean; // carry parentStateRoots + stateRoot (SPEC §7.3)
+  v2?: boolean; // B5: `v: 2` with `device` = deviceId, committed under state root v3
 };
 
-type Scenario = { name: string; projectId: string | null; description: string; steps: Step[]; genesis?: boolean };
+type Scenario = { name: string; projectId: string | null; description: string; steps: Step[]; genesis?: boolean; formatV2?: boolean };
 
 const SCENARIOS: Scenario[] = [
   {
@@ -835,8 +837,57 @@ const SCENARIOS: Scenario[] = [
       // a second name later: the latest amend of a path is the setting
       { label: 'g12', actor: 'bob', action: 'project.amend', subject: ['project', 'p-4'], predicate: { path: 'name', value: 'הגינה', decisionId: 'dn-2', order: 'name#dn-2' }, t: 8000 }
     ]
+  },
+  {
+    name: 'format-v2-mixed',
+    projectId: 'p-5',
+    formatV2: true,
+    description:
+      'B5 (SPEC §4, §6.5, §7): one chain of `v: 1` and `v: 2` events. A v2 event names its device by deviceId. `what: "false"` is a yes in v1 (Boolean, frozen) — and a re-vote in v2 by the same member replaces it, because the dedupe key is the same in both versions. The v2 vote m08 commits to the root it produces: under state root v3 (no vote eventId) that is possible, under v2 it never is. m09/m10 have keys that collided before the escape (O-5) — both are applied. Every root in `expect` that is not suffixed V3 is under state root v2, like every other scenario; `stateRootV3`, `normalizedStateV3` and `steps[i].rootAfterV3` are the same folds under v3.',
+    steps: [
+      { label: 'm01', actor: 'alice', action: 'project.create', subject: ['project', 'p-5'], predicate: { settings: { name: 'רקמה מעורבת' } }, t: 0, parents: [] },
+      { label: 'm02', actor: 'bob', action: 'project.join', subject: ['project', 'p-5'], t: 1000, v2: true },
+      { label: 'm03', actor: 'carol', action: 'project.join', subject: ['project', 'p-5'], t: 2000 },
+      { label: 'm04', actor: 'alice', action: 'tosplit.create', subject: ['tosplit', 'ts-5'], predicate: { total: { amount: '10000', code: 'ILS' } }, t: 3000 },
+      { label: 'm05', actor: 'alice', action: 'tosplit.vote', subject: ['tosplit', 'ts-5'], predicate: { what: true }, t: 4000 },
+      // v1: the string "false" is a yes (Boolean), forever
+      { label: 'm06', actor: 'bob', action: 'tosplit.vote', subject: ['tosplit', 'ts-5'], predicate: { what: 'false' }, t: 5000 },
+      // v2 re-vote by the same member: same dedupe key across versions, later wins
+      { label: 'm07', actor: 'bob', action: 'tosplit.vote', subject: ['tosplit', 'ts-5'], predicate: { what: false }, t: 6000, v2: true },
+      // a v2 vote committing to its own resulting root (O-3)
+      { label: 'm08', actor: 'carol', action: 'tosplit.vote', subject: ['tosplit', 'ts-5'], predicate: { what: true }, t: 7000, v2: true, commit: true },
+      // O-5: these two keys were identical before the escape
+      { label: 'm09', actor: 'alice', action: 'decision.vote', subject: ['decision', 'd|decision.vote'], predicate: { what: true }, t: 8000 },
+      { label: 'm10', actor: 'alice', action: 'decision.vote|decision.vote', subject: ['decision', 'd'], t: 9000 }
+    ]
   }
 ];
+
+/** B5: events no reader may accept, whatever their signature (SPEC §4). */
+async function buildShapeRejects(keys: Record<string, EdKey>): Promise<Obj[]> {
+  const base = async (name: string, over: Obj) => {
+    const body: Obj = {
+      v: 2,
+      actor: userId('alice'),
+      device: await deviceFingerprint(keys.alice.spki),
+      action: 'tosplit.vote',
+      subject: { type: 'tosplit', id: 'ts-5' },
+      parents: [],
+      ts: T0,
+      nonce: await nonceFor('shape/' + name),
+      ...over
+    };
+    const ev = await signWith(body, keys.alice.privateKey, 'Ed25519');
+    assertEq(isConsentEventShape(ev), false, 'shape reject ' + name);
+    return ev;
+  };
+  return [
+    { name: 'v2-what-string', reason: 'v2 `what` must be a boolean (O-6)', event: await base('v2-what-string', { predicate: { what: 'false' } }) },
+    { name: 'v2-what-number', reason: 'v2 `what` must be a boolean (O-6)', event: await base('v2-what-number', { predicate: { what: 1 } }) },
+    { name: 'v2-predicate-array', reason: 'a v2 predicate is an object', event: await base('v2-predicate-array', { predicate: [true] }) },
+    { name: 'v3', reason: 'no such event version', event: await base('v3', { v: 3, predicate: { what: true } }) }
+  ];
+}
 
 async function genesisPredicate(): Promise<Obj> {
   const g = emptyState('p-2');
@@ -877,9 +928,9 @@ async function buildScenario(sc: Scenario, keys: Record<string, EdKey>): Promise
     const predicate = sc.genesis && st.label === 'c01' ? await genesisPredicate() : st.predicate;
     const key = keys[st.actor];
     const body: Obj = {
-      v: 1,
+      v: st.v2 ? 2 : 1,
       actor: userId(st.actor),
-      device: key.spki,
+      device: st.v2 ? await deviceFingerprint(key.spki) : key.spki,
       action: st.action,
       subject: { type: st.subject[0], id: st.subject[1] },
       predicate,
@@ -888,13 +939,14 @@ async function buildScenario(sc: Scenario, keys: Record<string, EdKey>): Promise
       nonce: await nonceFor(`${sc.name}/${st.label}`)
     };
     if (st.commit) {
+      const rootV = stateVersionForEvent({ v: body.v as 1 | 2 });
       const roots: string[] = [];
-      for (const p of parents) roots.push(await computeStateRoot(project(closureOf([p], byId), sc.projectId)));
+      for (const p of parents) roots.push(await computeStateRoot(project(closureOf([p], byId), sc.projectId), rootV));
       body.parentStateRoots = roots;
       // The event's own id is unknowable before signing; the placeholder is
       // harmless only because this step's reducer never reads ev.id.
       const draft = { ...strip(body), id: '', sig: '' } as unknown as ConsentEvent;
-      body.stateRoot = await computeStateRoot(project([...closureOf(parents, byId), draft], sc.projectId));
+      body.stateRoot = await computeStateRoot(project([...closureOf(parents, byId), draft], sc.projectId), rootV);
     }
     const ev = (await signWith(body, key.privateKey, 'Ed25519')) as unknown as ConsentEvent;
     events.push(ev);
@@ -916,7 +968,13 @@ async function buildScenario(sc: Scenario, keys: Record<string, EdKey>): Promise
   const steps = [];
   for (let i = 0; i < applied.length; i++) {
     const prefix = applied.slice(0, i + 1);
-    steps.push({ id: applied[i].id, label: labels[applied[i].id], rootAfter: await computeStateRoot(project(prefix, sc.projectId)) });
+    const folded = project(prefix, sc.projectId);
+    steps.push({
+      id: applied[i].id,
+      label: labels[applied[i].id],
+      rootAfter: await computeStateRoot(folded, 2),
+      ...(sc.formatV2 ? { rootAfterV3: await computeStateRoot(folded, 3) } : {})
+    });
   }
   const finalState = project(events, sc.projectId);
 
@@ -932,8 +990,11 @@ async function buildScenario(sc: Scenario, keys: Record<string, EdKey>): Promise
       applied: applied.map((e) => e.id),
       heads: computeHeads(events),
       steps,
-      normalizedState: normalizeState(finalState),
-      stateRoot: await computeStateRoot(finalState)
+      normalizedState: normalizeState(finalState, 2),
+      stateRoot: await computeStateRoot(finalState, 2),
+      ...(sc.formatV2
+        ? { normalizedStateV3: normalizeState(finalState, 3), stateRootV3: await computeStateRoot(finalState, 3) }
+        : {})
     }
   };
 }
@@ -1046,7 +1107,9 @@ export async function buildVectors(previous?: Partial<VectorSet>): Promise<Vecto
       ...header('events'),
       about: 'Projection + state root (SPEC_CONSENT_FORMAT §5–§8). Verify every event (§3), fold them in any input order, and reproduce `expect`. `steps[i].rootAfter` is the root after folding applied[0..i] — use it to find the first divergence.',
       stateRootVersion: 2,
-      scenarios
+      formatV2Rule: 'B5 (SPEC §4): `v` is 1 or 2. A v2 predicate, when present, is an object whose `what` (when present) is a boolean; only `true` is a yes. v1 keeps Boolean(what) forever. A v1 event commits under state root v2, a v2 event under v3. The dedupe key (§6.5) is the same for both versions.',
+      scenarios,
+      shapeRejects: await buildShapeRejects(keys)
     },
     e2e: { ...header('e2e'), ...(await buildE2e(keys, firstEvent)) },
     quorum: { ...header('quorum'), ...(await buildQuorum(keys)) }

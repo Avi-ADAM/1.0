@@ -16,6 +16,8 @@
 
 import { canonicalize, type JsonValue } from '$lib/crypto/canonical';
 import { b64urlEncode } from '$lib/crypto/b64';
+import type { ConsentEvent } from './event';
+import { EMIT_FORMAT_V2 } from './emitFormat';
 import type {
   ProjectState,
   SubjectRound,
@@ -37,7 +39,27 @@ import type {
 // PLAN_sale_holder_consent, deliberately left out of v1 pending this bump)
 // and the new entity maps (missions, halukas, decisions, stageVotes, timers,
 // forums, meetings, away, settings).
-export const STATE_ROOT_VERSION = 2;
+//
+// v3 — B5 (O-3): v2 minus `eventId` in tosplit / stage votes. An event's id
+// hashes its signature, which signs its `stateRoot` — so under v2 a vote can
+// never commit to the root it produces. Nothing reads that field from a root.
+// v2 stays verifiable forever: a `v: 1` event commits under v2, a `v: 2`
+// event under v3, and a snapshot names its own (`stateV`). SPEC §7.
+
+export type StateRootVersion = 2 | 3;
+export const STATE_ROOT_VERSIONS: readonly StateRootVersion[] = [2, 3];
+
+/** The version this build WRITES into snapshots / genesis (the emit switch). */
+export const STATE_ROOT_VERSION: StateRootVersion = EMIT_FORMAT_V2 ? 3 : 2;
+
+export function isStateRootVersion(v: unknown): v is StateRootVersion {
+  return v === 2 || v === 3;
+}
+
+/** The root an event's `parentStateRoots` / `stateRoot` are computed under. */
+export function stateVersionForEvent(ev: Pick<ConsentEvent, 'v'>): StateRootVersion {
+  return ev.v === 2 ? 3 : 2;
+}
 
 /**
  * Pure: ProjectState → deterministic JSON value (sorted, no Sets/Maps/bigint).
@@ -56,9 +78,10 @@ export const STATE_ROOT_VERSION = 2;
  * Any structural change to ProjectState requires updating this function AND
  * bumping STATE_ROOT_VERSION.
  */
-export function normalizeState(state: ProjectState): JsonValue {
+export function normalizeState(state: ProjectState, version: StateRootVersion = STATE_ROOT_VERSION): JsonValue {
+  const withIds = version === 2;
   return {
-    v: STATE_ROOT_VERSION,
+    v: version,
     projectId: state.projectId,
     asOf: state.asOf,
     members: [...state.members].sort(),
@@ -67,7 +90,7 @@ export function normalizeState(state: ProjectState): JsonValue {
       .map(([k, v]) => [k, v.toString()] as JsonValue),
     tosplits: [...state.tosplits.entries()]
       .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))
-      .map(([k, v]) => [k, normalizeTosplit(v)] as JsonValue),
+      .map(([k, v]) => [k, normalizeTosplit(v, withIds)] as JsonValue),
     rounds: [...state.rounds.entries()]
       .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))
       .map(([k, v]) => [k, normalizeRound(v)] as JsonValue),
@@ -76,7 +99,7 @@ export function normalizeState(state: ProjectState): JsonValue {
     missions: sortedEntries(state.missions, normalizeMission),
     halukas: sortedEntries(state.halukas, normalizeHaluka),
     decisions: sortedEntries(state.decisions, normalizeDecision),
-    stageVotes: sortedEntries(state.stageVotes, normalizeStageVotes),
+    stageVotes: sortedEntries(state.stageVotes, (s) => normalizeStageVotes(s, withIds)),
     timers: sortedEntries(state.timers, normalizeTimer),
     forums: sortedEntries(state.forums, normalizeForum),
     meetings: sortedEntries(state.meetings, normalizeMeeting),
@@ -91,7 +114,7 @@ function sortedEntries<V>(map: Map<string, V>, norm: (v: V) => JsonValue): JsonV
     .map(([k, v]) => [k, norm(v)] as JsonValue) as unknown as JsonValue;
 }
 
-function normalizeTosplit(t: TosplitView): JsonValue {
+function normalizeTosplit(t: TosplitView, withIds: boolean): JsonValue {
   return {
     id: t.id,
     createdBy: t.createdBy,
@@ -100,7 +123,7 @@ function normalizeTosplit(t: TosplitView): JsonValue {
     approved: t.approved,
     votes: [...t.votes.entries()]
       .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))
-      .map(([k, v]) => [k, { what: v.what, ts: v.ts, eventId: v.eventId }] as JsonValue)
+      .map(([k, v]) => [k, withIds ? { what: v.what, ts: v.ts, eventId: v.eventId } : { what: v.what, ts: v.ts }] as JsonValue)
   } as unknown as JsonValue;
 }
 
@@ -184,14 +207,14 @@ function normalizeDecision(d: DecisionView): JsonValue {
   } as unknown as JsonValue;
 }
 
-function normalizeStageVotes(s: StageVotesView): JsonValue {
+function normalizeStageVotes(s: StageVotesView, withIds: boolean): JsonValue {
   return {
     subjectType: s.subjectType,
     subjectId: s.subjectId,
     approved: s.approved,
     votes: [...s.votes.entries()]
       .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))
-      .map(([k, v]) => [k, { what: v.what, ts: v.ts, eventId: v.eventId, order: v.order }])
+      .map(([k, v]) => [k, withIds ? { what: v.what, ts: v.ts, eventId: v.eventId, order: v.order } : { what: v.what, ts: v.ts, order: v.order }])
   } as unknown as JsonValue;
 }
 
@@ -244,8 +267,8 @@ function normalizeAway(a: AwayMark): JsonValue {
  * parents → computes root → checks event.parentStateRoots; applies event →
  * recomputes root → checks event.stateRoot.
  */
-export async function computeStateRoot(state: ProjectState): Promise<string> {
-  const normalized = normalizeState(state);
+export async function computeStateRoot(state: ProjectState, version: StateRootVersion = STATE_ROOT_VERSION): Promise<string> {
+  const normalized = normalizeState(state, version);
   const bytes = new TextEncoder().encode(canonicalize(normalized));
   const buf = await crypto.subtle.digest('SHA-256', bytes);
   return b64urlEncode(buf);
@@ -256,6 +279,6 @@ export async function computeStateRoot(state: ProjectState): Promise<string> {
  * Returns the canonical bytes that would be hashed — useful for property tests
  * that compare two distinct paths to the same root without re-doing crypto.
  */
-export function canonicalBytesOfState(state: ProjectState): Uint8Array {
-  return new TextEncoder().encode(canonicalize(normalizeState(state)));
+export function canonicalBytesOfState(state: ProjectState, version: StateRootVersion = STATE_ROOT_VERSION): Uint8Array {
+  return new TextEncoder().encode(canonicalize(normalizeState(state, version)));
 }

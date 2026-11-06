@@ -7,6 +7,7 @@
   "keyDerivation": "seed = SHA-256(UTF-8(\"1lev1-consent-v1/\" + label)); Ed25519 labels \"ed25519/<name>\", P-256 \"p256/<name>\", nonces \"nonce/<...>\" (first 16 bytes)",
   "about": "Projection + state root (SPEC_CONSENT_FORMAT §5–§8). Verify every event (§3), fold them in any input order, and reproduce `expect`. `steps[i].rootAfter` is the root after folding applied[0..i] — use it to find the first divergence.",
   "stateRootVersion": 2,
+  "formatV2Rule": "B5 (SPEC §4): `v` is 1 or 2. A v2 predicate, when present, is an object whose `what` (when present) is a boolean; only `true` is a yes. v1 keeps Boolean(what) forever. A v1 event commits under state root v2, a v2 event under v3. The dedupe key (§6.5) is the same for both versions.",
   "scenarios": [
     {
       "name": "rikma-lifecycle",
@@ -2334,6 +2335,605 @@
           ]
         },
         "stateRoot": "6DuyMEVzmgi891CFnWK8ICMzwSjRPQW2P6uCPbMU2fE"
+      }
+    },
+    {
+      "name": "format-v2-mixed",
+      "description": "B5 (SPEC §4, §6.5, §7): one chain of `v: 1` and `v: 2` events. A v2 event names its device by deviceId. `what: \"false\"` is a yes in v1 (Boolean, frozen) — and a re-vote in v2 by the same member replaces it, because the dedupe key is the same in both versions. The v2 vote m08 commits to the root it produces: under state root v3 (no vote eventId) that is possible, under v2 it never is. m09/m10 have keys that collided before the escape (O-5) — both are applied. Every root in `expect` that is not suffixed V3 is under state root v2, like every other scenario; `stateRootV3`, `normalizedStateV3` and `steps[i].rootAfterV3` are the same folds under v3.",
+      "projectId": "p-5",
+      "labels": {
+        "QqXQ99ErZoLte7l84lVo8jlyzRKcqPpucBbFSnVNsoM": "m01",
+        "jV1TMvoldAxDH1iKTF5-SpmqnfS9kgRFVJ28g5u7Gek": "m02",
+        "EmPo6BGaUjDWVr4Oom1D6MC6x05sUaxaCq_Gu0M1iDg": "m03",
+        "Bchr1ZzUk5WxUKwquhcFFZ6MAka5-Lu2gpeq5g4XruE": "m04",
+        "Apls-07p-A641R3mVG6_BJoAIY3AbKODSfimsSc0d9w": "m05",
+        "fqIR8mW1VXpUDu_6tMyFM2aOaEAqZmOWjIxAWrMhdfM": "m06",
+        "8gRD_Trl4BDnPK5tLJAELKWUPjbHTU-qXhv-aJEBEos": "m07",
+        "m8eKbTmgGrrH_0wujUO8iBUcNCUFTkCMSxYKfFMObx0": "m08",
+        "900IhoQreGHdRG7dLQM1uyJVwRwKg5ovsBrj3RTJSAM": "m09",
+        "vhtYcVwiEq1qJK2pEBA90tx97f904sVxarpT2QjYl3A": "m10"
+      },
+      "events": [
+        {
+          "v": 1,
+          "actor": "u-alice",
+          "device": "MCowBQYDK2VwAyEAw2aFyT5XfLsPDVxfoEQOCSVgl1_YS5aoiK8UGIh1RTY",
+          "action": "project.create",
+          "subject": {
+            "type": "project",
+            "id": "p-5"
+          },
+          "predicate": {
+            "settings": {
+              "name": "רקמה מעורבת"
+            }
+          },
+          "parents": [],
+          "ts": 1760000000000,
+          "nonce": "58rgdvctj57xv32dPrrpGQ",
+          "sig": "TZpn0IiUXLw_GoQEShNOewGUbwM8JAEjrlE3YIMOhoOuijjXcI_88UQIbcxMxrtdo9UNKKhxPIImhWJRZqpmDg",
+          "id": "QqXQ99ErZoLte7l84lVo8jlyzRKcqPpucBbFSnVNsoM"
+        },
+        {
+          "v": 2,
+          "actor": "u-bob",
+          "device": "iPr0Ueh2oQAPKT-qT1mWxFhTz_fh7HbR-FsQ50yQq7s",
+          "action": "project.join",
+          "subject": {
+            "type": "project",
+            "id": "p-5"
+          },
+          "parents": [
+            "QqXQ99ErZoLte7l84lVo8jlyzRKcqPpucBbFSnVNsoM"
+          ],
+          "ts": 1760000001000,
+          "nonce": "RbT1k46_oboF9J7FZGoyow",
+          "sig": "9BpkzJ_4xXFcjAjo_A-9kKU2Ci15rwM7aeSgO2IsNuz3MKRIcQUWGIcugLBpHpbBN7JJgAvaNJVH35gSMz-BBg",
+          "id": "jV1TMvoldAxDH1iKTF5-SpmqnfS9kgRFVJ28g5u7Gek"
+        },
+        {
+          "v": 1,
+          "actor": "u-carol",
+          "device": "MCowBQYDK2VwAyEAsstdtAKx6uNVNkciaL63LhA505Nlz4IcwVXgFN4GSsI",
+          "action": "project.join",
+          "subject": {
+            "type": "project",
+            "id": "p-5"
+          },
+          "parents": [
+            "jV1TMvoldAxDH1iKTF5-SpmqnfS9kgRFVJ28g5u7Gek"
+          ],
+          "ts": 1760000002000,
+          "nonce": "-n5drffx2OJaEUysFR1ytA",
+          "sig": "EUANmEcykJ5ZfevpVX4G4uMiG9xiNB-tS4srpieAEi8PGJhllHE3O0DKCNpAoDpnH5h-dNco6-jlVbt29GSxDg",
+          "id": "EmPo6BGaUjDWVr4Oom1D6MC6x05sUaxaCq_Gu0M1iDg"
+        },
+        {
+          "v": 1,
+          "actor": "u-alice",
+          "device": "MCowBQYDK2VwAyEAw2aFyT5XfLsPDVxfoEQOCSVgl1_YS5aoiK8UGIh1RTY",
+          "action": "tosplit.create",
+          "subject": {
+            "type": "tosplit",
+            "id": "ts-5"
+          },
+          "predicate": {
+            "total": {
+              "amount": "10000",
+              "code": "ILS"
+            }
+          },
+          "parents": [
+            "EmPo6BGaUjDWVr4Oom1D6MC6x05sUaxaCq_Gu0M1iDg"
+          ],
+          "ts": 1760000003000,
+          "nonce": "pUz9GI1Yxu-ZNrAHgt3D6g",
+          "sig": "Nwmiy71-tehCcVkHBNbYCH74xjKZ_1-Dui4UUFx8g7XoCF-d7ZbSQRAPndsyuyKNVjlZDUBEcPmzYxZIYz8QDA",
+          "id": "Bchr1ZzUk5WxUKwquhcFFZ6MAka5-Lu2gpeq5g4XruE"
+        },
+        {
+          "v": 1,
+          "actor": "u-alice",
+          "device": "MCowBQYDK2VwAyEAw2aFyT5XfLsPDVxfoEQOCSVgl1_YS5aoiK8UGIh1RTY",
+          "action": "tosplit.vote",
+          "subject": {
+            "type": "tosplit",
+            "id": "ts-5"
+          },
+          "predicate": {
+            "what": true
+          },
+          "parents": [
+            "Bchr1ZzUk5WxUKwquhcFFZ6MAka5-Lu2gpeq5g4XruE"
+          ],
+          "ts": 1760000004000,
+          "nonce": "lvXVdGcWDxLcFBpiCssx-g",
+          "sig": "In95VCEzRzLT-81zF6QH4d7rxJdT0NlF_W_pweYNh6TJWZfyxZz1xz7nuSm_RQZBMGI3fx8J-YFkjJo9a9OECQ",
+          "id": "Apls-07p-A641R3mVG6_BJoAIY3AbKODSfimsSc0d9w"
+        },
+        {
+          "v": 1,
+          "actor": "u-bob",
+          "device": "MCowBQYDK2VwAyEA6RjNbe3z0BZms5MszZc34tt-y7ERI4-oB0h6aXTRHy8",
+          "action": "tosplit.vote",
+          "subject": {
+            "type": "tosplit",
+            "id": "ts-5"
+          },
+          "predicate": {
+            "what": "false"
+          },
+          "parents": [
+            "Apls-07p-A641R3mVG6_BJoAIY3AbKODSfimsSc0d9w"
+          ],
+          "ts": 1760000005000,
+          "nonce": "d6vOo1_lofdp6EZTSzjQ_g",
+          "sig": "XlJWuL0wFGPcx53X8OpkDTVXnVCNlcjtWpKy47V2Hbk07d8HgO6DHYorWY6aVep8wbEFmFCHWNWWADyiO-TPCA",
+          "id": "fqIR8mW1VXpUDu_6tMyFM2aOaEAqZmOWjIxAWrMhdfM"
+        },
+        {
+          "v": 2,
+          "actor": "u-bob",
+          "device": "iPr0Ueh2oQAPKT-qT1mWxFhTz_fh7HbR-FsQ50yQq7s",
+          "action": "tosplit.vote",
+          "subject": {
+            "type": "tosplit",
+            "id": "ts-5"
+          },
+          "predicate": {
+            "what": false
+          },
+          "parents": [
+            "fqIR8mW1VXpUDu_6tMyFM2aOaEAqZmOWjIxAWrMhdfM"
+          ],
+          "ts": 1760000006000,
+          "nonce": "FRp7enyllqhFmuU1T1ixcg",
+          "sig": "rg8dOaDn-yfpPKL2GFEvtzZkcHMADwhNMFp6EhjYB2eBBNz7P3hbbvCDSJ2UwQ6AmZqVzsvfb4n7ucC68SnmBA",
+          "id": "8gRD_Trl4BDnPK5tLJAELKWUPjbHTU-qXhv-aJEBEos"
+        },
+        {
+          "v": 2,
+          "actor": "u-carol",
+          "device": "IpUQmq_cqvc-LrSSxvVOsE-BeyW_h3lLRxWPT3fQyLw",
+          "action": "tosplit.vote",
+          "subject": {
+            "type": "tosplit",
+            "id": "ts-5"
+          },
+          "predicate": {
+            "what": true
+          },
+          "parents": [
+            "8gRD_Trl4BDnPK5tLJAELKWUPjbHTU-qXhv-aJEBEos"
+          ],
+          "ts": 1760000007000,
+          "nonce": "cJ4n_0BHMcgwG7YhVNPtuQ",
+          "parentStateRoots": [
+            "_iFgH4INfb5mPmoYcTPFhGbE-zFsGiZ77VrcF1u6xmg"
+          ],
+          "stateRoot": "6qIv00kQJ9Vh_s5hzmUCGqCdp7mX8UCuJEvzYoxnX_k",
+          "sig": "BM-iMnpnKOGnp9kuAMgQzomH-BTOAwDfmOKL7G2x12VHUEMbA9nyadBgB2rG0VTcUlf3-zgUWH-E4xhuNU3sBQ",
+          "id": "m8eKbTmgGrrH_0wujUO8iBUcNCUFTkCMSxYKfFMObx0"
+        },
+        {
+          "v": 1,
+          "actor": "u-alice",
+          "device": "MCowBQYDK2VwAyEAw2aFyT5XfLsPDVxfoEQOCSVgl1_YS5aoiK8UGIh1RTY",
+          "action": "decision.vote",
+          "subject": {
+            "type": "decision",
+            "id": "d|decision.vote"
+          },
+          "predicate": {
+            "what": true
+          },
+          "parents": [
+            "m8eKbTmgGrrH_0wujUO8iBUcNCUFTkCMSxYKfFMObx0"
+          ],
+          "ts": 1760000008000,
+          "nonce": "jOWNpjV4j3BCLF6GUAeKyA",
+          "sig": "PKzI1Ad87WC2sJIy5O-EvitsOAEp3lL7FmB2Q9ZrwV-B6mZzC6KJ3wieaos6yUcDPoTzbsZB8NxZd_ZwQmhhBg",
+          "id": "900IhoQreGHdRG7dLQM1uyJVwRwKg5ovsBrj3RTJSAM"
+        },
+        {
+          "v": 1,
+          "actor": "u-alice",
+          "device": "MCowBQYDK2VwAyEAw2aFyT5XfLsPDVxfoEQOCSVgl1_YS5aoiK8UGIh1RTY",
+          "action": "decision.vote|decision.vote",
+          "subject": {
+            "type": "decision",
+            "id": "d"
+          },
+          "parents": [
+            "900IhoQreGHdRG7dLQM1uyJVwRwKg5ovsBrj3RTJSAM"
+          ],
+          "ts": 1760000009000,
+          "nonce": "PFkzk1_vedv9T61RA85ufw",
+          "sig": "6g4sxAqIoGPuIXw_X-HGA0AK74m6ovqE59qu9cSo6KiQ5bI5PkJ5mLsIC16p-c-Vw06Jad1kPR6h7gl6NbbtAA",
+          "id": "vhtYcVwiEq1qJK2pEBA90tx97f904sVxarpT2QjYl3A"
+        }
+      ],
+      "expect": {
+        "topoOrder": [
+          "QqXQ99ErZoLte7l84lVo8jlyzRKcqPpucBbFSnVNsoM",
+          "jV1TMvoldAxDH1iKTF5-SpmqnfS9kgRFVJ28g5u7Gek",
+          "EmPo6BGaUjDWVr4Oom1D6MC6x05sUaxaCq_Gu0M1iDg",
+          "Bchr1ZzUk5WxUKwquhcFFZ6MAka5-Lu2gpeq5g4XruE",
+          "Apls-07p-A641R3mVG6_BJoAIY3AbKODSfimsSc0d9w",
+          "fqIR8mW1VXpUDu_6tMyFM2aOaEAqZmOWjIxAWrMhdfM",
+          "8gRD_Trl4BDnPK5tLJAELKWUPjbHTU-qXhv-aJEBEos",
+          "m8eKbTmgGrrH_0wujUO8iBUcNCUFTkCMSxYKfFMObx0",
+          "900IhoQreGHdRG7dLQM1uyJVwRwKg5ovsBrj3RTJSAM",
+          "vhtYcVwiEq1qJK2pEBA90tx97f904sVxarpT2QjYl3A"
+        ],
+        "dedupeKeys": {
+          "QqXQ99ErZoLte7l84lVo8jlyzRKcqPpucBbFSnVNsoM": "u-alice|project:p-5|project.create|0",
+          "jV1TMvoldAxDH1iKTF5-SpmqnfS9kgRFVJ28g5u7Gek": "u-bob|project:p-5|project.join|0",
+          "EmPo6BGaUjDWVr4Oom1D6MC6x05sUaxaCq_Gu0M1iDg": "u-carol|project:p-5|project.join|0",
+          "Bchr1ZzUk5WxUKwquhcFFZ6MAka5-Lu2gpeq5g4XruE": "u-alice|tosplit:ts-5|tosplit.create|0",
+          "Apls-07p-A641R3mVG6_BJoAIY3AbKODSfimsSc0d9w": "u-alice|tosplit:ts-5|tosplit.vote|0",
+          "fqIR8mW1VXpUDu_6tMyFM2aOaEAqZmOWjIxAWrMhdfM": "u-bob|tosplit:ts-5|tosplit.vote|0",
+          "8gRD_Trl4BDnPK5tLJAELKWUPjbHTU-qXhv-aJEBEos": "u-bob|tosplit:ts-5|tosplit.vote|0",
+          "m8eKbTmgGrrH_0wujUO8iBUcNCUFTkCMSxYKfFMObx0": "u-carol|tosplit:ts-5|tosplit.vote|0",
+          "900IhoQreGHdRG7dLQM1uyJVwRwKg5ovsBrj3RTJSAM": "u-alice|decision:d\\|decision.vote|decision.vote|0",
+          "vhtYcVwiEq1qJK2pEBA90tx97f904sVxarpT2QjYl3A": "u-alice|decision:d|decision.vote\\|decision.vote|0"
+        },
+        "applied": [
+          "QqXQ99ErZoLte7l84lVo8jlyzRKcqPpucBbFSnVNsoM",
+          "jV1TMvoldAxDH1iKTF5-SpmqnfS9kgRFVJ28g5u7Gek",
+          "EmPo6BGaUjDWVr4Oom1D6MC6x05sUaxaCq_Gu0M1iDg",
+          "Bchr1ZzUk5WxUKwquhcFFZ6MAka5-Lu2gpeq5g4XruE",
+          "Apls-07p-A641R3mVG6_BJoAIY3AbKODSfimsSc0d9w",
+          "8gRD_Trl4BDnPK5tLJAELKWUPjbHTU-qXhv-aJEBEos",
+          "m8eKbTmgGrrH_0wujUO8iBUcNCUFTkCMSxYKfFMObx0",
+          "900IhoQreGHdRG7dLQM1uyJVwRwKg5ovsBrj3RTJSAM",
+          "vhtYcVwiEq1qJK2pEBA90tx97f904sVxarpT2QjYl3A"
+        ],
+        "heads": [
+          "vhtYcVwiEq1qJK2pEBA90tx97f904sVxarpT2QjYl3A"
+        ],
+        "steps": [
+          {
+            "id": "QqXQ99ErZoLte7l84lVo8jlyzRKcqPpucBbFSnVNsoM",
+            "label": "m01",
+            "rootAfter": "E-txBqOIH20TzL4V1RatuJ6S4RvMqVHd4YReONY9SHQ",
+            "rootAfterV3": "rF09l_4MdOesJxNhrm4wF9X4jcKRgzwwN8r-JctMAGc"
+          },
+          {
+            "id": "jV1TMvoldAxDH1iKTF5-SpmqnfS9kgRFVJ28g5u7Gek",
+            "label": "m02",
+            "rootAfter": "HFtk6PqDzPzGe6Te4QDgzvNEUpntZ0Hi4ThYENhQzJ8",
+            "rootAfterV3": "mJGC0In4t4YL_lb2B24B_RK9r2S64tVCtLTeo5m9Mt8"
+          },
+          {
+            "id": "EmPo6BGaUjDWVr4Oom1D6MC6x05sUaxaCq_Gu0M1iDg",
+            "label": "m03",
+            "rootAfter": "s1FN4vixua4M2r77kZ7EwgriXOpY8u_qozEEGcKvF9E",
+            "rootAfterV3": "MTVCJgiRp3chPa9JndcDIQJE68hejyOmvFl0cMiCu78"
+          },
+          {
+            "id": "Bchr1ZzUk5WxUKwquhcFFZ6MAka5-Lu2gpeq5g4XruE",
+            "label": "m04",
+            "rootAfter": "NA3s7-rNZeMLv5AyoyyUqQKIbndBa_veBdJSd7D5J38",
+            "rootAfterV3": "1s6VCuPty1kfKAMlhIAroz1RjxRMIl89cHYiCnEFKWQ"
+          },
+          {
+            "id": "Apls-07p-A641R3mVG6_BJoAIY3AbKODSfimsSc0d9w",
+            "label": "m05",
+            "rootAfter": "CxarFmRp9HT-zO0yyF1CfgwYShCBSmjEzY5ls8mC9KY",
+            "rootAfterV3": "SdUJIvKvIy3_cCfNwLWjh37ZVtvKQiBnweNvxpqfysw"
+          },
+          {
+            "id": "8gRD_Trl4BDnPK5tLJAELKWUPjbHTU-qXhv-aJEBEos",
+            "label": "m07",
+            "rootAfter": "xAD97jjaeInIL7ynPvNnHvSz8QgfLu68nvgAwCdcVdM",
+            "rootAfterV3": "_iFgH4INfb5mPmoYcTPFhGbE-zFsGiZ77VrcF1u6xmg"
+          },
+          {
+            "id": "m8eKbTmgGrrH_0wujUO8iBUcNCUFTkCMSxYKfFMObx0",
+            "label": "m08",
+            "rootAfter": "FKxfevakvfwkPNjHpWg2J2HM_xyesKk2oejfMZYR0oY",
+            "rootAfterV3": "6qIv00kQJ9Vh_s5hzmUCGqCdp7mX8UCuJEvzYoxnX_k"
+          },
+          {
+            "id": "900IhoQreGHdRG7dLQM1uyJVwRwKg5ovsBrj3RTJSAM",
+            "label": "m09",
+            "rootAfter": "30frVEcKgwGvDxaQygaZE_gM_Xm-uc8uZ9oFDOJWuNQ",
+            "rootAfterV3": "67_ABa2SHmhHzxvlqC9xmupuKZ0pYY6t4PMhORdQ7-g"
+          },
+          {
+            "id": "vhtYcVwiEq1qJK2pEBA90tx97f904sVxarpT2QjYl3A",
+            "label": "m10",
+            "rootAfter": "EKzAptgVXOktoiYHgdmH25MGugBsO1Zx3OrBEXBy4N4",
+            "rootAfterV3": "5mdoCHT32u23ExbHpqCaKq-0nc0LmUPm82nBMucWVrs"
+          }
+        ],
+        "normalizedState": {
+          "v": 2,
+          "projectId": "p-5",
+          "asOf": 1760000009000,
+          "members": [
+            "u-alice",
+            "u-bob",
+            "u-carol"
+          ],
+          "balances": [],
+          "tosplits": [
+            [
+              "ts-5",
+              {
+                "id": "ts-5",
+                "createdBy": "u-alice",
+                "createdAt": 1760000003000,
+                "predicate": {
+                  "total": {
+                    "amount": "10000",
+                    "code": "ILS"
+                  }
+                },
+                "approved": false,
+                "votes": [
+                  [
+                    "u-alice",
+                    {
+                      "what": true,
+                      "ts": 1760000004000,
+                      "eventId": "Apls-07p-A641R3mVG6_BJoAIY3AbKODSfimsSc0d9w"
+                    }
+                  ],
+                  [
+                    "u-bob",
+                    {
+                      "what": false,
+                      "ts": 1760000006000,
+                      "eventId": "8gRD_Trl4BDnPK5tLJAELKWUPjbHTU-qXhv-aJEBEos"
+                    }
+                  ],
+                  [
+                    "u-carol",
+                    {
+                      "what": true,
+                      "ts": 1760000007000,
+                      "eventId": "m8eKbTmgGrrH_0wujUO8iBUcNCUFTkCMSxYKfFMObx0"
+                    }
+                  ]
+                ]
+              }
+            ]
+          ],
+          "rounds": [
+            [
+              "tosplit:ts-5",
+              {
+                "current": 0,
+                "start": 1760000003000
+              }
+            ]
+          ],
+          "sales": [],
+          "saleClaims": [],
+          "missions": [],
+          "halukas": [],
+          "decisions": [],
+          "stageVotes": [
+            [
+              "decision:d|decision.vote",
+              {
+                "subjectType": "decision",
+                "subjectId": "d|decision.vote",
+                "approved": false,
+                "votes": [
+                  [
+                    "u-alice",
+                    {
+                      "what": true,
+                      "ts": 1760000008000,
+                      "eventId": "900IhoQreGHdRG7dLQM1uyJVwRwKg5ovsBrj3RTJSAM",
+                      "order": 0
+                    }
+                  ]
+                ]
+              }
+            ]
+          ],
+          "timers": [],
+          "forums": [],
+          "meetings": [],
+          "away": [],
+          "settings": [
+            [
+              "name",
+              "רקמה מעורבת"
+            ]
+          ]
+        },
+        "stateRoot": "EKzAptgVXOktoiYHgdmH25MGugBsO1Zx3OrBEXBy4N4",
+        "normalizedStateV3": {
+          "v": 3,
+          "projectId": "p-5",
+          "asOf": 1760000009000,
+          "members": [
+            "u-alice",
+            "u-bob",
+            "u-carol"
+          ],
+          "balances": [],
+          "tosplits": [
+            [
+              "ts-5",
+              {
+                "id": "ts-5",
+                "createdBy": "u-alice",
+                "createdAt": 1760000003000,
+                "predicate": {
+                  "total": {
+                    "amount": "10000",
+                    "code": "ILS"
+                  }
+                },
+                "approved": false,
+                "votes": [
+                  [
+                    "u-alice",
+                    {
+                      "what": true,
+                      "ts": 1760000004000
+                    }
+                  ],
+                  [
+                    "u-bob",
+                    {
+                      "what": false,
+                      "ts": 1760000006000
+                    }
+                  ],
+                  [
+                    "u-carol",
+                    {
+                      "what": true,
+                      "ts": 1760000007000
+                    }
+                  ]
+                ]
+              }
+            ]
+          ],
+          "rounds": [
+            [
+              "tosplit:ts-5",
+              {
+                "current": 0,
+                "start": 1760000003000
+              }
+            ]
+          ],
+          "sales": [],
+          "saleClaims": [],
+          "missions": [],
+          "halukas": [],
+          "decisions": [],
+          "stageVotes": [
+            [
+              "decision:d|decision.vote",
+              {
+                "subjectType": "decision",
+                "subjectId": "d|decision.vote",
+                "approved": false,
+                "votes": [
+                  [
+                    "u-alice",
+                    {
+                      "what": true,
+                      "ts": 1760000008000,
+                      "order": 0
+                    }
+                  ]
+                ]
+              }
+            ]
+          ],
+          "timers": [],
+          "forums": [],
+          "meetings": [],
+          "away": [],
+          "settings": [
+            [
+              "name",
+              "רקמה מעורבת"
+            ]
+          ]
+        },
+        "stateRootV3": "5mdoCHT32u23ExbHpqCaKq-0nc0LmUPm82nBMucWVrs"
+      }
+    }
+  ],
+  "shapeRejects": [
+    {
+      "name": "v2-what-string",
+      "reason": "v2 `what` must be a boolean (O-6)",
+      "event": {
+        "v": 2,
+        "actor": "u-alice",
+        "device": "yB9KophqgYoRi7_Adv0bWd5dsf2h1Qq4OJ5lcvmfRnY",
+        "action": "tosplit.vote",
+        "subject": {
+          "type": "tosplit",
+          "id": "ts-5"
+        },
+        "parents": [],
+        "ts": 1760000000000,
+        "nonce": "6-lSZ8MSatrYzN2_NUKWjw",
+        "predicate": {
+          "what": "false"
+        },
+        "sig": "Bb2vIm8519Alxp-fG2m3ihjrniPKrl86Fit_ft4rc0axOvMtYFxEU6bTDe-GyRPNUYMCZ1XyJjm9Bhh6VgzgBw",
+        "id": "KdRxHjE0Q5MnY9CGzYISkvPt7AcYHOfBGzxwm7MjAAM"
+      }
+    },
+    {
+      "name": "v2-what-number",
+      "reason": "v2 `what` must be a boolean (O-6)",
+      "event": {
+        "v": 2,
+        "actor": "u-alice",
+        "device": "yB9KophqgYoRi7_Adv0bWd5dsf2h1Qq4OJ5lcvmfRnY",
+        "action": "tosplit.vote",
+        "subject": {
+          "type": "tosplit",
+          "id": "ts-5"
+        },
+        "parents": [],
+        "ts": 1760000000000,
+        "nonce": "8TooCb-3A0ZFEvPIgLoXuQ",
+        "predicate": {
+          "what": 1
+        },
+        "sig": "Ue0nQuZ_xhoAVSVoBjGlBseRYh9CNFbmWcfdr084KopVLfTbeb2cYOBhK8a0RXXKUo_DIF5KW4vX1dCXVYQ6BA",
+        "id": "BMUn-dveWF5praFAW5xgD2HE2tqFEjQfSp2lP7Bnj00"
+      }
+    },
+    {
+      "name": "v2-predicate-array",
+      "reason": "a v2 predicate is an object",
+      "event": {
+        "v": 2,
+        "actor": "u-alice",
+        "device": "yB9KophqgYoRi7_Adv0bWd5dsf2h1Qq4OJ5lcvmfRnY",
+        "action": "tosplit.vote",
+        "subject": {
+          "type": "tosplit",
+          "id": "ts-5"
+        },
+        "parents": [],
+        "ts": 1760000000000,
+        "nonce": "b3W7zMIVNL54_k-7cl-EkA",
+        "predicate": [
+          true
+        ],
+        "sig": "20-GS8XbPZ_flA0TolqXc8z6GmKROYrNdMlWscsLdOpZg7NiB0WM1u2qhMLQ5gJvvgr7fq0rMmnTZGhN0qNHAg",
+        "id": "doFGGVqn0KuIBtSkSaLrF0D2ED3a287UI8TTtFsN6fg"
+      }
+    },
+    {
+      "name": "v3",
+      "reason": "no such event version",
+      "event": {
+        "v": 3,
+        "actor": "u-alice",
+        "device": "yB9KophqgYoRi7_Adv0bWd5dsf2h1Qq4OJ5lcvmfRnY",
+        "action": "tosplit.vote",
+        "subject": {
+          "type": "tosplit",
+          "id": "ts-5"
+        },
+        "parents": [],
+        "ts": 1760000000000,
+        "nonce": "Z8Tr2t7GToWsV9imuz7jmQ",
+        "predicate": {
+          "what": true
+        },
+        "sig": "ujvH25mNF9HKN8nuEwi9HavSE0EErD4GZMTLPCI7dIoLDGWTgSUMcPT5nK7xJIW1b52odo30beLtN-X2QT9NAQ",
+        "id": "1GtV8ifH91UfNoDMwfkabVWiPODo1dRt5njLvuJ1LCk"
       }
     }
   ]

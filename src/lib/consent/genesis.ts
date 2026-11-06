@@ -26,7 +26,7 @@
 
 import type { ProjectState } from './projection';
 import { emptyState } from './projection';
-import { normalizeState, computeStateRoot, STATE_ROOT_VERSION } from './stateRoot';
+import { normalizeState, computeStateRoot, STATE_ROOT_VERSION, isStateRootVersion } from './stateRoot';
 import { restoreState } from './stateRestore';
 import type { SnapshotPredicate } from '$lib/space/compaction';
 
@@ -68,9 +68,9 @@ export async function buildGenesisPredicate(state: ProjectState): Promise<Snapsh
   return {
     upTo: GENESIS_UP_TO,
     heads: [],
-    stateRoot: await computeStateRoot(state),
+    stateRoot: await computeStateRoot(state, STATE_ROOT_VERSION),
     stateV: STATE_ROOT_VERSION,
-    state: JSON.parse(JSON.stringify(normalizeState(state))) as unknown
+    state: JSON.parse(JSON.stringify(normalizeState(state, STATE_ROOT_VERSION))) as unknown
   };
 }
 
@@ -90,12 +90,14 @@ export async function verifyGenesisPredicate(
   if (predicate.upTo !== GENESIS_UP_TO || (predicate.heads?.length ?? 0) !== 0) {
     return { ok: false, reason: 'not_a_genesis_snapshot' };
   }
-  if (predicate.stateV !== STATE_ROOT_VERSION) {
+  // B5: v2 and v3 genesis both verify, each under its own version.
+  if (!isStateRootVersion(predicate.stateV)) {
     return { ok: false, reason: `state_version_mismatch:${predicate.stateV}` };
   }
   const restored = restoreState(predicate.state);
   if (!restored.ok) return { ok: false, reason: `restore_failed:${restored.reason}` };
-  const root = await computeStateRoot(restored.state);
+  if (restored.version !== predicate.stateV) return { ok: false, reason: 'state_version_mismatch:inline' };
+  const root = await computeStateRoot(restored.state, predicate.stateV);
   if (root !== predicate.stateRoot) {
     return { ok: false, reason: 'inline_state_does_not_match_root' };
   }

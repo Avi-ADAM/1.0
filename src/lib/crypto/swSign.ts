@@ -7,6 +7,7 @@
 import { signCanonical } from './sign';
 import { canonicalize } from './canonical';
 import type { ConsentEvent } from '$lib/consent/event';
+import { emitEnvelope } from '$lib/consent/signEvent';
 
 export type IdentityRow = {
   id: 'self';
@@ -98,10 +99,11 @@ export async function signEventInSw(partial: {
     return { ok: false, reason: 'actor_mismatch' };
   }
 
+  const env = await emitEnvelope(identity.devicePubB64, partial.predicate);
   const body = {
-    v: 1 as const,
+    v: env.v,
     actor: partial.actor,
-    device: identity.devicePubB64,
+    device: env.device,
     action: partial.action,
     subject: partial.subject,
     predicate: partial.predicate,

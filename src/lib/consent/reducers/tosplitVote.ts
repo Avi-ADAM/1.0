@@ -1,11 +1,12 @@
 import type { ConsentEvent } from '../event';
+import { voteWhat } from '../event';
 import type { ProjectState, TosplitView } from '../projection';
 
 export function tosplitVote(state: ProjectState, ev: ConsentEvent): ProjectState {
   const view = state.tosplits.get(ev.subject.id);
   if (!view) return state;
 
-  const what = Boolean((ev.predicate as { what?: unknown } | undefined)?.what);
+  const what = voteWhat(ev);
   const votes = new Map(view.votes);
   votes.set(ev.actor, { what, ts: ev.ts, eventId: ev.id });
 

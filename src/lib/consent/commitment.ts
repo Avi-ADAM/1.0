@@ -20,7 +20,7 @@
 import { dedupeKey, type ConsentEvent } from './event';
 import { project, applyEvent, emptyState, type ProjectState } from './projection';
 import { compareIds } from './ids';
-import { computeStateRoot } from './stateRoot';
+import { computeStateRoot, isStateRootVersion, stateVersionForEvent } from './stateRoot';
 import { checkDeltas } from './deltaCheck';
 import { verifyQuorum, type QuorumContext } from './quorum';
 import { quorumRequirement } from './policy';
@@ -258,13 +258,15 @@ export async function verifyCommitments(
 
   // ── parentStateRoots: one root per parent, each over that parent's own
   //    ancestor closure (plan §2 — "אם 1 הורה — אחד; אם merge — N") ─────────
+  // B5: a v1 event commits under state root v2, a v2 event under v3.
+  const rootV = stateVersionForEvent(ev);
   if (ev.parentStateRoots !== undefined) {
     if (ev.parentStateRoots.length !== ev.parents.length) {
       return { ok: false, reason: 'parent_roots_arity' };
     }
     for (let i = 0; i < ev.parents.length; i++) {
       // closure already resolved every ancestor; a parent's sub-closure is in the pool.
-      const root = await computeStateRoot(stateAt([ev.parents[i]], pool, projectId, cache));
+      const root = await computeStateRoot(stateAt([ev.parents[i]], pool, projectId, cache), rootV);
       if (root !== ev.parentStateRoots[i]) {
         return { ok: false, reason: `parent_root_mismatch:${ev.parents[i]}` };
       }
@@ -277,7 +279,7 @@ export async function verifyCommitments(
 
   // ── stateRoot: the state after applying this event ───────────────────────
   if (ev.stateRoot !== undefined) {
-    const root = await computeStateRoot(after);
+    const root = await computeStateRoot(after, rootV);
     if (root !== ev.stateRoot) return { ok: false, reason: 'state_root_mismatch' };
     checked.push('stateRoot');
   }
@@ -293,10 +295,14 @@ export async function verifyCommitments(
   // ── snapshot.commit: the ATTESTED root must also be true (§5.1) — clients
   //    will trust it as a sync starting point, so recompute it now ──────────
   if (ev.action === 'snapshot.commit') {
-    const p = ev.predicate as { upTo?: unknown; stateRoot?: unknown } | undefined;
+    const p = ev.predicate as { upTo?: unknown; stateRoot?: unknown; stateV?: unknown } | undefined;
     if (typeof p?.upTo !== 'string' || typeof p?.stateRoot !== 'string') {
       return { ok: false, reason: 'snapshot_bad_predicate' };
     }
+    // The attested root is under the snapshot's own stateV (absent = v2, the
+    // only version before B5).
+    const snapV = p.stateV === undefined ? 2 : p.stateV;
+    if (!isStateRootVersion(snapV)) return { ok: false, reason: 'snapshot_unknown_state_version:' + String(p.stateV) };
     if (p.upTo === GENESIS_UP_TO) {
       // T6 — a genesis covers no history: it is a DAG root carrying the state
       // imported from Strapi inline. There is nothing to replay, so the root
@@ -304,7 +310,8 @@ export async function verifyCommitments(
       if (ev.parents.length > 0) return { ok: false, reason: 'genesis_has_parents' };
       const restored = restoreState((ev.predicate as { state?: unknown }).state);
       if (!restored.ok) return { ok: false, reason: `genesis_restore_failed:${restored.reason}` };
-      if ((await computeStateRoot(restored.state)) !== p.stateRoot) {
+      if (restored.version !== snapV) return { ok: false, reason: 'genesis_state_version_mismatch' };
+      if ((await computeStateRoot(restored.state, snapV)) !== p.stateRoot) {
         return { ok: false, reason: 'snapshot_root_mismatch' };
       }
       checked.push('genesisRoot');
@@ -313,7 +320,7 @@ export async function verifyCommitments(
         // The attested coverage point must be an ancestor of the snapshot event.
         return { ok: false, reason: `snapshot_upTo_not_ancestor:${p.upTo}` };
       }
-      const attestedRoot = await computeStateRoot(stateAt([p.upTo], pool, projectId, cache));
+      const attestedRoot = await computeStateRoot(stateAt([p.upTo], pool, projectId, cache), snapV);
       if (attestedRoot !== p.stateRoot) {
         return { ok: false, reason: 'snapshot_root_mismatch' };
       }

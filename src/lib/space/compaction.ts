@@ -15,7 +15,7 @@
 
 import type { ConsentEvent } from '$lib/consent/event';
 import { project, subjectKey, type ProjectState } from '$lib/consent/projection';
-import { normalizeState, canonicalBytesOfState, STATE_ROOT_VERSION } from '$lib/consent/stateRoot';
+import { normalizeState, canonicalBytesOfState, STATE_ROOT_VERSION, isStateRootVersion, type StateRootVersion } from '$lib/consent/stateRoot';
 import { restoreState } from '$lib/consent/stateRestore';
 import { b64urlEncode } from '$lib/crypto/b64';
 import { computeHeads, ancestryClosure } from './protocol';
@@ -47,18 +47,18 @@ export async function buildSnapshotPredicate(
   const heads = computeHeads(all); // already sorted deterministically
   if (heads.length === 0) throw new Error('buildSnapshotPredicate: empty space');
   const state = project(all, projectId);
-  const stateRoot = await computeRoot(state);
+  const stateRoot = await computeRoot(state, STATE_ROOT_VERSION);
   return {
     upTo: heads[0],
     heads,
     stateRoot,
     stateV: STATE_ROOT_VERSION,
-    state: JSON.parse(JSON.stringify(normalizeState(state))) as unknown
+    state: JSON.parse(JSON.stringify(normalizeState(state, STATE_ROOT_VERSION))) as unknown
   };
 }
 
-async function computeRoot(state: ProjectState): Promise<string> {
-  const bytes = canonicalBytesOfState(state);
+async function computeRoot(state: ProjectState, version: StateRootVersion): Promise<string> {
+  const bytes = canonicalBytesOfState(state, version);
   const buf = await crypto.subtle.digest(
     'SHA-256',
     bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer
@@ -81,7 +81,9 @@ export async function verifySnapshotAgainstLocal(
   localEvents: Iterable<ConsentEvent>,
   projectId: string | null
 ): Promise<SnapshotVerifyResult> {
-  if (predicate.stateV !== STATE_ROOT_VERSION) {
+  // B5: a v2 and a v3 snapshot both verify, each under its own version.
+  const version = predicate.stateV;
+  if (!isStateRootVersion(version)) {
     return { ok: false, reason: `state_version_mismatch:${predicate.stateV}` };
   }
   const byId = new Map<string, ConsentEvent>();
@@ -92,14 +94,15 @@ export async function verifySnapshotAgainstLocal(
   // Replay exactly the covered history (closure of the declared heads).
   const covered = ancestryClosure(byId, predicate.heads);
   const coveredEvents = [...byId.values()].filter((e) => covered.has(e.id));
-  const myRoot = await computeRoot(project(coveredEvents, projectId));
+  const myRoot = await computeRoot(project(coveredEvents, projectId), version);
   if (myRoot !== predicate.stateRoot) {
     return { ok: false, reason: 'root_mismatch_with_local_replay' };
   }
   // The inline state must be the state the root commits to.
   const restored = restoreState(predicate.state);
   if (!restored.ok) return { ok: false, reason: `restore_failed:${restored.reason}` };
-  const inlineRoot = await computeRoot(restored.state);
+  if (restored.version !== version) return { ok: false, reason: 'state_version_mismatch:inline' };
+  const inlineRoot = await computeRoot(restored.state, version);
   if (inlineRoot !== predicate.stateRoot) {
     return { ok: false, reason: 'inline_state_does_not_match_root' };
   }

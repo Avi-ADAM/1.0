@@ -31,9 +31,10 @@ import type { SigAlgo } from '$lib/crypto/algorithm';
 import { verifyDeviceCert } from '$lib/crypto/deviceCert';
 import { deviceFingerprint, isDeviceFingerprint } from '$lib/crypto/deviceId';
 import { ed25519VerifyStrict } from '$lib/crypto/ed25519Strict';
+import { isConsentEventShape } from '$lib/consent/event';
 import type { ConsentEvent, DeviceCert } from '$lib/consent/event';
 import { project } from '$lib/consent/projection';
-import { computeStateRoot } from '$lib/consent/stateRoot';
+import { computeStateRoot, normalizeState } from '$lib/consent/stateRoot';
 import { verifyCommitments } from '$lib/consent/commitment';
 import { openSealed, type SealedEnvelope } from '$lib/space/e2e/seal';
 import { kemUnwrap } from '$lib/space/e2e/kem';
@@ -208,6 +209,66 @@ describe('consent vectors — events.json', () => {
       }
     }
     expect(seen).toBeGreaterThan(0);
+  });
+});
+
+describe('consent vectors — B5 format v2 (events.json)', () => {
+  const mixed = () => (vectors.events.scenarios as Obj[]).find((x) => x.name === 'format-v2-mixed')!;
+
+  it('the mixed chain folds to the stated v2 AND v3 roots, step by step', async () => {
+    const sc = mixed();
+    const events = sc.events as ConsentEvent[];
+    expect(events.some((e) => e.v === 2) && events.some((e) => e.v === 1)).toBe(true);
+    const final = project(events, sc.projectId);
+    expect(await computeStateRoot(final, 3)).toBe(sc.expect.stateRootV3);
+    expect(normalizeState(final, 3)).toEqual(sc.expect.normalizedStateV3);
+    const applied = sc.expect.applied as string[];
+    const byId = new Map(events.map((e) => [e.id, e]));
+    for (let i = 0; i < applied.length; i++) {
+      const prefix = applied.slice(0, i + 1).map((id) => byId.get(id)!);
+      expect(await computeStateRoot(project(prefix, sc.projectId), 3), sc.steps?.[i]?.label).toBe(sc.expect.steps[i].rootAfterV3);
+    }
+  });
+
+  it('v1 "false" is a yes, the v2 re-vote replaces it, and the v2 vote committed to its own root', async () => {
+    const sc = mixed();
+    const events = sc.events as ConsentEvent[];
+    const lab = (l: string) => events.find((e) => sc.labels[e.id] === l)!;
+    const final = project(events, sc.projectId);
+    const votes = final.tosplits.get('ts-5')!.votes;
+    expect(votes.get('u-bob')?.what).toBe(false); // m07 (v2) replaced m06
+    expect(project(events.filter((e) => sc.labels[e.id] !== 'm07'), sc.projectId).tosplits.get('ts-5')!.votes.get('u-bob')?.what).toBe(true);
+    expect(isDeviceFingerprint(lab('m07').device)).toBe(true);
+    // m08 verifies under v3; the same fold under v2 cannot match (its own id is inside).
+    const m08 = lab('m08');
+    expect(m08.stateRoot).toBeDefined();
+    const res = await verifyCommitments(m08, { getEvent: (id) => events.find((e) => e.id === id), mode: 'strict', projectId: sc.projectId });
+    expect(res.ok).toBe(true);
+    expect(await computeStateRoot(project(events.filter((e) => e.ts <= m08.ts), sc.projectId), 2)).not.toBe(m08.stateRoot);
+  });
+
+  it('the keys that collided before the escape are two keys now (O-5)', () => {
+    const sc = mixed();
+    const events = sc.events as ConsentEvent[];
+    const lab = (l: string) => events.find((e) => sc.labels[e.id] === l)!;
+    const k9 = sc.expect.dedupeKeys[lab('m09').id];
+    const k10 = sc.expect.dedupeKeys[lab('m10').id];
+    expect(k9).not.toBe(k10);
+    expect(sc.expect.applied).toEqual(expect.arrayContaining([lab('m09').id, lab('m10').id]));
+    // and every key in every OTHER scenario has no escape in it — the escape changed none
+    for (const other of vectors.events.scenarios as Obj[]) {
+      if (other.name === 'format-v2-mixed') continue;
+      for (const k of Object.values(other.expect.dedupeKeys as Record<string, string>)) expect(k).not.toContain('\\');
+    }
+  });
+
+  it('every shape reject is refused, though its signature is good', async () => {
+    const rejects = vectors.events.shapeRejects as Obj[];
+    expect(rejects.length).toBeGreaterThanOrEqual(4);
+    for (const r of rejects) {
+      expect(isConsentEventShape(r.event), r.name).toBe(false);
+      expect(await verifySignedObject(r.event, resolver), r.name).toEqual({ ok: true });
+    }
   });
 });
 

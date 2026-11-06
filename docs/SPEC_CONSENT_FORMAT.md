@@ -152,6 +152,14 @@ id        = b64url(SHA-256(canonical(body ∪ {sig})))      — כלומר הא�
 subject:{type,id}, parents:string[], ts, nonce, sig`. אופציונליים:
 `predicate, parentStateRoots, stateRoot, delta, quorum`.
 
+- **`v` = 1 או 2 (B5, נובמבר 2026).** שתי הגרסאות תקפות לנצח, ובאותה שרשרת.
+  `v: 2` אומר שלושה דברים: (א) `predicate`, אם קיים, הוא אובייקט, ו-`what` בו, אם קיים,
+  הוא boolean — אחרת האירוע **לא תקף בצורה** (`isConsentEventShape`), גם בחתימה טובה;
+  (ב) רק `what === true` הוא "כן" (ב-`v: 1` נשאר `Boolean(what)`, §6.4); (ג) ההתחייבויות
+  שלו (`parentStateRoots`, `stateRoot`) מחושבות ב-state root v3 (§7), ושל `v: 1` ב-v2.
+  מה שהחותם פולט נקבע במקום אחד, `src/lib/consent/emitFormat.ts` — **כבוי**: `v: 1` ו-SPKI.
+  מדליקים רק אחרי שכל הלקוחות מריצים את הקוראים (לקוח ישן מפיל `v: 2` כצורה לא מוכרת).
+  vectors: `events.json › format-v2-mixed` ו-`shapeRejects`.
 - **כל שדה חדש — אופציונלי, לנצח.** אירוע ישן חייב להישאר תקף.
 - `parents` = מזהי אירועים (DAG). זיוף אב משנה את כל צאצאיו.
 - מרחב ה-`action` — `ACTIONS` ב-`event.ts`. פעולה לא מוכרת היא **חוקית**
@@ -210,10 +218,18 @@ null פירושו "הראשון שנראה" (`project.create`/`project.join` ק�
 | מיון מחרוזות | `Array.prototype.sort()` = יחידות קוד UTF-16 | — |
 | חשבון | IEEE-754 double (`timeTick`, סכומי שעות) | s09 |
 
-### 6.5 חסר-ביטחון ידוע
-מפתח ה-dedupe מחובר ב-`|` בלי escaping: `actor` שמכיל `|` יכול להתנגש
-במפתח של מישהו אחר. כרגע `actor` = userId מספרי, אז זה לא מנוצל — אבל זו
-התנהגות קפואה עד bump (O-5).
+### 6.5 מפתח ה-dedupe — escaping (O-5, נסגר נובמבר 2026)
+```
+key = esc(actor) "|" escType(type) ":" esc(id) "|" esc(action) "|" esc(ToString(order ?? 0))
+esc(s)     = every \ in s becomes \\ , then every | becomes \|
+escType(s) = esc(s), then every : becomes \:
+```
+(תווים גולמיים, לא כתיב JSON: backslash בודד הופך לשניים.)
+עד B5 המפתח היה החיבור בלי escaping, ו-`id:"x|a", action:"b"` התנגש ב-`id:"x", action:"a|b"`.
+ה-escape הוא **הזהות** על כל מחרוזת בלי `\\` ו-`|` (ו-type בלי `:`) — כלומר על כל מפתח
+שיצרן כלשהו כתב אי-פעם — ולכן אף מפתח, root או עמודת `dedupeKey` ב-Strapi לא זזו.
+**אחד לשתי הגרסאות**: הצבעה חוזרת ב-`v: 2` מחליפה את ה-`v: 1` של אותו חבר. ה-ToString
+של `order` נשאר (1 ו-"1" = אותו מפתח, `dedupe-tostring-and-dangling`).
 
 ### 6.6 הגדרות רקמה — `project.amend` (A2b, נובמבר 2026)
 
@@ -243,7 +259,12 @@ null פירושו "הראשון שנראה" (`project.create`/`project.join` ק�
 
 ## 7. State root
 
-`src/lib/consent/stateRoot.ts`, `STATE_ROOT_VERSION = 2`.
+`src/lib/consent/stateRoot.ts`. שתי גרסאות, תקפות לנצח: **v2**, ו-**v3** (B5) = v2 בלי
+`eventId` בהצבעות של `tosplits` ו-`stageVotes` (O-3, §7.3). `v: 1` מתחייב ב-v2, `v: 2` ב-v3;
+snapshot ו-genesis נושאים `stateV` משלהם ומאומתים בה (חסר = 2). `STATE_ROOT_VERSION` = מה
+שה-build **כותב** (2 כל עוד המתג כבוי). מגבלה ידועה: state ששוחזר מ-snapshot v3 לא מחזיק
+`eventId` של הצבעות, ולכן root v2 עליו לא אמין — התחייבות של `v: 1` אחריו נבדקת מול השרשרת
+המלאה, לא מול ה-snapshot.
 
 ```
 stateRoot = b64url(SHA-256(canonical(normalizeState(state))))
@@ -264,7 +285,11 @@ meetings, away, settings`.
 - `stateRoot` = root של הקיפול על סגור האבות של כל ה-`parents` + האירוע עצמו.
 - (`commitment.ts`; vector: s34 נושא את שניהם, ונבדק במצב strict.)
 
-### 7.3 ⚠ פתוח: אירוע שה-reducer שלו קורא את `ev.id` (O-3)
+### 7.3 ✔ נסגר ב-v3: אירוע שה-reducer שלו קורא את `ev.id` (O-3)
+**ההכרעה (B5)**: v3 משמיט את `eventId` מהצורה המנורמלת (הוא נשאר ב-state בזיכרון), ולכן
+הצבעה `v: 2` יכולה להתחייב ל-root של עצמה (vector: `format-v2-mixed` › m08). ב-v2 זה
+נשאר בלתי אפשרי, כמתואר:
+
 `tosplit.vote` וכל ההצבעות דרך `stageVote` (וגם `decision.vote` גנרי) כותבות
 `eventId: ev.id` לתוך ה-state. אבל `id` הוא hash שכולל את החתימה, שחותמת על
 `stateRoot` — **הצבעה לא יכולה להתחייב ל-root של עצמה**. כרגע אף יצרן לא
@@ -304,7 +329,7 @@ meetings, away, settings`.
 |---|---|
 | `canonical.json` | קלט JSON כטקסט → מחרוזת קנונית + hash; ו-`rejects` |
 | `signatures.json` | RFC 8032, `ed25519Edge` (שלשות קצה + הכרעה, §3), מפתחות (עם `deviceId`), אובייקטים תקפים (כולל DeviceCert, P-256 ו-`device` כ-`deviceId`), אובייקטים פסולים + סיבה |
-| `events.json` | שלושה תרחישים: אירועים חתומים → סדר, dedupe, heads, root אחרי כל צעד, state מנורמל, root סופי |
+| `events.json` | (+ `format-v2-mixed`: שרשרת `v:1`/`v:2` עם roots ב-v2 וב-v3, ו-`shapeRejects`) שלושה תרחישים: אירועים חתומים → סדר, dedupe, heads, root אחרי כל צעד, state מנורמל, root סופי |
 | `e2e.json` | התחייבות מפתח, מעטפת sealed, עטיפת KEM עם ערכי ביניים |
 | `quorum.json` | הצבעות חתומות; לכל כלל QuorumProof (`quorum.ts`) מקרה עובר ומקרה נכשל עם ה-reason; לכל `Delta.kind` (`deltaCheck.ts`) לפני/אחרי/הצהרה → ok + `unchecked`, או reason. ה-state בקובץ הוא רק החלק ש-`checkDeltas` קורא (members, balances, `tosplits.approved`, rounds), ו-`agreers` ממוינים לפי code units |
 
@@ -342,11 +367,11 @@ meetings, away, settings`.
 |---|---|---|
 | ~~O-1~~ | ✔ **נסגר (נובמבר 2026)**: ארבעת הכללים ב-§3 + `signatures.json › ed25519Edge`. במקור: **קפדנות Ed25519** — מימושים נבדלים במקרי קצה (S לא קנוני, מפתח ציבורי מסדר קטן, R לא קנוני): RFC 8032, `verify_strict` של dalek ו-ZIP-215 לא מסכימים ביניהם, וההתנהגות של WebCrypto בכל דפדפן לא נבדקה כאן | חתימה "מוזרה" שעוברת במימוש אחד בלבד = פיצול. להחליט על כלל אחד ולהוסיף vectors של מקרי קצה |
 | ~~O-2~~ | ✔ **נסגר (נובמבר 2026)**: החותם מנרמל ל-low-S, המאמת מקבל את שתיהן (§3) | — |
-| O-3 | הצבעה לא יכולה להתחייב ל-root של עצמה | §7.3 |
+| ~~O-3~~ | ✔ **נסגר (B5)**: state root v3 בלי `eventId` של הצבעות. במקור: הצבעה לא יכולה להתחייב ל-root של עצמה | §7.3 |
 | ~~O-4~~ | ✔ **נסגר (נובמבר 2026)**: `quorum.json` (§10). `policy.ts` (איזו פעולה דורשת quorum) עדיין בלי vector — הוא טבלה, לא חישוב | — |
 | ~~O-10~~ | ✔ **נסגר (נובמבר 2026)**: "לא" ב-`agreers-only` = יציאה מהמסכימים, לא וטו. המסכימים = מצביעי ה"כן" (ההצבעה האחרונה של כל אחד); עובר כשיש לפחות אחד. vectors: `quorum.json › agreers-only-no-leaves`, `agreers-only-revote-no-leaves`. במקור: **`agreers-only` מקבל הצבעות "לא"** — ההערה ב-`quorum.ts` אומרת "at least 1 yes vote, no nos", והקוד בודק רק שיש yes אחד. ה-vectors מקבעים רק מקרים ששתי הקריאות מסכימות עליהם (yes בודד עובר, no בודד נכשל) | Ratson §3.0 משתמש בכלל הזה. להחליט מה נכון ולהוסיף vector של yes+no — תיקון בקוד = שינוי אימות |
-| O-5 | מפתח dedupe בלי escaping | §6.5 |
-| O-6 | `Boolean("false") === true` ב-`what` | לא באג קריפטוגרפי, אבל מפתיע; תיקון = bump |
+| ~~O-5~~ | ✔ **נסגר (B5)**: escaping שהוא הזהות על כל מפתח קיים. במקור: מפתח dedupe בלי escaping | §6.5 |
+| ~~O-6~~ | ✔ **נסגר (B5)** ב-`v: 2` (`what` boolean בלבד); ב-`v: 1` קפוא. במקור: `Boolean("false") === true` ב-`what` | לא באג קריפטוגרפי, אבל מפתיע; תיקון = bump |
 | O-7 | ◐ **קריאה סגורה (B4, נובמבר 2026)**: המאמת מקבל `deviceId` (§1); הפליטה עדיין SPKI עד מתג. במקור: **`device` = ה-SPKI המלא** בכל אירוע | ב-Ed25519 זה 44 בייט; ב-ML-DSA-65 כ-1,974 בייט (~2.6KB ב-b64url) — בכל אירוע. לפני מפתחות PQ: מזהה מכשיר = `b64url(SHA-256(SPKI))` (43 תווים), המפתח עצמו רק במאגר המפתחות. מאמת מזהה את הצורה לפי האורך, ושתי הצורות תקפות לנצח (§13) |
 | O-8 | **אין מקום לחתימה שנייה** על אותו אובייקט | חתימה היברידית (Ed25519 + ML-DSA) דורשת שדה אופציונלי והגדרה מה הוא מכסה ואיך ה-id מחושב (§13.3) |
 | O-9 | **ה-KEM של S3 קלאסי בלבד** (ECDH P-256) | "אסוף עכשיו, פענח אחר כך": כל מעטפה sealed נשמרת לנצח במראה. **תנאי לפתיחת שער S3**: KEM היברידי (§13.2) |
