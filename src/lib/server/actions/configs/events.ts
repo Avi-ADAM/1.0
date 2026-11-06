@@ -497,3 +497,103 @@ export const joinEventSessionConfig: ActionConfig = {
   updateStrategy: { type: 'none' },
   realtime: { scopes: (_p, r) => scopeList([scope('project', r?.projectId ?? r?.data?.projectId)]) }
 };
+
+/**
+ * The workshop half of a webinar (W4, §6): a registrant opened a 1lev1
+ * account from the event's "next step" link (`/hascama?event=<token>`). The
+ * signup action calls this once the account exists: the registration and the
+ * lead learn who that person is now, and the lead's log says so — which is how
+ * the host's live screen and the rikma's follow-up see it.
+ *
+ * The token is the proof, not the email: someone may sign up with another
+ * address than the one they registered with. Best effort, never fails signup.
+ */
+const linkEventSignup: ActionExecutionHandler = async (params, context, { strapi }) => {
+  const run = serviceRun(strapi, context);
+  const userId = String(params.userId ?? '');
+  if (!/^\d{1,12}$/.test(userId)) throw new ActionError('VALIDATION_FAILED', 'No account to link');
+  const found = await loadByToken(run, String(params.token ?? ''));
+  if (!found) throw new ActionError('NOT_FOUND', 'No such registration');
+  const { registration, event } = found;
+  if (registration.userId) return { linked: false, reason: 'alreadyLinked', projectId: event.projectId };
+
+  await run('eventRegistrationUpdate', { id: registration.id, data: { user: userId } });
+
+  const warnings: string[] = [];
+  if (registration.leadId) {
+    try {
+      const { leadStore, recordActivity, updateLead } = await import('$lib/server/leads/store');
+      const store = leadStore(strapi as any, context.fetch);
+      const lead = await store.run('eventLeadCustomer', { id: registration.leadId });
+      const hasCustomer = lead?.data?.lead?.data?.attributes?.customer_user?.data?.id != null;
+      if (!hasCustomer) await updateLead(store, registration.leadId, { customer_user: userId, lastActivityAt: new Date().toISOString() });
+      await recordActivity(store, { leadId: registration.leadId, kind: 'event', direction: 'in', body: `${event.title} · 1lev1 ✓` });
+    } catch (e) {
+      console.warn('[linkEventSignup] lead not updated', registration.leadId, e);
+      warnings.push('lead');
+    }
+  }
+  return { linked: true, registrationId: registration.id, projectId: event.projectId, warnings };
+};
+
+export const linkEventSignupConfig: ActionConfig = {
+  key: 'linkEventSignup',
+  description: 'Link a new 1lev1 account to the event registration it was opened from (server only — the signup action)',
+  graphqlOperation: linkEventSignup,
+  paramSchema: {
+    token: { type: 'string', required: true, description: "The registrant's token, carried from /hascama?event=" },
+    userId: { type: 'string', required: true, description: 'The account just created' }
+  },
+  access: ['serviceAdmin'],
+  authRules: [],
+  updateStrategy: { type: 'none' },
+  realtime: { scopes: (_p, r) => scopeList([scope('project', r?.projectId ?? r?.data?.projectId)]) }
+};
+
+/**
+ * "N new registrations to <event>" for the rikma's members — at most once an
+ * hour per event (the events cron batches and claims them, W4). It writes
+ * nothing: it exists for the notification it sends, the way PLAN_LEADS risk 1
+ * asked a public form's leads to arrive — grouped, not one buzz per person.
+ */
+const notifyEventRegistrations: ActionExecutionHandler = async (params) => ({
+  projectId: String(params.projectId),
+  eventId: String(params.eventId),
+  count: Number(params.count) || 0
+});
+
+export const notifyEventRegistrationsConfig: ActionConfig = {
+  key: 'notifyEventRegistrations',
+  description: "Tell a rikma's members how many people registered for one of its events since the last notice (server only — the events cron)",
+  graphqlOperation: notifyEventRegistrations,
+  paramSchema: {
+    projectId: { type: 'string', required: true, description: 'The rikma' },
+    eventId: { type: 'string', required: true, description: 'The event' },
+    title: { type: 'string', required: true, description: 'The event title' },
+    count: { type: 'number', required: true, description: 'New registrations since the last notice' }
+  },
+  access: ['serviceAdmin'],
+  authRules: [],
+  notification: {
+    recipients: { type: 'projectMembers', config: { projectIdParam: 'projectId', excludeSender: false } },
+    templates: {
+      title: {
+        he: 'נרשמים חדשים: {{title}}',
+        en: 'New registrations: {{title}}',
+        ar: 'تسجيلات جديدة: {{title}}',
+        ru: 'Новые регистрации: {{title}}',
+        es: 'Nuevos registros: {{title}}'
+      },
+      body: {
+        he: 'נרשמו {{count}} חדשים מאז העדכון הקודם. הם כבר בלידים של הרקמה',
+        en: '{{count}} new since the last update. They are already in the rikma’s leads',
+        ar: '{{count}} جدد منذ التحديث السابق. هم بالفعل ضمن العملاء المحتملين للريكما',
+        ru: 'Новых с прошлого обновления: {{count}}. Они уже в лидах рикмы',
+        es: '{{count}} nuevos desde la última actualización. Ya están en los contactos de la rikma'
+      }
+    },
+    intent: 'ambient',
+    metadata: { priority: 'low', url: '/moach/{{projectId}}/events/{{eventId}}' }
+  },
+  updateStrategy: { type: 'none' }
+};

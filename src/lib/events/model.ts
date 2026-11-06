@@ -209,6 +209,10 @@ export interface RegistrationView {
   createdAt: string | null;
   leadId: string | null;
   lang: string | null;
+  /** The 1lev1 account this registrant opened from the event (W4), if any. */
+  userId: string | null;
+  /** That account's `onboarding_status` — `done` once they finished. */
+  onboardingStatus: string | null;
 }
 
 export function toRegistrationView(node: any): RegistrationView | null {
@@ -232,7 +236,9 @@ export function toRegistrationView(node: any): RegistrationView | null {
     joinedAt: str(a.joinedAt),
     createdAt: str(a.createdAt),
     leadId: a.lead?.data?.id != null ? String(a.lead.data.id) : null,
-    lang: str(a.lang)
+    lang: str(a.lang),
+    userId: a.user?.data?.id != null ? String(a.user.data.id) : null,
+    onboardingStatus: str(a.user?.data?.attributes?.onboarding_status)
   };
 }
 
@@ -242,4 +248,37 @@ export function toRegistrationView(node: any): RegistrationView | null {
  */
 export function eventPath(rikma: { slug?: string | null; id: string | number }, eventSlug: string): string {
   return `/r/${encodeURIComponent(String(rikma.slug || rikma.id))}/e/${encodeURIComponent(eventSlug)}`;
+}
+
+/**
+ * The event's "next step" link, carrying the registrant's token when it is our
+ * own signup (`/hascama`): an account opened through it is linked back to the
+ * registration and the lead (W4, `linkEventSignup`). Any other link is left
+ * exactly as the member wrote it — the token is never handed to another site.
+ */
+export function withEventRef(afterUrl: string | null, token: string | null): string | null {
+  if (!afterUrl) return null;
+  if (!token || !/^\/hascama(?:[/?#]|$)/.test(afterUrl)) return afterUrl;
+  const [pathAndQuery, hash = ''] = afterUrl.split('#');
+  const [path, query = ''] = pathAndQuery.split('?');
+  const params = new URLSearchParams(query);
+  params.set('event', token);
+  return `${path}?${params}${hash ? `#${hash}` : ''}`;
+}
+
+/** True for our own signup link — where a registrant who already has an account has nothing to do. */
+export function isSignupLink(afterUrl: string | null): boolean {
+  return !!afterUrl && /^\/hascama(?:[/?#]|$)/.test(afterUrl);
+}
+
+/**
+ * The description as the page shows it: one paragraph per line of text.
+ * The page renders these and the translation layer hashes these — the same
+ * function on both sides, or a translation would never be found (W4).
+ */
+export function paragraphs(description: string | null | undefined): string[] {
+  return String(description ?? '')
+    .split(/\n+/)
+    .map((p) => p.trim())
+    .filter(Boolean);
 }

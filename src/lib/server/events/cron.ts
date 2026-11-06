@@ -19,11 +19,12 @@
 
 import { toSessionView, type SessionView } from '$lib/events/model';
 import { openSessions } from '$lib/events/sessions';
-import { eventPath } from '$lib/events/model';
+import { eventPath, withEventRef } from '$lib/events/model';
 import {
   URGENCY,
   parseSent,
   planMail,
+  notifyBatch,
   planNewDate,
   promotions,
   type MailKind,
@@ -36,6 +37,8 @@ import type { Run } from './store';
 export interface CronDeps {
   run: Run;
   send: (to: string, mail: BuiltMail) => Promise<{ ok: boolean }>;
+  /** The members' batched "N new registrations" notice (W4). */
+  notify?: (event: { id: string; projectId: string; title: string; hostId: string | null }, count: number) => Promise<void>;
   /** Best effort: a line on the person's lead (came / did not come). */
   logLead?: (leadId: string, body: string, actorId: string | null) => Promise<void>;
   origin: string;
@@ -52,6 +55,8 @@ export interface CronReport {
   sent: Partial<Record<MailKind, number>>;
   failed: number;
   deferred: number;
+  /** Events whose members were told about new registrations this run. */
+  notified: number;
   errors: string[];
 }
 
@@ -137,7 +142,7 @@ export async function runEventsCron(deps: CronDeps): Promise<CronReport> {
   const now = deps.now ?? (() => new Date());
   const started = Date.now();
   const budget = deps.budgetMs ?? 45_000;
-  const report: CronReport = { events: 0, promoted: 0, planned: 0, sent: {}, failed: 0, deferred: 0, errors: [] };
+  const report: CronReport = { events: 0, promoted: 0, planned: 0, sent: {}, failed: 0, deferred: 0, notified: 0, errors: [] };
 
   const res = await deps.run('eventsForCron', {});
   const events = ((res?.data?.rikmaEvents?.data ?? []) as any[])
@@ -146,6 +151,7 @@ export async function runEventsCron(deps: CronDeps): Promise<CronReport> {
   report.events = events.length;
 
   const jobs: Job[] = [];
+  const regsOf = new Map<string, Reg[]>();
   for (const event of events) {
     let regs: Reg[];
     try {
@@ -155,6 +161,7 @@ export async function runEventsCron(deps: CronDeps): Promise<CronReport> {
       report.errors.push(`event ${event.id}: ${(e as Error).message}`);
       continue;
     }
+    regsOf.set(event.id, regs);
 
     // A seat that opened goes to the earliest person waiting for it.
     for (const session of event.sessions) {
@@ -211,6 +218,8 @@ export async function runEventsCron(deps: CronDeps): Promise<CronReport> {
       report.errors.push(`claim ${reg.id}: ${(e as Error).message}`);
       continue;
     }
+    // Later writes in this run (the members' notice) build on what was just claimed.
+    reg.sent = sent;
 
     const origin = deps.origin.replace(/\/+$/, '');
     const mail = buildReminder({
@@ -218,7 +227,8 @@ export async function runEventsCron(deps: CronDeps): Promise<CronReport> {
       registrationId: reg.id,
       name: reg.name,
       lang: reg.lang,
-      event: { title: event.title, tagline: event.tagline, afterUrl: event.afterUrl },
+      // The signup link carries this registrant's token, so an account opened from the mail is linked back (W4).
+      event: { title: event.title, tagline: event.tagline, afterUrl: withEventRef(event.afterUrl, reg.token) },
       session: session
         ? { startsAt: session.startsAt, durationMin: session.durationMin, timezone: session.timezone, recordingUrl: session.recordingUrl }
         : null,
@@ -238,6 +248,34 @@ export async function runEventsCron(deps: CronDeps): Promise<CronReport> {
         await deps.logLead(reg.leadId, `${event.title} · ${plan.kind === 'thanks' ? '✓' : '✗'}`, null);
       } catch (e) {
         report.errors.push(`lead ${reg.leadId}: ${(e as Error).message}`);
+      }
+    }
+  }
+
+  // The members' notice: one per event per hour, "N new registrations",
+  // never one buzz per sign-up. Claimed on the rows before it is sent.
+  if (deps.notify && !deps.dry) {
+    const nowIso = now().toISOString();
+    for (const event of events) {
+      const batch = notifyBatch(regsOf.get(event.id) ?? [], now());
+      if (batch.length === 0) continue;
+      let claimed = 0;
+      for (const reg of batch) {
+        try {
+          const sent = { ...reg.sent, notified: nowIso };
+          await deps.run('eventRegistrationUpdate', { id: reg.id, data: { sent } });
+          reg.sent = sent;
+          claimed++;
+        } catch (e) {
+          report.errors.push(`notify-claim ${reg.id}: ${(e as Error).message}`);
+        }
+      }
+      if (claimed === 0) continue;
+      try {
+        await deps.notify({ id: event.id, projectId: event.projectId, title: event.title, hostId: event.hostId }, claimed);
+        report.notified++;
+      } catch (e) {
+        report.errors.push(`notify ${event.id}: ${(e as Error).message}`);
       }
     }
   }

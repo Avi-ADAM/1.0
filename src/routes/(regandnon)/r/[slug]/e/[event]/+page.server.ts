@@ -7,6 +7,7 @@ import { EVENT_SLUG_RE } from '$lib/events/validate';
 import { eventPath } from '$lib/events/model';
 import { canRegister, seatsLeft, takenBySession } from '$lib/events/sessions';
 import { eventRun, eventsLive, loadEventBySlug, loadSeats } from '$lib/server/events/store';
+import { translateSurface, eventPageGroups } from '$lib/server/translation/surfaces.js';
 
 /**
  * A rikma event's landing page (docs/inprogress/PLAN_EVENTS_WEBINARS.md §3).
@@ -18,7 +19,7 @@ import { eventRun, eventsLive, loadEventBySlug, loadSeats } from '$lib/server/ev
  * A draft or a proposal is shown to the rikma's members only — that is how
  * they read the page they are asked to approve; anyone else gets a 404.
  */
-export const load: PageServerLoad = async ({ params, locals, fetch, url }) => {
+export const load: PageServerLoad = async ({ params, locals, fetch, url, cookies }) => {
   const eventSlug = String(params.event ?? '').toLowerCase();
   if (!EVENT_SLUG_RE.test(eventSlug)) error(404, 'Not found');
 
@@ -58,7 +59,17 @@ export const load: PageServerLoad = async ({ params, locals, fetch, url }) => {
       taken: taken[s.key] ?? 0
     }));
 
+  // UGC translation (PLAN_UGC_TRANSLATION, W4): one batched cache read for
+  // the page's own strings. Off unless TRANSLATE_SURFACES names `eventPage`;
+  // a miss renders the member's words as written. Not for a preview — a
+  // draft is read by its own rikma, in its own language.
+  const { translations, pending } = isPublic
+    ? await translateSurface('eventPage', eventPageGroups(event, projectName), (locals as any).lang, fetch, cookies.get('autoTranslate'))
+    : { translations: null, pending: [] };
+
   return {
+    translations,
+    pending,
     event,
     sessions,
     totalRegistered: Object.values(taken).reduce((a, b) => a + b, 0),

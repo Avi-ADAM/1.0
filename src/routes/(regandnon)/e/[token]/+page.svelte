@@ -132,7 +132,12 @@
         {/if}
       </section>
 
-      {#if data.event.afterUrl && (phase === 'joinable' || phase === 'ended')}
+      {#if data.registration.signedUp}
+        <section class="rounded-2xl bg-emerald-600/15 border border-emerald-400/30 p-5">
+          <p class="font-semibold">{$t('events.mine.signedUp')}</p>
+          <a href="/onboard" class="inline-block mt-2 underline text-emerald-200">{$t('events.mine.continueOnboard')}</a>
+        </section>
+      {:else if data.event.afterUrl && (phase === 'joinable' || phase === 'ended')}
         <section class="rounded-2xl bg-amber-400/10 border border-amber-300/30 p-5">
           <p class="font-semibold mb-2">{$t('events.mine.nextStep')}</p>
           <a href={data.event.afterUrl} class="inline-block rounded-full px-5 py-2 bg-white text-black font-bold">{$t('events.mine.nextStepCta')}</a>

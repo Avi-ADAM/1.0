@@ -87,7 +87,9 @@
     "cancel": "ביטול ההרשמה",
     "cancelSure": "לבטל את ההרשמה?",
     "cancelYes": "כן, לבטל",
-    "cancelNo": "לא"
+    "cancelNo": "לא",
+    "signedUp": "כבר נרשמת ל-1lev1 — מעולה!",
+    "continueOnboard": "להמשיך בהרשמה"
   },
   "moach": {
     "title": "אירועים",
@@ -191,5 +193,22 @@
     "answers": "תשובות",
     "changeNotifies": "יש נרשמים למועד הזה: שינוי השעה או ביטול ישלחו להם מייל עם יומן מעודכן.",
     "sessionHasRegistrations": "אי אפשר למחוק מועד שיש בו נרשמים — אפשר לבטל אותו, והם יקבלו הודעה."
+  },
+  "live": {
+    "open": "מסך חי",
+    "title": "מסך חי",
+    "intro": "מי בחדר, מי פתח חשבון ומי סיים להירשם — כדי לפנות בשם למי שנתקע.",
+    "noSession": "אין מועד לאירוע הזה.",
+    "updated": "עודכן {{time}}",
+    "registered": "נרשמו",
+    "inRoom": "בחדר",
+    "signedUp": "פתחו חשבון",
+    "onboarded": "סיימו הרשמה",
+    "stage": {
+      "joinedNoAccount": "בחדר, עוד בלי חשבון",
+      "accountNotOnboarded": "פתח/ה חשבון, באמצע",
+      "onboarded": "סיים/ה",
+      "notJoined": "לא נכנס/ה"
+    }
   }
 }

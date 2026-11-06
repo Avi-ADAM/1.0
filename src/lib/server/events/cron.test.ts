@@ -227,4 +227,31 @@ describe('runEventsCron', () => {
     const report = await runEventsCron({ run, origin: 'https://x', now: () => at(-25 * 60), send: async () => ({ ok: true }), budgetMs: -1 });
     expect(report.deferred).toBe(3);
   });
+
+  it('tells the members once, in a batch, and claims the rows first', async () => {
+    const { run, updates } = fakeStrapi(at(-25 * 60));
+    // The three rows are new: give them a creation time inside the window.
+    const notify = vi.fn(async () => {});
+    const report = await runEventsCron({
+      run: async (qid: string, vars: any) => {
+        const res: any = await run(qid, vars);
+        if (qid === 'eventRegistrationsForCron') {
+          for (const r of res.data.eventRegistrations.data) r.attributes.createdAt = at(-26 * 60).toISOString();
+        }
+        return res;
+      },
+      origin: 'https://x',
+      now: () => at(-25 * 60),
+      send: async () => ({ ok: true }),
+      notify
+    });
+    expect(notify).toHaveBeenCalledTimes(1);
+    expect(notify).toHaveBeenCalledWith(expect.objectContaining({ id: '7', projectId: '5', title: 'Webinar', hostId: '11' }), 3);
+    expect(report.notified).toBe(1);
+    // Every claim keeps what the mail claims wrote before it.
+    const last = new Map<string, any>();
+    for (const u of updates) if (u.data?.sent) last.set(u.id, u.data.sent);
+    expect(last.get('1')).toMatchObject({ d1: expect.any(String), notified: expect.any(String) });
+  });
 });
+

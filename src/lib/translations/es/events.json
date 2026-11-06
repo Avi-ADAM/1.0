@@ -87,7 +87,9 @@
     "cancel": "Cancelar mi registro",
     "cancelSure": "¿Cancelar tu registro?",
     "cancelYes": "Sí, cancelar",
-    "cancelNo": "No"
+    "cancelNo": "No",
+    "signedUp": "Ya te uniste a 1lev1, ¡genial!",
+    "continueOnboard": "Seguir con la configuración"
   },
   "moach": {
     "title": "Eventos",
@@ -191,5 +193,22 @@
     "answers": "Respuestas",
     "changeNotifies": "Hay personas registradas en esta fecha: cambiar la hora o cancelarla les envía un correo con el calendario actualizado.",
     "sessionHasRegistrations": "No se puede borrar una fecha con registros: cancélala y se les avisará."
+  },
+  "live": {
+    "open": "Pantalla en vivo",
+    "title": "Pantalla en vivo",
+    "intro": "Quién está en la sala, quién abrió una cuenta y quién terminó, para llamar por su nombre a quien se trabó.",
+    "noSession": "Este evento no tiene fecha.",
+    "updated": "Actualizado {{time}}",
+    "registered": "Registrados",
+    "inRoom": "En la sala",
+    "signedUp": "Abrieron cuenta",
+    "onboarded": "Terminaron",
+    "stage": {
+      "joinedNoAccount": "En la sala, sin cuenta todavía",
+      "accountNotOnboarded": "Cuenta abierta, a mitad",
+      "onboarded": "Listo",
+      "notJoined": "No entró"
+    }
   }
 }

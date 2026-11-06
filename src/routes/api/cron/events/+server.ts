@@ -44,6 +44,16 @@ export const GET: RequestHandler = async ({ request, url, fetch }) => {
             ? { attachments: [{ filename: 'event.ics', content: m.ics, contentType: `text/calendar; charset=utf-8; method=${m.icsMethod ?? 'PUBLISH'}` }] }
             : {})
         }),
+      notify: async (event, count) => {
+        const { actionService } = await import('$lib/server/actions/index.js');
+        const { adminToken } = await import('$lib/server/adminToken.js');
+        const res: any = await actionService.executeAction(
+          'notifyEventRegistrations',
+          { projectId: event.projectId, eventId: event.id, title: event.title, count },
+          { userId: event.hostId ?? '', jwt: adminToken(), lang: 'he', fetch }
+        );
+        if (!res?.success) throw new Error(String(res?.error?.message ?? 'notify failed'));
+      },
       logLead: async (leadId, body) => {
         const { strapiClient } = await import('$lib/server/actions/index.js');
         const { leadStore, recordActivity } = await import('$lib/server/leads/store');

@@ -42,6 +42,8 @@ export interface SentLog {
   after?: string;
   cancelled?: string;
   offered?: string[];
+  /** When the rikma's members were told about this registration (batched, W4). */
+  notified?: string;
 }
 
 export interface PlanRegistration {
@@ -198,3 +200,29 @@ export function promotions<T extends { id: string; status: string; sessionKey: s
 
 /** The order a run works in when it cannot send everything at once. */
 export const URGENCY: MailKind[] = ['cancelled', 'moved', 'live', 'promoted', 'confirm', 'h1', 'd1', 'newDate', 'thanks', 'missed'];
+
+/** Members hear about new registrations at most this often (PLAN_LEADS risk 1: one buzz per sign-up is noise). */
+export const NOTIFY_EVERY_MS = HOUR;
+/** Rows older than this are never announced — a first run after a deploy must not report last month. */
+export const NOTIFY_MAX_AGE_MS = 3 * 24 * HOUR;
+
+/**
+ * Which registrations of one event go into the members' next "N new
+ * registrations" notice: the ones nobody was told about yet — but only once
+ * an hour per event, counted from the last notice any of its rows carries.
+ */
+export function notifyBatch<T extends { id: string; status: string; createdAt: string | null; sent: SentLog }>(
+  regs: T[],
+  now: Date = new Date()
+): T[] {
+  const t = now.getTime();
+  const last = Math.max(0, ...regs.map((r) => (r.sent?.notified ? Date.parse(r.sent.notified) : 0)).filter(Number.isFinite));
+  if (last && t - last < NOTIFY_EVERY_MS) return [];
+  return regs.filter(
+    (r) =>
+      !r.sent?.notified &&
+      r.status !== 'cancelled' &&
+      !!r.createdAt &&
+      t - Date.parse(r.createdAt) <= NOTIFY_MAX_AGE_MS
+  );
+}

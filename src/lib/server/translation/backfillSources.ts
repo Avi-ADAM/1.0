@@ -55,8 +55,10 @@ import {
     projectCardGroups,
     projectDetailGroups,
     resourceCardGroups,
-    resourceDetailGroups
+    resourceDetailGroups,
+    eventPageGroups
 } from './surfaces.js';
+import { toEventView } from '$lib/events/model';
 import type { SurfaceKey } from './config.js';
 import type { TranslatableString } from '$lib/translation/types.js';
 
@@ -212,16 +214,41 @@ const matanotSource: BackfillSource = {
 };
 
 /**
+ * `/r/<rikma>/e/<event>` — a published rikma event's landing page
+ * (PLAN_EVENTS_WEBINARS W4). The node becomes the page's own `EventView`
+ * through `toEventView`, and its strings come out of `eventPageGroups` — the
+ * builder the page's loader calls — so the two hash the same text.
+ */
+const rikmaEventSource: BackfillSource = {
+    key: 'rikmaEvent',
+    label: 'rikma events — each published event page',
+    qid: '481backfillEvents',
+    surfaces: ['eventPage'],
+    tier: 1,
+    rowsOf: pagedRows('rikmaEvents'),
+    totalOf: pagedTotal('rikmaEvents'),
+
+    strings(node: unknown): SourceGroup[] {
+        const n = node as Node;
+        if (!n?.attributes || isHiddenProject(n.attributes.project?.data?.id)) return [];
+        const view = toEventView(n);
+        if (!view || view.archived || view.status !== 'published') return [];
+        return [group('eventPage', eventPageGroups(view, n.attributes.project?.data?.attributes?.projectName))];
+    }
+};
+
+/**
  * Every source, tier order. `--only` filters this list by `key`.
  *
- * All four are tier 1 — public and anonymous — and within a tier the order is
+ * All are tier 1 — public and anonymous — and within a tier the order is
  * §7.1's: reader count over integration cost, missions first.
  */
 export const BACKFILL_SOURCES: BackfillSource[] = [
     openMissionSource,
     openMashaabimSource,
     projectSource,
-    matanotSource
+    matanotSource,
+    rikmaEventSource
 ];
 
 export function sourceByKey(key: string): BackfillSource | null {

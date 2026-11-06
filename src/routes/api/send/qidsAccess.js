@@ -975,4 +975,6 @@ export const qidsAccess = {
   'eventDecision': { allow: ['serviceAdmin'] },
   'eventsForCron': { allow: ['serviceAdmin'] },
   'eventRegistrationsForCron': { allow: ['serviceAdmin'] },
+  'eventLeadCustomer': { allow: ['serviceAdmin'] },
+  '481backfillEvents': { allow: ['serviceAdmin'] },
 };

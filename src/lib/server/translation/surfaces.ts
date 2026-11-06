@@ -23,6 +23,7 @@ import { readsCache, stateDir, type SurfaceKey } from './config.js';
 import { readTranslationCache } from './store.js';
 import { serverDemandLog } from './demand.js';
 import { collect } from '$lib/translation/collect.js';
+import { paragraphs } from '$lib/events/model';
 import { plainForTranslation } from '$lib/translation/richText.js';
 import type {
     AutoTranslatePref,
@@ -285,5 +286,44 @@ export function productCardGroups(cards: unknown[]): Record<string, unknown[]> {
                 const card = c as { projectId?: unknown; projectName?: unknown };
                 return { id: card.projectId, projectName: card.projectName };
             })
+    };
+}
+
+/**
+ * `/r/<rikma>/e/<event>` — a rikma event's landing page (PLAN_EVENTS_WEBINARS
+ * W4). Built from the same `EventView` the page renders, so the strings are
+ * the page's own: each description paragraph, each outcome and audience line,
+ * each agenda item and question, and the rikma's name. The backfill walker
+ * calls this very function on the same view.
+ *
+ * @param event an `EventView` (`toEventView`, public shape)
+ * @param projectName the rikma's name as the page shows it
+ */
+export function eventPageGroups(
+    event: {
+        id: string;
+        projectId: string | null;
+        title: string;
+        tagline: string | null;
+        description: string | null;
+        outcomes: string[];
+        audience: string[];
+        agenda: Array<{ title: string; desc: string | null }>;
+        faq: Array<{ q: string; a: string }>;
+    } | null,
+    projectName?: string | null
+): Record<string, unknown[]> {
+    if (!event) return {};
+    const id = event.id;
+    return {
+        rikmaEvent: [
+            { id, title: event.title, tagline: event.tagline },
+            ...paragraphs(event.description).map((p) => ({ id, description: p })),
+            ...event.outcomes.map((o) => ({ id, outcomes: o })),
+            ...event.audience.map((a) => ({ id, audience: a }))
+        ],
+        eventAgendaItem: event.agenda.map((i) => ({ id, title: i.title, desc: i.desc })),
+        eventFaqItem: event.faq.map((f) => ({ id, q: f.q, a: f.a })),
+        ...(projectName ? { project: [{ id: event.projectId, projectName }] } : {})
     };
 }

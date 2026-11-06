@@ -9,10 +9,19 @@
   import { t, locale, isRtl } from '$lib/translations';
   import RikmaSkin from '$lib/components/rikmaPublic/RikmaSkin.svelte';
   import { shownLook } from '$lib/rikmaLook/frame.svelte';
+  import Translated from '$lib/components/ui/Translated.svelte';
+  import TranslatedNote from '$lib/components/ui/TranslatedNote.svelte';
+  import { pageTranslations } from '$lib/translation/pageTranslations.svelte';
+  import { paragraphs } from '$lib/events/model';
 
   let { data } = $props();
 
   let event = $derived(data.event);
+  // UGC translation (W4): the loader's one cache read; a miss renders the
+  // member's own words. Every string below is one the loader hashed through
+  // `eventPageGroups` — the same paragraphs and lines, or nothing is found.
+  const tr = pageTranslations(() => data, () => $locale);
+  let paras = $derived(paragraphs(event.description));
   let look = $derived(shownLook(data.look ?? null));
   let open = $derived(data.sessions.filter((s) => s.open));
   /** @type {'rtl' | 'ltr'} */
@@ -144,13 +153,15 @@
 
     <!-- 1. Hero -->
     <section class="max-w-4xl mx-auto px-4 pt-12 pb-10 text-center">
-      <a href={`/r/${data.rikma.slug ?? data.rikma.id}`} class="text-white/60 text-sm hover:text-gold">{data.rikma.name}</a>
+      <a href={`/r/${data.rikma.slug ?? data.rikma.id}`} class="text-white/60 text-sm hover:text-gold"><Translated text={data.rikma.name} hit={tr.hitFor(data.rikma.name)} showNote={false} /></a>
       <p class="mt-3 text-xs uppercase tracking-widest text-gold/80">{$t(`events.kind.${event.kind}`)}</p>
       <h1 class="mt-2 text-3xl sm:text-5xl font-black leading-tight bg-clip-text text-transparent bg-gradient-to-l from-gold via-white to-barbi">
-        {event.title}
+        <Translated text={event.title} hit={tr.hitFor(event.title)} showNote={false} />
       </h1>
+      <!-- One provenance line for the hero's title and the rikma's name. -->
+      <TranslatedNote hit={tr.firstReal(event.title, data.rikma.name)} class="mt-1" />
       {#if event.tagline}
-        <p class="mt-4 text-lg text-white/80 max-w-2xl mx-auto">{event.tagline}</p>
+        <Translated as="p" class="mt-4 text-lg text-white/80 max-w-2xl mx-auto" text={event.tagline} hit={tr.hitFor(event.tagline)} />
       {/if}
       {#if next}
         <p class="mt-6 text-white/90">
@@ -172,9 +183,11 @@
     </section>
 
     <div class="max-w-3xl mx-auto px-4 pb-24 space-y-10">
-      {#if event.description}
+      {#if paras.length}
         <section class="glass rounded-2xl p-6">
-          <p class="whitespace-pre-line text-white/85 leading-relaxed">{event.description}</p>
+          {#each paras as p, i (i)}
+            <Translated as="p" class="text-white/85 leading-relaxed mb-3 last:mb-0" text={p} hit={tr.hitFor(p)} showNote={i === paras.length - 1} />
+          {/each}
         </section>
       {/if}
 
@@ -186,10 +199,11 @@
             {#each event.outcomes as o, i (i)}
               <li class="glass rounded-xl p-4 flex gap-3">
                 <span class="text-gold font-black">✓</span>
-                <span class="text-white/85">{o}</span>
+                <Translated class="text-white/85" text={o} hit={tr.hitFor(o)} showNote={false} />
               </li>
             {/each}
           </ul>
+          <TranslatedNote hit={tr.firstReal(...event.outcomes)} class="mt-2" />
         </section>
       {/if}
 
@@ -199,9 +213,10 @@
           <h2 class="section-title">{$t('events.page.audience')}</h2>
           <ul class="space-y-2">
             {#each event.audience as a, i (i)}
-              <li class="flex gap-3 text-white/85"><span class="text-barbi">●</span>{a}</li>
+              <li class="flex gap-3 text-white/85"><span class="text-barbi">●</span><Translated text={a} hit={tr.hitFor(a)} showNote={false} /></li>
             {/each}
           </ul>
+          <TranslatedNote hit={tr.firstReal(...event.audience)} class="mt-2" />
         </section>
       {/if}
 
@@ -219,12 +234,13 @@
                   {item.minutes != null ? $t('events.page.minutesShort', { count: item.minutes }) : ''}
                 </span>
                 <span>
-                  <span class="block font-semibold">{item.title}</span>
-                  {#if item.desc}<span class="block text-sm text-white/70 mt-1">{item.desc}</span>{/if}
+                  <Translated class="block font-semibold" text={item.title} hit={tr.hitFor(item.title)} showNote={false} />
+                  {#if item.desc}<Translated class="block text-sm text-white/70 mt-1" text={item.desc} hit={tr.hitFor(item.desc)} showNote={false} />{/if}
                 </span>
               </li>
             {/each}
           </ol>
+          <TranslatedNote hit={tr.firstReal(...event.agenda.flatMap((i) => [i.title, i.desc]))} class="mt-2" />
         </section>
       {/if}
 
@@ -342,8 +358,8 @@
           <div class="space-y-2">
             {#each event.faq as f, i (i)}
               <details class="glass rounded-xl p-4">
-                <summary class="font-semibold cursor-pointer">{f.q}</summary>
-                <p class="mt-2 text-white/80 whitespace-pre-line">{f.a}</p>
+                <summary class="font-semibold cursor-pointer"><Translated text={f.q} hit={tr.hitFor(f.q)} showNote={false} /></summary>
+                <Translated as="p" class="mt-2 text-white/80" text={f.a} hit={tr.hitFor(f.a)} />
               </details>
             {/each}
           </div>

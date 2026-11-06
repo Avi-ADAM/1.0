@@ -87,7 +87,9 @@
     "cancel": "Cancel my registration",
     "cancelSure": "Cancel your registration?",
     "cancelYes": "Yes, cancel",
-    "cancelNo": "No"
+    "cancelNo": "No",
+    "signedUp": "You've already joined 1lev1 — great!",
+    "continueOnboard": "Continue setting up"
   },
   "moach": {
     "title": "Events",
@@ -191,5 +193,22 @@
     "answers": "Answers",
     "changeNotifies": "People registered for this date: changing the time or cancelling emails them an updated calendar entry.",
     "sessionHasRegistrations": "A date with registrations can't be deleted — cancel it instead, and they'll be told."
+  },
+  "live": {
+    "open": "Live screen",
+    "title": "Live screen",
+    "intro": "Who is in the room, who opened an account and who finished — so you can call on whoever is stuck by name.",
+    "noSession": "This event has no date.",
+    "updated": "Updated {{time}}",
+    "registered": "Registered",
+    "inRoom": "In the room",
+    "signedUp": "Opened an account",
+    "onboarded": "Finished",
+    "stage": {
+      "joinedNoAccount": "In the room, no account yet",
+      "accountNotOnboarded": "Account opened, half-way",
+      "onboarded": "Done",
+      "notJoined": "Not here"
+    }
   }
 }

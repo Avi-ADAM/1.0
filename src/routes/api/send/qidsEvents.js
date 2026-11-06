@@ -28,6 +28,7 @@ const REGISTRATION_FIELDS = `
   sessionKey name email phone answers status joinedAt sent lang createdAt ref
   event { data { id } }
   lead { data { id } }
+  user { data { id attributes { onboarding_status } } }
 `;
 
 export const eventsQids = {
@@ -131,6 +132,30 @@ export const eventsQids = {
       sessionKey name email status joinedAt sent lang createdAt token
       lead { data { id } }
     } } }
+  }`,
+
+  // The translation backfill's corpus (PLAN_UGC_TRANSLATION, W4): every
+  // published event page, paged — only what a guest can read, no sessions, no
+  // registrations. The walker builds its strings with the page's own builder.
+  '481backfillEvents': `query BackfillEvents($page: Int = 1, $pageSize: Int = 200) {
+    rikmaEvents(
+      filters: { status: { eq: "published" } }
+      pagination: { page: $page, pageSize: $pageSize }
+      sort: "createdAt:desc"
+    ) {
+      data { id attributes {
+        slug kind title tagline description outcomes audience status lifecycle updatedAt
+        agenda { minutes title desc }
+        faq { q a }
+        project { data { id attributes { projectName } } }
+      } }
+      meta { pagination { page pageSize pageCount total } }
+    }
+  }`,
+
+  // linkEventSignup: does the registrant's lead already name a customer account?
+  'eventLeadCustomer': `query EventLeadCustomer($id: ID!) {
+    lead(id: $id) { data { id attributes { customer_user { data { id } } } } }
   }`,
 
   // Publishing on everyone's behalf rides the Decision model (kind 'event').

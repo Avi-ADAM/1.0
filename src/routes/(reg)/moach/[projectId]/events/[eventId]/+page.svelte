@@ -236,6 +236,9 @@
       <span class="text-sm text-slate-300">{status === 'published' ? $t('events.editor.shareLink') : $t('events.editor.previewLink')}</span>
       <a href={data.pageHref} target="_blank" rel="noopener" class="text-gold underline break-all" dir="ltr">{shareUrl}</a>
       <button type="button" class="text-sm underline" onclick={copyLink}>{copied ? $t('events.editor.copied') : $t('events.editor.copy')}</button>
+      {#if status === 'published'}
+        <a href={`/moach/${projectId}/events/${data.event?.id}/live`} class="ms-auto rounded-full px-4 py-1 bg-emerald-600 text-white text-sm font-semibold">{$t('events.live.open')}</a>
+      {/if}
     </div>
   {/if}
 

@@ -194,7 +194,9 @@ import {
   proposeEventConfig,
   registerForEventConfig,
   cancelEventRegistrationConfig,
-  joinEventSessionConfig
+  joinEventSessionConfig,
+  linkEventSignupConfig,
+  notifyEventRegistrationsConfig
 } from './events.js';
 import { logLeadActivityConfig } from './logLeadActivity.js';
 import { updateLeadStatusConfig } from './updateLeadStatus.js';
@@ -555,6 +557,8 @@ export function registerAllActions(): void {
   registerAction(registerForEventConfig);
   registerAction(cancelEventRegistrationConfig);
   registerAction(joinEventSessionConfig);
+  registerAction(linkEventSignupConfig);
+  registerAction(notifyEventRegistrationsConfig);
   registerAction(logLeadActivityConfig);
   registerAction(updateLeadStatusConfig);
   registerAction(updateLeadPlanConfig);

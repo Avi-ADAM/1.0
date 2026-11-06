@@ -1,7 +1,7 @@
 import { error, fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { eventRun, eventsLive, loadByToken } from '$lib/server/events/store';
-import { eventPath } from '$lib/events/model';
+import { eventPath, isSignupLink, withEventRef } from '$lib/events/model';
 import { sessionPhase } from '$lib/events/sessions';
 import { googleCalendarUrl, outlookCalendarUrl } from '$lib/events/ics';
 import { adminToken } from '$lib/server/adminToken.js';
@@ -36,13 +36,15 @@ export const load: PageServerLoad = async ({ params, fetch, url, setHeaders }) =
     registration: {
       name: registration.name,
       status: registration.status,
-      joinedAt: registration.joinedAt
+      joinedAt: registration.joinedAt,
+      // Already opened an account from this event — the signup step is done (W4).
+      signedUp: !!registration.userId && isSignupLink(event.afterUrl)
     },
     event: {
       title: event.title,
       tagline: event.tagline,
       kind: event.kind,
-      afterUrl: event.afterUrl,
+      afterUrl: withEventRef(event.afterUrl, params.token),
       hosts: event.hosts
     },
     session: session
