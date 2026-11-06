@@ -412,12 +412,89 @@ override של מפתחים; אחרת — הפרויקט ברשימה. עדכן �
   מלגה, מבצע), ובשאר הסוגים זה 0.
 - **`saleClaim` נשאר בנקודת הקריאה** (`decisionMaking.svelte`, עם `standingOrder`),
   ולכן הוא מדולג ב-registry.
-- **`project.amend` — ⏸ שאלה למשתמש**: `updateProjectDetails` משנה ישירות רק ברקמה
+- **`project.amend` — ⏸ שאלה למשתמש** (הצעה ב-"A2b" למטה): `updateProjectDetails` משנה ישירות רק ברקמה
   של חבר אחד. ברקמה עם יותר חברים הוא פותח `Decision` לכל שדה, והשינוי נכנס רק
   כשההחלטה מבשילה: בהצבעה האחרונה, או בשתיקה בצד השרת. בנוסף, אוצר המילים של
   `path` לא הוגדר אף פעם: ה-vectors משתמשים ב-`restime` במילישניות, ו-Strapi שומר
   קוד (`'feh'`). צריך להחליט (א) מי חותם על השינוי ומתי, ו-(ב) רשימת paths וסוגי ערכים,
   ואז זה שינוי פורמט עם vector.
+
+#### A2b — `project.amend`: הצעת תכנון (2026-11-06, ממתין לאישור)
+
+**מה קיים היום.** `updateProjectDetails` משנה ישירות רק ברקמה של חבר אחד. ברקמה עם
+יותר חברים הוא פותח `Decision` לכל שדה שהשתנה (12 סוגים: `name`, `pubdes`, `prides`,
+`newFlink`, `newWlink`, `timtoM`, `pic`, `codeLicense`, `vallueadd`/`vallueles`,
+`address`/`look`), ומעדכן קישורים משניים (github/discord/drive/twitter/whatsapp)
+ישירות. ההחלטה מבשילה בשני מקומות שמחילים את אותו שינוי בקוד כפול: ה-yes האחרון
+ב-`voteOnDecision`, או השתיקה ב-`/api/timegrama/decision`. היום שום שלב בזה לא נחתם,
+חוץ מההצבעות (אצווה 4).
+
+**העיקרון.** `project.amend` נחתם **כשהשינוי נכנס לתוקף**, לא כשהוא מוצע. ההצעה וההסכמה
+נחתמות כ-`decision.create` + `decision.vote`, לפי "לרכוב על מודל ה-Decision". ה-reducer לא
+משתנה, ולכן אין bump של `STATE_ROOT_VERSION`.
+
+**1. אוצר ה-paths — רשימה סגורה (v1), ערך מלא ולא דלתא**
+
+| path | ערך | מאיזה kind / שדה |
+|---|---|---|
+| `name` | מחרוזת | `name` |
+| `publicDescription` / `descripFor` | מחרוזת או null | `pubdes` / `prides` |
+| `links/website`, `links/facebook` | מחרוזת או null | `newWlink` / `newFlink` |
+| `links/github`, `links/discord`, `links/drive`, `links/twitter`, `links/whatsapp` | מחרוזת או null | עדכון ישיר |
+| `restime` | **הקוד של Strapi** (`'feh'`, …), לא מילישניות | `timtoM` |
+| `pic` | מזהה upload כמחרוזת | `pic` |
+| `codeLicense` | `{license, openYears}` | `codeLicense` |
+| `values` | **כל הקבוצה אחרי השינוי**, ids ממוינים לפי code units | `vallueadd` / `vallueles` |
+| `address` / `look` | הערך שהוחל אחרי הוולידציה מחדש | `address` / `look` |
+
+- **ערך מלא**, כי `value.set` (deltaCheck) והשוואה מול Strapi עובדים על ערכים, ושני
+  אירועים על אותו path מתקפלים לפי הסדר הטופולוגי בלי לדעת מה היה לפניהם.
+- **`restime` כקוד**: זה אוצר המילים של הפלטפורמה; ממנו נגזרים המילישניות
+  (`calcDeadlineMs`). ה-`restime: 172800000` שב-`events.json` הוא נתון לדוגמה ב-
+  `project.create`, ששום reducer לא מפרש. SPEC יקבע שהערך הוא הקוד, וה-vector החדש
+  ישתמש בקוד. ה-vector הקיים לא זז.
+- **מקור יחיד**: פונקציה טהורה `decisionToAmend(kind, decisionAttrs, current?) →
+  {path, value} | null` ב-`$lib/consent/specs/projectAmend.ts`. שני המחילים בשרת משתמשים
+  בה במקום הקוד הכפול, וגם החותם בלקוח. ככה מה שנחתם הוא בדיוק מה שנכתב ל-Strapi.
+
+**2. מי חותם ומתי — שלושה רגעים**
+
+| רגע | מי חותם | מה נחתם |
+|---|---|---|
+| **רקמה של חבר אחד**, עריכה ישירה | העורך, מהלקוח, דרך ה-registry | `project.amend` לכל path שהשתנה. ה-action מחזיר `applied: [{path, value}]` |
+| **קישורים משניים** ברקמה עם כמה חברים | אותו דבר | אותו דבר (הם לא עוברים Decision היום) |
+| **פתיחת הצעה** | המציע | `decision.create` (`kind`, `ref` = ה-path, והערך המוצע) + ה-`decision.vote` שלו (השרת כבר כותב לו yes) |
+| **ה-yes האחרון** | המצביע, מהלקוח | `decision.vote` (קיים) + `project.amend` עם `decisionId`. ‏`voteOnDecision` מחזיר `applied` בהבשלה |
+| **הבשלה בשתיקה** | **ראו 3** | `consensus.timeout` + `project.amend` |
+
+`decisionId` הוא שדה אופציונלי ב-predicate שה-reducer מתעלם ממנו (כמו `via` בטיימרים).
+ההצבעות על `decision:<id>` הן ה-evidence ל-QuorumProof בעתיד (`unanimous`). עד strict
+ההיעדר שלו הוא אזהרה.
+
+**3. שתיקה — ההחלטה העיקרית שנדרשת ממך**
+
+לשרת אין מפתח של אף חבר. שתי אפשרויות:
+
+- **(א) חתימה עצלה — מומלץ.** הלקוח הראשון של חבר שפותח את הרקמה ורואה Decision
+  שה-timegrama סגר (`archived`, בלי `project.amend` מתאים בשרשרת) חותם
+  `consensus.timeout` (`attestedNow`, `expectedEnd`) ואחריו `project.amend`. זה בדיוק
+  המודל של PLAN_restime_in_signed_chain §3.2: timeout הוא אירוע שכל מי שראה את
+  הדדליין עובר יכול לחתום. המציע מועדף, אבל כל חבר רשאי. שתי חתימות מקבילות של אותו
+  ערך לא מזיקות: ה-reducer קובע את אותו ערך. **מחיר**: עד שמישהו נכנס, ה-projection
+  מפגר אחרי Strapi, ובטלמטריה זה נראה כ"אי-התאמה שנעלמת".
+- **(ב) חתימה משותפת של מכשיר (push).** כמו בטיימרים. **לא מומלץ**: `judgeCosignRequest`
+  צר בכוונה ("מכשיר שחותם על כל מה שהשרת מבקש מבטל את הערך של כל חתימה"). הרחבה
+  שלו להגדרות רקמה היא בדיוק ההרחבה שהכרטיס של הטיימרים אוסר.
+
+**4. השוואה (אחרי שזה נחתם)** — `SpaceProjectionShadow` משווה `settings` מול שדות
+הרקמה ב-Strapi, רק ל-paths שיש להם `project.amend` בשרשרת (ל-genesis של T6 אין
+settings). טלמטריה `kind:'setting'`.
+
+**שלבים (אחרי אישור):** P1 מפרט + `decisionToAmend` + vector (S) · P2 חבר אחד, קישורים
+משניים, `decision.create`, ה-yes האחרון, ואיחוד שני המחילים (M) · P3 שתיקה בחתימה עצלה (M) ·
+P4 השוואה וטלמטריה (S).
+
+**לאשר:** (1) `restime` כקוד; (2) `values` כקבוצה מלאה; (3) שתיקה = חתימה עצלה (א).
 
 ### B6 — אימות התחייבויות אינקרמנטלי
 **למה**: `verifyCommitments` משחזר את כל סגור האבות לכל אירוע ⇒ O(n²) בסנכרון
@@ -519,7 +596,7 @@ projection, עם fallback ל-Strapi כשה-Space ריק או לא מסונכרן
 | C0 | התקנת Node 24 מקומית; deploy VPS עם `node:24-alpine` | C1, C2 (vectors PQ) |
 | B5 | אישור חבילת v3 | מימוש O-3/O-5/O-6 |
 | A4 | בחירת רקמת פיילוט + env בפרודקשן | A5 |
-| `project.amend` (A2) | מי חותם על שינוי הגדרות רקמה ומתי (חבר אחד: מיד; כמה חברים: כשה-Decision מבשיל), ואוצר ה-paths והערכים (למשל `restime` כקוד או במילישניות) | סיום A2 |
+| `project.amend` (A2b) | אישור ההצעה ב-"A2b": `restime` כקוד, `values` כקבוצה מלאה, שתיקה = חתימה עצלה של `consensus.timeout` | סיום A2 |
 | O-10 | `agreers-only`: האם הצבעת "לא" מפילה אותו (ההערה אומרת כן, הקוד לא) | vector חסר, Ratson §3.0 |
 | שער S3 | ההחלטה המוצרית (PLAN_serverless_p2p_data §1, תנאים א–ד) | S3, E1 |
 
@@ -544,3 +621,4 @@ projection, עם fallback ל-Strapi כשה-Space ריק או לא מסונכרן
 - 2026-11-06 · B1 · `spec/consent-v1/quorum.json`: 5 הצבעות חתומות, 22 מקרי quorum (לכל 7 הכללים עובר + נכשל, ועוד evidence חסר, מצביע לא זכאי, אירוע הקשר שמדולג, הצבעה חוזרת), 23 מקרי deltaCheck (כל 8 ה-kinds, completeness, `unchecked`). ה-state בקובץ = רק מה ש-`checkDeltas` קורא (`deltaStateFromJson`). **ממצא O-10**: `agreers-only` מקבל "לא" בניגוד להערה שלו; ה-vectors עוקפים את המקרה עד החלטה. SPEC §10 + §12 (O-4 ✔) · 549 בשכבה (היו 535), 19 vectors (היו 14), check: ‏1218 שגיאות (ביומן 1311; אין חדשות בקבצים שנגעתי) · commit `dist: A2.3 B1 B2` · הבא: B6 (מסלול B), או A2 (הצבעות)
 - 2026-11-06 · A2 אצווה 4 · `voteOnPendm` → `pendm.vote` (הסבב מהשרת, `order` חדש בתוצאה), `voteOnDecision` → `decision.vote` (כל הסוגים חוץ מ-`saleClaim`, שכבר נחתם בנקודת הקריאה), דרך `addVoteConsentSpec` עצמו, ולכן אותה צורה ואותו dedupe. `project.amend` הוחזר כשאלה (§5): השינוי מבשיל בצד השרת, ואוצר ה-paths לא מוגדר · +4 ב-`s2b.test.ts` · לא נבדק בדפדפן
 - 2026-11-06 · B6 · cache של `ProjectState` לפי heads ב-`commitment.ts` (`stateAt`, LRU); `applyEvent` אחד על ה-state של ההורים, ו-replay מלא רק כשיש התנגשות dedupe עם אב או כשאין state ב-cache. משותף רק ב-`ingestEvent` ובאימות בצד השרת, אחרי אימות החתימה · `commitmentCache.pbt.test.ts`: property על 40 DAGs + שרשרת 500 (≤2 replays מלאים), ‏555 בשכבה, 19 vectors ללא diff, check ‏1218 (ללא שינוי) · commit `dist: A2.4 B6` · הבא: C0 (🧑 Node 24) או B4 (מזהה מכשיר כטביעה), ו-A2 אחרי החלטת `project.amend`
+- 2026-11-06 · A2b (תכנון) · הצעה ל-`project.amend`: רשימת paths סגורה עם ערכים מלאים, `decisionToAmend` כמקור יחיד שגם מאחד את שני המחילים בשרת, חתימה ברגע שהשינוי נכנס לתוקף (עריכה ישירה, ה-yes האחרון, ושתיקה בחתימה עצלה של `consensus.timeout`), ו-4 שלבים · מסמכים בלבד · ממתין לאישור (§5)
