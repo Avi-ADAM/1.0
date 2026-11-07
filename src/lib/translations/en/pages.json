@@ -267,9 +267,9 @@
       "errInvalid": "Something in the details is not right — check the phone or email",
       "errTryAgain": "Sending failed — please try again",
       "viaLabel": "How should they get back to you?",
-      "viaSiteHint": "The answer reaches you here on 1lev1, as a notification — no phone or email needed.",
+      "viaSiteHint": "You will talk here on 1lev1 — you get a notification when they answer. No phone or email needed.",
       "optional": "optional",
-      "doneSite": "Sent. {{rikma}} will answer you here on 1lev1 — you will get a notification.",
+      "doneSite": "Sent. {{rikma}} will answer you in a conversation here on 1lev1 — it appears in your conversations, with a notification.",
       "via": {
         "site": "On the site",
         "email": "By email",

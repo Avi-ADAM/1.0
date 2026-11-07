@@ -19,7 +19,22 @@ export type ForumKind =
   | 'meeting'
   | 'wish'
   | 'wishoffer'
-  | 'saleClaim';
+  | 'saleClaim'
+  | 'lead';
+
+/**
+ * A lead's conversation (PLAN_LEADS L4): the rikma's members and the person
+ * who asked, signed in on the site. The subject starts with this — but only
+ * to name the thread. Who may read it is never taken from the subject (any
+ * user can still rename a forum through `92updateForumSubject`): the person
+ * is added only when a lead row points to this forum (`Lead.forum`), and
+ * lead rows are written by the server alone.
+ */
+export const LEAD_FORUM_PREFIX = 'LEAD::';
+
+export function leadForumSubject(leadId: string | number, title: string): string {
+  return `${LEAD_FORUM_PREFIX}${leadId}::${title.replace(/::/g, ':').slice(0, 120)}`;
+}
 
 export interface ForumMessageView {
   id: string;
@@ -155,6 +170,8 @@ function forumKind(attrs: any): ForumKind {
   if (entityArray(attrs?.sheiruts).length > 0 || attrs?.sheirutpend?.data) return 'sheirut';
   if (entityArray(attrs?.mesimabetahaliches).length > 0) return 'mission';
   if (String(attrs?.subject || '').startsWith('PROCESS')) return 'process';
+  // Display only — access for the person comes from the lead row (leadOfForum).
+  if (String(attrs?.subject || '').startsWith(LEAD_FORUM_PREFIX)) return 'lead';
   return 'project';
 }
 
@@ -192,6 +209,10 @@ function forumTitle(kind: ForumKind, attrs: any, projectName: string): string {
   if (kind === 'process') {
     const [, , title = ''] = subject.split('::');
     return title || subject || 'Process forum';
+  }
+  if (kind === 'lead') {
+    const [, , title = ''] = subject.split('::');
+    return title || projectName || 'Enquiry';
   }
   return subject || projectName || 'Forum';
 }
@@ -328,6 +349,66 @@ export function userCanAccessForum(entity: any, userId: string): boolean {
   return participantIdsForForum(entity).includes(String(userId));
 }
 
+export interface LeadOfForum {
+  leadId: string;
+  projectId: string | null;
+  customerUserId: string | null;
+  status: string | null;
+}
+
+/**
+ * The lead that points to this forum, read with the admin token (lead qids
+ * are serviceAdmin-only). Null when none does — and when `Lead.forum` is not
+ * deployed yet, so before that every forum reads exactly as it did.
+ */
+export async function leadOfForum(
+  strapi: StrapiLike,
+  forumId: string,
+  context: ActionContext
+): Promise<LeadOfForum | null> {
+  try {
+    const { adminToken } = await import('../adminToken.js');
+    const res = await strapi.execute('leadOfForum', { forumId: String(forumId) }, adminToken(), context.fetch);
+    const row = res?.data?.leads?.data?.[0];
+    if (!row?.id) return null;
+    const a = row.attributes ?? {};
+    return {
+      leadId: String(row.id),
+      projectId: entityId(a.project?.data),
+      customerUserId: entityId(a.customer_user?.data),
+      status: a.status ?? null
+    };
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Everyone in a forum. The same as `participantIdsForForum`, plus — for a
+ * lead's conversation — the person who asked. Only forums named as a lead's
+ * pay the extra read.
+ */
+export async function forumParticipantIds(
+  strapi: StrapiLike,
+  entity: any,
+  context: ActionContext
+): Promise<string[]> {
+  const base = participantIdsForForum(entity);
+  if (forumKind(entity?.attributes || {}) !== 'lead' || !entity?.id) return base;
+  const lead = await leadOfForum(strapi, String(entity.id), context);
+  return lead?.customerUserId ? uniqueIds([...base, lead.customerUserId]) : base;
+}
+
+export async function userCanAccessForumAsync(
+  strapi: StrapiLike,
+  entity: any,
+  userId: string,
+  context: ActionContext
+): Promise<boolean> {
+  if (userCanAccessForum(entity, userId)) return true;
+  return (await forumParticipantIds(strapi, entity, context)).includes(String(userId));
+}
+
 export async function getForumEntity(
   strapi: StrapiLike,
   forumId: string,
@@ -358,7 +439,7 @@ export async function authorizeForumParticipant(
     return { authorized: false, reason: 'Forum not found' };
   }
 
-  if (!userCanAccessForum(forum, userId)) {
+  if (!(await userCanAccessForumAsync(strapi, forum, userId, context))) {
     return { authorized: false, reason: 'User is not a participant in this forum' };
   }
 

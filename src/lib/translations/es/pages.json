@@ -268,9 +268,9 @@
       "errInvalid": "Algo en los datos no es correcto — revisa el teléfono o el correo",
       "errTryAgain": "No se pudo enviar — inténtalo de nuevo",
       "viaLabel": "¿Cómo te respondemos?",
-      "viaSiteHint": "La respuesta te llega aquí en 1lev1, como notificación — sin teléfono ni correo.",
+      "viaSiteHint": "Hablarán aquí en 1lev1 — recibirás una notificación cuando respondan. Sin teléfono ni correo.",
       "optional": "opcional",
-      "doneSite": "Enviado. {{rikma}} te responderá aquí en 1lev1 — recibirás una notificación.",
+      "doneSite": "Enviado. {{rikma}} te responderá en una conversación aquí en 1lev1 — aparece en tus conversaciones, con una notificación.",
       "via": {
         "site": "En el sitio",
         "email": "Por correo",

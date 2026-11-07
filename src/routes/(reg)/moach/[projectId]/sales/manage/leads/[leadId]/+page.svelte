@@ -224,6 +224,38 @@
     }
   }
 
+  /**
+   * The conversation with them on the site (L4): opened (or found) and, when
+   * there is something to say first — the offer — said there. Before
+   * `Lead.forum` is deployed this falls back to the one-way message.
+   */
+  async function openChat(firstMessage: string | null = null) {
+    if (busy) return;
+    busy = true;
+    try {
+      const res = await executeAction('ensureLeadForum', { leadId: lead.id, projectId }, { showErrorToast: false });
+      if (!res.success) {
+        const code = (res.error as any)?.code;
+        if (code === 'LEAD_CHAT_NOT_READY') {
+          siteText = firstMessage ?? siteText;
+          siteOpen = true;
+          return;
+        }
+        toast.error(actionErrorText(res, $t('shop.leads.err.save')));
+        return;
+      }
+      const forumId = String((res.data as any)?.forumId ?? '');
+      if (!forumId) return;
+      if (firstMessage) {
+        const sent = await executeAction('createChatMessage', { forumId, message: firstMessage }, { showErrorToast: false });
+        if (!sent.success) toast.error(actionErrorText(sent, $t('shop.leads.err.save')));
+      }
+      goto(`/forum/${forumId}`);
+    } finally {
+      busy = false;
+    }
+  }
+
   // ── the offer just written, ready to go out the way they asked ──
   let sentOffer = $state<OfferSummary | null>(null);
   let sentOfferText = $derived(
@@ -317,7 +349,7 @@
         {#if lead.customerUserId}
           <div class="ld-site">
             <span class="ld-value">{$t('shop.leads.contact.account', { name: lead.customerName ?? '' })}</span>
-            <button type="button" class="sh-btn sh-btn-outline ld-link" onclick={() => (siteOpen = !siteOpen)}>
+            <button type="button" class="sh-btn sh-btn-outline ld-link" disabled={busy} onclick={() => openChat()}>
               {$t('shop.leads.contact.siteCta')}
             </button>
           </div>
@@ -439,11 +471,8 @@
                     <button
                       type="button"
                       class="sh-btn {c === preferred ? 'sh-btn-primary' : 'sh-btn-outline'} ld-link"
-                      onclick={() => {
-                        siteText = sentOfferText;
-                        siteOpen = true;
-                        document.getElementById('ld-contact')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                      }}
+                      disabled={busy}
+                      onclick={() => openChat(sentOfferText)}
                     >
                       {$t('shop.leads.contact.via.site')}
                     </button>

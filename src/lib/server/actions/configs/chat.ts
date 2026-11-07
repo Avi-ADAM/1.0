@@ -1,9 +1,48 @@
 
 import type { ActionConfig } from '../types.js';
 import { env } from '$env/dynamic/private';
-import { getForumEntity, normalizeForum, participantIdsForForum } from '../forumAccess.js';
+import { forumParticipantIds, getForumEntity, leadOfForum, normalizeForum } from '../forumAccess.js';
 import { createChatMessageConsentSpec } from '$lib/consent/specs/s2b';
 import { scope, scopeList } from '$lib/realtime/scopes.js';
+
+/**
+ * A message in a lead's conversation, in the lead's log (best effort — the
+ * message itself is already saved). The person writing ⇒ `inbound`; a member
+ * ⇒ a contact out (`note`, written as a site message), and a `new` lead is
+ * now `contacted`.
+ */
+async function logOnLead(strapi: any, forumId: string, userId: string, text: string, context: any) {
+    const lead = await leadOfForum(strapi, forumId, context);
+    if (!lead) return;
+    const [{ leadStore, recordActivity, updateLead }, { SITE_MESSAGE_PREFIX }] = await Promise.all([
+        import('$lib/server/leads/store'),
+        import('$lib/leads/contact')
+    ]);
+    const store = leadStore(strapi, context.fetch);
+    const now = new Date().toISOString();
+    const excerpt = text.length > 500 ? `${text.slice(0, 497)}…` : text;
+    const fromThem = lead.customerUserId === userId;
+    await recordActivity(store, {
+        leadId: lead.leadId,
+        kind: fromThem ? 'inbound' : 'note',
+        direction: fromThem ? 'in' : 'out',
+        body: fromThem ? excerpt : `${SITE_MESSAGE_PREFIX}${excerpt}`,
+        actorId: fromThem ? null : userId,
+        at: now
+    });
+    const answered = !fromThem && (lead.status ?? 'new') === 'new';
+    await updateLead(store, lead.leadId, { lastActivityAt: now, ...(answered ? { status: 'contacted' } : {}) });
+    if (answered) {
+        await recordActivity(store, {
+            leadId: lead.leadId,
+            kind: 'statusChange',
+            fromStatus: 'new',
+            toStatus: 'contacted',
+            actorId: userId,
+            at: now
+        });
+    }
+}
 
 export const chatActions: ActionConfig[] = [
     {
@@ -60,7 +99,16 @@ export const chatActions: ActionConfig[] = [
             // 2. Prepare dynamic data for the notification orchestrator
             const projectName = forumView.projectName || '';
             const taskName = forumView.title || '';
-            const recipients = participantIdsForForum(forumEntity);
+            // A lead's conversation includes the person who asked (PLAN_LEADS L4).
+            const recipients = await forumParticipantIds(strapi, forumEntity, context);
+
+            // …and what is said there is part of the lead's story: the person
+            // writing is an inbound contact, a member answering is contact out.
+            if (forumView.kind === 'lead') {
+                await logOnLead(strapi, String(forumId), String(userId), message.trim(), context).catch((e) =>
+                    console.warn('[chat] lead log failed:', e?.message ?? e)
+                );
+            }
 
             // Return data for the next steps (notification/updateStrategy)
             // We include both flat properties for placeholders and a 'data' object for result passing

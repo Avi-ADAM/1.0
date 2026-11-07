@@ -15664,6 +15664,200 @@ ${PROMO_DECISION_FIELDS}
     }
   }`,
 
+  // A lead's conversation (L4) — the lead row is the authority for who is in it.
+  // Which lead points to this forum, and who asked (forumAccess.leadOfForum).
+  'leadOfForum': `query LeadOfForum($forumId: ID!) {
+    leads(filters: { forum: { id: { eq: $forumId } } }, pagination: { limit: 1 }) {
+      data { id attributes {
+        status
+        project { data { id } }
+        customer_user { data { id } }
+      } }
+    }
+  }`,
+
+  // ensureLeadForum: the lead's conversation, if it has one yet.
+  'leadForumOf': `query LeadForumOf($id: ID!) {
+    lead(id: $id) {
+      data { id attributes {
+        name
+        project { data { id attributes { user_1s { data { id } } } } }
+        customer_user { data { id } }
+        forum { data { id } }
+      } }
+    }
+  }`,
+
+  // The person's own leads' conversations, for their /forum list (forum.ts) —
+  // the same shape 104 reads, so they look like every other thread.
+  'leadForumsOfCustomer': `query LeadForumsOfCustomer($uid: ID!) {
+    leads(
+      filters: { customer_user: { id: { eq: $uid } }, forum: { id: { notNull: true } } }
+      pagination: { limit: 50 }
+    ) {
+      data { id attributes { forum { data { ...ForumListCore } } } }
+    }
+  }
+
+  fragment ForumListCore on ForumEntity {
+    id
+    attributes {
+      subject
+      spec
+      done
+      createdAt
+      publishedAt
+      updatedAt
+      messages(filters: { archived: { ne: true } }, sort: ["when:desc"], pagination: { limit: 1 }) {
+        data {
+          id
+          attributes {
+            content
+            when
+            users_permissions_user {
+              data { id attributes { username profilePic { data { attributes { url formats } } } } }
+            }
+          }
+        }
+      }
+      project { data { ...ForumListProjectCore } }
+      ratson_proposal {
+        data {
+          id
+          attributes {
+            ratson {
+              data {
+                id
+                attributes {
+                  name
+                  users_permissions_users {
+                    data { id attributes { username profilePic { data { attributes { url formats } } } } }
+                  }
+                }
+              }
+            }
+            proposer_users {
+              data { id attributes { username profilePic { data { attributes { url formats } } } } }
+            }
+          }
+        }
+      }
+      haluka {
+        data {
+          id
+          attributes {
+            amount
+            usersend { data { id attributes { username profilePic { data { attributes { url formats } } } } } }
+            userrecive { data { id attributes { username profilePic { data { attributes { url formats } } } } } }
+            project { data { ...ForumListProjectCore } }
+          }
+        }
+      }
+      pgisha {
+        data {
+          id
+          attributes {
+            name
+            desc
+            publishedAt
+            pgishausers {
+              data {
+                id
+                attributes {
+                  users_permissions_user {
+                    data { id attributes { username profilePic { data { attributes { url formats } } } } }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      asks {
+        data {
+          id
+          attributes {
+            users_permissions_user { data { id attributes { username profilePic { data { attributes { url formats } } } } } }
+            project { data { ...ForumListProjectCore } }
+          }
+        }
+      }
+      sheiruts {
+        data {
+          id
+          attributes {
+            name
+            descrip
+            project { data { ...ForumListProjectCore } }
+            users_permissions_users { data { id attributes { username profilePic { data { attributes { url formats } } } } } }
+            sheirutpend {
+              data {
+                id
+                attributes {
+                  users_permissions_user { data { id attributes { username profilePic { data { attributes { url formats } } } } } }
+                }
+              }
+            }
+          }
+        }
+      }
+      sheirutpend {
+        data {
+          id
+          attributes {
+            users_permissions_user { data { id attributes { username profilePic { data { attributes { url formats } } } } } }
+            project { data { ...ForumListProjectCore } }
+            sheirut { data { id attributes { name project { data { ...ForumListProjectCore } } } } }
+          }
+        }
+      }
+      mesimabetahaliches {
+        data {
+          id
+          attributes {
+            name
+            descrip
+            project { data { ...ForumListProjectCore } }
+          }
+        }
+      }
+      decisions(pagination: { limit: 5 }) {
+        data {
+          id
+          attributes {
+            kind
+            sale {
+              data {
+                id
+                attributes {
+                  reporter { data { id attributes { username profilePic { data { attributes { url formats } } } } } }
+                  users_permissions_user { data { id attributes { username profilePic { data { attributes { url formats } } } } } }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  fragment ForumListProjectCore on ProjectEntity {
+    id
+    attributes {
+      projectName
+      profilePic { data { attributes { url formats } } }
+      user_1s {
+        data {
+          id
+          attributes {
+            username
+            profilePic { data { attributes { url formats } } }
+          }
+        }
+      }
+    }
+  }`,
+
   'moachLeadPage': `query MoachLeadPage($id: ID!) {
     lead(id: $id) {
       data { id attributes {

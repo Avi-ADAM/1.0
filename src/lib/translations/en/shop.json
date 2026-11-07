@@ -1120,7 +1120,7 @@
       "viaLabel": "How they asked to be reached",
       "prefers": "Asked to be reached",
       "account": "Wrote from their 1lev1 account: {{name}}",
-      "siteCta": "Message on the site",
+      "siteCta": "Talk on the site",
       "siteLabel": "The message",
       "siteHint": "It reaches them as a 1lev1 notification (and by email or Telegram, per their settings). Their reply comes back to this enquiry.",
       "siteSend": "Send",

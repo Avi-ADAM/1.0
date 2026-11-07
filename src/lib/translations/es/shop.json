@@ -1120,7 +1120,7 @@
       "viaLabel": "Cómo pidió que lo contacten",
       "prefers": "Pidió que lo contacten",
       "account": "Escribió desde su cuenta de 1lev1: {{name}}",
-      "siteCta": "Mensaje en el sitio",
+      "siteCta": "Hablar en el sitio",
       "siteLabel": "El mensaje",
       "siteHint": "Le llega como notificación de 1lev1 (y por correo o Telegram, según su configuración). Su respuesta vuelve a esta consulta.",
       "siteSend": "Enviar",

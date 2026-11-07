@@ -196,6 +196,7 @@ import { mergeLeadsConfig } from './mergeLeads.js';
 import { exportLeadContactsConfig } from './exportLeadContacts.js';
 import { sendLeadOfferConfig } from './sendLeadOffer.js';
 import { messageLeadOnSiteConfig } from './messageLeadOnSite.js';
+import { ensureLeadForumConfig } from './ensureLeadForum.js';
 import { confirmOrderPaymentConfig } from './confirmOrderPayment.js';
 import { cancelOrderConfig, markOrderShippedConfig, markOrderFulfilledConfig } from './orderLifecycle.js';
 import { setShopStockConfig } from './shopStock.js';
@@ -551,6 +552,7 @@ export function registerAllActions(): void {
   registerAction(exportLeadContactsConfig);
   registerAction(sendLeadOfferConfig);
   registerAction(messageLeadOnSiteConfig);
+  registerAction(ensureLeadForumConfig);
   registerAction(confirmOrderPaymentConfig);
   registerAction(cancelOrderConfig);
   registerAction(markOrderShippedConfig);
