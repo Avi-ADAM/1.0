@@ -311,5 +311,11 @@
     "free": "A request for help.",
     "explainSymbolic": "The customer can pay up to {{amount}} for the whole wish, less than this part is worth. The difference is your gift, and only your own yes gives it: if you do not answer, the proposal is not approved on its own.",
     "explainFree": "The customer cannot pay for this wish. The work would be your gift, and only your own yes gives it: if you do not answer, the proposal is not approved on its own."
+  },
+  "offsite": {
+    "for": "For {{name}} · customer off the site",
+    "noName": "a customer",
+    "openLead": "Open the lead",
+    "chip": "Customer off the site"
   }
 }

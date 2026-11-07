@@ -2141,8 +2141,11 @@ export function mapSaleData(sheirut: any, projectId: string, userData: any, mode
     })) || [],
 
     // Customer info
-    customerId: customer?.id || userData.id, // Fallback to current user if it's a purchase
-    customerName: customer?.attributes?.username || userData.attributes?.username,
+    // Fallback to the viewer only on a purchase (they are its customer). A sale with no
+    // customer account is a deal for someone off the site (PLAN_OFFSITE_CLIENT) — the
+    // member selling it is not its customer.
+    customerId: customer?.id || (mode === 'buy' ? userData.id : ''),
+    customerName: customer?.attributes?.username || (mode === 'buy' ? userData.attributes?.username : ''),
     customerSrc: customer?.attributes?.profilePic?.data?.attributes?.url,
 
     // Product details

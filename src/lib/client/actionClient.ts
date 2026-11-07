@@ -551,6 +551,7 @@ export type ActionKey =
   | 'mergeLeads'
   | 'exportLeadContacts'
   | 'sendLeadOffer'
+  | 'startOffsiteDeal'
   | 'messageLeadOnSite'
   | 'ensureLeadForum'
   // Onboarding: the starter boards a new rikma is born with (PLAN_ONBOARDING Track B)

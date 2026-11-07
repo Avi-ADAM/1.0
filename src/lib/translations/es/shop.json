@@ -1045,7 +1045,8 @@
       "mergedInto": "Unida a otra consulta",
       "mergedFrom": "Una consulta duplicada se unió aquí",
       "contactsExported": "Teléfono y correo exportados a un archivo",
-      "siteMessage": "Mensaje en 1lev1"
+      "siteMessage": "Mensaje en 1lev1",
+      "offsiteDeal": "Se empezó el trabajo para esa persona"
     },
     "plan": {
       "title": "Qué sigue",
@@ -1131,6 +1132,17 @@
         "phone": "Por teléfono",
         "whatsapp": "Por WhatsApp"
       }
+    },
+    "offsite": {
+      "title": "Empezar el trabajo — sin registrarse",
+      "hint": "El trato se abre en la rikma para esa persona, aunque no esté en el sitio. Se abren las misiones del producto, los temporizadores corren sobre ellas y la página del trato muestra el avance.",
+      "bomHint": "Una línea del producto en la que ya se trabaja conserva su misión — el temporizador que ya corre cuenta para este trato.",
+      "start": "Empezar el trabajo",
+      "started": "El trabajo ha empezado",
+      "cta": "Empezar a trabajar sin que se registre",
+      "ctaHint": "Cuando el cliente no quiere trabajar a través del sitio — el trabajo, las horas y lo que hiciste quedan aquí.",
+      "open": "El trabajo para esa persona",
+      "openHint": "Misiones, horas y avance — en la página del trato."
     }
   },
   "customers": {

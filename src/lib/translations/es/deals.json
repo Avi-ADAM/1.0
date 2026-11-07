@@ -312,5 +312,11 @@
     "free": "Una solicitud de ayuda.",
     "explainSymbolic": "La clienta puede pagar hasta {{amount}} por todo el deseo, menos de lo que vale esta parte. La diferencia es tu regalo, y solo tu propio sí lo da: si no respondes, la propuesta no se aprueba sola.",
     "explainFree": "La clienta no puede pagar este deseo. El trabajo sería tu regalo, y solo tu propio sí lo da: si no respondes, la propuesta no se aprueba sola."
+  },
+  "offsite": {
+    "for": "Para {{name}} · cliente fuera del sitio",
+    "noName": "un cliente",
+    "openLead": "Ver el contacto",
+    "chip": "Cliente fuera del sitio"
   }
 }

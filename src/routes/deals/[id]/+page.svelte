@@ -152,10 +152,14 @@
 
   // The work itself (QA C-21): a wish deal's parts are its due lines, and the
   // providers' own notes come with the page. Other deals keep what they had.
-  const missionList = $derived(due ? missionsFromDue(due) : (deal?.missionList ?? []));
-  const missions = $derived(due ? missionCounts(missionList) : (deal?.missions ?? { done: 0, inProgress: 0, total: 0 }));
+  // A deal for a customer off the site (PLAN_OFFSITE_CLIENT P1): its work is the BOM of
+  // its product, read by the page's loader — measured the same way as a wish deal's.
+  const offsite = $derived(data.offsite ?? null);
+  const measured = $derived(!!due || (offsite?.missions.length ?? 0) > 0);
+  const missionList = $derived(due ? missionsFromDue(due) : offsite?.missions.length ? offsite.missions : (deal?.missionList ?? []));
+  const missions = $derived(measured ? missionCounts(missionList) : (deal?.missions ?? { done: 0, inProgress: 0, total: 0 }));
   const hours = $derived(
-    due
+    measured
       ? {
           done: displayHours(missionList.reduce((s, m) => s + m.hoursDone, 0)),
           total: displayHours(missionList.reduce((s, m) => s + m.hours, 0))
@@ -163,7 +167,7 @@
       : (deal?.hours ?? { done: 0, total: 0 })
   );
   const progressPct = $derived(
-    (due && workProgressPct(missionList)) ?? deal?.progressPct ?? 0
+    (measured && workProgressPct(missionList)) ?? deal?.progressPct ?? 0
   );
   const updates = $derived(data.updates ?? []);
   const fmtDay = (iso: string | null) => {
@@ -325,9 +329,18 @@
       <div class="hero-info">
         <h1 class="hero-product">{deal.product}</h1>
         <p class="hero-project">{deal.project} · {deal.category}</p>
+        {#if offsite}
+          <p class="hero-project">
+            {$t('deals.offsite.for', { name: offsite.lead?.name || $t('deals.offsite.noName') })}
+            {#if offsite.lead && sale?.projectId}
+              · <a href="/moach/{sale.projectId}/sales/manage/leads/{offsite.lead.id}">{$t('deals.offsite.openLead')}</a>
+            {/if}
+          </p>
+        {/if}
         <div class="hero-badges">
           <span class="status-badge {deal.status}">{STATUS_LABEL[deal.status]}</span>
           <span class="chip">{kind === 'purchase' ? 'אתה הקונה' : 'אתה במכירה'}</span>
+          {#if offsite}<span class="chip">{$t('deals.offsite.chip')}</span>{/if}
           {#if deal.startDate !== '—'}
             <span class="chip">התחיל {deal.startDate}</span>
           {/if}

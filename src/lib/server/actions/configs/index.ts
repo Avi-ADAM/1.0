@@ -195,6 +195,7 @@ import { updateLeadPlanConfig } from './updateLeadPlan.js';
 import { mergeLeadsConfig } from './mergeLeads.js';
 import { exportLeadContactsConfig } from './exportLeadContacts.js';
 import { sendLeadOfferConfig } from './sendLeadOffer.js';
+import { startOffsiteDealConfig } from './startOffsiteDeal.js';
 import { messageLeadOnSiteConfig } from './messageLeadOnSite.js';
 import { ensureLeadForumConfig } from './ensureLeadForum.js';
 import { confirmOrderPaymentConfig } from './confirmOrderPayment.js';
@@ -551,6 +552,7 @@ export function registerAllActions(): void {
   registerAction(mergeLeadsConfig);
   registerAction(exportLeadContactsConfig);
   registerAction(sendLeadOfferConfig);
+  registerAction(startOffsiteDealConfig);
   registerAction(messageLeadOnSiteConfig);
   registerAction(ensureLeadForumConfig);
   registerAction(confirmOrderPaymentConfig);

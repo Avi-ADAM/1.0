@@ -24,6 +24,7 @@
   import LeadLogForm from '$lib/components/leads/LeadLogForm.svelte';
   import LeadPauseForm from '$lib/components/leads/LeadPauseForm.svelte';
   import LeadOfferForm from '$lib/components/leads/LeadOfferForm.svelte';
+  import LeadOffsiteForm from '$lib/components/leads/LeadOffsiteForm.svelte';
   import {
     mailtoWithText,
     offerText,
@@ -144,6 +145,8 @@
 
   // ── send an offer (L4) — the products arrive streamed ──
   let offerOpen = $state(false);
+  // The work for them while they are not on the site (PLAN_OFFSITE_CLIENT P1).
+  let offsiteOpen = $state(false);
   let offerProducts = $state<
     Array<{ id: string; name: string; price: number | null; variants: Array<{ id: string; label: string; price: number | null; active: boolean }> }>
   >([]);
@@ -278,12 +281,17 @@
     return null;
   }
 
+  /** The deal a system log line points at (`offsiteDeal:<id>`, startOffsiteDeal). */
+  const offsiteDealOf = (body: string | null | undefined): string | null =>
+    body?.startsWith('offsiteDeal:') ? body.slice('offsiteDeal:'.length) || null : null;
+
   function activityText(a: (typeof lead.activities)[number]): string {
     if (a.kind === 'note' && siteMessageOf(a.body) !== null) return $t('shop.leads.timeline.siteMessage');
     if (a.kind === 'system') {
       const note = mergeNoteOf(a.body);
       if (note) return $t(note.dir === 'into' ? 'shop.leads.timeline.mergedInto' : 'shop.leads.timeline.mergedFrom');
       if (a.body === CONTACTS_EXPORTED) return $t('shop.leads.timeline.contactsExported');
+      if (offsiteDealOf(a.body)) return $t('shop.leads.timeline.offsiteDeal');
     }
     if (a.kind === 'statusChange' && a.toStatus) {
       return $t('shop.leads.timeline.statusChange', {
@@ -435,6 +443,8 @@
                 {#if a.kind === 'system' && mergeNoteOf(a.body)}
                   {@const note = mergeNoteOf(a.body)}
                   <a class="ld-entry-body" href="{base}/leads/{note?.id}">{$t('shop.leads.merge.open')}</a>
+                {:else if a.kind === 'system' && offsiteDealOf(a.body)}
+                  <a class="ld-entry-body" href="/deals/{offsiteDealOf(a.body)}">{$t('shop.leads.offsite.open')}</a>
                 {:else if a.kind === 'note' && siteMessageOf(a.body) !== null}
                   <p class="ld-entry-body">{siteMessageOf(a.body)}</p>
                 {:else if a.kind === 'linkOrder' && a.body?.startsWith('order:')}
@@ -491,6 +501,13 @@
                 <button type="button" class="sh-btn sh-btn-quiet ld-link" onclick={() => (sentOffer = null)}>{$t('shop.leads.offer.deliverDone')}</button>
               </div>
             </div>
+          {/if}
+          {#if lead.sheirutId}
+            <a class="sh-btn sh-btn-outline ld-wide" href="/deals/{lead.sheirutId}">{$t('shop.leads.offsite.open')}</a>
+            <p class="ld-muted">{$t('shop.leads.offsite.openHint')}</p>
+          {:else if offerProducts.length && lead.status !== 'spam'}
+            <button type="button" class="sh-btn sh-btn-outline ld-wide" onclick={() => (offsiteOpen = true)}>{$t('shop.leads.offsite.cta')}</button>
+            <p class="ld-muted">{$t('shop.leads.offsite.ctaHint')}</p>
           {/if}
           <a class="sh-btn {offerProducts.length ? 'sh-btn-outline' : 'sh-btn-primary sh-btn-lg'} ld-wide" href="/moach/{projectId}/sales?lead={lead.id}">{$t('shop.leads.page.reportSale')}</a>
           <p class="ld-muted">{$t('shop.leads.page.reportSaleHint')}</p>
@@ -556,7 +573,7 @@
       {/if}
 
       <!-- what is linked -->
-      {#if lead.orders.length || lead.previousLeadId}
+      {#if lead.orders.length || lead.previousLeadId || lead.sheirutId}
         <section class="sh-card ld-box" aria-labelledby="ld-linked">
           <h3 id="ld-linked" class="sh-section-label">{$t('shop.leads.page.linked')}</h3>
           <ul class="ld-linked">
@@ -566,6 +583,9 @@
                 <span class="ld-muted">· {o.total != null ? fmtMoney(o.total, o.currency) : ''}</span>
               </li>
             {/each}
+            {#if lead.sheirutId}
+              <li><a href="/deals/{lead.sheirutId}">{$t('shop.leads.offsite.open')}</a></li>
+            {/if}
             {#if lead.previousLeadId}
               <li><a href="{base}/leads/{lead.previousLeadId}">{$t('shop.leads.page.previous')}</a></li>
             {/if}
@@ -596,6 +616,20 @@
       sentOffer = summary;
       toast.success($t('shop.leads.offer.sent'));
       refresh();
+    }}
+  />
+</ShopSheet>
+
+<ShopSheet bind:open={offsiteOpen} label={$t('shop.leads.offsite.title')}>
+  <LeadOffsiteForm
+    {projectId}
+    leadId={lead.id}
+    products={offerProducts}
+    preselect={lead.products.map((p) => p.id)}
+    onDone={(sheirutId) => {
+      offsiteOpen = false;
+      toast.success($t('shop.leads.offsite.started'));
+      goto('/deals/' + sheirutId);
     }}
   />
 </ShopSheet>

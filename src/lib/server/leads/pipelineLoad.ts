@@ -164,6 +164,8 @@ export interface LeadPageView {
   /** How they asked to be reached (`$lib/leads/contact`), if they said. */
   contactVia: string | null;
   previousLeadId: string | null;
+  /** The deal opened for them while they are not on the site (PLAN_OFFSITE_CLIENT P1). */
+  sheirutId: string | null;
   products: Array<{ id: string; name: string }>;
   orders: LeadOrderView[];
   activities: LeadActivityView[];
@@ -227,6 +229,7 @@ export function toLeadPage(node: any): LeadPageView | null {
       return typeof d?.contactVia === 'string' ? d.contactVia : null;
     })(),
     previousLeadId: idOf(a.previousLead),
+    sheirutId: idOf(a.sheirut),
     products: ((a.products?.data ?? []) as any[])
       .map((p) => ({ id: String(p.id), name: str(p?.attributes?.name) ?? '' }))
       .filter((p) => p.name),

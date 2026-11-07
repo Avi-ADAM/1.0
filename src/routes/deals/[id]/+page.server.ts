@@ -7,6 +7,7 @@ import type { DealStageView } from '$lib/sheirut/dealChain';
 import { readProgressUpdates, type DealProgressUpdate } from '$lib/sheirut/dealProgress';
 import type { PageServerLoad } from './$types';
 import { rtKey } from '$lib/realtime/scopes';
+import { offsiteSideOf, type OffsiteSide } from '$lib/sheirut/offsiteDeal';
 
 export const load: PageServerLoad = async ({ params, locals, fetch, depends }) => {
   // Runs again when an action says this deal changed (PLAN_REALTIME_MIGRATION §3.4).
@@ -40,13 +41,26 @@ export const load: PageServerLoad = async ({ params, locals, fetch, depends }) =
         ])
       : [NO_PIECES, [] as DealStageView[]];
 
+    // A deal whose customer is not on the site (PLAN_OFFSITE_CLIENT P1): who it is for
+    // and the work on its product's BOM. Only a member sees such a deal — there is no
+    // customer to — and only a deal with no customer account reads it (offsiteSideOf).
+    let offsite: OffsiteSide | null = null;
+    if (result.sale && result.kind === 'sale' && !due) {
+      try {
+        offsite = offsiteSideOf(await sendViaProxy(fetch as any, 'offsiteDealSide', { sid: params.id }, { isSer: true }));
+      } catch (e) {
+        console.warn('[deals/[id]/+page.server] could not read the off-site side:', e);
+      }
+    }
+    const workIds = offsite ? offsite.missions.map((m) => m.id) : missionIds;
+
     // C-21, best-effort like `due`: what the providers wrote about the work when they
     // saved their timers. Read with the service token — the viewer is a party to this
     // deal (fetchSingleDeal answered), and a customer's own token cannot read timers.
     let updates: DealProgressUpdate[] = [];
-    if (result.sale && missionIds.length > 0) {
+    if (result.sale && workIds.length > 0) {
       try {
-        const res = await sendViaProxy(fetch as any, '420dealProgressUpdates', { missions: missionIds }, { isSer: true });
+        const res = await sendViaProxy(fetch as any, '420dealProgressUpdates', { missions: workIds }, { isSer: true });
         updates = readProgressUpdates(res);
       } catch (e) {
         console.warn('[deals/[id]/+page.server] could not read the progress updates:', e);
@@ -63,6 +77,7 @@ export const load: PageServerLoad = async ({ params, locals, fetch, depends }) =
       parts,
       receipt,
       stages,
+      offsite,
       viewerId: String(uid),
       viewerName: un ?? ''
     };

@@ -1045,7 +1045,8 @@
       "mergedInto": "Merged into another enquiry",
       "mergedFrom": "A duplicate enquiry was merged here",
       "contactsExported": "Phone and email exported to a file",
-      "siteMessage": "Message on 1lev1"
+      "siteMessage": "Message on 1lev1",
+      "offsiteDeal": "Work started for them"
     },
     "plan": {
       "title": "What's next",
@@ -1131,6 +1132,17 @@
         "phone": "By phone",
         "whatsapp": "On WhatsApp"
       }
+    },
+    "offsite": {
+      "title": "Start the work — no sign-up needed",
+      "hint": "The deal opens in the rikma for them, even if they are not on the site. The product's missions open, timers run on them, and the deal page shows the progress.",
+      "bomHint": "A product line already being worked on keeps its mission — the timer already running counts toward this deal.",
+      "start": "Start the work",
+      "started": "The work has started",
+      "cta": "Start working without them signing up",
+      "ctaHint": "When the customer doesn't want to work through the site — the work, the hours and what you made stay here.",
+      "open": "The work for them",
+      "openHint": "Missions, hours and progress — on the deal page."
     }
   },
   "customers": {

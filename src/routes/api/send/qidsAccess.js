@@ -690,6 +690,11 @@ export const qidsAccess = {
   'leadOfForum': { allow: ['serviceAdmin'] },
   'leadForumOf': { allow: ['serviceAdmin'] },
   'leadForumsOfCustomer': { allow: ['serviceAdmin'] },
+  // PLAN_OFFSITE_CLIENT P1 — run inside startOffsiteDeal (after projectMember) and
+  // the deal page (after fetchSingleDeal said the viewer is a member).
+  'offsiteDealProduct': { allow: ['serviceAdmin'] },
+  'offsiteDealLead': { allow: ['serviceAdmin'] },
+  'offsiteDealSide': { allow: ['serviceAdmin'] },
   'leadsByCustomer': { allow: ['serviceAdmin'] },
   'leadAskProduct': { allow: ['serviceAdmin'] },
   'moachCustomerLeads': { allow: ['serviceAdmin'] },

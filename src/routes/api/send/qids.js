@@ -15648,6 +15648,66 @@ ${PROMO_DECISION_FIELDS}
     }
   }`,
 
+  // Off-site client deal (docs/inprogress/PLAN_OFFSITE_CLIENT.md P1): the product a
+  // deal is opened on, with its BOM lines — the shape activateBom reads.
+  'offsiteDealProduct': `query OffsiteDealProduct($id: ID!) {
+    matanot(id: $id) {
+      data { id attributes {
+        name desc price pricingMode archived lifecycle
+        projectcreates(pagination: { limit: 1 }) { data { id } }
+        matanot_recipe_missions {
+          data { id attributes {
+            hoursPerUnit ratePerHour mode notes
+            pendm { data { id attributes { name descrip rishon { data { id } } mission { data { id } } } } }
+            mesimabetahalich { data { id } }
+          } }
+        }
+        matanot_recipe_resources {
+          data { id attributes {
+            mode
+            pmash { data { id attributes { name } } }
+            mashabetahalich { data { id } }
+          } }
+        }
+      } }
+    }
+  }`,
+
+  // The deal a lead already has, and the account it is linked to (if any).
+  'offsiteDealLead': `query OffsiteDealLead($id: ID!) {
+    lead(id: $id) {
+      data { id attributes {
+        sheirut { data { id } }
+        customer_user { data { id } }
+      } }
+    }
+  }`,
+
+  // The deal page for a deal with no customer on the site: who it is for (the
+  // lead) and the work on its product's BOM. Read only after fetchSingleDeal
+  // showed the viewer is a member of the deal's rikma.
+  'offsiteDealSide': `query OffsiteDealSide($sid: ID!) {
+    sheirut(id: $sid) {
+      data { id attributes {
+        users_permissions_users(pagination: { limit: 1 }) { data { id } }
+        matanot { data { id attributes {
+          matanot_recipe_missions {
+            data { id attributes {
+              hoursPerUnit
+              mesimabetahalich { data { id attributes {
+                name hoursassinged howmanyhoursalready finnished
+                users_permissions_user { data { id attributes { username } } }
+              } } }
+            } }
+          }
+        } } }
+      } }
+    }
+    leads(filters: { sheirut: { id: { eq: $sid } } }, pagination: { limit: 1 }) {
+      data { id attributes { name organization } }
+    }
+  }`,
+
   // The open lead of a signed-in person in this rikma (L4): someone reached
   // on the site writes again — the answer belongs in the same lead.
   'leadsByCustomer': `query LeadsByCustomer($pid: ID!, $uid: ID!) {
@@ -15869,6 +15929,7 @@ ${PROMO_DECISION_FIELDS}
         act { data { id } }
         customer_user { data { id attributes { username } } }
         previousLead { data { id } }
+        sheirut { data { id } }
         products(pagination: { limit: 20 }) { data { id attributes { name } } }
         orders(pagination: { limit: 50 }) { data { id attributes {
           ref displayNumber status total currencyCode createdAt
