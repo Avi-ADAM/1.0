@@ -695,6 +695,8 @@ export const qidsAccess = {
   'offsiteDealProduct': { allow: ['serviceAdmin'] },
   'offsiteDealLead': { allow: ['serviceAdmin'] },
   'offsiteDealSide': { allow: ['serviceAdmin'] },
+  'offsiteDealFulfillment': { allow: ['serviceAdmin'] },
+  'offsiteDealOwnMissions': { allow: ['serviceAdmin'] },
   'leadsByCustomer': { allow: ['serviceAdmin'] },
   'leadAskProduct': { allow: ['serviceAdmin'] },
   'moachCustomerLeads': { allow: ['serviceAdmin'] },

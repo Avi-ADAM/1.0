@@ -167,7 +167,7 @@
       : (deal?.hours ?? { done: 0, total: 0 })
   );
   const progressPct = $derived(
-    (measured && workProgressPct(missionList)) ?? deal?.progressPct ?? 0
+    (measured ? workProgressPct(missionList) : null) ?? deal?.progressPct ?? 0
   );
   const updates = $derived(data.updates ?? []);
   const fmtDay = (iso: string | null) => {

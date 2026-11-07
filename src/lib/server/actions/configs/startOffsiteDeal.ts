@@ -114,6 +114,26 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
     { projectId, matanot: product, fallbackSellerId: context.userId, remindExisting: false }
   );
 
+  // The deal's own missions: a BOM line does not point at the mission it opened, so
+  // without this the deal page would not know which work is this deal's. Best-effort —
+  // a missing link hides the progress, it does not undo the deal.
+  for (const missionId of missionIds) {
+    try {
+      await store.run('offsiteDealFulfillment', {
+        data: {
+          sheirut: String(sheirutId),
+          matanot: String(product.id),
+          createdMissions: missionId,
+          quantity: terms.quantity,
+          agreedPrice: terms.total,
+          publishedAt: now
+        }
+      });
+    } catch (err) {
+      console.warn('[startOffsiteDeal] fulfillment link failed:', (err as any)?.message ?? err);
+    }
+  }
+
   await updateLead(store, lead.id, { sheirut: String(sheirutId), lastActivityAt: now });
   await recordActivity(store, {
     leadId: lead.id,

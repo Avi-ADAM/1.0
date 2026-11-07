@@ -15683,6 +15683,26 @@ ${PROMO_DECISION_FIELDS}
     }
   }`,
 
+  // The mission doing a deal's part (PLAN_OFFSITE_CLIENT): one fulfillment per BOM
+  // mission, so the deal — not only its product — knows which missions are its own.
+  'offsiteDealFulfillment': `mutation OffsiteDealFulfillment($data: SheirutFulfillmentInput!) {
+    createSheirutFulfillment(data: $data) { data { id } }
+  }`,
+
+  // The missions that are a deal's own (its fulfillments) — apart from offsiteDealSide
+  // because the API token needs its own grant on sheirut-fulfillment (find); until it
+  // has one this read fails alone and the page still shows who the deal is for.
+  'offsiteDealOwnMissions': `query OffsiteDealOwnMissions($sid: ID!) {
+    sheirutFulfillments(filters: { sheirut: { id: { eq: $sid } } }, pagination: { limit: 50 }) {
+      data { id attributes {
+        createdMissions { data { id attributes {
+          name hoursassinged howmanyhoursalready finnished
+          users_permissions_user { data { id attributes { username } } }
+        } } }
+      } }
+    }
+  }`,
+
   // The deal page for a deal with no customer on the site: who it is for (the
   // lead) and the work on its product's BOM. Read only after fetchSingleDeal
   // showed the viewer is a member of the deal's rikma.

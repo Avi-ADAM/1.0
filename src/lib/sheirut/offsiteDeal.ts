@@ -39,7 +39,7 @@ const str = (v: unknown) => (typeof v === 'string' && v.trim() ? v.trim() : null
  * a customer on the site is not off-site: its product's missions may be shared with
  * other customers, so nothing is read for it (`null`).
  */
-export function offsiteSideOf(res: any): OffsiteSide | null {
+export function offsiteSideOf(res: any, ownRes?: any): OffsiteSide | null {
   const attrs = res?.data?.sheirut?.data?.attributes;
   if (!attrs) return null;
   if ((attrs.users_permissions_users?.data ?? []).length > 0) return null;
@@ -47,7 +47,14 @@ export function offsiteSideOf(res: any): OffsiteSide | null {
   const lead = leadRow?.id != null
     ? { id: String(leadRow.id), name: str(leadRow.attributes?.name), organization: str(leadRow.attributes?.organization) }
     : null;
-  return { lead, missions: missionsFromBom(attrs.matanot?.data?.attributes?.matanot_recipe_missions?.data ?? []) };
+  // The deal's own missions (its fulfillments) first, then BOM lines that hold one —
+  // a line someone was already working on when the deal opened.
+  // `ownRes`: qid offsiteDealOwnMissions, read apart (it may be refused — see the qid).
+  const own = ((ownRes?.data?.sheirutFulfillments?.data ?? []) as any[]).map((f) => ({
+    attributes: { mesimabetahalich: f?.attributes?.createdMissions }
+  }));
+  const lines = (attrs.matanot?.data?.attributes?.matanot_recipe_missions?.data ?? []) as any[];
+  return { lead, missions: missionsFromBom([...own, ...lines]) };
 }
 
 /** BOM mission lines → missions: one per line that has its mission in progress. */

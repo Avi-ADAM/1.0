@@ -8,6 +8,7 @@ import { readProgressUpdates, type DealProgressUpdate } from '$lib/sheirut/dealP
 import type { PageServerLoad } from './$types';
 import { rtKey } from '$lib/realtime/scopes';
 import { offsiteSideOf, type OffsiteSide } from '$lib/sheirut/offsiteDeal';
+import { strapiClient } from '$lib/server/actions';
 
 export const load: PageServerLoad = async ({ params, locals, fetch, depends }) => {
   // Runs again when an action says this deal changed (PLAN_REALTIME_MIGRATION §3.4).
@@ -47,7 +48,18 @@ export const load: PageServerLoad = async ({ params, locals, fetch, depends }) =
     let offsite: OffsiteSide | null = null;
     if (result.sale && result.kind === 'sale' && !due) {
       try {
-        offsite = offsiteSideOf(await sendViaProxy(fetch as any, 'offsiteDealSide', { sid: params.id }, { isSer: true }));
+        // The admin client, as every lead read: a lead carries a phone and an email, and
+        // the service token behind /api/send has no access to leads (Forbidden).
+        const admin = (qid: string) => strapiClient.execute(qid, { sid: params.id }, undefined, fetch as any);
+        const [side, own] = await Promise.all([
+          admin('offsiteDealSide'),
+          // Needs the API token's grant on sheirut-fulfillment; without it, the BOM lines only.
+          admin('offsiteDealOwnMissions').catch((e) => {
+            console.warn('[deals/[id]/+page.server] own missions of the deal are not readable:', (e as any)?.message ?? e);
+            return null;
+          })
+        ]);
+        offsite = offsiteSideOf(side, own);
       } catch (e) {
         console.warn('[deals/[id]/+page.server] could not read the off-site side:', e);
       }
@@ -61,7 +73,9 @@ export const load: PageServerLoad = async ({ params, locals, fetch, depends }) =
     if (result.sale && workIds.length > 0) {
       try {
         const res = await sendViaProxy(fetch as any, '420dealProgressUpdates', { missions: workIds }, { isSer: true });
-        updates = readProgressUpdates(res);
+        // sendViaProxy already unwraps `data` — the reader expects it wrapped. Without
+        // this the providers' notes never reached the page.
+        updates = readProgressUpdates({ data: res });
       } catch (e) {
         console.warn('[deals/[id]/+page.server] could not read the progress updates:', e);
       }

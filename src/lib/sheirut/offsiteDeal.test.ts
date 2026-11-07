@@ -54,6 +54,22 @@ describe('offsiteSideOf', () => {
     expect(side?.lead).toEqual({ id: '5', name: 'רוני', organization: null });
     expect(side?.missions.map((m) => m.id)).toEqual(['3']);
   });
+  it("reads the deal's own missions (fulfillments) before the product's BOM lines, once each", () => {
+    const own = {
+      data: {
+        sheirutFulfillments: {
+          data: [
+            { attributes: { createdMissions: { data: { id: 11, attributes: { name: 'שלי' } } } } },
+            { attributes: { createdMissions: { data: { id: 3, attributes: { name: 'x' } } } } },
+            { attributes: { createdMissions: { data: null } } }
+          ]
+        }
+      }
+    };
+    expect(offsiteSideOf(res([]), own)?.missions.map((m) => m.id)).toEqual(['11', '3']);
+    // Refused or absent: the BOM lines alone.
+    expect(offsiteSideOf(res([]), undefined)?.missions.map((m) => m.id)).toEqual(['3']);
+  });
   it('a deal with a customer on the site is not off-site — its product work may be shared', () => {
     expect(offsiteSideOf(res([42]))).toBeNull();
   });
