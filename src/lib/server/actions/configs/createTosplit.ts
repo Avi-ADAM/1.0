@@ -20,20 +20,62 @@
 import { noticeSubject } from '$lib/notices/links';
 import type { ActionConfig, ActionExecutionHandler } from '../types';
 import { calcDeadlineMs } from './actionUtils.js';
+import { ActionError } from '../errors.js';
+import { applyTosplitApproval, hervachDeltasFrom } from '$lib/server/haluka/applyTosplitApproval';
 import { scope, decisionScope, scopeList } from '$lib/realtime/scopes.js';
 
+/** Read the rikma's members and restime. `null` when the read itself failed. */
+async function readRikma(strapi: any, pid: string, context: any) {
+  try {
+    const info = await strapi.execute('saleClaimProjectInfo', { pid }, context.jwt, context.fetch);
+    const project = info?.data?.project?.data?.attributes;
+    if (!project) return null;
+    const memberIds: string[] = (project.user_1s?.data ?? []).map((m: any) => String(m?.id));
+    return { memberIds, restime: project.restime ?? 'feh' };
+  } catch (err) {
+    console.error(`[createTosplit] members of rikma ${pid} not read:`, err);
+    return null;
+  }
+}
+
 /**
- * The proposal, and the two writes that belong to it: its sales wait for the
- * vote (`pending`), and the rikma's silence clock starts. Both used to be sent
- * by the client straight through /api/send after this action returned
- * (PLAN_REALTIME_MIGRATION B9). A rikma of one has nobody to wait for — the
- * creator's vote is already unanimous and the client approves it at once
- * (approveHaluka) — so no clock is opened there.
+ * The proposal, and the writes that belong to it: its sales wait for the vote
+ * (`pending`), and the rikma's silence clock starts. Both used to be sent by
+ * the client straight through /api/send after this action returned
+ * (PLAN_REALTIME_MIGRATION B9).
  *
- * Returns the raw `70.5createTosplit` result, as the qid did: callers read
- * `data.createTosplit.data.id`.
+ * A rikma of ONE has nobody to wait for: the creator's vote is already
+ * unanimous, the sole member already holds the money, so there are no
+ * transfers and nothing to confirm. The split is closed right here — the same
+ * `applyTosplitApproval` a last signature or a matured clock runs — and no
+ * clock is opened. Whether the rikma is solo is read from Strapi, never taken
+ * from the client (docs/inprogress/QA_SOLO_RIKMA_2026-08.md B1).
+ *
+ * Returns the raw `70.5createTosplit` result, as the qid did (callers read
+ * `data.createTosplit.data.id`), plus `soloClosed: true` when it was closed.
  */
 const createTosplitHandler: ActionExecutionHandler = async (params, context, { strapi }) => {
+  const pid = String(params.data.project);
+  const halukas: unknown[] = Array.isArray(params.data?.halukas) ? params.data.halukas : [];
+  const siteShareHalukas: unknown[] = Array.isArray(params.data?.siteShareHalukas) ? params.data.siteShareHalukas : [];
+
+  const rikma = await readRikma(strapi, pid, context);
+  const solo = rikma?.memberIds.length === 1;
+
+  // No transfers is the normal result only where the money cannot be anywhere
+  // but with its owner. In a rikma of several members a proposal that moves
+  // nothing was not built — it must not be put to a vote, nor be closable by
+  // silence. A proposal whose only transfer is the platform's site-share keeps
+  // it outside the gating `halukas` set, so it still moves money.
+  if (halukas.length === 0 && siteShareHalukas.length === 0 && !solo) {
+    throw new ActionError(
+      'VALIDATION_FAILED',
+      rikma
+        ? 'A split in a rikma of several members needs at least one transfer'
+        : 'Could not verify the rikma members for a split with no transfers'
+    );
+  }
+
   const created = await strapi.execute('70.5createTosplit', { data: params.data }, context.jwt, context.fetch);
   const tosplitId = created?.data?.createTosplit?.data?.id;
   if (!tosplitId) return created;
@@ -52,24 +94,47 @@ const createTosplitHandler: ActionExecutionHandler = async (params, context, { s
     }
   }
 
-  try {
-    const info = await strapi.execute('saleClaimProjectInfo', { pid: String(params.data.project) }, context.jwt, context.fetch);
-    const project = info?.data?.project?.data?.attributes;
-    const members = project?.user_1s?.data ?? [];
-    if (members.length !== 1) {
-      await strapi.execute(
-        '32createTimeGrama',
+  if (solo) {
+    try {
+      await applyTosplitApproval(
+        strapi,
+        { jwt: context.jwt, fetch: context.fetch },
         {
-          whatami: 'tosplit',
-          tosplit: String(tosplitId),
-          date: new Date(Date.now() + calcDeadlineMs(project?.restime ?? 'feh')).toISOString()
-        },
-        context.jwt,
-        context.fetch
+          tosplitId: String(tosplitId),
+          // The sole member's own yes — from the session, not the payload.
+          vots: [{ what: true, users_permissions_user: String(context.userId ?? rikma!.memberIds[0]) }],
+          halukot: halukas as Array<string | number>,
+          sales: saleIds,
+          hervachUpdates: hervachDeltasFrom(params.data?.hervachti)
+        }
       );
+      return { ...created, soloClosed: true };
+    } catch (err) {
+      // Nothing was applied (step 1 is the one that throws), so the client's
+      // approveHaluka fallback can still close it without paying anyone twice.
+      console.error(`[createTosplit] solo tosplit ${tosplitId} not closed:`, err);
+      return { ...created, soloClosed: false };
     }
-  } catch (err) {
+  }
+
+  if (!rikma) {
     // The proposal stands; a vote still settles it. Without a clock, silence cannot.
+    console.error(`[createTosplit] silence clock for tosplit ${tosplitId} not opened: members not read`);
+    return created;
+  }
+
+  try {
+    await strapi.execute(
+      '32createTimeGrama',
+      {
+        whatami: 'tosplit',
+        tosplit: String(tosplitId),
+        date: new Date(Date.now() + calcDeadlineMs(rikma.restime)).toISOString()
+      },
+      context.jwt,
+      context.fetch
+    );
+  } catch (err) {
     console.error(`[createTosplit] silence clock for tosplit ${tosplitId} not opened:`, err);
   }
 
@@ -101,6 +166,8 @@ export const createTosplitConfig: ActionConfig = {
         // the sales happen to land on the right people. Rejecting it left solo
         // rikmas unable to ever close a split, with the sale stuck in
         // "pending distribution" forever. See docs/inprogress/QA_SOLO_RIKMA_2026-08.md B1.
+        // Whether an empty list is allowed depends on the rikma's members, which
+        // only the handler can read: it accepts [] in a rikma of one only.
         if (!Array.isArray(value.halukas)) {
           return false;
         }

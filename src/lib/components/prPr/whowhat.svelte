@@ -599,8 +599,12 @@
       // park the money for 48h waiting on a vote that can never arrive, so we
       // finalize immediately — the same call halukaask makes when the last
       // member approves. See docs/inprogress/QA_SOLO_RIKMA_2026-08.md B1.
-      if (isSoloRikma) {
-        const soloRes = await executeAction('approveHaluka', {
+      // The server reads the members itself and normally closes it inside
+      // createTosplit (`soloClosed`); approving again would add the hervachti
+      // twice, so the call below is only the fallback for when it could not.
+      const soloClosed = tosplitResult.data?.soloClosed === true;
+      if (soloClosed || isSoloRikma) {
+        const soloRes = soloClosed ? { success: true } : await executeAction('approveHaluka', {
           tosplitId: String(tosplitId),
           userId: cookieValueId,
           // The creator's vote is written by approveHaluka itself; passing it
