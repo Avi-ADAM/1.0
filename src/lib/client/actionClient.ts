@@ -551,6 +551,7 @@ export type ActionKey =
   | 'mergeLeads'
   | 'exportLeadContacts'
   | 'sendLeadOffer'
+  | 'messageLeadOnSite'
   // Onboarding: the starter boards a new rikma is born with (PLAN_ONBOARDING Track B)
   | 'seedPlanBoards'
   // Products — newmatana.svelte has always called this; the key was just missing here.

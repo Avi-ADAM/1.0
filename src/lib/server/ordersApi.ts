@@ -144,8 +144,18 @@ function addressOf(v: unknown): Record<string, string> | null {
  *
  * Every problem, not the first one: an integration fixing its request one
  * 400 at a time is an integration that ships late. Never throws.
+ *
+ * `arrangedReach`: how an arranged order's buyer must be reachable. A
+ * storefront's arranged order is a phone call (`'phone'`, the default — the
+ * public API's contract). An offer a member sends a lead (PLAN_LEADS L4) is
+ * arranged however the person asked to be reached — email, WhatsApp, or a
+ * message on 1lev1 — so `'any'` asks only that there is some way: a phone, an
+ * email, or `hasAccount` (a signed-in person, reached on the site).
  */
-export function validateOrderPayload(body: any): OrderValidation {
+export function validateOrderPayload(
+  body: any,
+  opts: { arrangedReach?: 'phone' | 'any'; hasAccount?: boolean } = {}
+): OrderValidation {
   if (!body || typeof body !== 'object' || Array.isArray(body)) {
     return {
       ok: false,
@@ -322,7 +332,13 @@ export function validateOrderPayload(body: any): OrderValidation {
   if (payment === 'arranged') {
     // Arranging a payment is a phone call — nobody can call a name alone.
     if (!buyer.name) problems.push({ field: 'buyer.name', message: 'is required when payment is "arranged"' });
-    if (!buyer.phone) problems.push({ field: 'buyer.phone', message: 'is required when payment is "arranged"' });
+    if (opts.arrangedReach === 'any') {
+      if (!buyer.phone && !buyer.email && !opts.hasAccount) {
+        problems.push({ field: 'buyer.phone', message: 'a phone, an email or an account is required when payment is "arranged"' });
+      }
+    } else if (!buyer.phone) {
+      problems.push({ field: 'buyer.phone', message: 'is required when payment is "arranged"' });
+    }
     // `amount` is what a provider charged; here nothing was charged yet.
     if (body.amount != null) {
       problems.push({

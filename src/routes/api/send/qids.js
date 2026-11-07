@@ -15604,6 +15604,7 @@ ${PROMO_DECISION_FIELDS}
         dedupeKey anonymizedAt
         project { data { id } }
         act { data { id } }
+        customer_user { data { id } }
         orders(pagination: { limit: 100 }) { data { id attributes { status } } }
         products(pagination: { limit: 50 }) { data { id } }
       } }
@@ -15647,6 +15648,22 @@ ${PROMO_DECISION_FIELDS}
     }
   }`,
 
+  // The open lead of a signed-in person in this rikma (L4): someone reached
+  // on the site writes again — the answer belongs in the same lead.
+  'leadsByCustomer': `query LeadsByCustomer($pid: ID!, $uid: ID!) {
+    leads(
+      filters: {
+        project: { id: { eq: $pid } }
+        customer_user: { id: { eq: $uid } }
+        or: [{ status: { null: true } }, { status: { notIn: ["won", "spam"] } }]
+      }
+      sort: ["createdAt:desc"]
+      pagination: { limit: 1 }
+    ) {
+      data { id attributes { name status owner { data { id } } act { data { id } } } }
+    }
+  }`,
+
   'moachLeadPage': `query MoachLeadPage($id: ID!) {
     lead(id: $id) {
       data { id attributes {
@@ -15656,6 +15673,7 @@ ${PROMO_DECISION_FIELDS}
         project { data { id } }
         owner { data { id attributes { username } } }
         act { data { id } }
+        customer_user { data { id attributes { username } } }
         previousLead { data { id } }
         products(pagination: { limit: 20 }) { data { id attributes { name } } }
         orders(pagination: { limit: 50 }) { data { id attributes {

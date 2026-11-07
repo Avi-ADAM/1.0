@@ -71,7 +71,13 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export function validateLeadPayload(
   raw: unknown,
-  opts: { requireConsent: boolean; defaultSource?: LeadSource; now?: Date }
+  opts: {
+    requireConsent: boolean;
+    defaultSource?: LeadSource;
+    now?: Date;
+    /** The person is reached through their 1lev1 account — a phone or an email is then optional (L4). */
+    hasAccount?: boolean;
+  }
 ): LeadValidation {
   if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return fail('body', 'Expected a JSON object');
   const b = raw as Record<string, unknown>;
@@ -107,7 +113,7 @@ export function validateLeadPayload(
   const phone = str(b.phone);
   if (phone === false) return fail('phone', 'phone must be a string');
   if (phone != null && (phone.length > 40 || !normalizePhone(phone))) return fail('phone', 'phone is not a valid number');
-  if (!email && !phone) return fail('email', 'email or phone is required');
+  if (!email && !phone && !opts.hasAccount) return fail('email', 'email or phone is required');
   out.email = email ? normalizeEmail(email) : null;
   out.phone = phone;
 

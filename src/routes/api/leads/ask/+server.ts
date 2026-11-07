@@ -18,6 +18,7 @@ import type { RequestHandler } from './$types';
 import { actionService, strapiClient } from '$lib/server/actions/index.js';
 import { adminToken } from '$lib/server/adminToken.js';
 import { checkRateLimit } from '$lib/server/apiPublic/http.js';
+import { acceptedChoice, CONTACT_VIA_KEY } from '$lib/leads/contact';
 
 const PER_IP_HOUR = 5;
 const HOUR = 60 * 60 * 1000;
@@ -68,15 +69,27 @@ export const POST: RequestHandler = async ({ request, fetch, getClientAddress, l
   if (!projectId) return json({ success: false, error: 'no such product' }, { status: 404 });
 
   const lang = str(body?.lang, 8) ?? 'he';
+  const uid = locals.uid ? String(locals.uid) : '';
+  const phone = str(body?.phone, 40);
+  const email = str(body?.email, 200)?.toLowerCase() ?? null;
+  // How they asked to be reached — kept only when they gave what it needs
+  // ("on the site" needs them signed in).
+  const contactVia = acceptedChoice(body?.contactVia, { phone, email, customerUserId: uid || null });
+  // Someone signed in may be reached on the site alone; a guest needs a phone or an email.
+  if (!phone && !email && !(uid && contactVia === 'site')) {
+    return json({ success: false, error: 'invalid', field: 'email' }, { status: 400 });
+  }
   const result: any = await actionService.executeAction(
     'createLead',
     {
       projectId,
       productId,
       name: str(body?.name, 200),
-      phone: str(body?.phone, 40),
-      email: str(body?.email, 200)?.toLowerCase(),
+      phone,
+      email,
       message: str(body?.message, 4000),
+      ...(contactVia ? { details: { [CONTACT_VIA_KEY]: contactVia } } : {}),
+      ...(uid ? { customerUserId: uid } : {}),
       source: 'shop',
       sourceUrl: str(body?.sourceUrl, 500),
       consent: { text: consentText, at: new Date().toISOString() },
@@ -84,7 +97,7 @@ export const POST: RequestHandler = async ({ request, fetch, getClientAddress, l
     },
     {
       // A signed-in visitor stays who they are; a guest is nobody in particular.
-      userId: locals.uid ? String(locals.uid) : '',
+      userId: uid,
       jwt: adminToken(),
       lang,
       fetch,

@@ -54,9 +54,20 @@ const TASK_DESCRIPTION: Record<string, string> = {
 const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
   const projectId = String(params.projectId);
   const source = params.source ?? 'api';
+  // The person's own 1lev1 account (L4: "reach me on the site") — only when the
+  // product page's server says the visitor is signed in as exactly that user.
+  // A member cannot point a lead at somebody else's account.
+  const customerUserId =
+    params.customerUserId != null &&
+    context.intake === 'publicProduct' &&
+    String(params.customerUserId) !== '' &&
+    String(params.customerUserId) === String(context.userId)
+      ? String(params.customerUserId)
+      : null;
   const v = validateLeadPayload(
     { ...params, source },
-    { requireConsent: source !== 'manual' }
+    // Someone reached on the site needs no phone or email.
+    { requireConsent: source !== 'manual', hasAccount: !!customerUserId }
   );
   if (v.ok === false) {
     const refusal = v as Extract<typeof v, { ok: false }>;
@@ -96,6 +107,29 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
 
   // 3. The same person writing again.
   const same = await findSameContact(store, projectId, lead.email, lead.phone);
+  // …or the same account writing again (L4): someone reached on the site may
+  // have left no phone or email, and their answer must land in the same lead.
+  if (!same.open && customerUserId) {
+    const res = await store.run('leadsByCustomer', { pid: projectId, uid: customerUserId });
+    const row = (res?.data?.leads?.data ?? [])[0];
+    if (row?.id) {
+      const ra = row.attributes ?? {};
+      same.open = {
+        id: String(row.id),
+        projectId,
+        name: ra.name ?? null,
+        organization: null,
+        status: ra.status ?? 'new',
+        ownerId: ra.owner?.data?.id != null ? String(ra.owner.data.id) : null,
+        actId: ra.act?.data?.id != null ? String(ra.act.data.id) : null,
+        externalId: null,
+        dedupeKey: null,
+        followUpAt: null,
+        lastActivityAt: null,
+        createdAt: null
+      };
+    }
+  }
   if (same.open) {
     const warnings: string[] = [];
     try {
@@ -115,7 +149,8 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
       await updateLead(store, same.open.id, {
         lastActivityAt: now,
         // A paused lead that writes again is due now — needsAttention surfaces it.
-        ...(same.open.status === 'paused' ? { followUpAt: now } : {})
+        ...(same.open.status === 'paused' ? { followUpAt: now } : {}),
+        ...(customerUserId ? { customer_user: customerUserId } : {})
       });
     } catch (e) {
       console.warn('[createLead] could not touch lead', same.open.id, e);
@@ -158,6 +193,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
   };
   if (lead.productId) data.products = [lead.productId];
   if (params.sourceKeyId) data.sourceKey = String(params.sourceKeyId);
+  if (customerUserId) data.customer_user = customerUserId;
   if (same.previousWon) data.previousLead = same.previousWon.id;
   for (const k of Object.keys(data)) if (data[k] == null) delete data[k];
 
@@ -265,6 +301,9 @@ export const createLeadConfig: ActionConfig = {
     utm: { type: 'object', required: false, description: 'utm source/medium/campaign/term/content' },
     consent: { type: 'object', required: false, description: '{ text, at } — required unless source is manual' },
     lang: optionalString("The person's language"),
+    customerUserId: optionalString(
+      "The visitor's own account — honoured only from the product page's server, for the signed-in visitor themself"
+    ),
     openTask: {
       type: 'boolean',
       required: false,

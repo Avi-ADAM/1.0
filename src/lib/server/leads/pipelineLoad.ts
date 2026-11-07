@@ -158,6 +158,11 @@ export interface LeadPageView {
   ownerId: string | null;
   ownerName: string | null;
   actId: string | null;
+  /** The 1lev1 account they wrote from (L4) — they can be answered on the site. */
+  customerUserId: string | null;
+  customerName: string | null;
+  /** How they asked to be reached (`$lib/leads/contact`), if they said. */
+  contactVia: string | null;
   previousLeadId: string | null;
   products: Array<{ id: string; name: string }>;
   orders: LeadOrderView[];
@@ -177,7 +182,7 @@ export function detailPairs(details: unknown): Array<[string, string]> {
   if (!d || typeof d !== 'object' || Array.isArray(d)) return [];
   const out: Array<[string, string]> = [];
   for (const [k, v] of Object.entries(d as Record<string, unknown>)) {
-    if (v === null || v === undefined || v === '') continue;
+    if (v === null || v === undefined || v === '' || k === 'contactVia') continue;
     if (typeof v === 'string' || typeof v === 'number' || typeof v === 'boolean') out.push([k, String(v)]);
     else if (Array.isArray(v) && v.every((x) => typeof x === 'string' || typeof x === 'number'))
       out.push([k, v.join(', ')]);
@@ -215,6 +220,12 @@ export function toLeadPage(node: any): LeadPageView | null {
     ownerId: idOf(a.owner),
     ownerName: str(a.owner?.data?.attributes?.username),
     actId: idOf(a.act),
+    customerUserId: idOf(a.customer_user),
+    customerName: str(a.customer_user?.data?.attributes?.username),
+    contactVia: (() => {
+      const d = typeof a.details === 'string' ? (() => { try { return JSON.parse(a.details); } catch { return null; } })() : a.details;
+      return typeof d?.contactVia === 'string' ? d.contactVia : null;
+    })(),
     previousLeadId: idOf(a.previousLead),
     products: ((a.products?.data ?? []) as any[])
       .map((p) => ({ id: String(p.id), name: str(p?.attributes?.name) ?? '' }))

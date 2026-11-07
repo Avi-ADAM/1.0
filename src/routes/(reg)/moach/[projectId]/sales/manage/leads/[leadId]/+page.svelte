@@ -24,6 +24,16 @@
   import LeadLogForm from '$lib/components/leads/LeadLogForm.svelte';
   import LeadPauseForm from '$lib/components/leads/LeadPauseForm.svelte';
   import LeadOfferForm from '$lib/components/leads/LeadOfferForm.svelte';
+  import {
+    mailtoWithText,
+    offerText,
+    preferredChannel,
+    reachableChannels,
+    siteMessageOf,
+    whatsappWithText,
+    type ContactChannel,
+    type OfferSummary
+  } from '$lib/leads/contact';
 
   let { data } = $props();
   const fmtMoney = useFormatMoney();
@@ -184,7 +194,60 @@
     lead.activities.map((a) => (a.kind === 'system' ? mergeNoteOf(a.body) : null)).find((n) => n?.dir === 'into') ?? null
   );
 
+  // ── how they asked to be reached (L4) ──
+  let reach = $derived({ phone: lead.phone, email: lead.email, customerUserId: lead.customerUserId });
+  let preferred = $derived(preferredChannel(lead.contactVia, reach));
+  let channels = $derived.by(() => {
+    const can = reachableChannels(reach);
+    return preferred ? [preferred, ...can.filter((c) => c !== preferred)] : can;
+  });
+  let canOffer = $derived(channels.length > 0);
+
+  // ── a message on 1lev1 ──
+  let siteOpen = $state(false);
+  let siteText = $state('');
+  async function sendSiteMessage(e: SubmitEvent) {
+    e.preventDefault();
+    if (!siteText.trim() || busy) return;
+    busy = true;
+    try {
+      const res = await executeAction('messageLeadOnSite', { projectId, leadId: lead.id, body: siteText.trim() }, { showErrorToast: false });
+      if (!res.success) toast.error(actionErrorText(res, $t('shop.leads.err.save')));
+      else {
+        toast.success($t('shop.leads.contact.siteSent'));
+        siteOpen = false;
+        siteText = '';
+        refresh();
+      }
+    } finally {
+      busy = false;
+    }
+  }
+
+  // ── the offer just written, ready to go out the way they asked ──
+  let sentOffer = $state<OfferSummary | null>(null);
+  let sentOfferText = $derived(
+    sentOffer
+      ? offerText(
+          sentOffer,
+          {
+            greeting: $t('shop.leads.offer.msgGreeting', { name: lead.name ?? '' }),
+            total: $t('shop.leads.offer.total'),
+            closing: $t('shop.leads.offer.msgClosing')
+          },
+          (n) => fmtMoney(n, null)
+        )
+      : ''
+  );
+  function deliveryHref(c: ContactChannel): string | null {
+    if (c === 'email') return mailtoWithText(lead.email, $t('shop.leads.offer.msgSubject'), sentOfferText);
+    if (c === 'whatsapp') return whatsappWithText(wa, sentOfferText);
+    if (c === 'phone') return tel;
+    return null;
+  }
+
   function activityText(a: (typeof lead.activities)[number]): string {
+    if (a.kind === 'note' && siteMessageOf(a.body) !== null) return $t('shop.leads.timeline.siteMessage');
     if (a.kind === 'system') {
       const note = mergeNoteOf(a.body);
       if (note) return $t(note.dir === 'into' ? 'shop.leads.timeline.mergedInto' : 'shop.leads.timeline.mergedFrom');
@@ -245,6 +308,30 @@
       <!-- reach them -->
       <section class="sh-card ld-box" aria-labelledby="ld-contact">
         <h3 id="ld-contact" class="sh-section-label">{$t('shop.leads.page.contact')}</h3>
+        {#if preferred}
+          <p class="ld-prefers">
+            {$t('shop.leads.contact.prefers')}
+            <span class="sh-chip sh-chip-gold">{$t(`shop.leads.contact.via.${preferred}`)}</span>
+          </p>
+        {/if}
+        {#if lead.customerUserId}
+          <div class="ld-site">
+            <span class="ld-value">{$t('shop.leads.contact.account', { name: lead.customerName ?? '' })}</span>
+            <button type="button" class="sh-btn sh-btn-outline ld-link" onclick={() => (siteOpen = !siteOpen)}>
+              {$t('shop.leads.contact.siteCta')}
+            </button>
+          </div>
+          {#if siteOpen}
+            <form class="ld-site-form" onsubmit={sendSiteMessage}>
+              <label class="sh-field">
+                <span>{$t('shop.leads.contact.siteLabel')}</span>
+                <textarea class="sh-input" bind:value={siteText} maxlength="2000"></textarea>
+              </label>
+              <p class="ld-muted">{$t('shop.leads.contact.siteHint')}</p>
+              <button type="submit" class="sh-btn sh-btn-primary" disabled={!siteText.trim() || busy}>{$t('shop.leads.contact.siteSend')}</button>
+            </form>
+          {/if}
+        {/if}
         <div class="ld-contact">
           {#if lead.phone}
             <span class="ld-value" dir="ltr">{lead.phone}</span>
@@ -316,6 +403,8 @@
                 {#if a.kind === 'system' && mergeNoteOf(a.body)}
                   {@const note = mergeNoteOf(a.body)}
                   <a class="ld-entry-body" href="{base}/leads/{note?.id}">{$t('shop.leads.merge.open')}</a>
+                {:else if a.kind === 'note' && siteMessageOf(a.body) !== null}
+                  <p class="ld-entry-body">{siteMessageOf(a.body)}</p>
                 {:else if a.kind === 'linkOrder' && a.body?.startsWith('order:')}
                   <p class="ld-entry-body">{$t('shop.order.number', { number: '' })}<bdi>{a.body.slice('order:'.length)}</bdi></p>
                 {:else if a.body && !(a.kind === 'system' && a.body === CONTACTS_EXPORTED)}
@@ -336,10 +425,43 @@
           <p class="ld-muted">{$t('shop.leads.page.wonHint')}</p>
         {:else}
           {#if offerProducts.length && lead.status !== 'spam'}
-            <button type="button" class="sh-btn sh-btn-primary sh-btn-lg ld-wide" onclick={() => (offerOpen = true)} disabled={!lead.phone}>
+            <button type="button" class="sh-btn sh-btn-primary sh-btn-lg ld-wide" onclick={() => (offerOpen = true)} disabled={!canOffer}>
               {$t('shop.leads.offer.cta')}
             </button>
-            <p class="ld-muted">{lead.phone ? $t('shop.leads.offer.ctaHint') : $t('shop.leads.offer.needsPhone')}</p>
+            <p class="ld-muted">{canOffer ? $t('shop.leads.offer.ctaHint') : $t('shop.leads.offer.needsContact')}</p>
+          {/if}
+          {#if sentOffer}
+            <div class="ld-deliver" role="status">
+              <p class="ld-deliver-title">{$t('shop.leads.offer.deliverTitle')}</p>
+              <div class="ld-links ld-deliver-links">
+                {#each channels as c (c)}
+                  {#if c === 'site'}
+                    <button
+                      type="button"
+                      class="sh-btn {c === preferred ? 'sh-btn-primary' : 'sh-btn-outline'} ld-link"
+                      onclick={() => {
+                        siteText = sentOfferText;
+                        siteOpen = true;
+                        document.getElementById('ld-contact')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                      }}
+                    >
+                      {$t('shop.leads.contact.via.site')}
+                    </button>
+                  {:else if deliveryHref(c)}
+                    <a
+                      class="sh-btn {c === preferred ? 'sh-btn-primary' : 'sh-btn-outline'} ld-link"
+                      href={deliveryHref(c)}
+                      target={c === 'whatsapp' ? '_blank' : undefined}
+                      rel={c === 'whatsapp' ? 'noopener noreferrer' : undefined}
+                      onclick={() => reached(c === 'phone' ? 'call' : c)}
+                    >
+                      {$t(`shop.leads.contact.via.${c}`)}
+                    </a>
+                  {/if}
+                {/each}
+                <button type="button" class="sh-btn sh-btn-quiet ld-link" onclick={() => (sentOffer = null)}>{$t('shop.leads.offer.deliverDone')}</button>
+              </div>
+            </div>
           {/if}
           <a class="sh-btn {offerProducts.length ? 'sh-btn-outline' : 'sh-btn-primary sh-btn-lg'} ld-wide" href="/moach/{projectId}/sales?lead={lead.id}">{$t('shop.leads.page.reportSale')}</a>
           <p class="ld-muted">{$t('shop.leads.page.reportSaleHint')}</p>
@@ -440,8 +562,9 @@
     leadId={lead.id}
     products={offerProducts}
     preselect={lead.products.map((p) => p.id)}
-    onDone={() => {
+    onDone={(summary) => {
       offerOpen = false;
+      sentOffer = summary;
       toast.success($t('shop.leads.offer.sent'));
       refresh();
     }}
@@ -621,6 +744,43 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
+  }
+  .ld-prefers {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--sh-muted);
+  }
+  .ld-site {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .ld-site-form {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .ld-deliver {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px;
+    border-radius: var(--sh-radius-sm);
+    background: var(--sh-card-2);
+  }
+  .ld-deliver-title {
+    margin: 0;
+    font-weight: 700;
+    font-size: 14px;
+  }
+  .ld-deliver-links {
+    flex-wrap: wrap;
+    justify-content: flex-start;
   }
   .ld-merged {
     padding: 12px 16px;

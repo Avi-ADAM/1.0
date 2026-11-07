@@ -16,6 +16,10 @@
   let email = $state('');
   let organization = $state('');
   let message = $state('');
+  // How they asked to be reached (L4). No "on the site": a lead typed by a
+  // member has no account behind it.
+  const VIA = ['email', 'phone', 'whatsapp'] as const;
+  let via = $state<(typeof VIA)[number] | null>(null);
   let busy = $state(false);
   let error = $state('');
 
@@ -36,6 +40,7 @@
           email: email.trim() || undefined,
           organization: organization.trim() || undefined,
           message: message.trim() || undefined,
+          ...(via && (via === 'email' ? email.trim() : phone.trim()) ? { details: { contactVia: via } } : {}),
           source: 'manual'
         },
         { showErrorToast: false }
@@ -69,6 +74,16 @@
       {$t('shop.leads.field.email')}
       <input class="sh-input" type="email" bind:value={email} maxlength="200" dir="ltr" autocomplete="off" />
     </label>
+  </div>
+  <div class="sh-field">
+    <span>{$t('shop.leads.contact.viaLabel')}</span>
+    <div class="sh-pills" role="group" aria-label={$t('shop.leads.contact.viaLabel')}>
+      {#each VIA as c (c)}
+        <button type="button" class="sh-pill" aria-pressed={via === c} onclick={() => (via = via === c ? null : c)}>
+          {$t(`shop.leads.contact.via.${c}`)}
+        </button>
+      {/each}
+    </div>
   </div>
   <label class="sh-field">
     {$t('shop.leads.field.organization')}

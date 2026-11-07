@@ -1044,7 +1044,8 @@
       "system": "Actualización",
       "mergedInto": "Unida a otra consulta",
       "mergedFrom": "Una consulta duplicada se unió aquí",
-      "contactsExported": "Teléfono y correo exportados a un archivo"
+      "contactsExported": "Teléfono y correo exportados a un archivo",
+      "siteMessage": "Mensaje en 1lev1"
     },
     "plan": {
       "title": "Qué sigue",
@@ -1093,7 +1094,6 @@
     "offer": {
       "cta": "Enviar una oferta",
       "ctaHint": "Un pedido que espera un pago acordado, con sus datos — aparece también en pedidos.",
-      "needsPhone": "Una oferta se paga acordando por teléfono — la consulta necesita un teléfono.",
       "title": "Oferta",
       "hint": "Los productos, la cantidad y el precio que ofreciste. Sus datos se toman de la consulta. Cuando pague, quien recibió el dinero lo confirma en pedidos.",
       "line": "Línea {{count}}",
@@ -1108,7 +1108,29 @@
       "note": "Una nota en la oferta (opcional)",
       "total": "Total",
       "send": "Enviar la oferta",
-      "sent": "Oferta registrada — ya la tiene"
+      "sent": "Oferta registrada — ya la tiene",
+      "needsContact": "La consulta no tiene teléfono, correo ni cuenta de 1lev1 — no hay cómo enviarle una oferta.",
+      "deliverTitle": "Envíale la oferta — como pidió:",
+      "deliverDone": "Ya la envié",
+      "msgGreeting": "Hola {{name}}, esta es nuestra oferta:",
+      "msgClosing": "Nos encantará saber de ti.",
+      "msgSubject": "Una oferta"
+    },
+    "contact": {
+      "viaLabel": "Cómo pidió que lo contacten",
+      "prefers": "Pidió que lo contacten",
+      "account": "Escribió desde su cuenta de 1lev1: {{name}}",
+      "siteCta": "Mensaje en el sitio",
+      "siteLabel": "El mensaje",
+      "siteHint": "Le llega como notificación de 1lev1 (y por correo o Telegram, según su configuración). Su respuesta vuelve a esta consulta.",
+      "siteSend": "Enviar",
+      "siteSent": "Mensaje enviado en 1lev1",
+      "via": {
+        "site": "En el sitio",
+        "email": "Por correo",
+        "phone": "Por teléfono",
+        "whatsapp": "Por WhatsApp"
+      }
     }
   },
   "customers": {

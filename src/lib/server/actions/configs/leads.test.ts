@@ -113,12 +113,21 @@ const strapi = {
             lead: {
               data: {
                 id: vars.id,
-                attributes: { ...l, project: rel(l.project), act: rel(l.act), orders: ids(l.orders), products: ids(l.products) }
+                attributes: { ...l, project: rel(l.project), act: rel(l.act), customer_user: rel(l.customer_user), orders: ids(l.orders), products: ids(l.products) }
               }
             }
           }
         };
       }
+      case 'leadsByCustomer': {
+        const hit = [...db.leads.keys()].find((id) => {
+          const l = db.leads.get(id)!;
+          return l.project === vars.pid && String(l.customer_user ?? '') === String(vars.uid) && !['won', 'spam'].includes(l.status);
+        });
+        return { data: { leads: { data: hit ? [{ id: hit, attributes: { ...db.leads.get(hit)!, owner: rel(null), act: rel(db.leads.get(hit)!.act) } }] : [] } } };
+      }
+      case 'ordersApiProject':
+        return { data: { project: { data: { id: vars.pid, attributes: { projectName: 'הוועד' } } } } };
       case 'leadContactsForExport': {
         const hits = [...db.leads.keys()].filter((id) => {
           const l = db.leads.get(id)!;
@@ -422,10 +431,19 @@ describe('sendLeadOffer (L4)', () => {
     );
   });
 
-  it('an offer is arranged by phone — a lead with only an email is told so, and nothing is written', async () => {
+  it('an offer goes by email too — a phone is not required', async () => {
     const { sendLeadOfferConfig } = await import('./sendLeadOffer.js');
+    nested.executeAction.mockResolvedValueOnce({ success: true, data: { orderId: '91' } });
+    const r = await call(sendLeadOfferConfig, { leadId: '71', lines: [{ productId: '123', quantity: 1, unitPrice: 10 }] });
+    expect(r).toMatchObject({ orderId: '91', status: 'offered' });
+    expect(nested.executeAction.mock.calls[0][1].order.buyer).toMatchObject({ name: 'אבי', email: 'avi@example.com', phone: null });
+  });
+
+  it('no phone, no email and no account: there is no way to send it, and nothing is written', async () => {
+    const { sendLeadOfferConfig } = await import('./sendLeadOffer.js');
+    db.leads.get('71')!.email = null;
     await expect(call(sendLeadOfferConfig, { leadId: '71', lines: [{ productId: '123', quantity: 1, unitPrice: 10 }] })).rejects.toMatchObject({
-      code: 'NEEDS_PHONE'
+      code: 'NEEDS_CONTACT'
     });
     expect(nested.executeAction).not.toHaveBeenCalled();
   });
@@ -451,5 +469,50 @@ describe('createLead: who may file a lead', () => {
     expect((await check('', { source: 'api', productId: '5' }, { intake: 'publicProduct' })).authorized).toBe(false);
     expect((await check('', { source: 'shop' }, { intake: 'publicProduct' })).authorized).toBe(false);
     expect((await check('9', { source: 'shop', productId: '5' }, {})).authorized).toBe(false);
+  });
+});
+
+describe('reached on the site (L4)', () => {
+  const asVisitor = (p: Record<string, any>, uid = '42') =>
+    (createLeadConfig.graphqlOperation as any)(
+      { projectId: '57', source: 'shop', productId: '123', consent, ...p },
+      { ...context, userId: uid, intake: 'publicProduct' },
+      { strapi }
+    );
+
+  it('a signed-in visitor may leave no phone or email; the lead is linked to their account', async () => {
+    const r = await asVisitor({ name: 'Maya', customerUserId: '42', details: { contactVia: 'site' } });
+    expect(r.duplicated).toBe(false);
+    expect(db.leads.get(r.leadId)).toMatchObject({ customer_user: '42', details: { contactVia: 'site' } });
+  });
+
+  it('writing again from the same account folds into the same lead', async () => {
+    const first = await asVisitor({ name: 'Maya', customerUserId: '42' });
+    const again = await asVisitor({ name: 'Maya', customerUserId: '42', message: 'and in blue?' });
+    expect(again).toMatchObject({ leadId: first.leadId, duplicated: true, reason: 'sameContact' });
+  });
+
+  it('nobody can point a lead at another account — not a member, not a visitor naming someone else', async () => {
+    const byMember = await createLead({ name: 'X', phone: '0501111111', consent, customerUserId: '42' });
+    expect(db.leads.get(byMember.leadId)!.customer_user).toBeUndefined();
+    const other = await asVisitor({ name: 'Y', phone: '0502222222', customerUserId: '99' }, '42');
+    expect(db.leads.get(other.leadId)!.customer_user).toBeUndefined();
+    await expect(asVisitor({ name: 'Z', customerUserId: '99' }, '42')).rejects.toMatchObject({ code: 'VALIDATION_FAILED' });
+  });
+
+  it('a member answers on the site: logged, contacted, and the notice names the account', async () => {
+    const { messageLeadOnSiteConfig } = await import('./messageLeadOnSite.js');
+    const lead = await asVisitor({ name: 'Maya', customerUserId: '42' });
+    db.activities = [];
+    const r = await call(messageLeadOnSiteConfig, { leadId: lead.leadId, body: 'כן, יש בכחול' });
+    expect(r).toMatchObject({ customerIds: ['42'], projectName: 'הוועד', excerpt: 'כן, יש בכחול', replyUrl: '/gift/123' });
+    expect(db.leads.get(lead.leadId)!.status).toBe('contacted');
+    expect(db.activities[0]).toMatchObject({ kind: 'note', direction: 'out', body: 'site:כן, יש בכחול', actor: '5' });
+  });
+
+  it('a lead with no account cannot be messaged on the site', async () => {
+    const { messageLeadOnSiteConfig } = await import('./messageLeadOnSite.js');
+    const lead = await createLead({ name: 'X', phone: '0503333333', consent });
+    await expect(call(messageLeadOnSiteConfig, { leadId: lead.leadId, body: 'hi' })).rejects.toMatchObject({ code: 'NO_ACCOUNT' });
   });
 });

@@ -1044,7 +1044,8 @@
       "system": "Update",
       "mergedInto": "Merged into another enquiry",
       "mergedFrom": "A duplicate enquiry was merged here",
-      "contactsExported": "Phone and email exported to a file"
+      "contactsExported": "Phone and email exported to a file",
+      "siteMessage": "Message on 1lev1"
     },
     "plan": {
       "title": "What's next",
@@ -1093,7 +1094,6 @@
     "offer": {
       "cta": "Send an offer",
       "ctaHint": "An order waiting for an arranged payment, with their details — it shows in the orders too.",
-      "needsPhone": "An offer is paid by arrangement over the phone — the lead needs a phone.",
       "title": "Offer",
       "hint": "The products, quantity and price you offered. Their details are filled from the enquiry. When they pay, whoever got the money confirms it in the orders screen.",
       "line": "Line {{count}}",
@@ -1108,7 +1108,29 @@
       "note": "A note on the offer (optional)",
       "total": "Total",
       "send": "Send the offer",
-      "sent": "Offer recorded — it is with them"
+      "sent": "Offer recorded — it is with them",
+      "needsContact": "The enquiry has no phone, email or 1lev1 account — there is no way to send them an offer.",
+      "deliverTitle": "Send them the offer — the way they asked:",
+      "deliverDone": "Already sent",
+      "msgGreeting": "Hello {{name}}, here is our offer:",
+      "msgClosing": "We would be glad to hear from you.",
+      "msgSubject": "An offer"
+    },
+    "contact": {
+      "viaLabel": "How they asked to be reached",
+      "prefers": "Asked to be reached",
+      "account": "Wrote from their 1lev1 account: {{name}}",
+      "siteCta": "Message on the site",
+      "siteLabel": "The message",
+      "siteHint": "It reaches them as a 1lev1 notification (and by email or Telegram, per their settings). Their reply comes back to this enquiry.",
+      "siteSend": "Send",
+      "siteSent": "Message sent to them on 1lev1",
+      "via": {
+        "site": "On the site",
+        "email": "By email",
+        "phone": "By phone",
+        "whatsapp": "On WhatsApp"
+      }
     }
   },
   "customers": {

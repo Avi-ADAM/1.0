@@ -266,7 +266,17 @@
       "done": "Enviado. {{rikma}} te responderá pronto.",
       "errTooMany": "Demasiadas consultas desde esta dirección — inténtalo en una hora",
       "errInvalid": "Algo en los datos no es correcto — revisa el teléfono o el correo",
-      "errTryAgain": "No se pudo enviar — inténtalo de nuevo"
+      "errTryAgain": "No se pudo enviar — inténtalo de nuevo",
+      "viaLabel": "¿Cómo te respondemos?",
+      "viaSiteHint": "La respuesta te llega aquí en 1lev1, como notificación — sin teléfono ni correo.",
+      "optional": "opcional",
+      "doneSite": "Enviado. {{rikma}} te responderá aquí en 1lev1 — recibirás una notificación.",
+      "via": {
+        "site": "En el sitio",
+        "email": "Por correo",
+        "phone": "Por teléfono",
+        "whatsapp": "Por WhatsApp"
+      }
     }
   },
   "editBasic": {

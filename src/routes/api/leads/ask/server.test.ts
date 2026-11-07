@@ -82,3 +82,22 @@ describe('POST /api/leads/ask', () => {
     expect((await call(BODY)).status).toBe(502);
   });
 });
+
+describe('how they asked to be reached', () => {
+  it('"on the site" is for someone signed in — then no phone or email is needed', async () => {
+    const r = await call({ ...BODY, phone: undefined, contactVia: 'site' }, { uid: '42' });
+    expect(r.status).toBe(200);
+    expect(mocks.executeAction.mock.calls[0][1]).toMatchObject({ customerUserId: '42', details: { contactVia: 'site' } });
+  });
+
+  it('a guest who chose "on the site" and left nothing else is asked for a way to reach them', async () => {
+    const r = await call({ ...BODY, phone: undefined, contactVia: 'site' });
+    expect(r.status).toBe(400);
+    expect(mocks.executeAction).not.toHaveBeenCalled();
+  });
+
+  it('a choice without what it needs is not kept (WhatsApp with no phone)', async () => {
+    await call({ ...BODY, phone: undefined, email: 'd@x.co', contactVia: 'whatsapp' });
+    expect(mocks.executeAction.mock.calls[0][1].details).toBeUndefined();
+  });
+});

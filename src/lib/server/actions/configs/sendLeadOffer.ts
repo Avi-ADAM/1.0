@@ -10,9 +10,11 @@
  * learn in the orders tab, and nothing moves (stock, sales, value) until the
  * member who gets the money confirms it.
  *
- * Arranging a payment is a phone call, so the lead needs a phone (the order
- * validator requires one for `arranged`). A product is required: an offer is
- * for something the rikma sells (open question 5 — answered "a product").
+ * The offer is sent the way the person asked to be reached — email, phone,
+ * WhatsApp or a message on 1lev1 (an international customer may have no
+ * phone that matters), so any one of a phone, an email or a linked account
+ * will do (`arrangedReach: 'any'`). A product is required: an offer is for
+ * something the rikma sells (open question 5 — answered "a product").
  */
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
@@ -35,8 +37,11 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
   const a = sideRes?.data?.lead?.data?.attributes ?? {};
   const phone = str(a.phone);
   const email = str(a.email);
-  if (!phone) {
-    throw new ActionError('NEEDS_PHONE', 'An offer is paid by arrangement — add the lead\'s phone first');
+  const customerUserId = a.customer_user?.data?.id != null ? String(a.customer_user.data.id) : null;
+  // The offer reaches them the way they asked — email, phone, WhatsApp or the
+  // site. Some way there must be.
+  if (!phone && !email && !customerUserId) {
+    throw new ActionError('NEEDS_CONTACT', 'Add a phone or an email to the lead first — there is no way to send them the offer');
   }
   const linked: string[] = ((a.orders?.data ?? []) as any[]).map((o) => String(o.id));
   const linkedStatuses: string[] = ((a.orders?.data ?? []) as any[]).map((o) => String(o?.attributes?.status ?? ''));
@@ -44,7 +49,8 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
   const lines = Array.isArray(params.lines) ? params.lines : [];
   if (!lines.length) throw new ActionError('VALIDATION_FAILED', 'An offer needs at least one product');
 
-  const v = validateOrderPayload({
+  const v = validateOrderPayload(
+    {
     // Unique per offer: a second offer to the same lead is a second order.
     externalId: `lead-${lead.id}-${Date.now().toString(36)}`,
     payment: 'arranged',
@@ -58,7 +64,9 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
       quantity: l?.quantity,
       unitPrice: l?.unitPrice
     }))
-  });
+    },
+    { arrangedReach: 'any', hasAccount: !!customerUserId }
+  );
   if (v.ok === false) {
     const refusal = v as Extract<typeof v, { ok: false }>;
     throw new ActionError('VALIDATION_FAILED', refusal.message, { problems: refusal.problems });

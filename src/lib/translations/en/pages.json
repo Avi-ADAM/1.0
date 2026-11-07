@@ -265,7 +265,17 @@
       "done": "Sent. {{rikma}} will get back to you soon.",
       "errTooMany": "Too many enquiries from this address — try again in an hour",
       "errInvalid": "Something in the details is not right — check the phone or email",
-      "errTryAgain": "Sending failed — please try again"
+      "errTryAgain": "Sending failed — please try again",
+      "viaLabel": "How should they get back to you?",
+      "viaSiteHint": "The answer reaches you here on 1lev1, as a notification — no phone or email needed.",
+      "optional": "optional",
+      "doneSite": "Sent. {{rikma}} will answer you here on 1lev1 — you will get a notification.",
+      "via": {
+        "site": "On the site",
+        "email": "By email",
+        "phone": "By phone",
+        "whatsapp": "On WhatsApp"
+      }
     }
   },
   "editBasic": {

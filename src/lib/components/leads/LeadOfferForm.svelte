@@ -7,6 +7,7 @@
    */
   import { t } from '$lib/translations';
   import { executeAction, actionErrorText } from '$lib/client/actionClient';
+  import type { OfferSummary } from '$lib/leads/contact';
 
   interface ProductOption {
     id: string;
@@ -26,7 +27,8 @@
     leadId: string;
     products: ProductOption[];
     preselect?: string[];
-    onDone: () => void;
+    /** What was offered, so the page can send it the way the person asked. */
+    onDone: (summary: OfferSummary) => void;
   } = $props();
 
   interface Line {
@@ -95,7 +97,15 @@
         error = actionErrorText(res, $t('shop.leads.err.save'));
         return;
       }
-      onDone();
+      onDone({
+        lines: lines.map((l) => {
+          const p = productOf(l.productId);
+          const v = activeVariants(l.productId).find((x) => x.id === l.variantId);
+          return { name: [p?.name ?? '', v?.label].filter(Boolean).join(' · '), quantity: l.quantity, unitPrice: l.unitPrice ?? 0 };
+        }),
+        total,
+        note: note.trim() || null
+      });
     } finally {
       busy = false;
     }
