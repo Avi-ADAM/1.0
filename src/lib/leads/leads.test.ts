@@ -159,6 +159,17 @@ describe('validateLeadPayload', () => {
     expect(validateLeadPayload({ ...base, phone: 'abc' }, { requireConsent: true, now })).toMatchObject({ ok: false, field: 'phone' });
   });
 
+  it('a customer off the site may leave no way to reach them — only when the deal path says so', () => {
+    const bare = { name: 'לקוח', source: 'manual' };
+    expect(validateLeadPayload(bare, { requireConsent: false, now })).toMatchObject({ ok: false, field: 'email' });
+    expect(validateLeadPayload(bare, { requireConsent: false, allowNoContact: true, now }).ok).toBe(true);
+    // A bad phone is still a bad phone.
+    expect(validateLeadPayload({ ...bare, phone: 'abc' }, { requireConsent: false, allowNoContact: true, now })).toMatchObject({
+      ok: false,
+      field: 'phone'
+    });
+  });
+
   it('refuses a lead without consent from a form, not from a member', () => {
     const { consent: _c, ...noConsent } = base;
     expect(validateLeadPayload(noConsent, { requireConsent: true, now })).toMatchObject({ ok: false, code: 'CONSENT_REQUIRED' });

@@ -1142,7 +1142,14 @@
       "cta": "Start working without them signing up",
       "ctaHint": "When the customer doesn't want to work through the site — the work, the hours and what you made stay here.",
       "open": "The work for them",
-      "openHint": "Missions, hours and progress — on the deal page."
+      "openHint": "Missions, hours and progress — on the deal page.",
+      "newCta": "Deal for a customer off the site",
+      "who": "Who it is for",
+      "name": "Name",
+      "phone": "Phone",
+      "email": "Email",
+      "anonymous": "Customer",
+      "whoHint": "All optional — you can leave it empty. The customer is kept as a lead, so you can reach them and bring them in later. No money is recorded here — that is a sale, later."
     }
   },
   "customers": {

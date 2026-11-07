@@ -67,7 +67,13 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
   const v = validateLeadPayload(
     { ...params, source },
     // Someone reached on the site needs no phone or email.
-    { requireConsent: source !== 'manual', hasAccount: !!customerUserId }
+    // A customer off the site with no details at all (PLAN_OFFSITE_CLIENT): only when
+    // startOffsiteDeal records them by hand — the context says so, a client cannot.
+    {
+      requireConsent: source !== 'manual',
+      hasAccount: !!customerUserId,
+      allowNoContact: context.intake === 'offsiteDeal' && source === 'manual'
+    }
   );
   if (v.ok === false) {
     const refusal = v as Extract<typeof v, { ok: false }>;

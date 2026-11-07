@@ -23,10 +23,45 @@ import { leadStore, loadLeadInProject, recordActivity, updateLead } from '$lib/s
 import { activateBom } from '$lib/server/deal/activateBom';
 import { offsiteDealTerms } from '$lib/sheirut/offsiteDeal';
 
+const clean = (v: unknown): string | undefined => (typeof v === 'string' && v.trim() ? v.trim() : undefined);
+
+/**
+ * A customer whose details are not on the site at all: they become a lead first, so the
+ * deal has someone to be for and the person can be reached or join later. Any of their
+ * details may be missing — the member records them by hand (`source: 'manual'`, no
+ * consent text) and the lead needs no phone or email (`intake: 'offsiteDeal'`). The
+ * same phone or email as an open lead folds into it, as every new lead does.
+ */
+async function leadForCustomer(params: Record<string, any>, context: any): Promise<string> {
+  const c = (params.customer ?? {}) as Record<string, unknown>;
+  const { actionService } = await import('../index.js');
+  const res: any = await actionService.executeAction(
+    'createLead',
+    {
+      projectId: String(params.projectId),
+      name: clean(c.name) ?? clean(params.defaultName) ?? 'Customer',
+      phone: clean(c.phone),
+      email: clean(c.email),
+      organization: clean(c.organization),
+      productId: String(params.productId),
+      source: 'manual',
+      openTask: false
+    },
+    { ...context, intake: 'offsiteDeal' }
+  );
+  const id = res?.data?.leadId;
+  if (!res?.success || !id) {
+    const err = res?.error ?? {};
+    throw new ActionError(err.code ?? 'EXECUTION_FAILED', err.message ?? 'The customer could not be recorded');
+  }
+  return String(id);
+}
+
 const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
   const projectId = String(params.projectId);
   const store = leadStore(strapi, context.fetch);
-  const lead = await loadLeadInProject(store, String(params.leadId), projectId);
+  const leadId = params.leadId ? String(params.leadId) : await leadForCustomer(params, context);
+  const lead = await loadLeadInProject(store, leadId, projectId);
   if (!lead) throw new ActionError('NOT_FOUND', 'No such lead in this rikma');
   if (lead.status === 'spam') throw new ActionError('VALIDATION_FAILED', 'This lead was put away as spam or a duplicate');
 
@@ -98,7 +133,13 @@ export const startOffsiteDealConfig: ActionConfig = {
 
   paramSchema: {
     projectId: { type: 'string', required: true, description: 'The rikma' },
-    leadId: { type: 'string', required: true, description: 'The lead the work is for' },
+    leadId: { type: 'string', required: false, description: 'The lead the work is for — or leave it out and give `customer`' },
+    customer: {
+      type: 'object',
+      required: false,
+      description: '{ name?, phone?, email?, organization? } — a customer not yet a lead; every field may be empty'
+    },
+    defaultName: { type: 'string', required: false, description: "The name for a customer who gave none, in the member's language" },
     productId: { type: 'string', required: true, description: 'A product of this rikma' },
     quantity: { type: 'number', required: false, description: 'How many (default 1)' },
     price: { type: 'number', required: false, description: 'Unit price agreed with the customer (default: the product price)' },

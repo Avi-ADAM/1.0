@@ -40,6 +40,7 @@
   import NewLeadForm from '$lib/components/leads/NewLeadForm.svelte';
   import LeadLogForm from '$lib/components/leads/LeadLogForm.svelte';
   import LeadPauseForm from '$lib/components/leads/LeadPauseForm.svelte';
+  import LeadOffsiteForm from '$lib/components/leads/LeadOffsiteForm.svelte';
 
   let { data } = $props();
   const fmtMoney = useFormatMoney();
@@ -57,6 +58,20 @@
       if (!live) return;
       pipeline = r ?? null;
       loaded = true;
+    });
+    return () => {
+      live = false;
+    };
+  });
+
+  // A deal for a customer whose details are not on the site (PLAN_OFFSITE_CLIENT) — the
+  // products it can be for stream in; the button waits for them.
+  let offsiteProducts = $state<Array<{ id: string; name: string; price: number | null }>>([]);
+  $effect(() => {
+    const p = data.offsiteProducts;
+    let live = true;
+    Promise.resolve(p).then((r) => {
+      if (live) offsiteProducts = r ?? [];
     });
     return () => {
       live = false;
@@ -200,10 +215,10 @@
     }
   }
 
-  let sheet = $state<'new' | 'log' | 'pause' | null>(null);
+  let sheet = $state<'new' | 'offsite' | 'log' | 'pause' | null>(null);
   let sheetOpen = $state(false);
   let target = $state<PipelineRow | null>(null);
-  function open(kind: 'new' | 'log' | 'pause', r: PipelineRow | null = null) {
+  function open(kind: 'new' | 'offsite' | 'log' | 'pause', r: PipelineRow | null = null) {
     sheet = kind;
     target = r;
     sheetOpen = true;
@@ -221,6 +236,11 @@
   <button type="button" class="sh-btn sh-btn-primary" onclick={() => open('new')} disabled={!pipeline?.ready}>
     + {$t('shop.leads.new.cta')}
   </button>
+  {#if offsiteProducts.length}
+    <button type="button" class="sh-btn sh-btn-outline" onclick={() => open('offsite')} disabled={!pipeline?.ready}>
+      + {$t('shop.leads.offsite.newCta')}
+    </button>
+  {/if}
 </div>
 
 {#if !loaded}
@@ -403,9 +423,19 @@
   {/if}
 {/if}
 
-<ShopSheet bind:open={sheetOpen} label={sheet === 'new' ? $t('shop.leads.new.title') : sheet === 'pause' ? $t('shop.leads.pause.title') : $t('shop.leads.action.log')}>
+<ShopSheet bind:open={sheetOpen} label={sheet === 'new' ? $t('shop.leads.new.title') : sheet === 'offsite' ? $t('shop.leads.offsite.title') : sheet === 'pause' ? $t('shop.leads.pause.title') : $t('shop.leads.action.log')}>
   {#if sheet === 'new'}
     <NewLeadForm {projectId} onDone={(id) => { sheetOpen = false; goto(`${base}/leads/${id}`); }} />
+  {:else if sheet === 'offsite'}
+    <LeadOffsiteForm
+      {projectId}
+      products={offsiteProducts}
+      onDone={(sheirutId) => {
+        sheetOpen = false;
+        toast.success($t('shop.leads.offsite.started'));
+        goto('/deals/' + sheirutId);
+      }}
+    />
   {:else if sheet === 'log' && target}
     <h2 class="sh-title pl-sheet-title">{$t('shop.leads.log.title', { name: target.name })}</h2>
     <LeadLogForm {projectId} leadId={target.id} onDone={done} />
@@ -425,6 +455,7 @@
   }
   .pl-head {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
     gap: 12px;

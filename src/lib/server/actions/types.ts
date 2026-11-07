@@ -450,8 +450,10 @@ export interface ActionContext {
    * public page (PLAN_LEADS L4: "ask about this product"). Nothing a client
    * sends can set it — `/api/action` builds the context itself — so an
    * action may let it through a rule that otherwise needs a member.
+   * `offsiteDeal`: startOffsiteDeal recording, by hand, a customer who left
+   * no details (PLAN_OFFSITE_CLIENT) — it widens nothing but that one check.
    */
-  intake?: 'publicProduct';
+  intake?: 'publicProduct' | 'offsiteDeal';
 }
 
 /**

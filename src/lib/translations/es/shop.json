@@ -1142,7 +1142,14 @@
       "cta": "Empezar a trabajar sin que se registre",
       "ctaHint": "Cuando el cliente no quiere trabajar a través del sitio — el trabajo, las horas y lo que hiciste quedan aquí.",
       "open": "El trabajo para esa persona",
-      "openHint": "Misiones, horas y avance — en la página del trato."
+      "openHint": "Misiones, horas y avance — en la página del trato.",
+      "newCta": "Trato para un cliente fuera del sitio",
+      "who": "Para quién",
+      "name": "Nombre",
+      "phone": "Teléfono",
+      "email": "Correo",
+      "anonymous": "Cliente",
+      "whoHint": "Todo es opcional — puedes dejarlo vacío. El cliente queda como contacto, para poder escribirle e invitarlo después. Aquí no se registra dinero — eso es una venta, después."
     }
   },
   "customers": {
