@@ -389,3 +389,67 @@ describe('createLead with openTask: false (the demo form, L6)', () => {
     expect(db.leads.get(r.leadId)).toMatchObject({ source: 'demo', status: 'new' });
   });
 });
+
+describe('sendLeadOffer (L4)', () => {
+  beforeEach(async () => {
+    await createLead({ name: 'דנה', phone: '0500000000', consent });
+    await createLead({ name: 'אבי', email: 'avi@example.com', consent });
+    db.activities = [];
+    nested.executeAction.mockClear();
+  });
+
+  it('writes an arranged order with the lead as buyer, links it, and the lead is offered', async () => {
+    const { sendLeadOfferConfig } = await import('./sendLeadOffer.js');
+    nested.executeAction.mockResolvedValueOnce({
+      success: true,
+      data: { orderId: '90', displayNumber: null, orderRef: '57:lead-70-x', total: 300, currency: 'ILS' }
+    });
+    const r = await call(sendLeadOfferConfig, { leadId: '70', lines: [{ productId: '123', quantity: 2, unitPrice: 150 }] });
+    expect(r).toMatchObject({ orderId: '90', status: 'offered' });
+    const [key, params] = nested.executeAction.mock.calls[0];
+    expect(key).toBe('createPaidOrder');
+    expect(params.order).toMatchObject({
+      payment: 'arranged',
+      buyer: { name: 'דנה', phone: '0500000000' },
+      lines: [{ productId: '123', quantity: 2, unitPrice: 150 }]
+    });
+    expect(db.leads.get('70')).toMatchObject({ status: 'offered', orders: ['90'] });
+    expect(db.activities).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ lead: '70', kind: 'linkOrder', body: 'order:90', actor: '5' }),
+        expect.objectContaining({ lead: '70', kind: 'statusChange', fromStatus: 'new', toStatus: 'offered' })
+      ])
+    );
+  });
+
+  it('an offer is arranged by phone — a lead with only an email is told so, and nothing is written', async () => {
+    const { sendLeadOfferConfig } = await import('./sendLeadOffer.js');
+    await expect(call(sendLeadOfferConfig, { leadId: '71', lines: [{ productId: '123', quantity: 1, unitPrice: 10 }] })).rejects.toMatchObject({
+      code: 'NEEDS_PHONE'
+    });
+    expect(nested.executeAction).not.toHaveBeenCalled();
+  });
+
+  it('refuses an offer with no product, and a lead of another rikma', async () => {
+    const { sendLeadOfferConfig } = await import('./sendLeadOffer.js');
+    await expect(call(sendLeadOfferConfig, { leadId: '70', lines: [] })).rejects.toMatchObject({ code: 'VALIDATION_FAILED' });
+    await expect(call(sendLeadOfferConfig, { projectId: '58', leadId: '70', lines: [{ productId: '1', quantity: 1, unitPrice: 1 }] })).rejects.toMatchObject({
+      code: 'NOT_FOUND'
+    });
+  });
+});
+
+describe('createLead: who may file a lead', () => {
+  const intakeRule = () => {
+    const or = (createLeadConfig.authRules as any[]).find((r) => r.type === 'or');
+    return or.config.rules.find((r: any) => r.type === 'custom').config.checkFunction;
+  };
+
+  it('a product page may file a shop lead about a product for a visitor — nothing else may', async () => {
+    const check = intakeRule();
+    expect((await check('', { source: 'shop', productId: '5' }, { intake: 'publicProduct' })).authorized).toBe(true);
+    expect((await check('', { source: 'api', productId: '5' }, { intake: 'publicProduct' })).authorized).toBe(false);
+    expect((await check('', { source: 'shop' }, { intake: 'publicProduct' })).authorized).toBe(false);
+    expect((await check('9', { source: 'shop', productId: '5' }, {})).authorized).toBe(false);
+  });
+});

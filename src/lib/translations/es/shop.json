@@ -1089,6 +1089,26 @@
       "done": "Unida",
       "open": "Ir a la consulta",
       "banner": "Esta consulta se unió a otra — toca para ir allí"
+    },
+    "offer": {
+      "cta": "Enviar una oferta",
+      "ctaHint": "Un pedido que espera un pago acordado, con sus datos — aparece también en pedidos.",
+      "needsPhone": "Una oferta se paga acordando por teléfono — la consulta necesita un teléfono.",
+      "title": "Oferta",
+      "hint": "Los productos, la cantidad y el precio que ofreciste. Sus datos se toman de la consulta. Cuando pague, quien recibió el dinero lo confirma en pedidos.",
+      "line": "Línea {{count}}",
+      "product": "Producto",
+      "pickProduct": "Elegir producto",
+      "variant": "Variante",
+      "pickVariant": "Elegir variante",
+      "quantity": "Cantidad",
+      "unitPrice": "Precio por unidad",
+      "removeLine": "Quitar esta línea",
+      "addLine": "Otro producto",
+      "note": "Una nota en la oferta (opcional)",
+      "total": "Total",
+      "send": "Enviar la oferta",
+      "sent": "Oferta registrada — ya la tiene"
     }
   },
   "customers": {

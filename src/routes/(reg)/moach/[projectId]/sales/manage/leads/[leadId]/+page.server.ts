@@ -1,6 +1,7 @@
 import { error } from '@sveltejs/kit';
 import { loadLeadPage, loadLeadSettings } from '$lib/server/leads/pipelineLoad';
 import { leadKey } from '$lib/leads/display';
+import { loadShopProducts } from '$lib/server/shop/moachShop.js';
 import type { PageServerLoad } from './$types';
 
 /**
@@ -19,5 +20,21 @@ export const load: PageServerLoad = async ({ params, parent, fetch, depends }) =
     error(503, 'LEADS_NOT_READY');
   }
   if (!lead) error(404, 'LEAD_NOT_FOUND');
-  return { lead, leadSettings: await loadLeadSettings(params.projectId, fetch) };
+  return {
+    lead,
+    leadSettings: await loadLeadSettings(params.projectId, fetch),
+    // What an offer can be for (L4) — streamed: the page never waits for it.
+    offerProducts: loadShopProducts(params.projectId, fetch)
+      .then((r) =>
+        (r.products ?? [])
+          .filter((p) => p.status !== 'archived')
+          .map((p) => ({
+            id: p.id,
+            name: p.name,
+            price: p.price,
+            variants: p.variants.map((v) => ({ id: v.id, label: v.label, price: v.price, active: v.active }))
+          }))
+      )
+      .catch(() => [])
+  };
 };

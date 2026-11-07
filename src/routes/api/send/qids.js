@@ -15636,6 +15636,17 @@ ${PROMO_DECISION_FIELDS}
     }
   }`,
 
+  // "Ask about this product" (L4): which rikma a public product belongs to,
+  // and whether it is still on sale. Read by /api/leads/ask only.
+  'leadAskProduct': `query LeadAskProduct($id: ID!) {
+    matanot(id: $id) {
+      data { id attributes {
+        name archived lifecycle
+        projectcreates(pagination: { limit: 1 }) { data { id } }
+      } }
+    }
+  }`,
+
   'moachLeadPage': `query MoachLeadPage($id: ID!) {
     lead(id: $id) {
       data { id attributes {

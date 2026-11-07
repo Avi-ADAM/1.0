@@ -246,7 +246,27 @@
     "quoteBudget": "How much would you pay? (optional)",
     "quoteBudgetPlaceholder": "You can leave this empty",
     "promoUntil": "Sale price until {{date}}",
-    "onSale": "On sale"
+    "onSale": "On sale",
+    "ask": {
+      "cta": "Ask about this product or request an offer",
+      "sub": "No sign-up — leave your details and the rikma gets back to you",
+      "subSignedIn": "A question, a special quantity or a price — the rikma gets back to you",
+      "title": "A question about {{name}}",
+      "name": "Name",
+      "phone": "Phone",
+      "email": "Email",
+      "message": "What would you like to know?",
+      "messagePlaceholder": "e.g. how much for 20 units? Can it arrive by Thursday?",
+      "consent": "I agree that my details go to {{rikma}} through 1lev1 so they can get back to me",
+      "theRikma": "the rikma",
+      "needContact": "A phone or an email is needed to get back to you",
+      "send": "Send",
+      "cancel": "Cancel",
+      "done": "Sent. {{rikma}} will get back to you soon.",
+      "errTooMany": "Too many enquiries from this address — try again in an hour",
+      "errInvalid": "Something in the details is not right — check the phone or email",
+      "errTryAgain": "Sending failed — please try again"
+    }
   },
   "editBasic": {
     "head": "Edit Profile",

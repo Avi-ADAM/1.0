@@ -444,6 +444,14 @@ export interface ActionContext {
    * devices still update. Absent for server-side and API-key callers.
    */
   clientId?: string;
+
+  /**
+   * Set only by a server endpoint that takes in a stranger's request on a
+   * public page (PLAN_LEADS L4: "ask about this product"). Nothing a client
+   * sends can set it — `/api/action` builds the context itself — so an
+   * action may let it through a rule that otherwise needs a member.
+   */
+  intake?: 'publicProduct';
 }
 
 /**

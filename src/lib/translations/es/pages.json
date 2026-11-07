@@ -247,7 +247,27 @@
     "quoteBudget": "¿Cuánto pagarías? (opcional)",
     "quoteBudgetPlaceholder": "Puedes dejarlo vacío",
     "promoUntil": "Precio de promoción hasta {{date}}",
-    "onSale": "En promoción"
+    "onSale": "En promoción",
+    "ask": {
+      "cta": "Preguntar por este producto o pedir una oferta",
+      "sub": "Sin registrarte — deja tus datos y la rikma te responde",
+      "subSignedIn": "Una pregunta, una cantidad especial o un precio — la rikma te responde",
+      "title": "Una pregunta sobre {{name}}",
+      "name": "Nombre",
+      "phone": "Teléfono",
+      "email": "Correo",
+      "message": "¿Qué te gustaría saber?",
+      "messagePlaceholder": "p. ej. ¿cuánto cuestan 20 unidades? ¿Puede llegar el jueves?",
+      "consent": "Acepto que mis datos se envíen a {{rikma}} a través de 1lev1 para que me respondan",
+      "theRikma": "la rikma",
+      "needContact": "Hace falta un teléfono o un correo para responderte",
+      "send": "Enviar",
+      "cancel": "Cancelar",
+      "done": "Enviado. {{rikma}} te responderá pronto.",
+      "errTooMany": "Demasiadas consultas desde esta dirección — inténtalo en una hora",
+      "errInvalid": "Algo en los datos no es correcto — revisa el teléfono o el correo",
+      "errTryAgain": "No se pudo enviar — inténtalo de nuevo"
+    }
   },
   "editBasic": {
     "head": "Editar perfil",

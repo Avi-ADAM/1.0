@@ -1089,6 +1089,26 @@
       "done": "Merged",
       "open": "Open the enquiry",
       "banner": "This enquiry was merged into another one — tap to go there"
+    },
+    "offer": {
+      "cta": "Send an offer",
+      "ctaHint": "An order waiting for an arranged payment, with their details — it shows in the orders too.",
+      "needsPhone": "An offer is paid by arrangement over the phone — the lead needs a phone.",
+      "title": "Offer",
+      "hint": "The products, quantity and price you offered. Their details are filled from the enquiry. When they pay, whoever got the money confirms it in the orders screen.",
+      "line": "Line {{count}}",
+      "product": "Product",
+      "pickProduct": "Pick a product",
+      "variant": "Variant",
+      "pickVariant": "Pick a variant",
+      "quantity": "Quantity",
+      "unitPrice": "Unit price",
+      "removeLine": "Remove this line",
+      "addLine": "Another product",
+      "note": "A note on the offer (optional)",
+      "total": "Total",
+      "send": "Send the offer",
+      "sent": "Offer recorded — it is with them"
     }
   },
   "customers": {

@@ -687,6 +687,7 @@ export const qidsAccess = {
   'moachPipelineLeads': { allow: ['serviceAdmin'] },
   'moachPipelineProposals': { allow: ['serviceAdmin'] },
   'moachLeadPage': { allow: ['serviceAdmin'] },
+  'leadAskProduct': { allow: ['serviceAdmin'] },
   'moachCustomerLeads': { allow: ['serviceAdmin'] },
   'leadMergeSide': { allow: ['serviceAdmin'] },
   'leadContactsForExport': { allow: ['serviceAdmin'] },

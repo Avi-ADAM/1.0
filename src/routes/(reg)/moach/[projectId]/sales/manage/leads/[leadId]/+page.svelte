@@ -23,6 +23,7 @@
   import ShopSheet from '$lib/components/shop/ShopSheet.svelte';
   import LeadLogForm from '$lib/components/leads/LeadLogForm.svelte';
   import LeadPauseForm from '$lib/components/leads/LeadPauseForm.svelte';
+  import LeadOfferForm from '$lib/components/leads/LeadOfferForm.svelte';
 
   let { data } = $props();
   const fmtMoney = useFormatMoney();
@@ -130,6 +131,22 @@
   }
 
   let pauseOpen = $state(false);
+
+  // ── send an offer (L4) — the products arrive streamed ──
+  let offerOpen = $state(false);
+  let offerProducts = $state<
+    Array<{ id: string; name: string; price: number | null; variants: Array<{ id: string; label: string; price: number | null; active: boolean }> }>
+  >([]);
+  $effect(() => {
+    const p = data.offerProducts;
+    let live = true;
+    Promise.resolve(p).then((r) => {
+      if (live) offerProducts = r ?? [];
+    });
+    return () => {
+      live = false;
+    };
+  });
 
   // ── merge (L5): the same person wrote twice ──
   // The other leads come from the layout's streamed pipeline.
@@ -299,6 +316,8 @@
                 {#if a.kind === 'system' && mergeNoteOf(a.body)}
                   {@const note = mergeNoteOf(a.body)}
                   <a class="ld-entry-body" href="{base}/leads/{note?.id}">{$t('shop.leads.merge.open')}</a>
+                {:else if a.kind === 'linkOrder' && a.body?.startsWith('order:')}
+                  <p class="ld-entry-body">{$t('shop.order.number', { number: '' })}<bdi>{a.body.slice('order:'.length)}</bdi></p>
                 {:else if a.body && !(a.kind === 'system' && a.body === CONTACTS_EXPORTED)}
                   <p class="ld-entry-body">{a.body}</p>
                 {/if}
@@ -316,7 +335,13 @@
         {#if stage === 'won'}
           <p class="ld-muted">{$t('shop.leads.page.wonHint')}</p>
         {:else}
-          <a class="sh-btn sh-btn-primary sh-btn-lg ld-wide" href="/moach/{projectId}/sales?lead={lead.id}">{$t('shop.leads.page.reportSale')}</a>
+          {#if offerProducts.length && lead.status !== 'spam'}
+            <button type="button" class="sh-btn sh-btn-primary sh-btn-lg ld-wide" onclick={() => (offerOpen = true)} disabled={!lead.phone}>
+              {$t('shop.leads.offer.cta')}
+            </button>
+            <p class="ld-muted">{lead.phone ? $t('shop.leads.offer.ctaHint') : $t('shop.leads.offer.needsPhone')}</p>
+          {/if}
+          <a class="sh-btn {offerProducts.length ? 'sh-btn-outline' : 'sh-btn-primary sh-btn-lg'} ld-wide" href="/moach/{projectId}/sales?lead={lead.id}">{$t('shop.leads.page.reportSale')}</a>
           <p class="ld-muted">{$t('shop.leads.page.reportSaleHint')}</p>
         {/if}
       </section>
@@ -408,6 +433,20 @@
     </div>
   </div>
 </div>
+
+<ShopSheet bind:open={offerOpen} label={$t('shop.leads.offer.title')}>
+  <LeadOfferForm
+    {projectId}
+    leadId={lead.id}
+    products={offerProducts}
+    preselect={lead.products.map((p) => p.id)}
+    onDone={() => {
+      offerOpen = false;
+      toast.success($t('shop.leads.offer.sent'));
+      refresh();
+    }}
+  />
+</ShopSheet>
 
 <ShopSheet bind:open={pauseOpen} label={$t('shop.leads.pause.title')}>
   <LeadPauseForm {projectId} leadId={lead.id} onDone={() => { pauseOpen = false; refresh(); }} />

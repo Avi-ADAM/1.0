@@ -13,6 +13,7 @@
   import NumberInput from '$lib/celim/ui/numberInput.svelte';
   import MatanotPublicView from '$lib/components/products/MatanotPublicView.svelte';
   import DiscoveryNav from '$lib/components/discovery/DiscoveryNav.svelte';
+  import AskAboutProduct from '$lib/components/leads/AskAboutProduct.svelte';
 
   // Icon imports (using SVG strings inline for performance if icons aren't provided via library)
   // Assuming standard icons or library usage in your project context.
@@ -556,6 +557,17 @@
                   </button>
                 </div>
               </div>
+            {/if}
+
+            <!-- A question or a price for a quantity — a lead of the rikma (PLAN_LEADS L4) -->
+            {#if !data.isMember && data.alld.archived !== true}
+              <AskAboutProduct
+                productId={String(data.mId)}
+                productName={data.alld.name ?? ''}
+                rikmaName={data.personalSeller?.username ?? data.alld.projectcreates?.data?.[0]?.attributes?.projectName ?? ''}
+                lang={$lang || 'he'}
+                signedIn={!!data.tok}
+              />
             {/if}
           </div>
         </div>

@@ -277,8 +277,27 @@ export const createLeadConfig: ActionConfig = {
   authRules: [
     { type: 'jwt', errorMessage: 'You must be logged in to record a lead' },
     {
-      type: 'projectMember',
-      config: { projectIdParam: 'projectId' },
+      type: 'or',
+      config: {
+        rules: [
+          {
+            type: 'projectMember',
+            config: { projectIdParam: 'projectId' },
+            errorMessage: 'Leads belong to the rikma — only its members record them'
+          },
+          // "Ask about this product" on a public page (L4): the server endpoint
+          // marks the context; it is always a shop lead about a named product.
+          {
+            type: 'custom',
+            config: {
+              checkFunction: async (_userId: string, params: Record<string, any>, context: any) => ({
+                authorized: context?.intake === 'publicProduct' && params.source === 'shop' && !!params.productId,
+                reason: 'Only a product page may file a lead for a visitor'
+              })
+            }
+          }
+        ]
+      },
       errorMessage: 'Leads belong to the rikma — only its members record them'
     }
   ],
