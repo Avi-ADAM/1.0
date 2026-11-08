@@ -12,7 +12,6 @@
   import '$lib/styles/shop.css';
   import { useFormatMoney } from '$lib/money/context.svelte';
   import Money from '$lib/components/money/Money.svelte';
-  import New from './newmatana.svelte';
   import { SaleComponent } from '$lib/components/sales';
   import dayjs from 'dayjs';
   import 'dayjs/locale/he.js';
@@ -125,7 +124,9 @@
 
   // ── reporting a sale / a new product — one sheet ──
   let isOpen = $state(false);
-  let a = $state(0); // 0 sale · 1 new product · 3 error
+  let a = $state(0); // 0 sale · 3 error
+  // One way to make a product: the unified form (PLAN_PRODUCT_FORM_UNIFIED).
+  const newProductHref = $derived(`/moach/${$idPr ?? projectId}/sales/new`);
   let kindOf = $state();
   let kindUlimit = $state(false);
   let quant = $state(),
@@ -150,10 +151,6 @@
     maid = undefined;
     isOpen = true;
     a = 0;
-  }
-  function addnew() {
-    isOpen = true;
-    a = 1;
   }
 
   // "Report a sale" from a lead's page (PLAN_LEADS §4.2): `?lead=<id>` opens the
@@ -198,23 +195,6 @@
     backToLead();
     a = 0;
   }
-  function done(event) {
-    isOpen = false;
-    a = 0;
-    bmiData.push(event.matana);
-    bmiData = bmiData;
-    // The quick form sets the basics; variants, the gallery and stock live in the full editor.
-    const id = event.matana?.id;
-    if (id != null) {
-      toast.success($t('project.hamatanot.createdAddVariants'), {
-        action: {
-          label: $t('project.hamatanot.addVariants'),
-          onClick: () => goto(`/moach/${projectId}/sales/manage/products/${id}`)
-        }
-      });
-    }
-  }
-
   /** @type {string | null} */
   let discoveryBusyId = $state(null);
 
@@ -399,11 +379,9 @@
   );
 </script>
 
-<ShopSheet bind:open={isOpen} label={a == 1 ? $t('project.hamatanot.createProduct') : $t('project.hamatanot.reportSale')}>
+<ShopSheet bind:open={isOpen} label={$t('project.hamatanot.reportSale')}>
   <div class="sp-sheet" dir={$isRtl ? 'rtl' : 'ltr'}>
-    {#if a == 1}
-      <New {projectId} onDone={done} />
-    {:else if a == 3}
+    {#if a == 3}
       <div class="sh-empty">
         <strong>{$t('project.hamatanot.error')}</strong>
         <button type="button" class="sh-btn sh-btn-primary" onclick={() => (a = 0)}>{$t('project.hamatanot.tryAgain')}</button>
@@ -414,7 +392,7 @@
         <div class="sh-empty">
           <strong>{$t('shop.sp.noProducts')}</strong>
           <p>{$t('shop.sp.noProductsBody')}</p>
-          <button type="button" class="sh-btn sh-btn-primary" onclick={addnew}>{$t('project.hamatanot.createProduct')}</button>
+          <a class="sh-btn sh-btn-primary" href={newProductHref}>{$t('project.hamatanot.createProduct')}</a>
         </div>
       {:else}
         <fieldset class="sp-pick">
@@ -490,10 +468,13 @@
         {#if projectName}<span class="sp-sub">{projectName}</span>{/if}
         <h1 class="sh-title sp-h1">{$t('shop.page.title')}</h1>
       </div>
+      <div class="sp-head-actions">
+      <a class="sh-btn sh-btn-outline" href={newProductHref}>{$t('project.hamatanot.createProduct')}</a>
       <button type="button" class="sh-btn sh-btn-primary" onclick={reportSale}>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
         {$t('project.hamatanot.reportSale')}
       </button>
+      </div>
     </header>
 
     {@render top?.()}
@@ -737,8 +718,7 @@
       <div class="sp-sec-head">
         <h2 class="sp-h2">{$t('project.hamatanot.ourProducts')}</h2>
         <div class="sp-sec-actions">
-          <button type="button" class="sh-btn sh-btn-outline" onclick={addnew}>{$t('project.hamatanot.createProduct')}</button>
-          <a class="sh-btn sh-btn-quiet" href="/moach/{$idPr}/sales/new">{$t('project.hamatanot.complexProduct')}</a>
+          <a class="sh-btn sh-btn-outline" href={newProductHref}>{$t('project.hamatanot.createProduct')}</a>
         </div>
       </div>
       {#if bmiData.length > 0}
@@ -854,6 +834,12 @@
     display: flex;
     align-items: center;
     gap: 12px;
+  }
+  .sp-head-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: flex-end;
   }
   .sp-head-text {
     display: flex;
