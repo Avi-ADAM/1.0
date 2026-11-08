@@ -5009,6 +5009,7 @@ export type Forum = {
   finiapruvals?: Maybe<FiniapruvalRelationResponseCollection>;
   forum_last_seens?: Maybe<ForumLastSeenRelationResponseCollection>;
   haluka?: Maybe<HalukaEntityResponse>;
+  lead?: Maybe<LeadEntityResponse>;
   maaps?: Maybe<MaapRelationResponseCollection>;
   mashabetahalich?: Maybe<MashabetahalichEntityResponse>;
   matanotpend?: Maybe<MatanotpendEntityResponse>;
@@ -5161,6 +5162,7 @@ export type ForumFiltersInput = {
   forum_last_seens?: InputMaybe<ForumLastSeenFiltersInput>;
   haluka?: InputMaybe<HalukaFiltersInput>;
   id?: InputMaybe<IdFilterInput>;
+  lead?: InputMaybe<LeadFiltersInput>;
   maaps?: InputMaybe<MaapFiltersInput>;
   mashabetahalich?: InputMaybe<MashabetahalichFiltersInput>;
   matanotpend?: InputMaybe<MatanotpendFiltersInput>;
@@ -5194,6 +5196,7 @@ export type ForumInput = {
   finiapruvals?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   forum_last_seens?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   haluka?: InputMaybe<Scalars['ID']['input']>;
+  lead?: InputMaybe<Scalars['ID']['input']>;
   maaps?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   mashabetahalich?: InputMaybe<Scalars['ID']['input']>;
   matanotpend?: InputMaybe<Scalars['ID']['input']>;
@@ -6059,6 +6062,7 @@ export type Lead = {
   estimatedValue?: Maybe<Scalars['Float']['output']>;
   externalId?: Maybe<Scalars['String']['output']>;
   followUpAt?: Maybe<Scalars['DateTime']['output']>;
+  forum?: Maybe<ForumEntityResponse>;
   lang?: Maybe<Scalars['String']['output']>;
   lastActivityAt?: Maybe<Scalars['DateTime']['output']>;
   message?: Maybe<Scalars['String']['output']>;
@@ -6217,6 +6221,7 @@ export type LeadFiltersInput = {
   estimatedValue?: InputMaybe<FloatFilterInput>;
   externalId?: InputMaybe<StringFilterInput>;
   followUpAt?: InputMaybe<DateTimeFilterInput>;
+  forum?: InputMaybe<ForumFiltersInput>;
   id?: InputMaybe<IdFilterInput>;
   lang?: InputMaybe<StringFilterInput>;
   lastActivityAt?: InputMaybe<DateTimeFilterInput>;
@@ -6262,6 +6267,7 @@ export type LeadInput = {
   estimatedValue?: InputMaybe<Scalars['Float']['input']>;
   externalId?: InputMaybe<Scalars['String']['input']>;
   followUpAt?: InputMaybe<Scalars['DateTime']['input']>;
+  forum?: InputMaybe<Scalars['ID']['input']>;
   lang?: InputMaybe<Scalars['String']['input']>;
   lastActivityAt?: InputMaybe<Scalars['DateTime']['input']>;
   message?: InputMaybe<Scalars['String']['input']>;

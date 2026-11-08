@@ -45,6 +45,19 @@ describe('activateBom', () => {
     expect(exec.mock.calls.filter(([q]) => q === '139createMesimabetahalich')).toHaveLength(2);
   });
 
+  it('opens no maap for a resource line whose pmash is still open', async () => {
+    const exec = vi.fn(async () => ({}));
+    await activateBom(exec, {
+      projectId: '51',
+      matanot: { id: '80', attributes: { name: 'x', matanot_recipe_missions: { data: [] }, matanot_recipe_resources: { data: [
+        { id: 'r1', attributes: { mode: 'createNew', pmash: { data: { id: 'q1', attributes: { name: 'a', archived: false } } }, mashabetahalich: { data: null } } },
+        { id: 'r2', attributes: { mode: 'createNew', pmash: { data: { id: 'q2', attributes: { name: 'b', archived: true } } }, mashabetahalich: { data: null } } }
+      ] } } },
+      fallbackSellerId: '1'
+    });
+    expect(exec.mock.calls.map(([q, v]: any) => [q, v.data.pmash])).toEqual([['141createMaap', 'q2']]);
+  });
+
   it('keeps the mission a line already holds, even if its pendm reads open', async () => {
     const { exec, out } = run([line('3', { archived: false }, { mesimabetahalich: { data: { id: '220' } } })]);
     expect((await out).missionIds).toEqual(['220']);

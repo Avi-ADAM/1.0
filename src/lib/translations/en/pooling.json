@@ -7,7 +7,9 @@
     "stepCapacity": "Participants per unit",
     "perUnitHint": "Each participant needs her own, like a flight or a meal.",
     "sharedHint": "One cost for the whole group. The more people join, the less each pays. A guide, for example.",
-    "steppedHint": "Another unit for every {{capacity}} participants, like a bus or a room."
+    "steppedHint": "Another unit for every {{capacity}} participants, like a bus or a room.",
+    "forGroup": "This product will also be offered to a group (a demand pool)",
+    "forGroupHint": "Only if several people will buy it together on one shared departure. Then you can set, for each mission and resource, how its cost is divided between the participants."
   },
   "tag": {
     "perUnit": "per participant",

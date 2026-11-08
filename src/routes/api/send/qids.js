@@ -3168,7 +3168,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                       stepCapacity
                       mode
                       notes
-                      pmash { data { id attributes { name price hm kindOf descrip } } }
+                      pmash { data { id attributes { name price hm kindOf descrip archived } } }
                       mashabetahalich { data { id attributes { name pricePerUnit kindOf descrip } } }
                     }
                   }
@@ -15665,7 +15665,7 @@ ${PROMO_DECISION_FIELDS}
         matanot_recipe_resources {
           data { id attributes {
             mode
-            pmash { data { id attributes { name } } }
+            pmash { data { id attributes { name archived } } }
             mashabetahalich { data { id } }
           } }
         }

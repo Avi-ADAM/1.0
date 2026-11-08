@@ -1,6 +1,6 @@
 # Strapi GraphQL Schema Reference
 > Auto-generated from `src/generated/graphql.ts`
-> Last updated: 2026-11-05
+> Last updated: 2026-11-07
 > Source: `codegen.ts` → `http://localhost:1337/graphql`
 
 This file provides a compact reference of all types available from the Strapi backend.
@@ -511,6 +511,7 @@ These are the main content types in the Strapi backend.
 | `finiapruvals` | `Maybe<FiniapruvalRelationResponseCollection>` |
 | `forum_last_seens` | `Maybe<ForumLastSeenRelationResponseCollection>` |
 | `haluka` | `Maybe<HalukaEntityResponse>` |
+| `lead` | `Maybe<LeadEntityResponse>` |
 | `maaps` | `Maybe<MaapRelationResponseCollection>` |
 | `mashabetahalich` | `Maybe<MashabetahalichEntityResponse>` |
 | `matanotpend` | `Maybe<MatanotpendEntityResponse>` |
@@ -704,6 +705,7 @@ These are the main content types in the Strapi backend.
 | `estimatedValue` | `Maybe<Scalars['Float']['output']>` |
 | `externalId` | `Maybe<Scalars['String']['output']>` |
 | `followUpAt` | `Maybe<Scalars['DateTime']['output']>` |
+| `forum` | `Maybe<ForumEntityResponse>` |
 | `lang` | `Maybe<Scalars['String']['output']>` |
 | `lastActivityAt` | `Maybe<Scalars['DateTime']['output']>` |
 | `message` | `Maybe<Scalars['String']['output']>` |
@@ -5833,6 +5835,7 @@ Used for creating/updating content.
 | `finiapruvals` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `forum_last_seens` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `haluka` | `InputMaybe<Scalars['ID']['input']>` |
+| `lead` | `InputMaybe<Scalars['ID']['input']>` |
 | `maaps` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `mashabetahalich` | `InputMaybe<Scalars['ID']['input']>` |
 | `matanotpend` | `InputMaybe<Scalars['ID']['input']>` |
@@ -6087,6 +6090,7 @@ Used for creating/updating content.
 | `estimatedValue` | `InputMaybe<Scalars['Float']['input']>` |
 | `externalId` | `InputMaybe<Scalars['String']['input']>` |
 | `followUpAt` | `InputMaybe<Scalars['DateTime']['input']>` |
+| `forum` | `InputMaybe<Scalars['ID']['input']>` |
 | `lang` | `InputMaybe<Scalars['String']['input']>` |
 | `lastActivityAt` | `InputMaybe<Scalars['DateTime']['input']>` |
 | `message` | `InputMaybe<Scalars['String']['input']>` |
@@ -8572,7 +8576,7 @@ Fields: `and`, `archived`, `createdAt`, `finnished_mission`, `forum`, `id`, `isT
 Fields: `and`, `createdAt`, `descrip`, `finiapruvals`, `finish`, `hearotMeyuchadot`, `id`, `idYesod`, `isFinished`, `isMust`, `isNotFinished`, `isglobal`, `iskvua`, `locale`, `localizations`, `mesimabetahalich`, `mission`, `missionName`, `month`, `noofhours`, `not`, `or`, `perhour`, `project`, `publishedAt`, `start`, `tafkidims`, `total`, `updatedAt`, `users_permissions_user`, `why`
 
 #### ForumFiltersInput
-Fields: `acts`, `and`, `askm`, `asks`, `askwant`, `createdAt`, `decisions`, `done`, `finiapruvals`, `forum_last_seens`, `haluka`, `id`, `maaps`, `mashabetahalich`, `matanotpend`, `mesimabetahaliches`, `messages`, `not`, `or`, `partofs`, `pendms`, `pgisha`, `pmashes`, `project`, `project_plan_boards`, `publishedAt`, `ratson`, `ratson_proposal`, `sheirutpend`, `sheiruts`, `spec`, `subject`, `updatedAt`
+Fields: `acts`, `and`, `askm`, `asks`, `askwant`, `createdAt`, `decisions`, `done`, `finiapruvals`, `forum_last_seens`, `haluka`, `id`, `lead`, `maaps`, `mashabetahalich`, `matanotpend`, `mesimabetahaliches`, `messages`, `not`, `or`, `partofs`, `pendms`, `pgisha`, `pmashes`, `project`, `project_plan_boards`, `publishedAt`, `ratson`, `ratson_proposal`, `sheirutpend`, `sheiruts`, `spec`, `subject`, `updatedAt`
 
 #### ForumLastSeenFiltersInput
 Fields: `and`, `archived`, `createdAt`, `forum`, `id`, `lastReadAt`, `not`, `or`, `updatedAt`, `users_permissions_user`
@@ -8608,7 +8612,7 @@ Fields: `and`, `clauses`, `createdAt`, `id`, `negotiation`, `not`, `or`, `order`
 Fields: `actor`, `and`, `at`, `body`, `createdAt`, `direction`, `fromStatus`, `id`, `kind`, `lead`, `meetingId`, `not`, `or`, `toStatus`, `updatedAt`
 
 #### LeadFiltersInput
-Fields: `act`, `activities`, `address`, `and`, `anonymizedAt`, `city`, `consentAt`, `consentText`, `createdAt`, `currencyCode`, `customer_user`, `dedupeKey`, `details`, `email`, `estimatedValue`, `externalId`, `followUpAt`, `id`, `lang`, `lastActivityAt`, `message`, `name`, `nextAction`, `not`, `or`, `orders`, `organization`, `owner`, `pausedNote`, `pausedReason`, `phone`, `previousLead`, `products`, `project`, `sales`, `sheirut`, `source`, `sourceKey`, `sourceLabel`, `sourceUrl`, `status`, `updatedAt`, `utm`, `variant`
+Fields: `act`, `activities`, `address`, `and`, `anonymizedAt`, `city`, `consentAt`, `consentText`, `createdAt`, `currencyCode`, `customer_user`, `dedupeKey`, `details`, `email`, `estimatedValue`, `externalId`, `followUpAt`, `forum`, `id`, `lang`, `lastActivityAt`, `message`, `name`, `nextAction`, `not`, `or`, `orders`, `organization`, `owner`, `pausedNote`, `pausedReason`, `phone`, `previousLead`, `products`, `project`, `sales`, `sheirut`, `source`, `sourceKey`, `sourceLabel`, `sourceUrl`, `status`, `updatedAt`, `utm`, `variant`
 
 #### MaagadFiltersInput
 Fields: `and`, `canonical_desc`, `categories`, `chat_forum`, `createdAt`, `frequency`, `id`, `lat`, `lng`, `members`, `name`, `not`, `offers`, `open_mashaabims`, `open_missions`, `or`, `origin`, `pinecone_id`, `process`, `publishedAt`, `radius`, `ratsons`, `scope`, `status_maagad`, `updatedAt`, `vallues`, `viability_hint`
@@ -9627,7 +9631,7 @@ Wrapper types for GraphQL responses.
 ```
 src/
 ├── generated/
-│   ├── graphql.ts              # Auto-generated types (codegen) - 24735 lines
+│   ├── graphql.ts              # Auto-generated types (codegen) - 24741 lines
 │   ├── index.ts                # Re-export hub
 │   └── STRAPI_SCHEMA_REFERENCE.md  # This file (AI agent reference)
 ├── lib/

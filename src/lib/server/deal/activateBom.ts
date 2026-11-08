@@ -115,6 +115,11 @@ export async function activateBom(exec: Exec, input: ActivateBomInput): Promise<
     if (attrs.mode === 'consumeExisting' || attrs.mashabetahalich?.data?.id) continue;
     const pmash = attrs.pmash?.data;
     if (!pmash?.id) continue;
+    // Still being voted on — the rikma has not agreed to this resource yet.
+    if (pmash.attributes?.archived === false) {
+      console.warn(`[activateBom] resource line ${rr.id ?? '?'}: its pmash ${pmash.id} is still open — no maap opened`);
+      continue;
+    }
     try {
       await exec('141createMaap', {
         data: {

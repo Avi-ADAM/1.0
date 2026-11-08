@@ -102,7 +102,9 @@
   }
 
   // ─── complex-only fields ──────────────────────────────────────────────────
-  let marginPct = $state(0);
+  // No margin and no overhead: a product costs what its parts cost
+  // (PLAN_PRODUCT_FORM_UNIFIED). The field stays in the payload, always 0.
+  const marginPct = 0;
   // The currency every price on this form is typed in — the price and each
   // recipe rate alike. The server converts all of them into the rikma's
   // (PLAN_MULTI_CURRENCY C5). A blank form starts in the writer's own; a draft
@@ -114,6 +116,19 @@
   );
   let recipeMissions = $state<RecipeMissionRow[]>([]);
   let recipeResources = $state<RecipeResourceRow[]>([]);
+
+  // "How the cost divides in a group" only means something for a product that
+  // will be offered to a demand pool (maagad). Hidden until the author says so;
+  // switching it off puts every line back to per-participant, so nothing the
+  // author can no longer see is still bending the price curve.
+  let forGroup = $state(false);
+
+  function setForGroup(on: boolean) {
+    forGroup = on;
+    if (on) return;
+    recipeMissions = recipeMissions.map((m) => ({ ...m, costShape: null, stepCapacity: null }));
+    recipeResources = recipeResources.map((r) => ({ ...r, costShape: null, stepCapacity: null }));
+  }
 
   let loading = $state(false);
   let success = $state(false);
@@ -219,7 +234,6 @@
     oneForeProject: $t('offerings.compose.oneForeProject'),
     missions: $t('offerings.compose.missions'),
     resources: $t('offerings.compose.resources'),
-    marginPct: $t('offerings.compose.marginPct'),
     subtotal: $t('offerings.compose.subtotal'),
     estimated: $t('offerings.compose.estimated'),
     total: $t('offerings.compose.total'),
@@ -526,6 +540,18 @@
   {#if isComplex}
     <div class="complex-hint">{ui.complexHint}</div>
 
+    <label class="for-group">
+      <input
+        type="checkbox"
+        checked={forGroup}
+        onchange={(e) => setForGroup(e.currentTarget.checked)}
+      />
+      <span>
+        <strong>{$t('pooling.costShape.forGroup')}</strong>
+        <small>{$t('pooling.costShape.forGroupHint')}</small>
+      </span>
+    </label>
+
     <section class="section">
       <div class="section-head">
         <h3>{ui.missions}</h3>
@@ -538,6 +564,7 @@
         {projectMembers}
         {missionTemplates}
         {multiMember}
+        groupPricing={forGroup}
       />
     </section>
 
@@ -553,22 +580,8 @@
         {projectMembers}
         {resourceTemplates}
         {multiMember}
+        groupPricing={forGroup}
       />
-    </section>
-
-    <section class="section margin-section">
-      <label class="field">
-        <span class="label-block">
-          {ui.marginPct}: <strong>{marginPct.toFixed(1)}%</strong>
-        </span>
-        <input
-          type="range"
-          min="0"
-          max="100"
-          step="0.5"
-          bind:value={marginPct}
-        />
-      </label>
     </section>
 
     <div class="summary">
@@ -735,6 +748,31 @@
     padding: 6px 10px;
     border-radius: 6px;
     font-size: 0.8rem;
+  }
+
+  .for-group {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    cursor: pointer;
+  }
+  .for-group input {
+    margin-top: 3px;
+    accent-color: var(--gold);
+  }
+  .for-group span {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .for-group strong {
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+  .for-group small {
+    font-size: 0.75rem;
+    color: var(--gold-l);
+    opacity: 0.85;
   }
 
   .field {

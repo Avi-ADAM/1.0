@@ -18,6 +18,12 @@
     projectMembers?: ProjectMember[];
     missionTemplates?: MissionTemplate[];
     multiMember?: boolean;
+    /**
+     * The product will also be sold to a group (a demand pool / maagad), so
+     * each line says how its cost divides between participants. Off ⇒ the
+     * picker is not shown at all: outside a group the question means nothing.
+     */
+    groupPricing?: boolean;
     /** The currency the rates are typed in (the composer's picker). */
     currency?: string;
   };
@@ -29,14 +35,15 @@
     projectMembers = [],
     missionTemplates = [],
     multiMember = false,
+    groupPricing = false,
     currency
   }: Props = $props();
 
   const t = $derived(
     $lang === 'he'
       ? {
-          empty: 'אין משימות עדיין. הוסף שורה כדי להתחיל לתמחר.',
-          add: '+ הוסף משימה',
+          empty: 'אין משימות עדיין. כדי להתחיל לתמחר, אפשר להוסיף שורה.',
+          add: '+ הוספת משימה',
           modeExisting: 'משימה קיימת בפרויקט',
           modeNew: 'משימה חדשה',
           pickExisting: 'בחר משימה פעילה',
@@ -341,7 +348,9 @@
         </label>
       </div>
 
-      <CostShapePicker bind:costShape={r.costShape} bind:stepCapacity={r.stepCapacity} />
+      {#if groupPricing}
+        <CostShapePicker bind:costShape={r.costShape} bind:stepCapacity={r.stepCapacity} />
+      {/if}
 
       {#if r.mode === 'createNew'}
         <label class="field">

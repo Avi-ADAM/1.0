@@ -201,6 +201,37 @@ describe('createComplexMatanot — recipe lines', () => {
     expect(varsOf('137createPendmForRecipe')[0]).not.toHaveProperty('archived');
   });
 
+  it('one member: a new resource opens through createResource, linked by a decided pmash', async () => {
+    executeAction.mockReset();
+    executeAction.mockResolvedValueOnce({ success: true, data: { id: '60', createdKind: 'OpenMashaabim', mashabetahalichId: '61', recurring: true } });
+    const { strapi, varsOf } = fakeStrapi({ members: 1 });
+    await handler(
+      { ...base, recipeResources: [{ name: 'שרת', kindOf: 'monthly', pricePerUnit: 100, quantityPerUnit: 1, assignedMemberId: '5', recurring: true }] },
+      context,
+      { strapi }
+    );
+    expect(executeAction).toHaveBeenCalledWith(
+      'createResource',
+      expect.objectContaining({ projectId: '90', name: 'שרת', price: 100, hm: 1, recurring: true, assignedUserId: '5' }),
+      context
+    );
+    expect(varsOf('138createPmashForRecipe')).toEqual([
+      expect.objectContaining({ name: 'שרת', archived: true, open_mashaabim: '60', recurring: true })
+    ]);
+    expect(varsOf('128createMatanotRecipeResource')).toEqual([
+      expect.objectContaining({ pmash: '501', mashabetahalich: '61', mode: 'createNew' })
+    ]);
+  });
+
+  it('one member: if the resource cannot be opened, it falls back to a vote', async () => {
+    executeAction.mockReset();
+    executeAction.mockRejectedValueOnce(new Error('needs an end date'));
+    const { strapi, varsOf } = fakeStrapi({ members: 1 });
+    await handler({ ...base, recipeResources: [{ name: 'חדר', kindOf: 'monthly', pricePerUnit: 50 }] }, context, { strapi });
+    expect(varsOf('138createPmashForRecipe')).toEqual([expect.objectContaining({ name: 'חדר' })]);
+    expect(varsOf('138createPmashForRecipe')[0]).not.toHaveProperty('archived');
+  });
+
   it('a one-off resource is not made recurring', async () => {
     const { strapi, varsOf } = fakeStrapi({ members: 3 });
     await handler(

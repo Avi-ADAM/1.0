@@ -567,8 +567,61 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
         }
       }
 
+      // One member: open it through createResource, as the missions above —
+      // open, or brought by the founder (a recurring one runs at once as a
+      // mashabetahalich). The line links it through a decided Pmash pointing at
+      // the open resource, the shape voteOnPmash leaves. A failure (e.g. a
+      // one-off monthly with no dates) falls back to the vote path below.
+      let soloMashaId: string | null = null;
+      if (!multiMember && !pmashId && !openMashaabimId && resourceMode === 'createNew' && !r.mashabetahalichId) {
+        const resourceName = r.name || `${String(name).trim()} - resource`;
+        const recurs = r.recurring === true && !!enumKindOf && RECURRABLE_KINDOF.has(enumKindOf);
+        try {
+          const created = await runAction('createResource', {
+            projectId,
+            name: resourceName,
+            description: r.notes || '',
+            price: Number(r.pricePerUnit) || 0,
+            easy: Number(r.pricePerUnit) || 0,
+            hm: Number(r.quantityPerUnit) || 1,
+            kindOf: enumKindOf || 'total',
+            entryCurrency: currency,
+            ...(recurs ? { recurring: true, cycleSize: Math.max(1, Math.floor(Number(r.cycleSize) || 1)) } : {}),
+            ...(r.assignedMemberId ? { assignedUserId: String(r.assignedMemberId) } : {})
+          }, context);
+          const out = created?.data?.data ?? created?.data ?? {};
+          const openId = out.id ? String(out.id) : null;
+          if (created?.success !== false && openId && out.createdKind === 'OpenMashaabim') {
+            if (out.mashabetahalichId) soloMashaId = String(out.mashabetahalichId);
+            const anchorRes = await strapi.execute(
+              '138createPmashForRecipe',
+              {
+                name: resourceName,
+                project: projectId,
+                price: toRikma(r.pricePerUnit),
+                easy: toRikma(r.pricePerUnit),
+                hm: Number(r.quantityPerUnit) || 1,
+                kindOf: enumKindOf || 'total',
+                descrip: r.notes || '',
+                ...(recurs ? { recurring: true, cycleSize: Math.max(1, Math.floor(Number(r.cycleSize) || 1)) } : {}),
+                archived: true,
+                open_mashaabim: openId,
+                publishedAt: now
+              },
+              context.jwt,
+              context.fetch
+            );
+            pmashId = anchorRes?.data?.createPmash?.data?.id
+              ? String(anchorRes.data.createPmash.data.id)
+              : null;
+          }
+        } catch (err) {
+          console.warn('[createComplexMatanot] one-member resource not opened, falling back to a vote:', err);
+        }
+      }
+
       // New resource → spawn a Pmash template so the recipe has a link target.
-      if (!pmashId && !openMashaabimId && resourceMode === 'createNew' && !r.mashabetahalichId) {
+      if (!pmashId && !soloMashaId && !openMashaabimId && resourceMode === 'createNew' && !r.mashabetahalichId) {
         try {
           const pmashVars: Record<string, unknown> = {
               name: r.name || `${String(name).trim()} - resource`,
@@ -614,7 +667,8 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
       };
       if (enumKindOf) vars.kindOf = enumKindOf;
       if (pmashId) vars.pmash = pmashId;
-      if (r.mashabetahalichId) vars.mashabetahalich = r.mashabetahalichId;
+      const lineMashaId = r.mashabetahalichId || soloMashaId;
+      if (lineMashaId) vars.mashabetahalich = lineMashaId;
       if (r.assignedMemberId) vars.assignedMember = r.assignedMemberId;
 
       try {

@@ -7,7 +7,9 @@
     "stepCapacity": "Participantes por unidad",
     "perUnitHint": "Cada participante necesita la suya, como un vuelo o una comida.",
     "sharedHint": "Un solo costo para todo el grupo. Cuantas más se suman, menos paga cada una. Por ejemplo, la guía.",
-    "steppedHint": "Una unidad más por cada {{capacity}} participantes, como un autobús o una habitación."
+    "steppedHint": "Una unidad más por cada {{capacity}} participantes, como un autobús o una habitación.",
+    "forGroup": "Este producto también se ofrecerá a un grupo (un grupo de demanda)",
+    "forGroupHint": "Solo si varias personas lo comprarán juntas en una salida compartida. Entonces podrás definir, para cada misión y recurso, cómo se reparte su costo entre las participantes."
   },
   "tag": {
     "perUnit": "por participante",

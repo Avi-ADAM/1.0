@@ -18,6 +18,8 @@
     projectMembers?: ProjectMember[];
     resourceTemplates?: ResourceTemplate[];
     multiMember?: boolean;
+    /** See MissionPickerList: the cost-shape picker shows only for a group product. */
+    groupPricing?: boolean;
     /** The currency the rates are typed in (the composer's picker). */
     currency?: string;
   };
@@ -29,6 +31,7 @@
     projectMembers = [],
     resourceTemplates = [],
     multiMember = false,
+    groupPricing = false,
     currency
   }: Props = $props();
 
@@ -81,7 +84,7 @@
     $lang === 'he'
       ? {
           empty: 'אין משאבים נדרשים. אפשר להשאיר ריק או להוסיף שורה.',
-          add: '+ הוסף משאב',
+          add: '+ הוספת משאב',
           modeExisting: 'משאב בתהליך בפרויקט',
           modeNew: 'משאב חדש',
           pickExisting: 'בחר משאב פעיל',
@@ -370,7 +373,9 @@
         </label>
       </div>
 
-      <CostShapePicker bind:costShape={r.costShape} bind:stepCapacity={r.stepCapacity} />
+      {#if groupPricing}
+        <CostShapePicker bind:costShape={r.costShape} bind:stepCapacity={r.stepCapacity} />
+      {/if}
 
       {#if r.mode === 'createNew'}
         <label class="field">
