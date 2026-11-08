@@ -30,6 +30,25 @@ export interface OffsiteSide {
   lead: { id: string; name: string | null; organization: string | null } | null;
   /** The work on the product's BOM, in the deal page's mission shape. */
   missions: Mission[];
+  /** The deal's price split by its BOM (`offsiteCostOf`); null when the BOM prices nothing. */
+  cost: { missions: number; resources: number } | null;
+}
+
+/**
+ * The agreed price split the way the product's BOM splits it: hours × rate of the
+ * mission lines against quantity × price of the resource lines, in proportion, so the
+ * two rows always add up to what the customer pays (a price above or below the BOM
+ * moves both). A BOM with no prices says nothing — null, and the page keeps its default.
+ */
+export function offsiteCostOf(total: unknown, missionLines: any[], resourceLines: any[]): OffsiteSide['cost'] {
+  const sum = (rows: any[], f: (a: any) => number) =>
+    (rows ?? []).reduce((s, r) => s + (Number.isFinite(f(r?.attributes ?? {})) ? f(r?.attributes ?? {}) : 0), 0);
+  const m = sum(missionLines, (a) => (finite(a.hoursPerUnit) ?? 0) * (finite(a.ratePerHour) ?? 0) * (finite(a.unitsPerProduct) ?? 1));
+  const r = sum(resourceLines, (a) => (finite(a.quantityPerUnit) ?? 0) * (finite(a.pricePerUnit) ?? 0));
+  const price = finite(total) ?? 0;
+  if (m + r <= 0 || price <= 0) return null;
+  const missions = Math.round((price * m) / (m + r) * 100) / 100;
+  return { missions, resources: Math.round((price - missions) * 100) / 100 };
 }
 
 const str = (v: unknown) => (typeof v === 'string' && v.trim() ? v.trim() : null);
@@ -53,8 +72,13 @@ export function offsiteSideOf(res: any, ownRes?: any): OffsiteSide | null {
   const own = ((ownRes?.data?.sheirutFulfillments?.data ?? []) as any[]).map((f) => ({
     attributes: { mesimabetahalich: f?.attributes?.createdMissions }
   }));
-  const lines = (attrs.matanot?.data?.attributes?.matanot_recipe_missions?.data ?? []) as any[];
-  return { lead, missions: missionsFromBom([...own, ...lines]) };
+  const product = attrs.matanot?.data?.attributes ?? {};
+  const lines = (product.matanot_recipe_missions?.data ?? []) as any[];
+  return {
+    lead,
+    missions: missionsFromBom([...own, ...lines]),
+    cost: offsiteCostOf(attrs.total ?? attrs.price, lines, product.matanot_recipe_resources?.data ?? [])
+  };
 }
 
 /** BOM mission lines → missions: one per line that has its mission in progress. */

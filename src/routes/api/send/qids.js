@@ -15709,11 +15709,15 @@ ${PROMO_DECISION_FIELDS}
   'offsiteDealSide': `query OffsiteDealSide($sid: ID!) {
     sheirut(id: $sid) {
       data { id attributes {
+        quant total price
         users_permissions_users(pagination: { limit: 1 }) { data { id } }
         matanot { data { id attributes {
+          matanot_recipe_resources {
+            data { id attributes { quantityPerUnit pricePerUnit } }
+          }
           matanot_recipe_missions {
             data { id attributes {
-              hoursPerUnit
+              hoursPerUnit ratePerHour unitsPerProduct
               mesimabetahalich { data { id attributes {
                 name hoursassinged howmanyhoursalready finnished
                 users_permissions_user { data { id attributes { username } } }

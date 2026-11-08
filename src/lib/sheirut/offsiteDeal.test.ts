@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { missionsFromBom, offsiteDealTerms, offsiteSideOf } from './offsiteDeal';
+import { missionsFromBom, offsiteCostOf, offsiteDealTerms, offsiteSideOf } from './offsiteDeal';
 
 const line = (id: number | null, a: Record<string, unknown> = {}, hoursPerUnit = 0) => ({
   attributes: { hoursPerUnit, mesimabetahalich: { data: id == null ? null : { id, attributes: a } } }
@@ -35,6 +35,23 @@ describe('missionsFromBom', () => {
       { id: '8', name: 'הדפסה', status: 'done', hours: 2, hoursDone: 2, paid: false, sub: undefined },
       { id: '9', name: 'משלוח', status: 'waiting', hours: 1.5, hoursDone: 0, paid: false, sub: undefined }
     ]);
+  });
+});
+
+describe('offsiteCostOf', () => {
+  const m = (h: number, rate: number, units = 1) => ({ attributes: { hoursPerUnit: h, ratePerHour: rate, unitsPerProduct: units } });
+  const r = (q: number, p: number) => ({ attributes: { quantityPerUnit: q, pricePerUnit: p } });
+  it('a BOM of missions only puts the whole price on missions (deal 10: 20h × 100)', () => {
+    expect(offsiteCostOf(2000, [m(20, 100)], [])).toEqual({ missions: 2000, resources: 0 });
+  });
+  it('splits in the BOM proportion and always adds up to the agreed price', () => {
+    expect(offsiteCostOf(3000, [m(10, 100)], [r(2, 500)])).toEqual({ missions: 1500, resources: 1500 });
+    const c = offsiteCostOf(1000, [m(1, 100)], [r(1, 200)])!;
+    expect(c.missions + c.resources).toBe(1000);
+  });
+  it('a BOM with no prices, or a deal at 0, says nothing', () => {
+    expect(offsiteCostOf(2000, [m(20, 0)], [])).toBeNull();
+    expect(offsiteCostOf(0, [m(20, 100)], [])).toBeNull();
   });
 });
 

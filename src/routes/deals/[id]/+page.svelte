@@ -46,7 +46,7 @@
           missions: due.lines.filter((l) => l.kind === 'mission').reduce((s, l) => s + l.due, 0),
           resources: due.lines.filter((l) => l.kind === 'resource').reduce((s, l) => s + l.due, 0)
         }
-      : (deal?.costBreakdown ?? { missions: 0, resources: 0 })
+      : (offsite?.cost ?? deal?.costBreakdown ?? { missions: 0, resources: 0 })
   );
 
   // "Next payment" opens the lev purchase card's own flow (CustomerPayment) — on a copy
@@ -407,9 +407,13 @@
           </div>
         {/if}
 
-        <div class="anim anim-d3">
-          <ResourcePanel resources={deal.resourceList} />
-        </div>
+        <!-- The product as a "resource" is how a plain deal reads; an off-site deal whose BOM
+             is all missions has no resource to show (PLAN_OFFSITE_CLIENT). -->
+        {#if !(offsite?.cost && offsite.cost.resources === 0)}
+          <div class="anim anim-d3">
+            <ResourcePanel resources={deal.resourceList} />
+          </div>
+        {/if}
 
         <div class="anim anim-d4">
           <ForumPanel bind:this={forumPanel} messages={deal.messages} onSend={sendMessage} />
