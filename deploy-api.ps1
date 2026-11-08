@@ -14,7 +14,7 @@
     Auth (private GHCR package): 'docker login ghcr.io' with a PAT that has
     write:packages here on the dev box, and read:packages once on the server.
 
-    Defaults target the existing VPS (ubuntu@18.159.130.31, key ~/Downloads/sail.pem,
+    Defaults target the existing VPS (ubuntu@91.90.82.93, key ~/.ssh/lev1-vps2,
     remote dir /home/ubuntu/api) — the same box that runs Strapi + socket-server.
     Build stays LOCAL: the VPS has 1.9 GB RAM / no swap and would OOM a vite build.
 
@@ -35,9 +35,9 @@
     .\deploy-api.ps1 -Tarball
 #>
 param(
-    [string]$Server = $(if ($env:DEPLOY_SERVER) { $env:DEPLOY_SERVER } else { "18.159.130.31" }),
+    [string]$Server = $(if ($env:DEPLOY_SERVER) { $env:DEPLOY_SERVER } else { "91.90.82.93" }),
     [string]$User = $(if ($env:DEPLOY_USER) { $env:DEPLOY_USER } else { "ubuntu" }),
-    [string]$SshKey = "$env:USERPROFILE\Downloads\sail.pem",   # private key for the VPS
+    [string]$SshKey = "$env:USERPROFILE\.ssh\lev1-vps2",   # private key for the VPS
     [string]$RemoteDir = "/home/ubuntu/api",       # ubuntu-owned; /opt needs root
     [string]$Registry = "ghcr.io",                 # container registry host
     [string]$Owner = "avi-adam",                   # GHCR namespace (must be lowercase)

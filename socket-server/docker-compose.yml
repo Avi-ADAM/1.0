@@ -6,7 +6,9 @@ services:
     container_name: unified-action-socket-server
     restart: unless-stopped
     ports:
-      - "3001:3001"
+      # loopback only — nginx reaches it over app_app-network; a public 3001
+      # skips nginx + TLS, and Docker's iptables rules bypass ufw.
+      - "127.0.0.1:3001:3001"
     environment:
       - PORT=3001
       - CLIENT_URL=${CLIENT_URL:-http://localhost:5173}

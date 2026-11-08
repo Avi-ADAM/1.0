@@ -19,7 +19,7 @@
     and the socket server has to go out BEFORE the app relies on it
     (docs/inprogress/PLAN_REALTIME_MIGRATION.md §3.3 — 'rt:changed').
 
-    Layout on the VPS (ubuntu@18.159.130.31):
+    Layout on the VPS (ubuntu@91.90.82.93):
       /home/ubuntu/socket/1.0/socket-server  legacy git clone the container was
                                              built from until now. Never touched
                                              here: its .env is copied ONCE, on the
@@ -45,9 +45,9 @@
     .\deploy-socket.ps1 -Logs        # deploy, then tail the container logs
 #>
 param(
-    [string]$Server = $(if ($env:DEPLOY_SERVER) { $env:DEPLOY_SERVER } else { "18.159.130.31" }),
+    [string]$Server = $(if ($env:DEPLOY_SERVER) { $env:DEPLOY_SERVER } else { "91.90.82.93" }),
     [string]$User = $(if ($env:DEPLOY_USER) { $env:DEPLOY_USER } else { "ubuntu" }),
-    [string]$SshKey = "$env:USERPROFILE\Downloads\sail.pem",
+    [string]$SshKey = "$env:USERPROFILE\.ssh\lev1-vps2",
     [string]$DeployDir = "/home/ubuntu/socket/deploy",
     [string]$LegacyDir = "/home/ubuntu/socket/1.0/socket-server",   # source of the .env on first deploy
     [string]$Project = "socket-server",                             # compose project of the running container
