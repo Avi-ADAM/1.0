@@ -3152,7 +3152,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                       stepCapacity
                       mode
                       notes
-                      pendm { data { id attributes { name descrip noofhours perhour rishon { data { id } } mission { data { id } } } } }
+                      pendm { data { id attributes { name descrip noofhours perhour archived rishon { data { id } } mission { data { id } } } } }
                       mesimabetahalich { data { id attributes { name howmanyhoursalready hoursassinged } } }
                     }
                   }
@@ -15658,7 +15658,7 @@ ${PROMO_DECISION_FIELDS}
         matanot_recipe_missions {
           data { id attributes {
             hoursPerUnit ratePerHour mode notes
-            pendm { data { id attributes { name descrip rishon { data { id } } mission { data { id } } } } }
+            pendm { data { id attributes { name descrip archived rishon { data { id } } mission { data { id } } } } }
             mesimabetahalich { data { id } }
           } }
         }

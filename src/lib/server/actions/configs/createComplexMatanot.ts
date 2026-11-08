@@ -20,9 +20,11 @@
  * A recipe line either proposes something new (a Pendm / Pmash, voted on with
  * the product) or links to what the rikma already has: `mesimabetahalichId` /
  * `mashabetahalichId` (in progress), or `openMissionId` / `openMashaabimId`
- * (open). The caller creates those through createMission / createResource
- * first — the rikma import does, in a one-member rikma — so this action never
- * decides for the rikma what a vote would have.
+ * (open). The caller may create those through createMission / createResource
+ * first — the rikma import does, in a one-member rikma. A new mission line in a
+ * one-member rikma that arrives without one (the product composer) is opened
+ * here through createMission, so the founder never gets a vote only they could
+ * answer; a multi-member rikma's new lines are always proposals.
  */
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
@@ -30,6 +32,12 @@ import { ENTRY_CURRENCY_PARAM, entryFields, normalizeEntry } from '$lib/server/m
 import { roundTo } from '$lib/money/currencies.js';
 import { scope, scopeList } from '$lib/realtime/scopes.js';
 import { storedCostShape } from '$lib/pooling/priceCurve';
+
+// Lazy: the action registry imports this config, so a static import would cycle.
+const runAction = async (key: string, params: Record<string, unknown>, context: any) => {
+  const { actionService } = await import('$lib/server/actions/index.js');
+  return actionService.executeAction(key, params, context);
+};
 
 type RecipeMissionInput = {
   pendmId?: string | null;
@@ -405,8 +413,60 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
         }
       }
 
+      // A one-member rikma has nobody to vote with: the product is active at once
+      // (statusOfVoting above), so its new mission is too — opened through
+      // createMission exactly as the standalone form would (in progress for the
+      // founder when they took it, open otherwise). The line keeps a decided
+      // Pendm as its name record, in the shape voteOnPendm leaves on consensus.
+      // A failure falls through to the vote path below, which loses nothing.
+      let soloMesimaId: string | null = null;
+      if (!multiMember && !pendmId && !openMissionId && missionMode === 'createNew' && !m.mesimabetahalichId) {
+        const missionName = m.name || `${String(name).trim()} - mission`;
+        const hours = (Number(m.hoursPerUnit) || 0) * (Number(m.unitsPerProduct) || 1);
+        try {
+          const created = await runAction('createMission', {
+            projectId,
+            missionName,
+            descrip: m.notes || '',
+            nhours: hours,
+            valph: Number(m.ratePerHour) || 0,
+            entryCurrency: currency,
+            iskvua: m.iskvua === true,
+            ...(m.assignedMemberId ? { assignedUserId: String(m.assignedMemberId) } : {}),
+            ...(processId ? { processId } : {})
+          }, context);
+          const out = created?.data?.data ?? created?.data ?? {};
+          const createdId = out.createdEntityId ? String(out.createdEntityId) : null;
+          if (created?.success !== false && createdId) {
+            if (out.createdEntityType === 'mesimabetahalich') soloMesimaId = createdId;
+            const anchorRes = await strapi.execute(
+              '137createPendmForRecipe',
+              {
+                name: missionName,
+                project: projectId,
+                perhour: toRikma(m.ratePerHour),
+                noofhours: hours,
+                descrip: m.notes || '',
+                iskvua: m.iskvua === true,
+                ...(m.assignedMemberId ? { rishon: m.assignedMemberId } : {}),
+                archived: true,
+                ...(out.createdEntityType === 'openMission' ? { open_mission: createdId } : {}),
+                publishedAt: now
+              },
+              context.jwt,
+              context.fetch
+            );
+            pendmId = anchorRes?.data?.createPendm?.data?.id
+              ? String(anchorRes.data.createPendm.data.id)
+              : null;
+          }
+        } catch (err) {
+          console.warn('[createComplexMatanot] one-member mission not opened, falling back to a vote:', err);
+        }
+      }
+
       // New mission → spawn a global Pendm so the recipe has something to link to.
-      if (!pendmId && !openMissionId && missionMode === 'createNew' && !m.mesimabetahalichId) {
+      if (!pendmId && !soloMesimaId && !openMissionId && missionMode === 'createNew' && !m.mesimabetahalichId) {
         try {
           const pendmVars: Record<string, unknown> = {
               name: m.name || `${String(name).trim()} - mission`,
@@ -443,7 +503,8 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
         publishedAt: now
       };
       if (pendmId) vars.pendm = pendmId;
-      if (m.mesimabetahalichId) vars.mesimabetahalich = m.mesimabetahalichId;
+      const lineMesimaId = m.mesimabetahalichId || soloMesimaId;
+      if (lineMesimaId) vars.mesimabetahalich = lineMesimaId;
       if (m.assignedMemberId) vars.assignedMember = m.assignedMemberId;
       if (processId) vars.partof = processId;
 

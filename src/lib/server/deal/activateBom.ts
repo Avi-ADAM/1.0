@@ -10,6 +10,8 @@
  *   reminder act, unless `remindExisting: false`);
  * - a line without one opens a mission in progress for whoever committed to it
  *   (`pendm.rishon`), or for `fallbackSellerId`, plus a reminder act;
+ * - a line whose `pendm` is still an open vote is skipped — the rikma has not
+ *   agreed to that work yet;
  * - `consumeExisting` lines are left to their own flow (M5.5);
  * - a resource line with a `pmash` and no `mashabetahalich` opens a maap.
  *
@@ -51,6 +53,16 @@ export async function activateBom(exec: Exec, input: ActivateBomInput): Promise<
         ? String(fallbackSellerId)
         : null;
     const lineName = pendm?.attributes?.name || attrs.notes || '';
+
+    // The line's mission is still being voted on: the rikma has not agreed to
+    // this work (nor to whom it goes), so a deal must not put it in progress
+    // under the proposer's name — that is how a running timer and an open vote
+    // for the same mission came to stand side by side. It opens when the vote
+    // matures. `archived` null is legacy (decided) and proceeds as before.
+    if (!mesimaId && pendm?.id && pendm?.attributes?.archived === false) {
+      console.warn(`[activateBom] line ${rm.id ?? '?'}: its pendm ${pendm.id} is still open — no mission opened`);
+      continue;
+    }
 
     if (!mesimaId && attrs.mode !== 'consumeExisting') {
       try {

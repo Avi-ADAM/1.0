@@ -21,6 +21,9 @@ vi.mock('$lib/server/money/normalizeEntry.js', () => ({
   })
 }));
 
+const { executeAction } = vi.hoisted(() => ({ executeAction: vi.fn() }));
+vi.mock('$lib/server/actions/index.js', () => ({ actionService: { executeAction } }));
+
 import { createComplexMatanotConfig } from './createComplexMatanot.js';
 
 const handler = createComplexMatanotConfig.graphqlOperation as (
@@ -146,6 +149,56 @@ describe('createComplexMatanot — recipe lines', () => {
       expect.objectContaining({ name: 'שכירות', kindOf: 'monthly', price: 6000, recurring: true, cycleSize: 1, isSelfProposal: true, selfProposalUser: '5' })
     ]);
     expect(varsOf('138createPmashForRecipe')[0]).not.toHaveProperty('archived');
+  });
+
+  // A one-member rikma: the product is active at once, so its new mission must
+  // not wait on a vote nobody else can answer (a running timer beside an open
+  // pendm for the same work).
+  it('one member: a new mission taken by the founder opens in progress, no vote', async () => {
+    executeAction.mockReset();
+    executeAction.mockResolvedValueOnce({ success: true, data: { createdEntityId: '220', createdEntityType: 'mesimabetahalich' } });
+    const { strapi, varsOf } = fakeStrapi({ members: 1 });
+    const out = await handler(
+      {
+        ...base,
+        recipeMissions: [{ name: 'בניית אתר', mode: 'createNew', hoursPerUnit: 20, ratePerHour: 100, assignedMemberId: '5', notes: 'd' }]
+      },
+      context,
+      { strapi }
+    );
+    expect(out.statusOfVoting).toBe('active');
+    expect(executeAction).toHaveBeenCalledWith(
+      'createMission',
+      expect.objectContaining({ projectId: '90', missionName: 'בניית אתר', nhours: 20, valph: 100, assignedUserId: '5', processId: '1' }),
+      context
+    );
+    expect(varsOf('137createPendmForRecipe')).toEqual([
+      expect.objectContaining({ name: 'בניית אתר', rishon: '5', archived: true, perhour: 100, noofhours: 20 })
+    ]);
+    expect(varsOf('125createMatanotRecipeMission')).toEqual([
+      expect.objectContaining({ mesimabetahalich: '220', pendm: '501', mode: 'createNew', assignedMember: '5' })
+    ]);
+  });
+
+  it('one member: an unassigned new mission opens as an open mission', async () => {
+    executeAction.mockReset();
+    executeAction.mockResolvedValueOnce({ success: true, data: { createdEntityId: '40', createdEntityType: 'openMission' } });
+    const { strapi, varsOf } = fakeStrapi({ members: 1 });
+    await handler({ ...base, recipeMissions: [{ name: 'צילום', mode: 'createNew', hoursPerUnit: 2, ratePerHour: 50 }] }, context, { strapi });
+    expect(executeAction.mock.calls[0][1]).not.toHaveProperty('assignedUserId');
+    expect(varsOf('137createPendmForRecipe')).toEqual([
+      expect.objectContaining({ name: 'צילום', archived: true, open_mission: '40' })
+    ]);
+    expect(varsOf('125createMatanotRecipeMission')[0]).not.toHaveProperty('mesimabetahalich');
+  });
+
+  it('one member: if the mission cannot be opened, the line falls back to a vote', async () => {
+    executeAction.mockReset();
+    executeAction.mockRejectedValueOnce(new Error('boom'));
+    const { strapi, varsOf } = fakeStrapi({ members: 1 });
+    await handler({ ...base, recipeMissions: [{ name: 'x', mode: 'createNew', hoursPerUnit: 1, ratePerHour: 1, assignedMemberId: '5' }] }, context, { strapi });
+    expect(varsOf('137createPendmForRecipe')).toEqual([expect.objectContaining({ name: 'x', rishon: '5' })]);
+    expect(varsOf('137createPendmForRecipe')[0]).not.toHaveProperty('archived');
   });
 
   it('a one-off resource is not made recurring', async () => {
