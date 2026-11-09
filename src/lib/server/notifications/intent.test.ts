@@ -174,6 +174,24 @@ describe('NotificationOrchestrator — the actor is never notified outside the s
     expect(sent.push).toEqual([]);
   });
 
+  it("a shop key's owner is not its actor: a rikma of one hears about its own shop's order", async () => {
+    const { orch, sent } = setup();
+    const viaKey = { ...context, via: 'apiKey' } as ActionContext;
+    await orch.notify(config({ intent: 'outcome' }), { userIds: ['1'] }, {}, viaKey);
+    expect(sent.socket).toEqual([['1']]);
+    expect(sent.push).toEqual([['1']]);
+  });
+
+  it('a shop key\'s owner with no app and no bot gets the order by email', async () => {
+    const { orch, sent } = setup();
+    vi.spyOn(orch as any, 'getUserProfile').mockImplementation(async (id: any) =>
+      id === '1' ? { id: '1', username: 'owner', email: 'o@x', lang: 'he', telegramId: '', machshirs: [] } : null
+    );
+    const viaKey = { ...context, via: 'apiKey' } as ActionContext;
+    await orch.notify(config({ intent: 'outcome' }), { userIds: ['1'] }, {}, viaKey);
+    expect(sent.email).toEqual([['1']]);
+  });
+
   it('an outcome reaches a member with no app and no bot by email', async () => {
     const { orch, sent } = setup();
     vi.spyOn(orch as any, 'getUserProfile').mockImplementation(async (id: any) =>

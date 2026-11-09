@@ -152,6 +152,8 @@ describe('POST /orders', () => {
     expect(params.projectId).toBe('57');
     expect(params.order.externalId).toBe('pi_1');
     expect(ctx.userId).toBe('9');
+    // Her shop did it, not she — so she is told about it off the site too.
+    expect(ctx.via).toBe('apiKey');
   });
 
   it('answers a retry of the same charge with 200 duplicated', async () => {
