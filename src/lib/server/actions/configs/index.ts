@@ -192,6 +192,15 @@ import { addAskChatEntryConfig } from './addAskChatEntry.js';
 import { createSaleConfig } from './createSale.js';
 import { createPaidOrderConfig } from './createPaidOrder.js';
 import { createLeadConfig } from './createLead.js';
+import {
+  saveEventConfig,
+  proposeEventConfig,
+  registerForEventConfig,
+  cancelEventRegistrationConfig,
+  joinEventSessionConfig,
+  linkEventSignupConfig,
+  notifyEventRegistrationsConfig
+} from './events.js';
 import { logLeadActivityConfig } from './logLeadActivity.js';
 import { updateLeadStatusConfig } from './updateLeadStatus.js';
 import { updateLeadPlanConfig } from './updateLeadPlan.js';
@@ -552,6 +561,14 @@ export function registerAllActions(): void {
   registerAction(createPaidOrderConfig);
   // Leads — the first stage of a sale (PLAN_LEADS L1)
   registerAction(createLeadConfig);
+  // Rikma events — webinars, workshops (PLAN_EVENTS_WEBINARS W2)
+  registerAction(saveEventConfig);
+  registerAction(proposeEventConfig);
+  registerAction(registerForEventConfig);
+  registerAction(cancelEventRegistrationConfig);
+  registerAction(joinEventSessionConfig);
+  registerAction(linkEventSignupConfig);
+  registerAction(notifyEventRegistrationsConfig);
   registerAction(logLeadActivityConfig);
   registerAction(updateLeadStatusConfig);
   registerAction(updateLeadPlanConfig);

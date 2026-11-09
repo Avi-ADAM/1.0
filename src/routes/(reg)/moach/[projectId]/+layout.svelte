@@ -191,7 +191,9 @@
     // incoming-wishes badge) unchanged.
     // 'resources' sits next to 'open' on purpose: one is what the rikma is
     // still looking for, the other is what it already holds and until when.
-    { id: 'opps', label: 'opps', tabs: ['wishes', 'open', 'resources', 'demand'] },
+    // 'events' = webinars and open meetings the rikma runs to meet the people it
+    // is looking for (PLAN_EVENTS_WEBINARS) — the same outward reach as 'demand'.
+    { id: 'opps', label: 'opps', tabs: ['wishes', 'open', 'resources', 'demand', 'events'] },
     { id: 'votes', label: 'votes', tabs: ['votes', 'archive'] }
   ];
 

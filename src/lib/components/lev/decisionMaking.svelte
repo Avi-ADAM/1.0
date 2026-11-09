@@ -152,6 +152,11 @@
             decisionLook = result.data.look ?? null;
             decisionPreviewHref = result.data.previewHref ?? '';
           }
+          // PLAN_EVENTS_WEBINARS: an event page about to go public.
+          if (kind === 'event') {
+            openmissionName = $t('lev.list.decision.event');
+            decisionPreviewHref = result.data.previewHref ?? '';
+          }
         }
       } catch (e) {
         console.warn('getDecisionDetails failed:', e);

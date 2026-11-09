@@ -35,7 +35,9 @@ export type SurfaceKey =
     | 'resourceDetail'
     | 'projectDirectory'
     | 'projectDetail'
-    | 'productDirectory';
+    | 'productDirectory'
+    // A rikma event's landing page (PLAN_EVENTS_WEBINARS W4).
+    | 'eventPage';
 
 /** Every key, for `--status` and for validating what an operator typed. */
 export const SURFACE_KEYS: SurfaceKey[] = [
@@ -45,7 +47,8 @@ export const SURFACE_KEYS: SurfaceKey[] = [
     'resourceDetail',
     'projectDirectory',
     'projectDetail',
-    'productDirectory'
+    'productDirectory',
+    'eventPage'
 ];
 
 function num(raw: string | undefined, fallback: number): number {

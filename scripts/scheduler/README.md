@@ -12,6 +12,7 @@ until this existed both ran only when somebody remembered to call them:
 | `shifts` | `GET /api/cron/shifts` | every hour | materializes shifts, opens declaration cycles, publishes drafts, closes rosters — answers `skipped` while `SHIFTS=off` |
 | `promotions` | `GET /api/cron/promotions` | every 15 minutes | starts scheduled promotions, ends them on time or cap, lifts a 24h pause |
 | `availability` | `GET /api/cron/availability` | every 5 minutes | switches off meeting availability past its `availableUntil` (1h by default, up to 20h) and tells the member |
+| `events` | `GET /api/cron/events` | every 5 minutes | rikma events: reminders (tomorrow, in an hour, we've started), thanks / you-missed-it after (marks no-shows), moved and cancelled dates, waiting list → seat, new date → who asked. Needs `CRON_SECRET` (fails closed) |
 | `orders` | `GET /api/cron/orders` | every hour | cancels arranged-payment orders still `pendingPayment` past their `expiresAt` |
 | `assistant-cleanup` | `GET /api/cron/assistant-cleanup` | daily at 06:00 | deletes agent-prepared signups nobody claimed within 14 days |
 
@@ -116,6 +117,7 @@ Environment variables win over the `.env` file; the `.env` file is found at
 | `SCHEDULER_SHIFTS_MINUTES` | `60` | shift-engine interval |
 | `SCHEDULER_PROMOTIONS_MINUTES` | `15` | promotion-clock interval |
 | `SCHEDULER_AVAILABILITY_MINUTES` | `5` | availability auto-off interval |
+| `SCHEDULER_EVENTS_MINUTES` | `5` | events reminder clock interval |
 | `SCHEDULER_ORDERS_MINUTES` | `60` | order-expiry interval |
 | `SCHEDULER_ASSISTANT_CLEANUP_HOUR` | `6` | earliest the signup cleanup may run |
 | `SCHEDULER_FAILURE_BACKOFF_MINUTES` | `15` | how long a failed job waits before it is tried again |

@@ -2,6 +2,7 @@ import { redirect, fail } from '@sveltejs/kit';
 import { importInvitedMeeting } from '$lib/server/importInvitedMeeting.js';
 
 import { signupCookieOptions } from '$lib/server/signupCookies.js';
+import { EVENT_SIGNUP_COOKIE } from '$lib/server/events/signupCookie.js';
 
 export async function load({ cookies, url }) {
   const opts = signupCookieOptions(url);
@@ -146,6 +147,24 @@ export const actions = {
           console.error('[signup] invited-meeting import failed:', err);
         }
         cookies.delete('invite_token', { path: '/' });
+      }
+
+      // Opened from a rikma event's "next step" (PLAN_EVENTS_WEBINARS W4): tell
+      // the registration and its lead who this person is now. Best-effort.
+      const eventToken = cookies.get(EVENT_SIGNUP_COOKIE);
+      if (eventToken && user?.id) {
+        try {
+          const { actionService } = await import('$lib/server/actions/index.js');
+          const { adminToken } = await import('$lib/server/adminToken.js');
+          await actionService.executeAction(
+            'linkEventSignup',
+            { token: eventToken, userId: String(user.id) },
+            { userId: '', jwt: adminToken(), lang: 'he', fetch }
+          );
+        } catch (err) {
+          console.error('[signup] event registration link failed:', err);
+        }
+        cookies.delete(EVENT_SIGNUP_COOKIE, { path: '/' });
       }
 
       throw redirect(303, '/signup/check-email');

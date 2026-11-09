@@ -28,6 +28,7 @@ import { signStipend } from '$lib/server/stipend/vote.js';
 import { signPromoDecision } from '$lib/server/promotions/decision';
 import { applyIdentityDecision } from '$lib/server/rikmaIdentity/identity.js';
 import { decisionToAmend, amendToStrapiWrite, type Amend } from '$lib/consent/specs/projectAmend';
+import { applyEventDecision } from '$lib/server/events/publish';
 import { calcDeadlineMs } from './actionUtils.js';
 import {
   fetchSaleClaim,
@@ -503,6 +504,17 @@ const voteOnDecisionHandler: ActionExecutionHandler = async (params, context, { 
         amend = res.amend;
       } catch (e) {
         console.error('[voteOnDecision:identity] approved but not applied:', { decisionId, kind, error: e });
+      }
+    } else if (kind === 'event') {
+      // PLAN_EVENTS_WEBINARS — the same applier the restime-silence path uses.
+      try {
+        await applyEventDecision(
+          (qid, vars) => strapi.execute(qid, vars, undefined, context.fetch),
+          String(decisionId),
+          String(projectId),
+        );
+      } catch (e) {
+        console.error('[voteOnDecision:event] approved but not published:', { decisionId, error: e });
       }
     } else {
       let currentValueIds: string[] | undefined;

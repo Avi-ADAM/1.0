@@ -240,6 +240,21 @@ const JOBS = [
     }
   },
   {
+    name: 'events',
+    description: 'rikma events — reminders, "we started", after mails, moved/cancelled dates, waiting list',
+    // PLAN_EVENTS_WEBINARS §5.2 (W3). "We've started" has a 20-minute window
+    // and "in an hour" 65 minutes, so this runs every 5. Idempotent: each mail
+    // is claimed on its registration before it is sent.
+    path: CRON_SECRET ? `/api/cron/events?key=${encodeURIComponent(CRON_SECRET)}` : '/api/cron/events',
+    timeoutMs: num('SCHEDULER_EVENTS_TIMEOUT_SECONDS', 120) * 1000,
+    due(now, state) {
+      const every = num('SCHEDULER_EVENTS_MINUTES', 5) * 60 * 1000;
+      if (!state.lastSuccess) return 'never run on this box';
+      const since = now.getTime() - Date.parse(state.lastSuccess);
+      return since >= every ? `${Math.round(since / 60000)}m since the last run` : null;
+    }
+  },
+  {
     name: 'orders',
     description: 'arranged-payment orders — cancel the ones past expiresAt',
     // PLAN_SHOP_OPERATIONS. A `pendingPayment` order past its `expiresAt` is

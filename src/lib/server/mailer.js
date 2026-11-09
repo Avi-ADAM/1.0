@@ -64,10 +64,13 @@ export function safeDisplayName(value) {
  * mail to its buyer); the address — and so SPF/DKIM — stays ours. `replyTo`
  * is where an answer goes.
  *
- * @param {{ to: string, subject?: string, html?: string, text?: string, fromName?: string, replyTo?: string }} options
+ * `attachments` is passed to nodemailer as is — e.g. an event's `.ics`
+ * (`{ filename, content, contentType }`).
+ *
+ * @param {{ to: string, subject?: string, html?: string, text?: string, fromName?: string, replyTo?: string, attachments?: Array<{ filename: string, content: string, contentType?: string }> }} options
  * @returns {Promise<{ ok: boolean, error?: unknown }>}
  */
-export async function sendMailSafe({ to, subject, html, text, fromName, replyTo }) {
+export async function sendMailSafe({ to, subject, html, text, fromName, replyTo, attachments }) {
   if (!to) return { ok: false, error: 'missing recipient' };
   try {
     const name = safeDisplayName(fromName);
@@ -77,7 +80,8 @@ export async function sendMailSafe({ to, subject, html, text, fromName, replyTo 
       subject,
       html,
       text,
-      ...(replyTo ? { replyTo } : {})
+      ...(replyTo ? { replyTo } : {}),
+      ...(attachments?.length ? { attachments } : {})
     });
     return { ok: true };
   } catch (error) {

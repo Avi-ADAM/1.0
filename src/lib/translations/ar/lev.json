@@ -706,7 +706,9 @@
     "chatClarify": "دردشة / توضيح",
     "negotiateRefine": "تفاوض / تدقيق",
     "roundWord": "الجولة",
-    "onTheTablePrefix": "النسخة المطروحة"
+    "onTheTablePrefix": "النسخة المطروحة",
+    "eventIntro": "اقتُرح نشر صفحة فعالية باسم الريكما. اقرأها قبل الموافقة:",
+    "eventPreview": "قراءة صفحة الفعالية"
   },
   "endOfLine": "وصلت إلى النهاية",
   "missionInProgress2": {
@@ -928,7 +930,8 @@
       "saleClaimSub": "من يحتفظ بالمال",
       "generic": "قرار بانتظار توقيعك",
       "address": "عنوان جديد للريكما",
-      "look": "مظهر جديد للصفحة العامة"
+      "look": "مظهر جديد للصفحة العامة",
+      "event": "نشر فعالية للريكما"
     },
     "sub": {
       "stipendFrom": "بتمويل {{name}}",

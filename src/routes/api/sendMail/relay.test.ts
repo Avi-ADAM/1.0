@@ -159,7 +159,10 @@ const REVIEWED_PUBLIC_MAILERS: Record<string, string> = {
   'src/routes/api/report/+server.ts':
     'public bug report; a signed-in reporter is answered at their account address (locals.uid), ' +
     'a guest gets the fixed template with none of their text, once per address per day ' +
-    '($lib/server/reportConfirmation.ts, report/server.test.ts)'
+    '($lib/server/reportConfirmation.ts, report/server.test.ts)',
+  'src/routes/api/cron/events/+server.ts':
+    'cron, fails closed on CRON_SECRET (checkCron required); fixed templates to registrants of rikma events, ' +
+    'each mail claimed on its row before sending ($lib/server/events/cron.ts, cron.test.ts)'
 };
 
 const ROOT = join(__dirname, '../../../..');

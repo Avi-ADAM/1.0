@@ -545,6 +545,10 @@ export type ActionKey =
   | 'markPlanItemCreated'
   // Leads (PLAN_LEADS)
   | 'createLead'
+  // Rikma events (PLAN_EVENTS_WEBINARS) — the member's side; the registrant's
+  // actions are serviceAdmin-only and never called from the browser.
+  | 'saveEvent'
+  | 'proposeEvent'
   | 'logLeadActivity'
   | 'updateLeadStatus'
   | 'updateLeadPlan'

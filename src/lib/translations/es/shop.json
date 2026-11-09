@@ -996,7 +996,8 @@
       "bot": "Bot",
       "demo": "Demo",
       "import": "Importación",
-      "concierge": "Concierge"
+      "concierge": "Concierge",
+      "event": "Evento"
     },
     "attention": {
       "unanswered": "Espera respuesta",
@@ -1067,7 +1068,8 @@
       "mergedFrom": "Una consulta duplicada se unió aquí",
       "contactsExported": "Teléfono y correo exportados a un archivo",
       "siteMessage": "Mensaje en 1lev1",
-      "offsiteDeal": "Se empezó el trabajo para esa persona"
+      "offsiteDeal": "Se empezó el trabajo para esa persona",
+      "event": "Evento"
     },
     "plan": {
       "title": "Qué sigue",

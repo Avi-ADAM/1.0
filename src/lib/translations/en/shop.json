@@ -996,7 +996,8 @@
       "bot": "Bot",
       "demo": "Demo",
       "import": "Import",
-      "concierge": "Concierge"
+      "concierge": "Concierge",
+      "event": "Event"
     },
     "attention": {
       "unanswered": "Waiting for an answer",
@@ -1067,7 +1068,8 @@
       "mergedFrom": "A duplicate enquiry was merged here",
       "contactsExported": "Phone and email exported to a file",
       "siteMessage": "Message on 1lev1",
-      "offsiteDeal": "Work started for them"
+      "offsiteDeal": "Work started for them",
+      "event": "Event"
     },
     "plan": {
       "title": "What's next",

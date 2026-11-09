@@ -996,7 +996,8 @@
       "bot": "بوت",
       "demo": "عرض تجريبي",
       "import": "استيراد",
-      "concierge": "كونسيرج"
+      "concierge": "كونسيرج",
+      "event": "فعالية"
     },
     "attention": {
       "unanswered": "ينتظر ردًا",
@@ -1067,7 +1068,8 @@
       "mergedFrom": "دُمج هنا استفسار مكرر",
       "contactsExported": "صُدّر الهاتف والبريد إلى ملف",
       "siteMessage": "رسالة عبر 1lev1",
-      "offsiteDeal": "بدأ العمل من أجلهم"
+      "offsiteDeal": "بدأ العمل من أجلهم",
+      "event": "فعالية"
     },
     "plan": {
       "title": "ما التالي",

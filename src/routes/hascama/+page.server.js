@@ -5,6 +5,7 @@ import {
   setConciergeIntent
 } from '$lib/concierge/regIntent.js';
 import { safeRedirectTarget } from '$lib/auth/redirectTarget.js';
+import { EVENT_SIGNUP_COOKIE } from '$lib/server/events/signupCookie.js';
 
 /**
  * Capture an email-bound guest invitation token off the register link.
@@ -66,6 +67,21 @@ export async function load({ url, cookies, fetch }) {
       secure: import.meta.env.PROD,
       sameSite: 'lax',
       maxAge: 60 * 60 // 1 hour — long enough to finish signup
+    });
+  }
+
+  // Registering from a rikma event (PLAN_EVENTS_WEBINARS W4): the event's
+  // "next step" link carries the registrant's token. The signup action links
+  // the new account back to that registration and its lead. Shape-checked
+  // only; the token itself is verified when it is used.
+  const eventToken = url.searchParams.get('event');
+  if (eventToken && /^[A-Za-z0-9_-]{20,100}$/.test(eventToken)) {
+    cookies.set(EVENT_SIGNUP_COOKIE, eventToken, {
+      path: '/',
+      httpOnly: true,
+      secure: url.protocol === 'https:',
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 24 // a day — a workshop signup may be finished that evening
     });
   }
 

@@ -706,7 +706,9 @@
     "chatClarify": "צ׳אט / בירור",
     "negotiateRefine": "משא-ומתן / דיוק",
     "roundWord": "סבב",
-    "onTheTablePrefix": "הגרסה שעל השולחן"
+    "onTheTablePrefix": "הגרסה שעל השולחן",
+    "eventIntro": "הוצע לפרסם דף אירוע בשם הרקמה. כדאי לקרוא אותו לפני שמאשרים:",
+    "eventPreview": "לקריאת דף האירוע"
   },
   "endOfLine": "התעדכנת בהכל",
   "missionInProgress2": {
@@ -928,7 +930,8 @@
       "saleClaimSub": "מי מחזיק את הכסף",
       "generic": "החלטה שממתינה לחתימתך",
       "address": "כתובת חדשה לרקמה",
-      "look": "מראה חדש לדף הציבורי"
+      "look": "מראה חדש לדף הציבורי",
+      "event": "פרסום אירוע של הרקמה"
     },
     "sub": {
       "stipendFrom": "במימון {{name}}",

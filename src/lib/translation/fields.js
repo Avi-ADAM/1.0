@@ -75,6 +75,39 @@ export const TRANSLATABLE = {
         }
     },
 
+    // A rikma event's landing page (PLAN_EVENTS_WEBINARS W4). The page shows
+    // `description` paragraph by paragraph and `outcomes` / `audience` line by
+    // line, and the cache collapses whitespace when it hashes — so each
+    // paragraph and each line is its own string (`eventPageGroups`). `form`,
+    // `consentText` and `afterUrl` are not here: a form label and the consent a
+    // person signs are the member's exact words, and a URL has no language.
+    rikmaEvent: {
+        entity: 'RikmaEvent',
+        fields: {
+            title: { mode: 'translate', max: 160 },
+            tagline: { mode: 'translate', max: 240 },
+            description: { mode: 'translate', max: 1200, note: 'one paragraph per string' },
+            outcomes: { mode: 'translate', max: 400, note: 'one line per string' },
+            audience: { mode: 'translate', max: 400, note: 'one line per string' }
+        }
+    },
+
+    eventAgendaItem: {
+        entity: 'ComponentEventsAgendaItem',
+        fields: {
+            title: { mode: 'translate', max: 200 },
+            desc: { mode: 'translate', max: 600 }
+        }
+    },
+
+    eventFaqItem: {
+        entity: 'ComponentEventsFaqItem',
+        fields: {
+            q: { mode: 'translate', max: 300 },
+            a: { mode: 'translate', max: 1200 }
+        }
+    },
+
     matanot: {
         entity: 'Matanot',
         fields: {

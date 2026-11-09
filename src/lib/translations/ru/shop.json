@@ -996,7 +996,8 @@
       "bot": "Бот",
       "demo": "Демо",
       "import": "Импорт",
-      "concierge": "Консьерж"
+      "concierge": "Консьерж",
+      "event": "Событие"
     },
     "attention": {
       "unanswered": "Ждёт ответа",
@@ -1067,7 +1068,8 @@
       "mergedFrom": "Сюда объединён дубликат обращения",
       "contactsExported": "Телефон и почта выгружены в файл",
       "siteMessage": "Сообщение в 1lev1",
-      "offsiteDeal": "Начата работа для них"
+      "offsiteDeal": "Начата работа для них",
+      "event": "Событие"
     },
     "plan": {
       "title": "Что дальше",

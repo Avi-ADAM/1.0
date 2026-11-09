@@ -14,6 +14,7 @@ import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { effectiveLicense, isDelayedLicense } from '$lib/codeLicense/codeLicense.js';
 import { readIdentity, type Run } from '$lib/server/rikmaIdentity/identity.js';
 import { displayAddress, rikmaPath } from '$lib/rikmaAddress/rikmaUrl.js';
+import { eventPath } from '$lib/events/model';
 import { parseLook } from '$lib/rikmaLook/look.js';
 
 const RESTIME_LABELS: Record<string, { he: string; en: string }> = {
@@ -36,6 +37,7 @@ const KIND_LABELS: Record<string, { he: string; en: string }> = {
   codeLicense: { he: 'שינוי רישיון הקוד', en: 'Code license change' },
   address:   { he: 'כתובת חדשה לרקמה', en: 'A new address for the rikma' },
   look:      { he: 'מראה חדש לדף הציבורי', en: 'A new look for the public page' },
+  event:     { he: 'פרסום אירוע של הרקמה', en: 'Publishing a rikma event' },
 };
 
 const LICENSE_LABELS: Record<string, { he: string; en: string }> = {
@@ -111,6 +113,31 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
     };
   }
 
+
+  // PLAN_EVENTS_WEBINARS — what is about to go public, and a way to look at it
+  // (the event page renders a draft or proposal for the rikma's members only).
+  if (kind === 'event') {
+    const evRes = await strapi
+      .execute('eventDecision', { id: String(decisionId) }, undefined, context.fetch)
+      .catch(() => null);
+    const d = evRes?.data?.decision?.data?.attributes;
+    const ev = d?.rikma_event?.data;
+    const onRikma = (d?.projects?.data ?? []).some((p: any) => String(p.id) === String(projectId));
+    if (onRikma && ev?.id) {
+      const read: Run = (qid, vars) => strapi.execute(qid, vars, undefined, context.fetch);
+      const current = await readIdentity(read, String(projectId));
+      return {
+        data: {
+          kind: 'event',
+          fieldLabel: KIND_LABELS.event,
+          currentValue: '',
+          newValue: String(ev.attributes?.title ?? ''),
+          previewHref: eventPath({ id: String(projectId), slug: current?.slug }, String(ev.attributes?.slug ?? '')),
+        },
+        updateStrategy: { type: 'none' },
+      };
+    }
+  }
 
   let currentValue = '';
   let newValue = '';

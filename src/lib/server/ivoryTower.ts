@@ -8,7 +8,7 @@
  * never `[]` — an outage must not tell members their rikma has no space.
  */
 
-export const IVORY_TOWER_DEFAULT_URL = 'https://ivory-tower-two.vercel.app';
+export const IVORY_TOWER_DEFAULT_URL = 'https://ivory-tower.1lev1.com';
 
 export interface TowerSpace {
 	slug: string;

@@ -399,7 +399,9 @@ const FIELD_DECISIONS = new Set([
   'codeLicense',
   // PLAN_RIKMA_SUBDOMAINS
   'address',
-  'look'
+  'look',
+  // PLAN_EVENTS_WEBINARS
+  'event'
 ]);
 
 /**

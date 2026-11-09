@@ -49,6 +49,7 @@ const READ_ONLY = new Set([
   // Write nothing: they exist for the notification they send.
   'githubIssueClosed',
   'githubWorkClaimable',
+  'notifyEventRegistrations',
   'loadCatalog',
   'previewArchiveMembership',
 ]);
