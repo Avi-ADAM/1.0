@@ -5,8 +5,8 @@
  * the row: every open deal before money.
  *
  * Tabs follow what the rikma has, not a mode it chose: a rikma that sells a
- * service sees sales · products · connect; the moment it adds a product that
- * ships, shipping appears. (A service rikma: in progress · sales · products · connect.) Nothing to remember to switch on — and the tab a
+ * service sees sales · products · connect; the moment it adds a product,
+ * shipping appears. (A service rikma: in progress · sales · products · connect.) Nothing to remember to switch on — and the tab a
  * member is on never disappears from under them.
  */
 
@@ -49,7 +49,9 @@ export function visibleTabs(facts: ManageFacts | null, active?: string | null): 
     pipeline: true,
     orders: has || facts.orders > 0,
     stock: has,
-    shipping: facts.ships || facts.shippingSet,
+    // Same reason: shipping is set up from its own tab, and no product form
+    // writes `deliveryOptions` — waiting for `ships` hid the only way in.
+    shipping: has || facts.shippingSet,
     // Fulfilment steps are set up from their own tab, so it shows with the
     // first product — waiting for a step to exist would hide the way to add one.
     fulfillment: has,

@@ -8,9 +8,8 @@ describe('visibleTabs', () => {
     expect(visibleTabs(facts())).toEqual(['pipeline', 'products', 'sales', 'customers', 'connect']);
   });
 
-  it('a product opens orders, stock, fulfilment and promotions — shipping only when something ships', () => {
-    expect(visibleTabs(facts({ products: 2 }))).toEqual(['pipeline', 'orders', 'stock', 'fulfillment', 'promotions', 'products', 'sales', 'customers', 'connect']);
-    expect(visibleTabs(facts({ products: 2, ships: true }))).toContain('shipping');
+  it('a product opens orders, stock, shipping, fulfilment and promotions', () => {
+    expect(visibleTabs(facts({ products: 2 }))).toEqual(['pipeline', 'orders', 'stock', 'shipping', 'fulfillment', 'promotions', 'products', 'sales', 'customers', 'connect']);
     expect(visibleTabs(facts({ shippingSet: true }))).toContain('shipping');
   });
 
